@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>TRN-ACA-DRL-04 — Setup + First Article + IR/FAI Drill | HESEM Academy</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+ .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
+ .tight li{margin:4px 0;}
+ 
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>DRILL-SETUP-FIRSTARTICLE-IR — Setup + First Article + IR/FAI Drill | HESEM Academy</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>DRILL-SETUP-FIRSTARTICLE-IR</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="cover">
+<div class="kicker">Drill Pack</div>
+<h1 class="h1">DRL-04 — Setup + First Article + IR/FAI Drill</h1>
+<p class="lead">
+ Drill này biến “biết setup” thành <b>setup có kiểm soát</b>: an toàn, đúng REV, đo CTQ đúng, ghi IR/FAI đúng và ra quyết định release đúng.
+ </p>
+</div>
+<div class="grid-2">
+<div class="card">
+<span class="badge">Mục tiêu</span>
+<ul class="tight">
+<li>Không chạy hàng loạt khi chưa release first piece.</li>
+<li>IR/FAI đầy đủ, đúng đơn vị, đúng phương pháp đo.</li>
+<li>Evidence nằm đúng SSOT và đúng naming.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Năng lực kích hoạt</span>
+<ul class="tight"><li><a href="../../01-Competency-System/02-Levels/index.html#C01"><b>C01</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C14"><b>C14</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C16"><b>C16</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C17"><b>C17</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C03"><b>C03</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C02"><b>C02</b></a></li></ul>
+</div>
+</div>
+<div class="card">
+<span class="badge">Chuẩn bị</span>
+<ul class="tight">
+<li>01 job có setup sheet + inspection plan.</li>
+<li>01 bộ gage trong hạn hiệu chuẩn (cal label rõ).</li>
+<li>Form IR/FAI và HOLD tag.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Trình tự thực hiện</span>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Owner</th><th>MRR</th><th style="width:90px;">Gate</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Pre-start safety: PPE, guard, LO/TO (KHI setup), 5S khu vực máy.</td><td>Setup/Operator</td><td>Pre-start checklist + ảnh 5S</td><td>STOP</td></tr><tr><td>2</td><td>Xác nhận program/setup sheet đúng REV và đúng job.</td><td>Setup</td><td>Link baseline + program release note</td><td>STOP</td></tr><tr><td>3</td><td>Kiểm tra dụng cụ đo: mã gage + hạn hiệu chuẩn + tình trạng.</td><td>QC</td><td>Gage check log + ảnh tem cal</td><td>HOLD</td></tr><tr><td>4</td><td>Setup máy theo setup sheet: tool, offset, fixture, zero.</td><td>Setup</td><td>Setup checklist + ảnh fixture</td><td>HOLD</td></tr><tr><td>5</td><td>Chạy first piece: đo CTQ theo inspection plan và ghi IR/FAI.</td><td>QC + Setup</td><td>IR/FAI ký + ảnh first piece</td><td>HOLD</td></tr><tr><td>6</td><td>Quyết định release: PASS hoặc HOLD + escal theo ladder.</td><td>Supervisor + QA</td><td>Release note hoặc HOLD tag + log escal</td><td>FAIL</td></tr><tr><td>7</td><td>Lưu toàn bộ evidence vào 20_Production/ và 30_QC/ theo naming rule.</td><td>Setup/QC</td><td>Links SSOT đúng tên</td><td>FAIL</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card danger">
+<span class="badge">Fail-fast</span>
+<ul class="tight">
+<li>Gage quá hạn hiệu chuẩn.</li>
+<li>Sai REV của setup sheet/program.</li>
+<li>Không lập IR/FAI hoặc thiếu chữ ký.</li>
+<li>Không HOLD khi lệch CTQ.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Rubric chấm điểm (10 điểm)</span>
+<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. PASS khi tổng ≥ 8/10 và không vi phạm fail-fast.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
+<tbody>
+<tr><td><b>Safety discipline</b></td><td>PPE/guard/LOTO/5S đạt; không bypass interlock.</td><td>0/1/2</td></tr><tr><td><b>Revision control</b></td><td>Setup sheet/program đúng REV; không dùng bản cũ.</td><td>0/1/2</td></tr><tr><td><b>Measurement integrity</b></td><td>Gage trong hạn; phương pháp đo đúng; đơn vị đúng.</td><td>0/1/2</td></tr><tr><td><b>Record accuracy</b></td><td>IR/FAI điền đủ trường; chữ ký đủ; kết luận logic.</td><td>0/1/2</td></tr><tr><td><b>Reaction plan</b></td><td>HOLD/escal đúng khi lệch CTQ; không chạy tiếp.</td><td>0/1/2</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<span class="badge">MRR tối thiểu</span>
+<ul class="tight">
+<li>Pre-start checklist + ảnh 5S.</li>
+<li>Setup checklist + ảnh fixture/tool.</li>
+<li>Gage check log + ảnh tem cal.</li>
+<li>IR/FAI ký + link SSOT đúng thư mục.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

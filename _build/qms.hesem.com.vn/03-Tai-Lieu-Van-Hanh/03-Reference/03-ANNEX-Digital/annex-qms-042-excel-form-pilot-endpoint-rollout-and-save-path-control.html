@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ANNEX-QMS-042 — Excel Form Pilot Endpoint Rollout & Save Path Control | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
+<style>
+@media print{.card,.table-card,.note,.box{page-break-inside:avoid;break-inside:avoid}h1,h2,h3{page-break-after:avoid;break-after:avoid}}
+.cardx{padding:14px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+.kpi .cardx b{font-size:18px}
+.smalltable td,.smalltable th{font-size:13px}
+.codeblock{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;white-space:pre-wrap;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:12px}
+</style>
+</head>
+<body><div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left"><a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a><div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div></div>
+<div class="title"><strong>ANNEX-QMS-042 — Excel Form Pilot Endpoint Rollout & Save Path Control</strong><span class="sub-vn">Chuẩn rollout pilot users, default app, trusted boundary và nơi lưu record</span></div>
+<div class="meta"><div class="row"><span><b>Owner:</b></span><span>IT / QA-QMS / Functional Owners</span></div><div class="row"><span><b>Baseline:</b></span><span>V0 / download_only_desktop_excel</span></div><div class="row"><span><b>Ngày cập nhật:</b></span><span>2026-03-21</span></div><div class="row"><span><b>Scope:</b></span><span>Pilot endpoints / save path / user behavior / production acceptance</span></div></div>
+</div>
+<div class="doc-content" id="docContent">
+
+<div class="note-blue"><b>Mục tiêu:</b> Khóa rollout pilot endpoints theo nguyên tắc <b>đúng app mở file, đúng nơi lưu record, đúng boundary trusted-location/publisher</b> và tách rõ file tải về tạm thời với record/evidence đã ban hành.</div>
+<div class="kpi">
+<div class="cardx"><div class="muted2">Default app</div><b>Desktop Excel</b></div>
+<div class="cardx"><div class="muted2">Save-path rule</div><b>Department-approved</b></div>
+<div class="cardx"><div class="muted2">Pilot set</div><b>IT + key users</b></div>
+<div class="cardx"><div class="muted2">Trust model</div><b>IT-managed only</b></div>
+</div>
+<div class="table-card"><table class="table smalltable"><thead><tr><th>Nhóm kiểm</th><th>Rule</th><th>Owner</th></tr></thead><tbody>
+<tr><td>Default app</td><td>`.xlsx` phải mở mặc định bằng desktop Microsoft Excel, không dùng browser preview làm lối chính.</td><td>IT</td></tr>
+<tr><td>Download vs record path</td><td>Users được hướng dẫn rõ Downloads chỉ là nơi nhận file; record/evidence phải lưu theo folder/process rule của bộ phận.</td><td>IT + Functional owner</td></tr>
+<tr><td>Trusted location</td><td>Chỉ thiết lập khi IT quyết định; không cho người dùng tự thêm uncontrolled folders.</td><td>IT</td></tr>
+<tr><td>Trusted publisher</td><td>Chỉ dùng nếu có macro project đã được phê duyệt và ký số; baseline V0 không có macro.</td><td>IT + QA/QMS</td></tr>
+<tr><td>Pilot confirmation</td><td>Người dùng trọng yếu phải click thử workbook đại diện, mở bằng Excel và lưu đúng nơi.</td><td>Functional owner + QA/QMS</td></tr>
+</tbody></table></div>
+<div class="card"><h3 class="h3">Pilot acceptance tối thiểu</h3>
+<ol class="tight">
+<li>5 workbook đại diện được tải thành công từ portal và từ internal docs.</li>
+<li>`.xlsx` mở bằng desktop Excel trên pilot endpoint.</li>
+<li>Người dùng phân biệt được tải file và lưu record chính thức.</li>
+<li>Không có uncontrolled sync folder hoặc email/chat attachment bị dùng như SoR.</li>
+<li>Nếu có trusted location/publisher thì danh sách phải do IT xuất và được review.</li>
+</ol></div>
+<div class="note-soft"><b>Liên kết vận hành:</b> <a href="annex-qms-038-excel-form-desktop-excel-endpoint-baseline-and-macro-trust-rollout.html">ANNEX-QMS-038</a> • <a href="annex-qms-039-excel-form-production-acceptance-and-uat-matrix.html">ANNEX-QMS-039</a> • <a href="../../../04-Bieu-Mau/10-FRM-CONTROL/pilot-endpoint-rollout-pack.html">Pilot Endpoint Rollout Pack</a> • <a href="../../../04-Bieu-Mau/10-FRM-CONTROL/desktop-excel-endpoint-baseline.html">Desktop Excel Endpoint Baseline</a>.</div>
+
+</div>
+</div></div></div></body></html>

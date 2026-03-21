@@ -1,0 +1,604 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>C11-L3 — Sales/RFQ & Contract Review — Lead | HESEM OS</title>
+<link href="../../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+</head>
+<body>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>C11-L3 — Sales/RFQ & Contract Review — Lead</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>C11-L3</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent"><h1>C11 – Kinh doanh/RFQ &amp; Rà soát hợp đồng – chốt yêu cầu đúng ngay từ đầu – Level 3</h1><p class="lead"><strong>Mô tả năng lực:</strong> Chuẩn hóa năng lực xử lý RFQ/PO theo dữ liệu: làm rõ yêu cầu, DFM, rủi ro, cam kết lead time; bàn giao kỹ thuật/sản xuất đúng chuẩn để tránh lỗi từ khâu đầu.</p><div class="hero">
+<h2>Mục tiêu đào tạo &amp; phạm vi Level 3</h2>
+<div class="small-note"><span class="badge">ISO 8.2.1</span> <span class="badge">ISO 8.2.2</span> <span class="badge">ISO 8.2.3</span> <span class="badge">ISO 8.3</span> <span class="badge">ISO 8.5.6</span> <span class="badge">ISO 7.5</span> <span class="badge">ISO 6.1</span> <span class="badge">ISO 9.1</span></div>
+<div class="meta">
+<div><strong>Đối tượng áp dụng:</strong><br/>Kinh doanh/BD + Kỹ thuật + QA (chủ trì: Estimating Function Manager) (và các vị trí liên quan theo phân công).</div>
+<div><strong>Đầu ra bắt buộc:</strong><br/>Evidence + metric theo K–S–E–M; đạt KPI gating để được công nhận Level.</div>
+<div><strong>Nguyên tắc ISO tích hợp:</strong><br/>Mọi bước quan trọng <em>PHẢI</em> có hồ sơ; thay đổi <em>PHẢI</em> được kiểm soát; dữ liệu tuân ALCOA+.</div>
+<div><strong>Thời lượng chuẩn:</strong><br/>L1: 4–6h • L2: 8–12h • L3: 12–20h • L4: 20–40h (theo dự án/OJT).</div>
+</div>
+</div><div class="card">
+<span class="badge">Drill Pack (Job CNC)</span>
+<p class="lead" style="margin-top:10px;">
+ Chạy drill trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html"><b>DRL-11</b> — Customer Requirement → CTQ Translation Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Shipping Packet + CoC Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Job Order E2E Drill (RFQ → Ship Packet)</a></li>
+</ul>
+<p class="small muted" style="margin-top:8px;">
+ Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ </p>
+</div><h2>1. Chuẩn đầu ra Level 3 theo K–S–E–M</h2><table class="table">
+<thead><tr><th>Knowledge (K)</th><th>Skill (S)</th><th>Evidence (E)</th><th>Metric (M)</th></tr></thead>
+<tbody>
+<tr>
+<td>Nắm vững phương pháp quản trị rủi ro cho contract review (risk register/FMEA rút gọn) và biết chuyển yêu cầu khách hàng thành Control Plan/Inspection Plan. Hiểu cơ chế kiểm soát thay đổi (ECR/ECO) và tác động tới giá – tiến độ – chất lượng.</td>
+<td>Dẫn dắt contract review cho đơn hàng phức tạp (multi-part, tight tolerance, special process, export packaging): tổ chức họp liên phòng, chốt CTQ + measurement method, đặt 'gating' cho xưởng, và theo dõi phản hồi khách hàng/điều chỉnh quote theo dữ liệu thực tế.</td>
+<td>(1) Biên bản họp contract review (cross-functional) cho ≥ 2 dự án; (2) Risk register có đánh giá S-O-D + action owner; (3) 01 gói FAI/FAIR plan đưa ra; (4) Báo cáo lessons learned cập nhật vào WI/Checklist.</td>
+<td>0 lỗi khách do sai yêu cầu/đọc sai note trong chu kỳ 6 tháng; tỷ lệ thay đổi sau PO (ECO) được xử lý đúng quy trình ≥ 100%; tỷ lệ dự án có risk register trước kick-off ≥ 95%.</td>
+</tr>
+</tbody>
+</table><h2>2. Yêu cầu chuẩn ISO tích hợp (PHẢI/PHẢI/ĐƯỢC PHÉP) + mapping clause</h2><p class="small">Các yêu cầu dưới đây viết theo ngôn ngữ ISO để dùng trực tiếp trong SOP/WI/FRM và làm căn cứ đánh giá. Mỗi yêu cầu gắn clause (điều khoản) để truy vết.</p><div class="req">
+<span class="tag shall">PHẢI</span>
+<div class="text">
+<div><strong>Tổ chức PHẢI duy trì quy trình xác định yêu cầu khách hàng trước khi cam kết (contract review), bao gồm yêu cầu kỹ thuật, chất lượng, giao hàng và pháp lý/thương mại.</strong> <span class="iso">ISO 8.2.2</span></div>
+<p>Bằng chứng tối thiểu: RFQ log + checklist hoàn chỉnh + bản quote/PO review có phê duyệt theo thẩm quyền.</p>
+</div>
+</div><div class="req">
+<span class="tag shall">PHẢI</span>
+<div class="text">
+<div><strong>Nhân sự thực hiện contract review PHẢI sử dụng bản vẽ/mô hình đúng phiên bản (revision) và trạng thái kiểm soát; mọi bản không kiểm soát PHẢI bị loại bỏ khỏi luồng xử lý.</strong> <span class="iso">ISO 7.5.3</span></div>
+<p>Áp dụng quản lý file: tên file có Rev, ngày nhận, nguồn; folder quyền truy cập; tuyệt đối không 'copy-paste' từ job cũ khi không xác minh revision.</p>
+</div>
+</div><div class="req">
+<span class="tag shall">PHẢI</span>
+<div class="text">
+<div><strong>Khi phát hiện yêu cầu mơ hồ hoặc vượt khả năng (capability), nhóm PHẢI phát hành yêu cầu làm rõ (RFI/clarification) và PHẢI không phát hành cam kết giá/lead time trước khi chốt dữ liệu tối thiểu.</strong> <span class="iso">ISO 8.2.3</span></div>
+<p>Quy định rõ 'stop-the-line' ở giai đoạn thương mại: báo Estimating Function Manager/Kỹ thuật/QA trước khi trả lời khách.</p>
+</div>
+</div><div class="req">
+<span class="tag shall">PHẢI</span>
+<div class="text">
+<div><strong>Mọi thay đổi yêu cầu sau khi chấp nhận đơn (PO/contract) PHẢI được kiểm soát và truyền đạt đến các bộ phận liên quan trước khi thực hiện.</strong> <span class="iso">ISO 8.5.6</span></div>
+<p>Tối thiểu: thông báo thay đổi + đánh giá tác động (cost/leadtime/quality) + cập nhật traveler/program/inspection plan.</p>
+</div>
+</div><div class="req">
+<span class="tag shall">PHẢI</span>
+<div class="text">
+<div><strong>Nhóm PHẢI áp dụng tư duy rủi ro để xếp hạng RFQ và quyết định mức độ review (quick screen vs full review) theo CTQ/khách hàng/lịch giao.</strong> <span class="iso">ISO 6.1</span></div>
+<p>Yêu cầu: ma trận rủi ro 3x3 (Impact x Likelihood) hoặc FMEA rút gọn (S–O–D).</p>
+</div>
+</div><div class="req">
+<span class="tag shall">PHẢI</span>
+<div class="text">
+<div><strong>Nhóm PHẢI theo dõi KPI của quá trình contract review (thời gian phản hồi, tỷ lệ thiếu dữ liệu, lỗi yêu cầu bị 'escape') và có reaction plan khi lệch mục tiêu.</strong> <span class="iso">ISO 9.1</span></div>
+<p>KPI phải có định nghĩa: công thức, nguồn dữ liệu, kỳ đo, owner và hành động khi vượt ngưỡng.</p>
+</div>
+</div><div class="req">
+<span class="tag may">ĐƯỢC PHÉP</span>
+<div class="text">
+<div><strong>Tổ chức ĐƯỢC PHÉP áp dụng chuẩn hóa biểu mẫu/CRM/ERP để tự động hóa RFQ log, kiểm soát phiên bản và phê duyệt điện tử.</strong> <span class="iso">ISO 7.1.3</span></div>
+<p>Khi số hóa, phải đảm bảo phân quyền, backup, đánh giá trail; tránh tạo 'hệ thống rác' nhiều phiên bản.</p>
+</div>
+</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L3: dẫn dắt review liên phòng + quản trị rủi ro + đảm bảo không 'escape' yêu cầu sang xưởng.</strong></div><h3>3.1. Vì sao C11 là “cổng chất lượng” của xưởng CNC job-order?</h3><p>Trong mô hình <em>high-mix / low-to-mid volume</em>, sai lệch xuất phát từ khâu đầu (RFQ/PO) khó sửa ở cuối vì đã “đóng băng” trên: đường chạy dao, đồ gá, vật tư, lịch máy và thậm chí cả chứng từ xuất khẩu. Thực tế đánh giá ISO cho thấy nhiều <em>nonconformity</em> không nằm ở máy móc mà nằm ở “hệ thống thông tin”: dùng sai revision, hiểu sai note, không kiểm soát thay đổi, không lưu hồ sơ contract review.</p><p><strong>Nguyên lý:</strong> lỗi “nhận sai yêu cầu” có chi phí cao nhất (COPQ cao) vì tạo ra lãng phí kép: <em>sai ngay lần đầu</em> + <em>điều chỉnh muộn</em>. Do đó, C11 phải được vận hành như một quy trình có dữ liệu, có gating, có phản ứng.</p><h3>3.2. Thuật ngữ cốt lõi (dùng thống nhất trong HESEM)</h3><ul>
+<li><strong>RFQ (Request for Quotation):</strong> yêu cầu báo giá – chưa tạo cam kết. RFQ thiếu dữ liệu; nhiệm vụ của HESEM là “đóng gói yêu cầu” bằng clarification.</li>
+<li><strong>RFI/Clarification:</strong> câu hỏi làm rõ; phải có <em>documented evidence</em> (email/biên bản) và phải “đóng” trước khi quote khi là CTQ.</li>
+<li><strong>Quote:</strong> báo giá – chứa assumptions/exclusions. Quote phải có version và người duyệt (approval).</li>
+<li><strong>PO/Contract:</strong> đơn hàng/ hợp đồng. Khi PO đã phát hành, thay đổi phải theo ECO/Change control.</li>
+<li><strong>CTQ (Critical-to-Quality):</strong> đặc tính ảnh hưởng chức năng/lắp ráp/an toàn/độ kín/hiệu suất. CTQ không chỉ là “dung sai chặt” mà còn là: nhám, sạch, không bavia, chứng từ, đóng gói.</li>
+</ul><h3>3.3. Mô hình “3 lớp yêu cầu” trong contract review</h3><div class="cols-2">
+<div class="figure">
+<strong>Lớp 1 – Kỹ thuật (Technical)</strong>
+<ul>
+<li>Bản vẽ/3D đúng revision; hệ đơn vị; tiêu chuẩn (ASME/ISO); GD&amp;T; notes đặc biệt.</li>
+<li>Vật liệu: grade, condition (T6, annealed…), heat/lot traceability.</li>
+<li>Quy trình đặc biệt: anodize, passivation, heat treat, clean room, marking.</li>
+</ul>
+<div class="cap">Sai lớp 1 dẫn đến NG kích thước/finish hoặc không thể gia công.</div>
+</div>
+<div class="figure">
+<strong>Lớp 2 – Chất lượng &amp; chứng từ (Quality/Docs)</strong>
+<ul>
+<li>Mức kiểm tra: in-process, final; yêu cầu CMM report, FAI/FAIR, CoC, MTR.</li>
+<li>Yêu cầu truy xuất: serial/lot, traveler, tem trạng thái.</li>
+<li>Yêu cầu đóng gói: sạch, chống va đập, hút ẩm, kitting.</li>
+</ul>
+<div class="cap">Sai lớp 2 tạo “đánh giá finding” và claim do thiếu chứng từ/traceability.</div>
+</div>
+</div><div class="figure">
+<strong>Lớp 3 – Thương mại (Commercial)</strong>
+<ul>
+<li>Incoterms, điều kiện thanh toán, điều kiện giao hàng, phí tooling/NRE, MOQ.</li>
+<li>Lead time: định nghĩa rõ (từ ngày nào? nhận vật liệu? nhận PO? chốt clarification?)</li>
+<li>Điều kiện thay đổi: khi khách đổi revision/qty/finish → quy tắc update giá &amp; lịch.</li>
+</ul>
+<div class="cap">Sai lớp 3 dẫn đến tranh chấp, trễ tiến độ, hoặc “margin leakage”.</div>
+</div><h3>3.4. Checklist completeness: “Không đủ dữ liệu – không cam kết”</h3><p>HESEM sử dụng checklist như một <strong>cơ chế chống sai</strong> (poka-yoke quản trị). Checklist không để “ký cho xong”; checklist phải dẫn tới hành động: thiếu dữ liệu nào → hỏi ai → hạn trả lời → lưu ở đâu.</p><details>
+<summary>RFQ Completeness Checklist (rút gọn)</summary>
+<ol>
+<li>Drawing/3D: file, revision, date, standard, unit.</li>
+<li>CTQ: dung sai chặt, surface finish, sealing surfaces, hole patterns, datums.</li>
+<li>Material: grade, condition, traceability need (MTR/heat).</li>
+<li>Process: heat treat/coating/marking/cleaning; approved supplier list?</li>
+<li>Quality docs: CoC, MTR, inspection report, FAI.</li>
+<li>Packaging/Label: WIP label, bagging, desiccant, shock indicator, shipping label content.</li>
+<li>Quantity &amp; schedule: proto/production, due date, forecast.</li>
+<li>Commercial: Incoterms, payment, currency, special terms.</li>
+</ol>
+</details><h3>3.5. DFM cho CNC – đặt câu hỏi đúng, tránh “tự làm liều”</h3><p>DFM không phải “cãi bản vẽ”. DFM là cung cấp thông tin kỹ thuật giúp khách <em>đạt cùng chức năng</em> với rủi ro thấp hơn. Một DFM tốt luôn có 3 phần: <strong>(1) vấn đề</strong> → <strong>(2) hậu quả</strong> → <strong>(3) đưa ra thay thế</strong> (kèm dữ liệu).</p><ul>
+<li><strong>Tool access &amp; fixturing:</strong> có bề mặt kẹp không? cần soft-jaw? có bị biến dạng khi kẹp không?</li>
+<li><strong>Tolerance vs capability:</strong> dung sai ±0.005mm cho mặt dài 300mm cần kế hoạch nhiệt/đo; khi khách không cần, đưa ra nới dung sai.</li>
+<li><strong>Burr/edge:</strong> note “break all edges” phải chuyển thành tiêu chuẩn (0.2–0.5) và plan kiểm soát.</li>
+<li><strong>Special process risk:</strong> anodize có đổi kích thước? heat treat có cong vênh? cần allowance?</li>
+</ul><div class="codeblock"><span class="c">Ví dụ câu hỏi DFM chuẩn (email):</span><br/>
+ 1) “Feature A: slot width 3.00 ±0.01, depth 25.0. Với tool L/D lớn, nguy cơ chatter và sai kích thước. HESEM đưa ra: tăng radius đáy lên R1.0 hoặc nới tol ±0.02 khi chức năng cho phép.”<br/>
+ 2) “Hole pattern true position 0.05 @ MMC. Đề nghị xác nhận datum scheme A|B|C và phương pháp kiểm (CMM/functional gage). Khi cần gage, HESEM báo thêm NRE.”</div><h3>3.6. Risk-based thinking: biến “cảm giác” thành dữ liệu quyết định</h3><p>Ở HESEM, mỗi RFQ/PO được gán mức rủi ro để quyết định mức review và người duyệt. Khung gán rủi ro tối thiểu:</p><ul>
+<li><strong>Impact:</strong> CTQ? khách hàng đánh giá? hậu quả khi sai (scrap/claim/safety)?</li>
+<li><strong>Likelihood:</strong> công nghệ mới? vật liệu khó? dung sai chặt? vendor chưa quen?</li>
+<li><strong>Detectability:</strong> có đo được không? có kiểm 100% không? có dấu hiệu sớm không?</li>
+</ul><p>Điểm rủi ro cao → bắt buộc họp liên phòng + QA sign-off + kế hoạch kiểm soát tăng.</p><h3>3.7. Handoff pack: bàn giao “sạch” để xưởng chạy không cần đoán</h3><p>Handoff pack là “bộ hồ sơ nội bộ” đi cùng job. Thiếu handoff pack, xưởng sẽ tự phỏng đoán và rủi ro tăng. Handoff pack tối thiểu gồm:</p><ol>
+<li>Drawing/3D controlled (Rev), spec, notes; danh sách CTQ highlight.</li>
+<li>Clarification log đã đóng (ai hỏi – ai trả lời – ngày – file/email).</li>
+<li>Yêu cầu chứng từ: MTR, CoC, CMM report, FAI; mẫu khách hàng khi có.</li>
+<li>Packaging/Label instruction: WIP label, shipping label, kitting list.</li>
+<li>Assumptions/exclusions của quote: cái gì đã/ chưa bao gồm.</li>
+</ol><div class="callout"><strong>Anti-escape rule:</strong> bất kỳ yêu cầu nào chưa rõ mà có nguy cơ tạo NG/claim thì phải “đóng clarification” trước khi release job.</div><h3>3.8. Từ CTQ sang Control Plan/Inspection Plan (cách làm của HESEM)</h3><p>Level 3 phải làm được “dịch” yêu cầu khách hàng thành kế hoạch kiểm soát. Mỗi CTQ cần có:</p><ul>
+<li><strong>Method:</strong> đo bằng gì (CMM, mic, bore gage, height gage, functional gage)?</li>
+<li><strong>Frequency:</strong> 100% / 1st piece / theo sampling (n=5 mỗi 20 pcs)?</li>
+<li><strong>Reaction plan:</strong> vượt ngưỡng thì làm gì (stop, segregate, NCR, adjust offset, inform QA)?</li>
+</ul><p>Điểm quan trọng: khi CTQ không đo được với hệ đo hiện có, phải quyết định: (1) mua gage, (2) thuê ngoài CMM, hoặc (3) thương lượng thay đổi yêu cầu.</p><h3>3.9. Change control sau PO: “đừng để xưởng biết tin cuối cùng”</h3><p>Thay đổi sau PO đến từ: revision mới, thay đổi quantity, thay đổi finish, thay đổi due date. Quy tắc vận hành:</p><ol>
+<li>Tiếp nhận thay đổi → tạo Change Notice (mã số) và lưu evidence.</li>
+<li>Đánh giá tác động: cost/lead time/quality ( cần re-program/re-fixture).</li>
+<li>Phê duyệt theo thẩm quyền (approval matrix) → cập nhật tất cả tài liệu: traveler, program, inspection plan, packaging.</li>
+<li>Truyền đạt: họp nhanh 10 phút + cập nhật board trạng thái để không bỏ sót.</li>
+</ol><div class="callout"><strong>Lưu ý chuyên gia:</strong> Nhiều claim quốc tế xuất phát từ “thiếu chứng từ/traceability” chứ không phải sai kích thước. Rà soát hợp đồng phải chốt docs &amp; packaging như CTQ.</div><h2>4. Quy trình thao tác chuẩn (flow dọc, dễ đọc)</h2><p class="small">Lưu đồ được thiết kế theo hướng dọc để đọc rõ khi in A4. chỉnh trực tiếp bằng HTML/CSS.</p><div class="vflow">
+<div class="vstep">
+<div class="vnum">1</div>
+<div class="vtext">
+<strong>Tiếp nhận RFQ &amp; lập mã RFQ</strong>
+<p>Nhận email/portal; tạo mã RFQ (RFQ-YYYY-XXX); lưu file vào thư mục controlled; ghi nguồn, ngày, người nhận.</p>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">2</div>
+<div class="vtext">
+<strong>Quick screen (5 phút)</strong>
+<p>Kiểm tra đủ file, revision, deadline, vật liệu, qty. Khi thiếu dữ liệu trọng yếu → phát hành RFI ngay.</p>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">3</div>
+<div class="vtext">
+<strong>RFQ log &amp; phân loại rủi ro</strong>
+<p>Điền RFQ log; đánh giá rủi ro (Impact x Likelihood x Detectability). Rủi ro cao → bắt buộc full review + họp liên phòng.</p>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">4</div>
+<div class="vtext">
+<strong>Technical review &amp; CTQ identification</strong>
+<p>Đọc bản vẽ/notes; đánh dấu CTQ; xác định công nghệ cần (3/4/5 axis, turning, EDM…).</p>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">5</div>
+<div class="vtext">
+<strong>DFM &amp; clarification</strong>
+<p>Tạo danh sách câu hỏi làm rõ; đưa ra DFM khi có; lưu evidence email/biên bản; không tự giả định CTQ.</p>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">6</div>
+<div class="vtext">
+<strong>Estimating input handoff</strong>
+<p>Gửi RFQ summary + file controlled + assumptions sơ bộ cho Estimating/Kỹ thuật; thống nhất BOM công đoạn khi có.</p>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">7</div>
+<div class="vtext">
+<strong>Quote build &amp; internal approval</strong>
+<p>Tạo báo giá theo mẫu; kiểm tra điều kiện thương mại; xin phê duyệt theo thẩm quyền (giá/margin/rủi ro).</p>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">8</div>
+<div class="vtext">
+<strong>Gửi quote &amp; theo dõi</strong>
+<p>Gửi quote kèm assumptions; cập nhật CRM; theo dõi phản hồi; quản lý phiên bản quote (Q1/Q2…).</p>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">9</div>
+<div class="vtext">
+<strong>PO/Rà soát hợp đồng (Order acceptance)</strong>
+<p>Khi nhận PO: so sánh PO vs quote; xác nhận rev, qty, lead time, docs, packaging; phát hành Order Acceptance record.</p>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">10</div>
+<div class="vtext">
+<strong>Kick-off &amp; release job pack</strong>
+<p>Họp kick-off ngắn (Kinh doanh–Eng–QA–Ops); release job pack controlled cho Kế hoạch/Sản xuất; thiết lập gating CTQ.</p>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">11</div>
+<div class="vtext">
+<strong>Change control (khi phát sinh)</strong>
+<p>Mọi thay đổi sau PO đi qua Change Notice; đánh giá tác động; cập nhật tài liệu; truyền đạt đến xưởng.</p>
+</div>
+</div>
+</div><h2>5. KPI/Metric áp dụng theo Level (có công thức + nguồn dữ liệu)</h2><p class="small">Bảng dưới dùng để “định lượng” năng lực. Target là quy định: khi áp dụng thực tế, HESEM hiệu chỉnh theo baseline và chiến lược năm. <strong>Gating</strong> là điều kiện bắt buộc (vi phạm → không công nhận Level/bonus dù điểm bài kiểm tra cao).</p><table class="table">
+<thead>
+<tr>
+<th>Metric/KPI</th>
+<th>Công thức đo</th>
+<th>Nguồn dữ liệu</th>
+<th>Tần suất</th>
+<th>Target L1</th>
+<th>Target L2</th>
+<th>Target L3</th>
+<th>Target L4</th>
+<th>Gating/Quy tắc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RFQ Log Timeliness</strong></td>
+<td class="mono">% RFQ được log trong ≤ 30 phút kể từ khi nhận</td>
+<td>RFQ log/CRM timestamp</td>
+<td>Tuần</td>
+<td>&gt;=95%</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td>100%</td>
+<td>Không log → coi như không kiểm soát</td>
+</tr>
+<tr>
+<td><strong>RFQ Completeness after Round-1 Clarification</strong></td>
+<td class="mono">RFQ đủ dữ liệu sau vòng 1 ÷ tổng RFQ</td>
+<td>Checklist + clarification log</td>
+<td>Tháng</td>
+<td>&gt;=80%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td>Thiếu CTQ mà vẫn quote → treo</td>
+</tr>
+<tr>
+<td><strong>Quote Turnaround Time (median)</strong></td>
+<td class="mono">Median(ngày gửi quote – ngày nhận RFQ đủ dữ liệu)</td>
+<td>CRM/Email log</td>
+<td>Tháng</td>
+<td>≤48h</td>
+<td>≤24h</td>
+<td>≤24h (complex)</td>
+<td>≤12h (triage)</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Quote Revision Error Rate</strong></td>
+<td class="mono">Số lần dùng sai revision ÷ tổng RFQ/PO</td>
+<td>NCR + RFQ đánh giá</td>
+<td>Tháng</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>Sai revision gây NG/claim → loại</td>
+</tr>
+<tr>
+<td><strong>Requirement Escape Rate</strong></td>
+<td class="mono"># lỗi do thiếu/hiểu sai yêu cầu phát hiện sau khi release job</td>
+<td>NCR/8D log</td>
+<td>Tháng</td>
+<td>&lt;=2</td>
+<td>&lt;=1</td>
+<td>0</td>
+<td>0</td>
+<td>Escape CTQ → loại</td>
+</tr>
+<tr>
+<td><strong>Clarification Cycle Count</strong></td>
+<td class="mono">Số vòng email/clarification đến khi chốt yêu cầu</td>
+<td>Email thread count</td>
+<td>Tháng</td>
+<td>&lt;=3</td>
+<td>&lt;=2</td>
+<td>&lt;=2</td>
+<td>&lt;=2</td>
+<td>Không lưu evidence clarification → treo</td>
+</tr>
+<tr>
+<td><strong>Order Acceptance Compliance</strong></td>
+<td class="mono">% PO có biên bản contract review/acceptance record</td>
+<td>Order acceptance form</td>
+<td>Tháng</td>
+<td>&gt;=95%</td>
+<td>&gt;=98%</td>
+<td>&gt;=100%</td>
+<td>&gt;=100%</td>
+<td>Không có acceptance record → treo</td>
+</tr>
+<tr>
+<td><strong>Customer Complaint – Miscommunication</strong></td>
+<td class="mono">Count (claim do hiểu sai yêu cầu/thiếu chứng từ)</td>
+<td>Customer claim log</td>
+<td>Quý</td>
+<td>0–1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>Claim do thiếu chứng từ/traceability → loại</td>
+</tr>
+</tbody></table><div class="kpi-gate">
+<strong>Gating bắt buộc để công nhận Level 3:</strong>
+<ul><li>Sai revision (bản vẽ/model/quote/PO) dẫn tới sản xuất sai hoặc claim.</li><li>Quote/nhận PO khi thiếu CTQ hoặc thiếu yêu cầu chứng từ/đóng gói mà không có clarification record.</li><li>Không có Order Acceptance record (PO review) hoặc phê duyệt vượt thẩm quyền.</li></ul>
+<p class="small">Gating ưu tiên: an toàn → chất lượng → tuân thủ hồ sơ → đạo đức dữ liệu. Vi phạm gating có nguy cơ dẫn tới không công nhận Level/bonus.</p>
+</div><h2>6. Bài tập theo Level (Case study HESEM)</h2><p class="small">Mỗi case được thiết kế theo “học thuật ứng dụng”: có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (evidence) để chấm. chuẩn làm theo nhóm và review chéo để tăng chất lượng tư duy.</p><div class="card">
+<h3>Case 1: Dự án multi-part + tight tolerance + FAI – tổ chức họp contract review</h3>
+<p class="small">Khách gửi RFQ 12 part thuộc một cụm, có 3 CTQ yêu cầu position 0.02 và profile 0.05. Yêu cầu FAI full balloon + CMM report.</p>
+<div class="cols-2">
+<div>
+<strong>Dữ liệu (Input):</strong>
+<ul><li>12 part, qty proto 2 bộ</li><li>CTQ: true position 0.02, profile 0.05, sealing surface Ra 0.8</li><li>Finish: passivation + laser mark serial</li></ul>
+</div>
+<div>
+<strong>Nhiệm vụ theo Level 3:</strong>
+<ol><li>Chuẩn bị agenda họp review liên phòng (Kinh doanh–Eng–QA–Ops–Purchasing).</li><li>Lập risk register (S-O-D) cho 8 rủi ro chính; gán owner và action.</li><li>Đưa ra Inspection/FAI plan: thiết bị đo, tần suất, format report.</li><li>Chốt gating trước khi release: kiểm soát revision, sample inspection, packaging clean.</li></ol>
+</div>
+</div>
+<hr class="sep"/>
+<strong>Sản phẩm đầu ra (Evidence):</strong>
+<ul><li>Biên bản họp + danh sách quyết định</li><li>Risk register</li><li>FAI/Inspection plan </li></ul>
+<div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi risk register có hành động phòng ngừa cụ thể (poka-yoke), không chỉ ghi chung chung.
+ </div>
+</div><div class="card">
+<h3>Case 2: Thay đổi revision sau PO – đánh giá tác động và thương lượng lại</h3>
+<p class="small">Sau khi nhận PO và đã mua vật liệu, khách phát hành Rev C thay đổi pocket depth và thêm note về edge break.</p>
+<div class="cols-2">
+<div>
+<strong>Dữ liệu (Input):</strong>
+<ul><li>Rev B → Rev C</li><li>Material đã cắt phôi</li><li>Lead time cam kết còn 5 ngày</li></ul>
+</div>
+<div>
+<strong>Nhiệm vụ theo Level 3:</strong>
+<ol><li>Kích hoạt Change control: tạo Change Notice, thu thập evidence.</li><li>Phối hợp Eng/Ops đánh giá tác động: re-program? scrap phôi? tăng cycle time?</li><li>Soạn đưa ra cho khách: điều chỉnh giá/lead time hoặc chấp nhận rủi ro theo thỏa thuận.</li><li>Cập nhật toàn bộ tài liệu nội bộ khi khách đồng ý.</li></ol>
+</div>
+</div>
+<hr class="sep"/>
+<strong>Sản phẩm đầu ra (Evidence):</strong>
+<ul><li>Change Notice + impact assessment</li><li>Email/biên bản thương lượng</li><li>Tài liệu cập nhật (traveler/program/inspection)</li></ul>
+<div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi đánh giá tác động có số liệu (giờ máy, vật liệu, thuê ngoài) và nêu rõ 'decision log'.
+ </div>
+</div><div class="card">
+<h3>Case 3: Khách yêu cầu năng lực đo kiểm vượt hiện trạng – quyết định make/buy</h3>
+<p class="small">CTQ yêu cầu Cpk ≥ 1.33 cho 1 kích thước và yêu cầu MSA/Gage R&amp;R. HESEM hiện chưa có MSA cho gage đó.</p>
+<div class="cols-2">
+<div>
+<strong>Dữ liệu (Input):</strong>
+<ul><li>CTQ tolerance tight</li><li>Customer đánh giá ready</li><li>Need GRR study</li></ul>
+</div>
+<div>
+<strong>Nhiệm vụ theo Level 3:</strong>
+<ol><li>Đánh giá khả năng: hệ đo hiện có, độ phân giải, calibration.</li><li>Đưa ra 3 phương án: (a) thực hiện MSA nội bộ; (b) thuê ngoài lab; (c) thương lượng thay yêu cầu.</li><li>Chốt với QA Manager (QA-01) về plan và thời gian thực hiện trước khi nhận PO.</li></ol>
+</div>
+</div>
+<hr class="sep"/>
+<strong>Sản phẩm đầu ra (Evidence):</strong>
+<ul><li>Capability assessment</li><li>Plan MSA + timeline</li><li>Decision record</li></ul>
+<div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi biết liên kết: ISO 7.1.5 (resource đo lường) và 9.1 (monitoring) trong lý do quyết định.
+ </div>
+</div><h2>7. OJT theo TWI (Job Breakdown + checklist)</h2><p class="small">TWI (Training Within Industry) nhấn mạnh: <strong>chia nhỏ công việc</strong> → <strong>điểm then chốt</strong> → <strong>lý do</strong>. OJT của HESEM phải tạo được “thói quen đúng” và bằng chứng (record) để sẵn sàng đánh giá.</p><h3>7.1. Job Breakdown Sheet (mẫu)</h3><table class="table">
+<thead><tr><th>Bước</th><th>Điểm then chốt (Key Points)</th><th>Lý do (Reasons)</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>1) Nhận RFQ và lưu file controlled</strong></td>
+<td>Lưu đúng folder, đặt tên có Rev, đánh dấu nguồn (email/portal).</td>
+<td>Tránh dùng sai revision; tạo truy vết (đánh giá trail).</td>
+</tr>
+<tr>
+<td><strong>2) Điền RFQ log + checklist</strong></td>
+<td>Không bỏ trống trường bắt buộc; đánh dấu CTQ/thiếu dữ liệu.</td>
+<td>Checklist là poka-yoke; dữ liệu đầu vào quyết định đúng/sai của quote.</td>
+</tr>
+<tr>
+<td><strong>3) Phát hành RFI/clarification khi thiếu/ mơ hồ</strong></td>
+<td>Câu hỏi ngắn gọn, có cấu trúc, ưu tiên CTQ; lưu evidence.</td>
+<td>Tránh tự suy đoán; làm rõ sớm giảm COPQ.</td>
+</tr>
+<tr>
+<td><strong>4) Handoff nội bộ (estimating/eng/QA)</strong></td>
+<td>Gửi RFQ summary 1 trang; đính kèm file controlled; nêu assumptions.</td>
+<td>Đảm bảo mọi bộ phận dùng chung thông tin; giảm vòng hỏi lại.</td>
+</tr>
+<tr>
+<td><strong>5) Quote/PO review và lưu hồ sơ</strong></td>
+<td>So sánh PO vs quote; xin phê duyệt theo thẩm quyền; lưu record.</td>
+<td>Đáp ứng ISO 8.2; tránh nhận điều kiện bất lợi.</td>
+</tr>
+</tbody></table><h3>7.2. OJT Checklist (Level 3)</h3><p class="small">Tick ✓ khi hoàn thành; lưu checklist như documented information. Người hướng dẫn ký xác nhận.</p><table class="table">
+<thead><tr><th>#</th><th>Hạng mục</th><th>Tiêu chí đạt</th><th>Kết quả</th><th>Ghi chú</th></tr></thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Tổ chức họp contract review liên phòng</td>
+<td>Có agenda, participant, quyết định, action owner</td>
+<td>□ Đạt □ Chưa</td>
+<td>…</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Lập risk register (S-O-D)</td>
+<td>≥8 rủi ro chính; có action; có theo dõi</td>
+<td>□ Đạt □ Chưa</td>
+<td>…</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Chốt CTQ + measurement method + reaction plan</td>
+<td>Mỗi CTQ có method/frequency/reaction; QA sign-off</td>
+<td>□ Đạt □ Chưa</td>
+<td>…</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Quản lý change control sau PO</td>
+<td>Có change notice, impact assessment, update tài liệu</td>
+<td>□ Đạt □ Chưa</td>
+<td>…</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Cập nhật lessons learned vào WI/checklist</td>
+<td>Có tài liệu cập nhật; đào tạo lại; verify hiệu lực</td>
+<td>□ Đạt □ Chưa</td>
+<td>…</td>
+</tr>
+</tbody></table><h2>8. Kiểm tra đánh giá (Test blueprint + quiz mẫu)</h2><h3>8.1. Test blueprint</h3><p class="small">Blueprint đảm bảo đề thi đo đúng năng lực: không chỉ hỏi “biết gì” mà hỏi “làm được gì” và “ra quyết định thế nào” trong bối cảnh HESEM.</p><table class="table">
+<thead><tr><th>Miền năng lực</th><th>Tỷ trọng</th><th>Mức nhận thức</th><th>Dạng câu hỏi</th><th>Số câu áp dụng</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>Khái niệm &amp; thuật ngữ RFQ/Rà soát hợp đồng</strong></td>
+<td>20%</td>
+<td>Remember/Understand</td>
+<td>MCQ/Short</td>
+<td>6</td>
+</tr>
+<tr>
+<td><strong>Checklist &amp; kiểm soát revision/records</strong></td>
+<td>25%</td>
+<td>Apply</td>
+<td>Scenario</td>
+<td>6</td>
+</tr>
+<tr>
+<td><strong>DFM + risk-based thinking</strong></td>
+<td>30%</td>
+<td>Analyze/Evaluate</td>
+<td>Case</td>
+<td>6</td>
+</tr>
+<tr>
+<td><strong>Handoff/Change control/Communication</strong></td>
+<td>25%</td>
+<td>Apply/Evaluate</td>
+<td>Case + writing</td>
+<td>4</td>
+</tr>
+</tbody></table><h3>8.2. Quiz mẫu (Level 3)</h3><div class="quiz">
+<ol>
+<li>Thiết kế agenda họp contract review liên phòng cho dự án 12 part có FAI. Những câu hỏi nào bắt buộc phải chốt?</li>
+<li>Risk register khác gì checklist? Nêu cách chấm điểm S-O-D và cách dùng để quyết định gating.</li>
+<li>Từ CTQ 'true position 0.02 @ MMC', bạn chuyển thành kế hoạch đo như thế nào? (method/frequency/reaction)</li>
+<li>Tình huống: Rev thay đổi sau PO khi đã mua vật liệu. Hãy mô tả quy trình change control và cách đánh giá tác động.</li>
+<li>Nêu 5 loại yêu cầu chứng từ/traceability bị bỏ sót nhưng gây reject khi nhập kho khách.</li>
+<li>Giải thích vì sao một thay đổi nhỏ ở note 'edge break' có nguy cơ gây NG ở khách quốc tế.</li>
+<li>Tình huống: khách yêu cầu Cpk ≥ 1.33 và GRR. Bạn quyết định make/buy như thế nào? Evidence nào cần?</li>
+<li>Khi phát hiện yêu cầu 'không đo được' với thiết bị hiện tại, bạn có 3 lựa chọn nào? Ưu/nhược?</li>
+<li>Viết reaction plan khi phát hiện mismatch PO vs quote ở mục quan trọng (docs/packaging).</li>
+<li>Đưa ra 3 hành động hệ thống để giảm 'requirement escape' về 0 trong 6 tháng.</li>
+</ol>
+</div><h2>9. Rubric chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Rubric giúp chấm công bằng và chống “cảm tính”. chuẩn chấm bởi 2 người (line manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
+<thead><tr><th>Tiêu chí</th><th>0 – Không đạt</th><th>1 – Đạt tối thiểu</th><th>2 – Tốt</th><th>3 – Xuất sắc</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>Kiểm soát revision &amp; hồ sơ (7.5)</strong></td>
+<td>Dùng sai/không chứng minh revision; thiếu hồ sơ.</td>
+<td>Dùng đúng revision; hồ sơ cơ bản đầy đủ.</td>
+<td>Hồ sơ đầy đủ, có cấu trúc; truy xuất nhanh.</td>
+<td>Thiết kế/huấn luyện người khác; đánh giá pass 100%.</td>
+</tr>
+<tr>
+<td><strong>Checklist &amp; RFQ completeness</strong></td>
+<td>Thiếu nhiều trường; hỏi lan man.</td>
+<td>Đủ trường chính; biết hỏi phần thiếu.</td>
+<td>Ưu tiên CTQ, hỏi gọn; đóng clarification vòng 1 tốt.</td>
+<td>Tối ưu checklist, giảm vòng hỏi; anti-gaming.</td>
+</tr>
+<tr>
+<td><strong>DFM &amp; tư duy rủi ro</strong></td>
+<td>Không nhận diện rủi ro; không có DFM.</td>
+<td>Nhận diện rủi ro phổ biến; báo cáo đúng.</td>
+<td>DFM có cơ sở, đưa ra thay thế rõ; có risk score.</td>
+<td>Dẫn dắt FMEA/risk register; giảm escape có số liệu.</td>
+</tr>
+<tr>
+<td><strong>Handoff &amp; phối hợp liên phòng</strong></td>
+<td>Bàn giao thiếu; gây hỏi lại nhiều.</td>
+<td>Có handoff pack tối thiểu.</td>
+<td>Handoff rõ, có CTQ &amp; assumptions; giảm rework.</td>
+<td>Thiết kế hệ thống handoff chuẩn; training &amp; đánh giá.</td>
+</tr>
+<tr>
+<td><strong>Xử lý thay đổi &amp; thương mại</strong></td>
+<td>Chấp nhận thay đổi không kiểm soát.</td>
+<td>Biết escalations; lưu evidence.</td>
+<td>Change control đúng; đánh giá tác động.</td>
+<td>Thiết kế approval matrix; tối ưu win rate &amp; margin.</td>
+</tr>
+</tbody></table><div class="callout"><strong>Điều kiện công nhận Level 3:</strong> Tổng điểm rubric ≥ 80% + đạt gating + được Management Board/OPS xác nhận vai trò lead trong ≥ 1 dự án quan trọng.</div><h2>10. Checklist tự đánh giá trước khi đề nghị xét Level</h2><ul>
+<li>Tôi luôn kiểm tra và xác nhận revision trước khi sử dụng bất kỳ file nào.</li><li>Tôi giải thích rõ lead time được tính từ đâu và điều kiện thay đổi.</li><li>Tôi biết phân biệt CTQ kỹ thuật – CTQ chứng từ – CTQ đóng gói và có checklist tương ứng.</li><li>Mọi clarification tôi đều lưu evidence và truy xuất trong ≤ 2 phút.</li><li>Khi gặp yêu cầu vượt capability, tôi dừng và escalates đúng thay vì tự phỏng đoán.</li><li>Tôi hiểu và tuân thủ approval matrix (khi áp dụng) – không vượt thẩm quyền.</li></ul></div></div></div>
+</div>
+<script src="../../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+

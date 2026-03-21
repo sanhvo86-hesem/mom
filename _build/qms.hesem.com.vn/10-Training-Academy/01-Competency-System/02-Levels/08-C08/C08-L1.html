@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>C08-L1 — Data-Driven Thinking & System Usage (ERP/Excel) — Foundation | HESEM OS</title>
+<link href="../../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+</head>
+<body>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>C08-L1 — Data-Driven Thinking & System Usage (ERP/Excel) — Foundation</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>C08-L1</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<h1>C08 — Tư duy dữ liệu &amp; sử dụng hệ thống (ERP/Excel) — Level 1</h1>
+<p class="lead"><strong>Level 1 — Kỷ luật ghi chép &amp; hồ sơ tại điểm làm việc.</strong> Module này tạo năng lực vận hành QMS bằng dữ liệu: ghi đúng, lưu đúng, truy xuất nhanh, quyết định theo số liệu có nguồn.</p>
+<div class="hero">
+<h2>Chuẩn thực chiến – Level 1</h2>
+<div class="meta">
+<div><strong>Vai trò mục tiêu</strong><br/>Tất cả nhân sự tạo hoặc chạm hồ sơ: Operator, Setup, QC, QA, WHS, PUR, PLA, ENG, Estimator (SAL-03), Finance/HR, Maintenance, EHS, Supervisor</div>
+<div><strong>Đầu ra bắt buộc</strong><ul><li>Ghi nhận dữ liệu ngay khi phát sinh (timestamp rõ) và dùng đúng biểu mẫu/đúng vị trí lưu (SSOT).</li><li>Kiểm tra JobNum/PartNo/REV trước khi ghi và trước khi phát hành hồ sơ.</li><li>Tạo 01 bộ evidence tối thiểu cho 01 Job mẫu theo đúng quy tắc đặt tên.</li></ul></div>
+<div><strong>Gate trọng yếu</strong><br/><span class="badge bad">Sai REV / sai Job / mất SSOT</span> = HOLD ngay</div>
+<div><strong>Thời lượng</strong><br/>Lý thuyết 45 phút • OJT 90 phút</div>
+</div>
+<p class="small-note">Chuẩn vận hành: dữ liệu dùng cho quyết định phải truy vết được nguồn (SoR), nằm trong SSOT, có timestamp, có người chịu trách nhiệm.</p>
+</div><div class="card">
+<span class="badge">Drill Pack (Job CNC)</span>
+<p class="lead" style="margin-top:10px;">
+ Chạy drill trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html"><b>DRL-02</b> — Revision &amp; SSOT Drill (Audit 60 giây)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-daily-management-tier.html"><b>DRL-08</b> — Daily Management (Tier Meeting) Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Job Order E2E Drill (RFQ → Ship Packet)</a></li>
+</ul>
+<p class="small muted" style="margin-top:8px;">
+ Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ </p>
+</div>
+<h2>2) Mục đích module &amp; bối cảnh vận hành</h2>
+<div class="card">
+<ul>
+<li>Chặn rủi ro sai REV, lẫn Job, thiếu chứng từ, mất truy vết bằng kỷ luật dữ liệu và SSOT.</li>
+<li>Biến “học xong” thành “làm được”: có checklist, OJT, performance test, MRR rõ.</li>
+<li>Đảm bảo audit-ready theo ISO 9001:2015 (revision-ready): hồ sơ truy xuất trong 60 giây, có kiểm soát thay đổi và phân quyền.</li>
+</ul>
+</div>
+<h2>3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + điểm chặn</h2>
+<p>Xuyên suốt toàn chuỗi Quote/Contract → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Feedback/CI. C08 kích hoạt tại mọi điểm ghi dữ liệu, phát hành hồ sơ, cập nhật trạng thái, phê duyệt số.</p>
+<div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Nguồn dữ liệu chuẩn (SoR)</strong><p>ERP/biểu mẫu gốc là nguồn; không dùng file rời làm nguồn quyết định.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>SSOT Job Dossier</strong><p>Mọi evidence của Job nằm trong Job-Dossiers theo cấu trúc bắt buộc.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Kiểm soát REV</strong><p>Luôn đối chiếu Part-REV-Master trước khi ghi và trước khi phát hành.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Ghi nhận &amp; phê duyệt</strong><p>Hồ sơ cần ký phải có định danh người tạo/kiểm/phê duyệt.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Upload evidence đúng chuẩn</strong><p>Đặt tên file chuẩn; tránh ghi đè; truy xuất 60 giây.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Cập nhật hệ thống</strong><p>ERP status phản ánh thực tế để WIP/dispatch không lệch.</p></div></div></div>
+<h2>4) Failure Points (tối thiểu 10 điểm gãy)</h2>
+<ol><li>Dùng sai REV (lấy từ email cũ, bản in cũ, file tải về máy cá nhân).</li><li>Ghi sai JobNum/PartNo/Operation dẫn tới evidence không truy vết được.</li><li>Không có timestamp hoặc ghi sau khi sự việc xảy ra (mất tính contemporaneous).</li><li>Sửa trực tiếp file đã phát hành, không có Change Notice, không có audit trail.</li><li>Upload sai thư mục (Job khác, Part khác) gây lẫn lô và sai truy xuất.</li><li>Đặt tên file sai quy tắc (dấu cách, thiếu REV, thiếu ngày) làm thất bại truy xuất 60 giây.</li><li>Dùng bản chụp màn hình làm “bản gốc” khi hệ thống có record chuẩn.</li><li>Thiếu chữ ký/định danh người tạo, người kiểm, người phê duyệt trên hồ sơ cần phê duyệt.</li><li>Dùng bảng Excel tự tạo không khóa cột/không kiểm soát phiên bản dẫn tới số liệu lệch.</li><li>Chia sẻ file qua kênh không kiểm soát (chat cá nhân) làm rò rỉ và mất kiểm soát phát hành.</li><li>Không cập nhật trạng thái trên ERP làm WIP dashboard sai, ưu tiên sai.</li><li>Không kích hoạt HOLD khi thiếu chứng từ/ngoại lệ; tiếp tục chạy tạo rủi ro ship sai.</li></ol>
+<h2>5) Risk Controls (control points + owner + evidence)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Control point</th><th>Owner</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>SSOT bắt buộc: Job-Dossiers và Part-REV-Master</strong></td><td>Tất cả roles</td><td>Thư mục chuẩn + link file</td><td>Không dùng ổ cá nhân làm SSOT</td></tr><tr><td><strong>Quy tắc đặt tên evidence theo ANNEX-QMS-003</strong></td><td>Tất cả roles</td><td>Tên file chứa JobNum_PartNo_REV_DocType_YYYYMMDD_##</td><td>File sai tên xem như chưa nộp</td></tr><tr><td><strong>Kiểm soát REV trước khi ghi &amp; trước khi phát hành</strong></td><td>Owner hồ sơ</td><td>Ảnh/record REV hợp lệ</td><td>Sai REV = HOLD ngay</td></tr><tr><td><strong>Change Notice cho mọi thay đổi dữ liệu/hồ sơ đã phát hành</strong></td><td>QA/QMS</td><td>FRM-QMS-022 + log thay đổi</td><td>Không có log = không công nhận</td></tr><tr><td><strong>Phân quyền theo nhóm (group-based access)</strong></td><td>IT/QA</td><td>FRM-QMS-014/018 + access review</td><td>Không cấp quyền cá nhân rời</td></tr><tr><td><strong>Retention/Record declaration theo SOP-QMS-011/016</strong></td><td>QA/QMS + IT</td><td>Retention label hoặc record declaration</td><td>Xóa/sửa không đúng thẩm quyền = incident</td></tr><tr><td><strong>Đối soát “1 nguồn chuẩn” trước họp Tier/dispatch</strong></td><td>PLA/OPS</td><td>Snapshot report + timestamp</td><td>Không dùng số liệu không có timestamp</td></tr><tr><td><strong>Kiểm tra chéo 2 người cho hồ sơ quan trọng (Final, CoC, NCR)</strong></td><td>QC/QA</td><td>Chữ ký/định danh người kiểm</td><td>Thiếu kiểm = HOLD</td></tr></tbody></table></div>
+<h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Phát hiện sai REV hoặc không xác định được REV hợp lệ.</strong></td><td>Dừng thao tác; khóa WIP tại công đoạn; báo Supervisor + QA; tạo HOLD reason code.</td></tr><tr><td><span class="badge warn">HOLD</span></td><td><strong>Thiếu chứng từ bắt buộc (MTR/CoC, FAI, calib record) hoặc evidence chưa upload SSOT.</strong></td><td>Gắn thẻ HOLD; không chuyển công đoạn; cập nhật log; kích hoạt escal theo PROC-OPS-003.</td></tr><tr><td><span class="badge bad">BLOCK</span></td><td><strong>Chia sẻ ngoài công ty hoặc cấp quyền trái quy định; phát hiện sửa/xóa hồ sơ đã phát hành.</strong></td><td>Ngắt chia sẻ; báo IT + QA; mở incident; truy vết audit trail; khôi phục bản gốc.</td></tr></tbody></table></div>
+<h2>7) Phản ứng 60 giây</h2>
+<ol><li>Xác nhận loại ngoại lệ: sai REV / lẫn Job / thiếu chứng từ / dữ liệu không truy vết.</li><li>Kích hoạt HOLD ngay tại điểm phát hiện (tag + cập nhật ERP hoặc log tương ứng).</li><li>Chụp 01 bằng chứng tại thời điểm phát hiện: màn hình ERP có timestamp hoặc ảnh nhãn/phiếu kèm JobNum.</li><li>Báo theo ladder: Cell owner → Supervisor → QA/QMS (≤ 10 phút).</li><li>Mở record tối thiểu: 01 log ngoại lệ + 01 mục hành động có due trong ngày.</li></ol>
+<h2>8) Checklist vận hành (≤ 15 bước)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Owner</th><th>Evidence/MRR</th><th>Lỗi lặp lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Xác nhận nguồn dữ liệu chuẩn (SoR) cho thông tin đang dùng</strong></td><td>Người thực hiện</td><td>Ảnh chụp màn hình/ID bản ghi trong ERP hoặc form gốc</td><td>Dùng file rời làm nguồn chính</td></tr><tr><td>2</td><td><strong>Mở Job Dossier đúng JobNum trên SSOT</strong></td><td>Người thực hiện</td><td>Thư mục Job Dossier tồn tại, đúng cấu trúc</td><td>Tạo thư mục cá nhân thay vì SSOT</td></tr><tr><td>3</td><td><strong>Kiểm tra PartNo/REV theo Part/REV Master</strong></td><td>Người thực hiện</td><td>Ảnh/đường dẫn bản REV hợp lệ</td><td>Lấy REV từ email cũ</td></tr><tr><td>4</td><td><strong>Tải và dùng đúng template/biểu mẫu</strong></td><td>Người thực hiện</td><td>File theo template được dùng</td><td>Tự tạo form mới</td></tr><tr><td>5</td><td><strong>Ghi dữ liệu theo nguyên tắc ALCOA+ (định danh–đọc được–đúng thời điểm–bản gốc–chính xác…)</strong></td><td>Người thực hiện</td><td>Hồ sơ có người tạo + thời điểm + nội dung rõ</td><td>Ghi bổ sung sau ca mà thiếu thời điểm</td></tr><tr><td>6</td><td><strong>Không sửa trực tiếp hồ sơ đã phát hành; dùng Change Notice khi cần</strong></td><td>Người thực hiện/QA</td><td>FRM-QMS-022 Document/Data Change Notice</td><td>Sửa file và ghi đè không log</td></tr><tr><td>7</td><td><strong>Upload evidence đúng thư mục và đúng tên chuẩn</strong></td><td>Người thực hiện</td><td>File đặt tên theo quy tắc ANNEX-QMS-003</td><td>Dùng dấu cách/ký tự lạ</td></tr><tr><td>8</td><td><strong>Cập nhật trạng thái job/operation trên ERP theo thực tế</strong></td><td>Người thực hiện</td><td>Transaction timestamp trong ERP</td><td>Quên cập nhật làm sai WIP</td></tr><tr><td>9</td><td><strong>Khi phát hiện sai REV/mix-up/thiếu chứng từ: kích hoạt HOLD</strong></td><td>Người thực hiện</td><td>HOLD reason code + log</td><td>Tiếp tục làm để “kịp tiến độ”</td></tr><tr><td>10</td><td><strong>Bàn giao ca bằng 1 trang tóm tắt (WIP + rủi ro + hành động)</strong></td><td>Người thực hiện</td><td>Ghi nhận bàn giao/dispatch note</td><td>Bàn giao miệng không evidence</td></tr><tr><td>11</td><td><strong>Kiểm tra quyền truy cập; không share ngoài công ty khi chưa có phê duyệt</strong></td><td>Người thực hiện/IT</td><td>FRM-IT-001 + access group</td><td>Share link mở rộng</td></tr><tr><td>12</td><td><strong>Đóng OJT: trainer ký xác nhận đạt và lưu vào hồ sơ đào tạo</strong></td><td>Trainer</td><td>FRM-HR-TRN-003/008/009 theo hệ thống</td><td>Không lưu hồ sơ đào tạo</td></tr></tbody></table></div>
+<h2>9) OJT thực chiến theo TWI</h2>
+<h3>Job breakdown (Step / Key Points / Reasons)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Key Points</th><th>Reasons</th></tr></thead><tbody><tr><td>1</td><td>Mở đúng Job Dossier trên SSOT</td><td>Đúng JobNum; đúng cấu trúc thư mục</td><td>Ngăn lẫn job và mất truy vết</td></tr><tr><td>2</td><td>Xác nhận PartNo/REV hợp lệ</td><td>Đối chiếu Part-REV-Master; ghi REV vào hồ sơ</td><td>Ngăn sản xuất theo bản lỗi thời</td></tr><tr><td>3</td><td>Điền biểu mẫu theo template</td><td>Không tự đổi cột; ghi rõ người tạo + thời điểm</td><td>Đảm bảo dữ liệu đọc được và audit trail</td></tr><tr><td>4</td><td>Upload evidence đúng tên</td><td>Tên file đủ JobNum/PartNo/REV/DocType/Date/Seq</td><td>Truy xuất 60 giây</td></tr><tr><td>5</td><td>Cập nhật trạng thái ERP</td><td>Transaction đúng công đoạn; không để trễ cập nhật</td><td>WIP &amp; ưu tiên đúng</td></tr><tr><td>6</td><td>Kích hoạt HOLD khi có ngoại lệ</td><td>Tag + reason code + log</td><td>Chặn bypass gate</td></tr></tbody></table></div>
+<h3>OJT output bắt buộc</h3>
+<ul><li>01 Job Dossier mẫu chứa tối thiểu 05 evidence: Traveler/Setup/Inspection/Material cert (mẫu)/Dispatch note.</li><li>01 log ngoại lệ (HOLD) cho tình huống sai REV và 01 hành động đóng trong ngày.</li></ul>
+<h3>Rubric L1–L4 (hành vi quan sát được)</h3>
+<div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Ghi đúng – lưu đúng – truy xuất đúng</td><td>Không lỗi JobNum/REV; evidence đúng tên; truy xuất ≤ 60 giây</td></tr><tr><td><strong>L2</strong></td><td>Đối soát dữ liệu và tạo báo cáo đơn giản</td><td>Tạo 01 báo cáo tiến độ/WIP có timestamp; phát hiện ≥ 3 lỗi dữ liệu và sửa đúng quy trình</td></tr><tr><td><strong>L3</strong></td><td>Phân tích &amp; chuẩn hóa báo cáo</td><td>Pareto/trend; chuẩn hóa template; huấn luyện 01 người dùng đúng</td></tr><tr><td><strong>L4</strong></td><td>Quản trị dữ liệu liên phòng</td><td>Data dictionary + dashboard; access/retention governance; xử lý incident</td></tr></tbody></table></div>
+<h2>10) Đánh giá</h2>
+<h3>Quiz (≥ 20 câu)</h3>
+<div class="quiz"><ol><li>SoR và SSOT khác nhau ở điểm nào trong HESEM?</li><li>Nêu 05 thành phần tối thiểu bắt buộc trong tên file evidence theo ANNEX-QMS-003.</li><li>Khi phát hiện sai REV trước khi gia công, hành động đầu tiên phải làm là gì?</li><li>Vì sao “ghi ngay khi làm” là yêu cầu bắt buộc trong QMS?</li><li>Khi thay đổi dữ liệu của hồ sơ đã phát hành, phải dùng biểu mẫu nào?</li><li>Dấu cách trong tên file evidence bị cấm vì lý do gì?</li><li>Nêu 03 ví dụ DocType hợp lệ trong tên file evidence cho Job Dossier.</li><li>Khi nhận file từ email khách hàng, bước kiểm soát bắt buộc trước khi dùng là gì?</li><li>Audit trail là gì và nó bảo vệ điều gì?</li><li>Phân quyền theo nhóm (group-based access) giúp chặn rủi ro nào?</li><li>Nêu 02 tình huống bắt buộc kích hoạt HOLD liên quan dữ liệu/hồ sơ.</li><li>Khi upload evidence lên SSOT, yêu cầu về REV thể hiện ở đâu?</li><li>Nêu 02 lỗi tạo ra “evidence mồ côi” (orphan evidence).</li><li>Sự khác nhau giữa “bản gốc” và “bản sao” trong hồ sơ số là gì?</li><li>Khi phát hiện dữ liệu ERP lệch với thực tế, ai chịu trách nhiệm cập nhật?</li><li>Retention label dùng để kiểm soát điều gì?</li><li>Nêu 03 vị trí bắt buộc lưu hồ sơ theo ANNEX-QMS-003 (tên library).</li><li>Khi chia sẻ file ra ngoài công ty, điều kiện bắt buộc là gì?</li><li>Nêu 02 hậu quả trực tiếp khi đặt sai tên file evidence.</li><li>Khi thiếu timestamp hoặc không xác định được người tạo, kết luận audit là gì?</li><li>Nguyên tắc ALCOA+ trong môi trường xưởng CNC áp vào điểm nào?</li><li>No evidence = No gate có nghĩa là gì trong vận hành hàng ngày?</li></ol></div>
+<h3>Scenario (≥ 3 tình huống thật)</h3>
+<details>
+<summary>Sai REV giữa Job Traveler và bản vẽ</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>JobNum: J12345 • PartNo: PN7788</li><li>Traveler ghi REV A; Part-REV-Master đang là REV B</li><li>Đã chuẩn bị dao và gá xong</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Ra quyết định GO/HOLD/STOP và ghi MRR bắt buộc.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>STOP thao tác; kích hoạt HOLD với reason 'REV mismatch'.</li><li>Chụp evidence: ảnh Part-REV-Master và traveler.</li><li>Tạo FRM-QMS-022 Change Notice hoặc yêu cầu Engineering phát hành đúng bản; cập nhật Job Pack trước khi chạy.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Evidence upload sai thư mục</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Bạn phát hiện file FinalInspect của J12345 đang nằm trong thư mục J12346</li><li>File đã được QA ký</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Ra quyết định và hành động trong 60 giây.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>HOLD phát hành ship packet của cả 2 job liên quan.</li><li>Di chuyển file theo quy trình có log (không delete); ghi nhận người thực hiện + thời điểm.</li><li>Cập nhật checklist kiểm soát và thông báo QA để xác nhận lại tính toàn vẹn.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Chia sẻ file qua kênh không kiểm soát</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Operator gửi file setup qua chat cá nhân cho bạn để xin ý kiến</li><li>File có thông tin khách hàng</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Ra quyết định và MRR cần tạo.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>BLOCK chia sẻ; yêu cầu xóa bản sao khỏi chat; chuyển file lên SSOT.</li><li>Mở incident dữ liệu theo SOP-QMS-011/015.</li><li>Rà soát quyền truy cập và huấn luyện lại nguyên tắc SSOT.</li></ul></div>
+</div>
+</details>
+<h3>Performance test</h3>
+<div class="card">
+<h3>Bài test tay nghề — Tạo gói chứng cứ tối thiểu cho 01 Job</h3>
+<h4>Bài làm bắt buộc</h4>
+<ol><li>Tạo đúng cấu trúc thư mục Job Dossier cho JobNum được giao.</li><li>Upload 05 evidence theo DocType quy định, đúng tên file.</li><li>Điền 01 checklist/record có đầy đủ người tạo + thời điểm + REV.</li><li>Tạo 01 log HOLD cho tình huống giả lập sai REV và đóng hành động trong ngày.</li></ol>
+<h4>PASS/FAIL</h4>
+<ul><li>PASS khi: 0 lỗi tên file; 0 lỗi JobNum/REV; truy xuất 60 giây đạt; HOLD được log đúng.</li><li>FAIL khi: sai REV hoặc evidence không nằm SSOT; thiếu timestamp; sửa file không log; share ngoài công ty.</li></ul>
+</div>
+<h2>11) PASS/FAIL criteria</h2>
+<div class="kpi-gate">
+<strong>PASS/FAIL (No evidence = No gate)</strong>
+<ul>
+<li>PASS khi hoàn thành OJT output và performance test đạt, toàn bộ evidence nằm trong SSOT, đúng REV, đúng tên file.</li>
+<li>FAIL ngay khi sai REV, mix-up Job/Part, bypass HOLD, chỉnh sửa hồ sơ đã phát hành không có log, hoặc không truy xuất được evidence.</li>
+</ul>
+</div>
+<h2>12) MRR tối thiểu (hồ sơ bắt buộc + naming + nơi lưu)</h2>
+<p><strong>Quy tắc đặt tên:</strong> <span class="mono">JobNum_PartNo_REV_DocType_YYYYMMDD_##.ext (chỉ A–Z,0–9, '-', '_'; cấm dấu cách).</span></p>
+<ul><li>Job Dossier (M365 library: Job-Dossiers) cho JobNum.</li><li>Part/REV Master (M365 library: Part-REV-Master) — bản REV tham chiếu.</li><li>FRM-QMS-022 Document/Data Change Notice (khi có thay đổi).</li><li>FRM-QMS-014/018 Access Matrix (khi cấp quyền hoặc điều chỉnh quyền).</li><li>Log HOLD/ngoại lệ theo PROC-OPS-003 hoặc log nội bộ công đoạn.</li><li>Hồ sơ OJT &amp; đánh giá: FRM-HR-TRN-003/008/009 (theo hệ thống đào tạo).</li></ul>
+<div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → <span class="mono">Job-Dossiers</span> và <span class="mono">Part-REV-Master</span>.</div>
+<h2>13) Common audit findings &amp; prevention</h2>
+<ol><li>Evidence không truy xuất được trong 60 giây do sai tên file hoặc sai thư mục.</li><li>Hồ sơ thiếu REV hoặc dùng REV không hợp lệ.</li><li>Thiếu định danh người tạo/người kiểm/người phê duyệt trên hồ sơ yêu cầu phê duyệt.</li><li>Sửa/xóa file đã phát hành không có log; mất audit trail.</li><li>Dữ liệu ERP không khớp hiện trường do cập nhật trễ hoặc cập nhật sai công đoạn.</li><li>Share link mở rộng quyền vượt thẩm quyền; không có phê duyệt.</li><li>Thiếu retention/record declaration cho hồ sơ bắt buộc lưu.</li><li>Dùng file cá nhân làm nguồn số liệu cho họp điều hành; không có timestamp/snapshot.</li><li>Evidence bị trùng tên hoặc thiếu số thứ tự 01/02 làm ghi đè không kiểm soát.</li></ol>
+<h2>Tài liệu liên quan</h2>
+<ul>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-504-job-dossier-and-evidence-pack.html">ANNEX-QMS-003 — Evidence Pack (Job Dossier + Data Governance)</a></li>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Quản trị dữ liệu &amp; phân quyền truy cập</a></li>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Data Classification &amp; Storage</a></li>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//wi-504-job-dossier-and-evidence-pack.html">WI-OPS-008 — Quản trị Job Dossier &amp; gói chứng cứ</a></li>
+</ul>
+</div></div></div>
+</div>
+<script src="../../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+
+
+
+

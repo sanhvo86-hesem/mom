@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#f3f0ff" stroke="#d0bfff" stroke-width="2"/>
+  <rect x="22" y="32" width="32" height="22" rx="11" fill="#7048e8" opacity=".2" stroke="#7048e8" stroke-width="1.5"/>
+  <rect x="66" y="32" width="32" height="22" rx="11" fill="#7048e8" opacity=".2" stroke="#7048e8" stroke-width="1.5"/>
+  <rect x="44" y="66" width="32" height="22" rx="11" fill="#7048e8" opacity=".3" stroke="#7048e8" stroke-width="1.5"/>
+  <path d="M50 50l12 20M70 50l-12 20" stroke="#7048e8" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="38" cy="43" r="3" fill="#7048e8"/><circle cx="82" cy="43" r="3" fill="#7048e8"/><circle cx="60" cy="77" r="3" fill="#7048e8"/>
+  <text x="60" y="108" text-anchor="middle" font-size="7" font-weight="700" fill="#5f3dc4" font-family="system-ui">COMMUNICATE</text>
+</svg>

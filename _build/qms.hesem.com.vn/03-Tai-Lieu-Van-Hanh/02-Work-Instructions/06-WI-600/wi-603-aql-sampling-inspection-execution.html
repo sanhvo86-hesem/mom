@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WI-603 — Thực hiện lấy mẫu AQL, chọn mẫu và quyết định accept/reject lô | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
+
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Work Instruction</span>
+          </div>
+        </div>
+        <div class="title"><strong>WI-603 — Thực hiện lấy mẫu AQL, chọn mẫu và quyết định accept/reject lô</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>WI-603</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA Manager / QC Lead</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi quyết định accept/reject theo lô ở Incoming, IPQC hoặc Final theo kế hoạch AQL hiệu lực.</div>
+      <h1>WI-603 — Thực hiện lấy mẫu AQL, chọn mẫu và quyết định accept/reject lô</h1>
+      
+<div class="section"><h2>1. Mục đích, phạm vi và logic lô kiểm</h2>
+<p>WI này hướng dẫn lấy mẫu AQL và quyết định accept/reject lô theo inspection by attributes. AQL dùng để ra quyết định với <strong>lô</strong>, không dùng thay cho kiểm soát quá trình và không được dùng để hợp thức hóa lô có defect critical. Kế hoạch lấy mẫu chỉ được chọn từ bảng tra đã được HESEM kiểm soát; không chụp, chép hoặc tự dựng bảng rời ngoài hệ thống.</p>
+<div class="callout-danger"><strong>CẤM</strong> đổi plan giữa chừng để đạt pass; cấm lấy “mẫu đẹp”; cấm trộn lot khác part/rev/heat/process state vào cùng một lot kiểm.</div></div>
+
+<div class="section"><h2>2. Điều kiện trước khi lấy mẫu</h2>
+<div class="table-card"><table><thead><tr><th>Điều kiện</th><th>Phải có</th><th>HOLD khi</th></tr></thead><tbody>
+<tr><td>Định nghĩa lot</td><td>Cùng part/rev, cùng condition, cùng nguồn/ca/process state, cùng phạm vi submit cho quyết định.</td><td>Lot trộn part/rev, trộn rework/suspect với sản phẩm thường.</td></tr>
+<tr><td>Defect classification</td><td>Áp dụng từ <a href="wi-601-visual-inspection-and-defect-classification.html">WI-601</a>, QPL và customer requirement.</td><td>Chưa chốt critical/major/minor hoặc còn tranh cãi tiêu chí.</td></tr>
+<tr><td>Kế hoạch AQL</td><td>Mức kiểm, inspection level, switching status và Ac/Re từ <a href="../../03-Reference/02-ANNEX-Standards/annex-qa-001-aql-method-reference.html">ANNEX-QA-001</a>.</td><td>Không xác định được plan hiệu lực.</td></tr>
+<tr><td>Measurement system</td><td>Gage hợp lệ và đã quick verify theo <a href="wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a>.</td><td>Gage nghi ngờ/hết hạn/chưa verify.</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>3. Trình tự thực hiện AQL</h2>
+<div class="step-list">
+<div class="step-item"><strong>Chốt lot và đơn vị kiểm.</strong><br/>Ghi rõ lot size, inspection unit, QPL/customer level, trạng thái normal/tightened/reduced và nguồn plan sử dụng.</div>
+<div class="step-item"><strong>Tra cỡ mẫu và Ac/Re.</strong><br/>Tra theo lot size và inspection level trong bảng đã phê duyệt. Nếu lot nhỏ hoặc customer chỉ định 100% thì không dùng AQL để giảm mẫu.</div>
+<div class="step-item"><strong>Lấy mẫu ngẫu nhiên.</strong><br/>Mẫu phải rải đều qua toàn lô hoặc toàn kiện; không lấy liên tiếp trong một khay duy nhất nếu lot phân bố nhiều vị trí/thời điểm. Với lot có nhiều pallet/box/khay, phải có quy tắc random hóa từng tầng chứa.</div>
+<div class="step-item"><strong>Kiểm và ghi defect.</strong><br/>Kiểm theo plan, phân loại defect từng chiếc, từng loại. Không được cộng dồn mơ hồ. Defect critical tách riêng khỏi major/minor.</div>
+<div class="step-item"><strong>Quyết định accept/reject.</strong><br/>So defect count với Ac/Re; reject lô khi vượt Re hoặc khi xuất hiện bất kỳ critical defect thuộc rule zero acceptance. Nếu plan nhiều bước yêu cầu sample tiếp theo, phải tuân đúng logic.</div>
+<div class="step-item"><strong>Xử lý sau quyết định.</strong><br/>Accept thì release lô theo gate tương ứng. Reject thì giữ lô, mở containment/NCR nếu cần và xác định hướng 100% sort/rework/reinspect dưới quyền QA.</div>
+</div></div>
+
+<div class="section"><h2>4. Switching rules, reinspection và lỗi thường gặp</h2>
+<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Quy định HESEM</th></tr></thead><tbody>
+<tr><td>Normal → Tightened</td><td>Chuyển khi có reject liên tiếp, complaint, defect trend xấu hoặc QPL/customer yêu cầu tăng cường.</td></tr>
+<tr><td>Tightened → Reduced</td><td>Chỉ giảm khi có lịch sử ổn định đủ dài và không có open issue; không áp dụng cho Job mới, Job high-risk, clean/vacuum hoặc sau containment gần đây.</td></tr>
+<tr><td>Reinspection sau rework/sort</td><td>QA phải xác định lại lot boundary và plan mới; không mặc định dùng lại y nguyên sample cũ.</td></tr>
+<tr><td>Mixed defect types</td><td>Critical/major/minor phải đếm riêng theo plan áp dụng; không bù trừ giữa các mức.</td></tr>
+<tr><td>Sampling bias</td><td>Nếu phát hiện bias mẫu, kết quả kiểm vô hiệu; phải HOLD và lấy mẫu lại.</td></tr>
+</tbody></table></div>
+<div class="callout-info"><strong>Nhớ:</strong> AQL chỉ giúp ra quyết định đối với lô. Khi quá trình đang drift, công cụ đúng là <a href="wi-604-spc-chart-use-process-capability-and-reaction.html">WI-604</a> và phản ứng IPQC theo <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>, không phải tiếp tục “hy vọng sample đẹp”.</div></div>
+
+<div class="section"><h2>5. Record, KPI và liên kết</h2>
+<div class="two-col">
+<div class="card"><h3>Record tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Lot definition, lot size, source plan, switching status.</li><li>Sample size, cách random hóa, defect count theo class.</li><li>Ac/Re decision, người kiểm, thời điểm, lệnh hold/release nếu có.</li><li>Liên kết NCR/100% sort/reinspection khi reject.</li></ul></div>
+<div class="card"><h3>HOLD bắt buộc</h3><ul class="tight" style="padding-left:18px;"><li>Không xác định được lot boundary hoặc mixed lot.</li><li>Không xác định được plan hiệu lực.</li><li>Measurement system nghi ngờ hoặc defect class còn tranh cãi.</li><li>Phát hiện critical defect hoặc dấu hiệu sample bias.</li></ul></div>
+</div>
+<div class="kpi-grid">
+<div class="kpi-box"><strong>KPI-WI603-01</strong><br/>Tỷ lệ reject theo lot và theo defect class.</div>
+<div class="kpi-box"><strong>KPI-WI603-02</strong><br/>Số lần chuyển tightened/reduced sai quy tắc.</div>
+<div class="kpi-box"><strong>KPI-WI603-03</strong><br/>Tỷ lệ tái kiểm do lot definition/sample bias sai.</div>
+<div class="kpi-box"><strong>KPI-WI603-04</strong><br/>Tỷ lệ reject lot sau đó phát hiện nguyên nhân thuộc measurement system.</div>
+</div>
+<div class="table-card"><table><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-603-aql-sampling-inspection.html">SOP-603</a></td><td>Khung AQL và scope áp dụng.</td></tr>
+<tr><td><a href="../../03-Reference/02-ANNEX-Standards/annex-qa-001-aql-method-reference.html">ANNEX-QA-001</a></td><td>Quy tắc plan, mức kiểm và switching rule.</td></tr>
+<tr><td><a href="../../03-Reference/02-ANNEX-Standards/annex-qa-003-quality-package-levels-qpl.html">ANNEX-QA-003</a></td><td>QPL và bộ bằng chứng/gate tương ứng.</td></tr>
+<tr><td><a href="wi-601-visual-inspection-and-defect-classification.html">WI-601</a></td><td>Phân loại defect và evidence ảnh.</td></tr>
+<tr><td><a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Cô lập lô reject hoặc nghi ngờ.</td></tr>
+</tbody></table></div></div>
+
+    </div>
+  </div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

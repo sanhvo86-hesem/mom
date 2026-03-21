@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WI-714 — Đóng gói sạch, thao tác sạch, bảo quản và bảo toàn tình trạng sản phẩm | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list, .photo-grid { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+ thead { display: table-header-group; }
+}
+.page-body h1 {font-size:24px;line-height:1.35;margin:0 0 10px;}
+.page-body h2 {font-size:18px;line-height:1.4;margin:18px 0 10px;color:var(--navy);}
+.page-body h3 {font-size:14px;line-height:1.5;margin:12px 0 6px;color:var(--ink);}
+.page-body h4 {font-size:13px;line-height:1.5;margin:10px 0 6px;color:var(--ink);}
+.table-card table {width:100%;border-collapse:collapse;font-size:12px;}
+.table-card th,.table-card td {border:1px solid var(--ln);padding:8px 10px;vertical-align:top;}
+.table-card th {background:var(--th-bg);border-color:var(--th-bdr);text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px;color:var(--ink2);}
+.kpi-grid,.matrix,.two-col,.three-col,.photo-grid {display:grid;gap:12px;margin:10px 0;}
+.kpi-grid,.two-col,.matrix {grid-template-columns:1fr 1fr;}
+.three-col,.photo-grid {grid-template-columns:1fr 1fr 1fr;}
+.kpi-box,.card,.lane,.figure-box,.step-item {border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:#fff;}
+.kpi-box {border-left:4px solid var(--blue);}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.keyline {margin:10px 0;padding:10px 12px;border:1px dashed var(--th-bdr);border-radius:var(--r);background:#fcfcfd;}
+.code,.path {font-family:var(--mono);font-size:12px;background:#f1f3f5;padding:1px 6px;border-radius:4px;}
+.path{display:inline-block;word-break:break-all;}
+ul.tight li {margin:4px 0;}
+.callout-danger,.callout-warning,.callout-info,.callout-success {padding:10px 12px;border-radius:10px;margin:10px 0;border:1px solid var(--ln);}
+.callout-danger{background:#fff5f5;border-color:#ffc9c9;}
+.callout-warning{background:#fff9db;border-color:#ffe066;}
+.callout-info{background:#e7f5ff;border-color:#a5d8ff;}
+.callout-success{background:#ebfbee;border-color:#b2f2bb;}
+.step-list {counter-reset:step;}
+.step-item{position:relative;padding-left:48px;}
+.step-item:before{counter-increment:step;content:counter(step);position:absolute;left:12px;top:12px;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;}
+hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix, .photo-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu vận hành • Work Instruction</span>
+</div>
+</div>
+<div class="title"><strong>WI-714 — Đóng gói sạch, thao tác sạch, bảo quản và bảo toàn tình trạng sản phẩm</strong></div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>WI-714</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>Packaging Supervisor / QA Engineer / Warehouse</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho part đã PASS cleaning / cleanliness / inspection và cần clean-pack, double-bag, moisture control, vacuum-compatible packaging hoặc bảo quản sạch trước khi lưu kho / giao hàng.</div>
+<h1>WI-714 — Đóng gói sạch, thao tác sạch, bảo quản và bảo toàn tình trạng sản phẩm</h1>
+<div class="section"><h2>1. Mục đích, phạm vi và trigger</h2>
+<p>WI này hướng dẫn từng bước thao tác <strong>clean-pack, double-bag, bảo quản sạch, chống tái nhiễm bẩn và bảo toàn tình trạng sản phẩm</strong> sau khi part đã PASS cleaning / cleanliness / final inspection tương ứng. Tài liệu này dùng tại bàn đóng gói sạch, khu clean build, khu final pack cho part vacuum-compatible và mọi shipment có yêu cầu preservation đặc biệt.</p>
+<div class="callout-danger"><strong>CẤM</strong> dùng WI này như một “checklist hình thức”. Nếu part chưa PASS cleanliness hoặc khu vực / vật tư / người thao tác không đạt, phải dừng ngay và chuyển HOLD. Không được đóng kín một part bẩn rồi hy vọng qua được shipment.</div></div>
+<div class="section"><h2>2. Điều kiện trước khi bắt đầu</h2>
+<div class="table-card"><table><thead><tr><th>Điều kiện</th><th>Phải có</th><th>HOLD khi</th></tr></thead><tbody>
+<tr><td>Tình trạng part</td><td>Đã PASS bước inspection / cleanliness / leak test tương ứng; có release record</td><td>Thiếu bằng chứng PASS, còn residue, stain, chip, burr, ẩm, dấu chạm tay bẩn</td></tr>
+<tr><td>Khu vực</td><td>Khu clean-pack đã line clearance; môi trường đạt theo <a href="wi-713-environmental-monitoring-and-response.html">WI-713</a></td><td>Còn carton hở, bụi, vật tư phát bụi, log môi trường không đạt hoặc quá hạn</td></tr>
+<tr><td>Người thao tác</td><td>Đã gowning / thay găng đúng loại; hiểu route đóng gói của job</td><td>Găng rách/bẩn, thao tác lẫn giữa khu sạch và khu bẩn, không được chứng nhận làm clean pack</td></tr>
+<tr><td>Vật tư</td><td>Đúng spec theo <a href="../../03-Reference/02-ANNEX-Standards/annex-whs-001-packaging-labeling-spec.html">ANNEX-WHS-001</a>; desiccant/HIC còn hạn; inner/outer bag không thủng</td><td>Vật tư sai cấp, quá hạn, không rõ nguồn hoặc đặt lẫn với vật tư thường</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>3. Chuẩn bị trạm clean-pack</h2>
+<div class="step-list">
+<div class="step-item"><strong>Clear bàn và khu vực</strong><br/>Chỉ để vật tư của đúng Job. Thu toàn bộ carton, dụng cụ bẩn, khăn lau thường, tem nhãn không liên quan. Bề mặt bàn phải sạch, khô, không có xơ và không có vật sắc có thể làm rách bag.</div>
+<div class="step-item"><strong>Chuẩn bị bộ vật tư theo route</strong><br/>Lấy đủ inner bag, outer bag, tray/divider, cap/plug, desiccant, HIC, nhãn, seal, photo checklist. Không mở nhiều bộ vật tư hơn số lượng cần xử lý trong ca.</div>
+<div class="step-item"><strong>Đọc job route trước khi chạm part</strong><br/>Xác nhận QPL, yêu cầu double-bag, N<sub>2</sub> purge, ESD, leak test, label cảnh báo và preservation window. Nếu route mơ hồ thì HOLD, không tự diễn giải.</div>
+</div></div>
+<div class="section"><h2>4. Trình tự thao tác clean-pack</h2>
+<div class="step-list">
+<div class="step-item"><strong>Xác nhận đúng part trước khi đóng gói</strong><br/>Đối chiếu Job, Part No., Rev, Qty, Lot/Serial và trạng thái release với traveler / dossier / nhãn khay. Nếu đang xử lý nhiều part tương tự, mỗi lần chỉ mở một lô tại một vị trí làm việc.</div>
+<div class="step-item"><strong>Last-look tại bàn sạch</strong><br/>Kiểm nhanh bề mặt, hốc, ren, lỗ, cạnh và túi đựng hiện tại. Không dùng khăn bẩn, khí nén thường hay tay trần chạm part. Khi phát hiện phoi, dust, dấu dầu, stain hoặc nước đọng: dừng và chuyển về bước xử lý contamination recovery.</div>
+<div class="step-item"><strong>Bảo vệ điểm nhạy cảm trước khi vào túi</strong><br/>Lắp cap/plug cho ren/lỗ khi route yêu cầu. Thêm spacer / frame / foam / lint-free wrap để ngăn va chạm giữa các mặt CTQ, bề mặt hoàn thiện hoặc cạnh sắc.</div>
+<div class="step-item"><strong>Đóng lớp trong</strong><br/>Đặt part vào inner tray / inner bag theo orientation đã chuẩn hóa. Với part cosmetic-critical: không để kim loại chạm kim loại; không ép phần nặng lên bề mặt hoàn thiện. Với part ESD: inner bag phải là shielding bag hoặc vật tư ESD tương đương.</div>
+<div class="step-item"><strong>N<sub>2</sub> purge khi route yêu cầu</strong><br/>Thực hiện purge theo <a href="../../03-Reference/02-ANNEX-Standards/annex-whs-001-packaging-labeling-spec.html">ANNEX-WHS-001</a>. Đầu cấp khí phải sạch, khô, không dầu. Giữ miệng túi đủ kín để khí quét từ đáy lên miệng túi; không chĩa đầu purge trực tiếp làm part va đập hoặc cuốn particle vào lại.</div>
+<div class="step-item"><strong>Đặt desiccant và HIC</strong><br/>Đặt đúng số unit, đúng vị trí đọc được, không để desiccant cấn trực tiếp vào bề mặt part. HIC phải nhìn thấy sau khi đóng, hoặc có ảnh chứng minh trước khi seal khi không thể nhìn từ ngoài.</div>
+<div class="step-item"><strong>Seal inner bag</strong><br/>Seal kín, phẳng, liên tục. Không xoắn bag làm sai orientation. Sau seal phải kiểm tra nhanh 3 điểm: đường seal liên tục, không kẹp part/vật tư vào mép seal, nhãn lớp trong đọc được.</div>
+<div class="step-item"><strong>Double-bag / outer protection</strong><br/>Khi route yêu cầu double-bag, phải cho inner bag vào outer bag mới, sạch và đúng cỡ. Outer bag không được tái dùng. Sau đó đặt vào carton / tote / tray ngoài đã có đệm chống xê dịch.</div>
+<div class="step-item"><strong>Dán nhãn và chụp ảnh</strong><br/>Dán nhãn inner / outer đúng vị trí. Chụp đủ ảnh bắt buộc: inner protection, HIC/desiccant khi áp dụng, seal, nhãn, toàn kiện. Ảnh không đạt chất lượng xem như chưa có bằng chứng.</div>
+<div class="step-item"><strong>Bàn giao sang shipping / storage</strong><br/>Chỉ chuyển khỏi bàn sạch sau khi checklist và ảnh đã hoàn tất. Kiện clean-pack phải đi vào vùng lưu kho đúng điều kiện ngay; không để ở lối đi, cạnh pallet gỗ hở hoặc cạnh máy phát bụi.</div>
+</div></div>
+<div class="section"><h2>5. Quy tắc mở lại, reseal và rework pack</h2>
+<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Cho phép mở lại không</th><th>Việc phải làm trước khi đóng lại</th></tr></thead><tbody>
+<tr><td>Mở để kiểm nhãn / kiểm ảnh</td><td>Chỉ khi thực sự cần</td><td>Đổi găng sạch, kiểm lại desiccant/HIC, chụp ảnh mới, cập nhật checklist</td></tr>
+<tr><td>Mở do thêm chứng từ / thêm tag</td><td>Không được mở inner bag chỉ để nhét giấy</td><td>Dùng pouch ngoài hoặc lớp tài liệu riêng; nếu đã mở inner bag phải đánh dấu reseal</td></tr>
+<tr><td>Mở do phát hiện sai qty / sai part / sai label</td><td>Được nhưng chuyển HOLD</td><td>Đối soát lại 100%, đổi toàn bộ nhãn bị ảnh hưởng, ảnh trước/sau và ghi log repack</td></tr>
+<tr><td>Bag bị rách / seal hở / HIC out-of-range</td><td>Không được coi là gói còn hiệu lực</td><td>Đánh giá contamination, thay bag mới, thay desiccant/HIC, purge lại khi route yêu cầu</td></tr>
+</tbody></table></div>
+<p class="tiny">Package clean-sensitive đã mở &gt; 15 phút ngoài khu cho phép phải xử lý như gói mất trạng thái sạch trừ khi Engineering/QA quy định ngắn hơn.</p></div>
+<div class="section"><h2>6. Contamination recovery và tiêu chí phải quay lại cleaning</h2>
+<div class="callout-warning"><strong>Không được</strong> lau chùi qua loa rồi đóng lại nếu part đã chạm bề mặt bẩn hoặc rơi khỏi khu kiểm soát.</div>
+<div class="table-card"><table><thead><tr><th>Sự cố</th><th>Hành động ngay</th><th>Có phải quay lại cleaning / inspection không</th></tr></thead><tbody>
+<tr><td>Part chạm bàn / găng / vật tư bẩn</td><td>Dừng đóng gói, cách ly part, giữ nguyên hiện trạng để đánh giá</td><td>Phải đánh giá lại; đa số trường hợp phải làm sạch và verify lại</td></tr>
+<tr><td>Bag thủng, seal hở, carton rơi</td><td>HOLD kiện, chụp ảnh, giữ chain of custody</td><td>Phải thay vật tư; nếu nghi part bị nhiễm bẩn phải quay lại cleaning</td></tr>
+<tr><td>HIC báo ẩm hoặc desiccant không hợp lệ</td><td>Không giao / không lưu như trạng thái PASS</td><td>Thay mới, purge lại khi áp dụng; nếu part đã exposure đáng kể phải đánh giá lại sạch / gỉ</td></tr>
+<tr><td>Particle / stain nhìn thấy bằng mắt</td><td>HOLD ngay</td><td>Phải quay lại bước làm sạch / verify tương ứng</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>7. Preservation window và điều kiện lưu kho</h2>
+<div class="table-card"><table><thead><tr><th>Loại pack</th><th>Khoảng hiệu lực mặc định</th><th>Điều kiện lưu</th><th>Revalidation khi</th></tr></thead><tbody>
+<tr><td>Clean pack thường</td><td>30 ngày</td><td>Khu sạch, khô, FIFO, không ánh nắng trực tiếp, không cạnh nguồn bụi / rung</td><td>Mở lại bag, mất seal, ảnh log môi trường thiếu, dấu ẩm</td></tr>
+<tr><td>Double-bag + desiccant / HIC</td><td>90 ngày hoặc theo route nghiêm hơn</td><td>Lưu trên kệ sạch, không chạm nền, không đè nặng lên kiện</td><td>HIC ngoài ngưỡng, desiccant hết hạn, bag outer hở</td></tr>
+<tr><td>Leak-tested / vacuum-compatible</td><td>Theo route khách hàng; nếu không ghi thì tối đa 30 ngày kể từ ngày pack</td><td>Bảo quản tránh chấn động, tránh xuyên thủng bag, kiểm soát opening strict</td><td>Mở lại inner bag, seal lỗi, packaging damage, có nghi ngờ contamination</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>8. Reject criteria và KPI</h2>
+<div class="two-col">
+<div class="card"><h3>Reject / HOLD</h3><ul class="tight">
+<li>Không chứng minh được PASS cleanliness / leak test / final inspection.</li>
+<li>Part còn particle, stain, moisture, burr hoặc dấu chạm tay không chấp nhận.</li>
+<li>Vật tư sai cấp, inner/outer bag thủng, seal lỗi, nhãn sai, ảnh không đủ.</li>
+<li>Không đủ desiccant/HIC hoặc không chứng minh được purge / double-bag theo route.</li>
+<li>Không còn trace rõ giữa inner pack, outer pack và checklist.</li>
+</ul></div>
+<div class="card"><h3>KPI phải theo dõi</h3><ul class="tight">
+<li>Clean-pack first-pass yield.</li>
+<li>Tỷ lệ repack do bag/label/seal lỗi.</li>
+<li>Số sự cố contamination recovery / tháng.</li>
+<li>% shipment clean-pack có đủ ảnh + checklist trước Ship Confirm.</li>
+</ul></div>
+</div></div>
+<div class="section"><h2>9. Bàn giao sang ship release</h2>
+<p>Kiện clean-pack chỉ được chuyển sang ship release khi: <strong>(1)</strong> checklist đóng gói sạch hoàn tất, <strong>(2)</strong> ảnh evidence đã nạp, <strong>(3)</strong> nhãn inner/outer khớp route, <strong>(4)</strong> preservation window còn hiệu lực, <strong>(5)</strong> nếu cần thì SSCC / label shipment đã sẵn sàng cho <a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a>.</p></div>
+<div class="section"><h2>10. Tài liệu liên kết</h2>
+<div class="table-card"><table><thead><tr><th>Tài liệu</th><th>Vai trò sử dụng</th></tr></thead><tbody>
+<tr><td><a href="wi-711-cleanroom-entry-and-gowning.html">WI-711</a></td><td>Gowning và kiểm soát người vào khu sạch.</td></tr>
+<tr><td><a href="wi-712-ultrasonic-cleaning-standard-work.html">WI-712</a></td><td>Làm sạch siêu âm trước clean pack khi route áp dụng.</td></tr>
+<tr><td><a href="wi-713-environmental-monitoring-and-response.html">WI-713</a></td><td>Điều kiện môi trường và phản ứng khi vượt ngưỡng.</td></tr>
+<tr><td><a href="wi-715-helium-leak-test-standard-work.html">WI-715</a></td><td>Liên kết cho part đã leak test.</td></tr>
+<tr><td><a href="wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a></td><td>Build và bagging vacuum-compatible sâu hơn theo route đặc biệt.</td></tr>
+<tr><td><a href="wi-721-fod-prevention-line-clearance-and-tool-accountability.html">WI-721</a></td><td>FOD, line clearance và accountability.</td></tr>
+<tr><td><a href="../../03-Reference/02-ANNEX-Standards/annex-whs-001-packaging-labeling-spec.html">ANNEX-WHS-001</a></td><td>Spec vật tư, nhãn, desiccant, purge, preservation.</td></tr>
+<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-qms-017-fod-prevention-program.html">ANNEX-QMS-017</a></td><td>Chương trình FOD.</td></tr>
+<tr><td><a href="../../03-Reference/02-ANNEX-Standards/annex-qa-003-quality-package-levels-qpl.html">ANNEX-QA-003</a></td><td>QPL và cấp đóng gói / cleanliness.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-709_Clean_Packaging_Checklist.xlsx">FRM-709</a></td><td>Checklist clean packaging.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-711_Cleanliness_Verification_Form.xlsx">FRM-711</a></td><td>Form xác nhận sạch.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-712_Helium_Leak_Test_Record.xlsx">FRM-712</a></td><td>Hồ sơ helium leak test khi áp dụng.</td></tr>
+</tbody></table></div></div>
+<div data-phase2f="true">
+<h2 class="h2" id="phase2f-clean-pack-gate">Phase 2F — Clean-pack release gate</h2>
+<div class="note"><b>Boundary</b><br/><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-709_Clean_Packaging_Checklist.xlsx">FRM-709</a> được dùng để khóa compatibility, bagging / sealing, hold-time và final release. Nếu có environmental entry requirement hoặc wipe/particle requirement thì phải nối thêm <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx">FRM-711</a> và <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-711_Cleanliness_Verification_Form.xlsx">FRM-712</a>.</div>
+</div></div>
+</div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

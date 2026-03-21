@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#fff0f6" stroke="#fcc2d7" stroke-width="2"/>
+  <circle cx="35" cy="50" r="12" fill="#c2255c" opacity=".1" stroke="#c2255c" stroke-width="1.5"/>
+  <circle cx="60" cy="50" r="12" fill="#c2255c" opacity=".15" stroke="#c2255c" stroke-width="1.5"/>
+  <circle cx="85" cy="50" r="12" fill="#c2255c" opacity=".2" stroke="#c2255c" stroke-width="1.5"/>
+  <path d="M47 50h1M73 50h1" stroke="#c2255c" stroke-width="2" stroke-linecap="round"/>
+  <path d="M44 50l4-3v6zM69 50l4-3v6z" fill="#c2255c"/>
+  <text x="35" y="53" text-anchor="middle" font-size="7" font-weight="700" fill="#c2255c" font-family="system-ui">S</text>
+  <text x="60" y="53" text-anchor="middle" font-size="7" font-weight="700" fill="#c2255c" font-family="system-ui">M</text>
+  <text x="85" y="53" text-anchor="middle" font-size="7" font-weight="700" fill="#c2255c" font-family="system-ui">D</text>
+  <rect x="28" y="70" width="64" height="10" rx="3" fill="#c2255c" opacity=".1" stroke="#c2255c" stroke-width="1"/>
+  <circle cx="42" cy="84" r="4" fill="none" stroke="#c2255c" stroke-width="1.5"/>
+  <circle cx="78" cy="84" r="4" fill="none" stroke="#c2255c" stroke-width="1.5"/>
+  <text x="60" y="108" text-anchor="middle" font-size="7" font-weight="700" fill="#c2255c" font-family="system-ui">SUPPLY CHAIN</text>
+</svg>

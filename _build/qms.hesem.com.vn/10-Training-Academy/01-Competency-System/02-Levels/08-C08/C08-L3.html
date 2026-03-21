@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>C08-L3 — Data-Driven Thinking & System Usage (ERP/Excel) — Lead | HESEM OS</title>
+<link href="../../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+</head>
+<body>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>C08-L3 — Data-Driven Thinking & System Usage (ERP/Excel) — Lead</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>C08-L3</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<h1>C08 — Tư duy dữ liệu &amp; sử dụng hệ thống (ERP/Excel) — Level 3</h1>
+<p class="lead"><strong>Level 3 — Phân tích dữ liệu &amp; chuẩn hóa báo cáo.</strong> Module này tạo năng lực vận hành QMS bằng dữ liệu: ghi đúng, lưu đúng, truy xuất nhanh, quyết định theo số liệu có nguồn.</p>
+<div class="hero">
+<h2>Chuẩn thực chiến – Level 3</h2>
+<div class="meta">
+<div><strong>Vai trò mục tiêu</strong><br/>QA/QC lead, Planner lead, Supervisor, Engineer, Estimator (SAL-03) lead</div>
+<div><strong>Đầu ra bắt buộc</strong><ul><li>Phân tích dữ liệu: Pareto lỗi, trend OTD, downtime, scrap cost.</li><li>Chuẩn hóa template báo cáo và huấn luyện người khác dùng đúng.</li><li>Thiết lập control dữ liệu: quyền truy cập, kiểm tra chéo, đánh giá dữ liệu.</li></ul></div>
+<div><strong>Gate trọng yếu</strong><br/><span class="badge bad">Sai REV / sai Job / mất SSOT</span> = HOLD ngay</div>
+<div><strong>Thời lượng</strong><br/>Lý thuyết 90 phút • Workshop 90 phút • OJT 240 phút</div>
+</div>
+<p class="small-note">Chuẩn vận hành: dữ liệu dùng cho quyết định phải truy vết được nguồn (SoR), nằm trong SSOT, có timestamp, có người chịu trách nhiệm.</p>
+</div><div class="card">
+<span class="badge">Drill Pack (Job CNC)</span>
+<p class="lead" style="margin-top:10px;">
+ Chạy drill trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html"><b>DRL-02</b> — Revision &amp; SSOT Drill (Audit 60 giây)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-daily-management-tier.html"><b>DRL-08</b> — Daily Management (Tier Meeting) Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Job Order E2E Drill (RFQ → Ship Packet)</a></li>
+</ul>
+<p class="small muted" style="margin-top:8px;">
+ Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ </p>
+</div>
+<h2>2) Mục đích module &amp; bối cảnh vận hành</h2>
+<div class="card">
+<ul>
+<li>Chặn rủi ro sai REV, lẫn Job, thiếu chứng từ, mất truy vết bằng kỷ luật dữ liệu và SSOT.</li>
+<li>Biến “học xong” thành “làm được”: có checklist, OJT, performance test, MRR rõ.</li>
+<li>Đảm bảo audit-ready theo ISO 9001:2015 (revision-ready): hồ sơ truy xuất trong 60 giây, có kiểm soát thay đổi và phân quyền.</li>
+</ul>
+</div>
+<h2>3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + điểm chặn</h2>
+<p>C08-L3 tập trung tại lớp ra quyết định: cải tiến chất lượng, điều độ, giảm scrap, tối ưu bottleneck.</p>
+<div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Chốt KPI dictionary</strong><p>Công thức + nguồn + owner + tần suất.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Dataset chuẩn</strong><p>SoR + timestamp + field mapping.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Phân tích Pareto/trend</strong><p>Xác định driver; gắn hành động.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Chuẩn hóa template</strong><p>Version control + change notice.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Kiểm tra chéo</strong><p>2 nguồn/1 KPI; xử lý sai lệch.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Huấn luyện</strong><p>OJT + rubric; nhân bản năng lực.</p></div></div></div>
+<h2>4) Failure Points (tối thiểu 10 điểm gãy)</h2>
+<ol><li>KPI không có định nghĩa dữ liệu; mỗi phòng hiểu khác.</li><li>Dataset trộn nhiều nguồn không kiểm soát; không truy vết.</li><li>Pareto/trend làm xong không gắn hành động và chủ sở hữu.</li><li>Không khóa template; báo cáo bị sửa lẻ tẻ.</li><li>Huấn luyện không có rubric; người học làm sai mà vẫn “đạt”.</li><li>Không có kiểm tra chéo; KPI bị sai kéo theo quyết định sai.</li><li>Quyền truy cập rộng làm rò rỉ hoặc sửa nhầm.</li><li>Không có retention; dataset bị xóa làm mất chuỗi bằng chứng.</li><li>Không có action log; lỗi lặp lại không giảm.</li><li>Không đưa kết quả phân tích vào review cadence; phân tích bị bỏ.</li></ol>
+<h2>5) Risk Controls (control points + owner + evidence)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Control point</th><th>Owner</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Data dictionary cho KPI</strong></td><td>Owner KPI</td><td>ANNEX-QMS-008 hoặc trang KPI dictionary</td><td>Không định nghĩa = không dùng</td></tr><tr><td><strong>Dataset có nguồn SoR + timestamp</strong></td><td>Owner report</td><td>Dataset header ghi nguồn</td><td>Không rõ nguồn = HOLD</td></tr><tr><td><strong>Action log bắt buộc cho Pareto/trend</strong></td><td>QA/OPS</td><td>Danh sách hành động + due</td><td>Không action = không đóng review</td></tr><tr><td><strong>Template controlled + change notice</strong></td><td>QA/QMS</td><td>FRM-QMS-022</td><td>Template là tài liệu kiểm soát</td></tr><tr><td><strong>Kiểm tra chéo 2 nguồn cho KPI trọng yếu</strong></td><td>Owner KPI</td><td>Biên bản đối soát</td><td>Sai lệch phải có closure</td></tr><tr><td><strong>Access/retention governance</strong></td><td>IT/QA</td><td>FRM-QMS-014 (EDAM) + SOP-QMS-013</td><td>Không có governance = incident</td></tr></tbody></table></div>
+<h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>KPI không có định nghĩa dữ liệu hoặc không xác định nguồn.</strong></td><td>Dừng trình bày; tạo data dictionary; xác định SoR.</td></tr><tr><td><span class="badge warn">HOLD</span></td><td><strong>Dataset/Report không có action log đi kèm.</strong></td><td>Không đưa vào review; tạo action log; gán owner/due.</td></tr><tr><td><span class="badge bad">BLOCK</span></td><td><strong>Template báo cáo bị sửa ngoài quy trình.</strong></td><td>Khóa template; khôi phục version; mở change notice.</td></tr></tbody></table></div>
+<h2>7) Phản ứng 60 giây</h2>
+<ol><li>Dừng dùng KPI đang tranh cãi; gắn nhãn 'UNDER REVIEW'.</li><li>Mở data dictionary cho KPI và chốt công thức + nguồn + tần suất.</li><li>Chạy đối soát nhanh 2 nguồn cho 01 điểm dữ liệu.</li><li>Ghi 01 action bắt buộc và gán owner + due trong 24h.</li><li>Cập nhật SSOT: phát hành version mới của template/report.</li></ol>
+<h2>8) Checklist vận hành (≤ 15 bước)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Owner</th><th>Evidence/MRR</th><th>Lỗi lặp lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Chọn KPI và định nghĩa (data dictionary) theo ANNEX-QMS-008</strong></td><td>Owner KPI</td><td>Trang định nghĩa KPI</td><td>KPI không định nghĩa làm tranh cãi</td></tr><tr><td>2</td><td><strong>Tạo dataset chuẩn từ nguồn SoR (ERP/QC forms)</strong></td><td>Owner report</td><td>Dataset có timestamp + nguồn</td><td>Trộn nhiều nguồn không kiểm soát</td></tr><tr><td>3</td><td><strong>Chạy phân tích Pareto: top lỗi/top scrap/top delay</strong></td><td>QA/OPS</td><td>Biểu đồ Pareto + danh sách hành động</td><td>Không gắn hành động</td></tr><tr><td>4</td><td><strong>Chạy trend theo tuần/tháng: OTD, WIP aging, downtime</strong></td><td>OPS/PLA</td><td>Trend chart + nhận định</td><td>Không ghi giả định</td></tr><tr><td>5</td><td><strong>Chuẩn hóa template báo cáo và khóa version</strong></td><td>Owner report</td><td>Template controlled</td><td>Template trôi</td></tr><tr><td>6</td><td><strong>Huấn luyện 01 người dùng báo cáo và đánh giá đạt</strong></td><td>Trainer</td><td>Biên bản OJT + rubric</td><td>Dạy miệng</td></tr><tr><td>7</td><td><strong>Thiết lập kiểm tra chéo: 2 nguồn/1 KPI</strong></td><td>Owner KPI</td><td>Quy tắc đối soát</td><td>Tin 1 nguồn không kiểm</td></tr><tr><td>8</td><td><strong>Thiết lập quyền truy cập &amp; retention cho dataset</strong></td><td>IT/QA</td><td>Access matrix + retention</td><td>Dataset bị xóa/đổi</td></tr><tr><td>9</td><td><strong>Phát hành báo cáo chuẩn lên SSOT</strong></td><td>Owner report</td><td>SSOT link</td><td>Gửi qua email cá nhân</td></tr><tr><td>10</td><td><strong>Đóng action và cập nhật kết quả vào KPI review</strong></td><td>Owner action</td><td>Action log</td><td>Không theo dõi closure</td></tr></tbody></table></div>
+<h2>9) OJT thực chiến theo TWI</h2>
+<h3>Job breakdown (Step / Key Points / Reasons)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Key Points</th><th>Reasons</th></tr></thead><tbody><tr><td>1</td><td>Định nghĩa KPI</td><td>Công thức + nguồn + tần suất + owner</td><td>Chặn hiểu sai</td></tr><tr><td>2</td><td>Tạo dataset chuẩn</td><td>SoR + timestamp + field mapping</td><td>Chặn số liệu trôi</td></tr><tr><td>3</td><td>Pareto/trend</td><td>Top drivers + action</td><td>Biến phân tích thành hành động</td></tr><tr><td>4</td><td>Chuẩn hóa template</td><td>Version control</td><td>Duy trì ổn định</td></tr><tr><td>5</td><td>Huấn luyện người khác</td><td>OJT + rubric</td><td>Nhân bản năng lực</td></tr></tbody></table></div>
+<h3>OJT output bắt buộc</h3>
+<ul><li>01 báo cáo Pareto top 5 lỗi + action log (≥ 5 hành động).</li><li>01 template báo cáo chuẩn có version và hướng dẫn dùng.</li><li>01 biên bản OJT cho 01 người học đạt theo rubric.</li></ul>
+<h3>Rubric L1–L4 (hành vi quan sát được)</h3>
+<div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Kỷ luật hồ sơ</td><td>Ghi đúng/lưu đúng/đúng REV</td></tr><tr><td><strong>L2</strong></td><td>Báo cáo &amp; đối soát</td><td>Report có timestamp + validation</td></tr><tr><td><strong>L3</strong></td><td>Phân tích &amp; chuẩn hóa</td><td>Pareto/trend + action log + template controlled + huấn luyện</td></tr><tr><td><strong>L4</strong></td><td>Governance &amp; tích hợp</td><td>Dashboard liên phòng + data model + access/retention + incident playbook</td></tr></tbody></table></div>
+<h2>10) Đánh giá</h2>
+<h3>Quiz (≥ 20 câu)</h3>
+<div class="quiz"><ol><li>Data dictionary của KPI phải có các trường nào?</li><li>Pareto dùng để trả lời câu hỏi gì trong xưởng CNC?</li><li>Trend chart dùng để phát hiện điều gì?</li><li>Vì sao action log bắt buộc đi kèm phân tích?</li><li>Khi template báo cáo đổi, hồ sơ nào phải tạo?</li><li>KPI trọng yếu phải kiểm tra chéo theo nguyên tắc nào?</li><li>Nêu 02 rủi ro khi quyền truy cập dataset quá rộng.</li><li>Bucket WIP aging BLACK kích hoạt escalation nào?</li><li>Sai định nghĩa KPI gây hậu quả gì cho OTD?</li><li>Nêu 03 trường hợp phải gắn nhãn UNDER REVIEW.</li><li>Audit trail của báo cáo thể hiện ở đâu?</li><li>Vì sao report phải ghi nguồn SoR?</li><li>Nêu 03 ví dụ KPI phù hợp cho xưởng CNC job shop.</li><li>Scrap cost cần liên kết với dữ liệu nào?</li><li>Downtime analysis cần dữ liệu đầu vào nào?</li><li>Nêu 02 cách khóa template để tránh sửa lẻ tẻ.</li><li>Một hành động tốt phải có những thuộc tính nào?</li><li>Huấn luyện báo cáo theo OJT khác gì hướng dẫn miệng?</li><li>Khi KPI tranh cãi, quyết định đúng là gì?</li><li>No evidence = No gate áp dụng cho phân tích ra sao?</li><li>Vì sao giữ version report là yêu cầu audit-ready?</li><li>Khi phát hiện KPI sai 3 tuần liên tiếp, bước xử lý là gì?</li></ol></div>
+<h3>Scenario (≥ 3 tình huống thật)</h3>
+<details>
+<summary>KPI OTD bị tranh cãi giữa Planning và Sales</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Planning tính OTD theo ngày ship thực tế</li><li>Sales tính theo ngày cam kết mới sau khi đổi promise</li><li>Dashboard hiển thị 2 con số</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Chốt hành động theo chuẩn data governance.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>STOP dùng dashboard; tạo data dictionary; thống nhất định nghĩa; phát hành version mới; lưu DCR record.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Pareto top lỗi nhưng không ai nhận action</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Top 1 lỗi: sai REV</li><li>Top 2 lỗi: thiếu chứng từ</li><li>Họp xong không có action log</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Hành động bắt buộc.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>HOLD kết luận họp; lập action log; gán owner/due; cập nhật Tier cadence.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Template báo cáo bị sửa ngoài quy trình</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Bạn thấy cột KPI bị đổi công thức</li><li>Không có change notice</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Ra quyết định và MRR.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>BLOCK template; khôi phục version; mở FRM-QMS-022; audit trail kiểm chứng.</li></ul></div>
+</div>
+</details>
+<h3>Performance test</h3>
+<div class="card">
+<h3>Bài test tay nghề — Làm 01 gói phân tích Pareto + action log</h3>
+<h4>Bài làm bắt buộc</h4>
+<ol><li>Tạo dataset có nguồn SoR + timestamp.</li><li>Thực hiện Pareto top 5 lỗi hoặc top 5 delay drivers.</li><li>Tạo action log ≥ 5 dòng, gán owner + due.</li><li>Chuẩn hóa template và huấn luyện 01 người dùng.</li></ol>
+<h4>PASS/FAIL</h4>
+<ul><li>PASS khi: dataset truy vết được; Pareto đúng; action log đủ; template controlled; người học thao tác đúng.</li><li>FAIL khi: thiếu nguồn; không có action log; template trôi; huấn luyện không có rubric.</li></ul>
+</div>
+<h2>11) PASS/FAIL criteria</h2>
+<div class="kpi-gate">
+<strong>PASS/FAIL (No evidence = No gate)</strong>
+<ul>
+<li>PASS khi hoàn thành OJT output và performance test đạt, toàn bộ evidence nằm trong SSOT, đúng REV, đúng tên file.</li>
+<li>FAIL ngay khi sai REV, mix-up Job/Part, bypass HOLD, chỉnh sửa hồ sơ đã phát hành không có log, hoặc không truy xuất được evidence.</li>
+</ul>
+</div>
+<h2>12) MRR tối thiểu (hồ sơ bắt buộc + naming + nơi lưu)</h2>
+<p><strong>Quy tắc đặt tên:</strong> <span class="mono">YYYYMMDD_HHMM_KPI_<tênkpi>_Vx.xlsx + DCR record trong controlled library.</tênkpi></span></p>
+<ul><li>KPI dictionary (ANNEX-QMS-008) cho KPI liên quan.</li><li>Dataset snapshot có timestamp + mapping.</li><li>Báo cáo Pareto/trend + action log.</li><li>FRM-QMS-022 (khi đổi template).</li><li>Hồ sơ OJT &amp; đánh giá.</li></ul>
+<div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → <span class="mono">Job-Dossiers</span> và <span class="mono">Part-REV-Master</span>.</div>
+<h2>13) Common audit findings &amp; prevention</h2>
+<ol><li>KPI không có định nghĩa; số liệu tranh cãi.</li><li>Không có nguồn SoR/timestamp trong dataset.</li><li>Phân tích không có action log.</li><li>Template báo cáo không controlled, không version.</li><li>Không có kiểm tra chéo cho KPI trọng yếu.</li><li>Quyền truy cập dataset rộng; không có access review.</li><li>Không có retention; dataset mất.</li><li>Huấn luyện không có bằng chứng OJT.</li></ol>
+<h2>Tài liệu liên quan</h2>
+<ul>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-504-job-dossier-and-evidence-pack.html">ANNEX-QMS-003 — Evidence Pack (Job Dossier + Data Governance)</a></li>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Quản trị dữ liệu &amp; phân quyền truy cập</a></li>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Data Classification &amp; Storage</a></li>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//wi-504-job-dossier-and-evidence-pack.html">WI-OPS-008 — Quản trị Job Dossier &amp; gói chứng cứ</a></li>
+</ul>
+</div></div></div>
+</div>
+<script src="../../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+
+
+
+

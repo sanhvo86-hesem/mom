@@ -1,0 +1,5 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule \.(zip|sql|bak|old)$ - [F,L,NC]
+  RewriteRule ^qms-data/ - [F,L,NC]
+</IfModule>

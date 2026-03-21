@@ -1,0 +1,271 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ANNEX-QMS-970 — Dictionary | HESEM QMS</title>
+<link href="../assets/style.css" rel="stylesheet"/>
+<style>
+  .dict-toolbar{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin:14px 0 10px; }
+  .dict-wrap{ width:100%; max-width:100%; overflow-x:hidden; }
+  .dict-table{ width:100%; border-collapse:collapse; font-size:13px; table-layout:fixed; }
+  .dict-table th, .dict-table td{ border:1px solid var(--border); padding:8px; vertical-align:top; }
+  .dict-table thead th{ background:#f8fafc; }
+  .dict-table .col-term{ width:20%; font-weight:800; white-space:normal; overflow-wrap:break-word; word-break:break-word; line-height:1.25; }
+  .dict-table .col-meaning{ width:26%; white-space:normal; overflow-wrap:break-word; word-break:break-word; line-height:1.25; }
+  .dict-table .col-def{ width:54%; white-space:normal; overflow-wrap:break-word; word-break:break-word; }
+  .th-en{ font-weight:800; }
+  .th-vn{ font-size:11px; color:var(--muted); margin-top:2px; font-weight:600; }
+  .term-top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .term-text{ font-weight:900; letter-spacing:.2px; }
+  .term-sub{ margin-top:4px; font-weight:600; color:var(--muted); font-size:11px; }
+  .badge-cat{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border); background:#fff; color:#0f172a; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; white-space:nowrap; }
+  .badge-cat .dot{ width:8px; height:8px; border-radius:999px; background:rgba(66,133,246,.9); display:inline-block; }
+  .meaning-en{ font-weight:800; line-height:1.35; }
+  .meaning-empty{ color:var(--muted); font-style:italic; }
+  .detail-body{ white-space:pre-wrap; color:#0f172a; line-height:1.4; }
+  .detail-body + .detail-body{ margin-top:8px; }
+  .detail-label{ font-weight:800; display:block; margin-bottom:3px; }
+  .dict-pager{ display:flex; gap:10px; align-items:center; justify-content:flex-end; margin:12px 0 0; }
+  .dict-btn{ appearance:none; border:1px solid var(--border); background:#fff; color:#0f172a; padding:8px 12px; border-radius:12px; font-weight:800; cursor:pointer; }
+  .dict-btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .dict-shown{ font-size:12px; color:var(--muted); font-weight:600; }
+  .chiplist{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{ appearance:none; border:1px solid var(--border); background:#fff; color:#0f172a; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; cursor:pointer; }
+  .chip.active{ background:#0f172a; color:#fff; border-color:#0f172a; }
+  .mini-tag{ display:inline-block; padding:2px 6px; border-radius:999px; font-size:11px; font-weight:700; background:#eef2ff; color:#1e3a8a; margin-bottom:6px; }
+  .load-note{ color:var(--muted); font-size:12px; }
+  @media print{
+    @page{ size:A4 landscape; margin:10mm; }
+    .searchbox, .chiplist, .dict-pager{ display:none !important; }
+    .dict-table{ font-size:10.5px; }
+    .page{ border:none; box-shadow:none; }
+    .page-body{ padding:0; }
+  }
+  @media print {
+    .card, .table-card, .callout, .note, .box, .iso-map, .preface-block, .form-sheet { page-break-inside: avoid; break-inside: avoid; }
+    h1, h2, h3, .h1, .h2, .h3 { page-break-after: avoid; break-after: avoid; }
+    tr { page-break-inside: avoid; break-inside: avoid; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    .table-card { overflow: visible !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../assets/hesem-logo.svg"/></a>
+          <div class="fh-company"><a href="../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
+        </div>
+        <div class="title">
+          <strong>ANNEX-QMS-970 — Dictionary</strong><br/>
+          <span class="muted">Từ điển thuật ngữ/viết tắt thống nhất; hiển thị theo thứ tự: viết tắt/thuật ngữ → tên đầy đủ tiếng Anh → tiếng Việt → định nghĩa/bối cảnh/hồ sơ.</span>
+        </div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>ANNEX-QMS-970</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày:</b></span><span>2026-03-01</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>QA Manager</span></div>
+        </div>
+      </div>
+
+      <div class="doc-content" id="docContent">
+        <span class="badge">DICTIONARY</span>
+        <h1 style="margin-top:10px;margin-bottom:6px;">ANNEX-QMS-970 — Dictionary</h1>
+        <div class="muted" style="margin-bottom:12px;">Trang này PHẢI được dùng để tra cứu viết tắt/thuật ngữ và định nghĩa thống nhất trong HESEM QMS. Khi soạn SOP/WI/FRM/REF, người soạn PHẢI dùng đúng thuật ngữ đã chuẩn hóa tại đây.</div>
+
+        <div class="callout" style="margin-bottom:12px;">
+          <b>Quy tắc hiển thị bắt buộc cho viết tắt:</b> ví dụ <b>SPC</b> → <b>Statistical Process Control</b> → <b>Kiểm soát quá trình bằng thống kê</b> → định nghĩa, bối cảnh sử dụng và hồ sơ liên quan.
+        </div>
+
+        <div class="card" style="margin-top:10px;">
+          <h2 class="h2" style="margin-top:0;">1. Mục đích sử dụng</h2>
+          <ul>
+            <li>Chuẩn hóa thuật ngữ dùng trong toàn bộ tài liệu kiểm soát.</li>
+            <li>Giảm sai lệch giao tiếp giữa Sales, Planning, Production, Quality, Engineering, Supply Chain, Finance, HR và IT.</li>
+            <li>Làm nguồn tham chiếu duy nhất cho định nghĩa viết tắt, chỉ số KPI, thuật ngữ chất lượng, thuật ngữ kỹ thuật CNC và thuật ngữ hệ thống.</li>
+          </ul>
+          <h2 class="h2">2. Quy tắc sử dụng bắt buộc</h2>
+          <ol>
+            <li>Khi gặp viết tắt hoặc thuật ngữ trong tài liệu, người dùng PHẢI tra cứu tại trang này trước khi áp dụng.</li>
+            <li>Nếu viết tắt chưa có trong từ điển, người soạn PHẢI dừng phát hành và gửi yêu cầu bổ sung cho QA/QMS.</li>
+            <li>Không được tự đặt nghĩa khác với định nghĩa đã phát hành.</li>
+            <li>Với thuật ngữ viết tắt, mục từ PHẢI có đủ 4 phần: term, meaning (EN), vi, definition/context/record.</li>
+          </ol>
+          <h2 class="h2">3. Cấu trúc mục từ</h2>
+          <div class="table-card">
+            <table class="table">
+              <thead><tr><th>Trường</th><th>Nội dung bắt buộc</th></tr></thead>
+              <tbody>
+                <tr><td>term</td><td>Viết tắt hoặc thuật ngữ chuẩn.</td></tr>
+                <tr><td>meaning</td><td>Tên đầy đủ tiếng Anh. Nếu term đã là cụm tiếng Anh đầy đủ, PHẢI lặp lại cụm chuẩn tại trường này.</td></tr>
+                <tr><td>vi</td><td>Dịch nghĩa tiếng Việt dùng thống nhất trong tài liệu HESEM.</td></tr>
+                <tr><td>def</td><td>Định nghĩa ngắn gọn, nêu điểm kiểm soát quan trọng.</td></tr>
+                <tr><td>ctx</td><td>Bối cảnh sử dụng trong HESEM: ai dùng, ở bước nào, điều kiện nào.</td></tr>
+                <tr><td>rec</td><td>Hồ sơ / bằng chứng / biểu mẫu liên quan (nếu có).</td></tr>
+                <tr><td>cat</td><td>Nhóm phân loại để lọc và tra cứu.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+        <div class="muted" style="margin-bottom:12px;">Quy tắc tra cứu: gõ viết tắt, tên đầy đủ tiếng Anh hoặc tiếng Việt. Kết quả hiển thị theo thứ tự: term → full English → tiếng Việt → chi tiết.</div>
+
+        <div class="dict-toolbar">
+          <div class="searchbox" style="flex:1; min-width:260px;">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M10 4a6 6 0 104.472 10.03l4.249 4.25a1 1 0 001.415-1.415l-4.25-4.249A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z" fill="currentColor"></path></svg>
+            <input id="q" type="search" autocomplete="off" placeholder="Search abbreviation / full English / Vietnamese (ví dụ: SPC, Statistical Process Control, kiểm soát quá trình)"/>
+            <span class="count" id="count"></span>
+          </div>
+        </div>
+        <div class="chiplist" id="chips"></div>
+        <div class="load-note" id="loadNote" style="margin:8px 0 0 2px;"></div>
+
+        <div class="dict-wrap" style="margin-top:10px;">
+          <table class="dict-table">
+            <colgroup>
+              <col style="width:20%"/>
+              <col style="width:26%"/>
+              <col style="width:54%"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th class="col-term"><div class="th-en">Term</div><div class="th-vn">Viết tắt / thuật ngữ chuẩn</div></th>
+                <th class="col-meaning"><div class="th-en">Full English (EN)</div><div class="th-vn">Tên đầy đủ tiếng Anh</div></th>
+                <th class="col-def"><div class="th-en">Vietnamese + Details</div><div class="th-vn">Dịch tiếng Việt • Định nghĩa • Bối cảnh • Hồ sơ</div></th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <div class="dict-pager"><button class="dict-btn" id="more" type="button">Xem thêm</button><span class="dict-shown" id="shown"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="./dict-data.js"></script>
+<script>
+(function(){
+  const PAGE_SIZE = 100;
+  const qEl = document.getElementById('q');
+  const countEl = document.getElementById('count');
+  const rowsEl = document.getElementById('rows');
+  const chipsEl = document.getElementById('chips');
+  const shownEl = document.getElementById('shown');
+  const moreEl = document.getElementById('more');
+  const loadNoteEl = document.getElementById('loadNote');
+  const state = { all: [], filtered: [], shown: 0, cat: 'ALL', q: '' };
+
+  function stripAccent(s){
+    return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  }
+  function normalize(s){
+    return stripAccent(String(s || '')).replace(/\s+/g, ' ').trim();
+  }
+  function esc(s){
+    return String(s || '').replace(/[&<>"]/g, function(ch){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[ch]; });
+  }
+  function byTerm(a,b){
+    return normalize(a.term).localeCompare(normalize(b.term), 'vi');
+  }
+  function buildText(item){
+    return normalize([item.term, item.meaning, item.vi, item.def, item.ctx, item.rec, item.cat].join(' | '));
+  }
+  function categories(data){
+    return Array.from(new Set(data.map(x => (x.cat || 'General').trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'vi'));
+  }
+  function filterData(){
+    const q = normalize(state.q);
+    state.filtered = state.all.filter(item => {
+      const catOk = state.cat === 'ALL' || (item.cat || 'General') === state.cat;
+      const qOk = !q || buildText(item).includes(q);
+      return catOk && qOk;
+    });
+    state.shown = Math.min(PAGE_SIZE, state.filtered.length);
+    renderRows();
+    renderStatus();
+  }
+  function renderChips(){
+    const cats = ['ALL'].concat(categories(state.all));
+    chipsEl.innerHTML = cats.map(cat => {
+      const label = cat === 'ALL' ? 'Tất cả' : cat;
+      const cls = 'chip' + (cat === state.cat ? ' active' : '');
+      return '<button type="button" class="'+cls+'" data-cat="'+esc(cat)+'">'+esc(label)+'</button>';
+    }).join('');
+    chipsEl.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', function(){ state.cat = this.getAttribute('data-cat'); filterData(); renderChips(); });
+    });
+  }
+  function rowHtml(item){
+    const meaning = item.meaning && item.meaning.trim() ? item.meaning.trim() : '';
+    const vi = item.vi && item.vi.trim() ? item.vi.trim() : '';
+    const def = item.def && item.def.trim() ? item.def.trim() : '';
+    const ctx = item.ctx && item.ctx.trim() ? item.ctx.trim() : '';
+    const rec = item.rec && item.rec.trim() ? item.rec.trim() : '';
+    return '<tr>' +
+      '<td class="col-term">' +
+        '<div class="term-top"><span class="term-text">'+esc(item.term || '')+'</span></div>' +
+        '<div class="term-sub">Mục từ chuẩn hóa</div>' +
+        '<div style="margin-top:6px"><span class="badge-cat"><span class="dot"></span>'+esc(item.cat || 'General')+'</span></div>' +
+      '</td>' +
+      '<td class="col-meaning">' +
+        ((meaning || (item.term && /^[A-Za-z0-9][A-Za-z0-9/&+,.()' \\-]*$/.test(item.term) ? item.term : '')) ? '<div class="meaning-en">'+esc(meaning || item.term)+'</div>' : '<div class="meaning-empty">Chưa có full English</div>') +
+      '</td>' +
+      '<td class="col-def">' +
+        (vi ? '<div class="detail-body"><span class="detail-label">Tiếng Việt</span>'+esc(vi)+'</div>' : '') +
+        (def ? '<div class="detail-body"><span class="detail-label">Định nghĩa</span>'+esc(def)+'</div>' : '') +
+        (ctx ? '<div class="detail-body"><span class="detail-label">Bối cảnh sử dụng</span>'+esc(ctx)+'</div>' : '') +
+        (rec ? '<div class="detail-body"><span class="detail-label">Hồ sơ / bằng chứng</span>'+esc(rec)+'</div>' : '') +
+      '</td>' +
+    '</tr>';
+  }
+  function renderRows(){
+    rowsEl.innerHTML = state.filtered.slice(0, state.shown).map(rowHtml).join('');
+    moreEl.disabled = state.shown >= state.filtered.length;
+  }
+  function renderStatus(){
+    countEl.textContent = state.filtered.length ? state.filtered.length + ' term' : '0 term';
+    shownEl.textContent = 'Hiển thị ' + Math.min(state.shown, state.filtered.length) + ' / ' + state.filtered.length;
+  }
+  moreEl.addEventListener('click', function(){ state.shown = Math.min(state.shown + PAGE_SIZE, state.filtered.length); renderRows(); renderStatus(); });
+  qEl.addEventListener('input', function(){ state.q = this.value || ''; filterData(); });
+
+  async function loadData(){
+    if (Array.isArray(window.HESEM_GLOSSARY) && window.HESEM_GLOSSARY.length) {
+      return window.HESEM_GLOSSARY;
+    }
+    const resp = await fetch('./dict-data.json', {cache:'no-store'});
+    if (!resp.ok) throw new Error('Không tải được dict-data.json');
+    return await resp.json();
+  }
+
+  loadData().then(list => {
+    state.all = (list || []).slice().sort(byTerm);
+    const missingMeaning = state.all.filter(x => !String(x.meaning || '').trim()).length;
+    loadNoteEl.textContent = 'Tổng mục từ: ' + state.all.length + '. Mục từ còn thiếu full English: ' + missingMeaning + '.';
+    renderChips();
+    filterData();
+  }).catch(err => {
+    loadNoteEl.textContent = 'Lỗi tải dữ liệu glossary: ' + (err && err.message ? err.message : err);
+    rowsEl.innerHTML = '<tr><td colspan="3">Không tải được dữ liệu glossary.</td></tr>';
+    moreEl.disabled = true;
+  });
+})();
+window.addEventListener('message', function(e){
+  if(e.data === 'getContent'){
+    var c = document.getElementById('docContent');
+    e.source.postMessage({type:'docContent', html:c ? c.innerHTML : document.body.innerHTML}, '*');
+  }
+});
+</script>
+<script src="../assets/app.js"></script>
+</body>
+</html>
+
+

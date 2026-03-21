@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>TRN-ACA-MRR-02 — Setup + FAI/IR Pack | HESEM Academy</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+ .chk{font-family:var(--mono); font-weight:800;}
+ .print-grid{display:grid; grid-template-columns: 1fr 1fr; gap: 12px;}
+ .sig{display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;}
+ .sig .box{border:1px dashed var(--line); border-radius:10px; padding:10px; min-height:64px;}
+ .mini{font-size:.92rem}
+ .tight li{margin:4px 0;}
+ .formline{display:inline-block; min-width:160px; border-bottom:1px solid var(--line);}
+ .muted2{color:var(--muted);}
+ .pill{display:inline-block; padding:2px 8px; border:1px solid var(--line); border-radius:999px; font-size:.82rem;}
+ 
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+</style>
+</head>
+<body>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>MRR-02-SETUP-FAI — Setup + FAI/IR Pack | HESEM Academy</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>MRR-02-SETUP-FAI</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="cover">
+<div class="kicker">MRR Pack</div>
+<h1 class="h1">Setup + FAI/IR Pack</h1>
+<p class="lead">Bộ MRR bắt buộc cho setup/prove-out/FAI trước khi chạy hàng loạt.</p>
+<div class="grid-2">
+<div class="note">
+<strong>Áp dụng</strong>
+<ul class="tight">
+<li><b>Vai trò:</b> Setup Lead • CNC Operator • QC • CAM</li>
+<li><b>Chuẩn lưu:</b> SSOT theo <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a></li>
+<li><b>Gate:</b> Thiếu MRR → STOP/HOLD/BLOCK theo mục “Fail-fast”.</li>
+</ul>
+</div>
+<div class="note">
+<strong>Thông tin Job / Hồ sơ</strong>
+<div class="mini">
+ JobCode: <span class="formline"> </span><br/>
+ Khách hàng: <span class="formline"> </span><br/>
+ Part No: <span class="formline"> </span>   Rev: <span class="formline"> </span><br/>
+ Số lượng: <span class="formline"> </span>   Due: <span class="formline"> </span><br/>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<h2 class="h2" style="margin-top:0;">Checklist MRR (Minimum Required Records)</h2>
+<p class="mini muted2">Tick đủ các dòng dưới đây. Mỗi dòng phải có bằng chứng trong SSOT và đặt tên file đúng chuẩn.</p>
+<div style="overflow:auto;">
+<table class="form-table">
+<tr>
+<th style="min-width:320px;">MRR / Bằng chứng</th>
+<th style="min-width:140px;">RecordType</th>
+<th style="min-width:110px;">Gate</th>
+<th style="min-width:120px;">Owner</th>
+<th style="min-width:220px;">SSOT path</th>
+<th style="min-width:260px;">Tên file chuẩn</th>
+</tr>
+<tr><td><span class="chk">☐</span> Baseline DRAWREV + setup sheet đúng REV</td><td>DRAW/SETUP</td><td>S0</td><td>Setup</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/SETUP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SETUP_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> NC program đúng release + checksum/version</td><td>NCREL</td><td>S0</td><td>CAM</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/NC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NC_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>.nc</td></tr>
+<tr><td><span class="chk">☐</span> Tool list + tool preset + tool life baseline</td><td>TOOL</td><td>S0</td><td>Setup</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/TOOLS/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_TOOL_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> Fixture/jig ID + tình trạng + xác nhận clamp safe</td><td>FIX</td><td>S0</td><td>Setup</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/FIXTURE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FIX_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Material batch ID + MTR/CoC liên kết</td><td>MAT</td><td>S0</td><td>WHS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/MATERIAL/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_MAT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Gage status OK (tem hiệu lực) cho CTQ</td><td>GAGE</td><td>S0</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/GAGE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_GAGE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Prove-out log (feed/speed/offset) + 1st run notes</td><td>PROVE</td><td>S1</td><td>Setup</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/PROVE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PROVE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> First Article / IR (first piece) ký bởi QC</td><td>FAI/IR</td><td>S1</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FAI/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FAI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Offset sheet lock (bản khóa) + người bàn giao</td><td>OFFSET</td><td>S1</td><td>Setup</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/OFFSET/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_OFFSET_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Handover log (Setup → Operator) + điểm kiểm soát</td><td>HANDO</td><td>S2</td><td>Setup</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/HANDOVER/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_HANDO_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Change request (khi chỉnh toolpath/offset beyond limit)</td><td>CHANGE</td><td>S2</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/CHANGE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CHANGE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+</table>
+</div>
+<div class="note mini"><strong>Gắn với module</strong>: C17 (CNC/Setup/CAM), C16 (Đo kiểm), C13 (Change control), C10 (Job gate).</div>
+</div>
+<div class="card">
+<h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
+<ul class="tight">
+<li>Không có NC release hoặc chạy file ngoài SSOT → BLOCK.</li><li>Không có FAI/IR ký mà chạy hàng loạt → STOP.</li><li>Tool/fixture sai ID hoặc clamp không an toàn → STOP.</li><li>Không khóa offset sheet hoặc bàn giao miệng → HOLD.</li>
+</ul>
+</div>
+<div class="card">
+<h2 class="h2" style="margin-top:0;">Audit 60 giây</h2>
+<ol class="tight">
+<li>Mở SETUP sheet và đối chiếu DRAWREV/CTQ map.</li><li>Mở PROVE log và xác nhận thay đổi feed/speed/offset có sign-off.</li><li>Mở FAI/IR và xác nhận các CTQ đạt.</li><li>Mở OFFSET lock sheet và handover log.</li>
+</ol>
+</div>
+<div class="card">
+<h2 class="h2" style="margin-top:0;">Ký xác nhận</h2>
+<div class="sig">
+<div class="box"><b>Người lập</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+<div class="box"><b>Người kiểm</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+<div class="box"><b>QA/QMS xác nhận</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+</div>
+</div>
+</div>
+</div></div></div>
+
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+

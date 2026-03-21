@@ -1,0 +1,623 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SYS-OPS-23 — SOP-QMS-12 M365 Audit-Ready Configuration: baseline, DLP, audit logging, evidence pack | HESEM OS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>SYS-OPS-23 — SOP-QMS-12 M365 Audit-Ready Configuration: baseline, DLP, audit logging, evidence pack</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-23</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="card">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-23</div>
+<h1 style="margin-top:10px">SOP-QMS-12 M365 Audit-Ready Configuration: baseline, DLP, audit logging, evidence pack</h1>
+<p class="muted">Đào tạo thực chiến để cấu hình và vận hành M365 theo chuẩn audit‑ready: chặn nhầm phiên bản, chặn rò rỉ dữ liệu, giữ dấu vết audit, dựng evidence pack đúng giờ.</p>
+<div class="tag blue">Phiên bản</div>
+</div>
+<div class="note">
+<strong>Thông tin triển khai</strong>
+<ul>
+<li><strong>Đối tượng:</strong> Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor</li>
+<li><strong>Khi kích hoạt:</strong> Khi onboarding khách hàng mới/part‑rev mới; khi mở quyền external cho khách/auditor; khi phát hành hoặc thay đổi baseline M365 ảnh hưởng QMS; trước audit khách hàng.</li>
+<li><strong>Thời lượng:</strong> Lý thuyết 2 giờ • Workshop 2 giờ • OJT 1 ca (4 giờ) • Rà soát sau 7 ngày (30 phút).</li>
+<li><strong>Điều kiện trước:</strong> Đã học SOP kiểm soát tài liệu; đã đọc SOP‑QMS‑012, FRM‑QMS‑016, ANNEX‑QMS‑003; nắm quy tắc Job Dossier/Evidence Pack; có tài khoản M365 theo role; đã được cấp quyền đúng ma trận.</li>
+</ul>
+</div>
+</div>
+<div class="toc">
+<strong>Mục lục nhanh</strong>
+<ul>
+<li><a href="#m2">2) Mục đích module &amp; bối cảnh vận hành</a></li>
+<li><a href="#m3">3) Vị trí trong chuỗi E2E + luồng handoff + điểm chặn</a></li>
+<li><a href="#m4">4) Failure Points (≥10)</a></li>
+<li><a href="#m5">5) Risk Controls (≥6)</a></li>
+<li><a href="#m6">6) Fail‑fast rules + STOP/HOLD/BLOCK</a></li>
+<li><a href="#m7">7) Phản ứng 60 giây</a></li>
+<li><a href="#m8">8) Checklist vận hành (≤15 bước)</a></li>
+<li><a href="#m9">9) OJT theo TWI + rubric L1–L4</a></li>
+<li><a href="#m10">10) Đánh giá: quiz + scenario + performance test</a></li>
+<li><a href="#m11">11) ĐẠT/KHÔNG ĐẠT criteria</a></li>
+<li><a href="#m12">12) MRR tối thiểu</a></li>
+<li><a href="#m13">13) Common audit findings &amp; prevention</a></li>
+<li><a href="#m14">14) DCR record</a></li>
+</ul>
+</div>
+</div>
+<h2 class="h2" id="m2">2) Mục đích module &amp; bối cảnh vận hành (gate/handoff; trách nhiệm; khi kích hoạt)</h2>
+<div class="callout">
+<b>Lý do tồn tại (Gate logic)</b>
+<ul>
+<li><b>Gate sai phiên bản:</b> Bản vẽ/spec/program/SOP sai Rev tạo scrap, khiếu nại, lọt lỗi ra khách hàng.</li>
+<li><b>Gate rò rỉ dữ liệu:</b> Chia sẻ sai phạm vi (Anyone link/guest ngoài kiểm soát) làm lộ drawing/CNC program/giá.</li>
+<li><b>Gate thiếu bằng chứng:</b> Thiếu dấu vết audit hoặc thiếu retention làm “No evidence = No gate” ở Ship Release và audit khách hàng.</li>
+</ul>
+</div>
+<div class="grid-2">
+<div class="note">
+<strong>Ai chịu trách nhiệm</strong>
+<ul>
+<li><b>IT/M365 Admin:</b> cấu hình baseline tenant, labels/DLP/retention, audit logging; cấp/thu hồi quyền; xuất bằng chứng cấu hình.</li>
+<li><b>QA/QMS:</b> định nghĩa yêu cầu evidence‑ready, kiểm tra kiểm tra đột xuất “đúng Rev”, dựng evidence pack cho audit; chặn gate khi thiếu MRR.</li>
+<li><b>Process Owners/Supervisor:</b> chịu trách nhiệm vùng dữ liệu (Released/Records/WIP) và kỷ luật lưu hồ sơ theo job.</li>
+<li><b>Toàn bộ role vận hành:</b> tạo hồ sơ đúng thư viện, đúng tên, đúng nhãn; không tự ý chia sẻ external; không dùng file từ chat/email làm “bản đúng”.</li>
+</ul>
+</div>
+<div class="note">
+<strong>Khi nào kích hoạt (Trigger)</strong>
+<ul>
+<li>Khi có <b>khách hàng/auditor</b> yêu cầu truy cập hồ sơ → dựng Evidence Pack và cấp quyền external theo kiểm soát.</li>
+<li>Khi có <b>part/REV mới</b> hoặc thay đổi Rev → kiểm tra vùng Part/REV master, chặn dùng bản cũ.</li>
+<li>Khi có <b>thay đổi cấu hình</b> (sharing, DLP, retention, permission) ảnh hưởng QMS → chạy checklist kiểm soát và lưu evidence.</li>
+<li>Khi phát hiện <b>lỗi dấu hiệu</b>: file nằm sai thư viện, link external không expiry, mass download, delete record.</li>
+</ul>
+</div>
+</div>
+<h2 class="h2" id="m3">3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + “điểm chặn”</h2>
+<p class="muted">Module này chạy xuyên chuỗi E2E và tạo điều kiện để mọi gate khác vận hành “evidence‑ready”.</p>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:260px">Bước E2E</th>
+<th>Input/Handoff vào M365</th>
+<th>Output bắt buộc (MRR)</th>
+<th>Điểm chặn (BLOCK)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>Quote/Contract</b> (Estimator (SAL-03))</td>
+<td>NDA/PO/spec khách hàng; yêu cầu chia sẻ</td>
+<td>Thư mục/Document Set khách hàng + nhãn bảo mật + log cấp quyền</td>
+<td>Không có log cấp quyền &amp; expiry external → <b>BLOCK</b> chia sẻ</td>
+</tr>
+<tr>
+<td><b>Planning</b> (Planner/Supervisor)</td>
+<td>JobNum/WO, Part/Rev, routing, yêu cầu evidence</td>
+<td>Job Dossier tạo đúng mẫu + link Part/REV master</td>
+<td>Job Dossier thiếu key Rev/Customer → <b>HOLD</b> phát hành job pack</td>
+</tr>
+<tr>
+<td><b>Engineering/Programming</b> (Programmer)</td>
+<td>Drawing/solid/spec “Released”</td>
+<td>Release record chương trình + link đến master data</td>
+<td>File CAM/DWG nằm ngoài Part/REV master → <b>STOP</b> chạy chương trình</td>
+</tr>
+<tr>
+<td><b>Production</b> (Operator/Setup)</td>
+<td>Setup sheet, IPQC log, ảnh hiện trường</td>
+<td>Record WIP đúng thư viện; không dùng file từ chat/email</td>
+<td>Dùng bản không truy xuất nguồn (không link Released) → <b>STOP</b></td>
+</tr>
+<tr>
+<td><b>QC/QA</b> (QC/QA)</td>
+<td>Inspection plan, gage status, NCR/MRB</td>
+<td>IR/FAI/CMM + NCR/MRB record có retention</td>
+<td>Thiếu retention label hoặc sửa overwrite → <b>HOLD</b> ship release</td>
+</tr>
+<tr>
+<td><b>Receiving/Purchasing</b> (Warehouse/Purchasing)</td>
+<td>Certs/CoC/material cert, supplier docs, outsource</td>
+<td>Supplier evidence lưu đúng job/lot; traceability</td>
+<td>Cert thiếu link job/lot → <b>HOLD</b> nhận hàng/đưa vào sản xuất</td>
+</tr>
+<tr>
+<td><b>Packing/Ship</b> (Warehouse + QA)</td>
+<td>Ship packet + evidence pack</td>
+<td>Evidence pack chỉ đọc + expiry + log chia sẻ</td>
+<td>No evidence = No gate → <b>BLOCK</b> xuất hàng</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 class="h2" id="m4">4) Failure Points (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
+<ol>
+<li><b>Wrong Rev at point‑of‑use:</b> Operator mở file từ email/chat, bỏ qua thư viện Released.</li>
+<li><b>Mix‑up dữ liệu khách:</b> Lưu drawing khách A vào thư mục khách B do đặt tên không chuẩn.</li>
+<li><b>Any‑link external:</b> Tạo “Anyone link” cho drawing/CNC program, không expiry, không log.</li>
+<li><b>Guest tồn tại vĩnh viễn:</b> Guest access không expiry, không access review, không thu hồi.</li>
+<li><b>Per‑file permission break:</b> Tự bẻ quyền từng file, mất kiểm soát ma trận quyền, audit fail.</li>
+<li><b>Record bị overwrite:</b> Sửa đè file IR/FAI thay vì phát hành bản đính chính, mất toàn vẹn.</li>
+<li><b>Thiếu retention label:</b> Cert/IR/NCR lưu như file rời, không retention, rơi vào “xóa nhầm”.</li>
+<li><b>Job Dossier không freeze:</b> Closeout xong vẫn sửa WIP, audit không chấp nhận record.</li>
+<li><b>Không có audit log evidence:</b> Không bật audit, không xuất log cho sự kiện share/download/delete.</li>
+<li><b>External share bypass gate:</b> Estimator (SAL-03) tự gửi zip/email cho khách thay vì evidence pack chỉ đọc.</li>
+<li><b>Mass delete/mass download:</b> Không có cảnh báo và quy trình phản ứng, mất dữ liệu hoặc lộ dữ liệu.</li>
+<li><b>OneDrive thành kho Records:</b> Người dùng lưu record tại OneDrive cá nhân, rủi ro nghỉ việc/mất truy xuất.</li>
+</ol>
+<h2 class="h2" id="m5">5) Risk Controls (control points; ai làm; bằng chứng; tối thiểu 6)</h2>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:200px">Control point</th>
+<th>Owner</th>
+<th>Bằng chứng/MRR</th>
+<th>Điều kiện đạt (Test/Acceptance)</th>
+<th style="width:120px">Evidence ID</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>MFA + quản trị vai trò</b></td>
+<td>IT/M365 Admin</td>
+<td>Ảnh màn hình cấu hình MFA + danh sách danh sách phân quyền vai trò (xuất)</td>
+<td>Đăng nhập thiết bị mới bắt MFA; không cấp Global Admin ngoài nhóm IT</td>
+<td><b>M365-01</b>, <b>M365-02</b></td>
+</tr>
+<tr>
+<td><b>Guest lifecycle</b></td>
+<td>IT + Supervisor</td>
+<td>Danh sách guest + expiry + biên bản access review quý</td>
+<td>Guest quá hạn bị thu hồi; access review có quyết định giữ/thu hồi</td>
+<td><b>M365-03</b></td>
+</tr>
+<tr>
+<td><b>Sharing baseline</b></td>
+<td>IT</td>
+<td>Chính sách default link type + bằng chứng áp dụng chính sách</td>
+<td>Link mới mặc định “Specific people”; external link có expiry</td>
+<td><b>M365-10</b>, <b>M365-11</b></td>
+</tr>
+<tr>
+<td><b>Controlled Docs: major/minor + approval</b></td>
+<td>Doc Control + QA/QMS</td>
+<td>Ảnh cấu hình library + kiểm tra thử publish</td>
+<td>User không được publish major; Draft không xuất hiện như Released</td>
+<td><b>M365-20</b>, <b>M365-21</b>, <b>M365-22</b></td>
+</tr>
+<tr>
+<td><b>Records: retention + bất biến</b></td>
+<td>QA/QMS + IT</td>
+<td>Retention labels gắn mặc định + mẫu record có DCR record</td>
+<td>Record không bị sửa đè; có nhãn retention theo loại hồ sơ</td>
+<td><b>M365-30</b>…<b>M365-33</b></td>
+</tr>
+<tr>
+<td><b>Purview: Sensitivity + DLP</b></td>
+<td>IT + QA/QMS</td>
+<td>Chính sách labels/DLP + bằng chứng thử share bị block</td>
+<td>Share external đối với Customer‑Confidential/Restricted bị chặn và ghi log</td>
+<td><b>M365-40</b>…<b>M365-42</b></td>
+</tr>
+<tr>
+<td><b>Audit logging + truy vấn quý</b></td>
+<td>IT</td>
+<td>Kết quả truy vấn audit log + biên bản xử lý sự kiện</td>
+<td>Truy xuất được sự kiện share/download/delete; có hành động khi bất ổn</td>
+<td><b>M365-50</b> <span class="muted">CNC-IMS-HUB → QMS-SSOT → Evidence-Pack.</span></td>
+</tr>
+<tr>
+<td><b>Evidence Pack chỉ đọc + expiry</b></td>
+<td>QA/QMS + Estimator (SAL-03)</td>
+<td>Evidence pack tại Z_Audit_Evidence_Pack + log chia sẻ + expiry</td>
+<td>Khách/auditor chỉ đọc; link có expiry; có FRM log cấp quyền</td>
+<td><b>M365-60</b> <span class="muted">CNC-IMS-HUB → QMS-SSOT → Evidence-Pack.</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 class="h2" id="m6">6) Fail‑fast rules (≥3) + tiêu chí STOP/HOLD/BLOCK</h2>
+<div class="callout">
+<ol>
+<li><b>STOP ngay</b> khi phát hiện file đang dùng không truy xuất từ thư viện Released/Records (mở từ email/chat/USB). Hành động: khóa thao tác, chuyển sang “bản đúng”, ghi nhận sự kiện.</li>
+<li><b>HOLD ngay</b> khi phát hiện record (IR/FAI/Cert/NCR) thiếu retention label hoặc bị sửa đè. Hành động: ngừng ship release, lập NCR nội bộ, tạo bản đính chính theo quy tắc record.</li>
+<li><b>BLOCK ngay</b> mọi chia sẻ external khi link “Anyone”, không expiry, hoặc cấp guest không log. Hành động: thu hồi link/guest, dựng lại evidence pack, cập nhật FRM log.</li>
+<li><b>BLOCK ship release</b> khi evidence pack không đủ MRR tối thiểu cho job (thiếu job dossier, thiếu inspection record, thiếu traceability). Hành động: bổ sung MRR trước khi GO.</li>
+</ol>
+</div>
+<h2 class="h2" id="m7">7) Phản ứng 60 giây (khi sai Rev/mix‑up/thiếu chứng từ/bypass gate/ship risk)</h2>
+<div class="grid-2">
+<div class="note">
+<strong>60 giây — Sai Rev / dùng file ngoài Released</strong>
+<ol>
+<li><b>DỪNG</b> thao tác tại máy/bàn QC.</li>
+<li><b>CÔ LẬP</b> bản file đang dùng (không xóa), chụp màn hình đường dẫn/nguồn lấy file.</li>
+<li><b>CHUYỂN</b> sang bản đúng trong Released/Part‑REV master, xác nhận Rev trên header.</li>
+<li><b>BÁO</b> Supervisor + QA trong 5 phút, ghi log sự kiện vào Job Dossier.</li>
+<li><b>ĐÁNH GIÁ</b> ảnh hưởng: part đã gia công bao nhiêu, cần hold lô nào.</li>
+</ol>
+</div>
+<div class="note">
+<strong>60 giây — Link external / guest ngoài kiểm soát</strong>
+<ol>
+<li><b>THU HỒI</b> link hoặc guest ngay trong SharePoint/Teams.</li>
+<li><b>GHI</b> lại thời điểm, đối tượng, phạm vi (site/library/file) vào log cấp quyền.</li>
+<li><b>QUÉT</b> audit log cho sự kiện download/share trong khung thời gian rủi ro.</li>
+<li><b>DỰNG</b> lại evidence pack chỉ đọc + expiry.</li>
+<li><b>THÔNG BÁO</b> QA/QMS để quyết định CAPA và thông báo khách hàng khi cần.</li>
+</ol>
+</div>
+</div>
+<h2 class="h2" id="m8">8) Checklist vận hành (≤15 bước) — mỗi bước có: Owner, Evidence/MRR, điểm sai hay gặp</h2>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:44px">#</th>
+<th>Bước</th>
+<th style="width:170px">Owner</th>
+<th style="width:260px">Evidence/MRR bắt buộc</th>
+<th>Điểm sai hay gặp</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Xác nhận role &amp; quyền truy cập theo ma trận</td><td>Supervisor + IT</td><td>Ảnh chụp nhóm quyền + log cấp quyền (FRM log)</td><td>Cấp quyền cá nhân, không theo group</td></tr>
+<tr><td>2</td><td>Bật MFA và kiểm tra đăng nhập thiết bị mới</td><td>IT</td><td>Ảnh cấu hình MFA + kết quả test</td><td>Dùng tài khoản admin chung, không tách vai trò</td></tr>
+<tr><td>3</td><td>Thiết lập sharing baseline: Specific people + expiry external</td><td>IT</td><td>Ảnh setting + test tạo link</td><td>Cho phép Anyone link</td></tr>
+<tr><td>4</td><td>Chuẩn hóa 3 vùng: Released / Records / WIP-Job Workspace</td><td>QA/QMS + Process Owners</td><td>Sơ đồ site/library + danh mục thư viện</td><td>Lẫn WIP vào Records, mất “freeze”</td></tr>
+<tr><td>5</td><td>Thiết lập Controlled Docs library: major/minor + approval</td><td>Doc Control + IT</td><td>Ảnh cấu hình versioning/approval + test publish</td><td>Draft xuất hiện như bản chính</td></tr>
+<tr><td>6</td><td>Thiết lập Records library: retention label mặc định + hạn chế delete</td><td>QA/QMS + IT</td><td>Danh sách retention labels + mẫu record có DCR record</td><td>Sửa đè file IR/FAI</td></tr>
+<tr><td>7</td><td>Thiết lập taxonomy nhãn bảo mật: Internal/Confidential/Customer‑Confidential/Restricted</td><td>IT + QA/QMS</td><td>Ảnh labels + mapping nhóm dữ liệu</td><td>Không gắn nhãn cho dữ liệu khách</td></tr>
+<tr><td>8</td><td>Thiết lập DLP: chặn share external cho Customer‑Confidential/Restricted</td><td>IT</td><td>Ảnh policy + test share bị block</td><td>Chỉ cảnh báo, không chặn</td></tr>
+<tr><td>9</td><td>Bật audit logging và xác nhận retention tối thiểu</td><td>IT</td><td>Ảnh audit setting + thông tin retention</td><td>Không lưu audit log đủ kỳ audit</td></tr>
+<tr><td>10</td><td>Tạo Job Dossier theo mẫu và link tới Part/REV master</td><td>Planner</td><td>Job Dossier tạo đúng cấu trúc + metadata Rev</td><td>Thiếu Rev, thiếu Customer code</td></tr>
+<tr><td>11</td><td>Ghi nhận release record chương trình / setup pack</td><td>Programmer + Setup</td><td>Release record + setup sheet ký xác nhận</td><td>Copy file CAM rời, không link master</td></tr>
+<tr><td>12</td><td>Lưu inspection records đúng thư viện + retention</td><td>QC/QA</td><td>IR/FAI/CMM PDF có label</td><td>Lưu trên máy cá nhân rồi gửi email</td></tr>
+<tr><td>13</td><td>Dựng Evidence Pack chỉ đọc tại Z_Audit_Evidence_Pack + expiry</td><td>QA/QMS + Estimator (SAL-03)</td><td>Evidence pack + log chia sẻ (FRM log)</td><td>Gửi file rời qua email</td></tr>
+<tr><td>14</td><td>Chạy truy vấn audit log cho sự kiện trọng yếu (share/download/delete)</td><td>IT + QA</td><td>Kết quả truy vấn + biên bản xử lý</td><td>Chạy xong không lưu evidence</td></tr>
+<tr><td>15</td><td>Đóng hồ sơ job: freeze WIP → record</td><td>QA/QMS + Supervisor</td><td>Biên bản closeout + trạng thái “frozen”</td><td>Closeout xong vẫn sửa file</td></tr>
+</tbody>
+</table>
+</div>
+<h2 class="h2" id="m9">9) OJT thực chiến theo TWI</h2>
+<div class="card">
+<h3 class="h3">9.1 Job breakdown (Step / Key Points / Reasons)</h3>
+<p class="muted">OJT tập trung “làm được và có bằng chứng”, không đọc lý thuyết.</p>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:44px">#</th>
+<th>Step</th>
+<th>Key Points (điểm then chốt)</th>
+<th>Reasons (vì sao phải làm)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Phân loại dữ liệu vào đúng vùng (Released/Records/WIP)</td>
+<td>Không đặt file “bản đúng” trong chat/email; luôn link về Released/Part‑REV master</td>
+<td>Chặn nhầm Rev; audit truy xuất đúng nguồn</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Tạo/kiểm tra link chia sẻ</td>
+<td>Chỉ “Specific people”; đặt expiry; không cho edit; ghi log cấp quyền</td>
+<td>Chặn rò rỉ; bảo vệ dữ liệu khách; bằng chứng audit</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Gắn nhãn bảo mật + kiểm tra DLP</td>
+<td>Gắn Customer‑Confidential/Restricted cho dữ liệu khách/CNC program; thử share để kiểm chứng block</td>
+<td>DLP chỉ có giá trị khi kiểm chứng tại điểm dùng</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Lưu record đúng cách</td>
+<td>Không overwrite; khi đính chính tạo bản mới + note; kiểm tra retention label</td>
+<td>Giữ toàn vẹn hồ sơ; audit không bác bỏ</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Dựng Evidence Pack</td>
+<td>Chỉ lấy Released/Record đã freeze; đặt tại Z_Audit_Evidence_Pack; chỉ đọc; expiry; log</td>
+<td>No evidence = No gate; audit mở được trong 3 phút</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Truy vấn audit log và lưu bằng chứng</td>
+<td>Chạy truy vấn theo khung thời gian; xuất kết quả; ghi nhận điều tra/hành động</td>
+<td>Chặn sự kiện “ẩn” như mass download/delete</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<h3 class="h3">9.2 OJT output (sản phẩm đầu ra bắt buộc)</h3>
+<ul>
+<li><b>01 bộ hồ sơ cấu hình</b> cho module này: FRM‑QMS‑016 được điền đầy đủ + bộ ảnh/snapshot evidence theo Evidence ID M365‑01…M365‑42.</li>
+<li><b>01 Job Dossier mẫu</b> (JobNum giả lập) có cấu trúc đúng, metadata Rev/Customer đầy đủ, có record inspection mẫu.</li>
+<li><b>01 Evidence Pack mẫu</b> đặt tại <b>Z_Audit_Evidence_Pack</b> (chỉ đọc + expiry) và có log chia sẻ.</li>
+<li><b>01 kết quả truy vấn audit log</b> cho sự kiện external share và delete trong 30 ngày gần nhất, kèm biên bản xử lý.</li>
+</ul>
+<p class="muted">Dữ liệu giả lập dùng cho OJT không chứa thông tin khách hàng thật. Khi OJT dùng job thật, QA/QMS gắn nhãn Customer‑Confidential và xử lý theo DLP.</p>
+</div>
+<div class="card">
+<h3 class="h3">9.3 Rubric L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn được cấp khi đạt)</h3>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:140px">Level</th>
+<th>Hành vi quan sát được</th>
+<th>Điều kiện lên level</th>
+<th>Quyền hạn được cấp khi đạt</th>
+<th style="width:220px">Áp dụng theo role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>L1</b><div class="muted">Nhận biết &amp; làm theo hướng dẫn (có giám sát)</div></td>
+<td>
+<ul>
+<li>Mở đúng “bản đúng” từ Released/Records, không dùng file từ chat/email.</li>
+<li>Lưu file đúng thư viện theo hướng dẫn; đặt tên đúng quy tắc.</li>
+<li>Báo Supervisor khi gặp link external hoặc file sai vị trí.</li>
+</ul>
+</td>
+<td>Bài kiểm tra đạt ≥ 75% và OJT check bước 1–2 đạt</td>
+<td>Được upload evidence vào Job Dossier/Records theo quyền</td>
+<td>Operator, Setup, Warehouse, Maintenance, EHS</td>
+</tr>
+<tr>
+<td><b>L2</b><div class="muted">Thực hiện độc lập (ổn định theo checklist)</div></td>
+<td>
+<ul>
+<li>Tạo Job Dossier đúng mẫu và link Part/REV master.</li>
+<li>Tạo release record (program/setup/inspection) và lưu đúng Records.</li>
+<li>Tự phát hiện sai Rev/mix‑up và kích hoạt phản ứng 60 giây.</li>
+</ul>
+</td>
+<td>OJT output có 0 lỗi gate; kiểm tra đột xuất 3 hồ sơ liên tiếp đạt</td>
+<td>Được tạo cấu trúc dossier/record trong phạm vi job; không cấp quyền external</td>
+<td>Planner, Programmer, QC, Purchasing, Estimator (SAL-03)</td>
+</tr>
+<tr>
+<td><b>L3</b><div class="muted">Kiểm soát &amp; chặn rủi ro (gating)</div></td>
+<td>
+<ul>
+<li>Thiết lập và kiểm chứng controls M365‑10…M365‑42 theo checklist.</li>
+<li>Dựng Evidence Pack chỉ đọc, đặt expiry, lưu log cấp quyền.</li>
+<li>Chạy truy vấn audit log, ra quyết định HOLD/BLOCK và ghi MRR xử lý.</li>
+</ul>
+</td>
+<td>Bài test thực hành PASS và 1 lần xử lý sự kiện giả lập đạt</td>
+<td>Được phê duyệt freeze hồ sơ job; được mở evidence pack cho audit theo quy trình</td>
+<td>QA, Supervisor, IT (theo phân quyền)</td>
+</tr>
+<tr>
+<td><b>L4</b><div class="muted">Thiết kế hệ thống &amp; cải tiến</div></td>
+<td>
+<ul>
+<li>Thiết kế lại library mẫu/metadata để giảm nhầm Rev và tăng truy xuất.</li>
+<li>Phân tích audit events theo xu hướng, tạo hành động phòng ngừa và cập nhật SOP/module.</li>
+<li>Tổ chức access review định kỳ và đóng hành động thu hồi quyền.</li>
+</ul>
+</td>
+<td>2 chu kỳ access review liên tiếp đạt + 1 cải tiến giảm rủi ro có bằng chứng</td>
+<td>Được phê duyệt thay đổi baseline M365 ảnh hưởng QMS (theo Change Control)</td>
+<td>IT/IMS Owner, QA/QMS Owner</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<h2 class="h2" id="m10">10) Đánh giá</h2>
+<div class="card">
+<h3 class="h3">10.1 Bài kiểm tra (≥20 câu) — trắc nghiệm + tình huống ngắn</h3>
+<ol>
+<li>Chọn đúng: “bản đúng” của drawing/SOP nằm ở vùng nào? A) WIP B) Released C) Email D) Desktop</li>
+<li>Hành động đúng khi nhận file drawing qua email: A) dùng luôn B) lưu OneDrive C) đối chiếu Released/Part‑REV master rồi dùng bản đúng D) gửi lại cho đồng nghiệp</li>
+<li>Link chia sẻ external bắt buộc: A) Anyone link B) Specific people C) không expiry D) cho edit mặc định</li>
+<li>Quy tắc “No evidence = No gate” áp dụng mạnh nhất ở bước nào? A) Setup B) Ship Release C) Nhập kho D) Họp giao ban</li>
+<li>Major/Minor version dùng để tách trạng thái nào? A) Internal/External B) Draft/Released C) Job/Part D) User/Admin</li>
+<li>Record bị đính chính đúng cách: A) overwrite file cũ B) xóa file cũ C) tạo file mới + ghi chú lý do D) đổi tên file cũ</li>
+<li>Retention label mục tiêu chính: A) làm đẹp thư viện B) bảo toàn hồ sơ theo thời hạn C) tăng tốc Wi‑Fi D) giảm dung lượng email</li>
+<li>Vai trò nào chịu trách nhiệm dựng Evidence Pack cho audit? A) Operator B) QA/QMS C) Maintenance D) Vendor</li>
+<li>Chọn đúng: OneDrive được dùng cho mục tiêu nào? A) kho Records B) kho Released C) vùng làm việc cá nhân và phải đồng bộ về site chuẩn D) kho audit log</li>
+<li>DLP chặn điều gì trong module này? A) in tài liệu B) share external dữ liệu Customer‑Confidential/Restricted C) mở file PDF D) rename folder</li>
+<li>Khi phát hiện sai Rev tại máy, hành động đầu tiên: A) tiếp tục gia công B) DỪNG và cô lập nguồn file C) xóa file D) gọi khách hàng</li>
+<li>Guest access bắt buộc có gì? A) vĩnh viễn B) expiry + access review C) mật khẩu chung D) quyền edit toàn site</li>
+<li>Audit logging phục vụ mục tiêu nào? A) đo OEE B) truy vết share/download/delete và thay đổi quyền C) tăng tốc máy CNC D) quản lý tồn kho</li>
+<li>Chọn đúng: “break per‑file permission” gây hậu quả nào? A) dễ audit hơn B) mất kiểm soát ma trận quyền và tăng lỗi chia sẻ C) tăng chất lượng D) giảm rủi ro</li>
+<li>Chọn đúng: Evidence Pack đặt ở đâu? A) Desktop QA B) Email C) Z_Audit_Evidence_Pack D) USB</li>
+<li>Khi Estimator (SAL-03) cần gửi hồ sơ cho khách, hành động đúng: A) gửi zip email B) share evidence pack chỉ đọc + expiry + log C) gửi link Anyone D) gửi qua chat cá nhân</li>
+<li>Điều kiện để GO ship release: A) đủ số lượng B) đủ MRR theo job dossier/evidence pack C) có lời hứa D) đã hết giờ</li>
+<li>Ai chịu trách nhiệm freeze WIP thành record khi closeout? A) QA/QMS + Supervisor B) Operator C) khách hàng D) shipper</li>
+<li>Chọn đúng: sự kiện nào bắt buộc truy vấn audit log định kỳ? A) đổi ca B) external share, mass download, delete record C) thay dao D) bật máy</li>
+<li>Trả lời ngắn: viết 3 mục MRR tối thiểu của Evidence Pack cho audit khách hàng.</li>
+</ol>
+</div>
+<div class="card">
+<h3 class="h3">10.2 Tình huống (≥3 tình huống thật) — yêu cầu quyết định HOLD/GO và ghi MRR</h3>
+<div class="note">
+<strong>Tình huống 1 — Audit khách hàng yêu cầu truy cập “job dossier mẫu”</strong>
+<p><b>Dữ kiện:</b> Estimator (SAL-03) nhận yêu cầu từ auditor truy cập 01 job dossier và 01 bản SOP. Estimator (SAL-03) đã tạo link SharePoint dạng “Anyone” không expiry cho thư mục job.</p>
+<p><b>Yêu cầu:</b> Quyết định <b>BLOCK/HOLD/GO</b>, liệt kê 5 hành động bắt buộc trong 30 phút đầu, và ghi MRR phải tạo.</p>
+</div>
+<div class="note">
+<strong>Tình huống 2 — Setup phát hiện sai Rev ngay trước chạy máy</strong>
+<p><b>Dữ kiện:</b> Setup sheet ghi REV F nhưng file drawing trên máy hiển thị REV E. Operator nói file lấy từ Teams chat hôm qua.</p>
+<p><b>Yêu cầu:</b> Quyết định <b>STOP/HOLD/GO</b>, thực hiện “phản ứng 60 giây”, và chỉ rõ bằng chứng phải lưu vào Job Dossier.</p>
+</div>
+<div class="note">
+<strong>Tình huống 3 — Phát hiện xóa nhầm record inspection</strong>
+<p><b>Dữ kiện:</b> QC báo file CMM PDF của job vừa closeout biến mất khỏi thư viện Records. Audit log cho thấy có sự kiện delete vào 21:10 ca 2.</p>
+<p><b>Yêu cầu:</b> Quyết định <b>HOLD/BLOCK/GO</b> cho ship release, liệt kê hành động điều tra + khôi phục, và MRR bắt buộc để đóng sự kiện.</p>
+</div>
+</div>
+<div class="card">
+<h3 class="h3">10.3 Bài test thực hành (bắt buộc) — mô tả bài test + rubric + ĐẠT/KHÔNG ĐẠT</h3>
+<div class="callout">
+<b>Bài test thực hành</b>
+<ol>
+<li><b>IT (hoặc người được phân quyền):</b> cấu hình 01 thư viện “Released” bật major/minor + approval, và 01 thư viện “Records” gắn retention label mặc định.</li>
+<li><b>QA/QMS:</b> dựng 01 Evidence Pack chỉ đọc + expiry; ghi log cấp quyền; kiểm chứng DLP bằng 01 lượt share thử.</li>
+<li><b>Role vận hành (Operator/Setup/Programmer/QC/Warehouse/Estimator (SAL-03)):</b> nộp 01 hồ sơ theo job giả lập đúng nơi, đúng tên; không dùng file từ chat/email; thực hiện 01 escalation theo phản ứng 60 giây (giả lập).</li>
+<li><b>IT + QA:</b> chạy 01 truy vấn audit log cho sự kiện external share trong 30 ngày; lưu kết quả + biên bản kết luận.</li>
+</ol>
+</div>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:160px">Tiêu chí</th>
+<th>PASS</th>
+<th>FAIL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>Gate file đúng nguồn</b></td>
+<td>100% file dùng trong test truy xuất từ Released/Records</td>
+<td>Có file lấy từ chat/email/desktop làm “bản đúng”</td>
+</tr>
+<tr>
+<td><b>Gate external share</b></td>
+<td>Link “Specific people”, chỉ đọc, có expiry, có log</td>
+<td>Any‑link; không expiry; không log; cho edit</td>
+</tr>
+<tr>
+<td><b>Gate record integrity</b></td>
+<td>Record có retention label; không overwrite; có DCR record</td>
+<td>Overwrite hoặc thiếu retention</td>
+</tr>
+<tr>
+<td><b>Gate dấu vết audit</b></td>
+<td>Có kết quả audit log + biên bản xử lý</td>
+<td>Không chứng minh được ai share/delete trong test</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<h2 class="h2" id="m11">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “No evidence = No gate”)</h2>
+<div class="callout">
+<ul>
+<li><b>PASS</b> khi: (1) Bài kiểm tra ≥ 75%; (2) Tình huống đạt: quyết định đúng STOP/HOLD/BLOCK/GO và liệt kê MRR đầy đủ; (3) Bài test thực hành PASS; (4) OJT output đủ và không có lỗi gate.</li>
+<li><b>FAIL</b> khi: thiếu bất kỳ MRR bắt buộc nào, hoặc vi phạm 1 gate (Any‑link, dùng file ngoài Released, overwrite record, thiếu retention, không có audit log evidence).</li>
+<li><b>Quy tắc cứng:</b> <b>No evidence = No gate</b>. Thiếu bằng chứng → không công nhận level và không cho vận hành quyền tương ứng.</li>
+</ul>
+</div>
+<h2 class="h2" id="m12">12) MRR tối thiểu</h2>
+<div class="card">
+<h3 class="h3">12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
+<ul>
+<li>FRM‑QMS‑016 (M365 Configuration Checklist) — bản điền đầy đủ và ký xác nhận.</li>
+<li>Bộ ảnh/snapshot evidence cho các controls: M365‑01,02,03,10,11,20,21,22,30–33,40–42.</li>
+<li>Log cấp/thu hồi quyền (FRM‑QMS‑15) cho mọi external share/guest.</li>
+<li>Biên bản access review quý (FRM‑QMS‑17) kèm quyết định thu hồi/cập nhật.</li>
+<li>Evidence Pack chỉ đọc (Z_Audit_Evidence_Pack) + expiry + danh mục nội dung.</li>
+<li>ANNEX‑QMS‑003 (Evidence Pack) — cấu trúc gói bằng chứng và quy tắc đóng gói.</li>
+<li>Kết quả truy vấn audit log định kỳ + biên bản xử lý sự kiện trọng yếu.</li>
+</ul>
+</div>
+<div class="card">
+<h3 class="h3">12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
+<div class="callout">
+<p><b>Quy tắc cứng:</b> tên file đủ 5 yếu tố: <b>Loại hồ sơ</b> + <b>ID</b> + <b>Ngày (ISO)</b> + <b>Scope</b> + <b>Trạng thái</b>.</p>
+<pre style="white-space:pre-wrap">M365CFG_{EvidenceID}_{YYYY-MM-DD}_{Scope}_{Status}.{ext}
+EX: M365CFG_M365-21_2026-02-04_ControlledDocsLibrary_PASS.png</pre>
+<p class="muted">Không dùng ký tự đặc biệt; không dùng tiếng Việt có dấu trong filename.</p>
+</div>
+</div>
+<div class="card">
+<h3 class="h3">12.3 NÆ¡i lÆ°u (SharePoint library/list/path)</h3>
+<ul>
+<li><b>QMS Controlled Documents:</b> CNC‑IMS‑HUB → QMS‑Controlled‑Documents → qms → sop (tài liệu SOP).</li>
+<li><b>Forms:</b> CNC‑IMS‑HUB → QMS‑Controlled‑Documents → forms (FRM).</li>
+<li><b>Training module:</b> CNC‑IMS‑HUB → QMS‑Controlled‑Documents → training → academy → system‑ops. <span class="muted">RBAC: QA/QMS approve • OPS execute • IT admin • sửa record gate = QA/QMS.</span></li>
+<li><b>Evidence Pack:</b> CNC‑IMS‑HUB → Z_Audit_Evidence_Pack. <span class="muted">Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint).</span></li>
+<li><b>Job Dossier:</b> CNC‑IMS‑HUB → Job‑Dossiers → JOB‑{JobNum}_{PartNum}_REV‑{Rev}.</li>
+<li><b>Part/REV Master Data:</b> CNC‑IMS‑HUB → DATA → 03_Production → 00_Programming → {CustomerCode} → {CustomerPartNo} → REV {Rev}.</li>
+</ul>
+</div>
+<h2 class="h2" id="m13">13) Common audit findings &amp; prevention (≥8)</h2>
+<ol>
+<li><b>Không chứng minh “bản đúng”:</b> auditor thấy file xuất phát từ email/chat → chặn bằng quy tắc point‑of‑use và kiểm tra đột xuất hàng tháng.</li>
+<li><b>External sharing không kiểm soát:</b> Anyone link/không expiry → chặn bằng baseline sharing + log cấp quyền.</li>
+<li><b>Guest không thu hồi:</b> guest tồn tại sau audit → chặn bằng expiry + access review quý.</li>
+<li><b>Record integrity yếu:</b> overwrite file inspection/cert → chặn bằng quy tắc đính chính + retention label.</li>
+<li><b>Thiếu retention:</b> hồ sơ không gắn retention label → chặn bằng default label tại Records library.</li>
+<li><b>Không có dấu vết audit:</b> không truy xuất ai delete/share → chặn bằng audit logging + truy vấn định kỳ.</li>
+<li><b>Mix‑up khách hàng:</b> đặt tên không chuẩn, lưu sai thư mục → chặn bằng chuẩn naming + mẫu folder.</li>
+<li><b>Evidence pack thiếu cấu trúc:</b> không có danh mục, không chỉ đọc → chặn bằng checklist dựng pack và kiểm chứng DLP trước chia sẻ.</li>
+<li><b>Per‑file permission break:</b> khó audit và dễ rò rỉ → chặn bằng nguyên tắc đặt quyền tại Site/Library/Document Set.</li>
+</ol>
+</div></div></div><!-- /container/page/page-body -->
+
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+

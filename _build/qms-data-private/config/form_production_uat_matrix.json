@@ -1,0 +1,158 @@
+{
+  "pack_id": "HESEM-FRM-UAT-V0-2026-03-21",
+  "forms": [
+    {
+      "code": "FRM-101",
+      "title": "Master Document Register",
+      "owner": "QMS Engineer / QA Manager",
+      "path": "04-Bieu-Mau/01-FRM-100/FRM-101_Master_Document_Register.xlsx",
+      "purpose": "Master register / document control",
+      "entry_point": "../04-Bieu-Mau/01-FRM-100/index.html; SOP-101",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-104",
+      "title": "Document Implementation Checklist",
+      "owner": "QMS Engineer / QA Manager",
+      "path": "04-Bieu-Mau/01-FRM-100/FRM-104_Document_Deployment_Checklist.xlsx",
+      "purpose": "Deployment gate",
+      "entry_point": "../04-Bieu-Mau/01-FRM-100/index.html; SOP-101",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-111",
+      "title": "Quarterly Access Review",
+      "owner": "IT / QA/QMS",
+      "path": "04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx",
+      "purpose": "Quarterly access review",
+      "entry_point": "../01-QMS-Portal/site-map.html; SOP-104",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-131",
+      "title": "Sổ đăng ký rủi ro và cơ hội",
+      "owner": "QMS Engineer",
+      "path": "04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx",
+      "purpose": "Risk register",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-103-risk-opportunity-fmea-and-control-plan.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-141",
+      "title": "IT Access Request Change Revocation",
+      "owner": "IT / Functional Owner",
+      "path": "04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx",
+      "purpose": "Access request / change / revoke",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-201",
+      "title": "RFQ Register",
+      "owner": "Customer Service",
+      "path": "04-Bieu-Mau/02-FRM-200/FRM-201_RFQ_Register.xlsx",
+      "purpose": "RFQ intake",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-201-rfq-contract-review-and-order-kickoff.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-202",
+      "title": "Checklist xem xét hợp đồng",
+      "owner": "Customer Service / Estimator",
+      "path": "04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx",
+      "purpose": "Contract review",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-201-rfq-contract-review-and-order-kickoff.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-205",
+      "title": "Job Dossier Index",
+      "owner": "Production Planner / QA / Document Control",
+      "path": "04-Bieu-Mau/02-FRM-200/FRM-205_Job_Dossier_Evidence_Index.xlsx",
+      "purpose": "Job dossier evidence index",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-202-job-dossier-gate-control-and-closeout.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-305",
+      "title": "Inspection Program Release Checklist",
+      "owner": "Engineering / QA / Metrology",
+      "path": "04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx",
+      "purpose": "Inspection program release",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/03-SOP-300/sop-302-inspection-planning-and-program-control.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-402",
+      "title": "Supplier Evaluation and Approval Record",
+      "owner": "Supply Chain Manager / QA Manager",
+      "path": "04-Bieu-Mau/04-FRM-400/FRM-402_Supplier_Evaluation_Form.xlsx",
+      "purpose": "Supplier evaluation",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-401-purchasing-and-supplier-control.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-405",
+      "title": "Supplier Performance Scorecard & Source Status Review",
+      "owner": "Supply Chain Manager / QA Manager",
+      "path": "04-Bieu-Mau/04-FRM-400/FRM-405_Supplier_Scorecard.xlsx",
+      "purpose": "Supplier scorecard",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-401-purchasing-and-supplier-control.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-511",
+      "title": "Setup and First-Piece Record",
+      "owner": "Setup Technician / Shift Leader / QA / Process owner",
+      "path": "04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx",
+      "purpose": "Setup and first piece",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-and-work-order-release.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-601",
+      "title": "Calibration Log",
+      "owner": "QA Manager / Metrology owner / Equipment owner",
+      "path": "04-Bieu-Mau/06-FRM-600/FRM-601_Calibration_Log.xlsx",
+      "purpose": "Calibration log",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-601-monitoring-and-measuring-resources.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-651",
+      "title": "Nonconformance Report",
+      "owner": "QA Manager / Process owner / Function owner liên quan",
+      "path": "04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx",
+      "purpose": "NCR",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-605-nonconformance-capa-and-8d.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-701",
+      "title": "Receiving and IQC Unified Log",
+      "owner": "Warehouse Clerk / Warehouse Lead",
+      "path": "04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx",
+      "purpose": "Receiving and IQC unified log",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-801",
+      "title": "Training Plan",
+      "owner": "HR Manager / Department Heads / Training owners",
+      "path": "04-Bieu-Mau/08-FRM-800/FRM-801_Training_Plan.xlsx",
+      "purpose": "Training plan",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-801-training-competency-and-authorization.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    },
+    {
+      "code": "FRM-911",
+      "title": "Biên bản xem xét của lãnh đạo và action register",
+      "owner": "Top Management / QA/QMS",
+      "path": "04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx",
+      "purpose": "Management review minutes",
+      "entry_point": "../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html",
+      "expected": "Portal / internal doc click tải đúng workbook .xlsx; mở bằng desktop Excel; lưu record tại nơi được phép; không rơi về HTML cũ."
+    }
+  ]
+}

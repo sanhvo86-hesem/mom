@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TRN-ACA-GATE-01 — Role Gate Tests &amp; Certification Logic | HESEM QMS</title>
+<link href="../../assets/style.css" rel="stylesheet"/>
+<style>
+
+/* PAGE BREAK & OVERFLOW FIX */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .form-sheet, .lane, .legend, .req, .vstep, .auth-grid, .backup-card, .org-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header { page-break-inside: avoid; break-inside: avoid; }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
+.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
+.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
+.raci-A {background:#fff5f5; color:#c92a2a;}
+.raci-R {background:#e7f5ff; color:#1864ab;}
+.raci-C {background:#fff9db; color:#e67700;}
+.raci-I {background:#ebfbee; color:#2b8a3e;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
+.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
+.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
+.doc-link-list {list-style:none; margin:0; padding:0;}
+.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
+.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
+.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
+.svg-wrap,.org-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
+.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
+.org-tree{display:flex;flex-direction:column;gap:16px;margin:8px 0;}
+.org-level{display:grid;gap:14px;}
+.org-level.cols-1{grid-template-columns:1fr;}
+.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr));}
+.org-card{border:1px solid var(--ln);border-top:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
+.org-card h3{font-size:14px;color:var(--navy);margin:0 0 4px;}
+.org-card p{margin:4px 0;font-size:12px;}
+.org-row{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);margin:12px 0;}
+.org-row h3{margin:0 0 8px;font-size:13px;color:var(--navy);}
+.badge-soft{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:10px;font-weight:700;margin-right:6px;margin-bottom:6px;}
+.kpi-box{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);margin:8px 0;}
+.kpi-box b{display:block;font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
+.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
+.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left:4px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
+.role-boundary{border:1px solid #cfe0ff;border-left:4px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
+.phase-card{border:1px solid var(--ln);border-left:4px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
+.phase-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
+.phase-card p:last-child,.role-boundary p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
+.small-note{font-size:12px;color:var(--ink2);}
+
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu kiểm soát</span>
+</div>
+</div>
+<div class="title">
+<strong>TRN-ACA-GATE-01 — Role Gate Tests &amp; Certification Logic</strong>
+<span class="sub-vn">Cơ chế gate test và chứng nhận theo family vai trò</span>
+</div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>TRN-ACA-GATE-01</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>HR Manager / Department Heads / QA Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="form-sheet">
+<div class="iso-map"><div class="iso-title">Nguyên tắc gate test</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Gate test phải dùng tình huống thật hoặc mô phỏng rất gần thực tế HESEM, không chỉ kiểm tra lý thuyết. Người vượt gate phải chứng minh được Knowledge + Skill + Evidence + Metric trong phạm vi vai trò.</div></div><div class="req"><span class="req-tag should">NÊN</span><div>Gate test của vị trí giữ quality gate, release gate hoặc customer commitment nên có phần quan sát trực tiếp tại hiện trường/hệ thống.</div></div></div>
+<h2 class="h2">1. Danh mục gate test theo family vai trò</h2><div class="table-card"><table class="table"><colgroup><col style="width:16%"/><col style="width:18%"/><col style="width:28%"/><col style="width:22%"/><col style="width:16%"/></colgroup><thead><tr><th>Family vai trò</th><th>Gate test chính</th><th>Bài test / tình huống</th><th>Evidence tối thiểu</th><th>Approver / certifier</th></tr></thead><tbody><tr><td>Commercial Front-end</td><td>Customer Service; Estimator</td><td>Gate A: RFQ/PO completeness &amp; customer communication discipline</td><td>Case nhận RFQ thiếu revision/CSR; phải xác định thông tin thiếu, route consult đúng và phát hành contract review đúng mẫu.</td><td>FRM-202, quote/assumption pack, change log, email trail đã kiểm soát</td><td>CEO / Customer Service owner</td></tr><tr><td>Engineering Release</td><td>DFM; Process; CAM</td><td>Gate B: feasibility → routing → NC release chain</td><td>Từ 1 part drawing mẫu, tạo feasibility summary, routing / NC release path, chỉ ra CTQ, gage/method và hold point.</td><td>FRM-303, routing/setup, FRM-305, NC release evidence</td><td>Engineering Lead/Manager</td></tr><tr><td>Planning &amp; IE</td><td>Planner; Production Engineer/IE</td><td>Gate C: dispatch &amp; data-driven improvement</td><td>Cho 1 backlog thật/mô phỏng, phải xếp lại dispatch theo readiness, chỉ ra bottleneck và mở action trên số liệu.</td><td>Dispatch list, WIP review, bottleneck analysis, action log</td><td>Production Director</td></tr><tr><td>Workshop Leadership</td><td>Workshop Manager; Shift Leader</td><td>Gate D: abnormality reaction &amp; handover</td><td>Thực hiện startup / tier review / shift handover với 1 abnormality scenario về quality hoặc machine downtime.</td><td>FRM-504, escalation record, short-term reaction and owner assignment</td><td>Production Director / QA Manager theo nội dung</td></tr><tr><td>Setup &amp; CNC Operation</td><td>Setup Technician; CNC Operator</td><td>Gate E: setup readiness &amp; first-off rule</td><td>Chạy mô phỏng setup/first-off: xác nhận program/tool/fixture/revision, ghi record, phản ứng khi first-off fail.</td><td>FRM-511, machine log, abnormality tag, traveler evidence</td><td>CNC Workshop Manager + Quality rule</td></tr><tr><td>Quality System &amp; Process Quality</td><td>QA; QMS; QE</td><td>Gate F: complaint / NCR / CAPA / audit closure</td><td>Dẫn một case từ complaint hoặc NCR đến containment, root cause, action, verification và management escalation.</td><td>FRM-651, FRM-652, audit or complaint response pack</td><td>QA Manager</td></tr><tr><td>QC / CMM / Metrology</td><td>QC Lead; QC/CMM; Metrology</td><td>Gate G: trusted measurement &amp; release discipline</td><td>Đo 1 part hoặc dữ liệu mẫu, chứng minh method/gage/CMM phù hợp, đánh giá khi measurement chain có nghi ngờ.</td><td>Inspection result, calibration/MSA check, release/hold decision log</td><td>QA Manager / Metrology owner</td></tr><tr><td>Supply Chain &amp; Shipment</td><td>SCM; Buyer; Warehouse; Tool Crib; Logistics</td><td>Gate H: supplier → lot → ship traceability</td><td>Từ PO đến receipt đến shipment, chứng minh giữ được cert/lot/status và không ship khi thiếu evidence.</td><td>PO tracker, receiving log, issue/lot traceability, shipping checklist</td><td>Supply Chain Manager</td></tr><tr><td>People, Safety &amp; Compliance</td><td>HR; EHS; Finance</td><td>Gate I: people / safety / financial control integration</td><td>Chứng minh 1 case onboarding, incident hoặc invoice request được xử lý đúng tuyến authority và record.</td><td>Training/incident/invoice pack, approval trail</td><td>CEO / functional manager</td></tr><tr><td>Digital &amp; ERP Governance</td><td>ERP Admin; IT Admin</td><td>Gate J: system integrity &amp; recovery discipline</td><td>Mô phỏng 1 change request hoặc incident; phải chỉ ra owner, test, backup/rollback, access control và communication.</td><td>Change request, UAT evidence, backup/restore or incident log</td><td>CEO / system owner</td></tr></tbody></table></div>
+<h2 class="h2">2. Quy tắc công nhận đạt gate</h2><ul><li>Không đạt gate nếu làm đúng thao tác nhưng không hiểu điểm dừng / quyền hold / escalation path của vai trò.</li><li>Không đạt gate nếu evidence không truy được revision, người thực hiện hoặc trạng thái phê duyệt liên quan.</li><li>Có thể đạt có điều kiện khi năng lực kỹ thuật đủ nhưng còn thiếu phạm vi ủy quyền cụ thể (machine family, customer family, gage/method family).</li><li>Tái kiểm tra gate bắt buộc khi có thay đổi lớn về công nghệ, máy, phương pháp đo, family sản phẩm hoặc sau lỗi nghiêm trọng liên quan.</li></ul>
+<h2 class="h2">3. Biểu mẫu dùng cho gate</h2><p><a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM-803</a><br/><a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-804_Competence_Assessment.xlsx">FRM-804</a><br/><a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-805_Skill_Level_Certificate.xlsx">FRM-805</a><br/><a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-806_Certification_Tracking_Log.xlsx">FRM-806</a><br/><a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-807</a><br/><a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-809</a><br/><a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a><br/><a href="../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-ops-003-cnc-operating-model-and-role-boundary.html">ANNEX-OPS-003</a></p>
+<div class="footer-note">Gate test được dùng để chuyển từ “được đào tạo” sang “được phép làm việc độc lập trong phạm vi xác định”.</div>
+</div>
+
+<h2>4. Gate pass không đồng nghĩa authorization pass</h2>
+<div class="decision-grid"><div class="decision-card"><h3>Gate passed, authorization pending</h3><p>Áp dụng khi người học đạt bài test nhưng chưa được cấp phạm vi machine / customer / approval boundary phù hợp.</p></div><div class="decision-card"><h3>Gate passed, authorization granted</h3><p>Chỉ khi register, approver và scope statement đã cập nhật; có thể làm độc lập trong boundary đã cấp.</p></div><div class="decision-card"><h3>Gate re-opened</h3><p>Dùng khi có repeat issue, change lớn hoặc requalification trigger làm authorization phải xem xét lại.</p></div></div>
+<div class="footer-note">Gate result nên được đọc cùng <a href="authorization-library.html">Authorization Library</a> và <a href="certification-register.html">Certification Register</a>.</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

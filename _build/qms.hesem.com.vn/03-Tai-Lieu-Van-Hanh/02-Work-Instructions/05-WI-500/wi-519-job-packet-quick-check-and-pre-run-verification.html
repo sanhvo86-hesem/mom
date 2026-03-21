@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WI-519 — Kiểm nhanh job packet, pre-run verification, first cut và restart sau bất thường | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list, .pill-grid { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.pill-grid {display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:10px 0;}
+.pill {border:1px solid var(--ln); border-radius:999px; padding:8px 12px; background:#fff; font-size:12px;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix, .pill-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu vận hành • Work Instruction</span>
+</div>
+</div>
+<div class="title"><strong>WI-519 — Kiểm nhanh job packet, pre-run verification, first cut và restart sau bất thường</strong></div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>WI-519</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>Production Manager / Setup Lead / QA Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng ngay trước Cycle Start, sau setup/changeover, sau tool change ảnh hưởng CTQ, sau offset edit/WCS reset, sau power loss/alarm, sau work transfer hoặc bất kỳ lần nào phải chạy lại máy sau trạng thái không ổn định.</div>
+<h1>WI-519 — Kiểm nhanh job packet, pre-run verification, first cut và restart sau bất thường</h1>
+<div class="section"><h2>1. Quy tắc 60 giây trước Cycle Start</h2>
+<p>WI này là cổng chặn cuối cùng trước khi nhấn <b>Cycle Start</b>. Trong vòng 60 giây, Operator hoặc Setup Lead phải xác nhận đủ 07 điểm bắt buộc tại máy. Nếu có 01 điểm không PASS hoặc không chứng minh được, máy phải vào <b>HOLD</b>.</p>
+<div class="callout-danger"><strong>STOP-THE-LINE</strong><br/>Không được chạy máy để “test tạm” khi chưa qua WI-519. Không được bỏ qua bước kiểm vì job lặp, vì đã từng chạy, vì gần đến giờ giao, hoặc vì người setup nói “ổn rồi”.</div></div>
+<div class="section"><h2>2. Khi nào bắt buộc dùng WI-519</h2>
+<div class="table-card"><table><thead><tr><th>Thời điểm</th><th>Phải thực hiện</th><th>Người xác nhận</th></tr></thead><tbody>
+<tr><td>Part đầu sau setup / changeover</td><td>Đủ 07 điểm kiểm + prove-out + xác nhận first cut</td><td>Operator + Setup Lead</td></tr>
+<tr><td>Sau thay tool ảnh hưởng CTQ, thay insert chính, thay holder</td><td>Kiểm lại tool list, offset, first cut, đặc tính chịu ảnh hưởng</td><td>Operator; QA cùng ký khi CTQ cao</td></tr>
+<tr><td>Sau offset edit, probe re-zero, đổi WCS, đổi fixture point</td><td>Lặp WI-519 đầy đủ</td><td>Setup Lead</td></tr>
+<tr><td>Sau alarm, power loss, reboot, dừng dài, changeover qua ca</td><td>Kiểm lại packet, machine state và proof cut</td><td>Supervisor</td></tr>
+<tr><td>Sau work transfer sang máy khác hoặc người khác nhận máy</td><td>Kiểm đầy đủ như part đầu của máy mới</td><td>Supervisor + người nhận máy</td></tr>
+<tr><td>Sau thay lot vật liệu, thay batch outsource, thay jaw/clamp orientation</td><td>Kiểm thêm traceability, clamp scheme và condition bề mặt</td><td>Operator + Setup Lead</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>3. Bảy điểm bắt buộc tại máy</h2>
+<div class="table-card"><table><thead><tr><th>Điểm kiểm</th><th>Phải xác nhận</th><th>Bằng chứng tối thiểu</th><th>FAIL khi</th></tr></thead><tbody>
+<tr><td>1. Revision set</td><td>Drawing/spec, traveler, setup sheet, tool list, inspection method, customer overlay cùng Part/Rev</td><td>Traveler + setup sheet + link hồ sơ</td><td>Sai revision, thiếu tài liệu hiệu lực, hoặc không biết bản nào đang chạy</td></tr>
+<tr><td>2. Material lot / traceability</td><td>Material tag, heat/lot, qty, condition khớp traveler và yêu cầu job</td><td>Tag vật liệu + traveler</td><td>Lot không khớp, không truy vết được hoặc lẫn vật liệu</td></tr>
+<tr><td>3. Tool list / tool life</td><td>ToolID đúng, tool CTQ còn life, insert/holder/stick-out đúng, không có tool hỏng</td><td>Tool list + log tuổi dao</td><td>Tool thiếu, sai vị trí, hết life, hoặc holder/runout nghi ngờ</td></tr>
+<tr><td>4. Offsets / probe zero / WCS</td><td>WCS đúng, probe/zero ổn định, offset giải thích được, không có giá trị lạ chưa xác nhận</td><td>Setup screen / zero check / note bàn giao</td><td>Offset không tin cậy, zero vừa đổi nhưng chưa re-verify</td></tr>
+<tr><td>5. Workholding / orientation</td><td>Fixture/jaw/clamp đúng ID, part hướng đúng, lực kẹp và chống rung phù hợp</td><td>Kiểm trực quan + fixture ID</td><td>Orientation sai, part nhô bất thường, clamp scheme không chắc chắn</td></tr>
+<tr><td>6. Coolant / chip evacuation / FOD</td><td>Coolant đúng loại và đúng vị trí phun; chip conveyor hoặc thu phoi hoạt động; vùng cắt sạch</td><td>Kiểm trực quan + máy ở trạng thái sạch</td><td>Chip kẹt, coolant yếu/sai hướng, còn vật lạ trong machine zone</td></tr>
+<tr><td>7. Dry-run / single block / first cut</td><td>Đã prove-out đoạn rủi ro; đã kiểm vùng gần clamp/rotary/transfer; có kế hoạch dừng kiểm part đầu</td><td>FRM-511 hoặc record first cut</td><td>Chưa prove-out, chưa kiểm vùng rủi ro, hoặc first cut không có người theo dõi</td></tr>
+</tbody></table></div>
+<div class="callout-info"><strong>Kiểm bổ sung bắt buộc</strong><br/>Job QPL-3/QPL-4, part có CTQ cao, part lần đầu, part có yêu cầu vacuum/clean/leak hoặc customer overlay đặc biệt phải kiểm thêm: gage readiness, inspection method, evidence path và người nhận đo part đầu.</div></div>
+<div class="section"><h2>4. Ba mức kiểm trước khi chạy</h2>
+<div class="table-card"><table><thead><tr><th>Mức kiểm</th><th>Mục tiêu</th><th>Nội dung</th><th>Không đạt thì làm gì</th></tr></thead><tbody>
+<tr><td>Mức A — Packet</td><td>Chặn sai revision, sai job, sai vật liệu, sai route</td><td>Kiểm tài liệu, traveler, material lot, QPL, customer overlay, previous hold/NCR</td><td>HOLD job packet; báo Supervisor / QA / Engineering</td></tr>
+<tr><td>Mức B — Machine static</td><td>Chặn sai setup phần cứng</td><td>Kiểm WCS, tool map, fixture orientation, coolant, chip/FOD, safety zone</td><td>HOLD machine; xử lý setup trước khi prove-out</td></tr>
+<tr><td>Mức C — Dynamic / first cut</td><td>Chặn crash, sai đường dao, drift sớm</td><td>Dry-run, single block, prove-out, part đầu, đặc tính chịu ảnh hưởng sau thay đổi</td><td>Dừng cycle; khoanh vùng last-known-good; chuyển WI-302 hoặc NCR nếu cần</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>5. Add-on bắt buộc theo họ máy</h2>
+<div class="table-card"><table><thead><tr><th>Họ máy</th><th>Phải kiểm thêm trước Cycle Start</th></tr></thead><tbody>
+<tr><td>3-axis vertical mill</td><td>Chiều cao đồ gá, vùng chạm hàm kẹp, chu trình probe, clearance của dao dài và thoát phoi trong pocket sâu.</td></tr>
+<tr><td>5-axis mill</td><td>Trạng thái rotary clamp/unclamp, gốc xoay, safe home, góc trục quay đầu tiên và đoạn đường dao gần fixture tower.</td></tr>
+<tr><td>CNC turning</td><td>Jaw step / collet đúng, chiều nhô phôi, tailstock/live center, nozzle coolant, chip quấn quanh phôi hoặc insert.</td></tr>
+<tr><td>Mill-turn</td><td>Main/sub spindle state, orientation của live tool, transfer point, sync giữa kênh, clearance vùng handoff.</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>6. Restart sau bất thường</h2>
+<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Kiểm lại tối thiểu</th><th>Phải giữ lại bằng chứng gì</th></tr></thead><tbody>
+<tr><td>Sau thay tool hoặc insert</td><td>Điểm 3, 4, 7; đo đặc tính bị ảnh hưởng; cập nhật log tuổi dao</td><td>FRM-511 / log tool change</td></tr>
+<tr><td>Sau offset edit / re-zero / probe calibration</td><td>Điểm 4, 5, 7; chạy single block ở đoạn rủi ro</td><td>Ghi rõ offset changed by / time / reason</td></tr>
+<tr><td>Sau alarm hoặc power loss</td><td>Điểm 1, 3, 4, 6, 7; khoanh vùng WIP từ last-known-good</td><td>Record thời điểm dừng và trạng thái WIP</td></tr>
+<tr><td>Sau thay lot vật liệu</td><td>Điểm 2, 5, 7; xác nhận lot mới và part đầu của lot mới</td><td>Traveler / lot trace</td></tr>
+<tr><td>Sau đổi ca hoặc đổi người vận hành</td><td>Điểm 1 đến 7 + handover note</td><td>Ký bàn giao ca trên hồ sơ job</td></tr>
+<tr><td>Sau nới kẹp, re-clamp, tháo part kiểm lại rồi gá lại</td><td>Điểm 4, 5, 7; cắt lại part đầu hoặc đo lại full feature chịu ảnh hưởng</td><td>Ghi rõ lý do re-clamp và part range liên quan</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>7. Sign-off và bằng chứng tối thiểu</h2>
+<p>Machine chỉ được xem là qua WI-519 khi <b>người chạy máy</b> và <b>người setup/giám sát</b> cùng xác nhận. Job có yêu cầu QA release, CTQ cao hoặc first piece nhạy cảm phải có xác nhận của QA theo rule job.</p>
+<div class="table-card"><table><thead><tr><th>Loại job</th><th>Bằng chứng tối thiểu</th><th>Người phải ký</th></tr></thead><tbody>
+<tr><td>Job tiêu chuẩn QPL-1/QPL-2</td><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> hoặc record số tương đương, traveler, last-known-good khi có restart</td><td>Operator + Setup Lead/Supervisor</td></tr>
+<tr><td>Job CTQ cao, QPL-3/QPL-4, customer overlay</td><td>FRM-511 + first-piece/FAI evidence + link hồ sơ đo</td><td>Operator + Setup Lead + QA</td></tr>
+<tr><td>Job sau crash/abnormal restart</td><td>FRM-511 + ghi rõ phạm vi suspect WIP + hành động restart</td><td>Supervisor + QA; Engineering/Maintenance khi có machine impact</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>8. Phản ứng khi FAIL</h2>
+<div class="step-list">
+<div class="step-item"><strong>Dừng Cycle Start.</strong><br/>Không cho phép chạy “một cái xem sao”.</div>
+<div class="step-item"><strong>Giữ trạng thái HOLD.</strong><br/>Tag máy, tag WIP hoặc tag lot liên quan nếu đã có cắt phoi sau lần kiểm cuối đạt.</div>
+<div class="step-item"><strong>Báo đúng người.</strong><br/>Sai packet/revision báo Engineering + QA; sai setup báo Setup Lead/Supervisor; nghi ngờ machine condition báo Maintenance; sai lot/material báo Warehouse + QA.</div>
+<div class="step-item"><strong>Khoanh vùng last-known-good.</strong><br/>Nếu đã có sản phẩm sau lần kiểm cuối đạt, phải xác định part range suspect trước khi mở lại máy.</div>
+<div class="step-item"><strong>Chỉ mở lại khi đã PASS lại WI-519.</strong><br/>Sửa xong nhưng không lặp lại WI-519 thì vẫn xem là chưa đủ điều kiện chạy.</div>
+</div>
+<div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">% pre-run PASS lần đầu; số restart sau bất thường; số sự cố wrong-rev/wrong-tool/wrong-offset bị chặn trước Cycle Start; số alarm trong 10 part đầu.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="wi-517-setup-changeover-smed-standard-work.html">WI-517</a>; <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>; <a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a>; <a href="../../03-Reference/01-ANNEX-System/annex-qms-014-put-thru-index.html">ANNEX-QMS-014</a>.</div></div></div></div>
+<div data-phase2f="true">
+<h2 class="h2" id="phase2f-job-packet-gate">Phase 2F — Job packet quick-check to decision record</h2>
+<div class="note"><b>Làm rõ vai trò</b><br/>WI-519 là quick-check tiêu chuẩn hoá bước chuẩn bị; kết quả chuẩn bị này phải được chốt thành decision record trên <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> khi setup / restart / work transfer thực sự mở gate chạy.</div>
+</div></div>
+</div>
+</div>
+</body>
+</html>

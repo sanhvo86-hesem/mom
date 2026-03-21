@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TRN-ACA-OJT-01 — OJT Tracker — Shop Floor Training Log | HESEM OS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<section class="card" id="ksem-gating">
+<h2>Chuẩn đầu ra K–S–E–M và KPI gating (cách dùng trong lớp)</h2>
+<p>Từ, mỗi mô-đun được chuẩn hóa theo 4 thành phần:</p>
+<ul>
+<li><strong>Knowledge</strong>: học viên hiểu đúng khái niệm, nguyên tắc, tiêu chuẩn.</li>
+<li><strong>Skill</strong>: học viên thực hiện đúng thao tác/quy trình trong điều kiện thực tế.</li>
+<li><strong>Evidence</strong>: có bằng chứng truy vết (checklist ký, ảnh, báo cáo, log).</li>
+<li><strong>Metric</strong>: có chỉ số đo lường theo Level (L1–L4) và có <em>Gate</em> chặn rủi ro.</li>
+</ul>
+<div class="grid-2">
+<div class="note">
+<strong>Cách giảng dạy theo K–S–E–M</strong>
+<ol>
+<li><strong>Giải thích nguyên tắc</strong> (K) bằng ví dụ tại HESEM.</li>
+<li><strong>Trình diễn thao tác chuẩn</strong> (S) và chỉ rõ “key points”.</li>
+<li><strong>Cho học viên làm và ghi nhận</strong> (E) bằng checklist/biểu mẫu thật.</li>
+<li><strong>Đối chiếu KPI/Metric</strong> (M) để quyết định đạt level và hành động cải tiến.</li>
+</ol>
+</div>
+<div class="kpi-gate">
+<strong>Gate – Quy tắc chặn</strong>
+<ul>
+<li>Các lỗi Gate hay gặp thuộc: <strong>An toàn</strong>, <strong>Quality record</strong>, <strong>Customer escape</strong>, <strong>Revision/Traceability</strong>.</li>
+<li>Vi phạm Gate → <strong>không công nhận level</strong> trong kỳ, bắt buộc OJT/CAPA, đánh giá lại sau khi đóng hành động.</li>
+<li>Tham chiếu chi tiết: <a href="../../01-Competency-System/01-Framework/competency-metrics.html">Từ điển KPI/Metric theo 19 năng lực</a>.</li>
+</ul>
+</div>
+</div>
+<p class="muted">Yêu cầu: Khi chấm điểm, giảng viên PHẢI tách rõ “điểm kiến thức” (quiz) và “điểm kỹ năng” (quan sát OJT theo rubric). Không dùng quiz để thay thế kỹ năng.</p>
+</section>
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>OJT-TRACKER — OJT Tracker — Shop Floor Training Log</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>OJT-TRACKER</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="cover">
+<div class="kicker">HESEM CNC Academy</div>
+<h1 class="h1">OJT Tracker – Nhật ký kèm cặp tại hiện trường</h1>
+<p class="lead">Trang này là <b>phiếu theo dõi OJT</b> dùng tại hiện trường. Mục tiêu: ghi nhận <b>việc thật</b>, khóa <b>Gate</b> theo QMS, và tạo <b>hồ sơ chứng minh Level</b> trong SSOT.</p>
+</div><div class="card">
+<span class="badge">OJT = Drill + MRR</span>
+<p class="lead" style="margin-top:10px;">
+ OJT đạt chuẩn khi học viên hoàn tất drill và nộp MRR vào SSOT.
+ Mở drill: <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li>Naming &amp; SSOT: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a></li>
+<li>Audit 60 giây: <a href="../../03-System-Operations/01-System-Guides/SYS-OPS-01.html"><b>SYS-OPS-01</b></a></li>
+</ul>
+</div>
+<div class="card danger">
+<span class="badge">Quy tắc bắt buộc</span>
+<ul class="tight">
+<li><b>CẤM</b> ký khống OJT. KHI không có bằng chứng trong SSOT → <b>không công nhận Level</b>.</li>
+<li>KHI dùng sai revision / sai CTQ / sai traceability → kích hoạt <b>HOLD</b> và mở <b>NCR</b>.</li>
+<li>Mỗi buổi OJT phải có <b>job code</b>, <b>module</b>, <b>MRR</b>, chữ ký 2 bên và kết luận <b>PASS/FAIL</b>.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Cách sử dụng (5 bước)</span>
+<ol style="margin:10px 0 0 0; padding-left:18px; line-height:1.75;">
+<li>Chốt <b>vai trò</b> và <b>Level mục tiêu</b> theo <a href="../../04-Templates-Tools/role-roadmaps.html"><b>TRN-ACA-RMAP-01</b></a>.</li>
+<li>Chọn module OJT trong <a href="../../01-Competency-System/02-Levels/index.html"><b>Danh mục 19 năng lực × 4 Level</b></a>.</li>
+<li>Thực hiện OJT theo checklist trong module và ghi vào bảng “Nhật ký OJT”.</li>
+<li>Nộp MRR vào Job Dossier (SSOT) theo đúng naming rule.</li>
+<li>Chấm theo rubric + performance test. Kết luận PASS/FAIL và khóa lỗi lặp lại bằng hành động khắc phục.</li>
+</ol>
+</div>
+<div class="card">
+<span class="badge">Thông tin học viên</span>
+<div class="table-card">
+<table class="table">
+<tbody>
+<tr><th style="width:22%">Họ tên</th><td>________________________________</td><th style="width:22%">Mã nhân sự</th><td>________________</td></tr>
+<tr><th>Vai trò</th><td>Operator / Setup / QC / CAM / Planner / WHS / PUR / QA</td><th>Ca làm</th><td>__________</td></tr>
+<tr><th>Trainer/Mentor</th><td>________________________________</td><th>Thời gian bắt đầu</th><td>____/____/______</td></tr>
+<tr><th>KPI Gate</th><td colspan="3">Safety • Record falsification • Customer escape • Traceability • Calibration</td></tr>
+</tbody>
+</table>
+</div>
+</div><div class="card">
+<span class="badge">OJT 1 trang theo vai trò (in)</span>
+<p class="lead" style="margin-top:10px;">Dùng khi cần kèm cặp nhanh theo ca. In 01 trang theo vai trò và ghi nhận theo buổi.</p>
+<ul class="tight">
+<li><a href="ojt-role-index.html"><b>TRN-ACA-OJT-02</b> — Danh sách OJT theo vai trò</a></li>
+<li><a href="ojt-role-operator.html"><b>TRN-ACA-OJT-OP-01</b> — CNC Operator</a></li>
+<li><a href="ojt-role-setup-teamlead.html"><b>TRN-ACA-OJT-SET-01</b> — Setup / Team Lead</a></li>
+<li><a href="ojt-role-qc-inspector.html"><b>TRN-ACA-OJT-QC-01</b> — QC Inspector</a></li>
+<li><a href="ojt-role-cam-nc.html"><b>TRN-ACA-OJT-CAM-01</b> — CAM / NC Programmer</a></li>
+<li><a href="ojt-role-planner-dispatcher.html"><b>TRN-ACA-OJT-PLA-01</b> — Production Planner</a></li>
+<li><a href="ojt-role-warehouse-receiving.html"><b>TRN-ACA-OJT-WHS-01</b> — Warehouse / Receiving</a></li>
+<li><a href="ojt-role-purchasing.html"><b>TRN-ACA-OJT-PUR-01</b> — Purchasing / Subcontract</a></li>
+<li><a href="ojt-role-qa-qms.html"><b>TRN-ACA-OJT-QMS-01</b> — QA Engineer / QMS</a></li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Nhật ký OJT (ghi theo từng buổi)</span>
+<p class="muted" style="margin:8px 0 0 0;">
+ Mỗi dòng tương ứng 01 buổi OJT tại hiện trường. Ghi rõ MRR và link/đường dẫn SSOT.
+ </p>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:10%">Ngày</th>
+<th style="width:10%">Job</th>
+<th style="width:14%">Module</th>
+<th>Mục tiêu OJT (hành vi quan sát được)</th>
+<th style="width:18%">MRR/SSOT (link/đường dẫn)</th>
+<th style="width:10%">Kết quả</th>
+<th style="width:14%">Chữ ký</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr><tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr><tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr><tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr><tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr><tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr><tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr><tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr><tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr><tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr><tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr><tr><td>____/____</td><td>______</td><td>C__-L_</td><td>______________________________________________</td><td>________________________________</td><td>PASS / FAIL</td><td>Trainer: ____<br/>Trainee: ____</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="grid-2">
+<div class="card">
+<span class="badge">Checklist OJT theo vai trò (tóm tắt)</span>
+<ul class="tight">
+<li><b>Operator (30 ngày):</b> C01-L1, C02-L1, C08-L1, C09-L1, C10-L1, C15-L1, C16-L1, C17-L1.</li>
+<li><b>Setup/Lead (60 ngày):</b> C02-L2, C09-L2, C10-L2, C13-L2, C16-L2, C17-L2.</li>
+<li><b>QC (60 ngày):</b> C03-L2, C13-L2, C16-L2, C10-L2.</li>
+<li><b>CAM (90 ngày):</b> C10-L3, C13-L3, C17-L3, C08-L3.</li>
+<li><b>Planner (60 ngày):</b> C09-L3, C10-L3, C08-L2.</li>
+<li><b>WHS/PUR (60 ngày):</b> C18-L2, C15-L2, C08-L2, C13-L2.</li>
+<li><b>QA/QMS (90 ngày):</b> C13-L4, C16-L4, C10-L4, SYS-OPS-01..05.</li>
+</ul>
+<p class="muted" style="margin:8px 0 0 0;">
+ Chi tiết theo vai trò: xem <a href="../../04-Templates-Tools/role-roadmaps.html"><b>TRN-ACA-RMAP-01</b></a>.
+ </p>
+</div>
+<div class="card">
+<span class="badge">Gate xử lý nhanh (60 giây)</span>
+<div class="kpi-gate">
+<strong>STOP</strong>
+<ul>
+<li>KHI phát hiện sai revision / file rời ngoài SSOT.</li>
+<li>KHI phát hiện nhầm vật liệu / mất traceability / thiếu cert bắt buộc.</li>
+</ul>
+</div>
+<div class="kpi-gate">
+<strong>HOLD</strong>
+<ul>
+<li>KHI thiếu MRR bắt buộc tại gate (FAI/IR, traveler, CoC, calibration record).</li>
+<li>KHI có dấu hiệu đo sai / dụng cụ quá hạn / template dữ liệu sai.</li>
+</ul>
+</div>
+<div class="kpi-gate">
+<strong>ESCALATE</strong>
+<ul>
+<li>KHI lỗi lặp lại 2 lần trong 7 ngày → mở CAPA và khóa nguyên nhân hệ thống.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="note">
+<strong>Dreyfus (phát triển kỹ năng)</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
+<li>Novice → làm theo hướng dẫn.</li>
+<li>Competent → làm độc lập theo chuẩn.</li>
+<li>Proficient/Expert → tối ưu, dạy lại, thiết kế hệ thống.</li>
+</ul>
+<div class="small muted">HESEM quy về Level L1–L4 trong rubric năng lực.</div>
+</div>
+<div class="note">
+<strong>70–20–10 (tỷ lệ triển khai thực tế)</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
+<li><b>70%</b> học qua công việc thật (OJT, dự án, job). </li>
+<li><b>20%</b> coaching/mentor, phản hồi 1–1.</li>
+<li><b>10%</b> lớp học, đọc tài liệu, quiz.</li>
+</ul>
+<div class="small muted">Mục tiêu: học nhanh nhưng không hy sinh an toàn &amp; chất lượng.</div>
+</div>
+</div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+

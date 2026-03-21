@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#e3f2fd" stroke="#90caf9" stroke-width="2"/>
+  <circle cx="60" cy="52" r="22" fill="none" stroke="#0c2d48" stroke-width="2"/>
+  <circle cx="60" cy="52" r="8" fill="#0c2d48" opacity=".15"/>
+  <path d="M60 30v-3M60 77v-3M38 52h-3M85 52h-3" stroke="#0c2d48" stroke-width="2" stroke-linecap="round"/>
+  <path d="M44 36l-2-2M78 36l2-2M44 68l-2 2M78 68l2 2" stroke="#0c2d48" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M42 85h36" stroke="#0c2d48" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+  <path d="M42 85l4-4M54 85l4-4M66 85l4-4" stroke="#0c2d48" stroke-width="1" opacity=".3"/>
+  <text x="60" y="55" text-anchor="middle" font-size="9" font-weight="800" fill="#0c2d48" font-family="system-ui">CNC</text>
+  <text x="60" y="108" text-anchor="middle" font-size="7" font-weight="700" fill="#0c2d48" font-family="system-ui">JOB ORDER</text>
+</svg>

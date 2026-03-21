@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  <rect x="28" y="25" width="64" height="55" rx="3" fill="none" stroke="#495057" stroke-width="2"/>
+  <line x1="28" y1="35" x2="92" y2="35" stroke="#495057" stroke-width="1" opacity=".3"/>
+  <rect x="36" y="42" width="28" height="20" rx="1" fill="none" stroke="#495057" stroke-width="1.5"/>
+  <line x1="50" y1="42" x2="50" y2="62" stroke="#495057" stroke-width="1" stroke-dasharray="2 2" opacity=".5"/>
+  <line x1="36" y1="52" x2="64" y2="52" stroke="#495057" stroke-width="1" stroke-dasharray="2 2" opacity=".5"/>
+  <path d="M70 45h14M70 52h14M70 59h10" stroke="#495057" stroke-width="1" opacity=".4" stroke-linecap="round"/>
+  <text x="50" y="72" text-anchor="middle" font-size="6" font-weight="600" fill="#495057" font-family="monospace">⌀ 25.0±0.01</text>
+  <text x="60" y="108" text-anchor="middle" font-size="7" font-weight="700" fill="#495057" font-family="system-ui">GD&amp;T</text>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#e3f2fd" stroke="#90caf9" stroke-width="2"/>
+  <rect x="30" y="28" width="24" height="16" rx="3" fill="#1565c0" opacity=".2" stroke="#1565c0" stroke-width="1.5"/>
+  <rect x="66" y="28" width="24" height="16" rx="3" fill="#1565c0" opacity=".2" stroke="#1565c0" stroke-width="1.5"/>
+  <rect x="48" y="56" width="24" height="16" rx="3" fill="#1565c0" opacity=".3" stroke="#1565c0" stroke-width="1.5"/>
+  <rect x="48" y="84" width="24" height="16" rx="3" fill="#1565c0" opacity=".2" stroke="#1565c0" stroke-width="1.5"/>
+  <path d="M42 44v16l18-4M78 44v16l-18-4M60 72v12" stroke="#1565c0" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <text x="42" y="39" text-anchor="middle" font-size="8" font-weight="700" fill="#1565c0" font-family="system-ui">IN</text>
+  <text x="78" y="39" text-anchor="middle" font-size="8" font-weight="700" fill="#1565c0" font-family="system-ui">SOP</text>
+  <text x="60" y="67" text-anchor="middle" font-size="7" font-weight="700" fill="#1565c0" font-family="system-ui">PROC</text>
+  <text x="60" y="95" text-anchor="middle" font-size="8" font-weight="700" fill="#1565c0" font-family="system-ui">OUT</text>
+  <text x="60" y="112" text-anchor="middle" font-size="7" font-weight="700" fill="#0d47a1" font-family="system-ui">PROCESS</text>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#e3f2fd" stroke="#90caf9" stroke-width="2"/>
+  <rect x="35" y="25" width="38" height="52" rx="4" fill="none" stroke="#1565c0" stroke-width="2"/>
+  <line x1="42" y1="38" x2="66" y2="38" stroke="#1565c0" stroke-width="1.5" opacity=".5"/>
+  <line x1="42" y1="46" x2="62" y2="46" stroke="#1565c0" stroke-width="1.5" opacity=".5"/>
+  <line x1="42" y1="54" x2="58" y2="54" stroke="#1565c0" stroke-width="1.5" opacity=".5"/>
+  <rect x="38" y="60" width="32" height="12" rx="2" fill="#1565c0" opacity=".1" stroke="#1565c0" stroke-width="1"/>
+  <path d="M70 80c6-4 14-2 14 6" stroke="#1565c0" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <line x1="82" y1="83" x2="88" y2="92" stroke="#1565c0" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="54" y="69" text-anchor="middle" font-size="7" font-weight="700" fill="#1565c0" font-family="system-ui">RFQ</text>
+  <text x="60" y="108" text-anchor="middle" font-size="7" font-weight="700" fill="#0d47a1" font-family="system-ui">SALES &amp; RFQ</text>
+</svg>

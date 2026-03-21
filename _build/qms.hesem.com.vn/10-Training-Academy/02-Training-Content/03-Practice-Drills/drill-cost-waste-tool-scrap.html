@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>TRN-ACA-DRL-10 — Cost &amp; Waste Drill (Tool life • Scrap • Rework) | HESEM Academy</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+ .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
+ .tight li{margin:4px 0;}
+ 
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>DRILL-COST-WASTE-TOOL-SCRAP — Cost &amp; Waste Drill (Tool life • Scrap • Rework) | HESEM Academy</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>DRILL-COST-WASTE-TOOL-SCRAP</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="cover">
+<div class="kicker">Drill Pack</div>
+<h1 class="h1">DRL-10 — Cost &amp; Waste Drill (Tool life • Scrap • Rework)</h1>
+<p class="lead">
+ Drill này rèn năng lực <b>tính cost thực tế</b> và <b>khóa lãng phí</b>: scrap, rework, tool wear, downtime.
+ Output của drill là 01 hành động cập nhật standard và có kiểm chứng.
+ </p>
+</div>
+<div class="grid-2">
+<div class="card">
+<span class="badge">Mục tiêu</span>
+<ul class="tight">
+<li>Chuyển “cảm giác tốn kém” thành con số.</li>
+<li>Chọn 1 hành động tác động lớn và khóa vào standard.</li>
+<li>Verification bằng before/after KPI.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Năng lực kích hoạt</span>
+<ul class="tight"><li><a href="../../01-Competency-System/02-Levels/index.html#C12"><b>C12</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C07"><b>C07</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C08"><b>C08</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C09"><b>C09</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C05"><b>C05</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C06"><b>C06</b></a></li></ul>
+</div>
+</div>
+<div class="card">
+<span class="badge">Chuẩn bị</span>
+<ul class="tight">
+<li>ERP/MES log hoặc bảng theo dõi tool, scrap, downtime.</li>
+<li>Template cost calc sheet.</li>
+<li>Bảng KPI cell.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Trình tự thực hiện</span>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Owner</th><th>MRR</th><th style="width:90px;">Gate</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Chọn 01 job/cell và lấy dữ liệu: scrap qty, rework time, tool consumption, downtime.</td><td>Team lead + Planner</td><td>Data extract (sheet)</td><td>FAIL</td></tr><tr><td>2</td><td>Tính cost: material scrap + machine time + tool cost + outsource cost (KHI có).</td><td>Team lead</td><td>Cost calc sheet (ký)</td><td>FAIL</td></tr><tr><td>3</td><td>Xếp hạng 3 nguyên nhân cost cao nhất và chỉ ra điểm gãy trong process.</td><td>Team</td><td>Pareto + problem statement</td><td>HOLD</td></tr><tr><td>4</td><td>Chốt 1 countermeasure có tác động lớn: parameter, tool change rule, check step, poka-yoke.</td><td>OPS/ENG</td><td>Action plan + updated standard</td><td>BLOCK</td></tr><tr><td>5</td><td>Chạy verification sau 1 ca: đo lại scrap/rework/tool và cập nhật board.</td><td>Team lead</td><td>Before/after KPI snapshot</td><td>FAIL</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card danger">
+<span class="badge">Fail-fast</span>
+<ul class="tight">
+<li>Dữ liệu không có nguồn hoặc không truy xuất được.</li>
+<li>Tính cost sai đơn vị hoặc sai công thức.</li>
+<li>Hành động không cập nhật standard.</li>
+<li>Không có verification.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Rubric chấm điểm (10 điểm)</span>
+<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. PASS khi tổng ≥ 8/10 và không vi phạm fail-fast.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
+<tbody>
+<tr><td><b>Data accuracy</b></td><td>Dữ liệu có nguồn rõ (ERP/MES/log); không nhập tay theo cảm tính.</td><td>0/1/2</td></tr><tr><td><b>Cost calculation</b></td><td>Công thức đúng; đơn vị đúng; có kiểm tra chéo.</td><td>0/1/2</td></tr><tr><td><b>Problem focus</b></td><td>Chọn đúng 3 nguyên nhân chính; không dàn trải.</td><td>0/1/2</td></tr><tr><td><b>Countermeasure quality</b></td><td>Hành động gắn vào standard; có owner + due + điều kiện kiểm soát.</td><td>0/1/2</td></tr><tr><td><b>Verification</b></td><td>Có before/after KPI; kết luận dựa trên số liệu.</td><td>0/1/2</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<span class="badge">MRR tối thiểu</span>
+<ul class="tight">
+<li>Data extract sheet (nguồn rõ).</li>
+<li>Cost calc sheet (ký + ngày).</li>
+<li>Problem statement + Pareto.</li>
+<li>Updated standard (setup sheet/SOP) + before/after KPI snapshot.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

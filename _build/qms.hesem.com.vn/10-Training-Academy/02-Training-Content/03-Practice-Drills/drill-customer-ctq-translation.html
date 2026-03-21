@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>TRN-ACA-DRL-11 — Customer Requirement → CTQ Translation Drill | HESEM Academy</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+ .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
+ .tight li{margin:4px 0;}
+ 
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>DRILL-CUSTOMER-CTQ-TRANSLATION — Customer Requirement → CTQ Translation Drill | HESEM Academy</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>DRILL-CUSTOMER-CTQ-TRANSLATION</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="cover">
+<div class="kicker">Drill Pack</div>
+<h1 class="h1">DRL-11 — Customer Requirement → CTQ Translation Drill</h1>
+<p class="lead">
+ Drill này khóa lỗi gốc của nhiều claim: <b>đọc yêu cầu không hết</b> và <b>dịch yêu cầu sai</b>.
+ Output của drill là 01 CTQ list + inspection plan + contract review summary nằm đúng SSOT.
+ </p>
+</div>
+<div class="grid-2">
+<div class="card">
+<span class="badge">Mục tiêu</span>
+<ul class="tight">
+<li>CTQ list rõ và dùng làm chuẩn cho toàn job.</li>
+<li>Inspection plan có reaction plan.</li>
+<li>Contract review có sign-off và link SSOT.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Năng lực kích hoạt</span>
+<ul class="tight"><li><a href="../../01-Competency-System/02-Levels/index.html#C11"><b>C11</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C10"><b>C10</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C14"><b>C14</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C03"><b>C03</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C04"><b>C04</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C02"><b>C02</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C13"><b>C13</b></a></li></ul>
+</div>
+</div>
+<div class="card">
+<span class="badge">Chuẩn bị</span>
+<ul class="tight">
+<li>01 RFQ/PO thật hoặc mô phỏng có đầy đủ drawing/spec/terms.</li>
+<li>Template CTQ list và inspection plan.</li>
+<li>Quy tắc naming: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Trình tự thực hiện</span>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Owner</th><th>MRR</th><th style="width:90px;">Gate</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Nhận RFQ/PO/drawing/spec và xác nhận REV set của khách hàng.</td><td>Estimator (SAL-03)</td><td>Input package link + REV note</td><td>STOP</td></tr><tr><td>2</td><td>Trích xuất yêu cầu: CTQ dim/tol, finish/spec, packaging/label, cert/FAI, special process.</td><td>Sales/QA/ENG</td><td>Requirement list (1 trang)</td><td>HOLD</td></tr><tr><td>3</td><td>Dịch yêu cầu thành CTQ list: đặc tính – phương pháp đo – tần suất – tiêu chí PASS/FAIL.</td><td>QA/QC/ENG</td><td>CTQ list + inspection method</td><td>HOLD</td></tr><tr><td>4</td><td>Tạo inspection plan + reaction plan (STOP/HOLD khi lệch CTQ).</td><td>QA/QC</td><td>Inspection plan (PDF)</td><td>HOLD</td></tr><tr><td>5</td><td>Contract review summary: xác nhận năng lực đáp ứng và điểm cần outsource.</td><td>Sales/QA/OPS</td><td>CR summary + sign-off</td><td>HOLD</td></tr><tr><td>6</td><td>Bàn giao cho planning/production: hold points + link baseline + checklist.</td><td>QA/Planning</td><td>Handoff note + links</td><td>FAIL</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card danger">
+<span class="badge">Fail-fast</span>
+<ul class="tight">
+<li>CTQ list thiếu phương pháp đo hoặc thiếu tiêu chí PASS/FAIL.</li>
+<li>Inspection plan không có reaction plan.</li>
+<li>Không có sign-off contract review.</li>
+<li>CTQ list nằm rời ngoài SSOT.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Rubric chấm điểm (10 điểm)</span>
+<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. PASS khi tổng ≥ 8/10 và không vi phạm fail-fast.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
+<tbody>
+<tr><td><b>Requirement extraction</b></td><td>Không bỏ sót yêu cầu đặc biệt (finish/pack/cert/FAI).</td><td>0/1/2</td></tr><tr><td><b>CTQ clarity</b></td><td>CTQ có phương pháp đo, tần suất, tiêu chí rõ.</td><td>0/1/2</td></tr><tr><td><b>Reaction plan</b></td><td>STOP/HOLD rule rõ và gắn vào process step.</td><td>0/1/2</td></tr><tr><td><b>Alignment</b></td><td>Sales/ENG/QA/OPS cùng dùng 1 bản CTQ list trong SSOT.</td><td>0/1/2</td></tr><tr><td><b>Record quality</b></td><td>CR summary có chữ ký; link SSOT đầy đủ.</td><td>0/1/2</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<span class="badge">MRR tối thiểu</span>
+<ul class="tight">
+<li>Requirement list (1 trang) + CTQ list.</li>
+<li>Inspection plan + reaction plan.</li>
+<li>Contract review summary có sign-off.</li>
+<li>Handoff note có link SSOT.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

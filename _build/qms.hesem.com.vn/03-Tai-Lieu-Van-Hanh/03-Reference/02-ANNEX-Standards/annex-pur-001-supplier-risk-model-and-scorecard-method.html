@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ANNEX-PUR-001 — Mô hình rủi ro nhà cung cấp và phương pháp scorecard | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body"><div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu vận hành • Annex</span>
+</div>
+</div>
+<div class="title"><strong>ANNEX-PUR-001 — Mô hình rủi ro nhà cung cấp và phương pháp scorecard</strong></div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>ANNEX-PUR-001</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>Purchasing Manager / QA Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi chọn nguồn cung mới, tái đánh giá nhà cung cấp hiện hữu, review định kỳ, ra quyết định probation/block, xác định mức incoming control và quyết định dual-source hoặc contingency source.</div>
+<h1>ANNEX-PUR-001 — Mô hình rủi ro nhà cung cấp và phương pháp scorecard</h1>
+<div class="callout-info"><b>Nguyên tắc nền:</b> Nhà cung cấp không được đánh giá chỉ bằng giá và lead time. Mọi nhà cung cấp ảnh hưởng CTQ, traceability, cert integrity, special process, delivery stability hoặc customer requirement PHẢI đi qua mô hình rủi ro và scorecard này trước khi cấp PO hoặc cho phép release vào sản xuất.</div>
+<h2>1. Mục đích và phạm vi áp dụng</h2>
+<p>ANNEX này quy định hai lớp kiểm soát song song: <b>(1) rủi ro nền của nhà cung cấp</b> và <b>(2) hiệu năng thực tế theo scorecard</b>. Hai lớp này cùng quyết định supplier status, tần suất review, mức độ incoming verification, yêu cầu dual-source, trigger probation/block và điều kiện mở khóa lại.</p>
+<p>Tài liệu áp dụng cho raw material suppliers, customer-designated suppliers, special processors, subcontract machining houses, dịch vụ kiểm định/hiệu chuẩn ảnh hưởng sản phẩm, và các nguồn cung ảnh hưởng trực tiếp tới tiến độ/tuân thủ chất lượng của Job order CNC.</p>
+<h2>2. Phân loại family và rủi ro nền R1–R4</h2>
+<div class="table-card"><table>
+<thead><tr><th>Family</th><th>Ví dụ</th><th>Rủi ro nền mặc định</th><th>Kiểm soát tối thiểu bắt buộc</th></tr></thead>
+<tbody>
+<tr><td>Critical raw material</td><td>Bar/plate/tube/forging/casting, vật liệu đặc chủng, customer-specified grade</td><td><span class="badge-red">R1</span></td><td>Approved source, cert/MTR 100%, heat/lot trace, incoming verification, substitute control, periodic scorecard.</td></tr>
+<tr><td>Special processor</td><td>Anodize, plating, passivation, heat treat, NDT, cleaning đặc biệt, coating</td><td><span class="badge-red">R1</span></td><td>Approved processor list, process scope/site scope review, cert pack, customer flow-down, return verification, expiry control.</td></tr>
+<tr><td>Subcontract machining / secondary ops</td><td>Grinding, EDM, laser mark, outsourced machining, balancing, lapping</td><td><span class="badge-amber">R2</span></td><td>Capability review, route/operation flow-down, first lot/FAI theo yêu cầu, delivery monitoring, containment rule.</td></tr>
+<tr><td>Inspection / calibration / external test service</td><td>Lab, calibration provider, external measurement/validation service</td><td><span class="badge-amber">R2</span></td><td>Approval scope, cert validity, traceability chain, evidence retention, re-review khi scope thay đổi.</td></tr>
+<tr><td>Packaging / logistics / general supply</td><td>Bao bì, consumable, vận chuyển, vật tư phụ không trực tiếp tạo đặc tính sản phẩm</td><td><span class="badge-blue">R3</span></td><td>PO clarity, receiving basic check, OTD monitoring, issue log.</td></tr>
+<tr><td>General service / low-impact supplier</td><td>Dịch vụ văn phòng, vật tư gián tiếp, dịch vụ không chạm sản phẩm</td><td><span class="badge-green">R4</span></td><td>Commercial control, service review theo nhu cầu, issue log khi có phát sinh.</td></tr>
+</tbody></table></div>
+<div class="callout-warn"><b>Quy tắc:</b> Customer-directed supplier vẫn PHẢI được chấm rủi ro và theo dõi hiệu năng. Customer-directed không có nghĩa là tự động “pass” cho các Job khác hoặc được miễn chứng cứ cert/trace/scope.</div>
+<h2>3. Gate onboarding trước PO đầu tiên</h2>
+<div class="step-list">
+<div class="step-item"><b>Xác định family và R-class.</b> Purchasing xác định family; QA/Engineering xác nhận mức ảnh hưởng tới CTQ, cert, cleanliness, special process, customer requirement và business continuity.</div>
+<div class="step-item"><b>Thu evidence pack.</b> Supplier profile, site address, process scope, customer scope, cert/accreditation, insurance/contact escalation, sample cert/MTR/CoC, capacity snapshot, NDA/data protection nếu cần.</div>
+<div class="step-item"><b>Đánh giá fit.</b> Với raw material: grade/condition/size/trace fit. Với processor: process scope/site match. Với subcontract machining: machine envelope/capability/gage/process control fit.</div>
+<div class="step-item"><b>Chấm rủi ro nền và thiết lập mức kiểm soát đầu vào.</b> Xác định incoming plan, first-lot rule, cert review depth, dual-source need và contingency requirement.</div>
+<div class="step-item"><b>Chỉ sau khi master được approve mới được cấp PO.</b> PO không được phát hành trước rồi mới hợp thức hóa hồ sơ nhà cung cấp.</div>
+</div>
+<h2>4. Phương pháp scorecard và trọng số</h2>
+<p>Scorecard dùng thang điểm 0–100. Từng dimension chấm theo dữ liệu thực tế, không chấm cảm tính. Nếu không có đủ lịch sử, dùng trạng thái <b>New/Insufficient History</b> và áp mức kiểm soát chặt hơn thay vì tự động cho điểm cao.</p>
+<div class="table-card"><table>
+<thead><tr><th>Dimension</th><th>Mô tả bắt buộc</th><th>Raw material</th><th>Special processor</th><th>Subcontract machining</th><th>General supply</th></tr></thead>
+<tbody>
+<tr><td>Quality performance</td><td>Reject rate, repeat defect, SCAR, escape, complaint, lot hold</td><td>25%</td><td>25%</td><td>25%</td><td>20%</td></tr>
+<tr><td>Delivery reliability</td><td>OTD, expedite response, lead-time stability, short ship / split ship</td><td>20%</td><td>15%</td><td>20%</td><td>25%</td></tr>
+<tr><td>Cert / trace integrity</td><td>MTR/CoC/cert completeness, lot trace, revision discipline, record accuracy</td><td>25%</td><td>20%</td><td>15%</td><td>10%</td></tr>
+<tr><td>Capability / scope fit</td><td>Khả năng đáp ứng process/size/tolerance/cleanliness/customer scope</td><td>10%</td><td>20%</td><td>20%</td><td>10%</td></tr>
+<tr><td>Responsiveness / change discipline</td><td>Thông báo thay đổi, phản hồi issue, action closure, transparency</td><td>10%</td><td>10%</td><td>10%</td><td>15%</td></tr>
+<tr><td>Business continuity / capacity</td><td>Single-point-of-failure, capacity, backup route, geopolitical/logistics risk</td><td>10%</td><td>10%</td><td>10%</td><td>20%</td></tr>
+</tbody></table></div>
+<div class="keyline"><b>Cách chấm:</b> Mỗi dimension chấm 1–5 rồi nhân trọng số. Điểm quy đổi cuối cùng = tổng (điểm dimension / 5 × trọng số). Chỉ dùng dữ liệu có nguồn trong Epicor hoặc SSOT; không dùng “ấn tượng cá nhân”.</div>
+<h2>5. Dữ liệu dùng để chấm điểm</h2>
+<div class="two-col">
+<div class="card"><h3>5.1 SoR / SSOT</h3><p><b>Epicor</b> là nguồn cho PO, receipt, return, promised date, actual receipt date, quantity received/rejected, supplier code, part/lot và transaction liên quan. <b>M365/SSOT</b> là nguồn cho cert pack, SCAR, audit note, capacity review, customer approval evidence và correspondence bắt buộc.</p></div>
+<div class="card"><h3>5.2 Window đánh giá</h3><p>Dùng rolling 12 tháng cho supplier ổn định. Supplier mới dùng rolling 3 tháng hoặc 3 lô đầu tiên, tùy cái nào đến sau. Không kết luận supplier tốt/xấu chỉ bằng 1 lô nếu chưa đủ dữ liệu, trừ khi có gating event nghiêm trọng.</p></div>
+</div>
+<h2>6. Gating event có quyền ghi đè score</h2>
+<div class="table-card"><table>
+<thead><tr><th>Sự kiện</th><th>Hành động bắt buộc</th><th>Authority tối thiểu</th></tr></thead>
+<tbody>
+<tr><td>Falsified/altered cert, cert không truy được nguồn, sửa tay không kiểm soát</td><td>Block ngay; dừng PO mới; giữ toàn bộ lô liên quan; đánh giá boundary impact</td><td>QA Mgr + Pur Mgr, escalated tới GM</td></tr>
+<tr><td>Special process cert/accreditation/scope hết hạn hoặc không đúng site/process</td><td>Hold ngay; không dispatch thêm tới processor đó cho scope bị ảnh hưởng</td><td>Pur Mgr + QA</td></tr>
+<tr><td>CTQ escape / customer complaint nghiêm trọng / repeat defect không kiểm soát</td><td>Probation hoặc Block; SCAR bắt buộc; review containment trước khi dùng lại</td><td>QA Mgr</td></tr>
+<tr><td>Supplier tự ý đổi nguồn, đổi vật liệu, đổi sub-tier hoặc đổi quy trình mà không thông báo</td><td>Hold toàn bộ Job/Lot bị ảnh hưởng; rescore ngay; xem xét block</td><td>Pur Mgr + Eng/QA</td></tr>
+<tr><td>OTD collapse kéo dài hoặc không đáp ứng expedite trên item single-source</td><td>Kích hoạt contingency/dual-source; review capacity risk; tăng review frequency</td><td>Pla Mgr + Pur Mgr</td></tr>
+</tbody></table></div>
+<h2>7. Status, ngưỡng hành động và tần suất review</h2>
+<div class="table-card"><table>
+<thead><tr><th>Điểm / trạng thái</th><th>Ý nghĩa</th><th>Hành động bắt buộc</th><th>Tần suất review tối thiểu</th></tr></thead>
+<tbody>
+<tr><td><span class="badge-green">90–100 Preferred</span></td><td>Hiệu năng ổn định, dữ liệu sạch, không có gating event mở</td><td>Dùng theo route chuẩn; vẫn giữ kiểm soát nền theo R-class</td><td>R1 hàng tháng; R2 hàng quý; R3/R4 nửa năm</td></tr>
+<tr><td><span class="badge-blue">80–89 Approved</span></td><td>Dùng được, còn điểm cần theo dõi</td><td>Review cải tiến theo issue log; không bỏ cert/trace review nền</td><td>R1 hàng tháng; R2 hàng quý; R3 nửa năm; R4 hàng năm</td></tr>
+<tr><td><span class="badge-amber">65–79 Conditional</span></td><td>Cho phép dùng có điều kiện</td><td>Tăng incoming check, giới hạn scope/part family, yêu cầu action plan, xem xét dual-source</td><td>Hàng tháng đến khi phục hồi</td></tr>
+<tr><td><span class="badge-red">50–64 Probation</span></td><td>Rủi ro cao, chỉ dùng khi có chấp thuận</td><td>PO mới cần phê duyệt case-by-case; phải có containment và action plan; có thể block theo item/process</td><td>Review mỗi lô hoặc mỗi tháng</td></tr>
+<tr><td><span class="badge-red">&lt; 50 Block</span></td><td>Không chấp nhận</td><td>Dừng PO mới; chỉ mở lại sau requalification và authority approval</td><td>Chỉ review lại khi đã có hồ sơ requalification</td></tr>
+</tbody></table></div>
+<h2>8. Quy tắc đặc biệt cho nhà cung cấp critical và customer-specific</h2>
+<ul class="tight">
+<li>Supplier/processors thuộc <b>R1</b> và là single-source cho Job critical PHẢI có contingency note hoặc phương án thay thế được duyệt bởi Planning/Purchasing/Engineering.</li>
+<li>Customer-approved hoặc customer-directed source chỉ hợp lệ trong phạm vi customer/scope được nêu. Không được dùng approval của customer A để suy ra approval cho customer B.</li>
+<li>Special processor phải được kiểm theo <a href="annex-pur-003-approved-processor-list.html">ANNEX-PUR-003</a>; supplier risk score không thay thế việc kiểm scope/site/cert expiry.</li>
+<li>Raw material supplier phải phù hợp với <a href="annex-eng-002-approved-materials-list.html">ANNEX-ENG-002</a>; score tốt không cho phép tự ý substitute material/grade/condition.</li>
+</ul>
+<h2>8A. Quy tắc chấm 1–5 cho từng dimension</h2>
+<div class="table-card"><table>
+<thead><tr><th>Dimension</th><th>Điểm 5</th><th>Điểm 3</th><th>Điểm 1</th></tr></thead>
+<tbody>
+<tr><td>Quality performance</td><td>Không có reject/escape lặp, corrective action đóng đúng hạn, evidence sạch.</td><td>Có issue cục bộ nhưng đã containment và không tái diễn kéo dài.</td><td>Repeat defect, CTQ issue, escape hoặc lot reject kéo dài.</td></tr>
+<tr><td>Delivery reliability</td><td>OTD ổn định, xác nhận tiến độ chủ động, không short ship bất ngờ.</td><td>Có trễ rải rác nhưng chủ động báo trước và recovery được.</td><td>Trễ lặp lại, thiếu minh bạch, không giữ cam kết expedites.</td></tr>
+<tr><td>Cert / trace integrity</td><td>Cert/MTR/CoC đầy đủ, đúng scope, đúng lot, không lỗi mapping.</td><td>Có lỗi hình thức nhỏ nhưng không mất trace nền và đã sửa ngay.</td><td>Thiếu cert, sai lot, sai scope, chỉnh tay không kiểm soát hoặc không truy xuất được nguồn.</td></tr>
+<tr><td>Capability / scope fit</td><td>Đúng process/site/customer scope, ổn định và có bằng chứng năng lực phù hợp.</td><td>Đáp ứng được nhưng còn phụ thuộc nhiều vào một người/một máy hoặc cần giám sát tăng cường.</td><td>Không đúng scope, quá tải, năng lực không phù hợp hoặc phải làm ngoài vùng đã phê duyệt.</td></tr>
+<tr><td>Responsiveness / change discipline</td><td>Báo thay đổi trước, phản hồi nhanh, action plan rõ, đóng việc đúng hạn.</td><td>Phản hồi chậm vừa phải nhưng còn kiểm soát được.</td><td>Im lặng, né tránh, tự ý thay đổi hoặc đóng action hời hợt.</td></tr>
+<tr><td>Business continuity / capacity</td><td>Có năng lực dự phòng, nguồn thay thế, kế hoạch khi tăng tải hoặc gián đoạn.</td><td>Có rủi ro trung bình nhưng đã nhận diện và có biện pháp tạm.</td><td>Single-point-of-failure cao, không có backup, rủi ro logistics/capacity chưa kiểm soát.</td></tr>
+</tbody></table></div>
+<h2>8B. Requalification sau probation hoặc block</h2>
+<p>Supplier đang ở trạng thái <b>Probation</b> hoặc <b>Block</b> chỉ được mở lại khi hoàn tất đầy đủ bộ requalification tương ứng với nguyên nhân đã bị hạ cấp. Bộ requalification tối thiểu gồm: nguyên nhân gốc đã xác minh, containment đã hiệu lực, bằng chứng corrective action, bằng chứng lô thử hoặc lô đầu tiên sau phục hồi, cert/scope/trace sạch, và xác nhận authority theo đúng family ảnh hưởng.</p>
+<div class="table-card"><table>
+<thead><tr><th>Trạng thái trước đó</th><th>Bằng chứng mở lại tối thiểu</th><th>Ai verify</th><th>Ai approve mở lại</th></tr></thead>
+<tbody>
+<tr><td>Conditional → Approved</td><td>Score hồi phục, không còn open issue quá hạn, incoming check tăng cường đã ổn</td><td>Purchasing + QA</td><td>Pur Mgr</td></tr>
+<tr><td>Probation → Conditional/Approved</td><td>Action plan đóng, ít nhất 1 lô hoặc 1 tháng vận hành sạch theo loại supplier, không còn gating event mở</td><td>Purchasing + QA + bộ phận dùng nguồn</td><td>Pur Mgr + QA Mgr</td></tr>
+<tr><td>Block → Probation/Conditional</td><td>Requalification đầy đủ, review leadership, test lot/first receipt pass, customer scope/cert/special process evidence hợp lệ</td><td>QA Mgr + Pur Mgr + Eng/Planning khi liên quan</td><td>Tổng Giám Đốc hoặc người được ủy quyền theo authority</td></tr>
+</tbody></table></div>
+<h2>9. Hồ sơ, KPI và tài liệu liên kết</h2>
+<div class="kpi-grid">
+<div class="kpi-box"><b>KPI-01</b><br/>% supplier/processor đúng review frequency theo R-class.</div>
+<div class="kpi-box"><b>KPI-02</b><br/>Số gating event không được phản ứng trong SLA.</div>
+<div class="kpi-box"><b>KPI-03</b><br/>% supplier scorecard có đủ evidence trail và nguồn dữ liệu.</div>
+<div class="kpi-box"><b>KPI-04</b><br/>% PO critical phát hành cho source đã approved đúng scope.</div>
+</div>
+<p><b>Hồ sơ bắt buộc:</b> supplier onboarding pack, scorecard, SCAR, capacity review, cert scope evidence, customer approval evidence và quyết định status. Tài liệu liên kết chặt: <a href="annex-pur-002-outsource-special-process-pack.html">ANNEX-PUR-002</a>, <a href="annex-pur-003-approved-processor-list.html">ANNEX-PUR-003</a>, <a href="annex-eng-002-approved-materials-list.html">ANNEX-ENG-002</a>, <a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>, <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-402_Supplier_Evaluation_Form.xlsx">FRM-402</a>, <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-405_Supplier_Scorecard.xlsx">FRM-405</a>.</p>
+<div data-phase2f="true">
+<h2 class="h2" id="phase2f-form-linkage">Phase 2F — Linkage to operational forms</h2>
+<div class="note"><b>Triển khai</b><br/>ANNEX này là model risk / scoring. Khi đưa vào điều hành, cần nối sang <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-402_Supplier_Evaluation_Form.xlsx">FRM-402</a> để chốt approval scope, <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-406_SCAR.xlsx">FRM-406</a> để phục hồi nguồn và <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> / <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> để kéo risk xuống gate receipt thực tế.</div>
+</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-annex-pur001">Workbook baseline V0 — Nối risk model sang workbook receipt hiện hành</h2><div class="note phase3a-workbook-alignment"><b>Rule nối dữ liệu</b><br/>Risk / scorecard / recovery model tại ANNEX-PUR-001 phải nối xuống <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> workbook để risk class thật sự đi vào receipt gate, và dùng <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> khi cần HOLD/disposition/release. <a href="../03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html">FRM-412</a> là mã không phát hành trong baseline V0 và được chuẩn hóa tại ANNEX-QMS-031; không phải workbook active.</div></div>
+</div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div data-phase2i="true">
+<h2>Phase 2I — Score-to-action override rules</h2>
+<div class="table-card"><table><thead><tr><th>Trigger</th><th>Default action</th><th>Điểm score có còn quyết định chính?</th></tr></thead><tbody>
+<tr><td>Customer escape / counterfeit suspicion / unauthorized site-process change</td><td>SCAR + event audit + source-status downgrade ngay cho scope bị ảnh hưởng.</td><td>Không. Gate event override thắng điểm tổng.</td></tr>
+<tr><td>Recurring cert / trace mismatch hoặc repeated receipt HOLD</td><td>Giữ Conditional / Probation và mở recovery path cụ thể.</td><td>Không, cho tới khi hiệu lực được chứng minh qua verification window.</td></tr>
+<tr><td>Chronic capacity / continuity risk ở source critical</td><td>Mở alternate source / contingency plan và escalte nếu cần.</td><td>Không hoàn toàn; risk continuity có thể giới hạn scope dù score khác còn ổn.</td></tr>
+</tbody></table></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,450 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Module C11 — Sales / RFQ & Contract Review | HESEM OS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+</head>
+<body>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>C11 — Module C11 — Sales / RFQ & Contract Review</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>C11</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent"><div class="card">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>Module C11</div>
+<h1 style="margin-top:10px">Hiểu khách hàng &amp; thương mại</h1>
+<p class="muted">Tài liệu giảng dạy nội bộ HESEM – chuẩn hóa theo L1–L4 (Knowledge–Skill–Evidence–Metric).</p>
+<div class="tag blue">Phiên bản.0</div>
+</div>
+<div class="note">
+<strong>Thông tin triển khai</strong>
+<ul>
+<li><strong>Đối tượng:</strong> Kinh doanh/Account, PM, Kế hoạch</li>
+<li><strong>Thời lượng Áp dụng: </strong> Lý thuyết 4 giờ • Workshop 3 giờ • OJT 8 giờ</li>
+<li><strong>Điều kiện trước:</strong> Hiểu quy trình C10.</li>
+</ul>
+</div>
+</div>
+<div class="toc">
+<strong>Mục lục nhanh</strong>
+<ul>
+<li><a href="#output">Chuẩn đầu ra L1–L4 (K–S–E–M)</a></li>
+<li><a href="#theory">Giáo trình lý thuyết sâu</a></li>
+<li><a href="#exercises">Bài tập theo level (Case HESEM)</a></li>
+<li><a href="#ojt">OJT checklist theo TWI</a></li>
+<li><a href="#test">Test blueprint + quiz + rubric</a></li>
+<li><a href="#kpi">KPI gating ↔ competency-metrics</a></li>
+</ul>
+</div>
+</div><div class="card"><span class="badge">Bắt đầu theo Level</span><div class="grid-2"><div><p class="lead">Chọn Level đúng và hoàn tất OJT + performance test trong module Level.</p><ul class="tight"><li><a href="../../01-Competency-System/02-Levels/C11-L1.html">C11-L1 — Thực hiện theo chuẩn</a></li><li><a href="../../01-Competency-System/02-Levels/C11-L2.html">C11-L2 — Làm độc lập &amp; bàn giao đúng</a></li><li><a href="../../01-Competency-System/02-Levels/C11-L3.html">C11-L3 — Dẫn dắt &amp; khoá lỗi lặp lại</a></li><li><a href="../../01-Competency-System/02-Levels/C11-L4.html">C11-L4 — Thiết kế hệ thống &amp; huấn luyện</a></li></ul></div><div class="note"><strong>Liên kết thực chiến</strong><ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;"><li><a href="../../01-Competency-System/01-Framework/competency-framework.html#C11">Khung năng lực</a></li><li><a href="../../01-Competency-System/01-Framework/competency-metrics.html#C11">KPI/Metric</a></li><li><a href="../../04-Templates-Tools/role-roadmaps.html">Lộ trình theo vai trò</a></li><li><a href="../../04-Templates-Tools/qms-ops-map.html">Training ↔ Process ↔ Records</a></li></ul><p class="mini">Hồ sơ bắt buộc nằm trong từng module Level (MRR). Lưu vào Job Dossier theo SYS-OPS-02.</p></div></div></div><div class="card">
+<span class="badge">Drill Pack (liên kết thực chiến)</span>
+<p class="lead" style="margin-top:10px;">
+ Module C11 đạt chuẩn khi học viên chạy drill và nộp MRR đúng SSOT.
+ Mở danh mục drill: <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li><a href="../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html"><b>DRL-11</b> — Customer Requirement → CTQ Translation Drill</a></li><li><a href="../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Shipping Packet + CoC Drill</a></li><li><a href="../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Job Order E2E Drill (RFQ → Ship Packet)</a></li>
+</ul>
+<p class="small muted" style="margin-top:8px;">
+ Naming &amp; SSOT: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ </p>
+</div><h2 id="output">Chuẩn đầu ra theo L1–L4 (Knowledge–Skill–Evidence–Metric)</h2><p class="muted">Chuẩn đầu ra là “hợp đồng học tập”: học xong phải <strong>làm được gì</strong>, có <strong>minh chứng</strong> gì, và được đo bằng <strong>metric</strong> nào. Bảng dưới là chuẩn áp dụng để HESEM chuẩn hóa đánh giá.</p><table class="table">
+<thead>
+<tr>
+<th style="width:180px">Level</th>
+<th>Knowledge (Biết)</th>
+<th>Skill (Làm)</th>
+<th>Evidence (Minh chứng)</th>
+<th>Metric/KPI (Đo lường)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>L1</strong><div class="muted">Nhận biết &amp; làm theo hướng dẫn (có giám sát)</div></td>
+<td>
+<ul>
+<li>Giải thích được các khái niệm cơ bản: <strong>VOC, RFQ Analysis, Assumptions</strong>.</li>
+<li>Nắm “điểm không được làm” (Do/Don’t) và lý do an toàn/chất lượng liên quan năng lực <strong>C11</strong>.</li>
+<li>Hiểu quy trình tối thiểu và vị trí của mình trong quy trình.</li>
+</ul>
+</td>
+<td>
+<ul>
+<li>Thực hiện được các bước cơ bản theo checklist/giám sát: <strong>Phân tích RFQ/VOC, Làm rõ &amp; DFM</strong>.</li>
+<li>Biết dừng và báo khi có lệch chuẩn (escalation).</li>
+</ul>
+</td>
+<td>
+<ul>
+<li>Điểm quiz ≥ 70% và ký xác nhận đã học.</li>
+<li>01 minh chứng thực hành có giám sát (ảnh/checklist ký).</li>
+</ul>
+</td>
+<td><ul><li><code>C11-M5</code>: <strong>Vi phạm NDA/điều khoản thương mại</strong> → mục tiêu <strong>=0</strong></li><li><code>C11-M1</code>: <strong>Quote turnaround time</strong> → mục tiêu <strong>&lt;=72h</strong></li><li><code>C11-M2</code>: <strong>Tỷ lệ win (Win rate)</strong> → mục tiêu <strong>&gt;=15%</strong></li><li><code>C11-M3</code>: <strong>Customer satisfaction (CSAT)</strong> → mục tiêu <strong>&gt;=4.0</strong></li></ul></td>
+</tr>
+<tr>
+<td><strong>L2</strong><div class="muted">Thực hiện độc lập (ổn định theo SOP/checklist)</div></td>
+<td>
+<ul>
+<li>Hiểu rõ quy trình chuẩn (workflow) và tiêu chí chấp nhận ở từng bước: <strong>Phân tích RFQ/VOC, Làm rõ &amp; DFM, Tính giá &amp; năng lực, Soạn báo giá chuẩn</strong>.</li>
+<li>Nắm thêm khái niệm/tiêu chuẩn nâng cao: <strong>Pricing, MOQ, Lead Time</strong>.</li>
+</ul>
+</td>
+<td>
+<ul>
+<li>Tự thực hiện công việc đúng SOP, không cần nhắc.</li>
+<li>Ghi hồ sơ/biểu mẫu đầy đủ, đúng thời điểm.</li>
+</ul>
+</td>
+<td>
+<ul>
+<li>Checklist OJT đạt (đủ chữ ký Người hướng dẫn + Người học).</li>
+<li>01 bài tập tình huống (case) đạt theo rubric.</li>
+</ul>
+</td>
+<td><ul><li><code>C11-M5</code>: <strong>Vi phạm NDA/điều khoản thương mại</strong> → mục tiêu <strong>=0</strong></li><li><code>C11-M1</code>: <strong>Quote turnaround time</strong> → mục tiêu <strong>&lt;=48h</strong></li><li><code>C11-M2</code>: <strong>Tỷ lệ win (Win rate)</strong> → mục tiêu <strong>&gt;=20%</strong></li><li><code>C11-M3</code>: <strong>Customer satisfaction (CSAT)</strong> → mục tiêu <strong>&gt;=4.2</strong></li></ul></td>
+</tr>
+<tr>
+<td><strong>L3</strong><div class="muted">Nâng cao (xử lý tình huống + tối ưu + hướng dẫn người khác)</div></td>
+<td>
+<ul>
+<li>Phân tích được nguyên nhân khi có sai lệch, dùng dữ liệu để kết luận.</li>
+<li>Biết lựa chọn công cụ phù hợp (checklist, RCA, đánh giá, đo kiểm…) theo rủi ro.</li>
+</ul>
+</td>
+<td>
+<ul>
+<li>Xử lý tình huống phức tạp; đưa ra phương án và giải thích đánh đổi.</li>
+<li>Hướng dẫn người khác (mini‑coaching) theo đúng chuẩn.</li>
+</ul>
+</td>
+<td>
+<ul>
+<li>01 báo cáo phân tích (A3/5Why/lesson learned) có minh chứng dữ liệu.</li>
+<li>01 lập yêu cầu cải tiến được thử nghiệm (pilot) và đo trước–sau.</li>
+</ul>
+</td>
+<td><ul><li><code>C11-M5</code>: <strong>Vi phạm NDA/điều khoản thương mại</strong> → mục tiêu <strong>=0</strong></li><li><code>C11-M1</code>: <strong>Quote turnaround time</strong> → mục tiêu <strong>&lt;=24h</strong></li><li><code>C11-M2</code>: <strong>Tỷ lệ win (Win rate)</strong> → mục tiêu <strong>&gt;=25%</strong></li><li><code>C11-M3</code>: <strong>Customer satisfaction (CSAT)</strong> → mục tiêu <strong>&gt;=4.4</strong></li></ul></td>
+</tr>
+<tr>
+<td><strong>L4</strong><div class="muted">Chuyên gia/hệ thống (chuẩn hóa, cải tiến hệ thống, huấn luyện &amp; dẫn dắt)</div></td>
+<td>
+<ul>
+<li>Thiết kế/chuẩn hóa hệ thống: SOP, checklist, đánh giá, đào tạo, KPI.</li>
+<li>Định nghĩa chuẩn dữ liệu &amp; ngưỡng KPI; xây “gating rule” cho năng lực.</li>
+</ul>
+</td>
+<td>
+<ul>
+<li>Dẫn dắt triển khai liên phòng ban; xử lý trade‑off QCDSM.</li>
+<li>Huấn luyện (train‑the‑trainer) và phát triển người kế cận.</li>
+</ul>
+</td>
+<td>
+<ul>
+<li>01 dự án chuẩn hóa/cải tiến cấp hệ thống (có SOP mới + đào tạo + đánh giá).</li>
+<li>02 nhân sự được kèm cặp nâng level (có hồ sơ chứng nhận).</li>
+</ul>
+</td>
+<td><ul><li><code>C11-M5</code>: <strong>Vi phạm NDA/điều khoản thương mại</strong> → mục tiêu <strong>=0</strong></li><li><code>C11-M1</code>: <strong>Quote turnaround time</strong> → mục tiêu <strong>&lt;=12h</strong></li><li><code>C11-M2</code>: <strong>Tỷ lệ win (Win rate)</strong> → mục tiêu <strong>&gt;=30%</strong></li><li><code>C11-M3</code>: <strong>Customer satisfaction (CSAT)</strong> → mục tiêu <strong>&gt;=4.6</strong></li></ul></td>
+</tr>
+</tbody>
+</table><h2 id="theory">Giáo trình lý thuyết sâu (học thuật ứng dụng)</h2><p>Năng lực <strong>C11 – Hiểu khách hàng &amp; thương mại</strong> là một phần của hệ thống vận hành Job Order tại HESEM.
+ Mục tiêu không chỉ “biết khái niệm”, mà phải chuyển hóa thành <strong>hành vi + chuẩn thao tác + hồ sơ</strong> để bảo vệ các cam kết <strong>QCDSM</strong> (Quality–Cost–Delivery–Safety–Morale).</p><div class="grid-2">
+<div class="note">
+<strong>Khung tư duy cốt lõi</strong>
+<ul><li>Đúng ngay từ đầu (Right First Time) tốt hơn sửa lỗi ở cuối: rẻ hơn, nhanh hơn, ít rủi ro hơn.</li><li>Chuẩn hóa trước – cải tiến sau: không có chuẩn thì không đo được và không cải tiến bền vững.</li><li>Minh chứng quan trọng hơn cảm giác: mọi kết luận phải dựa trên dữ liệu/hồ sơ/truy vết.</li><li>Rủi ro (Safety/Quality/Compliance) luôn ưu tiên trước năng suất ngắn hạn.</li><li>Báo giá là bài toán rủi ro: phải nói rõ assumption, scope, exclusions để bảo vệ hai bên.</li><li>DFM/clarification sớm giúp vừa giảm rủi ro sản xuất, vừa tăng khả năng trúng PO.</li></ul>
+</div>
+<div class="note">
+<strong>Liên kết với hệ thống đánh giá</strong>
+<ul>
+<li>Chuẩn đầu ra L1–L4 dùng để đánh giá công bằng (xem mục <a href="#output">Output</a>).</li>
+<li>KPI/Metric và <em>gating</em> dùng để chặn rủi ro (xem mục <a href="#kpi">KPI gating</a>).</li>
+<li>OJT theo TWI giúp “biến kiến thức thành kỹ năng” (xem mục <a href="#ojt">OJT</a>).</li>
+</ul>
+</div>
+</div><h3>1) Quy trình chuẩn/Workflow cho C11</h3><table class="table">
+<thead><tr><th style="width:70px">Bước</th><th>Nội dung</th></tr></thead>
+<tbody><tr><td style="width:55px"><strong>B1</strong></td><td><strong>Phân tích RFQ/VOC</strong><div class="muted">Hiểu chức năng, CTQ, lead time, rủi ro; xác nhận tiêu chuẩn.</div></td></tr><tr><td style="width:55px"><strong>B2</strong></td><td><strong>Làm rõ &amp; DFM</strong><div class="muted">Hỏi làm rõ; lập yêu cầu thay đổi để giảm rủi ro/cost khi được phép.</div></td></tr><tr><td style="width:55px"><strong>B3</strong></td><td><strong>Tính giá &amp; năng lực</strong><div class="muted">Cycle/setup, vật tư, dao, thuê ngoài; xác định lead time.</div></td></tr><tr><td style="width:55px"><strong>B4</strong></td><td><strong>Soạn báo giá chuẩn</strong><div class="muted">Giá + điều khoản + giả định + scope; version rõ ràng.</div></td></tr><tr><td style="width:55px"><strong>B5</strong></td><td><strong>Theo dõi &amp; đàm phán</strong><div class="muted">Follow‑up; ghi nhận phản hồi; điều chỉnh điều khoản hợp lý.</div></td></tr><tr><td style="width:55px"><strong>B6</strong></td><td><strong>Handover nội bộ</strong><div class="muted">Khi trúng PO: bàn giao đủ thông tin cho planning/ops.</div></td></tr></tbody>
+</table><div class="no-print">
+<p class="muted">Sơ đồ hóa workflow (để dán tại khu vực làm việc / onboarding nhanh):</p>
+<div class="vflow">
+<div class="vstep">
+<div class="vnum">1</div>
+<div class="vtext">
+<strong>Phân tích RFQ/VOC</strong>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">2</div>
+<div class="vtext">
+<strong>Làm rõ &amp; DFM</strong>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">3</div>
+<div class="vtext">
+<strong>Tính giá &amp; năng lực</strong>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">4</div>
+<div class="vtext">
+<strong>Soạn báo giá chuẩn</strong>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">5</div>
+<div class="vtext">
+<strong>Theo dõi &amp; đàm phán</strong>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">6</div>
+<div class="vtext">
+<strong>Handover nội bộ</strong>
+</div>
+</div>
+</div>
+</div><h3>2) Thuật ngữ &amp; công cụ trọng tâm</h3><p class="muted">Bảng này ưu tiên diễn giải theo “ngôn ngữ xưởng” để học viên áp dụng ngay, tránh học thuộc lý thuyết rời rạc.</p><table class="table">
+<thead><tr><th style="width:230px">Thuật ngữ/Công cụ</th><th>Diễn giải vận hành</th></tr></thead>
+<tbody><tr><td style="width:210px"><strong>VOC</strong></td><td>VOC: khái niệm trọng tâm của mô-đun; áp dụng trực tiếp để ra quyết định đúng trong công việc hằng ngày.</td></tr><tr><td style="width:210px"><strong>RFQ Analysis</strong></td><td>RFQ Analysis: khái niệm trọng tâm của mô-đun; áp dụng trực tiếp để ra quyết định đúng trong công việc hằng ngày.</td></tr><tr><td style="width:210px"><strong>Assumptions</strong></td><td>Assumptions: khái niệm trọng tâm của mô-đun; áp dụng trực tiếp để ra quyết định đúng trong công việc hằng ngày.</td></tr><tr><td style="width:210px"><strong>Pricing</strong></td><td>Pricing: khái niệm trọng tâm của mô-đun; áp dụng trực tiếp để ra quyết định đúng trong công việc hằng ngày.</td></tr><tr><td style="width:210px"><strong>MOQ</strong></td><td>MOQ: khái niệm trọng tâm của mô-đun; áp dụng trực tiếp để ra quyết định đúng trong công việc hằng ngày.</td></tr><tr><td style="width:210px"><strong>Lead Time</strong></td><td>Lead Time: khái niệm trọng tâm của mô-đun; áp dụng trực tiếp để ra quyết định đúng trong công việc hằng ngày.</td></tr><tr><td style="width:210px"><strong>Terms &amp; Conditions</strong></td><td>Terms &amp; Conditions: khái niệm trọng tâm của mô-đun; áp dụng trực tiếp để ra quyết định đúng trong công việc hằng ngày.</td></tr><tr><td style="width:210px"><strong>NDA</strong></td><td>Non‑Disclosure Agreement – thỏa thuận bảo mật; cấm chia sẻ thông tin khách hàng/thiết kế/giá.</td></tr></tbody>
+</table><h3>3) Sai lỗi hay gặp gặp &amp; cách phòng ngừa</h3><ul><li>Báo giá khi RFQ thiếu thông tin mà không ghi assumption.</li><li>Tính cost thiếu mục (finish, chứng chỉ, QC) → lỗ.</li><li>Cam kết lead time không kiểm tra năng lực/bottleneck.</li><li>Không quản lý version báo giá → nhầm điều khoản.</li><li>Handover nội bộ thiếu thông tin → ops chạy sai.</li><li>Vi phạm NDA/điều khoản → gate.</li></ul><h3>4) Biểu mẫu/Checklist liên quan (để tạo Evidence)</h3><ul><li><a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">RFQ Intake</a></li><li><a  download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-301_Costing_Sheet.xlsx">Costing Sheet</a></li><li><a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-201_RFQ_Register.xlsx">Customer Complaint</a></li></ul><h2 id="exercises">Bài tập theo Level (Case study HESEM)</h2><p>Dùng 1 case thực tế mô phỏng để luyện từ “biết” → “làm” → “xử lý” → “chuẩn hóa”.</p><div class="card">
+<div class="badge"><span class="dot"></span>Case study</div>
+<h3 style="margin-top:10px">RFQ thiếu thông tin – làm rõ &amp; lập báo giá có giả định</h3>
+<div class="grid-2">
+<div>
+<strong>Bối cảnh</strong>
+<ul><li>Khách gửi RFQ kèm bản vẽ nhưng không nêu yêu cầu finish và chứng chỉ.</li><li>Khi báo giá thấp sẽ rủi ro lỗ; báo giá cao sẽ mất cơ hội.</li><li>Bạn phải làm rõ, đưa giả định và bảo vệ lợi nhuận.</li></ul>
+</div>
+<div>
+<strong>Dữ liệu/giả định</strong>
+<ul><li>Khách hay gặp yêu cầu anodize hoặc passivation theo vật liệu.</li><li>Lịch sử win rate của khách này ~20%.</li></ul>
+</div>
+</div>
+<hr class="sep"/>
+<h4>L1 – Nhận biết &amp; làm theo hướng dẫn (có giám sát)</h4>
+<ul>
+<li>Nêu 5 thuật ngữ/khái niệm liên quan và giải thích ngắn gọn.</li><li>Chỉ ra 3 rủi ro chính trong tình huống và “điểm không được làm”.</li><li>Vẽ sơ đồ workflow (6 bước) và đánh dấu bước nào đang bị vi phạm trong case.</li>
+</ul>
+<h4>L2 – Thực hiện độc lập (ổn định theo SOP/checklist)</h4>
+<ul>
+<li>Điền 01 checklist/biểu mẫu liên quan (OJT/Job traveler/Inspection/… theo module).</li><li>lập yêu cầu hành động xử lý ngay (containment) và cách báo cáo/escalation.</li><li>lập yêu cầu cách ghi nhận hồ sơ (evidence) để lần sau truy vết được.</li>
+</ul>
+<h4>L3 – Nâng cao (xử lý tình huống + tối ưu + hướng dẫn người khác)</h4>
+<ul>
+<li>Phân tích nguyên nhân gốc (5Why/A3) dựa trên dữ liệu giả định trong case.</li><li>lập yêu cầu 2–3 hành động phòng ngừa tái diễn; nêu cách đo hiệu quả (metric trước–sau).</li><li>Thiết kế một “poka‑yoke”/cơ chế chặn lỗi (được là checklist, mẫu, visual control).</li>
+</ul>
+<h4>L4 – Chuyên gia/hệ thống (chuẩn hóa, cải tiến hệ thống, huấn luyện &amp; dẫn dắt)</h4>
+<ul>
+<li>lập yêu cầu chuẩn hóa cấp hệ thống: cập nhật SOP/checklist/training + đánh giá duy trì.</li><li>Thiết kế KPI gating/threshold cho nhóm (liên kết Từ điển KPI).</li><li>Soạn “one‑point lesson” để huấn luyện lại cho toàn nhóm (tối đa 1 trang).</li>
+</ul>
+</div><h2 id="ojt">OJT checklist theo TWI (Training Within Industry)</h2><p>HESEM dùng TWI – Job Instruction để chuẩn hóa huấn luyện tại chỗ: <strong>đúng người, đúng việc, đúng cách</strong>, giảm phụ thuộc “truyền miệng”.</p><div class="grid-2">
+<div class="note">
+<strong>TWI – 4 bước hướng dẫn (Job Instruction)</strong>
+<ol>
+<li><strong>Prepare the worker</strong>: chuẩn bị người học (mục tiêu, an toàn, tâm thế).</li>
+<li><strong>Present the operation</strong>: trình bày từng bước + <em>key points</em> + lý do.</li>
+<li><strong>Try out performance</strong>: cho học viên làm thử, sửa sai ngay, nhấn mạnh key points.</li>
+<li><strong>Follow up</strong>: theo dõi sau huấn luyện, phản hồi, ký xác nhận, chống “trở lại thói quen cũ”.</li>
+</ol>
+</div>
+<div class="note">
+<strong>Nguyên tắc làm OJT đạt chuẩn</strong>
+<ul>
+<li>Chia nhỏ công việc thành <strong>steps</strong> – không quá nhiều trong 1 buổi.</li>
+<li>Mỗi step phải có <strong>key points</strong> (điểm then chốt) và <strong>reasons</strong> (lý do).</li>
+<li>Đánh giá theo <strong>quan sát hành vi</strong>, không chỉ hỏi miệng.</li>
+</ul>
+</div>
+</div><h3>Job Breakdown Sheet (mẫu cho mô-đun C11)</h3><div class="card">
+<strong>Công việc OJT:</strong> Soạn báo giá chuẩn cho một RFQ CNC job order
+ <table class="table" style="margin-top:10px">
+<thead>
+<tr>
+<th style="width:55px">#</th>
+<th style="width:240px">Important Steps</th>
+<th>Key Points (điểm then chốt)</th>
+<th>Reasons (vì sao quan trọng)</th>
+</tr>
+</thead>
+<tbody>
+<tr><td style="width:55px"><strong>1</strong></td><td><strong>Đọc RFQ &amp; bản vẽ</strong></td><td>CTQ, vật liệu, finish, qty, lead time</td><td>Nắm yêu cầu thật.</td></tr><tr><td style="width:55px"><strong>2</strong></td><td><strong>Làm rõ điểm mơ hồ</strong></td><td>Hỏi trước; ghi assumption khi chưa rõ</td><td>Tránh báo giá sai.</td></tr><tr><td style="width:55px"><strong>3</strong></td><td><strong>Tính cost &amp; lead time</strong></td><td>Setup/cycle, vật tư, dao, thuê ngoài, QC</td><td>Giá có căn cứ.</td></tr><tr><td style="width:55px"><strong>4</strong></td><td><strong>Chốt điều khoản</strong></td><td>Incoterms, payment, warranty, NDA</td><td>Giảm rủi ro thương mại.</td></tr><tr><td style="width:55px"><strong>5</strong></td><td><strong>Trình bày báo giá rõ ràng</strong></td><td>Version, scope, exclusions</td><td>Tăng tính chuyên nghiệp.</td></tr><tr><td style="width:55px"><strong>6</strong></td><td><strong>Handover khi trúng PO</strong></td><td>Bàn giao job packet đủ cho ops</td><td>Chạy trơn tru.</td></tr>
+</tbody>
+</table>
+</div><h3>OJT Checklist (ký xác nhận đạt)</h3><p class="muted">Biểu mẫu áp dụng kèm: <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM‑HR‑TRN‑03 Checklist OJT</a>.</p><table class="table">
+<thead>
+<tr>
+<th style="width:55px">#</th>
+<th>Nội dung quan sát</th>
+<th style="width:90px">Đạt</th>
+<th style="width:110px">Cần kèm</th>
+<th>Ghi chú</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="width:55px">1</td>
+<td>Đọc RFQ &amp; bản vẽ<div class="muted">CTQ, vật liệu, finish, qty, lead time</div></td>
+<td style="width:90px; text-align:center">☐ Đạt</td>
+<td style="width:110px; text-align:center">☐ Cần kèm</td>
+<td style="min-width:180px"></td>
+</tr>
+<tr>
+<td style="width:55px">2</td>
+<td>Làm rõ điểm mơ hồ<div class="muted">Hỏi trước; ghi assumption khi chưa rõ</div></td>
+<td style="width:90px; text-align:center">☐ Đạt</td>
+<td style="width:110px; text-align:center">☐ Cần kèm</td>
+<td style="min-width:180px"></td>
+</tr>
+<tr>
+<td style="width:55px">3</td>
+<td>Tính cost &amp; lead time<div class="muted">Setup/cycle, vật tư, dao, thuê ngoài, QC</div></td>
+<td style="width:90px; text-align:center">☐ Đạt</td>
+<td style="width:110px; text-align:center">☐ Cần kèm</td>
+<td style="min-width:180px"></td>
+</tr>
+<tr>
+<td style="width:55px">4</td>
+<td>Chốt điều khoản<div class="muted">Incoterms, payment, warranty, NDA</div></td>
+<td style="width:90px; text-align:center">☐ Đạt</td>
+<td style="width:110px; text-align:center">☐ Cần kèm</td>
+<td style="min-width:180px"></td>
+</tr>
+<tr>
+<td style="width:55px">5</td>
+<td>Trình bày báo giá rõ ràng<div class="muted">Version, scope, exclusions</div></td>
+<td style="width:90px; text-align:center">☐ Đạt</td>
+<td style="width:110px; text-align:center">☐ Cần kèm</td>
+<td style="min-width:180px"></td>
+</tr>
+<tr>
+<td style="width:55px">6</td>
+<td>Handover khi trúng PO<div class="muted">Bàn giao job packet đủ cho ops</div></td>
+<td style="width:90px; text-align:center">☐ Đạt</td>
+<td style="width:110px; text-align:center">☐ Cần kèm</td>
+<td style="min-width:180px"></td>
+</tr>
+</tbody>
+</table><h2 id="test">Test blueprint + quiz mẫu + rubric đánh giá</h2><p>Thiết kế kiểm tra theo nguyên tắc: <strong>đo đúng chuẩn đầu ra</strong> (K–S–E–M) và ưu tiên <strong>ứng dụng</strong> hơn học thuộc.</p><h3>1) Test blueprint (khung đề)</h3><table class="table">
+<thead>
+<tr>
+<th style="width:60px">Phần</th>
+<th style="width:220px">Mục tiêu</th>
+<th>Nội dung đo</th>
+<th style="width:90px">Tỷ trọng</th>
+<th style="width:220px">Dạng câu hỏi</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>A</strong></td><td><strong>Kiến thức nền (L1)</strong></td><td>Nhận biết khái niệm, thuật ngữ, quy tắc Do/Don’t</td><td>20%</td><td>Trắc nghiệm + đúng/sai</td></tr><tr><td><strong>B</strong></td><td><strong>Áp dụng quy trình (L2)</strong></td><td>Áp dụng workflow, điền checklist/biểu mẫu, chọn hành động đúng</td><td>35%</td><td>Tình huống ngắn + điền biểu mẫu</td></tr><tr><td><strong>C</strong></td><td><strong>Phân tích &amp; xử lý (L3)</strong></td><td>Phân tích nguyên nhân, chọn công cụ, lập yêu cầu CAPA/kaizen</td><td>35%</td><td>Case phân tích + câu hỏi mở</td></tr><tr><td><strong>D</strong></td><td><strong>Chuẩn hóa &amp; hệ thống (L4)</strong></td><td>lập yêu cầu chuẩn hóa, KPI gating, kế hoạch đào tạo</td><td>10%</td><td>Mini‑A3/one‑page proposal</td></tr>
+</tbody>
+</table><h3>2) Quiz mẫu (12 câu)</h3><ol><li><strong>Q1.</strong> (L1) Trình bày mục tiêu của năng lực này trong vận hành Job Order tại HESEM.</li><li><strong>Q2.</strong> (L1) Giải thích 3 thuật ngữ: VOC, RFQ Analysis, Assumptions.</li><li><strong>Q3.</strong> (L1) Nêu 3 sai lỗi hay gặp gặp và hậu quả (an toàn/chất lượng/OTD).</li><li><strong>Q4.</strong> (L2) Liệt kê và mô tả ngắn 4 bước trong workflow: Phân tích RFQ/VOC, Làm rõ &amp; DFM, Tính giá &amp; năng lực, Soạn báo giá chuẩn.</li><li><strong>Q5.</strong> (L2) Với 1 tình huống lệch chuẩn, bạn sẽ escalation theo nguyên tắc nào? Nêu tối thiểu 3 thông tin cần báo (5W2H).</li><li><strong>Q6.</strong> (L2) Bạn cần tạo những hồ sơ/evidence nào để chứng minh đã làm đúng? Liệt kê ít nhất 3 loại. </li><li><strong>Q7.</strong> (L3) Chọn 1 lỗi điển hình của mô-đun và thực hiện 5Why (ít nhất 4 Why) kèm kiểm chứng/bằng chứng cần có.</li><li><strong>Q8.</strong> (L3) lập yêu cầu 2 hành động phòng ngừa tái diễn và cách đo hiệu lực (metric trước–sau).</li><li><strong>Q9.</strong> (L3) Thiết kế 1 cơ chế chặn lỗi (poka‑yoke/checklist/visual control) gắn với workflow.</li><li><strong>Q10.</strong> (L4) Chọn 1 metric Gate (C11-M5). Khi vi phạm, quy trình xử lý chuẩn là gì?</li><li><strong>Q11.</strong> (L4) lập yêu cầu cách chuẩn hóa: cập nhật SOP/checklist + đào tạo + đánh giá duy trì (nêu rõ ai làm, khi nào).</li><li><strong>Q12.</strong> (L4) Viết “one‑point lesson” (tối đa 10 dòng) để huấn luyện lại cho nhóm về điểm yếu hay gặp.</li></ol><details class="no-print">
+<summary>Đáp án áp dụng / ý chính chấm điểm</summary>
+<ol><li><strong>Q1:</strong> Nêu được liên kết QCDSM; vai trò của năng lực trong giảm rủi ro/ổn định; ví dụ trong công việc.</li><li><strong>Q2:</strong> Đúng định nghĩa vận hành; nêu được khi áp dụng và 1 rủi ro khi làm sai.</li><li><strong>Q3:</strong> Nêu đủ: hành vi sai → hậu quả → cách phòng ngừa (checklist/standard).</li><li><strong>Q4:</strong> Mô tả đúng trình tự; nêu đầu vào/đầu ra tối thiểu của từng bước.</li><li><strong>Q5:</strong> Có escalation sớm; thông tin đủ 5W2H; chốt next step.</li><li><strong>Q6:</strong> Nêu được ≥3 evidence: checklist, biên bản kiểm tra, ảnh, log, chữ ký…</li><li><strong>Q7:</strong> 5Why logic, có kiểm chứng; không đổ lỗi con người; ra root cause khả thi.</li><li><strong>Q8:</strong> Hành động phân biệt corrective/preventive; có metric &amp; thời gian verify.</li><li><strong>Q9:</strong> Giải pháp chặn lỗi cụ thể, dễ dùng, gắn điểm kiểm soát của workflow.</li><li><strong>Q10:</strong> Nêu đúng quy tắc Gate; dừng – ghi nhận – containment – CAPA – đánh giá lại.</li><li><strong>Q11:</strong> Có SOP/checklist version; kế hoạch đào tạo; tần suất đánh giá; owner rõ.</li><li><strong>Q12:</strong> One‑point lesson ngắn, rõ, tập trung key points + hình dung thao tác/tiêu chuẩn.</li></ol>
+<p class="muted">Quy định: đáp án là “ý chính” để chấm. Với câu hỏi mở, giảng viên được chấp nhận câu trả lời hợp lý khi có minh chứng/lập luận đúng.</p>
+</details><h3>3) Rubric đánh giá (áp dụng cho bài tập case + thực hành OJT)</h3><table class="table">
+<thead>
+<tr>
+<th style="width:220px">Tiêu chí</th>
+<th>L1</th>
+<th>L2</th>
+<th>L3</th>
+<th>L4</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>1. Tuân thủ an toàn &amp; gate</strong></td><td>Không vi phạm gate; biết dừng việc; xử lý rủi ro đúng</td><td>Đạt tối thiểu; còn cần nhắc</td><td>Ổn định; chủ động báo sớm</td><td>Dẫn dắt/đào tạo người khác; đánh giá</td></tr><tr><td><strong>2. Thực hiện workflow</strong></td><td>Làm đúng trình tự; không bỏ bước</td><td>Làm được nhưng chậm/thiếu nhất quán</td><td>Làm đúng, ổn định; biết tự kiểm</td><td>Tối ưu &amp; cải tiến workflow</td></tr><tr><td><strong>3. Hồ sơ &amp; minh chứng</strong></td><td>Ghi chép đúng, đủ, đúng thời điểm</td><td>Còn thiếu/sai format</td><td>Đầy đủ, truy vết được</td><td>Chuẩn hóa mẫu; kiểm tra chéo</td></tr><tr><td><strong>4. Phân tích &amp; xử lý tình huống</strong></td><td>Containment + RCA + CAPA</td><td>Xử lý triệu chứng; RCA yếu</td><td>RCA tốt; CAPA rõ; verify</td><td>Xây hệ thống phòng ngừa, chia sẻ bài học</td></tr><tr><td><strong>5. Giao tiếp &amp; phối hợp</strong></td><td>5W2H, RACI, vòng kín</td><td>Thông tin thiếu; cần nhắc</td><td>Đầy đủ; đúng kênh; đúng SLA</td><td>Dẫn dắt liên phòng ban; giảm xung đột</td></tr>
+</tbody>
+</table><h2 id="kpi">KPI gating liên kết sang competency-metrics</h2><p>KPI/Metric của năng lực <strong>C11</strong> được định nghĩa tại: <a href="../../01-Competency-System/01-Framework/competency-metrics.html#C11">Từ điển KPI/Metric (mục C11)</a>.
+ Trong đó các mục gắn nhãn <span class="tag orange">Gate</span> là điều kiện chặn – vi phạm là <strong>không công nhận</strong> level trong kỳ.</p><div class="kpi-gate">
+<strong>Danh sách Gate tiêu chuẩn cho C11</strong>
+<ul><li><code>C11-M5</code> – <strong>Vi phạm NDA/điều khoản thương mại</strong>: Gửi thông tin khách hàng ra ngoài, sai điều khoản, cam kết sai.</li></ul>
+<hr class="sep"/>
+<strong>Khi vi phạm Gate:</strong>
+<ol>
+<li>Dừng công việc liên quan (khi còn rủi ro).</li>
+<li>Lập NCR/Incident theo quy định, thực hiện containment.</li>
+<li>Thực hiện OJT bắt buộc (TWI) cho điểm yếu; đánh giá lại sau khi đóng CAPA.</li>
+</ol>
+</div><div class="card">
+<h2>Tài liệu liên quan</h2>
+<ul>
+<li><a href="../../01-Competency-System/01-Framework/competency-framework.html#C11">Khung năng lực (mục C11)</a></li>
+<li><a href="../../01-Competency-System/01-Framework/competency-assessment-guide.html#C11">Hướng dẫn đánh giá (mục C11)</a></li>
+<li><a href="../../01-Competency-System/01-Framework/competency-metrics.html#C11">Từ điển KPI/Metric (mục C11)</a></li>
+</ul>
+</div><div class="card">
+<div class="note">
+<strong>Tổ chức lớp học</strong>
+<ul>
+<li>Phần lý thuyết PHẢI dạy theo “tình huống → nguyên tắc → công cụ → thực hành”.</li>
+<li>Workshop ưu tiên làm biểu mẫu thật (job packet, CTQ list, IR, ECO…) trên case mẫu.</li>
+<li>OJT bắt buộc có quan sát tại hiện trường và ký xác nhận theo checklist.</li>
+</ul>
+</div>
+</div></div></div></div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+
+
+
+

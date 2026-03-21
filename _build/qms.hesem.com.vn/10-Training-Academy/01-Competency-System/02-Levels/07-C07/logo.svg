@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#fff9db" stroke="#ffe066" stroke-width="2"/>
+  <path d="M60 85V35" stroke="#e67700" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M45 50l15-15 15 15" stroke="#e67700" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M38 70c6-10 14-16 22-22" stroke="#e67700" stroke-width="1.5" fill="none" stroke-dasharray="3 3" opacity=".5"/>
+  <path d="M82 70c-6-10-14-16-22-22" stroke="#e67700" stroke-width="1.5" fill="none" stroke-dasharray="3 3" opacity=".5"/>
+  <circle cx="60" cy="35" r="4" fill="#e67700" opacity=".3"/>
+  <text x="60" y="108" text-anchor="middle" font-size="8" font-weight="700" fill="#e67700" font-family="system-ui">KAIZEN</text>
+</svg>

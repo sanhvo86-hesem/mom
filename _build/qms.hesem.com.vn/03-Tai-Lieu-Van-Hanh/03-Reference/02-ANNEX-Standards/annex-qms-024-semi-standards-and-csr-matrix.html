@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ANNEX-QMS-024 — Ma trận chuẩn SEMI, CSR và điều kiện đặc biệt | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+<style>
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px}
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.toc-grid a,.toc-grid span{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink)}
+.mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
+.tight li{margin:4px 0}
+.callout-strong{border-left:4px solid var(--blue);padding:12px 14px;background:var(--blue-l);border-radius:0 var(--r-sm) var(--r-sm) 0;margin:12px 0}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.kpi-card,.rule-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg)}
+.kpi-card h3,.rule-card h3{margin:0 0 6px;font-size:14px;color:var(--navy)}
+.doc-link-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.doc-link{display:inline-block;padding:6px 10px;border:1px solid var(--ln);border-radius:999px;background:var(--bg2);font-size:12px;font-weight:600;color:var(--navy)}
+.small-table td,.small-table th{font-size:12px}
+.matrix-wrap{overflow:auto;max-width:100%}
+.matrix-wrap table{min-width:1000px}
+.section-rule{height:1px;background:var(--ln);margin:18px 0}
+.note-list li{margin:6px 0}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body"><div class="form-header">
+<div class="fh-left"> <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<div class="fh-company"> <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a> <span>Tài liệu kiểm soát</span> </div>
+</div>
+<div class="title"> <strong>ANNEX-QMS-024 — Ma trận chuẩn SEMI, CSR và điều kiện đặc biệt</strong><br/>
+<span class="sub-vn">Ma trận dùng để xác định khi nào phải kích hoạt yêu cầu semiconductor, vacuum, cleanliness và customer-specific requirements</span>  </div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>ANNEX-QMS-024</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>Engineering Manager / QA Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div><div class="doc-content" id="docContent"><div class="form-sheet">
+<div class="card">
+<div class="badge"><span class="dot"></span>ANNEX-QMS-024</div>
+<h1 class="h1" style="margin-top:10px">ANNEX-QMS-024 — Ma trận chuẩn SEMI, CSR và điều kiện đặc biệt</h1>
+<p class="lead">
+ Ma trận tham chiếu chéo (cross-reference matrix) giữa <b>ISO 9001:2015</b> (revision-ready) và các tiêu chuẩn <b>SEMI</b> áp dụng cho semiconductor manufacturing.
+ Bao gồm mapping đến customer-specific requirements (CSR) phổ biến trong ngành.
+ </p>
+</div>
+<h2 class="h2">1. SEMI Standards áp dụng</h2>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:15%"/><col style="width:35%"/><col style="width:50%"/></colgroup>
+<thead><tr><th>SEMI Std</th><th>Tên đầy đủ</th><th>Phạm vi liên quan HESEM</th></tr></thead>
+<tbody>
+<tr><td><b>SEMI S2</b></td><td>Safety Guidelines for Semiconductor Manufacturing Equipment</td><td>Safety design, hazard analysis, labeling — ảnh hưởng product safety SOP.</td></tr>
+<tr><td><b>SEMI S8</b></td><td>Safety Guidelines for Ergonomics / Human Factors</td><td>Ergonomic design — liên quan human factors SOP-024.</td></tr>
+<tr><td><b>SEMI F57</b></td><td>Test Method for Determination of Particle Contamination</td><td>LPC method, particle count criteria — core cho cleanliness verification.</td></tr>
+<tr><td><b>SEMI F19</b></td><td>Specification for Surface Condition of Stainless Steel Components</td><td>EP surface finish, Cr/Fe ratio — liên quan ANNEX-QA-007.</td></tr>
+<tr><td><b>SEMI E10</b></td><td>Overall Equipment Effectiveness (OEE)</td><td>OEE measurement methodology — KPI dashboard.</td></tr>
+<tr><td><b>SEMI E79</b></td><td>Standard for Definition and Measurement of Equipment Reliability</td><td>Equipment reliability metrics — maintenance KPI.</td></tr>
+</tbody>
+</table></div>
+<h2 class="h2">2. ISO 9001 ↔ SEMI Mapping Matrix</h2>
+<div class="table-card"><table class="table iso-matrix">
+<colgroup><col style="width:12%"/><col style="width:25%"/><col style="width:15%"/><col style="width:48%"/></colgroup>
+<thead><tr><th>ISO Clause</th><th>Yêu cầu ISO</th><th>SEMI Ref</th><th>Triển khai tại HESEM</th></tr></thead>
+<tbody>
+<tr><td>4.1 / 4.2</td><td>Context &amp; Interested Parties</td><td>SEMI S2 §1</td><td>Semiconductor customer requirements → FRM-QMS-027 Context; FRM-QMS-023 CSR Register</td></tr>
+<tr><td>6.1</td><td>Risk &amp; Opportunity</td><td>SEMI S2 §5 (Hazard Analysis)</td><td>SOP-103 Risk; PFMEA; contamination risk assessment</td></tr>
+<tr><td>7.1.4</td><td>Environment for operation</td><td>SEMI S2 §9, F57</td><td>Clean zone controls; particle monitoring; WI-OPS-014 Env Monitor</td></tr>
+<tr><td>7.1.5</td><td>Monitoring &amp; measuring resources</td><td>SEMI F57 (LPC method)</td><td>SOP-601 Calibration; LPC equipment; PROC-QA-007</td></tr>
+<tr><td>8.4</td><td>External providers</td><td>SEMI F19 (EP/passivation)</td><td>SOP-401; PROC-QA-008 Surface Treatment Qualification</td></tr>
+<tr><td>8.5.1</td><td>Production &amp; service provision</td><td>SEMI S2 §6, S8, E10</td><td>PROC-CNC-001; SOP-702 Contamination; WI-OPS-019 Ultrasonic</td></tr>
+<tr><td>8.5.2</td><td>Identification &amp; traceability</td><td>SEMI F57 (lot traceability)</td><td>PROC-QA-006 Material Trace; FRM-ENG-005 Part Classification</td></tr>
+<tr><td>8.5.4</td><td>Preservation</td><td>SEMI S2 §8</td><td>WI-OPS-018 Clean Packaging; FRM-WHS-009 Checklist; N₂ purge</td></tr>
+<tr><td>8.6</td><td>Release of products</td><td>SEMI F57 (acceptance)</td><td>PROC-QA-007 Cleanliness Inspection; FRM-QA-019 Record</td></tr>
+<tr><td>8.7</td><td>Nonconforming outputs</td><td>—</td><td>SOP-606 NC/CAPA; particle count NCR</td></tr>
+<tr><td>9.1</td><td>Monitoring &amp; measurement</td><td>SEMI E10, E79</td><td>KPI: OEE, Cleanliness Pass Rate, Particle NCR Rate</td></tr>
+<tr><td>10.2</td><td>Corrective action</td><td>—</td><td>SOP-606; SOP-903 Continual Improvement</td></tr>
+</tbody>
+</table></div>
+<h2 class="h2">3. Customer-Specific Requirements (CSR) — Common Items</h2>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:25%"/><col style="width:35%"/><col style="width:40%"/></colgroup>
+<thead><tr><th>CSR Category</th><th>Yêu cầu phổ biến</th><th>Tài liệu HESEM đáp ứng</th></tr></thead>
+<tbody>
+<tr><td>Cleanliness certification</td><td>Particle count report per part/lot; cleaning process validation</td><td>FRM-QA-019; PROC-QA-007; SOP-702</td></tr>
+<tr><td>Surface finish</td><td>Ra/Rz certification; EP certificate; Cr/Fe ratio report</td><td>ANNEX-QA-007; Inspection Report; NCC EP cert</td></tr>
+<tr><td>Material traceability</td><td>Mill cert → part → shipment; 100% lot trace</td><td>PROC-QA-006; FRM-ENG-005</td></tr>
+<tr><td>Packaging &amp; shipping</td><td>Double-bag, N₂ purge, ESD, desiccant; clean room packaging</td><td>WI-OPS-018; FRM-WHS-009</td></tr>
+<tr><td>Change notification</td><td>30-day advance notice for process/material/location changes</td><td>SOP-106 Change Management</td></tr>
+<tr><td>Supplier management</td><td>Approved processor list; flowdown of cleanliness requirements</td><td>SOP-401; ANNEX-PUR-003 APL</td></tr>
+</tbody>
+</table></div>
+<p class="callout"><b>Điểm bắt buộc:</b> Mọi CSR cụ thể theo khách hàng phải được chuyển thành điều kiện thực thi tại contract review, baseline package, packaging/cleanliness plan và ship release pack. Không để CSR chỉ nằm ở level tham khảo.</p>
+<h2 class="h2">Tài liệu điều hành liên kết</h2><div class="doc-link-row"><span class="doc-link">SOP-201</span><span class="doc-link">SOP-301</span><span class="doc-link">SOP-505</span><span class="doc-link">SOP-605</span><span class="doc-link">SOP-702</span><span class="doc-link">WI-715</span><span class="doc-link">WI-716</span><span class="doc-link">ANNEX-QA-007</span></div>
+<h2 class="h2">4. Điều kiện kích hoạt bắt buộc tại HESEM</h2>
+<div class="table-card"><table class="table small-table"><thead><tr><th>Tình huống</th><th>Phải kích hoạt thêm kiểm soát nào</th><th>Tài liệu điều khiển</th><th>Bằng chứng bắt buộc</th></tr></thead><tbody>
+<tr><td>Job có yêu cầu cleanliness / particle-sensitive</td><td>Readiness review, kiểm soát vệ sinh, monitoring, clean pack, release pack phù hợp.</td><td>SOP-702; WI-711~716; ANNEX-QA-007; ANNEX-WHS-001</td><td>Cleaning log, particle data, clean pack evidence, label đúng yêu cầu.</td></tr>
+<tr><td>Job có yêu cầu vacuum / UHV / surface-sensitive</td><td>Kiểm soát bề mặt, passivation/EP, packaging sạch và chứng chỉ xử lý.</td><td>SOP-505; SOP-605; ANNEX-QA-007; ANNEX-PUR-003</td><td>Processor cert, inspection record, pack evidence.</td></tr>
+<tr><td>Job có CSR về thay đổi quy trình / vật liệu / địa điểm</td><td>Không thay đổi khi chưa có thông báo và phê duyệt theo yêu cầu khách hàng.</td><td>SOP-106; SOP-201; SOP-301</td><td>Change notice, customer approval, updated baseline.</td></tr>
+<tr><td>Job có QPL cao hoặc first-piece/FAI bắt buộc</td><td>Kích hoạt WI-302, QPL tương ứng, dossier evidence pack đầy đủ.</td><td>SOP-302; WI-302; ANNEX-QA-003; WI-203</td><td>Balloon drawing, inspection/CMM, approval log, dossier complete.</td></tr>
+</tbody></table></div>
+</div></div></div></div></div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">
+⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.
+</div>
+<script src="../../../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ANNEX-ORG-001 — Cơ cấu tổ chức, luồng handoff và từ điển role family | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
+.metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;}
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
+.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;}
+.link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);}
+.link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
+.link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);}
+.link-list{list-style:none;margin:0;padding:0}
+.link-list li{padding:4px 0 4px 0;font-size:12px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}
+.hero h1{font-size:22px;line-height:1.35;color:var(--navy);margin:0 0 8px}
+.hero p{font-size:13px;color:var(--ink2);margin:0}
+.mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
+.chip{display:inline-flex;padding:3px 10px;border-radius:999px;border:1px solid var(--ln);background:var(--bg2);font-size:11px;font-weight:600;margin-right:6px;margin-bottom:6px;}
+.legend-box{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.legend-box .chip{margin:0}
+.svg-wrap{overflow:auto;border:1px solid var(--ln);border-radius:var(--r);background:#fff;padding:12px}
+.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
+.notice-item{padding:10px 12px;border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r-sm);background:var(--bg);font-size:12px}
+.small{font-size:12px}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu hệ thống • Organization</span>
+          </div>
+        </div>
+        <div class="title">
+          <strong>ANNEX-ORG-001 — Cơ cấu tổ chức, luồng handoff và từ điển role family</strong>
+          <span class="sub-vn">Điểm vào cấp tổ chức cho org chart, handbook, JD và ma trận governance</span>
+        </div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>ANNEX-ORG-001</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>Tổng Giám Đốc / QMS Manager</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="doc-content" id="docContent">
+        <div class="form-sheet">
+
+<div class="hero">
+  <h1>ANNEX-ORG-001 — cơ cấu tổ chức, luồng handoff và từ điển role family</h1>
+  <p>Tài liệu này là <b>điểm vào organization-level</b> để người đọc thấy toàn bộ hệ thống theo family vai trò, tuyến báo cáo và giao điểm liên phòng ban. Annex này không chỉ là sơ đồ; nó còn chỉ ra người đọc nên mở handbook, JD và ma trận nào để hiểu đúng boundary quyết định.</p>
+</div>
+
+<div class="note"><b>Nguồn chuẩn theo tầng</b><br/>Khi cần hiểu tổ chức, hãy đi theo 4 tầng: <a href="annex-org-001-org-chart-fullpage.html">Org Chart</a> → handbook phòng ban → <a href="../03-Job-Descriptions/index.html">JD Library</a> → <a href="../04-RACI-Authority/annex-qms-025-authority-matrix.html">Authority / RACI / KPI / Deputy</a>. Không bỏ qua ma trận governance chỉ vì đã xem sơ đồ tổ chức.</div>
+<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#g1">1. Cách dùng annex này</a><a href="#g2">2. Sơ đồ tổ chức</a><a href="#g3">3. Role family directory</a><a href="#g4">4. Handoff trọng yếu trong luồng job</a><a href="#g5">5. Quy tắc cập nhật</a></div></div>
+<h2 class="h2" id="g1">1. Cách dùng annex này</h2>
+<ul class="tight"><li>Dùng khi onboarding manager, phân vai, xác định interface liên phòng ban, chuẩn bị audit hoặc giải quyết xung đột “ai là owner” trong luồng job.</li><li>Dùng như entry page để chuyển người đọc sang handbook, JD và ma trận governance đúng family vai trò.</li><li>Không dùng annex này để thay cho JD cá nhân hoặc authority matrix chi tiết; sơ đồ chỉ là lớp định hướng cấp tổ chức.</li></ul>
+<h2 class="h2" id="g2">2. Sơ đồ tổ chức</h2>
+
+<div class="svg-wrap">
+  <img src="../../../assets/company-org-chart.svg" alt="HESEM company org chart"/>
+</div>
+<div class="legend-box">
+  <span class="chip">Organization entry</span>
+  <span class="chip">Role family directory</span>
+  <span class="chip">Cross-functional handoff</span>
+  <span class="chip">Authority / RACI / KPI / Deputy</span>
+</div>
+
+<h2 class="h2" id="g3">3. Role family directory</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:16%"/><col style="width:26%"/><col style="width:16%"/><col style="width:22%"/><col style="width:20%"/></colgroup><thead><tr><th>Family</th><th>Phạm vi vai trò</th><th>Nguồn chuẩn kế tiếp</th><th>Quyết định / output chính</th><th>Handoff điển hình</th></tr></thead><tbody><tr><td>Executive / enterprise governance</td><td>General Manager, top management, production leadership, strategic owners</td><td><a href="../../01-Quality-Manual/qms-man-001-qms-manual.html">QMS Manual</a></td><td>Enterprise priorities, resource allocation, strategic escalation, management review</td><td>All functions via QMS Manual, Authority Matrix, Management Review</td></tr><tr><td>Production</td><td>Workshop, shift, setup, operator, clean-pack, maintenance interface</td><td><a href="../02-Department-Handbooks/dept-production-handbook.html">Production</a></td><td>Readiness, dispatch execution, cell control, abnormality response, output stability</td><td>Engineering, Quality, Supply Chain</td></tr><tr><td>Engineering</td><td>DFM, process engineering, CAM/NC, technical release</td><td><a href="../02-Department-Handbooks/dept-engineering-handbook.html">Engineering</a></td><td>Technical feasibility, release package, routing, NC/config control</td><td>Sales/CS, Production, Quality</td></tr><tr><td>Quality</td><td>QA/QMS, QC, audit, release governance</td><td><a href="../02-Department-Handbooks/dept-quality-handbook.html">Quality</a></td><td>Hold/release, inspection governance, NCR/CAPA, audit, ship packet integrity</td><td>Production, Engineering, SCM, Management Review</td></tr><tr><td>Supply Chain</td><td>Purchasing, warehouse, receiving, logistics</td><td><a href="../02-Department-Handbooks/dept-supply-chain-handbook.html">Supply-Chain</a></td><td>Supplier flowdown, receiving, lot/cert control, shipment preparation</td><td>Quality, Finance, Sales/CS</td></tr><tr><td>Sales & Customer Service</td><td>Customer interface, RFQ, order acknowledgment, complaint coordination</td><td><a href="../02-Department-Handbooks/dept-sales-and-customer-service-handbook.html">Sales-And-Customer-Service</a></td><td>Commercial commitment, contract review, customer communication</td><td>Engineering, Planning, Quality</td></tr><tr><td>Finance</td><td>AR/AP, invoicing, job closure, cash control</td><td><a href="../02-Department-Handbooks/dept-finance-handbook.html">Finance</a></td><td>Invoice release, costing closure, SoD for financial transactions</td><td>Sales/CS, SCM, Epicor</td></tr><tr><td>HR</td><td>Recruitment, training governance, competency, workforce records</td><td><a href="../02-Department-Handbooks/dept-hr-handbook.html">Hr</a></td><td>Headcount readiness, competency readiness, certification administration</td><td>Department heads, QA, EHS</td></tr><tr><td>EHS</td><td>Incident, work environment, hazard control, compliance</td><td><a href="../02-Department-Handbooks/dept-ehs-handbook.html">Ehs</a></td><td>Incident response, work-environment monitoring, prevention actions</td><td>Production, HR, QA</td></tr><tr><td>IT / Epicor</td><td>IT admin, Epicor admin, digital owners</td><td><a href="../02-Department-Handbooks/dept-it-handbook.html">It</a></td><td>Access, change, contingency, system-of-record and integration governance</td><td>All business functions</td></tr></tbody></table></div>
+<h2 class="h2" id="g4">4. Handoff trọng yếu trong luồng job</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:20%"/><col style="width:40%"/><col style="width:40%"/></colgroup><thead><tr><th>Giao điểm</th><th>Câu hỏi phải trả lời</th><th>Nguồn chuẩn</th></tr></thead><tbody><tr><td>Sales/CS ↔ Engineering</td><td>Đã khóa requirement, assumption, feasibility và revision chưa?</td><td><a href="../02-Department-Handbooks/dept-sales-and-customer-service-handbook.html">Sales &amp; CS Handbook</a> • <a href="../02-Department-Handbooks/dept-engineering-handbook.html">Engineering Handbook</a> • <a href="../04-RACI-Authority/annex-qms-025-authority-matrix.html">Authority Matrix</a></td></tr><tr><td>Engineering ↔ Production</td><td>Bộ release đã đủ routing/program/tooling/readiness chưa?</td><td><a href="../02-Department-Handbooks/dept-engineering-handbook.html">Engineering Handbook</a> • <a href="../02-Department-Handbooks/dept-production-handbook.html">Production Handbook</a></td></tr><tr><td>Production ↔ Quality</td><td>Điểm hold/release, abnormality reaction và evidence đã rõ chưa?</td><td><a href="../02-Department-Handbooks/dept-quality-handbook.html">Quality Handbook</a> • <a href="../04-RACI-Authority/annex-qms-026-raci-master-matrix.html">RACI</a></td></tr><tr><td>Supply Chain ↔ Quality ↔ Finance</td><td>Material / cert / ship / invoice đã reconcile chưa?</td><td><a href="../02-Department-Handbooks/dept-supply-chain-handbook.html">Supply Chain Handbook</a> • <a href="../02-Department-Handbooks/dept-finance-handbook.html">Finance Handbook</a> • <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-018-epicor-transaction-and-interface-map.html">ANNEX-QMS-018</a></td></tr><tr><td>HR ↔ Department heads ↔ QA</td><td>Roadmap, OJT, certification, coverage deputy đã cập nhật chưa?</td><td><a href="../../../10-Training-Academy/index.html">Training Academy</a> • <a href="../04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">Deputy Matrix</a> • <a href="../../../10-Training-Academy/04-Templates-Tools/certification-register.html">Certification Register</a></td></tr><tr><td>IT / Epicor ↔ business owners</td><td>Quyền, field mapping, contingency và source-of-record đã thống nhất chưa?</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-it-001-role-based-access-map.html">ANNEX-IT-001</a> • <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-018-epicor-transaction-and-interface-map.html">ANNEX-QMS-018</a> • <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-021-offline-fallback-kit.html">ANNEX-QMS-021</a></td></tr></tbody></table></div>
+<h2 class="h2" id="g5">5. Quy tắc cập nhật</h2>
+<ul class="tight"><li>Khi có thay đổi cơ cấu, đổi reporting line hoặc gộp/tách role family, phải rà cùng <a href="../03-Job-Descriptions/index.html">JD Library</a>, handbook liên quan và 4 ma trận governance.</li><li>Khi thay đổi ảnh hưởng coverage hoặc người thay thế, phải rà luôn <a href="../04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a> và lớp training/certification liên quan.</li><li>Mọi update có ảnh hưởng boundary quyết định phải được phản ánh vào <a href="../04-RACI-Authority/annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a> và <a href="../04-RACI-Authority/annex-qms-026-raci-master-matrix.html">ANNEX-QMS-026</a> trước khi triển khai rộng.</li></ul>
+<div class="footer-note">ANNEX-ORG-001 là trang định vị cấp tổ chức. Sơ đồ chỉ hữu ích khi người đọc tiếp tục đi vào handbook, JD và ma trận quản trị đang hiệu lực.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

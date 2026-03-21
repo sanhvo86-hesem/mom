@@ -1,0 +1,216 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>C10-L2 — CNC Job Order Process (RFQ → Cash) — Practitioner | HESEM Academy</title>
+<link href="../../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+</head>
+<body>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>C10-L2 — CNC Job Order Process (RFQ → Cash) — Practitioner | HESEM Academy</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>C10-L2</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent"><h1>C10 — Hiểu quy trình Job Order CNC (RFQ → Cash) — Level 2</h1>
+<p class="lead"><strong>Level 2 — Chạy 1 job segment độc lập &amp; bàn giao chuẩn evidence.</strong> Module này giúp nhân sự hiểu và vận hành chuỗi RFQ → Cash bằng “gate + hồ sơ”, giữ đúng revision set và bàn giao không mất thông tin.</p>
+<div class="hero">
+<h2>Chuẩn thực chiến – Level 2</h2>
+<div class="meta">
+<div><strong>Vai trò mục tiêu</strong><br/>Team leader/Cell leader, Planning/Dispatcher, Purchasing follow-up, Warehouse/IQC lead, QC lead, CS coordinator</div>
+<div><strong>Đầu ra bắt buộc</strong>
+<ul>
+<li>Dẫn dắt 01 Job từ G0 đến G2 hoặc từ G2 đến G4 trong phạm vi được giao, không thiếu evidence.</li><li>Cập nhật trạng thái WIP đúng thời điểm (ERP + visual) và mở escal trong 10 phút khi bị chặn.</li><li>Bàn giao chuẩn giữa phòng ban: kèm link SSOT + checklist bàn giao + người nhận xác nhận.</li>
+</ul>
+</div>
+<div><strong>Gate trọng yếu</strong><br/><span class="badge bad">Bàn giao không evidence / cập nhật WIP trễ</span> = HOLD/FAIL</div>
+<div><strong>Thời lượng</strong><br/>Lý thuyết 60 phút • OJT 120 phút</div>
+</div>
+<p class="small-note">Nguyên tắc vận hành: không nhảy gate, không dùng file rời làm nguồn, không ship khi thiếu ship packet.</p>
+</div><div class="card">
+<span class="badge">Drill Pack (Job CNC)</span>
+<p class="lead" style="margin-top:10px;">
+ Chạy drill trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Job Order E2E Drill (RFQ → Ship Packet)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Shipping Packet + CoC Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html"><b>DRL-02</b> — Revision &amp; SSOT Drill (Audit 60 giây)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html"><b>DRL-11</b> — Customer Requirement → CTQ Translation Drill</a></li>
+</ul>
+<p class="small muted" style="margin-top:8px;">
+ Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ </p>
+</div>
+<h2>2) Mục đích module &amp; bối cảnh vận hành</h2>
+<div class="card">
+<ul>
+<li>Đưa mọi người về cùng một “bản đồ công việc”: RFQ → Quote → Kickoff → ENG release → Execute → QC → Ship → Invoice.</li>
+<li>Chặn 3 rủi ro lớn của job shop CNC: <strong>sai revision</strong>, <strong>thiếu chứng từ</strong>, <strong>bàn giao mất thông tin</strong>.</li>
+<li>Biến hiểu biết thành hành động: checklist + OJT + performance test + MRR để vận hành QMS hàng ngày.</li>
+</ul>
+</div>
+<h2>3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + điểm chặn</h2>
+<p>Chuỗi Job Order vận hành theo gate G0–G5. Mỗi gate có điều kiện vào/ra và hồ sơ tối thiểu (MRR). Khi thiếu MRR hoặc sai revision set: kích hoạt HOLD.</p>
+<div class="vflow">
+<div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>G0 readiness</strong><p>Xác nhận đầu vào và tạo job pack đủ để release sản xuất.</p></div></div>
+<div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Kitting</strong><p>Chuẩn bị vật tư/dao/gá/fixturing và booking outsource.</p></div></div>
+<div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>G1 Release</strong><p>Release program/setup đúng revision và giữ bản phát hành duy nhất.</p></div></div>
+<div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>G2 FAI/First piece</strong><p>Đảm bảo FAI/first piece pass trước chạy hàng loạt.</p></div></div>
+<div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>G3 IPQC</strong><p>Duy trì ổn định; phản ứng ngay khi trend lệch CTQ.</p></div></div>
+<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>G4–G5 Ship</strong><p>Hoàn tất ship packet và đóng hành động sau giao hàng.</p></div></div>
+</div>
+<h2>4) Failure Points (tối thiểu 10 điểm gãy)</h2>
+<ol><li>Kitting thiếu dao/gá; đến máy mới phát hiện thiếu dẫn tới chờ đợi và trễ.</li><li>Không booking outsource sớm; đến hạn mới đặt làm lead time vỡ.</li><li>Release program/setup nhưng không khóa revision set; tồn tại 2 bản chạy song song.</li><li>FAI pass nhưng không lưu SSOT; downstream không chứng minh được.</li><li>IPQC phát hiện trend lệch nhưng tiếp tục chạy để “đủ qty”.</li><li>Rework được làm tại hiện trường nhưng không có NCR record và verification.</li><li>Chuyển ưu tiên bằng miệng; không có log; WIP bị xáo trộn.</li><li>Bị chặn &gt;15 phút nhưng không escal; planning không nhìn thấy rủi ro OTD.</li><li>Outsource finishing về trễ/thiếu cert nhưng vẫn đưa vào lắp/pack.</li><li>Ship partial nhưng không cập nhật packing list/CoC theo lot; traceability fail.</li><li>ERP status không khớp hiện trường; dashboard sai, dispatch sai.</li><li>Evidence bị phân tán nhiều nơi; mất 60 phút mới gom được khi audit.</li></ol>
+<h2>5) Risk Controls (control points + owner + evidence)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Control point</th><th>Owner</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Dispatch &amp; WIP control</strong></td><td>Planning/OPS</td><td>PROC-PLA-002 + Dispatch list snapshot</td><td>Không có dispatch snapshot = không đổi ưu tiên</td></tr><tr><td><strong>Kitting checklist trước release</strong></td><td>Cell leader</td><td>Kitting checklist + tool list</td><td>Thiếu kitting = không release máy</td></tr><tr><td><strong>Outsource booking &amp; PO note</strong></td><td>Purchasing</td><td>PROC-PUR-001 + PO note/spec</td><td>Thiếu PO note = HOLD outsource</td></tr><tr><td><strong>Program/setup release control</strong></td><td>Engineering/Production</td><td>PROC-CNC-002 + link SSOT</td><td>Chỉ 1 bản phát hành</td></tr><tr><td><strong>FAI/First piece gate</strong></td><td>QA/QC</td><td>SOP-QMS-009 + record FAI</td><td>FAI chưa pass = không chạy hàng loạt</td></tr><tr><td><strong>Escalation SLA</strong></td><td>All roles</td><td>PROC-OPS-003 escal log</td><td>Blocker &gt;15 phút = escal ≤10 phút</td></tr><tr><td><strong>Ship packet verification</strong></td><td>QA/Logistics</td><td>Ship packet checklist</td><td>Thiếu ship packet = HOLD ship</td></tr><tr><td><strong>Post-shipment feedback capture</strong></td><td>Estimator (SAL-03)</td><td>SOP-QMS-012 log feedback/complaint</td><td>Claim mở trong 24h và có containment</td></tr></tbody></table></div>
+<h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Sai REV hoặc không xác định được revision set của job.</strong></td><td>Dừng thao tác; gắn HOLD; báo Supervisor + QA; mở Change Notice khi có thay đổi.</td></tr><tr><td><span class="badge warn">HOLD</span></td><td><strong>Thiếu MRR bắt buộc tại gate (contract review, kickoff, baseline, FAI, ship packet).</strong></td><td>Không chuyển công đoạn/không ship; cập nhật log; escal theo PROC-OPS-003.</td></tr><tr><td><span class="badge bad">BLOCK</span></td><td><strong>Thay đổi program/setup/spec/đổi NCC mà không có record hoặc không có phê duyệt.</strong></td><td>Khóa phát hành; thu hồi bản rời; mở change package; chạy verification; cập nhật SSOT.</td></tr></tbody></table></div>
+<h2>7) Phản ứng 60 giây</h2>
+<ol>
+<li>Xác định loại rủi ro: sai revision / thiếu hồ sơ / sai bàn giao / change không kiểm soát.</li>
+<li>Kích hoạt HOLD ngay tại điểm phát hiện (tag + cập nhật log/ERP).</li>
+<li>Chụp 01 bằng chứng thời điểm phát hiện (màn hình ERP có timestamp hoặc link SSOT).</li>
+<li>Báo theo ladder: cell owner → supervisor → QA/QMS (≤ 10 phút).</li>
+<li>Mở 01 hành động có owner + due trong ngày và liên kết SSOT.</li>
+</ol>
+<h2>8) Checklist vận hành (≤ 15 bước)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Owner</th><th>Evidence/MRR</th><th>Lỗi lặp lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Chụp snapshot dispatch list đầu ca (WIP + due) và lưu vào SSOT.</strong></td><td>Planner/Leader</td><td>Dispatch snapshot</td><td>Đổi ưu tiên không evidence</td></tr><tr><td>2</td><td><strong>Kitting: xác nhận vật tư, dao, gá, bản vẽ, setup sheet, inspection plan.</strong></td><td>Cell leader</td><td>Kitting checklist</td><td>Thiếu dao/gá đến máy mới biết</td></tr><tr><td>3</td><td><strong>Booking outsource và xác nhận lead time bằng văn bản.</strong></td><td>Purchasing</td><td>Email/PO confirmation lưu SSOT</td><td>Đặt outsource muộn</td></tr><tr><td>4</td><td><strong>Release program/setup theo PROC-CNC-002 và khóa revision set.</strong></td><td>Engineering</td><td>Release record + link SSOT</td><td>Tồn tại 2 bản program</td></tr><tr><td>5</td><td><strong>Trước chạy hàng loạt: xác nhận FAI/first piece đã pass và được release.</strong></td><td>QC/QA</td><td>FAI record + sign-off</td><td>Chạy hàng loạt trước FAI</td></tr><tr><td>6</td><td><strong>Trong ca: cập nhật ERP status theo thời điểm phát sinh (start/hold/complete).</strong></td><td>Operator/Leader</td><td>ERP timestamp</td><td>Cập nhật cuối ca</td></tr><tr><td>7</td><td><strong>Khi trend lệch CTQ: dừng, đo xác nhận, mở NCR/containment.</strong></td><td>QC/Leader</td><td>IPQC log + NCR</td><td>Tiếp tục chạy để đủ qty</td></tr><tr><td>8</td><td><strong>Bị chặn &gt;15 phút: mở escal theo PROC-OPS-003 và gắn owner.</strong></td><td>Người thực hiện</td><td>Escal log</td><td>Giấu blocker</td></tr><tr><td>9</td><td><strong>Bàn giao giữa công đoạn/phòng: link SSOT + checklist bàn giao + người nhận ký.</strong></td><td>Leader</td><td>Handoff record</td><td>Bàn giao miệng</td></tr><tr><td>10</td><td><strong>Trước ship: đối soát lot/qty/traceability/CoC/final/packing list.</strong></td><td>QA/Logistics</td><td>Ship packet</td><td>Ship thiếu traceability</td></tr><tr><td>11</td><td><strong>Sau ship: ghi nhận phản hồi khách và đóng action trong 48h.</strong></td><td>Estimator (SAL-03)</td><td>Feedback log</td><td>Không capture feedback</td></tr></tbody></table></div>
+<h2>9) OJT thực chiến theo TWI</h2>
+<h3>Job breakdown (Step / Key Points / Reasons)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Key Points</th><th>Reasons</th></tr></thead><tbody><tr><td>1</td><td>Đọc job pack</td><td>Xác nhận JobNum/PartNo/REV và yêu cầu đặc biệt</td><td>Ngăn sai revision và bỏ sót CTQ</td></tr><tr><td>2</td><td>Nhận diện gate</td><td>Xác định gate hiện tại và điều kiện ra gate</td><td>Không nhảy gate</td></tr><tr><td>3</td><td>Chuẩn bị hồ sơ</td><td>Mở đúng form, điền đúng trường bắt buộc</td><td>Audit-ready</td></tr><tr><td>4</td><td>Thực thi &amp; ghi nhận</td><td>Ghi theo thời điểm phát sinh; lưu SSOT</td><td>Dữ liệu có giá trị</td></tr><tr><td>5</td><td>HOLD &amp; escal</td><td>Kích hoạt HOLD/STOP/BLOCK đúng rule</td><td>Chặn lỗi lan rộng</td></tr><tr><td>6</td><td>Bàn giao</td><td>Bàn giao bằng link SSOT + checklist + người nhận xác nhận</td><td>Không mất thông tin</td></tr></tbody></table></div>
+<h3>OJT output bắt buộc</h3>
+<ul>
+<li>01 trang “Job 5 dòng” (JobNum/PartNo/REV/CTQ/due date/special process) lưu vào SSOT.</li>
+<li>01 checklist xác nhận gate readiness (G0/G1/G2 theo phạm vi) và link SSOT.</li>
+<li>01 record HOLD + 01 hành động đóng trong ngày cho tình huống giả lập thiếu MRR.</li>
+</ul>
+<h3>Rubric L1–L4 (hành vi quan sát được)</h3>
+<div class="table-card"><table class="table rubric">
+<thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead>
+<tbody>
+<tr><td><strong>L1</strong></td><td>Nhận diện đúng luồng và gate; làm đúng tại điểm làm việc</td><td>Không sai JobNum/REV; biết HOLD; truy xuất hồ sơ ≤ 60 giây</td></tr>
+<tr><td><strong>L2</strong></td><td>Chạy job segment và bàn giao chuẩn evidence</td><td>Không thiếu MRR trong phạm vi; escal đúng SLA; bàn giao có xác nhận</td></tr>
+<tr><td><strong>L3</strong></td><td>Điều phối đa job theo cadence và dữ liệu</td><td>WIP aging kiểm soát; ưu tiên đúng; change được kiểm soát</td></tr>
+<tr><td><strong>L4</strong></td><td>Thiết kế hệ thống RFQ→Cash</td><td>Gate governance + KPI + audit plan; enforcement SSOT/ERP</td></tr>
+</tbody></table></div>
+<h2>10) Đánh giá</h2>
+<h3>Quiz (≥ 20 câu)</h3>
+<div class="quiz"><ol><li>Kitting checklist tối thiểu phải bao gồm những mục nào?</li><li>Điều kiện để đổi ưu tiên job trong ngày là gì?</li><li>Thế nào là ‘1 bản phát hành’ của program/setup?</li><li>Blocker &gt;15 phút phải làm gì và báo theo ladder nào?</li><li>FAI/first piece record phải lưu ở đâu để audit-ready?</li><li>Khi trend IPQC lệch CTQ, hành động đầu tiên là gì?</li><li>Outsource finishing cần PO note ghi những mục nào?</li><li>Handoff chuẩn gồm 4 thành phần nào?</li><li>Ship partial cần kiểm soát traceability theo lot ra sao?</li><li>ERP status không khớp hiện trường gây tác hại gì?</li><li>Phân biệt NCR containment và corrective action.</li><li>No evidence = No gate áp dụng trong đổi ưu tiên như thế nào?</li><li>Chỉ ra 3 lỗi bàn giao khiến job trễ dây chuyền.</li><li>Cách kiểm soát tồn tại 2 bản program trong xưởng.</li><li>Khi supplier báo trễ outsource 2 ngày, bước escal là gì?</li><li>Khi rework phát sinh, record bắt buộc là gì?</li><li>Điều kiện release ship packet là gì?</li><li>Ai chịu trách nhiệm cuối cùng khi ship thiếu chứng từ?</li><li>KPI WIP aging là gì và dùng để làm gì?</li><li>Một job đồng thời có mấy HOLD? Cách ghi log?</li><li>Định nghĩa readiness trong dispatch.</li><li>Cách kiểm tra truy xuất ≤ 60 giây.</li></ol></div>
+<h3>Scenario (≥ 3 tình huống thật)</h3>
+<details>
+<summary>Supplier outsource báo trễ 3 ngày khi job đang chờ finishing</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Job J24021 đang ở trạng thái chờ anodize</li><li>Due date khách trong 5 ngày</li><li>Supplier báo trễ thêm 3 ngày</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Hành động trong 10 phút và evidence phải có.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Mở escal theo PROC-OPS-003; cập nhật rủi ro OTD lên dispatch board.</li><li>Purchasing yêu cầu xác nhận lead time bằng văn bản; đưa ra phương án thay NCC qua change control.</li><li>Estimator (SAL-03) thông báo khách theo SLA; không hứa miệng.</li><li>QA đánh giá rủi ro change supplier; mở FRM-QMS-006 impact matrix khi đổi NCC.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>IPQC phát hiện trend lệch CTQ nhưng còn 30 pcs nữa mới đủ qty</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Job J24022 đang chạy OP30</li><li>Kết quả IPQC 3 lần liên tiếp tiến về biên trên</li><li>Planning thúc chạy đủ qty trong ca</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Quyết định và phản ứng bắt buộc.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>STOP chạy; đo xác nhận lại bằng dụng cụ chuẩn; gắn HOLD.</li><li>Mở NCR containment; cách ly lot đã chạy từ lần đo cuối.</li><li>Engineering/Setup review offset/tool wear; chỉ resume khi có verification pass.</li><li>Cập nhật escal vì rủi ro OTD; không chạy tiếp để đủ qty.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Khách yêu cầu expedite trong 24h cho job chưa FAI</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Job J24023 mới setup xong</li><li>Khách yêu cầu ship trong 24h</li><li>FAI chưa thực hiện</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Cách xử lý đúng gate và cách phản hồi khách.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Giữ gate: FAI/first piece vẫn bắt buộc cho CTQ.</li><li>Planning điều chỉnh ưu tiên có snapshot dispatch; mở escal và ghi quyết định ưu tiên.</li><li>Estimator (SAL-03) phản hồi khách theo dữ liệu: thời gian FAI + final + packing; không hứa vượt gate.</li><li>QA chuẩn bị nguồn lực kiểm nhanh; không bypass chứng từ.</li></ul></div>
+</div>
+</details>
+<h3>Performance test</h3>
+<div class="card">
+<h3>Bài test tay nghề — Dẫn dắt 01 job segment và bàn giao chuẩn</h3>
+<h4>Bài làm bắt buộc</h4>
+<ol>
+<li>Chạy mô phỏng 01 job từ G0 đến G2 (hoặc G2 đến G4) trong phạm vi được giao.</li><li>Tạo handoff package: link SSOT + checklist bàn giao + trạng thái WIP + rủi ro + hành động.</li><li>Đảm bảo escal được mở đúng SLA cho 01 blocker giả lập và đóng hành động trong ngày.</li>
+</ol>
+<h4>PASS/FAIL</h4>
+<ul>
+<li>PASS khi: gate quyết định đúng; evidence đủ; SSOT sạch; escal đúng SLA.</li>
+<li>FAIL khi: bypass gate; sai REV; ship khi thiếu ship packet; change không record.</li>
+</ul>
+</div>
+<h2>11) PASS/FAIL criteria</h2>
+<div class="kpi-gate">
+<strong>PASS/FAIL (No evidence = No gate)</strong>
+<ul>
+<li>PASS khi hoàn thành OJT output và performance test đạt; evidence nằm SSOT và truy xuất ≤ 60 giây.</li>
+<li>FAIL ngay khi: bypass gate; sai revision; ship khi thiếu ship packet; change không record.</li>
+</ul>
+</div>
+<h2>12) MRR tối thiểu (hồ sơ bắt buộc + naming + nơi lưu)</h2>
+<p><strong>Quy tắc đặt tên:</strong> <span class="mono">JobNum_PartNo_REV_DocType_YYYYMMDD_##.ext (chỉ A–Z,0–9, '-', '_'; cấm dấu cách).</span></p>
+<ul>
+<li>Dispatch snapshot đầu ca và log đổi ưu tiên.</li><li>Kitting checklist + tool list + setup sheet link SSOT.</li><li>PO/booking outsource + CoC/MTR khi nhận về.</li><li>Program/setup release record (PROC-CNC-002) và revision set khóa.</li><li>FAI/first piece record + IPQC log.</li><li>Escalation log theo PROC-OPS-003.</li><li>Handoff record (link SSOT + người nhận xác nhận).</li><li>Ship packet: CoC + final + packing list + label evidence.</li>
+</ul>
+<div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → <span class="mono">Job-Dossiers</span>.</div>
+<h2>13) Common audit findings &amp; prevention</h2>
+<ol>
+<li>Thiếu evidence gate (contract review/kickoff/baseline/FAI/final/ship packet).</li>
+<li>Revision set không được khóa; dùng file rời; tồn tại nhiều bản.</li>
+<li>Traveler/inspection plan không đồng bộ CTQ và hold points.</li>
+<li>Outsource finishing thiếu cert hoặc spec mismatch nhưng vẫn release.</li>
+<li>WIP status lệch hiện trường; dispatch sai ưu tiên.</li>
+<li>Escal log không có hoặc không đóng; rủi ro OTD không nhìn thấy.</li>
+<li>Evidence không truy xuất ≤ 60 giây do sai tên/sai thư mục.</li>
+</ol>
+<h2>Tài liệu liên quan</h2>
+<ul><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">PROC-PLA-002 — Dispatch Control &amp; Capacity Review</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">PROC-OPS-003 — Escalation SLA &amp; WIP</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">PROC-PUR-001 — Outsource Finishing</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">PROC-WHS-001 — Receiving &amp; Warehouse</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-QMS-012 — Customer Complaint / Escape Containment</a></li></ul></div></div></div>
+</div>
+<script src="../../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+
+

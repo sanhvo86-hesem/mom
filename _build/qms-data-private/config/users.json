@@ -1,0 +1,350 @@
+{
+    "settings": {
+        "require_mfa": true,
+        "issuer": "HESEM QMS"
+    },
+    "users": [
+        {
+            "username": "sanh.vo",
+            "password_hash": "$2y$10$ddK/9AJVjEctrUd0eao8guMybAtvSgBrc//QONGkxZhCoxJoi/Xuq",
+            "role": "ceo",
+            "active": true,
+            "created_at": "2026-02-13T04:20:22.318249Z",
+            "updated_at": "2026-03-09T08:21:14+00:00",
+            "name": "Võ Ngọc Sanh",
+            "dept": "EXE",
+            "title": "Chief Executive Officer (CEO)",
+            "cccd": "",
+            "phone": "",
+            "personal_email": "",
+            "last_login": "2026-03-09T08:21:14+00:00",
+            "mfa": {
+                "enabled": true,
+                "secret_b32": "OQ6HFXXRRPJNZYYS2HXS5LU2ZBDBXVW6",
+                "enabled_at": "2026-03-07T05:34:19+00:00"
+            }
+        },
+        {
+            "username": "mai.tran",
+            "password_hash": "$2y$10$qKHGnQlmFrEuiMZHlMz6h.WGKLLDeA0eYLViIbC13Tt/jRQXQChf6",
+            "role": "qa_manager",
+            "active": true,
+            "created_at": "2026-02-13T04:20:22.618767Z",
+            "updated_at": "2026-03-05T15:08:12+00:00",
+            "name": "Trần Thị Mai",
+            "dept": "QA",
+            "title": "QA Manager",
+            "cccd": "",
+            "phone": "",
+            "personal_email": "",
+            "mfa": {
+                "enabled": true,
+                "secret_b32": "SLCT4MU32YDQOUVKE7B4C26ATWPLIR57",
+                "enabled_at": "2026-03-04T09:01:05+00:00"
+            },
+            "last_login": "2026-03-05T15:08:12+00:00"
+        },
+        {
+            "username": "van.nguyen",
+            "password_hash": "$2b$12$iLvBzy37RwdUIF5NGU3omelsLh6LfmDj97HIh5X0C3j9SbkzoKxTm",
+            "role": "production_director",
+            "active": true,
+            "created_at": "2026-02-13T04:20:22.954824Z",
+            "updated_at": "2026-03-04T08:49:41+00:00",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Nguyễn Sỹ Văn",
+            "dept": "EXE",
+            "title": "Production Director",
+            "cccd": "",
+            "phone": "",
+            "personal_email": ""
+        },
+        {
+            "username": "bich.bui",
+            "password_hash": "$2y$10$Zlu3MaF1rAXw5tlalK57o.bmWESEnoHaUHO5tm9QU1/lLlsbaeqna",
+            "role": "hr_manager",
+            "active": true,
+            "created_at": "2026-02-13T04:20:23.232400Z",
+            "updated_at": "2026-03-04T08:58:07+00:00",
+            "name": "Bùi Thị Bích",
+            "dept": "HR",
+            "title": "HR Manager",
+            "cccd": "",
+            "phone": "",
+            "personal_email": "",
+            "mfa": {
+                "enabled": true,
+                "secret_b32": "HSBJLZWWV7EYQBQLZDPSBDJK4LAEYQR6",
+                "enabled_at": "2026-03-04T08:55:08+00:00"
+            },
+            "last_login": "2026-03-04T08:58:07+00:00"
+        },
+        {
+            "username": "yen.tran",
+            "password_hash": "$2b$12$mWsb79h2aSFf0hvRq0DI2uHF0RRY3T8QXDDaLbszCbwVBAjf.nbC6",
+            "role": "finance_manager",
+            "active": true,
+            "created_at": "2026-02-13T04:20:23.511218Z",
+            "updated_at": "2026-02-13T04:20:23.511236Z",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Trần Ngọc Yến",
+            "dept": "FIN",
+            "title": "Finance Manager (FIN-01)"
+        },
+        {
+            "username": "son.phan",
+            "password_hash": "$2b$12$lKLadIhNm0lXmP9dPpmgk.qowk108ICKI1xyT1XmBj5cU9uD8mt2i",
+            "role": "sales_officer",
+            "active": true,
+            "created_at": "2026-02-13T04:20:23.776875Z",
+            "updated_at": "2026-02-13T04:20:23.776893Z",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Phan Hồng Sơn",
+            "dept": "SAL",
+            "title": "Estimator (SAL-03)"
+        },
+        {
+            "username": "ha.nguyen",
+            "password_hash": "$2b$12$3tQmDDC.CHl2KnopxRo2kO8Wjz/FaLm5/aSs.jQDyt6MMfVOycyqe",
+            "role": "supply_chain_manager",
+            "active": false,
+            "created_at": "2026-02-13T04:20:24.045719Z",
+            "updated_at": "2026-03-05T09:19:26+00:00",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Nguyễn Thị Hà",
+            "dept": "PUR",
+            "title": "Purchasing Manager (PUR-02)",
+            "cccd": "",
+            "phone": "",
+            "personal_email": ""
+        },
+        {
+            "username": "khoa.tran",
+            "password_hash": "$2b$12$aVxL/rFISCQ1fkVazvA3v.M/v2PSNynsjyQge0D/ZiszyKKVSMaUK",
+            "role": "qc_inspector",
+            "active": false,
+            "created_at": "2026-02-13T04:20:24.317309Z",
+            "updated_at": "2026-03-05T09:19:21+00:00",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Trần Đăng Khoa",
+            "dept": "QA",
+            "title": "QC Inspector (QA-02)",
+            "cccd": "",
+            "phone": "",
+            "personal_email": ""
+        },
+        {
+            "username": "ngoc.pham",
+            "password_hash": "$2b$12$vOZuFpuHlN0kxCZfrosAXuNFclHI6uF1vp512lxclpWnyYR9Sd4Gq",
+            "role": "estimator",
+            "active": false,
+            "created_at": "2026-02-13T04:20:24.588906Z",
+            "updated_at": "2026-03-05T09:19:17+00:00",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Phạm Thị Ngọc",
+            "dept": "SAL",
+            "title": "Estimator (SAL-03)",
+            "cccd": "",
+            "phone": "",
+            "personal_email": ""
+        },
+        {
+            "username": "hue.bui",
+            "password_hash": "$2b$12$0qfNEBzCL5/373ql77Xmy.cF3A3idwnZnm2C4HKsvabIQ08CM4h8K",
+            "role": "warehouse_lead",
+            "active": true,
+            "created_at": "2026-02-13T04:20:24.859453Z",
+            "updated_at": "2026-02-13T04:20:24.859472Z",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Bùi Thị Huệ",
+            "dept": "WHS",
+            "title": "Warehouse Manager (WHS-01)"
+        },
+        {
+            "username": "hong.truong",
+            "password_hash": "$2b$12$dRtvzbnPtth87OX0A5Cm9u9p65M1ZG7KBY6abkGOl203abceGG/v6",
+            "role": "finance_officer",
+            "active": true,
+            "created_at": "2026-02-13T04:20:25.128654Z",
+            "updated_at": "2026-02-13T04:20:25.128673Z",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Trương thị Kim Hồng",
+            "dept": "FIN",
+            "title": "Accounting Staff (FIN-02)"
+        },
+        {
+            "username": "minh.tran",
+            "password_hash": "$2b$12$1Lkn8cnj64Q6bL1iChl/SO2JPhtfmn65gF0cJfr/eBl3NnBurQZu.",
+            "role": "cnc_operator",
+            "active": false,
+            "created_at": "2026-02-13T04:20:25.406066Z",
+            "updated_at": "2026-03-05T02:12:10+00:00",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Trần Văn Minh",
+            "dept": "PRO",
+            "title": "CNC Operator (PRO-04)",
+            "cccd": "",
+            "phone": "",
+            "personal_email": ""
+        },
+        {
+            "username": "dung.vo",
+            "password_hash": "$2b$12$KcgIboMBFTA8UKL94Kr.Ke39WSFZHnbLl5AtzfDy7f310fHGL37Aq",
+            "role": "hr_manager",
+            "active": false,
+            "created_at": "2026-02-13T04:20:26.211171Z",
+            "updated_at": "2026-03-05T09:19:12+00:00",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Võ Thị Dung",
+            "dept": "HR",
+            "title": "HR Manager (HR-01)",
+            "cccd": "",
+            "phone": "",
+            "personal_email": ""
+        },
+        {
+            "username": "hung.le",
+            "password_hash": "$2b$12$fq1owbWf3jrCtglFOE27zuXdMIAjGt/d/NFH3GjarWe37iiNUJl0e",
+            "role": "qms_engineer",
+            "active": false,
+            "created_at": "2026-02-13T04:20:26.487783Z",
+            "updated_at": "2026-03-05T09:18:59+00:00",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Lê Văn Hùng",
+            "dept": "QA",
+            "title": "Document Controller (QA-05)",
+            "cccd": "",
+            "phone": "",
+            "personal_email": ""
+        },
+        {
+            "username": "nam.nguyen",
+            "password_hash": "$2b$12$2wIdyx9VAFT3YqbTznAVKe14bcIGxF0wgt4VtMqb39Q2MH.qMRNiW",
+            "role": "prod_manager",
+            "active": true,
+            "created_at": "2026-02-13T04:20:26.752535Z",
+            "updated_at": "2026-02-13T04:20:26.752553Z",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Nguyễn Văn Nam",
+            "dept": "PRO",
+            "title": "Production Manager (PRO-01)"
+        },
+        {
+            "username": "trang.luu",
+            "password_hash": "$2b$12$Q89Jriv1k/hd3c1Y6QLaqOxu4.eMOfjv5kk/jmcrzAgrXMUWcaaOa",
+            "role": "it_admin",
+            "active": false,
+            "created_at": "2026-02-13T04:20:27.019969Z",
+            "updated_at": "2026-03-05T09:19:02+00:00",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Lưu Thị Trang",
+            "dept": "IT",
+            "title": "System Administrator (IT-02)",
+            "cccd": "",
+            "phone": "",
+            "personal_email": ""
+        },
+        {
+            "username": "khanh.nguyen",
+            "password_hash": "$2b$12$89vJKHP.oeUHfr76xv9lresMAtZNi0VY5FfxhwUKwqd2flqFYVeiO",
+            "role": "engineering_lead",
+            "active": true,
+            "created_at": "2026-02-13T04:20:27.295877Z",
+            "updated_at": "2026-02-13T04:20:27.295894Z",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Nguyễn Minh Khánh",
+            "dept": "ENG",
+            "title": "Engineering Manager (ENG-01)"
+        },
+        {
+            "username": "my.le",
+            "password_hash": "$2b$12$Jw5lyPpjc4MFkkdegHbet.Zc/cnKy95dnZlfnXUeLCNtKY26uxyLi",
+            "role": "cnc_operator",
+            "active": false,
+            "created_at": "2026-02-13T04:20:27.567852Z",
+            "updated_at": "2026-03-05T09:19:06+00:00",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Lê Thị Mỹ",
+            "dept": "GEN",
+            "title": "Trainee / Intern",
+            "cccd": "",
+            "phone": "",
+            "personal_email": ""
+        },
+        {
+            "username": "nam.pham",
+            "password_hash": "$2b$12$UQ36B5WwWg06T3N7bCmkTuTtX6ZxfG4J7i5w1dcGAAA.T7NUki/Q2",
+            "role": "qa_manager",
+            "active": false,
+            "created_at": "2026-02-13T04:20:27.839683Z",
+            "updated_at": "2026-03-05T09:18:48+00:00",
+            "mfa": {
+                "enabled": false
+            },
+            "name": "Phạm Văn Nam",
+            "dept": "QA",
+            "title": "QA Manager (QA-01)",
+            "cccd": "",
+            "phone": "",
+            "personal_email": ""
+        },
+        {
+            "username": "hien.hoang",
+            "password_hash": "$2y$10$qHfGOM2HzMKf8iorSUs43OxtP/M8/YpOjY.mwpJcilY0WJjqspW2C",
+            "name": "Hoàng Trung Hiền",
+            "role": "production_director",
+            "dept": "QA",
+            "title": "",
+            "active": true,
+            "cccd": "",
+            "phone": "",
+            "personal_email": "",
+            "created_at": "2026-03-05T02:24:55+00:00",
+            "updated_at": "2026-03-07T06:40:41+00:00",
+            "mfa": {
+                "enabled": true,
+                "secret_b32": "TKLX2MIA7HO2V56DYVNCIUYZRNWY6XP3",
+                "enabled_at": "2026-03-07T06:30:30+00:00"
+            },
+            "last_login": "2026-03-07T06:40:41+00:00"
+        }
+    ],
+    "data_collection": {
+        "collect_gps": false,
+        "collect_ip": false,
+        "collect_device": false,
+        "collect_navigation": false,
+        "collect_connection": false,
+        "require_consent": false
+    }
+}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WI-518 — Xác nhận chuyển công đoạn, chuyển máy, chuyển ca và chuyển người vận hành | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Work Instruction</span>
+          </div>
+        </div>
+        <div class="title"><strong>WI-518 — Xác nhận chuyển công đoạn, chuyển máy, chuyển ca và chuyển người vận hành</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>WI-518</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>Production Manager / Planning Manager / QA Manager</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi bàn giao Job giữa ca, giữa người vận hành, giữa máy, giữa công đoạn, hoặc khi chuyển WIP sang outsource/nhận lại từ outsource.</div>
+      <h1>WI-518 — Xác nhận chuyển công đoạn, chuyển máy, chuyển ca và chuyển người vận hành</h1>
+      
+<div class="section"><h2>1. Mục đích và phạm vi</h2>
+<p>Bất kỳ bàn giao nào làm thay đổi người chịu trách nhiệm trực tiếp với Job đều phải được xác nhận. Bàn giao không chỉ là chuyển WIP; đó là chuyển đầy đủ thông tin để người nhận có thể tiếp tục đúng revision, đúng điều kiện máy và đúng điểm kiểm soát mà không phải đoán.</p>
+<div class="callout-danger"><strong>CẤM</strong> bàn giao bằng lời nói đơn thuần. CẤM chuyển container mà không chốt Qty good/suspect/scrap. CẤM để người nhận tự “đoán tiếp” offset, tool state, hoặc open issue.</div></div>
+
+<div class="section"><h2>2. Các loại work transfer phải xác nhận</h2>
+<div class="table-card"><table><thead><tr><th>Loại transfer</th><th>Khi xảy ra</th><th>Điều kiện vào</th><th>Người nhận xác nhận</th></tr></thead><tbody>
+<tr><td>Shift handover</td><td>Hết ca hoặc đổi người chạy cùng máy/cùng job</td><td>Máy an toàn, trạng thái job rõ, Qty cập nhật</td><td>Operator/Leader ca nhận</td></tr>
+<tr><td>Machine transfer</td><td>Chuyển cùng Op sang máy khác</td><td>Đã phê duyệt đổi machine, release set cập nhật</td><td>Setup/Production tại máy nhận</td></tr>
+<tr><td>Operation transfer</td><td>Chuyển sang OpSeq kế tiếp</td><td>Op hiện tại complete, record đủ, label đúng</td><td>Owner công đoạn kế tiếp</td></tr>
+<tr><td>Outsource transfer</td><td>Gửi ra vendor/nhận từ vendor</td><td>PO flowdown, cert requirement, packaging đúng</td><td>WHS / PUR / QA</td></tr>
+<tr><td>Rework loop</td><td>Quay lại bước trước hoặc chuyển tuyến sửa</td><td>Có disposition rõ và route đặc biệt</td><td>QA + Production</td></tr>
+</tbody></table></div>
+<p>Tuyến đặc biệt áp theo <a href="../../03-Reference/01-ANNEX-System/annex-qms-014-put-thru-index.html">ANNEX-QMS-014</a>.</p></div>
+
+<div class="section"><h2>3. Gói thông tin bắt buộc khi bàn giao</h2>
+<div class="table-card"><table><thead><tr><th>Nhóm thông tin</th><th>Bắt buộc phải có</th></tr></thead><tbody>
+<tr><td>Nhận dạng Job</td><td>JobNum, PartNo, Rev, OpSeq, route code, QPL</td></tr>
+<tr><td>Số lượng</td><td>Qty good, qty suspect, qty scrap, qty còn lại, số container</td></tr>
+<tr><td>Điều kiện kỹ thuật</td><td>Program ID/Rev, setup sheet rev, tool/fixture đang dùng, offset lock/current state</td></tr>
+<tr><td>Điểm kiểm soát</td><td>First piece/FAI status, CTQ đang theo dõi, IPQC tần suất, open hold/open issue</td></tr>
+<tr><td>Hồ sơ đi kèm</td><td>Traveler, label, evidence pack bắt buộc, cert/coc khi áp dụng</td></tr>
+<tr><td>Rủi ro / do-not-do</td><td>Điểm nhạy cảm, lỗi vừa xảy ra, cảnh báo clamp/tool/path, last known good</td></tr>
+</tbody></table></div>
+<div class="callout-warn"><strong>Không đủ gói thông tin</strong> thì người nhận phải từ chối nhận việc và đặt HOLD cho đến khi người bàn giao bổ sung đủ.</div></div>
+
+<div class="section"><h2>4. Trình tự xác nhận transfer</h2>
+<div class="step-list">
+<div class="step-item"><strong>Người bàn giao chốt hiện trạng.</strong><br/>Dừng công đoạn ở điểm an toàn; cập nhật transaction và nhãn; chốt good/suspect/scrap; ghi open issue và last known good. Không bàn giao lúc tình trạng còn mơ hồ.</div>
+<div class="step-item"><strong>Người nhận đối chiếu vật lý và hồ sơ.</strong><br/>Đối chiếu JobNum, PartNo, Rev, Qty, container, nhãn, traveler, và hồ sơ/bằng chứng liên quan. Nếu là machine transfer, phải đối chiếu thêm release set của máy nhận.</div>
+<div class="step-item"><strong>Kiểm điều kiện tiếp tục chạy.</strong><br/>Xem first piece/FAI status, IPQC status, tool life, offset state, open hold/open NCR. Nếu có thay đổi machine/fixture/tool ảnh hưởng part thì phải quay về setup/first piece tương ứng.</div>
+<div class="step-item"><strong>Ký nhận hoặc từ chối nhận.</strong><br/>Chỉ ký nhận khi đủ thông tin, đủ hồ sơ và điều kiện vật lý phù hợp. Nếu từ chối, ghi rõ lý do và escalates ngay trong ca.</div>
+</div></div>
+
+<div class="section"><h2>5. Quy tắc riêng cho từng loại transfer</h2>
+<div class="matrix">
+<div class="card"><h3>5.1 Shift handover</h3><ul class="tight" style="padding-left:20px;"><li>Chốt part cuối cùng đang nằm ở trạng thái nào: good / suspect / đang đo / đang chờ quyết định.</li><li>Giao rõ tool sắp hết life, offset vừa chỉnh, đặc tính đang drift, lỗi vừa xảy ra.</li><li>Người nhận phải thực hiện quick-check theo <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a> trước khi bấm chạy lại.</li></ul></div>
+<div class="card"><h3>5.2 Machine transfer</h3><ul class="tight" style="padding-left:20px;"><li>Không dùng state của máy cũ để suy diễn máy mới.</li><li>Phải re-establish WCS/fixture/tooling trên máy mới và đánh giá lại first piece/FAI theo impact.</li><li>Routing/dispatch phải cập nhật trước khi chuyển WIP vật lý.</li></ul></div>
+<div class="card"><h3>5.3 Operation transfer</h3><ul class="tight" style="padding-left:20px;"><li>Container phải được move scan đúng công đoạn.</li><li>Điểm kiểm của công đoạn trước phải đóng đủ trước khi chuyển.</li><li>Owner công đoạn nhận kiểm tình trạng bề mặt, traceability và hồ sơ kèm theo.</li></ul></div>
+<div class="card"><h3>5.4 Outsource transfer</h3><ul class="tight" style="padding-left:20px;"><li>Phải có flowdown, packaging, label và cert requirement rõ.</li><li>Khi nhận về phải kiểm qty, tình trạng kiện, cert pack và trạng thái hold trước khi nhập.</li><li>Không nhập kho “treo chứng từ” cho job yêu cầu cert bắt buộc.</li></ul></div>
+</div></div>
+
+<div class="section"><h2>6. Hồ sơ, KPI và tài liệu liên kết</h2>
+<div class="kpi-grid">
+<div class="kpi-box"><strong>KPI-WI518-01</strong><br/>Tỷ lệ transfer có handover log / scan / qty reconciliation đầy đủ.</div>
+<div class="kpi-box"><strong>KPI-WI518-02</strong><br/>Số lỗi phát sinh do bàn giao thiếu thông tin hoặc chuyển sai route.</div>
+<div class="kpi-box"><strong>KPI-WI518-03</strong><br/>Tỷ lệ machine transfer phải làm lại first piece do release set sai hoặc thiếu.</div>
+<div class="kpi-box"><strong>KPI-WI518-04</strong><br/>Thời gian phản ứng khi transfer bị từ chối vì thiếu điều kiện.</div>
+</div>
+<div class="table-card"><table><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="wi-517-setup-changeover-smed-standard-work.html">WI-517</a></td><td>Setup/changeover trước khi bàn giao máy/job.</td></tr>
+<tr><td><a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Quick-check card cho người nhận trước khi chạy.</td></tr>
+<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-ops-002-gate-mrr-and-execution-synchronization-pack.html">ANNEX-OPS-002</a></td><td>Gate, MRR và đồng bộ bàn giao liên phòng ban.</td></tr>
+<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-qms-014-put-thru-index.html">ANNEX-QMS-014</a></td><td>Chỉ mục tuyến đặc biệt và bộ hồ sơ tăng cường.</td></tr>
+<tr><td><a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Job Dossier và completeness của hồ sơ bàn giao.</td></tr>
+</tbody></table></div></div>
+
+    </div>
+  </div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>TRN-ACA-MRR-06 — Daily Management Pack | HESEM Academy</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+ .chk{font-family:var(--mono); font-weight:800;}
+ .print-grid{display:grid; grid-template-columns: 1fr 1fr; gap: 12px;}
+ .sig{display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;}
+ .sig .box{border:1px dashed var(--line); border-radius:10px; padding:10px; min-height:64px;}
+ .mini{font-size:.92rem}
+ .tight li{margin:4px 0;}
+ .formline{display:inline-block; min-width:160px; border-bottom:1px solid var(--line);}
+ .muted2{color:var(--muted);}
+ .pill{display:inline-block; padding:2px 8px; border:1px solid var(--line); border-radius:999px; font-size:.82rem;}
+ 
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+</style>
+</head>
+<body>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>MRR-06-DAILY-MANAGEMENT — Daily Management Pack | HESEM Academy</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>MRR-06-DAILY-MANAGEMENT</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="cover">
+<div class="kicker">MRR Pack</div>
+<h1 class="h1">Daily Management Pack</h1>
+<p class="lead">Bộ MRR cho quản trị ngày: Tier meeting, WIP, downtime, escalation, KPI.</p>
+<div class="grid-2">
+<div class="note">
+<strong>Áp dụng</strong>
+<ul class="tight">
+<li><b>Vai trò:</b> OPS • Planning • QA/QMS</li>
+<li><b>Chuẩn lưu:</b> SSOT theo <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a></li>
+<li><b>Gate:</b> Thiếu MRR → STOP/HOLD/BLOCK theo mục “Fail-fast”.</li>
+</ul>
+</div>
+<div class="note">
+<strong>Thông tin Job / Hồ sơ</strong>
+<div class="mini">
+ JobCode: <span class="formline"> </span><br/>
+ Khách hàng: <span class="formline"> </span><br/>
+ Part No: <span class="formline"> </span>   Rev: <span class="formline"> </span><br/>
+ Số lượng: <span class="formline"> </span>   Due: <span class="formline"> </span><br/>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<h2 class="h2" style="margin-top:0;">Checklist MRR (Minimum Required Records)</h2>
+<p class="mini muted2">Tick đủ các dòng dưới đây. Mỗi dòng phải có bằng chứng trong SSOT và đặt tên file đúng chuẩn.</p>
+<div style="overflow:auto;">
+<table class="form-table">
+<tr>
+<th style="min-width:320px;">MRR / Bằng chứng</th>
+<th style="min-width:140px;">RecordType</th>
+<th style="min-width:110px;">Gate</th>
+<th style="min-width:120px;">Owner</th>
+<th style="min-width:220px;">SSOT path</th>
+<th style="min-width:260px;">Tên file chuẩn</th>
+</tr>
+<tr><td><span class="chk">☐</span> Tier meeting agenda (đầu ca) + attendance</td><td>TIER</td><td>D0</td><td>OPS</td><td class="mini">SSOT/Ops/Tier/<span class="pill">&lt;YYYYMMDD&gt;</span>/</td><td class="mini">TIER_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Action log (owner + due trong ngày)</td><td>ACT</td><td>D0</td><td>OPS</td><td class="mini">SSOT/Ops/Tier/<span class="pill">&lt;YYYYMMDD&gt;</span>/</td><td class="mini">ACT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> WIP aging report (job list) + ưu tiên</td><td>WIP</td><td>D0</td><td>Planning</td><td class="mini">SSOT/Ops/WIP/</td><td class="mini">WIP_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> Downtime log (machine/ca/cause/min)</td><td>DT</td><td>D0</td><td>OPS</td><td class="mini">SSOT/Ops/Downtime/</td><td class="mini">DT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> Quality alert (khi NG/escape) + containment</td><td>QALERT</td><td>D1</td><td>QA</td><td class="mini">SSOT/Ops/Quality-Alert/</td><td class="mini">QALERT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Escalation log (blocker &gt;15 phút)</td><td>ESC</td><td>D1</td><td>OPS</td><td class="mini">SSOT/Ops/Escalation/</td><td class="mini">ESC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> KPI dashboard snapshot (OTD/FPY/Scrap/Rework)</td><td>KPI</td><td>D2</td><td>OPS+QA</td><td class="mini">SSOT/Ops/KPI/</td><td class="mini">KPI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> OJT plan trong ngày (ai kèm ai, module nào)</td><td>OJT</td><td>D2</td><td>Trainer</td><td class="mini">SSOT/Training/OJT/<span class="pill">&lt;YYYYMMDD&gt;</span>/</td><td class="mini">OJT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+</table>
+</div>
+<div class="note mini"><strong>Gắn với module</strong>: C09 (OTD), C08 (Data), C03 (Quality at source), C07 (CAPA).</div>
+</div>
+<div class="card">
+<h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
+<ul class="tight">
+<li>Không chốt action log hoặc không có owner/due → HOLD kết luận họp.</li><li>Blocker &gt;15 phút không escalation log → FAIL gate cá nhân và đánh giá lại C09.</li><li>Quality alert thiếu containment → STOP chuyền liên quan.</li><li>Downtime log thiếu nguyên nhân → HOLD phân tích ngày.</li>
+</ul>
+</div>
+<div class="card">
+<h2 class="h2" style="margin-top:0;">Audit 60 giây</h2>
+<ol class="tight">
+<li>Mở folder Tier/<span class="pill">&lt;YYYYMMDD&gt;</span>/ và kiểm tra agenda + action log.</li><li>Mở WIP report và đối chiếu ưu tiên với due date.</li><li>Mở downtime log và xác nhận có cause category.</li><li>Mở KPI snapshot và đối chiếu trend.</li>
+</ol>
+</div>
+<div class="card">
+<h2 class="h2" style="margin-top:0;">Ký xác nhận</h2>
+<div class="sig">
+<div class="box"><b>Người lập</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+<div class="box"><b>Người kiểm</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+<div class="box"><b>QA/QMS xác nhận</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+</div>
+</div>
+</div>
+</div></div></div>
+
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+

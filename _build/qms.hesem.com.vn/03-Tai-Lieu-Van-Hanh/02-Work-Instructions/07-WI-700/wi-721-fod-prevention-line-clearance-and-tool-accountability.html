@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WI-721 — Chống FOD, line clearance, kiểm tool/vật lạ và xác nhận khu vực sạch | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.step-list {display:grid; gap:10px;}
+.step-item {border:1px solid var(--ln); border-left:4px solid var(--blue); padding:10px 12px; border-radius: var(--r); background:#fff;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.section {margin-top:16px;}
+ul.tight li {margin:4px 0;}
+.code {font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:#f8f9fa; border:1px solid var(--ln); border-radius:6px; padding:0 6px;}
+.callout-danger,.callout-warning,.callout-info,.callout-success {padding:10px 12px; border-radius:10px; margin:10px 0; border:1px solid var(--ln);}
+.callout-danger{background:#fff5f5;border-color:#ffc9c9;}
+.callout-warning{background:#fff9db;border-color:#ffe066;}
+.callout-info{background:#e7f5ff;border-color:#a5d8ff;}
+.callout-success{background:#ebfbee;border-color:#b2f2bb;}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu vận hành • Work Instruction</span>
+</div>
+</div>
+<div class="title"><strong>WI-721 — Chống FOD, line clearance, kiểm tool/vật lạ và xác nhận khu vực sạch</strong></div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>WI-721</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>Production Supervisor / QA / Warehouse / Maintenance</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng tại máy, bàn deburr, bàn kiểm, khu clean-pack, khu đóng gói, khu staging và mọi điểm có nguy cơ để lại hoặc mang theo vật lạ vào sản phẩm, khay, đồ gá, bao gói hoặc shipment.</div>
+<h1>WI-721 — Chống FOD, line clearance, kiểm tool/vật lạ và xác nhận khu vực sạch</h1>
+<div class="section"><h2>1. Mục đích, phạm vi và nguyên tắc không thỏa hiệp</h2>
+<p>WI này quy định hành vi chống FOD tại điểm dùng. FOD trong phạm vi HESEM bao gồm mọi vật thể không thuộc cấu hình hợp lệ của sản phẩm hoặc khu vực làm việc: chip, bavia rời, mảnh dao gãy, vít/shim rơi, đầu bút, giấy, nilon, lông găng, tem nhãn rời, desiccant lọt bao, nắp chụp, đầu bịt, khăn lau, bụi bẩn, và mọi mảnh vụn có thể gây xước, kẹt lắp, nhiễm bẩn, rò rỉ hoặc product escape.</p>
+<div class="callout-danger"><strong>Không thỏa hiệp:</strong> thiếu một món đồ phải kiểm soát = coi như có nguy cơ FOD. Không ai được cho chạy tiếp, chuyển bước, đóng gói hoặc ship khi line clearance chưa đạt, chưa đủ tool accountability, hoặc còn nghi vấn vật lạ trong part/fixture/tray/bao gói.</div>
+<p>WI này không thay ANNEX-QMS-017. ANNEX-QMS-017 đặt chương trình FOD ở cấp hệ thống. WI-721 biến chương trình đó thành thao tác bắt buộc tại nơi người làm chạm trực tiếp vào sản phẩm.</p></div>
+<div class="section"><h2>2. Phân vùng FOD và mức kiểm soát tại HESEM</h2>
+<div class="table-card"><table><thead><tr><th>Zone</th><th>Khu vực điển hình</th><th>Mức kiểm soát bắt buộc</th><th>Bằng chứng tối thiểu</th></tr></thead><tbody>
+<tr><td><span class="badge-red">FOD-A</span></td><td>Khu clean build, clean-pack, final inspection nhạy sạch, helium leak test, khu đóng inner bag/clean bag, staging trước ship đối với job clean/vacuum</td><td>Dụng cụ chuyên dùng theo khu; cấm giấy carton/băng keo lộ keo/khăn bẩn; kiểm soát vật tư sạch và vật tư cấm; line clearance trước nhận ca, trước mở bao, trước đóng bao, trước bàn giao</td><td>FOD card hoặc checklist bàn giao khu; ảnh/biên bản khi có abnormal; xác nhận last-look trước đóng kín</td></tr>
+<tr><td><span class="badge-amber">FOD-B</span></td><td>Máy CNC, khu setup, bàn deburr/finishing, bàn đo kiểm, staging giữa công đoạn, work transfer</td><td>Shadow board hoặc vị trí chuẩn cho tool; kiểm vật tư tiêu hao; thu hồi mảnh dao gãy; line clearance trước chạy, sau gãy dao, sau đổi job, trước chuyển công đoạn</td><td>Traveler / checklist / log abnormal / hold log khi có sự cố</td></tr>
+<tr><td><span class="badge-green">FOD-C</span></td><td>Kho nội bộ, khu outer pack, lối luân chuyển pallet, khu chờ outsource/nhập kho</td><td>Housekeeping, quy tắc vị trí, kiểm pallet/thùng/liner/nhãn, FIFO/zone discipline, cấm để vật lạ trên khay và trong thùng sản phẩm</td><td>Checklist kho/packaging khi tài liệu liên quan yêu cầu</td></tr>
+</tbody></table></div>
+<p class="tiny">Khi một job đi qua nhiều zone, phải áp dụng mức kiểm soát cao nhất đang hiệu lực cho bước đó. Job clean/vacuum đi qua khu machine vẫn phải tuân thủ logic nâng cấp khi chuyển sang FOD-A.</p></div>
+<div class="section"><h2>3. Line clearance bắt buộc theo thời điểm</h2>
+<div class="step-list">
+<div class="step-item"><strong>Đầu ca / đầu job / sau đổi người.</strong><br/>Người nhận ca hoặc người nhận job phải kiểm sạch khu vực làm việc, kiểm tray/khay, bề mặt bàn máy, đồ gá, jaw, pocket, drain area, chip trap, khay dụng cụ, giấy nháp, label cũ, packaging cũ, off-cut cũ. Không được nhận khu bằng lời nói. Phải nhìn, sờ, kiểm và xác nhận.</div>
+<div class="step-item"><strong>Trước first cut hoặc trước bắt đầu thao tác bằng tay trên part.</strong><br/>Phải xác nhận không còn vật liệu thừa của job trước, không còn mảnh insert, không còn shim/vít rời, không còn protective cap lẫn trong tray, không còn giẻ lau hoặc vật tư tiêu hao đặt trên máy.</div>
+<div class="step-item"><strong>Sau bất thường.</strong><br/>Mọi sự kiện gãy dao, crash, jam, tool pull-out, part slip, abnormal stop, mất điện, mở lại cửa máy giữa chu kỳ, rơi part, rơi khay, rách túi, đổ vật tư đều bắt buộc line clearance lại từ đầu cho vùng bị ảnh hưởng.</div>
+<div class="step-item"><strong>Trước chuyển bước / trước work transfer / trước pack.</strong><br/>Phải làm last-look tại các vị trí giữ dị vật: lỗ mù, bore, thread, pocket, channel, mặt tì, mặt sealing, mặt sau đồ gá, kẽ tray, đáy túi, góc hộp. Nếu part đi vào clean-pack hoặc leak test, line clearance phải bao gồm cả dụng cụ và packaging material trong vùng thao tác.</div>
+<div class="step-item"><strong>Cuối job / cuối ca.</strong><br/>Không để khu vực “bàn giao dở dang”. Phải trả tool về đúng chỗ, đánh dấu vật nghi ngờ, ghi rõ phần việc còn mở, và giữ nguyên HOLD nếu chưa tìm đủ vật thể nghi ngờ.</div>
+</div>
+<div class="table-card"><table><thead><tr><th>Sự kiện</th><th>Điểm kiểm tối thiểu</th><th>PASS khi</th><th>Không đạt thì làm gì</th></tr></thead><tbody>
+<tr><td>Nhận máy / nhận bàn</td><td>Khay part, đồ gá, tool board, nhãn cũ, giấy rời, vật tư tiêu hao</td><td>Khu sạch, đúng zone, không còn vật lạ không thuộc job hiện tại</td><td>Dừng nhận, dọn sạch, báo người bàn giao xác nhận lại</td></tr>
+<tr><td>Sau gãy dao / crash</td><td>Mảnh gãy, insert, screw, shim, cavity, bore, chip trap, coolant screen, tray</td><td>Tìm đủ và chứng minh vùng ảnh hưởng đã kiểm</td><td>Khoanh vùng suspect, mở hold, chỉ release sau khi QA chấp thuận</td></tr>
+<tr><td>Trước chuyển QC / clean-pack</td><td>Bề mặt part, pocket, blind hole, thread, backside, khay, túi, foam/liner</td><td>Không còn chip, bavia rời, vật tư lạ</td><td>Quay lại làm sạch/kiểm lại; đánh giá mở rộng cùng lot nếu cần</td></tr>
+<tr><td>Trước ship / bàn giao kho</td><td>Inner pack, outer pack, label backing, desiccant/HIC, nắp bịt, seal</td><td>Đúng pack build, không có vật lạ trong bao/hộp</td><td>Mở lại dưới kiểm soát sạch, repack và cập nhật evidence</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>4. Tool accountability và kiểm soát vật tư tiêu hao</h2>
+<div class="table-card"><table><thead><tr><th>Nhóm vật phải kiểm soát</th><th>Ví dụ</th><th>Quy tắc count/control</th><th>Khi lệch count</th></tr></thead><tbody>
+<tr><td>Tool cắt và phần tử nhỏ của tool</td><td>Dao, drill, tap, endmill, insert, screw, shim, collet parts, boring inserts</td><td>Dao chính và phần tử rời phải có vị trí chuẩn; với insert/screw/shim rời dùng cho 1 setup phải kiểm đếm trước-sau thao tác</td><td>STOP. Không chạy tiếp. Tìm trong máy, trên đồ gá, trong khay, trong chip; nếu không tìm đủ thì HOLD vùng ảnh hưởng</td></tr>
+<tr><td>Dụng cụ cầm tay và gauge rời</td><td>Allen key, torque key, pick, mirror, borescope, gauge pin, plug, feeler</td><td>Không đặt lẫn trên bàn máy hoặc trong khay part; xong việc phải trả đúng vị trí</td><td>Ngưng bàn giao; line clearance lại; kiểm sản phẩm và tray liên quan</td></tr>
+<tr><td>Vật tư tiêu hao sản xuất</td><td>Giẻ lau, khăn lint-free, nhám, brush, marker, tape, zip tie, swab</td><td>Chỉ dùng đúng khu; vật tư rời phải có nơi chứa; cấm để chạm trực tiếp lên part khi không được phép</td><td>Thu hồi ngay; kiểm vùng tiếp xúc; nếu vật tư thiếu hoặc rách/mất mảnh thì xử lý như FOD incident</td></tr>
+<tr><td>Vật tư đóng gói/bảo quản</td><td>Nắp chụp, cap, bag, liner, desiccant, HIC, tag, nhãn SSCC</td><td>Phải đối chiếu pack build; inner-pack chỉ dùng vật tư đúng spec; vật tư dư không để lẫn trong hộp sản phẩm</td><td>Ngưng đóng gói; kiểm lại toàn bộ pack; repack nếu cần</td></tr>
+</tbody></table></div>
+<div class="callout-warning"><strong>Quy tắc 10 phút:</strong> nếu vật thể phải kiểm soát không tìm thấy trong 10 phút tìm kiếm có phương pháp, coi toàn bộ vùng liên quan là suspect. Không được tự ý “cho qua vì chắc rơi ra ngoài”.</div></div>
+<div class="section"><h2>5. Quy tắc bàn giao, last-look và turnover clean-clear</h2>
+<p>Mọi bàn giao giữa người với người, giữa máy với công đoạn sau, giữa sản xuất với QC, giữa QC với clean-pack, giữa clean-pack với kho đều phải có thao tác <strong>clean-clear</strong>. Người giao chịu trách nhiệm để khu vực đủ điều kiện giao. Người nhận chịu trách nhiệm xác nhận lại trước khi nhận.</p>
+<div class="table-card"><table><thead><tr><th>Điểm bàn giao</th><th>Người giao phải làm</th><th>Người nhận phải xác nhận</th></tr></thead><tbody>
+<tr><td>Operator → Operator</td><td>Dọn khu, trả tool về vị trí, ghi abnormal/hold đang mở, chỉ ra vật nghi ngờ hoặc part suspect</td><td>Kiểm lại zone, tool count, trạng thái traveler và hold tag trước khi nhận</td></tr>
+<tr><td>Production → QC</td><td>Làm sạch part theo route, loại bỏ chip/bavia rời, bàn giao đúng khay/label</td><td>Last-look tại các vị trí giữ dị vật, xác nhận part/tray không lẫn vật lạ</td></tr>
+<tr><td>QC → Clean-pack/Shipping</td><td>Bàn giao part đã release, packaging spec và điểm lưu ý theo route</td><td>Kiểm part sạch, khay sạch, bao gói đúng spec, label zone đúng</td></tr>
+<tr><td>Work transfer / máy khác / công đoạn khác</td><td>Chốt trạng thái sạch của part, tray, fixture, loose items và tool remnants</td><td>Không nhận nếu tray/khu/bằng chứng không rõ ràng</td></tr>
+</tbody></table></div>
+<div class="callout-info"><strong>Last-look bắt buộc</strong>: kiểm bằng mắt và chạm nhẹ tại mép, góc, lỗ, cavity, channel, thread, mặt sealing, vùng sau đồ gá, đáy khay, đáy túi, mép hộp. Với job clean/vacuum, làm theo WI-714 và WI-716; không thay bằng thổi khí tùy tiện.</div></div>
+<div class="section"><h2>6. Phản ứng khi phát hiện FOD, thiếu tool hoặc nghi ngờ mất mảnh</h2>
+<div class="step-list">
+<div class="step-item"><strong>Dừng và giữ hiện trạng.</strong><br/>Ngừng thao tác tạo thêm rủi ro. Không quét dọn vội, không đổ chip, không xáo trộn tray trước khi xác định vùng nghi ngờ.</div>
+<div class="step-item"><strong>Khoanh vùng last-known-good đến suspect range.</strong><br/>Xác định thời điểm còn chắc chắn sạch gần nhất, sau đó khoanh mọi part/khay/công đoạn có khả năng bị ảnh hưởng.</div>
+<div class="step-item"><strong>Tìm kiếm có phương pháp.</strong><br/>Tìm theo thứ tự: vị trí thao tác trực tiếp → đồ gá/fixture → cavity/pocket/bore → khay/tray → chip/coolant trap → packaging/liner nếu đã chuyển bước. Khi nghi có mảnh nhỏ, dùng đèn/soi gương/borescope/dụng cụ thích hợp.</div>
+<div class="step-item"><strong>Đánh giá ảnh hưởng và quyết định containment.</strong><br/>Nếu chưa chứng minh sạch, mở HOLD theo WI-606 hoặc route tương ứng. Nếu part có chức năng sealing, vacuum, cleanliness hoặc safety-sensitive, mặc định nâng mức containment.</div>
+<div class="step-item"><strong>Chỉ release khi vòng bằng chứng đóng kín.</strong><br/>Release phải có bằng chứng đã tìm đủ hoặc đã kiểm chứng vùng ảnh hưởng bằng phương pháp thích hợp; có người chịu trách nhiệm ký; và traveler/log/hold được cập nhật.</div>
+</div>
+<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Xử lý bắt buộc</th><th>Thẩm quyền release</th></tr></thead><tbody>
+<tr><td>Thiếu insert/screw/shim/mảnh dao</td><td>HOLD vùng ảnh hưởng, tìm theo phương pháp, kiểm 100% vùng nghi ngờ</td><td>Production Supervisor + QA</td></tr>
+<tr><td>Phát hiện vật lạ trong bao gói</td><td>Dừng ship, mở lại dưới kiểm soát sạch, repack toàn bộ phạm vi liên quan</td><td>QA + Warehouse</td></tr>
+<tr><td>FOD lặp lại cùng máy/khu trong 1 ca</td><td>Mở hành động tại nguồn: xem lại tool board, consumable issue, line-clear pattern, housekeeping ownership</td><td>Production Supervisor / QA</td></tr>
+<tr><td>FOD có khả năng escape tới khách hàng</td><td>Kích hoạt NCR/escape path, khóa shipment liên quan, truy ngược lot</td><td>QA Manager theo SOP liên quan</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>7. Bằng chứng, KPI và tài liệu liên kết</h2>
+<div class="two-col">
+<div class="card"><h3>FOD evidence card tối thiểu</h3><ul class="tight" style="padding-left:18px;">
+<li>Mã job / part / rev / operation / machine</li>
+<li>Zone FOD áp dụng và thời điểm line clearance</li>
+<li>Người giao – người nhận – thời điểm bàn giao</li>
+<li>Abnormal / missing item / broken tool / found object</li>
+<li>Phạm vi suspect và quyết định HOLD hoặc RELEASE</li>
+<li>Ảnh hoặc link log khi sự cố xảy ra</li>
+</ul></div>
+<div class="card"><h3>KPI</h3><ul class="tight" style="padding-left:18px;">
+<li>KPI-WI721-01: số incident FOD theo khu/công đoạn</li>
+<li>KPI-WI721-02: số lần count mismatch của tool/vật tư tiêu hao</li>
+<li>KPI-WI721-03: số line-clearance fail khi bàn giao</li>
+<li>KPI-WI721-04: số escape liên quan FOD tới QC/Warehouse/khách hàng</li>
+<li>KPI-WI721-05: thời gian đóng containment cho sự cố FOD</li>
+</ul></div>
+</div>
+<div class="table-card"><table><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../01-SOPs/07-SOP-700/sop-703-product-safety-conformity-and-fod-prevention.html">SOP-703</a></td><td>Khung điều hành chương trình FOD và product safety</td></tr>
+<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-qms-017-fod-prevention-program.html">ANNEX-QMS-017</a></td><td>Chương trình FOD, zoning, audit và KPI ở cấp hệ thống</td></tr>
+<tr><td><a href="../../03-Reference/02-ANNEX-Standards/annex-hse-001-ppe-and-hazard-matrix.html">ANNEX-HSE-001</a></td><td>PPE và mối nguy theo khu vực/công việc</td></tr>
+<tr><td><a href="../05-WI-500/wi-516-machine-operation-quick-card.html">WI-516</a></td><td>Thẻ thao tác nhanh tại máy và abnormal stop</td></tr>
+<tr><td><a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td><td>Clean-pack, handling và preservation</td></tr>
+<tr><td><a href="../06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Containment và segregation khi có suspect product</td></tr>
+</tbody></table></div></div>
+</div>
+</div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

@@ -1,0 +1,2033 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TRN-MET-01 — KPI/Metric Dictionary by 19 Competencies | HESEM OS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+ /* In khổ ngang cho trang nhiều cột */
+ @page {
+ size: A4 landscape;
+ margin: 12mm 10mm;
+ }
+ .table td code, .table th code { font-size: 12px; }
+ .table td { font-size: 12px; }
+ .table th { font-size: 12px; }
+ 
+ 
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+</style>
+</head>
+<body>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>COMPETENCY-METRICS — KPI/Metric Dictionary by 19 Competencies</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>COMPETENCY-METRICS</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent"><div class="card">
+<div class="badge"><span class="dot"></span>KPI / Metric Dictionary</div>
+<h1 style="margin-top:10px">Từ điển KPI/Metric theo 19 năng lực (L1–L4)</h1>
+<p>Tài liệu này chuẩn hóa <strong>định lượng</strong> cho từng năng lực theo 4 level (L1–L4) với 4 cấu phần: <strong>Knowledge – Skill – Evidence – Metric</strong>.
+ Mục tiêu là: (1) đánh giá công bằng; (2) tạo “ngôn ngữ chung” giữa các phòng ban; (3) liên kết trực tiếp Skill Matrix ↔ chứng nhận level ↔ KPI gating.</p>
+<div class="grid-2">
+<div class="note">
+<strong>Nguyên tắc đo lường</strong>
+<ul>
+<li><strong>Định nghĩa KPI trước, đo sau:</strong> cùng một khái niệm phải có công thức + nguồn dữ liệu rõ ràng.</li>
+<li><strong>Ưu tiên dữ liệu gốc:</strong> ERP, NCR/CAPA, báo cáo QC, nhật ký máy, checklist ký tên.</li>
+<li><strong>Không “đo cho đẹp”:</strong> KPI phải dẫn tới hành động cải tiến; dữ liệu phải truy vết được.</li>
+<li><strong>Baseline &amp; hiệu chỉnh:</strong> ngưỡng L1–L4 là quy định; cần chốt baseline theo nhóm máy/khách/loại hàng.</li>
+</ul>
+</div>
+<div class="kpi-gate">
+<strong>Gate – Quy tắc chặn</strong>
+<ul>
+<li>Gate ưu tiên an toàn, chất lượng, tuân thủ pháp luật/khách hàng.</li>
+<li>Vi phạm Gate → <strong>dừng xét tăng level</strong>, bắt buộc OJT/CAPA, đánh giá lại sau khi đóng hành động.</li>
+<li>Gate cũng là “điều kiện cần” khi liên kết sang thưởng hiệu suất.</li>
+</ul>
+</div>
+</div>
+<div class="toc">
+<strong>Mục lục nhanh</strong>
+<ul>
+<li><a href="#C01">C01 – An toàn lao động &amp; 5S</a></li><li><a href="#C02">C02 – Kỷ luật &amp; tuân thủ quy trình</a></li><li><a href="#C03">C03 – Tư duy chất lượng (Right First Time)</a></li><li><a href="#C04">C04 – Giao tiếp &amp; phối hợp liên phòng ban</a></li><li><a href="#C05">C05 – Chủ động – trách nhiệm – tinh thần phục vụ</a></li><li><a href="#C06">C06 – Giải quyết vấn đề (5Why/PDCA/CAPA)</a></li><li><a href="#C07">C07 – Cải tiến liên tục (Kaizen/Lean)</a></li><li><a href="#C08">C08 – Tư duy dữ liệu &amp; sử dụng hệ thống (ERP/Excel)</a></li><li><a href="#C09">C09 – Quản lý thời gian – ưu tiên – đúng hạn</a></li><li><a href="#C10">C10 – Hiểu quy trình Job Order CNC (RFQ → Cash)</a></li><li><a href="#C11">C11 – Hiểu khách hàng &amp; thương mại</a></li><li><a href="#C12">C12 – Tư duy chi phí &amp; kiểm soát vật tư/hao phí</a></li><li><a href="#C13">C13 – Quản lý rủi ro &amp; kiểm soát thay đổi (Revision)</a></li><li><a href="#C14">C14 – Đọc hiểu bản vẽ 2D/3D – dung sai – GD&amp;T cơ bản</a></li><li><a href="#C15">C15 – Kiến thức vật liệu &amp; xử lý (heat treat/anodize/plating…)</a></li><li><a href="#C16">C16 – Đo lường – kiểm tra – tiêu chuẩn QC/FAI</a></li><li><a href="#C17">C17 – Năng lực kỹ thuật theo vị trí (CNC/Setup/CAM)</a></li><li><a href="#C18">C18 – Chuỗi cung ứng – mua hàng – logistics (nhận/xuất/traceability)</a></li><li><a href="#C19">C19 – Lãnh đạo &amp; huấn luyện (Coaching)</a></li>
+</ul>
+</div>
+<hr class="sep"/>
+<p class="muted">Yêu cầu triển khai: dùng tài liệu này như <strong>data dictionary</strong> để thiết kế dashboard KPI theo phòng ban và làm “gating rules” trong biểu mẫu chấm năng lực.</p>
+</div><section class="card" id="C01">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C01</div>
+<h2 style="margin-top:10px">An toàn lao động &amp; 5S</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C01-M1</code></td>
+<td><strong>Điểm đánh giá 5S khu vực</strong></td>
+<td>Điểm đánh giá 5S theo checklist (sàng lọc–sắp xếp–sạch sẽ–săn sóc–sẵn sàng).</td>
+<td><code>(Tổng điểm đạt / Tổng điểm tối đa) * 100</code></td>
+<td>Phiếu đánh giá 5S (HSE/QA) + ảnh hiện trường</td>
+<td>Tuần / Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80</td>
+<td>&gt;=90</td>
+<td>&gt;=95</td>
+<td>&gt;=97</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C01-M2</code></td>
+<td><strong>Tỷ lệ tuân thủ PPE</strong></td>
+<td>Tỷ lệ ca làm việc/quan sát đạt PPE đầy đủ theo quy định vị trí.</td>
+<td><code>(Số quan sát đạt PPE / Tổng quan sát) * 100</code></td>
+<td>Gemba walk / Safety observation log</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=95%</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td>&gt;=99.5%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C01-M3</code></td>
+<td><strong>Số Near-miss/Tháng (chất lượng báo cáo)</strong></td>
+<td>Số báo cáo suýt tai nạn có mô tả rõ nguyên nhân–hành động khắc phục.</td>
+<td><code>Đếm # báo cáo near-miss hợp lệ</code></td>
+<td>FRM-HSE… Near-miss report / nhóm HSE</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=1/quý</td>
+<td>&gt;=1/tháng</td>
+<td>&gt;=2/tháng</td>
+<td>&gt;=4/tháng (kèm 100% closure)</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C01-M4</code></td>
+<td><strong>Tỷ lệ đóng hành động an toàn đúng hạn</strong></td>
+<td>Tỷ lệ hành động khắc phục sau đánh giá/near-miss được đóng đúng hạn cam kết.</td>
+<td><code>(Số action đóng đúng hạn / Tổng action) * 100</code></td>
+<td>Action tracker (Excel/ERP)</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C01-M5</code></td>
+<td><strong>Sự cố an toàn mức nghiêm trọng</strong></td>
+<td>Số sự cố Level 3–4 (LTI, tai nạn nặng, vi phạm LOTO/guard).</td>
+<td><code>Đếm # sự cố nghiêm trọng</code></td>
+<td>Incident report</td>
+<td>Tháng/Quý</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C02">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C02</div>
+<h2 style="margin-top:10px">Kỷ luật &amp; tuân thủ quy trình</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C02-M1</code></td>
+<td><strong>Điểm đánh giá tuân thủ SOP</strong></td>
+<td>Điểm kiểm tra tuân thủ quy trình/tiêu chuẩn công việc tại vị trí.</td>
+<td><code>(Điểm đạt / Điểm tối đa) * 100</code></td>
+<td>Audit nội bộ + checklist công đoạn</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80</td>
+<td>&gt;=90</td>
+<td>&gt;=95</td>
+<td>&gt;=97</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C02-M2</code></td>
+<td><strong>Tỷ lệ hoàn tất checklist bắt buộc</strong></td>
+<td>Tỷ lệ checklist (setup, QC, kho, bảo trì…) được ghi đầy đủ đúng thời điểm.</td>
+<td><code>(Checklist đạt / Checklist yêu cầu) * 100</code></td>
+<td>Hồ sơ giấy/ERP/Excel</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=95%</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td>&gt;=99.5%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C02-M3</code></td>
+<td><strong>Số lỗi hồ sơ (record error) / tháng</strong></td>
+<td>Số lỗi sai/thiếu/không truy vết được trên hồ sơ sản xuất–QC–kho.</td>
+<td><code>Đếm # lỗi hồ sơ được ghi nhận</code></td>
+<td>Internal đánh giá / QA finding</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=3</td>
+<td>&lt;=2</td>
+<td>&lt;=1</td>
+<td>&lt;=0</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C02-M4</code></td>
+<td><strong>Tỷ lệ vi phạm nội quy kỷ luật</strong></td>
+<td>Số vi phạm giờ giấc, tác phong, quy định xưởng theo biên bản.</td>
+<td><code>(Số vi phạm / số nhân sự) * 100 hoặc đếm #</code></td>
+<td>HR/Line leader</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=1/tháng</td>
+<td>&lt;=1/quý</td>
+<td>&lt;=1/6 tháng</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C02-M5</code></td>
+<td><strong>Hành vi gian dối hồ sơ</strong></td>
+<td>Bất kỳ hành vi sửa/xóa/ghi khống hồ sơ (quality record falsification).</td>
+<td><code>Yes/No</code></td>
+<td>Điều tra QA/HR</td>
+<td>Sự kiện</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C03">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C03</div>
+<h2 style="margin-top:10px">Tư duy chất lượng (Right First Time)</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C03-M1</code></td>
+<td><strong>First Pass Yield (FPY) cá nhân/tổ</strong></td>
+<td>Tỷ lệ sản phẩm đạt ngay lần đầu không cần sửa/rework.</td>
+<td><code>FPY = (Số OK lần đầu / Tổng sản phẩm) * 100</code></td>
+<td>QC result + NCR log</td>
+<td>Tuần/Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td>&gt;=98%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C03-M2</code></td>
+<td><strong>Tỷ lệ lỗi lặp (Repeat defect)</strong></td>
+<td>Tỷ lệ lỗi đã từng xảy ra tái diễn sau khi đã có hành động khắc phục.</td>
+<td><code>(Số lỗi lặp / Tổng lỗi) * 100</code></td>
+<td>NCR/CAPA database</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=20%</td>
+<td>&lt;=10%</td>
+<td>&lt;=5%</td>
+<td>&lt;=3%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C03-M3</code></td>
+<td><strong>Customer escape</strong></td>
+<td>Số lỗi lọt ra khách hàng liên quan trực tiếp đến công đoạn/nhóm.</td>
+<td><code>Đếm # sự cố customer escape</code></td>
+<td>Customer complaint / 8D</td>
+<td>Tháng/Quý</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C03-M4</code></td>
+<td><strong>Tỷ lệ hoàn tất kiểm tra CTQ đúng chuẩn</strong></td>
+<td>Tỷ lệ đặc tính CTQ được kiểm tra &amp; ghi nhận đúng theo plan.</td>
+<td><code>(CTQ kiểm đủ / CTQ yêu cầu) * 100</code></td>
+<td>Inspection plan + report</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=95%</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td>&gt;=99.5%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C03-M5</code></td>
+<td><strong>Tỷ lệ phát hiện sớm (internal detection)</strong></td>
+<td>Tỷ lệ lỗi phát hiện ở nội bộ trước khi giao (ưu tiên phát hiện càng sớm càng tốt).</td>
+<td><code>(Lỗi phát hiện nội bộ / Tổng lỗi) * 100</code></td>
+<td>NCR log</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80%</td>
+<td>&gt;=85%</td>
+<td>&gt;=90%</td>
+<td>&gt;=92%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C04">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C04</div>
+<h2 style="margin-top:10px">Giao tiếp &amp; phối hợp liên phòng ban</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C04-M1</code></td>
+<td><strong>Điểm chất lượng bàn giao (handover score)</strong></td>
+<td>Chất lượng thông tin bàn giao ca/giữa phòng ban theo checklist 5W2H.</td>
+<td><code>(Mục đạt / Mục yêu cầu) * 100</code></td>
+<td>Handover sheet / ERP note</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80</td>
+<td>&gt;=90</td>
+<td>&gt;=95</td>
+<td>&gt;=97</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C04-M2</code></td>
+<td><strong>Thời gian phản hồi yêu cầu nội bộ</strong></td>
+<td>Thời gian trung bình phản hồi ticket/nhắn tin/email nội bộ theo SLA.</td>
+<td><code>Avg(Response time)</code></td>
+<td>Zalo/Email log (đo thủ công) / ticket sheet</td>
+<td>Tuần</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=24h</td>
+<td>&lt;=8h</td>
+<td>&lt;=4h</td>
+<td>&lt;=2h</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C04-M3</code></td>
+<td><strong>Tỷ lệ action item đóng đúng hạn</strong></td>
+<td>Tỷ lệ việc được giao trong cuộc họp/biên bản được hoàn thành đúng hạn.</td>
+<td><code>(Action đóng đúng hạn / Tổng action) * 100</code></td>
+<td>Meeting minutes tracker</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C04-M4</code></td>
+<td><strong>Số lỗi do thiếu thông tin</strong></td>
+<td>Số lỗi/rework/delay được xác định nguyên nhân gốc do thiếu/nhầm thông tin liên phòng ban.</td>
+<td><code>Đếm # sự cố</code></td>
+<td>NCR/CAPA + post-mortem</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=3</td>
+<td>&lt;=2</td>
+<td>&lt;=1</td>
+<td>&lt;=0</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C04-M5</code></td>
+<td><strong>Vi phạm giao tiếp gây rủi ro (NDA/khách hàng)</strong></td>
+<td>Chia sẻ file sai người, sai kênh, vi phạm bảo mật khách hàng.</td>
+<td><code>Yes/No</code></td>
+<td>IT/QA/HR incident</td>
+<td>Sự kiện</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C05">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C05</div>
+<h2 style="margin-top:10px">Chủ động – trách nhiệm – tinh thần phục vụ</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C05-M1</code></td>
+<td><strong>Tỷ lệ hoàn thành công việc đúng hạn</strong></td>
+<td>Tỷ lệ task cá nhân hoàn thành đúng hạn theo kế hoạch/kanban.</td>
+<td><code>(Task đúng hạn / Tổng task) * 100</code></td>
+<td>Bảng kế hoạch tổ/ERP</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=85%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C05-M2</code></td>
+<td><strong>Chỉ số chủ động (Proactive actions)</strong></td>
+<td>Số lần chủ động phát hiện rủi ro/lập yêu cầu giải pháp trước khi lỗi xảy ra.</td>
+<td><code>Đếm # action được ghi nhận</code></td>
+<td>Kaizen log / leader record</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=1/quý</td>
+<td>&gt;=1/tháng</td>
+<td>&gt;=2/tháng</td>
+<td>&gt;=4/tháng</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C05-M3</code></td>
+<td><strong>Tỷ lệ hỗ trợ “khách hàng nội bộ”</strong></td>
+<td>Mức độ hỗ trợ đúng SLA khi phòng ban khác cần (kho–sản xuất–QC…).</td>
+<td><code>(Yêu cầu đáp ứng / Tổng yêu cầu) * 100</code></td>
+<td>Ticket/nhật ký hỗ trợ</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C05-M4</code></td>
+<td><strong>Số lần tái nhắc việc (reminder) bởi quản lý</strong></td>
+<td>Số lần quản lý phải nhắc lại cùng 1 việc do chậm/không làm.</td>
+<td><code>Đếm #</code></td>
+<td>Leader log</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=4</td>
+<td>&lt;=2</td>
+<td>&lt;=1</td>
+<td>&lt;=0</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C05-M5</code></td>
+<td><strong>Vi phạm trách nhiệm gây hậu quả nghiêm trọng</strong></td>
+<td>Bỏ qua cảnh báo, không báo lỗi dẫn tới scrap lớn/ship sai/ tai nạn.</td>
+<td><code>Yes/No</code></td>
+<td>Điều tra sự cố</td>
+<td>Sự kiện</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C06">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C06</div>
+<h2 style="margin-top:10px">Giải quyết vấn đề (5Why/PDCA/CAPA)</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C06-M1</code></td>
+<td><strong>Tỷ lệ CAPA đóng đúng hạn</strong></td>
+<td>Tỷ lệ CAPA được đóng đúng hạn theo kế hoạch (gồm xác minh hiệu lực).</td>
+<td><code>(CAPA đóng đúng hạn / Tổng CAPA) * 100</code></td>
+<td>CAPA tracker</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C06-M2</code></td>
+<td><strong>Thời gian phản ứng containment</strong></td>
+<td>Thời gian từ lúc phát hiện lỗi đến khi cô lập/containment hoàn tất.</td>
+<td><code>Avg(hours)</code></td>
+<td>NCR/CAPA log</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=24h</td>
+<td>&lt;=8h</td>
+<td>&lt;=4h</td>
+<td>&lt;=2h</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C06-M3</code></td>
+<td><strong>Điểm chất lượng phân tích nguyên nhân (RCA score)</strong></td>
+<td>Điểm đánh giá chất lượng 5Why/Fishbone: có dữ liệu, loại trừ, logic rõ.</td>
+<td><code>Chấm theo rubric (0–100)</code></td>
+<td>Biên bản 8D/5Why</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=70</td>
+<td>&gt;=80</td>
+<td>&gt;=90</td>
+<td>&gt;=95</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C06-M4</code></td>
+<td><strong>Tỷ lệ lỗi tái diễn sau CAPA</strong></td>
+<td>Tỷ lệ lỗi tái diễn trong 90 ngày sau CAPA.</td>
+<td><code>(Lỗi tái diễn / Tổng CAPA) * 100</code></td>
+<td>NCR database</td>
+<td>Quý</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=15%</td>
+<td>&lt;=10%</td>
+<td>&lt;=5%</td>
+<td>&lt;=3%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C06-M5</code></td>
+<td><strong>Bỏ qua xử lý lỗi</strong></td>
+<td>Không lập NCR/CAPA khi phát hiện lỗi; hoặc tự ý sửa không ghi nhận.</td>
+<td><code>Yes/No</code></td>
+<td>QA đánh giá</td>
+<td>Sự kiện</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C07">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C07</div>
+<h2 style="margin-top:10px">Cải tiến liên tục (Kaizen/Lean)</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C07-M1</code></td>
+<td><strong>Số Kaizen/Tháng (hợp lệ)</strong></td>
+<td>Số lập yêu cầu cải tiến có mô tả vấn đề–giải pháp–lợi ích–thử nghiệm.</td>
+<td><code>Đếm # kaizen được duyệt</code></td>
+<td>Kaizen log</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=1/quý</td>
+<td>&gt;=1/tháng</td>
+<td>&gt;=2/tháng</td>
+<td>&gt;=4/tháng</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C07-M2</code></td>
+<td><strong>Tỷ lệ Kaizen được triển khai</strong></td>
+<td>Tỷ lệ lập yêu cầu cải tiến được triển khai thực tế (không chỉ ý tưởng).</td>
+<td><code>(Kaizen triển khai / Kaizen duyệt) * 100</code></td>
+<td>Kaizen log</td>
+<td>Quý</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=50%</td>
+<td>&gt;=60%</td>
+<td>&gt;=70%</td>
+<td>&gt;=80%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C07-M3</code></td>
+<td><strong>Giá trị tiết kiệm (ước tính)</strong></td>
+<td>Giá trị tiết kiệm thời gian/chi phí/scrap từ Kaizen (đã xác minh).</td>
+<td><code>Σ (Giờ tiết kiệm * cost/hr) + Σ (Scrap giảm * cost)</code></td>
+<td>Báo cáo Kaizen + xác minh Finance/QA</td>
+<td>Quý</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=1 triệu/quý</td>
+<td>&gt;=3 triệu/quý</td>
+<td>&gt;=5 triệu/quý</td>
+<td>&gt;=10 triệu/quý</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C07-M4</code></td>
+<td><strong>OEE/hiệu suất cải thiện khu vực</strong></td>
+<td>Mức cải thiện chỉ số OEE hoặc throughput sau cải tiến (khi áp dụng).</td>
+<td><code>Î”OEE = OEE_after - OEE_before</code></td>
+<td>Sản xuất report</td>
+<td>Quý</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=0</td>
+<td>&gt;=+1%</td>
+<td>&gt;=+2%</td>
+<td>&gt;=+3%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C07-M5</code></td>
+<td><strong>Cải tiến gây rủi ro (thay đổi không kiểm soát)</strong></td>
+<td>Thực hiện thay đổi không đánh giá rủi ro, không cập nhật SOP/đào tạo.</td>
+<td><code>Yes/No</code></td>
+<td>QA đánh giá</td>
+<td>Sự kiện</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C08">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C08</div>
+<h2 style="margin-top:10px">Tư duy dữ liệu &amp; sử dụng hệ thống (ERP/Excel)</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C08-M1</code></td>
+<td><strong>Tỷ lệ nhập liệu ERP đúng &amp; đủ</strong></td>
+<td>Tỷ lệ giao dịch/phiếu được nhập đúng trường bắt buộc, đúng thời điểm.</td>
+<td><code>(Giao dịch đúng/đủ / Tổng giao dịch) * 100</code></td>
+<td>ERP logs / kiểm tra chéo</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C08-M2</code></td>
+<td><strong>Lỗi dữ liệu (data error) / tháng</strong></td>
+<td>Số lỗi dữ liệu gây sai kế hoạch, sai tồn kho, sai báo cáo.</td>
+<td><code>Đếm # lỗi</code></td>
+<td>Audit dữ liệu</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=4</td>
+<td>&lt;=2</td>
+<td>&lt;=1</td>
+<td>&lt;=0</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C08-M3</code></td>
+<td><strong>Báo cáo KPI đúng hạn</strong></td>
+<td>Tỷ lệ báo cáo KPI/ca/tuần được nộp đúng hạn.</td>
+<td><code>(Báo cáo đúng hạn / Tổng báo cáo) * 100</code></td>
+<td>Email/drive</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C08-M4</code></td>
+<td><strong>Chất lượng file Excel</strong></td>
+<td>File có cấu trúc, dùng công thức đúng, khóa dữ liệu, có version.</td>
+<td><code>Chấm theo rubric (0–100)</code></td>
+<td>Review bởi quản lý</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=70</td>
+<td>&gt;=80</td>
+<td>&gt;=90</td>
+<td>&gt;=95</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C08-M5</code></td>
+<td><strong>Gian dối dữ liệu</strong></td>
+<td>Bất kỳ hành vi chỉnh số liệu để “đẹp KPI”, che giấu lỗi.</td>
+<td><code>Yes/No</code></td>
+<td>Điều tra QA/HR</td>
+<td>Sự kiện</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C09">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C09</div>
+<h2 style="margin-top:10px">Quản lý thời gian – ưu tiên – đúng hạn</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C09-M1</code></td>
+<td><strong>OTD (On-time delivery) task</strong></td>
+<td>Tỷ lệ công việc/công đoạn hoàn thành đúng kế hoạch đã cam kết.</td>
+<td><code>(Số task đúng hạn / Tổng task) * 100</code></td>
+<td>Sản xuất plan / Kanban</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=85%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C09-M2</code></td>
+<td><strong>WIP Aging</strong></td>
+<td>Tỷ lệ lệnh/chi tiết tồn tại quá “ngưỡng tuổi” cho phép ở công đoạn.</td>
+<td><code>(WIP quá hạn / Tổng WIP) * 100</code></td>
+<td>ERP/WIP board</td>
+<td>Tuần</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=15%</td>
+<td>&lt;=10%</td>
+<td>&lt;=7%</td>
+<td>&lt;=5%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C09-M3</code></td>
+<td><strong>Tỷ lệ đổi ưu tiên không kiểm soát</strong></td>
+<td>Số lần đổi ưu tiên gây gián đoạn mà không có lý do/duyệt.</td>
+<td><code>Đếm #</code></td>
+<td>Planner log</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=4</td>
+<td>&lt;=3</td>
+<td>&lt;=2</td>
+<td>&lt;=1</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C09-M4</code></td>
+<td><strong>Tỷ lệ trễ do cá nhân</strong></td>
+<td>Tỷ lệ trễ được xác định nguyên nhân trực tiếp do cá nhân (không phải hệ thống).</td>
+<td><code>(Lần trễ do cá nhân / Tổng lần trễ) * 100</code></td>
+<td>Post-mortem</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=30%</td>
+<td>&lt;=20%</td>
+<td>&lt;=10%</td>
+<td>&lt;=5%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C09-M5</code></td>
+<td><strong>Trễ deadline khách hàng (commit miss)</strong></td>
+<td>Miss cam kết giao hàng do không escalation kịp thời (được “gate” theo dự án).</td>
+<td><code>Đếm # miss</code></td>
+<td>OTD to customer</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=1</td>
+<td>&lt;=1</td>
+<td>&lt;=0</td>
+<td>&lt;=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C10">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C10</div>
+<h2 style="margin-top:10px">Hiểu quy trình Job Order CNC (RFQ → Cash)</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C10-M1</code></td>
+<td><strong>Tỷ lệ Job Packet đầy đủ</strong></td>
+<td>Tỷ lệ bộ hồ sơ lệnh (drawing rev, BOM, router, QC plan) đầy đủ trước khi chạy.</td>
+<td><code>(Job packet đầy đủ / Tổng job) * 100</code></td>
+<td>Checklist phát hành lệnh</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=85%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C10-M2</code></td>
+<td><strong>Tỷ lệ lỗi bước quy trình</strong></td>
+<td>Số lỗi do bỏ sót bước RFQ→PO→Plan→Purchase→Produce→QC→Ship→Invoice.</td>
+<td><code>Đếm # lỗi bước</code></td>
+<td>Ops review</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=4</td>
+<td>&lt;=2</td>
+<td>&lt;=1</td>
+<td>&lt;=0</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C10-M3</code></td>
+<td><strong>Lead time adherence</strong></td>
+<td>Tỷ lệ đơn hàng đạt lead time cam kết (internal).</td>
+<td><code>(Job đúng lead time / Tổng job) * 100</code></td>
+<td>ERP</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80%</td>
+<td>&gt;=85%</td>
+<td>&gt;=90%</td>
+<td>&gt;=92%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C10-M4</code></td>
+<td><strong>Tỷ lệ rework do thiếu thông tin lệnh</strong></td>
+<td>Tỷ lệ rework bắt nguồn từ thiếu/sai thông tin job order.</td>
+<td><code>(Rework do info / Tổng rework) * 100</code></td>
+<td>NCR</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=20%</td>
+<td>&lt;=15%</td>
+<td>&lt;=10%</td>
+<td>&lt;=5%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C10-M5</code></td>
+<td><strong>Ship sai / thiếu chứng từ</strong></td>
+<td>Giao sai hàng, thiếu CoC/MTR/IR theo yêu cầu khách.</td>
+<td><code>Đếm # sự cố</code></td>
+<td>Customer complaint / nhật ký giao hàng</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C11">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C11</div>
+<h2 style="margin-top:10px">Hiểu khách hàng &amp; thương mại</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C11-M1</code></td>
+<td><strong>Quote turnaround time</strong></td>
+<td>Thời gian từ khi nhận RFQ đến khi gửi báo giá.</td>
+<td><code>Avg(hours) hoặc % trong SLA</code></td>
+<td>CRM/Email log</td>
+<td>Tuần</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=72h</td>
+<td>&lt;=48h</td>
+<td>&lt;=24h</td>
+<td>&lt;=12h</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C11-M2</code></td>
+<td><strong>Tỷ lệ win (Win rate)</strong></td>
+<td>Tỷ lệ báo giá chuyển đổi thành PO (theo nhóm khách phù hợp).</td>
+<td><code>(PO / Quote) * 100</code></td>
+<td>CRM/ERP</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=15%</td>
+<td>&gt;=20%</td>
+<td>&gt;=25%</td>
+<td>&gt;=30%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C11-M3</code></td>
+<td><strong>Customer satisfaction (CSAT)</strong></td>
+<td>Điểm hài lòng khách hàng sau giao hàng/giải quyết vấn đề.</td>
+<td><code>Trung bình điểm khảo sát 1–5</code></td>
+<td>Survey</td>
+<td>Quý</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=4.0</td>
+<td>&gt;=4.2</td>
+<td>&gt;=4.4</td>
+<td>&gt;=4.6</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C11-M4</code></td>
+<td><strong>Thời gian xử lý complaint</strong></td>
+<td>Thời gian từ khi nhận complaint đến khi phản hồi containment &amp; 8D sơ bộ.</td>
+<td><code>Avg(days)</code></td>
+<td>8D log</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=7d</td>
+<td>&lt;=5d</td>
+<td>&lt;=3d</td>
+<td>&lt;=2d</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C11-M5</code></td>
+<td><strong>Vi phạm NDA/điều khoản thương mại</strong></td>
+<td>Gửi thông tin khách hàng ra ngoài, sai điều khoản, cam kết sai.</td>
+<td><code>Yes/No</code></td>
+<td>Incident report</td>
+<td>Sự kiện</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C12">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C12</div>
+<h2 style="margin-top:10px">Tư duy chi phí &amp; kiểm soát vật tư/hao phí</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C12-M1</code></td>
+<td><strong>Scrap cost/Tháng</strong></td>
+<td>Chi phí scrap quy đổi do lỗi thao tác/thiết lập/kiểm soát.</td>
+<td><code>Î£ (Qty scrap * cost/unit)</code></td>
+<td>NCR + cost sheet</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=x*</td>
+<td>&lt;=0.8x</td>
+<td>&lt;=0.6x</td>
+<td>&lt;=0.5x</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C12-M2</code></td>
+<td><strong>Material yield</strong></td>
+<td>Tỷ lệ sử dụng vật tư hiệu quả (giảm hao hụt).</td>
+<td><code>(Khối lượng/chiều dài sử dụng hữu ích / Tổng xuất kho) * 100</code></td>
+<td>Kho + BOM</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=92%</td>
+<td>&gt;=94%</td>
+<td>&gt;=96%</td>
+<td>&gt;=97%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C12-M3</code></td>
+<td><strong>Tool cost per part</strong></td>
+<td>Chi phí dao cụ/chi tiết theo nhóm máy/công đoạn.</td>
+<td><code>(Tổng chi phí dao / Số sp) </code></td>
+<td>Tool life log + mua hàng</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=std*</td>
+<td>&lt;=0.95*std</td>
+<td>&lt;=0.9*std</td>
+<td>&lt;=0.85*std</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C12-M4</code></td>
+<td><strong>Overtime ratio</strong></td>
+<td>Tỷ lệ OT so với giờ làm chuẩn do kế hoạch/hiệu suất/khẩn.</td>
+<td><code>OT hours / Regular hours</code></td>
+<td>Timesheet</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=15%</td>
+<td>&lt;=12%</td>
+<td>&lt;=10%</td>
+<td>&lt;=8%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C12-M5</code></td>
+<td><strong>Lãng phí do “mất kiểm soát vật tư”</strong></td>
+<td>Mất mát vật tư, dùng sai vật tư, không truy vết.</td>
+<td><code>Yes/No hoặc đếm #</code></td>
+<td>Inventory đánh giá</td>
+<td>Sự kiện/Tháng</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C13">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C13</div>
+<h2 style="margin-top:10px">Quản lý rủi ro &amp; kiểm soát thay đổi (Revision)</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C13-M1</code></td>
+<td><strong>Số lỗi revision (sai phiên bản bản vẽ)</strong></td>
+<td>Số lỗi dùng sai revision dẫn đến scrap/rework/ship sai.</td>
+<td><code>Đếm #</code></td>
+<td>NCR + ECO</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=2</td>
+<td>&lt;=1</td>
+<td>&lt;=0</td>
+<td>&lt;=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C13-M2</code></td>
+<td><strong>Tỷ lệ ECO/Change request xử lý đúng hạn</strong></td>
+<td>Tỷ lệ yêu cầu thay đổi được xử lý đúng hạn (review–phê duyệt–thông báo).</td>
+<td><code>(ECO đúng hạn / Tổng ECO) * 100</code></td>
+<td>ECO log</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C13-M3</code></td>
+<td><strong>FMEA coverage</strong></td>
+<td>Tỷ lệ job/part quan trọng có FMEA hoặc risk review trước khi chạy.</td>
+<td><code>(Job có risk review / Job yêu cầu) * 100</code></td>
+<td>Planner/Kỹ thuật</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=70%</td>
+<td>&gt;=80%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C13-M4</code></td>
+<td><strong>Số thay đổi không kiểm soát</strong></td>
+<td>Số thay đổi thực tế không qua quy trình (không ECO, không thông báo).</td>
+<td><code>Đếm #</code></td>
+<td>QA đánh giá</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=2</td>
+<td>&lt;=1</td>
+<td>&lt;=0</td>
+<td>&lt;=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C13-M5</code></td>
+<td><strong>Thời gian cập nhật hồ sơ sau thay đổi</strong></td>
+<td>Thời gian từ khi duyệt ECO đến khi update router, QC plan, work instruction.</td>
+<td><code>Avg(days)</code></td>
+<td>ECO log</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=5d</td>
+<td>&lt;=3d</td>
+<td>&lt;=2d</td>
+<td>&lt;=1d</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C14">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C14</div>
+<h2 style="margin-top:10px">Đọc hiểu bản vẽ 2D/3D – dung sai – GD&amp;T cơ bản</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C14-M1</code></td>
+<td><strong>Tỷ lệ lỗi do đọc sai bản vẽ</strong></td>
+<td>Tỷ lệ NCR/rework do hiểu sai kích thước, dung sai, datum, note.</td>
+<td><code>(Lỗi do đọc sai / Tổng lỗi) * 100</code></td>
+<td>NCR + RCA</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=15%</td>
+<td>&lt;=10%</td>
+<td>&lt;=5%</td>
+<td>&lt;=3%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C14-M2</code></td>
+<td><strong>Điểm CTQ list (đầy đủ &amp; đúng)</strong></td>
+<td>Điểm đánh giá danh sách CTQ trích từ bản vẽ (datums, tolerances, finish, notes).</td>
+<td><code>Chấm theo checklist (0–100)</code></td>
+<td>Review Eng/QC</td>
+<td>Theo job</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=70</td>
+<td>&gt;=80</td>
+<td>&gt;=90</td>
+<td>&gt;=95</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C14-M3</code></td>
+<td><strong>FAI pass rate lần 1</strong></td>
+<td>Tỷ lệ FAI đạt ngay lần đầu đối với part mới/part thay đổi.</td>
+<td><code>(FAI OK 1st / Tổng FAI) * 100</code></td>
+<td>FAI report</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=70%</td>
+<td>&gt;=80%</td>
+<td>&gt;=90%</td>
+<td>&gt;=92%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C14-M4</code></td>
+<td><strong>Tỷ lệ câu hỏi làm rõ (clarification) kịp thời</strong></td>
+<td>Tỷ lệ câu hỏi làm rõ gửi trước khi gia công, thay vì “tự đoán”.</td>
+<td><code>(Số clarification trước chạy / Tổng clarification) * 100</code></td>
+<td>Email/CRM</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C14-M5</code></td>
+<td><strong>Sai đơn vị/tiêu chuẩn (mm/inch, ISO/ASME)</strong></td>
+<td>Dùng sai hệ đơn vị/tiêu chuẩn gây sai số.</td>
+<td><code>Đếm # sự cố</code></td>
+<td>QA incident</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C15">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C15</div>
+<h2 style="margin-top:10px">Kiến thức vật liệu &amp; xử lý (heat treat/anodize/plating…)</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C15-M1</code></td>
+<td><strong>Tỷ lệ lỗi vật liệu/finish</strong></td>
+<td>Tỷ lệ lỗi do sai vật liệu, sai condition, sai xử lý bề mặt/nhiệt.</td>
+<td><code>(Lỗi vật liệu/finish / Tổng lỗi) * 100</code></td>
+<td>NCR + supplier doc</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=10%</td>
+<td>&lt;=7%</td>
+<td>&lt;=4%</td>
+<td>&lt;=2%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C15-M2</code></td>
+<td><strong>Tỷ lệ chứng chỉ vật liệu/finish đầy đủ</strong></td>
+<td>Tỷ lệ đơn hàng có đủ MTR/CoC/finish cert đúng heat/lot.</td>
+<td><code>(Bộ cert đủ / Tổng bộ yêu cầu) * 100</code></td>
+<td>Kho/QC doc pack</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C15-M3</code></td>
+<td><strong>Điểm chọn thông số cắt phù hợp vật liệu</strong></td>
+<td>Điểm đánh giá lựa chọn speed/feed, dao, coolant theo vật liệu.</td>
+<td><code>Chấm theo review (0–100)</code></td>
+<td>CAM review / machining log</td>
+<td>Theo job</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=70</td>
+<td>&gt;=80</td>
+<td>&gt;=90</td>
+<td>&gt;=95</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C15-M4</code></td>
+<td><strong>Tỷ lệ lỗi do biến dạng/nhiệt</strong></td>
+<td>Lỗi do biến dạng sau gia công/heat treat (warpage), không dự phòng allowance.</td>
+<td><code>(Lỗi warpage / Tổng lỗi) * 100</code></td>
+<td>NCR</td>
+<td>Quý</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=10%</td>
+<td>&lt;=7%</td>
+<td>&lt;=5%</td>
+<td>&lt;=3%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C15-M5</code></td>
+<td><strong>Tỷ lệ phế do ăn mòn/bẩn/contamination</strong></td>
+<td>Lỗi do bảo quản vật liệu sai, nhiễm bẩn trước khi plating/anodize.</td>
+<td><code>Đếm #</code></td>
+<td>QA + finishing supplier feedback</td>
+<td>Quý</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=2</td>
+<td>&lt;=1</td>
+<td>&lt;=0</td>
+<td>&lt;=0</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C16">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C16</div>
+<h2 style="margin-top:10px">Đo lường – kiểm tra – tiêu chuẩn QC/FAI</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C16-M1</code></td>
+<td><strong>Tỷ lệ kiểm tra theo plan</strong></td>
+<td>Tỷ lệ đặc tính trong inspection plan được kiểm tra &amp; ghi nhận đúng.</td>
+<td><code>(Đặc tính đo đủ / Đặc tính yêu cầu) * 100</code></td>
+<td>Inspection report</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=95%</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td>&gt;=99.5%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C16-M2</code></td>
+<td><strong>Lỗi đo lường (measurement error) bị đánh giá phát hiện</strong></td>
+<td>Số lỗi do chọn sai dụng cụ, sai phương pháp, sai đơn vị, sai đọc.</td>
+<td><code>Đếm # lỗi</code></td>
+<td>QA đánh giá / gage R&amp;R</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=3</td>
+<td>&lt;=2</td>
+<td>&lt;=1</td>
+<td>&lt;=0</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C16-M3</code></td>
+<td><strong>Calibration compliance</strong></td>
+<td>Tỷ lệ dụng cụ đo được hiệu chuẩn đúng hạn, không dùng quá hạn.</td>
+<td><code>(Dụng cụ đúng hạn / Tổng dụng cụ) * 100</code></td>
+<td>Calibration system</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td>&gt;=99.5%</td>
+<td>&gt;=99.7%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C16-M4</code></td>
+<td><strong>FAI/Inspection report đúng hạn</strong></td>
+<td>Tỷ lệ báo cáo FAI/IR phát hành đúng hạn theo cam kết giao hàng.</td>
+<td><code>(IR đúng hạn / Tổng IR) * 100</code></td>
+<td>QA log</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=85%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C16-M5</code></td>
+<td><strong>Gian dối kết quả đo</strong></td>
+<td>Sửa số liệu đo, ghi khống, bỏ qua đặc tính NG.</td>
+<td><code>Yes/No</code></td>
+<td>QA/HR</td>
+<td>Sự kiện</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C17">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C17</div>
+<h2 style="margin-top:10px">Năng lực kỹ thuật theo vị trí (CNC/Setup/CAM)</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C17-M1</code></td>
+<td><strong>Tỷ lệ machine crash / sự cố nghiêm trọng</strong></td>
+<td>Số sự cố va chạm, gãy dao lớn, hỏng spindle do thao tác.</td>
+<td><code>Đếm #</code></td>
+<td>Downtime log</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=1</td>
+<td>&lt;=0</td>
+<td>&lt;=0</td>
+<td>&lt;=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C17-M2</code></td>
+<td><strong>Setup time vs standard</strong></td>
+<td>Tỷ lệ thời gian setup thực tế so với định mức/chuẩn.</td>
+<td><code>Setup actual / Setup standard</code></td>
+<td>Time study / report</td>
+<td>Tuần</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=1.2</td>
+<td>&lt;=1.1</td>
+<td>&lt;=1.05</td>
+<td>&lt;=1.0</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C17-M3</code></td>
+<td><strong>Cycle time vs plan</strong></td>
+<td>Tỷ lệ cycle time thực tế so với plan sau tối ưu.</td>
+<td><code>Cycle actual / Cycle plan</code></td>
+<td>Machine data</td>
+<td>Tuần</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=1.15</td>
+<td>&lt;=1.1</td>
+<td>&lt;=1.05</td>
+<td>&lt;=1.0</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C17-M4</code></td>
+<td><strong>Tool life stability</strong></td>
+<td>Độ ổn định tuổi dao (giảm biến động, giảm gãy dao).</td>
+<td><code>CV(tool life) hoặc # gãy dao/100h</code></td>
+<td>Tool life log</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=5/100h</td>
+<td>&lt;=3/100h</td>
+<td>&lt;=2/100h</td>
+<td>&lt;=1/100h</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C17-M5</code></td>
+<td><strong>Tỷ lệ scrap do set-up/program</strong></td>
+<td>Tỷ lệ scrap do sai offset, sai gá, sai program.</td>
+<td><code>(Scrap setup/program / Tổng scrap) * 100</code></td>
+<td>NCR</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=20%</td>
+<td>&lt;=15%</td>
+<td>&lt;=10%</td>
+<td>&lt;=5%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C18">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C18</div>
+<h2 style="margin-top:10px">Chuỗi cung ứng – mua hàng – logistics (nhận/xuất/traceability)</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C18-M1</code></td>
+<td><strong>Receiving accuracy</strong></td>
+<td>Tỷ lệ nhận hàng đúng số lượng, đúng mã, đúng chứng từ.</td>
+<td><code>(Lô nhận đúng / Tổng lô) * 100</code></td>
+<td>Incoming log</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=95%</td>
+<td>&gt;=97%</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C18-M2</code></td>
+<td><strong>Inventory accuracy</strong></td>
+<td>Độ chính xác tồn kho qua kiểm kê vòng (cycle count).</td>
+<td><code>(Số dòng đúng / Tổng dòng kiểm) * 100</code></td>
+<td>Cycle count</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=97%</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td>&gt;=99.5%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C18-M3</code></td>
+<td><strong>OTD của nhà cung cấp</strong></td>
+<td>Tỷ lệ giao hàng đúng hạn của nhà cung cấp chủ lực.</td>
+<td><code>(PO line đúng hạn / Tổng PO line) * 100</code></td>
+<td>Purchasing log</td>
+<td>Tháng</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80%</td>
+<td>&gt;=85%</td>
+<td>&gt;=90%</td>
+<td>&gt;=92%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C18-M4</code></td>
+<td><strong>Shipping accuracy</strong></td>
+<td>Tỷ lệ xuất hàng đúng mã, đúng qty, đúng label, đúng doc pack.</td>
+<td><code>(Shipment đúng / Tổng shipment) * 100</code></td>
+<td>Shipping checklist</td>
+<td>Tuần</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=98%</td>
+<td>&gt;=99%</td>
+<td>&gt;=99.5%</td>
+<td>&gt;=99.7%</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+<tr>
+<td><code>C18-M5</code></td>
+<td><strong>Lỗi traceability</strong></td>
+<td>Thiếu/đứt traceability heat/lot/serial theo yêu cầu khách hàng.</td>
+<td><code>Đếm # sự cố</code></td>
+<td>QA đánh giá</td>
+<td>Tháng</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section><section class="card" id="C19">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>C19</div>
+<h2 style="margin-top:10px">Lãnh đạo &amp; huấn luyện (Coaching)</h2>
+<p class="muted">Bảng dưới là <strong>Định lượng áp dụng</strong> theo L1–L4. Khi triển khai thực tế, HESEM cần chốt “baseline” 4–8 tuần để hiệu chỉnh ngưỡng theo từng nhóm máy/khách hàng.</p>
+</div>
+<div class="note">
+<strong>Gating (Gate) nghĩa là:</strong>
+<div>Chỉ cần <em>vi phạm</em> metric Gate (ví dụ: dùng sai revision, customer escape, dùng dụng cụ đo quá hạn…) thì <strong>không được công nhận</strong> level/không được xét tăng level trong kỳ, và kích hoạt CAPA bắt buộc.</div>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Metric ID</th>
+<th>Metric</th>
+<th>Định nghĩa / Mục đích</th>
+<th style="min-width:220px">Công thức đo</th>
+<th style="min-width:170px">Nguồn dữ liệu</th>
+<th style="width:90px">Tần suất</th>
+<th style="width:60px">Xu hướng</th>
+<th style="width:90px">L1</th>
+<th style="width:90px">L2</th>
+<th style="width:90px">L3</th>
+<th style="width:90px">L4</th>
+<th style="width:70px">Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C19-M1</code></td>
+<td><strong>Tỷ lệ hoàn thành kế hoạch đào tạo đội nhóm</strong></td>
+<td>Tỷ lệ nhân viên hoàn thành training plan &amp; OJT theo tháng/quý.</td>
+<td><code>(NV hoàn thành / NV yêu cầu) * 100</code></td>
+<td>Training matrix</td>
+<td>Tháng/Quý</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=80%</td>
+<td>&gt;=85%</td>
+<td>&gt;=90%</td>
+<td>&gt;=92%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C19-M2</code></td>
+<td><strong>Coverage skill matrix</strong></td>
+<td>Tỷ lệ vị trí đạt “level tối thiểu” theo skill matrix.</td>
+<td><code>(Vị trí đạt / Tổng vị trí) * 100</code></td>
+<td>Ma trận năng lực</td>
+<td>Quý</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=75%</td>
+<td>&gt;=85%</td>
+<td>&gt;=90%</td>
+<td>&gt;=95%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C19-M3</code></td>
+<td><strong>Tỷ lệ nghỉ việc (turnover) nhóm</strong></td>
+<td>Tỷ lệ nghỉ việc tự nguyện trong nhóm (điều chỉnh theo thị trường).</td>
+<td><code>(Số nghỉ / Bình quân nhân sự) * 100</code></td>
+<td>HR</td>
+<td>Quý</td>
+<td style="text-align:center">↓</td>
+<td>&lt;=10%</td>
+<td>&lt;=8%</td>
+<td>&lt;=6%</td>
+<td>&lt;=5%</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C19-M4</code></td>
+<td><strong>Điểm “coaching effectiveness”</strong></td>
+<td>Điểm đánh giá hiệu quả kèm cặp (qua phản hồi nhân viên + kết quả).</td>
+<td><code>Khảo sát + KPI improvement (0–100)</code></td>
+<td>HR survey</td>
+<td>Quý</td>
+<td style="text-align:center">↑</td>
+<td>&gt;=70</td>
+<td>&gt;=80</td>
+<td>&gt;=90</td>
+<td>&gt;=95</td>
+<td style="text-align:center"><span class="tag teal">—</span></td>
+</tr>
+<tr>
+<td><code>C19-M5</code></td>
+<td><strong>Sự cố quản lý nghiêm trọng</strong></td>
+<td>Bạo lực, quấy rối, vi phạm an toàn nghiêm trọng do quản lý bỏ qua.</td>
+<td><code>Yes/No</code></td>
+<td>HR/HSE</td>
+<td>Sự kiện</td>
+<td style="text-align:center">↓</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td>=0</td>
+<td style="text-align:center"><span class="tag orange">Gate</span></td>
+</tr>
+</tbody></table>
+</section></div></div></div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ORG-RACI-001 — RACI Master Matrix | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+/* PAGE BREAK & OVERFLOW FIX */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .form-sheet, .lane, .legend, .req, .vstep, .auth-grid, .backup-card, .org-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header { page-break-inside: avoid; break-inside: avoid; }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
+.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
+.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
+.raci-A {background:#fff5f5; color:#c92a2a;}
+.raci-R {background:#e7f5ff; color:#1864ab;}
+.raci-C {background:#fff9db; color:#e67700;}
+.raci-I {background:#ebfbee; color:#2b8a3e;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
+.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
+.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
+.doc-link-list {list-style:none; margin:0; padding:0;}
+.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
+.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
+.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
+.svg-wrap,.org-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
+.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
+.org-tree{display:flex;flex-direction:column;gap:16px;margin:8px 0;}
+.org-level{display:grid;gap:14px;}
+.org-level.cols-1{grid-template-columns:1fr;}
+.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr));}
+.org-card{border:1px solid var(--ln);border-top:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
+.org-card h3{font-size:14px;color:var(--navy);margin:0 0 4px;}
+.org-card p{margin:4px 0;font-size:12px;}
+.org-row{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);margin:12px 0;}
+.org-row h3{margin:0 0 8px;font-size:13px;color:var(--navy);}
+.badge-soft{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:10px;font-weight:700;margin-right:6px;margin-bottom:6px;}
+.kpi-box{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);margin:8px 0;}
+.kpi-box b{display:block;font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
+.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
+.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left:4px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
+.role-boundary{border:1px solid #cfe0ff;border-left:4px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
+.phase-card{border:1px solid var(--ln);border-left:4px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
+.phase-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
+.phase-card p:last-child,.role-boundary p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
+.small-note{font-size:12px;color:var(--ink2);}
+
+
+
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
+.toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.toc-grid a{display:block;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2)}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg)}
+.metric-card .value{font-weight:800;font-size:16px;color:var(--navy);margin:6px 0}
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+.check-item{border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
+.process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.mini-note{font-size:12px;color:var(--ink2)}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+.decision-table th,.decision-table td{vertical-align:top}
+@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
+
+.doc-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+.doc-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.card h3{margin-top:0}
+.small{font-size:12px;color:var(--ink3);}
+.tight p{margin:8px 0;}
+.legend-row{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 18px;}
+.legend-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:8px 10px;font-size:12px;}
+.legend-swatch{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;border:1px solid var(--ln2);}
+.kpi-good{background:#ebfbee;color:#2b8a3e}
+.kpi-warn{background:#fff9db;color:#e67700}
+.kpi-bad{background:#fff5f5;color:#c92a2a}
+.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;white-space:nowrap}
+.matrix-table{width:100%;border-collapse:collapse;font-size:12px;}
+.matrix-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--navy);background:var(--th-bg);border:1px solid var(--th-bdr);text-transform:uppercase;letter-spacing:.3px;vertical-align:bottom}
+.matrix-table td{padding:8px 10px;border:1px solid var(--ln2);vertical-align:top;line-height:1.45}
+.matrix-table tbody tr:nth-child(even){background:#fafcfe}
+.matrix-table .section-row td{background:var(--navy)!important;color:#fff;font-weight:700;letter-spacing:.4px}
+.center{text-align:center}
+.nowrap{white-space:nowrap}
+.cell-a{background:#e3f2fd;color:#1565c0;font-weight:800;text-align:center}
+.cell-p{background:#fff3e0;color:#e65100;font-weight:700;text-align:center}
+.cell-v{background:#f3e5f5;color:#7b1fa2;font-weight:700;text-align:center}
+.cell-c{background:#fff9db;color:#e67700;font-weight:700;text-align:center}
+.cell-i{background:#e8f5e9;color:#2e7d32;font-weight:600;text-align:center}
+.cell-x{background:#f8f9fa;color:#868e96;text-align:center}
+.badge-strip{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.badge-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--ln);padding:6px 10px;border-radius:999px;font-size:12px}
+.footer-note{margin-top:18px;padding:14px 16px;border:1px dashed var(--ln2);border-radius:12px;background:var(--bg2);color:var(--ink2)}
+
+
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
+        </div>
+        <div class="title">
+          <strong>ORG-RACI-001 — RACI Master Matrix</strong>
+          <span class="sub-vn">Trang tóm tắt để định hướng role clusters và đường handoff trước khi mở bản RACI chi tiết</span>
+        </div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>ORG-RACI-001</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="doc-content" id="docContent">
+        <div class="form-sheet">
+          <div class="iso-map">
+            <div class="iso-title">Department / annex control intent</div>
+            <div class="req"><span class="req-tag shall">PHẢI</span><div>Trang này chỉ tóm tắt role clusters và handoff cốt lõi. RACI chi tiết ở mức hoạt động và stewardship nằm tại ANNEX-QMS-026 bản active.</div></div><div class="req"><span class="req-tag should">NÊN</span><div>Dùng trang này để orientation nhanh cho nhân sự mới hoặc khi mở đầu workshop liên chức năng.</div></div>
+          </div>
+          <div class="preface-block">
+            <div class="grid-2">
+              <div>
+                <p><b>Nhóm người dùng</b></p>
+                <div><span class="inline-tag">All functional owners</span><span class="inline-tag">New managers / supervisors</span><span class="inline-tag">Cross-functional review team</span></div>
+              </div>
+              <div>
+                <p><b>Tài liệu chính</b></p>
+                <div><span class="inline-tag">ANNEX-QMS-026</span><span class="inline-tag">ANNEX-QMS-025</span><span class="inline-tag">ANNEX-QMS-028</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. Tóm tắt nhóm vai trò chính</a><a href="#s2">2. Handoff cốt lõi</a><a href="#s3">3. Bản chi tiết cần đọc cùng</a></div></div>
+          <h2 class="h2" id="s1">1. Tóm tắt nhóm vai trò chính</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:32%"/><col style="width:50%"/></colgroup><thead><tr><th>Role cluster</th><th>Vai trò chính</th><th>Mục đích sử dụng</th></tr></thead><tbody><tr><td>Commercial</td><td>Customer Service, Estimator, CEO</td><td>RFQ, order data, customer communications, commercial commitments.</td></tr><tr><td>Engineering</td><td>Engineering Lead/Manager, Process Engineer, CAM/NC Programmer</td><td>Technical readiness, change control, release package.</td></tr><tr><td>Operations</td><td>Production Director, Planner, Workshop Manager</td><td>Capacity, dispatch, recovery, execution control.</td></tr><tr><td>Quality</td><td>QA Manager, Quality Engineer, QC Lead/QC, QMS Engineer</td><td>Containment, release, CAPA, document discipline.</td></tr><tr><td>Support</td><td>SCM, Finance, HR, EHS, IT, Epicor</td><td>Materials, money, people, safety, systems and continuity.</td></tr></tbody></table></div><h2 class="h2" id="s2">2. Handoff cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:32%"/><col style="width:68%"/></colgroup><thead><tr><th>Tuyến handoff</th><th>Output tối thiểu</th></tr></thead><tbody><tr><td>RFQ → quote / order review</td><td>Complete customer data, assumptions, technical risks, pricing basis.</td></tr><tr><td>Plan → shopfloor</td><td>Ready job pack, material/tool readiness, schedule priority, gate status.</td></tr><tr><td>Make → inspect → ship</td><td>Genealogy, inspection evidence, release status, pack/ship requirements.</td></tr><tr><td>Ship → invoice / cash</td><td>Final release + ship evidence + billing trigger + AR follow-up.</td></tr><tr><td>People / IT / continuity</td><td>Authorized-to-work, access lifecycle, deputy activation, fallback rules.</td></tr></tbody></table></div><h2 class="h2" id="s3">3. Bản chi tiết cần đọc cùng</h2>
+<p><a href="annex-qms-026-raci-master-matrix.html">ANNEX-QMS-026</a> là bản chuẩn cho RACI chi tiết. Các quyền phê duyệt cuối cùng vẫn do <a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a> điều chỉnh; continuity người thay thế do <a href="annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a> điều chỉnh.</p>
+<div class="footer-note">Trang summary này đã được đồng bộ với cấu trúc role clusters mới và không còn tham chiếu REF legacy.</div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

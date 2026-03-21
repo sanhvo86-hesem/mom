@@ -1,0 +1,836 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SYS-OPS-20 — SOP-QMS-09 First Article Inspection: triggers, AS9102-style discipline, evidence | HESEM OS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>SYS-OPS-20 — SOP-QMS-09 First Article Inspection: triggers, AS9102-style discipline, evidence</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-20</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+
+<!-- 1) Header VI/EN + Form-Header (tách rời) -->
+<div class="doc-content" id="docContent">
+<div class="cover">
+<div class="kicker">HESEM CNC Academy • System Ops • Gate Quality</div>
+<h1 class="h1">SYS-OPS-20</h1>
+<p class="lead">
+ Module này khóa chặt rủi ro “lọt lỗi ngay từ sản phẩm đầu”: sai REV, sai setup, sai dụng cụ đo, thiếu chứng chỉ vật liệu/special process,
+ và bypass gate dẫn tới ship sai. Chuẩn áp dụng: kỷ luật FAI kiểu AS9102 (Form 1–2–3, balloon, truy xuất) kết hợp Evidence Pack của HESEM.
+ </p>
+<div class="grid-2">
+<div class="note">
+<strong>Tài liệu nội bộ áp dụng trực tiếp</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
+<li>SOP-QMS-009 — First Article Inspection / First Piece Control</li>
+<li>ANNEX-QMS-003 — Evidence Pack (Job Dossier + Data Governance)</li>
+</ul>
+<div class="small muted" style="margin-top:8px">
+ Mục tiêu vận hành: <b>No evidence = No gate</b> tại điểm chặn FAI và trước Ship Release.
+ </div>
+</div>
+<div class="note">
+<strong>Đối tượng bắt buộc</strong>
+<div class="small muted" style="margin-top:6px">TargetRoles: Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor</div>
+<div style="margin-top:10px"><strong>Điều kiện tham gia</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
+<li>Đã học module “Revision control &amp; Job Pack discipline” (hoặc đã qua kiểm tra tương đương).</li>
+<li>Đã được cấp quyền truy cập M365 Evidence Pack theo vai trò.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout" style="margin-top:12px">
+<h3>Tuyên thệ chống hời hợt (bắt buộc áp dụng trong lớp &amp; ngoài xưởng)</h3>
+<ul>
+<li>Học để chạy xưởng và audit-ready. Mọi nội dung phải ra quyết định Gate, bàn giao (handoff) và tạo minh chứng.</li>
+<li>Thiếu dữ kiện thực tế của job → ghi <b>M365/SharePoint → HESEM-QMS-SSOT</b> ngay tại chỗ thiếu và dừng Gate tại đó.</li>
+<li>Không có hồ sơ chứng cứ → <b>BLOCK</b> chuyển công đoạn / ship.</li>
+</ul>
+</div>
+</div>
+<!-- 2) Mục đích module & bối cảnh vận hành -->
+<h2 class="h2">2) Mục đích module &amp; bối cảnh vận hành</h2>
+<div class="card">
+<p><strong>Mục đích:</strong> Chuẩn hóa cách kích hoạt, thực hiện, đánh giá và lưu bằng chứng First Article Inspection (FAI) / First Piece Control theo SOP-QMS-09,
+ đạt kỷ luật kiểu AS9102 để chống “lọt lỗi” và chống “thiếu hồ sơ” khi audit/khách hàng kiểm tra.</p>
+<div class="grid-2">
+<div class="note">
+<strong>Khi module được kích hoạt</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
+<li>Khi part mới / lần chạy đầu / chuyển nhà cung ứng / chuyển máy hoặc chuyển xưởng.</li>
+<li>Khi đổi REV bản vẽ/spec/ECO thay đổi fit–form–function hoặc thay đổi CTQ.</li>
+<li>Khi thay đổi program/CAM/post, fixture, routing, dao cụ chiến lược, phương pháp đo CTQ.</li>
+<li>Khi có sự cố: crash, sửa chữa lớn, thay spindle/linear scale, đo OOT, NCR liên quan kích thước CTQ.</li>
+<li>Khi có outsource/special process hoặc yêu cầu FAI từ PO/contract của khách hàng.</li>
+</ul>
+</div>
+<div class="note">
+<strong>Gate mục tiêu</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
+<li>Gate G1: First Piece PASS trước khi chạy loạt.</li>
+<li>Gate G2: FAI PASS (Full/Delta) trước khi release sản xuất hoặc ship khi hợp đồng yêu cầu.</li>
+<li>Gate G5: Ship Release chỉ mở khi Evidence Pack đầy đủ.</li>
+</ul>
+<div class="small muted" style="margin-top:8px">
+ Người chịu trách nhiệm chặn gate: <b>Supervisor + QA</b>. Người tạo record: theo checklist từng bước.
+ </div>
+</div>
+</div>
+<div style="margin-top:10px">
+<strong>Liên kết vận hành bắt buộc</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
+<li>FAI/First Piece gắn trực tiếp với kiểm soát REV, kiểm soát traceability vật liệu, kiểm soát calibration/gage, và kiểm soát outsource/special process.</li>
+<li>FAI là “cổng chặn” ngăn scrap và ngăn ship sai; đồng thời là “cổng chứng cứ” để audit-ready.</li>
+</ul>
+</div>
+</div>
+<div class="card">
+<h3>2.1 Kỷ luật kiểu AS9102 (thực thi trong HESEM, không bỏ sót đặc tính)</h3>
+<div class="grid-2">
+<div class="note">
+<strong>Form 1 — Part Number Accountability</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
+<li>Xác định part/assembly được thực hiện FAI, số job/shipment liên quan.</li>
+<li>Khóa REV: drawing/spec/routing/program.</li>
+<li>Ghi rõ “Baseline” và trạng thái <b>Full</b> hoặc <b>Delta</b>.</li>
+</ul>
+</div>
+<div class="note">
+<strong>Form 2 — Materials / Special Process / Functional Testing</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
+<li>Vật liệu: spec, heat/lot, chứng chỉ đi kèm.</li>
+<li>Special process: nhà cung ứng, spec/finish code, cert khớp lot/serial.</li>
+<li>Functional testing/NDI: phương pháp, tiêu chí PASS/FAIL, báo cáo đính kèm.</li>
+</ul>
+</div>
+</div>
+<div class="note" style="margin-top:10px">
+<strong>Form 3 — Characteristic Accountability (cốt lõi)</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
+<li><b>Account 100%</b> đặc tính: kích thước, GD&amp;T, notes, bề mặt, marking, cleaning, yêu cầu đóng gói (khi PO/spec yêu cầu).</li>
+<li>Mỗi dòng đo gắn với <b>01 balloon ID</b>; balloon ID không trùng; không bỏ số.</li>
+<li>Ghi rõ dụng cụ đo, độ phân giải, điều kiện đo, người đo, ngày giờ.</li>
+</ul>
+<div class="small muted" style="margin-top:8px">
+ Trong HESEM, Form 1–2–3 được phép thể hiện bằng “FAI record” nội bộ khi vẫn đảm bảo đầy đủ trường tương ứng và truy xuất audit.
+ </div>
+</div>
+<div class="callout" style="margin-top:12px">
+<h3>Quy tắc tái thực hiện FAI (re-accomplishment)</h3>
+<ul>
+<li>Khi đổi REV ảnh hưởng fit–form–function hoặc thay đổi CTQ.</li>
+<li>Khi thay đổi program/CAM/post, fixture, routing, phương pháp đo CTQ.</li>
+<li>Khi chuyển máy/chuyển xưởng/chuyển nhà cung ứng vật liệu hoặc special process.</li>
+<li>Khi phát hiện NCR/escape liên quan đặc tính đã PASS trước đó.</li>
+</ul>
+</div>
+</div>
+<div class="card">
+<h3>2.2 Nhịp triển khai đào tạo theo ca (ràng buộc bắt buộc)</h3>
+<ul style="margin:0; padding-left:18px; line-height:1.75">
+<li>Nhà máy vận hành <b>2 ca/ngày</b>, <b>6 ngày/tuần</b>.</li>
+<li>Mỗi vai trò học tối đa <b>2 ngày/tuần</b> (đảm bảo sản xuất).</li>
+<li>Nhịp học chuẩn: 01 buổi lý thuyết + 01 buổi mô phỏng + OJT tại job thật theo lịch Planner khóa trước.</li>
+<li>OJT diễn ra ngay tại điểm phát sinh (setup/đo/ship) để tạo MRR thật.</li>
+</ul>
+</div>
+<!-- 3) Vị trí trong chuỗi E2E + handoff -->
+<h2 class="h2">3) Vị trí trong chuỗi E2E &amp; luồng handoff (input/output) + điểm chặn</h2>
+<div class="card">
+<div class="small muted">Chuỗi E2E bắt buộc nêu rõ</div>
+<p style="margin-top:6px"><b>Quote/Contract → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Feedback/CI</b></p>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th>Bước</th>
+<th>Input tối thiểu</th>
+<th>Handoff / điểm chặn</th>
+<th>Output / Evidence (MRR)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>Planning</b></td>
+<td>PO/contract, yêu cầu FAI, routing sơ bộ</td>
+<td><b>Chèn Gate FAI</b> vào routing + lịch QC</td>
+<td>Job Pack có cột “FAI required” + trigger ghi rõ</td>
+</tr>
+<tr>
+<td><b>Engineering/Programming</b></td>
+<td>DWG/Model đúng REV, spec stack</td>
+<td><b>Freeze REV</b> + phát hành program/setup sheet</td>
+<td>Release record (program version, setup sheet) + link Part/REV master</td>
+</tr>
+<tr>
+<td><b>Purchasing/Receiving</b></td>
+<td>Material/outsourced process spec</td>
+<td><b>Chặn chứng chỉ</b>: thiếu cert → HOLD lot</td>
+<td>Material Cert/COA/CoC + trace heat/lot</td>
+</tr>
+<tr>
+<td><b>Production (Setup/Operator)</b></td>
+<td>Job Pack, dao cụ, fixture, gage plan</td>
+<td><b>Chặn chạy loạt</b>: chỉ gia công 01 pcs đầu</td>
+<td>First piece có nhãn HOLD/PASS, ảnh setup quan trọng</td>
+</tr>
+<tr>
+<td><b>QC/QA</b></td>
+<td>Ballooned drawing/inspection plan</td>
+<td><b>FAI Gate</b>: PASS/FAIL + quyết định HOLD/GO</td>
+<td>FAI pack (Form 1–2–3 hoặc record tương đương) + ký duyệt</td>
+</tr>
+<tr>
+<td><b>NCR/MRB</b></td>
+<td>FAIL / OOT / sai REV</td>
+<td><b>Containment</b>: phong tỏa, phân loại, quyết định MRB</td>
+<td>NCR + hành động containment + disposition</td>
+</tr>
+<tr>
+<td><b>Packing/Ship</b></td>
+<td>Ship packet, CoC, FAI/IR khi yêu cầu</td>
+<td><b>Ship Release Gate</b></td>
+<td>Ship packet đầy đủ + log ship release</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="callout" style="margin-top:12px">
+<h3>Điểm chặn bắt buộc (không được bypass)</h3>
+<ul>
+<li><b>BLOCK</b> chạy loạt khi chưa có First Piece PASS.</li>
+<li><b>BLOCK</b> release/ship khi thiếu FAI pack theo contract hoặc khi thiếu Evidence Pack tối thiểu.</li>
+<li><b>BLOCK</b> khi có rủi ro sai REV, mix-up lô, thiếu/giả chứng chỉ, gage OOT, outsource chưa có cert.</li>
+</ul>
+</div>
+</div>
+<!-- 4) Failure Points -->
+<h2 class="h2">4) Failure Points (tối thiểu 10 điểm gãy thực tế)</h2>
+<div class="card">
+<ol style="margin:0; padding-left:18px; line-height:1.75">
+<li><b>Sai REV</b> giữa drawing – routing – program – setup sheet.</li>
+<li><b>Balloon thiếu</b> hoặc đánh số không khớp record → mất truy xuất đặc tính.</li>
+<li><b>Đo sai dụng cụ</b> (độ phân giải không đủ) hoặc dùng gage hết hạn hiệu chuẩn.</li>
+<li><b>CTQ bị bỏ qua</b> vì “đo nhanh” hoặc vì thiếu plan đo.</li>
+<li><b>Đổi dao/offset</b> sau khi đo xong nhưng không re-check đặc tính bị ảnh hưởng.</li>
+<li><b>Mix-up lô vật liệu</b> do kho cấp sai heat/lot hoặc dán nhãn thiếu.</li>
+<li><b>Special process</b> (anodize/heat treat/coating/NDI) thiếu cert hoặc cert không khớp PO/spec.</li>
+<li><b>Bypass gate</b> do áp lực tiến độ: chạy loạt khi chưa có PASS ký.</li>
+<li><b>Thiếu chữ ký/thiếu ngày</b> trên record → audit coi như không tồn tại.</li>
+<li><b>Nhầm đơn vị đo</b> (inch/mm), nhầm datum/zero, nhầm GD&amp;T interpretation.</li>
+<li><b>Lưu sai chỗ/sai tên</b> trong Evidence Pack → không tìm được khi audit.</li>
+<li><b>Rework không kiểm soát</b> (mài/đánh bóng) làm thay đổi kích thước nhưng record không phản ánh.</li>
+</ol>
+</div>
+<!-- 5) Risk Controls -->
+<h2 class="h2">5) Risk Controls (control points – ai làm – bằng chứng)</h2>
+<div class="card">
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th>Control point</th>
+<th>Owner chính</th>
+<th>Điều kiện đạt</th>
+<th>Evidence/MRR tối thiểu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>CP1 — REV Lock</b></td>
+<td>Planner + Programmer</td>
+<td>Job Pack thể hiện 01 REV duy nhất; program/setup sheet trùng REV</td>
+<td>Ảnh/scan trang REV + release record program version</td>
+</tr>
+<tr>
+<td><b>CP2 — Balloon &amp; Plan</b></td>
+<td>QC + QA</td>
+<td>Mọi đặc tính yêu cầu được đánh số và có dòng đo tương ứng</td>
+<td>Ballooned drawing + inspection plan + form characteristic list</td>
+</tr>
+<tr>
+<td><b>CP3 — Gage Status</b></td>
+<td>QC + Maintenance</td>
+<td>Gage/CMM ở trạng thái hiệu lực; truy xuất tem hiệu chuẩn rõ</td>
+<td>Ảnh tem + link danh mục calibration M365/SharePoint → HESEM-QMS-SSOT</td>
+</tr>
+<tr>
+<td><b>CP4 — Material Trace</b></td>
+<td>Warehouse</td>
+<td>Heat/lot được dán nhãn; vật liệu đúng spec; chứng chỉ đầy đủ</td>
+<td>Material cert (PDF) + nhãn heat/lot + log cấp phát</td>
+</tr>
+<tr>
+<td><b>CP5 — Special Process Cert</b></td>
+<td>Purchasing + QA</td>
+<td>Nhà cung ứng đã phê duyệt; cert khớp PO/spec/lot; không thiếu trường</td>
+<td>CoC/CoA/special process cert + danh sách supplier approved M365/SharePoint → HESEM-QMS-SSOT</td>
+</tr>
+<tr>
+<td><b>CP6 — Gate Decision</b></td>
+<td>QC + QA + Supervisor</td>
+<td>PASS/FAIL rõ; FAIL có HOLD tag + NCR; PASS có chữ ký release</td>
+<td>FAI pack + ảnh tag HOLD/PASS + NCR khi FAIL</td>
+</tr>
+<tr>
+<td><b>CP7 — Evidence Pack Integrity</b></td>
+<td>QA + Doc Control</td>
+<td>Tên file đúng quy tắc; lưu đúng folder; truy xuất trong 60 giây</td>
+<td>Đường dẫn folder + checklist “Evidence completeness”</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note" style="margin-top:12px">
+<strong>Phân tách theo vai trò</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
+<li><b>Operator/Setup</b> chịu trách nhiệm “đúng setup – đúng first piece – không làm sai lệch trước khi QC đo”.</li>
+<li><b>Programmer</b> chịu trách nhiệm “đúng program version – đúng tool list – xác định đặc tính bị ảnh hưởng khi đổi”.</li>
+<li><b>QC/QA</b> chịu trách nhiệm “đúng phương pháp đo – đầy đủ record – quyết định gate”.</li>
+<li><b>Warehouse/Purchasing</b> chịu trách nhiệm “traceability/cert” để FAI không bị treo.</li>
+</ul>
+</div>
+</div>
+<!-- 6) Fail-fast rules -->
+<h2 class="h2">6) Fail-fast rules + tiêu chí STOP/HOLD/BLOCK</h2>
+<div class="card">
+<div class="grid-2">
+<div class="callout">
+<h3>Fail-fast rules (tối thiểu 3)</h3>
+<ul>
+<li><b>Rule 1:</b> Khi phát hiện sai REV ở bất kỳ tài liệu nào → <b>STOP</b> máy, <b>HOLD</b> toàn bộ WIP, mở NCR “REV mismatch”.</li>
+<li><b>Rule 2:</b> Khi gage/CMM hết hạn hoặc không truy xuất được tình trạng → <b>BLOCK</b> gate đo; không được “đo tạm”.</li>
+<li><b>Rule 3:</b> Khi thiếu material cert/special process cert theo PO/spec → <b>HOLD</b> lot và <b>BLOCK</b> ship release.</li>
+<li><b>Rule 4:</b> Khi đặc tính CTQ FAIL hoặc dữ liệu đo không đủ → <b>HOLD</b> job; chỉ mở lại khi có re-check PASS và record cập nhật.</li>
+</ul>
+</div>
+<div class="note">
+<strong>Định nghĩa trạng thái</strong>
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
+<li><b>STOP</b>: dừng thao tác/máy ngay lập tức để ngăn tạo thêm phế phẩm.</li>
+<li><b>HOLD</b>: phong tỏa sản phẩm/tài liệu; cấm chuyển công đoạn; dán nhãn HOLD.</li>
+<li><b>BLOCK</b>: không cho phép qua gate hệ thống; không ký release; không ship.</li>
+</ul>
+<div class="small muted" style="margin-top:8px">
+ Supervisor chịu trách nhiệm thực thi STOP/HOLD/BLOCK tại hiện trường. QA chịu trách nhiệm khóa gate tại hồ sơ.
+ </div>
+</div>
+</div>
+</div>
+<!-- 7) 60s reaction -->
+<h2 class="h2">7) Phản ứng 60 giây (khi phát hiện rủi ro sống còn)</h2>
+<div class="card">
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th>Sự cố</th>
+<th>Phản ứng 60 giây</th>
+<th>Ai gọi ai</th>
+<th>Bằng chứng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sai REV / tài liệu không khớp</td>
+<td>STOP máy → gom job pack → khoanh vùng WIP → dán HOLD</td>
+<td>Operator/Setup → Supervisor → QA/Programmer</td>
+<td>Ảnh 3 trang: drawing rev, program version, HOLD tag</td>
+</tr>
+<tr>
+<td>Mix-up lô vật liệu</td>
+<td>Đóng khay/box → dán HOLD “LOT MIX” → ngăn cấp phát thêm</td>
+<td>Warehouse → Supervisor → QA</td>
+<td>Ảnh nhãn heat/lot + log cấp phát</td>
+</tr>
+<tr>
+<td>Thiếu chứng chỉ</td>
+<td>HOLD shipment/job → gọi Purchasing lấy cert → không đóng gói</td>
+<td>Packing/Supervisor → Purchasing → QA</td>
+<td>Checklist ship release đánh dấu thiếu</td>
+</tr>
+<tr>
+<td>Gage OOT / tem hết hạn</td>
+<td>Ngưng đo → niêm phong gage → chuyển Maintenance/Calibration</td>
+<td>QC → Maintenance → QA</td>
+<td>Ảnh tem + phiếu cách ly dụng cụ</td>
+</tr>
+<tr>
+<td>Bypass gate / áp lực tiến độ</td>
+<td>BLOCK job tại hiện trường → báo Supervisor + QA → dừng chuyển công đoạn</td>
+<td>Bất kỳ ai → Supervisor → QA/Manager</td>
+<td>Log sự kiện + chữ ký xác nhận dừng</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 8) Checklist -->
+<h2 class="h2">8) Checklist vận hành (≤ 15 bước) — Owner + Evidence/MRR + điểm sai hay gặp</h2>
+<div class="card">
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th>#</th>
+<th>Bước vận hành</th>
+<th>Owner</th>
+<th>Evidence/MRR</th>
+<th>Điểm sai hay gặp</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Xác nhận yêu cầu FAI theo PO/contract và đánh dấu trong Job Pack</td><td>Estimator (SAL-03) + Planner</td><td>Trang PO highlight yêu cầu FAI + routing có Gate</td><td>Bỏ sót yêu cầu FAI trong PO</td></tr>
+<tr><td>2</td><td>Khóa REV: drawing/spec/model/routing/program/setup sheet thống nhất</td><td>Programmer + Planner</td><td>Release record + ảnh trang REV</td><td>Program chạy “bản cũ”</td></tr>
+<tr><td>3</td><td>Chuẩn bị ballooned drawing/inspection plan (đánh số duy nhất)</td><td>QC + QA</td><td>Ballooned drawing + plan</td><td>Số balloon không khớp record</td></tr>
+<tr><td>4</td><td>Kiểm tra vật liệu: spec + heat/lot + cert đủ trường</td><td>Warehouse</td><td>Material cert + nhãn heat/lot</td><td>Nhầm heat/lot do nhãn mờ</td></tr>
+<tr><td>5</td><td>Kiểm tra special process (khi có): supplier đã phê duyệt + cert theo spec</td><td>Purchasing + QA</td><td>Cert special process + PO/spec</td><td>Cert thiếu lot/serial</td></tr>
+<tr><td>6</td><td>Kiểm tra tình trạng gage/CMM và phương pháp đo CTQ</td><td>QC + Maintenance</td><td>Ảnh tem + gage list M365/SharePoint → HESEM-QMS-SSOT</td><td>Dùng gage độ phân giải thiếu</td></tr>
+<tr><td>7</td><td>Setup theo setup sheet: fixture, zero, tool list, offset baseline</td><td>Setup</td><td>Ảnh setup quan trọng + offset baseline</td><td>Nhầm tool length/wear</td></tr>
+<tr><td>8</td><td>Gia công 01 first piece, giữ nguyên trạng (không rework ngoài quy định)</td><td>Operator</td><td>Nhãn HOLD/PASS trên first piece</td><td>Đánh bóng làm lệch kích thước</td></tr>
+<tr><td>9</td><td>Đo CTQ trước, ghi rõ dụng cụ/điều kiện đo, người đo</td><td>QC</td><td>Record đo CTQ + ảnh đo khi cần</td><td>Ghi thiếu dụng cụ đo</td></tr>
+<tr><td>10</td><td>Hoàn tất Form 1–2–3 (hoặc record tương đương) + đính kèm CMM/ảnh</td><td>QC + QA</td><td>FAI pack PDF + CMM report</td><td>Thiếu đặc tính note/drawing note</td></tr>
+<tr><td>11</td><td>Quyết định Gate: PASS → ký release; FAIL → HOLD + NCR</td><td>QA + Supervisor</td><td>Gate sign-off + NCR khi FAIL</td><td>PASS miệng, không ký</td></tr>
+<tr><td>12</td><td>Khi có chỉnh offset/tool ảnh hưởng CTQ → re-check đặc tính liên quan</td><td>Setup + QC</td><td>Record re-check (before/after)</td><td>Chỉnh xong quên đo lại</td></tr>
+<tr><td>13</td><td>Lưu hồ sơ đúng folder Evidence Pack + đặt tên chuẩn</td><td>QC + QA</td><td>Đường dẫn folder + tên file chuẩn</td><td>Lưu vào Desktop/USB</td></tr>
+<tr><td>14</td><td>Ship Release kiểm tra: FAI/IR/CoC/cert đầy đủ</td><td>Supervisor + QA</td><td>Ship release checklist + ship packet</td><td>Thiếu cert outsource</td></tr>
+<tr><td>15</td><td>Post-job review: cập nhật lesson learned, cập nhật plan khi phát hiện lỗ hổng</td><td>Supervisor + QA + Programmer</td><td>Biên bản review + cập nhật WI/plan</td><td>Lặp lỗi do không cập nhật</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 9) OJT TWI -->
+<h2 class="h2">9) OJT thực chiến theo TWI</h2>
+<div class="card">
+<p><strong>Chuẩn OJT:</strong> Trainer làm mẫu 01 lần → học viên làm 02 lần dưới quan sát → 01 lần độc lập. Mọi bước đều tạo MRR.</p>
+<h3 style="margin-top:10px">9.1 Job Breakdown (Step / Key Points / Reasons)</h3>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th>Step</th>
+<th>Key Points (điểm then chốt)</th>
+<th>Reasons (vì sao bắt buộc)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Khóa REV</td>
+<td>So 3 nguồn: drawing + routing + program; ghi lại “REV lock snapshot”</td>
+<td>Chặn rủi ro ship sai REV; audit hỏi mở ra phải trùng</td>
+</tr>
+<tr>
+<td>Balloon &amp; đặc tính</td>
+<td>Đánh số tất cả kích thước + note + spec; số duy nhất, không trùng</td>
+<td>Đảm bảo “characteristic accountability” kiểu AS9102</td>
+</tr>
+<tr>
+<td>First piece discipline</td>
+<td>Chạy 01 pcs, dán HOLD, không rework trước khi đo</td>
+<td>Giữ mẫu đại diện cho quá trình; tránh “che lỗi”</td>
+</tr>
+<tr>
+<td>Đo CTQ đúng cách</td>
+<td>Chọn gage phù hợp; ghi dụng cụ đo; kiểm soát datum/zero</td>
+<td>CTQ sai → scrap/escape; đo sai → false pass</td>
+</tr>
+<tr>
+<td>Gate decision</td>
+<td>PASS/FAIL bằng chữ ký; FAIL mở NCR, không có “pass miệng”</td>
+<td>No evidence = No gate; chống bypass</td>
+</tr>
+<tr>
+<td>LÆ°u Evidence Pack</td>
+<td>Đúng folder, đúng tên file; truy xuất trong 60 giây</td>
+<td>Audit-ready; tránh mất hồ sơ</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 style="margin-top:14px">9.2 OJT output (bắt buộc nộp)</h3>
+<div class="note">
+<ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
+<li>01 bộ <b>FAI pack</b> hoàn chỉnh cho 01 job mẫu (Form 1–2–3 hoặc record tương đương) + ballooned drawing.</li>
+<li>01 checklist “FAI Gate decision” có chữ ký PASS/FAIL.</li>
+<li>01 ảnh nhãn HOLD/PASS trên first piece + ảnh tem hiệu chuẩn dụng cụ đo dùng cho CTQ.</li>
+<li>01 record đặt tên file và lưu đúng folder theo ANNEX-QMS-003.</li>
+</ul>
+</div>
+<h3 style="margin-top:14px">9.3 Rubric L1–L4 (hành vi quan sát được) + quyền hạn khi đạt</h3>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th>Level</th>
+<th>Hành vi quan sát được</th>
+<th>Điều kiện lên level</th>
+<th>Quyền hạn được cấp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>L1</b></td>
+<td>Nhận biết đúng trigger FAI; đọc đúng REV; gọi đúng người khi có mismatch</td>
+<td>Quiz đạt ≥ 80% và làm đúng “phản ứng 60 giây” trong mô phỏng</td>
+<td>Được tham gia ca chạy FAI dưới giám sát</td>
+</tr>
+<tr>
+<td><b>L2</b></td>
+<td>Thực hiện đúng checklist bước 1–10 dưới giám sát; tạo MRR không thiếu trường bắt buộc</td>
+<td>Hoàn tất OJT output 01 bộ, không lỗi Gate</td>
+<td>Operator/Setup được phép chạy job sau khi QC/QA ký PASS</td>
+</tr>
+<tr>
+<td><b>L3</b></td>
+<td>Phân tích change impact; xác định đặc tính bị ảnh hưởng; thực hiện delta FAI đúng phạm vi</td>
+<td>Performance test PASS: xử lý 01 tình huống đổi REV hoặc đổi program</td>
+<td>QC được phép ký Form 3; Setup được phép xác nhận offset baseline; Programmer được phép phát hành revision delta</td>
+</tr>
+<tr>
+<td><b>L4</b></td>
+<td>Thiết kế control plan FAI; chặn bypass; audit nội bộ và sửa lỗ hổng quy trình</td>
+<td>2 kỳ liên tiếp không có audit finding lặp; dẫn dắt 01 kaizen về FAI/evidence</td>
+<td>QA/Supervisor được phép phê duyệt gate và đào tạo lại; được cấp quyền audit-ready review</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="callout" style="margin-top:12px">
+<h3>Tiêu chí khác nhau theo vai trò (bắt buộc)</h3>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th>Vai trò</th>
+<th>Phạm vi áp dụng trong module</th>
+<th>Tiêu chí đạt tối thiểu để làm độc lập</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Operator</td><td>Giữ kỷ luật first piece, nhãn HOLD/PASS, không rework trái phép</td><td>L2 + không vi phạm Rule bypass gate</td></tr>
+<tr><td>Setup</td><td>Setup/offset baseline, re-check khi chỉnh CTQ</td><td>L2; L3 khi tự xác định đặc tính bị ảnh hưởng</td></tr>
+<tr><td>Programmer</td><td>REV lock, program version control, change impact</td><td>L3</td></tr>
+<tr><td>QC</td><td>Balloon/plan, đo CTQ, Form 3, lưu evidence</td><td>L3</td></tr>
+<tr><td>QA</td><td>Review/approve, NCR/MRB gate, ship release evidence</td><td>L4</td></tr>
+<tr><td>Warehouse</td><td>Traceability heat/lot, material cert</td><td>L2</td></tr>
+<tr><td>Purchasing</td><td>Special process cert, approved supplier discipline</td><td>L2; L3 khi xử lý cert thiếu trường</td></tr>
+<tr><td>Planner</td><td>Chèn gate vào routing, lịch QC, không “đẩy job” qua gate</td><td>L2</td></tr>
+<tr><td>Maintenance</td><td>Gage/CMM status, cách ly OOT</td><td>L2</td></tr>
+<tr><td>EHS</td><td>An toàn khu vực đo, hóa chất vệ sinh, ergonomic khi đo</td><td>L1 (nhận biết) + ký xác nhận checklist khu vực khi yêu cầu</td></tr>
+<tr><td>Estimator (SAL-03)</td><td>Nhận diện yêu cầu FAI trong PO, giao tiếp thay đổi tiến độ do gate</td><td>L1</td></tr>
+<tr><td>Supervisor</td><td>Thực thi STOP/HOLD/BLOCK, ký gate release</td><td>L4</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- 10) Assessment -->
+<h2 class="h2">10) Đánh giá (quiz + scenario + performance test)</h2>
+<div class="card">
+<h3>10.1 Quiz (≥ 20 câu)</h3>
+<ol style="margin:0; padding-left:18px; line-height:1.75">
+<li>FAI khác First Piece Control ở điểm nào về phạm vi đặc tính và hồ sơ?</li>
+<li>3 điều kiện bắt buộc để mở Gate chạy loạt sau first piece.</li>
+<li>Khi PO yêu cầu AS9102 FAIR, học viên phải tạo những thành phần hồ sơ nào?</li>
+<li>Ballooned drawing dùng để làm gì trong truy xuất audit?</li>
+<li>Khi đổi REV nhưng không đổi kích thước CTQ, delta FAI phải khóa những yếu tố nào?</li>
+<li>Điều gì xảy ra khi gage hết hạn hiệu chuẩn nhưng vẫn dùng để đo CTQ?</li>
+<li>Ai chịu trách nhiệm chặn bypass gate tại hiện trường?</li>
+<li>Định nghĩa STOP, HOLD, BLOCK khác nhau thế nào về hành động?</li>
+<li>Khi phát hiện sai REV giữa drawing và program, phản ứng 60 giây gồm những bước nào?</li>
+<li>Nêu 5 loại “đặc tính” phải được account trong Form 3 (kích thước, GD&amp;T, note…).</li>
+<li>Khi special process có cert nhưng không khớp lot/serial, trạng thái gate là gì?</li>
+<li>Vì sao first piece phải “giữ nguyên trạng” trước khi QC đo?</li>
+<li>Ai có quyền ký PASS/FAIL cho FAI gate theo module này?</li>
+<li>Quy tắc đặt tên file evidence trong Job Dossier gồm những thành phần nào?</li>
+<li>Khi chỉnh offset sau khi PASS CTQ, bước bắt buộc tiếp theo là gì?</li>
+<li>Nêu 3 lỗi audit liên quan FAI khiến khách hàng reject.</li>
+<li>Khi balloon thiếu một note quan trọng, đó là lỗi loại gì và xử lý thế nào?</li>
+<li>Nêu 2 bằng chứng tối thiểu để chứng minh traceability vật liệu.</li>
+<li>Khi CMM report tồn tại nhưng không có link/đính kèm trong FAI pack, gate có được mở không?</li>
+<li>Nêu 4 tình huống bắt buộc tái thực hiện FAI (re-accomplishment).</li>
+<li>Vai trò Planner phải làm gì để ngăn job bị treo tại cổng QC?</li>
+<li>Khi người đo chưa đạt năng lực, điều kiện cho phép đo là gì?</li>
+</ol>
+</div>
+<div class="card">
+<h3>10.2 Scenario (≥ 3 tình huống thật, yêu cầu HOLD/GO và ghi MRR)</h3>
+<div class="note">
+<strong>Scenario 1 — Sai REV phát hiện tại máy</strong>
+<p style="margin:6px 0 0 0; line-height:1.7">
+ Job J-28419: drawing ghi REV F, setup sheet ghi REV E, program file name có “REV-E”.
+ Operator đã gia công xong 01 first piece và chuẩn bị chạy loạt.
+ <br/><b>Yêu cầu:</b> ra quyết định HOLD/GO, liệt kê 5 bước phản ứng 60 giây, và nêu MRR phải tạo (tên file + folder).
+ </p>
+</div>
+<div class="note" style="margin-top:10px">
+<strong>Scenario 2 — Special process cert thiếu trường</strong>
+<p style="margin:6px 0 0 0; line-height:1.7">
+ Job J-29107 có anodize. Supplier gửi CoC ghi spec đúng nhưng thiếu “lot/serial” và thiếu ngày process.
+ Packing hỏi “có ship được không”.
+ <br/><b>Yêu cầu:</b> quyết định HOLD/GO, phân công Purchasing/QA làm gì trong 30 phút, và nêu bằng chứng tối thiểu để mở ship release.
+ </p>
+</div>
+<div class="note" style="margin-top:10px">
+<strong>Scenario 3 — Delta FAI sau đổi dao chiến lược</strong>
+<p style="margin:6px 0 0 0; line-height:1.7">
+ Job J-30012: giữ nguyên REV; đổi dao phay ngón Ø6 sang Ø5 do thiếu hàng, thay đường chạy dao để giữ bề mặt.
+ CTQ liên quan: vị trí lỗ theo datum A|B và độ nhám bề mặt.
+ <br/><b>Yêu cầu:</b> xác định phạm vi delta FAI (đặc tính nào bắt buộc đo lại), ai chịu trách nhiệm cập nhật record, và tiêu chí PASS/FAIL.
+ </p>
+</div>
+</div>
+<div class="card">
+<h3>10.3 Performance test (bắt buộc)</h3>
+<p><strong>Bài test:</strong> Diễn tập FAI Gate cho 01 job mô phỏng (có job pack, drawing, spec, program, vật liệu/cert, 01 first piece mẫu).</p>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th>Hạng mục chấm</th>
+<th>Yêu cầu PASS</th>
+<th>FAIL khi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>REV Lock</td>
+<td>Chỉ ra 01 REV duy nhất, lưu snapshot</td>
+<td>Không phát hiện mismatch</td>
+</tr>
+<tr>
+<td>Balloon &amp; Form 3</td>
+<td>Account 100% đặc tính yêu cầu; số balloon khớp record</td>
+<td>Bỏ sót note/spec/CTQ</td>
+</tr>
+<tr>
+<td>Đo CTQ</td>
+<td>Dụng cụ đo đúng; ghi đủ field; kết quả rõ</td>
+<td>Dùng gage OOT hoặc ghi thiếu dụng cụ</td>
+</tr>
+<tr>
+<td>Gate decision</td>
+<td>PASS/FAIL bằng chữ ký; FAIL có HOLD + NCR</td>
+<td>Pass miệng hoặc không containment</td>
+</tr>
+<tr>
+<td>Evidence Pack</td>
+<td>Lưu đúng folder, đúng tên; truy xuất trong 60 giây</td>
+<td>Lưu sai chỗ/sai tên hoặc thất lạc file</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="callout" style="margin-top:12px">
+<h3>PASS/FAIL của bài performance test</h3>
+<ul>
+<li><b>PASS</b>: không vi phạm Fail-fast rules; không thiếu MRR bắt buộc; quyết định gate đúng trạng thái.</li>
+<li><b>FAIL</b>: bất kỳ hành vi bypass gate; dùng gage OOT; thiếu chứng chỉ bắt buộc; thiếu chữ ký/thiếu record.</li>
+</ul>
+</div>
+</div>
+<!-- 11) PASS/FAIL criteria -->
+<h2 class="h2">11) PASS/FAIL criteria của module (No evidence = No gate)</h2>
+<div class="card">
+<div class="grid-2">
+<div class="callout">
+<h3>PASS</h3>
+<ul>
+<li>Quiz đạt ≥ 80% và không sai câu hỏi về STOP/HOLD/BLOCK.</li>
+<li>Hoàn tất OJT output đủ 4 hạng mục, lưu đúng Evidence Pack.</li>
+<li>Performance test PASS (không có lỗi Gate).</li>
+</ul>
+</div>
+<div class="callout">
+<h3>FAIL</h3>
+<ul>
+<li>Thiếu bất kỳ MRR bắt buộc hoặc lưu sai chỗ khiến không truy xuất được.</li>
+<li>Vi phạm bypass gate hoặc cố tình chạy loạt khi chưa có PASS ký.</li>
+<li>Không phát hiện sai REV hoặc không thực hiện containment khi phát hiện.</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- 12) MRR tối thiểu -->
+<h2 class="h2">12) MRR tối thiểu (hồ sơ phải tạo/đính kèm + naming + nơi lưu)</h2>
+<div class="card">
+<h3>12.1 Danh sách hồ sơ bắt buộc</h3>
+<ul style="margin:0; padding-left:18px; line-height:1.75">
+<li>FAI pack: Form 1–2–3 hoặc record tương đương (PDF).</li>
+<li>Ballooned drawing / inspection plan.</li>
+<li>First piece label (HOLD/PASS) — ảnh chụp.</li>
+<li>CMM report / dữ liệu đo (khi áp dụng).</li>
+<li>Material cert + traceability (heat/lot).</li>
+<li>Special process cert (khi áp dụng).</li>
+<li>NCR/MRB record (khi FAIL hoặc khi có deviation).</li>
+<li>Gate sign-off (QA/Supervisor).</li>
+</ul>
+<h3 style="margin-top:12px">12.2 Quy tắc đặt tên (theo ANNEX-QMS-003)</h3>
+<div class="note">
+<div class="small muted">Job Dossier evidence naming</div>
+<pre style="white-space:pre-wrap; margin:8px 0 0 0">JOB-{JobNum}_FAI-FAI-{YYYY}-{NNNN}_{YYYY-MM-DD}_REV-{Rev}_FirstArticle.pdf</pre>
+<div class="small muted" style="margin-top:8px">Không dùng tiếng Việt có dấu trong filename. Tránh ký tự: / \ : * ? " &lt; &gt; |</div>
+</div>
+<h3 style="margin-top:12px">12.3 NÆ¡i lÆ°u (SharePoint path)</h3>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th>Nhóm hồ sơ</th>
+<th>Nơi lưu chuẩn</th>
+<th>Ghi chú</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Job Dossier — FAI</td>
+<td>M365/SharePoint → CNC-IMS-HUB → Job-Dossiers → <code>JOB-{JobNum}_{PartNum}_REV-{Rev}</code> → <code>04_Inspection-FAI</code></td>
+<td>Áp dụng template Evidence Pack</td>
+</tr>
+<tr>
+<td>Part/REV Master Data</td>
+<td>M365/SharePoint → DATA → 03_Production → 00_Programming → {CustomerCode} → {CustomerPartNo} → <code>REV {Rev}</code> → <code>10_Quality</code></td>
+<td>Chứa balloon/inspection plan “chuẩn REV”</td>
+</tr>
+<tr>
+<td>Danh mục calibration/approved supplier</td>
+<td>M365/SharePoint → HESEM-QMS-SSOT (library/list chuẩn để truy xuất trạng thái)</td>
+<td>Module này yêu cầu có nguồn truy xuất tập trung</td>
+</tr>
+<tr>
+<td>Training record</td>
+<td>M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training → academy → system-ops</td>
+<td>Lưu rubric, checklist ký và kết quả đánh giá</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 style="margin-top:14px">12.4 Gaps/inconsistency nội bộ hay phát sinh &amp; cách xử lý</h3>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th>Gap</th>
+<th>Rủi ro</th>
+<th>Cách xử lý khóa lỗ hổng (bắt buộc)</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Job Pack ghi “FAI required” nhưng không ghi trigger cụ thể (part mới, đổi REV, đổi program...)</td>
+<td>Đánh sai phạm vi Full/Delta; bỏ sót re-accomplishment</td>
+<td>Bổ sung trường “FAI Trigger” trong Job Pack; thiếu trường = BLOCK Gate</td>
+<td>Planner</td>
+</tr>
+<tr>
+<td>Không có nguồn truy xuất tập trung danh mục calibration/approved supplier</td>
+<td>Audit không chấp nhận; dùng gage OOT; dùng supplier chưa phê duyệt</td>
+<td>Tạo/chuẩn hóa list M365 (calibration + approved supplier); đặt trong mục 12.3 và thay M365/SharePoint → HESEM-QMS-SSOT</td>
+<td>QA + Maintenance + Purchasing</td>
+</tr>
+<tr>
+<td>FAI record thiếu mapping balloon ID ↔ đặc tính (ghi “OK” chung chung)</td>
+<td>Mất characteristic accountability; reject FAIR</td>
+<td>Form 3 bắt buộc ghi số balloon và số đo cụ thể; không được ghi “OK” thay số đo</td>
+<td>QC</td>
+</tr>
+<tr>
+<td>Program version không “freeze” theo REV; file đặt tên thiếu REV</td>
+<td>Chạy nhầm chương trình; sai sản phẩm</td>
+<td>Release record ghi program version + tên file có REV; thiếu = HOLD job</td>
+<td>Programmer</td>
+</tr>
+<tr>
+<td>Evidence lưu rải rác (Desktop, Zalo, USB)</td>
+<td>Thất lạc; rủi ro bảo mật; không audit-ready</td>
+<td>Chỉ lưu vào SharePoint theo template Evidence Pack; phát hiện lưu ngoài = NCR data governance</td>
+<td>QA + Supervisor</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 13) Common audit findings -->
+<h2 class="h2">13) Common audit findings &amp; prevention (≥ 8)</h2>
+<div class="card">
+<ol style="margin:0; padding-left:18px; line-height:1.75">
+<li><b>FAI thiếu đặc tính</b> (bỏ sót note/spec) → chặn bằng CP2, kiểm tra “characteristic completeness” trước ký.</li>
+<li><b>Không truy xuất được balloon</b> → bắt buộc ballooned drawing đính kèm trong Part/REV Master + link trong job dossier.</li>
+<li><b>Thiếu chữ ký/ngày</b> → gate sign-off chỉ mở khi field đầy đủ; thiếu field = BLOCK.</li>
+<li><b>Gage status không chứng minh</b> → lưu ảnh tem + link danh mục calibration; OOT = cách ly.</li>
+<li><b>Material cert không khớp heat/lot</b> → kho dán nhãn heat/lot, log cấp phát và đối chiếu cert.</li>
+<li><b>Special process cert thiếu trường</b> → Purchasing yêu cầu re-issue; không ship khi chưa đủ.</li>
+<li><b>FAI không đại diện cho quá trình</b> (đo mẫu đã rework) → kỷ luật first piece “giữ nguyên trạng”.</li>
+<li><b>Lưu hồ sơ sai chỗ/sai tên</b> → áp dụng naming rule ANNEX-QMS-003; kiểm tra truy xuất 60 giây.</li>
+<li><b>Delta FAI làm sai phạm vi</b> → bắt buộc change impact review có chữ ký Programmer + QA.</li>
+<li><b>Bypass gate do tiến độ</b> → Supervisor chịu trách nhiệm chặn; log sự kiện; đánh giá lại năng lực.</li>
+</ol>
+</div>
+<!-- 14) DCR record -->
+</div><!-- /doc-content -->
+</div><!-- /page-body -->
+</div><!-- /page -->
+</div><!-- /container -->
+<!-- 1) Doc-Control (tách rời) -->
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+

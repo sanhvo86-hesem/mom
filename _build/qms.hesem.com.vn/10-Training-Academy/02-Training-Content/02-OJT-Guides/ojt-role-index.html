@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OJT-ROLE-INDEX — OJT 1 trang theo vai trò | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
+.metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;}
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
+.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;}
+.link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);}
+.link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
+.link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);}
+.link-list{list-style:none;margin:0;padding:0}
+.link-list li{padding:4px 0 4px 0;font-size:12px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}
+.hero h1{font-size:22px;line-height:1.35;color:var(--navy);margin:0 0 8px}
+.hero p{font-size:13px;color:var(--ink2);margin:0}
+.mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
+.chip{display:inline-flex;padding:3px 10px;border-radius:999px;border:1px solid var(--ln);background:var(--bg2);font-size:11px;font-weight:600;margin-right:6px;margin-bottom:6px;}
+.legend-box{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.legend-box .chip{margin:0}
+.svg-wrap{overflow:auto;border:1px solid var(--ln);border-radius:var(--r);background:#fff;padding:12px}
+.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
+.notice-item{padding:10px 12px;border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r-sm);background:var(--bg);font-size:12px}
+.small{font-size:12px}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Training Academy • OJT Guides</span>
+          </div>
+        </div>
+        <div class="title">
+          <strong>OJT-ROLE-INDEX — OJT 1 trang theo vai trò</strong>
+          <span class="sub-vn">Thư viện OJT theo vai trò, gate trọng yếu và đường chuyển sang assessment/certification</span>
+        </div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>OJT-ROLE-INDEX</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA Manager / HR Manager</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="doc-content" id="docContent">
+        <div class="form-sheet">
+
+<div class="hero">
+  <h1>OJT Role Index — thư viện OJT 1 trang theo vai trò</h1>
+  <p>OJT 1 trang là công cụ triển khai thực địa theo ca/cell để biến roadmap thành hành vi quan sát được. Trang này giúp chọn đúng phiếu OJT theo family vai trò, biết gate trọng yếu, biết phải nộp bằng chứng vào đâu và biết khi nào đủ điều kiện chuyển sang đánh giá/cấp chứng nhận.</p>
+</div>
+
+<div class="note"><b>Quy tắc dùng OJT</b><br/>Không dùng OJT 1 trang thay cho SOP/WI. Trước khi vào hiện trường, học viên phải biết bundle tài liệu từ <a href="../../04-Templates-Tools/role-roadmaps.html">Role Roadmaps</a> và handbook tương ứng. Sau OJT, bằng chứng phải được nối sang <a href="../../04-Templates-Tools/certification-register.html">Certification Register</a> và <a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-806_Certification_Tracking_Log.xlsx">FRM-806</a> nếu có đánh giá/cấp chứng nhận.</div>
+<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#o1">1. OJT 1 trang dùng như thế nào</a><a href="#o2">2. Thư viện OJT theo vai trò</a><a href="#o3">3. Khi nào OJT đủ để chuyển sang certification</a><a href="#o4">4. Hồ sơ và SSOT</a></div></div>
+<h2 class="h2" id="o1">1. OJT 1 trang dùng như thế nào</h2>
+<div class="vflow">
+<div class="vstep"><div class="vnum">1</div><div class="vtext">Chọn đúng family vai trò từ <a href="../../04-Templates-Tools/role-roadmaps.html">Role Roadmaps</a> hoặc JD liên quan.</div></div>
+<div class="vstep"><div class="vnum">2</div><div class="vtext">In hoặc mở phiếu OJT 1 trang tương ứng; người hướng dẫn phải chỉ rõ thao tác, điểm kiểm soát và lỗi gate.</div></div>
+<div class="vstep"><div class="vnum">3</div><div class="vtext">Ghi nhận bằng chứng quan sát, kết quả thực hiện và bất thường trên OJT/biểu mẫu thật theo <a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM-803</a> hoặc evidence pack tương đương.</div></div>
+<div class="vstep"><div class="vnum">4</div><div class="vtext">Khi đạt đủ số lần quan sát và gate yêu cầu, chuyển sang assessment / gate test / certification thay vì để OJT “treo mở” vô thời hạn.</div></div>
+</div>
+<h2 class="h2" id="o2">2. Thư viện OJT theo vai trò</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:16%"/><col style="width:16%"/><col style="width:16%"/><col style="width:22%"/><col style="width:18%"/><col style="width:12%"/></colgroup><thead><tr><th>Phiếu OJT</th><th>Vai trò áp dụng</th><th>Handbook nguồn chuẩn</th><th>JD / role family liên đới</th><th>Gate trọng yếu</th><th>Chuyển tiếp sau OJT</th></tr></thead><tbody><tr><td><a href="ojt-role-operator.html">TRN-ACA-OJT-OP-01</a></td><td>CNC Operator</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html">Production Handbook</a></td><td>JD-Operator / production family</td><td>First piece, revision, record discipline</td><td><a href="../../04-Templates-Tools/role-gate-tests.html">Role Gate Tests</a> • <a href="../../04-Templates-Tools/certification-register.html">Certification Register</a></td></tr><tr><td><a href="ojt-role-setup-teamlead.html">TRN-ACA-OJT-SET-01</a></td><td>Setup / Team Lead</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html">Production Handbook</a></td><td>JD-Setup Technician / Shift leadership</td><td>Program release, changeover, abnormality response</td><td><a href="../../04-Templates-Tools/role-gate-tests.html">Role Gate Tests</a> • <a href="../../04-Templates-Tools/certification-register.html">Certification Register</a></td></tr><tr><td><a href="ojt-role-planner-dispatcher.html">TRN-ACA-OJT-PLA-01</a></td><td>Production Planner</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html">Production Handbook</a></td><td>JD-Production Planner</td><td>Readiness, dispatch, WIP escalation</td><td><a href="../../04-Templates-Tools/role-gate-tests.html">Role Gate Tests</a> • <a href="../../04-Templates-Tools/certification-register.html">Certification Register</a></td></tr><tr><td><a href="ojt-role-cam-nc.html">TRN-ACA-OJT-CAM-01</a></td><td>CAM / NC Programmer</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html">Engineering Handbook</a></td><td>JD-CAM/NC Programmer</td><td>Configuration control, release, prove-out support</td><td><a href="../../04-Templates-Tools/role-gate-tests.html">Role Gate Tests</a> • <a href="../../04-Templates-Tools/certification-register.html">Certification Register</a></td></tr><tr><td><a href="ojt-role-qa-qms.html">TRN-ACA-OJT-QMS-01</a></td><td>QA Engineer / QMS</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html">Quality Handbook</a></td><td>JD-QA Manager / QMS Engineer / Quality Engineer</td><td>NCR/CAPA, release, audit evidence</td><td><a href="../../04-Templates-Tools/role-gate-tests.html">Role Gate Tests</a> • <a href="../../04-Templates-Tools/certification-register.html">Certification Register</a></td></tr><tr><td><a href="ojt-role-qc-inspector.html">TRN-ACA-OJT-QC-01</a></td><td>QC Inspector</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html">Quality Handbook</a></td><td>JD-QC Inspector / CMM family</td><td>Inspection evidence, hold/release discipline</td><td><a href="../../04-Templates-Tools/role-gate-tests.html">Role Gate Tests</a> • <a href="../../04-Templates-Tools/certification-register.html">Certification Register</a></td></tr><tr><td><a href="ojt-role-purchasing.html">TRN-ACA-OJT-PUR-01</a></td><td>Purchasing / Subcontract</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html">Supply-Chain Handbook</a></td><td>JD-Buyer / supply chain family</td><td>Flowdown, cert pack, supplier handoff</td><td><a href="../../04-Templates-Tools/role-gate-tests.html">Role Gate Tests</a> • <a href="../../04-Templates-Tools/certification-register.html">Certification Register</a></td></tr><tr><td><a href="ojt-role-warehouse-receiving.html">TRN-ACA-OJT-WHS-01</a></td><td>Warehouse / Receiving</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html">Supply-Chain Handbook</a></td><td>JD-Warehouse / logistics family</td><td>Lot control, receiving, status segregation</td><td><a href="../../04-Templates-Tools/role-gate-tests.html">Role Gate Tests</a> • <a href="../../04-Templates-Tools/certification-register.html">Certification Register</a></td></tr></tbody></table></div>
+<h2 class="h2" id="o3">3. Khi nào OJT đủ để chuyển sang certification</h2>
+<ul class="tight"><li>Khi học viên đã hoàn thành đủ vòng quan sát/thực hành tối thiểu theo roadmap và không còn lỗi gate chưa đóng.</li><li>Khi người hướng dẫn xác nhận học viên hiểu rõ điểm dừng, điểm escalated, bằng chứng phải tạo và không cần nhắc từng bước.</li><li>Khi assessment / gate test theo <a href="../../04-Templates-Tools/role-gate-tests.html">Role Gate Tests</a> đã được sắp lịch hoặc hoàn tất bằng <a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-804_Competence_Assessment.xlsx">FRM-804</a>.</li><li>Khi hồ sơ được đẩy về SSOT, có đường dẫn rõ theo <a href="../../04-Templates-Tools/evidence-naming-rule.html">Evidence Naming Rule</a> và đã sẵn sàng cập nhật <a href="../../04-Templates-Tools/certification-register.html">Certification Register</a>.</li></ul>
+<h2 class="h2" id="o4">4. Hồ sơ và SSOT</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:24%"/><col style="width:38%"/><col style="width:38%"/></colgroup><thead><tr><th>Loại hồ sơ</th><th>Tài liệu / nơi cập nhật</th><th>Ghi chú</th></tr></thead><tbody><tr><td>Điểm danh / buổi đào tạo</td><td><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-802_Attendance_List.xlsx">FRM-802</a></td><td>Dùng khi OJT diễn ra theo nhóm hoặc theo lịch đào tạo.</td></tr><tr><td>Checklist OJT</td><td><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM-803</a></td><td>Dùng để ghi nhận thực hành tại hiện trường, nhận xét và lần quan sát.</td></tr><tr><td>Assessment / chứng nhận</td><td><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-804_Competence_Assessment.xlsx">FRM-804</a> • <a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-805_Skill_Level_Certificate.xlsx">FRM-805</a> • <a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-806_Certification_Tracking_Log.xlsx">FRM-806</a></td><td>Dùng khi quyết định đạt level / cấp / treo / tái đánh giá.</td></tr><tr><td>Naming & storage</td><td><a href="../../04-Templates-Tools/evidence-naming-rule.html">Evidence Naming Rule</a></td><td>Mọi bằng chứng phải có đường dẫn SSOT, không để ở điện thoại/chat/email như record chính thức.</td></tr></tbody></table></div>
+<div class="footer-note">OJT 1 trang được thiết kế để dùng nhanh tại hiện trường. Tài liệu này chỉ hiệu quả khi được nối ngược về handbook, JD, roadmap, gate test và register chứng nhận.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

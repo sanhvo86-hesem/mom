@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ANNEX-QA-006 — Thông số SPC, chọn biểu đồ, capability và reaction plan | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Annex</span>
+          </div>
+        </div>
+        <div class="title"><strong>ANNEX-QA-006 — Thông số SPC, chọn biểu đồ, capability và reaction plan</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>ANNEX-QA-006</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>QA Manager / Process Engineer</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Áp dụng khi control plan yêu cầu SPC/capability hoặc khi cần theo dõi drift của đặc tính quan trọng trong quá trình gia công CNC.</div>
+      <h1>ANNEX-QA-006 — Thông số SPC, chọn biểu đồ, capability và reaction plan</h1>
+      <div class="section"><h2>1. Mục đích và phạm vi áp dụng SPC</h2><p>ANNEX này quy định logic dùng SPC, chọn loại chart, đặt reaction plan và đọc capability cho môi trường gia công CNC job order. SPC dùng để phát hiện drift và mất ổn định đủ sớm để ngăn escape. SPC không thay cho việc hiểu quá trình, không thay cho first-piece và không thay cho final inspection.</p><ul><li>Áp dụng cho đặc tính có thể đo lặp lại, có nhịp dữ liệu đủ và có giá trị kiểm soát drift trước khi vượt dung sai.</li><li>Không ép áp dụng SPC cho mọi đặc tính chỉ để “đủ bài”; chỉ áp dụng nơi dữ liệu và phản ứng có ý nghĩa vận hành.</li></ul></div><div class="section"><h2>2. Chọn biểu đồ và logic subgroup</h2><div class="table-card"><table><thead><tr><th>Tình huống dữ liệu</th><th>Chart ưu tiên</th><th>Ghi chú</th></tr></thead><tbody><tr><td>Đo liên tiếp từng chiếc, sản lượng thấp, job order ngắn</td><td>I-MR</td><td>Phù hợp cho nhiều job CNC vì subgroup nhỏ và dữ liệu nối thời gian</td></tr>
+<tr><td>Có thể lấy subgroup hợp lý trong một điều kiện ổn định ngắn</td><td>Xbar-R hoặc Xbar-S</td><td>Chỉ dùng khi subgroup thực sự đồng nhất</td></tr>
+<tr><td>Dữ liệu defect count / defectives</td><td>np / p / c / u chart theo bản chất dữ liệu</td><td>Không dùng chart biến số cho defect count</td></tr>
+<tr><td>Quá trình drift chậm cần nhạy sớm</td><td>EWMA/CUSUM khi được phê duyệt</td><td>Chỉ dùng khi người sở hữu hiểu rõ cách phản ứng</td></tr>
+</tbody></table></div></div><div class="section"><h2>3. Control limits, specification limits và capability</h2><ul><li><strong>Control limits</strong> dùng để nhận diện trạng thái kiểm soát thống kê. Vượt control limits hoặc xuất hiện tín hiệu bất thường là phải phản ứng quá trình.</li><li><strong>Specification limits</strong> là giới hạn yêu cầu sản phẩm. Sản phẩm có thể không vượt control limits nhưng vẫn không đạt specification nếu tâm/quy trình sai.</li><li>Capability chỉ có ý nghĩa khi dữ liệu lấy từ quá trình ổn định và hệ đo đủ tin cậy. Không dùng capability đẹp để che lấp dữ liệu không ổn định hoặc measurement system yếu.</li></ul><div class="table-card"><table><thead><tr><th>Mức đặc tính</th><th>Mục tiêu tối thiểu gợi ý</th><th>Lưu ý sử dụng</th></tr></thead><tbody><tr><td>Đặc tính thường</td><td>Cpk/Ppk theo mức doanh nghiệp đã phê duyệt</td><td>Không giảm reaction chỉ vì capability quá khứ tốt</td></tr>
+<tr><td>CTQ / đặc tính khách hàng nhạy</td><td>Mục tiêu cao hơn mức đặc tính thường nếu customer/QPL yêu cầu</td><td>Kết hợp với increased inspection hoặc tighter reaction nếu risk cao</td></tr>
+<tr><td>Quá trình mới / mới khôi phục</td><td>Chưa dùng capability để giảm nhịp kiểm cho tới khi đủ dữ liệu ổn định</td><td>Ưu tiên learning phase</td></tr>
+</tbody></table></div></div><div class="section"><h2>4. Tín hiệu bất thường và reaction plan</h2><div class="table-card"><table><thead><tr><th>Tín hiệu</th><th>Phản ứng bắt buộc</th></tr></thead><tbody><tr><td>Điểm vượt UCL/LCL</td><td>Dừng và xác định nguyên nhân; giữ product từ lần last-known-good phù hợp</td></tr>
+<tr><td>Run/trend/drift bất thường</td><td>Tăng nhịp kiểm, xác minh tool wear/offset/fixture/thermal; điều chỉnh có kiểm soát</td></tr>
+<tr><td>Capability giảm hoặc spread tăng</td><td>Xem lại máy, tool, phương pháp đo, nguyên liệu, người thao tác; không chỉ sửa số liệu</td></tr>
+<tr><td>Dữ liệu thiếu hoặc nhập sai</td><td>Không tự lấp số để giữ chart đẹp; chỉnh sửa theo rule dữ liệu có audit trail</td></tr>
+</tbody></table></div><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Tỷ lệ phản ứng đúng hạn với OOC; số escape sau tín hiệu SPC; tỷ lệ chart có dữ liệu hợp lệ; số case capability dùng sai bối cảnh.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;">SOP-604, WI-604, WI-302, ANNEX-QA-002, ANNEX-QA-004, ANNEX-QA-003.</div></div></div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WI-513 — Hướng dẫn vận hành máy phay 5 trục | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Work Instruction</span>
+          </div>
+        </div>
+        <div class="title"><strong>WI-513 — Hướng dẫn vận hành máy phay 5 trục</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>WI-513</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>Production Manager / Engineering Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi Job chạy trên máy 5-axis hoặc setup có rotary/tilt và kinematic control tương đương.</div>
+      <h1>WI-513 — Hướng dẫn vận hành máy phay 5 trục</h1>
+      <div class="section"><h2>1. Mục đích, phạm vi và điều kiện bắt buộc</h2><p>WI này áp dụng cho máy 5-axis và mọi setup có rotary/tilt/RTCP hoặc kinematic tương đương. Tài liệu này khóa các bước không được bỏ: kiểm envelope, kiểm zero rotary, prove-out theo góc nguy hiểm, và kiểm first-piece sau các thay đổi có ảnh hưởng kinematic.</p><div class="callout-danger"><strong>KHÔNG THỎA HIỆP</strong> 5-axis chỉ được chạy khi simulation, setup sheet, rotary logic, tool gauge length và clearances nói cùng một tiếng. Chỉ một điểm sai là đủ để crash giá trị lớn.</div></div><div class="section"><h2>2. Chuẩn bị rotary, fixture và kinematic</h2><div class="table-card"><table><thead><tr><th>Hạng mục</th><th>Yêu cầu bắt buộc</th><th>Điểm dừng</th></tr></thead><tbody><tr><td>Fixture envelope</td><td>Chiều cao clamp, bulông, đối trọng, ống khí/nước, probe clearance đã được xác minh</td><td>Bất kỳ phần nào vượt envelope chưa chứng minh = HOLD</td></tr>
+<tr><td>Rotary home / brake / zero</td><td>A/B/C hoặc bàn xoay phải về đúng chuẩn tham chiếu; brake và limit hoạt động đúng</td><td>Sai home/zero hoặc alarm rotary = không chạy</td></tr>
+<tr><td>RTCP/kinematic setting</td><td>Tham số machine mode, pivot length, tool center point logic đúng machine/program</td><td>Chưa xác minh = không prove-out</td></tr>
+<tr><td>Probe / calibration sphere</td><td>Probe ready hoặc có phương án zero thay thế đã phê duyệt</td><td>Probe nghi ngờ sau va chạm = HOLD cho tới khi xác minh</td></tr>
+</tbody></table></div></div><div class="section"><h2>3. Prove-out 5-axis và first-piece</h2><ul><li>Kiểm simulation kèm orientation và holder clearance cho mọi góc quay trọng yếu, không chỉ đường chạy dao trên màn hình.</li><li>Air-cut / single-block cho đoạn nhập dao đầu tiên ở mỗi orientation rủi ro cao; quan sát cả tool tip, holder và phần sau đồ gá.</li><li>Khi đổi tool length, holder, insert projection hoặc fixture shim, phải xem xét lại kinematic risk và prove-out mức phù hợp.</li><li>First-piece phải xác nhận cả hình học phụ thuộc orientation: vị trí tương quan giữa các mặt, true position, profile, tilt-sensitive features khi áp dụng.</li></ul></div><div class="section"><h2>4. Kiểm soát trong quá trình chạy và khi bất thường</h2><div class="table-card"><table><thead><tr><th>Dấu hiệu</th><th>Phản ứng bắt buộc</th></tr></thead><tbody><tr><td>Rotary rung, tiếng cạ, servo load bất thường</td><td>Feed hold hoặc E-stop theo mức độ; không restart cho tới khi xác định nguyên nhân</td></tr>
+<tr><td>Tool path đi vào vùng nghi ngờ va chạm</td><td>Dừng; kiểm simulation, WCS, orientation và tool setup trước khi chạy lại</td></tr>
+<tr><td>Kích thước drift theo góc quay hoặc sau warm-up</td><td>Khoanh vùng part affected; đo lại CTQ; xem xét thermal stabilization và kinematic check</td></tr>
+<tr><td>Part/fixture dịch chuyển sau index</td><td>HOLD toàn bộ part liên quan; kiểm lại clamp logic và mặt tựa; không sửa tắt bằng wear offset</td></tr>
+</tbody></table></div><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Số near-miss/crash 5-axis; first-piece pass rate; số lần phải prove-out lại do thay tool/fixture; drift sau warm-up.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;">SOP-502, SOP-504, WI-302, WI-517, WI-519, WI-516, ANNEX-ENG-001, ANNEX-HSE-001.</div></div></div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

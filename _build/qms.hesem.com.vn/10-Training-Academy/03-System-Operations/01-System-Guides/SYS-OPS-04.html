@@ -1,0 +1,592 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SYS-OPS-04 — Power Automate Flows &amp; Approvals: inventory, ApprovalHistory, error playbook | HESEM OS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>SYS-OPS-04 — Power Automate Flows &amp; Approvals: inventory, ApprovalHistory, error playbook</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-04</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent"><div class="card">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>Vận hành hệ thống • SYS-OPS-04</div>
+<h1 style="margin-top:10px">SYS-OPS-04 — Power Automate Flows &amp; Approvals: inventory, ApprovalHistory, error playbook</h1>
+<p class="muted">Đào tạo THỰC CHIẾN để chạy xưởng CNC job shop và sẵn sàng audit. Mọi bước đều gắn gate/handoff/rủi ro/MRR.</p>
+<div class="tag blue">Phiên bản</div>
+</div>
+<div class="note">
+<strong>Thông tin triển khai</strong>
+<ul>
+<li><strong>Target roles (bắt buộc):</strong> Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor</li>
+<li><strong>Kích hoạt module:</strong> Khi xưởng vận hành “paperless evidence” qua M365 Lists/SharePoint + Power Automate, và khi có yêu cầu duyệt (Ship Release / NCR / CAPA / Hold).</li>
+<li><strong>Không có bằng chứng = Không qua gate:</strong> Không có MRR hợp lệ thì trạng thái phải HOLD/BLOCK.</li>
+</ul>
+</div>
+</div>
+<div class="toc">
+<strong>Mục lục nhanh</strong>
+<ul>
+<li><a href="#purpose">2) Mục đích &amp; bối cảnh vận hành</a></li>
+<li><a href="#e2e">3) Vị trí trong chuỗi E2E + handoff + điểm chặn</a></li>
+<li><a href="#failure">4) Failure Points (&gt;=10)</a></li>
+<li><a href="#controls">5) Risk Controls (&gt;=6)</a></li>
+<li><a href="#failfast">6) Fail-fast rules + STOP/HOLD/BLOCK</a></li>
+<li><a href="#60s">7) Phản ứng 60 giây</a></li>
+<li><a href="#checklist">8) Checklist vận hành (≤15 bước)</a></li>
+<li><a href="#ojt">9) OJT thực chiến theo TWI</a></li>
+<li><a href="#assessment">10) Đánh giá (Quiz/Scenario/Performance)</a></li>
+<li><a href="#passfail">11) PASS/FAIL criteria</a></li>
+<li><a href="#mrr">12) MRR tối thiểu</a></li>
+<li><a href="#audit">13) Common audit findings &amp; prevention</a></li>
+<li><a href="#DCR record">14) DCR record</a></li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h2>2) Mục đích module &amp; bối cảnh vận hành</h2>
+<div class="grid-2">
+<div>
+<h3>Lý do tồn tại (Gate Logic)</h3>
+<ul>
+<li>Thiết lập “đường ray” để mọi quyết định vận hành có <b>dấu vết duyệt</b> (ApprovalHistory) và <b>dấu vết hệ thống</b> (IntegrationLogs) theo chuẩn audit.</li>
+<li>Chặn các rủi ro Top Risks: sai phiên bản (Wrong Rev), mix-up/lẫn lô, thiếu/giả chứng từ, bypass gate, ship sai, NCR/MRB không có bằng chứng.</li>
+<li>Ổn định vận hành 2 ca/ngày, 6 ngày/tuần: kiểm tra theo nhịp ca, không đẻ thêm người, không đẻ thêm file.</li>
+</ul>
+<h3>Ai chịu trách nhiệm (RACI theo role)</h3>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Role</th><th>Trách nhiệm bắt buộc trong module này</th><th>Điều kiện đạt (khác nhau theo role)</th></tr></thead>
+<tbody>
+<tr><td><b>Operator</b></td><td>Ghi nhận bằng chứng thực tế vào đúng Job Dossier; không bypass gate; phản hồi blocker trong 60 giây.</td><td>Thực hiện đúng 3 lần OJT “đính kèm bằng chứng + cập nhật record” không lỗi; hiểu 5 lý do BLOCKED phổ biến.</td></tr>
+<tr><td><b>Setup</b></td><td>Đảm bảo setup sheet/fixture photo nằm đúng thư mục; xác nhận Job Dossier đã tạo khi job Released.</td><td>Tạo đúng cấu trúc bằng chứng cho 2 job; không phát sinh sai Rev trong hồ sơ.</td></tr>
+<tr><td><b>Programmer</b></td><td>Đặt chương trình/NC/Revision đúng thư mục; cập nhật thông tin Rev theo routing; không phát hành file “mồ côi”.</td><td>1 ca chạy mẫu: chương trình + setup + rev trace truy xuất được trong 60 giây.</td></tr>
+<tr><td><b>QC</b></td><td>Đảm bảo Inspection/FAI record đủ trường bắt buộc; gắn Report URL vào hồ sơ.</td><td>2 case: 01 case yêu cầu FAI và 01 case không yêu cầu FAI — ghi nhận đúng và PASS.</td></tr>
+<tr><td><b>QA</b></td><td>Quản trị QCHold/NCR/CAPA; duyệt theo SoD; kiểm tra ApprovalHistory và dấu vết.</td><td>Không có phê duyệt thiếu Comment/DecisionTime; đóng 01 NCR và 01 CAPA có trail đầy đủ.</td></tr>
+<tr><td><b>Warehouse</b></td><td>Thực hiện PackagingChecks/SSCC; chạy ShipRelease gate; xử lý BLOCKED không né.</td><td>Release 01 pack chỉ khi PacketComplete=PASS; chứng minh được trail “từ record đến file”.</td></tr>
+<tr><td><b>Purchasing</b></td><td>Thu thập chứng từ nhà cung cấp/special process; gắn vào dossier đúng mục; phản hồi DocMissing.</td><td>2 lô nhận hàng: chứng từ truy xuất trong 60 giây, không thiếu rev/lot.</td></tr>
+<tr><td><b>Planner</b></td><td>Giám sát JobIndex/JobOper; đảm bảo job Released có dossier; điều phối handoff theo gate.</td><td>Không có job Released thiếu EvidenceFolderUrl; phản hồi blocker trong 1 ca.</td></tr>
+<tr><td><b>Maintenance</b></td><td>Ghi nhận ToolLife/Downtime theo record; giữ bằng chứng hiệu chuẩn CNC-IMS-HUB → QMS-Records → Metrology-Records..</td><td>Đóng 01 sự cố downtime có record + ảnh + nguyên nhân; không mất dấu vết.</td></tr>
+<tr><td><b>EHS</b></td><td>Gắn kiểm soát EHS vào hồ sơ khi có yêu cầu; khóa phát hành khi thiếu kiểm soát an toàn EHS gate: PPE • LOTO • Hot Work • Lifting • Chemical/Coolant • Machine Guard..</td><td>Nhận biết các điểm chặn EHS và phát hành đúng 100%.</td></tr>
+<tr><td><b>Estimator (SAL-03)</b></td><td>Không cam kết ship khi ShipRelease chưa RELEASED; truyền thông đúng trạng thái gate.</td><td>Không có email/quote xác nhận ship khi Status=BLOCKED/HOLD.</td></tr>
+<tr><td><b>Supervisor</b></td><td>Chủ trì handoff ca; cưỡng chế “No evidence = No gate”; mở sự cố khi có bypass.</td><td>0 lần bypass gate trong ca trực; 100% blocker có owner và due time.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<h3>Nền tảng HESEM đang dùng (Layer 1 — nội bộ)</h3>
+<ul>
+<li><b>M365 Lists</b> theo ANNEX-QMS-005 (Design rules, List catalog, Mapping, Standard codes).</li>
+<li><b>Power Automate</b> theo ANNEX-QMS-006 (Non‑negotiables, Flow inventory, ApprovalHistory, Error playbook).</li>
+<li><b>bộ mẫu cấu hình (SSOT)</b> (sharepoint-lists-schema.csv, README-step2-online-forms.txt, Step5 Power Automate pack, monitoring rules).</li>
+<li><b>Job Dossier</b> theo template thÆ° mục: 01_Rfq-Contract → … → 07_Shipping-Packing → 08_Photos.</li>
+</ul>
+<h3>Khoảng trống/không nhất quán nội bộ (đã chặn ngay trong module)</h3>
+<ul>
+<li><b>ApprovalHistory field set</b> không thống nhất giữa Annex và schema/PowerQuery: module này định nghĩa <b>tập trường tối thiểu</b> để audit được (mục 12) và yêu cầu IT cập nhật qua Change Management khi thiếu trường.</li>
+<li><b>IntegrationErrors list</b> xuất hiện trong Annex nhưng chưa có trong schema: module này dùng IntegrationLogs(Status=Failed) làm nguồn sự thật; IntegrationErrors ghi M365/SharePoint → HESEM-QMS-SSOT để triển khai sau.</li>
+</ul>
+<div class="note">
+<strong>Nguyên tắc toàn cầu (Layer 2) được áp dụng vào xưởng</strong>
+<ul>
+<li>Phê duyệt phải có SLA, nhắc việc, escalation, và trail theo người/giờ/ý kiến.</li>
+<li>Segregation of Duties: người tạo record không tự phê duyệt cho chính mình ở gate chất lượng/ship.</li>
+<li>Audit trail phải truy ra “ai làm gì, lúc nào, dựa trên bằng chứng nào”.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="e2e">
+<h2>3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + điểm chặn</h2>
+<p><b>Chuỗi E2E chuẩn:</b> Quote/Contract → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Feedback/CI.</p>
+<h3>Luồng handoff trọng yếu mà module này điều khiển</h3>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr><th>Bước E2E</th><th>Input bắt buộc</th><th>Output/Handoff</th><th>Điểm chặn (Gate)</th><th>MRR (bằng chứng tối thiểu)</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><b>Planning</b> (job Released)</td>
+<td>JobIndex/JobOperIndex mirror; Rev; due date</td>
+<td>Job Dossier được tạo và gắn link</td>
+<td><b>BLOCK</b> khi EvidenceFolderUrl trống</td>
+<td>JobIndex.EvidenceFolderUrl + cấu trúc thư mục</td>
+</tr>
+<tr>
+<td><b>Receiving</b> / IQC</td>
+<td>ReceivingIQC record + chứng từ nhà cung cấp</td>
+<td>Material “OK to use” hoặc HOLD</td>
+<td><b>HOLD</b> khi DocMissing / SuspectMaterial</td>
+<td>ReceivingIQC + file chứng từ trong dossier (06_Outsource hoặc mục phù hợp)</td>
+</tr>
+<tr>
+<td><b>Production</b></td>
+<td>LaborMirror + WIPTracker</td>
+<td>Trace theo JobNum/OprSeq</td>
+<td><b>STOP</b> khi mix-up/không truy vết</td>
+<td>LaborMirror record + ảnh/ghi chú trong dossier</td>
+</tr>
+<tr>
+<td><b>QC/QA</b></td>
+<td>InspectionReports/FAIReports + QCHoldLog/NCRLog</td>
+<td>Pass/Hold/NCR/CAPA</td>
+<td><b>HOLD</b> khi thiếu ReportUrl/thiếu Disposition</td>
+<td>ReportUrl + ApprovalHistory (khi đóng NCR/CAPA)</td>
+</tr>
+<tr>
+<td><b>Packing</b></td>
+<td>PackagingChecks + PackSSCCRegister</td>
+<td>PacketComplete</td>
+<td><b>BLOCK</b> khi thiếu PhotoEvidenceUrl hoặc SSCC chưa Verified</td>
+<td>PackagingChecks + ảnh bằng chứng + SSCC VerifiedAt</td>
+</tr>
+<tr>
+<td><b>Ship Release</b></td>
+<td>ShipRelease + dossier + QC/FAI + packaging + reconciliation</td>
+<td>Status=RELEASED hoặc BLOCKED</td>
+<td><b>STOP-SHIP</b> khi bất kỳ check FAIL</td>
+<td>ShipRelease + IntegrationLogs + ApprovalHistory (khi có bước duyệt)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Flow inventory (tối thiểu theo HESEM)</h3>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Flow</th><th>Trigger</th><th>Input</th><th>Output</th><th>Điểm vận hành phải kiểm</th></tr></thead>
+<tbody>
+<tr><td>FLOW_01_Sync_OpenJobs</td><td>Recurrence 15–30m</td><td>BAQ_OpenJobs</td><td>Upsert JobIndex</td><td>Delta+overlap; không advance cursor khi fail</td></tr>
+<tr><td>FLOW_02_Sync_JobOperations</td><td>Recurrence 30m</td><td>BAQ_JobOperations</td><td>Upsert JobOperIndex</td><td>JobNum+OprSeq duy nhất</td></tr>
+<tr><td>FLOW_03_Sync_LaborMirror</td><td>Recurrence 15m</td><td>BAQ_LaborTime</td><td>Upsert LaborMirror</td><td>Không thiếu JobNum/ClockIn</td></tr>
+<tr><td>FLOW_04_Sync_ShipmentMirror</td><td>Recurrence 15m</td><td>BAQ_ShipmentsOpen</td><td>Upsert ShipmentMirror</td><td>Không trễ so với ca vận hành</td></tr>
+<tr><td>FLOW_06_Create_JobDossier_OnNewJob</td><td>On JobIndex new/Released</td><td>JobIndex</td><td>Tạo thư mục hồ sơ</td><td>Không tạo sai đường dẫn/Rev</td></tr>
+<tr><td>FLOW_06_QA_Approvals</td><td>On submit (Hold/NCR/CAPA/Ship)</td><td>Record</td><td>ApprovalHistory</td><td>SoD + comment + timestamp</td></tr>
+<tr><td>FLOW_07_ShipRelease_Validator</td><td>On ShipRelease create/modify</td><td>ShipRelease + dossier</td><td>PASS/BLOCK + notify</td><td>Gate stop‑ship, không có “pass im lặng”</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="failure">
+<h2>4) Failure Points (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>#</th><th>Điểm gãy</th><th>Bước E2E</th><th>Tín hiệu phát hiện</th><th>Hành động bắt buộc (fail-fast)</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Flow sync bị tắt/không chạy theo lịch</td><td>Planning/Production</td><td>IntegrationLogs trống &gt; 60 phút trong giờ ca</td><td>Supervisor kích hoạt STOP dữ liệu; khóa quyết định theo mirror</td></tr>
+<tr><td>2</td><td>Cursor LastSyncUtc bị advance dù run fail</td><td>Planning</td><td>Khoảng trống dữ liệu; JobIndex thiếu job mới</td><td>IT rollback cursor; ghi Incident + MRR</td></tr>
+<tr><td>3</td><td>Upsert không idempotent → trùng record</td><td>Planning</td><td>2 EpicorKey giống nhau</td><td>IT sửa khóa; QA khóa sử dụng dữ liệu trùng</td></tr>
+<tr><td>4</td><td>Job Released nhưng EvidenceFolderUrl trống</td><td>Planning</td><td>JobIndex filter EvidenceFolderUrl=blank</td><td>Planner HOLD phát hành; chạy lại FLOW_06 hoặc tạo hồ sơ thủ công và log</td></tr>
+<tr><td>5</td><td>Approval thực hiện qua chat/email, không log</td><td>QA/Ship</td><td>Không có ApprovalHistory cho RecordID</td><td>BLOCK gate; yêu cầu duyệt lại trong hệ thống</td></tr>
+<tr><td>6</td><td>ApprovalHistory thiếu comment/time/approver</td><td>QA</td><td>Trường bắt buộc rỗng</td><td>QA trả về (Reject) và yêu cầu ghi rõ; không cho “Approve trắng”</td></tr>
+<tr><td>7</td><td>ShipRelease bị sửa trạng thái bằng tay để vượt gate</td><td>Ship</td><td>Status=RELEASED nhưng validator log FAIL</td><td>STOP-SHIP; mở NCR nội bộ; khóa quyền sửa tay RBAC: QA/QMS approve • OPS execute • IT admin • sửa record gate = QA/QMS.</td></tr>
+<tr><td>8</td><td>SSCC chưa Verified nhưng vẫn đóng gói</td><td>Packing</td><td>PackSSCCRegister.VerifiedAt trống</td><td>BLOCK; Warehouse tái in/đối chiếu; ghi StandupAction</td></tr>
+<tr><td>9</td><td>FAI bắt buộc nhưng thiếu report URL</td><td>QC/QA</td><td>RequiresFAI=TRUE và ReportUrl trống</td><td>HOLD; QC lập report và gắn link trước khi ship</td></tr>
+<tr><td>10</td><td>DocMissing/special process cert thiếu</td><td>Purchasing/Receiving</td><td>ReceivingIQC DocMissing</td><td>HOLD vật tư; Purchasing truy chứng từ; không phát hành vào sản xuất</td></tr>
+<tr><td>11</td><td>Data quality: record thiếu JobNum/PackID</td><td>All</td><td>Daily check phát hiện null key</td><td>STOP quyết định dựa trên record lỗi; sửa nguyên nhân đầu nguồn</td></tr>
+<tr><td>12</td><td>Anomaly: spike BLOCKED nhưng không có owner</td><td>Ship/Standup</td><td>Blocked count tăng; StandupActions rỗng</td><td>Supervisor mở standup ngay; gán owner + due time</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="controls">
+<h2>5) Risk Controls (control points; ai làm; bằng chứng; tối thiểu 6)</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Control point</th><th>Owner chính</th><th>Bằng chứng/MRR</th><th>Điều kiện PASS</th><th>Hành động khi FAIL</th></tr></thead>
+<tbody>
+<tr><td>CP1 — Delta+overlap + idempotent upsert</td><td>IT</td><td>IntegrationSettings + IntegrationLogs</td><td>Không trùng EpicorKey; LastSyncUtc chỉ update khi Success</td><td>Khóa sử dụng dữ liệu mirror; IT sửa và ghi incident</td></tr>
+<tr><td>CP2 — Audit fields bắt buộc</td><td>QA/QMS</td><td>List schema audit: Created/Modified + FlowRunId FlowRunId = cột bắt buộc trên mọi record gate (Power Automate Run ID).</td><td>Truy ra ai/giờ cho mọi record gate</td><td>Không qua gate cho record thiếu audit fields</td></tr>
+<tr><td>CP3 — Evidence lưu bằng URL, không nhét file vào list</td><td>All role tạo record</td><td>EvidenceFolderUrl/RecordUrl</td><td>Link mở được; file nằm đúng thư mục dossier</td><td>Reject record; yêu cầu sửa link và tổ chức lại hồ sơ</td></tr>
+<tr><td>CP4 — SoD cho approvals</td><td>QA + Supervisor</td><td>ApprovalHistory + quyền truy cập M365/SharePoint → HESEM-QMS-SSOT</td><td>Approver khác người tạo; comment bắt buộc khi Reject</td><td>Block và mở NCR nội bộ khi tự duyệt</td></tr>
+<tr><td>CP5 — Hard gate ShipRelease</td><td>Warehouse + QA</td><td>ShipRelease + IntegrationLogs + PackagingChecks + PackSSCCRegister</td><td>Validator PASS mới được RELEASED</td><td>BLOCKED + notify Teams + StandupAction</td></tr>
+<tr><td>CP6 — Monitoring &amp; anomaly rules</td><td>Supervisor</td><td>Báo cáo/ảnh chụp màn hình dashboard mỗi ca CNC-IMS-HUB → QMS-Records → Dash-Snapshots.</td><td>0 Released khi recon FAIL; 0 NCR Closed thiếu disposition</td><td>STOP-SHIP hoặc HOLD chất lượng; mở hành động khắc phục</td></tr>
+<tr><td>CP7 — Version control cho Flow</td><td>IT</td><td>Export package + DCR record</td><td>Mọi thay đổi flow có ticket + phê duyệt + rollback plan</td><td>Rollback ngay khi phát hiện ảnh hưởng gate</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="failfast">
+<h2>6) Fail-fast rules (≥3) + tiêu chí STOP/HOLD/BLOCK</h2>
+<div class="grid-2">
+<div>
+<h3>Định nghĩa trạng thái cưỡng chế</h3>
+<ul>
+<li><b>STOP:</b> Dừng thao tác ngay tại hiện trường. Áp dụng khi có rủi ro an toàn/mix-up/ship sai.</li>
+<li><b>HOLD:</b> Giữ trạng thái tại bước hiện tại, không handoff sang bước sau.</li>
+<li><b>BLOCK:</b> Khóa hệ thống gate (ShipRelease/Approval) cho tới khi đủ MRR.</li>
+</ul>
+</div>
+<div>
+<h3>Fail-fast rules (cưỡng chế)</h3>
+<ol>
+<li><b>Rule FF1 — Mirror không tin cậy:</b> Khi IntegrationLogs(Failed) xảy ra 3 lần liên tiếp cho flow sync trong giờ ca → <b>STOP dữ liệu</b>; Planner/Supervisor chuyển sang kiểm bằng Epicor trực tiếp Fallback: Epicor trực tiếp + export CSV vào SSOT..</li>
+<li><b>Rule FF2 — No evidence:</b> Khi bất kỳ gate record (ShipRelease/NCR/CAPA/QC Hold) thiếu EvidenceFolderUrl hoặc thiếu file bắt buộc → <b>HOLD/BLOCK</b> ngay tại record; không mở ngoại lệ.</li>
+<li><b>Rule FF3 — Bypass gate:</b> Khi phát hiện Status=RELEASED nhưng validator FAIL hoặc thiếu ApprovalHistory → <b>STOP-SHIP</b>, mở NCR nội bộ, khóa quyền sửa tay và báo cáo ban điều hành trong ca.</li>
+<li><b>Rule FF4 — Null key:</b> Khi record gate thiếu JobNum/PackID/ID khóa → <b>BLOCK</b> record; sửa dữ liệu đầu nguồn rồi mới chạy lại.</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="section" id="60s">
+<h2>7) Phản ứng 60 giây (khi sai Rev/mix-up/thiếu chứng từ/OOT gage/bypass gate/ship risk)</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Tình huống</th><th>Dấu hiệu</th><th>Phản ứng 60 giây (bắt buộc)</th><th>MRR tối thiểu trong 10 phút</th></tr></thead>
+<tbody>
+<tr>
+<td>Sai Rev / dùng bản cũ</td>
+<td>File trong dossier không khớp Rev trên JobIndex</td>
+<td>Supervisor ra lệnh <b>STOP</b>; Setup/Programmer thu hồi file; QC đánh dấu HOLD lô</td>
+<td>QCHoldLog + ảnh màn hình Rev + link file đúng</td>
+</tr>
+<tr>
+<td>Mix-up / lẫn lô</td>
+<td>Labor/WIP không truy JobNum; nhầm khay/nhãn</td>
+<td>Operator dừng máy; dán nhãn “HOLD”; gọi QC/QA tới hiện trường</td>
+<td>QCHoldLog + ảnh hiện trường + ghi chú containment</td>
+</tr>
+<tr>
+<td>Thiếu chứng từ / nghi giả</td>
+<td>ReceivingIQC DocMissing hoặc cert không hợp lệ</td>
+<td>Purchasing/Warehouse giữ vật tư; QA khóa “OK to use”</td>
+<td>ReceivingIQC + file chứng từ trong dossier + log liên hệ NCC</td>
+</tr>
+<tr>
+<td>OOT gage / hiệu chuẩn hết hạn</td>
+<td>Thiết bị đo quá hạn hiệu chuẩn CNC-IMS-HUB → QMS-Records → Metrology-Records.</td>
+<td>QC/QA dừng đo; gắn HOLD; Maintenance cô lập gage</td>
+<td>Record sự cố + ảnh nhãn hiệu chuẩn + hành động thay thế</td>
+</tr>
+<tr>
+<td>Bypass gate / ship risk</td>
+<td>ShipRelease RELEASED nhưng thiếu SSCC/packet/inspection</td>
+<td>Warehouse dừng xuất hàng; Supervisor kích hoạt <b>STOP-SHIP</b>; QA mở NCR nội bộ</td>
+<td>ShipRelease set BLOCKED + IntegrationLogs + StandupAction</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="checklist">
+<h2>8) Checklist vận hành (≤15 bước) — mỗi bước có Owner, Evidence/MRR, điểm sai hay gặp</h2>
+<p class="muted">Checklist này chạy theo nhịp <b>đầu ca</b> và <b>trước khi ship</b>. Mục tiêu: phát hiện sớm, chặn sớm, không để lỗi đi tới customer.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>#</th><th>Bước thao tác</th><th>Owner</th><th>Evidence/MRR</th><th>Điểm sai hay gặp</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Mở IntegrationLogs (24h) và lọc Failed/Warning</td><td>Supervisor</td><td>Ảnh chụp màn hình + link log</td><td>Bỏ sót lỗi do không lọc theo FlowName</td></tr>
+<tr><td>2</td><td>Kiểm tra IntegrationSettings.LastSyncUtc cho JobIndex/Labor/Shipments</td><td>Planner</td><td>Giá trị timestamp + ảnh chụp</td><td>Nhầm múi giờ; đọc nhầm ngày</td></tr>
+<tr><td>3</td><td>Rà JobIndex: Released nhưng EvidenceFolderUrl trống</td><td>Planner</td><td>Danh sách job + hành động xử lý</td><td>Cho chạy sản xuất khi hồ sơ chưa tạo</td></tr>
+<tr><td>4</td><td>Kiểm tra thư mục Job Dossier của job mới (cấu trúc 01→08)</td><td>Setup</td><td>Link thư mục + ảnh cấu trúc</td><td>Tạo nhầm tên folder; thiếu Rev</td></tr>
+<tr><td>5</td><td>Kiểm tra backlog Approvals (Ship/NCR/CAPA/Hold)</td><td>QA</td><td>Danh sách approval quá hạn</td><td>Để trôi SLA; không escalation</td></tr>
+<tr><td>6</td><td>Kiểm tra SoD: người tạo record không tự duyệt</td><td>QA + Supervisor</td><td>ApprovalHistory đối chiếu CreatedBy</td><td>Chấp nhận tự duyệt “cho nhanh”</td></tr>
+<tr><td>7</td><td>Rà ShipRelease status=BLOCKED và lý do thiếu</td><td>Warehouse</td><td>ShipRelease record + missing reason</td><td>Chỉ xem status, không đọc lý do</td></tr>
+<tr><td>8</td><td>Bổ sung bằng chứng thiếu (packet/inspection/packaging/SSCC)</td><td>Owner theo lý do</td><td>File trong dossier + URL gắn vào record</td><td>Gắn link sai thư mục; file “mồ côi”</td></tr>
+<tr><td>9</td><td>Chạy lại validation (FLOW_07) bằng cách cập nhật ShipRelease</td><td>Warehouse</td><td>IntegrationLogs run mới + PASS/BLOCK</td><td>Không ghi lại runId; không chứng minh revalidate</td></tr>
+<tr><td>10</td><td>Khi PASS: xác nhận có ApprovalHistory (khi flow yêu cầu duyệt)</td><td>QA</td><td>ApprovalHistory.ApprovalID + DecisionTime</td><td>Release khi approval chưa log</td></tr>
+<tr><td>11</td><td>Đóng vòng lặp: tạo/đóng StandupAction cho mọi blocker</td><td>Supervisor</td><td>StandupActions (Owner/Due/Close)</td><td>Không có owner; không có due time</td></tr>
+<tr><td>12</td><td>Handoff ca: ghi “tình trạng gate” (Blocked/Hold/Stop)</td><td>Supervisor</td><td>Biên bản handoff Biểu mẫu: forms/index.html#dao-tao (FRM-Training/OJT/Assessment/Certificate).</td><td>Truyền miệng; mất dấu vết</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="ojt">
+<h2>9) OJT thực chiến theo TWI</h2>
+<h3>OJT Output (bắt buộc để được công nhận đạt)</h3>
+<ul>
+<li>01 case ShipRelease từ <b>BLOCKED → RELEASED</b> có đủ chứng cứ (packet + inspection + packaging + SSCC).</li>
+<li>01 record ApprovalHistory (nguồn: ShipRelease hoặc NCR/CAPA) có đầy đủ trường tối thiểu.</li>
+<li>01 IntegrationLogs dòng “Warning/Failed” được xử lý và đóng vòng lặp bằng StandupAction.</li>
+<li>01 bộ hồ sơ Job Dossier đúng cấu trúc, truy xuất được trong 60 giây (từ record → file).</li>
+</ul>
+<h3>Job Breakdown (TWI): “Xử lý BLOCKED ShipRelease và tạo trail audit”</h3>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Step</th><th>Key Points (điểm then chốt)</th><th>Reasons (lý do)</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Mở ShipRelease và đọc “missing reason”, không chỉ nhìn Status</td><td>Không đọc lý do dẫn tới sửa sai chỗ</td></tr>
+<tr><td>2</td><td>Truy EvidenceFolderUrl và mở đúng thư mục hồ sơ</td><td>Đảm bảo bằng chứng nằm đúng nơi, truy xuất được</td></tr>
+<tr><td>3</td><td>Hoàn tất chứng cứ packaging: PackagingChecks=Pass và có PhotoEvidenceUrl</td><td>Thiếu ảnh/record làm gate thất bại</td></tr>
+<tr><td>4</td><td>Đối chiếu SSCC: PackSSCCRegister VerifiedAt không rỗng</td><td>SSCC là điểm chặn chống nhầm kiện</td></tr>
+<tr><td>5</td><td>Đối chiếu QC/FAI: ReportUrl có và đúng job; RequiresFAI thì FAI=Pass</td><td>Tránh ship khi chưa đạt chất lượng</td></tr>
+<tr><td>6</td><td>Cập nhật record để kích hoạt revalidate; ghi lại FlowRunId/IntegrationLogs</td><td>Audit cần thấy run mới và kết quả</td></tr>
+<tr><td>7</td><td>Khi flow yêu cầu duyệt: tạo approval đúng tuyến, không tự duyệt</td><td>SoD chặn gian lận và sai sót</td></tr>
+<tr><td>8</td><td>Khi PASS: xác nhận PASS có MRR đủ; đóng StandupAction</td><td>Không đóng vòng lặp tạo “lỗi tái diễn”</td></tr>
+</tbody>
+</table>
+</div>
+<h3>Rubric L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn được cấp)</h3>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện lên level</th><th>Quyền hạn được cấp khi đạt</th></tr></thead>
+<tbody>
+<tr>
+<td><b>L1</b> — Biết quy tắc</td>
+<td>Nêu đúng 4 trạng thái STOP/HOLD/BLOCK/RELEASED; nêu đúng “No evidence = No gate”.</td>
+<td>Quiz ≥ ngưỡng theo role (mục 11).</td>
+<td>Được thao tác xem dashboard/log, không được thay đổi trạng thái gate.</td>
+</tr>
+<tr>
+<td><b>L2</b> — Làm được có giám sát</td>
+<td>Tạo record đúng trường bắt buộc; gắn link bằng chứng đúng thư mục; không tạo record thiếu key.</td>
+<td>Hoàn tất OJT output 1 lần có giám sát, không lỗi.</td>
+<td>Được cập nhật record thuộc role mình (vd: PackagingChecks/QC report), chưa được RELEASED ship.</td>
+</tr>
+<tr>
+<td><b>L3</b> — Chạy độc lập theo checklist</td>
+<td>Tự xử lý blocker theo checklist 12 bước; revalidate và lưu trail; không phát sinh bypass.</td>
+<td>Hoàn tất OJT output 3 lần liên tiếp không lỗi; Supervisor ký xác nhận.</td>
+<td><b>Warehouse</b> đạt L3 mới được thao tác ShipRelease đến bước “Ready for approval”; <b>QC</b> đạt L3 mới được chốt Pass report.</td>
+</tr>
+<tr>
+<td><b>L4</b> — Dẫn dắt + chặn rủi ro</td>
+<td>Phát hiện anomaly, mở hành động khắc phục, cưỡng chế STOP-SHIP; huấn luyện lại tại hiện trường.</td>
+<td>1 ca trực: 0 bypass gate; 100% blocker có owner/due; QA/Supervisor đánh giá đạt.</td>
+<td><b>QA</b> đạt L4 mới được phê duyệt đóng NCR/CAPA; <b>Supervisor</b> đạt L4 mới được duyệt ngoại lệ Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint)..</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="assessment">
+<h2>10) Đánh giá</h2>
+<h3>10.1 Quiz (≥20 câu) — trắc nghiệm + tình huống ngắn</h3>
+<ol>
+<li>(MCQ) “No evidence = No gate” nghĩa là gì trong ShipRelease?</li>
+<li>(MCQ) Khi IntegrationLogs báo Failed, hành động nào bị cấm? A) Advance LastSyncUtc B) Tạo StandupAction C) Gửi notify D) Giữ cursor</li>
+<li>(MCQ) Delta+overlap dùng để chặn rủi ro nào?</li>
+<li>(MCQ) Idempotent upsert bắt buộc dùng khóa nào cho JobIndex? A) JobNum B) EpicorKey C) PartNum D) DueDate</li>
+<li>(MCQ) Ai bị cấm tự phê duyệt record do chính mình tạo ở gate Ship/NCR?</li>
+<li>(Short) Nêu 3 trường tối thiểu trong ApprovalHistory để audit được.</li>
+<li>(MCQ) ShipRelease Validator kiểm tra tối thiểu những nhóm gì? A) Packaging B) Inspection/FAI C) SSCC D) Tất cả</li>
+<li>(MCQ) Khi RequiresFAI=TRUE và thiếu ReportUrl, trạng thái đúng là gì?</li>
+<li>(Short) Viết 1 câu “phản ứng 60 giây” khi phát hiện bypass gate.</li>
+<li>(MCQ) Bằng chứng phải lưu theo nguyên tắc nào? A) Nhét file vào list B) Lưu URL tới dossier C) Gửi email D) Chụp hình để máy</li>
+<li>(MCQ) Khi ShipRelease BLOCKED do SSCC chưa Verified, owner xử lý chính là ai?</li>
+<li>(MCQ) Field nào chống trùng record? A) Comment B) EpicorKey/RecordID C) PhotoURL D) Status</li>
+<li>(Short) Nêu 2 tín hiệu anomaly bắt buộc kiểm theo ca.</li>
+<li>(MCQ) Khi Approval quá hạn, bước escalation nằm ở đâu? A) Bỏ qua B) Ghi log và escalate C) Tự approve D) Đổi status thủ công</li>
+<li>(MCQ) Khi record thiếu JobNum/PackID, hành động đúng là gì?</li>
+<li>(Short) Nêu 5 lỗi audit hay gặp liên quan approvals và cách chặn.</li>
+<li>(MCQ) Trạng thái nào tương ứng “khóa hệ thống gate”?</li>
+<li>(MCQ) Ai chịu trách nhiệm handoff ca và gán owner cho blocker?</li>
+<li>(Short) Viết quy tắc đặt tên 1 file bằng chứng ship packet.</li>
+<li>(MCQ) Khi phát hiện mix-up, hành động đầu tiên tại hiện trường là gì?</li>
+</ol>
+<details class="note">
+<summary><strong>Đáp án chuẩn (chỉ dùng cho Trainer/QA/Supervisor)</strong></summary>
+<ol>
+<li>Không có MRR hợp lệ thì không RELEASED, bắt buộc HOLD/BLOCK.</li>
+<li>A (Advance LastSyncUtc bị cấm khi fail).</li>
+<li>Chặn mất dữ liệu do trễ đồng bộ và chặn bỏ sót record quanh điểm chuyển ca.</li>
+<li>B.</li>
+<li>Operator/Setup/Programmer/QC/QA/Warehouse/Purchasing/Planner/Maintenance/EHS/Estimator (SAL-03)/Supervisor đều bị cấm tự duyệt record do chính mình tạo ở gate chất lượng/ship.</li>
+<li>ApprovalID; SourceList/SourceRecordID; Approver; Outcome; DecisionTime (tối thiểu 3 trong số đó phải có: ApprovalID + Approver + DecisionTime).</li>
+<li>D.</li>
+<li>HOLD/BLOCKED.</li>
+<li>STOP-SHIP; set BLOCKED; mở NCR nội bộ; khóa quyền; notify ban điều hành.</li>
+<li>B.</li>
+<li>Warehouse.</li>
+<li>B.</li>
+<li>Integration failure 3 lần; ShipRelease blocked spike; SSCC reconciliation fail; CAPA overdue.</li>
+<li>B.</li>
+<li>BLOCK và sửa dữ liệu đầu nguồn.</li>
+<li>Tham chiếu mục 13.</li>
+<li>BLOCK.</li>
+<li>Supervisor.</li>
+<li>Ví dụ: SP_{{JobNum}}_{{PackID}}_{{YYYYMMDD}}_CoC.pdf</li>
+<li>Dừng máy, cô lập sản phẩm, gọi QC/QA.</li>
+</ol>
+</details>
+<h3>10.2 Scenario (≥3 tình huống thật — có dữ kiện; yêu cầu quyết định HOLD/GO và ghi MRR)</h3>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Scenario</th><th>Dữ kiện</th><th>Quyết định bắt buộc</th><th>MRR phải ghi</th></tr></thead>
+<tbody>
+<tr>
+<td><b>S1 — DocMissing vật tư</b></td>
+<td>ReceivingIQC: JobNum=J240125, Lot=LT-778, DocMissing=TRUE, supplier cert chưa có; sản xuất đang chờ vật tư.</td>
+<td><b>HOLD</b> vật tư; không phát hành vào sản xuất.</td>
+<td>ReceivingIQC record + StandupAction cho Purchasing + link email/biên bản liên hệ NCC trong dossier</td>
+</tr>
+<tr>
+<td><b>S2 — FAI bắt buộc nhưng thiếu report</b></td>
+<td>RequiresFAI=TRUE; FAIReports trống; ShipRelease chuẩn bị tạo.</td>
+<td><b>BLOCK</b> ShipRelease; QC lập FAI và gắn ReportUrl.</td>
+<td>FAI report file + link ReportUrl + IntegrationLogs run validator</td>
+</tr>
+<tr>
+<td><b>S3 — Bypass gate bị phát hiện</b></td>
+<td>ShipRelease.Status=RELEASED nhưng validator log ghi PackagingChecks thiếu PhotoEvidenceUrl; SSCC chưa Verified.</td>
+<td><b>STOP-SHIP</b>; set lại BLOCKED; mở NCR nội bộ.</td>
+<td>ShipRelease update + IntegrationLogs(Failed/Warning) + NCRLog nội bộ + StandupAction</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>10.3 Performance test (bắt buộc)</h3>
+<div class="note">
+<strong>Bài test:</strong> “Từ BLOCKED đến RELEASED có trail đầy đủ” (thời gian tối đa 45 phút/case)<br/>
+<strong>Mô tả:</strong> Trainer tạo 01 ShipRelease giả lập bị BLOCKED do thiếu 2 bằng chứng (PhotoEvidenceUrl và thiếu ReportUrl). Học viên phải:
+ <ol>
+<li>Xác định đúng missing reason trong 3 phút.</li>
+<li>Tạo/đính kèm đủ bằng chứng vào đúng Job Dossier.</li>
+<li>Cập nhật record để chạy lại validator và đạt PASS.</li>
+<li>Thực hiện approval đúng tuyến (khi được yêu cầu) và tạo ApprovalHistory đầy đủ.</li>
+<li>Ghi IntegrationLogs/StandupAction và đóng vòng lặp.</li>
+</ol>
+<strong>Rubric PASS/FAIL:</strong>
+<ul>
+<li><b>PASS</b> khi: 100% bằng chứng truy xuất được; validator PASS; ApprovalHistory đầy đủ; không có thao tác bypass; hoàn tất trong 45 phút.</li>
+<li><b>FAIL</b> khi: thiếu bất kỳ MRR; dùng đường vòng (email/chat) để duyệt; sửa trạng thái gate thủ công; không chứng minh revalidate bằng log.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="passfail">
+<h2>11) PASS/FAIL criteria (rõ ràng; nhấn mạnh “No evidence = No gate”)</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Role</th><th>Ngưỡng quiz</th><th>Yêu cầu OJT</th><th>Yêu cầu performance test</th><th>Kết luận</th></tr></thead>
+<tbody>
+<tr><td>Operator / Setup / Programmer</td><td>≥ 80%</td><td>OJT output đạt 2 lần liên tiếp</td><td>PASS (tham gia theo phần role)</td><td>PASS khi đủ 3 cột</td></tr>
+<tr><td>QC / Warehouse</td><td>≥ 85%</td><td>OJT output đạt 3 lần liên tiếp</td><td>PASS đầy đủ</td><td>PASS mới được thao tác gate quan trọng</td></tr>
+<tr><td>QA / Supervisor</td><td>≥ 90%</td><td>OJT output đạt 3 lần liên tiếp + 0 bypass gate</td><td>PASS + đánh giá dẫn dắt</td><td>PASS mới được duyệt/ra lệnh STOP-SHIP</td></tr>
+<tr><td>Purchasing / Planner / Maintenance / EHS / Estimator (SAL-03)</td><td>≥ 80%</td><td>Hoàn tất phần OJT liên quan chứng từ/handoff</td><td>PASS (phần role)</td><td>PASS khi không vi phạm gate</td></tr>
+</tbody>
+</table>
+</div>
+<p><b>Nguyên tắc cưỡng chế:</b> Không có bằng chứng (MRR) = FAIL ngay tại gate, không có ngoại lệ vận hành.</p>
+</div>
+<div class="section" id="mrr">
+<h2>12) MRR tối thiểu</h2>
+<h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
+<ul>
+<li><b>SharePoint Lists:</b> JobIndex, JobOperIndex, LaborMirror, ReceivingIQC, InspectionReports, FAIReports, QCHoldLog, NCRLog, CAPA8D, PackagingChecks, PackSSCCRegister, ShipRelease, StandupActions, IntegrationSettings, IntegrationLogs, ApprovalHistory.</li>
+<li><b>Job Dossier (SharePoint library):</b> cấu trúc thÆ° mục 01→08; ship packet nằm ở “07_Shipping-Packing” hoặc “07_ShipPacket” Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint)..</li>
+<li><b>Teams:</b> thông báo lỗi vào kênh #control-tower-alerts (theo flow spec).</li>
+<li><b>M365/SharePoint → HESEM-QMS-SSOT</b> IntegrationErrors list (khi triển khai), hoặc chuẩn hóa dùng IntegrationLogs.</li>
+</ul>
+<h3>12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Hạng mục</th><th>Quy tắc đặt tên</th><th>Ví dụ</th></tr></thead>
+<tbody>
+<tr><td>Ship packet file</td><td>SP_{{JobNum}}_{{PackID}}_{{YYYYMMDD}}_{{DocType}}.pdf</td><td>SP_J240125_PK009_20260203_CoC.pdf</td></tr>
+<tr><td>Ảnh packaging</td><td>PKG_{{PackID}}_{{YYYYMMDDHHMM}}.jpg</td><td>PKG_PK009_202602031930.jpg</td></tr>
+<tr><td>FAI report</td><td>FAI_{{JobNum}}_{{Rev}}_{{YYYYMMDD}}.pdf</td><td>FAI_J240125_RevB_20260203.pdf</td></tr>
+<tr><td>Approval log</td><td>AH_{{SourceList}}_{{SourceRecordID}}_{{YYYYMMDDHHMM}}</td><td>AH_ShipRelease_SR-00019_202602031945</td></tr>
+<tr><td>Integration log snapshot</td><td>LOG_{{FlowName}}_{{YYYYMMDD}}.png</td><td>LOG_FLOW_07_20260203.png</td></tr>
+</tbody>
+</table>
+</div>
+<h3>12.3 NÆ¡i lÆ°u (SharePoint library/list/path)</h3>
+<ul>
+<li><b>Lists:</b> M365/SharePoint → Site SharePoint Site: CNC-IMS-HUB. → Lists theo schema.</li>
+<li><b>Job Dossier:</b> M365/SharePoint → Library “Job-Dossiers” Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint). → {{JobNum}}_{{PartNum}}_Rev{{RevisionNum}} → 01..08.</li>
+<li><b>Module này:</b> M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training → academy → system-ops.</li>
+<li><b>Snapshot bằng chứng theo ca:</b> lưu vào 08_Management-Review trong dossier của ngày/tuần Quy ước: 01 JobCode = 01 Dossier; không tạo dossier theo ca..</li>
+</ul>
+<h3>12.4 Tập trường tối thiểu cho ApprovalHistory (chuẩn audit)</h3>
+<p class="muted">Mục tiêu: truy xuất được “ai duyệt gì, lúc nào, dựa trên record nào, dựa trên bằng chứng nào”.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Trường</th><th>Bắt buộc</th><th>Ghi chú vận hành</th></tr></thead>
+<tbody>
+<tr><td>ApprovalID</td><td>Yes</td><td>Duy nhất, indexed</td></tr>
+<tr><td>SourceList</td><td>Yes</td><td>ShipRelease/NCRLog/CAPA8D/QCHoldLog…</td></tr>
+<tr><td>SourceRecordID</td><td>Yes</td><td>ID của record gốc</td></tr>
+<tr><td>Approver</td><td>Yes</td><td>Person/Group; không trống</td></tr>
+<tr><td>Outcome</td><td>Yes</td><td>Approved/Rejected/Returned</td></tr>
+<tr><td>DecisionTime</td><td>Yes</td><td>Timestamp, indexed</td></tr>
+<tr><td>Comments</td><td>Conditional</td><td>Bắt buộc khi Rejected/Returned</td></tr>
+<tr><td>EvidenceFolderUrl</td><td>Conditional</td><td>Gắn link thư mục chứng cứ khi gate liên quan dossier</td></tr>
+<tr><td>RecordUrl</td><td>Yes</td><td>Link về record gốc</td></tr>
+<tr><td>FlowRunId</td><td>M365/SharePoint → HESEM-QMS-SSOT</td><td>Đồng nhất với Annex-006; triển khai qua change</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="audit">
+<h2>13) Common audit findings &amp; prevention (tối thiểu 8)</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>#</th><th>Lỗi audit hay gặp</th><th>Tại sao bị fail</th><th>Cách chặn trong vận hành</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Duyệt ngoài hệ thống (email/chat), không có ApprovalHistory</td><td>Không chứng minh được quyết định</td><td>BLOCK gate; duyệt lại trong flow; lưu trail</td></tr>
+<tr><td>2</td><td>Thiếu bằng chứng file/URL, record chỉ có chữ</td><td>Không truy xuất được “evidence”</td><td>Chỉ cho PASS khi EvidenceFolderUrl/ReportUrl mở được</td></tr>
+<tr><td>3</td><td>SoD bị vi phạm (tự duyệt)</td><td>Rủi ro gian lận, sai sót</td><td>Đối chiếu CreatedBy vs Approver theo checklist bước 6</td></tr>
+<tr><td>4</td><td>ShipRelease RELEASED khi còn missing reason</td><td>Bypass gate</td><td>Flow_07 cưỡng chế BLOCKED; giám sát anomaly “Released khi recon FAIL = 0”</td></tr>
+<tr><td>5</td><td>FAI/Inspection thiếu ReportUrl</td><td>Không có chứng cứ chất lượng</td><td>HOLD/BLOCK cho đến khi gắn report</td></tr>
+<tr><td>6</td><td>IntegrationLogs thiếu thông tin runId/duration/count</td><td>Không chứng minh kiểm soát hệ thống</td><td>Chuẩn hóa log fields; snapshot theo ca</td></tr>
+<tr><td>7</td><td>Record thiếu khóa (JobNum/PackID), dữ liệu không sạch</td><td>Không truy vết; có nguy cơ mix-up</td><td>Rule FF4; daily data quality check</td></tr>
+<tr><td>8</td><td>Không có DCR record cho thay đổi flow</td><td>Không kiểm soát thay đổi</td><td>CP7: mọi thay đổi flow có ticket + rollback + phê duyệt</td></tr>
+<tr><td>9</td><td>Handoff ca không có biên bản</td><td>Mất dấu vết trách nhiệm</td><td>Checklist bước 12; lưu biên bản vào kho M365/SharePoint → HESEM-QMS-SSOT</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="DCR record">
+</div></div>
+</div></div></div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+

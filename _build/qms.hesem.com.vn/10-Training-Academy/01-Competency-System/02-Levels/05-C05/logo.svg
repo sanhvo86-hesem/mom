@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#fff4e6" stroke="#ffd8a8" stroke-width="2"/>
+  <path d="M40 60c0-8 4-14 12-14s12 6 12 14" stroke="#d9480f" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M56 60c0-8 4-14 12-14s12 6 12 14" stroke="#d9480f" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M42 62h10v6c0 3-2 5-5 5s-5-2-5-5z" fill="#d9480f" opacity=".2" stroke="#d9480f" stroke-width="1.5"/>
+  <path d="M66 62h10v6c0 3-2 5-5 5s-5-2-5-5z" fill="#d9480f" opacity=".2" stroke="#d9480f" stroke-width="1.5"/>
+  <path d="M52 68l8-2 8 2" stroke="#d9480f" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M46 80c0 0 5 6 14 6s14-6 14-6" stroke="#d9480f" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
+  <text x="60" y="108" text-anchor="middle" font-size="7" font-weight="700" fill="#d9480f" font-family="system-ui">CUSTOMER B2B</text>
+</svg>

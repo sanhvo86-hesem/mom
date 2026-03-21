@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#f1f3f5" stroke="#ced4da" stroke-width="2"/>
+  <rect x="30" y="30" width="60" height="45" rx="4" fill="none" stroke="#343a40" stroke-width="2"/>
+  <rect x="34" y="34" width="52" height="30" rx="2" fill="#343a40" opacity=".08"/>
+  <path d="M44 44l8 8-8 8M56 56h12" stroke="#343a40" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="36" y="80" width="48" height="6" rx="3" fill="#343a40" opacity=".15" stroke="#343a40" stroke-width="1"/>
+  <text x="60" y="108" text-anchor="middle" font-size="7" font-weight="700" fill="#343a40" font-family="system-ui">CNC / CAM</text>
+</svg>

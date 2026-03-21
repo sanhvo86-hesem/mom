@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>TRN-ACA-DRL-01 — Job Order E2E Drill (RFQ → Ship Packet) | HESEM Academy</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+ .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
+ .tight li{margin:4px 0;}
+ 
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>DRILL-JOBORDER-E2E — Job Order E2E Drill (RFQ → Ship Packet) | HESEM Academy</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>DRILL-JOBORDER-E2E</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="cover">
+<div class="kicker">Drill Pack</div>
+<h1 class="h1">DRL-01 — Job Order E2E Drill (RFQ → Ship Packet)</h1>
+<p class="lead">
+ Drill này mô phỏng chuỗi <b>RFQ → Cash</b> bằng 01 job thật: khóa REV, chốt CTQ, chạy gate sản xuất, tạo ship packet và kiểm tra truy xuất 60 giây.
+ </p>
+</div>
+<div class="grid-2">
+<div class="card">
+<span class="badge">Mục tiêu</span>
+<ul class="tight">
+<li>Không nhảy gate. Không ship khi thiếu ship packet.</li>
+<li>MRR nằm đúng SSOT và truy xuất ≤ 60 giây.</li>
+<li>Handoff rõ: ai nhận gì, ai bàn giao gì.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Năng lực kích hoạt</span>
+<ul class="tight"><li><a href="../../01-Competency-System/02-Levels/index.html#C02"><b>C02</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C03"><b>C03</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C04"><b>C04</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C08"><b>C08</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C09"><b>C09</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C10"><b>C10</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C13"><b>C13</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C14"><b>C14</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C15"><b>C15</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C16"><b>C16</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C17"><b>C17</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C18"><b>C18</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C11"><b>C11</b></a></li></ul>
+<p class="small muted" style="margin-top:8px;">Mentor chấm theo hành vi + MRR, không chấm theo cảm tính.</p>
+</div>
+</div>
+<div class="card">
+<span class="badge">Chuẩn bị</span>
+<ul class="tight">
+<li>01 job thật đang chạy hoặc job vừa hoàn tất (có dossier đủ: PO, drawing/spec, traveler, baseline).</li>
+<li>Quy tắc naming: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
+<li>Các biểu mẫu liên quan: Contract Review, Job Kickoff, IR/FAI, NCR/CAPA, Ship Packet.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Thời lượng</span>
+<ul class="tight">
+<li>Chuẩn bị dossier: 15 phút</li>
+<li>Chạy drill: 45–90 phút (theo quy mô job)</li>
+<li>Debrief: 10 phút</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Trình tự thực hiện (bắt buộc)</span>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Owner</th><th>MRR (bằng chứng)</th><th style="width:90px;">Gate</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Mở Job Dossier, xác nhận JobNum/PartNo/REV và lock revision set.</td><td>Tất cả role</td><td>Screenshot đường dẫn dossier + REV tại folder name</td><td>STOP</td></tr><tr><td>2</td><td>Rà soát hợp đồng/PO: chốt CTQ + chứng từ bắt buộc (FAI/MTR/CoC/pack).</td><td>Estimator (SAL-03) + QA</td><td>CR form + CTQ list (PDF)</td><td>HOLD</td></tr><tr><td>3</td><td>Kickoff: routing + hold points + risk rating + outsource needs.</td><td>Planning/OPS</td><td>Job kickoff checklist + Traveler</td><td>HOLD</td></tr><tr><td>4</td><td>Engineering baseline: phát hành setup sheet + inspection plan + CAM release link.</td><td>ENG/CAM</td><td>Baseline pack + release log</td><td>BLOCK</td></tr><tr><td>5</td><td>Pre-start + safety: PPE/5S + xác nhận tool/gage trong hạn.</td><td>Supervisor + Setup</td><td>Pre-start checklist + ảnh setup</td><td>STOP</td></tr><tr><td>6</td><td>Setup + chạy first piece: đo CTQ và lập IR/FAI.</td><td>Setup + QC</td><td>IR/FAI ký + ảnh first piece</td><td>HOLD</td></tr><tr><td>7</td><td>In-process: ghi IPQC log theo reaction plan.</td><td>Operator + QC</td><td>IPQC log (PDF)</td><td>HOLD</td></tr><tr><td>8</td><td>Outsource (KHI có): đối soát spec + nhận cert + traceability.</td><td>PUR + WHS + QA</td><td>PO note + Supplier cert + receiving record</td><td>HOLD</td></tr><tr><td>9</td><td>Final + ship packet: CoC + final IR + packing/label photo.</td><td>QA/QC + WHS</td><td>Ship packet checklist + CoC + packing photo</td><td>HOLD</td></tr><tr><td>10</td><td>Audit drill 60 giây: mentor gọi 01 record bất kỳ và yêu cầu mở đúng file.</td><td>Assessor</td><td>Link SSOT mở đúng ≤ 60s</td><td>FAIL</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card danger">
+<span class="badge">Fail-fast</span>
+<ul class="tight">
+<li>Sai REV hoặc không chứng minh được REV trong SSOT.</li>
+<li>Thiếu 01 hồ sơ bắt buộc tại gate: CR, Traveler, Baseline, IR/FAI, CoC/Ship packet.</li>
+<li>Evidence đặt sai tên hoặc nằm ngoài dossier.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Rubric chấm điểm (10 điểm)</span>
+<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. PASS khi tổng ≥ 8/10 và không vi phạm fail-fast.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
+<tbody>
+<tr><td><b>Revision control</b></td><td>Không dùng file rời; REV đúng; DCR record có dấu vết.</td><td>0/1/2</td></tr><tr><td><b>CTQ translation</b></td><td>CTQ rõ, có inspection method và hold point.</td><td>0/1/2</td></tr><tr><td><b>Evidence discipline</b></td><td>MRR đủ, tên file đúng chuẩn, nằm đúng thư mục.</td><td>0/1/2</td></tr><tr><td><b>Gate decision</b></td><td>STOP/HOLD/BLOCK kích hoạt đúng khi thiếu hồ sơ hoặc lệch chuẩn.</td><td>0/1/2</td></tr><tr><td><b>Handoff quality</b></td><td>Bàn giao bằng link SSOT + người nhận xác nhận; không bàn giao bằng lời.</td><td>0/1/2</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<span class="badge">Debrief (10 phút)</span>
+<ol style="margin:10px 0 0 0; padding-left:18px; line-height:1.75;">
+<li>Điểm gãy lớn nhất trong job nằm ở gate nào? Chủ sở hữu là ai?</li>
+<li>MRR nào bị thiếu/sai tên? Nguyên nhân gốc thuộc người hay hệ thống?</li>
+<li>Chốt 03 hành động chặn lặp (owner + due trong ngày) và nộp vào SSOT.</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

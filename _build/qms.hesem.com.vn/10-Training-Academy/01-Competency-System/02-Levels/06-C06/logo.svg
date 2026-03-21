@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#e6fcf5" stroke="#96f2d7" stroke-width="2"/>
+  <circle cx="52" cy="50" r="18" fill="none" stroke="#0b7285" stroke-width="2.5"/>
+  <line x1="65" y1="63" x2="85" y2="83" stroke="#0b7285" stroke-width="3" stroke-linecap="round"/>
+  <path d="M52 42l-4 4 4 4M52 50l4 4-4 4" stroke="#0b7285" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".5"/>
+  <text x="52" y="54" text-anchor="middle" font-size="8" font-weight="700" fill="#0b7285" font-family="system-ui">?</text>
+  <text x="60" y="108" text-anchor="middle" font-size="7" font-weight="700" fill="#0b7285" font-family="system-ui">ROOT CAUSE</text>
+</svg>

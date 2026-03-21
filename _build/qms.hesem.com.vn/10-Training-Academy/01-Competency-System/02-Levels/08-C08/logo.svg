@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#edf2ff" stroke="#bac8ff" stroke-width="2"/>
+  <rect x="30" y="70" width="12" height="18" rx="2" fill="#5c7cfa" opacity=".5"/>
+  <rect x="47" y="55" width="12" height="33" rx="2" fill="#5c7cfa" opacity=".6"/>
+  <rect x="64" y="42" width="12" height="46" rx="2" fill="#5c7cfa" opacity=".7"/>
+  <rect x="81" y="30" width="12" height="58" rx="2" fill="#5c7cfa" opacity=".8"/>
+  <path d="M36 65l17-12 17-10 17-10" stroke="#364fc7" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="36" cy="65" r="3" fill="#364fc7"/><circle cx="53" cy="53" r="3" fill="#364fc7"/>
+  <circle cx="70" cy="43" r="3" fill="#364fc7"/><circle cx="87" cy="33" r="3" fill="#364fc7"/>
+  <text x="60" y="108" text-anchor="middle" font-size="7" font-weight="700" fill="#364fc7" font-family="system-ui">DATA-DRIVEN</text>
+</svg>

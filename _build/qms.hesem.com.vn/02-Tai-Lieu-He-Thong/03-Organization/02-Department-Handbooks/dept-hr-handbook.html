@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HR — Department Handbook | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+/* PAGE BREAK & OVERFLOW FIX */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .form-sheet, .lane, .legend, .req, .vstep, .auth-grid, .backup-card, .org-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header { page-break-inside: avoid; break-inside: avoid; }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
+.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
+.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
+.raci-A {background:#fff5f5; color:#c92a2a;}
+.raci-R {background:#e7f5ff; color:#1864ab;}
+.raci-C {background:#fff9db; color:#e67700;}
+.raci-I {background:#ebfbee; color:#2b8a3e;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
+.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
+.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
+.doc-link-list {list-style:none; margin:0; padding:0;}
+.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
+.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
+.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
+.svg-wrap,.org-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
+.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
+.org-tree{display:flex;flex-direction:column;gap:16px;margin:8px 0;}
+.org-level{display:grid;gap:14px;}
+.org-level.cols-1{grid-template-columns:1fr;}
+.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr));}
+.org-card{border:1px solid var(--ln);border-top:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
+.org-card h3{font-size:14px;color:var(--navy);margin:0 0 4px;}
+.org-card p{margin:4px 0;font-size:12px;}
+.org-row{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);margin:12px 0;}
+.org-row h3{margin:0 0 8px;font-size:13px;color:var(--navy);}
+.badge-soft{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:10px;font-weight:700;margin-right:6px;margin-bottom:6px;}
+.kpi-box{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);margin:8px 0;}
+.kpi-box b{display:block;font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
+.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
+.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left:4px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
+.role-boundary{border:1px solid #cfe0ff;border-left:4px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
+.phase-card{border:1px solid var(--ln);border-left:4px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
+.phase-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
+.phase-card p:last-child,.role-boundary p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
+.small-note{font-size:12px;color:var(--ink2);}
+
+
+
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
+.toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.toc-grid a{display:block;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2)}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg)}
+.metric-card .value{font-weight:800;font-size:16px;color:var(--navy);margin:6px 0}
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+.check-item{border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
+.process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.mini-note{font-size:12px;color:var(--ink2)}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+.decision-table th,.decision-table td{vertical-align:top}
+@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
+
+.doc-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+.doc-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.card h3{margin-top:0}
+.small{font-size:12px;color:var(--ink3);}
+.tight p{margin:8px 0;}
+.legend-row{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 18px;}
+.legend-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:8px 10px;font-size:12px;}
+.legend-swatch{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;border:1px solid var(--ln2);}
+.kpi-good{background:#ebfbee;color:#2b8a3e}
+.kpi-warn{background:#fff9db;color:#e67700}
+.kpi-bad{background:#fff5f5;color:#c92a2a}
+.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;white-space:nowrap}
+.matrix-table{width:100%;border-collapse:collapse;font-size:12px;}
+.matrix-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--navy);background:var(--th-bg);border:1px solid var(--th-bdr);text-transform:uppercase;letter-spacing:.3px;vertical-align:bottom}
+.matrix-table td{padding:8px 10px;border:1px solid var(--ln2);vertical-align:top;line-height:1.45}
+.matrix-table tbody tr:nth-child(even){background:#fafcfe}
+.matrix-table .section-row td{background:var(--navy)!important;color:#fff;font-weight:700;letter-spacing:.4px}
+.center{text-align:center}
+.nowrap{white-space:nowrap}
+.cell-a{background:#e3f2fd;color:#1565c0;font-weight:800;text-align:center}
+.cell-p{background:#fff3e0;color:#e65100;font-weight:700;text-align:center}
+.cell-v{background:#f3e5f5;color:#7b1fa2;font-weight:700;text-align:center}
+.cell-c{background:#fff9db;color:#e67700;font-weight:700;text-align:center}
+.cell-i{background:#e8f5e9;color:#2e7d32;font-weight:600;text-align:center}
+.cell-x{background:#f8f9fa;color:#868e96;text-align:center}
+.badge-strip{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.badge-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--ln);padding:6px 10px;border-radius:999px;font-size:12px}
+.footer-note{margin-top:18px;padding:14px 16px;border:1px dashed var(--ln2);border-radius:12px;background:var(--bg2);color:var(--ink2)}
+
+
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
+        </div>
+        <div class="title">
+          <strong>HR — Department Handbook</strong>
+          <span class="sub-vn">Sổ tay vận hành phòng Nhân sự cho mô hình job-order, competency-driven và evidence-based workforce governance</span>
+        </div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>HR-HANDBOOK</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>HR Manager / Chief Executive Officer</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="doc-content" id="docContent">
+        <div class="form-sheet">
+          <div class="iso-map">
+            <div class="iso-title">Department / annex control intent</div>
+            <div class="req"><span class="req-tag shall">PHẢI</span><div>HR phải khóa logic “authorized-to-work” theo <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a> và <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-hr-001-competency-levels-and-certification-rules.html">ANNEX-HR-001</a>; không bố trí người vào công việc rủi ro cao hoặc vị trí ảnh hưởng chất lượng khi chưa đủ điều kiện đào tạo, OJT, chứng nhận và hồ sơ pháp lý.</div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Dữ liệu nhân sự, timekeeping, payroll input, hồ sơ đào tạo và hồ sơ kỷ luật phải được quản trị như dữ liệu kiểm soát theo <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>; bản cứng, email, Excel, Epicor và M365 không được mâu thuẫn nhau.</div></div><div class="req"><span class="req-tag should">NÊN</span><div>HR nên vận hành như một “capability office”: dùng JD, skill matrix, lộ trình học nghề, deputy coverage và <a href="../04-RACI-Authority/annex-qms-027-kpi-cascade-dictionary.html">KPI cascade</a> để chủ động đóng khoảng trống năng lực thay vì chỉ xử lý thủ tục nhân sự.</div></div>
+          </div>
+          <div class="preface-block">
+            <div class="grid-2">
+              <div>
+                <p><b>Vai trò thuộc phạm vi</b></p>
+                <div><span class="inline-tag">HR Manager</span><span class="inline-tag">Department Heads</span><span class="inline-tag">Finance Manager</span><span class="inline-tag">IT Admin</span><span class="inline-tag">Epicor System Administrator</span><span class="inline-tag">EHS Specialist</span></div>
+              </div>
+              <div>
+                <p><b>Mã tài liệu chính</b></p>
+                <div><span class="inline-tag">SOP-801</span><span class="inline-tag">SOP-104</span><span class="inline-tag">SOP-105</span><span class="inline-tag">SOP-804</span><span class="inline-tag">ANNEX-HR-001</span><span class="inline-tag">ANNEX-QMS-027</span><span class="inline-tag">ANNEX-QMS-028</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#p1">1. Mục tiêu phòng ban</a><a href="#p2">2. Phạm vi</a><a href="#p3">3. Trách nhiệm bắt buộc</a><a href="#p4">4. Quyền hạn</a><a href="#p5">5. Đầu ra bắt buộc</a><a href="#p6">6. KPI</a><a href="#p7">7. Giao diện phòng ban</a><a href="#p8">8. Tài liệu liên quan</a><a href="#p9">9. Mô hình vận hành &amp; ranh giới vai trò</a><a href="#p10">10. Nhịp điều hành, dữ liệu và bằng chứng</a><a href="#p11">11. Năng lực, backup coverage và deputy rule</a><a href="#p12">12. Rủi ro trọng yếu &amp; trigger escalation</a></div></div>
+          <h2 class="h2" id="p1">1. Mục tiêu phòng ban</h2>
+<p>Phòng HR bảo đảm công ty luôn có <b>đúng người – đúng năng lực – đúng chứng nhận – đúng hồ sơ pháp lý – đúng dữ liệu đầu vào cho lương thưởng</b> để chuỗi RFQ → Plan → Make → Inspect → Ship vận hành ổn định. Trong mô hình CNC job-order/high-mix, HR không chỉ tuyển người và lưu hồ sơ; HR phải biến yêu cầu vận hành thành một hệ thống năng lực có thể lập kế hoạch, đào tạo, đánh giá, thay thế tạm thời và duy trì liên tục.</p>
+<div class="doc-grid-3">
+  <div class="card"><h3>Headcount readiness</h3><p>Dự báo và lấp chỗ trống nhân lực trọng yếu trước khi nó trở thành bottleneck sản xuất hoặc rủi ro giao hàng.</p></div>
+  <div class="card"><h3>Capability readiness</h3><p>Khóa ma trận kỹ năng, OJT, certification, tái chứng nhận và deputy coverage cho vai trò có gate ảnh hưởng chất lượng/an toàn.</p></div>
+  <div class="card"><h3>Workforce governance</h3><p>Quản trị hồ sơ, timekeeping, quan hệ lao động, onboarding/offboarding, confidentiality và handover tri thức theo chuẩn QMS.</p></div>
+</div>
+<h2 class="h2" id="p2">2. Phạm vi</h2><div class="table-card"><table class="table"><colgroup><col style="width:20%"/><col style="width:47%"/><col style="width:33%"/></colgroup><thead><tr><th>Nội dung bao phủ</th><th>Mô tả áp dụng</th><th>Ngoài phạm vi / không được vượt quyền</th></tr></thead><tbody><tr><td>Tuyển dụng & onboarding</td><td>Manpower request, JD, tuyển chọn, offer, nhận việc, thử việc, hồ sơ nhận việc, phối hợp cấp tài khoản/dụng cụ/PPE/training ngày đầu.</td><td>Không tự đánh giá thay chuyên môn kỹ thuật; line owner vẫn xác nhận năng lực thực hành tại công đoạn.</td></tr><tr><td>Năng lực, đào tạo & chứng nhận</td><td>Training plan, attendance, OJT, competency assessment, certification tracking, recertification, skill matrix, learning roadmap.</td><td>Không bỏ qua gate chứng nhận chỉ vì thiếu người hoặc áp lực giao hàng.</td></tr><tr><td>Hồ sơ nhân sự & pháp lý</td><td>Hợp đồng, phụ lục, BHXH/BHYT/BHTN, biến động nhân sự, hồ sơ kỷ luật, hồ sơ nghỉ việc, hồ sơ bảo mật/cam kết.</td><td>Không phát hành dữ liệu nhạy cảm ngoài nguyên tắc need-to-know.</td></tr><tr><td>Timekeeping / payroll input</td><td>Attendance, OT, leave, shift change, allowance input, xác nhận dữ liệu chuyển Finance.</td><td>Không tự ý sửa dữ liệu lương khi chưa có bằng chứng/phê duyệt nguồn.</td></tr><tr><td>Quan hệ lao động & văn hóa vận hành</td><td>Kỷ luật, truyền thông nội bộ, grievance handling, welfare, labor relations, phối hợp công đoàn và chính sách nội bộ.</td><td>Không thay CEO quyết định chính sách vượt thẩm quyền đã ban hành.</td></tr><tr><td>Knowledge transfer & continuity</td><td>Handover khi điều chuyển/nghỉ việc, danh sách vị trí khuyết trọng yếu, deputy coverage, training backlog, succession input.</td><td>Không tạo “backup trên giấy” khi người thay thế chưa được huấn luyện/chứng nhận.</td></tr></tbody></table></div><h2 class="h2" id="p3">3. Trách nhiệm bắt buộc</h2><div class="table-card"><table class="table"><colgroup><col style="width:23%"/><col style="width:47%"/><col style="width:30%"/></colgroup><thead><tr><th>Nhóm trách nhiệm</th><th>Điểm kiểm soát bắt buộc</th><th>Bằng chứng tối thiểu</th></tr></thead><tbody><tr><td>Hoạch định nhân lực</td><td>Dịch nhu cầu năng lực từ kế hoạch vận hành/JD thành headcount plan, recruiting priority, onboarding slot và đào tạo nhập môn.</td><td>Manpower plan, hiring tracker, prioritized vacancy list.</td></tr><tr><td>Chuẩn hóa đầu vào tuyển dụng</td><td>Bảo đảm mọi tuyển dụng đi từ JD active, competency requirement, interview criteria và authority được ban hành.</td><td>JD active, interview pack, approval to recruit.</td></tr><tr><td>Onboarding & authorized-to-work</td><td>Chặn mọi trường hợp vào làm nhưng chưa hoàn tất hồ sơ pháp lý, safety induction, account/access, PPE và training bắt buộc.</td><td>Onboarding checklist, safety/training attendance, access request, dossier completeness.</td></tr><tr><td>Vận hành hệ năng lực</td><td>Duy trì plan → attendance → OJT → assessment → certification → tracking → recertification; nối skill matrix với deputy matrix và KPI.</td><td>FRM-801 đến FRM-806, FRM-807/809, competency dashboard.</td></tr><tr><td>Timekeeping / payroll control</td><td>Thu – đối soát – khóa dữ liệu attendance/OT/leave/allowance trước khi bàn giao Finance; chặn dữ liệu thiếu approver hoặc sai nguồn.</td><td>Attendance reconciliation, approved OT log, payroll input pack.</td></tr><tr><td>Quan hệ lao động & hồ sơ pháp lý</td><td>Duy trì hồ sơ lao động, bảo hiểm, quyết định nhân sự, grievance log, kỷ luật và welfare record đầy đủ, truy xuất được.</td><td>Personnel dossier index, statutory submissions, labor-relations file.</td></tr><tr><td>Offboarding & knowledge retention</td><td>Thu hồi quyền, tài sản, badge, dữ liệu; chốt hồ sơ nghỉ việc và handover tri thức/chứng nhận chưa bàn giao.</td><td>Offboarding checklist, access revocation, handover minutes.</td></tr><tr><td>Cải tiến hệ thống con người</td><td>Theo dõi turnover, training effectiveness, vacancy age, certified-role coverage, deputy readiness và root cause cho lặp lỗi nhân sự.</td><td>Monthly HR dashboard, action log, CAPA/lesson learned input.</td></tr></tbody></table></div><h2 class="h2" id="p4">4. Quyền hạn</h2>
+<div class="card tight">
+<ul class="doc-link-list">
+<li>Có quyền <b>không xác nhận</b> bố trí người vào vị trí yêu cầu chứng nhận, công việc rủi ro cao hoặc giao điểm chất lượng khi điều kiện training/certification chưa đạt.</li>
+<li>Có quyền <b>trả lại</b> dữ liệu timekeeping/payroll input nếu thiếu approver, thiếu chứng từ, sai nguồn hoặc xung đột với dữ liệu hệ thống.</li>
+<li>Có quyền yêu cầu line owner bổ sung đánh giá thử việc, OJT, competency evidence, deputy training plan và kế hoạch lấp khoảng trống năng lực.</li>
+<li>Có quyền kích hoạt quy trình thu hồi quyền truy cập/phương tiện làm việc khi nhân sự nghỉ việc, điều chuyển, đình chỉ hoặc vi phạm bảo mật.</li>
+<li>Có quyền escalte lên CEO đối với rủi ro thiếu người trọng yếu, vi phạm pháp lý lao động, lặp lỗi kỷ luật nghiêm trọng hoặc tỷ lệ certified-role coverage xuống dưới ngưỡng kiểm soát.</li>
+</ul>
+</div>
+<h2 class="h2" id="p5">5. Đầu ra bắt buộc</h2><div class="table-card"><table class="table"><colgroup><col style="width:20%"/><col style="width:45%"/><col style="width:12%"/><col style="width:23%"/></colgroup><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nguồn / nơi lưu</th></tr></thead><tbody><tr><td>Workforce plan & vacancy board</td><td>Headcount plan, vị trí mở, độ ưu tiên, target hire date, risk note cho vị trí ảnh hưởng năng lực giao hàng/chất lượng.</td><td>Tuần / tháng</td><td>HR tracker, management review input.</td></tr><tr><td>Recruitment & onboarding pack</td><td>JD active, phỏng vấn, offer, onboarding checklist, NDA/cam kết, phối hợp cấp account/PPE/training.</td><td>Theo đợt tuyển / theo người</td><td>HR dossiers, onboarding folder.</td></tr><tr><td>Personnel & statutory dossier</td><td>Hồ sơ cá nhân, hợp đồng, quyết định, bảo hiểm, phụ lục, nghỉ việc, công đoàn và hồ sơ tuân thủ lao động.</td><td>Liên tục</td><td>Personnel files (controlled access).</td></tr><tr><td>Training / OJT / certification records</td><td>Kế hoạch đào tạo, attendance, OJT, assessment, certification, recertification, tracking log.</td><td>Tuần / tháng / quý</td><td>FRM-801–806, Academy folder.</td></tr><tr><td>Skill matrix & certified-role coverage</td><td>Ma trận năng lực, tỷ lệ chứng nhận, khoảng trống backup, kế hoạch lấp năng lực.</td><td>Tháng</td><td>FRM-807, FRM-809, deputy linkage.</td></tr><tr><td>Payroll input pack</td><td>Attendance, OT, leave, allowance, roster changes đã đối soát và approved.</td><td>Kỳ lương / tháng</td><td>Controlled payroll input folder.</td></tr><tr><td>Offboarding & revocation pack</td><td>Biên bản bàn giao, thu hồi quyền/tài sản, note tri thức, status hồ sơ/chứng nhận còn mở.</td><td>Theo case</td><td>Offboarding folder, access revocation ticket.</td></tr></tbody></table></div><h2 class="h2" id="p6">6. KPI</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:34%"/><col style="width:18%"/><col style="width:30%"/></colgroup><thead><tr><th>KPI</th><th>Cách đo / nguồn</th><th>Owner</th><th>Reaction rule</th></tr></thead><tbody><tr><td>Time-to-fill cho vị trí trọng yếu</td><td>Số ngày từ approved requisition đến accepted offer/ready-to-start; tracker tuyển dụng.</td><td>HR Manager</td><td>Vượt ngưỡng 2 kỳ review liên tiếp phải escalte nhu cầu tuyển/nguồn tuyển lên CEO và trưởng bộ phận.</td></tr><tr><td>90-day retention</td><td>Tỷ lệ ở lại sau thử việc của các vai trò trọng yếu.</td><td>HR Manager</td><td>Rơi dưới ngưỡng phải phân tích nguyên nhân theo nguồn tuyển/onboarding/line management.</td></tr><tr><td>Training completion đúng hạn</td><td>% khóa bắt buộc hoàn tất đúng plan.</td><td>HR Manager + Dept Heads</td><td>Quá hạn phải khóa authorized-to-work cho hạng mục liên quan.</td></tr><tr><td>Certification compliance</td><td>% vai trò yêu cầu chứng nhận đang ở trạng thái valid.</td><td>HR Manager + Line Owners</td><td>Bất kỳ chứng nhận critical hết hạn phải mở containment và lịch tái chứng nhận.</td></tr><tr><td>Payroll input accuracy & timeliness</td><td>Số lỗi dữ liệu payroll / số hồ sơ trễ cutoff.</td><td>HR Manager</td><td>Lỗi lặp phải mở corrective action nguồn dữ liệu/approval chain.</td></tr><tr><td>Personnel file completeness</td><td>% hồ sơ đầy đủ theo checklist pháp lý/nội bộ.</td><td>HR Manager</td><td>Thiếu hồ sơ bắt buộc > ngưỡng phải lập closure plan và rà soát toàn bộ population.</td></tr><tr><td>Certified-role backup coverage</td><td>% vai trò critical có ít nhất 1 deputy hợp lệ.</td><td>HR Manager + Department Owners</td><td>Xuống ngưỡng phải cập nhật deputy plan và training roadmap ngay trong tháng.</td></tr></tbody></table></div><h2 class="h2" id="p7">7. Giao diện phòng ban</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:38%"/><col style="width:14%"/><col style="width:30%"/></colgroup><thead><tr><th>Đối tác / tuyến phối hợp</th><th>Input ↔ output chính</th><th>SLA / nhịp</th><th>Bằng chứng handoff</th></tr></thead><tbody><tr><td>CEO</td><td>Headcount strategy, chính sách nhân sự, escalation lao động nhạy cảm ↔ workforce risk report, labor-risk escalation.</td><td>Tuần / tháng / theo case</td><td>Management pack, decision log.</td></tr><tr><td>Department Heads</td><td>Manpower request, competency need, probation/OJT result, deputy gap ↔ recruitment progress, training plan, certification status.</td><td>Daily/weekly</td><td>Approved requisition, evaluation forms, training action log.</td></tr><tr><td>Finance</td><td>Payroll cutoff, allowance rule, headcount change ↔ payroll input pack, cost-of-labor data.</td><td>Kỳ lương / tháng</td><td>Payroll input pack, reconciliation log.</td></tr><tr><td>IT / Epicor</td><td>Onboarding access, revocation, SoD conflict ↔ approved access request, quarterly review output.</td><td>Theo case / quý</td><td>FRM-141, FRM-111, access status log.</td></tr><tr><td>EHS</td><td>Safety induction, incident follow-up, health surveillance ↔ attendance, authorized-to-work gate, corrective actions.</td><td>Theo case / tháng</td><td>Training records, incident follow-up log.</td></tr><tr><td>Quality / QMS</td><td>Audit evidence, competence records, internal audit action ↔ competency evidence, closure plan.</td><td>Tháng / quý</td><td>Audit evidence pack, action tracker.</td></tr></tbody></table></div><h2 class="h2" id="p8">8. Tài liệu liên quan</h2><div class="table-card"><table class="table"><colgroup><col style="width:20%"/><col style="width:80%"/></colgroup><thead><tr><th>Nhóm</th><th>Tài liệu</th></tr></thead><tbody><tr><td>QMS / Organization</td><td><a href="../../01-Quality-Manual/qms-man-001-qms-manual.html">QMS-MAN-001</a><br/><a href="../04-RACI-Authority/annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a><br/><a href="../04-RACI-Authority/annex-qms-026-raci-master-matrix.html">ANNEX-QMS-026</a><br/><a href="../04-RACI-Authority/annex-qms-027-kpi-cascade-dictionary.html">ANNEX-QMS-027</a><br/><a href="../04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a><br/><a href="../05-Labor-Relations/annex-hr-lab-001-collective-bargaining-agreement.html">ANNEX-HR-LAB-001</a></td></tr><tr><td>SOP / WI / ANNEX cốt lõi</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a><br/><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-802-incident-near-miss-and-ehs.html">SOP-802</a><br/><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-804-human-factors-and-error-proofing.html">SOP-804</a><br/><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a><br/><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-105-organizational-knowledge-management.html">SOP-105</a><br/><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-hr-001-competency-levels-and-certification-rules.html">ANNEX-HR-001</a><br/><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-it-001-role-based-access-map.html">ANNEX-IT-001</a><br/><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-it-002-access-request-field-dictionary.html">ANNEX-IT-002</a><br/><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-qms-020-escalation-matrix-and-sla.html">ANNEX-QMS-020</a></td></tr><tr><td>Forms / Academy</td><td><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-801_Training_Plan.xlsx">FRM-801</a><br/><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-802_Attendance_List.xlsx">FRM-802</a><br/><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM-803</a><br/><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-804_Competence_Assessment.xlsx">FRM-804</a><br/><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-805_Skill_Level_Certificate.xlsx">FRM-805</a><br/><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-806_Certification_Tracking_Log.xlsx">FRM-806</a><br/><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-807</a><br/><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-809</a><br/><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a><br/><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a><br/><a href="../../../10-Training-Academy/04-Templates-Tools/role-roadmaps.html">TRN-ACA-RMAP-01</a><br/><a href="../../../10-Training-Academy/04-Templates-Tools/role-gate-tests.html">TRN-ACA-GATE-01</a></td></tr></tbody></table></div><h2 class="h2" id="p9">9. Mô hình vận hành &amp; ranh giới vai trò</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:27%"/><col style="width:27%"/><col style="width:28%"/></colgroup><thead><tr><th>Giao điểm</th><th>HR sở hữu</th><th>Bộ phận khác sở hữu</th><th>Điểm khóa boundary</th></tr></thead><tbody><tr><td>Recruitment & selection</td><td>Quy trình tuyển, hồ sơ, legal check, offer administration.</td><td>Department Head xác định năng lực công việc, phỏng vấn chuyên môn và quyết định phù hợp kỹ thuật.</td><td>Không ra offer khi JD/authority chưa rõ; không tuyển “trước rồi hoàn hồ sơ sau” cho vị trí critical.</td></tr><tr><td>Training & certification</td><td>Khung quy trình, lịch, hồ sơ, tracking, nhắc hạn, hệ thống skill matrix.</td><td>Line owner/OJT assessor xác nhận competence thực hành và readiness thực tế tại công đoạn.</td><td>HR không “ký thay” chứng nhận kỹ thuật; line owner không được bỏ qua record package.</td></tr><tr><td>Payroll input</td><td>Thu thập/đối soát dữ liệu, khóa cutoff, phát hành input pack.</td><td>Finance tính lương, hạch toán, đối chiếu số liệu và chi trả.</td><td>Mọi điều chỉnh sau cutoff phải có evidence trail và approver đúng authority.</td></tr><tr><td>Offboarding & access revocation</td><td>Thông báo nghỉ việc/điều chuyển, checklist thu hồi, lưu hồ sơ.</td><td>IT/Epicor thực hiện revoke/disable; line owner thu hồi dụng cụ, dữ liệu công việc.</td><td>Offboarding không đóng nếu access hoặc tài sản còn mở.</td></tr><tr><td>Deputy coverage</td><td>Theo dõi coverage, training roadmap, risk heatmap.</td><td>Department owner chỉ định người thay thế phù hợp và xác nhận khả năng làm việc thực tế.</td><td>Không ghi deputy nếu chưa hoàn tất training/authorization tối thiểu.</td></tr></tbody></table></div><h2 class="h2" id="p10">10. Nhịp điều hành, dữ liệu và bằng chứng</h2><div class="table-card"><table class="table"><colgroup><col style="width:16%"/><col style="width:34%"/><col style="width:23%"/><col style="width:27%"/></colgroup><thead><tr><th>Nhịp điều hành</th><th>Nội dung</th><th>Owner / người tham gia</th><th>Bằng chứng / SSOT</th></tr></thead><tbody><tr><td>Daily / by exception</td><td>Biến động headcount, absence, onboarding mới, access/revocation gấp, incident liên quan người lao động.</td><td>HR Manager + line owners + IT/EHS khi cần.</td><td>Absence board, onboarding checklist, urgent action log.</td></tr><tr><td>Weekly</td><td>Vacancy review, tuyển dụng, probation status, training backlog, certified-role gap, deputy gap.</td><td>HR Manager + Department Heads.</td><td>Weekly workforce review deck.</td></tr><tr><td>Monthly</td><td>Payroll cutoff, headcount dashboard, turnover, file completeness, mandatory training completion, labor-risk review.</td><td>HR Manager + Finance + CEO.</td><td>Monthly HR dashboard, payroll input pack.</td></tr><tr><td>Quarterly</td><td>Quarterly access review, recertification outlook, succession/deputy review, labor relations review.</td><td>HR + IT/Epicor + Dept Heads + CEO.</td><td>FRM-111, recertification forecast, succession note.</td></tr></tbody></table></div>
+<div class="footer-note">SSOT/SoR: hồ sơ pháp lý và nhân sự tại controlled personnel files; đào tạo/chứng nhận tại bộ FRM-801 đến FRM-806 và Academy records; skill matrix tại FRM-807/809; access lifecycle tại FRM-141/FRM-111; payroll input pack là bản phát hành chính thức sang Finance sau khi HR khóa dữ liệu.</div>
+<h2 class="h2" id="p11">11. Năng lực, backup coverage và deputy rule</h2><div class="table-card"><table class="table"><colgroup><col style="width:19%"/><col style="width:31%"/><col style="width:28%"/><col style="width:22%"/></colgroup><thead><tr><th>Vai trò / phạm vi</th><th>Năng lực tối thiểu</th><th>Deputy / backup rule</th><th>Giới hạn không chuyển giao</th></tr></thead><tbody><tr><td><a href="../03-Job-Descriptions/08-JD-HR/jd-hr-manager.html">HR Manager</a></td><td>Hiểu đầy đủ JD, khung năng lực, luật lao động cơ bản, payroll input control, records confidentiality, onboarding/offboarding, labor relations, evidence discipline.</td><td>Deputy vận hành tạm thời theo <a href="../04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a>; mọi quyết định chính sách/kỷ luật nhạy cảm vẫn escalte CEO.</td><td>Không tự ý thay đổi policy lương thưởng, cơ cấu lương hoặc quyết định kỷ luật mức cao khi chưa có authority.</td></tr><tr><td>Vai trò line owner hỗ trợ</td><td>Phải biết cách xác nhận OJT, skill gap, probation result, deputy readiness cho nhân sự thuộc phạm vi mình.</td><td>HR chịu tracking; line owner chịu xác nhận năng lực thực hành.</td><td>Không tách record HR khỏi xác nhận thực hành của bộ phận chuyên môn.</td></tr></tbody></table></div><h2 class="h2" id="p12">12. Rủi ro trọng yếu &amp; trigger escalation</h2><div class="table-card"><table class="table"><colgroup><col style="width:20%"/><col style="width:24%"/><col style="width:36%"/><col style="width:20%"/></colgroup><thead><tr><th>Rủi ro / trigger</th><th>Dấu hiệu nhận biết</th><th>Containment / escalation tối thiểu</th><th>Owner đầu tiên</th></tr></thead><tbody><tr><td>Vị trí critical trống kéo dài</td><td>Vacancy age cao, overtime kéo dài, nhiều ca thiếu người, kế hoạch giao hàng bị ảnh hưởng.</td><td>Escalate CEO + owner bộ phận; kích hoạt plan tuyển gấp, outsource tạm, cross-training hoặc reschedule.</td><td>HR Manager</td></tr><tr><td>Người làm việc khi chưa đủ điều kiện</td><td>Thiếu training, cert hết hạn, hồ sơ pháp lý chưa hoàn tất nhưng đã bố trí vào công việc.</td><td>Stop assignment, cập nhật roster, kích hoạt training/containment và thông báo owner bộ phận.</td><td>HR Manager / line owner</td></tr><tr><td>Payroll data sai / trễ cutoff</td><td>Attendance xung đột, OT thiếu phê duyệt, adjustment không có source.</td><td>Giữ payroll input pack, mở reconciliation, escalte Finance khi ảnh hưởng kỳ lương.</td><td>HR Manager</td></tr><tr><td>Turnover tăng ở nhóm vai trò trọng yếu</td><td>Nghỉ việc sớm, probation fail, absenteeism tăng.</td><td>Phân tích theo nguồn tuyển/onboarding/quản trị ca; mở action plan với owner bộ phận.</td><td>HR Manager + CEO</td></tr><tr><td>Rò rỉ dữ liệu nhân sự / truy cập sai</td><td>File lương chia sẻ sai, offboarding chưa revoke quyền, account dùng chung.</td><td>Kích hoạt incident data control theo SOP-104; cô lập truy cập, log sự kiện, rà soát population.</td><td>HR Manager + IT</td></tr></tbody></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

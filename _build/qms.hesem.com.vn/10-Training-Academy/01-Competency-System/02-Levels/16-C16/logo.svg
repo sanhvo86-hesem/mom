@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#e6fcf5" stroke="#96f2d7" stroke-width="2"/>
+  <rect x="25" y="40" width="70" height="8" rx="4" fill="#0b7285" opacity=".15" stroke="#0b7285" stroke-width="1.5"/>
+  <path d="M30 48v6M40 48v4M50 48v6M60 48v4M70 48v6M80 48v4M90 48v6" stroke="#0b7285" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M40 62l20 0 20-12" stroke="#0b7285" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="60" cy="62" r="3" fill="#0b7285"/>
+  <text x="60" y="80" text-anchor="middle" font-size="7" font-weight="600" fill="#0b7285" font-family="monospace">±0.001mm</text>
+  <text x="60" y="108" text-anchor="middle" font-size="7" font-weight="700" fill="#0b7285" font-family="system-ui">METROLOGY</text>
+</svg>

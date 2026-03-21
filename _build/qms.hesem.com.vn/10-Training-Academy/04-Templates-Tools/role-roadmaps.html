@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TRN-ACA-RMAP-01 — Role Roadmaps (30/60/90 ngày) | HESEM QMS</title>
+<link href="../../assets/style.css" rel="stylesheet"/>
+<style>
+
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
+.metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;}
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
+.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;}
+.link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);}
+.link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
+.link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);}
+.link-list{list-style:none;margin:0;padding:0}
+.link-list li{padding:4px 0 4px 0;font-size:12px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}
+.hero h1{font-size:22px;line-height:1.35;color:var(--navy);margin:0 0 8px}
+.hero p{font-size:13px;color:var(--ink2);margin:0}
+.mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
+.chip{display:inline-flex;padding:3px 10px;border-radius:999px;border:1px solid var(--ln);background:var(--bg2);font-size:11px;font-weight:600;margin-right:6px;margin-bottom:6px;}
+.legend-box{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.legend-box .chip{margin:0}
+.svg-wrap{overflow:auto;border:1px solid var(--ln);border-radius:var(--r);background:#fff;padding:12px}
+.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
+.notice-item{padding:10px 12px;border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r-sm);background:var(--bg);font-size:12px}
+.small{font-size:12px}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+
+.phase-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:#fff}
+.phase-card h3{font-size:15px;color:var(--navy);margin:0 0 8px}
+.phase-card p{margin:6px 0}
+.phase-card .gate{margin-top:8px;font-size:12px;color:var(--ink2)}
+
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Training Academy • Templates &amp; Tools</span>
+</div>
+</div>
+<div class="title">
+<strong>TRN-ACA-RMAP-01 — Role Roadmaps (30/60/90 ngày)</strong>
+<span class="sub-vn">Roadmap triển khai theo family vai trò sau khi đồng bộ JD, handbook, deputy và certification</span>
+</div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>TRN-ACA-RMAP-01</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>HR Manager / Department Heads / QA Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="form-sheet">
+<div class="hero">
+<h1>Role Roadmaps — roadmap 30/60/90 ngày theo family vai trò</h1>
+<p>Roadmap này nối <b>JD ↔ handbook ↔ bundle SOP/WI/FRM ↔ OJT ↔ certification</b> để tránh onboarding hoặc cross-training kiểu “đọc vài file rồi vào làm”. Mỗi roadmap là khung chuẩn; trưởng bộ phận vẫn phải điều chỉnh theo machine family, customer requirement và mức criticality thực tế.</p>
+</div>
+<div class="note"><b>Quy tắc dùng roadmap</b><br/>Mỗi roadmap phải bám JD active, handbook phòng ban, <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-025-authority-matrix.html">Authority Matrix</a>, <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">Deputy Matrix</a> và bundle vận hành mà vai trò trực tiếp sử dụng. Khi role-boundary hoặc training gate thay đổi, roadmap liên quan phải được rà lại cùng <a href="certification-register.html">Certification Register</a>.</div>
+<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#rr1">1. Roadmap theo family vai trò</a><a href="#rr2">2. Quy tắc triển khai</a><a href="#rr3">3. Khi dùng cho deputy / backup</a></div></div>
+<h2 class="h2" id="rr1">1. Roadmap theo family vai trò</h2>
+<div class="link-grid">
+<div class="phase-card">
+<h3>Commercial Front-end</h3>
+<p><b>Áp dụng cho:</b> Customer Service; Estimator</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"/><col style="width:33%"/><col style="width:34%"/></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Hiểu RFQ/PO completeness, contract review, quote assumption, order change control và rule escalated khi feasibility chưa khóa.</td><td>Tự điều phối RFQ → quote → order acknowledgement đúng SSOT, mở/đóng change log và phối hợp kickoff theo rule.</td><td>Dẫn một luồng quote-to-order end-to-end với bằng chứng đầy đủ, không còn uncontrolled promise / uncontrolled change.</td></tr></tbody></table></div>
+<p class="gate"><b>Gate trọng yếu:</b> RFQ completeness • assumption discipline • kickoff readiness</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html">Sales &amp; CS Handbook</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a> • <a  download="" href="../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM-202 Contract Review</a> • <a href="../../02-Tai-Lieu-He-Thong/03-Organization/01-Org-Chart/annex-org-001-org-chart-fullpage.html">ANNEX-ORG-001</a></p>
+</div>
+<div class="phase-card">
+<h3>Engineering Release</h3>
+<p><b>Áp dụng cho:</b> DFM Engineer; Process Engineer; CAM/NC Programmer; Engineering Lead</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"/><col style="width:33%"/><col style="width:34%"/></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm drawing/spec/CTQ, feasibility method, routing concept, NC/configuration control và handoff với QA/Production.</td><td>Phát hành DFM/routing/NC theo rule, xử lý technical abnormality và change request có log, giữ revision integrity.</td><td>Dẫn một technical release / ECN / prove-out support trọn gói cho family được giao với evidence đầy đủ.</td></tr></tbody></table></div>
+<p class="gate"><b>Gate trọng yếu:</b> Revision control • release authority • prove-out / abnormality response</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html">Engineering Handbook</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-cam-nc.html">OJT CAM/NC</a></p>
+</div>
+<div class="phase-card">
+<h3>Planning &amp; IE</h3>
+<p><b>Áp dụng cho:</b> Production Planner; Production Engineer / IE</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"/><col style="width:33%"/><col style="width:34%"/></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Hiểu readiness logic, dispatch rule, WIP/aging, bottleneck data, standard time và escalation ladder.</td><td>Tự điều độ và theo dõi năng lực theo rule đã duyệt; mở action khi readiness hoặc flow mất kiểm soát.</td><td>Dẫn một chu kỳ điều độ / cải tiến tái cân bằng có số liệu trước-sau và handoff rõ với workshop.</td></tr></tbody></table></div>
+<p class="gate"><b>Gate trọng yếu:</b> Readiness • dispatch discipline • WIP escalation</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html">Production Handbook</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-planner-dispatcher.html">OJT Planner</a> • <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-027-kpi-cascade-dictionary.html">KPI Cascade</a></p>
+</div>
+<div class="phase-card">
+<h3>Workshop Leadership</h3>
+<p><b>Áp dụng cho:</b> Production Director; Workshop Manager; Shift Leader</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"/><col style="width:33%"/><col style="width:34%"/></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm startup check, manpower/cell control, abnormality response, handover, product safety/FOD discipline.</td><td>Điều hành ca/cell theo visual management, reaction rule và escalation đúng điểm, không “giữ lỗi trong ca”.</td><td>Dẫn một chu kỳ vận hành ổn định với OTD/FPY/response đạt target nội bộ và bằng chứng quản trị đầy đủ.</td></tr></tbody></table></div>
+<p class="gate"><b>Gate trọng yếu:</b> Abnormality response • shift handover • release / escalation discipline</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html">Production Handbook</a> • <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-025-authority-matrix.html">Authority Matrix</a> • <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">Deputy Matrix</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></p>
+</div>
+<div class="phase-card">
+<h3>Setup &amp; CNC Operation</h3>
+<p><b>Áp dụng cho:</b> Setup Technician; CNC Operator; Team Lead</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"/><col style="width:33%"/><col style="width:34%"/></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm setup sheet, tool list, first-piece rule, machine discipline, clean/FOD/traceability basics.</td><td>Thực hiện setup / operation độc lập trong scope cho phép, dùng form đúng, biết dừng khi gate không đạt.</td><td>Duy trì thao tác ổn định theo family máy được giao, có bằng chứng first-piece/record discipline và hỗ trợ đào tạo L1/L2.</td></tr></tbody></table></div>
+<p class="gate"><b>Gate trọng yếu:</b> Setup release • first-piece • revision / traceability • machine discipline</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html">Production Handbook</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-setup-teamlead.html">OJT Setup / Team Lead</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-operator.html">OJT Operator</a> • <a href="role-gate-tests.html">Role Gate Tests</a></p>
+</div>
+<div class="phase-card">
+<h3>Quality System &amp; Process Quality</h3>
+<p><b>Áp dụng cho:</b> QA Manager; QMS Engineer; Quality Engineer</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"/><col style="width:33%"/><col style="width:34%"/></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm QMS architecture, control plan, CAPA, complaint, audit/LPA, release governance và KPI logic.</td><td>Tự dẫn dắt NCR/CAPA, audit, complaint response và planning quality cho family được giao.</td><td>Chốt và xác minh hiệu lực một chu kỳ cải tiến / audit / CAPA hoàn chỉnh, đóng đúng với management review logic.</td></tr></tbody></table></div>
+<p class="gate"><b>Gate trọng yếu:</b> Containment • effectiveness verification • release governance</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html">Quality Handbook</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-qa-qms.html">OJT QA/QMS</a></p>
+</div>
+<div class="phase-card">
+<h3>QC / CMM / Metrology</h3>
+<p><b>Áp dụng cho:</b> QC Inspector; CMM / inspection family</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"/><col style="width:33%"/><col style="width:34%"/></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Hiểu inspection plan, measurement discipline, evidence traceability, hold/release basics.</td><td>Thực hiện kiểm tra, ghi nhận và escalated bất thường đúng rule; không bỏ qua thiếu dữ liệu/thiếu chứng cứ.</td><td>Duy trì inspection performance ổn định, zero uncontrolled release trong scope được giao.</td></tr></tbody></table></div>
+<p class="gate"><b>Gate trọng yếu:</b> Measurement evidence • hold/release • abnormality response</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html">Quality Handbook</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-qc-inspector.html">OJT QC Inspector</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a> • <a  download="" href="../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651 NCR</a></p>
+</div>
+<div class="phase-card">
+<h3>Supply Chain &amp; Shipment</h3>
+<p><b>Áp dụng cho:</b> Supply Chain Manager; Buyer; Warehouse / Receiving; Logistics</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"/><col style="width:33%"/><col style="width:34%"/></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm supplier flow-down, cert review, lot control, receiving status, shipping docs, clean-pack/ship-ready rule.</td><td>Tự xử lý vòng PO → receiving → issue → dispatch với traceability đầy đủ, không mất cert/lot/status.</td><td>Vận hành ổn định chuỗi nguồn cung / shipment cho family job được giao mà không phát sinh uncontrolled material status.</td></tr></tbody></table></div>
+<p class="gate"><b>Gate trọng yếu:</b> Cert / lot control • supplier handoff • ship packet readiness</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html">Supply Chain Handbook</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-purchasing.html">OJT Purchasing</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-warehouse-receiving.html">OJT Warehouse</a></p>
+</div>
+<div class="phase-card">
+<h3>People, Safety &amp; Compliance</h3>
+<p><b>Áp dụng cho:</b> HR Manager; EHS Specialist; trainers; compliance support</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"/><col style="width:33%"/><col style="width:34%"/></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm competency governance, certification cycle, incident/near-miss rule, work environment and statutory basics.</td><td>Tự vận hành một chu kỳ đào tạo/chứng nhận hoặc incident follow-up với record đầy đủ và handoff đúng owner.</td><td>Chủ trì readiness review cho coverage nhân lực, certification hoặc EHS improvement trong phạm vi phụ trách.</td></tr></tbody></table></div>
+<p class="gate"><b>Gate trọng yếu:</b> Training evidence • certification integrity • incident / work-environment response</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html">HR Handbook</a> • <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html">EHS Handbook</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a> • <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-802-incident-near-miss-and-ehs.html">SOP-802</a> • <a href="certification-register.html">Certification Register</a></p>
+</div>
+<div class="phase-card">
+<h3>Digital &amp; ERP Governance</h3>
+<p><b>Áp dụng cho:</b> Epicor System Administrator; IT Administrator; business system owner</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"/><col style="width:33%"/><col style="width:34%"/></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm field mapping, access, workflow, backup baseline, issue/change control, data traceability, system boundary.</td><td>Tự xử lý access/change/incident theo rule, giữ data integrity và biết khi nào phải hold transaction hoặc rollback.</td><td>Dẫn một thay đổi hoặc phục hồi hệ thống với evidence UAT, approval, backup, rollback và owner sign-off đầy đủ.</td></tr></tbody></table></div>
+<p class="gate"><b>Gate trọng yếu:</b> Least privilege • change integrity • contingency / backfill</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html">IT Handbook</a> • <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html">Epicor Handbook</a> • <a href="../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-it-001-role-based-access-map.html">ANNEX-IT-001</a> • <a href="../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-018-epicor-transaction-and-interface-map.html">ANNEX-QMS-018</a> • <a href="../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-021-offline-fallback-kit.html">ANNEX-QMS-021</a></p>
+</div>
+</div>
+<h2 class="h2" id="rr2">2. Quy tắc triển khai</h2>
+<ul class="tight"><li>Roadmap 30/60/90 ngày là khung chuẩn; trưởng bộ phận phải cá thể hóa theo scope thực tế, ca làm việc, máy, sản phẩm hoặc customer requirement.</li><li>Mỗi mốc phải có bằng chứng: đào tạo / OJT / assessment / output thực tế và cập nhật về SSOT theo <a href="evidence-naming-rule.html">Evidence Naming Rule</a>.</li><li>Không coi hoàn thành mốc 30/60/90 là đương nhiên đủ cấp chứng nhận; việc công nhận level phải đi qua <a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-804_Competence_Assessment.xlsx">FRM-804</a>, <a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-805_Skill_Level_Certificate.xlsx">FRM-805</a> và <a href="certification-register.html">Certification Register</a>.</li><li>Khi xuất hiện gate breach, roadmap phải bị điều chỉnh và học viên có thể bị chuyển trạng thái Hold/Conditional trong register chứng nhận.</li></ul>
+<h2 class="h2" id="rr3">3. Khi dùng cho deputy / backup</h2>
+<p>Roadmap là căn cứ để xây coverage deputy thực chất. Trước khi một người được tính là backup cho vai trò critical, cần đối chiếu cả ba lớp: (1) role nằm trong <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a>; (2) roadmap/OJT/assessment đã đi đủ; (3) certification còn hiệu lực trong đúng scope. Chỉ hoàn thành đào tạo lớp hoặc “đã làm thay vài lần” không đủ để coi là deputy hợp lệ.</p>
+<div class="footer-note">Roadmap này là công cụ triển khai. Nguồn chuẩn cho quyết định phân quyền, phân vai và coverage cuối cùng vẫn là handbook, JD, authority matrix và deputy matrix đang hiệu lực.</div>
+</div>
+
+<h2>4. Trained ≠ certified ≠ authorized ≠ deputy</h2>
+<div class="table-card"><table><thead><tr><th>Trạng thái</th><th>Nói lên điều gì</th><th>Chưa cho phép điều gì</th></tr></thead><tbody>
+<tr><td>Trained</td><td>Đã học nội dung và có evidence tham dự / OJT.</td><td>Không tự động được làm độc lập hoặc ký release.</td></tr>
+<tr><td>Certified</td><td>Đã vượt qua gate / đánh giá cho một scope năng lực xác định.</td><td>Không tự động có approval authority hoặc deputy coverage.</td></tr>
+<tr><td>Authorized</td><td>Được phép thực hiện / sign trong scope đã nêu và đang còn hiệu lực.</td><td>Không mặc định được làm ngoài customer / machine / shift boundary đã cấp.</td></tr>
+<tr><td>Deputy ready</td><td>Có thể kích hoạt backup cho role critical khi đủ bằng chứng duy trì năng lực.</td><td>Không có hiệu lực nếu register / matrix / recent evidence chưa cập nhật.</td></tr>
+</tbody></table></div>
+<div class="note"><b>Dùng cùng</b><br/>Xem thêm <a href="authorization-library.html">Authorization Library</a> để biến roadmap thành quyền được phép làm có boundary rõ ràng.</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

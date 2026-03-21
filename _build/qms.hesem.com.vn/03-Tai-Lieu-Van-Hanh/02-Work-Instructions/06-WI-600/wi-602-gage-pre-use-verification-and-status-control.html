@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WI-602 — Kiểm trước khi dùng dụng cụ đo, trạng thái CAL và xử lý nghi ngờ | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu vận hành • Work Instruction</span>
+</div>
+</div>
+<div class="title"><strong>WI-602 — Kiểm trước khi dùng dụng cụ đo, trạng thái CAL và xử lý nghi ngờ</strong></div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>WI-602</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>QA Manager / Metrology Lead / Maintenance Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng trước mọi phép đo pass/fail, CTQ, FAI, SPC, final release hoặc bất kỳ phép đo nào ảnh hưởng quyết định chất lượng.</div>
+<h1>WI-602 — Kiểm trước khi dùng dụng cụ đo, trạng thái CAL và xử lý nghi ngờ</h1>
+<div class="section"><h2>1. Mục đích và nguyên tắc sử dụng dụng cụ đo</h2>
+<p>WI này chuẩn hóa kiểm trước khi dùng dụng cụ đo tại điểm dùng. Mọi phép đo dùng để quyết định pass/fail, set offset, release first piece, release final hoặc xác nhận CTQ đều phải đi qua gate này. Không nhãn trạng thái, nhãn mờ, seal hỏng, gage vừa rơi hoặc không chứng minh được chuẩn so sánh thì coi như <span class="badge-red">HOLD</span>.</p>
+<div class="callout-danger"><strong>CẤM</strong> mượn gage của công đoạn khác mà không sign-out. CẤM đo CTQ bằng gage chưa zero/chưa verify. CẤM che giấu sự cố rơi, va đập, pin yếu, màn hình lỗi hoặc reading nhảy bất thường.</div></div>
+<div class="section"><h2>2. Gate kiểm trước khi dùng</h2>
+<div class="table-card"><table><thead><tr><th>Gate</th><th>Phải kiểm</th><th>PASS khi</th><th>HOLD khi</th></tr></thead><tbody>
+<tr><td>G1 — Nhận diện</td><td>Gage ID, serial, trạng thái CAL, ngày hết hạn, owner/vị trí cấp phát.</td><td>Nhãn rõ, đúng gage, còn hiệu lực.</td><td>Không nhãn, sai ID, quá hạn, không truy ra record.</td></tr>
+<tr><td>G2 — Tình trạng vật lý</td><td>Mặt đo, mỏ đo, đầu dò, dây cáp, màn hình, pin, seal, hộp bảo quản.</td><td>Không sứt mẻ, không rỉ, không bavia, không seal broken.</td><td>Rơi/va đập, seal hỏng, mặt đo trầy, ren gauge mẻ, pin yếu gây mất ổn định.</td></tr>
+<tr><td>G3 — Zero / reference</td><td>Zero tại điều kiện dùng; kiểm bằng chuẩn reference hoặc master phù hợp.</td><td>Zero ổn định, lặp lại tốt, master check đạt.</td><td>Zero trôi, lặp lại kém, sai trên master.</td></tr>
+<tr><td>G4 — Điều kiện đo</td><td>Nhiệt độ, sạch bề mặt, lực đo, đơn vị mm/inch, mode absolute/incremental.</td><td>Điều kiện đo phù hợp method và dụng cụ.</td><td>Chi tiết/gage còn nóng, bẩn, đơn vị sai, operator không hiểu method.</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>3. Quick verification theo nhóm gage</h2>
+<div class="table-card"><table><thead><tr><th>Nhóm gage</th><th>Kiểm trước khi dùng</th><th>Lưu ý thực chiến</th></tr></thead><tbody>
+<tr><td>Caliper / height gauge</td><td>Zero, trượt êm, không hở mỏ, kiểm 1–2 block/reference point.</td><td>Không dùng caliper cho CTQ dung sai rất chặt nếu method đã yêu cầu micrometer/CMM.</td></tr>
+<tr><td>Micrometer ngoài/trong</td><td>Vệ sinh mặt đo, zero bằng standard, kiểm ratchet/force, kiểm repeat 3 lần.</td><td>Nếu cảm giác siết khác thường hoặc mỏ đo trượt, dừng dùng ngay.</td></tr>
+<tr><td>Bore gauge / air gage</td><td>Set bằng ring/setting master đúng size, xác minh điểm zero và repeatability.</td><td>Luôn ghi size master đã dùng. Sai master hoặc master chưa nhiệt ổn định là HOLD.</td></tr>
+<tr><td>Indicator / dial test</td><td>Kiểm hành trình, độ trơn, kim về 0, đầu tiếp xúc không mẻ.</td><td>Không dùng indicator có hysteresis rõ hoặc kim giật.</td></tr>
+<tr><td>Pin/thread plug / ring gauge</td><td>Kiểm tình trạng bề mặt, mã size/class, hướng GO/NO-GO, sạch phoi.</td><td>Cấm dùng pin/ring mòn không truy được lịch sử hoặc lẫn bộ.</td></tr>
+<tr><td>Surface roughness / leak / special test instrument</td><td>Kiểm trạng thái CAL, self-test, reference specimen/zero block, phụ kiện đúng.</td><td>Nếu method yêu cầu warm-up hoặc environment stabilization thì phải chờ đủ thời gian.</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>4. Phản ứng khi gage nghi ngờ hoặc fail gate</h2>
+<div class="step-list">
+<div class="step-item"><strong>Dừng dùng ngay.</strong><br/>Đặt trạng thái HOLD vật lý; không tiếp tục đo để “kiểm thử thêm”.</div>
+<div class="step-item"><strong>Khóa ảnh hưởng.</strong><br/>Xác định phép đo nào đã dùng gage này từ lần verify cuối cùng; nếu đã dùng cho CTQ/release thì kích hoạt <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
+<div class="step-item"><strong>Đổi phương pháp đo.</strong><br/>Chuyển sang gage khác đã verify hoặc sang CMM/fixture/reference method được QA phê duyệt.</div>
+<div class="step-item"><strong>Ghi nhận sự cố.</strong><br/>Log sự cố phải có gage ID, hiện tượng, thời điểm, người phát hiện, job liên quan và hành động tạm thời.</div>
+</div>
+<div class="callout-warn"><strong>Rule:</strong> Nếu gage fail trên master hoặc có seal broken, mọi kết quả đang chờ release dựa trên gage đó phải dừng lại đến khi có quyết định của QA/Metrology.</div></div>
+<div class="section"><h2>5. Khi nào phải gọi QA / Metrology</h2>
+<div class="two-col">
+<div class="card"><h3>Phải escalation ngay</h3><ul class="tight" style="padding-left:18px;"><li>Gage đo CTQ/release final bị fail quick verification.</li><li>Gage rơi, va đập, ngâm dầu/dung dịch hoặc nghi nhiễm bẩn.</li><li>Đọc số không lặp lại, sai master, hoặc khác nhau giữa hai gage vượt ngưỡng nội bộ.</li><li>Không tìm thấy standard/master hợp lệ để verify.</li></ul></div>
+<div class="card"><h3>Cho phép xử lý tại chỗ</h3><ul class="tight" style="padding-left:18px;"><li>Lau sạch bề mặt đo theo chuẩn.</li><li>Thay pin hoặc reset mode khi không ảnh hưởng integrity của thiết bị.</li><li>Thực hiện zero lại sau khi đã xác minh nguyên nhân là do thao tác.</li></ul></div>
+</div></div>
+<div class="section"><h2>6. Hồ sơ, KPI và tài liệu liên kết</h2>
+<div class="kpi-grid">
+<div class="kpi-box"><strong>KPI-WI602-01</strong><br/>Tỷ lệ gage fail quick verification trên tổng số lần sử dụng.</div>
+<div class="kpi-box"><strong>KPI-WI602-02</strong><br/>Số lô bị ảnh hưởng do dùng gage nghi ngờ/hết hạn/seal broken.</div>
+<div class="kpi-box"><strong>KPI-WI602-03</strong><br/>Tỷ lệ CTQ measurement có evidence verify đầy đủ trước khi đo.</div>
+<div class="kpi-box"><strong>KPI-WI602-04</strong><br/>Số lần operator phải đổi method đo do measurement system không phù hợp.</div>
+</div>
+<div class="table-card"><table><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-601-calibration-and-gage-control.html">SOP-601</a></td><td>Quản lý hiệu chuẩn và vòng đời gage.</td></tr>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-602-measurement-system-analysis-msagr-r.html">SOP-602</a></td><td>MSA, Gage R&amp;R và năng lực hệ thống đo.</td></tr>
+<tr><td><a href="../../03-Reference/02-ANNEX-Standards/annex-qa-002-msa-acceptance-criteria.html">ANNEX-QA-002</a></td><td>Tiêu chí chấp nhận MSA và guide xác nhận gage.</td></tr>
+<tr><td><a href="wi-604-spc-chart-use-process-capability-and-reaction.html">WI-604</a></td><td>SPC/capability chỉ hợp lệ khi measurement system đạt.</td></tr>
+<tr><td><a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Containment khi measurement result không còn đáng tin.</td></tr>
+</tbody></table></div></div>
+<div data-phase2f="true">
+<h2 class="h2" id="phase2f-study-selection">Phase 2F — Study selection guide</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Khi nào</th><th>Dùng hồ sơ nào</th><th>Boundary</th></tr></thead><tbody>
+<tr><td>Pre-use check / shift check / after event</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-602_Gage_Verification_Log.xlsx">FRM-602</a></td><td>Không thay cho calibration hay MSA đầy đủ.</td></tr>
+<tr><td>Nghi ngờ người đo + thiết bị variation</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-611_GRR_Study_Form.xlsx">FRM-611</a></td><td>Dùng khi quyết định cần nhìn repeatability / reproducibility.</td></tr>
+<tr><td>Nghi ngờ bias / linearity / drift</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-612_Bias_Linearity_Stability_Study_Form.xlsx">FRM-612</a></td><td>Dùng khi GR&amp;R không trả lời đủ rủi ro.</td></tr>
+<tr><td>Visual pass/fail hoặc CMM qualification</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-613_Attribute_MSA_and_CMM_Qualification_Record.xlsx">FRM-613</a></td><td>Khóa consistency của attribute decision hoặc program release.</td></tr>
+</tbody></table></div>
+</div></div>
+</div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

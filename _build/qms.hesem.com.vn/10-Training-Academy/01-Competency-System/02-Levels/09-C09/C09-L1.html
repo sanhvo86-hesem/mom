@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>C09-L1 — Time Management & Prioritization — Foundation | HESEM OS</title>
+<link href="../../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+</head>
+<body>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>C09-L1 — Time Management & Prioritization — Foundation</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>C09-L1</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<h1>C09 — Quản lý thời gian – ưu tiên – đúng hạn — Level 1</h1>
+<p class="lead"><strong>Level 1 — Kỷ luật đúng hạn trong ca.</strong> Module này tạo thói quen đúng hạn và ưu tiên đúng để giữ OTD mà không phá quality gate.</p>
+<div class="hero">
+<h2>Chuẩn thực chiến – Level 1</h2>
+<div class="meta">
+<div><strong>Vai trò mục tiêu</strong><br/>Operator, Setup, QC, Warehouse, Maintenance; mọi vị trí nhận việc từ Daily Dispatch List</div>
+<div><strong>Đầu ra bắt buộc</strong><ul><li>Lập to-do trong ca theo Daily Dispatch List và cập nhật trạng thái đúng thời điểm.</li><li>Báo sớm rủi ro trễ và kích hoạt escal theo SLA; không giấu blocker.</li><li>Không bypass gate: pre-start check, HOLD, QC release.</li></ul></div>
+<div><strong>Gate trọng yếu</strong><br/><span class="badge bad">Bypass HOLD/REV/QC</span> = FAIL</div>
+<div><strong>Thời lượng</strong><br/>Lý thuyết 45 phút • OJT 90 phút</div>
+</div>
+<p class="small-note">Nguyên tắc vận hành: làm đúng việc trước (priority), làm đúng cách (gate), và báo sớm (escal) khi bị chặn.</p>
+</div><div class="card">
+<span class="badge">Drill Pack (Job CNC)</span>
+<p class="lead" style="margin-top:10px;">
+ Chạy drill trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-daily-management-tier.html"><b>DRL-08</b> — Daily Management (Tier Meeting) Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Job Order E2E Drill (RFQ → Ship Packet)</a></li>
+</ul>
+<p class="small muted" style="margin-top:8px;">
+ Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ </p>
+</div>
+<h2>2) Mục đích module &amp; bối cảnh vận hành</h2>
+<div class="card">
+<ul>
+<li>Giữ cam kết giao hàng (OTD) bằng kỷ luật dispatch, freeze window, WIP aging, escal ladder.</li>
+<li>Chặn 2 nhóm rủi ro song song: (1) trễ đơn; (2) chạy nhanh nhưng phá gate gây lỗi chất lượng.</li>
+<li>Biến quản lý thời gian thành hành vi quan sát được: checklist, OJT, performance test, PASS/FAIL.</li>
+</ul>
+</div>
+<h2>3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + điểm chặn</h2>
+<p>C09-L1 nằm tại Production/QC/WHS trong chuỗi Planning → Production → QC/QA → Packing/Ship. Kích hoạt mỗi đầu ca, mỗi lần nhận job mới, mỗi khi có blocker.</p>
+<div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Nhận Daily Dispatch List</strong><p>Chỉ nhận việc từ danh sách phát hành trong ngày (cut-off + timestamp).</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Pre-start gate</strong><p>Kiểm đủ điều kiện: REV, vật tư, dao/gá, chương trình, kiểm chuẩn đo.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Thực hiện theo ưu tiên</strong><p>Làm theo Priority Class P0–P3 và freeze window.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Cập nhật trạng thái</strong><p>Update WIP/ERP hoặc board ngay khi chuyển trạng thái.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Escal khi bị chặn</strong><p>Blocker &gt; 15 phút hoặc risk trễ kích hoạt ladder.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Bàn giao ca</strong><p>Bàn giao có evidence: job đang làm, trạng thái, rủi ro, hành động.</p></div></div></div>
+<h2>4) Failure Points (tối thiểu 10 điểm gãy)</h2>
+<ol><li>Bỏ qua Daily Dispatch List, tự chọn job theo cảm tính.</li><li>Không làm pre-start gate: chạy khi thiếu vật tư/thiếu REV/thiếu chương trình.</li><li>Không cập nhật trạng thái làm WIP board và ERP lệch hiện trường.</li><li>Giấu blocker, báo trễ sau khi đã quá hạn.</li><li>Tiếp tục gia công khi đang HOLD do thiếu chứng từ hoặc sai REV.</li><li>Đổi ưu tiên trong ca mà không có phê duyệt; phá freeze window.</li><li>Không tách công việc chuẩn bị (dao/gá/đồ đo) dẫn tới chờ đợi dài.</li><li>Bàn giao ca bằng miệng, không có evidence; job bị treo.</li><li>Không kiểm WIP aging, job bị queue kéo dài vượt ngưỡng.</li><li>Không gọi escal đúng cấp, kéo dài nghẽn và trễ promise.</li><li>Làm song song quá nhiều job (WIP cá nhân cao) làm mọi việc chậm.</li><li>Không chốt 1 việc trước khi mở việc mới, gây lỗi lẫn job.</li></ol>
+<h2>5) Risk Controls (control points + owner + evidence)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Control point</th><th>Owner</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Daily Dispatch List phát hành theo WI-OPS-003</strong></td><td>PLA/Dispatcher</td><td>FRM-OPS-006 có timestamp</td><td>Không có danh sách = không nhận job</td></tr><tr><td><strong>Pre-start gate trước khi đưa job vào máy</strong></td><td>Operator/Setup/Supervisor</td><td>Checklist pre-start + xác nhận REV</td><td>Thiếu điều kiện = HOLD</td></tr><tr><td><strong>Priority Class P0–P3 + freeze window</strong></td><td>Supervisor</td><td>ANNEX-OPS-001</td><td>Đổi ưu tiên phải có log</td></tr><tr><td><strong>WIP aging bucket + hành động theo bucket</strong></td><td>Supervisor/Owner job</td><td>FRM-OPS-007</td><td>RED/BLACK phải escal</td></tr><tr><td><strong>Escalation ladder theo PROC-OPS-003</strong></td><td>Mọi role</td><td>Log escal + closure</td><td>Escal là mở khóa quyết định</td></tr><tr><td><strong>Bàn giao ca có evidence</strong></td><td>Cell owner</td><td>Dispatch note/handover log</td><td>Không evidence = FAIL gate</td></tr><tr><td><strong>WIP limit cá nhân/nhóm</strong></td><td>Supervisor</td><td>Board WIP + giới hạn</td><td>Vượt WIP limit = dừng nhận việc mới</td></tr></tbody></table></div>
+<h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Sai REV hoặc không có bằng chứng REV hợp lệ.</strong></td><td>Dừng nhận job; kích hoạt HOLD; báo Supervisor + QA.</td></tr><tr><td><span class="badge warn">HOLD</span></td><td><strong>Thiếu điều kiện pre-start (vật tư/dao/gá/chương trình/đồ đo).</strong></td><td>Gắn HOLD reason; không chạy; mở hành động giải tỏa.</td></tr><tr><td><span class="badge bad">BLOCK</span></td><td><strong>Blocker kéo dài và không escal theo SLA.</strong></td><td>Dừng tiếp tục tự xử; escal theo ladder; ghi log và due time.</td></tr></tbody></table></div>
+<h2>7) Phản ứng 60 giây</h2>
+<ol><li>Xác định blocker thuộc nhóm: REV/Material/Tooling/Program/Measurement/QC release.</li><li>Gắn HOLD ngay và cập nhật board/ERP với reason code.</li><li>Báo Supervisor trong 10 phút; nêu rõ: job, công đoạn, rủi ro trễ (giờ).</li><li>Chụp 01 evidence tại thời điểm phát hiện: ảnh nhãn, traveler, màn hình ERP.</li><li>Gắn 01 hành động có due trong ca; không để blocker trôi sang ca sau.</li></ol>
+<h2>8) Checklist vận hành (≤ 15 bước)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Owner</th><th>Evidence/MRR</th><th>Lỗi lặp lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Nhận FRM-OPS-006 và đọc 3 dòng: JobNum/Op/Due/Priority</strong></td><td>Operator</td><td>Daily Dispatch List</td><td>Nhận việc ngoài danh sách</td></tr><tr><td>2</td><td><strong>Kiểm HOLD status và reason code</strong></td><td>Operator</td><td>ERP/board status</td><td>Không nhìn HOLD</td></tr><tr><td>3</td><td><strong>Kiểm REV theo Part-REV-Master</strong></td><td>Operator/Setup</td><td>Ảnh/record REV</td><td>Dùng bản in cũ</td></tr><tr><td>4</td><td><strong>Kiểm vật tư đủ và có chứng từ khi cần</strong></td><td>Operator/WHS</td><td>MTR/CoC khi yêu cầu</td><td>Thiếu chứng từ mà vẫn chạy</td></tr><tr><td>5</td><td><strong>Kiểm dao/gá/chương trình đúng mã</strong></td><td>Setup/Programmer</td><td>Setup sheet/NC program release</td><td>Dùng chương trình cũ</td></tr><tr><td>6</td><td><strong>Kiểm đồ đo trong hạn kiểm chuẩn</strong></td><td>QC/Operator</td><td>Calib label/record</td><td>Dùng gage quá hạn</td></tr><tr><td>7</td><td><strong>Chốt kế hoạch 2 giờ: 1 job chính + 1 việc chuẩn bị</strong></td><td>Operator</td><td>To-do ca</td><td>Mở quá nhiều việc</td></tr><tr><td>8</td><td><strong>Thực hiện job theo ưu tiên; không phá freeze window</strong></td><td>Operator</td><td>Board/dispatch</td><td>Đổi ưu tiên tự ý</td></tr><tr><td>9</td><td><strong>Cập nhật trạng thái ngay khi chuyển bước</strong></td><td>Operator</td><td>ERP transaction/board update</td><td>Cập nhật trễ</td></tr><tr><td>10</td><td><strong>Khi bị chặn &gt;15 phút: escal Level 0→1</strong></td><td>Operator</td><td>Log escal</td><td>Tự xử kéo dài</td></tr><tr><td>11</td><td><strong>Bàn giao ca: ghi rõ job đang làm + trạng thái + rủi ro</strong></td><td>Cell owner</td><td>Handover log</td><td>Bàn giao miệng</td></tr><tr><td>12</td><td><strong>Đóng OJT và lưu hồ sơ</strong></td><td>Trainer</td><td>FRM-HR-TRN-003/008/009</td><td>Không có evidence đào tạo</td></tr></tbody></table></div>
+<h2>9) OJT thực chiến theo TWI</h2>
+<h3>Job breakdown (Step / Key Points / Reasons)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Key Points</th><th>Reasons</th></tr></thead><tbody><tr><td>1</td><td>Đọc dispatch</td><td>Nhìn JobNum/Op/Due/Priority/HOLD</td><td>Bắt đúng việc</td></tr><tr><td>2</td><td>Pre-start gate</td><td>REV + vật tư + dao/gá + chương trình + đồ đo</td><td>Chặn chạy sai</td></tr><tr><td>3</td><td>Time plan 2 giờ</td><td>1 job chính + 1 việc chuẩn bị</td><td>Giảm chờ</td></tr><tr><td>4</td><td>Update status</td><td>Cập nhật ngay khi chuyển trạng thái</td><td>WIP đúng</td></tr><tr><td>5</td><td>Escal</td><td>Blocker &gt; 15 phút kích hoạt ladder</td><td>Không giấu trễ</td></tr><tr><td>6</td><td>Handover</td><td>Bàn giao có evidence</td><td>Không rơi việc</td></tr></tbody></table></div>
+<h3>OJT output bắt buộc</h3>
+<ul><li>01 to-do ca theo dispatch (có ưu tiên và thời điểm bắt đầu/kết thúc).</li><li>01 log escal cho 01 blocker và 01 closure trong ca.</li><li>01 bàn giao ca có evidence cho 01 job đang dở.</li></ul>
+<h3>Rubric L1–L4 (hành vi quan sát được)</h3>
+<div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Làm đúng trong ca</td><td>Theo dispatch; pre-start gate đạt; update status đúng; escal đúng SLA</td></tr><tr><td><strong>L2</strong></td><td>Lập kế hoạch tuần/ngày</td><td>Chủ động chuẩn bị; giữ cam kết; WIP cá nhân thấp</td></tr><tr><td><strong>L3</strong></td><td>Điều phối nhóm</td><td>Quản trị bottleneck; WIP board; huấn luyện</td></tr><tr><td><strong>L4</strong></td><td>Thiết kế hệ thống OTD</td><td>Cadence; KPI; capacity; escalation; quyết định theo dữ liệu</td></tr></tbody></table></div>
+<h2>10) Đánh giá</h2>
+<h3>Quiz (≥ 20 câu)</h3>
+<div class="quiz"><ol><li>Daily Dispatch List do ai phát hành và lưu ở đâu?</li><li>Pre-start gate gồm những hạng mục nào?</li><li>Priority Class P0 khác P2 ở điểm nào?</li><li>Freeze window là gì và vì sao phải tuân thủ?</li><li>WIP aging bucket BLACK kích hoạt hành động gì?</li><li>Khi blocker kéo dài 20 phút, hành động bắt buộc là gì?</li><li>HOLD reason code dùng để làm gì?</li><li>Vì sao update status trễ làm OTD giảm?</li><li>Nêu 03 ví dụ blocker phổ biến trong xưởng CNC.</li><li>No evidence = No gate áp dụng cho bàn giao ca ra sao?</li><li>Khi phát hiện sai REV, quyết định bắt buộc là gì?</li><li>WIP limit cá nhân có mục tiêu gì?</li><li>FRM-OPS-007 dùng để ghi gì?</li><li>Vì sao không được tự đổi ưu tiên trong ca?</li><li>Khi job thiếu chứng từ, hành động bắt buộc là gì?</li><li>Escalation ladder Level 1 phản hồi trong bao lâu theo PROC-OPS-003?</li><li>AgingDays tính từ mốc nào tới mốc nào?</li><li>Bucket AMBER yêu cầu hành động trong bao lâu?</li><li>Khi bàn giao ca, tối thiểu phải ghi những gì?</li><li>Khi job đang HOLD, có được đưa vào máy không?</li><li>Khi WIP board lệch hiện trường, bước sửa đúng là gì?</li><li>Vì sao làm song song quá nhiều job làm năng suất giảm?</li></ol></div>
+<h3>Scenario (≥ 3 tình huống thật)</h3>
+<details>
+<summary>Job P1 nhưng thiếu đồ đo trong hạn kiểm chuẩn</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>JobNum J30001 • Priority P1 • Due 48h</li><li>Gage cần dùng đã quá hạn kiểm chuẩn</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Ra quyết định GO/HOLD/STOP và ghi MRR.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>HOLD job; yêu cầu QC đổi gage hoặc hiệu chuẩn; log escal; không bypass.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Supervisor đổi ưu tiên giữa ca</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Bạn đang chạy job P2</li><li>Supervisor yêu cầu chuyển sang job P0 ngay</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Hành động bắt buộc để phá freeze window đúng quy tắc.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Yêu cầu phê duyệt đúng cấp và ghi change note; cập nhật dispatch/ERP; bàn giao job đang dở có evidence.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Blocker kéo dài nhưng operator im lặng</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Máy dừng do dao gãy</li><li>30 phút không escal</li><li>WIP aging tăng</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Đánh giá PASS/FAIL và hành động khắc phục.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>FAIL; dừng tự xử; escal Level 1; huấn luyện lại phản ứng 60 giây; ghi action log.</li></ul></div>
+</div>
+</details>
+<h3>Performance test</h3>
+<div class="card">
+<h3>Bài test tay nghề — Điều hành 1 ca theo dispatch</h3>
+<h4>Bài làm bắt buộc</h4>
+<ol><li>Nhận dispatch và lập to-do 2 giờ đầu ca.</li><li>Thực hiện pre-start gate cho 1 job được giao.</li><li>Update status đúng thời điểm (ít nhất 3 lần).</li><li>Xử lý 1 tình huống blocker giả lập theo phản ứng 60 giây và escal đúng.</li><li>Bàn giao ca có evidence.</li></ol>
+<h4>PASS/FAIL</h4>
+<ul><li>PASS khi: không bypass gate; update status đúng; escal đúng; bàn giao đủ evidence.</li><li>FAIL khi: sai REV; chạy khi thiếu điều kiện; không escal; không có bàn giao evidence.</li></ul>
+</div>
+<h2>11) PASS/FAIL criteria</h2>
+<div class="kpi-gate">
+<strong>PASS/FAIL (No evidence = No gate)</strong>
+<ul>
+<li>PASS khi hoàn thành OJT output và performance test đạt; tuân thủ dispatch/freeze/escal; có log và closure.</li>
+<li>FAIL ngay khi bypass gate (REV/HOLD/QC), giấu blocker, không escal theo SLA, hoặc không có evidence bàn giao.</li>
+</ul>
+</div>
+<h2>12) MRR tối thiểu (hồ sơ bắt buộc + naming + nơi lưu)</h2>
+<p><strong>Quy tắc đặt tên:</strong> <span class="mono">JobNum_PartNo_REV_DISPATCHNOTE_YYYYMMDD_##.pdf hoặc theo naming rule ANNEX-QMS-003.</span></p>
+<ul><li>FRM-OPS-006 Daily Dispatch List (bản trong ngày).</li><li>FRM-OPS-007 WIP Aging Log (khi aging vượt ngưỡng).</li><li>WIP tag FRM-WHS-003 (khi job cần nhận diện trạng thái).</li><li>Log escal theo PROC-OPS-003 (hoặc action log tại Tier).</li><li>Hồ sơ OJT &amp; đánh giá: FRM-HR-TRN-003/008/009.</li></ul>
+<div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → Job-Dossiers (dispatch note/evidence) + controlled forms library.</div>
+<h2>13) Common audit findings &amp; prevention</h2>
+<ol><li>Không tuân thủ dispatch; làm sai ưu tiên.</li><li>Không có pre-start gate evidence.</li><li>Update status trễ hoặc sai, WIP lệch hiện trường.</li><li>Job HOLD vẫn được đưa vào máy.</li><li>Không có log escal; blocker bị giấu.</li><li>Bàn giao ca không evidence; việc rơi.</li><li>WIP aging vượt ngưỡng nhưng không action.</li><li>Phá freeze window không có phê duyệt/log.</li></ol>
+<h2>Tài liệu liên quan</h2>
+<ul>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//wi-501-dispatch-capacity-and-wip-rules.html">WI-OPS-003 — Dispatch &amp; WIP Aging</a></li>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-rules.html">ANNEX-OPS-001 — Quy tắc Dispatch &amp; WIP Aging</a></li>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">PROC-PLA-002 — Dispatch control &amp; capacity review</a></li>
+<li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">PROC-OPS-003 — Escalation SLA &amp; WIP Aging</a></li>
+<li><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-OPS-006 — Daily Dispatch List</a></li>
+<li><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-OPS-007 — WIP Aging Log</a></li>
+</ul>
+</div></div></div>
+</div>
+<script src="../../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QMS Engineer | HESEM QMS</title>
+<link href="../../../../assets/style.css" rel="stylesheet"/>
+<style>
+/* PAGE BREAK & OVERFLOW FIX */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .form-sheet, .lane, .legend, .req, .vstep, .auth-grid {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header { page-break-inside: avoid; break-inside: avoid; }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
+.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
+.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
+.raci-A {background:#fff5f5; color:#c92a2a;}
+.raci-R {background:#e7f5ff; color:#1864ab;}
+.raci-C {background:#fff9db; color:#e67700;}
+.raci-I {background:#ebfbee; color:#2b8a3e;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
+.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
+.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
+.doc-link-list {list-style:none; margin:0; padding:0;}
+.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
+.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
+.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
+.svg-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
+.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
+
+
+
+/* JD-LAYOUT-PLUS */
+.jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left:4px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
+.jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left:4px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
+.jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
+.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
+.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left:4px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
+.muted-note{font-size:12px; color:var(--ink2,#475569);}
+.raci-badge{display:inline-block; min-width:26px; text-align:center; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;}
+.raci-a{background:#fff3e0; color:#b45309;}
+.raci-r{background:#e0f2fe; color:#0369a1;}
+.raci-c{background:#f3e8ff; color:#7e22ce;}
+.raci-i{background:#ecfdf5; color:#047857;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
+.comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
+.comp-card ul{margin-bottom:0;}
+.require-table th{width:24%;}
+.inline-note{margin-top:8px; font-size:12px; color:var(--ink2,#475569);}
+@media (max-width: 920px){ .auth-grid,.comp-grid{grid-template-columns:1fr;} }
+@media print {
+ .jd-purpose,.jd-mission,.auth-grid,.auth-item,.backup-card,.comp-grid,.comp-card{page-break-inside:avoid; break-inside:avoid;}
+}
+
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu kiểm soát</span>
+</div>
+</div>
+<div class="title">
+<strong>JD-QMS-ENGINEER — QMS Engineer</strong>
+<span class="sub-vn">Kỹ sư Hệ thống QMS</span>
+</div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>JD-QMS-ENGINEER</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>HR Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="form-sheet">
+<div class="preface-block">
+<p><b>Bộ phận</b> Quality    <b>Vai trò trong chuỗi giá trị</b> Tài liệu &amp; dữ liệu hệ thống → audit/CAPA tracking → KPI/management review → knowledge/training system coordination.    <b>Tài liệu liên đới</b> SOP-101 SOP-104 WI-101 WI-202 WI-203 ANNEX-OPS-003</p>
+</div>
+<div class="jd-purpose"><p>Vai trò của tài liệu: JD này khóa rõ phạm vi công việc, điểm kết thúc trách nhiệm và cơ chế handoff của Kỹ sư Hệ thống QMS; dùng làm đầu vào chuẩn cho tuyển dụng, OJT/đào tạo, đánh giá năng lực, KPI, lương thưởng và phối hợp liên phòng ban trong chuỗi RFQ → ship. JD này phải được đọc cùng ANNEX-OPS-003, ANNEX-QMS-025, ANNEX-QMS-026, ANNEX-QMS-027, ANNEX-QMS-028 và SOP/WI/ANNEX đang hiệu lực.</p></div>
+<h2 class="h2">1. Thông tin vị trí (Position ID &amp; Title)</h2>
+<div class="table-card">
+<table class="table require-table"><tbody>
+<tr><th>Mã vị trí (Position ID)</th><td>JD-QMS-ENGINEER</td></tr>
+<tr><th>Chức danh theo tài liệu</th><td>QMS Engineer</td></tr>
+<tr><th>Bộ phận</th><td>Quality</td></tr>
+<tr><th>Cấp vai trò</th><td>Professional / Staff</td></tr>
+<tr><th>Nhóm vai trò</th><td>QA / QC / QMS / kiểm soát chất lượng &amp; truy vết</td></tr>
+<tr><th>Báo cáo trực tiếp cho</th><td>QA Manager.</td></tr>
+<tr><th>Quản lý trực tiếp</th><td>Không có nhân sự báo cáo trực tiếp.</td></tr>
+<tr><th>Phối hợp chức năng chính</th><td>Phối hợp với tất cả owner tài liệu, process owner, internal auditor và IT / M365 admin để kiểm soát tài liệu – hồ sơ – evidence theo đúng quy định.</td></tr>
+<tr><th>Hệ thống / công cụ vận hành chính</th><td>Hồ sơ inspection/CMM; NCR/MRB/CAPA; calibration &amp; traceability records; Epicor inspection status và controlled forms.</td></tr>
+<tr><th>Vai trò trong chuỗi giá trị</th><td>Tài liệu &amp; dữ liệu hệ thống → audit/CAPA tracking → KPI/management review → knowledge/training system coordination.</td></tr></tbody></table>
+</div>
+<h2 class="h2">2. Sứ mệnh vị trí (Role Mission)</h2>
+<div class="jd-mission"><p>QMS Engineer là người giữ nhịp cho hệ thống tài liệu và hồ sơ kiểm soát của công ty. Vị trí này bảo đảm tài liệu đúng phiên bản, hồ sơ truy được, audit có bằng chứng và mọi thay đổi hệ thống đều đi qua đúng cổng kiểm soát.</p><p>Chức danh này đặc biệt quan trọng khi công ty vận hành bằng Epicor + SSOT, vì chỉ cần mất kỷ luật tài liệu / record là toàn bộ hệ thống KPI, đào tạo, audit và cải tiến sẽ mất độ tin cậy.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Tài liệu được phát hành / thu hồi / phân phối có kiểm soát, không để bản lỗi thời tồn tại ở hiện trường.</li><li>Hồ sơ và evidence pack truy xuất được nhanh, đúng naming / retention / ownership.</li><li>Audit và closure được vận hành bằng cơ chế thật, không bị đứt bằng chứng hoặc đẩy việc về phút cuối.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> QMS Engineer là owner vận hành hệ QMS và tài liệu kiểm soát; không trực tiếp phán quyết sản phẩm đạt/không đạt như QA/QC, và không viết thay nội dung chuyên môn của mọi quy trình nếu process owner chưa xác nhận.</p></div><div class="callout"><p><b>Trọng tâm cập nhật từ bộ tài liệu vận hành nâng cấp</b></p><ul class="tight"><li>Giữ hệ tài liệu, ma trận tham chiếu, hồ sơ, dashboard logic và roadmap change đồng nhất để QMS phục vụ vận hành thật thay vì chỉ đẹp về cấu trúc.</li><li>Mọi thay đổi tài liệu phải phản ánh đúng role-boundary, authority, RACI, KPI cascade và evidence pack; không để SOP/WI/ANNEX/JD chạy lệch nhau.</li><li>Đưa document control, knowledge management và audit-readiness thành năng lực vận hành hàng ngày, không phải việc dọn dẹp trước audit.</li></ul></div>
+<h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
+<div class="table-card">
+<table class="table require-table"><tbody>
+<tr><th>Báo cáo trực tiếp</th><td>QA Manager.</td></tr>
+<tr><th>Nhân sự báo cáo trực tiếp</th><td>Không có nhân sự báo cáo trực tiếp.</td></tr>
+<tr><th>Tuyến phối hợp chức năng</th><td>Phối hợp với tất cả owner tài liệu, process owner, internal auditor và IT / M365 admin để kiểm soát tài liệu – hồ sơ – evidence theo đúng quy định.</td></tr>
+<tr><th>Giao diện nội bộ chính</th><td>QA Manager; tất cả trưởng bộ phận; Internal Auditor; IT / Epicor admin; HR.</td></tr>
+<tr><th>Giao diện bên ngoài</th><td>Tổ chức chứng nhận / auditor / khách audit khi được phân công; đơn vị lưu trữ / số hóa khi cần.</td></tr>
+<tr><th>Phạm vi vị trí</th><td>Vai trò chuyên môn của bộ phận Quality; tập trung vào chuẩn hóa, phân tích dữ liệu, thực thi nghiệp vụ và phối hợp liên phòng ban.</td></tr>
+</tbody></table>
+</div>
+<h2 class="h2">4. Trách nhiệm chính (Key Responsibilities)</h2>
+<div class="table-card">
+<table class="table"><thead><tr><th style="width:26%">Nhóm trách nhiệm</th><th>Nội dung trách nhiệm</th></tr></thead><tbody>
+<tr><th style="width:26%">Document control và change administration</th><td><ul><li>Duy trì master list, version history, distribution log, print control và danh mục tài liệu hiện hành của toàn hệ thống.</li><li>Kiểm tra hồ sơ phê duyệt trước khi phát hành tài liệu mới / sửa đổi / thu hồi; không phát hành khi thiếu authority hoặc thiếu change rationale.</li><li>Phối hợp process owner để bảo đảm thay đổi tài liệu được truyền thông, huấn luyện và thay thế đúng ở hiện trường.</li></ul></td></tr><tr><th style="width:26%">Record retention và truy xuất bằng chứng</th><td><ul><li>Quản nguyên tắc naming, lưu trữ, retention, truy xuất hồ sơ giấy / số, link-not-copy và cấu trúc SSOT của hồ sơ vận hành.</li><li>Hỗ trợ các bộ phận chuẩn bị evidence pack cho audit, management review, customer request hoặc điều tra nội bộ.</li><li>Theo dõi các rủi ro mất hồ sơ, lưu sai nơi, thiếu metadata hoặc sử dụng file ngoài vùng kiểm soát.</li></ul></td></tr><tr><th style="width:26%">Audit coordination và closure control</th><td><ul><li>Điều phối kế hoạch audit nội bộ / audit bên ngoài, lịch đánh giá, checklist, distribution và theo dõi finding.</li><li>Thu thập và kiểm tra closure evidence trước khi trình QA Manager / auditor xác nhận đóng finding.</li><li>Báo cáo các điểm nghẽn lặp về document compliance, audit readiness và kỷ luật hồ sơ.</li></ul></td></tr><tr><th style="width:26%">Xây nền hệ thống</th><td><ul><li>Phối hợp QA/QMS cải tiến cấu trúc tài liệu, cross-reference giữa SOP / WI / Form / JD / KPI / OJT.</li><li>Hỗ trợ đào tạo document control, record integrity, revision awareness cho các bộ phận.</li><li>Theo dõi mức độ trưởng thành của hệ thống hồ sơ số và đề xuất cải tiến với IT / M365 governance.</li></ul></td></tr>
+<tr><th style="width:26%">System coherence, matrices &amp; document change control</th><td><ul><li>Quản lý vòng đời tài liệu, cross-reference rules, portal/index, master matrices, dashboard dictionary, record retention và chất lượng nội dung tài liệu hệ thống.</li><li>Điều phối cập nhật chéo giữa SOP/WI/ANNEX/JD/handbook/forms/training khi có thay đổi quy trình, vai trò, dữ liệu hoặc bài học từ audit/CAPA/kaizen.</li><li>Theo dõi change roadmap, stale documents, redirect/legacy links, evidence-pack completeness và khoảng trống hệ thống cần bổ sung.</li></ul></td></tr></tbody></table>
+</div>
+<div class="table-card role-boundary-box">
+<table class="table">
+<tbody>
+<tr>
+<th style="width:26%">Điểm kết thúc trách nhiệm</th>
+<td>QMS Engineer là owner vận hành hệ QMS và tài liệu kiểm soát; không trực tiếp phán quyết sản phẩm đạt/không đạt như QA/QC, và không viết thay nội dung chuyên môn của mọi quy trình nếu process owner chưa xác nhận.</td>
+</tr>
+<tr>
+<th style="width:26%">Không thuộc trách nhiệm chính / phải escalated</th>
+<td><ul><li>Không phát hành tài liệu mới/sửa đổi khi chưa có process owner xác nhận nội dung và tuyến phê duyệt đúng theo SOP-101/SOP-106.</li><li>Không đóng CAPA/audit finding chỉ vì đã có hành động tạm; phải kiểm soát bằng chứng, deadline, owner và logic hiệu lực.</li><li>Không dùng quyền document control để thay đổi thực tế vận hành mà không có phê duyệt; vai trò này quản cơ chế kiểm soát, không sở hữu mọi quy trình chuyên môn.</li><li>Chịu trách nhiệm về document master, revision visibility, portal/record organization, audit schedule support, KPI dictionary, management review input và organizational knowledge.</li><li>Kết thúc trách nhiệm khi hệ tài liệu và dữ liệu QMS phản ánh đúng hiện trạng, người dùng nhìn thấy bản đúng và các action hệ thống được theo dõi đến cùng.</li></ul></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, người giữ vị trí phải chuyển đúng owner thay vì xử lý ngoài tuyến kiểm soát.</p>
+<p class="inline-note">Mọi thay đổi ảnh hưởng chất lượng, giao hàng, chi phí, revision, release hoặc truy vết phải tuân theo quy trình/hồ sơ liên kết tại Mục 12.</p>
+<h2 class="h2">5. Quyền hạn (Authority &amp; Decision Rights)</h2>
+<div class="auth-grid">
+<div class="auth-item">Không phát hành tài liệu khi thiếu phê duyệt, thiếu version control hoặc thiếu change impact review.</div><div class="auth-item">Thu hồi / yêu cầu hủy bản lỗi thời đang được sử dụng tại hiện trường.</div><div class="auth-item">Từ chối đóng audit finding khi evidence chưa đủ hoặc chưa chứng minh được hiệu lực.</div><div class="auth-item">Yêu cầu process owner cung cấp / hiệu chỉnh hồ sơ và metadata để hệ thống truy xuất được.</div>
+<div class="auth-item">Có quyền yêu cầu process owner cập nhật chéo tài liệu, giữ phát hành bản mới hoặc mở corrective action hệ thống khi phát hiện mâu thuẫn giữa tài liệu và thực hành.</div></div>
+<h2 class="h2">6. Giao diện liên phòng ban — RACI / Handoff</h2>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:24%">Đối tác / tuyến phối hợp</th>
+<th>Nội dung handoff / phối hợp</th>
+<th style="width:10%">RACI</th>
+<th>Kết quả mong đợi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th style="width:20%">QA Manager</th>
+<td><p>Nhận ưu tiên hệ thống, phê duyệt tài liệu/cơ chế, escalations về overdue CAPA/audit issues và kết quả management review.</p></td>
+<td style="width:10%; text-align:center"><span class="raci-badge raci-r">R</span></td>
+<td>QMS vận hành theo đúng định hướng chất lượng cấp công ty.</td>
+</tr>
+<tr>
+<th style="width:20%">All Process Owners / Department Heads</th>
+<td><p>Điều phối soạn/sửa tài liệu, review, phê duyệt, huấn luyện triển khai và theo dõi việc áp dụng.</p></td>
+<td style="width:10%; text-align:center"><span class="raci-badge raci-a">A</span></td>
+<td>Mỗi tài liệu có owner, không có bản mồ côi hoặc nội dung vô chủ.</td>
+</tr>
+<tr>
+<th style="width:20%">Internal Auditor</th>
+<td><p>Cung cấp chương trình audit, tiêu chí, lịch, hồ sơ nền và theo dõi closure của findings.</p></td>
+<td style="width:10%; text-align:center"><span class="raci-badge raci-c">C</span></td>
+<td>Audit nối mạch với CAPA và quản trị hệ thống.</td>
+</tr>
+<tr>
+<th style="width:20%">HR / Training Academy</th>
+<td><p>Đồng bộ training matrix, hồ sơ OJT, năng lực liên quan tài liệu mới hoặc thay đổi hệ thống.</p></td>
+<td style="width:10%; text-align:center"><span class="raci-badge raci-i">I</span></td>
+<td>Thay đổi tài liệu được chuyển hóa thành đào tạo thực tế.</td>
+</tr>
+<tr>
+<th style="width:20%">Epicor System Administrator / IT</th>
+<td><p>Phối hợp khi tài liệu, dashboard, workflow hoặc portal cần tích hợp số hóa/SSOT.</p></td>
+<td style="width:10%; text-align:center"><span class="raci-badge raci-i">I</span></td>
+<td>QMS và hệ thống số không chạy hai bộ dữ liệu lệch nhau.</td>
+</tr>
+</tbody>
+</table>
+</div><p class="inline-note">Quy ước: R = đầu mối trực tiếp thực hiện/phản hồi; A = đầu mối chịu trách nhiệm cuối cùng trong tuyến phối hợp; C = cần tham vấn/bắt buộc đồng bộ trước khi tiếp tục; I = cần được thông tin để đồng bộ trạng thái.</p>
+<h2 class="h2">7. Đầu ra bắt buộc / hồ sơ quản trị</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nơi lưu / nguồn</th></tr></thead><tbody><tr><td>Master list &amp; distribution log</td><td>Danh mục tài liệu hiện hành, lịch sử phát hành, phân phối và thu hồi.</td><td>Thường xuyên cập nhật</td><td>Document control system / SSOT.</td></tr><tr><td>Audit packs &amp; closure evidence</td><td>Checklist, báo cáo, finding log, closure evidence và status audit.</td><td>Theo kế hoạch / khi phát sinh</td><td>FRM-901, FRM-911, audit dossier.</td></tr><tr><td>Record retrieval support</td><td>Gói hồ sơ phục vụ audit / complaint / review / investigation.</td><td>Khi phát sinh</td><td>SSOT / controlled record store.</td></tr><tr><td>System compliance report</td><td>Báo cáo tình trạng document compliance, obsolete documents, retrieval SLA.</td><td>Tháng / quý</td><td>QMS dashboard / management report.</td></tr><tr><td>System-consistency &amp; change roadmap pack</td><td>Danh mục tài liệu stale/redirect, ma trận cập nhật chéo, action register, audit-evidence pack và status của các thay đổi hệ thống đang mở.</td><td>Tháng / quý / theo dự án</td><td>Portal/QMS master index; ANNEX-QMS-023; audit pack; document change log.</td></tr></tbody></table></div>
+<h2 class="h2">8. KPI cá nhân</h2>
+<div class="table-card"><table class="table"><thead><tr><th>KPI trọng yếu</th><th>Cách đo / nguồn dữ liệu</th><th>Chu kỳ theo dõi</th></tr></thead><tbody><tr><td>Document compliance</td><td>Số lỗi bản lỗi thời, phát hành sai, thiếu kiểm soát bản in.</td><td>Tháng</td></tr><tr><td>Record retrieval SLA</td><td>Thời gian truy xuất hồ sơ / evidence pack theo yêu cầu.</td><td>Tháng</td></tr><tr><td>Audit finding closure on-time</td><td>Tỷ lệ finding đóng đúng hạn với evidence đủ chuẩn.</td><td>Tháng</td></tr><tr><td>Obsolete print incidents</td><td>Số vụ phát hiện bản lỗi thời tại hiện trường.</td><td>Tháng</td></tr><tr><td>Evidence completeness</td><td>Tỷ lệ gói hồ sơ audit / review đầy đủ ngay từ lần đầu.</td><td>Tháng / quý</td></tr><tr><td>Tỷ lệ đóng cập nhật chéo tài liệu đúng hạn</td><td>Tỷ lệ thay đổi quy trình/role/data model được phản ánh đầy đủ vào SOP/WI/ANNEX/JD/form/training trong thời hạn đã chốt.</td><td>Tháng</td></tr></tbody></table></div>
+<h2 class="h2">9. Yêu cầu năng lực (Competency Requirement)</h2>
+<div class="comp-grid">
+<div class="comp-card"><p><b>Kiến thức chuyên môn &amp; hệ thống</b></p><ul><li>Hiểu version control, approval workflow, record retention, naming rules, retrieval logic và sự liên kết giữa tài liệu – KPI – đào tạo – audit.</li><li>Cẩn thận với metadata, thư mục, quyền truy cập và tính toàn vẹn của bằng chứng.</li></ul></div>
+<div class="comp-card"><p><b>Năng lực hành vi / phối hợp</b></p><ul><li>Rất kỹ lưỡng, đúng hẹn, chịu được công việc đòi hỏi tracking nhiều đầu việc nhỏ nhưng quan trọng.</li><li>Giao tiếp tốt, biết nhắc việc và kiểm soát closure mà không làm mất quan hệ phối hợp.</li></ul></div>
+</div>
+<div class="callout"><p><b>Mô-đun năng lực / đào tạo cốt lõi</b></p><ul><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C02.html"><b>C02</b> — Module C02 — Process Discipline &amp; Standard Work Compliance</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C04.html"><b>C04</b> — Module C04 — Cross-Department Communication &amp; Coordination</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C06.html"><b>C06</b> — Module C06 — Problem Solving (5Why / PDCA / CAPA)</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C08.html"><b>C08</b> — Module C08 — Data-Driven Thinking &amp; System Usage (ERP/Excel)</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C10.html"><b>C10</b> — Module C10 — CNC Job Order Process (RFQ → Cash)</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C13.html"><b>C13</b> — Module C13 — Risk Management &amp; Revision Control</a></li></ul></div>
+<p class="inline-note">Mức đánh giá chi tiết, gating OJT và lộ trình phát triển áp dụng theo training matrix / competency assessment guide hiện hành của bộ phận.</p>
+<h2 class="h2">10. Học vấn, kinh nghiệm &amp; yêu cầu tuyển dụng</h2>
+<div class="table-card">
+<table class="table require-table"><tbody>
+<tr><th>Trình độ / chứng chỉ</th><td><ul><li>Tốt nghiệp cao đẳng / đại học; ưu tiên ngành quản lý chất lượng, quản trị hệ thống, kỹ thuật công nghiệp, thư viện – lưu trữ số hoặc tương đương.</li><li>Ưu tiên có nền tảng document control / audit / records management.</li></ul></td></tr><tr><th>Kinh nghiệm</th><td><ul><li>Có kinh nghiệm kiểm soát tài liệu / hồ sơ / audit coordination trong hệ thống ISO / QMS hoặc môi trường kiểm soát tương đương.</li><li>Ưu tiên đã làm với hệ thống hồ sơ số, SharePoint / M365 / document platform.</li></ul></td></tr><tr><th>Hệ thống / công cụ cần dùng</th><td><p>Hồ sơ inspection/CMM; NCR/MRB/CAPA; calibration &amp; traceability records; Epicor inspection status và controlled forms.</p></td></tr><tr><th>Điều kiện / đặc thù công việc</th><td><p>Kết hợp giữa bàn làm việc và hiện trường; phải xuống xưởng/kho để xác minh dữ liệu, quan sát rủi ro và bảo đảm handoff thực tế.</p></td></tr><tr><th>Lưu ý tuyển dụng ưu tiên</th><td><p>Ưu tiên ứng viên đã làm việc trong môi trường gia công chính xác/high-mix–low-volume, quen ERP và kỷ luật tài liệu kiểm soát.</p></td></tr>
+</tbody></table>
+</div>
+<h2 class="h2">11. Người thay thế / kế nhiệm tạm thời</h2>
+<div class="backup-card">
+<p><b>Primary Backup:</b> Lead/Manager trực tiếp hoặc nhân sự đồng chức năng đã được OJT và chỉ định thay thế trong thời gian vắng mặt.</p>
+<p><b>Secondary Backup:</b> Người quản lý trực tiếp bố trí nguồn lực dự phòng theo ca/kế hoạch để duy trì công việc và truy vết hồ sơ.</p>
+<p><b>Giới hạn quyền khi thay thế:</b> Chỉ thực hiện trong phạm vi công việc thường lệ; không tự phê duyệt change, release, cam kết khách hàng, ngoại lệ chất lượng hay chi phí vượt thẩm quyền chức danh gốc.</p>
+<p><b>Nguyên tắc kích hoạt:</b> Kích hoạt khi nghỉ phép, công tác, đào tạo, vắng mặt ngắn hạn hoặc khối lượng tăng đột biến; phải có phân công rõ bằng email, ca lệnh hoặc bảng phân nhiệm.</p>
+</div>
+<h2 class="h2">12. SOP / WI / Form / Academy liên quan</h2>
+<div class="table-card"><table class="table"><tbody><tr><th style="width:28%">SOP cốt lõi</th><td><ul class="doc-link-list"><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-101-document-and-data-control.html"><b>SOP-101</b> — Kiểm soát tài liệu và dữ liệu điều hành</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html"><b>SOP-104</b> — Quản trị dữ liệu, hồ sơ, bảo mật và bảo vệ IP</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-105-organizational-knowledge-management.html"><b>SOP-105</b> — Quản trị tri thức tổ chức</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html"><b>SOP-106</b> — Quản trị thay đổi và cấu hình</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-107-communication-management.html"><b>SOP-107</b> — Quản trị truyền thông và chuyển cấp xử lý</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-901-internal-audit-and-lpa.html"><b>SOP-901</b> — Đánh giá nội bộ và LPA</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html"><b>SOP-902</b> — Xem xét của lãnh đạo</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html"><b>SOP-903</b> — Cải tiến liên tục và Kaizen</a></li></ul></td></tr><tr><th style="width:28%">WI / Reference / System</th><td><ul class="doc-link-list"><li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html"><b>WI-101</b> — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html"><b>WI-202</b> — Điều hành hằng ngày, họp tầng, KPI, action log và xử lý vượt cấp</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html"><b>WI-203</b> — Lập Job Dossier, nạp bằng chứng, kiểm tính đầy đủ hồ sơ và khóa hồ sơ</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-qms-001-process-map-detailed.html"><b>ANNEX-QMS-001</b> — Bản đồ quá trình chi tiết và điểm giao diện</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-qms-003-audit-evidence-pack-master.html"><b>ANNEX-QMS-003</b> — Master pack bằng chứng audit, cross-reference và record map</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-qms-008-dashboard-kpi-dictionary-and-data-model.html"><b>ANNEX-QMS-008</b> — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-qms-010-document-writing-and-cross-reference-rules.html"><b>ANNEX-QMS-010</b> — Document Writing and Cross-Reference Rules</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-qms-023-change-roadmap-and-priority-register.html"><b>ANNEX-QMS-023</b> — Change Roadmap and Priority Register</a></li><li><a href="../../../../10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-12.html"><b>SYS-OPS-12</b> — Document Control Operations: Version Control, Obsolescence &amp; Distribution | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-15.html"><b>SYS-OPS-15</b> — Internal Audit Operations: Program, Sampling, Reporting &amp; Effectiveness | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-16.html"><b>SYS-OPS-16</b> — Management Review Operations | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-22.html"><b>SYS-OPS-22</b> — Data Governance (access model, quarterly review, incident response) | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-26.html"><b>SYS-OPS-26</b> — Records &amp; Digital Evidence Management: Classification, Naming &amp; Surveillance | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-28.html"><b>SYS-OPS-28</b> — Enterprise File Plan &amp; Department Filing Matrix | HESEM OS</a></li></ul></td></tr><tr><th style="width:28%">Biểu mẫu / hồ sơ</th><td><ul class="doc-link-list"><li><a  download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-901_Internal_Audit_Checklist.xlsx"><b>FRM-901</b> — Checklist đánh giá nội bộ</a></li><li><a  download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-902_Layered_Process_Audit_Checklist.xlsx"><b>FRM-902</b> — Layered Process Audit Checklist</a></li><li><a  download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx"><b>FRM-911</b> — Biên bản xem xét của lãnh đạo</a></li></ul></td></tr><tr><th style="width:28%">Academy / năng lực</th><td><ul class="doc-link-list"><li><a href="../../../../10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-qa-qms.html"><b>TRN-ACA-OJT-QMS-01</b> — OJT 1 trang — QA Engineer / QMS | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C02.html"><b>Module C02</b> — Process Discipline &amp; Standard Work Compliance | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C08.html"><b>Module C08</b> — Data-Driven Thinking &amp; System Usage (ERP/Excel) | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C13.html"><b>Module C13</b> — Risk Management &amp; Revision Control | HESEM OS</a></li></ul></td></tr><tr><th style="width:28%">Reference điều hành</th><td><ul class="doc-link-list"><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-ops-003-cnc-operating-model-and-role-boundary.html"><b>ANNEX-OPS-003</b> — CNC Operating Model and Role Boundary</a></li><li><a href="../../04-RACI-Authority/annex-qms-025-authority-matrix.html"><b>ANNEX-QMS-025</b> — Ma trận thẩm quyền quyết định và nhả giữ</a></li><li><a href="../../04-RACI-Authority/annex-qms-026-raci-master-matrix.html"><b>ANNEX-QMS-026</b> — RACI master ở mức hoạt động và tài liệu</a></li><li><a href="../../04-RACI-Authority/annex-qms-027-kpi-cascade-dictionary.html"><b>ANNEX-QMS-027</b> — Từ điển KPI cascade</a></li><li><a href="../../04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html"><b>ANNEX-QMS-028</b> — Ma trận deputy / backup</a></li></ul></td></tr></tbody></table></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

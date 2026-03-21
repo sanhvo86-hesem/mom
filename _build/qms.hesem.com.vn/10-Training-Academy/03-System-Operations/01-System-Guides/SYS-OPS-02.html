@@ -1,0 +1,826 @@
+﻿<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SYS-OPS-02 — Job Dossier Data Architecture & Part/Rev Master (SharePoint + Purview) | HESEM OS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+ .path{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; font-size:12px;}
+ .mini{font-size:12px;color:#374151;}
+ .tight td{padding:8px 10px;}
+ .role-tag{display:inline-block;padding:2px 8px;border-radius:999px;background:#f3f4f6;border:1px solid #e5e7eb;font-size:12px;margin:2px 6px 2px 0;}
+ .kpi{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; font-size:12px;}
+ .warn{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px 14px;}
+ .ok{background:#ecfeff;border:1px solid #a5f3fc;border-radius:12px;padding:12px 14px;}
+ 
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+</style>
+</head>
+<body>
+<!-- 1) HEADER (VI/EN) -->
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>SYS-OPS-02 — Job Dossier Data Architecture & Part/Rev Master (SharePoint + Purview)</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-02</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+
+<!-- 1) FORM-HEADER (VI/EN) -->
+<div class="doc-content" id="docContent">
+<div class="card">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>Module SYS-OPS-02</div>
+<h1 style="margin-top:10px">Kiến trúc dữ liệu Job Dossier &amp; Part/REV Master (SharePoint + Purview)</h1>
+<p class="lead"><b>Từ “giấy tờ rời rạc” → “bằng chứng truy xuất 60 giây”.</b> Module này chuẩn hoá cách <b>tạo, lưu, liên kết, gắn metadata, gắn nhãn lưu trữ</b> để đảm bảo mọi phòng ban làm đúng một chuẩn và không bao giờ “lạc REV”.</p>
+<div class="callout">
+<b>Quy tắc ranh giới (bắt buộc):</b> Dữ liệu <b>MES time entry</b> nằm trong Epicor (System of Record) → M365 chỉ phản chiếu để dashboard/điều tra; <b>không lưu bản copy time entry</b> trong SharePoint trừ khi là hồ sơ sự cố có phê duyệt.
+ </div>
+</div>
+<div class="note">
+<strong>Đối tượng &amp; điều kiện triển khai</strong>
+<ul>
+<li><b>Áp dụng:</b>
+<span class="role-tag">Operator</span><span class="role-tag">Setup</span><span class="role-tag">Programmer</span><span class="role-tag">QC</span><span class="role-tag">QA</span>
+<span class="role-tag">Warehouse</span><span class="role-tag">Purchasing</span><span class="role-tag">Planner</span><span class="role-tag">Maintenance</span><span class="role-tag">EHS</span>
+<span class="role-tag">Estimator (SAL-03)</span><span class="role-tag">Supervisor</span>
+</li>
+<li><b>Thời lượng YÊU CẦU:</b> Lý thuyết 90 phút • Thực hành 90 phút • OJT 120 phút (chia 2 ca/ngày, tối đa 2 ngày/tuần/nhân sự).</li>
+<li><b>Điều kiện trước:</b> Đã học WI-OPS-008 (Job Dossier Governance) và nắm quy tắc đặt tên file (ANNEX-QMS-003).</li>
+<li><b>Kích hoạt học:</b> (1) có job mới, (2) có Part/REV mới hoặc đổi REV, (3) chuẩn bị outsource/ship release.</li>
+</ul>
+<div class="warn" style="margin-top:10px">
+<b>Nguyên tắc kiểm soát:</b> Khi thiếu hồ sơ tối thiểu (MRR) hoặc metadata bắt buộc → <b>HOLD</b> ngay tại gate, không “linh động”.
+ </div>
+</div>
+</div>
+<div class="toc">
+<strong>Mục lục nhanh</strong>
+<ul>
+<li><a href="#s2">2) Mục tiêu &amp; bối cảnh (vì sao phải làm đúng)</a></li>
+<li><a href="#s3">3) Vị trí trong chuỗi E2E Job Order (handoff &amp; điểm chặn)</a></li>
+<li><a href="#s4">4) Failure points hay gặp gặp (≥ 10) – dấu hiệu &amp; hậu quả</a></li>
+<li><a href="#s5">5) Risk controls (≥ 6) – kiểm soát trọng yếu theo vai trò</a></li>
+<li><a href="#s6">6) Dừng sớm (fail-fast) rules (≥ 3) – điều kiện dừng việc</a></li>
+<li><a href="#s7">7) “60-second reaction” – xử lý nhanh khi phát hiện lỗi</a></li>
+<li><a href="#s8">8) Checklist triển khai (≤ 15 bước) – ai làm, minh chứng, lỗi hay gặp</a></li>
+<li><a href="#s9">9) OJT (TWI) + rubric đánh giá L1–L4 theo role</a></li>
+<li><a href="#s10">10) Assessment pack: quiz (≥ 20) + tình huống (≥ 3) + performance test</a></li>
+<li><a href="#s11">11) Tiêu chí ĐẠT/KHÔNG ĐẠT (PASS/FAIL)</a></li>
+<li><a href="#s12">12) MRR tối thiểu (records) – loại hồ sơ, naming, nơi lưu</a></li>
+<li><a href="#s13">13) Audit findings hay gặp gặp (≥ 8) &amp; cách phòng ngừa</a></li>
+<li><a href="#s14">14) DCR record</a></li>
+</ul>
+</div>
+</div>
+<!-- 2) PURPOSE & CONTEXT -->
+<div class="card" id="s2">
+<h2>2) Mục tiêu &amp; bối cảnh (vì sao phải làm đúng)</h2>
+<div class="grid-2">
+<div>
+<p><b>Job Dossier</b> là “túi bằng chứng” theo từng job/shipments. <b>Part/REV Master (DATA)</b> là “nguồn đúng” cho bản vẽ/CAM/BOM/spec theo <b>REV</b>. Hai kho này liên kết với nhau để:</p>
+<ul>
+<li><b>Chống nhầm REV:</b> mọi bằng chứng job phải tham chiếu đúng Rev kỹ thuật.</li>
+<li><b>Audit-ready:</b> mở đúng thư mục, đủ hồ sơ, đúng nhãn lưu trữ và record declaration.</li>
+<li><b>Không trùng dữ liệu:</b> Epicor là SoR cho giao dịch (MES/ERP); SharePoint lưu bằng chứng + master theo chuẩn.</li>
+<li><b>Cổng discipline:</b> gate không đạt thì không được release (đặc biệt G5 Ship Release).</li>
+</ul>
+</div>
+<div class="ok">
+<b>Kết quả kỳ vọng (đo được)</b>
+<ul>
+<li><span class="kpi">KPI-01</span>: Truy xuất bộ hồ sơ job (FAI/Final/Ship Packet) trong ≤ <b>60 giây</b>.</li>
+<li><span class="kpi">KPI-02</span>: 0 trường hợp “sai REV phát hành/ gia công/ đo kiểm”.</li>
+<li><span class="kpi">KPI-03</span>: 100% Tier-1 record có <b>metadata bắt buộc</b> + nhãn <b>LAM-T1-10Y-RECORD</b> (hoặc label override theo hợp đồng).</li>
+<li><span class="kpi">KPI-04</span>: 0 Ship Release khi thiếu MRR (No evidence = No gate).</li>
+</ul>
+</div>
+</div>
+<h3>Hai thư viện SharePoint bắt buộc (chuẩn hệ thống)</h3>
+<div class="table-wrap">
+<table class="tight">
+<thead>
+<tr><th>Library</th><th>Mục đích</th><th>Đối tượng</th><th>Rule quan trọng</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><b>Job-Dossiers</b></td>
+<td>Bằng chứng phát sinh theo từng job/shipment</td>
+<td>QA/WHS/OPS</td>
+<td>Cổng-driven MRR; Tier-1 declare as record; <b>không chứa CAM master</b></td>
+</tr>
+<tr>
+<td><b>DATA (Programming / Part-REV)</b></td>
+<td>Master data theo Part/REV (drawing/CAM/BOM/spec)</td>
+<td>ENG/PROGRAM/QA</td>
+<td>1 nguồn đúng theo REV; dùng <b>00_Archive</b> để quản lý REV cũ</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 3) E2E POSITION -->
+<div class="card" id="s3">
+<h2>3) Vị trí trong chuỗi E2E Job Order (handoff &amp; điểm chặn)</h2>
+<p class="muted">Mục này trả lời 3 câu hỏi: (1) “ai handoff cho ai”, (2) “dữ liệu nằm ở đâu”, (3) “gate nào chặn được rủi ro sai REV/thiếu bằng chứng”.</p>
+<h3>3.1 Chuỗi E2E (tóm tắt theo đối tượng dữ liệu)</h3>
+<div class="table-wrap">
+<table class="tight">
+<thead>
+<tr>
+<th>Giai đoạn</th>
+<th>Handoff chính</th>
+<th>Đối tượng dữ liệu</th>
+<th>Nơi lưu (chuẩn)</th>
+<th>Cổng/Điểm chặn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RFQ → Contract review</td>
+<td>Estimator (SAL-03) → Planner/QA</td>
+<td>Yêu cầu khách hàng, PO/contract, spec</td>
+<td>Job Dossier / <b>01_Rfq-Contract</b></td>
+<td>Chặn “thiếu yêu cầu đặc biệt” trước khi plan</td>
+</tr>
+<tr>
+<td>Engineering / Programming</td>
+<td>ENG/Programmer → Setup/OPS</td>
+<td>DWG/SOL/CAM/BOM theo <b>REV</b></td>
+<td>DATA / <span class="path">.../{CustomerPartNo}/REV {Rev}</span></td>
+<td>Chặn “dùng file Rev cũ” tại phát hành master</td>
+</tr>
+<tr>
+<td>Planning / Routing</td>
+<td>Planner → OPS/QC</td>
+<td>Routing, setup plan, risk notes</td>
+<td>Job Dossier / <b>02_Planning-Routing</b></td>
+<td><b>G1 Ready-to-Run</b> (đúng Rev + đủ release)</td>
+</tr>
+<tr>
+<td>Production / Setup</td>
+<td>Setup → Operator/QC</td>
+<td>Release Record + link CAM master, setup proof</td>
+<td>Job Dossier / <b>03_Programs-Setup</b></td>
+<td>Chặn “gia công khi chưa release”</td>
+</tr>
+<tr>
+<td>Inspection / Metrology</td>
+<td>QC → QA</td>
+<td>FAI/IR/CMM (Tier-1)</td>
+<td>Job Dossier / <b>04_Inspection-FAI</b></td>
+<td><b>G2/G3/G4</b> (Pass/Fail/Hold)</td>
+</tr>
+<tr>
+<td>Outsource (khi có)</td>
+<td>Purchasing/WHS → QA</td>
+<td>Dispatch packet, certs, incoming verification</td>
+<td>Job Dossier / <b>06_Outsource</b></td>
+<td>Chặn “thiếu chứng chỉ/lot” trước khi nhận hàng</td>
+</tr>
+<tr>
+<td>Shipping</td>
+<td>WHS → QA/Supervisor</td>
+<td>Ship packet, CoC/Cert, photos (Tier-1)</td>
+<td>Job Dossier / <b>07_Shipping-Packing</b></td>
+<td><b>G5 Ship Release</b> (hard stop)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>3.2 Hai template folder (bắt buộc dùng đúng chuẩn)</h3>
+<div class="grid-2">
+<div class="note">
+<strong>Job Dossier template (Job-Dossiers)</strong>
+<p class="mini">Tên folder job (YÊU CẦU): <span class="path">{JobNum}_{PartNum}_{RevisionNum}</span></p>
+<pre style="white-space:pre-wrap">01_Rfq-Contract
+02_Planning-Routing
+03_Programs-Setup
+04_Inspection-FAI
+05_NCR-Hold-CAPA
+06_Outsource
+07_Shipping-Packing
+08_Photos</pre>
+<p class="mini"><b>Không tạo</b> folder TimeEntry.</p>
+</div>
+<div class="note">
+<strong>Part/REV Master template (DATA)</strong>
+<p class="mini"><span class="path">DATA / 03_Production / 00_Programming / {CustomerCode} / {CustomerPartNo} / REV {Rev}</span></p>
+<pre style="white-space:pre-wrap">00_Archive
+01_Specification
+02_Drawings-and-Solids
+03_BOM
+04_CAM
+05_Engineering
+06_Manufacturing
+07_Planning
+08_PO
+09_Purchasing
+10_Quality
+11_Reports</pre>
+<p class="mini">Khi đổi Rev: tạo folder <span class="path">REV F</span>, chuyển Rev cũ sang <span class="path">00_Archive</span> theo Change Management.</p>
+</div>
+</div>
+</div>
+<!-- 4) FAILURE POINTS -->
+<div class="card" id="s4">
+<h2>4) Failure points hay gặp gặp (≥ 10) – dấu hiệu &amp; hậu quả</h2>
+<p class="muted">Đây là những “điểm gãy” hay gây sai REV/thiếu hồ sơ. Nhận ra sớm để dừng đúng chỗ.</p>
+<div class="table-wrap">
+<table class="tight">
+<thead>
+<tr><th>#</th><th>Failure point</th><th>Dấu hiệu</th><th>Hậu quả (QCDSM)</th><th>Chặn ở đâu</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Folder job đặt sai <b>RevisionNum</b></td><td>JobNum đúng nhưng Rev sai trong tên/metadata</td><td>Gia công/đo theo Rev sai → scrap, rework, stop-ship</td><td>Checklist bước 2–3, G1</td></tr>
+<tr><td>2</td><td>Copy CAM/DWG vào Job Dossier thay vì link</td><td>03_Programs-Setup chứa file master “giống” DATA</td><td>2 nguồn dữ liệu → lệch phiên bản, audit fail</td><td>Rule “Job chỉ lưu Release Record”</td></tr>
+<tr><td>3</td><td>Không cập nhật <b>00_Archive</b> khi đổi REV</td><td>Rev mới &amp; cũ lẫn trong cùng folder</td><td>Nguy cơ “lấy nhầm file”, không truy vết supersede</td><td>Change Mgmt + Doc Control</td></tr>
+<tr><td>4</td><td>Thiếu metadata bắt buộc Tier-1</td><td>File FAI/IR/CMM không có JobNum/RecordID…</td><td>Không search được, auto-label fail → audit finding</td><td>G2/G4 validation</td></tr>
+<tr><td>5</td><td>Không gắn nhãn Purview / không declare record</td><td>Tier-1 nằm đúng folder nhưng label không áp</td><td>Rủi ro xoá/sửa ngoài kiểm soát</td><td>Purview auto-apply + QA check</td></tr>
+<tr><td>6</td><td>RecordType/DocType dùng “tự chế”</td><td>RecordType không nằm trong danh mục chuẩn</td><td>Báo cáo Pareto sai, retention sai</td><td>Choice codes + training</td></tr>
+<tr><td>7</td><td>Ship packet “đủ giấy” nhưng thiếu <b>approval history</b></td><td>Không chứng minh ai release</td><td>Audit fail, rủi ro tranh chấp khách hàng</td><td>G5 Ship Release</td></tr>
+<tr><td>8</td><td>Outsource chứng chỉ/lot thiếu</td><td>Cert không có lot/heat hoặc không map job</td><td>Traceability fail, được bị trả hàng</td><td>06_Outsource + IQC</td></tr>
+<tr><td>9</td><td>Estimator (SAL-03) không đưa “special requirement” vào dossier</td><td>Spec/PO note nằm trong email cá nhân</td><td>Sai yêu cầu, trễ giao, NCR</td><td>01_Rfq-Contract review</td></tr>
+<tr><td>10</td><td>Planner phát hành traveler không có QR/link dossier</td><td>Không scan được đến folder bằng chứng</td><td>Handover chậm, audit mất thời gian</td><td>Print rule + G1</td></tr>
+<tr><td>11</td><td>QC upload report nhưng “file name” không theo chuẩn</td><td>Không có JobNum/REV/Date</td><td>Export/email mất truy vết, audit hỏi lại</td><td>Naming enforcement</td></tr>
+<tr><td>12</td><td>Supervisor “bỏ qua gate” vì gấp</td><td>Ship đi khi thiếu MRR</td><td>Stop-ship, chargeback, mất khách</td><td>Dừng sớm (fail-fast) rule + escalation</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 5) RISK CONTROLS -->
+<div class="card" id="s5">
+<h2>5) Risk controls (≥ 6) – kiểm soát trọng yếu theo vai trò</h2>
+<p class="muted">Mỗi kiểm soát phải trả lời: <b>ai làm</b> • <b>làm lúc nào</b> • <b>minh chứng gì</b> • <b>chặn rủi ro nào</b>.</p>
+<div class="table-wrap">
+<table class="tight">
+<thead>
+<tr><th>Control point</th><th>Kiểm soát</th><th>Chủ trì</th><th>Minh chứng (MRR)</th><th>Rủi ro chặn</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><b>CP1</b> – Tạo Job Dossier chuẩn</td>
+<td>Tạo folder job đúng template + đúng <b>JobNum/PartNum/RevisionNum</b>; lưu URL vào JobIndex</td>
+<td>Planner/IT</td>
+<td>Folder tồn tại + metadata JobNum/PartNum/RevisionNum</td>
+<td>Sai Rev/thiếu dossier</td>
+</tr>
+<tr>
+<td><b>CP2</b> – Phát hành Part/REV master</td>
+<td>File DWG/SOL/CAM theo chuẩn naming + metadata (DocType/DocID/EffectiveDate/REV)</td>
+<td>ENG/Programmer</td>
+<td>File master trong DATA/REV {Rev}</td>
+<td>Dùng file không kiểm soát</td>
+</tr>
+<tr>
+<td><b>CP3</b> – Release Record (job)</td>
+<td>Trong 03_Programs-Setup, chỉ lưu “Release Record” + link đến file master (không copy)</td>
+<td>Programmer/Setup</td>
+<td>Release Record có người phát hành/ngày/filename/REV/link</td>
+<td>Lệch phiên bản giữa job và master</td>
+</tr>
+<tr>
+<td><b>CP4</b> – Metadata bắt buộc Tier-1</td>
+<td>Khi upload FAI/IR/CMM/ShipPacket: bắt buộc JobNum/RecordType/RecordID/RevisionNum (+Result khi có)</td>
+<td>QA/QC/WHS</td>
+<td>File Tier-1 có đủ cột bắt buộc</td>
+<td>Không search/retention fail</td>
+</tr>
+<tr>
+<td><b>CP5</b> – Purview label &amp; record declaration</td>
+<td>Auto-apply label theo path + content type; Tier-1 phải declare as record</td>
+<td>Records Manager/IT</td>
+<td>Label: LAM-T1-10Y-RECORD áp trên Tier-1</td>
+<td>Xoá/sửa ngoài kiểm soát</td>
+</tr>
+<tr>
+<td><b>CP6</b> – MRR validation theo gate</td>
+<td>Cổng chỉ release khi MRR đủ; thiếu → HOLD + ghi log (ShipRelease/QCHold/NCR)</td>
+<td>QA + Supervisor + WHS</td>
+<td>Bảng kiểm MRR + approval history</td>
+<td>Ship thiếu bằng chứng</td>
+</tr>
+<tr>
+<td><b>CP7</b> – Outsource traceability</td>
+<td>06_Outsource phải có dispatch packet + chứng chỉ + incoming IR; map đúng JobNum/Supplier/Lot</td>
+<td>Purchasing/WHS/QA</td>
+<td>OS evidence + IQC result</td>
+<td>Thiếu traceability / sai lô</td>
+</tr>
+<tr>
+<td><b>CP8</b> – Change Management</td>
+<td>Đổi REV phải có record thay đổi; Rev cũ chuyển 00_Archive; không sửa file record đã declare</td>
+<td>Doc Control + QA/QMS</td>
+<td>Change record + folder archive đúng</td>
+<td>Không truy vết phiên bản</td>
+</tr>Draft</tbody>
+</table>
+</div>
+<div class="callout" style="margin-top:12px">
+<b>Nguyên tắc “1 nguồn đúng”:</b> Part/REV Master (DATA) là nguồn đúng cho DWG/CAM/SPEC. Job Dossier chỉ lưu bằng chứng theo job + Release Record + link master.
+ </div>
+</div>
+<!-- 6) FAIL-FAST -->
+<div class="card" id="s6">
+<h2>6) Dừng sớm (fail-fast) rules (≥ 3) – điều kiện dừng việc</h2>
+<p class="muted">Dừng sớm (fail-fast) giúp tránh “làm tiếp rồi sửa sau”. Khi gặp điều kiện dưới đây, <b>dừng ngay</b> và escalate theo tuyến.</p>
+<div class="table-wrap">
+<table class="tight">
+<thead><tr><th>Rule</th><th>Điều kiện kích hoạt</th><th>Hành động bắt buộc</th><th>Chủ trì</th><th>Ghi nhận</th></tr></thead>
+<tbody>
+<tr>
+<td><b>FF1 — Wrong REV</b></td>
+<td>RevisionNum trên job/traveler ≠ REV của file master (DATA) hoặc ≠ Epicor PartRev</td>
+<td>DỪNG gia công/đo kiểm; HOLD WIP; tạo Hold log; chỉ tiếp tục khi có release đúng</td>
+<td>Operator/Setup/QC</td>
+<td>QCHoldLog + ảnh + link file sai/đúng</td>
+</tr>
+<tr>
+<td><b>FF2 — Missing Tier-1 record</b></td>
+<td>Thiếu FAI/Final IR/CMM/ShipPacket theo MRR trước gate</td>
+<td>Không release gate; WHS không ship; mở NCR khi đã trễ/đã lỡ làm sai</td>
+<td>QA/WHS/Supervisor</td>
+<td>ShipRelease log + approval history</td>
+</tr>
+<tr>
+<td><b>FF3 — Metadata/Label fail</b></td>
+<td>Tier-1 file thiếu metadata bắt buộc hoặc không có label Tier-1</td>
+<td>Không accept hồ sơ; yêu cầu sửa metadata/đúng content type; khi đã declare record sai cách → Doc Control xử lý</td>
+<td>QA + Records Manager</td>
+<td>Checklist validation + ticket IT (khi lỗi auto-apply)</td>
+</tr>
+<tr>
+<td><b>FF4 — Outsource traceability fail</b></td>
+<td>Thiếu cert/lot/heat hoặc không map được JobNum/Supplier</td>
+<td>Không nhận hàng vào sản xuất; cách ly; mở NCR khi ảnh hưởng tiến độ</td>
+<td>WHS/QA/PUR</td>
+<td>Incoming IR + NCR</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 7) 60-SECOND REACTION -->
+<div class="card" id="s7">
+<h2>7) “60-second reaction” – xử lý nhanh khi phát hiện lỗi</h2>
+<div class="grid-2">
+<div class="note">
+<strong>Tình huống A: nghi sai REV (phổ biến nhất)</strong>
+<ol>
+<li>Ngừng thao tác (Stop) và giữ nguyên WIP.</li>
+<li>Scan QR mở Job Dossier → xem <b>RevisionNum</b> của job.</li>
+<li>Mở Release Record ở <b>03_Programs-Setup</b> → click link tới DATA.</li>
+<li>Đối chiếu REV folder + tên file master (<span class="path">REV-X</span>).</li>
+<li>Khi mismatch → kích hoạt <b>FF1</b> (HOLD + log).</li>
+</ol>
+</div>
+<div class="note">
+<strong>Tình huống B: chuẩn bị Ship Release nhưng thiếu hồ sơ</strong>
+<ol>
+<li>Mở <b>07_Shipping-Packing</b> và <b>04_Inspection-FAI</b>.</li>
+<li>Đối chiếu bảng MRR theo gate (mục <a href="#s12">12</a>).</li>
+<li>Thiếu Tier-1 → kích hoạt <b>FF2</b>.</li>
+<li>Khi có nhưng thiếu metadata/label → kích hoạt <b>FF3</b>.</li>
+</ol>
+</div>
+</div>
+<div class="grid-2" style="margin-top:10px">
+<div class="note">
+<strong>Tình huống C: outsource chứng chỉ thiếu</strong>
+<ol>
+<li>Mở <b>06_Outsource</b> → tìm cert/dispatch packet theo naming.</li>
+<li>Kiểm tra Supplier + Lot/Heat có khớp PO/packing.</li>
+<li>Không khớp/thiếu → kích hoạt <b>FF4</b>.</li>
+</ol>
+</div>
+<div class="note">
+<strong>Tình huống D: file Tier-1 đã declare record nhưng cần “sửa”</strong>
+<ol>
+<li>Không sửa trực tiếp file record đã declare.</li>
+<li>Tạo bản thay thế theo quy trình “thay thế có kiểm soát” (tên rõ ràng + lý do).</li>
+<li>Gắn link giữa bản cũ–mới; khi ảnh hưởng chất lượng → NCR/CAPA.</li>
+</ol>
+</div>
+</div>
+</div>
+<!-- 8) CHECKLIST <=15 -->
+<div class="card" id="s8">
+<h2>8) Checklist triển khai (≤ 15 bước) – ai làm, minh chứng, lỗi hay gặp</h2>
+<p class="muted">Checklist này dùng cho triển khai tại hiện trường và cho audit nội bộ. Mỗi bước phải có “dấu vết” (evidence).</p>
+<div class="table-wrap">
+<table class="tight">
+<thead>
+<tr>
+<th style="width:44px">#</th>
+<th>Bước</th>
+<th>Chủ trì</th>
+<th>Minh chứng</th>
+<th>Lỗi hay gặp</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Xác nhận JobNum/PartNum/RevisionNum từ Epicor phản chiếu (JobIndex)</td><td>Planner</td><td>JobIndex có record + Rev đúng</td><td>Copy nhầm Rev từ email</td></tr>
+<tr><td>2</td><td>Tạo Job Dossier folder theo template + đặt tên chuẩn</td><td>IT/Planner</td><td>Folder tồn tại + cấu trúc 01→08</td><td>Thiếu folder 05/06/07</td></tr>
+<tr><td>3</td><td>Gắn metadata cơ bản cho dossier (JobNum, PartNum, RevisionNum, Customer)</td><td>Planner/QA</td><td>Cột metadata có giá trị</td><td>Để trống Customer → retention sai</td></tr>
+<tr><td>4</td><td>Kiểm tra/khởi tạo Part/REV folder trong DATA đúng Rev</td><td>ENG/Programmer</td><td><span class="path">.../REV {Rev}/</span> có template đầy đủ</td><td>Đặt Rev không thống nhất (RevE/REV-E)</td></tr>
+<tr><td>5</td><td>Upload DWG/SOL/SPEC theo naming chuẩn Part/REV</td><td>ENG</td><td>File có <span class="path">_{DocType}_{DocID}_{YYYY-MM-DD}_REV-{Rev}_</span></td><td>Thiếu DocID/Date</td></tr>
+<tr><td>6</td><td>Upload CAM master theo naming chuẩn + ghi EffectiveDate</td><td>Programmer</td><td>File CAM nằm trong <b>04_CAM</b></td><td>Để CAM ở Desktop/USB</td></tr>
+<tr><td>7</td><td>Tạo Release Record trong Job Dossier (03_Programs-Setup) + link tới master</td><td>Programmer/Setup</td><td>Release Record + link + người phát hành</td><td>Copy file master vào Job Dossier</td></tr>
+<tr><td>8</td><td>Estimator (SAL-03) lưu PO/contract/special requirement vào 01_Rfq-Contract</td><td>Estimator (SAL-03)</td><td>File/spec nằm đúng folder</td><td>Giữ trong email cá nhân</td></tr>
+<tr><td>9</td><td>Planner phát hành traveler có QR mở Job Dossier</td><td>Planner</td><td>Traveler/label có QR</td><td>QR sai link hoặc thiếu QR</td></tr>
+<tr><td>10</td><td>QC/QA upload FAI/IR/CMM đúng folder 04_Inspection-FAI</td><td>QC/QA</td><td>File theo naming chuẩn Job + đủ metadata</td><td>Đặt sai RecordType</td></tr>
+<tr><td>11</td><td>Gắn Content Type cho Tier-1 (FAI/Final/CMM/ShipPacket…)</td><td>QA/WHS</td><td>Content Type đúng</td><td>Để default “Document”</td></tr>
+<tr><td>12</td><td>Kiểm tra Purview label auto-apply (Tier-1 phải có LAM-T1-10Y-RECORD)</td><td>QA/IT</td><td>Label hiển thị đúng</td><td>Label không áp do thiếu metadata</td></tr>
+<tr><td>13</td><td>Outsource: lưu dispatch packet + cert + incoming IR ở 06_Outsource</td><td>PUR/WHS/QA</td><td>OS evidence + Lot/Heat đầy đủ</td><td>Không map được JobNum</td></tr>
+<tr><td>14</td><td>WHS lập Ship Packet (07_Shipping-Packing) + ảnh + CoC/Cert</td><td>WHS</td><td>Ship packet complete</td><td>Thiếu approval history</td></tr>
+<tr><td>15</td><td>QA/Supervisor validate MRR &amp; release G5 Ship Release</td><td>QA + Supervisor</td><td>MRR PASS + approval</td><td>“Linh động” bỏ qua gate</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout" style="margin-top:12px">
+<b>Mẹo thực chiến:</b> Sau khi upload Tier-1, khi không thấy label Tier-1 trong 1–2 phút, kiểm tra lại <b>metadata bắt buộc</b> trước khi gọi IT (đa số lỗi do thiếu JobNum/RecordID/RevisionNum).
+ </div>
+</div>
+<!-- 9) OJT TWI + RUBRIC -->
+<div class="card" id="s9">
+<h2>9) OJT (TWI) + rubric đánh giá L1–L4 theo role</h2>
+<p class="muted">OJT tập trung vào “các bước then chốt dễ sai” (REV, link master, metadata, label, gate). Áp dụng TWI Job Instruction: <b>Bước</b> • <b>Điểm then chốt</b> • <b>Lý do</b>.</p>
+<h3>9.1 TWI Job Breakdown — Công việc lõi: “Tạo &amp; duy trì liên kết Job Dossier ↔ Part/REV đúng REV”</h3>
+<div class="table-wrap">
+<table class="tight">
+<thead><tr><th style="width:55px">Bước</th><th>Làm gì</th><th>Điểm then chốt (Key points)</th><th>Lý do (Reasons)</th></tr></thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Xác nhận Rev từ JobIndex/Epicor phản chiếu</td>
+<td>Chỉ dùng 1 nguồn Rev; không lấy từ file cũ/email</td>
+<td>Rev là “khoá” chống nhầm; sai từ đầu sẽ sai toàn chuỗi</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Mở DATA đúng <span class="path">REV {Rev}</span></td>
+<td>Không mở 00_Archive khi làm Rev hiện hành</td>
+<td>00_Archive chỉ để truy xuất lịch sử, không dùng cho sản xuất</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Kiểm tra naming file master</td>
+<td>Phải có DocType + DocID + Date + REV</td>
+<td>Đảm bảo export/email vẫn truy vết được</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Tạo Release Record ở Job Dossier</td>
+<td>Release Record chứa: người phát hành, ngày, filename, REV, link</td>
+<td>Job không chứa file master; chỉ chứa quyết định phát hành</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Upload Tier-1 evidence đúng folder</td>
+<td>FAI/IR/CMM/ShipPacket phải vào 04/07 theo chuẩn</td>
+<td>Auto-apply retention label dựa vào path + content type</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Gắn metadata bắt buộc + content type</td>
+<td>JobNum/RecordType/RecordID/RevisionNum (+Result)</td>
+<td>Thiếu metadata → không label → audit fail</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Validate label Tier-1 &amp; record declaration</td>
+<td>Tier-1 phải có LAM-T1-10Y-RECORD</td>
+<td>Giảm rủi ro sửa/xoá; tăng tính pháp lý</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>9.2 Rubric L1–L4 (áp dụng theo vai trò)</h3>
+<div class="table-wrap">
+<table class="tight">
+<thead>
+<tr><th>Level</th><th>Hành vi quan sát được (chung)</th><th>Minh chứng</th><th>Quyền/Phạm vi sau khi đạt</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><b>L1</b><div class="mini">Biết &amp; làm theo hướng dẫn (có giám sát)</div></td>
+<td>Biết mở đúng Job Dossier; biết phân biệt Job Dossier vs DATA; biết quy tắc naming cơ bản; biết báo khi nghi sai REV.</td>
+<td>Quiz ≥ 70% + 01 bài thực hành mở đúng folder/REV dưới giám sát.</td>
+<td>Được phép upload Tier-3 (ảnh) đúng folder; chưa tự release gate.</td>
+</tr>
+<tr>
+<td><b>L2</b><div class="mini">Thực hiện độc lập (ổn định theo checklist)</div></td>
+<td>Tự thực hiện checklist 15 bước liên quan vai trò; upload đúng folder; đặt tên đúng; gắn đủ metadata bắt buộc theo content type.</td>
+<td>OJT checklist đạt (ký người hướng dẫn) + 01 tình huống xử lý đúng (Hold/Go).</td>
+<td>Được phép tạo/hoàn thiện hồ sơ theo vai trò (QC/QA/WHS) nhưng vẫn phải qua approval ở gate.</td>
+</tr>
+<tr>
+<td><b>L3</b><div class="mini">Nâng cao (xử lý tình huống + hướng dẫn)</div></td>
+<td>Phát hiện sai lệch hệ thống (label không áp, metadata lệch); xử lý theo fail-fast; hướng dẫn người mới; thực hiện diễn tập audit 60s.</td>
+<td>01 báo cáo lesson learned hoặc audit mini (≥ 5 mẫu kiểm).</td>
+<td>Được giao vai trò “người kiểm tra” ở gate nội bộ (tuỳ phòng) và tham gia cải tiến quy tắc.</td>
+</tr>
+<tr>
+<td><b>L4</b><div class="mini">Chuyên gia/hệ thống (chuẩn hoá &amp; cải tiến)</div></td>
+<td>Thiết kế/chuẩn hoá content types, site columns, auto-apply rules; rà soát quyền; dẫn dắt change management khi đổi cấu trúc.</td>
+<td>01 thay đổi hệ thống được phê duyệt + có test plan + rollback plan.</td>
+<td>Được phân quyền cấu hình (Records Manager/SharePoint Admin) theo uỷ quyền.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>9.3 Yêu cầu tối thiểu theo role (điểm khác biệt)</h3>
+<div class="table-wrap">
+<table class="tight">
+<thead><tr><th>Role</th><th>Phải làm được sau module</th><th>Điểm kiểm tra trọng yếu</th></tr></thead>
+<tbody>
+<tr><td><b>Operator</b></td><td>Scan QR mở đúng Job Dossier; nhận biết sai REV; upload ảnh T3 đúng folder.</td><td>Thực hành tình huống FF1 trong 60 giây.</td></tr>
+<tr><td><b>Setup</b></td><td>Đọc Release Record; xác nhận link master; lưu setup proof đúng nơi.</td><td>Không dùng file từ USB/Desktop; chỉ dùng file từ DATA/REV đúng.</td></tr>
+<tr><td><b>Programmer</b></td><td>Phát hành CAM master + naming + metadata; tạo Release Record (link) cho job.</td><td>Không copy CAM vào Job Dossier; biết archive khi đổi Rev.</td></tr>
+<tr><td><b>QC</b></td><td>Upload IR/FAI/CMM đúng folder + naming; gắn Result; kích hoạt Hold/NCR khi fail.</td><td>Metadata bắt buộc Tier-1 và RecordType chuẩn.</td></tr>
+<tr><td><b>QA</b></td><td>Validate MRR theo gate; kiểm tra label/record declaration; approve release theo quy định.</td><td>Không release G5 khi thiếu Tier-1 record/approval.</td></tr>
+<tr><td><b>Warehouse</b></td><td>Lập ship packet; lưu CoC/certs; đảm bảo approval history; ảnh đóng gói.</td><td>Ship Packet là Tier-1; phải có label Tier-1.</td></tr>
+<tr><td><b>Purchasing</b></td><td>Outsource: dispatch packet + supplier certs + traceability.</td><td>Lot/Heat phải map được JobNum/PO.</td></tr>
+<tr><td><b>Planner</b></td><td>Tạo/đảm bảo dossier tồn tại; traveler có QR; routing/Rev đúng.</td><td>Rev đồng nhất giữa Epicor phản chiếu, traveler, Release Record.</td></tr>
+<tr><td><b>Maintenance</b></td><td>Khi có sự cố thiết bị ảnh hưởng job: lưu bằng chứng sự cố đúng nơi (khi được yêu cầu).</td><td>Không lưu time entry; chỉ lưu hồ sơ sự cố có approval.</td></tr>
+<tr><td><b>EHS</b></td><td>Khi có yêu cầu khách hàng về EHS hoặc sự cố: lưu hồ sơ liên quan đúng folder (01 hoặc 05).</td><td>Phân loại đúng Tier/label theo tính chất.</td></tr>
+<tr><td><b>Estimator (SAL-03)</b></td><td>Lưu yêu cầu khách hàng &amp; contract review vào 01_Rfq-Contract.</td><td>Không để yêu cầu trong email cá nhân.</td></tr>
+<tr><td><b>Supervisor</b></td><td>Thực thi fail-fast; không bypass gate; điều phối escalation.</td><td>G5 là hard stop; phải có MRR + approval.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 10) ASSESSMENT PACK -->
+<div class="card" id="s10">
+<h2>10) Assessment pack: quiz (≥ 20) + tình huống (≥ 3) + performance test (bắt buộc)</h2>
+<h3>10.1 Quiz (tối thiểu 20 câu)</h3>
+<p class="mini">Gợi ý triển khai: 25 phút, làm trên điện thoại/PC. PASS khi đạt ngưỡng theo mục <a href="#s11">11</a>.</p>
+<ol>
+<li>Phân biệt đúng: “Job Dossier” dùng để làm gì? “DATA Part/REV” dùng để làm gì?</li>
+<li>Vì sao không được copy CAM master vào Job Dossier?</li>
+<li>Định dạng tên file chuẩn cho Part/REV master là gì?</li>
+<li>Định dạng tên file chuẩn cho Job Dossier evidence là gì?</li>
+<li>3 metadata bắt buộc tối thiểu cho Tier-1 evidence là gì?</li>
+<li>Nhãn lưu trữ mặc định cho Tier-1 (Lam-ready) là gì? Có declare record không?</li>
+<li>Folder nào trong Job Dossier chứa FAI/IR/CMM?</li>
+<li>Folder nào trong Job Dossier chứa ship packet?</li>
+<li>Dừng sớm (fail-fast) FF1 kích hoạt khi nào? Hành động bắt buộc là gì?</li>
+<li>“No evidence = No gate” áp dụng mạnh nhất ở gate nào?</li>
+<li>Outsource evidence tối thiểu cần những loại gì?</li>
+<li>00_Archive trong DATA dùng khi nào? Có được dùng để sản xuất không?</li>
+<li>Vì sao metadata giúp retention/search tốt hơn chỉ naming?</li>
+<li>Trong Tier-1, khi file đã declare record mà phát hiện lỗi, phải xử lý như thế nào?</li>
+<li>Ai chịu trách nhiệm kiểm tra label Tier-1 trước Ship Release?</li>
+<li>Ví dụ RecordType chuẩn cho inspection report là gì?</li>
+<li>Ví dụ DocType chuẩn cho bản vẽ là gì?</li>
+<li>Tại sao không lưu bản copy MES time entry trong SharePoint?</li>
+<li>Hệ quả audit khi thiếu approval history ở Ship Release là gì?</li>
+<li>Kể tên ít nhất 2 điểm chặn trong chuỗi E2E giúp chống nhầm REV.</li>
+<li>Trong checklist, bước nào đảm bảo traveler có QR? Chủ trì là ai?</li>
+<li>Khi label Tier-1 không tự áp, kiểm tra gì trước khi gọi IT?</li>
+<li>Truy xuất hồ sơ job trong 60 giây cần mở 2 folder nào trước?</li>
+<li>Vai trò Estimator (SAL-03) phải lưu tài liệu ở folder nào?</li>
+</ol>
+<h3>10.2 Scenario (tối thiểu 3 tình huống)</h3>
+<div class="table-wrap">
+<table class="tight">
+<thead><tr><th>#</th><th>Tình huống</th><th>Dữ liệu đầu vào</th><th>Quyết định đúng</th><th>Minh chứng phải tạo</th></tr></thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><b>Nghi sai REV trước khi chạy máy</b></td>
+<td>Traveler ghi Rev D, Release Record link tới DATA/REV E</td>
+<td>HOLD (FF1) + chỉ tiếp tục khi thống nhất Rev theo JobIndex/Epicor</td>
+<td>Hold log + ảnh traveler + link Release Record</td>
+</tr>
+<tr>
+<td>2</td>
+<td><b>Chuẩn bị Ship Release nhưng thiếu CoC</b></td>
+<td>07_Shipping-Packing có ship checklist &amp; photos, thiếu CoC/Cert</td>
+<td>Không release G5; yêu cầu bổ sung; khi trễ cam kết → mở NCR (tuỳ mức)</td>
+<td>ShipRelease log (PacketIncomplete) + action owner</td>
+</tr>
+<tr>
+<td>3</td>
+<td><b>Outsource cert thiếu lot/heat</b></td>
+<td>Cert scan có Supplier nhưng không có Lot/Heat; PO yêu cầu traceability</td>
+<td>Cách ly, không nhận vào sản xuất (FF4); yêu cầu supplier cung cấp bổ sung</td>
+<td>Incoming IR = Hold + yêu cầu bổ sung chứng chỉ</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>10.3 Bài thực hành đánh giá (bắt buộc – vì liên quan gate/approval)</h3>
+<div class="note">
+<strong>Bài thực hành (30–40 phút/nhóm)</strong>
+<ol>
+<li>Tạo (hoặc kiểm tra) đúng cấu trúc folder Job Dossier cho 1 job mẫu.</li>
+<li>Upload 01 file master (DWG hoặc CAM) vào DATA/REV đúng với naming chuẩn.</li>
+<li>Tạo 01 Release Record trong Job Dossier (03_Programs-Setup) có link tới master.</li>
+<li>Upload 01 file Tier-1 (FAI/Final IR/CMM/ShipPacket) vào đúng folder và gắn đủ metadata bắt buộc.</li>
+<li>Chứng minh label Tier-1 đã áp và file đã declare record (hoặc báo đúng khi chưa áp do thiếu metadata).</li>
+<li>Thực hiện “diễn tập audit 60 giây”: mở và chỉ ra FAI/Final + Ship Packet.</li>
+</ol>
+<p class="mini"><b>Chấm theo rubric:</b> đúng REV (40%) • đúng nơi lưu/link (25%) • đúng metadata/label (25%) • tốc độ &amp; kỷ luật gate (10%).</p>
+</div>
+</div>
+<!-- 11) ĐẠT/KHÔNG ĐẠT (PASS/FAIL) -->
+<div class="card" id="s11">
+<h2>11) Tiêu chí ĐẠT/KHÔNG ĐẠT (PASS/FAIL)</h2>
+<div class="table-wrap">
+<table class="tight">
+<thead><tr><th>Hạng mục</th><th>PASS</th><th>FAIL (bất kỳ điều kiện nào)</th></tr></thead>
+<tbody>
+<tr>
+<td>Quiz</td>
+<td>≥ 80% (vai trò QA/WHS/Programmer/Planner) • ≥ 70% (vai trò còn lại)</td>
+<td>Dưới ngưỡng hoặc trả lời sai các câu “hard rule” (No evidence = No gate, Wrong REV, Tier-1 label)</td>
+</tr>
+<tr>
+<td>Scenario</td>
+<td>≥ 2/3 tình huống quyết định đúng (Hold/Go) và chỉ ra minh chứng cần tạo</td>
+<td>Chọn “GO” khi phải HOLD (FF1/FF2/FF4)</td>
+</tr>
+<tr>
+<td>Bài thực hành đánh giá</td>
+<td>Đạt ≥ 85/100 và không vi phạm hard rule (copy master vào job, bypass gate, dùng Rev archive)</td>
+<td>Không chứng minh được link master đúng REV hoặc thiếu metadata/label Tier-1</td>
+</tr>
+<tr>
+<td>Kỷ luật gate</td>
+<td>Thực hiện đúng tuyến escalate; ghi nhận đúng log/evidence</td>
+<td>Bỏ qua gate hoặc “sửa hồ sơ cho đủ” sau khi đã release</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="warn" style="margin-top:12px">
+<b>Quy tắc cứng (vi phạm = FAIL ngay):</b>
+<ul>
+<li>Gia công/đo kiểm khi nghi sai REV mà không HOLD (FF1).</li>
+<li>Release Ship (G5) khi thiếu Tier-1 record hoặc thiếu approval history.</li>
+<li>Copy CAM/DWG master vào Job Dossier để “tiện dùng” (tạo 2 nguồn dữ liệu).</li>
+<li>Sửa file Tier-1 đã declare record ngoài quy trình kiểm soát.</li>
+</ul>
+</div>
+</div>
+<!-- 12) MRR -->
+<div class="card" id="s12">
+<h2>12) MRR tối thiểu (records) – loại hồ sơ, naming, nơi lưu</h2>
+<p class="muted">MRR là “hàng rào” cho gate. Dưới đây là tối thiểu; khách hàng/hợp đồng được yêu cầu thêm (ghi rõ trong 01_Rfq-Contract).</p>
+<h3>12.1 Quy tắc đặt tên file (chuẩn, bắt buộc)</h3>
+<div class="grid-2">
+<div class="callout">
+<b>Part/REV Master (DATA)</b><br/>
+<code>{CustomerPartNo}_{DocType}_{DocID}_{YYYY-MM-DD}_REV-{Rev}_{ShortDesc}.{ext}</code>
+</div>
+<div class="callout">
+<b>Job Dossier (Job-Dossiers)</b><br/>
+<code>JOB-{JobNum}_{RecordType}-{RecordID}_{YYYY-MM-DD}_REV-{Rev}_{ShortDesc}.{ext}</code>
+</div>
+</div>
+<p class="mini">Không dùng tiếng Việt có dấu trong filename. Tránh ký tự: <span class="path">/ \ : * ? " &lt; &gt; |</span>.</p>
+<h3>12.2 Bảng MRR tối thiểu theo gate (gợi ý vận hành)</h3>
+<div class="table-wrap">
+<table class="tight">
+<thead><tr><th>Cổng</th><th>MRR tối thiểu</th><th>Tier</th><th>Nơi lưu</th><th>Ai chịu trách nhiệm</th></tr></thead>
+<tbody>
+<tr>
+<td><b>G1 Ready‑to‑Run</b></td>
+<td>Release Record (program/setup) + xác nhận đúng REV + (khi yêu cầu) gage/cal OK</td>
+<td>T2/T3</td>
+<td>03_Programs-Setup (+ liên kết DATA)</td>
+<td>Programmer/Setup + QA</td>
+</tr>
+<tr>
+<td><b>G2 First‑Piece / FAI</b></td>
+<td>FAI decision + FAI package (khi yêu cầu) + balloon drawing link</td>
+<td><b>T1</b></td>
+<td>04_Inspection-FAI</td>
+<td>QA</td>
+</tr>
+<tr>
+<td><b>G3 IPQC</b></td>
+<td>IPQC IR/CMM (khi áp dụng) + reaction plan khi fail</td>
+<td>T2/T1 (tuỳ yêu cầu)</td>
+<td>04_Inspection-FAI</td>
+<td>QC + QA</td>
+</tr>
+<tr>
+<td><b>G4 Final / Pack</b></td>
+<td>Final IR (Pass) + CMM report (khi có) + packaging checklist (Pass)</td>
+<td><b>T1</b></td>
+<td>04_Inspection-FAI + 07_Shipping-Packing</td>
+<td>QA + WHS</td>
+</tr>
+<tr>
+<td><b>G5 Ship Release</b></td>
+<td>Ship packet complete (CoC/Cert/PL/SSCC proof theo yêu cầu) + ảnh đóng gói + tất cả HOLD/NCR đóng hoặc disposition approved</td>
+<td><b>T1</b></td>
+<td>07_Shipping-Packing (+ 05_NCR-Hold-CAPA)</td>
+<td>WHS + QA + Supervisor</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>12.3 Content types &amp; retention labels (Purview)</h3>
+<p class="mini">Các content type dưới đây dùng để auto-apply retention label. Khi hệ thống chưa triển khai đủ, đánh dấu <b>M365/SharePoint → HESEM-QMS-SSOT</b> trong checklist go-live.</p>
+<div class="table-wrap">
+<table class="tight">
+<thead><tr><th>Content Type</th><th>Tier</th><th>Default retention label</th><th>Declare record</th><th>Cột bắt buộc</th><th>Folder YÊU CẦU</th></tr></thead>
+<tbody>
+<tr><td><b>FAI Package</b></td><td>T1</td><td>LAM-T1-10Y-RECORD</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID</td><td>04_Inspection-FAI</td></tr>
+<tr><td><b>Final Inspection</b></td><td>T1</td><td>LAM-T1-10Y-RECORD</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID; Result</td><td>04_Inspection-FAI</td></tr>
+<tr><td><b>CMM Report</b></td><td>T1</td><td>LAM-T1-10Y-RECORD</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID; Result</td><td>04_Inspection-FAI</td></tr>
+<tr><td><b>Ship Packet</b></td><td>T1</td><td>LAM-T1-10Y-RECORD</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID</td><td>07_Shipping-Packing</td></tr>
+<tr><td><b>CoC / Certificate</b></td><td>T1</td><td>LAM-T1-10Y-RECORD</td><td>Yes</td><td>JobNum; Customer; RecordType; RecordID</td><td>07_Shipping-Packing</td></tr>
+<tr><td><b>NCR / CAPA Closure</b></td><td>T1</td><td>LAM-T1-10Y-RECORD</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID; Status</td><td>05_NCR-Hold-CAPA</td></tr>
+<tr><td><b>Receiving IQC</b></td><td>T2</td><td>HESEM-T2-5Y</td><td>No</td><td>RecordType; RecordID; Supplier; LotNumber; Result</td><td>06_Outsource</td></tr>
+<tr><td><b>Outsource Evidence</b></td><td>T2</td><td>HESEM-T2-5Y</td><td>No</td><td>JobNum; Supplier; RecordType; RecordID</td><td>06_Outsource</td></tr>
+<tr><td><b>Operational Photo</b></td><td>T3</td><td>HESEM-T3-3Y</td><td>No</td><td>JobNum; RecordType; Cổng</td><td>08_Photos</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout" style="margin-top:12px">
+<b>Nơi lưu trữ chuẩn (đường dẫn):</b> M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → <b>Job-Dossiers</b> và <b>DATA</b>.<br/>
+<span class="mini">Khi site/library thực tế khác với chuẩn này, ghi rõ <b>M365/SharePoint → HESEM-QMS-SSOT</b> trong DCR record (mục 14) để cập nhật tài liệu.</span>
+</div>
+</div>
+<!-- 13) AUDIT FINDINGS -->
+<div class="card" id="s13">
+<h2>13) Audit findings hay gặp gặp (≥ 8) &amp; cách phòng ngừa</h2>
+<div class="table-wrap">
+<table class="tight">
+<thead><tr><th>#</th><th>Finding</th><th>Vì sao bị hỏi</th><th>Cách phòng ngừa (hành động cụ thể)</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Không chứng minh “đúng REV”</td><td>Khách/audit hỏi file master &amp; job evidence có khớp Rev không</td><td>Release Record phải link DATA/REV đúng; diễn tập audit 60 giây</td></tr>
+<tr><td>2</td><td>Thiếu Tier-1 record hoặc thiếu metadata bắt buộc</td><td>Không search/retention được; rủi ro thất lạc</td><td>Enforce content type + required columns; QA validate trước gate</td></tr>
+<tr><td>3</td><td>Tier-1 không có retention label / không declare record</td><td>Hồ sơ được bị xoá/sửa</td><td>Auto-apply rule theo path + content type; kiểm tra label sau upload</td></tr>
+<tr><td>4</td><td>Master data nằm rải rác (email/USB/local)</td><td>Không kiểm soát phiên bản</td><td>Draft</td></tr>
+<tr><td>5</td><td>Job Dossier chứa file master “bản copy”</td><td>2 nguồn dữ liệu → sai lệch</td><td>Job chỉ lưu Release Record + link; khi cần “freeze” phải có approval &amp; lý do</td></tr>
+<tr><td>6</td><td>Ship packet thiếu approval history</td><td>Không chứng minh ai release/ai chịu trách nhiệm</td><td>ShipRelease phải có approval; Supervisor kiểm tra trước ship</td></tr>
+<tr><td>7</td><td>Outsource thiếu chứng chỉ/lot/heat</td><td>Traceability là yêu cầu bắt buộc</td><td>WHS/QA kiểm trước nhận; lưu đầy đủ ở 06_Outsource</td></tr>
+<tr><td>8</td><td>Không kiểm soát Rev cũ (không có 00_Archive hoặc archive sai)</td><td>Không truy vết supersede</td><td>Đổi Rev phải chuyển Rev cũ vào 00_Archive + change record</td></tr>
+<tr><td>9</td><td>Tên file không theo chuẩn, khó export</td><td>Audit yêu cầu export/offline pack</td><td>Áp naming chuẩn ANNEX-QMS-003; training + spot check</td></tr>
+<tr><td>10</td><td>Bỏ qua gate vì gấp</td><td>Rủi ro stop-ship cao</td><td>Dừng sớm (fail-fast) + hard stop G5; KPI theo “gate compliance”</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 14) DCR record -->
+<div class="card" id="s14">
+</div></div></div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+

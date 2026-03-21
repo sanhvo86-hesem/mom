@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EHS Specialist | HESEM QMS</title>
+<link href="../../../../assets/style.css" rel="stylesheet"/>
+<style>
+/* PAGE BREAK & OVERFLOW FIX */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .form-sheet, .lane, .legend, .req, .vstep, .auth-grid {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header { page-break-inside: avoid; break-inside: avoid; }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
+.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
+.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
+.raci-A {background:#fff5f5; color:#c92a2a;}
+.raci-R {background:#e7f5ff; color:#1864ab;}
+.raci-C {background:#fff9db; color:#e67700;}
+.raci-I {background:#ebfbee; color:#2b8a3e;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
+.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
+.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
+.doc-link-list {list-style:none; margin:0; padding:0;}
+.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
+.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
+.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
+.svg-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
+.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
+
+
+
+/* JD-LAYOUT-PLUS */
+.jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left:4px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
+.jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left:4px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
+.jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
+.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
+.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left:4px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
+.muted-note{font-size:12px; color:var(--ink2,#475569);}
+.raci-badge{display:inline-block; min-width:26px; text-align:center; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;}
+.raci-a{background:#fff3e0; color:#b45309;}
+.raci-r{background:#e0f2fe; color:#0369a1;}
+.raci-c{background:#f3e8ff; color:#7e22ce;}
+.raci-i{background:#ecfdf5; color:#047857;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
+.comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
+.comp-card ul{margin-bottom:0;}
+.require-table th{width:24%;}
+.inline-note{margin-top:8px; font-size:12px; color:var(--ink2,#475569);}
+@media (max-width: 920px){ .auth-grid,.comp-grid{grid-template-columns:1fr;} }
+@media print {
+ .jd-purpose,.jd-mission,.auth-grid,.auth-item,.backup-card,.comp-grid,.comp-card{page-break-inside:avoid; break-inside:avoid;}
+}
+
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu kiểm soát</span>
+</div>
+</div>
+<div class="title">
+<strong>JD-EHS-SPECIALIST — EHS Specialist</strong>
+<span class="sub-vn">Chuyên viên EHS</span>
+</div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>JD-EHS-SPECIALIST</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>HR Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="form-sheet">
+<div class="preface-block">
+<p><b>Bộ phận</b> EHS    <b>Vai trò trong chuỗi giá trị</b> Risk assessment → permit/LOTO/compliance → monitoring/incident response → training &amp; emergency readiness → cải thiện môi trường làm việc an toàn.    <b>Tài liệu liên đới</b> SOP-802 SOP-804 WI-202 WI-713 ANNEX-HSE-001 ANNEX-OPS-003</p>
+</div>
+<div class="jd-purpose"><p>Vai trò của tài liệu: JD này khóa rõ phạm vi công việc, điểm kết thúc trách nhiệm và cơ chế handoff của Chuyên viên EHS; dùng làm đầu vào chuẩn cho tuyển dụng, OJT/đào tạo, đánh giá năng lực, KPI, lương thưởng và phối hợp liên phòng ban trong chuỗi RFQ → ship. JD này phải được đọc cùng ANNEX-OPS-003, ANNEX-QMS-025, ANNEX-QMS-026, ANNEX-QMS-027, ANNEX-QMS-028 và SOP/WI/ANNEX đang hiệu lực.</p></div>
+<h2 class="h2">1. Thông tin vị trí (Position ID &amp; Title)</h2>
+<div class="table-card">
+<table class="table require-table"><tbody>
+<tr><th>Mã vị trí (Position ID)</th><td>JD-EHS-SPECIALIST</td></tr>
+<tr><th>Chức danh theo tài liệu</th><td>EHS Specialist</td></tr>
+<tr><th>Bộ phận</th><td>EHS</td></tr>
+<tr><th>Cấp vai trò</th><td>Professional / Staff</td></tr>
+<tr><th>Nhóm vai trò</th><td>EHS / tuân thủ pháp lý / an toàn hiện trường</td></tr>
+<tr><th>Báo cáo trực tiếp cho</th><td>Chief Executive Officer.</td></tr>
+<tr><th>Quản lý trực tiếp</th><td>Không có nhân sự báo cáo trực tiếp.</td></tr>
+<tr><th>Phối hợp chức năng chính</th><td>Phối hợp chức năng với Production Director và các quản lý hiện trường về thực thi an toàn; với HR Manager về đào tạo / hồ sơ lao động; với Maintenance Technician về an toàn máy / điện / utility; với QA Manager về contamination / FOD / evidences khi có sự cố.</td></tr>
+<tr><th>Hệ thống / công cụ vận hành chính</th><td>Risk register; PPE/training records; incident/near-miss log; legal compliance tracker và action follow-up log.</td></tr>
+<tr><th>Vai trò trong chuỗi giá trị</th><td>Risk assessment → permit/LOTO/compliance → monitoring/incident response → training &amp; emergency readiness → cải thiện môi trường làm việc an toàn.</td></tr></tbody></table>
+</div>
+<h2 class="h2">2. Sứ mệnh vị trí (Role Mission)</h2>
+<div class="jd-mission"><p>EHS Specialist bảo vệ con người, tài sản và môi trường vận hành của doanh nghiệp, đồng thời bảo đảm nhà máy luôn trong trạng thái sẵn sàng trước rủi ro an toàn – cháy nổ – sự cố môi trường – tình huống khẩn cấp.</p><p>Với bối cảnh gia công bán dẫn / cơ khí chính xác, EHS không chỉ là kiểm tra PPE. Vị trí này phải điều khiển cả hệ thống phòng ngừa: machine safety, LOTO, contractor control, cleanroom / contamination awareness, waste / chemical discipline, fire readiness và điều tra học hỏi sau incident.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Rủi ro an toàn trọng yếu được nhận diện, hành động và theo dõi closure có hệ thống; không để tồn tại điều kiện mất an toàn nghiêm trọng kéo dài.</li><li>Đào tạo an toàn, hồ sơ pháp lý PCCC / môi trường và bằng chứng kiểm tra hiện trường luôn đầy đủ, cập nhật và sẵn sàng làm việc với cơ quan chức năng / khách hàng.</li><li>Nhà máy có năng lực ứng phó khẩn cấp thực tế, với drill, emergency route, contact tree và contingency logic rõ ràng cho 2 ca sản xuất.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> EHS Specialist là owner của an toàn và môi trường; không trực tiếp điều độ sản xuất hay phê duyệt chất lượng, nhưng có quyền dừng công việc khi xuất hiện điều kiện không an toàn.</p></div><div class="callout"><p><b>Trọng tâm cập nhật từ bộ tài liệu vận hành nâng cấp</b></p><ul class="tight"><li>Bảo vệ con người và môi trường làm việc bằng hệ điều hành an toàn gắn với sản xuất thật: PPE, hazard control, incident/near-miss learning và điều kiện môi trường.</li><li>EHS phải gắn với abnormality/recovery thực tế, không chỉ kiểm tra compliance theo lịch.</li><li>Kết nối safety với human factors, FOD/cleanliness discipline và readiness của ca/xưởng.</li></ul></div>
+<h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
+<div class="table-card">
+<table class="table require-table"><tbody>
+<tr><th>Báo cáo trực tiếp</th><td>Chief Executive Officer.</td></tr>
+<tr><th>Nhân sự báo cáo trực tiếp</th><td>Không có nhân sự báo cáo trực tiếp.</td></tr>
+<tr><th>Tuyến phối hợp chức năng</th><td>Phối hợp chức năng với Production Director và các quản lý hiện trường về thực thi an toàn; với HR Manager về đào tạo / hồ sơ lao động; với Maintenance Technician về an toàn máy / điện / utility; với QA Manager về contamination / FOD / evidences khi có sự cố.</td></tr>
+<tr><th>Giao diện nội bộ chính</th><td>Chief Executive Officer; HR Manager; Production Director; Shift Leaders; Maintenance Technician; QA Manager; Warehouse; Supply Chain; IT / Facilities.</td></tr>
+<tr><th>Giao diện bên ngoài</th><td>Cơ quan quản lý về PCCC, môi trường, an toàn lao động; nhà cung cấp xử lý chất thải / dịch vụ an toàn; nhà thầu / contractor vào làm việc tại nhà máy.</td></tr>
+<tr><th>Phạm vi vị trí</th><td>Vai trò chuyên môn của bộ phận EHS; tập trung vào chuẩn hóa, phân tích dữ liệu, thực thi nghiệp vụ và phối hợp liên phòng ban.</td></tr>
+</tbody></table>
+</div>
+<h2 class="h2">4. Trách nhiệm chính (Key Responsibilities)</h2>
+<div class="table-card">
+<table class="table"><thead><tr><th style="width:26%">Nhóm trách nhiệm</th><th>Nội dung trách nhiệm</th></tr></thead><tbody>
+<tr><th style="width:26%">Quản trị rủi ro an toàn hiện trường</th><td><ul><li>Tổ chức nhận diện mối nguy, đánh giá rủi ro, kiểm tra PPE, machine guarding, LOTO, điện, khí nén, nâng hạ, chemical handling, ergonomics và điều kiện làm việc hiện trường.</li><li>Thực hiện safety patrol / audit, phát hiện unsafe act / unsafe condition, theo dõi hành động khắc phục và escalated các rủi ro nghiêm trọng.</li><li>Phối hợp Maintenance và quản lý khu vực trong việc kiểm soát thiết bị có nguy cơ cao, biển báo, lockout, permit và điều kiện vận hành an toàn.</li></ul></td></tr><tr><th style="width:26%">Incident / near miss / emergency preparedness</th><td><ul><li>Tiếp nhận và điều tra incident / near miss / unsafe condition, triển khai containment, xác định nguyên nhân, theo dõi corrective action và đánh giá hiệu lực.</li><li>Xây dựng và duy trì emergency plan, sơ đồ thoát nạn, contact list, drill scenario, spill / fire / power outage response và phương án liên tục vận hành liên quan.</li><li>Điều phối diễn tập định kỳ, review bài học sau drill / incident và cập nhật phương án ứng phó.</li></ul></td></tr><tr><th style="width:26%">PCCC, môi trường và tuân thủ pháp lý</th><td><ul><li>Quản lý hồ sơ PCCC, môi trường, kiểm định / hiệu chuẩn thiết bị liên quan an toàn, waste / chemical records, báo cáo định kỳ và giấy phép / hồ sơ theo quy định.</li><li>Làm việc với cơ quan chức năng, nhà thầu, đơn vị xử lý chất thải và các bên liên quan về các hoạt động thanh tra / kiểm tra / khắc phục.</li><li>Giám sát environmental monitoring, housekeeping, kiểm soát FOD / cleanliness interface với các khu vực có yêu cầu đặc biệt.</li></ul></td></tr><tr><th style="width:26%">Đào tạo và xây văn hóa an toàn</th><td><ul><li>Xây chương trình đào tạo an toàn đầu vào, tái đào tạo, toolbox talk, training cho nhà thầu và đào tạo chuyên đề theo rủi ro thực tế.</li><li>Phối hợp HR và quản lý các bộ phận ghi nhận attendance, năng lực an toàn và điều kiện cấp phép làm việc / vận hành.</li><li>Dẫn dắt truyền thông an toàn, bài học cảnh báo, chiến dịch cải tiến và hoạt động nâng cao nhận thức EHS toàn công ty.</li></ul></td></tr>
+<tr><th style="width:26%">Risk controls, incident learning &amp; environmental discipline</th><td><ul><li>Quản lý hazard/PPE matrix, incident &amp; near-miss process, emergency response, safety training, environment monitoring liên quan và hành động phòng ngừa.</li><li>Tham gia hoặc yêu cầu điều tra sâu các sự kiện có yếu tố human factors, fatigue, housekeeping, unsafe workaround hoặc environmental condition bất lợi.</li><li>Theo dõi việc đóng action an toàn và tính hiệu lực tại hiện trường, đặc biệt với các biện pháp liên quan ca đêm, OT, máy quay lại sau sự cố và khu vực sạch.</li></ul></td></tr></tbody></table>
+</div>
+<div class="table-card role-boundary-box">
+<table class="table">
+<tbody>
+<tr>
+<th style="width:26%">Điểm kết thúc trách nhiệm</th>
+<td>EHS Specialist là owner của an toàn và môi trường; không trực tiếp điều độ sản xuất hay phê duyệt chất lượng, nhưng có quyền dừng công việc khi xuất hiện điều kiện không an toàn.</td>
+</tr>
+<tr>
+<th style="width:26%">Không thuộc trách nhiệm chính / phải escalated</th>
+<td><ul><li>Không cho phép sản xuất/bảo trì tiếp tục trong điều kiện mất an toàn dù có áp lực tiến độ; quyền stop-work vì an toàn là bất khả thương lượng.</li><li>Không tự thay đổi phương pháp gia công vì năng suất; mọi biện pháp kiểm soát an toàn phải phối hợp với owner kỹ thuật/vận hành để triển khai bền vững.</li><li>Không xử lý sự cố an toàn chỉ ở mức hình thức; mọi incident/near miss phải có nguyên nhân, action owner và theo dõi closure.</li><li>Chịu trách nhiệm risk assessment, permit, PPE, machine safety/LOTO support, môi trường, chất thải, đào tạo an toàn, điều tra sự cố và readiness ứng phó khẩn cấp.</li><li>Kết thúc trách nhiệm mỗi case khi điều kiện an toàn được phục hồi/xác nhận, action phòng ngừa đã cắm vào hiện trường và hồ sơ được lưu đầy đủ.</li></ul></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, người giữ vị trí phải chuyển đúng owner thay vì xử lý ngoài tuyến kiểm soát.</p>
+<p class="inline-note">Mọi thay đổi ảnh hưởng chất lượng, giao hàng, chi phí, revision, release hoặc truy vết phải tuân theo quy trình/hồ sơ liên kết tại Mục 12.</p>
+<h2 class="h2">5. Quyền hạn (Authority &amp; Decision Rights)</h2>
+<div class="auth-grid">
+<div class="auth-item">Dừng công việc / dừng thiết bị / phong tỏa khu vực khi phát hiện điều kiện mất an toàn nghiêm trọng hoặc nguy cơ sự cố tức thời.</div><div class="auth-item">Từ chối cho contractor / nhân sự vào làm việc tại khu vực kiểm soát nếu chưa đáp ứng điều kiện an toàn, PPE, training hoặc permit bắt buộc.</div><div class="auth-item">Yêu cầu hành động khắc phục với thời hạn rõ ràng đối với các phát hiện EHS; escalated lên Chief Executive Officer khi owner chậm closure hoặc rủi ro ở mức cao.</div><div class="auth-item">Không cho đóng incident nghiêm trọng khi chưa hoàn tất điều tra, corrective action và bằng chứng hiệu lực phù hợp.</div>
+<div class="auth-item">Có quyền dừng công việc hoặc yêu cầu hold khu vực/thiết bị khi tồn tại nguy cơ an toàn chưa được kiểm soát hoặc điều kiện môi trường vượt ngưỡng chấp nhận.</div></div>
+<h2 class="h2">6. Giao diện liên phòng ban — RACI / Handoff</h2>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:24%">Đối tác / tuyến phối hợp</th>
+<th>Nội dung handoff / phối hợp</th>
+<th style="width:10%">RACI</th>
+<th>Kết quả mong đợi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th style="width:20%">Chief Executive Officer</th>
+<td><p>Báo cáo các rủi ro EHS lớn, sự cố nghiêm trọng, nhu cầu đầu tư bắt buộc và tuân thủ pháp luật.</p></td>
+<td style="width:10%; text-align:center"><span class="raci-badge raci-r">R</span></td>
+<td>Lãnh đạo nắm đúng mức độ rủi ro EHS để ra quyết định.</td>
+</tr>
+<tr>
+<th style="width:20%">Production / Maintenance / Workshop</th>
+<td><p>Phối hợp permit, LOTO, guarding, housekeeping, machine safety, chemical handling và điều tra sự cố tại hiện trường.</p></td>
+<td style="width:10%; text-align:center"><span class="raci-badge raci-a">A</span></td>
+<td>Biện pháp an toàn đi vào vận hành thực tế, không đứng ngoài hiện trường.</td>
+</tr>
+<tr>
+<th style="width:20%">HR Manager</th>
+<td><p>Triển khai onboarding safety, training bắt buộc, hồ sơ năng lực an toàn và truyền thông nội bộ.</p></td>
+<td style="width:10%; text-align:center"><span class="raci-badge raci-c">C</span></td>
+<td>Người lao động được trang bị và chứng thực năng lực an toàn cần thiết.</td>
+</tr>
+<tr>
+<th style="width:20%">QA/QMS / Internal Audit</th>
+<td><p>Cung cấp hồ sơ compliance, corrective action, KPI an toàn/môi trường và hỗ trợ audit/management review.</p></td>
+<td style="width:10%; text-align:center"><span class="raci-badge raci-i">I</span></td>
+<td>EHS tích hợp vào hệ quản trị công ty.</td>
+</tr>
+<tr>
+<th style="width:20%">External authorities / service providers</th>
+<td><p>Điều phối kiểm định, xử lý chất thải, hồ sơ pháp lý và phản hồi cơ quan chức năng khi được phân công.</p></td>
+<td style="width:10%; text-align:center"><span class="raci-badge raci-i">I</span></td>
+<td>Tuân thủ EHS bên ngoài được duy trì liên tục.</td>
+</tr>
+</tbody>
+</table>
+</div><p class="inline-note">Quy ước: R = đầu mối trực tiếp thực hiện/phản hồi; A = đầu mối chịu trách nhiệm cuối cùng trong tuyến phối hợp; C = cần tham vấn/bắt buộc đồng bộ trước khi tiếp tục; I = cần được thông tin để đồng bộ trạng thái.</p>
+<h2 class="h2">7. Đầu ra bắt buộc / hồ sơ quản trị</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nơi lưu / nguồn</th></tr></thead><tbody><tr><td>EHS inspection &amp; risk control records</td><td>Biên bản kiểm tra hiện trường, danh sách mối nguy / phát hiện, owner hành động và tình trạng closure.</td><td>Ngày / tuần / tháng</td><td>Safety patrol log, action tracker, hồ sơ EHS.</td></tr><tr><td>Incident / near miss dossiers</td><td>Hồ sơ báo cáo sự cố, điều tra nguyên nhân, containment, corrective action và bài học rút ra.</td><td>Khi phát sinh</td><td>FRM-811, investigation file, action log.</td></tr><tr><td>Environmental / cleanliness logs</td><td>Hồ sơ môi trường, kiểm tra điều kiện khu vực, cleanliness / FOD interface và các log giám sát liên quan.</td><td>Ngày / tuần / tháng</td><td>FRM-708, FRM-812, WI-713 records.</td></tr><tr><td>Emergency drill &amp; contingency records</td><td>Kế hoạch diễn tập, biên bản drill, kết quả đánh giá và cập nhật phương án khẩn cấp.</td><td>Quý / năm / khi phát sinh</td><td>Drill file, contingency records, SOP-108 evidence.</td></tr><tr><td>Legal compliance dossiers</td><td>Hồ sơ PCCC, môi trường, làm việc cơ quan chức năng, giấy phép / kiểm định và bằng chứng tuân thủ.</td><td>Theo kỳ / khi phát sinh</td><td>Legal compliance file, audit-ready folders.</td></tr><tr><td>Safety training records</td><td>Kế hoạch và bằng chứng đào tạo an toàn, contractor induction, refresh training và attendance.</td><td>Tháng / quý</td><td>FRM-801, FRM-802, EHS training dossier.</td></tr><tr><td>Safety-learning &amp; control pack</td><td>Incident/near-miss records, hazard actions, PPE/environment compliance, verification of closure và lessons learned chia sẻ lại cho các bộ phận.</td><td>Theo sự kiện / tháng</td><td>FRM-811; FRM-812; training records; hazard matrix action log.</td></tr></tbody></table></div>
+<h2 class="h2">8. KPI cá nhân</h2>
+<div class="table-card"><table class="table"><thead><tr><th>KPI trọng yếu</th><th>Cách đo / nguồn dữ liệu</th><th>Chu kỳ theo dõi</th></tr></thead><tbody><tr><td>Incident / near-miss performance</td><td>Số incident ghi nhận, near miss report rate, mức độ nghiêm trọng và xu hướng theo khu vực / ca.</td><td>Tháng</td></tr><tr><td>Corrective action closure</td><td>Tỷ lệ và thời gian đóng các hành động khắc phục EHS / incident / audit finding.</td><td>Tuần / tháng</td></tr><tr><td>Safety training compliance</td><td>Tỷ lệ nhân sự / contractor hoàn tất đào tạo an toàn bắt buộc và tái đào tạo đúng hạn.</td><td>Tháng</td></tr><tr><td>Inspection finding aging</td><td>Số phát hiện EHS quá hạn chưa xử lý và mức độ tồn đọng theo rủi ro.</td><td>Tuần / tháng</td></tr><tr><td>Emergency readiness</td><td>Kết quả drill, tình trạng sẵn sàng thiết bị / phương án ứng phó và thời gian phản ứng trong diễn tập.</td><td>Quý</td></tr><tr><td>Legal / regulatory compliance</td><td>Số điểm không phù hợp / vi phạm / nhắc nhở từ cơ quan chức năng hoặc audit khách hàng liên quan EHS.</td><td>Quý / năm</td></tr><tr><td>Near-miss closure on-time</td><td>Tỷ lệ sự kiện near-miss/unsafe condition được điều tra, giao owner và đóng đúng hạn với bằng chứng hiệu lực tại hiện trường.</td><td>Tháng</td></tr></tbody></table></div>
+<h2 class="h2">9. Yêu cầu năng lực (Competency Requirement)</h2>
+<div class="comp-grid">
+<div class="comp-card"><p><b>Kiến thức chuyên môn &amp; hệ thống</b></p><ul><li>Hiểu mối nguy công nghiệp phổ biến: machine safety, LOTO, điện, khí, hóa chất, cháy nổ, chất thải, ergonomics và yêu cầu ứng phó khẩn cấp.</li><li>Biết xây dựng hồ sơ pháp lý, log giám sát, kế hoạch đào tạo, điều tra sự cố và theo dõi corrective action một cách có hệ thống.</li><li>Có khả năng dùng Excel / hệ thống số để quản action list, training matrix, hồ sơ pháp lý và dashboard EHS.</li></ul></div>
+<div class="comp-card"><p><b>Năng lực hành vi / phối hợp</b></p><ul><li>Có bản lĩnh hiện trường, dám dừng việc khi không an toàn và giao tiếp thuyết phục với quản lý / công nhân.</li><li>Kỷ luật hồ sơ tốt, phản ứng nhanh khi có sự cố và theo đuổi closure đến cùng.</li><li>Có tư duy phòng ngừa, không chỉ xử lý sau khi tai nạn đã xảy ra.</li></ul></div>
+</div>
+<div class="callout"><p><b>Mô-đun năng lực / đào tạo cốt lõi</b></p><ul><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C01.html"><b>C01</b> — Module C01 — Workplace Safety &amp; 5S</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C04.html"><b>C04</b> — Module C04 — Cross-Department Communication &amp; Coordination</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C06.html"><b>C06</b> — Module C06 — Problem Solving (5Why / PDCA / CAPA)</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C08.html"><b>C08</b> — Module C08 — Data-Driven Thinking &amp; System Usage (ERP/Excel)</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C09.html"><b>C09</b> — Module C09 — Time Management &amp; Prioritization</a></li></ul></div>
+<p class="inline-note">Mức đánh giá chi tiết, gating OJT và lộ trình phát triển áp dụng theo training matrix / competency assessment guide hiện hành của bộ phận.</p>
+<h2 class="h2">10. Học vấn, kinh nghiệm &amp; yêu cầu tuyển dụng</h2>
+<div class="table-card">
+<table class="table require-table"><tbody>
+<tr><th>Trình độ / chứng chỉ</th><td><ul><li>Tốt nghiệp cao đẳng / đại học ngành an toàn lao động, môi trường, kỹ thuật công nghiệp hoặc tương đương.</li><li>Ưu tiên có chứng chỉ / đào tạo về an toàn, PCCC, ISO 45001 / ISO 14001 hoặc nghiệp vụ tương đương.</li></ul></td></tr><tr><th>Kinh nghiệm</th><td><ul><li>Có kinh nghiệm phụ trách EHS trong nhà máy sản xuất; ưu tiên môi trường gia công cơ khí, điện tử, phòng sạch hoặc có yêu cầu kiểm soát contamination / FOD.</li><li>Ưu tiên có kinh nghiệm làm việc với cơ quan chức năng, tổ chức drill, điều tra incident và kiểm soát contractor.</li></ul></td></tr><tr><th>Hệ thống / công cụ cần dùng</th><td><p>Risk register; PPE/training records; incident/near-miss log; legal compliance tracker và action follow-up log.</p></td></tr><tr><th>Điều kiện / đặc thù công việc</th><td><p>Di chuyển nhiều tại hiện trường để kiểm tra, huấn luyện và điều tra sự cố; sẵn sàng hỗ trợ ứng phó tình huống khẩn cấp khi được triệu tập.</p></td></tr><tr><th>Lưu ý tuyển dụng ưu tiên</th><td><p>Ưu tiên ứng viên phù hợp với văn hóa kỷ luật quy trình, minh bạch dữ liệu và sẵn sàng học theo lộ trình OJT/đánh giá năng lực.</p></td></tr>
+</tbody></table>
+</div>
+<h2 class="h2">11. Người thay thế / kế nhiệm tạm thời</h2>
+<div class="backup-card">
+<p><b>Primary Backup:</b> Lead/Manager trực tiếp hoặc nhân sự đồng chức năng đã được OJT và chỉ định thay thế trong thời gian vắng mặt.</p>
+<p><b>Secondary Backup:</b> Người quản lý trực tiếp bố trí nguồn lực dự phòng theo ca/kế hoạch để duy trì công việc và truy vết hồ sơ.</p>
+<p><b>Giới hạn quyền khi thay thế:</b> Chỉ thực hiện trong phạm vi công việc thường lệ; không tự phê duyệt change, release, cam kết khách hàng, ngoại lệ chất lượng hay chi phí vượt thẩm quyền chức danh gốc.</p>
+<p><b>Nguyên tắc kích hoạt:</b> Kích hoạt khi nghỉ phép, công tác, đào tạo, vắng mặt ngắn hạn hoặc khối lượng tăng đột biến; phải có phân công rõ bằng email, ca lệnh hoặc bảng phân nhiệm.</p>
+</div>
+<h2 class="h2">12. SOP / WI / Form / Academy liên quan</h2>
+<div class="table-card"><table class="table"><tbody><tr><th style="width:28%">SOP cốt lõi</th><td><ul class="doc-link-list"><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-802-incident-near-miss-and-ehs.html"><b>SOP-802</b> — Báo cáo sự cố, suýt sự cố (near-miss) và kiểm soát EHS</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-804-human-factors-and-error-proofing.html"><b>SOP-804</b> — Yếu tố con người, phòng ngừa sai lỗi và poka-yoke</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/07-SOP-700/sop-703-product-safety-conformity-and-fod-prevention.html"><b>SOP-703</b> — An toàn sản phẩm, kiểm soát tính phù hợp và phòng ngừa FOD</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html"><b>SOP-108</b> — Ứng phó gián đoạn vận hành và liên tục kinh doanh</a></li></ul></td></tr><tr><th style="width:28%">WI / Reference / System</th><td><ul class="doc-link-list"><li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html"><b>WI-202</b> — Điều hành hằng ngày, họp tầng, KPI, action log và xử lý vượt cấp</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-713-environmental-monitoring-and-response.html"><b>WI-713</b> — Theo dõi môi trường, lấy mẫu, đọc kết quả và phản ứng khi lệch chuẩn</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/02-ANNEX-Standards/annex-hse-001-ppe-and-hazard-matrix.html"><b>ANNEX-HSE-001</b> — Ma trận mối nguy, PPE và trigger permit theo công việc/khu vực</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-qms-017-fod-prevention-program.html"><b>ANNEX-QMS-017</b> — Chương trình phòng ngừa FOD</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-711-cleanroom-entry-and-gowning.html"><b>WI-711</b> — Vào phòng sạch, thay đồ, hành vi trong khu sạch, rời khu và tái nhập đúng cách</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-721-fod-prevention-line-clearance-and-tool-accountability.html"><b>WI-721</b> — Chống FOD, line clearance, kiểm tool/vật lạ và xác nhận khu vực sạch</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-qms-001-process-map-detailed.html"><b>ANNEX-QMS-001</b> — Bản đồ quá trình chi tiết và điểm giao diện</a></li></ul></td></tr><tr><th style="width:28%">Biểu mẫu / hồ sơ</th><td><ul class="doc-link-list"><li><a  download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-811_Incident_Report.xlsx"><b>FRM-811</b> — Incident Report</a></li><li><a  download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-812_Lighting_Log.xlsx"><b>FRM-812</b> — Lighting Log</a></li><li><a  download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-801_Training_Plan.xlsx"><b>FRM-801</b> — Kế hoạch đào tạo</a></li><li><a  download="" href="../../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx"><b>FRM-708</b> — Environmental Log</a></li><li><a  download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-802_Attendance_List.xlsx"><b>FRM-802</b> — Attendance Sheet</a></li></ul></td></tr><tr><th style="width:28%">Academy / năng lực</th><td><ul class="doc-link-list"><li><a href="../../../../10-Training-Academy/04-Templates-Tools/role-roadmaps.html"><b>TRN-ACA-RMAP-01</b> — Training Roadmap by Role (30/60/90 Days)</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C01.html"><b>Module C01</b> — Workplace Safety &amp; 5S | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C04.html"><b>Module C04</b> — Cross-Department Communication &amp; Coordination | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C06.html"><b>Module C06</b> — Problem Solving (5Why / PDCA / CAPA) | HESEM OS</a></li></ul></td></tr><tr><th style="width:28%">Reference điều hành</th><td><ul class="doc-link-list"><li><a href="../../04-RACI-Authority/annex-qms-025-authority-matrix.html"><b>ANNEX-QMS-025</b> — Ma trận thẩm quyền quyết định và nhả giữ</a></li><li><a href="../../04-RACI-Authority/annex-qms-026-raci-master-matrix.html"><b>ANNEX-QMS-026</b> — RACI master ở mức hoạt động và tài liệu</a></li><li><a href="../../04-RACI-Authority/annex-qms-027-kpi-cascade-dictionary.html"><b>ANNEX-QMS-027</b> — Từ điển KPI cascade</a></li><li><a href="../../04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html"><b>ANNEX-QMS-028</b> — Ma trận deputy / backup</a></li></ul></td></tr></tbody></table></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

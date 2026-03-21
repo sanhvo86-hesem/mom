@@ -1,0 +1,19 @@
+# Apache/httpd example — force FRM workbook download in /04-Bieu-Mau/
+<Directory "/var/www/html/04-Bieu-Mau">
+  Options -Indexes
+  AllowOverride All
+</Directory>
+
+<IfModule mod_mime.c>
+  AddType application/vnd.openxmlformats-officedocument.spreadsheetml.sheet .xlsx
+  AddType application/vnd.ms-excel.sheet.macroEnabled.12 .xlsm
+  AddType application/vnd.ms-excel .xls
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(xlsx|xlsm|xls)$">
+    Header always set Content-Disposition "attachment"
+    Header always set X-Content-Type-Options "nosniff"
+    Header unset Content-Security-Policy
+  </FilesMatch>
+</IfModule>

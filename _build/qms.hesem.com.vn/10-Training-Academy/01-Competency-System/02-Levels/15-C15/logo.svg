@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="56" fill="#f3f0ff" stroke="#d0bfff" stroke-width="2"/>
+  <circle cx="48" cy="45" r="10" fill="#5f3dc4" opacity=".15" stroke="#5f3dc4" stroke-width="1.5"/>
+  <circle cx="72" cy="45" r="10" fill="#5f3dc4" opacity=".15" stroke="#5f3dc4" stroke-width="1.5"/>
+  <circle cx="60" cy="65" r="10" fill="#5f3dc4" opacity=".15" stroke="#5f3dc4" stroke-width="1.5"/>
+  <line x1="48" y1="45" x2="72" y2="45" stroke="#5f3dc4" stroke-width="1.5" opacity=".5"/>
+  <line x1="48" y1="45" x2="60" y2="65" stroke="#5f3dc4" stroke-width="1.5" opacity=".5"/>
+  <line x1="72" y1="45" x2="60" y2="65" stroke="#5f3dc4" stroke-width="1.5" opacity=".5"/>
+  <circle cx="48" cy="45" r="3" fill="#5f3dc4"/><circle cx="72" cy="45" r="3" fill="#5f3dc4"/><circle cx="60" cy="65" r="3" fill="#5f3dc4"/>
+  <path d="M30 82h60" stroke="#5f3dc4" stroke-width="3" stroke-linecap="round" opacity=".2"/>
+  <path d="M30 86h60" stroke="#5f3dc4" stroke-width="1.5" stroke-linecap="round" opacity=".15"/>
+  <text x="60" y="108" text-anchor="middle" font-size="7" font-weight="700" fill="#5f3dc4" font-family="system-ui">MATERIAL</text>
+</svg>
