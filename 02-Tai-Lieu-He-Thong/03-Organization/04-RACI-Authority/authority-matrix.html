@@ -6,7 +6,6 @@
 <title>ORG-AUTH-001 — Authority Matrix | HESEM QMS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
-
 /* PAGE BREAK & OVERFLOW FIX */
 @media print {
  .card, .table-card, .callout, .note, .box, .iso-map,
@@ -69,6 +68,60 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .phase-card p:last-child,.role-boundary p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
 .small-note{font-size:12px;color:var(--ink2);}
 
+
+
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
+.toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.toc-grid a{display:block;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2)}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg)}
+.metric-card .value{font-weight:800;font-size:16px;color:var(--navy);margin:6px 0}
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+.check-item{border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
+.process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.mini-note{font-size:12px;color:var(--ink2)}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+.decision-table th,.decision-table td{vertical-align:top}
+@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
+
+.doc-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+.doc-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.card h3{margin-top:0}
+.small{font-size:12px;color:var(--ink3);}
+.tight p{margin:8px 0;}
+.legend-row{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 18px;}
+.legend-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:8px 10px;font-size:12px;}
+.legend-swatch{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;border:1px solid var(--ln2);}
+.kpi-good{background:#ebfbee;color:#2b8a3e}
+.kpi-warn{background:#fff9db;color:#e67700}
+.kpi-bad{background:#fff5f5;color:#c92a2a}
+.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;white-space:nowrap}
+.matrix-table{width:100%;border-collapse:collapse;font-size:12px;}
+.matrix-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--navy);background:var(--th-bg);border:1px solid var(--th-bdr);text-transform:uppercase;letter-spacing:.3px;vertical-align:bottom}
+.matrix-table td{padding:8px 10px;border:1px solid var(--ln2);vertical-align:top;line-height:1.45}
+.matrix-table tbody tr:nth-child(even){background:#fafcfe}
+.matrix-table .section-row td{background:var(--navy)!important;color:#fff;font-weight:700;letter-spacing:.4px}
+.center{text-align:center}
+.nowrap{white-space:nowrap}
+.cell-a{background:#e3f2fd;color:#1565c0;font-weight:800;text-align:center}
+.cell-p{background:#fff3e0;color:#e65100;font-weight:700;text-align:center}
+.cell-v{background:#f3e5f5;color:#7b1fa2;font-weight:700;text-align:center}
+.cell-c{background:#fff9db;color:#e67700;font-weight:700;text-align:center}
+.cell-i{background:#e8f5e9;color:#2e7d32;font-weight:600;text-align:center}
+.cell-x{background:#f8f9fa;color:#868e96;text-align:center}
+.badge-strip{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.badge-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--ln);padding:6px 10px;border-radius:999px;font-size:12px}
+.footer-note{margin-top:18px;padding:14px 16px;border:1px dashed var(--ln2);border-radius:12px;background:var(--bg2);color:var(--ink2)}
+
+
 </style>
 </head>
 <body>
@@ -77,29 +130,44 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
     <div class="page-body">
       <div class="form-header">
         <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu kiểm soát</span>
-          </div>
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
         </div>
         <div class="title">
           <strong>ORG-AUTH-001 — Authority Matrix</strong>
-          <span class="sub-vn">Trang rút gọn / chuyển hướng tới bản authority chi tiết</span>
+          <span class="sub-vn">Trang tóm tắt để điều hướng đến authority matrix active và các ANNEX liên quan</span>
         </div>
         <div class="meta">
           <div class="row"><span><b>Mã:</b></span><span>ORG-AUTH-001</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V1.0</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
           <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>CEO / QA Manager</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager</span></div>
           <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
         </div>
       </div>
       <div class="doc-content" id="docContent">
         <div class="form-sheet">
-<div class="note"><b>Tài liệu rút gọn.</b> Trang này được giữ để tương thích đường dẫn cũ. Bản authority chi tiết sau cập nhật JD mới nhất nằm tại <a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025 — Authority Matrix</a>.</div>
-<h2 class="h2">1. Tóm tắt authority cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:34%"/><col style="width:33%"/><col style="width:33%"/></colgroup><thead><tr><th>Chủ đề</th><th>Owner quyết định cuối</th><th>Tài liệu chi tiết</th></tr></thead><tbody><tr><td>Commercial commitment / order acceptance</td><td>CEO / người được ủy quyền</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Technical release / engineering change</td><td>Engineering Lead/Manager + QA rule</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/ref-020-cnc-operating-model-and-role-boundary.html">REF-020</a></td></tr><tr><td>Dispatch / production recovery</td><td>Production Director / delegated planner rule</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Quality hold / final release / stop-ship</td><td>QA Manager</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Supplier / outsource approval</td><td>Supply Chain Manager + Quality rule</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Deputy / backup activation</td><td>HR / department owner</td><td><a href="annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a></td></tr></tbody></table></div>
-<div class="footer-note">Đường dẫn cũ được giữ để các tài liệu cũ hoặc bookmark vẫn hoạt động.</div>
+          <div class="iso-map">
+            <div class="iso-title">Department / annex control intent</div>
+            <div class="req"><span class="req-tag shall">PHẢI</span><div>Trang này chỉ là summary portal. Mọi quyết định phê duyệt, nhả giữ, stop/restart hoặc ngoại lệ phải tra ANNEX-QMS-025 bản active.</div></div><div class="req"><span class="req-tag should">NÊN</span><div>Dùng trang này như bảng chỉ đường nhanh cho lãnh đạo và owner chức năng, không dùng thay authority matrix chi tiết.</div></div>
+          </div>
+          <div class="preface-block">
+            <div class="grid-2">
+              <div>
+                <p><b>Vai trò sử dụng</b></p>
+                <div><span class="inline-tag">All functional owners</span><span class="inline-tag">Chief Executive Officer</span><span class="inline-tag">Department Heads</span></div>
+              </div>
+              <div>
+                <p><b>Tài liệu chính</b></p>
+                <div><span class="inline-tag">ANNEX-QMS-025</span><span class="inline-tag">ANNEX-QMS-026</span><span class="inline-tag">ANNEX-QMS-027</span><span class="inline-tag">ANNEX-QMS-028</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. Tóm tắt authority cốt lõi</a><a href="#s2">2. Điểm cần đọc cùng</a><a href="#s3">3. Khi nào phải tra ANNEX chi tiết</a></div></div>
+          <h2 class="h2" id="s1">1. Tóm tắt authority cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:34%"/><col style="width:30%"/><col style="width:36%"/></colgroup><thead><tr><th>Chủ đề</th><th>Owner quyết định cuối</th><th>Tài liệu chi tiết</th></tr></thead><tbody><tr><td>Commercial commitment / order acceptance</td><td>CEO / theo ANNEX-QMS-025</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Technical release / engineering change</td><td>Engineering Lead/Manager trong phạm vi authority</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Dispatch / production recovery</td><td>Production Director / CNC Workshop Manager theo gate</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Quality hold / final release / stop-ship</td><td>QA Manager / CEO theo severity</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Supplier / outsource / inventory exception</td><td>Supply Chain Manager cùng verification liên quan</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Deputy / backup activation</td><td>HR Manager + department owner</td><td><a href="annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a></td></tr></tbody></table></div><h2 class="h2" id="s2">2. Điểm cần đọc cùng</h2><div class="table-card"><table class="table"><colgroup><col style="width:30%"/><col style="width:70%"/></colgroup><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody><tr><td><a href="annex-qms-026-raci-master-matrix.html">ANNEX-QMS-026</a></td><td>Làm rõ owner hoạt động/handoff khi authority đã biết.</td></tr><tr><td><a href="annex-qms-027-kpi-cascade-dictionary.html">ANNEX-QMS-027</a></td><td>Làm rõ ai sở hữu KPI và reaction rule sau quyết định.</td></tr><tr><td><a href="annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a></td><td>Làm rõ continuity khi owner chính vắng mặt.</td></tr></tbody></table></div><h2 class="h2" id="s3">3. Khi nào phải tra ANNEX chi tiết</h2>
+<p>Bất kỳ trường hợp nào có customer impact, cash impact, quality hold/release, safety incident, change control, access nhạy cảm hoặc contingency activation đều phải mở bản chi tiết tại <a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a>. Summary này không đủ để phê duyệt giao dịch hay release gate.</p>
+<div class="footer-note">Trang summary đã đồng bộ với bộ ANNEX active; không còn dùng REF cũ hoặc authority page legacy làm nguồn chuẩn.</div>
+
         </div>
       </div>
     </div>

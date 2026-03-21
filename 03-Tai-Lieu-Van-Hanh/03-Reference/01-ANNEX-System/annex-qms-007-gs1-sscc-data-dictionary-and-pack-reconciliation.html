@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ANNEX-QMS-007 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Annex</span>
+          </div>
+        </div>
+        <div class="title"><strong>ANNEX-QMS-007 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>ANNEX-QMS-007</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>WHS Manager / IT Manager / QMS Manager</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi cấp PackID/SSCC, in nhãn logistics, split/merge kiện, reprint/void nhãn, và đối soát trước ship confirm.</div>
+      <h1>ANNEX-QMS-007 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</h1>
+      
+<div class="section"><h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
+<p>ANNEX này giữ toàn bộ quy tắc dữ liệu cho PackID và SSCC. Mọi thao tác in nhãn, quét, reprint, void, split/merge và đối soát kiện hàng phải bám đúng Annex này. Dữ liệu logistics không được tự chế ngoài hệ thống.</p>
+<div class="callout-danger"><strong>CẤM</strong> tái sử dụng SSCC. CẤM ship khi ReconciliationStatus là BLOCKED. CẤM sửa tay dữ liệu PackID/SSCC trên nhãn để “chạy cho kịp”.</div></div>
+
+<div class="section"><h2>2. Từ điển dữ liệu bắt buộc</h2>
+<div class="table-card"><table><thead><tr><th>Field</th><th>Bắt buộc</th><th>Nguồn dữ liệu chuẩn</th><th>Quy tắc</th></tr></thead><tbody>
+<tr><td>PackID</td><td>Có</td><td>Epicor/WHS transaction</td><td>Duy nhất trong shipment scope; không đổi sau ship confirm.</td></tr>
+<tr><td>SSCC (AI 00)</td><td>Có khi dùng logistics label</td><td>Service cấp mã được kiểm soát</td><td>18 số, check digit hợp lệ, duy nhất toàn cục trong vòng đời quản lý của công ty.</td></tr>
+<tr><td>Shipment / Order / Release</td><td>Có</td><td>Epicor</td><td>Phải khớp ship-to, bill-to, điều kiện giao hàng.</td></tr>
+<tr><td>JobNum / PartNo / Rev</td><td>Có</td><td>Epicor + controlled release set</td><td>Không được ship sai revision; revision phải khớp hồ sơ quality release.</td></tr>
+<tr><td>Qty / UOM</td><td>Có</td><td>Epicor + packing count thực tế</td><td>Tổng qty trên mọi PackID phải khớp shipment lines.</td></tr>
+<tr><td>Child-Parent mapping</td><td>Có khi pallet/carton nhiều tầng</td><td>WHS scan logic</td><td>Phải nhìn được quan hệ pallet ↔ carton ↔ inner pack.</td></tr>
+<tr><td>LabelPrintVersion</td><td>Có</td><td>Label service</td><td>Giúp truy vết layout/template đang dùng.</td></tr>
+<tr><td>ReprintCount / VoidFlag</td><td>Có</td><td>Reprint/Void log</td><td>Mỗi reprint/void phải có reason code và người phê duyệt.</td></tr>
+<tr><td>PacketComplete</td><td>Có</td><td>SSOT ship packet</td><td>Chỉ PASS khi đủ hồ sơ bắt buộc theo QPL và yêu cầu khách hàng.</td></tr>
+<tr><td>ReconciliationStatus</td><td>Có</td><td>Validator logic</td><td>PASS / FAIL / BLOCKED. BLOCKED chặn ship confirm.</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>3. Quy tắc vòng đời PackID / SSCC</h2>
+<div class="step-list">
+<div class="step-item"><strong>Cấp mã.</strong><br/>PackID được tạo trong transaction đã phê duyệt. SSCC chỉ được cấp cho logistic unit thực sự tồn tại. Không cấp mã “dự trữ” để dán sau.</div>
+<div class="step-item"><strong>In và quét xác nhận.</strong><br/>Sau in, phải quét xác nhận đúng parser, đúng PackID và đúng shipment context. Nhãn không đọc được hoặc đọc sai AI phải hủy ngay.</div>
+<div class="step-item"><strong>Split / merge.</strong><br/>Split tạo PackID/SSCC con mới, giữ liên hệ cha-con và điều chỉnh Qty. Merge phải giữ một parent unit rõ ràng; không mất dấu container thành phần.</div>
+<div class="step-item"><strong>Reprint / void.</strong><br/>Reprint chỉ cho phép khi nhãn hỏng, mất hoặc đổi vật lý container hợp lệ. Void dùng khi container bị hủy, gộp lại, dán sai, hoặc shipment đổi cấu trúc. Mọi hành động phải lưu log.</div>
+<div class="step-item"><strong>Ship confirm.</strong><br/>Chỉ cho phép khi PacketComplete = PASS, ReconciliationStatus = PASS, không có hold mở và ship packet đủ.</div>
+</div></div>
+
+<div class="section"><h2>4. Quy tắc đối soát kiện hàng</h2>
+<div class="table-card"><table><thead><tr><th>Hạng mục đối soát</th><th>PASS khi</th><th>BLOCK khi</th></tr></thead><tbody>
+<tr><td>Qty reconciliation</td><td>Tổng Qty theo PackID = shipment line = packing list</td><td>Chênh số lượng hoặc UOM</td></tr>
+<tr><td>Revision reconciliation</td><td>Part/Rev trên nhãn khớp release set và ship packet</td><td>Sai rev hoặc lẫn nhiều rev trong một logistic unit không được phép</td></tr>
+<tr><td>Child-parent relationship</td><td>Cấu trúc carton/pallet rõ ràng và quét ra đúng</td><td>Parent không mở được child hoặc child mất quan hệ</td></tr>
+<tr><td>Evidence reconciliation</td><td>CoC/cert/packing checklist/ảnh kiện đầy đủ khi áp dụng</td><td>Thiếu hồ sơ bắt buộc hoặc link hỏng</td></tr>
+<tr><td>Status reconciliation</td><td>Không còn hold, không còn suspect chưa xử lý</td><td>Có hold mở hoặc issue chưa disposition</td></tr>
+</tbody></table></div>
+<p>Chi tiết đóng gói vật lý và label layout xem <a href="../02-ANNEX-Standards/annex-whs-001-packaging-labeling-spec.html">ANNEX-WHS-001</a>. Hướng dẫn thao tác tại điểm dùng sẽ theo WI ship release tương ứng.</p></div>
+
+<div class="section"><h2>5. Ngoại lệ bắt buộc phải có phê duyệt</h2>
+<ul class="tight" style="padding-left:20px; margin:8px 0;">
+<li><strong>Split shipment:</strong> phải đối chiếu riêng theo từng phần giao, giữ rõ shipment line và chứng từ tương ứng.</li>
+<li><strong>Merge pallet:</strong> phải có parent-child mapping và ảnh kiện cuối.</li>
+<li><strong>Reprint khẩn:</strong> chỉ dùng khi đã xác minh không đổi dữ liệu; phải có reason code.</li>
+<li><strong>Manual fallback:</strong> khi hệ thống offline, dùng bộ dự phòng theo <a href="../03-ANNEX-Digital/annex-qms-021-offline-fallback-kit.html">ANNEX-QMS-021</a> và đồng bộ lại ngay khi hệ thống phục hồi.</li>
+</ul></div>
+
+<div class="section"><h2>6. Tài liệu liên kết</h2>
+<div class="table-card"><table><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../02-ANNEX-Standards/annex-whs-001-packaging-labeling-spec.html">ANNEX-WHS-001</a></td><td>Packaging spec, label layout, clean pack và preservation.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a></td><td>Barcode nội bộ, scan-to-action và quản lý label trong xưởng.</td></tr>
+<tr><td><a href="../03-ANNEX-Digital/annex-qms-005-m365-lists-and-field-mapping.html">ANNEX-QMS-005</a></td><td>Field mapping của hệ thống số.</td></tr>
+<tr><td><a href="../03-ANNEX-Digital/annex-qms-021-offline-fallback-kit.html">ANNEX-QMS-021</a></td><td>Offline fallback kit.</td></tr>
+<tr><td><a href="../02-ANNEX-Standards/annex-qa-003-quality-package-levels-qpl.html">ANNEX-QA-003</a></td><td>Mức hồ sơ bắt buộc theo QPL.</td></tr>
+</tbody></table></div></div>
+
+    </div>
+  </div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

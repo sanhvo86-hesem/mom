@@ -2,96 +2,85 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>WI-515 — Mill Turn Guide | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WI-515 — Hướng dẫn vận hành mill-turn / multitask | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
-/* === PAGE BREAK & OVERFLOW FIX (auto-applied) === */
 @media print {
-  .card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.vstep{page-break-inside:avoid;break-inside:avoid}
-  h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}
-  .form-header,.sig-row,.sign-row{page-break-inside:avoid;break-inside:avoid}
-  tr{page-break-inside:avoid;break-inside:avoid}
-  thead{display:table-header-group}tfoot{display:table-footer-group}
-  p{orphans:3;widows:3}.table-card{overflow:visible!important}
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
 }
-.page-body{overflow-x:hidden}
-.table-card,.table-block,.table-wrap{overflow-x:auto;max-width:100%}
-table{max-width:100%;table-layout:auto}
-td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 </head>
 <body>
-<div class="container"><div class="page"><div class="page-body">
-<div class="form-header">
-<div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Work Instruction</span>
+          </div>
+        </div>
+        <div class="title"><strong>WI-515 — Hướng dẫn vận hành mill-turn / multitask</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>WI-515</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>Production Manager / Engineering Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho máy mill-turn hoặc multitasking có nhiều spindle/mode trên cùng máy và rủi ro transfer/sync cao.</div>
+      <h1>WI-515 — Hướng dẫn vận hành mill-turn / multitask</h1>
+      <div class="section"><h2>1. Mục đích, phạm vi và ranh giới</h2><p>WI này áp dụng cho máy mill-turn / multitask có nhiều mode gia công trên cùng máy, có main spindle, sub-spindle, turret, live tool hoặc B-axis. Tài liệu này ưu tiên kiểm soát chuyển mode, transfer, synchronization và interference zone.</p><div class="callout-danger"><strong>CẤM</strong> restart giữa chương trình khi chưa hiểu rõ trạng thái của từng spindle, turret, trục quay, sub-spindle và part transfer stage. Mill-turn không cho phép “chạy thử bằng cảm giác”.</div></div><div class="section"><h2>2. Chuẩn bị trước khi chạy</h2><div class="table-card"><table><thead><tr><th>Hạng mục</th><th>Yêu cầu</th><th>Điểm dừng</th></tr></thead><tbody><tr><td>Coordinate systems</td><td>Machine zero, work offsets, spindle coordinate, sub-spindle transfer coordinate và plane phải rõ</td><td>Không rõ hệ tọa độ = HOLD</td></tr>
+<tr><td>Tool package</td><td>Tách rõ turning tool, live tool, driven holder, station/channel, rotation direction</td><td>Lẫn tool group hoặc sai station = HOLD</td></tr>
+<tr><td>Transfer logic</td><td>Clamp/unclamp sequence, spindle sync, cutoff/transfer recovery đã được xác minh</td><td>Chưa làm rõ transfer = không chạy</td></tr>
+<tr><td>Simulation</td><td>Simulation bao gồm channel sync, sub-spindle transfer, retract và interference</td><td>Không simulation đầy đủ = không prove-out</td></tr>
+</tbody></table></div></div><div class="section"><h2>3. Chuyển mode, transfer và prove-out</h2><ul><li>Mỗi lần chuyển từ turning sang milling hoặc ngược lại phải xác nhận lại plane, spindle selection, live tool state và safe retract.</li><li>Trước part transfer, phải kiểm main spindle grip, sub-spindle grip, sync speed/phase và khoảng hở thiết bị.</li><li>Phần prove-out của transfer phải được theo dõi trực tiếp; không chạy ở tốc độ sản xuất ngay lần đầu.</li><li>Nếu dùng nhiều channel, phải xác nhận điểm interlock giữa channel và điều kiện tiếp tục của mỗi channel.</li></ul></div><div class="section"><h2>4. Kiểm soát trong khi chạy và restart</h2><div class="table-card"><table><thead><tr><th>Tình huống</th><th>Phản ứng bắt buộc</th></tr></thead><tbody><tr><td>Mất đồng bộ spindle</td><td>Dừng; kiểm trạng thái giữ phôi và logic sync; không tự chạy tiếp đoạn transfer</td></tr>
+<tr><td>Live tool/holder có dấu hiệu cạ hoặc rung</td><td>Dừng; kiểm gauge length, holder clearance, mode và wear</td></tr>
+<tr><td>Part transfer fail hoặc part không ngồi đúng</td><td>HOLD part và máy; kiểm trình tự clamp/unclamp, pressure, jaws/collet và sequence timing</td></tr>
+<tr><td>Mất điện / reset controller / operator mất track dòng lệnh</td><td>Chuyển sang WI-516; chỉ restart sau khi xác minh state của toàn bộ trục và part</td></tr>
+</tbody></table></div><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Transfer first-time pass; số lỗi mode/plane; số near-miss do sync/interference; tỷ lệ phải re-prove-out sau thay tool/holder.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;">SOP-502, SOP-504, SOP-503, WI-517, WI-519, WI-516, ANNEX-ENG-001, ANNEX-HSE-001.</div></div></div></div>
+    </div>
   </div>
 </div>
-<div class="title">
-  <strong>WI-515 — Mill Turn Guide</strong>
-  <span class="sub-vn"></span>
-</div>
-<div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>WI-515</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>Process Engineer / CNC Workshop Manager</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-</div>
-</div>
-<div class="doc-content" id="docContent"><div class="form-sheet">
-
-<h2 class="h2">1. Mục đích</h2><p>Dùng tại máy mill-turn hoặc multitask cho part cần nhiều công nghệ trong cùng lần gá.</p>
-
-<h2 class="h2">2. PPE</h2><ul>
-  <li>Kính, giày bảo hộ; tránh vùng transfer và vùng quay của cả 2 spindle.</li>
-  <li>Giữ khoảng cách an toàn khi bar feeder và sub-spindle hoạt động.</li>
-</ul>
-
-<h2 class="h2">3. Dụng cụ</h2><ul>
-  <li>Program/simulation, setup sheet</li>
-  <li>Danh mục tool live/turning</li>
-  <li>FRM-511 và phương tiện kiểm part sau transfer</li>
-</ul>
-
-<h2 class="h2">4. Các bước</h2><h3 class="h3">4.1 Chuyển mode và chuẩn bị transfer</h3><ul>
-  <li>Xác nhận mode tiện / phay / spindle sync và plane theo program comment.</li>
-  <li>Kiểm safe state trước khi chuyển mode hoặc gọi live tool.</li>
-  <li>Nếu dùng sub-spindle, xác nhận transfer sequence, jaw/collet trạng thái và alignment.</li>
-</ul>
-
-<h3 class="h3">4.2 Live tooling và sub-spindle</h3><ul>
-  <li>Tool quay có offset riêng; không sao chép offset từ turning tool.</li>
-  <li>Kiểm interference turret-spindle-tailstock-holder trước khi chạy thật.</li>
-  <li>Transfer part phải có bước verify kẹp chuyển phôi và vị trí part catcher khi áp dụng.</li>
-</ul>
-
-<h3 class="h3">4.3 Yêu cầu đặc thù bán dẫn</h3><ul>
-  <li>Mill-turn phù hợp part cần giữ đồng tâm và vị trí tương đối giữa feature tiện - phay trong cùng lần gá.</li>
-  <li>Dung sai ±0.005-0.015 mm và Ra 0.4-0.8 μm yêu cầu kiểm chặt sync giữa spindle chính và sub-spindle, cùng với vibration của live tool.</li>
-  <li>Mọi va chạm nhỏ trong transfer hoặc live-tool milling đều có thể tạo lỗi bề mặt khó thấy; phải treat như sự cố chất lượng tiềm ẩn.</li>
-</ul>
-
-<h2 class="h2">5. Tiêu chí</h2><div class="table-card"><table class="table"><thead><tr><th>Tiêu chí</th><th>Đạt khi</th></tr></thead><tbody><tr><td>Mode control</td><td>Mode và plane đúng theo bước chương trình</td></tr><tr><td>Transfer</td><td>Kẹp chuyển phôi an toàn, repeatable, không slip</td></tr><tr><td>Live tooling</td><td>Không rung bất thường, offset và C-axis orientation đúng</td></tr><tr><td>Multi-process alignment</td><td>Đặc tính giữa tiện và phay giữ được tương quan</td></tr></tbody></table></div>
-
-<h2 class="h2">6. Xử lý bất thường</h2><ul>
-  <li>Lỗi transfer hoặc slip part: dừng máy, giữ toàn bộ part từ last known good và kiểm chuck/sub-spindle.</li>
-  <li>Interference risk: không chạy tiếp, review simulation/setup.</li>
-  <li>Rung live tool hoặc mặt phay xấu: kiểm holder, offset, C-axis lock, runout và load spindle.</li>
-</ul>
-
-<h2 class="h2">7. SOP liên quan</h2><ul>
-  <li><a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a> Vận hành gia công CNC</li>
-  <li><a href="../../01-SOPs/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html">SOP-503</a> Bảo trì - Tooling, PM &amp; Ứng phó sự cố</li>
-  <li><a href="../../../04-Bieu-Mau/05-FRM-500/frm-511-setup-and-first-piece-record.html">FRM-511</a> Phiếu Setup &amp; First Piece</li>
-</ul>
-
-</div></div>
-
-</div></div></div>
 </body>
 </html>

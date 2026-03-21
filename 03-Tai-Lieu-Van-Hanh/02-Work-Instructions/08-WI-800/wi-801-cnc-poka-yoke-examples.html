@@ -2,84 +2,141 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>WI-801 — CNC Poka-yoke Examples | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WI-801 — Triển khai poka-yoke tại công đoạn và xác nhận hiệu lực | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
-/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
 @media print {
- .card, .table-card, .callout, .note, .box, .iso-map,
- .preface-block, .form-sheet, .lane, .legend, .req, .vstep {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- h1, h2, h3, .h1, .h2, .h3 {
- page-break-after: avoid;
- break-after: avoid;
- }
- .form-header { page-break-inside: avoid; break-inside: avoid; }
- .sig-row, .sign-row, .approval-row { page-break-inside: avoid; break-inside: avoid; }
- tr { page-break-inside: avoid; break-inside: avoid; }
- thead { display: table-header-group; }
- tfoot { display: table-footer-group; }
- p { orphans: 3; widows: 3; }
- .table-card { overflow: visible !important; }
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list, .checklist, .grid-2 { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
 }
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);} 
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid, .grid-2 {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.step-list, .checklist {display:grid; gap:10px;}
+.step-item {border:1px solid var(--ln); border-left:4px solid var(--blue); padding:10px 12px; border-radius: var(--r); background:#fff;}
+.section {margin-top:16px;}
+ul.tight li {margin:4px 0;}
+.code {font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:#f8f9fa; border:1px solid var(--ln); border-radius:6px; padding:0 6px;}
+.callout-danger,.callout-warning,.callout-info,.callout-ok {padding:12px 14px; border-radius: var(--r); margin:10px 0; border:1px solid var(--ln); background:#fff;}
+.callout-danger{border-left:4px solid #c92a2a; background:#fff5f5;}
+.callout-warning{border-left:4px solid #e67700; background:#fff9db;}
+.callout-info{border-left:4px solid #1971c2; background:#e7f5ff;}
+.callout-ok{border-left:4px solid #2b8a3e; background:#ebfbee;}
+.meta .row{display:grid; grid-template-columns:150px 1fr; gap:10px; margin:4px 0;}
 </style>
-
 </head>
 <body>
-<div class="container">
-  <div class="page">
-    <div class="page-body">
-<div class="form-header">
-<div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
-</div>
-<div class="title">
-  <strong>WI-801 — CNC Poka-yoke Examples</strong>
-  <span class="sub-vn"></span>
-</div>
-<div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>WI-801</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>Quality Engineer / HR Manager</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-</div>
-</div>
-<div class="doc-content" id="docContent">
-        <div class="form-sheet">
-          <h2 class="h2">1. Mục đích</h2>
-<p>Cung cấp ví dụ thực tế để các bộ phận chọn nhanh cơ chế Poka-Yoke phù hợp cho CNC, inspection, packaging và kho.</p>
-<h2 class="h2">2. PPE</h2>
-<ul><li>PPE theo khu vực áp dụng; WI này không tạo PPE riêng.</li></ul>
-<h2 class="h2">3. Dụng cụ</h2>
-<ul><li>Ảnh hiện trường / sơ đồ layout</li><li>Label printer / barcode / scanner nếu dùng giải pháp scan</li><li>Vật tư màu, line tape, shadow board, chốt định vị, sensor hoặc checklist tại điểm dùng</li></ul>
-<h2 class="h2">4. Các bước</h2>
-<div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext">Xác định lỗi lặp hoặc lỗi có hậu quả lớn nhất tại khu vực. Chụp ảnh hiện trường và mô tả điểm sai dễ xảy ra.</div></div><div class="vstep"><div class="vnum">2</div><div class="vtext">Chọn kiểu chống sai phù hợp: chốt cơ khí, sensor, barcode, ảnh mẫu, checklist, màu, interlock phần mềm.</div></div><div class="vstep"><div class="vnum">3</div><div class="vtext">Làm thử ở phạm vi nhỏ trên 1 máy / 1 line / 1 khu đóng gói. Theo dõi người dùng có hiểu và có bypass được không.</div></div><div class="vstep"><div class="vnum">4</div><div class="vtext">Chuẩn hóa cơ chế hiệu quả vào WI/ảnh chuẩn/shadow board và đào tạo ca 1 - ca 2 trước khi nhân rộng.</div></div><div class="vstep"><div class="vnum">5</div><div class="vtext">Theo dõi ít nhất 1 chu kỳ lỗi hoặc 1 tháng; nếu lỗi còn xảy ra, nâng cấp mức chống sai.</div></div></div>
-<h2 class="h2">5. Tiêu chí</h2>
-<div class="table-card"><table class="table">
-<thead><tr><th>Nhóm ví dụ</th><th>Tiêu chí dùng tốt</th></tr></thead>
-<tbody><tr><td>Fixture / setup</td><td>Không thể lắp ngược hoặc nếu lắp sai thì máy không cho chạy / người dùng thấy sai ngay.</td></tr><tr><td>Revision / NC</td><td>Chương trình đúng revision được chọn tự động hoặc có xác nhận scan/lock trước khi run.</td></tr><tr><td>Inspection / gage</td><td>Người đo nhìn thấy ngay gage đúng/sai qua ảnh, màu, mã hoặc interlock.</td></tr><tr><td>Packaging / shipping</td><td>Sai nhãn hoặc thiếu carton count bị phát hiện trước khi niêm phong cuối.</td></tr></tbody></table></div><div class="table-card"><table class="table"><thead><tr><th>Ví dụ</th><th>Mô tả</th></tr></thead><tbody><tr><td><b>PY-01</b></td><td>Chốt định vị asymmetry để fixture chỉ lắp một chiều.</td></tr><tr><td><b>PY-02</b></td><td>Scan traveler mở đúng thư mục chương trình NC của revision hiện hành.</td></tr><tr><td><b>PY-03</b></td><td>Tool cart có shadow + mã số vị trí; thiếu tool nhìn thấy ngay.</td></tr><tr><td><b>PY-04</b></td><td>Ảnh gage đúng treo tại điểm đo; gage sai loại bị cấm màu.</td></tr><tr><td><b>PY-05</b></td><td>WIP khay pass / hold / NG dùng màu khác nhau và có vạch đỗ riêng.</td></tr><tr><td><b>PY-06</b></td><td>Bag clean pack yêu cầu tick lần cuối cho plug/cap/desiccant/humidity card.</td></tr><tr><td><b>PY-07</b></td><td>Nhãn shipping chỉ in khi quét đủ carton count và PO reference.</td></tr><tr><td><b>PY-08</b></td><td>Bảng giao ca bắt buộc điền machine status, hold lot, tool concern trước khi ký bàn giao.</td></tr></tbody></table></div>
-<h2 class="h2">6. Xử lý bất thường</h2>
-<ul><li>Poka-yoke bị bypass hoặc không dùng: dừng dùng cơ chế đó cho đến khi đánh giá lại nguyên nhân và huấn luyện lại.</li><li>Giải pháp làm chậm công việc quá mức hoặc gây lỗi mới: thử lại ở mức pilot và điều chỉnh trước khi nhân rộng.</li></ul>
-<h2 class="h2">7. SOP liên quan</h2>
-<ul><li>SOP-804 — Yếu tố con người & Phòng lỗi</li><li>SOP-606 — NCR, CAPA & Phản ứng IPQC</li><li>SOP-901 — Đánh giá nội bộ & LPA</li></ul>
-
+<div class="page-wrap">
+  <div class="page-body">
+    <div class="hero card">
+      <div class="eyebrow">HESEM ENGINEERING</div>
+      <div class="hero-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start;">
+        <div>
+          <div class="doc-type">Tài liệu vận hành • Work Instruction</div>
+          <div class="doc-title" style="font-size:28px;font-weight:800;line-height:1.25;margin:6px 0 8px;">WI-801 — Triển khai poka-yoke tại công đoạn và xác nhận hiệu lực</div>
+        </div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>WI-801</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA Engineer / Production Supervisor / Process Engineer</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
         </div>
       </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi có lỗi lặp, near-miss, công đoạn rủi ro cao, thay đổi setup/máy/route hoặc cần chuẩn hóa control chống sai tại point-of-use.</div>
+      <h1>WI-801 — Triển khai poka-yoke tại công đoạn và xác nhận hiệu lực</h1>
+      
+<div class="section"><h2>1. Mục đích và khi nào phải mở WI-801</h2>
+<p>WI-801 dùng để triển khai poka-yoke tại công đoạn một cách có kiểm soát. Tài liệu này không phải thư viện ví dụ; thư viện ví dụ nằm ở <a href="../../03-Reference/01-ANNEX-System/annex-qms-022-poka-yoke-cnc-examples.html">ANNEX-QMS-022</a>. WI này chỉ trả lời 5 câu hỏi: lỗi nào cần chặn, chọn cơ chế nào, thử thế nào, xác nhận hiệu lực ra sao và khi nào được đưa vào vận hành chính thức.</p>
+<div class="callout-danger"><strong>KHÔNG CHẤP NHẬN</strong> dùng “đào tạo lại”, “nhắc nhở cẩn thận hơn”, hoặc “treo thêm bảng nhắc” như giải pháp duy nhất cho lỗi lặp, lỗi có hậu quả lớn, near-miss nghiêm trọng hoặc lỗi dễ lọt qua gate.</div></div>
+
+<div class="section"><h2>2. Trigger bắt buộc phải triển khai poka-yoke</h2>
+<div class="table-card"><table><thead><tr><th>Trigger</th><th>Phải làm</th><th>Owner khởi tạo</th></tr></thead><tbody>
+<tr><td>Lỗi lặp cùng cơ chế trong 2 kỳ / 2 job / 2 ca gần nhau</td><td>Mở đánh giá poka-yoke, không được đóng CAPA chỉ bằng đào tạo lại.</td><td>QA + khu vực phát sinh lỗi</td></tr>
+<tr><td>Near-miss có khả năng gây escape, crash, mixed part, sai revision, sai material, sai CTQ</td><td>Phân tích ngay khả năng loại bỏ / interlock / detect sớm tại nguồn.</td><td>Supervisor / QA</td></tr>
+<tr><td>New machine / new setup family / new route có rủi ro thao tác cao</td><td>Đánh giá trước khi sản xuất hàng loạt hoặc trước khi giao Job đầu tiên.</td><td>Engineering / Production</td></tr>
+<tr><td>Manual entry / manual select / manual count tại điểm có hậu quả lớn</td><td>Ưu tiên scan, lock, keying, interlock hoặc forced data completeness.</td><td>IT / Production / QA</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>3. Thứ tự ưu tiên chọn cơ chế chống sai</h2>
+<div class="table-card"><table><thead><tr><th>Mức</th><th>Nguyên tắc</th><th>Ví dụ phù hợp với HESEM</th><th>Không đạt nếu</th></tr></thead><tbody>
+<tr><td><span class="badge-green">M1 — Loại bỏ</span></td><td>Làm cho thao tác sai là không thể hoặc không có đường vào.</td><td>Fixture keying, anti-rev lock, one-way orientation, khóa program theo part-rev.</td><td>Người dùng vẫn có thể bypass dễ dàng bằng một thao tác thường ngày.</td></tr>
+<tr><td><span class="badge-blue">M2 — Ngăn chặn</span></td><td>Bắt buộc điều kiện đúng xảy ra trước khi bước tiếp theo chạy.</td><td>Scan-to-open đúng traveler, forced checklist, interlock offset/door/probe.</td><td>Hệ thống vẫn cho chạy dù thiếu điều kiện nhưng chỉ hiện cảnh báo nhẹ.</td></tr>
+<tr><td><span class="badge-amber">M3 — Phát hiện tức thời</span></td><td>Phát hiện sai ngay tại điểm dùng và buộc người thao tác dừng lại.</td><td>Màu gage, witness mark, alarm mismatch, count mismatch trước seal.</td><td>Lỗi chỉ được phát hiện ở công đoạn sau hoặc ở final inspection.</td></tr>
+<tr><td><span class="badge-red">M4 — Giảm hậu quả</span></td><td>Khi chưa thể chặn từ đầu, phải cô lập phạm vi và truy được ngay.</td><td>Unique lot separation, scan log, segregated bin, abnormal event flag.</td><td>Không khóa được phạm vi ảnh hưởng hoặc không giúp containment nhanh hơn.</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>4. Quy trình triển khai poka-yoke tại công đoạn</h2>
+<div class="step-list">
+<div class="step-item"><strong>Bước 1 — Chốt lỗi mục tiêu.</strong> Mô tả lỗi bằng hành vi cụ thể: nhầm revision, nhầm program, lắp ngược, sai offset, bỏ sót cap, sai count, dùng sai gage, sai tool, mixed part… Không dùng mô tả mơ hồ kiểu “operator bất cẩn”.</div>
+<div class="step-item"><strong>Bước 2 — Chốt điểm dùng và điểm chặn.</strong> Xác định đúng station, đúng bước, đúng người, đúng điểm mà lỗi có thể bị chặn sớm nhất. Poka-yoke đặt càng xa nguồn sai thì càng yếu.</div>
+<div class="step-item"><strong>Bước 3 — Chọn giải pháp.</strong> Dùng <a href="../../03-Reference/01-ANNEX-System/annex-qms-022-poka-yoke-cnc-examples.html">ANNEX-QMS-022</a> để chọn cơ chế; ưu tiên cơ khí / key / lock / interlock trước visual hoặc nhắc nhớ.</div>
+<div class="step-item"><strong>Bước 4 — Kiểm tra khả năng bypass.</strong> Trước khi pilot, phải trả lời: có thể tắt, lách, đổi đường, bỏ qua hay dùng đồ khác thay thế cơ chế này không. Nếu có, chưa được release.</div>
+<div class="step-item"><strong>Bước 5 — Pilot có kiểm soát.</strong> Thử trên 1 máy / 1 station / 1 nhóm Job. Thực hiện dry-run, first-piece, giao ca và ít nhất một tình huống bất thường mô phỏng để xem cơ chế phản ứng thế nào.</div>
+<div class="step-item"><strong>Bước 6 — Đo hiệu lực.</strong> Kiểm tra lại đúng lỗi mục tiêu, cycle time, mức hiểu của người dùng, số lần false alarm, số lần bypass và mức sạch/ an toàn/ bảo trì bị ảnh hưởng. Chỉ giữ giải pháp nếu hiệu lực tăng mà không sinh lỗi mới.</div>
+<div class="step-item"><strong>Bước 7 — Cập nhật tài liệu nguồn.</strong> Khi release, phải cập nhật WI tại điểm dùng, ảnh chuẩn/shadow board nếu có, SOP/ANNEX/FORM liên quan, và record vào register / change control.</div>
+<div class="step-item"><strong>Bước 8 — Xem lại sau 30 ngày hoặc sau 3 Job đại diện.</strong> Nếu lỗi còn tái diễn cùng cơ chế, nâng cấp level chống sai; không đóng sự vụ bằng câu “đã có poka-yoke rồi”.</div>
+</div></div>
+
+<div class="section"><h2>5. Điều kiện chấp nhận trước khi release chính thức</h2>
+<div class="table-card"><table><thead><tr><th>Hạng mục</th><th>Đạt khi</th><th>Không đạt khi</th></tr></thead><tbody>
+<tr><td>Hiệu lực lỗi mục tiêu</td><td>Lỗi mục tiêu không còn tái diễn trong pilot hoặc bị chặn ngay tại nguồn trước khi chuyển bước.</td><td>Lỗi vẫn lọt qua pilot hoặc chỉ bị phát hiện ở bước sau.</td></tr>
+<tr><td>Khả năng bypass</td><td>Khó bypass, hoặc bypass sẽ lộ rõ ngay và để lại tín hiệu phát hiện tức thời.</td><td>Người dùng có thể bỏ qua dễ dàng mà hệ thống không biết.</td></tr>
+<tr><td>An toàn / ergonomic</td><td>Không tạo động tác nguy hiểm mới, không che tầm nhìn, không gây kẹt tay, không ép thao tác vụng.</td><td>Giảm lỗi này nhưng mở ra rủi ro an toàn hoặc FOD khác.</td></tr>
+<tr><td>Cycle time / dòng chảy</td><td>Tác động chấp nhận được và đã được owner đồng ý.</td><td>Làm ách tắc lớn mà không đem lại giá trị tương xứng.</td></tr>
+<tr><td>Bảo trì / sustain</td><td>Có owner, có spare / photo standard / vị trí lưu, có cách kiểm trước ca khi cần.</td><td>Không ai chịu trách nhiệm giữ cơ chế ở trạng thái sẵn dùng.</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>6. Khi poka-yoke bị bypass, hỏng hoặc mất hiệu lực</h2>
+<div class="callout-warning"><strong>PHẢN ỨNG BẮT BUỘC</strong> Dừng dùng cơ chế đó như bằng chứng kiểm soát, mở containment cho phạm vi đã đi qua, khôi phục control tạm thời ở mức cao hơn và đánh giá lại nguyên nhân trước khi cho chạy lại.</div>
+<div class="step-list">
+<div class="step-item"><strong>1)</strong> Cô lập sản phẩm / WIP / lô có khả năng đã đi qua khi control mất hiệu lực.</div>
+<div class="step-item"><strong>2)</strong> Đánh giá đây là lỗi thiết kế control, lỗi bảo trì, lỗi đào tạo, hay lỗi cố ý bypass.</div>
+<div class="step-item"><strong>3)</strong> Cập nhật WI / ANNEX / audit point nếu nguyên nhân là control design yếu.</div>
+<div class="step-item"><strong>4)</strong> Chỉ cho chạy lại khi đã có bằng chứng khôi phục hiệu lực.</div>
+</div></div>
+
+<div class="section"><h2>7. Record, KPI và liên kết</h2>
+<div class="grid-2">
+<div class="kpi-box"><h3>Record bắt buộc</h3><ul class="tight" style="padding-left:18px;">
+<li>Mô tả lỗi mục tiêu, ảnh hiện trạng, bằng chứng pilot và quyết định release.</li>
+<li>Link register / NCR / CAPA / near-miss liên quan.</li>
+<li>Ảnh chuẩn, layout, control spec, hoặc logic scan/interlock nếu là giải pháp số.</li>
+<li>Cập nhật training / authorized-to-work nếu thao tác tại station thay đổi.</li>
+</ul></div>
+<div class="kpi-box"><h3>KPI</h3><ul class="tight" style="padding-left:18px;">
+<li>KPI-WI801-01: lỗi lặp đã được chuyển sang control chống sai.</li>
+<li>KPI-WI801-02: tỷ lệ bypass / mất hiệu lực của control đã triển khai.</li>
+<li>KPI-WI801-03: thời gian từ trigger đến release poka-yoke tại điểm dùng.</li>
+</ul></div>
+</div>
+<div class="table-card"><table><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../01-SOPs/08-SOP-800/sop-804-human-factors-and-error-proofing.html">SOP-804</a></td><td>Khung quản trị yếu tố con người và chống sai.</td></tr>
+<tr><td><a href="../../01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Đưa control có hiệu lực vào cải tiến chuẩn hóa.</td></tr>
+<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-qms-022-poka-yoke-cnc-examples.html">ANNEX-QMS-022</a></td><td>Thư viện giải pháp mẫu để chọn nhanh cơ chế phù hợp.</td></tr>
+<tr><td><a href="../05-WI-500/wi-512-3-axis-vertical-milling-guide.html">WI-512</a> / <a href="../05-WI-500/wi-513-5-axis-milling-guide.html">WI-513</a> / <a href="../05-WI-500/wi-514-cnc-turning-guide.html">WI-514</a> / <a href="../05-WI-500/wi-515-mill-turn-guide.html">WI-515</a> / <a href="../05-WI-500/wi-516-machine-operation-quick-card.html">WI-516</a></td><td>Các điểm dùng chính để nhúng control.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-811_Incident_Report.xlsx">FRM-811</a></td><td>Near-miss / incident / trigger cho chống sai.</td></tr>
+</tbody></table></div></div>
+
     </div>
   </div>
 </div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

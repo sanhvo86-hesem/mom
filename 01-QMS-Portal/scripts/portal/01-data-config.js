@@ -239,7 +239,7 @@ let TITLES = [...DEFAULT_TITLES];
 
 // V9 migration: clear stale session cache BEFORE loading
 (function(){
-  const QMS_VER = 'v10.1';
+  const QMS_VER = 'v10.2';
   try {
     if(sessionStorage.getItem('hesem_qms_version') !== QMS_VER){
       sessionStorage.removeItem('hesem_departments');
@@ -519,28 +519,28 @@ function showConsentDialog(){
 // ═══════════════════════════════════════════════════════════════════════
 // Universal access base: policies, manual, training, org chart
 const _UNI = [
-  "POL-QMS-*","QMS-MAN-*","ANNEX-ORG-*",
+  "POL-QMS*","QMS-MAN*","ANNEX-ORG*",
   "C0*","C1*","C*-L*",
-  "TRAINING-MATRIX*","COMPETENCY-*","ASSESSMENT-*","SKILL-*",
-  "CERTIFICATE-*","CERTIFICATION-*","EVIDENCE-*","QMS-OPS-*",
-  "ROLE-*","TRAINEE-*","TRAINER-*",
-  "OJT-*","DRILL-*","SYS-OPS-*","TRN-OPS-*","MRR-*",
-  "REF-001-*","REF-002-*","REF-005-*",
-  "FRM-801-*","FRM-802-*","FRM-803-*","FRM-804-*","FRM-805-*",
-  "FRM-806-*","FRM-807-*","FRM-808-*","FRM-809-*",
-  "FRM-811-*",
-  "SOP-107-*","SOP-108-*"
+  "TRAINING-MATRIX*","COMPETENCY*","ASSESSMENT*","SKILL*",
+  "CERTIFICATE*","CERTIFICATION*","EVIDENCE*","QMS-OPS*",
+  "ROLE*","TRAINEE*","TRAINER*",
+  "OJT*","DRILL*","SYS-OPS*","TRN-OPS*","MRR*",
+  "ANNEX-QMS-001*","ANNEX-QMS-002*","ANNEX-QMS-020*",
+  "FRM-801*","FRM-802*","FRM-803*","FRM-804*","FRM-805*",
+  "FRM-806*","FRM-807*","FRM-808*","FRM-809*",
+  "FRM-811*",
+  "SOP-107*","SOP-108*"
 ];
 // Manager-level extras: full system SOPs, RACI, authority, dept handbooks, audit & improvement
 const _MGR = [
   "SOP-1*","SOP-9*",
-  "DEPT-*",
-  "ANNEX-JOB-*","ANNEX-QMS-02*",
-  "AUTHORITY-MATRIX","RACI-MASTER-MATRIX",
-  "ANNEX-HR-LAB-*","REF-*",
+  "DEPT*",
+  "JD*","ANNEX*",
+  "ANNEX-QMS-025*","ANNEX-QMS-026*","ANNEX-QMS-027*","ANNEX-QMS-028*",
+  "LAB*",
   "FRM-1*","FRM-9*",
-  "SOP-801-*","SOP-804-*","FRM-812-*",
-  "WI-901-*"
+  "SOP-801*","SOP-804*","FRM-812*",
+  "WI-901*"
 ];
 
 const ROLE_DOCS = {
@@ -846,8 +846,8 @@ const ROLE_DOCS = {
     "SOP-702-*","SOP-703-*",
     "WI-711-*","WI-713-*","WI-721-*",
     "FRM-708-*",
-    "REF-006-*","REF-007-*","REF-008-*",
-    "ANNEX-HR-LAB-*","DEPT-EHS-*",
+    "ANNEX-QMS-016*","ANNEX-QMS-011*","ANNEX-QMS-024*",
+    "LAB*","DEPT-EHS-*",
     "WI-8*"
   ],
 
@@ -856,7 +856,7 @@ const ROLE_DOCS = {
   epicor_admin: [
     ..._UNI, ..._MGR,
     "SOP-104-*","SOP-105-*",
-    "REF-01*",
+    "ANNEX-QMS-005*","ANNEX-QMS-006*","ANNEX-QMS-008*","ANNEX-QMS-012*","ANNEX-QMS-015*","ANNEX-QMS-018*","ANNEX-QMS-020*","ANNEX-IT-001*","ANNEX-IT-002*","ANNEX-OPS-003*",
     "SOP-201-*","SOP-501-*",
     "SOP-401-*","SOP-803-*",
     "FRM-1*","FRM-2*","FRM-4*","FRM-5*",
@@ -864,6 +864,49 @@ const ROLE_DOCS = {
     "DEPT-IT-*","DEPT-EPICOR-*"
   ]
 };
+
+function normalizeDocPattern(pattern){
+  const raw = String(pattern||'').trim().toUpperCase();
+  if(!raw) return [];
+  const base = raw.replace(/-\*$/,'*');
+  const out = new Set([base]);
+  const aliasMap = {
+    'AUTHORITY-MATRIX':'ANNEX-QMS-025',
+    'RACI-MASTER-MATRIX':'ANNEX-QMS-026',
+    'ANNEX-HR-LAB*':'LAB*',
+    'ANNEX-JOB*':'JD*',
+    'REF-001*':'ANNEX-QMS-001*',
+    'REF-002*':'ANNEX-QMS-002*',
+    'REF-005*':'ANNEX-QMS-020*',
+    'REF-006*':'ANNEX-QMS-016*',
+    'REF-007*':'ANNEX-QMS-011*',
+    'REF-008*':'ANNEX-QMS-024*',
+    'REF-010*':'ANNEX-QMS-005*',
+    'REF-011*':'ANNEX-QMS-006*',
+    'REF-012*':'ANNEX-QMS-012*',
+    'REF-013*':'ANNEX-QMS-018*',
+    'REF-014*':'ANNEX-QMS-006*',
+    'REF-015*':'ANNEX-QMS-015*',
+    'REF-020*':'ANNEX-OPS-003*',
+    'REF-021*':'ANNEX-QMS-023*'
+  };
+  if(aliasMap[base]) out.add(aliasMap[base]);
+  if(base === 'REF*' || base === 'REF-*') out.add('ANNEX*');
+  if(base === 'REF-01*'){
+    ['ANNEX-QMS-005*','ANNEX-QMS-006*','ANNEX-QMS-008*','ANNEX-QMS-012*','ANNEX-QMS-015*','ANNEX-QMS-018*','ANNEX-IT-001*','ANNEX-IT-002*'].forEach(v=>out.add(v));
+  }
+  return Array.from(out);
+}
+function docCodeMatchesPattern(docCode, pattern){
+  const code = String(docCode||'').trim().toUpperCase();
+  if(!code) return false;
+  return normalizeDocPattern(pattern).some(p=>p.endsWith('*') ? code.startsWith(p.slice(0,-1)) : code===p);
+}
+function expandPatternToDocCodes(pattern, docs){
+  const source = Array.isArray(docs) ? docs : (Array.isArray(DOCS) ? DOCS : []);
+  return source.filter(d=>d && docCodeMatchesPattern(d.code, pattern)).map(d=>d.code);
+}
+
 // Immutable admin whitelist — UI edits to ROLES cannot bypass this
 const ADMIN_ROLES = Object.freeze(['ceo','qa_manager','it_admin']);
 function isAdmin(){ return currentUser && ADMIN_ROLES.includes(currentUser.role); }
@@ -1067,6 +1110,10 @@ function saveCustomIcons(){try{sessionStorage.setItem('hesem_custom_icons',JSON.
 
 function getDocIcon(code){
   if(CUSTOM_ICONS['doc:'+code]) return CUSTOM_ICONS['doc:'+code];
+  try{
+    const doc = Array.isArray(DOCS) ? DOCS.find(d=>String(d.code||'').toUpperCase()===String(code||'').toUpperCase()) : null;
+    if(doc && (/(xlsx|xlsm|xls|csv)/i.test(String(doc.ext||'')) || doc.delivery_mode==='download' || /\.(xlsx|xlsm|xls|csv)$/i.test(String(doc.path||'')))) return '📊';
+  }catch(e){}
   let best='📄',bestLen=0;
   for(const [prefix,icon] of Object.entries(DOC_ICON_MAP)){
     if(code.startsWith(prefix)&&prefix.length>bestLen){best=icon;bestLen=prefix.length;}
@@ -1223,16 +1270,17 @@ function getFolderDesc(folderPath){
 
 function getDocDesc(code){
   if(!code) return '';
-  // Try exact match first
   const upper = code.toUpperCase();
   if(DOC_DESCS[upper]) return DOC_DESCS[upper];
-  // Try converting filename-style code
   const slug = upper.replace(/_/g, '-');
   if(DOC_DESCS[slug]) return DOC_DESCS[slug];
-  // Try partial match
   for(const k in DOC_DESCS){
     if(k.startsWith(upper) || upper.startsWith(k)) return DOC_DESCS[k];
   }
+  try{
+    const doc = Array.isArray(DOCS) ? DOCS.find(d=>String(d.code||'').toUpperCase()===upper) : null;
+    if(doc && doc.description) return doc.description;
+  }catch(e){}
   return '';
 }
 
@@ -1544,16 +1592,13 @@ function _toggleSubPerms(cb, catId, subPath, role){
     return parts.some(part => part === subPath);
   });
   docsInSub.forEach(d=>{
-    const has = ROLE_DOCS[role].some(p=>p.endsWith('*')?d.code.startsWith(p.slice(0,-1)):p===d.code);
+    const has = ROLE_DOCS[role].some(p=>docCodeMatchesPattern(d.code,p));
     if(cb.checked && !has){
       ROLE_DOCS[role].push(d.code);
     } else if(!cb.checked && has){
       const idx=ROLE_DOCS[role].indexOf(d.code);
       if(idx>-1) ROLE_DOCS[role].splice(idx,1);
-      ROLE_DOCS[role]=ROLE_DOCS[role].filter(p=>{
-        if(p.endsWith('*') && d.code.startsWith(p.slice(0,-1))) return false;
-        return true;
-      });
+      ROLE_DOCS[role]=ROLE_DOCS[role].filter(p=>!docCodeMatchesPattern(d.code,p));
     }
   });
   saveRoleDocsToStorage();
@@ -1684,7 +1729,7 @@ const I = {
   login_btn:{vi:'Đăng nhập',en:'Log in'},
   login_error:{vi:'Sai tài khoản hoặc mã PIN',en:'Invalid username or PIN'},
   login_demo:{vi:'CHỌN NHANH TÀI KHOẢN DEMO',en:'QUICK SELECT DEMO ACCOUNT'},
-  login_hero:{vi:'Hệ thống<br>Quản lý Chất lượng<br><em>ISO 9001:2026</em>',en:'Quality<br>Management System<br><em>ISO 9001:2026</em>'},
+  login_hero:{vi:'Hệ thống<br>Quản lý Chất lượng<br><em>ISO 9001:2015 • Revision-ready</em>',en:'Quality<br>Management System<br><em>ISO 9001:2015 • Revision-ready</em>'},
   login_desc:{vi:'Nền tảng quản lý tài liệu QMS tập trung cho toàn công ty. Truy cập SOP, quy trình vận hành, biểu mẫu và hướng dẫn công việc theo phân quyền chức năng.',en:'Centralized QMS document management platform. Access SOPs, operating procedures, forms and work instructions based on role-based permissions.'},
   // Dashboard
   hello:{vi:'Xin chào',en:'Hello'},
@@ -1958,5 +2003,4 @@ function initLang(){
 }
 
 // ═══════════════════════════════════════════════════
-
 

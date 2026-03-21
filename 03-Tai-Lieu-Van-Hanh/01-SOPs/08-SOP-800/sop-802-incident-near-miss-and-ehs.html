@@ -4,131 +4,175 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SOP-802 — Incident Near-miss and EHS | HESEM QMS</title>
+<title>SOP-802 — Báo cáo sự cố, suýt sự cố (near-miss) và kiểm soát EHS | HESEM QMS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
-/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+.chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
+.tight li{margin:4px 0;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
+.metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
+.metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
+.mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.gate-card{border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
+.gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
+.field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
+.field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
+.field .blank{width:100%;min-height:22px;}
+.legend-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0;}
+.legend-row .chip{margin-bottom:0;}
+.footer-note{margin-top:20px;font-size:11px;color:var(--ink3);}
+.subtle{color:var(--ink2);font-size:12px;}
+.boxed-list{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
+.lane-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.35px;color:var(--navy);margin-bottom:6px;}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700;margin:0 6px 6px 0;}
+.rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
+.small{font-size:12px}
+.note-soft{border-left:4px solid #eab308;background:#fffbeb;padding:12px 14px;border-radius:8px;margin:12px 0;}
+.note-blue{border-left:4px solid var(--blue);background:var(--blue-l);padding:12px 14px;border-radius:8px;margin:12px 0;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+.callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
+.callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
+.step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+.step-band span{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ln);background:var(--bg);padding:6px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.source-box{border:1px dashed var(--ln);border-radius:var(--r);padding:12px 14px;background:var(--bg);}
+.role-note{border-left:4px solid #94a3b8;background:#f8fafc;padding:12px 14px;border-radius:8px;margin-top:10px}
+table{max-width:100%;table-layout:auto}
+td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-align:top}
 @media print {
- .card, .table-card, .callout, .note, .box, .iso-map,
- .preface-block, .form-sheet, .lane, .legend, .req, .vstep {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- h1, h2, h3, .h1, .h2, .h3 {
- page-break-after: avoid;
- break-after: avoid;
- }
- .form-header { page-break-inside: avoid; break-inside: avoid; }
- .sig-row, .sign-row, .approval-row { page-break-inside: avoid; break-inside: avoid; }
- tr { page-break-inside: avoid; break-inside: avoid; }
- thead { display: table-header-group; }
- tfoot { display: table-footer-group; }
- p { orphans: 3; widows: 3; }
- .table-card { overflow: visible !important; }
+  .card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.metric-card,.gate-card,.field,.boxed-list,.callout-card,.source-box{page-break-inside:avoid;break-inside:avoid}
+  h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}
+  tr{page-break-inside:avoid;break-inside:avoid}
+  thead{display:table-header-group}tfoot{display:table-footer-group}
 }
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
+@media (max-width: 900px){.grid-2,.grid-3,.field-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-<div class="container">
-<div class="page">
-<div class="page-body">
+<div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu kiểm soát</span>
 </div>
 </div>
 <div class="title">
-<strong>SOP-802 — Incident Near-miss and EHS</strong>
-<span class="sub-vn"></span>
+<strong>SOP-802 — Báo cáo sự cố, suýt sự cố (near-miss) và kiểm soát EHS</strong>
+<span class="sub-vn">Báo trong ca, cô lập ngay, điều tra đủ và đóng hành động tới hiệu lực</span>
 </div>
-<div class="meta">
-<div class="row"><span><b>Mã:</b></span><span>SOP-802</span></div>
-<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Chủ sở hữu:</b></span><span>EHS Specialist / HR Manager</span></div>
-<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+<div class="meta"><div class="row"><span><b>Mã:</b></span><span>SOP-802</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span>Chuyên viên EHS / Trưởng HR</span></div><div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div></div>
 </div>
+<div class="doc-content" id="docContent"><div class="form-sheet">
+<div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi sự cố, suýt sự cố (near-miss) và điều kiện không an toàn phải được báo ngay trong ca; sự cố nghiêm trọng phải kích hoạt phản ứng khẩn cấp trước khi làm bất cứ việc gì khác.</div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Hiện trường, thiết bị và sản phẩm liên quan phải được cô lập phù hợp trước khi điều tra; release khu vực/thiết bị chỉ được thực hiện bởi người có thẩm quyền.</div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Điều tra phải chạm tới nguyên nhân hệ thống và phải dẫn tới hành động có đầu mối phụ trách, thời hạn và verify hiệu lực rõ ràng.</div></div>
 </div>
-<div class="doc-content" id="docContent">
-<div class="form-sheet">
-<div class="iso-map">
-<div class="iso-title">ISO / Standard mapping</div>
-<div class="small muted">Map điều khoản hoặc chuẩn kỹ thuật vào yêu cầu triển khai tại xưởng (Point-of-Use).</div>
-<div class="req">
-<span class="req-tag shall">PHẢI</span>
-<div>Sự cố, near-miss và điều kiện không an toàn PHẢI được báo trong ca; sự cố nghiêm trọng PHẢI kích hoạt phản ứng khẩn cấp trước khi làm báo cáo. <span class="iso-ref">ISO 45001 practice / internal EHS</span></div>
-</div><div class="req">
-<span class="req-tag shall">PHẢI</span>
-<div>PPE, LOTO, PCCC, xử lý tràn đổ và bảo vệ môi trường PHẢI được tuân thủ theo rủi ro từng khu vực; vi phạm nghiêm trọng có thể dừng công việc ngay. <span class="iso-ref">Luật ATVSLĐ / PCCC / môi trường</span></div>
-</div><div class="req">
-<span class="req-tag shall">PHẢI</span>
-<div>Điều tra sự cố PHẢI đi đến nguyên nhân và hành động ngăn tái diễn; near-miss có rủi ro cao không được đóng chỉ bằng nhắc nhở miệng. <span class="iso-ref">ISO 9001 10.2 / EHS best practice</span></div>
-</div><div class="req">
-<span class="req-tag shall">PHẢI</span>
-<div>Ứng phó khẩn cấp PHẢI có người chỉ huy, tuyến liên lạc, điểm tập kết và bằng chứng diễn tập/huấn luyện khi áp dụng. <span class="iso-ref">Emergency preparedness</span></div>
-</div><div class="req">
-<span class="req-tag should">NÊN</span>
-<div>Theo dõi chiếu sáng, housekeeping, machine guarding và biển báo tại các điểm rủi ro cao trong xưởng 2 ca 12 giờ. <span class="iso-ref">Best practice shop floor</span></div>
+<div class="preface-block"><div class="callout"><div class="card-title">Lệnh điều hành</div><p>Báo ngay trong ca, cứu người trước, cô lập nguy cơ trước, giữ hiện trường đủ để điều tra, khóa mọi ảnh hưởng tới sản phẩm hoặc giao hàng, rồi đóng hành động đến khi không còn tái diễn.</p><div class="legend-row"><span class="chip">Cổng kiểm soát: 802-G1 → 802-G5</span><span class="chip">Biểu mẫu bắt buộc: FRM-811 / FRM-181</span><span class="chip">Biểu mẫu theo điều kiện: FRM-812 / FRM-651 / FRM-652 / FRM-151</span><span class="chip">SOP liên đới: SOP-108 / SOP-503 / SOP-606 / SOP-801</span><span class="chip">Liên kết EHS: EHS Handbook / drill an toàn</span></div></div></div>
+<div class="toc"><div class="toc-title">Mục lục</div><div class="toc-grid"><a href="#p1">1. Mục đích</a><a href="#p2">2. Phạm vi</a><a href="#p3">3. Thuật ngữ &amp; nguyên tắc</a><a href="#p4">4. Vai trò, quyền hạn &amp; RACI</a><a href="#p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</a><a href="#p6">6. Cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</a><a href="#p7">7. Quy trình chi tiết</a><a href="#p8">8. Ngoại lệ, thay đổi &amp; làm lại</a><a href="#p9">9. Hệ thống, hồ sơ &amp; dữ liệu</a><a href="#p10">10. Biểu mẫu, WI, SOP &amp; JD liên kết</a></div></div>
+<h2 class="h2" id="p1">1. Mục đích</h2><p>Thiết lập cơ chế báo cáo sớm, phản ứng nhanh, điều tra đủ và đóng hành động dứt điểm cho mọi <b>sự cố, suýt sự cố (near-miss) và điều kiện không an toàn</b> trong nhà máy CNC. Mục tiêu là chặn tái diễn, bảo vệ con người, thiết bị, môi trường và sản phẩm.</p><ul class="tight"><li>Tạo phản xạ “báo trong ca – cô lập ngay – giữ hiện trường – điều tra tới nguyên nhân – đóng hành động tới hiệu lực”.</li><li>Liên kết EHS với sản xuất, bảo trì, chất lượng, HR và contingency; không để sự cố an toàn bị tách rời khỏi rủi ro chất lượng hoặc giao hàng.</li><li>Biến suýt sự cố (near-miss) thành nguồn học tập bắt buộc thay vì bỏ qua vì “chưa gây hậu quả”.</li></ul>
+<h2 class="h2" id="p2">2. Phạm vi</h2><div class="callout-grid"><div class="callout-card"><h3>Có bao phủ</h3><ul class="tight"><li>Tai nạn lao động, sơ cứu, sự cố thiết bị có yếu tố an toàn, suýt sự cố (near-miss), điều kiện không an toàn, hành vi không an toàn, tràn đổ, cháy nhỏ, thiếu PPE, vấn đề ergonomics/housekeeping/ánh sáng.</li><li>Containment hiện trường, cô lập năng lượng, khoanh vùng sản phẩm chịu ảnh hưởng khi sự cố chạm tới chất lượng hoặc giao hàng.</li><li>Điều tra nguyên nhân trực tiếp và nguyên nhân hệ thống, theo dõi hành động, xác nhận hiệu lực và lưu hồ sơ EHS.</li><li>Liên kết với đào tạo, CAPA, contingency, bảo trì, layout và lessons learned.</li></ul></div><div class="callout-card"><h3>Không thay thế / không được vượt quyền</h3><ul class="tight"><li>Không thay thế <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a> về kế hoạch ứng phó tổng thể; <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-802-incident-near-miss-and-ehs.html">SOP-802</a> sở hữu báo cáo và điều tra sự cố/suýt sự cố (near-miss).</li><li>Không thay thế <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> về logic NCR/CAPA chất lượng, nhưng phải kích hoạt <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a> / <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a> khi sự cố chạm tới sản phẩm hoặc hệ thống chất lượng.</li><li>Không cho phép dọn hiện trường, chạy lại máy hoặc tiếp tục sản xuất trước khi đã cô lập và ghi nhận bằng chứng tối thiểu, trừ khi cần hành động khẩn cấp để cứu người.</li></ul></div></div>
+<h2 class="h2" id="p3">3. Thuật ngữ &amp; nguyên tắc</h2><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:40%"/><col style="width:44%"/></colgroup><thead><tr><th>Thuật ngữ</th><th>Định nghĩa vận hành</th><th>Quy định bắt buộc</th></tr></thead><tbody><tr><td>Sự cố</td><td>Biến cố đã gây thương tích, thiệt hại, tràn đổ, gián đoạn an toàn hoặc nguy cơ môi trường.</td><td>Phải báo ngay; phải có Incident ID; phải có đầu mối phụ trách điều tra và hành động.</td></tr><tr><td>Suýt sự cố (near-miss)</td><td>Suýt xảy ra sự cố: chưa gây hậu quả nhưng đã có nguy cơ thật.</td><td>Xử lý nghiêm như nguồn học tập bắt buộc; không xem là chuyện nhỏ.</td></tr><tr><td>Điều kiện không an toàn</td><td>Tình trạng thiết bị, layout, PPE, ánh sáng, housekeeping, hóa chất, biển báo... có khả năng gây sự cố.</td><td>Phải ghi nhận, phân loại và giao đầu mối phụ trách khắc phục; không đợi tai nạn xảy ra mới xử lý.</td></tr><tr><td>Containment an toàn</td><td>Biện pháp khẩn cấp để chặn nguy hiểm lan rộng: cô lập khu vực, LOTO, sơ tán, dừng máy, khoanh vùng sản phẩm.</td><td>Thực hiện trước khi điều tra chi tiết.</td></tr><tr><td>Nguyên nhân trực tiếp / nguyên nhân hệ thống</td><td>Nguyên nhân trực tiếp là tác nhân gần nhất; nguyên nhân hệ thống là lỗ hổng quản trị, thiết bị, đào tạo, tài liệu, giám sát, layout...</td><td>Điều tra phải chạm tới nguyên nhân hệ thống; không dừng ở lỗi cá nhân.</td></tr><tr><td>Release hiện trường</td><td>Quyết định cho phép mở lại khu vực/thiết bị sau sự cố.</td><td>Chỉ người có thẩm quyền được release; line không tự mở lại.</td></tr></tbody></table></div><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:10%"/><col style="width:28%"/><col style="width:40%"/><col style="width:22%"/></colgroup><thead><tr><th>Mức</th><th>Định nghĩa</th><th>Phản ứng tối thiểu</th><th>Thời hạn điều tra sơ bộ</th></tr></thead><tbody><tr><td>S1</td><td>Suýt sự cố (near-miss) hoặc điều kiện không an toàn chưa gây thương tích nhưng có thể lặp lại.</td><td>Báo trong ca; containment tại chỗ; đầu mối phụ trách xử lý trong ngày.</td><td>Trong ca</td></tr><tr><td>S2</td><td>Sự cố nhẹ / sơ cứu / hư hại nhỏ / dừng ngắn.</td><td>Báo ngay cho Shift Leader và EHS; cô lập khu vực; điều tra nguyên nhân trực tiếp và nguyên nhân hệ thống.</td><td>Trong 24 giờ</td></tr><tr><td>S3</td><td>Sự cố có thương tích nghỉ việc, nguy cơ cháy/nổ, tràn đổ lớn, hư máy nghiêm trọng hoặc nguy cơ ảnh hưởng sản phẩm diện rộng.</td><td>Kích hoạt ứng phó khẩn cấp; stop line/stop area; thông báo lãnh đạo; bảo toàn hiện trường.</td><td>Bắt đầu ngay; báo cáo sơ bộ trong 24 giờ</td></tr><tr><td>S4</td><td>Sự cố thảm họa hoặc có nguy cơ pháp lý/cơ quan chức năng / ảnh hưởng khách hàng nghiêm trọng.</td><td>Kích hoạt contingency, phong tỏa hiện trường, thông báo lãnh đạo cao nhất và các bên theo quy định.</td><td>Ngay lập tức</td></tr></tbody></table></div><div class="note-blue"><b>Nguyên tắc bắt buộc:</b> cứu người trước, cô lập nguy cơ trước, giữ hiện trường đủ để điều tra, rồi mới bàn tới sản lượng hoặc tiến độ. Không im lặng với suýt sự cố (near-miss).</div>
+
+<div class="note-blue"><b>Nguyên tắc EHS và near miss.</b> Mọi sự cố, near miss và điều kiện không an toàn phải được nhìn ở hai hướng song song: tác động đến con người/môi trường và tác động đến sản phẩm/quy trình. Sự kiện chỉ được xem là đóng khi cả đường EHS và đường chất lượng đều đã được kiểm soát nếu có liên quan.</div>
+<div class="table-card"><table>
+<thead><tr><th>Nhóm sự kiện</th><th>Ví dụ</th><th>Đường xử lý bắt buộc</th></tr></thead>
+<tbody>
+<tr><td>EHS thuần</td><td>trượt ngã, đứt tay, nâng hạ, khí nén, điện, bỏng, tiếng ồn</td><td>HSE route + corrective action</td></tr>
+<tr><td>Chất lượng/ sản phẩm có yếu tố EHS</td><td>contamination event, cleanroom breach, coolant spill ảnh hưởng job, FOD event</td><td>HSE + quality hold + containment</td></tr>
+<tr><td>Thiết bị</td><td>breakdown nguy hiểm, guard failure, interlock defeat</td><td>HSE + Maintenance + block machine</td></tr>
+<tr><td>Nhà thầu / visitor</td><td>vi phạm PPE, xâm nhập khu hạn chế, sự cố khi làm dịch vụ</td><td>HSE route + contractor control</td></tr>
+<tr><td>After-hours</td><td>sự kiện ngoài giờ/ca đêm/ngày nghỉ</td><td>After-hours escalation + evidence preservation</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:15%"/><col style="width:21%"/><col style="width:24%"/><col style="width:18%"/><col style="width:22%"/></colgroup><thead><tr><th>Vai trò</th><th>Trách nhiệm chính</th><th>Quyền hạn / điểm dừng</th><th>KPI chính</th></tr></thead><tbody><tr><td>Chuyên viên EHS</td><td>Sở hữu quy trình sự cố/suýt sự cố (near-miss); phân loại mức độ; điều phối điều tra; theo dõi đóng hành động và compliance EHS.</td><td>Được quyền dừng khu vực/thiết bị theo thẩm quyền EHS; yêu cầu bằng chứng và mở lại sau review.</td><td>Incident rate; suýt sự cố (near-miss) reporting; đóng sự kiện timeliness.</td></tr><tr><td>Trưởng HR</td><td>Phối hợp sơ cứu, hồ sơ nhân sự liên quan, hỗ trợ truyền thông/đào tạo lại và theo dõi các vấn đề người lao động.</td><td>Được quyền chặn người chưa đủ điều kiện quay lại công việc liên quan sau sự cố khi chưa hoàn tất yêu cầu bắt buộc.</td><td>Training completion after incident; return-to-work compliance.</td></tr><tr><td>Giám đốc Sản xuất / Shift Leader</td><td>Thực hiện dừng việc, cô lập hiện trường, cung cấp nguồn lực containment, phối hợp điều tra và đóng hành động hiện trường.</td><td>Được quyền stop line / stop area; không được tự mở lại khi chưa release.</td><td>Phản ứng xử lý time; repeat unsafe condition.</td></tr><tr><td>Maintenance</td><td>Cô lập năng lượng, bảo toàn bằng chứng thiết bị, sửa chữa và requalification sau sự cố máy có yếu tố an toàn.</td><td>Không được tháo dỡ/chỉnh sửa hiện trường khi chưa có phép, trừ tình huống cứu người.</td><td>Time to safe state; recurrence after repair.</td></tr><tr><td>QA / Kỹ sư Chất lượng</td><td>Đánh giá ảnh hưởng tới WIP/FG, mở NCR/CAPA khi sự cố chạm tới sản phẩm hoặc process quality.</td><td>Giữ HOLD chất lượng; dừng giao hàng khi cần.</td><td>Product-impact lỗi lọt; containment completeness.</td></tr></tbody></table></div><div class="role-note"><b>Yêu cầu cascade vào JD:</b> <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html">Chuyên viên EHS</a>, <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html">Trưởng HR</a>, <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html">Giám đốc Sản xuất</a>, <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html">Shift Leader</a>, <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">Trưởng QA</a> phải ghi rõ quyền dừng việc, nghĩa vụ báo cáo trong ca, trách nhiệm bảo toàn hiện trường, trách nhiệm mở CAPA và điều kiện release khu vực/thiết bị sau sự cố.</div>
+
+<div class="table-card"><table>
+<thead><tr><th>Quyết định</th><th>Người quyết định cuối</th><th>Điều kiện bắt buộc</th></tr></thead>
+<tbody>
+<tr><td>Stop work / cô lập khu vực</td><td>Người phát hiện + Line Leader ngay lập tức</td><td>Không cần chờ phê duyệt nếu có nguy cơ cho người hoặc sản phẩm.</td></tr>
+<tr><td>Release khu vực sau sự cố</td><td>HSE Officer; QA đồng xác nhận nếu có tác động sản phẩm</td><td>Đã loại bỏ mối nguy, đã vệ sinh/containment, đã ghi nhận bằng chứng.</td></tr>
+<tr><td>Phân loại mức độ sự kiện</td><td>HSE Officer</td><td>Dựa vào mức thương tích, ảnh hưởng môi trường, sản phẩm, khách hàng và pháp lý.</td></tr>
+<tr><td>Thông báo khách hàng/cơ quan bên ngoài</td><td>General Manager hoặc người được ủy quyền</td><td>Chỉ sau khi facts tối thiểu được xác nhận và đường quality/EHS đã thống nhất.</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2><div class="field-grid"><div class="field"><b>Đầu vào bắt buộc</b><div class="blank">Thông tin người/bộ phận liên quan; thời gian, địa điểm, ảnh/video nếu có; tình trạng khu vực/thiết bị; PPE sử dụng; dữ liệu job/máy chịu ảnh hưởng; nhân chứng; log môi trường/ánh sáng khi liên quan.</div></div><div class="field"><b>Đầu ra bắt buộc</b><div class="blank">Incident report, containment action, ảnh hiện trường, phân loại mức độ, biên bản điều tra, action list, verify hiệu lực và bài học triển khai lại.</div></div><div class="field"><b>Điều kiện mở phản ứng sự cố</b><div class="blank">Mọi người tại hiện trường phải biết đường dây báo cáo, vị trí thiết bị khẩn cấp, người chỉ huy ca và tuyến liên lạc với EHS/HR/Maintenance/QA.</div></div><div class="field"><b>Điều kiện mở lại khu vực / thiết bị</b><div class="blank">Nguy cơ đã được cô lập; bảo trì/kiểm định cần thiết hoàn tất; con người và sản phẩm an toàn; EHS hoặc người được ủy quyền đã release.</div></div></div><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:24%"/><col style="width:44%"/><col style="width:32%"/></colgroup><thead><tr><th>Tình huống</th><th>Containment tức thời</th><th>Liên kết thêm</th></tr></thead><tbody><tr><td>Thương tích / sơ cứu</td><td>Dừng việc; sơ cứu; gọi hỗ trợ; cô lập khu vực; ghi nhận người chứng kiến và tình trạng.</td><td>HR + EHS</td></tr><tr><td>Sự cố máy có yếu tố an toàn</td><td>LOTO / cắt nguồn; treo biển cảnh báo; giữ hiện trường; chặn sử dụng lại thiết bị.</td><td>Maintenance + Production</td></tr><tr><td>Suýt sự cố (near-miss) / unsafe condition</td><td>Loại bỏ nguy cơ tức thời nếu an toàn; chụp ảnh; báo trong ca; đánh giá khả năng lặp lại.</td><td>Shift Leader + EHS</td></tr><tr><td>Sự cố ảnh hưởng WIP / FG</td><td>Cách ly lô liên quan; giữ giao hàng; đánh giá ảnh hưởng chất lượng.</td><td>QA + <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr></tbody></table></div>
+<h2 class="h2" id="p6">6. Cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2><div class="gate-grid"><div class="gate-card"><h3>802-G1 — Báo cáo và bảo vệ hiện trường</h3>
+<p class="small"><b>Mở cổng khi:</b> Sự cố/suýt sự cố (near-miss) đã được báo; người và khu vực đã ở trạng thái an toàn tối thiểu.</p>
+<p class="small"><b>Giữ/HOLD khi:</b> Chưa báo, hiện trường đang mở nguy cơ, hoặc tiếp tục sản xuất khi chưa cô lập.</p>
+<p class="small"><b>Chủ trì:</b> Shift Leader / EHS</p>
+<p class="small"><b>Bằng chứng:</b> FRM-811 / ảnh hiện trường</p></div><div class="gate-card"><h3>802-G2 — Phân loại, containment và release tạm thời</h3>
+<p class="small"><b>Mở cổng khi:</b> Mức độ đã xác định; khu vực/thiết bị/sản phẩm liên quan đã khoanh vùng; đầu mối phụ trách xử lý đã nhận việc.</p>
+<p class="small"><b>Giữ/HOLD khi:</b> Chưa rõ phạm vi, chưa cô lập năng lượng, hoặc còn tranh cãi mức độ nhưng line vẫn chạy.</p>
+<p class="small"><b>Chủ trì:</b> Chuyên viên EHS</p>
+<p class="small"><b>Bằng chứng:</b> FRM-811 / containment note / FRM-181 khi kích hoạt contingency</p></div><div class="gate-card"><h3>802-G3 — Điều tra nguyên nhân</h3>
+<p class="small"><b>Mở cổng khi:</b> Đã có dữ liệu, nhân chứng, ảnh, log và sự tham gia của các bên cần thiết.</p>
+<p class="small"><b>Giữ/HOLD khi:</b> Dữ liệu thiếu, hiện trường bị thay đổi, hoặc chỉ ghi nhận mô tả mà chưa đi vào nguyên nhân.</p>
+<p class="small"><b>Chủ trì:</b> Chuyên viên EHS + đầu mối phụ trách bộ phận</p>
+<p class="small"><b>Bằng chứng:</b> incident investigation pack</p></div><div class="gate-card"><h3>802-G4 — Hành động khắc phục / phòng ngừa</h3>
+<p class="small"><b>Mở cổng khi:</b> Hành động có đầu mối phụ trách, hạn hoàn thành, nguồn lực và tiêu chí verify rõ.</p>
+<p class="small"><b>Giữ/HOLD khi:</b> Chỉ nhắc nhở miệng, không có đầu mối phụ trách hoặc không chạm tới nguyên nhân hệ thống.</p>
+<p class="small"><b>Chủ trì:</b> Trưởng bộ phận</p>
+<p class="small"><b>Bằng chứng:</b> action log / FRM-652 khi cần</p></div><div class="gate-card"><h3>802-G5 — Xác nhận hiệu lực và đóng</h3>
+<p class="small"><b>Mở cổng khi:</b> Hành động đã triển khai, risk residual chấp nhận được, người liên quan đã được training lại và khu vực/thiết bị được release đúng thẩm quyền.</p>
+<p class="small"><b>Giữ/HOLD khi:</b> Lỗi lặp lại, chưa training lại, hoặc release khu vực chỉ bằng miệng.</p>
+<p class="small"><b>Chủ trì:</b> Chuyên viên EHS / Trưởng HR</p>
+<p class="small"><b>Bằng chứng:</b> verification log / training evidence</p></div></div><div class="metric-grid"><div class="metric-card"><div class="value">↑</div><div class="label">Suýt sự cố (near-miss) reporting</div><div class="mini-note">Khuyến khích tăng số suýt sự cố (near-miss) được báo đúng vì đó là tín hiệu chủ động phòng ngừa.</div></div><div class="metric-card"><div class="value">0</div><div class="label">Unclosed major incident</div><div class="mini-note">Không để sự cố mức nghiêm trọng treo hành động hoặc treo release khu vực quá hạn.</div></div><div class="metric-card"><div class="value">≤30 ngày</div><div class="label">Đóng sự kiện timeliness</div><div class="mini-note">Thời gian chuẩn để đóng action EHS, trừ khi sự cố có yêu cầu pháp lý hoặc kỹ thuật kéo dài hơn đã được phê duyệt.</div></div><div class="metric-card"><div class="value">0</div><div class="label">Repeat high-risk incident</div><div class="mini-note">Không chấp nhận tái diễn sự cố nguy cơ cao tại cùng khu vực vì thiếu kiểm soát hệ thống.</div></div><div class="metric-card"><div class="value">100%</div><div class="label">PPE / safeguard correction</div><div class="mini-note">Mọi finding PPE, guard, ánh sáng, biển báo phải có đầu mối phụ trách và xác nhận đóng.</div></div></div><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Chưa cô lập hiện trường, chưa release thiết bị/khu vực, chưa đánh giá ảnh hưởng tới sản phẩm, hoặc chưa training lại sau sự cố nghiêm trọng đều buộc dừng mở lại hoạt động liên quan.</div>
+
+<div class="metric-grid">
+<div class="metric-card"><div class="value">100%</div><div class="label">Near miss và sự kiện mức trọng yếu được báo trong ca</div></div>
+<div class="metric-card"><div class="value">&lt; 24 giờ</div><div class="label">Hoàn thành containment sơ bộ</div></div>
+<div class="metric-card"><div class="value">100%</div><div class="label">Sự kiện ảnh hưởng sản phẩm có quality hold nếu cần</div></div>
+<div class="metric-card"><div class="value">0</div><div class="label">Release khu vực khi chưa đủ evidence</div></div>
 </div>
-</div><div class="preface-block">
-<h2 class="h2">Điều kiện áp dụng và kiểm soát</h2>
-<div class="grid-2">
-<div>
-<p><b>Tình huống thuộc phạm vi SOP</b></p>
-<ul><li>Tai nạn lao động, thương tích, sự cố máy gây mất an toàn, cháy/nổ, tràn đổ, va chạm xe nâng, mất điện ảnh hưởng an toàn.</li><li>Near-miss, unsafe condition, vi phạm PPE/LOTO, lỗi machine guarding, ánh sáng không đạt, housekeeping gây vấp/ngã.</li></ul>
+<div class="gate-grid">
+<div class="gate-card"><h3>Gate HSE-01 — Stop work</h3><p>Bất kỳ ai có quyền dừng việc khi có nguy cơ tức thời. Không ai được phạt vì dừng việc đúng lý do.</p></div>
+<div class="gate-card"><h3>Gate HSE-02 — Containment</h3><p>Sự kiện có thể ảnh hưởng sản phẩm, cleanliness, FOD hoặc traceability phải đồng thời mở đường containment của QA.</p></div>
+<div class="gate-card"><h3>Gate HSE-03 — Release</h3><p>Không release khu vực, máy hoặc lô liên quan khi chưa đóng được nguyên nhân trực tiếp, containment và tiêu chí an toàn tối thiểu.</p></div>
 </div>
-<div>
-<p><b>Đầu ra / hồ sơ</b></p>
-<ul><li><b>Output:</b> FRM-811 báo cáo sự cố/near-miss, điều tra, hành động, bài học chia sẻ.</li><li><b>Output:</b> FRM-812 nhật ký ánh sáng và bằng chứng kiểm tra hiện trường.</li></ul>
+<h2 class="h2" id="p7">7. Quy trình chi tiết</h2><div class="step-band"><span>Báo ngay</span><span>Cô lập</span><span>Phân loại</span><span>Điều tra</span><span>Hành động</span><span>Verify / đóng</span></div><h3>7.1 Phản ứng trong 0–10 phút đầu</h3><p>Người phát hiện phải ưu tiên bảo vệ con người: dừng thao tác, cảnh báo xung quanh, gọi hỗ trợ và kích hoạt ứng phó cơ bản phù hợp tình huống. Shift Leader phải nhận quyền chỉ huy tại hiện trường cho đến khi EHS hoặc cấp thẩm quyền cao hơn tiếp quản.</p><ul class="tight"><li>Nếu có thương tích: sơ cứu ngay, gọi hỗ trợ y tế, giữ lối vào/ra thông thoáng và ghi nhận người bị nạn, thời gian, vị trí.</li><li>Nếu có nguy cơ từ thiết bị: LOTO hoặc cắt nguồn theo khả năng được đào tạo; cấm người không có nhiệm vụ vào khu vực.</li><li>Nếu có nguy cơ cháy, tràn đổ, khí, điện hoặc sập đổ: kích hoạt tuyến ứng phó theo <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a> và quy định EHS hiện hành.</li></ul><h3>7.2 Báo cáo trong ca và lập hồ sơ ban đầu</h3><p>Mọi sự cố và suýt sự cố (near-miss) phải được báo trong ca làm việc. Chuyên viên EHS phải phát hành Incident ID và yêu cầu hồ sơ ban đầu đủ để không mất thông tin cốt lõi khi ca kết thúc.</p><ul class="tight"><li>Dùng <a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-811_Incident_Report.xlsx">FRM-811</a> để ghi tối thiểu: thời gian, địa điểm, người liên quan, mô tả, thiết bị/job liên quan, loại sự cố, mức độ sơ bộ, ảnh hiện trường.</li><li>Nếu sự cố có khả năng ảnh hưởng delivery hoặc nhiều khu vực, phải ghi thêm vào <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-181_Business_Disruption_Event_Log.xlsx">FRM-181</a> để nối với contingency/event log.</li><li>Line không được giữ riêng thông tin ở chat cá nhân hoặc sổ tay mà không đưa vào hồ sơ chính thức.</li></ul><h3>7.3 Cô lập hiện trường, khoanh vùng thiết bị và đánh giá ảnh hưởng tới sản phẩm</h3><p>Containment phải bao trùm cả con người, thiết bị và sản phẩm. Khi sự cố xảy ra gần WIP/FG hoặc gần công đoạn trọng yếu, QA phải được kéo vào ngay để xác định lô nào cần HOLD và có dừng giao hàng hay không.</p><ul class="tight"><li>Thiết bị liên quan chỉ được sửa hoặc chạy lại sau khi có release; ảnh hiện trường và dữ liệu lỗi phải được chụp/lưu trước khi can thiệp kỹ thuật, trừ hành động cứu người.</li><li>WIP/FG liên quan phải được nhận diện và cách ly rõ; không tiếp tục giao hàng hoặc chuyển bước vì “không chắc có ảnh hưởng”.</li><li>Khi sự cố phát sinh từ ánh sáng, guard, layout, PPE hoặc housekeeping, phải chặn rủi ro tại tất cả khu tương tự nếu khả năng lặp lại cao.</li></ul><h3>7.4 Điều tra nguyên nhân trực tiếp và nguyên nhân hệ thống</h3><p>Chuyên viên EHS điều phối điều tra với các bộ phận liên quan. Điều tra phải đi đủ: chuyện gì đã xảy ra, vì sao xảy ra, tại sao hệ thống cho phép xảy ra, và cần thay đổi gì để không lặp lại.</p><ul class="tight"><li>Bắt buộc thu bằng chứng: ảnh, log, lời khai, trạng thái guard/PPE, tình trạng thiết bị, tình trạng housekeeping, lịch bảo trì/đào tạo khi liên quan.</li><li>Phân biệt rõ lỗi thao tác cá nhân với lỗ hổng hệ thống như training không đủ, layout xấu, guard thiếu, quy trình mờ, áp lực giao hàng, hoặc thiết bị xuống cấp.</li><li>Sự cố có yếu tố chất lượng hoặc customer impact phải nối sang <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> để mở NCR/CAPA tương ứng.</li></ul><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:22%"/><col style="width:36%"/><col style="width:42%"/></colgroup><thead><tr><th>Nguồn nguyên nhân hệ thống thường gặp</th><th>Ví dụ</th><th>Phản ứng mong đợi</th></tr></thead><tbody><tr><td>Đào tạo / năng lực</td><td>Người mới chưa hiểu LOTO, PPE, thao tác an toàn tại máy.</td><td>Rà lại route năng lực; mở đào tạo lại; kiểm coverage theo <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a>.</td></tr><tr><td>Thiết bị / bảo trì</td><td>Guard thiếu, sensor lỗi, đèn cảnh báo hỏng, máy rung bất thường.</td><td>Containment thiết bị; sửa và requalification; tăng PM nếu cần.</td></tr><tr><td>Layout / housekeeping</td><td>Lối đi bị chặn, chất đống, vật cản, ánh sáng kém.</td><td>Sửa layout, biển báo, chuẩn 5S và audit lại khu vực tương tự.</td></tr><tr><td>Tài liệu / giám sát</td><td>Rule có nhưng không rõ hoặc giám sát không cưỡng chế.</td><td>Sửa SOP/WI, tăng walkdown, tăng accountability của cấp quản lý.</td></tr></tbody></table></div><h3>7.5 Hành động khắc phục, training lại và release khu vực</h3><p>Trưởng bộ phận phải nhận đầu mối phụ trách từng hành động với hạn hoàn thành và tiêu chí xác nhận rõ. Hành động có thể gồm sửa thiết bị, bổ sung guard, đổi layout, thay PPE, tăng housekeeping, sửa SOP/WI, training lại hoặc thay đổi phân quyền công việc.</p><ul class="tight"><li>Khi sự cố chạm tới nhiều bộ phận hoặc có khả năng lặp lại hệ thống, phải mở <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a> để theo dõi CAPA.</li><li>Sau khi hành động triển khai, phải verify tại hiện trường và chỉ release khu vực/thiết bị bằng quyết định có thẩm quyền, không bằng miệng.</li><li>Bài học quan trọng phải ghi vào <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-151_Lessons_Learned_Register.xlsx">FRM-151</a> và cascade sang các khu vực có risk tương tự.</li></ul>
+
+<div class="callout-grid">
+<div class="callout-card"><h3>Phản ứng trong 15 phút đầu</h3><ul class="tight"><li>Bảo vệ người trước</li><li>Cô lập nguồn nguy hiểm và khu vực</li><li>Giữ nguyên hiện trường nếu cần điều tra</li><li>Xác định có sản phẩm/WIP liên quan hay không</li><li>Báo đúng tuyến escalation theo ca</li></ul></div>
+<div class="callout-card"><h3>Điều tra nguyên nhân</h3><p>Điều tra phải nhìn đủ 3 lớp: điều kiện không an toàn, hành vi/con người, và cơ chế quản trị cho phép sự kiện xảy ra. Không chốt nguyên nhân ở mức “bất cẩn” nếu chưa kiểm tra điều kiện công việc và tiêu chuẩn.</p></div>
+<div class="callout-card"><h3>Học lại sau sự cố</h3><p>Mọi sự kiện mức trọng yếu phải để lại thay đổi cụ thể: tiêu chuẩn, barrier, training, check sheet, layout, PPE, maintenance, supplier rule hoặc escalation rule.</p></div>
 </div>
-</div>
-<p class="callout">Nguyên tắc: cứu người và cô lập nguy cơ trước; hồ sơ đi sau nhưng không được bỏ.</p>
-</div><h2 class="h2">1. Mục đích</h2>
-<p>Thiết lập phản ứng EHS tại HESEM cho an toàn, near-miss, PPE, LOTO, PCCC, môi trường và ứng phó khẩn cấp trong mô hình sản xuất 2 ca 12 giờ.</p>
-<h2 class="h2">2. Phạm vi</h2>
-<ul><li>Áp dụng cho toàn bộ nhân sự, nhà thầu, khách thăm và người làm việc trong khu vực HESEM quản lý.</li><li>Bao gồm khu CNC, deburr, cleaning/packaging, warehouse, văn phòng và khu tiện ích khi liên quan an toàn - môi trường.</li></ul>
-<h2 class="h2">3. Thuật ngữ</h2>
-<div class="table-card"><table class="table">
-<thead><tr><th>Thuật ngữ</th><th>Diễn giải</th></tr></thead>
-<tbody><tr><td><b>Incident</b></td><td>Sự cố đã gây thương tích, hư hại tài sản, cháy, tràn đổ hoặc ảnh hưởng môi trường.</td></tr><tr><td><b>Near-miss</b></td><td>Tình huống suýt gây sự cố, chưa có hậu quả nhưng có tiềm năng gây mất an toàn hoặc môi trường.</td></tr><tr><td><b>Unsafe condition</b></td><td>Điều kiện không an toàn như guard thiếu, dây điện hở, nền trơn, đèn hỏng, rò khí, rò dầu.</td></tr><tr><td><b>LOTO</b></td><td>Khóa/treo biển nguồn năng lượng trước khi can thiệp bảo trì hoặc xử lý nguy hiểm.</td></tr><tr><td><b>Spill</b></td><td>Sự cố tràn hóa chất/dầu/nước thải vượt kiểm soát thông thường.</td></tr></tbody></table></div>
-<h2 class="h2">4. RACI</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Vai trò</th><th>R</th><th>A</th><th>C</th><th>I</th></tr></thead><tbody><tr><td>EHS Specialist</td><td>●</td><td></td><td></td><td></td></tr><tr><td>CEO</td><td></td><td>●</td><td></td><td></td></tr><tr><td>HR Manager</td><td></td><td></td><td>●</td><td></td></tr><tr><td>Production Director</td><td></td><td></td><td>●</td><td></td></tr><tr><td>QA Manager</td><td></td><td></td><td>●</td><td></td></tr><tr><td>CNC Workshop Manager</td><td></td><td></td><td>●</td><td></td></tr></tbody></table></div><div class="role-boundary"><b>Role-boundary / authority note:</b> EHS là tuyến chức năng; mọi quản lý tuyến đầu phải chịu trách nhiệm thực thi an toàn tại điểm làm việc, không được chuyển giao nghĩa vụ an toàn chỉ cho chuyên viên EHS. Xem thêm <a href="../../03-Reference/01-ANNEX-System/ref-020-cnc-operating-model-and-role-boundary.html">REF-020</a>, <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a> và <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-026-raci-master-matrix.html">ANNEX-QMS-026</a> để đối chiếu giữa tài liệu.</div>
-<h2 class="h2">5. Quy tắc bắt buộc tại hiện trường</h2>
-<div class="table-card"><table class="table">
-<thead><tr><th>Nhóm rủi ro</th><th>Quy tắc tối thiểu</th></tr></thead>
-<tbody><tr><td>PPE</td><td>Mang đúng PPE theo khu vực; vi phạm lặp lại phải dừng công việc và đào tạo lại.</td></tr><tr><td>LOTO</td><td>Không mở guard hoặc can thiệp nguồn khi chưa khóa nguồn và treo biển theo quy định.</td></tr><tr><td>PCCC</td><td>Không chặn lối thoát hiểm, tủ điện, bình chữa cháy; vật liệu dễ cháy phải lưu đúng nơi.</td></tr><tr><td>Hóa chất / dầu / khí</td><td>Ghi nhãn, dùng khay hứng, có spill kit, không rót/chuyển chiết không kiểm soát.</td></tr><tr><td>Housekeeping / ánh sáng</td><td>Lối đi thông, nền khô sạch, ánh sáng đạt mức làm việc; khu tối hoặc đèn nhấp nháy phải khắc phục.</td></tr></tbody></table></div>
-<h2 class="h2">6. Phản ứng tức thời khi có sự cố</h2>
-<div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext">Ngừng công việc và cô lập nguồn nguy hiểm nếu việc này không làm tăng rủi ro cho người bị nạn.</div></div><div class="vstep"><div class="vnum">2</div><div class="vtext">Cứu người / sơ cứu / gọi hỗ trợ y tế hoặc đội khẩn cấp theo mức độ nghiêm trọng.</div></div><div class="vstep"><div class="vnum">3</div><div class="vtext">Bảo vệ hiện trường ở mức cần thiết để phục vụ điều tra, trừ khi cần xử lý khẩn cấp để ngăn hậu quả lan rộng.</div></div><div class="vstep"><div class="vnum">4</div><div class="vtext">Thông báo EHS Specialist, quản lý khu vực và CEO theo tuyến đã quy định đối với sự cố nghiêm trọng.</div></div><div class="vstep"><div class="vnum">5</div><div class="vtext">Lập FRM-811 trong ca hoặc ngay sau khi hiện trường an toàn.</div></div></div>
-<h2 class="h2">7. Báo cáo near-miss và điều kiện không an toàn</h2>
-<ul><li>Bất kỳ ai thấy near-miss hoặc unsafe condition đều có quyền và trách nhiệm báo.</li><li>Near-miss có tiềm năng cao (ví dụ guard mở, rò điện, vật nặng sắp đổ, xe nâng suýt va người) PHẢI có hành động tạm thời ngay trong ca.</li><li>Không áp dụng văn hóa đổ lỗi cá nhân cho báo cáo near-miss. Mục tiêu là chặn sự cố trước khi nó xảy ra.</li></ul>
-<h2 class="h2">8. Điều tra, hành động và đóng vụ việc</h2>
-<div class="table-card"><table class="table">
-<thead><tr><th>Bước</th><th>Nội dung</th></tr></thead>
-<tbody><tr><td>Phân loại mức độ</td><td>First aid, medical, lost time, property damage, spill, fire, near-miss high potential…</td></tr><tr><td>Thu thập bằng chứng</td><td>Ảnh hiện trường, nhân chứng, máy/thiết bị liên quan, điều kiện ca làm việc, PPE/guard/LOTO.</td></tr><tr><td>Nguyên nhân</td><td>Tìm nguyên nhân trực tiếp và nguyên nhân hệ thống: thiết bị, quy trình, năng lực, human factors, môi trường.</td></tr><tr><td>Hành động</td><td>Containment ngay, sửa guard/thiết bị, bổ sung biển báo, đào tạo lại, CAPA nếu cần.</td></tr><tr><td>Xác nhận hiệu lực</td><td>Kiểm tra lại hiện trường, audit follow-up, trend sự cố tương tự.</td></tr></tbody></table></div>
-<h2 class="h2">9. Ứng phó khẩn cấp</h2>
-<ul><li>Tối thiểu phải có: danh bạ khẩn cấp, sơ đồ thoát hiểm, điểm tập kết, người chỉ huy ban đầu, vật tư ứng phó phù hợp.</li><li>Tình huống diễn tập NÊN bao gồm: cháy, mất điện, tràn đổ hóa chất/dầu, tai nạn cá nhân và sự cố khí/nước làm ảnh hưởng an toàn.</li><li>Sau diễn tập, EHS Specialist ghi nhận bài học và action với deadline rõ ràng.</li></ul>
-<h2 class="h2">10. Giám sát hiện trường</h2>
-<ul><li>FRM-812 dùng để theo dõi ánh sáng hoặc điểm đo chiếu sáng khi khu vực có thay đổi layout, máy mới hoặc phản ánh nhìn kém.</li><li>Khu vực phát sinh dầu/chip/nước nhiều NÊN có lịch kiểm housekeeping và chống trơn trượt rõ ràng cho cả hai ca.</li></ul>
-<h2 class="h2">Biểu mẫu liên quan</h2>
-<ul><li>FRM-811 — Báo cáo sự cố</li><li>FRM-812 — Nhật ký ánh sáng</li></ul>
-<h2 class="h2">Tài liệu liên quan</h2>
-<ul><li>SOP-801 — Năng lực, Đào tạo &amp; Chứng nhận</li><li>SOP-804 — Yếu tố con người &amp; Phòng lỗi</li><li>SOP-901 — Đánh giá nội bộ &amp; LPA</li></ul>
-<h2 class="h2">Ký duyệt</h2>
-<div class="sig-row"><div><div class="muted small"><b>Người lập</b></div><div class="sig-box"></div></div><div><div class="muted small"><b>Rà soát EHS</b></div><div class="sig-box"></div></div><div><div class="muted small"><b>Phê duyệt CEO</b></div><div class="sig-box"></div></div></div><div class="annex-block">
-<div class="annex-title">Footer</div>
-<p class="muted">SOP chủ quản: <b>SOP-802</b> · Lưu hồ sơ theo SOP-104.</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+<div class="table-card"><table>
+<thead><tr><th>Bước</th><th>Đầu ra bắt buộc</th><th>Điểm kiểm soát</th></tr></thead>
+<tbody>
+<tr><td>1. Report</td><td>Incident ID / near-miss ID</td><td>Không report miệng rồi bỏ</td></tr>
+<tr><td>2. Containment</td><td>Khu vực an toàn, WIP liên quan được nhận diện</td><td>Quality hold nếu có nguy cơ sản phẩm</td></tr>
+<tr><td>3. Điều tra</td><td>Phân loại sự kiện, nguyên nhân trực tiếp/gốc</td><td>Có ảnh, nhân chứng, timeline, evidence</td></tr>
+<tr><td>4. Hành động</td><td>Corrective actions, owner, due date</td><td>Phân biệt containment và corrective action</td></tr>
+<tr><td>5. Review &amp; close</td><td>Biên bản đóng sự kiện</td><td>Không đóng khi chưa xác minh hiệu lực</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:22%"/><col style="width:40%"/><col style="width:14%"/><col style="width:24%"/></colgroup><thead><tr><th>Tình huống ngoại lệ</th><th>Xử lý bắt buộc</th><th>Đầu mối phụ trách chính</th><th>Hồ sơ / evidence</th></tr></thead><tbody><tr><td>Suýt sự cố (near-miss) xảy ra cuối ca hoặc cuối tuần</td><td>Vẫn phải báo và ghi Incident ID trước khi giao ca; không để dồn sang ca sau.</td><td>Shift Leader</td><td><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-811_Incident_Report.xlsx">FRM-811</a></td></tr><tr><td>Sự cố nghi có ảnh hưởng pháp lý / khách hàng / cơ quan chức năng</td><td>Escalate ngay lãnh đạo; khóa truyền thông ngoài; dùng kênh chính thức.</td><td>Chuyên viên EHS + lãnh đạo</td><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-181_Business_Disruption_Event_Log.xlsx">FRM-181</a></td></tr><tr><td>Thiết bị cần sửa gấp để bảo vệ an toàn nhưng hiện trường phải giữ</td><td>Cho phép xử lý tối thiểu để loại nguy hiểm cấp bách; chụp/lưu đầy đủ bằng chứng trước và sau can thiệp.</td><td>Maintenance + EHS</td><td>ảnh / maintenance log</td></tr><tr><td>Sự cố làm gián đoạn giao hàng</td><td>Nối với contingency plan và đánh giá delivery impact; không tự bỏ qua điều tra vì áp lực tiến độ.</td><td>Giám đốc Sản xuất + CS</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td></tr></tbody></table></div>
+
+<ul class="tight">
+<li>After-hours event phải dùng contact chain của ANNEX-QMS-020; không đợi tới giờ hành chính mới report.</li>
+<li>Near miss lặp lại cùng loại 3 lần trong 90 ngày phải nâng cấp thành sự kiện điều tra sâu, kể cả khi chưa có thương tích.</li>
+<li>Nhà thầu/khách/visitor vi phạm an toàn tại khu vực HESEM vẫn phải vào hệ sự kiện của HESEM; không xử lý ngoài sổ.</li>
+<li>Nếu sự kiện có yếu tố product safety/FOD/contamination, phải liên kết với SOP-703, WI-721, SOP-606 hoặc SOP-202 tùy mức ảnh hưởng khách hàng.</li>
+</ul>
+<h2 class="h2" id="p9">9. Hệ thống, hồ sơ &amp; dữ liệu</h2><div class="field-grid"><div class="field"><b>Hệ thống ghi nhận chuẩn (SoR)</b><div class="blank">Incident register và log sự kiện được chỉ định là nguồn nhìn trạng thái hiện hành của từng sự cố; mọi tình trạng release khu vực/thiết bị phải phản ánh tại nguồn chính thức đó.</div></div><div class="field"><b>Nguồn hồ sơ chuẩn (SSOT)</b><div class="blank">M365/SharePoint hoặc thư mục EHS được kiểm soát dùng để lưu FRM-811, ảnh hiện trường, biên bản điều tra, action list, bằng chứng training lại, maintenance release và related CAPA.</div></div><div class="field"><b>Trường dữ liệu tối thiểu</b><div class="blank">Incident ID; thời gian/địa điểm; người liên quan; loại sự cố; mức độ; mô tả; containment; thiết bị/job liên quan; ảnh hưởng sản phẩm; đầu mối phụ trách; due date; release status.</div></div><div class="field"><b>Quy tắc đóng hồ sơ</b><div class="blank">Sự cố chỉ được đóng khi hành động đã verify effective, khu vực/thiết bị được release đúng thẩm quyền và mọi yêu cầu training lại hoặc CAPA nối tiếp đã hoàn tất.</div></div></div><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:26%"/><col style="width:24%"/><col style="width:12%"/><col style="width:22%"/></colgroup><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Nơi lưu / nguồn</th><th>Chủ trì</th><th>Điều kiện đóng</th></tr></thead><tbody><tr><td><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-811_Incident_Report.xlsx">FRM-811</a></td><td>Báo cáo sự cố / suýt sự cố (near-miss) và hồ sơ ban đầu</td><td>EHS SSOT</td><td>Chuyên viên EHS</td><td>Khi thông tin nền đủ và incident ID phát hành</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-181_Business_Disruption_Event_Log.xlsx">FRM-181</a></td><td>Log sự kiện / contingency khi sự cố lan rộng hoặc ảnh hưởng hoạt động</td><td>Contingency thư mục</td><td>EHS / Production</td><td>Khi event được kết luận</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-812_Lighting_Log.xlsx">FRM-812</a></td><td>Evidence khi sự cố/suýt sự cố (near-miss) liên quan điều kiện ánh sáng hoặc môi trường nhìn thấy</td><td>EHS / maintenance thư mục</td><td>EHS / Maintenance</td><td>Theo case</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a></td><td>NCR khi sự cố chạm tới sản phẩm</td><td>Quality SSOT</td><td>QA / QC</td><td>Khi disposition đóng</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a></td><td>CAPA khi cần hành động hệ thống</td><td>Quality/EHS SSOT</td><td>Đầu mối phụ trách bộ phận + QA/EHS</td><td>Khi verified effective</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-151_Lessons_Learned_Register.xlsx">FRM-151</a></td><td>Lessons learned để chống tái diễn</td><td>CI / lessons learned thư mục</td><td>EHS / QMS</td><td>Khi bài học được cascade xong</td></tr></tbody></table></div>
+
+<div class="table-card"><table>
+<thead><tr><th>Hồ sơ</th><th>Yêu cầu</th></tr></thead>
+<tbody>
+<tr><td>Incident / near-miss report</td><td>Phải có mô tả sự kiện, thời gian, địa điểm, người liên quan, containment ban đầu.</td></tr>
+<tr><td>Điều tra và hành động</td><td>Phải có root cause, barrier failure, owner, due date và xác minh hiệu lực.</td></tr>
+<tr><td>Release khu vực / máy</td><td>Phải có tiêu chí release, người xác nhận và liên kết hình ảnh/evidence nếu cần.</td></tr>
+<tr><td>Hồ sơ thông báo ngoài</td><td>Phải lưu khi có customer notice, insurer, cơ quan chức năng hoặc contractor notice.</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="p10">10. Biểu mẫu, WI, SOP &amp; JD liên kết</h2><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:48%"/><col style="width:38%"/></colgroup><thead><tr><th>Nhóm</th><th>Tài liệu liên quan</th><th>Vai trò trong SOP</th></tr></thead><tbody><tr><td>Biểu mẫu bắt buộc</td><td><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-811_Incident_Report.xlsx">FRM-811</a> ; <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-181_Business_Disruption_Event_Log.xlsx">FRM-181</a></td><td>Khóa báo cáo sự cố/suýt sự cố (near-miss) và event log khi sự cố chạm vận hành rộng hơn.</td></tr><tr><td>Biểu mẫu theo điều kiện</td><td><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-812_Lighting_Log.xlsx">FRM-812</a> ; <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a> ; <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a> ; <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-151_Lessons_Learned_Register.xlsx">FRM-151</a></td><td>Dùng khi có yếu tố ánh sáng, ảnh hưởng sản phẩm, CAPA hoặc cần cascade bài học.</td></tr><tr><td>SOP liên đới</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a> ; <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html">SOP-503</a> ; <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> ; <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a></td><td>Khóa ứng phó tổng thể, an toàn thiết bị/sự cố dừng máy, chất lượng và năng lực sau sự cố.</td></tr><tr><td>Department / training links</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html">EHS Handbook</a> ; <a href="../../../10-Training-Academy/02-Training-Content/03-Practice-Drills/drill-safety-5s-hazards.html">Drill Safety 5S Hazards</a></td><td>Dùng để chuẩn hóa drill, thực hành và quy tắc khu vực.</td></tr><tr><td>JD bắt buộc cascade</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html">Chuyên viên EHS</a> ; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html">Trưởng HR</a> ; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html">Shift Leader</a> ; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html">Giám đốc Sản xuất</a> ; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">Trưởng QA</a></td><td>JD phải mô tả rõ nghĩa vụ báo cáo trong ca, quyền dừng việc, điều kiện release khu vực và trách nhiệm điều tra / training lại.</td></tr></tbody></table></div><div class="note-blue"><b>Yêu cầu nối tài liệu:</b> mọi suýt sự cố (near-miss) hoặc sự cố lặp lại phải được chuyển thành thay đổi kiểm soát thực tế ở SOP/WI, đào tạo lại theo <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a> và, khi chạm sản phẩm, phải đi tiếp vào <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>.</div>
+</div></div></div></div></div>
+<script src="../../../assets/app.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -45,7 +45,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
     <span>Tài liệu kiểm soát</span>
@@ -73,8 +73,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="meta">
 <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-25</span></div>
 <div class="row"><span><b>TrainingID:</b></span><span>25</span></div>
-<div class="row"><span><b>Phiên bản:</b></span><span>Draft</span></div>
-<div class="row"><span><b>Ngày hiệu lực:</b></span><span>2026-02-25</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS + IT</span></div>
 <div class="row"><span><b>Phê duyệt:</b></span><span>General Manager (EXE-01)</span></div>
 </div>
@@ -317,8 +317,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td><b>Single source of truth</b>: Released docs chỉ nằm trong <b>QMS-Controlled-Documents</b>; nơi khác chỉ link.</td><td>QA/QMS</td><td>Link Released + trang doc-control + log phát hành</td><td>Mỗi lần phát hành</td></tr>
 <tr><td>2</td><td><b>Job Dossier Document Set</b> theo WO/Lot + folder chuẩn; WIP → Records theo closeout.</td><td>Process Owner</td><td>01 Document Set đúng cấu trúc + Closeout checklist ký</td><td>Mỗi WO/Lot</td></tr>
 <tr><td>3</td><td><b>Programs Restricted Library</b>: CNC programs/post/setup chỉ phát hành từ thư viện Restricted; PROD chỉ Read/Use.</td><td>Engineering + IT</td><td>Release note + đường dẫn program + quyền nhóm</td><td>Mỗi lần release</td></tr>
-<tr><td>4</td><td><b>Least privilege &amp; group-based</b>: cấp quyền qua nhóm; mọi thay đổi có log và thời hạn.</td><td>IT + Data Owner</td><td><a href="../../../04-Bieu-Mau/01-FRM-100/frm-109-access-rights-and-dcr-matrix.html#DCR record">FRM-QMS-15</a> + cập nhật Access Matrix (<a href="../../../04-Bieu-Mau/01-FRM-100/frm-109-access-rights-and-dcr-matrix.html">FRM-QMS-14</a>/<a href="../../../04-Bieu-Mau/01-FRM-100/frm-109-access-rights-and-dcr-matrix.html#edam">FRM-QMS-18</a>)</td><td>Mỗi thay đổi</td></tr>
-<tr><td>5</td><td><b>Quarterly Access Review</b>: rà soát quyền + guest expiry + gói minh chứng.</td><td>IT + QA/QMS</td><td><a href="../../../04-Bieu-Mau/01-FRM-100/frm-111-quarterly-access-review.html">FRM-QMS-17</a> (gói minh chứng) + danh sách thu hồi</td><td>Hàng quý</td></tr>
+<tr><td>4</td><td><b>Least privilege &amp; group-based</b>: cấp quyền qua nhóm; mọi thay đổi có log và thời hạn.</td><td>IT + Data Owner</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#DCR record">FRM-QMS-15</a> + cập nhật Access Matrix (<a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html">FRM-QMS-14</a>/<a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#edam">FRM-QMS-18</a>)</td><td>Mỗi thay đổi</td></tr>
+<tr><td>5</td><td><b>Quarterly Access Review</b>: rà soát quyền + guest expiry + gói minh chứng.</td><td>IT + QA/QMS</td><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-QMS-17</a> (gói minh chứng) + danh sách thu hồi</td><td>Hàng quý</td></tr>
 <tr><td>6</td><td><b>Records integrity</b>: records không chỉnh sửa; đính chính bằng file mới có lý do; retention label áp dụng.</td><td>QA/QMS</td><td>Phiên bản/retention + log đính chính</td><td>Mỗi record</td></tr>
 <tr><td>7</td><td><b>External sharing cổng chặn</b>: chỉ share qua gói minh chứng; link chỉ đọc có expiry; cấm share Restricted.</td><td>QA/QMS + Estimator (SAL-03)</td><td>Evidence pack link + FRM-QMS-15 + screenshot expiry</td><td>Mỗi lần share</td></tr>
 <tr><td>8</td><td><b>Spot-check tuân thủ</b>: chọn mẫu WO/Lot kiểm tra vị trí lưu, tên file, quyền truy cập, khóa closeout.</td><td>QA/QMS</td><td>Biên bản spot-check + NCR/CAPA khi phát hiện</td><td>Hàng tháng</td></tr>
@@ -394,7 +394,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3" style="margin-top:0">OJT Output bắt buộc (Deliverables)</h3>
 <ul class="iso-list">
 <li><b>01 WO/Lot Document Set hoàn chỉnh</b> (cấu trúc folder chuẩn) gồm tối thiểu: Customer Inputs, Router/Setup, Programs (Restricted link), IPQC, Inspection, Material/CoC, Shipping, Closeout Lock.</li>
-<li><b>01 Access DCR record</b> hoàn chỉnh (khi có cấp quyền/chia sẻ) theo <a href="../../../04-Bieu-Mau/01-FRM-100/frm-109-access-rights-and-dcr-matrix.html#DCR record">FRM-QMS-15</a>.</li>
+<li><b>01 Access DCR record</b> hoàn chỉnh (khi có cấp quyền/chia sẻ) theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#DCR record">FRM-QMS-15</a>.</li>
 <li><b>01 Gói minh chứng</b> chỉ đọc có expiry (mô phỏng audit/customer) + ảnh chụp cấu hình expiry + danh sách người được cấp quyền.</li>
 </ul>
 <div class="req"><span class="req-tag shall">PHẢI</span>

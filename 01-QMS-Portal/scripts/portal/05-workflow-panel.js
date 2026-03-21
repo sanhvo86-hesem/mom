@@ -517,8 +517,8 @@ function renderAdminRetention(){
       <div style="font-size:13px;font-weight:700;margin-bottom:6px">📋 ${lang==='en'?'Document Retention Policy':'Chính sách lưu giữ tài liệu'}</div>
       <div style="font-size:11px;color:var(--text-3);line-height:1.6;margin-bottom:16px">
         ${lang==='en'
-          ?'Configure retention period per document type. Obsolete versions can only be deleted after the configured number of years. Aligned with ISO 9001:2026 §7.5.3 and ISO 9001:2026.'
-          :'Cấu hình thời gian lưu giữ theo loại tài liệu. Phiên bản lỗi thời chỉ có thể xóa sau số năm quy định. Tuân thủ ISO 9001:2026 §7.5.3 và ISO 9001:2026.'}
+          ?'Configure retention period per document type. Obsolete versions can only be deleted after the configured number of years. Aligned with documented-information control and retention requirements.'
+          :'Cấu hình thời gian lưu giữ theo loại tài liệu. Phiên bản lỗi thời chỉ có thể xóa sau số năm quy định. Phù hợp yêu cầu kiểm soát và lưu giữ thông tin dạng văn bản.'}
       </div>
     </div>
     <table class="admin-table">

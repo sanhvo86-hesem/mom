@@ -156,7 +156,7 @@ Mọi tài liệu đều bọc trong:
 ## 6. Quy tắc phiên bản & Workflow
 
 - **V0** — Bản nháp (Draft), chưa phát hành
-- **V1.0** — Phát hành lần đầu (Initial Release) sau khi được duyệt
+- **V0** — Phát hành lần đầu (Initial Release) sau khi được duyệt
 - **V1.x** — Cập nhật nhỏ (Minor): sửa lỗi chính tả, format, bổ sung nhỏ
 - **V2.0** — Cập nhật lớn (Major): thay đổi nội dung/quy trình quan trọng
 

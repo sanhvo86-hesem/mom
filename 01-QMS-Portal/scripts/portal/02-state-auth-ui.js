@@ -565,10 +565,7 @@ function canAccessDoc(docCode){
   const perms = ROLE_DOCS[currentUser.role];
   if(!perms) return false;
   if(perms === "ALL") return true;
-  return perms.some(p => {
-    if(p.endsWith('*')) return docCode.startsWith(p.slice(0,-1));
-    return p === docCode;
-  });
+  return perms.some(p => (typeof docCodeMatchesPattern==='function' ? docCodeMatchesPattern(docCode,p) : (p.endsWith('*') ? docCode.startsWith(p.slice(0,-1)) : p===docCode)));
 }
 function canAccess(catDept){
   // Legacy compat: check if ANY doc in this category is accessible
@@ -588,10 +585,7 @@ function docMatchesRole(docCode, role){
   const perms = ROLE_DOCS[role];
   if(!perms) return false;
   if(perms === "ALL") return true;
-  return perms.some(p => {
-    if(p.endsWith('*')) return docCode.startsWith(p.slice(0,-1));
-    return p === docCode;
-  });
+  return perms.some(p => (typeof docCodeMatchesPattern==='function' ? docCodeMatchesPattern(docCode,p) : (p.endsWith('*') ? docCode.startsWith(p.slice(0,-1)) : p===docCode)));
 }
 
 function getCatForDoc(doc){
@@ -697,6 +691,26 @@ function navigateTo(page, filter){
   renderSidebar();
 }
 
+function isDownloadOnlyDoc(doc){
+  try{
+    if(!doc) return false;
+    if(doc.delivery_mode === 'download' || doc.portal_behavior === 'download_on_open') return true;
+    if(/^(xlsx|xlsm|xls|csv)$/i.test(String(doc.ext||''))) return true;
+    return /\.(xlsx|xlsm|xls|csv)$/i.test(String(doc.path||''));
+  }catch(e){ return false; }
+}
+
+function triggerDocDownload(doc){
+  if(!doc || !doc.path) return;
+  const a = document.createElement('a');
+  a.href = '../' + String(doc.path).replace(/^\/+/, '');
+  a.download = '';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>a.remove(), 0);
+}
+
 async function openDoc(code){
   // Ensure no stray overlay blocks the UI
   try{ document.querySelectorAll('.vp-overlay').forEach(el=>el.remove()); }catch(e){}
@@ -727,6 +741,13 @@ async function openDoc(code){
       editMode=false;
       editingDoc=null;
     }
+  }
+
+  if(isDownloadOnlyDoc(doc)){
+    trackPageView('doc/'+code, '⬇️ '+code+' — '+(doc.title||'').substring(0,60));
+    triggerDocDownload(doc);
+    showToast(lang==='en' ? 'Downloading workbook: ' + code : 'Đang tải workbook: ' + code);
+    return;
   }
 
   // Track document view
@@ -1156,7 +1177,7 @@ function renderDashboard(){
           <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>Epicor Kinetic</b> — System of Record (transactions)<br><span style="color:var(--text-3)">Job, Dispatch, Time Entry, PO, Inventory</span></div>
           <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>M365 / SharePoint</b> — SSOT (evidence/records)<br><span style="color:var(--text-3)">${T('controlled_docs')}</span></div>
           <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>Quality Gates</b> — G0 → G5<br><span style="color:var(--text-3)">Hold/Release ${T('at_each_gate')}</span></div>
-          <div style="padding:10px 0"><b>${T('standards')}</b> — ISO 9001:2026 → ISO 9001:2026<br><span style="color:var(--text-3)">CNC Semiconductor Grade</span></div>
+          <div style="padding:10px 0"><b>${T('standards')}</b> — ISO 9001:2015 • revision-ready<br><span style="color:var(--text-3)">CNC Semiconductor Grade</span></div>
         </div>
       </div>
     </div>
@@ -2250,8 +2271,8 @@ function openCreateDocModal(cat){
           <input type="hidden" id="cd-folder" value="${initFolder}">
           <div class="help-text" style="margin-top:4px;font-size:11px;color:var(--text-3)">
             ${lang==='en'
-              ?'Auto-computed from Category + Department. The <b>_Archive</b> subfolder for version control will be created inside this folder.'
-              :'Tự động tính từ Loại + Phòng ban. Thư mục <b>_Archive</b> cho kiểm soát phiên bản sẽ nằm trong cùng thư mục này.'}
+              ?'Auto-computed from Category + Department. Baseline V0 does not create an <b>_Archive</b> subfolder; control is maintained through the active file, checksum registry and release manifest.'
+              :'Tự động tính từ Loại + Phòng ban. Baseline V0 không tạo thư mục <b>_Archive</b>; kiểm soát được duy trì qua file active, checksum registry và release manifest.'}
           </div>
         </div>
       </div>
@@ -2867,7 +2888,7 @@ function renderAdminUsers(){
           <td style="padding:6px 10px;text-align:center;white-space:nowrap">
             <button onclick="showUserModal('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">✏</button>
             <button onclick="editUserPerms('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">🔐</button>
-            <button onclick="toggleUserActive('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">${u.active!==false?'⏸':'â–¶'}</button>
+            <button onclick="toggleUserActive('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">${u.active!==false?'⏸':'▶'}</button>
             <button onclick="deleteUserConfirm('${u.id}')" class="btn-admin danger sm" style="padding:3px 8px;font-size:10px">🗑</button>
           </td>
         </tr>`;
@@ -2897,7 +2918,7 @@ function renderAdminUsers(){
           <div class="uc-actions">
             <button onclick="showUserModal('${u.id}')">✏ ${T('admin_edit')}</button>
             <button onclick="editUserPerms('${u.id}')">🔐 Quyền</button>
-            <button class="danger" onclick="toggleUserActive('${u.id}')">${u.active!==false?'⏸ Khóa':'â–¶ Mở'}</button>
+            <button class="danger" onclick="toggleUserActive('${u.id}')">${u.active!==false?'⏸ Khóa':'▶ Mở'}</button>
             <button class="danger" onclick="deleteUserConfirm('${u.id}')">🗑</button>
           </div>
         </div>`;
@@ -3777,10 +3798,8 @@ function toggleRoleDoc(cb, role){
   if(!cb.checked){
     // Check if was matched by wildcard
     ROLE_DOCS[role].forEach((p,i)=>{
-      if(p.endsWith('*') && doc.startsWith(p.slice(0,-1))){
-        // Expand wildcard, remove the matching doc
-        const prefix=p.slice(0,-1);
-        const allInWild=DOCS.filter(d=>d.code.startsWith(prefix)).map(d=>d.code);
+      if((typeof docCodeMatchesPattern==='function' ? docCodeMatchesPattern(doc,p) : (p.endsWith('*') && doc.startsWith(p.slice(0,-1))))){
+        const allInWild=(typeof expandPatternToDocCodes==='function' ? expandPatternToDocCodes(p,DOCS) : DOCS.filter(d=>p.endsWith('*') && d.code.startsWith(p.slice(0,-1))).map(d=>d.code));
         ROLE_DOCS[role].splice(i,1,...allInWild.filter(c=>c!==doc));
       }
     });
@@ -3795,7 +3814,7 @@ function toggleCatPerms(cb, catId, role){
   if(ROLE_DOCS[role]==='ALL') return;
   const docsInCat=DOCS.filter(d=>d.cat===catId);
   docsInCat.forEach(d=>{
-    const has=ROLE_DOCS[role].some(p=>p.endsWith('*')?d.code.startsWith(p.slice(0,-1)):p===d.code);
+    const has=ROLE_DOCS[role].some(p=>(typeof docCodeMatchesPattern==='function' ? docCodeMatchesPattern(d.code,p) : (p.endsWith('*') ? d.code.startsWith(p.slice(0,-1)) : p===d.code)));
     if(cb.checked && !has){
       ROLE_DOCS[role].push(d.code);
     } else if(!cb.checked && has){
@@ -3803,10 +3822,7 @@ function toggleCatPerms(cb, catId, role){
       const idx=ROLE_DOCS[role].indexOf(d.code);
       if(idx>-1) ROLE_DOCS[role].splice(idx,1);
       // Also expand/remove wildcards
-      ROLE_DOCS[role]=ROLE_DOCS[role].filter(p=>{
-        if(p.endsWith('*') && d.code.startsWith(p.slice(0,-1))) return false;
-        return true;
-      });
+      ROLE_DOCS[role]=ROLE_DOCS[role].filter(p=>(typeof docCodeMatchesPattern==='function' ? !docCodeMatchesPattern(d.code,p) : !(p.endsWith('*') && d.code.startsWith(p.slice(0,-1)))));
     }
   });
   saveRoleDocsToStorage();
@@ -4411,4 +4427,3 @@ function reassignUserRole(){
 
 
 // ═══════════════════════════════════════════════════
-

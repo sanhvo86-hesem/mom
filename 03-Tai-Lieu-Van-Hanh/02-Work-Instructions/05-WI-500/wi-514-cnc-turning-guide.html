@@ -2,96 +2,85 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>WI-514 — CNC Turning Guide | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WI-514 — Hướng dẫn vận hành tiện CNC | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
-/* === PAGE BREAK & OVERFLOW FIX (auto-applied) === */
 @media print {
-  .card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.vstep{page-break-inside:avoid;break-inside:avoid}
-  h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}
-  .form-header,.sig-row,.sign-row{page-break-inside:avoid;break-inside:avoid}
-  tr{page-break-inside:avoid;break-inside:avoid}
-  thead{display:table-header-group}tfoot{display:table-footer-group}
-  p{orphans:3;widows:3}.table-card{overflow:visible!important}
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
 }
-.page-body{overflow-x:hidden}
-.table-card,.table-block,.table-wrap{overflow-x:auto;max-width:100%}
-table{max-width:100%;table-layout:auto}
-td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 </head>
 <body>
-<div class="container"><div class="page"><div class="page-body">
-<div class="form-header">
-<div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Work Instruction</span>
+          </div>
+        </div>
+        <div class="title"><strong>WI-514 — Hướng dẫn vận hành tiện CNC</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>WI-514</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>Production Manager / Engineering Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho máy tiện CNC, turning center và nguyên công turning trên máy có live tooling khi logic kẹp quay/phôi quay vẫn là rủi ro chính.</div>
+      <h1>WI-514 — Hướng dẫn vận hành tiện CNC</h1>
+      <div class="section"><h2>1. Mục đích và rủi ro đặc thù</h2><p>WI này chuẩn hóa vận hành tiện CNC và các nguyên công turning/live-tooling mức tiện. Trọng tâm là kiểm soát grip length, runout, stick-out, tailstock/steady rest, tool nose radius compensation và các điểm dễ gây parting/thread failure.</p><div class="callout-danger"><strong>NGUY HIỂM CAO</strong> phôi quay tốc độ cao có thể gây văng phôi, cuốn vật lạ và gây chấn thương nghiêm trọng. Không đo, không gạt chip, không chỉnh tay gần chuck khi spindle đang quay.</div></div><div class="section"><h2>2. Setup chuck/collet và prove-out</h2><div class="table-card"><table><thead><tr><th>Mục</th><th>Yêu cầu</th><th>Điểm dừng</th></tr></thead><tbody><tr><td>Jaw/collet</td><td>Chọn đúng dải kẹp, đúng hình dáng và chiều kẹp; mặt kẹp sạch và không nứt</td><td>Jaw/collet không phù hợp hoặc bẩn = không chạy</td></tr>
+<tr><td>Grip length / stick-out</td><td>Phải chứng minh đủ grip, đủ support; L/D cao phải có tailstock/steady rest nếu cần</td><td>Stick-out vượt kiểm soát mà chưa có support = HOLD</td></tr>
+<tr><td>Runout / concentricity</td><td>Kiểm runout theo setup sheet và risk của feature</td><td>Runout không đạt = không cắt tinh/không cắt ren</td></tr>
+<tr><td>Tool nose radius comp</td><td>Gọi đúng hướng dao và TNR comp; verify trên first-piece</td><td>Nghi ngờ TNR comp = dừng prove-out</td></tr>
+</tbody></table></div></div><div class="section"><h2>3. Trong khi chạy: tiện, ren, parting và live tooling</h2><ul><li>Kiểm chip control. Chip dài quấn quanh part, chuck hoặc tool là dấu hiệu phải điều chỉnh ngay.</li><li>Đối với ren, phải xác nhận pitch, lead-in/out, runout groove và tool wear trước khi chạy hàng loạt.</li><li>Đối với parting/cutoff, phải kiểm support, coolant, chip evacuation và vị trí thu part để tránh kẹt/văng.</li><li>Khi có live tooling, phải xác nhận lại plane/mode và không để lẫn logic giữa turning axis và milling axis.</li></ul><h3>3.1 Dấu hiệu dừng ngay</h3><div class="table-card"><table><thead><tr><th>Dấu hiệu</th><th>Hành động</th></tr></thead><tbody><tr><td>Phôi trượt, rung mạnh hoặc dấu vết trượt kẹp</td><td>E-stop hoặc dừng an toàn ngay; cô lập part đã gia công từ lần kẹp gần nhất</td></tr>
+<tr><td>Thread pitch nghi ngờ, crest/root bất thường</td><td>Dừng và xác minh ngay bằng phép kiểm phù hợp; không tiếp tục chạy theo giả định</td></tr>
+<tr><td>Parting phát tiếng rít, kẹt chip, nhiệt tăng</td><td>Dừng; kiểm tool, coolant, speed/feed và support</td></tr>
+<tr><td>Bar feeder/remnant bất thường</td><td>Dừng nhận liệu; cô lập part có thể ảnh hưởng</td></tr>
+</tbody></table></div><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Tỷ lệ parting fail; số case phôi trượt/rung; first-piece pass cho thread/OD/ID critical; số lần dùng sai TNR comp.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;">SOP-502, SOP-504, SOP-503, WI-302, WI-517, WI-516, ANNEX-HSE-001.</div></div></div></div>
+    </div>
   </div>
 </div>
-<div class="title">
-  <strong>WI-514 — CNC Turning Guide</strong>
-  <span class="sub-vn"></span>
-</div>
-<div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>WI-514</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>Process Engineer / CNC Workshop Manager</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-</div>
-</div>
-<div class="doc-content" id="docContent"><div class="form-sheet">
-
-<h2 class="h2">1. Mục đích</h2><p>Dùng tại máy tiện CNC và máy tiện có live tooling cho part family tròn xoay.</p>
-
-<h2 class="h2">2. PPE</h2><ul>
-  <li>Kính, giày bảo hộ, không đứng trong vùng bar feeder hoặc sau bar feeder khi nạp liệu.</li>
-  <li>Không đo khi spindle đang quay.</li>
-</ul>
-
-<h2 class="h2">3. Dụng cụ</h2><ul>
-  <li>Jaw/collet đúng loại</li>
-  <li>Indicator hoặc phương tiện kiểm runout</li>
-  <li>Setup sheet, traveler, FRM-511</li>
-</ul>
-
-<h2 class="h2">4. Các bước</h2><h3 class="h3">4.1 Setup chuck / collet</h3><ul>
-  <li>Chọn jaw hoặc collet đúng loại và đúng dải kẹp; kiểm sạch chip trước khi lắp.</li>
-  <li>Kiểm stick-out, grip length, runout phôi và nhu cầu tailstock/steady rest.</li>
-  <li>Bar feeder hoặc remnant setting phải phù hợp chiều dài và số lượng part/bar.</li>
-</ul>
-
-<h3 class="h3">4.2 Tiện và finish</h3><ul>
-  <li>Xác nhận nose radius compensation, insert orientation, spindle mode và coolant direction.</li>
-  <li>Theo dõi chip control, parting behavior, built-up edge và surface finish.</li>
-  <li>Khi dùng live tooling, kiểm C-axis orientation và offset riêng cho tool quay.</li>
-</ul>
-
-<h3 class="h3">4.3 Yêu cầu đặc thù bán dẫn</h3><ul>
-  <li>Chi tiết tròn xoay của ngành bán dẫn thường yêu cầu đồng tâm, concentricity, circular feature finish và burr nhỏ ở mép lỗ/rãnh.</li>
-  <li>Dung sai ±0.005-0.020 mm và Ra 0.4-0.8 μm đòi hỏi kiểm chặt jaw bore, runout, chip breaker và wear của insert finishing.</li>
-  <li>Parting hoặc grooving trên vật liệu mềm/dễ xước phải có phương án hứng part và bảo vệ bề mặt ngay khi rời máy.</li>
-</ul>
-
-<h2 class="h2">5. Tiêu chí</h2><div class="table-card"><table class="table"><thead><tr><th>Tiêu chí</th><th>Đạt khi</th></tr></thead><tbody><tr><td>Kẹp phôi</td><td>Grip length và runout phù hợp; không có dấu hiệu trượt phôi</td></tr><tr><td>Tool/offset</td><td>TNR, orientation và offset khớp chương trình</td></tr><tr><td>Surface finish</td><td>Không có chatter, tear, built-up edge hoặc parting burr quá mức</td></tr><tr><td>Concentricity</td><td>Đặc tính đồng tâm/OD-ID đạt sau first piece</td></tr></tbody></table></div>
-
-<h2 class="h2">6. Xử lý bất thường</h2><ul>
-  <li>Chip quấn dài hoặc parting không ổn định: dừng và chỉnh chip breaker/feed/coolant trước khi tiếp tục.</li>
-  <li>Runout hoặc concentricity xấu: kiểm jaw/collet, bore soft jaw, chuck cleanliness và setup datum.</li>
-  <li>Built-up edge làm xấu bề mặt: thay insert, xem lại cutting speed/coolant và batch size kiểm.</li>
-</ul>
-
-<h2 class="h2">7. SOP liên quan</h2><ul>
-  <li><a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a> Vận hành gia công CNC</li>
-  <li><a href="../../01-SOPs/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html">SOP-503</a> Bảo trì - Tooling, PM &amp; Ứng phó sự cố</li>
-  <li><a href="../../../04-Bieu-Mau/05-FRM-500/frm-511-setup-and-first-piece-record.html">FRM-511</a> Phiếu Setup &amp; First Piece</li>
-</ul>
-
-</div></div>
-
-</div></div></div>
 </body>
 </html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Periodic Control Cadence | HESEM QMS</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+<style>
+@media print{.card,.table-card,.note,.box{page-break-inside:avoid;break-inside:avoid}h1,h2,h3{page-break-after:avoid;break-after:avoid}}
+.cardx{padding:14px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+.kpi .cardx b{font-size:18px}
+.smalltable td,.smalltable th{font-size:13px}
+.codeblock{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;white-space:pre-wrap;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:12px}
+</style>
+</head>
+<body><div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left"><a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"/></a><div class="fh-company"><a href="../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div></div>
+<div class="title"><strong>Periodic Control Cadence</strong><span class="sub-vn">Chu kỳ kiểm tra định kỳ sau go-live cho thư viện FRM workbook</span></div>
+<div class="meta"><div class="row"><span><b>Owner:</b></span><span>IT / QA-QMS / Functional Owners</span></div><div class="row"><span><b>Delivery:</b></span><span>Download-only</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày baseline:</b></span><span>2026-03-21</span></div></div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="note-blue"><b>Dùng khi nào:</b> dùng để khóa nhịp kiểm tra sau go-live, tránh tình trạng thư viện workbook đúng ở ngày phát hành nhưng lệch dần sau đó.</div>
+<div class="table-card"><table class="table smalltable"><thead><tr><th>Tần suất</th><th>Owner</th><th>Điều phải kiểm</th><th>Output</th></tr></thead><tbody>
+<tr><td>Daily</td><td>IT / QA-QMS</td><td>Download/auth/path issues</td><td>Issue triage</td></tr>
+<tr><td>Weekly</td><td>QA-QMS / IT</td><td>Smoke-check 15 form trọng yếu</td><td>Weekly note</td></tr>
+<tr><td>Monthly</td><td>QA-QMS</td><td>Checksum spot-check; header verification; changed-scope link audit</td><td>Monthly review</td></tr>
+<tr><td>Quarterly</td><td>QA-QMS / IT / Functional owners</td><td>Critical-form UAT pack; endpoint baseline review; NOT_ISSUED review</td><td>Quarterly acceptance pack</td></tr>
+<tr><td>On change</td><td>Functional owner + QA-QMS + IT</td><td>Checksum update; registry/docs update; targeted UAT</td><td>Release closure</td></tr>
+</tbody></table></div>
+<div class="card"><h3 class="h3">Technical baseline hiện tại</h3><ul class="tight">
+<li>111 workbook active đã được scan kỹ thuật.</li>
+<li>0 workbook có VBA/macros.</li>
+<li>0 workbook có external links.</li>
+<li>111 workbook có data validation.</li>
+</ul></div>
+<div class="note-soft"><b>Xem thêm:</b> <a href="../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-040-excel-form-periodic-integrity-audit-and-control-cadence.html">ANNEX-QMS-040</a> • <a href="../../01-QMS-Portal/docs/form-workbook-technical-audit-baseline.md">Technical audit</a>.</div>
+</div>
+</div></div></div></body></html>

@@ -1,0 +1,7 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Route controlled documents through the portal auth gate while preserving
+  # the original URL path for relative links inside HTML documents.
+  RewriteRule ^(archive|02-Tai-Lieu-He-Thong|03-Tai-Lieu-Van-Hanh|04-Bieu-Mau|05-Processes|07-Forms-Records|10-Training-Academy)/(.*)\.(html|xlsx|xlsm|xls|csv)$ 01-QMS-Portal/api.php?action=doc_stream&path=$1/$2.$3 [QSA,L,NC]
+</IfModule>

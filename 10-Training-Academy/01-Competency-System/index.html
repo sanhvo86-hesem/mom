@@ -1,1 +1,103 @@
-﻿<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Competency System</title><style>body{font-family:Segoe UI,Tahoma,Arial,sans-serif;max-width:900px;margin:28px auto;padding:0 16px;line-height:1.6;color:#1f2937}h1{font-size:22px;margin:0 0 10px}p{color:#4b5563}ul{padding-left:20px}a{color:#0b5bd3;text-decoration:none}a:hover{text-decoration:underline}.box{border:1px solid #dbe5f4;background:#f8fbff;border-radius:10px;padding:14px 16px;margin-top:14px}</style></head><body><h1>Competency System</h1><p>Trang điều hướng cho framework và level competency.</p><div class="box"><ul><li><a href="./02-Levels/index.html">02-Levels</a></li><li><a href="./01-Framework/competency-framework.html">01-Framework</a></li><li><a href="./03-Matrices/training-matrix-production.html">03-Matrices</a></li></ul></div></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TRN-ACA-COMP-INDEX — Competency System | HESEM QMS</title>
+<link href="../../assets/style.css" rel="stylesheet"/>
+<style>
+
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
+.metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;}
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
+.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;}
+.link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);}
+.link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
+.link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);}
+.link-list{list-style:none;margin:0;padding:0}
+.link-list li{padding:4px 0 4px 0;font-size:12px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}
+.hero h1{font-size:22px;line-height:1.35;color:var(--navy);margin:0 0 8px}
+.hero p{font-size:13px;color:var(--ink2);margin:0}
+.mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
+.chip{display:inline-flex;padding:3px 10px;border-radius:999px;border:1px solid var(--ln);background:var(--bg2);font-size:11px;font-weight:600;margin-right:6px;margin-bottom:6px;}
+.legend-box{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.legend-box .chip{margin:0}
+.svg-wrap{overflow:auto;border:1px solid var(--ln);border-radius:var(--r);background:#fff;padding:12px}
+.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
+.notice-item{padding:10px 12px;border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r-sm);background:var(--bg);font-size:12px}
+.small{font-size:12px}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Training Academy • Competency System</span>
+          </div>
+        </div>
+        <div class="title">
+          <strong>TRN-ACA-COMP-INDEX — Competency System</strong>
+          <span class="sub-vn">Khung năng lực, level, matrix triển khai và liên kết tới chứng nhận/deputy</span>
+        </div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>TRN-ACA-COMP-INDEX</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>HR Manager / QA Manager</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="doc-content" id="docContent">
+        <div class="form-sheet">
+
+<div class="hero">
+  <h1>Competency System — khung năng lực, level và ma trận triển khai</h1>
+  <p>Khối competency này là lớp chuẩn để chuyển từ “đã đào tạo” sang “được công nhận đủ năng lực để làm việc độc lập / làm deputy / giữ chứng nhận”. Tất cả level phải có tiêu chí, bằng chứng và gate rõ ràng.</p>
+</div>
+
+<div class="note"><b>Liên kết quản trị</b><br/>Competency system phải được dùng cùng <a href="../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html">HR Handbook</a>, <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028 Deputy / Backup Matrix</a>, <a href="../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">JD Library</a> và <a href="../04-Templates-Tools/certification-register.html">Certification Register</a> để tránh tách rời giữa mô tả vai trò và năng lực thực tế.</div>
+<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#c1">1. Kiến trúc competency</a><a href="#c2">2. Level logic</a><a href="#c3">3. Ma trận theo phòng ban</a><a href="#c4">4. Cấp chứng nhận và deputy</a><a href="#c5">5. Hồ sơ bắt buộc</a></div></div>
+<h2 class="h2" id="c1">1. Kiến trúc competency</h2>
+<div class="metric-grid"><div class="metric-card"><div class="label">Competency modules</div><div class="value">19</div><div class="mini-note">Bộ mô-đun năng lực cốt lõi của hệ thống.</div></div><div class="metric-card"><div class="label">Level definitions</div><div class="value">76</div><div class="mini-note">Các trang level chi tiết theo competency và mức độ.</div></div><div class="metric-card"><div class="label">Department matrices</div><div class="value">10</div><div class="mini-note">Ma trận triển khai theo phòng ban / nhóm chức năng.</div></div><div class="metric-card"><div class="label">Core governance links</div><div class="value">4</div><div class="mini-note">JD, handbook, deputy matrix, certification register.</div></div></div>
+<ul class="tight"><li>Framework nền được mô tả tại <a href="01-Framework/competency-framework.html">Competency Framework</a>.</li><li>Các level năng lực chi tiết nằm tại <a href="02-Levels/index.html">Level Library</a> và phải được dùng làm chuẩn chấm, không “tự chế level” ngoài hệ thống.</li><li>Triển khai theo phòng ban dùng ma trận tại thư mục 03-Matrices; ma trận chỉ ra competency nào là bắt buộc / hỗ trợ / tùy chọn theo từng family vai trò.</li><li>Trạng thái đạt level, hold, withdraw và recertification phải quay về <a href="../04-Templates-Tools/certification-register.html">Certification Register</a> và <a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-806_Certification_Tracking_Log.xlsx">FRM-806</a> để giữ dấu vết hệ thống.</li></ul>
+<h2 class="h2" id="c2">2. Level logic</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:10%"/><col style="width:36%"/><col style="width:54%"/></colgroup><thead><tr><th>Level</th><th>Ý nghĩa vận hành</th><th>Điều kiện công nhận tối thiểu</th></tr></thead><tbody><tr><td>L1</td><td>Nhận biết / hỗ trợ dưới giám sát</td><td>Hiểu quy tắc nền, hoàn thành module bắt buộc, thao tác khi có người kèm trực tiếp.</td></tr><tr><td>L2</td><td>Thực hiện thường quy trong phạm vi xác định</td><td>Qua OJT cơ bản, dùng biểu mẫu đúng, biết dừng và escalated khi gặp bất thường/gate.</td></tr><tr><td>L3</td><td>Làm việc độc lập trong scope đã phê duyệt</td><td>Có bằng chứng thực chiến, pass gate test và duy trì performance / record discipline ổn định.</td></tr><tr><td>L4</td><td>Dẫn dắt / huấn luyện / backup cho người khác</td><td>Có năng lực huấn luyện, xử lý biến động, xác minh đầu ra và đủ điều kiện nằm trong coverage deputy theo vai trò.</td></tr></tbody></table></div>
+<h2 class="h2" id="c3">3. Ma trận theo phòng ban</h2>
+<div class="link-grid">
+<div class="link-card"><h3>Master framework</h3><p>Các trang nền dùng chung trước khi mở matrix phòng ban.</p><ul class="link-list"><li><a href="01-Framework/competency-framework.html">Competency Framework</a></li><li><a href="02-Levels/index.html">Level Library</a></li><li><a href="../04-Templates-Tools/role-roadmaps.html">Role Roadmaps</a></li><li><a href="../04-Templates-Tools/role-gate-tests.html">Role Gate Tests</a></li></ul></div>
+<div class="link-card"><h3>Department matrices 1</h3><p>Chọn matrix tương ứng với family chức năng hoặc department owner.</p><ul class="link-list"><li><a href="03-Matrices/training-matrix-engineering.html">Engineering matrix</a></li><li><a href="03-Matrices/training-matrix-estimating.html">Estimating / commercial matrix</a></li><li><a href="03-Matrices/training-matrix-finance-hr.html">Finance &amp; HR matrix</a></li></ul></div>
+<div class="link-card"><h3>Department matrices 2</h3><p>Chọn matrix tương ứng với family chức năng hoặc department owner.</p><ul class="link-list"><li><a href="03-Matrices/training-matrix-hse.html">EHS matrix</a></li><li><a href="03-Matrices/training-matrix-maintenance.html">Maintenance matrix</a></li><li><a href="03-Matrices/training-matrix-planning-purchasing.html">Planning &amp; purchasing matrix</a></li></ul></div>
+<div class="link-card"><h3>Department matrices 3</h3><p>Chọn matrix tương ứng với family chức năng hoặc department owner.</p><ul class="link-list"><li><a href="03-Matrices/training-matrix-production.html">Production matrix</a></li><li><a href="03-Matrices/training-matrix-quality.html">Quality matrix</a></li><li><a href="03-Matrices/training-matrix-warehouse.html">Warehouse matrix</a></li></ul></div>
+<div class="link-card"><h3>Department matrices 4</h3><p>Chọn matrix tương ứng với family chức năng hoặc department owner.</p><ul class="link-list"><li><a href="03-Matrices/training-matrix.html">Master matrix overview</a></li></ul></div>
+</div>
+<h2 class="h2" id="c4">4. Cấp chứng nhận và deputy</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:26%"/><col style="width:74%"/></colgroup><thead><tr><th>Tình huống</th><th>Cách dùng competency system</th></tr></thead><tbody><tr><td>Onboarding vai trò mới</td><td>Xác định level target từ JD/handbook, gán roadmap 30/60/90, triển khai OJT và chấm level theo framework.</td></tr><tr><td>Cross-training / mở rộng cell / product family</td><td>Dùng matrix phòng ban + role roadmap để bổ sung competency còn thiếu; chỉ đưa vào vận hành độc lập khi level và gate tương ứng đã được công nhận.</td></tr><tr><td>Bổ nhiệm deputy / backup</td><td>Kiểm tra coverage tại <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a> rồi đối chiếu bằng chứng level/certification; không dùng chỉ định miệng thay cho năng lực đã được chứng minh.</td></tr><tr><td>Vi phạm gate hoặc thay đổi process lớn</td><td>Treo hoặc giới hạn chứng nhận tại <a href="../04-Templates-Tools/certification-register.html">Certification Register</a> và kích hoạt đánh giá lại sau OJT/CA phù hợp.</td></tr></tbody></table></div>
+<h2 class="h2" id="c5">5. Hồ sơ bắt buộc</h2>
+<ul class="tight"><li>Checklist OJT / attendance / assessment phải dùng các form: <a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-802_Attendance_List.xlsx">FRM-802</a>, <a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM-803</a>, <a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-804_Competence_Assessment.xlsx">FRM-804</a>, <a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-805_Skill_Level_Certificate.xlsx">FRM-805</a>, <a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-806_Certification_Tracking_Log.xlsx">FRM-806</a>.</li><li>Nếu dùng KPI hoặc skill matrix để theo dõi duy trì năng lực, cập nhật đồng thời <a  download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-809 Skill Matrix &amp; KPI</a>.</li><li>Mọi bằng chứng phải lưu theo naming rule và SSOT, tham chiếu qua <a href="../04-Templates-Tools/evidence-naming-rule.html">Evidence Naming Rule</a>.</li></ul>
+<div class="footer-note">Competency System là chuẩn chấm và quản trị năng lực, không chỉ là thư mục bài học. Khi role thay đổi hoặc process/gate thay đổi, framework và matrix liên quan phải được rà đồng thời với JD, handbook và certification register.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

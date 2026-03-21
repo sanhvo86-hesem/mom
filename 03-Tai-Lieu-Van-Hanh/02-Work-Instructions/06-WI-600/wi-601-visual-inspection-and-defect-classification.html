@@ -1,98 +1,139 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>WI-601 — Visual Inspection &amp; Defect Classification | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
-<style>
-.chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
-.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
-.tight li{margin:4px 0;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
-.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
-.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
-.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
-.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
-.metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
-.metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
-.mini-note{font-size:12px;color:var(--ink2);line-height:1.55;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
-.gate-card{border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
-.gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
-.field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
-.field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
-.field .blank{width:100%;min-height:22px;}
-.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;}
-.check-item{padding:8px 10px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);font-size:12px;}
-.check-item .chk{margin-right:6px;}
-.legend-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0;}
-.legend-row .chip{margin-bottom:0;}
-.footer-note{margin-top:20px;font-size:11px;color:var(--ink3);}
-.decision-table td:first-child, .decision-table th:first-child{font-weight:700;}
-.kpi-good{color:#166534;font-weight:700;}
-.kpi-watch{color:#92400e;font-weight:700;}
-.kpi-bad{color:#b91c1c;font-weight:700;}
-.control-stack > * + *{margin-top:12px;}
-.subtle{color:var(--ink2);font-size:12px;}
-.boxed-list{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
-.lane-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.35px;color:var(--navy);margin-bottom:6px;}
-.flow-note{font-size:11px;color:var(--ink3)}
-.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700;margin:0 6px 6px 0;}
-.audit-score{font-size:24px;font-weight:700;color:var(--navy);}
-.matrix-small td,.matrix-small th{font-size:12px;}
-.svg-wrap{overflow:auto;border:1px solid var(--ln);border-radius:var(--r);background:#fff;padding:12px}
-.legend-box{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.legend-box span{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ln);background:var(--bg);padding:4px 8px;border-radius:999px;font-size:11px}
-.sq{width:12px;height:12px;border-radius:3px;display:inline-block}
-.rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
-.small{font-size:12px}
-@media print {
-  .card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.lane,.legend,.req,.auth-grid,.backup-card,.vstep,.metric-card,.gate-card,.field,.boxed-list,.svg-wrap{page-break-inside:avoid;break-inside:avoid}
-  h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}
-  .form-header,.sig-row,.sign-row,.approval-row{page-break-inside:avoid;break-inside:avoid}
-  tr{page-break-inside:avoid;break-inside:avoid}
-  thead{display:table-header-group}tfoot{display:table-footer-group}
-  p{orphans:3;widows:3}.table-card{overflow:visible!important}
-}
-.page-body{overflow-x:hidden}
-.table-card,.table-block,.table-wrap{overflow-x:auto;max-width:100%}
-table{max-width:100%;table-layout:auto}
-td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
-@media (max-width: 900px){.grid-3{grid-template-columns:1fr;}.field-grid{grid-template-columns:1fr;}}
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WI-601 — Kiểm tra ngoại quan, phân loại lỗi và ghi nhận bằng chứng | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
 
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
+
 </head>
 <body>
-<div class="container"><div class="page"><div class="page-body">
-<div class="form-header">
-<div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>
-<div class="fh-company">
-<a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-<span>Tài liệu kiểm soát</span>
-</div>
-</div>
-<div class="title">
-<strong>WI-601 — Visual Inspection &amp; Defect Classification</strong>
-<span class="sub-vn">Chuẩn hóa cách nhìn lỗi ngoại quan và phân loại mức độ ảnh hưởng</span>
-</div>
-<div class="meta">
-<div class="row"><span><b>Mã:</b></span><span>WI-601</span></div>
-<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Chủ sở hữu:</b></span><span>QC Inspector Lead / Quality Engineer</span></div>
-<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-</div>
-</div>
-<div class="doc-content" id="docContent"><div class="form-sheet">
-<div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Visual inspection phải được thực hiện dưới điều kiện ánh sáng, khoảng cách và tiêu chí phù hợp; không phân loại lỗi cảm tính hoặc thay đổi theo từng người.</div></div></div><div class="card"><div class="badge"><span class="dot"></span>WI-601</div><div class="role-boundary"><b>Vai trò / quyền hạn khi dùng tài liệu này:</b> QC Lead xác định ưu tiên kiểm và phân loại lỗi; Quality Engineer sở hữu định nghĩa defect / severity; Deburr/Production không tự đổi chuẩn chấp nhận nếu chưa qua tuyến Quality. Xem thêm <a href="../../03-Reference/01-ANNEX-System/ref-020-cnc-operating-model-and-role-boundary.html">REF-020</a>, <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a> và <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a> khi cần giải thích sâu.</div><h1 class="h1" style="margin-top:10px">WI-601 — Visual Inspection &amp; Defect Classification</h1><p class="mini-note">Chuẩn hóa cách nhìn lỗi ngoại quan và phân loại mức độ ảnh hưởng</p></div><h2 class="h2" id="p1">1. Khi nào dùng</h2><ul class="tight"><li>Incoming visual check.</li><li>In-process/final visual check.</li><li>Complaint/NCR review.</li></ul><h2 class="h2" id="p2">2. Các bước thực hiện</h2><h3 class="h3">Chuẩn bị</h3><ul class="tight"><li>Xác định tiêu chí visual của khách hàng hoặc chuẩn nội bộ cho job.</li><li>Kiểm điều kiện ánh sáng, vệ sinh mẫu và thiết bị phóng đại nếu cần.</li></ul><h3 class="h3">Phân loại</h3><ul class="tight"><li>Tách lỗi critical / major / minor theo ảnh hưởng chức năng, an toàn, lắp ráp, sạch hoặc ngoại quan khách hàng.</li><li>Khi nghi ngờ, escalate thay vì tự hạ mức độ lỗi.</li></ul><h3 class="h3">Ghi nhận</h3><ul class="tight"><li>Ảnh, mô tả, vị trí lỗi và số lượng ảnh hưởng phải đủ để truy xuất lại.</li></ul><h2 class="h2" id="p3">3. Điểm tự kiểm trước khi kết thúc</h2><ul class="tight"><li>Điều kiện quan sát đúng?</li><li>Tiêu chí áp dụng đúng job?</li><li>Lỗi đã chụp ảnh/mô tả đủ?</li><li>Đã quyết định đúng mức độ?</li></ul><h2 class="h2" id="p4">4. Tài liệu liên quan</h2><ul class="tight"><li><a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></li><li><a href="../../01-SOPs/07-SOP-700/sop-703-product-safety-conformity-and-fod-prevention.html">SOP-703</a></li></ul>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Work Instruction</span>
+          </div>
+        </div>
+        <div class="title"><strong>WI-601 — Kiểm tra ngoại quan, phân loại lỗi và ghi nhận bằng chứng</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>WI-601</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA Manager / QC Lead / Quality Engineer</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng tại Incoming, IPQC, Final, complaint review, containment review hoặc bất kỳ gate nào cần quyết định defect class bằng ngoại quan.</div>
+      <h1>WI-601 — Kiểm tra ngoại quan, phân loại lỗi và ghi nhận bằng chứng</h1>
+      
+<div class="section"><h2>1. Mục đích, ranh giới và điều kiện quan sát</h2>
+<p>WI này chuẩn hóa kiểm tra ngoại quan tại Incoming, IPQC, Final và khi đánh giá NCR/complaint. Người kiểm phải dùng tiêu chí chấp nhận đúng Job, đúng Part/Rev, đúng QPL và đúng customer requirement. Không được phân loại lỗi bằng cảm tính, không đổi mức độ lỗi để “cho qua lô”, và không dùng một tiêu chí chung cho mọi nhóm sản phẩm.</p>
+<div class="table-card"><table><thead><tr><th>Yếu tố</th><th>Yêu cầu bắt buộc</th><th>HOLD khi</th></tr></thead><tbody>
+<tr><td>Ánh sáng</td><td>Khu vực kiểm phải đủ sáng, không có bóng che mạnh, không để nguồn sáng phản xạ làm mất dấu xước/vết cháy.</td><td>Không đủ sáng, bóng đổ lớn, không xác định rõ trạng thái bề mặt.</td></tr>
+<tr><td>Độ sạch</td><td>Chi tiết phải được thổi sạch/phủi sạch theo quy định trước khi soi; không kiểm trên bề mặt còn dầu bẩn/chip rời che lỗi.</td><td>Còn phoi, bụi, dung dịch hoặc keo bám che lỗi.</td></tr>
+<tr><td>Phương tiện quan sát</td><td>Dùng mắt thường, kính lúp, borescope hoặc nguồn sáng phụ theo mức yêu cầu từng bề mặt/khoang.</td><td>Thiếu phương tiện cần thiết để kết luận.</td></tr>
+<tr><td>Mẫu chuẩn/ảnh chuẩn</td><td>Khi có photo standard hoặc sample chuẩn, phải đối chiếu theo đúng revision hiện hành.</td><td>Dùng ảnh/mẫu cũ, không truy được nguồn chuẩn.</td></tr>
+</tbody></table></div>
+<div class="callout-danger"><strong>CẤM</strong> lau xoá, blend, deburr hoặc làm sạch bổ sung sau khi đã nhìn thấy lỗi mà chưa chụp ảnh/ghi nhận. CẤM gom nhiều lỗi thành một mô tả chung mơ hồ kiểu “bề mặt xấu”.</div></div>
+
+<div class="section"><h2>2. Phân loại lỗi và nguyên tắc quyết định</h2>
+<p>Phân loại lỗi phải bám ảnh hưởng thực tới chức năng, an toàn, lắp ráp, sạch, truy vết và yêu cầu khách hàng. Khi một lỗi chạm đồng thời nhiều tiêu chí, phải lấy mức nghiêm trọng cao hơn.</p>
+<div class="table-card"><table><thead><tr><th>Mức lỗi</th><th>Định nghĩa vận hành</th><th>Ví dụ CNC/clean/vacuum</th><th>Quyết định mặc định</th></tr></thead><tbody>
+<tr><td><span class="badge-red">Critical</span></td><td>Lỗi ảnh hưởng an toàn, chức năng chính, kín khít, truy vết vật liệu, nhầm Part/Rev, nhầm hướng lắp hoặc vi phạm customer critical requirement.</td><td>Nhầm vật liệu/nhầm cert; nứt; thiếu feature chức năng; seal surface hỏng; lẫn dị vật bên trong khoang vacuum; sai nhãn làm lẫn part.</td><td>HOLD ngay, cô lập lô, mở phản ứng theo <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</td></tr>
+<tr><td><span class="badge-amber">Major</span></td><td>Lỗi không được phép vì ảnh hưởng lắp ráp, hiệu năng, độ bền, độ sạch, lớp phủ, ngoại quan khách hàng hoặc gây rework đáng kể.</td><td>Burr còn sắc tại mép lắp; ren hỏng; xước sâu trên mặt lộ; vết tool mark vượt chuẩn; lớp phủ bong; stain/oxide ở bề mặt cấm.</td><td>HOLD lô hoặc khu vực ảnh hưởng; đánh giá rework/sort; không release khi chưa có xác nhận QA.</td></tr>
+<tr><td><span class="badge-blue">Minor</span></td><td>Lỗi nhỏ không ảnh hưởng chức năng nhưng vượt chuẩn thẩm mỹ hoặc chuẩn hoàn thiện nội bộ.</td><td>Vết xước nhẹ ngoài vùng khách nhìn thấy; mark nhẹ ở bề mặt không chức năng; sai sót bao gói nhỏ nhưng chưa gây hại sản phẩm.</td><td>Quyết định theo QPL/customer rule; vẫn phải ghi nhận nếu vượt ngưỡng lặp.</td></tr>
+<tr><td><span class="badge-green">Observation</span></td><td>Điểm cần theo dõi nhưng chưa cấu thành defect.</td><td>Xu hướng màu sắc hơi lệch; dấu tiếp xúc nhẹ trong giới hạn; burr đã xử lý nhưng cần watch.</td><td>Ghi nhận trend nếu lặp; không tự nâng thành pass vĩnh viễn cho lần sau.</td></tr>
+</tbody></table></div>
+<div class="keyline"><strong>Rule:</strong> Một lỗi lặp lại nhiều lần trên lô dù từng chiếc vẫn trong ngưỡng minor có thể bị nâng mức xử lý vì phản ánh mất kiểm soát quá trình. QA quyết định dựa trên QPL, customer requirement và lịch sử complaint.</div></div>
+
+<div class="section"><h2>3. Trình tự kiểm ngoại quan</h2>
+<div class="step-list">
+<div class="step-item"><strong>Xác định tiêu chí.</strong><br/>Mở drawing/spec, traveler, QPL và yêu cầu đóng gói/sạch liên quan. Đánh dấu rõ bề mặt chức năng, bề mặt khách nhìn thấy, vùng cấm burr, vùng cấm chạm tay, vùng cần ảnh chụp chứng cứ.</div>
+<div class="step-item"><strong>Chuẩn bị chi tiết.</strong><br/>Làm sạch bề mặt theo mức cho phép. Với chi tiết clean/vacuum, chỉ dùng phương pháp làm sạch được phép; không tự ý chùi bằng giẻ bẩn hoặc dung môi không phê duyệt.</div>
+<div class="step-item"><strong>Kiểm theo vùng.</strong><br/>Kiểm lần lượt: nhận diện part/rev/label → bề mặt ngoài → cạnh/ren/bo góc → bề mặt kín khít/seat → lỗ, rãnh, khoang khuất → lớp phủ/màu/anodize/passivation → bao gói/nhãn kiện nếu là gate shipping.</div>
+<div class="step-item"><strong>Chụp ảnh và mô tả.</strong><br/>Ảnh phải có toàn cảnh và cận cảnh; mô tả phải có vị trí, kích thước/ước lượng, hướng nhìn, số lượng chiếc bị ảnh hưởng và mức lỗi dự kiến.</div>
+<div class="step-item"><strong>Ra quyết định.</strong><br/>Nếu còn nghi ngờ giữa hai mức lỗi, phải escalation cho QA Lead/Quality Engineer; không tự hạ mức. Lỗi critical/major gắn ngay HOLD status và đi <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
 </div></div>
-</div></div></div>
-<script src="../../../assets/app.js"></script>
+
+<div class="section"><h2>4. Thư viện lỗi thường gặp theo nhóm công đoạn</h2>
+<div class="table-card"><table><thead><tr><th>Nhóm lỗi</th><th>Dấu hiệu nhận biết</th><th>Điểm cần làm rõ</th><th>Tài liệu liên kết</th></tr></thead><tbody>
+<tr><td>Burr / edge break</td><td>Cạnh sắc, ba via, bavia kéo sợi, chamfer thiếu hoặc quá tay.</td><td>Có ở vùng seal/fit/thread không? Có nguy cơ FOD hoặc cắt tay khách không?</td><td><a href="../../01-SOPs/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html">SOP-505</a>, <a href="../05-WI-500/wi-516-machine-operation-quick-card.html">WI-516</a></td></tr>
+<tr><td>Scratch / dent / ding</td><td>Vết cào, móp, dập, va chạm khi xếp khay hoặc kẹp.</td><td>Nằm ở bề mặt chức năng hay cosmetic? Có phá lớp phủ không?</td><td><a href="../../03-Reference/02-ANNEX-Standards/annex-whs-001-packaging-labeling-spec.html">ANNEX-WHS-001</a></td></tr>
+<tr><td>Chatter / tool mark / mismatch finish</td><td>Sóng bề mặt, vân dao bất thường, bề mặt không đồng nhất.</td><td>Ảnh hưởng Ra/Rz, sealing, vacuum, coating adhesion hay không?</td><td><a href="../../03-Reference/02-ANNEX-Standards/annex-qa-007-surface-finish-vacuum-compatibility.html">ANNEX-QA-007</a></td></tr>
+<tr><td>Plating / anodize / passivation anomaly</td><td>Loang màu, chảy mép, bỏ sót, blister, peeling, stain sau xử lý bề mặt.</td><td>Có đủ cert/lot? Có ở vùng cấm mask/unmask không?</td><td><a href="../../03-Reference/02-ANNEX-Standards/annex-pur-002-outsource-special-process-pack.html">ANNEX-PUR-002</a></td></tr>
+<tr><td>Foreign matter / contamination</td><td>Chip, xơ vải, bột trắng, dầu bẩn, tape residue, marker.</td><td>Ở vùng clean/vacuum/gas path hay chỉ ở bao gói ngoài?</td><td><a href="../../03-Reference/01-ANNEX-System/annex-qms-017-fod-prevention-program.html">ANNEX-QMS-017</a></td></tr>
+<tr><td>Traceability / labeling defect</td><td>Thiếu nhãn, sai part/rev/qty/lot, không đọc được barcode.</td><td>Ảnh hưởng nhầm lẫn lô hay customer paperwork không?</td><td><a href="../02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>, <a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>5. Ghi nhận, hold và KPI</h2>
+<div class="two-col">
+<div class="card"><h3>Evidence tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Mã Job/WO, part/rev, lot/qty, công đoạn, người kiểm, thời gian.</li><li>Ảnh lỗi đủ thấy vị trí và mức độ.</li><li>Defect class, quyết định accept/reject/hold, phạm vi ảnh hưởng.</li><li>Liên kết tới NCR/containment nếu có.</li></ul></div>
+<div class="card"><h3>HOLD bắt buộc</h3><ul class="tight" style="padding-left:18px;"><li>Không xác định được defect class hoặc tiêu chí chuẩn.</li><li>Lỗi critical/major ở bề mặt chức năng, clean, vacuum, gas path hoặc customer-facing.</li><li>Thiếu truy vết, thiếu cert, sai label, nghi nhầm part/rev.</li><li>Phát hiện lỗi lặp có xu hướng tăng nhưng chưa khoanh được nguyên nhân.</li></ul></div>
+</div>
+<div class="kpi-grid">
+<div class="kpi-box"><strong>KPI-WI601-01</strong><br/>Tỷ lệ escape do visual defect phát hiện sau gate cuối.</div>
+<div class="kpi-box"><strong>KPI-WI601-02</strong><br/>Tỷ lệ classification mismatch giữa Inspector và QA review.</div>
+<div class="kpi-box"><strong>KPI-WI601-03</strong><br/>Tỷ lệ lô phải tái kiểm do evidence ảnh/mô tả không đủ.</div>
+<div class="kpi-box"><strong>KPI-WI601-04</strong><br/>Top 5 defect type theo part family / process family.</div>
+</div>
+<div class="table-card"><table><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-603-aql-sampling-inspection.html">SOP-603</a></td><td>Khung AQL cho lot inspection.</td></tr>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>Gate kiểm cuối và phát hành giao hàng.</td></tr>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td><td>Containment, NCR và phản ứng khi lỗi phát hiện.</td></tr>
+<tr><td><a href="wi-603-aql-sampling-inspection-execution.html">WI-603</a></td><td>Hướng dẫn lấy mẫu AQL và quyết định accept/reject.</td></tr>
+<tr><td><a href="wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a></td><td>Gate kiểm cuối, CoC/CofC và handoff shipment.</td></tr>
+</tbody></table></div></div>
+
+    </div>
+  </div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

@@ -1,0 +1,34 @@
+{
+  "release_id": "FRM-V0-BASELINE",
+  "revision": "V0",
+  "release_date": "2026-03-21",
+  "delivery_profile": "download_only_desktop_excel",
+  "scope": {
+    "released_workbooks": 111,
+    "not_issued_codes_in_v0": 5,
+    "series_folders": [
+      "01-FRM-100",
+      "02-FRM-200",
+      "03-FRM-300",
+      "04-FRM-400",
+      "05-FRM-500",
+      "06-FRM-600",
+      "07-FRM-700",
+      "08-FRM-800",
+      "09-FRM-900"
+    ]
+  },
+  "controls": {
+    "checksum_registry": "01-QMS-Portal/qms-data/config/form_control_registry.json",
+    "portal_docs_catalog": "01-QMS-Portal/qms-data/config/docs_custom.json",
+    "attachment_policy": "04-Bieu-Mau/.htaccess",
+    "impact_note": "Update all affected system documents before release closure."
+  },
+  "owner_signoff": {
+    "functional_owner": "",
+    "qa_qms_owner": "",
+    "it_owner": "",
+    "approved_at": ""
+  },
+  "change_note": "Initial controlled baseline V0. No archive or backup retained in repository package."
+}

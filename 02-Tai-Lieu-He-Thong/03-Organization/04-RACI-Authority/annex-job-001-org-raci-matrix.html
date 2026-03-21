@@ -6,7 +6,6 @@
 <title>ANNEX-JOB-001 — RACI Matrix &amp; SLA (RFQ → Cash) | HESEM QMS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
-
 /* PAGE BREAK & OVERFLOW FIX */
 @media print {
  .card, .table-card, .callout, .note, .box, .iso-map,
@@ -69,6 +68,60 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .phase-card p:last-child,.role-boundary p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
 .small-note{font-size:12px;color:var(--ink2);}
 
+
+
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
+.toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.toc-grid a{display:block;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2)}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg)}
+.metric-card .value{font-weight:800;font-size:16px;color:var(--navy);margin:6px 0}
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+.check-item{border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
+.process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.mini-note{font-size:12px;color:var(--ink2)}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+.decision-table th,.decision-table td{vertical-align:top}
+@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
+
+.doc-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+.doc-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.card h3{margin-top:0}
+.small{font-size:12px;color:var(--ink3);}
+.tight p{margin:8px 0;}
+.legend-row{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 18px;}
+.legend-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:8px 10px;font-size:12px;}
+.legend-swatch{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;border:1px solid var(--ln2);}
+.kpi-good{background:#ebfbee;color:#2b8a3e}
+.kpi-warn{background:#fff9db;color:#e67700}
+.kpi-bad{background:#fff5f5;color:#c92a2a}
+.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;white-space:nowrap}
+.matrix-table{width:100%;border-collapse:collapse;font-size:12px;}
+.matrix-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--navy);background:var(--th-bg);border:1px solid var(--th-bdr);text-transform:uppercase;letter-spacing:.3px;vertical-align:bottom}
+.matrix-table td{padding:8px 10px;border:1px solid var(--ln2);vertical-align:top;line-height:1.45}
+.matrix-table tbody tr:nth-child(even){background:#fafcfe}
+.matrix-table .section-row td{background:var(--navy)!important;color:#fff;font-weight:700;letter-spacing:.4px}
+.center{text-align:center}
+.nowrap{white-space:nowrap}
+.cell-a{background:#e3f2fd;color:#1565c0;font-weight:800;text-align:center}
+.cell-p{background:#fff3e0;color:#e65100;font-weight:700;text-align:center}
+.cell-v{background:#f3e5f5;color:#7b1fa2;font-weight:700;text-align:center}
+.cell-c{background:#fff9db;color:#e67700;font-weight:700;text-align:center}
+.cell-i{background:#e8f5e9;color:#2e7d32;font-weight:600;text-align:center}
+.cell-x{background:#f8f9fa;color:#868e96;text-align:center}
+.badge-strip{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.badge-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--ln);padding:6px 10px;border-radius:999px;font-size:12px}
+.footer-note{margin-top:18px;padding:14px 16px;border:1px dashed var(--ln2);border-radius:12px;background:var(--bg2);color:var(--ink2)}
+
+
 </style>
 </head>
 <body>
@@ -77,30 +130,44 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
     <div class="page-body">
       <div class="form-header">
         <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu kiểm soát</span>
-          </div>
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
         </div>
         <div class="title">
           <strong>ANNEX-JOB-001 — RACI Matrix &amp; SLA (RFQ → Cash)</strong>
-          <span class="sub-vn">Tóm tắt owner, SLA và hold point trên chuỗi giá trị</span>
+          <span class="sub-vn">Trang điều hướng value-stream để nối RFQ → Cash với authority, RACI chi tiết, KPI và deputy coverage</span>
         </div>
         <div class="meta">
           <div class="row"><span><b>Mã:</b></span><span>ANNEX-JOB-001</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V1.0</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
           <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>CEO / Customer Service / QA Manager</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager</span></div>
           <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
         </div>
       </div>
       <div class="doc-content" id="docContent">
         <div class="form-sheet">
-<div class="iso-map"><div class="iso-title">Mục đích</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Annex này là bản tóm tắt vận hành nhanh cho chuỗi RFQ → Cash, dùng trong họp liên phòng ban và onboarding để hiểu owner, SLA và điểm nghẽn cần escalated.</div></div></div>
-<h2 class="h2">1. RACI / SLA cấp value-stream</h2><div class="table-card"><table class="table"><colgroup><col style="width:24%"/><col style="width:18%"/><col style="width:12%"/><col style="width:22%"/><col style="width:24%"/></colgroup><thead><tr><th>Bước giá trị</th><th>Owner chính</th><th>SLA mục tiêu</th><th>Hold point điển hình</th><th>Escalation route</th></tr></thead><tbody><tr><td>RFQ logging & completeness check</td><td>Customer Service</td><td>4 giờ làm việc</td><td>Thiếu drawing/spec/revision/CSR</td><td>Customer Service escalates Estimator + DFM</td></tr><tr><td>Technical feasibility review</td><td>DFM Engineer</td><td>1–3 ngày tùy độ khó</td><td>CTQ mơ hồ; method/special process chưa rõ</td><td>DFM escalates Engineering Lead + Quality + SCM</td></tr><tr><td>Cost build & quote release</td><td>Estimator</td><td>1–2 ngày sau khi đủ feasibility</td><td>Assumption chưa khóa; margin / NRE / lead time chưa duyệt</td><td>Estimator escalates CEO / Customer Service</td></tr><tr><td>PO acknowledgment</td><td>Customer Service</td><td>Trong 24 giờ sau order acceptance</td><td>PO mismatch, delivery promise conflict, missing flow-down</td><td>Customer Service escalates CEO / Planner / SCM</td></tr><tr><td>Routing / NC / method release</td><td>Process Engineer / CAM</td><td>Trước planned start theo route risk</td><td>Revision conflict; missing method / CTQ / fixture</td><td>Engineering escalates Workshop + QA</td></tr><tr><td>Material / outsource readiness</td><td>Supply Chain Manager</td><td>Trước job release</td><td>Missing cert / delay vendor / lot traceability gap</td><td>SCM escalates Planner + Customer Service</td></tr><tr><td>Dispatch / schedule confirmation</td><td>Production Planner</td><td>Mỗi ngày / mỗi ca</td><td>Capacity conflict / missing readiness</td><td>Planner escalates Production Director</td></tr><tr><td>First-off approval</td><td>Setup Technician + Quality gate</td><td>Trước chạy serial</td><td>First-off fail / method not ready</td><td>Setup/Shift escalates Engineering + Quality</td></tr><tr><td>Final inspection & shipment release</td><td>QC Lead / QA</td><td>Trước booking cut-off</td><td>Missing evidence / NCR open / metrology concern</td><td>QC/QA escalates Customer Service + Logistics</td></tr><tr><td>Complaint initial response</td><td>Customer Service + Quality Engineer</td><td>Trong 24 giờ</td><td>Customer escape / containment chưa xác định</td><td>QE escalates QA Manager / CEO</td></tr></tbody></table></div>
-<h2 class="h2">2. Cách dùng</h2><ul><li>Dùng annex này cho daily/tier meeting liên phòng ban khi cần nhìn toàn chuỗi thay vì nhìn từng SOP riêng lẻ.</li><li>SLA là mục tiêu vận hành nội bộ; khi có CSR hoặc yêu cầu khách hàng chặt hơn, yêu cầu khách hàng được ưu tiên.</li><li>Nếu một bước lặp lại tình trạng hold nhiều lần, phải mở corrective action hoặc improvement project chứ không chỉ escalate miệng.</li></ul>
-<div class="footer-note">Bản tóm tắt này phải được đọc cùng REF-020, SOP-201, SOP-301, SOP-501, SOP-605 và ANNEX-QMS-025.</div>
+          <div class="iso-map">
+            <div class="iso-title">Department / annex control intent</div>
+            <div class="req"><span class="req-tag shall">PHẢI</span><div>Trang này chỉ cung cấp bức tranh RFQ → Cash ở mức điều hướng. Ma trận chi tiết phải tra ANNEX-QMS-026 và authority ở ANNEX-QMS-025.</div></div><div class="req"><span class="req-tag should">NÊN</span><div>Dùng khi onboarding hoặc review nhanh các giao điểm value-stream, không dùng thay activity-level RACI.</div></div>
+          </div>
+          <div class="preface-block">
+            <div class="grid-2">
+              <div>
+                <p><b>Value-stream clusters</b></p>
+                <div><span class="inline-tag">Commercial</span><span class="inline-tag">Engineering</span><span class="inline-tag">Production</span><span class="inline-tag">Quality</span><span class="inline-tag">Supply Chain</span><span class="inline-tag">Finance</span><span class="inline-tag">HR/IT/EHS</span></div>
+              </div>
+              <div>
+                <p><b>Tài liệu active</b></p>
+                <div><span class="inline-tag">ANNEX-QMS-025</span><span class="inline-tag">ANNEX-QMS-026</span><span class="inline-tag">ANNEX-QMS-027</span><span class="inline-tag">ANNEX-QMS-028</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. RACI value-stream RFQ → Cash</a><a href="#s2">2. SLA / escalation cốt lõi</a><a href="#s3">3. Tài liệu active thay thế chi tiết</a></div></div>
+          <h2 class="h2" id="s1">1. RACI value-stream RFQ → Cash</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:20%"/><col style="width:22%"/><col style="width:40%"/></colgroup><thead><tr><th>Stage</th><th>A cốt lõi</th><th>R cốt lõi</th><th>Bằng chứng handoff</th></tr></thead><tbody><tr><td>RFQ / quote</td><td>Customer Service / Estimator / CEO theo mức</td><td>CS, EST, Engineering</td><td>RFQ package, assumptions, technical/commercial review.</td></tr><tr><td>Order review / planning</td><td>CEO / PD / ENGM theo family quyết định</td><td>CS, PPL, ENGM, QA, SCM</td><td>Reviewed order, capacity/material/gate readiness.</td></tr><tr><td>Make / inspect</td><td>PD / QA theo gate</td><td>WKM, shopfloor, QA, Engineering</td><td>Traveler/dossier, first-piece/in-process/final evidence.</td></tr><tr><td>Ship / invoice</td><td>QA / Finance theo gate</td><td>Shipping, CS, Finance</td><td>Final release, ship proof, invoice request.</td></tr><tr><td>Cash / close</td><td>Finance Manager / CEO theo authority</td><td>APAR, GLP, Finance</td><td>AR/AP/close evidence, reconciliations, approvals.</td></tr></tbody></table></div><h2 class="h2" id="s2">2. SLA / escalation cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:42%"/><col style="width:58%"/></colgroup><thead><tr><th>Khi nào escalte</th><th>Escalation tối thiểu</th></tr></thead><tbody><tr><td>Customer promise rủi ro / hot-rush impact nhiều job</td><td>CEO + PD + CS</td></tr><tr><td>Quality hold / suspected escape / stop-ship risk</td><td>QA + CEO + CS</td></tr><tr><td>Material shortage / outsource failure ảnh hưởng due date</td><td>SCM + PD + CS</td></tr><tr><td>Payroll / payment / close issue ảnh hưởng deadline hoặc cash</td><td>Finance Manager + CEO</td></tr><tr><td>Outage hệ thống / continuity trigger</td><td>ITA/ESA + CEO + owner affected process</td></tr></tbody></table></div><h2 class="h2" id="s3">3. Tài liệu active thay thế chi tiết</h2>
+<p>Đọc cùng <a href="annex-qms-026-raci-master-matrix.html">ANNEX-QMS-026</a> cho activity-level RACI, <a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a> cho quyền phê duyệt/nhả giữ, <a href="annex-qms-027-kpi-cascade-dictionary.html">ANNEX-QMS-027</a> cho KPI owner và <a href="annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a> cho continuity người thay thế.</p>
+<div class="footer-note">Trang điều hướng này đã được refresh theo bộ ANNEX active; mọi quyết định chi tiết phải dùng bản chuẩn liên kết ở trên.</div>
+
         </div>
       </div>
     </div>

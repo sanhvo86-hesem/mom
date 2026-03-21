@@ -2,104 +2,85 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>WI-512 — 3 Axis Vertical Milling Guide | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WI-512 — Hướng dẫn vận hành máy phay đứng 3 trục | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
-/* === PAGE BREAK & OVERFLOW FIX (auto-applied) === */
 @media print {
-  .card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.vstep{page-break-inside:avoid;break-inside:avoid}
-  h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}
-  .form-header,.sig-row,.sign-row{page-break-inside:avoid;break-inside:avoid}
-  tr{page-break-inside:avoid;break-inside:avoid}
-  thead{display:table-header-group}tfoot{display:table-footer-group}
-  p{orphans:3;widows:3}.table-card{overflow:visible!important}
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
 }
-.page-body{overflow-x:hidden}
-.table-card,.table-block,.table-wrap{overflow-x:auto;max-width:100%}
-table{max-width:100%;table-layout:auto}
-td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 </head>
 <body>
-<div class="container"><div class="page"><div class="page-body">
-<div class="form-header">
-<div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Work Instruction</span>
+          </div>
+        </div>
+        <div class="title"><strong>WI-512 — Hướng dẫn vận hành máy phay đứng 3 trục</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>WI-512</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>Production Manager / Engineering Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi Job chạy trên VMC 3 trục hoặc máy phay/khoan có logic setup tương đương.</div>
+      <h1>WI-512 — Hướng dẫn vận hành máy phay đứng 3 trục</h1>
+      <div class="section"><h2>1. Mục đích, phạm vi và ranh giới</h2><p>WI này chuẩn hóa thao tác tại máy phay đứng 3 trục từ lúc nhận máy đến lúc bàn giao Job. Mục tiêu là giữ đúng WCS, đúng tool, đúng vùng kẹp, đúng first-piece và giữ quá trình ổn định trong suốt ca chạy. WI này áp dụng cho VMC 3 trục, máy khoan/phay cùng logic trục X/Y/Z và các setup không có rotary 5-axis.</p><div class="callout-danger"><strong>CẤM</strong> bỏ warm-up khi máy vừa mở đầu ca, bỏ verify WCS sau changeover, dùng lại offset của Job trước, hoặc chạy qua clamp/soft jaw mà chưa chứng minh clearance.</div></div><div class="section"><h2>2. Chuẩn bị trước khi chạy</h2><div class="table-card"><table><thead><tr><th>Hạng mục</th><th>Yêu cầu bắt buộc</th><th>Pass/Fail</th></tr></thead><tbody><tr><td>Tình trạng máy</td><td>Điện/khí/coolant/bôi trơn/chip conveyor/guard/interlock bình thường; vùng làm việc sạch</td><td>Thiếu 1 mục = không nhận máy</td></tr>
+<tr><td>Tài liệu</td><td>Job packet, setup sheet, tool list, program release, gate trạng thái mở</td><td>Thiếu hoặc mâu thuẫn = HOLD</td></tr>
+<tr><td>Đồ gá / vật tư</td><td>Fixture đúng revision, mặt tựa sạch, clamp đủ lực và đủ khoảng hở dao</td><td>Không chứng minh được = HOLD</td></tr>
+<tr><td>Dụng cụ cắt</td><td>Tool đúng pocket, đúng gauge length/holder, tình trạng sắc bén phù hợp, tool life/reset đúng</td><td>Sai pocket hoặc tool mòn vượt ngưỡng = không chạy</td></tr>
+</tbody></table></div></div><div class="section"><h2>3. Setup và prove-out tại máy</h2><h3>3.1 Xác lập WCS và offset</h3><ul><li>Làm zero theo method đã release. Cấm tự đổi method nếu chưa được Engineering chấp thuận.</li><li>Probe/edge finder phải ở trạng thái dùng được; nếu probe bị nghi ngờ sau va chạm, chuyển sang WI-516 và xác minh lại trước khi tiếp tục.</li><li>Ghi nhận offset/wear theo trường dữ liệu quy định; không để note rời không kiểm soát.</li></ul><h3>3.2 Dry-run và first cut</h3><ul><li>Chạy graphics hoặc simulation đã được release; sau đó air-cut hoặc dry-run với mức override an toàn cho đoạn có rủi ro cao.</li><li>Đoạn tiếp cận đầu tiên tới clamp, pocket sâu, khoan dài hoặc dao có gauge length lớn phải quan sát trực tiếp.</li><li>Bất kỳ dấu hiệu rung, cạ clamp, chip tích bất thường, phun coolant lệch, tiếng cắt không ổn định đều phải dừng và điều chỉnh có kiểm soát.</li></ul><h3>3.3 First-piece</h3><div class="table-card"><table><thead><tr><th>Điểm kiểm</th><th>Yêu cầu</th></tr></thead><tbody><tr><td>Kích thước/CTQ đầu tiên</td><td>Đo đủ theo first-piece / control plan / balloon nếu áp dụng</td></tr>
+<tr><td>Bề mặt và bavia</td><td>Kiểm ngay sau nguyên công; xác nhận burr-risk area và edge break requirement</td></tr>
+<tr><td>Đối chiếu chương trình - thực tế</td><td>Program comment, tool call, offset, operation note phải khớp với thao tác thực tế</td></tr>
+<tr><td>Release chạy tiếp</td><td>Chỉ được chạy tiếp khi gate first-piece đã mở theo WI-302/SOP-302</td></tr>
+</tbody></table></div></div><div class="section"><h2>4. Kiểm soát trong khi chạy và kết thúc Job</h2><h3>4.1 Trong khi chạy</h3><ul><li>Theo dõi spindle load, âm thanh cắt, chip color/form, coolant coverage, tool wear và bề mặt cắt; không chờ tới khi part ra lỗi mới phản ứng.</li><li>Đối với CTQ nhạy drift, giữ nhịp đo theo control plan hoặc theo chỉ thị first-piece release.</li><li>Khi thay dao, phải xác nhận lại tool identity, offset/wear entry và part status bị ảnh hưởng.</li></ul><h3>4.2 Kết thúc và bàn giao</h3><ul><li>Làm sạch bàn máy, đồ gá, khay WIP và khu đặt hồ sơ; không để chip hoặc part còn lẫn.</li><li>Bàn giao rõ trạng thái tool, offset wear, part count, hàng nghi ngờ, hàng sample, và công đoạn tiếp theo.</li><li>Nếu Job chưa hoàn tất hết ca, để lại trạng thái máy an toàn, hồ sơ rõ ràng và nhãn WIP đúng trạng thái.</li></ul><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">First-pass first-piece; setup-related scrap; số lần dừng do WCS/offset/tool mismatch; số lần clamp/fixture interference gần xảy ra.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;">SOP-502, SOP-504, SOP-503, WI-302, WI-517, WI-519, WI-516, ANNEX-ENG-001, ANNEX-HSE-001.</div></div></div></div>
+    </div>
   </div>
 </div>
-<div class="title">
-  <strong>WI-512 — 3 Axis Vertical Milling Guide</strong>
-  <span class="sub-vn"></span>
-</div>
-<div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>WI-512</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>Process Engineer / CNC Workshop Manager</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-</div>
-</div>
-<div class="doc-content" id="docContent"><div class="form-sheet">
-
-<h2 class="h2">1. Mục đích</h2><p>Dùng tại VMC 3 trục cho mọi job release vào cell phay đứng.</p>
-
-<h2 class="h2">2. PPE</h2><ul>
-  <li>Kính, giày bảo hộ, quần áo gọn, không trang sức lỏng.</li>
-  <li>Không dùng găng tay khi spindle đang quay hoặc khi thao tác gần tool quay.</li>
-</ul>
-
-<h2 class="h2">3. Dụng cụ</h2><ul>
-  <li>Job packet / setup sheet / program release</li>
-  <li>Probe hoặc edge finder theo quy định</li>
-  <li>Dụng cụ vệ sinh chip, torque wrench khi áp dụng</li>
-  <li>FRM-511, FRM-513</li>
-</ul>
-
-<h2 class="h2">4. Các bước</h2><h3 class="h3">4.1 Chuẩn bị trước khi chạy</h3><ol>
-  <li>Warm-up máy; kiểm tra bôi trơn, coolant, khí nén, chip conveyor và tình trạng guard/interlock.</li>
-  <li>Xác nhận WCS đúng setup sheet; dán nhận diện G54/G55 khi có nhiều fixture.</li>
-  <li>Kiểm tool list, tool length/diameter offset, holder condition và safe retract.</li>
-</ol>
-
-<h3 class="h3">4.2 Setup và tool path</h3><ul>
-  <li>Load program từ nguồn đã release; đọc header/comment PN-rev-op trước khi cycle start.</li>
-  <li>Dry-run single block hoặc feed override thấp cho vùng gần clamp, pocket sâu, contour dài và tool change đầu tiên.</li>
-  <li>Đảm bảo dao có reach đủ nhưng không quá dài gây rung; ưu tiên shorten gauge length khi có thể.</li>
-</ul>
-
-<h3 class="h3">4.3 First piece và kiểm trong quá trình</h3><ul>
-  <li>Đo toàn bộ CTQ và feature rủi ro sau first piece; sau khi thay dao lớn hoặc sửa offset ngoài wear bình thường thì kiểm lại đặc tính bị ảnh hưởng.</li>
-  <li>Theo dõi burr, chatter marks, tool witness, size drift và chip packing trong pocket sâu.</li>
-  <li>Bề mặt yêu cầu Ra thấp cần kiểm tool edge, coolant delivery và chiến lược finishing pass ổn định.</li>
-</ul>
-
-<h3 class="h3">4.4 Yêu cầu đặc thù bán dẫn</h3><ul>
-  <li>Dung sai ±0.005-0.025 mm và Ra 0.4-0.8 μm yêu cầu warm-up đủ, fixture sạch, tool sharp và offset sửa có kiểm chứng.</li>
-  <li>Bề mặt chức năng, sealing face hoặc bề mặt nhạy xước <b>PHẢI</b> tránh chạm tay trần, tránh kéo lê chi tiết trên bàn máy và phải có bảo vệ sau khi tháo khỏi fixture.</li>
-  <li>Chip, coolant residue và bavia nhỏ có thể trở thành nguồn contamination; sau mỗi nguyên công cần vệ sinh có kiểm soát và giữ part trên khay sạch.</li>
-</ul>
-
-<h2 class="h2">5. Tiêu chí</h2><div class="table-card"><table class="table"><thead><tr><th>Tiêu chí</th><th>Đạt khi</th></tr></thead><tbody><tr><td>WCS/offset</td><td>Đúng setup sheet, verify bằng điểm chuẩn hoặc probing</td></tr><tr><td>Tool path</td><td>Không có risk va chạm, retract an toàn, holder clearance đạt</td></tr><tr><td>First piece</td><td>CTQ, burr và surface pass trước khi chạy batch</td></tr><tr><td>In-process</td><td>Không có drift lặp và không có dấu hiệu chatter/chip packing</td></tr></tbody></table></div>
-
-<h2 class="h2">6. Xử lý bất thường</h2><ul>
-  <li>Chatter hoặc nhám xấu: kiểm độ dài dao, runout, tool wear, fixture rigidity, step-over/feed.</li>
-  <li>Burr tăng nhanh: kiểm tool sharpness, path exit, chip evacuation và chiến lược finishing.</li>
-  <li>Offset phải sửa liên tục cùng một chiều: gọi QC/Engineering để điều tra drift, không tiếp tục chạy mù.</li>
-</ul>
-
-<h2 class="h2">7. SOP liên quan</h2><ul>
-  <li><a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a> Vận hành gia công CNC</li>
-  <li><a href="../../01-SOPs/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html">SOP-503</a> Bảo trì - Tooling, PM &amp; Ứng phó sự cố</li>
-  <li><a href="../../../04-Bieu-Mau/05-FRM-500/frm-511-setup-and-first-piece-record.html">FRM-511</a> Phiếu Setup &amp; First Piece</li>
-  <li><a href="../../../04-Bieu-Mau/05-FRM-500/frm-513-tool-life-log.html">FRM-513</a> Nhật ký Tool Life</li>
-</ul>
-
-</div></div>
-
-</div></div></div>
 </body>
 </html>

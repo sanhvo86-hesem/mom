@@ -2,92 +2,89 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>WI-511 — Machine Type Quick Reference | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WI-511 — Thẻ nhanh theo loại máy, điểm rủi ro crash, safe start và safe recovery | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
-/* === PAGE BREAK & OVERFLOW FIX (auto-applied) === */
 @media print {
-  .card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.vstep{page-break-inside:avoid;break-inside:avoid}
-  h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}
-  .form-header,.sig-row,.sign-row{page-break-inside:avoid;break-inside:avoid}
-  tr{page-break-inside:avoid;break-inside:avoid}
-  thead{display:table-header-group}tfoot{display:table-footer-group}
-  p{orphans:3;widows:3}.table-card{overflow:visible!important}
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
 }
-.page-body{overflow-x:hidden}
-.table-card,.table-block,.table-wrap{overflow-x:auto;max-width:100%}
-table{max-width:100%;table-layout:auto}
-td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 </head>
 <body>
-<div class="container"><div class="page"><div class="page-body">
-<div class="form-header">
-<div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Work Instruction</span>
+          </div>
+        </div>
+        <div class="title"><strong>WI-511 — Thẻ nhanh theo loại máy, điểm rủi ro crash, safe start và safe recovery</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>WI-511</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>Production Manager / Engineering Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng trước khi nhận máy, nhận Job mới, đổi cell hoặc khi cần xác định nhanh machine family phù hợp và mức rủi ro vận hành.</div>
+      <h1>WI-511 — Thẻ nhanh theo loại máy, điểm rủi ro crash, safe start và safe recovery</h1>
+      <div class="section"><h2>1. Mục đích và cách dùng</h2><p>WI này là thẻ nhanh để chọn đúng family máy, nhắc rủi ro crash theo từng loại máy và nhắc quy tắc safe start / safe recovery trước khi mở các WI máy chi tiết. WI này không thay cho routing, setup sheet hoặc machine-specific guide. Khi routing hoặc setup sheet đã release, WI này chỉ dùng để tự kiểm và nhận diện rủi ro trước khi chạy.</p><div class="callout-warning"><strong>QUY TẮC</strong> chọn máy theo khả năng kiểm soát rủi ro và độ ổn định quá trình, không chọn chỉ vì máy đang rảnh. Bất kỳ nghi ngờ nào về envelope, độ cứng vững, rotary clearance, part transfer hoặc tailstock/steady rest đều phải escalated trước khi release.</div></div><div class="section"><h2>2. Bảng tra nhanh theo loại máy</h2><div class="table-card"><table><thead><tr><th>Loại máy</th><th>Dùng tốt cho</th><th>Rủi ro điển hình</th><th>Điểm dừng bắt buộc</th></tr></thead><tbody><tr><td>VMC 3 trục</td><td>Pocket, face, drilling/tapping, contour cơ bản, đồ gá đơn giản, bề mặt dễ nhìn thấy</td><td>Sai WCS, kẹp thấp, chip tích trong pocket, dao dài rung</td><td>Không rõ mặt chuẩn / không chứng minh được clamp clearance</td></tr>
+<tr><td>Máy 5 trục</td><td>Nhiều mặt, contour phức, giảm lần gá, yêu cầu concentricity/position qua nhiều mặt</td><td>Crash rotary, sai RTCP/kinematic, đồ gá vượt envelope, va holder</td><td>Chưa simulation và chưa prove-out góc quay nguy hiểm</td></tr>
+<tr><td>Tiện CNC</td><td>Part tròn xoay, trục, ren, rãnh, cắt đứt, live tooling mức vừa</td><td>Phôi văng, grip length thiếu, parting kẹt, thread sai pitch, runout</td><td>Stick-out không được kiểm soát hoặc chưa xác nhận tailstock/steady rest</td></tr>
+<tr><td>Mill-turn / multitask</td><td>Part cần tiện + phay + khoan + transfer trên một máy, giảm số lần gá</td><td>Sync sai, mode sai, va turret/spindle, part transfer lỗi, plane sai</td><td>Chưa làm rõ coordinate system, channel sync hoặc transfer sequence</td></tr>
+<tr><td>CMM / kiểm ngoài máy</td><td>Verification CTQ, FAI, hình học phức</td><td>Probe/path sai, fixture đo không ổn định, nhầm part/rev</td><td>Không có balloon/plan đo hoặc chưa xác nhận part orientation</td></tr>
+</tbody></table></div></div><div class="section"><h2>3. Safe start, stop và gọi hỗ trợ</h2><ul><li>Trước khi chạy lần đầu hoặc sau đổi Job, người nhận máy phải xác nhận <span class='code'>đúng Part/Rev - đúng machine family - đúng setup sheet - đúng program release - đúng gate mở</span>.</li><li>Nếu thấy guard/interlock, air pressure, coolant, lubrication, chip conveyor hoặc hệ giữ phôi bất thường, dừng nhận máy và gọi người có trách nhiệm. Không dùng quick reference để hợp thức hóa việc chạy tạm.</li><li>Khi có tiếng va chạm, rung bất thường, dấu hiệu quá tải, phôi kẹp không ổn, mảnh dao mất, chip kẹt ở vùng quan sát quan trọng hoặc bất kỳ tình huống không hiểu rõ nguyên nhân, phải chuyển sang WI-516 ngay.</li></ul><div class="keyline"><strong>Nhắc nhanh theo chuẩn an toàn:</strong> vùng point of operation, rotating parts, ingoing nip points, flying chips và sparks phải được bảo vệ; mọi can thiệp tay vào vùng nguy hiểm phải thực hiện khi máy ở trạng thái an toàn và được phép can thiệp.</div></div><div class="section"><h2>4. Khi nào chuyển sang WI chi tiết</h2><div class="table-card"><table><thead><tr><th>Tình huống</th><th>Tài liệu phải mở tiếp</th></tr></thead><tbody><tr><td>Xác nhận machine family và điểm rủi ro trước chạy</td><td>WI-511 + WI-519</td></tr>
+<tr><td>Setup/changeover/release máy</td><td>WI-517 + WI-519 + ANNEX-ENG-001</td></tr>
+<tr><td>Vận hành phay 3 trục</td><td>WI-512</td></tr>
+<tr><td>Vận hành phay 5 trục</td><td>WI-513</td></tr>
+<tr><td>Vận hành tiện CNC</td><td>WI-514</td></tr>
+<tr><td>Vận hành mill-turn</td><td>WI-515</td></tr>
+<tr><td>Bất thường, restart, crash, mất điện, nghi ngờ chuẩn máy</td><td>WI-516</td></tr>
+</tbody></table></div><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Số lần chọn sai machine family; số lần dừng trước khi crash; số case escalated đúng lúc; số lỗi do người nhận máy không mở đúng WI chi tiết.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;">SOP-502, SOP-503, SOP-703, WI-512~516, WI-517, WI-519, ANNEX-HSE-001, ANNEX-QMS-017.</div></div></div></div>
+    </div>
   </div>
 </div>
-<div class="title">
-  <strong>WI-511 — Machine Type Quick Reference</strong>
-  <span class="sub-vn"></span>
-</div>
-<div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>WI-511</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>Process Engineer / CNC Workshop Manager</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-</div>
-</div>
-<div class="doc-content" id="docContent"><div class="form-sheet">
-
-<h2 class="h2">1. Mục đích</h2><p>Dùng khi routing part mới, đổi cell hoặc cần kiểm nhanh machine-family phù hợp với mức dung sai và bề mặt.</p>
-
-<h2 class="h2">2. PPE</h2><ul>
-  <li>Khi dùng trong văn phòng: không áp dụng PPE đặc biệt.</li>
-  <li>Khi xuống máy xác minh cell: kính và giày bảo hộ.</li>
-</ul>
-
-<h2 class="h2">3. Dụng cụ</h2><ul>
-  <li>Bản vẽ / spec / routing</li>
-  <li>Danh mục machine capability nội bộ</li>
-  <li>Thông tin năng lực CMM và đồ gá</li>
-</ul>
-
-<h2 class="h2">4. Các bước</h2><h3 class="h3">4.1 Bảng tra nhanh</h3><div class="table-card"><table class="table"><thead><tr><th>Loại máy</th><th>Capability chính</th><th>Precision class gợi ý</th><th>Linh kiện bán dẫn phù hợp</th><th>Lưu ý chọn máy</th></tr></thead><tbody><tr><td>VMC 3 trục</td><td>Pocket, face, drill, tapping, contour đơn giản; fixture ổn định</td><td>PC-3: ±0.020 đến ±0.025 mm</td><td>Bracket, cover, block, plate, manifold đơn giản</td><td>Ưu tiên khi datum đơn giản, ít side access, CTQ tập trung 1-2 mặt</td></tr><tr><td>5-axis</td><td>Multi-face, contour phức tạp, giảm số lần gá, kiểm soát tool reach</td><td>PC-1/PC-2: ±0.005 đến ±0.015 mm</td><td>Arm, complex manifold, body có nhiều mặt nghiêng/undercut</td><td>Chọn khi cần giữ tương quan nhiều mặt hoặc giảm stack-up do nhiều lần gá</td></tr><tr><td>CNC lathe</td><td>OD/ID turning, groove, thread, parting, live tool cơ bản</td><td>PC-2/PC-3: ±0.010 đến ±0.020 mm</td><td>Bushing, ring, nozzle body, shaft, fitting tròn xoay</td><td>Kiểm chặt runout, chuck jaw, chip control và parting</td></tr><tr><td>Mill-Turn</td><td>Turning + milling + drilling trên cùng lần gá, transfer/sub-spindle</td><td>PC-1/PC-2: ±0.005 đến ±0.015 mm</td><td>Spool, valve body nhỏ, connector body, part có feature quanh chu vi</td><td>Chọn khi cần giảm re-clamp và giữ đồng tâm/đồng vị trí giữa tiện - phay</td></tr></tbody></table></div>
-
-<h3 class="h3">4.2 Quy tắc chọn máy</h3><ul>
-  <li>Ưu tiên máy giữ được ít lần gá nhất mà vẫn đáp ứng tool access, độ cứng vững và khả năng đo kiểm.</li>
-  <li>Không đưa chi tiết yêu cầu ±0.005 mm hoặc surface critical lên máy chỉ phù hợp PC-3 nếu chưa có xác nhận từ Engineering/QA.</li>
-  <li>Xem thêm lead time setup, risk collision, availability của probe/tool setter, bar feeder, rotary calibration và năng lực người setup.</li>
-</ul>
-
-<h3 class="h3">4.3 Yêu cầu đặc thù bán dẫn</h3><ul>
-  <li>Dung sai thường nằm trong vùng ±0.005-0.025 mm và Ra 0.4-0.8 μm; việc chọn máy phải xem xét đồng thời nhiệt, rung, tool reach và khả năng bảo vệ bề mặt.</li>
-  <li>Chi tiết có bề mặt chức năng hoặc bề mặt wetted <b>PHẢI</b> ưu tiên máy và đồ gá giảm re-clamp, giảm dấu kẹp và giảm nguy cơ xước.</li>
-  <li>Khi chi tiết làm bằng stainless, aluminum sạch hoặc vật liệu dễ xước, cần xem xét riêng coolant cleanliness, chip evacuation và phương án bảo vệ sau gia công.</li>
-</ul>
-
-<h2 class="h2">5. Tiêu chí</h2><div class="table-card"><table class="table"><thead><tr><th>Tiêu chí</th><th>Đạt khi</th></tr></thead><tbody><tr><td>Chọn machine family</td><td>Machine đáp ứng capability, precision class và access của feature</td></tr><tr><td>Chọn setup owner</td><td>Ca làm việc có đủ Setup Technician/Operator phù hợp độ phức tạp</td></tr><tr><td>Rủi ro đã nhìn thấy</td><td>Collision, burr, thermal drift, chip evacuation và đo kiểm đã được tính</td></tr></tbody></table></div>
-
-<h2 class="h2">6. Xử lý bất thường</h2><ul>
-  <li>Không có máy phù hợp theo planning hiện tại: escalated Engineering + Production Director để đổi routing hoặc thương lượng lịch.</li>
-  <li>Machine available nhưng capability nghi ngờ: không gán tạm để “chạy thử”; yêu cầu review kỹ thuật trước.</li>
-  <li>Chi tiết thuộc part family mới: bắt buộc DFM/setup review trước khi release.</li>
-</ul>
-
-<h2 class="h2">7. SOP liên quan</h2><ul>
-  <li><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a> Kỹ thuật - DFM, Báo giá &amp; Lập kế hoạch gia công</li>
-  <li><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a> Lập kế hoạch sản xuất, Lịch trình &amp; Kiểm soát Dispatch</li>
-  <li><a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a> Vận hành gia công CNC</li>
-</ul>
-
-</div></div>
-
-</div></div></div>
 </body>
 </html>

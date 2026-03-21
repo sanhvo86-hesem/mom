@@ -1070,7 +1070,7 @@ function submitForReview(code){
     const currentRev=state.revision||'0';
 
     // Use latest RELEASED revision as the "from" version in the submit modal.
-    // This avoids showing "v1.0 -> v2.0" when the current draft is already v1.0
+    // This avoids showing a misleading revision jump when the current draft is already the current revision
     // based on a released v0.
     const versions=getDocVersions(code)||[];
     let released=null;
