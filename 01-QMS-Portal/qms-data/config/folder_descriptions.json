@@ -1,4 +1,4 @@
-{
+﻿{
   "01-ANNEX-System": "Phụ lục hệ thống — Process Map, ISO Cross-reference Matrix, Evidence Pack",
   "01-C01": "C01 — Workplace Safety & 5S: An toàn lao động, Vệ sinh công nghiệp",
   "01-Competency-System": "Hệ thống năng lực — Framework, 19 Competencies, Level 1-4, Matrix",
@@ -106,7 +106,6 @@
   "05-FRM-500": "Biểu mẫu sản xuất — Job Traveler, Setup Sheet, Downtime Log",
   "05-JD-Supply-Chain": "Chuỗi cung ứng — Supply Chain Manager, Buyer, Logistics Coordinator",
   "05-Labor-Relations": "Quan hệ lao động, thỏa ước tập thể và tài liệu điều phối lao động nội bộ.",
-  "05-Processes": "Bản đồ quy trình và entry pages theo process.",
   "05-SOP-500": "SOP sản xuất: planning, dispatch, tooling, program release, machining execution và finishing.",
   "05-WI-500": "WI sản xuất: setup, changeover, work transfer, pre-run verification và GS1 shipping data.",
   "06-C06": "C06 — Problem Solving: Phân tích nguyên nhân gốc, 8D/5Why/Fishbone",
@@ -116,15 +115,12 @@
   "06-WI-600": "WI chất lượng: gage use, AQL, SPC, final inspection và suspect-product reaction.",
   "07-C07": "C07 — Kaizen & Lean: Cải tiến liên tục, Loại bỏ lãng phí",
   "07-FRM-700": "Biểu mẫu kho vận — GRN, Packing List, Delivery Note, Inventory",
-  "07-Forms-Records": "Entry pages cho form / record library.",
   "07-JD-Finance": "Phòng Tài chính — Finance Manager, AP/AR Accountant, GL/Payroll",
   "07-SOP-700": "Kho vận — Tiếp nhận IQC, Đóng gói, Bảo quản, Xuất hàng",
   "07-WI-700": "WI kho / clean-pack: receiving, storage, environmental control, clean packaging, leak test, FOD.",
   "08-C08": "C08 — Data-Driven Thinking: Tư duy dựa trên dữ liệu, SPC, Pareto",
   "08-FRM-800": "Biểu mẫu nhân sự — Training Record, Competency Matrix, OJT Log",
   "08-JD-HR": "Phòng Nhân sự — HR Manager",
-  "08-Organization": "Entry pages legacy về tổ chức, giữ để điều hướng tương thích.",
-  "08-Organization/03-Job-Descriptions": "Entry pages legacy cho thư viện JD, giữ để điều hướng tương thích.",
   "08-SOP-800": "Nhân sự & HSE — Đào tạo, Truyền thông, An toàn lao động",
   "08-WI-800": "Hướng dẫn nhân sự — OJT checklist, Đánh giá năng lực, Onboarding",
   "09-C09": "C09 — Time Management: Quản lý thời gian, Ưu tiên công việc",
@@ -184,4 +180,8 @@
   "01-QMS-Portal/qms-data/config": "Cấu hình portal cho delivery profile, release workflow, descriptions, visibility, quyền truy cập và metadata của FRM workbook.",
   "04-Bieu-Mau/10-FRM-CONTROL/runtime-examples": "Ví dụ cấu hình triển khai download-only cho FRM workbook baseline V0: Apache, Nginx, IIS, reverse proxy/CDN và ghi chú endpoint Windows.",
   "10-FRM-CONTROL/runtime-examples": "Ví dụ cấu hình triển khai download-only cho FRM workbook baseline V0: Apache, Nginx, IIS, reverse proxy/CDN và ghi chú endpoint Windows."
+
 }
+
+
+

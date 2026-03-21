@@ -1,7 +1,18 @@
+DirectoryIndex index.php index.html
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # Legacy entry pages were removed from the root tree; keep lightweight redirects
+  # for old bookmarks and older training materials that still hit the old URLs.
+  RewriteRule ^05-Processes/?$ 03-Tai-Lieu-Van-Hanh/01-SOPs/index.html [R=302,L,NC]
+  RewriteRule ^05-Processes/index\.html$ 03-Tai-Lieu-Van-Hanh/01-SOPs/index.html [R=302,L,NC]
+  RewriteRule ^07-Forms-Records/?$ 04-Bieu-Mau/index.html [R=302,L,NC]
+  RewriteRule ^07-Forms-Records/index\.html$ 04-Bieu-Mau/index.html [R=302,L,NC]
+  RewriteRule ^08-Organization/03-Job-Descriptions/?$ 02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html [R=302,L,NC]
+  RewriteRule ^08-Organization/03-Job-Descriptions/index\.html$ 02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html [R=302,L,NC]
+
   # Route controlled documents through the portal auth gate while preserving
   # the original URL path for relative links inside HTML documents.
-  RewriteRule ^(archive|02-Tai-Lieu-He-Thong|03-Tai-Lieu-Van-Hanh|04-Bieu-Mau|05-Processes|07-Forms-Records|10-Training-Academy)/(.*)\.(html|xlsx|xlsm|xls|csv)$ 01-QMS-Portal/api.php?action=doc_stream&path=$1/$2.$3 [QSA,L,NC]
+  RewriteRule ^(archive|02-Tai-Lieu-He-Thong|03-Tai-Lieu-Van-Hanh|04-Bieu-Mau|10-Training-Academy)/(.*)\.(html|xlsx|xlsm|xls|csv)$ 01-QMS-Portal/api.php?action=doc_stream&path=$1/$2.$3 [QSA,L,NC]
 </IfModule>

@@ -220,15 +220,15 @@ function first_existing_rel_dir(array $candidates, string $rootDir): string {
 
 function default_folder_for_cat(string $cat, string $rootDir): string {
   $candidates = match ($cat) {
-    'MAN' => ['02-Tai-Lieu-He-Thong/01-Quality-Manual', '02-Quality-Manual'],
-    'POL' => ['02-Tai-Lieu-He-Thong/02-Policies-Objectives', '03-Policies-Objectives'],
-    'ORG', 'JD', 'DEP' => ['02-Tai-Lieu-He-Thong/03-Organization', '08-Organization'],
-    'SOP', 'PROC' => ['03-Tai-Lieu-Van-Hanh/01-SOPs', '04-SOPs', '05-Processes'],
-    'WI' => ['03-Tai-Lieu-Van-Hanh/02-Work-Instructions', '06-Work-Instructions'],
-    'ANNEX' => ['03-Tai-Lieu-Van-Hanh/03-Reference', '09-Annexes-References'],
-    'FRM' => ['04-Bieu-Mau', '07-Forms-Records'],
+    'MAN' => ['02-Tai-Lieu-He-Thong/01-Quality-Manual'],
+    'POL' => ['02-Tai-Lieu-He-Thong/02-Policies-Objectives'],
+    'ORG', 'JD', 'DEP' => ['02-Tai-Lieu-He-Thong/03-Organization'],
+    'SOP', 'PROC' => ['03-Tai-Lieu-Van-Hanh/01-SOPs'],
+    'WI' => ['03-Tai-Lieu-Van-Hanh/02-Work-Instructions'],
+    'ANNEX' => ['03-Tai-Lieu-Van-Hanh/03-Reference'],
+    'FRM' => ['04-Bieu-Mau'],
     'TRN' => ['10-Training-Academy'],
-    default => ['03-Tai-Lieu-Van-Hanh/01-SOPs', '04-SOPs'],
+    default => ['03-Tai-Lieu-Van-Hanh/01-SOPs'],
   };
   return first_existing_rel_dir($candidates, $rootDir);
 }
@@ -1495,6 +1495,25 @@ function users_save(string $usersFile, array $store): void {
   @chmod($usersFile, 0664);
 }
 
+function invalidate_scan_cache(string $dataDir): void {
+  $cacheFile = $dataDir . '/scan_cache.json';
+  if (is_file($cacheFile)) {
+    @unlink($cacheFile);
+  }
+}
+
+function filename_matches_doc_code(string $filename, string $code): bool {
+  $expected = strtoupper(trim($code));
+  if ($expected === '') return false;
+  if (scan_extract_code($filename) === $expected) return true;
+
+  $stem = strtolower(pathinfo($filename, PATHINFO_FILENAME));
+  $slug = slugify($expected);
+  if ($slug === '') return false;
+
+  return $stem === $slug || str_starts_with($stem, $slug . '-');
+}
+
 function find_user_by_username(array $store, string $username): ?array {
   $u = strtolower(trim($username));
   foreach (($store['users'] ?? []) as $user) {
@@ -2101,7 +2120,7 @@ switch ($action) {
     save_custom_docs($CUSTOM_DOCS_FILE, $custom);
 
     // Invalidate scan cache so portal picks up new doc immediately
-    @unlink($DATA_DIR . '/scan_cache.json');
+    invalidate_scan_cache($DATA_DIR);
 
     api_json(['ok' => true, 'doc' => $docObj, 'base_path' => $baseRel, 'state' => $state, 'versions' => $manifest['versions'], 'server_time' => now_iso()]);
 
@@ -2486,7 +2505,7 @@ case 'doc_save_draft': {
 
     $baseRel = safe_rel_path($basePath);
     if (is_reserved_root_segment($baseRel)) api_json(['ok' => false, 'error' => 'invalid_base_path'], 400);
-      if (scan_extract_code(basename($baseRel)) !== strtoupper($code)) {
+      if (!filename_matches_doc_code(basename($baseRel), $code)) {
       api_json(['ok' => false, 'error' => 'code_path_mismatch'], 400);
     }
     $baseAbs = join_in_root($ROOT_DIR, $baseRel);
@@ -2717,7 +2736,7 @@ case 'doc_save_draft': {
     if (trim($basePath) === '') api_json(['ok' => false, 'error' => 'missing_base_path'], 400);
     $baseRel = safe_rel_path($basePath);
     if (is_reserved_root_segment($baseRel)) api_json(['ok' => false, 'error' => 'invalid_base_path'], 400);
-      if (scan_extract_code(basename($baseRel)) !== strtoupper($code)) {
+      if (!filename_matches_doc_code(basename($baseRel), $code)) {
       api_json(['ok' => false, 'error' => 'code_path_mismatch'], 400);
     }
     $dt = human_dt();
@@ -3388,7 +3407,7 @@ if ($username === '') {
         ) {
           continue;
         }
-        if (scan_extract_code($filename) !== $code) continue;
+        if (!filename_matches_doc_code($filename, $code)) continue;
         $found = $file->getPathname();
         $foundRel = $relFound;
         break;
@@ -3487,7 +3506,7 @@ if ($username === '') {
       }
 
       // Invalidate cache
-      @unlink($DATA_DIR . '/scan_cache.json');
+      invalidate_scan_cache($DATA_DIR);
       api_json(['ok' => true, 'code' => $code, 'archived_as' => $archiveName]);
     } catch (Throwable $e) {
       @error_log('[delete_doc] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
@@ -3622,7 +3641,7 @@ if ($username === '') {
       }
 
       // Invalidate cache
-      @unlink($DATA_DIR . '/scan_cache.json');
+      invalidate_scan_cache($DATA_DIR);
       api_json(['ok' => true, 'folder' => $folderPath, 'file_count' => $fileCount, 'doc_codes' => array_values(array_keys($docCodes)), 'archived_as' => $archiveName]);
     } catch (Throwable $e) {
       @error_log('[delete_folder] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
@@ -3664,7 +3683,7 @@ if ($username === '') {
       if (is_dir($targetDir)) api_json(['ok' => false, 'error' => 'folder_exists'], 400);
       if (!@mkdir($targetDir, 0755, true)) api_json(['ok' => false, 'error' => 'mkdir_failed'], 500);
 
-      @unlink($DATA_DIR . '/scan_cache.json');
+      invalidate_scan_cache($DATA_DIR);
       api_json(['ok' => true, 'path' => $targetRel]);
 
     } catch (Throwable $e) {
@@ -3712,7 +3731,7 @@ if ($username === '') {
           ) {
             continue;
           }
-        if (scan_extract_code($file->getFilename()) !== $code) continue;
+        if (!filename_matches_doc_code($file->getFilename(), $code)) continue;
           $found = $file->getPathname();
           break;
         }
@@ -3763,7 +3782,7 @@ if ($username === '') {
     }
 
     // Invalidate cache
-    @unlink($DATA_DIR . '/scan_cache.json');
+    invalidate_scan_cache($DATA_DIR);
 
     // Update custom_docs.json
     try {
@@ -4547,7 +4566,7 @@ if ($username === '') {
         if ($changed) save_custom_docs($CUSTOM_DOCS_FILE, $custom);
       } catch (Throwable $e) { /* non-critical */ }
 
-      @unlink($DATA_DIR . '/scan_cache.json');
+      invalidate_scan_cache($DATA_DIR);
       api_json(['ok' => true, 'new_path' => $newPath, 'updated_files' => $updated]);
 
     } catch (Throwable $e) {
@@ -4639,7 +4658,7 @@ if ($username === '') {
             || str_starts_with($rel, 'assets/')
             || str_starts_with($rel, '11-Glossary/')
           ) continue;
-      if (scan_extract_code($file->getFilename()) !== $oldCode) continue;
+      if (!filename_matches_doc_code($file->getFilename(), $oldCode)) continue;
           $foundFile = $absPath;
           $foundRel = str_replace('\\', '/', $rel);
           break;
@@ -4723,7 +4742,7 @@ if ($username === '') {
       }
       unset($cd);
       if ($changed) save_custom_docs($CUSTOM_DOCS_FILE, $custom);
-      @unlink($DATA_DIR . '/scan_cache.json');
+      invalidate_scan_cache($DATA_DIR);
 
       api_json(['ok' => true, 'new_path' => $renamedRel, 'updated_files' => $updated]);
 

@@ -744,14 +744,16 @@ async function openDoc(code){
   }
 
   if(isDownloadOnlyDoc(doc)){
-    trackPageView('doc/'+code, '⬇️ '+code+' — '+(doc.title||'').substring(0,60));
+    const displayTitle = getDocDisplayTitle(doc);
+    trackPageView('doc/'+code, '⬇️ '+code+' — '+displayTitle.substring(0,60));
     triggerDocDownload(doc);
     showToast(lang==='en' ? 'Downloading workbook: ' + code : 'Đang tải workbook: ' + code);
     return;
   }
 
   // Track document view
-  trackPageView('doc/'+code, '📄 '+code+' — '+(doc.title||'').substring(0,60));
+  const displayTitle = getDocDisplayTitle(doc);
+  trackPageView('doc/'+code, '📄 '+code+' — '+displayTitle.substring(0,60));
   editMode=false;
   editingDoc=null;
   currentDoc=code;
@@ -939,12 +941,15 @@ function updateDocViewerHeader(doc){
   const headerActionsHtml = headerActions
     ? `<div class="dv-action-group dv-edit-actions">${headerActions}</div>`
     : '';
+  const displayTitle = getDocDisplayTitle(doc);
+  const displayDesc = getDocDisplayDescription(doc);
 
   document.getElementById('doc-viewer-header').innerHTML = `
     <div class="dv-top">
       <div class="dv-title-area">
         <div class="dv-code" style="color:${cat.color}">${doc.code} <span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:${statusColor(status)}18;color:${statusColor(status)}">${statusLabel(status)}</span></div>
-        <div class="dv-name">${doc.title}</div>
+        <div class="dv-name">${displayTitle}</div>
+        ${displayDesc ? `<div class="dv-desc">${displayDesc}</div>` : ''}
       </div>
       <div class="dv-top-actions">
         ${headerActionsHtml}
@@ -1189,9 +1194,11 @@ function renderDashboard(){
         ${execShortcuts.map(doc=>{
           const cat=getCatForDoc(doc);
           const locked=!canAccessDoc(doc.code);
+          const displayTitle = getDocDisplayTitle(doc);
+          const displayDesc = getDocDisplayDescription(doc);
           return `<button class="quick-btn" style="border-left-color:#6366f1" onclick="openDoc('${doc.code}')">
             <span class="q-icon">${cat?cat.icon:'📄'}</span>
-            <div><div class="q-label">${doc.title}</div><div class="q-count">${doc.code}</div></div>
+            <div class="q-meta"><div class="q-code">${doc.code}</div><div class="q-label">${displayTitle}</div>${displayDesc?`<div class="q-desc">${displayDesc}</div>`:''}</div>
             ${locked?'<span class="lock">🔒</span>':''}
           </button>`;
         }).join('')}
@@ -1366,19 +1373,21 @@ function renderDocFileList(docs){
   if(docs.length === 0) return `<div class="fm-empty">${T('no_docs')}</div>`;
   let html = `<div class="fm-files">
     <div class="fm-header-row">
-      <span></span><span>${T('doc_code')} / ${T('doc_name')}</span><span>${T('rev')}</span><span>${T('status')}</span><span>${T('access')}</span>
+      <span></span><span>${lang==='en'?'Document code / Standard title':'Mã tài liệu / Tên file chuẩn'}</span><span>${T('rev')}</span><span>${T('status')}</span><span>${T('access')}</span>
     </div>`;
   docs.forEach(doc => {
     const cat = getCatForDoc(doc);
     const locked = !canAccessDoc(doc.code);
     const dragAttr = folderEditMode ? `draggable="true" ondragstart="handleFileDragStart(event,'${escapeHtml(doc.code)}')"` : '';
+    const displayTitle = getDocDisplayTitle(doc);
+    const displayDesc = getDocDisplayDescription(doc);
     html += `
       <div class="fm-file-row ${locked?'locked':''}" ${locked?'':`onclick="openDoc('${doc.code}')"`} ${dragAttr} oncontextmenu="event.preventDefault();event.stopPropagation();openDocEditMenu(event,'${escapeHtml(doc.code)}','${escapeHtml(doc.title)}')" data-doc-code="${doc.code}">
         <div class="fm-file-icon" style="border-color:${cat?cat.color:'#a5b4fc'}">${getDocIcon(doc.code)}</div>
         <div class="fm-file-name">
           <span style="color:${cat?cat.color:'#64748b'}">${doc.code}</span>
-          <small>${doc.title}</small>
-          ${getDocDesc(doc.code)?`<small class="fm-doc-desc">${getDocDesc(doc.code)}</small>`:''}
+          <small>${displayTitle}</small>
+          ${displayDesc?`<small class="fm-doc-desc">${displayDesc}</small>`:''}
         </div>
         <div class="fm-file-rev">v${getDocRevision(doc)}</div>
         <div class="fm-file-status"><span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;background:${statusColor(getDocStatus(doc))}15;color:${statusColor(getDocStatus(doc))}">${statusLabel(getDocStatus(doc))}</span></div>
@@ -1711,16 +1720,16 @@ function openDocEditDialog(code, title){
         </div>
 
         <div class="modal-field" style="margin-top:10px">
-          <label>${lang==='en'?'Title':'Tiêu đề'}</label>
+          <label>${lang==='en'?'Standard title / file name':'Tên file / tiêu đề chuẩn'}</label>
           <input id="de-title" type="text" value="${escapeHtml(title)}" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
         </div>
 
         <div class="modal-field" style="margin-top:10px">
-          <label>${lang==='en'?'Description / Notes':'Ghi chú / Mô tả'}</label>
-          <textarea id="de-desc" rows="2" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;font-size:13px" placeholder="${lang==='en'?'Brief description':'Mô tả ngắn'}">${escapeHtml(desc)}</textarea>
+          <label>${lang==='en'?'Vietnamese description':'Mô tả tiếng Việt'}</label>
+          <textarea id="de-desc" rows="2" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;font-size:13px" placeholder="${lang==='en'?'Brief Vietnamese description':'Mô tả ngắn bằng tiếng Việt'}">${escapeHtml(desc)}</textarea>
         </div>
 
-        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Renaming updates all cross-references automatically':'Đổi mã/tiêu đề sẽ cập nhật tất cả tham chiếu chéo tự động'}</div>
+        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Portal layout follows Code → English standard title → Vietnamese description. Renaming updates all cross-references automatically.':'Portal hiển thị theo thứ tự Mã tài liệu → tên file chuẩn tiếng Anh → mô tả tiếng Việt. Đổi mã/tiêu đề sẽ cập nhật tất cả tham chiếu chéo tự động.'}</div>
       </div>
       <div class="modal-actions">
         <button class="btn-admin" onclick="document.getElementById('doc-edit-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
@@ -2403,15 +2412,25 @@ function handleSearch(q){
   if(!q){ document.getElementById('search-results').innerHTML=''; document.getElementById('search-suggestions').style.display='flex'; return; }
   document.getElementById('search-suggestions').style.display='none';
   const ql = q.toLowerCase();
-  const results = getVisibleDocs().filter(d => d.code.toLowerCase().includes(ql) || d.title.toLowerCase().includes(ql));
+  const results = getVisibleDocs().filter(doc => {
+    const haystack = [
+      doc.code,
+      doc.title,
+      getDocDisplayTitle(doc),
+      getDocDisplayDescription(doc),
+    ].join(' ').toLowerCase();
+    return haystack.includes(ql);
+  });
   document.getElementById('search-results').innerHTML = results.length === 0 
     ? '<div style="padding:24px;color:var(--text-3);text-align:center">'+T('no_results')+' "'+q+'"</div>'
     : results.map(doc => {
       const cat = getCatForDoc(doc);
       const locked = !canAccessDoc(doc.code);
+      const displayTitle = getDocDisplayTitle(doc);
+      const displayDesc = getDocDisplayDescription(doc);
       return `<div class="search-result ${locked?'locked':''}" ${locked?'':`onclick="openDoc('${doc.code}')"`}>
         <div class="sr-badge" style="background:${cat.color}">${cat.icon}</div>
-        <div><div class="sr-code" style="color:${cat.color}">${doc.code}</div><div class="sr-title">${doc.title}</div></div>
+        <div class="sr-main"><div class="sr-code" style="color:${cat.color}">${doc.code}</div><div class="sr-title">${displayTitle}</div>${displayDesc?`<div class="sr-desc">${displayDesc}</div>`:''}</div>
         <div class="sr-cat">${catLabel(cat).split('(')[0].trim()} ${locked?'🔒':''}</div>
       </div>`;
     }).join('');

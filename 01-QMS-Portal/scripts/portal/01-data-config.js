@@ -1284,6 +1284,131 @@ function getDocDesc(code){
   return '';
 }
 
+const DOC_TITLE_TOKEN_MAP = {
+  ap: 'AP',
+  apqp: 'APQP',
+  ar: 'AR',
+  as9100d: 'AS9100D',
+  bom: 'BOM',
+  capa: 'CAPA',
+  cnc: 'CNC',
+  coc: 'COC',
+  coa: 'COA',
+  cpk: 'Cpk',
+  crm: 'CRM',
+  csr: 'CSR',
+  dep: 'DEP',
+  dhr: 'DHR',
+  dnc: 'DNC',
+  ecr: 'ECR',
+  eco: 'ECO',
+  ehs: 'EHS',
+  erp: 'ERP',
+  fai: 'FAI',
+  fod: 'FOD',
+  frm: 'FRM',
+  gmp: 'GMP',
+  gs1: 'GS1',
+  hse: 'HSE',
+  hr: 'HR',
+  ipqc: 'IPQC',
+  iso: 'ISO',
+  iso9001: 'ISO 9001',
+  iqc: 'IQC',
+  it: 'IT',
+  jd: 'JD',
+  kpi: 'KPI',
+  lab: 'LAB',
+  m365: 'M365',
+  nc: 'NC',
+  ncr: 'NCR',
+  oee: 'OEE',
+  ojt: 'OJT',
+  org: 'ORG',
+  pfmea: 'PFMEA',
+  po: 'PO',
+  ppc: 'PPC',
+  qa: 'QA',
+  qc: 'QC',
+  qms: 'QMS',
+  raci: 'RACI',
+  ref: 'REF',
+  rfq: 'RFQ',
+  sla: 'SLA',
+  sop: 'SOP',
+  sops: 'SOPs',
+  spc: 'SPC',
+  sscc: 'SSCC',
+  swot: 'SWOT',
+  trn: 'TRN',
+  wi: 'WI',
+};
+const DOC_TITLE_LOWER_WORDS = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'from', 'in', 'of', 'on', 'or', 'the', 'to', 'via', 'with']);
+
+function looksLikeVietnameseText(text){
+  if(!text) return false;
+  return /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(String(text).normalize('NFC'));
+}
+
+function deriveDocTitleToken(token, index){
+  if(!token) return '';
+  const lower = token.toLowerCase();
+  if(DOC_TITLE_TOKEN_MAP[lower]) return DOC_TITLE_TOKEN_MAP[lower];
+  if(/^\d+$/.test(token)) return token;
+  if(index > 0 && DOC_TITLE_LOWER_WORDS.has(lower)) return lower;
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+}
+
+function deriveDocTitleFromPath(doc){
+  const relPath = String(doc?.path || '').split(/[?#]/)[0];
+  const base = (relPath.split('/').pop() || '').replace(/\.[^.]+$/, '');
+  if(!base) return '';
+
+  const code = String(doc?.code || '').trim().toLowerCase();
+  let stem = base;
+  if(code){
+    const codeTokens = code.split(/[^a-z0-9]+/).filter(Boolean);
+    if(codeTokens.length){
+      const prefixPattern = '^' + codeTokens.join('[-_]+') + '(?:[-_]+)?';
+      stem = stem.replace(new RegExp(prefixPattern, 'i'), '');
+    }
+  }
+  if(!stem) return '';
+
+  const tokens = stem.split(/[-_]+/).filter(Boolean);
+  if(!tokens.length) return '';
+
+  return tokens
+    .map((token, index) => deriveDocTitleToken(token, index))
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getDocDisplayTitle(doc){
+  if(!doc) return '';
+  const rawTitle = String(doc.title || '').trim();
+  const code = String(doc.code || '').trim();
+  const derivedTitle = deriveDocTitleFromPath(doc);
+  if(!rawTitle || rawTitle.toUpperCase() === code.toUpperCase()) return derivedTitle || rawTitle || code;
+  if(looksLikeVietnameseText(rawTitle) && derivedTitle) return derivedTitle;
+  return rawTitle;
+}
+
+function getDocDisplayDescription(doc){
+  if(!doc) return '';
+  const explicitDesc = String(getDocDesc(doc.code) || '').trim();
+  if(explicitDesc) return explicitDesc;
+
+  const rawTitle = String(doc.title || '').trim();
+  const displayTitle = getDocDisplayTitle(doc);
+  if(rawTitle && rawTitle !== displayTitle && looksLikeVietnameseText(rawTitle)) return rawTitle;
+
+  const folderDesc = String(getFolderDesc(doc.folder || '') || '').trim();
+  if(folderDesc) return folderDesc;
+  return '';
+}
+
 async function saveFolderDesc(folderPath, desc){
   FOLDER_DESCS[folderPath] = desc;
   try { await apiCall('folder_descriptions', {path: folderPath, description: desc}); } catch(e){}
@@ -2003,4 +2128,3 @@ function initLang(){
 }
 
 // ═══════════════════════════════════════════════════
-
