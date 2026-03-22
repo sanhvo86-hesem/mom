@@ -570,6 +570,7 @@ function closeDocViewerForce(){
   editMode=false;
   editingDoc=null;
   currentDoc=null;
+  try{ resetDocViewerZoom(); }catch(e){}
   var iframe=document.getElementById('doc-iframe');
   iframe.onload=null;
   iframe.removeAttribute('srcdoc');
@@ -1494,6 +1495,67 @@ function getDocViewFile(doc){
   return doc.path;
 }
 
+let viewerDocZoom = 100;
+const VIEWER_DOC_ZOOM_MIN = 60;
+const VIEWER_DOC_ZOOM_MAX = 200;
+const VIEWER_DOC_ZOOM_STEP = 10;
+
+function clampViewerDocZoom(value){
+  const numeric = Number(value);
+  if(!Number.isFinite(numeric)) return 100;
+  return Math.max(VIEWER_DOC_ZOOM_MIN, Math.min(VIEWER_DOC_ZOOM_MAX, numeric));
+}
+
+function getDocIframeDocument(iframe){
+  try{
+    return iframe ? (iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document)) : null;
+  }catch(e){
+    return null;
+  }
+}
+
+function applyDocViewerZoomToDocument(idoc){
+  try{
+    if(!idoc) return;
+    const target = idoc.body || idoc.documentElement;
+    if(!target) return;
+    let styleEl = idoc.getElementById('portal-doc-viewer-zoom-style');
+    if(!styleEl){
+      styleEl = idoc.createElement('style');
+      styleEl.id = 'portal-doc-viewer-zoom-style';
+      (idoc.head || idoc.documentElement || target).appendChild(styleEl);
+    }
+    styleEl.textContent = `html{overflow:auto;}body{zoom:${viewerDocZoom}% !important;}`;
+  }catch(e){}
+}
+
+function resetDocViewerZoom(){
+  viewerDocZoom = 100;
+  const iframe = document.getElementById('doc-iframe');
+  const idoc = getDocIframeDocument(iframe);
+  if(idoc) applyDocViewerZoomToDocument(idoc);
+}
+
+function attachIframeViewerZoom(iframe){
+  const idoc = getDocIframeDocument(iframe);
+  if(!idoc || !idoc.documentElement) return;
+  applyDocViewerZoomToDocument(idoc);
+  if(idoc.__portalViewerZoomAttached) return;
+  const wheelHandler = function(event){
+    if(!event || !event.ctrlKey) return;
+    const delta = Number(event.deltaY || 0);
+    if(!Number.isFinite(delta) || delta === 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const nextZoom = clampViewerDocZoom(viewerDocZoom + (delta < 0 ? VIEWER_DOC_ZOOM_STEP : -VIEWER_DOC_ZOOM_STEP));
+    if(nextZoom === viewerDocZoom) return;
+    viewerDocZoom = nextZoom;
+    applyDocViewerZoomToDocument(idoc);
+  };
+  idoc.addEventListener('wheel', wheelHandler, {capture:true, passive:false});
+  idoc.__portalViewerZoomAttached = true;
+}
+
 function loadDocContent(code){
   const doc=DOCS.find(d=>d.code===code);
   if(!doc) return;
@@ -1527,6 +1589,11 @@ function loadDocContent(code){
     const title=(typeof escapeHtml==='function') ? escapeHtml(getDocDisplayTitle(doc)||doc.title||doc.code) : (getDocDisplayTitle(doc)||doc.title||doc.code);
     const desc=(typeof escapeHtml==='function') ? escapeHtml(getDocDisplayDescription(doc)||'') : (getDocDisplayDescription(doc)||'');
     const owner=(typeof escapeHtml==='function') ? escapeHtml(String((state&&state.owner)||doc.owner||'QA/QMS')) : String((state&&state.owner)||doc.owner||'QA/QMS');
+    iframe.onload=function(){
+      try{ attachIframeViewerZoom(iframe); }catch(e){}
+      if(loading) loading.style.display='none';
+      iframe.style.opacity='1';
+    };
     iframe.srcdoc = `<!DOCTYPE html>
       <html lang="vi">
       <head>
@@ -1573,8 +1640,9 @@ function loadDocContent(code){
         </div>
       </body>
       </html>`;
-    if(loading) loading.style.display='none';
-    iframe.style.opacity='1';
+    setTimeout(function(){
+      if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+    }, 5000);
     return;
   }
 
@@ -1610,6 +1678,7 @@ function loadDocContent(code){
         // Sync language after injection, even for legacy docs that never loaded assets/app.js.
         try{ syncIframeDocumentLanguage(iframe, lang); }catch(e){}
         try{ if(typeof attachIframeLinkBridge==='function') attachIframeLinkBridge(iframe, doc, viewFile); }catch(e){}
+        try{ attachIframeViewerZoom(iframe); }catch(e){}
       }catch(e){}
       if(loading) loading.style.display='none';
       iframe.style.opacity='1';

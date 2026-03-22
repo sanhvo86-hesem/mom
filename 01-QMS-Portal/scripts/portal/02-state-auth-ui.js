@@ -962,6 +962,7 @@ async function openDoc(code){
   editingDoc=null;
   currentDoc=code;
   setDocHeaderMetaCollapsed(true);
+  try{ if(typeof resetDocViewerZoom==='function') resetDocViewerZoom(); }catch(e){}
   edFullscreen=false;
   const _ec=document.getElementById('editor-container');
   if(_ec){ _ec.style.display='none'; _ec.classList.remove('ed-fullscreen'); }
@@ -1062,6 +1063,7 @@ function closeDocViewer(){
   editingDoc=null;
   currentDoc=null;
   setDocHeaderMetaCollapsed(true);
+  try{ if(typeof resetDocViewerZoom==='function') resetDocViewerZoom(); }catch(e){}
   // Clean up iframe state to prevent stale content
   var iframe=document.getElementById('doc-iframe');
   iframe.onload=null;

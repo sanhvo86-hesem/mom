@@ -366,7 +366,7 @@ button{cursor:pointer;border:none;background:none}
   .breadcrumb{font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1;min-width:0}
   .user-info .name{font-size:11px}
   .user-info .title{display:none}
-  #doc-viewer-header{padding:9px 12px;max-height:40%}
+  #doc-viewer-header{display:none}
   .dv-top{grid-template-columns:1fr}
   .dv-top-actions{justify-content:flex-start}
   .dv-top-actions .dv-action-group{justify-content:flex-start}
