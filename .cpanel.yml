@@ -1,0 +1,6 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/pqobnire/qms.hesem.com.vn
+    - /bin/cp -R * $DEPLOYPATH/
+    - /bin/cp .htaccess $DEPLOYPATH/.htaccess
