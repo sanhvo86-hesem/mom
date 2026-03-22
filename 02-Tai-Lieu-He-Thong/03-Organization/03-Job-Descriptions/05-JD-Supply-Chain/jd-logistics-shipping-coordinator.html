@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -118,7 +118,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Sau khi hàng ship-ready → booking/carrier/export docs → pack list/dispatch → POD/tracking → bàn giao dữ liệu giao hàng cho CS/Finance.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Role Mission)</h2>
-<div class="jd-mission"><p>Logistics / Shipping Coordinator chịu trách nhiệm đưa hàng đã release rời nhà máy đúng thời điểm, đúng người nhận, đúng dữ liệu shipping và có đủ bằng chứng giao nhận. Vị trí này bảo vệ “chặng cuối” của cam kết giao hàng.</p><p>Thành công của vị trí nằm ở sự chính xác và chủ động: chỉ giao khi đủ điều kiện, nhưng khi đủ điều kiện thì phải book, theo dõi và xử lý ngoại lệ rất nhanh.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Shipment đi đúng lịch, đúng label / packing list / tracking, không phát sinh sai người nhận / sai tài liệu / sai số lượng.</li><li>POD và tracking được thu hồi / cập nhật đầy đủ, giúp Customer Service và Finance đóng vòng order-to-cash.</li><li>Các ngoại lệ vận chuyển được phát hiện sớm và xử lý trước khi biến thành trễ giao hàng nghiêm trọng.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Logistics / Shipping Coordinator sở hữu thực thi giao hàng và chứng từ logistics; không có quyền ship release khi thiếu QA/CS approval và không thay đổi yêu cầu nhãn/pack/khách hàng khi chưa được xác nhận.</p></div><div class="callout"><p><b>Trọng tâm cập nhật từ bộ tài liệu vận hành nâng cấp</b></p><ul class="tight"><li>Biến pack-ready thành ship-ready đúng chứng từ, đúng label/SSCC, đúng tuyến vận chuyển và đúng điều kiện nhả giữ cuối.</li><li>Không để shipment rời nhà máy khi part/lot/count/label/pack list/COC không reconcile hoàn chỉnh.</li><li>Là mắt xích cuối cùng kết nối Warehouse - Quality - Customer Service - Finance trong chuỗi giao hàng và thu tiền.</li></ul></div>
+<div class="jd-mission"><p>Logistics / Shipping Coordinator chịu trách nhiệm đưa hàng đã release rời nhà máy đúng thời điểm, đúng người nhận, đúng dữ liệu shipping và có đủ bằng chứng giao nhận. Vị trí này bảo vệ “chặng cuối” của cam kết giao hàng.</p><p>Thành công của vị trí nằm ở sự chính xác và chủ động: chỉ giao khi đủ điều kiện, nhưng khi đủ điều kiện thì phải book, theo dõi và xử lý ngoại lệ rất nhanh.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Shipment đi đúng lịch, đúng label / packing list / tracking, không phát sinh sai người nhận / sai tài liệu / sai số lượng.</li><li>POD và tracking được thu hồi / cập nhật đầy đủ, giúp Customer Service và Finance đóng vòng order-to-cash.</li><li>Các ngoại lệ vận chuyển được phát hiện sớm và xử lý trước khi biến thành trễ giao hàng nghiêm trọng.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Logistics / Shipping Coordinator sở hữu thực thi giao hàng và chứng từ logistics; không có quyền ship release khi thiếu QA/CS approval và không thay đổi yêu cầu nhãn/pack/khách hàng khi chưa được xác nhận.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Biến pack-ready thành ship-ready đúng chứng từ, đúng label/SSCC, đúng tuyến vận chuyển và đúng điều kiện nhả giữ cuối.</li><li>Không để shipment rời nhà máy khi part/lot/count/label/pack list/COC không reconcile hoàn chỉnh.</li><li>Là mắt xích cuối cùng kết nối Warehouse - Quality - Customer Service - Finance trong chuỗi giao hàng và thu tiền.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
@@ -136,7 +136,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th style="width:26%">Xác minh readiness trước khi giao</th><td><ul><li>Kiểm tra release status, shipping checklist, label, packing list data, consignee details, requested documents và special instruction trước khi book / giao.</li><li>Không đưa hàng lên xe / cho pickup nếu còn điểm mù về release, label, pack reconciliation hoặc chứng từ.</li><li>Phối hợp clean-pack / QA / CS để khóa hết open point trước giờ giao.</li></ul></td></tr><tr><th style="width:26%">Booking và theo dõi hành trình</th><td><ul><li>Book forwarder / carrier / courier phù hợp với lead time, tuyến đường, điều kiện bảo quản và chi phí.</li><li>Theo dõi pickup, tracking, ETA, POD và chủ động cập nhật tình trạng cho bộ phận liên quan.</li><li>Xử lý claim / delay / reroute / failed pickup cùng với nhà vận chuyển và cấp quản lý.</li></ul></td></tr><tr><th style="width:26%">Quản trị hồ sơ outbound</th><td><ul><li>Lưu shipping checklist, label, booking confirmation, tracking, POD và các chứng từ giao hàng theo quy định.</li><li>Phối hợp Finance khi cần bằng chứng ship confirm / POD để hỗ trợ invoicing / AR.</li><li>Đề xuất cải tiến về SSCC, nhãn, layout staging, checklist giao hàng hoặc lựa chọn forwarder.</li></ul></td></tr>
 <tr><th style="width:26%">Ship pack, SSCC &amp; export-release coordination</th><td><ul><li>Kiểm tra ship instruction, route/carrier, pack list, label/SSCC, release status, count reconciliation và chứng từ đi kèm trước khi dispatch.</li><li>Phối hợp với Customer Service/Quality/Warehouse để xử lý mismatch chứng từ, late release, special labeling hoặc shipment split/hold.</li><li>Duy trì log dispatch và bằng chứng giao nhận phù hợp cho truy xuất, AR và complaint handling.</li></ul></td></tr></tbody></table>
 </div>
-<div class="table-card role-boundary-box">
+<div class="table-card ranh giới trách nhiệm-box">
 <table class="table">
 <tbody>
 <tr>
@@ -234,3 +234,5 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </div>
 </body>
 </html>
+
+

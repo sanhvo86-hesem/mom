@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -21,19 +21,19 @@
 <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
 <div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
 </div>
-<div class="title"><strong>ANNEX-QMS-035 — Download-only Delivery Profile &amp; UAT Gate</strong><span class="sub-vn">Profile delivery chuẩn và UAT gate của baseline V0</span></div>
+<div class="title"><strong>ANNEX-QMS-035 — Download-only Delivery Profile &amp; UAT Gate</strong><span class="sub-vn">Profile delivery chuẩn và UAT gate của danh mục hiện hành</span></div>
 <div class="meta"><div class="row"><span><b>Owner:</b></span><span>IT / QA/QMS</span></div><div class="row"><span><b>Active profile:</b></span><span>download_only_desktop_excel</span></div><div class="row"><span><b>Web-open:</b></span><span>Không áp dụng</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div></div>
 </div>
 <div class="doc-content" id="docContent">
 
-<div class="note-blue"><b>Delivery baseline:</b> Tất cả form FRM workbook trong HESEM QMS hiện dùng profile <b>download_only_desktop_excel</b>. Đây là profile production duy nhất của baseline V0.</div>
+<div class="note-blue"><b>Delivery baseline:</b> Tất cả form FRM workbook trong HESEM QMS hiện dùng profile <b>download_only_desktop_excel</b>. Đây là profile production duy nhất của danh mục hiện hành.</div>
 <div class="table-card"><table class="table"><thead><tr><th>Gate</th><th>Tiêu chí phải đạt</th><th>Bằng chứng</th></tr></thead><tbody>
 <tr><td>Portal click behavior</td><td>Click trên portal phải tải đúng file .xlsx active.</td><td>Portal UAT click map.</td></tr>
 <tr><td>Internal links</td><td>Link trong SOP/WI/Manual/Handbook/JD/Training phải trỏ thẳng tới .xlsx và có thuộc tính download.</td><td>HTML link audit.</td></tr>
 <tr><td>Attachment enforcement</td><td>Server phải trả workbook dưới dạng attachment download.</td><td><code>04-Bieu-Mau/.htaccess</code>.</td></tr>
 <tr><td>Non-issued code control</td><td>Mã không phát hành trong V0 không được lộ như form active.</td><td>ANNEX-QMS-031 + control register + metadata audit.</td></tr>
-<tr><td>Archive neutrality</td><td>Không còn thư mục archive trong controlled package baseline V0.</td><td>Repository tree audit.</td></tr>
-<tr><td>Server rollout checklist</td><td>Server thật, proxy/CDN và attachment headers phải được xác nhận theo stack đã chọn.</td><td><a href="annex-qms-037-excel-form-download-only-runtime-rollout-and-server-checklist.html">ANNEX-QMS-037</a> + <a href="../../../04-Bieu-Mau/10-FRM-CONTROL/server-delivery-rollout-checklist.html">Control checklist</a>.</td></tr><tr><td>Desktop endpoint baseline</td><td>Pilot users phải dùng desktop Excel và hiểu trusted location/publisher boundary.</td><td><a href="annex-qms-038-excel-form-desktop-excel-endpoint-baseline-and-macro-trust-rollout.html">ANNEX-QMS-038</a>.</td></tr><tr><td>Production acceptance</td><td>Nhóm workbook trọng yếu phải qua UAT ký nhận trước khi chốt go-live.</td><td><a href="annex-qms-039-excel-form-production-acceptance-and-uat-matrix.html">ANNEX-QMS-039</a>.</td></tr><tr><td>Periodic control</td><td>Sau go-live phải có cadence daily/weekly/monthly/quarterly/on-change.</td><td><a href="annex-qms-040-excel-form-periodic-integrity-audit-and-control-cadence.html">ANNEX-QMS-040</a>.</td></tr></tbody></table></div>
+<tr><td>Archive neutrality</td><td>Không còn thư mục archive trong controlled package danh mục hiện hành.</td><td>Repository tree audit.</td></tr>
+<tr><td>Checklist triển khai máy chủ</td><td>Server thật, proxy/CDN và attachment headers phải được xác nhận theo stack đã chọn.</td><td><a href="annex-qms-037-excel-form-download-only-runtime-rollout-and-server-checklist.html">ANNEX-QMS-037</a> + <a href="../../../04-Bieu-Mau/10-FRM-CONTROL/server-delivery-rollout-checklist.html">Checklist điều khiển</a>.</td></tr><tr><td>Chuẩn máy trạm</td><td>Người dùng được chỉ định phải dùng desktop Excel và hiểu trusted location/publisher boundary.</td><td><a href="annex-qms-038-excel-form-desktop-excel-endpoint-baseline-and-macro-trust-rollout.html">ANNEX-QMS-038</a>.</td></tr><tr><td>Xác nhận đưa vào vận hành</td><td>Nhóm workbook trọng yếu phải qua UAT ký nhận trước khi đưa vào vận hành.</td><td><a href="annex-qms-039-excel-form-production-acceptance-and-uat-matrix.html">ANNEX-QMS-039</a>.</td></tr><tr><td>Kiểm soát định kỳ</td><td>Sau khi đưa vào vận hành phải có nhịp ngày/tuần/tháng/quý/khi thay đổi.</td><td><a href="annex-qms-040-excel-form-periodic-integrity-audit-and-control-cadence.html">ANNEX-QMS-040</a>.</td></tr></tbody></table></div>
 
 </div>
 </div></div></div>

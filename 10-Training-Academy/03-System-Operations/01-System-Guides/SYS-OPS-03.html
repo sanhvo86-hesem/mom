@@ -73,7 +73,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="title">
 <strong>SYS-OPS-03 — Lớp thực thi SharePoint Lists trong M365: lược đồ, ánh xạ trường, quy tắc chất lượng</strong><br/>
 <span class="muted">M365 SharePoint Lists execution layer: schema, field mapping, quality rules</span><br/>
-<span class="muted">Phạm vi: SharePoint Lists (M365) — lớp thực thi (execution layer) cho Job Dossier, phê duyệt và truy xuất audit-ready.</span>
+<span class="muted">Phạm vi: SharePoint Lists (M365) — lớp thực thi (execution layer) cho Job Dossier, phê duyệt và truy xuất sẵn sàng đánh giá.</span>
 </div>
 <div class="meta">
 <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-03</span></div>
@@ -88,7 +88,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card"><div class="big">Dấu vết phê duyệt</div><div class="muted">Mọi quyết định release phải có ApprovalHistory.</div></div>
 </div>
 <h2>1. Tổng quan module</h2>
-<p><b>Mục tiêu:</b> Sau module này, người học phải vận hành được lớp “execution layer” trên M365/SharePoint Lists theo chuẩn audit-ready: <b>đúng list</b>, <b>đúng trường</b>, <b>đúng mã chuẩn</b>, <b>đúng bằng chứng (URL)</b>, và <b>đúng vòng đời trạng thái</b>.</p>
+<p><b>Mục tiêu:</b> Sau module này, người học phải vận hành được lớp “execution layer” trên M365/SharePoint Lists theo chuẩn sẵn sàng đánh giá: <b>đúng list</b>, <b>đúng trường</b>, <b>đúng mã chuẩn</b>, <b>đúng bằng chứng (URL)</b>, và <b>đúng vòng đời trạng thái</b>.</p>
 <div class="callout">
 <b>Tài liệu nền bắt buộc đã dùng để xây module (không dẫn link ra ngoài):</b>
 <ul>
@@ -106,7 +106,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thực thi 3 cơ chế kiểm soát: <b>fail-fast</b>, <b>phản ứng 60 giây</b>, và <b>đối chiếu (reconciliation) trước ship</b>.</li>
 <li>Đạt level L1→L4 theo rubric quan sát được, gắn với quyền hạn theo vai trò.</li>
 </ul>
-<p><b>Điều kiện triển khai trong nhà máy:</b> 2 ca/ngày, 6 ngày/tuần. Mỗi vai trò tham gia tối đa <b>02 phiên/tuần</b> (mỗi phiên ~2 giờ). Kế hoạch gợi ý:</p>
+<p><b>Điều kiện triển khai trong nhà máy:</b> 2 ca/ngày, 6 ngày/tuần. Mỗi vai trò tham gia tối đa <b>02 phiên/tuần</b> (mỗi phiên ~2 giờ). Kế hoạch áp dụng:</p>
 <div class="table-card"><table class="table"><thead><tr><th>Tuần</th><th>Phiên</th><th>Áp dụng ca</th><th>Đối tượng</th><th>Nội dung</th></tr></thead><tbody><tr><td>Tuần 1</td><td>Buổi 1 (2h)</td><td>Ca 1</td><td>Supervisor + QA + QC + Warehouse</td><td>Nền tảng: No evidence = No gate; đọc list view; hiểu mapping 5 quy trình chính; demo QCHoldLog/NCR/ShipRelease.</td></tr><tr><td>Tuần 1</td><td>Buổi 2 (2h)</td><td>Ca 2</td><td>Operator + Setup + Programmer</td><td>Thực hành tạo record (dưới giám sát); tập phản ứng 60 giây; nhập đúng choice codes.</td></tr><tr><td>Tuần 2</td><td>Buổi 3 (2h)</td><td>Ca 1</td><td>Purchasing + Receiving + Planner</td><td>ReceivingIQC/Outsource evidence; WIP/DispatchPlan; xử lý sync fail (IntegrationLogs).</td></tr><tr><td>Tuần 2</td><td>Buổi 4 (2h)</td><td>Ca 2</td><td>Maintenance + EHS</td><td>Downtime/Tool life + action escalation; stop-work vs hold; evidence.</td></tr><tr><td>Tuần 3</td><td>OJT 1 (2h)</td><td>Ca 1</td><td>QC + QA + Warehouse</td><td>OJT theo gate G2/G4/G5: FAI/Final/Ship; đối chiếu packet; approval logging.</td></tr><tr><td>Tuần 3</td><td>OJT 2 (2h)</td><td>Ca 2</td><td>Operator + Setup</td><td>OJT tại line: nhập downtime/tool/pack; mở HOLD khi lỗi cố ý.</td></tr><tr><td>Tuần 4</td><td>Đánh giá (2h)</td><td>Ca 1 &amp; Ca 2 (chia nhóm)</td><td>Tất cả role (theo nhóm)</td><td>Quiz + performance test + review audit findings; chốt L-level + quyền hạn.</td></tr></tbody></table></div>
 <h2>2. Vì sao cần execution layer (Bối cảnh + mục đích)</h2>
 <p>Execution layer là “sổ cái vận hành” cho Job Order: ghi nhận các sự kiện quan trọng (gate, hold, NCR, phê duyệt, ship packet) theo cấu trúc chuẩn để <b>truy xuất trong 30 giây khi audit</b>.</p>
@@ -242,4 +242,5 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
+
 

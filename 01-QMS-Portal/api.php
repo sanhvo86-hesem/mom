@@ -58,6 +58,8 @@ $DICT_JS_FILE   = $ROOT_DIR . '/11-Glossary/dict-data.js';
 
 @ini_set('error_log', $LOG_FILE);
 
+require_once __DIR__ . '/form_workflow.php';
+
 // ---------- Hard fail safe handlers ----------
 register_shutdown_function(function () {
   $e = error_get_last();
@@ -826,6 +828,7 @@ function portal_normalize_revision_value(string $value): string {
 }
 
 function load_form_control_registry_docs(string $file, string $rootDir): array {
+  global $DATA_DIR;
   $json = read_json_file($file);
   if (!is_array($json)) return [];
 
@@ -848,14 +851,23 @@ function load_form_control_registry_docs(string $file, string $rootDir): array {
     if (!in_array($ext, ['xlsx','xlsm','xls','csv'], true)) continue;
 
     $folder = trim((string)($entry['folder'] ?? dirname($relPath)));
+    $state = form_load_state_existing($DATA_DIR, $code);
+    $status = strtolower(trim((string)($entry['status'] ?? 'approved'))) ?: 'approved';
+    $revision = portal_normalize_revision_value((string)($entry['rev'] ?? '0'));
+    $owner = trim((string)($entry['owner'] ?? 'QA/QMS')) ?: 'QA/QMS';
+    if (is_array($state)) {
+      if (!empty($state['status'])) $status = strtolower(trim((string)$state['status']));
+      if (array_key_exists('revision', $state)) $revision = portal_normalize_revision_value((string)($state['revision'] ?? '0'));
+      if (!empty($state['owner'])) $owner = trim((string)$state['owner']);
+    }
     $docs[] = [
       'code' => $code,
       'title' => trim((string)($entry['title'] ?? '')) ?: $code,
       'cat' => 'FRM',
       'path' => $relPath,
-      'rev' => portal_normalize_revision_value((string)($entry['rev'] ?? '0')),
-      'status' => strtolower(trim((string)($entry['status'] ?? 'approved'))) ?: 'approved',
-      'owner' => trim((string)($entry['owner'] ?? 'QA/QMS')) ?: 'QA/QMS',
+      'rev' => $revision,
+      'status' => $status,
+      'owner' => $owner,
       'folder' => $folder,
       'ext' => $ext,
       'delivery_mode' => trim((string)($entry['delivery_mode'] ?? 'download')) ?: 'download',
@@ -2149,6 +2161,13 @@ switch ($action) {
       $basePath = (string)($d['base_path'] ?? ($d['path'] ?? ''));
       if ($code === '') continue;
       if (trim($basePath) === '') continue;
+      $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $basePath);
+      if (is_array($formEntry)) {
+        $st = form_load_state_existing($DATA_DIR, (string)$formEntry['code']);
+        if (!is_array($st)) $st = form_state_fallback_from_registry($formEntry);
+        $out[$code] = $st;
+        continue;
+      }
       $st = load_doc_state($ROOT_DIR, $basePath, $ARCHIVE_DIR, $code);
       if ($st) {
         $out[$code] = $st;
@@ -2171,6 +2190,18 @@ switch ($action) {
     }
     if (trim($code) === '') api_json(['ok' => false, 'error' => 'missing_code'], 400);
     if (trim($basePath) === '') api_json(['ok' => false, 'error' => 'missing_base_path'], 400);
+    $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $basePath);
+    if (is_array($formEntry)) {
+      $state = form_load_state($DATA_DIR, $ROOT_DIR, $formEntry);
+      $manifest = form_load_manifest($DATA_DIR, $ROOT_DIR, $formEntry);
+      api_json([
+        'ok' => true,
+        'code' => strtoupper(trim((string)($formEntry['code'] ?? $code))),
+        'state' => $state,
+        'versions' => form_public_versions($manifest, $state, (string)$formEntry['code'], (string)$formEntry['path']),
+        'server_time' => now_iso(),
+      ]);
+    }
     $manifest = load_doc_manifest($ROOT_DIR, $basePath, $ARCHIVE_DIR, $code);
     $state = load_doc_state($ROOT_DIR, $basePath, $ARCHIVE_DIR, $code);
 
@@ -2217,6 +2248,79 @@ switch ($action) {
     if (trim($basePath) === '') api_json(['ok' => false, 'error' => 'missing_base_path'], 400);
 
     $baseRel = safe_rel_path($basePath);
+    $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $baseRel);
+    if (is_array($formEntry)) {
+      $state = form_load_state($DATA_DIR, $ROOT_DIR, $formEntry);
+      $manifest = form_load_manifest($DATA_DIR, $ROOT_DIR, $formEntry);
+      $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
+      $releasedRev = form_latest_released_revision($manifest, $state, '0');
+      $parts = explode('.', $releasedRev, 2);
+      $maj = (int)($parts[0] ?? 0);
+      $min = isset($parts[1]) ? (int)$parts[1] : 0;
+      $newRevision = ($updateType === 'major')
+        ? (($maj + 1) . '.0')
+        : ($maj . '.' . ($min + 1));
+      foreach ($versions as $version) {
+        if (!is_array($version)) continue;
+        if (!in_array((string)($version['status'] ?? ''), ['draft', 'in_review', 'pending_approval'], true)) continue;
+        $privateRel = trim((string)($version['private_rel'] ?? ''));
+        if ($privateRel === '') continue;
+        try {
+          $privateAbs = form_resolve_private_abs($DATA_DIR, $privateRel);
+          if (is_file($privateAbs)) @unlink($privateAbs);
+        } catch (Throwable $e) {
+          // ignore stale private draft files
+        }
+      }
+      $versions = array_values(array_filter($versions, function($version) {
+        if (!is_array($version)) return false;
+        return !in_array((string)($version['status'] ?? ''), ['draft', 'in_review', 'pending_approval'], true);
+      }));
+      $dt = human_dt();
+      array_unshift($versions, [
+        'id' => ts_compact() . '_draft',
+        'version' => 'v' . $newRevision,
+        'status' => 'draft',
+        'date' => $dt,
+        'user' => (string)($me['name'] ?? $me['username'] ?? ''),
+        'role' => (string)($me['role'] ?? ''),
+        'note' => 'Khởi tạo phiên bản workbook mới — chờ upload',
+        'updateType' => $updateType,
+        'storage' => 'private',
+      ]);
+      $manifest['versions'] = $versions;
+      $manifest['base'] = (string)$formEntry['path'];
+      $manifest['kind'] = 'excel_form';
+      form_save_manifest($DATA_DIR, (string)$formEntry['code'], $manifest);
+      $state['status'] = 'draft';
+      $state['revision'] = $newRevision;
+      $state['released_revision'] = $releasedRev;
+      $state['updateType'] = $updateType;
+      $state['has_release'] = true;
+      $state['checked_out_by'] = [
+        'name' => (string)($me['name'] ?? $me['username'] ?? ''),
+        'role' => (string)($me['role'] ?? ''),
+        'date' => $dt,
+      ];
+      $state['lastEdit'] = [
+        'by' => (string)($me['name'] ?? $me['username'] ?? ''),
+        'role' => (string)($me['role'] ?? ''),
+        'date' => $dt,
+        'note' => 'Khởi tạo phiên bản workbook mới',
+      ];
+      foreach (['submittedBy','submittedDate','submittedUpdateType','rejectedBy','approvedBy','approvedDate'] as $k) {
+        if (array_key_exists($k, $state)) unset($state[$k]);
+      }
+      form_save_state($DATA_DIR, (string)$formEntry['code'], $state);
+      invalidate_scan_cache($DATA_DIR);
+      api_json([
+        'ok' => true,
+        'code' => (string)$formEntry['code'],
+        'state' => $state,
+        'versions' => form_public_versions($manifest, $state, (string)$formEntry['code'], (string)$formEntry['path']),
+        'server_time' => now_iso(),
+      ]);
+    }
 
     // Load per-folder manifest + state
     $manifest = load_doc_manifest($ROOT_DIR, $baseRel, $ARCHIVE_DIR, $code);
@@ -2402,6 +2506,113 @@ case 'doc_save_draft': {
     api_json(['ok' => true, 'code' => $code, 'state' => $state, 'versions' => $versions, 'server_time' => now_iso()]);
   }
 
+  case 'form_upload_draft': {
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    require_csrf();
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_doc_workflow_editor($me, $ROLE_PERMS_FILE);
+
+    $code = strtoupper(trim((string)($_POST['code'] ?? '')));
+    $basePath = (string)($_POST['base_path'] ?? ($_POST['path'] ?? ''));
+    $note = trim((string)($_POST['note'] ?? ''));
+    if ($code === '') api_json(['ok' => false, 'error' => 'missing_code'], 400);
+    if (trim($basePath) === '') api_json(['ok' => false, 'error' => 'missing_base_path'], 400);
+    if (!isset($_FILES['file']) || !is_array($_FILES['file'])) api_json(['ok' => false, 'error' => 'missing_file'], 400);
+
+    $baseRel = safe_rel_path($basePath);
+    $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $baseRel);
+    if (!is_array($formEntry)) api_json(['ok' => false, 'error' => 'form_not_found'], 404);
+
+    $state = form_load_state($DATA_DIR, $ROOT_DIR, $formEntry);
+    if (($state['status'] ?? 'approved') === 'approved') api_json(['ok' => false, 'error' => 'start_new_revision_required'], 400);
+
+    $manifest = form_load_manifest($DATA_DIR, $ROOT_DIR, $formEntry);
+    $revision = form_normalize_revision((string)($_POST['revision'] ?? ($state['revision'] ?? '0')), form_normalize_revision((string)($state['revision'] ?? '0'), '0'));
+    $updateType = (($state['updateType'] ?? 'minor') === 'major') ? 'major' : 'minor';
+    $upload = $_FILES['file'];
+    $tmpName = (string)($upload['tmp_name'] ?? '');
+    $uploadError = (int)($upload['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($uploadError !== UPLOAD_ERR_OK || $tmpName === '') api_json(['ok' => false, 'error' => 'upload_failed'], 400);
+
+    $liveExt = form_extension_from_path((string)$formEntry['path']);
+    $uploadExt = strtolower(pathinfo((string)($upload['name'] ?? ''), PATHINFO_EXTENSION));
+    if (!form_is_workbook_extension($uploadExt)) api_json(['ok' => false, 'error' => 'unsupported_form_extension'], 400);
+    if ($liveExt !== '' && $uploadExt !== $liveExt) api_json(['ok' => false, 'error' => 'extension_mismatch'], 400);
+
+    $draftMeta = form_private_file_meta($DATA_DIR, (string)$formEntry['code'], $revision, 'draft', $uploadExt);
+    ensure_dir(dirname($draftMeta['abs']));
+    $moved = @move_uploaded_file($tmpName, $draftMeta['abs']);
+    if (!$moved) {
+      $moved = @copy($tmpName, $draftMeta['abs']);
+    }
+    if (!$moved || !is_file($draftMeta['abs'])) api_json(['ok' => false, 'error' => 'upload_store_failed'], 500);
+
+    $sha = form_sha256_file($draftMeta['abs']);
+    $size = @filesize($draftMeta['abs']) ?: 0;
+    $dt = human_dt();
+    $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
+    $idx = form_find_working_entry_index($versions, $revision, ['draft', 'in_review', 'pending_approval']);
+    $entry = [
+      'id' => $idx >= 0 ? (string)($versions[$idx]['id'] ?? (ts_compact() . '_draft')) : (ts_compact() . '_draft'),
+      'version' => 'v' . $revision,
+      'status' => 'draft',
+      'date' => $dt,
+      'user' => (string)($me['name'] ?? $me['username'] ?? ''),
+      'role' => (string)($me['role'] ?? ''),
+      'note' => $note !== '' ? $note : 'Uploaded workbook draft',
+      'updateType' => $updateType,
+      'storage' => 'private',
+      'private_rel' => $draftMeta['rel'],
+      'sha256' => $sha,
+      'size_bytes' => $size,
+      'original_name' => (string)($upload['name'] ?? ''),
+    ];
+    if ($idx >= 0) {
+      $oldPrivateRel = trim((string)($versions[$idx]['private_rel'] ?? ''));
+      if ($oldPrivateRel !== '' && $oldPrivateRel !== $draftMeta['rel']) {
+        try {
+          $oldPrivateAbs = form_resolve_private_abs($DATA_DIR, $oldPrivateRel);
+          if (is_file($oldPrivateAbs)) @unlink($oldPrivateAbs);
+        } catch (Throwable $e) {
+          // ignore stale file
+        }
+      }
+      $versions[$idx] = array_merge($versions[$idx], $entry);
+    } else {
+      array_unshift($versions, $entry);
+    }
+    $manifest['versions'] = $versions;
+    $manifest['base'] = (string)$formEntry['path'];
+    $manifest['kind'] = 'excel_form';
+    form_save_manifest($DATA_DIR, (string)$formEntry['code'], $manifest);
+
+    $state['status'] = 'draft';
+    $state['revision'] = $revision;
+    $state['updateType'] = $updateType;
+    $state['checked_out_by'] = [
+      'name' => (string)($me['name'] ?? $me['username'] ?? ''),
+      'role' => (string)($me['role'] ?? ''),
+      'date' => $dt,
+    ];
+    $state['lastEdit'] = [
+      'by' => (string)($me['name'] ?? $me['username'] ?? ''),
+      'role' => (string)($me['role'] ?? ''),
+      'date' => $dt,
+      'note' => $note !== '' ? $note : 'Uploaded workbook draft',
+    ];
+    form_save_state($DATA_DIR, (string)$formEntry['code'], $state);
+    invalidate_scan_cache($DATA_DIR);
+
+    api_json([
+      'ok' => true,
+      'code' => (string)$formEntry['code'],
+      'state' => $state,
+      'versions' => form_public_versions($manifest, $state, (string)$formEntry['code'], (string)$formEntry['path']),
+      'server_time' => now_iso(),
+    ]);
+  }
+
   case 'doc_submit_review': {
     if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
     require_csrf();
@@ -2418,6 +2629,63 @@ case 'doc_save_draft': {
     $html = (string)($data['html'] ?? '');
     if (trim($code) === '') api_json(['ok' => false, 'error' => 'missing_code'], 400);
     if (trim($basePath) === '') api_json(['ok' => false, 'error' => 'missing_base_path'], 400);
+    $baseRel = safe_rel_path($basePath);
+    $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $baseRel);
+    if (is_array($formEntry)) {
+      $state = form_load_state($DATA_DIR, $ROOT_DIR, $formEntry);
+      $manifest = form_load_manifest($DATA_DIR, $ROOT_DIR, $formEntry);
+      $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
+      $revision = form_normalize_revision($revision, form_normalize_revision((string)($state['revision'] ?? '0'), '0'));
+      $ext = form_extension_from_path((string)$formEntry['path']);
+      $draftMeta = form_private_file_meta($DATA_DIR, (string)$formEntry['code'], $revision, 'draft', $ext);
+      $reviewMeta = form_private_file_meta($DATA_DIR, (string)$formEntry['code'], $revision, 'in_review', $ext);
+      if (!is_file($draftMeta['abs'])) api_json(['ok' => false, 'error' => 'missing_draft_upload'], 400);
+      form_move_file_or_throw($draftMeta['abs'], $reviewMeta['abs']);
+      $sha = form_sha256_file($reviewMeta['abs']);
+      $size = @filesize($reviewMeta['abs']) ?: 0;
+      $dt = human_dt();
+      $idx = form_find_working_entry_index($versions, $revision, ['draft', 'in_review', 'pending_approval']);
+      $entry = [
+        'id' => $idx >= 0 ? (string)($versions[$idx]['id'] ?? (ts_compact() . '_review')) : (ts_compact() . '_review'),
+        'version' => 'v' . $revision,
+        'status' => 'in_review',
+        'date' => $dt,
+        'user' => (string)($me['name'] ?? $me['username'] ?? ''),
+        'role' => (string)($me['role'] ?? ''),
+        'note' => $note !== '' ? $note : 'Submitted workbook for review',
+        'updateType' => ($updateType === 'minor') ? 'minor' : 'major',
+        'storage' => 'private',
+        'private_rel' => $reviewMeta['rel'],
+        'sha256' => $sha,
+        'size_bytes' => $size,
+        'submittedBy' => (string)($me['name'] ?? $me['username'] ?? ''),
+        'submittedDate' => $dt,
+      ];
+      if ($idx >= 0) $versions[$idx] = array_merge($versions[$idx], $entry);
+      else array_unshift($versions, $entry);
+      $manifest['versions'] = $versions;
+      form_save_manifest($DATA_DIR, (string)$formEntry['code'], $manifest);
+      $state['status'] = 'in_review';
+      $state['revision'] = $revision;
+      $state['updateType'] = ($updateType === 'minor') ? 'minor' : 'major';
+      $state['submittedBy'] = [
+        'name' => (string)($me['name'] ?? $me['username'] ?? ''),
+        'role' => (string)($me['role'] ?? ''),
+        'date' => $dt,
+        'updateType' => $state['updateType'],
+        'note' => $note,
+      ];
+      if (isset($state['rejectedBy'])) unset($state['rejectedBy']);
+      form_save_state($DATA_DIR, (string)$formEntry['code'], $state);
+      invalidate_scan_cache($DATA_DIR);
+      api_json([
+        'ok' => true,
+        'code' => (string)$formEntry['code'],
+        'state' => $state,
+        'versions' => form_public_versions($manifest, $state, (string)$formEntry['code'], (string)$formEntry['path']),
+        'server_time' => now_iso(),
+      ]);
+    }
     if (strlen(trim($html)) < 30) api_json(['ok' => false, 'error' => 'missing_html'], 400);
 
     $info = doc_store_info($ROOT_DIR, $basePath);
@@ -2507,6 +2775,140 @@ case 'doc_save_draft': {
     if (is_reserved_root_segment($baseRel)) api_json(['ok' => false, 'error' => 'invalid_base_path'], 400);
       if (!filename_matches_doc_code(basename($baseRel), $code)) {
       api_json(['ok' => false, 'error' => 'code_path_mismatch'], 400);
+    }
+    $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $baseRel);
+    if (is_array($formEntry)) {
+      $state = form_load_state($DATA_DIR, $ROOT_DIR, $formEntry);
+      $manifest = form_load_manifest($DATA_DIR, $ROOT_DIR, $formEntry);
+      $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
+      $newRevision = form_normalize_revision($newRevision, form_normalize_revision((string)($state['revision'] ?? '0'), '0'));
+      $ext = form_extension_from_path((string)$formEntry['path']);
+      $reviewMeta = form_private_file_meta($DATA_DIR, (string)$formEntry['code'], $newRevision, 'in_review', $ext);
+      $draftMeta = form_private_file_meta($DATA_DIR, (string)$formEntry['code'], $newRevision, 'draft', $ext);
+      $sourceAbs = is_file($reviewMeta['abs']) ? $reviewMeta['abs'] : $draftMeta['abs'];
+      if (!is_file($sourceAbs)) api_json(['ok' => false, 'error' => 'missing_review_file'], 400);
+      $baseAbs = join_in_root($ROOT_DIR, $baseRel);
+      ensure_dir(dirname($baseAbs));
+      $dt = human_dt();
+      $effDate = substr($dt, 0, 10);
+      $prevRevision = form_latest_released_revision($manifest, $state, form_normalize_revision((string)($state['released_revision'] ?? '0'), '0'));
+      $hasRelease = false;
+      foreach ($versions as $version) {
+        if (!is_array($version)) continue;
+        if (in_array((string)($version['status'] ?? ''), ['approved', 'initial_release'], true)) {
+          $hasRelease = true;
+          break;
+        }
+      }
+      if (is_file($baseAbs) && $hasRelease) {
+        $archiveMeta = form_private_file_meta($DATA_DIR, (string)$formEntry['code'], $prevRevision, 'obsolete', $ext);
+        form_copy_file_or_throw($baseAbs, $archiveMeta['abs']);
+        $archiveSha = form_sha256_file($archiveMeta['abs']);
+        $archiveSize = @filesize($archiveMeta['abs']) ?: 0;
+        foreach ($versions as &$version) {
+          if (!is_array($version)) continue;
+          if (!in_array((string)($version['status'] ?? ''), ['approved', 'initial_release'], true)) continue;
+          $version['status'] = 'obsolete';
+          $version['storage'] = 'private';
+          $version['private_rel'] = $archiveMeta['rel'];
+          $version['sha256'] = $archiveSha;
+          $version['size_bytes'] = $archiveSize;
+          unset($version['live_path']);
+        }
+        unset($version);
+      }
+      form_copy_file_or_throw($sourceAbs, $baseAbs);
+      $liveSha = form_sha256_file($baseAbs);
+      $liveSize = @filesize($baseAbs) ?: 0;
+      foreach ([$reviewMeta['abs'], $draftMeta['abs']] as $workingAbs) {
+        if (is_file($workingAbs)) @unlink($workingAbs);
+      }
+      $cleaned = [];
+      foreach ($versions as $version) {
+        if (!is_array($version)) continue;
+        $status = (string)($version['status'] ?? '');
+        $versionRev = form_normalize_revision(revision_from_version_string((string)($version['version'] ?? '')), '');
+        if ($versionRev === $newRevision && in_array($status, ['draft', 'in_review', 'pending_approval'], true)) {
+          continue;
+        }
+        $cleaned[] = $version;
+      }
+      $capturedSubmittedBy = '';
+      $capturedSubmittedDate = '';
+      $capturedLastEditBy = '';
+      $capturedLastEditRole = '';
+      $capturedLastEditDate = '';
+      if (isset($state['submittedBy']) && is_array($state['submittedBy'])) {
+        $capturedSubmittedBy = (string)($state['submittedBy']['name'] ?? '');
+        $capturedSubmittedDate = (string)($state['submittedBy']['date'] ?? '');
+      }
+      if (isset($state['lastEdit']) && is_array($state['lastEdit'])) {
+        $capturedLastEditBy = (string)($state['lastEdit']['by'] ?? '');
+        $capturedLastEditRole = (string)($state['lastEdit']['role'] ?? '');
+        $capturedLastEditDate = (string)($state['lastEdit']['date'] ?? '');
+      }
+      array_unshift($cleaned, [
+        'id' => ts_compact() . '_approved',
+        'version' => 'v' . $newRevision,
+        'status' => $hasRelease ? 'approved' : 'initial_release',
+        'date' => $dt,
+        'user' => (string)($me['name'] ?? $me['username'] ?? ''),
+        'role' => (string)($me['role'] ?? ''),
+        'submittedBy' => $capturedSubmittedBy,
+        'submittedDate' => $capturedSubmittedDate,
+        'lastEditBy' => $capturedLastEditBy,
+        'lastEditRole' => $capturedLastEditRole,
+        'lastEditDate' => $capturedLastEditDate,
+        'approvedBy' => (string)($me['name'] ?? $me['username'] ?? ''),
+        'approvedDate' => $dt,
+        'note' => $note,
+        'updateType' => ($updateType === 'minor') ? 'minor' : 'major',
+        'storage' => 'live',
+        'live_path' => $baseRel,
+        'sha256' => $liveSha,
+        'size_bytes' => $liveSize,
+      ]);
+      $manifest['versions'] = $cleaned;
+      $manifest['base'] = $baseRel;
+      form_save_manifest($DATA_DIR, (string)$formEntry['code'], $manifest);
+      $state['status'] = 'approved';
+      $state['revision'] = $newRevision;
+      $state['released_revision'] = $newRevision;
+      $state['updateType'] = ($updateType === 'minor') ? 'minor' : 'major';
+      $state['effective_date'] = $effDate;
+      $state['approvedBy'] = [
+        'name' => (string)($me['name'] ?? $me['username'] ?? ''),
+        'role' => (string)($me['role'] ?? ''),
+        'date' => $dt,
+      ];
+      $state['approvedDate'] = $dt;
+      $state['has_release'] = true;
+      foreach (['submittedBy','submittedDate','submittedUpdateType','rejectedBy','checked_out_by'] as $k) {
+        if (array_key_exists($k, $state)) unset($state[$k]);
+      }
+      form_save_state($DATA_DIR, (string)$formEntry['code'], $state);
+      $existingNotes = $formEntry['notes'] ?? [];
+      if (!is_array($existingNotes)) $existingNotes = [];
+      $existingNotes[] = 'Workbook version history is controlled in private release archive outside web root.';
+      $existingNotes = array_values(array_unique(array_map('strval', $existingNotes)));
+      form_registry_patch_entry($FORM_CONTROL_REGISTRY_FILE, (string)$formEntry['code'], [
+        'rev' => 'V' . $newRevision,
+        'effective_date' => $effDate,
+        'status' => 'approved',
+        'control_status' => 'RELEASED',
+        'sha256' => $liveSha,
+        'notes' => $existingNotes,
+        'version_control_model' => 'private_archive_release_control',
+        'release_workflow_id' => 'QMS-FRM-EXCEL-PRIVATE-RELEASE-CONTROL',
+      ]);
+      invalidate_scan_cache($DATA_DIR);
+      api_json([
+        'ok' => true,
+        'code' => (string)$formEntry['code'],
+        'state' => $state,
+        'versions' => form_public_versions($manifest, $state, (string)$formEntry['code'], (string)$formEntry['path']),
+        'server_time' => now_iso(),
+      ]);
     }
     $baseAbs = join_in_root($ROOT_DIR, $baseRel);
 
@@ -2739,6 +3141,62 @@ case 'doc_save_draft': {
       if (!filename_matches_doc_code(basename($baseRel), $code)) {
       api_json(['ok' => false, 'error' => 'code_path_mismatch'], 400);
     }
+    $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $baseRel);
+    if (is_array($formEntry)) {
+      $dt = human_dt();
+      $state = form_load_state($DATA_DIR, $ROOT_DIR, $formEntry);
+      $manifest = form_load_manifest($DATA_DIR, $ROOT_DIR, $formEntry);
+      $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
+      $targetRevision = form_normalize_revision((string)($state['revision'] ?? '0'), '0');
+      $ext = form_extension_from_path((string)$formEntry['path']);
+      $reviewMeta = form_private_file_meta($DATA_DIR, (string)$formEntry['code'], $targetRevision, 'in_review', $ext);
+      $draftMeta = form_private_file_meta($DATA_DIR, (string)$formEntry['code'], $targetRevision, 'draft', $ext);
+      if (is_file($reviewMeta['abs'])) {
+        form_move_file_or_throw($reviewMeta['abs'], $draftMeta['abs']);
+      } elseif (!is_file($draftMeta['abs'])) {
+        api_json(['ok' => false, 'error' => 'nothing_to_reject'], 400);
+      }
+      $sha = form_sha256_file($draftMeta['abs']);
+      $size = @filesize($draftMeta['abs']) ?: 0;
+      $idx = form_find_working_entry_index($versions, $targetRevision, ['in_review', 'pending_approval', 'draft']);
+      if ($idx >= 0) {
+        $existingNote = trim((string)($versions[$idx]['note'] ?? ''));
+        $versions[$idx]['status'] = 'draft';
+        $versions[$idx]['date'] = $dt;
+        $versions[$idx]['storage'] = 'private';
+        $versions[$idx]['private_rel'] = $draftMeta['rel'];
+        $versions[$idx]['sha256'] = $sha;
+        $versions[$idx]['size_bytes'] = $size;
+        $versions[$idx]['rejectedBy'] = (string)($me['name'] ?? $me['username'] ?? '');
+        $versions[$idx]['rejectedDate'] = $dt;
+        if ($reason !== '') {
+          $versions[$idx]['note'] = ($existingNote !== '' ? ($existingNote . ' | ') : '') . 'Rejected: ' . $reason;
+        }
+        unset($versions[$idx]['submittedBy'], $versions[$idx]['submittedDate'], $versions[$idx]['approvedBy'], $versions[$idx]['approvedDate'], $versions[$idx]['live_path']);
+      }
+      $manifest['versions'] = $versions;
+      form_save_manifest($DATA_DIR, (string)$formEntry['code'], $manifest);
+      $state['status'] = 'draft';
+      $state['revision'] = $targetRevision;
+      $state['rejectedBy'] = [
+        'name' => (string)($me['name'] ?? $me['username'] ?? ''),
+        'role' => (string)($me['role'] ?? ''),
+        'date' => $dt,
+        'reason' => $reason,
+      ];
+      foreach (['submittedBy','submittedDate','submittedUpdateType','approvedBy','approvedDate'] as $k) {
+        if (array_key_exists($k, $state)) unset($state[$k]);
+      }
+      form_save_state($DATA_DIR, (string)$formEntry['code'], $state);
+      invalidate_scan_cache($DATA_DIR);
+      api_json([
+        'ok' => true,
+        'code' => (string)$formEntry['code'],
+        'state' => $state,
+        'versions' => form_public_versions($manifest, $state, (string)$formEntry['code'], (string)$formEntry['path']),
+        'server_time' => now_iso(),
+      ]);
+    }
     $dt = human_dt();
     $info = doc_store_info($ROOT_DIR, $baseRel);
     $state = load_doc_state($ROOT_DIR, $baseRel, $ARCHIVE_DIR, $code) ?? [];
@@ -2832,6 +3290,17 @@ case 'doc_save_draft': {
     if (trim($basePath) === '') api_json(['ok' => false, 'error' => 'missing_base_path'], 400);
     if (!in_array($field, ['owner', 'approver'], true)) api_json(['ok' => false, 'error' => 'invalid_field'], 400);
     $baseRel = safe_rel_path($basePath);
+    $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $baseRel);
+    if (is_array($formEntry)) {
+      $state = form_load_state($DATA_DIR, $ROOT_DIR, $formEntry);
+      $state[$field] = $value;
+      form_save_state($DATA_DIR, (string)$formEntry['code'], $state);
+      if ($field === 'owner') {
+        form_registry_patch_entry($FORM_CONTROL_REGISTRY_FILE, (string)$formEntry['code'], ['owner' => $value]);
+        invalidate_scan_cache($DATA_DIR);
+      }
+      api_json(['ok' => true, 'code' => (string)$formEntry['code'], 'state' => $state, 'server_time' => now_iso()]);
+    }
     $state = load_doc_state($ROOT_DIR, $baseRel, $ARCHIVE_DIR, $code) ?? [];
     $state[$field] = $value;
     save_doc_state($ROOT_DIR, $baseRel, $state);
@@ -2865,6 +3334,59 @@ case 'doc_save_draft': {
     if (trim($code) === '') api_json(['ok' => false, 'error' => 'missing_code'], 400);
     if (trim($basePath) === '') api_json(['ok' => false, 'error' => 'missing_base_path'], 400);
     $baseRel = safe_rel_path($basePath);
+    $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $baseRel);
+    if (is_array($formEntry)) {
+      $state = form_load_state($DATA_DIR, $ROOT_DIR, $formEntry);
+      $manifest = form_load_manifest($DATA_DIR, $ROOT_DIR, $formEntry);
+      $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
+      $kept = [];
+      $deleted = 0;
+      foreach ($versions as $version) {
+        if (!is_array($version)) continue;
+        $status = (string)($version['status'] ?? '');
+        if (in_array($status, ['draft', 'in_review', 'pending_approval'], true)) {
+          $privateRel = trim((string)($version['private_rel'] ?? ''));
+          if ($privateRel !== '') {
+            try {
+              $privateAbs = form_resolve_private_abs($DATA_DIR, $privateRel);
+              if (is_file($privateAbs)) @unlink($privateAbs);
+            } catch (Throwable $e) {
+              // ignore stale private files
+            }
+          }
+          $deleted++;
+          continue;
+        }
+        $kept[] = $version;
+      }
+      $manifest['versions'] = $kept;
+      form_save_manifest($DATA_DIR, (string)$formEntry['code'], $manifest);
+      $hasApproved = false;
+      foreach ($kept as $version) {
+        if (!is_array($version)) continue;
+        if (in_array((string)($version['status'] ?? ''), ['approved', 'initial_release'], true)) {
+          $hasApproved = true;
+          break;
+        }
+      }
+      $releasedRev = form_latest_released_revision(['versions' => $kept], $state, form_normalize_revision((string)($formEntry['rev'] ?? '0'), '0'));
+      $state['status'] = $hasApproved ? 'approved' : 'draft';
+      $state['revision'] = $hasApproved ? $releasedRev : form_normalize_revision((string)($state['revision'] ?? '0'), '0');
+      $state['released_revision'] = $releasedRev;
+      foreach (['submittedBy','submittedDate','submittedUpdateType','rejectedBy','checked_out_by'] as $k) {
+        if (array_key_exists($k, $state)) unset($state[$k]);
+      }
+      form_save_state($DATA_DIR, (string)$formEntry['code'], $state);
+      invalidate_scan_cache($DATA_DIR);
+      api_json([
+        'ok' => true,
+        'code' => (string)$formEntry['code'],
+        'deleted' => $deleted,
+        'state' => $state,
+        'versions' => form_public_versions($manifest, $state, (string)$formEntry['code'], (string)$formEntry['path']),
+        'server_time' => now_iso(),
+      ]);
+    }
     $info = doc_store_info($ROOT_DIR, $baseRel);
     $manifest = load_doc_manifest($ROOT_DIR, $baseRel, $ARCHIVE_DIR, $code);
     $versions = $manifest['versions'] ?? [];
@@ -4296,6 +4818,58 @@ if ($username === '') {
     $hidden = load_doc_visibility($DOC_VIS_FILE);
     $visibleDocs = portal_filter_docs_for_user($docs, $me, $PORTAL_CONFIG_JS_FILE, $hidden);
     api_json(['ok' => true, 'docs' => $visibleDocs, 'tree' => $tree, 'count' => count($visibleDocs), 'cached' => false]);
+  }
+
+  case 'form_version_stream': {
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    if (empty($_SESSION['user'])) {
+      header('Location: portal.html');
+      http_response_code(302);
+      exit;
+    }
+    $me = require_logged_in($store);
+    $code = strtoupper(trim((string)($_GET['code'] ?? '')));
+    $basePath = (string)($_GET['base_path'] ?? ($_GET['path'] ?? ''));
+    $id = trim((string)($_GET['id'] ?? ''));
+    if ($code === '' || trim($basePath) === '' || $id === '') api_json(['ok' => false, 'error' => 'missing_params'], 400);
+    $baseRel = safe_rel_path($basePath);
+    $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $baseRel);
+    if (!is_array($formEntry)) api_json(['ok' => false, 'error' => 'form_not_found'], 404);
+    $doc = [
+      'code' => strtoupper(trim((string)($formEntry['code'] ?? $code))),
+      'path' => (string)($formEntry['path'] ?? $baseRel),
+      'folder' => (string)($formEntry['folder'] ?? dirname($baseRel)),
+      'cat' => 'FRM',
+    ];
+    $hidden = load_doc_visibility($DOC_VIS_FILE);
+    if (!portal_can_access_doc($me, $doc, portal_load_role_docs($PORTAL_CONFIG_JS_FILE), array_values(array_map(function($value) {
+      return strtoupper((string)$value);
+    }, $hidden)))) {
+      api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    }
+    $resolved = form_resolve_version_for_stream($DATA_DIR, $ROOT_DIR, $formEntry, $id);
+    if (!is_array($resolved) || !is_file((string)($resolved['abs'] ?? ''))) api_json(['ok' => false, 'error' => 'not_found'], 404);
+    $ext = strtolower((string)($resolved['ext'] ?? ''));
+    $mimeMap = [
+      'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'xlsm' => 'application/vnd.ms-excel.sheet.macroEnabled.12',
+      'xls' => 'application/vnd.ms-excel',
+      'csv' => 'text/csv; charset=utf-8',
+    ];
+    $contentType = $mimeMap[$ext] ?? 'application/octet-stream';
+    if (session_status() === PHP_SESSION_ACTIVE) @session_write_close();
+    http_response_code(200);
+    header('Content-Type: ' . $contentType);
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: same-origin');
+    header('Content-Disposition: attachment; filename="' . rawurlencode((string)($resolved['name'] ?? basename((string)$resolved['abs']))) . '"');
+    $size = @filesize((string)$resolved['abs']);
+    if ($size !== false) header('Content-Length: ' . (string)$size);
+    readfile((string)$resolved['abs']);
+    exit;
   }
 
   case 'doc_stream': {

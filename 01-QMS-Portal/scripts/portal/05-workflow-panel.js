@@ -570,6 +570,7 @@ function renderAdminRetention(){
 function renderVersionHistory(doc){
   if(!doc) return;
   const container=document.getElementById('vh-container');
+  const isWorkbook = (typeof isDownloadOnlyDoc==='function') ? isDownloadOnlyDoc(doc) : false;
 
   // Load + normalize history
   let versions=getDocVersions(doc.code);
@@ -601,14 +602,14 @@ function renderVersionHistory(doc){
         ${versions.length===0
           ?'<div style="padding:16px;text-align:center;font-size:11px;color:#94a3b8">'+T('wf_no_history')+'</div>'
           :versions.map((v,i)=>`
-            <div class="vh-entry ${(v.status==='approved' && v.file===doc.path)?'vh-current':''} ${v.file?'vh-clickable':''}" ${v.file?'onclick="openVersionPreview(\''+doc.code+'\','+i+')"':''}>
+            <div class="vh-entry ${isCurrentVersionEntry(doc,v)?'vh-current':''} ${versionHasAccess(doc,v)?'vh-clickable':''}" ${versionHasAccess(doc,v)?'onclick="openVersionPreview(\''+doc.code+'\','+i+')"':''}>
               <div class="vh-dot ${v.status}"></div>
               <div class="vh-info">
                 <span class="ver">${v.version}</span>
                 <span style="color:${statusColor(v.status)};font-size:10px;font-weight:600;margin-left:6px">${statusLabel(v.status)}</span>
                 ${v.updateType?'<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin-left:4px;'+(v.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(v.updateType==='major'?'MAJOR':'MINOR')+'</span>':''}
-                ${(v.status==='approved' && v.file===doc.path)?'<span style="background:#dcfce7;color:#16a34a;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;font-weight:700">'+T('wf_current')+'</span>':''}
-                ${v.file?'<span style="font-size:9px;color:#1565c0;margin-left:4px;cursor:pointer" title="'+(lang==='en'?'Click to view':'Nhấn để xem')+'">👁 '+(lang==='en'?'View':'Xem')+'</span>':''}
+                ${isCurrentVersionEntry(doc,v)?'<span style="background:#dcfce7;color:#16a34a;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;font-weight:700">'+T('wf_current')+'</span>':''}
+                ${versionHasAccess(doc,v)?'<span style="font-size:9px;color:#1565c0;margin-left:4px;cursor:pointer" title="'+(lang==='en'?(isWorkbook?'Click to download':'Click to view'):(isWorkbook?'Nhấn để tải':'Nhấn để xem'))+'">'+(isWorkbook?'⬇':'👁')+' '+(lang==='en'?(isWorkbook?'Download':'View'):(isWorkbook?'Tải':'Xem'))+'</span>':''}
                 <div class="date">${v.date}</div>
                 <div class="who">${v.user} — ${v.role}</div>
                 ${v.submittedBy?'<div style="font-size:10px;color:#0369a1;margin-top:2px">📤 '+(lang==='en'?'Submitted by':'Gửi bởi')+': '+v.submittedBy+(v.submittedDate?' · '+v.submittedDate:'')+'</div>':''}
@@ -616,7 +617,7 @@ function renderVersionHistory(doc){
                 ${v.approvedBy?'<div style="font-size:10px;color:#16a34a;margin-top:2px">✅ '+(lang==='en'?'Approved by':'Duyệt bởi')+': '+v.approvedBy+(v.approvedDate?' · '+v.approvedDate:'')+'</div>':''}
                 ${v.note?'<div class="note">"'+v.note+'"</div>':''}
               </div>
-              ${i>0&&v.file&&canEdit({code:doc.code})?'<button class="vh-restore" onclick="event.stopPropagation();restoreVersion(\''+doc.code+'\','+i+')">'+T('wf_restore')+'</button>':''}
+              ${!isWorkbook && i>0 && versionHasAccess(doc,v) && canEdit({code:doc.code})?'<button class="vh-restore" onclick="event.stopPropagation();restoreVersion(\''+doc.code+'\','+i+')">'+T('wf_restore')+'</button>':''}
               ${canDeleteVersion(doc.code,v)&&isAdmin()?'<button class="vh-restore" style="color:#dc2626;border-color:#fca5a5" onclick="event.stopPropagation();deleteVersion(\''+doc.code+'\','+i+')" title="'+(lang==='en'?'Retention period exceeded':'Hết hạn lưu giữ')+'">🗑 '+(lang==='en'?'Delete':'Xóa')+'</button>':''}
             </div>
           `).join('')
@@ -649,12 +650,43 @@ function openVersionPreview(code, idx){
 
   const versions=getDocVersions(code);
   const v=versions[idx];
-  if(!v||!v.file) return;
   const doc=DOCS.find(d=>d.code===code);
+  const accessUrl=getVersionAccessUrl(doc,v);
+  if(!v || !accessUrl) return;
+  const isWorkbook = (typeof isDownloadOnlyDoc==='function') ? isDownloadOnlyDoc(doc) : false;
 
   const overlay=document.createElement('div');
   overlay.className='vp-overlay';
-  overlay.innerHTML=`
+  overlay.innerHTML=isWorkbook ? `
+    <div class="vp-modal" style="max-width:720px">
+      <div class="vp-header">
+        <div>
+          <h4>${doc?doc.code:code} — ${v.version} <span style="color:${statusColor(v.status)};font-size:11px">${statusLabel(v.status)}</span></h4>
+          <div class="vp-meta">${v.date} · ${v.user} · ${v.role}${v.note?' · "'+v.note+'"':''}</div>
+        </div>
+        <div class="vp-actions">
+          <button class="vp-open" onclick="event.stopPropagation();window.open('${accessUrl}','_blank')">⬇ ${lang==='en'?'Download version':'Tải phiên bản'}</button>
+          <button class="vp-close" onclick="event.stopPropagation();var o=this.closest('.vp-overlay'); if(o) o.remove();">✕</button>
+        </div>
+      </div>
+      <div class="vp-body" style="padding:22px;background:#f8fafc">
+        <div style="background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:20px">
+          <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:10px">${lang==='en'?'Controlled workbook version':'Phiên bản workbook được kiểm soát'}</div>
+          <div style="font-size:26px;font-weight:800;color:#0f172a;margin-bottom:6px">${v.version}</div>
+          <div style="font-size:14px;color:#475569;line-height:1.6">
+            ${lang==='en'
+              ?'This Excel version is stored under controlled release history. Use the button above to download the exact staged or archived workbook.'
+              :'Phiên bản Excel này được lưu trong lịch sử phát hành có kiểm soát. Dùng nút phía trên để tải đúng workbook đã được stage hoặc archive.'}
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:18px">
+            <div style="border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#fff"><b style="display:block;font-size:11px;color:#64748b;text-transform:uppercase;margin-bottom:4px">${lang==='en'?'Status':'Trạng thái'}</b><span>${statusLabel(v.status)}</span></div>
+            <div style="border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#fff"><b style="display:block;font-size:11px;color:#64748b;text-transform:uppercase;margin-bottom:4px">${lang==='en'?'Updated by':'Cập nhật bởi'}</b><span>${v.user||'—'}</span></div>
+            <div style="border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#fff"><b style="display:block;font-size:11px;color:#64748b;text-transform:uppercase;margin-bottom:4px">${lang==='en'?'When':'Thời điểm'}</b><span>${v.date||'—'}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ` : `
     <div class="vp-modal">
       <div class="vp-header">
         <div>
@@ -662,16 +694,20 @@ function openVersionPreview(code, idx){
           <div class="vp-meta">${v.date} · ${v.user} · ${v.role}${v.note?' · "'+v.note+'"':''}</div>
         </div>
         <div class="vp-actions">
-          <button class="vp-open" onclick="event.stopPropagation();window.open('../${v.file}${v.file.indexOf('?')>=0?'&':'?'}t=${Date.now()}','_blank')">↗ ${lang==='en'?'Open in new tab':'Mở tab mới'}</button>
+          <button class="vp-open" onclick="event.stopPropagation();window.open('${accessUrl}${accessUrl.indexOf('?')>=0?'&':'?'}t=${Date.now()}','_blank')">↗ ${lang==='en'?'Open in new tab':'Mở tab mới'}</button>
           <button class="vp-close" onclick="event.stopPropagation();var o=this.closest('.vp-overlay'); if(o) o.remove();">✕</button>
         </div>
       </div>
       <div class="vp-body" style="padding:0">
-        <iframe src="../${v.file}${v.file.indexOf('?')>=0?'&':'?'}t=${Date.now()}" style="width:100%;height:75vh;border:0"></iframe>
+        <iframe src="${accessUrl}${accessUrl.indexOf('?')>=0?'&':'?'}t=${Date.now()}" style="width:100%;height:75vh;border:0"></iframe>
       </div>
     </div>
   `;
   document.body.appendChild(overlay);
+  if(isWorkbook){
+    overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
+    return;
+  }
   // Sync language (VI/EN) for the preview iframe
   try{
     const fr=overlay.querySelector('iframe');
@@ -696,4 +732,3 @@ function openVersionPreview(code, idx){
 }
 
 // ═══════════════════════════════════════════════════
-

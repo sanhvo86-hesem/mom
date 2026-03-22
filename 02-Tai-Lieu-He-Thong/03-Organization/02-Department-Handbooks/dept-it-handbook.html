@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -64,10 +64,10 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left:4px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
-.role-boundary{border:1px solid #cfe0ff;border-left:4px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
+.ranh giới trách nhiệm{border:1px solid #cfe0ff;border-left:4px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
 .phase-card{border:1px solid var(--ln);border-left:4px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
 .phase-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.phase-card p:last-child,.role-boundary p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
+.phase-card p:last-child,.ranh giới trách nhiệm p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
 .small-note{font-size:12px;color:var(--ink2);}
 
 
@@ -123,7 +123,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
       </div>
       <div class="doc-content" id="docContent">
         <div class="form-sheet">
-<div class="iso-map"><div class="iso-title">Department control intent</div><div class="req"><span class="req-tag shall">PHẢI</span><div>IT phải giữ hạ tầng số, quyền truy cập và khả năng phục hồi ở trạng thái sẵn sàng cho vận hành; tính tiện lợi không được đánh đổi bằng mất kiểm soát quyền hoặc mất khả năng khôi phục.</div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi cấp quyền, đổi quyền, thu hồi quyền, cấu hình list/library/flow và thiết bị đầu cuối phải có ticket/record được phê duyệt và truy vết.</div></div><div class="req"><span class="req-tag should">NÊN</span><div>IT vận hành theo nguyên tắc “recovery-ready”: backup dùng được, restore đã test, fallback kit sẵn sàng, endpoint có kỷ luật và owner rõ.</div></div></div>
+<div class="iso-map"><div class="iso-title">Department control intent</div><div class="req"><span class="req-tag shall">PHẢI</span><div>IT phải giữ hạ tầng số, quyền truy cập và khả năng phục hồi ở trạng thái sẵn sàng cho vận hành; tính tiện lợi không được đánh đổi bằng mất kiểm soát quyền hoặc mất khả năng khôi phục.</div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi cấp quyền, đổi quyền, thu hồi quyền, cấu hình list/library/flow và thiết bị đầu cuối phải có ticket/record được phê duyệt và truy vết.</div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>IT vận hành theo nguyên tắc “recovery-ready”: backup dùng được, restore đã test, fallback kit sẵn sàng, endpoint có kỷ luật và owner rõ.</div></div></div>
 <div class="preface-block"><div class="grid-2"><div><p><b>Vai trò thuộc phòng</b></p><div><span class="inline-tag">IT Admin</span><span class="inline-tag">Support vendor / service partner (nếu có)</span></div></div><div><p><b>Mã tài liệu chính</b></p><div><span class="inline-tag">SOP-104</span><span class="inline-tag">SOP-106</span><span class="inline-tag">SOP-108</span><span class="inline-tag">WI-101</span><span class="inline-tag">ANNEX-IT-001</span><span class="inline-tag">ANNEX-IT-002</span><span class="inline-tag">ANNEX-QMS-005</span><span class="inline-tag">ANNEX-QMS-006</span><span class="inline-tag">ANNEX-QMS-019</span><span class="inline-tag">ANNEX-QMS-021</span></div></div></div></div>
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#t1">1. Mục tiêu phòng ban</a><a href="#t2">2. Phạm vi</a><a href="#t3">3. Trách nhiệm bắt buộc</a><a href="#t4">4. Quyền hạn</a><a href="#t5">5. Đầu ra bắt buộc</a><a href="#t6">6. KPI</a><a href="#t7">7. Giao diện phòng ban</a><a href="#t8">8. Tài liệu liên quan</a><a href="#t9">9. Mô hình vận hành &amp; ranh giới vai trò</a><a href="#t10">10. Nhịp điều hành, dữ liệu và bằng chứng</a><a href="#t11">11. Năng lực, backup coverage và deputy rule</a><a href="#t12">12. Rủi ro trọng yếu &amp; trigger escalation</a></div></div>
 <h2 class="h2" id="t1">1. Mục tiêu phòng ban</h2>

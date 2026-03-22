@@ -1037,6 +1037,10 @@ function submitForReview(code){
   try{
     const doc=DOCS.find(d=>d.code===code);
     if(!doc) return;
+    if(typeof isDownloadOnlyDoc==='function' && isDownloadOnlyDoc(doc)){
+      submitWorkbookForReview(code);
+      return;
+    }
 
     
     // Prevent submit while viewing translated EN to avoid capturing translated header/UI into archive HTML
@@ -1163,6 +1167,97 @@ function submitForReview(code){
   }
 }
 
+async function uploadFormDraft(code){
+  try{
+    const doc = DOCS.find(d=>d.code===code);
+    if(!doc) return;
+    const state = getDocState(code) || {revision:doc.rev||'0', status:'draft'};
+    if(state.status === 'approved'){
+      showToast(lang==='en'?'Start a new revision first':'Hãy bắt đầu phiên bản mới trước');
+      return;
+    }
+    const revision = String(state.revision || doc.rev || '0');
+    const note = prompt(
+      lang==='en'
+        ? `Upload workbook draft for ${doc.code} (v${revision})\n\nAdd a short check-in comment:`
+        : `Upload workbook nháp cho ${doc.code} (v${revision})\n\nNhập ghi chú check-in ngắn:`,
+      ''
+    );
+    if(note === null) return;
+    const picker = document.createElement('input');
+    picker.type = 'file';
+    picker.accept = '.xlsx,.xlsm,.xls,.csv';
+    picker.style.display = 'none';
+    picker.onchange = async function(){
+      try{
+        const file = picker.files && picker.files[0];
+        if(!file) return;
+        const fd = new FormData();
+        fd.append('code', doc.code);
+        fd.append('base_path', doc.path);
+        fd.append('revision', revision);
+        fd.append('note', note || '');
+        fd.append('file', file, file.name);
+        showToast(lang==='en'?'Uploading workbook draft...':'Đang upload workbook nháp...');
+        const res = await apiCallFormData('form_upload_draft', fd, 180000);
+        if(res && res.ok){
+          if(res.state) setDocState(code, res.state);
+          if(res.versions) setDocVersions(code, res.versions);
+          showToast(lang==='en'?'✅ Workbook draft uploaded':'✅ Đã upload workbook nháp');
+          await openDocPreview(code);
+          return;
+        }
+        showToast('\u26A0 ' + ((res && (res.detail || res.error)) ? (res.detail || res.error) : 'upload_failed'));
+      }catch(err){
+        console.error('uploadFormDraft error:', err);
+        showToast('Error: '+(err && err.message ? err.message : err));
+      }finally{
+        setTimeout(()=>{ try{ picker.remove(); }catch(e){} }, 0);
+      }
+    };
+    document.body.appendChild(picker);
+    picker.click();
+  }catch(err){
+    console.error('uploadFormDraft error:', err);
+    showToast('Error: '+(err && err.message ? err.message : err));
+  }
+}
+
+async function submitWorkbookForReview(code){
+  try{
+    const doc = DOCS.find(d=>d.code===code);
+    if(!doc) return;
+    const state = getDocState(code) || {status:'draft', revision:doc.rev||'0'};
+    const revision = String(state.revision || doc.rev || '0');
+    const versions = getDocVersions(code) || [];
+    const hasDraftUpload = versions.some(v=>v && v.status==='draft' && String(v.version||'').replace(/^v/i,'')===revision && versionHasAccess(doc, v));
+    if(!hasDraftUpload){
+      showToast(lang==='en'?'Upload a draft workbook first':'Hãy upload workbook nháp trước');
+      return;
+    }
+    const note = prompt(
+      lang==='en'
+        ? `Submit workbook ${doc.code} v${revision} for review\n\nChange note:`
+        : `Gửi workbook ${doc.code} v${revision} để xem xét\n\nGhi chú thay đổi:`,
+      ''
+    );
+    if(note === null) return;
+    const updateType = String(state.updateType || 'minor') === 'major' ? 'major' : 'minor';
+    const res = await apiCall('doc_submit_review', {code: doc.code, base_path: doc.path, revision, updateType, note: note || ''});
+    if(res && res.ok){
+      if(res.state) setDocState(code, res.state);
+      if(res.versions) setDocVersions(code, res.versions);
+      showToast(lang==='en'?'📤 Workbook submitted for review':'📤 Đã gửi workbook để xem xét');
+      await openDocPreview(code);
+      return;
+    }
+    showToast('\u26A0 ' + ((res && (res.detail || res.error)) ? (res.detail || res.error) : 'submit_failed'));
+  }catch(err){
+    console.error('submitWorkbookForReview error:', err);
+    showToast('Error: '+(err && err.message ? err.message : err));
+  }
+}
+
 let _selectedSubmitType=null;
 let _submitTypeLock=null;
 
@@ -1258,7 +1353,7 @@ async function approveDoc(code){
     const state = getDocState(code) || {status:'draft', revision: doc.rev||'0'};
     const updateType = state.updateType || (state.submittedUpdateType||'minor');
     const currentRev = String(state.revision || doc.rev || '0');
-    const prevRev = String(doc.rev || '0');
+    const prevRev = String(state.released_revision || doc.rev || '0');
 
     // IMPORTANT: do NOT bump revision here.
     // The revision to approve is the current state.revision (set when starting a new revision / submitting for review).
@@ -1333,9 +1428,14 @@ async function rejectDoc(code){
 async function restoreVersion(code, idx){
   const doc=DOCS.find(d=>d.code===code);
   if(!doc) return;
+  if(typeof isDownloadOnlyDoc==='function' && isDownloadOnlyDoc(doc)){
+    showToast(lang==='en'?'Restore to draft is not available for workbook versions. Start a new revision and upload a workbook draft instead.':'Khôi phục thành nháp chưa áp dụng cho workbook. Hãy bắt đầu phiên bản mới rồi upload workbook nháp.');
+    return;
+  }
   const versions=getDocVersions(code);
   const v=versions[idx];
-  if(!v || !v.file) return;
+  const url = getVersionAccessUrl(doc, v);
+  if(!v || !url) return;
 
   const msg = lang==='en'
     ? ('Restore ' + (v.version||'this version') + ' as a NEW draft?')
@@ -1344,8 +1444,7 @@ async function restoreVersion(code, idx){
 
   try{
     // Fetch the full HTML file of the selected version
-    const url = '../' + v.file + (v.file.indexOf('?')>=0 ? '&' : '?') + 't=' + Date.now();
-    const html = await fetch(url, {credentials:'include'}).then(r=>r.text());
+    const html = await fetch(url + (url.indexOf('?')>=0 ? '&' : '?') + 't=' + Date.now(), {credentials:'include'}).then(r=>r.text());
     const rev = (v.version||'v0').replace(/^v/i,'') || '0';
     const note = (lang==='en'?'Restored from ':'Khôi phục từ ') + (v.version||'');
 
@@ -1416,6 +1515,69 @@ function loadDocContent(code){
     iframe.removeAttribute('src');
   }catch(e){}
 
+  if(typeof isDownloadOnlyDoc==='function' && isDownloadOnlyDoc(doc)){
+    const state=getDocState(code)||{};
+    const versions=getDocVersions(code)||[];
+    const currentEntry=versions.find(v=>isCurrentVersionEntry(doc,v)) || versions.find(v=>v && (v.status==='approved' || v.status==='initial_release')) || null;
+    const workingEntry=versions.find(v=>v && (v.status==='draft' || v.status==='in_review')) || null;
+    const currentUrl=currentEntry ? getVersionAccessUrl(doc,currentEntry) : buildDocStreamUrl(doc,true);
+    const workingUrl=workingEntry ? getVersionAccessUrl(doc,workingEntry) : '';
+    const revision=String(getDocRevision(doc)||'0');
+    const status=String(getDocStatus(doc)||'approved');
+    const title=(typeof escapeHtml==='function') ? escapeHtml(getDocDisplayTitle(doc)||doc.title||doc.code) : (getDocDisplayTitle(doc)||doc.title||doc.code);
+    const desc=(typeof escapeHtml==='function') ? escapeHtml(getDocDisplayDescription(doc)||'') : (getDocDisplayDescription(doc)||'');
+    const owner=(typeof escapeHtml==='function') ? escapeHtml(String((state&&state.owner)||doc.owner||'QA/QMS')) : String((state&&state.owner)||doc.owner||'QA/QMS');
+    iframe.srcdoc = `<!DOCTYPE html>
+      <html lang="vi">
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body{margin:0;background:#f8fafc;font-family:Segoe UI,Arial,sans-serif;color:#0f172a}
+          .wrap{padding:24px}
+          .card{background:#fff;border:1px solid #dbe3ef;border-radius:18px;padding:24px;box-shadow:0 16px 40px rgba(15,23,42,.06)}
+          .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#475569;margin-bottom:8px}
+          h1{margin:0 0 8px;font-size:28px;line-height:1.2}
+          .sub{font-size:14px;color:#475569;margin-bottom:18px}
+          .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:18px 0 22px}
+          .meta{border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;background:#f8fafc}
+          .meta b{display:block;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+          .meta span{font-size:14px;font-weight:600}
+          .cta{display:flex;flex-wrap:wrap;gap:12px}
+          .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:700;border:1px solid #cbd5e1;background:#fff;color:#0f172a}
+          .btn.primary{background:#0f766e;color:#fff;border-color:#0f766e}
+          .note{margin-top:18px;padding:14px 16px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;font-size:13px;line-height:1.6}
+        </style>
+      </head>
+      <body>
+        <div class="wrap">
+          <div class="card">
+            <div class="eyebrow">Controlled Excel Form</div>
+            <h1>${doc.code} — ${title}</h1>
+            ${desc?`<div class="sub">${desc}</div>`:''}
+            <div class="grid">
+              <div class="meta"><b>${lang==='en'?'Current revision':'Phiên bản hiện hành'}</b><span>v${revision}</span></div>
+              <div class="meta"><b>${lang==='en'?'Status':'Trạng thái'}</b><span>${status}</span></div>
+              <div class="meta"><b>${lang==='en'?'Owner':'Chủ sở hữu'}</b><span>${owner}</span></div>
+              <div class="meta"><b>${lang==='en'?'Delivery mode':'Cách phát hành'}</b><span>${lang==='en'?'Download only':'Chỉ tải về'}</span></div>
+            </div>
+            <div class="cta">
+              <a class="btn primary" href="${currentUrl}" target="_blank">${lang==='en'?'Download current workbook':'Tải workbook hiện hành'}</a>
+              ${workingUrl?`<a class="btn" href="${workingUrl}" target="_blank">${lang==='en'?'Download working copy':'Tải bản làm việc'}</a>`:''}
+            </div>
+            <div class="note">
+              ${lang==='en'
+                ?'Excel forms are version-controlled through private staging, review, approval, and immutable archive. The active file remains at the canonical form path, while draft and historical copies are stored outside the web root.'
+                :'Biểu mẫu Excel hiện được kiểm soát phiên bản qua private staging, review, approval và immutable archive. File active vẫn nằm ở đường dẫn biểu mẫu chuẩn, còn draft và các bản lịch sử được lưu ngoài web root.'}
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>`;
+    if(loading) loading.style.display='none';
+    iframe.style.opacity='1';
+    return;
+  }
+
   // Load the best file (live approved OR archive working copy), then inject any
   // unsaved local edits (editor-only) on top.
   setTimeout(function(){
@@ -1460,4 +1622,3 @@ function loadDocContent(code){
 
 
 // ═══════════════════════════════════════════════════
-

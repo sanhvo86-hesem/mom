@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -65,10 +65,10 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left:4px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
-.role-boundary{border:1px solid #cfe0ff;border-left:4px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
+.ranh giới trách nhiệm{border:1px solid #cfe0ff;border-left:4px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
 .phase-card{border:1px solid var(--ln);border-left:4px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
 .phase-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.phase-card p:last-child,.role-boundary p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
+.phase-card p:last-child,.ranh giới trách nhiệm p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
 .small-note{font-size:12px;color:var(--ink2);}
 
 
@@ -124,7 +124,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </div>
 <div class="doc-content" id="docContent">
 <div class="form-sheet">
-<div class="iso-map"><div class="iso-title">Department control intent</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Engineering phải quản lý một baseline package sạch cho mỗi job/revision theo <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a>; không chấp nhận nhiều nguồn kỹ thuật song song ngoài kiểm soát.</div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi giả định thương mại-kỹ thuật ảnh hưởng cost, lead time, capability, inspection method hoặc outsource phải được ghi nhận có owner và ngày đóng.</div></div><div class="req"><span class="req-tag should">NÊN</span><div>Engineering thiết kế quá trình để ngăn lỗi từ đầu, giảm phụ thuộc vào kiểm cuối và giúp Production lặp lại được công việc.</div></div></div>
+<div class="iso-map"><div class="iso-title">Department control intent</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Engineering phải quản lý một baseline package sạch cho mỗi job/revision theo <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a>; không chấp nhận nhiều nguồn kỹ thuật song song ngoài kiểm soát.</div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi giả định thương mại-kỹ thuật ảnh hưởng cost, lead time, capability, inspection method hoặc outsource phải được ghi nhận có owner và ngày đóng.</div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Engineering thiết kế quá trình để ngăn lỗi từ đầu, giảm phụ thuộc vào kiểm cuối và giúp Production lặp lại được công việc.</div></div></div>
 <div class="preface-block"><div class="grid-2"><div><p><b>Vai trò thuộc phòng</b></p><div><span class="inline-tag">Engineering Lead / Manager</span><span class="inline-tag">DFM Engineer</span><span class="inline-tag">Process Engineer</span><span class="inline-tag">CAM / NC Programmer</span></div></div><div><p><b>Mã tài liệu chính</b></p><div><span class="inline-tag">SOP-301</span><span class="inline-tag">SOP-302</span><span class="inline-tag">SOP-303</span><span class="inline-tag">SOP-106</span><span class="inline-tag">WI-302</span><span class="inline-tag">WI-518</span><span class="inline-tag">WI-519</span><span class="inline-tag">ANNEX-ENG-001</span><span class="inline-tag">ANNEX-QA-004</span></div></div></div></div>
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#e1">1. Mục tiêu phòng ban</a><a href="#e2">2. Phạm vi</a><a href="#e3">3. Trách nhiệm bắt buộc</a><a href="#e4">4. Quyền hạn</a><a href="#e5">5. Đầu ra bắt buộc</a><a href="#e6">6. KPI</a><a href="#e7">7. Giao diện phòng ban</a><a href="#e8">8. Tài liệu liên quan</a><a href="#e9">9. Mô hình vận hành &amp; ranh giới vai trò</a><a href="#e10">10. Nhịp điều hành, dữ liệu và bằng chứng</a><a href="#e11">11. Năng lực, backup coverage và deputy rule</a><a href="#e12">12. Rủi ro trọng yếu &amp; trigger escalation</a></div></div>
 <h2 class="h2" id="e1">1. Mục tiêu phòng ban</h2>
@@ -162,8 +162,8 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2 phase3a-workbook-alignment" id="phase3a-eng-workbooks">13. Workbook-control cho khối Engineering</h2><div class="note phase3a-workbook-alignment"><b>Ý nghĩa vận hành</b><br/>Engineering không chỉ phát hành HTML-style records nữa. Các workbook mới kéo release control về đúng chỗ: package approval, inspection-program release và baseline evidence được kiểm soát bằng workbook có signoff lane và effectivity rõ.</div><ul class="tight phase3a-workbook-alignment">
 <li><a  download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM-305</a> là workbook release checklist cho inspection-program / quality planning; không dùng email thread làm bằng chứng release thay thế.</li>
 <li><a  download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-306_Engineering_Release_and_Baseline_Package_Approval.xlsx">FRM-306</a> là workbook phê duyệt baseline package và engineering release; đây là cổng kiểm soát chính khi job chuyển từ readiness kỹ thuật sang phát hành cho execution.</li>
-<li>Khi SOP/WI/handbook mô tả engineering release, phải xem HTML form cũ ngoài baseline V0 chỉ là nơi tra lịch sử / phạm vi mã / phạm vi quy trình; signoff thật luôn nằm trên workbook active.</li>
-</ul><div class="footer-note">Handbook này khóa lại cách Engineering ra quyết định sau cập nhật bộ SOP/WI/ANNEX. Khi thay đổi baseline package, SSOT, role-boundary hoặc logic prove-out/FAI, handbook phải được rà lại đồng thời với authority, RACI và các chuẩn kỹ thuật liên quan.</div>
+<li>Khi SOP/WI/handbook mô tả engineering release, phải xem HTML form cũ ngoài danh mục hiện hành chỉ là nơi tra lịch sử / phạm vi mã / phạm vi quy trình; signoff thật luôn nằm trên workbook active.</li>
+</ul><div class="footer-note">Handbook này khóa lại cách Engineering ra quyết định khi bộ SOP/WI/ANNEX thay đổi. Khi thay đổi baseline package, SSOT, ranh giới trách nhiệm hoặc logic prove-out/FAI, handbook phải được rà lại đồng thời với authority, RACI và các chuẩn kỹ thuật liên quan.</div>
 </div>
 </div>
 </div>
@@ -171,3 +171,5 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </div>
 </body>
 </html>
+
+

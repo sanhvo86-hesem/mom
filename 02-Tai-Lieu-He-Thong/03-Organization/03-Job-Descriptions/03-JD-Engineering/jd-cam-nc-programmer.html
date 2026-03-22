@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -118,7 +118,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Sau DFM/process release → lập trình CAM/NC → simulation/verification → phát hành chương trình có revision → hỗ trợ prove-out.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Role Mission)</h2>
-<div class="jd-mission"><p>CAM/NC Programmer chịu trách nhiệm phát hành chương trình gia công đúng revision, an toàn và có khả năng lặp lại trên các hệ máy được phân công. Đây là vị trí bảo vệ “ngôn ngữ máy” của công ty.</p><p>Vị trí này phải khóa chắc phiên bản, simulation, post-processor, program release pack và logic backup; tuyệt đối không để chương trình chưa xác minh hoặc chương trình lỗi thời lọt xuống xưởng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>NC program phát hành sạch lỗi logic cơ bản, có simulation / peer review phù hợp và đủ thông tin để setup dùng an toàn.</li><li>Revision control của chương trình được bảo vệ chặt; khi có sửa đổi đều truy được ai sửa, sửa gì, vì sao.</li><li>Phản ứng với lỗi hiện trường nhanh và có kỷ luật change control, không “vá file” thiếu kiểm soát.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> CAM/NC Programmer sở hữu độ đúng và tính kiểm soát của NC program; không thay Process Engineer trong định nghĩa phương pháp, không thay shopfloor trong điều độ và không cho phép sửa code vô kiểm soát tại máy.</p></div><div class="callout"><p><b>Trọng tâm cập nhật từ bộ tài liệu vận hành nâng cấp</b></p><ul class="tight"><li>Phát hành NC package an toàn, đúng revision, đúng machine family/post-processor và đủ bằng chứng prove-out để Setup/Operator chạy ổn định.</li><li>Mọi thay đổi program phải là controlled change; không chấp nhận “sửa tay ở máy” không dấu vết hoặc dùng file cũ vì tiện.</li><li>Hỗ trợ giải quyết bất thường bằng logic chương trình, chiến lược cắt và restart an toàn, không đẩy hết trách nhiệm cho vận hành.</li></ul></div>
+<div class="jd-mission"><p>CAM/NC Programmer chịu trách nhiệm phát hành chương trình gia công đúng revision, an toàn và có khả năng lặp lại trên các hệ máy được phân công. Đây là vị trí bảo vệ “ngôn ngữ máy” của công ty.</p><p>Vị trí này phải khóa chắc phiên bản, simulation, post-processor, program release pack và logic backup; tuyệt đối không để chương trình chưa xác minh hoặc chương trình lỗi thời lọt xuống xưởng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>NC program phát hành sạch lỗi logic cơ bản, có simulation / peer review phù hợp và đủ thông tin để setup dùng an toàn.</li><li>Revision control của chương trình được bảo vệ chặt; khi có sửa đổi đều truy được ai sửa, sửa gì, vì sao.</li><li>Phản ứng với lỗi hiện trường nhanh và có kỷ luật change control, không “vá file” thiếu kiểm soát.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> CAM/NC Programmer sở hữu độ đúng và tính kiểm soát của NC program; không thay Process Engineer trong định nghĩa phương pháp, không thay shopfloor trong điều độ và không cho phép sửa code vô kiểm soát tại máy.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Phát hành NC package an toàn, đúng revision, đúng machine family/post-processor và đủ bằng chứng prove-out để Setup/Operator chạy ổn định.</li><li>Mọi thay đổi program phải là controlled change; không chấp nhận “sửa tay ở máy” không dấu vết hoặc dùng file cũ vì tiện.</li><li>Hỗ trợ giải quyết bất thường bằng logic chương trình, chiến lược cắt và restart an toàn, không đẩy hết trách nhiệm cho vận hành.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
@@ -136,7 +136,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th style="width:26%">Lập trình và mô phỏng</th><td><ul><li>Xây toolpath, lựa chọn strategy cắt gọt phù hợp với machine / material / tolerance / surface requirement.</li><li>Thực hiện simulation, collision check, stock check, post-processing và xác nhận tính khả thi trước khi release.</li><li>Giữ logic đặt tên file, revision, thư mục lưu trữ, backup và program pack thống nhất theo quy định.</li></ul></td></tr><tr><th style="width:26%">Phát hành và quản revision</th><td><ul><li>Phát hành chương trình với đầy đủ release note, version, machine applicability, tool list / setup note cần thiết.</li><li>Thu hồi bản lỗi thời, ngăn sử dụng file cũ ở máy và kiểm soát chặt quyền truy cập / chỉnh sửa file NC.</li><li>Thực hiện peer review / checklist review đối với chương trình phức tạp hoặc job có rủi ro cao.</li></ul></td></tr><tr><th style="width:26%">Hỗ trợ prove-out và change control</th><td><ul><li>Phối hợp setup trong prove-out, xử lý lỗi toolpath / post / sequence khi phát hiện ở hiện trường.</li><li>Mọi sửa đổi sau release phải qua log thay đổi, ghi chú nguyên nhân và cập nhật revision / release pack phù hợp.</li><li>Rút kinh nghiệm từ lỗi hiện trường để cập nhật strategy / post / standard library.</li></ul></td></tr>
 <tr><th style="width:26%">NC package control &amp; prove-out support</th><td><ul><li>Quản trị NC version, post-processor, simulation/prove-out intent, setup reference, restart logic, safe line and machine-specific constraints.</li><li>Phối hợp với Process/Setup/QC trong giai đoạn first-piece và khi có abnormality liên quan toolpath, strategy, cycle stability hoặc surface/geometry result.</li><li>Khi thay đổi program sau phát hành, phải để lại dấu vết change reason, approval path và điều kiện tái xác nhận tương ứng.</li></ul></td></tr></tbody></table>
 </div>
-<div class="table-card role-boundary-box">
+<div class="table-card ranh giới trách nhiệm-box">
 <table class="table">
 <tbody>
 <tr>
@@ -234,3 +234,5 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </div>
 </body>
 </html>
+
+

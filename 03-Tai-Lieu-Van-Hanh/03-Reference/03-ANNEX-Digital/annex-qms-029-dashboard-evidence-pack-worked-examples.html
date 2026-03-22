@@ -128,7 +128,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="table-card"><table class="table"><thead><tr><th>Thành phần pack</th><th>Nội dung ví dụ</th><th>Ghi chú kiểm soát</th></tr></thead><tbody>
 <tr><td>Cover page</td><td>Pack title, period, freeze-date, owner, audience, confidentiality, version</td><td>Không có cover = khó chứng minh đã review pack nào.</td></tr>
 <tr><td>Metric summary</td><td>OTD, FPY, NCR rate, overdue CAPA, training completion, supplier on-time</td><td>Chỉ dùng số đã freeze; không kéo live data sau thời điểm khóa.</td></tr>
-<tr><td>Commentary</td><td>3–5 bullet về biến động, cause nổi bật, risk và action</td><td>Commentary phải tách với raw data.</td></tr>
+<tr><td>Ghi chú điều hành</td><td>3–5 bullet về biến động, cause nổi bật, risk và action</td><td>Ghi chú điều hành phải tách với raw data.</td></tr>
 <tr><td>Evidence index</td><td>Link đến extract, query, list, report, cert log, NCR log</td><td>Link phải trỏ tới SoR/SSOT, không trỏ bản copy không kiểm soát.</td></tr>
 <tr><td>Exception note (nếu có)</td><td>Gắn sang worked example B</td><td>Nếu có bất thường, freeze-date pack không được giả vờ “số sạch”.</td></tr>
 </tbody></table></div>
@@ -139,7 +139,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <tr><td>Issue summary</td><td>Shipment postings 12-Mar chưa đồng bộ do outage ERP 09:10–11:45</td><td>Giải thích vì sao số liệu pack lệch so với live view.</td></tr>
 <tr><td>Affected KPI / dashboard</td><td>OTD dispatch, shipped revenue, overdue jobs</td><td>Chỉ rõ metric nào bị ảnh hưởng.</td></tr>
 <tr><td>Data impact</td><td>3 shipments posted late after freeze; revenue restated +1.8%</td><td>Cho người đọc biết mức độ ảnh hưởng.</td></tr>
-<tr><td>Temporary treatment</td><td>Freeze giữ nguyên; commentary nêu riêng; restatement ở pack kỳ sau</td><td>Không được sửa âm thầm.</td></tr>
+<tr><td>Temporary treatment</td><td>Freeze giữ nguyên; ghi chú điều hành nêu riêng; restatement ở pack kỳ sau</td><td>Không được sửa âm thầm.</td></tr>
 <tr><td>Owner / approver</td><td>Epicor admin / Finance manager / QA manager</td><td>Chỉ rõ ai chịu trách nhiệm giải trình.</td></tr>
 </tbody></table></div>
 <div class="field-grid">
@@ -157,15 +157,15 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <h2 class="h2" id="a5">5. Worked example D — management-review pack</h2>
 <div class="table-card"><table class="table"><thead><tr><th>Section</th><th>Nội dung ví dụ</th><th>Output phải tạo ra</th></tr></thead><tbody>
 <tr><td>Context &amp; risk shifts</td><td>Top business/customer/supply/people risks, changes since prior review</td><td>Decision về ưu tiên và nguồn lực</td></tr>
-<tr><td>Performance pack</td><td>KPI freeze-date summary + commentary + exception notes</td><td>Decision giữ / đổi target, escalation, special review</td></tr>
+<tr><td>Performance pack</td><td>KPI freeze-date summary + ghi chú điều hành + exception notes</td><td>Decision giữ / đổi target, escalation, special review</td></tr>
 <tr><td>Effectiveness of actions</td><td>Status NCR/CAPA/audit actions, overdue items, repeat issues</td><td>Close / carry-over / re-open / leadership action</td></tr>
 <tr><td>Resource &amp; competence</td><td>Skill coverage, deputy gaps, hiring/training needs, system constraints</td><td>Resource plan / competency action</td></tr>
-<tr><td>Improvement agenda</td><td>Top improvement projects, digital control, supplier actions, customer escalations</td><td>Project owner, due, review date</td></tr>
+<tr><td>Improvement agenda</td><td>Top improvement projects, kiểm soát dữ liệu và quyền truy cập, supplier actions, customer escalations</td><td>Project owner, due, review date</td></tr>
 </tbody></table></div>
 <div class="note">Worked example này nên chảy trực tiếp sang <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a>. Biên bản chỉ có giá trị khi người đến sau lần ngược được pack nào đã được dùng để ra từng quyết định.</div>
 <h2 class="h2" id="a5e">5E. Worked example E — competence / deputy note cho KPI pack</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:24%"/><col style="width:26%"/><col style="width:24%"/><col style="width:26%"/></colgroup><thead><tr><th>Scenario</th><th>Commentary chuẩn</th><th>Bằng chứng đính kèm</th><th>Decision ask lên management review</th></tr></thead><tbody><tr><td>OTD giảm vì chỉ một người đủ điều kiện chạy setup / first-piece</td><td>Nêu rõ đây là gap về deputy coverage, không phải chỉ là lịch làm việc. Ghi tên vai trò, công việc bị nghẽn và ngày risk sẽ thành critical.</td><td>FRM-807 skill matrix, FRM-805 level certification, FRM-806 tracking log, ANNEX-QMS-028 deputy matrix.</td><td>Phê duyệt kế hoạch requalification / temporary restriction / overtime containment / hiring or cross-training.</td></tr><tr><td>Defect lặp lại sau đào tạo lại</td><td>Ghi rõ người liên quan đã attend training nhưng bằng chứng competency và authorization còn thiếu hoặc chưa chứng minh hiệu lực trên sản phẩm thật.</td><td>FRM-803 OJT checklist, FRM-804 competency assessment, NCR/CAPA link.</td><td>Yêu cầu đổi phương pháp đào tạo, supervisor sign-off, revalidation on-job hoặc stop-release cho tới khi đủ điều kiện.</td></tr><tr><td>CMM / final release phụ thuộc một cá nhân duy nhất</td><td>Ghi rõ đây là continuity risk và audit-readiness risk; nêu điều kiện tạm chấp nhận và ngày hết hiệu lực.</td><td>Certification log, access / authorization record, deputy plan.</td><td>Mở action về deputy coverage, succession, recertification cadence và escalation class.</td></tr></tbody></table></div>
-<div class="note"><b>Cách dùng</b><br/>Worked example này dùng khi KPI commentary chạm tới yếu tố con người. Mục đích là để pack trình bày đúng bản chất vấn đề: không nhầm <b>đã học</b> với <b>đã đủ năng lực và được phép làm</b>.</div>
+<div class="table-card"><table class="table"><colgroup><col style="width:24%"/><col style="width:26%"/><col style="width:24%"/><col style="width:26%"/></colgroup><thead><tr><th>Scenario</th><th>Ghi chú điều hành chuẩn</th><th>Bằng chứng đính kèm</th><th>Decision ask lên management review</th></tr></thead><tbody><tr><td>OTD giảm vì chỉ một người đủ điều kiện chạy setup / first-piece</td><td>Nêu rõ đây là gap về bố trí người thay thế, không phải chỉ là lịch làm việc. Ghi tên vai trò, công việc bị nghẽn và ngày risk sẽ thành critical.</td><td>FRM-807 skill matrix, FRM-805 level certification, FRM-806 tracking log, ANNEX-QMS-028 deputy matrix.</td><td>Phê duyệt kế hoạch requalification / temporary restriction / overtime containment / hiring or cross-training.</td></tr><tr><td>Defect lặp lại sau đào tạo lại</td><td>Ghi rõ người liên quan đã attend training nhưng bằng chứng competency và authorization còn thiếu hoặc chưa chứng minh hiệu lực trên sản phẩm thật.</td><td>FRM-803 OJT checklist, FRM-804 competency assessment, NCR/CAPA link.</td><td>Yêu cầu đổi phương pháp đào tạo, supervisor sign-off, revalidation on-job hoặc stop-release cho tới khi đủ điều kiện.</td></tr><tr><td>CMM / final release phụ thuộc một cá nhân duy nhất</td><td>Ghi rõ đây là continuity risk và audit-readiness risk; nêu điều kiện tạm chấp nhận và ngày hết hiệu lực.</td><td>Certification log, access / authorization record, deputy plan.</td><td>Mở action về bố trí người thay thế, succession, recertification cadence và escalation class.</td></tr></tbody></table></div>
+<div class="note"><b>Cách dùng</b><br/>Worked example này dùng khi KPI ghi chú điều hành chạm tới yếu tố con người. Mục đích là để pack trình bày đúng bản chất vấn đề: không nhầm <b>đã học</b> với <b>đã đủ năng lực và được phép làm</b>.</div>
 <h2 class="h2" id="a6">6. Naming, metadata và evidence rules</h2>
 <div class="check-grid">
 <div class="check-item"><span class="chk"></span>Tên pack phải đọc ra được kỳ, freeze-date, version và audience</div>
@@ -204,3 +204,4 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </div></div></div></div>
 </body>
 </html>
+

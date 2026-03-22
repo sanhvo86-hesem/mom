@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -118,7 +118,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Điều phối toàn bộ thực thi inspection trong xưởng: first-off, in-process, final, evidence completeness và flow inspection priorities.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Role Mission)</h2>
-<div class="jd-mission"><p>QC Inspector Lead là người giữ nhịp vận hành của các quality gate tại hiện trường. Vị trí này bảo đảm đội QC phản hồi đúng thời điểm, dùng đúng phương pháp đo, áp cùng một tiêu chuẩn đánh giá và escalated đúng tuyến khi phát sinh bất thường.</p><p>Đây là vai trò cầu nối giữa chiến lược chất lượng của QA Manager và thực thi hằng ngày của QC Inspector. Chất lượng của first-piece, in-process, final inspection và sự trung thực của hồ sơ đo phụ thuộc lớn vào năng lực tổ chức tuyến đầu của vị trí này.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mọi yêu cầu kiểm quan trọng được nhận – phân công – phản hồi đúng SLA, không phụ thuộc vào cá nhân đơn lẻ.</li><li>Đội QC làm việc cùng một chuẩn: đúng revision, đúng gage/CMM, đúng cách ghi nhận và đúng nguyên tắc hold / escalate.</li><li>QA Manager nhìn thấy tín hiệu rủi ro sớm, còn Production nhận được chất lượng gate rõ ràng, nhất quán và truy vết được.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> QC Inspector Lead quản execution của tuyến inspection; không thay QA Manager trong release/disposition hệ thống và không thay Quality Engineer trong thiết kế control plan/phân tích hệ thống.</p></div><div class="callout"><p><b>Trọng tâm cập nhật từ bộ tài liệu vận hành nâng cấp</b></p><ul class="tight"><li>Biến yêu cầu quality gate thành lịch kiểm và phản ứng thực dụng: đúng người, đúng phương tiện đo, đúng SLA, đúng hold/release discipline.</li><li>Giữ integrity của inspection flow và suspect-product segregation; không để áp lực giao hàng làm mờ ranh giới giữa verify và approve.</li><li>Đưa feedback từ QC/CMM về QE/QA/Engineering/Production đủ nhanh để ngăn lỗi lặp hoặc ship-risk.</li></ul></div>
+<div class="jd-mission"><p>QC Inspector Lead là người giữ nhịp vận hành của các quality gate tại hiện trường. Vị trí này bảo đảm đội QC phản hồi đúng thời điểm, dùng đúng phương pháp đo, áp cùng một tiêu chuẩn đánh giá và escalated đúng tuyến khi phát sinh bất thường.</p><p>Đây là vai trò cầu nối giữa chiến lược chất lượng của QA Manager và thực thi hằng ngày của QC Inspector. Chất lượng của first-piece, in-process, final inspection và sự trung thực của hồ sơ đo phụ thuộc lớn vào năng lực tổ chức tuyến đầu của vị trí này.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mọi yêu cầu kiểm quan trọng được nhận – phân công – phản hồi đúng SLA, không phụ thuộc vào cá nhân đơn lẻ.</li><li>Đội QC làm việc cùng một chuẩn: đúng revision, đúng gage/CMM, đúng cách ghi nhận và đúng nguyên tắc hold / escalate.</li><li>QA Manager nhìn thấy tín hiệu rủi ro sớm, còn Production nhận được chất lượng gate rõ ràng, nhất quán và truy vết được.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> QC Inspector Lead quản execution của tuyến inspection; không thay QA Manager trong release/disposition hệ thống và không thay Quality Engineer trong thiết kế control plan/phân tích hệ thống.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Biến yêu cầu quality gate thành lịch kiểm và phản ứng thực dụng: đúng người, đúng phương tiện đo, đúng SLA, đúng hold/release discipline.</li><li>Giữ integrity của inspection flow và suspect-product segregation; không để áp lực giao hàng làm mờ ranh giới giữa verify và approve.</li><li>Đưa feedback từ QC/CMM về QE/QA/Engineering/Production đủ nhanh để ngăn lỗi lặp hoặc ship-risk.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
@@ -140,7 +140,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th style="width:26%">Dữ liệu và cải tiến tuyến đầu</th><td><ul><li>Theo dõi inspection response, record error, false accept, backlog, gage readiness và skill coverage của đội QC.</li><li>Đề xuất cải tiến layout kiểm, visual standard, sample plan deployment, phương pháp đo, dashboard hoặc logic phân công để tăng độ ổn định của quality gate.</li><li>Hỗ trợ audit / customer visit / management review bằng dữ liệu thực tế từ hiện trường QC.</li></ul></td></tr>
 <tr><th style="width:26%">Inspection flow, hold/release &amp; dossier integrity</th><td><ul><li>Bố trí nguồn lực kiểm, ưu tiên jobs theo gate/ship-risk, xác nhận gage/CMM status, review result logic và bảo đảm suspect product được segregate rõ.</li><li>Kiểm tra độ đầy đủ của dossier/evidence liên quan quality gate trước khi nhả bước tiếp theo hoặc trước khi chuyển final release.</li><li>Khi backlog hoặc abnormality đe dọa ship release, phải mở escalation với Planner/QA/Production thay vì âm thầm kéo dài hàng chờ.</li></ul></td></tr></tbody></table>
 </div>
-<div class="table-card role-boundary-box">
+<div class="table-card ranh giới trách nhiệm-box">
 <table class="table">
 <tbody>
 <tr>
@@ -253,3 +253,5 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </div>
 </body>
 </html>
+
+

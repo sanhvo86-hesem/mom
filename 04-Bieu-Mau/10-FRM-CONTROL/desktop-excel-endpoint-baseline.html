@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Desktop Excel Endpoint Baseline | HESEM QMS</title>
+<title>Chuẩn máy trạm mở biểu mẫu | HESEM QMS</title>
 <link rel="stylesheet" href="../../assets/style.css"/>
 <style>
 @media print{.card,.table-card,.note,.box{page-break-inside:avoid;break-inside:avoid}h1,h2,h3{page-break-after:avoid;break-after:avoid}}
@@ -16,20 +16,20 @@
 </head>
 <body><div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
-<div class="fh-left"><a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"/></a><div class="fh-company"><a href="../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div></div>
-<div class="title"><strong>Desktop Excel Endpoint Baseline</strong><span class="sub-vn">Baseline endpoint cho người dùng mở workbook FRM bằng desktop Excel</span></div>
-<div class="meta"><div class="row"><span><b>Owner:</b></span><span>IT / QA-QMS / Functional Owners</span></div><div class="row"><span><b>Delivery:</b></span><span>Download-only</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày baseline:</b></span><span>2026-03-21</span></div></div>
+<div class="fh-left"><a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"/></a><div class="fh-company"><a href="../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>TÃ i liá»‡u kiá»ƒm soÃ¡t</span></div></div>
+<div class="title"><strong>Chuẩn máy trạm mở biểu mẫu</strong><span class="sub-vn">Baseline endpoint cho ngÆ°á»i dÃ¹ng má»Ÿ workbook FRM báº±ng desktop Excel</span></div>
+<div class="meta"><div class="row"><span><b>Owner:</b></span><span>IT / QA-QMS / Functional Owners</span></div><div class="row"><span><b>Delivery:</b></span><span>Download-only</span></div><div class="row"><span><b>PhiÃªn báº£n:</b></span><span>V0</span></div><div class="row"><span><b>NgÃ y baseline:</b></span><span>2026-03-21</span></div></div>
 </div>
 <div class="doc-content" id="docContent">
-<div class="note-blue"><b>Dùng khi nào:</b> dùng khi pilot user onboarding, IT rollout hoặc audit endpoint để xác nhận người dùng mở workbook active bằng desktop Excel và hiểu boundary của file tải xuống.</div>
-<div class="table-card"><table class="table smalltable"><thead><tr><th>Mục kiểm</th><th>Rule</th><th>Owner</th><th>Kết quả</th></tr></thead><tbody>
-<tr><td>Default app</td><td>`.xlsx` mở bằng Microsoft Excel desktop</td><td>IT</td><td>☐ PASS ☐ FAIL</td></tr>
-<tr><td>Download folder</td><td>Người dùng biết nơi tải và không dùng folder này như thư viện phát hành chính thức</td><td>IT + User</td><td>☐ PASS ☐ FAIL</td></tr>
-<tr><td>Save path</td><td>Người dùng biết nơi lưu record/evidence theo bộ phận</td><td>Functional owner</td><td>☐ PASS ☐ FAIL</td></tr>
-<tr><td>Trusted location</td><td>Nếu có thì do IT quản trị; user không tự thêm uncontrolled folders</td><td>IT</td><td>☐ PASS ☐ FAIL</td></tr>
-<tr><td>Trusted publisher</td><td>Nếu có macro signed projects thì publisher list phải được review</td><td>IT + QA/QMS</td><td>☐ PASS ☐ FAIL</td></tr>
-<tr><td>User behavior</td><td>Không rename/copy local rồi phát tán như bản chính thức</td><td>User</td><td>☐ PASS ☐ FAIL</td></tr>
+<div class="note-blue"><b>DÃ¹ng khi nÃ o:</b> dÃ¹ng khi pilot user onboarding, IT rollout hoáº·c audit endpoint Ä‘á»ƒ xÃ¡c nháº­n ngÆ°á»i dÃ¹ng má»Ÿ workbook active báº±ng desktop Excel vÃ  hiá»ƒu boundary cá»§a file táº£i xuá»‘ng.</div>
+<div class="table-card"><table class="table smalltable"><thead><tr><th>Má»¥c kiá»ƒm</th><th>Rule</th><th>Owner</th><th>Káº¿t quáº£</th></tr></thead><tbody>
+<tr><td>Default app</td><td>`.xlsx` má»Ÿ báº±ng Microsoft Excel desktop</td><td>IT</td><td>â˜ PASS â˜ FAIL</td></tr>
+<tr><td>Download folder</td><td>NgÆ°á»i dÃ¹ng biáº¿t nÆ¡i táº£i vÃ  khÃ´ng dÃ¹ng folder nÃ y nhÆ° thÆ° viá»‡n phÃ¡t hÃ nh chÃ­nh thá»©c</td><td>IT + User</td><td>â˜ PASS â˜ FAIL</td></tr>
+<tr><td>Save path</td><td>NgÆ°á»i dÃ¹ng biáº¿t nÆ¡i lÆ°u record/evidence theo bá»™ pháº­n</td><td>Functional owner</td><td>â˜ PASS â˜ FAIL</td></tr>
+<tr><td>Trusted location</td><td>Náº¿u cÃ³ thÃ¬ do IT quáº£n trá»‹; user khÃ´ng tá»± thÃªm uncontrolled folders</td><td>IT</td><td>â˜ PASS â˜ FAIL</td></tr>
+<tr><td>Trusted publisher</td><td>Náº¿u cÃ³ macro signed projects thÃ¬ publisher list pháº£i Ä‘Æ°á»£c review</td><td>IT + QA/QMS</td><td>â˜ PASS â˜ FAIL</td></tr>
+<tr><td>User behavior</td><td>KhÃ´ng rename/copy local rá»“i phÃ¡t tÃ¡n nhÆ° báº£n chÃ­nh thá»©c</td><td>User</td><td>â˜ PASS â˜ FAIL</td></tr>
 </tbody></table></div>
-<div class="note-soft"><b>Xem thêm:</b> <a href="../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-038-excel-form-desktop-excel-endpoint-baseline-and-macro-trust-rollout.html">ANNEX-QMS-038</a>.</div>
+<div class="note-soft"><b>Xem thÃªm:</b> <a href="../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-038-excel-form-desktop-excel-endpoint-baseline-and-macro-trust-rollout.html">ANNEX-QMS-038</a>.</div>
 </div>
 </div></div></div></body></html>

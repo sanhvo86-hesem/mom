@@ -152,6 +152,28 @@ async function apiCall(action, payload=null, method='POST', timeoutMs=45000){
   }
 }
 
+async function apiCallFormData(action, formData, timeoutMs=120000){
+  const url = 'api.php?action=' + encodeURIComponent(action);
+  const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const opts = {method:'POST', credentials:'include', headers:{}};
+  if(controller) opts.signal = controller.signal;
+  if(csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
+  opts.body = formData;
+  let timer = null;
+  try{
+    if(controller && timeoutMs && timeoutMs > 0){
+      timer = setTimeout(()=>{ try{ controller.abort(); }catch(e){} }, timeoutMs);
+    }
+    const res = await fetch(url, opts);
+    let data = null;
+    try{ data = await res.json(); }catch(e){}
+    if(!data) throw new Error('Invalid server response');
+    return data;
+  }finally{
+    if(timer) clearTimeout(timer);
+  }
+}
+
 function showLoginError(msg){
   const el = document.getElementById('login-error');
   var text = msg || T('login_error');
@@ -700,15 +722,61 @@ function isDownloadOnlyDoc(doc){
   }catch(e){ return false; }
 }
 
+function buildDocStreamUrl(doc, download=true, overridePath=''){
+  try{
+    if(!doc) return '';
+    const relPath = String(overridePath || doc.path || '').replace(/^\/+/, '');
+    if(!relPath) return '';
+    const qs = new URLSearchParams();
+    qs.set('action', 'doc_stream');
+    qs.set('path', relPath);
+    if(doc.code) qs.set('code', String(doc.code));
+    if(download) qs.set('download', '1');
+    return 'api.php?' + qs.toString();
+  }catch(e){
+    return '';
+  }
+}
+
 function triggerDocDownload(doc){
   if(!doc || !doc.path) return;
   const a = document.createElement('a');
-  a.href = '../' + String(doc.path).replace(/^\/+/, '');
+  a.href = buildDocStreamUrl(doc, true);
   a.download = '';
   a.style.display = 'none';
   document.body.appendChild(a);
   a.click();
   setTimeout(()=>a.remove(), 0);
+}
+
+function downloadCurrentDoc(code){
+  const doc = DOCS.find(d=>d.code===code);
+  if(!doc) return;
+  triggerDocDownload(doc);
+}
+
+function getVersionAccessUrl(doc, version){
+  try{
+    if(version && version.download_url) return String(version.download_url);
+    if(version && version.file){
+      if(isDownloadOnlyDoc(doc)) return buildDocStreamUrl(doc, true, version.file);
+      return '../' + String(version.file).replace(/^\/+/, '');
+    }
+  }catch(e){}
+  return '';
+}
+
+function versionHasAccess(doc, version){
+  return !!getVersionAccessUrl(doc, version);
+}
+
+function isCurrentVersionEntry(doc, version){
+  try{
+    if(version && version.is_current) return true;
+    return !!(version && version.status==='approved' && version.file===doc.path);
+  }catch(e){
+    return false;
+  }
 }
 
 async function openDoc(code){
@@ -743,17 +811,9 @@ async function openDoc(code){
     }
   }
 
-  if(isDownloadOnlyDoc(doc)){
-    const displayTitle = getDocDisplayTitle(doc);
-    trackPageView('doc/'+code, '⬇️ '+code+' — '+displayTitle.substring(0,60));
-    triggerDocDownload(doc);
-    showToast(lang==='en' ? 'Downloading workbook: ' + code : 'Đang tải workbook: ' + code);
-    return;
-  }
-
   // Track document view
   const displayTitle = getDocDisplayTitle(doc);
-  trackPageView('doc/'+code, '📄 '+code+' — '+displayTitle.substring(0,60));
+  trackPageView('doc/'+code, (isDownloadOnlyDoc(doc)?'📊 ':'📄 ')+code+' — '+displayTitle.substring(0,60));
   editMode=false;
   editingDoc=null;
   currentDoc=code;
@@ -874,6 +934,9 @@ function buildDocHeaderActions(doc){
   try{
     if(!doc) return '';
     const status=getDocStatus(doc);
+    const isWorkbook=isDownloadOnlyDoc(doc);
+    const versions=getDocVersions(doc.code)||[];
+    const activeDraft=versions.find(v=>v && v.status==='draft' && (v.download_url || v.file) && String(v.version||'').replace(/^v/i,'')===String(getDocRevision(doc)||''));
 
     // While editing: show edit workflow buttons
     if(editMode && editingDoc===doc.code){
@@ -885,8 +948,16 @@ function buildDocHeaderActions(doc){
     }
 
     // Draft: show Edit
-    if(status==='draft' && canEdit(doc)){
+    if(status==='draft' && canEdit(doc) && !isWorkbook){
       return `<button class="wf-btn edit" onclick="startEdit('${doc.code}')">${T('wf_edit')}</button>`;
+    }
+
+    if(isWorkbook && status==='draft' && canEdit(doc)){
+      return `
+        <button class="wf-btn save" onclick="uploadFormDraft('${doc.code}')">${lang==='en'?'Upload draft':'Upload bản nháp'}</button>
+        ${activeDraft?`<button class="wf-btn submit" onclick="submitWorkbookForReview('${doc.code}')">${T('wf_submit_review')}</button>`:''}
+        <button class="wf-btn cancel" onclick="deleteDraft('${doc.code}')">${lang==='en'?'Discard draft':'Hủy nháp'}</button>
+      `;
     }
 
     // In review: show Approve/Reject (for approvers)
@@ -943,6 +1014,16 @@ function updateDocViewerHeader(doc){
     : '';
   const displayTitle = getDocDisplayTitle(doc);
   const displayDesc = getDocDisplayDescription(doc);
+  const isWorkbook = isDownloadOnlyDoc(doc);
+  const navActionsHtml = isWorkbook
+    ? `<div class="dv-action-group dv-nav-actions">
+          <button class="dv-back" onclick="closeDocViewer()">${T('back')}</button>
+          <button class="dv-back" onclick="downloadCurrentDoc('${doc.code}')">${lang==='en'?'Download':'Tải về'}</button>
+       </div>`
+    : `<div class="dv-action-group dv-nav-actions">
+          <button class="dv-back" onclick="closeDocViewer()">${T('back')}</button>
+          <button class="dv-back" onclick="window.open('../${viewFile}','_blank')">${T('open_tab')}</button>
+       </div>`;
 
   document.getElementById('doc-viewer-header').innerHTML = `
     <div class="dv-top">
@@ -953,10 +1034,7 @@ function updateDocViewerHeader(doc){
       </div>
       <div class="dv-top-actions">
         ${headerActionsHtml}
-        <div class="dv-action-group dv-nav-actions">
-          <button class="dv-back" onclick="closeDocViewer()">${T('back')}</button>
-          <button class="dv-back" onclick="window.open('../${viewFile}','_blank')">${T('open_tab')}</button>
-        </div>
+        ${navActionsHtml}
       </div>
     </div>
     <div class="dv-meta">
