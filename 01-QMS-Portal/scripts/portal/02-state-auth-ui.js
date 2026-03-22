@@ -2794,35 +2794,118 @@ function renderDictionary(){
     <input class="search-input-lg" type="text" placeholder="${T('dict_ph')}" id="dict-search" oninput="handleDictSearch(this.value)" autofocus>
     <div id="dict-body">
       <div class="dict-loading"><div class="spinner"></div>${T('dict_loading')}</div>
-    </div>`;
+  </div>`;
   loadDictData().then(()=>{renderDictBody();updateDictBadge();});
+}
+
+function normalizeDictionarySearchText(text){
+  return String(text || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+function isDictionaryWordStart(text, index){
+  return index === 0 || text.charAt(index - 1) === ' ';
+}
+
+function scoreDictionaryField(text, query, fieldWeight){
+  if(!text || !query) return null;
+  const idx = text.indexOf(query);
+  const tokens = query.split(' ').filter(Boolean);
+  let bestScore = null;
+
+  if(text === query){
+    bestScore = fieldWeight + 600;
+  }
+  if(text.startsWith(query)){
+    const score = fieldWeight + 420 - Math.min(160, text.length - query.length);
+    bestScore = bestScore === null ? score : Math.max(bestScore, score);
+  }
+  if(idx >= 0){
+    const boundaryBoost = isDictionaryWordStart(text, idx) ? 290 : 180;
+    const score = fieldWeight + boundaryBoost - Math.min(140, idx * 3);
+    bestScore = bestScore === null ? score : Math.max(bestScore, score);
+  }
+  if(tokens.length > 1){
+    const tokenIndexes = tokens.map(token => text.indexOf(token));
+    if(tokenIndexes.every(tokenIndex => tokenIndex >= 0)){
+      const boundaryHits = tokenIndexes.filter(tokenIndex => isDictionaryWordStart(text, tokenIndex)).length;
+      const tokenPenalty = Math.min(120, tokenIndexes.reduce((sum, tokenIndex) => sum + tokenIndex, 0));
+      const score = fieldWeight + 210 + (boundaryHits * 24) - tokenPenalty;
+      bestScore = bestScore === null ? score : Math.max(bestScore, score);
+    }
+  }
+
+  return bestScore;
+}
+
+function getDictionarySearchMatch(item, rawQuery){
+  const query = normalizeDictionarySearchText(rawQuery);
+  if(!query) return { item, score: 0 };
+
+  const fields = [
+    { key: 'term', value: normalizeDictionarySearchText(item.term), weight: 1200 },
+    { key: 'vi', value: normalizeDictionarySearchText(item.vi), weight: 1120 },
+    { key: 'meaning', value: normalizeDictionarySearchText(item.meaning), weight: 720 },
+    { key: 'def', value: normalizeDictionarySearchText(item.def), weight: 220 }
+  ];
+
+  let bestField = null;
+  let bestScore = null;
+
+  fields.forEach(field => {
+    const score = scoreDictionaryField(field.value, query, field.weight);
+    if(score === null) return;
+    if(bestScore === null || score > bestScore){
+      bestScore = score;
+      bestField = field.key;
+    }
+  });
+
+  if(bestScore === null) return null;
+
+  const termLength = String(item.term || '').trim().length || 999;
+  return {
+    item,
+    score: bestScore,
+    field: bestField,
+    termLength,
+    term: String(item.term || '').toLowerCase()
+  };
+}
+
+function getRankedDictionaryMatches(items, rawQuery){
+  return items
+    .map(item => getDictionarySearchMatch(item, rawQuery))
+    .filter(Boolean)
+    .sort((a, b) => {
+      if(b.score !== a.score) return b.score - a.score;
+      if(a.termLength !== b.termLength) return a.termLength - b.termLength;
+      return a.term.localeCompare(b.term);
+    });
 }
 
 function renderDictBody(){
   if(!dictData) return;
   const el = document.getElementById('dict-body');
-  
+
+  const rankedMatches = dictQuery ? getRankedDictionaryMatches(dictData, dictQuery) : [];
+  const queryMatchedItems = dictQuery ? rankedMatches.map(match => match.item) : dictData;
+
   // Filter
-  let filtered = dictData;
-  if(dictQuery){
-    const q = dictQuery.toLowerCase();
-    filtered = dictData.filter(d => 
-      d.term.toLowerCase().includes(q) || 
-      (d.vi && d.vi.toLowerCase().includes(q)) || 
-      d.def.toLowerCase().includes(q) ||
-      (d.meaning && d.meaning.toLowerCase().includes(q))
-    );
-  }
+  let filtered = queryMatchedItems;
   if(dictCatFilter !== 'ALL'){
     filtered = filtered.filter(d => d.cat === dictCatFilter);
   }
-  
+
   // Category counts
   const catCounts = {};
-  const srcData = dictQuery ? dictData.filter(d => {
-    const q = dictQuery.toLowerCase();
-    return d.term.toLowerCase().includes(q)||(d.vi&&d.vi.toLowerCase().includes(q))||d.def.toLowerCase().includes(q)||(d.meaning&&d.meaning.toLowerCase().includes(q));
-  }) : dictData;
+  const srcData = queryMatchedItems;
   srcData.forEach(d => { catCounts[d.cat] = (catCounts[d.cat]||0)+1; });
   
   const showing = filtered.slice(0, dictShowCount);
