@@ -68,7 +68,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
           <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
         </div>
       </div>
-      <div class="note"><strong>ÁP DỤNG hHI</strong><br/>Dùng khi có part mới, revision mới, đổi máy/chương trình/fixture/tool có ảnh hưởng, sau crash/PM lớn, hoặc khi khách hàng yêu cầu first piece/FAI.</div>
+      <div class="note"><strong>ÁP DỤNG hHI</strong><br/>Dùng khi có part mới, phiên bản mới, đổi máy/chương trình/fixture/tool có ảnh hưởng, sau crash/PM lớn, hoặc khi khách hàng yêu cầu first piece/FAI.</div>
       <h1>WI-302 — Thực hiện first piece, FAI, balloon/CMM và đóng gói bằng chứng</h1>
       
 <div class="section"><h2>1. Mục đích và nguyên tắc không thương lượng</h2>
@@ -83,7 +83,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>2. Ma trận kích hoạt: First Piece, Delta FAI, Full FAI</h2>
 <div class="table-card"><table><thead><tr><th>Tình huống</th><th>Mức bắt buộc</th><th>Ghi chú vận hành</th></tr></thead><tbody>
 <tr><td>Part mới / lần chạy đầu</td><td><span class="badge-red">Full FAI</span> + First Piece</td><td>Đo đầy đủ đặc tính theo balloon/spec, khóa release trước khi chạy lô.</td></tr>
-<tr><td>Revision mới / ECO ảnh hưởng đặc tính</td><td><span class="badge-red">Full FAI</span> hoặc <span class="badge-amber">Delta FAI</span> theo impact</td><td>Nếu ảnh hưởng CTQ, datum, tolerance chain hoặc fit/function thì mặc định Full FAI.</td></tr>
+<tr><td>phiên bản mới / ECO ảnh hưởng đặc tính</td><td><span class="badge-red">Full FAI</span> hoặc <span class="badge-amber">Delta FAI</span> theo impact</td><td>Nếu ảnh hưởng CTQ, datum, tolerance chain hoặc fit/function thì mặc định Full FAI.</td></tr>
 <tr><td>Đổi máy, đổi fixture, đổi route, đổi WCS logic, đổi chương trình chính</td><td><span class="badge-amber">Delta FAI</span> + First Piece</td><td>Phải đo lại toàn bộ đặc tính bị ảnh hưởng và các CTQ liên quan.</td></tr>
 <tr><td>Thay dao/insert bình thường không đổi logic cắt</td><td><span class="badge-blue">First Piece tăng cường</span></td><td>Đo CTQ, kích thước zero và bề mặt/cạnh nhạy cảm trước khi chạy tiếp.</td></tr>
 <tr><td>Sau crash, PM lớn, thay spindle, sửa đồ gá, nghi ngờ capability</td><td><span class="badge-red">Revalidation FAI</span></td><td>QA và ENG quyết định phạm vi; không dùng dữ liệu cũ để suy diễn.</td></tr>

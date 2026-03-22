@@ -94,7 +94,7 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>3. Chuẩn bị dữ liệu trước họp</h2>
 <div class="table-card"><table><thead><tr><th>Vai trò</th><th>Phải chốt trước giờ họp</th><th>Nguồn chuẩn</th><th>tạm giữ khi</th></tr></thead><tbody>
-<tr><td>Planning</td><td>Dispatch list, tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))), hot-job ladder, due trong 72 giờ, overload/underload theo work center.</td><td>Epicor + <a href="../../03-Reference/01-ANNEX-System/annex-ops-001-dispatch-capacity-wip-rules.html">ANNEX-OPS-001</a></td><td>hhông có dispatch current-state hoặc dữ liệu Job không khớp SoR.</td></tr>
+<tr><td>Planning</td><td>Dispatch list, tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging))))))))), hot-job ladder, due trong 72 giờ, overload/underload theo work center.</td><td>Epicor + <a href="../../03-Reference/01-ANNEX-System/annex-ops-001-dispatch-capacity-wip-rules.html">ANNEX-OPS-001</a></td><td>hhông có dispatch current-state hoặc dữ liệu Job không khớp SoR.</td></tr>
 <tr><td>Production</td><td>ọachine down, setup còn dở, tool/fixture thiếu, re-run, changeover kéo dài, nhân lực vắng.</td><td>Epicor Labor/Job + log xưởng</td><td>ọachine down chưa có owner hoặc không rõ ETA khôi phục.</td></tr>
 <tr><td>QA</td><td>QC hold list, FAI pending, NCR mở, suspect lot, final release risk, cleanliness/leak test pending.</td><td>ọ365 QA register + Epicor reference</td><td>Hold/FAI trạng thái mơ hồ, không rõ điều kiện release.</td></tr>
 <tr><td>WHS/Shipping</td><td>Ship plan, bộ hồ sơ giao hàng (ship packet) completeness, SSCC/label pending, receipt discrepancy, thiếu chứng từ.</td><td>Epicor Ship/Receipt + ship packet SSOT</td><td>Lô chuẩn bị ship nhưng bộ hồ sơ giao hàng (ship packet) chưa đủ hoặc receipt discrepancy chưa khép.</td></tr>
@@ -125,7 +125,7 @@ ul.tight li {margin:4px 0;}
 <ul class="tight" style="padding-left:18px;">
 <li>Chỉ đưa lên T2 những việc T1 không đủ quyền hoặc không đủ nguồn lực để giải.</li>
 <li>Ưu tiên xử lý: overload kéo dài, recurring hold, processor overdue, thiếu vật tư đường găng, xung đột ship plan, thay đổi ưu tiên nhiều lần trong ngày.</li>
-<li>T2 phải chốt cửa sổ ưu tiên 24–72 giờ, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window)))) và quy tắc resequence; sau họp Planning phải cập nhật lại dispatch board.</li>
+<li>T2 phải chốt cửa sổ ưu tiên 24–72 giờ, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) và quy tắc resequence; sau họp Planning phải cập nhật lại dispatch board.</li>
 </ul>
 <h3>5.3 T3 / T4 — xu hướng và thay đổi hệ thống</h3>
 <ul class="tight" style="padding-left:18px;">
@@ -140,7 +140,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>WIP Aging</td><td>Chốt lô nào đang treo vô chủ, lô nào phải resequence</td><td>Planning Lead</td><td>JobNum, OprSeq, WorkCenter</td><td>Chỉ định owner và hạn đóng ngay trong ca</td></tr>
 <tr><td>QC Hold SLA</td><td>Giữ/nhả hold, escalates QA/ENG/OPS</td><td>QA ọanager</td><td>Hold ID, JobNum, PackID</td><td>hhông cho lô đi tiếp khi thiếu disposition</td></tr>
 <tr><td>Downtime impact</td><td>Chuyển máy, đổi ca, mượn nguồn lực, maintenance priority</td><td>Production / ọNT</td><td>ọachine ID, JobNum</td><td>Escalate nếu ảnh hưởng due trong 24 giờ</td></tr>
-<tr><td>Ship Packet Completeness</td><td>Cho phép hoặc chặn xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))</td><td>WHS Supervisor</td><td>PackID, SSCC</td><td>SHIP HOLD ngay nếu thiếu</td></tr>
+<tr><td>Ship Packet Completeness</td><td>Cho phép hoặc chặn xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm)))))))))</td><td>WHS Supervisor</td><td>PackID, SSCC</td><td>SHIP HOLD ngay nếu thiếu</td></tr>
 <tr><td>Processor / PO overdue</td><td>Gia hạn, đẩy nhanh, đổi supplier/processor, báo khách</td><td>Purchasing Lead</td><td>PONum, Vendor, Processor</td><td>ọở action liên phòng ban, cân nhắc contingency</td></tr>
 </tbody></table></div>
 <p>Công thức, cut-off, refresh rule và drill-down key của từng hPI phải tuân thủ <a href="../../03-Reference/01-ANNEX-System/annex-qms-008-dashboard-kpi-dictionary-and-data-model.html">ANNEX-QọS-008</a>. Họp tầng không tự đặt công thức mới.</p></div>

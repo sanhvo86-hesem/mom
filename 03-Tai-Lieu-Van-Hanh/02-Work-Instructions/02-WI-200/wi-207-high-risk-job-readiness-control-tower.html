@@ -68,8 +68,8 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>1. Mục đích, trigger và nguyên tắc kích hoạt</h2>
 <p>WI này bắt buộc dùng để kiểm tra mức sẵn sàng của những Job có rủi ro giao hàng hoặc rủi ro chất lượng cao trước khi thả vào nhịp chạy bình thường. Control tower không thay cho họp hằng ngày; control tower là cơ chế <strong>khóa điều kiện vào cuộc</strong> cho Job đặc biệt để tránh “đã phát lệnh rồi mới đi nhặt thiếu sót”.</p>
 <div class="table-card"><table><thead><tr><th>Trigger</th><th>Kích hoạt khi</th><th>Chủ trì</th><th>Kết quả bắt buộc</th></tr></thead><tbody>
-<tr><td>Job mới / part mới</td><td>Lần đầu gia công tại HESEM, revision mới, tolerance chặt, process chain chưa có lịch sử ổn định.</td><td>Engineering + Planning</td><td>Ready / Blocked / Ready with controls.</td></tr>
-<tr><td>Job rủi ro giao hàng</td><td>thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))) ngắn, commit date sát, nhiều công đoạn outsource, thiếu vật tư/tool/gage hoặc open issue ảnh hưởng ship.</td><td>Program / Planning</td><td>Action list có owner và SLA.</td></tr>
+<tr><td>Job mới / part mới</td><td>Lần đầu gia công tại HESEM, phiên bản mới, tolerance chặt, process chain chưa có lịch sử ổn định.</td><td>Engineering + Planning</td><td>Ready / Blocked / Ready with controls.</td></tr>
+<tr><td>Job rủi ro giao hàng</td><td>thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time))))))))) ngắn, commit date sát, nhiều công đoạn outsource, thiếu vật tư/tool/gage hoặc open issue ảnh hưởng ship.</td><td>Program / Planning</td><td>Action list có owner và SLA.</td></tr>
 <tr><td>Job đặc biệt</td><td>QPL cao, cleanliness/vacuum, leak test, special process, customer property, first article/revalidation.</td><td>QA + Engineering</td><td>Gate matrix, evidence pack và escalation path rõ.</td></tr>
 <tr><td>Job bị hold kéo dài</td><td>Open HOLD &gt; 24 giờ, repeat defect, work transfer, đổi máy/đổi route, NCR mở chưa khép.</td><td>Planning + QA</td><td>Quyết định tiếp tục / dừng / đổi chiến lược.</td></tr>
 </tbody></table></div>

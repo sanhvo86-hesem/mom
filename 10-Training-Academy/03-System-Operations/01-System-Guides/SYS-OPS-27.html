@@ -114,7 +114,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Maintenance</b></td><td>Nộp hồ sơ bảo trì, hiệu chuẩn, OOT gage evidence liên quan sản xuất.</td><td>đạt khi nộp 01 calibration/maintenance record vào Tier-1 khi liên quan CTQ; kích hoạt phản ứng 60 giây khi OOT.</td></tr>
 <tr><td><b>EHS</b></td><td>Nộp hồ sơ an toàn, sự cố, điều tra, đào tạo bắt buộc liên quan pháp lý.</td><td>đạt khi phân loại record theo Tier phù hợp và khóa thay đổi hồ sơ sự cố.</td></tr>
 <tr><td><b>Estimator (SAL-03)</b></td><td>Nộp PO/contract, yêu cầu khách hàng về thời hạn lưu giữ, yêu cầu chứng từ giao hàng.</td><td>đạt khi ghi rõ yêu cầu retention trong hồ sơ job và kích hoạt Tier-1-15Y khi hợp đồng yêu cầu.</td></tr>
-<tr><td><b>Supervisor</b></td><td>Chịu trách nhiệm gate phê duyệt giao hàng (ship release), phê duyệt HOLD/RELEASE, kiểm soát bypass.</td><td>đạt khi thực hiện 01 ca kiểm tra gate: “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))” và ký xác nhận MRR.</td></tr>
+<tr><td><b>Supervisor</b></td><td>Chịu trách nhiệm gate phê duyệt giao hàng (ship release), phê duyệt HOLD/RELEASE, kiểm soát bypass.</td><td>đạt khi thực hiện 01 ca kiểm tra gate: “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))” và ký xác nhận MRR.</td></tr>
 </table>
 <div class="kpi-gate" style="margin-top:12px;">
 <b>Nguyên tắc khóa:</b> Không có nhãn lưu trữ + không có trạng thái Record cho Tier-1 → <b>BLOCK</b> tại gate liên quan.
@@ -134,7 +134,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Engineering</td><td>Bản vẽ, revision, setup sheet</td><td>Hồ sơ phát hành theo revision</td><td>Ghi đè file revision cũ → HOLD và tạo bản mới (không overwrite).</td></tr>
 <tr><td>Purchasing/Receiving</td><td>Chứng chỉ supplier, IQC</td><td>Receiving IQC record + lot/heat</td><td>Thiếu Lot/Heat với vật liệu CTQ → HOLD cấp phát.</td></tr>
 <tr><td>Production</td><td>Ảnh/ghi chép, data vận hành</td><td>Operational Photo + metadata</td><td>Không có JobNum/RevisionNum → BLOCK lưu vào thư viện evidence.</td></tr>
-<tr><td>QC/QA</td><td>FAI/Final/CMM + ship packet</td><td>Tier-1 record (10Y/15Y) hoàn chỉnh</td><td><b>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))</b> tại Final/phê duyệt giao hàng (ship release).</td></tr>
+<tr><td>QC/QA</td><td>FAI/Final/CMM + ship packet</td><td>Tier-1 record (10Y/15Y) hoàn chỉnh</td><td><b>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))</b> tại Final/phê duyệt giao hàng (ship release).</td></tr>
 <tr><td>NCR/MRB</td><td>NCR + CAPA closure</td><td>Record closure + disposition đúng</td><td>NCR đóng mà thiếu bằng chứng khắc phục → HOLD đóng NCR.</td></tr>
 <tr><td>Ship</td><td>Ship packet + CoC</td><td>bộ hồ sơ giao hàng (ship packet) record + trích xuất set</td><td>Trích xuất thiếu file/metadata → BLOCK ship.</td></tr>
 </table>
@@ -148,7 +148,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Rule tự dán nhãn dựa tên loại nội dung viết khác nhau giữa SOP và bộ mẫu cấu hình (SSOT) → policy không match, nhãn không dán.</li>
 <li>Người dùng dán nhãn thủ công lên Tier-1 rồi đổi lại Tier-2 để “dễ sửa” → phá tính phòng vệ.</li>
 <li>File bị đổi tên/move sau khi đã dán nhãn record → đứt đường dẫn bằng chứng trong bộ hồ sơ giao hàng (ship packet).</li>
-<li>Overwrite file thay vì tạo revision mới → mất lịch sử.</li>
+<li>Overwrite file thay vì tạo phiên bản mới → mất lịch sử.</li>
 <li>Disposition review không được thực hiện khi tới hạn → tồn đọng, mất kiểm soát.</li>
 <li>Trích xuất bằng chứng chỉ kéo PDF bề mặt, bỏ file native/metadata → audit bác bỏ.</li>
 <li>Audit log/retention audit không bật hoặc không đủ quyền → không chứng minh được ai làm gì khi nào.</li>
@@ -254,7 +254,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1. Chọn đúng thư mục và loại nội dung</td><td>Đi vào 04_Inspection-FAI; chọn “FAI Package” trước khi upload</td><td>Auto-apply match theo thư mục + loại nội dung</td></tr>
 <tr><td>2. Upload file và khóa định dạng record</td><td>Upload PDF ký; đính kèm file native khi có; không overwrite</td><td>PDF ký là record chính; overwrite phá lịch sử</td></tr>
 <tr><td>3. Điền metadata bắt buộc</td><td>JobNum, PartNum, RevisionNum, RecordType, RecordID</td><td>Truy xuất theo job/part/rev và chống lẫn lô</td></tr>
-<tr><td>4. Xác nhận nhãn và trạng thái Record</td><td>Mở thuộc tính file; kiểm tra nhãn T1 + trạng thái Hồ sơ (Record)</td><td>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))</td></tr>
+<tr><td>4. Xác nhận nhãn và trạng thái Record</td><td>Mở thuộc tính file; kiểm tra nhãn T1 + trạng thái Hồ sơ (Record)</td><td>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))</td></tr>
 <tr><td>5. Xuất bằng chứng theo job</td><td>Trích xuất gói theo job/lot; kèm bảng kê gói (manifest) <b>M365/SharePoint → HESEM-QMS-SSOT</b></td><td>Audit cần bộ bằng chứng có cấu trúc</td></tr>
 </table>
 <h3 class="h2" style="margin-top:14px;">Rubric L1–L4 (hành vi quan sát được)</h3>
@@ -279,7 +279,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Auto-apply policy dán nhãn dựa điều kiện nào? (Chọn 2) A. Thư mục/path B. Loại nội dung/metadata C. Màu icon D. Thời tiết</li>
 <li>Khi tự dán nhãn dựa trên cột metadata, điều kiện hệ thống nào cần được xác nhận để policy tìm thấy cột? (Nêu 1 điểm kiểm soát)</li>
 <li>Disposition review phục vụ mục tiêu gì trong kiểm soát hồ sơ?</li>
-<li>“không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))” áp dụng trực tiếp tại gate nào trong chuỗi E2E?</li>
+<li>“không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))” áp dụng trực tiếp tại gate nào trong chuỗi E2E?</li>
 <li>Trường “RecordID” dùng để chặn rủi ro nào?</li>
 <li>Khi thiếu Lot/Heat cho vật liệu CTQ, bộ phận nào kích hoạt HOLD và tại bước nào?</li>
 <li>Record versioning dùng để làm gì?</li>

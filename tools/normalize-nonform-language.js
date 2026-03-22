@@ -12,6 +12,8 @@ const SKIP_DIR_PARTS = [
   `${path.sep}04-Bieu-Mau${path.sep}`,
   `${path.sep}_build${path.sep}`,
   `${path.sep}_Deleted${path.sep}`,
+  `${path.sep}.git${path.sep}`,
+  `${path.sep}node_modules${path.sep}`,
 ];
 
 const SKIP_FILES = new Set([
@@ -22,10 +24,7 @@ const KEYWORD_AUDIT = [
   'sai revision',
   'HOLD khi',
   'ship khi',
-  'khi fail',
   'audit fail',
-  'backup coverage',
-  'deputy rule',
   'route sạch',
   'Deputy / backup rule',
   'trigger escalation',
@@ -33,12 +32,78 @@ const KEYWORD_AUDIT = [
   'FAIL khi',
   'BLOCK ship khi',
   'NCR khi fail',
-  'owner xử lý',
-  'Evidence Pack chuẩn quốc tế',
-  'Audit Drill 60 giây',
+  'document đầu mối',
+  'revision mới',
+  'controllables của từng owner',
+  'Gate FAIL ở',
+  'metric mức “Major Gate”',
+  'cap skill bonus',
+];
+
+const rawHtmlReplace = [
+  {
+    re: /<b>Gate FAIL<\/b> ở bất kỳ <b>metric “Critical Gate”<\/b>/g,
+    repl: '<b>Không đạt</b> ở bất kỳ <b>tiêu chí “Critical Gate”</b>',
+  },
+  {
+    re: /<b>Gate FAIL<\/b> ở metric mức “Major Gate” ⇒ <b>cap<\/b> skill bonus/g,
+    repl: '<b>Không đạt</b> ở <b>tiêu chí “Major Gate”</b> ⇒ <b>giới hạn</b> thưởng kỹ năng (skill bonus)',
+  },
+  {
+    re: /Phối hợp HR và QA\/QMS để xây dựng ma trận kỹ năng \(skill matrix\), certification gates, OJT theo vai trò và đào tạo chéo nhằm giảm rủi ro phụ thuộc cá nhân\./g,
+    repl: 'Phối hợp HR và QA/QMS để xây dựng ma trận kỹ năng (skill matrix), các cổng chứng nhận (certification gates), OJT theo vai trò và đào tạo chéo nhằm giảm rủi ro phụ thuộc cá nhân.',
+  },
+  {
+    re: /Nhận mục tiêu ca, ưu tiên job, kế hoạch nhân lực \(manpower plan\) và các vấn đề cần follow-up đặc biệt\./g,
+    repl: 'Nhận mục tiêu ca, ưu tiên job, kế hoạch nhân lực (manpower plan) và các vấn đề cần theo dõi đặc biệt (follow-up).',
+  },
+  {
+    re: /<b>Documented Information \(ISO 7\.5\)<\/b>/g,
+    repl: '<b>thông tin dạng văn bản (Documented Information, ISO 7.5)</b>',
+  },
 ];
 
 const alwaysReplace = [
+  {
+    re: /Đo controllables của từng owner: readiness, closure discipline, data hygiene, mức bao phủ dự phòng \(backup coverage\), system availability\./g,
+    repl: 'Đo các yếu tố trong phạm vi kiểm soát của từng người phụ trách: mức sẵn sàng, kỷ luật đóng việc, độ sạch dữ liệu, mức bao phủ dự phòng (backup coverage) và mức sẵn sàng hệ thống.',
+  },
+  {
+    re: /Quy tắc bắt buộc \(PHẢI\) — Gate FAIL thì xử lý như sau:/g,
+    repl: 'Quy tắc bắt buộc (PHẢI) — nếu không đạt cổng kiểm soát (gate) thì xử lý như sau:',
+  },
+  {
+    re: /Gate FAIL ở bất kỳ metric “Critical Gate”/g,
+    repl: 'Không đạt ở bất kỳ tiêu chí “Critical Gate”',
+  },
+  {
+    re: /Gate FAIL ở metric mức “Major Gate”/g,
+    repl: 'Không đạt ở tiêu chí “Major Gate”',
+  },
+  {
+    re: /\bcap\b skill bonus/gi,
+    repl: 'giới hạn skill bonus',
+  },
+  {
+    re: /document đầu mối/gi,
+    repl: 'đầu mối kiểm soát tài liệu',
+  },
+  {
+    re: /revision mới/gi,
+    repl: 'phiên bản mới',
+  },
+  {
+    re: /manpower plan \/ certification gate \/ discipline/gi,
+    repl: 'kế hoạch nhân lực (manpower plan) / cổng chứng nhận (certification gate) / kỷ luật vận hành',
+  },
+  {
+    re: /theo dõi đặc biệt \(theo dõi tiếp \(follow-up\)\)/gi,
+    repl: 'theo dõi đặc biệt (follow-up)',
+  },
+  {
+    re: /thưởng kỹ năng \(thưởng kỹ năng \(skill bonus\)\)/gi,
+    repl: 'thưởng kỹ năng (skill bonus)',
+  },
   {
     re: /No evidence = No gate/gi,
     repl: 'không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)',
@@ -105,14 +170,14 @@ const alwaysReplace = [
   },
   {
     re: /\btrigger escalation\b/gi,
-    repl: 'điều kiện kích hoạt escalation',
+    repl: 'điều kiện kích hoạt leo thang (escalation)',
   },
   {
     re: /\bBLOCK ship khi\b/gi,
     repl: 'chặn giao hàng khi',
   },
   {
-    re: /\bowner xử lý\b/gi,
+    re: /owner xử lý/gi,
     repl: 'người phụ trách xử lý',
   },
   {
@@ -133,7 +198,7 @@ const alwaysReplace = [
   },
   {
     re: /\baudit-ready\b/gi,
-    repl: 'sẵn sàng cho audit',
+    repl: 'sẵn sàng cho đánh giá (audit-ready)',
   },
 ];
 
@@ -212,7 +277,7 @@ const vietnameseContextReplace = [
   },
   {
     re: /\bKPI Dictionary\b/g,
-    repl: 'từ điển KPI (KPI dictionary)',
+    repl: 'từ điển KPI (KPI Dictionary)',
   },
   {
     re: /\blead time\b/gi,
@@ -260,7 +325,7 @@ const vietnameseContextReplace = [
   },
   {
     re: /\bsource-control\b/gi,
-    repl: 'kiểm soát nguồn (source control)',
+    repl: 'kiểm soát nguồn (source-control)',
   },
   {
     re: /\bmaster data\b/gi,
@@ -281,6 +346,86 @@ const vietnameseContextReplace = [
   {
     re: /\bissue register\b/gi,
     repl: 'sổ đăng ký vấn đề (issue register)',
+  },
+  {
+    re: /\bmanpower plan\b/gi,
+    repl: 'kế hoạch nhân lực (manpower plan)',
+  },
+  {
+    re: /\bmanpower planning\b/gi,
+    repl: 'kế hoạch nhân lực (manpower planning)',
+  },
+  {
+    re: /\brecruitment\b/gi,
+    repl: 'tuyển dụng (recruitment)',
+  },
+  {
+    re: /\bonboarding\b/gi,
+    repl: 'hội nhập nhân sự mới (onboarding)',
+  },
+  {
+    re: /\btraining administration\b/gi,
+    repl: 'điều phối đào tạo (training administration)',
+  },
+  {
+    re: /\baudit training\b/gi,
+    repl: 'đào tạo phục vụ đánh giá (audit training)',
+  },
+  {
+    re: /\bcertification gate\b/gi,
+    repl: 'cổng chứng nhận (certification gate)',
+  },
+  {
+    re: /\bcertification gates\b/gi,
+    repl: 'các cổng chứng nhận (certification gates)',
+  },
+  {
+    re: /\bclosure discipline\b/gi,
+    repl: 'kỷ luật đóng việc (closure discipline)',
+  },
+  {
+    re: /\bdata hygiene\b/gi,
+    repl: 'độ sạch dữ liệu (data hygiene)',
+  },
+  {
+    re: /\bsystem availability\b/gi,
+    repl: 'mức sẵn sàng hệ thống (system availability)',
+  },
+  {
+    re: /\bCritical system availability\b/g,
+    repl: 'mức sẵn sàng hệ thống trọng yếu (critical system availability)',
+  },
+  {
+    re: /\bJD library\b/g,
+    repl: 'thư viện JD (JD library)',
+  },
+  {
+    re: /\bskill\/certification matrices\b/gi,
+    repl: 'ma trận kỹ năng/chứng nhận (skill/certification matrices)',
+  },
+  {
+    re: /\bpayroll input\b/gi,
+    repl: 'dữ liệu đầu vào tính lương (payroll input)',
+  },
+  {
+    re: /\bpayroll inputs\b/gi,
+    repl: 'dữ liệu đầu vào tính lương (payroll inputs)',
+  },
+  {
+    re: /\bfollow-up\b/gi,
+    repl: 'theo dõi tiếp (follow-up)',
+  },
+  {
+    re: /\bskill bonus\b/gi,
+    repl: 'thưởng kỹ năng (skill bonus)',
+  },
+  {
+    re: /\bDocumented Information\b/g,
+    repl: 'thông tin dạng văn bản (Documented Information)',
+  },
+  {
+    re: /\bincident log\b/gi,
+    repl: 'nhật ký sự cố (incident log)',
   },
 ];
 
@@ -308,6 +453,26 @@ const dedupePairs = [
   ['sổ đăng ký vấn đề', 'issue register'],
   ['mức bao phủ dự phòng', 'backup coverage'],
   ['quy tắc người thay thế', 'deputy rule'],
+  ['kế hoạch nhân lực', 'manpower plan'],
+  ['kế hoạch nhân lực', 'manpower planning'],
+  ['tuyển dụng', 'recruitment'],
+  ['hội nhập nhân sự mới', 'onboarding'],
+  ['điều phối đào tạo', 'training administration'],
+  ['đào tạo phục vụ đánh giá', 'audit training'],
+  ['cổng chứng nhận', 'certification gate'],
+  ['các cổng chứng nhận', 'certification gates'],
+  ['kỷ luật đóng việc', 'closure discipline'],
+  ['độ sạch dữ liệu', 'data hygiene'],
+  ['mức sẵn sàng hệ thống', 'system availability'],
+  ['mức sẵn sàng hệ thống trọng yếu', 'critical system availability'],
+  ['thư viện JD', 'JD library'],
+  ['ma trận kỹ năng/chứng nhận', 'skill/certification matrices'],
+  ['dữ liệu đầu vào tính lương', 'payroll input'],
+  ['dữ liệu đầu vào tính lương', 'payroll inputs'],
+  ['theo dõi tiếp', 'follow-up'],
+  ['thưởng kỹ năng', 'skill bonus'],
+  ['thông tin dạng văn bản', 'Documented Information'],
+  ['nhật ký sự cố', 'incident log'],
 ];
 
 function hasVietnamese(text) {
@@ -340,6 +505,42 @@ function walk(dir, acc = []) {
   return acc;
 }
 
+function replaceRawHtml(html) {
+  let next = html;
+  for (const { re, repl } of rawHtmlReplace) {
+    next = next.replace(re, repl);
+  }
+  return next;
+}
+
+function collapseNestedPairs(text) {
+  let next = text;
+  for (const [vi, en] of dedupePairs) {
+    const escapedVi = vi.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapedEn = en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const nested = new RegExp(
+      `${escapedVi}\\s*\\(${escapedVi}\\s*\\(${escapedEn}\\)\\)`,
+      'gi'
+    );
+    while (nested.test(next)) {
+      next = next.replace(nested, `${vi} (${en})`);
+    }
+  }
+  next = next.replace(
+    /theo dõi đặc biệt \(theo dõi tiếp \(follow-up\)\)/gi,
+    'theo dõi đặc biệt (follow-up)'
+  );
+  next = next.replace(
+    /thưởng kỹ năng \(thưởng kỹ năng \(skill bonus\)\)/gi,
+    'thưởng kỹ năng (skill bonus)'
+  );
+  next = next.replace(
+    /thông tin dạng văn bản \(thông tin dạng văn bản \(Documented Information\), ISO 7\.5\)/g,
+    'thông tin dạng văn bản (Documented Information, ISO 7.5)'
+  );
+  return next;
+}
+
 function replaceVisibleText(html) {
   let out = '';
   let cursor = 0;
@@ -356,23 +557,12 @@ function replaceVisibleText(html) {
     for (const { re, repl } of alwaysReplace) {
       next = next.replace(re, repl);
     }
-    if (!hasVietnamese(next)) {
-      return next;
-    }
-    for (const { re, repl } of vietnameseContextReplace) {
-      next = next.replace(re, repl);
-    }
-    for (const [vi, en] of dedupePairs) {
-      const escapedVi = vi.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const escapedEn = en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const nested = new RegExp(
-        `${escapedVi}\\s*\\(${escapedVi}\\s*\\(${escapedEn}\\)\\)`,
-        'gi'
-      );
-      while (nested.test(next)) {
-        next = next.replace(nested, `${vi} (${en})`);
+    if (hasVietnamese(next)) {
+      for (const { re, repl } of vietnameseContextReplace) {
+        next = next.replace(re, repl);
       }
     }
+    next = collapseNestedPairs(next);
     return next;
   }
 
@@ -405,7 +595,8 @@ function replaceVisibleText(html) {
 function auditCounts(text) {
   const counts = {};
   for (const key of KEYWORD_AUDIT) {
-    counts[key] = (text.match(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+    const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    counts[key] = (text.match(new RegExp(escaped, 'g')) || []).length;
   }
   return counts;
 }
@@ -431,11 +622,11 @@ const changedFiles = [];
 for (const file of files) {
   const original = fs.readFileSync(file, 'utf8');
   beforeCounts.push(auditCounts(original));
-  const normalized = replaceVisibleText(original);
+  const normalized = replaceVisibleText(replaceRawHtml(original));
   afterCounts.push(auditCounts(normalized));
   if (normalized !== original) {
     fs.writeFileSync(file, normalized, 'utf8');
-    changedFiles.push(path.relative(ROOT, file));
+    changedFiles.push(path.relative(ROOT, file).replace(/\\/g, '/'));
   }
 }
 

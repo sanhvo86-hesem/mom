@@ -68,7 +68,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
           <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
         </div>
       </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi cấp PackID/SSCC, in nhãn logistics, split/merge kiện, reprint/void nhãn, và đối soát trước xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm)))).</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi cấp PackID/SSCC, in nhãn logistics, split/merge kiện, reprint/void nhãn, và đối soát trước xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))))))).</div>
       <h1>ANNEX-QMS-007 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</h1>
       
 <div class="section"><h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
@@ -77,7 +77,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>2. Từ điển dữ liệu bắt buộc</h2>
 <div class="table-card"><table><thead><tr><th>Field</th><th>Bắt buộc</th><th>Nguồn dữ liệu chuẩn</th><th>Quy tắc</th></tr></thead><tbody>
-<tr><td>PackID</td><td>Có</td><td>Epicor/WHS transaction</td><td>Duy nhất trong shipment scope; không đổi sau xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm)))).</td></tr>
+<tr><td>PackID</td><td>Có</td><td>Epicor/WHS transaction</td><td>Duy nhất trong shipment scope; không đổi sau xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))))))).</td></tr>
 <tr><td>SSCC (AI 00)</td><td>Có khi dùng logistics label</td><td>Service cấp mã được kiểm soát</td><td>18 số, check digit hợp lệ, duy nhất toàn cục trong vòng đời quản lý của công ty.</td></tr>
 <tr><td>Shipment / Order / Release</td><td>Có</td><td>Epicor</td><td>Phải khớp ship-to, bill-to, điều kiện giao hàng.</td></tr>
 <tr><td>JobNum / PartNo / Rev</td><td>Có</td><td>Epicor + controlled release set</td><td>Không được ship sai phiên bản (wrong revision); revision phải khớp hồ sơ quality release.</td></tr>
@@ -86,7 +86,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>LabelPrintVersion</td><td>Có</td><td>Label service</td><td>Giúp truy vết layout/template đang dùng.</td></tr>
 <tr><td>ReprintCount / VoidFlag</td><td>Có</td><td>Reprint/Void log</td><td>Mỗi reprint/void phải có reason code và người phê duyệt.</td></tr>
 <tr><td>PacketComplete</td><td>Có</td><td>SSOT ship packet</td><td>Chỉ đạt khi đủ hồ sơ bắt buộc theo QPL và yêu cầu khách hàng.</td></tr>
-<tr><td>ReconciliationStatus</td><td>Có</td><td>Validator logic</td><td>PASS / FAIL / BLOCKED. BLOCKED chặn xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm)))).</td></tr>
+<tr><td>ReconciliationStatus</td><td>Có</td><td>Validator logic</td><td>PASS / FAIL / BLOCKED. BLOCKED chặn xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))))))).</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>3. Quy tắc vòng đời PackID / SSCC</h2>

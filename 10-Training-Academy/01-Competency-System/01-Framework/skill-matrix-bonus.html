@@ -109,11 +109,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Cơ chế này tích hợp trực tiếp vào: <b>(i) chứng nhận Level</b> và <b>(ii) tính thưởng theo ma trận kỹ năng (skill matrix)</b>.
  </p>
 <div class="note">
-<strong>Quy tắc bắt buộc (PHẢI) — Gate FAIL thì xử lý như sau:</strong>
+<strong>Quy tắc bắt buộc (PHẢI) — nếu không đạt cổng kiểm soát (gate) thì xử lý như sau:</strong>
 <ul>
-<li><b>Gate FAIL</b> ở bất kỳ <b>metric “Critical Gate”</b> ⇒ <b>không cấp mới Level</b> trong kỳ và <b>khóa skill bonus</b> (K<sub>gate</sub>=0) trong kỳ.</li>
-<li><b>Gate FAIL</b> ở metric mức “Major Gate” ⇒ <b>cap</b> skill bonus (ví dụ K<sub>gate</sub>=0.5) hoặc giữ Level nhưng bắt buộc CAPA/OJT bổ sung.</li>
-<li>Gate phải dựa trên <b>dữ liệu khách quan</b> (điểm đánh giá, NCR, customer escape, log an toàn, tuân thủ revision…) và được lưu <b>Documented Information (ISO 7.5)</b>.</li>
+<li><b>Không đạt</b> ở bất kỳ <b>tiêu chí “Critical Gate”</b> ⇒ <b>không cấp mới Level</b> trong kỳ và <b>khóa thưởng kỹ năng (skill bonus)</b> (K<sub>gate</sub>=0) trong kỳ.</li>
+<li><b>Không đạt</b> ở <b>tiêu chí “Major Gate”</b> ⇒ <b>giới hạn</b> thưởng kỹ năng (skill bonus) (ví dụ K<sub>gate</sub>=0.5) hoặc giữ Level nhưng bắt buộc CAPA/OJT bổ sung.</li>
+<li>Gate phải dựa trên <b>dữ liệu khách quan</b> (điểm đánh giá, NCR, customer escape, log an toàn, tuân thủ revision…) và được lưu <b>thông tin dạng văn bản (Documented Information, ISO 7.5)</b>.</li>
 </ul>
 </div>
 <h3>2.1 Gate cấp công ty (Company-wide gates)</h3>
@@ -167,9 +167,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Công thức (PHẢI):
  </p>
 <pre class="codeblock">K_gate = IF(Any Critical Gate FAIL, 0, IF(Any Major Gate FAIL, 0.5, 1))</pre>
-<h3>3.4 Skill Bonus (phần thưởng kỹ năng)</h3>
+<h3>3.4 thưởng kỹ năng (skill bonus) (phần thưởng kỹ năng)</h3>
 <p>
- Skill Bonus được tách như một phần của “thưởng hiệu suất” (để tối ưu đóng BHXH theo mô hình HESEM).
+ thưởng kỹ năng (skill bonus) được tách như một phần của “thưởng hiệu suất” (để tối ưu đóng BHXH theo mô hình HESEM).
  Công thức áp dụng (PHẢI):
  </p>
 <pre class="codeblock">Bonus_skill = BaseSalary * Rate_skill_pool * K_skill * K_gate</pre>
@@ -237,7 +237,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Tài liệu ma trận kỹ năng (skill matrix) &amp; Bonus Map <b>PHẢI</b> có mã, phiên bản, ngày hiệu lực, owner, và lịch review.</li>
 <li>Dữ liệu KPI/metric <b>PHẢI</b> có nguồn, định nghĩa, công thức, và lưu vết.</li>
-<li>Cấp Level <b>PHẢI</b> dựa trên: Test + danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (OJT checklist)))) + Rubric + Evidence + Gate PASS.</li>
+<li>Cấp Level <b>PHẢI</b> dựa trên: Test + danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (OJT checklist))))))))) + Rubric + Evidence + Gate PASS.</li>
 <li>Thay đổi định nghĩa Level/Metric <b>PHẢI</b> đi qua quy trình ECO/Kiểm soát tài liệu (SOP-QMS-01).</li>
 </ul>
 </section></div></div></div>
