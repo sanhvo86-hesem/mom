@@ -131,9 +131,13 @@
     </div>
     <nav id="sidebar-nav"></nav>
     <div class="sidebar-footer">
-      <button class="sidebar-toggle" onclick="toggleSidebar()">
-        <span class="icon" id="collapse-icon">◁</span>
-        <span id="collapse-text">Thu gọn</span>
+      <button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()" type="button" aria-label="Thu gọn menu" title="Thu gọn menu">
+        <span class="icon" id="collapse-icon" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.25 3.5L5.75 8L10.25 12.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="sidebar-toggle-label" id="collapse-text">Thu gọn menu</span>
       </button>
     </div>
   </aside>

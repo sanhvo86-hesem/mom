@@ -720,6 +720,7 @@ async function showApp(){
   await refreshAllDocStatesFromServer();
 
   renderSidebar();
+  syncSidebarToggleState();
   navigateTo('dashboard');
   loadUsersFromServerIfAdmin();
 }
@@ -3081,9 +3082,27 @@ function escapeHtml(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function syncSidebarToggleState(){
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('sidebar-toggle-btn');
+  const toggleText = document.getElementById('collapse-text');
+  if(!sidebar || !toggleBtn || !toggleText) return;
+  const collapsed = sidebar.classList.contains('collapsed');
+  const label = collapsed ? 'M\u1edf r\u1ed9ng menu' : 'Thu g\u1ecdn menu';
+  toggleBtn.setAttribute('aria-label', label);
+  toggleBtn.setAttribute('title', label);
+  toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  toggleText.textContent = collapsed ? 'M\u1edf r\u1ed9ng' : 'Thu g\u1ecdn';
+}
+
 function toggleSidebar(){
   // Desktop only: collapse/expand
   if(window.innerWidth > 900){
+    const sidebarEl = document.getElementById('sidebar');
+    if(!sidebarEl) return;
+    sidebarEl.classList.toggle('collapsed');
+    syncSidebarToggleState();
+    return;
     const s = document.getElementById('sidebar');
     s.classList.toggle('collapsed');
     const icon = document.getElementById('collapse-icon');
