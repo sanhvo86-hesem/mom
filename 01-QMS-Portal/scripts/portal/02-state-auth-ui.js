@@ -530,6 +530,18 @@ async function checkSession(){
         showApp();
         return;
       }
+      if(s && s.enroll_pending){
+        csrfToken = s.csrf_token || null;
+        enrollInfo = s;
+        document.getElementById('enroll-issuer').textContent = s.issuer || '';
+        document.getElementById('enroll-username').textContent = s.username || '';
+        document.getElementById('enroll-secret').textContent = s.secret || '';
+        document.getElementById('enroll-otpauth').textContent = s.otpauth_url || '';
+        renderEnrollQR(s.otpauth_url || '');
+        setLoginChecking(false, '');
+        setLoginStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số');
+        return;
+      }
       if(s && s.mfa_pending){
         csrfToken = s.csrf_token || null;
         setLoginChecking(false, '');

@@ -365,11 +365,7 @@ function require_logged_in(array $store): array {
   if (isset($_SESSION['last_active'])) {
     $last = (int)$_SESSION['last_active'];
     if ($last > 0 && ($now - $last) > $idleLimit) {
-      // Clear session safely
-      $_SESSION = [];
-      if (session_status() === PHP_SESSION_ACTIVE) {
-        @session_destroy();
-      }
+      destroy_auth_session();
       api_json(['ok' => false, 'error' => 'session_expired'], 401);
     }
   }
@@ -1378,8 +1374,98 @@ function read_json_body(): array {
   return is_array($data) ? $data : [];
 }
 
+function file_head_bytes(string $path, int $length = 4096): string {
+  if (!is_file($path) || $length < 1) return '';
+  $fh = @fopen($path, 'rb');
+  if (!$fh) return '';
+  $bytes = (string)@fread($fh, $length);
+  @fclose($fh);
+  return $bytes;
+}
+
+function csv_payload_looks_textual(string $payload): bool {
+  if ($payload === '' || str_contains($payload, "\0")) return false;
+  $len = strlen($payload);
+  $controlCount = 0;
+  for ($i = 0; $i < $len; $i++) {
+    $ord = ord($payload[$i]);
+    $isAllowedControl = in_array($ord, [9, 10, 13], true);
+    if (($ord < 32 && !$isAllowedControl) || $ord === 127) $controlCount++;
+  }
+  return ($controlCount / max(1, $len)) < 0.02;
+}
+
+function workbook_zip_structure_valid(string $path): bool {
+  if (!class_exists('ZipArchive')) return true;
+  $zip = new ZipArchive();
+  if ($zip->open($path) !== true) return false;
+  foreach (['[Content_Types].xml', '_rels/.rels', 'xl/workbook.xml'] as $entry) {
+    if ($zip->locateName($entry, ZipArchive::FL_NOCASE) === false) {
+      $zip->close();
+      return false;
+    }
+  }
+  $zip->close();
+  return true;
+}
+
+function uploaded_workbook_signature_valid(string $path, string $ext): bool {
+  $ext = strtolower(trim($ext));
+  $head = file_head_bytes($path, 4096);
+  if ($head === '') return false;
+
+  return match ($ext) {
+    'xlsx', 'xlsm' => str_starts_with($head, "PK\x03\x04") && workbook_zip_structure_valid($path),
+    'xls' => str_starts_with($head, hex2bin('D0CF11E0A1B11AE1')),
+    'csv' => csv_payload_looks_textual($head),
+    default => false,
+  };
+}
+
 function client_ip(): string {
   return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+}
+
+function clear_auth_session_state(): void {
+  unset(
+    $_SESSION['user'],
+    $_SESSION['preauth_user'],
+    $_SESSION['mfa_ok'],
+    $_SESSION['enroll_user'],
+    $_SESSION['enroll_secret'],
+    $_SESSION['enroll_started'],
+    $_SESSION['last_active']
+  );
+}
+
+function set_preauth_session(string $username): void {
+  if (session_status() !== PHP_SESSION_ACTIVE) session_init();
+  session_regenerate_id(true);
+  clear_auth_session_state();
+  $_SESSION['preauth_user'] = strtolower(trim($username));
+  $_SESSION['mfa_ok'] = false;
+}
+
+function set_authenticated_session(string $username): void {
+  if (session_status() !== PHP_SESSION_ACTIVE) session_init();
+  session_regenerate_id(true);
+  clear_auth_session_state();
+  $_SESSION['user'] = strtolower(trim($username));
+  $_SESSION['mfa_ok'] = true;
+  $_SESSION['last_active'] = time();
+}
+
+function destroy_auth_session(): void {
+  if (session_status() !== PHP_SESSION_ACTIVE) session_init();
+  clear_auth_session_state();
+  if (ini_get('session.use_cookies')) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 3600, $params['path'] ?: '/', $params['domain'] ?? '', (bool)($params['secure'] ?? false), (bool)($params['httponly'] ?? true));
+  }
+  $_SESSION = [];
+  if (session_status() === PHP_SESSION_ACTIVE) {
+    @session_destroy();
+  }
 }
 
 function session_requires_completed_mfa(array $user, array $settings = []): bool {
@@ -1715,6 +1801,7 @@ switch ($action) {
   case 'status': {
     $logged = false;
     $mfaPending = false;
+    $enrollPending = false;
     $user = null;
     if (!empty($_SESSION['user']) && is_array($store)) {
       $u = find_user_by_username($store, (string)$_SESSION['user']);
@@ -1726,10 +1813,42 @@ switch ($action) {
         }
       }
     }
+    $enrollUser = (string)($_SESSION['enroll_user'] ?? '');
+    $enrollSecret = (string)($_SESSION['enroll_secret'] ?? '');
+    $enrollStarted = (int)($_SESSION['enroll_started'] ?? 0);
+    if (!$logged && $enrollUser !== '' && $enrollSecret !== '' && (time() - $enrollStarted) <= 600) {
+      $settings = is_array($store['settings'] ?? null) ? $store['settings'] : [];
+      $issuer = (string)($settings['issuer'] ?? 'HESEM QMS');
+      $mfaPending = false;
+      $enrollPending = true;
+      api_json([
+        'ok' => true,
+        'logged_in' => false,
+        'mfa_pending' => false,
+        'enroll_pending' => true,
+        'issuer' => $issuer,
+        'account' => $enrollUser,
+        'username' => $enrollUser,
+        'secret' => $enrollSecret,
+        'otpauth_url' => otpauth_url($issuer, $enrollUser, $enrollSecret),
+        'user' => null,
+        'csrf_token' => csrf_token(),
+        'server_time' => now_iso(),
+        'initialized' => is_array($store),
+      ]);
+    }
+    $preauthUser = (string)($_SESSION['preauth_user'] ?? '');
+    if (!$logged && !$enrollPending && $preauthUser !== '' && is_array($store)) {
+      $u = find_user_by_username($store, $preauthUser);
+      if ($u && session_requires_completed_mfa($u, is_array($store['settings'] ?? null) ? $store['settings'] : []) && empty($_SESSION['mfa_ok'])) {
+        $mfaPending = true;
+      }
+    }
     api_json([
       'ok' => true,
       'logged_in' => (bool)$logged,
       'mfa_pending' => (bool)$mfaPending,
+      'enroll_pending' => (bool)$enrollPending,
       'user' => $user,
       'csrf_token' => csrf_token(),
       'server_time' => now_iso(),
@@ -2583,6 +2702,10 @@ case 'doc_save_draft': {
     if ($storedSize <= 0 || $storedSize > $MAX_FORM_UPLOAD_BYTES) {
       if (is_file($draftMeta['abs'])) @unlink($draftMeta['abs']);
       api_json(['ok' => false, 'error' => $storedSize > $MAX_FORM_UPLOAD_BYTES ? 'upload_too_large' : 'invalid_upload_size', 'max_bytes' => $MAX_FORM_UPLOAD_BYTES], $storedSize > $MAX_FORM_UPLOAD_BYTES ? 413 : 400);
+    }
+    if (!uploaded_workbook_signature_valid($draftMeta['abs'], $uploadExt)) {
+      if (is_file($draftMeta['abs'])) @unlink($draftMeta['abs']);
+      api_json(['ok' => false, 'error' => 'invalid_file_signature'], 400);
     }
 
     $sha = form_sha256_file($draftMeta['abs']);
@@ -3725,10 +3848,6 @@ case 'auth_login': {
       api_json(['ok' => false, 'error' => 'invalid_credentials'], 401);
     }
 
-    session_regenerate_id(true);
-    $_SESSION['user'] = $username;
-    $_SESSION['mfa_ok'] = false;
-
     $settings = $store['settings'] ?? [];
     $requireMfa = (bool)($settings['require_mfa'] ?? true);
 
@@ -3744,7 +3863,7 @@ case 'auth_login': {
       api_json(['ok' => false, 'error' => 'invalid_code'], 401);
     }
 
-    $_SESSION['mfa_ok'] = true;
+    set_authenticated_session($username);
 
     $user['last_login'] = now_iso();
     $user['updated_at'] = now_iso();
@@ -3763,6 +3882,7 @@ case 'auth_login': {
     ]);
   }
 
+  set_preauth_session($username);
   api_json([
     'ok' => true,
     'mfa_required' => true,
@@ -3774,6 +3894,7 @@ case 'auth_login': {
 
 
     if ($requireMfa) {
+      set_preauth_session($username);
       $secretBin = random_bytes(20);
       $secretB32 = base32_encode($secretBin);
 
@@ -3797,7 +3918,7 @@ case 'auth_login': {
     }
 
     // No MFA required
-    $_SESSION['mfa_ok'] = true;
+    set_authenticated_session($username);
     $user['last_login'] = now_iso();
     $user['updated_at'] = now_iso();
     update_user($store, $user);
@@ -3824,7 +3945,7 @@ case 'auth_login': {
 
     rate_limit_check('mfa_' . client_ip(), 60, 300, $RL_DIR);
 
-$username = (string)($_SESSION['user'] ?? '');
+$username = (string)($_SESSION['preauth_user'] ?? '');
 if ($username === '') {
   // Fallback (compatibility): if session was lost between steps, allow verify by re-supplying username/password.
   $u = strtolower(trim((string)($data['username'] ?? '')));
@@ -3838,9 +3959,6 @@ if ($username === '') {
   $h = (string)($uRec['password_hash'] ?? '');
   if ($h === '' || !password_verify($p, $h)) { usleep(150000); api_json(['ok' => false, 'error' => 'unauthorized'], 401); }
 
-  session_regenerate_id(true);
-  $_SESSION['user'] = $u;
-  $_SESSION['mfa_ok'] = false;
   $username = $u;
 }
 
@@ -3855,7 +3973,7 @@ if ($username === '') {
 
     if (!totp_verify($secretB32, $code, 1, 30, 6)) api_json(['ok' => false, 'error' => 'invalid_code'], 401);
 
-    $_SESSION['mfa_ok'] = true;
+    set_authenticated_session($username);
 
     $user['last_login'] = now_iso();
     $user['updated_at'] = now_iso();
@@ -3909,9 +4027,7 @@ if ($username === '') {
       api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
     }
 
-    $_SESSION['user'] = $username;
-    $_SESSION['mfa_ok'] = true;
-    unset($_SESSION['enroll_user'], $_SESSION['enroll_secret'], $_SESSION['enroll_started']);
+    set_authenticated_session($username);
 
     api_json([
       'ok' => true,
@@ -3923,9 +4039,9 @@ if ($username === '') {
   }
 
   case 'auth_logout': {
-    if ($method !== 'GET') require_csrf();
-    $_SESSION = [];
-    if (session_status() === PHP_SESSION_ACTIVE) session_destroy();
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    require_csrf();
+    destroy_auth_session();
     api_json(['ok' => true, 'logged_in' => false]);
   }
 
