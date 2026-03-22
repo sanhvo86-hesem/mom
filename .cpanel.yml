@@ -4,5 +4,5 @@ deployment:
     - export DEPLOYPATH=/home/pqobnire/qms.hesem.com.vn
     - /bin/cp -R * $DEPLOYPATH/
     - /bin/cp .htaccess $DEPLOYPATH/.htaccess
-    - /bin/mkdir -p /home/pqobnire/qms-data-private/config
-    - /bin/cp _build/qms-data-private/config/folder_descriptions.json /home/pqobnire/qms-data-private/config/folder_descriptions.json 2>/dev/null || true
+    # One-time migration: copy live data from qms-data-private back into in-repo qms-data
+    - /bin/cp -n /home/pqobnire/qms-data-private/config/*.json $DEPLOYPATH/01-QMS-Portal/qms-data/config/ 2>/dev/null || true

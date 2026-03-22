@@ -29,16 +29,13 @@ $DATA_DIR_ENV = trim((string)(getenv('QMS_DATA_DIR') ?: ''));
 if ($DATA_DIR_ENV !== '') {
   $DATA_DIR = rtrim(str_replace('\\', '/', $DATA_DIR_ENV), '/\\');
 } else {
-  // Prefer private data outside web root if writable; fallback to legacy in-webroot dir.
-  $privateCandidate = rtrim(str_replace('\\', '/', $ROOT_PARENT_DIR), '/\\') . '/qms-data-private';
-  $DATA_DIR = $privateCandidate;
-}
-
-// If selected dir is unavailable, fallback to legacy data dir for compatibility.
-if (!is_dir($DATA_DIR)) @mkdir($DATA_DIR, 0775, true);
-if (!is_dir($DATA_DIR) || !is_writable($DATA_DIR)) {
+  // NOTE: Always use in-repo qms-data dir. Do NOT create qms-data-private outside
+  // the repo — it breaks git deploy (files outside repo are not synced by git pull).
+  // All config/data lives in 01-QMS-Portal/qms-data/ which is protected by .htaccess.
   $DATA_DIR = $LEGACY_DATA_DIR;
 }
+
+if (!is_dir($DATA_DIR)) @mkdir($DATA_DIR, 0775, true);
 
 $CONF_DIR   = $DATA_DIR . '/config';
 $USERS_FILE = $CONF_DIR . '/users.json';
