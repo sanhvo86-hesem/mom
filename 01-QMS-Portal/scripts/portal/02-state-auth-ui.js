@@ -16,11 +16,20 @@ function syncDocViewerDetailVisibility(){
   const headerEl = document.getElementById('doc-viewer-header');
   if(headerEl){
     headerEl.classList.toggle('details-collapsed', docHeaderMetaCollapsed);
+    headerEl.style.display = docHeaderMetaCollapsed ? 'none' : '';
   }
   const historyEl = document.getElementById('vh-container');
   if(historyEl){
     historyEl.classList.toggle('is-collapsed', docHeaderMetaCollapsed);
   }
+}
+
+function setDocHeaderToolbar(html=''){
+  const toolbarEl = document.getElementById('doc-header-toolbar');
+  if(!toolbarEl) return;
+  const content = String(html || '').trim();
+  toolbarEl.innerHTML = content;
+  toolbarEl.classList.toggle('is-active', !!content);
 }
 
 function toggleDocHeaderMeta(force){
@@ -758,6 +767,7 @@ function navigateTo(page, filter){
     if(bcEl) bcEl.innerHTML = `<span>HESEM QMS</span><span style="margin:0 4px">›</span><span class="current">${titles[page]||page}</span>`;
   }
   
+  setDocHeaderToolbar('');
   if(page==='dashboard') renderDashboard();
   if(page==='documents') renderDocuments();
   if(page==='search') renderSearch();
@@ -1195,17 +1205,18 @@ function updateDocViewerHeader(doc){
        </div>`;
 
   const headerEl = document.getElementById('doc-viewer-header');
-  syncDocViewerDetailVisibility();
+  setDocHeaderToolbar(`
+    <div class="doc-toolbar-shell">
+      ${headerActionsHtml}
+      ${navActionsHtml}
+    </div>
+  `);
   headerEl.innerHTML = `
     <div class="dv-top">
       <div class="dv-title-area">
         <div class="dv-code" style="color:${cat.color}">${doc.code} <span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:${statusColor(status)}18;color:${statusColor(status)}">${statusLabel(status)}</span></div>
         <div class="dv-name">${displayTitle}</div>
         ${displayDesc ? `<div class="dv-desc">${displayDesc}</div>` : ''}
-      </div>
-      <div class="dv-top-actions">
-        ${headerActionsHtml}
-        ${navActionsHtml}
       </div>
     </div>
     <div class="dv-meta${docHeaderMetaCollapsed ? ' is-collapsed' : ''}">
@@ -1219,6 +1230,7 @@ function updateDocViewerHeader(doc){
       </div>
       ${activityNotes ? `<div class="dv-meta-notes">${activityNotes}</div>` : ''}
     </div>`;
+  syncDocViewerDetailVisibility();
 }
 
 // ═══════════════════════════════════════════════════
