@@ -284,9 +284,9 @@ function setLoginStage(stage, msg=''){
     return;
   }
 
-  // MFA / ENROLL stages — keep fields editable so user can correct credentials
-  user.disabled = false;
-  pass.disabled = false;
+  // MFA / ENROLL stages
+  user.disabled = true;
+  pass.disabled = true;
   if(mfa) mfa.style.display = 'block';
 
   const toggle = document.getElementById('recovery-toggle');
