@@ -1,16 +1,273 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
+
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>C18-L1.html - Redirect</title>
-  <meta http-equiv="refresh" content="0; url=18-C18/C18-L1.html" />
-  <link rel="stylesheet" href="../../../assets/style.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>C18-L1 — Supply Chain, Purchasing & Logistics — Foundation | HESEM OS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
 </head>
 <body>
-  <div class="container"><div class="page"><div class="page-body">
-    <p>Redirecting to <a href="18-C18/C18-L1.html">18-C18/C18-L1.html</a>...</p>
-  </div></div></div>
-  <script src="../../../assets/app.js"></script>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>C18-L1 — Supply Chain, Purchasing & Logistics — Foundation</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>C18-L1</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent"><h1>C18-L1 — Chuỗi cung ứng – mua hàng – logistics (nhận/xuất/traceability) — Nhận/Xuất đúng chứng từ &amp; nhãn truy xuất</h1><div class="card">
+<span class="badge">Drill Pack (Job CNC)</span>
+<p class="lead" style="margin-top:10px;">
+ Chạy drill trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-material-cert-specialprocess.html"><b>DRL-03</b> — Material Cert &amp; Special Process Outsource Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Shipping Packet + CoC Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Job Order E2E Drill (RFQ → Ship Packet)</a></li>
+</ul>
+<p class="small muted" style="margin-top:8px;">
+ Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ </p>
+</div><p class="lead"><strong>Mô tả năng lực:</strong> Thực hiện nhận hàng – xuất hàng đúng chứng từ, đúng nhãn truy xuất, đúng trạng thái (OK/HOLD/NG) để bảo đảm truy vết và tránh lẫn lô trong xưởng CNC.</p><div class="card"><strong>Mô tả Level:</strong> Làm đúng theo checklist tại điểm làm việc (receiving/warehouse/shipping). Biết gắn HOLD và báo cấp khi thiếu dữ liệu hoặc có sai lệch.</div><section class="hero">
+<div class="hero-grid">
+<div>
+<span class="pill">C18-L1 • Nhận/Xuất • Truy xuất</span>
+<h2 class="h2">Mục tiêu huấn luyện</h2>
+<ul>
+<li>Thực hiện đúng <b>3-Point Match</b> tại nhận hàng và tại xuất hàng.</li>
+<li>Phân tách rõ <b>OK / HOLD / NG</b>, không để lẫn trạng thái trong khu vực kho.</li>
+<li>Dán nhãn truy xuất tối thiểu và ghi nhận đủ hồ sơ để truy vết trong 5 phút.</li>
+</ul>
+<div class="callout ok">
+<b>Chuẩn thực chiến:</b> Không có chứng từ truy xuất = <b>HOLD</b>. Không có nhãn = <b>HOLD</b>. 
+ Không có bàn giao = <b>HOLD</b>.
+ </div>
+</div>
+<div class="note">
+<strong>Gate bắt buộc (không vượt)</strong>
+<div>Xuất sai vật liệu/thiếu chứng từ/nhầm revision/nhầm lô = <b>không đạt Level</b> và kích hoạt NCR/CAPA.</div>
+<div class="small muted" style="margin-top:8px;">Tham chiếu: <a href="../../01-Framework/competency-metrics.html#C18">KPI/Metric Dictionary – C18</a>.</div>
+</div>
+</div>
+</section><h2 class="h2">1) Chuẩn đầu ra (K-S-E-M)</h2><table class="table">
+<thead><tr><th style="width:160px">Nhóm</th><th>Yêu cầu đạt</th><th style="width:260px">Bằng chứng</th></tr></thead>
+<tbody>
+<tr>
+<td><b>K</b> (Kiến thức)</td>
+<td>Giải thích được 3-Point Match: <b>PO/Spec</b> ↔ <b>Chứng từ (MTR/CoC/Packing list)</b> ↔ <b>Hàng thực tế (nhãn/heat/qty)</b>. Hiểu HOLD là trạng thái bắt buộc khi thiếu dữ liệu.</td>
+<td>Quiz đạt ≥ 8/10.</td>
+</tr>
+<tr>
+<td><b>S</b> (Kỹ năng)</td>
+<td>Thực hiện nhận hàng và xuất hàng theo checklist, dán nhãn truy xuất, lưu hồ sơ đúng vị trí.</td>
+<td>01 bộ hồ sơ nhận hàng + 01 bộ hồ sơ xuất hàng (ảnh/scan).</td>
+</tr>
+<tr>
+<td><b>E</b> (Minh chứng)</td>
+<td>Ghi nhận log và cập nhật theo luồng thống nhất (PO tracker, kho, QA hold khi có sai lệch).</td>
+<td>FRM-PUR-001/Log nhận hàng, ảnh nhãn, log HOLD.</td>
+</tr>
+<tr>
+<td><b>M</b> (Metric)</td>
+<td>Receiving accuracy đạt ngưỡng L1 theo C18-M1; không phát sinh mix-up do kho/nhận/xuất.</td>
+<td>Báo cáo tuần + xác nhận trưởng bộ phận.</td>
+</tr>
+</tbody>
+</table><h2 class="h2">2) Quy tắc vận hành tại điểm nhận/xuất</h2><div class="cols-2">
+<div class="card">
+<h3 class="h3">PHẢI</h3>
+<ul>
+<li>Đối chiếu <b>PO</b> ↔ <b>Packing list/MTR/CoC</b> ↔ <b>nhãn/heat/qty</b> trước khi nhập kho.</li>
+<li>Gắn <b>HOLD</b> ngay khi thiếu chứng từ, nhãn không đọc được, heat/lot không khớp, bao bì hư hỏng.</li>
+<li>Dán nhãn truy xuất tối thiểu: <b>Supplier</b>, <b>Material/Part No</b>, <b>Heat/Lot</b>, <b>Qty</b>, <b>Date</b>, <b>Status</b>.</li>
+<li>Lưu chứng từ theo cấu trúc thư mục đã chuẩn hoá (Supplier Folder Index).</li>
+</ul>
+</div>
+<div class="card">
+<h3 class="h3">PHẢI CHẶN</h3>
+<ul>
+<li>Nhập kho vào khu <b>OK</b> khi chưa qua 3-Point Match.</li>
+<li>Gỡ nhãn/đổi nhãn khi chưa cập nhật hồ sơ và chưa có người phê duyệt.</li>
+<li>Gộp nhiều lô/heat vào 01 thùng khi không có quy tắc truy xuất và không có hồ sơ gộp lô.</li>
+<li>Xuất hàng khi chưa kiểm tra trạng thái <b>Release</b> (QA/OPS) và chưa đủ dossier.</li>
+</ul>
+</div>
+</div><h2 class="h2">3) Flow chuẩn: Inbound → WIP → Outbound</h2><div class="vflow">
+<div class="step">
+<div class="cap">B1 — Nhận chứng từ</div>
+<ul>
+<li>Lấy PO, packing list, MTR/CoC (khi áp dụng), yêu cầu đặc biệt (spec, revision).</li>
+<li>Kiểm tra mã nhà cung cấp, số PO, số lô/heat.</li>
+</ul>
+</div>
+<div class="step">
+<div class="cap">B2 — Kiểm tra hàng thực tế</div>
+<ul>
+<li>Kiểm số lượng, tình trạng bao bì, tem nhãn, dấu heat/lot.</li>
+<li>Gắn HOLD ngay khi có sai lệch/dấu hiệu hư hỏng.</li>
+</ul>
+</div>
+<div class="step">
+<div class="cap">B3 — Phân luồng trạng thái</div>
+<ul>
+<li><b>OK</b>: đủ 3-Point Match, đủ chứng từ, nhãn rõ.</li>
+<li><b>HOLD</b>: thiếu chứng từ/không khớp/khó truy xuất.</li>
+<li><b>NG/RETURN</b>: không phù hợp, lập NCR và xử lý trả về theo quy định.</li>
+</ul>
+</div>
+<div class="step">
+<div class="cap">B4 — Dán nhãn kho + định vị</div>
+<ul>
+<li>Dán nhãn kho, ghi location, cập nhật log/PO tracker.</li>
+<li>Không để vật tư “không vị trí”.</li>
+</ul>
+</div>
+<div class="step">
+<div class="cap">B5 — Xuất kho / giao nhận</div>
+<ul>
+<li>Pick đúng Part/Rev/Lot, đối chiếu với yêu cầu job.</li>
+<li>Đóng gói theo spec, dán nhãn shipping, chuẩn bị dossier.</li>
+</ul>
+</div>
+</div><h2 class="h2">4) Checklist tại điểm làm việc (dùng ngay)</h2><div class="cols-2">
+<div class="card">
+<h3 class="h3">Nhận hàng (Inbound)</h3>
+<ul>
+<li>Đã có PO + packing list + MTR/CoC (khi áp dụng).</li>
+<li>Heat/Lot trên chứng từ khớp nhãn hàng.</li>
+<li>Số lượng khớp; bao bì không hư hỏng.</li>
+<li>Đã gắn status OK/HOLD/NG; vật tư HOLD để đúng khu.</li>
+<li>Đã cập nhật <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-PUR-001 — PO Tracker</a>.</li>
+<li>Đã lưu chứng từ theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html">FRM-PUR-007 — Supplier Product Folder Index</a>.</li>
+</ul>
+</div>
+<div class="card">
+<h3 class="h3">Xuất hàng (Outbound)</h3>
+<ul>
+<li>Đối chiếu Job/Part/Rev/Qty với traveller/packing list.</li>
+<li>Trạng thái đã Release (QA/OPS), không có HOLD.</li>
+<li>Đóng gói theo quy định bảo quản; nhãn shipping đầy đủ.</li>
+<li>Dossier: CoC/IR/FAI (khi yêu cầu) + packing list.</li>
+<li>Ghi log phát hành CoC: <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-QA-011</a>.</li>
+</ul>
+</div>
+</div><div class="card">
+<h3 class="h3">Tài liệu thao tác liên quan</h3>
+<ul>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">PROC-WHS-001 — Receiving &amp; Warehouse</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">PROC-WHS-002 — Packaging &amp; Labeling</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">PROC-PUR-002 — Purchasing &amp; Supplier Control</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">PROC-QA-004 — Final Inspection &amp; CoC Release</a></li>
+</ul>
+</div><h2 class="h2">5) Tình huống thực hành (case)</h2><div class="case">
+<div class="cap">Case 1 — Vật liệu về thiếu MTR/CoC</div>
+<ul>
+<li>Gắn HOLD, đưa vào khu HOLD, chụp ảnh nhãn/heat.</li>
+<li>Cập nhật PO tracker trạng thái <b>HOLD – thiếu chứng từ</b>.</li>
+<li>Báo PUR/QA: yêu cầu bổ sung MTR/CoC; không được cấp phát vào sản xuất.</li>
+</ul>
+</div><div class="case">
+<div class="cap">Case 2 — Nhãn heat không khớp chứng từ</div>
+<ul>
+<li>Dừng nhập kho, gắn HOLD, cô lập lô.</li>
+<li>Soát lại packing list; gọi nhà cung cấp xác nhận heat.</li>
+<li>Khi không xác nhận được trong SLA: tạo NCR và xử lý RETURN theo PROC.</li>
+</ul>
+</div><h2 class="h2">6) Quiz nhanh (10 câu)</h2><ol>
+<li>3-Point Match gồm 3 yếu tố nào?</li>
+<li>Khi thiếu MTR/CoC, trạng thái bắt buộc là gì?</li>
+<li>Liệt kê 6 trường dữ liệu bắt buộc trên nhãn truy xuất kho.</li>
+<li>Điểm phân biệt OK và HOLD là gì?</li>
+<li>Hành động đầu tiên khi thấy heat/lot không khớp?</li>
+<li>Kho được phép gộp 2 lô/heat vào 01 thùng khi nào?</li>
+<li>Dossier xuất hàng tối thiểu gồm các tài liệu nào?</li>
+<li>FRM nào dùng để quản lý PO line và trạng thái giao hàng?</li>
+<li>FRM nào dùng để chuẩn hoá cấu trúc lưu chứng từ nhà cung cấp?</li>
+<li>1 lỗi Gate của C18 là gì?</li>
+</ol><details class="card"><summary><b>Đáp án chuẩn</b></summary>
+<ol>
+<li>PO/Spec ↔ Chứng từ (MTR/CoC/packing list) ↔ Hàng thực tế (nhãn/heat/qty).</li>
+<li>HOLD.</li>
+<li>Supplier; Material/Part No; Heat/Lot; Qty; Date; Status (bổ sung Location khi áp dụng).</li>
+<li>OK: đủ dữ liệu và khớp; HOLD: thiếu dữ liệu hoặc có sai lệch cần xác minh.</li>
+<li>Gắn HOLD và cô lập lô.</li>
+<li>Khi có quy tắc truy xuất + hồ sơ gộp lô được phê duyệt.</li>
+<li>CoC/IR/FAI (khi yêu cầu) + packing list + nhãn shipping.</li>
+<li>FRM-PUR-001.</li>
+<li>FRM-PUR-007.</li>
+<li>Xuất sai vật liệu/nhầm revision/thiếu chứng từ truy xuất.</li>
+</ol>
+</details><h2 class="h2">7) Bài test thực hành &amp; tiêu chí đạt</h2><div class="card">
+<h3 class="h3">Nhiệm vụ</h3>
+<ol>
+<li>Nhận 01 lô vật tư: hoàn tất 3-Point Match, dán nhãn, cập nhật PO tracker, lưu chứng từ đúng cấu trúc.</li>
+<li>Chuẩn bị 01 lô xuất hàng: đối chiếu Job/Part/Rev/Qty, chuẩn bị dossier tối thiểu, dán nhãn shipping.</li>
+</ol>
+<h3 class="h3">Tiêu chí đạt</h3>
+<ul>
+<li>Không sai khác PO/packing list/nhãn/qty/heat.</li>
+<li>HOLD xử lý đúng (cô lập + log + báo cấp).</li>
+<li>Hồ sơ truy xuất mở ra được trong 5 phút.</li>
+</ul>
+</div></div></div></div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
