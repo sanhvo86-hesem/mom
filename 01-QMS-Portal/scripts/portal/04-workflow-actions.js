@@ -1,4 +1,4 @@
-﻿// WORKFLOW ACTIONS
+// WORKFLOW ACTIONS
 // ═══════════════════════════════════════════════════
 function startEdit(code){
   try{
@@ -1019,7 +1019,7 @@ const innerHtml = _getCurrentEditorInnerHtml();
           edMarkSaved(lang==='en'?('\u2713 Draft saved \u2014 v'+revision):('\u2713 \u0110\u00e3 l\u01b0u nh\u00e1p \u2014 v'+revision));
         }
       }catch(e){}
-      showToast(lang==='en'?'💾 Draft saved — v'+revision:'💾 Đã lÆ°u nháp — v'+revision);
+      showToast(lang==='en'?'💾 Draft saved — v'+revision:'💾 Đã lưu nháp — v'+revision);
       // refresh workflow panel/DCR record in preview
       try{ renderWorkflowPanel(doc); }catch(e){}
       try{ renderVersionHistory(doc); }catch(e){}

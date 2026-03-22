@@ -53,11 +53,11 @@ Mọi tài liệu HTML đều PHẢI có header theo cấu trúc sau:
     </div>
   </div>
   <div class="title">
-    <strong>[MÃ TÀI LIỆU] — [TÊN TÀI LIỆU]</strong>
+    <strong>[M� TÀI LIỆU] — [TÊN TÀI LIỆU]</strong>
     <span class="sub-vn">[Phụ đề tiếng Việt nếu có]</span>
   </div>
   <div class="meta">
-    <div class="row"><span><b>Mã:</b></span><span>[MÃ TÀI LIỆU]</span></div>
+    <div class="row"><span><b>Mã:</b></span><span>[M� TÀI LIỆU]</span></div>
     <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
     <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
     <div class="row"><span><b>Chủ sở hữu:</b></span><span>[PHÒNG BAN]</span></div>

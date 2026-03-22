@@ -134,7 +134,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>M365 Lists</b> theo ANNEX-QMS-005 (Design rules, List catalog, Mapping, Standard codes).</li>
 <li><b>Power Automate</b> theo ANNEX-QMS-006 (Non‑negotiables, Flow inventory, ApprovalHistory, Error playbook).</li>
 <li><b>bộ mẫu cấu hình (SSOT)</b> (sharepoint-lists-schema.csv, README-step2-online-forms.txt, Step5 Power Automate pack, monitoring rules).</li>
-<li><b>Job Dossier</b> theo template thÆ° mục: 01_Rfq-Contract → … → 07_Shipping-Packing → 08_Photos.</li>
+<li><b>Job Dossier</b> theo template thư mục: 01_Rfq-Contract → … → 07_Shipping-Packing → 08_Photos.</li>
 </ul>
 <h3>Khoảng trống/không nhất quán nội bộ (đã chặn ngay trong module)</h3>
 <ul>
@@ -519,7 +519,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
 <ul>
 <li><b>SharePoint Lists:</b> JobIndex, JobOperIndex, LaborMirror, ReceivingIQC, InspectionReports, FAIReports, QCHoldLog, NCRLog, CAPA8D, PackagingChecks, PackSSCCRegister, ShipRelease, StandupActions, IntegrationSettings, IntegrationLogs, ApprovalHistory.</li>
-<li><b>Job Dossier (SharePoint library):</b> cấu trúc thÆ° mục 01→08; ship packet nằm ở “07_Shipping-Packing” hoặc “07_ShipPacket” Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint)..</li>
+<li><b>Job Dossier (SharePoint library):</b> cấu trúc thư mục 01→08; ship packet nằm ở “07_Shipping-Packing” hoặc “07_ShipPacket” Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint)..</li>
 <li><b>Teams:</b> thông báo lỗi vào kênh #control-tower-alerts (theo flow spec).</li>
 <li><b>M365/SharePoint → HESEM-QMS-SSOT</b> IntegrationErrors list (khi triển khai), hoặc chuẩn hóa dùng IntegrationLogs.</li>
 </ul>
@@ -536,7 +536,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody>
 </table>
 </div>
-<h3>12.3 NÆ¡i lÆ°u (SharePoint library/list/path)</h3>
+<h3>12.3 Nơi lưu (SharePoint library/list/path)</h3>
 <ul>
 <li><b>Lists:</b> M365/SharePoint → Site SharePoint Site: CNC-IMS-HUB. → Lists theo schema.</li>
 <li><b>Job Dossier:</b> M365/SharePoint → Library “Job-Dossiers” Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint). → {{JobNum}}_{{PartNum}}_Rev{{RevisionNum}} → 01..08.</li>

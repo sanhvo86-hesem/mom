@@ -1,4 +1,4 @@
-﻿// APP STATE
+// APP STATE
 // ═══════════════════════════════════════════════════
 let currentUser = null;
 let currentPage = 'dashboard';
@@ -1945,7 +1945,7 @@ function showIconPickerInline(targetType, targetId, btnId){
   if(!btn) return;
   const rect = btn.getBoundingClientRect();
   
-  const catLabels={docs:'📄 Tài liệu',folders:'📁 ThÆ° mục',departments:'🏢 Phòng ban',tools:'🔧 Công cụ',industry:'🏭 Ngành',objects:'🎪 Đối tượng',symbols:'✨ Biểu tượng',nature:'🌍 Tự nhiên',flags:'🏳️ Cờ',food:'🍜 Ẩm thực',hands:'🤝 Biểu cảm'};
+  const catLabels={docs:'📄 Tài liệu',folders:'📁 Thư mục',departments:'🏢 Phòng ban',tools:'🔧 Công cụ',industry:'🏭 Ngành',objects:'🎪 Đối tượng',symbols:'✨ Biểu tượng',nature:'🌍 Tự nhiên',flags:'🏳️ Cờ',food:'🍜 Ẩm thực',hands:'🤝 Biểu cảm'};
   let gridHtml='';
   Object.entries(ICON_LIBRARY).forEach(([catKey,icons])=>{
     gridHtml+=`<div style="margin-bottom:8px">
@@ -2852,15 +2852,15 @@ async function saveDictTerm(originalTerm){
   try{
     const res = await apiCall('dict_upsert',{term,vi,meaning,cat,def,ctx,rec,originalTerm});
     if(!(res && res.ok)){
-      showToast((res && res.error)?('âš  '+res.error):(lang==='en'?'âš  Save failed':'âš  LÆ°u thất bại'));
+      showToast((res && res.error)?('âš  '+res.error):(lang==='en'?'âš  Save failed':'âš  Lưu thất bại'));
       return;
     }
     dictData = res.items || dictData;
     closeModal();
     renderDictBody();
-    showToast(lang==='en'?'✓ Saved':'✓ Đã lÆ°u');
+    showToast(lang==='en'?'✓ Saved':'✓ Đã lưu');
   }catch(e){
-    showToast(lang==='en'?'âš  Save failed':'âš  LÆ°u thất bại');
+    showToast(lang==='en'?'âš  Save failed':'âš  Lưu thất bại');
   }
 }
 
@@ -2968,16 +2968,16 @@ async function adminSaveAll(){
   try{
     const resRole = await saveRolePermsToServer();
     if(!(resRole && resRole.ok)){
-      showToast((resRole && resRole.error) ? ('âš  '+resRole.error) : (lang==='en'?'âš  Save failed':'âš  LÆ°u thất bại'));
+      showToast((resRole && resRole.error) ? ('âš  '+resRole.error) : (lang==='en'?'âš  Save failed':'âš  Lưu thất bại'));
       return;
     }
     const resDocs = await saveDocVisibilityToServer();
     if(!(resDocs && resDocs.ok)){
-      showToast((resDocs && resDocs.error) ? ('âš  '+resDocs.error) : (lang==='en'?'âš  Save failed':'âš  LÆ°u thất bại'));
+      showToast((resDocs && resDocs.error) ? ('âš  '+resDocs.error) : (lang==='en'?'âš  Save failed':'âš  Lưu thất bại'));
       return;
     }
   }catch(e){
-    showToast(lang==='en'?'âš  Save failed':'âš  LÆ°u thất bại');
+    showToast(lang==='en'?'âš  Save failed':'âš  Lưu thất bại');
     return;
   }
 
@@ -3516,7 +3516,7 @@ function showUserModal(userId){
 
       <div class="modal-actions">
         <button class="btn-admin" onclick="closeModal()">${lang==='en'?'Cancel':'Hủy'}</button>
-        <button class="btn-admin primary" onclick="saveUserFromModal(${isEdit?`'${escapeHtml(u0.id)}'`:"''"})">${lang==='en'?'Save':'LÆ°u'}</button>
+        <button class="btn-admin primary" onclick="saveUserFromModal(${isEdit?`'${escapeHtml(u0.id)}'`:"''"})">${lang==='en'?'Save':'Lưu'}</button>
       </div>
     </div>
   `;
@@ -3598,7 +3598,7 @@ async function saveUserFromModal(userId){
           wrap.style.display = 'block';
         }
       }
-      showToast(lang==='en'?'✅ Saved':'✅ Đã lÆ°u');
+      showToast(lang==='en'?'✅ Saved':'✅ Đã lưu');
       closeModal();
       await loadUsersFromServerIfAdmin();
       renderAdminUsers();
@@ -4321,7 +4321,7 @@ function renderAdminOrgChart(){
 }
 
 function exportOrgChartSVG(){
-  showToast(lang==='en'?'💡 Use Print (Ctrl+P) to save as PDF':'💡 Dùng In (Ctrl+P) để lÆ°u PDF');
+  showToast(lang==='en'?'💡 Use Print (Ctrl+P) to save as PDF':'💡 Dùng In (Ctrl+P) để lưu PDF');
 }
 
 // ═══════════════════════════════════════════════════
