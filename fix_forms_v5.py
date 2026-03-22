@@ -142,12 +142,15 @@ def safe_transform_colors(ws, ncols):
                     new_color = FONT_MAP[fn_c]
 
                 # When fill changed dark->light, white text must become dark
-                # 1565C0 (dark blue) -> EFF6FF (light): white text -> #1B3A6B
-                # 0C2D48 (dark navy) -> 005A9E (medium): white text stays white
                 if old_fill_was_dark and fn_c == 'FFFFFF':
                     if fc == '1565C0':  # section header: dark->light
                         new_color = '1B3A6B'
-                    # 0C2D48 col header: still dark bg, white text OK
+
+                # ALSO: if fill is ALREADY EFF6FF (light) but text is WHITE
+                # This handles files where generator used correct fill but wrong font
+                current_fill = fhex(cell)
+                if current_fill == 'EFF6FF' and fn_c == 'FFFFFF':
+                    new_color = '1B3A6B'
 
                 if new_color:
                     cell.font = Font(
