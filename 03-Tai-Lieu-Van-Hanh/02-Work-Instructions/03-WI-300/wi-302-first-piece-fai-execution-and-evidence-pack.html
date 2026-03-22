@@ -73,7 +73,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
       
 <div class="section"><h2>1. Mục đích và nguyên tắc không thương lượng</h2>
 <p>First piece và FAI là cổng chặn để bảo vệ xưởng khỏi scrap hàng loạt, protect schedule khỏi treo Job và protect khách hàng khỏi escape. Khi gate này chưa pass, sản xuất hàng loạt <strong>không được</strong> chạy.</p>
-<div class="callout-danger"><strong>CẤM</strong> chạy lô chỉ vì “đã chạy part tương tự”. CẤM bỏ qua balloon/CMM khi Job yêu cầu. CẤM ký PASS khi chưa đo hết đặc tính thuộc phạm vi của first piece/FAI. CẤM để Production tự mở gate FAI nếu QA chưa release.</div>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Kích hoạt first piece/FAI theo đúng job đang chạy, thực hiện balloon/CMM khi Job yêu cầu, chỉ ký PASS sau khi đã đo đủ đặc tính thuộc phạm vi kiểm, và chỉ mở gate FAI khi QA đã release.</div>
 <ul class="tight" style="padding-left:20px; margin:8px 0;">
 <li>Mọi trigger FAI/first piece phải được nhìn thấy trên Job Packet, traveler và hồ sơ Job.</li>
 <li>Mẫu first piece phải truy ra được máy, chương trình, tool/fixture, người setup, ca và thời điểm.</li>

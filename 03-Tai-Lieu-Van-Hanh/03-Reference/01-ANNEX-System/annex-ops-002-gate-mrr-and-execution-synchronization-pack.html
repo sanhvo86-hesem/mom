@@ -76,7 +76,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
       
 <div class="section"><h2>1. Mục đích, cách dùng và ranh giới</h2>
 <p>ANNEX này là bộ matrix dùng chung để đồng bộ <strong>gate, MRR, handoff field, role ownership và điều kiện đồng bộ dữ liệu</strong> từ G0 đến G5. ANNEX này <strong>không thay</strong> WI thao tác tại điểm dùng. Người sử dụng tra ANNEX này để biết mỗi gate cần bộ hồ sơ nào, ai được quyền mở/giữ/nhả gate, phải bàn giao trường dữ liệu nào và khi nào phải dừng vì lệch revision hoặc lệch nguồn dữ liệu.</p>
-<div class="callout-warning"><strong>CẤM</strong> đóng gate chỉ vì “đã làm xong thực tế”. Gate chỉ được đóng khi đủ entry criteria, đủ MRR tối thiểu và trạng thái giữa SoR/SSOT/traveler/barcode cùng nói một tiếng.</div>
+<div class="callout-warning"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ đóng gate khi đủ entry criteria, đủ MRR tối thiểu và trạng thái giữa SoR, SSOT, traveler và barcode đã đồng nhất.</div>
 <div class="two-col">
 <div class="card"><h3>SoR</h3><p>System of Record cho giao dịch gốc: ERP / shipment / routing / pack / inventory.</p></div>
 <div class="card"><h3>SSOT</h3><p>Single Source of Truth cho evidence pack, dossier, ảnh, checklist, phê duyệt số, exception log.</p></div>

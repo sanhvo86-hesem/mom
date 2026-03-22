@@ -1543,7 +1543,7 @@ function loadDocContent(code){
           .meta b{display:block;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
           .meta span{font-size:14px;font-weight:600}
           .cta{display:flex;flex-wrap:wrap;gap:12px}
-          .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:700;border:1px solid #cbd5e1;background:#fff;color:#0f172a}
+          .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:700;border:1px solid #cbd5e1;background:#fff;color:#0f172a;cursor:pointer;font:inherit}
           .btn.primary{background:#0f766e;color:#fff;border-color:#0f766e}
           .note{margin-top:18px;padding:14px 16px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;font-size:13px;line-height:1.6}
         </style>
@@ -1561,8 +1561,8 @@ function loadDocContent(code){
               <div class="meta"><b>${lang==='en'?'Delivery mode':'Cách phát hành'}</b><span>${lang==='en'?'Download only':'Chỉ tải về'}</span></div>
             </div>
             <div class="cta">
-              <a class="btn primary" href="${currentUrl}" target="_blank">${lang==='en'?'Download current workbook':'Tải workbook hiện hành'}</a>
-              ${workingUrl?`<a class="btn" href="${workingUrl}" target="_blank">${lang==='en'?'Download working copy':'Tải bản làm việc'}</a>`:''}
+              <button class="btn primary" type="button" onclick='parent.triggerDownloadUrl(${JSON.stringify(currentUrl)})'>${lang==='en'?'Download current workbook':'Tải workbook hiện hành'}</button>
+              ${workingUrl?`<button class="btn" type="button" onclick='parent.triggerDownloadUrl(${JSON.stringify(workingUrl)})'>${lang==='en'?'Download working copy':'Tải bản làm việc'}</button>`:''}
             </div>
             <div class="note">
               ${lang==='en'

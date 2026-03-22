@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -67,7 +67,7 @@ ul.tight li {margin:4px 0;}
 <h1>WI-702 — Bảo quản, môi trường kho/xưởng, vị trí, FIFO/FEFO và kiểm soát chạm hỏng</h1><div class="section"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
 <p>WI này khóa cách lưu kho, staging, giữ môi trường, bố trí vị trí, cấp phát FIFO/FEFO, hoàn trả hàng và phản ứng khi phát hiện bất thường đối với raw material, bán thành phẩm, thành phẩm, hàng clean-pack và vật tư đóng gói có kiểm soát. Mục tiêu là giữ đúng <strong>truy vết</strong>, đúng <strong>tình trạng bảo quản</strong>, đúng <strong>vị trí</strong> và đúng <strong>thứ tự cấp phát</strong> từ lúc hàng được nhập vị trí cho đến khi issue cho công đoạn hoặc giao cho khách.</p>
 <p><strong>QUYỀN DỪNG:</strong> Warehouse, IQC, QA, Planning, Production Supervisor và người có authority release được quyền dừng cấp phát hoặc dừng chuyển vị trí khi phát hiện sai nhãn trạng thái, thiếu lot/heat, lệch môi trường, lô clean-pack mất seal, dấu hiệu ăn mòn, lẫn revision, lẫn location hoặc tồn già vượt rule.</p>
-<div class="callout-danger"><strong>CẤM</strong> để hàng sát nền, sát tường, chồng vượt khả năng chịu tải, dùng vị trí tạm mà không ghi nhận, cấp phát theo “cầm được lô nào lấy lô đó”, hoặc để part đã hoàn thiện bề mặt chạm trực tiếp vào nhau khi chưa có vật liệu ngăn cách phù hợp.</div></div><div class="section"><h2>2. Rule phân vùng, trạng thái và quyền thao tác theo zone</h2>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Lưu hàng cách nền, cách tường, trong giới hạn chịu tải, ghi nhận mọi vị trí tạm, cấp phát theo FIFO hoặc FEFO đã xác nhận và dùng đúng vật liệu ngăn cách cho part đã hoàn thiện bề mặt.</div></div><div class="section"><h2>2. Rule phân vùng, trạng thái và quyền thao tác theo zone</h2>
 <div class="table-card"><table><thead><tr><th>Zone</th><th>Dùng cho</th><th>Ai được đặt / lấy</th><th>Nhãn bắt buộc</th><th>Điều kiện được rời zone</th></tr></thead><tbody>
 <tr><td>RM</td><td>Raw material đã PASS và đủ truy vết</td><td>Warehouse; IQC chỉ xác nhận trạng thái</td><td>Part/Material family, size, heat/lot, qty, location</td><td>Chỉ issue theo WO/Job đã được dispatch và theo FIFO/heat plan</td></tr>
 <tr><td>IQC</td><td>Hàng mới nhận chờ xác nhận chứng từ hoặc kiểm đầu vào</td><td>Receiving/IQC</td><td>PO/ASN, supplier, part, qty, trạng thái IQC</td><td>Phải có PASS hoặc quyết định xử lý hợp lệ</td></tr>

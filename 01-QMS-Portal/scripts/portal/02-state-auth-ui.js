@@ -738,15 +738,22 @@ function buildDocStreamUrl(doc, download=true, overridePath=''){
   }
 }
 
-function triggerDocDownload(doc){
-  if(!doc || !doc.path) return;
+function triggerDownloadUrl(url){
+  const href = String(url || '').trim();
+  if(!href) return;
   const a = document.createElement('a');
-  a.href = buildDocStreamUrl(doc, true);
+  a.href = href;
   a.download = '';
+  a.rel = 'noopener';
   a.style.display = 'none';
   document.body.appendChild(a);
   a.click();
   setTimeout(()=>a.remove(), 0);
+}
+
+function triggerDocDownload(doc){
+  if(!doc || !doc.path) return;
+  triggerDownloadUrl(buildDocStreamUrl(doc, true));
 }
 
 function downloadCurrentDoc(code){

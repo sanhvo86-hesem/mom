@@ -665,7 +665,7 @@ function openVersionPreview(code, idx){
           <div class="vp-meta">${v.date} · ${v.user} · ${v.role}${v.note?' · "'+v.note+'"':''}</div>
         </div>
         <div class="vp-actions">
-          <button class="vp-open" onclick="event.stopPropagation();window.open('${accessUrl}','_blank')">⬇ ${lang==='en'?'Download version':'Tải phiên bản'}</button>
+          <button class="vp-open" onclick='event.stopPropagation();triggerDownloadUrl(${JSON.stringify(accessUrl)})'>⬇ ${lang==='en'?'Download version':'Tải phiên bản'}</button>
           <button class="vp-close" onclick="event.stopPropagation();var o=this.closest('.vp-overlay'); if(o) o.remove();">✕</button>
         </div>
       </div>

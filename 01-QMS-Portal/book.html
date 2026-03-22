@@ -122,7 +122,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" style="margin-top:12px;">
 <h2 class="h2" style="margin-top:0;">3. Quy tắc hệ thống bắt buộc</h2>
 <ul>
-<li><b>Epicor Kinetic là System of Record</b> cho mọi transaction: time entry, job status, PO/receipt, ship confirm, inventory transaction, job cost. Cấm ghi thay bằng file hoặc bảng cá nhân.</li>
+<li><b>Epicor Kinetic là System of Record</b> cho mọi transaction: time entry, job status, PO/receipt, ship confirm, inventory transaction, job cost. Phải ghi nhận trực tiếp trên Epicor; không dùng file hoặc bảng cá nhân để thay transaction chính thức.</li>
 <li><b>M365 là nơi lưu Evidence/Records</b>. Record PHẢI lưu theo SSOT; chỉ chia sẻ bằng liên kết; retention event-based; legal hold theo <a href="../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-013</a>.</li>
 <li>Trước khi dùng tài liệu, người dùng PHẢI kiểm tra doc-control: mã, revision, ngày hiệu lực, phạm vi áp dụng.</li>
 <li>Khi phát sinh ngoại lệ (rework/waiver/deviation), phải thực hiện theo quy trình NCR/Deviation của QMS và lưu record đúng thư viện M365.</li>
@@ -185,7 +185,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" style="margin-top:0;">5. Quy tắc cập nhật và kiểm soát thay đổi</h2>
 <ul>
 <li>Chủ sở hữu PHẢI rà soát nội dung sổ tay theo chu kỳ hoặc khi có thay đổi quy trình/biểu mẫu.</li>
-<li><b>Hold point:</b> Cấm phát hành revision mới nếu thiếu: (1) DCR record; (2) LINK_MAP; (3) TEST_REPORT; hoặc có link nội bộ gãy.</li>
+<li><b>Hold point:</b> Phải giữ nguyên revision hiện hành cho đến khi đủ: (1) DCR record; (2) LINK_MAP; (3) TEST_REPORT; và mọi link nội bộ đã được kiểm tra không gãy.</li>
 <li>Mọi thay đổi phải đồng bộ: title + form-header + H1 + doc-control.</li>
 </ul>
 </div>

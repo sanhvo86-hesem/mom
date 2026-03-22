@@ -74,7 +74,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>1. Mục đích và nguyên tắc điều hành</h2>
 <p>ANNEX này khóa bộ rule dùng chung cho <b>điều độ</b>, <b>rà soát năng lực</b>, <b>giới hạn WIP</b>, <b>freeze window</b>, <b>resequence</b>, <b>hot-job</b> và <b>aging</b> ở toàn bộ xưởng CNC job order của HESEM. Planner, Dispatcher, Supervisor và Ops Manager phải dùng cùng một rule set để ra quyết định; cấm để mỗi ca hoặc mỗi cell dùng một cách hiểu khác nhau.</p>
-<div class="callout-danger"><strong>CẤM</strong><br/>Cấm phá lịch vì trao đổi miệng. Cấm kéo job đang HOLD vào máy. Cấm mở quá nhiều hot-job cùng lúc làm vỡ nhịp xưởng. Cấm chất WIP trước bottleneck vượt giới hạn rồi coi đó là “đã chuẩn bị sẵn”.</div>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span><br/>Giữ lịch bằng cơ chế dispatch chính thức, tôn trọng trạng thái HOLD, giới hạn số hot-job đồng thời và kiểm soát WIP trước bottleneck trong ngưỡng đã phát hành.</div>
 <div class="callout-info"><strong>System of Record</strong><br/>Epicor là SoR cho trạng thái Job/Op, queue, labor/move/complete, reservation, ship. M365 chỉ là SSOT cho snapshot, action log, meeting minutes, decision record và bằng chứng đi kèm.</div>
 </div>
 

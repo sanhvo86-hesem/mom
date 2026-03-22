@@ -77,7 +77,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Phải</b> áp dụng khi thay thế biểu mẫu giấy bằng biểu mẫu số hoá để ghi nhận vận hành tại xưởng CNC: kiểm tra công đoạn, log hold, checklist đóng gói, nhật ký giao ca, yêu cầu hỗ trợ máy/tooling.</li>
 <li><b>Phải</b> áp dụng khi cần <b>phê duyệt điện tử</b> (Power Automate Approvals) cho các điểm dừng chất lượng/ship-release.</li>
 <li><b>Không được</b> dùng M365 để tạo “sổ” thay thế Epicor cho các giao dịch: time entry, xác nhận hoàn thành công đoạn, xuất kho, ship confirm, cập nhật PO.</li>
-<li><b>Cấm</b> tạo link tải Excel (.xls/.xlsx/.xlsm) hoặc dùng file Excel làm nguồn ghi nhận.</li>
+<li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Ghi nhận trực tiếp trên hệ thống đã chỉ định; không dùng file Excel làm nguồn ghi nhận vận hành.</li>
 </ul></div><div class="card"><h2 class="h2" style="margin-top:0;">2. Công cụ / vật tư</h2><ul>
 <li>M365: SharePoint Site <b>CNC-IMS-HUB</b>; SharePoint Lists; Document Libraries; Teams; Power Apps; Power Automate Approvals; Microsoft Purview (Retention/Legal hold).</li>
 <li>Thiết bị: PC/kiosk tại xưởng; máy quét mã vạch 1D/2D (USB keyboard-wedge); mạng nội bộ ổn định; máy in nhãn (nếu biểu mẫu có nhãn).</li>
@@ -206,9 +206,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </tbody>
 </table>
-</div><p><b>Legal hold:</b> Khi có legal hold theo SOP-104, <b>cấm</b> xoá/sửa hồ sơ thuộc phạm vi hold cho tới khi được gỡ hold.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">6. An toàn / ESD / FOD</h2><ul>
+</div><p><b>Legal hold:</b> Khi có legal hold theo SOP-104, hồ sơ thuộc phạm vi hold <b>phải</b> được giữ nguyên trạng cho tới khi được gỡ hold.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">6. An toàn / ESD / FOD</h2><ul>
 <li><b>Phải</b> bố trí kiosk không cản lối đi và không nằm trong vùng nguy hiểm máy đang chạy.</li>
-<li><b>Phải</b> giữ sạch khu vực scan/ghi nhận; <b>cấm</b> để giấy vụn/bụi phoi che mã vạch (FOD).</li>
+<li><b>Phải</b> giữ sạch khu vực scan/ghi nhận và giữ mã vạch luôn nhìn thấy rõ, không bị giấy vụn hoặc bụi phoi che khuất (FOD).</li>
 <li><b>Phải</b> tuân thủ quy định ESD khi ghi nhận tại khu vực có linh kiện nhạy ESD; <b>không được</b> đặt thiết bị cá nhân lên bàn thao tác.</li>
 </ul></div><div class="card"><h2 class="h2" style="margin-top:0;">7. Hệ thống áp dụng (SoR / SSOT)</h2><div class="table-card">
 <table class="table">
@@ -224,7 +224,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>M365 (SharePoint/Teams/Power Platform/Purview)</b></td>
 <td>Evidence/Records SSOT</td>
-<td>Hồ sơ và bằng chứng <b>phải</b> lưu tại SSOT; <b>cấm</b> sao chép phân tán; retention event-based và legal hold theo SOP-104.</td>
+<td>Hồ sơ và bằng chứng <b>phải</b> lưu tại SSOT như một nguồn chuẩn duy nhất; retention event-based và legal hold theo SOP-104.</td>
 </tr>
 <tr>
 <td>Power BI</td>
@@ -235,7 +235,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div></div><h2 class="h2">Tài liệu điều hành liên kết</h2><div class="doc-link-row"><span class="doc-link">SOP-101</span><span class="doc-link">SOP-104</span><span class="doc-link">SOP-107</span><span class="doc-link">SOP-108</span><span class="doc-link">ANNEX-QMS-005</span><span class="doc-link">ANNEX-QMS-006</span><span class="doc-link">ANNEX-QMS-019</span><span class="doc-link">ANNEX-QMS-021</span></div>
 <h2 class="h2">8. Kiểm soát tài khoản, chữ ký điện tử và quyền sửa dữ liệu</h2>
-<div class="callout-strong"><b>Nguyên tắc bắt buộc:</b> Cấm dùng tài khoản dùng chung. Người tạo bản ghi không được tự phê duyệt bản ghi của chính mình tại các gate cần phê duyệt độc lập. Mọi sửa đổi sau khi phê duyệt phải để lại audit trail gồm người sửa, thời điểm sửa, nội dung trước/sau và lý do sửa.</div>
+<div class="callout-strong"><b>Nguyên tắc bắt buộc:</b> Phải dùng đúng tài khoản cá nhân đã được cấp quyền. Người tạo bản ghi không được tự phê duyệt bản ghi của chính mình tại các gate cần phê duyệt độc lập. Mọi sửa đổi sau khi phê duyệt phải để lại audit trail gồm người sửa, thời điểm sửa, nội dung trước/sau và lý do sửa.</div>
 <ul class="tight note-list">
 <li>Phải dùng đúng vai trò được cấp quyền. Không được mượn tài khoản của người khác để gửi, duyệt, backfill hoặc mở hold.</li>
 <li>Record ở trạng thái <b>Approved / Released / Closed</b> chỉ được sửa khi có quyền override theo <b>ANNEX-QMS-025</b> và phải tạo log lý do.</li>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -77,7 +77,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <h1>WI-517 — Setup, changeover, SMED theo họ máy và xác nhận ready-to-run</h1>
 <div class="section"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
 <p>WI này chuẩn hóa toàn bộ hoạt động setup và changeover để máy vào trạng thái <b>ready-to-run</b> đúng revision, đúng chương trình, đúng đồ gá, đúng tool list, đúng phương pháp đo và đúng điều kiện an toàn trước khi cắt phoi. WI này áp dụng cho 3-axis vertical mill, 5-axis mill, CNC turning và mill-turn.</p>
-<div class="callout-danger"><strong>QUYỀN DỪNG</strong><br/>Setup Lead, Supervisor, QA, Engineering và Maintenance có quyền dừng changeover ngay lập tức khi có một trong các tình huống sau: sai revision set; nghi ngờ sai chương trình; fixture/jaw không đủ điều kiện; offset/probe zero không tin cậy; gage CTQ chưa sẵn sàng; phát hiện nguy cơ crash, FOD hoặc rủi ro năng lượng chưa được kiểm soát. <b>CẤM</b> chạy thử để “xem có ổn không”.</div>
+<div class="callout-danger"><strong>QUYỀN DỪNG</strong><br/>Setup Lead, Supervisor, QA, Engineering và Maintenance có quyền dừng changeover ngay lập tức khi có một trong các tình huống sau: sai revision set; nghi ngờ sai chương trình; fixture/jaw không đủ điều kiện; offset/probe zero không tin cậy; gage CTQ chưa sẵn sàng; phát hiện nguy cơ crash, FOD hoặc rủi ro năng lượng chưa được kiểm soát. <b>PHẢI</b> xác minh điều kiện an toàn và readiness trước khi chạy thử.</div>
 <div class="keyline"><strong>Kết quả đầu ra bắt buộc</strong><br/>Kết thúc WI-517 phải tạo được 03 đầu ra: <b>(1)</b> máy ở trạng thái ready-to-run có sign-off, <b>(2)</b> hồ sơ setup/changeover được ghi vết đầy đủ, <b>(3)</b> lệnh chuyển qua <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> và <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a> để xác nhận first piece và pre-run trước Cycle Start.</div></div>
 <div class="section"><h2>2. Tình huống bắt buộc mở WI-517</h2>
 <div class="table-card"><table><thead><tr><th>Tình huống</th><th>Mức changeover bắt buộc</th><th>Gate / hồ sơ tối thiểu</th><th>Không được chạy khi</th></tr></thead><tbody>
@@ -98,7 +98,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Material lot</td><td>Đúng mác, condition, heat/lot; vật liệu đầu vào khớp traveler và yêu cầu khách hàng</td><td>MTR/CoC + traveler</td><td>Không truy vết được lot hoặc material tag không khớp</td></tr>
 <tr><td>Machine condition</td><td>Máy sẵn sàng, alarm sạch, PM không quá hạn ảnh hưởng chất lượng, coolant/chip system hoạt động</td><td>Machine status board + handover ca</td><td>Alarm mở, machine drift nghi ngờ, coolant/conveyor/probe không tin cậy</td></tr>
 </tbody></table></div>
-<div class="callout-warn"><strong>CẤM</strong> dừng máy để changeover khi external preparation chưa xong. Dừng máy nhưng vẫn đi tìm tool, fixture, gage hoặc revision đúng được xem là changeover lỗi chuẩn.</div></div>
+<div class="callout-warn"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Hoàn tất external preparation trước khi dừng máy để changeover. Khi máy đã dừng, tool, fixture, gage và revision đúng phải sẵn sàng đầy đủ tại điểm dùng.</div></div>
 <div class="section"><h2>4. External SMED — chuẩn bị ngoài máy theo họ máy</h2>
 <p>External SMED là phần việc phải hoàn tất trước khi máy dừng. Mọi thứ có thể chuẩn bị ngoài máy đều phải kéo ra ngoài máy. Không để time internal bị chiếm bởi việc đi tìm dữ liệu, tool, fixture hoặc người ký.</p>
 <div class="table-card"><table><thead><tr><th>Họ máy</th><th>External bắt buộc</th><th>Điểm nhạy cảm phải khóa trước</th></tr></thead><tbody>
@@ -137,7 +137,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Đo kiểm</td><td>Gage ID, người nhận đo first piece, đặc tính phải đo, mức QPL</td><td>QA / người đo được chỉ định</td></tr>
 <tr><td>Rủi ro còn mở</td><td>Điểm cần theo dõi ở 1–3 part đầu; vùng dễ rung; chip issue; lưu ý burr/surface</td><td>Setup Lead + Supervisor</td></tr>
 </tbody></table></div>
-<div class="callout-warn"><strong>CẤM</strong> bàn giao bằng trí nhớ miệng. Nếu changeover qua ca, người giao và người nhận phải cùng xem máy, cùng xem hồ sơ và cùng ký FRM-514 / FRM-511.</div></div>
+<div class="callout-warn"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Bàn giao trực tiếp tại máy, cùng xem hồ sơ và cùng ký FRM-514 / FRM-511 khi changeover qua ca.</div></div>
 <div class="section"><h2>7. Restart sau bất thường hoặc sau crash</h2>
 <div class="table-card"><table><thead><tr><th>Tình huống</th><th>Phải làm trước khi chạy lại</th><th>Ai mở lại release</th></tr></thead><tbody>
 <tr><td>Tool gãy, insert sứt, offset điều chỉnh vì drift CTQ</td><td>Đổi tool, ghi tuổi dao, re-check offset, đo lại đặc tính chịu ảnh hưởng, cập nhật last-known-good</td><td>Supervisor; QA cùng ký nếu ảnh hưởng CTQ</td></tr>
