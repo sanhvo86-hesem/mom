@@ -1641,7 +1641,7 @@ function renderDocCategoryGrid(VDOCS){
       <div class="fm-folder" onclick="currentFilter='${cat.id}';currentFolderPath=[];renderDocuments();renderSidebar()" style="padding:20px 14px">
         <div style="width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:${cat.color};color:#fff;font-size:24px;box-shadow:0 4px 12px ${cat.color}33">${cat.icon}</div>
         <div class="fm-label" style="font-size:14px;margin-top:4px">${catLabel(cat).split('(')[0].trim()}</div>
-        <div class="fm-count">${cnt} ${lang==='en'?'documents':'tài liệu'}</div>
+        <div class="fm-count">${cnt} ${lang==='en'?'docs':'tài liệu'}</div>
       </div>`;
   });
   html += `</div>`;
