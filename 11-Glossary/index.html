@@ -241,6 +241,9 @@
     if (Array.isArray(window.HESEM_GLOSSARY) && window.HESEM_GLOSSARY.length) {
       return window.HESEM_GLOSSARY;
     }
+    if (Array.isArray(window.DICT_DATA) && window.DICT_DATA.length) {
+      return window.DICT_DATA;
+    }
     const resp = await fetch('./dict-data.json', {cache:'no-store'});
     if (!resp.ok) throw new Error('Không tải được dict-data.json');
     return await resp.json();

@@ -916,7 +916,9 @@ function save_dict_items(string $jsonFile, string $jsFile, array $items): void {
   write_json_file($jsonFile, $clean);
 
   // Also rebuild dict-data.js for offline usage if present
-  $js = "window.DICT_DATA = " . json_encode($clean, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . ";\n";
+  $payload = json_encode($clean, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  $js = "window.HESEM_GLOSSARY = " . $payload . ";\n"
+      . "window.DICT_DATA = window.HESEM_GLOSSARY;\n";
   @file_put_contents($jsFile, $js, LOCK_EX);
 }
 
