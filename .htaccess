@@ -1,9 +1,30 @@
+Options -Indexes
+
 <IfModule mod_dir.c>
   DirectoryIndex index.php index.html
 </IfModule>
 
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Permitted-Cross-Domain-Policies "none"
+  Header always set Permissions-Policy "accelerometer=(), autoplay=(), camera=(), geolocation=(self), gyroscope=(), magnetometer=(), microphone=(), payment=(), publickey-credentials-get=(self), usb=()"
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://hesem.com.vn https://www.hesem.com.vn; font-src 'self' data:; connect-src 'self'; frame-src 'self'; media-src 'self' data: blob:; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
+
+  # Block direct access to hidden files/directories while preserving ACME challenges.
+  RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L,NC]
+
+  # Keep internal work product and maintenance artifacts out of the public surface.
+  RewriteRule ^(?:\.git|\.vscode|\.claude|tools|_build|_Deleted|_reports|__pycache__)/ - [F,L,NC]
+  RewriteRule ^01-QMS-Portal/docs/ - [F,L,NC]
+  RewriteRule ^01-QMS-Portal/SECURITY_OPERATIONS\.md$ - [F,L,NC]
+  RewriteRule \.(?:zip|sql|bak|old|md|py|ps1|log|sqlite|db|pem|key|dist|tmp)$ - [F,L,NC]
 
   # Legacy entry pages were removed from the root tree; keep lightweight redirects
   # for old bookmarks and older training materials that still hit the old URLs.
