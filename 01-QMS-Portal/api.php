@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');
+@ini_set('expose_php', '0');
 error_reporting(E_ALL);
 
 $BASE_DIR   = __DIR__;
@@ -48,6 +49,7 @@ $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
 $PORTAL_CONFIG_JS_FILE = $BASE_DIR . '/scripts/portal/01-data-config.js';
 $LOG_FILE   = $DATA_DIR . '/php_error.log';
 $RL_DIR     = $DATA_DIR . '/ratelimit';
+$MAX_FORM_UPLOAD_BYTES = 25 * 1024 * 1024;
 
 // Legacy (centralized) document version store (kept for backward compatibility / migration)
 $ARCHIVE_DIR = $ROOT_DIR . '/archive';
@@ -376,10 +378,11 @@ function require_logged_in(array $store): array {
   $me = find_user_by_username($store, (string)$_SESSION['user']);
   if (!$me || !($me['active'] ?? true)) api_json(['ok' => false, 'error' => 'unauthorized'], 401);
 
-  // If MFA is required by system settings, enforce completed MFA for sensitive actions
+  // Enforce completed MFA whenever system policy requires it or the user has MFA enabled.
   $settings = $store['settings'] ?? [];
-  $requireMfa = (bool)($settings['require_mfa'] ?? true);
-  if ($requireMfa && empty($_SESSION['mfa_ok'])) api_json(['ok' => false, 'error' => 'mfa_required'], 401);
+  if (session_requires_completed_mfa($me, is_array($settings) ? $settings : []) && empty($_SESSION['mfa_ok'])) {
+    api_json(['ok' => false, 'error' => 'mfa_required'], 401);
+  }
 
   return $me;
 }
@@ -1379,6 +1382,13 @@ function client_ip(): string {
   return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 }
 
+function session_requires_completed_mfa(array $user, array $settings = []): bool {
+  $systemRequiresMfa = (bool)($settings['require_mfa'] ?? true);
+  $userMfa = $user['mfa'] ?? [];
+  $userHasMfa = is_array($userMfa) && (bool)($userMfa['enabled'] ?? false);
+  return $systemRequiresMfa || $userHasMfa;
+}
+
 function now_iso(): string {
   return gmdate('c');
 }
@@ -1406,10 +1416,18 @@ function session_init(): void {
     || (strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https')
     || ((string)($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on');
 
+  @ini_set('session.use_only_cookies', '1');
+  @ini_set('session.use_strict_mode', '1');
+  @ini_set('session.cookie_httponly', '1');
+  @ini_set('session.cookie_samesite', 'Lax');
+  if ($https) {
+    @ini_set('session.cookie_secure', '1');
+  }
+
   // Host-only cookie (do not set Domain attribute) to maximize compatibility on subdomains
   $domain = '';
 
-  session_name('HESEMSESSID');
+  session_name($https ? '__Host-HESEMSESSID' : 'HESEMSESSID');
   session_set_cookie_params([
     'lifetime' => 0,
     'path' => '/',
@@ -1695,15 +1713,23 @@ $action = match ($action) {
 
 switch ($action) {
   case 'status': {
-    $logged = !empty($_SESSION['user']);
+    $logged = false;
+    $mfaPending = false;
     $user = null;
-    if ($logged && is_array($store)) {
+    if (!empty($_SESSION['user']) && is_array($store)) {
       $u = find_user_by_username($store, (string)$_SESSION['user']);
-      if ($u) $user = sanitize_user_for_client($u);
+      if ($u) {
+        $mfaPending = session_requires_completed_mfa($u, is_array($store['settings'] ?? null) ? $store['settings'] : []) && empty($_SESSION['mfa_ok']);
+        if (!$mfaPending) {
+          $logged = true;
+          $user = sanitize_user_for_client($u);
+        }
+      }
     }
     api_json([
       'ok' => true,
       'logged_in' => (bool)$logged,
+      'mfa_pending' => (bool)$mfaPending,
       'user' => $user,
       'csrf_token' => csrf_token(),
       'server_time' => now_iso(),
@@ -2534,6 +2560,11 @@ case 'doc_save_draft': {
     $tmpName = (string)($upload['tmp_name'] ?? '');
     $uploadError = (int)($upload['error'] ?? UPLOAD_ERR_NO_FILE);
     if ($uploadError !== UPLOAD_ERR_OK || $tmpName === '') api_json(['ok' => false, 'error' => 'upload_failed'], 400);
+    $uploadSize = (int)($upload['size'] ?? 0);
+    if ($uploadSize <= 0) api_json(['ok' => false, 'error' => 'invalid_upload_size'], 400);
+    if ($uploadSize > $MAX_FORM_UPLOAD_BYTES) {
+      api_json(['ok' => false, 'error' => 'upload_too_large', 'max_bytes' => $MAX_FORM_UPLOAD_BYTES], 413);
+    }
 
     $liveExt = form_extension_from_path((string)$formEntry['path']);
     $uploadExt = strtolower(pathinfo((string)($upload['name'] ?? ''), PATHINFO_EXTENSION));
@@ -2547,9 +2578,15 @@ case 'doc_save_draft': {
       $moved = @copy($tmpName, $draftMeta['abs']);
     }
     if (!$moved || !is_file($draftMeta['abs'])) api_json(['ok' => false, 'error' => 'upload_store_failed'], 500);
+    clearstatcache(true, $draftMeta['abs']);
+    $storedSize = @filesize($draftMeta['abs']) ?: 0;
+    if ($storedSize <= 0 || $storedSize > $MAX_FORM_UPLOAD_BYTES) {
+      if (is_file($draftMeta['abs'])) @unlink($draftMeta['abs']);
+      api_json(['ok' => false, 'error' => $storedSize > $MAX_FORM_UPLOAD_BYTES ? 'upload_too_large' : 'invalid_upload_size', 'max_bytes' => $MAX_FORM_UPLOAD_BYTES], $storedSize > $MAX_FORM_UPLOAD_BYTES ? 413 : 400);
+    }
 
     $sha = form_sha256_file($draftMeta['abs']);
-    $size = @filesize($draftMeta['abs']) ?: 0;
+    $size = $storedSize;
     $dt = human_dt();
     $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
     $idx = form_find_working_entry_index($versions, $revision, ['draft', 'in_review', 'pending_approval']);

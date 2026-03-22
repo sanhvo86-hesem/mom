@@ -530,6 +530,12 @@ async function checkSession(){
         showApp();
         return;
       }
+      if(s && s.mfa_pending){
+        csrfToken = s.csrf_token || null;
+        setLoginChecking(false, '');
+        setLoginStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator');
+        return;
+      }
       // Not logged in
       break;
     }catch(e){
