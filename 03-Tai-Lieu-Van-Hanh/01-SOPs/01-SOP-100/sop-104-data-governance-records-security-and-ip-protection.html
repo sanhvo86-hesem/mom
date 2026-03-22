@@ -137,9 +137,9 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td><b>Least privilege</b></td><td>Chỉ cấp đúng quyền tối thiểu cần cho vai trò, đúng thời hạn và đúng phạm vi dữ liệu. Hết nhu cầu phải thu hồi ngay.</td></tr>
 <tr><td><b>SoD</b> – phân tách trách nhiệm</td><td>Người yêu cầu/duyệt/thực thi không được nhập nhằng. Quyền đặc quyền, quyền xóa, quyền release hoặc quyền sửa rule hệ thống phải có phân tách và bằng chứng duyệt.</td></tr>
 <tr><td><b>Dữ liệu kiểm soát</b></td><td>Gồm dữ liệu kỹ thuật, dữ liệu khách hàng, cost sheet, NC, CMM/program, reports, evidence quality, complaint/RMA, supplier scorecard, payroll/training. Các loại này không được chia sẻ tự do.</td></tr>
-<tr><td><b>Record declaration / legal hold</b></td><td>Hồ sơ khi đủ điều kiện phải bị khóa record hoặc gắn legal hold để cấm sửa/hủy trái phép. Thiếu hai lớp này thì record chưa được xem là kiểm soát hoàn chỉnh.</td></tr>
+<tr><td><b>Record declaration / legal hold</b></td><td>Hồ sơ khi đủ điều kiện phải bị khóa record hoặc gắn legal hold để PHẢI chặn sửa/hủy trái phép. Thiếu hai lớp này thì record chưa được xem là kiểm soát hoàn chỉnh.</td></tr>
 <tr><td><b>3-minute retrieval test</b></td><td>Bất kỳ hồ sơ thuộc audit, complaint, ship release hoặc customer inquiry phải truy ra trong tối đa 3 phút bằng đường dẫn, metadata và case ID chuẩn.</td></tr>
-<tr><td><b>No shared account</b></td><td>Cấm dùng chung tài khoản, cấm “mượn user”, cấm để tài khoản của người đã nghỉ việc tiếp tục hoạt động dưới tên khác.</td></tr>
+<tr><td><b>No shared account</b></td><td>PHẢI dùng đúng tài khoản cá nhân, không “mượn user” và phải khóa ngay tài khoản của người đã nghỉ việc.</td></tr>
 </tbody></table></div>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:20%"/><col style="width:20%"/><col style="width:30%"/><col style="width:30%"/></colgroup><thead><tr><th>Mức dữ liệu</th><th>Ví dụ</th><th>Kiểm soát bắt buộc</th><th>Không được phép</th></tr></thead><tbody>
 <tr><td>Nội bộ phổ thông</td><td>Thông báo nội bộ, biểu mẫu trống, lịch họp</td><td>Read theo nhóm; edit theo owner; version control</td><td>Không phát tán như tài liệu đã phê duyệt nếu chưa qua SOP-101</td></tr>
@@ -175,7 +175,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:32%"/><col style="width:18%"/><col style="width:18%"/><col style="width:32%"/></colgroup><thead><tr><th>KPI</th><th>Mục tiêu</th><th>Tần suất</th><th>Ghi chú vận hành</th></tr></thead><tbody>
 <tr><td>Thời gian cấp quyền chuẩn cho nhân sự mới</td><td>≤ 1 ngày làm việc sau khi đủ hồ sơ</td><td>Tháng</td><td>Chỉ tính request đủ dữ liệu và đúng thẩm quyền.</td></tr>
 <tr><td>Thời gian revoke khi offboarding</td><td>Trong ngày hiệu lực nghỉ việc / chuyển vai trò</td><td>Case-by-case</td><td>Account, guest link, shared device, mailbox delegation phải đóng đồng bộ.</td></tr>
-<tr><td>Tỷ lệ hoàn thành quarterly access review</td><td>100%</td><td>Quý</td><td>Không chấp nhận close hình thức khi chưa xử lý quyền treo.</td></tr>
+<tr><td>Tỷ lệ hoàn thành quarterly access review</td><td>100%</td><td>Quý</td><td>Quarterly access review chỉ được đóng khi toàn bộ quyền treo đã được xử lý đúng trạng thái.</td></tr>
 <tr><td>Restore test pass rate</td><td>100%</td><td>Quý</td><td>Phải có time-to-restore và bằng chứng file phục hồi dùng được.</td></tr>
 <tr><td>Tỷ lệ hồ sơ truy xuất trong 3 phút</td><td>≥ 95%</td><td>Tháng / audit</td><td>Đo trên sample hồ sơ thật: complaint, ship release, NCR, job dossier.</td></tr>
 <tr><td>Số sự cố data/IP do chia sẻ sai, sai quyền, sai file</td><td>0 major</td><td>Tháng</td><td>Nếu có sự cố phải mở escalation theo <a href="../../03-Reference/01-ANNEX-System/annex-qms-020-escalation-matrix-and-sla.html">ANNEX-QMS-020</a>.</td></tr>
@@ -195,7 +195,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="source-box"><b>Bằng chứng tối thiểu của một request quyền hợp lệ:</b> người dùng; vai trò; Department; hệ thống; nhóm dữ liệu; lý do nghiệp vụ; ngày bắt đầu; ngày hết hạn nếu tạm thời; người duyệt; xác nhận người thực thi; bằng chứng test sau cấp quyền. Thiếu bất kỳ trường nào trong số này thì request chưa đủ điều kiện để thực hiện.</div>
 <ul class="tight">
 <li>Quyền đặc quyền phải có justification, thời hạn, người chịu trách nhiệm giám sát và evidence đóng quyền sau khi hết việc.</li>
-<li>Guest access chỉ mở theo thư viện hoặc nhóm hồ sơ được chỉ định; cấm guest browse toàn site.</li>
+<li>Guest access chỉ mở theo thư viện hoặc nhóm hồ sơ được chỉ định; PHẢI chặn guest browse toàn site.</li>
 <li>Role change phải rà toàn bộ quyền cũ; không chỉ cộng quyền mới lên quyền cũ.</li>
 <li>Offboarding phải thu hồi account, group, shared mailbox access, guest share, mobile session và token liên quan.</li>
 </ul>
@@ -230,7 +230,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Restore test phải có scenario, người thực hiện, người xác nhận và thời gian phục hồi.</li>
 <li>Phải test cả file, folder, list item và case evidence trọng yếu.</li>
 <li>Nếu restore fail hoặc thời gian vượt ngưỡng, phải mở action và chuyển cấp nếu ảnh hưởng job đang chạy.</li>
-<li>Không chấp nhận câu trả lời “có backup rồi” khi không có bằng chứng phục hồi thành công.</li>
+<li>Mọi tuyên bố backup sẵn sàng phải đi kèm bằng chứng phục hồi thành công.</li>
 </ul>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:24%"/><col style="width:26%"/><col style="width:20%"/><col style="width:30%"/></colgroup><thead><tr><th>Kịch bản restore test</th><th>Phải kiểm</th><th>Mục tiêu thời gian</th><th>Điều kiện PASS</th></tr></thead><tbody>
 <tr><td>Khôi phục 1 file hồ sơ</td><td>Đúng file, đúng revision, đúng metadata, mở được link</td><td>Theo mục tiêu nội bộ đã phê duyệt</td><td>Người dùng business xác nhận dùng được ngay</td></tr>

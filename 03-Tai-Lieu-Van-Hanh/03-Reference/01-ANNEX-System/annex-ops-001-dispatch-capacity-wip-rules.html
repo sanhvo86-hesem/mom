@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -73,7 +73,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
       <h1>ANNEX-OPS-001 — Quy tắc điều độ, rà soát năng lực, freeze window và giới hạn WIP</h1>
 
 <div class="section"><h2>1. Mục đích và nguyên tắc điều hành</h2>
-<p>ANNEX này khóa bộ rule dùng chung cho <b>điều độ</b>, <b>rà soát năng lực</b>, <b>giới hạn WIP</b>, <b>freeze window</b>, <b>resequence</b>, <b>hot-job</b> và <b>aging</b> ở toàn bộ xưởng CNC job order của HESEM. Planner, Dispatcher, Supervisor và Ops Manager phải dùng cùng một rule set để ra quyết định; cấm để mỗi ca hoặc mỗi cell dùng một cách hiểu khác nhau.</p>
+<p>ANNEX này khóa bộ rule dùng chung cho <b>điều độ</b>, <b>rà soát năng lực</b>, <b>giới hạn WIP</b>, <b>freeze window</b>, <b>resequence</b>, <b>hot-job</b> và <b>aging</b> ở toàn bộ xưởng CNC job order của HESEM. Planner, Dispatcher, Supervisor và Ops Manager phải dùng cùng một rule set để ra quyết định; không để mỗi ca hoặc mỗi cell dùng một cách hiểu khác nhau.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span><br/>Giữ lịch bằng cơ chế dispatch chính thức, tôn trọng trạng thái HOLD, giới hạn số hot-job đồng thời và kiểm soát WIP trước bottleneck trong ngưỡng đã phát hành.</div>
 <div class="callout-info"><strong>System of Record</strong><br/>Epicor là SoR cho trạng thái Job/Op, queue, labor/move/complete, reservation, ship. M365 chỉ là SSOT cho snapshot, action log, meeting minutes, decision record và bằng chứng đi kèm.</div>
 </div>
@@ -196,3 +196,4 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
+

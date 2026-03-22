@@ -135,13 +135,13 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <tr><td>People / competence dashboard</td><td>Certification due, OJT progress, coverage, deputy readiness</td><td>HR Manager + Department Heads</td><td>HR / Training admin</td><td>Training records, certification logs, competency matrices</td><td>Weekly / monthly</td><td>Training master log + FRM-809 / FRM-806</td></tr>
 <tr><td>Digital governance dashboard</td><td>Refresh health, stale datasets, overdue access review, privileged-access expiry</td><td>IT Manager / QMS Manager</td><td>IT admin</td><td>Portal logs, access review records, dataset refresh logs</td><td>Weekly / monthly</td><td>Admin log export + incident register</td></tr>
 </tbody></table></div>
-<div class="note-warning"><b>Quy tắc hierarchy</b><br/>Dashboard <b>không thay thế source-of-record</b>. Khi số dashboard lệch với SoR, người điều hành phải dùng SoR để ra quyết định, đồng thời mở issue dữ liệu hoặc incident theo severity; cấm “chọn số nào có lợi hơn”.</div>
+<div class="note-warning"><b>Quy tắc hierarchy</b><br/>Dashboard <b>không thay thế source-of-record</b>. Khi số dashboard lệch với SoR, người điều hành phải dùng SoR để ra quyết định, đồng thời mở issue dữ liệu hoặc incident theo severity; PHẢI giữ một bộ số điều hành duy nhất theo SoR, không “chọn số nào có lợi hơn”.</div>
 
 <h2 class="h2" id="a3">3. Environment, deployment pipeline và release class</h2>
 <div class="table-card"><table class="table"><thead><tr><th>Environment / lớp</th><th>Mục đích</th><th>Ai được sửa</th><th>Evidence tối thiểu</th><th>Khi nào được move lên</th></tr></thead><tbody>
 <tr><td>DEV</td><td>Build dataset, transform, measure, layout, pipeline thử nghiệm</td><td>Assigned maker / data owner</td><td>Change note, test case, sample output</td><td>Khi logic đã qua self-check và có owner business review</td></tr>
 <tr><td>UAT / PRE-PROD</td><td>Business validation, sign-off formula, drill-down, threshold, exception-note behavior</td><td>Assigned maker + owner được chỉ định</td><td>Test log, before/after snapshot, defect list</td><td>Khi owner business chấp thuận và rollback path đã sẵn</td></tr>
-<tr><td>PROD dataset / semantic model</td><td>Nguồn dữ liệu chính cho dashboard production</td><td>Data owner / admin được chỉ định</td><td>Approved change ID, deployment log, refresh test</td><td>Chỉ move sau sign-off và ngoài cửa sổ cấm nếu ảnh hưởng kỳ đang freeze</td></tr>
+<tr><td>PROD dataset / semantic model</td><td>Nguồn dữ liệu chính cho dashboard production</td><td>Data owner / admin được chỉ định</td><td>Approved change ID, deployment log, refresh test</td><td>Chỉ move sau sign-off và ngoài cửa sổ freeze nếu ảnh hưởng kỳ đang đóng</td></tr>
 <tr><td>PROD report / workspace / portal card</td><td>Lớp hiển thị cho người dùng cuối</td><td>Publisher / admin theo role</td><td>Release pack, communication note nếu ảnh hưởng người dùng</td><td>Sau khi semantic model PROD ổn định và refresh pass</td></tr>
 </tbody></table></div>
 <div class="callout-grid">
@@ -168,7 +168,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="table-card"><table class="table"><thead><tr><th>Ngữ cảnh</th><th>Refresh / cut-off chuẩn</th><th>Freeze-date / freeze rule</th><th>Khi nào cần exception note</th><th>Nơi ghi nhận</th></tr></thead><tbody>
 <tr><td>T1/T2 điều hành trong ngày</td><td>Refresh trước họp tối thiểu 10–15 phút</td><td>Không freeze kỳ dài; freeze snapshot của cuộc họp</td><td>Refresh fail, stale data, manual override, missing drill-down</td><td>Board note / WI-901 ghi chú điều hành</td></tr>
 <tr><td>T3 tuần / tháng</td><td>Refresh theo lịch pack công bố</td><td>Freeze tại giờ chốt pack</td><td>Late posting, reclass data, missing customer/supplier update</td><td>Pack ghi chú điều hành + action log</td></tr>
-<tr><td>T4 / management review</td><td>Dùng snapshot đã freeze cho kỳ review</td><td>Cấm sửa số kỳ đã freeze nếu không có change record</td><td>Backfill sau freeze, SoR correction sau close, dataset incident</td><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> + change record</td></tr>
+<tr><td>T4 / management review</td><td>Dùng snapshot đã freeze cho kỳ review</td><td>PHẢI giữ nguyên số kỳ đã freeze nếu chưa có change record</td><td>Backfill sau freeze, SoR correction sau close, dataset incident</td><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> + change record</td></tr>
 <tr><td>Customer / external pack</td><td>Theo pack đã phê duyệt</td><td>Freeze theo phiên bản gửi ra ngoài</td><td>Số nội bộ chưa khớp external disclosure pack</td><td>Release pack + communication log</td></tr>
 </tbody></table></div>
 <div class="field-grid">

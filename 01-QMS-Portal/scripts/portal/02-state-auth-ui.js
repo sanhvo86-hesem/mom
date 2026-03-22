@@ -738,6 +738,87 @@ function buildDocStreamUrl(doc, download=true, overridePath=''){
   }
 }
 
+function normalizeDocRelativePath(relPath){
+  try{
+    return String(relPath || '')
+      .trim()
+      .replace(/\\/g,'/')
+      .replace(/^\/+/,'')
+      .replace(/^\.\//,'');
+  }catch(e){
+    return '';
+  }
+}
+
+function findDocByRelativePath(relPath){
+  try{
+    const normalized = normalizeDocRelativePath(relPath);
+    if(!normalized) return null;
+    return DOCS.find(d => normalizeDocRelativePath(d && d.path) === normalized) || null;
+  }catch(e){
+    return null;
+  }
+}
+
+function buildPathStreamUrl(relPath, download=true, code=''){
+  try{
+    const normalized = normalizeDocRelativePath(relPath);
+    if(!normalized) return '';
+    const linkedDoc = findDocByRelativePath(normalized);
+    const qs = new URLSearchParams();
+    qs.set('action', 'doc_stream');
+    qs.set('path', normalized);
+    const resolvedCode = String(code || (linkedDoc && linkedDoc.code) || '').trim();
+    if(resolvedCode) qs.set('code', resolvedCode);
+    if(download) qs.set('download', '1');
+    return 'api.php?' + qs.toString();
+  }catch(e){
+    return '';
+  }
+}
+
+function resolveLinkedDocPath(href, baseDocPath=''){
+  try{
+    const rawHref = String(href || '').trim();
+    if(!rawHref || rawHref.startsWith('#')) return '';
+    if(/^(javascript|mailto|tel|data):/i.test(rawHref)) return '';
+    const baseUrl = new URL('../' + normalizeDocRelativePath(baseDocPath), window.location.href);
+    const targetUrl = new URL(rawHref, baseUrl);
+    if(targetUrl.origin !== window.location.origin) return '';
+    return normalizeDocRelativePath(decodeURIComponent(targetUrl.pathname.replace(/^\/+/, '')));
+  }catch(e){
+    return '';
+  }
+}
+
+function attachIframeLinkBridge(iframe, doc, baseDocPath=''){
+  try{
+    const idoc = iframe && (iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document));
+    if(!idoc || !idoc.addEventListener || idoc.__hesemPortalLinkBridgeAttached) return;
+    const effectiveBasePath = normalizeDocRelativePath(baseDocPath || (doc && doc.path) || '');
+    idoc.addEventListener('click', function(e){
+      const anchor = e && e.target && typeof e.target.closest === 'function' ? e.target.closest('a[href]') : null;
+      if(!anchor || e.defaultPrevented) return;
+      if(e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const relPath = resolveLinkedDocPath(anchor.getAttribute('href'), effectiveBasePath);
+      if(!relPath) return;
+      const linkedDoc = findDocByRelativePath(relPath);
+      if(/\.(xlsx|xlsm|xls|csv)$/i.test(relPath) || anchor.hasAttribute('download')){
+        e.preventDefault();
+        e.stopPropagation();
+        triggerDownloadUrl(buildPathStreamUrl(relPath, true, linkedDoc && linkedDoc.code));
+        return;
+      }
+      if(linkedDoc && /\.(html?)$/i.test(relPath) && typeof openDoc === 'function'){
+        e.preventDefault();
+        e.stopPropagation();
+        openDoc(linkedDoc.code);
+      }
+    }, true);
+    idoc.__hesemPortalLinkBridgeAttached = true;
+  }catch(e){}
+}
+
 function triggerDownloadUrl(url){
   const href = String(url || '').trim();
   if(!href) return;
@@ -2744,7 +2825,7 @@ function openDictTermModal(term){
     </div>
     <div class="modal-field"><label>${lang==='en'?'Definition':'Định nghĩa'}</label><textarea id="dm-def" rows="4" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.def||''):''}</textarea></div>
     <div class="modal-field"><label>${lang==='en'?'Context / Example':'Ngữ cảnh / Ví dụ'}</label><textarea id="dm-ctx" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.ctx||''):''}</textarea></div>
-    <div class="modal-field"><label>${lang==='en'?'Recommendation':'Khuyến nghị'}</label><textarea id="dm-rec" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.rec||''):''}</textarea></div>
+    <div class="modal-field"><label>${lang==='en'?'Required records':'Hồ sơ phải có'}</label><textarea id="dm-rec" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.rec||''):''}</textarea></div>
 
     <div class="modal-actions">
       <button class="btn-admin secondary" onclick="closeModal()">✕ ${T('admin_cancel')}</button>
@@ -4531,3 +4612,4 @@ function reassignUserRole(){
 
 
 // ═══════════════════════════════════════════════════
+

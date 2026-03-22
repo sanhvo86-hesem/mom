@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -107,8 +107,8 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <p>Mỗi setup phải có một <strong>operation block</strong> riêng. Không dùng một sheet chung mô tả mơ hồ cho nhiều setup có logic WCS hoặc workholding khác nhau.</p>
 <div class="table-card"><table><thead><tr><th>Nhóm dữ liệu</th><th>Nội dung bắt buộc</th><th>Ghi chú</th></tr></thead><tbody>
 <tr><td>Operation block ID</td><td>Setup no., machine family, machine size envelope nếu quan trọng, fixture ID/rev, program main/sub program list</td><td>Dùng để khóa đúng cấu hình thực tế của từng công đoạn.</td></tr>
-<tr><td>Orientation</td><td>Mặt A/B/C hoặc top/front/right; ảnh minh họa và mũi tên định hướng phải thống nhất với bản vẽ</td><td>Không chấp nhận mô tả chỉ bằng chữ nếu có nguy cơ đảo mặt.</td></tr>
-<tr><td>Clamp strategy</td><td>Điểm tỳ, điểm kẹp, thứ tự kẹp, lực/torque, soft jaw profile, support/rest pad, anti-slip note</td><td>Phải chỉ rõ vùng cấm kẹp và vùng dễ biến dạng.</td></tr>
+<tr><td>Orientation</td><td>Mặt A/B/C hoặc top/front/right; ảnh minh họa và mũi tên định hướng phải thống nhất với bản vẽ</td><td>Phải dùng ảnh minh họa và mũi tên định hướng; không mô tả chỉ bằng chữ khi có nguy cơ đảo mặt.</td></tr>
+<tr><td>Clamp strategy</td><td>Điểm tỳ, điểm kẹp, thứ tự kẹp, lực/torque, soft jaw profile, support/rest pad, anti-slip note</td><td>Phải chỉ rõ vùng phải tránh kẹp và vùng dễ biến dạng.</td></tr>
 <tr><td>Cut access / interference</td><td>Vùng cắt bị che, clearance, safe retract plane, rotary collision note, tailstock/sub-spindle conditions nếu có</td><td>Thiếu clearances cho 5-axis/mill-turn là lý do HOLD release.</td></tr>
 <tr><td>Transfer / re-clamp</td><td>Điều kiện bàn giao qua setup sau, datum carry-over, stock allowance remaining, unfinished critical surfaces</td><td>Khóa logic giữa setup trước và setup sau.</td></tr>
 </tbody></table></div>
@@ -174,7 +174,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>10. Quy tắc thay đổi, supersede và reject conditions</h2>
-<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Cấm làm</th></tr></thead><tbody>
+<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
 <tr><td>Đổi offset logic / WCS / datum / orientation</td><td>Phát hành revision mới, cập nhật prove-out note và trigger gate liên quan.</td><td>Sửa miệng hoặc ghi bút tay tại máy rồi tiếp tục chạy hàng loạt.</td></tr>
 <tr><td>Đổi fixture / jaw / stop / clamp strategy</td><td>Cập nhật ảnh, torque, locator, risk note và phê duyệt lại.</td><td>Dùng fixture “gần giống” mà không cập nhật sheet.</td></tr>
 <tr><td>Đổi tool assembly / substitute</td><td>Cập nhật Tool List revision, sister tool logic, life band và required verification.</td><td>Đổi tool rồi chỉ báo miệng cho ca sau.</td></tr>
@@ -197,3 +197,5 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 </body>
 </html>
+
+

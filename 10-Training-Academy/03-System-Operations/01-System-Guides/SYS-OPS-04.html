@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -410,10 +410,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>10.1 Quiz (≥20 câu) — trắc nghiệm + tình huống ngắn</h3>
 <ol>
 <li>(MCQ) “No evidence = No gate” nghĩa là gì trong ShipRelease?</li>
-<li>(MCQ) Khi IntegrationLogs báo Failed, hành động nào bị cấm? A) Advance LastSyncUtc B) Tạo StandupAction C) Gửi notify D) Giữ cursor</li>
+<li>(MCQ) Khi IntegrationLogs báo Failed, hành động nào phải chặn ngay? A) Advance LastSyncUtc B) Tạo StandupAction C) Gửi notify D) Giữ cursor</li>
 <li>(MCQ) Delta+overlap dùng để chặn rủi ro nào?</li>
 <li>(MCQ) Idempotent upsert bắt buộc dùng khóa nào cho JobIndex? A) JobNum B) EpicorKey C) PartNum D) DueDate</li>
-<li>(MCQ) Ai bị cấm tự phê duyệt record do chính mình tạo ở gate Ship/NCR?</li>
+<li>(MCQ) Ai phải tách khỏi quyền tự phê duyệt record do chính mình tạo ở gate Ship/NCR?</li>
 <li>(Short) Nêu 3 trường tối thiểu trong ApprovalHistory để audit được.</li>
 <li>(MCQ) ShipRelease Validator kiểm tra tối thiểu những nhóm gì? A) Packaging B) Inspection/FAI C) SSCC D) Tất cả</li>
 <li>(MCQ) Khi RequiresFAI=TRUE và thiếu ReportUrl, trạng thái đúng là gì?</li>
@@ -434,10 +434,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <summary><strong>Đáp án chuẩn (chỉ dùng cho Trainer/QA/Supervisor)</strong></summary>
 <ol>
 <li>Không có MRR hợp lệ thì không RELEASED, bắt buộc HOLD/BLOCK.</li>
-<li>A (Advance LastSyncUtc bị cấm khi fail).</li>
+<li>A (PHẢI chặn Advance LastSyncUtc khi fail).</li>
 <li>Chặn mất dữ liệu do trễ đồng bộ và chặn bỏ sót record quanh điểm chuyển ca.</li>
 <li>B.</li>
-<li>Operator/Setup/Programmer/QC/QA/Warehouse/Purchasing/Planner/Maintenance/EHS/Estimator (SAL-03)/Supervisor đều bị cấm tự duyệt record do chính mình tạo ở gate chất lượng/ship.</li>
+<li>Operator/Setup/Programmer/QC/QA/Warehouse/Purchasing/Planner/Maintenance/EHS/Estimator (SAL-03)/Supervisor đều phải tách khỏi quyền tự duyệt record do chính mình tạo ở gate chất lượng/ship.</li>
 <li>ApprovalID; SourceList/SourceRecordID; Approver; Outcome; DecisionTime (tối thiểu 3 trong số đó phải có: ApprovalID + Approver + DecisionTime).</li>
 <li>D.</li>
 <li>HOLD/BLOCKED.</li>

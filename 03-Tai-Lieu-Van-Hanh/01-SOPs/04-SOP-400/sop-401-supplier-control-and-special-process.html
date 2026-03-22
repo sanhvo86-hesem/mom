@@ -120,14 +120,14 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td>NCC được phê duyệt</td><td>NCC đã hoàn tất đánh giá theo cấp rủi ro đang áp dụng, hồ sơ còn hiệu lực và không ở trạng thái Probation / Suspend / Block cho family liên quan.</td></tr>
 <tr><td>Processor được phê duyệt</td><td>Nhà gia công ngoài hoặc special processor được HESEM cho phép dùng cho một <b>process family + spec/scope + site</b> xác định. Phê duyệt processor không tự động áp cho mọi site hay mọi process.</td></tr>
 <tr><td>Flow-down</td><td>Bộ yêu cầu HESEM chuyển xuống NCC bằng PO, checklist và pack đính kèm để NCC có thể làm đúng từ đầu.</td></tr>
-<tr><td>Single-source</td><td>Nguồn mà tại thời điểm lập đơn hàng chỉ có một lựa chọn thực tế. Single-source không bị cấm, nhưng phải có biện pháp bảo vệ tiến độ và rủi ro riêng.</td></tr>
+<tr><td>Single-source</td><td>Nguồn mà tại thời điểm lập đơn hàng chỉ có một lựa chọn thực tế. Single-source được phép dùng khi đã có biện pháp bảo vệ tiến độ và rủi ro riêng.</td></tr>
 <tr><td>Special process</td><td>Quá trình mà đầu ra không thể được xác nhận đầy đủ chỉ bằng kiểm tra sau cùng; vì vậy phải kiểm soát năng lực nguồn, scope chứng chỉ, flow-down và receipt evidence chặt hơn.</td></tr>
 <tr><td>SCAR</td><td>Supplier Corrective Action Request. Kích hoạt khi có lỗi lặp, lỗi nghiêm trọng, thiếu chứng chỉ, sai spec, sai revision, giao trễ kéo dài hoặc vi phạm change notification.</td></tr>
 </tbody></table></div>
 <div class="callout-grid">
 <div class="callout-card"><h3>Nguyên tắc 1 — Kiểm soát theo rủi ro và family</h3><ul class="tight"><li>Không đánh giá “một lần dùng cho mọi thứ”. Mỗi supplier / processor phải được nhìn theo <b>family</b>: raw material, standard hardware, tool, subcontract machining, special process, calibration, logistics.</li><li>Supplier có thể Approved cho một family nhưng chỉ Conditional hoặc Block cho family khác.</li></ul></div>
 <div class="callout-card"><h3>Nguyên tắc 2 — Chỉ phát hành PO khi flow-down đã sạch</h3><ul class="tight"><li>Mọi field quan trọng phải được khóa trước khi phát hành: part no., rev, spec, quantity, due date, cert required, traceability, customer flow-down, packaging, label, change-notice.</li><li>PO không được dùng như “vỏ bọc” để gửi việc đi khi pack kỹ thuật chưa sạch.</li></ul></div>
-<div class="callout-card"><h3>Nguyên tắc 3 — Special process phải theo site + scope + evidence</h3><ul class="tight"><li>Không chấp nhận logic “nhà cung cấp từng làm tốt nên site nào cũng được”. Mọi approval phải xem đúng site, đúng process family, đúng spec/customer scope và hiệu lực chứng chỉ.</li><li>Processor không gửi đủ cert, không match scope hoặc đổi process route không báo phải HOLD ngay.</li></ul></div>
+<div class="callout-card"><h3>Nguyên tắc 3 — Special process phải theo site + scope + evidence</h3><ul class="tight"><li>Mọi phê duyệt phải theo đúng site đã được chứng minh; không suy rộng từ thành tích của site khác. Mọi approval phải xem đúng site, đúng process family, đúng spec/customer scope và hiệu lực chứng chỉ.</li><li>Processor không gửi đủ cert, không match scope hoặc đổi process route không báo phải HOLD ngay.</li></ul></div>
 <div class="callout-card"><h3>Nguyên tắc 4 — Receipt là cổng chất lượng, không phải thủ tục kho</h3><ul class="tight"><li>Hàng về phải đi qua nhận dạng, kiểm số lượng, tình trạng bao gói, cert review và incoming inspection theo rule. Không nhận thẳng vào WIP.</li><li>Thiếu bằng chứng = HOLD. Áp lực tiến độ không được dùng để bypass gate.</li></ul></div>
 </div>
 <h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2>
@@ -276,7 +276,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Chặn nhận tiếp/không phát hành tiếp lô liên quan; đặt <b>HOLD</b> tại receipt, WIP và shipment nếu có liên quan.</li>
 <li>Xác định tất cả job, PO, lot, cert, ship date và customer bị ảnh hưởng.</li>
 <li>Kích hoạt supplier contact chain, yêu cầu containment, replacement lead time và evidence gốc.</li>
-<li>Nếu có ảnh hưởng khách hàng, CS/QA phải thống nhất một thông điệp duy nhất; cấm supplier hoặc xưởng tự liên lạc lệch thông tin.</li>
+<li>Nếu có ảnh hưởng khách hàng, CS/QA phải thống nhất một thông điệp duy nhất; supplier hoặc xưởng không được tự liên lạc lệch thông tin.</li>
 <li>Mở hồ sơ SCAR/NCR/CAPA khi vượt ngưỡng được quy định; không dùng email rời rạc để thay hồ sơ chính thức.</li>
 </ol></div>
 <h3>7.17 Giám sát trôi scope/site và kỷ luật tái thẩm định nguồn</h3>
@@ -326,3 +326,6 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ul></div></div></div></div>
 <script src="../../../assets/app.js"></script>
 </body></html>
+
+
+

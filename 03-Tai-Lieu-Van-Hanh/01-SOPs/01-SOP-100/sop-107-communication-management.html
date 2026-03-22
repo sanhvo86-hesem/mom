@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -189,7 +189,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <ul class="tight">
 <li>Tier 1 tập trung vào an toàn, chất lượng, máy, tool, vật tư, readiness và blocker trong ca.</li>
 <li>Tier 2/3 dùng để chốt ưu tiên 24 giờ, giải xung đột năng lực và ra quyết định vượt quyền ca.</li>
-<li>Case severity cao phải gắn KPI, owner, due time và next action; cấm ghi “đang xử lý”.</li>
+<li>Case severity cao phải gắn KPI, owner, due time và next action; trạng thái phải ghi next action cụ thể; không dừng ở “đang xử lý”.</li>
 <li>Nếu có nhiều group chat, chỉ một log được công nhận là record chính thức.</li>
 </ul>
 <h3>7.3 Truyền thông với khách hàng và nhà cung cấp</h3>
@@ -212,7 +212,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <p>After-hours escalation áp dụng khi ảnh hưởng thời gian không chờ được đến giờ hành chính: ship trong ngày, complaint nghi field escape, máy/cleanroom/special process failure làm dừng đơn ưu tiên, sự cố dữ liệu khiến không ship được, hoặc sự cố IP cần khóa ngay. Người nhận escalation phải xác nhận đã nhận và chỉ định người ra quyết định tiếp theo.</p>
 <ul class="tight">
 <li>Nếu không liên lạc được người level 1 trong thời gian SLA, phải nhảy level ngay theo ladder.</li>
-<li>Không chấp nhận “đã gọi nhưng không nghe máy” là trạng thái cuối.</li>
+<li>“Đã gọi nhưng không nghe máy” không được xem là trạng thái cuối; phải có bước escalate kế tiếp.</li>
 <li>War room chỉ đóng khi có decision log và owner cho bước tiếp theo.</li>
 <li>Sự kiện ngoài giờ phải được backfill vào log chính thức trong ngày làm việc kế tiếp.</li>
 </ul>
@@ -261,3 +261,4 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <script src="../../../assets/app.js"></script>
 </body>
 </html>
+

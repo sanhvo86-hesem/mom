@@ -88,7 +88,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-item"><strong>Bước 1 — Chuẩn bị trước họp.</strong><br/>Planning phát agenda, liệt kê trigger, cập nhật Job dashboard, open hold, shortage, ship risk, bottleneck và action cũ chưa đóng. Engineering, QA, Warehouse, Production phải nạp dữ liệu trước giờ họp; control tower không dùng để đi hỏi dữ liệu sơ cấp.</div>
 <div class="step-item"><strong>Bước 2 — Chốt baseline của Job.</strong><br/>Xác nhận đúng part/rev, qty, route, customer priority, quality package, ship mode và special handling. Nếu baseline chưa khóa, cuộc họp dừng ở trạng thái <span class="badge-red">BLOCKED</span>.</div>
 <div class="step-item"><strong>Bước 3 — So readiness theo 6 trục.</strong><br/>Lần lượt qua: material, program/setup, machine capacity, gage/inspection, special process/cleanliness, hồ sơ/bằng chứng ship. Mỗi trục phải có câu trả lời: đủ / thiếu / rủi ro / owner / SLA.</div>
-<div class="step-item"><strong>Bước 4 — Quyết định trạng thái.</strong><br/><span class="badge-green">READY</span>: đủ điều kiện chạy. <span class="badge-amber">READY WITH CONTROLS</span>: được chạy nhưng phải giữ control bổ sung và gate review cứng. <span class="badge-red">BLOCKED</span>: cấm thả Job vào nhịp chạy cho đến khi đóng gap.</div>
+<div class="step-item"><strong>Bước 4 — Quyết định trạng thái.</strong><br/><span class="badge-green">READY</span>: đủ điều kiện chạy. <span class="badge-amber">READY WITH CONTROLS</span>: được chạy nhưng phải giữ control bổ sung và gate review cứng. <span class="badge-red">BLOCKED</span>: PHẢI chặn Job khỏi nhịp chạy cho đến khi đóng gap.</div>
 <div class="step-item"><strong>Bước 5 — Phát lệnh và khóa owner.</strong><br/>Mỗi gap phải có owner đích danh, thời hạn, đầu ra cần nộp, nơi nộp, và escalation level khi quá hạn. Không ghi action dạng “theo dõi thêm”, “xem xét”, “cập nhật sau”.</div>
 <div class="step-item"><strong>Bước 6 — Theo dõi sau họp.</strong><br/>Control tower review lại theo nhịp đã chốt cho đến khi Job về trạng thái xanh. Nếu phát sinh rủi ro mới làm thay đổi assumptions, phải họp lại; không được ngầm đổi plan trên shopfloor.</div>
 </div></div>
@@ -99,7 +99,7 @@ ul.tight li {margin:4px 0;}
 <tr><td><span class="badge-red">BLOCKED</span></td><td>Thiếu baseline, thiếu vật tư/chứng chỉ quan trọng, chưa chốt processor, chưa sẵn gage/fixture, open NCR ảnh hưởng CTQ, hoặc điều kiện first piece chưa sẵn.</td><td>Không dispatch; mở escalation theo <a href="../../03-Reference/01-ANNEX-System/annex-qms-020-escalation-matrix-and-sla.html">ANNEX-QMS-020</a>.</td></tr>
 <tr><td><span class="badge-red">SHIP-RISK</span></td><td>Job đang chạy nhưng nguy cơ không đạt ngày giao hoặc không kịp release pack.</td><td>Chuyển sang họp tăng tần suất; ưu tiên nguồn lực; đánh giá OT/vendor/partial shipment theo quyền hạn.</td></tr>
 </tbody></table></div>
-<div class="callout-warning"><strong>HOLD bắt buộc:</strong> cấm gắn trạng thái READY nếu first piece/FAI bắt buộc mà chưa rõ thời điểm thực hiện, hoặc nếu special process/cert path chưa có owner nhận và ngày trả cert.</div></div>
+<div class="callout-warning"><strong>HOLD bắt buộc:</strong> PHẢI giữ trạng thái BLOCKED/HOLD nếu first piece/FAI bắt buộc mà chưa rõ thời điểm thực hiện, hoặc nếu special process/cert path chưa có owner nhận và ngày trả cert.</div></div>
 <div class="section"><h2>5. Record, KPI và liên kết tài liệu</h2>
 <div class="two-col">
 <div class="card"><h3>Record tối thiểu</h3><ul class="tight" style="padding-left:18px;">

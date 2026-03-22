@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -126,7 +126,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>CS/Báo giá <b>PHẢI</b> khóa đúng <b>part number, revision, quantity, unit of measure, Incoterm, quality package level, special requirements, customer-supplied material/tooling</b> trước khi phát hành báo giá.</li>
 <li>Không được phát hành quote nếu còn mâu thuẫn giữa drawing, model, email làm rõ và BOM/phạm vi giao hàng.</li>
 <li>Ngày giao chỉ được hứa khi <b>Engineering</b> đã xác nhận khả năng gia công, <b>Planning</b> đã xác nhận năng lực hữu hạn, và <b>QA</b> đã xác nhận yêu cầu inspection/release có thể đáp ứng.</li>
-<li>RFQ thiếu thông tin kỹ thuật hoặc thiếu yêu cầu chất lượng bắt buộc <b>PHẢI</b> trả về trạng thái <b>HOLD–CLARIFICATION</b> trên <a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-201_RFQ_Register.xlsx">FRM-201</a>; cấm báo giá tạm theo suy đoán.</li>
+<li>RFQ thiếu thông tin kỹ thuật hoặc thiếu yêu cầu chất lượng bắt buộc <b>PHẢI</b> trả về trạng thái <b>HOLD–CLARIFICATION</b> trên <a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-201_RFQ_Register.xlsx">FRM-201</a>; chỉ được báo giá sau khi đã làm rõ dữ liệu đầu vào.</li>
 </ul></div>
 <div class="grid-2">
 <div class="metric-card"><div class="value">HOLD–T</div><div class="label">Thiếu hoặc mâu thuẫn dữ liệu kỹ thuật</div><div class="mini-note">Drawing/model/rev/spec chưa khóa, dung sai thiếu, finish/cleanliness/leak requirement chưa rõ.</div></div>
@@ -139,13 +139,13 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <ul class="tight">
 <li>Kick-off trên <a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-204_Order_Kickoff_Checklist.xlsx">FRM-204</a> <b>PHẢI</b> khóa: part/rev, route, machine family, setup owner, FAI/first piece logic, material source, outsource requirement, pack/ship rule, customer communication owner.</li>
 <li>Mọi thay đổi sau kick-off về revision, due date, ship mode, split lot, packing, special process, QPL, customer-supplied items đều <b>PHẢI</b> đi qua change path và cập nhật lại Job Dossier.</li>
-<li>Khi thay đổi làm ảnh hưởng ngày giao hoặc chi phí, CS/Báo giá <b>PHẢI</b> phát hành thông tin cam kết mới cho khách hàng; cấm để xưởng chạy theo lịch mới trong khi khách hàng vẫn giữ lịch cũ.</li>
+<li>Khi thay đổi làm ảnh hưởng ngày giao hoặc chi phí, CS/Báo giá <b>PHẢI</b> phát hành thông tin cam kết mới cho khách hàng; lịch nội bộ và lịch khách hàng phải được đồng bộ trước khi xưởng chạy theo kế hoạch mới.</li>
 </ul></div>
 <h3>7.5 Quy tắc split lot, partial ship, expedite và outsource support</h3>
 <ul class="tight">
 <li><b>Split lot</b> chỉ được phép khi traceability, labeling và completion logic vẫn giữ được theo từng sub-lot; nếu không, phải giữ một lot duy nhất.</li>
 <li><b>Partial ship</b> chỉ được release khi khách hàng chấp thuận hoặc PO/contract cho phép, và bộ chứng từ CoC/packing list phản ánh đúng lượng giao từng đợt.</li>
-<li><b>Expedite / hot-job</b> chỉ được mở khi đã xác định rõ việc hy sinh gì: overtime, resequence, outsource assist, partial ship hoặc đổi commit. Cấm ra lệnh gấp mà không chỉ rõ nguồn bù năng lực.</li>
+<li><b>Expedite / hot-job</b> chỉ được mở khi đã xác định rõ việc hy sinh gì: overtime, resequence, outsource assist, partial ship hoặc đổi commit. PHẢI chỉ rõ nguồn bù năng lực trước khi ra lệnh gấp.</li>
 <li><b>Outsource support</b> phải chạy đồng bộ với <a href="../04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>; không được tách vật tư hoặc bán thành phẩm đi ngoài khi chưa có pack outsource, flow-down và gate nhận hàng về.</li>
 </ul>
 <h3>7.6 Bộ bằng chứng tối thiểu để đóng đơn hàng sạch</h3>

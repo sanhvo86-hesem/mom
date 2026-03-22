@@ -274,7 +274,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:130px">Zone</th>
 <th style="width:280px">Vai trò</th>
 <th>Chứa gì</th>
-<th style="width:260px">Cấm</th>
+<th style="width:260px">Phải tránh</th>
 </tr>
 </thead>
 <tbody>
@@ -346,7 +346,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Engineering</td>
 <td>Release program/drawing bằng cách gửi file đính kèm Teams/email</td>
 <td>Nhiều bản song song; chạy sai Rev</td>
-<td>Release bắt buộc theo package + SnapshotID; cấm copy tay</td>
+<td>Release bắt buộc theo package + SnapshotID; không copy tay</td>
 </tr>
 <tr>
 <td>Purchasing</td>
@@ -460,7 +460,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP7 — Obsolete quarantine</b></td>
 <td>QA/QMS</td>
-<td>Thu hồi bản obsolete; kho obsolete chỉ đọc; cấm sử dụng tại xưởng.</td>
+<td>Thu hồi bản obsolete; kho obsolete chỉ đọc; PHẢI loại khỏi điểm dùng tại xưởng.</td>
 <td>Danh mục obsolete + log thay đổi + thông báo phát hành</td>
 </tr>
 <tr>
@@ -737,7 +737,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>6</td>
 <td>Khóa &amp; declare record khi đủ</td>
-<td>Pack có index + signoff + record status; cấm sửa nội dung sau declare.</td>
+<td>Pack có index + signoff + record status; PHẢI khóa nội dung sau declare.</td>
 <td>Record bảo vệ bằng chứng; audit yêu cầu tính toàn vẹn.</td>
 </tr>
 <tr>
@@ -935,8 +935,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Tên folder/file theo key</td>
-<td>Đúng JobNum/PartRev/Date/REV; không dấu; không ký tự cấm</td>
-<td>Thiếu key; dùng “final”; sai Rev; có ký tự cấm</td>
+<td>Đúng JobNum/PartRev/Date/REV; không dấu; không ký tự không hợp lệ</td>
+<td>Thiếu key; dùng “final”; sai Rev; có ký tự không hợp lệ</td>
 </tr>
 <tr>
 <td>Primary Home</td>

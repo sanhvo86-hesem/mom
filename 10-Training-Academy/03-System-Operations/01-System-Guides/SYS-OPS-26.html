@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -213,7 +213,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">6) Fail-fast rules</span>
 <h2 class="h2" style="margin-top:12px;">STOP / HOLD / BLOCK</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Rule</th><th>Tiêu chí kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td>STOP</td><td>Phát hiện sai Revision trên DWG/CAM/Setup/FAI/IR so với routing hoặc traveler.</td><td>Dừng gia công/đo; khoá quyền sửa file; tạo NCR; cập nhật Job Dossier đúng Rev; chỉ GO khi Supervisor ký MRR-13.</td></tr><tr><td>HOLD</td><td>Thiếu hồ sơ Tier 1 bắt buộc trước gate (Final/Ship).</td><td>Giữ hàng tại khu HOLD; không đóng gói/không ship; thực hiện completeness check và bổ sung hồ sơ; QA xác nhận MRR-12.</td></tr><tr><td>BLOCK</td><td>Phát hiện chứng từ giả/không xác thực (CoC/Cert/outsource).</td><td>Chặn nhận hàng/chặn ship; thông báo Purchasing + QA; mở NCR supplier; lưu toàn bộ bằng chứng vào 05_NCR-Hold-CAPA.</td></tr><tr><td>STOP</td><td>Gage dùng cho CTQ hết hạn/không truy vết chứng chỉ hiệu chuẩn.</td><td>Dừng đo/không chấp nhận kết quả; thay gage đạt chuẩn; lưu chứng chỉ vào Job Dossier; QC ký lại IR.</td></tr><tr><td>HOLD</td><td>File Tier 1 bị sửa sau ship (audit log có thay đổi).</td><td>Khoá thư viện; mở điều tra; xuất audit log; lập CAPA; báo cáo Ban điều hành.</td></tr></tbody></table></div>
+<div class="table-card"><table class="table"><thead><tr><th>Rule</th><th>Tiêu chí kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td>STOP</td><td>Phát hiện sai Revision trên DWG/CAM/Setup/FAI/IR so với routing hoặc traveler.</td><td>Dừng gia công/đo; khoá quyền sửa file; tạo NCR; cập nhật Job Dossier đúng Rev; chỉ GO khi Supervisor ký MRR-13.</td></tr><tr><td>HOLD</td><td>Thiếu hồ sơ Tier 1 bắt buộc trước gate (Final/Ship).</td><td>Giữ hàng tại khu HOLD; không đóng gói/không ship; thực hiện completeness check và bổ sung hồ sơ; QA xác nhận MRR-12.</td></tr><tr><td>BLOCK</td><td>Phát hiện chứng từ giả/không xác thực (CoC/Cert/outsource).</td><td>Chặn nhận hàng/chặn ship; thông báo Purchasing + QA; mở NCR supplier; lưu toàn bộ bằng chứng vào 05_NCR-Hold-CAPA.</td></tr><tr><td>STOP</td><td>Gage dùng cho CTQ hết hạn/không truy vết chứng chỉ hiệu chuẩn.</td><td>Dừng đo; PHẢI loại bỏ kết quả không hợp lệ, thay gage đạt chuẩn, lưu chứng chỉ vào Job Dossier và QC ký lại IR.</td></tr><tr><td>HOLD</td><td>File Tier 1 bị sửa sau ship (audit log có thay đổi).</td><td>Khoá thư viện; mở điều tra; xuất audit log; lập CAPA; báo cáo Ban điều hành.</td></tr></tbody></table></div>
 </div>
 <div style="height:16px"></div>
 <div class="card">

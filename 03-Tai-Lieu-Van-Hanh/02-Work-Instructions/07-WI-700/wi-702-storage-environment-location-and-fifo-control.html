@@ -97,7 +97,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table><thead><tr><th>Tình huống</th><th>Rule điều hành bắt buộc</th><th>Ai được quyết định ngoại lệ</th></tr></thead><tbody>
 <tr><td>Raw material cùng family, nhiều heat/lô</td><td>Ưu tiên lô cũ nhất đủ điều kiện; nếu Job yêu cầu heat plan hoặc customer freeze lot thì heat plan thắng FIFO thuần.</td><td>Planning + QA + Warehouse Supervisor theo authority</td></tr>
 <tr><td>Consumable / desiccant / HIC / vật tư có hạn dùng</td><td>FEFO bắt buộc; lô gần hết hạn được dùng trước nếu còn trong window cho phép.</td><td>Không có ngoại lệ nếu lô đã quá hạn</td></tr>
-<tr><td>Split lot cho cùng một Job</td><td>Phải ghi rõ lot sequence, qty từng lot, balance còn lại và lệnh issue. Cấm trộn lô vào một khay mà không có vách tách và nhãn riêng.</td><td>Warehouse + Production Supervisor</td></tr>
+<tr><td>Split lot cho cùng một Job</td><td>Phải ghi rõ lot sequence, qty từng lot, balance còn lại và lệnh issue. PHẢI tách lô bằng vách ngăn và nhãn riêng, không để chung trong một khay.</td><td>Warehouse + Production Supervisor</td></tr>
 <tr><td>Remnant / dư đầu thanh / tấm cắt lẻ</td><td>Chỉ được trả kho nếu còn nhãn heat/lot, nhận diện kích thước hữu dụng và không có nghi ngờ trộn lẫn. Mất truy vết thì chỉ được đưa vào HOLD.</td><td>QA đánh giá khả năng dùng lại</td></tr>
 <tr><td>Hot job / expedite</td><td>Expedite không được phá FIFO nếu làm mất trace hoặc gây đói lệnh đã commit. Muốn resequence phải theo ladder tại <a href="../../03-Reference/01-ANNEX-System/annex-ops-001-dispatch-capacity-wip-rules.html">ANNEX-OPS-001</a>.</td><td>Planning / Ops Manager theo authority</td></tr>
 </tbody></table></div>
@@ -109,7 +109,7 @@ ul.tight li {margin:4px 0;}
 <li>Thanh tròn, ống, bar stock PHẢI có chặn chống lăn; bó vật liệu dài PHẢI dùng rack hoặc giá đỡ đúng tải.</li>
 <li>Hàng clean-pack chỉ được thao tác bởi người có PPE/gowning phù hợp và khu thao tác đã line-clear.</li>
 </ul></div>
-<div class="card"><h3>Điều bị cấm</h3><ul class="tight" style="padding-left:18px;">
+<div class="card"><h3>Điều phải tránh</h3><ul class="tight" style="padding-left:18px;">
 <li>Kéo lê part trên mặt bàn, mặt pallet hoặc mép kệ.</li>
 <li>Đặt part trực tiếp trên carton bụi, gỗ thô phát bụi, giẻ bẩn hoặc khay có dính chip/coolant.</li>
 <li>Để WIP/FG chung với dao cụ, dụng cụ cầm tay, bu lông rời, giấy nhám hoặc vật lạ.</li>
@@ -161,9 +161,9 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table><thead><tr><th>Tình huống</th><th>Record chính</th><th>Hành động bắt buộc</th><th>Ai được mở lại</th></tr></thead><tbody>
 <tr><td>Excursion ngắn dưới action limit ở S0 và chưa thấy ảnh hưởng vật lý</td><td><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx">FRM-708</a></td><td>Ghi log, tăng theo dõi, xác nhận không có stock đặc biệt lẫn trong zone.</td><td>Warehouse owner theo quyền hạn được giao.</td></tr>
 <tr><td>Excursion hoặc monitoring gap trên S1 / S2</td><td>FRM-708 + log affected stock</td><td>Gắn HOLD cho lô bị nghi ảnh hưởng; kiểm expiry / window / condition trước mọi cấp phát.</td><td>QA hoặc material/process owner.</td></tr>
-<tr><td>Breach trên S3 clean-pack / vacuum-sensitive</td><td>FRM-708 + <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-709_Clean_Packaging_Checklist.xlsx">FRM-709</a> khi liên quan pack sạch</td><td>Chuyển clean-hold; cấm issue, cấm ship, đánh giá re-clean / re-pack / re-verify.</td><td>QA / clean-area owner theo <a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a>.</td></tr>
+<tr><td>Breach trên S3 clean-pack / vacuum-sensitive</td><td>FRM-708 + <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-709_Clean_Packaging_Checklist.xlsx">FRM-709</a> khi liên quan pack sạch</td><td>Chuyển clean-hold; PHẢI chặn issue, chặn ship và đánh giá re-clean / re-pack / re-verify.</td><td>QA / clean-area owner theo <a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a>.</td></tr>
 <tr><td>Restricted stock / quarantine bị di chuyển sai zone hoặc mở bao ngoài kiểm soát</td><td>FRM-708 / hold log tương ứng</td><td>Khoanh phạm vi, dán lại trạng thái, điều tra movement và đánh giá integrity.</td><td>Đúng owner của issue đó; Warehouse không tự release.</td></tr>
 </tbody></table></div>
-<div class="note-warning"><b>Điểm cấm</b><br/>Không “hạ class” của hàng bằng cách chỉ đổi vị trí hoặc thay nhãn. Nếu từ S3/S4 chuyển về S0/S1, phải có record chứng minh điều kiện release đã đạt và người có thẩm quyền đã chấp thuận.</div></div>
+<div class="note-warning"><b>Điểm bắt buộc</b><br/>PHẢI giữ nguyên class kiểm soát của hàng cho đến khi có record chứng minh điều kiện release đã đạt và người có thẩm quyền đã chấp thuận. Không chỉ đổi vị trí hoặc thay nhãn để hạ class.</div></div>
 </body>
 </html>

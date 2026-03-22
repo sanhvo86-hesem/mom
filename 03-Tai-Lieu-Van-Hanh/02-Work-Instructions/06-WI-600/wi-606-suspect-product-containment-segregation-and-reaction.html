@@ -104,7 +104,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>REWORK / SORT</td><td>Đã chốt disposition có đường thực hiện rõ</td><td>Phải có WI/route/tiêu chí chấp nhận và người phê duyệt. Rework xong phải quay lại gate kiểm phù hợp.</td></tr>
 <tr><td>SCRAP / RETURN</td><td>Lô không thể hoặc không được phép release</td><td>Phải khóa qty, lot, chi phí, bằng chứng và transaction hệ thống tương ứng.</td></tr>
 </tbody></table></div>
-<p>Tag vật lý, trạng thái hệ thống và hồ sơ NCR <strong>PHẢI</strong> cùng một thông tin. Cấm có tình huống pallet dán HOLD nhưng hệ thống vẫn usable, hoặc hệ thống HOLD nhưng hàng lại để trong zone tốt không có nhãn.</p>
+<p>Tag vật lý, trạng thái hệ thống và hồ sơ NCR <strong>PHẢI</strong> cùng một thông tin. PHẢI đồng bộ trạng thái giữa pallet, hệ thống và zone lưu; không để pallet dán HOLD nhưng hệ thống vẫn usable, hoặc hệ thống HOLD nhưng hàng lại ở zone tốt không có nhãn.</p>
 </div><div class="section">
 <h2>5. Tuyến quyết định sau containment và release sau disposition</h2>
 <div class="two-col">
@@ -127,7 +127,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div><div class="section">
 <h2>6. Special cases phải xử lý theo rule chặt hơn</h2>
 <h3>6.1 Cert / trace break</h3>
-<p>Nếu part/lot không nối được với cert, MTC, processor cert hoặc chain-of-custody thì mặc định là suspect. Chỉ có hai hướng: khôi phục được trace bằng evidence độc lập và được QA chấp nhận, hoặc disposition về RETURN/SCRAP/USE-AS-IS theo thẩm quyền. Cấm “suy luận hợp lý” để ghép cert cho lô khác.</p>
+<p>Nếu part/lot không nối được với cert, MTC, processor cert hoặc chain-of-custody thì mặc định là suspect. Chỉ có hai hướng: khôi phục được trace bằng evidence độc lập và được QA chấp nhận, hoặc disposition về RETURN/SCRAP/USE-AS-IS theo thẩm quyền. PHẢI dựa trên evidence độc lập; không “suy luận hợp lý” để ghép cert cho lô khác.</p>
 <h3>6.2 Customer escape / ship risk</h3>
 <p>Nếu lô nghi ngờ đã tới khu đóng gói, đã tạo CoC, đã ship confirm hoặc có khả năng đã giao khách, phải kích hoạt stop-ship / intercept / customer communication theo thang escalation đã phê duyệt. Không chờ họp CAPA mới gọi khách hoặc hãng vận chuyển.</p>
 <h3>6.3 FOD / clean breach</h3>

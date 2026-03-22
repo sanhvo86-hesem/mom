@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -132,7 +132,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table><thead><tr><th>Kết quả</th><th>Quyết định</th><th>Hành động bắt buộc</th><th>Phạm vi test lại</th></tr></thead><tbody>
 <tr><td>Nhỏ hơn limit rõ ràng và tín hiệu ổn định</td><td><span class="badge-green">PASS</span></td><td>Ký record, nạp hồ sơ vào job dossier và chuyển bước tiếp theo.</td><td>Không cần, trừ khi có yêu cầu lặp trên nhiều orientation/port.</td></tr>
 <tr><td>Nằm trong vùng cảnh báo nội bộ hoặc dao động sát limit</td><td><span class="badge-amber">CẢNH BÁO</span></td><td>Re-check cùng method, xác nhận lại fixture/background, chạy lặp theo số lần quy định. Chỉ PASS khi kết quả ổn định và QA chấp nhận.</td><td>Test lại vị trí hoặc toàn bộ cụm theo quyết định QA.</td></tr>
-<tr><td>Vượt limit</td><td><span class="badge-red">FAIL</span></td><td>HOLD ngay, đánh dấu vị trí nghi rò, mở NCR/rework, cấm chuyển đóng gói hoặc giao hàng.</td><td>Sau rework phải test lại đủ phạm vi chịu ảnh hưởng; nếu có thay seal/weld/joint trọng yếu thì test lại toàn bộ cụm.</td></tr>
+<tr><td>Vượt limit</td><td><span class="badge-red">FAIL</span></td><td>HOLD ngay, đánh dấu vị trí nghi rò, mở NCR/rework, phải chặn chuyển đóng gói hoặc giao hàng.</td><td>Sau rework phải test lại đủ phạm vi chịu ảnh hưởng; nếu có thay seal/weld/joint trọng yếu thì test lại toàn bộ cụm.</td></tr>
 <tr><td>Background/standard leak/session check không đạt</td><td><span class="badge-blue">TEST VOID</span></td><td>Không dùng dữ liệu session để release. Sửa máy/điều kiện test trước khi chạy lại.</td><td>Chạy lại đầy đủ từ đầu.</td></tr>
 </tbody></table></div></div>
 

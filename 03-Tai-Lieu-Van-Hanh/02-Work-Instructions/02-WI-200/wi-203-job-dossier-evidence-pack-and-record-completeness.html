@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -73,7 +73,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Contingency / Offline Event</td><td>Lưu event log, scan nhập bù, checklist backfill khi hệ thống down</td><td>Không thay Dossier chính sau khi hệ thống đã phục hồi</td><td>QA/QMS</td></tr>
 <tr><td>Customer Pack output</td><td>Lưu bundle/hồ sơ phát hành ra ngoài theo yêu cầu từng shipment hoặc source inspection</td><td>Không phải nơi làm việc nội bộ chính trong quá trình sản xuất</td><td>QA / Shipping theo route</td></tr>
 </tbody></table></div>
-<p>Mọi link trong dossier phải trỏ về SSOT đang hiệu lực. Cấm gửi hoặc lưu đường dẫn tới bản tải về trên desktop cá nhân. Cấm tạo dossier phụ song song cho cùng một JobNum.</p></div>
+<p>Mọi link trong dossier phải trỏ về SSOT đang hiệu lực. PHẢI giữ link về nguồn chuẩn; không gửi hoặc lưu đường dẫn tới bản tải về trên desktop cá nhân, và không tạo dossier phụ song song cho cùng một JobNum.</p></div>
 <div class="section"><h2>3. Cấu trúc Job Dossier, chủ sở hữu và thời điểm phải nạp hồ sơ</h2>
 <div class="table-card"><table><thead><tr><th>Thư mục</th><th>Nội dung bắt buộc</th><th>Owner chính</th><th>Thời điểm phải có</th></tr></thead><tbody>
 <tr><td>00_Admin-Control</td><td>Index, manifest, approval history, change log, customer requirement summary, dossier status</td><td>Planning / QA</td><td>Ngay khi mở job</td></tr>
@@ -86,9 +86,9 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>07_NCR-CAPA-Deviation</td><td>NCR, concession, waiver, escape, CAPA, rework chain, customer deviation approval</td><td>QA</td><td>Ngay khi sự kiện phát sinh</td></tr>
 <tr><td>99_Archive-Locked</td><td>Snapshot cuối, signed manifest, export bundle, archive note</td><td>QA/QMS</td><td>Sau ship hoặc job close</td></tr>
 </tbody></table></div>
-<div class="keyline"><strong>SLA nạp record:</strong> record vận hành tạo trong ca phải được nạp vào dossier trong chính ca đó hoặc chậm nhất trước khi đóng gate kế tiếp. Cấm giữ ảnh, phiếu giấy hoặc file đo ở máy cá nhân để “cuối tuần nhập một lần”.</div></div>
+<div class="keyline"><strong>SLA nạp record:</strong> record vận hành tạo trong ca phải được nạp vào dossier trong chính ca đó hoặc chậm nhất trước khi đóng gate kế tiếp. PHẢI chuyển ảnh, phiếu giấy và file đo vào dossier đúng hạn; không giữ ở máy cá nhân để “cuối tuần nhập một lần”.</div></div>
 <div class="section"><h2>4. Tiêu chí chấp nhận cho từng loại bằng chứng</h2>
-<div class="table-card"><table><thead><tr><th>Loại record</th><th>Được chấp nhận khi</th><th>Không chấp nhận khi</th></tr></thead><tbody>
+<div class="table-card"><table><thead><tr><th>Loại record</th><th>Được chấp nhận khi</th><th>PHẢI trả lại khi</th></tr></thead><tbody>
 <tr><td>Biểu mẫu scan / giấy ký tay</td><td>Đọc rõ, đủ trang, có tên/initial/ngày, nhận diện được job/part/rev/gate</td><td>Mờ, thiếu trang, thiếu thông tin nhận diện, cắt mất vùng ký hoặc giá trị đo</td></tr>
 <tr><td>Ảnh / video hiện trường</td><td>Thể hiện đúng đối tượng, đúng thời điểm và đủ bối cảnh để hiểu ảnh đang chứng minh điều gì</td><td>Ảnh rời rạc không nhận diện được part/job, ảnh bị chỉnh sửa làm mất dấu vết, ảnh chụp lại màn hình thay cho evidence gốc khi không có lý do</td></tr>
 <tr><td>PDF report / native file đo</td><td>Có program ID/rev khi áp dụng, đúng part/rev, đúng lô/job, liên kết được tới raw data gốc khi required</td><td>Chỉ có bản in/screenshot mà không giữ file gốc trong khi route yêu cầu raw data/native evidence</td></tr>
@@ -99,7 +99,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>5. Các bước thao tác bắt buộc</h2>
 <div class="step-list">
 <div class="step-item"><strong>Tạo dossier ngay khi planning release.</strong><br/>Planning mở dossier đúng template, gắn JobNum, PartNo, Rev, Base QPL, overlay code, và link tới baseline package. Không chờ tới khi có hồ sơ đầu tiên mới tạo thư mục.</div>
-<div class="step-item"><strong>Nạp hồ sơ đúng gate, đúng ngày.</strong><br/>Người phát sinh record chịu trách nhiệm nạp hoặc bàn giao nạp đúng thư mục G0–G5. Cấm để file ở root, cấm giữ file trong Downloads/Desktop và coi đó là “đã có hồ sơ”.</div>
+<div class="step-item"><strong>Nạp hồ sơ đúng gate, đúng ngày.</strong><br/>Người phát sinh record chịu trách nhiệm nạp hoặc bàn giao nạp đúng thư mục G0–G5. PHẢI đưa file vào đúng thư mục hồ sơ; không để ở root, không giữ trong Downloads/Desktop rồi coi đó là “đã có hồ sơ”.</div>
 <div class="step-item"><strong>Điền metadata ngay khi nạp.</strong><br/>JobNum, PartNo, Rev, Gate, DocType, RecordDate, Owner, QPL/overlay, lot/heat khi áp dụng, và retention trigger phải được điền đầy đủ để truy xuất được trong 60 giây.</div>
 <div class="step-item"><strong>Kiểm completeness trước khi đóng gate.</strong><br/>Owner của gate tự kiểm trước, QA kiểm chéo ở các gate chất lượng và ship release. Thiếu một mục mandatory thì gate không được đóng.</div>
 <div class="step-item"><strong>Xuất customer package đúng biến thể.</strong><br/>Khi khách yêu cầu data pack, source inspection pack, clean/vacuum pack hoặc FAI pack, phải xuất từ dossier chính và lưu ngược index của pack đã phát hành vào G5 hoặc thư mục tương ứng.</div>

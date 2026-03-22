@@ -133,7 +133,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Program</td><td>Program ID/Rev/hash, nguồn phát hành, trạng thái prove-out</td><td>Setup Lead + Engineering khi job rủi ro</td></tr>
 <tr><td>WCS / datum</td><td>WCS đang dùng, datum logic, probe routine, điểm cần cẩn trọng</td><td>Setup Lead</td></tr>
 <tr><td>Tool status</td><td>ToolID loaded, tool CTQ, tuổi dao còn lại, tool backup đã chuẩn bị hay chưa</td><td>Setup Lead + Tool Crib khi có</td></tr>
-<tr><td>Fixture status</td><td>Fixture/Jaw ID, orientation, torque note, vùng cấm chạm, clamp force note khi áp dụng</td><td>Setup Lead</td></tr>
+<tr><td>Fixture status</td><td>Fixture/Jaw ID, orientation, torque note, vùng phải tránh chạm, clamp force note khi áp dụng</td><td>Setup Lead</td></tr>
 <tr><td>Đo kiểm</td><td>Gage ID, người nhận đo first piece, đặc tính phải đo, mức QPL</td><td>QA / người đo được chỉ định</td></tr>
 <tr><td>Rủi ro còn mở</td><td>Điểm cần theo dõi ở 1–3 part đầu; vùng dễ rung; chip issue; lưu ý burr/surface</td><td>Setup Lead + Supervisor</td></tr>
 </tbody></table></div>
@@ -151,7 +151,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table><thead><tr><th>Mã mất thời gian</th><th>Nghĩa</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td>L01</td><td>Chờ tool / preset / insert</td><td>Chuẩn hóa pull list, tool crib prep, tool preset trước giờ dừng máy</td></tr>
 <tr><td>L02</td><td>Fixture / jaw / hardware không sẵn</td><td>Chuẩn hóa kit đồ gá, pre-qualification ngoài máy</td></tr>
-<tr><td>L03</td><td>Sai revision set / thiếu tài liệu</td><td>Khóa release set từ đầu, cấm phát lệnh changeover khi hồ sơ chưa khóa</td></tr>
+<tr><td>L03</td><td>Sai revision set / thiếu tài liệu</td><td>Khóa release set từ đầu, PHẢI chặn phát lệnh changeover khi hồ sơ chưa khóa</td></tr>
 <tr><td>L04</td><td>Program mismatch / DNC lỗi / file không tìm thấy</td><td>Chuẩn hóa vault/DNC, checksum, naming và quyền phát hành</td></tr>
 <tr><td>L05</td><td>Zero/probe/offset mất ổn định</td><td>Kiểm machine condition, probe, quy trình set datum và training</td></tr>
 <tr><td>L06</td><td>First piece FAIL / FAI chậm</td><td>Rà CTQ, method đo, gage readiness, handoff QA</td></tr>

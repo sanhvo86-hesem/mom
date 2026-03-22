@@ -150,7 +150,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>File bị đổi tên/move sau khi đã dán nhãn record → đứt đường dẫn bằng chứng trong ship packet.</li>
 <li>Overwrite file thay vì tạo revision mới → mất lịch sử.</li>
 <li>Disposition review không được thực hiện khi tới hạn → tồn đọng, mất kiểm soát.</li>
-<li>Trích xuất bằng chứng chỉ kéo PDF bề mặt, bỏ file native/metadata → audit không chấp nhận.</li>
+<li>Trích xuất bằng chứng chỉ kéo PDF bề mặt, bỏ file native/metadata → audit bác bỏ.</li>
 <li>Audit log/retention audit không bật hoặc không đủ quyền → không chứng minh được ai làm gì khi nào.</li>
 <li>Can thiệp thư viện lưu giữ hệ thống (Preservation Hold) → phá cơ chế lưu giữ của Microsoft 365.</li>
 </ol>
@@ -283,7 +283,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Trường “RecordID” dùng để chặn rủi ro nào?</li>
 <li>Khi thiếu Lot/Heat cho vật liệu CTQ, bộ phận nào kích hoạt HOLD và tại bước nào?</li>
 <li>Record versioning dùng để làm gì?</li>
-<li>thư viện lưu giữ hệ thống (Preservation Hold) là gì và hành động nào bị cấm?</li>
+<li>thư viện lưu giữ hệ thống (Preservation Hold) là gì và hành động nào phải chặn?</li>
 <li>Chọn đúng: Tier-2 mặc định giữ trong bao lâu theo bộ mẫu cấu hình (SSOT)? A. 1 năm B. 3 năm C. 5 năm D. 10 năm</li>
 <li>Trong 9 loại nội dungs, cái nào dùng cho outsource? A. Receiving IQC B. Outsource Evidence C. Operational Photo D. CMM Report</li>
 <li>Khi đóng NCR/CAPA, hồ sơ closure nằm loại nội dung nào và nhãn nào phải dán?</li>
@@ -300,7 +300,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  • 7: A,B • 8: Cột phải searchable/managed property ở tenant search schema <b>Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint).</b>
  • 9: Quyết định xóa/giữ cuối vòng đời có bằng chứng • 10: Final/Ship release • 11: Tránh lẫn hồ sơ/nhầm lô/nhầm revision
  • 12: Warehouse tại Receiving hoặc Supervisor tại cấp phát <b>Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint).</b> • 13: Giữ lịch sử record
- • 14: Thư viện hệ thống; cấm can thiệp thủ công • 15: C • 16: B • 17: NCR / CAPA Closure + LAM-T1-10Y-RECORD (khi trạng thái Closed)
+ • 14: Thư viện hệ thống; không can thiệp thủ công • 15: C • 16: B • 17: NCR / CAPA Closure + LAM-T1-10Y-RECORD (khi trạng thái Closed)
  • 18: QA • 19: QC + Supervisor • 20: JobNum + PartNum + RevisionNum (kèm RecordType/RecordID) • 21: LAM-T1-15Y-RECORD
  • 22: Metadata + checklist/bảng kê gói (manifest).
  </div>
@@ -421,4 +421,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
+
+
+
 

@@ -184,10 +184,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:160px">Mức</th><th>Ví dụ CNC job shop</th><th>Quy tắc lưu &amp; chia sẻ tối thiểu</th></tr></thead>
 <tbody>
-<tr><td><b>Public</b></td><td>Catalog năng lực, brochure</td><td>Cho phép chia sẻ; cấm đưa hồ sơ QMS/WO vào mức này</td></tr>
-<tr><td><b>Internal</b></td><td>SOP/WI nội bộ, biểu mẫu không chứa dữ liệu khách</td><td>Cấm share external khi chưa có phê duyệt</td></tr>
+<tr><td><b>Public</b></td><td>Catalog năng lực, brochure</td><td>Chỉ dùng cho catalog năng lực, brochure; PHẢI giữ hồ sơ QMS/WO ở mức phân loại cao hơn</td></tr>
+<tr><td><b>Internal</b></td><td>SOP/WI nội bộ, biểu mẫu không chứa dữ liệu khách</td><td>Chỉ share external khi đã có phê duyệt</td></tr>
 <tr><td><b>Customer-Confidential</b></td><td>Drawing/spec/model, dữ liệu đo, complaint, CoC theo yêu cầu khách</td><td>Chỉ share external qua gói minh chứng; link có expiry; chỉ đọc</td></tr>
-<tr><td><b>Restricted</b></td><td>CNC programs/post, pricing/margin, audit logs, HR/Finance nhạy cảm</td><td>Cấm share external; giới hạn nghiêm ngặt theo nhóm; DLP chặn xuất dữ liệu</td></tr>
+<tr><td><b>Restricted</b></td><td>CNC programs/post, pricing/margin, audit logs, HR/Finance nhạy cảm</td><td>PHẢI chặn share external; giới hạn nghiêm ngặt theo nhóm; DLP chặn xuất dữ liệu</td></tr>
 </tbody>
 </table>
 <div class="req"><span class="req-tag shall">PHẢI</span>
@@ -320,7 +320,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>4</td><td><b>Least privilege &amp; group-based</b>: cấp quyền qua nhóm; mọi thay đổi có log và thời hạn.</td><td>IT + Data Owner</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#DCR record">FRM-QMS-15</a> + cập nhật Access Matrix (<a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html">FRM-QMS-14</a>/<a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#edam">FRM-QMS-18</a>)</td><td>Mỗi thay đổi</td></tr>
 <tr><td>5</td><td><b>Quarterly Access Review</b>: rà soát quyền + guest expiry + gói minh chứng.</td><td>IT + QA/QMS</td><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-QMS-17</a> (gói minh chứng) + danh sách thu hồi</td><td>Hàng quý</td></tr>
 <tr><td>6</td><td><b>Records integrity</b>: records không chỉnh sửa; đính chính bằng file mới có lý do; retention label áp dụng.</td><td>QA/QMS</td><td>Phiên bản/retention + log đính chính</td><td>Mỗi record</td></tr>
-<tr><td>7</td><td><b>External sharing cổng chặn</b>: chỉ share qua gói minh chứng; link chỉ đọc có expiry; cấm share Restricted.</td><td>QA/QMS + Estimator (SAL-03)</td><td>Evidence pack link + FRM-QMS-15 + screenshot expiry</td><td>Mỗi lần share</td></tr>
+<tr><td>7</td><td><b>External sharing cổng chặn</b>: chỉ share qua gói minh chứng; link chỉ đọc có expiry; PHẢI chặn share Restricted.</td><td>QA/QMS + Estimator (SAL-03)</td><td>Evidence pack link + FRM-QMS-15 + screenshot expiry</td><td>Mỗi lần share</td></tr>
 <tr><td>8</td><td><b>Spot-check tuân thủ</b>: chọn mẫu WO/Lot kiểm tra vị trí lưu, tên file, quyền truy cập, khóa closeout.</td><td>QA/QMS</td><td>Biên bản spot-check + NCR/CAPA khi phát hiện</td><td>Hàng tháng</td></tr>
 </tbody>
 </table>
@@ -379,7 +379,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>7</td><td>Đối với inspection records: phát hành vào Records; khóa không sửa; đính chính bằng file mới có lý do.</td><td>QC/QA</td><td>DCR record/retention + log đính chính</td><td>Overwrite file để “đẹp số”</td></tr>
 <tr><td>8</td><td>Đối với supplier cert/CoC: lưu QMS-Records/Suppliers và gắn link vào Job Dossier/Material.</td><td>Purchasing/Warehouse</td><td>Link cert + dấu nhận hàng</td><td>Để cert trong email/scan rời không truy xuất</td></tr>
 <tr><td>9</td><td>Không bẻ quyền theo file; mọi thay đổi quyền qua FRM-QMS-15 và nhóm quyền.</td><td>IT + Data Owner</td><td>FRM-QMS-15 + nhóm quyền</td><td>Chia sẻ trực tiếp cho cá nhân, không thời hạn</td></tr>
-<tr><td>10</td><td>Chia sẻ external chỉ qua gói minh chứng chỉ đọc có expiry; cấm share Restricted.</td><td>QA + Estimator (SAL-03)</td><td>Link expiry + log share</td><td>Share cả thư viện hoặc folder WO</td></tr>
+<tr><td>10</td><td>Chia sẻ external chỉ qua gói minh chứng chỉ đọc có expiry; PHẢI chặn share Restricted.</td><td>QA + Estimator (SAL-03)</td><td>Link expiry + log share</td><td>Share cả thư viện hoặc folder WO</td></tr>
 <tr><td>11</td><td>Khi closeout WO/Lot: freeze WIP thành Records và khóa chỉ đọc/retention.</td><td>QA + Supervisor</td><td>Closeout checklist ký + trạng thái locked</td><td>Tiếp tục sửa hồ sơ sau giao hàng</td></tr>
 <tr><td>12</td><td>Thực hiện spot-check định kỳ: 01 WO/Lot/tuần theo lịch QMS.</td><td>QA/QMS</td><td>Biên bản spot-check + hành động</td><td>Kiểm tra “cho có” không có bằng chứng</td></tr>
 <tr><td>13</td><td>Thực hiện quarterly access review + thu hồi quyền trong ≤ 24h khi kết thúc audit/dự án.</td><td>IT + QA/QMS</td><td>FRM-QMS-17 + danh sách thu hồi</td><td>Guest access tồn tại vô hạn</td></tr>
@@ -446,7 +446,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>7. Share external đúng cổng chặn</b></td>
-<td>Chỉ share gói minh chứng chỉ đọc có expiry; ghi log FRM-QMS-15; cấm share Restricted.</td>
+<td>Chỉ share gói minh chứng chỉ đọc có expiry; ghi log FRM-QMS-15; PHẢI chặn share Restricted.</td>
 <td>Thu hồi được, đáp ứng NDA và audit.</td>
 </tr>
 <tr>
@@ -508,7 +508,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Kho “nguồn sự thật duy nhất” cho Released/Controlled Docs là kho nào?</li>
 <li>Mức phân loại nào áp dụng cho CNC programs/post/pricing/margin theo SOP-QMS-011?</li>
 <li>Khi file thuộc Customer-Confidential, hành vi chia sẻ external bắt buộc đi qua cơ chế nào?</li>
-<li>Điều cấm số 1 liên quan lưu trữ records là gì?</li>
+<li>Quy tắc bắt buộc số 1 liên quan lưu trữ records là gì?</li>
 <li>Ý nghĩa vận hành của “freeze WIP thành Record khi closeout” là gì?</li>
 <li>Khi phát hiện program không truy xuất được đường dẫn thư viện Restricted, hành động chặn lỗi tức thì là gì?</li>
 <li>Least privilege được thực thi bằng cách cấp quyền qua gì?</li>
@@ -665,7 +665,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3</td><td>Records chỉnh sửa/overwrite, không có lịch sử đính chính.</td><td>Mất non-repudiation.</td><td>Đính chính bằng file mới có lý do; giữ bản cũ; retention.</td></tr>
 <tr><td>4</td><td>Cấp quyền theo cá nhân; không có log thay đổi quyền.</td><td>Không kiểm soát least privilege.</td><td>Chỉ cấp qua group; mọi thay đổi ghi FRM-QMS-15.</td></tr>
 <tr><td>5</td><td>Guest/external access không có expiry hoặc không thu hồi sau audit.</td><td>Rủi ro rò rỉ kéo dài.</td><td>Evidence pack share có expiry; quarterly review + thu hồi ≤ 24h.</td></tr>
-<tr><td>6</td><td>Dữ liệu nhạy cảm (program/pricing) được chia sẻ hoặc lưu sai mức.</td><td>Vi phạm phân loại dữ liệu.</td><td>Cấm share Restricted; library Restricted giới hạn download; kiểm tra định kỳ.</td></tr>
+<tr><td>6</td><td>Dữ liệu nhạy cảm (program/pricing) được chia sẻ hoặc lưu sai mức.</td><td>Vi phạm phân loại dữ liệu.</td><td>PHẢI chặn share Restricted; library Restricted giới hạn download; kiểm tra định kỳ.</td></tr>
 <tr><td>7</td><td>Thiếu CoC/certs/traceability liên kết WO/Lot.</td><td>Không chứng minh nguồn gốc vật liệu.</td><td>Cổng chặn Receiving → Production: không phát vật tư khi thiếu cert đúng nơi.</td></tr>
 <tr><td>8</td><td>Không chứng minh quarterly access review (không có gói minh chứng).</td><td>Audit fail governance.</td><td>FRM-QMS-17 bắt buộc hàng quý; lưu trong QMS-Records/IT_Evidence.</td></tr>
 <tr><td>9</td><td>Chia sẻ external ngoài gói minh chứng (share cả folder/job dossier).</td><td>Phạm vi lộ dữ liệu vượt scope.</td><td>Fail-fast BLOCK; đào tạo lại bắt buộc; log incident.</td></tr>

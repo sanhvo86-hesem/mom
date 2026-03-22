@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -94,7 +94,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Wetted gas / chemical path</td><td>≤ 0.20 µm hoặc chặt hơn theo spec</td><td>≤ 1.0 µm</td><td>Bề mặt liên tục, không xước sâu, không pit mở, không cặn trong passage.</td><td>Smear do dao, burr mép lỗ, cặn cleaner, dấu tay sau passivation.</td></tr>
 <tr><td>Vacuum seal face / O-ring groove / mating face</td><td>Thông thường ≤ 0.40 µm; vùng knife-edge theo spec chặt hơn</td><td>≤ 1.6 µm</td><td>Không ding, dent, nick, scratch cắt seal; không bo tròn mép dao ở knife-edge.</td><td>Va đập sau gia công, xước khi vệ sinh, rework làm sai profile seal.</td></tr>
 <tr><td>Internal bore / concealed passage</td><td>≤ 0.40–0.80 µm theo chức năng và L/D</td><td>Theo spec hoặc baseline nội bộ</td><td>Không để phoi kéo, sludge, oxide, burr ẩn, dầu cắt giữ lại trong khoang.</td><td>Pocket sâu, lỗ giao nhau, ren trong, điểm đổi đường kính.</td></tr>
-<tr><td>External structural / non-critical outer face</td><td>≤ 1.6 µm hoặc theo finish gia công chuẩn</td><td>≤ 6.3 µm</td><td>Được phép có tool mark nhẹ nếu drawing không cấm, nhưng không được có xước sâu hoặc damage sau đóng gói.</td><td>Góc sắc, mép lộ, vùng tỳ trên khay hoặc carton.</td></tr>
+<tr><td>External structural / non-critical outer face</td><td>≤ 1.6 µm hoặc theo finish gia công chuẩn</td><td>≤ 6.3 µm</td><td>Được phép có tool mark nhẹ nếu drawing cho phép, nhưng không được có xước sâu hoặc damage sau đóng gói.</td><td>Góc sắc, mép lộ, vùng tỳ trên khay hoặc carton.</td></tr>
 </tbody></table></div>
 <div class="callout-warn"><strong>Rule rework</strong><br/>Sau bất kỳ rework nào tác động vào vùng seal, vùng wetted, vùng vacuum-side hoặc surface-critical, phải đánh giá lại <b>nhám bề mặt</b>, <b>tình trạng burr</b>, <b>độ kín</b> và <b>độ sạch</b> của vùng bị ảnh hưởng. Không được “sửa đẹp” rồi release lại mà không mở vòng đánh giá cần thiết.</div>
 </div>
@@ -102,7 +102,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>4. Leak class, outgassing và bằng chứng tối thiểu</h2>
 <div class="table-card"><table><thead><tr><th>Lớp ứng dụng</th><th>Chuẩn leak điển hình</th><th>Outgassing / cleanliness expectation</th><th>Bằng chứng tối thiểu</th></tr></thead><tbody>
 <tr><td>High vacuum chamber / seal critical</td><td>Đến mức 1×10⁻⁹ mbar·L/s khi customer spec yêu cầu</td><td>Ưu tiên bề mặt đã EP hoặc finish tương đương; clean handling chặt; packaging sạch.</td><td>Kết quả He leak test đúng method, record thiết bị, trạng thái after-clean/after-bake khi áp dụng, evidence bao gói.</td></tr>
-<tr><td>Gas delivery / manifold / high-purity line</td><td>Thường 1×10⁻⁸ mbar·L/s hoặc theo spec</td><td>Không chấp nhận cặn trong đường khí; processor cert và cleanliness evidence phải nối chuỗi.</td><td>Leak record + cert xử lý bề mặt + photo evidence vùng đóng gói.</td></tr>
+<tr><td>Gas delivery / manifold / high-purity line</td><td>Thường 1×10⁻⁸ mbar·L/s hoặc theo spec</td><td>Đường khí phải sạch, không có cặn; processor cert và cleanliness evidence phải nối chuỗi.</td><td>Leak record + cert xử lý bề mặt + photo evidence vùng đóng gói.</td></tr>
 <tr><td>General vacuum fitting / controlled enclosure</td><td>Thường 1×10⁻⁷ mbar·L/s hoặc theo spec</td><td>Không cho handling breach sau khi leak pass; mở túi phải theo reseal rule.</td><td>Leak record, traveler, ship-release reconciliation.</td></tr>
 <tr><td>Clean build / vacuum-compatible nhưng không có leak spec riêng</td><td>Theo spec assembly hoặc gate nội bộ</td><td>Ưu tiên quản lý contamination và handling; outgassing material review bắt buộc cho polymer/adhesive dùng trong vùng nhạy.</td><td>Evidence clean build, bagging, preservation, material compatibility review.</td></tr>
 </tbody></table></div>
@@ -111,7 +111,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>5. Ma trận vật liệu – ứng dụng – xử lý bề mặt</h2>
 <div class="table-card"><table><thead><tr><th>Vật liệu</th><th>Ứng dụng nên dùng</th><th>Ứng dụng phải tránh / cần điều kiện</th><th>Xử lý bề mặt ưu tiên</th><th>Ghi chú bắt buộc</th></tr></thead><tbody>
-<tr><td>SS316L / 316L VAR</td><td>Wetted, vacuum, corrosive nhẹ đến trung bình, clean service, manifold, fitting, chamber fittings</td><td>Không tự thay bằng 304/303 cho đường khí hoặc vùng ăn mòn nếu customer chưa chấp thuận</td><td>Passivation; EP khi yêu cầu high-purity / low outgassing</td><td>Phải truy vết heat/lot; cấm nhiễm sắt tự do; sau xử lý phải bảo vệ bề mặt khỏi cấn/xước.</td></tr>
+<tr><td>SS316L / 316L VAR</td><td>Wetted, vacuum, corrosive nhẹ đến trung bình, clean service, manifold, fitting, chamber fittings</td><td>Không tự thay bằng 304/303 cho đường khí hoặc vùng ăn mòn nếu customer chưa chấp thuận</td><td>Passivation; EP khi yêu cầu high-purity / low outgassing</td><td>Phải truy vết heat/lot; phải loại trừ nhiễm sắt tự do; sau xử lý phải bảo vệ bề mặt khỏi cấn/xước.</td></tr>
 <tr><td>304/304L</td><td>Structural, general clean assembly, một số part cơ khí không ăn mòn cao</td><td>Không ưu tiên cho wetted corrosive hoặc high-purity gas path nếu chưa review</td><td>Passivation khi spec yêu cầu</td><td>Không tự thay thế cho 316L ở vùng có rủi ro ăn mòn hoặc ion release.</td></tr>
 <tr><td>Al6061-T6 / 6082 / 7075 theo AML</td><td>Housing, plate, fixture, non-aggressive gas/vacuum part khi spec cho phép</td><td>Không dùng cho môi trường acid/base mạnh; với vacuum-sensitive job phải review coating, bake limit và cleanliness</td><td>Anodize Type II/III hoặc finish theo spec</td><td>Dễ xước và dễ giữ particle ở vết xước; cần separator phù hợp ngay sau finishing.</td></tr>
 <tr><td>Hastelloy C-276 / alloy đặc biệt</td><td>Môi trường ăn mòn cao, gas/chemical đặc biệt, customer overlay chặt</td><td>Không thay bằng SS nếu chưa có Engineering approval</td><td>Passivation; EP nếu spec yêu cầu</td><td>Giá cao, khó gia công, phải giữ trace rất chặt theo heat và processor.</td></tr>
@@ -126,15 +126,15 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Electropolish (EP)</td><td>High-purity, wetted, vacuum, cần giảm roughness và cải thiện cleanability</td><td>Bề mặt đồng đều; không pit, không orange peel, không burn, không smear; cert/lot trace đầy đủ; vùng chức năng đạt target Ra theo spec.</td><td>Color bất thường, patchy finish, pit mở, cert không đủ scope hoặc processor ngoài approved scope.</td></tr>
 <tr><td>Passivation</td><td>SS cần khử sắt tự do và nâng chống ăn mòn</td><td>Không stain, không đổi màu bất thường, không water-break fail khi yêu cầu, chứng cứ xử lý rõ lot/batch.</td><td>Rust flash, stain, trace batch đứt hoặc mismatch giữa cert và lot part.</td></tr>
 <tr><td>Anodize / hard anodize</td><td>Aluminum cần wear/corrosion protection hoặc isolation theo spec</td><td>Độ phủ đều, không nứt, không bong, không biến dạng làm ảnh hưởng tolerance chức năng.</td><td>Flaking, burn mark, scratch lộ nền, masking sai vùng hoặc thickness out-of-spec.</td></tr>
-<tr><td>PVD / coating đặc biệt</td><td>Surface functional theo customer/process spec</td><td>Adhesion đạt, vùng cấm coat được bảo vệ, cert + coupon + visual acceptance nối chuỗi.</td><td>Coating mẻ, patchy, overspray vùng cấm, thiếu cert/coupon.</td></tr>
+<tr><td>PVD / coating đặc biệt</td><td>Surface functional theo customer/process spec</td><td>Adhesion đạt, vùng phải bảo vệ khỏi coat được kiểm soát, cert + coupon + visual acceptance nối chuỗi.</td><td>Coating mẻ, patchy, overspray vào vùng phải tránh phủ, thiếu cert/coupon.</td></tr>
 </tbody></table></div>
 <p>Đối với special process outsource, cert chỉ là <b>điều kiện cần</b>. Điều kiện đủ là part thực tế sau nhận hàng phải qua visual, traceability và rule acceptance của HESEM trước khi chuyển bước.</p>
 </div>
 
-<div class="section"><h2>7. Bề mặt cấm, vật tư cấm và trạng thái không được release</h2>
+<div class="section"><h2>7. Bề mặt phải loại trừ, vật tư phải loại trừ và trạng thái không được release</h2>
 <div class="two-col">
 <div class="card">
-<h3>7.1 Bề mặt cấm đối với job vacuum / clean / high-purity</h3>
+<h3>7.1 Bề mặt phải loại trừ đối với job vacuum / clean / high-purity</h3>
 <ul class="tight">
 <li>Burr còn sót, đặc biệt ở giao lỗ, ren trong, groove seal và mép passage.</li>
 <li>Scratch xuyên hướng seal hoặc scratch sâu nhìn thấy rõ trên vùng mating/vacuum-side.</li>
@@ -144,10 +144,10 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </ul>
 </div>
 <div class="card">
-<h3>7.2 Vật tư / hành vi cấm</h3>
+<h3>7.2 Vật tư / hành vi phải loại trừ</h3>
 <ul class="tight">
 <li>Không dùng băng keo, giấy, xốp, mút hoặc vật liệu phát bụi chạm trực tiếp part vacuum/clean nếu chưa được duyệt.</li>
-<li>Không dùng vật tư có silicone, lưu huỳnh, dầu, grease hoặc VCI cho job customer cấm hoặc vùng vacuum-sensitive.</li>
+<li>Không dùng vật tư có silicone, lưu huỳnh, dầu, grease hoặc VCI cho job customer không cho phép hoặc vùng vacuum-sensitive.</li>
 <li>Không để part đã clean/pack tiếp xúc lại với bàn, khăn, găng, tray hoặc hộp bẩn.</li>
 <li>Không mở túi rồi đóng lại mà không thay seal/bằng chứng theo rule reseal.</li>
 </ul>
@@ -160,7 +160,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Không được làm</th></tr></thead><tbody>
 <tr><td>Rework vùng seal / surface critical</td><td>Đánh giá lại nhám, profile, leak risk và cleanliness; cập nhật evidence theo gate liên quan.</td><td>Không được đánh bóng chữa cháy rồi ship nếu chưa review lại ảnh hưởng chức năng.</td></tr>
 <tr><td>Part đã leak-pass nhưng bị mở túi / chạm tay / rơi / va chạm</td><td>Đánh giá lại clean-state, packaging state và khi cần phải retest leak hoặc re-clean/re-pack theo WI liên quan.</td><td>Không dùng lập luận “chỉ mở xem một chút” để bỏ qua re-evaluation.</td></tr>
-<tr><td>Part sau outsource surface treatment</td><td>Kiểm cert, lot trace, visual acceptance, vùng cấm coat và quy cách bao gói khi nhận về.</td><td>Không nhập kho/không chuyển bước chỉ dựa vào phiếu giao hàng.</td></tr>
+<tr><td>Part sau outsource surface treatment</td><td>Kiểm cert, lot trace, visual acceptance, vùng phải bảo vệ khỏi coat và quy cách bao gói khi nhận về.</td><td>Không nhập kho/không chuyển bước chỉ dựa vào phiếu giao hàng.</td></tr>
 <tr><td>Part vacuum-sensitive chờ giao</td><td>Áp dụng preservation window, seal status, label trạng thái và điều kiện lưu trữ theo ANNEX-WHS-001 / WI-714.</td><td>Không để tồn mở quá cửa sổ bảo quản mà không re-pack/re-verify.</td></tr>
 </tbody></table></div>
 </div>
@@ -194,3 +194,5 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
+
+

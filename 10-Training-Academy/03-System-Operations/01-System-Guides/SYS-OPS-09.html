@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="vi">
 <head>
@@ -148,7 +148,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Phân định “nguồn đúng” theo đối tượng</h3>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Đối tượng</th><th>Nguồn đúng</th><th>Nguồn thực thi/bằng chứng</th><th>Cấm làm</th></tr></thead>
+<thead><tr><th>Đối tượng</th><th>Nguồn đúng</th><th>Nguồn thực thi/bằng chứng</th><th>Phải tránh</th></tr></thead>
 <tbody>
 <tr><td>Job / Rev / Routing / Shipment / MES time entry</td><td>Epicor Kinetic</td><td>M365 chỉ hiển thị (mirror) + evidence link</td><td>Chỉnh tay list mirror</td></tr>
 <tr><td>Hold / NCR / CAPA / Packaging / ShipRelease / Approvals</td><td>M365 lists</td><td>Job Dossier (file), ApprovalHistory (log)</td><td>Phê duyệt bằng chat/miệng</td></tr>
@@ -293,7 +293,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>6</td><td>Kiểm tra ShipRelease pending/BLOCKED; chốt blocker trong ngày</td><td>WHS + QA</td><td>Danh sách BLOCKED + lý do</td><td>Đổi Status bằng tay</td></tr>
 <tr><td>7</td><td>Kiểm tra PackSSCCRegister: status Verified/Released đúng logic</td><td>WHS</td><td>Record PackSSCCRegister + scan evidence</td><td>Reprint không có reason</td></tr>
 <tr><td>8</td><td>Kiểm tra ApprovalHistory đủ cho Ship Release, NCR/CAPA closure</td><td>QA</td><td>ApprovalHistory lọc theo SourceList</td><td>Phê duyệt qua chat/miệng</td></tr>
-<tr><td>9</td><td>Kiểm tra naming evidence Tier 1 theo ANNEX-QMS-003</td><td>Doc Control</td><td>Danh sách file Tier 1 + tên file</td><td>Filename có dấu/ký tự cấm</td></tr>
+<tr><td>9</td><td>Kiểm tra naming evidence Tier 1 theo ANNEX-QMS-003</td><td>Doc Control</td><td>Danh sách file Tier 1 + tên file</td><td>Filename có dấu/ký tự không hợp lệ</td></tr>
 <tr><td>10</td><td>Kiểm tra dashboard refresh status (JobIndex/ShipRelease cadence)</td><td>IT</td><td>Refresh log + thời điểm gần nhất</td><td>Dashboard hiển thị “cũ” mà không báo</td></tr>
 <tr><td>11</td><td>Đóng triage: StandupActions Severity S1/S2 có owner + due date</td><td>Supervisor</td><td>StandupActions list</td><td>Không gán owner rõ</td></tr>
 <tr><td>12</td><td>Ghi nhận học viên OJT hoàn thành performance test</td><td>Trainer</td><td>Phiếu chấm + link evidence</td><td>Chấm “đạt” không có dấu vết</td></tr>
@@ -430,7 +430,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="mini">A. M365 Lists • B. Epicor Kinetic • C. Power BI • D. Excel</div>
 </li>
 <li><b>(MC)</b> Mirror (JobIndex/ShipmentMirror) cho phép chỉnh tay dữ liệu?
- <div class="mini">A. Cho phép • B. Cấm</div>
+ <div class="mini">A. Cho phép • B. Phải chặn</div>
 </li>
 <li><b>(MC)</b> “Delta + overlap” dùng mục tiêu gì?
  <div class="mini">A. Tăng trùng • B. Chống rơi record do lệch thời gian • C. Giảm audit • D. Đổi nguồn đúng</div>

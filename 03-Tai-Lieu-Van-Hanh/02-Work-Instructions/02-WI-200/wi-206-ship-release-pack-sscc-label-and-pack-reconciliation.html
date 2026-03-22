@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -110,7 +110,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table><thead><tr><th>Tình huống pack</th><th>Rule bắt buộc</th><th>Authority tối thiểu</th></tr></thead><tbody>
 <tr><td>Một line — một logistic unit</td><td>01 PackID / 01 SSCC / 01 bộ evidence</td><td>Warehouse/Shipping</td></tr>
 <tr><td>Một line — nhiều logistic unit</td><td>Mỗi kiện/pallet có SSCC riêng; outer-pack summary phải cộng đúng inner-pack</td><td>Warehouse/Shipping</td></tr>
-<tr><td>Partial shipment</td><td>Tách riêng qty giao kỳ này, qty còn lại, reason code và chứng từ áp dụng; cấm dùng nhãn của full shipment</td><td>Warehouse Manager + QA</td></tr>
+<tr><td>Partial shipment</td><td>Tách riêng qty giao kỳ này, qty còn lại, reason code và chứng từ áp dụng; không dùng nhãn của full shipment</td><td>Warehouse Manager + QA</td></tr>
 <tr><td>Repack sau khi đã dán nhãn</td><td>VOID nhãn cũ, tạo lại mapping inner ↔ outer ↔ pallet, chụp lại evidence, review lại pack completeness</td><td>Warehouse Manager + QA</td></tr>
 <tr><td>Customer overlay label hoặc thay Ship-to</td><td>Phải có xác nhận từ Sales/Customer Service và QA; không tự sửa tay trên nhãn</td><td>Sales/CS + QA + Warehouse</td></tr>
 </tbody></table></div></div>

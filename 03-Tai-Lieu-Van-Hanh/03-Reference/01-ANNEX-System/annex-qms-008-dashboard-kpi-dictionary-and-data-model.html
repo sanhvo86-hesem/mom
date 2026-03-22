@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -150,7 +150,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table><thead><tr><th>Ngữ cảnh dùng</th><th>Cut-off / refresh</th><th>Nguồn ưu tiên</th><th>Rule khi mismatch</th></tr></thead><tbody>
 <tr><td>T1 đầu ca</td><td>Chốt trước họp tối thiểu 15 phút</td><td>Epicor report / dashboard đã refresh</td><td>Dùng Epicor để quyết định, mở Data Issue, không chờ dashboard sửa xong</td></tr>
 <tr><td>T2/T3</td><td>Chốt theo lịch họp trong ANNEX-QMS-009</td><td>Dashboard + export SoR</td><td>Nếu số trend lệch SoR, issue owner phải giải trình ngay trong cuộc họp</td></tr>
-<tr><td>T4 / Management Review</td><td>Snapshot đã freeze theo tháng/quý</td><td>Release pack đã phê duyệt</td><td>Cấm sửa ngược số của kỳ đã freeze mà không có change record</td></tr>
+<tr><td>T4 / Management Review</td><td>Snapshot đã freeze theo tháng/quý</td><td>Release pack đã phê duyệt</td><td>Mọi sửa số của kỳ đã freeze phải đi qua change record</td></tr>
 <tr><td>Customer report</td><td>Theo kỳ khách hàng yêu cầu</td><td>Dataset release đã phê duyệt</td><td>Không gửi report ngoài release pack</td></tr>
 </tbody></table></div>
 <ul class="tight" style="padding-left:18px;">
@@ -186,7 +186,7 @@ ul.tight li {margin:4px 0;}
 <li>Đổi key drill-down hoặc dimension chuẩn</li>
 </ul></div>
 </div>
-<p>Cấm “sửa nhanh” dashboard trong giờ họp mà không có dấu vết. Thay đổi có thể được làm rất nhanh, nhưng phải có record, người duyệt và bản so sánh trước–sau.</p></div>
+<p>Mọi chỉnh sửa dashboard trong giờ họp phải có dấu vết rõ ràng. Thay đổi có thể được làm rất nhanh, nhưng phải có record, người duyệt và bản so sánh trước–sau.</p></div>
 
 
 <div class="section" id="a10"><h2>10. Dashboard pack, freeze-date và exception-note mapping</h2><div class="table-card"><table class="table"><colgroup><col style="width:22%"/><col style="width:30%"/><col style="width:24%"/><col style="width:24%"/></colgroup><thead><tr><th>Field / note mở rộng</th><th>Khi nào bắt buộc ghi</th><th>Ý nghĩa quản trị</th><th>Cross-link</th></tr></thead><tbody><tr><td>People dependency note</td><td>KPI chịu ảnh hưởng bởi skill, certification, authorization hoặc deputy gap.</td><td>Ngăn việc giải thích KPI sai theo hướng “thiếu người” chung chung.</td><td>ANNEX-HR-001, FRM-807, ANNEX-QMS-028</td></tr><tr><td>Carry-over action reference</td><td>KPI đỏ kéo dài qua kỳ hoặc chưa đóng containment.</td><td>Buộc pack nói rõ lịch sử quyết định và trạng thái hiệu lực.</td><td>FRM-911, CAPA / kaizen / action log</td></tr><tr><td>Comparability break flag</td><td>Đổi source, đổi logic, backfill, manual adjustment hoặc freeze-date reset.</td><td>Bảo vệ quyết định khỏi việc so sánh sai giữa các kỳ.</td><td>ANNEX-QMS-012, WI-901</td></tr></tbody></table></div>
@@ -215,3 +215,5 @@ ul.tight li {margin:4px 0;}
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
+
+

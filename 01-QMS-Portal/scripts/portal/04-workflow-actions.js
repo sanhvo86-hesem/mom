@@ -1609,6 +1609,7 @@ function loadDocContent(code){
         }catch(e){}
         // Sync language after injection, even for legacy docs that never loaded assets/app.js.
         try{ syncIframeDocumentLanguage(iframe, lang); }catch(e){}
+        try{ if(typeof attachIframeLinkBridge==='function') attachIframeLinkBridge(iframe, doc, viewFile); }catch(e){}
       }catch(e){}
       if(loading) loading.style.display='none';
       iframe.style.opacity='1';
