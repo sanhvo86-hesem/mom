@@ -491,7 +491,7 @@ function rgbToHex(rgb){
   return '#'+(1<<24|m[0]<<16|m[1]<<8|+m[2]).toString(16).slice(1);
 }
 
-// â”€â”€ Unsaved Changes Dialog â”€â”€
+// ── Unsaved Changes Dialog ──
 function showUnsavedDialog(editingCode, targetCode){
   try{ document.querySelectorAll('.unsaved-modal-overlay').forEach(el=>el.remove()); }catch(e){}
   const editDoc = DOCS.find(d=>d.code===editingCode);
@@ -610,7 +610,7 @@ async function saveDraftSilent(code){
   }
 }
 
-// â”€â”€ Collapsible Property Panel â”€â”€
+// ── Collapsible Property Panel ──
 let edPropsCollapsed = false;
 function edTogglePropsPanel(){
   edPropsCollapsed = !edPropsCollapsed;

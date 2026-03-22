@@ -966,7 +966,7 @@ async function openDoc(code){
   }
   if(!canAccessDoc(doc.code)) return;
 
-  // â”€â”€ Unsaved Changes Guard â”€â”€
+  // ── Unsaved Changes Guard ──
   if(editMode && editingDoc && editingDoc !== code){
     let hasUnsaved=true;
     try{
@@ -2669,7 +2669,7 @@ async function submitCreateDoc(cat){
       // Also refresh dashboard counters
       renderDashboard();
     }else{
-      showToast((res && res.error) ? ('âš  '+res.error) : (lang==='en'?'âš  Create failed':'âš  Tạo thất bại'));
+      showToast((res && res.error) ? ('⚠ '+res.error) : (lang==='en'?'⚠ Create failed':'⚠ Tạo thất bại'));
     }
   }catch(err){
     showToast('Error: '+(err && err.message ? err.message : err));
@@ -2996,9 +2996,9 @@ function handleDictSearch(q){
   renderDictBody();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────
 // DICTIONARY CRUD (Admin only)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────
 function openDictTermModal(term){
   if(!isAdmin()){
     showToast(lang==='en'?'Not permitted':'Không có quyền');
@@ -3049,7 +3049,7 @@ async function saveDictTerm(originalTerm){
   try{
     const res = await apiCall('dict_upsert',{term,vi,meaning,cat,def,ctx,rec,originalTerm});
     if(!(res && res.ok)){
-      showToast((res && res.error)?('âš  '+res.error):(lang==='en'?'âš  Save failed':'âš  Lưu thất bại'));
+      showToast((res && res.error)?('⚠ '+res.error):(lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
       return;
     }
     dictData = res.items || dictData;
@@ -3057,7 +3057,7 @@ async function saveDictTerm(originalTerm){
     renderDictBody();
     showToast(lang==='en'?'✓ Saved':'✓ Đã lưu');
   }catch(e){
-    showToast(lang==='en'?'âš  Save failed':'âš  Lưu thất bại');
+    showToast(lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại');
   }
 }
 
@@ -3067,14 +3067,14 @@ async function deleteDictTerm(term){
   try{
     const res = await apiCall('dict_delete',{term});
     if(!(res && res.ok)){
-      showToast((res && res.error)?('âš  '+res.error):(lang==='en'?'âš  Delete failed':'âš  Xóa thất bại'));
+      showToast((res && res.error)?('⚠ '+res.error):(lang==='en'?'⚠ Delete failed':'⚠ Xóa thất bại'));
       return;
     }
     dictData = res.items || dictData;
     renderDictBody();
     showToast(lang==='en'?'✓ Deleted':'✓ Đã xóa');
   }catch(e){
-    showToast(lang==='en'?'âš  Delete failed':'âš  Xóa thất bại');
+    showToast(lang==='en'?'⚠ Delete failed':'⚠ Xóa thất bại');
   }
 }
 
@@ -3183,16 +3183,16 @@ async function adminSaveAll(){
   try{
     const resRole = await saveRolePermsToServer();
     if(!(resRole && resRole.ok)){
-      showToast((resRole && resRole.error) ? ('âš  '+resRole.error) : (lang==='en'?'âš  Save failed':'âš  Lưu thất bại'));
+      showToast((resRole && resRole.error) ? ('⚠ '+resRole.error) : (lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
       return;
     }
     const resDocs = await saveDocVisibilityToServer();
     if(!(resDocs && resDocs.ok)){
-      showToast((resDocs && resDocs.error) ? ('âš  '+resDocs.error) : (lang==='en'?'âš  Save failed':'âš  Lưu thất bại'));
+      showToast((resDocs && resDocs.error) ? ('⚠ '+resDocs.error) : (lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
       return;
     }
   }catch(e){
-    showToast(lang==='en'?'âš  Save failed':'âš  Lưu thất bại');
+    showToast(lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại');
     return;
   }
 
@@ -3790,7 +3790,7 @@ async function saveUserFromModal(userId){
     const personal_email = String(document.getElementById('um-personal-email')?.value||'').trim();
 
     if(!username){
-      showToast(lang==='en'?'âš  Username is required':'âš  Username là bắt buộc');
+      showToast(lang==='en'?'⚠ Username is required':'⚠ Username là bắt buộc');
       return;
     }
     if(!name){
@@ -4624,7 +4624,7 @@ function renderAdminActivity(){
                 <span style="font-size:9px;padding:1px 6px;border-radius:6px;background:#e3f2fd;color:#1565c0">${escapeHtml(s.role||'')}</span>
                 <span style="font-size:10px;color:var(--text-2)">🕐 ${dateStr}</span>
               </div>
-              <button class="btn-admin secondary sm" onclick="this.parentElement.parentElement.querySelector('.al-detail').style.display=this.parentElement.parentElement.querySelector('.al-detail').style.display==='none'?'':'none';this.textContent=this.textContent.includes('â–¾')?'â–´ Thu gọn':'â–¾ Chi tiết'">
+              <button class="btn-admin secondary sm" onclick="this.parentElement.parentElement.querySelector('.al-detail').style.display=this.parentElement.parentElement.querySelector('.al-detail').style.display==='none'?'':'none';this.textContent=this.textContent.includes('▾')?'▴ Thu gọn':'▾ Chi tiết'">
                 ▾ ${lang==='en'?'Detail':'Chi tiết'}
               </button>
             </div>

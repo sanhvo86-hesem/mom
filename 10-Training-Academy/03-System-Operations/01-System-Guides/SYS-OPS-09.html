@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SYS-OPS-09 â€” Epicor Kinetic Integration Pack (BAQ â†’ REST â†’ M365 Replica) | HESEM OS</title>
+<title>SYS-OPS-09 — Epicor Kinetic Integration Pack (BAQ → REST → M365 Replica) | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
  .kpi{display:inline-block;padding:2px 8px;border-radius:999px;background:#f3f4f6;border:1px solid #e5e7eb;font-size:12px;margin-right:6px;}
@@ -13,7 +13,7 @@
  .warn{border-left:6px solid #b91c1c;background:#fff5f5;}
  .ok{border-left:6px solid #065f46;background:#f0fdf4;}
  
-/* â•â•â• PAGE BREAK & OVERFLOW FIX (auto-applied) â•â•â• */
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
 @media print {
  .card, .table-card, .callout, .note, .box, .iso-map,
  .preface-block, .jd-mission, .form-sheet, .lane,
@@ -55,19 +55,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>TÃ i liá»‡u kiá»ƒm soÃ¡t</span>
+    <span>Tài liệu kiểm soát</span>
   </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-09 â€” Epicor Kinetic Integration Pack (BAQ â†’ REST â†’ M365 Replica)</strong>
+  <strong>SYS-OPS-09 — Epicor Kinetic Integration Pack (BAQ → REST → M365 Replica)</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>MÃ£:</b></span><span>SYS-OPS-09</span></div>
-  <div class="row"><span><b>PhiÃªn báº£n:</b></span><span>V0</span></div>
-  <div class="row"><span><b>NgÃ y hiá»‡u lá»±c:</b></span><span>Theo quyáº¿t Ä‘á»‹nh ban hÃ nh</span></div>
-  <div class="row"><span><b>Chá»§ sá»Ÿ há»¯u:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>PhÃª duyá»‡t:</b></span><span>Tá»•ng GiÃ¡m Äá»‘c</span></div>
+  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-09</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
 </div>
 </div>
 
@@ -75,259 +75,259 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="doc-content" id="docContent">
 <div class="card">
 <div class="badge"><span class="dot"></span>SYS-OPS-09</div>
-<h1 style="margin-top:10px">TÃ­ch há»£p Epicor â†’ M365: Quy táº¯c váº­n hÃ nh, báº±ng chá»©ng vÃ  gate</h1>
+<h1 style="margin-top:10px">Tích hợp Epicor → M365: Quy tắc vận hành, bằng chứng và gate</h1>
 <p class="lead">
- Module nÃ y chuáº©n hoÃ¡ cÃ¡ch dÃ¹ng â€œbáº£n sao dá»¯ liá»‡uâ€ (Mirror) Ä‘á»ƒ váº­n hÃ nh tá»‘c Ä‘á»™ cao, giá»¯ Ä‘Ãºng Rev, giá»¯ Ä‘Ãºng gate, giá»¯ Ä‘Ãºng audit.
- Module Ã¡p dá»¥ng cho toÃ n bá»™ vai trÃ² váº­n hÃ nh vÃ¬ má»i quyáº¿t Ä‘á»‹nh giao tiáº¿p/quality/ship Ä‘á»u dá»±a trÃªn dá»¯ liá»‡u.
+ Module này chuẩn hoá cách dùng “bản sao dữ liệu” (Mirror) để vận hành tốc độ cao, giữ đúng Rev, giữ đúng gate, giữ đúng audit.
+ Module áp dụng cho toàn bộ vai trò vận hành vì mọi quyết định giao tiếp/quality/ship đều dựa trên dữ liệu.
  </p>
 <div class="callout warn">
-<h3>NguyÃªn táº¯c cá»©ng (khÃ´ng thÆ°Æ¡ng lÆ°á»£ng)</h3>
+<h3>Nguyên tắc cứng (không thương lượng)</h3>
 <ul>
-<li><b>Epicor Kinetic = nguá»“n Ä‘Ãºng (System of Record)</b> cho Job/Rev/Routing/Shipment/MES time entry.</li>
-<li><b>M365 = thá»±c thi + báº±ng chá»©ng</b> cho approvals, checklist, há»“ sÆ¡ (Evidence Pack) vÃ  log váº­n hÃ nh.</li>
-<li><b>Mirror trong M365 = chá»‰ Ä‘á»c</b> (JobIndex/JobOperIndex/LaborMirror/ShipmentMirror). KhÃ´ng chá»‰nh tay dá»¯ liá»‡u mirror.</li>
-<li><b>KhÃ´ng cÃ³ báº±ng chá»©ng = khÃ´ng cÃ³ gate.</b> Thiáº¿u MRR báº¯t buá»™c â†’ BLOCK (Ä‘áº·c biá»‡t gate phê duyệt giao hàng (ship release)).</li>
+<li><b>Epicor Kinetic = nguồn đúng (System of Record)</b> cho Job/Rev/Routing/Shipment/MES time entry.</li>
+<li><b>M365 = thực thi + bằng chứng</b> cho approvals, checklist, hồ sơ (Evidence Pack) và log vận hành.</li>
+<li><b>Mirror trong M365 = chỉ đọc</b> (JobIndex/JobOperIndex/LaborMirror/ShipmentMirror). Không chỉnh tay dữ liệu mirror.</li>
+<li><b>Không có bằng chứng = không có gate.</b> Thiếu MRR bắt buộc → BLOCK (đặc biệt gate phê duyệt giao hàng (ship release)).</li>
 </ul>
 </div>
 <div class="table-wrap" style="margin-top:12px">
 <table class="tight">
 <thead>
-<tr><th>Äá»c trÆ°á»›c (ná»™i bá»™)</th><th>Má»¥c Ä‘Ã­ch</th></tr>
+<tr><th>Đọc trước (nội bộ)</th><th>Mục đích</th></tr>
 </thead>
 <tbody>
-<tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-018-epicor-transaction-and-interface-map.html">ANNEX-QMS-018</a></td><td>NguyÃªn táº¯c tÃ­ch há»£p, BAQ tá»‘i thiá»ƒu, mapping, logs</td></tr>
+<tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-018-epicor-transaction-and-interface-map.html">ANNEX-QMS-018</a></td><td>Nguyên tắc tích hợp, BAQ tối thiểu, mapping, logs</td></tr>
 <tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-006-power-automate-flows-and-approvals-spec.html">ANNEX-QMS-006</a></td><td>Delta + overlap, idempotent, retry, observability</td></tr>
-<tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-005-m365-lists-and-field-mapping.html">ANNEX-QMS-005</a></td><td>Danh má»¥c list, khoÃ¡ tá»± nhiÃªn, URL báº±ng chá»©ng</td></tr>
-<tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-504-job-dossier-and-evidence-pack.html">ANNEX-QMS-003</a></td><td>Job Dossier, naming, retention tiers, audit drill 60 giÃ¢y</td></tr>
-<tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-505-gs1-sscc-shipping-data.html">ANNEX-QMS-007</a></td><td>SSCC/PackID vÃ  Ä‘á»‘i soÃ¡t Ä‘á»ƒ cháº·n ship sai/thiáº¿u</td></tr>
+<tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-005-m365-lists-and-field-mapping.html">ANNEX-QMS-005</a></td><td>Danh mục list, khoá tự nhiên, URL bằng chứng</td></tr>
+<tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-504-job-dossier-and-evidence-pack.html">ANNEX-QMS-003</a></td><td>Job Dossier, naming, retention tiers, audit drill 60 giây</td></tr>
+<tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-505-gs1-sscc-shipping-data.html">ANNEX-QMS-007</a></td><td>SSCC/PackID và đối soát để chặn ship sai/thiếu</td></tr>
 <tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-qms-008-dashboard-kpi-dictionary-and-data-model.html">ANNEX-QMS-008</a></td><td>KPI + data model + Data Health</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="card">
-<h2>1) Má»¥c tiÃªu, pháº¡m vi, Ä‘á»‘i tÆ°á»£ng há»c</h2>
+<h2>1) Mục tiêu, phạm vi, đối tượng học</h2>
 <ul>
-<li><b>Má»¥c tiÃªu:</b> váº­n hÃ nh Ä‘Ãºng â€œ1 nguá»“n Ä‘Ãºngâ€, cháº·n sai Rev, cháº·n ship thiáº¿u packet, giá»¯ truy váº¿t ISO 9001 (thÃ´ng tin dáº¡ng vÄƒn báº£n).</li>
-<li><b>Pháº¡m vi dá»¯ liá»‡u:</b> Job, Operation, Labor, Shipment, SSCC/Pack, Evidence links, ApprovalHistory, IntegrationLogs/Settings.</li>
-<li><b>Äá»‘i tÆ°á»£ng:</b> Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor.</li>
+<li><b>Mục tiêu:</b> vận hành đúng “1 nguồn đúng”, chặn sai Rev, chặn ship thiếu packet, giữ truy vết ISO 9001 (thông tin dạng văn bản).</li>
+<li><b>Phạm vi dữ liệu:</b> Job, Operation, Labor, Shipment, SSCC/Pack, Evidence links, ApprovalHistory, IntegrationLogs/Settings.</li>
+<li><b>Đối tượng:</b> Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor.</li>
 </ul>
 <div class="callout">
-<h3>Vai trÃ² dÃ¹ng module vÃ o viá»‡c gÃ¬</h3>
+<h3>Vai trò dùng module vào việc gì</h3>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Vai trÃ²</th><th>Quyáº¿t Ä‘á»‹nh dá»±a trÃªn dá»¯ liá»‡u</th><th>Dá»¯ liá»‡u/Ä‘iá»ƒm cháº¡m báº¯t buá»™c</th></tr></thead>
+<thead><tr><th>Vai trò</th><th>Quyết định dựa trên dữ liệu</th><th>Dữ liệu/điểm chạm bắt buộc</th></tr></thead>
 <tbody>
-<tr><td>Operator / Setup</td><td>Cháº¡y Ä‘Ãºng Job/Rev/Op, dá»«ng khi sai báº±ng chá»©ng</td><td>JobIndex, JobOperIndex, Job Dossier (má»Ÿ nhanh)</td></tr>
-<tr><td>Programmer</td><td>PhÃ¡t hÃ nh chÆ°Æ¡ng trÃ¬nh Ä‘Ãºng Rev, chá»‘ng nháº§m Rev</td><td>JobIndex.RevisionNum, Part/REV Master, Release record</td></tr>
-<tr><td>QC / QA</td><td>Hold/NCR/CAPA, xÃ¡c nháº­n PASS/FAIL, Ä‘Ã³ng há»“ sÆ¡</td><td>QCHoldLog, NCRLog, InspectionReports, ApprovalHistory</td></tr>
-<tr><td>Warehouse</td><td>ÄÃ³ng gÃ³i, in SSCC, gate phê duyệt giao hàng (ship release)</td><td>PackSSCCRegister, PackagingChecks, ShipRelease, ShipmentMirror</td></tr>
-<tr><td>Planner</td><td>Æ¯u tiÃªn WIP, OTD, giáº£i phÃ³ng ngháº½n</td><td>JobIndex.DueDate/Status, KPI dashboards</td></tr>
-<tr><td>Purchasing</td><td>Outsource/certs, trÃ¡nh thiáº¿u chá»©ng tá»«</td><td>OutsourceMirror, Job Dossier (certs)</td></tr>
-<tr><td>Maintenance</td><td>Downtime log chuáº©n Ä‘á»ƒ pháº£n Ã¡nh OEE</td><td>Downtime log (list liÃªn quan) IncidentLog (SharePoint List) + Teams: QMS-ALERT.</td></tr>
-<tr><td>EHS</td><td>HÃ nh Ä‘á»™ng an toÃ n vÃ o Tier board</td><td>StandupActions (Severity/SLA)</td></tr>
-<tr><td>Estimator (SAL-03)</td><td>Cam káº¿t giao hÃ ng dá»±a trÃªn gate</td><td>ShipRelease.Status, Gate_ShipReady, OTD</td></tr>
-<tr><td>Supervisor</td><td>Control tower: lá»—i sync, blocker, escalations</td><td>IntegrationLogs, StandupActions, Data Health</td></tr>
+<tr><td>Operator / Setup</td><td>Chạy đúng Job/Rev/Op, dừng khi sai bằng chứng</td><td>JobIndex, JobOperIndex, Job Dossier (mở nhanh)</td></tr>
+<tr><td>Programmer</td><td>Phát hành chương trình đúng Rev, chống nhầm Rev</td><td>JobIndex.RevisionNum, Part/REV Master, Release record</td></tr>
+<tr><td>QC / QA</td><td>Hold/NCR/CAPA, xác nhận PASS/FAIL, đóng hồ sơ</td><td>QCHoldLog, NCRLog, InspectionReports, ApprovalHistory</td></tr>
+<tr><td>Warehouse</td><td>Đóng gói, in SSCC, gate phê duyệt giao hàng (ship release)</td><td>PackSSCCRegister, PackagingChecks, ShipRelease, ShipmentMirror</td></tr>
+<tr><td>Planner</td><td>Ưu tiên WIP, OTD, giải phóng nghẽn</td><td>JobIndex.DueDate/Status, KPI dashboards</td></tr>
+<tr><td>Purchasing</td><td>Outsource/certs, tránh thiếu chứng từ</td><td>OutsourceMirror, Job Dossier (certs)</td></tr>
+<tr><td>Maintenance</td><td>Downtime log chuẩn để phản ánh OEE</td><td>Downtime log (list liên quan) IncidentLog (SharePoint List) + Teams: QMS-ALERT.</td></tr>
+<tr><td>EHS</td><td>Hành động an toàn vào Tier board</td><td>StandupActions (Severity/SLA)</td></tr>
+<tr><td>Estimator (SAL-03)</td><td>Cam kết giao hàng dựa trên gate</td><td>ShipRelease.Status, Gate_ShipReady, OTD</td></tr>
+<tr><td>Supervisor</td><td>Control tower: lỗi sync, blocker, escalations</td><td>IntegrationLogs, StandupActions, Data Health</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
 <div class="card">
-<h2>2) Vá»‹ trÃ­ trong chuá»—i endâ€‘toâ€‘end vÃ  Ä‘iá»ƒm bÃ n giao</h2>
-<p><b>Chuá»—i E2E (Ä‘iá»ƒm bÃ n giao):</b></p>
+<h2>2) Vị trí trong chuỗi end‑to‑end và điểm bàn giao</h2>
+<p><b>Chuỗi E2E (điểm bàn giao):</b></p>
 <ol>
-<li>Estimator (SAL-03) nháº­n PO â†’ táº¡o Order/Job trong Epicor.</li>
-<li>Planner táº¡o/Ä‘iá»u chá»‰nh routing, due date, release job.</li>
-<li>Integration Pack cháº¡y BAQ â†’ REST/OData â†’ upsert vÃ o M365 lists (Mirror) + táº¡o Job Dossier.</li>
-<li>OPS thá»±c thi (log Hold/NCR/Packaging/ShipRelease) trong M365, báº±ng chá»©ng lÆ°u vÃ o Job Dossier.</li>
-<li>Gate phê duyệt giao hàng (ship release) cháº¡y validator: PASS â†’ RELEASED, lá»—i â†’ BLOCKED + táº¡o StandupAction.</li>
-<li>Power BI Ä‘á»c lists Ä‘á»ƒ dashboard KPI + Data Health.</li>
+<li>Estimator (SAL-03) nhận PO → tạo Order/Job trong Epicor.</li>
+<li>Planner tạo/điều chỉnh routing, due date, release job.</li>
+<li>Integration Pack chạy BAQ → REST/OData → upsert vào M365 lists (Mirror) + tạo Job Dossier.</li>
+<li>OPS thực thi (log Hold/NCR/Packaging/ShipRelease) trong M365, bằng chứng lưu vào Job Dossier.</li>
+<li>Gate phê duyệt giao hàng (ship release) chạy validator: PASS → RELEASED, lỗi → BLOCKED + tạo StandupAction.</li>
+<li>Power BI đọc lists để dashboard KPI + Data Health.</li>
 </ol>
 <div class="callout ok">
-<h3>PhÃ¢n Ä‘á»‹nh â€œnguá»“n Ä‘Ãºngâ€ theo Ä‘á»‘i tÆ°á»£ng</h3>
+<h3>Phân định “nguồn đúng” theo đối tượng</h3>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Äá»‘i tÆ°á»£ng</th><th>Nguá»“n Ä‘Ãºng</th><th>Nguá»“n thá»±c thi/báº±ng chá»©ng</th><th>Pháº£i trÃ¡nh</th></tr></thead>
+<thead><tr><th>Đối tượng</th><th>Nguồn đúng</th><th>Nguồn thực thi/bằng chứng</th><th>Phải tránh</th></tr></thead>
 <tbody>
-<tr><td>Job / Rev / Routing / Shipment / MES time entry</td><td>Epicor Kinetic</td><td>M365 chá»‰ hiá»ƒn thá»‹ (mirror) + evidence link</td><td>Chá»‰nh tay list mirror</td></tr>
-<tr><td>Hold / NCR / CAPA / Packaging / ShipRelease / Approvals</td><td>M365 lists</td><td>Job Dossier (file), ApprovalHistory (log)</td><td>PhÃª duyá»‡t báº±ng chat/miá»‡ng</td></tr>
-<tr><td>Evidence files (IR/FAI/CMM/CoC/Cert/Photos/Ship packet)</td><td>SharePoint libraries</td><td>URL trong list + retention tier</td><td>NhÃ©t file vÃ o list</td></tr>
+<tr><td>Job / Rev / Routing / Shipment / MES time entry</td><td>Epicor Kinetic</td><td>M365 chỉ hiển thị (mirror) + evidence link</td><td>Chỉnh tay list mirror</td></tr>
+<tr><td>Hold / NCR / CAPA / Packaging / ShipRelease / Approvals</td><td>M365 lists</td><td>Job Dossier (file), ApprovalHistory (log)</td><td>Phê duyệt bằng chat/miệng</td></tr>
+<tr><td>Evidence files (IR/FAI/CMM/CoC/Cert/Photos/Ship packet)</td><td>SharePoint libraries</td><td>URL trong list + retention tier</td><td>Nhét file vào list</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
 <div class="card">
-<h2>3) Tá»« khoÃ¡ váº­n hÃ nh (cáº§n thuá»™c)</h2>
+<h2>3) Từ khoá vận hành (cần thuộc)</h2>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Thuáº­t ngá»¯</th><th>Äá»‹nh nghÄ©a váº­n hÃ nh</th><th>Äiá»ƒm lá»—i hay gáº·p</th></tr></thead>
+<thead><tr><th>Thuật ngữ</th><th>Định nghĩa vận hành</th><th>Điểm lỗi hay gặp</th></tr></thead>
 <tbody>
-<tr><td><b>BAQ</b></td><td>Business Activity Query trong Epicor; xuáº¥t dá»¯ liá»‡u theo táº­p chuáº©n (OpenJobs, Operations, Labor, Shipmentsâ€¦)</td><td>Thiáº¿u trÆ°á»ng khoÃ¡/LastUpdated</td></tr>
-<tr><td><b>OData / nextLink</b></td><td>REST/OData paging; khi cÃ³ <span class="mono">@odata.nextLink</span> thÃ¬ táº£i tiáº¿p trang káº¿</td><td>Bá» paging â†’ thiáº¿u dá»¯ liá»‡u</td></tr>
-<tr><td><b>Delta + overlap</b></td><td>Äá»c <span class="mono">LastUpdated â‰¥ cursor âˆ’ 5 phÃºt</span> Ä‘á»ƒ chá»‘ng miss do clock drift</td><td>KhÃ´ng overlap â†’ rÆ¡i record</td></tr>
-<tr><td><b>Watermark (cursor)</b></td><td>Thá»i Ä‘iá»ƒm Ä‘á»“ng bá»™ cuá»‘i; lÆ°u trong IntegrationSettings</td><td>Äáº©y cursor khi lá»—i â†’ máº¥t dá»¯ liá»‡u</td></tr>
-<tr><td><b>Idempotent upsert</b></td><td>Upsert theo khoÃ¡ tá»± nhiÃªn (EpicorKey/JobNum+OprSeqâ€¦); cháº¡y láº¡i cho ra cÃ¹ng káº¿t quáº£</td><td>KhoÃ¡ sai â†’ trÃ¹ng/ghi Ä‘Ã¨ nháº§m</td></tr>
-<tr><td><b>Throttling 429/503</b></td><td>SharePoint giá»›i háº¡n; cáº§n retry + backoff + batch</td><td>Retry dá»“n dáº­p â†’ fail dÃ¢y chuyá»n</td></tr>
-<tr><td><b>Audit trail</b></td><td>ApprovalHistory + Evidence link + IntegrationLogs</td><td>Thiáº¿u log â†’ khÃ´ng audit Ä‘Æ°á»£c</td></tr>
-<tr><td><b>MRR</b></td><td>Minimum Required Record: báº±ng chá»©ng tá»‘i thiá»ƒu Ä‘á»ƒ qua gate</td><td>ÄÃ­nh thiáº¿u/Ä‘Ã­nh sai folder</td></tr>
+<tr><td><b>BAQ</b></td><td>Business Activity Query trong Epicor; xuất dữ liệu theo tập chuẩn (OpenJobs, Operations, Labor, Shipments…)</td><td>Thiếu trường khoá/LastUpdated</td></tr>
+<tr><td><b>OData / nextLink</b></td><td>REST/OData paging; khi có <span class="mono">@odata.nextLink</span> thì tải tiếp trang kế</td><td>Bỏ paging → thiếu dữ liệu</td></tr>
+<tr><td><b>Delta + overlap</b></td><td>Đọc <span class="mono">LastUpdated ≥ cursor − 5 phút</span> để chống miss do clock drift</td><td>Không overlap → rơi record</td></tr>
+<tr><td><b>Watermark (cursor)</b></td><td>Thời điểm đồng bộ cuối; lưu trong IntegrationSettings</td><td>Đẩy cursor khi lỗi → mất dữ liệu</td></tr>
+<tr><td><b>Idempotent upsert</b></td><td>Upsert theo khoá tự nhiên (EpicorKey/JobNum+OprSeq…); chạy lại cho ra cùng kết quả</td><td>Khoá sai → trùng/ghi đè nhầm</td></tr>
+<tr><td><b>Throttling 429/503</b></td><td>SharePoint giới hạn; cần retry + backoff + batch</td><td>Retry dồn dập → fail dây chuyền</td></tr>
+<tr><td><b>Audit trail</b></td><td>ApprovalHistory + Evidence link + IntegrationLogs</td><td>Thiếu log → không audit được</td></tr>
+<tr><td><b>MRR</b></td><td>Minimum Required Record: bằng chứng tối thiểu để qua gate</td><td>Đính thiếu/đính sai folder</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="card">
-<h2>4) 10 Ä‘iá»ƒm tháº¥t báº¡i vÃ  cÃ¡ch cháº·n</h2>
-<p class="mini">Má»—i Ä‘iá»ƒm tháº¥t báº¡i cÃ³ â€œtÃ­n hiá»‡uâ€, â€œháº­u quáº£â€, â€œhÃ nh Ä‘á»™ng cháº·nâ€ vÃ  â€œbáº±ng chá»©ngâ€.</p>
+<h2>4) 10 điểm thất bại và cách chặn</h2>
+<p class="mini">Mỗi điểm thất bại có “tín hiệu”, “hậu quả”, “hành động chặn” và “bằng chứng”.</p>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>#</th><th>Äiá»ƒm tháº¥t báº¡i</th><th>TÃ­n hiá»‡u nháº­n biáº¿t</th><th>Háº­u quáº£</th><th>HÃ nh Ä‘á»™ng cháº·n</th><th>Báº±ng chá»©ng (MRR)</th></tr></thead>
+<thead><tr><th>#</th><th>Điểm thất bại</th><th>Tín hiệu nhận biết</th><th>Hậu quả</th><th>Hành động chặn</th><th>Bằng chứng (MRR)</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Mirror trá»… (stale)</td><td>JobIndex.EpicorLastSync quÃ¡ háº¡n [SLA]</td><td>Quyáº¿t Ä‘á»‹nh dá»±a dá»¯ liá»‡u cÅ©</td><td>Dá»ªNG dÃ¹ng mirror cho gate; má»Ÿ Epicor kiá»ƒm tra; táº¡o StandupAction S1</td><td>áº¢nh mÃ n hÃ¬nh Epicor + log StandupAction</td></tr>
-<tr><td>2</td><td>Bá» paging nextLink</td><td>Counts lá»‡ch giá»¯a Epicor vÃ  JobIndex</td><td>Thiáº¿u job/operation</td><td>Cháº·n cutover; cháº¡y láº¡i flow; ghi IntegrationLogs Warning/Failed</td><td>IntegrationLogs + sá»‘ liá»‡u Ä‘á»‘i soÃ¡t</td></tr>
-<tr><td>3</td><td>KhoÃ¡ tá»± nhiÃªn sai</td><td>TrÃ¹ng EpicorKey hoáº·c JobNum nhiá»u dÃ²ng</td><td>Dashboard sai, gate sai</td><td>KhoÃ¡ láº¡i theo schema; dá»n trÃ¹ng cÃ³ audit</td><td>BÃ¡o cÃ¡o Data Health (duplicates)</td></tr>
-<tr><td>4</td><td>Äáº©y watermark khi lá»—i</td><td>IntegrationLogs Failed nhÆ°ng IntegrationSettings cáº­p nháº­t</td><td>Máº¥t record vÄ©nh viá»…n</td><td>KhoÃ¡ quyá»n cáº­p nháº­t IntegrationSettings; Ä‘iá»u tra flow</td><td>IntegrationSettings history + IntegrationLogs</td></tr>
-<tr><td>5</td><td>Sai timezone/format ngÃ y</td><td>DueDate lá»‡ch 1 ngÃ y</td><td>Planner sai Æ°u tiÃªn</td><td>Chuáº©n hoÃ¡ UTC â†’ local; typed columns trong Power Query</td><td>Screenshot mapping + dataset refresh log</td></tr>
-<tr><td>6</td><td>Thiáº¿u EvidenceFolderUrl</td><td>JobIndex.EvidenceFolderUrl rá»—ng</td><td>Audit drill fail, thiáº¿u báº±ng chá»©ng</td><td>Cháº¡y láº¡i táº¡o Job Dossier (idempotent); khÃ³a gate liÃªn quan</td><td>Link folder + cáº¥u trÃºc folder Ä‘Ãºng</td></tr>
-<tr><td>7</td><td>Nháº§m Rev giá»¯a Job vÃ  Part/REV Master</td><td>JobIndex.RevisionNum khÃ¡c folder REV</td><td>Cháº¡y sai chÆ°Æ¡ng trÃ¬nh/drawing</td><td>Hold ngay; má»Ÿ QCHoldLog ReasonCode=WrongRev; kiá»ƒm tra Part/REV</td><td>QCHoldLog + áº£nh/Ä‘Æ°á»ng dáº«n file Rev Ä‘Ãºng</td></tr>
-<tr><td>8</td><td>Throttling SharePoint</td><td>Flow fail 429/503</td><td>Backlog, trá»… dá»¯ liá»‡u</td><td>Giáº£m batch; báº­t retry/backoff; giÃ£n lá»‹ch; ghi IntegrationLogs</td><td>IntegrationLogs + thÃ´ng sá»‘ retry/batch</td></tr>
-<tr><td>9</td><td>Thiáº¿u ApprovalHistory</td><td>Record Ä‘Ã³ng nhÆ°ng khÃ´ng cÃ³ ApprovalHistory</td><td>KhÃ´ng audit Ä‘Æ°á»£c phÃª duyá»‡t</td><td>Cháº·n Ä‘Ã³ng há»“ sÆ¡; cháº¡y láº¡i approval flow; Ä‘Ã o táº¡o láº¡i approver</td><td>ApprovalHistory + record URL</td></tr>
-<tr><td>10</td><td>bộ hồ sơ giao hàng (ship packet) thiáº¿u (gate lá»ng)</td><td>ShipRelease validator FAIL hoáº·c PacketComplete=No</td><td>Ship sai/thiáº¿u â†’ khiáº¿u náº¡i khÃ¡ch</td><td>BLOCKED + StandupAction S1; bá»• sung chá»©ng tá»«; re-validate</td><td>ShipRelease + folder ship packet + Final IR/CoC</td></tr>
+<tr><td>1</td><td>Mirror trễ (stale)</td><td>JobIndex.EpicorLastSync quá hạn [SLA]</td><td>Quyết định dựa dữ liệu cũ</td><td>DỪNG dùng mirror cho gate; mở Epicor kiểm tra; tạo StandupAction S1</td><td>Ảnh màn hình Epicor + log StandupAction</td></tr>
+<tr><td>2</td><td>Bỏ paging nextLink</td><td>Counts lệch giữa Epicor và JobIndex</td><td>Thiếu job/operation</td><td>Chặn cutover; chạy lại flow; ghi IntegrationLogs Warning/Failed</td><td>IntegrationLogs + số liệu đối soát</td></tr>
+<tr><td>3</td><td>Khoá tự nhiên sai</td><td>Trùng EpicorKey hoặc JobNum nhiều dòng</td><td>Dashboard sai, gate sai</td><td>Khoá lại theo schema; dọn trùng có audit</td><td>Báo cáo Data Health (duplicates)</td></tr>
+<tr><td>4</td><td>Đẩy watermark khi lỗi</td><td>IntegrationLogs Failed nhưng IntegrationSettings cập nhật</td><td>Mất record vĩnh viễn</td><td>Khoá quyền cập nhật IntegrationSettings; điều tra flow</td><td>IntegrationSettings history + IntegrationLogs</td></tr>
+<tr><td>5</td><td>Sai timezone/format ngày</td><td>DueDate lệch 1 ngày</td><td>Planner sai ưu tiên</td><td>Chuẩn hoá UTC → local; typed columns trong Power Query</td><td>Screenshot mapping + dataset refresh log</td></tr>
+<tr><td>6</td><td>Thiếu EvidenceFolderUrl</td><td>JobIndex.EvidenceFolderUrl rỗng</td><td>Audit drill fail, thiếu bằng chứng</td><td>Chạy lại tạo Job Dossier (idempotent); khóa gate liên quan</td><td>Link folder + cấu trúc folder đúng</td></tr>
+<tr><td>7</td><td>Nhầm Rev giữa Job và Part/REV Master</td><td>JobIndex.RevisionNum khác folder REV</td><td>Chạy sai chương trình/drawing</td><td>Hold ngay; mở QCHoldLog ReasonCode=WrongRev; kiểm tra Part/REV</td><td>QCHoldLog + ảnh/đường dẫn file Rev đúng</td></tr>
+<tr><td>8</td><td>Throttling SharePoint</td><td>Flow fail 429/503</td><td>Backlog, trễ dữ liệu</td><td>Giảm batch; bật retry/backoff; giãn lịch; ghi IntegrationLogs</td><td>IntegrationLogs + thông số retry/batch</td></tr>
+<tr><td>9</td><td>Thiếu ApprovalHistory</td><td>Record đóng nhưng không có ApprovalHistory</td><td>Không audit được phê duyệt</td><td>Chặn đóng hồ sơ; chạy lại approval flow; đào tạo lại approver</td><td>ApprovalHistory + record URL</td></tr>
+<tr><td>10</td><td>bộ hồ sơ giao hàng (ship packet) thiếu (gate lỏng)</td><td>ShipRelease validator FAIL hoặc PacketComplete=No</td><td>Ship sai/thiếu → khiếu nại khách</td><td>BLOCKED + StandupAction S1; bổ sung chứng từ; re-validate</td><td>ShipRelease + folder ship packet + Final IR/CoC</td></tr>
 </tbody>
 </table>
 </div>
-<p class="mini"><b>M365/SharePoint â†’ HESEM-QMS-SSOT</b> SLA cho â€œEpicorLastSync quÃ¡ háº¡nâ€ theo plant (vÃ­ dá»¥ 30 phÃºt), Ä‘á»“ng bá»™ vá»›i cadence flow.</p>
+<p class="mini"><b>M365/SharePoint → HESEM-QMS-SSOT</b> SLA cho “EpicorLastSync quá hạn” theo plant (ví dụ 30 phút), đồng bộ với cadence flow.</p>
 </div>
 <div class="card">
-<h2>5) Kiá»ƒm soÃ¡t rá»§i ro (6 kiá»ƒm soÃ¡t báº¯t buá»™c)</h2>
+<h2>5) Kiểm soát rủi ro (6 kiểm soát bắt buộc)</h2>
 <div class="grid-2">
 <div class="card">
 <h3>R1. Observability</h3>
-<p class="mini">Má»i flow ghi IntegrationLogs: RunId, FlowName, Start/End, counts, Status, ErrorSummary.</p>
+<p class="mini">Mọi flow ghi IntegrationLogs: RunId, FlowName, Start/End, counts, Status, ErrorSummary.</p>
 </div>
 <div class="card">
-<h3>R2. Cursor an toÃ n</h3>
-<p class="mini">IntegrationSettings cáº­p nháº­t sau khi run SUCCESS; run FAIL khÃ´ng cáº­p nháº­t.</p>
+<h3>R2. Cursor an toàn</h3>
+<p class="mini">IntegrationSettings cập nhật sau khi run SUCCESS; run FAIL không cập nhật.</p>
 </div>
 <div class="card">
-<h3>R3. KhoÃ¡ tá»± nhiÃªn + indexing</h3>
-<p class="mini">EpicorKey/JobNum+OprSeq/PackNumâ€¦ cÃ³ unique + index theo schema.</p>
+<h3>R3. Khoá tự nhiên + indexing</h3>
+<p class="mini">EpicorKey/JobNum+OprSeq/PackNum… có unique + index theo schema.</p>
 </div>
 <div class="card">
 <h3>R4. Data Health board</h3>
-<p class="mini">Theo dÃµi null keys, duplicates, latency, refresh failures; triage má»—i ngÃ y.</p>
+<p class="mini">Theo dõi null keys, duplicates, latency, refresh failures; triage mỗi ngày.</p>
 </div>
 <div class="card">
 <h3>R5. Gate Ship Release</h3>
-<p class="mini">Flow validator cháº·n ship; má»i ngoáº¡i lá»‡ báº¯t buá»™c cÃ³ ApprovalHistory.</p>
+<p class="mini">Flow validator chặn ship; mọi ngoại lệ bắt buộc có ApprovalHistory.</p>
 </div>
 <div class="card">
-<h3>R6. Evidence Pack chuáº©n</h3>
-<p class="mini">Job Dossier + naming + retention tier; link trong list, khÃ´ng nhÃ©t file vÃ o list.</p>
+<h3>R6. Evidence Pack chuẩn</h3>
+<p class="mini">Job Dossier + naming + retention tier; link trong list, không nhét file vào list.</p>
 </div>
 </div>
 </div>
 <div class="card">
-<h2>6) Failâ€‘fast rules (3 luáº­t dá»«ng ngay)</h2>
+<h2>6) Fail‑fast rules (3 luật dừng ngay)</h2>
 <div class="callout warn">
 <ol>
-<li><b>Khi EpicorLastSync quÃ¡ háº¡n</b> â†’ Dá»ªNG dÃ¹ng mirror cho quyáº¿t Ä‘á»‹nh gate/ship; má»Ÿ Epicor Ä‘á»ƒ xÃ¡c nháº­n; táº¡o StandupAction S1.</li>
-<li><b>Khi JobIndex.RevisionNum khÃ¡c Rev Ä‘ang thao tÃ¡c</b> â†’ Dá»ªNG sáº£n xuáº¥t/pack; táº¡o QCHoldLog; khÃ³a release chÆ°Æ¡ng trÃ¬nh.</li>
-<li><b>Khi ShipRelease validator bÃ¡o FAIL/BLOCKED</b> â†’ Dá»ªNG ship; khÃ´ng xuáº¥t kho; bá»• sung MRR Ä‘Ãºng folder; cháº¡y láº¡i validate.</li>
+<li><b>Khi EpicorLastSync quá hạn</b> → DỪNG dùng mirror cho quyết định gate/ship; mở Epicor để xác nhận; tạo StandupAction S1.</li>
+<li><b>Khi JobIndex.RevisionNum khác Rev đang thao tác</b> → DỪNG sản xuất/pack; tạo QCHoldLog; khóa release chương trình.</li>
+<li><b>Khi ShipRelease validator báo FAIL/BLOCKED</b> → DỪNG ship; không xuất kho; bổ sung MRR đúng folder; chạy lại validate.</li>
 </ol>
 </div>
-<p class="mini"><b>Luáº­t chung:</b> má»i â€œdá»«ngâ€ pháº£i Ä‘á»ƒ láº¡i dáº¥u váº¿t: Hold/NCR/StandupAction/IntegrationLogs.</p>
+<p class="mini"><b>Luật chung:</b> mọi “dừng” phải để lại dấu vết: Hold/NCR/StandupAction/IntegrationLogs.</p>
 </div>
 <div class="card">
-<h2>7) Pháº£n á»©ng 60 giÃ¢y (playbook táº¡i hiá»‡n trÆ°á»ng)</h2>
+<h2>7) Phản ứng 60 giây (playbook tại hiện trường)</h2>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>TÃ¬nh huá»‘ng</th><th>0â€“60 giÃ¢y pháº£i lÃ m</th><th>Ai lÃ m</th><th>Dáº¥u váº¿t báº¯t buá»™c</th></tr></thead>
+<thead><tr><th>Tình huống</th><th>0–60 giây phải làm</th><th>Ai làm</th><th>Dấu vết bắt buộc</th></tr></thead>
 <tbody>
 <tr>
-<td>Sai Rev nghi ngá»</td>
-<td>So JobNum/Rev trÃªn traveler â†” JobIndex; má»Ÿ Part/REV Master; dá»«ng mÃ¡y; gáº¯n tag HOLD</td>
+<td>Sai Rev nghi ngờ</td>
+<td>So JobNum/Rev trên traveler ↔ JobIndex; mở Part/REV Master; dừng máy; gắn tag HOLD</td>
 <td>Operator/Setup + QC</td>
-<td>QCHoldLog ReasonCode=WrongRev + áº£nh file Rev Ä‘Ãºng</td>
+<td>QCHoldLog ReasonCode=WrongRev + ảnh file Rev đúng</td>
 </tr>
 <tr>
-<td>Mirror trá»…</td>
-<td>Má»Ÿ IntegrationLogs xem status; kiá»ƒm tra Epicor trá»±c tiáº¿p; thÃ´ng bÃ¡o supervisor</td>
+<td>Mirror trễ</td>
+<td>Mở IntegrationLogs xem status; kiểm tra Epicor trực tiếp; thông báo supervisor</td>
 <td>Supervisor + IT</td>
 <td>IntegrationLogs + StandupAction S1</td>
 </tr>
 <tr>
-<td>Thiáº¿u EvidenceFolderUrl</td>
-<td>Má»Ÿ JobIndex; kÃ­ch hoáº¡t táº¡o Job Dossier; gáº¯n blocker trÃªn Tier</td>
+<td>Thiếu EvidenceFolderUrl</td>
+<td>Mở JobIndex; kích hoạt tạo Job Dossier; gắn blocker trên Tier</td>
 <td>Supervisor + IT</td>
-<td>Link folder + checklist cáº¥u trÃºc folder</td>
+<td>Link folder + checklist cấu trúc folder</td>
 </tr>
 <tr>
 <td>ShipRelease BLOCKED</td>
-<td>Má»Ÿ lÃ½ do thiáº¿u; táº£i lÃªn Final IR/CoC/áº£nh packing; re-validate</td>
+<td>Mở lý do thiếu; tải lên Final IR/CoC/ảnh packing; re-validate</td>
 <td>WHS + QA</td>
 <td>ShipRelease + folder ship packet + ApprovalHistory</td>
 </tr>
 <tr>
 <td>Throttling 429</td>
-<td>Dá»«ng cháº¡y láº¡i liÃªn tá»¥c; chuyá»ƒn sang retry/backoff; giáº£m batch; ghi log</td>
+<td>Dừng chạy lại liên tục; chuyển sang retry/backoff; giảm batch; ghi log</td>
 <td>IT</td>
-<td>IntegrationLogs Warning/Failed + cáº¥u hÃ¬nh retry/batch</td>
+<td>IntegrationLogs Warning/Failed + cấu hình retry/batch</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="card">
-<h2>8) Checklist váº­n hÃ nh chuáº©n (â‰¤ 15 bÆ°á»›c)</h2>
-<p class="mini">Checklist Ã¡p dá»¥ng cho ca trÆ°á»Ÿng/supervisor vÃ  ngÆ°á»i trá»±c IT/QMS.</p>
+<h2>8) Checklist vận hành chuẩn (≤ 15 bước)</h2>
+<p class="mini">Checklist áp dụng cho ca trưởng/supervisor và người trực IT/QMS.</p>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>#</th><th>BÆ°á»›c</th><th>Owner</th><th>Báº±ng chá»©ng (MRR)</th><th>Lá»—i hay gáº·p</th></tr></thead>
+<thead><tr><th>#</th><th>Bước</th><th>Owner</th><th>Bằng chứng (MRR)</th><th>Lỗi hay gặp</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Kiá»ƒm tra IntegrationLogs 3 flow mirror (jobs/ops/ship) tráº¡ng thÃ¡i SUCCESS/WARNING</td><td>Supervisor</td><td>áº¢nh mÃ n hÃ¬nh IntegrationLogs</td><td>Chá»‰ nhÃ¬n â€œflow run successâ€ mÃ  bá» ErrorSummary</td></tr>
-<tr><td>2</td><td>Kiá»ƒm tra IntegrationSettings watermark cáº­p nháº­t Ä‘Ãºng sau SUCCESS</td><td>IT</td><td>Record IntegrationSettings + timestamp</td><td>Cursor nháº£y khi run FAIL</td></tr>
-<tr><td>3</td><td>Kiá»ƒm tra Data Health: null keys/duplicates/latency</td><td>Supervisor</td><td>BÃ¡o cÃ¡o Data Health CNC-IMS-HUB â†’ QMS-Records â†’ Dash-Snapshots.</td><td>KhÃ´ng triage lá»—i láº·p</td></tr>
-<tr><td>4</td><td>Spot check 5 Job: JobIndex â†” Epicor (JobNum, Rev, DueDate, Status)</td><td>Planner</td><td>Danh sÃ¡ch spot check + áº£nh</td><td>So sai company/plant</td></tr>
-<tr><td>5</td><td>Kiá»ƒm tra Job Dossier táº¡o Ä‘á»§ folder template theo ANNEX-QMS-003</td><td>QA/QMS</td><td>Link folder + danh sÃ¡ch folder</td><td>Template lá»‡ch do flow cáº¥u hÃ¬nh khÃ¡c</td></tr>
-<tr><td>6</td><td>Kiá»ƒm tra ShipRelease pending/BLOCKED; chá»‘t blocker trong ngÃ y</td><td>WHS + QA</td><td>Danh sÃ¡ch BLOCKED + lÃ½ do</td><td>Äá»•i Status báº±ng tay</td></tr>
-<tr><td>7</td><td>Kiá»ƒm tra PackSSCCRegister: status Verified/Released Ä‘Ãºng logic</td><td>WHS</td><td>Record PackSSCCRegister + scan evidence</td><td>Reprint khÃ´ng cÃ³ reason</td></tr>
-<tr><td>8</td><td>Kiá»ƒm tra ApprovalHistory Ä‘á»§ cho phê duyệt giao hàng (ship release), NCR/CAPA closure</td><td>QA</td><td>ApprovalHistory lá»c theo SourceList</td><td>PhÃª duyá»‡t qua chat/miá»‡ng</td></tr>
-<tr><td>9</td><td>Kiá»ƒm tra naming evidence Tier 1 theo ANNEX-QMS-003</td><td>Doc Control</td><td>Danh sÃ¡ch file Tier 1 + tÃªn file</td><td>Filename cÃ³ dáº¥u/kÃ½ tá»± khÃ´ng há»£p lá»‡</td></tr>
-<tr><td>10</td><td>Kiá»ƒm tra dashboard refresh status (JobIndex/ShipRelease cadence)</td><td>IT</td><td>Refresh log + thá»i Ä‘iá»ƒm gáº§n nháº¥t</td><td>Dashboard hiá»ƒn thá»‹ â€œcÅ©â€ mÃ  khÃ´ng bÃ¡o</td></tr>
-<tr><td>11</td><td>ÄÃ³ng triage: StandupActions Severity S1/S2 cÃ³ owner + due date</td><td>Supervisor</td><td>StandupActions list</td><td>KhÃ´ng gÃ¡n owner rÃµ</td></tr>
-<tr><td>12</td><td>Ghi nháº­n há»c viÃªn OJT hoÃ n thÃ nh performance test</td><td>Trainer</td><td>Phiáº¿u cháº¥m + link evidence</td><td>Cháº¥m â€œÄ‘áº¡tâ€ khÃ´ng cÃ³ dáº¥u váº¿t</td></tr>
+<tr><td>1</td><td>Kiểm tra IntegrationLogs 3 flow mirror (jobs/ops/ship) trạng thái SUCCESS/WARNING</td><td>Supervisor</td><td>Ảnh màn hình IntegrationLogs</td><td>Chỉ nhìn “flow run success” mà bỏ ErrorSummary</td></tr>
+<tr><td>2</td><td>Kiểm tra IntegrationSettings watermark cập nhật đúng sau SUCCESS</td><td>IT</td><td>Record IntegrationSettings + timestamp</td><td>Cursor nhảy khi run FAIL</td></tr>
+<tr><td>3</td><td>Kiểm tra Data Health: null keys/duplicates/latency</td><td>Supervisor</td><td>Báo cáo Data Health CNC-IMS-HUB → QMS-Records → Dash-Snapshots.</td><td>Không triage lỗi lặp</td></tr>
+<tr><td>4</td><td>Spot check 5 Job: JobIndex ↔ Epicor (JobNum, Rev, DueDate, Status)</td><td>Planner</td><td>Danh sách spot check + ảnh</td><td>So sai company/plant</td></tr>
+<tr><td>5</td><td>Kiểm tra Job Dossier tạo đủ folder template theo ANNEX-QMS-003</td><td>QA/QMS</td><td>Link folder + danh sách folder</td><td>Template lệch do flow cấu hình khác</td></tr>
+<tr><td>6</td><td>Kiểm tra ShipRelease pending/BLOCKED; chốt blocker trong ngày</td><td>WHS + QA</td><td>Danh sách BLOCKED + lý do</td><td>Đổi Status bằng tay</td></tr>
+<tr><td>7</td><td>Kiểm tra PackSSCCRegister: status Verified/Released đúng logic</td><td>WHS</td><td>Record PackSSCCRegister + scan evidence</td><td>Reprint không có reason</td></tr>
+<tr><td>8</td><td>Kiểm tra ApprovalHistory đủ cho phê duyệt giao hàng (ship release), NCR/CAPA closure</td><td>QA</td><td>ApprovalHistory lọc theo SourceList</td><td>Phê duyệt qua chat/miệng</td></tr>
+<tr><td>9</td><td>Kiểm tra naming evidence Tier 1 theo ANNEX-QMS-003</td><td>Doc Control</td><td>Danh sách file Tier 1 + tên file</td><td>Filename có dấu/ký tự không hợp lệ</td></tr>
+<tr><td>10</td><td>Kiểm tra dashboard refresh status (JobIndex/ShipRelease cadence)</td><td>IT</td><td>Refresh log + thời điểm gần nhất</td><td>Dashboard hiển thị “cũ” mà không báo</td></tr>
+<tr><td>11</td><td>Đóng triage: StandupActions Severity S1/S2 có owner + due date</td><td>Supervisor</td><td>StandupActions list</td><td>Không gán owner rõ</td></tr>
+<tr><td>12</td><td>Ghi nhận học viên OJT hoàn thành performance test</td><td>Trainer</td><td>Phiếu chấm + link evidence</td><td>Chấm “đạt” không có dấu vết</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="card">
-<h2>9) OJT theo TWI Job Breakdown (báº¯t buá»™c)</h2>
-<p class="mini">OJT lÃ m trÃªn 01 job tháº­t hoáº·c job demo, theo Ä‘Ãºng gate vÃ  dáº¥u váº¿t.</p>
+<h2>9) OJT theo TWI Job Breakdown (bắt buộc)</h2>
+<p class="mini">OJT làm trên 01 job thật hoặc job demo, theo đúng gate và dấu vết.</p>
 <div class="card">
-<h3>Job 1: XÃ¡c minh Job/Rev + má»Ÿ Job Dossier trong 60 giÃ¢y</h3>
+<h3>Job 1: Xác minh Job/Rev + mở Job Dossier trong 60 giây</h3>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>BÆ°á»›c</th><th>Äiá»ƒm chÃ­nh (Key points)</th><th>LÃ½ do</th></tr></thead>
+<thead><tr><th>Bước</th><th>Điểm chính (Key points)</th><th>Lý do</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Má»Ÿ JobIndex báº±ng JobNum; Ä‘á»c PartNum + RevisionNum + DueDate</td><td>Cháº·n nháº§m job/nháº§m rev ngay tá»« Ä‘áº§u</td></tr>
-<tr><td>2</td><td>Má»Ÿ EvidenceFolderUrl; kiá»ƒm tra folder 04_Inspection-FAI vÃ  07_Shipping-Packing</td><td>Audit drill; gate dá»±a báº±ng chá»©ng</td></tr>
-<tr><td>3</td><td>Má»Ÿ Part/REV Master link; Ä‘á»‘i chiáº¿u file DWG/CAM Ä‘Ãºng REV</td><td>Cháº·n cháº¡y sai chÆ°Æ¡ng trÃ¬nh/drawing</td></tr>
-<tr><td>4</td><td>Ghi nháº­n káº¿t quáº£ vÃ o checklist ca (PASS/FAIL)</td><td>Giá»¯ dáº¥u váº¿t kiá»ƒm soÃ¡t</td></tr>
+<tr><td>1</td><td>Mở JobIndex bằng JobNum; đọc PartNum + RevisionNum + DueDate</td><td>Chặn nhầm job/nhầm rev ngay từ đầu</td></tr>
+<tr><td>2</td><td>Mở EvidenceFolderUrl; kiểm tra folder 04_Inspection-FAI và 07_Shipping-Packing</td><td>Audit drill; gate dựa bằng chứng</td></tr>
+<tr><td>3</td><td>Mở Part/REV Master link; đối chiếu file DWG/CAM đúng REV</td><td>Chặn chạy sai chương trình/drawing</td></tr>
+<tr><td>4</td><td>Ghi nhận kết quả vào checklist ca (PASS/FAIL)</td><td>Giữ dấu vết kiểm soát</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="card">
-<h3>Job 2: Xá»­ lÃ½ â€œsai Rev nghi ngá»â€ trong 60 giÃ¢y</h3>
+<h3>Job 2: Xử lý “sai Rev nghi ngờ” trong 60 giây</h3>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>BÆ°á»›c</th><th>Äiá»ƒm chÃ­nh (Key points)</th><th>LÃ½ do</th></tr></thead>
+<thead><tr><th>Bước</th><th>Điểm chính (Key points)</th><th>Lý do</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Dá»«ng thao tÃ¡c; gáº¯n tag HOLD vÃ o lÃ´/chi tiáº¿t</td><td>Cháº·n sai há»ng lan rá»™ng</td></tr>
-<tr><td>2</td><td>Táº¡o QCHoldLog: JobNum, ReasonCode, Containment, Severity</td><td>dấu vết kiểm toán (audit trail) + SLA xá»­ lÃ½</td></tr>
-<tr><td>3</td><td>ÄÃ­nh báº±ng chá»©ng: áº£nh traveler + link file Rev Ä‘Ãºng</td><td>Giáº£m tranh luáº­n, tÄƒng tá»‘c quyáº¿t Ä‘á»‹nh</td></tr>
-<tr><td>4</td><td>ThÃ´ng bÃ¡o supervisor; cáº­p nháº­t StandupAction khi Severity CTQ</td><td>Æ¯u tiÃªn xá»­ lÃ½ theo Tier</td></tr>
+<tr><td>1</td><td>Dừng thao tác; gắn tag HOLD vào lô/chi tiết</td><td>Chặn sai hỏng lan rộng</td></tr>
+<tr><td>2</td><td>Tạo QCHoldLog: JobNum, ReasonCode, Containment, Severity</td><td>dấu vết kiểm toán (audit trail) + SLA xử lý</td></tr>
+<tr><td>3</td><td>Đính bằng chứng: ảnh traveler + link file Rev đúng</td><td>Giảm tranh luận, tăng tốc quyết định</td></tr>
+<tr><td>4</td><td>Thông báo supervisor; cập nhật StandupAction khi Severity CTQ</td><td>Ưu tiên xử lý theo Tier</td></tr>
 </tbody>
 </table>
 </div>
@@ -336,178 +336,178 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Job 3: Gate Ship Release (WHS/QA)</h3>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>BÆ°á»›c</th><th>Äiá»ƒm chÃ­nh (Key points)</th><th>LÃ½ do</th></tr></thead>
+<thead><tr><th>Bước</th><th>Điểm chính (Key points)</th><th>Lý do</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>XÃ¡c nháº­n PackID/SSCC trong PackSSCCRegister tráº¡ng thÃ¡i Verified</td><td>Cháº·n nháº§m nhÃ£n/nháº§m pack</td></tr>
-<tr><td>2</td><td>XÃ¡c nháº­n PackagingChecks PASS + cÃ³ PhotosUrl</td><td>Chá»©ng minh Ä‘Ã³ng gÃ³i Ä‘Ãºng</td></tr>
-<tr><td>3</td><td>XÃ¡c nháº­n Final IR/FAI PASS cÃ³ ReportUrl trong InspectionReports</td><td>Cháº·n ship thiáº¿u kiá»ƒm tra</td></tr>
-<tr><td>4</td><td>Táº¡o/ cáº­p nháº­t ShipRelease: PacketComplete=Yes; cháº¡y validator</td><td>Gate tá»± Ä‘á»™ng; giáº£m sai sÃ³t thá»§ cÃ´ng</td></tr>
-<tr><td>5</td><td>Äáº£m báº£o ApprovalHistory cÃ³ quyáº¿t Ä‘á»‹nh phÃª duyá»‡t</td><td>Audit báº¯t buá»™c</td></tr>
+<tr><td>1</td><td>Xác nhận PackID/SSCC trong PackSSCCRegister trạng thái Verified</td><td>Chặn nhầm nhãn/nhầm pack</td></tr>
+<tr><td>2</td><td>Xác nhận PackagingChecks PASS + có PhotosUrl</td><td>Chứng minh đóng gói đúng</td></tr>
+<tr><td>3</td><td>Xác nhận Final IR/FAI PASS có ReportUrl trong InspectionReports</td><td>Chặn ship thiếu kiểm tra</td></tr>
+<tr><td>4</td><td>Tạo/ cập nhật ShipRelease: PacketComplete=Yes; chạy validator</td><td>Gate tự động; giảm sai sót thủ công</td></tr>
+<tr><td>5</td><td>Đảm bảo ApprovalHistory có quyết định phê duyệt</td><td>Audit bắt buộc</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
 <div class="card">
-<h2>10) Output chuáº©n theo level (L1â€“L4)</h2>
+<h2>10) Output chuẩn theo level (L1–L4)</h2>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Level</th><th>NÄƒng lá»±c quan sÃ¡t Ä‘Æ°á»£c</th><th>Output báº¯t buá»™c</th><th>Chá»‰ sá»‘</th></tr></thead>
+<thead><tr><th>Level</th><th>Năng lực quan sát được</th><th>Output bắt buộc</th><th>Chỉ số</th></tr></thead>
 <tbody>
 <tr>
 <td><b>L1</b></td>
-<td>Äá»c Ä‘Ãºng â€œnguá»“n Ä‘Ãºngâ€; má»Ÿ Ä‘Æ°á»£c JobIndex vÃ  Job Dossier; hiá»ƒu Failâ€‘fast rules</td>
-<td>HoÃ n thÃ nh Job 1 OJT</td>
-<td><span class="kpi">Audit drill â‰¤ 60s</span></td>
+<td>Đọc đúng “nguồn đúng”; mở được JobIndex và Job Dossier; hiểu Fail‑fast rules</td>
+<td>Hoàn thành Job 1 OJT</td>
+<td><span class="kpi">Audit drill ≤ 60s</span></td>
 </tr>
 <tr>
 <td><b>L2</b></td>
-<td>Táº¡o Ä‘Æ°á»£c log Ä‘Ãºng list (Hold/NCR/Packaging/ShipRelease); Ä‘Ã­nh Ä‘Ãºng báº±ng chá»©ng</td>
-<td>HoÃ n thÃ nh Job 2 hoáº·c Job 3 OJT</td>
-<td><span class="kpi">0 lá»—i naming Tier 1</span> <span class="kpi">0 bypass gate</span></td>
+<td>Tạo được log đúng list (Hold/NCR/Packaging/ShipRelease); đính đúng bằng chứng</td>
+<td>Hoàn thành Job 2 hoặc Job 3 OJT</td>
+<td><span class="kpi">0 lỗi naming Tier 1</span> <span class="kpi">0 bypass gate</span></td>
 </tr>
 <tr>
 <td><b>L3</b></td>
-<td>Triaging Ä‘Æ°á»£c lá»—i dá»¯ liá»‡u: stale/duplicates/latency; Ä‘iá»u phá»‘i StandupActions</td>
-<td>BÃ¡o cÃ¡o triage 01 ca + giáº£i quyáº¿t 01 blocker</td>
-<td><span class="kpi">Backlog = 0</span> <span class="kpi">ShipRelease BLOCKED xá»­ lÃ½ trong SLA</span></td>
+<td>Triaging được lỗi dữ liệu: stale/duplicates/latency; điều phối StandupActions</td>
+<td>Báo cáo triage 01 ca + giải quyết 01 blocker</td>
+<td><span class="kpi">Backlog = 0</span> <span class="kpi">ShipRelease BLOCKED xử lý trong SLA</span></td>
 </tr>
 <tr>
 <td><b>L4</b></td>
-<td>Chá»§ trÃ¬ control tower: chuáº©n hoÃ¡ schema/flow, kiá»ƒm soÃ¡t thay Ä‘á»•i, phÃ²ng ngá»«a tÃ¡i phÃ¡t</td>
-<td>RC/Corrective action cho 01 sá»± cá»‘ tÃ­ch há»£p</td>
+<td>Chủ trì control tower: chuẩn hoá schema/flow, kiểm soát thay đổi, phòng ngừa tái phát</td>
+<td>RC/Corrective action cho 01 sự cố tích hợp</td>
 <td><span class="kpi">Error rate &lt; 0.5%</span> <span class="kpi">Latency trong SLA</span></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p class="mini"><b>M365/SharePoint â†’ HESEM-QMS-SSOT</b> SLA cá»¥ thá»ƒ cho â€œBLOCKED xá»­ lÃ½ trong SLAâ€ theo ANNEX liÃªn quan (SLA Tier/Approvals).</p>
+<p class="mini"><b>M365/SharePoint → HESEM-QMS-SSOT</b> SLA cụ thể cho “BLOCKED xử lý trong SLA” theo ANNEX liên quan (SLA Tier/Approvals).</p>
 </div>
 <div class="card">
-<h2>11) Rubric Ä‘Ã¡nh giÃ¡ (L1â€“L4) theo hÃ nh vi</h2>
+<h2>11) Rubric đánh giá (L1–L4) theo hành vi</h2>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>TiÃªu chÃ­</th><th>L1</th><th>L2</th><th>L3</th><th>L4</th></tr></thead>
+<thead><tr><th>Tiêu chí</th><th>L1</th><th>L2</th><th>L3</th><th>L4</th></tr></thead>
 <tbody>
 <tr>
-<td>ÄÃºng nguá»“n Ä‘Ãºng</td>
-<td>Nháº¯c láº¡i Ä‘Ãºng 3 nguyÃªn táº¯c cá»©ng</td>
-<td>Ãp dá»¥ng Ä‘Ãºng trong thao tÃ¡c</td>
-<td>PhÃ¡t hiá»‡n vÃ  cháº·n sai nguá»“n</td>
-<td>Thiáº¿t káº¿ cÆ¡ cháº¿ cháº·n sai nguá»“n</td>
+<td>Đúng nguồn đúng</td>
+<td>Nhắc lại đúng 3 nguyên tắc cứng</td>
+<td>Áp dụng đúng trong thao tác</td>
+<td>Phát hiện và chặn sai nguồn</td>
+<td>Thiết kế cơ chế chặn sai nguồn</td>
 </tr>
 <tr>
-<td>Dáº¥u váº¿t (audit)</td>
-<td>Má»Ÿ Ä‘Æ°á»£c EvidenceFolderUrl</td>
-<td>Táº¡o record + link Ä‘Ãºng</td>
-<td>Kiá»ƒm tra chÃ©o ApprovalHistory/ShipRelease</td>
-<td>Chuáº©n hoÃ¡ retention/naming vÃ  kiá»ƒm soÃ¡t thay Ä‘á»•i</td>
+<td>Dấu vết (audit)</td>
+<td>Mở được EvidenceFolderUrl</td>
+<td>Tạo record + link đúng</td>
+<td>Kiểm tra chéo ApprovalHistory/ShipRelease</td>
+<td>Chuẩn hoá retention/naming và kiểm soát thay đổi</td>
 </tr>
 <tr>
 <td>Gate discipline</td>
-<td>KhÃ´ng vÆ°á»£t gate</td>
-<td>Thá»±c thi gate theo checklist</td>
+<td>Không vượt gate</td>
+<td>Thực thi gate theo checklist</td>
 <td>Triaging blocker theo severity</td>
-<td>Giáº£m blocker báº±ng phÃ²ng ngá»«a há»‡ thá»‘ng</td>
+<td>Giảm blocker bằng phòng ngừa hệ thống</td>
 </tr>
 <tr>
-<td>Pháº£n á»©ng 60 giÃ¢y</td>
-<td>Thá»±c hiá»‡n Ä‘Ãºng 1 playbook</td>
-<td>Thá»±c hiá»‡n Ä‘Ãºng 2 playbook</td>
-<td>Äiá»u phá»‘i triage + StandupAction</td>
-<td>Äá»‹nh nghÄ©a láº¡i playbook theo dá»¯ liá»‡u thá»±c táº¿</td>
+<td>Phản ứng 60 giây</td>
+<td>Thực hiện đúng 1 playbook</td>
+<td>Thực hiện đúng 2 playbook</td>
+<td>Điều phối triage + StandupAction</td>
+<td>Định nghĩa lại playbook theo dữ liệu thực tế</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="card">
-<h2>12) BÃ i kiá»ƒm tra (quiz â‰¥ 20 cÃ¢u) + 3 ká»‹ch báº£n tÃ¬nh huá»‘ng</h2>
+<h2>12) Bài kiểm tra (quiz ≥ 20 câu) + 3 kịch bản tình huống</h2>
 <div class="card">
-<h3>Quiz (20 cÃ¢u)</h3>
+<h3>Quiz (20 câu)</h3>
 <ol>
-<li><b>(MC)</b> Nguá»“n Ä‘Ãºng cho Job/Rev/Routing lÃ  há»‡ thá»‘ng nÃ o?
- <div class="mini">A. M365 Lists â€¢ B. Epicor Kinetic â€¢ C. Power BI â€¢ D. Excel</div>
+<li><b>(MC)</b> Nguồn đúng cho Job/Rev/Routing là hệ thống nào?
+ <div class="mini">A. M365 Lists • B. Epicor Kinetic • C. Power BI • D. Excel</div>
 </li>
-<li><b>(MC)</b> Mirror (JobIndex/ShipmentMirror) cho phÃ©p chá»‰nh tay dá»¯ liá»‡u?
- <div class="mini">A. Cho phÃ©p â€¢ B. Pháº£i cháº·n</div>
+<li><b>(MC)</b> Mirror (JobIndex/ShipmentMirror) cho phép chỉnh tay dữ liệu?
+ <div class="mini">A. Cho phép • B. Phải chặn</div>
 </li>
-<li><b>(MC)</b> â€œDelta + overlapâ€ dÃ¹ng má»¥c tiÃªu gÃ¬?
- <div class="mini">A. TÄƒng trÃ¹ng â€¢ B. Chá»‘ng rÆ¡i record do lá»‡ch thá»i gian â€¢ C. Giáº£m audit â€¢ D. Äá»•i nguá»“n Ä‘Ãºng</div>
+<li><b>(MC)</b> “Delta + overlap” dùng mục tiêu gì?
+ <div class="mini">A. Tăng trùng • B. Chống rơi record do lệch thời gian • C. Giảm audit • D. Đổi nguồn đúng</div>
 </li>
-<li><b>(MC)</b> Khi cÃ³ <span class="mono">@odata.nextLink</span> trong response, hÃ nh Ä‘á»™ng Ä‘Ãºng lÃ  gÃ¬?
- <div class="mini">A. Bá» qua â€¢ B. Táº£i tiáº¿p trang káº¿ â€¢ C. Reset cursor â€¢ D. XoÃ¡ list</div>
+<li><b>(MC)</b> Khi có <span class="mono">@odata.nextLink</span> trong response, hành động đúng là gì?
+ <div class="mini">A. Bỏ qua • B. Tải tiếp trang kế • C. Reset cursor • D. Xoá list</div>
 </li>
-<li><b>(MC)</b> Watermark (cursor) lÆ°u á»Ÿ Ä‘Ã¢u?
- <div class="mini">A. IntegrationSettings â€¢ B. ApprovalHistory â€¢ C. Job Dossier â€¢ D. ShipRelease</div>
+<li><b>(MC)</b> Watermark (cursor) lưu ở đâu?
+ <div class="mini">A. IntegrationSettings • B. ApprovalHistory • C. Job Dossier • D. ShipRelease</div>
 </li>
-<li><b>(MC)</b> Upsert idempotent dá»±a trÃªn gÃ¬?
- <div class="mini">A. TiÃªu Ä‘á» file â€¢ B. KhoÃ¡ tá»± nhiÃªn (EpicorKey/JobNum+OprSeqâ€¦) â€¢ C. MÃ u dashboard â€¢ D. NgÆ°á»i nháº­p</div>
+<li><b>(MC)</b> Upsert idempotent dựa trên gì?
+ <div class="mini">A. Tiêu đề file • B. Khoá tự nhiên (EpicorKey/JobNum+OprSeq…) • C. Màu dashboard • D. Người nhập</div>
 </li>
-<li><b>(MC)</b> Throttling SharePoint hay tráº£ mÃ£ nÃ o?
- <div class="mini">A. 200 â€¢ B. 201 â€¢ C. 429/503 â€¢ D. 302</div>
+<li><b>(MC)</b> Throttling SharePoint hay trả mã nào?
+ <div class="mini">A. 200 • B. 201 • C. 429/503 • D. 302</div>
 </li>
-<li><b>(MC)</b> Khi run FAIL, cursor xá»­ lÃ½ ra sao?
- <div class="mini">A. Cáº­p nháº­t lÃªn utcNow â€¢ B. Giá»¯ nguyÃªn â€¢ C. Trá»« 7 ngÃ y â€¢ D. XoÃ¡</div>
+<li><b>(MC)</b> Khi run FAIL, cursor xử lý ra sao?
+ <div class="mini">A. Cập nhật lên utcNow • B. Giữ nguyên • C. Trừ 7 ngày • D. Xoá</div>
 </li>
-<li><b>(MC)</b> â€œKhÃ´ng cÃ³ báº±ng chá»©ng = khÃ´ng cÃ³ gateâ€ Ã¡p dá»¥ng máº¡nh nháº¥t á»Ÿ gate nÃ o?
- <div class="mini">A. Giao ca â€¢ B. phê duyệt giao hàng (ship release) â€¢ C. Há»p tuáº§n â€¢ D. Cháº¥m cÃ´ng</div>
+<li><b>(MC)</b> “Không có bằng chứng = không có gate” áp dụng mạnh nhất ở gate nào?
+ <div class="mini">A. Giao ca • B. phê duyệt giao hàng (ship release) • C. Họp tuần • D. Chấm công</div>
 </li>
-<li><b>(MC)</b> Record phÃª duyá»‡t pháº£i Ä‘Æ°á»£c lÆ°u á»Ÿ Ä‘Ã¢u Ä‘á»ƒ audit?
- <div class="mini">A. ApprovalHistory â€¢ B. Chat nhÃ³m â€¢ C. Email cÃ¡ nhÃ¢n â€¢ D. Ghi nhá»›</div>
+<li><b>(MC)</b> Record phê duyệt phải được lưu ở đâu để audit?
+ <div class="mini">A. ApprovalHistory • B. Chat nhóm • C. Email cá nhân • D. Ghi nhớ</div>
 </li>
-<li><b>(MC)</b> Evidence file Tier 1 lÆ°u á»Ÿ Ä‘Ã¢u?
- <div class="mini">A. Trong list â€¢ B. SharePoint library (Job Dossier/Partâ€‘REV) vÃ  list chá»‰ lÆ°u URL â€¢ C. USB â€¢ D. MÃ¡y cÃ¡ nhÃ¢n</div>
+<li><b>(MC)</b> Evidence file Tier 1 lưu ở đâu?
+ <div class="mini">A. Trong list • B. SharePoint library (Job Dossier/Part‑REV) và list chỉ lưu URL • C. USB • D. Máy cá nhân</div>
 </li>
-<li><b>(MC)</b> Äiá»u kiá»‡n PASS phê duyệt giao hàng (ship release) báº¯t buá»™c cÃ³ gÃ¬?
+<li><b>(MC)</b> Điều kiện PASS phê duyệt giao hàng (ship release) bắt buộc có gì?
  <div class="mini">A. PacketComplete=Yes + Final IR PASS + Packaging PASS + SSCC Verified + ApprovalHistory</div>
 </li>
-<li><b>(MC)</b> Khi JobIndex.EvidenceFolderUrl rá»—ng, hÃ nh Ä‘á»™ng Ä‘Ãºng lÃ  gÃ¬?
- <div class="mini">A. Bá» qua â€¢ B. KÃ­ch hoáº¡t táº¡o Job Dossier (idempotent) + cháº·n gate liÃªn quan â€¢ C. Chá»‰nh tay JobIndex â€¢ D. XoÃ¡ job</div>
+<li><b>(MC)</b> Khi JobIndex.EvidenceFolderUrl rỗng, hành động đúng là gì?
+ <div class="mini">A. Bỏ qua • B. Kích hoạt tạo Job Dossier (idempotent) + chặn gate liên quan • C. Chỉnh tay JobIndex • D. Xoá job</div>
 </li>
-<li><b>(MC)</b> Khi nghi ngá» sai Rev, log nÃ o báº¯t buá»™c?
- <div class="mini">A. QCHoldLog â€¢ B. IntegrationLogs â€¢ C. JobIndex â€¢ D. Power BI</div>
+<li><b>(MC)</b> Khi nghi ngờ sai Rev, log nào bắt buộc?
+ <div class="mini">A. QCHoldLog • B. IntegrationLogs • C. JobIndex • D. Power BI</div>
 </li>
-<li><b>(MC)</b> Dá»¯ liá»‡u mirror dÃ¹ng cho má»¥c tiÃªu gÃ¬?
- <div class="mini">A. Thá»±c thi ghi ngÆ°á»£c ERP â€¢ B. Lookup/hiá»ƒn thá»‹ nhanh + dashboard â€¢ C. Thay tháº¿ Epicor â€¢ D. LÆ°u file</div>
+<li><b>(MC)</b> Dữ liệu mirror dùng cho mục tiêu gì?
+ <div class="mini">A. Thực thi ghi ngược ERP • B. Lookup/hiển thị nhanh + dashboard • C. Thay thế Epicor • D. Lưu file</div>
 </li>
-<li><b>(Tá»± luáº­n ngáº¯n)</b> NÃªu 3 failâ€‘fast rules vÃ  dáº¥u váº¿t báº¯t buá»™c cho má»—i rule.</li>
-<li><b>(Tá»± luáº­n ngáº¯n)</b> MÃ´ táº£ cÃ¡ch xá»­ lÃ½ â€œMirror trá»…â€ trong 60 giÃ¢y.</li>
-<li><b>(Tá»± luáº­n ngáº¯n)</b> Viáº¿t Ä‘Ãºng 01 tÃªn file evidence Tier 1 theo ANNEX-QMS-003 (job dossier).</li>
-<li><b>(TÃ¬nh huá»‘ng ngáº¯n)</b> ShipRelease Ä‘ang BLOCKED vÃ¬ thiáº¿u Final IR. HÃ nh Ä‘á»™ng 4 bÆ°á»›c Ä‘á»ƒ chuyá»ƒn sang RELEASED.</li>
-<li><b>(TÃ¬nh huá»‘ng ngáº¯n)</b> Dashboard OTD lá»‡ch; nghi ngá» DueDate bá»‹ sai timezone. Chuá»—i kiá»ƒm tra 5 bÆ°á»›c.</li>
+<li><b>(Tự luận ngắn)</b> Nêu 3 fail‑fast rules và dấu vết bắt buộc cho mỗi rule.</li>
+<li><b>(Tự luận ngắn)</b> Mô tả cách xử lý “Mirror trễ” trong 60 giây.</li>
+<li><b>(Tự luận ngắn)</b> Viết đúng 01 tên file evidence Tier 1 theo ANNEX-QMS-003 (job dossier).</li>
+<li><b>(Tình huống ngắn)</b> ShipRelease đang BLOCKED vì thiếu Final IR. Hành động 4 bước để chuyển sang RELEASED.</li>
+<li><b>(Tình huống ngắn)</b> Dashboard OTD lệch; nghi ngờ DueDate bị sai timezone. Chuỗi kiểm tra 5 bước.</li>
 </ol>
 <div class="callout" style="margin-top:10px">
-<h3>ÄÃ¡p Ã¡n (dÃ¹ng cho trainer)</h3>
+<h3>Đáp án (dùng cho trainer)</h3>
 <p class="mini">1B, 2B, 3B, 4B, 5A, 6B, 7C, 8B, 9B, 10A, 11B, 12A, 13B, 14A, 15B</p>
-<p class="mini">CÃ¢u 16â€“20 cháº¥m theo rubric: Ä‘Ãºng â€œnguá»“n Ä‘Ãºngâ€, Ä‘Ãºng gate, cÃ³ dáº¥u váº¿t, Ä‘Ãºng trÃ¬nh tá»±.</p>
+<p class="mini">Câu 16–20 chấm theo rubric: đúng “nguồn đúng”, đúng gate, có dấu vết, đúng trình tự.</p>
 </div>
 </div>
 <div class="card">
-<h3>3 ká»‹ch báº£n tÃ¬nh huá»‘ng (scenario)</h3>
+<h3>3 kịch bản tình huống (scenario)</h3>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Ká»‹ch báº£n</th><th>Äáº§u vÃ o</th><th>HÃ nh Ä‘á»™ng báº¯t buá»™c</th><th>Expected result</th><th>Báº±ng chá»©ng</th></tr></thead>
+<thead><tr><th>Kịch bản</th><th>Đầu vào</th><th>Hành động bắt buộc</th><th>Expected result</th><th>Bằng chứng</th></tr></thead>
 <tbody>
 <tr>
-<td>SC-01: Sai Rev do dá»¯ liá»‡u cÅ©</td>
+<td>SC-01: Sai Rev do dữ liệu cũ</td>
 <td>JobIndex Rev=E, traveler ghi Rev=F</td>
-<td>Dá»«ng; QCHoldLog WrongRev; kiá»ƒm tra Epicor + Part/REV; cáº­p nháº­t StandupAction</td>
-<td>KhÃ´ng cháº¡y/khÃ´ng ship sai Rev; root cause rÃµ</td>
-<td>QCHoldLog + link file Rev Ä‘Ãºng + áº£nh Epicor</td>
+<td>Dừng; QCHoldLog WrongRev; kiểm tra Epicor + Part/REV; cập nhật StandupAction</td>
+<td>Không chạy/không ship sai Rev; root cause rõ</td>
+<td>QCHoldLog + link file Rev đúng + ảnh Epicor</td>
 </tr>
 <tr>
-<td>SC-02: Throttling gÃ¢y backlog</td>
-<td>Flow fail 429; IntegrationLogs Warning liÃªn tá»¥c</td>
-<td>Báº­t retry/backoff; giáº£m batch; giÃ£n cadence; kiá»ƒm tra index list; triage Data Health</td>
-<td>Latency vá» SLA; error rate vá» ngÆ°á»¡ng</td>
-<td>IntegrationLogs before/after + cáº¥u hÃ¬nh</td>
+<td>SC-02: Throttling gây backlog</td>
+<td>Flow fail 429; IntegrationLogs Warning liên tục</td>
+<td>Bật retry/backoff; giảm batch; giãn cadence; kiểm tra index list; triage Data Health</td>
+<td>Latency về SLA; error rate về ngưỡng</td>
+<td>IntegrationLogs before/after + cấu hình</td>
 </tr>
 <tr>
-<td>SC-03: Stopâ€‘ship bá»‹ kÃ­ch hoáº¡t</td>
+<td>SC-03: Stop‑ship bị kích hoạt</td>
 <td>ShipRelease BLOCKED, PacketComplete=No</td>
-<td>Bá»• sung bộ hồ sơ giao hàng (ship packet) Tier 1; Ä‘áº£m báº£o Final IR/CoC/Cert; cháº¡y validator; ApprovalHistory</td>
-<td>ShipRelease RELEASED há»£p lá»‡</td>
+<td>Bổ sung bộ hồ sơ giao hàng (ship packet) Tier 1; đảm bảo Final IR/CoC/Cert; chạy validator; ApprovalHistory</td>
+<td>ShipRelease RELEASED hợp lệ</td>
 <td>ShipRelease + folder ship packet + ApprovalHistory</td>
 </tr>
 </tbody>
@@ -516,116 +516,116 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<h2>13) Performance test (báº¯t buá»™c vÃ¬ cÃ³ thao tÃ¡c gate/approve)</h2>
-<p class="mini">Performance test cháº¥m PASS/FAIL theo hÃ nh vi vÃ  dáº¥u váº¿t, khÃ´ng cháº¥m cáº£m tÃ­nh.</p>
+<h2>13) Performance test (bắt buộc vì có thao tác gate/approve)</h2>
+<p class="mini">Performance test chấm PASS/FAIL theo hành vi và dấu vết, không chấm cảm tính.</p>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>NhÃ³m</th><th>BÃ i thá»±c hÃ nh</th><th>TiÃªu chÃ­ PASS</th><th>TiÃªu chÃ­ FAIL (1 lá»—i lÃ  FAIL)</th><th>Báº±ng chá»©ng báº¯t buá»™c</th></tr></thead>
+<thead><tr><th>Nhóm</th><th>Bài thực hành</th><th>Tiêu chí PASS</th><th>Tiêu chí FAIL (1 lỗi là FAIL)</th><th>Bằng chứng bắt buộc</th></tr></thead>
 <tbody>
 <tr>
 <td>OPS (Operator/Setup)</td>
-<td>Chá»n 01 job â†’ xÃ¡c minh Rev â†’ má»Ÿ Job Dossier Ã¢â€°Â¤ 60s</td>
-<td>ÄÃºng Job/Rev; má»Ÿ Ä‘Ãºng folder; ghi checklist ca</td>
-<td>Tiáº¿p tá»¥c cháº¡y khi nghi ngá» sai Rev; khÃ´ng Ä‘á»ƒ dáº¥u váº¿t</td>
-<td>áº¢nh má»Ÿ folder + checklist</td>
+<td>Chọn 01 job → xác minh Rev → mở Job Dossier ≤ 60s</td>
+<td>Đúng Job/Rev; mở đúng folder; ghi checklist ca</td>
+<td>Tiếp tục chạy khi nghi ngờ sai Rev; không để dấu vết</td>
+<td>Ảnh mở folder + checklist</td>
 </tr>
 <tr>
 <td>QC/QA</td>
-<td>Táº¡o 01 QCHoldLog + Ä‘Ã­nh evidence Ä‘Ãºng; táº¡o/kiá»ƒm tra ApprovalHistory</td>
-<td>Record Ä‘áº§y Ä‘á»§ trÆ°á»ng báº¯t buá»™c; link Ä‘Ãºng folder; workflow rÃµ</td>
-<td>Hold khÃ´ng containment; evidence Ä‘áº·t sai nÆ¡i; Ä‘Ã³ng khÃ´ng approval</td>
+<td>Tạo 01 QCHoldLog + đính evidence đúng; tạo/kiểm tra ApprovalHistory</td>
+<td>Record đầy đủ trường bắt buộc; link đúng folder; workflow rõ</td>
+<td>Hold không containment; evidence đặt sai nơi; đóng không approval</td>
 <td>QCHoldLog + ApprovalHistory + folder link</td>
 </tr>
 <tr>
 <td>WHS</td>
-<td>ÄÄƒng kÃ½ SSCC + PackagingChecks + ShipRelease; xá»­ lÃ½ tá»« BLOCKED â†’ RELEASED</td>
-<td>PASS Ä‘á»§ Ä‘iá»u kiá»‡n; validator chuyá»ƒn RELEASED; approval cÃ³ log</td>
-<td>Xuáº¥t kho khi BLOCKED; sá»­a Status báº±ng tay</td>
+<td>Đăng ký SSCC + PackagingChecks + ShipRelease; xử lý từ BLOCKED → RELEASED</td>
+<td>PASS đủ điều kiện; validator chuyển RELEASED; approval có log</td>
+<td>Xuất kho khi BLOCKED; sửa Status bằng tay</td>
 <td>PackSSCCRegister + PackagingChecks + ShipRelease + ApprovalHistory</td>
 </tr>
 <tr>
 <td>Supervisor/Planner/Sales</td>
-<td>Äá»c dashboard + xÃ¡c nháº­n gate Ä‘á»ƒ tráº£ lá»i khÃ¡ch</td>
-<td>Chá»‰ cam káº¿t khi ShipRelease RELEASED vÃ  dá»¯ liá»‡u khÃ´ng trá»…</td>
-<td>Cam káº¿t khi gate chÆ°a PASS; dÃ¹ng dá»¯ liá»‡u stale</td>
-<td>áº¢nh dashboard + record ShipRelease</td>
+<td>Đọc dashboard + xác nhận gate để trả lời khách</td>
+<td>Chỉ cam kết khi ShipRelease RELEASED và dữ liệu không trễ</td>
+<td>Cam kết khi gate chưa PASS; dùng dữ liệu stale</td>
+<td>Ảnh dashboard + record ShipRelease</td>
 </tr>
 <tr>
 <td>IT</td>
-<td>Triaging 01 lá»—i sync: stale/paging/throttling</td>
-<td>Khoanh vÃ¹ng nguyÃªn nhÃ¢n; hÃ nh Ä‘á»™ng khÃ´i phá»¥c; logs Ä‘áº§y Ä‘á»§</td>
-<td>Äáº©y watermark khi lá»—i; xoÃ¡ dá»¯ liá»‡u khÃ´ng audit</td>
-<td>IntegrationLogs + IntegrationSettings + bÃ¡o cÃ¡o triage</td>
+<td>Triaging 01 lỗi sync: stale/paging/throttling</td>
+<td>Khoanh vùng nguyên nhân; hành động khôi phục; logs đầy đủ</td>
+<td>Đẩy watermark khi lỗi; xoá dữ liệu không audit</td>
+<td>IntegrationLogs + IntegrationSettings + báo cáo triage</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="card">
-<h2>14) MRR tá»‘i thiá»ƒu (Minimum Required Record) vÃ  nÆ¡i lÆ°u</h2>
-<p class="mini">MRR lÃ  tiÃªu chÃ­ gate. Thiáº¿u MRR â†’ BLOCK.</p>
+<h2>14) MRR tối thiểu (Minimum Required Record) và nơi lưu</h2>
+<p class="mini">MRR là tiêu chí gate. Thiếu MRR → BLOCK.</p>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>NhÃ³m MRR</th><th>MRR báº¯t buá»™c</th><th>NÆ¡i lÆ°u</th><th>KhoÃ¡/Ä‘Æ°á»ng dáº«n</th><th>Retention</th></tr></thead>
+<thead><tr><th>Nhóm MRR</th><th>MRR bắt buộc</th><th>Nơi lưu</th><th>Khoá/đường dẫn</th><th>Retention</th></tr></thead>
 <tbody>
 <tr>
 <td>Integration</td>
-<td>IntegrationLogs cho má»—i run; IntegrationSettings watermark</td>
-<td>M365/SharePoint â†’ CNC-IMS-HUB â†’ Lists</td>
+<td>IntegrationLogs cho mỗi run; IntegrationSettings watermark</td>
+<td>M365/SharePoint → CNC-IMS-HUB → Lists</td>
 <td>RunId, FlowName, LastSyncTime</td>
-<td>â‰¥ 03 nÄƒm</td>
+<td>≥ 03 năm</td>
 </tr>
 <tr>
 <td>Job master</td>
 <td>JobIndex record + EvidenceFolderUrl</td>
 <td>List JobIndex (mirror)</td>
 <td>EpicorKey (unique), JobNum (index)</td>
-<td>â‰¥ 03 nÄƒm</td>
+<td>≥ 03 năm</td>
 </tr>
 <tr>
 <td>Evidence Pack</td>
 <td>Job Dossier folder theo template ANNEX-QMS-003</td>
 <td>SharePoint library Job-Dossiers</td>
 <td class="mono">JOB-{JobNum}_{PartNum}_REV-{Rev}</td>
-<td>Tier 1 â‰¥ 10 nÄƒm</td>
+<td>Tier 1 ≥ 10 năm</td>
 </tr>
 <tr>
 <td>Inspection</td>
 <td>InspectionReports (Final/FAI) PASS + ReportUrl</td>
 <td>List InspectionReports</td>
 <td>IRID + JobNum</td>
-<td>Tier 1 â‰¥ 10 nÄƒm</td>
+<td>Tier 1 ≥ 10 năm</td>
 </tr>
 <tr>
 <td>Quality events</td>
 <td>QCHoldLog/NCRLog/CAPA8D + approvals</td>
 <td>M365 lists + Job Dossier folder 05_NCR-Hold-CAPA</td>
 <td>HoldID/NCRID/CAPAID</td>
-<td>Tier 1 cho closure â‰¥ 10 nÄƒm</td>
+<td>Tier 1 cho closure ≥ 10 năm</td>
 </tr>
 <tr>
 <td>Packaging &amp; ship</td>
 <td>PackagingChecks PASS + photos; PackSSCCRegister Verified; ShipRelease RELEASED; ship packet folder</td>
 <td>M365 lists + Job Dossier 07_Shipping-Packing</td>
 <td>PackID/SSCC/ShipReleaseID</td>
-<td>Tier 1 â‰¥ 10 nÄƒm</td>
+<td>Tier 1 ≥ 10 năm</td>
 </tr>
 <tr>
 <td>Approvals</td>
 <td>ApprovalHistory cho Ship Release, NCR/CAPA closure</td>
 <td>List ApprovalHistory</td>
 <td>ApprovalID + SourceRecordID</td>
-<td>â‰¥ 10 nÄƒm</td>
+<td>≥ 10 năm</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="callout warn" style="margin-top:12px">
-<h3>Khoáº£ng trá»‘ng cáº§n xá»­ lÃ½ ngay (Ä‘Ã£ tháº¥y trong tÃ i liá»‡u ná»™i bá»™)</h3>
+<h3>Khoảng trống cần xử lý ngay (đã thấy trong tài liệu nội bộ)</h3>
 <ul>
-<li><b>ChÃªnh template Job Dossier:</b> ANNEX-QMS-003 khÃ¡c vá»›i flow táº¡o folder trong bá»™ máº«u cáº¥u hÃ¬nh (SSOT). Chuáº©n hoÃ¡ theo ANNEX-QMS-003; cáº­p nháº­t flow Ä‘á»ƒ táº¡o Ä‘Ãºng folder. <span class="mono">MÃ£ change: CR-{YYYY}-{Seq} (gáº¯n link approval).</span></li>
-<li><b>IntegrationErrors:</b> ANNEX-QMS-006/011 nháº¯c â€œIntegrationErrorsâ€ nhÆ°ng schema CSV chÆ°a cÃ³. Táº¡o list IntegrationErrors theo Change Management hoáº·c chuáº©n hoÃ¡ ghi lá»—i theo IntegrationLogs.ErrorSummary + lÆ°u payload vÃ o thÆ° má»¥c â€œ09_Archive-OldVersionsâ€ trong Job Dossier. <span class="mono">Chuáº©n hÃ³a: dÃ¹ng 01 SSOT (SharePoint) lÃ m nguá»“n sá»± tháº­t.</span></li>
-<li><b>SLA latency:</b> Module dÃ¹ng placeholder [SLA]. Äá»‹nh nghÄ©a SLA theo cadence flow vÃ  rÃ ng buá»™c váº­n hÃ nh; dÃ¹ng lÃ m failâ€‘fast rule.</li>
+<li><b>Chênh template Job Dossier:</b> ANNEX-QMS-003 khác với flow tạo folder trong bộ mẫu cấu hình (SSOT). Chuẩn hoá theo ANNEX-QMS-003; cập nhật flow để tạo đúng folder. <span class="mono">Mã change: CR-{YYYY}-{Seq} (gắn link approval).</span></li>
+<li><b>IntegrationErrors:</b> ANNEX-QMS-006/011 nhắc “IntegrationErrors” nhưng schema CSV chưa có. Tạo list IntegrationErrors theo Change Management hoặc chuẩn hoá ghi lỗi theo IntegrationLogs.ErrorSummary + lưu payload vào thư mục “09_Archive-OldVersions” trong Job Dossier. <span class="mono">Chuẩn hóa: dùng 01 SSOT (SharePoint) làm nguồn sự thật.</span></li>
+<li><b>SLA latency:</b> Module dùng placeholder [SLA]. Định nghĩa SLA theo cadence flow và ràng buộc vận hành; dùng làm fail‑fast rule.</li>
 </ul>
 </div>
 </div>
@@ -634,7 +634,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- doc control -->
 </div></div>
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">âš  Báº£n in khÃ´ng cÃ³ Ä‘Ã³ng dáº¥u kiá»ƒm soÃ¡t phiÃªn báº£n thÃ¬ tÃ i liá»‡u nÃ y khÃ´ng cÃ³ giÃ¡ trá»‹. Chá»‰ sá»­ dá»¥ng phiÃªn báº£n hiá»‡n hÃ nh trÃªn há»‡ thá»‘ng HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

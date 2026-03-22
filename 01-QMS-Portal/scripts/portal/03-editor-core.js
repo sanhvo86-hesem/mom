@@ -1,4 +1,4 @@
-﻿// DOCUMENT WORKFLOW & EDITING ENGINE
+// DOCUMENT WORKFLOW & EDITING ENGINE
 // ═══════════════════════════════════════════════════
 
 // States: draft | in_review | pending_approval | approved | obsolete
@@ -1759,11 +1759,11 @@ function edImgResize100(){if(edSelectedImg){edSelectedImg.style.width='100%';edS
 // TABLE CONTEXT MENU (Right-click)
 // ═══════════════════════════════════════════════════
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ────────────────────────────────────────────────
 // TABLE COLUMN WIDTH ENGINE (colgroup-based)
 // Fix: support tables WITH <colgroup> widths, allow drag + numeric width edits
 // Applied globally in editor mode
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ────────────────────────────────────────────────
 const _edTableDefaults = new WeakMap();
 
 function edTableSetAutofitState(table, mode, lock){
@@ -4067,7 +4067,7 @@ function edSelectShape(el){
   // Text toggle
   var shText=el.querySelector('.ed-sh-text');
   var btnTxt=document.createElement('button');
-  btnTxt.textContent=shText?'AÌ²':'A';
+  btnTxt.textContent=shText?'A̲':'A';
   btnTxt.title=vi?'Thêm/Xóa text':'Toggle text';
   btnTxt.style.cssText='height:22px;font-size:11px;font-weight:700;border:1px solid #ddd;border-radius:3px;background:'+(shText?'#e8f0fe':'#fff')+';cursor:pointer;padding:0 5px;color:#1a73e8';
   btnTxt.addEventListener('click',function(ev){
@@ -4077,7 +4077,7 @@ function edSelectShape(el){
     else{
       var nd=document.createElement('div');nd.className='ed-sh-text';nd.contentEditable='true';
       nd.textContent='Text';
-      el.appendChild(nd);btnTxt.style.background='#e8f0fe';btnTxt.textContent='AÌ²';
+      el.appendChild(nd);btnTxt.style.background='#e8f0fe';btnTxt.textContent='A̲';
     }
     edMarkModified();
   });
