@@ -6,6 +6,29 @@ let currentFilter = 'ALL';
 let searchQuery = '';
 let currentFolderPath = []; // Hierarchical navigation: ['08-Organization','03-Job-Descriptions','01-JD-EXE']
 let folderEditMode = false; // Toggle for file manager edit mode
+const DOC_HEADER_META_COLLAPSE_KEY = 'hesem_doc_header_meta_collapsed';
+let docHeaderMetaCollapsed = true;
+try{
+  const savedDocHeaderMetaCollapsed = sessionStorage.getItem(DOC_HEADER_META_COLLAPSE_KEY);
+  if(savedDocHeaderMetaCollapsed === '0' || savedDocHeaderMetaCollapsed === '1'){
+    docHeaderMetaCollapsed = savedDocHeaderMetaCollapsed === '1';
+  }
+}catch(_e){}
+
+function setDocHeaderMetaCollapsed(collapsed){
+  docHeaderMetaCollapsed = !!collapsed;
+  try{
+    sessionStorage.setItem(DOC_HEADER_META_COLLAPSE_KEY, docHeaderMetaCollapsed ? '1' : '0');
+  }catch(_e){}
+}
+
+function toggleDocHeaderMeta(force){
+  setDocHeaderMetaCollapsed(typeof force === 'boolean' ? force : !docHeaderMetaCollapsed);
+  if(currentDoc){
+    const doc = DOCS.find(d=>d.code===currentDoc);
+    if(doc) updateDocViewerHeader(doc);
+  }
+}
 
 // Server-backed (folder-based) document workflow state + DCR record
 // NOTE: This replaces the old sessionStorage-only versioning for ISO compliance.
@@ -1079,21 +1102,21 @@ function updateDocViewerHeader(doc){
   let submittedMeta='';
   if(state && state.submittedBy && state.submittedBy.name){
     const sb=state.submittedBy;
-    const utBadge=sb.updateType?(' <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(sb.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(sb.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'';
-    submittedMeta=`<div>📤 ${T('sm_submitter_label')}<b>${sb.name}</b> · ${sb.date||''}${utBadge}</div>`;
+    const utBadge=sb.updateType?(' <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(sb.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(sb.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'';    
+    submittedMeta=`<div class="dv-meta-note submit"><span class="dv-meta-note-label">${T('sm_submitter_label')}</span><b>${sb.name}</b><span>${sb.date||''}</span>${utBadge}</div>`;
   }
 
   // Build last-editor meta (who last edited/saved draft)
   let lastEditMeta='';
   if(state && state.lastEdit && state.lastEdit.by){
     const le=state.lastEdit;
-    lastEditMeta=`<div>✏️ ${lang==='en'?'Last edited by':'Người chỉnh sửa cuối'}:<b> ${le.by}</b>${le.role?' — '+le.role:''} · ${le.date||''}</div>`;
+    lastEditMeta=`<div class="dv-meta-note edit"><span class="dv-meta-note-label">${lang==='en'?'Last edited by':'Người chỉnh sửa cuối'}</span><b>${le.by}</b><span>${le.role?le.role+' · ':''}${le.date||''}</span></div>`;
   }
 
   // Build approved-by meta
   let approvedMeta='';
   if(state && state.approvedBy && state.approvedBy.name && status==='approved'){
-    approvedMeta=`<div>✅ ${T('wf_approved_by')}<b>${state.approvedBy.name}</b> · ${state.approvedBy.date||state.approvedDate||''}</div>`;
+    approvedMeta=`<div class="dv-meta-note approve"><span class="dv-meta-note-label">${T('wf_approved_by')}</span><b>${state.approvedBy.name}</b><span>${state.approvedBy.date||state.approvedDate||''}</span></div>`;
   }
 
   const headerActions = buildDocHeaderActions(doc);
@@ -1103,17 +1126,32 @@ function updateDocViewerHeader(doc){
   const displayTitle = getDocDisplayTitle(doc);
   const displayDesc = getDocDisplayDescription(doc);
   const isWorkbook = isDownloadOnlyDoc(doc);
+  const detailToggleLabel = docHeaderMetaCollapsed
+    ? (lang==='en' ? 'Show details' : 'Hiện chi tiết')
+    : (lang==='en' ? 'Hide details' : 'Ẩn chi tiết');
+  const detailToggleHtml = `<button class="dv-back dv-detail-toggle" aria-expanded="${docHeaderMetaCollapsed?'false':'true'}" onclick="toggleDocHeaderMeta()">${docHeaderMetaCollapsed?'▾':'▴'} ${detailToggleLabel}</button>`;
+  const ownerEditButton = canEdit(doc)
+    ? '<button class="dv-meta-edit" onclick="event.stopPropagation();editDocMeta(\''+doc.code+'\',\'owner\')" title="'+(lang==='en'?'Edit owner':'Chỉnh chủ sở hữu')+'">'+(lang==='en'?'Edit':'Sửa')+'</button>'
+    : '';
+  const approverEditButton = canEdit(doc)
+    ? '<button class="dv-meta-edit" onclick="event.stopPropagation();editDocMeta(\''+doc.code+'\',\'approver\')" title="'+(lang==='en'?'Edit approver':'Chỉnh người duyệt')+'">'+(lang==='en'?'Edit':'Sửa')+'</button>'
+    : '';
+  const activityNotes = [submittedMeta, lastEditMeta, approvedMeta].filter(Boolean).join('');
   const navActionsHtml = isWorkbook
     ? `<div class="dv-action-group dv-nav-actions">
+          ${detailToggleHtml}
           <button class="dv-back" onclick="closeDocViewer()">${T('back')}</button>
           <button class="dv-back" onclick="downloadCurrentDoc('${doc.code}')">${lang==='en'?'Download':'Tải về'}</button>
        </div>`
     : `<div class="dv-action-group dv-nav-actions">
+          ${detailToggleHtml}
           <button class="dv-back" onclick="closeDocViewer()">${T('back')}</button>
           <button class="dv-back" onclick="window.open('../${viewFile}','_blank')">${T('open_tab')}</button>
        </div>`;
 
-  document.getElementById('doc-viewer-header').innerHTML = `
+  const headerEl = document.getElementById('doc-viewer-header');
+  headerEl.classList.toggle('details-collapsed', docHeaderMetaCollapsed);
+  headerEl.innerHTML = `
     <div class="dv-top">
       <div class="dv-title-area">
         <div class="dv-code" style="color:${cat.color}">${doc.code} <span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:${statusColor(status)}18;color:${statusColor(status)}">${statusLabel(status)}</span></div>
@@ -1125,16 +1163,16 @@ function updateDocViewerHeader(doc){
         ${navActionsHtml}
       </div>
     </div>
-    <div class="dv-meta">
-      <div>${T('code_label')}<b>${doc.code}</b></div>
-      <div>${T('revision_label')}<b style="color:${statusColor(status)}">v${rev}</b></div>
-      <div>${T('type')}<b>${catLabel(cat)}</b></div>
-      <div>${T('owner')}<b>${(state&&state.owner)?state.owner:doc.owner}</b>${canEdit(doc)?'<span style="cursor:pointer;font-size:10px;color:#1565c0;margin-left:4px" onclick="editDocMeta(\''+doc.code+'\',\'owner\')" title="'+(lang==='en'?'Edit owner':'Chỉnh chủ sở hữu')+'">✏</span>':''}</div>
-      <div>${T('approver')}<b>${(state&&state.approver)?state.approver:T('gd')}</b>${canEdit(doc)?'<span style="cursor:pointer;font-size:10px;color:#1565c0;margin-left:4px" onclick="editDocMeta(\''+doc.code+'\',\'approver\')" title="'+(lang==='en'?'Edit approver':'Chỉnh người duyệt')+'">✏</span>':''}</div>
-      <div>${T('status')}<b style="color:${statusColor(status)}">${statusLabel(status)}</b></div>
-      ${submittedMeta}
-      ${lastEditMeta}
-      ${approvedMeta}
+    <div class="dv-meta${docHeaderMetaCollapsed ? ' is-collapsed' : ''}">
+      <div class="dv-meta-grid">
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('code_label')}</span><div class="dv-meta-value"><b>${doc.code}</b></div></div>
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('revision_label')}</span><div class="dv-meta-value"><b style="color:${statusColor(status)}">v${rev}</b></div></div>
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('type')}</span><div class="dv-meta-value"><b>${catLabel(cat)}</b></div></div>
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('owner')}</span><div class="dv-meta-value"><b>${(state&&state.owner)?state.owner:doc.owner}</b>${ownerEditButton}</div></div>
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('approver')}</span><div class="dv-meta-value"><b>${(state&&state.approver)?state.approver:T('gd')}</b>${approverEditButton}</div></div>
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('status')}</span><div class="dv-meta-value"><b style="color:${statusColor(status)}">${statusLabel(status)}</b></div></div>
+      </div>
+      ${activityNotes ? `<div class="dv-meta-notes">${activityNotes}</div>` : ''}
     </div>`;
 }
 
