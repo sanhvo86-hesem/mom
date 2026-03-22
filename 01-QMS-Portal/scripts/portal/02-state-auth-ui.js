@@ -51,11 +51,16 @@ function getDocHeaderIcon(name){
   return icons[name] || icons.expand;
 }
 
+function cleanDocHeaderButtonLabel(label){
+  return String(label || '').replace(/^[^\p{L}\p{N}]+/u, '').trim();
+}
+
 function renderDocHeaderButton(label, icon, tone, onClick, extraClass='', extraAttrs=''){
   const toneClass = tone ? ` dv-btn-${tone}` : '';
   const className = extraClass ? ` ${extraClass}` : '';
   const attrs = extraAttrs ? ` ${extraAttrs}` : '';
-  return `<button class="dv-btn${toneClass}${className}"${attrs} onclick="${onClick}"><span class="dv-btn-ico">${getDocHeaderIcon(icon)}</span><span class="dv-btn-label">${label}</span></button>`;
+  const cleanLabel = cleanDocHeaderButtonLabel(label);
+  return `<button class="dv-btn${toneClass}${className}"${attrs} onclick="${onClick}"><span class="dv-btn-ico">${getDocHeaderIcon(icon)}</span><span class="dv-btn-label">${cleanLabel}</span></button>`;
 }
 
 // Server-backed (folder-based) document workflow state + DCR record

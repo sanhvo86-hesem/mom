@@ -205,12 +205,10 @@ button{cursor:pointer;border:none;background:none}
 .dv-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px 14px}
 /* Doc header actions (match updated UI: Edit/Save/Submit/Cancel moved to top-right) */
 .dv-top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.dv-top-actions .dv-action-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;padding:3px;border:1px solid #dde5ef;border-radius:14px;background:rgba(255,255,255,.86);box-shadow:0 4px 14px rgba(15,23,42,.04)}
-.dv-top-actions .dv-edit-actions{background:linear-gradient(180deg,#f8fbff 0%,#f2f7ff 100%);border-color:#d8e4fb}
-.dv-top-actions .dv-nav-actions{background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%)}
+.dv-top-actions .dv-action-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding:0;border:none;border-radius:0;background:transparent;box-shadow:none}
 .dv-title-area{min-width:0;display:flex;flex-direction:column;gap:5px}
-.dv-btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:#334155;font-size:11px;font-weight:650;letter-spacing:.01em;white-space:nowrap;transition:all .16s ease;box-shadow:none}
-.dv-btn:hover{background:#fff;border-color:#d7e3f4;box-shadow:0 1px 6px rgba(15,23,42,.05)}
+.dv-btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 11px;border:1px solid #dbe4ef;border-radius:10px;background:#fff;color:#334155;font-size:11px;font-weight:650;letter-spacing:.01em;white-space:nowrap;transition:all .16s ease;box-shadow:0 1px 3px rgba(15,23,42,.03)}
+.dv-btn:hover{background:#fff;border-color:#bfd0e5;box-shadow:0 4px 12px rgba(15,23,42,.08);transform:translateY(-1px)}
 .dv-btn:active{transform:translateY(1px)}
 .dv-btn-ico{width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;color:currentColor;flex-shrink:0;opacity:.92}
 .dv-btn-ico svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round}
@@ -223,8 +221,8 @@ button{cursor:pointer;border:none;background:none}
 .dv-btn-success:hover{background:#e3f7ea;border-color:#91d8a5}
 .dv-btn-danger{background:#fef2f2;color:#b91c1c;border-color:#f8b4b4}
 .dv-btn-danger:hover{background:#fde8e8;border-color:#ef8f8f}
-.dv-btn-neutral{background:transparent;color:#334155;border-color:transparent}
-.dv-btn-neutral:hover{background:#fff;border-color:#d7e3f4}
+.dv-btn-neutral{background:#fff;color:#334155;border-color:#dbe4ef}
+.dv-btn-neutral:hover{background:#fff;border-color:#bfd0e5}
 .dv-detail-toggle{color:#0c2d48}
 .dv-meta{margin-top:8px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;overflow:hidden}
 .dv-meta.is-collapsed{display:none}
