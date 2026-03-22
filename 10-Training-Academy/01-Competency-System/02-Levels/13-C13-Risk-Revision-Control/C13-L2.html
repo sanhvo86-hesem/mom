@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>C13-L2 — Risk Management & Revision Control — Practitioner | HESEM Academy</title>
+<link href="../../../../assets/style.css" rel="stylesheet"/>
+
+<style>
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
+@media print {
+ .card, .table-card, .callout, .note, .box, .iso-map,
+ .preface-block, .jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ .sig-row, .sign-row, .approval-row {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ .table-card { overflow: visible !important; }
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+</style>
+</head>
+<body>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+  <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+  <div class="fh-company">
+    <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <span>Tài liệu kiểm soát</span>
+  </div>
+</div>
+<div class="title">
+  <strong>C13-L2 — Risk Management & Revision Control — Practitioner | HESEM Academy</strong>
+  <span class="sub-vn"></span>
+</div>
+<div class="meta">
+  <div class="row"><span><b>Mã:</b></span><span>C13-L2</span></div>
+  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent"><h1>C13 — Quản lý rủi ro &amp; kiểm soát thay đổi (Revision) — Level 2</h1>
+<p class="lead"><strong>Level 2 — Thực thi change control trong phạm vi tổ/công đoạn.</strong> Module này tạo kỷ luật rủi ro &amp; revision: phát hiện nhanh, ghi nhận đúng, phê duyệt đúng cấp, triển khai có verification và dấu vết kiểm toán (dấu vết kiểm toán (audit trail)).</p>
+<div class="hero">
+<h2>Chuẩn thực chiến – Level 2</h2>
+<div class="meta">
+<div><strong>Vai trò mục tiêu</strong><br/>Cell leader, QC lead, Engineer, Planner, Purchasing follow-up</div>
+<div><strong>Đầu ra bắt buộc</strong>
+<ul>
+<li>Đánh giá impact và cập nhật baseline package/job traveler trong cùng ngày khi có change.</li><li>Triển khai containment và verification plan cho change ảnh hưởng CTQ.</li><li>Đóng change bằng evidence: ai nhận thông tin, ai được đào tạo, kết quả kiểm chứng.</li>
+</ul>
+</div>
+<div><strong>Gate trọng yếu</strong><br/><span class="badge bad">Impact chưa đánh giá / đào tạo chưa ghi nhận</span> = HOLD/FAIL</div>
+<div><strong>Thời lượng</strong><br/>Lý thuyết 75 phút • OJT 120 phút</div>
+</div>
+<p class="small-note">Nguyên tắc vận hành: change không hồ sơ = không thay đổi. Sai REV = dừng ngay tại điểm phát hiện.</p>
+</div><div class="card">
+<span class="badge">Drill Pack (Job CNC)</span>
+<p class="lead" style="margin-top:10px;">
+ Chạy drill trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cam-release-changecontrol.html"><b>DRL-05</b> — CAM Release Pack + Change Control Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html"><b>DRL-02</b> — Revision &amp; SSOT Drill (Audit 60 giây)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-ncr-capa-response.html"><b>DRL-06</b> — NCR + CAPA Quick Response Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-material-cert-specialprocess.html"><b>DRL-03</b> — Material Cert &amp; Special Process Outsource Drill</a></li>
+</ul>
+<p class="small muted" style="margin-top:8px;">
+ Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ </p>
+</div>
+<h2>2) Mục đích module &amp; bối cảnh vận hành</h2>
+<div class="card">
+<ul>
+<li>Chặn rủi ro số 1 của xưởng job shop: <strong>sai revision</strong> và <strong>change ngoài kiểm soát</strong>.</li>
+<li>Biến “rủi ro” thành hành động: trigger → record → impact → approve → implement → verify → close.</li>
+<li>Gắn change control với vận hành RFQ→Cash: change phải cập nhật job pack và bộ hồ sơ giao hàng (bộ hồ sơ giao hàng (ship packet)).</li>
+</ul>
+</div>
+<h2>3) Luồng E2E quản lý rủi ro &amp; thay đổi</h2>
+<div class="vflow">
+<div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Triage</strong><p>Phân loại change: customer/engineering/process/supplier/data.</p></div></div>
+<div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Impact &amp; Plan</strong><p>Đánh giá tác động và lập kế hoạch triển khai + containment.</p></div></div>
+<div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Implement</strong><p>Cập nhật tài liệu/ERP/job pack và thu hồi bản cũ.</p></div></div>
+<div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Train</strong><p>Đào tạo lại đúng đối tượng và ghi nhận evidence.</p></div></div>
+<div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Verify</strong><p>Thực hiện verification theo CTQ và đóng change bằng dữ liệu.</p></div></div>
+</div>
+<h2>4) Failure Points (tối thiểu 10 điểm gãy)</h2>
+<ol><li>Mở change nhưng không có owner/due; change treo dài ngày.</li><li>Impact matrix điền chung chung; không chỉ ra CTQ bị ảnh hưởng.</li><li>Containment thiếu; change làm lỗi lan rộng ra nhiều lot.</li><li>Đào tạo lại chỉ nói miệng; không có training record.</li><li>Cập nhật job pack nhưng không cập nhật ERP; dữ liệu lệch.</li><li>Không thu hồi bản cũ tại hiện trường; tồn tại 2 bản song song.</li><li>Verification làm xong nhưng không link SSOT; dấu vết kiểm toán (dấu vết kiểm toán (audit trail)) đứt.</li><li>Supplier change không có evidence; PO note không cập nhật.</li><li>Change làm tăng cost/OT nhưng không báo finance và không review margin.</li><li>Change lặp lại do không có lesson learned.</li></ol>
+<h2>5) Risk Controls (control points + owner + evidence)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Control point</th><th>Owner</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Change owner &amp; due date</strong></td><td>Change requester</td><td>FRM-QMS-022 + owner/due</td><td>Không owner/due = không accept change</td></tr><tr><td><strong>Containment plan</strong></td><td>QA/OPS</td><td>Containment checklist + NCR khi cần</td><td>Containment thiếu = risk lan rộng</td></tr><tr><td><strong>Impact matrix chi tiết</strong></td><td>Owner change</td><td>FRM-QMS-006</td><td>Phải nêu CTQ/record bị ảnh hưởng</td></tr><tr><td><strong>Training evidence</strong></td><td>Leader/HR</td><td>OJT record + attendance</td><td>Không có record = không cho làm</td></tr><tr><td><strong>ERP alignment</strong></td><td>Planning/IT</td><td>Transaction log + snapshot</td><td>Cập nhật job pack phải đồng bộ ERP</td></tr><tr><td><strong>Supplier change control</strong></td><td>PUR/QMS</td><td>SOP-QMS-010 + PO note update</td><td>Supplier change phải có evidence</td></tr><tr><td><strong>Verification &amp; close</strong></td><td>QA</td><td>Verification record + close log</td><td>Không verify = không close</td></tr><tr><td><strong>Financial impact review</strong></td><td>Finance</td><td>PROC-FIN-002 review</td><td>Change tăng cost phải review margin</td></tr></tbody></table></div>
+<h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Sai REV hoặc phát hiện thay đổi chưa kiểm soát.</strong></td><td>Dừng thao tác; gắn HOLD; báo leader + QA/QMS; mở Change Notice.</td></tr><tr><td><span class="badge warn">HOLD</span></td><td><strong>Impact chưa đánh giá hoặc chưa có phê duyệt.</strong></td><td>Không thực thi change; không ship; tạo action và escal theo SLA.</td></tr><tr><td><span class="badge bad">BLOCK</span></td><td><strong>Chỉnh sửa tài liệu phát hành/đổi supplier/process mà không qua workflow.</strong></td><td>Khóa phát hành; thu hồi bản rời; mở major change package; audit lại.</td></tr></tbody></table></div>
+<h2>7) Phản ứng 60 giây</h2>
+<ol>
+<li>Dừng thao tác và gắn HOLD tại điểm phát hiện.</li>
+<li>Chụp 01 bằng chứng có timestamp (email/screenshot ERP/link SSOT).</li>
+<li>Mở Change Notice và ghi phạm vi ảnh hưởng (job/công đoạn/lot).</li>
+<li>Báo leader + QA/QMS (≤ 10 phút) và đặt owner/due cho hành động trong ngày.</li>
+</ol>
+<h2>8) Checklist vận hành (≤ 15 bước)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Owner</th><th>Evidence/MRR</th><th>Repeat issue lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Triage change và gắn class: customer/engineering/process/supplier/data.</strong></td><td>Owner change</td><td>DCR record</td><td>Không phân loại</td></tr><tr><td>2</td><td><strong>Điền impact matrix: CTQ bị ảnh hưởng, hồ sơ cần cập nhật, gate bị ảnh hưởng.</strong></td><td>Owner change</td><td>FRM-QMS-006</td><td>Impact chung chung</td></tr><tr><td>3</td><td><strong>Thiết lập containment ngay: cách ly lot, HOLD, dừng ship.</strong></td><td>QA/OPS</td><td>Containment log</td><td>Lỗi lan rộng</td></tr><tr><td>4</td><td><strong>Cập nhật baseline package/job traveler/kế hoạch kiểm tra (kế hoạch kiểm tra (inspection plan)) và thu hồi bản cũ tại hiện trường.</strong></td><td>ENG/QA</td><td>Updated docs SSOT</td><td>Tồn tại 2 bản</td></tr><tr><td>5</td><td><strong>Đồng bộ ERP status/job routing/notes với change đã phát hành.</strong></td><td>Planning/IT</td><td>ERP transaction log</td><td>ERP lệch</td></tr><tr><td>6</td><td><strong>Đào tạo lại đúng đối tượng và lưu training record.</strong></td><td>Leader/HR</td><td>Training record</td><td>Đào tạo miệng</td></tr><tr><td>7</td><td><strong>Thực hiện verification: first piece/FAI/re-validation theo CTQ.</strong></td><td>QA/QC</td><td>Verification record</td><td>Không verify CTQ</td></tr><tr><td>8</td><td><strong>Review tác động chi phí và báo finance khi change tăng cost/OT.</strong></td><td>Owner change</td><td>Margin review note</td><td>Cost tăng không biết</td></tr><tr><td>9</td><td><strong>Đóng change: link toàn bộ evidence, lesson learned, cập nhật standard.</strong></td><td>Owner change</td><td>Close record</td><td>Change treo</td></tr></tbody></table></div>
+<h2>9) OJT thực chiến theo TWI</h2>
+<h3>Job breakdown (Step / Key Points / Reasons)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Key Points</th><th>Reasons</th></tr></thead><tbody><tr><td>1</td><td>Nhận diện trigger</td><td>Đọc dữ kiện và xác định loại change</td><td>Đặt đúng quy trình xử lý</td></tr><tr><td>2</td><td>Dừng &amp; giữ</td><td>HOLD tại điểm phát hiện</td><td>Chặn lỗi lan rộng</td></tr><tr><td>3</td><td>Mở record</td><td>Tạo Change Notice + impact matrix</td><td>Có dấu vết kiểm toán (dấu vết kiểm toán (audit trail))</td></tr><tr><td>4</td><td>Phê duyệt</td><td>Lấy đúng cấp phê duyệt</td><td>Tránh change ngoài kiểm soát</td></tr><tr><td>5</td><td>Triển khai</td><td>Cập nhật baseline + thu hồi bản cũ + thông báo</td><td>Không tồn tại 2 bản</td></tr><tr><td>6</td><td>Verify &amp; close</td><td>Verification + đóng hồ sơ + lesson learned</td><td>Ngăn lỗi lặp</td></tr></tbody></table></div>
+<h3>OJT output bắt buộc</h3>
+<ul>
+<li>01 change package đầy đủ (Change Notice + impact + approval + implement + verify + close).</li>
+<li>01 bằng chứng thu hồi bản cũ tại hiện trường và chỉ còn 1 bản phát hành trong SSOT.</li>
+<li>01 communication log: ai nhận thông tin, ai đã được đào tạo lại.</li>
+</ul>
+<h3>Rubric L1–L4 (hành vi quan sát được)</h3>
+<div class="table-card"><table class="table rubric">
+<thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead>
+<tbody>
+<tr><td><strong>L1</strong></td><td>Nhận diện trigger và kỷ luật revision tại điểm làm việc</td><td>Không dùng sai REV; mở notice đúng; biết HOLD</td></tr>
+<tr><td><strong>L2</strong></td><td>Triển khai change trong phạm vi tổ/công đoạn</td><td>Impact rõ; training record đủ; verification có dữ liệu</td></tr>
+<tr><td><strong>L3</strong></td><td>Dẫn dắt change board và giảm escape</td><td>KPI cải thiện; emergency giảm; supplier change kiểm soát</td></tr>
+<tr><td><strong>L4</strong></td><td>Thiết kế hệ thống risk &amp; change cấp công ty</td><td>Workflow cưỡng chế; sẵn sàng đánh giá; KPI có reaction plan</td></tr>
+</tbody></table></div>
+<h2>10) Đánh giá</h2>
+<h3>Quiz (≥ 20 câu)</h3>
+<div class="quiz"><ol><li>Change owner cần chịu trách nhiệm gì?</li><li>Containment khác corrective action ở điểm nào?</li><li>Impact matrix phải chỉ ra những hồ sơ nào cần cập nhật?</li><li>Thu hồi bản cũ tại hiện trường làm như thế nào để có evidence?</li><li>Đồng bộ ERP với change cần những transaction nào?</li><li>Verification plan cho change CTQ gồm những bước nào?</li><li>Training record tối thiểu phải có thông tin gì?</li><li>Supplier change phải cập nhật PO note những mục nào?</li><li>Change tăng cost phải báo finance bằng cách nào?</li><li>Điều kiện để close change là gì?</li><li>Khi change treo 7 ngày, escal theo ladder nào?</li><li>Nêu 3 lỗi làm change thành ‘emergency change’.</li><li>Làm sao tránh tồn tại 2 bản phát hành?</li><li>Ai cần được thông báo khi change ảnh hưởng bộ hồ sơ giao hàng (bộ hồ sơ giao hàng (ship packet))?</li><li>Change ảnh hưởng kế hoạch kiểm tra (kế hoạch kiểm tra (inspection plan)) cần cập nhật gì?</li><li>Cách gắn lesson learned vào standard.</li><li>Định nghĩa change class và ví dụ.</li><li>Cách kiểm tra training đã đủ đối tượng.</li><li>Khi change ảnh hưởng supplier, điều kiện acceptance là gì?</li><li>Tại sao change phải link SSOT?</li><li>Cách đo change thời gian dẫn (thời gian dẫn (lead time)).</li><li>Khi verification fail, bước tiếp theo là gì?</li></ol></div>
+<h3>Scenario (≥ 3 tình huống thật)</h3>
+<details>
+<summary>Change tolerance CTQ trên bản vẽ, job đang chạy</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Khách giảm dung sai lỗ từ ±0.05 xuống ±0.02</li><li>Job đã chạy 20 pcs</li><li>Còn 80 pcs chưa chạy</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Containment và triển khai change trong ngày.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>HOLD toàn bộ lot; đánh dấu 20 pcs đã làm và cô lập.</li><li>Mở change package + impact matrix; cập nhật kế hoạch kiểm tra (kế hoạch kiểm tra (inspection plan)) và program.</li><li>Chạy verification first piece theo dung sai mới trước khi chạy tiếp.</li><li>Estimator (SAL-03) cập nhật khách về ảnh hưởng lịch giao dựa trên dữ liệu.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Đổi dao do hết tuổi thọ, thay đổi bề mặt</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Dao cũ gây bề mặt xấu; dao mới khác hãng</li><li>CTQ liên quan Ra và burr</li><li>Due date sát</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Cách xử lý để vừa giữ tiến độ vừa kiểm soát chất lượng.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Mở DCR record nội bộ và đánh giá impact CTQ.</li><li>Thiết lập verification: chạy 1 pcs, đo Ra/burr; QA xác nhận.</li><li>Cập nhật setup sheet/tool list; lưu SSOT; thu hồi bản cũ.</li><li>Chỉ chạy hàng loạt khi verification pass.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Supplier đổi phương pháp đóng gói, phát sinh móp hàng</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>2 job gần đây bị móp sau shipping</li><li>Supplier nói đổi vật liệu foam</li><li>Khách cảnh báo chargeback</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Hành động theo change control và containment.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Containment: HOLD ship cho lô đang đóng; kiểm tra 100% đóng gói.</li><li>Mở supplier change + impact matrix; cập nhật packaging spec và PO note.</li><li>Verification: drop test/visual standard; ghi evidence.</li><li>Đóng change khi có dữ liệu chứng minh giảm lỗi móp.</li></ul></div>
+</div>
+</details>
+<h3>Performance test</h3>
+<div class="card">
+<h3>Bài test tay nghề — Triển khai 01 change từ đầu đến đóng hồ sơ</h3>
+<h4>Bài làm bắt buộc</h4>
+<ol>
+<li>Chọn 01 change thật (hoặc case giả lập) ảnh hưởng CTQ và đi qua triage → impact → approve.</li><li>Cập nhật 01 bộ baseline package và thu hồi bản cũ tại hiện trường.</li><li>Tổ chức 01 buổi đào tạo lại (15 phút) và lưu training record + quiz 5 câu.</li><li>Thực hiện 01 verification (first piece) và đóng change bằng dữ liệu.</li>
+</ol>
+<h4>PASS/FAIL</h4>
+<ul>
+<li>đạt khi: change package đầy đủ; không tồn tại 2 bản phát hành; verification có dữ liệu; training record có.</li>
+<li>Không đạt khi: thực thi change trước phê duyệt; không có impact; không có verification; dùng sai REV.</li>
+</ul>
+</div>
+<h2>11) PASS/FAIL criteria</h2>
+<div class="kpi-gate">
+<strong>PASS/FAIL (No evidence = No change)</strong>
+<ul>
+<li>đạt khi: change package đầy đủ; chỉ 1 bản phát hành; verification có dữ liệu; training record đủ; truy xuất ≤ 60 giây.</li>
+<li>FAIL ngay khi: thực thi change trước phê duyệt; dùng sai REV; không có impact/verification; không có dấu vết kiểm toán (dấu vết kiểm toán (audit trail)).</li>
+</ul>
+</div>
+<h2>12) MRR tối thiểu (hồ sơ bắt buộc + naming + nơi lưu)</h2>
+<p><strong>Quy tắc đặt tên:</strong> <span class="mono">JobNum_or_System_REV_ChangeType_YYYYMMDD_##.ext (chỉ A–Z,0–9, '-', '_'; không dùng dấu cách).</span></p>
+<ul>
+<li>Change package: FRM-QMS-022 + FRM-QMS-006 + approval record.</li><li>Containment log/NCR khi phát sinh.</li><li>Updated baseline docs (drawing/spec/program/setup/kế hoạch kiểm tra (kế hoạch kiểm tra (inspection plan))) + thu hồi bản cũ evidence.</li><li>ERP alignment evidence (transaction log).</li><li>Training record + quiz evidence.</li><li>Verification record (first piece/FAI/re-validation).</li><li>Margin impact note (PROC-FIN-002).</li><li>Close record + lesson learned.</li>
+</ul>
+<div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → <span class="mono">QMS-Controlled-Documents</span> và <span class="mono">Job-Dossiers</span>.</div>
+<h2>13) Common audit findings &amp; prevention</h2>
+<ol>
+<li>Dùng sai REV tại hiện trường (bản in cũ, file rời).</li>
+<li>Change không có record hoặc không có phê duyệt.</li>
+<li>Impact matrix thiếu CTQ/hồ sơ bị ảnh hưởng.</li>
+<li>Tồn tại 2 bản phát hành; không thu hồi bản cũ.</li>
+<li>Verification không có dữ liệu hoặc không link SSOT.</li>
+<li>Training sau change không có record/re-cert.</li>
+<li>Supplier change không có evidence hoặc PO note không cập nhật.</li>
+<li>sổ đăng ký rủi ro (sổ đăng ký rủi ro (risk register)) treo, không owner/due.</li>
+</ol>
+<h2>Tài liệu liên quan</h2>
+<ul><li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP-QMS-008 — Change Management</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-QMS-010 — External Provider Control</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html">PROC-FIN-002 — Job Costing &amp; Margin Review</a></li><li><a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-212_Customer_Change_Request.xlsx">FRM-SAL-003 — Customer Change Order Review</a></li><li><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-105_Peer_Review_Log.xlsx">FRM-QMS-007 — Peer Review Log</a></li></ul></div></div></div>
+</div>
+<script src="../../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
+
+
+
+
+
+

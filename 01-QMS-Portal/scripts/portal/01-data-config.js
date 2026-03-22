@@ -1089,6 +1089,16 @@ const FOLDER_ICON_MAP = {
   '01-FRM-100':'🏛️','02-FRM-200':'💼','03-FRM-300':'⚙️','04-FRM-400':'🔗',
   '05-FRM-500':'🏭','06-FRM-600':'🔍','07-FRM-700':'📦','08-FRM-800':'👥',
   '09-FRM-900':'♻️',
+  // Competency Levels (C01-C19)
+  '01-C01-Safety-5S':'🦺','02-C02-Process-Discipline':'📋','03-C03-Right-First-Time':'🎯',
+  '04-C04-Cross-Dept-Communication':'🤝','05-C05-Customer-Service-B2B':'🤵',
+  '06-C06-Problem-Solving-RCA':'🔍','07-C07-Kaizen-Lean':'♻️',
+  '08-C08-Data-Driven-ERP':'📊','09-C09-Time-Management':'⏱️',
+  '10-C10-CNC-Job-Order-Process':'🔩','11-C11-Sales-Contract-Review':'💼',
+  '12-C12-Estimating-Costing':'💰','13-C13-Risk-Revision-Control':'⚠️',
+  '14-C14-Drawing-GDT':'📐','15-C15-Material-Science':'🧪',
+  '16-C16-Advanced-Metrology':'🔬','17-C17-CNC-Setup-CAM':'⚙️',
+  '18-C18-Supply-Chain':'🛒','19-C19-Leadership-Coaching':'👨‍🏫',
   // Organization
   '01-Org-Chart':'📊','02-Department-Handbooks':'📕','03-Job-Descriptions':'👔',
   '04-RACI-Authority':'🔑','05-Labor-Relations':'⚖️',
