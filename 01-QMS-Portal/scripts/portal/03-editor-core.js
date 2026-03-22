@@ -440,9 +440,11 @@ function buildEditorToolbar(){
   area.removeEventListener('keydown',edKeyDown);
   area.removeEventListener('mouseup',edUpdateState);
   area.removeEventListener('keyup',edUpdateState);
+  area.removeEventListener('wheel',edHandleEditorWheelZoom,true);
   area.addEventListener('input',edOnInput);
   area.addEventListener('keydown',edKeyDown);
   area.addEventListener('mouseup',edUpdateState);
+  area.addEventListener('wheel',edHandleEditorWheelZoom,{capture:true,passive:false});
   // Named handlers to avoid stacking on repeated buildEditorToolbar calls
   if(!window._edClosePopups){
     window._edClosePopups=function(){document.querySelectorAll('.ed-cpick-dd,.ed-special-panel').forEach(function(d){d.classList.remove('open');});};
@@ -6036,6 +6038,17 @@ function edReplaceAll(){
 // ═══════════════════════════════════════════════════
 // ZOOM
 // ═══════════════════════════════════════════════════
+function edHandleEditorWheelZoom(e){
+  if(!e || !e.ctrlKey || !editMode) return;
+  const area=document.getElementById('editor-area');
+  if(!area || !area.contains(e.target)) return;
+  const delta=Number(e.deltaY||0);
+  if(!Number.isFinite(delta) || delta===0) return;
+  e.preventDefault();
+  e.stopPropagation();
+  edSetZoom(edZoom + (delta<0 ? 10 : -10));
+}
+
 function edSetZoom(z){
   edZoom=Math.max(50,Math.min(200,z));
   const page=document.getElementById('editor-area');
