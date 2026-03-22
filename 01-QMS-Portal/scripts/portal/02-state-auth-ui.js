@@ -6,24 +6,26 @@ let currentFilter = 'ALL';
 let searchQuery = '';
 let currentFolderPath = []; // Hierarchical navigation: ['08-Organization','03-Job-Descriptions','01-JD-EXE']
 let folderEditMode = false; // Toggle for file manager edit mode
-const DOC_HEADER_META_COLLAPSE_KEY = 'hesem_doc_header_meta_collapsed';
 let docHeaderMetaCollapsed = true;
-try{
-  const savedDocHeaderMetaCollapsed = sessionStorage.getItem(DOC_HEADER_META_COLLAPSE_KEY);
-  if(savedDocHeaderMetaCollapsed === '0' || savedDocHeaderMetaCollapsed === '1'){
-    docHeaderMetaCollapsed = savedDocHeaderMetaCollapsed === '1';
-  }
-}catch(_e){}
 
 function setDocHeaderMetaCollapsed(collapsed){
   docHeaderMetaCollapsed = !!collapsed;
-  try{
-    sessionStorage.setItem(DOC_HEADER_META_COLLAPSE_KEY, docHeaderMetaCollapsed ? '1' : '0');
-  }catch(_e){}
+}
+
+function syncDocViewerDetailVisibility(){
+  const headerEl = document.getElementById('doc-viewer-header');
+  if(headerEl){
+    headerEl.classList.toggle('details-collapsed', docHeaderMetaCollapsed);
+  }
+  const historyEl = document.getElementById('vh-container');
+  if(historyEl){
+    historyEl.classList.toggle('is-collapsed', docHeaderMetaCollapsed);
+  }
 }
 
 function toggleDocHeaderMeta(force){
   setDocHeaderMetaCollapsed(typeof force === 'boolean' ? force : !docHeaderMetaCollapsed);
+  syncDocViewerDetailVisibility();
   if(currentDoc){
     const doc = DOCS.find(d=>d.code===currentDoc);
     if(doc) updateDocViewerHeader(doc);
@@ -928,6 +930,7 @@ async function openDoc(code){
   editMode=false;
   editingDoc=null;
   currentDoc=code;
+  setDocHeaderMetaCollapsed(true);
   edFullscreen=false;
   const _ec=document.getElementById('editor-container');
   if(_ec){ _ec.style.display='none'; _ec.classList.remove('ed-fullscreen'); }
@@ -992,6 +995,7 @@ async function openDocPreview(code){
 
     // Ensure doc viewer is active
     currentDoc = code;
+    setDocHeaderMetaCollapsed(true);
     const viewer = document.getElementById('doc-viewer');
     if(viewer) viewer.classList.add('active');
 
@@ -1026,6 +1030,7 @@ function closeDocViewer(){
   editMode=false;
   editingDoc=null;
   currentDoc=null;
+  setDocHeaderMetaCollapsed(true);
   // Clean up iframe state to prevent stale content
   var iframe=document.getElementById('doc-iframe');
   iframe.onload=null;
@@ -1150,7 +1155,7 @@ function updateDocViewerHeader(doc){
        </div>`;
 
   const headerEl = document.getElementById('doc-viewer-header');
-  headerEl.classList.toggle('details-collapsed', docHeaderMetaCollapsed);
+  syncDocViewerDetailVisibility();
   headerEl.innerHTML = `
     <div class="dv-top">
       <div class="dv-title-area">

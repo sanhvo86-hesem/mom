@@ -570,6 +570,9 @@ function renderAdminRetention(){
 function renderVersionHistory(doc){
   if(!doc) return;
   const container=document.getElementById('vh-container');
+  if(container){
+    container.classList.toggle('is-collapsed', !!(typeof docHeaderMetaCollapsed!=='undefined' && docHeaderMetaCollapsed));
+  }
   const isWorkbook = (typeof isDownloadOnlyDoc==='function') ? isDownloadOnlyDoc(doc) : false;
 
   // Load + normalize history
@@ -643,6 +646,9 @@ function renderVersionHistory(doc){
       </div>
     </div>
   `;
+  if(typeof syncDocViewerDetailVisibility==='function'){
+    syncDocViewerDetailVisibility();
+  }
 }
 
 function openVersionPreview(code, idx){

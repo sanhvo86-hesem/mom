@@ -198,6 +198,9 @@ button{cursor:pointer;border:none;background:none}
 #doc-viewer.active{display:flex;flex-direction:column}
 #doc-viewer-header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;flex-shrink:0;overflow-y:auto;max-height:34%;transition:padding .2s ease,max-height .2s ease}
 #doc-viewer-header.details-collapsed{padding-bottom:10px}
+#doc-viewer-header.details-collapsed .dv-title-area{gap:0}
+#doc-viewer-header.details-collapsed .dv-name,
+#doc-viewer-header.details-collapsed .dv-desc{display:none}
 .dv-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:flex-start;gap:14px 20px}
 /* Doc header actions (match updated UI: Edit/Save/Submit/Cancel moved to top-right) */
 .dv-top-actions{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;justify-content:flex-end}
@@ -228,6 +231,7 @@ button{cursor:pointer;border:none;background:none}
 .dv-title-area .dv-code{font-family:var(--mono);font-size:16px;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .dv-title-area .dv-name{font-size:13px;color:var(--text-2);font-weight:600;line-height:1.35}
 .dv-title-area .dv-desc{font-size:12px;color:var(--text-3);line-height:1.45;max-width:760px}
+#vh-container.is-collapsed{display:none}
 .dv-actions{display:flex;gap:8px}
 .dv-actions button{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface);color:var(--text-2);transition:all .15s}
 .dv-actions button:hover{background:#f8f9fa}
