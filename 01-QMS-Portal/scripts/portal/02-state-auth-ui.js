@@ -32,6 +32,32 @@ function toggleDocHeaderMeta(force){
   }
 }
 
+function getDocHeaderIcon(name){
+  const icons = {
+    edit:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+    save:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>',
+    upload:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M20 16.5a3.5 3.5 0 0 1-3.5 3.5h-9A3.5 3.5 0 0 1 4 16.5"/></svg>',
+    submit:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>',
+    cancel:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+    approve:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>',
+    reject:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 9 9 15"/><path d="m9 9 6 6"/><circle cx="12" cy="12" r="9"/></svg>',
+    revision:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 4v6h-6"/><path d="M20.5 15a9 9 0 1 1-2.6-9.4L23 10"/></svg>',
+    back:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/><path d="M21 12H9"/></svg>',
+    external:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6"/><path d="M10 14 20 4"/><path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"/></svg>',
+    download:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>',
+    expand:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
+    collapse:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>'
+  };
+  return icons[name] || icons.expand;
+}
+
+function renderDocHeaderButton(label, icon, tone, onClick, extraClass='', extraAttrs=''){
+  const toneClass = tone ? ` dv-btn-${tone}` : '';
+  const className = extraClass ? ` ${extraClass}` : '';
+  const attrs = extraAttrs ? ` ${extraAttrs}` : '';
+  return `<button class="dv-btn${toneClass}${className}"${attrs} onclick="${onClick}"><span class="dv-btn-ico">${getDocHeaderIcon(icon)}</span><span class="dv-btn-label">${label}</span></button>`;
+}
+
 // Server-backed (folder-based) document workflow state + DCR record
 // NOTE: This replaces the old sessionStorage-only versioning for ISO compliance.
 const SERVER_DOC_STATE = {};      // code -> state
@@ -1057,30 +1083,30 @@ function buildDocHeaderActions(doc){
     // While editing: show edit workflow buttons
     if(editMode && editingDoc===doc.code){
       return `
-        <button class="wf-btn save" onclick="saveDraft('${doc.code}')">${T('wf_save_draft')}</button>
-        <button class="wf-btn submit" onclick="submitForReview('${doc.code}')">${T('wf_submit_review')}</button>
-        <button class="wf-btn cancel" onclick="cancelEdit()">${T('wf_cancel_edit')}</button>
+        ${renderDocHeaderButton(T('wf_save_draft'), 'save', 'primary', `saveDraft('${doc.code}')`)}
+        ${renderDocHeaderButton(T('wf_submit_review'), 'submit', 'accent', `submitForReview('${doc.code}')`)}
+        ${renderDocHeaderButton(T('wf_cancel_edit'), 'cancel', 'neutral', 'cancelEdit()')}
       `;
     }
 
     // Draft: show Edit
     if(status==='draft' && canEdit(doc) && !isWorkbook){
-      return `<button class="wf-btn edit" onclick="startEdit('${doc.code}')">${T('wf_edit')}</button>`;
+      return renderDocHeaderButton(T('wf_edit'), 'edit', 'primary', `startEdit('${doc.code}')`);
     }
 
     if(isWorkbook && status==='draft' && canEdit(doc)){
       return `
-        <button class="wf-btn save" onclick="uploadFormDraft('${doc.code}')">${lang==='en'?'Upload draft':'Upload bản nháp'}</button>
-        ${activeDraft?`<button class="wf-btn submit" onclick="submitWorkbookForReview('${doc.code}')">${T('wf_submit_review')}</button>`:''}
-        <button class="wf-btn cancel" onclick="deleteDraft('${doc.code}')">${lang==='en'?'Discard draft':'Hủy nháp'}</button>
+        ${renderDocHeaderButton(lang==='en'?'Upload draft':'Upload bản nháp', 'upload', 'primary', `uploadFormDraft('${doc.code}')`)}
+        ${activeDraft?renderDocHeaderButton(T('wf_submit_review'), 'submit', 'accent', `submitWorkbookForReview('${doc.code}')`):''}
+        ${renderDocHeaderButton(lang==='en'?'Discard draft':'Hủy nháp', 'cancel', 'danger', `deleteDraft('${doc.code}')`)}
       `;
     }
 
     // In review: show Approve/Reject (for approvers)
     if(status==='in_review' && canApprove(doc)){
       return `
-        <button class="wf-btn approve" onclick="approveDoc('${doc.code}')">${T('wf_approve_doc')}</button>
-        <button class="wf-btn reject" onclick="rejectDoc('${doc.code}')">${T('wf_reject_doc')}</button>
+        ${renderDocHeaderButton(T('wf_approve_doc'), 'approve', 'success', `approveDoc('${doc.code}')`)}
+        ${renderDocHeaderButton(T('wf_reject_doc'), 'reject', 'danger', `rejectDoc('${doc.code}')`)}
       `;
     }
 
@@ -1088,7 +1114,7 @@ function buildDocHeaderActions(doc){
     if(status==='approved'){
       const canCreateRevision = ROLES[currentUser.role] && ROLES[currentUser.role].canEditDocs;
       if(canCreateRevision){
-        return `<button class="wf-btn edit" onclick="startNewRevision('${doc.code}')">${T('new_revision')}</button>`;
+        return renderDocHeaderButton(T('new_revision'), 'revision', 'neutral', `startNewRevision('${doc.code}')`);
       }
     }
   }catch(e){}
@@ -1134,7 +1160,14 @@ function updateDocViewerHeader(doc){
   const detailToggleLabel = docHeaderMetaCollapsed
     ? (lang==='en' ? 'Show details' : 'Hiện chi tiết')
     : (lang==='en' ? 'Hide details' : 'Ẩn chi tiết');
-  const detailToggleHtml = `<button class="dv-back dv-detail-toggle" aria-expanded="${docHeaderMetaCollapsed?'false':'true'}" onclick="toggleDocHeaderMeta()">${docHeaderMetaCollapsed?'▾':'▴'} ${detailToggleLabel}</button>`;
+  const detailToggleHtml = renderDocHeaderButton(
+    detailToggleLabel,
+    docHeaderMetaCollapsed ? 'expand' : 'collapse',
+    'neutral',
+    'toggleDocHeaderMeta()',
+    'dv-detail-toggle',
+    `aria-expanded="${docHeaderMetaCollapsed?'false':'true'}"`
+  );
   const ownerEditButton = canEdit(doc)
     ? '<button class="dv-meta-edit" onclick="event.stopPropagation();editDocMeta(\''+doc.code+'\',\'owner\')" title="'+(lang==='en'?'Edit owner':'Chỉnh chủ sở hữu')+'">'+(lang==='en'?'Edit':'Sửa')+'</button>'
     : '';
@@ -1145,13 +1178,13 @@ function updateDocViewerHeader(doc){
   const navActionsHtml = isWorkbook
     ? `<div class="dv-action-group dv-nav-actions">
           ${detailToggleHtml}
-          <button class="dv-back" onclick="closeDocViewer()">${T('back')}</button>
-          <button class="dv-back" onclick="downloadCurrentDoc('${doc.code}')">${lang==='en'?'Download':'Tải về'}</button>
+          ${renderDocHeaderButton(T('back'), 'back', 'neutral', 'closeDocViewer()')}
+          ${renderDocHeaderButton(lang==='en'?'Download':'Tải về', 'download', 'neutral', `downloadCurrentDoc('${doc.code}')`)}
        </div>`
     : `<div class="dv-action-group dv-nav-actions">
           ${detailToggleHtml}
-          <button class="dv-back" onclick="closeDocViewer()">${T('back')}</button>
-          <button class="dv-back" onclick="window.open('../${viewFile}','_blank')">${T('open_tab')}</button>
+          ${renderDocHeaderButton(T('back'), 'back', 'neutral', 'closeDocViewer()')}
+          ${renderDocHeaderButton(T('open_tab'), 'external', 'neutral', `window.open('../${viewFile}','_blank')`)}
        </div>`;
 
   const headerEl = document.getElementById('doc-viewer-header');
