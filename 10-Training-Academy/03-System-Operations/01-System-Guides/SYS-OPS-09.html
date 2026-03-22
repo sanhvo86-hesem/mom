@@ -86,7 +86,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Epicor Kinetic = nguá»“n Ä‘Ãºng (System of Record)</b> cho Job/Rev/Routing/Shipment/MES time entry.</li>
 <li><b>M365 = thá»±c thi + báº±ng chá»©ng</b> cho approvals, checklist, há»“ sÆ¡ (Evidence Pack) vÃ  log váº­n hÃ nh.</li>
 <li><b>Mirror trong M365 = chá»‰ Ä‘á»c</b> (JobIndex/JobOperIndex/LaborMirror/ShipmentMirror). KhÃ´ng chá»‰nh tay dá»¯ liá»‡u mirror.</li>
-<li><b>KhÃ´ng cÃ³ báº±ng chá»©ng = khÃ´ng cÃ³ gate.</b> Thiáº¿u MRR báº¯t buá»™c â†’ BLOCK (Ä‘áº·c biá»‡t gate Ship Release).</li>
+<li><b>KhÃ´ng cÃ³ báº±ng chá»©ng = khÃ´ng cÃ³ gate.</b> Thiáº¿u MRR báº¯t buá»™c â†’ BLOCK (Ä‘áº·c biá»‡t gate phê duyệt giao hàng (ship release)).</li>
 </ul>
 </div>
 <div class="table-wrap" style="margin-top:12px">
@@ -121,7 +121,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Operator / Setup</td><td>Cháº¡y Ä‘Ãºng Job/Rev/Op, dá»«ng khi sai báº±ng chá»©ng</td><td>JobIndex, JobOperIndex, Job Dossier (má»Ÿ nhanh)</td></tr>
 <tr><td>Programmer</td><td>PhÃ¡t hÃ nh chÆ°Æ¡ng trÃ¬nh Ä‘Ãºng Rev, chá»‘ng nháº§m Rev</td><td>JobIndex.RevisionNum, Part/REV Master, Release record</td></tr>
 <tr><td>QC / QA</td><td>Hold/NCR/CAPA, xÃ¡c nháº­n PASS/FAIL, Ä‘Ã³ng há»“ sÆ¡</td><td>QCHoldLog, NCRLog, InspectionReports, ApprovalHistory</td></tr>
-<tr><td>Warehouse</td><td>ÄÃ³ng gÃ³i, in SSCC, gate Ship Release</td><td>PackSSCCRegister, PackagingChecks, ShipRelease, ShipmentMirror</td></tr>
+<tr><td>Warehouse</td><td>ÄÃ³ng gÃ³i, in SSCC, gate phê duyệt giao hàng (ship release)</td><td>PackSSCCRegister, PackagingChecks, ShipRelease, ShipmentMirror</td></tr>
 <tr><td>Planner</td><td>Æ¯u tiÃªn WIP, OTD, giáº£i phÃ³ng ngháº½n</td><td>JobIndex.DueDate/Status, KPI dashboards</td></tr>
 <tr><td>Purchasing</td><td>Outsource/certs, trÃ¡nh thiáº¿u chá»©ng tá»«</td><td>OutsourceMirror, Job Dossier (certs)</td></tr>
 <tr><td>Maintenance</td><td>Downtime log chuáº©n Ä‘á»ƒ pháº£n Ã¡nh OEE</td><td>Downtime log (list liÃªn quan) IncidentLog (SharePoint List) + Teams: QMS-ALERT.</td></tr>
@@ -141,7 +141,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Planner táº¡o/Ä‘iá»u chá»‰nh routing, due date, release job.</li>
 <li>Integration Pack cháº¡y BAQ â†’ REST/OData â†’ upsert vÃ o M365 lists (Mirror) + táº¡o Job Dossier.</li>
 <li>OPS thá»±c thi (log Hold/NCR/Packaging/ShipRelease) trong M365, báº±ng chá»©ng lÆ°u vÃ o Job Dossier.</li>
-<li>Gate Ship Release cháº¡y validator: PASS â†’ RELEASED, lá»—i â†’ BLOCKED + táº¡o StandupAction.</li>
+<li>Gate phê duyệt giao hàng (ship release) cháº¡y validator: PASS â†’ RELEASED, lá»—i â†’ BLOCKED + táº¡o StandupAction.</li>
 <li>Power BI Ä‘á»c lists Ä‘á»ƒ dashboard KPI + Data Health.</li>
 </ol>
 <div class="callout ok">
@@ -192,7 +192,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>7</td><td>Nháº§m Rev giá»¯a Job vÃ  Part/REV Master</td><td>JobIndex.RevisionNum khÃ¡c folder REV</td><td>Cháº¡y sai chÆ°Æ¡ng trÃ¬nh/drawing</td><td>Hold ngay; má»Ÿ QCHoldLog ReasonCode=WrongRev; kiá»ƒm tra Part/REV</td><td>QCHoldLog + áº£nh/Ä‘Æ°á»ng dáº«n file Rev Ä‘Ãºng</td></tr>
 <tr><td>8</td><td>Throttling SharePoint</td><td>Flow fail 429/503</td><td>Backlog, trá»… dá»¯ liá»‡u</td><td>Giáº£m batch; báº­t retry/backoff; giÃ£n lá»‹ch; ghi IntegrationLogs</td><td>IntegrationLogs + thÃ´ng sá»‘ retry/batch</td></tr>
 <tr><td>9</td><td>Thiáº¿u ApprovalHistory</td><td>Record Ä‘Ã³ng nhÆ°ng khÃ´ng cÃ³ ApprovalHistory</td><td>KhÃ´ng audit Ä‘Æ°á»£c phÃª duyá»‡t</td><td>Cháº·n Ä‘Ã³ng há»“ sÆ¡; cháº¡y láº¡i approval flow; Ä‘Ã o táº¡o láº¡i approver</td><td>ApprovalHistory + record URL</td></tr>
-<tr><td>10</td><td>Ship packet thiáº¿u (gate lá»ng)</td><td>ShipRelease validator FAIL hoáº·c PacketComplete=No</td><td>Ship sai/thiáº¿u â†’ khiáº¿u náº¡i khÃ¡ch</td><td>BLOCKED + StandupAction S1; bá»• sung chá»©ng tá»«; re-validate</td><td>ShipRelease + folder ship packet + Final IR/CoC</td></tr>
+<tr><td>10</td><td>bộ hồ sơ giao hàng (ship packet) thiáº¿u (gate lá»ng)</td><td>ShipRelease validator FAIL hoáº·c PacketComplete=No</td><td>Ship sai/thiáº¿u â†’ khiáº¿u náº¡i khÃ¡ch</td><td>BLOCKED + StandupAction S1; bá»• sung chá»©ng tá»«; re-validate</td><td>ShipRelease + folder ship packet + Final IR/CoC</td></tr>
 </tbody>
 </table>
 </div>
@@ -292,7 +292,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>5</td><td>Kiá»ƒm tra Job Dossier táº¡o Ä‘á»§ folder template theo ANNEX-QMS-003</td><td>QA/QMS</td><td>Link folder + danh sÃ¡ch folder</td><td>Template lá»‡ch do flow cáº¥u hÃ¬nh khÃ¡c</td></tr>
 <tr><td>6</td><td>Kiá»ƒm tra ShipRelease pending/BLOCKED; chá»‘t blocker trong ngÃ y</td><td>WHS + QA</td><td>Danh sÃ¡ch BLOCKED + lÃ½ do</td><td>Äá»•i Status báº±ng tay</td></tr>
 <tr><td>7</td><td>Kiá»ƒm tra PackSSCCRegister: status Verified/Released Ä‘Ãºng logic</td><td>WHS</td><td>Record PackSSCCRegister + scan evidence</td><td>Reprint khÃ´ng cÃ³ reason</td></tr>
-<tr><td>8</td><td>Kiá»ƒm tra ApprovalHistory Ä‘á»§ cho Ship Release, NCR/CAPA closure</td><td>QA</td><td>ApprovalHistory lá»c theo SourceList</td><td>PhÃª duyá»‡t qua chat/miá»‡ng</td></tr>
+<tr><td>8</td><td>Kiá»ƒm tra ApprovalHistory Ä‘á»§ cho phê duyệt giao hàng (ship release), NCR/CAPA closure</td><td>QA</td><td>ApprovalHistory lá»c theo SourceList</td><td>PhÃª duyá»‡t qua chat/miá»‡ng</td></tr>
 <tr><td>9</td><td>Kiá»ƒm tra naming evidence Tier 1 theo ANNEX-QMS-003</td><td>Doc Control</td><td>Danh sÃ¡ch file Tier 1 + tÃªn file</td><td>Filename cÃ³ dáº¥u/kÃ½ tá»± khÃ´ng há»£p lá»‡</td></tr>
 <tr><td>10</td><td>Kiá»ƒm tra dashboard refresh status (JobIndex/ShipRelease cadence)</td><td>IT</td><td>Refresh log + thá»i Ä‘iá»ƒm gáº§n nháº¥t</td><td>Dashboard hiá»ƒn thá»‹ â€œcÅ©â€ mÃ  khÃ´ng bÃ¡o</td></tr>
 <tr><td>11</td><td>ÄÃ³ng triage: StandupActions Severity S1/S2 cÃ³ owner + due date</td><td>Supervisor</td><td>StandupActions list</td><td>KhÃ´ng gÃ¡n owner rÃµ</td></tr>
@@ -325,7 +325,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>BÆ°á»›c</th><th>Äiá»ƒm chÃ­nh (Key points)</th><th>LÃ½ do</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Dá»«ng thao tÃ¡c; gáº¯n tag HOLD vÃ o lÃ´/chi tiáº¿t</td><td>Cháº·n sai há»ng lan rá»™ng</td></tr>
-<tr><td>2</td><td>Táº¡o QCHoldLog: JobNum, ReasonCode, Containment, Severity</td><td>Audit trail + SLA xá»­ lÃ½</td></tr>
+<tr><td>2</td><td>Táº¡o QCHoldLog: JobNum, ReasonCode, Containment, Severity</td><td>dấu vết kiểm toán (audit trail) + SLA xá»­ lÃ½</td></tr>
 <tr><td>3</td><td>ÄÃ­nh báº±ng chá»©ng: áº£nh traveler + link file Rev Ä‘Ãºng</td><td>Giáº£m tranh luáº­n, tÄƒng tá»‘c quyáº¿t Ä‘á»‹nh</td></tr>
 <tr><td>4</td><td>ThÃ´ng bÃ¡o supervisor; cáº­p nháº­t StandupAction khi Severity CTQ</td><td>Æ¯u tiÃªn xá»­ lÃ½ theo Tier</td></tr>
 </tbody>
@@ -451,7 +451,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="mini">A. Cáº­p nháº­t lÃªn utcNow â€¢ B. Giá»¯ nguyÃªn â€¢ C. Trá»« 7 ngÃ y â€¢ D. XoÃ¡</div>
 </li>
 <li><b>(MC)</b> â€œKhÃ´ng cÃ³ báº±ng chá»©ng = khÃ´ng cÃ³ gateâ€ Ã¡p dá»¥ng máº¡nh nháº¥t á»Ÿ gate nÃ o?
- <div class="mini">A. Giao ca â€¢ B. Ship Release â€¢ C. Há»p tuáº§n â€¢ D. Cháº¥m cÃ´ng</div>
+ <div class="mini">A. Giao ca â€¢ B. phê duyệt giao hàng (ship release) â€¢ C. Há»p tuáº§n â€¢ D. Cháº¥m cÃ´ng</div>
 </li>
 <li><b>(MC)</b> Record phÃª duyá»‡t pháº£i Ä‘Æ°á»£c lÆ°u á»Ÿ Ä‘Ã¢u Ä‘á»ƒ audit?
  <div class="mini">A. ApprovalHistory â€¢ B. Chat nhÃ³m â€¢ C. Email cÃ¡ nhÃ¢n â€¢ D. Ghi nhá»›</div>
@@ -459,7 +459,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>(MC)</b> Evidence file Tier 1 lÆ°u á»Ÿ Ä‘Ã¢u?
  <div class="mini">A. Trong list â€¢ B. SharePoint library (Job Dossier/Partâ€‘REV) vÃ  list chá»‰ lÆ°u URL â€¢ C. USB â€¢ D. MÃ¡y cÃ¡ nhÃ¢n</div>
 </li>
-<li><b>(MC)</b> Äiá»u kiá»‡n PASS Ship Release báº¯t buá»™c cÃ³ gÃ¬?
+<li><b>(MC)</b> Äiá»u kiá»‡n PASS phê duyệt giao hàng (ship release) báº¯t buá»™c cÃ³ gÃ¬?
  <div class="mini">A. PacketComplete=Yes + Final IR PASS + Packaging PASS + SSCC Verified + ApprovalHistory</div>
 </li>
 <li><b>(MC)</b> Khi JobIndex.EvidenceFolderUrl rá»—ng, hÃ nh Ä‘á»™ng Ä‘Ãºng lÃ  gÃ¬?
@@ -506,7 +506,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>SC-03: Stopâ€‘ship bá»‹ kÃ­ch hoáº¡t</td>
 <td>ShipRelease BLOCKED, PacketComplete=No</td>
-<td>Bá»• sung ship packet Tier 1; Ä‘áº£m báº£o Final IR/CoC/Cert; cháº¡y validator; ApprovalHistory</td>
+<td>Bá»• sung bộ hồ sơ giao hàng (ship packet) Tier 1; Ä‘áº£m báº£o Final IR/CoC/Cert; cháº¡y validator; ApprovalHistory</td>
 <td>ShipRelease RELEASED há»£p lá»‡</td>
 <td>ShipRelease + folder ship packet + ApprovalHistory</td>
 </tr>

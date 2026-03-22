@@ -79,7 +79,7 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>2. Trigger báº¯t buá»™c pháº£i triá»ƒn khai poka-yoke</h2>
 <div class="table-card"><table><thead><tr><th>Trigger</th><th>Pháº£i lÃ m</th><th>Owner khá»Ÿi táº¡o</th></tr></thead><tbody>
 <tr><td>Repeat issue cÃ¹ng cÆ¡ cháº¿ trong 2 ká»³ / 2 job / 2 ca gáº§n nhau</td><td>Má»Ÿ Ä‘Ã¡nh giÃ¡ poka-yoke, khÃ´ng Ä‘Æ°á»£c Ä‘Ã³ng CAPA chá»‰ báº±ng Ä‘Ã o táº¡o láº¡i.</td><td>QA + khu vá»±c phÃ¡t sinh lá»—i</td></tr>
-<tr><td>Near-miss cÃ³ kháº£ nÄƒng gÃ¢y escape, crash, mixed part, sai revision, sai material, sai CTQ</td><td>PhÃ¢n tÃ­ch ngay kháº£ nÄƒng loáº¡i bá» / interlock / detect sá»›m táº¡i nguá»“n.</td><td>Supervisor / QA</td></tr>
+<tr><td>Near-miss cÃ³ kháº£ nÄƒng gÃ¢y escape, crash, mixed part, sai phiên bản (wrong revision), sai material, sai CTQ</td><td>PhÃ¢n tÃ­ch ngay kháº£ nÄƒng loáº¡i bá» / interlock / detect sá»›m táº¡i nguá»“n.</td><td>Supervisor / QA</td></tr>
 <tr><td>New machine / new setup family / new route cÃ³ rá»§i ro thao tÃ¡c cao</td><td>ÄÃ¡nh giÃ¡ trÆ°á»›c khi sáº£n xuáº¥t hÃ ng loáº¡t hoáº·c trÆ°á»›c khi giao Job Ä‘áº§u tiÃªn.</td><td>Engineering / Production</td></tr>
 <tr><td>Manual entry / manual select / manual count táº¡i Ä‘iá»ƒm cÃ³ háº­u quáº£ lá»›n</td><td>Æ¯u tiÃªn scan, lock, keying, interlock hoáº·c forced data completeness.</td><td>IT / Production / QA</td></tr>
 </tbody></table></div></div>
@@ -88,7 +88,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table><thead><tr><th>Má»©c</th><th>NguyÃªn táº¯c</th><th>VÃ­ dá»¥ phÃ¹ há»£p vá»›i HESEM</th><th>KhÃ´ng Ä‘áº¡t náº¿u</th></tr></thead><tbody>
 <tr><td><span class="badge-green">M1 â€” Loáº¡i bá»</span></td><td>LÃ m cho thao tÃ¡c sai lÃ  khÃ´ng thá»ƒ hoáº·c khÃ´ng cÃ³ Ä‘Æ°á»ng vÃ o.</td><td>Fixture keying, anti-rev lock, one-way orientation, khÃ³a program theo part-rev.</td><td>NgÆ°á»i dÃ¹ng váº«n cÃ³ thá»ƒ bypass dá»… dÃ ng báº±ng má»™t thao tÃ¡c thÆ°á»ng ngÃ y.</td></tr>
 <tr><td><span class="badge-blue">M2 â€” NgÄƒn cháº·n</span></td><td>Báº¯t buá»™c Ä‘iá»u kiá»‡n Ä‘Ãºng xáº£y ra trÆ°á»›c khi bÆ°á»›c tiáº¿p theo cháº¡y.</td><td>Scan-to-open Ä‘Ãºng traveler, forced checklist, interlock offset/door/probe.</td><td>Há»‡ thá»‘ng váº«n cho cháº¡y dÃ¹ thiáº¿u Ä‘iá»u kiá»‡n nhÆ°ng chá»‰ hiá»‡n cáº£nh bÃ¡o nháº¹.</td></tr>
-<tr><td><span class="badge-amber">M3 â€” PhÃ¡t hiá»‡n tá»©c thá»i</span></td><td>PhÃ¡t hiá»‡n sai ngay táº¡i Ä‘iá»ƒm dÃ¹ng vÃ  buá»™c ngÆ°á»i thao tÃ¡c dá»«ng láº¡i.</td><td>MÃ u gage, witness mark, alarm mismatch, count mismatch trÆ°á»›c seal.</td><td>Lá»—i chá»‰ Ä‘Æ°á»£c phÃ¡t hiá»‡n á»Ÿ cÃ´ng Ä‘oáº¡n sau hoáº·c á»Ÿ final inspection.</td></tr>
+<tr><td><span class="badge-amber">M3 â€” PhÃ¡t hiá»‡n tá»©c thá»i</span></td><td>PhÃ¡t hiá»‡n sai ngay táº¡i Ä‘iá»ƒm dÃ¹ng vÃ  buá»™c ngÆ°á»i thao tÃ¡c dá»«ng láº¡i.</td><td>MÃ u gage, witness mark, alarm mismatch, count mismatch trÆ°á»›c seal.</td><td>Lá»—i chá»‰ Ä‘Æ°á»£c phÃ¡t hiá»‡n á»Ÿ cÃ´ng Ä‘oáº¡n sau hoáº·c á»Ÿ kiểm tra cuối (final inspection).</td></tr>
 <tr><td><span class="badge-red">M4 â€” Giáº£m háº­u quáº£</span></td><td>Khi chÆ°a thá»ƒ cháº·n tá»« Ä‘áº§u, pháº£i cÃ´ láº­p pháº¡m vi vÃ  truy Ä‘Æ°á»£c ngay.</td><td>Unique lot separation, scan log, segregated bin, abnormal event flag.</td><td>KhÃ´ng khÃ³a Ä‘Æ°á»£c pháº¡m vi áº£nh hÆ°á»Ÿng hoáº·c khÃ´ng giÃºp containment nhanh hÆ¡n.</td></tr>
 </tbody></table></div></div>
 

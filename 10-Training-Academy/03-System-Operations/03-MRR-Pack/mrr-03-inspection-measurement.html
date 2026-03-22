@@ -114,7 +114,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr><td><span class="chk">☐</span> Danh mục gage dùng cho job (gage list) + status OK</td><td>GAGE</td><td>Q0</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/GAGE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_GAGELIST_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Calibration certificate cho gage CTQ</td><td>CAL</td><td>Q0</td><td>QA/QC</td><td class="mini">SSOT/Quality/CAL/</td><td class="mini">CAL_<gageid>_<span class="pill">&lt;YYYYMMDD&gt;</span>.pdf</gageid></td></tr>
-<tr><td><span class="chk">☐</span> Inspection plan / CTQ map (tần suất + phương pháp đo)</td><td>IPLAN</td><td>Q0</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/PLAN/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPLAN_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> kế hoạch kiểm tra (inspection plan) / CTQ map (tần suất + phương pháp đo)</td><td>IPLAN</td><td>Q0</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/PLAN/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPLAN_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> FAI/IR (first piece) ký xác nhận</td><td>FAI/IR</td><td>Q1</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FAI/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FAI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> IPQC record (đo trong quá trình)</td><td>IPQC</td><td>Q2</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/IPQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> SPC chart (khi CTQ yêu cầu kiểm soát thống kê)</td><td>SPC</td><td>Q2</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/SPC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SPC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
@@ -128,13 +128,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
 <ul class="tight">
-<li>Dùng gage hết hạn tem hoặc không có chứng chỉ hiệu chuẩn → STOP.</li><li>Không có inspection plan/CTQ map mà vẫn đo theo cảm tính → HOLD.</li><li>FAI/IR thiếu chữ ký QC → STOP.</li><li>Sửa số đo sau khi ghi (không có log/initial) → BLOCK và điều tra integrity.</li>
+<li>Dùng gage hết hạn tem hoặc không có chứng chỉ hiệu chuẩn → STOP.</li><li>Không có kế hoạch kiểm tra (inspection plan)/CTQ map mà vẫn đo theo cảm tính → HOLD.</li><li>FAI/IR thiếu chữ ký QC → STOP.</li><li>Sửa số đo sau khi ghi (không có log/initial) → BLOCK và điều tra integrity.</li>
 </ul>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Audit 60 giây</h2>
 <ol class="tight">
-<li>Mở GAGELIST và đối chiếu tem gage tại hiện trường.</li><li>Mở IPLAN và đối chiếu CTQ map với bản vẽ REV.</li><li>Mở FAI/IR và IPQC record; kiểm tra dấu thời gian và chữ ký.</li><li>Mở FQC và đối chiếu Ship Packet.</li>
+<li>Mở GAGELIST và đối chiếu tem gage tại hiện trường.</li><li>Mở IPLAN và đối chiếu CTQ map với bản vẽ REV.</li><li>Mở FAI/IR và IPQC record; kiểm tra dấu thời gian và chữ ký.</li><li>Mở FQC và đối chiếu bộ hồ sơ giao hàng (ship packet).</li>
 </ol>
 </div>
 <div class="card">

@@ -101,7 +101,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>K</b> (Kiến thức)</td>
-<td>Giải thích được 3-Point Match: <b>PO/Spec</b> ↔ <b>Chứng từ (MTR/CoC/phiếu kê đóng gói (phiếu kê đóng gói (packing list)))</b> ↔ <b>Hàng thực tế (nhãn/heat/qty)</b>. Hiểu HOLD là trạng thái bắt buộc khi thiếu dữ liệu.</td>
+<td>Giải thích được 3-Point Match: <b>PO/Spec</b> ↔ <b>Chứng từ (MTR/CoC/phiếu kê đóng gói (packing list))</b> ↔ <b>Hàng thực tế (nhãn/heat/qty)</b>. Hiểu HOLD là trạng thái bắt buộc khi thiếu dữ liệu.</td>
 <td>Quiz đạt ≥ 8/10.</td>
 </tr>
 <tr>
@@ -143,7 +143,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="step">
 <div class="cap">B1 — Nhận chứng từ</div>
 <ul>
-<li>Lấy PO, phiếu kê đóng gói (phiếu kê đóng gói (packing list)), MTR/CoC (khi áp dụng), yêu cầu đặc biệt (spec, revision).</li>
+<li>Lấy PO, phiếu kê đóng gói (packing list), MTR/CoC (khi áp dụng), yêu cầu đặc biệt (spec, revision).</li>
 <li>Kiểm tra mã nhà cung cấp, số PO, số lô/heat.</li>
 </ul>
 </div>
@@ -180,7 +180,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3">Nhận hàng (Inbound)</h3>
 <ul>
-<li>Đã có PO + phiếu kê đóng gói (phiếu kê đóng gói (packing list)) + MTR/CoC (khi áp dụng).</li>
+<li>Đã có PO + phiếu kê đóng gói (packing list) + MTR/CoC (khi áp dụng).</li>
 <li>Heat/Lot trên chứng từ khớp nhãn hàng.</li>
 <li>Số lượng khớp; bao bì không hư hỏng.</li>
 <li>Đã gắn status OK/HOLD/NG; vật tư HOLD để đúng khu.</li>
@@ -191,10 +191,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3">Xuất hàng (Outbound)</h3>
 <ul>
-<li>Đối chiếu Job/Part/Rev/Qty với traveller/phiếu kê đóng gói (phiếu kê đóng gói (packing list)).</li>
+<li>Đối chiếu Job/Part/Rev/Qty với traveller/phiếu kê đóng gói (packing list).</li>
 <li>Trạng thái đã Release (QA/OPS), không có HOLD.</li>
 <li>Đóng gói theo quy định bảo quản; nhãn shipping đầy đủ.</li>
-<li>Dossier: CoC/IR/FAI (khi yêu cầu) + phiếu kê đóng gói (phiếu kê đóng gói (packing list)).</li>
+<li>Dossier: CoC/IR/FAI (khi yêu cầu) + phiếu kê đóng gói (packing list).</li>
 <li>Ghi log phát hành CoC: <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-QA-011</a>.</li>
 </ul>
 </div>
@@ -217,7 +217,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="cap">Case 2 — Nhãn heat không khớp chứng từ</div>
 <ul>
 <li>Dừng nhập kho, gắn HOLD, cô lập lô.</li>
-<li>Soát lại phiếu kê đóng gói (phiếu kê đóng gói (packing list)); gọi nhà cung cấp xác nhận heat.</li>
+<li>Soát lại phiếu kê đóng gói (packing list); gọi nhà cung cấp xác nhận heat.</li>
 <li>Khi không xác nhận được trong SLA: tạo NCR và xử lý RETURN theo PROC.</li>
 </ul>
 </div><h2 class="h2">6) Quiz nhanh (10 câu)</h2><ol>
@@ -233,13 +233,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>1 lỗi Gate của C18 là gì?</li>
 </ol><details class="card"><summary><b>Đáp án chuẩn</b></summary>
 <ol>
-<li>PO/Spec ↔ Chứng từ (MTR/CoC/phiếu kê đóng gói (phiếu kê đóng gói (packing list))) ↔ Hàng thực tế (nhãn/heat/qty).</li>
+<li>PO/Spec ↔ Chứng từ (MTR/CoC/phiếu kê đóng gói (packing list)) ↔ Hàng thực tế (nhãn/heat/qty).</li>
 <li>HOLD.</li>
 <li>Supplier; Material/Part No; Heat/Lot; Qty; Date; Status (bổ sung Location khi áp dụng).</li>
 <li>OK: đủ dữ liệu và khớp; HOLD: thiếu dữ liệu hoặc có sai lệch cần xác minh.</li>
 <li>Gắn HOLD và cô lập lô.</li>
 <li>Khi có quy tắc truy xuất + hồ sơ gộp lô được phê duyệt.</li>
-<li>CoC/IR/FAI (khi yêu cầu) + phiếu kê đóng gói (phiếu kê đóng gói (packing list)) + nhãn shipping.</li>
+<li>CoC/IR/FAI (khi yêu cầu) + phiếu kê đóng gói (packing list) + nhãn shipping.</li>
 <li>FRM-PUR-001.</li>
 <li>FRM-PUR-007.</li>
 <li>Xuất sai vật liệu/nhầm revision/thiếu chứng từ truy xuất.</li>
@@ -252,7 +252,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 <h3 class="h3">Tiêu chí đạt</h3>
 <ul>
-<li>Không sai khác PO/phiếu kê đóng gói (phiếu kê đóng gói (packing list))/nhãn/qty/heat.</li>
+<li>Không sai khác PO/phiếu kê đóng gói (packing list)/nhãn/qty/heat.</li>
 <li>HOLD xử lý đúng (cô lập + log + báo cấp).</li>
 <li>Hồ sơ truy xuất mở ra được trong 5 phút.</li>
 </ul>

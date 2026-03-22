@@ -88,8 +88,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Sau thay lot vật liệu, thay batch outsource, thay jaw/clamp orientation</td><td>Kiểm thêm traceability, clamp scheme và condition bề mặt</td><td>Operator + Setup Lead</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>3. Bảy điểm bắt buộc tại máy</h2>
-<div class="table-card"><table><thead><tr><th>Điểm kiểm</th><th>Phải xác nhận</th><th>Bằng chứng tối thiểu</th><th>FAIL khi</th></tr></thead><tbody>
-<tr><td>1. Revision set</td><td>Drawing/spec, traveler, setup sheet, tool list, inspection method, customer overlay cùng Part/Rev</td><td>Traveler + setup sheet + link hồ sơ</td><td>Sai revision, thiếu tài liệu hiệu lực, hoặc không biết bản nào đang chạy</td></tr>
+<div class="table-card"><table><thead><tr><th>Điểm kiểm</th><th>Phải xác nhận</th><th>Bằng chứng tối thiểu</th><th>Không đạt khi</th></tr></thead><tbody>
+<tr><td>1. Revision set</td><td>Drawing/spec, traveler, setup sheet, tool list, inspection method, customer overlay cùng Part/Rev</td><td>Traveler + setup sheet + link hồ sơ</td><td>sai phiên bản (wrong revision), thiếu tài liệu hiệu lực, hoặc không biết bản nào đang chạy</td></tr>
 <tr><td>2. Material lot / traceability</td><td>Material tag, heat/lot, qty, condition khớp traveler và yêu cầu job</td><td>Tag vật liệu + traveler</td><td>Lot không khớp, không truy vết được hoặc lẫn vật liệu</td></tr>
 <tr><td>3. Tool list / tool life</td><td>ToolID đúng, tool CTQ còn life, insert/holder/stick-out đúng, không có tool hỏng</td><td>Tool list + log tuổi dao</td><td>Tool thiếu, sai vị trí, hết life, hoặc holder/runout nghi ngờ</td></tr>
 <tr><td>4. Offsets / probe zero / WCS</td><td>WCS đúng, probe/zero ổn định, offset giải thích được, không có giá trị lạ chưa xác nhận</td><td>Setup screen / zero check / note bàn giao</td><td>Offset không tin cậy, zero vừa đổi nhưng chưa re-verify</td></tr>
@@ -100,7 +100,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-info"><strong>Kiểm bổ sung bắt buộc</strong><br/>Job QPL-3/QPL-4, part có CTQ cao, part lần đầu, part có yêu cầu vacuum/clean/leak hoặc customer overlay đặc biệt phải kiểm thêm: gage readiness, inspection method, evidence path và người nhận đo part đầu.</div></div>
 <div class="section"><h2>4. Ba mức kiểm trước khi chạy</h2>
 <div class="table-card"><table><thead><tr><th>Mức kiểm</th><th>Mục tiêu</th><th>Nội dung</th><th>Không đạt thì làm gì</th></tr></thead><tbody>
-<tr><td>Mức A — Packet</td><td>Chặn sai revision, sai job, sai vật liệu, sai route</td><td>Kiểm tài liệu, traveler, material lot, QPL, customer overlay, previous hold/NCR</td><td>HOLD job packet; báo Supervisor / QA / Engineering</td></tr>
+<tr><td>Mức A — Packet</td><td>Chặn sai phiên bản (wrong revision), sai job, sai vật liệu, sai route</td><td>Kiểm tài liệu, traveler, material lot, QPL, customer overlay, previous hold/NCR</td><td>HOLD job packet; báo Supervisor / QA / Engineering</td></tr>
 <tr><td>Mức B — Machine static</td><td>Chặn sai setup phần cứng</td><td>Kiểm WCS, tool map, fixture orientation, coolant, chip/FOD, safety zone</td><td>HOLD machine; xử lý setup trước khi prove-out</td></tr>
 <tr><td>Mức C — Dynamic / first cut</td><td>Chặn crash, sai đường dao, drift sớm</td><td>Dry-run, single block, prove-out, part đầu, đặc tính chịu ảnh hưởng sau thay đổi</td><td>Dừng cycle; khoanh vùng last-known-good; chuyển WI-302 hoặc NCR nếu cần</td></tr>
 </tbody></table></div></div>
@@ -127,7 +127,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Job CTQ cao, QPL-3/QPL-4, customer overlay</td><td>FRM-511 + first-piece/FAI evidence + link hồ sơ đo</td><td>Operator + Setup Lead + QA</td></tr>
 <tr><td>Job sau crash/abnormal restart</td><td>FRM-511 + ghi rõ phạm vi suspect WIP + hành động restart</td><td>Supervisor + QA; Engineering/Maintenance khi có machine impact</td></tr>
 </tbody></table></div></div>
-<div class="section"><h2>8. Phản ứng khi FAIL</h2>
+<div class="section"><h2>8. Phản ứng khi không đạt</h2>
 <div class="step-list">
 <div class="step-item"><strong>Dừng Cycle Start.</strong><br/>Không cho phép chạy “một cái xem sao”.</div>
 <div class="step-item"><strong>Giữ trạng thái HOLD.</strong><br/>Tag máy, tag WIP hoặc tag lot liên quan nếu đã có cắt phoi sau lần kiểm cuối đạt.</div>

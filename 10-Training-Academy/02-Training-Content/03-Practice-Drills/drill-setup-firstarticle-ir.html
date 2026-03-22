@@ -94,7 +94,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">Chuẩn bị</span>
 <ul class="tight">
-<li>01 job có setup sheet + inspection plan.</li>
+<li>01 job có setup sheet + kế hoạch kiểm tra (inspection plan).</li>
 <li>01 bộ gage trong hạn hiệu chuẩn (cal label rõ).</li>
 <li>Form IR/FAI và HOLD tag.</li>
 </ul>
@@ -107,7 +107,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Owner</th><th>MRR</th><th style="width:90px;">Gate</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Pre-start safety: PPE, guard, LO/TO (KHI setup), 5S khu vực máy.</td><td>Setup/Operator</td><td>Pre-start checklist + ảnh 5S</td><td>STOP</td></tr><tr><td>2</td><td>Xác nhận program/setup sheet đúng REV và đúng job.</td><td>Setup</td><td>Link baseline + program release note</td><td>STOP</td></tr><tr><td>3</td><td>Kiểm tra dụng cụ đo: mã gage + hạn hiệu chuẩn + tình trạng.</td><td>QC</td><td>Gage check log + ảnh tem cal</td><td>HOLD</td></tr><tr><td>4</td><td>Setup máy theo setup sheet: tool, offset, fixture, zero.</td><td>Setup</td><td>Setup checklist + ảnh fixture</td><td>HOLD</td></tr><tr><td>5</td><td>Chạy first piece: đo CTQ theo inspection plan và ghi IR/FAI.</td><td>QC + Setup</td><td>IR/FAI ký + ảnh first piece</td><td>HOLD</td></tr><tr><td>6</td><td>Quyết định release: PASS hoặc HOLD + escal theo ladder.</td><td>Supervisor + QA</td><td>Release note hoặc HOLD tag + log escal</td><td>FAIL</td></tr><tr><td>7</td><td>Lưu toàn bộ evidence vào 20_Production/ và 30_QC/ theo naming rule.</td><td>Setup/QC</td><td>Links SSOT đúng tên</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Pre-start safety: PPE, guard, LO/TO (KHI setup), 5S khu vực máy.</td><td>Setup/Operator</td><td>Pre-start checklist + ảnh 5S</td><td>STOP</td></tr><tr><td>2</td><td>Xác nhận program/setup sheet đúng REV và đúng job.</td><td>Setup</td><td>Link baseline + program release note</td><td>STOP</td></tr><tr><td>3</td><td>Kiểm tra dụng cụ đo: mã gage + hạn hiệu chuẩn + tình trạng.</td><td>QC</td><td>Gage check log + ảnh tem cal</td><td>HOLD</td></tr><tr><td>4</td><td>Setup máy theo setup sheet: tool, offset, fixture, zero.</td><td>Setup</td><td>Setup checklist + ảnh fixture</td><td>HOLD</td></tr><tr><td>5</td><td>Chạy first piece: đo CTQ theo kế hoạch kiểm tra (inspection plan) và ghi IR/FAI.</td><td>QC + Setup</td><td>IR/FAI ký + ảnh first piece</td><td>HOLD</td></tr><tr><td>6</td><td>Quyết định release: PASS hoặc HOLD + escal theo ladder.</td><td>Supervisor + QA</td><td>Release note hoặc HOLD tag + log escal</td><td>FAIL</td></tr><tr><td>7</td><td>Lưu toàn bộ evidence vào 20_Production/ và 30_QC/ theo naming rule.</td><td>Setup/QC</td><td>Links SSOT đúng tên</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
@@ -118,12 +118,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Gage quá hạn hiệu chuẩn.</li>
 <li>Sai REV của setup sheet/program.</li>
 <li>Không lập IR/FAI hoặc thiếu chữ ký.</li>
-<li>Không HOLD khi lệch CTQ.</li>
+<li>Không tạm giữ khi lệch CTQ.</li>
 </ul>
 </div>
 <div class="card">
 <span class="badge">Rubric chấm điểm (10 điểm)</span>
-<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. PASS khi tổng ≥ 8/10 và không vi phạm fail-fast.</p>
+<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. đạt khi tổng ≥ 8/10 và không vi phạm fail-fast.</p>
 <div class="table-card">
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>

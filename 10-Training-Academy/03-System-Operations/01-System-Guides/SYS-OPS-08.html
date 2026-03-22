@@ -106,7 +106,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="gate">
 <div class="smallcaps">Gate bắt buộc</div>
 <p style="margin:6px 0 0 0">
-<b>No evidence = No gate.</b> KPI hiển thị trên báo cáo không được dùng để quyết định GO/SHIP khi thiếu MRR tại SharePoint (dossier/packet/log phê duyệt).
+<b>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)).</b> KPI hiển thị trên báo cáo không được dùng để quyết định GO/giao hàng khi thiếu MRR tại SharePoint (dossier/packet/log phê duyệt).
  </p>
 </div>
 </div>
@@ -204,7 +204,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>QC/QA</td>
 <td>NCRLog, QCHoldLog, CAPA8D</td>
 <td>Quality Cockpit</td>
-<td>HOLD CTQ chưa đóng + vẫn “Lam Ready” → BLOCK SHIP</td>
+<td>HOLD CTQ chưa đóng + vẫn “Lam Ready” → chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP)))</td>
 </tr>
 <tr>
 <td>NCR/MRB</td>
@@ -266,13 +266,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Refresh schedule lệch ca</b> → dashboard dùng dữ liệu cũ trong thời điểm quyết định.</li>
 <li><b>Publish thẳng PROD</b> → bypass UAT, không có BI_ReleaseNotes, không rollback.</li>
 <li><b>RLS cấu hình sai</b> → rò dữ liệu khách hàng, vi phạm bảo mật.</li>
-<li><b>Không khóa “No evidence = No gate”</b> → dùng KPI thay bằng chứng, tạo customer escape.</li>
+<li><b>Không khóa “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))”</b> → dùng KPI thay bằng chứng, tạo customer escape.</li>
 </ol>
 </div>
 <!-- 5) Risk Controls -->
 <div class="card">
 <h2>5) Risk Controls (control points; ai làm; bằng chứng)</h2>
-<p>Mỗi control point có Owner rõ ràng và MRR bắt buộc. Thiếu MRR → Gate không công nhận.</p>
+<p>Mỗi điểm kiểm soát (control point) có Owner rõ ràng và MRR bắt buộc. Thiếu MRR → Gate không công nhận.</p>
 <div class="table-wrap">
 <table>
 <thead>
@@ -343,7 +343,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>STOP (dừng ngay trong 60 giây)</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Khi dashboard dùng dữ liệu cũ hơn ngưỡng ca (timestamp không cập nhật) và vẫn có quyết định SHIP/GO đang chờ.</li>
-<li>Khi drill-through không mở tới EvidenceFolderUrl hoặc link bằng chứng chính (ship packet/IR/FAI) trống.</li>
+<li>Khi drill-through không mở tới EvidenceFolderUrl hoặc link bằng chứng chính (bộ hồ sơ giao hàng (ship packet)/IR/FAI) trống.</li>
 <li>Khi phát hiện KPI “Lam Ready %” tăng đột biến trong lúc QCHold/NCR mở tăng.</li>
 </ul>
 </div>
@@ -401,7 +401,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>RLS nghi ngờ sai</td>
 <td>IT khóa quyền xem report với nhóm nghi ngờ, chuyển report về DEV, mở điều tra.</td>
-<td>Audit trail quyền + release note khóa quyền</td>
+<td>dấu vết kiểm toán (audit trail) quyền + release note khóa quyền</td>
 </tr>
 </tbody>
 </table>
@@ -481,7 +481,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>DAX/KPI</td>
-<td>Dán template; thay placeholder; khóa logic “No evidence = No gate”</td>
+<td>Dán template; thay placeholder; khóa logic “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))”</td>
 <td>KPI sai hoặc thiếu gate tạo customer escape</td>
 </tr>
 <tr>
@@ -563,7 +563,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi fnGetSharePointList báo “not found or duplicated”, hành động chặn là gì?</li>
 <li>Trường hợp DueDate là text, KPI nào hỏng trước và dấu hiệu nhận biết?</li>
 <li>Vì sao cần expand hyperlink column trước khi dùng drill-through?</li>
-<li>Định nghĩa “No evidence = No gate” trong Control Tower.</li>
+<li>Định nghĩa “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))” trong Control Tower.</li>
 <li>Điều kiện BLOCK publish PROD.</li>
 <li>Khi refresh fail trong ca, ai ra quyết định và MRR nào bắt buộc?</li>
 <li>Giải thích vì sao star schema làm KPI ổn định hơn (một ý).</li>
@@ -574,7 +574,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Điểm chặn khi drill-through không mở EvidenceFolderUrl.</li>
 <li>Refresh owner account phải thuộc loại nào và vì sao?</li>
 <li>Biên bản UAT tối thiểu phải chứng minh điều gì?</li>
-<li>Control point nào khóa schema list và bằng chứng tương ứng?</li>
+<li>điểm kiểm soát (control point) nào khóa schema list và bằng chứng tương ứng?</li>
 <li>Chỉ ra 1 dấu hiệu dữ liệu “đúng cú pháp, sai thực tế”.</li>
 <li>Quy tắc STOP khi dashboard dùng dữ liệu cũ hơn ngưỡng ca.</li>
 <li>NCR/CAPA aging dùng để chặn rủi ro gì trong xưởng?</li>
@@ -639,7 +639,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>User track</b></td>
 <td>Thực hiện phản ứng 60 giây cho 01 anomaly và tạo record MRR đầy đủ (incident/anomaly + link evidence).</td>
 <td>Chọn đúng HOLD/GO; record đủ trường bắt buộc; link evidence mở được.</td>
-<td>Ra quyết định GO/SHIP khi thiếu evidence; không tạo record.</td>
+<td>Ra quyết định GO/giao hàng khi thiếu evidence; không tạo record.</td>
 </tr>
 </tbody>
 </table>
@@ -705,7 +705,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Dùng tài khoản cá nhân chạy refresh</b> → chuyển sang account vận hành/service principal M365/SharePoint → HESEM-QMS-SSOT.</li>
 <li><b>RLS không chứng minh được</b> → RLS_Test_Record 3 role.</li>
 <li><b>Model không nhất quán với schema list</b> → CP1 khóa schema + CP2 kiểm query.</li>
-<li><b>Dashboard dẫn dắt quyết định ship khi thiếu chứng từ</b> → khóa No evidence = No gate; STOP khi thiếu link evidence.</li>
+<li><b>Dashboard dẫn dắt quyết định giao hàng khi thiếu chứng từ</b> → khóa không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))); STOP khi thiếu link evidence.</li>
 <li><b>Không có kế hoạch rollback</b> → bắt buộc rollback trong release notes + test.</li>
 <li><b>Không có chủ sở hữu dữ liệu</b> → RACI ngắn và owner list trong record.</li>
 </ol>

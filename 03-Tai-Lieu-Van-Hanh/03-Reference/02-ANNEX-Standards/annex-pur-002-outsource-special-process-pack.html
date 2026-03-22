@@ -76,7 +76,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Khóa đủ pack trước khi gửi hàng ra ngoài, chỉ nhận hàng outsource về như hàng tốt khi cert, report, trace và scope đã đủ theo pack, và phát hành lại pack hoặc addendum pack có kiểm soát cho mọi thay đổi part rev, spec rev, route, processor, lot, qty, clean hoặc vacuum class, customer note làm thay đổi yêu cầu kỹ thuật.</div>
 </div><div class="section">
 <h2>2. Bộ dữ liệu bìa pack bắt buộc</h2>
-<div class="table-card"><table><thead><tr><th>Trường dữ liệu</th><th>Bắt buộc</th><th>Mục đích</th><th>Gate HOLD khi thiếu hoặc sai</th></tr></thead><tbody>
+<div class="table-card"><table><thead><tr><th>Trường dữ liệu</th><th>Bắt buộc</th><th>Mục đích</th><th>Gate tạm giữ khi thiếu hoặc sai</th></tr></thead><tbody>
 <tr><td>WO/Job / PO / subcontract PO</td><td>PHẢI có</td><td>Khóa giao dịch và liên kết trách nhiệm.</td><td>Không xác định được nguồn phát hành hoặc không liên kết được với routing/job.</td></tr>
 <tr><td>Part no / Rev / qty / UOM</td><td>PHẢI có</td><td>Khóa revision và số lượng giao nhận.</td><td>Part/Rev/qty không đồng nhất giữa PO, pack và traveller.</td></tr>
 <tr><td>Process family / process spec / class</td><td>PHẢI có</td><td>Xác định đúng loại xử lý và scope cert cần nhận về.</td><td>Chỉ ghi tên process chung chung như “anodize” mà không có class/spec/revision.</td></tr>
@@ -121,7 +121,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-warning"><strong>Job clean / vacuum / semiconductor:</strong> ngoài pack tiêu chuẩn, phải gắn thêm yêu cầu từ <a href="annex-qa-007-surface-finish-vacuum-compatibility.html">ANNEX-QA-007</a>, <a href="annex-whs-001-packaging-labeling-spec.html">ANNEX-WHS-001</a>, <a href="../../02-Work-Instructions/07-WI-700/wi-715-helium-leak-test-standard-work.html">WI-715</a> và <a href="../../02-Work-Instructions/07-WI-700/wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a> khi job có yêu cầu leak, clean pack hoặc vacuum compatibility.</div>
 </div><div class="section">
 <h2>6. Gate gửi đi và gate nhận về</h2>
-<div class="table-card"><table><thead><tr><th>Gate</th><th>PASS khi</th><th>HOLD khi</th></tr></thead><tbody>
+<div class="table-card"><table><thead><tr><th>Gate</th><th>đạt khi</th><th>tạm giữ khi</th></tr></thead><tbody>
 <tr><td>S0 — Pack release</td><td>Đủ cover data, technical lock, trace bundle, approved processor, packaging note, PO flow-down.</td><td>Thiếu rev lock, thiếu cert requirement, processor chưa approved hoặc hàng chưa pass công đoạn trước.</td></tr>
 <tr><td>S1 — Dispatch to processor</td><td>Qty/lot/box count đúng; pack phát hành đúng phiên bản; shipping label và seal đúng rule.</td><td>Nhầm qty, mixed lot chưa tách, label không map với pack, không có ảnh giao nhận khi job nhạy.</td></tr>
 <tr><td>S2 — In-process / overdue</td><td>ETA, promised date và delay action được theo dõi; có backup plan nếu chạm risk due date.</td><td>Quá hạn không escalation, processor thay đổi thông tin nhưng chưa chấp thuận lại.</td></tr>

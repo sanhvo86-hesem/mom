@@ -64,7 +64,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
 <div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
 </div>
-<div class="title"><strong>SOP-401 — Kiểm soát nhà cung cấp, mua hàng và công đoạn đặc biệt thuê ngoài</strong><span class="sub-vn">Kiểm soát nguồn cung, flow-down, special process outsource, receipt evidence và hiệu suất NCC</span></div>
+<div class="title"><strong>SOP-401 — Kiểm soát nhà cung cấp, mua hàng và công đoạn đặc biệt thuê ngoài</strong><span class="sub-vn">Kiểm soát nguồn cung, flow-down, công đoạn đặc biệt thuê ngoài (công đoạn đặc biệt thuê ngoài (công đoạn đặc biệt thuê ngoài (công đoạn đặc biệt thuê ngoài (special process outsource)))), bằng chứng nhận hàng (bằng chứng nhận hàng (bằng chứng nhận hàng (bằng chứng nhận hàng (receipt evidence)))) và hiệu suất NCC</span></div>
 <div class="meta"><div class="row"><span><b>Mã:</b></span><span>SOP-401</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span>Supply Chain Manager / QA Manager</span></div><div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div></div>
 </div>
 <div class="doc-content" id="docContent"><div class="form-sheet">
@@ -79,7 +79,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <a href="#p3">3. Thuật ngữ &amp; nguyên tắc</a>
 <a href="#p4">4. Vai trò, quyền hạn &amp; RACI</a>
 <a href="#p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</a>
-<a href="#p6">6. Control gate, điểm dừng bắt buộc &amp; KPI</a>
+<a href="#p6">6. cổng kiểm soát (control gate), điểm dừng bắt buộc &amp; KPI</a>
 <a href="#p7">7. Quy trình chi tiết</a>
 <a href="#p8">8. Ngoại lệ, thay đổi &amp; làm lại</a>
 <a href="#p9">9. Hệ thống, hồ sơ &amp; dữ liệu</a>
@@ -120,9 +120,9 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td>NCC được phê duyệt</td><td>NCC đã hoàn tất đánh giá theo cấp rủi ro đang áp dụng, hồ sơ còn hiệu lực và không ở trạng thái Probation / Suspend / Block cho family liên quan.</td></tr>
 <tr><td>Processor được phê duyệt</td><td>Nhà gia công ngoài hoặc special processor được HESEM cho phép dùng cho một <b>process family + spec/scope + site</b> xác định. Phê duyệt processor không tự động áp cho mọi site hay mọi process.</td></tr>
 <tr><td>Flow-down</td><td>Bộ yêu cầu HESEM chuyển xuống NCC bằng PO, checklist và pack đính kèm để NCC có thể làm đúng từ đầu.</td></tr>
-<tr><td>Single-source</td><td>Nguồn mà tại thời điểm lập đơn hàng chỉ có một lựa chọn thực tế. Single-source được phép dùng khi đã có biện pháp bảo vệ tiến độ và rủi ro riêng.</td></tr>
-<tr><td>Special process</td><td>Quá trình mà đầu ra không thể được xác nhận đầy đủ chỉ bằng kiểm tra sau cùng; vì vậy phải kiểm soát năng lực nguồn, scope chứng chỉ, flow-down và receipt evidence chặt hơn.</td></tr>
-<tr><td>SCAR</td><td>Supplier Corrective Action Request. Kích hoạt khi có lỗi lặp, lỗi nghiêm trọng, thiếu chứng chỉ, sai spec, sai revision, giao trễ kéo dài hoặc vi phạm change notification.</td></tr>
+<tr><td>Single-source</td><td>Nguồn mà tại thời điểm lập đơn hàng chỉ có một lựa chọn thực tế. nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (single-source)))) được phép dùng khi đã có biện pháp bảo vệ tiến độ và rủi ro riêng.</td></tr>
+<tr><td>Special process</td><td>Quá trình mà đầu ra không thể được xác nhận đầy đủ chỉ bằng kiểm tra sau cùng; vì vậy phải kiểm soát năng lực nguồn, scope chứng chỉ, flow-down và bằng chứng nhận hàng (bằng chứng nhận hàng (bằng chứng nhận hàng (bằng chứng nhận hàng (receipt evidence)))) chặt hơn.</td></tr>
+<tr><td>SCAR</td><td>Supplier hành động khắc phục (corrective action) Request (SCAR) (SCAR). Kích hoạt khi có lỗi lặp, lỗi nghiêm trọng, thiếu chứng chỉ, sai spec, sai phiên bản (wrong revision), giao trễ kéo dài hoặc vi phạm change notification.</td></tr>
 </tbody></table></div>
 <div class="callout-grid">
 <div class="callout-card"><h3>Nguyên tắc 1 — Kiểm soát theo rủi ro và family</h3><ul class="tight"><li>Không đánh giá “một lần dùng cho mọi thứ”. Mỗi supplier / processor phải được nhìn theo <b>family</b>: raw material, standard hardware, tool, subcontract machining, special process, calibration, logistics.</li><li>Supplier có thể Approved cho một family nhưng chỉ Conditional hoặc Block cho family khác.</li></ul></div>
@@ -132,12 +132,12 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </div>
 <h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:48%"/><col style="width:36%"/></colgroup><thead><tr><th>Vai trò</th><th>Trách nhiệm bắt buộc</th><th>Quyền hạn mở / dừng</th></tr></thead><tbody>
-<tr><td>Supply Chain Manager</td><td>Chủ trì chiến lược nguồn cung, phê duyệt family/risk class, chấp thuận nguồn dùng có điều kiện, xử lý single-source và escalation khi supplier ảnh hưởng OTD/OTQ.</td><td>Được mở 401-G1 cho supplier thường; được dừng toàn bộ family khi có bằng chứng mất kiểm soát hoặc customer complaint liên quan NCC.</td></tr>
-<tr><td>Buyer / Purchasing</td><td>Thu thập hồ sơ supplier, phát hành PO, gửi flow-down, theo dõi commit, cập nhật ETA, tổ chức pack outsource và record supplier folder.</td><td>Được HOLD 401-G2 khi PO thiếu field, pack chưa đủ, cert/scope chưa rõ, hoặc supplier không cam kết được lead time / output condition.</td></tr>
+<tr><td>Supply Chain Manager</td><td>Chủ trì chiến lược nguồn cung, phê duyệt family/risk class, chấp thuận nguồn dùng có điều kiện, xử lý nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (single-source)))) và escalation khi supplier ảnh hưởng OTD/OTQ.</td><td>Được mở 401-G1 cho supplier thường; được dừng toàn bộ family khi có bằng chứng mất kiểm soát hoặc customer complaint liên quan NCC.</td></tr>
+<tr><td>Buyer / Purchasing</td><td>Thu thập hồ sơ supplier, phát hành PO, gửi flow-down, theo dõi commit, cập nhật ETA, tổ chức pack outsource và record supplier folder.</td><td>Được HOLD 401-G2 khi PO thiếu field, pack chưa đủ, cert/scope chưa rõ, hoặc supplier không cam kết được thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))) / output condition.</td></tr>
 <tr><td>QA Manager</td><td>Phê duyệt mức kiểm soát chất lượng của supplier / processor, chặn nguồn khi phát sinh lỗi, phê duyệt release hoặc reject hàng trả về theo bằng chứng.</td><td>Có quyền HOLD/REJECT mọi lô hàng hoặc supplier khi cert/scope không phù hợp, có nghi ngờ giả mạo hoặc lỗi ảnh hưởng CTQ.</td></tr>
 <tr><td>Quality Engineer</td><td>Xem spec, cert requirement, test requirement, incoming plan, scorecard, SCAR và effectiveness sau hành động khắc phục.</td><td>Được yêu cầu tightened receipt inspection hoặc 100% inspection theo trend rủi ro.</td></tr>
 <tr><td>Engineering Lead / Process Engineer</td><td>Xác nhận bản vẽ, special notes, process route, masking/fixture requirement, coupon/test sample requirement, approved material/process requirement.</td><td>Được chặn gửi việc ra ngoài khi baseline kỹ thuật chưa khóa hoặc chưa đủ dữ liệu để NCC làm đúng.</td></tr>
-<tr><td>Planner</td><td>Đánh giá tác động capacity và due date, kích hoạt outsource theo plan, phản hồi ưu tiên/hot-job, phối hợp recovery khi NCC trễ.</td><td>Được escalte lên 401-G3/401-G5 khi outsource ảnh hưởng dispatch stability hoặc freeze window.</td></tr>
+<tr><td>Planner</td><td>Đánh giá tác động capacity và due date, kích hoạt outsource theo plan, phản hồi ưu tiên/hot-job, phối hợp recovery khi NCC trễ.</td><td>Được escalte lên 401-G3/401-G5 khi outsource ảnh hưởng dispatch stability hoặc cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window)))).</td></tr>
 <tr><td>Warehouse / IQC</td><td>Xuất/nhận kiện, kiểm đếm, kiểm nhận dạng, giữ quarantine, thực hiện incoming log và chuyển QA đánh giá khi cần.</td><td>Được từ chối xuất/gửi hoặc không nhập kho khi nhãn, số lượng, tình trạng bao gói hoặc chứng từ không khớp.</td></tr>
 </tbody></table></div>
 <div class="role-note"><b>Quyền vượt cấp:</b> Dùng supplier / processor ngoài danh sách Approved, dùng source đã Suspend/Block, ship thẳng vật tư/hàng outsource về xưởng chưa qua gate hoặc waive cert/scope chỉ được phép khi <b>Tổng Giám Đốc + QA Manager + Supply Chain Manager</b> cùng phê duyệt bằng hồ sơ rõ lý do, phạm vi và biện pháp bảo vệ.</div>
@@ -148,11 +148,11 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="field"><b>Điều kiện tiên quyết</b><div class="blank">Không phát hành khi part/rev/spec chưa khóa, chưa rõ cert requirement, chưa rõ source family, hoặc processor scope chưa verified.</div></div>
 <div class="field"><b>Điểm dừng tự động</b><div class="blank">Suspend/Block status, cert hết hạn, site/scope mismatch, counterfeit signal, repeated reject, customer-nominated source chưa có waiver rõ.</div></div>
 </div>
-<h2 class="h2" id="p6">6. Control gate, điểm dừng bắt buộc &amp; KPI</h2>
+<h2 class="h2" id="p6">6. cổng kiểm soát (control gate), điểm dừng bắt buộc &amp; KPI</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:28%"/><col style="width:20%"/><col style="width:18%"/><col style="width:20%"/></colgroup><thead><tr><th>Cổng</th><th>Tiêu chí mở cổng</th><th>Điểm dừng bắt buộc</th><th>Owner</th><th>KPI chính</th></tr></thead><tbody>
-<tr><td><b>401-G1</b><br/>Source approval</td><td>Đã xác định family; risk class; approved/conditional processor status; customer source restriction; alternate source status.</td><td>NCC mới chưa đánh giá; site/scope mismatch; Block status; single-source chưa có risk treatment.</td><td>Supply Chain + QA</td><td>% supplier hồ sơ đầy đủ; % critical buy có nguồn thay thế; cycle time onboarding.</td></tr>
-<tr><td><b>401-G2</b><br/>PO &amp; flow-down release</td><td>PO đủ field; pack kỹ thuật đủ; flow-down checklist pass; due date và output condition được NCC commit.</td><td>Thiếu rev/spec; thiếu cert requirement; yêu cầu đóng gói/nhãn chưa rõ; chưa xác nhận lead time.</td><td>Buyer</td><td>PO right-first-time; % PO phát hành lại; response time xác nhận đơn.</td></tr>
-<tr><td><b>401-G3</b><br/>Outsource dispatch</td><td>Hàng gửi đi đã nhận dạng; kit đầy đủ; form yêu cầu outsource sạch; logistics path và ETA rõ; risk of delay reviewed.</td><td>Thiếu traveler/pack; quantity mismatch; job đang hold; processor commit không phù hợp freeze window.</td><td>Buyer + Planner + Warehouse</td><td>On-time send-out; outsource turnaround adherence; hot-job containment response.</td></tr>
+<tr><td><b>401-G1</b><br/>Source approval</td><td>Đã xác định family; risk class; approved/conditional processor status; customer source restriction; alternate source status.</td><td>NCC mới chưa đánh giá; site/scope mismatch; Block status; nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (single-source)))) chưa có risk treatment.</td><td>Supply Chain + QA</td><td>% supplier hồ sơ đầy đủ; % critical buy có nguồn thay thế; cycle time onboarding.</td></tr>
+<tr><td><b>401-G2</b><br/>PO &amp; flow-down release</td><td>PO đủ field; pack kỹ thuật đủ; flow-down checklist pass; due date và output condition được NCC commit.</td><td>Thiếu rev/spec; thiếu cert requirement; yêu cầu đóng gói/nhãn chưa rõ; chưa xác nhận thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))).</td><td>Buyer</td><td>PO right-first-time; % PO phát hành lại; response time xác nhận đơn.</td></tr>
+<tr><td><b>401-G3</b><br/>Outsource dispatch</td><td>Hàng gửi đi đã nhận dạng; kit đầy đủ; form yêu cầu outsource sạch; logistics path và ETA rõ; risk of delay reviewed.</td><td>Thiếu traveler/pack; quantity mismatch; job đang hold; processor commit không phù hợp cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window)))).</td><td>Buyer + Planner + Warehouse</td><td>On-time send-out; outsource turnaround adherence; hot-job containment response.</td></tr>
 <tr><td><b>401-G4</b><br/>Receipt certification &amp; release</td><td>Kiện về nguyên vẹn; cert match part/rev/spec/lot/site; quantity match; incoming inspection pass theo rule.</td><td>Thiếu cert; cert giả nghi ngờ; lot/heat mismatch; bao gói hư; special process scope mismatch.</td><td>Warehouse / IQC + QA</td><td>Cert completeness; incoming reject ppm; % receipt hold đúng hạn xử lý.</td></tr>
 <tr><td><b>401-G5</b><br/>Scorecard / SCAR / requalification</td><td>Data OTD/OTQ cập nhật; scorecard review; corrective action đóng; status Approved/Probation/Suspend cập nhật.</td><td>SCAR quá hạn; reject lặp; OTD/OTQ dưới ngưỡng; change-notice violation.</td><td>Supply Chain + QA</td><td>OTD; quality reject rate; SCAR overdue; probation close rate.</td></tr>
 </tbody></table></div>
@@ -167,7 +167,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <ol class="tight">
 <li>Buyer hoặc Supply Chain Manager phải xác định family ngay từ đầu: raw material, standard buy, tool, subcontract machining, special process, calibration/service.</li>
 <li>Risk class phải tính theo <b>ảnh hưởng CTQ, khả năng thay thế, lịch sử lỗi, thời gian dẫn, mức phụ thuộc vào chứng chỉ/scope</b> và ràng buộc khách hàng.</li>
-<li>Single-source phải ghi rõ tình trạng alternate source, safety stock / buying window / outsource contingency. Không được coi single-source là tình trạng “bình thường” nếu chưa có biện pháp bảo vệ tiến độ.</li>
+<li>nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (single-source)))) phải ghi rõ tình trạng alternate source, safety stock / buying window / outsource contingency. Không được coi nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (single-source)))) là tình trạng “bình thường” nếu chưa có biện pháp bảo vệ tiến độ.</li>
 </ol>
 <h3 class="h3">7.2 Đánh giá nguồn mới, thay đổi nguồn hoặc thay đổi site/process</h3>
 <ol class="tight">
@@ -203,13 +203,13 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Trước khi gửi, Buyer + Planner + Warehouse phải xác nhận part/rev, quantity, route, processor, due date, traveler/job packet, tình trạng bề mặt hiện tại, photo evidence nếu job yêu cầu.</li>
 <li><a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx">FRM-403</a> phải mô tả rõ process requested, spec, masking / rack / orientation / witness sample / coupon nếu áp dụng. <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-404</a> phải pass trước khi giao kiện cho Logistics.</li>
 <li>Nếu job đi nhiều processor liên tiếp, mỗi chặng phải có release riêng; không gom nhiều special process vào một “giao miệng”.</li>
-<li>Hot-job gửi ngoài trong freeze window của Planning phải theo authority ladder và ghi rõ ai chịu trách nhiệm tác động tới lịch xưởng.</li>
+<li>Hot-job gửi ngoài trong cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window)))) của Planning phải theo authority ladder và ghi rõ ai chịu trách nhiệm tác động tới lịch xưởng.</li>
 </ol>
 <h3 class="h3">7.6 Theo dõi commit, chậm giao và sự kiện supplier</h3>
 <ol class="tight">
 <li>Buyer phải có bằng chứng commit date của supplier và cập nhật ETA vào hệ thống. ETA không có bằng chứng không được dùng để cam kết lại với khách hàng hoặc với Planning.</li>
 <li>Khi supplier trễ, phải phân loại nguyên nhân ngay: vật tư thiếu, queue overload, process issue, cert issue, transport issue, sub-tier issue hay customer hold.</li>
-<li>Sự kiện sau đây phải escalation ngay qua <a href="../../03-Reference/01-ANNEX-System/annex-qms-020-escalation-matrix-and-sla.html">ANNEX-QMS-020</a>: special process cert hết hạn giữa chừng, site change không báo, repeated reject, counterfeit signal, hoặc ETA trượt làm ảnh hưởng gate ship release.</li>
+<li>Sự kiện sau đây phải escalation ngay qua <a href="../../03-Reference/01-ANNEX-System/annex-qms-020-escalation-matrix-and-sla.html">ANNEX-QMS-020</a>: special process cert hết hạn giữa chừng, site change không báo, repeated reject, counterfeit signal, hoặc ETA trượt làm ảnh hưởng gate phê duyệt giao hàng (ship release).</li>
 </ol>
 <h3 class="h3">7.7 Nhận hàng về, review chứng chỉ và quyết định nhập</h3>
 <ol class="tight">
@@ -236,7 +236,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Supplier không được tự đổi sub-tier cho công đoạn, vật tư hoặc dịch vụ có ảnh hưởng CTQ nếu HESEM chưa review và chấp thuận. Khi supplier sử dụng sub-tier được phép, chain trace và cert chain phải truy ngược được tới sub-tier đó.</li>
 <li>Supplier folder phải đủ cấu trúc để audit trong thời gian ngắn: master record, risk class, approved family/scope/site, cert/scope copies, scorecard history, SCAR, audit report, approved contacts, emergency contacts và decision log.</li>
 <li>Khi xảy ra gián đoạn như cháy nhà xưởng NCC, mất điện dài, vận chuyển bị giữ, cert authority issue, chemical bath shutdown hoặc quality escape hàng loạt, trong <b>60 phút đầu</b> Buyer phải ghi rõ ảnh hưởng tới open POs/jobs, ETA mới tạm thời, source dự phòng khả dụng, và quyết định escalation theo SLA. Không chờ đủ mọi thông tin mới bắt đầu phản ứng.</li>
-<li>Nếu supplier event ảnh hưởng nhiều hơn một job hoặc chạm due date của job đang ở freeze window, phải mở war-room mini giữa Supply Chain, Planning, QA và Production để chốt priority, receipt inspection strategy và communication cadence.</li>
+<li>Nếu supplier event ảnh hưởng nhiều hơn một job hoặc chạm due date của job đang ở cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window)))), phải mở war-room mini giữa Supply Chain, Planning, QA và Production để chốt priority, receipt inspection strategy và communication cadence.</li>
 </ol>
 <div class="note-blue"><b>Rule về hồ sơ:</b> Một NCC chỉ được xem là đang được kiểm soát khi từ supplier folder có thể truy ra ngay: trạng thái source hiện tại, family được phép dùng, cert/scope đang hiệu lực, open POs, open SCAR và event gần nhất ảnh hưởng OTD/OTQ.</div><h3 class="h3">7.11 Customer complaint liên quan supplier và quy tắc đóng vòng lặp</h3>
 <ol class="tight">
@@ -246,8 +246,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ol>
 <h3 class="h3">7.12 Audit chu kỳ, requalification định kỳ và kiểm chứng tính sẵn sàng của nguồn dự phòng</h3>
 <ol class="tight">
-<li>Supplier / processor thuộc nhóm rủi ro cao, single-source hoặc special process phải có nhịp review định kỳ rõ: hồ sơ còn hiệu lực, scope còn đúng, performance trend và nhu cầu requalification.</li>
-<li>Alternate source nếu có trong danh sách nhưng nhiều tháng không dùng phải được xem xét lại khả năng kích hoạt thật: lead time hiện tại, MOQ, condition of use, cert availability, customer acceptance và đường logistics. Nguồn dự phòng chỉ có giá trị khi có thể dùng được, không phải chỉ vì tên còn nằm trên danh sách.</li>
+<li>Supplier / processor thuộc nhóm rủi ro cao, nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (single-source)))) hoặc special process phải có nhịp review định kỳ rõ: hồ sơ còn hiệu lực, scope còn đúng, performance trend và nhu cầu requalification.</li>
+<li>Alternate source nếu có trong danh sách nhưng nhiều tháng không dùng phải được xem xét lại khả năng kích hoạt thật: thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))) hiện tại, MOQ, condition of use, cert availability, customer acceptance và đường logistics. Nguồn dự phòng chỉ có giá trị khi có thể dùng được, không phải chỉ vì tên còn nằm trên danh sách.</li>
 <li>Khi supplier pass audit nhưng performance ngoài hiện trường xấu đi, performance data có ưu tiên cao hơn “điểm audit đẹp”. Audit là bằng chứng hỗ trợ, không thay cho dữ liệu OTD/OTQ thật.</li>
 </ol>
 <div class="note-soft"><b>Rule cuối cùng của SOP-401:</b> Mua đúng không phải là “mua được hàng”, mà là <b>đưa đúng đầu vào đã kiểm soát</b> vào hệ thống HESEM với đủ bằng chứng để các gate sau có thể tin cậy.</div><h3 class="h3">7.13 Bộ bằng chứng tối thiểu của một lần nhận hàng hợp lệ</h3>
@@ -275,7 +275,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <ol class="tight">
 <li>Chặn nhận tiếp/không phát hành tiếp lô liên quan; đặt <b>HOLD</b> tại receipt, WIP và shipment nếu có liên quan.</li>
 <li>Xác định tất cả job, PO, lot, cert, ship date và customer bị ảnh hưởng.</li>
-<li>Kích hoạt supplier contact chain, yêu cầu containment, replacement lead time và evidence gốc.</li>
+<li>Kích hoạt supplier contact chain, yêu cầu containment, replacement thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))) và evidence gốc.</li>
 <li>Nếu có ảnh hưởng khách hàng, CS/QA phải thống nhất một thông điệp duy nhất; supplier hoặc xưởng không được tự liên lạc lệch thông tin.</li>
 <li>Mở hồ sơ SCAR/NCR/CAPA khi vượt ngưỡng được quy định; không dùng email rời rạc để thay hồ sơ chính thức.</li>
 </ol></div>

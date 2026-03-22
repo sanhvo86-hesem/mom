@@ -74,7 +74,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
       
 <div class="section"><h2>1. Mục đích và quy tắc quản trị dữ liệu setup</h2>
 <p>ANNEX này khóa cấu trúc dữ liệu bắt buộc của <strong>Setup Sheet</strong>, <strong>Tool List</strong> và các phụ lục setup liên quan. Mọi gói release dùng để setup, prove-out, first piece, work transfer, machine restart sau crash hoặc rebaseline đều phải dùng đúng cấu trúc dữ liệu này. Không được phát hành setup sheet theo kiểu mô tả tự do, thiếu trường khóa hoặc dựa vào trí nhớ của người setup.</p>
-<div class="callout-danger"><strong>Điểm dừng phát hành:</strong> thiếu Part/Rev, thiếu machine family, thiếu fixture logic, thiếu WCS/probing method, thiếu tool list hoặc thiếu prove-out note là <strong>không được phát hành</strong>. Nếu release thiếu dữ liệu rồi mới bù bằng miệng ở xưởng thì release đó không có giá trị.</div>
+<div class="callout-danger"><strong>Điểm dừng phát hành:</strong> thiếu Part/Rev, thiếu nhóm máy (machine family), thiếu fixture logic, thiếu WCS/probing method, thiếu tool list hoặc thiếu prove-out note là <strong>không được phát hành</strong>. Nếu release thiếu dữ liệu rồi mới bù bằng miệng ở xưởng thì release đó không có giá trị.</div>
 <div class="callout-info"><strong>Nguyên tắc:</strong> một setup sheet chỉ được dùng khi nó trả lời được đầy đủ 6 câu hỏi: <strong>chạy job nào</strong>, <strong>trên máy nào</strong>, <strong>kẹp như thế nào</strong>, <strong>lấy chuẩn ở đâu</strong>, <strong>dùng tool nào</strong>, và <strong>mở chu kỳ đầu như thế nào</strong>.</div>
 </div>
 
@@ -106,7 +106,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="section"><h2>4. Dữ liệu công đoạn bắt buộc theo từng setup</h2>
 <p>Mỗi setup phải có một <strong>operation block</strong> riêng. Không dùng một sheet chung mô tả mơ hồ cho nhiều setup có logic WCS hoặc workholding khác nhau.</p>
 <div class="table-card"><table><thead><tr><th>Nhóm dữ liệu</th><th>Nội dung bắt buộc</th><th>Ghi chú</th></tr></thead><tbody>
-<tr><td>Operation block ID</td><td>Setup no., machine family, machine size envelope nếu quan trọng, fixture ID/rev, program main/sub program list</td><td>Dùng để khóa đúng cấu hình thực tế của từng công đoạn.</td></tr>
+<tr><td>Operation block ID</td><td>Setup no., nhóm máy (machine family), machine size envelope nếu quan trọng, fixture ID/rev, program main/sub program list</td><td>Dùng để khóa đúng cấu hình thực tế của từng công đoạn.</td></tr>
 <tr><td>Orientation</td><td>Mặt A/B/C hoặc top/front/right; ảnh minh họa và mũi tên định hướng phải thống nhất với bản vẽ</td><td>Phải dùng ảnh minh họa và mũi tên định hướng; không mô tả chỉ bằng chữ khi có nguy cơ đảo mặt.</td></tr>
 <tr><td>Clamp strategy</td><td>Điểm tỳ, điểm kẹp, thứ tự kẹp, lực/torque, soft jaw profile, support/rest pad, anti-slip note</td><td>Phải chỉ rõ vùng phải tránh kẹp và vùng dễ biến dạng.</td></tr>
 <tr><td>Cut access / interference</td><td>Vùng cắt bị che, clearance, safe retract plane, rotary collision note, tailstock/sub-spindle conditions nếu có</td><td>Thiếu clearances cho 5-axis/mill-turn là lý do HOLD release.</td></tr>
@@ -114,7 +114,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </tbody></table></div>
 </div>
 
-<div class="section"><h2>5. Ma trận dữ liệu theo machine family</h2>
+<div class="section"><h2>5. Ma trận dữ liệu theo nhóm máy (machine family)</h2>
 <div class="table-card"><table><thead><tr><th>Machine family</th><th>Trường bắt buộc thêm</th><th>Điểm dừng phát hành</th></tr></thead><tbody>
 <tr><td>3-axis VMC</td><td>Vise/fixture type, jaw projection, soft-jaw ID, stop location, top-of-stock, side stop, probe cycle, tool length source</td><td>Không chỉ ra top-of-stock và probe/WCS method.</td></tr>
 <tr><td>5-axis mill</td><td>Rotary orientation state, zero return condition, trunnion/table angle convention, machine limit/collision note, TCP/RTCP condition, singularity watchpoints</td><td>Không có safe angle / collision note / retract strategy.</td></tr>
@@ -153,7 +153,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 
 <div class="section"><h2>8. Probing, WCS, critical offsets và prove-out</h2>
 <div class="table-card"><table><thead><tr><th>Mục</th><th>Yêu cầu dữ liệu</th></tr></thead><tbody>
-<tr><td>Datum strategy</td><td>Phải chỉ rõ datum vật lý, datum logic trong chương trình, và mối liên hệ với bản vẽ/inspection plan.</td></tr>
+<tr><td>Datum strategy</td><td>Phải chỉ rõ datum vật lý, datum logic trong chương trình, và mối liên hệ với bản vẽ/kế hoạch kiểm tra (inspection plan).</td></tr>
 <tr><td>Probe cycle</td><td>Mã cycle, bề mặt chạm, expected result, logic pass/fail, write-back allowed hay không.</td></tr>
 <tr><td>Critical offsets</td><td>Danh sách offset không được sửa bởi operator hoặc chỉ được sửa trong biên độ hẹp; nêu rõ ai được sửa và phải log ở đâu.</td></tr>
 <tr><td>Prove-out mode</td><td>Dry-run / graphics / single block / rapid cap / spindle cap / first-cut watchpoint / feature-by-feature release.</td></tr>
@@ -178,16 +178,16 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <tr><td>Đổi offset logic / WCS / datum / orientation</td><td>Phát hành revision mới, cập nhật prove-out note và trigger gate liên quan.</td><td>Sửa miệng hoặc ghi bút tay tại máy rồi tiếp tục chạy hàng loạt.</td></tr>
 <tr><td>Đổi fixture / jaw / stop / clamp strategy</td><td>Cập nhật ảnh, torque, locator, risk note và phê duyệt lại.</td><td>Dùng fixture “gần giống” mà không cập nhật sheet.</td></tr>
 <tr><td>Đổi tool assembly / substitute</td><td>Cập nhật Tool List revision, sister tool logic, life band và required verification.</td><td>Đổi tool rồi chỉ báo miệng cho ca sau.</td></tr>
-<tr><td>Machine transfer</td><td>Tạo addendum hoặc setup block mới cho machine family đích.</td><td>Dùng nguyên setup sheet của machine family khác.</td></tr>
+<tr><td>Machine transfer</td><td>Tạo addendum hoặc setup block mới cho nhóm máy (machine family) đích.</td><td>Dùng nguyên setup sheet của nhóm máy (machine family) khác.</td></tr>
 <tr><td>Hot fix tại xưởng</td><td>Quay về controlled change; mọi bản in cũ phải được thu hồi hoặc đánh dấu superseded.</td><td>Chạy theo bản cũ và hứa “sẽ sửa sau”.</td></tr>
 </tbody></table></div>
-<div class="callout-danger"><strong>Reject conditions tổng hợp:</strong> thiếu trường bắt buộc; ảnh không đúng fixture; Tool List không khớp pocket; không có prove-out note; không chỉ ra CTQ đầu tiên; không xác định machine family; không có người release. Gặp một trong các điều kiện này, Document Control/ENG phải từ chối phát hành.</div>
+<div class="callout-danger"><strong>Reject conditions tổng hợp:</strong> thiếu trường bắt buộc; ảnh không đúng fixture; Tool List không khớp pocket; không có prove-out note; không chỉ ra CTQ đầu tiên; không xác định nhóm máy (machine family); không có người release. Gặp một trong các điều kiện này, Document Control/ENG phải từ chối phát hành.</div>
 </div>
 
 <div class="section"><h2>11. KPI, audit hooks và tài liệu liên kết</h2>
 <div class="kpi-grid">
 <div class="kpi-box"><strong>KPI</strong><div class="tiny" style="margin-top:6px;">Tỷ lệ setup sheet phát hành đúng ngay lần đầu; số lỗi setup do thiếu field; số lần machine transfer phải sửa sheet; số incident liên quan sai WCS/tool list/fixture note.</div></div>
-<div class="kpi-box"><strong>Audit hooks</strong><div class="tiny" style="margin-top:6px;">Random check 3 job đang chạy: header đúng, machine family đúng, fixture photo đúng, tool list khớp pocket, prove-out note đủ, CTQ đầu tiên được chỉ rõ.</div></div>
+<div class="kpi-box"><strong>Audit hooks</strong><div class="tiny" style="margin-top:6px;">Random check 3 job đang chạy: header đúng, nhóm máy (machine family) đúng, fixture photo đúng, tool list khớp pocket, prove-out note đủ, CTQ đầu tiên được chỉ rõ.</div></div>
 </div>
 <div class="callout-info"><strong>Tài liệu liên kết:</strong> <a href="../01-ANNEX-System/annex-qms-004-job-dossier-template-and-metadata-dictionary.html">ANNEX-QMS-004</a>, <a href="../01-ANNEX-System/annex-qms-014-put-thru-index.html">ANNEX-QMS-014</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-512-3-axis-vertical-milling-guide.html">WI-512</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-513-5-axis-milling-guide.html">WI-513</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-514-cnc-turning-guide.html">WI-514</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-515-mill-turn-guide.html">WI-515</a>, <a href="../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a>, <a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>.</div>
 </div>

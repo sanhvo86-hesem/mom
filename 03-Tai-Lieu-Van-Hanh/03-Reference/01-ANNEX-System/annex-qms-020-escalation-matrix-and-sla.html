@@ -65,7 +65,7 @@
       <div class="section">
         <h2>2. Nguyên tắc vận hành bắt buộc</h2>
         <div class="two-col">
-          <div class="keyline"><b>2.1 Một sự kiện – một owner điều phối</b><br/>Mỗi sự kiện chỉ có một người điều phối chính để giữ action log, nhịp thông báo, quyết định họp war room và đóng sự kiện. Người điều phối không được đẩy trách nhiệm sang nhiều đầu mối song song.</div>
+          <div class="keyline"><b>2.1 Một sự kiện – một owner điều phối</b><br/>Mỗi sự kiện chỉ có một người điều phối chính để giữ nhật ký hành động (action log), nhịp thông báo, quyết định họp war room và đóng sự kiện. Người điều phối không được đẩy trách nhiệm sang nhiều đầu mối song song.</div>
           <div class="keyline"><b>2.2 Containment đi trước phân tích</b><br/>Khi sự kiện có nguy cơ lan rộng, ưu tiên đầu tiên là chặn lan rộng: HOLD lot, cách ly part, dừng công đoạn, khóa shipment, đóng quyền truy cập, khóa revision hoặc chặn use-to-stock.</div>
           <div class="keyline"><b>2.3 Escalation theo ngưỡng, không theo cảm tính</b><br/>Nếu chạm ngưỡng của bảng trigger thì escalation tự động có hiệu lực, kể cả khi người phụ trách cho rằng “có thể tự xử lý”.</div>
           <div class="keyline"><b>2.4 Sau giờ vẫn phải xử lý</b><br/>Sự kiện phát sinh ngoài giờ, ngày nghỉ, ngày lễ vẫn áp dụng SLA. Không được đợi đến sáng hôm sau nếu sự kiện chạm ngưỡng Critical, ảnh hưởng shipment, safety, data integrity hoặc customer-facing commitment.</div>
@@ -78,7 +78,7 @@
           <thead><tr><th>Mức</th><th>Định nghĩa</th><th>Quyết định mặc định</th><th>Ví dụ điển hình</th></tr></thead>
           <tbody>
             <tr><td><span class="badge-green">L1</span></td><td>Sự kiện cục bộ, không lan rộng, không ảnh hưởng khách hàng, không ảnh hưởng safety/conformity nếu chặn ngay.</td><td>Owner tại công đoạn xử lý; escalation tối thiểu tới cấp lead nếu cần hỗ trợ.</td><td>Thiếu ảnh setup, nhãn nội bộ in sai nhưng chưa sử dụng, 1 gage hết tem trạng thái trước khi đo.</td></tr>
-            <tr><td><span class="badge-amber">L2</span></td><td>Sự kiện có nguy cơ ảnh hưởng lot/job hoặc làm trễ tiến độ nếu không chặn trong ca.</td><td>Hold cục bộ; báo QA/Planning/Ops theo family.</td><td>WIP aging vượt ngưỡng, thiếu MTR cho lot incoming, CNC crash làm ngưng máy chính.</td></tr>
+            <tr><td><span class="badge-amber">L2</span></td><td>Sự kiện có nguy cơ ảnh hưởng lot/job hoặc làm trễ tiến độ nếu không chặn trong ca.</td><td>Hold cục bộ; báo QA/Planning/Ops theo family.</td><td>tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))) vượt ngưỡng, thiếu MTR cho lot incoming, CNC crash làm ngưng máy chính.</td></tr>
             <tr><td><span class="badge-red">L3</span></td><td>Sự kiện ảnh hưởng conformity, delivery commitment, clean-state, traceability hoặc processor scope; có khả năng lan rộng sang nhiều lot/job.</td><td>Hold lot/job hoặc hold shipment; quản lý cấp chức năng phải vào cuộc.</td><td>Part fail CTQ sau first piece, shipment pack thiếu chứng từ release, outsource processor hết scope hợp lệ.</td></tr>
             <tr><td><span class="badge-red">L4</span></td><td>Sự kiện nghiêm trọng liên quan safety, escape, counterfeit, mất truy xuất lớn, data integrity, customer stop, recall hoặc nghĩa vụ pháp lý.</td><td>Dừng ngay, war room, báo lãnh đạo cao nhất, chuẩn bị customer notice.</td><td>Escape ra khách hàng, mất genealogy vật liệu cho hàng đã giao, phát hiện counterfeit confirmed, contamination/failure có khả năng ảnh hưởng vacuum application.</td></tr>
           </tbody>
@@ -86,13 +86,13 @@
       </div>
 
       <div class="section">
-        <h2>4. Trigger escalation theo family sự kiện</h2>
+        <h2>4. điều kiện kích hoạt escalation theo family sự kiện</h2>
         <div class="table-card"><table>
           <thead><tr><th>Family</th><th>Trigger L2</th><th>Trigger L3</th><th>Trigger L4</th><th>Owner điều phối mặc định</th></tr></thead>
           <tbody>
             <tr><td>Quality / Conformity</td><td>NCR lặp lại; fail first piece; sai khác ảnh hưởng lot hiện hành.</td><td>CTQ/OOS; mixed status; nghi ngờ escape; missing mandatory evidence trước release.</td><td>Escape đã ship, suspect counterfeit, mất truy xuất vật liệu cho hàng đã giao.</td><td>QA</td></tr>
-            <tr><td>Delivery / Planning</td><td>WIP aging vượt ngưỡng đỏ; hot job không có owner; freeze window bị phá.</td><td>Nguy cơ miss ship date đã cam kết; machine bottleneck không có route thay thế; partial ship chưa được phê duyệt.</td><td>Customer stop line / penalty exposure / shipment blocked ở cửa giao.</td><td>Planning / Ops</td></tr>
-            <tr><td>Machine / Tooling / Utility</td><td>Breakdown > 30 phút ở công đoạn nút cổ chai; tool life vượt ngưỡng.</td><td>Crash làm ảnh hưởng toolpath/setup/part genealogy; utility event làm dừng nhiều cell.</td><td>Sự kiện gây mất an toàn, fire risk, electrical hazard hoặc ảnh hưởng nhiều job trọng yếu.</td><td>Ops / Maintenance</td></tr>
+            <tr><td>Delivery / Planning</td><td>tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))) vượt ngưỡng đỏ; hot job không có owner; cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window)))) bị phá.</td><td>Nguy cơ miss ship date đã cam kết; machine bottleneck không có route thay thế; partial ship chưa được phê duyệt.</td><td>Customer stop line / penalty exposure / shipment blocked ở cửa giao.</td><td>Planning / Ops</td></tr>
+            <tr><td>Machine / Tooling / Utility</td><td>Breakdown > 30 phút ở công đoạn nút cổ chai; tuổi dao (tool life) vượt ngưỡng.</td><td>Crash làm ảnh hưởng toolpath/setup/part genealogy; utility event làm dừng nhiều cell.</td><td>Sự kiện gây mất an toàn, fire risk, electrical hazard hoặc ảnh hưởng nhiều job trọng yếu.</td><td>Ops / Maintenance</td></tr>
             <tr><td>Cleanliness / FOD / Packaging</td><td>Monitoring vượt alert; phát hiện open-pack không đúng quy tắc; line clearance fail.</td><td>Particle trend vượt action limit; FOD found trong khu/pack; preservation window quá hạn.</td><td>Contamination có khả năng ảnh hưởng customer application; clean-state bị phá sau release.</td><td>QA / Ops</td></tr>
             <tr><td>Supplier / External provider</td><td>Chậm cert, chậm processor slot, missing evidence khi receipt.</td><td>Processor scope không phù hợp; special process fail; approved status xuống probation.</td><td>NCC gây escape lớn, vi phạm pháp lý, mất cert/approval bắt buộc cho job đang chạy.</td><td>Purchasing / QA</td></tr>
             <tr><td>Data / System / Access</td><td>Workflow lỗi làm chậm phê duyệt; folder sai path; user access mismatch cục bộ.</td><td>Data integrity risk giữa Epicor và M365; record không khôi phục được; quyền cao cấp cấp sai cho user đang active.</td><td>Mất dữ liệu release/shipment; suspected cyber event; thay đổi trái phép ảnh hưởng quyết định quality/delivery.</td><td>IT / QMS</td></tr>

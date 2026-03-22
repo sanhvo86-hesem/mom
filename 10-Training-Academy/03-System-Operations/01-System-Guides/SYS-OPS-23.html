@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SYS-OPS-23 — SOP-QMS-12 M365 Audit-Ready Configuration: baseline, DLP, audit logging, evidence pack | HESEM OS</title>
+<title>SYS-OPS-23 — SOP-QMS-12 M365 sẵn sàng cho audit Configuration: baseline, DLP, audit logging, evidence pack | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -51,7 +51,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-23 — SOP-QMS-12 M365 Audit-Ready Configuration: baseline, DLP, audit logging, evidence pack</strong>
+  <strong>SYS-OPS-23 — SOP-QMS-12 M365 sẵn sàng cho audit Configuration: baseline, DLP, audit logging, evidence pack</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -67,7 +67,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="grid-2">
 <div>
 <div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-23</div>
-<h1 style="margin-top:10px">SOP-QMS-12 M365 Audit-Ready Configuration: baseline, DLP, audit logging, evidence pack</h1>
+<h1 style="margin-top:10px">SOP-QMS-12 M365 sẵn sàng cho audit Configuration: baseline, DLP, audit logging, evidence pack</h1>
 <p class="muted">Đào tạo thực chiến để cấu hình và vận hành M365 theo chuẩn audit‑ready: chặn nhầm phiên bản, chặn rò rỉ dữ liệu, giữ dấu vết audit, dựng evidence pack đúng giờ.</p>
 <div class="tag blue">Phiên bản</div>
 </div>
@@ -106,7 +106,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Gate sai phiên bản:</b> Bản vẽ/spec/program/SOP sai Rev tạo scrap, khiếu nại, lọt lỗi ra khách hàng.</li>
 <li><b>Gate rò rỉ dữ liệu:</b> Chia sẻ sai phạm vi (Anyone link/guest ngoài kiểm soát) làm lộ drawing/CNC program/giá.</li>
-<li><b>Gate thiếu bằng chứng:</b> Thiếu dấu vết audit hoặc thiếu retention làm “No evidence = No gate” ở Ship Release và audit khách hàng.</li>
+<li><b>Gate thiếu bằng chứng:</b> Thiếu dấu vết audit hoặc thiếu retention làm “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))” ở phê duyệt giao hàng (ship release) và audit khách hàng.</li>
 </ul>
 </div>
 <div class="grid-2">
@@ -157,7 +157,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Engineering/Programming</b> (Programmer)</td>
 <td>Drawing/solid/spec “Released”</td>
-<td>Release record chương trình + link đến master data</td>
+<td>Release record chương trình + link đến dữ liệu gốc (master data)</td>
 <td>File CAM/DWG nằm ngoài Part/REV master → <b>STOP</b> chạy chương trình</td>
 </tr>
 <tr>
@@ -182,7 +182,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Packing/Ship</b> (Warehouse + QA)</td>
 <td>Ship packet + evidence pack</td>
 <td>Evidence pack chỉ đọc + expiry + log chia sẻ</td>
-<td>No evidence = No gate → <b>BLOCK</b> xuất hàng</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)) → <b>BLOCK</b> xuất hàng</td>
 </tr>
 </tbody>
 </table>
@@ -193,7 +193,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Mix‑up dữ liệu khách:</b> Lưu drawing khách A vào thư mục khách B do đặt tên không chuẩn.</li>
 <li><b>Any‑link external:</b> Tạo “Anyone link” cho drawing/CNC program, không expiry, không log.</li>
 <li><b>Guest tồn tại vĩnh viễn:</b> Guest access không expiry, không access review, không thu hồi.</li>
-<li><b>Per‑file permission break:</b> Tự bẻ quyền từng file, mất kiểm soát ma trận quyền, audit fail.</li>
+<li><b>Per‑file permission break:</b> Tự bẻ quyền từng file, mất kiểm soát ma trận quyền, đánh giá không đạt.</li>
 <li><b>Record bị overwrite:</b> Sửa đè file IR/FAI thay vì phát hành bản đính chính, mất toàn vẹn.</li>
 <li><b>Thiếu retention label:</b> Cert/IR/NCR lưu như file rời, không retention, rơi vào “xóa nhầm”.</li>
 <li><b>Job Dossier không freeze:</b> Closeout xong vẫn sửa WIP, audit bác bỏ record.</li>
@@ -278,7 +278,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout">
 <ol>
 <li><b>STOP ngay</b> khi phát hiện file đang dùng không truy xuất từ thư viện Released/Records (mở từ email/chat/USB). Hành động: khóa thao tác, chuyển sang “bản đúng”, ghi nhận sự kiện.</li>
-<li><b>HOLD ngay</b> khi phát hiện record (IR/FAI/Cert/NCR) thiếu retention label hoặc bị sửa đè. Hành động: ngừng ship release, lập NCR nội bộ, tạo bản đính chính theo quy tắc record.</li>
+<li><b>HOLD ngay</b> khi phát hiện record (IR/FAI/Cert/NCR) thiếu retention label hoặc bị sửa đè. Hành động: ngừng phê duyệt giao hàng (ship release), lập NCR nội bộ, tạo bản đính chính theo quy tắc record.</li>
 <li><b>BLOCK ngay</b> mọi chia sẻ external khi link “Anyone”, không expiry, hoặc cấp guest không log. Hành động: thu hồi link/guest, dựng lại evidence pack, cập nhật FRM log.</li>
 <li><b>BLOCK ship release</b> khi evidence pack không đủ MRR tối thiểu cho job (thiếu job dossier, thiếu inspection record, thiếu traceability). Hành động: bổ sung MRR trước khi GO.</li>
 </ol>
@@ -380,7 +380,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>5</td>
 <td>Dựng Evidence Pack</td>
 <td>Chỉ lấy Released/Record đã freeze; đặt tại Z_Audit_Evidence_Pack; chỉ đọc; expiry; log</td>
-<td>No evidence = No gate; audit mở được trong 3 phút</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))); audit mở được trong 3 phút</td>
 </tr>
 <tr>
 <td>6</td>
@@ -479,7 +479,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Chọn đúng: “bản đúng” của drawing/SOP nằm ở vùng nào? A) WIP B) Released C) Email D) Desktop</li>
 <li>Hành động đúng khi nhận file drawing qua email: A) dùng luôn B) lưu OneDrive C) đối chiếu Released/Part‑REV master rồi dùng bản đúng D) gửi lại cho đồng nghiệp</li>
 <li>Link chia sẻ external bắt buộc: A) Anyone link B) Specific people C) không expiry D) cho edit mặc định</li>
-<li>Quy tắc “No evidence = No gate” áp dụng mạnh nhất ở bước nào? A) Setup B) Ship Release C) Nhập kho D) Họp giao ban</li>
+<li>Quy tắc “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))” áp dụng mạnh nhất ở bước nào? A) Setup B) phê duyệt giao hàng (ship release) C) Nhập kho D) Họp giao ban</li>
 <li>Major/Minor version dùng để tách trạng thái nào? A) Internal/External B) Draft/Released C) Job/Part D) User/Admin</li>
 <li>Record bị đính chính đúng cách: A) overwrite file cũ B) xóa file cũ C) tạo file mới + ghi chú lý do D) đổi tên file cũ</li>
 <li>Retention label mục tiêu chính: A) làm đẹp thư viện B) bảo toàn hồ sơ theo thời hạn C) tăng tốc Wi‑Fi D) giảm dung lượng email</li>
@@ -492,7 +492,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Chọn đúng: “break per‑file permission” gây hậu quả nào? A) dễ audit hơn B) mất kiểm soát ma trận quyền và tăng lỗi chia sẻ C) tăng chất lượng D) giảm rủi ro</li>
 <li>Chọn đúng: Evidence Pack đặt ở đâu? A) Desktop QA B) Email C) Z_Audit_Evidence_Pack D) USB</li>
 <li>Khi Estimator (SAL-03) cần gửi hồ sơ cho khách, hành động đúng: A) gửi zip email B) share evidence pack chỉ đọc + expiry + log C) gửi link Anyone D) gửi qua chat cá nhân</li>
-<li>Điều kiện để GO ship release: A) đủ số lượng B) đủ MRR theo job dossier/evidence pack C) có lời hứa D) đã hết giờ</li>
+<li>Điều kiện để GO phê duyệt giao hàng (ship release): A) đủ số lượng B) đủ MRR theo job dossier/evidence pack C) có lời hứa D) đã hết giờ</li>
 <li>Ai chịu trách nhiệm freeze WIP thành record khi closeout? A) QA/QMS + Supervisor B) Operator C) khách hàng D) shipper</li>
 <li>Chọn đúng: sự kiện nào bắt buộc truy vấn audit log định kỳ? A) đổi ca B) external share, mass download, delete record C) thay dao D) bật máy</li>
 <li>Trả lời ngắn: viết 3 mục MRR tối thiểu của Evidence Pack cho audit khách hàng.</li>
@@ -513,7 +513,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Tình huống 3 — Phát hiện xóa nhầm record inspection</strong>
 <p><b>Dữ kiện:</b> QC báo file CMM PDF của job vừa closeout biến mất khỏi thư viện Records. Audit log cho thấy có sự kiện delete vào 21:10 ca 2.</p>
-<p><b>Yêu cầu:</b> Quyết định <b>HOLD/BLOCK/GO</b> cho ship release, liệt kê hành động điều tra + khôi phục, và MRR bắt buộc để đóng sự kiện.</p>
+<p><b>Yêu cầu:</b> Quyết định <b>HOLD/BLOCK/GO</b> cho phê duyệt giao hàng (ship release), liệt kê hành động điều tra + khôi phục, và MRR bắt buộc để đóng sự kiện.</p>
 </div>
 </div>
 <div class="card">
@@ -561,12 +561,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 </div>
-<h2 class="h2" id="m11">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “No evidence = No gate”)</h2>
+<h2 class="h2" id="m11">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))”)</h2>
 <div class="callout">
 <ul>
 <li><b>PASS</b> khi: (1) Bài kiểm tra ≥ 75%; (2) Tình huống đạt: quyết định đúng STOP/HOLD/BLOCK/GO và liệt kê MRR đầy đủ; (3) Bài test thực hành PASS; (4) OJT output đủ và không có lỗi gate.</li>
 <li><b>FAIL</b> khi: thiếu bất kỳ MRR bắt buộc nào, hoặc vi phạm 1 gate (Any‑link, dùng file ngoài Released, overwrite record, thiếu retention, không có audit log evidence).</li>
-<li><b>Quy tắc cứng:</b> <b>No evidence = No gate</b>. Thiếu bằng chứng → không công nhận level và không cho vận hành quyền tương ứng.</li>
+<li><b>Quy tắc cứng:</b> <b>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))</b>. Thiếu bằng chứng → không công nhận level và không cho vận hành quyền tương ứng.</li>
 </ul>
 </div>
 <h2 class="h2" id="m12">12) MRR tối thiểu</h2>

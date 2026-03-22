@@ -68,7 +68,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="grid-2">
 <div>
 <div class="badge"><span class="dot"></span>Module SYS-OPS-16</div>
-<h1 style="margin-top:10px">Xem xét của lãnh đạo (Management Review)</h1>
+<h1 style="margin-top:10px">xem xét của lãnh đạo (management review)</h1>
 <p class="lead">
  Xem xét của lãnh đạo là điểm <b>chốt quyết định</b> của hệ thống ISO: nhìn xu hướng, xác nhận hiệu lực QMS,
  khóa nguồn lực, và gắn trách nhiệm vào <b>Action list có chủ sở hữu + hạn + bằng chứng</b>.
@@ -145,7 +145,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Planner / Production Control</b></td>
-<td>Trình bày OTD, WIP aging, dispatch adherence, backlog/capacity.</td>
+<td>Trình bày OTD, tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))), dispatch adherence, backlog/capacity.</td>
 <td>KPI snapshot + Pareto blockers + danh sách job quá SLA có owner xử lý.</td>
 <td><span class="kpi-pill">L2</span></td>
 </tr>
@@ -169,7 +169,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Warehouse / Shipping</b></td>
-<td>Trình bày ship readiness, lỗi đóng gói, thiếu ship packet, sai nhãn.</td>
+<td>Trình bày ship readiness, lỗi đóng gói, thiếu bộ hồ sơ giao hàng (ship packet), sai nhãn.</td>
 <td>Danh sách job bị chặn ship + nguyên nhân + hành động đóng bằng chứng.</td>
 <td><span class="kpi-pill">L2</span></td>
 </tr>
@@ -235,7 +235,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note" style="margin-top:12px;">
 <strong>Ghi nhận lệch tài liệu cần xử lý</strong>
 <ul>
-<li>FRM-QMS-003 đang hiển thị tiêu đề không đúng nội dung biểu mẫu (hiển thị “Purchasing &amp; Supplier Control”). Biểu mẫu PHẢI được chỉnh tiêu đề để khớp “Management Review Minutes”.</li>
+<li>FRM-QMS-003 đang hiển thị tiêu đề không đúng nội dung biểu mẫu (hiển thị “Purchasing &amp; Supplier Control”). Biểu mẫu PHẢI được chỉnh tiêu đề để khớp “xem xét của lãnh đạo (management review) Minutes”.</li>
 <li>Đường dẫn SOP-QMS-005 nằm trong thư mục <code>qms/sop</code>. Khi tài liệu nội bộ ghi <code>qms/procedures</code>, QA/QMS cập nhật master list để tránh trỏ sai.</li>
 </ul>
 </div>
@@ -298,7 +298,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Action (hành động)</b></td>
 <td>Công việc có owner, hạn, tiêu chí đóng, và bằng chứng. Action không có owner bị xem là không tồn tại.</td>
-<td>Action: “Cập nhật checklist ship release” • Owner: WHS Lead • Due: 2026-03-05 • Evidence: link file.</td>
+<td>Action: “Cập nhật checklist phê duyệt giao hàng (ship release)” • Owner: WHS Lead • Due: 2026-03-05 • Evidence: link file.</td>
 </tr>
 <tr>
 <td><b>MRR cho MR</b></td>
@@ -389,7 +389,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Planner (L2)</b></td>
 <td>
- Trình bày OTD/WIP aging theo xu hướng; nêu top blockers theo Pareto; gắn owner xử lý cho từng blocker chính.
+ Trình bày OTD/tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))) theo xu hướng; nêu top blockers theo Pareto; gắn owner xử lý cho từng blocker chính.
  </td>
 <td>
  KPI snapshot đúng kỳ + 01 action xử lý blocker có bằng chứng (dispatch plan/expedite log).
@@ -517,7 +517,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>A2</b></td><td>Review action kỳ trước</td><td>Action quá hạn có escalations</td></tr>
 <tr><td><b>A3</b></td><td>Review KPI xu hướng (OTD/Quality/Flow/Equipment)</td><td>Đỏ → tạo action; xanh → xác nhận duy trì</td></tr>
 <tr><td><b>A4</b></td><td>Customer + Supplier + Audit + CAPA</td><td>Chốt containment/CAPA/SCAR</td></tr>
-<tr><td><b>A5</b></td><td>Rủi ro &amp; thay đổi (REV/layout/máy/nhân sự)</td><td>Cập nhật Risk Register + quyết định kiểm soát</td></tr>
+<tr><td><b>A5</b></td><td>Rủi ro &amp; thay đổi (REV/layout/máy/nhân sự)</td><td>Cập nhật sổ đăng ký rủi ro (risk register) + quyết định kiểm soát</td></tr>
 <tr><td><b>A6</b></td><td>Nguồn lực &amp; quyết định cấp hệ thống</td><td>Quyết định nguồn lực có owner/hạn</td></tr>
 </tbody>
 </table>
@@ -555,12 +555,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>2</td><td>Không review action kỳ trước</td><td>Action trôi, lặp lỗi</td><td>Mục A2 bắt buộc đứng đầu agenda</td><td>Chủ trì</td><td>Minutes có bảng action kỳ trước</td></tr>
 <tr><td>3</td><td>Action không có owner cá nhân</td><td>Không ai chịu trách nhiệm</td><td>Minutes chỉ chấp nhận owner cá nhân</td><td>QA/QMS</td><td>Action list có tên người</td></tr>
 <tr><td>4</td><td>Action không có hạn</td><td>Quá hạn kéo dài, mất kiểm soát</td><td>Không chốt action khi thiếu due date</td><td>Chủ trì</td><td>Action list có due</td></tr>
-<tr><td>5</td><td>Đóng action không có bằng chứng</td><td>Audit fail, lỗi lặp</td><td>Đóng action kèm link hồ sơ; QA/QMS kiểm tra hiệu lực</td><td>Owner + QA</td><td>Link evidence trong tracker</td></tr>
+<tr><td>5</td><td>Đóng action không có bằng chứng</td><td>đánh giá không đạt, lỗi lặp</td><td>Đóng action kèm link hồ sơ; QA/QMS kiểm tra hiệu lực</td><td>Owner + QA</td><td>Link evidence trong tracker</td></tr>
 <tr><td>6</td><td>Minutes phát hành trễ</td><td>Mất nhịp triển khai, lệch thông tin 2 ca</td><td>Phát hành trong 24 giờ; KPI theo dõi</td><td>QA/QMS</td><td>Email/Teams thông báo + file</td></tr>
 <tr><td>7</td><td>Không review audit findings/CAPA</td><td>Repeat NC, khách đánh giá không đạt</td><td>Agenda có mục audit + CAPA aging</td><td>QA/QMS</td><td>CAPA list + trạng thái</td></tr>
 <tr><td>8</td><td>Bỏ qua phản hồi khách hàng/complaint</td><td>Escapes, mất uy tín</td><td>Customer feedback là input bắt buộc</td><td>Sales/QA</td><td>Customer log + NCR/8D</td></tr>
 <tr><td>9</td><td>Bỏ qua supplier/outsourcing performance</td><td>Chậm giao, lỗi đầu vào</td><td>Scorecard + PO trễ + action escalation</td><td>PUR</td><td>Supplier scorecard</td></tr>
-<tr><td>10</td><td>Không cập nhật rủi ro khi có thay đổi REV/layout</td><td>Rủi ro CTQ lọt, sai REV</td><td>Risk Register cập nhật sau MR, gắn owner</td><td>ENG + QA</td><td>Risk register entry</td></tr>
+<tr><td>10</td><td>Không cập nhật rủi ro khi có thay đổi REV/layout</td><td>Rủi ro CTQ lọt, sai REV</td><td>sổ đăng ký rủi ro (risk register) cập nhật sau MR, gắn owner</td><td>ENG + QA</td><td>Risk register entry</td></tr>
 <tr><td>11</td><td>Họp thiếu đại diện 2 ca</td><td>Triển khai lệch ca, lỗi lặp</td><td>Đặt giờ họp có đại diện 2 ca; ghi attendance</td><td>Chủ trì</td><td>Attendance trong minutes</td></tr>
 <tr><td>12</td><td>Quyết định không gắn nguồn lực</td><td>Action không thực thi, quá hạn</td><td>Quyết định nguồn lực ghi rõ ai cấp và thời điểm</td><td>Chủ trì</td><td>Decision + resource line</td></tr>
 </tbody>
@@ -583,7 +583,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>4</td><td>Phát hành minutes trong 24 giờ</td><td>QA/QMS</td><td>FRM-QMS-003 phát hành + thông báo</td><td>100% kỳ MR đúng hạn</td></tr>
 <tr><td>5</td><td>Follow-up action quá hạn tại Tier 2</td><td>Leads + QA</td><td>Biên bản Tier 2 + trạng thái tracker</td><td>Action quá hạn có escalation rõ ràng</td></tr>
 <tr><td>6</td><td>Kiểm tra hiệu lực trước khi đóng action</td><td>QA/QMS</td><td>Effectiveness check note + evidence link</td><td>Đóng action không có bằng chứng = 0</td></tr>
-<tr><td>7</td><td>Kiểm soát nhầm REV khi tham chiếu job</td><td>ENG + QA</td><td>Link Part/REV master data + xác nhận</td><td>Không dùng dữ liệu không xác nhận REV</td></tr>
+<tr><td>7</td><td>Kiểm soát nhầm REV khi tham chiếu job</td><td>ENG + QA</td><td>Link Part/REV dữ liệu gốc (master data) + xác nhận</td><td>Không dùng dữ liệu không xác nhận REV</td></tr>
 </tbody>
 </table>
 </div>
@@ -604,7 +604,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Tình huống 1: phát hiện nguy cơ “nhầm REV” trong Data Pack</strong>
 <ol style="margin:0 0 0 18px; line-height:1.85;">
 <li>Khóa họp ở mục liên quan; ghi vào minutes trạng thái <b>HOLD</b> dữ liệu.</li>
-<li>QA/QMS yêu cầu ENG xác nhận “REV đúng” và cung cấp link master data.</li>
+<li>QA/QMS yêu cầu ENG xác nhận “REV đúng” và cung cấp link dữ liệu gốc (master data).</li>
 <li>Minutes ghi rõ: dữ liệu nào bị HOLD, ai chịu trách nhiệm, hạn xác nhận.</li>
 </ol>
 </div>
@@ -630,7 +630,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>11) Bài tập &amp; đánh giá</h2>
 <h3>11.1 Bài tập tình huống (case HESEM) – tối thiểu 03</h3>
 <div class="callout">
-<b>Case A — OTD giảm và WIP aging tăng (ảnh hưởng 2 ca)</b><br/>
+<b>Case A — OTD giảm và tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))) tăng (ảnh hưởng 2 ca)</b><br/>
  Dữ liệu: OTD tuần = 88% (mục tiêu 95%), WIP quá SLA = 14 job, top blocker: chờ đo CMM + chờ outsource anodize.
  Nhiệm vụ: tạo 03 action bắt buộc (owner/hạn/bằng chứng), trong đó 01 action liên quan nguồn lực đo kiểm và 01 action liên quan nhà cung cấp.
  </div>
@@ -640,7 +640,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
 <div class="callout" style="margin-top:10px;">
 <b>Case C — Calibration compliance không đạt</b><br/>
- Dữ liệu: 03 gage quá hạn hiệu chuẩn, có job sắp ship dùng các gage đó. Nhiệm vụ: chặn ship release liên quan, xác nhận truy vết job, và ra quyết định nguồn lực hiệu chuẩn.
+ Dữ liệu: 03 gage quá hạn hiệu chuẩn, có job sắp ship dùng các gage đó. Nhiệm vụ: chặn phê duyệt giao hàng (ship release) liên quan, xác nhận truy vết job, và ra quyết định nguồn lực hiệu chuẩn.
  </div>
 <h3>11.2 Bài kiểm tra thực hành (Performance Test) – bắt buộc</h3>
 <table class="table">

@@ -81,7 +81,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>ANNEX-QMS-003 — Evidence Pack (Job Dossier + Data Governance)</li>
 </ul>
 <div class="small muted" style="margin-top:8px">
- Mục tiêu vận hành: <b>No evidence = No gate</b> tại điểm chặn FAI và trước Ship Release.
+ Mục tiêu vận hành: <b>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))</b> tại điểm chặn FAI và trước phê duyệt giao hàng (ship release).
  </div>
 </div>
 <div class="note">
@@ -124,8 +124,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Gate mục tiêu</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
 <li>Gate G1: First Piece PASS trước khi chạy loạt.</li>
-<li>Gate G2: FAI PASS (Full/Delta) trước khi release sản xuất hoặc ship khi hợp đồng yêu cầu.</li>
-<li>Gate G5: Ship Release chỉ mở khi Evidence Pack đầy đủ.</li>
+<li>Gate G2: FAI PASS (Full/Delta) trước khi release sản xuất hoặc giao hàng khi hợp đồng yêu cầu.</li>
+<li>Gate G5: phê duyệt giao hàng (ship release) chỉ mở khi Evidence Pack đầy đủ.</li>
 </ul>
 <div class="small muted" style="margin-top:8px">
  Người chịu trách nhiệm chặn gate: <b>Supervisor + QA</b>. Người tạo record: theo checklist từng bước.
@@ -244,9 +244,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Packing/Ship</b></td>
-<td>Ship packet, CoC, FAI/IR khi yêu cầu</td>
+<td>bộ hồ sơ giao hàng (ship packet), CoC, FAI/IR khi yêu cầu</td>
 <td><b>Ship Release Gate</b></td>
-<td>Ship packet đầy đủ + log ship release</td>
+<td>bộ hồ sơ giao hàng (ship packet) đầy đủ + log phê duyệt giao hàng (ship release)</td>
 </tr>
 </tbody>
 </table>
@@ -255,7 +255,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Điểm chặn bắt buộc (không được bypass)</h3>
 <ul>
 <li><b>BLOCK</b> chạy loạt khi chưa có First Piece PASS.</li>
-<li><b>BLOCK</b> release/ship khi thiếu FAI pack theo contract hoặc khi thiếu Evidence Pack tối thiểu.</li>
+<li><b>BLOCK</b> release/giao hàng khi thiếu FAI pack theo contract hoặc khi thiếu Evidence Pack tối thiểu.</li>
 <li><b>BLOCK</b> khi có rủi ro sai REV, mix-up lô, thiếu/giả chứng chỉ, gage OOT, outsource chưa có cert.</li>
 </ul>
 </div>
@@ -326,7 +326,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>CP6 — Gate Decision</b></td>
 <td>QC + QA + Supervisor</td>
 <td>PASS/FAIL rõ; FAIL có HOLD tag + NCR; PASS có chữ ký release</td>
-<td>FAI pack + ảnh tag HOLD/PASS + NCR khi FAIL</td>
+<td>FAI pack + ảnh tag HOLD/PASS + NCR khi không đạt</td>
 </tr>
 <tr>
 <td><b>CP7 — Evidence Pack Integrity</b></td>
@@ -403,7 +403,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Thiếu chứng chỉ</td>
 <td>HOLD shipment/job → gọi Purchasing lấy cert → không đóng gói</td>
 <td>Packing/Supervisor → Purchasing → QA</td>
-<td>Checklist ship release đánh dấu thiếu</td>
+<td>Checklist phê duyệt giao hàng (ship release) đánh dấu thiếu</td>
 </tr>
 <tr>
 <td>Gage OOT / tem hết hạn</td>
@@ -438,7 +438,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Xác nhận yêu cầu FAI theo PO/contract và đánh dấu trong Job Pack</td><td>Estimator (SAL-03) + Planner</td><td>Trang PO highlight yêu cầu FAI + routing có Gate</td><td>Bỏ sót yêu cầu FAI trong PO</td></tr>
 <tr><td>2</td><td>Khóa REV: drawing/spec/model/routing/program/setup sheet thống nhất</td><td>Programmer + Planner</td><td>Release record + ảnh trang REV</td><td>Program chạy “bản cũ”</td></tr>
-<tr><td>3</td><td>Chuẩn bị ballooned drawing/inspection plan (đánh số duy nhất)</td><td>QC + QA</td><td>Ballooned drawing + plan</td><td>Số balloon không khớp record</td></tr>
+<tr><td>3</td><td>Chuẩn bị ballooned drawing/kế hoạch kiểm tra (inspection plan) (đánh số duy nhất)</td><td>QC + QA</td><td>Ballooned drawing + plan</td><td>Số balloon không khớp record</td></tr>
 <tr><td>4</td><td>Kiểm tra vật liệu: spec + heat/lot + cert đủ trường</td><td>Warehouse</td><td>Material cert + nhãn heat/lot</td><td>Nhầm heat/lot do nhãn mờ</td></tr>
 <tr><td>5</td><td>Kiểm tra special process (khi có): supplier đã phê duyệt + cert theo spec</td><td>Purchasing + QA</td><td>Cert special process + PO/spec</td><td>Cert thiếu lot/serial</td></tr>
 <tr><td>6</td><td>Kiểm tra tình trạng gage/CMM và phương pháp đo CTQ</td><td>QC + Maintenance</td><td>Ảnh tem + gage list M365/SharePoint → HESEM-QMS-SSOT</td><td>Dùng gage độ phân giải thiếu</td></tr>
@@ -446,10 +446,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>8</td><td>Gia công 01 first piece, giữ nguyên trạng (không rework ngoài quy định)</td><td>Operator</td><td>Nhãn HOLD/PASS trên first piece</td><td>Đánh bóng làm lệch kích thước</td></tr>
 <tr><td>9</td><td>Đo CTQ trước, ghi rõ dụng cụ/điều kiện đo, người đo</td><td>QC</td><td>Record đo CTQ + ảnh đo khi cần</td><td>Ghi thiếu dụng cụ đo</td></tr>
 <tr><td>10</td><td>Hoàn tất Form 1–2–3 (hoặc record tương đương) + đính kèm CMM/ảnh</td><td>QC + QA</td><td>FAI pack PDF + CMM report</td><td>Thiếu đặc tính note/drawing note</td></tr>
-<tr><td>11</td><td>Quyết định Gate: PASS → ký release; FAIL → HOLD + NCR</td><td>QA + Supervisor</td><td>Gate sign-off + NCR khi FAIL</td><td>PASS miệng, không ký</td></tr>
+<tr><td>11</td><td>Quyết định Gate: PASS → ký release; FAIL → HOLD + NCR</td><td>QA + Supervisor</td><td>Gate sign-off + NCR khi không đạt</td><td>PASS miệng, không ký</td></tr>
 <tr><td>12</td><td>Khi có chỉnh offset/tool ảnh hưởng CTQ → re-check đặc tính liên quan</td><td>Setup + QC</td><td>Record re-check (before/after)</td><td>Chỉnh xong quên đo lại</td></tr>
 <tr><td>13</td><td>Lưu hồ sơ đúng folder Evidence Pack + đặt tên chuẩn</td><td>QC + QA</td><td>Đường dẫn folder + tên file chuẩn</td><td>Lưu vào Desktop/USB</td></tr>
-<tr><td>14</td><td>Ship Release kiểm tra: FAI/IR/CoC/cert đầy đủ</td><td>Supervisor + QA</td><td>Ship release checklist + ship packet</td><td>Thiếu cert outsource</td></tr>
+<tr><td>14</td><td>phê duyệt giao hàng (ship release) kiểm tra: FAI/IR/CoC/cert đầy đủ</td><td>Supervisor + QA</td><td>Ship release checklist + ship packet</td><td>Thiếu cert outsource</td></tr>
 <tr><td>15</td><td>Post-job review: cập nhật lesson learned, cập nhật plan khi phát hiện lỗ hổng</td><td>Supervisor + QA + Programmer</td><td>Biên bản review + cập nhật WI/plan</td><td>Lặp lỗi do không cập nhật</td></tr>
 </tbody>
 </table>
@@ -493,12 +493,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Gate decision</td>
 <td>PASS/FAIL bằng chữ ký; FAIL mở NCR, không có “pass miệng”</td>
-<td>No evidence = No gate; chống bypass</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))); chống bypass</td>
 </tr>
 <tr>
 <td>Lưu Evidence Pack</td>
 <td>Đúng folder, đúng tên file; truy xuất trong 60 giây</td>
-<td>Audit-ready; tránh mất hồ sơ</td>
+<td>sẵn sàng cho audit; tránh mất hồ sơ</td>
 </tr>
 </tbody>
 </table>
@@ -624,7 +624,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p style="margin:6px 0 0 0; line-height:1.7">
  Job J-29107 có anodize. Supplier gửi CoC ghi spec đúng nhưng thiếu “lot/serial” và thiếu ngày process.
  Packing hỏi “có ship được không”.
- <br/><b>Yêu cầu:</b> quyết định HOLD/GO, phân công Purchasing/QA làm gì trong 30 phút, và nêu bằng chứng tối thiểu để mở ship release.
+ <br/><b>Yêu cầu:</b> quyết định HOLD/GO, phân công Purchasing/QA làm gì trong 30 phút, và nêu bằng chứng tối thiểu để mở phê duyệt giao hàng (ship release).
  </p>
 </div>
 <div class="note" style="margin-top:10px">
@@ -645,7 +645,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th>Hạng mục chấm</th>
 <th>Yêu cầu PASS</th>
-<th>FAIL khi</th>
+<th>Không đạt khi</th>
 </tr>
 </thead>
 <tbody>
@@ -686,7 +686,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <!-- 11) PASS/FAIL criteria -->
-<h2 class="h2">11) PASS/FAIL criteria của module (No evidence = No gate)</h2>
+<h2 class="h2">11) PASS/FAIL criteria của module (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))</h2>
 <div class="card">
 <div class="grid-2">
 <div class="callout">
@@ -718,7 +718,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>CMM report / dữ liệu đo (khi áp dụng).</li>
 <li>Material cert + traceability (heat/lot).</li>
 <li>Special process cert (khi áp dụng).</li>
-<li>NCR/MRB record (khi FAIL hoặc khi có deviation).</li>
+<li>NCR/MRB record (khi không đạt hoặc khi có deviation).</li>
 <li>Gate sign-off (QA/Supervisor).</li>
 </ul>
 <h3 style="margin-top:12px">12.2 Quy tắc đặt tên (theo ANNEX-QMS-003)</h3>
@@ -746,7 +746,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Part/REV Master Data</td>
 <td>M365/SharePoint → DATA → 03_Production → 00_Programming → {CustomerCode} → {CustomerPartNo} → <code>REV {Rev}</code> → <code>10_Quality</code></td>
-<td>Chứa balloon/inspection plan “chuẩn REV”</td>
+<td>Chứa balloon/kế hoạch kiểm tra (inspection plan) “chuẩn REV”</td>
 </tr>
 <tr>
 <td>Danh mục calibration/approved supplier</td>
@@ -816,7 +816,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Thiếu chữ ký/ngày</b> → gate sign-off chỉ mở khi field đầy đủ; thiếu field = BLOCK.</li>
 <li><b>Gage status không chứng minh</b> → lưu ảnh tem + link danh mục calibration; OOT = cách ly.</li>
 <li><b>Material cert không khớp heat/lot</b> → kho dán nhãn heat/lot, log cấp phát và đối chiếu cert.</li>
-<li><b>Special process cert thiếu trường</b> → Purchasing yêu cầu re-issue; không ship khi chưa đủ.</li>
+<li><b>Special process cert thiếu trường</b> → Purchasing yêu cầu re-issue; không giao hàng khi chưa đủ.</li>
 <li><b>FAI không đại diện cho quá trình</b> (đo mẫu đã rework) → kỷ luật first piece “giữ nguyên trạng”.</li>
 <li><b>Lưu hồ sơ sai chỗ/sai tên</b> → áp dụng naming rule ANNEX-QMS-003; kiểm tra truy xuất 60 giây.</li>
 <li><b>Delta FAI làm sai phạm vi</b> → bắt buộc change impact review có chữ ký Programmer + QA.</li>

@@ -99,7 +99,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Purchasing</b>: duyệt NCC/duyệt điều kiện PO/Job Pack; duy trì ASL/AVL; vận hành FRM-PUR-002/005; phát hành SCAR theo quy trình liên quan.</li>
 <li><b>QA/QC</b>: xác nhận CTQ/KPC; định nghĩa phương pháp kiểm; vận hành gate kiểm tra nhận về FRM-QA-005; quyết định HOLD/REJECT khi chứng từ/đo kiểm không đạt.</li>
 <li><b>Warehouse</b>: kiểm đếm – đóng gói – nhãn lot/serial; vận hành dispatch checklist FRM-PUR-004; cách ly lô HOLD.</li>
-<li><b>Planner/Supervisor</b>: khóa lịch, buffer lead time; không cho chạy “tắt” khi gate chưa PASS.</li>
+<li><b>Planner/Supervisor</b>: khóa lịch, buffer thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))); không cho chạy “tắt” khi gate chưa PASS.</li>
 <li><b>Engineering/Programmer/Setup/Operator</b>: xác định yêu cầu kỹ thuật/finish/masking; bảo vệ bề mặt; cung cấp thông tin kỹ thuật đúng revision cho Purchasing.</li>
 <li><b>Estimator (SAL-03)</b>: khóa yêu cầu khách hàng/hợp đồng; xác nhận yêu cầu chứng chỉ; phát tín hiệu thay đổi.</li>
 </ul>
@@ -143,7 +143,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Final/Ship</td>
 <td>Hồ sơ NCC đầy đủ</td>
 <td>Evidence pack sẵn sàng đánh giá</td>
-<td>No evidence = No gate</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))</td>
 </tr>
 </table>
 </div>
@@ -157,7 +157,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiếu chứng chỉ bắt buộc (CoC/CoA/heat treat/plating cert) hoặc chứng chỉ không khớp PO/Rev.</li>
 <li>Không đo CTQ bị ảnh hưởng bởi finishing (thickness/hardness/dimension drift) trước khi release.</li>
 <li>Đóng gói không bảo vệ bề mặt sau finishing; trầy xước làm phát sinh scrap/rework.</li>
-<li>Bỏ qua gate nhận về do áp lực tiến độ; hàng đi thẳng vào sản xuất/ship khi chưa PASS.</li>
+<li>Bỏ qua gate nhận về do áp lực tiến độ; hàng đi thẳng vào sản xuất/giao hàng khi chưa PASS.</li>
 <li>Không cập nhật scorecard; không kích hoạt hành động khi KPI tụt; rủi ro lặp lại NCR.</li>
 <li>Không lưu hồ sơ đúng nơi; không truy xuất được trong 60 giây khi audit/khách hàng hỏi.</li>
 <li>Không có tiêu chí HOLD/REJECT rõ; quyết định theo cảm tính; không nhất quán giữa ca.</li>
@@ -359,12 +359,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <b>Áp dụng theo role (bắt buộc):</b>
 <ul>
-<li><b>Purchasing:</b> PASS khi tự hoàn tất FRM-PUR-002/003/005 và phát hành PO có flow‑down, không lỗi Rev/cert/traceability.</li>
-<li><b>QA/QC:</b> PASS khi tự vận hành FRM-QA-005 và ra quyết định HOLD/REJECT đúng tiêu chí, không bỏ sót chứng chỉ.</li>
-<li><b>Warehouse:</b> PASS khi vận hành FRM-PUR-004, nhãn lot/serial chuẩn, ảnh hiện trạng đầy đủ, không để bypass gate.</li>
-<li><b>Engineering/Programmer/Setup/Operator:</b> PASS khi cung cấp yêu cầu finishing/CTQ rõ và bảo vệ bề mặt đúng hướng dẫn khi bàn giao kho.</li>
-<li><b>Planner/Supervisor:</b> PASS khi khóa lịch không cho “chạy tắt” và xử lý escalation theo fail-fast rules.</li>
-<li><b>Estimator (SAL-03):</b> PASS khi xác nhận yêu cầu chứng chỉ và chuyển thông tin thay đổi tới Purchasing/QA trong ngày phát sinh.</li>
+<li><b>Purchasing:</b> đạt khi tự hoàn tất FRM-PUR-002/003/005 và phát hành PO có flow‑down, không lỗi Rev/cert/traceability.</li>
+<li><b>QA/QC:</b> đạt khi tự vận hành FRM-QA-005 và ra quyết định HOLD/REJECT đúng tiêu chí, không bỏ sót chứng chỉ.</li>
+<li><b>Warehouse:</b> đạt khi vận hành FRM-PUR-004, nhãn lot/serial chuẩn, ảnh hiện trạng đầy đủ, không để bypass gate.</li>
+<li><b>Engineering/Programmer/Setup/Operator:</b> đạt khi cung cấp yêu cầu finishing/CTQ rõ và bảo vệ bề mặt đúng hướng dẫn khi bàn giao kho.</li>
+<li><b>Planner/Supervisor:</b> đạt khi khóa lịch không cho “chạy tắt” và xử lý escalation theo fail-fast rules.</li>
+<li><b>Estimator (SAL-03):</b> đạt khi xác nhận yêu cầu chứng chỉ và chuyển thông tin thay đổi tới Purchasing/QA trong ngày phát sinh.</li>
 </ul>
 </div>
 <h2 class="h2">10) Đánh giá</h2>
@@ -449,7 +449,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 </div>
-<h2 class="h2">11) PASS/FAIL criteria (nhấn mạnh “No evidence = No gate”)</h2>
+<h2 class="h2">11) PASS/FAIL criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))”)</h2>
 <div class="card">
 <ul>
 <li><b>Quiz:</b> ≥ 85% đúng.</li>

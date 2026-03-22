@@ -89,7 +89,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="kpi">
 <div class="tag blue">KPI: truy xuất Job/PartRev/Evidence ≤ 3 phút</div>
 <div class="tag">Nguyên tắc: 01 đối tượng = 01 Primary Home</div>
-<div class="tag">Luật: No evidence = No gate</div>
+<div class="tag">Luật: không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))</div>
 </div>
 </div>
 <div class="note">
@@ -98,7 +98,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Đối tượng (bắt buộc):</strong> Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor</li>
 <li><strong>Thời lượng:</strong> Lý thuyết 90 phút • Workshop 60 phút • OJT 120 phút (theo ca)</li>
 <li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền tối thiểu theo role; đã học Orientation + quy tắc an toàn dữ liệu nội bộ.</li>
-<li><strong>Điểm chặn:</strong> Release Part/Rev • Nhận chứng từ vật liệu/outsource • Đóng kiểm tra • Ship packet</li>
+<li><strong>Điểm chặn:</strong> Release Part/Rev • Nhận chứng từ vật liệu/outsource • Đóng kiểm tra • bộ hồ sơ giao hàng (ship packet)</li>
 </ul>
 </div>
 </div>
@@ -128,8 +128,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>Module này tồn tại để khóa 03 rủi ro sống còn của xưởng CNC job shop:</b>
 <ol style="margin:10px 0 0 18px">
 <li><b>Sai Rev / sai bản vẽ / sai chương trình</b> → gia công sai → scrap/rework → giao sai.</li>
-<li><b>Mix-up lẫn Job/lot</b> → mất traceability → ship sai → khiếu nại/audit fail.</li>
-<li><b>Thiếu/giả chứng từ</b> (COA/Cert/outsource/cali) → không chứng minh phù hợp → “No evidence = No gate”.</li>
+<li><b>Mix-up lẫn Job/lot</b> → mất traceability → ship sai → khiếu nại/đánh giá không đạt.</li>
+<li><b>Thiếu/giả chứng từ</b> (COA/Cert/outsource/cali) → không chứng minh phù hợp → “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))”.</li>
 </ol>
 <div class="muted" style="margin-top:8px">
  Khi một bộ phận lưu sai nơi hoặc copy file để “tiện”, hệ thống mất SSOT và mọi role phía sau mất thời gian truy xuất.
@@ -168,7 +168,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Đóng kiểm tra / chuẩn bị ship</td>
 <td>QC + QA + Warehouse</td>
-<td>Hoàn tất report; tạo ship packet theo PackID; kiểm link tới pack bắt buộc; declare record.</td>
+<td>Hoàn tất report; tạo bộ hồ sơ giao hàng (ship packet) theo PackID; kiểm link tới pack bắt buộc; declare record.</td>
 <td>IR/CMM/FAI pack + Ship packet + CoC</td>
 </tr>
 </tbody>
@@ -288,7 +288,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Zone02</b><div class="muted">Part/Rev</div></td>
 <td>Programmer/Engineering (Owner), QA (ack)</td>
 <td>Drawing/CAD/CAM/Setup released theo PartNum-Rev; package release</td>
-<td>Không nhét evidence theo Job; không chạy shopfloor từ file local/USB</td>
+<td>Không nhét evidence theo Job; không chạy shopfloor từ tệp cục bộ (local file)/USB</td>
 </tr>
 <tr>
 <td><b>Zone03</b><div class="muted">Job Evidence</div></td>
@@ -369,7 +369,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Setup</td>
 <td>Setup sheet update tại xưởng nhưng không tạo PackageID mới</td>
-<td>Không trace thay đổi; audit fail</td>
+<td>Không trace thay đổi; đánh giá không đạt</td>
 <td>Setup tạo package mới và publish; bản cũ chuyển obsolete</td>
 </tr>
 <tr>
@@ -386,7 +386,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Packing/Ship</td>
-<td>Ship packet gom nhiều shipment vào 1 pack, không theo PackID</td>
+<td>bộ hồ sơ giao hàng (ship packet) gom nhiều shipment vào 1 pack, không theo PackID</td>
 <td>Mix-up shipment; truy xuất sai</td>
 <td>Warehouse tạo 1 pack = 1 PackID; index mapping item</td>
 </tr>
@@ -454,7 +454,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP6 — Ship packet gate</b></td>
 <td>Warehouse + QA</td>
-<td>Ship packet theo PackID; checklist “đủ pack bắt buộc”; declare record trước ship.</td>
+<td>bộ hồ sơ giao hàng (ship packet) theo PackID; checklist “đủ pack bắt buộc”; declare record trước ship.</td>
 <td>Ship packet + CoC + checklist + record status</td>
 </tr>
 <tr>
@@ -483,8 +483,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>STOP</b> (dừng thao tác ngay)
  <ul style="margin:10px 0 0 18px">
 <li>Khi phát hiện Rev trên máy/xưởng khác Rev trên snapshot hoặc traveler.</li>
-<li>Khi mở file không nằm trong Primary Home (file local, USB, email attachment).</li>
-<li>Khi report/ship packet thiếu key (JobNum/PartRev/Date/PackID).</li>
+<li>Khi mở file không nằm trong Primary Home (tệp cục bộ (local file), USB, email attachment).</li>
+<li>Khi report/bộ hồ sơ giao hàng (ship packet) thiếu key (JobNum/PartRev/Date/PackID).</li>
 </ul>
 </div>
 <div class="note">
@@ -492,7 +492,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <ul style="margin:10px 0 0 18px">
 <li>Khi chứng từ vật liệu/outsource thiếu hoặc không map được lot/heat.</li>
 <li>Khi inspection pack chưa ký hoặc chưa declare record.</li>
-<li>Khi job có NCR mở mà ship packet không gắn link NCR disposition.</li>
+<li>Khi job có NCR mở mà bộ hồ sơ giao hàng (ship packet) không gắn link NCR disposition.</li>
 </ul>
 </div>
 </div>
@@ -563,7 +563,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>IT/Data + Supervisor</td>
 </tr>
 <tr>
-<td>Ship risk (ship packet thiếu link)</td>
+<td>Ship risk (bộ hồ sơ giao hàng (ship packet) thiếu link)</td>
 <td>HOLD ship; hoàn thiện pack</td>
 <td>Checklist ship gate + link pack bắt buộc</td>
 <td>Warehouse + QA</td>
@@ -614,7 +614,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Setup</td>
 <td>Xác nhận setup sheet đúng Rev; tạo SnapshotID cho xưởng.</td>
 <td>SnapshotID + ack</td>
-<td>Chạy từ file local; không có SnapshotID</td>
+<td>Chạy từ tệp cục bộ (local file); không có SnapshotID</td>
 </tr>
 <tr>
 <td>5</td>
@@ -675,7 +675,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>13</td>
 <td>Warehouse + QA</td>
-<td>Tạo ship packet theo PackID; checklist đủ pack; HOLD khi thiếu.</td>
+<td>Tạo bộ hồ sơ giao hàng (ship packet) theo PackID; checklist đủ pack; tạm giữ khi thiếu.</td>
 <td>Ship packet + checklist + CoC</td>
 <td>Gom nhiều shipment vào 1 pack; thiếu link IR</td>
 </tr>
@@ -744,7 +744,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>7</td>
 <td>Truy xuất audit theo 3 phút</td>
 <td>Bắt đầu từ index/register; mở link tới pack; chứng minh key + Rev.</td>
-<td>Audit fail khi mất thời gian và không chứng minh tính kiểm soát.</td>
+<td>đánh giá không đạt khi mất thời gian và không chứng minh tính kiểm soát.</td>
 </tr>
 </tbody>
 </table>
@@ -754,7 +754,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:10px 0 0 18px">
 <li>01 Job Dossier theo template (JobNum + PartNum + Rev) với đủ 08 thư mục.</li>
 <li>01 Part/Rev container (PartNum-Rev) có <b>CFG package</b> (manifest + file) và 01 SnapshotID.</li>
-<li>01 pack evidence mẫu (IR hoặc Cert hoặc Ship packet) có tên đúng quy tắc + có index + có signoff (giả lập).</li>
+<li>01 pack evidence mẫu (IR hoặc Cert hoặc bộ hồ sơ giao hàng (ship packet)) có tên đúng quy tắc + có index + có signoff (giả lập).</li>
 <li>01 bài truy xuất: tìm đúng pack theo key trong ≤ 3 phút và chụp ảnh màn hình làm bằng chứng hoàn tất OJT.</li>
 </ul>
 </div>
@@ -780,7 +780,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </td>
 <td>
 <ul>
-<li><b>Operator/Setup:</b> mở đúng SnapshotID, không dùng file local.</li>
+<li><b>Operator/Setup:</b> mở đúng SnapshotID, không dùng tệp cục bộ (local file).</li>
 <li><b>QC/Warehouse:</b> upload file vào đúng mục trong Job Dossier.</li>
 <li><b>Estimator (SAL-03)/Purchasing:</b> lưu hợp đồng/cert đúng Zone05 và gắn link Job.</li>
 </ul>
@@ -818,7 +818,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Supervisor:</b> chốt gate đầu ca và gate trước ship.</li>
 <li><b>QA:</b> mở NCR và tạo closure pack đủ bằng chứng.</li>
-<li><b>Warehouse:</b> chặn ship khi thiếu pack bắt buộc.</li>
+<li><b>Warehouse:</b> chặn giao hàng khi thiếu pack bắt buộc.</li>
 </ul>
 </td>
 <td>Được quyền <b>gate signoff</b> (ký checklist) theo phạm vi bộ phận</td>
@@ -861,11 +861,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>PackID dùng để chặn lỗi gì ở bước Ship?</li>
 <li>Hành động nào là “link-not-copy” đúng?</li>
 <li>Khi thiếu cert outsource, quyết định bắt buộc là STOP hay HOLD?</li>
-<li>Role nào chốt gate Ship packet?</li>
+<li>Role nào chốt gate bộ hồ sơ giao hàng (ship packet)?</li>
 <li>AssetID có vai trò gì trong hồ sơ calibration?</li>
 <li>Nêu 03 thông tin bắt buộc phải có trên inspection report.</li>
 <li>Record đã declare còn được phép chỉnh sửa nội dung không?</li>
-<li>“No evidence = No gate” áp dụng rõ nhất ở những bước nào trong E2E?</li>
+<li>“không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))” áp dụng rõ nhất ở những bước nào trong E2E?</li>
 <li>NCR evidence theo job nằm ở đâu? Closure pack nằm ở đâu?</li>
 <li>Điểm khác nhau giữa Part/Rev master và Job evidence là gì?</li>
 <li>Trong 60 giây, học viên phải ghi MRR gì khi phát hiện bypass gate?</li>
@@ -889,7 +889,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Khi Operator mở chương trình trên máy thấy tên file có “REV-B” nhưng traveler ghi “REV-C”.
  File đang nằm trong ổ D: của máy.
  </td>
-<td>STOP + BLOCK file local; chỉ chạy từ SnapshotID đúng Rev</td>
+<td>STOP + BLOCK tệp cục bộ (local file); chỉ chạy từ SnapshotID đúng Rev</td>
 <td>Ảnh màn hình path + log hold + link SnapshotID đúng</td>
 <td>Operator → Supervisor → Programmer + QA</td>
 </tr>
@@ -905,7 +905,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>3</td>
 <td>
- QC đã đo xong và xuất report, nhưng report thiếu JobNum. Warehouse chuẩn bị ship và ship packet chưa có link IR.
+ QC đã đo xong và xuất report, nhưng report thiếu JobNum. Warehouse chuẩn bị ship và bộ hồ sơ giao hàng (ship packet) chưa có link IR.
  </td>
 <td>HOLD ship; QC sửa report theo quy tắc; QA gate lại</td>
 <td>Report PDF mới + signoff + checklist ship gate cập nhật</td>
@@ -920,7 +920,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <ol style="margin:10px 0 0 18px">
 <li>Tạo Job Dossier đúng template và đặt tên đúng key.</li>
 <li>Tạo Part/Rev container và publish 01 CFG package (manifest + file) với PackageID.</li>
-<li>Tạo 01 pack evidence (IR hoặc Cert hoặc Ship packet) có index và đặt tên đúng quy tắc.</li>
+<li>Tạo 01 pack evidence (IR hoặc Cert hoặc bộ hồ sơ giao hàng (ship packet)) có index và đặt tên đúng quy tắc.</li>
 <li>Truy xuất: theo key mở đúng pack trong ≤ 3 phút và chứng minh “Primary Home” (không mở từ nơi khác).</li>
 </ol>
 </div>
@@ -951,7 +951,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Gate decision</td>
 <td>Áp dụng STOP/HOLD/BLOCK đúng tình huống và ghi MRR</td>
-<td>Cho chạy/ship khi thiếu bằng chứng; không ghi MRR</td>
+<td>Cho chạy/giao hàng khi thiếu bằng chứng; không ghi MRR</td>
 </tr>
 <tr>
 <td>Thời gian truy xuất</td>
@@ -963,7 +963,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 11) PASS/FAIL -->
 <div class="card" id="passfail">
-<h2 class="h2" style="margin-top:0">11) PASS/FAIL criteria (nhấn mạnh “No evidence = No gate”)</h2>
+<h2 class="h2" style="margin-top:0">11) PASS/FAIL criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))”)</h2>
 <div class="grid-2">
 <div class="note">
 <b>PASS</b>
@@ -979,8 +979,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:10px 0 0 18px">
 <li>Bất kỳ hồ sơ nào thiếu key hoặc lưu sai Primary Home.</li>
 <li>Bất kỳ hành vi copy file ra ngoài luồng hoặc sửa file đã declare record.</li>
-<li>Không áp dụng STOP/HOLD khi phát hiện sai Rev/thiếu chứng từ.</li>
-<li>Không tạo MRR: <b>No evidence = No gate</b>.</li>
+<li>Không áp dụng STOP/tạm giữ khi phát hiện sai Rev/thiếu chứng từ.</li>
+<li>Không tạo MRR: <b>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))</b>.</li>
 </ul>
 </div>
 </div>
@@ -1193,13 +1193,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>4</td>
 <td>Không chứng minh traceability lot/heat</td>
-<td>Cert pack bắt buộc map lot/PO/Job; receiving HOLD khi thiếu</td>
+<td>Cert pack bắt buộc map lot/PO/Job; receiving tạm giữ khi thiếu</td>
 <td>Cert pack + receiving acceptance</td>
 </tr>
 <tr>
 <td>5</td>
-<td>Ship packet thiếu link tới IR/CMM/FAI</td>
-<td>Ship gate checklist; HOLD ship khi thiếu</td>
+<td>bộ hồ sơ giao hàng (ship packet) thiếu link tới IR/CMM/FAI</td>
+<td>Ship gate checklist; HOLD giao hàng khi thiếu</td>
 <td>Checklist ship gate + pack links</td>
 </tr>
 <tr>

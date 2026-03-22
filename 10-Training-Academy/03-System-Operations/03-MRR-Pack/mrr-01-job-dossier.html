@@ -132,11 +132,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
 <tr><td><span class="chk">☐</span> RFQ + yêu cầu khách hàng (bản gốc)</td><td>RFQ</td><td>G0</td><td>Sales</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RFQ_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Contract Review (yêu cầu/CTQ/rủi ro/chấp nhận năng lực)</td><td>CR</td><td>G1</td><td>Sales+QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review)))) (yêu cầu/CTQ/rủi ro/chấp nhận năng lực)</td><td>CR</td><td>G1</td><td>Sales+QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> PO/WO/JobCode được phát hành</td><td>WO</td><td>G1</td><td>Planning</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_WO_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Baseline bản vẽ + spec (REV kiểm soát)</td><td>DRAW/SPEC</td><td>G2</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_DRAWREV_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Route / Process Plan / CTQ map</td><td>PLAN</td><td>G2</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PLAN_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> Risk Register (job-level) + hành động chặn</td><td>RISK</td><td>G2</td><td>QA+OPS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RISK_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> sổ đăng ký rủi ro (risk register) (job-level) + hành động chặn</td><td>RISK</td><td>G2</td><td>QA+OPS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RISK_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> NC Release Pack (simulation + checklist release)</td><td>NCREL</td><td>G2</td><td>CAM/ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/NC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCREL_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Traveler / Job Pack (theo route)</td><td>TRV</td><td>G3</td><td>Planning</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_TRV_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Setup Sheet + Tool list + Offset list</td><td>SETUP</td><td>G3</td><td>Setup</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/SETUP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SETUP_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
@@ -154,13 +154,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
 <ul class="tight">
-<li>Sai REV bản vẽ hoặc thiếu baseline trong SSOT → BLOCK.</li><li>Thiếu Contract Review hoặc thiếu CTQ map → HOLD tại G2.</li><li>Chạy máy khi chưa có NC Release Pack hoặc setup sheet → STOP.</li><li>FAI/IR chưa ký mà đã chạy hàng loạt → STOP và HOLD toàn bộ WIP.</li><li>Ship khi thiếu CoC/Ship Packet → BLOCK.</li>
+<li>Sai REV bản vẽ hoặc thiếu baseline trong SSOT → BLOCK.</li><li>Thiếu rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review)))) hoặc thiếu CTQ map → HOLD tại G2.</li><li>Chạy máy khi chưa có NC Release Pack hoặc setup sheet → STOP.</li><li>FAI/IR chưa ký mà đã chạy hàng loạt → STOP và HOLD toàn bộ WIP.</li><li>giao hàng khi thiếu CoC/bộ hồ sơ giao hàng (ship packet) → BLOCK.</li>
 </ul>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Audit 60 giây</h2>
 <ol class="tight">
-<li>Mở SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/ và xác nhận có đủ thư mục 00→06.</li><li>Mở file baseline DRAWREV và kiểm tra REV trùng PO/WO.</li><li>Mở NCREL checklist và xác nhận simulation + release sign-off.</li><li>Mở FAI/IR và đối chiếu CTQ map.</li><li>Mở Ship Packet và kiểm tra CoC/packing list/label khớp JobCode.</li>
+<li>Mở SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/ và xác nhận có đủ thư mục 00→06.</li><li>Mở file baseline DRAWREV và kiểm tra REV trùng PO/WO.</li><li>Mở NCREL checklist và xác nhận simulation + release sign-off.</li><li>Mở FAI/IR và đối chiếu CTQ map.</li><li>Mở bộ hồ sơ giao hàng (ship packet) và kiểm tra CoC/phiếu kê đóng gói (packing list)/label khớp JobCode.</li>
 </ol>
 </div>
 <div class="card">

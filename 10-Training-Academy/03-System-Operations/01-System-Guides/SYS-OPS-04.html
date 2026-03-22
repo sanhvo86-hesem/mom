@@ -74,7 +74,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Thông tin triển khai</strong>
 <ul>
 <li><strong>Target roles (bắt buộc):</strong> Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor</li>
-<li><strong>Kích hoạt module:</strong> Khi xưởng vận hành “paperless evidence” qua M365 Lists/SharePoint + Power Automate, và khi có yêu cầu duyệt (Ship Release / NCR / CAPA / Hold).</li>
+<li><strong>Kích hoạt module:</strong> Khi xưởng vận hành “paperless evidence” qua M365 Lists/SharePoint + Power Automate, và khi có yêu cầu duyệt (phê duyệt giao hàng (ship release) / NCR / CAPA / Hold).</li>
 <li><strong>Không có bằng chứng = Không qua gate:</strong> Không có MRR hợp lệ thì trạng thái phải HOLD/BLOCK.</li>
 </ul>
 </div>
@@ -122,8 +122,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Planner</b></td><td>Giám sát JobIndex/JobOper; đảm bảo job Released có dossier; điều phối handoff theo gate.</td><td>Không có job Released thiếu EvidenceFolderUrl; phản hồi blocker trong 1 ca.</td></tr>
 <tr><td><b>Maintenance</b></td><td>Ghi nhận ToolLife/Downtime theo record; giữ bằng chứng hiệu chuẩn CNC-IMS-HUB → QMS-Records → Metrology-Records..</td><td>Đóng 01 sự cố downtime có record + ảnh + nguyên nhân; không mất dấu vết.</td></tr>
 <tr><td><b>EHS</b></td><td>Gắn kiểm soát EHS vào hồ sơ khi có yêu cầu; khóa phát hành khi thiếu kiểm soát an toàn EHS gate: PPE • LOTO • Hot Work • Lifting • Chemical/Coolant • Machine Guard..</td><td>Nhận biết các điểm chặn EHS và phát hành đúng 100%.</td></tr>
-<tr><td><b>Estimator (SAL-03)</b></td><td>Không cam kết ship khi ShipRelease chưa RELEASED; truyền thông đúng trạng thái gate.</td><td>Không có email/quote xác nhận ship khi Status=BLOCKED/HOLD.</td></tr>
-<tr><td><b>Supervisor</b></td><td>Chủ trì handoff ca; cưỡng chế “No evidence = No gate”; mở sự cố khi có bypass.</td><td>0 lần bypass gate trong ca trực; 100% blocker có owner và due time.</td></tr>
+<tr><td><b>Estimator (SAL-03)</b></td><td>Không cam kết giao hàng khi ShipRelease chưa RELEASED; truyền thông đúng trạng thái gate.</td><td>Không có email/quote xác nhận giao hàng khi Status=BLOCKED/HOLD.</td></tr>
+<tr><td><b>Supervisor</b></td><td>Chủ trì handoff ca; cưỡng chế “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))”; mở sự cố khi có bypass.</td><td>0 lần bypass gate trong ca trực; 100% blocker có owner và due time.</td></tr>
 </tbody>
 </table>
 </div>
@@ -146,7 +146,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Phê duyệt phải có SLA, nhắc việc, escalation, và trail theo người/giờ/ý kiến.</li>
 <li>Segregation of Duties: người tạo record không tự phê duyệt cho chính mình ở gate chất lượng/ship.</li>
-<li>Audit trail phải truy ra “ai làm gì, lúc nào, dựa trên bằng chứng nào”.</li>
+<li>dấu vết kiểm toán (audit trail) phải truy ra “ai làm gì, lúc nào, dựa trên bằng chứng nào”.</li>
 </ul>
 </div>
 </div>
@@ -201,7 +201,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Ship Release</b></td>
 <td>ShipRelease + dossier + QC/FAI + packaging + reconciliation</td>
 <td>Status=RELEASED hoặc BLOCKED</td>
-<td><b>STOP-SHIP</b> khi bất kỳ check FAIL</td>
+<td><b>dừng giao hàng (dừng giao hàng (STOP-SHIP))</b> khi bất kỳ check FAIL</td>
 <td>ShipRelease + IntegrationLogs + ApprovalHistory (khi có bước duyệt)</td>
 </tr>
 </tbody>
@@ -212,7 +212,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th>Flow</th><th>Trigger</th><th>Input</th><th>Output</th><th>Điểm vận hành phải kiểm</th></tr></thead>
 <tbody>
-<tr><td>FLOW_01_Sync_OpenJobs</td><td>Recurrence 15–30m</td><td>BAQ_OpenJobs</td><td>Upsert JobIndex</td><td>Delta+overlap; không advance cursor khi fail</td></tr>
+<tr><td>FLOW_01_Sync_OpenJobs</td><td>Recurrence 15–30m</td><td>BAQ_OpenJobs</td><td>Upsert JobIndex</td><td>Delta+overlap; không advance cursor khi không đạt</td></tr>
 <tr><td>FLOW_02_Sync_JobOperations</td><td>Recurrence 30m</td><td>BAQ_JobOperations</td><td>Upsert JobOperIndex</td><td>JobNum+OprSeq duy nhất</td></tr>
 <tr><td>FLOW_03_Sync_LaborMirror</td><td>Recurrence 15m</td><td>BAQ_LaborTime</td><td>Upsert LaborMirror</td><td>Không thiếu JobNum/ClockIn</td></tr>
 <tr><td>FLOW_04_Sync_ShipmentMirror</td><td>Recurrence 15m</td><td>BAQ_ShipmentsOpen</td><td>Upsert ShipmentMirror</td><td>Không trễ so với ca vận hành</td></tr>
@@ -235,7 +235,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>4</td><td>Job Released nhưng EvidenceFolderUrl trống</td><td>Planning</td><td>JobIndex filter EvidenceFolderUrl=blank</td><td>Planner HOLD phát hành; chạy lại FLOW_06 hoặc tạo hồ sơ thủ công và log</td></tr>
 <tr><td>5</td><td>Approval thực hiện qua chat/email, không log</td><td>QA/Ship</td><td>Không có ApprovalHistory cho RecordID</td><td>BLOCK gate; yêu cầu duyệt lại trong hệ thống</td></tr>
 <tr><td>6</td><td>ApprovalHistory thiếu comment/time/approver</td><td>QA</td><td>Trường bắt buộc rỗng</td><td>QA trả về (Reject) và yêu cầu ghi rõ; không cho “Approve trắng”</td></tr>
-<tr><td>7</td><td>ShipRelease bị sửa trạng thái bằng tay để vượt gate</td><td>Ship</td><td>Status=RELEASED nhưng validator log FAIL</td><td>STOP-SHIP; mở NCR nội bộ; khóa quyền sửa tay RBAC: QA/QMS approve • OPS execute • IT admin • sửa record gate = QA/QMS.</td></tr>
+<tr><td>7</td><td>ShipRelease bị sửa trạng thái bằng tay để vượt gate</td><td>Ship</td><td>Status=RELEASED nhưng validator log FAIL</td><td>dừng giao hàng (dừng giao hàng (dừng giao hàng (STOP-SHIP))); mở NCR nội bộ; khóa quyền sửa tay RBAC: QA/QMS approve • OPS execute • IT admin • sửa record gate = QA/QMS.</td></tr>
 <tr><td>8</td><td>SSCC chưa Verified nhưng vẫn đóng gói</td><td>Packing</td><td>PackSSCCRegister.VerifiedAt trống</td><td>BLOCK; Warehouse tái in/đối chiếu; ghi StandupAction</td></tr>
 <tr><td>9</td><td>FAI bắt buộc nhưng thiếu report URL</td><td>QC/QA</td><td>RequiresFAI=TRUE và ReportUrl trống</td><td>HOLD; QC lập report và gắn link trước khi ship</td></tr>
 <tr><td>10</td><td>DocMissing/special process cert thiếu</td><td>Purchasing/Receiving</td><td>ReceivingIQC DocMissing</td><td>HOLD vật tư; Purchasing truy chứng từ; không phát hành vào sản xuất</td></tr>
@@ -249,14 +249,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>5) Risk Controls (control points; ai làm; bằng chứng; tối thiểu 6)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>Control point</th><th>Owner chính</th><th>Bằng chứng/MRR</th><th>Điều kiện PASS</th><th>Hành động khi FAIL</th></tr></thead>
+<thead><tr><th>Control point</th><th>Owner chính</th><th>Bằng chứng/MRR</th><th>Điều kiện PASS</th><th>Hành động khi không đạt</th></tr></thead>
 <tbody>
 <tr><td>CP1 — Delta+overlap + idempotent upsert</td><td>IT</td><td>IntegrationSettings + IntegrationLogs</td><td>Không trùng EpicorKey; LastSyncUtc chỉ update khi Success</td><td>Khóa sử dụng dữ liệu mirror; IT sửa và ghi incident</td></tr>
 <tr><td>CP2 — Audit fields bắt buộc</td><td>QA/QMS</td><td>List schema audit: Created/Modified + FlowRunId FlowRunId = cột bắt buộc trên mọi record gate (Power Automate Run ID).</td><td>Truy ra ai/giờ cho mọi record gate</td><td>Không qua gate cho record thiếu audit fields</td></tr>
 <tr><td>CP3 — Evidence lưu bằng URL, không nhét file vào list</td><td>All role tạo record</td><td>EvidenceFolderUrl/RecordUrl</td><td>Link mở được; file nằm đúng thư mục dossier</td><td>Reject record; yêu cầu sửa link và tổ chức lại hồ sơ</td></tr>
 <tr><td>CP4 — SoD cho approvals</td><td>QA + Supervisor</td><td>ApprovalHistory + quyền truy cập M365/SharePoint → HESEM-QMS-SSOT</td><td>Approver khác người tạo; comment bắt buộc khi Reject</td><td>Block và mở NCR nội bộ khi tự duyệt</td></tr>
 <tr><td>CP5 — Hard gate ShipRelease</td><td>Warehouse + QA</td><td>ShipRelease + IntegrationLogs + PackagingChecks + PackSSCCRegister</td><td>Validator PASS mới được RELEASED</td><td>BLOCKED + notify Teams + StandupAction</td></tr>
-<tr><td>CP6 — Monitoring &amp; anomaly rules</td><td>Supervisor</td><td>Báo cáo/ảnh chụp màn hình dashboard mỗi ca CNC-IMS-HUB → QMS-Records → Dash-Snapshots.</td><td>0 Released khi recon FAIL; 0 NCR Closed thiếu disposition</td><td>STOP-SHIP hoặc HOLD chất lượng; mở hành động khắc phục</td></tr>
+<tr><td>CP6 — Monitoring &amp; anomaly rules</td><td>Supervisor</td><td>Báo cáo/ảnh chụp màn hình dashboard mỗi ca CNC-IMS-HUB → QMS-Records → Dash-Snapshots.</td><td>0 Released khi recon FAIL; 0 NCR Closed thiếu disposition</td><td>dừng giao hàng (dừng giao hàng (dừng giao hàng (STOP-SHIP))) hoặc HOLD chất lượng; mở hành động khắc phục</td></tr>
 <tr><td>CP7 — Version control cho Flow</td><td>IT</td><td>Export package + DCR record</td><td>Mọi thay đổi flow có ticket + phê duyệt + rollback plan</td><td>Rollback ngay khi phát hiện ảnh hưởng gate</td></tr>
 </tbody>
 </table>
@@ -278,7 +278,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li><b>Rule FF1 — Mirror không tin cậy:</b> Khi IntegrationLogs(Failed) xảy ra 3 lần liên tiếp cho flow sync trong giờ ca → <b>STOP dữ liệu</b>; Planner/Supervisor chuyển sang kiểm bằng Epicor trực tiếp Fallback: Epicor trực tiếp + export CSV vào SSOT..</li>
 <li><b>Rule FF2 — No evidence:</b> Khi bất kỳ gate record (ShipRelease/NCR/CAPA/QC Hold) thiếu EvidenceFolderUrl hoặc thiếu file bắt buộc → <b>HOLD/BLOCK</b> ngay tại record; không mở ngoại lệ.</li>
-<li><b>Rule FF3 — Bypass gate:</b> Khi phát hiện Status=RELEASED nhưng validator FAIL hoặc thiếu ApprovalHistory → <b>STOP-SHIP</b>, mở NCR nội bộ, khóa quyền sửa tay và báo cáo ban điều hành trong ca.</li>
+<li><b>Rule FF3 — Bypass gate:</b> Khi phát hiện Status=RELEASED nhưng validator FAIL hoặc thiếu ApprovalHistory → <b>dừng giao hàng (dừng giao hàng (STOP-SHIP))</b>, mở NCR nội bộ, khóa quyền sửa tay và báo cáo ban điều hành trong ca.</li>
 <li><b>Rule FF4 — Null key:</b> Khi record gate thiếu JobNum/PackID/ID khóa → <b>BLOCK</b> record; sửa dữ liệu đầu nguồn rồi mới chạy lại.</li>
 </ol>
 </div>
@@ -317,7 +317,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Bypass gate / ship risk</td>
 <td>ShipRelease RELEASED nhưng thiếu SSCC/packet/inspection</td>
-<td>Warehouse dừng xuất hàng; Supervisor kích hoạt <b>STOP-SHIP</b>; QA mở NCR nội bộ</td>
+<td>Warehouse dừng xuất hàng; Supervisor kích hoạt <b>dừng giao hàng (dừng giao hàng (STOP-SHIP))</b>; QA mở NCR nội bộ</td>
 <td>ShipRelease set BLOCKED + IntegrationLogs + StandupAction</td>
 </tr>
 </tbody>
@@ -365,7 +365,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>2</td><td>Truy EvidenceFolderUrl và mở đúng thư mục hồ sơ</td><td>Đảm bảo bằng chứng nằm đúng nơi, truy xuất được</td></tr>
 <tr><td>3</td><td>Hoàn tất chứng cứ packaging: PackagingChecks=Pass và có PhotoEvidenceUrl</td><td>Thiếu ảnh/record làm gate thất bại</td></tr>
 <tr><td>4</td><td>Đối chiếu SSCC: PackSSCCRegister VerifiedAt không rỗng</td><td>SSCC là điểm chặn chống nhầm kiện</td></tr>
-<tr><td>5</td><td>Đối chiếu QC/FAI: ReportUrl có và đúng job; RequiresFAI thì FAI=Pass</td><td>Tránh ship khi chưa đạt chất lượng</td></tr>
+<tr><td>5</td><td>Đối chiếu QC/FAI: ReportUrl có và đúng job; RequiresFAI thì FAI=Pass</td><td>Tránh giao hàng khi chưa đạt chất lượng</td></tr>
 <tr><td>6</td><td>Cập nhật record để kích hoạt revalidate; ghi lại FlowRunId/IntegrationLogs</td><td>Audit cần thấy run mới và kết quả</td></tr>
 <tr><td>7</td><td>Khi flow yêu cầu duyệt: tạo approval đúng tuyến, không tự duyệt</td><td>SoD chặn gian lận và sai sót</td></tr>
 <tr><td>8</td><td>Khi PASS: xác nhận PASS có MRR đủ; đóng StandupAction</td><td>Không đóng vòng lặp tạo “lỗi tái diễn”</td></tr>
@@ -379,7 +379,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>L1</b> — Biết quy tắc</td>
-<td>Nêu đúng 4 trạng thái STOP/HOLD/BLOCK/RELEASED; nêu đúng “No evidence = No gate”.</td>
+<td>Nêu đúng 4 trạng thái STOP/HOLD/BLOCK/RELEASED; nêu đúng “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))”.</td>
 <td>Quiz ≥ ngưỡng theo role (mục 11).</td>
 <td>Được thao tác xem dashboard/log, không được thay đổi trạng thái gate.</td>
 </tr>
@@ -397,7 +397,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L4</b> — Dẫn dắt + chặn rủi ro</td>
-<td>Phát hiện anomaly, mở hành động khắc phục, cưỡng chế STOP-SHIP; huấn luyện lại tại hiện trường.</td>
+<td>Phát hiện anomaly, mở hành động khắc phục, cưỡng chế dừng giao hàng (dừng giao hàng (dừng giao hàng (STOP-SHIP))); huấn luyện lại tại hiện trường.</td>
 <td>1 ca trực: 0 bypass gate; 100% blocker có owner/due; QA/Supervisor đánh giá đạt.</td>
 <td><b>QA</b> đạt L4 mới được phê duyệt đóng NCR/CAPA; <b>Supervisor</b> đạt L4 mới được duyệt ngoại lệ Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint)..</td>
 </tr>
@@ -409,7 +409,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>10) Đánh giá</h2>
 <h3>10.1 Quiz (≥20 câu) — trắc nghiệm + tình huống ngắn</h3>
 <ol>
-<li>(MCQ) “No evidence = No gate” nghĩa là gì trong ShipRelease?</li>
+<li>(MCQ) “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))” nghĩa là gì trong ShipRelease?</li>
 <li>(MCQ) Khi IntegrationLogs báo Failed, hành động nào phải chặn ngay? A) Advance LastSyncUtc B) Tạo StandupAction C) Gửi notify D) Giữ cursor</li>
 <li>(MCQ) Delta+overlap dùng để chặn rủi ro nào?</li>
 <li>(MCQ) Idempotent upsert bắt buộc dùng khóa nào cho JobIndex? A) JobNum B) EpicorKey C) PartNum D) DueDate</li>
@@ -427,21 +427,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>(Short) Nêu 5 lỗi audit hay gặp liên quan approvals và cách chặn.</li>
 <li>(MCQ) Trạng thái nào tương ứng “khóa hệ thống gate”?</li>
 <li>(MCQ) Ai chịu trách nhiệm handoff ca và gán owner cho blocker?</li>
-<li>(Short) Viết quy tắc đặt tên 1 file bằng chứng ship packet.</li>
+<li>(Short) Viết quy tắc đặt tên 1 file bằng chứng bộ hồ sơ giao hàng (ship packet).</li>
 <li>(MCQ) Khi phát hiện mix-up, hành động đầu tiên tại hiện trường là gì?</li>
 </ol>
 <details class="note">
 <summary><strong>Đáp án chuẩn (chỉ dùng cho Trainer/QA/Supervisor)</strong></summary>
 <ol>
 <li>Không có MRR hợp lệ thì không RELEASED, bắt buộc HOLD/BLOCK.</li>
-<li>A (PHẢI chặn Advance LastSyncUtc khi fail).</li>
+<li>A (PHẢI chặn Advance LastSyncUtc khi không đạt).</li>
 <li>Chặn mất dữ liệu do trễ đồng bộ và chặn bỏ sót record quanh điểm chuyển ca.</li>
 <li>B.</li>
 <li>Operator/Setup/Programmer/QC/QA/Warehouse/Purchasing/Planner/Maintenance/EHS/Estimator (SAL-03)/Supervisor đều phải tách khỏi quyền tự duyệt record do chính mình tạo ở gate chất lượng/ship.</li>
 <li>ApprovalID; SourceList/SourceRecordID; Approver; Outcome; DecisionTime (tối thiểu 3 trong số đó phải có: ApprovalID + Approver + DecisionTime).</li>
 <li>D.</li>
 <li>HOLD/BLOCKED.</li>
-<li>STOP-SHIP; set BLOCKED; mở NCR nội bộ; khóa quyền; notify ban điều hành.</li>
+<li>dừng giao hàng (dừng giao hàng (dừng giao hàng (STOP-SHIP))); set BLOCKED; mở NCR nội bộ; khóa quyền; notify ban điều hành.</li>
 <li>B.</li>
 <li>Warehouse.</li>
 <li>B.</li>
@@ -475,7 +475,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>S3 — Bypass gate bị phát hiện</b></td>
 <td>ShipRelease.Status=RELEASED nhưng validator log ghi PackagingChecks thiếu PhotoEvidenceUrl; SSCC chưa Verified.</td>
-<td><b>STOP-SHIP</b>; set lại BLOCKED; mở NCR nội bộ.</td>
+<td><b>dừng giao hàng (dừng giao hàng (STOP-SHIP))</b>; set lại BLOCKED; mở NCR nội bộ.</td>
 <td>ShipRelease update + IntegrationLogs(Failed/Warning) + NCRLog nội bộ + StandupAction</td>
 </tr>
 </tbody>
@@ -500,15 +500,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="section" id="passfail">
-<h2>11) PASS/FAIL criteria (rõ ràng; nhấn mạnh “No evidence = No gate”)</h2>
+<h2>11) PASS/FAIL criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))”)</h2>
 <div class="table-card">
 <table class="table">
 <thead><tr><th>Role</th><th>Ngưỡng quiz</th><th>Yêu cầu OJT</th><th>Yêu cầu performance test</th><th>Kết luận</th></tr></thead>
 <tbody>
-<tr><td>Operator / Setup / Programmer</td><td>≥ 80%</td><td>OJT output đạt 2 lần liên tiếp</td><td>PASS (tham gia theo phần role)</td><td>PASS khi đủ 3 cột</td></tr>
+<tr><td>Operator / Setup / Programmer</td><td>≥ 80%</td><td>OJT output đạt 2 lần liên tiếp</td><td>PASS (tham gia theo phần role)</td><td>đạt khi đủ 3 cột</td></tr>
 <tr><td>QC / Warehouse</td><td>≥ 85%</td><td>OJT output đạt 3 lần liên tiếp</td><td>PASS đầy đủ</td><td>PASS mới được thao tác gate quan trọng</td></tr>
-<tr><td>QA / Supervisor</td><td>≥ 90%</td><td>OJT output đạt 3 lần liên tiếp + 0 bypass gate</td><td>PASS + đánh giá dẫn dắt</td><td>PASS mới được duyệt/ra lệnh STOP-SHIP</td></tr>
-<tr><td>Purchasing / Planner / Maintenance / EHS / Estimator (SAL-03)</td><td>≥ 80%</td><td>Hoàn tất phần OJT liên quan chứng từ/handoff</td><td>PASS (phần role)</td><td>PASS khi không vi phạm gate</td></tr>
+<tr><td>QA / Supervisor</td><td>≥ 90%</td><td>OJT output đạt 3 lần liên tiếp + 0 bypass gate</td><td>PASS + đánh giá dẫn dắt</td><td>PASS mới được duyệt/ra lệnh dừng giao hàng (dừng giao hàng (dừng giao hàng (STOP-SHIP)))</td></tr>
+<tr><td>Purchasing / Planner / Maintenance / EHS / Estimator (SAL-03)</td><td>≥ 80%</td><td>Hoàn tất phần OJT liên quan chứng từ/handoff</td><td>PASS (phần role)</td><td>đạt khi không vi phạm gate</td></tr>
 </tbody>
 </table>
 </div>
@@ -519,7 +519,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
 <ul>
 <li><b>SharePoint Lists:</b> JobIndex, JobOperIndex, LaborMirror, ReceivingIQC, InspectionReports, FAIReports, QCHoldLog, NCRLog, CAPA8D, PackagingChecks, PackSSCCRegister, ShipRelease, StandupActions, IntegrationSettings, IntegrationLogs, ApprovalHistory.</li>
-<li><b>Job Dossier (SharePoint library):</b> cấu trúc thư mục 01→08; ship packet nằm ở “07_Shipping-Packing” hoặc “07_ShipPacket” Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint)..</li>
+<li><b>Job Dossier (SharePoint library):</b> cấu trúc thư mục 01→08; bộ hồ sơ giao hàng (ship packet) nằm ở “07_Shipping-Packing” hoặc “07_ShipPacket” Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint)..</li>
 <li><b>Teams:</b> thông báo lỗi vào kênh #control-tower-alerts (theo flow spec).</li>
 <li><b>M365/SharePoint → HESEM-QMS-SSOT</b> IntegrationErrors list (khi triển khai), hoặc chuẩn hóa dùng IntegrationLogs.</li>
 </ul>
@@ -570,7 +570,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>#</th><th>Lỗi audit hay gặp</th><th>Tại sao bị fail</th><th>Cách chặn trong vận hành</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Duyệt ngoài hệ thống (email/chat), không có ApprovalHistory</td><td>Không chứng minh được quyết định</td><td>BLOCK gate; duyệt lại trong flow; lưu trail</td></tr>
-<tr><td>2</td><td>Thiếu bằng chứng file/URL, record chỉ có chữ</td><td>Không truy xuất được “evidence”</td><td>Chỉ cho PASS khi EvidenceFolderUrl/ReportUrl mở được</td></tr>
+<tr><td>2</td><td>Thiếu bằng chứng file/URL, record chỉ có chữ</td><td>Không truy xuất được “evidence”</td><td>Chỉ cho đạt khi EvidenceFolderUrl/ReportUrl mở được</td></tr>
 <tr><td>3</td><td>SoD bị vi phạm (tự duyệt)</td><td>Rủi ro gian lận, sai sót</td><td>Đối chiếu CreatedBy vs Approver theo checklist bước 6</td></tr>
 <tr><td>4</td><td>ShipRelease RELEASED khi còn missing reason</td><td>Bypass gate</td><td>Flow_07 cưỡng chế BLOCKED; giám sát anomaly “Released khi recon FAIL = 0”</td></tr>
 <tr><td>5</td><td>FAI/Inspection thiếu ReportUrl</td><td>Không có chứng cứ chất lượng</td><td>HOLD/BLOCK cho đến khi gắn report</td></tr>

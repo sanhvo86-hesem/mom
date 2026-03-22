@@ -74,16 +74,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="kicker">Drill Pack</div>
 <h1 class="h1">DRL-07 — Shipping Packet + CoC Drill</h1>
 <p class="lead">
- Drill này khóa điểm chết: <b>ship thiếu chứng từ</b>. Mục tiêu: ship packet hoàn chỉnh, CoC đúng, traceability đủ, GO-SHIP đúng gate.
+ Drill này khóa điểm chết: <b>ship thiếu chứng từ</b>. Mục tiêu: bộ hồ sơ giao hàng (ship packet) hoàn chỉnh, CoC đúng, traceability đủ, GO-SHIP đúng gate.
  </p>
 </div>
 <div class="grid-2">
 <div class="card">
 <span class="badge">Mục tiêu</span>
 <ul class="tight">
-<li>Ship packet đủ và đúng theo PO/CR.</li>
+<li>bộ hồ sơ giao hàng (ship packet) đủ và đúng theo PO/CR.</li>
 <li>CoC đúng template và ký đúng người.</li>
-<li>Không GO-SHIP khi thiếu 01 tài liệu bắt buộc.</li>
+<li>Không GO-giao hàng khi thiếu 01 tài liệu bắt buộc.</li>
 </ul>
 </div>
 <div class="card">
@@ -95,7 +95,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">Chuẩn bị</span>
 <ul class="tight">
 <li>01 job gần ship (hoặc job đã ship có hồ sơ đủ).</li>
-<li>Template CoC và ship packet checklist.</li>
+<li>Template CoC và bộ hồ sơ giao hàng (ship packet) checklist.</li>
 <li>Quy tắc naming: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
 </ul>
 </div>
@@ -107,7 +107,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Owner</th><th>MRR</th><th style="width:90px;">Gate</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Đọc PO/Contract Review: chốt danh mục ship packet bắt buộc.</td><td>QA/CS</td><td>Ship packet checklist (job-specific)</td><td>HOLD</td></tr><tr><td>2</td><td>Reconciliation Final IR/FAI: quantity, serial/lot (KHI có), CTQ PASS.</td><td>QC</td><td>Final IR/FAI link</td><td>HOLD</td></tr><tr><td>3</td><td>Reconciliation chứng từ vật liệu/outsource: MTR + supplier cert khớp spec/REV.</td><td>QA/WHS</td><td>MTR/Cert links</td><td>HOLD</td></tr><tr><td>4</td><td>Tạo CoC theo template: JobNum/PartNo/REV/Qty/Spec, ký số hoặc ký scan.</td><td>QA</td><td>CoC PDF</td><td>HOLD</td></tr><tr><td>5</td><td>Packing/label: chụp ảnh label + packing, đối soát yêu cầu đặc biệt.</td><td>WHS</td><td>Label photo + packing list</td><td>HOLD</td></tr><tr><td>6</td><td>Lưu toàn bộ ship packet tại 50_Shipping/ theo naming rule + tạo 01 link tổng.</td><td>QA</td><td>Ship packet folder link</td><td>FAIL</td></tr><tr><td>7</td><td>Gate GO-SHIP: ký release (QA + WHS) và cập nhật ERP/dispatch.</td><td>QA + WHS</td><td>Ship release record</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Đọc PO/rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review)))): chốt danh mục bộ hồ sơ giao hàng (ship packet) bắt buộc.</td><td>QA/CS</td><td>Ship packet checklist (job-specific)</td><td>HOLD</td></tr><tr><td>2</td><td>Reconciliation Final IR/FAI: quantity, serial/lot (KHI có), CTQ PASS.</td><td>QC</td><td>Final IR/FAI link</td><td>HOLD</td></tr><tr><td>3</td><td>Reconciliation chứng từ vật liệu/outsource: MTR + supplier cert khớp spec/REV.</td><td>QA/WHS</td><td>MTR/Cert links</td><td>HOLD</td></tr><tr><td>4</td><td>Tạo CoC theo template: JobNum/PartNo/REV/Qty/Spec, ký số hoặc ký scan.</td><td>QA</td><td>CoC PDF</td><td>HOLD</td></tr><tr><td>5</td><td>Packing/label: chụp ảnh label + packing, đối soát yêu cầu đặc biệt.</td><td>WHS</td><td>Label photo + packing list</td><td>HOLD</td></tr><tr><td>6</td><td>Lưu toàn bộ bộ hồ sơ giao hàng (ship packet) tại 50_Shipping/ theo naming rule + tạo 01 link tổng.</td><td>QA</td><td>Ship packet folder link</td><td>FAIL</td></tr><tr><td>7</td><td>Gate GO-SHIP: ký release (QA + WHS) và cập nhật ERP/dispatch.</td><td>QA + WHS</td><td>Ship release record</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
@@ -118,17 +118,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiếu CoC hoặc CoC sai REV/Qty.</li>
 <li>Thiếu Final IR/FAI hoặc CTQ chưa PASS.</li>
 <li>Thiếu MTR/Cert cho vật liệu/outsource.</li>
-<li>Ship packet nằm ngoài 50_Shipping/ hoặc đặt tên sai chuẩn.</li>
+<li>bộ hồ sơ giao hàng (ship packet) nằm ngoài 50_Shipping/ hoặc đặt tên sai chuẩn.</li>
 </ul>
 </div>
 <div class="card">
 <span class="badge">Rubric chấm điểm (10 điểm)</span>
-<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. PASS khi tổng ≥ 8/10 và không vi phạm fail-fast.</p>
+<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. đạt khi tổng ≥ 8/10 và không vi phạm fail-fast.</p>
 <div class="table-card">
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Completeness</b></td><td>Đủ các tài liệu bắt buộc theo PO/CR.</td><td>0/1/2</td></tr><tr><td><b>Accuracy</b></td><td>PartNo/REV/Qty/Spec đúng trên mọi tài liệu.</td><td>0/1/2</td></tr><tr><td><b>Traceability</b></td><td>MTR/Cert liên kết được tới lot/heat; hồ sơ nằm đúng 40_Supplier/.</td><td>0/1/2</td></tr><tr><td><b>CoC quality</b></td><td>CoC đúng template, ký đúng người có thẩm quyền.</td><td>0/1/2</td></tr><tr><td><b>SSOT discipline</b></td><td>Ship packet nằm đúng 50_Shipping/ và truy xuất ≤ 60 giây.</td><td>0/1/2</td></tr>
+<tr><td><b>Completeness</b></td><td>Đủ các tài liệu bắt buộc theo PO/CR.</td><td>0/1/2</td></tr><tr><td><b>Accuracy</b></td><td>PartNo/REV/Qty/Spec đúng trên mọi tài liệu.</td><td>0/1/2</td></tr><tr><td><b>Traceability</b></td><td>MTR/Cert liên kết được tới lot/heat; hồ sơ nằm đúng 40_Supplier/.</td><td>0/1/2</td></tr><tr><td><b>CoC quality</b></td><td>CoC đúng template, ký đúng người có thẩm quyền.</td><td>0/1/2</td></tr><tr><td><b>SSOT discipline</b></td><td>bộ hồ sơ giao hàng (ship packet) nằm đúng 50_Shipping/ và truy xuất ≤ 60 giây.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>
@@ -136,7 +136,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">MRR tối thiểu</span>
 <ul class="tight">
-<li>Ship packet checklist có tick và chữ ký.</li>
+<li>bộ hồ sơ giao hàng (ship packet) checklist có tick và chữ ký.</li>
 <li>CoC file (PDF) theo naming rule.</li>
 <li>Label/packing photo.</li>
 <li>Link folder 50_Shipping/ và truy xuất ≤ 60 giây.</li>

@@ -81,8 +81,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>02_G1-Setup-Release</td><td>Setup sheet, tool list, material allocation, program link, gage readiness, work transfer preconditions</td><td>Engineering / Production</td><td>Trước G1 release</td></tr>
 <tr><td>03_G2-FAI-First-Piece</td><td>FAI/first-piece report, balloon, photo, raw/CMM data khi áp dụng, release decision</td><td>QA / Production / Engineering</td><td>Khi G2 được kích hoạt</td></tr>
 <tr><td>04_G3-IPQC-Production</td><td>Traveler, IPQC records, abnormal stop/restart evidence, hold log, capability/SPC records khi áp dụng</td><td>Production / QA</td><td>Trong cùng ca hoặc cùng ngày phát sinh</td></tr>
-<tr><td>05_G4-Final-QC-Packaging</td><td>Final inspection, certs, processor receipt, packaging/preservation evidence, clean-pack evidence khi áp dụng</td><td>QA / Warehouse</td><td>Trước G4 release</td></tr>
-<tr><td>06_G5-Ship-Release</td><td>Ship release checklist, CoC/CoA, packing list, SSCC/label evidence, ship confirm handoff, customer pack</td><td>QA / Warehouse / Shipping</td><td>Trước ship confirm</td></tr>
+<tr><td>05_G4-Final-QC-Packaging</td><td>kiểm tra cuối (final inspection), certs, processor receipt, packaging/preservation evidence, clean-pack evidence khi áp dụng</td><td>QA / Warehouse</td><td>Trước G4 release</td></tr>
+<tr><td>06_G5-Ship-Release</td><td>Ship release checklist, CoC/CoA, packing list, SSCC/label evidence, ship confirm handoff, customer pack</td><td>QA / Warehouse / Shipping</td><td>Trước xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))</td></tr>
 <tr><td>07_NCR-CAPA-Deviation</td><td>NCR, concession, waiver, escape, CAPA, rework chain, customer deviation approval</td><td>QA</td><td>Ngay khi sự kiện phát sinh</td></tr>
 <tr><td>99_Archive-Locked</td><td>Snapshot cuối, signed manifest, export bundle, archive note</td><td>QA/QMS</td><td>Sau ship hoặc job close</td></tr>
 </tbody></table></div>
@@ -101,7 +101,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Tạo dossier ngay khi planning release.</strong><br/>Planning mở dossier đúng template, gắn JobNum, PartNo, Rev, Base QPL, overlay code, và link tới baseline package. Không chờ tới khi có hồ sơ đầu tiên mới tạo thư mục.</div>
 <div class="step-item"><strong>Nạp hồ sơ đúng gate, đúng ngày.</strong><br/>Người phát sinh record chịu trách nhiệm nạp hoặc bàn giao nạp đúng thư mục G0–G5. PHẢI đưa file vào đúng thư mục hồ sơ; không để ở root, không giữ trong Downloads/Desktop rồi coi đó là “đã có hồ sơ”.</div>
 <div class="step-item"><strong>Điền metadata ngay khi nạp.</strong><br/>JobNum, PartNo, Rev, Gate, DocType, RecordDate, Owner, QPL/overlay, lot/heat khi áp dụng, và retention trigger phải được điền đầy đủ để truy xuất được trong 60 giây.</div>
-<div class="step-item"><strong>Kiểm completeness trước khi đóng gate.</strong><br/>Owner của gate tự kiểm trước, QA kiểm chéo ở các gate chất lượng và ship release. Thiếu một mục mandatory thì gate không được đóng.</div>
+<div class="step-item"><strong>Kiểm completeness trước khi đóng gate.</strong><br/>Owner của gate tự kiểm trước, QA kiểm chéo ở các gate chất lượng và phê duyệt giao hàng (ship release). Thiếu một mục mandatory thì gate không được đóng.</div>
 <div class="step-item"><strong>Xuất customer package đúng biến thể.</strong><br/>Khi khách yêu cầu data pack, source inspection pack, clean/vacuum pack hoặc FAI pack, phải xuất từ dossier chính và lưu ngược index của pack đã phát hành vào G5 hoặc thư mục tương ứng.</div>
 <div class="step-item"><strong>Khóa hồ sơ sau ship/job close.</strong><br/>Tạo manifest cuối, snapshot cuối, xác định retention trigger, khóa chỉnh sửa theo quyền đã quy định và chuyển bản cần lưu dài hạn vào vùng archive.</div>
 </div></div>
@@ -111,13 +111,13 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>G1</td><td>Setup sheet, tool list, material allocation, program link/release, gage readiness, pre-run readiness</td><td>Engineering / Production</td><td>Không cho chạy first piece</td></tr>
 <tr><td>G2</td><td>FAI/first-piece evidence khi trigger, quyết định release/hold/fail, balloon/raw/CMM data khi required</td><td>QA / Production / Engineering</td><td>Không cho chạy lô hoặc chạy lại sau thay đổi</td></tr>
 <tr><td>G3</td><td>Traveler/IPQC, hold log, restart evidence, SPC/capability/reaction records khi áp dụng</td><td>Production / QA</td><td>Không đóng công đoạn, không chuyển bước</td></tr>
-<tr><td>G4</td><td>Final inspection, certs, processor receipt, packaging/preservation/clean-pack evidence khi áp dụng</td><td>QA / Warehouse</td><td>Không mở G5 ship release</td></tr>
-<tr><td>G5</td><td>Ship checklist, CoC/CoA, packing list, SSCC/label evidence, customer package nếu required</td><td>QA / Shipping / Warehouse</td><td>Không ship confirm</td></tr>
+<tr><td>G4</td><td>kiểm tra cuối (final inspection), certs, processor receipt, packaging/preservation/clean-pack evidence khi áp dụng</td><td>QA / Warehouse</td><td>Không mở G5 phê duyệt giao hàng (ship release)</td></tr>
+<tr><td>G5</td><td>Ship checklist, CoC/CoA, phiếu kê đóng gói (packing list), SSCC/label evidence, customer package nếu required</td><td>QA / Shipping / Warehouse</td><td>Không xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))</td></tr>
 </tbody></table></div>
 <p>QPL và overlay làm dày thêm ma trận trên. Ví dụ: O-FAI bổ sung full FAI pack tại G2; O-SP bổ sung processor/cert pack tại G4/G5; O-CLEAN bổ sung clean-pack/preservation evidence tại G4/G5; O-SHIP bổ sung pack build và partial-ship mapping tại G5.</p></div>
 <div class="section"><h2>7. Biến thể customer package phải xuất đúng</h2>
 <div class="table-card"><table><thead><tr><th>Biến thể</th><th>Khi nào dùng</th><th>Thành phần bắt buộc</th></tr></thead><tbody>
-<tr><td>Standard ship pack</td><td>Mọi shipment</td><td>CoC/CoA khi áp dụng, packing list, label/SSCC evidence, ship release sign-off</td></tr>
+<tr><td>Standard ship pack</td><td>Mọi shipment</td><td>CoC/CoA khi áp dụng, phiếu kê đóng gói (packing list), label/SSCC evidence, phê duyệt giao hàng (ship release) sign-off</td></tr>
 <tr><td>FAI pack</td><td>Khách yêu cầu FAI hoặc G2 trigger yêu cầu phát hành ra ngoài</td><td>FAI report, balloon/characteristic list, report đo, decision log, part/rev trace</td></tr>
 <tr><td>Special process pack</td><td>Có outsource/special process</td><td>Processor cert, route link, receipt verification, lot mapping, exception approval nếu có</td></tr>
 <tr><td>Clean / vacuum pack</td><td>Job cleanliness/vacuum-sensitive</td><td>Cleaning, clean build, packaging material compliance, preservation evidence, photo pack theo spec</td></tr>
@@ -141,7 +141,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <ul style="padding-left:20px; margin:8px 0;">
 <li>Khi hệ thống down, áp dụng ngay ANNEX-QMS-021 và mở event log. Không tạo folder tạm trên desktop cá nhân để xử lý lâu dài.</li>
 <li>Record tạo offline phải nhập bù, scan/đối chiếu và chốt backfill trong thời hạn quy định của event log. Chưa backfill đủ = hồ sơ vẫn chưa hoàn chỉnh.</li>
-<li>Ship release khi offline mặc định HOLD, trừ ngoại lệ đã được thẩm quyền cao nhất phê duyệt đúng hồ sơ.</li>
+<li>phê duyệt giao hàng (ship release) khi offline mặc định HOLD, trừ ngoại lệ đã được thẩm quyền cao nhất phê duyệt đúng hồ sơ.</li>
 </ul></div>
 <div class="section"><h2>10. Khóa hồ sơ, KPI và tài liệu liên kết</h2>
 <div class="two-col">
@@ -149,7 +149,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <li>KPI-DOS-01: tỷ lệ dossier đủ MRR theo gate</li>
 <li>KPI-DOS-02: tỷ lệ evidence mở được và đúng link SSOT</li>
 <li>KPI-DOS-03: tỷ lệ backfill đúng hạn sau offline event</li>
-<li>KPI-DOS-04: tỷ lệ ship packet hoàn chỉnh trước ship confirm</li>
+<li>KPI-DOS-04: tỷ lệ bộ hồ sơ giao hàng (ship packet) hoàn chỉnh trước xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))</li>
 <li>KPI-DOS-05: thời gian truy xuất key evidence của active job</li>
 </ul></div>
 <div class="card"><h3>Điều kiện khóa hồ sơ</h3><ul style="padding-left:18px; margin:8px 0;">
@@ -165,11 +165,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td><a href="../../03-Reference/03-ANNEX-Digital/annex-qms-019-m365-folder-structure-blueprint.html">ANNEX-QMS-019</a></td><td>Blueprint folder M365 và mapping record</td></tr>
 <tr><td><a href="../../03-Reference/03-ANNEX-Digital/annex-qms-021-offline-fallback-kit.html">ANNEX-QMS-021</a></td><td>Bộ dự phòng ngoại tuyến và nhập bù</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-System/annex-ops-002-gate-mrr-and-execution-synchronization-pack.html">ANNEX-OPS-002</a></td><td>MRR tối thiểu theo gate và handoff fields</td></tr>
-<tr><td><a href="wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td><td>Ship release pack, SSCC và reconciliation</td></tr>
+<tr><td><a href="wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td><td>phê duyệt giao hàng (ship release) pack, SSCC và reconciliation</td></tr>
 <tr><td><a href="wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a></td><td>Gate/hold/release execution</td></tr>
 <tr><td><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>Order fulfillment từ RFQ đến thu tiền</td></tr>
 <tr><td><a href="../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td><td>Baseline package và job snapshot control</td></tr>
-<tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>Final inspection, CoC và ship release</td></tr>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>kiểm tra cuối (final inspection), CoC và phê duyệt giao hàng (ship release)</td></tr>
 </tbody></table></div></div>
 </div>
 </div>

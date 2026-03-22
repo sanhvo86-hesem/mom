@@ -145,9 +145,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td><b>Wrong revision</b></td><td>Gia cÃ´ng sai yÃªu cáº§u, ship sai, claim</td><td>HOLD tá»©c thÃ¬ + khÃ³a Job/ship + kiá»ƒm chá»©ng Job/Part/Rev trÆ°á»›c release</td></tr>
 <tr><td><b>Mix-up/láº«n lÃ´</b></td><td>Máº¥t truy xuáº¥t, láº«n tráº¡ng thÃ¡i OK/NG</td><td>Segregation khu HOLD + nhÃ£n tráº¡ng thÃ¡i + truy xuáº¥t theo JobNum</td></tr>
-<tr><td><b>Missing / falsified outsource documents</b></td><td>KhÃ´ng Ä‘áº¡t yÃªu cáº§u Ä‘áº·c biá»‡t, rá»§i ro phÃ¡p lÃ½</td><td>BLOCK ship release khi thiáº¿u cert; NCR+SCAR</td></tr>
+<tr><td><b>Missing / falsified outsource documents</b></td><td>KhÃ´ng Ä‘áº¡t yÃªu cáº§u Ä‘áº·c biá»‡t, rá»§i ro phÃ¡p lÃ½</td><td>BLOCK phê duyệt giao hàng (ship release) khi thiáº¿u cert; NCR+SCAR</td></tr>
 <tr><td><b>OOT gage/calibration quÃ¡ háº¡n</b></td><td>Äo sai, lá»t lá»—i CTQ</td><td>HOLD + Ä‘Ã¡nh giÃ¡ áº£nh hÆ°á»Ÿng + NCR/CAPA theo SOP-QMS-007</td></tr>
-<tr><td><b>Bypass gate</b></td><td>Giao nháº§m, máº¥t báº±ng chá»©ng audit</td><td>No evidence = No gate; má»i release cÃ³ record</td></tr>
+<tr><td><b>Bypass gate</b></td><td>Giao nháº§m, máº¥t báº±ng chá»©ng audit</td><td>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))); má»i release cÃ³ record</td></tr>
 </tbody>
 </table>
 </div>
@@ -156,7 +156,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" id="s2" style="margin-top:0">2. Pháº¡m vi &amp; vai trÃ² (báº¯t buá»™c nÃªu pháº§n Ã¡p dá»¥ng riÃªng cho tá»«ng role vÃ  tiÃªu chÃ­ Ä‘áº¡t)</h2>
 <div class="note">
-<b>NguyÃªn táº¯c váº­n hÃ nh:</b> Vai trÃ² nÃ o â€œcháº¡m vÃ o sáº£n pháº©m/recordâ€ táº¡i Ä‘iá»ƒm HOLD, NCR, MRB, ship release thÃ¬ vai trÃ² Ä‘Ã³ <b>PHáº¢I</b> hiá»ƒu pháº§n Ã¡p dá»¥ng vÃ  <b>PHáº¢I</b> táº¡o Ä‘Æ°á»£c báº±ng chá»©ng tá»‘i thiá»ƒu Ä‘Ãºng nÆ¡i lÆ°u.
+<b>NguyÃªn táº¯c váº­n hÃ nh:</b> Vai trÃ² nÃ o â€œcháº¡m vÃ o sáº£n pháº©m/recordâ€ táº¡i Ä‘iá»ƒm HOLD, NCR, MRB, phê duyệt giao hàng (ship release) thÃ¬ vai trÃ² Ä‘Ã³ <b>PHáº¢I</b> hiá»ƒu pháº§n Ã¡p dá»¥ng vÃ  <b>PHáº¢I</b> táº¡o Ä‘Æ°á»£c báº±ng chá»©ng tá»‘i thiá»ƒu Ä‘Ãºng nÆ¡i lÆ°u.
  </div>
 <h3 class="h3">2.1 Chuáº©n thuáº­t ngá»¯ ná»™i bá»™ Ä‘á»ƒ trÃ¡nh lá»‡ch há»‡ thá»‘ng</h3>
 <ul style="line-height:1.9">
@@ -203,7 +203,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Warehouse</b></td>
-<td>Quáº£n lÃ½ khu HOLD; chá»‘ng mix-up; kiá»ƒm soÃ¡t ship packet; BLOCK ship khi thiáº¿u Ä‘iá»u kiá»‡n.</td>
+<td>Quáº£n lÃ½ khu HOLD; chá»‘ng mix-up; kiá»ƒm soÃ¡t bộ hồ sơ giao hàng (ship packet); BLOCK giao hàng khi thiáº¿u Ä‘iá»u kiá»‡n.</td>
 <td>KhÃ´ng xuáº¥t hÃ ng khi ShipRelease tráº¡ng thÃ¡i Blocked/RequestRelease; lÆ°u báº±ng chá»©ng Ä‘Ãºng thÆ° má»¥c.</td>
 </tr>
 <tr>
@@ -228,7 +228,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Estimator (SAL-03)</b></td>
-<td>Concession/khÃ¡ch hÃ ng: cháº·n giao; thu báº±ng chá»©ng cháº¥p thuáº­n; cáº­p nháº­t ship packet; chuyá»ƒn SOP-QMS-012 khi cÃ³ thoÃ¡t lá»—i.</td>
+<td>Concession/khÃ¡ch hÃ ng: cháº·n giao; thu báº±ng chá»©ng cháº¥p thuáº­n; cáº­p nháº­t bộ hồ sơ giao hàng (ship packet); chuyá»ƒn SOP-QMS-012 khi cÃ³ thoÃ¡t lá»—i.</td>
 <td>Má»i cháº¥p thuáº­n pháº£i náº±m trong SSOT; khÃ´ng dÃ¹ng â€œÄ‘á»“ng Ã½ miá»‡ngâ€; báº±ng chá»©ng cháº¥p thuáº­n náº±m trong SSOT; má»i thay Ä‘á»•i yÃªu cáº§u cÃ³ change record.</td>
 </tr>
 <tr>
@@ -278,8 +278,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>FP-03:</b> Hold log thiáº¿u ReasonCode/Severity/Containment â†’ khÃ´ng kÃ­ch hoáº¡t Ä‘Ãºng quy táº¯c Ä‘iá»u hÆ°á»›ng, release mÃ¹.</li>
 <li><b>FP-04:</b> NCR thiáº¿u Job/Part/Rev hoáº·c thiáº¿u báº±ng chá»©ng Ä‘o â†’ MRB quyáº¿t theo cáº£m tÃ­nh.</li>
 <li><b>FP-05:</b> Ghi nháº§m DefectType/Disposition code trong list â†’ sai thá»‘ng kÃª Pareto, sai Æ°u tiÃªn CAPA.</li>
-<li><b>FP-06:</b> MRB quyáº¿t rework nhÆ°ng khÃ´ng cÃ³ WI/inspection plan cáº­p nháº­t â†’ rework táº¡o lá»—i má»›i.</li>
-<li><b>FP-07:</b> Concession khÃ´ng cÃ³ cháº¥p thuáº­n hoáº·c cháº¥p thuáº­n náº±m ngoÃ i SSOT â†’ ship risk vÃ  audit fail.</li>
+<li><b>FP-06:</b> MRB quyáº¿t rework nhÆ°ng khÃ´ng cÃ³ WI/kế hoạch kiểm tra (inspection plan) cáº­p nháº­t â†’ rework táº¡o lá»—i má»›i.</li>
+<li><b>FP-07:</b> Concession khÃ´ng cÃ³ cháº¥p thuáº­n hoáº·c cháº¥p thuáº­n náº±m ngoÃ i SSOT â†’ ship risk vÃ  đánh giá không đạt.</li>
 <li><b>FP-08:</b> Rework xong nhÆ°ng khÃ´ng kiá»ƒm chá»©ng 100% CTQ hoáº·c khÃ´ng cÃ³ IR PASS â†’ release sai.</li>
 <li><b>FP-09:</b> NguyÃªn nhÃ¢n gá»‘c dá»«ng á»Ÿ â€œdo thao tÃ¡câ€ â†’ khÃ´ng cÃ³ hÃ nh Ä‘á»™ng há»‡ thá»‘ng, lá»—i tÃ¡i diá»…n.</li>
 <li><b>FP-10:</b> Äiá»ƒm lá»t khÃ´ng xÃ¡c Ä‘á»‹nh â†’ Ä‘iá»ƒm kiá»ƒm tra khÃ´ng Ä‘Æ°á»£c bá»• sung, QC tiáº¿p tá»¥c lá»t.</li>
@@ -293,7 +293,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" id="s5" style="margin-top:0">5. Risk Controls (liá»‡t kÃª control points; ai lÃ m; báº±ng chá»©ng; tá»‘i thiá»ƒu 6)</h2>
 <div class="note">
-<b>Quy táº¯c:</b> Má»—i control point cÃ³ <b>Owner</b> rÃµ + <b>Evidence</b> rÃµ + <b>TiÃªu chÃ­ Ä‘áº¡t</b> rÃµ. Thiáº¿u evidence lÃ  <b>BLOCK</b>.
+<b>Quy táº¯c:</b> Má»—i điểm kiểm soát (control point) cÃ³ <b>Owner</b> rÃµ + <b>Evidence</b> rÃµ + <b>TiÃªu chÃ­ Ä‘áº¡t</b> rÃµ. Thiáº¿u evidence lÃ  <b>BLOCK</b>.
  </div>
 <div class="table-card">
 <table class="table">
@@ -352,7 +352,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>CP-08 Outsource cert gate</b></td>
 <td>Purchasing + Receiving + QA</td>
 <td>Cert Ä‘áº§y Ä‘á»§ + trace lot/heat + link vÃ o Job Dossier</td>
-<td>Thiáº¿u cert lÃ  BLOCK; nháº­n hÃ ng HOLD khi DocsComplete=No</td>
+<td>Thiáº¿u cert lÃ  BLOCK; nháº­n hÃ ng tạm giữ khi DocsComplete=No</td>
 </tr>
 <tr>
 <td><b>CP-09 Ship release gate</b></td>
@@ -395,7 +395,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>UAI</b> (Use-as-is)</td>
 <td>KhÃ´ng cáº§n rework; Ä‘Ã¡p á»©ng yÃªu cáº§u; hoáº·c cÃ³ concession cháº¥p thuáº­n</td>
-<td>BiÃªn báº£n MRB + báº±ng chá»©ng trong dung sai hoáº·c concession báº±ng vÄƒn báº£n; Ship packet cáº­p nháº­t</td>
+<td>BiÃªn báº£n MRB + báº±ng chá»©ng trong dung sai hoáº·c concession báº±ng vÄƒn báº£n; bộ hồ sơ giao hàng (ship packet) cáº­p nháº­t</td>
 </tr>
 <tr>
 <td><b>SCR</b> (Scrap)</td>
@@ -444,10 +444,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>D0</b></td><td>Láº­p káº¿ hoáº¡ch &amp; containment</td><td>Stop-ship/HOLD; khoanh vÃ¹ng áº£nh hÆ°á»Ÿng; káº¿ hoáº¡ch dá»¯ liá»‡u cáº§n thu</td></tr>
 <tr><td><b>D1</b></td><td>Láº­p nhÃ³m 8D</td><td>Danh sÃ¡ch vai trÃ² (QA/QC/Production/Engineering/PUR/Sales khi cÃ³); RACI</td></tr>
 <tr><td><b>D2</b></td><td>MÃ´ táº£ váº¥n Ä‘á»</td><td>5W2H; áº£nh/Ä‘o/CMM; â€œcÃ³/khÃ´ng cÃ³â€ (pháº¡m vi xáº£y ra / khÃ´ng xáº£y ra)</td></tr>
-<tr><td><b>D3</b></td><td>Containment táº¡m thá»i</td><td>Sort/re-inspection plan; quarantine WIP/FG; cháº·n ship release; log káº¿t quáº£</td></tr>
-<tr><td><b>D4</b></td><td>NguyÃªn nhÃ¢n gá»‘c &amp; Ä‘iá»ƒm lá»t</td><td>5-Why/Ishikawa; dá»¯ liá»‡u offset/tool life/setup; xÃ¡c Ä‘á»‹nh Ä‘iá»ƒm lá»t cá»¥ thá»ƒ</td></tr>
+<tr><td><b>D3</b></td><td>Containment táº¡m thá»i</td><td>Sort/re-kế hoạch kiểm tra (inspection plan); quarantine WIP/FG; cháº·n phê duyệt giao hàng (ship release); log káº¿t quáº£</td></tr>
+<tr><td><b>D4</b></td><td>NguyÃªn nhÃ¢n gá»‘c &amp; Ä‘iá»ƒm lá»t</td><td>5-Why/Ishikawa; dá»¯ liá»‡u offset/tuổi dao (tool life)/setup; xÃ¡c Ä‘á»‹nh Ä‘iá»ƒm lá»t cá»¥ thá»ƒ</td></tr>
 <tr><td><b>D5</b></td><td>Chá»n hÃ nh Ä‘á»™ng kháº¯c phá»¥c</td><td>HÃ nh Ä‘á»™ng há»‡ thá»‘ng (poka-yoke, program lock, fixture control, checkpoint); Ä‘Ã¡nh giÃ¡ rá»§i ro</td></tr>
-<tr><td><b>D6</b></td><td>Triá»ƒn khai &amp; xÃ¡c nháº­n</td><td>WI/Setup/Inspection plan cáº­p nháº­t cÃ³ kiá»ƒm soÃ¡t; báº±ng chá»©ng rollout; training record</td></tr>
+<tr><td><b>D6</b></td><td>Triá»ƒn khai &amp; xÃ¡c nháº­n</td><td>WI/Setup/kế hoạch kiểm tra (inspection plan) cáº­p nháº­t cÃ³ kiá»ƒm soÃ¡t; báº±ng chá»©ng rollout; training record</td></tr>
 <tr><td><b>D7</b></td><td>NgÄƒn tÃ¡i diá»…n</td><td>Chuáº©n hÃ³a quy trÃ¬nh; cáº­p nháº­t tÃ i liá»‡u; audit táº¡i hiá»‡n trÆ°á»ng; KPI theo dÃµi</td></tr>
 <tr><td><b>D8</b></td><td>Káº¿t thÃºc &amp; ghi nháº­n</td><td>Hiá»‡u lá»±c Ä‘áº¡t; lesson learned; Ä‘Ã³ng CAPA; pháº£n há»“i liÃªn quan (khÃ¡ch hÃ ng/NCC)</td></tr>
 </tbody>
@@ -487,8 +487,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>BLOCK</b></td>
-<td>YÃªu cáº§u release/ship khi thiáº¿u evidence hoáº·c thiáº¿u phÃª duyá»‡t</td>
-<td>KhÃ³a ship release; escalates lÃªn QA/Supervisor; ghi rÃµ lÃ½ do</td>
+<td>YÃªu cáº§u release/giao hàng khi thiáº¿u evidence hoáº·c thiáº¿u phÃª duyá»‡t</td>
+<td>KhÃ³a phê duyệt giao hàng (ship release); escalates lÃªn QA/Supervisor; ghi rÃµ lÃ½ do</td>
 <td>ShipRelease=Blocked + link NCR/Hold</td>
 </tr>
 </tbody>
@@ -496,7 +496,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3 class="h3">6.2 Fail-fast rules (báº¯t buá»™c)</h3>
 <ul style="line-height:1.9">
-<li><b>FF-01 No evidence = No gate:</b> khi thiáº¿u IR PASS/CMM report/cert/approval, gate Final/Ship lÃ  <b>BLOCK</b>.</li>
+<li><b>FF-01 không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)):</b> khi thiáº¿u IR PASS/CMM report/cert/approval, gate Final/Ship lÃ  <b>BLOCK</b>.</li>
 <li><b>FF-02 Sai Rev lÃ  STOP:</b> khi phÃ¡t hiá»‡n mismatch giá»¯a Job pack vÃ  program/setup/print, thá»±c hiá»‡n STOP vÃ  má»Ÿ HOLD ngay.</li>
 <li><b>FF-03 Mix-up lÃ  STOP:</b> khi máº¥t truy xuáº¥t lÃ´/JobNum hoáº·c nhÃ£n rÆ¡i, thá»±c hiá»‡n STOP; quarantine toÃ n bá»™ khu vá»±c liÃªn quan.</li>
 <li><b>FF-04 Concession pháº£i cÃ³ cháº¥p thuáº­n trÆ°á»›c giao:</b> khi cháº¥p thuáº­n chÆ°a cÃ³, disposition UAI bá»‹ khÃ³a vÃ  chuyá»ƒn sang rework/scrap/return.</li>
@@ -606,7 +606,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>2</td><td>Táº¡o QCHoldLog</td><td>Chá»n Ä‘Ãºng ReasonCode/Severity; ghi Containment hÃ nh Ä‘á»™ng ngay; gÃ¡n Owner</td><td>Quy táº¯c Ä‘iá»u hÆ°á»›ng hoáº¡t Ä‘á»™ng; khÃ´ng â€œHOLD vÃ´ chá»§â€</td></tr>
 <tr><td>3</td><td>KhÃ³a Job/Rev táº¡i Ä‘iá»ƒm sá»­ dá»¥ng</td><td>So sÃ¡nh Job pack â†” program â†” setup â†” print; dÃ¡n tag â€œRev suspectâ€</td><td>Cháº·n sai Rev lÃ  rá»§i ro cháº¿t ngÆ°á»i</td></tr>
 <tr><td>4</td><td>Thu báº±ng chá»©ng Ä‘o</td><td>Ghi rÃµ gage ID; áº£nh cÃ³ thÆ°á»›c/scale; CMM report gáº¯n Ä‘Ãºng JobNum</td><td>MRB quyáº¿t dá»±a trÃªn dá»¯ liá»‡u, khÃ´ng dá»±a cáº£m giÃ¡c</td></tr>
-<tr><td>5</td><td>QA má»Ÿ NCR</td><td>DetectedAt/DefectType/QtyAffected; link EvidenceFolderUrl; Status=Open</td><td>Audit trail Ä‘áº§y Ä‘á»§; khoanh vÃ¹ng áº£nh hÆ°á»Ÿng</td></tr>
+<tr><td>5</td><td>QA má»Ÿ NCR</td><td>DetectedAt/DefectType/QtyAffected; link EvidenceFolderUrl; Status=Open</td><td>dấu vết kiểm toán (audit trail) Ä‘áº§y Ä‘á»§; khoanh vÃ¹ng áº£nh hÆ°á»Ÿng</td></tr>
 <tr><td>6</td><td>ÄÃ¡nh giÃ¡ áº£nh hÆ°á»Ÿng</td><td>Khoanh WIP/FG/outsourcing/ship history; liá»‡t kÃª lÃ´ suspect</td><td>Cháº·n lá»—i â€œxáº£y ra nÆ¡i khÃ¡câ€ theo ISO 10.2</td></tr>
 <tr><td>7</td><td>MRB quyáº¿t disposition</td><td>Quyáº¿t rÃµ rework/scrap/return/use-as-is; gáº¯n tiÃªu chÃ­ verification</td><td>KhÃ´ng cÃ³ tiÃªu chÃ­ thÃ¬ release mÃ¹</td></tr>
 <tr><td>8</td><td>Thá»±c hiá»‡n correction</td><td>Rework cÃ³ WI; scrap cÃ³ transaction; return cÃ³ chá»©ng tá»«</td><td>Truy váº¿t vÃ  kiá»ƒm soÃ¡t chi phÃ­ cháº¥t lÆ°á»£ng</td></tr>
@@ -675,7 +675,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>WHS/PUR/Planner/Sales</b></td>
 <td>Nháº­n biáº¿t ship risk vÃ  chá»©ng tá»«</td>
-<td>BLOCK ship khi thiáº¿u packet; khÃ³a nháº­n hÃ ng khi thiáº¿u cert</td>
+<td>BLOCK giao hàng khi thiáº¿u packet; khÃ³a nháº­n hÃ ng khi thiáº¿u cert</td>
 <td>Váº­n hÃ nh gate Ä‘Ãºng record; handoff rÃµ owner/deadline</td>
 <td>Chá»§ trÃ¬ escalation liÃªn phÃ²ng; cháº·n Ã¡p lá»±c due date lÃ m bypass gate</td>
 </tr>
@@ -685,7 +685,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">10.1 Quyá»n háº¡n sau khi Ä‘áº¡t (vÃ­ dá»¥)</h3>
 <ul style="line-height:1.9">
 <li><b>Operator/Setup L3:</b> Ä‘Æ°á»£c quyá»n STOP táº¡i mÃ¡y vÃ  Ä‘Æ°a WIP vÃ o HOLD khÃ´ng cáº§n xin phÃ©p trÆ°á»›c.</li>
-<li><b>QC L3:</b> Ä‘Æ°á»£c quyá»n táº¡o QCHoldLog vÃ  yÃªu cáº§u kho BLOCK ship release khi thiáº¿u evidence.</li>
+<li><b>QC L3:</b> Ä‘Æ°á»£c quyá»n táº¡o QCHoldLog vÃ  yÃªu cáº§u kho BLOCK phê duyệt giao hàng (ship release) khi thiáº¿u evidence.</li>
 <li><b>QA L3:</b> Ä‘Æ°á»£c quyá»n release khi IR PASS vÃ  há»“ sÆ¡ Ä‘áº§y Ä‘á»§; Ä‘Æ°á»£c quyá»n má»Ÿ CAPA vÃ  Ä‘áº·t owner/deadline.</li>
 <li><b>Supervisor L4:</b> Ä‘Æ°á»£c quyá»n Ä‘iá»u phá»‘i MRB vÃ  escalates lÃªn GM khi cÃ³ concession/stop-ship.</li>
 </ul>
@@ -695,7 +695,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" id="s11" style="margin-top:0">11. ÄÃ¡nh giÃ¡: Quiz â‰¥20 â€¢ Scenario â‰¥3 â€¢ BÃ i kiá»ƒm tra thá»±c hÃ nh (báº¯t buá»™c)</h2>
 <h3 class="h3">11.1 Quiz (24 cÃ¢u, trá»™n tráº¯c nghiá»‡m + tÃ¬nh huá»‘ng ngáº¯n)</h3>
 <ol style="line-height:1.9">
-<li>â€œNo evidence = No gateâ€ nghÄ©a lÃ  gÃ¬ trong bá»‘i cáº£nh ship release?</li>
+<li>â€œkhông có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))â€ nghÄ©a lÃ  gÃ¬ trong bá»‘i cáº£nh phê duyệt giao hàng (ship release)?</li>
 <li>QCHoldLog báº¯t buá»™c tá»‘i thiá»ƒu trÆ°á»ng nÃ o Ä‘á»ƒ record há»£p lá»‡?</li>
 <li>HoldReasonCode nÃ o dÃ¹ng khi phÃ¡t hiá»‡n sai chÆ°Æ¡ng trÃ¬nh gia cÃ´ng? (MAT/PROC/PROG/GAGE/OUT/HAND/UNK)</li>
 <li>Khi phÃ¡t hiá»‡n sai Rev táº¡i mÃ¡y, 60 giÃ¢y Ä‘áº§u PHáº¢I lÃ m 3 viá»‡c gÃ¬?</li>
@@ -747,7 +747,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">Rubric PASS/FAIL cho performance test</h3>
 <div class="table-card">
 <table class="table">
-<thead><tr><th style="width:220px">Háº¡ng má»¥c</th><th>PASS khi</th><th>FAIL khi</th></tr></thead>
+<thead><tr><th style="width:220px">Háº¡ng má»¥c</th><th>đạt khi</th><th>Không đạt khi</th></tr></thead>
 <tbody>
 <tr><td>HOLD 60 giÃ¢y</td><td>CÃ´ láº­p váº­t lÃ½ + bÃ¡o Ä‘Ãºng tuyáº¿n + record HOLD</td><td>Chá»‰ bÃ¡o miá»‡ng; khÃ´ng cÃ³ record; hÃ ng rá»i khá»i line</td></tr>
 <tr><td>QCHoldLog</td><td>ReasonCode/Severity/Containment/Owner/Status Ä‘áº§y Ä‘á»§</td><td>Thiáº¿u owner hoáº·c containment; dÃ¹ng sai code</td></tr>
@@ -760,10 +760,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 12 -->
 <div class="card">
-<h2 class="h2" id="s12" style="margin-top:0">12. TiÃªu chÃ­ PASS/FAIL (rÃµ rÃ ng; nháº¥n máº¡nh â€œNo evidence = No gateâ€)</h2>
+<h2 class="h2" id="s12" style="margin-top:0">12. TiÃªu chÃ­ PASS/FAIL (rÃµ rÃ ng; nháº¥n máº¡nh â€œkhông có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))â€)</h2>
 <ul style="line-height:1.9">
 <li><b>PASS</b> khi: Quiz â‰¥ 85% <b>vÃ </b> Scenario Ä‘áº¡t â‰¥ 2/3 <b>vÃ </b> BÃ i kiá»ƒm tra thá»±c hÃ nh Ä‘áº¡t 100% checklist.</li>
-<li><b>FAIL</b> khi: thiáº¿u báº¥t ká»³ output artifact/MRR, hoáº·c vi pháº¡m STOP/HOLD/BLOCK, hoáº·c release/ship khi thiáº¿u evidence.</li>
+<li><b>FAIL</b> khi: thiáº¿u báº¥t ká»³ output artifact/MRR, hoáº·c vi pháº¡m STOP/HOLD/BLOCK, hoáº·c release/giao hàng khi thiáº¿u evidence.</li>
 <li><b>TÃ¡i Ä‘Ã¡nh giÃ¡</b> xáº£y ra trong ca káº¿ tiáº¿p sau khi Ä‘Ã£ OJT bá»• sung vÃ  hoÃ n táº¥t thiáº¿u há»¥t báº±ng chá»©ng.</li>
 </ul>
 <div class="req">

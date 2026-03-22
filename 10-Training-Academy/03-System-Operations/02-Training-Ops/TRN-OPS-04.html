@@ -66,7 +66,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="doc-content" id="docContent">
 <div class="form-sheet">
 <div class="form-content">
-<h1>TRN-OPS-04 — Thiết kế đề &amp; ngân hàng câu hỏi: Test blueprint, quiz template, anti-cheat, versioning</h1>
+<h1>TRN-OPS-04 — Thiết kế đề &amp; ngân hàng câu hỏi: bản thiết kế kiểm thử (test blueprint), quiz template, anti-cheat, versioning</h1>
 <p class="lead">
  Module này thiết lập kỷ luật “đánh giá năng lực có kiểm soát” để cấp quyền làm việc theo vai trò.
  Mọi bài kiểm tra phải bám rủi ro vận hành, có bằng chứng, có kiểm soát phiên bản và có cơ chế chống gian lận.
@@ -132,9 +132,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Planning</b></td>
-<td>Khi phát hành route, CTQ, inspection plan.</td>
+<td>Khi phát hành route, CTQ, kế hoạch kiểm tra (inspection plan).</td>
 <td>Blueprint theo CTQ; danh mục câu hỏi “Fail-Gate”.</td>
-<td>Chặn phát hành kế hoạch khi thiếu blueprint hoặc sai revision tài liệu.</td>
+<td>Chặn phát hành kế hoạch khi thiếu blueprint hoặc sai phiên bản (wrong revision) tài liệu.</td>
 </tr>
 <tr>
 <td><b>Engineering</b></td>
@@ -156,9 +156,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>QC/QA</b></td>
-<td>Khi đổi tiêu chí accept/reject, gauge, FAI, ship release.</td>
+<td>Khi đổi tiêu chí accept/reject, gauge, FAI, phê duyệt giao hàng (ship release).</td>
 <td>Scenario GO/HOLD; checklist evidence pack.</td>
-<td>Chặn release/ship khi thiếu bằng chứng thi đạt của người ký.</td>
+<td>Chặn release/giao hàng khi thiếu bằng chứng thi đạt của người ký.</td>
 </tr>
 <tr>
 <td><b>NCR/MRB</b></td>
@@ -170,7 +170,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Packing/Ship/Feedback</b></td>
 <td>Khi khách yêu cầu nhãn, đóng gói, chứng từ ship đặc thù.</td>
 <td>Quiz &amp; scenario ship risk; log version đề thi theo lô.</td>
-<td>Chặn ship khi checklist/quiz gating sai hoặc thiếu hồ sơ.</td>
+<td>Chặn giao hàng khi checklist/quiz gating sai hoặc thiếu hồ sơ.</td>
 </tr>
 </tbody>
 </table>
@@ -293,7 +293,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Quy tắc chặn</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
-<li><b>STOP:</b> Khi phát hiện đề/blueprint dùng sai revision hoặc không truy ra revision nguồn.</li>
+<li><b>STOP:</b> Khi phát hiện đề/blueprint dùng sai phiên bản (wrong revision) hoặc không truy ra revision nguồn.</li>
 <li><b>HOLD:</b> Khi phát hiện nghi vấn rò rỉ đề/đáp án hoặc học viên không xác thực danh tính.</li>
 <li><b>BLOCK:</b> Khi không có proctor log/attendance/kết quả ký xác nhận; bằng chứng bị xem là “không tồn tại”.</li>
 </ul>
@@ -314,7 +314,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>Sai revision đề/blueprint</b></td>
+<td><b>sai phiên bản (wrong revision) đề/blueprint</b></td>
 <td>Khoá phát hành; thu hồi bản in; dừng thi; mở NCR nội bộ theo SOP-QMS-006.</td>
 <td>Log thu hồi + NCR + danh sách người bị ảnh hưởng.</td>
 </tr>
@@ -525,7 +525,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>
 <ul style="margin:0; padding-left:18px; line-height:1.75;">
 <li>Performance test đạt PASS (mục 10).</li>
-<li>Không có lỗi sai revision hoặc thiếu bằng chứng.</li>
+<li>Không có lỗi sai phiên bản (wrong revision) hoặc thiếu bằng chứng.</li>
 </ul>
 </td>
 <td>
@@ -586,7 +586,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>“No evidence = no gate” nghĩa là gì trong bối cảnh đánh giá năng lực?</td><td>A. Không có bằng chứng thì không được công nhận PASS</td><td>Fail-Gate</td></tr>
+<tr><td>1</td><td>“không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))” nghĩa là gì trong bối cảnh đánh giá năng lực?</td><td>A. Không có bằng chứng thì không được công nhận PASS</td><td>Fail-Gate</td></tr>
 <tr><td>2</td><td>Tài liệu nào bắt buộc kiểm tra revision trước khi lập blueprint?</td><td>D. SOP/WI/FRM/Spec có hiệu lực</td><td>Fail-Gate</td></tr>
 <tr><td>3</td><td>Thành phần nào PHẢI có trong mỗi câu hỏi thuộc ngân hàng?</td><td>C. Tag + đáp án + giải thích</td><td></td></tr>
 <tr><td>4</td><td>Mục tiêu chính của “test blueprint” là gì?</td><td>B. Liên kết mục tiêu học với tỷ trọng câu hỏi theo rủi ro</td><td></td></tr>
@@ -631,7 +631,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>1</td>
 <td>
-<b>Sai revision nguồn:</b> Blueprint đang dùng WI phiên bản. Trong Master List vừa phát hành WI có thay đổi tiêu chí accept/reject.
+<b>sai phiên bản (wrong revision) nguồn:</b> Blueprint đang dùng WI phiên bản. Trong Master List vừa phát hành WI có thay đổi tiêu chí accept/reject.
  Buổi thi dự kiến diễn ra trong 2 giờ tới, đã in đề version A/B.
  </td>
 <td><b>HOLD</b></td>
@@ -650,7 +650,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>3</td>
 <td>
 <b>Thi có điểm cao đột biến:</b> 12/12 học viên đạt 100% trong 5 phút, không có log coi thi chi tiết.
- Các học viên này đang chờ cấp quyền ký checklist ship release.
+ Các học viên này đang chờ cấp quyền ký checklist phê duyệt giao hàng (ship release).
  </td>
 <td><b>BLOCK</b></td>
 <td>Biên bản vô hiệu; kế hoạch thi lại có proctoring; performance test bắt buộc; ghi nhận quyết định không cấp quyền khi thiếu bằng chứng.</td>
@@ -694,7 +694,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <hr/>
-<h2>10) PASS/FAIL criteria (nhấn mạnh “No evidence = No gate”)</h2>
+<h2>10) PASS/FAIL criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))”)</h2>
 <div class="callout">
 <ul style="margin:0; padding-left:18px; line-height:1.9;">
 <li><b>PASS</b> khi: (1) đạt điểm theo ngưỡng; (2) 0 lỗi Fail-Gate; (3) có đủ MRR; (4) hoàn tất OJT/performance theo yêu cầu role.</li>

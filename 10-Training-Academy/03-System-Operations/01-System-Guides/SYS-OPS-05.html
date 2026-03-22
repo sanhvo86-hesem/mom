@@ -97,14 +97,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="badge"><span class="dot"></span>MODULE OVERVIEW</div>
 <h1 style="margin-top:10px">SYS-OPS-05 — GS1 SSCC Shipping Label &amp; Pack Reconciliation (Lam-ready)</h1>
 <p class="lead">
- Module này chuẩn hoá nhãn vận chuyển theo GS1 SSCC và cơ chế đối soát PackID/SSCC ↔ Epicor ShipmentMirror ↔ M365 ShipRelease ↔ Ship Packet (Job Dossier).
+ Module này chuẩn hoá nhãn vận chuyển theo GS1 SSCC và cơ chế đối soát PackID/SSCC ↔ Epicor ShipmentMirror ↔ M365 ShipRelease ↔ bộ hồ sơ giao hàng (ship packet) (Job Dossier).
  Module này khoá cứng điểm xuất hàng (Gate G5) để ngăn ship sai part/rev/qty, ngăn thiếu chứng cứ, và tạo dấu vết audit.
  </p>
 <div class="kpi">
 <div class="box"><b>Mục tiêu lỗi</b><span>0 shipment sai</span><div class="mini">Sai part / sai rev / sai qty / sai job</div></div>
 <div class="box"><b>Điểm khoá</b><span>Gate G5</span><div class="mini">Ship Release Validator</div></div>
 <div class="box"><b>Đối tượng</b><span>PackID + SSCC</span><div class="mini">Mỗi kiện 1 ID duy nhất</div></div>
-<div class="box"><b>Lưu trữ</b><span>Tier 1 ≥ 10 năm</span><div class="mini">Ship Packet + chứng cứ khoá gate</div></div>
+<div class="box"><b>Lưu trữ</b><span>Tier 1 ≥ 10 năm</span><div class="mini">bộ hồ sơ giao hàng (ship packet) + chứng cứ khoá gate</div></div>
 </div>
 <div class="warn" style="margin-top:12px">
 <b>Quy tắc vận hành:</b> Khi ReconciliationStatus ≠ <span class="qa-badge">Pass</span> hoặc PacketComplete ≠ <span class="qa-badge">Yes</span> → trạng thái ShipRelease = <span class="qa-badge">Blocked</span> và kiện hàng không rời khỏi nhà máy.
@@ -204,7 +204,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>EpicorPackNum</td><td>Epicor Mirror</td><td>Yes</td><td>Khớp ShipmentMirror</td><td>PackSSCCRegister / ShipRelease</td></tr>
 <tr><td>SSCC</td><td>Label service</td><td>Yes</td><td>18 digits; check digit hợp lệ; không tái sử dụng</td><td>PackSSCCRegister / ShipRelease</td></tr>
 <tr><td>JobNum</td><td>JobIndex</td><td>Yes</td><td>Job tồn tại; khớp Part/Rev/Customer</td><td>ShipRelease / PackagingChecks</td></tr>
-<tr><td>Qty</td><td>ShipmentMirror</td><td>Yes</td><td>Khớp count + packing list</td><td>ShipmentMirror / ShipRelease</td></tr>
+<tr><td>Qty</td><td>ShipmentMirror</td><td>Yes</td><td>Khớp count + phiếu kê đóng gói (packing list)</td><td>ShipmentMirror / ShipRelease</td></tr>
 <tr><td>PacketComplete</td><td>M365</td><td>Yes</td><td>Yes khi đủ link chứng cứ Tier‑1</td><td>ShipRelease</td></tr>
 <tr><td>ReconciliationStatus</td><td>FLOW-WHS-13</td><td>Yes</td><td>Pass / Fail / Blocked</td><td>ShipRelease</td></tr>
 <tr><td>Status</td><td>WHS</td><td>Yes</td><td>Draft/Printed/Verified/Released/Shipped/Voided</td><td>PackSSCCRegister</td></tr>
@@ -212,7 +212,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>ReprintReasonCode</td><td>WHS Lead/QA</td><td>Cond.</td><td>Bắt buộc khi PrintVersion &gt; 1</td><td>PackSSCCRegister</td></tr>
 <tr><td>PacketFolderUrl</td><td>Job Dossier</td><td>Yes</td><td>Trỏ đúng 07_Shipping-Packing</td><td>ShipRelease / PackSSCCRegister</td></tr>
 <tr><td>QRLinkShipRelease</td><td>FLOW-WHS-11</td><td>Yes</td><td>Quét mở đúng màn hình ShipRelease</td><td>PackSSCCRegister</td></tr>
-<tr><td>QRLinkShipPacket</td><td>FLOW-WHS-11</td><td>Yes</td><td>Quét mở đúng thư mục Ship Packet</td><td>PackSSCCRegister</td></tr>
+<tr><td>QRLinkShipPacket</td><td>FLOW-WHS-11</td><td>Yes</td><td>Quét mở đúng thư mục bộ hồ sơ giao hàng (ship packet)</td><td>PackSSCCRegister</td></tr>
 </tbody>
 </table>
 </div>
@@ -225,7 +225,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li>PackID tồn tại trong ShipmentMirror và Job/Qty match.</li>
 <li>SSCC đã đăng ký trong PackSSCCRegister và trạng thái = Verified.</li>
-<li>Ship Packet có tối thiểu: Final IR/CMM + CoC/Cert theo PO + PackagingChecks PASS + ảnh nhãn.</li>
+<li>bộ hồ sơ giao hàng (ship packet) có tối thiểu: Final IR/CMM + CoC/Cert theo PO + PackagingChecks PASS + ảnh nhãn.</li>
 <li>ShipRelease có ApprovalHistory (WHS + QA) và Status = Released.</li>
 </ol>
 </div>
@@ -233,7 +233,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">BLOCKED (ShipRelease.Status = Blocked)</h3>
 <ul>
 <li>Thiếu bất kỳ điều kiện PASS nào.</li>
-<li>Qty trong ShipmentMirror khác Qty trên ShipRelease/packing list.</li>
+<li>Qty trong ShipmentMirror khác Qty trên ShipRelease/phiếu kê đóng gói (packing list).</li>
 <li>Reprint xảy ra khi chưa ghi ReprintReasonCode hoặc không có phê duyệt.</li>
 <li>PackID/SSCC quét mở sai JobNum hoặc sai PackID.</li>
 <li>HOLD/NCR mở tác động shipment.</li>
@@ -265,14 +265,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td class="role">QA/QMS</td>
 <td>CTQ + Gate G5</td>
-<td>Kiểm tra hồ sơ Ship Packet; phê duyệt ShipRelease; điều tra mismatch; phê duyệt void/reprint</td>
+<td>Kiểm tra hồ sơ bộ hồ sơ giao hàng (ship packet); phê duyệt ShipRelease; điều tra mismatch; phê duyệt void/reprint</td>
 <td>ApprovalHistory; PacketComplete; ReconciliationStatus</td>
 <td>Audit simulation + CAPA logic</td>
 </tr>
 <tr>
 <td class="role">QC/Metrology</td>
 <td>G4</td>
-<td>Phát hành Final IR/CMM; đảm bảo file khoá; upload đúng thư mục; link vào Ship Packet</td>
+<td>Phát hành Final IR/CMM; đảm bảo file khoá; upload đúng thư mục; link vào bộ hồ sơ giao hàng (ship packet)</td>
 <td>FinalIRPass; file naming; folder placement</td>
 <td>MRR check + file check</td>
 </tr>
@@ -352,10 +352,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>6</td><td>In nhãn (FLOW-WHS-12) và dán nhãn đúng vị trí; kiểm tra chữ in</td><td>WHS + Maintenance</td><td>PrintVersion=1; ảnh nhãn rõ; barcode đọc được</td><td>Barcode mờ; dán che; dán sai kiện</td></tr>
 <tr><td>7</td><td>Scan test: quét PackID/SSCC mở đúng ShipRelease; xác nhận Job/Part/Rev/Qty</td><td>WHS</td><td>PackagingChecks.LabelScanVerified=True; timestamp</td><td>Quét mở sai; scanner cấu hình sai</td></tr>
 <tr><td>8</td><td>Thực hiện FRM-WHS-007 và chụp ảnh chứng cứ đóng gói (tối thiểu 4 ảnh)</td><td>WHS</td><td>PackagingChecks record + PhotosUrl/EvidenceFolderUrl</td><td>Thiếu ảnh nhãn; ảnh mờ; không có timestamp</td></tr>
-<tr><td>9</td><td>Chuẩn bị Ship Packet: Packing List + CoC + cert theo PO + bản sao điện tử</td><td>QA + WHS</td><td>File trong 07_Shipping-Packing; naming chuẩn</td><td>Thiếu CoC/cert; file sai Rev</td></tr>
+<tr><td>9</td><td>Chuẩn bị bộ hồ sơ giao hàng (ship packet): phiếu kê đóng gói (packing list) + CoC + cert theo PO + bản sao điện tử</td><td>QA + WHS</td><td>File trong 07_Shipping-Packing; naming chuẩn</td><td>Thiếu CoC/cert; file sai Rev</td></tr>
 <tr><td>10</td><td>Tạo/hoàn thiện ShipRelease record; gắn PacketFolderUrl; đặt PacketComplete</td><td>WHS</td><td>ShipRelease row: PacketFolderUrl + PacketComplete</td><td>Link folder sai; PacketComplete đặt sai</td></tr>
 <tr><td>11</td><td>Submit ShipRelease để chạy FLOW-WHS-13; nhận ReconciliationStatus</td><td>WHS</td><td>ReconciliationStatus Pass/Fail/Blocked; log time</td><td>Submit thiếu trường; status không cập nhật</td></tr>
-<tr><td>12</td><td>Khi Fail/Blocked: mở StandupAction S1; khoanh vùng; sửa nguyên nhân và re‑validate</td><td>Supervisor + QA + WHS</td><td>Action log + bằng chứng sửa lỗi; re‑run validator</td><td>Bypass; ship “tạm”; sửa không có log</td></tr>
+<tr><td>12</td><td>khi không đạt/Blocked: mở StandupAction S1; khoanh vùng; sửa nguyên nhân và re‑validate</td><td>Supervisor + QA + WHS</td><td>nhật ký hành động (action log) + bằng chứng sửa lỗi; re‑run validator</td><td>Bypass; ship “tạm”; sửa không có log</td></tr>
 <tr><td>13</td><td>Khi Pass: WHS + QA phê duyệt; ShipRelease.Status = Released</td><td>WHS Lead + QA</td><td>ApprovalHistory; audit trail</td><td>Thiếu chữ ký; phê duyệt sai người</td></tr>
 <tr><td>14</td><td>Bàn giao carrier; cập nhật Carrier/Tracking/ShipDate; PackSSCCRegister.Status = Shipped</td><td>WHS</td><td>Carrier/Tracking; ảnh bàn giao; timestamp</td><td>Tracking sai; thiếu ảnh bàn giao</td></tr>
 <tr><td>15</td><td>Lưu POD/Proof; khóa hồ sơ Tier 1; đóng shipment</td><td>QA + Estimator (SAL-03)</td><td>POD file; retention label Tier 1 ≥ 10 năm</td><td>POD thất lạc; retention không áp</td></tr>
@@ -372,7 +372,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Split pack</b></td>
 <td>Mỗi thùng 01 SSCC; mapping Qty rõ theo từng thùng; tổng Qty khớp ShipmentMirror</td>
-<td>Ảnh từng thùng + bảng mapping Qty + packing list cập nhật</td>
+<td>Ảnh từng thùng + bảng mapping Qty + phiếu kê đóng gói (packing list) cập nhật</td>
 <td>PackSSCCRegister tạo nhiều dòng; ShipRelease liên kết đầy đủ PackID/SSCC</td>
 </tr>
 <tr>
@@ -391,7 +391,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Reprint</b></td>
 <td>Chỉ WHS Lead hoặc QA thực hiện; PrintVersion tăng; bắt buộc ReprintReasonCode</td>
 <td>ReprintReasonCode + comment + ảnh nhãn mới</td>
-<td>PackSSCCRegister.PrintVersion&gt;1; audit trail đầy đủ</td>
+<td>PackSSCCRegister.PrintVersion&gt;1; dấu vết kiểm toán (audit trail) đầy đủ</td>
 </tr>
 </tbody>
 </table>
@@ -405,9 +405,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Sai Part/Rev trên nhãn</td><td>Ship sai; recall; chargeback</td><td>Scan test mở đúng ShipRelease + đối chiếu Rev</td><td>WHS + QA</td></tr>
 <tr><td>2</td><td>Qty nhãn khác ShipmentMirror</td><td>Thiếu/thừa</td><td>Validator so Qty; status Blocked</td><td>WHS</td></tr>
-<tr><td>3</td><td>Thiếu Final IR/CMM PASS</td><td>Ship khi chưa đạt</td><td>PacketComplete = No; Blocked</td><td>QC + QA</td></tr>
+<tr><td>3</td><td>Thiếu Final IR/CMM PASS</td><td>giao hàng khi chưa đạt</td><td>PacketComplete = No; Blocked</td><td>QC + QA</td></tr>
 <tr><td>4</td><td>Thiếu CoC/cert theo PO</td><td>Reject tại khách</td><td>MRR check + PacketComplete gate</td><td>QA</td></tr>
-<tr><td>5</td><td>Reprint không có reason</td><td>Mất audit trail</td><td>FLOW-WHS-12 bắt buộc ReprintReasonCode</td><td>WHS Lead</td></tr>
+<tr><td>5</td><td>Reprint không có reason</td><td>Mất dấu vết kiểm toán (audit trail)</td><td>FLOW-WHS-12 bắt buộc ReprintReasonCode</td><td>WHS Lead</td></tr>
 <tr><td>6</td><td>SSCC trùng hoặc tái sử dụng</td><td>Mất traceability</td><td>SSCC uniqueness check + Status Voided</td><td>IT + WHS</td></tr>
 <tr><td>7</td><td>Quét barcode không mở đúng màn hình</td><td>Mix‑up khi ship</td><td>LabelScanVerified=True trước khi seal</td><td>WHS</td></tr>
 <tr><td>8</td><td>Ảnh đóng gói thiếu hoặc mờ</td><td>Không chứng minh khi claim</td><td>FRM-WHS-007 yêu cầu ảnh tối thiểu; audit spot check</td><td>WHS + QA</td></tr>
@@ -425,21 +425,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiếu bằng chứng Pack reconciliation (không có ReconciliationStatus hoặc không có log run).</li>
 <li>Reprint nhãn không có lý do và không có phê duyệt.</li>
 <li>SSCC/PackID không duy nhất hoặc bị tái sử dụng sau khi Voided.</li>
-<li>Ship Packet thiếu CoC/cert theo yêu cầu PO.</li>
+<li>bộ hồ sơ giao hàng (ship packet) thiếu CoC/cert theo yêu cầu PO.</li>
 <li>Final IR/CMM không khoá hoặc không truy xuất được trong Job Dossier.</li>
 <li>PacketFolderUrl trỏ sai; chứng cứ rải rác, không theo cấu trúc Job Dossier.</li>
 <li>ApprovalHistory không rõ người phê duyệt; role không phù hợp.</li>
 <li>Retention label không áp cho hồ sơ Tier 1; không chứng minh thời hạn lưu ≥ 10 năm.</li>
 </ol>
 <div class="callout">
-<b>Quy tắc kiểm soát:</b> QA thực hiện audit nội bộ theo mẫu “Ship Packet Spot‑Check” M365/SharePoint → HESEM-QMS-SSOT với tần suất tối thiểu 01 lần/tuần cho các shipment đã Released.
+<b>Quy tắc kiểm soát:</b> QA thực hiện audit nội bộ theo mẫu “bộ hồ sơ giao hàng (ship packet) Spot‑Check” M365/SharePoint → HESEM-QMS-SSOT với tần suất tối thiểu 01 lần/tuần cho các shipment đã Released.
  </div>
 </div>
 <div class="card">
 <h2>10) Hồ sơ tối thiểu (MRR) + quy tắc đặt tên + nơi lưu</h2>
 <div class="grid-2">
 <div>
-<h3 class="h3">MRR bắt buộc cho Ship Release (Tier 1)</h3>
+<h3 class="h3">MRR bắt buộc cho phê duyệt giao hàng (ship release) (Tier 1)</h3>
 <ul>
 <li>ShipRelease record (Released) + ReconciliationStatus = Pass.</li>
 <li>Final IR/CMM PASS (PDF khoá).</li>
@@ -479,7 +479,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Tuần 1 – Ngày 2</td><td>Thao tác WHS: Assign SSCC, Print, Scan test, FRM-WHS-007</td><td>WHS + Maintenance + QA</td><td>3.0h</td><td>OJT demo + 01 shipment giả lập/nhóm</td></tr>
 <tr><td>Tuần 2 – Ngày 3</td><td>Ship Packet: MRR Tier 1 + naming + retention + CoC/cert</td><td>QA + QC + Estimator (SAL-03)</td><td>2.5h</td><td>MRR checklist hoàn chỉnh + 01 bộ hồ sơ mẫu</td></tr>
 <tr><td>Tuần 2 – Ngày 4</td><td>Reconciliation gate: xử lý Fail/Blocked + ngoại lệ split/merge/void/reprint</td><td>WHS Lead + Supervisor + QA</td><td>3.0h</td><td>03 scenario drill đạt PASS</td></tr>
-<tr><td>Tuần 3 – Ngày 5</td><td>OJT tại hiện trường: chạy thật 2 job (mỗi ca 1 job)</td><td>WHS + QA + Planner</td><td>4.0h</td><td>02 ShipRelease Pass + audit trail đầy đủ</td></tr>
+<tr><td>Tuần 3 – Ngày 5</td><td>OJT tại hiện trường: chạy thật 2 job (mỗi ca 1 job)</td><td>WHS + QA + Planner</td><td>4.0h</td><td>02 ShipRelease Pass + dấu vết kiểm toán (audit trail) đầy đủ</td></tr>
 <tr><td>Tuần 3 – Ngày 6</td><td>Thi đánh giá: quiz + performance test + audit simulation</td><td>Role‑based</td><td>2.5h</td><td>Chứng nhận L2/L3 theo rubric</td></tr>
 </tbody>
 </table>
@@ -500,7 +500,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3. In &amp; dán nhãn</td><td>Barcode đậm, không nhòe; dán phẳng; không che thông tin</td><td>Scan reliability; giảm reprint</td></tr>
 <tr><td>4. Scan test</td><td>Quét mở đúng ShipRelease + đúng Job/Part/Rev/Qty</td><td>Khoá lỗi sai nhãn trước khi seal</td></tr>
 <tr><td>5. Chụp ảnh đóng gói</td><td>Tối thiểu 4 ảnh: (a) sản phẩm bảo vệ (b) thùng mở (c) thùng đóng (d) nhãn</td><td>Chứng minh khi claim vận chuyển</td></tr>
-<tr><td>6. Hoàn thiện Ship Packet</td><td>CoC/cert đúng Rev; file đặt tên chuẩn; lưu đúng 07_Shipping-Packing</td><td>Audit truy xuất nhanh; ngăn thiếu cert</td></tr>
+<tr><td>6. Hoàn thiện bộ hồ sơ giao hàng (ship packet)</td><td>CoC/cert đúng Rev; file đặt tên chuẩn; lưu đúng 07_Shipping-Packing</td><td>Audit truy xuất nhanh; ngăn thiếu cert</td></tr>
 <tr><td>7. Submit + PASS</td><td>ReconciliationStatus=Pass trước khi phê duyệt</td><td>Gate G5 khoá cứng</td></tr>
 <tr><td>8. Bàn giao carrier</td><td>Tracking đúng; ảnh bàn giao; cập nhật ShipDate</td><td>Truy vết giao hàng</td></tr>
 </tbody>
@@ -529,7 +529,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L3</b></td>
 <td>Tự vận hành và xử lý ngoại lệ</td>
 <td>Xử lý 02 scenario Fail/Blocked thành Pass với log đầy đủ; không phát sinh bypass</td>
-<td>Reprint không reason; void sai; sửa không có audit trail</td>
+<td>Reprint không reason; void sai; sửa không có dấu vết kiểm toán (audit trail)</td>
 </tr>
 <tr>
 <td><b>L4</b></td>
@@ -554,7 +554,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Reconciliation Qty lấy dữ liệu chuẩn từ đâu? (A) Excel cá nhân (B) ShipmentMirror từ Epicor (C) Email (D) Ảnh chụp</li>
 <li>Trạng thái nào của PackSSCCRegister được dùng khi huỷ nhãn? (A) Released (B) Voided (C) Shipped (D) Printed</li>
 <li>Scan test thực hiện trước thời điểm nào? (A) Sau khi bàn giao carrier (B) Trước khi seal kiện (C) Sau khi ship (D) Sau khi audit</li>
-<li>Ship Packet phải nằm trong folder nào của Job Dossier? (A) 03_Programs-Setup (B) 04_Inspection-FAI (C) 07_Shipping-Packing (D) 08_Photos</li>
+<li>bộ hồ sơ giao hàng (ship packet) phải nằm trong folder nào của Job Dossier? (A) 03_Programs-Setup (B) 04_Inspection-FAI (C) 07_Shipping-Packing (D) 08_Photos</li>
 <li>Ai được phép reprint nhãn theo rule? (A) Bất kỳ ai (B) WHS Lead hoặc QA (C) Sales (D) Customer</li>
 <li>Khi SSCC đã Voided, xử lý đúng là gì? (A) Tái sử dụng SSCC (B) Xoá record (C) Giữ record + không tái sử dụng (D) Đổi customer</li>
 <li>Mục tiêu chính của đối soát là gì? (A) Tăng giấy tờ (B) Ngăn ship sai/thiếu + tạo audit evidence (C) Tăng thời gian (D) Giảm ảnh chụp</li>
@@ -586,13 +586,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="badge"><span class="dot"></span>SCENARIO 1</div>
 <h3 class="h3">Qty mismatch</h3>
 <p class="mini"><b>Tình huống:</b> ShipmentMirror Qty = 10, ShipRelease Qty = 9.</p>
-<p class="mini"><b>Hành động bắt buộc:</b> đặt Blocked; khoanh vùng; kiểm đếm lại; cập nhật packing list; re‑submit validator.</p>
+<p class="mini"><b>Hành động bắt buộc:</b> đặt Blocked; khoanh vùng; kiểm đếm lại; cập nhật phiếu kê đóng gói (packing list); re‑submit validator.</p>
 <p class="mini"><b>Bằng chứng:</b> ảnh count sheet + log chỉnh sửa + ReconciliationStatus=Pass.</p>
 </div>
 <div class="card" style="margin:0">
 <div class="badge"><span class="dot"></span>SCENARIO 2</div>
 <h3 class="h3">Thiếu cert theo PO</h3>
-<p class="mini"><b>Tình huống:</b> PO yêu cầu cert plating; Ship Packet chưa có file cert.</p>
+<p class="mini"><b>Tình huống:</b> PO yêu cầu cert plating; bộ hồ sơ giao hàng (ship packet) chưa có file cert.</p>
 <p class="mini"><b>Hành động bắt buộc:</b> PacketComplete=No; Blocked; Purchasing/Planner truy file cert; QA xác nhận đúng Rev; upload vào 07_Shipping-Packing.</p>
 <p class="mini"><b>Bằng chứng:</b> cert file + naming chuẩn + ApprovalHistory sau khi Pass.</p>
 </div>

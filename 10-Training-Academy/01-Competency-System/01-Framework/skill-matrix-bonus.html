@@ -62,8 +62,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
 </div>
 </div>
-<div class="doc-content" id="docContent"><h1>Skill Matrix &amp; Bonus Mapping — KPI gating liên kết Level/Thưởng</h1><p class="lead">
- Tài liệu này thiết kế một <b>Skill Matrix (19 năng lực x 4 Level)</b> được đo – chứng minh – và quy đổi trực tiếp sang <b>Level/Bonus</b>,
+<div class="doc-content" id="docContent"><h1>ma trận kỹ năng (skill matrix) &amp; Bonus Mapping — KPI gating liên kết Level/Thưởng</h1><p class="lead">
+ Tài liệu này thiết kế một <b>ma trận kỹ năng (skill matrix) (19 năng lực x 4 Level)</b> được đo – chứng minh – và quy đổi trực tiếp sang <b>Level/Bonus</b>,
  đồng thời tích hợp cơ chế <b>gating KPI/metric</b> để đảm bảo thưởng chỉ trả khi <i>đúng năng lực + đúng kỷ luật vận hành</i>.
  </p><div class="note">
 <strong>ISO 9001 clauses liên quan (tích hợp trực tiếp trong cơ chế):</strong>
@@ -75,7 +75,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 <div class="muted">Ngôn ngữ ISO: <b>PHẢI</b> (bắt buộc), <b>PHẢI</b>, <b>ĐƯỢC PHÉP</b> (theo chọn) — áp dụng xuyên suốt khi viết.</div>
 </div><section class="card">
-<h2>1) Khái niệm &amp; cấu trúc dữ liệu Skill Matrix</h2>
+<h2>1) Khái niệm &amp; cấu trúc dữ liệu ma trận kỹ năng (skill matrix)</h2>
 <p><b>Skill Matrix</b> là bảng mapping giữa:</p>
 <ul>
 <li><b>Vị trí</b> (Job/Role) → <b>mức Level yêu cầu</b> theo từng năng lực (C01…C19), kèm <b>trọng số</b> (Weight) theo mức độ quan trọng.</li>
@@ -106,7 +106,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>2) KPI gating: “cổng” điều kiện để khóa/mở Level &amp; Bonus</h2>
 <p>
 <b>Gating KPI/metric</b> là cơ chế “cổng an toàn” để tránh trường hợp nhân sự đạt điểm kỹ năng nhưng vi phạm kỷ luật chất lượng/an toàn/tuân thủ.
- Cơ chế này tích hợp trực tiếp vào: <b>(i) chứng nhận Level</b> và <b>(ii) tính thưởng theo Skill Matrix</b>.
+ Cơ chế này tích hợp trực tiếp vào: <b>(i) chứng nhận Level</b> và <b>(ii) tính thưởng theo ma trận kỹ năng (skill matrix)</b>.
  </p>
 <div class="note">
 <strong>Quy tắc bắt buộc (PHẢI) — Gate FAIL thì xử lý như sau:</strong>
@@ -121,7 +121,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <ul>
 <li><b>An toàn</b>: tai nạn lao động nghiêm trọng / vi phạm LOTO / bỏ PPE.</li>
-<li><b>Chất lượng</b>: customer escape / ship sai revision / sai vật liệu / sai kích thước nghiêm trọng.</li>
+<li><b>Chất lượng</b>: customer escape / ship sai phiên bản (wrong revision) / sai vật liệu / sai kích thước nghiêm trọng.</li>
 <li><b>Tuân thủ</b>: dùng sai bản vẽ, sửa file không theo ECO, thiếu traceability.</li>
 </ul>
 </div>
@@ -142,12 +142,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Nguyên tắc (PHẢI):</strong>
 <ul>
-<li>Gate PHẢI ưu tiên metric có “hậu quả lớn” (an toàn, customer escape, sai revision, sai vật liệu, sai traceability).</li>
+<li>Gate PHẢI ưu tiên metric có “hậu quả lớn” (an toàn, customer escape, sai phiên bản (wrong revision), sai vật liệu, sai traceability).</li>
 <li>Gate phải có <b>công thức</b> + <b>nguồn dữ liệu</b> rõ ràng để đánh giá được.</li>
 </ul>
 </div>
 </section><section class="card">
-<h2>3) Công thức map Skill Matrix → Level/Bonus</h2>
+<h2>3) Công thức map ma trận kỹ năng (skill matrix) → Level/Bonus</h2>
 <h3>3.1 Quy đổi Level thành điểm</h3>
 <div class="note">
 <strong>Quy ước (PHẢI):</strong>
@@ -183,10 +183,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="muted">Các tỷ lệ này được điều chỉnh theo bậc lương và thị trường lao động Việt Nam.</div>
 </div>
 </section><section class="card">
-<h2>4) Skill Matrix theo phòng ban + vị trí (mẫu) &amp; liên kết level/bonus</h2>
+<h2>4) ma trận kỹ năng (skill matrix) theo phòng ban + vị trí (mẫu) &amp; liên kết level/bonus</h2>
 <p>
- HESEM đã có các bảng <b>Training Matrix theo phòng ban</b> (mức yêu cầu Level theo vị trí).
- Skill Matrix “đủ chuẩn” sẽ lấy Level yêu cầu từ các bảng này và gán thêm: <b>Weight + Gate + Bonus mapping</b>.
+ HESEM đã có các bảng <b>ma trận đào tạo (training matrix) theo phòng ban</b> (mức yêu cầu Level theo vị trí).
+ ma trận kỹ năng (skill matrix) “đủ chuẩn” sẽ lấy Level yêu cầu từ các bảng này và gán thêm: <b>Weight + Gate + Bonus mapping</b>.
  </p>
 <div class="grid-2">
 <div>
@@ -201,7 +201,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div>
-<h3>Mẫu đánh giá từng nhân sự (Employee Skill Matrix)</h3>
+<h3>Mẫu đánh giá từng nhân sự (Employee ma trận kỹ năng (skill matrix))</h3>
 <p>
  Dùng form chuẩn để:
  <b>(i)</b> lấy Level yêu cầu theo vị trí, <b>(ii)</b> ghi Level hiện tại + evidence, <b>(iii)</b> đối chiếu gate metric,
@@ -219,7 +219,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>BaseSalary = 9,500,000 VND</li>
 <li>Rate_skill_pool = 6%</li>
-<li>K_skill (từ Skill Matrix) = 0.87</li>
+<li>K_skill (từ ma trận kỹ năng (skill matrix)) = 0.87</li>
 <li>Gate: không có Critical FAIL, có 1 Major FAIL (trễ calibration check) ⇒ K_gate = 0.5</li>
 </ul>
 <pre class="codeblock">Bonus_skill = 9,500,000 * 0.06 * 0.87 * 0.5
@@ -235,9 +235,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </section><section class="card">
 <h2>6) Yêu cầu triển khai &amp; kiểm soát phiên bản (ISO 7.5)</h2>
 <ul>
-<li>Tài liệu Skill Matrix &amp; Bonus Map <b>PHẢI</b> có mã, phiên bản, ngày hiệu lực, owner, và lịch review.</li>
+<li>Tài liệu ma trận kỹ năng (skill matrix) &amp; Bonus Map <b>PHẢI</b> có mã, phiên bản, ngày hiệu lực, owner, và lịch review.</li>
 <li>Dữ liệu KPI/metric <b>PHẢI</b> có nguồn, định nghĩa, công thức, và lưu vết.</li>
-<li>Cấp Level <b>PHẢI</b> dựa trên: Test + OJT checklist + Rubric + Evidence + Gate PASS.</li>
+<li>Cấp Level <b>PHẢI</b> dựa trên: Test + danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (OJT checklist)))) + Rubric + Evidence + Gate PASS.</li>
 <li>Thay đổi định nghĩa Level/Metric <b>PHẢI</b> đi qua quy trình ECO/Kiểm soát tài liệu (SOP-QMS-01).</li>
 </ul>
 </section></div></div></div>

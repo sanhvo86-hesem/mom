@@ -88,7 +88,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li>Má»i váº¥n Ä‘á» Ä‘i qua Tier meeting PHáº¢I cÃ³ <b>Chá»§ trÃ¡ch nhiá»‡m + Deadline (giá»/phÃºt) + Káº¿t quáº£ + Minh chá»©ng</b>.</li>
 <li>KhÃ´ng ghi â€œÄ‘ang xá»­ lÃ½â€ chung chung. KhÃ´ng chuyá»ƒn ca mÃ  khÃ´ng cÃ³ owner rÃµ.</li>
-<li><b>No evidence = No gate</b>: khÃ´ng cÃ³ MRR thÃ¬ coi nhÆ° chÆ°a lÃ m.</li>
+<li><b>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))</b>: khÃ´ng cÃ³ MRR thÃ¬ coi nhÆ° chÆ°a lÃ m.</li>
 </ul>
 </div>
 <p class="mini muted">
@@ -141,7 +141,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>QC / QA</b></td>
 <td>Tier 1 + Tier 2 + Tier 3</td>
-<td>Quáº£n lÃ½ hold/NCR/MRB; kÃ­ch hoáº¡t containment; cháº·n ship khi thiáº¿u há»“ sÆ¡; xÃ¡c nháº­n â€œship releaseâ€.</td>
+<td>Quáº£n lÃ½ hold/NCR/MRB; kÃ­ch hoáº¡t containment; cháº·n giao hàng khi thiáº¿u há»“ sÆ¡; xÃ¡c nháº­n â€œphê duyệt giao hàng (ship release)â€.</td>
 <td>Äáº¡t khi: hold cÃ³ containment + tiÃªu chÃ­ giáº£i hold + minh chá»©ng Ä‘o/kiá»ƒm Ä‘Ãºng; khÃ´ng cÃ³ ship-release khi thiáº¿u MRR.</td>
 </tr>
 <tr>
@@ -242,7 +242,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>60â€“90 phÃºt</td>
 <td>Trend KPI, audit findings, customer performance, supplier performance, risk register, CAPA effectiveness</td>
 <td>
- BiÃªn báº£n quyáº¿t Ä‘á»‹nh nguá»“n lá»±c/Æ°u tiÃªn + cáº­p nháº­t risk register + quyáº¿t Ä‘á»‹nh thay Ä‘á»•i quy trÃ¬nh (khi phÃ¡t sinh)
+ BiÃªn báº£n quyáº¿t Ä‘á»‹nh nguá»“n lá»±c/Æ°u tiÃªn + cáº­p nháº­t sổ đăng ký rủi ro (risk register) + quyáº¿t Ä‘á»‹nh thay Ä‘á»•i quy trÃ¬nh (khi phÃ¡t sinh)
  </td>
 </tr>
 </tbody>
@@ -311,7 +311,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <label class="blabel"><h1 class="h1" style="margin-top:0;">4) Failure Points (tá»‘i thiá»ƒu 10 Ä‘iá»ƒm gÃ£y thá»±c táº¿)</h1></label>
 <ol class="tight">
-<li><b>Sai revision/báº£n váº½</b> vÃ o sáº£n xuáº¥t vÃ¬ Tier 1 khÃ´ng kiá»ƒm tráº¡ng thÃ¡i release â†’ phÃ¡t sinh scrap/rework.</li>
+<li><b>sai phiên bản (wrong revision)/báº£n váº½</b> vÃ o sáº£n xuáº¥t vÃ¬ Tier 1 khÃ´ng kiá»ƒm tráº¡ng thÃ¡i release â†’ phÃ¡t sinh scrap/rework.</li>
 <li><b>Mix-up/láº«n lÃ´</b> vÃ¬ Warehouse khÃ´ng khÃ³a traceability táº¡i handoff giá»¯a ca â†’ ship sai lÃ´.</li>
 <li><b>Missing / falsified outsource documents/special process</b> vÃ¬ Tier 2 khÃ´ng rÃ  packet â†’ máº¥t báº±ng chá»©ng audit.</li>
 <li><b>Job â€œÄ‘á»©ng imâ€ qua Ä‘Ãªm</b> vÃ¬ khÃ´ng gÃ¡n owner + deadline giá»/phÃºt â†’ trá»… giao hÃ ng.</li>
@@ -319,7 +319,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Bypass gate QC</b> vÃ¬ Ã¡p lá»±c tiáº¿n Ä‘á»™ + khÃ´ng cÃ³ STOP/HOLD rÃµ â†’ nonconforming product.</li>
 <li><b>Gage OOT/Overdue calibration</b> nhÆ°ng váº«n Ä‘o vÃ¬ Tier 1 khÃ´ng xem tráº¡ng thÃ¡i gage â†’ dá»¯ liá»‡u Ä‘o khÃ´ng há»£p lá»‡.</li>
 <li><b>Downtime láº·p láº¡i</b> vÃ¬ Maintenance xá»­ lÃ½ â€œchá»¯a chÃ¡yâ€ khÃ´ng cÃ³ action chá»‘ng láº·p + khÃ´ng ghi evidence.</li>
-<li><b>Backlog QC</b> vÃ¬ khÃ´ng Æ°u tiÃªn theo ship cutoff â†’ miss ship khi chá» FQC.</li>
+<li><b>Backlog QC</b> vÃ¬ khÃ´ng Æ°u tiÃªn theo ship cutoff â†’ miss giao hàng khi chá» FQC.</li>
 <li><b>ThÃ´ng tin khÃ¡ch hÃ ng thay Ä‘á»•i</b> (spec/ship date) khÃ´ng Ä‘Æ°á»£c Ä‘áº©y vÃ o Tier 3 â†’ quyáº¿t Ä‘á»‹nh sáº£n xuáº¥t sai Æ°u tiÃªn.</li>
 <li><b>Action list phÃ¬nh to</b> vÃ¬ khÃ´ng Ä‘Ã³ng action báº±ng báº±ng chá»©ng â†’ â€œreport theatreâ€.</li>
 <li><b>Escalation sai ngÆ°á»¡ng</b> (Ä‘á»£i Ä‘áº¿n há»p tuáº§n) khi váº¥n Ä‘á» thuá»™c S1/S2 â†’ thiá»‡t háº¡i lan rá»™ng trong cÃ¹ng ngÃ y.</li>
@@ -368,7 +368,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Shipping packet completeness</b></td>
 <td>Warehouse + QA</td>
 <td>Má»—i lÃ´ trÆ°á»›c cutoff</td>
-<td>Checklist packet + áº£nh nhÃ£n + COC/packing list</td>
+<td>Checklist packet + áº£nh nhÃ£n + COC/phiếu kê đóng gói (packing list)</td>
 <td>S1 khi thiáº¿u chá»©ng tá»«/traceability</td>
 </tr>
 <tr>
@@ -424,7 +424,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>Sai revision/báº£n váº½</b></td>
+<td><b>sai phiên bản (wrong revision)/báº£n váº½</b></td>
 <td>
  1) Dá»ªNG mÃ¡y/khÃ³a job (tag HOLD). 2) CÃ´ láº­p phÃ´i/chi tiáº¿t liÃªn quan. 3) Gá»i Programmer + QA xÃ¡c nháº­n rev. 4) Ghi S1 vÃ o FRM-OPS-005.
  </td>
@@ -483,7 +483,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>1</td><td>Chuáº©n bá»‹ báº£ng Tier 1: WIP/Dispatch, Due â‰¤ 48h, Blocked, Holds, Ship cutoff, Downtime</td><td>Supervisor + Planner + QC</td><td>áº¢nh Tier board + dá»¯ liá»‡u WIP Nguá»“n: SSOT + Epicor + IntegrationLogs.</td><td>Thiáº¿u danh sÃ¡ch Due â‰¤ 48h; thiáº¿u blocker</td></tr>
-<tr><td>2</td><td>Má»Ÿ há»p Ä‘Ãºng giá», nháº¯c â€œNo evidence = No gateâ€, chá»‘t timebox 15 phÃºt</td><td>Supervisor</td><td>FRM-OPS-005 cÃ³ giá» há»p + Ä‘iá»u phá»‘i</td><td>Há»p kÃ©o dÃ i, lan man, khÃ´ng chá»‘t output</td></tr>
+<tr><td>2</td><td>Má»Ÿ há»p Ä‘Ãºng giá», nháº¯c â€œkhông có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))â€, chá»‘t timebox 15 phÃºt</td><td>Supervisor</td><td>FRM-OPS-005 cÃ³ giá» há»p + Ä‘iá»u phá»‘i</td><td>Há»p kÃ©o dÃ i, lan man, khÃ´ng chá»‘t output</td></tr>
 <tr><td>3</td><td>RÃ  Dispatch/WIP: job Due â‰¤ 48h vÃ  job Blocked</td><td>Planner + Supervisor</td><td>FRM-OPS-005 (Trigger/Aging/áº¢nh hÆ°á»Ÿng)</td><td>KhÃ´ng ghi aging; khÃ´ng gÃ¡n owner</td></tr>
 <tr><td>4</td><td>RÃ  Quality holds/NCR/MRB: quyáº¿t Ä‘á»‹nh GO/HOLD/BLOCK</td><td>QC/QA</td><td>Hold/NCR record + quyáº¿t Ä‘á»‹nh + containment</td><td>Ghi â€œÄ‘ang chá»â€ khÃ´ng tiÃªu chÃ­ giáº£i hold</td></tr>
 <tr><td>5</td><td>RÃ  Shipping readiness: packet, nhÃ£n, traceability, cutoff</td><td>Warehouse + QA</td><td>Checklist packet + áº£nh nhÃ£n + COC</td><td>Cho Ä‘Ã³ng gÃ³i khi thiáº¿u COC/nhÃ£n</td></tr>
@@ -586,7 +586,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Äiá»u phá»‘i há»p theo timebox; Ã©p Ä‘Ã³ng action; chá»‘t GO/HOLD/BLOCK dá»±a trÃªn báº±ng chá»©ng.</td>
 <td>
  Supervisor: báº¯t buá»™c Ä‘áº¡t L3.<br/>
- QC/QA lead: chá»‘t hold/ship release theo gate.
+ QC/QA lead: chá»‘t hold/phê duyệt giao hàng (ship release) theo gate.
  </td>
 <td>ÄÆ°á»£c lÃ m Ä‘iá»u phá»‘i Tier 1 vÃ  kÃ­ch hoáº¡t escal Level 2.</td>
 </tr>
@@ -611,15 +611,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <label class="blabel"><h1 class="h1" style="margin-top:0;">10) ÄÃ¡nh giÃ¡ (Äáº T/KHÃ”NG Äáº T) â€” BÃ i tráº¯c nghiá»‡m + TÃ¬nh huá»‘ng + BÃ i kiá»ƒm tra thá»±c hÃ nh</h1></label>
 <h3>10.1 BÃ i tráº¯c nghiá»‡m (â‰¥ 20 cÃ¢u) â€” tráº¯c nghiá»‡m + tÃ¬nh huá»‘ng ngáº¯n</h3>
 <ol class="tight">
-<li>â€œNo evidence = No gateâ€ nghÄ©a lÃ  gÃ¬ trong Tier meeting?</li>
+<li>â€œkhông có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))â€ nghÄ©a lÃ  gÃ¬ trong Tier meeting?</li>
 <li>NgÆ°á»¡ng escal Level 2 theo PROC-OPS-003 lÃ  gÃ¬?</li>
 <li>Trong FRM-OPS-005, tá»‘i thiá»ƒu pháº£i cÃ³ nhá»¯ng cá»™t nÃ o Ä‘á»ƒ má»™t action há»£p lá»‡?</li>
-<li>Khi phÃ¡t hiá»‡n sai revision Ä‘ang cháº¡y mÃ¡y, bÆ°á»›c Ä‘áº§u tiÃªn pháº£i lÃ m lÃ  gÃ¬?</li>
+<li>Khi phÃ¡t hiá»‡n sai phiên bản (wrong revision) Ä‘ang cháº¡y mÃ¡y, bÆ°á»›c Ä‘áº§u tiÃªn pháº£i lÃ m lÃ  gÃ¬?</li>
 <li>PhÃ¢n biá»‡t STOP SHIP vÃ  HOLD JOB trong module nÃ y.</li>
 <li>Chá»n Ä‘Ã¡p Ã¡n Ä‘Ãºng: Tier 1 táº­p trung vÃ o (A) chiáº¿n lÆ°á»£c nÄƒm (B) váº¥n Ä‘á» trong ca vÃ  hÃ nh Ä‘á»™ng giá»/phÃºt (C) há»p dÃ i 2 giá» (D) trÃ¬nh bÃ y slide.</li>
 <li>Khi hold CTQ xuáº¥t hiá»‡n, ai chá»‹u trÃ¡ch nhiá»‡m containment?</li>
 <li>Chá»n Ä‘Ã¡p Ã¡n Ä‘Ãºng: job Due â‰¤ 48h khÃ´ng cÃ³ owner action trong FRM-OPS-005 Ä‘Æ°á»£c coi lÃ  (A) OK (B) Blocked (C) Gate-OPS-01 FAIL (D) Ä‘Ã³ng.</li>
-<li>Tháº¿ nÃ o lÃ  â€œbypass gateâ€ trong bá»‘i cáº£nh ship release?</li>
+<li>Tháº¿ nÃ o lÃ  â€œbypass gateâ€ trong bá»‘i cáº£nh phê duyệt giao hàng (ship release)?</li>
 <li>Kho pháº£i kiá»ƒm gÃ¬ Ä‘á»ƒ cháº·n mix-up trÆ°á»›c khi ship?</li>
 <li>Khi gage overdue calibration, hÃ nh Ä‘á»™ng trong 60 giÃ¢y lÃ  gÃ¬?</li>
 <li>Chá»n Ä‘Ã¡p Ã¡n Ä‘Ãºng: Tier 2 táº­p trung vÃ o (A) backlog/capacity/outsource (B) trang trÃ­ báº£ng (C) ká»ƒ chuyá»‡n (D) bá» action.</li>
@@ -629,7 +629,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>TÃ¬nh huá»‘ng ngáº¯n: Job A Due trong 36h, thiáº¿u tool. NÃªu trigger, áº£nh hÆ°á»Ÿng, vÃ  escal ngÆ°á»¡ng.</li>
 <li>TÃ¬nh huá»‘ng ngáº¯n: Packet thiáº¿u COC trÆ°á»›c giá» cutoff. Quyáº¿t Ä‘á»‹nh gÃ¬ vÃ  record á»Ÿ Ä‘Ã¢u?</li>
 <li>TÃ¬nh huá»‘ng ngáº¯n: Outsource trá»… ETA 24h, áº£nh hÆ°á»Ÿng ship date. Escal theo táº§ng nÃ o?</li>
-<li>Äiá»ƒm khÃ¡c nhau giá»¯a Tier 3 vÃ  Management Review lÃ  gÃ¬ trong thá»±c hÃ nh record?</li>
+<li>Äiá»ƒm khÃ¡c nhau giá»¯a Tier 3 vÃ  xem xét của lãnh đạo (management review) lÃ  gÃ¬ trong thá»±c hÃ nh record?</li>
 <li>TiÃªu chÃ­ PASS cá»§a Supervisor khÃ¡c Operator á»Ÿ Ä‘iá»ƒm nÃ o?</li>
 </ol>
 <h3>10.2 TÃ¬nh huá»‘ng (â‰¥ 3 tÃ¬nh huá»‘ng tháº­t) â€” cÃ³ dá»¯ kiá»‡n, yÃªu cáº§u HOLD/GO vÃ  ghi MRR</h3>
@@ -675,12 +675,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>á»¨ng viÃªn xá»­ lÃ½ 01 tÃ¬nh huá»‘ng S1/S2 theo â€œPháº£n á»©ng 60 giÃ¢yâ€ vÃ  escal Ä‘Ãºng level.</li>
 </ul>
 <p><b>PASS:</b> Ä‘á»§ 4 máº£ng + Ä‘á»§ action há»£p lá»‡ + escal Ä‘Ãºng ngÆ°á»¡ng + khÃ´ng cÃ³ action Ä‘Ã³ng khi thiáº¿u evidence.<br/>
-<b>FAIL:</b> thiáº¿u 1 máº£ng báº¯t buá»™c; due time mÆ¡ há»“; khÃ´ng escal khi vÆ°á»£t ngÆ°á»¡ng; cho GO/SHIP khi thiáº¿u há»“ sÆ¡.</p>
+<b>FAIL:</b> thiáº¿u 1 máº£ng báº¯t buá»™c; due time mÆ¡ há»“; khÃ´ng escal khi vÆ°á»£t ngÆ°á»¡ng; cho GO/giao hàng khi thiáº¿u há»“ sÆ¡.</p>
 </div>
 </div>
 <!-- 11) Äáº T/KHÃ”NG Äáº T -->
 <div class="card">
-<label class="blabel"><h1 class="h1" style="margin-top:0;">11) Äáº T/KHÃ”NG Äáº T criteria (nháº¥n máº¡nh â€œNo evidence = No gateâ€)</h1></label>
+<label class="blabel"><h1 class="h1" style="margin-top:0;">11) Äáº T/KHÃ”NG Äáº T criteria (nháº¥n máº¡nh â€œkhông có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))â€)</h1></label>
 <div class="table-card">
 <table class="table">
 <thead>
@@ -703,7 +703,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>
 <ul class="tight">
 <li>ÄÃ³ng action khi thiáº¿u evidence.</li>
-<li>Cho GO/SHIP khi thiáº¿u packet/traceability/ship release record.</li>
+<li>Cho GO/giao hàng khi thiáº¿u packet/traceability/phê duyệt giao hàng (ship release) record.</li>
 <li>KhÃ´ng escal khi vÆ°á»£t ngÆ°á»¡ng 2 giá» hoáº·c áº£nh hÆ°á»Ÿng Due â‰¤ 48h.</li>
 <li>DÃ¹ng gage OOT/overdue Ä‘á»ƒ Ä‘o CTQ.</li>
 <li>KhÃ´ng bÃ n giao action giá»¯a ca.</li>
@@ -719,11 +719,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <label class="blabel"><h1 class="h1" style="margin-top:0;">12) MRR tá»‘i thiá»ƒu (há»“ sÆ¡ báº¯t buá»™c)</h1></label>
 <h3>12.1 Danh sÃ¡ch há»“ sÆ¡ pháº£i táº¡o/Ä‘Ã­nh kÃ¨m</h3>
 <ul class="tight">
-<li><b>FRM-OPS-005 â€” Daily Standup Action Log</b> (má»—i ca).</li>
+<li><b>FRM-OPS-005 â€” Daily Standup nhật ký hành động (action log)</b> (má»—i ca).</li>
 <li><b>áº¢nh Tier board</b>: Ä‘áº§u ca + cuá»‘i ca (má»—i ca).</li>
 <li><b>Escalation log</b> Level 2/3 (khi phÃ¡t sinh).</li>
 <li><b>Hold/NCR/MRB há»“ sÆ¡</b> liÃªn quan action (khi phÃ¡t sinh).</li>
-<li><b>Shipping packet checklist</b> + ship release record (má»—i lÃ´).</li>
+<li><b>Shipping packet checklist</b> + phê duyệt giao hàng (ship release) record (má»—i lÃ´).</li>
 <li><b>Weekly Tier 2 action plan</b> (má»—i tuáº§n).</li>
 <li><b>Monthly Tier 3 minutes</b> (má»—i thÃ¡ng).</li>
 </ul>
@@ -754,7 +754,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Action list khÃ´ng cÃ³ due time</b> â†’ báº¯t buá»™c due time giá»/phÃºt trong FRM-OPS-005.</li>
 <li><b>Action Ä‘Ã³ng nhÆ°ng khÃ´ng cÃ³ evidence</b> â†’ cháº·n Ä‘Ã³ng status khi thiáº¿u link/áº£nh/phiáº¿u.</li>
 <li><b>Hold CTQ khÃ´ng cÃ³ containment</b> â†’ QA báº¯t buá»™c ghi containment + tiÃªu chÃ­ giáº£i hold.</li>
-<li><b>Ship release khÃ´ng cÃ³ record</b> â†’ STOP SHIP cho Ä‘áº¿n khi record Ä‘á»§.</li>
+<li><b>phê duyệt giao hàng (ship release) khÃ´ng cÃ³ record</b> â†’ STOP SHIP cho Ä‘áº¿n khi record Ä‘á»§.</li>
 <li><b>KhÃ´ng cÃ³ báº±ng chá»©ng bÃ n giao giá»¯a ca</b> â†’ báº¯t buá»™c áº£nh Tier board cuá»‘i ca + review action.</li>
 <li><b>Escalation khÃ´ng theo SLA</b> â†’ Ã¡p thang escal 2 giá» / Due â‰¤ 48h / miss ship.</li>
 <li><b>Mix-up do traceability yáº¿u</b> â†’ Warehouse báº¯t buá»™c check 100% trÆ°á»›c ship, ghi evidence.</li>

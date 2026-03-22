@@ -102,7 +102,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note" style="margin-top:12px">
 <b>Logic triển khai dùng trong khóa học:</b> HESEM vận hành với <b>2 lớp KPI</b>.
 Lớp 1 là <b>enterprise objectives / primary KPIs</b> của POL-QMS-002 để quản trị cấp công ty.
-Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SPC, traceability, training compliance, WIP aging hay hold SLA để bảo vệ objective khỏi đạt giả.
+Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SPC, traceability, training compliance, tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))) hay hold SLA để bảo vệ objective khỏi đạt giả.
 </div>
 <div class="toc">
 <strong>Mục lục nhanh (1–14)</strong>
@@ -130,13 +130,13 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <p class="lead">Policy là “kim chỉ nam ra quyết định”; Objectives/KPI là “cơ chế điều hành bằng dữ liệu”. Module này khóa 4 điều: <b>đúng mục tiêu</b> • <b>đúng dữ liệu</b> • <b>đúng tầng KPI</b> • <b>đúng nhịp hành động</b>.</p>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
-<div>Người học <b>PHẢI</b> triển khai được Chính sách &amp; Mục tiêu thành bảng KPI có công thức – owner – nguồn dữ liệu – cadence – rule hành động; <b>PHẢI</b> tạo đủ bằng chứng để chứng minh trong audit và trong Management Review.</div>
+<div>Người học <b>PHẢI</b> triển khai được Chính sách &amp; Mục tiêu thành bảng KPI có công thức – owner – nguồn dữ liệu – cadence – rule hành động; <b>PHẢI</b> tạo đủ bằng chứng để chứng minh trong audit và trong xem xét của lãnh đạo (management review).</div>
 </div>
 <h3 class="h3">Đầu ra bắt buộc (output artifacts)</h3>
 <ul style="line-height:1.9">
 <li><b>01</b> “Objective Cascade Sheet” (Công ty → Phòng ban → Tổ/Cell → Ca/Job) có RACI + ngưỡng hành động.</li>
 <li><b>01</b> “KPI Definition Card” cho 01 KPI được giao (theo ANNEX-QMS-027): công thức, nguồn dữ liệu, khóa số, anti-gaming.</li>
-<li><b>01</b> “Tier Meeting Output” cho kỳ gần nhất: action log có owner + due + bằng chứng (theo WI-502).</li>
+<li><b>01</b> “Tier Meeting Output” cho kỳ gần nhất: nhật ký hành động (action log) có owner + due + bằng chứng (theo WI-502).</li>
 <li><b>01</b> “Awareness Evidence”: bằng chứng truyền thông policy cho vai trò liên quan (attendance + quiz hoặc ký nhận).</li>
 </ul>
 <h3 class="h3">Điều kiện kích hoạt học &amp; tái học</h3>
@@ -166,7 +166,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <tbody>
 <tr>
 <td><b>Top Management / GM</b></td>
-<td>Phê duyệt policy &amp; objective; chốt ưu tiên khi xung đột Quality–Delivery–Cost; chủ trì Management Review.</td>
+<td>Phê duyệt policy &amp; objective; chốt ưu tiên khi xung đột Quality–Delivery–Cost; chủ trì xem xét của lãnh đạo (management review).</td>
 <td>FRM-QMS-03 (MR minutes) • quyết định cập nhật mục tiêu/KPI • phân bổ nguồn lực.</td>
 </tr>
 <tr>
@@ -182,7 +182,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <tr>
 <td><b>Production Leader / Supervisor</b></td>
 <td>Owner schedule adherence/FPY; chặn bypass gate; đảm bảo dữ liệu shopfloor đúng; thực hiện containment khi lệch.</td>
-<td>Standup action log • NCR link • evidence tại hiện trường.</td>
+<td>Standup nhật ký hành động (action log) • NCR link • evidence tại hiện trường.</td>
 </tr>
 <tr>
 <td><b>QC/QA (thực thi)</b></td>
@@ -238,7 +238,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 </tr>
 <tr>
 <td><b>Plan/Dispatch</b></td>
-<td>Tier 1 daily: WIP aging &gt; ngưỡng phải có action + escalation.</td>
+<td>Tier 1 daily: tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))) &gt; ngưỡng phải có action + escalation.</td>
 <td>OTD • WIP aging</td>
 <td>Planner: FRM-OPS-06/07 + action log.</td>
 </tr>
@@ -250,7 +250,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 </tr>
 <tr>
 <td><b>QC Release</b></td>
-<td>Thiếu record = HOLD; CTQ risk = STOP-SHIP.</td>
+<td>Thiếu record = HOLD; CTQ risk = dừng giao hàng (dừng giao hàng (dừng giao hàng (STOP-SHIP))).</td>
 <td>QC hold SLA • NCR aging</td>
 <td>QC/QA: FRM-QA-06 + disposition.</td>
 </tr>
@@ -294,7 +294,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
  </div>
 <ol style="line-height:1.9">
 <li><b>Chuỗi cascading xuống cá nhân:</b> Trong triển khai HESEM, cascading <b>PHẢI</b> xuống mức “người làm – người giữ gate” (operator/QC/leader) thông qua <b>standard work + checklist + KPI board</b>. Không dùng câu “không triển khai xuống cá nhân”.</li>
-<li><b>KPI core set:</b> Bộ KPI cấp Công ty <b>PHẢI</b> bám theo 7 primary KPIs của <b>POL-QMS-002</b>: OTD, FPY, Internal NCR Rate, CAPA On-Time Closure, Customer Complaint Rate, Revenue &amp; Gross Margin, LTIR / safety incident control. Các KPI như WIP aging, QC hold SLA hoặc calibration compliance là KPI dẫn xuất và phải truy ngược được về ít nhất một objective cấp công ty.</li>
+<li><b>KPI core set:</b> Bộ KPI cấp Công ty <b>PHẢI</b> bám theo 7 primary KPIs của <b>POL-QMS-002</b>: OTD, FPY, Internal NCR Rate, CAPA On-Time Closure, Customer Complaint Rate, Revenue &amp; Gross Margin, LTIR / safety incident control. Các KPI như tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))), QC hold SLA hoặc calibration compliance là KPI dẫn xuất và phải truy ngược được về ít nhất một objective cấp công ty.</li>
 <li><b>Nhịp xem xét &amp; escalation:</b> KPI vận hành <b>PHẢI</b> chạy theo tier cadence; KPI “đỏ” <b>PHẢI</b> có action trong Tier 1 và được escalate theo WI-502. Không chờ tới họp tháng mới hành động.</li>
 </ol>
 </div>
@@ -318,14 +318,14 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <tr><td><b>F02</b></td><td>Mục tiêu không đo được (không công thức/nguồn)</td><td>KPI tranh cãi, số không khớp</td><td>Audit NC 6.2/9.1</td><td>ANNEX-QMS-027 KPI card + data trace</td></tr>
 <tr><td><b>F03</b></td><td>Không có owner KPI</td><td>Không ai mở action khi KPI “đỏ”</td><td>Trễ giao hàng kéo dài</td><td>RACI cascade sheet + action log</td></tr>
 <tr><td><b>F04</b></td><td>Đổi due date để “đạt OTD”</td><td>Due date thay đổi không có record</td><td>Anti-gaming fail, mất niềm tin dữ liệu</td><td>Change control record + audit trail</td></tr>
-<tr><td><b>F05</b></td><td>Không chạy Tier cadence đúng nhịp</td><td>Thiếu minutes/action log</td><td>KPI “đỏ” không có hành động</td><td>FRM-OPS-05 action log + Tier agenda</td></tr>
+<tr><td><b>F05</b></td><td>Không chạy Tier cadence đúng nhịp</td><td>Thiếu minutes/nhật ký hành động (action log)</td><td>KPI “đỏ” không có hành động</td><td>FRM-OPS-05 action log + Tier agenda</td></tr>
 <tr><td><b>F06</b></td><td>KPI đo nhưng không có rule hành động</td><td>Báo cáo số xong dừng</td><td>Không cải tiến, MR không hiệu lực</td><td>Rule-by-threshold + action evidence</td></tr>
 <tr><td><b>F07</b></td><td>Không khóa phiên bản KPI definition</td><td>Cùng KPI nhiều công thức</td><td>Audit NC 7.5</td><td>DCR record KPI dictionary + version</td></tr>
 <tr><td><b>F08</b></td><td>Thiếu bằng chứng “đóng action”</td><td>Action overdue, không evidence</td><td>OTD/Quality không cải thiện</td><td>Action closure evidence (ảnh/record)</td></tr>
 <tr><td><b>F09</b></td><td>Stop-ship bị bỏ qua</td><td>Ship thiếu QC release/record</td><td>Customer complaint/return</td><td>QC release gate + shipping validator</td></tr>
 <tr><td><b>F10</b></td><td>Dữ liệu KPI sai (duplicate/null/late)</td><td>KPI nhảy số khác chuẩn</td><td>Quyết định sai, MR sai</td><td>Data health check + SOP-104</td></tr>
 <tr><td><b>F11</b></td><td>CAPA đóng “trên giấy”</td><td>Lỗi tái diễn, effectiveness trống</td><td>Major NC 10.2</td><td>Effectiveness check record + trend</td></tr>
-<tr><td><b>F12</b></td><td>Objective xung đột, không có quyết định</td><td>Plan vs QA tranh cãi, job treo</td><td>WIP aging vượt ngưỡng</td><td>Decision record (T3/MR) + priority</td></tr>
+<tr><td><b>F12</b></td><td>Objective xung đột, không có quyết định</td><td>Plan vs QA tranh cãi, job treo</td><td>tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))) vượt ngưỡng</td><td>Decision record (T3/MR) + priority</td></tr>
 </tbody>
 </table>
 </div>
@@ -348,7 +348,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <tbody>
 <tr>
 <td><b>RC-01</b></td>
-<td>Kiểm soát phiên bản Policy/Objectives/KPI Dictionary (single source of truth)</td>
+<td>Kiểm soát phiên bản Policy/Objectives/từ điển KPI (KPI dictionary) (single source of truth)</td>
 <td>QA/QMS</td>
 <td>Master list + DCR record + phát hành theo SOP-101</td>
 <td>Sai phiên bản tại điểm sử dụng → STOP + NCR trong 2h</td>
@@ -357,14 +357,14 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <td><b>RC-02</b></td>
 <td>Khóa định nghĩa KPI (formula/source/owner/cadence) theo ANNEX-QMS-027</td>
 <td>QA/QMS + IT</td>
-<td>KPI Definition Card + audit trail dữ liệu</td>
+<td>KPI Definition Card + dấu vết kiểm toán (audit trail) dữ liệu</td>
 <td>Tranh cãi định nghĩa KPI → HOLD report + fix trong 1 ngày</td>
 </tr>
 <tr>
 <td><b>RC-03</b></td>
 <td>Tier cadence &amp; escalation standard work theo WI-502</td>
 <td>Planner + Ops Lead</td>
-<td>FRM-OPS-05 action log + minutes + ảnh board</td>
+<td>FRM-OPS-05 nhật ký hành động (action log) + minutes + ảnh board</td>
 <td>T1 thiếu output trong ngày → escalate T2 cùng ngày</td>
 </tr>
 <tr>
@@ -383,7 +383,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 </tr>
 <tr>
 <td><b>RC-06</b></td>
-<td>Management Review: chốt mục tiêu, nguồn lực, action lớn</td>
+<td>xem xét của lãnh đạo (management review): chốt mục tiêu, nguồn lực, action lớn</td>
 <td>Top Management</td>
 <td>FRM-QMS-03 + input pack (trend/audit/risks)</td>
 <td>KPI “đỏ” dài kỳ → đưa vào MR/T3 để quyết định</td>
@@ -412,7 +412,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <h3 class="h3">7.1 Fail-fast rules (tối thiểu 3)</h3>
 <ol style="line-height:1.9">
 <li><b>FF-01 (Evidence first):</b> Khi thiếu record cho gate (QC release, shipping pack, due-date change, tier output), gate <b>PHẢI</b> FAIL và công việc <b>PHẢI</b> HOLD.</li>
-<li><b>FF-02 (One definition):</b> Khi KPI không truy xuất về “1 định nghĩa”, báo cáo KPI <b>PHẢI</b> BLOCK đến khi KPI Dictionary được sửa và phát hành.</li>
+<li><b>FF-02 (One definition):</b> Khi KPI không truy xuất về “1 định nghĩa”, báo cáo KPI <b>PHẢI</b> BLOCK đến khi từ điển KPI (KPI dictionary) được sửa và phát hành.</li>
 <li><b>FF-03 (Escalate by threshold):</b> Khi KPI vượt ngưỡng đỏ, owner <b>PHẢI</b> mở action trong Tier 1 và escalate theo WI-502; không để “trôi” sang kỳ sau.</li>
 <li><b>FF-04 (No silent change):</b> Khi thay đổi mục tiêu/KPI/due date không có change control, dữ liệu kỳ đó <b>PHẢI</b> vô hiệu và phải audit lại.</li>
 </ol>
@@ -429,7 +429,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <div class="card">
 <h3 class="h3" style="margin-top:0">HOLD (Giữ, không chuyển bước)</h3>
 <ul>
-<li>Thiếu MRR cho kỳ KPI (minutes/action log/record).</li>
+<li>Thiếu MRR cho kỳ KPI (minutes/nhật ký hành động (action log)/record).</li>
 <li>Thiếu bằng chứng truyền thông policy cho nhóm vai trò.</li>
 <li>Thiếu RACI owner cho KPI/cascading.</li>
 </ul>
@@ -473,7 +473,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 </tr>
 <tr>
 <td><b>Thiếu record gate (QC release/shipping pack)</b></td>
-<td>HOLD • yêu cầu record từ owner • không ship • ghi vào action log T1.</td>
+<td>HOLD • yêu cầu record từ owner • không ship • ghi vào nhật ký hành động (action log) T1.</td>
 <td>QA/WHS</td>
 <td>QC Hold Log + action log</td>
 </tr>
@@ -516,7 +516,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 </thead>
 <tbody>
 <tr><td><b>1</b></td><td>Kiểm tra phiên bản POL-QMS-001/002 và SOP-102 đang “Released”.</td><td>QA/QMS</td><td>Master list + link controlled</td><td>Dùng bản gửi email (uncontrolled)</td></tr>
-<tr><td><b>2</b></td><td>Khóa 7 primary KPIs cấp Công ty và owner theo RACI; xác định rõ KPI dẫn xuất của từng bộ phận (ví dụ: WIP aging, Hold SLA, calibration compliance).</td><td>QA/QMS + Process Owners</td><td>Objective Cascade Sheet</td><td>KPI không có owner, không truy ngược objective</td></tr>
+<tr><td><b>2</b></td><td>Khóa 7 primary KPIs cấp Công ty và owner theo RACI; xác định rõ KPI dẫn xuất của từng bộ phận (ví dụ: tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))), Hold SLA, calibration compliance).</td><td>QA/QMS + Process Owners</td><td>Objective Cascade Sheet</td><td>KPI không có owner, không truy ngược objective</td></tr>
 <tr><td><b>3</b></td><td>Tạo/ cập nhật KPI Definition Card cho từng KPI core (formula/source/anti-gaming).</td><td>QA/QMS + IT</td><td>ANNEX-QMS-027 card + DCR record</td><td>Một KPI nhiều công thức</td></tr>
 <tr><td><b>4</b></td><td>Thiết lập Tier cadence (T1/T2/T3) và agenda cố định.</td><td>Planner + Ops Lead</td><td>WI-502 + lịch họp</td><td>Họp không có agenda</td></tr>
 <tr><td><b>5</b></td><td>Thiết lập bảng KPI/board tại điểm sử dụng (xưởng/QC/kho) theo “1 trang – 1 hành động”.</td><td>Ops Lead + QA</td><td>Ảnh board + vị trí + version</td><td>Board có số nhưng không action</td></tr>
@@ -528,7 +528,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <tr><td><b>11</b></td><td>Khoá anti-gaming: due date change, đóng NCR/CAPA có evidence.</td><td>Planner + QA</td><td>Audit trail + log</td><td>Đổi due date không record</td></tr>
 <tr><td><b>12</b></td><td>Khi KPI đỏ: kích hoạt CAPA/containment và gắn action vào Tier.</td><td>Process Owner</td><td>NCR/CAPA + action log link</td><td>CAPA không effectiveness</td></tr>
 <tr><td><b>13</b></td><td>Tổng hợp “Quality Data Pack” cho MR (trend, audit, risk, complaints).</td><td>QA/QMS</td><td>MR input pack + FRM-QMS-03</td><td>MR thiếu dữ liệu khách hàng</td></tr>
-<tr><td><b>14</b></td><td>Họp Management Review: chốt mục tiêu, nguồn lực, action lớn.</td><td>Top Mgmt</td><td>FRM-QMS-03 + decision</td><td>Action MR không theo dõi</td></tr>
+<tr><td><b>14</b></td><td>Họp xem xét của lãnh đạo (management review): chốt mục tiêu, nguồn lực, action lớn.</td><td>Top Mgmt</td><td>FRM-QMS-03 + decision</td><td>Action MR không theo dõi</td></tr>
 <tr><td><b>15</b></td><td>Phát hành thay đổi (policy/objective/KPI) theo SOP-101 và rollout.</td><td>QA/QMS</td><td>FRM-QMS-10/12 + DCR record</td><td>Không thu hồi bản cũ</td></tr>
 </tbody>
 </table>
@@ -622,7 +622,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <tr>
 <td><b>L2</b></td>
 <td>Thực hiện được cascade sheet cho nhóm; cập nhật KPI board; chạy Tier 1 đúng agenda.</td>
-<td>01 cascade sheet • 01 Tier 1 minutes/action log • evidence đóng 1 action</td>
+<td>01 cascade sheet • 01 Tier 1 minutes/nhật ký hành động (action log) • evidence đóng 1 action</td>
 <td>Được HOLD job khi thiếu MRR; được mở action và giao owner.</td>
 </tr>
 <tr>
@@ -652,15 +652,15 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <ol style="line-height:1.9">
 <li>Quality Policy thuộc điều khoản ISO nào? (A) 5.2 (B) 6.2 (C) 9.1 (D) 10.2</li>
 <li>Quality Objectives bắt buộc có thành phần nào? (A) Metric + owner + cadence + evidence (B) Chỉ cần target (C) Chỉ cần biểu đồ (D) Chỉ cần họp</li>
-<li>KPI Dictionary dùng để khóa điều gì? (A) Một KPI nhiều định nghĩa (B) Đổi màu dashboard (C) In poster (D) Gửi email</li>
+<li>từ điển KPI (KPI dictionary) dùng để khóa điều gì? (A) Một KPI nhiều định nghĩa (B) Đổi màu dashboard (C) In poster (D) Gửi email</li>
 <li>Khi thiếu record cho gate QC release, trạng thái đúng là gì? (A) Ship (B) HOLD (C) Ignore (D) Delay record</li>
-<li>Tier 1 output bắt buộc là gì? (A) Slide đẹp (B) Action log có owner + due (C) Ảnh nhóm (D) Email</li>
+<li>Tier 1 output bắt buộc là gì? (A) Slide đẹp (B) nhật ký hành động (action log) có owner + due (C) Ảnh nhóm (D) Email</li>
 <li>Anti-gaming liên quan trực tiếp tới quy tắc nào? (A) Đổi due date không record (B) In thêm form (C) Mua dụng cụ (D) Tăng giờ họp</li>
 <li>MRR nghĩa là gì? (A) Minimum Required Records (B) Monthly Revenue Report (C) Machine Run Rate (D) Manual Revision Rule</li>
 <li>Cadence Tier đúng thứ tự nào? (A) T1 daily → T2 weekly → T3 monthly → MR annual (B) MR daily → T3 weekly → T2 monthly → T1 annual (C) Chỉ họp tháng (D) Không cần nhịp</li>
 <li>Khi KPI definition không thống nhất, hành động đúng là gì? (A) BLOCK KPI report (B) Tự chọn công thức (C) Bỏ KPI (D) Chờ audit</li>
 <li>Owner của policy/objectives version control là ai? (A) QA/QMS (B) Operator (C) Khách hàng (D) NCC</li>
-<li>Điều khoản ISO liên quan Management Review là? (A) 9.3 (B) 7.5 (C) 8.5 (D) 4.4</li>
+<li>Điều khoản ISO liên quan xem xét của lãnh đạo (management review) là? (A) 9.3 (B) 7.5 (C) 8.5 (D) 4.4</li>
 <li>Khi data health FAIL, hành động đúng là? (A) BLOCK quyết định dựa KPI (B) Vẫn báo cáo (C) Đổi màu (D) Ghi chú miệng</li>
 <li>Chứng minh awareness policy dùng bằng chứng nào? (A) Attendance + quiz/ký nhận (B) Chỉ treo poster (C) Chỉ nói miệng (D) Chỉ gửi file</li>
 <li>Trong cascading, yếu tố bắt buộc để không “rơi trách nhiệm” là? (A) RACI rõ (B) Logo đẹp (C) Nhiều KPI (D) Email dài</li>
@@ -671,11 +671,11 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <li>Khi phát hiện bypass gate, việc đầu tiên là? (A) STOP + cô lập + mở NCR (B) Gửi mail (C) Chờ QA (D) Ship nhanh</li>
 <li>KPI core set cấp Công ty tối thiểu bao nhiêu? (A) 7 (B) 3 (C) 20 (D) 1</li>
 <li>Ngưỡng “đỏ” dùng để làm gì? (A) Kích hoạt hành động/escalation (B) Trang trí (C) In poster (D) Tạo báo cáo</li>
-<li>Mọi thay đổi KPI core set được chốt ở đâu? (A) Management Review/T3 có quyết định ghi nhận (B) Chat nhóm (C) Cá nhân tự đổi (D) Email khách</li>
+<li>Mọi thay đổi KPI core set được chốt ở đâu? (A) xem xét của lãnh đạo (management review)/T3 có quyết định ghi nhận (B) Chat nhóm (C) Cá nhân tự đổi (D) Email khách</li>
 </ol>
 <h3 class="h3">12.2 Scenario (3 tình huống có dữ liệu)</h3>
 <div class="card">
-<h3 class="h3" style="margin-top:0">Scenario 1 — OTD đỏ và WIP aging vượt ngưỡng</h3>
+<h3 class="h3" style="margin-top:0">Scenario 1 — OTD đỏ và tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging)))) vượt ngưỡng</h3>
 <p><b>Dữ liệu 4 tuần:</b> OTD = 92% → 90% → 88% → 89% ; WIP aging &gt;48h = 6 → 9 → 12 → 11 job; Top reason: outsource overdue 40%, QC hold 25%, machine downtime 20%.</p>
 <p><b>Yêu cầu:</b> Lập 03 action Tier 1 (owner + due trong ngày) và 01 action Tier 2 (cải tiến) kèm evidence dự kiến.</p>
 </div>
@@ -734,7 +734,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như calibration, MSA/SP
 <li><b>AF-02:</b> Mục tiêu không được truyền thông/không chứng minh nhận biết. <b>Chặn:</b> attendance + quiz/ký nhận.</li>
 <li><b>AF-03:</b> KPI không được theo dõi định kỳ (thiếu minutes/action). <b>Chặn:</b> Tier cadence + FRM-OPS-05.</li>
 <li><b>AF-04:</b> KPI “đỏ” không có hành động hoặc hành động không hiệu lực. <b>Chặn:</b> action log + evidence + effectiveness check.</li>
-<li><b>AF-05:</b> Due date thay đổi không có change control (anti-gaming). <b>Chặn:</b> khoá quy tắc đổi due date + audit trail.</li>
+<li><b>AF-05:</b> Due date thay đổi không có change control (anti-gaming). <b>Chặn:</b> khoá quy tắc đổi due date + dấu vết kiểm toán (audit trail).</li>
 <li><b>AF-06:</b> Không kiểm soát phiên bản KPI definition/policy (7.5). <b>Chặn:</b> SOP-101 + DCR record.</li>
 <li><b>AF-07:</b> MR không dùng dữ liệu KPI/audit/risk làm input (9.3). <b>Chặn:</b> Quality Data Pack + checklist MR.</li>
 <li><b>AF-08:</b> Data health kém làm sai KPI (duplicate/null). <b>Chặn:</b> SOP-104 + data health report.</li>

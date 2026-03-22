@@ -88,10 +88,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>Knowledge (K)</th><th>Skill (S)</th><th>Evidence (E)</th><th>Metric (M)</th></tr></thead>
 <tbody>
 <tr>
-<td>Hiểu sâu hệ thống tài chính–vận hành của job shop: cấu trúc P&amp;L theo cell/nhóm máy (nhóm máy (machine family)), quy tắc định giá theo chiến lược thị trường, cơ chế kiểm soát thay đổi cost model, và governance dữ liệu (dữ liệu gốc (dữ liệu gốc (master data)), đánh giá trail).</td>
+<td>Hiểu sâu hệ thống tài chính–vận hành của job shop: cấu trúc P&amp;L theo cell/nhóm máy (machine family), quy tắc định giá theo chiến lược thị trường, cơ chế kiểm soát thay đổi cost model, và governance dữ liệu (dữ liệu gốc (master data), đánh giá trail).</td>
 <td>Thiết kế hệ thống estimating/job costing cấp công ty: policy rate/markup, approval, thư viện định mức (routing library), tích hợp ERP/MES, dashboard margin &amp; capacity, đào tạo + đánh giá để đảm bảo tính nhất quán và chống 'gaming'.</td>
-<td>Chính sách cost model phát hành; hệ thống dữ liệu gốc (dữ liệu gốc (master data))/ routing library; dashboard GM &amp; variance; 02 đợt đánh giá nội bộ; chương trình đào tạo estimator.</td>
-<td>GM% ổn định và tăng theo mục tiêu; margin leakage giảm; thời gian dẫn (thời gian dẫn (lead time)) quote giảm; đánh giá không có major NC về kiểm soát dữ liệu cost.</td>
+<td>Chính sách cost model phát hành; hệ thống dữ liệu gốc (master data)/ routing library; dashboard GM &amp; variance; 02 đợt đánh giá nội bộ; chương trình đào tạo estimator.</td>
+<td>GM% ổn định và tăng theo mục tiêu; margin leakage giảm; thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))) quote giảm; đánh giá không có major NC về kiểm soát dữ liệu cost.</td>
 </tr>
 </tbody>
 </table><h2>2. Yêu cầu chuẩn ISO tích hợp (PHẢI/PHẢI/ĐƯỢC PHÉP) + mapping clause</h2><p class="small">Các yêu cầu dưới đây viết theo ngôn ngữ ISO để dùng trực tiếp trong SOP/WI/FRM và làm căn cứ đánh giá. Mỗi yêu cầu gắn clause (điều khoản) để truy vết.</p><div class="req">
@@ -136,7 +136,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><strong>Tổ chức ĐƯỢC PHÉP triển khai ABC/Throughput Accounting và mô hình tối ưu giá theo bottleneck để nâng lợi nhuận.</strong> <span class="iso">ISO 10.3</span></div>
 <p>Áp dụng khi dữ liệu đủ tin cậy; bắt đầu từ pilot cell.</p>
 </div>
-</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L4: thiết kế hệ thống costing cấp công ty – dữ liệu, governance, chiến lược pricing.</strong></div><h3>3.1. Estimating trong CNC job shop: “báo giá là dự báo có kiểm soát”</h3><p>Estimating không phải đoán. Estimating là <strong>mô hình hóa</strong> công việc để ra quyết định thương mại: có phải nhận job không, nhận với giá nào, cam kết thời gian dẫn (thời gian dẫn (lead time)) nào, rủi ro ở đâu. Trong job-order CNC, sai estimate xuất phát từ 3 nguồn:</p><ul>
+</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L4: thiết kế hệ thống costing cấp công ty – dữ liệu, governance, chiến lược pricing.</strong></div><h3>3.1. Estimating trong CNC job shop: “báo giá là dự báo có kiểm soát”</h3><p>Estimating không phải đoán. Estimating là <strong>mô hình hóa</strong> công việc để ra quyết định thương mại: có phải nhận job không, nhận với giá nào, cam kết thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))) nào, rủi ro ở đâu. Trong job-order CNC, sai estimate xuất phát từ 3 nguồn:</p><ul>
 <li><strong>Thiếu dữ liệu đầu vào:</strong> chưa chốt CTQ, chưa chốt finish/packaging/docs.</li>
 <li><strong>Định mức sai:</strong> setup underestimated, toolpath thực tế khác giả định, đo kiểm bị bỏ sót.</li>
 <li><strong>Hệ thống rate sai:</strong> dùng rate “cảm tính” không phản ánh overhead và utilization.</li>
@@ -167,7 +167,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>8–15%:</strong> công nghệ mới/special process/tight tolerance/khách đánh giá.</li>
 </ul><p>Dự phòng phải được ghi rõ lý do trong estimate và được duyệt theo thẩm quyền.</p><h3>3.7. Job Costing &amp; Variance: biến “đau” thành “dữ liệu học”</h3><p>Một hệ thống job costing tốt không nhằm “truy lỗi cá nhân” mà nhằm trả lời 3 câu hỏi:</p><ol>
 <li>Chúng ta dự báo sai ở đâu (setup/run/material/QC/thuê ngoài)?</li>
-<li>Nguyên nhân hệ thống là gì (dữ liệu gốc (dữ liệu gốc (master data)), routing, training, máy móc, phương pháp)?</li>
+<li>Nguyên nhân hệ thống là gì (dữ liệu gốc (master data), routing, training, máy móc, phương pháp)?</li>
 <li>Hành động nào làm giảm sai lệch trong tương lai (update định mức, cải tiến process, thay đổi quote policy)?</li>
 </ol><p>Cấu trúc báo cáo chênh lệch:</p><ul>
 <li><strong>Time variance:</strong> (Actual hours − Standard hours) x Rate.</li>
@@ -179,7 +179,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Overhead engineering phân bổ theo <strong>số giờ lập trình/DFM</strong>.</li>
 </ul><p>ABC giúp tránh tình trạng: job đơn giản bị đội giá, job phức tạp bị under-quote.</p><h3>3.9. Pricing theo năng lực &amp; bottleneck: tư duy chiến lược</h3><p>Khi xưởng có “nút thắt” (máy 5-axis/CMM), giá không thể chỉ dựa trên cost-plus. Cần thêm yếu tố:</p><ul>
 <li><strong>Capacity-based pricing:</strong> job chiếm bottleneck giờ cao phải có premium hoặc phải chọn lọc.</li>
-<li><strong>Value-based:</strong> khi HESEM giúp khách rút thời gian dẫn (thời gian dẫn (lead time)) hoặc giảm rủi ro, giá trị đó phản ánh vào giá.</li>
+<li><strong>Value-based:</strong> khi HESEM giúp khách rút thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))) hoặc giảm rủi ro, giá trị đó phản ánh vào giá.</li>
 <li><strong>Portfolio:</strong> cân bằng job margin cao vs job ổn định để tối ưu dòng tiền.</li>
 </ul><p>Level 4 phải thiết kế governance: ai được quyền giảm giá, giảm bao nhiêu, và phải chứng minh bằng dữ liệu.</p><h2>4. Quy trình thao tác chuẩn (flow dọc, dễ đọc)</h2><p class="small">Lưu đồ được thiết kế theo hướng dọc để đọc rõ khi in A4. chỉnh trực tiếp bằng HTML/CSS.</p><div class="vflow">
 <div class="vstep">
@@ -228,7 +228,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vnum">7</div>
 <div class="vtext">
 <strong>Tính thuê ngoài/finishing/packaging</strong>
-<p>Báo giá vendor; thêm handling &amp; thời gian dẫn (thời gian dẫn (lead time)); xác định packaging level.</p>
+<p>Báo giá vendor; thêm handling &amp; thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))); xác định packaging level.</p>
 </div>
 </div>
 <div class="vstep">
@@ -383,7 +383,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div>
 <strong>Nhiệm vụ theo Level 4:</strong>
-<ol><li>Đưa ra chuẩn dữ liệu gốc (dữ liệu gốc (master data)): routing code, downtime code, scrap code.</li><li>Thiết kế quy trình kiểm soát thay đổi dữ liệu gốc (dữ liệu gốc (master data)) (DC).</li><li>Thiết kế đánh giá plan để đảm bảo dữ liệu tin cậy.</li></ol>
+<ol><li>Đưa ra chuẩn dữ liệu gốc (master data): routing code, downtime code, scrap code.</li><li>Thiết kế quy trình kiểm soát thay đổi dữ liệu gốc (master data) (DC).</li><li>Thiết kế đánh giá plan để đảm bảo dữ liệu tin cậy.</li></ol>
 </div>
 </div>
 <hr class="sep"/>
@@ -393,7 +393,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
 </div><div class="card">
 <h3>Case 3: Chiến lược portfolio – chọn job để tối ưu năng lực</h3>
-<p class="small">Xưởng bị quá tải, thời gian dẫn (thời gian dẫn (lead time)) tăng, khách phàn nàn. Cần chọn lọc job theo lợi thế HESEM.</p>
+<p class="small">Xưởng bị quá tải, thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))) tăng, khách phàn nàn. Cần chọn lọc job theo lợi thế HESEM.</p>
 <div class="cols-2">
 <div>
 <strong>Dữ liệu (Input):</strong>
@@ -401,7 +401,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div>
 <strong>Nhiệm vụ theo Level 4:</strong>
-<ol><li>Phân tích lợi thế theo nhóm máy (nhóm máy (machine family)), QC capability, thời gian dẫn (thời gian dẫn (lead time)).</li><li>Đưa ra rule chọn job (acceptance criteria) gắn với costing và risk.</li><li>Đưa KPI theo dõi hiệu lực: OTD, GM, utilization, WIP.</li></ol>
+<ol><li>Phân tích lợi thế theo nhóm máy (machine family), QC capability, thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))).</li><li>Đưa ra rule chọn job (acceptance criteria) gắn với costing và risk.</li><li>Đưa KPI theo dõi hiệu lực: OTD, GM, utilization, WIP.</li></ol>
 </div>
 </div>
 <hr class="sep"/>
@@ -450,7 +450,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>2</td>
 <td>Tích hợp dữ liệu ERP/MES</td>
-<td>Data governance; đánh giá trail; dữ liệu gốc (dữ liệu gốc (master data)) control</td>
+<td>Data governance; đánh giá trail; dữ liệu gốc (master data) control</td>
 <td>□ Đạt □ Chưa</td>
 <td>…</td>
 </tr>
@@ -509,10 +509,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody></table><h3>8.2. Quiz mẫu (Level 4)</h3><div class="quiz">
 <ol>
 <li>Thiết kế policy floor margin và discount rule cho HESEM: những ràng buộc nào để chống 'race to bottom'?</li>
-<li>Mô tả governance dữ liệu gốc (dữ liệu gốc (master data)) (routing, rates, codes) để đảm bảo đánh giá trail.</li>
+<li>Mô tả governance dữ liệu gốc (master data) (routing, rates, codes) để đảm bảo đánh giá trail.</li>
 <li>Tích hợp ERP/MES cho job costing: dữ liệu nào là 'critical' và cách đảm bảo chất lượng dữ liệu?</li>
 <li>Portfolio strategy: bạn sẽ chọn/loại RFQ dựa trên costing và capability như thế nào?</li>
-<li>Thiết kế dashboard GM theo nhóm máy (nhóm máy (machine family))/cell: metric nào cần và tần suất?</li>
+<li>Thiết kế dashboard GM theo nhóm máy (machine family)/cell: metric nào cần và tần suất?</li>
 <li>Mock đánh giá hệ thống costing: bạn kiểm tra những evidence nào để tìm NC?</li>
 <li>Nêu 3 rủi ro khi chỉ dùng cost-plus và bỏ qua bottleneck/capacity.</li>
 <li>Bạn đào tạo estimator mới ra sao để họ không 'copy rate' sai từ job cũ?</li>
@@ -540,7 +540,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Cost drivers (QC/thuê ngoài/packaging)</strong></td>
 <td>Bỏ sót; dẫn tới lỗ.</td>
 <td>Nhận diện cơ bản; thêm chi phí.</td>
-<td>Tính đầy đủ; thời gian dẫn (thời gian dẫn (lead time)) breakdown rõ.</td>
+<td>Tính đầy đủ; thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time)))) breakdown rõ.</td>
 <td>Thiết kế ABC/driver; tối ưu bottleneck.</td>
 </tr>
 <tr>

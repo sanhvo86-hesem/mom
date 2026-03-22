@@ -281,7 +281,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiáº¿t bá»‹ Ä‘o háº¿t háº¡n calib/OOT â†’ káº¿t quáº£ First Piece khÃ´ng tin cáº­y.</li>
 <li>XÃ¡c nháº­n lÃ m nhÆ°ng khÃ´ng lÆ°u evidence â†’ audit â€œKhÃ´ng cÃ³ báº±ng chá»©ng = khÃ´ng qua cá»•ngâ€.</li>
 <li>Triá»ƒn khai â€œÃ¡p dá»¥ng ngayâ€ táº¡i hiá»‡n trÆ°á»ng nhÆ°ng khÃ´ng há»£p thá»©c hÃ³a há»“ sÆ¡ trong 24h â†’ máº¥t kiá»ƒm soÃ¡t thay Ä‘á»•i.</li>
-<li>Ship release bá» qua gate QA khi gáº¥p tiáº¿n Ä‘á»™ â†’ phÃ¡t sinh NCR/MRB/khÃ¡ch tráº£ hÃ ng.</li>
+<li>phê duyệt giao hàng (ship release) bá» qua gate QA khi gáº¥p tiáº¿n Ä‘á»™ â†’ phÃ¡t sinh NCR/MRB/khÃ¡ch tráº£ hÃ ng.</li>
 </ol>
 </div>
 <h2 class="h2">5) Risk Controls (control points; ai lÃ m; báº±ng chá»©ng)</h2>
@@ -290,7 +290,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead>
 <tr>
 <th style="width:70px;">#</th>
-<th>Control point báº¯t buá»™c</th>
+<th>điểm kiểm soát (control point) báº¯t buá»™c</th>
 <th style="width:190px;">Owner</th>
 <th style="width:260px;">Evidence/MRR</th>
 <th style="width:170px;">Táº§n suáº¥t</th>
@@ -369,7 +369,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3" style="margin-top:0">FF3 â€” WIP khÃ´ng kiá»ƒm soÃ¡t</h3>
 <ul>
 <li>Khi cut-in chÆ°a chá»‘t hoáº·c tá»“n/WIP láº«n Rev â†’ <b>HOLD</b> toÃ n bá»™ lÃ´ liÃªn quan táº¡i kho/xÆ°á»Ÿng.</li>
-<li>Chá»‰ gá»¡ HOLD khi cÃ³ quyáº¿t Ä‘á»‹nh QA + Planner + Supervisor vÃ  nhÃ£n phÃ¢n luá»“ng hoÃ n táº¥t.</li>
+<li>Chá»‰ gá»¡ tạm giữ khi cÃ³ quyáº¿t Ä‘á»‹nh QA + Planner + Supervisor vÃ  nhÃ£n phÃ¢n luá»“ng hoÃ n táº¥t.</li>
 </ul>
 </div>
 </div>
@@ -403,7 +403,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3</td><td>HoÃ n thÃ nh Change Impact Matrix Ä‘á»§ háº¡ng má»¥c: CTQ, program, fixture, gage, NCC, WIP.</td><td>Engineering + QC + Production + Purchasing + Warehouse</td><td>FRM-QMS-006 kÃ½ Ä‘á»§</td><td>Bá» sÃ³t WIP/traceability hoáº·c thiáº¿t bá»‹ Ä‘o.</td></tr>
 <tr><td>4</td><td>Chá»‘t phÃª duyá»‡t theo má»©c: C1/C2/C3/Emergency; khi cáº§n cÃ³ xÃ¡c nháº­n khÃ¡ch.</td><td>QA + cáº¥p phÃª duyá»‡t</td><td>Chá»¯ kÃ½/biÃªn báº£n CCB</td><td>Thiáº¿u chá»¯ kÃ½ báº¯t buá»™c.</td></tr>
 <tr><td>5</td><td>Chá»‘t cut-in theo lot/serial/date; láº­p danh sÃ¡ch job bá»‹ áº£nh hÆ°á»Ÿng.</td><td>Planner + QA</td><td>Cut-in record</td><td>Cut-in ghi â€œtá»« nayâ€ khÃ´ng cÃ³ má»‘c.</td></tr>
-<tr><td>6</td><td>Cáº­p nháº­t tÃ i liá»‡u/dá»¯ liá»‡u: traveler, setup sheet, inspection plan, label, program.</td><td>Kiá»ƒm soÃ¡t tÃ i liá»‡u (Doc Control)/QA + Engineering</td><td>Danh má»¥c cáº­p nháº­t trong FRM-QMS-022</td><td>Cáº­p nháº­t má»™t pháº§n, bá» sÃ³t label/pack.</td></tr>
+<tr><td>6</td><td>Cáº­p nháº­t tÃ i liá»‡u/dá»¯ liá»‡u: traveler, setup sheet, kế hoạch kiểm tra (inspection plan), label, program.</td><td>Kiá»ƒm soÃ¡t tÃ i liá»‡u (Doc Control)/QA + Engineering</td><td>Danh má»¥c cáº­p nháº­t trong FRM-QMS-022</td><td>Cáº­p nháº­t má»™t pháº§n, bá» sÃ³t label/pack.</td></tr>
 <tr><td>7</td><td>KhÃ³a &amp; thu há»“i báº£n cÅ© táº¡i xÆ°á»Ÿng/kho; dÃ¡n Rev má»›i táº¡i mÃ¡y.</td><td>Supervisor + Warehouse</td><td>Log thu há»“i + áº£nh hiá»‡n trÆ°á»ng</td><td>Báº£n cÅ© cÃ²n treo táº¡i mÃ¡y.</td></tr>
 <tr><td>8</td><td>Flow-down thay Ä‘á»•i cho NCC/thuÃª ngoÃ i qua PO; chá»‘t yÃªu cáº§u cert.</td><td>Purchasing</td><td>PO revision + yÃªu cáº§u cert</td><td>PO khÃ´ng ghi Rev/spec má»›i.</td></tr>
 <tr><td>9</td><td>Segregate tá»“n/WIP theo Rev; nhÃ£n HOLD/REWORK; quyáº¿t Ä‘á»‹nh xá»­ lÃ½ WIP.</td><td>Warehouse + QA</td><td>BiÃªn báº£n cÃ¡ch ly + list lot</td><td>Láº«n lÃ´ trong cÃ¹ng ká»‡.</td></tr>
@@ -520,7 +520,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>[TÃ¬nh huá»‘ng ngáº¯n] Khi phÃ¡t hiá»‡n gage Ä‘o CTQ háº¿t háº¡n calib trong lÃºc Ä‘ang Ä‘o First Piece, tráº¡ng thÃ¡i gate lÃ  gÃ¬ vÃ  ai pháº£i Ä‘Æ°á»£c gá»i?</li>
 <li>[TÃ¬nh huá»‘ng ngáº¯n] Khi program má»›i Ä‘Ã£ phÃ¡t hÃ nh nhÆ°ng mÃ¡y Ä‘ang cháº¡y file tÃªn gáº§n giá»‘ng, thao tÃ¡c khÃ³a nguá»“n lá»—i lÃ  gÃ¬?</li>
 <li>[TÃ¬nh huá»‘ng ngáº¯n] Khi kho phÃ¡t hiá»‡n tá»“n cÃ¹ng part nhÆ°ng khÃ¡c Rev Ä‘áº·t chung ká»‡, hÃ nh Ä‘á»™ng báº¯t buá»™c trong 60 giÃ¢y lÃ  gÃ¬?</li>
-<li>[Tráº¯c nghiá»‡m] Khi thay Ä‘á»•i routing/thá»© tá»± nguyÃªn cÃ´ng, báº¯t buá»™c cáº­p nháº­t gÃ¬? A) Chá»‰ traveler B) Traveler + setup sheet + inspection plan C) Chá»‰ program D) Chá»‰ PO</li>
+<li>[Tráº¯c nghiá»‡m] Khi thay Ä‘á»•i routing/thá»© tá»± nguyÃªn cÃ´ng, báº¯t buá»™c cáº­p nháº­t gÃ¬? A) Chá»‰ traveler B) Traveler + setup sheet + kế hoạch kiểm tra (inspection plan) C) Chá»‰ program D) Chá»‰ PO</li>
 <li>[Tráº¯c nghiá»‡m] Khi thay Ä‘á»•i phÃ¡t sinh tá»« NCR/MRB, tÃ i liá»‡u Ä‘iá»u phá»‘i báº¯t buá»™c lÃ  gÃ¬? A) MRB decision + CR/Notice B) Chá»‰ email C) Chá»‰ há»p miá»‡ng D) KhÃ´ng cáº§n vÃ¬ Ä‘Ã£ NCR</li>
 <li>[Tráº¯c nghiá»‡m] â€œFirst Pieceâ€ trong bá»‘i cáº£nh change management dÃ¹ng Ä‘á»ƒ lÃ m gÃ¬? A) Trang trÃ­ há»“ sÆ¡ B) Chá»©ng minh sáº£n pháº©m phÃ¹ há»£p sau thay Ä‘á»•i C) TÄƒng sá»‘ lÆ°á»£ng máº«u D) Thay tháº¿ FAI luÃ´n</li>
 <li>[Tráº¯c nghiá»‡m] Khi thiáº¿u chá»¯ kÃ½ phÃª duyá»‡t báº¯t buá»™c trÃªn CR, tráº¡ng thÃ¡i Ä‘Ãºng lÃ  gÃ¬? A) GO B) HOLD/BLOCK C) Ship trÆ°á»›c D) Äá»£i cuá»‘i tuáº§n kÃ½</li>
@@ -605,7 +605,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Supervisor</td><td>â‰¥90%</td><td>ÄÃºng cáº£ 3 scenario</td><td>Thá»±c thi gate táº¡i line; kiá»ƒm tra Ä‘Ã o táº¡o; kÃ½ thu há»“i báº£n cÅ©; phá»‘i há»£p Ä‘Ã³ng CR.</td></tr>
 </tbody>
 </table>
-<p><b>FAIL ngay</b> khi xáº£y ra 01 trong cÃ¡c Ä‘iá»u kiá»‡n: má»Ÿ cá»•ng khi thiáº¿u báº±ng chá»©ng; cho cháº¡y khi mismatch Rev; khÃ´ng khoanh vÃ¹ng WIP; ship khi chÆ°a cÃ³ gate QA.</p>
+<p><b>FAIL ngay</b> khi xáº£y ra 01 trong cÃ¡c Ä‘iá»u kiá»‡n: má»Ÿ cá»•ng khi thiáº¿u báº±ng chá»©ng; cho cháº¡y khi mismatch Rev; khÃ´ng khoanh vÃ¹ng WIP; giao hàng khi chÆ°a cÃ³ gate QA.</p>
 </div>
 <h2 class="h2">12) MRR tá»‘i thiá»ƒu</h2>
 <div class="card">
@@ -614,7 +614,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>FRM-QMS-022</b> â€” Document/Data Change Notice (mÃ£ CR).</li>
 <li><b>FRM-QMS-006</b> â€” Change Impact Matrix (Ä‘á»§ chá»¯ kÃ½ liÃªn phÃ²ng).</li>
 <li><b>FRM-SAL-003</b> â€” Customer Change Order Review (khi thay Ä‘á»•i tá»« khÃ¡ch).</li>
-<li>Danh má»¥c tÃ i liá»‡u cáº­p nháº­t: traveler, setup sheet, inspection plan, label, routing.</li>
+<li>Danh má»¥c tÃ i liá»‡u cáº­p nháº­t: traveler, setup sheet, kế hoạch kiểm tra (inspection plan), label, routing.</li>
 <li>Báº±ng chá»©ng program: file name + version + checksum (mÃ£ kiá»ƒm) + log phÃ¡t hÃ nh.</li>
 <li>Báº±ng chá»©ng xÃ¡c nháº­n: First Piece/IR/CMM/FAI (theo má»©c) + káº¿t luáº­n PASS/FAIL.</li>
 <li>Báº±ng chá»©ng WIP segregation: áº£nh nhÃ£n HOLD/REWORK + list lot/serial + quyáº¿t Ä‘á»‹nh xá»­ lÃ½.</li>
@@ -647,8 +647,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Program khÃ´ng cÃ³ version/checksum (mÃ£ kiá»ƒm) â†’ cháº·n báº±ng bÆ°á»›c 11; báº¯t buá»™c log phÃ¡t hÃ nh.</li>
 <li>Thiáº¿t bá»‹ Ä‘o háº¿t háº¡n calib nhÆ°ng váº«n dÃ¹ng â†’ cháº·n báº±ng xÃ¡c nháº­n plan + FF2.</li>
 <li>Outsource/special process thiáº¿u cert/flow-down â†’ cháº·n báº±ng bÆ°á»›c 8â€“9 vÃ  incoming verification tÄƒng má»©c.</li>
-<li>Ship khi thiáº¿u báº±ng chá»©ng First Piece/FAI hoáº·c COC sai Rev â†’ cháº·n báº±ng ship gate control point #6.</li>
-<li>ÄÃ³ng CR khi chÆ°a xÃ¡c minh hiá»‡u lá»±c â†’ cháº·n báº±ng control point #7; yÃªu cáº§u biÃªn báº£n hiá»‡u lá»±c.</li>
+<li>giao hàng khi thiáº¿u báº±ng chá»©ng First Piece/FAI hoáº·c COC sai Rev â†’ cháº·n báº±ng ship gate điểm kiểm soát (control point) #6.</li>
+<li>ÄÃ³ng CR khi chÆ°a xÃ¡c minh hiá»‡u lá»±c â†’ cháº·n báº±ng điểm kiểm soát (control point) #7; yÃªu cáº§u biÃªn báº£n hiá»‡u lá»±c.</li>
 </ol>
 </div>
 </div>

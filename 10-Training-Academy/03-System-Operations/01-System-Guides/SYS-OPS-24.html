@@ -69,7 +69,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <div class="badge"><span class="dot"></span>Training Module SYS-OPS-24</div>
 <h1 style="margin-top:10px">SOP-QMS-012 Admin Handoff Build Sheet: SoD, evidence rules, acceptance tests</h1>
-<p class="muted">ÄÃ o táº¡o thá»±c chiáº¿n Ä‘á»ƒ triá»ƒn khai/kiá»ƒm soÃ¡t Build Sheet quáº£n trá»‹ M365 theo chuáº©n sáºµn sÃ ng Ä‘Ã¡nh giÃ¡. NguyÃªn táº¯c cá»©ng: <b>No evidence = No gate</b>.</p>
+<p class="muted">ÄÃ o táº¡o thá»±c chiáº¿n Ä‘á»ƒ triá»ƒn khai/kiá»ƒm soÃ¡t Build Sheet quáº£n trá»‹ M365 theo chuáº©n sáºµn sÃ ng Ä‘Ã¡nh giÃ¡. NguyÃªn táº¯c cá»©ng: <b>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))</b>.</p>
 <div class="tag blue">PhiÃªn báº£n</div>
 </div>
 <div class="note">
@@ -100,7 +100,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card" id="sec2">
 <h2>2) Má»¥c Ä‘Ã­ch module &amp; bá»‘i cáº£nh váº­n hÃ nh</h2>
-<p><b>Module tá»“n táº¡i Ä‘á»ƒ cháº·n 3 nhÃ³m rá»§i ro cháº¿t ngÆ°á»i:</b> (1) sai Rev/phiÃªn báº£n dáº«n tá»›i cháº¡y sai chÆ°Æ¡ng trÃ¬nh, dÃ¹ng sai báº£n váº½; (2) thiáº¿u/giáº£ báº±ng chá»©ng lÃ m audit fail; (3) má»Ÿ quyá»n sai dáº«n tá»›i lá»™ dá»¯ liá»‡u khÃ¡ch hÃ ng, xoÃ¡ record, bypass gate.</p>
+<p><b>Module tá»“n táº¡i Ä‘á»ƒ cháº·n 3 nhÃ³m rá»§i ro cháº¿t ngÆ°á»i:</b> (1) sai Rev/phiÃªn báº£n dáº«n tá»›i cháº¡y sai chÆ°Æ¡ng trÃ¬nh, dÃ¹ng sai báº£n váº½; (2) thiáº¿u/giáº£ báº±ng chá»©ng lÃ m đánh giá không đạt; (3) má»Ÿ quyá»n sai dáº«n tá»›i lá»™ dá»¯ liá»‡u khÃ¡ch hÃ ng, xoÃ¡ record, bypass gate.</p>
 <p><b>Gate/Handoff:</b> Build Sheet lÃ  <b>single source</b> cho má»i cáº¥u hÃ¬nh áº£nh hÆ°á»Ÿng QMS (SharePoint/Teams/Purview/Entra). IT cáº¥u hÃ¬nh theo Build Sheet; QA/QMS xÃ¡c nháº­n Ä‘áº¡t theo acceptance tests; Supervisor/Process Owner chá»‹u trÃ¡ch nhiá»‡m nghiá»‡p vá»¥ vÃ  quyáº¿t Ä‘á»‹nh HOLD/GO theo báº±ng chá»©ng.</p>
 <h3>TrÃ¡ch nhiá»‡m theo role (Ã¡p dá»¥ng riÃªng + tiÃªu chÃ­ Ä‘áº¡t khÃ¡c nhau)</h3>
 <table class="form-table">
@@ -108,29 +108,29 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Operator</b></td><td>DÃ¹ng Ä‘Ãºng báº£n Released; táº¡o báº±ng chá»©ng táº¡i Ä‘iá»ƒm dÃ¹ng (kiosk/line); pháº£n á»©ng 60 giÃ¢y khi phÃ¡t hiá»‡n sai Rev/mix-up</td><td>Thá»±c hiá»‡n Ä‘Ãºng 5 bÆ°á»›c kiá»ƒm tra Rev trÆ°á»›c thao tÃ¡c + ghi MRR 01 case HOLD</td></tr>
 <tr><td><b>Setup</b></td><td>Äá»‘i chiáº¿u Rev giá»¯a báº£n váº½â€“setup sheetâ€“program; khÃ³a thay Ä‘á»•i sau closeout; ná»™p báº±ng chá»©ng setup</td><td>HoÃ n táº¥t checklist step liÃªn quan setup + táº¡o Ä‘á»§ evidence theo naming rule</td></tr>
 <tr><td><b>Programmer</b></td><td>Quy táº¯c quáº£n lÃ½ chÆ°Æ¡ng trÃ¬nh CNC theo Released/Draft; traceable program output; cháº·n cháº¡y program chÆ°a Released</td><td>Thiáº¿t láº­p 01 case â€œReleased vs Draftâ€ Ä‘áº¡t acceptance test TC-01</td></tr>
-<tr><td><b>QC</b></td><td>Kiá»ƒm tra record integrity; truy xuáº¥t há»“ sÆ¡ â‰¤3 phÃºt; phÃ¡t hiá»‡n thiáº¿u packet thÃ¬ BLOCK Ship</td><td>Cháº¡y 01 scenario â€œShip packet thiáº¿u IRâ€ vÃ  ra quyáº¿t Ä‘á»‹nh BLOCK + ghi MRR</td></tr>
+<tr><td><b>QC</b></td><td>Kiá»ƒm tra record integrity; truy xuáº¥t há»“ sÆ¡ â‰¤3 phÃºt; phÃ¡t hiá»‡n thiáº¿u packet thÃ¬ BLOCK Ship</td><td>Cháº¡y 01 scenario â€œbộ hồ sơ giao hàng (ship packet) thiáº¿u IRâ€ vÃ  ra quyáº¿t Ä‘á»‹nh BLOCK + ghi MRR</td></tr>
 <tr><td><b>QA</b></td><td>Äá»‹nh nghÄ©a Ä‘áº¡t/khÃ´ng Ä‘áº¡t; cháº¡y acceptance tests; kÃ½ sign-off go-live; quáº£n trá»‹ evidence pack</td><td>KÃ½ Ä‘Ãºng 01 bá»™ káº¿t quáº£ UAT/Acceptance + phÃ¡t hÃ nh audit pack</td></tr>
-<tr><td><b>Warehouse</b></td><td>Ship Release Validator; kiá»ƒm tra packet; kiá»ƒm soÃ¡t nhÃ£n/traceability; block ship risk</td><td>Chá»©ng minh 0 láº§n ship thiáº¿u packet trong bÃ i test + lÆ°u evidence</td></tr>
+<tr><td><b>Warehouse</b></td><td>phê duyệt giao hàng (ship release) Validator; kiá»ƒm tra packet; kiá»ƒm soÃ¡t nhÃ£n/traceability; block ship risk</td><td>Chá»©ng minh 0 láº§n ship thiáº¿u packet trong bÃ i test + lÆ°u evidence</td></tr>
 <tr><td><b>Purchasing</b></td><td>Kiá»ƒm soÃ¡t tÃ i liá»‡u nhÃ  cung cáº¥p; Ä‘iá»u kiá»‡n Ä‘áº·c biá»‡t (special process); lÆ°u chá»©ng tá»« Ä‘Ãºng nÆ¡i</td><td>Gáº¯n Ä‘Ãºng yÃªu cáº§u chá»©ng tá»« vÃ o planning packet + lÆ°u Ä‘Ãºng path</td></tr>
 <tr><td><b>Planner</b></td><td>Khá»Ÿi táº¡o Job Dossier Ä‘Ãºng template; kiá»ƒm soÃ¡t mix-up; kÃ­ch hoáº¡t hold Ä‘Ãºng Ä‘iá»ƒm cháº·n</td><td>Táº¡o 01 Job Dossier máº«u Ä‘Ãºng cáº¥u trÃºc + táº¡o MRR closeout</td></tr>
 <tr><td><b>Maintenance</b></td><td>LÆ°u/calibration record; cháº·n sá»­ dá»¥ng gage OOT; liÃªn káº¿t OOT vá»›i hold</td><td>Cháº¡y pháº£n á»©ng 60 giÃ¢y cho case gage OOT + ghi MRR</td></tr>
 <tr><td><b>EHS</b></td><td>LÆ°u há»“ sÆ¡ an toÃ n liÃªn quan thay Ä‘á»•i layout/kiosk/thiáº¿t bá»‹; cháº·n bypass PPE/LOTO</td><td>Kiá»ƒm tra evidence EHS trong change package + kÃ½ xÃ¡c nháº­n</td></tr>
 <tr><td><b>Estimator (SAL-03)</b></td><td>ÄÆ°a Ä‘iá»u khoáº£n contract vá» retention/confidential; xÃ¡c nháº­n external sharing scope</td><td>XÃ¡c nháº­n Ä‘Ãºng 01 retention tier + guardrail external theo há»£p Ä‘á»“ng</td></tr>
-<tr><td><b>Supervisor</b></td><td>Quyáº¿t Ä‘á»‹nh HOLD/GO; cÆ°á»¡ng cháº¿ â€œNo evidence = No gateâ€; phÃ¢n cÃ´ng OJT</td><td>Thá»±c hiá»‡n review 01 change package vÃ  ra quyáº¿t Ä‘á»‹nh dá»±a trÃªn evidence</td></tr>
+<tr><td><b>Supervisor</b></td><td>Quyáº¿t Ä‘á»‹nh HOLD/GO; cÆ°á»¡ng cháº¿ â€œkhông có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))â€; phÃ¢n cÃ´ng OJT</td><td>Thá»±c hiá»‡n review 01 change package vÃ  ra quyáº¿t Ä‘á»‹nh dá»±a trÃªn evidence</td></tr>
 </table>
 <div class="note">
 <strong>LiÃªn káº¿t HESEM ná»™i bá»™</strong>
 <ul>
-<li>SOP-QMS-011 (Data Governance), SOP-QMS-012 (M365 Audit-Ready Configuration), SOP-QMS-012 (Admin Handoff Build Sheet)</li>
+<li>SOP-QMS-011 (Data Governance), SOP-QMS-012 (M365 sẵn sàng cho audit Configuration), SOP-QMS-012 (Admin Handoff Build Sheet)</li>
 <li>ANNEX-QMS-013 (Go-live Runbook, Testing, Cutover Plan)</li>
-<li>FRM-QMS-014 (Unified Access &amp; Data Matrix â€” Access + EDAM), FRM-QMS-015 (Access DCR record), FRM-QMS-015 (M365 Configuration Checklist), FRM-QMS-016 (Quarterly Access Review Evidence Pack)</li>
+<li>FRM-QMS-014 (Unified Access &amp; Data Matrix â€” Access + EDAM), FRM-QMS-015 (Access DCR record), FRM-QMS-015 (M365 Configuration Checklist), FRM-QMS-016 (Quarterly rà soát quyền truy cập (access review) Evidence Pack)</li>
 </ul>
 </div>
 </div>
 <div class="card" id="sec3">
 <h2>3) Vá»‹ trÃ­ trong chuá»—i E2E + luá»“ng handoff (input/output) + â€œÄ‘iá»ƒm cháº·nâ€</h2>
 <h3>3.1 Vá»‹ trÃ­ trong chuá»—i E2E</h3>
-<p>Module kÃ­ch hoáº¡t máº¡nh nháº¥t táº¡i cÃ¡c Ä‘oáº¡n: <b>Quote/Contract â†’ Planning â†’ Engineering</b> (Ä‘á»‹nh nghÄ©a yÃªu cáº§u, IA, retention, access) vÃ  kÃ©o xuyÃªn suá»‘t Ä‘áº¿n <b>Ship</b> (ship release packet). Module nÃ y táº¡o â€œháº¡ táº§ng báº±ng chá»©ngâ€ cho toÃ n chuá»—i.</p>
+<p>Module kÃ­ch hoáº¡t máº¡nh nháº¥t táº¡i cÃ¡c Ä‘oáº¡n: <b>Quote/Contract â†’ Planning â†’ Engineering</b> (Ä‘á»‹nh nghÄ©a yÃªu cáº§u, IA, retention, access) vÃ  kÃ©o xuyÃªn suá»‘t Ä‘áº¿n <b>Ship</b> (phê duyệt giao hàng (ship release) packet). Module nÃ y táº¡o â€œháº¡ táº§ng báº±ng chá»©ngâ€ cho toÃ n chuá»—i.</p>
 <p><b>Äiá»ƒm cháº·n chÃ­nh:</b> KhÃ´ng GO-LIVE cáº¥u hÃ¬nh; khÃ´ng phÃ¡t hÃ nh Released template; khÃ´ng ship; khÃ´ng má»Ÿ external sharing khi thiáº¿u Build Sheet validated + evidence pack.</p>
 <h3>3.2 Luá»“ng handoff báº¯t buá»™c (Input â†’ Output)</h3>
 <table class="form-table">
@@ -182,9 +182,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" id="sec4">
 <h2>4) Failure Points (tá»‘i thiá»ƒu 10 Ä‘iá»ƒm gÃ£y thá»±c táº¿)</h2>
 <ol>
-<li>Setting ID khÃ´ng duy nháº¥t â†’ evidence khÃ´ng trace Ä‘Æ°á»£c â†’ audit fail.</li>
+<li>Setting ID khÃ´ng duy nháº¥t â†’ evidence khÃ´ng trace Ä‘Æ°á»£c â†’ đánh giá không đạt.</li>
 <li>Build Sheet thiáº¿u Acceptance Test â†’ QA khÃ´ng cÃ³ chuáº©n Ä‘áº¡t/khÃ´ng Ä‘áº¡t â†’ go-live cáº£m tÃ­nh.</li>
-<li>IT vá»«a cáº¥u hÃ¬nh vá»«a tá»± kÃ½ â€œÄ‘áº¡tâ€ â†’ vi pháº¡m SoD â†’ audit fail.</li>
+<li>IT vá»«a cáº¥u hÃ¬nh vá»«a tá»± kÃ½ â€œÄ‘áº¡tâ€ â†’ vi pháº¡m SoD â†’ đánh giá không đạt.</li>
 <li>Evidence chá»¥p thiáº¿u ngá»¯ cáº£nh (khÃ´ng tháº¥y site/library/giÃ¡ trá»‹ setting) â†’ evidence vÃ´ hiá»‡u.</li>
 <li>Evidence bá»‹ cáº¯t/ghi chÃº Ä‘Ã¨ lÃªn báº£n gá»‘c â†’ máº¥t tÃ­nh toÃ n váº¹n record.</li>
 <li>Retention label gáº¯n sai scope â†’ record háº¿t háº¡n sá»›m hoáº·c khÃ´ng khoÃ¡ xoÃ¡ â†’ máº¥t há»“ sÆ¡.</li>
@@ -192,7 +192,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Permission â€œbreakâ€ theo tá»«ng file â†’ quyá»n rÆ¡i rá»›t, khÃ´ng review Ä‘Æ°á»£c â†’ lá»™/thiáº¿u quyá»n.</li>
 <li>User tháº¥y Draft vÃ  sá»­ dá»¥ng Draft thay Released â†’ sai Rev â†’ scrap/rework.</li>
 <li>Job closeout khÃ´ng khoÃ¡ read-only â†’ chá»‰nh sá»­a sau khi ship â†’ máº¥t traceability.</li>
-<li>Ship release khÃ´ng cháº·n packet thiáº¿u IR/COC/cal cert â†’ ship sai â†’ claim khÃ¡ch hÃ ng.</li>
+<li>phê duyệt giao hàng (ship release) khÃ´ng cháº·n packet thiáº¿u IR/COC/cal cert â†’ ship sai â†’ claim khÃ¡ch hÃ ng.</li>
 <li>KhÃ´ng cÃ³ snapshot memberships â†’ khÃ´ng chá»©ng minh kiá»ƒm soÃ¡t truy cáº­p táº¡i thá»i Ä‘iá»ƒm audit.</li>
 </ol>
 </div>
@@ -225,13 +225,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Fail test báº¥t ká»³ â†’ HOLD/ROLLBACK</td>
 </tr>
 <tr>
-<td>CP5 â€” Ship Release Validator cháº·n ship risk</td>
+<td>CP5 â€” phê duyệt giao hàng (ship release) Validator cháº·n ship risk</td>
 <td>Warehouse + QC</td>
 <td>Checklist ship packet + block log + notification</td>
 <td>Packet thiáº¿u â†’ BLOCK</td>
 </tr>
 <tr>
-<td>CP6 â€” Quarterly Access Review</td>
+<td>CP6 â€” Quarterly rà soát quyền truy cập (access review)</td>
 <td>QA/QMS + Process Owners</td>
 <td>FRM-QMS-016 + snapshot groups/memberships</td>
 <td>Thiáº¿u review ká»³ â†’ NCR</td>
@@ -249,7 +249,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>BLOCK GO-LIVE</b> khi thiáº¿u Build Sheet tráº¡ng thÃ¡i <b>Validated</b> hoáº·c thiáº¿u evidence gá»‘c cho báº¥t ká»³ Setting ID thuá»™c lá»›p Sharing/DLP/Retention/Access.</li>
 <li><b>HOLD JOB</b> khi phÃ¡t hiá»‡n sai Rev (báº£n váº½/program/setup sheet) hoáº·c user truy cáº­p Ä‘Æ°á»£c Draft trong luá»“ng sáº£n xuáº¥t.</li>
-<li><b>BLOCK SHIP</b> khi Ship packet thiáº¿u báº¥t ká»³ thÃ nh pháº§n báº¯t buá»™c (IR/COC/cal cert/special process cert/traceability label) hoáº·c khi há»‡ thá»‘ng bÃ¡o ship release validator fail.</li>
+<li><b>chặn giao hàng (chặn giao hàng (BLOCK SHIP))</b> khi bộ hồ sơ giao hàng (ship packet) thiáº¿u báº¥t ká»³ thÃ nh pháº§n báº¯t buá»™c (IR/COC/cal cert/special process cert/traceability label) hoáº·c khi há»‡ thá»‘ng bÃ¡o phê duyệt giao hàng (ship release) validator fail.</li>
 <li><b>STOP CHANGE</b> khi thay Ä‘á»•i external sharing vÆ°á»£t baseline hoáº·c khi DLP test TC-03 fail.</li>
 <li><b>ROLLBACK</b> khi smoke test end-to-end fail sau cutover (5 jobs + 3 packs theo ANNEX-QMS-013).</li>
 </ul>
@@ -272,7 +272,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Thiáº¿u báº±ng chá»©ng/evidence khÃ´ng truy xuáº¥t</td>
-<td>BLOCK gate; ghi â€œNo evidence = No gateâ€; má»Ÿ ticket truy xuáº¥t; khÃ´ng tiáº¿p tá»¥c bÆ°á»›c káº¿ tiáº¿p.</td>
+<td>BLOCK gate; ghi â€œkhông có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))â€; má»Ÿ ticket truy xuáº¥t; khÃ´ng tiáº¿p tá»¥c bÆ°á»›c káº¿ tiáº¿p.</td>
 <td>Báº¥t ká»³ role táº¡i gate</td>
 <td>01 ticket + ghi chÃº gate + áº£nh mÃ n hÃ¬nh lá»—i truy xuáº¥t</td>
 </tr>
@@ -290,7 +290,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Rá»§i ro ship sai/ship thiáº¿u packet</td>
-<td>BLOCK SHIP; giá»¯ hÃ ng táº¡i staging; thÃ´ng bÃ¡o Estimator (SAL-03) Ä‘á»ƒ cháº·n ETA; QC rÃ  láº¡i packet.</td>
+<td>chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP))); giá»¯ hÃ ng táº¡i staging; thÃ´ng bÃ¡o Estimator (SAL-03) Ä‘á»ƒ cháº·n ETA; QC rÃ  láº¡i packet.</td>
 <td>Warehouse + QC + Estimator (SAL-03)</td>
 <td>Ship block log + danh sÃ¡ch packet thiáº¿u</td>
 </tr>
@@ -307,13 +307,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>5</td><td>Thá»±c thi cáº¥u hÃ¬nh theo Build Sheet vÃ  chá»¥p evidence gá»‘c</td><td>IT</td><td>áº¢nh/export/log theo Evidence Type</td><td>Chá»¥p thiáº¿u ngá»¯ cáº£nh/thiáº¿u giÃ¡ trá»‹ setting</td></tr>
 <tr><td>6</td><td>LÆ°u evidence Ä‘Ãºng naming rule + Ä‘Ãºng kho</td><td>IT</td><td>YYYYQ#_SETTINGID_ShortName.ext + lÆ°u vÃ o QMS-Records</td><td>Äáº·t tÃªn tuá»³ tiá»‡n, lÆ°u sai thÆ° má»¥c</td></tr>
 <tr><td>7</td><td>Cháº¡y acceptance tests báº±ng user tháº­t (TC-01â€¦TC-05 + case theo ANNEX)</td><td>QA</td><td>Báº£ng káº¿t quáº£ test + áº£nh/log</td><td>Test báº±ng admin lÃ m sai káº¿t quáº£</td></tr>
-<tr><td>8</td><td>Ghi issue list vÃ  cÆ°á»¡ng cháº¿ HOLD/ROLLBACK khi fail</td><td>QA + Supervisor</td><td>Issue list + quyáº¿t Ä‘á»‹nh HOLD/ROLLBACK</td><td>Cho GO dÃ¹ fail test</td></tr>
+<tr><td>8</td><td>Ghi issue list vÃ  cÆ°á»¡ng cháº¿ HOLD/ROLLBACK khi không đạt</td><td>QA + Supervisor</td><td>Issue list + quyáº¿t Ä‘á»‹nh HOLD/ROLLBACK</td><td>Cho GO dÃ¹ fail test</td></tr>
 <tr><td>9</td><td>Chá»‘t Build Sheet final (Status=Validated) vÃ  kÃ½ sign-off</td><td>QA</td><td>Build Sheet final + chá»¯ kÃ½</td><td>Status chÆ°a Validated</td></tr>
-<tr><td>10</td><td>Láº­p cutover plan: freeze window, snapshot, smoke test, rollback</td><td>IT + Supervisor</td><td>ANNEX-QMS-013 báº£n kÃ½</td><td>KhÃ´ng cÃ³ snapshot trÆ°á»›c cutover</td></tr>
+<tr><td>10</td><td>Láº­p cutover plan: cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window)))), snapshot, smoke test, rollback</td><td>IT + Supervisor</td><td>ANNEX-QMS-013 báº£n kÃ½</td><td>KhÃ´ng cÃ³ snapshot trÆ°á»›c cutover</td></tr>
 <tr><td>11</td><td>Go-live + thÃ´ng bÃ¡o policy + Ä‘Ã o táº¡o Ä‘iá»ƒm dÃ¹ng (kiosk/line)</td><td>Supervisor + Process Owners</td><td>Go-live memo + training record</td><td>KhÃ´ng Ä‘Ã o táº¡o Ä‘iá»ƒm dÃ¹ng gÃ¢y bypass</td></tr>
 <tr><td>12</td><td>BÃ n giao package IT â†’ QA/IMS (snapshots quyá»n/retention/DLP, guests)</td><td>IT</td><td>Handover package + links evidence</td><td>Thiáº¿u snapshot memberships hoáº·c guests</td></tr>
-<tr><td>13</td><td>Ship Release Validator: cháº·n ship packet thiáº¿u</td><td>Warehouse + QC</td><td>Ship checklist + block log</td><td>Ship trÆ°á»›c khi packet Ä‘á»§</td></tr>
-<tr><td>14</td><td>Quarterly access review + lÆ°u FRM-QMS-016</td><td>QA + Process Owners</td><td>FRM-QMS-016 + snapshot</td><td>KhÃ´ng review Ä‘á»‹nh ká»³</td></tr>
+<tr><td>13</td><td>phê duyệt giao hàng (ship release) Validator: cháº·n bộ hồ sơ giao hàng (ship packet) thiáº¿u</td><td>Warehouse + QC</td><td>Ship checklist + block log</td><td>Ship trÆ°á»›c khi packet Ä‘á»§</td></tr>
+<tr><td>14</td><td>rà soát quyền truy cập hàng quý (rà soát quyền truy cập hàng quý (rà soát quyền truy cập hàng quý (quarterly access review))) + lÆ°u FRM-QMS-016</td><td>QA + Process Owners</td><td>FRM-QMS-016 + snapshot</td><td>KhÃ´ng review Ä‘á»‹nh ká»³</td></tr>
 </table>
 </div>
 <div class="card" id="sec9">
@@ -330,7 +330,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>2) KhÃ³a SoD</td>
 <td>NgÆ°á»i cáº¥u hÃ¬nh khÃ¡c ngÆ°á»i phÃª duyá»‡t; ghi RACI ngay trong package</td>
-<td>SoD fail â†’ audit fail; lá»—i ná»™i bá»™ khÃ³ truy</td>
+<td>SoD fail â†’ đánh giá không đạt; lá»—i ná»™i bá»™ khÃ³ truy</td>
 </tr>
 <tr>
 <td>3) Láº­p Build Sheet</td>
@@ -364,7 +364,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>01 bá»™ evidence gá»‘c cho 15 Setting ID, Ä‘Ãºng naming rule, Ä‘Ãºng kho lÆ°u.</li>
 <li>01 báº£ng káº¿t quáº£ acceptance tests (TC-01â€¦TC-05 + 02 test theo ANNEX-QMS-013).</li>
 <li>01 handover package IT â†’ QA/IMS: snapshot groups/memberships, site permissions, retention labels/policies, DLP policies, external guests.</li>
-<li>01 quyáº¿t Ä‘á»‹nh gate (HOLD hoáº·c GO) dá»±a trÃªn evidence; ghi rÃµ â€œNo evidence = No gateâ€.</li>
+<li>01 quyáº¿t Ä‘á»‹nh gate (HOLD hoáº·c GO) dá»±a trÃªn evidence; ghi rÃµ â€œkhông có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))â€.</li>
 </ul>
 <h3>9.3 Rubric L1â€“L4 (hÃ nh vi quan sÃ¡t Ä‘Æ°á»£c; Ä‘iá»u kiá»‡n lÃªn level; quyá»n háº¡n khi Ä‘áº¡t)</h3>
 <table class="form-table">
@@ -385,7 +385,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L3</b></td>
 <td>Cháº¡y acceptance tests Ä‘á»™c láº­p; phÃ¡t hiá»‡n fail vÃ  kÃ­ch hoáº¡t HOLD/BLOCK Ä‘Ãºng 60 giÃ¢y.</td>
 <td>Performance test PASS; táº¡o handover package Ä‘áº§y Ä‘á»§; truy xuáº¥t evidence â‰¤ 3 phÃºt.</td>
-<td>IT: Ä‘Æ°á»£c triá»ƒn khai theo Build Sheet trÃªn PROD khi cÃ³ sign-off QA. QA/QMS: Ä‘Æ°á»£c kÃ½ sign-off tá»«ng setting. Warehouse/QC: Ä‘Æ°á»£c BLOCK SHIP táº¡i gate.</td>
+<td>IT: Ä‘Æ°á»£c triá»ƒn khai theo Build Sheet trÃªn PROD khi cÃ³ sign-off QA. QA/QMS: Ä‘Æ°á»£c kÃ½ sign-off tá»«ng setting. Warehouse/QC: Ä‘Æ°á»£c chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP))) táº¡i gate.</td>
 </tr>
 <tr>
 <td><b>L4</b></td>
@@ -414,14 +414,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>(MC) Kho lÆ°u evidence IT theo SOP-QMS-012 lÃ  gÃ¬? A) Desktop B) Email C) QMS-Records/J_IT_Backup_and_Access_Evidence/YYYY/Q# D) USB</li>
 <li>(MC) Ai Ä‘á»‹nh nghÄ©a â€œÄ‘áº¡t/khÃ´ng Ä‘áº¡tâ€ cho cáº¥u hÃ¬nh áº£nh hÆ°á»Ÿng QMS? A) IT B) QA/QMS C) Operator D) Sales</li>
 <li>(MC) Acceptance test TC-01 â€œReleased vs Draftâ€ kiá»ƒm tra Ä‘iá»u gÃ¬? A) MÃ u file B) User tiÃªu chuáº©n chá»‰ tháº¥y Released, khÃ´ng publish major C) Tá»‘c Ä‘á»™ máº¡ng D) In áº¥n</li>
-<li>(MC) Acceptance test TC-03 kiá»ƒm tra gÃ¬? A) DLP cháº·n share external cho tÃ i liá»‡u nháº¡y cáº£m B) 5S C) Tool life D) Cycle time</li>
-<li>(MC) â€œNo evidence = No gateâ€ Ã¡p dá»¥ng trá»±c tiáº¿p táº¡i Ä‘Ã¢u? A) Khu Äƒn B) Gate GO-LIVE/SHIP/QC release C) Cháº¥m cÃ´ng D) Báº£o trÃ¬</li>
-<li>(MC) Khi fail acceptance test, hÃ nh Ä‘á»™ng báº¯t buá»™c lÃ  gÃ¬? A) GO luÃ´n B) HOLD/ROLLBACK C) Bá» qua D) Chá» ngÆ°á»i khÃ¡c</li>
+<li>(MC) Acceptance test TC-03 kiá»ƒm tra gÃ¬? A) DLP cháº·n share external cho tÃ i liá»‡u nháº¡y cáº£m B) 5S C) tuổi dao (tool life) D) Cycle time</li>
+<li>(MC) â€œkhông có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))â€ Ã¡p dá»¥ng trá»±c tiáº¿p táº¡i Ä‘Ã¢u? A) Khu Äƒn B) Gate GO-LIVE/SHIP/QC release C) Cháº¥m cÃ´ng D) Báº£o trÃ¬</li>
+<li>(MC) khi không đạt acceptance test, hÃ nh Ä‘á»™ng báº¯t buá»™c lÃ  gÃ¬? A) GO luÃ´n B) HOLD/ROLLBACK C) Bá» qua D) Chá» ngÆ°á»i khÃ¡c</li>
 <li>(MC) â€œBreak permission theo tá»«ng fileâ€ pháº£i cháº·n vÃ¬ lÃ½ do nÃ o? A) Tá»‘n mÃ u B) KhÃ´ng review Ä‘Æ°á»£c quyá»n, táº¡o quyá»n rÆ¡i rá»›t C) File náº·ng D) In cháº­m</li>
 <li>(MC) Snapshot groups/memberships dÃ¹ng Ä‘á»ƒ lÃ m gÃ¬? A) Trang trÃ­ B) Chá»©ng minh kiá»ƒm soÃ¡t truy cáº­p táº¡i thá»i Ä‘iá»ƒm audit C) TÄƒng dung lÆ°á»£ng D) Táº¡o emoji</li>
-<li>(MC) Ship Release Validator fail yÃªu cáº§u quyáº¿t Ä‘á»‹nh gÃ¬? A) GO ship B) BLOCK SHIP C) Chuyá»ƒn ca D) Chá» email</li>
+<li>(MC) phê duyệt giao hàng (ship release) Validator fail yÃªu cáº§u quyáº¿t Ä‘á»‹nh gÃ¬? A) GO ship B) chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP))) C) Chuyá»ƒn ca D) Chá» email</li>
 <li>(MC) Khi phÃ¡t hiá»‡n gage OOT, bÆ°á»›c 60 giÃ¢y gá»“m gÃ¬? A) DÃ¡n tháº» OOT + khÃ³a sá»­ dá»¥ng + HOLD lot liÃªn quan B) Tiáº¿p tá»¥c Ä‘o C) Vá»©t gage D) Chá» tuáº§n sau</li>
-<li>(MC) Cutover plan báº¯t buá»™c cÃ³ ná»™i dung nÃ o? A) Freeze window + snapshot + smoke test + rollback B) Poster C) Nháº¡c D) áº¢nh</li>
+<li>(MC) Cutover plan báº¯t buá»™c cÃ³ ná»™i dung nÃ o? A) cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window)))) + snapshot + smoke test + rollback B) Poster C) Nháº¡c D) áº¢nh</li>
 <li>(TÃ¬nh huá»‘ng) Khi Operator má»Ÿ Job Dossier vÃ  tháº¥y 2 file báº£n váº½ cÃ¹ng tÃªn khÃ¡c Rev, hÃ nh Ä‘á»™ng gate lÃ  gÃ¬?</li>
 <li>(TÃ¬nh huá»‘ng) Khi Warehouse chuáº©n bá»‹ ship vÃ  packet thiáº¿u IR, quyáº¿t Ä‘á»‹nh lÃ  gÃ¬ vÃ  MRR nÃ o pháº£i táº¡o?</li>
 <li>(TÃ¬nh huá»‘ng) Khi QA truy xuáº¥t evidence cho 1 Setting ID mÃ  khÃ´ng tÃ¬m tháº¥y file Ä‘Ãºng naming rule, hÃ nh Ä‘á»™ng lÃ  gÃ¬?</li>
@@ -438,11 +438,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div class="note">
-<strong>Scenario 2 â€” Ship packet thiáº¿u chá»©ng tá»«</strong>
+<strong>Scenario 2 â€” bộ hồ sơ giao hàng (ship packet) thiáº¿u chá»©ng tá»«</strong>
 <ul>
 <li><b>Dá»¯ kiá»‡n:</b> Packing P-2602-015; packet thiáº¿u IR; cÃ³ COC; cÃ³ nhÃ£n traceability; khÃ¡ch yÃªu cáº§u IR báº¯t buá»™c.</li>
 <li><b>YÃªu cáº§u:</b> Ra quyáº¿t Ä‘á»‹nh HOLD/GO; ghi MRR; thÃ´ng bÃ¡o Estimator (SAL-03) Ä‘á»ƒ cháº·n ETA.</li>
-<li><b>ÄÃ¡p Ã¡n Ä‘áº¡t:</b> BLOCK SHIP; táº¡o ship block log + yÃªu cáº§u QC bá»• sung IR; khÃ´ng xuáº¥t hÃ ng.</li>
+<li><b>ÄÃ¡p Ã¡n Ä‘áº¡t:</b> chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP))); táº¡o ship block log + yÃªu cáº§u QC bá»• sung IR; khÃ´ng xuáº¥t hÃ ng.</li>
 </ul>
 </div>
 <div class="note">
@@ -466,10 +466,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="card" id="sec11">
-<h2>11) PASS/FAIL criteria (nháº¥n máº¡nh â€œNo evidence = No gateâ€)</h2>
+<h2>11) PASS/FAIL criteria (nháº¥n máº¡nh â€œkhông có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))â€)</h2>
 <ul>
 <li><b>PASS</b> khi Ä‘áº¡t Ä‘á»“ng thá»i: Quiz â‰¥ 80%; OJT output Ä‘áº§y Ä‘á»§; Performance test PASS; khÃ´ng vi pháº¡m SoD; khÃ´ng cÃ³ bÆ°á»›c nÃ o thiáº¿u evidence.</li>
-<li><b>FAIL</b> khi xáº£y ra 1 trong cÃ¡c Ä‘iá»u kiá»‡n: thiáº¿u evidence cho báº¥t ká»³ Setting ID; dÃ¹ng sai Rev mÃ  khÃ´ng HOLD; fail TC-03 hoáº·c TC-01; ship packet thiáº¿u mÃ  váº«n GO; vi pháº¡m SoD.</li>
+<li><b>FAIL</b> khi xáº£y ra 1 trong cÃ¡c Ä‘iá»u kiá»‡n: thiáº¿u evidence cho báº¥t ká»³ Setting ID; dÃ¹ng sai Rev mÃ  khÃ´ng HOLD; fail TC-03 hoáº·c TC-01; bộ hồ sơ giao hàng (ship packet) thiáº¿u mÃ  váº«n GO; vi pháº¡m SoD.</li>
 <li><b>Quy táº¯c cÆ°á»¡ng cháº¿:</b> Thiáº¿u báº±ng chá»©ng â†’ <b>BLOCK</b> gate tÆ°Æ¡ng á»©ng (GO-LIVE/SHIP/QC release). KhÃ´ng cÃ³ ngoáº¡i lá»‡ váº­n hÃ nh.</li>
 </ul>
 </div>
@@ -484,7 +484,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Snapshot: groups + memberships + site permissions; danh sÃ¡ch retention labels/policies; danh sÃ¡ch DLP policies; danh sÃ¡ch external guests + expiry + má»¥c Ä‘Ã­ch.</li>
 <li>Go-live memo + cutover plan + rollback plan + hypercare plan.</li>
 <li>FRM-QMS-015 (Access DCR record) cho má»i thay Ä‘á»•i quyá»n.</li>
-<li>FRM-QMS-016 (Quarterly Access Review Evidence Pack) cho ká»³ review.</li>
+<li>FRM-QMS-016 (Quarterly rà soát quyền truy cập (access review) Evidence Pack) cho ká»³ review.</li>
 </ul>
 <h3>12.2 TÃªn chuáº©n &amp; quy táº¯c Ä‘áº·t tÃªn</h3>
 <ul>
@@ -508,9 +508,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Thiáº¿u SoD</b> â†’ RACI báº¯t buá»™c trong package; audit kiá»ƒm tra chá»¯ kÃ½ khÃ¡c ngÆ°á»i.</li>
 <li><b>Obsolete document dÃ¹ng táº¡i Ä‘iá»ƒm thao tÃ¡c</b> â†’ Point-of-use chá»‰ hiá»ƒn thá»‹ Released; banner cáº£nh bÃ¡o Draft.</li>
 <li><b>Record bá»‹ xoÃ¡/sá»­a sau closeout</b> â†’ TC-02 record integrity + cÆ¡ cháº¿ recover + log.</li>
-<li><b>External sharing vÆ°á»£t baseline</b> â†’ TC-03 DLP guardrail + STOP CHANGE khi fail.</li>
+<li><b>External sharing vÆ°á»£t baseline</b> â†’ TC-03 DLP guardrail + STOP CHANGE khi không đạt.</li>
 <li><b>Thiáº¿u snapshot quyá»n</b> â†’ Má»—i láº§n change pháº£i lÆ°u snapshot before/after vÃ  FRM-QMS-015.</li>
-<li><b>Ship packet thiáº¿u</b> â†’ Ship Release Validator + BLOCK SHIP vÃ  log Ä‘áº§y Ä‘á»§.</li>
+<li><b>bộ hồ sơ giao hàng (ship packet) thiáº¿u</b> â†’ phê duyệt giao hàng (ship release) Validator + chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP))) vÃ  log Ä‘áº§y Ä‘á»§.</li>
 <li><b>KhÃ´ng review quyá»n Ä‘á»‹nh ká»³</b> â†’ FRM-QMS-016 theo quÃ½; thiáº¿u review â†’ NCR.</li>
 <li><b>Acceptance tests cháº¡y báº±ng admin</b> â†’ Test suite báº¯t buá»™c cháº¡y báº±ng user tháº­t theo role.</li>
 </ol>
