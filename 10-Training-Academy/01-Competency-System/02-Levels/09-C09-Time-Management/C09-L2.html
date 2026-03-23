@@ -66,44 +66,44 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="doc-content" id="docContent">
 <h1>C09 — Quản lý thời gian – ưu tiên – đúng hạn — Level 2</h1>
-<p class="lead"><strong>Level 2 — Lập kế hoạch tuần/ngày &amp; chuẩn bị trước để giữ đúng hạn.</strong> Module này tạo thói quen đúng hạn và ưu tiên đúng để giữ OTD mà không phá cổng kiểm soát chất lượng (quality gate).</p>
+<p class="lead"><strong>Level 2 — Lập kế hoạch tuần/ngày &amp; chuẩn bị trước để giữ đúng hạn.</strong> Mô-đun này tạo thói quen đúng hạn và ưu tiên đúng để giữ OTD mà không phá cổng kiểm soát chất lượng (quality gate).</p>
 <div class="hero">
 <h2>Chuẩn thực chiến – Level 2</h2>
 <div class="meta">
 <div><strong>Vai trò mục tiêu</strong><br/>Operator senior, Setup leader, QC senior, Warehouse lead</div>
 <div><strong>Đầu ra bắt buộc</strong><ul><li>Tự lập kế hoạch tuần/ngày; ưu tiên theo ngày đến hạn và ảnh hưởng.</li><li>Chuẩn bị trước vật tư/dao/gá/chương trình/đồ đo để tránh chờ.</li><li>Giữ cam kết cá nhân: tỷ lệ đúng hạn cao và có log khi rủi ro trễ.</li></ul></div>
-<div><strong>Cổng kiểm soát (gate) trọng yếu</strong><br/><span class="badge bad">Bypass HOLD/REV/QC</span> = FAIL</div>
+<div><strong>Cổng kiểm soát (gate) trọng yếu</strong><br/><span class="badge bad">Vượt qua HOLD/REV/QC</span> = FAIL</div>
 <div><strong>Thời lượng</strong><br/>Lý thuyết 60 phút • Workshop 60 phút • OJT 240 phút</div>
 </div>
 <p class="small-note">Nguyên tắc vận hành: làm đúng việc trước (priority), làm đúng cách (cổng kiểm soát), và báo sớm (escal) khi bị chặn.</p>
 </div><div class="card">
-<span class="badge">Drill Pack (Job CNC)</span>
+<span class="badge">Bộ diễn tập (Job CNC)</span>
 <p class="lead" style="margin-top:10px;">
- Chạy drill trên job thật để luyện hành vi và tạo MRR.
- Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ Thực hiện diễn tập trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-daily-management-tier.html"><b>DRL-08</b> — Daily Management (Tier Meeting) Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Lệnh sản xuất E2E Drill (RFQ → Bộ hồ sơ giao hàng (ship packet))</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-daily-management-tier.html"><b>DRL-08</b> — Bài diễn tập Daily Management (Tier Meeting)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Bài diễn tập Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet))</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
  </p>
 </div>
-<h2>2) Mục đích module &amp; bối cảnh vận hành</h2>
+<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card">
 <ul>
 <li>Giữ cam kết giao hàng (OTD) bằng kỷ luật dispatch, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), tuổi tồn WIP (tuổi tồn (aging) / tuổi tồn), escal ladder.</li>
 <li>Chặn 2 nhóm rủi ro song song: (1) trễ đơn; (2) chạy nhanh nhưng phá cổng kiểm soát gây lỗi chất lượng.</li>
-<li>Biến quản lý thời gian thành hành vi quan sát được: bảng kiểm, OJT, performance test, PASS/FAIL.</li>
+<li>Biến quản lý thời gian thành hành vi quan sát được: bảng kiểm, OJT, performance test, ĐẠT/KHÔNG ĐẠT.</li>
 </ul>
 </div>
-<h2>3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + điểm chặn</h2>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <p>C09-L2 nằm tại Planning execution: chuẩn bị trước giúp giảm queue/wait tại Production/QC/WHS.</p>
 <div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Nhìn tuần</strong><p>Xem due list 7 ngày + tuổi tồn WIP (tuổi tồn / tuổi tồn); xác định P0/P1/P2.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Xây daily plan</strong><p>Chốt 3 job trọng tâm/ngày; giữ WIP limit.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Chuẩn bị trước</strong><p>Tool/material/program/fixture/kế hoạch kiểm tra (inspection plan) sẵn trước khi máy trống.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Chốt mức sẵn sàng</strong><p>Tất cả điều kiện pre-start đạt trước giờ vào máy.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Theo dõi cam kết</strong><p>Log rủi ro trễ và escal trước 24–48h.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Kết ca</strong><p>Review plan vs actual; cập nhật bài học và hành động.</p></div></div></div>
-<h2>4) Failure Points (tối thiểu 10 điểm gãy)</h2>
+<h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
 <ol><li>Chỉ lập kế hoạch theo trí nhớ; không có bảng kế hoạch tuần/ngày.</li><li>Không chuẩn bị trước, máy trống nhưng chờ dao/gá/vật tư.</li><li>Không quản trị WIP cá nhân, mở quá nhiều job.</li><li>Không log rủi ro trễ trước 24–48h; đến hạn mới báo.</li><li>Không phối hợp QC release; job xong nhưng chờ QC dài.</li><li>Không tách việc chuẩn bị và việc chạy; lẫn lộn làm trễ.</li><li>Không review plan vs actual; lỗi lặp lại không được chặn.</li><li>Đổi ưu tiên liên tục làm mất nhịp.</li><li>Không dùng bucket tuổi tồn WIP (tuổi tồn / tuổi tồn); không thấy sớm job RED/BLACK.</li><li>Không escal trước khi trễ; escal muộn làm mất cơ hội.</li></ol>
-<h2>5) Risk Controls (control points + người phụ trách + bằng chứng)</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Control point</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Weekly due list + daily plan</strong></td><td>Người phụ trách Cell</td><td>Bảng kế hoạch tuần/ngày</td><td>Không có plan = không điều phối được</td></tr><tr><td><strong>Mức sẵn sàng bảng kiểm trước khi máy trống</strong></td><td>Setup/Operator</td><td>Bảng kiểm mức sẵn sàng</td><td>Thiếu mức sẵn sàng = không start</td></tr><tr><td><strong>WIP limit cá nhân</strong></td><td>Supervisor</td><td>WIP board</td><td>Vượt WIP limit = dừng nhận job mới</td></tr><tr><td><strong>Escal sớm theo risk window 72h</strong></td><td>Người phụ trách Cell</td><td>Log escal</td><td>Risk trễ phải escal</td></tr><tr><td><strong>Bucket WIP tuổi tồn theo ANNEX-OPS-001</strong></td><td>Người phụ trách Cell</td><td>FRM-OPS-007</td><td>RED/BLACK phải hành động</td></tr><tr><td><strong>Review plan vs actual cuối ca</strong></td><td>Người phụ trách Cell</td><td>Biên bản review</td><td>Không review = lỗi lặp lại</td></tr></tbody></table></div>
+<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người phụ trách + bằng chứng)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Điểm kiểm soát</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Weekly due list + daily plan</strong></td><td>Người phụ trách Cell</td><td>Bảng kế hoạch tuần/ngày</td><td>Không có plan = không điều phối được</td></tr><tr><td><strong>Mức sẵn sàng bảng kiểm trước khi máy trống</strong></td><td>Setup/Operator</td><td>Bảng kiểm mức sẵn sàng</td><td>Thiếu mức sẵn sàng = không start</td></tr><tr><td><strong>WIP limit cá nhân</strong></td><td>Supervisor</td><td>WIP board</td><td>Vượt WIP limit = dừng nhận job mới</td></tr><tr><td><strong>Escal sớm theo risk window 72h</strong></td><td>Người phụ trách Cell</td><td>Log escal</td><td>Risk trễ phải escal</td></tr><tr><td><strong>Bucket WIP tuổi tồn theo ANNEX-OPS-001</strong></td><td>Người phụ trách Cell</td><td>FRM-OPS-007</td><td>RED/BLACK phải hành động</td></tr><tr><td><strong>Review plan vs actual cuối ca</strong></td><td>Người phụ trách Cell</td><td>Biên bản review</td><td>Không review = lỗi lặp lại</td></tr></tbody></table></div>
 <h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
 <div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Kế hoạch ngày không bám due list/dispatch.</strong></td><td>Dừng nhận job mới; lập lại plan theo due và priority.</td></tr><tr><td><span class="badge warn">HOLD</span></td><td><strong>Job chưa đạt mức sẵn sàng nhưng đã đưa vào máy.</strong></td><td>HOLD; trả về trạng thái chuẩn bị; log nguyên nhân.</td></tr><tr><td><span class="badge bad">BLOCK</span></td><td><strong>Risk trễ 72h nhưng không escal.</strong></td><td>Escal Level 1/2 theo ladder; gán quyết định và due.</td></tr></tbody></table></div>
 <h2>7) Phản ứng 60 giây</h2>
@@ -111,14 +111,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
 <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Repeat issue lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Mở due list 7 ngày và đánh dấu P0/P1/P2</strong></td><td>Người phụ trách Cell</td><td>Due list snapshot</td><td>Không nhìn tuần</td></tr><tr><td>2</td><td><strong>Chọn 3 job trọng tâm trong ngày</strong></td><td>Người phụ trách Cell</td><td>Daily plan</td><td>Chọn quá nhiều</td></tr><tr><td>3</td><td><strong>Kiểm mức sẵn sàng: vật tư/dao/gá/chương trình/đồ đo</strong></td><td>Setup/Operator</td><td>Mức sẵn sàng bảng kiểm</td><td>Đợi tới lúc máy trống mới chuẩn bị</td></tr><tr><td>4</td><td><strong>Chuẩn bị trước 1 job kế tiếp khi máy đang chạy</strong></td><td>Operator</td><td>To-do chuẩn bị</td><td>Lãng phí thời gian chết</td></tr><tr><td>5</td><td><strong>Kiểm bucket tuổi tồn WIP (tuổi tồn / tuổi tồn); hành động cho AMBER/RED/BLACK</strong></td><td>Người phụ trách Cell</td><td>FRM-OPS-007</td><td>Không action</td></tr><tr><td>6</td><td><strong>Log rủi ro trễ trước 24–48h</strong></td><td>Người phụ trách Cell</td><td>Escal log</td><td>Báo trễ muộn</td></tr><tr><td>7</td><td><strong>Review cuối ca: plan vs actual + 1 bài học</strong></td><td>Người phụ trách Cell</td><td>Biên bản review</td><td>Không review</td></tr><tr><td>8</td><td><strong>Đóng OJT và lưu hồ sơ</strong></td><td>Trainer</td><td>Hồ sơ đào tạo</td><td>Thiếu bằng chứng</td></tr></tbody></table></div>
 <h2>9) OJT thực chiến theo TWI</h2>
-<h3>Job breakdown (Step / Key Points / Reasons)</h3>
-<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Key Points</th><th>Reasons</th></tr></thead><tbody><tr><td>1</td><td>Plan tuần</td><td>Nhìn due 7 ngày; xác định job găng</td><td>Chặn bất ngờ</td></tr><tr><td>2</td><td>Plan ngày</td><td>Chọn 3 job trọng tâm</td><td>Giữ nhịp</td></tr><tr><td>3</td><td>Chuẩn bị trước</td><td>Mức sẵn sàng đủ trước giờ start</td><td>Giảm chờ</td></tr><tr><td>4</td><td>Theo dõi tuổi tồn WIP (tuổi tồn / tuổi tồn)</td><td>Bucket + action</td><td>Chặn trễ</td></tr><tr><td>5</td><td>Escal sớm</td><td>Risk window 72h</td><td>Mở khóa quyết định</td></tr></tbody></table></div>
-<h3>OJT output bắt buộc</h3>
+<h3>Job breakdown (Step / Điểm then chốt / Lý do)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Plan tuần</td><td>Nhìn due 7 ngày; xác định job găng</td><td>Chặn bất ngờ</td></tr><tr><td>2</td><td>Plan ngày</td><td>Chọn 3 job trọng tâm</td><td>Giữ nhịp</td></tr><tr><td>3</td><td>Chuẩn bị trước</td><td>Mức sẵn sàng đủ trước giờ start</td><td>Giảm chờ</td></tr><tr><td>4</td><td>Theo dõi tuổi tồn WIP (tuổi tồn / tuổi tồn)</td><td>Bucket + action</td><td>Chặn trễ</td></tr><tr><td>5</td><td>Escal sớm</td><td>Risk window 72h</td><td>Mở khóa quyết định</td></tr></tbody></table></div>
+<h3>OJT đầu ra bắt buộc</h3>
 <ul><li>01 kế hoạch tuần + 01 kế hoạch ngày có ưu tiên và thời điểm.</li><li>01 mức sẵn sàng bảng kiểm cho 2 job (hiện tại và kế tiếp).</li><li>01 log escal sớm (trước khi trễ) và closure.</li></ul>
 <h3>Rubric L1–L4 (hành vi quan sát được)</h3>
 <div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Kỷ luật trong ca</td><td>Theo dispatch; pre-start cổng kiểm soát; escal đúng</td></tr><tr><td><strong>L2</strong></td><td>Plan &amp; chuẩn bị trước</td><td>Plan tuần/ngày; mức sẵn sàng; WIP thấp; log risk sớm</td></tr><tr><td><strong>L3</strong></td><td>Điều phối nhóm</td><td>Quản trị bottleneck; WIP board; huấn luyện</td></tr><tr><td><strong>L4</strong></td><td>Thiết kế hệ thống OTD</td><td>Cadence; KPI; capacity; escalation</td></tr></tbody></table></div>
 <h2>10) Đánh giá</h2>
-<h3>Quiz (≥ 20 câu)</h3>
+<h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
 <div class="quiz"><ol><li>WIP limit giúp giảm loại lãng phí nào?</li><li>Kế hoạch tuần phải dựa trên dữ liệu nào?</li><li>Mức sẵn sàng bảng kiểm bắt buộc gồm những gì?</li><li>Risk window 72h dùng để kích hoạt hành động gì?</li><li>Bucket AMBER yêu cầu action trong bao lâu?</li><li>Vì sao chuẩn bị trước 1 job khi máy đang chạy làm OTD tăng?</li><li>Nêu 02 dấu hiệu plan ngày bị quá tải.</li><li>Khi job chờ QC quá 16 giờ làm việc, ai phải escal?</li><li>Nêu 03 ví dụ việc chuẩn bị trước cho CNC.</li><li>Vì sao review plan vs actual là cổng kiểm soát học tập?</li><li>Khi thiếu vật tư, hành động sớm phải làm là gì?</li><li>Khi outsource có rủi ro trễ, escal đi đâu?</li><li>Nêu 02 hậu quả khi đổi ưu tiên liên tục.</li><li>Giữ WIP thấp giúp giảm rủi ro nào?</li><li>Khi plan tuần đổi, cần cập nhật bằng chứng gì?</li><li>Ai chịu trách nhiệm chốt plan ngày?</li><li>Khi mức sẵn sàng thiếu chương trình NC, phải làm gì?</li><li>Khi job RED xuất hiện, hành động tối thiểu là gì?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate) áp dụng cho plan ra sao?</li><li>Nêu 02 cách để tránh chờ dao/gá.</li><li>Khi có 2 job cùng due, ưu tiên theo nguyên tắc nào?</li><li>Khi phát hiện plan ngày không đạt, bước sửa là gì?</li></ol></div>
 <h3>Scenario (≥ 3 tình huống thật)</h3>
 <details>
@@ -147,22 +147,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Bài test tay nghề — Lập plan tuần/ngày và giữ mức sẵn sàng</h3>
 <h4>Bài làm bắt buộc</h4>
 <ol><li>Lập plan tuần từ due list.</li><li>Lập plan ngày (3 job trọng tâm) với WIP limit.</li><li>Thực hiện mức sẵn sàng bảng kiểm cho 2 job.</li><li>Ghi 1 escal sớm cho risk trễ và closure.</li><li>Review plan vs actual cuối ca.</li></ol>
-<h4>PASS/FAIL</h4>
+<h4>ĐẠT/KHÔNG ĐẠT</h4>
 <ul><li>đạt khi: plan có bằng chứng; mức sẵn sàng đạt; escal sớm; review có hành động.</li><li>Không đạt khi: không plan; mức sẵn sàng thiếu; escal muộn; không review.</li></ul>
 </div>
-<h2>11) PASS/FAIL criteria</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT criteria</h2>
 <div class="kpi-gate">
-<strong>PASS/FAIL (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</strong>
+<strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</strong>
 <ul>
-<li>đạt khi hoàn thành OJT output và performance test đạt; tuân thủ dispatch/freeze/escal; có log và closure.</li>
-<li>FAIL ngay khi bypass cổng kiểm soát (REV/HOLD/QC), giấu blocker, không escal theo SLA, hoặc không có bằng chứng bàn giao.</li>
+<li>đạt khi hoàn thành OJT đầu ra và performance test đạt; tuân thủ dispatch/freeze/escal; có log và closure.</li>
+<li>FAIL ngay khi vượt qua cổng kiểm soát (REV/HOLD/QC), giấu blocker, không escal theo SLA, hoặc không có bằng chứng bàn giao.</li>
 </ul>
 </div>
 <h2>12) MRR tối thiểu (hồ sơ bắt buộc + naming + nơi lưu)</h2>
 <p><strong>Quy tắc đặt tên:</strong> <span class="mono">YYYYMMDD_<cell>_DAILYPLAN.xlsx + link SSOT.</cell></span></p>
 <ul><li>Due list 7 ngày (snapshot).</li><li>Daily plan + mức sẵn sàng bảng kiểm.</li><li>FRM-OPS-007 WIP tuổi tồn log + action.</li><li>Escal log theo PROC-OPS-003.</li><li>Hồ sơ OJT &amp; đánh giá.</li></ul>
 <div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → Job-Dossiers (dispatch note/bằng chứng) + controlled forms library.</div>
-<h2>13) Common đánh giá findings &amp; prevention</h2>
+<h2>13) Common đánh giá phát hiện &amp; phòng ngừa</h2>
 <ol><li>Không có plan tuần/ngày; ưu tiên theo cảm tính.</li><li>Mức sẵn sàng không được kiểm; chờ dài.</li><li>WIP cá nhân cao; nhiều job dở.</li><li>Risk trễ không escal sớm.</li><li>Bucket AMBER/RED/BLACK không có action.</li><li>Review cuối ca không thực hiện.</li><li>Đổi ưu tiên liên tục không log.</li><li>Thiếu bằng chứng cho plan và mức sẵn sàng.</li></ol>
 <h2>Tài liệu liên quan</h2>
 <ul>

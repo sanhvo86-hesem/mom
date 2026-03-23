@@ -65,7 +65,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="doc-content" id="docContent"><h1>C10 — Hiểu quy trình Lệnh sản xuất CNC (RFQ → Cash) — Level 4</h1>
-<p class="lead"><strong>Level 4 — Thiết kế hệ thống RFQ→Cash (Operating System) &amp; governance.</strong> Module này giúp nhân sự hiểu và vận hành chuỗi RFQ → Cash bằng “cổng kiểm soát (gate) + hồ sơ”, giữ đúng revision set và bàn giao không mất thông tin.</p>
+<p class="lead"><strong>Level 4 — Thiết kế hệ thống RFQ→Cash (Operating System) &amp; governance.</strong> Mô-đun này giúp nhân sự hiểu và vận hành chuỗi RFQ → Cash bằng “cổng kiểm soát (gate) + hồ sơ”, giữ đúng revision set và bàn giao không mất thông tin.</p>
 <div class="hero">
 <h2>Chuẩn thực chiến – Level 4</h2>
 <div class="meta">
@@ -80,27 +80,27 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <p class="small-note">Nguyên tắc vận hành: không nhảy cổng kiểm soát, không dùng file rời làm nguồn, không giao hàng khi thiếu bộ hồ sơ giao hàng (ship packet).</p>
 </div><div class="card">
-<span class="badge">Drill Pack (Job CNC)</span>
+<span class="badge">Bộ diễn tập (Job CNC)</span>
 <p class="lead" style="margin-top:10px;">
- Chạy drill trên job thật để luyện hành vi và tạo MRR.
- Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ Thực hiện diễn tập trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Lệnh sản xuất E2E Drill (RFQ → Bộ hồ sơ giao hàng)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Shipping Packet + CoC Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html"><b>DRL-02</b> — Revision &amp; SSOT Drill (Đánh giá 60 giây)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html"><b>DRL-11</b> — Customer Requirement → CTQ Translation Drill</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Bài diễn tập Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Bài diễn tập Shipping Packet + CoC</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html"><b>DRL-02</b> — Bài diễn tập Revision &amp; SSOT (Đánh giá 60 giây)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html"><b>DRL-11</b> — Bài diễn tập Customer Requirement → CTQ Translation</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
  </p>
 </div>
-<h2>2) Mục đích module &amp; bối cảnh vận hành</h2>
+<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card">
 <ul>
-<li>Đưa mọi người về cùng một “bản đồ công việc”: RFQ → Quote → Kickoff → ENG release → Execute → QC → Ship → Invoice.</li>
-<li>Chặn 3 rủi ro lớn của job shop CNC: <strong>sai phiên bản (wrong revision)</strong>, <strong>thiếu chứng từ</strong>, <strong>bàn giao mất thông tin</strong>.</li>
+<li>Đưa mọi người về cùng một “bản đồ công việc”: RFQ → Báo giá → Khởi động → ENG release → Execute → QC → Ship → Invoice.</li>
+<li>Chặn 3 rủi ro lớn của xưởng gia công theo đơn (job shop) CNC: <strong>sai phiên bản (wrong revision)</strong>, <strong>thiếu chứng từ</strong>, <strong>bàn giao mất thông tin</strong>.</li>
 <li>Biến hiểu biết thành hành động: bảng kiểm + OJT + performance test + MRR để vận hành QMS hàng ngày.</li>
 </ul>
 </div>
-<h2>3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + điểm chặn</h2>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <p>Chuỗi Lệnh sản xuất vận hành theo cổng kiểm soát G0–G5. Mỗi cổng kiểm soát có điều kiện vào/ra và hồ sơ tối thiểu (MRR). Khi thiếu MRR hoặc sai phiên bản (wrong revision) set: kích hoạt HOLD.</p>
 <div class="vflow">
 <div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Governance</strong><p>Định nghĩa chủ quá trình, RACI và ngưỡng phê duyệt.</p></div></div>
@@ -108,14 +108,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>KPI System</strong><p>Thiết kế KPI pack: OTD, thời gian dẫn (lead time), FPY, COPQ, AR days.</p></div></div>
 <div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Đánh giá System</strong><p>Thiết kế đánh giá plan: LPA, đánh giá nội bộ, customer đánh giá mức sẵn sàng.</p></div></div>
 <div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Supplier System</strong><p>Thiết kế supplier management và outsource control end-to-end.</p></div></div>
-<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Scaling</strong><p>Chuẩn hóa ma trận đào tạo (training matrix), hội nhập nhân sự mới (onboarding), coaching và năng lực 19×4.</p></div></div>
+<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Scaling</strong><p>Chuẩn hóa ma trận đào tạo (training matrix), hội nhập nhân sự mới (onboarding), kèm cặp phát triển (coaching) và năng lực 19×4.</p></div></div>
 </div>
-<h2>4) Failure Points (tối thiểu 10 điểm gãy)</h2>
+<h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
 <ol><li>Không có chủ quá trình; trách nhiệm mờ dẫn tới cổng kiểm soát bị bỏ qua.</li><li>Không cưỡng chế SSOT; tài liệu rải rác; dấu vết kiểm toán (đánh giá trail) không tồn tại.</li><li>KPI không có định nghĩa nguồn dữ liệu; tranh cãi số; quyết định sai.</li><li>Cổng kiểm soát không có entry/exit criteria; mỗi người hiểu một kiểu.</li><li>Không có đánh giá plan; phát hiện lỗi muộn qua claim khách.</li><li>Supplier change không qua kiểm soát; chất lượng dao động mạnh.</li><li>Training không bám job thực tế; người học không vận hành được hệ thống.</li><li>Hệ thống không có reaction plan khi KPI lệch; chỉ báo cáo mà không hành động.</li><li>ERP giao dịch không chuẩn; dữ liệu planning/finance lệch.</li><li>Không có bài học kinh nghiệm; lỗi lặp trở lại.</li></ol>
-<h2>5) Risk Controls (control points + người phụ trách + bằng chứng)</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Control point</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Cổng kiểm soát charter G0–G5</strong></td><td>Ops Manager</td><td>Cổng kiểm soát charter + MRR list</td><td>Cổng kiểm soát không charter = không triển khai</td></tr><tr><td><strong>SSOT &amp; document control</strong></td><td>QMS + IT</td><td>SOP-QMS-001/011/015 + access review</td><td>Không có SSOT = đánh giá không đạt</td></tr><tr><td><strong>KPI dictionary</strong></td><td>Ops/Finance/QMS</td><td>Chỉ số definition + data source</td><td>KPI không định nghĩa = không dùng</td></tr><tr><td><strong>Đánh giá plan</strong></td><td>QMS</td><td>SOP-QMS-004 + LPA schedule</td><td>Không đánh giá = không chứng minh hiệu lực</td></tr><tr><td><strong>Supplier governance</strong></td><td>PUR + QMS</td><td>SOP-QMS-010 + supplier scorecard</td><td>Supplier change phải qua kiểm soát thay đổi</td></tr><tr><td><strong>Training matrix &amp; mức sẵn sàng</strong></td><td>HR + Ops</td><td>Training matrix + OJT hồ sơ</td><td>Không có OJT bằng chứng = không cho làm độc lập</td></tr></tbody></table></div>
+<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người phụ trách + bằng chứng)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Điểm kiểm soát</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Cổng kiểm soát charter G0–G5</strong></td><td>Ops Manager</td><td>Cổng kiểm soát charter + MRR list</td><td>Cổng kiểm soát không charter = không triển khai</td></tr><tr><td><strong>SSOT &amp; document control</strong></td><td>QMS + IT</td><td>SOP-QMS-001/011/015 + access review</td><td>Không có SSOT = đánh giá không đạt</td></tr><tr><td><strong>KPI dictionary</strong></td><td>Ops/Finance/QMS</td><td>Chỉ số definition + data source</td><td>KPI không định nghĩa = không dùng</td></tr><tr><td><strong>Đánh giá plan</strong></td><td>QMS</td><td>SOP-QMS-004 + LPA schedule</td><td>Không đánh giá = không chứng minh hiệu lực</td></tr><tr><td><strong>Supplier governance</strong></td><td>PUR + QMS</td><td>SOP-QMS-010 + supplier thẻ điểm (scorecard)</td><td>Supplier change phải qua kiểm soát thay đổi</td></tr><tr><td><strong>Training matrix &amp; mức sẵn sàng</strong></td><td>HR + Ops</td><td>Training matrix + OJT hồ sơ</td><td>Không có OJT bằng chứng = không cho làm độc lập</td></tr></tbody></table></div>
 <h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Sai REV hoặc không xác định được revision set của job.</strong></td><td>Dừng thao tác; gắn HOLD; báo Supervisor + QA; mở Change Notice khi có thay đổi.</td></tr><tr><td><span class="badge warn">HOLD</span></td><td><strong>Thiếu MRR bắt buộc tại cổng kiểm soát (rà soát hợp đồng , kickoff, baseline, FAI, bộ hồ sơ giao hàng bộ hồ sơ giao hàng / rà soát hợp đồng).</strong></td><td>Không chuyển công đoạn/không ship; cập nhật log; escal theo PROC-OPS-003.</td></tr><tr><td><span class="badge bad">BLOCK</span></td><td><strong>Thay đổi program/setup/spec/đổi NCC mà không có hồ sơ hoặc không có phê duyệt.</strong></td><td>Khóa phát hành; thu hồi bản rời; mở change package; chạy verification; cập nhật SSOT.</td></tr></tbody></table></div>
+<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Sai REV hoặc không xác định được revision set của job.</strong></td><td>Dừng thao tác; gắn HOLD; báo Supervisor + QA; mở Change Notice khi có thay đổi.</td></tr><tr><td><span class="badge warn">HOLD</span></td><td><strong>Thiếu MRR bắt buộc tại cổng kiểm soát (rà soát hợp đồng , khởi động, baseline, FAI, bộ hồ sơ giao hàng bộ hồ sơ giao hàng / rà soát hợp đồng).</strong></td><td>Không chuyển công đoạn/không ship; cập nhật log; escal theo PROC-OPS-003.</td></tr><tr><td><span class="badge bad">BLOCK</span></td><td><strong>Thay đổi program/setup/spec/đổi NCC mà không có hồ sơ hoặc không có phê duyệt.</strong></td><td>Khóa phát hành; thu hồi bản rời; mở change package; chạy verification; cập nhật SSOT.</td></tr></tbody></table></div>
 <h2>7) Phản ứng 60 giây</h2>
 <ol>
 <li>Xác định loại rủi ro: sai phiên bản (wrong revision) / thiếu hồ sơ / sai bàn giao / change không kiểm soát.</li>
@@ -125,11 +125,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Mở 01 hành động có người phụ trách + due trong ngày và liên kết SSOT.</li>
 </ol>
 <h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
-<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Repeat issue lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Ban hành cổng kiểm soát charter G0–G5: entry/exit criteria, MRR, người phụ trách, reaction plan.</strong></td><td>chủ quá trình</td><td>Cổng kiểm soát charter</td><td>Cổng kiểm soát hiểu khác nhau</td></tr><tr><td>2</td><td><strong>Định nghĩa SSOT &amp; luồng phát hành: revision set, bộ hồ sơ chuẩn (baseline package), bộ hồ sơ giao hàng.</strong></td><td>QMS/IT</td><td>SOP + file plan</td><td>Tài liệu rải rác</td></tr><tr><td>3</td><td><strong>Thiết kế KPI dictionary và chốt nguồn dữ liệu (ERP/M365).</strong></td><td>Ops/Finance</td><td>Chỉ số dictionary</td><td>Tranh cãi số liệu</td></tr><tr><td>4</td><td><strong>Thiết kế cadence review: daily tier, weekly plan, monthly xem xét của lãnh đạo.</strong></td><td>Ops/GM</td><td>Cadence calendar</td><td>Không có nhịp điều hành</td></tr><tr><td>5</td><td><strong>Thiết kế đánh giá system: LPA + đánh giá nội bộ + customer đánh giá mức sẵn sàng.</strong></td><td>QMS</td><td>Đánh giá plan</td><td>đánh giá không đạt</td></tr><tr><td>6</td><td><strong>Thiết kế supplier governance cho outsource: scorecard + đánh giá + kiểm soát thay đổi.</strong></td><td>PUR/QMS</td><td>Supplier system pack</td><td>Supplier change uncontrolled</td></tr><tr><td>7</td><td><strong>Chuẩn hóa training 19×4, hội nhập nhân sự mới (onboarding), coaching; gắn với job thật.</strong></td><td>HR/Ops</td><td>Training matrix + OJT</td><td>Training không vận hành được</td></tr></tbody></table></div>
+<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Repeat issue lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Ban hành cổng kiểm soát charter G0–G5: entry/exit criteria, MRR, người phụ trách, reaction plan.</strong></td><td>chủ quá trình</td><td>Cổng kiểm soát charter</td><td>Cổng kiểm soát hiểu khác nhau</td></tr><tr><td>2</td><td><strong>Định nghĩa SSOT &amp; luồng phát hành: revision set, bộ hồ sơ chuẩn (baseline package), bộ hồ sơ giao hàng.</strong></td><td>QMS/IT</td><td>SOP + file plan</td><td>Tài liệu rải rác</td></tr><tr><td>3</td><td><strong>Thiết kế KPI dictionary và chốt nguồn dữ liệu (ERP/M365).</strong></td><td>Ops/Finance</td><td>Chỉ số dictionary</td><td>Tranh cãi số liệu</td></tr><tr><td>4</td><td><strong>Thiết kế cadence review: daily tier, weekly plan, monthly xem xét của lãnh đạo.</strong></td><td>Ops/GM</td><td>Cadence calendar</td><td>Không có nhịp điều hành</td></tr><tr><td>5</td><td><strong>Thiết kế đánh giá system: LPA + đánh giá nội bộ + customer đánh giá mức sẵn sàng.</strong></td><td>QMS</td><td>Đánh giá plan</td><td>đánh giá không đạt</td></tr><tr><td>6</td><td><strong>Thiết kế supplier governance cho outsource: thẻ điểm + đánh giá + kiểm soát thay đổi.</strong></td><td>PUR/QMS</td><td>Supplier system pack</td><td>Supplier change uncontrolled</td></tr><tr><td>7</td><td><strong>Chuẩn hóa training 19×4, hội nhập nhân sự mới (onboarding), kèm cặp phát triển; gắn với job thật.</strong></td><td>HR/Ops</td><td>Training matrix + OJT</td><td>Training không vận hành được</td></tr></tbody></table></div>
 <h2>9) OJT thực chiến theo TWI</h2>
-<h3>Job breakdown (Step / Key Points / Reasons)</h3>
-<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Key Points</th><th>Reasons</th></tr></thead><tbody><tr><td>1</td><td>Đọc job pack</td><td>Xác nhận JobNum/PartNo/REV và yêu cầu đặc biệt</td><td>Ngăn sai phiên bản (wrong revision) và bỏ sót CTQ</td></tr><tr><td>2</td><td>Nhận diện cổng kiểm soát</td><td>Xác định cổng kiểm soát hiện tại và điều kiện ra cổng kiểm soát</td><td>Không nhảy cổng kiểm soát</td></tr><tr><td>3</td><td>Chuẩn bị hồ sơ</td><td>Mở đúng form, điền đúng trường bắt buộc</td><td>sẵn sàng cho đánh giá</td></tr><tr><td>4</td><td>Thực thi &amp; ghi nhận</td><td>Ghi theo thời điểm phát sinh; lưu SSOT</td><td>Dữ liệu có giá trị</td></tr><tr><td>5</td><td>HOLD &amp; escal</td><td>Kích hoạt HOLD/STOP/BLOCK đúng rule</td><td>Chặn lỗi lan rộng</td></tr><tr><td>6</td><td>Bàn giao</td><td>Bàn giao bằng link SSOT + bảng kiểm + người nhận xác nhận</td><td>Không mất thông tin</td></tr></tbody></table></div>
-<h3>OJT output bắt buộc</h3>
+<h3>Job breakdown (Step / Điểm then chốt / Lý do)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Đọc job pack</td><td>Xác nhận JobNum/PartNo/REV và yêu cầu đặc biệt</td><td>Ngăn sai phiên bản (wrong revision) và bỏ sót CTQ</td></tr><tr><td>2</td><td>Nhận diện cổng kiểm soát</td><td>Xác định cổng kiểm soát hiện tại và điều kiện ra cổng kiểm soát</td><td>Không nhảy cổng kiểm soát</td></tr><tr><td>3</td><td>Chuẩn bị hồ sơ</td><td>Mở đúng form, điền đúng trường bắt buộc</td><td>sẵn sàng cho đánh giá</td></tr><tr><td>4</td><td>Thực thi &amp; ghi nhận</td><td>Ghi theo thời điểm phát sinh; lưu SSOT</td><td>Dữ liệu có giá trị</td></tr><tr><td>5</td><td>HOLD &amp; escal</td><td>Kích hoạt HOLD/STOP/BLOCK đúng rule</td><td>Chặn lỗi lan rộng</td></tr><tr><td>6</td><td>Bàn giao</td><td>Bàn giao bằng link SSOT + bảng kiểm + người nhận xác nhận</td><td>Không mất thông tin</td></tr></tbody></table></div>
+<h3>OJT đầu ra bắt buộc</h3>
 <ul>
 <li>01 trang “Job 5 dòng” (JobNum/PartNo/REV/CTQ/ngày đến hạn/công đoạn đặc biệt) lưu vào SSOT.</li>
 <li>01 bảng kiểm xác nhận cổng kiểm soát mức sẵn sàng (G0/G1/G2 theo phạm vi) và link SSOT.</li>
@@ -145,14 +145,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><strong>L4</strong></td><td>Thiết kế hệ thống RFQ→Cash</td><td>Cổng kiểm soát governance + KPI + đánh giá plan; enforcement SSOT/ERP</td></tr>
 </tbody></table></div>
 <h2>10) Đánh giá</h2>
-<h3>Quiz (≥ 20 câu)</h3>
-<div class="quiz"><ol><li>Cổng kiểm soát charter tối thiểu gồm những phần nào?</li><li>SSOT khác SoR và cách cưỡng chế SSOT trong tổ chức?</li><li>KPI dictionary cần chốt những trường nào để không tranh cãi số?</li><li>OTD đo theo cổng kiểm soát mang lại lợi ích gì?</li><li>COPQ gồm những thành phần nào trong CNC job shop?</li><li>AR days ảnh hưởng gì đến RFQ→Cash?</li><li>Đánh giá plan cần phủ những rủi ro nào trước customer đánh giá?</li><li>LPA khác đánh giá nội bộ ở mục tiêu gì?</li><li>Supplier governance cho outsource cần chỉ số nào?</li><li>Change supplier cần đi qua hệ thống nào?</li><li>ma trận đào tạo (training matrix) 19×4 gắn với cổng kiểm soát như thế nào?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate) được biến thành cưỡng chế bằng cách nào?</li><li>Khi KPI lệch mục tiêu, reaction plan chuẩn gồm gì?</li><li>Vai trò chủ quá trình trong RFQ→Cash là gì?</li><li>Cách thiết kế cadence review để không thành họp báo cáo.</li><li>Định nghĩa thời gian dẫn end-to-end trong job shop.</li><li>Cách kiểm soát revision set ở cấp hệ thống.</li><li>Cách đảm bảo bộ hồ sơ giao hàng luôn đầy đủ trước ship.</li><li>Cách quản trị bài học kinh nghiệm và cập nhật standard.</li><li>Khi scale lên 2x sản lượng, rủi ro hệ thống tăng ở đâu?</li><li>Điều kiện để phê duyệt thay đổi quy trình/cổng kiểm soát.</li><li>Bộ bằng chứng tối thiểu cho customer đánh giá về RFQ→Cash.</li></ol></div>
+<h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
+<div class="quiz"><ol><li>Cổng kiểm soát charter tối thiểu gồm những phần nào?</li><li>SSOT khác SoR và cách cưỡng chế SSOT trong tổ chức?</li><li>KPI dictionary cần chốt những trường nào để không tranh cãi số?</li><li>OTD đo theo cổng kiểm soát mang lại lợi ích gì?</li><li>COPQ gồm những thành phần nào trong CNC xưởng gia công theo đơn?</li><li>AR days ảnh hưởng gì đến RFQ→Cash?</li><li>Đánh giá plan cần phủ những rủi ro nào trước customer đánh giá?</li><li>LPA khác đánh giá nội bộ ở mục tiêu gì?</li><li>Supplier governance cho outsource cần chỉ số nào?</li><li>Change supplier cần đi qua hệ thống nào?</li><li>ma trận đào tạo (training matrix) 19×4 gắn với cổng kiểm soát như thế nào?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate) được biến thành cưỡng chế bằng cách nào?</li><li>Khi KPI lệch mục tiêu, reaction plan chuẩn gồm gì?</li><li>Vai trò chủ quá trình trong RFQ→Cash là gì?</li><li>Cách thiết kế cadence review để không thành họp báo cáo.</li><li>Định nghĩa thời gian dẫn end-to-end trong xưởng gia công theo đơn.</li><li>Cách kiểm soát revision set ở cấp hệ thống.</li><li>Cách đảm bảo bộ hồ sơ giao hàng luôn đầy đủ trước ship.</li><li>Cách quản trị bài học kinh nghiệm và cập nhật standard.</li><li>Khi scale lên 2x sản lượng, rủi ro hệ thống tăng ở đâu?</li><li>Điều kiện để phê duyệt thay đổi quy trình/cổng kiểm soát.</li><li>Bộ bằng chứng tối thiểu cho customer đánh giá về RFQ→Cash.</li></ol></div>
 <h3>Scenario (≥ 3 tình huống thật)</h3>
 <details>
 <summary>Khách hàng đánh giá đột xuất yêu cầu bộ bằng chứng (evidence pack) của 5 job trong 2 giờ</summary>
 <div class="grid">
 <div class="dl"><h4>Dữ kiện</h4><ul><li>Khách muốn xem RFQ→bộ hồ sơ giao hàng</li><li>Yêu cầu chứng minh revision control và traceability</li><li>5 job khác nhau, có outsource finishing</li></ul></div>
-<div class="dl"><h4>Yêu cầu</h4><p><strong>Thiết kế phản ứng và cấu trúc bộ bằng chứng.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Dùng SSOT Job-Dossiers để truy xuất theo JobNum trong 60 giây/job.</li><li>Cổng kiểm soát charter quy định MRR: rà soát hợp đồng, kickoff, baseline, FAI, final, CoC, bộ hồ sơ giao hàng.</li><li>Phân công người phụ trách theo RACI; ghi log đánh giá request và thời điểm cung cấp.</li><li>Sau đánh giá: ghi bài học kinh nghiệm và cập nhật training/standard.</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Thiết kế phản ứng và cấu trúc bộ bằng chứng.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Dùng SSOT Job-Dossiers để truy xuất theo JobNum trong 60 giây/job.</li><li>Cổng kiểm soát charter quy định MRR: rà soát hợp đồng, khởi động, baseline, FAI, final, CoC, bộ hồ sơ giao hàng.</li><li>Phân công người phụ trách theo RACI; ghi log đánh giá request và thời điểm cung cấp.</li><li>Sau đánh giá: ghi bài học kinh nghiệm và cập nhật training/standard.</li></ul></div>
 </div>
 </details>
 <details>
@@ -166,7 +166,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <summary>Scale lên gấp đôi sản lượng, outsource tăng mạnh</summary>
 <div class="grid">
 <div class="dl"><h4>Dữ kiện</h4><ul><li>Outsource finishing tăng 3x</li><li>Supplier thời gian dẫn dao động</li><li>Claim khách tăng</li></ul></div>
-<div class="dl"><h4>Yêu cầu</h4><p><strong>Thiết kế cải tiến hệ thống để giữ OTD và chất lượng.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Thiết kế supplier scorecard + đánh giá + approved list; chốt spec và cert requirement.</li><li>Thiết lập capacity review và mức sẵn sàng theo cổng kiểm soát; tăng QA capacity cho FAI/final.</li><li>Chuẩn hóa kitting và dispatch; cưỡng chế SSOT và naming rule.</li><li>Theo dõi KPI: outsource thời gian dẫn, NCR rate, escape rate và reaction plan.</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Thiết kế cải tiến hệ thống để giữ OTD và chất lượng.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Thiết kế supplier thẻ điểm + đánh giá + approved list; chốt spec và cert requirement.</li><li>Thiết lập capacity review và mức sẵn sàng theo cổng kiểm soát; tăng QA capacity cho FAI/final.</li><li>Chuẩn hóa kitting và dispatch; cưỡng chế SSOT và naming rule.</li><li>Theo dõi KPI: outsource thời gian dẫn, NCR rate, escape rate và reaction plan.</li></ul></div>
 </div>
 </details>
 <h3>Performance test</h3>
@@ -176,31 +176,31 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li>Viết 01 cổng kiểm soát charter cho G0 hoặc G2 gồm entry/exit criteria + MRR + reaction plan.</li><li>Thiết kế KPI dictionary tối thiểu 8 chỉ số (OTD, thời gian dẫn, FPY, NCR rate, tuổi tồn WIP (tuổi tồn / tuổi tồn), outsource thời gian dẫn, COPQ, AR days).</li><li>Thiết kế đánh giá plan 90 ngày: LPA + đánh giá nội bộ + bộ bằng chứng bảng kiểm.</li>
 </ol>
-<h4>PASS/FAIL</h4>
+<h4>ĐẠT/KHÔNG ĐẠT</h4>
 <ul>
 <li>đạt khi: cổng kiểm soát quyết định đúng; bằng chứng đủ; SSOT sạch; escal đúng SLA.</li>
-<li>Không đạt khi: bypass cổng kiểm soát; sai REV; giao hàng khi thiếu bộ hồ sơ giao hàng; change không hồ sơ.</li>
+<li>Không đạt khi: vượt qua cổng kiểm soát; sai REV; giao hàng khi thiếu bộ hồ sơ giao hàng; change không hồ sơ.</li>
 </ul>
 </div>
-<h2>11) PASS/FAIL criteria</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT criteria</h2>
 <div class="kpi-gate">
-<strong>PASS/FAIL (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</strong>
+<strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</strong>
 <ul>
-<li>đạt khi hoàn thành OJT output và performance test đạt; bằng chứng nằm SSOT và truy xuất ≤ 60 giây.</li>
-<li>FAIL ngay khi: bypass cổng kiểm soát; sai phiên bản (wrong revision); giao hàng khi thiếu bộ hồ sơ giao hàng; change không hồ sơ.</li>
+<li>đạt khi hoàn thành OJT đầu ra và performance test đạt; bằng chứng nằm SSOT và truy xuất ≤ 60 giây.</li>
+<li>FAIL ngay khi: vượt qua cổng kiểm soát; sai phiên bản (wrong revision); giao hàng khi thiếu bộ hồ sơ giao hàng; change không hồ sơ.</li>
 </ul>
 </div>
 <h2>12) MRR tối thiểu (hồ sơ bắt buộc + naming + nơi lưu)</h2>
 <p><strong>Quy tắc đặt tên:</strong> <span class="mono">JobNum_PartNo_REV_DocType_YYYYMMDD_##.ext (chỉ A–Z,0–9, '-', '_'; không dùng dấu cách).</span></p>
 <ul>
-<li>Cổng kiểm soát charter G0–G5 + RACI.</li><li>Chỉ số dictionary + data source map.</li><li>Cadence calendar + xem xét của lãnh đạo minutes.</li><li>Đánh giá plan + LPA bảng kiểm + đánh giá nội bộ reports.</li><li>Supplier system pack: scorecard + đánh giá + kiểm soát thay đổi hồ sơ.</li><li>ma trận đào tạo (training matrix) 19×4 + OJT bằng chứng packs.</li><li>Bộ bằng chứng bảng kiểm cho customer đánh giá.</li>
+<li>Cổng kiểm soát charter G0–G5 + RACI.</li><li>Chỉ số dictionary + data source map.</li><li>Cadence calendar + xem xét của lãnh đạo minutes.</li><li>Đánh giá plan + LPA bảng kiểm + đánh giá nội bộ reports.</li><li>Supplier system pack: thẻ điểm + đánh giá + kiểm soát thay đổi hồ sơ.</li><li>ma trận đào tạo (training matrix) 19×4 + OJT bằng chứng packs.</li><li>Bộ bằng chứng bảng kiểm cho customer đánh giá.</li>
 </ul>
 <div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → <span class="mono">Job-Dossiers</span>.</div>
-<h2>13) Common đánh giá findings &amp; prevention</h2>
+<h2>13) Common đánh giá phát hiện &amp; phòng ngừa</h2>
 <ol>
-<li>Thiếu bằng chứng cổng kiểm soát (rà soát hợp đồng /kickoff/baseline/FAI/final/bộ hồ sơ giao hàng bộ hồ sơ giao hàng / rà soát hợp đồng).</li>
+<li>Thiếu bằng chứng cổng kiểm soát (rà soát hợp đồng /khởi động/baseline/FAI/final/bộ hồ sơ giao hàng bộ hồ sơ giao hàng / rà soát hợp đồng).</li>
 <li>Revision set không được khóa; dùng file rời; tồn tại nhiều bản.</li>
-<li>Traveler/kế hoạch kiểm tra (inspection plan) không đồng bộ CTQ và điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (hold point)))))).</li>
+<li>Traveler/kế hoạch kiểm tra (inspection plan) không đồng bộ CTQ và điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (hold point)))))))))))))).</li>
 <li>Outsource finishing thiếu cert hoặc spec mismatch nhưng vẫn release.</li>
 <li>WIP status lệch hiện trường; dispatch sai ưu tiên.</li>
 <li>Escal log không có hoặc không đóng; rủi ro OTD không nhìn thấy.</li>

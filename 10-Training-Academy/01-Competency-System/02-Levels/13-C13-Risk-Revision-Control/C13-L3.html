@@ -65,14 +65,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="doc-content" id="docContent"><h1>C13 — Quản lý rủi ro &amp; kiểm soát thay đổi (Revision) — Level 3</h1>
-<p class="lead"><strong>Level 3 — Lead change board &amp; risk review liên phòng.</strong> Module này tạo kỷ luật rủi ro &amp; revision: phát hiện nhanh, ghi nhận đúng, phê duyệt đúng cấp, triển khai có verification và dấu vết kiểm toán (đánh giá trail).</p>
+<p class="lead"><strong>Level 3 — Lead change board &amp; risk review liên phòng.</strong> Mô-đun này tạo kỷ luật rủi ro &amp; revision: phát hiện nhanh, ghi nhận đúng, phê duyệt đúng cấp, triển khai có verification và dấu vết kiểm toán (đánh giá trail).</p>
 <div class="hero">
 <h2>Chuẩn thực chiến – Level 3</h2>
 <div class="meta">
 <div><strong>Vai trò mục tiêu</strong><br/>QA/QMS lead, Engineering lead, Planning lead, Ops supervisor, Estimator (SAL-03) lead</div>
 <div><strong>Đầu ra bắt buộc</strong>
 <ul>
-<li>Vận hành change board: triage → impact → approve → implement → verify → close.</li><li>Quản trị sổ đăng ký rủi ro (risk register) theo CTQ/OTD/cost, có người phụ trách và ngày đến hạn.</li><li>Giảm emergency change và tránh escape bằng verification plan và LPA.</li>
+<li>Vận hành change board: triage → impact → approve → implement → xác minh → close.</li><li>Quản trị sổ đăng ký rủi ro (risk register) theo CTQ/OTD/cost, có người phụ trách và ngày đến hạn.</li><li>Giảm emergency change và tránh escape bằng verification plan và LPA.</li>
 </ul>
 </div>
 <div><strong>Cổng kiểm soát (gate) trọng yếu</strong><br/><span class="badge bad">Emergency change / escape / supplier change uncontrolled</span> = HOLD/FAIL</div>
@@ -80,23 +80,23 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <p class="small-note">Nguyên tắc vận hành: change không hồ sơ = không thay đổi. Sai REV = dừng ngay tại điểm phát hiện.</p>
 </div><div class="card">
-<span class="badge">Drill Pack (Job CNC)</span>
+<span class="badge">Bộ diễn tập (Job CNC)</span>
 <p class="lead" style="margin-top:10px;">
- Chạy drill trên job thật để luyện hành vi và tạo MRR.
- Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ Thực hiện diễn tập trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cam-release-changecontrol.html"><b>DRL-05</b> — CAM Release Pack + Kiểm soát thay đổi Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html"><b>DRL-02</b> — Revision &amp; SSOT Drill (Đánh giá 60 giây)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-ncr-capa-response.html"><b>DRL-06</b> — NCR + CAPA Quick Response Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-material-cert-specialprocess.html"><b>DRL-03</b> — Material Cert &amp; Công đoạn đặc biệt Outsource Drill</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cam-release-changecontrol.html"><b>DRL-05</b> — Bài diễn tập CAM Release Pack + Kiểm soát thay đổi</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html"><b>DRL-02</b> — Bài diễn tập Revision &amp; SSOT (Đánh giá 60 giây)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-ncr-capa-response.html"><b>DRL-06</b> — Bài diễn tập NCR + CAPA Quick Response</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-material-cert-specialprocess.html"><b>DRL-03</b> — Bài diễn tập Material Cert &amp; Công đoạn đặc biệt Outsource</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
  </p>
 </div>
-<h2>2) Mục đích module &amp; bối cảnh vận hành</h2>
+<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card">
 <ul>
-<li>Chặn rủi ro số 1 của xưởng job shop: <strong>sai phiên bản (wrong revision)</strong> và <strong>change ngoài kiểm soát</strong>.</li>
-<li>Biến “rủi ro” thành hành động: trigger → hồ sơ → impact → approve → implement → verify → close.</li>
+<li>Chặn rủi ro số 1 của xưởng xưởng gia công theo đơn (job shop): <strong>sai phiên bản (wrong revision)</strong> và <strong>change ngoài kiểm soát</strong>.</li>
+<li>Biến “rủi ro” thành hành động: trigger → hồ sơ → impact → approve → implement → xác minh → close.</li>
 <li>Gắn kiểm soát thay đổi với vận hành RFQ→Cash: change phải cập nhật job pack và bộ hồ sơ giao hàng (ship packet).</li>
 </ul>
 </div>
@@ -106,13 +106,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Risk review</strong><p>Quản trị sổ đăng ký rủi ro theo job/nhóm job và ưu tiên theo rủi ro.</p></div></div>
 <div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Approval thresholds</strong><p>Thiết lập ngưỡng phê duyệt và SLA triển khai change.</p></div></div>
 <div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Verification governance</strong><p>Chuẩn hóa verification: test plan, sampling, acceptance.</p></div></div>
-<div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Supplier change</strong><p>Kiểm soát supplier change: đánh giá, scorecard, PPAP-lite.</p></div></div>
+<div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Supplier change</strong><p>Kiểm soát supplier change: đánh giá, thẻ điểm (scorecard), PPAP-lite.</p></div></div>
 <div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Prevent escape</strong><p>Giảm escape bằng LPA và bài học kinh nghiệm cập nhật standard.</p></div></div>
 </div>
-<h2>4) Failure Points (tối thiểu 10 điểm gãy)</h2>
-<ol><li>Change board không có cadence; change xử lý theo hứng.</li><li>Emergency change nhiều; làm tăng lỗi escape.</li><li>sổ đăng ký rủi ro không có người phụ trách/due; rủi ro treo.</li><li>Approval thresholds không rõ; đổi CTQ không qua đúng cấp.</li><li>Verification thiếu chuẩn; kết quả tranh cãi.</li><li>Supplier change không có scorecard/đánh giá; chất lượng dao động.</li><li>LPA không phủ điểm change; lỗi lặp.</li><li>Change thời gian dẫn (lead time) dài; ảnh hưởng OTD và cost.</li><li>Thông báo change không kiểm soát; người liên quan không biết.</li><li>Không đo escape rate; chỉ biết khi khách complain.</li></ol>
-<h2>5) Risk Controls (control points + người phụ trách + bằng chứng)</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Control point</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Change board cadence</strong></td><td>QMS/OPS</td><td>Change board minutes + action list</td><td>Không có minutes = không close change</td></tr><tr><td><strong>Sổ đăng ký rủi ro governance</strong></td><td>QMS</td><td>FRM-QMS-005 + người phụ trách/due</td><td>Risk không người phụ trách/due = escal</td></tr><tr><td><strong>Approval thresholds</strong></td><td>GM/QMS</td><td>RACI + threshold table</td><td>CTQ change phải đúng cấp</td></tr><tr><td><strong>Verification standard</strong></td><td>QA</td><td>Verification template + acceptance</td><td>Không verify = không release</td></tr><tr><td><strong>Supplier scorecard &amp; đánh giá</strong></td><td>PUR/QMS</td><td>Scorecard + đánh giá report</td><td>Supplier change phải đánh giá</td></tr><tr><td><strong>LPA focus on change points</strong></td><td>QA</td><td>PROC-QA-002 LPA log</td><td>LPA không có = escape tăng</td></tr><tr><td><strong>Chỉ số: change thời gian dẫn / escape rate</strong></td><td>QMS</td><td>Dashboard + reaction plan</td><td>KPI lệch = CAPA</td></tr></tbody></table></div>
+<h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
+<ol><li>Change board không có cadence; change xử lý theo hứng.</li><li>Emergency change nhiều; làm tăng lỗi escape.</li><li>sổ đăng ký rủi ro không có người phụ trách/due; rủi ro treo.</li><li>Approval thresholds không rõ; đổi CTQ không qua đúng cấp.</li><li>Verification thiếu chuẩn; kết quả tranh cãi.</li><li>Supplier change không có thẻ điểm/đánh giá; chất lượng dao động.</li><li>LPA không phủ điểm change; lỗi lặp.</li><li>Change thời gian dẫn (lead time) dài; ảnh hưởng OTD và cost.</li><li>Thông báo change không kiểm soát; người liên quan không biết.</li><li>Không đo escape rate; chỉ biết khi khách complain.</li></ol>
+<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người phụ trách + bằng chứng)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Điểm kiểm soát</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Change board cadence</strong></td><td>QMS/OPS</td><td>Change board minutes + action list</td><td>Không có minutes = không close change</td></tr><tr><td><strong>Sổ đăng ký rủi ro governance</strong></td><td>QMS</td><td>FRM-QMS-005 + người phụ trách/due</td><td>Risk không người phụ trách/due = escal</td></tr><tr><td><strong>Approval thresholds</strong></td><td>GM/QMS</td><td>RACI + threshold table</td><td>CTQ change phải đúng cấp</td></tr><tr><td><strong>Verification standard</strong></td><td>QA</td><td>Verification template + acceptance</td><td>Không xác minh = không release</td></tr><tr><td><strong>Supplier thẻ điểm &amp; đánh giá</strong></td><td>PUR/QMS</td><td>Thẻ điểm + đánh giá report</td><td>Supplier change phải đánh giá</td></tr><tr><td><strong>LPA focus on change points</strong></td><td>QA</td><td>PROC-QA-002 LPA log</td><td>LPA không có = escape tăng</td></tr><tr><td><strong>Chỉ số: change thời gian dẫn / escape rate</strong></td><td>QMS</td><td>Dashboard + reaction plan</td><td>KPI lệch = CAPA</td></tr></tbody></table></div>
 <h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
 <div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Sai REV hoặc phát hiện thay đổi chưa kiểm soát.</strong></td><td>Dừng thao tác; gắn HOLD; báo leader + QA/QMS; mở Change Notice.</td></tr><tr><td><span class="badge warn">HOLD</span></td><td><strong>Impact chưa đánh giá hoặc chưa có phê duyệt.</strong></td><td>Không thực thi change; không ship; tạo action và escal theo SLA.</td></tr><tr><td><span class="badge bad">BLOCK</span></td><td><strong>Chỉnh sửa tài liệu phát hành/đổi supplier/quy trình mà không qua luồng công việc.</strong></td><td>Khóa phát hành; thu hồi bản rời; mở major change package; đánh giá lại.</td></tr></tbody></table></div>
 <h2>7) Phản ứng 60 giây</h2>
@@ -123,13 +123,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Báo leader + QA/QMS (≤ 10 phút) và đặt người phụ trách/due cho hành động trong ngày.</li>
 </ol>
 <h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
-<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Repeat issue lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Thiết lập change board: lịch họp, thành phần, rule triage.</strong></td><td>QMS lead</td><td>Change board charter</td><td>Không có charter</td></tr><tr><td>2</td><td><strong>Chốt approval thresholds theo loại change (CTQ/quy trình/supplier/data).</strong></td><td>GM/QMS</td><td>Threshold table</td><td>Đổi CTQ sai cấp</td></tr><tr><td>3</td><td><strong>Đo change thời gian dẫn theo class và trigger escal khi vượt SLA.</strong></td><td>QMS</td><td>Dashboard</td><td>Change treo</td></tr><tr><td>4</td><td><strong>Quản trị sổ đăng ký rủi ro theo job/nhóm job; review hàng tuần.</strong></td><td>QMS/OPS</td><td>Risk review minutes</td><td>Risk treo</td></tr><tr><td>5</td><td><strong>Chuẩn hóa verification template và acceptance criteria.</strong></td><td>QA</td><td>Verification template</td><td>Verify tranh cãi</td></tr><tr><td>6</td><td><strong>Triển khai LPA tập trung điểm change: revision check, program release, bộ hồ sơ giao hàng.</strong></td><td>QA</td><td>LPA log</td><td>Escape tăng</td></tr><tr><td>7</td><td><strong>Đóng learning loop: change gây NCR/claim → CAPA → update standard/training.</strong></td><td>QMS</td><td>CAPA + update bằng chứng</td><td>Repeat issue</td></tr></tbody></table></div>
+<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Repeat issue lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Thiết lập change board: lịch họp, thành phần, rule triage.</strong></td><td>QMS lead</td><td>Change board charter</td><td>Không có charter</td></tr><tr><td>2</td><td><strong>Chốt approval thresholds theo loại change (CTQ/quy trình/supplier/data).</strong></td><td>GM/QMS</td><td>Threshold table</td><td>Đổi CTQ sai cấp</td></tr><tr><td>3</td><td><strong>Đo change thời gian dẫn theo class và trigger escal khi vượt SLA.</strong></td><td>QMS</td><td>Dashboard</td><td>Change treo</td></tr><tr><td>4</td><td><strong>Quản trị sổ đăng ký rủi ro theo job/nhóm job; review hàng tuần.</strong></td><td>QMS/OPS</td><td>Risk review minutes</td><td>Risk treo</td></tr><tr><td>5</td><td><strong>Chuẩn hóa verification template và acceptance criteria.</strong></td><td>QA</td><td>Verification template</td><td>Xác minh tranh cãi</td></tr><tr><td>6</td><td><strong>Triển khai LPA tập trung điểm change: revision check, phát hành chương trình (program release), bộ hồ sơ giao hàng.</strong></td><td>QA</td><td>LPA log</td><td>Escape tăng</td></tr><tr><td>7</td><td><strong>Đóng learning loop: change gây NCR/claim → CAPA → update standard/training.</strong></td><td>QMS</td><td>CAPA + update bằng chứng</td><td>Repeat issue</td></tr></tbody></table></div>
 <h2>9) OJT thực chiến theo TWI</h2>
-<h3>Job breakdown (Step / Key Points / Reasons)</h3>
-<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Key Points</th><th>Reasons</th></tr></thead><tbody><tr><td>1</td><td>Nhận diện trigger</td><td>Đọc dữ kiện và xác định loại change</td><td>Đặt đúng quy trình xử lý</td></tr><tr><td>2</td><td>Dừng &amp; giữ</td><td>HOLD tại điểm phát hiện</td><td>Chặn lỗi lan rộng</td></tr><tr><td>3</td><td>Mở hồ sơ</td><td>Tạo Change Notice + impact matrix</td><td>Có dấu vết kiểm toán (đánh giá trail)</td></tr><tr><td>4</td><td>Phê duyệt</td><td>Lấy đúng cấp phê duyệt</td><td>Tránh change ngoài kiểm soát</td></tr><tr><td>5</td><td>Triển khai</td><td>Cập nhật baseline + thu hồi bản cũ + thông báo</td><td>Không tồn tại 2 bản</td></tr><tr><td>6</td><td>Verify &amp; close</td><td>Verification + đóng hồ sơ + bài học kinh nghiệm</td><td>Ngăn lỗi lặp</td></tr></tbody></table></div>
-<h3>OJT output bắt buộc</h3>
+<h3>Job breakdown (Step / Điểm then chốt / Lý do)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Nhận diện trigger</td><td>Đọc dữ kiện và xác định loại change</td><td>Đặt đúng quy trình xử lý</td></tr><tr><td>2</td><td>Dừng &amp; giữ</td><td>HOLD tại điểm phát hiện</td><td>Chặn lỗi lan rộng</td></tr><tr><td>3</td><td>Mở hồ sơ</td><td>Tạo Change Notice + impact matrix</td><td>Có dấu vết kiểm toán (đánh giá trail)</td></tr><tr><td>4</td><td>Phê duyệt</td><td>Lấy đúng cấp phê duyệt</td><td>Tránh change ngoài kiểm soát</td></tr><tr><td>5</td><td>Triển khai</td><td>Cập nhật baseline + thu hồi bản cũ + thông báo</td><td>Không tồn tại 2 bản</td></tr><tr><td>6</td><td>Xác minh &amp; close</td><td>Verification + đóng hồ sơ + bài học kinh nghiệm</td><td>Ngăn lỗi lặp</td></tr></tbody></table></div>
+<h3>OJT đầu ra bắt buộc</h3>
 <ul>
-<li>01 change package đầy đủ (Change Notice + impact + approval + implement + verify + close).</li>
+<li>01 change package đầy đủ (Change Notice + impact + approval + implement + xác minh + close).</li>
 <li>01 bằng chứng thu hồi bản cũ tại hiện trường và chỉ còn 1 bản phát hành trong SSOT.</li>
 <li>01 communication log: ai nhận thông tin, ai đã được đào tạo lại.</li>
 </ul>
@@ -143,20 +143,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><strong>L4</strong></td><td>Thiết kế hệ thống risk &amp; change cấp công ty</td><td>Luồng công việc cưỡng chế; sẵn sàng đánh giá; KPI có reaction plan</td></tr>
 </tbody></table></div>
 <h2>10) Đánh giá</h2>
-<h3>Quiz (≥ 20 câu)</h3>
-<div class="quiz"><ol><li>Change board cần những vai trò nào và mục tiêu gì?</li><li>Approval thresholds phân theo tiêu chí nào?</li><li>Change thời gian dẫn tính từ điểm nào đến điểm nào?</li><li>Emergency change gây rủi ro gì cho QMS?</li><li>Escape rate là gì và đo bằng dữ liệu nào?</li><li>Verification standard phải có những trường nào?</li><li>Supplier scorecard tối thiểu gồm những chỉ số gì?</li><li>LPA tập trung điểm nào để giảm escape?</li><li>sổ đăng ký rủi ro governance cần rule gì?</li><li>Khi risk vượt ngưỡng, escal theo ladder nào?</li><li>CAPA liên kết change board như thế nào?</li><li>Làm sao giảm tồn tại 2 bản phát hành?</li><li>Tại sao minutes change board là bằng chứng bắt buộc?</li><li>Định nghĩa PPAP-lite trong outsource.</li><li>Khi supplier change, acceptance criteria là gì?</li><li>Khi verification fail, change board quyết định gì?</li><li>Cách thiết kế reaction plan cho KPI lệch.</li><li>Chỉ ra 3 nguyên nhân tạo emergency change.</li><li>Khi change ảnh hưởng bộ hồ sơ giao hàng, ai phải tham gia?</li><li>Cách quản trị training sau change.</li><li>Khi change thời gian dẫn dài, KPI nào bị ảnh hưởng?</li><li>Cách đo hiệu lực LPA.</li></ol></div>
+<h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
+<div class="quiz"><ol><li>Change board cần những vai trò nào và mục tiêu gì?</li><li>Approval thresholds phân theo tiêu chí nào?</li><li>Change thời gian dẫn tính từ điểm nào đến điểm nào?</li><li>Emergency change gây rủi ro gì cho QMS?</li><li>Escape rate là gì và đo bằng dữ liệu nào?</li><li>Verification standard phải có những trường nào?</li><li>Supplier thẻ điểm tối thiểu gồm những chỉ số gì?</li><li>LPA tập trung điểm nào để giảm escape?</li><li>sổ đăng ký rủi ro governance cần rule gì?</li><li>Khi risk vượt ngưỡng, escal theo ladder nào?</li><li>CAPA liên kết change board như thế nào?</li><li>Làm sao giảm tồn tại 2 bản phát hành?</li><li>Tại sao minutes change board là bằng chứng bắt buộc?</li><li>Định nghĩa PPAP-lite trong outsource.</li><li>Khi supplier change, acceptance criteria là gì?</li><li>Khi verification fail, change board quyết định gì?</li><li>Cách thiết kế reaction plan cho KPI lệch.</li><li>Chỉ ra 3 nguyên nhân tạo emergency change.</li><li>Khi change ảnh hưởng bộ hồ sơ giao hàng, ai phải tham gia?</li><li>Cách quản trị training sau change.</li><li>Khi change thời gian dẫn dài, KPI nào bị ảnh hưởng?</li><li>Cách đo hiệu lực LPA.</li></ol></div>
 <h3>Scenario (≥ 3 tình huống thật)</h3>
 <details>
 <summary>Tỷ lệ emergency change tăng mạnh trong tháng</summary>
 <div class="grid">
 <div class="dl"><h4>Dữ kiện</h4><ul><li>10 change/tháng, 6 change là emergency</li><li>Escape tăng, claim khách tăng</li><li>OPS nói do áp lực OTD</li></ul></div>
-<div class="dl"><h4>Yêu cầu</h4><p><strong>Hành động hệ thống và thay đổi governance.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Thiết lập thresholds và rule: emergency chỉ áp dụng khi có phê duyệt GM/QMS.</li><li>Phân tích nguyên nhân gốc của 6 emergency: thiếu input, thiếu mức sẵn sàng, thiếu planning.</li><li>Tăng LPA tại điểm release program/bộ hồ sơ giao hàng và training lại.</li><li>Đưa KPI emergency change vào dashboard và review hàng tuần.</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Hành động hệ thống và thay đổi governance.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Thiết lập thresholds và rule: emergency chỉ áp dụng khi có phê duyệt GM/QMS.</li><li>Phân tích nguyên nhân gốc của 6 emergency: thiếu đầu vào, thiếu mức sẵn sàng, thiếu planning.</li><li>Tăng LPA tại điểm release program/bộ hồ sơ giao hàng và training lại.</li><li>Đưa KPI emergency change vào dashboard và review hàng tuần.</li></ul></div>
 </div>
 </details>
 <details>
 <summary>Supplier đổi quy trình plating làm CTQ bề mặt fail</summary>
 <div class="grid">
-<div class="dl"><h4>Dữ kiện</h4><ul><li>2 job fail visual/roughness</li><li>Supplier nói đổi line plating</li><li>Khách yêu cầu báo cáo</li></ul></div>
+<div class="dl"><h4>Dữ kiện</h4><ul><li>2 job fail trực quan/roughness</li><li>Supplier nói đổi line plating</li><li>Khách yêu cầu báo cáo</li></ul></div>
 <div class="dl"><h4>Yêu cầu</h4><p><strong>Xử lý theo change board và supplier governance.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Containment: HOLD tất cả job dùng plating line mới; cô lập lot.</li><li>Supplier đánh giá nhanh; yêu cầu bằng chứng quy trình mới và corrective action.</li><li>Thiết lập verification plan tăng cường cho 3 job tiếp theo.</li><li>Change board quyết định: tạm dừng line / đổi NCC / PPAP-lite.</li></ul></div>
 </div>
 </details>
@@ -174,15 +174,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li>Thiết kế charter cho change board (triage, SLA, thresholds).</li><li>Chạy 01 phiên change board mô phỏng với 5 change khác nhau và tạo action list.</li><li>Thiết kế 01 dashboard: change thời gian dẫn + escape rate + top 5 root causes.</li>
 </ol>
-<h4>PASS/FAIL</h4>
+<h4>ĐẠT/KHÔNG ĐẠT</h4>
 <ul>
 <li>đạt khi: change package đầy đủ; không tồn tại 2 bản phát hành; verification có dữ liệu; training hồ sơ có.</li>
 <li>Không đạt khi: thực thi change trước phê duyệt; không có impact; không có verification; dùng sai REV.</li>
 </ul>
 </div>
-<h2>11) PASS/FAIL criteria</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT criteria</h2>
 <div class="kpi-gate">
-<strong>PASS/FAIL (No bằng chứng = No change)</strong>
+<strong>ĐẠT/KHÔNG ĐẠT (No bằng chứng = No change)</strong>
 <ul>
 <li>đạt khi: change package đầy đủ; chỉ 1 bản phát hành; verification có dữ liệu; training hồ sơ đủ; truy xuất ≤ 60 giây.</li>
 <li>FAIL ngay khi: thực thi change trước phê duyệt; dùng sai REV; không có impact/verification; không có dấu vết kiểm toán (đánh giá trail).</li>
@@ -191,10 +191,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>12) MRR tối thiểu (hồ sơ bắt buộc + naming + nơi lưu)</h2>
 <p><strong>Quy tắc đặt tên:</strong> <span class="mono">JobNum_or_System_REV_ChangeType_YYYYMMDD_##.ext (chỉ A–Z,0–9, '-', '_'; không dùng dấu cách).</span></p>
 <ul>
-<li>Change board charter + minutes + action list.</li><li>Threshold table (approval levels) theo class.</li><li>Dashboard: change thời gian dẫn, emergency rate, escape rate.</li><li>Sổ đăng ký rủi ro review minutes + escal log.</li><li>Supplier scorecard + đánh giá reports + PPAP-lite package.</li><li>Verification templates + acceptance hồ sơ.</li><li>LPA logs tập trung điểm change.</li><li>CAPA/bài học kinh nghiệm cập nhật standard/training.</li>
+<li>Change board charter + minutes + action list.</li><li>Threshold table (approval levels) theo class.</li><li>Dashboard: change thời gian dẫn, emergency rate, escape rate.</li><li>Sổ đăng ký rủi ro review minutes + escal log.</li><li>Supplier thẻ điểm + đánh giá reports + PPAP-lite package.</li><li>Verification templates + acceptance hồ sơ.</li><li>LPA logs tập trung điểm change.</li><li>CAPA/bài học kinh nghiệm cập nhật standard/training.</li>
 </ul>
 <div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → <span class="mono">QMS-Controlled-Documents</span> và <span class="mono">Job-Dossiers</span>.</div>
-<h2>13) Common đánh giá findings &amp; prevention</h2>
+<h2>13) Common đánh giá phát hiện &amp; phòng ngừa</h2>
 <ol>
 <li>Dùng sai REV tại hiện trường (bản in cũ, file rời).</li>
 <li>Change không có hồ sơ hoặc không có phê duyệt.</li>
@@ -206,7 +206,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>sổ đăng ký rủi ro treo, không người phụ trách/due.</li>
 </ol>
 <h2>Tài liệu liên quan</h2>
-<ul><li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//09-SOP-900//sop-901-internal-audit-and-lpa.html">SOP-QMS-004 — Đánh giá nội bộ</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-901-internal-audit-and-lpa.html">PROC-QA-002 — Layered Quy trình Đánh giá (LPA)</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//06-SOP-600//sop-606-ncr-capa-and-ipqc-reaction.html">SOP-QMS-006 — NC/CAPA</a></li><li><a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-405_Supplier_Scorecard.xlsx">ANNEX-PUR-001 — Supplier Risk Model &amp; Scorecard</a></li></ul></div></div></div>
+<ul><li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//09-SOP-900//sop-901-internal-audit-and-lpa.html">SOP-QMS-004 — Đánh giá nội bộ</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-901-internal-audit-and-lpa.html">PROC-QA-002 — Layered Quy trình Đánh giá (LPA)</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//06-SOP-600//sop-606-ncr-capa-and-ipqc-reaction.html">SOP-QMS-006 — NC/CAPA</a></li><li><a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-405_Supplier_Scorecard.xlsx">ANNEX-PUR-001 — Supplier Risk Model &amp; Thẻ điểm</a></li></ul></div></div></div>
 </div>
 <script src="../../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>

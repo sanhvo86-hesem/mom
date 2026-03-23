@@ -78,8 +78,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="badge"><span class="dot"></span>SYS-OPS-09</div>
 <h1 style="margin-top:10px">Tích hợp Epicor → M365: Quy tắc vận hành, bằng chứng và cổng kiểm soát (gate)</h1>
 <p class="lead">
- Module này chuẩn hoá cách dùng “bản sao dữ liệu” (Mirror) để vận hành tốc độ cao, giữ đúng Rev, giữ đúng cổng kiểm soát, giữ đúng đánh giá.
- Module áp dụng cho toàn bộ vai trò vận hành vì mọi quyết định giao tiếp/quality/ship đều dựa trên dữ liệu.
+ Mô-đun này chuẩn hoá cách dùng “bản sao dữ liệu” (Mirror) để vận hành tốc độ cao, giữ đúng Rev, giữ đúng cổng kiểm soát, giữ đúng đánh giá.
+ Mô-đun áp dụng cho toàn bộ vai trò vận hành vì mọi quyết định giao tiếp/quality/ship đều dựa trên dữ liệu.
  </p>
 <div class="callout warn">
 <h3>Nguyên tắc cứng (không thương lượng)</h3>
@@ -99,7 +99,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-018-epicor-transaction-and-interface-map.html">ANNEX-QMS-018</a></td><td>Nguyên tắc tích hợp, BAQ tối thiểu, mapping, logs</td></tr>
 <tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-006-power-automate-flows-and-approvals-spec.html">ANNEX-QMS-006</a></td><td>Delta + overlap, idempotent, retry, observability</td></tr>
 <tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-005-m365-lists-and-field-mapping.html">ANNEX-QMS-005</a></td><td>Danh mục list, khoá tự nhiên, URL bằng chứng</td></tr>
-<tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/">ANNEX-QMS-003</a></td><td>Hồ sơ công việc (job dossier), naming, retention tiers, đánh giá drill 60 giây</td></tr>
+<tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/">ANNEX-QMS-003</a></td><td>Hồ sơ công việc (job dossier), naming, retention tiers, đánh giá diễn tập 60 giây</td></tr>
 <tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/">ANNEX-QMS-007</a></td><td>SSCC/PackID và đối soát để chặn ship sai/thiếu</td></tr>
 <tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-qms-008-dashboard-kpi-dictionary-and-data-model.html">ANNEX-QMS-008</a></td><td>KPI + data model + Data Health</td></tr>
 </tbody>
@@ -114,14 +114,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Đối tượng:</b> Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor.</li>
 </ul>
 <div class="callout">
-<h3>Vai trò dùng module vào việc gì</h3>
+<h3>Vai trò dùng mô-đun vào việc gì</h3>
 <div class="table-wrap">
 <table class="tight">
 <thead><tr><th>Vai trò</th><th>Quyết định dựa trên dữ liệu</th><th>Dữ liệu/điểm chạm bắt buộc</th></tr></thead>
 <tbody>
 <tr><td>Operator / Setup</td><td>Chạy đúng Job/Rev/Op, dừng khi sai bằng chứng</td><td>JobIndex, JobOperIndex, Hồ sơ công việc (mở nhanh)</td></tr>
 <tr><td>Programmer</td><td>Phát hành chương trình đúng Rev, chống nhầm Rev</td><td>JobIndex.RevisionNum, Part/REV Master, Release hồ sơ</td></tr>
-<tr><td>QC / QA</td><td>Hold/NCR/CAPA, xác nhận PASS/FAIL, đóng hồ sơ</td><td>QCHoldLog, NCRLog, InspectionReports, ApprovalHistory</td></tr>
+<tr><td>QC / QA</td><td>Hold/NCR/CAPA, xác nhận ĐẠT/KHÔNG ĐẠT, đóng hồ sơ</td><td>QCHoldLog, NCRLog, InspectionReports, ApprovalHistory</td></tr>
 <tr><td>Warehouse</td><td>Đóng gói, in SSCC, cổng kiểm soát phê duyệt giao hàng</td><td>PackSSCCRegister, PackagingChecks, ShipRelease, ShipmentMirror</td></tr>
 <tr><td>Planner</td><td>Ưu tiên WIP, OTD, giải phóng nghẽn</td><td>JobIndex.DueDate/Status, KPI dashboards</td></tr>
 <tr><td>Purchasing</td><td>Outsource/certs, tránh thiếu chứng từ</td><td>OutsourceMirror, Hồ sơ công việc (certs)</td></tr>
@@ -185,26 +185,26 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>#</th><th>Điểm thất bại</th><th>Tín hiệu nhận biết</th><th>Hậu quả</th><th>Hành động chặn</th><th>Bằng chứng (MRR)</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Mirror trễ (stale)</td><td>JobIndex.EpicorLastSync quá hạn [SLA]</td><td>Quyết định dựa dữ liệu cũ</td><td>DỪNG dùng mirror cho cổng kiểm soát; mở Epicor kiểm tra; tạo StandupAction S1</td><td>Ảnh màn hình Epicor + log StandupAction</td></tr>
-<tr><td>2</td><td>Bỏ paging nextLink</td><td>Counts lệch giữa Epicor và JobIndex</td><td>Thiếu job/operation</td><td>Chặn cutover; chạy lại flow; ghi IntegrationLogs Warning/Failed</td><td>IntegrationLogs + số liệu đối soát</td></tr>
+<tr><td>2</td><td>Bỏ paging nextLink</td><td>Counts lệch giữa Epicor và JobIndex</td><td>Thiếu job/operation</td><td>Chặn cutover; chạy lại luồng; ghi IntegrationLogs Warning/Failed</td><td>IntegrationLogs + số liệu đối soát</td></tr>
 <tr><td>3</td><td>Khoá tự nhiên sai</td><td>Trùng EpicorKey hoặc JobNum nhiều dòng</td><td>Dashboard sai, cổng kiểm soát sai</td><td>Khoá lại theo schema; dọn trùng có đánh giá</td><td>Báo cáo Data Health (duplicates)</td></tr>
-<tr><td>4</td><td>Đẩy watermark khi lỗi</td><td>IntegrationLogs Failed nhưng IntegrationSettings cập nhật</td><td>Mất hồ sơ vĩnh viễn</td><td>Khoá quyền cập nhật IntegrationSettings; điều tra flow</td><td>IntegrationSettings history + IntegrationLogs</td></tr>
+<tr><td>4</td><td>Đẩy watermark khi lỗi</td><td>IntegrationLogs Failed nhưng IntegrationSettings cập nhật</td><td>Mất hồ sơ vĩnh viễn</td><td>Khoá quyền cập nhật IntegrationSettings; điều tra luồng</td><td>IntegrationSettings history + IntegrationLogs</td></tr>
 <tr><td>5</td><td>Sai timezone/format ngày</td><td>DueDate lệch 1 ngày</td><td>Planner sai ưu tiên</td><td>Chuẩn hoá UTC → local; typed columns trong Power Query</td><td>Screenshot mapping + dataset refresh log</td></tr>
-<tr><td>6</td><td>Thiếu EvidenceFolderUrl</td><td>JobIndex.EvidenceFolderUrl rỗng</td><td>Đánh giá drill fail, thiếu bằng chứng</td><td>Chạy lại tạo Hồ sơ công việc (idempotent); khóa cổng kiểm soát liên quan</td><td>Link folder + cấu trúc folder đúng</td></tr>
+<tr><td>6</td><td>Thiếu EvidenceFolderUrl</td><td>JobIndex.EvidenceFolderUrl rỗng</td><td>Đánh giá diễn tập fail, thiếu bằng chứng</td><td>Chạy lại tạo Hồ sơ công việc (idempotent); khóa cổng kiểm soát liên quan</td><td>Link folder + cấu trúc folder đúng</td></tr>
 <tr><td>7</td><td>Nhầm Rev giữa Job và Part/REV Master</td><td>JobIndex.RevisionNum khác folder REV</td><td>Chạy sai chương trình/drawing</td><td>Hold ngay; mở QCHoldLog ReasonCode=WrongRev; kiểm tra Part/REV</td><td>QCHoldLog + ảnh/đường dẫn file Rev đúng</td></tr>
-<tr><td>8</td><td>Throttling SharePoint</td><td>Flow fail 429/503</td><td>Backlog, trễ dữ liệu</td><td>Giảm batch; bật retry/backoff; giãn lịch; ghi IntegrationLogs</td><td>IntegrationLogs + thông số retry/batch</td></tr>
-<tr><td>9</td><td>Thiếu ApprovalHistory</td><td>Hồ sơ đóng nhưng không có ApprovalHistory</td><td>Không đánh giá được phê duyệt</td><td>Chặn đóng hồ sơ; chạy lại approval flow; đào tạo lại approver</td><td>ApprovalHistory + hồ sơ URL</td></tr>
+<tr><td>8</td><td>Throttling SharePoint</td><td>Luồng fail 429/503</td><td>Backlog, trễ dữ liệu</td><td>Giảm batch; bật retry/backoff; giãn lịch; ghi IntegrationLogs</td><td>IntegrationLogs + thông số retry/batch</td></tr>
+<tr><td>9</td><td>Thiếu ApprovalHistory</td><td>Hồ sơ đóng nhưng không có ApprovalHistory</td><td>Không đánh giá được phê duyệt</td><td>Chặn đóng hồ sơ; chạy lại approval luồng; đào tạo lại approver</td><td>ApprovalHistory + hồ sơ URL</td></tr>
 <tr><td>10</td><td>bộ hồ sơ giao hàng thiếu (cổng kiểm soát lỏng)</td><td>ShipRelease validator FAIL hoặc PacketComplete=No</td><td>Ship sai/thiếu → khiếu nại khách</td><td>BLOCKED + StandupAction S1; bổ sung chứng từ; re-validate</td><td>ShipRelease + folder bộ hồ sơ giao hàng + Final IR/CoC</td></tr>
 </tbody>
 </table>
 </div>
-<p class="mini"><b>M365/SharePoint → HESEM-QMS-SSOT</b> SLA cho “EpicorLastSync quá hạn” theo plant (ví dụ 30 phút), đồng bộ với cadence flow.</p>
+<p class="mini"><b>M365/SharePoint → HESEM-QMS-SSOT</b> SLA cho “EpicorLastSync quá hạn” theo plant (ví dụ 30 phút), đồng bộ với cadence luồng.</p>
 </div>
 <div class="card">
 <h2>5) Kiểm soát rủi ro (6 kiểm soát bắt buộc)</h2>
 <div class="grid-2">
 <div class="card">
 <h3>R1. Observability</h3>
-<p class="mini">Mọi flow ghi IntegrationLogs: RunId, FlowName, Start/End, counts, Status, ErrorSummary.</p>
+<p class="mini">Mọi luồng ghi IntegrationLogs: RunId, FlowName, Start/End, counts, Status, ErrorSummary.</p>
 </div>
 <div class="card">
 <h3>R2. Cursor an toàn</h3>
@@ -220,7 +220,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card">
 <h3>R5. Cổng kiểm soát Phê duyệt giao hàng</h3>
-<p class="mini">Flow validator chặn ship; mọi ngoại lệ bắt buộc có ApprovalHistory.</p>
+<p class="mini">Luồng validator chặn ship; mọi ngoại lệ bắt buộc có ApprovalHistory.</p>
 </div>
 <div class="card">
 <h3>R6. Bộ bằng chứng chuẩn</h3>
@@ -240,7 +240,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="mini"><b>Luật chung:</b> mọi “dừng” phải để lại dấu vết: Hold/NCR/StandupAction/IntegrationLogs.</p>
 </div>
 <div class="card">
-<h2>7) Phản ứng 60 giây (playbook tại hiện trường)</h2>
+<h2>7) Phản ứng 60 giây (cẩm nang triển khai (playbook) tại hiện trường)</h2>
 <div class="table-wrap">
 <table class="tight">
 <thead><tr><th>Tình huống</th><th>0–60 giây phải làm</th><th>Ai làm</th><th>Dấu vết bắt buộc</th></tr></thead>
@@ -286,11 +286,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="tight">
 <thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng (MRR)</th><th>Lỗi hay gặp</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Kiểm tra IntegrationLogs 3 flow mirror (jobs/ops/ship) trạng thái SUCCESS/WARNING</td><td>Supervisor</td><td>Ảnh màn hình IntegrationLogs</td><td>Chỉ nhìn “flow run success” mà bỏ ErrorSummary</td></tr>
+<tr><td>1</td><td>Kiểm tra IntegrationLogs 3 luồng mirror (jobs/ops/ship) trạng thái SUCCESS/WARNING</td><td>Supervisor</td><td>Ảnh màn hình IntegrationLogs</td><td>Chỉ nhìn “luồng run success” mà bỏ ErrorSummary</td></tr>
 <tr><td>2</td><td>Kiểm tra IntegrationSettings watermark cập nhật đúng sau SUCCESS</td><td>IT</td><td>Hồ sơ IntegrationSettings + timestamp</td><td>Cursor nhảy khi run FAIL</td></tr>
 <tr><td>3</td><td>Kiểm tra Data Health: null keys/duplicates/latency</td><td>Supervisor</td><td>Báo cáo Data Health CNC-IMS-HUB → QMS-Hồ sơ → Dash-Snapshots.</td><td>Không triage lỗi lặp</td></tr>
 <tr><td>4</td><td>Spot check 5 Job: JobIndex ↔ Epicor (JobNum, Rev, DueDate, Status)</td><td>Planner</td><td>Danh sách spot check + ảnh</td><td>So sai company/plant</td></tr>
-<tr><td>5</td><td>Kiểm tra Hồ sơ công việc tạo đủ folder template theo ANNEX-QMS-003</td><td>QA/QMS</td><td>Link folder + danh sách folder</td><td>Template lệch do flow cấu hình khác</td></tr>
+<tr><td>5</td><td>Kiểm tra Hồ sơ công việc tạo đủ folder template theo ANNEX-QMS-003</td><td>QA/QMS</td><td>Link folder + danh sách folder</td><td>Template lệch do luồng cấu hình khác</td></tr>
 <tr><td>6</td><td>Kiểm tra ShipRelease pending/BLOCKED; chốt blocker trong ngày</td><td>WHS + QA</td><td>Danh sách BLOCKED + lý do</td><td>Đổi Status bằng tay</td></tr>
 <tr><td>7</td><td>Kiểm tra PackSSCCRegister: status Verified/Released đúng logic</td><td>WHS</td><td>Hồ sơ PackSSCCRegister + scan bằng chứng</td><td>Reprint không có reason</td></tr>
 <tr><td>8</td><td>Kiểm tra ApprovalHistory đủ cho phê duyệt giao hàng, NCR/CAPA closure</td><td>QA</td><td>ApprovalHistory lọc theo SourceList</td><td>Phê duyệt qua chat/miệng</td></tr>
@@ -309,12 +309,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Job 1: Xác minh Job/Rev + mở Hồ sơ công việc trong 60 giây</h3>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Bước</th><th>Điểm chính (Key points)</th><th>Lý do</th></tr></thead>
+<thead><tr><th>Bước</th><th>Điểm chính (Điểm then chốt)</th><th>Lý do</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Mở JobIndex bằng JobNum; đọc PartNum + RevisionNum + DueDate</td><td>Chặn nhầm job/nhầm rev ngay từ đầu</td></tr>
-<tr><td>2</td><td>Mở EvidenceFolderUrl; kiểm tra folder 04_Inspection-FAI và 07_Shipping-Packing</td><td>Đánh giá drill; cổng kiểm soát dựa bằng chứng</td></tr>
+<tr><td>2</td><td>Mở EvidenceFolderUrl; kiểm tra folder 04_Inspection-FAI và 07_Shipping-Packing</td><td>Đánh giá diễn tập; cổng kiểm soát dựa bằng chứng</td></tr>
 <tr><td>3</td><td>Mở Part/REV Master link; đối chiếu file DWG/CAM đúng REV</td><td>Chặn chạy sai chương trình/drawing</td></tr>
-<tr><td>4</td><td>Ghi nhận kết quả vào bảng kiểm ca (PASS/FAIL)</td><td>Giữ dấu vết kiểm soát</td></tr>
+<tr><td>4</td><td>Ghi nhận kết quả vào bảng kiểm ca (ĐẠT/KHÔNG ĐẠT)</td><td>Giữ dấu vết kiểm soát</td></tr>
 </tbody>
 </table>
 </div>
@@ -323,7 +323,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Job 2: Xử lý “sai Rev nghi ngờ” trong 60 giây</h3>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Bước</th><th>Điểm chính (Key points)</th><th>Lý do</th></tr></thead>
+<thead><tr><th>Bước</th><th>Điểm chính (Điểm then chốt)</th><th>Lý do</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Dừng thao tác; gắn tag HOLD vào lô/chi tiết</td><td>Chặn sai hỏng lan rộng</td></tr>
 <tr><td>2</td><td>Tạo QCHoldLog: JobNum, ReasonCode, Containment, Severity</td><td>dấu vết kiểm toán (đánh giá trail) + SLA xử lý</td></tr>
@@ -337,7 +337,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Job 3: Cổng kiểm soát Phê duyệt giao hàng (WHS/QA)</h3>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Bước</th><th>Điểm chính (Key points)</th><th>Lý do</th></tr></thead>
+<thead><tr><th>Bước</th><th>Điểm chính (Điểm then chốt)</th><th>Lý do</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Xác nhận PackID/SSCC trong PackSSCCRegister trạng thái Verified</td><td>Chặn nhầm nhãn/nhầm pack</td></tr>
 <tr><td>2</td><td>Xác nhận PackagingChecks PASS + có PhotosUrl</td><td>Chứng minh đóng gói đúng</td></tr>
@@ -350,22 +350,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<h2>10) Output chuẩn theo level (L1–L4)</h2>
+<h2>10) Đầu ra chuẩn theo level (L1–L4)</h2>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Level</th><th>Năng lực quan sát được</th><th>Output bắt buộc</th><th>Chỉ số</th></tr></thead>
+<thead><tr><th>Level</th><th>Năng lực quan sát được</th><th>Đầu ra bắt buộc</th><th>Chỉ số</th></tr></thead>
 <tbody>
 <tr>
 <td><b>L1</b></td>
 <td>Đọc đúng “nguồn đúng”; mở được JobIndex và Hồ sơ công việc; hiểu Fail‑fast rules</td>
 <td>Hoàn thành Job 1 OJT</td>
-<td><span class="kpi">Đánh giá drill ≤ 60s</span></td>
+<td><span class="kpi">Đánh giá diễn tập ≤ 60s</span></td>
 </tr>
 <tr>
 <td><b>L2</b></td>
 <td>Tạo được log đúng list (Hold/NCR/Packaging/ShipRelease); đính đúng bằng chứng</td>
 <td>Hoàn thành Job 2 hoặc Job 3 OJT</td>
-<td><span class="kpi">0 lỗi naming Tier 1</span> <span class="kpi">0 bypass cổng kiểm soát</span></td>
+<td><span class="kpi">0 lỗi naming Tier 1</span> <span class="kpi">0 vượt qua cổng kiểm soát</span></td>
 </tr>
 <tr>
 <td><b>L3</b></td>
@@ -375,7 +375,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L4</b></td>
-<td>Chủ trì trung tâm điều hành: chuẩn hoá schema/flow, kiểm soát thay đổi, phòng ngừa tái phát</td>
+<td>Chủ trì trung tâm điều hành: chuẩn hoá schema/luồng, kiểm soát thay đổi, phòng ngừa tái phát</td>
 <td>RC/Corrective action cho 01 sự cố tích hợp</td>
 <td><span class="kpi">Error rate &lt; 0.5%</span> <span class="kpi">Latency trong SLA</span></td>
 </tr>
@@ -413,19 +413,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Phản ứng 60 giây</td>
-<td>Thực hiện đúng 1 playbook</td>
-<td>Thực hiện đúng 2 playbook</td>
+<td>Thực hiện đúng 1 cẩm nang triển khai</td>
+<td>Thực hiện đúng 2 cẩm nang triển khai</td>
 <td>Điều phối triage + StandupAction</td>
-<td>Định nghĩa lại playbook theo dữ liệu thực tế</td>
+<td>Định nghĩa lại cẩm nang triển khai theo dữ liệu thực tế</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="card">
-<h2>12) Bài kiểm tra (quiz ≥ 20 câu) + 3 kịch bản tình huống</h2>
+<h2>12) Bài kiểm tra (bài kiểm tra nhanh ≥ 20 câu) + 3 kịch bản tình huống</h2>
 <div class="card">
-<h3>Quiz (20 câu)</h3>
+<h3>Bài kiểm tra nhanh (20 câu)</h3>
 <ol>
 <li><b>(MC)</b> Nguồn đúng cho Job/Rev/Routing là hệ thống nào?
  <div class="mini">A. M365 Lists • B. Epicor Kinetic • C. Power BI • D. Excel</div>
@@ -499,7 +499,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>SC-02: Throttling gây backlog</td>
-<td>Flow fail 429; IntegrationLogs Warning liên tục</td>
+<td>Luồng fail 429; IntegrationLogs Warning liên tục</td>
 <td>Bật retry/backoff; giảm batch; giãn cadence; kiểm tra index list; triage Data Health</td>
 <td>Latency về SLA; error rate về ngưỡng</td>
 <td>IntegrationLogs before/after + cấu hình</td>
@@ -518,7 +518,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card">
 <h2>13) Performance test (bắt buộc vì có thao tác cổng kiểm soát/approve)</h2>
-<p class="mini">Performance test chấm PASS/FAIL theo hành vi và dấu vết, không chấm cảm tính.</p>
+<p class="mini">Performance test chấm ĐẠT/KHÔNG ĐẠT theo hành vi và dấu vết, không chấm cảm tính.</p>
 <div class="table-wrap">
 <table class="tight">
 <thead><tr><th>Nhóm</th><th>Bài thực hành</th><th>Tiêu chí PASS</th><th>Tiêu chí FAIL (1 lỗi là FAIL)</th><th>Bằng chứng bắt buộc</th></tr></thead>
@@ -624,9 +624,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout warn" style="margin-top:12px">
 <h3>Khoảng trống cần xử lý ngay (đã thấy trong tài liệu nội bộ)</h3>
 <ul>
-<li><b>Chênh template Hồ sơ công việc:</b> ANNEX-QMS-003 khác với flow tạo folder trong bộ mẫu cấu hình (SSOT). Chuẩn hoá theo ANNEX-QMS-003; cập nhật flow để tạo đúng folder. <span class="mono">Mã change: CR-{YYYY}-{Seq} (gắn link approval).</span></li>
+<li><b>Chênh template Hồ sơ công việc:</b> ANNEX-QMS-003 khác với luồng tạo folder trong bộ mẫu cấu hình (SSOT). Chuẩn hoá theo ANNEX-QMS-003; cập nhật luồng để tạo đúng folder. <span class="mono">Mã change: CR-{YYYY}-{Seq} (gắn link approval).</span></li>
 <li><b>IntegrationErrors:</b> ANNEX-QMS-006/011 nhắc “IntegrationErrors” nhưng schema CSV chưa có. Tạo list IntegrationErrors theo Change Management hoặc chuẩn hoá ghi lỗi theo IntegrationLogs.ErrorSummary + lưu payload vào thư mục “09_Archive-OldVersions” trong Hồ sơ công việc. <span class="mono">Chuẩn hóa: dùng 01 SSOT (SharePoint) làm nguồn sự thật.</span></li>
-<li><b>SLA latency:</b> Module dùng placeholder [SLA]. Định nghĩa SLA theo cadence flow và ràng buộc vận hành; dùng làm fail‑fast rule.</li>
+<li><b>SLA latency:</b> Mô-đun dùng placeholder [SLA]. Định nghĩa SLA theo cadence luồng và ràng buộc vận hành; dùng làm fail‑fast rule.</li>
 </ul>
 </div>
 </div>

@@ -69,9 +69,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <div class="grid-2">
 <div>
-<div class="badge"><span class="dot"></span>Module SYS-OPS-17</div>
+<div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-17</div>
 <h1 style="margin-top:10px">NCR/CAPA: containment – MRB disposition – 8D – effectiveness check</h1>
-<p class="muted">Mục tiêu của module là cắt đúng “điểm gãy” trước khi lỗi lan rộng: <b>HOLD đúng</b> • <b>NCR đủ dữ kiện</b> • <b>MRB quyết đúng</b> • <b>CAPA làm đúng</b> • <b>Hiệu lực chứng minh được</b>.</p>
+<p class="muted">Mục tiêu của mô-đun là cắt đúng “điểm gãy” trước khi lỗi lan rộng: <b>HOLD đúng</b> • <b>NCR đủ dữ kiện</b> • <b>MRB quyết đúng</b> • <b>CAPA làm đúng</b> • <b>Hiệu lực chứng minh được</b>.</p>
 <div class="tag blue">Phiên bản</div>
 </div>
 <div class="note">
@@ -99,63 +99,63 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-005-m365-lists-and-field-mapping.html"><b>ANNEX-QMS-005 — M365 Lists &amp; Field Mapping</b></a> (list catalog, trường dữ liệu tối thiểu, nguyên tắc SSOT)</li>
 <li> (schema QCHoldLog/NCRLog/CAPA8D)</li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-101-document-and-data-control.html"><b>SOP-QMS-001 — Document Control</b></a> (khóa đúng phiên bản, chống sai Rev)</li>
-<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//06-SOP-600//sop-601-calibration-and-gage-control.html"><b>SOP-QMS-007 — Calibration</b></a> (OOT gage → đánh giá ảnh hưởng → NCR/CAPA)</li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//06-SOP-600//sop-601-calibration-and-gage-control.html"><b>SOP-QMS-007 — Hiệu chuẩn</b></a> (OOT gage → đánh giá ảnh hưởng → NCR/CAPA)</li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html"><b>SOP-QMS-012 — Khiếu nại/thoát lỗi</b></a> (stop-ship, containment mở rộng)</li>
 </ul>
 </div>
 <div class="toc">
 <strong>Mục lục nhanh (1–14)</strong>
 <ul>
-<li><a href="#s1">1. Mục đích module &amp; bối cảnh vận hành</a></li>
-<li><a href="#s2">2. Phạm vi &amp; vai trò (áp dụng theo từng role)</a></li>
-<li><a href="#s3">3. Vị trí trong chuỗi E2E + luồng handoff + điểm chặn</a></li>
-<li><a href="#s4">4. Failure Points (≥10 điểm gãy thực tế)</a></li>
-<li><a href="#s5">5. Risk Controls (control points + bằng chứng)</a></li>
+<li><a href="#s1">1. Mục đích mô-đun &amp; bối cảnh vận hành</a></li>
+<li><a href="#s2">2. Phạm vi &amp; vai trò (áp dụng theo từng vai trò)</a></li>
+<li><a href="#s3">3. Vị trí trong chuỗi E2E + luồng bàn giao + điểm chặn</a></li>
+<li><a href="#s4">4. Điểm đứt gãy (≥10 điểm gãy thực tế)</a></li>
+<li><a href="#s5">5. Biện pháp kiểm soát rủi ro (điểm kiểm soát + bằng chứng)</a></li>
 <li><a href="#s6">6. Fail-fast rules + STOP/HOLD/BLOCK</a></li>
 <li><a href="#s7">7. Phản ứng 60 giây</a></li>
 <li><a href="#s8">8. Bảng kiểm vận hành (≤15 bước)</a></li>
 <li><a href="#s9">9. OJT theo TWI (Job breakdown)</a></li>
 <li><a href="#s10">10. Rubric L1–L4 theo vai trò &amp; quyền hạn</a></li>
-<li><a href="#s11">11. Đánh giá: Quiz ≥20 • Scenario ≥3 • Bài kiểm tra thực hành</a></li>
-<li><a href="#s12">12. Tiêu chí PASS/FAIL</a></li>
-<li><a href="#s13">13. MRR tối thiểu + đánh giá findings</a></li>
+<li><a href="#s11">11. Đánh giá: Bài kiểm tra nhanh ≥20 • Scenario ≥3 • Bài kiểm tra thực hành</a></li>
+<li><a href="#s12">12. Tiêu chí ĐẠT/KHÔNG ĐẠT</a></li>
+<li><a href="#s13">13. MRR tối thiểu + đánh giá phát hiện</a></li>
 <li><a href="#s14">14. DCR hồ sơ</a></li>
 </ul>
 </div>
 </div>
 <!-- 1 -->
 <div class="card">
-<h2 class="h2" id="s1" style="margin-top:0">1. Mục đích module &amp; bối cảnh vận hành (cổng kiểm soát (gate)/handoff; ai chịu trách nhiệm; khi nào kích hoạt)</h2>
-<p class="lead">NCR/CAPA là “phanh khẩn cấp” của xưởng. Module này biến lỗi thành hành động có kiểm soát: <b>chặn</b> → <b>quyết</b> → <b>sửa</b> → <b>ngăn tái diễn</b> → <b>chứng minh hiệu lực</b>.</p>
+<h2 class="h2" id="s1" style="margin-top:0">1. Mục đích mô-đun &amp; bối cảnh vận hành (cổng kiểm soát (gate)/bàn giao; ai chịu trách nhiệm; khi nào kích hoạt)</h2>
+<p class="lead">NCR/CAPA là “phanh khẩn cấp” của xưởng. Mô-đun này biến lỗi thành hành động có kiểm soát: <b>chặn</b> → <b>quyết</b> → <b>sửa</b> → <b>ngăn tái diễn</b> → <b>chứng minh hiệu lực</b>.</p>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
 <div>Người học <b>PHẢI</b> vận hành được điểm chặn <b>HOLD</b>, tạo NCR đủ dữ kiện tối thiểu, tham gia MRB để ra quyết định disposition đúng rủi ro, mở 8D/CAPA đúng ngưỡng, và đóng hồ sơ khi có bằng chứng hiệu lực. Thiếu bằng chứng là <b>BLOCK</b> cổng kiểm soát.</div>
 </div>
-<h3 class="h3">1.1 Khi nào module kích hoạt (học / tái học)</h3>
+<h3 class="h3">1.1 Khi nào mô-đun kích hoạt (học / tái học)</h3>
 <ul style="line-height:1.9">
 <li>Khi nhận việc mới thuộc nhóm vai trò mục tiêu.</li>
 <li>Khi phát hành phiên bản mới của SOP-QMS-006 hoặc thay đổi schema list (ANNEX-QMS-005).</li>
-<li>Khi xảy ra stop-ship, rủi ro giao hàng, thoát lỗi, sai Rev, mix-up/lẫn lô, thiếu/giả chứng từ, OOT gage.</li>
+<li>Khi xảy ra stop-ship, rủi ro giao hàng, thoát lỗi, sai Rev, lẫn lộn (mix-up)/lẫn lô, thiếu/giả chứng từ, OOT gage.</li>
 <li>Khi NCR lặp lại ≥ 2 lần / 90 ngày hoặc theo cảnh báo KPI (theo SOP-QMS-006).</li>
 <li>Khi đánh giá finding liên quan 8.7 / 10.2 / 7.5.</li>
 </ul>
 <h3 class="h3">1.2 “Lý do tồn tại” (Top rủi ro phải chặn)</h3>
 <div class="table-card">
 <table class="table">
-<thead><tr><th style="width:260px">Rủi ro</th><th>Hậu quả</th><th style="width:280px">Điểm chặn của module</th></tr></thead>
+<thead><tr><th style="width:260px">Rủi ro</th><th>Hậu quả</th><th style="width:280px">Điểm chặn của mô-đun</th></tr></thead>
 <tbody>
 <tr><td><b>Wrong revision</b></td><td>Gia công sai yêu cầu, ship sai, claim</td><td>HOLD tức thì + khóa Job/ship + kiểm chứng Job/Part/Rev trước release</td></tr>
-<tr><td><b>Mix-up/lẫn lô</b></td><td>Mất truy xuất, lẫn trạng thái OK/NG</td><td>Segregation khu HOLD + nhãn trạng thái + truy xuất theo JobNum</td></tr>
+<tr><td><b>Lẫn lộn/lẫn lô</b></td><td>Mất truy xuất, lẫn trạng thái OK/NG</td><td>Segregation khu HOLD + nhãn trạng thái + truy xuất theo JobNum</td></tr>
 <tr><td><b>Missing / falsified outsource documents</b></td><td>Không đạt yêu cầu đặc biệt, rủi ro pháp lý</td><td>BLOCK phê duyệt giao hàng (ship release) khi thiếu cert; NCR+SCAR</td></tr>
-<tr><td><b>OOT gage/calibration quá hạn</b></td><td>Đo sai, lọt lỗi CTQ</td><td>HOLD + đánh giá ảnh hưởng + NCR/CAPA theo SOP-QMS-007</td></tr>
-<tr><td><b>Bypass cổng kiểm soát</b></td><td>Giao nhầm, mất bằng chứng đánh giá</td><td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate); mọi release có hồ sơ</td></tr>
+<tr><td><b>OOT gage/hiệu chuẩn quá hạn</b></td><td>Đo sai, lọt lỗi CTQ</td><td>HOLD + đánh giá ảnh hưởng + NCR/CAPA theo SOP-QMS-007</td></tr>
+<tr><td><b>Vượt qua cổng kiểm soát</b></td><td>Giao nhầm, mất bằng chứng đánh giá</td><td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate); mọi release có hồ sơ</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 <!-- 2 -->
 <div class="card">
-<h2 class="h2" id="s2" style="margin-top:0">2. Phạm vi &amp; vai trò (bắt buộc nêu phần áp dụng riêng cho từng role và tiêu chí đạt)</h2>
+<h2 class="h2" id="s2" style="margin-top:0">2. Phạm vi &amp; vai trò (bắt buộc nêu phần áp dụng riêng cho từng vai trò và tiêu chí đạt)</h2>
 <div class="note">
 <b>Nguyên tắc vận hành:</b> Vai trò nào “chạm vào sản phẩm/hồ sơ” tại điểm HOLD, NCR, MRB, phê duyệt giao hàng thì vai trò đó <b>PHẢI</b> hiểu phần áp dụng và <b>PHẢI</b> tạo được bằng chứng tối thiểu đúng nơi lưu.
  </div>
@@ -172,7 +172,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead>
 <tr>
 <th style="width:170px">Vai trò</th>
-<th>Áp dụng trong module (phần bắt buộc)</th>
+<th>Áp dụng trong mô-đun (phần bắt buộc)</th>
 <th style="width:290px">Tiêu chí đạt theo vai trò (khác nhau theo quyền)</th>
 </tr>
 </thead>
@@ -195,7 +195,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>QC</b></td>
 <td>Đo/xác nhận NC; lập Inspection bằng chứng; kích hoạt HOLD; cung cấp dữ kiện đo phục vụ NCR/MRB.</td>
-<td>Đo đúng dụng cụ &amp; trạng thái calibration; ghi rõ Job/Part/Rev; bằng chứng đủ để QA mở NCR trong ngày.</td>
+<td>Đo đúng dụng cụ &amp; trạng thái hiệu chuẩn; ghi rõ Job/Part/Rev; bằng chứng đủ để QA mở NCR trong ngày.</td>
 </tr>
 <tr>
 <td><b>QA</b></td>
@@ -204,7 +204,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Warehouse</b></td>
-<td>Quản lý khu HOLD; chống mix-up; kiểm soát bộ hồ sơ giao hàng (ship packet); BLOCK giao hàng khi thiếu điều kiện.</td>
+<td>Quản lý khu HOLD; chống lẫn lộn; kiểm soát bộ hồ sơ giao hàng (ship packet); BLOCK giao hàng khi thiếu điều kiện.</td>
 <td>Không xuất hàng khi ShipRelease trạng thái Blocked/RequestRelease; lưu bằng chứng đúng thư mục.</td>
 </tr>
 <tr>
@@ -235,7 +235,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Supervisor</b></td>
 <td>Kích hoạt containment; phân công người phụ trách; duy trì kỷ luật cổng kiểm soát; điều phối nguồn lực MRB/CAPA.</td>
-<td>Không có bypass cổng kiểm soát; phân công rõ người phụ trách &amp; deadline; escalates theo fail-fast khi quá hạn.</td>
+<td>Không có vượt qua cổng kiểm soát; phân công rõ người phụ trách &amp; deadline; escalates theo fail-fast khi quá hạn.</td>
 </tr>
 </tbody>
 </table>
@@ -243,15 +243,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 3 -->
 <div class="card">
-<h2 class="h2" id="s3" style="margin-top:0">3. Vị trí trong chuỗi E2E + luồng handoff (input/output) + điểm chặn</h2>
+<h2 class="h2" id="s3" style="margin-top:0">3. Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <h3 class="h3">3.1 Chuỗi E2E nơi NCR/CAPA “bắt lỗi”</h3>
 <div class="note">
- Quote/Contract → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → <b>NCR/MRB</b> → Final → Packing → Ship → Feedback/CI
+ Báo giá/Hợp đồng → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → <b>NCR/MRB</b> → Final → Packing → Ship → Phản hồi/CI
  </div>
-<h3 class="h3">3.2 Handoff bắt buộc (input/output)</h3>
+<h3 class="h3">3.2 Bàn giao bắt buộc (đầu vào/đầu ra)</h3>
 <div class="table-card">
 <table class="table">
-<thead><tr><th style="width:220px">Bước</th><th>Input bắt buộc</th><th>Output bắt buộc</th><th style="width:220px">Điểm chặn</th></tr></thead>
+<thead><tr><th style="width:220px">Bước</th><th>Đầu vào bắt buộc</th><th>Đầu ra bắt buộc</th><th style="width:220px">Điểm chặn</th></tr></thead>
 <tbody>
 <tr><td><b>Phát hiện NC</b></td><td>Job/Part/Rev + dấu hiệu lỗi + vị trí phát hiện</td><td>Hàng bị cô lập + HOLD vật lý + thông báo ca</td><td>HOLD tại hiện trường</td></tr>
 <tr><td><b>Hold log</b></td><td>JobNum + ReasonCode + Containment + Severity</td><td>Hồ sơ QCHoldLog + link bằng chứng folder</td><td>Không hồ sơ = BLOCK</td></tr>
@@ -272,10 +272,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 4 -->
 <div class="card">
-<h2 class="h2" id="s4" style="margin-top:0">4. Failure Points (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
+<h2 class="h2" id="s4" style="margin-top:0">4. Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
 <ol style="line-height:1.9">
 <li><b>FP-01:</b> Phát hiện lỗi nhưng không dừng công đoạn, hàng tiếp tục chạy → lỗi lan rộng.</li>
-<li><b>FP-02:</b> Không tách hàng OK/NG, không có nhãn trạng thái → mix-up/lẫn lô.</li>
+<li><b>FP-02:</b> Không tách hàng OK/NG, không có nhãn trạng thái → lẫn lộn/lẫn lô.</li>
 <li><b>FP-03:</b> Hold log thiếu ReasonCode/Severity/Containment → không kích hoạt đúng quy tắc điều hướng, release mù.</li>
 <li><b>FP-04:</b> NCR thiếu Job/Part/Rev hoặc thiếu bằng chứng đo → MRB quyết theo cảm tính.</li>
 <li><b>FP-05:</b> Ghi nhầm DefectType/Disposition code trong list → sai thống kê Pareto, sai ưu tiên CAPA.</li>
@@ -287,20 +287,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>FP-11:</b> OOT gage phát hiện muộn, không đánh giá ảnh hưởng → hàng đã giao bị nghi ngờ.</li>
 <li><b>FP-12:</b> CAPA đóng khi chưa có effectiveness check → đánh giá finding 10.2.</li>
 <li><b>FP-13:</b> Bằng chứng lưu trong máy cá nhân hoặc gửi chat → mất SSOT, không truy xuất.</li>
-<li><b>FP-14:</b> Planner/Warehouse “đẩy” ship vì áp lực ngày đến hạn → bypass cổng kiểm soát.</li>
+<li><b>FP-14:</b> Planner/Warehouse “đẩy” ship vì áp lực ngày đến hạn → vượt qua cổng kiểm soát.</li>
 </ol>
 </div>
 <!-- 5 -->
 <div class="card">
-<h2 class="h2" id="s5" style="margin-top:0">5. Risk Controls (liệt kê control points; ai làm; bằng chứng; tối thiểu 6)</h2>
+<h2 class="h2" id="s5" style="margin-top:0">5. Biện pháp kiểm soát rủi ro (liệt kê điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6)</h2>
 <div class="note">
-<b>Quy tắc:</b> Mỗi điểm kiểm soát (control point) có <b>Người phụ trách</b> rõ + <b>Bằng chứng</b> rõ + <b>Tiêu chí đạt</b> rõ. Thiếu bằng chứng là <b>BLOCK</b>.
+<b>Quy tắc:</b> Mỗi điểm kiểm soát (điểm kiểm soát) có <b>Người phụ trách</b> rõ + <b>Bằng chứng</b> rõ + <b>Tiêu chí đạt</b> rõ. Thiếu bằng chứng là <b>BLOCK</b>.
  </div>
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
-<th style="width:190px">Control point</th>
+<th style="width:190px">Điểm kiểm soát</th>
 <th style="width:170px">Người phụ trách</th>
 <th>Bằng chứng (MRR)</th>
 <th style="width:260px">Tiêu chí đạt</th>
@@ -365,7 +365,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="note" style="margin-top:12px">
-<b>Khoảng trống đã khóa ngay trong module:</b> SOP-QMS-006 dùng Minor/Major/Critical, list dùng MIN/MAJ/CTQ. Module này áp mapping rõ ở mục 2.1 để tránh sai dữ liệu và sai quy tắc điều hướng.
+<b>Khoảng trống đã khóa ngay trong mô-đun:</b> SOP-QMS-006 dùng Minor/Major/Critical, list dùng MIN/MAJ/CTQ. Mô-đun này áp mapping rõ ở mục 2.1 để tránh sai dữ liệu và sai quy tắc điều hướng.
  </div>
 <h3 class="h3">5.1 MRB disposition — quyết định theo rủi ro, không theo cảm tính</h3>
 <div class="note">
@@ -438,7 +438,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:70px">D</th>
 <th style="width:240px">Nội dung</th>
-<th>Deliverables tối thiểu</th>
+<th>Đầu ra yêu cầu tối thiểu</th>
 </tr>
 </thead>
 <tbody>
@@ -476,7 +476,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>STOP</b></td>
-<td>Rủi ro CTQ, sai Rev, mix-up, OOT gage, khả năng ship sai</td>
+<td>Rủi ro CTQ, sai Rev, lẫn lộn, OOT gage, khả năng ship sai</td>
 <td>Dừng công đoạn; cô lập WIP; báo Supervisor+QC+QA trong ca</td>
 <td>QCHoldLog (Severity=CTQ) + ảnh bằng chứng</td>
 </tr>
@@ -499,14 +499,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="line-height:1.9">
 <li><b>FF-01 không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate):</b> khi thiếu IR PASS/CMM report/cert/approval, cổng kiểm soát Final/Ship là <b>BLOCK</b>.</li>
 <li><b>FF-02 Sai Rev là STOP:</b> khi phát hiện mismatch giữa Job pack và program/setup/print, thực hiện STOP và mở HOLD ngay.</li>
-<li><b>FF-03 Mix-up là STOP:</b> khi mất truy xuất lô/JobNum hoặc nhãn rơi, thực hiện STOP; quarantine toàn bộ khu vực liên quan.</li>
+<li><b>FF-03 Lẫn lộn là STOP:</b> khi mất truy xuất lô/JobNum hoặc nhãn rơi, thực hiện STOP; quarantine toàn bộ khu vực liên quan.</li>
 <li><b>FF-04 Concession phải có chấp thuận trước giao:</b> khi chấp thuận chưa có, disposition UAI bị khóa và chuyển sang rework/scrap/return.</li>
 <li><b>FF-05 OOT gage là STOP:</b> khi dụng cụ đo quá hạn hoặc nghi OOT, dừng đo, hold sản phẩm đã đo và kích hoạt đánh giá ảnh hưởng.</li>
 </ul>
 </div>
 <!-- 7 -->
 <div class="card">
-<h2 class="h2" id="s7" style="margin-top:0">7. Phản ứng 60 giây (khi sai Rev/mix-up/thiếu chứng từ/OOT gage/bypass cổng kiểm soát/rủi ro giao hàng)</h2>
+<h2 class="h2" id="s7" style="margin-top:0">7. Phản ứng 60 giây (khi sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua cổng kiểm soát/rủi ro giao hàng)</h2>
 <div class="note">
 <b>Mục tiêu:</b> 60 giây đầu khóa rủi ro “giao nhầm – lan rộng – mất truy xuất”. Sau 60 giây mới chuyển sang điều tra chi tiết.
  </div>
@@ -520,7 +520,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Ảnh nhãn HOLD + QCHoldLog ReasonCode=PROG hoặc PROC; ghi rõ Rev suspect</td>
 </tr>
 <tr>
-<td><b>Mix-up/lẫn lô</b></td>
+<td><b>Lẫn lộn/lẫn lô</b></td>
 <td>STOP di chuyển; quarantine khu vực; đếm nhanh số khay; khóa cửa/kệ HOLD; báo Warehouse</td>
 <td>Ảnh khu vực + QCHoldLog ReasonCode=HAND, Severity=CTQ; ghi “traceability lost”</td>
 </tr>
@@ -535,7 +535,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>QCHoldLog ReasonCode=GAGE; gage ID + ngày hết hạn; ảnh tem calib</td>
 </tr>
 <tr>
-<td><b>Bypass cổng kiểm soát / rủi ro giao hàng</b></td>
+<td><b>Vượt qua cổng kiểm soát / rủi ro giao hàng</b></td>
 <td>BLOCK ship; kéo lại packing về khu HOLD; báo QA+Supervisor+Estimator (SAL-03)</td>
 <td>ShipRelease=Blocked + link Hold/NCR; ảnh packing trạng thái HOLD</td>
 </tr>
@@ -576,7 +576,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>11</td><td><b>Quyết định mở CAPA/8D</b> theo ngưỡng</td><td>QA</td><td>CAPA8D hồ sơ + 8D file</td><td>Major/Critical nhưng không mở CAPA</td></tr>
 <tr><td>12</td><td><b>Nguyên nhân gốc + điểm lọt</b> + hành động hệ thống</td><td>Người phụ trách CAPA</td><td>5-Why/Ishikawa + action + bằng chứng rollout</td><td>Nguyên nhân gốc = “do người”; không có cơ chế ngăn</td></tr>
 <tr><td>13</td><td><b>Effectiveness check</b> và đóng hồ sơ</td><td>QA+Supervisor</td><td>Bằng chứng trước/sau + CAPA status Closed</td><td>Đóng vì “đã làm xong” nhưng không có dữ liệu hiệu lực</td></tr>
-<tr><td>14</td><td><b>Release/Ship</b> chỉ khi cổng kiểm soát PASS</td><td>QA+WHS</td><td>ShipRelease Released + packet complete</td><td>Xuất hàng khi thiếu packet; thiếu link NCR</td></tr>
+<tr><td>14</td><td><b>Release/Ship</b> chỉ khi cổng kiểm soát PASS</td><td>QA+WHS</td><td>ShipRelease Released + packet đầy đủ</td><td>Xuất hàng khi thiếu packet; thiếu link NCR</td></tr>
 </tbody>
 </table>
 </div>
@@ -586,10 +586,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 9 -->
 <div class="card">
-<h2 class="h2" id="s9" style="margin-top:0">9. OJT thực chiến theo TWI: Job breakdown (Step / Key Points / Reasons) + OJT output</h2>
+<h2 class="h2" id="s9" style="margin-top:0">9. OJT thực chiến theo TWI: Job breakdown (Step / Điểm then chốt / Lý do) + OJT đầu ra</h2>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
-<div>OJT xảy ra trên <b>01 tình huống thật</b> hoặc mô phỏng bằng hồ sơ thật. Người học tạo đủ output và được đánh giá tại hiện trường. Thiếu output là FAIL.</div>
+<div>OJT xảy ra trên <b>01 tình huống thật</b> hoặc mô phỏng bằng hồ sơ thật. Người học tạo đủ đầu ra và được đánh giá tại hiện trường. Thiếu đầu ra là FAIL.</div>
 </div>
 <h3 class="h3">9.1 Job breakdown — “Xử lý 01 NCR từ phát hiện đến đóng”</h3>
 <div class="table-card">
@@ -598,8 +598,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:44px">#</th>
 <th>Step (bước)</th>
-<th>Key Points (điểm then chốt)</th>
-<th>Reasons (lý do)</th>
+<th>Điểm then chốt</th>
+<th>Lý do (lý do)</th>
 </tr>
 </thead>
 <tbody>
@@ -618,7 +618,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody>
 </table>
 </div>
-<h3 class="h3">9.2 OJT output (sản phẩm đầu ra bắt buộc)</h3>
+<h3 class="h3">9.2 OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
 <ul style="line-height:1.9">
 <li><b>01</b> hồ sơ QCHoldLog đầy đủ (kèm ảnh nhãn HOLD và mô tả containment).</li>
 <li><b>01</b> NCR package: NCRLog + thư mục NCR có tối thiểu 03 bằng chứng (ảnh + đo + liên quan Rev).</li>
@@ -650,7 +650,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Gọi đúng STOP/HOLD/BLOCK</td>
 <td>HOLD vật lý đúng nhãn; báo đúng tuyến</td>
 <td>Khoanh vùng đúng theo Job/Opr; bàn giao QC/QA đủ dữ kiện</td>
-<td>Dẫn dắt containment tại line; huấn luyện ca; chặn bypass</td>
+<td>Dẫn dắt containment tại line; huấn luyện ca; chặn vượt qua</td>
 </tr>
 <tr>
 <td><b>QC</b></td>
@@ -677,8 +677,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>WHS/PUR/Planner/Sales</b></td>
 <td>Nhận biết rủi ro giao hàng và chứng từ</td>
 <td>BLOCK giao hàng khi thiếu packet; khóa nhận hàng khi thiếu cert</td>
-<td>Vận hành cổng kiểm soát đúng hồ sơ; handoff rõ người phụ trách/deadline</td>
-<td>Chủ trì escalation liên phòng; chặn áp lực ngày đến hạn làm bypass cổng kiểm soát</td>
+<td>Vận hành cổng kiểm soát đúng hồ sơ; bàn giao rõ người phụ trách/deadline</td>
+<td>Chủ trì escalation liên phòng; chặn áp lực ngày đến hạn làm vượt qua cổng kiểm soát</td>
 </tr>
 </tbody>
 </table>
@@ -693,8 +693,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 11 -->
 <div class="card">
-<h2 class="h2" id="s11" style="margin-top:0">11. Đánh giá: Quiz ≥20 • Scenario ≥3 • Bài kiểm tra thực hành (bắt buộc)</h2>
-<h3 class="h3">11.1 Quiz (24 câu, trộn trắc nghiệm + tình huống ngắn)</h3>
+<h2 class="h2" id="s11" style="margin-top:0">11. Đánh giá: Bài kiểm tra nhanh ≥20 • Scenario ≥3 • Bài kiểm tra thực hành (bắt buộc)</h2>
+<h3 class="h3">11.1 Bài kiểm tra nhanh (24 câu, trộn trắc nghiệm + tình huống ngắn)</h3>
 <ol style="line-height:1.9">
 <li>“không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” nghĩa là gì trong bối cảnh phê duyệt giao hàng?</li>
 <li>QCHoldLog bắt buộc tối thiểu trường nào để hồ sơ hợp lệ?</li>
@@ -709,10 +709,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Nguyên nhân gốc khác điểm lọt ở điểm nào? Nêu 01 ví dụ “điểm lọt” trong CNC.</li>
 <li>Khi CAPA được đóng, bằng chứng nào chứng minh “effectiveness check” đã xảy ra?</li>
 <li>Khi NC do nhà cung cấp/outsourcing, Purchasing phải tạo loại hồ sơ nào và liên kết ra sao?</li>
-<li>Định nghĩa “mix-up” và hành động 60 giây đầu để khóa mix-up.</li>
+<li>Định nghĩa “lẫn lộn” và hành động 60 giây đầu để khóa lẫn lộn.</li>
 <li>Trường hợp nào bắt buộc mở CAPA/8D theo SOP-QMS-006?</li>
 <li>Tại sao chụp ảnh lỗi phải có thước/scale hoặc chỉ dấu đo?</li>
-<li>Planner phải làm gì để chống bypass cổng kiểm soát khi có HOLD?</li>
+<li>Planner phải làm gì để chống vượt qua cổng kiểm soát khi có HOLD?</li>
 <li>Warehouse phải kiểm tra những điều kiện nào trước khi chuyển ShipRelease sang Released?</li>
 <li>Ghi sai mã Severity trong list gây hậu quả vận hành gì?</li>
 <li>Khi nguyên nhân gốc ghi “do người”, yêu cầu bắt buộc phải bổ sung là gì?</li>
@@ -740,12 +740,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p><b>Decision required:</b> xác định nguyên nhân gốc và điểm lọt mới; định nghĩa hành động hệ thống bắt buộc; định nghĩa “effectiveness” bằng thước đo cụ thể; quyết định khi nào đóng CAPA và khi nào mở lại.</p>
 <p><b>MRR bắt buộc:</b> CAPA8D cập nhật RootCause+EscapePoint+CorrectiveAction; bằng chứng rollout (WI/Setup update + training hồ sơ); dữ liệu trước/sau.</p>
 </div>
-<h3 class="h3" style="margin-top:14px">11.3 Bài kiểm tra thực hành (bắt buộc vì đây là module cổng kiểm soát)</h3>
+<h3 class="h3" style="margin-top:14px">11.3 Bài kiểm tra thực hành (bắt buộc vì đây là mô-đun cổng kiểm soát)</h3>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
 <div>Người học <b>PHẢI</b> hoàn thành bài test tại hiện trường hoặc mô phỏng bằng hồ sơ thật: (1) kích hoạt HOLD đúng 60 giây; (2) tạo QCHoldLog đúng mã; (3) tạo NCR package đủ tối thiểu; (4) lập MRB decision với tiêu chí verification; (5) lập CAPA 8D (khi tình huống đạt ngưỡng hoặc tình huống mô phỏng) và thiết lập effectiveness check. Thiếu 1 phần là FAIL.</div>
 </div>
-<h3 class="h3">Rubric PASS/FAIL cho performance test</h3>
+<h3 class="h3">Rubric ĐẠT/KHÔNG ĐẠT cho performance test</h3>
 <div class="table-card">
 <table class="table">
 <thead><tr><th style="width:220px">Hạng mục</th><th>đạt khi</th><th>Không đạt khi</th></tr></thead>
@@ -761,10 +761,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 12 -->
 <div class="card">
-<h2 class="h2" id="s12" style="margin-top:0">12. Tiêu chí PASS/FAIL (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”)</h2>
+<h2 class="h2" id="s12" style="margin-top:0">12. Tiêu chí ĐẠT/KHÔNG ĐẠT (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”)</h2>
 <ul style="line-height:1.9">
-<li><b>PASS</b> khi: Quiz ≥ 85% <b>và</b> Scenario đạt ≥ 2/3 <b>và</b> Bài kiểm tra thực hành đạt 100% bảng kiểm.</li>
-<li><b>FAIL</b> khi: thiếu bất kỳ output artifact/MRR, hoặc vi phạm STOP/HOLD/BLOCK, hoặc release/giao hàng khi thiếu bằng chứng.</li>
+<li><b>PASS</b> khi: Bài kiểm tra nhanh ≥ 85% <b>và</b> Scenario đạt ≥ 2/3 <b>và</b> Bài kiểm tra thực hành đạt 100% bảng kiểm.</li>
+<li><b>FAIL</b> khi: thiếu bất kỳ đầu ra artifact/MRR, hoặc vi phạm STOP/HOLD/BLOCK, hoặc release/giao hàng khi thiếu bằng chứng.</li>
 <li><b>Tái đánh giá</b> xảy ra trong ca kế tiếp sau khi đã OJT bổ sung và hoàn tất thiếu hụt bằng chứng.</li>
 </ul>
 <div class="req">
@@ -774,8 +774,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 13 -->
 <div class="card">
-<h2 class="h2" id="s13" style="margin-top:0">13. MRR tối thiểu (hồ sơ) + quy tắc đặt tên + nơi lưu + Common đánh giá findings</h2>
-<h3 class="h3">13.1 Danh sách MRR bắt buộc cho module này</h3>
+<h2 class="h2" id="s13" style="margin-top:0">13. MRR tối thiểu (hồ sơ) + quy tắc đặt tên + nơi lưu + Common đánh giá phát hiện</h2>
+<h3 class="h3">13.1 Danh sách MRR bắt buộc cho mô-đun này</h3>
 <div class="note">
 <b>SSOT vận hành theo SOP-QMS-006:</b><br/>
  • Hồ sơ công việc: CNC-IMS-HUB/Job-Dossiers/&lt;JobNum&gt;/05_NCR-Hold-CAPA/NCR_&lt;NCR-ID&gt;/<br/>
@@ -800,9 +800,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>NCR bộ bằng chứng (evidence pack)</td><td>NCR_&lt;NCR-ID&gt;_EvidencePack.pdf</td><td>Ảnh + đo + CMM/IR + Rev bằng chứng; không để file rời khỏi folder NCR</td></tr>
 <tr><td>MRB minutes</td><td>MRB_Minutes_&lt;NCR-ID&gt;_YYYY-MM-DD.docx</td><td>Disposition + điều kiện release + quyết định mở CAPA</td></tr>
 <tr><td>Rework instruction</td><td>WI_Rework_&lt;NCR-ID&gt;_Vx.pdf</td><td>Step rõ + điểm kiểm tra đo + ai ký xác nhận</td></tr>
-<tr><td>Verification report</td><td>IR_&lt;JobNum&gt;_Verify_&lt;NCR-ID&gt;.pdf</td><td>PASS/FAIL + gage IDs; CTQ 100% khi CTQ</td></tr>
+<tr><td>Verification report</td><td>IR_&lt;JobNum&gt;_Verify_&lt;NCR-ID&gt;.pdf</td><td>ĐẠT/KHÔNG ĐẠT + gage IDs; CTQ 100% khi CTQ</td></tr>
 <tr><td>OJT bảng kiểm</td><td>SYS-OPS-17_OJT_&lt;Name&gt;_YYYY-MM-DD.xlsx</td><td>12 bước job breakdown + ký người hướng dẫn + link tình huống</td></tr>
-<tr><td>Quiz result</td><td>SYS-OPS-17_Quiz_YYYY-MM-DD.xlsx</td><td>Điểm + câu sai + kế hoạch bù</td></tr>
+<tr><td>Bài kiểm tra nhanh result</td><td>SYS-OPS-17_Quiz_YYYY-MM-DD.xlsx</td><td>Điểm + câu sai + kế hoạch bù</td></tr>
 <tr><td>Effectiveness bằng chứng</td><td>CAPA_&lt;CAPA-ID&gt;_Effectiveness_YYYY-MM-DD.pdf</td><td>Dữ liệu trước/sau + cửa sổ theo dõi + kết luận không tái diễn</td></tr>
 </tbody>
 </table>
@@ -813,17 +813,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Không dùng tên mơ hồ như “scan1.pdf”, “image.png”.</li>
 <li>EvidenceFolderUrl trong list trỏ tới thư mục SSOT; không đính file vào list.</li>
 </ul>
-<h3 class="h3">13.3 Common đánh giá findings &amp; prevention (ít nhất 8)</h3>
+<h3 class="h3">13.3 Common đánh giá phát hiện &amp; phòng ngừa (ít nhất 8)</h3>
 <ol style="line-height:1.9">
 <li><b>AF-01:</b> Không chứng minh kiểm soát đầu ra không phù hợp (8.7). <b>Chặn:</b> HOLD vật lý + QCHoldLog.</li>
 <li><b>AF-02:</b> NCR thiếu dữ kiện tối thiểu (Job/Rev/Qty/ảnh/đo). <b>Chặn:</b> rule mở NCR và bảng kiểm bước 4–5.</li>
 <li><b>AF-03:</b> Concession không có chấp thuận bằng văn bản trước giao. <b>Chặn:</b> Cổng kiểm soát-Concession + BLOCK ship.</li>
-<li><b>AF-04:</b> Rework không có WI hoặc không có verification report. <b>Chặn:</b> bắt buộc WI_Rework + IR Verify.</li>
+<li><b>AF-04:</b> Rework không có WI hoặc không có verification report. <b>Chặn:</b> bắt buộc WI_Rework + IR Xác minh.</li>
 <li><b>AF-05:</b> Nguyên nhân gốc dừng ở mức “do người”. <b>Chặn:</b> bắt buộc xác định cơ chế + điểm lọt.</li>
 <li><b>AF-06:</b> CAPA đóng không có effectiveness check (10.2). <b>Chặn:</b> CAPA8D.EffectivenessCheckDate + bằng chứng trước/sau.</li>
 <li><b>AF-07:</b> Bằng chứng nằm ngoài SSOT hoặc thiếu link. <b>Chặn:</b> EvidenceFolderUrl + quy tắc liên kết, không sao chép.</li>
 <li><b>AF-08:</b> OOT gage không đánh giá ảnh hưởng. <b>Chặn:</b> STOP theo FF-05 + mở NCR khi có rủi ro.</li>
-<li><b>AF-09:</b> Bypass cổng kiểm soát do áp lực giao hàng. <b>Chặn:</b> ShipRelease cổng kiểm soát + Supervisor escalation.</li>
+<li><b>AF-09:</b> Vượt qua cổng kiểm soát do áp lực giao hàng. <b>Chặn:</b> ShipRelease cổng kiểm soát + Supervisor escalation.</li>
 <li><b>AF-10:</b> Mã list sai (Severity/DefectType/Disposition) làm sai phân tích xu hướng. <b>Chặn:</b> mapping mục 2.1 + kiểm tra QA trước khi đóng.</li>
 </ol>
 </div>
@@ -834,7 +834,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//06-SOP-600//sop-606-ncr-capa-and-ipqc-reaction.html">SOP-QMS-006 — NCR/CAPA</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-005-m365-lists-and-field-mapping.html">ANNEX-QMS-005 — M365 Lists and Field Mapping</a></li>
 
-<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//06-SOP-600//sop-601-calibration-and-gage-control.html">SOP-QMS-007 — Calibration</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//06-SOP-600//sop-601-calibration-and-gage-control.html">SOP-QMS-007 — Hiệu chuẩn</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP-QMS-008 — Change Management</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-QMS-012 — Khiếu nại/thoát lỗi</a></li>
 <li><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-QA-03 — NCR Report</a></li>

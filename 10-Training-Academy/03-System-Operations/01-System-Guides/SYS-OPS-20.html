@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SYS-OPS-20 — SOP-QMS-09 First Article Inspection: triggers, AS9102-style discipline, bằng chứng | HESEM OS</title>
+<title>SYS-OPS-20 — SOP-QMS-09 Kiểm tra sản phẩm đầu tiên (first article) Inspection: triggers, AS9102-style discipline, bằng chứng | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
 /* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
@@ -53,7 +53,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-20 — SOP-QMS-09 First Article Inspection: triggers, AS9102-style discipline, bằng chứng</strong>
+  <strong>SYS-OPS-20 — SOP-QMS-09 Kiểm tra sản phẩm đầu tiên Inspection: triggers, AS9102-style discipline, bằng chứng</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -71,14 +71,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="kicker">HESEM CNC Academy • System Ops • Cổng kiểm soát (gate) Quality</div>
 <h1 class="h1">SYS-OPS-20</h1>
 <p class="lead">
- Module này khóa chặt rủi ro “lọt lỗi ngay từ sản phẩm đầu”: sai REV, sai setup, sai dụng cụ đo, thiếu chứng chỉ vật liệu/công đoạn đặc biệt,
- và bypass cổng kiểm soát dẫn tới ship sai. Chuẩn áp dụng: kỷ luật FAI kiểu AS9102 (Form 1–2–3, balloon, truy xuất) kết hợp Bộ bằng chứng (evidence pack) của HESEM.
+ Mô-đun này khóa chặt rủi ro “lọt lỗi ngay từ sản phẩm đầu”: sai REV, sai setup, sai dụng cụ đo, thiếu chứng chỉ vật liệu/công đoạn đặc biệt,
+ và vượt qua cổng kiểm soát dẫn tới ship sai. Chuẩn áp dụng: kỷ luật FAI kiểu AS9102 (Form 1–2–3, balloon, truy xuất) kết hợp Bộ bằng chứng (evidence pack) của HESEM.
  </p>
 <div class="grid-2">
 <div class="note">
 <strong>Tài liệu nội bộ áp dụng trực tiếp</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
-<li>SOP-QMS-009 — First Article Inspection / Mẫu đầu (first piece) Control</li>
+<li>SOP-QMS-009 — Kiểm tra sản phẩm đầu tiên Inspection / Mẫu đầu (first piece) Control</li>
 <li>ANNEX-QMS-003 — Bộ bằng chứng (Hồ sơ công việc (job dossier) + Data Governance)</li>
 </ul>
 <div class="small muted" style="margin-top:8px">
@@ -90,7 +90,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="small muted" style="margin-top:6px">TargetRoles: Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor</div>
 <div style="margin-top:10px"><strong>Điều kiện tham gia</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
-<li>Đã học module “Revision control &amp; Job Pack discipline” (hoặc đã qua kiểm tra tương đương).</li>
+<li>Đã học mô-đun “Revision control &amp; Job Pack discipline” (hoặc đã qua kiểm tra tương đương).</li>
 <li>Đã được cấp quyền truy cập M365 Bộ bằng chứng theo vai trò.</li>
 </ul>
 </div>
@@ -99,20 +99,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout" style="margin-top:12px">
 <h3>Tuyên thệ chống hời hợt (bắt buộc áp dụng trong lớp &amp; ngoài xưởng)</h3>
 <ul>
-<li>Học để chạy xưởng và sẵn sàng đánh giá. Mọi nội dung phải ra quyết định Cổng kiểm soát, bàn giao (handoff) và tạo minh chứng.</li>
+<li>Học để chạy xưởng và sẵn sàng đánh giá. Mọi nội dung phải ra quyết định Cổng kiểm soát, bàn giao (bàn giao) và tạo minh chứng.</li>
 <li>Thiếu dữ kiện thực tế của job → ghi <b>M365/SharePoint → HESEM-QMS-SSOT</b> ngay tại chỗ thiếu và dừng Cổng kiểm soát tại đó.</li>
 <li>Không có hồ sơ chứng cứ → <b>BLOCK</b> chuyển công đoạn / ship.</li>
 </ul>
 </div>
 </div>
 <!-- 2) Mục đích module & bối cảnh vận hành -->
-<h2 class="h2">2) Mục đích module &amp; bối cảnh vận hành</h2>
+<h2 class="h2">2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card">
-<p><strong>Mục đích:</strong> Chuẩn hóa cách kích hoạt, thực hiện, đánh giá và lưu bằng chứng First Article Inspection (FAI) / Mẫu đầu Control theo SOP-QMS-09,
+<p><strong>Mục đích:</strong> Chuẩn hóa cách kích hoạt, thực hiện, đánh giá và lưu bằng chứng Kiểm tra sản phẩm đầu tiên Inspection (FAI) / Mẫu đầu Control theo SOP-QMS-09,
  đạt kỷ luật kiểu AS9102 để chống “lọt lỗi” và chống “thiếu hồ sơ” khi đánh giá/khách hàng kiểm tra.</p>
 <div class="grid-2">
 <div class="note">
-<strong>Khi module được kích hoạt</strong>
+<strong>Khi mô-đun được kích hoạt</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
 <li>Khi part mới / lần chạy đầu / chuyển nhà cung ứng / chuyển máy hoặc chuyển xưởng.</li>
 <li>Khi đổi REV bản vẽ/spec/ECO thay đổi fit–form–function hoặc thay đổi CTQ.</li>
@@ -136,7 +136,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div style="margin-top:10px">
 <strong>Liên kết vận hành bắt buộc</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
-<li>FAI/Mẫu đầu gắn trực tiếp với kiểm soát REV, kiểm soát traceability vật liệu, kiểm soát calibration/gage, và kiểm soát outsource/công đoạn đặc biệt.</li>
+<li>FAI/Mẫu đầu gắn trực tiếp với kiểm soát REV, kiểm soát traceability vật liệu, kiểm soát hiệu chuẩn/gage, và kiểm soát outsource/công đoạn đặc biệt.</li>
 <li>FAI là “cổng chặn” ngăn scrap và ngăn ship sai; đồng thời là “cổng chứng cứ” để sẵn sàng đánh giá.</li>
 </ul>
 </div>
@@ -157,7 +157,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
 <li>Vật liệu: spec, heat/lot, chứng chỉ đi kèm.</li>
 <li>Công đoạn đặc biệt: nhà cung ứng, spec/finish code, cert khớp lot/serial.</li>
-<li>Functional testing/NDI: phương pháp, tiêu chí PASS/FAIL, báo cáo đính kèm.</li>
+<li>Functional testing/NDI: phương pháp, tiêu chí ĐẠT/KHÔNG ĐẠT, báo cáo đính kèm.</li>
 </ul>
 </div>
 </div>
@@ -192,18 +192,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <!-- 3) Vị trí trong chuỗi E2E + handoff -->
-<h2 class="h2">3) Vị trí trong chuỗi E2E &amp; luồng handoff (input/output) + điểm chặn</h2>
+<h2 class="h2">3) Vị trí trong chuỗi E2E &amp; luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <div class="card">
 <div class="small muted">Chuỗi E2E bắt buộc nêu rõ</div>
-<p style="margin-top:6px"><b>Quote/Contract → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Feedback/CI</b></p>
+<p style="margin-top:6px"><b>Báo giá/Hợp đồng → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Phản hồi/CI</b></p>
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
 <th>Bước</th>
-<th>Input tối thiểu</th>
-<th>Handoff / điểm chặn</th>
-<th>Output / Bằng chứng (MRR)</th>
+<th>Đầu vào tối thiểu</th>
+<th>Bàn giao / điểm chặn</th>
+<th>Đầu ra / Bằng chứng (MRR)</th>
 </tr>
 </thead>
 <tbody>
@@ -234,7 +234,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>QC/QA</b></td>
 <td>Ballooned drawing/inspection plan</td>
-<td><b>FAI Cổng kiểm soát</b>: PASS/FAIL + quyết định HOLD/GO</td>
+<td><b>FAI Cổng kiểm soát</b>: ĐẠT/KHÔNG ĐẠT + quyết định HOLD/GO</td>
 <td>FAI pack (Form 1–2–3 hoặc hồ sơ tương đương) + ký duyệt</td>
 </tr>
 <tr>
@@ -253,16 +253,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="callout" style="margin-top:12px">
-<h3>Điểm chặn bắt buộc (không được bypass)</h3>
+<h3>Điểm chặn bắt buộc (không được vượt qua)</h3>
 <ul>
 <li><b>BLOCK</b> chạy loạt khi chưa có Mẫu đầu PASS.</li>
 <li><b>BLOCK</b> release/giao hàng khi thiếu FAI pack theo contract hoặc khi thiếu Bộ bằng chứng tối thiểu.</li>
-<li><b>BLOCK</b> khi có rủi ro sai REV, mix-up lô, thiếu/giả chứng chỉ, gage OOT, outsource chưa có cert.</li>
+<li><b>BLOCK</b> khi có rủi ro sai REV, lẫn lộn (mix-up) lô, thiếu/giả chứng chỉ, gage OOT, outsource chưa có cert.</li>
 </ul>
 </div>
 </div>
 <!-- 4) Failure Points -->
-<h2 class="h2">4) Failure Points (tối thiểu 10 điểm gãy thực tế)</h2>
+<h2 class="h2">4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế)</h2>
 <div class="card">
 <ol style="margin:0; padding-left:18px; line-height:1.75">
 <li><b>Sai REV</b> giữa drawing – routing – program – setup sheet.</li>
@@ -270,9 +270,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Đo sai dụng cụ</b> (độ phân giải không đủ) hoặc dùng gage hết hạn hiệu chuẩn.</li>
 <li><b>CTQ bị bỏ qua</b> vì “đo nhanh” hoặc vì thiếu plan đo.</li>
 <li><b>Đổi dao/offset</b> sau khi đo xong nhưng không re-check đặc tính bị ảnh hưởng.</li>
-<li><b>Mix-up lô vật liệu</b> do kho cấp sai heat/lot hoặc dán nhãn thiếu.</li>
+<li><b>Lẫn lộn lô vật liệu</b> do kho cấp sai heat/lot hoặc dán nhãn thiếu.</li>
 <li><b>Công đoạn đặc biệt</b> (anodize/heat treat/coating/NDI) thiếu cert hoặc cert không khớp PO/spec.</li>
-<li><b>Bypass cổng kiểm soát</b> do áp lực tiến độ: chạy loạt khi chưa có PASS ký.</li>
+<li><b>Vượt qua cổng kiểm soát</b> do áp lực tiến độ: chạy loạt khi chưa có PASS ký.</li>
 <li><b>Thiếu chữ ký/thiếu ngày</b> trên hồ sơ → đánh giá coi như không tồn tại.</li>
 <li><b>Nhầm đơn vị đo</b> (inch/mm), nhầm datum/zero, nhầm GD&amp;T interpretation.</li>
 <li><b>Lưu sai chỗ/sai tên</b> trong Bộ bằng chứng → không tìm được khi đánh giá.</li>
@@ -280,13 +280,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 </div>
 <!-- 5) Risk Controls -->
-<h2 class="h2">5) Risk Controls (control points – ai làm – bằng chứng)</h2>
+<h2 class="h2">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát – ai làm – bằng chứng)</h2>
 <div class="card">
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
-<th>Control point</th>
+<th>Điểm kiểm soát</th>
 <th>Người phụ trách chính</th>
 <th>Điều kiện đạt</th>
 <th>Bằng chứng/MRR tối thiểu</th>
@@ -309,7 +309,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>CP3 — Gage Status</b></td>
 <td>QC + Maintenance</td>
 <td>Gage/CMM ở trạng thái hiệu lực; truy xuất tem hiệu chuẩn rõ</td>
-<td>Ảnh tem + link danh mục calibration M365/SharePoint → HESEM-QMS-SSOT</td>
+<td>Ảnh tem + link danh mục hiệu chuẩn M365/SharePoint → HESEM-QMS-SSOT</td>
 </tr>
 <tr>
 <td><b>CP4 — Material Trace</b></td>
@@ -326,7 +326,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP6 — Cổng kiểm soát Decision</b></td>
 <td>QC + QA + Supervisor</td>
-<td>PASS/FAIL rõ; FAIL có HOLD tag + NCR; PASS có chữ ký release</td>
+<td>ĐẠT/KHÔNG ĐẠT rõ; FAIL có HOLD tag + NCR; PASS có chữ ký release</td>
 <td>FAI pack + ảnh tag HOLD/PASS + NCR khi không đạt</td>
 </tr>
 <tr>
@@ -395,7 +395,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Ảnh 3 trang: drawing rev, program version, HOLD tag</td>
 </tr>
 <tr>
-<td>Mix-up lô vật liệu</td>
+<td>Lẫn lộn lô vật liệu</td>
 <td>Đóng khay/box → dán HOLD “LOT MIX” → ngăn cấp phát thêm</td>
 <td>Warehouse → Supervisor → QA</td>
 <td>Ảnh nhãn heat/lot + log cấp phát</td>
@@ -408,12 +408,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Gage OOT / tem hết hạn</td>
-<td>Ngưng đo → niêm phong gage → chuyển Maintenance/Calibration</td>
+<td>Ngưng đo → niêm phong gage → chuyển Maintenance/Hiệu chuẩn</td>
 <td>QC → Maintenance → QA</td>
 <td>Ảnh tem + phiếu cách ly dụng cụ</td>
 </tr>
 <tr>
-<td>Bypass cổng kiểm soát / áp lực tiến độ</td>
+<td>Vượt qua cổng kiểm soát / áp lực tiến độ</td>
 <td>BLOCK job tại hiện trường → báo Supervisor + QA → dừng chuyển công đoạn</td>
 <td>Bất kỳ ai → Supervisor → QA/Manager</td>
 <td>Log sự kiện + chữ ký xác nhận dừng</td>
@@ -460,14 +460,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2">9) OJT thực chiến theo TWI</h2>
 <div class="card">
 <p><strong>Chuẩn OJT:</strong> Trainer làm mẫu 01 lần → học viên làm 02 lần dưới quan sát → 01 lần độc lập. Mọi bước đều tạo MRR.</p>
-<h3 style="margin-top:10px">9.1 Job Breakdown (Step / Key Points / Reasons)</h3>
+<h3 style="margin-top:10px">9.1 Job Breakdown (Step / Điểm then chốt / Lý do)</h3>
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
 <th>Step</th>
-<th>Key Points (điểm then chốt)</th>
-<th>Reasons (vì sao bắt buộc)</th>
+<th>Điểm then chốt</th>
+<th>Lý do (vì sao bắt buộc)</th>
 </tr>
 </thead>
 <tbody>
@@ -493,8 +493,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Cổng kiểm soát decision</td>
-<td>PASS/FAIL bằng chữ ký; FAIL mở NCR, không có “pass miệng”</td>
-<td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate); chống bypass</td>
+<td>ĐẠT/KHÔNG ĐẠT bằng chữ ký; FAIL mở NCR, không có “pass miệng”</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate); chống vượt qua</td>
 </tr>
 <tr>
 <td>Lưu Bộ bằng chứng</td>
@@ -504,11 +504,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody>
 </table>
 </div>
-<h3 style="margin-top:14px">9.2 OJT output (bắt buộc nộp)</h3>
+<h3 style="margin-top:14px">9.2 OJT đầu ra (bắt buộc nộp)</h3>
 <div class="note">
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
 <li>01 bộ <b>FAI pack</b> hoàn chỉnh cho 01 job mẫu (Form 1–2–3 hoặc hồ sơ tương đương) + ballooned drawing.</li>
-<li>01 bảng kiểm “FAI Cổng kiểm soát decision” có chữ ký PASS/FAIL.</li>
+<li>01 bảng kiểm “FAI Cổng kiểm soát decision” có chữ ký ĐẠT/KHÔNG ĐẠT.</li>
 <li>01 ảnh nhãn HOLD/PASS trên mẫu đầu + ảnh tem hiệu chuẩn dụng cụ đo dùng cho CTQ.</li>
 <li>01 hồ sơ đặt tên file và lưu đúng folder theo ANNEX-QMS-003.</li>
 </ul>
@@ -528,13 +528,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>L1</b></td>
 <td>Nhận biết đúng trigger FAI; đọc đúng REV; gọi đúng người khi có mismatch</td>
-<td>Quiz đạt ≥ 80% và làm đúng “phản ứng 60 giây” trong mô phỏng</td>
+<td>Bài kiểm tra nhanh đạt ≥ 80% và làm đúng “phản ứng 60 giây” trong mô phỏng</td>
 <td>Được tham gia ca chạy FAI dưới giám sát</td>
 </tr>
 <tr>
 <td><b>L2</b></td>
 <td>Thực hiện đúng bảng kiểm bước 1–10 dưới giám sát; tạo MRR không thiếu trường bắt buộc</td>
-<td>Hoàn tất OJT output 01 bộ, không lỗi Cổng kiểm soát</td>
+<td>Hoàn tất OJT đầu ra 01 bộ, không lỗi Cổng kiểm soát</td>
 <td>Operator/Setup được phép chạy job sau khi QC/QA ký PASS</td>
 </tr>
 <tr>
@@ -545,7 +545,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L4</b></td>
-<td>Thiết kế control plan FAI; chặn bypass; đánh giá nội bộ và sửa lỗ hổng quy trình</td>
+<td>Thiết kế control plan FAI; chặn vượt qua; đánh giá nội bộ và sửa lỗ hổng quy trình</td>
 <td>2 kỳ liên tiếp không có đánh giá finding lặp; dẫn dắt 01 kaizen về FAI/bằng chứng</td>
 <td>QA/Supervisor được phép phê duyệt cổng kiểm soát và đào tạo lại; được cấp quyền sẵn sàng đánh giá review</td>
 </tr>
@@ -559,12 +559,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead>
 <tr>
 <th>Vai trò</th>
-<th>Phạm vi áp dụng trong module</th>
+<th>Phạm vi áp dụng trong mô-đun</th>
 <th>Tiêu chí đạt tối thiểu để làm độc lập</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>Operator</td><td>Giữ kỷ luật mẫu đầu, nhãn HOLD/PASS, không rework trái phép</td><td>L2 + không vi phạm Rule bypass cổng kiểm soát</td></tr>
+<tr><td>Operator</td><td>Giữ kỷ luật mẫu đầu, nhãn HOLD/PASS, không rework trái phép</td><td>L2 + không vi phạm Rule vượt qua cổng kiểm soát</td></tr>
 <tr><td>Setup</td><td>Setup/offset baseline, re-check khi chỉnh CTQ</td><td>L2; L3 khi tự xác định đặc tính bị ảnh hưởng</td></tr>
 <tr><td>Programmer</td><td>REV lock, program version control, change impact</td><td>L3</td></tr>
 <tr><td>QC</td><td>Balloon/plan, đo CTQ, Form 3, lưu bằng chứng</td><td>L3</td></tr>
@@ -582,9 +582,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <!-- 10) Assessment -->
-<h2 class="h2">10) Đánh giá (quiz + scenario + performance test)</h2>
+<h2 class="h2">10) Đánh giá (bài kiểm tra nhanh + scenario + performance test)</h2>
 <div class="card">
-<h3>10.1 Quiz (≥ 20 câu)</h3>
+<h3>10.1 Bài kiểm tra nhanh (≥ 20 câu)</h3>
 <ol style="margin:0; padding-left:18px; line-height:1.75">
 <li>FAI khác Mẫu đầu Control ở điểm nào về phạm vi đặc tính và hồ sơ?</li>
 <li>3 điều kiện bắt buộc để mở Cổng kiểm soát chạy loạt sau mẫu đầu.</li>
@@ -592,13 +592,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Ballooned drawing dùng để làm gì trong truy xuất đánh giá?</li>
 <li>Khi đổi REV nhưng không đổi kích thước CTQ, delta FAI phải khóa những yếu tố nào?</li>
 <li>Điều gì xảy ra khi gage hết hạn hiệu chuẩn nhưng vẫn dùng để đo CTQ?</li>
-<li>Ai chịu trách nhiệm chặn bypass cổng kiểm soát tại hiện trường?</li>
+<li>Ai chịu trách nhiệm chặn vượt qua cổng kiểm soát tại hiện trường?</li>
 <li>Định nghĩa STOP, HOLD, BLOCK khác nhau thế nào về hành động?</li>
 <li>Khi phát hiện sai REV giữa drawing và program, phản ứng 60 giây gồm những bước nào?</li>
 <li>Nêu 5 loại “đặc tính” phải được account trong Form 3 (kích thước, GD&amp;T, note…).</li>
 <li>Khi công đoạn đặc biệt có cert nhưng không khớp lot/serial, trạng thái cổng kiểm soát là gì?</li>
 <li>Vì sao mẫu đầu phải “giữ nguyên trạng” trước khi QC đo?</li>
-<li>Ai có quyền ký PASS/FAIL cho FAI cổng kiểm soát theo module này?</li>
+<li>Ai có quyền ký ĐẠT/KHÔNG ĐẠT cho FAI cổng kiểm soát theo mô-đun này?</li>
 <li>Quy tắc đặt tên file bằng chứng trong Hồ sơ công việc gồm những thành phần nào?</li>
 <li>Khi chỉnh offset sau khi PASS CTQ, bước bắt buộc tiếp theo là gì?</li>
 <li>Nêu 3 lỗi đánh giá liên quan FAI khiến khách hàng reject.</li>
@@ -633,7 +633,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p style="margin:6px 0 0 0; line-height:1.7">
  Job J-30012: giữ nguyên REV; đổi dao phay ngón Ø6 sang Ø5 do thiếu hàng, thay đường chạy dao để giữ bề mặt.
  CTQ liên quan: vị trí lỗ theo datum A|B và độ nhám bề mặt.
- <br/><b>Yêu cầu:</b> xác định phạm vi delta FAI (đặc tính nào bắt buộc đo lại), ai chịu trách nhiệm cập nhật hồ sơ, và tiêu chí PASS/FAIL.
+ <br/><b>Yêu cầu:</b> xác định phạm vi delta FAI (đặc tính nào bắt buộc đo lại), ai chịu trách nhiệm cập nhật hồ sơ, và tiêu chí ĐẠT/KHÔNG ĐẠT.
  </p>
 </div>
 </div>
@@ -667,7 +667,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Cổng kiểm soát decision</td>
-<td>PASS/FAIL bằng chữ ký; FAIL có HOLD + NCR</td>
+<td>ĐẠT/KHÔNG ĐẠT bằng chữ ký; FAIL có HOLD + NCR</td>
 <td>Pass miệng hoặc không containment</td>
 </tr>
 <tr>
@@ -679,22 +679,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="callout" style="margin-top:12px">
-<h3>PASS/FAIL của bài performance test</h3>
+<h3>ĐẠT/KHÔNG ĐẠT của bài performance test</h3>
 <ul>
 <li><b>PASS</b>: không vi phạm Fail-fast rules; không thiếu MRR bắt buộc; quyết định cổng kiểm soát đúng trạng thái.</li>
-<li><b>FAIL</b>: bất kỳ hành vi bypass cổng kiểm soát; dùng gage OOT; thiếu chứng chỉ bắt buộc; thiếu chữ ký/thiếu hồ sơ.</li>
+<li><b>FAIL</b>: bất kỳ hành vi vượt qua cổng kiểm soát; dùng gage OOT; thiếu chứng chỉ bắt buộc; thiếu chữ ký/thiếu hồ sơ.</li>
 </ul>
 </div>
 </div>
 <!-- 11) PASS/FAIL criteria -->
-<h2 class="h2">11) PASS/FAIL criteria của module (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</h2>
+<h2 class="h2">11) ĐẠT/KHÔNG ĐẠT criteria của mô-đun (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</h2>
 <div class="card">
 <div class="grid-2">
 <div class="callout">
 <h3>PASS</h3>
 <ul>
-<li>Quiz đạt ≥ 80% và không sai câu hỏi về STOP/HOLD/BLOCK.</li>
-<li>Hoàn tất OJT output đủ 4 hạng mục, lưu đúng Bộ bằng chứng.</li>
+<li>Bài kiểm tra nhanh đạt ≥ 80% và không sai câu hỏi về STOP/HOLD/BLOCK.</li>
+<li>Hoàn tất OJT đầu ra đủ 4 hạng mục, lưu đúng Bộ bằng chứng.</li>
 <li>Performance test PASS (không có lỗi Cổng kiểm soát).</li>
 </ul>
 </div>
@@ -702,7 +702,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>FAIL</h3>
 <ul>
 <li>Thiếu bất kỳ MRR bắt buộc hoặc lưu sai chỗ khiến không truy xuất được.</li>
-<li>Vi phạm bypass cổng kiểm soát hoặc cố tình chạy loạt khi chưa có PASS ký.</li>
+<li>Vi phạm vượt qua cổng kiểm soát hoặc cố tình chạy loạt khi chưa có PASS ký.</li>
 <li>Không phát hiện sai REV hoặc không thực hiện containment khi phát hiện.</li>
 </ul>
 </div>
@@ -745,14 +745,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Áp dụng template Bộ bằng chứng</td>
 </tr>
 <tr>
-<td>Part/REV Master Data</td>
+<td>Part/REV Dữ liệu gốc</td>
 <td>M365/SharePoint → DATA → 03_Production → 00_Programming → {CustomerCode} → {CustomerPartNo} → <code>REV {Rev}</code> → <code>10_Quality</code></td>
 <td>Chứa balloon/kế hoạch kiểm tra (inspection plan) “chuẩn REV”</td>
 </tr>
 <tr>
-<td>Danh mục calibration/approved supplier</td>
+<td>Danh mục hiệu chuẩn/approved supplier</td>
 <td>M365/SharePoint → HESEM-QMS-SSOT (library/list chuẩn để truy xuất trạng thái)</td>
-<td>Module này yêu cầu có nguồn truy xuất tập trung</td>
+<td>Mô-đun này yêu cầu có nguồn truy xuất tập trung</td>
 </tr>
 <tr>
 <td>Training hồ sơ</td>
@@ -781,9 +781,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Planner</td>
 </tr>
 <tr>
-<td>Không có nguồn truy xuất tập trung danh mục calibration/approved supplier</td>
+<td>Không có nguồn truy xuất tập trung danh mục hiệu chuẩn/approved supplier</td>
 <td>PHẢI chặn tại đánh giá; không dùng gage OOT; chỉ dùng supplier đã phê duyệt</td>
-<td>Tạo/chuẩn hóa list M365 (calibration + approved supplier); đặt trong mục 12.3 và thay M365/SharePoint → HESEM-QMS-SSOT</td>
+<td>Tạo/chuẩn hóa list M365 (hiệu chuẩn + approved supplier); đặt trong mục 12.3 và thay M365/SharePoint → HESEM-QMS-SSOT</td>
 <td>QA + Maintenance + Purchasing</td>
 </tr>
 <tr>
@@ -809,19 +809,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <!-- 13) Common audit findings -->
-<h2 class="h2">13) Common đánh giá findings &amp; prevention (≥ 8)</h2>
+<h2 class="h2">13) Common đánh giá phát hiện &amp; phòng ngừa (≥ 8)</h2>
 <div class="card">
 <ol style="margin:0; padding-left:18px; line-height:1.75">
 <li><b>FAI thiếu đặc tính</b> (bỏ sót note/spec) → chặn bằng CP2, kiểm tra “characteristic completeness” trước ký.</li>
 <li><b>Không truy xuất được balloon</b> → bắt buộc ballooned drawing đính kèm trong Part/REV Master + link trong hồ sơ công việc.</li>
 <li><b>Thiếu chữ ký/ngày</b> → cổng kiểm soát sign-off chỉ mở khi field đầy đủ; thiếu field = BLOCK.</li>
-<li><b>Gage status không chứng minh</b> → lưu ảnh tem + link danh mục calibration; OOT = cách ly.</li>
+<li><b>Gage status không chứng minh</b> → lưu ảnh tem + link danh mục hiệu chuẩn; OOT = cách ly.</li>
 <li><b>Material cert không khớp heat/lot</b> → kho dán nhãn heat/lot, log cấp phát và đối chiếu cert.</li>
 <li><b>Công đoạn đặc biệt cert thiếu trường</b> → Purchasing yêu cầu re-issue; không giao hàng khi chưa đủ.</li>
 <li><b>FAI không đại diện cho quá trình</b> (đo mẫu đã rework) → kỷ luật mẫu đầu “giữ nguyên trạng”.</li>
 <li><b>Lưu hồ sơ sai chỗ/sai tên</b> → áp dụng naming rule ANNEX-QMS-003; kiểm tra truy xuất 60 giây.</li>
 <li><b>Delta FAI làm sai phạm vi</b> → bắt buộc change impact review có chữ ký Programmer + QA.</li>
-<li><b>Bypass cổng kiểm soát do tiến độ</b> → Supervisor chịu trách nhiệm chặn; log sự kiện; đánh giá lại năng lực.</li>
+<li><b>Vượt qua cổng kiểm soát do tiến độ</b> → Supervisor chịu trách nhiệm chặn; log sự kiện; đánh giá lại năng lực.</li>
 </ol>
 </div>
 <!-- 14) DCR record -->

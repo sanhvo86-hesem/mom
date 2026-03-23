@@ -74,9 +74,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <div class="grid-2">
 <div>
-<div class="badge"><span class="dot"></span>Module TRN-OPS-06</div>
+<div class="badge"><span class="dot"></span>Mô-đun TRN-OPS-06</div>
 <h1 style="margin-top:10px">sẵn sàng cho đánh giá cho hồ sơ đào tạo: lưu trữ, truy xuất 60s, chỉ số, recert cadence</h1>
-<p class="muted">Mục tiêu: mọi hồ sơ đào tạo liên quan chất lượng/an toàn/cổng kiểm soát (gate) phải truy xuất được trong <b>≤60 giây</b>, đúng phiên bản, đúng phạm vi, có bằng chứng đánh giá hiệu lực (quiz + scenario + performance test/OJT).</p>
+<p class="muted">Mục tiêu: mọi hồ sơ đào tạo liên quan chất lượng/an toàn/cổng kiểm soát (gate) phải truy xuất được trong <b>≤60 giây</b>, đúng phiên bản, đúng phạm vi, có bằng chứng đánh giá hiệu lực (bài kiểm tra nhanh + scenario + performance test/OJT).</p>
 <div class="tag blue">Phiên bản</div>
 </div>
 <div class="note">
@@ -93,28 +93,28 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Mục lục nhanh</strong>
 <ul>
 <li><a href="#purpose">2) Mục đích &amp; bối cảnh vận hành</a></li>
-<li><a href="#e2e">3) Vị trí trong chuỗi E2E + luồng handoff + điểm chặn</a></li>
-<li><a href="#failure">4) Failure Points</a></li>
-<li><a href="#controls">5) Risk Controls</a></li>
+<li><a href="#e2e">3) Vị trí trong chuỗi E2E + luồng bàn giao + điểm chặn</a></li>
+<li><a href="#failure">4) Điểm đứt gãy</a></li>
+<li><a href="#controls">5) Biện pháp kiểm soát rủi ro</a></li>
 <li><a href="#failfast">6) Fail-fast rules + STOP/HOLD/BLOCK</a></li>
 <li><a href="#react60">7) Phản ứng 60 giây</a></li>
 <li><a href="#checklist">8) Bảng kiểm vận hành (≤15 bước)</a></li>
 <li><a href="#ojt">9) OJT thực chiến theo TWI</a></li>
-<li><a href="#assessment">10) Đánh giá (Quiz + Scenario + bài kiểm tra thực hành)</a></li>
-<li><a href="#passfail">11) PASS/FAIL criteria</a></li>
+<li><a href="#assessment">10) Đánh giá (Bài kiểm tra nhanh + Scenario + bài kiểm tra thực hành)</a></li>
+<li><a href="#passfail">11) ĐẠT/KHÔNG ĐẠT criteria</a></li>
 <li><a href="#mrr">12) MRR tối thiểu (hồ sơ + đặt tên + nơi lưu)</a></li>
-<li><a href="#findings">13) Common đánh giá findings &amp; prevention</a></li>
+<li><a href="#findings">13) Common đánh giá phát hiện &amp; phòng ngừa</a></li>
 <li><a href="#DCR record">14) DCR hồ sơ</a></li>
 </ul>
 </div>
 </div>
 <!-- 2) Mục đích module & bối cảnh vận hành -->
 <div class="card" id="purpose">
-<h2>2) Mục đích module &amp; bối cảnh vận hành (cổng kiểm soát/handoff; ai chịu trách nhiệm; khi nào kích hoạt)</h2>
+<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành (cổng kiểm soát/bàn giao; ai chịu trách nhiệm; khi nào kích hoạt)</h2>
 <div class="callout">
 <h3>Lý do tồn tại (Cổng kiểm soát Logic)</h3>
 <ul>
-<li><b>Cổng kiểm soát năng lực:</b> xưởng CNC job shop chạy tốc độ cao; bố trí sai người/sai phạm vi gây sai Rev, sai đo, ship sai, NCR/MRB, customer escape.</li>
+<li><b>Cổng kiểm soát năng lực:</b> xưởng CNC gia công theo đơn (job shop) chạy tốc độ cao; bố trí sai người/sai phạm vi gây sai Rev, sai đo, ship sai, NCR/MRB, customer escape.</li>
 <li><b>Cổng kiểm soát đánh giá:</b> đánh giá viên/khách hàng yêu cầu chứng minh “ai làm gì” và “đã được đào tạo/đánh giá hiệu lực”. Không có hồ sơ = không có chứng minh.</li>
 <li><b>Cổng kiểm soát vận hành:</b> hồ sơ nằm rải rác, đặt tên sai, trộn phiên bản, thiếu ký/thiếu rubric làm xưởng mất thời gian, treo job, phát sinh tranh chấp.</li>
 </ul>
@@ -122,28 +122,28 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Chủ thể chịu trách nhiệm</h3>
 <table class="table tight">
 <thead>
-<tr><th style="width:180px">Vai trò</th><th>Trách nhiệm bắt buộc trong module này</th><th style="width:220px">Điều kiện “được làm việc độc lập”</th></tr>
+<tr><th style="width:180px">Vai trò</th><th>Trách nhiệm bắt buộc trong mô-đun này</th><th style="width:220px">Điều kiện “được làm việc độc lập”</th></tr>
 </thead>
 <tbody>
 <tr>
 <td><b>HR/Training</b></td>
 <td>Quản trị kế hoạch đào tạo, sổ theo dõi tái chứng nhận, kho hồ sơ đào tạo; đảm bảo truy xuất 60 giây theo yêu cầu đánh giá.</td>
-<td>Kho hồ sơ có cấu trúc chuẩn; log tái chứng nhận cập nhật; drill truy xuất PASS.</td>
+<td>Kho hồ sơ có cấu trúc chuẩn; log tái chứng nhận cập nhật; diễn tập truy xuất PASS.</td>
 </tr>
 <tr>
 <td><b>QA/QMS (Doc Control)</b></td>
-<td>Kiểm soát phiên bản module, kiểm soát biểu mẫu/rubric/quiz; kiểm tra “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” tại các cổng kiểm soát chất lượng.</td>
+<td>Kiểm soát phiên bản mô-đun, kiểm soát biểu mẫu/rubric/bài kiểm tra nhanh; kiểm tra “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” tại các cổng kiểm soát chất lượng.</td>
 <td>Dashboard chỉ số có số; điểm chặn thực thi; đóng vòng khi phát hiện thiếu hồ sơ.</td>
 </tr>
 <tr>
 <td><b>Supervisor/Leader</b></td>
-<td>Chỉ bố trí người còn hiệu lực; xác nhận OJT; thực hiện drill truy xuất 60 giây khi có đánh giá.</td>
-<td>Đủ bằng chứng cho cả cá nhân và đội; drill 03 hồ sơ liên tiếp PASS.</td>
+<td>Chỉ bố trí người còn hiệu lực; xác nhận OJT; thực hiện diễn tập truy xuất 60 giây khi có đánh giá.</td>
+<td>Đủ bằng chứng cho cả cá nhân và đội; diễn tập 03 hồ sơ liên tiếp PASS.</td>
 </tr>
 <tr>
 <td><b>Nhân sự thực thi (Operator/Setup/Programmer/QC/Warehouse/Purchasing/Planner/Maintenance/EHS/Estimator (SAL-03))</b></td>
 <td>Tạo và nộp đủ bằng chứng học/đánh giá; lưu đúng cấu trúc; tự truy xuất hồ sơ của mình trong 60 giây.</td>
-<td>Đạt quiz + scenario + performance test theo role; hồ sơ đặt tên đúng; truy xuất PASS.</td>
+<td>Đạt bài kiểm tra nhanh + scenario + performance test theo vai trò; hồ sơ đặt tên đúng; truy xuất PASS.</td>
 </tr>
 </tbody>
 </table>
@@ -157,21 +157,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 3) Vị trí trong chuỗi E2E -->
 <div class="card" id="e2e">
-<h2>3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + “điểm chặn”</h2>
-<p class="muted">Module này là “hệ thống chặn” xuyên suốt E2E. Mỗi bước có người làm và bằng chứng năng lực tương ứng. Thiếu bằng chứng = không mở cổng kiểm soát ở bước có rủi ro.</p>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + “điểm chặn”</h2>
+<p class="muted">Mô-đun này là “hệ thống chặn” xuyên suốt E2E. Mỗi bước có người làm và bằng chứng năng lực tương ứng. Thiếu bằng chứng = không mở cổng kiểm soát ở bước có rủi ro.</p>
 <div class="table-wrap">
 <table class="table tight">
 <thead>
 <tr>
 <th style="width:170px">Bước E2E</th>
-<th>Input (hồ sơ/điều kiện)</th>
-<th>Output (hồ sơ/bằng chứng)</th>
+<th>Đầu vào (hồ sơ/điều kiện)</th>
+<th>Đầu ra (hồ sơ/bằng chứng)</th>
 <th style="width:220px">Điểm chặn (Cổng kiểm soát)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><b>Quote/Contract</b></td>
+<td><b>Báo giá/Hợp đồng</b></td>
 <td>Yêu cầu khách hàng/điều khoản chất lượng</td>
 <td>Training hồ sơ “Customer requirements awareness” cho Estimator (SAL-03)</td>
 <td>Thiếu hồ sơ nhận thức điều khoản = <b>BLOCK</b> chốt cam kết/thời gian dẫn (lead time)</td>
@@ -179,12 +179,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Planning</b></td>
 <td>Routing/CTQ list/plan tải</td>
-<td>Hồ sơ “Planner competency scope” + drill truy xuất</td>
+<td>Hồ sơ “Planner competency scope” + diễn tập truy xuất</td>
 <td>Thiếu scope valid = <b>BLOCK</b> phát hành traveler cho CTQ</td>
 </tr>
 <tr>
 <td><b>Engineering</b></td>
-<td>Drawing/REV/master data</td>
+<td>Drawing/REV/dữ liệu gốc</td>
 <td>Hồ sơ đào tạo kiểm soát Rev + release hồ sơ</td>
 <td>Sai Rev/thiếu hồ sơ = <b>BLOCK</b> phát hành chương trình</td>
 </tr>
@@ -208,7 +208,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>QC/QA</b></td>
-<td>Control plan + gage list + calibration</td>
+<td>Control plan + gage list + hiệu chuẩn</td>
 <td>Hồ sơ đo kiểm + quyền ký “inspection release”</td>
 <td>Gage OOT hoặc hồ sơ hết hạn = <b>HOLD</b> lot / <b>BLOCK</b> release</td>
 </tr>
@@ -237,47 +237,47 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate) = <b>BLOCK</b> xuất hàng</td>
 </tr>
 <tr>
-<td><b>Feedback/CI</b></td>
-<td>Customer feedback + đánh giá nội bộ</td>
+<td><b>Phản hồi/CI</b></td>
+<td>Customer phản hồi + đánh giá nội bộ</td>
 <td>Hồ sơ đào tạo cải tiến/cập nhật SOP sau finding</td>
 <td>Finding mở quá hạn = <b>HOLD</b> tăng level / <b>BLOCK</b> mở scope mới</td>
 </tr>
 </tbody>
 </table>
 </div>
-<h3>Luồng handoff tối thiểu (input/output)</h3>
+<h3>Luồng bàn giao tối thiểu (đầu vào/đầu ra)</h3>
 <ol>
-<li><b>HR/Training</b> cấp “Bộ bằng chứng đào tạo” cho từng nhân sự theo module → gửi link kho hồ sơ + quy tắc đặt tên.</li>
+<li><b>HR/Training</b> cấp “Bộ bằng chứng đào tạo” cho từng nhân sự theo mô-đun → gửi link kho hồ sơ + quy tắc đặt tên.</li>
 <li><b>Supervisor</b> xác nhận OJT + kiểm tra hạn chứng nhận trước khi giao việc.</li>
-<li><b>QA/QMS</b> đánh giá nội bộ theo drill 60 giây và trả về action list; đóng action mới mở scope.</li>
+<li><b>QA/QMS</b> đánh giá nội bộ theo diễn tập 60 giây và trả về action list; đóng action mới mở scope.</li>
 </ol>
 </div>
 <!-- 4) Failure Points -->
 <div class="card" id="failure">
-<h2>4) Failure Points (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
+<h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
 <ol>
 <li><b>Sai Rev</b>: hồ sơ đào tạo tham chiếu tài liệu cũ; trainee học sai phiên bản.</li>
 <li><b>Thiếu scope</b>: chứng nhận có nhưng không ghi rõ phạm vi (máy/nhóm công đoạn/CTQ).</li>
 <li><b>Trộn người</b>: file bằng chứng đặt tên mơ hồ, lẫn ID nhân sự.</li>
-<li><b>Thiếu đánh giá hiệu lực</b>: chỉ có attendance, không có quiz/scenario/performance test.</li>
+<li><b>Thiếu đánh giá hiệu lực</b>: chỉ có attendance, không có bài kiểm tra nhanh/scenario/performance test.</li>
 <li><b>Thiếu rubric</b>: đánh giá bằng cảm tính; đánh giá hỏi tiêu chí đạt không trả lời được.</li>
 <li><b>Thiếu chữ ký/duyệt</b>: không xác định ai là trainer/assessor; thiếu quyền hạn.</li>
 <li><b>Hồ sơ nằm rải rác</b>: email/Zalo/USB; không có kho chính thức → truy xuất chậm.</li>
-<li><b>Đặt tên sai</b>: không có module code, không có ngày ISO, không có revision → khó lọc.</li>
+<li><b>Đặt tên sai</b>: không có mô-đun code, không có ngày ISO, không có revision → khó lọc.</li>
 <li><b>Không theo dõi hết hạn</b>: người đã hết hạn vẫn được bố trí vào công đoạn CTQ.</li>
 <li><b>Không khóa cổng kiểm soát</b>: phát hiện thiếu hồ sơ nhưng vẫn cho chạy/ship để “đỡ trễ”.</li>
-<li><b>Không có drill</b>: đến lúc đánh giá mới đi tìm → mất thời gian, lộ khoảng trống.</li>
+<li><b>Không có diễn tập</b>: đến lúc đánh giá mới đi tìm → mất thời gian, lộ khoảng trống.</li>
 <li><b>Không đóng vòng CAPA</b>: NCR do năng lực nhưng không có đào tạo lại + đánh giá lại.</li>
 </ol>
 </div>
 <!-- 5) Risk Controls -->
 <div class="card" id="controls">
-<h2>5) Risk Controls (control points; ai làm; bằng chứng; tối thiểu 6 control points)</h2>
+<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6 điểm kiểm soát)</h2>
 <div class="table-wrap">
 <table class="table tight">
 <thead>
 <tr>
-<th style="width:170px">Control point</th>
+<th style="width:170px">Điểm kiểm soát</th>
 <th style="width:160px">Người phụ trách</th>
 <th>Bằng chứng/MRR bắt buộc</th>
 <th style="width:160px">Tần suất</th>
@@ -287,13 +287,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP1 — Nguồn dữ liệu duy nhất</b></td>
 <td>HR/Training</td>
-<td>Kho hồ sơ đào tạo (SharePoint Library) + cấu trúc theo nhân sự/role/module</td>
+<td>Kho hồ sơ đào tạo (SharePoint Library) + cấu trúc theo nhân sự/vai trò/mô-đun</td>
 <td>Liên tục</td>
 </tr>
 <tr>
 <td><b>CP2 — Khoá phiên bản</b></td>
 <td>QA/QMS (Doc Control)</td>
-<td>Danh mục module + phiên bản; hồ sơ “đã nhận thức phiên bản mới” khi phát hành</td>
+<td>Danh mục mô-đun + phiên bản; hồ sơ “đã nhận thức phiên bản mới” khi phát hành</td>
 <td>Khi phát hành</td>
 </tr>
 <tr>
@@ -311,13 +311,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP5 — Đủ bằng chứng (pack)</b></td>
 <td>QA/QMS</td>
-<td>Bộ “Bộ bằng chứng đào tạo” đủ: attendance + quiz + scenario + performance test + rubric</td>
+<td>Bộ “Bộ bằng chứng đào tạo” đủ: attendance + bài kiểm tra nhanh + scenario + performance test + rubric</td>
 <td>Trước khi cấp scope</td>
 </tr>
 <tr>
-<td><b>CP6 — Drill truy xuất 60 giây</b></td>
+<td><b>CP6 — Diễn tập truy xuất 60 giây</b></td>
 <td>Supervisor + HR</td>
-<td>Log drill: thời gian truy xuất + kết quả PASS/FAIL + hành động khắc phục</td>
+<td>Log diễn tập: thời gian truy xuất + kết quả ĐẠT/KHÔNG ĐẠT + hành động khắc phục</td>
 <td>Tuần/Tháng</td>
 </tr>
 <tr>
@@ -342,36 +342,36 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" id="failfast">
 <h2>6) Fail-fast rules (≥3) + tiêu chí STOP/HOLD/BLOCK</h2>
 <ul>
-<li><b>FF1 — Không tìm thấy hồ sơ trong 60 giây:</b> <b>BLOCK</b> cấp scope mới và <b>HOLD</b> thực hiện công đoạn CTQ đến khi drill PASS.</li>
+<li><b>FF1 — Không tìm thấy hồ sơ trong 60 giây:</b> <b>BLOCK</b> cấp scope mới và <b>HOLD</b> thực hiện công đoạn CTQ đến khi diễn tập PASS.</li>
 <li><b>FF2 — Hồ sơ dùng sai phiên bản tài liệu:</b> <b>STOP</b> đào tạo đang diễn ra, thu hồi tài liệu, đào tạo lại theo phiên bản đúng, ghi nhận lý do và hành động phòng ngừa.</li>
-<li><b>FF3 — Thiếu đánh giá hiệu lực (quiz/scenario/performance test):</b> <b>BLOCK</b> công nhận hoàn tất module; attendance không được tính là hoàn tất.</li>
+<li><b>FF3 — Thiếu đánh giá hiệu lực (bài kiểm tra nhanh/scenario/performance test):</b> <b>BLOCK</b> công nhận hoàn tất mô-đun; attendance không được tính là hoàn tất.</li>
 <li><b>FF4 — Chứng nhận hết hạn hoặc bị Suspended:</b> <b>BLOCK</b> bố trí ca trong phạm vi; chỉ được làm việc có giám sát sau khi tái chứng nhận PASS.</li>
 </ul>
 <div class="note">
-<strong>Tiêu chí chặn (Cổng kiểm soát) theo role</strong>
+<strong>Tiêu chí chặn (Cổng kiểm soát) theo vai trò</strong>
 <div class="mini">Supervisor/QA có quyền chặn bố trí và chặn cổng kiểm soát release. HR có quyền chặn cấp chứng nhận và chặn mở scope. Nhân sự thực thi không được “tự quyết” vượt cổng kiểm soát.</div>
 </div>
 </div>
 <!-- 7) Phản ứng 60 giây -->
 <div class="card" id="react60">
-<h2>7) Phản ứng 60 giây (khi sai Rev/mix-up/thiếu chứng từ/OOT gage/bypass cổng kiểm soát/rủi ro giao hàng…)</h2>
+<h2>7) Phản ứng 60 giây (khi sai Rev/lẫn lộn (mix-up)/thiếu chứng từ/OOT gage/vượt qua cổng kiểm soát/rủi ro giao hàng…)</h2>
 <div class="grid-2">
 <div>
-<h3>Drill chuẩn (mục tiêu ≤60 giây)</h3>
+<h3>Diễn tập chuẩn (mục tiêu ≤60 giây)</h3>
 <ol>
 <li>Mở <b>SharePoint Training Hồ sơ</b> → tìm theo <b>Mã NV</b> hoặc <b>Họ tên</b>.</li>
 <li>Mở folder <span class="path">TRN-OPS-06</span> → chọn phiên bản mới nhất.</li>
-<li>Mở 04 file bắt buộc: <b>Attendance</b> + <b>kết quả quiz</b> + <b>Scenario</b> + <b>bài kiểm tra thực hành rubric</b>.</li>
-<li>Chụp màn hình “đường dẫn + ngày + trạng thái Valid” làm bằng chứng drill (lưu vào log drill).</li>
+<li>Mở 04 file bắt buộc: <b>Attendance</b> + <b>kết quả bài kiểm tra nhanh</b> + <b>Scenario</b> + <b>bài kiểm tra thực hành rubric</b>.</li>
+<li>Chụp màn hình “đường dẫn + ngày + trạng thái Valid” làm bằng chứng diễn tập (lưu vào log diễn tập).</li>
 </ol>
 </div>
 <div class="note">
 <strong>Phản ứng nhanh theo lỗi</strong>
 <ul>
 <li><b>Sai Rev:</b> HOLD công việc liên quan Rev đó → xác minh tài liệu đúng Rev → đào tạo nhận thức lại → cập nhật hồ sơ.</li>
-<li><b>Mix-up hồ sơ người khác:</b> HOLD xác nhận năng lực → khoá quyền sửa → HR/Doc Control sửa cấu trúc + đánh giá 10 hồ sơ ngẫu nhiên.</li>
+<li><b>Lẫn lộn hồ sơ người khác:</b> HOLD xác nhận năng lực → khoá quyền sửa → HR/Doc Control sửa cấu trúc + đánh giá 10 hồ sơ ngẫu nhiên.</li>
 <li><b>Thiếu chữ ký/assessor:</b> HOLD cấp scope → tổ chức đánh giá lại có rubric, ký rõ trainer/assessor.</li>
-<li><b>Rủi ro giao hàng do thiếu hồ sơ cổng kiểm soát:</b> BLOCK phê duyệt giao hàng và mở NCR “No bằng chứng” (điều tra nguyên nhân: bypass cổng kiểm soát).</li>
+<li><b>Rủi ro giao hàng do thiếu hồ sơ cổng kiểm soát:</b> BLOCK phê duyệt giao hàng và mở NCR “No bằng chứng” (điều tra nguyên nhân: vượt qua cổng kiểm soát).</li>
 </ul>
 </div>
 </div>
@@ -391,20 +391,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Xác định role + scope công việc (máy/công đoạn/CTQ) cho từng người</td><td>Supervisor + HR</td><td>Skill Matrix + scope note</td><td>Không ghi rõ phạm vi → đánh giá hỏi “được làm gì” không trả lời được</td></tr>
+<tr><td>1</td><td>Xác định vai trò + scope công việc (máy/công đoạn/CTQ) cho từng người</td><td>Supervisor + HR</td><td>Skill Matrix + scope note</td><td>Không ghi rõ phạm vi → đánh giá hỏi “được làm gì” không trả lời được</td></tr>
 <tr><td>2</td><td>Định danh hồ sơ: mã NV, họ tên chuẩn, bộ phận, ca</td><td>HR</td><td>Danh mục nhân sự chuẩn</td><td>Viết tắt/đổi tên → tìm không ra</td></tr>
-<tr><td>3</td><td>Thiết lập folder chuẩn theo nhân sự/role/module</td><td>HR</td><td>Folder structure + quyền truy cập</td><td>Folder trùng tên/khác cấu trúc giữa phòng ban</td></tr>
-<tr><td>4</td><td>Kiểm tra phiên bản module đang áp dụng (Draft,...)</td><td>QA/QMS</td><td>Danh mục module + DCR hồ sơ</td><td>Đào tạo bằng file cũ lưu trên máy cá nhân</td></tr>
+<tr><td>3</td><td>Thiết lập folder chuẩn theo nhân sự/vai trò/mô-đun</td><td>HR</td><td>Folder structure + quyền truy cập</td><td>Folder trùng tên/khác cấu trúc giữa phòng ban</td></tr>
+<tr><td>4</td><td>Kiểm tra phiên bản mô-đun đang áp dụng (Draft,...)</td><td>QA/QMS</td><td>Danh mục mô-đun + DCR hồ sơ</td><td>Đào tạo bằng file cũ lưu trên máy cá nhân</td></tr>
 <tr><td>5</td><td>Tổ chức đào tạo và ghi attendance</td><td>Trainer</td><td>FRM-HR-TRN-002</td><td>Chỉ có danh sách, không có nội dung/giờ học</td></tr>
-<tr><td>6</td><td>Thi quiz và lưu kết quả</td><td>Trainer</td><td>FRM-HR-TRN-009 + kết quả</td><td>Không lưu đáp án/ký xác nhận</td></tr>
+<tr><td>6</td><td>Thi bài kiểm tra nhanh và lưu kết quả</td><td>Trainer</td><td>FRM-HR-TRN-009 + kết quả</td><td>Không lưu đáp án/ký xác nhận</td></tr>
 <tr><td>7</td><td>Chạy scenario và lưu quyết định + bằng chứng</td><td>Trainer + QA</td><td>phiếu tình huống + quyết định HOLD/GO</td><td>Trả lời miệng, không có hồ sơ</td></tr>
-<tr><td>8</td><td>Thực hiện performance test theo role</td><td>Assessor (Supervisor/QA/HR)</td><td>Rubric PASS/FAIL + thời gian</td><td>Không bấm giờ; không có tiêu chí</td></tr>
+<tr><td>8</td><td>Thực hiện performance test theo vai trò</td><td>Assessor (Supervisor/QA/HR)</td><td>Rubric ĐẠT/KHÔNG ĐẠT + thời gian</td><td>Không bấm giờ; không có tiêu chí</td></tr>
 <tr><td>9</td><td>Đóng gói “Bộ bằng chứng đào tạo” và gắn trạng thái</td><td>HR</td><td>Pack bảng kiểm + trạng thái Valid</td><td>Thiếu 1 file trong pack</td></tr>
 <tr><td>10</td><td>Cập nhật chứng nhận/level + phạm vi</td><td>HR + Supervisor</td><td>FRM-HR-TRN-005</td><td>Không liên kết scope với công việc thực tế</td></tr>
 <tr><td>11</td><td>Cập nhật log tái chứng nhận + ngày hết hạn</td><td>HR</td><td>FRM-HR-TRN-006</td><td>Quên cập nhật → hết hạn không ai biết</td></tr>
-<tr><td>12</td><td>Thực hiện drill truy xuất 60 giây và ghi log</td><td>Supervisor + HR</td><td>Log drill + ảnh màn hình</td><td>Chỉ drill khi đánh giá tới</td></tr>
+<tr><td>12</td><td>Thực hiện diễn tập truy xuất 60 giây và ghi log</td><td>Supervisor + HR</td><td>Log diễn tập + ảnh màn hình</td><td>Chỉ diễn tập khi đánh giá tới</td></tr>
 <tr><td>13</td><td>Ghi nhận chỉ số tháng và action khi không đạt</td><td>QA/QMS</td><td>Dashboard / report</td><td>Không có số đo, chỉ “cảm giác”</td></tr>
-<tr><td>14</td><td>Đánh giá nội bộ mẫu 10 hồ sơ/role có CTQ</td><td>QA/QMS</td><td>Đánh giá bảng kiểm + finding</td><td>Không khóa cổng kiểm soát khi phát hiện thiếu</td></tr>
+<tr><td>14</td><td>Đánh giá nội bộ mẫu 10 hồ sơ/vai trò có CTQ</td><td>QA/QMS</td><td>Đánh giá bảng kiểm + finding</td><td>Không khóa cổng kiểm soát khi phát hiện thiếu</td></tr>
 <tr><td>15</td><td>Đóng vòng: cập nhật SOP/biểu mẫu khi phát hiện lỗ hổng</td><td>QA/QMS + HR</td><td>Change hồ sơ + đào tạo nhận thức</td><td>Fix một lần rồi quên, lỗi lặp lại</td></tr>
 </tbody>
 </table>
@@ -414,10 +414,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" id="ojt">
 <h2>9) OJT thực chiến theo TWI</h2>
 <div class="callout">
-<h3>OJT output bắt buộc</h3>
+<h3>OJT đầu ra bắt buộc</h3>
 <ul>
 <li>01 bộ <b>Bộ bằng chứng đào tạo</b> hoàn chỉnh cho 01 nhân sự (đúng cấu trúc, đúng đặt tên, đúng phiên bản).</li>
-<li>01 bản <b>log drill 60 giây</b> PASS (có bấm giờ và ảnh màn hình đường dẫn).</li>
+<li>01 bản <b>log diễn tập 60 giây</b> PASS (có bấm giờ và ảnh màn hình đường dẫn).</li>
 <li>01 bản cập nhật <b>FRM-HR-TRN-006</b> thể hiện ngày hết hạn + trạng thái Valid.</li>
 </ul>
 </div>
@@ -428,27 +428,27 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:46px">#</th>
 <th>Step (Important Step)</th>
-<th>Key Points (điểm mấu chốt)</th>
-<th>Reasons (vì sao phải làm đúng)</th>
+<th>Điểm then chốt (điểm mấu chốt)</th>
+<th>Lý do (vì sao phải làm đúng)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>1</td>
-<td>Định danh đúng người + đúng module + đúng phiên bản</td>
+<td>Định danh đúng người + đúng mô-đun + đúng phiên bản</td>
 <td>Draft</td>
-<td>Chống mix-up; đánh giá hỏi ai/đã học gì/phiên bản nào trả lời ngay</td>
+<td>Chống lẫn lộn; đánh giá hỏi ai/đã học gì/phiên bản nào trả lời ngay</td>
 </tr>
 <tr>
 <td>2</td>
 <td>Tạo cấu trúc folder chuẩn</td>
-<td>1 người = 1 folder; trong đó 1 module = 1 folder; không đặt tên tiếng Việt có dấu</td>
+<td>1 người = 1 folder; trong đó 1 mô-đun = 1 folder; không đặt tên tiếng Việt có dấu</td>
 <td>Ổn định khi lọc/sort; giảm sai tên; tăng tốc truy xuất</td>
 </tr>
 <tr>
 <td>3</td>
 <td>Lưu đủ 4 file bắt buộc</td>
-<td>Attendance + Quiz + Scenario + bài kiểm tra thực hành rubric; mỗi file có ngày ISO</td>
+<td>Attendance + Bài kiểm tra nhanh + Scenario + bài kiểm tra thực hành rubric; mỗi file có ngày ISO</td>
 <td>Attendance không chứng minh hiệu lực; 4 file tạo “bằng chứng hoàn chỉnh”</td>
 </tr>
 <tr>
@@ -459,9 +459,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>5</td>
-<td>Chạy drill truy xuất 60 giây và lưu bằng chứng</td>
+<td>Thực hiện diễn tập truy xuất 60 giây và lưu bằng chứng</td>
 <td>Bấm giờ; mở đúng 04 file; chụp màn hình đường dẫn + trạng thái</td>
-<td>“sẵn sàng cho đánh giá” được chứng minh bằng thời gian và bằng chứng drill</td>
+<td>“sẵn sàng cho đánh giá” được chứng minh bằng thời gian và bằng chứng diễn tập</td>
 </tr>
 </tbody>
 </table>
@@ -481,18 +481,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L1</b><div class="muted">Làm theo hướng dẫn</div></td>
 <td>Tạo được folder và lưu đủ 04 file với hỗ trợ; tìm lại hồ sơ của mình trong ≤120 giây.</td>
 <td>Được tham gia công việc có giám sát; chưa được giao nhiệm vụ giữ hồ sơ của team.</td>
-<td>Pack của cá nhân + log drill (bấm giờ)</td>
+<td>Pack của cá nhân + log diễn tập (bấm giờ)</td>
 </tr>
 <tr>
 <td><b>L2</b><div class="muted">Thực hiện độc lập</div></td>
 <td>Tự tạo pack, đặt tên đúng, kiểm tra chữ ký/scope; truy xuất ≤60 giây liên tiếp 02 lần.</td>
-<td>Được làm việc độc lập trong phạm vi role đã được cấp (scope).</td>
+<td>Được làm việc độc lập trong phạm vi vai trò đã được cấp (scope).</td>
 <td>Pack hoàn chỉnh + status Valid</td>
 </tr>
 <tr>
 <td><b>L3</b><div class="muted">Chuẩn hóa cho nhóm</div></td>
-<td>Đánh giá mẫu 05 hồ sơ trong nhóm; phát hiện sai tên/sai phiên bản và mở action list; drill PASS cho 03 người khác.</td>
-<td>Được làm trainer/coach nội bộ cho module; được quyền yêu cầu tạm giữ khi thiếu hồ sơ.</td>
+<td>Đánh giá mẫu 05 hồ sơ trong nhóm; phát hiện sai tên/sai phiên bản và mở action list; diễn tập PASS cho 03 người khác.</td>
+<td>Được làm trainer/coach nội bộ cho mô-đun; được quyền yêu cầu tạm giữ khi thiếu hồ sơ.</td>
 <td>Đánh giá bảng kiểm + action closure</td>
 </tr>
 <tr>
@@ -503,28 +503,28 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </tbody>
 </table>
-<h3>Tiêu chí đạt khác nhau theo role (bắt buộc)</h3>
+<h3>Tiêu chí đạt khác nhau theo vai trò (bắt buộc)</h3>
 <div class="table-wrap">
 <table class="table tight">
 <thead>
 <tr>
-<th style="width:190px">Role</th>
+<th style="width:190px">Vai trò</th>
 <th>Điều kiện đạt tối thiểu</th>
 <th style="width:240px">Điểm chặn riêng</th>
 </tr>
 </thead>
 <tbody>
-<tr><td><b>Operator/Setup</b></td><td>Quiz ≥ 80% • Scenario ≥ 2/3 PASS • bài kiểm tra thực hành: tạo pack + truy xuất ≤60 giây</td><td>Không đạt ≤60 giây = BLOCK chạy độc lập</td></tr>
-<tr><td><b>Programmer</b></td><td>Nhấn mạnh kiểm soát Rev + bằng chứng release; drill mở được hồ sơ phiên bản module + hồ sơ awareness Rev</td><td>Sai Rev trong hồ sơ = STOP phát hành chương trình</td></tr>
-<tr><td><b>QC</b></td><td>Drill mở được hồ sơ năng lực đo kiểm + trạng thái hiệu lực; hiểu liên kết với calibration/traceability</td><td>Thiếu hồ sơ = HOLD lot</td></tr>
-<tr><td><b>QA</b></td><td>Thiết lập chỉ số + đánh giá mẫu + action closure; drill 10 hồ sơ ngẫu nhiên ≤60 giây</td><td>No bằng chứng = BLOCK phê duyệt giao hàng</td></tr>
-<tr><td><b>Warehouse</b></td><td>Drill mở được hồ sơ packing/traceability; biết gắn chứng từ vào bộ hồ sơ giao hàng đúng job</td><td>Thiếu hồ sơ = HOLD packing</td></tr>
-<tr><td><b>Purchasing</b></td><td>Drill mở được hồ sơ kiểm soát supplier/công đoạn đặc biệt; biết yêu cầu cert</td><td>Thiếu hồ sơ = BLOCK PO công đoạn đặc biệt</td></tr>
-<tr><td><b>Planner</b></td><td>Drill mở được hồ sơ planning cổng kiểm soát; biết chặn staffing theo scope</td><td>Thiếu hồ sơ = BLOCK phát hành traveler CTQ</td></tr>
-<tr><td><b>Maintenance</b></td><td>Drill mở được hồ sơ an toàn/LOTO + phạm vi; biết treo máy khi thiếu chứng nhận</td><td>Hết hạn = BLOCK can thiệp máy trong phạm vi</td></tr>
-<tr><td><b>EHS</b></td><td>Drill mở được hồ sơ an toàn; biết đánh giá PPE/near-miss và liên kết đào tạo lại</td><td>Thiếu hồ sơ = STOP công việc nguy hiểm</td></tr>
-<tr><td><b>Estimator (SAL-03)</b></td><td>Drill mở được hồ sơ nhận thức yêu cầu khách hàng; biết chặn cam kết vượt năng lực</td><td>Thiếu hồ sơ = BLOCK chốt cam kết chất lượng</td></tr>
-<tr><td><b>Supervisor</b></td><td>Drill 03 hồ sơ bất kỳ trong ≤60 giây; biết kích hoạt HOLD/BLOCK; biết cập nhật recert log cùng HR</td><td>Không chặn khi thiếu bằng chứng = mở NCR “bypass cổng kiểm soát”</td></tr>
+<tr><td><b>Operator/Setup</b></td><td>Bài kiểm tra nhanh ≥ 80% • Scenario ≥ 2/3 PASS • bài kiểm tra thực hành: tạo pack + truy xuất ≤60 giây</td><td>Không đạt ≤60 giây = BLOCK chạy độc lập</td></tr>
+<tr><td><b>Programmer</b></td><td>Nhấn mạnh kiểm soát Rev + bằng chứng release; diễn tập mở được hồ sơ phiên bản mô-đun + hồ sơ awareness Rev</td><td>Sai Rev trong hồ sơ = STOP phát hành chương trình</td></tr>
+<tr><td><b>QC</b></td><td>Diễn tập mở được hồ sơ năng lực đo kiểm + trạng thái hiệu lực; hiểu liên kết với hiệu chuẩn/traceability</td><td>Thiếu hồ sơ = HOLD lot</td></tr>
+<tr><td><b>QA</b></td><td>Thiết lập chỉ số + đánh giá mẫu + action closure; diễn tập 10 hồ sơ ngẫu nhiên ≤60 giây</td><td>No bằng chứng = BLOCK phê duyệt giao hàng</td></tr>
+<tr><td><b>Warehouse</b></td><td>Diễn tập mở được hồ sơ packing/traceability; biết gắn chứng từ vào bộ hồ sơ giao hàng đúng job</td><td>Thiếu hồ sơ = HOLD packing</td></tr>
+<tr><td><b>Purchasing</b></td><td>Diễn tập mở được hồ sơ kiểm soát supplier/công đoạn đặc biệt; biết yêu cầu cert</td><td>Thiếu hồ sơ = BLOCK PO công đoạn đặc biệt</td></tr>
+<tr><td><b>Planner</b></td><td>Diễn tập mở được hồ sơ planning cổng kiểm soát; biết chặn staffing theo scope</td><td>Thiếu hồ sơ = BLOCK phát hành traveler CTQ</td></tr>
+<tr><td><b>Maintenance</b></td><td>Diễn tập mở được hồ sơ an toàn/LOTO + phạm vi; biết treo máy khi thiếu chứng nhận</td><td>Hết hạn = BLOCK can thiệp máy trong phạm vi</td></tr>
+<tr><td><b>EHS</b></td><td>Diễn tập mở được hồ sơ an toàn; biết đánh giá PPE/sự cố suýt xảy ra (near-miss) và liên kết đào tạo lại</td><td>Thiếu hồ sơ = STOP công việc nguy hiểm</td></tr>
+<tr><td><b>Estimator (SAL-03)</b></td><td>Diễn tập mở được hồ sơ nhận thức yêu cầu khách hàng; biết chặn cam kết vượt năng lực</td><td>Thiếu hồ sơ = BLOCK chốt cam kết chất lượng</td></tr>
+<tr><td><b>Supervisor</b></td><td>Diễn tập 03 hồ sơ bất kỳ trong ≤60 giây; biết kích hoạt HOLD/BLOCK; biết cập nhật recert log cùng HR</td><td>Không chặn khi thiếu bằng chứng = mở NCR “vượt qua cổng kiểm soát”</td></tr>
 </tbody>
 </table>
 </div>
@@ -532,7 +532,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 10) Đánh giá -->
 <div class="card" id="assessment">
 <h2>10) Đánh giá</h2>
-<h3>10.1 Quiz (≥20 câu) — pha trộn trắc nghiệm + tình huống ngắn</h3>
+<h3>10.1 Bài kiểm tra nhanh (≥20 câu) — pha trộn trắc nghiệm + tình huống ngắn</h3>
 <ol>
 <li>Định nghĩa “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” và hệ quả vận hành khi thiếu hồ sơ.</li>
 <li>4 thành phần tối thiểu của Bộ bằng chứng đào tạo là gì?</li>
@@ -543,17 +543,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Vai trò nào được quyền BLOCK phê duyệt giao hàng và căn cứ bằng chứng nào?</li>
 <li>Trạng thái Valid/Suspended/Expired khác nhau như thế nào và hành động kèm theo.</li>
 <li>Quy tắc cảnh báo trước hạn trong log tái chứng nhận gồm những gì.</li>
-<li>Handoff giữa HR và Supervisor trong việc cấp scope gồm những bước nào.</li>
-<li>Trong drill 60 giây, phải mở tối thiểu những file nào.</li>
+<li>Bàn giao giữa HR và Supervisor trong việc cấp scope gồm những bước nào.</li>
+<li>Trong diễn tập 60 giây, phải mở tối thiểu những file nào.</li>
 <li>Khi phát hiện hồ sơ sai Rev, thao tác STOP/HOLD/BLOCK thực hiện ra sao.</li>
 <li>Liên kết NCR/CAPA với đào tạo lại phải thể hiện bằng những hồ sơ nào.</li>
 <li>Vì sao không lưu hồ sơ đào tạo phân tán qua chat/email.</li>
 <li>Khi đánh giá hỏi “ai được quyền ký kiểm tra cuối”, tìm bằng chứng ở đâu.</li>
-<li>Chỉ ra 02 rủi ro “mix-up hồ sơ” trong xưởng 2 ca/ngày và cách chặn.</li>
+<li>Chỉ ra 02 rủi ro “lẫn lộn hồ sơ” trong xưởng 2 ca/ngày và cách chặn.</li>
 <li>Ai là người phụ trách cập nhật FRM-HR-TRN-006 và tần suất tối thiểu.</li>
-<li>Điều kiện FAIL bắt buộc phải đào tạo lại theo module này.</li>
+<li>Điều kiện FAIL bắt buộc phải đào tạo lại theo mô-đun này.</li>
 <li>Chỉ ra 03 chỉ số dùng đo mức sẵn sàng đánh giá cho hồ sơ đào tạo.</li>
-<li>Trình tự đóng vòng cải tiến khi drill FAIL.</li>
+<li>Trình tự đóng vòng cải tiến khi diễn tập FAIL.</li>
 </ol>
 <h3>10.2 Scenario (≥3) — có dữ kiện; yêu cầu quyết định HOLD/GO và ghi MRR</h3>
 <div class="table-wrap">
@@ -564,15 +564,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>1</td>
-<td>Đánh giá nội bộ lấy mẫu 01 Operator đang chạy công đoạn CTQ. Kho hồ sơ có attendance và quiz, thiếu performance test rubric. Supervisor nói “đã đánh giá miệng”.</td>
-<td><b>HOLD</b> công đoạn CTQ cho Operator và <b>BLOCK</b> công nhận hoàn tất module</td>
+<td>Đánh giá nội bộ lấy mẫu 01 Operator đang chạy công đoạn CTQ. Kho hồ sơ có attendance và bài kiểm tra nhanh, thiếu performance test rubric. Supervisor nói “đã đánh giá miệng”.</td>
+<td><b>HOLD</b> công đoạn CTQ cho Operator và <b>BLOCK</b> công nhận hoàn tất mô-đun</td>
 <td>Action list + performance test mới + rubric ký + cập nhật trạng thái Valid</td>
 </tr>
 <tr>
 <td>2</td>
 <td>Khách hàng yêu cầu chứng minh Estimator (SAL-03) đã được đào tạo điều khoản “bộ hồ sơ giao hàng bắt buộc gồm CoC + cert công đoạn đặc biệt”. Hồ sơ lưu trong email cá nhân, không có trong kho.</td>
-<td><b>BLOCK</b> chốt cam kết bộ hồ sơ giao hàng đến khi hồ sơ đưa vào kho và drill PASS</td>
-<td>Pack của Estimator (SAL-03) + log drill 60 giây + hồ sơ nhận thức điều khoản</td>
+<td><b>BLOCK</b> chốt cam kết bộ hồ sơ giao hàng đến khi hồ sơ đưa vào kho và diễn tập PASS</td>
+<td>Pack của Estimator (SAL-03) + log diễn tập 60 giây + hồ sơ nhận thức điều khoản</td>
 </tr>
 <tr>
 <td>3</td>
@@ -589,7 +589,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Nhiệm vụ:</b> tạo mới 01 folder hồ sơ cho 01 nhân sự giả lập, lưu đủ 04 file mẫu (theo template), đặt tên đúng, và truy xuất lại trong ≤60 giây.</li>
 <li><b>Điều kiện bấm giờ:</b> bắt đầu khi assessor đưa yêu cầu “mở hồ sơ Tên/Mã NV – TRN-OPS-06” và dừng khi mở xong file thứ 4.</li>
-<li><b>PASS/FAIL:</b> đạt khi ≤60 giây và đủ 04 file đúng đặt tên; Không đạt khi &gt;60 giây hoặc thiếu/đặt tên sai/không xác định phiên bản.</li>
+<li><b>ĐẠT/KHÔNG ĐẠT:</b> đạt khi ≤60 giây và đủ 04 file đúng đặt tên; Không đạt khi &gt;60 giây hoặc thiếu/đặt tên sai/không xác định phiên bản.</li>
 </ul>
 </div>
 <table class="table tight">
@@ -599,7 +599,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>Thời gian truy xuất</td><td>≤60 giây</td><td>&gt;60 giây</td></tr>
 <tr><td>Đầy đủ 04 file bắt buộc</td><td>Đủ</td><td>Thiếu bất kỳ file nào</td></tr>
-<tr><td>Đặt tên theo quy tắc</td><td>Đúng 100%</td><td>Sai module code/ngày/phiên bản/mã NV</td></tr>
+<tr><td>Đặt tên theo quy tắc</td><td>Đúng 100%</td><td>Sai mô-đun code/ngày/phiên bản/mã NV</td></tr>
 <tr><td>Chữ ký trainer/assessor</td><td>Rõ</td><td>Không xác định người chịu trách nhiệm</td></tr>
 <tr><td>Gắn scope &amp; trạng thái</td><td>Valid + scope rõ</td><td>Không có scope hoặc trạng thái mơ hồ</td></tr>
 </tbody>
@@ -607,9 +607,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 11) PASS/FAIL -->
 <div class="card" id="passfail">
-<h2>11) PASS/FAIL criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”)</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”)</h2>
 <ul>
-<li><b>PASS (tối thiểu):</b> Quiz ≥ 80% + Scenario ≥ 2/3 PASS + bài kiểm tra thực hành PASS (≤60 giây) + Pack đủ 04 file + trạng thái Valid.</li>
+<li><b>PASS (tối thiểu):</b> Bài kiểm tra nhanh ≥ 80% + Scenario ≥ 2/3 PASS + bài kiểm tra thực hành PASS (≤60 giây) + Pack đủ 04 file + trạng thái Valid.</li>
 <li><b>FAIL (bất kỳ điều kiện nào):</b> &gt;60 giây; thiếu 01 file; sai phiên bản; không rõ trainer/assessor; không có scope; log tái chứng nhận không cập nhật.</li>
 <li><b>Quy tắc chốt:</b> <b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate).</b> Không có MRR trong kho chính thức = không được bố trí trong phạm vi ảnh hưởng chất lượng/CTQ.</li>
 </ul>
@@ -620,22 +620,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>12.1 Danh sách hồ sơ cần tạo/đính kèm (Bộ bằng chứng đào tạo)</h3>
 <ul>
 <li>FRM-HR-TRN-002 — Attendance List (kèm ngày/giờ/giảng viên)</li>
-<li>Quiz (template FRM-HR-TRN-009) + kết quả chấm + ký xác nhận</li>
+<li>Bài kiểm tra nhanh (template FRM-HR-TRN-009) + kết quả chấm + ký xác nhận</li>
 <li>phiếu tình huống (03 tình huống) + quyết định HOLD/GO + lý do + ký</li>
-<li>bài kiểm tra thực hành rubric (PASS/FAIL + thời gian + nhận xét + ký)</li>
+<li>bài kiểm tra thực hành rubric (ĐẠT/KHÔNG ĐẠT + thời gian + nhận xét + ký)</li>
 <li>FRM-HR-TRN-005 — Level Certification (khi cấp scope/level)</li>
 <li>FRM-HR-TRN-006 — Re-Certification Tracking Log (ngày hết hạn + trạng thái)</li>
-<li>Log drill 60 giây (thời gian + ảnh màn hình đường dẫn)</li>
+<li>Log diễn tập 60 giây (thời gian + ảnh màn hình đường dẫn)</li>
 </ul>
 <h3>12.2 Tên chuẩn &amp; quy tắc đặt tên (không dấu; dễ lọc; dễ đánh giá)</h3>
-<p class="mini"><b>Nguyên tắc:</b> 01 file = 01 bằng chứng; tên file có đủ: <b>EmpID</b> + <b>Module</b> + <b>LoạiHồSơ</b> + <b>Date ISO</b> + <b>Version</b>.</p>
+<p class="mini"><b>Nguyên tắc:</b> 01 file = 01 bằng chứng; tên file có đủ: <b>EmpID</b> + <b>Mô-đun</b> + <b>LoạiHồSơ</b> + <b>Date ISO</b> + <b>Version</b>.</p>
 <pre style="white-space:pre-wrap">TRN-OPS-06_EMP-{{EmpID}}_{{LoạiHồSơ}}_{{YYYY-MM-DD}}_V0.{{ext}}</pre>
-<p class="mini"><b>LoạiHồSơ chuẩn:</b> ATTEND, QUIZ, SCENARIO, PERFTEST, CERT, RECERTLOG, DRILLLOG.</p>
+<p class="mini"><b>LoạiHồSơ chuẩn:</b> ATTEND, BÀI KIỂM TRA NHANH, SCENARIO, PERFTEST, CERT, RECERTLOG, DRILLLOG.</p>
 <h3>12.3 Nơi lưu (SharePoint library/list/path)</h3>
 <div class="callout">
 <ul>
 <li><b>Kho hồ sơ đào tạo (bằng chứng):</b> <span class="path">M365/SharePoint → CNC-IMS-HUB → CNC-IMS-HUB → QMS-Hồ sơ → Training-Hồ sơ. → {{Department}} → {{EmpID}} → TRN-OPS-06</span></li>
-<li><b>Biểu mẫu &amp; module (tài liệu kiểm soát):</b> <span class="path">M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training → academy</span></li>
+<li><b>Biểu mẫu &amp; mô-đun (tài liệu kiểm soát):</b> <span class="path">M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training → academy</span></li>
 <li><b>Log tái chứng nhận (list):</b> <span class="path">M365/SharePoint → CNC-IMS-HUB → CNC-IMS-HUB → QMS-Hồ sơ → Training-Hồ sơ. → Re-Cert Tracking</span></li>
 </ul>
 </div>
@@ -656,9 +656,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><code>TRN-OPS-06-M1</code></td>
 <td><b>Tỷ lệ truy xuất ≤60 giây</b></td>
-<td>% hồ sơ mẫu truy xuất ≤60 giây trong drill</td>
-<td><code>(# PASS ≤60s / # mẫu drill) * 100</code></td>
-<td>Log drill</td>
+<td>% hồ sơ mẫu truy xuất ≤60 giây trong diễn tập</td>
+<td><code>(# PASS ≤60s / # mẫu diễn tập) * 100</code></td>
+<td>Log diễn tập</td>
 <td>Tuần/Tháng</td>
 <td style="text-align:center"><span class="tag orange">Cổng kiểm soát</span></td>
 </tr>
@@ -682,7 +682,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><code>TRN-OPS-06-M4</code></td>
-<td><b>NCR do bypass cổng kiểm soát hồ sơ</b></td>
+<td><b>NCR do vượt qua cổng kiểm soát hồ sơ</b></td>
 <td>Số NCR do bố trí sai năng lực/thiếu hồ sơ</td>
 <td><code>Đếm # NCR loại “No bằng chứng / Staffing”</code></td>
 <td>NCR log</td>
@@ -701,30 +701,30 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <table class="table tight">
 <thead>
-<tr><th style="width:190px">Nhóm role</th><th>Cadence</th><th>Ghi chú</th></tr>
+<tr><th style="width:190px">Nhóm vai trò</th><th>Cadence</th><th>Ghi chú</th></tr>
 </thead>
 <tbody>
 <tr><td>Operator/Setup/Programmer/QC/QA</td><td><b>Chu kỳ tái đánh giá: 12 tháng (L1–L2) • 24 tháng (L3–L4).</b></td><td>Nhóm ảnh hưởng chất lượng/CTQ, bắt buộc định nghĩa hạn</td></tr>
 <tr><td>Warehouse/Purchasing/Planner</td><td><b>Chu kỳ tái đánh giá: 12 tháng (L1–L2) • 24 tháng (L3–L4).</b></td><td>Nhóm ảnh hưởng traceability/supplier/plan</td></tr>
 <tr><td>Maintenance/EHS</td><td><b>M365/SharePoint → HESEM-QMS-SSOT</b></td><td>Nhóm ảnh hưởng an toàn và dừng máy</td></tr>
 <tr><td>Estimator (SAL-03)</td><td><b>M365/SharePoint → HESEM-QMS-SSOT</b></td><td>Nhóm ảnh hưởng cam kết khách hàng/điều khoản</td></tr>
-<tr><td>Supervisor</td><td><b>M365/SharePoint → HESEM-QMS-SSOT</b></td><td>Nhóm chặn cổng kiểm soát, phải có drill định kỳ</td></tr>
+<tr><td>Supervisor</td><td><b>M365/SharePoint → HESEM-QMS-SSOT</b></td><td>Nhóm chặn cổng kiểm soát, phải có diễn tập định kỳ</td></tr>
 </tbody>
 </table>
 </div>
 <!-- 13) Common audit findings -->
 <div class="card" id="findings">
-<h2>13) Common đánh giá findings &amp; prevention (ít nhất 8 lỗi đánh giá hay gặp cho module này)</h2>
+<h2>13) Common đánh giá phát hiện &amp; phòng ngừa (ít nhất 8 lỗi đánh giá hay gặp cho mô-đun này)</h2>
 <ol>
 <li><b>Không có bằng chứng hiệu lực đào tạo:</b> Chặn bằng “Pack 04 file bắt buộc” + performance test.</li>
 <li><b>Không kiểm soát phiên bản tài liệu đào tạo:</b> Chặn bằng CP2 (version lock) + hồ sơ nhận thức khi phát hành.</li>
 <li><b>Không chứng minh phạm vi/ủy quyền:</b> Chặn bằng FRM-HR-TRN-005 ghi scope + quyền ký.</li>
-<li><b>Hồ sơ phân tán, truy xuất chậm:</b> Chặn bằng kho single source + drill 60 giây có log.</li>
+<li><b>Hồ sơ phân tán, truy xuất chậm:</b> Chặn bằng kho single source + diễn tập 60 giây có log.</li>
 <li><b>Không theo dõi hết hạn tái chứng nhận:</b> Chặn bằng FRM-HR-TRN-006 + cảnh báo + check trước ca.</li>
 <li><b>Không liên kết NCR với đào tạo lại:</b> Chặn bằng CP7: NCR phải tham chiếu hồ sơ đào tạo lại + đánh giá lại.</li>
 <li><b>Đánh giá cảm tính, thiếu rubric:</b> Chặn bằng rubric L1–L4 và rubric performance test.</li>
-<li><b>Bypass cổng kiểm soát để kịp tiến độ:</b> Chặn bằng FF rules + mở NCR “bypass cổng kiểm soát” + khóa quyền release.</li>
-<li><b>Trộn hồ sơ người khác (mix-up):</b> Chặn bằng định danh EmpID + quy tắc đặt tên + đánh giá mẫu 10 hồ sơ.</li>
+<li><b>Vượt qua cổng kiểm soát để kịp tiến độ:</b> Chặn bằng FF rules + mở NCR “vượt qua cổng kiểm soát” + khóa quyền release.</li>
+<li><b>Trộn hồ sơ người khác (lẫn lộn):</b> Chặn bằng định danh EmpID + quy tắc đặt tên + đánh giá mẫu 10 hồ sơ.</li>
 </ol>
 </div>
 <!-- 14) DCR record -->

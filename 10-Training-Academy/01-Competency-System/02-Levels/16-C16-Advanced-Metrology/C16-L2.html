@@ -72,18 +72,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="small-note"><span class="badge">ISO 6.1</span> <span class="badge">ISO 7.1.5</span> <span class="badge">ISO 7.2</span> <span class="badge">ISO 7.5</span> <span class="badge">ISO 8.5.1</span> <span class="badge">ISO 8.6</span> <span class="badge">ISO 8.7</span> <span class="badge">ISO 9.1</span> <span class="badge">ISO 10.2</span> <span class="badge">ISO 10.3</span></div>
 <div class="meta">
 <div><strong>Đối tượng áp dụng:</strong><br/>QA/QC + Metrology + Kỹ thuật (chủ trì: QA Manager (QA-01))</div>
-<div><strong>Đầu ra bắt buộc:</strong><br/>Bằng chứng + chỉ số theo K–S–E–M; đạt KPI gating để được công nhận Level.</div>
+<div><strong>Đầu ra bắt buộc:</strong><br/>Bằng chứng + chỉ số theo K–S–E–M; đạt Cơ chế chặn theo KPI (KPI gating) để được công nhận Level.</div>
 <div><strong>Nguyên tắc ISO tích hợp:</strong><br/>Mọi bước quan trọng <em>PHẢI</em> có hồ sơ; thay đổi <em>PHẢI</em> được kiểm soát; dữ liệu tuân ALCOA+; tư duy rủi ro (risk‑based).</div>
 <div><strong>Thời lượng chuẩn:</strong><br/>L1: 4–6h • L2: 8–12h • L3: 12–20h • L4: 20–40h (theo dự án/OJT).</div>
 </div>
 </div><div class="card">
-<span class="badge">Drill Pack (Job CNC)</span>
+<span class="badge">Bộ diễn tập (Job CNC)</span>
 <p class="lead" style="margin-top:10px;">
- Chạy drill trên job thật để luyện hành vi và tạo MRR.
- Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ Thực hiện diễn tập trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-setup-firstarticle-ir.html"><b>DRL-04</b> — Setup + First Article + IR/FAI Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Shipping Packet + CoC Drill</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-setup-firstarticle-ir.html"><b>DRL-04</b> — Bài diễn tập Setup + Kiểm tra sản phẩm đầu tiên (first article) + IR/FAI</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Bài diễn tập Shipping Packet + CoC</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
@@ -102,7 +102,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag shall">PHẢI</span>
 <div class="text">
 <div><strong>Tổ chức PHẢI xác định và cung cấp nguồn lực đo lường phù hợp; thiết bị đo PHẢI được hiệu chuẩn/kiểm tra và duy trì để đảm bảo kết quả hợp lệ.</strong> <span class="iso">ISO 7.1.5</span></div>
-<p>Bằng chứng: calibration register, tem/ID, hồ sơ kiểm tra ngày, điều kiện môi trường đo.</p>
+<p>Bằng chứng: hiệu chuẩn register, tem/ID, hồ sơ kiểm tra ngày, điều kiện môi trường đo.</p>
 </div>
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
@@ -120,13 +120,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag shall">PHẢI</span>
 <div class="text">
 <div><strong>Tổ chức PHẢI áp dụng MSA/GR&amp;R, đánh giá bias/linearity/stability và/hoặc uncertainty để giảm rủi ro quyết định đo cho CTQ.</strong> <span class="iso">ISO 9.1 &amp; 6.1</span></div>
-<p>Bằng chứng: MSA register, báo cáo GRR, chính sách tiêu chí pass/fail theo rủi ro.</p>
+<p>Bằng chứng: MSA register, báo cáo GRR, chính sách tiêu chí đạt/không đạt theo rủi ro.</p>
 </div>
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
 <div class="text">
 <div><strong>Khi phát hiện không phù hợp liên quan đo lường (sai thiết bị, sai phương pháp, OOT), sản phẩm PHẢI được cô lập và xử lý theo quy trình kiểm soát NC.</strong> <span class="iso">ISO 8.7</span></div>
-<p>Bằng chứng: NCR, tag HOLD, impact assessment, re-inspection hồ sơ.</p>
+<p>Bằng chứng: NCR, tag HOLD, impact đánh giá, re-inspection hồ sơ.</p>
 </div>
 </div><div class="req">
 <span class="tag may">ĐƯỢC PHÉP</span>
@@ -165,7 +165,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Dung sai chặt</td><td>±0.005…±0.02</td><td>CMM/VMM/air gage</td><td>chuẩn MSA/GRR cho CTQ.</td></tr>
 <tr><td>GD&amp;T/CTQ phức tạp</td><td>true position, profile, runout…</td><td>CMM + chiến lược alignment theo datum</td><td>Sai datum = sai toàn bộ kết quả.</td></tr>
 </tbody>
-</table><h3>3.4 ALCOA+ và tính toàn vẹn dữ liệu đo (data integrity)</h3><p>Với ISO, dữ liệu đo chỉ có giá trị khi <strong>đúng – đủ – truy vết</strong>. Quy tắc ALCOA+ (Attributable, Legible, Contemporaneous, Original, Accurate + Complete, Consistent, Enduring, Available) là “chuẩn đạo đức dữ liệu”. Các lỗi hay gặp: ghi hồi tố cuối ca, thiếu ký tên, chỉnh số “cho đẹp”, dùng file Excel không kiểm soát phiên bản.</p><h3>3.5 FAI/FAIR &amp; Ballooning: biến bản vẽ thành danh mục đặc tính đo</h3><p><strong>FAI</strong> (First Article Inspection) là “bài kiểm tra năng lực” của cả chuỗi: bản vẽ → quy trình → gá → chương trình → đo → hồ sơ. Level 2 phải làm được:</p><ul>
+</table><h3>3.4 ALCOA+ và tính toàn vẹn dữ liệu đo (data integrity)</h3><p>Với ISO, dữ liệu đo chỉ có giá trị khi <strong>đúng – đủ – truy vết</strong>. Quy tắc ALCOA+ (Attributable, Legible, Contemporaneous, Original, Accurate + Đầy đủ, Consistent, Enduring, Available) là “chuẩn đạo đức dữ liệu”. Các lỗi hay gặp: ghi hồi tố cuối ca, thiếu ký tên, chỉnh số “cho đẹp”, dùng file Excel không kiểm soát phiên bản.</p><h3>3.5 FAI/FAIR &amp; Ballooning: biến bản vẽ thành danh mục đặc tính đo</h3><p><strong>FAI</strong> (Kiểm tra sản phẩm đầu tiên Inspection) là “bài kiểm tra năng lực” của cả chuỗi: bản vẽ → quy trình → gá → chương trình → đo → hồ sơ. Level 2 phải làm được:</p><ul>
 <li>Balloon drawing đúng revision, đánh số đặc tính có hệ thống (CTQ ưu tiên).</li>
 <li>Lập <strong>characteristic list</strong>: đặc tính, tiêu chí, phương pháp đo, tần suất, reaction plan.</li>
 <li>Phân tách: CTQ / key / cosmetic; đồng thời “flag” các note hay bị bỏ sót (deburr, edge break, clean, marking, packaging).</li>
@@ -173,7 +173,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Alignment theo datum reference frame (3-2-1), tránh “best-fit” không kiểm soát cho CTQ lắp ráp.</li>
 <li>Version control: program CMM phải có ID/rev, DCR hồ sơ; không chạy file “mới sửa nhanh” mà không lưu dấu (ISO 7.5 / 8.5.6).</li>
 <li>Teach-back: giải thích lại cho trưởng nhóm “vì sao chọn alignment này” bằng ngôn ngữ chức năng lắp ráp.</li>
-</ul><h3>3.7 MSA thực dụng: thiết kế GR&amp;R để trả lời câu hỏi đúng</h3><p>MSA không phải làm để có báo cáo, mà để trả lời: <strong>Hệ đo này có đủ tốt để ra quyết định OK/NG cho CTQ không?</strong> Thiết kế tối thiểu (áp dụng): 10 part x 3 operator x 2 trial. Sau đó đọc %GRR và hành động.</p><h2>4. Quy trình thao tác chuẩn (flow dọc, dễ đọc)</h2><p class="small">Lưu đồ được thiết kế theo hướng dọc để đọc rõ khi in A4. chỉnh trực tiếp bằng HTML/CSS.</p><div class="vflow">
+</ul><h3>3.7 MSA thực dụng: thiết kế GR&amp;R để trả lời câu hỏi đúng</h3><p>MSA không phải làm để có báo cáo, mà để trả lời: <strong>Hệ đo này có đủ tốt để ra quyết định OK/NG cho CTQ không?</strong> Thiết kế tối thiểu (áp dụng): 10 part x 3 operator x 2 trial. Sau đó đọc %GRR và hành động.</p><h2>4. Quy trình thao tác chuẩn (luồng dọc, dễ đọc)</h2><p class="small">Lưu đồ được thiết kế theo hướng dọc để đọc rõ khi in A4. chỉnh trực tiếp bằng HTML/CSS.</p><div class="vflow">
 <div class="vstep">
 <div class="vnum">1</div>
 <div class="vtext">
@@ -220,7 +220,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vnum">7</div>
 <div class="vtext">
 <strong>Phản hồi &amp; cải tiến hệ đo</strong>
-<p>MSA/GRR, cập nhật WI/plan, calibration interval, training &amp; đánh giá.</p>
+<p>MSA/GRR, cập nhật WI/plan, hiệu chuẩn interval, training &amp; đánh giá.</p>
 </div>
 </div>
 </div><h2>5. KPI/Chỉ số áp dụng theo Level (có công thức + nguồn dữ liệu)</h2><p class="small">Bảng dưới dùng để “định lượng” năng lực. Khi áp dụng thực tế, HESEM phải hiệu chỉnh target theo baseline và mức rủi ro khách hàng.</p><table class="table">
@@ -239,9 +239,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><strong>Calibration compliance (thiết bị đo dùng cho CTQ)</strong></td>
+<td><strong>Hiệu chuẩn compliance (thiết bị đo dùng cho CTQ)</strong></td>
 <td class="mono">#thiết bị còn hạn / #thiết bị dùng</td>
-<td>Calibration system + gauge log</td>
+<td>Hiệu chuẩn system + gauge log</td>
 <td>Theo ca/tuần</td>
 <td>≥99%</td>
 <td>≥99.5%</td>
@@ -284,8 +284,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><strong>Thời gian truy xuất hồ sơ đo/FAI</strong></td>
-<td class="mono">Median phút truy xuất 1 job (test drill)</td>
-<td>Document control drill</td>
+<td class="mono">Median phút truy xuất 1 job (diễn tập thử)</td>
+<td>Diễn tập kiểm soát tài liệu</td>
 <td>Tháng</td>
 <td>≤15'</td>
 <td>≤12'</td>
@@ -296,8 +296,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Gating bắt buộc để công nhận Level:</strong>
 <ul><li>0 sử dụng thiết bị đo quá hạn hoặc không có tem/ID hợp lệ cho CTQ.</li><li>Hồ sơ đo/FAI phải đầy đủ ALCOA+ (đúng lúc, rõ ràng, có người chịu trách nhiệm, không tẩy xóa).</li><li>Khi nghi ngờ (uncertainty/điều kiện đo không đạt) → PHẢI HOLD và escalate; không tự ý release.</li><li>CMM program/kế hoạch kiểm tra (inspection plan) phải đúng revision và có kiểm soát thay đổi (DCR hồ sơ).</li></ul>
 <p class="small">Gating ưu tiên an toàn – chất lượng – tuân thủ hồ sơ. Vi phạm gating có nguy cơ dẫn tới không công nhận level/bonus dù điểm bài kiểm tra cao.</p>
-</div><h2>6. Bài tập theo Level (Case study HESEM)</h2><p class="small">Mỗi case được thiết kế theo tinh thần học thuật ứng dụng: có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (bằng chứng) để chấm.</p><div class="card">
-<h3>Case 1: FAI cho chi tiết pattern lỗ CTQ (true position)</h3>
+</div><h2>6. Bài tập theo Level (Nghiên cứu tình huống HESEM)</h2><p class="small">Mỗi tình huống được thiết kế theo tinh thần học thuật ứng dụng: có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (bằng chứng) để chấm.</p><div class="card">
+<h3>Tình huống 1: FAI cho chi tiết pattern lỗ CTQ (true position)</h3>
 <p class="small">Khách yêu cầu FAI cho chi tiết có 6 lỗ, true position 0.05, datum A/B/C; bề mặt Ra 1.6; edge break 0.2–0.5. Bạn phải đảm bảo đo đúng và ra quyết định release đúng.</p>
 <div class="grid">
 <div class="dl"><h4>Dữ liệu/đầu vào</h4><ul><li>Bản vẽ 2D/3D + note bề mặt/edge.</li><li>PO yêu cầu FAI (FAIR) + IR kèm theo.</li><li>Thiết bị: panme, pin gage, CMM (khi có).</li></ul></div>
@@ -306,35 +306,35 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="dl"><h4>Tiêu chí chấm</h4><ul><li>Balloon/characteristic list đầy đủ, không bỏ sót note bản vẽ.</li><li>kế hoạch kiểm tra (inspection plan) có logic đo/đủ điều kiện release.</li><li>Giải thích rõ datum/alignment và vì sao chọn strategy.</li></ul></div>
 </div>
 </div><div class="card">
-<h3>Case 2: MSA/GR&amp;R cho panme đo OD – quyết định dụng cụ có đủ tin cậy không</h3>
+<h3>Tình huống 2: MSA/GR&amp;R cho panme đo OD – quyết định dụng cụ có đủ tin cậy không</h3>
 <p class="small">Một đặc tính OD có tolerance ±0.01 mm. Bạn nghi ngờ hệ đo chưa đủ tốt. Hãy chứng minh bằng MSA và đưa ra hành động.</p>
 <div class="grid">
 <div class="dl"><h4>Dữ liệu/đầu vào</h4><ul><li>Tolerance OD: 20.000 ± 0.010.</li><li>Dụng cụ: panme 0–25 mm (0.001).</li><li>Nhân lực: 3 người đo 2 lần.</li></ul></div>
 <div class="dl"><h4>Nhiệm vụ</h4><ul><li>Thiết kế GR&amp;R study cho panme OD (10 part x 3 operator x 2 trial).</li><li>Thu thập dữ liệu (hoặc dùng dữ liệu mẫu) và tính %GRR theo mẫu.</li><li>Kết luận: gage dùng được không? khi không thì action gì?</li></ul></div>
-<div class="dl"><h4>Đầu ra/Bằng chứng</h4><ul><li>MSA plan + dataset + báo cáo %GRR.</li><li>Kết luận pass/fail + kế hoạch hành động.</li><li>Cập nhật WI đo OD (khi cần).</li></ul></div>
+<div class="dl"><h4>Đầu ra/Bằng chứng</h4><ul><li>MSA plan + dataset + báo cáo %GRR.</li><li>Kết luận đạt/không đạt + kế hoạch hành động.</li><li>Cập nhật WI đo OD (khi cần).</li></ul></div>
 <div class="dl"><h4>Tiêu chí chấm</h4><ul><li>Thiết kế study đúng cấu trúc (part/operator/trial).</li><li>Kết luận nhất quán với dữ liệu.</li><li>Kế hoạch hành động phù hợp (training/fixture/upgrade).</li></ul></div>
 </div>
 </div><div class="card">
-<h3>Case 3: Xử lý sự cố thiết bị đo Out-of-Tolerance (OOT) – đánh giá ảnh hưởng &amp; CAPA</h3>
+<h3>Tình huống 3: Xử lý sự cố thiết bị đo Out-of-Tolerance (OOT) – đánh giá ảnh hưởng &amp; CAPA</h3>
 <p class="small">Trong đánh giá nội bộ phát hiện một đồng hồ so đã quá hạn hiệu chuẩn 2 tuần, nhưng đã được dùng đo CTQ. Cần xử lý ngay để giảm rủi ro khách hàng.</p>
 <div class="grid">
 <div class="dl"><h4>Dữ liệu/đầu vào</h4><ul><li>Thiết bị: đồng hồ so tem hết hạn 14 ngày.</li><li>CTQ: runout ≤ 0.03.</li><li>Jobs đo trong 2 tuần: 6 job (batch nhỏ).</li></ul></div>
 <div class="dl"><h4>Nhiệm vụ</h4><ul><li>Khoanh vùng ảnh hưởng: liệt kê các job đo bằng thiết bị đó trong khoảng thời gian.</li><li>Lập kế hoạch re-inspection theo mức rủi ro (ưu tiên CTQ).</li><li>Cập nhật trạng thái sản phẩm (HOLD/REWORK/ACCEPT) theo quy trình.</li></ul></div>
-<div class="dl"><h4>Đầu ra/Bằng chứng</h4><ul><li>Bảng đánh giá ảnh hưởng (impact assessment).</li><li>Kế hoạch re-inspection + kết quả.</li><li>Báo cáo đóng sự cố OOT cấp xưởng.</li></ul></div>
+<div class="dl"><h4>Đầu ra/Bằng chứng</h4><ul><li>Bảng đánh giá ảnh hưởng (impact đánh giá).</li><li>Kế hoạch re-inspection + kết quả.</li><li>Báo cáo đóng sự cố OOT cấp xưởng.</li></ul></div>
 <div class="dl"><h4>Tiêu chí chấm</h4><ul><li>Khoanh vùng đủ và hợp lý.</li><li>Re-inspection có ưu tiên CTQ và có hồ sơ.</li><li>Tuân thủ 8.7 và 7.5.</li></ul></div>
 </div>
 </div><h2>7. OJT theo TWI (Job Breakdown + bảng kiểm)</h2><h3>7.1 Job Breakdown Sheet (bản tiêu chuẩn dạy việc)</h3><table class="table">
 <thead>
-<tr><th>Bước công việc (TWI Job Breakdown)</th><th>Key Points (Điểm then chốt)</th><th>Reasons (Vì sao quan trọng)</th></tr>
+<tr><th>Bước công việc (TWI Job Breakdown)</th><th>Điểm then chốt</th><th>Lý do (Vì sao quan trọng)</th></tr>
 </thead>
 <tbody><tr><td><strong>Chuẩn bị đo CTQ (pre-check)</strong></td><td>Kiểm tem hiệu chuẩn; làm sạch chi tiết &amp; dụng cụ; ổn định nhiệt; chọn đúng phương pháp đo</td><td>Tránh đo sai do thiết bị/điều kiện; giảm false decision</td></tr><tr><td><strong>Thực hiện đo &amp; ghi hồ sơ</strong></td><td>Đặt dụng cụ đúng vị trí; lực đo ổn định; đo lặp theo WI; ghi ngay vào form; ký tên</td><td>Đảm bảo repeatability và data integrity (ALCOA+)</td></tr><tr><td><strong>Ra quyết định &amp; xử lý sai lệch</strong></td><td>So sánh với tolerance/guardband; dán OK/HOLD/NG; escalate khi nghi ngờ; lưu hồ sơ</td><td>Ngăn lọt lỗi/loại nhầm; đáp ứng ISO 8.6/8.7</td></tr></tbody>
 </table><h3>7.2 danh mục OJT (bảng kiểm / danh mục) (quan sát tại hiện trường)</h3><table class="table">
 <thead><tr><th>#</th><th>Nội dung danh mục OJT (bảng kiểm / danh mục)</th><th>Kết quả</th><th>Ghi chú</th></tr></thead>
 <tbody><tr><td>1</td><td>Kiểm tra tem hiệu chuẩn/ID thiết bị đo trước khi sử dụng (đúng dải đo, không hư hỏng).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>2</td><td>Chuẩn bị điều kiện đo: làm sạch chi tiết, loại bỏ bavia, ổn định nhiệt độ khi cần.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>3</td><td>Thực hiện đo theo WI (đúng điểm đo, đúng lực đo, đúng số lần lặp).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>4</td><td>Ghi hồ sơ ngay tại thời điểm đo (ALCOA+), đầy đủ job/rev/lot/thiết bị/ký tên.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>5</td><td>Gắn trạng thái OK/HOLD/NG đúng quy định và cô lập sản phẩm HOLD/NG.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>6</td><td>Giải thích được vì sao chọn phương pháp đo này (tolerance/CTQ).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>7</td><td>Thực hiện truy xuất 1 bộ hồ sơ FAI/đo cho 1 job trong thời gian mục tiêu.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>8</td><td>Xử lý tình huống sai lệch: tem hết hạn/đo dao động/thiết bị rơi → HOLD + escalate.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>9</td><td>Tạo characteristic list/kế hoạch kiểm tra (inspection plan) đơn giản và thực hiện đo theo plan.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr></tbody>
-</table><h2>8. Kiểm tra đánh giá (bản thiết kế kiểm thử (test blueprint) + quiz mẫu)</h2><h3>8.1 Test blueprint</h3><table class="table">
+</table><h2>8. Kiểm tra đánh giá (bản thiết kế kiểm thử (test blueprint) + bài kiểm tra nhanh mẫu)</h2><h3>8.1 Test blueprint</h3><table class="table">
 <thead><tr><th>Nhóm nội dung</th><th>Số câu</th><th>Tỷ trọng</th></tr></thead>
-<tbody><tr><td>FAI/balloon/inspection plan</td><td>6</td><td>25%</td></tr><tr><td>CMM căn bản + version control</td><td>6</td><td>25%</td></tr><tr><td>MSA/GRR cơ bản</td><td>6</td><td>25%</td></tr><tr><td>Case analysis</td><td>6</td><td>25%</td></tr></tbody>
-</table><h3>8.2 Quiz mẫu</h3><div class="quiz">
+<tbody><tr><td>FAI/balloon/inspection plan</td><td>6</td><td>25%</td></tr><tr><td>CMM căn bản + version control</td><td>6</td><td>25%</td></tr><tr><td>MSA/GRR cơ bản</td><td>6</td><td>25%</td></tr><tr><td>Tình huống analysis</td><td>6</td><td>25%</td></tr></tbody>
+</table><h3>8.2 Bài kiểm tra nhanh mẫu</h3><div class="quiz">
 <div class="card">
 <strong>Câu 1 (MCQ):</strong> FAI quan trọng nhất để chứng minh điều gì?
 <ol type="A"><li><strong>A.</strong> Chỉ chứng minh người đo giỏi</li><li><strong>B.</strong> Chứng minh cả chuỗi: bản vẽ→quy trình→gá→chương trình→đo→hồ sơ phù hợp</li><li><strong>C.</strong> Chỉ để có hình ảnh gửi khách</li><li><strong>D.</strong> Chỉ phục vụ nội bộ</li></ol>
@@ -381,9 +381,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 7:Chấm theo đủ cột + logic CTQ.
 8:Chấm theo rõ ID/rev/log/approval.</div></details><h2>9. Rubric chấm điểm &amp; tiêu chuẩn công nhận Level</h2><table class="table rubric">
 <thead><tr><th>Tiêu chí</th><th>Tỷ trọng</th><th>Mô tả đạt</th></tr></thead>
-<tbody><tr><td><strong>Bài kiểm tra kiến thức</strong></td><td>30%</td><td>Hiểu và áp dụng được vào bài tập; trả lời có logic ISO/rủi ro.</td></tr><tr><td><strong>Case study</strong></td><td>40%</td><td>Tạo được đầu ra (plan/WI/mẫu) đúng cấu trúc; có reasoning.</td></tr><tr><td><strong>OJT + bằng chứng</strong></td><td>30%</td><td>Thực hiện được trên job thật; có hồ sơ/bằng chứng; không vi phạm gating.</td></tr></tbody>
+<tbody><tr><td><strong>Bài kiểm tra kiến thức</strong></td><td>30%</td><td>Hiểu và áp dụng được vào bài tập; trả lời có logic ISO/rủi ro.</td></tr><tr><td><strong>Nghiên cứu tình huống</strong></td><td>40%</td><td>Tạo được đầu ra (plan/WI/mẫu) đúng cấu trúc; có reasoning.</td></tr><tr><td><strong>OJT + bằng chứng</strong></td><td>30%</td><td>Thực hiện được trên job thật; có hồ sơ/bằng chứng; không vi phạm gating.</td></tr></tbody>
 </table><div class="callout"><strong>Ngưỡng đạt:</strong> Tổng điểm ≥ 80/100 và không vi phạm gating bắt buộc (an toàn/chất lượng/tuân thủ hồ sơ).</div><h2>10. Bảng kiểm tự đánh giá trước khi đề nghị xét Level</h2><div class="card">
-<ul><li>Tôi có đủ bằng chứng (form/hồ sơ/log) chứng minh năng lực – không chỉ ‘nói được’.</li><li>Tôi hiểu các gating bắt buộc và không có vi phạm trong kỳ đánh giá.</li><li>Tôi truy xuất hồ sơ liên quan trong thời gian mục tiêu (đánh giá drill).</li><li>Tôi chọn đúng phương pháp đo theo dung sai/CTQ và giải thích được lý do.</li><li>Tôi hiểu rủi ro false accept/false reject và biết khi nào phải HOLD/escalate.</li></ul>
+<ul><li>Tôi có đủ bằng chứng (form/hồ sơ/log) chứng minh năng lực – không chỉ ‘nói được’.</li><li>Tôi hiểu các gating bắt buộc và không có vi phạm trong kỳ đánh giá.</li><li>Tôi truy xuất hồ sơ liên quan trong thời gian mục tiêu (đánh giá diễn tập).</li><li>Tôi chọn đúng phương pháp đo theo dung sai/CTQ và giải thích được lý do.</li><li>Tôi hiểu rủi ro false accept/false reject và biết khi nào phải HOLD/escalate.</li></ul>
 </div><hr/><p class="small"><strong>Ghi chú triển khai:</strong> Tài liệu này được thiết kế để tích hợp trực tiếp vào sổ tay vận hành/đào tạo của HESEM. Khi đưa vào áp dụng, cần gắn mã SOP/WI/FRM thực tế, người phê duyệt và ngày hiệu lực, đồng thời liên kết ma trận kỹ năng (skill matrix) + chính sách thưởng/level.</p></div></div></div>
 </div>
 <script src="../../../../assets/app.js"></script>

@@ -68,10 +68,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <div class="grid-2">
 <div>
-<div class="badge"><span class="dot"></span>Module SYS-OPS-10</div>
+<div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-10</div>
 <h1 style="margin-top:10px">Power Platform ALM &amp; Governance</h1>
 <p class="muted">
- ModuleCode: <b>SYS-OPS-10</b> • ModuleTitle: <b>Power Platform ALM &amp; Governance (Solution import-ready, security model)</b><br/>
+ Mã mô-đun: <b>SYS-OPS-10</b> • Tên mô-đun: <b>Power Platform ALM &amp; Governance (Solution import-ready, security model)</b><br/>
  Mục tiêu: triển khai Power Platform theo chuẩn import-ready, quản trị quyền/ dữ liệu theo zone, và tạo MRR đủ để qua đánh giá mà không “đốt” thời gian truy vết.
  </p>
 <div class="tag blue">Phiên bản</div>
@@ -80,8 +80,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Thông tin triển khai</strong>
 <ul>
 <li><strong>TargetRoles:</strong> Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor</li>
-<li><strong>Thời lượng chuẩn:</strong> 90 phút lý thuyết (ca 1/ca 2) • 120 phút workshop theo case xưởng • 120 phút OJT tại hiện trường + ký xác nhận</li>
-<li><strong>Nhịp triển khai:</strong> 2 ca/ngày, 6 ngày/tuần. Mỗi role học tối đa 2 ngày/tuần. Ca nào nghỉ học thì ca đó vẫn vận hành theo bảng kiểm.</li>
+<li><strong>Thời lượng chuẩn:</strong> 90 phút lý thuyết (ca 1/ca 2) • 120 phút workshop theo tình huống xưởng • 120 phút OJT tại hiện trường + ký xác nhận</li>
+<li><strong>Nhịp triển khai:</strong> 2 ca/ngày, 6 ngày/tuần. Mỗi vai trò học tối đa 2 ngày/tuần. Ca nào nghỉ học thì ca đó vẫn vận hành theo bảng kiểm.</li>
 <li><strong>Tài liệu nội bộ bắt buộc đã đọc:</strong> ANNEX-QMS-012; SOP-QMS-012; SOP-QMS-012; SOP-QMS-011; SOP-QMS-011; WI-OPS-008; WI-OPS-001</li>
 <li><strong>Nguyên tắc cứng:</strong> không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate). Không có MRR thì không được đưa vào PROD và không được dùng để chạy xưởng.</li>
 </ul>
@@ -91,40 +91,40 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Mục lục nhanh</strong>
 <ul>
 <li><a href="#sec2">2) Mục đích &amp; bối cảnh vận hành</a></li>
-<li><a href="#sec3">3) Vị trí E2E + handoff + điểm chặn</a></li>
-<li><a href="#sec4">4) Failure Points</a></li>
-<li><a href="#sec5">5) Risk Controls</a></li>
+<li><a href="#sec3">3) Vị trí E2E + bàn giao + điểm chặn</a></li>
+<li><a href="#sec4">4) Điểm đứt gãy</a></li>
+<li><a href="#sec5">5) Biện pháp kiểm soát rủi ro</a></li>
 <li><a href="#sec6">6) Fail-fast rules + STOP/HOLD/BLOCK</a></li>
 <li><a href="#sec7">7) Phản ứng 60 giây</a></li>
 <li><a href="#sec8">8) Bảng kiểm vận hành (≤15 bước)</a></li>
 <li><a href="#sec9">9) OJT theo TWI + Rubric L1–L4</a></li>
-<li><a href="#sec10">10) Đánh giá (Quiz + Scenario + Performance test)</a></li>
-<li><a href="#sec11">11) PASS/FAIL criteria</a></li>
+<li><a href="#sec10">10) Đánh giá (Bài kiểm tra nhanh + Scenario + Performance test)</a></li>
+<li><a href="#sec11">11) ĐẠT/KHÔNG ĐẠT criteria</a></li>
 <li><a href="#sec12">12) MRR tối thiểu (hồ sơ, naming, nơi lưu)</a></li>
-<li><a href="#sec13">13) Common đánh giá findings &amp; prevention</a></li>
+<li><a href="#sec13">13) Common đánh giá phát hiện &amp; phòng ngừa</a></li>
 <li><a href="#sec14">14) DCR hồ sơ</a></li>
 </ul>
 </div>
 <!-- 2) -->
-<h2 id="sec2">2) Mục đích module &amp; bối cảnh vận hành</h2>
+<h2 id="sec2">2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <p>
- Module này tồn tại để khóa các rủi ro “chết người” khi xưởng dùng Power Platform (app/flow/report) làm hệ thống vận hành:
- sai phiên bản (Rev), sai môi trường (DEV/UAT/PROD), lẫn dữ liệu khách hàng, bypass cổng kiểm soát, và thiếu bằng chứng khi đánh giá.
+ Mô-đun này tồn tại để khóa các rủi ro “chết người” khi xưởng dùng Power Platform (app/luồng/report) làm hệ thống vận hành:
+ sai phiên bản (Rev), sai môi trường (DEV/UAT/PROD), lẫn dữ liệu khách hàng, vượt qua cổng kiểm soát, và thiếu bằng chứng khi đánh giá.
  Khi hệ thống số sai, xưởng chạy sai: mua sai vật tư, gia công sai Rev, đo sai tiêu chí, ship sai, hoặc không kéo được hồ sơ đúng trong 3 phút.
  </p>
 <div class="note">
-<strong>Khi nào kích hoạt module</strong>
+<strong>Khi nào kích hoạt mô-đun</strong>
 <ul>
-<li>Khi tạo mới hoặc thay đổi solution/app/flow/report liên quan vận hành xưởng (Hồ sơ công việc (job dossier), QC, phê duyệt giao hàng (ship release), Supplier control, NCR/MRB, EHS).</li>
+<li>Khi tạo mới hoặc thay đổi solution/app/luồng/report liên quan vận hành xưởng (Hồ sơ công việc (job dossier), QC, phê duyệt giao hàng (ship release), Supplier control, NCR/MRB, EHS).</li>
 <li>Khi có nhu cầu đưa thay đổi vào UAT hoặc PROD.</li>
 <li>Khi thay đổi mô hình quyền, nhóm truy cập, DLP, nhãn phân loại dữ liệu, hoặc retention/hồ sơ.</li>
-<li>Khi bàn giao hệ thống (admin handoff) từ IT sang QA/QMS/IMS hoặc khi nhận yêu cầu đánh giá bộ bằng chứng (evidence pack) từ khách hàng.</li>
+<li>Khi bàn giao hệ thống (admin bàn giao) từ IT sang QA/QMS/IMS hoặc khi nhận yêu cầu đánh giá bộ bằng chứng (evidence pack) từ khách hàng.</li>
 </ul>
 </div>
-<h3>Ma trận áp dụng theo role (phạm vi &amp; tiêu chí đạt khác nhau)</h3>
+<h3>Ma trận áp dụng theo vai trò (phạm vi &amp; tiêu chí đạt khác nhau)</h3>
 <table class="form-table">
 <tr>
-<th style="width:16%">Role</th>
+<th style="width:16%">Vai trò</th>
 <th>Phạm vi bắt buộc</th>
 <th style="width:26%">Bằng chứng bắt buộc (MRR cá nhân)</th>
 <th style="width:14%">Level mục tiêu</th>
@@ -144,13 +144,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Programmer</b></td>
 <td>Tạo solution import-ready (env vars, connection refs, publisher, version); xuất gói triển khai; chạy pipeline DEV→UAT→PROD; ghi DCR hồ sơ.</td>
-<td>01 gói triển khai UAT + bộ bằng chứng + biên bản PASS/FAIL theo performance test.</td>
+<td>01 gói triển khai UAT + bộ bằng chứng + biên bản ĐẠT/KHÔNG ĐẠT theo performance test.</td>
 <td>L4</td>
 </tr>
 <tr>
 <td><b>QC</b></td>
 <td>Xác nhận dữ liệu QC dùng đúng Rev/lot; khóa hồ sơ; kiểm tra DLP/label khi gửi đánh giá pack.</td>
-<td>01 case scenario HOLD/GO + 01 bằng chứng truy xuất đúng IR/CMM theo WO/Lot.</td>
+<td>01 tình huống scenario HOLD/GO + 01 bằng chứng truy xuất đúng IR/CMM theo WO/Lot.</td>
 <td>L3</td>
 </tr>
 <tr>
@@ -162,13 +162,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Warehouse</b></td>
 <td>Dùng app phê duyệt giao hàng theo cổng kiểm soát; chặn giao hàng khi thiếu MRR; không share external ngoài kênh đánh giá pack.</td>
-<td>01 case phê duyệt giao hàng bị BLOCK do thiếu MRR + biên bản xử lý.</td>
+<td>01 tình huống phê duyệt giao hàng bị BLOCK do thiếu MRR + biên bản xử lý.</td>
 <td>L3</td>
 </tr>
 <tr>
 <td><b>Purchasing</b></td>
-<td>Dùng flow/app mua hàng theo quyền; chặn connector bị DLP; giữ trace supplier docs theo zone.</td>
-<td>01 case request cấp quyền theo luồng công việc + bằng chứng phân loại dữ liệu.</td>
+<td>Dùng luồng/app mua hàng theo quyền; chặn connector bị DLP; giữ trace supplier docs theo zone.</td>
+<td>01 tình huống request cấp quyền theo luồng công việc + bằng chứng phân loại dữ liệu.</td>
 <td>L2</td>
 </tr>
 <tr>
@@ -203,18 +203,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </table>
 <!-- 3) -->
-<h2 id="sec3">3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + điểm chặn</h2>
+<h2 id="sec3">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <p>
- SYS-OPS-10 không đứng riêng lẻ. Module này là “hệ thống chặn rủi ro” xuyên suốt chuỗi:
- <b>Quote/Contract → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Feedback/CI</b>.
+ SYS-OPS-10 không đứng riêng lẻ. Mô-đun này là “hệ thống chặn rủi ro” xuyên suốt chuỗi:
+ <b>Báo giá/Hợp đồng → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Phản hồi/CI</b>.
  Mọi thay đổi hệ thống số tác động trực tiếp tới đúng/sai của dữ liệu trong từng bước trên.
  </p>
-<h3>Luồng handoff bắt buộc</h3>
+<h3>Luồng bàn giao bắt buộc</h3>
 <table class="form-table">
 <tr>
 <th style="width:22%">Bước</th>
-<th style="width:22%">Input bắt buộc</th>
-<th>Output bắt buộc</th>
+<th style="width:22%">Đầu vào bắt buộc</th>
+<th>Đầu ra bắt buộc</th>
 <th style="width:18%">Điểm chặn</th>
 </tr>
 <tr>
@@ -255,12 +255,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </table>
 <!-- 4) -->
-<h2 id="sec4">4) Failure Points (tối thiểu 10 điểm gãy thực tế)</h2>
+<h2 id="sec4">4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế)</h2>
 <ol>
 <li><b>Nhập nhầm phiên bản solution</b>: import gói cũ, thiếu hotfix, hoặc lệch version so với DCR hồ sơ.</li>
 <li><b>Nhập nhầm môi trường</b>: deploy thẳng vào PROD, bỏ qua UAT, hoặc chạy thử bằng dữ liệu thật.</li>
 <li><b>Unmanaged tồn tại trong PROD</b>: người dùng chỉnh trực tiếp trong PROD, tạo “độ lệch” không truy vết.</li>
-<li><b>Connection Reference trỏ sai</b>: flow/app gọi nhầm site/library, nhầm list, nhầm tenant.</li>
+<li><b>Connection Reference trỏ sai</b>: luồng/app gọi nhầm site/library, nhầm list, nhầm tenant.</li>
 <li><b>Environment Variable bị hard-code</b>: copy/paste URL, GUID, mailbox, khiến dữ liệu chảy sai vùng.</li>
 <li><b>DLP bị bỏ qua</b>: connector ngoài danh sách cho phép kéo dữ liệu khách ra kênh ngoài.</li>
 <li><b>SoD bị phá</b>: cùng một người vừa cấu hình vừa tự phê duyệt go-live.</li>
@@ -271,11 +271,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Không đóng Hồ sơ công việc</b>: sau closeout vẫn sửa được hồ sơ, phá tính bất biến của bằng chứng.</li>
 </ol>
 <!-- 5) -->
-<h2 id="sec5">5) Risk Controls (control points; ai làm; bằng chứng)</h2>
+<h2 id="sec5">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng)</h2>
 <p>Danh sách control dưới đây là bắt buộc. Mỗi control phải có Setting ID trong Build Sheet và có bằng chứng.</p>
 <table class="form-table">
 <tr>
-<th style="width:22%">Control point</th>
+<th style="width:22%">Điểm kiểm soát</th>
 <th style="width:16%">Người phụ trách</th>
 <th>Bằng chứng (MRR)</th>
 <th style="width:18%">Rủi ro bị chặn</th>
@@ -284,7 +284,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>C1 — DEV/UAT/PROD tách môi trường</b></td>
 <td>IT</td>
 <td>Ảnh cấu hình environment + danh sách makers/admins theo environment + log pipeline stages</td>
-<td>Deploy nhầm môi trường, bypass UAT</td>
+<td>Deploy nhầm môi trường, vượt qua UAT</td>
 </tr>
 <tr>
 <td><b>C2 — Solution import-ready</b> (env vars, connection refs)</td>
@@ -301,7 +301,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>C4 — DLP policy theo zone dữ liệu</b></td>
 <td>IT + QA</td>
-<td>DLP policy export/screenshot + test case “Customer-Confidential không share external”</td>
+<td>DLP policy export/screenshot + test tình huống “Customer-Confidential không share external”</td>
 <td>Rò rỉ dữ liệu khách hàng</td>
 </tr>
 <tr>
@@ -313,7 +313,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>C6 — Acceptance tests bằng user thật</b></td>
 <td>QA</td>
-<td>Biên bản test + kết quả PASS/FAIL + issue list đóng</td>
+<td>Biên bản test + kết quả ĐẠT/KHÔNG ĐẠT + issue list đóng</td>
 <td>Test ảo giác, lỗi khi chạy ca</td>
 </tr>
 <tr>
@@ -323,7 +323,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Không rollback, downtime</td>
 </tr>
 <tr>
-<td><b>C8 — Handover package</b> IT → QA/QMS</td>
+<td><b>C8 — Bàn giao package</b> IT → QA/QMS</td>
 <td>IT + QA</td>
 <td>Build Sheet final (Validated) + link bằng chứng + danh sách policies/guests</td>
 <td>Thiếu bàn giao, không truy vết</td>
@@ -335,14 +335,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Quy tắc dừng ngay</strong>
 <ul>
 <li><b>BLOCK:</b> Không có ticket/Change Request hợp lệ → không được làm bất kỳ thay đổi nào trong UAT/PROD.</li>
-<li><b>BLOCK:</b> Thiếu bằng chứng cho bất kỳ điểm kiểm soát (control point) C1–C8 → không được GO-LIVE.</li>
+<li><b>BLOCK:</b> Thiếu bằng chứng cho bất kỳ điểm kiểm soát (điểm kiểm soát) C1–C8 → không được GO-LIVE.</li>
 <li><b>HOLD:</b> Phát hiện unmanaged thay đổi trong PROD → khóa deploy, lập điều tra, khôi phục theo managed package.</li>
 <li><b>HOLD:</b> Connection Reference/Environment Variable không có danh sách kiểm tra và không có xác nhận đúng mục tiêu → dừng import.</li>
 <li><b>STOP:</b> DLP bị mở rộng connector ngoài danh sách cho phép đối với dữ liệu Customer-Confidential/Restricted → dừng ngay và rollback.</li>
 </ul>
 </div>
 <!-- 7) -->
-<h2 id="sec7">7) Phản ứng 60 giây (khi sai Rev/mix-up/thiếu chứng từ/bypass cổng kiểm soát/rủi ro giao hàng)</h2>
+<h2 id="sec7">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn (mix-up)/thiếu chứng từ/vượt qua cổng kiểm soát/rủi ro giao hàng)</h2>
 <table class="form-table">
 <tr>
 <th style="width:26%">Tình huống kích hoạt</th>
@@ -355,7 +355,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>01 log sự cố + 01 ảnh bằng chứng + link hồ sơ Released</td>
 </tr>
 <tr>
-<td><b>Mix-up lẫn lô</b> do app hiển thị sai lot</td>
+<td><b>Lẫn lộn lẫn lô</b> do app hiển thị sai lot</td>
 <td>BLOCK tách vật lý container • Gắn nhãn HOLD • QC/QA kiểm tra truy vết • Không được ship</td>
 <td>01 biên bản HOLD + cập nhật Hồ sơ công việc</td>
 </tr>
@@ -365,7 +365,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>01 bảng kiểm MRR thiếu + 01 quyết định BLOCK có chữ ký</td>
 </tr>
 <tr>
-<td><b>Bypass cổng kiểm soát</b> (deploy bỏ UAT hoặc không sign-off)</td>
+<td><b>Vượt qua cổng kiểm soát</b> (deploy bỏ UAT hoặc không sign-off)</td>
 <td>STOP pipeline • Thu hồi quyền deploy tạm thời • Mở điều tra SoD • Khôi phục theo bản đã sign-off gần nhất</td>
 <td>01 biên bản vi phạm cổng kiểm soát + snapshot quyền</td>
 </tr>
@@ -445,7 +445,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>9</td>
 <td>Chạy acceptance tests bằng user thật</td>
 <td>QA</td>
-<td>Biên bản test + PASS/FAIL + issue list</td>
+<td>Biên bản test + ĐẠT/KHÔNG ĐẠT + issue list</td>
 <td>Test bằng admin</td>
 </tr>
 <tr>
@@ -486,13 +486,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 <!-- 9) -->
 <h2 id="sec9">9) OJT thực chiến theo TWI</h2>
-<h3>Job Breakdown (Step / Key Points / Reasons)</h3>
+<h3>Job Breakdown (Step / Điểm then chốt / Lý do)</h3>
 <table class="form-table">
 <tr>
 <th style="width:6%">#</th>
 <th style="width:28%">Step</th>
-<th>Key Points (điểm phải làm đúng)</th>
-<th style="width:30%">Reasons (vì sao bắt buộc)</th>
+<th>Điểm then chốt (điểm phải làm đúng)</th>
+<th style="width:30%">Lý do (vì sao bắt buộc)</th>
 </tr>
 <tr>
 <td>1</td>
@@ -516,7 +516,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>4</td>
 <td>Tạo Environment Variables và Connection References</td>
 <td>Không hard-code URL/GUID • Có bảng mapping theo environment</td>
-<td>Tránh flow/app gọi nhầm site/list của khách khác</td>
+<td>Tránh luồng/app gọi nhầm site/list của khách khác</td>
 </tr>
 <tr>
 <td>5</td>
@@ -528,7 +528,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>6</td>
 <td>Deploy UAT theo pipeline stage</td>
 <td>Không deploy tay • Log pipeline phải lưu</td>
-<td>Khóa bypass cổng kiểm soát và chứng minh chuỗi deploy</td>
+<td>Khóa vượt qua cổng kiểm soát và chứng minh chuỗi deploy</td>
 </tr>
 <tr>
 <td>7</td>
@@ -543,11 +543,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate); sẵn sàng đánh giá trong 3 phút</td>
 </tr>
 </table>
-<h3>OJT output (sản phẩm đầu ra bắt buộc)</h3>
+<h3>OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
 <ul>
 <li>01 Build Sheet có Setting IDs (Status: Validated) + link tới bằng chứng.</li>
 <li>01 gói triển khai UAT (managed) + log pipeline + bảng kiểm pre-import ký.</li>
-<li>01 bộ acceptance tests kết quả PASS/FAIL có chữ ký QA + Supervisor.</li>
+<li>01 bộ acceptance tests kết quả ĐẠT/KHÔNG ĐẠT có chữ ký QA + Supervisor.</li>
 <li>01 snapshot quyền (groups/memberships/permissions) tại thời điểm go-live.</li>
 <li>01 bộ bằng chứng lưu đúng kho, đúng quy tắc đặt tên.</li>
 </ul>
@@ -562,19 +562,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>L1</b></td>
 <td>Nêu đúng khái niệm DEV/UAT/PROD, managed/unmanaged, DLP, zone dữ liệu; nhận biết “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”.</td>
-<td>Quiz ≥ 80% (phần kiến thức)</td>
+<td>Bài kiểm tra nhanh ≥ 80% (phần kiến thức)</td>
 <td>Được phép dùng app theo quyền user</td>
 </tr>
 <tr>
 <td><b>L2</b></td>
 <td>Thực hành đúng: mở đúng hồ sơ Released, tìm bằng chứng đúng WO/Lot trong 3 phút, tạo log sự cố khi mismatch Rev.</td>
 <td>OJT pass + 01 scenario quyết định HOLD/GO đúng</td>
-<td>Được phép xác nhận thao tác theo bảng kiểm role (Operator/Setup/Purchasing/Maintenance/EHS)</td>
+<td>Được phép xác nhận thao tác theo bảng kiểm vai trò (Operator/Setup/Purchasing/Maintenance/EHS)</td>
 </tr>
 <tr>
 <td><b>L3</b></td>
 <td>Thực hành quản trị cổng kiểm soát: chặn giao hàng khi thiếu MRR; kiểm tra quyền theo group; xác nhận closeout freeze của Hồ sơ công việc.</td>
-<td>Performance test phần role đạt PASS</td>
+<td>Performance test phần vai trò đạt PASS</td>
 <td>Được phép ra quyết định HOLD/BLOCK trong phạm vi bộ phận (QC/Warehouse/Planner/Estimator (SAL-03))</td>
 </tr>
 <tr>
@@ -586,13 +586,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 <!-- 10) -->
 <h2 id="sec10">10) Đánh giá</h2>
-<h3>10.1 Quiz (≥ 20 câu; trắc nghiệm + tình huống ngắn)</h3>
+<h3>10.1 Bài kiểm tra nhanh (≥ 20 câu; trắc nghiệm + tình huống ngắn)</h3>
 <ol>
 <li>DEV/UAT/PROD dùng để làm gì trong ALM?</li>
 <li>Managed solution dùng ở môi trường nào và mục đích gì?</li>
 <li>Unmanaged solution được phép tồn tại ở môi trường nào?</li>
 <li>Vì sao phải dùng Environment Variables thay vì hard-code?</li>
-<li>Connection Reference có vai trò gì trong flow/app?</li>
+<li>Connection Reference có vai trò gì trong luồng/app?</li>
 <li>DLP policy chặn cái gì và chặn theo cơ chế nào?</li>
 <li>Quy tắc “không break permission theo từng file” chặn rủi ro gì?</li>
 <li>SoD là gì và vì sao đánh giá quan tâm?</li>
@@ -600,7 +600,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi phát hiện app hiển thị sai Rev, hành động đầu tiên là gì?</li>
 <li>Khi có yêu cầu share dữ liệu Customer-Confidential ra ngoài, kênh đúng là gì?</li>
 <li>Vì sao acceptance test phải chạy bằng user thật?</li>
-<li>Tình huống: flow gửi email ra ngoài kèm file “Customer-Confidential”. Quyết định HOLD/GO? Ghi MRR nào?</li>
+<li>Tình huống: luồng gửi email ra ngoài kèm file “Customer-Confidential”. Quyết định HOLD/GO? Ghi MRR nào?</li>
 <li>Tình huống: deploy UAT xong nhưng chưa có sign-off. Có được deploy PROD không? Trả lời theo cổng kiểm soát.</li>
 <li>Tình huống: Warehouse chuẩn bị ship nhưng thiếu 01 IR. Quyết định? MRR phải tạo?</li>
 <li>Tình huống: phát hiện unmanaged edit trong PROD. STOP/HOLD/BLOCK? Vì sao?</li>
@@ -623,23 +623,23 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Yêu cầu: ra quyết định HOLD/GO, chỉ định kênh đúng, và liệt kê bằng chứng cần lưu để chứng minh tuân thủ.
  </div>
 <div class="note">
-<strong>Scenario 3 — Bypass UAT và thiếu sign-off</strong><br/>
+<strong>Scenario 3 — Vượt qua UAT và thiếu sign-off</strong><br/>
  Dữ kiện: Programmer deploy thẳng lên PROD để “kịp ca”, chưa chạy acceptance tests. Sau deploy, Warehouse báo app phê duyệt giao hàng lỗi lọc lot.
  Có lệnh ship trong 2 giờ tới.<br/>
- Yêu cầu: ra quyết định STOP/HOLD/BLOCK, mô tả rollback, và liệt kê MRR + trách nhiệm từng role.
+ Yêu cầu: ra quyết định STOP/HOLD/BLOCK, mô tả rollback, và liệt kê MRR + trách nhiệm từng vai trò.
  </div>
 <h3>10.3 Performance test (bắt buộc)</h3>
 <p><b>Mô tả bài test:</b> triển khai 01 thay đổi nhỏ (ví dụ: thêm 01 trường “Rev” bắt buộc trong app Hồ sơ công việc) theo đúng bảng kiểm 1→14, qua UAT, có sign-off, và tạo bộ bằng chứng hoàn chỉnh.</p>
 <table class="form-table">
 <tr>
-<th style="width:22%">Nhóm role</th>
+<th style="width:22%">Nhóm vai trò</th>
 <th>Nhiệm vụ test</th>
-<th style="width:20%">PASS/FAIL</th>
+<th style="width:20%">ĐẠT/KHÔNG ĐẠT</th>
 </tr>
 <tr>
 <td><b>Programmer</b></td>
 <td>Chuẩn import-ready (env vars/connection refs/version) • Export managed • Deploy UAT qua pipeline • Lưu log • Không hard-code</td>
-<td>đạt khi đủ bằng chứng C2–C3–C8 và không có bypass</td>
+<td>đạt khi đủ bằng chứng C2–C3–C8 và không có vượt qua</td>
 </tr>
 <tr>
 <td><b>QA</b></td>
@@ -658,13 +658,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </table>
 <!-- 11) -->
-<h2 id="sec11">11) PASS/FAIL criteria</h2>
+<h2 id="sec11">11) ĐẠT/KHÔNG ĐẠT criteria</h2>
 <div class="note">
 <strong>Điều kiện PASS</strong>
 <ul>
-<li>Hoàn tất OJT output theo role và có chữ ký xác nhận.</li>
-<li>Quiz đạt ≥ 80% và scenario quyết định HOLD/GO đúng theo cổng kiểm soát.</li>
-<li>Performance test đạt PASS theo rubric nhóm role.</li>
+<li>Hoàn tất OJT đầu ra theo vai trò và có chữ ký xác nhận.</li>
+<li>Bài kiểm tra nhanh đạt ≥ 80% và scenario quyết định HOLD/GO đúng theo cổng kiểm soát.</li>
+<li>Performance test đạt PASS theo rubric nhóm vai trò.</li>
 <li>Bộ bằng chứng đủ: mapping theo Setting ID, đặt tên đúng, lưu đúng kho, truy xuất trong 3 phút.</li>
 </ul>
 </div>
@@ -672,7 +672,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Điều kiện FAIL</strong>
 <ul>
 <li>Thiếu bất kỳ MRR nào thuộc nhóm “Tier 1” cho go-live hoặc phê duyệt giao hàng.</li>
-<li>Deploy bypass UAT hoặc thiếu sign-off QA.</li>
+<li>Deploy vượt qua UAT hoặc thiếu sign-off QA.</li>
 <li>Hard-code connection/value hoặc mở rộng connector trái DLP đối với dữ liệu Customer-Confidential/Restricted.</li>
 <li>Bằng chứng không chứng minh được ngữ cảnh (không thấy tên site/library/setting value).</li>
 </ul>
@@ -684,11 +684,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Build Sheet (Validated)</b>: Setting IDs + control objective + acceptance tests + trạng thái.</li>
 <li><b>Pre-import bảng kiểm</b>: xác nhận dependency, env vars, connection refs.</li>
 <li><b>Pipeline log</b>: lịch sử deploy DEV→UAT→PROD (ảnh + log xuất).</li>
-<li><b>Acceptance tests hồ sơ</b>: PASS/FAIL + issue list + chữ ký QA + Supervisor.</li>
+<li><b>Acceptance tests hồ sơ</b>: ĐẠT/KHÔNG ĐẠT + issue list + chữ ký QA + Supervisor.</li>
 <li><b>Backup/export trước release</b>: gói export và snapshot cấu hình.</li>
 <li><b>Snapshot quyền</b>: groups/memberships/permissions tại thời điểm go-live.</li>
 <li><b>DCR hồ sơ release</b>: version, nội dung thay đổi, rủi ro, quyết định GO/HOLD.</li>
-<li><b>Incident log</b> (khi phát sinh): mô tả, phản ứng 60 giây, rollback, quyết định.</li>
+<li><b>Nhật ký sự cố</b> (khi phát sinh): mô tả, phản ứng 60 giây, rollback, quyết định.</li>
 </ul>
 <h3>12.2 Quy tắc đặt tên (bắt buộc)</h3>
 <div class="note">
@@ -708,20 +708,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
 <h3>12.3 Nơi lưu (SharePoint library/list/path)</h3>
 <ul>
-<li><b>Tài liệu kiểm soát (module này):</b> M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training → academy → system-ops</li>
+<li><b>Tài liệu kiểm soát (mô-đun này):</b> M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training → academy → system-ops</li>
 <li><b>Bằng chứng IT/Access/Backup:</b> QMS-Hồ sơ/J_IT_Backup_and_Access_Evidence/YYYY/Q#</li>
 <li><b>Bằng chứng Power Platform ALM:</b> M365/SharePoint → HESEM-QMS-SSOT (tạo library/folder chuẩn dưới QMS-Hồ sơ để lưu export, pipeline logs, acceptance hồ sơ)</li>
 <li><b>Form FRM-QMS-14/15/16/17:</b> M365/SharePoint → HESEM-QMS-SSOT (gói hiện tại chưa có form; khi phát hành form phải cập nhật đường dẫn và mã form)</li>
 </ul>
 <!-- 13) -->
-<h2 id="sec13">13) Common đánh giá findings &amp; prevention (≥ 8 lỗi)</h2>
+<h2 id="sec13">13) Common đánh giá phát hiện &amp; phòng ngừa (≥ 8 lỗi)</h2>
 <ol>
 <li><b>Không chứng minh được chuỗi deploy</b> → lưu log pipeline + sign-off theo cổng kiểm soát.</li>
 <li><b>Unmanaged trong PROD</b> → bắt buộc managed + khóa quyền maker trong PROD.</li>
 <li><b>Bằng chứng không có ngữ cảnh</b> → screenshot phải thấy tên site/library + setting value.</li>
 <li><b>Quyền truy cập không kiểm soát</b> → dùng group baseline; không tách quyền per-file; có snapshot quyền.</li>
 <li><b>Không có acceptance tests bằng user thật</b> → chạy test theo persona (Operator/QC/Warehouse).</li>
-<li><b>DLP không phù hợp mức dữ liệu</b> → map zone + classification với DLP connectors; có test case chặn share.</li>
+<li><b>DLP không phù hợp mức dữ liệu</b> → map zone + classification với DLP connectors; có test tình huống chặn share.</li>
 <li><b>Hard-code env values</b> → dùng env vars; có bảng kiểm pre-import; có mapping theo environment.</li>
 <li><b>Không có backup/rollback</b> → export trước release và lưu đúng kho bằng chứng.</li>
 <li><b>Không đóng Hồ sơ công việc</b> → freeze khi closeout; hồ sơ hạn chế sửa/xóa; truy xuất trong 3 phút.</li>

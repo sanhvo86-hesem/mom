@@ -69,7 +69,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-23</div>
 <h1 style="margin-top:10px">SOP-QMS-12 M365 sẵn sàng cho đánh giá Configuration: baseline, DLP, đánh giá logging, bộ bằng chứng</h1>
-<p class="muted">Đào tạo thực chiến để cấu hình và vận hành M365 theo chuẩn đánh giá‑ready: chặn nhầm phiên bản, chặn rò rỉ dữ liệu, giữ dấu vết đánh giá, dựng bộ bằng chứng đúng giờ.</p>
+<p class="muted">Đào tạo thực chiến để cấu hình và vận hành M365 theo chuẩn sẵn sàng cho đánh giá: chặn nhầm phiên bản, chặn rò rỉ dữ liệu, giữ dấu vết đánh giá, dựng bộ bằng chứng đúng giờ.</p>
 <div class="tag blue">Phiên bản</div>
 </div>
 <div class="note">
@@ -78,30 +78,30 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Đối tượng:</strong> Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor</li>
 <li><strong>Khi kích hoạt:</strong> Khi hội nhập nhân sự mới (onboarding) khách hàng mới/part‑rev mới; khi mở quyền external cho khách/auditor; khi phát hành hoặc thay đổi baseline M365 ảnh hưởng QMS; trước đánh giá khách hàng.</li>
 <li><strong>Thời lượng:</strong> Lý thuyết 2 giờ • Workshop 2 giờ • OJT 1 ca (4 giờ) • Rà soát sau 7 ngày (30 phút).</li>
-<li><strong>Điều kiện trước:</strong> Đã học SOP kiểm soát tài liệu; đã đọc SOP‑QMS‑012, FRM‑QMS‑016, ANNEX‑QMS‑003; nắm quy tắc Hồ sơ công việc (job dossier)/Bộ bằng chứng; có tài khoản M365 theo role; đã được cấp quyền đúng ma trận.</li>
+<li><strong>Điều kiện trước:</strong> Đã học SOP kiểm soát tài liệu; đã đọc SOP‑QMS‑012, FRM‑QMS‑016, ANNEX‑QMS‑003; nắm quy tắc Hồ sơ công việc (job dossier)/Bộ bằng chứng; có tài khoản M365 theo vai trò; đã được cấp quyền đúng ma trận.</li>
 </ul>
 </div>
 </div>
 <div class="toc">
 <strong>Mục lục nhanh</strong>
 <ul>
-<li><a href="#m2">2) Mục đích module &amp; bối cảnh vận hành</a></li>
-<li><a href="#m3">3) Vị trí trong chuỗi E2E + luồng handoff + điểm chặn</a></li>
-<li><a href="#m4">4) Failure Points (≥10)</a></li>
-<li><a href="#m5">5) Risk Controls (≥6)</a></li>
+<li><a href="#m2">2) Mục đích mô-đun &amp; bối cảnh vận hành</a></li>
+<li><a href="#m3">3) Vị trí trong chuỗi E2E + luồng bàn giao + điểm chặn</a></li>
+<li><a href="#m4">4) Điểm đứt gãy (≥10)</a></li>
+<li><a href="#m5">5) Biện pháp kiểm soát rủi ro (≥6)</a></li>
 <li><a href="#m6">6) Fail‑fast rules + STOP/HOLD/BLOCK</a></li>
 <li><a href="#m7">7) Phản ứng 60 giây</a></li>
 <li><a href="#m8">8) Bảng kiểm vận hành (≤15 bước)</a></li>
 <li><a href="#m9">9) OJT theo TWI + rubric L1–L4</a></li>
-<li><a href="#m10">10) Đánh giá: quiz + scenario + performance test</a></li>
+<li><a href="#m10">10) Đánh giá: bài kiểm tra nhanh + scenario + performance test</a></li>
 <li><a href="#m11">11) ĐẠT/KHÔNG ĐẠT criteria</a></li>
 <li><a href="#m12">12) MRR tối thiểu</a></li>
-<li><a href="#m13">13) Common đánh giá findings &amp; prevention</a></li>
+<li><a href="#m13">13) Common đánh giá phát hiện &amp; phòng ngừa</a></li>
 <li><a href="#m14">14) DCR hồ sơ</a></li>
 </ul>
 </div>
 </div>
-<h2 class="h2" id="m2">2) Mục đích module &amp; bối cảnh vận hành (cổng kiểm soát (gate)/handoff; trách nhiệm; khi kích hoạt)</h2>
+<h2 class="h2" id="m2">2) Mục đích mô-đun &amp; bối cảnh vận hành (cổng kiểm soát (gate)/bàn giao; trách nhiệm; khi kích hoạt)</h2>
 <div class="callout">
 <b>Lý do tồn tại (Cổng kiểm soát logic)</b>
 <ul>
@@ -117,7 +117,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>IT/M365 Admin:</b> cấu hình baseline tenant, labels/DLP/retention, đánh giá logging; cấp/thu hồi quyền; xuất bằng chứng cấu hình.</li>
 <li><b>QA/QMS:</b> định nghĩa yêu cầu bằng chứng‑ready, kiểm tra kiểm tra đột xuất “đúng Rev”, dựng bộ bằng chứng cho đánh giá; chặn cổng kiểm soát khi thiếu MRR.</li>
 <li><b>chủ quá trình/Supervisor:</b> chịu trách nhiệm vùng dữ liệu (Released/Hồ sơ/WIP) và kỷ luật lưu hồ sơ theo job.</li>
-<li><b>Toàn bộ role vận hành:</b> tạo hồ sơ đúng thư viện, đúng tên, đúng nhãn; không tự ý chia sẻ external; không dùng file từ chat/email làm “bản đúng”.</li>
+<li><b>Toàn bộ vai trò vận hành:</b> tạo hồ sơ đúng thư viện, đúng tên, đúng nhãn; không tự ý chia sẻ external; không dùng file từ chat/email làm “bản đúng”.</li>
 </ul>
 </div>
 <div class="note">
@@ -130,21 +130,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 </div>
-<h2 class="h2" id="m3">3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + “điểm chặn”</h2>
-<p class="muted">Module này chạy xuyên chuỗi E2E và tạo điều kiện để mọi cổng kiểm soát khác vận hành “bằng chứng‑ready”.</p>
+<h2 class="h2" id="m3">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + “điểm chặn”</h2>
+<p class="muted">Mô-đun này chạy xuyên chuỗi E2E và tạo điều kiện để mọi cổng kiểm soát khác vận hành “bằng chứng‑ready”.</p>
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
 <th style="width:260px">Bước E2E</th>
-<th>Input/Handoff vào M365</th>
-<th>Output bắt buộc (MRR)</th>
+<th>Đầu vào/Bàn giao vào M365</th>
+<th>Đầu ra bắt buộc (MRR)</th>
 <th>Điểm chặn (BLOCK)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><b>Quote/Contract</b> (Estimator (SAL-03))</td>
+<td><b>Báo giá/Hợp đồng</b> (Estimator (SAL-03))</td>
 <td>NDA/PO/spec khách hàng; yêu cầu chia sẻ</td>
 <td>Thư mục/Document Set khách hàng + nhãn bảo mật + log cấp quyền</td>
 <td>Không có log cấp quyền &amp; expiry external → <b>BLOCK</b> chia sẻ</td>
@@ -158,7 +158,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Engineering/Programming</b> (Programmer)</td>
 <td>Drawing/solid/spec “Released”</td>
-<td>Release hồ sơ chương trình + link đến dữ liệu gốc (master data)</td>
+<td>Release hồ sơ chương trình + link đến dữ liệu gốc (dữ liệu gốc)</td>
 <td>File CAM/DWG nằm ngoài Part/REV master → <b>STOP</b> chạy chương trình</td>
 </tr>
 <tr>
@@ -188,10 +188,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody>
 </table>
 </div>
-<h2 class="h2" id="m4">4) Failure Points (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
+<h2 class="h2" id="m4">4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
 <ol>
 <li><b>Wrong Rev at point‑of‑use:</b> Operator mở file từ email/chat, bỏ qua thư viện Released.</li>
-<li><b>Mix‑up dữ liệu khách:</b> Lưu drawing khách A vào thư mục khách B do đặt tên không chuẩn.</li>
+<li><b>Lẫn lộn (mix-up) dữ liệu khách:</b> Lưu drawing khách A vào thư mục khách B do đặt tên không chuẩn.</li>
 <li><b>Any‑link external:</b> Tạo “Anyone link” cho drawing/CNC program, không expiry, không log.</li>
 <li><b>Guest tồn tại vĩnh viễn:</b> Guest access không expiry, không access review, không thu hồi.</li>
 <li><b>Per‑file permission break:</b> Tự bẻ quyền từng file, mất kiểm soát ma trận quyền, đánh giá không đạt.</li>
@@ -199,16 +199,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Thiếu retention label:</b> Cert/IR/NCR lưu như file rời, không retention, rơi vào “xóa nhầm”.</li>
 <li><b>Hồ sơ công việc không freeze:</b> Closeout xong vẫn sửa WIP, đánh giá bác bỏ hồ sơ.</li>
 <li><b>Không có đánh giá log bằng chứng:</b> Không bật đánh giá, không xuất log cho sự kiện share/download/delete.</li>
-<li><b>External share bypass cổng kiểm soát:</b> Estimator (SAL-03) tự gửi zip/email cho khách thay vì bộ bằng chứng chỉ đọc.</li>
+<li><b>External share vượt qua cổng kiểm soát:</b> Estimator (SAL-03) tự gửi zip/email cho khách thay vì bộ bằng chứng chỉ đọc.</li>
 <li><b>Mass delete/mass download:</b> Không có cảnh báo và quy trình phản ứng, mất dữ liệu hoặc lộ dữ liệu.</li>
 <li><b>OneDrive thành kho Hồ sơ:</b> Người dùng lưu hồ sơ tại OneDrive cá nhân, rủi ro nghỉ việc/mất truy xuất.</li>
 </ol>
-<h2 class="h2" id="m5">5) Risk Controls (control points; ai làm; bằng chứng; tối thiểu 6)</h2>
+<h2 class="h2" id="m5">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6)</h2>
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
-<th style="width:200px">Control point</th>
+<th style="width:200px">Điểm kiểm soát</th>
 <th>Người phụ trách</th>
 <th>Bằng chứng/MRR</th>
 <th>Điều kiện đạt (Test/Acceptance)</th>
@@ -284,7 +284,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>BLOCK phê duyệt giao hàng</b> khi bộ bằng chứng không đủ MRR tối thiểu cho job (thiếu hồ sơ công việc, thiếu inspection hồ sơ, thiếu traceability). Hành động: bổ sung MRR trước khi GO.</li>
 </ol>
 </div>
-<h2 class="h2" id="m7">7) Phản ứng 60 giây (khi sai Rev/mix‑up/thiếu chứng từ/bypass cổng kiểm soát/rủi ro giao hàng)</h2>
+<h2 class="h2" id="m7">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn/thiếu chứng từ/vượt qua cổng kiểm soát/rủi ro giao hàng)</h2>
 <div class="grid-2">
 <div class="note">
 <strong>60 giây — Sai Rev / dùng file ngoài Released</strong>
@@ -320,7 +320,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Xác nhận role &amp; quyền truy cập theo ma trận</td><td>Supervisor + IT</td><td>Ảnh chụp nhóm quyền + log cấp quyền (FRM log)</td><td>Cấp quyền cá nhân, không theo group</td></tr>
+<tr><td>1</td><td>Xác nhận vai trò &amp; quyền truy cập theo ma trận</td><td>Supervisor + IT</td><td>Ảnh chụp nhóm quyền + log cấp quyền (FRM log)</td><td>Cấp quyền cá nhân, không theo group</td></tr>
 <tr><td>2</td><td>Bật MFA và kiểm tra đăng nhập thiết bị mới</td><td>IT</td><td>Ảnh cấu hình MFA + kết quả test</td><td>Dùng tài khoản admin chung, không tách vai trò</td></tr>
 <tr><td>3</td><td>Thiết lập sharing baseline: Specific people + expiry external</td><td>IT</td><td>Ảnh setting + test tạo link</td><td>Cho phép Anyone link</td></tr>
 <tr><td>4</td><td>Chuẩn hóa 3 vùng: Released / Hồ sơ / WIP-Job Không gian làm việc</td><td>QA/QMS + chủ quá trình</td><td>Sơ đồ site/library + danh mục thư viện</td><td>Lẫn WIP vào Hồ sơ, mất “freeze”</td></tr>
@@ -340,7 +340,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h2 class="h2" id="m9">9) OJT thực chiến theo TWI</h2>
 <div class="card">
-<h3 class="h3">9.1 Job breakdown (Step / Key Points / Reasons)</h3>
+<h3 class="h3">9.1 Job breakdown (Step / Điểm then chốt / Lý do)</h3>
 <p class="muted">OJT tập trung “làm được và có bằng chứng”, không đọc lý thuyết.</p>
 <div class="table-card">
 <table class="table">
@@ -348,8 +348,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:44px">#</th>
 <th>Step</th>
-<th>Key Points (điểm then chốt)</th>
-<th>Reasons (vì sao phải làm)</th>
+<th>Điểm then chốt</th>
+<th>Lý do (vì sao phải làm)</th>
 </tr>
 </thead>
 <tbody>
@@ -394,9 +394,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<h3 class="h3">9.2 OJT output (sản phẩm đầu ra bắt buộc)</h3>
+<h3 class="h3">9.2 OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
 <ul>
-<li><b>01 bộ hồ sơ cấu hình</b> cho module này: FRM‑QMS‑016 được điền đầy đủ + bộ ảnh/snapshot bằng chứng theo Bằng chứng ID M365‑01…M365‑42.</li>
+<li><b>01 bộ hồ sơ cấu hình</b> cho mô-đun này: FRM‑QMS‑016 được điền đầy đủ + bộ ảnh/snapshot bằng chứng theo Bằng chứng ID M365‑01…M365‑42.</li>
 <li><b>01 Hồ sơ công việc mẫu</b> (JobNum giả lập) có cấu trúc đúng, metadata Rev/Customer đầy đủ, có hồ sơ inspection mẫu.</li>
 <li><b>01 Bộ bằng chứng mẫu</b> đặt tại <b>Z_Audit_Evidence_Pack</b> (chỉ đọc + expiry) và có log chia sẻ.</li>
 <li><b>01 kết quả truy vấn đánh giá log</b> cho sự kiện external share và delete trong 30 ngày gần nhất, kèm biên bản xử lý.</li>
@@ -413,7 +413,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Hành vi quan sát được</th>
 <th>Điều kiện lên level</th>
 <th>Quyền hạn được cấp khi đạt</th>
-<th style="width:220px">Áp dụng theo role</th>
+<th style="width:220px">Áp dụng theo vai trò</th>
 </tr>
 </thead>
 <tbody>
@@ -436,10 +436,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Tạo Hồ sơ công việc đúng mẫu và link Part/REV master.</li>
 <li>Tạo release hồ sơ (program/setup/inspection) và lưu đúng Hồ sơ.</li>
-<li>Tự phát hiện sai Rev/mix‑up và kích hoạt phản ứng 60 giây.</li>
+<li>Tự phát hiện sai Rev/lẫn lộn và kích hoạt phản ứng 60 giây.</li>
 </ul>
 </td>
-<td>OJT output có 0 lỗi cổng kiểm soát; kiểm tra đột xuất 3 hồ sơ liên tiếp đạt</td>
+<td>OJT đầu ra có 0 lỗi cổng kiểm soát; kiểm tra đột xuất 3 hồ sơ liên tiếp đạt</td>
 <td>Được tạo cấu trúc dossier/hồ sơ trong phạm vi job; không cấp quyền external</td>
 <td>Planner, Programmer, QC, Purchasing, Estimator (SAL-03)</td>
 </tr>
@@ -461,7 +461,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>
 <ul>
 <li>Thiết kế lại library mẫu/metadata để giảm nhầm Rev và tăng truy xuất.</li>
-<li>Phân tích đánh giá events theo xu hướng, tạo hành động phòng ngừa và cập nhật SOP/module.</li>
+<li>Phân tích đánh giá events theo xu hướng, tạo hành động phòng ngừa và cập nhật SOP/mô-đun.</li>
 <li>Tổ chức access review định kỳ và đóng hành động thu hồi quyền.</li>
 </ul>
 </td>
@@ -486,7 +486,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Retention label mục tiêu chính: A) làm đẹp thư viện B) bảo toàn hồ sơ theo thời hạn C) tăng tốc Wi‑Fi D) giảm dung lượng email</li>
 <li>Vai trò nào chịu trách nhiệm dựng Bộ bằng chứng cho đánh giá? A) Operator B) QA/QMS C) Maintenance D) Vendor</li>
 <li>Chọn đúng: OneDrive được dùng cho mục tiêu nào? A) kho Hồ sơ B) kho Released C) vùng làm việc cá nhân và phải đồng bộ về site chuẩn D) kho đánh giá log</li>
-<li>DLP chặn điều gì trong module này? A) in tài liệu B) share external dữ liệu Customer‑Confidential/Restricted C) mở file PDF D) rename folder</li>
+<li>DLP chặn điều gì trong mô-đun này? A) in tài liệu B) share external dữ liệu Customer‑Confidential/Restricted C) mở file PDF D) rename folder</li>
 <li>Khi phát hiện sai Rev tại máy, hành động đầu tiên: A) tiếp tục gia công B) DỪNG và cô lập nguồn file C) xóa file D) gọi khách hàng</li>
 <li>Guest access bắt buộc có gì? A) vĩnh viễn B) expiry + access review C) mật khẩu chung D) quyền edit toàn site</li>
 <li>Đánh giá logging phục vụ mục tiêu nào? A) đo OEE B) truy vết share/download/delete và thay đổi quyền C) tăng tốc máy CNC D) quản lý tồn kho</li>
@@ -524,7 +524,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li><b>IT (hoặc người được phân quyền):</b> cấu hình 01 thư viện “Released” bật major/minor + approval, và 01 thư viện “Hồ sơ” gắn retention label mặc định.</li>
 <li><b>QA/QMS:</b> dựng 01 Bộ bằng chứng chỉ đọc + expiry; ghi log cấp quyền; kiểm chứng DLP bằng 01 lượt share thử.</li>
-<li><b>Role vận hành (Operator/Setup/Programmer/QC/Warehouse/Estimator (SAL-03)):</b> nộp 01 hồ sơ theo job giả lập đúng nơi, đúng tên; không dùng file từ chat/email; thực hiện 01 escalation theo phản ứng 60 giây (giả lập).</li>
+<li><b>Vai trò vận hành (Operator/Setup/Programmer/QC/Warehouse/Estimator (SAL-03)):</b> nộp 01 hồ sơ theo job giả lập đúng nơi, đúng tên; không dùng file từ chat/email; thực hiện 01 escalation theo phản ứng 60 giây (giả lập).</li>
 <li><b>IT + QA:</b> chạy 01 truy vấn đánh giá log cho sự kiện external share trong 30 ngày; lưu kết quả + biên bản kết luận.</li>
 </ol>
 </div>
@@ -565,7 +565,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" id="m11">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”)</h2>
 <div class="callout">
 <ul>
-<li><b>PASS</b> khi: (1) Bài kiểm tra ≥ 75%; (2) Tình huống đạt: quyết định đúng STOP/HOLD/BLOCK/GO và liệt kê MRR đầy đủ; (3) Bài test thực hành PASS; (4) OJT output đủ và không có lỗi cổng kiểm soát.</li>
+<li><b>PASS</b> khi: (1) Bài kiểm tra ≥ 75%; (2) Tình huống đạt: quyết định đúng STOP/HOLD/BLOCK/GO và liệt kê MRR đầy đủ; (3) Bài test thực hành PASS; (4) OJT đầu ra đủ và không có lỗi cổng kiểm soát.</li>
 <li><b>FAIL</b> khi: thiếu bất kỳ MRR bắt buộc nào, hoặc vi phạm 1 cổng kiểm soát (Any‑link, dùng file ngoài Released, overwrite hồ sơ, thiếu retention, không có đánh giá log bằng chứng).</li>
 <li><b>Quy tắc cứng:</b> <b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</b>. Thiếu bằng chứng → không công nhận level và không cho vận hành quyền tương ứng.</li>
 </ul>
@@ -597,13 +597,13 @@ EX: M365CFG_M365-21_2026-02-04_ControlledDocsLibrary_PASS.png</pre>
 <ul>
 <li><b>QMS Controlled Documents:</b> CNC‑IMS‑HUB → QMS‑Controlled‑Documents → qms → sop (tài liệu SOP).</li>
 <li><b>Forms:</b> CNC‑IMS‑HUB → QMS‑Controlled‑Documents → forms (FRM).</li>
-<li><b>Training module:</b> CNC‑IMS‑HUB → QMS‑Controlled‑Documents → training → academy → system‑ops. <span class="muted">RBAC: QA/QMS approve • OPS execute • IT admin • sửa hồ sơ cổng kiểm soát = QA/QMS.</span></li>
+<li><b>Training mô-đun:</b> CNC‑IMS‑HUB → QMS‑Controlled‑Documents → training → academy → system‑ops. <span class="muted">RBAC: QA/QMS approve • OPS execute • IT admin • sửa hồ sơ cổng kiểm soát = QA/QMS.</span></li>
 <li><b>Bộ bằng chứng:</b> CNC‑IMS‑HUB → Z_Audit_Evidence_Pack. <span class="muted">Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint).</span></li>
 <li><b>Hồ sơ công việc:</b> CNC‑IMS‑HUB → Job‑Dossiers → JOB‑{JobNum}_{PartNum}_REV‑{Rev}.</li>
-<li><b>Part/REV Master Data:</b> CNC‑IMS‑HUB → DATA → 03_Production → 00_Programming → {CustomerCode} → {CustomerPartNo} → REV {Rev}.</li>
+<li><b>Part/REV Dữ liệu gốc:</b> CNC‑IMS‑HUB → DATA → 03_Production → 00_Programming → {CustomerCode} → {CustomerPartNo} → REV {Rev}.</li>
 </ul>
 </div>
-<h2 class="h2" id="m13">13) Common đánh giá findings &amp; prevention (≥8)</h2>
+<h2 class="h2" id="m13">13) Common đánh giá phát hiện &amp; phòng ngừa (≥8)</h2>
 <ol>
 <li><b>Không chứng minh “bản đúng”:</b> auditor thấy file xuất phát từ email/chat → chặn bằng quy tắc point‑of‑use và kiểm tra đột xuất hàng tháng.</li>
 <li><b>External sharing không kiểm soát:</b> Anyone link/không expiry → chặn bằng baseline sharing + log cấp quyền.</li>
@@ -611,7 +611,7 @@ EX: M365CFG_M365-21_2026-02-04_ControlledDocsLibrary_PASS.png</pre>
 <li><b>Tính toàn vẹn hồ sơ yếu:</b> overwrite file inspection/cert → chặn bằng quy tắc đính chính + retention label.</li>
 <li><b>Thiếu retention:</b> hồ sơ không gắn retention label → chặn bằng default label tại Hồ sơ library.</li>
 <li><b>Không có dấu vết đánh giá:</b> không truy xuất ai delete/share → chặn bằng đánh giá logging + truy vấn định kỳ.</li>
-<li><b>Mix‑up khách hàng:</b> đặt tên không chuẩn, lưu sai thư mục → chặn bằng chuẩn naming + mẫu folder.</li>
+<li><b>Lẫn lộn khách hàng:</b> đặt tên không chuẩn, lưu sai thư mục → chặn bằng chuẩn naming + mẫu folder.</li>
 <li><b>Bộ bằng chứng thiếu cấu trúc:</b> không có danh mục, không chỉ đọc → chặn bằng bảng kiểm dựng pack và kiểm chứng DLP trước chia sẻ.</li>
 <li><b>Per‑file permission break:</b> khó đánh giá và dễ rò rỉ → chặn bằng nguyên tắc đặt quyền tại Site/Library/Document Set.</li>
 </ol>

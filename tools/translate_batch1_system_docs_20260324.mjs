@@ -360,6 +360,288 @@ const RULES = [
     "tuổi tồn"
   ),
   commonRule(
+    "cleanup_job_dossier_creation",
+    /\b(?:CP1\s*[—-]\s*)?hồ sơ công việc creation\b/gi,
+    "tạo hồ sơ công việc"
+  ),
+  commonRule(
+    "cleanup_locked_signed",
+    /\blocked\/signed\b/gi,
+    "đã khóa/đã ký"
+  ),
+  commonRule(
+    "cleanup_signed_locked",
+    /\bsigned\/locked\b/gi,
+    "đã ký/đã khóa"
+  ),
+  commonRule(
+    "cleanup_technical_controls",
+    /\bkỹ thuật controls\b/gi,
+    "kiểm soát kỹ thuật"
+  ),
+  commonRule(
+    "cleanup_stop_work_dup",
+    /\bDừng việc\s*\(\s*Stop Work\s*\)\s*\(\s*dừng việc\s*\)/g,
+    "Dừng việc (Stop Work)"
+  ),
+  commonRule(
+    "cleanup_coolant_nested",
+    /\bChất lỏng làm mát\s*\(\s*dung dịch làm mát\s*\(\s*coolant\s*\)\s*\)/g,
+    "Dung dịch làm mát (coolant)"
+  ),
+  commonRule(
+    "cleanup_leading_signs",
+    /\bTín hiệu sớm\s*\(\s*dấu hiệu sớm\s*\)/g,
+    "Dấu hiệu sớm"
+  ),
+  commonRule(
+    "cleanup_job_shop_cnc",
+    /\b(?:xưởng|Xưởng)\s+CNC\s+(?:xưởng|Xưởng)\s+gia công theo đơn(?:\s*\(\s*job shop\s*\))?/g,
+    "xưởng CNC gia công theo đơn (job shop)"
+  ),
+  commonRule(
+    "cleanup_deliverables_dup",
+    /\bđầu ra\s*\(\s*đầu ra yêu cầu\s*\)/gi,
+    "đầu ra yêu cầu"
+  ),
+  commonRule(
+    "cleanup_mix_up_prevention",
+    /\blẫn lộn prevention\b/gi,
+    "phòng ngừa lẫn lộn"
+  ),
+  commonRule(
+    "cleanup_mix_up_dup",
+    /\bLẫn lộn\/lẫn lộn\b/g,
+    "Lẫn lộn"
+  ),
+  commonRule(
+    "cleanup_job_shop_nested",
+    /\bxưởng CNC gia công theo đơn\s*\(\s*xưởng gia công theo đơn\s*\(\s*job shop\s*\)\s*\)/gi,
+    "xưởng CNC gia công theo đơn (job shop)"
+  ),
+  commonRule(
+    "cleanup_job_shop_plain_dup",
+    /\bxưởng CNC gia công theo đơn\s*\(\s*xưởng gia công theo đơn\s*\)/gi,
+    "xưởng CNC gia công theo đơn"
+  ),
+  commonRule(
+    "cleanup_output_note",
+    /\bđầu ra(?: yêu cầu)?\s*\(\s*đầu ra yêu cầu\s*\)/gi,
+    "đầu ra yêu cầu"
+  ),
+  commonRule(
+    "cleanup_major_step_header",
+    /\bBước công việc\s*\(\s*Bước chính\s*\)/g,
+    "Bước công việc"
+  ),
+  commonRule(
+    "cleanup_key_points_dup",
+    /\bĐiểm then chốt\s*\(\s*Điểm then chốt\s*\)/g,
+    "Điểm then chốt"
+  ),
+  commonRule(
+    "cleanup_reasons_dup",
+    /\bLý do\s*\(\s*Lý do\s*\)/g,
+    "Lý do"
+  ),
+  commonRule(
+    "cleanup_assessment_dup",
+    /\bĐánh giá\s*\(\s*Đánh giá\s*\)/g,
+    "Đánh giá"
+  ),
+  commonRule(
+    "cleanup_quiz_dup",
+    /\bBài kiểm tra nhanh\s*\(\s*Bài kiểm tra nhanh\s*\)/g,
+    "Bài kiểm tra nhanh"
+  ),
+  commonRule(
+    "cleanup_standalone_stop_work_note",
+    /^\s*\(\s*dừng việc\s*\)\s*$/g,
+    ""
+  ),
+  commonRule(
+    "cleanup_mix_up_note",
+    /\blẫn lộn\s*\(\s*lẫn lộn lô\/phiên bản\s*\)/gi,
+    "lẫn lộn lô/phiên bản"
+  ),
+  commonRule(
+    "cleanup_internal_drill",
+    /\bnội bộ drill\b/gi,
+    "diễn tập nội bộ"
+  ),
+  commonRule(
+    "cleanup_audit_drill_label",
+    /\bđánh giá drill\b/gi,
+    "diễn tập đánh giá"
+  ),
+  commonRule(
+    "cleanup_planning_kickoff",
+    /\bPlanning khởi động\b/g,
+    "khởi động Planning"
+  ),
+  commonRule(
+    "cleanup_common_findings",
+    /\btrending common phát hiện\b/gi,
+    "theo dõi xu hướng các phát hiện phổ biến"
+  ),
+  commonRule(
+    "cleanup_right_first_time_nested",
+    /\bĐúng ngay từ lần đầu\s*\(\s*Đúng ngay từ lần đầu\s*\(\s*Đúng ngay từ lần đầu\s*\(\s*Right First Time\s*\)\s*\)\s*\)/g,
+    "Đúng ngay từ lần đầu (Right First Time)"
+  ),
+  commonRule(
+    "cleanup_right_first_time_dup",
+    /\bĐúng ngay từ lần đầu\s*\(\s*Đúng ngay từ lần đầu\s*\(\s*Right First Time\s*\)\s*\)/g,
+    "Đúng ngay từ lần đầu (Right First Time)"
+  ),
+  commonRule(
+    "cleanup_mix_up_nested",
+    /\blẫn lộn\s*\(\s*mix-up\s*\)\s*\(\s*lẫn lộn lô\/phiên bản\s*\)/gi,
+    "lẫn lộn (mix-up)"
+  ),
+  commonRule(
+    "cleanup_stop_work_inline_note",
+    /\(\s*dừng việc\s*\)\s*(?=và)/gi,
+    ""
+  ),
+  commonRule(
+    "cleanup_anti_mix_up",
+    /\banti[-‑]lẫn lộn\b/gi,
+    "chống lẫn lộn"
+  ),
+  uncommonRule(
+    "job_shop",
+    /\bxưởng gia công theo đơn\s*\(\s*job shop\s*\)|(?<!xưởng gia công theo đơn \()(?<!xưởng CNC gia công theo đơn \()\bjob shop\b/gi,
+    "xưởng gia công theo đơn (job shop)",
+    "xưởng gia công theo đơn"
+  ),
+  uncommonRule(
+    "right_first_time",
+    /\bđúng ngay từ lần đầu\s*\(\s*Right First Time\s*\)|\bRight First Time\b/gi,
+    "đúng ngay từ lần đầu (Right First Time)",
+    "đúng ngay từ lần đầu"
+  ),
+  uncommonRule(
+    "kpi_gating",
+    /\bcơ chế chặn theo KPI\s*\(\s*KPI gating\s*\)|\bKPI gating\b/gi,
+    "cơ chế chặn theo KPI (KPI gating)",
+    "cơ chế chặn theo KPI"
+  ),
+  uncommonRule(
+    "scorecard",
+    /\bthẻ điểm\s*\(\s*scorecards?\s*\)|\bscorecards?\b/gi,
+    "thẻ điểm (scorecard)",
+    "thẻ điểm"
+  ),
+  uncommonRule(
+    "playbook",
+    /\bcẩm nang triển khai\s*\(\s*playbooks?\s*\)|\bplaybooks?\b/gi,
+    "cẩm nang triển khai (playbook)",
+    "cẩm nang triển khai"
+  ),
+  uncommonRule(
+    "coaching",
+    /\bkèm cặp phát triển\s*\(\s*coaching\s*\)|\bcoaching\b/gi,
+    "kèm cặp phát triển (coaching)",
+    "kèm cặp phát triển"
+  ),
+  uncommonRule(
+    "mentoring",
+    /\bcố vấn phát triển\s*\(\s*mentoring\s*\)|\bmentoring\b/gi,
+    "cố vấn phát triển (mentoring)",
+    "cố vấn phát triển"
+  ),
+  uncommonRule(
+    "near_miss",
+    /\bsự cố suýt xảy ra\s*\(\s*near[-‑ ]miss\s*\)|\bnear[-‑ ]miss\b/gi,
+    "sự cố suýt xảy ra (near-miss)",
+    "sự cố suýt xảy ra"
+  ),
+  uncommonRule(
+    "mix_up",
+    /\blẫn lộn\s*\(\s*mix[-‑ ]up\s*\)|\bmix[-‑ ]up\b/gi,
+    "lẫn lộn (mix-up)",
+    "lẫn lộn"
+  ),
+  uncommonRule(
+    "visual_management",
+    /\bquản lý trực quan\s*\(\s*Visual Management\s*\)|\bVisual Management\b/gi,
+    "quản lý trực quan (Visual Management)",
+    "quản lý trực quan"
+  ),
+  uncommonRule(
+    "hierarchy_of_controls",
+    /\bthứ bậc biện pháp kiểm soát\s*\(\s*Hierarchy of Controls\s*\)|\bHierarchy of Controls\b/gi,
+    "thứ bậc biện pháp kiểm soát (Hierarchy of Controls)",
+    "thứ bậc biện pháp kiểm soát"
+  ),
+  uncommonRule(
+    "stop_work",
+    /\bdừng việc\s*\(\s*Stop Work\s*\)|\bStop Work\b/gi,
+    "dừng việc (Stop Work)",
+    "dừng việc"
+  ),
+  uncommonRule(
+    "coolant",
+    /\bdung dịch làm mát\s*\(\s*coolant\s*\)|\bcoolant\b/gi,
+    "dung dịch làm mát (coolant)",
+    "dung dịch làm mát"
+  ),
+  uncommonRule(
+    "interlock",
+    /\bliên động an toàn\s*\(\s*interlock\s*\)|\binterlock\b/gi,
+    "liên động an toàn (interlock)",
+    "liên động an toàn"
+  ),
+  uncommonRule(
+    "shadow_board",
+    /\bbảng treo bóng dụng cụ\s*\(\s*shadow board\s*\)|\bshadow board\b/gi,
+    "bảng treo bóng dụng cụ (shadow board)",
+    "bảng treo bóng dụng cụ"
+  ),
+  uncommonRule(
+    "zero_energy",
+    /\btrạng thái cô lập năng lượng\s*\(\s*Zero energy\s*\)|\bZero energy\b/gi,
+    "trạng thái cô lập năng lượng (Zero energy)",
+    "trạng thái cô lập năng lượng"
+  ),
+  uncommonRule(
+    "work_order",
+    /\blệnh công việc\s*\(\s*Work Order\s*\)|\bWork Order\b/gi,
+    "lệnh công việc (Work Order)",
+    "lệnh công việc"
+  ),
+  uncommonRule(
+    "dispatch_packet",
+    /\bbộ hồ sơ gửi nhà cung cấp\s*\(\s*dispatch packet\s*\)|\bdispatch packet\b/gi,
+    "bộ hồ sơ gửi nhà cung cấp (dispatch packet)",
+    "bộ hồ sơ gửi nhà cung cấp"
+  ),
+  uncommonRule(
+    "program_release",
+    /\bphát hành chương trình\s*\(\s*program release\s*\)|\bprogram release\b/gi,
+    "phát hành chương trình (program release)",
+    "phát hành chương trình"
+  ),
+  uncommonRule(
+    "inspection_package",
+    /\bbộ hồ sơ kiểm tra\s*\(\s*Inspection Package\s*\)|\bInspection Package\b/gi,
+    "bộ hồ sơ kiểm tra (Inspection Package)",
+    "bộ hồ sơ kiểm tra"
+  ),
+  uncommonRule(
+    "dry_run",
+    /\bchạy thử khô\s*\(\s*Dry run\s*\)|\bDry run\b/gi,
+    "chạy thử khô (dry run)",
+    "chạy thử khô"
+  ),
+  uncommonRule(
+    "first_article",
+    /\bkiểm tra sản phẩm đầu tiên\s*\(\s*first article\s*\)|\bfirst article\b/gi,
+    "kiểm tra sản phẩm đầu tiên (first article)",
+    "kiểm tra sản phẩm đầu tiên"
+  ),
+  commonRule(
     "contract_review",
     /\brà soát hợp đồng\s*\(\s*contract review(?:\s*\/\s*rà soát hợp đồng)?\s*\)|\bcontract review\b/gi,
     "rà soát hợp đồng"
@@ -415,6 +697,10 @@ const RULES = [
   commonRule("approval_matrix", /\bapproval matrix\b/gi, "ma trận phê duyệt"),
   commonRule("authority_matrix", /\bauthority matrix\b/gi, "ma trận thẩm quyền"),
   commonRule("action_plan", /\baction plan\b/gi, "kế hoạch hành động"),
+  commonRule("control_point", /\bcontrol points?\b/gi, "điểm kiểm soát"),
+  commonRule("failure_point", /\bfailure points?\b/gi, "điểm đứt gãy"),
+  commonRule("risk_control", /\brisk controls?\b/gi, "biện pháp kiểm soát rủi ro"),
+  commonRule("dispatch_plan", /\bdispatch plan\b/gi, "kế hoạch điều phối"),
   commonRule("workflow", /\bworkflow\b/gi, "luồng công việc"),
   commonRule("record_integrity", /\brecord integrity\b/gi, "tính toàn vẹn hồ sơ"),
   commonRule("record_retention", /\brecord retention\b/gi, "lưu giữ hồ sơ"),
@@ -436,6 +722,23 @@ const RULES = [
   commonRule("change_control", /\bchange control\b/gi, "kiểm soát thay đổi"),
   commonRule("pre_run_verification", /\bpre-run verification\b/gi, "xác minh trước khi chạy"),
   commonRule("work_transfer", /\bwork transfer\b/gi, "chuyển giao công việc"),
+  commonRule("handoff", /\bhandoffs?\b/gi, "bàn giao"),
+  commonRule("input", /\binputs?\b/gi, "đầu vào"),
+  commonRule("output", /\boutputs?\b/gi, "đầu ra"),
+  commonRule("kickoff", /\bkickoff\b/gi, "khởi động"),
+  commonRule("incoming_verification", /\bincoming verification\b/gi, "xác minh đầu vào"),
+  commonRule("prevention", /\bprevention\b/gi, "phòng ngừa"),
+  commonRule("findings", /\bfindings\b/gi, "phát hiện"),
+  commonRule("revision_reference", /\brevision reference\b/gi, "tham chiếu revision"),
+  commonRule("master_data", /\bmaster data\b/gi, "dữ liệu gốc"),
+  commonRule("escapes", /\bescapes\b/gi, "lọt lỗi"),
+  commonRule("chip_guard", /\bchip guard\b/gi, "tấm chắn phoi"),
+  commonRule("visual", /\bvisual\b/gi, "trực quan"),
+  commonRule("complete", /\bcomplete\b/gi, "đầy đủ"),
+  commonRule("bypass", /\bbypass\b/gi, "vượt qua"),
+  commonRule("calibration", /\bcalibration\b/gi, "hiệu chuẩn"),
+  commonRule("incoming_inspection", /\bincoming inspection\b/gi, "kiểm tra đầu vào"),
+  commonRule("roadmap", /\broadmaps?\b/gi, "lộ trình"),
   commonRule("readiness", /\breadiness\b/gi, "mức sẵn sàng"),
   commonRule("root_cause", /\broot cause\b/gi, "nguyên nhân gốc"),
   commonRule("lesson_learned", /\blesson learned\b/gi, "bài học kinh nghiệm"),
@@ -460,6 +763,65 @@ const RULES = [
   commonRule("offline_mode", /\boffline mode\b/gi, "chế độ ngoại tuyến"),
   commonRule("restore_test", /\brestore test\b/gi, "thử khôi phục"),
   commonRule("transaction", /\btransactions?\b/gi, "giao dịch"),
+  commonRule("hesem_style", /\bHESEM-style\b/g, "theo phong cách HESEM"),
+  commonRule("assessment", /\bAssessment\b/g, "Đánh giá"),
+  commonRule("assessment_lower", /\bassessment\b/gi, "đánh giá"),
+  commonRule("quiz", /\bQuiz\b/g, "Bài kiểm tra nhanh"),
+  commonRule("quiz_lower", /\bquiz\b/gi, "bài kiểm tra nhanh"),
+  commonRule("case_study", /\bcase study\b/gi, "nghiên cứu tình huống"),
+  commonRule("case_heading", /\bCase (?=\d)/g, "Tình huống "),
+  commonRule("case_lower", /\bcase\b/gi, "tình huống"),
+  commonRule("pre_test", /\bpre-test\b/gi, "kiểm tra trước"),
+  commonRule("post_test", /\bpost-test\b/gi, "kiểm tra sau"),
+  commonRule("key_points", /\bKey Points\b/g, "Điểm then chốt"),
+  commonRule("key_points_lower", /\bkey points\b/gi, "điểm then chốt"),
+  commonRule("reasons", /\bReasons\b/g, "Lý do"),
+  commonRule("reasons_lower", /\breasons\b/gi, "lý do"),
+  commonRule("drill_pack", /\bDrill Pack\b/g, "Bộ diễn tập"),
+  commonRule("run_drill", /\bchạy drill\b/gi, "thực hiện diễn tập"),
+  commonRule("drill_index", /\bdanh mục drill\b/gi, "danh mục diễn tập"),
+  commonRule("drill_tap", /\bdrill\/tap\b/gi, "khoan/taro"),
+  commonRule("test_drill", /\btest drill\b/gi, "diễn tập thử"),
+  commonRule("document_control_drill", /\bDocument control drill\b/g, "diễn tập kiểm soát tài liệu"),
+  commonRule("drill_record", /\bhồ sơ drill\b/gi, "hồ sơ diễn tập"),
+  commonRule("prepare_the_learner", /\bPrepare the learner\b/g, "Chuẩn bị người học"),
+  commonRule("present_the_operation", /\bPresent the operation\b/g, "Trình bày thao tác"),
+  commonRule("try_out_performance", /\bTry-out performance\b/g, "Thực hành thử"),
+  commonRule("safety_observation", /\bSafety Observation\b/g, "Quan sát an toàn"),
+  commonRule("incident_log", /\bIncident log\b/g, "Nhật ký sự cố"),
+  commonRule("ergonomics", /\bergonomics\b/gi, "công thái học"),
+  commonRule("module_code", /\bModuleCode\b/g, "Mã mô-đun"),
+  commonRule("module_title", /\bModuleTitle\b/g, "Tên mô-đun"),
+  commonRule("cross_functional", /\bCross‑functional\b/g, "liên phòng ban"),
+  commonRule("tracker", /\btracker\b/gi, "bảng theo dõi"),
+  commonRule("module", /\bmodule\b/gi, "mô-đun"),
+  commonRule("roles", /\broles\b/gi, "vai trò"),
+  commonRule("role", /\brole\b/gi, "vai trò"),
+  commonRule("flow", /\bflow\b/gi, "luồng"),
+  commonRule("feedback", /\bfeedback\b/gi, "phản hồi"),
+  commonRule("contract_cap", /\bContract\b/g, "Hợp đồng"),
+  commonRule("assessment_ready", /đánh giá[-‑]ready/gi, "sẵn sàng cho đánh giá"),
+  commonRule("update_master_data_vn", /update dữ liệu gốc/gi, "cập nhật dữ liệu gốc"),
+  commonRule("release_record_vn", /\brelease hồ sơ\b/gi, "phát hành hồ sơ"),
+  commonRule("in_process_record_check", /In[-‑]quy trình check hồ sơ/gi, "kiểm tra hồ sơ trong quá trình"),
+  commonRule("incoming_verification_plan", /xác minh đầu vào plan/gi, "kế hoạch xác minh đầu vào"),
+  commonRule("calibrated_gages", /\bcalibrated gages\b/gi, "dụng cụ đo đã hiệu chuẩn"),
+  commonRule("action_log", /\baction log\b/gi, "nhật ký hành động"),
+  commonRule("pass_fail", /\bpass\/fail\b/gi, "đạt/không đạt"),
+  commonRule("quote", /\bquote\b/gi, "báo giá"),
+  commonRule("international_grade", /\bInternational-grade\b/gi, "chuẩn quốc tế"),
+  commonRule("verify_effectiveness", /\bverify effectiveness\b/gi, "xác minh hiệu lực"),
+  commonRule("verify", /\bverify\b/gi, "xác minh"),
+  commonRule("simulation", /\bsimulation\b/gi, "mô phỏng"),
+  commonRule("deliverables", /\bdeliverables\b/gi, "đầu ra yêu cầu"),
+  commonRule("major_steps", /\bmajor steps\b/gi, "các bước chính"),
+  commonRule("major_step", /\bMajor Step\b/g, "Bước chính"),
+  commonRule("leading_signs", /\bleading signs\b/gi, "dấu hiệu sớm"),
+  commonRule("contamination", /\bcontamination\b/gi, "nhiễm bẩn"),
+  commonRule("elimination", /\bElimination\b/g, "Loại bỏ"),
+  commonRule("substitution", /\bSubstitution\b/g, "Thay thế"),
+  commonRule("administrative", /\bAdministrative\b/g, "Biện pháp hành chính"),
+  commonRule("locked", /\blocked\b/gi, "đã khóa"),
   commonRule("source_revision", /\bsource revision\b/gi, "phiên bản nguồn"),
   commonRule("evidence_driven", /\bevidence-driven\b/gi, "dựa trên bằng chứng"),
   commonRule("evidence_requirements", /\bevidence requirements?\b/gi, "yêu cầu bằng chứng"),
@@ -499,6 +861,52 @@ const RULES = [
   commonRule("complaints", /\bcomplaints\b/gi, "khiếu nại"),
   commonRule("complaint", /\bcomplaint\b/gi, "khiếu nại"),
   commonRule("audit", /\baudit\b/gi, "đánh giá"),
+  customRule(
+    "drill_title_suffix",
+    /([—-]\s*)([^<>\n]{1,120}?)\s+Drill\b/g,
+    (_, prefix, title) => `${prefix}Bài diễn tập ${title.trim()}`
+  ),
+  commonRule("drill_generic", /\bdrill\b/gi, "diễn tập"),
+  commonRule(
+    "cleanup_post_job_shop_nested",
+    /\bxưởng CNC gia công theo đơn\s*\(\s*xưởng gia công theo đơn\s*\(\s*job shop\s*\)\s*\)/gi,
+    "xưởng CNC gia công theo đơn (job shop)"
+  ),
+  commonRule(
+    "cleanup_post_job_shop_plain_dup",
+    /\bxưởng CNC gia công theo đơn\s*\(\s*xưởng gia công theo đơn\s*\)/gi,
+    "xưởng CNC gia công theo đơn"
+  ),
+  commonRule(
+    "cleanup_post_output_note",
+    /đầu ra\s*\(\s*đầu ra yêu cầu\s*\)/gi,
+    "đầu ra yêu cầu"
+  ),
+  commonRule(
+    "cleanup_post_key_points_dup",
+    /Điểm then chốt\s*\(\s*Điểm then chốt\s*\)/gi,
+    "Điểm then chốt"
+  ),
+  commonRule(
+    "cleanup_post_assessment_dup",
+    /Đánh giá\s*\(\s*Đánh giá\s*\)/gi,
+    "Đánh giá"
+  ),
+  commonRule(
+    "cleanup_post_case_dup",
+    /\btình huống\s*\(\s*tình huống\s*\)/gi,
+    "tình huống"
+  ),
+  commonRule(
+    "cleanup_post_right_first_time_nested",
+    /\bĐúng ngay từ lần đầu\s*\(\s*Đúng ngay từ lần đầu\s*\(\s*Right First Time\s*\)\s*\)/g,
+    "Đúng ngay từ lần đầu (Right First Time)"
+  ),
+  commonRule(
+    "cleanup_post_mix_up_nested",
+    /\blẫn lộn\s*\(\s*mix-up\s*\)\s*\(\s*lẫn lộn lô\/phiên bản\s*\)/gi,
+    "lẫn lộn (mix-up)"
+  ),
 ];
 
 function processText(text, state, fileStats) {
@@ -544,7 +952,7 @@ function writeReports(report) {
   fs.writeFileSync(REPORT_JSON, JSON.stringify(report, null, 2), "utf8");
 
   const lines = [
-    "# Translation Batch 1 - 02-Tai-Lieu-He-Thong - 2026-03-24",
+    `# Translation Batch - ${path.relative(ROOT, TARGET_DIR)} - 2026-03-24`,
     "",
     `- Target directory: \`${path.relative(ROOT, TARGET_DIR)}\``,
     `- Files scanned: ${report.filesScanned}`,

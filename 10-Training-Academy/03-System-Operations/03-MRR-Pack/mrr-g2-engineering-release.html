@@ -114,10 +114,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr><td><span class="chk">☐</span> Drawing/spec baseline (PDF) đúng REV (đã khóa)</td><td>DRW</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_DRW_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Quy trình plan / routing (operation list + CTQ)</td><td>PP</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PP_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> NC Release Pack (simulation + release bảng kiểm + post)</td><td>NCREL</td><td>CAM</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/NC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCREL_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> NC Release Pack (mô phỏng + release bảng kiểm + post)</td><td>NCREL</td><td>CAM</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/NC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCREL_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Setup sheet draft + tool list + offset strategy</td><td>SETUP</td><td>ENG/Setup</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/SETUP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SETUP_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Control plan / inspection plan (CTQ, sampling, gage)</td><td>CTRL</td><td>QA/QMS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/QP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CTRL_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> Gage list + calibration status snapshot</td><td>GAGE</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/QP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_GAGE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> Gage list + hiệu chuẩn status snapshot</td><td>GAGE</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/QP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_GAGE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Công đoạn đặc biệt plan + subcontract pack (khi có)</td><td>SPPLAN</td><td>ENG+PUR</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/SP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SPPLAN_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> DCR hồ sơ (engineering) — số hiệu thay đổi</td><td>CHG</td><td>QA/QMS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CHG_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 </table>
@@ -126,7 +126,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
 <ul class="tight">
-<li>NC program phát hành không có simulation bằng chứng → <b>STOP</b>.</li>
+<li>NC program phát hành không có mô phỏng bằng chứng → <b>STOP</b>.</li>
 <li>Control plan thiếu CTQ hoặc thiếu tiêu chí chấp nhận → <b>HOLD</b>.</li>
 <li>Thay đổi REV không qua kiểm soát thay đổi → <b>BLOCK</b> (khóa phát hành).</li>
 </ul>

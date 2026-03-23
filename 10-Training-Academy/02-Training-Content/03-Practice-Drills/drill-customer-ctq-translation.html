@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>TRN-ACA-DRL-11 — Customer Requirement → CTQ Translation Drill | HESEM Academy</title>
+<title>TRN-Bài diễn tập ACA-DRL-11 — Customer Requirement → CTQ Translation | HESEM Academy</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -59,11 +59,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>DRILL-CUSTOMER-CTQ-TRANSLATION — Customer Requirement → CTQ Translation Drill | HESEM Academy</strong>
+  <strong>DIỄN TẬP-Bài diễn tập CUSTOMER-CTQ-TRANSLATION — Customer Requirement → CTQ Translation | HESEM Academy</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>DRILL-CUSTOMER-CTQ-TRANSLATION</span></div>
+  <div class="row"><span><b>Mã:</b></span><span>DIỄN TẬP-CUSTOMER-CTQ-TRANSLATION</span></div>
   <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
   <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
   <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
@@ -72,11 +72,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="doc-content" id="docContent">
 <div class="cover">
-<div class="kicker">Drill Pack</div>
-<h1 class="h1">DRL-11 — Customer Requirement → CTQ Translation Drill</h1>
+<div class="kicker">Bộ diễn tập</div>
+<h1 class="h1">DRL-Bài diễn tập 11 — Customer Requirement → CTQ Translation</h1>
 <p class="lead">
- Drill này khóa lỗi gốc của nhiều claim: <b>đọc yêu cầu không hết</b> và <b>dịch yêu cầu sai</b>.
- Output của drill là 01 CTQ list + kế hoạch kiểm tra (inspection plan) + rà soát hợp đồng summary nằm đúng SSOT.
+ Diễn tập này khóa lỗi gốc của nhiều claim: <b>đọc yêu cầu không hết</b> và <b>dịch yêu cầu sai</b>.
+ Đầu ra của diễn tập là 01 CTQ list + kế hoạch kiểm tra (inspection plan) + rà soát hợp đồng summary nằm đúng SSOT.
  </p>
 </div>
 <div class="grid-2">
@@ -109,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Người phụ trách</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Nhận RFQ/PO/drawing/spec và xác nhận REV set của khách hàng.</td><td>Estimator (SAL-03)</td><td>Input package link + REV note</td><td>STOP</td></tr><tr><td>2</td><td>Trích xuất yêu cầu: CTQ dim/tol, finish/spec, packaging/label, cert/FAI, công đoạn đặc biệt.</td><td>Sales/QA/ENG</td><td>Requirement list (1 trang)</td><td>HOLD</td></tr><tr><td>3</td><td>Dịch yêu cầu thành CTQ list: đặc tính – phương pháp đo – tần suất – tiêu chí PASS/FAIL.</td><td>QA/QC/ENG</td><td>CTQ list + inspection method</td><td>HOLD</td></tr><tr><td>4</td><td>Tạo kế hoạch kiểm tra (inspection plan) + reaction plan (STOP/tạm giữ khi lệch CTQ).</td><td>QA/QC</td><td>Inspection plan (PDF)</td><td>HOLD</td></tr><tr><td>5</td><td>rà soát hợp đồng summary: xác nhận năng lực đáp ứng và điểm cần outsource.</td><td>Sales/QA/OPS</td><td>CR summary + sign-off</td><td>HOLD</td></tr><tr><td>6</td><td>Bàn giao cho planning/production: điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (hold point)))))) + link baseline + bảng kiểm.</td><td>QA/Planning</td><td>Handoff note + links</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Nhận RFQ/PO/drawing/spec và xác nhận REV set của khách hàng.</td><td>Estimator (SAL-03)</td><td>Đầu vào package link + REV note</td><td>STOP</td></tr><tr><td>2</td><td>Trích xuất yêu cầu: CTQ dim/tol, finish/spec, packaging/label, cert/FAI, công đoạn đặc biệt.</td><td>Sales/QA/ENG</td><td>Requirement list (1 trang)</td><td>HOLD</td></tr><tr><td>3</td><td>Dịch yêu cầu thành CTQ list: đặc tính – phương pháp đo – tần suất – tiêu chí ĐẠT/KHÔNG ĐẠT.</td><td>QA/QC/ENG</td><td>CTQ list + inspection method</td><td>HOLD</td></tr><tr><td>4</td><td>Tạo kế hoạch kiểm tra (inspection plan) + reaction plan (STOP/tạm giữ khi lệch CTQ).</td><td>QA/QC</td><td>Inspection plan (PDF)</td><td>HOLD</td></tr><tr><td>5</td><td>rà soát hợp đồng summary: xác nhận năng lực đáp ứng và điểm cần outsource.</td><td>Sales/QA/OPS</td><td>CR summary + sign-off</td><td>HOLD</td></tr><tr><td>6</td><td>Bàn giao cho planning/production: điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (hold point)))))))))))))) + link baseline + bảng kiểm.</td><td>QA/Planning</td><td>Bàn giao note + links</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
@@ -117,7 +117,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card danger">
 <span class="badge">Fail-fast</span>
 <ul class="tight">
-<li>CTQ list thiếu phương pháp đo hoặc thiếu tiêu chí PASS/FAIL.</li>
+<li>CTQ list thiếu phương pháp đo hoặc thiếu tiêu chí ĐẠT/KHÔNG ĐẠT.</li>
 <li>kế hoạch kiểm tra (inspection plan) không có reaction plan.</li>
 <li>Không có sign-off rà soát hợp đồng.</li>
 <li>CTQ list nằm rời ngoài SSOT.</li>
@@ -141,7 +141,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Requirement list (1 trang) + CTQ list.</li>
 <li>Inspection plan + reaction plan.</li>
 <li>rà soát hợp đồng summary có sign-off.</li>
-<li>Handoff note có link SSOT.</li>
+<li>Bàn giao note có link SSOT.</li>
 </ul>
 </div>
 </div>

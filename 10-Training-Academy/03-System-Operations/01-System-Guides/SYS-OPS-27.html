@@ -69,14 +69,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="kicker">HESEM CNC Academy • Vận hành hệ thống</div>
 <h1 class="h1">SYS-OPS-27</h1>
 <p class="lead">
- Module này khóa chặt một rủi ro sống còn: <b>mất/thiếu/đổi chứng cứ</b> dẫn tới <b>ship sai</b>, <b>không truy xuất</b>, <b>trượt đánh giá</b>.
- Mọi hành động trong module đều gắn <b>cổng kiểm soát (gate)</b>, <b>handoff</b>, <b>MRR</b> và cơ chế <b>STOP/HOLD/BLOCK</b>.
+ Mô-đun này khóa chặt một rủi ro sống còn: <b>mất/thiếu/đổi chứng cứ</b> dẫn tới <b>ship sai</b>, <b>không truy xuất</b>, <b>trượt đánh giá</b>.
+ Mọi hành động trong mô-đun đều gắn <b>cổng kiểm soát (gate)</b>, <b>bàn giao</b>, <b>MRR</b> và cơ chế <b>STOP/HOLD/BLOCK</b>.
  </p>
 </div>
 <div style="height:16px"></div>
 <div class="card">
 <span class="badge">1) Mục đích &amp; bối cảnh vận hành</span>
-<h2 class="h2" style="margin-top:12px;">Mục đích module</h2>
+<h2 class="h2" style="margin-top:12px;">Mục đích mô-đun</h2>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Định danh đúng <b>hồ sơ</b> (Hồ sơ) và <b>thời hạn lưu</b> theo Tier (T1/T2/T3) để bảo toàn bằng chứng cho khách hàng, pháp lý, và ISO.</li>
 <li>Thiết lập và vận hành <b>tự dán nhãn</b> để chặn phụ thuộc vào thao tác thủ công và giảm lỗi phân loại.</li>
@@ -84,7 +84,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 <div class="grid-2" style="margin-top:12px;">
 <div class="note">
-<strong>Khi nào kích hoạt module</strong>
+<strong>Khi nào kích hoạt mô-đun</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Khi xưởng đưa SharePoint/Hồ sơ công việc (job dossier) vào vận hành thật, có yêu cầu lưu giữ hồ sơ theo hợp đồng/khách hàng.</li>
 <li>Khi phát hành/đổi revision SOP, WI, biểu mẫu và hồ sơ kiểm tra, hồ sơ ship, hồ sơ NCR/CAPA.</li>
@@ -98,7 +98,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>QC/QA:</b> đảm bảo hồ sơ Tier-1 hoàn chỉnh trước phê duyệt giao hàng (ship release).</li>
 <li><b>OPS/Người phụ trách từng khu vực:</b> nộp hồ sơ đúng loại nội dung/metadata để tự dán nhãn chạy đúng.</li>
 </ul>
-<div class="small muted">Vai trò IT/M365 hỗ trợ cấu hình hệ thống được ghi trong bảng kiểm và MRR, không thuộc TargetRoles của module.</div>
+<div class="small muted">Vai trò IT/M365 hỗ trợ cấu hình hệ thống được ghi trong bảng kiểm và MRR, không thuộc TargetRoles của mô-đun.</div>
 </div>
 </div>
 <h3 class="h2" style="margin-top:14px;">TargetRoles &amp; phạm vi áp dụng theo vai trò</h3>
@@ -111,26 +111,26 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>QA</b></td><td>Quản trị retention schedule, duyệt hủy theo vòng đời (Disposition), trích xuất bằng chứng, kiểm soát thay đổi.</td><td>đạt khi chạy trọn vòng: tự dán nhãn test → hồ sơ declaration → trích xuất bằng chứng → lập log disposition.</td></tr>
 <tr><td><b>Warehouse</b></td><td>Nộp Receiving IQC, chứng từ lô/heat, CoC nhà cung cấp, bộ hồ sơ giao hàng (ship packet).</td><td>đạt khi nộp 01 bộ Receiving IQC + Lot/Heat + Supplier + đúng thư mục; chặn thiếu chứng từ trước cấp vật tư.</td></tr>
 <tr><td><b>Purchasing</b></td><td>Thu nhận/kiểm soát chứng chỉ nhà cung cấp, outsource bằng chứng, điều khoản lưu giữ theo PO.</td><td>đạt khi gắn Supplier + OrderNum + RecordType đúng; hồ sơ outsource nằm đúng loại nội dung “Outsource Bằng chứng”.</td></tr>
-<tr><td><b>Planner</b></td><td>Thiết lập cấu trúc Hồ sơ công việc, kiểm tra liên kết Order/Job, đảm bảo luồng handoff không đứt.</td><td>đạt khi tạo 01 hồ sơ công việc đúng cấu trúc thư mục + mapping loại nội dung theo khu vực.</td></tr>
-<tr><td><b>Maintenance</b></td><td>Nộp hồ sơ bảo trì, hiệu chuẩn, OOT gage bằng chứng liên quan sản xuất.</td><td>đạt khi nộp 01 calibration/maintenance hồ sơ vào Tier-1 khi liên quan CTQ; kích hoạt phản ứng 60 giây khi OOT.</td></tr>
+<tr><td><b>Planner</b></td><td>Thiết lập cấu trúc Hồ sơ công việc, kiểm tra liên kết Order/Job, đảm bảo luồng bàn giao không đứt.</td><td>đạt khi tạo 01 hồ sơ công việc đúng cấu trúc thư mục + mapping loại nội dung theo khu vực.</td></tr>
+<tr><td><b>Maintenance</b></td><td>Nộp hồ sơ bảo trì, hiệu chuẩn, OOT gage bằng chứng liên quan sản xuất.</td><td>đạt khi nộp 01 hiệu chuẩn/maintenance hồ sơ vào Tier-1 khi liên quan CTQ; kích hoạt phản ứng 60 giây khi OOT.</td></tr>
 <tr><td><b>EHS</b></td><td>Nộp hồ sơ an toàn, sự cố, điều tra, đào tạo bắt buộc liên quan pháp lý.</td><td>đạt khi phân loại hồ sơ theo Tier phù hợp và khóa thay đổi hồ sơ sự cố.</td></tr>
 <tr><td><b>Estimator (SAL-03)</b></td><td>Nộp PO/contract, yêu cầu khách hàng về thời hạn lưu giữ, yêu cầu chứng từ giao hàng.</td><td>đạt khi ghi rõ yêu cầu retention trong hồ sơ job và kích hoạt Tier-1-15Y khi hợp đồng yêu cầu.</td></tr>
-<tr><td><b>Supervisor</b></td><td>Chịu trách nhiệm cổng kiểm soát phê duyệt giao hàng, phê duyệt HOLD/RELEASE, kiểm soát bypass.</td><td>đạt khi thực hiện 01 ca kiểm tra cổng kiểm soát: “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” và ký xác nhận MRR.</td></tr>
+<tr><td><b>Supervisor</b></td><td>Chịu trách nhiệm cổng kiểm soát phê duyệt giao hàng, phê duyệt HOLD/RELEASE, kiểm soát vượt qua.</td><td>đạt khi thực hiện 01 ca kiểm tra cổng kiểm soát: “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” và ký xác nhận MRR.</td></tr>
 </table>
 <div class="kpi-gate" style="margin-top:12px;">
 <b>Nguyên tắc khóa:</b> Không có nhãn lưu trữ + không có trạng thái Hồ sơ cho Tier-1 → <b>BLOCK</b> tại cổng kiểm soát liên quan.
  </div>
 </div>
 <div class="card">
-<span class="badge">2) Vị trí trong chuỗi E2E &amp; luồng handoff</span>
-<h2 class="h2" style="margin-top:12px;">Module nằm ở đâu trong chuỗi</h2>
+<span class="badge">2) Vị trí trong chuỗi E2E &amp; luồng bàn giao</span>
+<h2 class="h2" style="margin-top:12px;">Mô-đun nằm ở đâu trong chuỗi</h2>
 <div class="note">
- Quote/Contract → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Feedback/CI
+ Báo giá/Hợp đồng → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Phản hồi/CI
  </div>
-<h3 class="h2" style="margin-top:14px;">Luồng handoff (Input/Output) và điểm chặn</h3>
+<h3 class="h2" style="margin-top:14px;">Luồng bàn giao (Đầu vào/Đầu ra) và điểm chặn</h3>
 <table class="form-table">
-<tr><th>Bước</th><th>Input</th><th>Output bắt buộc</th><th>Điểm chặn (Cổng kiểm soát)</th></tr>
-<tr><td>Quote/Contract</td><td>PO/Contract + yêu cầu retention</td><td>Retention tier yêu cầu cho job</td><td>Thiếu yêu cầu retention → ghi <b>M365/SharePoint → HESEM-QMS-SSOT</b> trong hồ sơ công việc, không bỏ trống.</td></tr>
+<tr><th>Bước</th><th>Đầu vào</th><th>Đầu ra bắt buộc</th><th>Điểm chặn (Cổng kiểm soát)</th></tr>
+<tr><td>Báo giá/Hợp đồng</td><td>PO/Hợp đồng + yêu cầu retention</td><td>Retention tier yêu cầu cho job</td><td>Thiếu yêu cầu retention → ghi <b>M365/SharePoint → HESEM-QMS-SSOT</b> trong hồ sơ công việc, không bỏ trống.</td></tr>
 <tr><td>Planning</td><td>Cấu trúc dossier + mapping loại nội dung</td><td>Thư mục + loại nội dung đúng</td><td>Loại nội dung chưa bật trong library → BLOCK go-live.</td></tr>
 <tr><td>Engineering</td><td>Bản vẽ, revision, setup sheet</td><td>Hồ sơ phát hành theo revision</td><td>Ghi đè file revision cũ → HOLD và tạo bản mới (không overwrite).</td></tr>
 <tr><td>Purchasing/Receiving</td><td>Chứng chỉ supplier, IQC</td><td>Receiving IQC hồ sơ + lot/heat</td><td>Thiếu Lot/Heat với vật liệu CTQ → HOLD cấp phát.</td></tr>
@@ -141,7 +141,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="card">
-<span class="badge">3) Failure Points (≥10)</span>
+<span class="badge">3) Điểm đứt gãy (≥10)</span>
 <h2 class="h2" style="margin-top:12px;">10 điểm gãy thực tế phải chặn</h2>
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
 <li>Loại nội dung không khớp danh mục chuẩn → tự dán nhãn dán nhãn sai tier.</li>
@@ -157,14 +157,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 <div class="note" style="margin-top:12px;">
 <b>Sửa không nhất quán nội bộ:</b> bộ mẫu cấu hình (SSOT) dùng tên loại nội dung “FAI Package/kiểm tra cuối/CMM Report/bộ hồ sơ giao hàng/CoC / Certificate”.
- SOP-QMS-013 ghi rút gọn “FAI/FinalInspection/CMMReport/CoC”. Module này khóa chuẩn theo bộ mẫu cấu hình (SSOT) và chỉnh rule tự dán nhãn theo đúng tên chuẩn.
+ SOP-QMS-013 ghi rút gọn “FAI/FinalInspection/CMMReport/CoC”. Mô-đun này khóa chuẩn theo bộ mẫu cấu hình (SSOT) và chỉnh rule tự dán nhãn theo đúng tên chuẩn.
  </div>
 </div>
 <div class="card">
-<span class="badge">4) Risk Controls (≥6)</span>
-<h2 class="h2" style="margin-top:12px;">Control points bắt buộc</h2>
+<span class="badge">4) Biện pháp kiểm soát rủi ro (≥6)</span>
+<h2 class="h2" style="margin-top:12px;">Điểm kiểm soát bắt buộc</h2>
 <table class="form-table">
-<tr><th>Control point</th><th>Ai làm</th><th>Bằng chứng/MRR</th><th>Chặn rủi ro</th></tr>
+<tr><th>Điểm kiểm soát</th><th>Ai làm</th><th>Bằng chứng/MRR</th><th>Chặn rủi ro</th></tr>
 <tr><td>CP1 — Khóa taxonomy nhãn (T1/T2/T3) và chủ lịch lưu giữ</td><td>QA/QMS</td><td>Retention Label Plan (trích xuất) + phê duyệt</td><td>Sai thời hạn lưu, giữ thiếu hợp đồng</td></tr>
 <tr><td>CP2 — Bật Loại nội dung + bắt buộc Site Columns cho Tier-1</td><td>QA/QMS + Admin hệ thống</td><td>Ảnh cấu hình library + bảng mapping loại nội dung</td><td>Thiếu metadata, không truy xuất</td></tr>
 <tr><td>CP3 — Auto-apply policy chạy theo thư mục + loại nội dung</td><td>QA/QMS + Admin hệ thống</td><td>Kết quả mô phỏng + log test R1–R4</td><td>Phụ thuộc thủ công, dán nhãn sai</td></tr>
@@ -231,8 +231,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>7</td><td>Chạy mô phỏng và sửa rule tới khi tỷ lệ match đạt PASS</td><td>QA/QMS</td><td>Report mô phỏng</td><td>Triển khai thẳng không mô phỏng</td></tr>
 <tr><td>8</td><td>Bật hồ sơ declaration cho nhãn Tier-1 + bật hồ sơ versioning</td><td>QA/QMS</td><td>Ảnh trạng thái Hồ sơ + versioning</td><td>Hồ sơ bị “unlock” không kiểm soát</td></tr>
 <tr><td>9</td><td>Test end-to-end: upload 1 bộ FAI + 1 bộ hồ sơ giao hàng + 1 NCR closure</td><td>QC + QA</td><td>3 bộ hồ sơ test + log kết quả</td><td>Test thiếu metadata làm nhãn không dán</td></tr>
-<tr><td>10</td><td>Ban hành quy tắc đặt tên file + RecordID và khóa trùng lặp</td><td>QA/QMS</td><td>Quy tắc đặt tên trong module này</td><td>RecordID trùng gây lẫn hồ sơ</td></tr>
-<tr><td>11</td><td>Đào tạo OJT theo TWI cho từng role; ghi rubric L1–L4</td><td>Supervisor + Trainer</td><td>Phiếu OJT + rubric ký</td><td>Chỉ học lý thuyết, không có minh chứng</td></tr>
+<tr><td>10</td><td>Ban hành quy tắc đặt tên file + RecordID và khóa trùng lặp</td><td>QA/QMS</td><td>Quy tắc đặt tên trong mô-đun này</td><td>RecordID trùng gây lẫn hồ sơ</td></tr>
+<tr><td>11</td><td>Đào tạo OJT theo TWI cho từng vai trò; ghi rubric L1–L4</td><td>Supervisor + Trainer</td><td>Phiếu OJT + rubric ký</td><td>Chỉ học lý thuyết, không có minh chứng</td></tr>
 <tr><td>12</td><td>Vận hành phê duyệt giao hàng Cổng kiểm soát: kiểm tra nhãn+hồ sơ+đủ hồ sơ</td><td>QC + Supervisor</td><td>Bảng kiểm phê duyệt giao hàng</td><td>Bỏ qua cổng kiểm soát do “gấp”</td></tr>
 <tr><td>13</td><td>Thiết lập disposition queue và lịch review</td><td>QA/QMS</td><td>Lịch review + quyền hạn</td><td>Không có người chịu trách nhiệm</td></tr>
 <tr><td>14</td><td>Thực hiện duyệt hủy theo vòng đời (Disposition) và ghi quyết định</td><td>QA/QMS</td><td>Disposition log</td><td>Quyết định bằng miệng, không MRR</td></tr>
@@ -243,7 +243,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">8) OJT thực chiến theo TWI</span>
 <h2 class="h2" style="margin-top:12px;">Job Breakdown — “Nộp hồ sơ Tier-1 đúng nhãn và đúng hồ sơ”</h2>
 <div class="note">
-<strong>OJT output bắt buộc</strong>
+<strong>OJT đầu ra bắt buộc</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>01 bộ hồ sơ “FAI Package” hoàn chỉnh: PDF ký + file đính kèm (bản vẽ balloon/đo) + metadata đủ 5 trường bắt buộc.</li>
 <li>Nhãn dán tự động là <b>LAM-T1-10Y-HỒ SƠ</b> và trạng thái <b>Hồ sơ</b> hiển thị.</li>
@@ -251,7 +251,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <table class="form-table" style="margin-top:12px;">
-<tr><th>Step</th><th>Key Points (điểm chốt)</th><th>Reasons (lý do)</th></tr>
+<tr><th>Step</th><th>Điểm then chốt (điểm chốt)</th><th>Lý do (lý do)</th></tr>
 <tr><td>1. Chọn đúng thư mục và loại nội dung</td><td>Đi vào 04_Inspection-FAI; chọn “FAI Package” trước khi upload</td><td>Auto-apply match theo thư mục + loại nội dung</td></tr>
 <tr><td>2. Upload file và khóa định dạng hồ sơ</td><td>Upload PDF ký; đính kèm file native khi có; không overwrite</td><td>PDF ký là hồ sơ chính; overwrite phá lịch sử</td></tr>
 <tr><td>3. Điền metadata bắt buộc</td><td>JobNum, PartNum, RevisionNum, RecordType, RecordID</td><td>Truy xuất theo job/part/rev và chống lẫn lô</td></tr>
@@ -261,15 +261,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h2" style="margin-top:14px;">Rubric L1–L4 (hành vi quan sát được)</h3>
 <table class="form-table">
 <tr><th>Level</th><th>Hành vi quan sát</th><th>Điều kiện lên level</th><th>Quyền hạn khi đạt</th></tr>
-<tr><td><b>L1</b></td><td>Nêu đúng Tier-1/Tier-2/Tier-3 và ý nghĩa Hồ sơ.</td><td>Quiz ≥ 80% (Operator/Setup/Warehouse) hoặc ≥ 85% (các role còn lại).</td><td>Được nộp hồ sơ dưới giám sát.</td></tr>
-<tr><td><b>L2</b></td><td>Nộp 01 hồ sơ đúng loại nội dung + đủ metadata + nhãn tự dán nhãn dán đúng.</td><td>Hoàn thành OJT output; không sai 5 trường bắt buộc.</td><td>Được nộp hồ sơ độc lập trong phạm vi role.</td></tr>
-<tr><td><b>L3</b></td><td>Phát hiện nhãn sai, khoanh vùng nguyên nhân (loại nội dung, metadata, rule) và kích hoạt HOLD.</td><td>Thực hiện 1 case xử lý sai nhãn; ghi MRR đầy đủ.</td><td>Được tham gia phê duyệt giao hàng cổng kiểm soát (QC/QA/Supervisor) hoặc review hồ sơ khu vực (Planner/Lead).</td></tr>
+<tr><td><b>L1</b></td><td>Nêu đúng Tier-1/Tier-2/Tier-3 và ý nghĩa Hồ sơ.</td><td>Bài kiểm tra nhanh ≥ 80% (Operator/Setup/Warehouse) hoặc ≥ 85% (các vai trò còn lại).</td><td>Được nộp hồ sơ dưới giám sát.</td></tr>
+<tr><td><b>L2</b></td><td>Nộp 01 hồ sơ đúng loại nội dung + đủ metadata + nhãn tự dán nhãn dán đúng.</td><td>Hoàn thành OJT đầu ra; không sai 5 trường bắt buộc.</td><td>Được nộp hồ sơ độc lập trong phạm vi vai trò.</td></tr>
+<tr><td><b>L3</b></td><td>Phát hiện nhãn sai, khoanh vùng nguyên nhân (loại nội dung, metadata, rule) và kích hoạt HOLD.</td><td>Thực hiện 1 tình huống xử lý sai nhãn; ghi MRR đầy đủ.</td><td>Được tham gia phê duyệt giao hàng cổng kiểm soát (QC/QA/Supervisor) hoặc review hồ sơ khu vực (Planner/Lead).</td></tr>
 <tr><td><b>L4</b></td><td>Chạy duyệt hủy theo vòng đời (Disposition) + trích xuất; kiểm soát thay đổi policy và chứng minh đánh giá log.</td><td>PASS performance test quản trị (QA/QMS) và review thành công 1 batch disposition.</td><td>Được ủy quyền quản trị retention/disposition/trích xuất theo phân quyền.</td></tr>
 </table>
 </div>
 <div class="card">
-<span class="badge">9) Đánh giá (Quiz + Scenario + Performance test)</span>
-<h2 class="h2" style="margin-top:12px;">Quiz (≥20 câu)</h2>
+<span class="badge">9) Đánh giá (Bài kiểm tra nhanh + Scenario + Performance test)</span>
+<h2 class="h2" style="margin-top:12px;">Bài kiểm tra nhanh (≥20 câu)</h2>
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.85;">
 <li>Retention label trong Purview dùng để làm gì trong vận hành xưởng? (Chọn 2) A. Giữ/xóa theo thời hạn B. Tăng tốc máy CNC C. Khóa hồ sơ Tier-1 D. Tự sinh PO</li>
 <li>Khai báo hồ sơ (Hồ sơ) khác gì nhãn tiêu chuẩn? A. Chỉ đổi màu file B. Áp ràng buộc sửa/xóa C. Tăng dung lượng D. Tự gửi email</li>
@@ -288,8 +288,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Chọn đúng: Tier-2 mặc định giữ trong bao lâu theo bộ mẫu cấu hình (SSOT)? A. 1 năm B. 3 năm C. 5 năm D. 10 năm</li>
 <li>Trong 9 loại nội dungs, cái nào dùng cho outsource? A. Receiving IQC B. Outsource Bằng chứng C. Operational Photo D. CMM Report</li>
 <li>Khi đóng NCR/CAPA, hồ sơ closure nằm loại nội dung nào và nhãn nào phải dán?</li>
-<li>Role nào chịu trách nhiệm vận hành duyệt hủy theo vòng đời (Disposition)?</li>
-<li>Role nào chịu trách nhiệm chặn giao hàng khi thiếu bộ hồ sơ giao hàng hồ sơ?</li>
+<li>Vai trò nào chịu trách nhiệm vận hành duyệt hủy theo vòng đời (Disposition)?</li>
+<li>Vai trò nào chịu trách nhiệm chặn giao hàng khi thiếu bộ hồ sơ giao hàng hồ sơ?</li>
 <li>Quy tắc đặt tên file phải chứa tối thiểu 3 token nào để truy xuất theo job?</li>
 <li>Khi cần giữ &gt;10 năm theo hợp đồng Lam, nhãn nào dùng trong retention plan?</li>
 <li>Khi xuất bằng chứng cho đánh giá, tối thiểu phải đi kèm gì ngoài file PDF?</li>
@@ -332,11 +332,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>Mục tiêu:</b> chứng minh năng lực thao tác thật: phân loại → tự dán nhãn → hồ sơ → trích xuất → log.
  </div>
 <table class="form-table" style="margin-top:10px;">
-<tr><th>Bài test</th><th>Thực hiện</th><th>PASS/FAIL rubric</th></tr>
+<tr><th>Bài test</th><th>Thực hiện</th><th>ĐẠT/KHÔNG ĐẠT rubric</th></tr>
 <tr>
 <td><b>PT1 — Vai trò thao tác (Operator/Setup/Warehouse/Programmer)</b></td>
 <td>
- Tạo 01 hồ sơ theo role trong đúng thư mục; chọn đúng loại nội dung; điền đủ metadata; xác nhận nhãn đã dán trong 2 phút.
+ Tạo 01 hồ sơ theo vai trò trong đúng thư mục; chọn đúng loại nội dung; điền đủ metadata; xác nhận nhãn đã dán trong 2 phút.
  </td>
 <td>
 <b>PASS</b>: đúng loại nội dung + đủ 5 metadata + nhãn đúng tier; <b>FAIL</b>: thiếu 1 metadata bắt buộc hoặc nhãn sai tier.
@@ -363,13 +363,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="card">
-<span class="badge">10) PASS/FAIL criteria</span>
-<h2 class="h2" style="margin-top:12px;">Tiêu chí PASS/FAIL (rõ ràng, có bằng chứng)</h2>
+<span class="badge">10) ĐẠT/KHÔNG ĐẠT criteria</span>
+<h2 class="h2" style="margin-top:12px;">Tiêu chí ĐẠT/KHÔNG ĐẠT (rõ ràng, có bằng chứng)</h2>
 <table class="form-table">
-<tr><th>Nhóm vai trò</th><th>Quiz</th><th>OJT</th><th>Performance test</th><th>Điều kiện FAIL ngay</th></tr>
-<tr><td>Operator, Setup, Warehouse</td><td>≥ 80%</td><td>Hoàn thành OJT output</td><td>PASS PT1</td><td>Thiếu 1 metadata bắt buộc hoặc nhãn sai tier</td></tr>
-<tr><td>Programmer, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03)</td><td>≥ 85%</td><td>Hoàn thành OJT output theo role</td><td>PASS PT1</td><td>Overwrite file Tier-1 hoặc tạo RecordID trùng</td></tr>
-<tr><td>QC, QA, Supervisor</td><td>≥ 90%</td><td>Hoàn thành OJT output + 1 scenario đúng</td><td>PASS PT2 (QC/Supervisor) hoặc PT3 (QA)</td><td>Cho GO tại phê duyệt giao hàng khi thiếu hồ sơ Tier-1</td></tr>
+<tr><th>Nhóm vai trò</th><th>Bài kiểm tra nhanh</th><th>OJT</th><th>Performance test</th><th>Điều kiện FAIL ngay</th></tr>
+<tr><td>Operator, Setup, Warehouse</td><td>≥ 80%</td><td>Hoàn thành OJT đầu ra</td><td>PASS PT1</td><td>Thiếu 1 metadata bắt buộc hoặc nhãn sai tier</td></tr>
+<tr><td>Programmer, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03)</td><td>≥ 85%</td><td>Hoàn thành OJT đầu ra theo vai trò</td><td>PASS PT1</td><td>Overwrite file Tier-1 hoặc tạo RecordID trùng</td></tr>
+<tr><td>QC, QA, Supervisor</td><td>≥ 90%</td><td>Hoàn thành OJT đầu ra + 1 scenario đúng</td><td>PASS PT2 (QC/Supervisor) hoặc PT3 (QA)</td><td>Cho GO tại phê duyệt giao hàng khi thiếu hồ sơ Tier-1</td></tr>
 </table>
 <div class="kpi-gate" style="margin-top:12px;">
 <b>Nguyên tắc chấm:</b> Không có bằng chứng (MRR) = FAIL, dù trả lời đúng.
@@ -400,7 +400,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
 </div>
 <div class="card">
-<span class="badge">12) Common đánh giá findings &amp; prevention (≥8)</span>
+<span class="badge">12) Common đánh giá phát hiện &amp; phòng ngừa (≥8)</span>
 <h2 class="h2" style="margin-top:12px;">8 lỗi đánh giá hay bị bắt và cách chặn</h2>
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.85;">
 <li><b>Không chứng minh được thời hạn lưu</b> → chặn bằng MRR-01 và phê duyệt thay đổi.</li>
@@ -410,7 +410,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Nhãn dán không nhất quán giữa thư mục</b> → dùng tự dán nhãn theo thư mục + loại nội dung; mô phỏng trước go-live.</li>
 <li><b>Disposition không có log quyết định</b> → MRR-07 bắt buộc.</li>
 <li><b>Trích xuất thiếu chứng cứ kèm theo</b> → bảng kiểm xuất + bảng kê gói (manifest) <b>M365/SharePoint → HESEM-QMS-SSOT</b>.</li>
-<li><b>Bypass cổng kiểm soát do “gấp”</b> → Supervisor chịu trách nhiệm; dấu vết kiểm toán (đánh giá trail) bắt buộc; vi phạm = NCR nội bộ.</li>
+<li><b>Vượt qua cổng kiểm soát do “gấp”</b> → Supervisor chịu trách nhiệm; dấu vết kiểm toán (đánh giá trail) bắt buộc; vi phạm = NCR nội bộ.</li>
 </ol>
 </div>
 <div class="card">

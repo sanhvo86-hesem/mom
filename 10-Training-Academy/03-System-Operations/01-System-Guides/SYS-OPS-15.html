@@ -104,15 +104,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Mục lục nhanh</strong>
 <ul>
 <li><a href="#sec1">1) Mục tiêu học &amp; phạm vi áp dụng</a></li>
-<li><a href="#sec2">2) Vị trí trong chuỗi E2E + luồng handoff</a></li>
+<li><a href="#sec2">2) Vị trí trong chuỗi E2E + luồng bàn giao</a></li>
 <li><a href="#sec3">3) Điểm lỗi (tối thiểu 10 điểm lỗi)</a></li>
 <li><a href="#sec4">4) Kiểm soát rủi ro (tối thiểu 6 kiểm soát)</a></li>
 <li><a href="#sec5">5) Quy tắc chặn nhanh (STOP/HOLD/BLOCK)</a></li>
 <li><a href="#sec6">6) “Phản ứng 60 giây” khi phát hiện rủi ro lớn</a></li>
 <li><a href="#sec7">7) bảng kiểm vận hành (≤ 15 bước)</a></li>
 <li><a href="#sec8">8) danh mục OJT (bảng kiểm / danh mục) theo TWI + rubric L1–L4</a></li>
-<li><a href="#sec9">9) Bài kiểm tra (quiz + tình huống + thực hành)</a></li>
-<li><a href="#sec10">10) Tiêu chí PASS/FAIL</a></li>
+<li><a href="#sec9">9) Bài kiểm tra (bài kiểm tra nhanh + tình huống + thực hành)</a></li>
+<li><a href="#sec10">10) Tiêu chí ĐẠT/KHÔNG ĐẠT</a></li>
 <li><a href="#sec11">11) Hồ sơ &amp; MRR (tối thiểu, naming, nơi lưu)</a></li>
 <li><a href="#sec12">12) Lỗi đánh giá hay gặp tại HESEM &amp; cách ngăn tái diễn</a></li>
 <li><a href="#sec13">13) DCR hồ sơ</a></li>
@@ -123,7 +123,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" id="sec1">1) Mục tiêu học &amp; phạm vi áp dụng</h2>
 <div class="card">
 <p class="lead"><b>Đầu ra sau khóa học:</b> học viên vận hành được một cuộc đánh giá nội bộ theo bằng chứng, viết phát hiện đúng cấu trúc, kích hoạt CAPA đúng mức độ, và xác nhận hiệu lực đóng phát hiện.</p>
-<h3 class="h3">1.1. Phạm vi áp dụng theo vai trò (tiêu chí khác nhau theo role)</h3>
+<h3 class="h3">1.1. Phạm vi áp dụng theo vai trò (tiêu chí khác nhau theo vai trò)</h3>
 <table class="table">
 <thead>
 <tr>
@@ -166,12 +166,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Kinh doanh/CS + HR/Đào tạo</b></td>
 <td>Trình bày rà soát hợp đồng/CSR, xử lý khiếu nại; đào tạo năng lực và hồ sơ năng lực.</td>
-<td>CSR/PO/Tiêu chuẩn được kiểm soát phiên bản; hồ sơ đào tạo truy xuất theo người/role/ngày.</td>
+<td>CSR/PO/Tiêu chuẩn được kiểm soát phiên bản; hồ sơ đào tạo truy xuất theo người/vai trò/ngày.</td>
 </tr>
 </tbody>
 </table>
 <h3 class="h3">1.2. Chuẩn đầu ra L1–L4 (Kiến thức–Kỹ năng–Minh chứng–Chỉ số)</h3>
-<p class="muted">L1–L2 áp dụng rộng cho đánh giáee. L3–L4 áp dụng cho đánh giáor/QA-QMS. Tiêu chí chi tiết ở mục OJT &amp; PASS/FAIL.</p>
+<p class="muted">L1–L2 áp dụng rộng cho đánh giáee. L3–L4 áp dụng cho đánh giáor/QA-QMS. Tiêu chí chi tiết ở mục OJT &amp; ĐẠT/KHÔNG ĐẠT.</p>
 <table class="table">
 <thead>
 <tr>
@@ -188,13 +188,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Giải thích được mục tiêu đánh giá nội bộ, khái niệm bằng chứng khách quan, phân loại Major/Minor/OFI.</td>
 <td>Truy xuất được 01 bộ hồ sơ Job theo yêu cầu đánh giáor; trả lời theo hồ sơ, không theo “nhớ”.</td>
 <td>01 bảng kiểm phỏng vấn + 01 liên kết hồ sơ minh chứng.</td>
-<td>Điểm quiz ≥ 80%.</td>
+<td>Điểm bài kiểm tra nhanh ≥ 80%.</td>
 </tr>
 <tr>
 <td><b>L2</b><div class="muted">Vận hành ổn định</div></td>
 <td>Hiểu cấu trúc phát hiện và nguyên tắc “Không có bằng chứng = Không qua cổng kiểm soát (gate)”.</td>
 <td>Thực hiện được phản ứng STOP/tạm giữ khi phát hiện rủi ro lớn tại điểm làm việc.</td>
-<td>01 case mô phỏng: dừng đúng, cô lập đúng, mở NCR đúng.</td>
+<td>01 tình huống mô phỏng: dừng đúng, cô lập đúng, mở NCR đúng.</td>
 <td>0 lỗi nghiêm trọng trong bài thực hành.</td>
 </tr>
 <tr>
@@ -223,7 +223,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <!-- SECTION 2 -->
-<h2 class="h2" id="sec2">2) Vị trí trong chuỗi E2E + luồng handoff</h2>
+<h2 class="h2" id="sec2">2) Vị trí trong chuỗi E2E + luồng bàn giao</h2>
 <div class="card">
 <p class="lead">Đánh giá nội bộ là “hệ thống giám sát độc lập” cắt ngang chuỗi Lệnh sản xuất. Đánh giá truy vết theo 01 Job thật: từ PO/CSR đến Giao hàng Bộ chứng từ, kiểm các cổng kiểm soát quan trọng.</p>
 <h3 class="h3">2.1. Bản đồ E2E (điểm lấy mẫu &amp; điểm chặn)</h3>
@@ -274,10 +274,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Label/trace; góiing spec; ship bảng kiểm; CoC/PL; bằng chứng “last chance”.</td>
 </tr>
 <tr>
-<td><b>Feedback loop</b></td>
+<td><b>Phản hồi loop</b></td>
 <td>Khiếu nại/Return</td>
 <td>CAPA effectiveness</td>
-<td>Xu hướng NCR; verify hiệu lực; cập nhật WI/SOP/training; Xem xét của lãnh đạo action.</td>
+<td>Xu hướng NCR; xác minh hiệu lực; cập nhật WI/SOP/training; Xem xét của lãnh đạo action.</td>
 </tr>
 </tbody>
 </table>
@@ -287,7 +287,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Khi có rủi ro vận hành:</b> phát sinh NCR Major, khiếu nại khách hàng, lỗi tái diễn, OTD giảm mạnh, scrap tăng, thay đổi lớn (máy, người, quy trình, nhà cung cấp).</li>
 <li><b>Khi có yêu cầu từ lãnh đạo:</b> phục vụ Xem xét của lãnh đạo hoặc chuẩn bị đánh giá khách hàng/chứng nhận.</li>
 </ul>
-<h3 class="h3">2.3. Luồng handoff 9 bước (tương thích SOP-QMS-004)</h3>
+<h3 class="h3">2.3. Luồng bàn giao 9 bước (tương thích SOP-QMS-004)</h3>
 <div class="vflow">
 <div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Lập chương trình</strong> (QA/QMS giữ lịch + ưu tiên theo rủi ro).</div></div>
 <div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Lập kế hoạch</strong> (mục tiêu, phạm vi, tiêu chí, đội đánh giá, thông báo).</div></div>
@@ -385,7 +385,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Đào tạo năng lực</b></td>
-<td>Ma trận đào tạo, hồ sơ đào tạo theo role, đánh giá OJT, ủy quyền ký duyệt.</td>
+<td>Ma trận đào tạo, hồ sơ đào tạo theo vai trò, đánh giá OJT, ủy quyền ký duyệt.</td>
 <td>BLOCK: nhân sự chưa đạt năng lực ký duyệt cổng kiểm soát.</td>
 </tr>
 <tr>
@@ -490,7 +490,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>7</td><td>Đánh giá viên</td><td>Đánh giá hồ sơ: Phiếu theo dõi Job (Traveler), FAI/IPQC/FQC, NCR/CAPA, ship bộ chứng từ.</td><td>Liên kết/ID hồ sơ + trích thông tin</td><td>Ghi phát hiện thiếu số Job/Rev/ID gage</td></tr>
 <tr><td>8</td><td>Đánh giá viên</td><td>Viết phát hiện theo template chuẩn và phân loại.</td><td>Danh sách phát hiện</td><td>Dùng câu cảm tính, thiếu tiêu chí</td></tr>
 <tr><td>9</td><td>Đánh giá viên + Chủ quá trình</td><td>Họp kết thúc meeting: chốt người phụ trách + ngày đến hạn + containment cho Major.</td><td>Biên bản kết thúc + chữ ký</td><td>Không chốt rõ containment/ảnh hưởng lô</td></tr>
-<tr><td>10</td><td>Trưởng đoàn đánh giá</td><td>Phát hành report trong 03 ngày làm việc.</td><td>Assessment report</td><td>Trễ phát hành làm mất lực triển khai</td></tr>
+<tr><td>10</td><td>Trưởng đoàn đánh giá</td><td>Phát hành report trong 03 ngày làm việc.</td><td>Đánh giá report</td><td>Trễ phát hành làm mất lực triển khai</td></tr>
 <tr><td>11</td><td>Chủ quá trình</td><td>Thực hiện correction/CAPA theo SOP-QMS-006.</td><td>8D/CAPA + minh chứng</td><td>Chỉ “đào tạo lại” mà không sửa hệ thống</td></tr>
 <tr><td>12</td><td>QA/QMS</td><td>Xác nhận hiệu lực: kiểm bằng chứng kết quả (KPI/re-đánh giá/quan sát).</td><td>Hồ sơ xác nhận hiệu lực</td><td>Đóng khi thiếu minh chứng kết quả</td></tr>
 <tr><td>13</td><td>QA/QMS</td><td>Đóng phát hiện + cập nhật KPI đánh giá + đưa vào Xem xét của lãnh đạo.</td><td>bảng KPI + MR biên bảns</td><td>Không cập nhật trend NC tái diễn</td></tr>
@@ -548,7 +548,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>L2</b></td>
 <td>Thực hiện STOP/HOLD đúng và báo đúng kênh; hồ sơ cung cấp đầy đủ Job/Rev/ID.</td>
-<td>Được thao tác độc lập trong phạm vi role; được ký bước nội bộ trong Phiếu theo dõi Job (Traveler) theo ủy quyền.</td>
+<td>Được thao tác độc lập trong phạm vi vai trò; được ký bước nội bộ trong Phiếu theo dõi Job (Traveler) theo ủy quyền.</td>
 </tr>
 <tr>
 <td><b>L3</b></td>
@@ -564,7 +564,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <!-- SECTION 9 -->
-<h2 class="h2" id="sec9">9) Bài kiểm tra (quiz + tình huống + thực hành)</h2>
+<h2 class="h2" id="sec9">9) Bài kiểm tra (bài kiểm tra nhanh + tình huống + thực hành)</h2>
 <div class="card">
 <h3 class="h3" style="margin-top:0;">9.1. Trắc nghiệm (24 câu — khoanh 1 đáp án đúng)</h3>
 <ol style="margin:10px 0 0 18px; line-height:1.9;">
@@ -593,7 +593,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi phát sinh NCR Major liên quan sản phẩm, đánh giá nội bộ được kích hoạt theo: (A) bỏ qua (B) trigger rủi ro (C) chờ năm sau (D) chờ khách nhắc.</li>
 <li>Tài liệu sai phiên bản tại điểm dùng phải xử lý: (A) giữ nguyên (B) thu hồi &amp; thay bản hiện hành + ghi minh chứng (C) xóa file (D) đổi tên.</li>
 </ol>
-<h3 class="h3">9.2. Tình huống (03 case — trả lời bằng hành động + bằng chứng)</h3>
+<h3 class="h3">9.2. Tình huống (03 tình huống — trả lời bằng hành động + bằng chứng)</h3>
 <div class="note">
 <p><b>Tình huống 1 — Sai rev:</b> Đánh giá phát hiện máy đang chạy theo bản vẽ Rev-A, trong khi Phiếu theo dõi Job (Traveler) ghi Rev-B. Yêu cầu: liệt kê hành động 60 giây + hồ sơ phải tạo + ai chịu trách nhiệm.</p>
 <p><b>Tình huống 2 — Dụng cụ đo quá hạn:</b> kiểm cuối dùng micrometer hết hạn 5 ngày để quyết định OK/NG. Yêu cầu: phân loại phát hiện + containment + đánh giá ảnh hưởng lô.</p>
@@ -618,7 +618,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </details>
 </div>
 <!-- SECTION 10 -->
-<h2 class="h2" id="sec10">10) Tiêu chí PASS/FAIL</h2>
+<h2 class="h2" id="sec10">10) Tiêu chí ĐẠT/KHÔNG ĐẠT</h2>
 <div class="card">
 <h3 class="h3" style="margin-top:0;">10.1. PASS</h3>
 <ul style="margin:10px 0 0 18px; line-height:1.9;">
@@ -650,11 +650,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td><b>Đánh giá plan / bảng kiểm (FRM-QMS-002)</b></td><td>Chốt phạm vi/tiêu chí/lịch/đội đánh giá</td><td><span class="path">QMS-Hồ sơ / Z_Audit_Evidence_Pack</span> <span class="muted">Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint).</span></td></tr>
-<tr><td><b>Assessment report</b></td><td>Kết luận + phát hiện + ngày đến hạn</td><td><span class="path">QMS-Hồ sơ / Z_Audit_Evidence_Pack</span></td></tr>
+<tr><td><b>Đánh giá report</b></td><td>Kết luận + phát hiện + ngày đến hạn</td><td><span class="path">QMS-Hồ sơ / Z_Audit_Evidence_Pack</span></td></tr>
 <tr><td><b>Detection log</b></td><td>Theo dõi trạng thái đóng</td><td><span class="path">QMS-Improvement / NCR-CAPA-Change</span></td></tr>
 <tr><td><b>NCR/CAPA góiage</b></td><td>cô lập + RCA + hành động ngăn tái diễn</td><td><span class="path">Job-Dossiers / &lt;Job&gt; / 05_NCR-Hold-CAPA</span></td></tr>
 <tr><td><b>Effectiveness bằng chứng</b></td><td>Kết quả chứng minh không tái diễn</td><td><span class="path">QMS-Hồ sơ / Z_Audit_Evidence_Pack</span> hoặc <span class="path">bảng KPI</span></td></tr>
-<tr><td><b>Attendance list / meeting minutes</b></td><td>Họp mở/Họp kết thúc &amp; cam kết</td><td>Đính kèm Assessment report</td></tr>
+<tr><td><b>Attendance list / meeting minutes</b></td><td>Họp mở/Họp kết thúc &amp; cam kết</td><td>Đính kèm Đánh giá report</td></tr>
 </tbody>
 </table>
 <h3 class="h3">11.2. Quy tắc đặt tên (chuẩn hóa truy xuất)</h3>

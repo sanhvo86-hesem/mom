@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>HR-TRN-11 — Skill Matrix & Bonus Mapping — KPI Gating by Level | HESEM OS</title>
+<title>HR-TRN-11 — Skill Matrix & Bonus Mapping — Cơ chế chặn theo KPI (KPI gating) by Level | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -51,7 +51,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>SKILL-MATRIX-BONUS — Skill Matrix & Bonus Mapping — KPI Gating by Level</strong>
+  <strong>SKILL-MATRIX-BONUS — Skill Matrix & Bonus Mapping — Cơ chế chặn theo KPI by Level</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -62,7 +62,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
 </div>
 </div>
-<div class="doc-content" id="docContent"><h1>ma trận kỹ năng (skill matrix) &amp; Bonus Mapping — KPI gating liên kết Level/Thưởng</h1><p class="lead">
+<div class="doc-content" id="docContent"><h1>ma trận kỹ năng (skill matrix) &amp; Bonus Mapping — Cơ chế chặn theo KPI liên kết Level/Thưởng</h1><p class="lead">
  Tài liệu này thiết kế một <b>ma trận kỹ năng (skill matrix) (19 năng lực x 4 Level)</b> được đo – chứng minh – và quy đổi trực tiếp sang <b>Level/Bonus</b>,
  đồng thời tích hợp cơ chế <b>gating KPI/chỉ số</b> để đảm bảo thưởng chỉ trả khi <i>đúng năng lực + đúng kỷ luật vận hành</i>.
  </p><div class="note">
@@ -78,7 +78,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>1) Khái niệm &amp; cấu trúc dữ liệu ma trận kỹ năng (skill matrix)</h2>
 <p><b>Skill Matrix</b> là bảng mapping giữa:</p>
 <ul>
-<li><b>Vị trí</b> (Job/Role) → <b>mức Level yêu cầu</b> theo từng năng lực (C01…C19), kèm <b>trọng số</b> (Weight) theo mức độ quan trọng.</li>
+<li><b>Vị trí</b> (Job/Vai trò) → <b>mức Level yêu cầu</b> theo từng năng lực (C01…C19), kèm <b>trọng số</b> (Weight) theo mức độ quan trọng.</li>
 <li><b>Nhân sự</b> → <b>Level hiện tại</b> (đã chứng nhận) + <b>bằng chứng</b> + <b>chỉ số định lượng</b> + <b>gating</b>.</li>
 <li><b>Quy đổi thưởng</b> → hệ số/tiền thưởng theo mô hình thưởng hiệu suất HESEM (không đưa OT vào đóng BHXH; OT hoạch toán qua thưởng hiệu suất).</li>
 </ul>
@@ -103,7 +103,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 </section><section class="card">
-<h2>2) KPI gating: “cổng” điều kiện để khóa/mở Level &amp; Bonus</h2>
+<h2>2) Cơ chế chặn theo KPI: “cổng” điều kiện để khóa/mở Level &amp; Bonus</h2>
 <p>
 <b>Gating KPI/chỉ số</b> là cơ chế “cổng an toàn” để tránh trường hợp nhân sự đạt điểm kỹ năng nhưng vi phạm kỷ luật chất lượng/an toàn/tuân thủ.
  Cơ chế này tích hợp trực tiếp vào: <b>(i) chứng nhận Level</b> và <b>(ii) tính thưởng theo ma trận kỹ năng (skill matrix)</b>.
@@ -190,7 +190,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </p>
 <div class="grid-2">
 <div>
-<h3>Mẫu theo phòng ban (Role Targets)</h3>
+<h3>Mẫu theo phòng ban (Vai trò Targets)</h3>
 <ul>
 <li><a href="../../01-Competency-System/03-Matrices/training-matrix-estimating.html">Kinh doanh</a></li>
 <li><a href="../../01-Competency-System/03-Matrices/training-matrix-engineering.html">Kỹ thuật</a></li>
@@ -214,13 +214,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 </section><section class="card">
-<h2>5) Ví dụ tính (Case study HESEM)</h2>
+<h2>5) Ví dụ tính (Nghiên cứu tình huống HESEM)</h2>
 <p><b>Tình huống:</b> Nhân sự A là CNC Operator (Lệnh sản xuất) — tháng 01/2026.</p>
 <ul>
 <li>BaseSalary = 9,500,000 VND</li>
 <li>Rate_skill_pool = 6%</li>
 <li>K_skill (từ ma trận kỹ năng (skill matrix)) = 0.87</li>
-<li>Cổng kiểm soát: không có Critical FAIL, có 1 Major FAIL (trễ calibration check) ⇒ K_gate = 0.5</li>
+<li>Cổng kiểm soát: không có Critical FAIL, có 1 Major FAIL (trễ hiệu chuẩn check) ⇒ K_gate = 0.5</li>
 </ul>
 <pre class="codeblock">Bonus_skill = 9,500,000 * 0.06 * 0.87 * 0.5
  ≈ 247,650 VND</pre>

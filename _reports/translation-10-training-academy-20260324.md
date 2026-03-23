@@ -1,39 +1,42 @@
-# Translation Batch 1 - 02-Tai-Lieu-He-Thong - 2026-03-24
+# Translation Batch - 10-Training-Academy - 2026-03-24
 
 - Target directory: `10-Training-Academy`
 - Files scanned: 197
-- Files changed: 29
-- Total replacements: 35
+- Files changed: 103
+- Total replacements: 173
 
 ## Top Rules
 
-- `cleanup_no_evidence_double_paren`: 26
+- `cleanup_post_key_points_dup`: 83
+- `right_first_time`: 40
+- `cleanup_post_assessment_dup`: 21
+- `cleanup_post_output_note`: 20
 - `hold_point`: 9
 
 ## Top Changed Files
 
-- `10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L1.html`: 2 thay thế (hold_point=1, cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L2.html`: 2 thay thế (cleanup_no_evidence_double_paren=1, hold_point=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L3.html`: 2 thay thế (cleanup_no_evidence_double_paren=1, hold_point=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L4.html`: 2 thay thế (cleanup_no_evidence_double_paren=1, hold_point=1)
-- `10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-02.html`: 2 thay thế (cleanup_no_evidence_double_paren=2)
-- `10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-03.html`: 2 thay thế (cleanup_no_evidence_double_paren=2)
-- `10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L1.html`: 1 thay thế (hold_point=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L2.html`: 1 thay thế (hold_point=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L1.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L2.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L3.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L4.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/09-C09-Time-Management/C09-L1.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/09-C09-Time-Management/C09-L2.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/09-C09-Time-Management/C09-L3.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/01-Competency-System/02-Levels/09-C09-Time-Management/C09-L4.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html`: 1 thay thế (hold_point=1)
-- `10-Training-Academy/02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html`: 1 thay thế (hold_point=1)
-- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-01.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-02.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-06.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-10.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-12.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-20.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
-- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-22.html`: 1 thay thế (cleanup_no_evidence_double_paren=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/01-C01-Safety-5S/C01-L1.html`: 4 thay thế (right_first_time=1, cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/01-C01-Safety-5S/C01-L2.html`: 4 thay thế (right_first_time=1, cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/01-C01-Safety-5S/C01-L3.html`: 4 thay thế (right_first_time=1, cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/01-C01-Safety-5S/C01-L4.html`: 4 thay thế (right_first_time=1, cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L1.html`: 4 thay thế (hold_point=1, cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L2.html`: 4 thay thế (cleanup_post_output_note=1, cleanup_post_key_points_dup=1, hold_point=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/03-C03-Right-First-Time/C03-L1.html`: 4 thay thế (right_first_time=1, cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/03-C03-Right-First-Time/C03-L2.html`: 4 thay thế (right_first_time=1, cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/03-C03-Right-First-Time/C03-L3.html`: 4 thay thế (right_first_time=1, cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/03-C03-Right-First-Time/C03-L4.html`: 4 thay thế (right_first_time=1, cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L3.html`: 3 thay thế (cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L4.html`: 3 thay thế (cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/04-C04-Cross-Dept-Communication/C04-L1.html`: 3 thay thế (cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/04-C04-Cross-Dept-Communication/C04-L2.html`: 3 thay thế (cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/04-C04-Cross-Dept-Communication/C04-L3.html`: 3 thay thế (cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/04-C04-Cross-Dept-Communication/C04-L4.html`: 3 thay thế (cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/05-C05-Customer-Service-B2B/C05-L1.html`: 3 thay thế (cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/05-C05-Customer-Service-B2B/C05-L2.html`: 3 thay thế (cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/05-C05-Customer-Service-B2B/C05-L3.html`: 3 thay thế (cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/01-Competency-System/02-Levels/05-C05-Customer-Service-B2B/C05-L4.html`: 3 thay thế (cleanup_post_output_note=1, cleanup_post_key_points_dup=1, cleanup_post_assessment_dup=1)
+- `10-Training-Academy/02-Training-Content/01-Modules/C01.html`: 2 thay thế (right_first_time=1, cleanup_post_key_points_dup=1)
+- `10-Training-Academy/02-Training-Content/01-Modules/C02.html`: 2 thay thế (right_first_time=1, cleanup_post_key_points_dup=1)
+- `10-Training-Academy/02-Training-Content/01-Modules/C03.html`: 2 thay thế (right_first_time=1, cleanup_post_key_points_dup=1)
+- `10-Training-Academy/02-Training-Content/01-Modules/C04.html`: 2 thay thế (right_first_time=1, cleanup_post_key_points_dup=1)
+- `10-Training-Academy/02-Training-Content/01-Modules/C05.html`: 2 thay thế (right_first_time=1, cleanup_post_key_points_dup=1)

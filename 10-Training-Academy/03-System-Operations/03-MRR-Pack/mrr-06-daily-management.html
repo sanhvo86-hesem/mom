@@ -114,27 +114,27 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
 <tr><td><span class="chk">☐</span> Tier meeting agenda (đầu ca) + attendance</td><td>TIER</td><td>D0</td><td>OPS</td><td class="mini">SSOT/Ops/Tier/<span class="pill">&lt;YYYYMMDD&gt;</span>/</td><td class="mini">TIER_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> nhật ký hành động (action log) (người phụ trách + due trong ngày)</td><td>ACT</td><td>D0</td><td>OPS</td><td class="mini">SSOT/Ops/Tier/<span class="pill">&lt;YYYYMMDD&gt;</span>/</td><td class="mini">ACT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> nhật ký hành động (nhật ký hành động) (người phụ trách + due trong ngày)</td><td>ACT</td><td>D0</td><td>OPS</td><td class="mini">SSOT/Ops/Tier/<span class="pill">&lt;YYYYMMDD&gt;</span>/</td><td class="mini">ACT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> tuổi tồn WIP (tuổi tồn (aging) / tuổi tồn) report (job list) + ưu tiên</td><td>WIP</td><td>D0</td><td>Planning</td><td class="mini">SSOT/Ops/WIP/</td><td class="mini">WIP_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Downtime log (machine/ca/cause/min)</td><td>DT</td><td>D0</td><td>OPS</td><td class="mini">SSOT/Ops/Downtime/</td><td class="mini">DT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Quality alert (khi NG/escape) + containment</td><td>QALERT</td><td>D1</td><td>QA</td><td class="mini">SSOT/Ops/Quality-Alert/</td><td class="mini">QALERT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Escalation log (blocker &gt;15 phút)</td><td>ESC</td><td>D1</td><td>OPS</td><td class="mini">SSOT/Ops/Escalation/</td><td class="mini">ESC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> KPI dashboard snapshot (OTD/FPY/Scrap/Rework)</td><td>KPI</td><td>D2</td><td>OPS+QA</td><td class="mini">SSOT/Ops/KPI/</td><td class="mini">KPI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> OJT plan trong ngày (ai kèm ai, module nào)</td><td>OJT</td><td>D2</td><td>Trainer</td><td class="mini">SSOT/Training/OJT/<span class="pill">&lt;YYYYMMDD&gt;</span>/</td><td class="mini">OJT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> OJT plan trong ngày (ai kèm ai, mô-đun nào)</td><td>OJT</td><td>D2</td><td>Trainer</td><td class="mini">SSOT/Training/OJT/<span class="pill">&lt;YYYYMMDD&gt;</span>/</td><td class="mini">OJT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 </table>
 </div>
-<div class="note mini"><strong>Gắn với module</strong>: C09 (OTD), C08 (Data), C03 (Quality at source), C07 (CAPA).</div>
+<div class="note mini"><strong>Gắn với mô-đun</strong>: C09 (OTD), C08 (Data), C03 (Quality at source), C07 (CAPA).</div>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
 <ul class="tight">
-<li>Không chốt nhật ký hành động (action log) hoặc không có người phụ trách/due → HOLD kết luận họp.</li><li>Blocker &gt;15 phút không escalation log → FAIL cổng kiểm soát cá nhân và đánh giá lại C09.</li><li>Quality alert thiếu containment → STOP chuyền liên quan.</li><li>Downtime log thiếu nguyên nhân → HOLD phân tích ngày.</li>
+<li>Không chốt nhật ký hành động (nhật ký hành động) hoặc không có người phụ trách/due → HOLD kết luận họp.</li><li>Blocker &gt;15 phút không escalation log → FAIL cổng kiểm soát cá nhân và đánh giá lại C09.</li><li>Quality alert thiếu containment → STOP chuyền liên quan.</li><li>Downtime log thiếu nguyên nhân → HOLD phân tích ngày.</li>
 </ul>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Đánh giá 60 giây</h2>
 <ol class="tight">
-<li>Mở folder Tier/<span class="pill">&lt;YYYYMMDD&gt;</span>/ và kiểm tra agenda + nhật ký hành động (action log).</li><li>Mở WIP report và đối chiếu ưu tiên với ngày đến hạn.</li><li>Mở downtime log và xác nhận có cause category.</li><li>Mở KPI snapshot và đối chiếu trend.</li>
+<li>Mở folder Tier/<span class="pill">&lt;YYYYMMDD&gt;</span>/ và kiểm tra agenda + nhật ký hành động (nhật ký hành động).</li><li>Mở WIP report và đối chiếu ưu tiên với ngày đến hạn.</li><li>Mở downtime log và xác nhận có cause category.</li><li>Mở KPI snapshot và đối chiếu trend.</li>
 </ol>
 </div>
 <div class="card">
