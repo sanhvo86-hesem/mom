@@ -7,16 +7,23 @@ const ROOT = path.resolve("C:/Users/TEST4/qms.hesem.com.vn");
 const TARGET_DIR = process.argv[2]
   ? path.resolve(ROOT, process.argv[2])
   : path.join(ROOT, "02-Tai-Lieu-He-Thong");
+const TARGET_SLUG = path
+  .relative(ROOT, TARGET_DIR)
+  .replace(/\\/g, "-")
+  .toLowerCase()
+  .replace(/[^a-z0-9-]+/g, "-")
+  .replace(/-+/g, "-")
+  .replace(/^-|-$/g, "");
 
 const REPORT_JSON = path.join(
   ROOT,
   "_reports",
-  "translation-batch1-system-docs-20260324.json"
+  `translation-${TARGET_SLUG}-20260324.json`
 );
 const REPORT_MD = path.join(
   ROOT,
   "_reports",
-  "translation-batch1-system-docs-20260324.md"
+  `translation-${TARGET_SLUG}-20260324.md`
 );
 
 function walk(dir, files = []) {
@@ -147,7 +154,17 @@ const RULES = [
   ),
   commonRule(
     "cleanup_no_evidence_no_gate",
-    /không có bằng chứng thì không qua cổng kiểm soát\s*\(\s*No bằng chứng = No cổng kiểm soát(?:\s*\/\s*không có bằng chứng thì không qua cổng kiểm soát)?\s*\)|No bằng chứng = No cổng kiểm soát(?:\s*\/\s*không có bằng chứng thì không qua cổng kiểm soát)?|No evidence = No gate/gi,
+    /không có bằng chứng thì không qua cổng kiểm soát\s*\([\s\S]{0,180}?No (?:evidence|bằng chứng) = No (?:gate|cổng kiểm soát(?:\s*\(\s*gate\s*\))?)[\s\S]{0,180}?\)|No bằng chứng = No cổng kiểm soát(?:\s*\(\s*gate\s*\))?(?:\s*\/\s*không có bằng chứng thì không qua cổng kiểm soát)?|No evidence = No gate/gi,
+    "không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)"
+  ),
+  commonRule(
+    "cleanup_no_evidence_suffix",
+    /không có bằng chứng thì không qua cổng kiểm soát\s*\(No evidence = No gate\)(?:\s*\(cổng kiểm soát\)\))?(?:\s*\(cổng kiểm soát\))?(?:\s*\/\s*không có bằng chứng thì không qua cổng kiểm soát)?/gi,
+    "không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)"
+  ),
+  commonRule(
+    "cleanup_no_evidence_double_paren",
+    /không có bằng chứng thì không qua cổng kiểm soát\s*\(No evidence = No gate\)\)/gi,
     "không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)"
   ),
   commonRule(
@@ -159,6 +176,36 @@ const RULES = [
     "cleanup_60_second_audit_drill",
     /60-second Đánh giá Drill|60-second đánh giá drill|60-second audit drill/gi,
     "diễn tập đánh giá 60 giây"
+  ),
+  commonRule(
+    "cleanup_training_no_gate_label",
+    /No bằng chứng = No cổng kiểm soát(?:\s*\(\s*gate\s*\))?/gi,
+    "No evidence = No gate"
+  ),
+  commonRule(
+    "cleanup_in_process",
+    /in-quy trình/gi,
+    "trong quá trình"
+  ),
+  commonRule(
+    "cleanup_job_order_process_title",
+    /CNC Lệnh sản xuất Quy trình/gi,
+    "Quy trình Lệnh sản xuất CNC"
+  ),
+  commonRule(
+    "cleanup_competency_metric",
+    /competency-chỉ số/gi,
+    "chỉ số năng lực"
+  ),
+  commonRule(
+    "cleanup_evidence_standards",
+    /Bộ bằng chứng Tiêu chuẩn|bộ bằng chứng chuẩn quốc tế\s*\(\s*Bộ bằng chứng\s*\)/gi,
+    "Tiêu chuẩn Bộ bằng chứng"
+  ),
+  commonRule(
+    "cleanup_audit_drill_dup",
+    /bài diễn tập đánh giá 60 giây\s*\(\s*diễn tập đánh giá 60 giây\s*\)/gi,
+    "bài diễn tập đánh giá 60 giây"
   ),
   commonRule(
     "cleanup_readiness_before_run",
@@ -194,7 +241,7 @@ const RULES = [
   ),
   uncommonRule(
     "gate",
-    /\bcổng kiểm soát\s*\(\s*gate\s*\)|(?<!quality )(?<!stage-)\bgate\b/gi,
+    /\bcổng kiểm soát\s*\(\s*gate\s*\)|(?<!No evidence = No )(?<!No bằng chứng = No )(?<!quality )(?<!stage-)\bgate\b/gi,
     "cổng kiểm soát (gate)",
     "cổng kiểm soát"
   ),
@@ -416,7 +463,7 @@ const RULES = [
   commonRule("source_revision", /\bsource revision\b/gi, "phiên bản nguồn"),
   commonRule("evidence_driven", /\bevidence-driven\b/gi, "dựa trên bằng chứng"),
   commonRule("evidence_requirements", /\bevidence requirements?\b/gi, "yêu cầu bằng chứng"),
-  commonRule("evidence", /\bevidence\b(?!\s*pack\b)/gi, "bằng chứng"),
+  commonRule("evidence", /(?<!No )\bevidence\b(?!\s*pack(?:age)?\b)/gi, "bằng chứng"),
   commonRule("checklists", /\bchecklists\b/gi, "bảng kiểm"),
   commonRule("checklist", /\bchecklist\b/gi, "bảng kiểm"),
   commonRule("authority", /\bauthority\b/gi, "thẩm quyền"),

@@ -107,7 +107,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Cổng kiểm soát sai phiên bản:</b> Bản vẽ/spec/program/SOP sai Rev tạo scrap, khiếu nại, lọt lỗi ra khách hàng.</li>
 <li><b>Cổng kiểm soát rò rỉ dữ liệu:</b> Chia sẻ sai phạm vi (Anyone link/guest ngoài kiểm soát) làm lộ drawing/CNC program/giá.</li>
-<li><b>Cổng kiểm soát thiếu bằng chứng:</b> Thiếu dấu vết đánh giá hoặc thiếu retention làm “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)” ở phê duyệt giao hàng (ship release) và đánh giá khách hàng.</li>
+<li><b>Cổng kiểm soát thiếu bằng chứng:</b> Thiếu dấu vết đánh giá hoặc thiếu retention làm “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” ở phê duyệt giao hàng (ship release) và đánh giá khách hàng.</li>
 </ul>
 </div>
 <div class="grid-2">
@@ -183,7 +183,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Packing/Ship</b> (Warehouse + QA)</td>
 <td>Bộ hồ sơ giao hàng (ship packet) + bộ bằng chứng</td>
 <td>Bộ bằng chứng chỉ đọc + expiry + log chia sẻ</td>
-<td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát) → <b>BLOCK</b> xuất hàng</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate) → <b>BLOCK</b> xuất hàng</td>
 </tr>
 </tbody>
 </table>
@@ -381,7 +381,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>5</td>
 <td>Dựng Bộ bằng chứng</td>
 <td>Chỉ lấy Released/Hồ sơ đã freeze; đặt tại Z_Audit_Evidence_Pack; chỉ đọc; expiry; log</td>
-<td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát); đánh giá mở được trong 3 phút</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate); đánh giá mở được trong 3 phút</td>
 </tr>
 <tr>
 <td>6</td>
@@ -480,7 +480,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Chọn đúng: “bản đúng” của drawing/SOP nằm ở vùng nào? A) WIP B) Released C) Email D) Desktop</li>
 <li>Hành động đúng khi nhận file drawing qua email: A) dùng luôn B) lưu OneDrive C) đối chiếu Released/Part‑REV master rồi dùng bản đúng D) gửi lại cho đồng nghiệp</li>
 <li>Link chia sẻ external bắt buộc: A) Anyone link B) Specific people C) không expiry D) cho edit mặc định</li>
-<li>Quy tắc “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)” áp dụng mạnh nhất ở bước nào? A) Setup B) phê duyệt giao hàng C) Nhập kho D) Họp giao ban</li>
+<li>Quy tắc “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” áp dụng mạnh nhất ở bước nào? A) Setup B) phê duyệt giao hàng C) Nhập kho D) Họp giao ban</li>
 <li>Major/Minor version dùng để tách trạng thái nào? A) Internal/External B) Draft/Released C) Job/Part D) User/Admin</li>
 <li>Hồ sơ bị đính chính đúng cách: A) overwrite file cũ B) xóa file cũ C) tạo file mới + ghi chú lý do D) đổi tên file cũ</li>
 <li>Retention label mục tiêu chính: A) làm đẹp thư viện B) bảo toàn hồ sơ theo thời hạn C) tăng tốc Wi‑Fi D) giảm dung lượng email</li>
@@ -562,12 +562,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 </div>
-<h2 class="h2" id="m11">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”)</h2>
+<h2 class="h2" id="m11">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”)</h2>
 <div class="callout">
 <ul>
 <li><b>PASS</b> khi: (1) Bài kiểm tra ≥ 75%; (2) Tình huống đạt: quyết định đúng STOP/HOLD/BLOCK/GO và liệt kê MRR đầy đủ; (3) Bài test thực hành PASS; (4) OJT output đủ và không có lỗi cổng kiểm soát.</li>
 <li><b>FAIL</b> khi: thiếu bất kỳ MRR bắt buộc nào, hoặc vi phạm 1 cổng kiểm soát (Any‑link, dùng file ngoài Released, overwrite hồ sơ, thiếu retention, không có đánh giá log bằng chứng).</li>
-<li><b>Quy tắc cứng:</b> <b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)</b>. Thiếu bằng chứng → không công nhận level và không cho vận hành quyền tương ứng.</li>
+<li><b>Quy tắc cứng:</b> <b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</b>. Thiếu bằng chứng → không công nhận level và không cho vận hành quyền tương ứng.</li>
 </ul>
 </div>
 <h2 class="h2" id="m12">12) MRR tối thiểu</h2>

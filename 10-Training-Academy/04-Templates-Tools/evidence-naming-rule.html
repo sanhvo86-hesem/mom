@@ -78,7 +78,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card danger">
 <span class="badge">Cổng kiểm soát (gate)</span>
 <ul class="tight">
-<li><b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)</b>: thiếu MRR trong SSOT → khóa chuyển bước.</li>
+<li><b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</b>: thiếu MRR trong SSOT → khóa chuyển bước.</li>
 <li><b>Sai REV</b> hoặc <b>file rời ngoài SSOT</b> → HOLD/FAIL.</li>
 <li><b>Đặt tên sai chuẩn</b> → hồ sơ không được công nhận trong đánh giá năng lực.</li>
 </ul>
@@ -112,7 +112,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  JOB-2602-001_BRACKET-123_REV-C/
  <br/>├── 00_Input/ (PO, RFQ, Drawing, Spec)
  <br/>├── 10_Engineering/ (Bộ hồ sơ chuẩn (baseline package), CAM, Setup sheet)
- <br/>├── 20_Production/ (Traveler, Setup photos, In-quy trình log)
+ <br/>├── 20_Production/ (Traveler, Setup photos, Trong quá trình log)
  <br/>├── 30_QC/ (IR, FAI, Final, NCR)
  <br/>├── 40_Supplier/ (MTR, CoC, Outsource cert)
  <br/>├── 50_Shipping/ (bộ hồ sơ giao hàng (ship packet), CoC, Packing, Label)
@@ -164,7 +164,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>CR</b></td><td>Rà soát hợp đồng</td><td>FRM-QA-001</td></tr>
 <tr><td><b>BASELINE</b></td><td>Bộ hồ sơ chuẩn</td><td>Setup sheet + inspection plan</td></tr>
 <tr><td><b>TRV</b></td><td>Traveler/Route</td><td>FRM-OPS-001</td></tr>
-<tr><td><b>IR</b></td><td>Inspection Report</td><td>In-quy trình/Final IR</td></tr>
+<tr><td><b>IR</b></td><td>Inspection Report</td><td>Trong quá trình/Final IR</td></tr>
 <tr><td><b>FAI</b></td><td>First Article Inspection</td><td>FAI report</td></tr>
 <tr><td><b>NCR</b></td><td>Nonconformity Report</td><td>NCR + disposition</td></tr>
 <tr><td><b>CAPA</b></td><td>Corrective action</td><td>CAPA hồ sơ + effectiveness</td></tr>

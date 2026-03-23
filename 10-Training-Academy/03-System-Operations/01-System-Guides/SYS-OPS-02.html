@@ -142,7 +142,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><span class="kpi">KPI-01</span>: Truy xuất bộ hồ sơ job (FAI/Final/bộ hồ sơ giao hàng (ship packet)) trong ≤ <b>60 giây</b>.</li>
 <li><span class="kpi">KPI-02</span>: 0 trường hợp “sai REV phát hành/ gia công/ đo kiểm”.</li>
 <li><span class="kpi">KPI-03</span>: 100% Tier-1 hồ sơ có <b>metadata bắt buộc</b> + nhãn <b>LAM-T1-10Y-HỒ SƠ</b> (hoặc label override theo hợp đồng).</li>
-<li><span class="kpi">KPI-04</span>: 0 phê duyệt giao hàng khi thiếu MRR (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)).</li>
+<li><span class="kpi">KPI-04</span>: 0 phê duyệt giao hàng khi thiếu MRR (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate).</li>
 </ul>
 </div>
 </div>
@@ -615,7 +615,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Folder nào trong Hồ sơ công việc chứa FAI/IR/CMM?</li>
 <li>Folder nào trong Hồ sơ công việc chứa bộ hồ sơ giao hàng?</li>
 <li>Dừng sớm (fail-fast) FF1 kích hoạt khi nào? Hành động bắt buộc là gì?</li>
-<li>“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)” áp dụng mạnh nhất ở cổng kiểm soát nào?</li>
+<li>“không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” áp dụng mạnh nhất ở cổng kiểm soát nào?</li>
 <li>Outsource bằng chứng tối thiểu cần những loại gì?</li>
 <li>00_Archive trong DATA dùng khi nào? Có được dùng để sản xuất không?</li>
 <li>Vì sao metadata giúp retention/search tốt hơn chỉ naming?</li>
@@ -684,7 +684,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Quiz</td>
 <td>≥ 80% (vai trò QA/WHS/Programmer/Planner) • ≥ 70% (vai trò còn lại)</td>
-<td>Dưới ngưỡng hoặc trả lời sai các câu “hard rule” (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát) , Wrong REV, Tier-1 label / không có bằng chứng thì không qua cổng kiểm soát)</td>
+<td>Dưới ngưỡng hoặc trả lời sai các câu “hard rule” (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate) , Wrong REV, Tier-1 label / không có bằng chứng thì không qua cổng kiểm soát)</td>
 </tr>
 <tr>
 <td>Scenario</td>

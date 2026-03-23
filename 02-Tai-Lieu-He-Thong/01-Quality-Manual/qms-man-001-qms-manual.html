@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-
-<html lang="vi">
+<!DOCTYPE html> <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>QMS-MAN-001 — Sổ tay Hệ thống Quản lý Chất lượng cho doanh nghiệp gia công CNC toàn cầu | HESEM QMS</title>
 <link href="../../assets/style.css" rel="stylesheet"/>
-<style>
-
-.chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
+<style> .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
 .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
@@ -52,23 +48,13 @@
 .sq{width:12px;height:12px;border-radius:3px;display:inline-block}
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
-@media print {
-  .card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.lane,.legend,.req,.auth-grid,.backup-card,.vstep,.metric-card,.gate-card,.field,.boxed-list,.svg-wrap{page-break-inside:avoid;break-inside:avoid}
-  h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}
-  .form-header,.sig-row,.sign-row,.approval-row{page-break-inside:avoid;break-inside:avoid}
-  tr{page-break-inside:avoid;break-inside:avoid}
-  thead{display:table-header-group}tfoot{display:table-footer-group}
-  p{orphans:3;widows:3}.table-card{overflow:visible!important}
+@media print { .card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.lane,.legend,.req,.auth-grid,.backup-card,.vstep,.metric-card,.gate-card,.field,.boxed-list,.svg-wrap{page-break-inside:avoid;break-inside:avoid} h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid} .form-header,.sig-row,.sign-row,.approval-row{page-break-inside:avoid;break-inside:avoid} tr{page-break-inside:avoid;break-inside:avoid} thead{display:table-header-group}tfoot{display:table-footer-group} p{orphans:3;widows:3}.table-card{overflow:visible!important}
 }
 .page-body{overflow-x:hidden}
 .table-card,.table-block,.table-wrap{overflow-x:auto;max-width:100%}
 table{max-width:100%;table-layout:auto}
 td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
-@media (max-width: 960px; width:100%; box-sizing:border-box){.grid-3{grid-template-columns:1fr;}.field-grid{grid-template-columns:1fr;}}
-
-
-
-.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
+@media (max-width: 960px; width:100%; box-sizing:border-box){.grid-3{grid-template-columns:1fr;}.field-grid{grid-template-columns:1fr;}} .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
 .toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
 .toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .toc-grid a{display:block;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2)}
@@ -88,13 +74,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 .mini-note{font-size:12px;color:var(--ink2)}
 .footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
 .decision-table th,.decision-table td{vertical-align:top}
-@media (max-width:960px; width:100%; box-sizing:border-box){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
-
-.rule-table td b{color:var(--navy)}
-.section-jump{margin-top:10px}
-
-
-</style>
+@media (max-width:960px; width:100%; box-sizing:border-box){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}} .rule-table td b{color:var(--navy)}
+.section-jump{margin-top:10px} </style>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
 </head>
 <body>
@@ -173,12 +154,12 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <h2 class="h2" id="m13">13. Khả năng chống gián đoạn và phục hồi</h2>
 <p>QMS phải duy trì khả năng hoạt động có kiểm soát khi xuất hiện sự kiện gián đoạn như mất điện, mất mạng, hỏng máy trọng yếu, lỗi hệ thống số, đứt nguồn cung, thiếu người ở vai trò critical, sự cố an ninh thông tin hoặc sự kiện an toàn/EHS.</p>
 <div class="table-card"><table class="table"><colgroup><col style="width:24%"/><col style="width:76%"/></colgroup><thead><tr><th>Loại sự kiện</th><th>Yêu cầu phản ứng hệ thống</th></tr></thead><tbody><tr><td>Mất hệ thống số / mất mạng</td><td>Kích hoạt contingency và offline kit theo <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a> / <a href="../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118</a>; giữ traceability giấy và nhập bù sau khôi phục.</td></tr><tr><td>Hỏng máy / mất năng lực process</td><td>Đánh giá resequence, cross-load, outsource, rủi ro giao hàng; update trung tâm điều hành (control tower) theo <a href="../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> và handbook Production.</td></tr><tr><td>Supplier / processor disruption</td><td>Đánh giá nguồn thay thế, impact đến WIP/ship, customer communication và risk disposition.</td></tr><tr><td>Rò rỉ dữ liệu / sự cố access</td><td>Contain access, preserve bằng chứng, assess impact to hồ sơ/IP, review SoD and recovery.</td></tr><tr><td>Thiếu người ở vai trò critical</td><td>Kích hoạt bố trí người thay thế theo <a href="../03-Organization/01-ANNEX-100/annex-123-deputy-backup-matrix.html">ANNEX-123</a> và skill/certification rules.</td></tr></tbody></table></div>
-<h2 class="h2 phase3a-workbook-alignment" id="m14">14. Cơ chế kiểm soát biểu mẫu Excel</h2><div class="note phase3a-workbook-alignment"><b>Nguyên tắc hệ thống</b><br/>Biểu mẫu FRM phải được điều khiển theo mô hình <b>một workbook Excel đang hiệu lực / tải trực tiếp</b>. File workbook trong series folder là nơi ghi nhận, ký xác nhận, theo dõi hành động và bảo toàn kiểm soát dữ liệu; các HTML form cũ không thuộc danh mục hiện hành; việc chuẩn hóa mã và phạm vi được giữ tại (removed). Quy tắc điều khiển được khóa tại , register ảnh hưởng tại  và trung tâm kiểm soát tại <a href="../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Trung tâm kiểm soát biểu mẫu</a>.<div class="note-soft"><b>Tài liệu kiểm soát bắt buộc đọc:</b> Phải đọc (removed) đến (removed) để kiểm soát phát hành, máy trạm, máy chủ, xác nhận trước vận hành, kiểm tra toàn vẹn và khóa phạm vi sử dụng. Mở trực tiếp trên trình duyệt không thuộc mô hình vận hành được phép.</div></div><div class="table-card phase3a-workbook-alignment"><table class="table"><colgroup><col style="width:20%"/><col style="width:34%"/><col style="width:46%"/></colgroup><thead><tr><th>Chặng quá trình</th><th>Workbook / hồ sơ trọng yếu</th><th>Ý nghĩa hệ thống</th></tr></thead><tbody>
+<h2 class="h2 phase3a-workbook-alignment" id="m14">14. Cơ chế kiểm soát biểu mẫu Excel</h2><div class="note phase3a-workbook-alignment"><b>Nguyên tắc hệ thống</b><br/>Biểu mẫu FRM phải được điều khiển theo mô hình <b>một workbook Excel đang hiệu lực / tải trực tiếp</b>. File workbook trong series folder là nơi ghi nhận, ký xác nhận, theo dõi hành động và bảo toàn kiểm soát dữ liệu; các HTML form cũ không thuộc danh mục hiện hành; việc chuẩn hóa mã và phạm vi được giữ tại . Quy tắc điều khiển được khóa tại , register ảnh hưởng tại và trung tâm kiểm soát tại <a href="../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Trung tâm kiểm soát biểu mẫu</a>.<div class="note-soft"><b>Tài liệu kiểm soát bắt buộc đọc:</b> Phải đọc đến để kiểm soát phát hành, máy trạm, máy chủ, xác nhận trước vận hành, kiểm tra toàn vẹn và khóa phạm vi sử dụng. Mở trực tiếp trên trình duyệt không thuộc mô hình vận hành được phép.</div></div><div class="table-card phase3a-workbook-alignment"><table class="table"><colgroup><col style="width:20%"/><col style="width:34%"/><col style="width:46%"/></colgroup><thead><tr><th>Chặng quá trình</th><th>Workbook / hồ sơ trọng yếu</th><th>Ý nghĩa hệ thống</th></tr></thead><tbody>
 <tr><td>RFQ / contract / orchestration</td><td><a download="" href="../../04-Bieu-Mau/02-FRM-200/FRM-201_RFQ_Register.xlsx">FRM-201</a>, <a download="" href="../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a>, <a download="" href="../../04-Bieu-Mau/02-FRM-200/FRM-205_Job_Dossier_Evidence_Index.xlsx">FRM-205</a>, <a download="" href="../../04-Bieu-Mau/02-FRM-200/FRM-208_Daily_Tier_Meeting_and_Escalation_Log.xlsx">FRM-208</a>, <a download="" href="../../04-Bieu-Mau/02-FRM-200/FRM-209_High_Risk_Job_Readiness_Review.xlsx">FRM-209</a></td><td>Chuỗi hồ sơ đơn hàng chuyển sang workbook để khóa giả định, escalation hằng ngày, mức sẵn sàng của job rủi ro cao và hồ sơ bằng chứng thay vì dùng HTML form tĩnh.</td></tr>
 <tr><td>Phát hành kỹ thuật</td><td><a download="" href="../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM-305</a>, <a download="" href="../../04-Bieu-Mau/03-FRM-300/FRM-306_Engineering_Release_and_Baseline_Package_Approval.xlsx">FRM-306</a></td><td>Bộ hồ sơ phát hành, phê duyệt phát hành và phát hành chương trình kiểm tra (inspection program release) phải bám workbook để kiểm soát revision, hiệu lực áp dụng, xác nhận phê duyệt và bộ bằng chứng (evidence pack).</td></tr>
 <tr><td>Mức sẵn sàng sản xuất &amp; execution</td><td><a download="" href="../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a>, <a download="" href="../../04-Bieu-Mau/05-FRM-500/FRM-518_Work_Transfer_Validation_Record.xlsx">FRM-518</a>, <a download="" href="../../04-Bieu-Mau/05-FRM-500/FRM-519_Job_Packet_Quick_Check_and_Pre_Run_Verification.xlsx">FRM-519</a></td><td>Setup, chuyển giao công việc và xác minh trước khi chạy được chuyển sang workbook để giữ bảng kiểm điều kiện chạy, bàn giao giữa công đoạn và đóng action trên cùng cấu trúc dữ liệu.</td></tr>
-<tr><td>Receiving / warehouse / clean-pack</td><td><a download="" href="../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a>, <a download="" href="../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a>, <a download="" href="../../04-Bieu-Mau/07-FRM-700/FRM-713_Cleanroom_Entry_and_Gowning_Log.xlsx">FRM-713</a>, <a download="" href="../../04-Bieu-Mau/07-FRM-700/FRM-714_Ultrasonic_Cleaning_Batch_Record.xlsx">FRM-714</a>, <a download="" href="../../04-Bieu-Mau/07-FRM-700/FRM-715_Vacuum_Compatible_Clean_Build_and_Bagging_Record.xlsx">FRM-715</a>, <a download="" href="../../04-Bieu-Mau/07-FRM-700/FRM-721_FOD_Line_Clearance_and_Tool_Accountability_Log.xlsx">FRM-721</a></td><td>FRM-701 workbook là hồ sơ hợp nhất cho receiving/IQC cổng kiểm soát, put-away và storage handoff;  chỉ còn trong ghi chú phạm vi mã để giải thích phạm vi lịch sử sau khi logic được hợp nhất vào FRM-701. Cụm clean/cleanroom/vacuum/FOD dùng workbook riêng để bảo toàn traceability và ranh giới phát hành.</td></tr>
-<tr><td>Mã không phát hành trong danh mục hiện hành</td><td>,  và các mã không phát hành trong danh mục hiện hành tại (removed)</td><td>Các mã này chỉ còn dùng để tra phạm vi mã / phạm vi quy trình; không được xem là workbook active và không được dùng để tạo hồ sơ mới.</td></tr>
+<tr><td>Receiving / warehouse / clean-pack</td><td><a download="" href="../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a>, <a download="" href="../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a>, <a download="" href="../../04-Bieu-Mau/07-FRM-700/FRM-713_Cleanroom_Entry_and_Gowning_Log.xlsx">FRM-713</a>, <a download="" href="../../04-Bieu-Mau/07-FRM-700/FRM-714_Ultrasonic_Cleaning_Batch_Record.xlsx">FRM-714</a>, <a download="" href="../../04-Bieu-Mau/07-FRM-700/FRM-715_Vacuum_Compatible_Clean_Build_and_Bagging_Record.xlsx">FRM-715</a>, <a download="" href="../../04-Bieu-Mau/07-FRM-700/FRM-721_FOD_Line_Clearance_and_Tool_Accountability_Log.xlsx">FRM-721</a></td><td>FRM-701 workbook là hồ sơ hợp nhất cho receiving/IQC cổng kiểm soát, put-away và storage handoff; chỉ còn trong ghi chú phạm vi mã để giải thích phạm vi lịch sử sau khi logic được hợp nhất vào FRM-701. Cụm clean/cleanroom/vacuum/FOD dùng workbook riêng để bảo toàn traceability và ranh giới phát hành.</td></tr>
+<tr><td>Mã không phát hành trong danh mục hiện hành</td><td>, và các mã không phát hành trong danh mục hiện hành tại </td><td>Các mã này chỉ còn dùng để tra phạm vi mã / phạm vi quy trình; không được xem là workbook active và không được dùng để tạo hồ sơ mới.</td></tr>
 </tbody></table></div><div class="footer-note">Sổ tay này phải được đọc cùng bộ SOP/WI/ANNEX/handbook/JD hiện hành. Khi có thay đổi làm ảnh hưởng ranh giới trách nhiệm, nguồn chuẩn duy nhất, thẩm quyền, thẩm quyền cổng kiểm soát hoặc kiến trúc ứng phó gián đoạn, QMS manual phải được rà lại cùng danh mục ưu tiên tại ANNEX-119.</div>
 </div>
 </div>
@@ -186,9 +167,4 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </div>
 </div>
 </body>
-</html>
-
-
-
-
-
+</html> 

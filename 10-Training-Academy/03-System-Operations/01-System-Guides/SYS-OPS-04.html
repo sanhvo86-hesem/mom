@@ -124,7 +124,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Maintenance</b></td><td>Ghi nhận ToolLife/Downtime theo hồ sơ; giữ bằng chứng hiệu chuẩn CNC-IMS-HUB → QMS-Hồ sơ → Metrology-Hồ sơ..</td><td>Đóng 01 sự cố downtime có hồ sơ + ảnh + nguyên nhân; không mất dấu vết.</td></tr>
 <tr><td><b>EHS</b></td><td>Gắn kiểm soát EHS vào hồ sơ khi có yêu cầu; khóa phát hành khi thiếu kiểm soát an toàn EHS cổng kiểm soát: PPE • LOTO • Hot Work • Lifting • Chemical/Coolant • Machine Guard..</td><td>Nhận biết các điểm chặn EHS và phát hành đúng 100%.</td></tr>
 <tr><td><b>Estimator (SAL-03)</b></td><td>Không cam kết giao hàng khi ShipRelease chưa RELEASED; truyền thông đúng trạng thái cổng kiểm soát.</td><td>Không có email/quote xác nhận giao hàng khi Status=BLOCKED/HOLD.</td></tr>
-<tr><td><b>Supervisor</b></td><td>Chủ trì handoff ca; cưỡng chế “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”; mở sự cố khi có bypass.</td><td>0 lần bypass cổng kiểm soát trong ca trực; 100% blocker có người phụ trách và due time.</td></tr>
+<tr><td><b>Supervisor</b></td><td>Chủ trì handoff ca; cưỡng chế “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”; mở sự cố khi có bypass.</td><td>0 lần bypass cổng kiểm soát trong ca trực; 100% blocker có người phụ trách và due time.</td></tr>
 </tbody>
 </table>
 </div>
@@ -380,7 +380,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>L1</b> — Biết quy tắc</td>
-<td>Nêu đúng 4 trạng thái STOP/HOLD/BLOCK/RELEASED; nêu đúng “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”.</td>
+<td>Nêu đúng 4 trạng thái STOP/HOLD/BLOCK/RELEASED; nêu đúng “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”.</td>
 <td>Quiz ≥ ngưỡng theo role (mục 11).</td>
 <td>Được thao tác xem dashboard/log, không được thay đổi trạng thái cổng kiểm soát.</td>
 </tr>
@@ -410,7 +410,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>10) Đánh giá</h2>
 <h3>10.1 Quiz (≥20 câu) — trắc nghiệm + tình huống ngắn</h3>
 <ol>
-<li>(MCQ) “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)” nghĩa là gì trong ShipRelease?</li>
+<li>(MCQ) “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” nghĩa là gì trong ShipRelease?</li>
 <li>(MCQ) Khi IntegrationLogs báo Failed, hành động nào phải chặn ngay? A) Advance LastSyncUtc B) Tạo StandupAction C) Gửi notify D) Giữ cursor</li>
 <li>(MCQ) Delta+overlap dùng để chặn rủi ro nào?</li>
 <li>(MCQ) Idempotent upsert bắt buộc dùng khóa nào cho JobIndex? A) JobNum B) EpicorKey C) PartNum D) DueDate</li>
@@ -501,7 +501,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="section" id="passfail">
-<h2>11) PASS/FAIL criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”)</h2>
+<h2>11) PASS/FAIL criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”)</h2>
 <div class="table-card">
 <table class="table">
 <thead><tr><th>Role</th><th>Ngưỡng quiz</th><th>Yêu cầu OJT</th><th>Yêu cầu performance test</th><th>Kết luận</th></tr></thead>

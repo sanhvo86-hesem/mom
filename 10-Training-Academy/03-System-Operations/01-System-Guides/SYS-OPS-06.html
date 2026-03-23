@@ -91,7 +91,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="pill">Operator</span><span class="pill">Setup</span><span class="pill">Programmer</span><span class="pill">QC</span><span class="pill">QA</span><span class="pill">Warehouse</span><span class="pill">Purchasing</span><span class="pill">Planner</span><span class="pill">Maintenance</span><span class="pill">EHS</span><span class="pill">Estimator (SAL-03)</span><span class="pill">Supervisor</span>
 </li>
 <li><strong>Thời lượng chuẩn:</strong> 2.5 giờ lớp chung (mục 2–7) • 1.5 giờ thực hành theo role (mục 8–10) • OJT 1 ca làm việc (mục 9).</li>
-<li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền truy cập danh sách vận hành; đã hoàn tất Orientation về “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”.</li>
+<li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền truy cập danh sách vận hành; đã hoàn tất Orientation về “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”.</li>
 <li><strong>Kích hoạt:</strong> Khi tạo KPI mới, khi sửa công thức KPI, khi thay đổi quan hệ mô hình, khi refresh lỗi, khi đánh giá hỏi “đo KPI bằng gì”.</li>
 </ul>
 </div>
@@ -132,7 +132,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <strong>Trách nhiệm bắt buộc (không né trách nhiệm)</strong>
 <ul>
-<li><span class="must">QA/QMS</span>: khóa định nghĩa KPI, khóa logic cổng kiểm soát “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”, kiểm soát thay đổi.</li>
+<li><span class="must">QA/QMS</span>: khóa định nghĩa KPI, khóa logic cổng kiểm soát “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”, kiểm soát thay đổi.</li>
 <li><span class="must">IT/BI</span>: khóa mô hình dữ liệu, khóa đo Data Health/Refresh/Latency, khóa quyền truy cập (RLS).</li>
 <li><span class="must">Supervisor</span>: dùng KPI để chặn quyết định, ép ghi nhận hành động và MRR trong standup.</li>
 <li><span class="must">Mọi role vận hành</span>: tạo dữ liệu đúng khóa (JobNum/Rev/Date), gắn link minh chứng, không tạo “Excel riêng”.</li>
@@ -286,7 +286,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 </div>
-<h3>Điểm chặn cốt lõi (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát))</h3>
+<h3>Điểm chặn cốt lõi (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</h3>
 <ul>
 <li><span class="must">Cổng kiểm soát 1 — Định nghĩa:</span> Dashboard chỉ được dùng KPI nằm trong KPI dictionary.</li>
 <li><span class="must">Cổng kiểm soát 2 — Truy vết:</span> KPI không drill‑down đến danh sách hồ sơ (Job/Pack/NCR) bị xem là “không đo”.</li>
@@ -585,7 +585,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" id="sec10">
 <h2>10) Đánh giá</h2>
 <h3>10.1 Quiz (≥20 câu — trắc nghiệm + tình huống ngắn)</h3>
-<p class="muted">Câu trả lời phải dựa trên “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)” và cấu trúc KPI dictionary/data model. Câu trả lời phải bám bằng chứng và cấu trúc dữ liệu, không suy diễn cảm tính.</p>
+<p class="muted">Câu trả lời phải dựa trên “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” và cấu trúc KPI dictionary/data model. Câu trả lời phải bám bằng chứng và cấu trúc dữ liệu, không suy diễn cảm tính.</p>
 <ol>
 <li>KPI được phép xuất hiện trên dashboard khi nào?</li>
 <li>Trường nào trong KPI dictionary bắt buộc để ngăn “đa định nghĩa”?</li>
@@ -649,7 +649,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 11) PASS/FAIL criteria -->
 <div class="card" id="sec11">
-<h2>11) PASS/FAIL criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”)</h2>
+<h2>11) PASS/FAIL criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”)</h2>
 <div class="kpi-box">
 <ul>
 <li><span class="must">PASS (tối thiểu):</span> Quiz ≥ 80% <span class="mini">Ngưỡng: OTD ≥ 95% • NCR repeat = 0 • Đánh giá finding repeat = 0.</span> + hoàn tất Performance test PASS + nộp đủ OJT output (mục 9) có link minh chứng.</li>

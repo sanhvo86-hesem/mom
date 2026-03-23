@@ -1,0 +1,224 @@
+{
+  "filesScanned": 197,
+  "filesChanged": 29,
+  "totalReplacements": 35,
+  "topRules": [
+    {
+      "rule": "cleanup_no_evidence_double_paren",
+      "count": 26
+    },
+    {
+      "rule": "hold_point",
+      "count": 9
+    }
+  ],
+  "changedFiles": [
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L1.html",
+      "total": 2,
+      "byRule": {
+        "hold_point": 1,
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L2.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1,
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L3.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1,
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L4.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1,
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-02.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 2
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-03.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 2
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L1.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L2.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L1.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L2.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L3.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L4.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/09-C09-Time-Management/C09-L1.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/09-C09-Time-Management/C09-L2.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/09-C09-Time-Management/C09-L3.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/09-C09-Time-Management/C09-L4.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-01.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-02.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-06.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-10.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-12.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-20.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-22.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-24.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-28.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-05.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_no_evidence_double_paren": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/04-Templates-Tools/role-gate-tests.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    }
+  ]
+}

@@ -72,7 +72,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-QMS-016 — rà soát quyền truy cập hàng quý Bộ bằng chứng (evidence pack)</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/">ANNEX-QMS-004 — Hồ sơ công việc (job dossier) Template &amp; Metadata Dictionary</a></li>
 </ul>
-<div class="muted">Quy tắc cốt lõi: <b>không có bằng chứng thì không qua cổng kiểm soát (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát (gate)) (cổng kiểm soát) / không có bằng chứng thì không qua cổng kiểm soát)</b>. Mọi cấp quyền, chia sẻ, thu hồi, rà soát, điều tra đều phải để lại MRR kiểm tra được.</div>
+<div class="muted">Quy tắc cốt lõi: <b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</b>. Mọi cấp quyền, chia sẻ, thu hồi, rà soát, điều tra đều phải để lại MRR kiểm tra được.</div>
 </div>
 <div class="card">
 <div class="badge"><span class="dot"></span>SYS-OPS-22</div>
@@ -315,7 +315,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:52px">#</th><th>Step</th><th>Key Points</th><th>Reasons</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>1</td><td>Chốt ‘đối tượng dữ liệu’ + Rev + zone (Released/Hồ sơ/WIP)</td><td>Sai đối tượng/Sai Rev làm sai sản xuất; sai zone làm mất kiểm soát.</td></tr><tr><td>2</td><td>2</td><td>Điền yêu cầu truy cập với phạm vi tối thiểu + expiry rõ</td><td>Thiếu expiry làm guest tồn tại; thiếu phạm vi làm cấp quyền vượt mức.</td></tr><tr><td>3</td><td>3</td><td>Đối chiếu FRM-QMS-014 để chọn quyền chuẩn theo role</td><td>Ma trận là baseline; ngoại lệ chỉ xuất hiện khi có phê duyệt.</td></tr><tr><td>4</td><td>4</td><td>Lấy phê duyệt chủ dữ liệu cho quyền vượt mức hoặc dữ liệu nhạy cảm</td><td>Tạo trách nhiệm; chặn bypass cổng kiểm soát.</td></tr><tr><td>5</td><td>5</td><td>IT thực thi bằng nhóm; bật log/đánh giá; cấu hình sharing theo chuẩn</td><td>Giảm unique permissions; tăng truy xuất.</td></tr><tr><td>6</td><td>6</td><td>Xác minh truy cập: mở đúng link Released đúng Rev; kiểm tra quyền không dư</td><td>Chặn ‘cấp xong để đó’; ngăn quyền dư.</td></tr><tr><td>7</td><td>7</td><td>Lưu bằng chứng: export trước/sau + ảnh màn hình + link lưu</td><td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát).</td></tr><tr><td>8</td><td>8</td><td>Thu hồi đúng hạn (expiry/đổi vai trò/kết thúc dự án)</td><td>Giảm rủi ro rò rỉ; giữ hệ thống sạch.</td></tr>
+<tr><td>1</td><td>1</td><td>Chốt ‘đối tượng dữ liệu’ + Rev + zone (Released/Hồ sơ/WIP)</td><td>Sai đối tượng/Sai Rev làm sai sản xuất; sai zone làm mất kiểm soát.</td></tr><tr><td>2</td><td>2</td><td>Điền yêu cầu truy cập với phạm vi tối thiểu + expiry rõ</td><td>Thiếu expiry làm guest tồn tại; thiếu phạm vi làm cấp quyền vượt mức.</td></tr><tr><td>3</td><td>3</td><td>Đối chiếu FRM-QMS-014 để chọn quyền chuẩn theo role</td><td>Ma trận là baseline; ngoại lệ chỉ xuất hiện khi có phê duyệt.</td></tr><tr><td>4</td><td>4</td><td>Lấy phê duyệt chủ dữ liệu cho quyền vượt mức hoặc dữ liệu nhạy cảm</td><td>Tạo trách nhiệm; chặn bypass cổng kiểm soát.</td></tr><tr><td>5</td><td>5</td><td>IT thực thi bằng nhóm; bật log/đánh giá; cấu hình sharing theo chuẩn</td><td>Giảm unique permissions; tăng truy xuất.</td></tr><tr><td>6</td><td>6</td><td>Xác minh truy cập: mở đúng link Released đúng Rev; kiểm tra quyền không dư</td><td>Chặn ‘cấp xong để đó’; ngăn quyền dư.</td></tr><tr><td>7</td><td>7</td><td>Lưu bằng chứng: export trước/sau + ảnh màn hình + link lưu</td><td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate).</td></tr><tr><td>8</td><td>8</td><td>Thu hồi đúng hạn (expiry/đổi vai trò/kết thúc dự án)</td><td>Giảm rủi ro rò rỉ; giữ hệ thống sạch.</td></tr>
 </tbody>
 </table>
 </div>
@@ -428,7 +428,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2>11) PASS/FAIL criteria</h2>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div><b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)</b>. Bài làm thiếu bằng chứng bị đánh FAIL, không cấp quyền thao tác/cổng kiểm soát.</div>
+<div><b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</b>. Bài làm thiếu bằng chứng bị đánh FAIL, không cấp quyền thao tác/cổng kiểm soát.</div>
 </div>
 <div class="grid-2">
 <div>

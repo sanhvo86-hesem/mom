@@ -132,7 +132,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>QA/QMS (Doc Control)</b></td>
-<td>Kiểm soát phiên bản module, kiểm soát biểu mẫu/rubric/quiz; kiểm tra “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)” tại các cổng kiểm soát chất lượng.</td>
+<td>Kiểm soát phiên bản module, kiểm soát biểu mẫu/rubric/quiz; kiểm tra “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” tại các cổng kiểm soát chất lượng.</td>
 <td>Dashboard chỉ số có số; điểm chặn thực thi; đóng vòng khi phát hiện thiếu hồ sơ.</td>
 </tr>
 <tr>
@@ -234,7 +234,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Ship</b></td>
 <td>Phê duyệt giao hàng (ship release) bảng kiểm</td>
 <td>Hồ sơ “phê duyệt giao hàng authorization” (QA/Supervisor)</td>
-<td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát) = <b>BLOCK</b> xuất hàng</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate) = <b>BLOCK</b> xuất hàng</td>
 </tr>
 <tr>
 <td><b>Feedback/CI</b></td>
@@ -334,7 +334,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Epicor = hệ thống ghi nhận chính</b> cho dữ liệu giao dịch (job, routing, shipment, MES time entry). Hồ sơ đào tạo thuộc nhóm <b>documented information</b> và lưu ở M365.</li>
 <li><b>M365 = thực thi + bằng chứng</b>: kho hồ sơ đào tạo là nơi trả lời đánh giá; không lưu phân tán.</li>
-<li><b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)</b>: thiếu MRR = BLOCK các cổng kiểm soát liên quan chất lượng/CTQ.</li>
+<li><b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</b>: thiếu MRR = BLOCK các cổng kiểm soát liên quan chất lượng/CTQ.</li>
 </ul>
 </div>
 </div>
@@ -534,7 +534,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>10) Đánh giá</h2>
 <h3>10.1 Quiz (≥20 câu) — pha trộn trắc nghiệm + tình huống ngắn</h3>
 <ol>
-<li>Định nghĩa “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)” và hệ quả vận hành khi thiếu hồ sơ.</li>
+<li>Định nghĩa “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” và hệ quả vận hành khi thiếu hồ sơ.</li>
 <li>4 thành phần tối thiểu của Bộ bằng chứng đào tạo là gì?</li>
 <li>Điểm khác nhau giữa “attendance” và “bằng chứng of effectiveness”.</li>
 <li>Vì sao phải khóa phiên bản tài liệu khi đào tạo?</li>
@@ -607,11 +607,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 11) PASS/FAIL -->
 <div class="card" id="passfail">
-<h2>11) PASS/FAIL criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”)</h2>
+<h2>11) PASS/FAIL criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”)</h2>
 <ul>
 <li><b>PASS (tối thiểu):</b> Quiz ≥ 80% + Scenario ≥ 2/3 PASS + bài kiểm tra thực hành PASS (≤60 giây) + Pack đủ 04 file + trạng thái Valid.</li>
 <li><b>FAIL (bất kỳ điều kiện nào):</b> &gt;60 giây; thiếu 01 file; sai phiên bản; không rõ trainer/assessor; không có scope; log tái chứng nhận không cập nhật.</li>
-<li><b>Quy tắc chốt:</b> <b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát).</b> Không có MRR trong kho chính thức = không được bố trí trong phạm vi ảnh hưởng chất lượng/CTQ.</li>
+<li><b>Quy tắc chốt:</b> <b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate).</b> Không có MRR trong kho chính thức = không được bố trí trong phạm vi ảnh hưởng chất lượng/CTQ.</li>
 </ul>
 </div>
 <!-- 12) MRR tối thiểu -->
