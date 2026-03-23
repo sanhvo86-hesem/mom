@@ -2076,7 +2076,8 @@ function setLang(l){
     document.querySelectorAll('.vp-overlay iframe').forEach(f=>frames.push(f));
     frames.forEach(f=>{
       try{
-        if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(f, l);
+        if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(f, l);
+        else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(f, l);
         else if(f && f.contentWindow) f.contentWindow.postMessage({type:'setLang',lang:l},'*');
       }catch(_e){}
     });
@@ -2123,9 +2124,23 @@ function setLang(l){
       updateDocViewerHeader(doc);
       renderWorkflowPanel(doc);
       renderVersionHistory(doc);
-      // Reload iframe so Google Translate cookie + iframe translation apply reliably
+      // Keep the current iframe mounted and re-sync language in place.
+      // Reload only if the viewer has not loaded any document yet.
       if(!editMode){
-        try{ loadDocContent(currentDoc); }catch(e){}
+        try{
+          const iframe = document.getElementById('doc-iframe');
+          const iframeReady = !!(iframe && (
+            iframe.getAttribute('src') ||
+            iframe.getAttribute('srcdoc') ||
+            (iframe.contentDocument && iframe.contentDocument.body && iframe.contentDocument.body.childNodes.length)
+          ));
+          if(iframeReady){
+            if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(iframe, l);
+            else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(iframe, l);
+          }else{
+            loadDocContent(currentDoc);
+          }
+        }catch(e){}
       }
     }
   }

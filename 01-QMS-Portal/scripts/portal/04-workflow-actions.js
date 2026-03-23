@@ -859,6 +859,35 @@ function syncIframeDocumentLanguage(iframe, targetLang){
   });
 }
 
+function scheduleIframeDocumentLanguageSync(iframe, targetLang){
+  if(!iframe) return Promise.resolve(false);
+  const normalizedLang = targetLang === 'en' ? 'en' : 'vi';
+  const syncToken = String(Date.now()) + ':' + Math.random().toString(36).slice(2);
+  const retryDelays = normalizedLang === 'en' ? [0, 400, 1200, 2600, 5200] : [0, 180];
+  iframe.__qmsLangSyncToken = syncToken;
+  let chain = Promise.resolve(false);
+  retryDelays.forEach(function(delay){
+    chain = chain.then(function(lastResult){
+      return new Promise(function(resolve){
+        function runSync(){
+          if(!iframe || iframe.__qmsLangSyncToken !== syncToken){
+            resolve(lastResult);
+            return;
+          }
+          syncIframeDocumentLanguage(iframe, normalizedLang).then(function(result){
+            resolve(!!result || lastResult);
+          }).catch(function(){
+            resolve(lastResult);
+          });
+        }
+        if(delay > 0) setTimeout(runSync, delay);
+        else runSync();
+      });
+    });
+  });
+  return chain;
+}
+
 function ensureDocHtmlHasLanguageBridge(clone, docPath){
   try{
     if(!clone) return;
@@ -1676,7 +1705,9 @@ function loadDocContent(code){
           }
         }catch(e){}
         // Sync language after injection, even for legacy docs that never loaded assets/app.js.
-        try{ syncIframeDocumentLanguage(iframe, lang); }catch(e){}
+        // Retry a few times in EN mode because Google Translate inside the iframe
+        // can initialize asynchronously after the document load event.
+        try{ scheduleIframeDocumentLanguageSync(iframe, lang); }catch(e){}
         try{ if(typeof attachIframeLinkBridge==='function') attachIframeLinkBridge(iframe, doc, viewFile); }catch(e){}
         try{ attachIframeViewerZoom(iframe); }catch(e){}
       }catch(e){}

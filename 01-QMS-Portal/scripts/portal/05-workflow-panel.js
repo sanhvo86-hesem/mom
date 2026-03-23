@@ -721,15 +721,17 @@ function openVersionPreview(code, idx){
       fr.addEventListener('load', ()=>{
         try{
           if(fr.contentDocument && typeof repairBrokenDocStyleArtifacts==='function') repairBrokenDocStyleArtifacts(fr.contentDocument);
-          if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(fr, lang);
-          else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},'*');
+                if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(fr, lang);
+                else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(fr, lang);
+                else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},'*');
         }catch(_e){}
       });
       setTimeout(()=>{
         try{
           if(fr.contentDocument && typeof repairBrokenDocStyleArtifacts==='function') repairBrokenDocStyleArtifacts(fr.contentDocument);
-          if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(fr, lang);
-          else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},'*');
+                if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(fr, lang);
+                else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(fr, lang);
+                else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},'*');
         }catch(_e){}
       }, 200);
     }
