@@ -11,7 +11,7 @@
       "id": "ROLE-001",
       "title": "CEO sees authority matrix",
       "role": "ceo",
-      "doc_code": "ANNEX-QMS-025",
+      "doc_code": "ANNEX-120",
       "expected": true,
       "risk_group": "authority"
     },
@@ -19,7 +19,7 @@
       "id": "ROLE-002",
       "title": "CNC operator cannot see authority matrix",
       "role": "cnc_operator",
-      "doc_code": "ANNEX-QMS-025",
+      "doc_code": "ANNEX-120",
       "expected": false,
       "risk_group": "authority"
     },
@@ -27,7 +27,7 @@
       "id": "ROLE-003",
       "title": "Finance manager sees KPI cascade",
       "role": "finance_manager",
-      "doc_code": "ANNEX-QMS-027",
+      "doc_code": "ANNEX-122",
       "expected": true,
       "risk_group": "kpi"
     },
@@ -35,7 +35,7 @@
       "id": "ROLE-004",
       "title": "QA manager sees worked examples annex",
       "role": "qa_manager",
-      "doc_code": "ANNEX-QMS-029",
+      "doc_code": "ANNEX-124",
       "expected": true,
       "risk_group": "digital-admin"
     },
@@ -43,7 +43,7 @@
       "id": "ROLE-005",
       "title": "CNC operator cannot see worked examples annex",
       "role": "cnc_operator",
-      "doc_code": "ANNEX-QMS-029",
+      "doc_code": "ANNEX-124",
       "expected": false,
       "risk_group": "digital-admin"
     },
@@ -157,28 +157,28 @@
     },
     {
       "id": "ALIAS-001",
-      "title": "Legacy REF-012 pattern maps to ANNEX-QMS-012",
+      "title": "Legacy REF-012 pattern maps to ANNEX-113",
       "kind": "alias-match",
       "pattern": "REF-012*",
-      "doc_code": "ANNEX-QMS-012",
+      "doc_code": "ANNEX-113",
       "expected": true,
       "risk_group": "alias"
     },
     {
       "id": "ALIAS-002",
-      "title": "Legacy REF-020 pattern maps to ANNEX-OPS-003",
+      "title": "Legacy REF-020 pattern maps to ANNEX-503",
       "kind": "alias-match",
       "pattern": "REF-020*",
-      "doc_code": "ANNEX-OPS-003",
+      "doc_code": "ANNEX-503",
       "expected": true,
       "risk_group": "alias"
     },
     {
       "id": "ALIAS-003",
-      "title": "Legacy REF-021 pattern maps to ANNEX-QMS-023",
+      "title": "Legacy REF-021 pattern maps to ANNEX-119",
       "kind": "alias-match",
       "pattern": "REF-021*",
-      "doc_code": "ANNEX-QMS-023",
+      "doc_code": "ANNEX-119",
       "expected": true,
       "risk_group": "alias"
     },
@@ -186,12 +186,12 @@
       "id": "OVR-001",
       "title": "Grant override enables temporary access to worked examples annex",
       "role": "production_planner",
-      "doc_code": "ANNEX-QMS-029",
+      "doc_code": "ANNEX-124",
       "expected": true,
       "risk_group": "override-grant",
       "override": {
         "grant": [
-          "ANNEX-QMS-029"
+          "ANNEX-124"
         ]
       },
       "context": "Approved temporary access for deputy evidence-pack reviewer."
@@ -200,12 +200,12 @@
       "id": "OVR-002",
       "title": "Deny override still blocks dashboard governance annex",
       "role": "qa_manager",
-      "doc_code": "ANNEX-QMS-012",
+      "doc_code": "ANNEX-113",
       "expected": false,
       "risk_group": "override-deny",
       "override": {
         "deny": [
-          "ANNEX-QMS-012"
+          "ANNEX-113"
         ]
       }
     }

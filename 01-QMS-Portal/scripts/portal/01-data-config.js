@@ -525,7 +525,7 @@ const _UNI = [
   "CERTIFICATE*","CERTIFICATION*","EVIDENCE*","QMS-OPS*",
   "ROLE*","TRAINEE*","TRAINER*",
   "OJT*","DRILL*","SYS-OPS*","TRN-OPS*","MRR*",
-  "ANNEX-QMS-001*","ANNEX-QMS-002*","ANNEX-QMS-020*",
+  "ANNEX-105*","ANNEX-106*","ANNEX-117*",
   "FRM-801*","FRM-802*","FRM-803*","FRM-804*","FRM-805*",
   "FRM-806*","FRM-807*","FRM-808*","FRM-809*",
   "FRM-811*",
@@ -536,7 +536,7 @@ const _MGR = [
   "SOP-1*","SOP-9*",
   "DEPT*",
   "JD*","ANNEX*",
-  "ANNEX-QMS-025*","ANNEX-QMS-026*","ANNEX-QMS-027*","ANNEX-QMS-028*",
+  "ANNEX-120*","ANNEX-121*","ANNEX-122*","ANNEX-123*",
   "LAB*",
   "FRM-1*","FRM-9*",
   "SOP-801*","SOP-804*","FRM-812*",
@@ -846,7 +846,7 @@ const ROLE_DOCS = {
     "SOP-702-*","SOP-703-*",
     "WI-711-*","WI-713-*","WI-721-*",
     "FRM-708-*",
-    "ANNEX-QMS-016*","ANNEX-QMS-011*","ANNEX-QMS-024*",
+    "ANNEX-607*","ANNEX-112*","ANNEX-608*",
     "LAB*","DEPT-EHS-*",
     "WI-8*"
   ],
@@ -856,7 +856,7 @@ const ROLE_DOCS = {
   epicor_admin: [
     ..._UNI, ..._MGR,
     "SOP-104-*","SOP-105-*",
-    "ANNEX-QMS-005*","ANNEX-QMS-006*","ANNEX-QMS-008*","ANNEX-QMS-012*","ANNEX-QMS-015*","ANNEX-QMS-018*","ANNEX-QMS-020*","ANNEX-IT-001*","ANNEX-IT-002*","ANNEX-OPS-003*",
+    "ANNEX-108*","ANNEX-109*","ANNEX-110*","ANNEX-113*","ANNEX-114*","ANNEX-115*","ANNEX-117*","ANNEX-101*","ANNEX-102*","ANNEX-503*",
     "SOP-201-*","SOP-501-*",
     "SOP-401-*","SOP-803-*",
     "FRM-1*","FRM-2*","FRM-4*","FRM-5*",
@@ -871,29 +871,29 @@ function normalizeDocPattern(pattern){
   const base = raw.replace(/-\*$/,'*');
   const out = new Set([base]);
   const aliasMap = {
-    'AUTHORITY-MATRIX':'ANNEX-QMS-025',
-    'RACI-MASTER-MATRIX':'ANNEX-QMS-026',
+    'AUTHORITY-MATRIX':'ANNEX-120',
+    'RACI-MASTER-MATRIX':'ANNEX-121',
     'ANNEX-HR-LAB*':'LAB*',
     'ANNEX-JOB*':'JD*',
-    'REF-001*':'ANNEX-QMS-001*',
-    'REF-002*':'ANNEX-QMS-002*',
-    'REF-005*':'ANNEX-QMS-020*',
-    'REF-006*':'ANNEX-QMS-016*',
-    'REF-007*':'ANNEX-QMS-011*',
-    'REF-008*':'ANNEX-QMS-024*',
-    'REF-010*':'ANNEX-QMS-005*',
-    'REF-011*':'ANNEX-QMS-006*',
-    'REF-012*':'ANNEX-QMS-012*',
-    'REF-013*':'ANNEX-QMS-018*',
-    'REF-014*':'ANNEX-QMS-006*',
-    'REF-015*':'ANNEX-QMS-015*',
-    'REF-020*':'ANNEX-OPS-003*',
-    'REF-021*':'ANNEX-QMS-023*'
+    'REF-001*':'ANNEX-105*',
+    'REF-002*':'ANNEX-106*',
+    'REF-005*':'ANNEX-117*',
+    'REF-006*':'ANNEX-607*',
+    'REF-007*':'ANNEX-112*',
+    'REF-008*':'ANNEX-608*',
+    'REF-010*':'ANNEX-108*',
+    'REF-011*':'ANNEX-109*',
+    'REF-012*':'ANNEX-113*',
+    'REF-013*':'ANNEX-115*',
+    'REF-014*':'ANNEX-109*',
+    'REF-015*':'ANNEX-114*',
+    'REF-020*':'ANNEX-503*',
+    'REF-021*':'ANNEX-119*'
   };
   if(aliasMap[base]) out.add(aliasMap[base]);
   if(base === 'REF*' || base === 'REF-*') out.add('ANNEX*');
   if(base === 'REF-01*'){
-    ['ANNEX-QMS-005*','ANNEX-QMS-006*','ANNEX-QMS-008*','ANNEX-QMS-012*','ANNEX-QMS-015*','ANNEX-QMS-018*','ANNEX-IT-001*','ANNEX-IT-002*'].forEach(v=>out.add(v));
+    ['ANNEX-108*','ANNEX-109*','ANNEX-110*','ANNEX-113*','ANNEX-114*','ANNEX-115*','ANNEX-101*','ANNEX-102*'].forEach(v=>out.add(v));
   }
   return Array.from(out);
 }

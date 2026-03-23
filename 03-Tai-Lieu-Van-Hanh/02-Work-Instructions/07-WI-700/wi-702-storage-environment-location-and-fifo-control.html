@@ -86,7 +86,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>Vật tư đóng gói, nhãn, túi, desiccant, HIC</td><td>Giữ khô, sạch, có FEFO/hạn dùng nếu áp dụng; tách khỏi khu có dầu/bụi/ẩm</td><td>Lot vật tư, shelf life, tình trạng bao nguyên, contamination risk</td><td>Loại khỏi line-side nếu ướt, rách, nhiễm bẩn hoặc hết hạn</td></tr>
 <tr><td>Customer property / customer-returned items</td><td>Tách zone nhận diện riêng, gắn nhãn rõ chủ sở hữu và tình trạng kiểm tra</td><td>Qty, identity, damage-at-receipt, customer ref, special handling note</td><td>Không được nhập chung với stock HESEM; lệch phải báo khách hàng và QA</td></tr>
 </tbody></table></div>
-<div class="callout-warning"><strong>Rule mặc định:</strong> nếu bản vẽ, spec vật liệu, customer requirement hoặc rule clean/vacuum nghiêm hơn Annex này thì quy định nghiêm hơn được ưu tiên áp dụng. Khi không có spec riêng, dùng dải kiểm soát và zoning mặc định theo <a href="../../03-Reference/02-ANNEX-Standards/annex-whs-002-warehouse-location-fifo-rules.html">ANNEX-WHS-002</a>.</div></div><div class="section"><h2>4. Chuẩn put-away, relocation, return-to-stock và staging</h2>
+<div class="callout-warning"><strong>Rule mặc định:</strong> nếu bản vẽ, spec vật liệu, customer requirement hoặc rule clean/vacuum nghiêm hơn Annex này thì quy định nghiêm hơn được ưu tiên áp dụng. Khi không có spec riêng, dùng dải kiểm soát và zoning mặc định theo <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a>.</div></div><div class="section"><h2>4. Chuẩn put-away, relocation, return-to-stock và staging</h2>
 <div class="step-list">
 <div class="step-item"><strong>Put-away sau nhận hàng.</strong><br/>Chỉ put-away vào zone usable khi <a href="wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a> đã hoàn tất: hàng được nhận diện đúng, cert/trace đạt, nhãn truy vết đã dán và trạng thái không còn ở IQC/HOLD. Lô chưa rõ chứng từ chỉ được để tại zone IQC hoặc QH.</div>
 <div class="step-item"><strong>Relocation.</strong><br/>Mọi chuyển vị trí từ kệ này sang kệ khác, từ kho sang line-side, từ line-side về staging hoặc từ vị trí chuẩn sang overflow PHẢI kèm cập nhật location ngay trong cùng nhịp thao tác. Không được chuyển hàng trước, cập nhật sau theo kiểu “khi nào rảnh sẽ sửa”.</div>
@@ -99,7 +99,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>Consumable / desiccant / HIC / vật tư có hạn dùng</td><td>FEFO bắt buộc; lô gần hết hạn được dùng trước nếu còn trong window cho phép.</td><td>Không có ngoại lệ nếu lô đã quá hạn</td></tr>
 <tr><td>Split lot cho cùng một Job</td><td>Phải ghi rõ lot sequence, qty từng lot, balance còn lại và lệnh issue. PHẢI tách lô bằng vách ngăn và nhãn riêng, không để chung trong một khay.</td><td>Warehouse + Production Supervisor</td></tr>
 <tr><td>Remnant / dư đầu thanh / tấm cắt lẻ</td><td>Chỉ được trả kho nếu còn nhãn heat/lot, nhận diện kích thước hữu dụng và không có nghi ngờ trộn lẫn. Mất truy vết thì chỉ được đưa vào HOLD.</td><td>QA đánh giá khả năng dùng lại</td></tr>
-<tr><td>Hot job / expedite</td><td>Expedite không được phá FIFO nếu làm mất trace hoặc gây đói lệnh đã commit. Muốn resequence phải theo ladder tại <a href="../../03-Reference/01-ANNEX-System/annex-ops-001-dispatch-capacity-wip-rules.html">ANNEX-OPS-001</a>.</td><td>Planning / Ops Manager theo authority</td></tr>
+<tr><td>Hot job / expedite</td><td>Expedite không được phá FIFO nếu làm mất trace hoặc gây đói lệnh đã commit. Muốn resequence phải theo ladder tại <a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a>.</td><td>Planning / Ops Manager theo authority</td></tr>
 </tbody></table></div>
 <p>Khi issue cho Job, Warehouse PHẢI ghi nhận lot/heat thực cấp phát. Nếu Job dùng nhiều heat hoặc nhiều balance remnant, traveler hoặc evidence issue PHẢI cho phép truy ngược từng qty đã cấp cho từng work order/operation. Không được dùng “xuất tổng” rồi để người ngoài xưởng tự chia tay.</p></div><div class="section"><h2>6. Kiểm soát chạm hỏng, lẫn lộn và mất sạch trong kho/xưởng</h2>
 <div class="two-col">
@@ -149,8 +149,8 @@ ul.tight li {margin:4px 0;}
 <tr><td><a href="wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a></td><td>Nhận hàng, IQC, traceability và nhập vị trí ban đầu.</td></tr>
 <tr><td><a href="wi-713-environmental-monitoring-and-response.html">WI-713</a></td><td>Monitoring nhiệt ẩm, alarm và phản ứng khi lệch môi trường.</td></tr>
 <tr><td><a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td><td>Luật clean-pack, preservation và seal/open/reseal.</td></tr>
-<tr><td><a href="../../03-Reference/02-ANNEX-Standards/annex-whs-002-warehouse-location-fifo-rules.html">ANNEX-WHS-002</a></td><td>Schema location, zoning, FIFO/FEFO, cycle count và overflow chi tiết.</td></tr>
-<tr><td><a href="../../03-Reference/02-ANNEX-Standards/annex-hse-001-ppe-and-hazard-matrix.html">ANNEX-HSE-001</a></td><td>PPE và hazard theo thao tác xếp dỡ/bảo quản.</td></tr>
+<tr><td><a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a></td><td>Schema location, zoning, FIFO/FEFO, cycle count và overflow chi tiết.</td></tr>
+<tr><td><a href="../../03-Reference/08-ANNEX-800/annex-803-ppe-and-hazard-matrix.html">ANNEX-803</a></td><td>PPE và hazard theo thao tác xếp dỡ/bảo quản.</td></tr>
 </tbody></table></div></div></div>
 </div>
 </div>

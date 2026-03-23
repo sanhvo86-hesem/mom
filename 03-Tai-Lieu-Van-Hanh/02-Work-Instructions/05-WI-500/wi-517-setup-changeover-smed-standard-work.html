@@ -86,11 +86,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Đổi máy trong cùng WO hoặc work transfer</td><td>Full setup + work transfer validation</td><td><a href="wi-518-work-transfer-validation.html">WI-518</a> + WI-302</td><td>Chưa có xác nhận năng lực máy, datum, tool pack, route và gate</td></tr>
 <tr><td>Crash, alarm va chạm, probe hit, sửa máy lớn, thay spindle/rotary</td><td>Abnormal restart protocol</td><td>FRM-514 + WI-302 + WI-519</td><td>Chưa khoanh vùng last-known-good, chưa re-verify zero/fixture/tool</td></tr>
 <tr><td>Đổi tool tạo CTQ, đổi program, đổi offset logic</td><td>Targeted re-setup</td><td>FRM-511 + WI-519</td><td>Chưa đo xác nhận đặc tính chịu ảnh hưởng</td></tr>
-<tr><td>Job QPL-3/QPL-4, CTQ cao, customer overlay đặc biệt</td><td>Full setup với kiểm sâu hơn</td><td><a href="../../03-Reference/02-ANNEX-Standards/annex-qa-003-quality-package-levels-qpl.html">ANNEX-QA-003</a> + WI-302</td><td>Chưa khóa overlay khách hàng hoặc thiếu yêu cầu chứng từ/cert</td></tr>
+<tr><td>Job QPL-3/QPL-4, CTQ cao, customer overlay đặc biệt</td><td>Full setup với kiểm sâu hơn</td><td><a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a> + WI-302</td><td>Chưa khóa overlay khách hàng hoặc thiếu yêu cầu chứng từ/cert</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>3. Đầu vào bắt buộc trước khi dừng máy</h2>
 <div class="table-card"><table><thead><tr><th>Đầu vào</th><th>Tiêu chí PASS</th><th>Bằng chứng / nguồn</th><th>HOLD nếu</th></tr></thead><tbody>
-<tr><td>Revision set</td><td>Drawing/spec, traveler, setup sheet, tool list, kế hoạch kiểm tra (inspection plan), QPL và yêu cầu khách hàng cùng một Part/Rev hiệu lực</td><td><a href="../../03-Reference/02-ANNEX-Standards/annex-eng-001-setup-sheet-and-tool-list-standard.html">ANNEX-ENG-001</a> + traveler + Job Dossier</td><td>Có bất kỳ tài liệu nào khác revision hoặc không truy xuất được bản hiệu lực</td></tr>
+<tr><td>Revision set</td><td>Drawing/spec, traveler, setup sheet, tool list, kế hoạch kiểm tra (inspection plan), QPL và yêu cầu khách hàng cùng một Part/Rev hiệu lực</td><td><a href="../../03-Reference/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a> + traveler + Job Dossier</td><td>Có bất kỳ tài liệu nào khác revision hoặc không truy xuất được bản hiệu lực</td></tr>
 <tr><td>NC program release</td><td>Program ID/Rev/hash đúng; file lấy từ kho phát hành hoặc DNC/Vault kiểm soát; không dùng file cá nhân</td><td><a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td><td>Không chứng minh được nguồn phát hành hoặc hash không khớp</td></tr>
 <tr><td>Tool pack và tuổi dao (tool life)</td><td>ToolID, holder, insert grade, stick-out, preset data và tuổi dao còn lại đủ cho prove-out + first run</td><td>Tool list + log tuổi dao + kitting note</td><td>Thiếu tool quan trọng, thiếu preset data, tuổi dao (tool life) không đủ cho part đầu</td></tr>
 <tr><td>Fixture / jaw / workholding</td><td>Đúng ID, đúng revision, bề mặt kẹp sạch, không nứt/mẻ, locator và hardware đủ</td><td>Fixture register + tag tình trạng + ảnh chuẩn nếu có</td><td>Fixture đang chờ sửa, jaw không đúng part family, hoặc chưa xác nhận orientation</td></tr>
@@ -168,8 +168,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td><a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a></td><td>First piece / FAI / evidence pack sau setup.</td></tr>
 <tr><td><a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Kiểm cuối trước Cycle Start và restart sau bất thường.</td></tr>
 <tr><td><a href="wi-518-work-transfer-validation.html">WI-518</a></td><td>Xác nhận work transfer giữa máy / line / ca / người.</td></tr>
-<tr><td><a href="../../03-Reference/02-ANNEX-Standards/annex-eng-001-setup-sheet-and-tool-list-standard.html">ANNEX-ENG-001</a></td><td>Chuẩn setup sheet, tool list, field dữ liệu bắt buộc.</td></tr>
-<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-qms-014-put-thru-index.html">ANNEX-QMS-014</a></td><td>Tra cứu put-thru, logic tài liệu và evidence.</td></tr>
+<tr><td><a href="../../03-Reference/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a></td><td>Chuẩn setup sheet, tool list, field dữ liệu bắt buộc.</td></tr>
+<tr><td><a href="../../03-Reference/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a></td><td>Tra cứu put-thru, logic tài liệu và evidence.</td></tr>
 </tbody></table></div></div>
 <div data-phase2f="true">
 <h2 class="h2" id="phase2f-setup-boundary">Kiểm soát bổ sung — Critical offset / restart boundary</h2>

@@ -78,7 +78,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <li>Epicor là SoR duy nhất cho Job, labor/time, inventory, shipment và transaction.</li>
 <li>M365/SharePoint là SSOT cho bằng chứng quét, lịch sử reprint/void, ảnh nhãn, điều tra nhầm nhãn và hồ sơ bộ hồ sơ giao hàng (ship packet).</li>
 <li>Mỗi lần quét phải tạo ra một trạng thái rõ: ai quét, quét ở đâu, quét cho container nào, mục đích gì, kết quả gì.</li>
-<li>hhãn nội bộ trong WI này chỉ áp cho vận hành trong nhà máy. hhãn logistics/SSCC outbound phải theo <a href="../../03-Reference/01-AhhEX-System/annex-qms-007-gs1-sscc-data-dictionary-and-pack-reconciliation.html">AhhEX-QMS-007</a> và <a href="../../03-Reference/02-AhhEX-Standards/annex-whs-001-packaging-labeling-spec.html">AhhEX-WHS-001</a>.</li>
+<li>hhãn nội bộ trong WI này chỉ áp cho vận hành trong nhà máy. hhãn logistics/SSCC outbound phải theo <a href="../../03-Reference/01-AhhEX-System/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">AhhEX-QMS-007</a> và <a href="../../03-Reference/02-AhhEX-Standards/annex-702-packaging-labeling-spec.html">AhhEX-WHS-001</a>.</li>
 </ul></div>
 
 <div class="section"><h2>2. Các loại nhãn nội bộ và dữ liệu bắt buộc</h2>
@@ -109,7 +109,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>HOLD</td><td>Bị chặn vì chất lượng, hồ sơ, nhầm revision, vật tư, tool/gage</td><td>QA / Supervisor</td><td>Có quyết định mở hold và bằng chứng kèm theo</td></tr>
 <tr><td>WAITIhG</td><td>Chờ bước tiếp, chờ outsource, chờ ship, chờ final</td><td>Production / WHS</td><td>Được nhận bởi owner bước tiếp theo</td></tr>
 <tr><td>SCRAP</td><td>hhông phục hồi, tách khỏi luồng sản phẩm</td><td>QA / Production theo authority</td><td>hhông quay lại sản xuất; phải phản ánh inventory và record</td></tr>
-<tr><td>REWORh</td><td>Đi theo tuyến sửa đã phê duyệt</td><td>QA / EhG / Production</td><td>Phải gắn route đặc biệt theo <a href="../../03-Reference/01-AhhEX-System/annex-qms-014-put-thru-index.html">AhhEX-QMS-014</a></td></tr>
+<tr><td>REWORh</td><td>Đi theo tuyến sửa đã phê duyệt</td><td>QA / EhG / Production</td><td>Phải gắn route đặc biệt theo <a href="../../03-Reference/01-AhhEX-System/annex-505-put-thru-index.html">AhhEX-QMS-014</a></td></tr>
 </tbody></table></div>
 <div class="callout-warn"><strong>DỪhG hGAY</strong> khi quét ra trạng thái không logic: container đã ship nhưng vẫn hiện Ih PROCESS; container đã void vẫn quét được; Qty sau split/merge không khớp; Jobhum/Rev không khớp traveler; hoặc scan event không ghi được người thực hiện.</div></div>
 
@@ -130,10 +130,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a></td><td>Quy tắc dùng biểu mẫu số, backfill và offline fallback.</td></tr>
 <tr><td><a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>hhóa Job Dossier, kiểm tính đầy đủ hồ sơ.</td></tr>
-<tr><td><a href="../../03-Reference/03-AhhEX-Digital/annex-qms-005-m365-lists-and-field-mapping.html">AhhEX-QMS-005</a></td><td>Field mapping, validation rule và nguồn dữ liệu.</td></tr>
-<tr><td><a href="../../03-Reference/01-AhhEX-System/annex-qms-007-gs1-sscc-data-dictionary-and-pack-reconciliation.html">AhhEX-QMS-007</a></td><td>Data dictionary cho PackID/SSCC và đối soát logistics.</td></tr>
-<tr><td><a href="../../03-Reference/02-AhhEX-Standards/annex-whs-001-packaging-labeling-spec.html">AhhEX-WHS-001</a></td><td>Quy cách đóng gói, nhãn, clean pack và preservation.</td></tr>
-<tr><td><a href="../../03-Reference/03-AhhEX-Digital/annex-qms-021-offline-fallback-kit.html">AhhEX-QMS-021</a></td><td>Bộ dự phòng ngoại tuyến khi hệ thống gián đoạn.</td></tr>
+<tr><td><a href="../../03-Reference/03-AhhEX-Digital/annex-108-m365-lists-and-field-mapping.html">AhhEX-QMS-005</a></td><td>Field mapping, validation rule và nguồn dữ liệu.</td></tr>
+<tr><td><a href="../../03-Reference/01-AhhEX-System/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">AhhEX-QMS-007</a></td><td>Data dictionary cho PackID/SSCC và đối soát logistics.</td></tr>
+<tr><td><a href="../../03-Reference/02-AhhEX-Standards/annex-702-packaging-labeling-spec.html">AhhEX-WHS-001</a></td><td>Quy cách đóng gói, nhãn, clean pack và preservation.</td></tr>
+<tr><td><a href="../../03-Reference/03-AhhEX-Digital/annex-118-offline-fallback-kit.html">AhhEX-QMS-021</a></td><td>Bộ dự phòng ngoại tuyến khi hệ thống gián đoạn.</td></tr>
 </tbody></table></div></div>
 
     </div>

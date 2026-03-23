@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ANNEX-502 — MRR theo gate, điều kiện đồng bộ thực thi và rule bàn giao G0–G5 | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
+
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list, .photo-grid { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+ thead { display: table-header-group; }
+}
+.page-body h1 {font-size:24px;line-height:1.35;margin:0 0 10px;}
+.page-body h2 {font-size:18px;line-height:1.4;margin:18px 0 10px;color:var(--navy);}
+.page-body h3 {font-size:14px;line-height:1.5;margin:12px 0 6px;color:var(--ink);}
+.page-body h4 {font-size:13px;line-height:1.5;margin:10px 0 6px;color:var(--ink);}
+.table-card table {width:100%;border-collapse:collapse;font-size:12px;}
+.table-card th,.table-card td {border:1px solid var(--ln);padding:8px 10px;vertical-align:top;}
+.table-card th {background:var(--th-bg);border-color:var(--th-bdr);text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px;color:var(--ink2);}
+.kpi-grid,.matrix,.two-col,.three-col,.photo-grid {display:grid;gap:12px;margin:10px 0;}
+.kpi-grid,.two-col,.matrix {grid-template-columns:1fr 1fr;}
+.three-col,.photo-grid {grid-template-columns:1fr 1fr 1fr;}
+.kpi-box,.card,.lane,.figure-box,.step-item {border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:#fff;}
+.kpi-box {border-left:4px solid var(--blue);}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.keyline {margin:10px 0;padding:10px 12px;border:1px dashed var(--th-bdr);border-radius:var(--r);background:#fcfcfd;}
+.code,.path {font-family:var(--mono);font-size:12px;background:#f1f3f5;padding:1px 6px;border-radius:4px;}
+.path{display:inline-block;word-break:break-all;}
+ul.tight li {margin:4px 0;}
+.callout-danger,.callout-warning,.callout-info,.callout-success {padding:10px 12px;border-radius:10px;margin:10px 0;border:1px solid var(--ln);}
+.callout-danger{background:#fff5f5;border-color:#ffc9c9;}
+.callout-warning{background:#fff9db;border-color:#ffe066;}
+.callout-info{background:#e7f5ff;border-color:#a5d8ff;}
+.callout-success{background:#ebfbee;border-color:#b2f2bb;}
+.step-list {counter-reset:step;}
+.step-item{position:relative;padding-left:48px;}
+.step-item:before{counter-increment:step;content:counter(step);position:absolute;left:12px;top:12px;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;}
+hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix, .photo-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Annex</span>
+          </div>
+        </div>
+        <div class="title"><strong>ANNEX-502 — MRR theo gate, điều kiện đồng bộ thực thi và rule bàn giao G0–G5</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>ANNEX-502</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>Operations Manager / QA Manager</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng để tra matrix gate và MRR cho mọi job order CNC từ RFQ đến giao hàng. Planner, Engineering, QA, Production, Warehouse và người audit phải dùng cùng một matrix này khi kiểm gate và khi bàn giao hồ sơ.</div>
+      <h1>ANNEX-502 — MRR theo gate, điều kiện đồng bộ thực thi và rule bàn giao G0–G5</h1>
+      
+<div class="section"><h2>1. Mục đích, cách dùng và ranh giới</h2>
+<p>ANNEX này là bộ matrix dùng chung để đồng bộ <strong>gate, MRR, handoff field, role ownership và điều kiện đồng bộ dữ liệu</strong> từ G0 đến G5. ANNEX này <strong>không thay</strong> WI thao tác tại điểm dùng. Người sử dụng tra ANNEX này để biết mỗi gate cần bộ hồ sơ nào, ai được quyền mở/giữ/nhả gate, phải bàn giao trường dữ liệu nào và khi nào phải dừng vì lệch revision hoặc lệch nguồn dữ liệu.</p>
+<div class="callout-warning"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ đóng gate khi đủ entry criteria, đủ MRR tối thiểu và trạng thái giữa SoR, SSOT, traveler và barcode đã đồng nhất.</div>
+<div class="two-col">
+<div class="card"><h3>SoR</h3><p>System of Record cho giao dịch gốc: ERP / shipment / routing / pack / inventory.</p></div>
+<div class="card"><h3>SSOT</h3><p>Single Source of Truth cho evidence pack, dossier, ảnh, checklist, phê duyệt số, exception log.</p></div>
+</div></div>
+
+<div class="section"><h2>2. Gate map G0–G5</h2>
+<div class="table-card"><table><thead><tr><th>Gate</th><th>Mục tiêu</th><th>Entry criteria</th><th>Decision owner</th><th>MRR tối thiểu</th><th>Hold signal mạnh nhất</th></tr></thead><tbody>
+<tr><td><span class="badge-blue">G0 — RFQ / Contract kickoff</span></td><td>Khóa yêu cầu khách hàng, rev, CSR, qty, due date, QPL sơ bộ</td><td>RFQ/PO rõ, file kỹ thuật có thể đọc, assumption đã ghi</td><td>Sales / Engineering</td><td>RFQ register, contract review, kickoff checklist</td><td>Thiếu file kỹ thuật, rev mơ hồ, requirement conflict</td></tr>
+<tr><td><span class="badge-blue">G1 — Planning / Engineering release</span></td><td>Khóa baseline, route, setup, tool, program, inspection requirement</td><td>Baseline đã phát hành, planning release PASS</td><td>Engineering / Planning</td><td>Setup sheet, route, tool list, inspection requirement, planning release checklist</td><td>Mismatch giữa drawing/setup/program/control plan</td></tr>
+<tr><td><span class="badge-blue">G2 — Setup / first-piece / FAI release</span></td><td>Xác nhận máy có thể chạy lô theo CTQ đã phê duyệt</td><td>Job packet đủ, machine ready, gage ready, first-piece plan rõ</td><td>Production + QA</td><td>Setup & first-piece record, FAI/first-piece evidence</td><td>Thiếu gage, thiếu sign-off, sai offset / sai fixture / sai datum</td></tr>
+<tr><td><span class="badge-blue">G3 — Production execution / IPQC control</span></td><td>Giữ ổn định trong chạy lô, phản ứng nhanh khi drift</td><td>G2 đã nhả, dispatch list hợp lệ, WIP rule rõ</td><td>Production Supervisor / QA</td><td>Dispatch list, traveler, IPQC/SPC/AQL record khi áp dụng</td><td>WIP không trace được, missed check, drift nhưng không phản ứng</td></tr>
+<tr><td><span class="badge-blue">G4 — Final inspection / shipment packet ready</span></td><td>Khóa kết quả cuối, CoC/cert/pack requirement</td><td>Lot hoàn tất, rework đóng, cert thu đủ</td><td>QA + WHS</td><td>Final inspection report, final inspection register, shipment checklist draft</td><td>Thiếu cert, trace broken, pack level không đúng</td></tr>
+<tr><td><span class="badge-blue">G5 — Ship release / closeout</span></td><td>Cho phép giao hàng và khóa evidence để closeout / billing</td><td>Shipment packet PASS, pack reconciliation PASS, authority đúng</td><td>WHS + QA + Finance khi closeout</td><td>Shipping checklist, ship label, pack reconciliation, CoC, proof of pickup</td><td>SSCC / label / phiếu kê đóng gói (packing list) / CoC không khớp hoặc shipment chưa RELEASED</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>3. Bundle MRR bắt buộc theo từng gate</h2>
+<div class="table-card"><table><thead><tr><th>Gate</th><th>Bộ hồ sơ tối thiểu phải truy xuất được trong 60 giây</th><th>Nơi phải tìm thấy</th><th>Ai chịu trách nhiệm completeness</th></tr></thead><tbody>
+<tr><td>G0</td><td>RFQ register, rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review))))))))), customer requirements / CSR, bản vẽ đang báo giá, assumption log</td><td>ERP + Job Dossier</td><td>Sales / Estimator</td></tr>
+<tr><td>G1</td><td>Baseline drawing/rev, route, setup sheet, program ID, tool list, control plan / inspection requirement, planning release</td><td>ERP + Engineering folder + Job Dossier</td><td>Engineering + Planning</td></tr>
+<tr><td>G2</td><td>Setup and first-piece record, balloon/FAI pack khi áp dụng, gage availability, machine ready sign-off, abnormal risk notes</td><td>Traveler + Job Dossier + machine-side packet</td><td>Production Supervisor + QA</td></tr>
+<tr><td>G3</td><td>Dispatch list, traveler, WIP card, IPQC/SPC/AQL record, downtime / abnormal restart log, outsource transfer log khi áp dụng</td><td>Machine packet + ERP + SSOT</td><td>Production / Planning / QA</td></tr>
+<tr><td>G4</td><td>kiểm tra cuối (final inspection) report, cert bundle, material / outsource cert, deviation / NCR disposition nếu có, packaging level</td><td>QA packet + Shipping Packet draft</td><td>QA</td></tr>
+<tr><td>G5</td><td>Shipping checklist, shipping label / SSCC, pack reconciliation, CoC, proof of pickup, invoice request trigger</td><td>Shipping Packet + ERP shipment</td><td>WHS + QA</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>4. Trường dữ liệu handoff bắt buộc giữa các vai</h2>
+<div class="table-card"><table><thead><tr><th>Nhóm trường</th><th>Giao từ</th><th>Nhận bởi</th><th>Phải có</th><th>Không được để trống</th></tr></thead><tbody>
+<tr><td>Job master</td><td>Sales / Planning</td><td>Engineering / Production / QA / WHS</td><td>Customer, Job, Part, Rev, Qty, due date, ship-to, priority class</td><td>Job, Part, Rev, Qty, due date</td></tr>
+<tr><td>Engineering release</td><td>Engineering</td><td>Planning / Production / QA</td><td>Program ID, setup sheet ID, fixture/tool requirement, CTQ list, datum logic, special notes</td><td>Program ID, setup sheet ID, CTQ / control reference</td></tr>
+<tr><td>Quality gate</td><td>QA</td><td>Production / WHS</td><td>First-piece result, FAI requirement, inspection frequency, hold/release result, cert requirement</td><td>Gate status, hold reason, release owner</td></tr>
+<tr><td>Dispatch / WIP</td><td>Planning</td><td>Production</td><td>Machine assignment, sequence, lot split rule, hot-job flag, freeze window, outsource legs</td><td>Machine / work center, sequence, lot split rule</td></tr>
+<tr><td>Shipment</td><td>QA / WHS</td><td>WHS / Finance</td><td>QPL / packaging class, label requirement, SSCC need, CoC bundle, invoice trigger</td><td>Packaging class, shipment status, shipping packet completeness</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>5. Dấu hiệu lệch revision-set và hành động bắt buộc</h2>
+<div class="table-card"><table><thead><tr><th>Dấu hiệu lệch</th><th>Ví dụ thực tế</th><th>Hành động bắt buộc</th><th>Ai phải biết ngay</th></tr></thead><tbody>
+<tr><td>Drawing Rev ≠ Setup sheet Rev</td><td>Bản vẽ Rev C nhưng setup sheet còn Rev B</td><td>HOLD G1/G2. Dừng setup. Thu hồi packet tại máy. Rebaseline lại trước khi chạy.</td><td>Engineering, Planning, Production, QA</td></tr>
+<tr><td>Program ID ≠ Program release list</td><td>Máy đang gọi chương trình cũ hoặc chương trình không nằm trong baseline</td><td>HOLD G2/G3. Không chạy first cut. Ghi abnormal restart / wrong program event.</td><td>Production Supervisor, Engineering, QA</td></tr>
+<tr><td>Traveler / barcode / WIP card không khớp lot</td><td>Lot trên khay khác với lot trong traveler</td><td>HOLD G3/G4. Cách ly lô, kiểm 100% trace, không trộn lại bằng tay.</td><td>Production, QA, WHS</td></tr>
+<tr><td>Shipment label / SSCC ≠ pack record</td><td>Outer carton dán nhầm SSCC hoặc Pack ID</td><td>HOLD G5. Không xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))))))). Repack / relabel theo quyền hạn cho phép.</td><td>WHS, QA</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>6. Retrieval drill 60 giây</h2>
+<div class="callout-info"><strong>Mục tiêu:</strong> tại mỗi gate, người phụ trách phải mở đúng bằng chứng trong 60 giây. Không tìm thấy trong 60 giây xem như chưa kiểm soát đủ.</div>
+<div class="table-card"><table><thead><tr><th>Gate</th><th>Phải truy xuất trong 60 giây</th><th>Đạt khi</th></tr></thead><tbody>
+<tr><td>G1</td><td>Setup sheet đúng Rev, Program ID, Planning release checklist</td><td>Mở đúng file / đúng bản đang hiệu lực / đúng Job</td></tr>
+<tr><td>G2</td><td>Setup and first-piece record, inspection points, gage status</td><td>Thấy rõ người ký, giờ ký và kết quả PASS/HOLD</td></tr>
+<tr><td>G3</td><td>Dispatch list, current WIP status, abnormal log mở gần nhất</td><td>Xác nhận được lô đang ở đâu, ai giữ và đang chờ gì</td></tr>
+<tr><td>G4</td><td>Final inspection report, cert bundle, open NCR affecting shipment</td><td>Không còn tài liệu thiếu hoặc liên kết lỗi</td></tr>
+<tr><td>G5</td><td>Shipping checklist, label/SSCC, pack reconciliation, CoC</td><td>Đủ 4 mục và cùng một Pack ID / Shipment</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>7. Customer overlay và package đặc biệt</h2>
+<div class="table-card"><table><thead><tr><th>Overlay</th><th>Khi áp dụng</th><th>Phải cộng thêm vào MRR</th></tr></thead><tbody>
+<tr><td>Prototype / hot-job</td><td>thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time))))))))) cực ngắn, sample, urgent recovery</td><td>Risk note, deviation approval, expedited dispatch record</td></tr>
+<tr><td>Semiconductor / vacuum / cleanliness</td><td>Part có clean build, leak test, particle / moisture / vacuum requirement</td><td>Clean pack evidence, cleanliness verification, leak test record, preservation class</td></tr>
+<tr><td>Outsource-heavy</td><td>Có nhiều công đoạn thuê ngoài / special process</td><td>Dispatch checklist, processor cert, incoming verification, lot trace continuity</td></tr>
+<tr><td>Customer-mandated cert pack</td><td>Khách yêu cầu material cert, CoC format riêng, serial-level trace</td><td>Customer-format cert, serial map, customer label / pack photo theo spec</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>8. Exception path: work transfer, rebaseline, split lot, partial ship</h2>
+<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Có được đi tiếp không</th><th>Điều kiện bắt buộc trước khi mở lại</th></tr></thead><tbody>
+<tr><td>Work transfer sang máy / ca / người khác</td><td>Chỉ được đi tiếp sau G2 mini-check hoặc theo <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Handoff log, current offset/tool state, part sample retained, first 1–3 pcs verify lại</td></tr>
+<tr><td>Rebaseline do đổi rev / ECO</td><td>Không được dùng dữ liệu G2/G3 cũ nguyên xi</td><td>Thu hồi revision set cũ, baseline mới, đánh dấu cut-over time, re-sign engineering + QA</td></tr>
+<tr><td>Split lot / partial ship</td><td>Được nếu trace và label tách hoàn toàn</td><td>Mỗi lot con có pack reconciliation riêng, label riêng, qty balance rõ</td></tr>
+<tr><td>Repack / relabel sau G5</td><td>Được trong giới hạn thẩm quyền</td><td>Giữ chain of custody, ảnh trước/sau, reprint / relabel log, QA/WHS approval</td></tr>
+<tr><td>MRB use-as-is / deviation</td><td>Chỉ được nếu deviation nằm trong packet shipment</td><td>Decision record, applicability, lot/serial list và khách hàng chấp nhận khi cần</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>9. KPI phải theo dõi và câu hỏi audit nhanh</h2>
+<div class="two-col">
+<div class="card"><h3>KPI</h3><ul class="tight">
+<li>% gate đóng đúng hạn theo plan.</li>
+<li>% retrieval drill PASS trong 60 giây.</li>
+<li>% packet thiếu MRR tại G4/G5.</li>
+<li>Số sự cố mismatch revision / packet / shipment theo tháng.</li>
+</ul></div>
+<div class="card"><h3>Audit nhanh</h3><ul class="tight">
+<li>Gate hiện tại là gì? Ai có quyền nhả gate?</li>
+<li>MRR tối thiểu của gate này nằm ở đâu?</li>
+<li>Nếu drawing rev và setup rev khác nhau thì ai phải biết trước tiên?</li>
+<li>Trong 60 giây có mở ra được đúng evidence không?</li>
+</ul></div>
+</div></div>
+
+<div class="section"><h2>10. Tài liệu liên kết</h2>
+<div class="table-card"><table><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a></td><td>Thực hiện gate, hold, release tại hiện trường.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Kiểm completeness hồ sơ theo gate.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Điều độ, WIP và cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))).</td></tr>
+<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Work transfer validation.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Pre-run verification tại máy.</td></tr>
+<tr><td><a href="annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a></td><td>Metadata và structure của dossier.</td></tr>
+<tr><td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation và SLA.</td></tr>
+<tr><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/01-ANNEX-100/annex-120-authority-matrix.html">ANNEX-120</a></td><td>Authority matrix.</td></tr>
+<tr><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/01-ANNEX-100/annex-121-raci-master-matrix.html">ANNEX-121</a></td><td>RACI master matrix.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-501_Planning_Release_Checklist.xlsx">FRM-501</a></td><td>Planning release checklist.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a></td><td>Setup and first-piece record.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a></td><td>Final inspection report.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx">FRM-702</a></td><td>Shipping checklist.</td></tr>
+</tbody></table></div></div>
+
+    </div>
+  </div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

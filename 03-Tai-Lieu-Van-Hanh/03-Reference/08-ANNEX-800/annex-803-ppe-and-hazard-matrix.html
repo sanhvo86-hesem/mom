@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ANNEX-803 — Ma trận mối nguy, PPE và trigger permit theo công việc/khu vực | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+@media print {
+ .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
+.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body"><div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu vận hành • Annex</span>
+</div>
+</div>
+<div class="title"><strong>ANNEX-803 — Ma trận mối nguy, PPE và trigger permit theo công việc/khu vực</strong></div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>ANNEX-803</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>HSE Manager / Production Manager</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+</div>
+</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Áp dụng cho mọi khu vực và công việc có mối nguy cơ khí, hóa chất, nâng hạ, điện/khí nén hoặc năng lượng nguy hiểm trong nhà máy CNC. Bất kỳ thay đổi nào làm tăng mối nguy hoặc thay đổi cách làm việc PHẢI đối chiếu lại ma trận này trước khi cho người vào việc.</div>
+<h1>ANNEX-803 — Ma trận mối nguy, PPE và trigger permit theo công việc/khu vực</h1>
+<div class="callout-danger"><b>Nguyên tắc nền:</b> PPE là lớp bảo vệ cuối cùng. Không được dùng PPE để hợp thức hóa việc làm sai phương pháp, tháo guard/interlock, bỏ qua LOTO, đứng trong vùng cẩu, thổi chip vào người, hoặc thao tác khi hiện trường chưa an toàn.</div>
+<h2>1. Mục đích và cách dùng tại hiện trường</h2>
+<p>Tài liệu này quy định mối nguy chính, PPE tối thiểu, trigger nâng cấp PPE và trigger permit/stop-work theo từng loại công việc. Supervisor, HSE, Maintenance và người trực tiếp làm việc PHẢI dùng tài liệu này trước khi vào công việc mới, khi đổi máy/công đoạn, khi đổi hóa chất/vật tư, khi đổi trạng thái vận hành, hoặc khi chuyển từ chế độ sản xuất thường sang setup, prove-out, sửa chữa, làm sạch hoặc xử lý bất thường.</p>
+<p>Ma trận này không thay thế JSA/permit cho công việc đặc biệt. Nếu rủi ro phát sinh vượt ngoài ma trận hoặc có thay đổi điều kiện hiện trường, công việc PHẢI dừng để đánh giá lại trước khi làm tiếp.</p>
+<h2>2. Từ điển mối nguy và từ điển PPE</h2>
+<div class="two-col">
+<div class="card">
+<h3>2.1 Mã mối nguy</h3>
+<div class="table-card"><table>
+<thead><tr><th>Mã</th><th>Mối nguy</th><th>Ví dụ điển hình</th></tr></thead>
+<tbody>
+<tr><td>HZ-01</td><td>Rotating / point of operation</td><td>Spindle, chuck, tool, pallet, axis di chuyển, tool changer.</td></tr>
+<tr><td>HZ-02</td><td>Flying chips / spark / sharp edge</td><td>Chip nóng, burr sắc, đá mài, part sắc cạnh.</td></tr>
+<tr><td>HZ-03</td><td>Coolant / chemical exposure</td><td>Trộn coolant, vệ sinh bể, hóa chất làm sạch, dung môi.</td></tr>
+<tr><td>HZ-04</td><td>Noise / vibration</td><td>Máy gia công, deburr, khí nén, thiết bị rung.</td></tr>
+<tr><td>HZ-05</td><td>Lift / crush / pinch</td><td>Xe nâng, cẩu, pa-lăng, pallet, kẹp phôi, door pinch.</td></tr>
+<tr><td>HZ-06</td><td>Compressed air / stored energy</td><td>Khí nén, áp suất tồn dư, spring force, hydraulic/pneumatic circuits.</td></tr>
+<tr><td>HZ-07</td><td>Electrical / hazardous energy</td><td>Tủ điện, servo, nguồn cấp, can thiệp khi chưa cô lập năng lượng.</td></tr>
+<tr><td>HZ-08</td><td>Slip / trip / housekeeping</td><td>Sàn dầu, dây điện/ống khí, pallet lấn lối đi, chip rơi vãi.</td></tr>
+<tr><td>HZ-09</td><td>Contamination / clean build</td><td>Open package, cleanroom, vacuum-sensitive part, packaging sạch.</td></tr>
+<tr><td>HZ-10</td><td>Contractor / special permit</td><td>Hot work, làm trên cao, confined space, chemical purge.</td></tr>
+</tbody></table></div>
+</div>
+<div class="card">
+<h3>2.2 Mã PPE</h3>
+<div class="table-card"><table>
+<thead><tr><th>Mã</th><th>PPE</th><th>Ghi chú bắt buộc</th></tr></thead>
+<tbody>
+<tr><td>PPE-01</td><td>Kính bảo hộ</td><td>Bắt buộc trong khu vực sản xuất/kho, không dùng kính râm thay thế.</td></tr>
+<tr><td>PPE-02</td><td>Face shield</td><td>Dùng khi nguy cơ bắn chip/splash cao; không thay kính bảo hộ nền.</td></tr>
+<tr><td>PPE-03</td><td>Giày bảo hộ</td><td>Bắt buộc khi vào xưởng/kho; PHẢI dùng giày bảo hộ, không dùng dép/giày vải mềm.</td></tr>
+<tr><td>PPE-04</td><td>Bịt tai / nút tai</td><td>Dùng tại điểm có tiếng ồn vượt ngưỡng hoặc theo cảnh báo khu vực.</td></tr>
+<tr><td>PPE-05</td><td>Găng chống cắt</td><td>Dùng khi xử lý part sắc, chip, vật sắc; PHẢI tháo khỏi vùng có chi tiết quay.</td></tr>
+<tr><td>PPE-06</td><td>Găng chống hóa chất</td><td>Chọn theo SDS/hóa chất; không dùng găng chống cắt thay cho hóa chất.</td></tr>
+<tr><td>PPE-07</td><td>Tạp dề / tay áo / che giọt bắn</td><td>Dùng khi có splash coolant/hóa chất hoặc vệ sinh bể.</td></tr>
+<tr><td>PPE-08</td><td>Respirator / khẩu trang chuyên dụng</td><td>Chỉ dùng khi hazard assessment yêu cầu và người dùng được huấn luyện phù hợp.</td></tr>
+<tr><td>PPE-09</td><td>Áo phản quang / mũ bảo hộ</td><td>Dùng ở vùng nâng hạ, xe nâng, cẩu ngoài trời hoặc contractor work.</td></tr>
+<tr><td>PPE-10</td><td>PPE sạch / cleanroom</td><td>Găng sạch, áo choàng, mũ, khẩu trang sạch theo WI-711/WI-714.</td></tr>
+</tbody></table></div>
+</div>
+</div>
+<h2>3. Ma trận PPE và trigger permit theo công việc</h2>
+<div class="table-card"><table>
+<thead><tr><th>Công việc / khu vực</th><th>Mối nguy chính</th><th>PPE tối thiểu</th><th>PPE/kiểm soát bổ sung khi rủi ro tăng</th><th>Trigger permit / authority</th><th>Trigger dừng việc / HOLD</th></tr></thead>
+<tbody>
+<tr><td>Vận hành CNC bình thường</td><td>HZ-01, HZ-02, HZ-04, HZ-08</td><td>PPE-01, PPE-03; quần áo gọn; không đeo trang sức/vật treo</td><td>PPE-04 nếu tại khu vực noise cao; shield kín máy/guard hoạt động</td><td>Nếu phải mở cửa để can thiệp khi máy chưa ở trạng thái an toàn, chuyển sang setup/bất thường</td><td>Guard/interlock không hoạt động; chip phun ra ngoài; sàn trơn dầu; cửa/lối đi bị chắn</td></tr>
+<tr><td>Setup/changeover/prove-out</td><td>HZ-01, HZ-02, HZ-05, HZ-06</td><td>PPE-01, PPE-03; PPE-05 khi xử lý dao/đồ gá sắc; không dùng găng gần tool quay</td><td>PPE-02 khi prove-out splash/chip cao; dụng cụ nâng hợp tải; check guard/probe/offset</td><td>Can thiệp sâu vào vùng máy, tháo guard, nâng đồ gá nặng, restore sau crash, hoặc cần kiểm soát năng lượng -&gt; Maintenance/HSE/Production authority</td><td>Sai program/Rev, fixture chưa khóa, offset không rõ, đồ gá vượt tải tay người, cần cấp điện test ngoài vùng an toàn</td></tr>
+<tr><td>Deburr, grinding, polishing, edge-break</td><td>HZ-02, HZ-04, HZ-08</td><td>PPE-01, PPE-03, PPE-05</td><td>PPE-02, PPE-04, PPE-08 theo bụi/khói; local extraction</td><td>Nếu dùng đá/công cụ không chuẩn, thay vật tư, hoặc mài part có yêu cầu vacuum-sensitive -&gt; QA/Engineering review</td><td>Đá/dao mòn nứt, dust build-up, thiếu extraction, part lẫn với clean/vacuum-sensitive pack</td></tr>
+<tr><td>Trộn coolant, vệ sinh bể, thay lọc, xử lý tràn</td><td>HZ-03, HZ-08</td><td>PPE-01, PPE-03, PPE-06, PPE-07</td><td>PPE-08 nếu hazard assessment/SDS yêu cầu; barrier cone, spill kit, absorbent</td><td>Thay đổi hóa chất, tỷ lệ pha, chất tẩy mới, làm việc tại khu thông gió kém -&gt; HSE review</td><td>Không có SDS, không rõ hóa chất, tràn ra lối đi, tiếp xúc da/mắt, thùng chứa sai nhãn</td></tr>
+<tr><td>Ultrasonic cleaning / chemical cleaning</td><td>HZ-03, HZ-09</td><td>PPE-01, PPE-03, PPE-06, PPE-07</td><td>PPE-10 khi part yêu cầu sạch; kiểm soát basket load, rinse/dry, contamination carryover</td><td>Thay dung dịch, thay thông số, part vacuum-sensitive, mở pack sạch trước cleaning -&gt; QA/HSE authority</td><td>Tank chemistry ngoài giới hạn, rinse/dry không đạt, basket quá tải, part chạm trực tiếp đáy/bề mặt bẩn</td></tr>
+<tr><td>Receiving / warehouse / put-away / picking</td><td>HZ-05, HZ-07, HZ-08</td><td>PPE-01, PPE-03</td><td>PPE-05 khi xử lý kiện sắc; PPE-09 tại lane xe nâng/cẩu</td><td>Lift đặc biệt, chuyển hàng dài/nặng/quá khổ, xử lý kiện rách có nguy cơ sắc hoặc hóa chất rò -&gt; WHS/HSE authority</td><td>Kiện rách, pallet gãy, lane xe nâng bị cản, mixed lot/mixed label, location blocked</td></tr>
+<tr><td>Nâng hạ bằng pa-lăng/cẩu/xe nâng</td><td>HZ-05</td><td>PPE-01, PPE-03, PPE-09</td><td>Tag line, exclusion zone, spotter; dụng cụ nâng có tải định mức và kiểm định hợp lệ</td><td>Mọi lift không thường quy, tải lệch tâm, tải quá khổ, lift trên khu đang có người qua lại -&gt; permit/authority theo HSE</td><td>Không rõ tải, sling/shackle không đạt, không có spotter, người đứng dưới tải, tuyến di chuyển không clear</td></tr>
+<tr><td>Bảo trì điện / khí nén / thủy lực / stored energy</td><td>HZ-06, HZ-07</td><td>PPE theo công việc và hazard assessment; tối thiểu PPE-01, PPE-03</td><td>LOTO, test-before-touch, công cụ cách điện phù hợp, barrier</td><td>Can thiệp vào nguồn điện/khí nén/áp suất tích trữ bắt buộc theo permit/LOTO và người được phép</td><td>Chưa cô lập năng lượng, không xả áp, thiếu permit, interlock bị bypass không kiểm soát</td></tr>
+<tr><td>Cleanroom / clean-pack / vacuum bagging</td><td>HZ-09</td><td>PPE-10 theo WI-711/WI-714</td><td>Double-bag, N₂ purge, desiccant/HIC, line clearance, contamination recovery kit</td><td>Mở pack sạch, reseal, rebag, contamination recovery, vacuum-sensitive build -&gt; QA release path</td><td>Gowning sai, vật tư sạch không đạt, open bag quá thời gian, phát hiện particle/oil/fiber lạ</td></tr>
+<tr><td>Thổi khí nén / làm sạch khu vực</td><td>HZ-02, HZ-06, HZ-09</td><td>PPE-01, PPE-03</td><td>Dùng nozzle an toàn, barrier nếu được phép; ưu tiên hút chip thay vì thổi</td><td>PHẢI loại trừ hành vi thổi vào khu có part sạch/open pack, thổi lên người/quần áo và thổi vào ổ trượt/cụm điện</td><td>Người dùng khí nén để thổi quần áo/da người, thổi vào part sạch, thổi làm chip bay qua line khác</td></tr>
+<tr><td>Nhà thầu / hot work / làm trên cao / confined space</td><td>HZ-10 cùng các hazard liên quan</td><td>Theo permit và hazard assessment; PPE nền không được thấp hơn ma trận</td><td>Barrier khu vực, fire watch, fall protection, gas check, rescue plan tùy loại việc</td><td>Bắt buộc permit trước khi vào việc</td><td>Thiếu permit, thiếu briefing, chưa khóa vùng, thiết bị không đạt, contractor không được huấn luyện</td></tr>
+</tbody></table></div>
+<h2>4. Trigger nâng cấp PPE, trigger permit và các điều phải tránh</h2>
+<div class="callout-warn"><b>PHẢI nâng cấp PPE hoặc chuyển sang permit/authority review</b> khi có một trong các dấu hiệu sau: mở guard hoặc vào vùng point-of-operation; prove-out có nguy cơ splash/chip bất thường; thay hóa chất hoặc không còn SDS hợp lệ; nâng hạ ngoài thao tác thường quy; công việc tạo bụi/khói hoặc noise cao hơn bình thường; xử lý spill/sự cố; mở pack sạch hoặc làm việc với part vacuum-sensitive.</div>
+<ul class="tight">
+<li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Giữ tay trần khỏi chi tiết quay, chuck quay, tool quay và mọi spindle còn khả năng chuyển động.</li>
+<li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Dùng khí nén đúng vùng cho phép và giữ tuyệt đối tránh người, quần áo, mặt, part sạch, open package, tủ điện và vùng có chip dễ bắn sang người khác.</li>
+<li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Giữ nguyên guard và interlock, giữ nhãn cảnh báo và signage luôn nhìn thấy rõ, và dừng máy ngay khi guard lỗi.</li>
+<li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì đúng mức PPE theo hazard assessment, không hạ chuẩn vì thói quen cá nhân hoặc vì làm nhanh.</li>
+</ul>
+<h2>5. Housekeeping, exposure control và kiểm tra PPE</h2>
+<div class="matrix">
+<div class="card"><h3>5.1 Housekeeping</h3><p>Lối đi, vùng xe nâng, khu clean-pack, cửa tủ điện và lối thoát hiểm PHẢI luôn thông thoáng. Chip, dầu, coolant tràn, pallet rỗng, dây khí/dây điện vắt ngang lối đi PHẢI được xử lý ngay trong ca, không để sang cuối ca.</p></div>
+<div class="card"><h3>5.2 Exposure control</h3><p>Khi có splash hóa chất/coolant vào mắt/da, tiếp xúc khói/bụi mạnh, hoặc part sạch bị lộ nhiễm bẩn, công việc PHẢI dừng, người bị ảnh hưởng PHẢI được xử lý theo phương án an toàn, và hiện trường PHẢI được giữ lại đủ để điều tra nguyên nhân.</p></div>
+<div class="card"><h3>5.3 Kiểm tra PPE đầu ca</h3><p>PPE rách, nứt, trầy che khuất tầm nhìn, mất đàn hồi, nhiễm dầu/hóa chất hoặc không còn phù hợp loại việc phải loại khỏi sử dụng ngay. Không dùng PPE hỏng với lý do “còn dùng tạm được”.</p></div>
+<div class="card"><h3>5.4 Huấn luyện và cấp phát</h3><p>Người chưa được huấn luyện hazard/PPE cho loại việc tương ứng không được tự vào việc. HSE và quản lý trực tiếp PHẢI giữ danh mục PPE cấp phát, hướng dẫn dùng, bảo quản và thay thế.</p></div>
+</div>
+<h2>6. Chỉ số theo dõi và hồ sơ liên quan</h2>
+<div class="kpi-grid">
+<div class="kpi-box"><b>KPI-01</b><br/>Tỷ lệ tuân thủ PPE tại audit tuyến/ngày.</div>
+<div class="kpi-box"><b>KPI-02</b><br/>Số near-miss liên quan chip/coolant/lifting/compressed air.</div>
+<div class="kpi-box"><b>KPI-03</b><br/>Tỷ lệ đóng corrective action sau PPE violation đúng hạn.</div>
+<div class="kpi-box"><b>KPI-04</b><br/>Số lần stop-work đúng và kịp thời trước khi thành sự cố.</div>
+</div>
+<p><b>Hồ sơ bắt buộc liên quan:</b> permit/HSE record, incident/near-miss report, PPE issue log, area inspection record, spill response record và các form tại nhóm FRM-800. Tài liệu liên kết chặt: <a href="../../02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a>, <a href="../../02-Work-Instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a>, <a href="../../02-Work-Instructions/07-WI-700/wi-721-fod-prevention-line-clearance-and-tool-accountability.html">WI-721</a>, <a href="../../01-SOPs/08-SOP-800/sop-802-incident-near-miss-and-ehs.html">SOP-802</a>.</p>
+</div>
+</div>
+</div>
+</body>
+</html>

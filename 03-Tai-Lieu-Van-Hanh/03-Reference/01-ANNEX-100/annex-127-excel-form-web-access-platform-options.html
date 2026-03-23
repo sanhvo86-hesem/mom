@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ANNEX-127 — Excel Form Web Access Decision Record | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
+<style>
+@media print{.card,.table-card,.note,.box{page-break-inside:avoid;break-inside:avoid}h1,h2,h3{page-break-after:avoid;break-after:avoid}}
+.muted2{color:#64748b;font-size:13px}
+.cardx{padding:14px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+.kpi .cardx b{font-size:18px}
+.smalltable td,.smalltable th{font-size:13px}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
+</div>
+<div class="title"><strong>ANNEX-127 — Excel Form Web Access Decision Record</strong><span class="sub-vn">Quyết định production baseline: không mở form Excel trên web</span></div>
+<div class="meta"><div class="row"><span><b>Owner:</b></span><span>QA/QMS / IT</span></div><div class="row"><span><b>Decision:</b></span><span>Download-only</span></div><div class="row"><span><b>Production baseline:</b></span><span>No web-open</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div></div>
+</div>
+<div class="doc-content" id="docContent">
+
+<div class="note-blue"><b>Decision record:</b> HESEM chốt production baseline của thư viện FRM workbook là <b>download-only</b>. Form Excel không mở trực tiếp trên web trong danh mục hiện hành.</div>
+<div class="table-card"><table class="table"><thead><tr><th>Chủ đề</th><th>Quyết định</th><th>Ý nghĩa áp dụng</th></tr></thead><tbody>
+<tr><td>Browser-open</td><td>Không áp dụng trong danh mục hiện hành.</td><td>Portal click luôn tải file .xlsx, không render hay mở web office.</td></tr>
+<tr><td>Desktop execution</td><td>Bắt buộc dùng desktop Excel theo chính sách endpoint hiện hành.</td><td>Đảm bảo data validation, hidden logic, in ấn và workflow sử dụng đồng nhất.</td></tr>
+<tr><td>Hồ sơ nghiên cứu cũ</td><td>Không đưa vào controlled package hiện hành.</td><td>Tránh lẫn giữa đánh giá thử nghiệm và cấu hình production.</td></tr>
+<tr><td>Review trong tương lai</td><td>Chỉ đánh giá lại khi HESEM có change package riêng cho delivery model.</td><td>Ngăn việc thay đổi phương thức sử dụng workbook một cách tự phát.</td></tr>
+</tbody></table></div>
+
+</div>
+</div></div></div>
+</body>
+</html>

@@ -98,7 +98,7 @@
     "browser_open_adoption_status": "NOT_ADOPTED",
     "notes": [
       "Mã không phát hành trong baseline V0.",
-      "Dùng ANNEX-QMS-031 để xem phạm vi mã và biểu mẫu active bao phủ."
+      "Dùng ANNEX-126 để xem phạm vi mã và biểu mẫu active bao phủ."
     ]
   },
   "FRM-104": {
@@ -237,7 +237,7 @@
     "browser_open_adoption_status": "NOT_ADOPTED",
     "notes": [
       "Mã không phát hành trong baseline V0.",
-      "Dùng ANNEX-QMS-031 để xem phạm vi mã và biểu mẫu active bao phủ."
+      "Dùng ANNEX-126 để xem phạm vi mã và biểu mẫu active bao phủ."
     ]
   },
   "FRM-109": {
@@ -266,7 +266,7 @@
     "browser_open_adoption_status": "NOT_ADOPTED",
     "notes": [
       "Mã không phát hành trong baseline V0.",
-      "Dùng ANNEX-QMS-031 để xem phạm vi mã và biểu mẫu active bao phủ."
+      "Dùng ANNEX-126 để xem phạm vi mã và biểu mẫu active bao phủ."
     ]
   },
   "FRM-110": {
@@ -1910,12 +1910,12 @@
     "rev": null,
     "effective_date": "2026-03-21",
     "coverage_codes": [
-      "ANNEX-PUR-003",
+      "ANNEX-403",
       "FRM-405",
       "FRM-409",
       "FRM-411"
     ],
-    "rationale": "Supplier evidence retrieval is now controlled by ANNEX-PUR-003 dossier structure plus active supplier records FRM-405 / FRM-409 / FRM-411; no standalone workbook was issued for FRM-407.",
+    "rationale": "Supplier evidence retrieval is now controlled by ANNEX-403 dossier structure plus active supplier records FRM-405 / FRM-409 / FRM-411; no standalone workbook was issued for FRM-407.",
     "active_delivery_profile": "download_only_desktop_excel",
     "browser_open_enabled": false,
     "release_workflow_id": "QMS-FRM-EXCEL-V0-BASELINE",
@@ -1925,7 +1925,7 @@
     "browser_open_adoption_status": "NOT_ADOPTED",
     "notes": [
       "Mã không phát hành trong baseline V0.",
-      "Dùng ANNEX-QMS-031 để xem phạm vi mã và biểu mẫu active bao phủ."
+      "Dùng ANNEX-126 để xem phạm vi mã và biểu mẫu active bao phủ."
     ]
   },
   "FRM-408": {
@@ -2064,7 +2064,7 @@
     "browser_open_adoption_status": "NOT_ADOPTED",
     "notes": [
       "Mã không phát hành trong baseline V0.",
-      "Dùng ANNEX-QMS-031 để xem phạm vi mã và biểu mẫu active bao phủ."
+      "Dùng ANNEX-126 để xem phạm vi mã và biểu mẫu active bao phủ."
     ]
   },
   "FRM-413": {

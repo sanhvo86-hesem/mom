@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ANNEX-124 — Dashboard Evidence Pack Worked Examples | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);} 
+.metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;} 
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700} 
+.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;} 
+.link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);} 
+.link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;} 
+.link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);} 
+.link-list{list-style:none;margin:0;padding:0} 
+.link-list li{padding:4px 0 4px 0;font-size:12px} 
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px} 
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px} 
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px} 
+.tight{margin:0;padding-left:18px} 
+.tight li{margin:4px 0} 
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;} 
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;} 
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;} 
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);} 
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;} 
+.hero h1{font-size:24px;margin:0 0 8px;color:var(--navy);} 
+.hero p{margin:0;color:var(--ink2);} 
+.note{border-left:4px solid #1f4e79;background:#f7fbff;padding:12px 14px;margin:14px 0;border-radius:10px;} 
+.note-warning{border-left:4px solid #b45309;background:#fff7ed;padding:12px 14px;margin:14px 0;border-radius:10px;} 
+.note-danger{border-left:4px solid #b91c1c;background:#fff1f2;padding:12px 14px;margin:14px 0;border-radius:10px;} 
+.notice-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0;} 
+.notice-item{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);} 
+.notice-item b{display:block;color:var(--navy);margin-bottom:6px;} 
+.table-card{border:1px solid var(--ln);border-radius:var(--r);overflow:hidden;background:#fff;margin:12px 0;} 
+.small{font-size:12px;color:var(--ink2);} 
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:12px 0;} 
+.callout-card{border:1px solid var(--ln);padding:14px;border-radius:12px;background:#fff;} 
+.callout-card h3{font-size:14px;margin:0 0 8px;color:var(--navy);} 
+.req-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0;} 
+.req{display:flex;gap:10px;border:1px solid var(--ln);border-radius:12px;padding:12px;background:#fff;} 
+.req-tag{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:24px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.4px} 
+.must{background:#ffe8e8;color:#8f1d1d} 
+.should{background:#eef6ff;color:#1f4e79} 
+.may{background:#eef8ef;color:#2f6b2f} 
+.footer-note{margin-top:18px;padding:12px 14px;border-radius:10px;background:#f6f7f9;color:var(--ink2);font-size:12px} 
+.field-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:12px 0} 
+.field{border:1px solid var(--ln);border-radius:12px;padding:12px;background:#fff} 
+.blank{display:block;min-height:46px;border:1px dashed #cbd5e1;border-radius:8px;background:#fcfdff;padding:8px;margin-top:8px} 
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:12px 0} 
+.check-item{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--ln);border-radius:10px;padding:10px;background:#fff;font-size:12px} 
+.chk{display:inline-block;width:14px;height:14px;border:1px solid #64748b;border-radius:3px;margin-top:2px} 
+.inline-tag{display:inline-flex;align-items:center;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px} 
+.kpi-card{border:1px solid var(--ln);padding:14px;border-radius:12px;background:#fff;} 
+.kpi-card h3{font-size:14px;margin:0 0 8px;color:var(--navy);} 
+.page-body h2{font-size:18px;line-height:1.4;margin:18px 0 10px;color:var(--navy);} 
+.page-body h3{font-size:14px;line-height:1.5;margin:12px 0 6px;color:var(--ink);} 
+.table-card table{width:100%;border-collapse:collapse;font-size:12px;} 
+.table-card th,.table-card td{border:1px solid var(--ln);padding:8px 10px;vertical-align:top;} 
+.table-card th{background:var(--th-bg);border-color:var(--th-bdr);text-align:left;} 
+.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+.decision-card{border:1px solid var(--ln);border-left:4px solid var(--navy);padding:14px;border-radius:12px;background:#fff}
+.decision-card h3{font-size:14px;margin:0 0 8px;color:var(--navy)}
+.status-pill{display:inline-flex;align-items:center;justify-content:center;min-width:62px;height:24px;border-radius:999px;border:1px solid var(--ln);font-size:10px;font-weight:800;letter-spacing:.35px;background:#fff}
+.level-pill{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:24px;border-radius:999px;background:#eef2ff;color:#243b6b;border:1px solid #c7d2fe;font-weight:800;font-size:11px;margin-right:6px}
+@media print {
+ .card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.vstep,.hero,.field,.req,.callout-card,.notice-item,.kpi-card,.decision-card {page-break-inside:avoid;break-inside:avoid}
+ h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}
+ .form-header,.sig-row,.sign-row{page-break-inside:avoid;break-inside:avoid}
+ tr{page-break-inside:avoid;break-inside:avoid}
+ thead{display:table-header-group}tfoot{display:table-footer-group}
+ p{orphans:3;widows:3}.table-card{overflow:visible!important}
+}
+.page-body{overflow-x:hidden}
+.table-card,.table-block,.table-wrap{overflow-x:auto;max-width:100%}
+table{max-width:100%;table-layout:auto}
+td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
+
+</style>
+</head>
+<body>
+<div class="container"><div class="page landscape"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Phụ lục tham chiếu • ANNEX-Digital</span>
+</div>
+</div>
+<div class="title">
+<strong>ANNEX-124 — Dashboard Evidence Pack Worked Examples</strong>
+<span class="sub-vn">Ví dụ mẫu cho freeze-date pack, exception-note pack, quarterly access-bộ hồ sơ rà soát (review pack) và management-bộ hồ sơ rà soát (review pack).</span>
+</div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>ANNEX-124</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / Dashboard owners / IT system owners</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc / QA Manager theo thẩm quyền</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent"><div class="form-sheet">
+<div class="hero"><h1>ANNEX-124 — worked examples cho dashboard evidence packs</h1><p>Phụ lục này không tạo thêm một lớp giấy tờ mới. Nó cung cấp <b>ví dụ mẫu dùng ngay</b> cho freeze-date pack, exception-note pack, quarterly access-bộ hồ sơ rà soát (review pack) và management-bộ hồ sơ rà soát (review pack), để đội vận hành hiểu cụ thể một pack “đủ dùng” phải trông như thế nào, chứa gì và khóa metadata ra sao.</p></div>
+<div class="note"><b>Đọc cùng</b><br/><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>, <a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a>, <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a>, <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> và <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118</a>.</div>
+<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#a1">1. Mục đích và boundary</a><a href="#a2">2. Worked example A — freeze-date pack</a><a href="#a3">3. Worked example B — exception-note pack</a><a href="#a4">4. Worked example C — quarterly access-review pack</a><a href="#a5">5. Worked example D — management-review pack</a><a href="#a5e">5E. Worked example E — competence / deputy note</a><a href="#a6">6. Naming, metadata và evidence rules</a><a href="#a7">7. Liên kết tài liệu và cách dùng</a></div></div>
+<h2 class="h2" id="a1">1. Mục đích và boundary</h2>
+<div class="notice-strip">
+<div class="notice-item"><b>Mục tiêu</b>Giúp owner KPI, QMS và IT/Digital thống nhất format pack, metadata, freeze-date, exception-note và evidence path.</div>
+<div class="notice-item"><b>Không thay thế hồ sơ gốc</b>Pack chỉ là lớp trình bày / tổng hợp. SoR/SSOT vẫn nằm ở hệ hoặc thư mục nguồn chuẩn.</div>
+<div class="notice-item"><b>Dùng theo mức rủi ro</b>Không phải mọi dashboard đều cần full pack. Pack phải tỷ lệ với mức độ quyết định và độ nhạy dữ liệu.</div>
+</div>
+<div class="table-card"><table class="table"><thead><tr><th>Loại pack</th><th>Khi nào phải có</th><th>Owner tối thiểu</th><th>Consumer chính</th></tr></thead><tbody>
+<tr><td>Freeze-date pack</td><td>KPI pack dùng cho tier review, MR hoặc quyết định chính thức</td><td>KPI owner + QMS</td><td>Lãnh đạo / process owners</td></tr>
+<tr><td>Exception-note pack</td><td>Có late posting, manual correction, offline event, missing source, restatement</td><td>Dashboard owner + data owner</td><td>Người dùng pack / QMS / audit</td></tr>
+<tr><td>Quarterly access-review pack</td><td>Rà định kỳ quyền user, privileged account, deputy, service account</td><td>IT admin + system owner + reviewer độc lập</td><td>IT / QMS / management</td></tr>
+<tr><td>Management-review pack</td><td>Họp xem xét của lãnh đạo (management review) theo SOP-902</td><td>QMS + KPI owners</td><td>Ban lãnh đạo</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="a2">2. Worked example A — freeze-date pack</h2>
+<div class="field-grid">
+<div class="field"><b>Suggested pack title</b><div class="blank">Site KPI Pack — Month 03/2026 — freeze 2026-03-17 17:00</div></div>
+<div class="field"><b>Metadata bắt buộc</b><div class="blank">Owner, source-of-record, freeze-date, refresh cadence, file version, audience, approval path.</div></div>
+</div>
+<div class="table-card"><table class="table"><thead><tr><th>Thành phần pack</th><th>Nội dung ví dụ</th><th>Ghi chú kiểm soát</th></tr></thead><tbody>
+<tr><td>Cover page</td><td>Pack title, period, freeze-date, owner, audience, confidentiality, version</td><td>Không có cover = khó chứng minh đã bộ hồ sơ rà soát (review pack) nào.</td></tr>
+<tr><td>Metric summary</td><td>OTD, FPY, NCR rate, overdue CAPA, training completion, supplier on-time</td><td>Chỉ dùng số đã freeze; không kéo live data sau thời điểm khóa.</td></tr>
+<tr><td>Ghi chú điều hành</td><td>3–5 bullet về biến động, cause nổi bật, risk và action</td><td>Ghi chú điều hành phải tách với raw data.</td></tr>
+<tr><td>Evidence index</td><td>Link đến extract, query, list, report, cert log, NCR log</td><td>Link phải trỏ tới SoR/SSOT, không trỏ bản copy không kiểm soát.</td></tr>
+<tr><td>Exception note (nếu có)</td><td>Gắn sang worked example B</td><td>Nếu có bất thường, freeze-date pack không được giả vờ “số sạch”.</td></tr>
+</tbody></table></div>
+<div class="note-warning"><b>Naming example</b><br/>`MR-KPI-PACK_Q1-2026_FREEZE_2026-03-17_1700_v01.pdf` hoặc cùng logic trong SharePoint / folder name. Quy tắc tên phải cho phép người đến sau đọc ra được kỳ nào, đã khóa lúc nào và bản nào đang được dùng.</div>
+<h2 class="h2" id="a3">3. Worked example B — exception-note pack</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Trường</th><th>Ví dụ</th><th>Mục đích</th></tr></thead><tbody>
+<tr><td>Event ID</td><td>OFL-2026-004</td><td>Khóa truy vết sang incident / offline log.</td></tr>
+<tr><td>Issue summary</td><td>Shipment postings 12-Mar chưa đồng bộ do outage ERP 09:10–11:45</td><td>Giải thích vì sao số liệu pack lệch so với live view.</td></tr>
+<tr><td>Affected KPI / dashboard</td><td>OTD dispatch, shipped revenue, overdue jobs</td><td>Chỉ rõ metric nào bị ảnh hưởng.</td></tr>
+<tr><td>Data impact</td><td>3 shipments posted late after freeze; revenue restated +1.8%</td><td>Cho người đọc biết mức độ ảnh hưởng.</td></tr>
+<tr><td>Temporary treatment</td><td>Freeze giữ nguyên; ghi chú điều hành nêu riêng; restatement ở pack kỳ sau</td><td>Không được sửa âm thầm.</td></tr>
+<tr><td>Owner / approver</td><td>Epicor admin / Finance manager / QA manager</td><td>Chỉ rõ ai chịu trách nhiệm giải trình.</td></tr>
+</tbody></table></div>
+<div class="field-grid">
+<div class="field"><b>Backfill / reconciliation path</b><div class="blank">Link tới raw extract, manual ledger, nhật ký sự cố (incident log), closure evidence.</div></div>
+<div class="field"><b>Communication note</b><div class="blank">Ai đã được thông báo, khi nào, pack nào bị ảnh hưởng, có cần reopen review không.</div></div>
+</div>
+<h2 class="h2" id="a4">4. Worked example C — quarterly access-review pack</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Pack section</th><th>Nội dung ví dụ</th><th>Dùng cùng</th></tr></thead><tbody>
+<tr><td>Population summary</td><td>Total active users, privileged accounts, leavers not revoked, service accounts, dormant accounts</td><td>FRM-111 section 1–2</td></tr>
+<tr><td>Reviewer worksheet</td><td>User, role, dept, access set, business need, deputy status, SoD concern, action</td><td>FRM-111 section 3–4</td></tr>
+<tr><td>Action register</td><td>Revoke, reduce privilege, validate service account, owner confirmation, overdue follow-up</td><td>FRM-111 section 5</td></tr>
+<tr><td>Evidence bundle</td><td>System export, approval records, FRM-141 request, exceptions, screenshots</td><td>FRM-111 / FRM-141</td></tr>
+</tbody></table></div>
+<div class="small">Deputy access không nên được “bật miệng”. Worked example giả định deputy activation đi qua FRM-141 hoặc override có phê duyệt và vẫn bị rà trong pack định kỳ.</div>
+<h2 class="h2" id="a5">5. Worked example D — management-review pack</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Section</th><th>Nội dung ví dụ</th><th>Output phải tạo ra</th></tr></thead><tbody>
+<tr><td>Context &amp; risk shifts</td><td>Top business/customer/supply/people risks, changes since prior review</td><td>Decision về ưu tiên và nguồn lực</td></tr>
+<tr><td>Performance pack</td><td>KPI freeze-date summary + ghi chú điều hành + exception notes</td><td>Decision giữ / đổi target, escalation, special review</td></tr>
+<tr><td>Effectiveness of actions</td><td>Status NCR/CAPA/audit actions, overdue items, repeat issues</td><td>Close / carry-over / re-open / leadership action</td></tr>
+<tr><td>Resource &amp; competence</td><td>Skill coverage, deputy gaps, hiring/training needs, system constraints</td><td>Resource plan / competency action</td></tr>
+<tr><td>Improvement agenda</td><td>Top improvement projects, kiểm soát dữ liệu và quyền truy cập, supplier actions, customer escalations</td><td>Project owner, due, review date</td></tr>
+</tbody></table></div>
+<div class="note">Worked example này nên chảy trực tiếp sang <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a>. Biên bản chỉ có giá trị khi người đến sau lần ngược được pack nào đã được dùng để ra từng quyết định.</div>
+<h2 class="h2" id="a5e">5E. Worked example E — competence / deputy note cho KPI pack</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:24%"/><col style="width:26%"/><col style="width:24%"/><col style="width:26%"/></colgroup><thead><tr><th>Scenario</th><th>Ghi chú điều hành chuẩn</th><th>Bằng chứng đính kèm</th><th>Decision ask lên xem xét của lãnh đạo (management review)</th></tr></thead><tbody><tr><td>OTD giảm vì chỉ một người đủ điều kiện chạy setup / first-piece</td><td>Nêu rõ đây là gap về bố trí người thay thế, không phải chỉ là lịch làm việc. Ghi tên vai trò, công việc bị nghẽn và ngày risk sẽ thành critical.</td><td>FRM-807 skill matrix, FRM-805 level certification, FRM-806 tracking log, ANNEX-123 deputy matrix.</td><td>Phê duyệt kế hoạch requalification / temporary restriction / overtime containment / hiring or cross-training.</td></tr><tr><td>Defect lặp lại sau đào tạo lại</td><td>Ghi rõ người liên quan đã attend training nhưng bằng chứng competency và authorization còn thiếu hoặc chưa chứng minh hiệu lực trên sản phẩm thật.</td><td>FRM-803 OJT checklist, FRM-804 competency assessment, NCR/CAPA link.</td><td>Yêu cầu đổi phương pháp đào tạo, supervisor sign-off, revalidation on-job hoặc stop-release cho tới khi đủ điều kiện.</td></tr><tr><td>CMM / final release phụ thuộc một cá nhân duy nhất</td><td>Ghi rõ đây là continuity risk và audit-readiness risk; nêu điều kiện tạm chấp nhận và ngày hết hiệu lực.</td><td>Certification log, access / authorization record, deputy plan.</td><td>Mở action về bố trí người thay thế, succession, recertification cadence và escalation class.</td></tr></tbody></table></div>
+<div class="note"><b>Cách dùng</b><br/>Worked example này dùng khi KPI ghi chú điều hành chạm tới yếu tố con người. Mục đích là để pack trình bày đúng bản chất vấn đề: không nhầm <b>đã học</b> với <b>đã đủ năng lực và được phép làm</b>.</div>
+<h2 class="h2" id="a6">6. Naming, metadata và evidence rules</h2>
+<div class="check-grid">
+<div class="check-item"><span class="chk"></span>Tên pack phải đọc ra được kỳ, freeze-date, version và audience</div>
+<div class="check-item"><span class="chk"></span>Cover page hoặc metadata phải nêu owner, source-of-record, exception note status</div>
+<div class="check-item"><span class="chk"></span>Link trong pack phải trỏ về source kiểm soát, không trỏ file cá nhân không quản lý</div>
+<div class="check-item"><span class="chk"></span>Nếu restatement xảy ra, phải lưu cả bản đã dùng để review và bản restated sau đó</div>
+</div>
+<h2 class="h2" id="a7">7. Liên kết tài liệu và cách dùng</h2>
+<div class="link-grid">
+<div class="link-card"><h3>Khi build dashboard packs</h3><ul class="link-list"><li><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118</a></li></ul></div>
+<div class="link-card"><h3>Khi rà quyền và deputy</h3><ul class="link-list"><li><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a></li><li><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></li><li><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/01-ANNEX-100/annex-123-deputy-backup-matrix.html">ANNEX-123</a></li></ul></div>
+<div class="link-card"><h3>Khi build MR pack</h3><ul class="link-list"><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a></li><li><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></li><li><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/01-ANNEX-100/annex-122-kpi-cascade-dictionary.html">ANNEX-122</a></li></ul></div>
+</div>
+<div class="footer-note">ANNEX-124 nên được dùng như “mẫu hình dung chuẩn” trong quá trình huấn luyện owner mới, rà pack trước freeze-date và kiểm tính đầy đủ của evidence bundle trước xem xét của lãnh đạo (management review) hoặc access review.</div>
+
+<div data-phase2i="true">
+<h2>Worked example F — Management-review carry-over → CI conversion pack</h2>
+<div class="table-card"><table><thead><tr><th>Thành phần pack</th><th>Ví dụ điền</th><th>Tại sao cần</th></tr></thead><tbody>
+<tr><td>Issue statement</td><td>“On-time delivery cho family X đỏ 3 kỳ liên tiếp dù đã thay đổi lịch dispatch và tăng expediting.”</td><td>Cho thấy đây không còn là action watch đơn thuần mà là recurrence watch.</td></tr>
+<tr><td>MR decision history</td><td>Kỳ 1: containment. Kỳ 2: tăng monitoring. Kỳ 3: resource gate vì thiếu alternate source / planning rule.</td><td>Giúp quyết định vì sao phải chuyển route sang CI.</td></tr>
+<tr><td>KPI freeze pack</td><td>Trend 3 kỳ, owner, source, freeze-date, exception note nếu có.</td><td>Khóa baseline để charter không đổi số sau khi mở.</td></tr>
+<tr><td>Opened route</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-653_A3_PDCA_Form.xlsx">FRM-653</a> với owner Planning + Supply Chain, sponsor Production Director.</td><td>Chứng minh xem xét của lãnh đạo (management review) đã giao vấn đề sang đúng đường giải quyết.</td></tr>
+<tr><td>Closure evidence expected</td><td>Lead-time stability 2 kỳ liên tiếp, không còn premium expedites ngoài ngưỡng, updated dispatch rule đã đào tạo.</td><td>Ngăn việc đóng cải tiến bằng cảm giác.</td></tr>
+</tbody></table></div>
+<div class="note">Worked example này dùng khi MR thấy issue lặp lại hoặc resource-gated. MR giữ quyền governance, còn CI/A3 giữ quyền điều tra sâu, thử nghiệm, chuẩn hóa và xác nhận lợi ích.</div>
+</div>
+</div>
+<h2>6F. Worked example F — action effectiveness &amp; resource-gate review pack</h2>
+<div class="note"><b>Mục đích</b><br/>Dùng khi xem xét của lãnh đạo (management review) hoặc tier review không chỉ cần danh sách action đang mở mà cần biết action nào đang bị chặn bởi nguồn lực, action nào đã đủ bằng chứng effectiveness, và action nào cần nâng lên recurrence watch.</div>
+<div class="table-card"><table><thead><tr><th>Sheet / tab</th><th>Nội dung tối thiểu</th><th>Ghi chú đặt tên</th></tr></thead><tbody>
+<tr><td>01_action-register</td><td>Action ID, origin, owner, due, current status, linked KPI / NCR / hold / complaint.</td><td>Khóa freeze-date cho snapshot review.</td></tr>
+<tr><td>02_effectiveness-check</td><td>Criterion, measured result, pass/fail, evidence path, reviewer.</td><td>PHẢI có basis đo cho ô “effective”; không để trống căn cứ.</td></tr>
+<tr><td>03_resource-gates</td><td>Budget / tooling / IT / vendor / headcount gate, blocker, fallback, decision requested.</td><td>Dùng để tách action yếu do execution với action đang chờ resource.</td></tr>
+<tr><td>04_carry-over-watch</td><td>Overdue, aging bucket, recurrence watch, next escalation level.</td><td>Tránh carry-over mơ hồ qua nhiều kỳ review.</td></tr>
+</tbody></table></div>
+</div></div></div></div>
+</body>
+</html>
+

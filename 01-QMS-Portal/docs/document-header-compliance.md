@@ -30,8 +30,8 @@ The audit found 5 controlled docs using the legacy `hero card` layout instead of
 - `03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-715-helium-leak-test-standard-work.html`
 - `03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-716-vacuum-compatible-clean-build-and-bagging.html`
 - `03-Tai-Lieu-Van-Hanh/02-Work-Instructions/08-WI-800/wi-801-cnc-poka-yoke-examples.html`
-- `03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-hr-001-competency-levels-and-certification-rules.html`
-- `03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-System/annex-qms-022-poka-yoke-cnc-examples.html`
+- `03-Tai-Lieu-Van-Hanh/03-Reference/08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html`
+- `03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html`
 
 All 5 were normalized to:
 

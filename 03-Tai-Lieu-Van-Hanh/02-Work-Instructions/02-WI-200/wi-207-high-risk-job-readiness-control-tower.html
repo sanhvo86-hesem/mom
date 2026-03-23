@@ -82,7 +82,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>Capacity &amp; execution</td><td>Máy dự kiến, ca chạy, fixture/tool/gage readiness, bottleneck, alternate route, contingency.</td><td>Không có năng lực khả thi, fixture/gage chưa sẵn, alternate plan rỗng.</td></tr>
 <tr><td>Quality &amp; release</td><td>First piece/FAI trigger, inspection method, cleanliness/leak/ship release pack, dossier path.</td><td>Chưa chốt gate owner hoặc chưa có bằng chứng bắt buộc để release.</td></tr>
 </tbody></table></div>
-<p>Tất cả dữ liệu trên phải được đặt vào <a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> và schema của <a href="../../03-Reference/01-ANNEX-System/annex-qms-004-job-dossier-template-and-metadata-dictionary.html">ANNEX-QMS-004</a>. Không dùng control tower nếu dữ liệu rải ngoài chat, email cá nhân hoặc file desktop không được kiểm soát.</p></div>
+<p>Tất cả dữ liệu trên phải được đặt vào <a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> và schema của <a href="../../03-Reference/02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>. Không dùng control tower nếu dữ liệu rải ngoài chat, email cá nhân hoặc file desktop không được kiểm soát.</p></div>
 <div class="section"><h2>3. Trình tự họp control tower</h2>
 <div class="step-list">
 <div class="step-item"><strong>Bước 1 — Chuẩn bị trước họp.</strong><br/>Planning phát agenda, liệt kê trigger, cập nhật Job dashboard, open hold, shortage, ship risk, bottleneck và action cũ chưa đóng. Engineering, QA, Warehouse, Production phải nạp dữ liệu trước giờ họp; control tower không dùng để đi hỏi dữ liệu sơ cấp.</div>
@@ -96,7 +96,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table><thead><tr><th>Trạng thái</th><th>Điều kiện</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td><span class="badge-green">READY</span></td><td>Material, route, program, setup, gage, plan kiểm và hồ sơ release đều đã sẵn hoặc đã có bằng chứng xác nhận.</td><td>Cho vào dispatch board; kiểm theo gate chuẩn.</td></tr>
 <tr><td><span class="badge-amber">READY WITH CONTROLS</span></td><td>Có rủi ro đã biết nhưng đã có containment hợp lệ như alternate machine, split lot, staged material, tăng sampling, daily control tower.</td><td>Ghi rõ control bổ sung, owner, điều kiện dừng và thời điểm review tiếp.</td></tr>
-<tr><td><span class="badge-red">BLOCKED</span></td><td>Thiếu baseline, thiếu vật tư/chứng chỉ quan trọng, chưa chốt processor, chưa sẵn gage/fixture, open NCR ảnh hưởng CTQ, hoặc điều kiện first piece chưa sẵn.</td><td>Không dispatch; mở escalation theo <a href="../../03-Reference/01-ANNEX-System/annex-qms-020-escalation-matrix-and-sla.html">ANNEX-QMS-020</a>.</td></tr>
+<tr><td><span class="badge-red">BLOCKED</span></td><td>Thiếu baseline, thiếu vật tư/chứng chỉ quan trọng, chưa chốt processor, chưa sẵn gage/fixture, open NCR ảnh hưởng CTQ, hoặc điều kiện first piece chưa sẵn.</td><td>Không dispatch; mở escalation theo <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</td></tr>
 <tr><td><span class="badge-red">SHIP-RISK</span></td><td>Job đang chạy nhưng nguy cơ không đạt ngày giao hoặc không kịp release pack.</td><td>Chuyển sang họp tăng tần suất; ưu tiên nguồn lực; đánh giá OT/vendor/partial shipment theo quyền hạn.</td></tr>
 </tbody></table></div>
 <div class="callout-warning"><strong>HOLD bắt buộc:</strong> PHẢI giữ trạng thái BLOCKED/HOLD nếu first piece/FAI bắt buộc mà chưa rõ thời điểm thực hiện, hoặc nếu special process/cert path chưa có owner nhận và ngày trả cert.</div></div>
@@ -119,12 +119,12 @@ ul.tight li {margin:4px 0;}
 <tr><td><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a></td><td>Readiness về baseline kỹ thuật.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Điều độ và dispatch.</td></tr>
 <tr><td><a href="wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a></td><td>Nhịp điều hành hằng ngày; control tower là tầng tăng cường cho Job đặc biệt.</td></tr>
-<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-ops-002-gate-mrr-and-execution-synchronization-pack.html">ANNEX-OPS-002</a></td><td>Gate/MRR và đồng bộ thực thi.</td></tr>
+<tr><td><a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>Gate/MRR và đồng bộ thực thi.</td></tr>
 </tbody></table></div></div>
 <h2 class="h2 phase3a-workbook-alignment" id="phase3a-wi207-workbooks">10. Biểu mẫu Excel đang hiệu lực — Daily control tower chạy trên workbook hiện hành</h2><div class="note phase3a-workbook-alignment"><b>Rule điều hành</b><br/>Trong danh mục hiện hành, WI-207 phải dùng hai workbook mới làm xương sống cho control tower: <a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-208_Daily_Tier_Meeting_and_Escalation_Log.xlsx">FRM-208</a> cho nhịp daily tier/escalation và <a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-209_High_Risk_Job_Readiness_Review.xlsx">FRM-209</a> cho readiness package của high-risk jobs. Không dùng note rời, chat thread hay whiteboard ảnh chụp làm evidence chính khi gate decision đang mở.</div><ul class="tight phase3a-workbook-alignment">
 <li><a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-208_Daily_Tier_Meeting_and_Escalation_Log.xlsx">FRM-208</a>: blocker log, escalation owner, ETA, next-review slot, carry-over status.</li>
 <li><a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-209_High_Risk_Job_Readiness_Review.xlsx">FRM-209</a>: package readiness theo risk class, missing evidence, gate decision và action-close rule.</li>
-<li>Dữ liệu tác nghiệp và signoff phải nằm trong workbook RELEASED; nếu cần tra lịch sử hoặc phạm vi mã / phạm vi quy trình thì dùng Trung tâm kiểm soát biểu mẫu và ANNEX-QMS-031, không dùng HTML form cũ ngoài danh mục hiện hành làm điểm vào vận hành.</li>
+<li>Dữ liệu tác nghiệp và signoff phải nằm trong workbook RELEASED; nếu cần tra lịch sử hoặc phạm vi mã / phạm vi quy trình thì dùng Trung tâm kiểm soát biểu mẫu và ANNEX-126, không dùng HTML form cũ ngoài danh mục hiện hành làm điểm vào vận hành.</li>
 </ul></div>
 </div>
 </div>

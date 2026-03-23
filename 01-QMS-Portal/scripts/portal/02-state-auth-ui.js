@@ -1689,9 +1689,9 @@ function renderDashboard(){
   const execShortcutCodes = [
     "PROC-OPS-001",
     "WI-OPS-001",
-    "ANNEX-OPS-002",
+    "ANNEX-502",
     "WI-OPS-008",
-    "ANNEX-QMS-003",
+    "ANNEX-107",
     "FRM-OPS-008",
     "FRM-PLA-001",
     "FRM-QA-007",
@@ -3082,7 +3082,7 @@ function renderDictionary(){
   el.innerHTML = `
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
       <div>
-        <h2 style="font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px">📖 ${T('dict_title')} <span style="font-size:12px;font-weight:400;color:var(--text-3);background:#f1f3f5;padding:2px 10px;border-radius:20px">ANNEX-QMS-970</span></h2>
+        <h2 style="font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px">📖 ${T('dict_title')} <span style="font-size:12px;font-weight:400;color:var(--text-3);background:#f1f3f5;padding:2px 10px;border-radius:20px">ANNEX-50470</span></h2>
         <p style="font-size:13px;color:var(--text-3);margin-top:4px">${T('dict_desc')}</p>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-shrink:0">
@@ -3258,7 +3258,7 @@ function renderDictBody(){
       }).join('')}
     </div>
     ${hasMore ? `<button class="dict-more-btn" onclick="dictShowCount+=30;renderDictBody()">${T('dict_more')} (${filtered.length - dictShowCount > 0 ? filtered.length - dictShowCount : 0} ${T('dict_remaining')})</button>` : ''}
-    <div style="margin-top:12px;font-size:11px;color:var(--text-3);text-align:center">${T('showing')} ${Math.min(dictShowCount, filtered.length)} / ${filtered.length} · ${T('dict_source')}: ANNEX-QMS-970</div>
+    <div style="margin-top:12px;font-size:11px;color:var(--text-3);text-align:center">${T('showing')} ${Math.min(dictShowCount, filtered.length)} / ${filtered.length} · ${T('dict_source')}: ANNEX-50470</div>
   `;
 }
 

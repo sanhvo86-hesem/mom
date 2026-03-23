@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ANNEX-115 — Bản đồ transaction và interface Epicor | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet"/>
+<style>
+
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
+.metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;}
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
+.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;}
+.link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);}
+.link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
+.link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);}
+.link-list{list-style:none;margin:0;padding:0}
+.link-list li{padding:4px 0 4px 0;font-size:12px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}
+.hero h1{font-size:22px;line-height:1.35;color:var(--navy);margin:0 0 8px}
+.hero p{font-size:13px;color:var(--ink2);margin:0}
+.mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
+.chip{display:inline-flex;padding:3px 10px;border-radius:999px;border:1px solid var(--ln);background:var(--bg2);font-size:11px;font-weight:600;margin-right:6px;margin-bottom:6px;}
+.legend-box{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.legend-box .chip{margin:0}
+.svg-wrap{overflow:auto;border:1px solid var(--ln);border-radius:var(--r);background:#fff;padding:12px}
+.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
+.notice-item{padding:10px 12px;border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r-sm);background:var(--bg);font-size:12px}
+.small{font-size:12px}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Annex số hóa</span>
+          </div>
+        </div>
+        <div class="title">
+          <strong>ANNEX-115 — Bản đồ transaction và interface Epicor</strong>
+          <span class="sub-vn">Khóa SoR, owner giao dịch, reconciliation, freeze-date và liên kết tới xem xét của lãnh đạo (management review) / contingency</span>
+        </div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>ANNEX-115</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>Epicor Administrator / QMS Manager / Finance Controller</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+        </div>
+      </div>
+      <div class="doc-content" id="docContent">
+        <div class="form-sheet">
+
+<div class="iso-map">
+  <div class="iso-title">Nguyên tắc bắt buộc</div>
+  <div class="req"><span class="req-tag shall">PHẢI</span><div>Epicor là <b>system of record</b> cho transaction ERP đã chốt; M365/SharePoint/Forms/approval packs là SoR cho workflow, phê duyệt và bằng chứng nơi đã được định nghĩa.</div></div>
+  <div class="req"><span class="req-tag shall">PHẢI</span><div>Khi dữ liệu giữa Epicor và evidence pack mâu thuẫn, phải <b>hold giao dịch hoặc hold release</b> cho đến khi owner nghiệp vụ xác minh và reconcile, không “sửa cho khớp bằng tay” ở file ngoài.</div></div>
+  <div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi dashboard, xem xét của lãnh đạo (management review) pack và báo cáo quyết định nên lấy từ nguồn đã khóa owner, freeze-date và refresh rule, thay vì lấy từ extract ad hoc.</div></div>
+</div>
+
+<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#e1">1. Mục đích và phạm vi</a><a href="#e2">2. Kiến trúc SoR / SSOT</a><a href="#e3">3. Bản đồ transaction theo family</a><a href="#e4">4. Handoff theo gate G0–G5</a><a href="#e5">5. Dashboard, freeze-date và kiểm soát nguồn (source control)</a><a href="#e6">6. dữ liệu gốc (master data) và change control</a><a href="#e7">7. Mismatch, exception và offline mode</a><a href="#e8">8. Evidence, KPI và ownership</a><a href="#e9">9. Tài liệu liên kết</a></div></div>
+<h2 class="h2" id="e1">1. Mục đích và phạm vi</h2>
+
+<p>ANNEX này mô tả cách Epicor kết nối với vận hành của HESEM: ai là owner transaction, dữ liệu nào là SoR, bằng chứng nào nằm ở M365/Portal, ai được sửa gì và khi nào phải hold để reconcile. Tài liệu được dùng cho các dòng chảy quote/order/job, material & receiving, production data, quality hold/release, shipment, invoicing/job close, dashboards và contingency.</p>
+
+<h2 class="h2" id="e2">2. Kiến trúc SoR / SSOT</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:26%"/><col style="width:30%"/><col style="width:26%"/></colgroup><thead><tr><th>Lớp hệ thống</th><th>Vai trò</th><th>Ví dụ dữ liệu</th><th>Quy tắc</th></tr></thead><tbody><tr><td>Epicor</td><td>System of record cho transaction ERP đã chốt</td><td>Customer/order/job, PO, receipt, issue, labor, completion, shipment, invoice, close, dữ liệu gốc (master data) có kiểm soát</td><td>Không thay Epicor bằng Excel/file riêng để chốt giao dịch vận hành.</td></tr><tr><td>M365 / SharePoint / Portal</td><td>SSOT cho workflow, phê duyệt, hồ sơ và evidence pack</td><td>Kickoff pack, engineering release package, QA records, ship release pack, MR pack, training evidence</td><td>Link-not-copy; dùng đường dẫn chuẩn và naming rule.</td></tr><tr><td>Power BI / dashboards</td><td>Tầng xem và phân tích đã khóa kiểm soát nguồn (source control)</td><td>OTD, WIP aging, quality dashboards, MR scorecards</td><td>Không dùng dashboard làm nơi sửa dữ liệu nguồn.</td></tr><tr><td>Paper / offline forms</td><td>Biện pháp duy trì tạm thời khi hệ thống số gián đoạn</td><td>Traveler in, contingency forms, handwritten release under controlled exception</td><td>Phải backfill và reconcile theo ANNEX-118 ngay khi phục hồi.</td></tr></tbody></table></div>
+<h2 class="h2" id="e3">3. Bản đồ transaction theo family</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:17%"/><col style="width:10%"/><col style="width:18%"/><col style="width:30%"/><col style="width:25%"/></colgroup><thead><tr><th>Family giao dịch</th><th>SoR chính</th><th>Business owner</th><th>Bằng chứng / linked pack</th><th>Điểm khóa / phải chặn</th></tr></thead><tbody><tr><td>Quote / order / job creation</td><td>Epicor</td><td>Sales & CS + Planner / owner được ủy quyền</td><td><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a> • kickoff / contract review pack</td><td>Không tạo job/order ngoài SoR; assumption chưa khóa thì không commit.</td></tr><tr><td>Engineering release / routing / revision</td><td>Epicor + controlled release pack</td><td>Engineering owner</td><td><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a> • <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> • engineering pack</td><td>Không chạy phiên bản mới nếu change/release chưa hoàn tất.</td></tr><tr><td>Purchasing / receiving / material status</td><td>Epicor</td><td>Supply Chain / Warehouse</td><td><a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> • <a href="../../01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a> • cert/receiving evidence</td><td>Không issue hoặc ship material khi cert/status chưa rõ.</td></tr><tr><td>Labor / machine / WIP / completion</td><td>Epicor</td><td>Production owner / Planner</td><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a> • shop-floor records</td><td>Không ghi bù tùy tiện mà thiếu trace / timestamp.</td></tr><tr><td>QA hold / release / NCR linkage</td><td>Epicor + QA evidence pack</td><td>QA / QC authority</td><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a> • <a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> • QA records</td><td>Không release hàng chỉ vì cần ship nếu evidence/gate chưa đạt.</td></tr><tr><td>Shipment / ship confirm</td><td>Epicor</td><td>Warehouse / Logistics + QA release authority</td><td>Packing list, CoC, ship packet, tracking evidence</td><td>xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))))))) phải bám bộ hồ sơ giao hàng (ship packet) đã khóa; không ship ngoài SoR rồi nhập bù thiếu kiểm soát.</td></tr><tr><td>Invoice / AR / job close</td><td>Epicor</td><td>Finance owner</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html">Finance Handbook</a> • billing pack</td><td>Không chốt doanh thu/close job khi shipment/evidence còn mismatch.</td></tr><tr><td>Master data / access / configuration</td><td>Epicor + access/change records</td><td>Epicor admin + business owner</td><td><a href="annex-101-role-based-access-map.html">ANNEX-101</a> • <a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a> • <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td><td>Không đổi dữ liệu gốc (master data)/permissions trực tiếp trên PROD mà thiếu approval.</td></tr></tbody></table></div>
+<h2 class="h2" id="e4">4. Handoff theo gate G0–G5</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:10%"/><col style="width:30%"/><col style="width:20%"/><col style="width:40%"/></colgroup><thead><tr><th>Gate</th><th>Transaction / trạng thái cần khóa</th><th>Owner chính</th><th>Dữ liệu tối thiểu phải khớp</th></tr></thead><tbody><tr><td>G0 RFQ / quote</td><td>Customer/order intent, revision, requirement completeness</td><td>Sales & CS / Estimator</td><td>Customer data, PN, revision, qty, due, assumption log.</td></tr><tr><td>G1 Contract / kickoff</td><td>Job open, kickoff readiness, supply/technical baseline</td><td>Sales & CS + Planner + Engineering</td><td>Job no., scope, revision baseline, kickoff pack.</td></tr><tr><td>G2 Engineering release</td><td>Routing/program/tooling/inspection release</td><td>Engineering</td><td>Job, revision, routing, program release link, inspection requirement.</td></tr><tr><td>G3 Production / WIP</td><td>Labor, machine, completion, material issue, abnormality</td><td>Production / Planner</td><td>Job no., operation, qty, timestamps, material/lot as applicable.</td></tr><tr><td>G4 Final QC / pack</td><td>QA status, ship packet completeness, release decision</td><td>Quality + Warehouse</td><td>Inspection outcome, hold/release state, CoC/pack evidence.</td></tr><tr><td>G5 Ship / bill / close</td><td>Ship confirm, invoice, closeout</td><td>Warehouse + Finance</td><td>Ship date, tracking, billing readiness, close checklist.</td></tr></tbody></table></div>
+<h2 class="h2" id="e5">5. Dashboard, freeze-date và kiểm soát nguồn (source control)</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:22%"/><col style="width:22%"/><col style="width:18%"/><col style="width:20%"/><col style="width:18%"/></colgroup><thead><tr><th>Pack / dashboard</th><th>Nguồn dữ liệu</th><th>Owner</th><th>Freeze / refresh rule</th><th>Dùng cho</th></tr></thead><tbody><tr><td>Daily operational scoreboards</td><td>Epicor extracts + controlled lists</td><td>Planner / production owner / QA owner tùy dashboard</td><td>Refresh theo nhịp điều hành; issue phải truy về source transaction</td><td>Tier meetings, abnormality response, WIP control.</td></tr><tr><td>Management review KPI pack</td><td>Dashboard đã khóa source + ghi chú điều hành pack</td><td>KPI owner theo ANNEX-122</td><td>Có freeze-date cho kỳ review; sau freeze chỉ cập nhật bằng cơ chế note/exception</td><td>SOP-902 / FRM-911.</td></tr><tr><td>Finance / billing packs</td><td>Epicor + shipment evidence + billing support docs</td><td>Finance owner</td><td>Freeze theo cut-off kỳ và close checklist</td><td>Invoice release, period close, dispute handling.</td></tr></tbody></table></div>
+
+<p>Nguyên tắc: dashboard phục vụ quyết định phải chỉ rõ <b>owner nguồn</b>, <b>refresh cadence</b>, <b>freeze-date</b> và <b>điểm xử lý exception</b>. Các quy tắc triển khai dashboard và access nằm tại <a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>.</p>
+
+<h2 class="h2" id="e6">6. dữ liệu gốc (master data) và change control</h2>
+<ul class="tight"><li>Tạo/chỉnh customer, part, revision, routing, user group, security hoặc integration mapping phải đi qua <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106 Change &amp; Configuration Management</a> và approval tương ứng.</li><li>Business owner quyết định nội dung nghiệp vụ; Epicor/IT owner quyết định tính khả thi kỹ thuật, migration, UAT, backout và thời điểm go-live.</li><li>Mọi thay đổi ảnh hưởng field mapping, quyền hoặc dashboard phải rà chéo với <a href="annex-101-role-based-access-map.html">ANNEX-101</a>, <a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a> và <a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>.</li></ul>
+<h2 class="h2" id="e7">7. Mismatch, exception và offline mode</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:30%"/><col style="width:70%"/></colgroup><thead><tr><th>Tình huống</th><th>Phản ứng bắt buộc</th></tr></thead><tbody><tr><td>Epicor khác evidence pack / M365 record</td><td>Hold transaction hoặc hold release; owner nghiệp vụ reconcile trước khi tiếp tục.</td></tr><tr><td>sai phiên bản (wrong revision) / sai job / sai mapping</td><td>Contain, đánh giá impact, correction theo change control; nếu đã đi vào sản xuất/ship thì xử lý NCR/escape phù hợp.</td></tr><tr><td>Mất mạng / Epicor unavailable</td><td>Kích hoạt <a href="annex-118-offline-fallback-kit.html">ANNEX-118</a> và <a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a>; chỉ tiếp tục các hoạt động được phép trong offline rule, sau đó backfill có kiểm soát.</td></tr><tr><td>Need manual override / urgent shipment</td><td>Escalated theo authority; mọi override phải để lại evidence, reason code và review hậu sự kiện.</td></tr></tbody></table></div>
+<h2 class="h2" id="e8">8. Evidence, KPI và ownership</h2>
+<div class="table-card"><table class="table"><colgroup><col style="width:36%"/><col style="width:22%"/><col style="width:42%"/></colgroup><thead><tr><th>KPI / control signal</th><th>Owner theo dõi</th><th>Ý nghĩa</th></tr></thead><tbody><tr><td>% transaction mismatch giữa Epicor và evidence pack</td><td>Epicor owner + business owner liên quan</td><td>Đo tính toàn vẹn SoR / SSOT.</td></tr><tr><td>Số incident backfill trễ hoặc thiếu evidence sau offline</td><td>IT / QMS / process owner</td><td>Đo kỷ luật phục hồi sau gián đoạn.</td></tr><tr><td>Số thay đổi dữ liệu gốc (master data) không đủ approval hoặc UAT</td><td>Epicor/IT owner</td><td>Đo chất lượng change control trên ERP.</td></tr><tr><td>Tỷ lệ xem xét của lãnh đạo (management review) pack dùng nguồn đã khóa owner/freeze</td><td>QMS Manager + KPI owners</td><td>Đo tính kỷ luật dữ liệu của lớp quản trị.</td></tr></tbody></table></div>
+<h2 class="h2" id="e9">9. Tài liệu liên kết</h2>
+<ul class="tight"><li><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html">Epicor Handbook</a> / <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html">IT Handbook</a> / <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html">Finance Handbook</a> / <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html">Production Handbook</a> / <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html">Quality Handbook</a>.</li><li><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> / <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> / <a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a> / <a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a>.</li><li><a href="annex-101-role-based-access-map.html">ANNEX-101</a> / <a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a> / <a href="annex-118-offline-fallback-kit.html">ANNEX-118</a> / <a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>.</li></ul>
+<div class="footer-note">ANNEX-115 là bản đồ điều khiển data flow nghiệp vụ. Khi owner transaction, source-of-record, dashboard rule hoặc continuity logic thay đổi, tài liệu này phải được rà cùng handbook và xem xét của lãnh đạo (management review) pack.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+

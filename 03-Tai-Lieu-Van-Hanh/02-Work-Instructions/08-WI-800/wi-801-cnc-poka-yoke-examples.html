@@ -73,7 +73,7 @@ ul.tight li {margin:4px 0;}
       <h1>WI-801 — Triển khai poka-yoke tại công đoạn và xác nhận hiệu lực</h1>
       
 <div class="section"><h2>1. Mục đích và khi nào phải mở WI-801</h2>
-<p>WI-801 dùng để triển khai poka-yoke tại công đoạn một cách có kiểm soát. Tài liệu này không phải thư viện ví dụ; thư viện ví dụ nằm ở <a href="../../03-Reference/01-ANNEX-System/annex-qms-022-poka-yoke-cnc-examples.html">ANNEX-QMS-022</a>. WI này chỉ trả lời 5 câu hỏi: lỗi nào cần chặn, chọn cơ chế nào, thử thế nào, xác nhận hiệu lực ra sao và khi nào được đưa vào vận hành chính thức.</p>
+<p>WI-801 dùng để triển khai poka-yoke tại công đoạn một cách có kiểm soát. Tài liệu này không phải thư viện ví dụ; thư viện ví dụ nằm ở <a href="../../03-Reference/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html">ANNEX-507</a>. WI này chỉ trả lời 5 câu hỏi: lỗi nào cần chặn, chọn cơ chế nào, thử thế nào, xác nhận hiệu lực ra sao và khi nào được đưa vào vận hành chính thức.</p>
 <div class="callout-danger"><strong>PHẢI</strong> triển khai giải pháp error-proofing thực chất cho lỗi lặp, lỗi có hậu quả lớn, near-miss nghiêm trọng hoặc lỗi dễ lọt qua gate; không chỉ dừng ở “đào tạo lại”, “nhắc nhở cẩn thận hơn” hoặc “treo thêm bảng nhắc”.</div></div>
 
 <div class="section"><h2>2. Trigger bắt buộc phải triển khai poka-yoke</h2>
@@ -96,7 +96,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-list">
 <div class="step-item"><strong>Bước 1 — Chốt lỗi mục tiêu.</strong> Mô tả lỗi bằng hành vi cụ thể: nhầm revision, nhầm program, lắp ngược, sai offset, bỏ sót cap, sai count, dùng sai gage, sai tool, mixed part… Không dùng mô tả mơ hồ kiểu “operator bất cẩn”.</div>
 <div class="step-item"><strong>Bước 2 — Chốt điểm dùng và điểm chặn.</strong> Xác định đúng station, đúng bước, đúng người, đúng điểm mà lỗi có thể bị chặn sớm nhất. Poka-yoke đặt càng xa nguồn sai thì càng yếu.</div>
-<div class="step-item"><strong>Bước 3 — Chọn giải pháp.</strong> Dùng <a href="../../03-Reference/01-ANNEX-System/annex-qms-022-poka-yoke-cnc-examples.html">ANNEX-QMS-022</a> để chọn cơ chế; ưu tiên cơ khí / key / lock / interlock trước visual hoặc nhắc nhớ.</div>
+<div class="step-item"><strong>Bước 3 — Chọn giải pháp.</strong> Dùng <a href="../../03-Reference/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html">ANNEX-507</a> để chọn cơ chế; ưu tiên cơ khí / key / lock / interlock trước visual hoặc nhắc nhớ.</div>
 <div class="step-item"><strong>Bước 4 — Kiểm tra khả năng bypass.</strong> Trước khi pilot, phải trả lời: có thể tắt, lách, đổi đường, bỏ qua hay dùng đồ khác thay thế cơ chế này không. Nếu có, chưa được release.</div>
 <div class="step-item"><strong>Bước 5 — Pilot có kiểm soát.</strong> Thử trên 1 máy / 1 station / 1 nhóm Job. Thực hiện dry-run, first-piece, giao ca và ít nhất một tình huống bất thường mô phỏng để xem cơ chế phản ứng thế nào.</div>
 <div class="step-item"><strong>Bước 6 — Đo hiệu lực.</strong> Kiểm tra lại đúng lỗi mục tiêu, cycle time, mức hiểu của người dùng, số lần false alarm, số lần bypass và mức sạch/ an toàn/ bảo trì bị ảnh hưởng. Chỉ giữ giải pháp nếu hiệu lực tăng mà không sinh lỗi mới.</div>
@@ -139,7 +139,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/08-SOP-800/sop-804-human-factors-and-error-proofing.html">SOP-804</a></td><td>Khung quản trị yếu tố con người và chống sai.</td></tr>
 <tr><td><a href="../../01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Đưa control có hiệu lực vào cải tiến chuẩn hóa.</td></tr>
-<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-qms-022-poka-yoke-cnc-examples.html">ANNEX-QMS-022</a></td><td>Thư viện giải pháp mẫu để chọn nhanh cơ chế phù hợp.</td></tr>
+<tr><td><a href="../../03-Reference/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html">ANNEX-507</a></td><td>Thư viện giải pháp mẫu để chọn nhanh cơ chế phù hợp.</td></tr>
 <tr><td><a href="../05-WI-500/wi-512-3-axis-vertical-milling-guide.html">WI-512</a> / <a href="../05-WI-500/wi-513-5-axis-milling-guide.html">WI-513</a> / <a href="../05-WI-500/wi-514-cnc-turning-guide.html">WI-514</a> / <a href="../05-WI-500/wi-515-mill-turn-guide.html">WI-515</a> / <a href="../05-WI-500/wi-516-machine-operation-quick-card.html">WI-516</a></td><td>Các điểm dùng chính để nhúng control.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-811_Incident_Report.xlsx">FRM-811</a></td><td>Near-miss / incident / trigger cho chống sai.</td></tr>
 </tbody></table></div></div>

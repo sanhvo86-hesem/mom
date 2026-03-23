@@ -106,7 +106,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="step-list">
 <div class="step-item"><strong>Phát hành board theo nhóm máy (machine family).</strong><br/>Tách riêng 3-axis, 5-axis, turning, mill-turn, finishing, clean/leak/final release và outsource queue. Không trộn tất cả lên một danh sách rồi yêu cầu Supervisor tự hiểu.</div>
 <div class="step-item"><strong>Khóa Top list.</strong><br/>Đầu mỗi ca phải xác định rõ Top P0/P1, job đầu tiên lên máy, job thứ hai đã staged, và các job P3/HOLD bị chặn.</div>
-<div class="step-item"><strong>Xác định cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))).</strong><br/>Sau khi công bố dispatch đầu ca, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) của ca có hiệu lực. Từ thời điểm này, mọi đổi lịch phải theo rule ở ANNEX-OPS-001.</div>
+<div class="step-item"><strong>Xác định cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))).</strong><br/>Sau khi công bố dispatch đầu ca, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) của ca có hiệu lực. Từ thời điểm này, mọi đổi lịch phải theo rule ở ANNEX-501.</div>
 <div class="step-item"><strong>Giao việc và xác nhận hiểu việc.</strong><br/>Supervisor/Cell Lead phải xác nhận người chạy máy hiểu job nào chạy trước, job nào chờ, job nào cần setup song song, và job nào có gate QA/ENG/WHS đi kèm.</div>
 </div>
 </div>
@@ -122,7 +122,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>5. Finite capacity review trong ngày</h2>
-<p>Planner phải review lại năng lực khi xuất hiện một trong các trigger sau: machine down vượt ngưỡng reserve, P0 chen vào lịch, đổi revision, outsource return không về đúng hạn, QA hold phát sinh ở bottleneck, hoặc queued standard hours vượt cap theo ANNEX-OPS-001.</p>
+<p>Planner phải review lại năng lực khi xuất hiện một trong các trigger sau: machine down vượt ngưỡng reserve, P0 chen vào lịch, đổi revision, outsource return không về đúng hạn, QA hold phát sinh ở bottleneck, hoặc queued standard hours vượt cap theo ANNEX-501.</p>
 <div class="table-card"><table><thead><tr><th>Trigger</th><th>Phản ứng bắt buộc</th><th>Ai quyết định</th></tr></thead><tbody>
 <tr><td>Machine down / abnormality lớn</td><td>Ước lượng giờ mất, xác định jobs impacted, cập nhật board và chọn phương án: giữ lịch, chuyển tải, tăng ca hoặc outsource</td><td>Ops Manager + Planner</td></tr>
 <tr><td>P0 mới</td><td>Chỉ rõ job nào bị lùi; review lại setup reserve, QA gate, ship impact</td><td>Ops Manager hoặc cao hơn</td></tr>
@@ -196,10 +196,10 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="kpi-box"><strong>KPI-PLAN-04</strong><br/>Tỷ lệ xử lý sự kiện vượt cap trong SLA.</div>
 </div>
 <div class="table-card"><table><thead><tr><th>Hồ sơ / tài liệu</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-ops-001-dispatch-capacity-wip-rules.html">ANNEX-OPS-001</a></td><td>Rule điều độ, WIP cap, hot-job ladder, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))).</td></tr>
-<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-ops-002-gate-mrr-and-execution-synchronization-pack.html">ANNEX-OPS-002</a></td><td>Gate/MRR và rule bàn giao theo bước.</td></tr>
-<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-qms-020-escalation-matrix-and-sla.html">ANNEX-QMS-020</a></td><td>Escalation và SLA.</td></tr>
-<tr><td><a href="../../03-Reference/01-ANNEX-System/annex-qms-009-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-QMS-009</a></td><td>Chuẩn họp tầng và nhật ký hành động (action log).</td></tr>
+<tr><td><a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>Rule điều độ, WIP cap, hot-job ladder, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))).</td></tr>
+<tr><td><a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>Gate/MRR và rule bàn giao theo bước.</td></tr>
+<tr><td><a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation và SLA.</td></tr>
+<tr><td><a href="../../03-Reference/05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Chuẩn họp tầng và nhật ký hành động (action log).</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a></td><td>Dispatch list hằng ca/ngày.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a></td><td>tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging))))))))) và action.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Khung thủ tục nền của planning/dispatch.</td></tr>
