@@ -86,7 +86,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li><b>Vai trò:</b> All roles • QA/QMS</li>
 <li><b>Chuẩn lưu:</b> SSOT theo <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a></li>
-<li><b>Gate:</b> Thiếu MRR → STOP/HOLD/BLOCK theo mục “Fail-fast”.</li>
+<li><b>Cổng kiểm soát (gate):</b> Thiếu MRR → STOP/HOLD/BLOCK theo mục “Fail-fast”.</li>
 </ul>
 </div>
 <div class="note">
@@ -101,40 +101,40 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<h2 class="h2" style="margin-top:0;">Checklist MRR (Minimum Required Records)</h2>
+<h2 class="h2" style="margin-top:0;">Bảng kiểm MRR (Minimum Required Hồ sơ)</h2>
 <p class="mini muted2">Tick đủ các dòng dưới đây. Mỗi dòng phải có bằng chứng trong SSOT và đặt tên file đúng chuẩn.</p>
 <div style="overflow:auto;">
 <table class="form-table">
 <tr>
 <th style="min-width:320px;">MRR / Bằng chứng</th>
 <th style="min-width:140px;">RecordType</th>
-<th style="min-width:110px;">Gate</th>
-<th style="min-width:120px;">Owner</th>
+<th style="min-width:110px;">Cổng kiểm soát</th>
+<th style="min-width:120px;">Người phụ trách</th>
 <th style="min-width:220px;">SSOT path</th>
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
-<tr><td><span class="chk">☐</span> QC HOLD tag/record (cô lập vật tư/WIP/FG)</td><td>HOLD</td><td>N0</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/HOLD/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_HOLD_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> NCR record (mô tả NG + ảnh + kích thước + số lượng)</td><td>NCR</td><td>N0</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> QC HOLD tag/hồ sơ (cô lập vật tư/WIP/FG)</td><td>HOLD</td><td>N0</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/HOLD/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_HOLD_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> NCR hồ sơ (mô tả NG + ảnh + kích thước + số lượng)</td><td>NCR</td><td>N0</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Containment action (chặn thoát) + danh sách lô ảnh hưởng</td><td>CONT</td><td>N0</td><td>OPS+QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CONT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Disposition (REWORK/SCRAP/USE-AS-IS/RETURN) + phê duyệt</td><td>DISP</td><td>N1</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_DISP_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Root cause (5Why / Fishbone) + xác nhận bằng dữ liệu</td><td>RCA</td><td>N2</td><td>QA+ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RCA_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> CAPA plan (hành động + owner + due + control update)</td><td>CAPA</td><td>N2</td><td>QA/QMS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CAPA_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> Verification evidence (đo lại/FAI lại/SPC/3 lô liên tiếp)</td><td>VERI</td><td>N3</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_VERI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Closure sign-off + lesson learned (update WI/Training)</td><td>CLOSE</td><td>N3</td><td>QA/QMS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CLOSE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Nguyên nhân gốc (5Why / Fishbone) + xác nhận bằng dữ liệu</td><td>RCA</td><td>N2</td><td>QA+ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RCA_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> CAPA plan (hành động + người phụ trách + due + control update)</td><td>CAPA</td><td>N2</td><td>QA/QMS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CAPA_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> Verification bằng chứng (đo lại/FAI lại/SPC/3 lô liên tiếp)</td><td>VERI</td><td>N3</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_VERI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Closure sign-off + bài học kinh nghiệm (update WI/Training)</td><td>CLOSE</td><td>N3</td><td>QA/QMS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CLOSE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 </table>
 </div>
-<div class="note mini"><strong>Gắn với module</strong>: C07 (CAPA), C06 (NCR), C13 (Change control), C10 (Gate), C08 (SSOT).</div>
+<div class="note mini"><strong>Gắn với module</strong>: C07 (CAPA), C06 (NCR), C13 (Kiểm soát thay đổi), C10 (Cổng kiểm soát), C08 (SSOT).</div>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
 <ul class="tight">
-<li>Không cô lập sản phẩm NG hoặc không dán HOLD → STOP.</li><li>Không mở NCR mà xử lý miệng → BLOCK.</li><li>Disposition thiếu phê duyệt QA/Customer (khi yêu cầu) → HOLD.</li><li>Đóng CAPA khi chưa có verification evidence → HOLD.</li>
+<li>Không cô lập sản phẩm NG hoặc không dán HOLD → STOP.</li><li>Không mở NCR mà xử lý miệng → BLOCK.</li><li>Disposition thiếu phê duyệt QA/Customer (khi yêu cầu) → HOLD.</li><li>Đóng CAPA khi chưa có verification bằng chứng → HOLD.</li>
 </ul>
 </div>
 <div class="card">
-<h2 class="h2" style="margin-top:0;">Audit 60 giây</h2>
+<h2 class="h2" style="margin-top:0;">Đánh giá 60 giây</h2>
 <ol class="tight">
-<li>Mở thư mục NCR và xác nhận có ảnh + số lượng + lot/serial.</li><li>Mở CAPA plan và đối chiếu owner/due.</li><li>Mở verification evidence và đối chiếu tiêu chí đạt.</li><li>Mở closure và kiểm tra WI/Training đã cập nhật.</li>
+<li>Mở thư mục NCR và xác nhận có ảnh + số lượng + lot/serial.</li><li>Mở CAPA plan và đối chiếu người phụ trách/due.</li><li>Mở verification bằng chứng và đối chiếu tiêu chí đạt.</li><li>Mở closure và kiểm tra WI/Training đã cập nhật.</li>
 </ol>
 </div>
 <div class="card">

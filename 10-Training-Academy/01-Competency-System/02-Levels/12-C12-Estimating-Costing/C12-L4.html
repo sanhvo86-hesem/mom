@@ -69,7 +69,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="small-note"><span class="badge">ISO 8.2.2</span> <span class="badge">ISO 8.1</span> <span class="badge">ISO 7.1.2</span> <span class="badge">ISO 7.1.3</span> <span class="badge">ISO 9.1</span> <span class="badge">ISO 6.1</span> <span class="badge">ISO 7.5</span></div>
 <div class="meta">
 <div><strong>Đối tượng áp dụng:</strong><br/>Estimator/Costing + Finance + OPS/Kỹ thuật (chủ trì: Costing Lead) (và các vị trí liên quan theo phân công).</div>
-<div><strong>Đầu ra bắt buộc:</strong><br/>Evidence + metric theo K–S–E–M; đạt KPI gating để được công nhận Level.</div>
+<div><strong>Đầu ra bắt buộc:</strong><br/>Bằng chứng + chỉ số theo K–S–E–M; đạt KPI gating để được công nhận Level.</div>
 <div><strong>Nguyên tắc ISO tích hợp:</strong><br/>Mọi bước quan trọng <em>PHẢI</em> có hồ sơ; thay đổi <em>PHẢI</em> được kiểm soát; dữ liệu tuân ALCOA+.</div>
 <div><strong>Thời lượng chuẩn:</strong><br/>L1: 4–6h • L2: 8–12h • L3: 12–20h • L4: 20–40h (theo dự án/OJT).</div>
 </div>
@@ -80,19 +80,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cost-waste-tool-scrap.html"><b>DRL-10</b> — Cost &amp; Waste Drill (Tool life • Scrap • Rework)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Job Order E2E Drill (RFQ → Ship Packet)</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cost-waste-tool-scrap.html"><b>DRL-10</b> — Cost &amp; Waste Drill (Tool life • Scrap • Rework)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Lệnh sản xuất E2E Drill (RFQ → Bộ hồ sơ giao hàng (ship packet))</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
  </p>
 </div><h2>1. Chuẩn đầu ra Level 4 theo K–S–E–M</h2><table class="table">
-<thead><tr><th>Knowledge (K)</th><th>Skill (S)</th><th>Evidence (E)</th><th>Metric (M)</th></tr></thead>
+<thead><tr><th>Knowledge (K)</th><th>Skill (S)</th><th>Bằng chứng (E)</th><th>Chỉ số (M)</th></tr></thead>
 <tbody>
 <tr>
 <td>Hiểu sâu hệ thống tài chính–vận hành của job shop: cấu trúc P&amp;L theo cell/nhóm máy (machine family), quy tắc định giá theo chiến lược thị trường, cơ chế kiểm soát thay đổi cost model, và governance dữ liệu (gốc master data , đánh giá trail).</td>
 <td>Thiết kế hệ thống estimating/job costing cấp công ty: policy rate/markup, approval, thư viện định mức (routing library), tích hợp ERP/MES, dashboard margin &amp; capacity, đào tạo + đánh giá để đảm bảo tính nhất quán và chống 'gaming'.</td>
 <td>Chính sách cost model phát hành; hệ thống dữ liệu gốc (master data)/ routing library; dashboard GM &amp; variance; 02 đợt đánh giá nội bộ; chương trình đào tạo estimator.</td>
-<td>GM% ổn định và tăng theo mục tiêu; margin leakage giảm; thời gian dẫn (lead time / thời gian dẫn) quote giảm; đánh giá không có major NC về kiểm soát dữ liệu cost.</td>
+<td>GM% ổn định và tăng theo mục tiêu; margin leakage giảm; thời gian dẫn (lead time) quote giảm; đánh giá không có major NC về kiểm soát dữ liệu cost.</td>
 </tr>
 </tbody>
 </table><h2>2. Yêu cầu chuẩn ISO tích hợp (PHẢI/PHẢI/ĐƯỢC PHÉP) + mapping clause</h2><p class="small">Các yêu cầu dưới đây viết theo ngôn ngữ ISO để dùng trực tiếp trong SOP/WI/FRM và làm căn cứ đánh giá. Mỗi yêu cầu gắn clause (điều khoản) để truy vết.</p><div class="req">
@@ -105,19 +105,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag shall">PHẢI</span>
 <div class="text">
 <div><strong>Mọi estimate/quote PHẢI được review và phê duyệt theo thẩm quyền trước khi phát hành cho khách hàng.</strong> <span class="iso">ISO 8.2.2</span></div>
-<p>Ngưỡng phê duyệt theo rủi ro: margin thấp, khách mới, special process, CTQ cao.</p>
+<p>Ngưỡng phê duyệt theo rủi ro: margin thấp, khách mới, công đoạn đặc biệt, CTQ cao.</p>
 </div>
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
 <div class="text">
 <div><strong>Tổ chức PHẢI theo dõi và phân tích sự khác biệt giữa estimate và actual để cải tiến (feedback loop).</strong> <span class="iso">ISO 9.1.3</span></div>
-<p>Thiết lập variance report: time, material, scrap, thuê ngoài, overhead. Có action owner và deadline.</p>
+<p>Thiết lập variance report: time, material, scrap, thuê ngoài, overhead. Có action người phụ trách và deadline.</p>
 </div>
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
 <div class="text">
 <div><strong>Khi thay đổi cost model (rate, overhead driver, định mức), tổ chức PHẢI kiểm soát thay đổi và thông báo các bên liên quan.</strong> <span class="iso">ISO 8.5.6</span></div>
-<p>DCR record + phê duyệt; tránh thay đổi ngầm dẫn tới báo giá không nhất quán.</p>
+<p>DCR hồ sơ + phê duyệt; tránh thay đổi ngầm dẫn tới báo giá không nhất quán.</p>
 </div>
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
@@ -137,7 +137,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><strong>Tổ chức ĐƯỢC PHÉP triển khai ABC/Throughput Accounting và mô hình tối ưu giá theo bottleneck để nâng lợi nhuận.</strong> <span class="iso">ISO 10.3</span></div>
 <p>Áp dụng khi dữ liệu đủ tin cậy; bắt đầu từ pilot cell.</p>
 </div>
-</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L4: thiết kế hệ thống costing cấp công ty – dữ liệu, governance, chiến lược pricing.</strong></div><h3>3.1. Estimating trong CNC job shop: “báo giá là dự báo có kiểm soát”</h3><p>Estimating không phải đoán. Estimating là <strong>mô hình hóa</strong> công việc để ra quyết định thương mại: có phải nhận job không, nhận với giá nào, cam kết thời gian dẫn (lead time / thời gian dẫn) nào, rủi ro ở đâu. Trong job-order CNC, sai estimate xuất phát từ 3 nguồn:</p><ul>
+</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L4: thiết kế hệ thống costing cấp công ty – dữ liệu, governance, chiến lược pricing.</strong></div><h3>3.1. Estimating trong CNC job shop: “báo giá là dự báo có kiểm soát”</h3><p>Estimating không phải đoán. Estimating là <strong>mô hình hóa</strong> công việc để ra quyết định thương mại: có phải nhận job không, nhận với giá nào, cam kết thời gian dẫn nào, rủi ro ở đâu. Trong lệnh sản xuất CNC, sai estimate xuất phát từ 3 nguồn:</p><ul>
 <li><strong>Thiếu dữ liệu đầu vào:</strong> chưa chốt CTQ, chưa chốt finish/packaging/docs.</li>
 <li><strong>Định mức sai:</strong> setup underestimated, toolpath thực tế khác giả định, đo kiểm bị bỏ sót.</li>
 <li><strong>Hệ thống rate sai:</strong> dùng rate “cảm tính” không phản ánh overhead và utilization.</li>
@@ -145,7 +145,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><strong>NRE/Tooling (one-time):</strong> lập trình, thiết kế/ gia công đồ gá, gage đặc biệt, FAI ballooning.</li>
 <li><strong>Unit price:</strong> vật liệu + gia công (setup + run) + QC/inspection + finishing/thuê ngoài + packaging + overhead + margin.</li>
-<li><strong>Điều kiện:</strong> lead time definition, MOQ, validity, Incoterms, payment, change policy.</li>
+<li><strong>Điều kiện:</strong> thời gian dẫn definition, MOQ, validity, Incoterms, payment, change policy.</li>
 </ul>
 <div class="cap">Tách NRE giúp minh bạch: prototype tốn setup cao nhưng run thấp; production thì ngược lại.</div>
 </div><h3>3.3. Machine Hour Rate: công thức và bẫy hay gặp</h3><p><strong>Machine Hour Rate (MHR)</strong> là chi phí 1 giờ máy “ bán” (chargeable hour), không phải 1 giờ đồng hồ. Một cách tính thực dụng:</p><div class="codeblock">
@@ -165,22 +165,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul><h3>3.6. Dự phòng rủi ro (contingency) – dùng có kỷ luật</h3><p>Dự phòng là cần thiết cho job mới, nhưng phải có kỷ luật để chống “độn giá”. HESEM Dùng 3 mức:</p><ul>
 <li><strong>0–3%:</strong> job lặp/đã có dữ liệu.</li>
 <li><strong>3–8%:</strong> job mới nhưng công nghệ quen.</li>
-<li><strong>8–15%:</strong> công nghệ mới/special process/tight tolerance/khách đánh giá.</li>
+<li><strong>8–15%:</strong> công nghệ mới/công đoạn đặc biệt/tight tolerance/khách đánh giá.</li>
 </ul><p>Dự phòng phải được ghi rõ lý do trong estimate và được duyệt theo thẩm quyền.</p><h3>3.7. Job Costing &amp; Variance: biến “đau” thành “dữ liệu học”</h3><p>Một hệ thống job costing tốt không nhằm “truy lỗi cá nhân” mà nhằm trả lời 3 câu hỏi:</p><ol>
 <li>Chúng ta dự báo sai ở đâu (setup/run/material/QC/thuê ngoài)?</li>
 <li>Nguyên nhân hệ thống là gì (dữ liệu gốc (master data), routing, training, máy móc, phương pháp)?</li>
-<li>Hành động nào làm giảm sai lệch trong tương lai (update định mức, cải tiến process, thay đổi quote policy)?</li>
+<li>Hành động nào làm giảm sai lệch trong tương lai (update định mức, cải tiến quy trình, thay đổi quote policy)?</li>
 </ol><p>Cấu trúc báo cáo chênh lệch:</p><ul>
 <li><strong>Time variance:</strong> (Actual hours − Standard hours) x Rate.</li>
 <li><strong>Material variance:</strong> (Actual material cost − Standard) + Scrap cost.</li>
-<li><strong>Process variance:</strong> thuê ngoài cost, tool cost, rework/scrap, downtime.</li>
+<li><strong>Quy trình variance:</strong> thuê ngoài cost, tool cost, rework/scrap, downtime.</li>
 </ul><div class="callout"><strong>Rule:</strong> 80% sai lệch đến từ 20% nguyên nhân lặp. Hãy phân loại job theo “family” để tìm pattern.</div><h3>3.8. Activity‑Based Costing (ABC) ở mức áp dụng cho HESEM</h3><p>ABC không cần phức tạp. Ý tưởng: overhead phân bổ theo “driver” thực tế. Ví dụ:</p><ul>
 <li>Overhead QA phân bổ theo <strong>số lần kiểm</strong> hoặc <strong>giờ CMM</strong>.</li>
 <li>Overhead setup phân bổ theo <strong>số lần setup</strong>.</li>
 <li>Overhead engineering phân bổ theo <strong>số giờ lập trình/DFM</strong>.</li>
 </ul><p>ABC giúp tránh tình trạng: job đơn giản bị đội giá, job phức tạp bị under-quote.</p><h3>3.9. Pricing theo năng lực &amp; bottleneck: tư duy chiến lược</h3><p>Khi xưởng có “nút thắt” (máy 5-axis/CMM), giá không thể chỉ dựa trên cost-plus. Cần thêm yếu tố:</p><ul>
 <li><strong>Capacity-based pricing:</strong> job chiếm bottleneck giờ cao phải có premium hoặc phải chọn lọc.</li>
-<li><strong>Value-based:</strong> khi HESEM giúp khách rút thời gian dẫn (lead time / thời gian dẫn) hoặc giảm rủi ro, giá trị đó phản ánh vào giá.</li>
+<li><strong>Value-based:</strong> khi HESEM giúp khách rút thời gian dẫn hoặc giảm rủi ro, giá trị đó phản ánh vào giá.</li>
 <li><strong>Portfolio:</strong> cân bằng job margin cao vs job ổn định để tối ưu dòng tiền.</li>
 </ul><p>Level 4 phải thiết kế governance: ai được quyền giảm giá, giảm bao nhiêu, và phải chứng minh bằng dữ liệu.</p><h2>4. Quy trình thao tác chuẩn (flow dọc, dễ đọc)</h2><p class="small">Lưu đồ được thiết kế theo hướng dọc để đọc rõ khi in A4. chỉnh trực tiếp bằng HTML/CSS.</p><div class="vflow">
 <div class="vstep">
@@ -229,7 +229,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vnum">7</div>
 <div class="vtext">
 <strong>Tính thuê ngoài/finishing/packaging</strong>
-<p>Báo giá vendor; thêm handling &amp; thời gian dẫn (lead time / thời gian dẫn); xác định packaging level.</p>
+<p>Báo giá vendor; thêm handling &amp; thời gian dẫn; xác định packaging level.</p>
 </div>
 </div>
 <div class="vstep">
@@ -260,10 +260,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p>Sau sản xuất: lấy actual, phân tích variance, cập nhật định mức/routing library.</p>
 </div>
 </div>
-</div><h2>5. KPI/Metric áp dụng theo Level (có công thức + nguồn dữ liệu)</h2><p class="small">Bảng dưới dùng để “định lượng” năng lực. Target là quy định: khi áp dụng thực tế, HESEM hiệu chỉnh theo baseline và chiến lược năm. <strong>Gating</strong> là điều kiện bắt buộc (vi phạm → không công nhận Level/bonus dù điểm bài kiểm tra cao).</p><table class="table">
+</div><h2>5. KPI/Chỉ số áp dụng theo Level (có công thức + nguồn dữ liệu)</h2><p class="small">Bảng dưới dùng để “định lượng” năng lực. Target là quy định: khi áp dụng thực tế, HESEM hiệu chỉnh theo baseline và chiến lược năm. <strong>Gating</strong> là điều kiện bắt buộc (vi phạm → không công nhận Level/bonus dù điểm bài kiểm tra cao).</p><table class="table">
 <thead>
 <tr>
-<th>Metric/KPI</th>
+<th>Chỉ số/KPI</th>
 <th>Công thức đo</th>
 <th>Nguồn dữ liệu</th>
 <th>Tần suất</th>
@@ -320,7 +320,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Leakage &gt; ngưỡng 2 kỳ → không xét Level</td>
 </tr>
 <tr>
-<td><strong>Variance Closure Lead Time</strong></td>
+<td><strong>Variance Closure Thời gian dẫn</strong></td>
 <td class="mono">Ngày đóng variance report − ngày ship</td>
 <td>Variance tracker</td>
 <td>Tháng</td>
@@ -328,7 +328,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>&lt;=10d</td>
 <td>&lt;=7d</td>
 <td>&lt;=5d</td>
-<td>Không có action plan → treo</td>
+<td>Không có kế hoạch hành động → treo</td>
 </tr>
 <tr>
 <td><strong>Under-quote Incident</strong></td>
@@ -343,8 +343,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><strong>Routing Library Update Rate</strong></td>
-<td class="mono">Số update định mức/routing có evidence / tháng</td>
-<td>Master data DCR record</td>
+<td class="mono">Số update định mức/routing có bằng chứng / tháng</td>
+<td>Master data DCR hồ sơ</td>
 <td>Tháng</td>
 <td>&gt;=1</td>
 <td>&gt;=2</td>
@@ -356,7 +356,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Gating bắt buộc để công nhận Level 4:</strong>
 <ul><li>Thiếu dòng chi phí bắt buộc hoặc dùng rate không đúng policy.</li><li>Sửa số liệu estimate sau khi đã có actual để 'đẹp' (vi phạm đạo đức dữ liệu).</li><li>Under-quote gây lỗ do không kiểm soát rủi ro/assumptions.</li></ul>
 <p class="small">Gating ưu tiên: an toàn → chất lượng → tuân thủ hồ sơ → đạo đức dữ liệu. Vi phạm gating có nguy cơ dẫn tới không công nhận Level/bonus.</p>
-</div><h2>6. Bài tập theo Level (Case study HESEM)</h2><p class="small">Mỗi case được thiết kế theo “học thuật ứng dụng”: có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (evidence) để chấm. chuẩn làm theo nhóm và review chéo để tăng chất lượng tư duy.</p><div class="card">
+</div><h2>6. Bài tập theo Level (Case study HESEM)</h2><p class="small">Mỗi case được thiết kế theo “học thuật ứng dụng”: có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (bằng chứng) để chấm. chuẩn làm theo nhóm và review chéo để tăng chất lượng tư duy.</p><div class="card">
 <h3>Case 1: Thiết kế policy pricing &amp; approval cho toàn công ty</h3>
 <p class="small">HESEM muốn thống nhất: ai được quyền giảm giá, khi nào cần Management Board duyệt, và cách ghi nhận discount để phân tích.</p>
 <div class="cols-2">
@@ -366,12 +366,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div>
 <strong>Nhiệm vụ theo Level 4:</strong>
-<ol><li>Thiết kế policy: floor margin theo phân khúc, discount rules, approval matrix.</li><li>Thiết kế form/field trong CRM để lưu lý do discount.</li><li>Đưa ra dashboard theo dõi: GM, win rate, discount distribution.</li></ol>
+<ol><li>Thiết kế policy: floor margin theo phân khúc, discount rules, ma trận phê duyệt.</li><li>Thiết kế form/field trong CRM để lưu lý do discount.</li><li>Đưa ra dashboard theo dõi: GM, win rate, discount distribution.</li></ol>
 </div>
 </div>
 <hr class="sep"/>
-<strong>Sản phẩm đầu ra (Evidence):</strong>
-<ul><li>Policy </li><li>Approval matrix</li><li>Dashboard mock</li></ul>
+<strong>Sản phẩm đầu ra (Bằng chứng):</strong>
+<ul><li>Policy </li><li>Ma trận phê duyệt</li><li>Dashboard mock</li></ul>
 <div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi policy cân bằng cạnh tranh &amp; lợi nhuận và có cơ chế đánh giá.
  </div>
 </div><div class="card">
@@ -388,13 +388,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <hr class="sep"/>
-<strong>Sản phẩm đầu ra (Evidence):</strong>
-<ul><li>Data governance plan</li><li>Change control procedure</li><li>Audit checklist</li></ul>
+<strong>Sản phẩm đầu ra (Bằng chứng):</strong>
+<ul><li>Data governance plan</li><li>Kiểm soát thay đổi procedure</li><li>Đánh giá bảng kiểm</li></ul>
 <div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi kế hoạch triển khai theo giai đoạn, có quick wins.
  </div>
 </div><div class="card">
 <h3>Case 3: Chiến lược portfolio – chọn job để tối ưu năng lực</h3>
-<p class="small">Xưởng bị quá tải, thời gian dẫn (lead time / thời gian dẫn) tăng, khách phàn nàn. Cần chọn lọc job theo lợi thế HESEM.</p>
+<p class="small">Xưởng bị quá tải, thời gian dẫn tăng, khách phàn nàn. Cần chọn lọc job theo lợi thế HESEM.</p>
 <div class="cols-2">
 <div>
 <strong>Dữ liệu (Input):</strong>
@@ -402,15 +402,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div>
 <strong>Nhiệm vụ theo Level 4:</strong>
-<ol><li>Phân tích lợi thế theo nhóm máy (machine family), QC capability, thời gian dẫn (lead time / thời gian dẫn).</li><li>Đưa ra rule chọn job (acceptance criteria) gắn với costing và risk.</li><li>Đưa KPI theo dõi hiệu lực: OTD, GM, utilization, WIP.</li></ol>
+<ol><li>Phân tích lợi thế theo nhóm máy (machine family), QC capability, thời gian dẫn.</li><li>Đưa ra rule chọn job (acceptance criteria) gắn với costing và risk.</li><li>Đưa KPI theo dõi hiệu lực: OTD, GM, utilization, WIP.</li></ol>
 </div>
 </div>
 <hr class="sep"/>
-<strong>Sản phẩm đầu ra (Evidence):</strong>
+<strong>Sản phẩm đầu ra (Bằng chứng):</strong>
 <ul><li>Báo cáo phân tích</li><li>Acceptance criteria</li><li>KPI plan</li></ul>
 <div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi đưa ra vừa chiến lược vừa vận hành được (không lý thuyết suông).
  </div>
-</div><h2>7. OJT theo TWI (Job Breakdown + checklist)</h2><p class="small">TWI (Training Within Industry) nhấn mạnh: <strong>chia nhỏ công việc</strong> → <strong>điểm then chốt</strong> → <strong>lý do</strong>. OJT của HESEM phải tạo được “thói quen đúng” và bằng chứng (record) để sẵn sàng đánh giá.</p><h3>7.1. Job Breakdown Sheet (mẫu)</h3><table class="table">
+</div><h2>7. OJT theo TWI (Job Breakdown + bảng kiểm)</h2><p class="small">TWI (Training Within Industry) nhấn mạnh: <strong>chia nhỏ công việc</strong> → <strong>điểm then chốt</strong> → <strong>lý do</strong>. OJT của HESEM phải tạo được “thói quen đúng” và bằng chứng (hồ sơ) để sẵn sàng đánh giá.</p><h3>7.1. Job Breakdown Sheet (mẫu)</h3><table class="table">
 <thead><tr><th>Bước</th><th>Điểm then chốt (Key Points)</th><th>Lý do (Reasons)</th></tr></thead>
 <tbody>
 <tr>
@@ -435,10 +435,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><strong>5) Review &amp; lưu version</strong></td>
-<td>Check completeness; xin phê duyệt; lưu version và evidence.</td>
+<td>Check completeness; xin phê duyệt; lưu version và bằng chứng.</td>
 <td>Đáp ứng ISO và chống tranh chấp nội bộ.</td>
 </tr>
-</tbody></table><h3>7.2. OJT Checklist (Level 4)</h3><p class="small">Tick ✓ khi hoàn thành; lưu checklist như documented information. Người hướng dẫn ký xác nhận.</p><table class="table">
+</tbody></table><h3>7.2. OJT Bảng kiểm (Level 4)</h3><p class="small">Tick ✓ khi hoàn thành; lưu bảng kiểm như documented information. Người hướng dẫn ký xác nhận.</p><table class="table">
 <thead><tr><th>#</th><th>Hạng mục</th><th>Tiêu chí đạt</th><th>Kết quả</th><th>Ghi chú</th></tr></thead>
 <tbody>
 <tr>
@@ -464,7 +464,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>4</td>
-<td>Audit hệ thống costing</td>
+<td>Đánh giá hệ thống costing</td>
 <td>Mock đánh giá; NC/OFI; CAPA hiệu lực</td>
 <td>□ Đạt □ Chưa</td>
 <td>…</td>
@@ -513,8 +513,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Mô tả governance dữ liệu gốc (master data) (routing, rates, codes) để đảm bảo đánh giá trail.</li>
 <li>Tích hợp ERP/MES cho job costing: dữ liệu nào là 'critical' và cách đảm bảo chất lượng dữ liệu?</li>
 <li>Portfolio strategy: bạn sẽ chọn/loại RFQ dựa trên costing và capability như thế nào?</li>
-<li>Thiết kế dashboard GM theo nhóm máy (machine family)/cell: metric nào cần và tần suất?</li>
-<li>Mock đánh giá hệ thống costing: bạn kiểm tra những evidence nào để tìm NC?</li>
+<li>Thiết kế dashboard GM theo nhóm máy (machine family)/cell: chỉ số nào cần và tần suất?</li>
+<li>Mock đánh giá hệ thống costing: bạn kiểm tra những bằng chứng nào để tìm NC?</li>
 <li>Nêu 3 rủi ro khi chỉ dùng cost-plus và bỏ qua bottleneck/capacity.</li>
 <li>Bạn đào tạo estimator mới ra sao để họ không 'copy rate' sai từ job cũ?</li>
 <li>Đưa ra cơ chế review định kỳ MHR và utilization. Ai tham gia? Data nào dùng?</li>
@@ -541,7 +541,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Cost drivers (QC/thuê ngoài/packaging)</strong></td>
 <td>Bỏ sót; dẫn tới lỗ.</td>
 <td>Nhận diện cơ bản; thêm chi phí.</td>
-<td>Tính đầy đủ; thời gian dẫn (lead time / thời gian dẫn) breakdown rõ.</td>
+<td>Tính đầy đủ; thời gian dẫn breakdown rõ.</td>
 <td>Thiết kế ABC/driver; tối ưu bottleneck.</td>
 </tr>
 <tr>
@@ -555,10 +555,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Đạo đức dữ liệu &amp; kiểm soát thay đổi</strong></td>
 <td>Sửa số để đẹp; không đánh giá trail.</td>
 <td>Lưu version; không sửa hồi tố.</td>
-<td>DCR record có phê duyệt.</td>
+<td>DCR hồ sơ có phê duyệt.</td>
 <td>Thiết kế governance toàn công ty; chống gaming.</td>
 </tr>
-</tbody></table><div class="callout"><strong>Điều kiện công nhận Level 4:</strong> Management Board/Finance/QA công nhận: hệ thống chạy ≥ 3 tháng, dữ liệu đáng tin, có cải thiện hiệu quả chứng minh.</div><h2>10. Checklist tự đánh giá trước khi đề nghị xét Level</h2><ul>
+</tbody></table><div class="callout"><strong>Điều kiện công nhận Level 4:</strong> Management Board/Finance/QA công nhận: hệ thống chạy ≥ 3 tháng, dữ liệu đáng tin, có cải thiện hiệu quả chứng minh.</div><h2>10. Bảng kiểm tự đánh giá trước khi đề nghị xét Level</h2><ul>
 <li>Tôi luôn tách setup và run, ghi rõ giả định và nguồn dữ liệu.</li><li>Tôi không tự ý thay đổi rate/markup ngoài policy; mọi thay đổi có phê duyệt.</li><li>Tôi luôn kiểm tra unit (inch/mm) và các note finishing/packaging/docs trước khi chốt estimate.</li><li>Sau mỗi job, tôi có thói quen xem actual vs estimate và cập nhật định mức/routing khi cần.</li><li>Tôi hiểu margin leakage và biết cách phát hiện sớm bằng dữ liệu Finance/MES.</li></ul></div></div></div>
 </div>
 <script src="../../../../assets/app.js"></script>

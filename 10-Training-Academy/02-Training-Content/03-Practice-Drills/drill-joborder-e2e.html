@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>TRN-ACA-DRL-01 — Job Order E2E Drill (RFQ → Ship Packet) | HESEM Academy</title>
+<title>TRN-ACA-DRL-01 — Lệnh sản xuất E2E Drill (RFQ → Bộ hồ sơ giao hàng (ship packet)) | HESEM Academy</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -59,7 +59,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>DRILL-JOBORDER-E2E — Job Order E2E Drill (RFQ → Ship Packet) | HESEM Academy</strong>
+  <strong>DRILL-JOBORDER-E2E — Lệnh sản xuất E2E Drill (RFQ → Bộ hồ sơ giao hàng) | HESEM Academy</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -73,16 +73,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="doc-content" id="docContent">
 <div class="cover">
 <div class="kicker">Drill Pack</div>
-<h1 class="h1">DRL-01 — Job Order E2E Drill (RFQ → Ship Packet)</h1>
+<h1 class="h1">DRL-01 — Lệnh sản xuất E2E Drill (RFQ → Bộ hồ sơ giao hàng)</h1>
 <p class="lead">
- Drill này mô phỏng chuỗi <b>RFQ → Cash</b> bằng 01 job thật: khóa REV, chốt CTQ, chạy gate sản xuất, tạo bộ hồ sơ giao hàng (ship packet) và kiểm tra truy xuất 60 giây.
+ Drill này mô phỏng chuỗi <b>RFQ → Cash</b> bằng 01 job thật: khóa REV, chốt CTQ, chạy cổng kiểm soát (gate) sản xuất, tạo bộ hồ sơ giao hàng và kiểm tra truy xuất 60 giây.
  </p>
 </div>
 <div class="grid-2">
 <div class="card">
 <span class="badge">Mục tiêu</span>
 <ul class="tight">
-<li>Không nhảy gate. Không giao hàng khi thiếu bộ hồ sơ giao hàng (ship packet).</li>
+<li>Không nhảy cổng kiểm soát. Không giao hàng khi thiếu bộ hồ sơ giao hàng.</li>
 <li>MRR nằm đúng SSOT và truy xuất ≤ 60 giây.</li>
 <li>Handoff rõ: ai nhận gì, ai bàn giao gì.</li>
 </ul>
@@ -98,7 +98,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li>01 job thật đang chạy hoặc job vừa hoàn tất (có dossier đủ: PO, drawing/spec, traveler, baseline).</li>
 <li>Quy tắc naming: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
-<li>Các biểu mẫu liên quan: rà soát hợp đồng (contract review / rà soát hợp đồng), Job Kickoff, IR/FAI, NCR/CAPA, bộ hồ sơ giao hàng (ship packet).</li>
+<li>Các biểu mẫu liên quan: rà soát hợp đồng, Job Kickoff, IR/FAI, NCR/CAPA, bộ hồ sơ giao hàng.</li>
 </ul>
 </div>
 <div class="card">
@@ -114,10 +114,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Owner</th><th>MRR (bằng chứng)</th><th style="width:90px;">Gate</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Người phụ trách</th><th>MRR (bằng chứng)</th><th style="width:90px;">Cổng kiểm soát</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Mở Job Dossier, xác nhận JobNum/PartNo/REV và lock revision set.</td><td>Tất cả role</td><td>Screenshot đường dẫn dossier + REV tại folder name</td><td>STOP</td></tr><tr><td>2</td><td>Rà soát hợp đồng/PO: chốt CTQ + chứng từ bắt buộc (FAI/MTR/CoC/pack).</td><td>Estimator (SAL-03) + QA</td><td>CR form + CTQ list (PDF)</td><td>HOLD</td></tr><tr><td>3</td><td>Kickoff: routing + hold points + risk rating + outsource needs.</td><td>Planning/OPS</td><td>Job kickoff checklist + Traveler</td><td>HOLD</td></tr><tr><td>4</td><td>Engineering baseline: phát hành setup sheet + kế hoạch kiểm tra (inspection plan) + CAM release link.</td><td>ENG/CAM</td><td>Baseline pack + release log</td><td>BLOCK</td></tr><tr><td>5</td><td>Pre-start + safety: PPE/5S + xác nhận tool/gage trong hạn.</td><td>Supervisor + Setup</td><td>Pre-start checklist + ảnh setup</td><td>STOP</td></tr><tr><td>6</td><td>Setup + chạy first piece: đo CTQ và lập IR/FAI.</td><td>Setup + QC</td><td>IR/FAI ký + ảnh first piece</td><td>HOLD</td></tr><tr><td>7</td><td>In-process: ghi IPQC log theo reaction plan.</td><td>Operator + QC</td><td>IPQC log (PDF)</td><td>HOLD</td></tr><tr><td>8</td><td>Outsource (KHI có): đối soát spec + nhận cert + traceability.</td><td>PUR + WHS + QA</td><td>PO note + Supplier cert + receiving record</td><td>HOLD</td></tr><tr><td>9</td><td>Final + ship packet: CoC + final IR + packing/label photo.</td><td>QA/QC + WHS</td><td>Ship packet checklist + CoC + packing photo</td><td>HOLD</td></tr><tr><td>10</td><td>bài diễn tập đánh giá 60 giây (60-second audit drill): mentor gọi 01 record bất kỳ và yêu cầu mở đúng file.</td><td>Assessor</td><td>Link SSOT mở đúng ≤ 60s</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Mở Hồ sơ công việc (job dossier), xác nhận JobNum/PartNo/REV và lock revision set.</td><td>Tất cả role</td><td>Screenshot đường dẫn dossier + REV tại folder name</td><td>STOP</td></tr><tr><td>2</td><td>Rà soát hợp đồng/PO: chốt CTQ + chứng từ bắt buộc (FAI/MTR/CoC/pack).</td><td>Estimator (SAL-03) + QA</td><td>CR form + CTQ list (PDF)</td><td>HOLD</td></tr><tr><td>3</td><td>Kickoff: routing + điểm giữ (điểm giữ (hold point)) + risk rating + outsource needs.</td><td>Planning/OPS</td><td>Job kickoff bảng kiểm + Traveler</td><td>HOLD</td></tr><tr><td>4</td><td>Engineering baseline: phát hành setup sheet + kế hoạch kiểm tra (inspection plan) + CAM release link.</td><td>ENG/CAM</td><td>Baseline pack + release log</td><td>BLOCK</td></tr><tr><td>5</td><td>Pre-start + safety: PPE/5S + xác nhận tool/gage trong hạn.</td><td>Supervisor + Setup</td><td>Pre-start bảng kiểm + ảnh setup</td><td>STOP</td></tr><tr><td>6</td><td>Setup + chạy mẫu đầu (first piece): đo CTQ và lập IR/FAI.</td><td>Setup + QC</td><td>IR/FAI ký + ảnh mẫu đầu</td><td>HOLD</td></tr><tr><td>7</td><td>In-quy trình: ghi IPQC log theo reaction plan.</td><td>Operator + QC</td><td>IPQC log (PDF)</td><td>HOLD</td></tr><tr><td>8</td><td>Outsource (KHI có): đối soát spec + nhận cert + traceability.</td><td>PUR + WHS + QA</td><td>PO note + Supplier cert + receiving hồ sơ</td><td>HOLD</td></tr><tr><td>9</td><td>Final + bộ hồ sơ giao hàng: CoC + final IR + packing/label photo.</td><td>QA/QC + WHS</td><td>Bộ hồ sơ giao hàng bảng kiểm + CoC + packing photo</td><td>HOLD</td></tr><tr><td>10</td><td>bài diễn tập đánh giá 60 giây (diễn tập đánh giá 60 giây): mentor gọi 01 hồ sơ bất kỳ và yêu cầu mở đúng file.</td><td>Assessor</td><td>Link SSOT mở đúng ≤ 60s</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
@@ -126,8 +126,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">Fail-fast</span>
 <ul class="tight">
 <li>Sai REV hoặc không chứng minh được REV trong SSOT.</li>
-<li>Thiếu 01 hồ sơ bắt buộc tại gate: CR, Traveler, Baseline, IR/FAI, CoC/bộ hồ sơ giao hàng (ship packet).</li>
-<li>Evidence đặt sai tên hoặc nằm ngoài dossier.</li>
+<li>Thiếu 01 hồ sơ bắt buộc tại cổng kiểm soát: CR, Traveler, Baseline, IR/FAI, CoC/bộ hồ sơ giao hàng.</li>
+<li>Bằng chứng đặt sai tên hoặc nằm ngoài dossier.</li>
 </ul>
 </div>
 <div class="card">
@@ -137,7 +137,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Revision control</b></td><td>Không dùng file rời; REV đúng; DCR record có dấu vết.</td><td>0/1/2</td></tr><tr><td><b>CTQ translation</b></td><td>CTQ rõ, có inspection method và hold point.</td><td>0/1/2</td></tr><tr><td><b>Evidence discipline</b></td><td>MRR đủ, tên file đúng chuẩn, nằm đúng thư mục.</td><td>0/1/2</td></tr><tr><td><b>Gate decision</b></td><td>STOP/HOLD/BLOCK kích hoạt đúng khi thiếu hồ sơ hoặc lệch chuẩn.</td><td>0/1/2</td></tr><tr><td><b>Handoff quality</b></td><td>Bàn giao bằng link SSOT + người nhận xác nhận; không bàn giao bằng lời.</td><td>0/1/2</td></tr>
+<tr><td><b>Revision control</b></td><td>Không dùng file rời; REV đúng; DCR hồ sơ có dấu vết.</td><td>0/1/2</td></tr><tr><td><b>CTQ translation</b></td><td>CTQ rõ, có inspection method và điểm giữ.</td><td>0/1/2</td></tr><tr><td><b>Bằng chứng discipline</b></td><td>MRR đủ, tên file đúng chuẩn, nằm đúng thư mục.</td><td>0/1/2</td></tr><tr><td><b>Cổng kiểm soát decision</b></td><td>STOP/HOLD/BLOCK kích hoạt đúng khi thiếu hồ sơ hoặc lệch chuẩn.</td><td>0/1/2</td></tr><tr><td><b>Handoff quality</b></td><td>Bàn giao bằng link SSOT + người nhận xác nhận; không bàn giao bằng lời.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>
@@ -145,9 +145,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">Debrief (10 phút)</span>
 <ol style="margin:10px 0 0 0; padding-left:18px; line-height:1.75;">
-<li>Điểm gãy lớn nhất trong job nằm ở gate nào? Chủ sở hữu là ai?</li>
+<li>Điểm gãy lớn nhất trong job nằm ở cổng kiểm soát nào? Chủ sở hữu là ai?</li>
 <li>MRR nào bị thiếu/sai tên? Nguyên nhân gốc thuộc người hay hệ thống?</li>
-<li>Chốt 03 hành động chặn lặp (owner + due trong ngày) và nộp vào SSOT.</li>
+<li>Chốt 03 hành động chặn lặp (người phụ trách + due trong ngày) và nộp vào SSOT.</li>
 </ol>
 </div>
 </div>

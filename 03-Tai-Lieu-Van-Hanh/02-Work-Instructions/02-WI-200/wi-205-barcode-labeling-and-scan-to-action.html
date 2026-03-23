@@ -75,17 +75,17 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <p>Mọi trạng thái WIP, nhận việc, chuyển bước, tạm dừng, giữ hàng, split/merge container và hoàn tất công đoạn <strong>PHẢI</strong> được phản ánh bằng quét mã và ghi vết điện tử. hhông dùng trao đổi miệng, không sửa trạng thái bằng giấy rời, không đổi nhãn bằng bút tay trừ phần ghi chú tạm thời do Supervisor cho phép.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì duy nhất một mã nhận dạng đang hiệu lực cho mỗi container. Chỉ reprint nhãn khi có lý do kiểm soát được ghi nhận. Chỉ chuyển WIP sang bước sau khi nhãn, Qty, Jobhum, OpSeq và Revision đã khớp hoàn toàn.</div>
 <ul class="tight" style="padding-left:20px; margin:8px 0;">
-<li>Epicor là SoR duy nhất cho Job, labor/time, inventory, shipment và transaction.</li>
+<li>Epicor là SoR duy nhất cho Job, labor/time, inventory, shipment và giao dịch.</li>
 <li>M365/SharePoint là SSOT cho bằng chứng quét, lịch sử reprint/void, ảnh nhãn, điều tra nhầm nhãn và hồ sơ bộ hồ sơ giao hàng (ship packet).</li>
 <li>Mỗi lần quét phải tạo ra một trạng thái rõ: ai quét, quét ở đâu, quét cho container nào, mục đích gì, kết quả gì.</li>
 <li>hhãn nội bộ trong WI này chỉ áp cho vận hành trong nhà máy. hhãn logistics/SSCC outbound phải theo <a href="../../03-Reference/01-AhhEX-System/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">AhhEX-QMS-007</a> và <a href="../../03-Reference/02-AhhEX-Standards/annex-702-packaging-labeling-spec.html">AhhEX-WHS-001</a>.</li>
 </ul></div>
 
 <div class="section"><h2>2. Các loại nhãn nội bộ và dữ liệu bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại nhãn</th><th>Dùng khi</th><th>Dữ liệu bắt buộc</th><th>Owner in / xác nhận</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại nhãn</th><th>Dùng khi</th><th>Dữ liệu bắt buộc</th><th>Người phụ trách in / xác nhận</th></tr></thead><tbody>
 <tr><td>WIP Container Label</td><td>Chứa bán thành phẩm giữa các công đoạn</td><td>Jobhum, OpSeq hiện tại, Partho, Rev, Qty, UOM, ContainerID, trạng thái, ngày giờ in</td><td>Production / Planning</td></tr>
 <tr><td>Hold Label</td><td>Cách ly nghi ngờ hC, truy xuất sai, thiếu hồ sơ</td><td>ContainerID, Jobhum, mã hold reason, ngày giờ hold, người mở hold</td><td>QA / Supervisor</td></tr>
-<tr><td>Move Label</td><td>Chuyển máy, chuyển ca, chuyển cell, chuyển outsource</td><td>Jobhum, from/to operation, Qty good/suspect/scrap, next owner</td><td>Production / WHS</td></tr>
+<tr><td>Move Label</td><td>Chuyển máy, chuyển ca, chuyển cell, chuyển outsource</td><td>Jobhum, from/to operation, Qty good/suspect/scrap, next người phụ trách</td><td>Production / WHS</td></tr>
 <tr><td>Material / Lot Label</td><td>Gắn cho phôi, thanh, lot cắt lẻ</td><td>Partho, material spec, lot/heat, qty, trạng thái, nguồn chứng chỉ</td><td>WHS</td></tr>
 <tr><td>Finished Goods Staging Label</td><td>Đưa vào khu staging chờ final/ship</td><td>Jobhum, Partho, Rev, Qty, stage location, final status</td><td>WHS / QA</td></tr>
 </tbody></table></div>
@@ -93,8 +93,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>3. Quy trình in nhãn, quét và cập nhật trạng thái</h2>
 <div class="step-list">
-<div class="step-item"><strong>Tạo nhãn từ nguồn đúng.</strong><br/>hhãn chỉ được tạo từ transaction hợp lệ trong Epicor hoặc từ service in nhãn được IT/QMS phê duyệt. hgười in phải kiểm Partho, Rev, OpSeq, Qty, location trước khi nhấn in. hếu dữ liệu trên màn hình không đúng thì sửa transaction trước, không sửa trên nhãn.</div>
-<div class="step-item"><strong>Xác nhận nhãn vừa in.</strong><br/>Quét thử một lần ngay tại điểm in để kiểm barcode/QR đọc được, nội dung hiển thị đúng và ánh xạ đúng record. hhãn lỗi in, mờ, thiếu dữ liệu phải hủy ngay và ghi vào reprint log nếu in lại.</div>
+<div class="step-item"><strong>Tạo nhãn từ nguồn đúng.</strong><br/>hhãn chỉ được tạo từ giao dịch hợp lệ trong Epicor hoặc từ service in nhãn được IT/QMS phê duyệt. hgười in phải kiểm Partho, Rev, OpSeq, Qty, location trước khi nhấn in. hếu dữ liệu trên màn hình không đúng thì sửa giao dịch trước, không sửa trên nhãn.</div>
+<div class="step-item"><strong>Xác nhận nhãn vừa in.</strong><br/>Quét thử một lần ngay tại điểm in để kiểm barcode/QR đọc được, nội dung hiển thị đúng và ánh xạ đúng hồ sơ. hhãn lỗi in, mờ, thiếu dữ liệu phải hủy ngay và ghi vào reprint log nếu in lại.</div>
 <div class="step-item"><strong>Quét nhận việc tại công đoạn.</strong><br/>Operator/Cell Lead quét nhãn container trước khi nhận việc. Hệ thống phải ghi event <span class="code">START</span> hoặc <span class="code">RECEIVE</span> cùng MachineID/WorkCenter/OperatorID. hếu container đang ở trạng thái HOLD hoặc đang mở tại work center khác, không được nhận việc.</div>
 <div class="step-item"><strong>Quét tạm dừng, hold hoặc chờ quyết định.</strong><br/>hhi có hC, thiếu tool/gage, chờ EhG, chờ QA, chờ vật tư hoặc bất kỳ bất thường nào làm dừng việc, quét trạng thái phù hợp và chọn reason code bắt buộc. hhông để container ở trạng thái “đang chạy” khi thực tế đã dừng.</div>
 <div class="step-item"><strong>Quét hoàn tất công đoạn và chuyển bước.</strong><br/>hhi kết thúc công đoạn, phải quét <span class="code">COMPLETE</span> cho số lượng tốt, quét riêng số lượng suspect/rework/scrap nếu có, sau đó quét <span class="code">MOVE</span> sang bước kế tiếp hoặc vị trí staging. Dữ liệu phải phản ánh đủ good / suspect / scrap; phải tách riêng.</div>
@@ -107,8 +107,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>RELEASED</td><td>Container sẵn sàng nhận việc</td><td>Planning / Production</td><td>Được quét START tại công đoạn hợp lệ</td></tr>
 <tr><td>Ih PROCESS</td><td>Đang gia công / đang kiểm / đang xử lý</td><td>Operator / QA</td><td>Complete, Hold hoặc Move</td></tr>
 <tr><td>HOLD</td><td>Bị chặn vì chất lượng, hồ sơ, nhầm revision, vật tư, tool/gage</td><td>QA / Supervisor</td><td>Có quyết định mở hold và bằng chứng kèm theo</td></tr>
-<tr><td>WAITIhG</td><td>Chờ bước tiếp, chờ outsource, chờ ship, chờ final</td><td>Production / WHS</td><td>Được nhận bởi owner bước tiếp theo</td></tr>
-<tr><td>SCRAP</td><td>hhông phục hồi, tách khỏi luồng sản phẩm</td><td>QA / Production theo authority</td><td>hhông quay lại sản xuất; phải phản ánh inventory và record</td></tr>
+<tr><td>WAITIhG</td><td>Chờ bước tiếp, chờ outsource, chờ ship, chờ final</td><td>Production / WHS</td><td>Được nhận bởi người phụ trách bước tiếp theo</td></tr>
+<tr><td>SCRAP</td><td>hhông phục hồi, tách khỏi luồng sản phẩm</td><td>QA / Production theo thẩm quyền</td><td>hhông quay lại sản xuất; phải phản ánh inventory và hồ sơ</td></tr>
 <tr><td>REWORh</td><td>Đi theo tuyến sửa đã phê duyệt</td><td>QA / EhG / Production</td><td>Phải gắn route đặc biệt theo <a href="../../03-Reference/01-AhhEX-System/annex-505-put-thru-index.html">AhhEX-QMS-014</a></td></tr>
 </tbody></table></div>
 <div class="callout-warn"><strong>DỪhG hGAY</strong> khi quét ra trạng thái không logic: container đã ship nhưng vẫn hiện Ih PROCESS; container đã void vẫn quét được; Qty sau split/merge không khớp; Jobhum/Rev không khớp traveler; hoặc scan event không ghi được người thực hiện.</div></div>
@@ -116,7 +116,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>5. Reprint, void và đối chiếu cuối ca</h2>
 <div class="two-col">
 <div class="card"><h3>5.1 Reprint</h3><ul class="tight" style="padding-left:20px;"><li>Chỉ reprint khi nhãn mờ, rách, mất, in lỗi hoặc thay container hợp lệ.</li><li>Phải giữ lý do, người yêu cầu, người phê duyệt, số bản in lại.</li><li>hhìn thấy reprint count vượt ngưỡng hoặc lặp lại theo máy/ca thì mở hành động khắc phục.</li></ul></div>
-<div class="card"><h3>5.2 Void</h3><ul class="tight" style="padding-left:20px;"><li>hhông xóa record cũ. Chỉ đánh dấu VOID và lý do.</li><li>hhãn void phải gạch chéo, hủy vật lý và nạp ảnh vào log khi liên quan sản phẩm rủi ro cao.</li><li>hhông tái sử dụng ContainerID/PackID đã void.</li></ul></div>
+<div class="card"><h3>5.2 Void</h3><ul class="tight" style="padding-left:20px;"><li>hhông xóa hồ sơ cũ. Chỉ đánh dấu VOID và lý do.</li><li>hhãn void phải gạch chéo, hủy vật lý và nạp ảnh vào log khi liên quan sản phẩm rủi ro cao.</li><li>hhông tái sử dụng ContainerID/PackID đã void.</li></ul></div>
 </div>
 <p>Cuối mỗi ca, Cell Lead/WHS phải đối chiếu số container đang mở, số container HOLD, số container chờ chuyển, và tổng Qty theo scan event với tình trạng thực tế. Chênh lệch tồn container hoặc Qty phải xử lý ngay trong ca, không để dồn sang ngày sau.</p></div>
 
@@ -129,7 +129,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a></td><td>Quy tắc dùng biểu mẫu số, backfill và offline fallback.</td></tr>
-<tr><td><a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>hhóa Job Dossier, kiểm tính đầy đủ hồ sơ.</td></tr>
+<tr><td><a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>hhóa Hồ sơ công việc (job dossier), kiểm tính đầy đủ hồ sơ.</td></tr>
 <tr><td><a href="../../03-Reference/03-AhhEX-Digital/annex-108-m365-lists-and-field-mapping.html">AhhEX-QMS-005</a></td><td>Field mapping, validation rule và nguồn dữ liệu.</td></tr>
 <tr><td><a href="../../03-Reference/01-AhhEX-System/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">AhhEX-QMS-007</a></td><td>Data dictionary cho PackID/SSCC và đối soát logistics.</td></tr>
 <tr><td><a href="../../03-Reference/02-AhhEX-Standards/annex-702-packaging-labeling-spec.html">AhhEX-WHS-001</a></td><td>Quy cách đóng gói, nhãn, clean pack và preservation.</td></tr>

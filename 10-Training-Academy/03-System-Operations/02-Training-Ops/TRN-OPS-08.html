@@ -75,9 +75,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <h1 style="margin-top:10px">Configuration &amp; Revision Control for CNC (Wrong‑Rev Prevention)</h1>
  <p class="muted">
  Mục tiêu: giảm “wrong revision / wrong program” về <b>0</b> bằng 3 lớp kiểm soát:
- <b>(1) Baseline Package</b> (đúng file, đúng Rev),
- <b>(2) Gate checks</b> (Planning release → Job kickoff → First piece),
- <b>(3) Configuration audit</b> (đối chiếu as‑built ↔ requirement).
+ <b>(1) Bộ hồ sơ chuẩn (baseline package)</b> (đúng file, đúng Rev),
+ <b>(2) Cổng kiểm soát (gate) checks</b> (Planning release → Job kickoff → Mẫu đầu (first piece)),
+ <b>(3) Configuration đánh giá</b> (đối chiếu as‑built ↔ requirement).
  </p>
  </div>
  <div class="note">
@@ -95,9 +95,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <strong>Mục lục nhanh</strong>
  <ul>
  <li><a href="#where">2) Rev có thể sai ở đâu? (failure points)</a></li>
- <li><a href="#controls">3) Controls thực chiến (baseline + gates + audit)</a></li>
- <li><a href="#checklist">4) Checklist 10 điểm (job‑level)</a></li>
- <li><a href="#workshop">5) Workshop: làm config audit trong 15 phút</a></li>
+ <li><a href="#controls">3) Controls thực chiến (baseline + gates + đánh giá)</a></li>
+ <li><a href="#checklist">4) Bảng kiểm 10 điểm (job‑level)</a></li>
+ <li><a href="#workshop">5) Workshop: làm config đánh giá trong 15 phút</a></li>
  <li><a href="#assessment">6) Đánh giá (quiz + scenario)</a></li>
  <li><a href="#records">7) Hồ sơ bắt buộc</a></li>
  </ul>
@@ -111,75 +111,75 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <colgroup><col style="width:26%"/><col style="width:44%"/><col style="width:30%"/></colgroup>
  <thead><tr><th>Điểm lỗi</th><th>Ví dụ</th><th>Control bắt buộc</th></tr></thead>
  <tbody>
- <tr><td><b>PO / Drawing</b></td><td>Khách gửi bản vẽ mới nhưng PO ghi cũ</td><td>Contract review <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM‑QA‑001</a> + freeze</td></tr>
- <tr><td><b>CAM source</b></td><td>File CAM/NC lấy từ folder cá nhân</td><td>Baseline package (SSOT) + manifest checksum</td></tr>
+ <tr><td><b>PO / Drawing</b></td><td>Khách gửi bản vẽ mới nhưng PO ghi cũ</td><td>Rà soát hợp đồng <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM‑QA‑001</a> + freeze</td></tr>
+ <tr><td><b>CAM source</b></td><td>File CAM/NC lấy từ folder cá nhân</td><td>Bộ hồ sơ chuẩn (SSOT) + manifest checksum</td></tr>
  <tr><td><b>Post / Machine</b></td><td>Chạy nhầm post, nhầm machine config</td><td>Program release control (PROC‑CNC‑002)</td></tr>
  <tr><td><b>Setup sheet</b></td><td>Setup sheet không cập nhật rev</td><td>Setup sheet phát hành &amp; peer review</td></tr>
  <tr><td><b>On-machine program</b></td><td>Operator dùng program cũ lưu trên máy</td><td>Chỉ chạy program từ location kiểm soát; verify ID/Rev</td></tr>
- <tr><td><b>CMM program</b></td><td>Chương trình đo mismatch drawing rev</td><td>Inspection program release <a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM‑QA‑016</a></td></tr>
- <tr><td><b>As-built records</b></td><td>Ship pack thiếu chứng chỉ outsource đúng scope</td><td>Config audit <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a> + gate G5</td></tr>
+ <tr><td><b>CMM program</b></td><td>Chương trình đo mismatch drawing rev</td><td>Phát hành chương trình kiểm tra (inspection program release) <a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM‑QA‑016</a></td></tr>
+ <tr><td><b>As-built hồ sơ</b></td><td>Bộ hồ sơ giao hàng (ship packet) thiếu chứng chỉ outsource đúng scope</td><td>Config đánh giá <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a> + cổng kiểm soát G5</td></tr>
  </tbody>
  </table>
  </div>
  </div>
 
  <div class="card" id="controls">
- <h2>3) Controls thực chiến (baseline + gates + audit)</h2>
+ <h2>3) Controls thực chiến (baseline + gates + đánh giá)</h2>
  <div class="grid-2">
  <div class="callout">
- <h3>(1) Baseline Package</h3>
+ <h3>(1) Bộ hồ sơ chuẩn</h3>
  <ul class="list">
  <li>Tập file “đúng Rev” được phát hành 1 lần, có manifest/checksum.</li>
  <li>Không dùng file rời (email/zalo/USB) để chạy sản xuất.</li>
- <li>Được đối chiếu tại: Planning release → Job kickoff → First piece.</li>
+ <li>Được đối chiếu tại: Planning release → Job kickoff → Mẫu đầu.</li>
  </ul>
  </div>
  <div class="note">
- <h3>(2) Configuration Audit</h3>
+ <h3>(2) Configuration Đánh giá</h3>
  <ul class="list">
  <li>Đối chiếu requirement ↔ program/setup/inspection ↔ chứng chỉ ↔ as‑built.</li>
  <li>Thực hiện nhanh bằng <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a>.</li>
- <li>Áp dụng tối thiểu cho job có: Rev mới, CTQ, outsource special process, hoặc khách yêu cầu.</li>
+ <li>Áp dụng tối thiểu cho job có: Rev mới, CTQ, outsource công đoạn đặc biệt, hoặc khách yêu cầu.</li>
  </ul>
  </div>
  </div>
  <div class="callout">
- <h3>(3) Gate enforcement</h3>
+ <h3>(3) Cổng kiểm soát enforcement</h3>
  <p class="mini">Gates là cơ chế cưỡng chế không bypass. Tham chiếu <a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//02-WI-200//">WI‑OPS‑001</a>.</p>
  <ul class="list">
  <li><b>G0:</b> Contract freeze (đúng bản vẽ/rev, CTQ nhận diện)</li>
  <li><b>Planning Release:</b> FRM‑PLA‑001 đối chiếu baseline manifest</li>
  <li><b>G1:</b> FRM‑OPS‑008 + setup sheet + program release</li>
- <li><b>G2:</b> First piece/FAI + (nếu có) FRM‑QA‑016 CMM program release</li>
- <li><b>G4/G5:</b> Config audit + ship pack completeness</li>
+ <li><b>G2:</b> Mẫu đầu/FAI + (nếu có) FRM‑QA‑016 CMM program release</li>
+ <li><b>G4/G5:</b> Config đánh giá + bộ hồ sơ giao hàng completeness</li>
  </ul>
  </div>
  </div>
 
  <div class="card" id="checklist">
- <h2>4) Checklist 10 điểm (job‑level)</h2>
+ <h2>4) Bảng kiểm 10 điểm (job‑level)</h2>
  <ol class="list">
  <li>Part/Rev trên PO = Part/Rev trên drawing/spec?</li>
- <li>Baseline package có manifest/checksum và đúng Part/Rev?</li>
+ <li>Bộ hồ sơ chuẩn có manifest/checksum và đúng Part/Rev?</li>
  <li>Setup sheet hiển thị Program ID/Rev/Tool list/zero point?</li>
  <li>Chương trình trên máy = program phát hành (ID/Rev)?</li>
  <li>kế hoạch kiểm tra (inspection plan) có CTQ method + gage “green”?</li>
  <li>Nếu dùng CMM: FRM‑QA‑016 pass và báo cáo đo có Program ID/Rev?</li>
  <li>Nếu outsource: APL/scope/cert trace đầy đủ?</li>
  <li>Traveler/labels phản ánh đúng Rev &amp; trace lot?</li>
- <li>Job Dossier đặt đúng folder &amp; naming?</li>
+ <li>Hồ sơ công việc (job dossier) đặt đúng folder &amp; naming?</li>
  <li>Nếu phát hiện mismatch ở bất kỳ điểm nào → STOP/HOLD &amp; escalate.</li>
  </ol>
  </div>
 
  <div class="card" id="workshop">
- <h2>5) Workshop: làm config audit trong 15 phút</h2>
+ <h2>5) Workshop: làm config đánh giá trong 15 phút</h2>
  <p class="mini">Chọn 1 job thật (hoặc job mẫu), thực hiện FRM‑QA‑017 theo nhóm. Mục tiêu: tìm ít nhất 2 điểm mismatch tiềm ẩn và đề xuất control.</p>
  <ul class="list">
  <li>Nhóm 1: requirement (drawing/spec/CTQ)</li>
  <li>Nhóm 2: program/setup (CAM/NC/setup sheet)</li>
- <li>Nhóm 3: inspection/records (IR/FAI/CMM program)</li>
- <li>Nhóm 4: ship pack (labels/CoC/certs)</li>
+ <li>Nhóm 3: inspection/hồ sơ (IR/FAI/CMM program)</li>
+ <li>Nhóm 4: bộ hồ sơ giao hàng (labels/CoC/certs)</li>
  </ul>
  </div>
 
@@ -198,8 +198,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
  <div class="note">
  <h3>Scenario</h3>
- <p class="mini">Giảng viên đưa 1 bộ job pack có 1 lỗi “mismatch” (ví dụ: drawing Rev B, setup sheet Rev A). Học viên phải phát hiện và nêu đúng gate/record để HOLD.</p>
- <p class="mini"><b>Pass:</b> phát hiện mismatch + nêu đúng gate + tạo đúng bằng chứng (QC hold/log). <b>Fail:</b> đề xuất “chạy tạm rồi sửa sau”.</p>
+ <p class="mini">Giảng viên đưa 1 bộ job pack có 1 lỗi “mismatch” (ví dụ: drawing Rev B, setup sheet Rev A). Học viên phải phát hiện và nêu đúng cổng kiểm soát/hồ sơ để HOLD.</p>
+ <p class="mini"><b>Pass:</b> phát hiện mismatch + nêu đúng cổng kiểm soát + tạo đúng bằng chứng (QC hold/log). <b>Fail:</b> đề xuất “chạy tạm rồi sửa sau”.</p>
  </div>
  </div>
  </div>
@@ -212,7 +212,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <li>Workshop output: 01 bản FRM‑QA‑017 đã điền (job mẫu) + action list</li>
  </ul>
  <div class="note">
- <b>Nơi lưu chuẩn:</b> <span class="path">HR-Records/Training/TRN-OPS-08/&lt;YYYY&gt;/&lt;Batch&gt;</span>
+ <b>Nơi lưu chuẩn:</b> <span class="path">HR-Hồ sơ/Training/TRN-OPS-08/&lt;YYYY&gt;/&lt;Batch&gt;</span>
  </div>
  </div>
 

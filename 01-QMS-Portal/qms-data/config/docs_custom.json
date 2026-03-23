@@ -3238,8 +3238,8 @@
       "cat": "WI"
     },
     {
-      "code": "ANNEX-136",
-      "title": "ANNEX-136 — Server Stack Download Delivery Profiles",
+      "code": "(removed)",
+      "title": "(removed) — Server Stack Download Delivery Profiles",
       "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-136-excel-form-server-stack-download-delivery-profiles.html",
       "owner": "IT / QA-QMS",
       "category": "ANNEX",
@@ -3247,8 +3247,8 @@
       "description": "Chuẩn cấu hình stack server/edge để workbook FRM luôn được delivery dưới dạng download-only."
     },
     {
-      "code": "ANNEX-137",
-      "title": "ANNEX-137 — Pilot Endpoint Rollout and Save Path Control",
+      "code": "(removed)",
+      "title": "(removed) — Pilot Endpoint Rollout and Save Path Control",
       "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-137-excel-form-pilot-endpoint-rollout-and-save-path-control.html",
       "owner": "IT / QA-QMS / Functional Owners",
       "category": "ANNEX",
@@ -3256,8 +3256,8 @@
       "description": "Chuẩn rollout pilot endpoints, default app và save-path control cho baseline download-only."
     },
     {
-      "code": "ANNEX-138",
-      "title": "ANNEX-138 — Editorial Consistency Audit and Final Repair Register",
+      "code": "(removed)",
+      "title": "(removed) — Editorial Consistency Audit and Final Repair Register",
       "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-138-excel-form-editorial-consistency-audit-and-final-repair-register.html",
       "owner": "QA-QMS / IT",
       "category": "ANNEX",

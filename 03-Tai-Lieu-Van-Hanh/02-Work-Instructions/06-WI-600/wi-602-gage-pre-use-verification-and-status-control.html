@@ -72,11 +72,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng trước mọi phép đo pass/fail, CTQ, FAI, SPC, final release hoặc bất kỳ phép đo nào ảnh hưởng quyết định chất lượng.</div>
 <h1>WI-602 — Kiểm trước khi dùng dụng cụ đo, trạng thái CAL và xử lý nghi ngờ</h1>
 <div class="section"><h2>1. Mục đích và nguyên tắc sử dụng dụng cụ đo</h2>
-<p>WI này chuẩn hóa kiểm trước khi dùng dụng cụ đo tại điểm dùng. Mọi phép đo dùng để quyết định pass/fail, set offset, release first piece, release final hoặc xác nhận CTQ đều phải đi qua gate này. Không nhãn trạng thái, nhãn mờ, seal hỏng, gage vừa rơi hoặc không chứng minh được chuẩn so sánh thì coi như <span class="badge-red">HOLD</span>.</p>
+<p>WI này chuẩn hóa kiểm trước khi dùng dụng cụ đo tại điểm dùng. Mọi phép đo dùng để quyết định pass/fail, set offset, release mẫu đầu (first piece), release final hoặc xác nhận CTQ đều phải đi qua cổng kiểm soát (gate) này. Không nhãn trạng thái, nhãn mờ, seal hỏng, gage vừa rơi hoặc không chứng minh được chuẩn so sánh thì coi như <span class="badge-red">HOLD</span>.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Sign-out mọi gage dùng liên công đoạn, chỉ đo CTQ bằng gage đã zero và verify, và khai báo ngay mọi sự cố rơi, va đập, pin yếu, màn hình lỗi hoặc reading bất thường.</div></div>
-<div class="section"><h2>2. Gate kiểm trước khi dùng</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Gate</th><th>Phải kiểm</th><th>đạt khi</th><th>tạm giữ khi</th></tr></thead><tbody>
-<tr><td>G1 — Nhận diện</td><td>Gage ID, serial, trạng thái CAL, ngày hết hạn, owner/vị trí cấp phát.</td><td>Nhãn rõ, đúng gage, còn hiệu lực.</td><td>Không nhãn, sai ID, quá hạn, không truy ra record.</td></tr>
+<div class="section"><h2>2. Cổng kiểm soát kiểm trước khi dùng</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Phải kiểm</th><th>đạt khi</th><th>tạm giữ khi</th></tr></thead><tbody>
+<tr><td>G1 — Nhận diện</td><td>Gage ID, serial, trạng thái CAL, ngày hết hạn, người phụ trách/vị trí cấp phát.</td><td>Nhãn rõ, đúng gage, còn hiệu lực.</td><td>Không nhãn, sai ID, quá hạn, không truy ra hồ sơ.</td></tr>
 <tr><td>G2 — Tình trạng vật lý</td><td>Mặt đo, mỏ đo, đầu dò, dây cáp, màn hình, pin, seal, hộp bảo quản.</td><td>Không sứt mẻ, không rỉ, không bavia, không seal broken.</td><td>Rơi/va đập, seal hỏng, mặt đo trầy, ren gauge mẻ, pin yếu gây mất ổn định.</td></tr>
 <tr><td>G3 — Zero / reference</td><td>Zero tại điều kiện dùng; kiểm bằng chuẩn reference hoặc master phù hợp.</td><td>Zero ổn định, lặp lại tốt, master check đạt.</td><td>Zero trôi, lặp lại kém, sai trên master.</td></tr>
 <tr><td>G4 — Điều kiện đo</td><td>Nhiệt độ, sạch bề mặt, lực đo, đơn vị mm/inch, mode absolute/incremental.</td><td>Điều kiện đo phù hợp method và dụng cụ.</td><td>Chi tiết/gage còn nóng, bẩn, đơn vị sai, operator không hiểu method.</td></tr>
@@ -90,7 +90,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Pin/thread plug / ring gauge</td><td>Kiểm tình trạng bề mặt, mã size/class, hướng GO/NO-GO, sạch phoi.</td><td>Không dùng pin/ring mòn không truy được lịch sử hoặc lẫn bộ.</td></tr>
 <tr><td>Surface roughness / leak / special test instrument</td><td>Kiểm trạng thái CAL, self-test, reference specimen/zero block, phụ kiện đúng.</td><td>Nếu method yêu cầu warm-up hoặc environment stabilization thì phải chờ đủ thời gian.</td></tr>
 </tbody></table></div></div>
-<div class="section"><h2>4. Phản ứng khi gage nghi ngờ hoặc fail gate</h2>
+<div class="section"><h2>4. Phản ứng khi gage nghi ngờ hoặc fail cổng kiểm soát</h2>
 <div class="step-list">
 <div class="step-item"><strong>Dừng dùng ngay.</strong><br/>Đặt trạng thái HOLD vật lý; không tiếp tục đo để “kiểm thử thêm”.</div>
 <div class="step-item"><strong>Khóa ảnh hưởng.</strong><br/>Xác định phép đo nào đã dùng gage này từ lần verify cuối cùng; nếu đã dùng cho CTQ/release thì kích hoạt <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
@@ -107,7 +107,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="kpi-grid">
 <div class="kpi-box"><strong>KPI-WI602-01</strong><br/>Tỷ lệ gage fail quick verification trên tổng số lần sử dụng.</div>
 <div class="kpi-box"><strong>KPI-WI602-02</strong><br/>Số lô bị ảnh hưởng do dùng gage nghi ngờ/hết hạn/seal broken.</div>
-<div class="kpi-box"><strong>KPI-WI602-03</strong><br/>Tỷ lệ CTQ measurement có evidence verify đầy đủ trước khi đo.</div>
+<div class="kpi-box"><strong>KPI-WI602-03</strong><br/>Tỷ lệ CTQ measurement có bằng chứng verify đầy đủ trước khi đo.</div>
 <div class="kpi-box"><strong>KPI-WI602-04</strong><br/>Số lần operator phải đổi method đo do measurement system không phù hợp.</div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>

@@ -8,7 +8,7 @@
     "ổn định tên portal docs theo baseline"
   ],
   "repairs": [
-    "ANNEX-130 dùng slug download-only chuẩn",
+    "(removed) dùng slug download-only chuẩn",
     "Portal docs phase tạm đổi sang baseline filenames ổn định",
     "Logo HESEM trong active HTML dùng local asset",
     "Bổ sung stack profiles, pilot rollout và final repair register",

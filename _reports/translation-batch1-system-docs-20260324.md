@@ -1,135 +1,50 @@
 # Translation Batch 1 - 02-Tai-Lieu-He-Thong - 2026-03-24
 
-- Target directory: `02-Tai-Lieu-He-Thong`
-- Files scanned: 54
-- Files changed: 54
-- Total replacements: 2806
+- Target directory: `10-Training-Academy`
+- Files scanned: 197
+- Files changed: 163
+- Total replacements: 1508
 
 ## Top Rules
 
-- `owner`: 282
-- `readiness`: 204
-- `audit`: 194
-- `record`: 171
-- `evidence`: 152
-- `records`: 147
-- `gate`: 137
-- `checklist`: 124
-- `first_piece`: 113
-- `complaint`: 102
-- `transaction`: 92
-- `authority`: 81
-- `job_order`: 70
-- `lead_time`: 44
-- `contract_review`: 42
-- `change_control`: 42
-- `management_review`: 41
-- `ship_release`: 40
-- `aging`: 39
-- `due_date`: 38
-- `process_owner`: 38
-- `high_mix`: 31
-- `lesson_learned`: 29
-- `control_tower`: 27
-- `quality_gate`: 26
-- `workflow`: 24
-- `final_inspection`: 24
-- `cert_pack`: 22
-- `follow_up`: 22
-- `root_cause`: 20
-- `ship_risk`: 19
-- `technical_release`: 18
-- `job_dossier`: 17
-- `owner_main`: 16
-- `title_owner`: 15
-- `evidence_pack`: 13
-- `pre_run_verification`: 12
-- `owners`: 12
-- `job_packet`: 12
-- `assumption_log`: 11
-- `baseline_package`: 11
-- `effectivity`: 11
-- `pack_reconciliation`: 11
-- `authority_matrix`: 11
-- `record_integrity`: 10
-- `signoff`: 9
-- `business_owners`: 9
-- `engineering_release`: 9
-- `action_tracker`: 9
-- `internal_audit`: 8
-- `escalation_owner`: 8
-- `job_traveler`: 8
-- `release_package`: 7
-- `ship_confirm`: 7
-- `restore_test`: 6
-- `inspection_program_release`: 6
-- `review_pack`: 6
-- `access_control`: 6
-- `data_owner`: 6
-- `approval_matrix`: 6
-- `production_readiness`: 4
-- `audit_evidence`: 4
-- `record_retention`: 4
-- `work_transfer`: 4
-- `action_plan`: 4
-- `order_ack`: 4
-- `hold_point`: 4
-- `process_owners`: 3
-- `ship_packet`: 3
-- `workspace`: 3
-- `pending_approvals`: 3
-- `contract_screening`: 2
-- `support_functions`: 2
-- `change_history`: 2
-- `source_revision`: 2
-- `offline_mode`: 2
-- `owner_approval`: 2
-- `open_orders`: 2
-- `ship_release_pack`: 2
-- `complaints`: 2
-- `delay_notice`: 2
-- `quote_package`: 2
-- `hot_issues`: 2
-- `low_mid_volume`: 1
-- `evidence_driven`: 1
-- `owner_giao_dien`: 1
-- `source_control`: 1
-- `stage_gate`: 1
-- `reviewers`: 1
-- `reviewed_requirements`: 1
-- `department_owners`: 1
-- `ship_mode`: 1
-- `evidence_requirements`: 1
-- `open_issues`: 1
-- `internal_owner`: 1
-- `shipment_update`: 1
-- `high_risk_job`: 1
-- `owner_main_lower`: 1
+- `metric`: 568
+- `process`: 204
+- `special_process`: 172
+- `gate`: 147
+- `cleanup_no_evidence_no_gate`: 139
+- `evidence`: 139
+- `metrics`: 56
+- `cleanup_ksem`: 48
+- `cleanup_60_second_audit_drill`: 13
+- `hold_point`: 9
+- `cleanup_system_of_record`: 6
+- `processes`: 4
+- `standards`: 3
 
 ## Top Changed Files
 
-- `02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html`: 142 thay thế (gate=14, evidence=10, record=9, authority=6, effectivity=5, management_review=4)
-- `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html`: 130 thay thế (transaction=49, owner=19, process_owner=11, record=8, evidence=8, records=5)
-- `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html`: 115 thay thế (complaint=23, owner=14, contract_review=10, record=8, change_control=6, control_tower=4)
-- `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html`: 113 thay thế (gate=17, complaint=17, audit=12, owner=11, record=9, evidence=6)
-- `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html`: 111 thay thế (first_piece=22, readiness=13, owner=12, gate=11, evidence=10, record=9)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-internal-auditor-outsource.html`: 107 thay thế (audit=59, process_owner=8, owner=7, management_review=6, checklist=6, evidence=4)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html`: 102 thay thế (audit=33, evidence=11, process_owner=9, owner=7, management_review=6, record=6)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html`: 86 thay thế (audit=18, complaint=11, owner=7, readiness=6, gate=6, ship_release=5)
-- `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html`: 83 thay thế (first_piece=11, owner=9, evidence=7, baseline_package=6, record=5, effectivity=5)
-- `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html`: 82 thay thế (owner=21, readiness=10, record=8, business_owners=6, title_owner=5, workflow=4)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html`: 80 thay thế (readiness=15, due_date=9, gate=9, aging=7, owner=6, transaction=5)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html`: 80 thay thế (complaint=23, contract_review=15, owner=6, due_date=5, change_control=4, ship_release=4)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html`: 76 thay thế (gate=11, readiness=10, record=10, quality_gate=10, final_inspection=6, evidence=4)
-- `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html`: 73 thay thế (evidence=26, aging=7, owner=6, audit=5, records=4, due_date=4)
-- `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html`: 73 thay thế (record=8, owner=8, cert_pack=7, gate=5, readiness=4, complaint=3)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html`: 70 thay thế (transaction=11, records=9, workflow=7, owner=7, evidence=6, audit=6)
-- `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html`: 69 thay thế (owner=18, records=8, readiness=7, checklist=7, record=5, authority=4)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html`: 64 thay thế (first_piece=15, readiness=15, owner=8, gate=7, record=6, quality_gate=2)
-- `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html`: 63 thay thế (owner=13, checklist=6, readiness=5, evidence=5, records=5, gate=4)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html`: 62 thay thế (change_control=8, technical_release=8, readiness=6, owner=6, first_piece=5, lesson_learned=4)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html`: 60 thay thế (readiness=11, owner=7, gate=6, record=5, aging=4, control_tower=4)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html`: 60 thay thế (first_piece=22, record=7, gate=6, evidence=3, readiness=2, change_control=2)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html`: 52 thay thế (lead_time=7, checklist=7, lesson_learned=6, engineering_release=5, contract_review=5, owner=5)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html`: 52 thay thế (readiness=21, cert_pack=7, owner=5, control_tower=4, ship_risk=2, ship_release=2)
-- `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html`: 50 thay thế (gate=8, record=8, records=6, evidence=6, first_piece=4, final_inspection=4)
+- `10-Training-Academy/01-Competency-System/01-Framework/competency-metrics.html`: 64 thay thế (metric=62, metrics=2)
+- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-01.html`: 44 thay thế (cleanup_60_second_audit_drill=10, special_process=9, gate=6, cleanup_no_evidence_no_gate=5, evidence=5, process=5)
+- `10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-06.html`: 34 thay thế (metric=9, cleanup_no_evidence_no_gate=6, gate=6, evidence=6, special_process=4, metrics=3)
+- `10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-03.html`: 32 thay thế (gate=10, cleanup_no_evidence_no_gate=9, evidence=9, metric=4)
+- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-20.html`: 28 thay thế (special_process=17, cleanup_no_evidence_no_gate=3, gate=3, evidence=3, process=2)
+- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-14.html`: 27 thay thế (special_process=9, process=9, cleanup_no_evidence_no_gate=3, gate=3, evidence=3)
+- `10-Training-Academy/01-Competency-System/02-Levels/15-C15-Material-Science/C15-L3.html`: 26 thay thế (special_process=22, process=4)
+- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-26.html`: 25 thay thế (cleanup_no_evidence_no_gate=7, gate=7, evidence=7, special_process=3, process=1)
+- `10-Training-Academy/02-Training-Content/01-Modules/C03.html`: 22 thay thế (metric=11, process=6, cleanup_ksem=2, metrics=2, special_process=1)
+- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-24.html`: 22 thay thế (gate=7, cleanup_no_evidence_no_gate=6, evidence=6, special_process=2, process=1)
+- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-03.html`: 20 thay thế (cleanup_no_evidence_no_gate=6, gate=6, evidence=6, process=2)
+- `10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-05.html`: 20 thay thế (cleanup_no_evidence_no_gate=6, gate=6, evidence=6, special_process=2)
+- `10-Training-Academy/02-Training-Content/01-Modules/C10.html`: 19 thay thế (metric=11, process=4, cleanup_ksem=2, metrics=2)
+- `10-Training-Academy/02-Training-Content/01-Modules/C02.html`: 18 thay thế (metric=11, process=3, cleanup_ksem=2, metrics=2)
+- `10-Training-Academy/02-Training-Content/01-Modules/C13.html`: 18 thay thế (metric=11, cleanup_ksem=2, metrics=2, process=2, special_process=1)
+- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-23.html`: 18 thay thế (cleanup_no_evidence_no_gate=6, gate=6, evidence=6)
+- `10-Training-Academy/01-Competency-System/02-Levels/15-C15-Material-Science/C15-L4.html`: 17 thay thế (special_process=16, process=1)
+- `10-Training-Academy/02-Training-Content/01-Modules/C15.html`: 17 thay thế (metric=11, cleanup_ksem=2, metrics=2, process=1, special_process=1)
+- `10-Training-Academy/02-Training-Content/01-Modules/C16.html`: 17 thay thế (metric=11, cleanup_ksem=2, metrics=2, process=2)
+- `10-Training-Academy/02-Training-Content/01-Modules/C17.html`: 17 thay thế (metric=11, cleanup_ksem=2, metrics=2, process=2)
+- `10-Training-Academy/02-Training-Content/01-Modules/C18.html`: 17 thay thế (metric=11, cleanup_ksem=2, metrics=2, process=1, special_process=1)
+- `10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-07.html`: 17 thay thế (special_process=5, cleanup_no_evidence_no_gate=4, gate=4, evidence=4)
+- `10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L4.html`: 16 thay thế (process=5, metric=3, cleanup_no_evidence_no_gate=2, gate=2, evidence=2, special_process=1)
+- `10-Training-Academy/02-Training-Content/01-Modules/C01.html`: 16 thay thế (metric=11, cleanup_ksem=2, metrics=2, process=1)
+- `10-Training-Academy/02-Training-Content/01-Modules/C04.html`: 16 thay thế (metric=11, cleanup_ksem=2, metrics=2, process=1)

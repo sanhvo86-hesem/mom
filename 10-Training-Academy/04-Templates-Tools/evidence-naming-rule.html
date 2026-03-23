@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>TRN-ACA-EVID-01 — Evidence Naming Convention & Storage Rules (SSOT) | HESEM OS</title>
+<title>TRN-ACA-EVID-01 — Bằng chứng Naming Convention & Storage Rules (SSOT) | HESEM OS</title>
 <link href="../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -55,11 +55,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>EVIDENCE-NAMING-RULE — Evidence Naming Convention & Storage Rules (SSOT)</strong>
+  <strong>BẰNG CHỨNG-NAMING-RULE — Bằng chứng Naming Convention & Storage Rules (SSOT)</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>EVIDENCE-NAMING-RULE</span></div>
+  <div class="row"><span><b>Mã:</b></span><span>BẰNG CHỨNG-NAMING-RULE</span></div>
   <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
   <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
   <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
@@ -71,14 +71,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="kicker">HESEM CNC Academy</div>
 <h1 class="h1">Quy tắc đặt tên &amp; lưu bằng chứng (SSOT)</h1>
 <p class="lead">
- Trang này chuẩn hóa <b>cách đặt tên file</b>, <b>cấu trúc Job Dossier</b> và <b>quy tắc lưu bằng chứng</b>.
- Mục tiêu: truy xuất hồ sơ <b>≤ 60 giây</b> trong audit khách hàng và audit nội bộ.
+ Trang này chuẩn hóa <b>cách đặt tên file</b>, <b>cấu trúc Hồ sơ công việc (job dossier)</b> và <b>quy tắc lưu bằng chứng</b>.
+ Mục tiêu: truy xuất hồ sơ <b>≤ 60 giây</b> trong đánh giá khách hàng và đánh giá nội bộ.
  </p>
 </div>
 <div class="card danger">
-<span class="badge">Gate</span>
+<span class="badge">Cổng kiểm soát (gate)</span>
 <ul class="tight">
-<li><b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)</b>: thiếu MRR trong SSOT → khóa chuyển bước.</li>
+<li><b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)</b>: thiếu MRR trong SSOT → khóa chuyển bước.</li>
 <li><b>Sai REV</b> hoặc <b>file rời ngoài SSOT</b> → HOLD/FAIL.</li>
 <li><b>Đặt tên sai chuẩn</b> → hồ sơ không được công nhận trong đánh giá năng lực.</li>
 </ul>
@@ -87,7 +87,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">1) Nguyên tắc SSOT</span>
 <ul class="tight">
-<li><b>Source of Record (SoR)</b>: Epicor/MES/thiết bị đo (log gốc).</li>
+<li><b>Source of Hồ sơ (SoR)</b>: Epicor/MES/thiết bị đo (log gốc).</li>
 <li><b>Single Source of Truth (SSOT)</b>: M365/SharePoint → <b>HESEM-QMS-SSOT</b>.</li>
 <li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Lưu hồ sơ chính trong SSOT đã chỉ định; không dùng máy cá nhân, USB, Zalo hoặc Email làm nơi lưu chính.</li>
 <li><b>KHI</b> bắt buộc chụp màn hình (sự cố hệ thống) → tạo <b>Incident Note</b> và nộp vào SSOT.</li>
@@ -104,15 +104,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<span class="badge">3) Cấu trúc Job Dossier chuẩn</span>
+<span class="badge">3) Cấu trúc Hồ sơ công việc chuẩn</span>
 <p class="lead" style="margin-top:10px;">
- Job Dossier được đặt tên theo mẫu: <b>{JobNum}_{PartNum}_{RevisionNum}</b>.
+ Hồ sơ công việc được đặt tên theo mẫu: <b>{JobNum}_{PartNum}_{RevisionNum}</b>.
  </p>
 <div class="mono-block" style="margin-top:10px;">
  JOB-2602-001_BRACKET-123_REV-C/
  <br/>├── 00_Input/ (PO, RFQ, Drawing, Spec)
- <br/>├── 10_Engineering/ (Baseline package, CAM, Setup sheet)
- <br/>├── 20_Production/ (Traveler, Setup photos, In-process log)
+ <br/>├── 10_Engineering/ (Bộ hồ sơ chuẩn (baseline package), CAM, Setup sheet)
+ <br/>├── 20_Production/ (Traveler, Setup photos, In-quy trình log)
  <br/>├── 30_QC/ (IR, FAI, Final, NCR)
  <br/>├── 40_Supplier/ (MTR, CoC, Outsource cert)
  <br/>├── 50_Shipping/ (bộ hồ sơ giao hàng (ship packet), CoC, Packing, Label)
@@ -128,7 +128,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mẫu chuẩn:
  </p>
 <div class="mono-block">
- {JobNum}_{PartNum}_REV-{Rev}_{RecordType}_{YYYY-MM-DD}_{Seq}_{Owner}.{ext}
+ {JobNum}_{PartNum}_REV-{Rev}_{RecordType}_{YYYY-MM-DD}_{Seq}_{Người phụ trách}.{ext}
  </div>
 <div class="table-card" style="margin-top:12px;">
 <table class="table">
@@ -140,7 +140,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>RecordType</b></td><td>Loại hồ sơ</td><td>IR / FAI / NCR / CoC</td></tr>
 <tr><td><b>Date</b></td><td>Ngày tạo</td><td>2026-02-09</td></tr>
 <tr><td><b>Seq</b></td><td>Thứ tự</td><td>01 / 02</td></tr>
-<tr><td><b>Owner</b></td><td>Người tạo</td><td>QC / SET / CAM</td></tr>
+<tr><td><b>Người phụ trách</b></td><td>Người tạo</td><td>QC / SET / CAM</td></tr>
 </tbody>
 </table>
 </div>
@@ -161,20 +161,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td><b>RFQ</b></td><td>Yêu cầu báo giá</td><td>RFQ + drawing/spec</td></tr>
 <tr><td><b>PO</b></td><td>Đơn hàng khách hàng</td><td>PO + terms</td></tr>
-<tr><td><b>CR</b></td><td>Contract Review</td><td>FRM-QA-001</td></tr>
-<tr><td><b>BASELINE</b></td><td>Baseline package</td><td>Setup sheet + inspection plan</td></tr>
+<tr><td><b>CR</b></td><td>Rà soát hợp đồng</td><td>FRM-QA-001</td></tr>
+<tr><td><b>BASELINE</b></td><td>Bộ hồ sơ chuẩn</td><td>Setup sheet + inspection plan</td></tr>
 <tr><td><b>TRV</b></td><td>Traveler/Route</td><td>FRM-OPS-001</td></tr>
-<tr><td><b>IR</b></td><td>Inspection Report</td><td>In-process/Final IR</td></tr>
+<tr><td><b>IR</b></td><td>Inspection Report</td><td>In-quy trình/Final IR</td></tr>
 <tr><td><b>FAI</b></td><td>First Article Inspection</td><td>FAI report</td></tr>
 <tr><td><b>NCR</b></td><td>Nonconformity Report</td><td>NCR + disposition</td></tr>
-<tr><td><b>CAPA</b></td><td>Corrective action</td><td>CAPA record + effectiveness</td></tr>
+<tr><td><b>CAPA</b></td><td>Corrective action</td><td>CAPA hồ sơ + effectiveness</td></tr>
 <tr><td><b>MTR</b></td><td>Material test report</td><td>Mill cert</td></tr>
 <tr><td><b>SUP-CERT</b></td><td>Supplier certificate</td><td>Anodize/heat treat cert</td></tr>
 <tr><td><b>COC</b></td><td>Certificate of Conformance</td><td>CoC</td></tr>
-<tr><td><b>PACK</b></td><td>Packing/Label</td><td>Packing list + label photo</td></tr>
-<tr><td><b>SHIP</b></td><td>Shipping evidence</td><td>Delivery note, POD</td></tr>
-<tr><td><b>OJT</b></td><td>Đào tạo tại hiện trường</td><td>OJT log + checklist</td></tr>
-<tr><td><b>GATE</b></td><td>Gate test</td><td>Role gate test pack</td></tr>
+<tr><td><b>PACK</b></td><td>Packing/Label</td><td>Phiếu kê đóng gói + label photo</td></tr>
+<tr><td><b>SHIP</b></td><td>Shipping bằng chứng</td><td>Delivery note, POD</td></tr>
+<tr><td><b>OJT</b></td><td>Đào tạo tại hiện trường</td><td>OJT log + bảng kiểm</td></tr>
+<tr><td><b>CỔNG KIỂM SOÁT</b></td><td>Cổng kiểm soát test</td><td>Role cổng kiểm soát test pack</td></tr>
 <tr><td><b>CERT</b></td><td>Chứng nhận level</td><td>Certificate scan + register</td></tr>
 </tbody>
 </table>
@@ -182,7 +182,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card">
 <span class="badge">6) Quy tắc đặt tên hồ sơ đào tạo</span>
-<p class="lead" style="margin-top:10px;">Áp dụng cho OJT/Gate Test/Certificate.</p>
+<p class="lead" style="margin-top:10px;">Áp dụng cho OJT/Cổng kiểm soát Test/Certificate.</p>
 <div class="mono-block">
  EMP-{EmpID}_{RecordType}_{CxxLx}_{YYYY-MM-DD}_{Seq}_{Assessor}.{ext}
  </div>
@@ -199,19 +199,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">7) Fail-fast</span>
 <ul class="tight">
 <li>Thiếu <b>REV</b> trong tên file → FAIL.</li>
-<li>Không nằm trong <b>Job Dossier</b> hoặc <b>Training SSOT</b> → FAIL.</li>
+<li>Không nằm trong <b>Hồ sơ công việc</b> hoặc <b>Training SSOT</b> → FAIL.</li>
 <li>Ghi chồng file cũ (overwrite) → FAIL, bắt buộc tạo Seq mới.</li>
-<li>Không truy xuất được trong 60 giây → FAIL gate.</li>
+<li>Không truy xuất được trong 60 giây → FAIL cổng kiểm soát.</li>
 </ul>
 </div>
 <div class="card">
 <span class="badge">8) Drill truy xuất 60 giây</span>
 <ol style="margin:10px 0 0 0; padding-left:18px; line-height:1.75;">
-<li>Mở Job Dossier theo JobNum.</li>
+<li>Mở Hồ sơ công việc theo JobNum.</li>
 <li>Xác nhận REV tại folder name.</li>
 <li>Tìm RecordType theo thư mục: 30_QC, 50_Shipping, 40_Supplier…</li>
 <li>Mở đúng file theo mẫu tên; kiểm tra ngày và Seq.</li>
-<li>Copy link file (SharePoint link) và dán vào form/record cần bàn giao.</li>
+<li>Copy link file (SharePoint link) và dán vào form/hồ sơ cần bàn giao.</li>
 </ol>
 </div>
 </div>

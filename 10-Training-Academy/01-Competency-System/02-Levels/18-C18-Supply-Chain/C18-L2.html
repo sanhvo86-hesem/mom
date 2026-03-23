@@ -71,12 +71,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục drill tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-material-cert-specialprocess.html"><b>DRL-03</b> — Material Cert &amp; Special Process Outsource Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Shipping Packet + CoC Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Job Order E2E Drill (RFQ → Ship Packet)</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-material-cert-specialprocess.html"><b>DRL-03</b> — Material Cert &amp; Công đoạn đặc biệt Outsource Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Shipping Packet + CoC Drill</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Lệnh sản xuất E2E Drill (RFQ → Bộ hồ sơ giao hàng (ship packet))</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
  </p>
-</div><p class="lead"><strong>Mô tả năng lực:</strong> Quản trị PO tracker, kiểm soát nhà cung cấp và vận hành outsource (dispatch/return) có đầy đủ dossier và cổng kiểm tra đầu vào.</p><div class="card"><strong>Mô tả Level:</strong> Vận hành mua hàng và logistics cho dịch vụ thuê ngoài/nhà cung cấp: theo dõi PO, kiểm soát hồ sơ NCC, triển khai dispatch và nhận về theo checklist, xử lý sai lệch tồn kho bằng cycle count.</div><section class="hero">
+</div><p class="lead"><strong>Mô tả năng lực:</strong> Quản trị PO tracker, kiểm soát nhà cung cấp và vận hành outsource (dispatch/return) có đầy đủ dossier và cổng kiểm tra đầu vào.</p><div class="card"><strong>Mô tả Level:</strong> Vận hành mua hàng và logistics cho dịch vụ thuê ngoài/nhà cung cấp: theo dõi PO, kiểm soát hồ sơ NCC, triển khai dispatch và nhận về theo bảng kiểm, xử lý sai lệch tồn kho bằng cycle count.</div><section class="hero">
 <div class="hero-grid">
 <div>
 <span class="pill">C18-L2 • Mua hàng • Nhà cung cấp • Outsource</span>
@@ -91,7 +91,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
 </div>
 <div class="note">
-<strong>Gate bắt buộc</strong>
+<strong>Cổng kiểm soát (gate) bắt buộc</strong>
 <div>Không có đánh giá nhà cung cấp / không có hồ sơ outsource / nhập kho sai phiên bản (wrong revision) = không đạt Level.</div>
 </div>
 </div>
@@ -105,8 +105,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>S</b></td>
-<td>Tạo/duy trì PO tracker, kiểm soát hồ sơ NCC, dispatch outsource đúng checklist, nhận về đúng incoming gate.</td>
-<td>01 hồ sơ outsource hoàn chỉnh + 01 cycle count record.</td>
+<td>Tạo/duy trì PO tracker, kiểm soát hồ sơ NCC, dispatch outsource đúng bảng kiểm, nhận về đúng incoming cổng kiểm soát.</td>
+<td>01 hồ sơ outsource hoàn chỉnh + 01 cycle count hồ sơ.</td>
 </tr>
 <tr>
 <td><b>E</b></td>
@@ -131,7 +131,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="cap">B2 — Chọn NCC &amp; phát hành PO</div>
 <ul>
 <li>NCC phải nằm trong danh sách phê duyệt hoặc có hồ sơ đánh giá ban đầu.</li>
-<li>PO phải nêu: Part/Rev/Process/Qty/Leadtime/Docs.</li>
+<li>PO phải nêu: Part/Rev/Quy trình/Qty/Thời gian dẫn (lead time)/Docs.</li>
 </ul>
 </div>
 <div class="step">
@@ -162,12 +162,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Đóng SCAR khi có hành động + bằng chứng hiệu lực.</li>
 </ul>
 </div>
-</div><h2 class="h2">3) Checklist thực chiến</h2><div class="cols-2">
+</div><h2 class="h2">3) Bảng kiểm thực chiến</h2><div class="cols-2">
 <div class="card">
 <h3 class="h3">PO tracker (mỗi PO line)</h3>
 <ul>
-<li>PO/Line/Part/Rev/Process/Qty/Leadtime.</li>
-<li>Yêu cầu chứng từ (MTR/CoC/Process Cert).</li>
+<li>PO/Line/Part/Rev/Quy trình/Qty/Thời gian dẫn.</li>
+<li>Yêu cầu chứng từ (MTR/CoC/Quy trình Cert).</li>
 <li>Trạng thái kiểm tra đầu vào: required / not required + tiêu chí.</li>
 <li>Log trao đổi NCC: ngày/giờ/người/commit.</li>
 </ul>
@@ -175,8 +175,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3">Outsource dossier (dispatch &amp; return)</h3>
 <ul>
-<li>Dispatch checklist ký đủ.</li>
-<li>Return: CoC/cert + incoming inspection record.</li>
+<li>Dispatch bảng kiểm ký đủ.</li>
+<li>Return: CoC/cert + incoming inspection hồ sơ.</li>
 <li>Hồ sơ lưu theo Supplier Folder Index.</li>
 </ul>
 </div>
@@ -194,15 +194,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>FRM nào dùng để đánh giá nhà cung cấp?</li>
 <li>FRM nào dùng để scorecard NCC theo tháng?</li>
 <li>FRM nào dùng để phát hành SCAR?</li>
-<li>Dispatch outsource bắt buộc dùng checklist nào?</li>
+<li>Dispatch outsource bắt buộc dùng bảng kiểm nào?</li>
 <li>Incoming inspection cho outsource dùng form nào?</li>
 <li>Cycle count nhằm mục tiêu gì?</li>
 <li>Hành động bắt buộc khi PO trễ và ảnh hưởng kế hoạch?</li>
-<li>1 ví dụ về Gate của C18.</li>
+<li>1 ví dụ về Cổng kiểm soát của C18.</li>
 </ol><details class="card"><summary><b>Đáp án chuẩn</b></summary>
 <ol>
 <li>Kiểm soát quá trình/đầu vào từ bên ngoài (externally provided).</li>
-<li>Part/Rev/Process + Qty + yêu cầu chứng từ/tiêu chí chất lượng.</li>
+<li>Part/Rev/Quy trình + Qty + yêu cầu chứng từ/tiêu chí chất lượng.</li>
 <li>FRM-PUR-002.</li>
 <li>FRM-PUR-005.</li>
 <li>FRM-PUR-006.</li>

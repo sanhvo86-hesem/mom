@@ -83,8 +83,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">Mục tiêu</span>
 <ul class="tight">
 <li>Không để hazard tồn tại sau khi đã thấy.</li>
-<li>Before/after evidence rõ.</li>
-<li>nhật ký hành động (action log) có owner/due và theo dõi ca sau.</li>
+<li>Before/after bằng chứng rõ.</li>
+<li>nhật ký hành động (action log) có người phụ trách/due và theo dõi ca sau.</li>
 </ul>
 </div>
 <div class="card">
@@ -95,7 +95,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">Chuẩn bị</span>
 <ul class="tight">
-<li>Checklist 5S và hazard list template.</li>
+<li>Bảng kiểm 5S và hazard list template.</li>
 <li>Thẻ STOP/HOLD, băng cảnh báo.</li>
 <li>Điện thoại chụp ảnh (timestamp).</li>
 </ul>
@@ -105,10 +105,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Owner</th><th>MRR</th><th style="width:90px;">Gate</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Người phụ trách</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Chọn 01 khu vực (cell/máy/kho) và chạy 5S walk (≤ 10 phút).</td><td>Trainee</td><td>Before photos</td><td>FAIL</td></tr><tr><td>2</td><td>Nhận diện ≥ 10 hazard: PPE, guard, trip, chip, coolant, điện, nâng hạ, dao cụ.</td><td>Trainee</td><td>Hazard list (1 trang)</td><td>HOLD</td></tr><tr><td>3</td><td>Phân loại: STOP (nguy hiểm ngay) / FIX (sửa trong ca) / PLAN (hành động có due).</td><td>Supervisor</td><td>Risk classification + tag</td><td>STOP</td></tr><tr><td>4</td><td>Thực hiện FIX ngay tại hiện trường và chụp after photo.</td><td>Team</td><td>After photos</td><td>FAIL</td></tr><tr><td>5</td><td>Mở nhật ký hành động (action log) cho PLAN: owner + due + evidence link.</td><td>Supervisor</td><td>Action log</td><td>FAIL</td></tr><tr><td>6</td><td>Cập nhật board an toàn/5S và escal KHI vượt quyền hạn cell.</td><td>Supervisor</td><td>Board update snapshot + escal log</td><td>HOLD</td></tr>
+<tr><td>1</td><td>Chọn 01 khu vực (cell/máy/kho) và chạy 5S walk (≤ 10 phút).</td><td>Trainee</td><td>Before photos</td><td>FAIL</td></tr><tr><td>2</td><td>Nhận diện ≥ 10 hazard: PPE, guard, trip, chip, coolant, điện, nâng hạ, dao cụ.</td><td>Trainee</td><td>Hazard list (1 trang)</td><td>HOLD</td></tr><tr><td>3</td><td>Phân loại: STOP (nguy hiểm ngay) / FIX (sửa trong ca) / PLAN (hành động có due).</td><td>Supervisor</td><td>Risk classification + tag</td><td>STOP</td></tr><tr><td>4</td><td>Thực hiện FIX ngay tại hiện trường và chụp after photo.</td><td>Team</td><td>After photos</td><td>FAIL</td></tr><tr><td>5</td><td>Mở nhật ký hành động (action log) cho PLAN: người phụ trách + due + bằng chứng link.</td><td>Supervisor</td><td>Action log</td><td>FAIL</td></tr><tr><td>6</td><td>Cập nhật board an toàn/5S và escal KHI vượt quyền hạn cell.</td><td>Supervisor</td><td>Board update snapshot + escal log</td><td>HOLD</td></tr>
 </tbody>
 </table>
 </div>
@@ -117,8 +117,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">Fail-fast</span>
 <ul class="tight">
 <li>Phát hiện hazard nhưng không STOP hoặc không FIX trong ca.</li>
-<li>Không có before/after evidence.</li>
-<li>nhật ký hành động (action log) không có owner/due.</li>
+<li>Không có before/after bằng chứng.</li>
+<li>nhật ký hành động (action log) không có người phụ trách/due.</li>
 </ul>
 </div>
 <div class="card">
@@ -128,7 +128,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Hazard spotting</b></td><td>Nhận diện đủ và đúng loại hazard; không bỏ sót nguy cơ lớn.</td><td>0/1/2</td></tr><tr><td><b>Immediate control</b></td><td>STOP kích hoạt đúng; không để nguy cơ tồn tại khi phát hiện.</td><td>0/1/2</td></tr><tr><td><b>5S execution</b></td><td>FIX thực hiện trong ca và có before/after evidence.</td><td>0/1/2</td></tr><tr><td><b>Action management</b></td><td>PLAN có owner + due + theo dõi; escal đúng tuyến.</td><td>0/1/2</td></tr><tr><td><b>Culture</b></td><td>Thái độ ownership: chủ động, không đổ lỗi.</td><td>0/1/2</td></tr>
+<tr><td><b>Hazard spotting</b></td><td>Nhận diện đủ và đúng loại hazard; không bỏ sót nguy cơ lớn.</td><td>0/1/2</td></tr><tr><td><b>Immediate control</b></td><td>STOP kích hoạt đúng; không để nguy cơ tồn tại khi phát hiện.</td><td>0/1/2</td></tr><tr><td><b>5S execution</b></td><td>FIX thực hiện trong ca và có before/after bằng chứng.</td><td>0/1/2</td></tr><tr><td><b>Action management</b></td><td>PLAN có người phụ trách + due + theo dõi; escal đúng tuyến.</td><td>0/1/2</td></tr><tr><td><b>Culture</b></td><td>Thái độ ownership: chủ động, không đổ lỗi.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>

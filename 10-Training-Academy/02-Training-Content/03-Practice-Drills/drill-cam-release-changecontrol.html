@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>TRN-ACA-DRL-05 — CAM Release Pack + Change Control Drill | HESEM Academy</title>
+<title>TRN-ACA-DRL-05 — CAM Release Pack + Kiểm soát thay đổi Drill | HESEM Academy</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -59,7 +59,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>DRILL-CAM-RELEASE-CHANGECONTRO — CAM Release Pack + Change Control Drill | HESEM Academy</strong>
+  <strong>DRILL-CAM-RELEASE-CHANGECONTRO — CAM Release Pack + Kiểm soát thay đổi Drill | HESEM Academy</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -73,16 +73,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="doc-content" id="docContent">
 <div class="cover">
 <div class="kicker">Drill Pack</div>
-<h1 class="h1">DRL-05 — CAM Release Pack + Change Control Drill</h1>
+<h1 class="h1">DRL-05 — CAM Release Pack + Kiểm soát thay đổi Drill</h1>
 <p class="lead">
- Drill này biến “lập trình xong” thành <b>release đúng hệ thống</b>: pack đầy đủ, có DCR record, có verification và bàn giao bằng SSOT.
+ Drill này biến “lập trình xong” thành <b>release đúng hệ thống</b>: pack đầy đủ, có DCR hồ sơ, có verification và bàn giao bằng SSOT.
  </p>
 </div>
 <div class="grid-2">
 <div class="card">
 <span class="badge">Mục tiêu</span>
 <ul class="tight">
-<li>Program release có đủ pack và evidence simulation.</li>
+<li>Program release có đủ pack và bằng chứng simulation.</li>
 <li>Change REV không làm chạy sai chương trình.</li>
 <li>Pack cũ được archive và truy xuất được.</li>
 </ul>
@@ -105,10 +105,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Owner</th><th>MRR</th><th style="width:90px;">Gate</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Người phụ trách</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Xác nhận input: drawing/spec đúng REV và CTQ list đã chốt.</td><td>CAM/ENG</td><td>Link input files + REV confirmation note</td><td>STOP</td></tr><tr><td>2</td><td>Tạo program + tool list + setup sheet theo template baseline.</td><td>CAM</td><td>Program file + tool list + setup sheet</td><td>HOLD</td></tr><tr><td>3</td><td>Chạy simulation/verify và lưu evidence (ảnh hoặc report).</td><td>CAM</td><td>Simulation report/ảnh</td><td>HOLD</td></tr><tr><td>4</td><td>Release pack: đặt tên file đúng chuẩn, tạo DCR record (REV, date, reason).</td><td>CAM/ENG</td><td>Release log + link pack</td><td>BLOCK</td></tr><tr><td>5</td><td>Phát hành: cập nhật Job Dossier/10_Engineering/ và gửi link cho Setup/Production.</td><td>CAM</td><td>SharePoint link + handoff log</td><td>FAIL</td></tr><tr><td>6</td><td>Change scenario: nhận drawing REV mới → thu hồi pack cũ, archive, tạo pack mới và chạy verification lại.</td><td>CAM/ENG + QA</td><td>Change notice + new pack + archive proof</td><td>BLOCK</td></tr>
+<tr><td>1</td><td>Xác nhận input: drawing/spec đúng REV và CTQ list đã chốt.</td><td>CAM/ENG</td><td>Link input files + REV confirmation note</td><td>STOP</td></tr><tr><td>2</td><td>Tạo program + tool list + setup sheet theo template baseline.</td><td>CAM</td><td>Program file + tool list + setup sheet</td><td>HOLD</td></tr><tr><td>3</td><td>Chạy simulation/verify và lưu bằng chứng (ảnh hoặc report).</td><td>CAM</td><td>Simulation report/ảnh</td><td>HOLD</td></tr><tr><td>4</td><td>Release pack: đặt tên file đúng chuẩn, tạo DCR hồ sơ (REV, date, reason).</td><td>CAM/ENG</td><td>Release log + link pack</td><td>BLOCK</td></tr><tr><td>5</td><td>Phát hành: cập nhật Hồ sơ công việc (job dossier)/10_Engineering/ và gửi link cho Setup/Production.</td><td>CAM</td><td>SharePoint link + handoff log</td><td>FAIL</td></tr><tr><td>6</td><td>Change scenario: nhận drawing REV mới → thu hồi pack cũ, archive, tạo pack mới và chạy verification lại.</td><td>CAM/ENG + QA</td><td>Change notice + new pack + archive proof</td><td>BLOCK</td></tr>
 </tbody>
 </table>
 </div>
@@ -116,8 +116,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card danger">
 <span class="badge">Fail-fast</span>
 <ul class="tight">
-<li>Release program khi chưa có simulation/verify evidence.</li>
-<li>Không có DCR record khi thay đổi REV.</li>
+<li>Release program khi chưa có simulation/verify bằng chứng.</li>
+<li>Không có DCR hồ sơ khi thay đổi REV.</li>
 <li>Pack cũ không archive dẫn tới nhầm lẫn tại xưởng.</li>
 </ul>
 </div>
@@ -128,7 +128,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Input control</b></td><td>Input file controlled và đúng REV; CTQ list có dấu vết.</td><td>0/1/2</td></tr><tr><td><b>Release completeness</b></td><td>Program + tool list + setup sheet + simulation evidence đầy đủ.</td><td>0/1/2</td></tr><tr><td><b>Change discipline</b></td><td>Pack cũ được archive; pack mới có DCR record và verification lại.</td><td>0/1/2</td></tr><tr><td><b>Handoff</b></td><td>Setup/Production nhận link SSOT; không gửi file đính kèm qua chat.</td><td>0/1/2</td></tr><tr><td><b>Record quality</b></td><td>Tên file đúng chuẩn; không có trùng tên/overwrite.</td><td>0/1/2</td></tr>
+<tr><td><b>Input control</b></td><td>Input file controlled và đúng REV; CTQ list có dấu vết.</td><td>0/1/2</td></tr><tr><td><b>Release completeness</b></td><td>Program + tool list + setup sheet + simulation bằng chứng đầy đủ.</td><td>0/1/2</td></tr><tr><td><b>Change discipline</b></td><td>Pack cũ được archive; pack mới có DCR hồ sơ và verification lại.</td><td>0/1/2</td></tr><tr><td><b>Handoff</b></td><td>Setup/Production nhận link SSOT; không gửi file đính kèm qua chat.</td><td>0/1/2</td></tr><tr><td><b>Hồ sơ quality</b></td><td>Tên file đúng chuẩn; không có trùng tên/overwrite.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>
@@ -137,8 +137,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">MRR tối thiểu</span>
 <ul class="tight">
 <li>Program file + tool list + setup sheet theo naming rule.</li>
-<li>Simulation/verify evidence.</li>
-<li>Release log + DCR record.</li>
+<li>Simulation/verify bằng chứng.</li>
+<li>Release log + DCR hồ sơ.</li>
 <li>Proof archive pack cũ tại 90_Archive/ (link SSOT).</li>
 </ul>
 </div>

@@ -88,13 +88,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <a href="#s5">5) Risk Controls</a> •
  <a href="#s6">6) Fail-fast</a> •
  <a href="#s7">7) Phản ứng 60 giây</a> •
- <a href="#s8">8) Checklist</a> •
+ <a href="#s8">8) Bảng kiểm</a> •
  <a href="#s9">9) OJT TWI</a> •
  <a href="#s10">10) Đánh giá</a> •
  <a href="#s11">11) PASS/FAIL</a> •
  <a href="#s12">12) MRR</a> •
- <a href="#s13">13) Audit findings</a> •
- <a href="#s14">14) DCR record</a>
+ <a href="#s13">13) Đánh giá findings</a> •
+ <a href="#s14">14) DCR hồ sơ</a>
 </div>
 </div>
 <div class="callout">
@@ -118,7 +118,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="role-tag">Supervisor</span>
 </div>
 <div style="margin-top:6px;">
-<b>Luật vàng:</b> “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” — Không có minh chứng = không thông qua gate = KHÔNG ĐƯỢC giao việc thuộc phạm vi cần chứng nhận.
+<b>Luật vàng:</b> “không có bằng chứng thì không qua cổng kiểm soát (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát (gate)) (cổng kiểm soát) / không có bằng chứng thì không qua cổng kiểm soát)” — Không có minh chứng = không thông qua cổng kiểm soát = KHÔNG ĐƯỢC giao việc thuộc phạm vi cần chứng nhận.
  </div>
 </div>
 </div>
@@ -129,7 +129,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>Mục đích</b>
 <ul class="tight">
 <li>Chuẩn hóa cách đánh giá năng lực theo 19 năng lực C01–C19 và Level L1–L4.</li>
-<li>Ràng buộc cấp quyền thao tác/gate theo Level để chặn lỗi: sai Rev, mix-up, thiếu chứng từ, bypass gate, ship rủi ro.</li>
+<li>Ràng buộc cấp quyền thao tác/cổng kiểm soát theo Level để chặn lỗi: sai Rev, mix-up, thiếu chứng từ, bypass cổng kiểm soát, ship rủi ro.</li>
 <li>Thiết lập luồng hồ sơ (MRR) để sẵn sàng đánh giá: truy xuất được ai làm, làm trong phạm vi nào, bằng minh chứng gì, hiệu lực tới ngày nào.</li>
 </ul>
 </div>
@@ -163,14 +163,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Tổ chức đánh giá (quiz + scenario + performance)</td>
 <td>Supervisor/Trainer</td>
 <td>Trưởng bộ phận</td>
-<td>QA (gate chất lượng), HR (hồ sơ)</td>
+<td>QA (cổng kiểm soát chất lượng), HR (hồ sơ)</td>
 <td>Học viên</td>
 </tr>
 <tr>
 <td>Phê duyệt kết quả &amp; phát hành chứng nhận Level</td>
 <td>HR</td>
 <td>HR Manager</td>
-<td>QA/QMS (điều kiện gate), Trưởng bộ phận</td>
+<td>QA/QMS (điều kiện cổng kiểm soát), Trưởng bộ phận</td>
 <td>Planner, Warehouse, Production, QC/QA</td>
 </tr>
 <tr>
@@ -181,8 +181,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Ban giám đốc, QA</td>
 </tr>
 <tr>
-<td>Gate giao việc theo Level (phân công, release, sign-off)</td>
-<td>Supervisor / Planner / QA / QC / Warehouse (theo gate)</td>
+<td>Cổng kiểm soát giao việc theo Level (phân công, release, sign-off)</td>
+<td>Supervisor / Planner / QA / QC / Warehouse (theo cổng kiểm soát)</td>
 <td>Trưởng bộ phận liên quan</td>
 <td>HR</td>
 <td>Học viên</td>
@@ -195,23 +195,23 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>QC/QA:</b> Level gắn quyền chấp nhận/loại, phê duyệt phương pháp đo, phát hành báo cáo FAI/IR, xử lý NCR/MRB theo thẩm quyền.</li>
 <li><b>Warehouse/Purchasing/Planner/Estimator (SAL-03):</b> Level gắn quyền release chứng từ, kiểm soát traceability, chặn ship rủi ro, kiểm soát nhà cung cấp/outsource.</li>
 <li><b>Maintenance/EHS:</b> Level gắn quyền LOTO, nghiệm thu an toàn, phê duyệt điều kiện vận hành an toàn.</li>
-<li><b>Supervisor:</b> Level gắn quyền phân công, release công việc, xác nhận gate và cấp phép làm việc theo phạm vi chứng nhận.</li>
+<li><b>Supervisor:</b> Level gắn quyền phân công, release công việc, xác nhận cổng kiểm soát và cấp phép làm việc theo phạm vi chứng nhận.</li>
 </ul>
 </div>
 <!-- 3 -->
 <h2 id="s3">3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + điểm chặn</h2>
 <div class="callout">
-<b>Chuỗi E2E (nhìn theo gate)</b>
+<b>Chuỗi E2E (nhìn theo cổng kiểm soát)</b>
 <div class="small">
  Quote/Contract → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Feedback/CI
  </div>
 </div>
 <h3>Module TRN-OPS-02 nằm ở đâu?</h3>
 <ul class="tight">
-<li><b>Gate trước Production:</b> xác nhận người vận hành / set-up / lập trình nằm trong phạm vi chứng nhận hợp lệ.</li>
-<li><b>Gate trước QC/QA sign-off:</b> xác nhận người đo/duyệt có thẩm quyền Level đúng scope (gage/method/CTQ).</li>
-<li><b>Gate trước Ship:</b> xác nhận người release phiếu kê đóng gói (packing list)/CoC/traceability có chứng nhận scope phù hợp; chặn giao hàng khi hồ sơ năng lực thiếu.</li>
-<li><b>Gate sau NCR/MRB:</b> tái đánh giá năng lực bắt buộc khi NCR liên quan thao tác/đo/duyệt; cập nhật log tái chứng nhận.</li>
+<li><b>Cổng kiểm soát trước Production:</b> xác nhận người vận hành / set-up / lập trình nằm trong phạm vi chứng nhận hợp lệ.</li>
+<li><b>Cổng kiểm soát trước QC/QA sign-off:</b> xác nhận người đo/duyệt có thẩm quyền Level đúng scope (gage/method/CTQ).</li>
+<li><b>Cổng kiểm soát trước Ship:</b> xác nhận người release phiếu kê đóng gói (phiếu kê đóng gói)/CoC/traceability có chứng nhận scope phù hợp; chặn giao hàng khi hồ sơ năng lực thiếu.</li>
+<li><b>Cổng kiểm soát sau NCR/MRB:</b> tái đánh giá năng lực bắt buộc khi NCR liên quan thao tác/đo/duyệt; cập nhật log tái chứng nhận.</li>
 </ul>
 <h3>Luồng handoff (Input/Output)</h3>
 <table class="form-table">
@@ -220,7 +220,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Input bắt buộc</th>
 <th>Thực hiện</th>
 <th>Output bắt buộc</th>
-<th>Điểm chặn (Gate)</th>
+<th>Điểm chặn (Cổng kiểm soát)</th>
 </tr>
 <tr>
 <td>H1 — Yêu cầu đánh giá</td>
@@ -232,7 +232,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>H2 — Thực hiện đánh giá</td>
 <td>Rubric C01–C19; câu hỏi quiz; bài performance test; WO/Job minh chứng</td>
-<td>Supervisor/Trainer + QA (gate)</td>
+<td>Supervisor/Trainer + QA (cổng kiểm soát)</td>
 <td>FRM-HR-TRN-010 (rubric) + bằng chứng kèm theo</td>
 <td>KHÔNG ĐƯỢC ký đạt khi thiếu minh chứng quan sát/thực hành</td>
 </tr>
@@ -264,13 +264,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Phân công người làm công đoạn CTQ khi chứng nhận hết hạn hoặc scope không khớp máy/công đoạn/vật liệu.</li>
 <li>Ký đạt rubric khi thiếu WO/Job minh chứng hoặc thiếu bản ghi đo kiểm.</li>
 <li>Dùng rubric lỗi phiên bản; tiêu chí Level thay đổi nhưng không phát hành lại.</li>
-<li>Đánh giá chỉ dựa trên quiz; thiếu performance test cho thao tác/gate/đo/duyệt.</li>
+<li>Đánh giá chỉ dựa trên quiz; thiếu performance test cho thao tác/cổng kiểm soát/đo/duyệt.</li>
 <li>Người đánh giá có xung đột lợi ích; tự chấm cho bản thân hoặc chấm để kịp tiến độ.</li>
 <li>Không ghi rõ phạm vi chứng nhận; dẫn tới bố trí sai (ví dụ: chạy máy 5 trục trong khi scope chỉ 3 trục).</li>
 <li>Không cập nhật log theo dõi tái chứng nhận; cảnh báo hết hạn bị bỏ qua.</li>
 <li>Thiếu truy xuất revision: WO ghi Rev A, chứng nhận/đánh giá tham chiếu Rev B.</li>
 <li>Mix-up hồ sơ: ghép nhầm rubric của người khác; thiếu mã NV; file name sai quy tắc.</li>
-<li>Bỏ qua gate sau NCR/MRB: lỗi lặp lại nhưng không tái đánh giá và không thu hồi quyền thao tác.</li>
+<li>Bỏ qua cổng kiểm soát sau NCR/MRB: lỗi lặp lại nhưng không tái đánh giá và không thu hồi quyền thao tác.</li>
 <li>Warehouse/Estimator (SAL-03) release giao hàng khi thiếu chứng nhận của người release chứng từ hoặc thiếu bằng chứng traceability.</li>
 <li>QC/QA ký chấp nhận bằng gage OOT hoặc dùng phương pháp đo chưa được phê duyệt.</li>
 </ol>
@@ -280,17 +280,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th>Control point</th>
 <th>Mục tiêu rủi ro</th>
-<th>Owner</th>
+<th>Người phụ trách</th>
 <th>Bằng chứng/MRR bắt buộc</th>
 </tr>
 <tr>
-<td>CP1 — Gate phân công theo danh sách “Authorized Scope”</td>
-<td>Chặn bố trí sai năng lực; chặn bypass gate</td>
+<td>CP1 — Cổng kiểm soát phân công theo danh sách “Authorized Scope”</td>
+<td>Chặn bố trí sai năng lực; chặn bypass cổng kiểm soát</td>
 <td>Supervisor + Planner</td>
 <td>Danh sách Authorized Scope cập nhật theo chứng nhận (đính kèm FRM-HR-TRN-005)</td>
 </tr>
 <tr>
-<td>CP2 — Performance test bắt buộc cho thao tác/gate/đo/duyệt</td>
+<td>CP2 — Performance test bắt buộc cho thao tác/cổng kiểm soát/đo/duyệt</td>
 <td>Chặn đánh giá hình thức</td>
 <td>Supervisor/Trainer + QA/QC</td>
 <td>Rubric FRM-HR-TRN-010 + WO/Job minh chứng + ảnh/chữ ký</td>
@@ -302,7 +302,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Biên bản review + dấu kiểm “scope rõ” trên FRM-HR-TRN-005</td>
 </tr>
 <tr>
-<td>CP4 — Thu hồi quyền khi hết hạn/vi phạm gate</td>
+<td>CP4 — Thu hồi quyền khi hết hạn/vi phạm cổng kiểm soát</td>
 <td>Chặn ship rủi ro; chặn lặp lỗi</td>
 <td>HR + Supervisor + QA</td>
 <td>Log FRM-HR-TRN-006 cập nhật trạng thái; quyết định HOLD/STOP có chữ ký</td>
@@ -346,21 +346,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>Mục tiêu:</b> khóa rủi ro trong 60 giây — bảo vệ chất lượng và truy xuất.
  </div>
 <ol class="tight">
-<li><b>Dừng:</b> dừng giao việc hoặc dừng sign-off tại gate đang xảy ra.</li>
+<li><b>Dừng:</b> dừng giao việc hoặc dừng sign-off tại cổng kiểm soát đang xảy ra.</li>
 <li><b>Khoanh vùng:</b> xác định phạm vi ảnh hưởng (job/WO, máy/cell, lô vật tư, gage, chứng từ, người liên quan).</li>
 <li><b>Khóa bằng chứng:</b> chụp ảnh hiện trường, lưu file đang dùng, khóa bản in; ghi thời điểm phát hiện.</li>
 <li><b>Thông báo đúng kênh:</b> Supervisor + QA (khi liên quan chất lượng/ship) + HR (khi liên quan chứng nhận).</li>
-<li><b>Quyết định gate:</b> HOLD/STOP/BLOCK theo fail-fast; ghi nhận trên MRR.</li>
+<li><b>Quyết định cổng kiểm soát:</b> HOLD/STOP/BLOCK theo fail-fast; ghi nhận trên MRR.</li>
 <li><b>Thay phương án:</b> chuyển người đủ Level; thay gage đúng hiệu lực; phát hành lại tài liệu đúng revision.</li>
 </ol>
 <!-- 8 -->
-<h2 id="s8">8) Checklist vận hành (≤15 bước) — Owner, Evidence/MRR, điểm sai hay gặp gặp</h2>
+<h2 id="s8">8) Bảng kiểm vận hành (≤15 bước) — Người phụ trách, Bằng chứng/MRR, điểm sai hay gặp gặp</h2>
 <table class="form-table">
 <tr>
 <th>#</th>
 <th>Bước</th>
-<th>Owner</th>
-<th>Evidence/MRR</th>
+<th>Người phụ trách</th>
+<th>Bằng chứng/MRR</th>
 <th>Điểm sai hay gặp gặp</th>
 </tr>
 <tr>
@@ -393,7 +393,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>5</td>
-<td>Tổ chức scenario quyết định gate (HOLD/GO) theo case thật của xưởng</td>
+<td>Tổ chức scenario quyết định cổng kiểm soát (HOLD/GO) theo case thật của xưởng</td>
 <td>Supervisor + QA</td>
 <td>Phiếu scenario có quyết định + lý do + MRR</td>
 <td>Quyết định không ghi lý do; thiếu hành động 60 giây</td>
@@ -423,7 +423,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>9</td>
 <td>Review chéo trước cấp chứng nhận: kiểm scope, kiểm bằng chứng, kiểm chữ ký</td>
 <td>HR + Trưởng bộ phận</td>
-<td>Biên bản review; checklist review</td>
+<td>Biên bản review; bảng kiểm review</td>
 <td>Review bằng miệng, không có hồ sơ</td>
 </tr>
 <tr>
@@ -442,7 +442,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>12</td>
-<td>Cập nhật danh sách Authorized Scope để gate phân công và gate sign-off</td>
+<td>Cập nhật danh sách Authorized Scope để cổng kiểm soát phân công và cổng kiểm soát sign-off</td>
 <td>Supervisor + Planner + QA</td>
 <td>Danh sách Authorized Scope có ngày cập nhật</td>
 <td>Danh sách không đồng bộ với chứng nhận</td>
@@ -452,7 +452,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Thực hiện hành động khắc phục khi không đạt và lên lịch tái đánh giá</td>
 <td>Supervisor</td>
 <td>Kế hoạch bù (MRR) + lịch tái đánh giá</td>
-<td>Hành động bù không có deadline/owner</td>
+<td>Hành động bù không có deadline/người phụ trách</td>
 </tr>
 <tr>
 <td>14</td>
@@ -475,7 +475,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>OJT output bắt buộc</b>
 <ul class="tight">
 <li>01 bộ hồ sơ hoàn chỉnh cho 01 nhân sự: FRM-HR-TRN-010 + FRM-HR-TRN-004 + FRM-HR-TRN-005 + cập nhật FRM-HR-TRN-006.</li>
-<li>01 quyết định gate có lý do và MRR cho 01 scenario (HOLD hoặc GO).</li>
+<li>01 quyết định cổng kiểm soát có lý do và MRR cho 01 scenario (HOLD hoặc GO).</li>
 <li>01 bằng chứng WO/Job minh chứng đúng Rev (đính kèm hình ảnh/bản ghi đo).</li>
 </ul>
 </div>
@@ -488,8 +488,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>1. Chốt scope &amp; Level mục tiêu</td>
-<td>Ghi đúng mã máy/cell/công đoạn/vật liệu; bám ma trận C01–C19; gắn CTQ/gate</td>
-<td>Scope rõ để tránh bố trí sai năng lực và để audit truy xuất</td>
+<td>Ghi đúng mã máy/cell/công đoạn/vật liệu; bám ma trận C01–C19; gắn CTQ/cổng kiểm soát</td>
+<td>Scope rõ để tránh bố trí sai năng lực và để đánh giá truy xuất</td>
 </tr>
 <tr>
 <td>2. Khóa phiên bản tài liệu đánh giá</td>
@@ -507,9 +507,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Minh chứng lớp K (Knowledge) và chống nhầm hồ sơ</td>
 </tr>
 <tr>
-<td>5. Thực hiện scenario gate</td>
+<td>5. Thực hiện scenario cổng kiểm soát</td>
 <td>Chọn quyết định HOLD/STOP/BLOCK đúng luật; ghi “phản ứng 60 giây”</td>
-<td>Chặn ship rủi ro và chặn bypass gate</td>
+<td>Chặn ship rủi ro và chặn bypass cổng kiểm soát</td>
 </tr>
 <tr>
 <td>6. Quan sát thực hành &amp; chấm rubric</td>
@@ -519,12 +519,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>7. Ghi rõ quyền hạn theo role</td>
 <td>Quyền thao tác/đo/duyệt/release gắn Level; ghi giới hạn scope</td>
-<td>Gate phân quyền rõ để giảm rủi ro</td>
+<td>Cổng kiểm soát phân quyền rõ để giảm rủi ro</td>
 </tr>
 <tr>
 <td>8. Review chéo &amp; phát hành chứng nhận</td>
 <td>Review đủ minh chứng; ký đúng người; phát hành số CN; ghi hiệu lực</td>
-<td>Hồ sơ sẵn sàng audit, truy xuất nhanh</td>
+<td>Hồ sơ sẵn sàng đánh giá, truy xuất nhanh</td>
 </tr>
 <tr>
 <td>9. Cập nhật log &amp; danh sách Authorized Scope</td>
@@ -538,14 +538,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>L1 — Cần kèm cặp</b>
 <ul class="tight">
 <li>Thực hiện nhiệm vụ theo hướng dẫn trực tiếp; không tự xử lý lệch chuẩn.</li>
-<li>KHÔNG ĐƯỢC ký gate, không được tự release, không được tự thay đổi thông số/quy trình.</li>
+<li>KHÔNG ĐƯỢC ký cổng kiểm soát, không được tự release, không được tự thay đổi thông số/quy trình.</li>
 <li>Quyền hạn: thao tác dưới giám sát, ghi nhận đầy đủ, escalte ngay khi có lệch chuẩn.</li>
 </ul>
 </div>
 <div class="kpi-box">
 <b>L2 — Làm được</b>
 <ul class="tight">
-<li>Thực hiện độc lập theo SOP/WI đúng Rev; tự kiểm tra điểm trọng yếu theo checklist.</li>
+<li>Thực hiện độc lập theo SOP/WI đúng Rev; tự kiểm tra điểm trọng yếu theo bảng kiểm.</li>
 <li>Được giao việc trong scope L2 đã ghi rõ; không vượt phạm vi chứng nhận.</li>
 <li>Quyền hạn: thao tác/đo/ghi nhận trong phạm vi; không phê duyệt ngoại lệ.</li>
 </ul>
@@ -563,7 +563,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li>Dẫn dắt, huấn luyện OJT; chuẩn hóa cách làm; giữ kỷ luật hồ sơ.</li>
 <li>Được phân quyền làm assessor theo phạm vi; tham gia review chéo cấp chứng nhận.</li>
-<li>Quyền hạn: xác nhận gate theo thẩm quyền role; mở CAPA và theo dõi đến khi đóng.</li>
+<li>Quyền hạn: xác nhận cổng kiểm soát theo thẩm quyền role; mở CAPA và theo dõi đến khi đóng.</li>
 </ul>
 </div>
 </div>
@@ -577,20 +577,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Operator</td>
-<td>Chạy máy theo WI; tự kiểm tra CTQ theo checklist; ghi nhận traceability</td>
+<td>Chạy máy theo WI; tự kiểm tra CTQ theo bảng kiểm; ghi nhận traceability</td>
 <td>Chặn lỗi tool wear/offset drift; kích hoạt phản ứng 60 giây khi nghi mix-up/sai Rev</td>
-<td>Huấn luyện OJT thao tác an toàn; tham gia chuẩn hóa checklist và 5S tại cell</td>
+<td>Huấn luyện OJT thao tác an toàn; tham gia chuẩn hóa bảng kiểm và 5S tại cell</td>
 </tr>
 <tr>
 <td>Setup</td>
-<td>Set-up đồ gá, dao cụ, offset theo WI; xác nhận first-piece</td>
+<td>Set-up đồ gá, dao cụ, offset theo WI; xác nhận mẫu đầu (first piece)</td>
 <td>Thiết lập control plan tại máy; xử lý lệch chuẩn rung/dao gãy; chặn NG lan rộng</td>
 <td>Chuẩn hóa phương pháp set-up; coaching set-up mới; review rủi ro set-up</td>
 </tr>
 <tr>
 <td>Programmer</td>
 <td>Phát hành chương trình đúng revision; quản trị phiên bản CAM; post đúng máy</td>
-<td>Phân tích root cause khi lỗi đường chạy; cập nhật chương trình có kiểm soát</td>
+<td>Phân tích nguyên nhân gốc khi lỗi đường chạy; cập nhật chương trình có kiểm soát</td>
 <td>Chuẩn hóa thư viện toolpath; review chéo chương trình; đào tạo chuẩn đặt tên file</td>
 </tr>
 <tr>
@@ -601,9 +601,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>QA</td>
-<td>Review hồ sơ chất lượng; xác nhận gate theo danh mục thẩm quyền</td>
+<td>Review hồ sơ chất lượng; xác nhận cổng kiểm soát theo danh mục thẩm quyền</td>
 <td>Điều phối NCR/MRB; xác nhận CAPA hiệu lực; chặn ship rủi ro</td>
-<td>Phê duyệt disposition theo thẩm quyền; dẫn dắt audit nội bộ và calibration đánh giá</td>
+<td>Phê duyệt disposition theo thẩm quyền; dẫn dắt đánh giá nội bộ và calibration đánh giá</td>
 </tr>
 <tr>
 <td>Warehouse</td>
@@ -614,13 +614,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Purchasing</td>
 <td>Đặt hàng đúng spec/Rev; kiểm soát chứng từ nhà cung cấp</td>
-<td>Chặn outsource/special process thiếu chứng chỉ; kích hoạt NCR nhà cung cấp</td>
+<td>Chặn outsource/công đoạn đặc biệt thiếu chứng chỉ; kích hoạt NCR nhà cung cấp</td>
 <td>Phê duyệt nhà cung cấp theo thẩm quyền; dẫn dắt đánh giá nhà cung cấp</td>
 </tr>
 <tr>
 <td>Planner</td>
 <td>Lập kế hoạch theo năng lực máy/người; không release khi thiếu Authorized Scope</td>
-<td>Điều phối ưu tiên; chặn bypass gate; escalte khi rủi ro OTD</td>
+<td>Điều phối ưu tiên; chặn bypass cổng kiểm soát; escalte khi rủi ro OTD</td>
 <td>Phê duyệt thay đổi kế hoạch lớn theo thẩm quyền; chuẩn hóa quy tắc release</td>
 </tr>
 <tr>
@@ -631,19 +631,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>EHS</td>
-<td>Thực hiện kiểm tra an toàn theo checklist; ghi nhận hành động</td>
+<td>Thực hiện kiểm tra an toàn theo bảng kiểm; ghi nhận hành động</td>
 <td>Điều tra near-miss; kích hoạt CAPA an toàn; chặn nguy cơ tại hiện trường</td>
 <td>Phê duyệt tiêu chuẩn an toàn/5S; dẫn dắt đào tạo định kỳ</td>
 </tr>
 <tr>
 <td>Estimator (SAL-03)</td>
 <td>Ghi nhận yêu cầu khách hàng đúng; kiểm soát revision hợp đồng/tài liệu</td>
-<td>Chặn cam kết sai; escalte rủi ro spec/thời gian dẫn (lead time / thời gian dẫn); ghi nhận thay đổi có kiểm soát</td>
+<td>Chặn cam kết sai; escalte rủi ro spec/thời gian dẫn (lead time); ghi nhận thay đổi có kiểm soát</td>
 <td>Phê duyệt điều khoản thương mại theo thẩm quyền; chuẩn hóa handoff quote→plan</td>
 </tr>
 <tr>
 <td>Supervisor</td>
-<td>Phân công theo Authorized Scope; kiểm soát gate tại hiện trường</td>
+<td>Phân công theo Authorized Scope; kiểm soát cổng kiểm soát tại hiện trường</td>
 <td>Ra quyết định HOLD/STOP/BLOCK; kích hoạt 60 giây; điều phối nguồn lực</td>
 <td>Đánh giá và ký rubric theo phạm vi; dẫn dắt review chéo và calibration chấm Level</td>
 </tr>
@@ -652,11 +652,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 id="s10">10) Đánh giá</h2>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
-<div>Module này có bài performance test vì liên quan cấp quyền và gate vận hành.</div>
+<div>Module này có bài performance test vì liên quan cấp quyền và cổng kiểm soát vận hành.</div>
 </div>
 <h3>10.1 Quiz (&gt;=20 câu) — trắc nghiệm + tình huống ngắn</h3>
 <ol class="tight">
-<li>Cụm từ “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” được áp dụng tại bước nào trong chuỗi đánh giá và tại gate phân công?</li>
+<li>Cụm từ “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)” được áp dụng tại bước nào trong chuỗi đánh giá và tại cổng kiểm soát phân công?</li>
 <li>Nêu 3 loại minh chứng bắt buộc trong đánh giá năng lực theo K–S–B–R.</li>
 <li>Hãy chọn đáp án đúng: Hồ sơ đánh giá năng lực tối thiểu gồm các form nào?
  <ul class="tight">
@@ -675,11 +675,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Chọn đáp án đúng: Performance test áp dụng cho đối tượng nào?
  <ul class="tight">
 <li>A. Chỉ Operator</li>
-<li>B. Tất cả role khi công việc có thao tác/gate/đo/duyệt thuộc scope chứng nhận</li>
+<li>B. Tất cả role khi công việc có thao tác/cổng kiểm soát/đo/duyệt thuộc scope chứng nhận</li>
 <li>C. Chỉ bộ phận văn phòng</li>
 </ul>
 </li>
-<li>Nêu 2 ví dụ về bypass gate trong bối cảnh đánh giá năng lực.</li>
+<li>Nêu 2 ví dụ về bypass cổng kiểm soát trong bối cảnh đánh giá năng lực.</li>
 <li>Trong FRM-HR-TRN-006, “trạng thái” tối thiểu gồm các giá trị nào?</li>
 <li>Chọn đáp án đúng: Khi phát hiện mix-up hồ sơ, luật fail-fast là:
  <ul class="tight">
@@ -689,7 +689,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </li>
 <li>Nêu 3 Failure Points có khả năng dẫn tới ship rủi ro.</li>
-<li>Ai thực hiện CP1 “Gate phân công theo Authorized Scope”?</li>
+<li>Ai thực hiện CP1 “Cổng kiểm soát phân công theo Authorized Scope”?</li>
 <li>Khi bài performance test dùng gage OOT, hành động theo FF4 là gì?</li>
 <li>Chọn đáp án đúng: Review chéo trước cấp chứng nhận nhằm mục tiêu nào?
  <ul class="tight">
@@ -705,19 +705,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Chọn đáp án đúng: Kết quả PASS chỉ có hiệu lực khi:
  <ul class="tight">
 <li>A. Supervisor nói đạt</li>
-<li>B. Có đủ hồ sơ MRR theo checklist và chứng nhận được phát hành</li>
+<li>B. Có đủ hồ sơ MRR theo bảng kiểm và chứng nhận được phát hành</li>
 <li>C. Học viên cam kết sẽ làm tốt</li>
 </ul>
 </li>
-<li>Nêu 2 lỗi audit về năng lực hay gặp và cách chặn bằng điểm kiểm soát (control point).</li>
+<li>Nêu 2 lỗi đánh giá về năng lực hay gặp và cách chặn bằng điểm kiểm soát (control point).</li>
 </ol>
 <h3>10.2 Scenario (&gt;=3) — tình huống thật, có dữ kiện, yêu cầu HOLD/GO và ghi MRR</h3>
 <div class="no-break">
-<div class="callout"><b>Scenario 1 — Sai Rev tại gate Production</b></div>
+<div class="callout"><b>Scenario 1 — Sai Rev tại cổng kiểm soát Production</b></div>
 <ul class="tight">
 <li><b>Dữ kiện:</b> WO ghi Drawing Rev C. Tại máy, Operator cầm bản in Rev B. Operator có chứng nhận Level L2 cho máy đúng cell, chứng nhận còn hiệu lực.</li>
 <li><b>Decision required:</b> Chọn HOLD/GO/STOP/BLOCK và ghi phản ứng 60 giây.</li>
-<li><b>MRR bắt buộc:</b> Ảnh bản in Rev B; ghi nhận thời điểm; log quyết định gate; tài liệu đúng Rev được phát hành lại.</li>
+<li><b>MRR bắt buộc:</b> Ảnh bản in Rev B; ghi nhận thời điểm; log quyết định cổng kiểm soát; tài liệu đúng Rev được phát hành lại.</li>
 </ul>
 </div>
 <div class="no-break">
@@ -731,7 +731,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="no-break">
 <div class="callout"><b>Scenario 3 — Hết hạn chứng nhận tại Warehouse trước Ship</b></div>
 <ul class="tight">
-<li><b>Dữ kiện:</b> Nhân sự Warehouse phụ trách dán nhãn &amp; release phiếu kê đóng gói (packing list) có chứng nhận scope traceability hết hạn hôm qua. Lô hàng đã đóng kiện.</li>
+<li><b>Dữ kiện:</b> Nhân sự Warehouse phụ trách dán nhãn &amp; release phiếu kê đóng gói (phiếu kê đóng gói) có chứng nhận scope traceability hết hạn hôm qua. Lô hàng đã đóng kiện.</li>
 <li><b>Decision required:</b> Chọn HOLD/GO/STOP/BLOCK và ghi phản ứng 60 giây.</li>
 <li><b>MRR bắt buộc:</b> Log FRM-HR-TRN-006 cập nhật trạng thái quá hạn; biên bản thu hồi quyền; release lại bởi người còn hiệu lực.</li>
 </ul>
@@ -742,7 +742,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li>Học viên hoàn tất 01 gói hồ sơ đánh giá cho chính scope công việc của role trong ca thực tế.</li>
 <li>Gói hồ sơ có đủ: quiz + scenario + quan sát thực hành + ghi rõ scope/giới hạn quyền hạn + lưu MRR đúng quy tắc.</li>
-<li>Người đánh giá chấm theo FRM-HR-TRN-010; gate fail-fast áp dụng trực tiếp.</li>
+<li>Người đánh giá chấm theo FRM-HR-TRN-010; cổng kiểm soát fail-fast áp dụng trực tiếp.</li>
 </ul>
 </div>
 <table class="form-table">
@@ -759,7 +759,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Sai Rev → BLOCK</td>
 </tr>
 <tr>
-<td>Thực hiện thao tác/gate đúng role</td>
+<td>Thực hiện thao tác/cổng kiểm soát đúng role</td>
 <td>Thực hiện đúng WI/SOP; không vượt scope</td>
 <td>Quan sát trực tiếp; chữ ký assessor</td>
 <td>Vượt scope → STOP</td>
@@ -771,7 +771,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Thiếu minh chứng → HOLD</td>
 </tr>
 <tr>
-<td>Ra quyết định gate</td>
+<td>Ra quyết định cổng kiểm soát</td>
 <td>Chọn đúng HOLD/STOP/BLOCK; thực hiện phản ứng 60 giây</td>
 <td>Phiếu scenario + log quyết định</td>
 <td>Sai quyết định → FAIL</td>
@@ -784,12 +784,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </table>
 <!-- 11 -->
-<h2 id="s11">11) PASS/FAIL criteria (rõ ràng; nhấn mạnh không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát))</h2>
+<h2 id="s11">11) PASS/FAIL criteria (rõ ràng; nhấn mạnh không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát))</h2>
 <div class="callout">
 <b>PASS</b>
 <ul class="tight">
 <li>Quiz đạt ≥ 80% số điểm.</li>
-<li>Scenario: quyết định gate đúng 100% và ghi đủ MRR.</li>
+<li>Scenario: quyết định cổng kiểm soát đúng 100% và ghi đủ MRR.</li>
 <li>Performance test: không vi phạm fail-fast; hoàn tất gói hồ sơ trong 1 ca làm việc; truy xuất trong 2 phút.</li>
 <li>Scope/giới hạn quyền hạn ghi rõ trên chứng nhận và đồng bộ Authorized Scope.</li>
 </ul>
@@ -801,7 +801,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiếu minh chứng bắt buộc hoặc thiếu chữ ký/ngày/WO tham chiếu.</li>
 <li>Không truy xuất được hồ sơ trong 2 phút hoặc lưu sai nơi kiểm soát.</li>
 </ul>
-<div style="margin-top:8px;"><b>Luật:</b> “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”.</div>
+<div style="margin-top:8px;"><b>Luật:</b> “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”.</div>
 </div>
 <!-- 12 -->
 <h2 id="s12">12) MRR tối thiểu</h2>
@@ -818,7 +818,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <div class="mono"><b>TRN-OPS-02</b>_<b>{Dept}</b>_<b>{Role}</b>_<b>{EmpID}</b>_<b>{Scope}</b>_<b>{YYYYMMDD}</b>_<b>{Artifact}</b>_V0</div>
 <div class="small muted" style="margin-top:6px;">
- Artifact: RUBRIC-TRN010 | ASSESS-TRN004 | CERT-TRN005 | LOG-TRN006 | QUIZ | SCENARIO | EVIDENCE
+ Artifact: RUBRIC-TRN010 | ASSESS-TRN004 | CERT-TRN005 | LOG-TRN006 | QUIZ | SCENARIO | BẰNG CHỨNG
  • Scope ghi mã máy/cell/công đoạn (không ghi chung chung).
  </div>
 </div>
@@ -846,7 +846,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </table>
 <!-- 13 -->
-<h2 id="s13">13) Common audit findings &amp; prevention (≥8)</h2>
+<h2 id="s13">13) Common đánh giá findings &amp; prevention (≥8)</h2>
 <table class="form-table">
 <tr>
 <th>#</th>
@@ -856,7 +856,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>1</td>
 <td>Hồ sơ đánh giá thiếu minh chứng (không có WO/Job, không có bản ghi đo)</td>
-<td>CP2 + Checklist bước 6–8; sampling tháng (CP6)</td>
+<td>CP2 + Bảng kiểm bước 6–8; sampling tháng (CP6)</td>
 </tr>
 <tr>
 <td>2</td>
@@ -895,7 +895,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>9</td>
-<td>Không truy xuất hồ sơ nhanh khi audit hỏi</td>
+<td>Không truy xuất hồ sơ nhanh khi đánh giá hỏi</td>
 <td>Quy tắc đặt tên + path SharePoint kiểm soát + yêu cầu truy xuất 2 phút</td>
 </tr>
 </table>

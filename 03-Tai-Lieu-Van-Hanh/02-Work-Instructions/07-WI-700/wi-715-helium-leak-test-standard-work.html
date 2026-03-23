@@ -77,8 +77,8 @@ ul.tight li {margin:4px 0;}
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ release bằng kết quả test khi đã có giới hạn chấp nhận rõ trên bản vẽ, spec, PO hoặc customer note, detector còn hiệu chuẩn, standard leak kiểm trước đạt và part sạch, khô, ổn định nhiệt theo yêu cầu.</div></div>
 
 <div class="section"><h2>2. Điều kiện trước khi đưa part vào test</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục</th><th>Phải có</th><th>tạm giữ khi</th><th>Record</th></tr></thead><tbody>
-<tr><td>Yêu cầu kỹ thuật</td><td>Drawing / customer spec / routing note đã chỉ rõ giới hạn rò, đơn vị đo, phương pháp ưu tiên và trạng thái part khi test.</td><td>Thiếu spec, thiếu đơn vị, chỉ ghi chung chung “leak test” nhưng không có limit.</td><td>Traveler / job packet / QPL / customer spec.</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục</th><th>Phải có</th><th>tạm giữ khi</th><th>Hồ sơ</th></tr></thead><tbody>
+<tr><td>Yêu cầu kỹ thuật</td><td>Drawing / customer spec / routing note đã chỉ rõ giới hạn rò, đơn vị đo, phương pháp ưu tiên và trạng thái part khi test.</td><td>Thiếu spec, thiếu đơn vị, chỉ ghi chung chung “leak test” nhưng không có limit.</td><td>Traveler / bộ hồ sơ công việc (job packet) / QPL / customer spec.</td></tr>
 <tr><td>Tình trạng part</td><td>Part đã hoàn tất công đoạn trước, đã làm sạch phần dầu/bụi, khô, có nhận dạng part-rev-lot và đã đóng kín các port theo đúng cấu hình test.</td><td>Part còn ẩm, còn solvent, còn burr/phoi/FOD, thiếu cap/plug hoặc chưa xác nhận đúng cấu hình test.</td><td>Traveler + kiểm cuối trước test.</td></tr>
 <tr><td>Thiết bị</td><td>Leak detector, standard leak, bơm, probe, adapter và fixture còn hạn, phù hợp dải đo và được nhận diện rõ ID.</td><td>Bất kỳ thiết bị nào quá hạn, hỏng, không có ID hoặc standard leak không truy xuất được.</td><td>FRM-712 + nhãn thiết bị.</td></tr>
 <tr><td>Người thực hiện</td><td>Người test có <span class="code">Authorized-to-work</span> cho leak test theo <a href="../../03-Reference/08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html">ANNEX-801</a>.</td><td>Người chưa được ủy quyền hoặc đã hết hiệu lực chứng nhận.</td><td>Training / certification log.</td></tr>
@@ -92,7 +92,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>Small sealed component, chi tiết kín nhỏ</td><td>Bombing method</td><td>Spec cho phép nạp He trước rồi đo rò ra ngoài.</td><td>Không kiểm soát được áp nạp, thời gian nạp, dwell time hoặc fixture không ổn định.</td></tr>
 <tr><td>Pressure decay / bubble / soap</td><td>Chỉ dùng để pre-screen gross leak</td><td>Phát hiện gross leak trước khi vào fine leak test.</td><td>Dùng như phương pháp release chính nếu spec yêu cầu helium leak test.</td></tr>
 </tbody></table></div>
-<div class="callout-warning"><strong>LƯU Ý</strong> Nếu spec khách hàng yêu cầu quy đổi sang working fluid khác, việc quy đổi chỉ được thực hiện khi engineering/QA đã phê chuẩn phương pháp và công thức quy đổi. Mặc định tại HESEM, record release phải lưu giá trị đo helium thật cùng điều kiện test.</div></div>
+<div class="callout-warning"><strong>LƯU Ý</strong> Nếu spec khách hàng yêu cầu quy đổi sang working fluid khác, việc quy đổi chỉ được thực hiện khi engineering/QA đã phê chuẩn phương pháp và công thức quy đổi. Mặc định tại HESEM, hồ sơ release phải lưu giá trị đo helium thật cùng điều kiện test.</div></div>
 
 <div class="section"><h2>4. Kiểm trước mỗi ca test</h2>
 <div class="step-list">
@@ -110,7 +110,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-item"><strong>2)</strong> Lắp part vào fixture, bảo đảm seal sạch, không kẹt sợi, không lẫn băng keo/tạp chất trên mặt kín.</div>
 <div class="step-item"><strong>3)</strong> Hút xuống áp test theo khả năng của hệ. Nếu không đạt áp yêu cầu hoặc có gross leak, dừng để sửa gross leak trước.</div>
 <div class="step-item"><strong>4)</strong> Nạp helium theo quy trình đã phê chuẩn, giữ thời gian ổn định đủ để detector đọc giá trị ổn định. Không lắc, đập hoặc xoay fixture trong lúc đang ghi nhận.</div>
-<div class="step-item"><strong>5)</strong> Ghi giá trị ổn định, background, method, fixture ID và điều kiện test vào record. Nếu FAIL, khoanh vùng vị trí nghi rò để chuyển rework.</div>
+<div class="step-item"><strong>5)</strong> Ghi giá trị ổn định, background, method, fixture ID và điều kiện test vào hồ sơ. Nếu FAIL, khoanh vùng vị trí nghi rò để chuyển rework.</div>
 </div>
 <h3>5.2 Sniff method</h3>
 <div class="step-list">
@@ -130,7 +130,7 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>6. Đọc kết quả và quyết định</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Kết quả</th><th>Quyết định</th><th>Hành động bắt buộc</th><th>Phạm vi test lại</th></tr></thead><tbody>
-<tr><td>Nhỏ hơn limit rõ ràng và tín hiệu ổn định</td><td><span class="badge-green">PASS</span></td><td>Ký record, nạp hồ sơ vào job dossier và chuyển bước tiếp theo.</td><td>Không cần, trừ khi có yêu cầu lặp trên nhiều orientation/port.</td></tr>
+<tr><td>Nhỏ hơn limit rõ ràng và tín hiệu ổn định</td><td><span class="badge-green">PASS</span></td><td>Ký hồ sơ, nạp hồ sơ vào hồ sơ công việc (job dossier) và chuyển bước tiếp theo.</td><td>Không cần, trừ khi có yêu cầu lặp trên nhiều orientation/port.</td></tr>
 <tr><td>Nằm trong vùng cảnh báo nội bộ hoặc dao động sát limit</td><td><span class="badge-amber">CẢNH BÁO</span></td><td>Re-check cùng method, xác nhận lại fixture/background, chạy lặp theo số lần quy định. Chỉ đạt khi kết quả ổn định và QA chấp nhận.</td><td>Test lại vị trí hoặc toàn bộ cụm theo quyết định QA.</td></tr>
 <tr><td>Vượt limit</td><td><span class="badge-red">FAIL</span></td><td>HOLD ngay, đánh dấu vị trí nghi rò, mở NCR/rework, phải chặn chuyển đóng gói hoặc giao hàng.</td><td>Sau rework phải test lại đủ phạm vi chịu ảnh hưởng; nếu có thay seal/weld/joint trọng yếu thì test lại toàn bộ cụm.</td></tr>
 <tr><td>Background/standard leak/session check không đạt</td><td><span class="badge-blue">TEST VOID</span></td><td>Không dùng dữ liệu session để release. Sửa máy/điều kiện test trước khi chạy lại.</td><td>Chạy lại đầy đủ từ đầu.</td></tr>
@@ -144,14 +144,14 @@ ul.tight li {margin:4px 0;}
 <tr><td>Bombing result thấp bất thường</td><td>Áp nạp thấp, thời gian nạp thiếu, dwell time quá lâu.</td><td>Làm lại toàn bộ batch theo đúng recipe; không sửa số bằng suy đoán.</td></tr>
 </tbody></table></div></div>
 
-<div class="section"><h2>8. Record, bằng chứng và KPI</h2>
+<div class="section"><h2>8. Hồ sơ, bằng chứng và KPI</h2>
 <div class="grid-2">
-<div class="kpi-box"><h3>Record bắt buộc</h3><ul class="tight" style="padding-left:18px;">
+<div class="kpi-box"><h3>Hồ sơ bắt buộc</h3><ul class="tight" style="padding-left:18px;">
 <li><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-712_Helium_Leak_Test_Record.xlsx">FRM-712</a> với method, limit, measured value, equipment ID, người test, kết luận.</li>
 <li>Ảnh/scan spec hoặc routing note nếu limit đến từ yêu cầu riêng của khách hàng.</li>
-<li>Record pre-use check của detector / standard leak cho session.</li>
-<li>NCR / rework record nếu FAIL.</li>
-<li>Link lên job dossier theo <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>.</li>
+<li>Hồ sơ pre-use check của detector / standard leak cho session.</li>
+<li>NCR / rework hồ sơ nếu FAIL.</li>
+<li>Link lên hồ sơ công việc theo <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>.</li>
 </ul></div>
 <div class="kpi-box"><h3>KPI</h3><ul class="tight" style="padding-left:18px;">
 <li>KPI-WI715-01: tỷ lệ PASS ngay lần test đầu.</li>
@@ -161,7 +161,7 @@ ul.tight li {margin:4px 0;}
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html">SOP-505</a></td><td>Kiểm soát đầu vào từ finishing trước khi qua test đặc biệt.</td></tr>
-<tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>Cổng release cuối chỉ mở khi có record PASS hợp lệ.</td></tr>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>Cổng release cuối chỉ mở khi có hồ sơ PASS hợp lệ.</td></tr>
 <tr><td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td><td>Yêu cầu sạch trước/sau test với part nhạy sạch.</td></tr>
 <tr><td><a href="../../03-Reference/06-ANNEX-600/annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a></td><td>Rule bề mặt, vacuum compatibility, limit và lưu ý vật liệu.</td></tr>
 <tr><td><a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a> / <a href="wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a></td><td>Bàn giao part nhạy sạch / vacuum sau test.</td></tr>

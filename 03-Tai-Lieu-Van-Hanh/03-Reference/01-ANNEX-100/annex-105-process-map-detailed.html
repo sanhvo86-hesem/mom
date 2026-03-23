@@ -79,7 +79,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="fh-company"> <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a> <span>Tài liệu kiểm soát</span> </div>
 </div>
 <div class="title"> <strong>ANNEX-105 — Bản đồ quá trình chi tiết và điểm giao diện</strong><br/>
-<span class="sub-vn">Bản đồ chuẩn của hệ thống vận hành HESEM; dùng để khóa handoff, gate và record giữa các nhóm quá trình</span>  </div>
+<span class="sub-vn">Bản đồ chuẩn của hệ thống vận hành HESEM; dùng để khóa handoff, cổng kiểm soát (gate) và hồ sơ giữa các nhóm quá trình</span>  </div>
 <div class="meta">
 <div class="row"><span><b>Mã:</b></span><span>ANNEX-105</span></div>
 <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
@@ -95,9 +95,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div>
 <p><b>Đầu vào / Đầu ra</b></p>
-<ul class="list"><li><b>Input:</b> Epicor Kinetic (transaction)</li><li><b>Input:</b> M365/SharePoint (SSOT hồ sơ)</li><li><b>Output:</b> Record/Log đầy đủ tại SSOT</li><li><b>Output:</b> Trạng thái gate được mở hoặc giữ theo tiêu chí</li></ul>
+<ul class="list"><li><b>Input:</b> Epicor Kinetic (giao dịch)</li><li><b>Input:</b> M365/SharePoint (SSOT hồ sơ)</li><li><b>Output:</b> Hồ sơ/Log đầy đủ tại SSOT</li><li><b>Output:</b> Trạng thái cổng kiểm soát được mở hoặc giữ theo tiêu chí</li></ul>
 </div>
-</div><p class="callout"><b>Hold/Release:</b> Thiếu bằng chứng bắt buộc: áp dụng HOLD theo tiêu chí của tài liệu; không chuyển bước cho đến khi đủ bằng chứng.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết hồ sơ SSOT.</p></div><div class="section"><h2 class="h2">1. Mục đích và cách sử dụng</h2><ul class="list"><li>Phải sử dụng ANNEX-105 làm bản đồ quá trình chuẩn khi ban hành hoặc sửa đổi SOP/PROC/WI/FRM và khi mô tả tương tác quá trình trong các trang tổng quan.</li><li>Không được tạo bản đồ quá trình khác để thay thế. Mọi sơ đồ phụ chỉ được trích từ bản đồ này và phải giữ nguyên mã nhóm quá trình (M/P/S/I).</li><li>Phải dùng bản đồ này để xác định “handoff” liên phòng ban và điểm dừng (hold point) bắt buộc trước khi chuyển bước hoặc trước khi giao hàng.</li><li>Bản in ra chỉ được dùng làm bản tham chiếu. Trước khi sử dụng, phải kiểm tra phiên bản hiệu lực trên trang HTML SSOT.</li></ul></div><div class="section"><h2 class="h2">2. Nội dung</h2><h3 class="h3">2.1 Quy ước đọc bản đồ</h3><p>Các ký hiệu và quy ước dưới đây là bắt buộc khi đọc và khi trích dẫn bản đồ:</p><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:6.25%;"/><col style="width:22.32%;"/><col style="width:71.43%;"/></colgroup><thead><tr><th>Ký hiệu</th><th>Ý nghĩa</th><th>Quy tắc sử dụng</th></tr></thead><tbody><tr><td>M</td><td>Management (PDCA)</td><td>Quy định lãnh đạo, mục tiêu, rủi ro/cơ hội, xem xét và cải tiến.</td></tr><tr><td>P</td><td>Core process (RFQ → Cash)</td><td>Quy định luồng tạo đơn hàng, kỹ thuật, sản xuất, kiểm tra, giao hàng và đóng job.</td></tr><tr><td>S</td><td>Support process</td><td>Quy định các quá trình hỗ trợ: nhân sự, bảo trì, hiệu chuẩn, IT/dữ liệu, EHS, quản trị nhà cung cấp.</td></tr><tr><td>I</td><td>Improve/NC/CAPA</td><td>Quy định xử lý không phù hợp và hành động khắc phục, đánh giá hiệu lực.</td></tr></tbody></table></div><p class="muted">Khi trích dẫn trong tài liệu khác, phải ghi mã nhóm + số thứ tự (ví dụ: P05, S03) đúng như trên bản đồ.</p><h3 class="h3">2.2 Bản đồ quá trình (SVG)</h3><div class="card"><div class="legend" style="margin-bottom:10px;">
+</div><p class="callout"><b>Hold/Release:</b> Thiếu bằng chứng bắt buộc: áp dụng HOLD theo tiêu chí của tài liệu; không chuyển bước cho đến khi đủ bằng chứng.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết hồ sơ SSOT.</p></div><div class="section"><h2 class="h2">1. Mục đích và cách sử dụng</h2><ul class="list"><li>Phải sử dụng ANNEX-105 làm bản đồ quá trình chuẩn khi ban hành hoặc sửa đổi SOP/PROC/WI/FRM và khi mô tả tương tác quá trình trong các trang tổng quan.</li><li>Không được tạo bản đồ quá trình khác để thay thế. Mọi sơ đồ phụ chỉ được trích từ bản đồ này và phải giữ nguyên mã nhóm quá trình (M/P/S/I).</li><li>Phải dùng bản đồ này để xác định “handoff” liên phòng ban và điểm dừng (điểm giữ (điểm giữ (hold point))) bắt buộc trước khi chuyển bước hoặc trước khi giao hàng.</li><li>Bản in ra chỉ được dùng làm bản tham chiếu. Trước khi sử dụng, phải kiểm tra phiên bản hiệu lực trên trang HTML SSOT.</li></ul></div><div class="section"><h2 class="h2">2. Nội dung</h2><h3 class="h3">2.1 Quy ước đọc bản đồ</h3><p>Các ký hiệu và quy ước dưới đây là bắt buộc khi đọc và khi trích dẫn bản đồ:</p><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:6.25%;"/><col style="width:22.32%;"/><col style="width:71.43%;"/></colgroup><thead><tr><th>Ký hiệu</th><th>Ý nghĩa</th><th>Quy tắc sử dụng</th></tr></thead><tbody><tr><td>M</td><td>Management (PDCA)</td><td>Quy định lãnh đạo, mục tiêu, rủi ro/cơ hội, xem xét và cải tiến.</td></tr><tr><td>P</td><td>Core process (RFQ → Cash)</td><td>Quy định luồng tạo đơn hàng, kỹ thuật, sản xuất, kiểm tra, giao hàng và đóng job.</td></tr><tr><td>S</td><td>Support process</td><td>Quy định các quá trình hỗ trợ: nhân sự, bảo trì, hiệu chuẩn, IT/dữ liệu, EHS, quản trị nhà cung cấp.</td></tr><tr><td>I</td><td>Improve/NC/CAPA</td><td>Quy định xử lý không phù hợp và hành động khắc phục, đánh giá hiệu lực.</td></tr></tbody></table></div><p class="muted">Khi trích dẫn trong tài liệu khác, phải ghi mã nhóm + số thứ tự (ví dụ: P05, S03) đúng như trên bản đồ.</p><h3 class="h3">2.2 Bản đồ quá trình (SVG)</h3><div class="card"><div class="legend" style="margin-bottom:10px;">
 <span class="pill"><span class="swatch mgt"></span>Management (M)</span>
 <span class="pill"><span class="swatch core"></span>Core (P)</span>
 <span class="pill"><span class="swatch sup"></span>Support (S)</span>
@@ -121,7 +121,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </marker>
 </defs>
 <!-- Title -->
-<text class="title" text-anchor="middle" x="600" y="42">PROCESS MAP &amp; INTERACTION – HESEM (CNC JOB ORDER)</text>
+<text class="title" text-anchor="middle" x="600" y="42">PROCESS MAP &amp; INTERACTION – HESEM (CNC LỆNH SẢN XUẤT)</text>
 <text class="sub" text-anchor="middle" x="600" y="70">Vertical layout prioritized for print readability. Outsource surface finishing is optional after deburr stage.</text>
 <!-- Lanes -->
 <rect class="lane" height="200" width="1060" x="70" y="100"></rect>
@@ -137,7 +137,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <text class="small" text-anchor="middle" x="270" y="242">ISO 5,6</text>
 <rect class="box mgt" height="130" width="320" x="440" y="150"></rect>
 <text class="title" text-anchor="middle" x="600" y="190">M02 Risk &amp; Opportunity</text>
-<text class="small" text-anchor="middle" x="600" y="218">Risk register • Change planning</text>
+<text class="small" text-anchor="middle" x="600" y="218">Sổ đăng ký rủi ro (risk register) • Change planning</text>
 <text class="small" text-anchor="middle" x="600" y="242">ISO 6.1, 6.3</text>
 <rect class="box mgt" height="130" width="320" x="770" y="150"></rect>
 <text class="title" text-anchor="middle" x="930" y="190">M03 Evaluate &amp; Improve</text>
@@ -146,7 +146,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- Core vertical chain -->
 <!-- C01 -->
 <rect class="box core" height="90" width="560" x="320" y="370"></rect>
-<text class="title" text-anchor="middle" x="600" y="405">P01 RFQ Intake &amp; Contract Review</text>
+<text class="title" text-anchor="middle" x="600" y="405">P01 RFQ Intake &amp; Rà soát hợp đồng</text>
 <text class="small" text-anchor="middle" x="600" y="432">FRM-SAL-01 • FRM-QA-01 • Define CTQ/Spec</text>
 <!-- C02 -->
 <rect class="box core" height="90" width="560" x="320" y="490"></rect>
@@ -167,15 +167,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- C06 -->
 <rect class="box core" height="90" width="560" x="320" y="970"></rect>
 <text class="title" text-anchor="middle" x="600" y="1005">P06 Deburr / Cleaning / In‑house Finishing</text>
-<text class="small" text-anchor="middle" x="600" y="1032">WI-PRO-02 • FRM-OPS-04 finishing checklist</text>
+<text class="small" text-anchor="middle" x="600" y="1032">WI-PRO-02 • FRM-OPS-04 finishing bảng kiểm</text>
 <!-- C07 Optional thuê ngoài -->
 <rect class="box core" height="90" width="560" x="320" y="1090"></rect>
 <text class="title" text-anchor="middle" x="600" y="1125">P07 Outsource Finishing (Optional)</text>
-<text class="small" text-anchor="middle" x="600" y="1152">WI-PUR-02 • FRM-PUR-03/04 • FRM-QA-05 • Cert pack</text>
+<text class="small" text-anchor="middle" x="600" y="1152">WI-PUR-02 • FRM-PUR-03/04 • FRM-QA-05 • Bộ chứng từ chứng nhận</text>
 <!-- C08 -->
 <rect class="box core" height="90" width="560" x="320" y="1210"></rect>
-<text class="title" text-anchor="middle" x="600" y="1245">P08 Final Inspection &amp; QA Release</text>
-<text class="small" text-anchor="middle" x="600" y="1272">FRM-QA-02 • CoC/CoA verification • Release gate (8.6)</text>
+<text class="title" text-anchor="middle" x="600" y="1245">P08 Kiểm tra cuối &amp; QA Release</text>
+<text class="small" text-anchor="middle" x="600" y="1272">FRM-QA-02 • CoC/CoA verification • Release cổng kiểm soát (8.6)</text>
 <!-- C09 -->
 <rect class="box core" height="90" width="560" x="320" y="1330"></rect>
 <text class="title" text-anchor="middle" x="600" y="1365">P09 Packaging / Labeling / Shipping</text>
@@ -223,7 +223,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <text class="small" text-anchor="middle" x="1015" y="1712">đánh giá nội bộ • MR • KPI</text>
 <rect class="box sup" height="110" width="190" x="920" y="1775"></rect>
 <text class="title" text-anchor="middle" x="1015" y="1810">S11 Customer Care</text>
-<text class="small" text-anchor="middle" x="1015" y="1837">Complaint • Feedback</text>
+<text class="small" text-anchor="middle" x="1015" y="1837">Khiếu nại • Feedback</text>
 <rect class="box sup" height="110" width="190" x="920" y="1900"></rect>
 <text class="title" text-anchor="middle" x="1015" y="1935">S12 Purchasing</text>
 <text class="small" text-anchor="middle" x="1015" y="1962">PO • Outsource</text>
@@ -264,7 +264,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <path class="arr" d="M450 610 L450 660"></path>
 <rect class="bx" height="90" rx="14" width="390" x="260" y="660"></rect>
 <text class="t1" text-anchor="middle" x="450" y="695">Release / Move to Next Step</text>
-<text class="t2" text-anchor="middle" x="450" y="722">Đạt yêu cầu → chuyển bước tiếp theo trong Job Order</text>
+<text class="t2" text-anchor="middle" x="450" y="722">Đạt yêu cầu → chuyển bước tiếp theo trong Lệnh sản xuất</text>
 <!-- NCR branch (if NG) -->
 <text class="yesno" x="670" y="555">NG → NCR/CAPA</text>
 <path class="arr" d="M650 570 L800 570"></path>
@@ -276,22 +276,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- NO path -->
 <text class="yesno" x="420" y="352">YES</text>
 <path class="arr" d="M450 330 L450 380"></path>
-</svg><p class="muted" style="margin-top:10px;">Nếu áp dụng thuê ngoài hoàn thiện, phải kiểm soát nhà cung cấp theo SOP-401 và phải thu đủ chứng chỉ/biên bản trong Evidence Pack trước khi release.</p></div>
+</svg><p class="muted" style="margin-top:10px;">Nếu áp dụng thuê ngoài hoàn thiện, phải kiểm soát nhà cung cấp theo SOP-401 và phải thu đủ chứng chỉ/biên bản trong Bộ bằng chứng (evidence pack) trước khi release.</p></div>
 <h3 class="h3">2.3 Luồng MTO (RFQ → Cash) dạng tóm tắt</h3>
-<p>Luồng MTO áp dụng cho Job Order CNC được chuẩn hoá theo các pha và điểm bàn giao. Mỗi pha <b>PHẢI</b> có record tối thiểu và quy tắc SoR/SSOT rõ ràng.</p>
+<p>Luồng MTO áp dụng cho Lệnh sản xuất CNC được chuẩn hoá theo các pha và điểm bàn giao. Mỗi pha <b>PHẢI</b> có hồ sơ tối thiểu và quy tắc SoR/SSOT rõ ràng.</p>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table">
-<colgroup><col style="width:2.36%;"/><col style="width:11.02%;"/><col style="width:43.31%;"/><col style="width:18.90%;"/><col style="width:24.41%;"/></colgroup><thead><tr><th>Pha</th><th>Handoff</th><th>Record bắt buộc</th><th>SoR</th><th>SSOT</th></tr></thead>
+<colgroup><col style="width:2.36%;"/><col style="width:11.02%;"/><col style="width:43.31%;"/><col style="width:18.90%;"/><col style="width:24.41%;"/></colgroup><thead><tr><th>Pha</th><th>Handoff</th><th>Hồ sơ bắt buộc</th><th>SoR</th><th>SSOT</th></tr></thead>
 <tbody>
-<tr><td>P01</td><td>Sales → ENG</td><td>rà soát hợp đồng (contract review / rà soát hợp đồng) đóng + QPL xác định</td><td>Epicor (RFQ/Quote/SO)</td><td>M365 (hồ sơ yêu cầu, phê duyệt)</td></tr>
-<tr><td>P02</td><td>ENG → Planning</td><td>Baseline package phát hành + Control Plan (khi áp dụng)</td><td>Epicor (Part/Rev/Job)</td><td>M365 (baseline, control plan)</td></tr>
-<tr><td>P03</td><td>Planning → OPS</td><td>Job kickoff checklist + traveler phát hành</td><td>Epicor (dispatch)</td><td>M365 (traveler, checklist)</td></tr>
-<tr><td>P04</td><td>OPS → QA</td><td>FAI/First piece (khi áp dụng) + IPQC log</td><td>Epicor (job status/time)</td><td>M365 (inspection records)</td></tr>
-<tr><td>P05</td><td>QA → Shipping</td><td>Final inspection + CoC release + Ship pack</td><td>Epicor (ship confirm)</td><td>M365 (ship evidence)</td></tr>
-<tr><td>P06</td><td>Shipping → Sales (Post-delivery)</td><td>Warranty claim / RMA intake + investigation + disposition</td><td>Epicor (RMA order)</td><td>M365 (Warranty-RMA records, FRM-SAL-004)</td></tr>
+<tr><td>P01</td><td>Sales → ENG</td><td>rà soát hợp đồng đóng + QPL xác định</td><td>Epicor (RFQ/Quote/SO)</td><td>M365 (hồ sơ yêu cầu, phê duyệt)</td></tr>
+<tr><td>P02</td><td>ENG → Planning</td><td>Bộ hồ sơ chuẩn (baseline package) phát hành + Control Plan (khi áp dụng)</td><td>Epicor (Part/Rev/Job)</td><td>M365 (baseline, control plan)</td></tr>
+<tr><td>P03</td><td>Planning → OPS</td><td>Job kickoff bảng kiểm + traveler phát hành</td><td>Epicor (dispatch)</td><td>M365 (traveler, bảng kiểm)</td></tr>
+<tr><td>P04</td><td>OPS → QA</td><td>FAI/Mẫu đầu (first piece) (khi áp dụng) + IPQC log</td><td>Epicor (job status/time)</td><td>M365 (inspection hồ sơ)</td></tr>
+<tr><td>P05</td><td>QA → Shipping</td><td>Kiểm tra cuối + CoC release + Bộ hồ sơ giao hàng (ship packet)</td><td>Epicor (xác nhận giao hàng (ship confirm))</td><td>M365 (ship bằng chứng)</td></tr>
+<tr><td>P06</td><td>Shipping → Sales (Post-delivery)</td><td>Warranty claim / RMA intake + investigation + disposition</td><td>Epicor (RMA order)</td><td>M365 (Warranty-RMA hồ sơ, FRM-SAL-004)</td></tr>
 </tbody>
 </table></div>
-<h3 class="h3">2.4 Điểm dừng (hold point) cấp hệ thống</h3><ul class="list"><li>HP-00: Không được phát hành sản xuất nếu chưa xác định QPL và chưa ghi vào Job Traveler/Job Dossier.</li><li>HP-01B: Khi QPL yêu cầu Control Plan, không được release lô đầu nếu thiếu FRM-QA-012 đã phát hành.</li><li>HP-02B: Không được chạy máy nếu chương trình chưa xác nhận nguồn SSOT và revision; tham chiếu PROC-CNC-002.</li><li>HP-05B: Khi có thuê ngoài hoàn thiện đặc biệt, không được nhận hàng nếu thiếu gói hồ sơ theo ANNEX-402.</li><li>HP-01: Không được phát hành sản xuất khi chưa hoàn tất rà soát hợp đồng (contract review / rà soát hợp đồng) và xác nhận CTQ/Spec theo hồ sơ SSOT.</li><li>HP-02: Không được chạy máy khi chương trình/Setup sheet chưa được phát hành theo kiểm soát phiên bản.</li><li>HP-03: Không được chuyển công đoạn khi chưa ghi nhận kết quả kiểm tra công đoạn (in‑process) theo register tương ứng.</li><li>HP-04: Không được giao hàng khi chưa có kiểm tra cuối (final inspection) + QA Release; thao tác xác nhận giao hàng (ship confirm / xác nhận giao hàng) và trạng thái job phải ghi trong Epicor Kinetic.</li><li>HP-05: Nếu có thuê ngoài hoàn thiện, không được nhận hàng/giải phóng (release) khi thiếu chứng chỉ/biên bản theo Evidence Pack.</li>
-<li>HP-06: Post-delivery — Warranty/RMA claim phải được tiếp nhận, điều tra (QA) và disposition trong SLA theo PROC-SAL-002. Không đóng case khi chưa có root cause + corrective action.</li></ul>
+<h3 class="h3">2.4 Điểm dừng (điểm giữ) cấp hệ thống</h3><ul class="list"><li>HP-00: Không được phát hành sản xuất nếu chưa xác định QPL và chưa ghi vào Phiếu theo dõi công việc (job traveler)/Hồ sơ công việc (job dossier).</li><li>HP-01B: Khi QPL yêu cầu Control Plan, không được release lô đầu nếu thiếu FRM-QA-012 đã phát hành.</li><li>HP-02B: Không được chạy máy nếu chương trình chưa xác nhận nguồn SSOT và revision; tham chiếu PROC-CNC-002.</li><li>HP-05B: Khi có thuê ngoài hoàn thiện đặc biệt, không được nhận hàng nếu thiếu gói hồ sơ theo ANNEX-402.</li><li>HP-01: Không được phát hành sản xuất khi chưa hoàn tất rà soát hợp đồng và xác nhận CTQ/Spec theo hồ sơ SSOT.</li><li>HP-02: Không được chạy máy khi chương trình/Setup sheet chưa được phát hành theo kiểm soát phiên bản.</li><li>HP-03: Không được chuyển công đoạn khi chưa ghi nhận kết quả kiểm tra công đoạn (in‑process) theo register tương ứng.</li><li>HP-04: Không được giao hàng khi chưa có kiểm tra cuối + QA Release; thao tác xác nhận giao hàng và trạng thái job phải ghi trong Epicor Kinetic.</li><li>HP-05: Nếu có thuê ngoài hoàn thiện, không được nhận hàng/giải phóng (release) khi thiếu chứng chỉ/biên bản theo Bộ bằng chứng.</li>
+<li>HP-06: Post-delivery — Warranty/RMA claim phải được tiếp nhận, điều tra (QA) và disposition trong SLA theo PROC-SAL-002. Không đóng case khi chưa có nguyên nhân gốc + corrective action.</li></ul>
 <h3 class="h3">2.5 Tài liệu mới bổ sung vào quy trình</h3>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:12%;"/><col style="width:30%;"/><col style="width:18%;"/><col style="width:40%;"/></colgroup>
 <thead><tr><th>Pha/Vị trí</th><th>Tài liệu mới</th><th>Mã</th><th>Vai trò trong process</th></tr></thead>
@@ -302,24 +302,24 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>S (HR)</td><td>Organizational Knowledge Management</td><td>SOP-105</td><td>Thu thập, lưu trữ, chia sẻ tri thức (7.1.6)</td></tr>
 <tr><td>S (Calibration)</td><td>Gage &amp; Equipment Inventory</td><td>FRM-QMS-026</td><td>Master list thiết bị đo lường (7.1.5)</td></tr>
 <tr><td>P06 (Post-delivery)</td><td>Warranty &amp; RMA Process</td><td>PROC-SAL-002</td><td>Xử lý warranty claim &amp; RMA (ISO 9001:2015 8.5.5)</td></tr>
-<tr><td>M (Review)</td><td>Management Review Input Checklist</td><td>ANNEX-119</td><td>ISO 9001:2015 §9.3.2 enhanced checklist</td></tr>
-<tr><td>S (MNT)</td><td>Crash Incident Report</td><td>FRM-MNT-002</td><td>Evidence form cho PROC-MNT-003</td></tr>
+<tr><td>M (Review)</td><td>Xem xét của lãnh đạo Input Bảng kiểm</td><td>ANNEX-119</td><td>ISO 9001:2015 §9.3.2 enhanced bảng kiểm</td></tr>
+<tr><td>S (MNT)</td><td>Crash Incident Report</td><td>FRM-MNT-002</td><td>Bằng chứng form cho PROC-MNT-003</td></tr>
 <tr><td>S (MNT)</td><td>Tooling &amp; Fixture Register</td><td>FRM-MNT-003</td><td>Master register quản lý đồ gá</td></tr>
 <tr><td>S (MNT)</td><td>Gage Verification Log</td><td>FRM-MNT-004</td><td>Sổ theo dõi kiểm tra gage</td></tr>
-<tr><td>S (MNT)</td><td>Machine History Card</td><td>FRM-MNT-005</td><td>Machine master record (7.1.3)</td></tr>
-<tr><td>P03 (Setup)</td><td>Job Packet Quick-Check Card</td><td>WI-OPS-017</td><td>1-page operator checklist trước chạy CNC</td></tr>
-</tbody></table></div><h3 class="h3">2.5 Records &amp; Registers liên quan</h3><p>Các record sau là bắt buộc khi kiểm soát thay đổi và khi rà soát hiệu lực của bản đồ quá trình:</p><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:19.63%;"/><col style="width:10.96%;"/><col style="width:4.57%;"/><col style="width:30.14%;"/><col style="width:23.74%;"/><col style="width:10.96%;"/></colgroup><thead><tr><th>Record/Bằng chứng</th><th>Register/List</th><th>SoR/SSOT</th><th>Nơi lưu SSOT</th><th>Retention (event-based)</th><th>Legal hold</th></tr></thead><tbody><tr><td>Phiếu yêu cầu thay đổi tài liệu (DCR)</td><td>Document Change Register</td><td>SSOT: M365</td><td><b>M365: CNC-IMS-HUB/QMS-Records/01_DocumentControl/DCR</b></td><td>Sự kiện: DCR đóng → giữ tối thiểu 03 năm</td><td>Áp dụng theo SOP-104</td></tr><tr><td>Biên bản rà soát bản đồ quá trình (định kỳ)</td><td>Process Map Review Log</td><td>SSOT: M365</td><td><b>M365: CNC-IMS-HUB/QMS-Records/02_ProcessReview/Process-Map</b></td><td>Sự kiện: kỳ rà soát kết thúc → giữ 03 năm</td><td>Áp dụng theo SOP-104</td></tr><tr><td>Bản gốc SVG + bản phát hành HTML/PDF</td><td>Document Register</td><td>SSOT: M365</td><td><b>M365: CNC-IMS-HUB/QMS-Controlled-Documents/qms/annex/ANNEX-105</b></td><td>Sự kiện: revision bị thay thế → giữ tối thiểu 03 năm</td><td>Áp dụng theo SOP-104</td></tr></tbody></table></div></div><div class="section"><h2 class="h2">3. Quy tắc chủ sở hữu và cập nhật</h2><ul class="list"><li>Chủ sở hữu tài liệu là QA/QMS. Chỉ QA/QMS (Document Control) được quyền cập nhật nội dung và phát hành phiên bản mới.</li><li>Mọi thay đổi phải theo SOP-QMS-001 và SOP-106; phải có DCR, rà soát liên phòng ban và phê duyệt bởi General Manager (EXE-01).</li><li>Khi cập nhật, phải kiểm tra các điểm: mã quá trình (M/P/S/I), điểm dừng chất lượng, liên kết tới SOP/PROC/WI/FRM, và quy tắc SoR/SSOT.</li><li>Không được mô tả hoặc tạo cơ chế ghi nhận transaction ngoài Epicor Kinetic. Trạng thái job, time entry, inventory transaction, xác nhận giao hàng (ship confirm / xác nhận giao hàng) và PO/receipt chỉ được ghi trong Epicor.</li></ul></div><div class="section"></div><h2 class="h2">Tài liệu điều hành liên kết</h2><div class="doc-link-row"><span class="doc-link">SOP-101</span><span class="doc-link">SOP-102</span><span class="doc-link">SOP-201</span><span class="doc-link">SOP-301</span><span class="doc-link">SOP-303</span><span class="doc-link">SOP-501</span><span class="doc-link">SOP-605</span><span class="doc-link">SOP-901</span><span class="doc-link">SOP-902</span><span class="doc-link">SOP-903</span></div>
+<tr><td>S (MNT)</td><td>Machine History Card</td><td>FRM-MNT-005</td><td>Machine master hồ sơ (7.1.3)</td></tr>
+<tr><td>P03 (Setup)</td><td>Bộ hồ sơ công việc (job packet) Quick-Check Card</td><td>WI-OPS-017</td><td>1-page operator bảng kiểm trước chạy CNC</td></tr>
+</tbody></table></div><h3 class="h3">2.5 Hồ sơ &amp; Registers liên quan</h3><p>Các hồ sơ sau là bắt buộc khi kiểm soát thay đổi và khi rà soát hiệu lực của bản đồ quá trình:</p><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:19.63%;"/><col style="width:10.96%;"/><col style="width:4.57%;"/><col style="width:30.14%;"/><col style="width:23.74%;"/><col style="width:10.96%;"/></colgroup><thead><tr><th>Hồ sơ/Bằng chứng</th><th>Register/List</th><th>SoR/SSOT</th><th>Nơi lưu SSOT</th><th>Retention (event-based)</th><th>Legal hold</th></tr></thead><tbody><tr><td>Phiếu yêu cầu thay đổi tài liệu (DCR)</td><td>Document Change Register</td><td>SSOT: M365</td><td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/01_DocumentControl/DCR</b></td><td>Sự kiện: DCR đóng → giữ tối thiểu 03 năm</td><td>Áp dụng theo SOP-104</td></tr><tr><td>Biên bản rà soát bản đồ quá trình (định kỳ)</td><td>Process Map Review Log</td><td>SSOT: M365</td><td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/02_ProcessReview/Process-Map</b></td><td>Sự kiện: kỳ rà soát kết thúc → giữ 03 năm</td><td>Áp dụng theo SOP-104</td></tr><tr><td>Bản gốc SVG + bản phát hành HTML/PDF</td><td>Document Register</td><td>SSOT: M365</td><td><b>M365: CNC-IMS-HUB/QMS-Controlled-Documents/qms/annex/ANNEX-105</b></td><td>Sự kiện: revision bị thay thế → giữ tối thiểu 03 năm</td><td>Áp dụng theo SOP-104</td></tr></tbody></table></div></div><div class="section"><h2 class="h2">3. Quy tắc chủ sở hữu và cập nhật</h2><ul class="list"><li>Chủ sở hữu tài liệu là QA/QMS. Chỉ QA/QMS (Document Control) được quyền cập nhật nội dung và phát hành phiên bản mới.</li><li>Mọi thay đổi phải theo SOP-QMS-001 và SOP-106; phải có DCR, rà soát liên phòng ban và phê duyệt bởi General Manager (EXE-01).</li><li>Khi cập nhật, phải kiểm tra các điểm: mã quá trình (M/P/S/I), điểm dừng chất lượng, liên kết tới SOP/PROC/WI/FRM, và quy tắc SoR/SSOT.</li><li>Không được mô tả hoặc tạo cơ chế ghi nhận giao dịch ngoài Epicor Kinetic. Trạng thái job, time entry, inventory giao dịch, xác nhận giao hàng và PO/receipt chỉ được ghi trong Epicor.</li></ul></div><div class="section"></div><h2 class="h2">Tài liệu điều hành liên kết</h2><div class="doc-link-row"><span class="doc-link">SOP-101</span><span class="doc-link">SOP-102</span><span class="doc-link">SOP-201</span><span class="doc-link">SOP-301</span><span class="doc-link">SOP-303</span><span class="doc-link">SOP-501</span><span class="doc-link">SOP-605</span><span class="doc-link">SOP-901</span><span class="doc-link">SOP-902</span><span class="doc-link">SOP-903</span></div>
 <h2 class="h2">4. Nhóm quá trình theo 37 SOP hiện hành</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table small-table"><thead><tr><th>Nhóm</th><th>Vai trò của nhóm</th><th>SOP hiện hành</th><th>Điểm giao diện chính</th></tr></thead><tbody>
 <tr><td>M1 — Quản trị hệ thống</td><td>Khóa bối cảnh, tài liệu, dữ liệu, thay đổi, truyền thông, contingency.</td><td>SOP-101 đến SOP-108</td><td>Áp cho mọi quá trình trước khi release và khi có thay đổi.</td></tr>
 <tr><td>P1 — Khách hàng / hợp đồng</td><td>Nhận yêu cầu, review hợp đồng, quản lý tài sản khách hàng, khiếu nại.</td><td>SOP-201, SOP-202, SOP-203</td><td>Sales → ENG → Planning; Customer feedback → QA/QMS.</td></tr>
-<tr><td>P2 — Engineering</td><td>DFM, quoting, baseline package, first piece / FAI.</td><td>SOP-301, SOP-302, SOP-303</td><td>ENG → Planning / Production / QA.</td></tr>
+<tr><td>P2 — Engineering</td><td>DFM, quoting, bộ hồ sơ chuẩn, mẫu đầu / FAI.</td><td>SOP-301, SOP-302, SOP-303</td><td>ENG → Planning / Production / QA.</td></tr>
 <tr><td>S1 — NCC / vật tư</td><td>Nhà cung cấp, special process, traceability, counterfeit prevention.</td><td>SOP-401, SOP-402</td><td>PUR / WHS / QA / ENG.</td></tr>
 <tr><td>P3 — Điều độ / gia công / hoàn thiện</td><td>Lập kế hoạch, setup, machining, bảo trì, secondary operations.</td><td>SOP-501 đến SOP-505</td><td>Planning → OPS → QA.</td></tr>
-<tr><td>P4 — Đo lường / release</td><td>Calibration, MSA, AQL, SPC, final inspection, NCR/CAPA.</td><td>SOP-601 đến SOP-606</td><td>QA ↔ OPS ↔ WHS ↔ Sales.</td></tr>
+<tr><td>P4 — Đo lường / release</td><td>Calibration, MSA, AQL, SPC, kiểm tra cuối, NCR/CAPA.</td><td>SOP-601 đến SOP-606</td><td>QA ↔ OPS ↔ WHS ↔ Sales.</td></tr>
 <tr><td>S2 — Kho / sạch / an toàn sản phẩm</td><td>Receiving, preservation, cleanliness, FOD, conformity.</td><td>SOP-701 đến SOP-703</td><td>WHS / QA / OPS / Shipping.</td></tr>
 <tr><td>S3 — Con người / tài chính / EHS</td><td>Năng lực, EHS, invoicing/job costing, human factors.</td><td>SOP-801 đến SOP-804</td><td>HR / HSE / FIN / Line managers.</td></tr>
-<tr><td>M2 — Assurance &amp; cải tiến</td><td>Audit, management review, continual improvement.</td><td>SOP-901, SOP-902, SOP-903</td><td>QMS / Top management / Process owners.</td></tr>
+<tr><td>M2 — Assurance &amp; cải tiến</td><td>Đánh giá, xem xét của lãnh đạo, continual improvement.</td><td>SOP-901, SOP-902, SOP-903</td><td>QMS / Top management / Chủ quá trình.</td></tr>
 </tbody></table></div>
 </div><div class="section"><h2 class="h2">5. Related links</h2><ul class="list"><li>QMS Index</li><li>Process Index</li><li>ANNEX-106</li><li>ANNEX-107</li><li>ANNEX-201</li><li>SOP-QMS-001</li><li>SOP-106</li><li>SOP-401</li><li>SOP-104</li><li>SOP-104</li><li>Site-map</li></ul></div></div>
 </div></div>

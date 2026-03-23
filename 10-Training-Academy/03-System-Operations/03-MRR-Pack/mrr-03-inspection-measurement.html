@@ -86,7 +86,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li><b>Vai trò:</b> QC • QA/QMS • OPS</li>
 <li><b>Chuẩn lưu:</b> SSOT theo <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a></li>
-<li><b>Gate:</b> Thiếu MRR → STOP/HOLD/BLOCK theo mục “Fail-fast”.</li>
+<li><b>Cổng kiểm soát (gate):</b> Thiếu MRR → STOP/HOLD/BLOCK theo mục “Fail-fast”.</li>
 </ul>
 </div>
 <div class="note">
@@ -101,30 +101,30 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<h2 class="h2" style="margin-top:0;">Checklist MRR (Minimum Required Records)</h2>
+<h2 class="h2" style="margin-top:0;">Bảng kiểm MRR (Minimum Required Hồ sơ)</h2>
 <p class="mini muted2">Tick đủ các dòng dưới đây. Mỗi dòng phải có bằng chứng trong SSOT và đặt tên file đúng chuẩn.</p>
 <div style="overflow:auto;">
 <table class="form-table">
 <tr>
 <th style="min-width:320px;">MRR / Bằng chứng</th>
 <th style="min-width:140px;">RecordType</th>
-<th style="min-width:110px;">Gate</th>
-<th style="min-width:120px;">Owner</th>
+<th style="min-width:110px;">Cổng kiểm soát</th>
+<th style="min-width:120px;">Người phụ trách</th>
 <th style="min-width:220px;">SSOT path</th>
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
 <tr><td><span class="chk">☐</span> Danh mục gage dùng cho job (gage list) + status OK</td><td>GAGE</td><td>Q0</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/GAGE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_GAGELIST_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Calibration certificate cho gage CTQ</td><td>CAL</td><td>Q0</td><td>QA/QC</td><td class="mini">SSOT/Quality/CAL/</td><td class="mini">CAL_<gageid>_<span class="pill">&lt;YYYYMMDD&gt;</span>.pdf</gageid></td></tr>
 <tr><td><span class="chk">☐</span> kế hoạch kiểm tra (inspection plan) / CTQ map (tần suất + phương pháp đo)</td><td>IPLAN</td><td>Q0</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/PLAN/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPLAN_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> FAI/IR (first piece) ký xác nhận</td><td>FAI/IR</td><td>Q1</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FAI/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FAI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> IPQC record (đo trong quá trình)</td><td>IPQC</td><td>Q2</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/IPQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> FAI/IR (mẫu đầu (first piece)) ký xác nhận</td><td>FAI/IR</td><td>Q1</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FAI/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FAI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> IPQC hồ sơ (đo trong quá trình)</td><td>IPQC</td><td>Q2</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/IPQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> SPC chart (khi CTQ yêu cầu kiểm soát thống kê)</td><td>SPC</td><td>Q2</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/SPC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SPC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> MSA/GRR (khi thay gage, thay phương pháp đo, thay người đo)</td><td>MSA</td><td>Q2</td><td>QA</td><td class="mini">SSOT/Quality/MSA/</td><td class="mini">MSA_<gageid>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</gageid></td></tr>
 <tr><td><span class="chk">☐</span> NCR (khi phát hiện NG) + disposition</td><td>NCR</td><td>Q2</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> Final Inspection Report + acceptance</td><td>FQC</td><td>Q3</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Kiểm tra cuối Report + acceptance</td><td>FQC</td><td>Q3</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 </table>
 </div>
-<div class="note mini"><strong>Gắn với module</strong>: C16 (Đo kiểm), C03 (Quality at source), C13 (Change control), C10 (Gate).</div>
+<div class="note mini"><strong>Gắn với module</strong>: C16 (Đo kiểm), C03 (Quality at source), C13 (Kiểm soát thay đổi), C10 (Cổng kiểm soát).</div>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
@@ -133,9 +133,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div class="card">
-<h2 class="h2" style="margin-top:0;">Audit 60 giây</h2>
+<h2 class="h2" style="margin-top:0;">Đánh giá 60 giây</h2>
 <ol class="tight">
-<li>Mở GAGELIST và đối chiếu tem gage tại hiện trường.</li><li>Mở IPLAN và đối chiếu CTQ map với bản vẽ REV.</li><li>Mở FAI/IR và IPQC record; kiểm tra dấu thời gian và chữ ký.</li><li>Mở FQC và đối chiếu bộ hồ sơ giao hàng (ship packet).</li>
+<li>Mở GAGELIST và đối chiếu tem gage tại hiện trường.</li><li>Mở IPLAN và đối chiếu CTQ map với bản vẽ REV.</li><li>Mở FAI/IR và IPQC hồ sơ; kiểm tra dấu thời gian và chữ ký.</li><li>Mở FQC và đối chiếu bộ hồ sơ giao hàng (ship packet).</li>
 </ol>
 </div>
 <div class="card">

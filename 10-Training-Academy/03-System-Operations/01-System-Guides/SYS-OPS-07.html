@@ -82,14 +82,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="grid-2">
 <div>
 <div class="badge"><span class="dot"></span>Module SYS-OPS-07</div>
-<h1 style="margin-top:10px">Tier Meetings (Tier 1/2/3) là “GATE VẬN HÀNH” — không có bằng chứng thì không được coi là đã kiểm soát</h1>
+<h1 style="margin-top:10px">Tier Meetings (Tier 1/2/3) là “CỔNG KIỂM SOÁT (GATE) VẬN HÀNH” — không có bằng chứng thì không được coi là đã kiểm soát</h1>
 <p class="lead">Module này chuẩn hóa: nhịp họp, nội dung bắt buộc, chuẩn leo thang, chuẩn ghi nhận hành động, và chuẩn đóng hành động bằng minh chứng (MRR) để sẵn sàng đánh giá.</p>
 <div class="callout-strong">
 <div class="danger">CAM KẾT TIÊU CHUẨN</div>
 <ul class="tight">
 <li>Mọi vấn đề đi qua Tier meeting PHẢI có <b>Chủ trách nhiệm + Deadline (giờ/phút) + Kết quả + Minh chứng</b>.</li>
-<li>Không ghi “đang xử lý” chung chung. Không chuyển ca mà không có owner rõ.</li>
-<li><b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)</b>: không có MRR thì coi như chưa làm.</li>
+<li>Không ghi “đang xử lý” chung chung. Không chuyển ca mà không có người phụ trách rõ.</li>
+<li><b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)</b>: không có MRR thì coi như chưa làm.</li>
 </ul>
 </div>
 <p class="mini muted">
@@ -130,14 +130,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Operator / Setup</b></td>
 <td>Tier 1 (đầu ca)</td>
-<td>Nêu vấn đề tại chỗ (an toàn, chất lượng, thiếu tool, thiếu giấy tờ) + cập nhật trạng thái job/WO + xác nhận owner hành động.</td>
+<td>Nêu vấn đề tại chỗ (an toàn, chất lượng, thiếu tool, thiếu giấy tờ) + cập nhật trạng thái job/WO + xác nhận người phụ trách hành động.</td>
 <td>Đạt khi: ghi đúng trigger + mô tả ảnh hưởng + chụp/đính kèm minh chứng tại chỗ cho 100% issue do mình nêu.</td>
 </tr>
 <tr>
 <td><b>Programmer</b></td>
 <td>Tier 1 (khi có blocker kỹ thuật) + Tier 2</td>
 <td>Chốt revision, CTQ, strategy kiểm soát chương trình; phát hành bản sửa với dấu vết; không cho chạy khi chưa rõ rev/CTQ.</td>
-<td>Đạt khi: mọi thay đổi chương trình có dấu vết + link file đúng rev + xác nhận first-piece gate M365/SharePoint → HESEM-QMS-SSOT theo WI liên quan.</td>
+<td>Đạt khi: mọi thay đổi chương trình có dấu vết + link file đúng rev + xác nhận mẫu đầu (first piece) cổng kiểm soát M365/SharePoint → HESEM-QMS-SSOT theo WI liên quan.</td>
 </tr>
 <tr>
 <td><b>QC / QA</b></td>
@@ -167,7 +167,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Estimator (SAL-03)</b></td>
 <td>Tier 3 (khi có rủi ro khách)</td>
 <td>Đóng vòng thông tin với khách; xác nhận ưu tiên đơn; ghi nhận khiếu nại/feedback và chuyển CAPA.</td>
-<td>Đạt khi: mọi thay đổi cam kết giao hàng có record + thông báo khách có dấu vết M365/SharePoint → HESEM-QMS-SSOT.</td>
+<td>Đạt khi: mọi thay đổi cam kết giao hàng có hồ sơ + thông báo khách có dấu vết M365/SharePoint → HESEM-QMS-SSOT.</td>
 </tr>
 <tr>
 <td><b>Supervisor</b></td>
@@ -192,9 +192,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Mục đích (bắt buộc)</h3>
 <ul class="tight">
 <li>Khóa “điểm mù” giữa các bộ phận: mọi blocker phải được thấy trong <b>Tier 1</b>, quyết trong <b>Tier 2</b>, và chốt nguồn lực trong <b>Tier 3</b>.</li>
-<li>Chặn rủi ro “bypass gate”: không chuyển trạng thái job/WO khi thiếu minh chứng.</li>
+<li>Chặn rủi ro “bypass cổng kiểm soát”: không chuyển trạng thái job/WO khi thiếu minh chứng.</li>
 <li>Chuẩn hóa leo thang theo SLA: vấn đề không được tự “chết dần” trong im lặng.</li>
-<li>Tạo bằng chứng vận hành (MRR) đủ để audit: truy xuất được “ai quyết – khi nào – dựa trên gì – kết quả gì”.</li>
+<li>Tạo bằng chứng vận hành (MRR) đủ để đánh giá: truy xuất được “ai quyết – khi nào – dựa trên gì – kết quả gì”.</li>
 </ul>
 </div>
 <div>
@@ -202,7 +202,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li><b>Mỗi đầu ca</b>: Tier 1 tại khu vực sản xuất/kho/QC.</li>
 <li><b>Mỗi tuần</b>: Tier 2 để quyết định backlog/capacity/outsource/ưu tiên.</li>
-<li><b>Mỗi tháng</b>: Tier 3 để chốt rủi ro hệ thống, nguồn lực, kết quả audit, hiệu lực CAPA.</li>
+<li><b>Mỗi tháng</b>: Tier 3 để chốt rủi ro hệ thống, nguồn lực, kết quả đánh giá, hiệu lực CAPA.</li>
 <li><b>Khi phát sinh rủi ro S1/S2</b>: kích hoạt escal ngay, không chờ đến lịch họp.</li>
 </ul>
 </div>
@@ -223,7 +223,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Tier 1</b> (Daily/Shift)</td>
 <td>Đầu mỗi ca (2 ca/ngày)</td>
 <td>10–15 phút</td>
-<td>Dispatch/WIP, job Due ≤ 48h, danh sách Blocked, Quality holds/NCR, Shipping readiness, Downtime top 3, EHS alerts</td>
+<td>Dispatch/WIP, job Due ≤ 48h, danh sách Blocked, Quality holds/NCR, Shipping mức sẵn sàng, Downtime top 3, EHS alerts</td>
 <td>
 <b>FRM-OPS-005 Standup Action Log</b> (cập nhật đầy đủ) + ảnh Tier board + danh sách escal (S1/S2) trong ca
  </td>
@@ -241,9 +241,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Tier 3</b> (Monthly)</td>
 <td>1 lần/tháng (cố định)</td>
 <td>60–90 phút</td>
-<td>Trend KPI, audit findings, customer performance, supplier performance, risk register, CAPA effectiveness</td>
+<td>Trend KPI, đánh giá findings, customer performance, supplier performance, sổ đăng ký rủi ro (risk register), CAPA effectiveness</td>
 <td>
- Biên bản quyết định nguồn lá»±c/ưu tiên + cập nhật sổ đăng ký rủi ro (risk register) + quyết định thay đổi quy trình (khi phát sinh)
+ Biên bản quyết định nguồn lá»±c/ưu tiên + cập nhật sổ đăng ký rủi ro + quyết định thay đổi quy trình (khi phát sinh)
  </td>
 </tr>
 </tbody>
@@ -261,7 +261,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Bước E2E</th>
 <th>Đầu vào vào Tier meeting</th>
 <th>Đầu ra/Handoff</th>
-<th>Điểm chặn (Gate) trong module này</th>
+<th>Điểm chặn (Cổng kiểm soát) trong module này</th>
 </tr>
 </thead>
 <tbody>
@@ -269,37 +269,37 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Planning → Production</td>
 <td>Dispatch/WIP + job Due ≤ 48h + blocker</td>
 <td>Action để giải blocker / đổi ưu tiên / đổi route</td>
-<td><b>Gate-OPS-01:</b> Job Due ≤ 48h bắt buộc có owner và kế hoạch giờ/phút trong FRM-OPS-005.</td>
+<td><b>Cổng kiểm soát-OPS-01:</b> Job Due ≤ 48h bắt buộc có người phụ trách và kế hoạch giờ/phút trong FRM-OPS-005.</td>
 </tr>
 <tr>
 <td>Engineering → Production/QC</td>
 <td>Rev/CTQ/Program status</td>
-<td>Release program + first-piece gate</td>
-<td><b>Gate-ENG-01:</b> Khi chưa xác nhận rev/CTQ → HOLD, không chạy.</td>
+<td>Release program + mẫu đầu cổng kiểm soát</td>
+<td><b>Cổng kiểm soát-ENG-01:</b> Khi chưa xác nhận rev/CTQ → HOLD, không chạy.</td>
 </tr>
 <tr>
 <td>Purchasing/Outsource → Receiving</td>
-<td>ETA NCC + tình trạng chứng từ special process</td>
+<td>ETA NCC + tình trạng chứng từ công đoạn đặc biệt</td>
 <td>Escal NCC / backup route</td>
-<td><b>Gate-SUP-01:</b> Khi outsource/special process thiếu chứng từ → HOLD lô, không nhập “OK”.</td>
+<td><b>Cổng kiểm soát-SUP-01:</b> Khi outsource/công đoạn đặc biệt thiếu chứng từ → HOLD lô, không nhập “OK”.</td>
 </tr>
 <tr>
 <td>Production → QC/QA</td>
 <td>Holds, NCR, MRB queue</td>
 <td>Containment + disposition + rework plan</td>
-<td><b>Gate-Q-01:</b> Hold CTQ chưa có containment + tiêu chí giải hold → BLOCK.</td>
+<td><b>Cổng kiểm soát-Q-01:</b> Hold CTQ chưa có containment + tiêu chí giải hold → BLOCK.</td>
 </tr>
 <tr>
 <td>Final → Packing → Ship</td>
-<td>Shipping readiness + packet completeness</td>
-<td>Ship release / shipment block</td>
-<td><b>Gate-SHIP-01:</b> Khi thiếu packet/chứng từ/nhãn/traceability → STOP SHIP ngay.</td>
+<td>Shipping mức sẵn sàng + packet completeness</td>
+<td>Phê duyệt giao hàng / shipment block</td>
+<td><b>Cổng kiểm soát-SHIP-01:</b> Khi thiếu packet/chứng từ/nhãn/traceability → STOP SHIP ngay.</td>
 </tr>
 <tr>
 <td>Ship → Feedback/CI</td>
-<td>Late/complaint/returns</td>
+<td>Late/khiếu nại/returns</td>
 <td>CAPA + management decision</td>
-<td><b>Gate-CAPA-01:</b> Khi CAPA quá hạn → escal Tier 3; không đóng khi thiếu bằng chứng hiệu lực.</td>
+<td><b>Cổng kiểm soát-CAPA-01:</b> Khi CAPA quá hạn → escal Tier 3; không đóng khi thiếu bằng chứng hiệu lực.</td>
 </tr>
 </tbody>
 </table>
@@ -314,19 +314,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol class="tight">
 <li><b>sai phiên bản (wrong revision)/bản vẽ</b> vào sản xuất vì Tier 1 không kiểm trạng thái release → phát sinh scrap/rework.</li>
 <li><b>Mix-up/lẫn lô</b> vì Warehouse không khóa traceability tại handoff giữa ca → ship sai lô.</li>
-<li><b>Missing / falsified outsource documents/special process</b> vì Tier 2 không rà packet → mất bằng chứng audit.</li>
-<li><b>Job “đứng im” qua đêm</b> vì không gán owner + deadline giờ/phút → trễ giao hàng.</li>
-<li><b>Quality hold bị bỏ quên</b> vì không có rule escal khi hold vượt SLA → ship risk.</li>
-<li><b>Bypass gate QC</b> vì áp lực tiến độ + không có STOP/HOLD rõ → nonconforming product.</li>
+<li><b>Missing / falsified outsource documents/công đoạn đặc biệt</b> vì Tier 2 không rà packet → mất bằng chứng đánh giá.</li>
+<li><b>Job “đứng im” qua đêm</b> vì không gán người phụ trách + deadline giờ/phút → trễ giao hàng.</li>
+<li><b>Quality hold bị bỏ quên</b> vì không có rule escal khi hold vượt SLA → rủi ro giao hàng.</li>
+<li><b>Bypass cổng kiểm soát QC</b> vì áp lực tiến độ + không có STOP/HOLD rõ → nonconforming product.</li>
 <li><b>Gage OOT/Overdue calibration</b> nhưng vẫn đo vì Tier 1 không xem trạng thái gage → dữ liệu đo không hợp lệ.</li>
-<li><b>Downtime lặp lại</b> vì Maintenance xử lý “chữa cháy” không có action chống lặp + không ghi evidence.</li>
+<li><b>Downtime lặp lại</b> vì Maintenance xử lý “chữa cháy” không có action chống lặp + không ghi bằng chứng.</li>
 <li><b>Backlog QC</b> vì không ưu tiên theo ship cutoff → miss giao hàng khi chờ FQC.</li>
 <li><b>Thông tin khách hàng thay đổi</b> (spec/ship date) không được đẩy vào Tier 3 → quyết định sản xuất sai ưu tiên.</li>
 <li><b>Action list phình to</b> vì không đóng action bằng bằng chứng → “report theatre”.</li>
 <li><b>Escalation sai ngưỡng</b> (đợi đến họp tuần) khi vấn đề thuộc S1/S2 → thiệt hại lan rộng trong cùng ngày.</li>
 </ol>
 <div class="callout-strong">
-<b>Điểm chặn bắt buộc:</b> Khi phát sinh 1 điểm gãy thuộc nhóm <span class="danger">Rev/Mix-up/Ship risk/CTQ hold/OOT gage</span> → kích hoạt mục “Phản ứng 60 giây” và ghi log ngay trong FRM-OPS-005.
+<b>Điểm chặn bắt buộc:</b> Khi phát sinh 1 điểm gãy thuộc nhóm <span class="danger">Rev/Mix-up/Rủi ro giao hàng/CTQ hold/OOT gage</span> → kích hoạt mục “Phản ứng 60 giây” và ghi log ngay trong FRM-OPS-005.
  </div>
 </div>
 <!-- 5) Risk Controls -->
@@ -352,7 +352,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>S1 khi phát hiện chạy sai rev</td>
 </tr>
 <tr>
-<td><b>WIP Aging</b>: job Due ≤ 48h / Blocked list</td>
+<td><b>WIP Tuổi tồn (aging)</b>: job Due ≤ 48h / Blocked list</td>
 <td>Planner + Supervisor</td>
 <td>Mỗi Tier 1</td>
 <td>FRM-OPS-005 + ảnh WIP board</td>
@@ -362,14 +362,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Quality hold governance</b>: containment + tiêu chí giải hold</td>
 <td>QC/QA</td>
 <td>Mỗi Tier 1</td>
-<td>NCR/Hold record + bằng chứng đo/kiểm</td>
+<td>NCR/Hold hồ sơ + bằng chứng đo/kiểm</td>
 <td>S1 khi hold CTQ/stop ship</td>
 </tr>
 <tr>
 <td><b>Shipping packet completeness</b></td>
 <td>Warehouse + QA</td>
 <td>Mỗi lô trước cutoff</td>
-<td>Checklist packet + ảnh nhãn + COC/phiếu kê đóng gói (packing list)</td>
+<td>Bảng kiểm packet + ảnh nhãn + COC/phiếu kê đóng gói (phiếu kê đóng gói)</td>
 <td>S1 khi thiếu chứng từ/traceability</td>
 </tr>
 <tr>
@@ -387,10 +387,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>S2 khi downtime lặp hoặc dừng line</td>
 </tr>
 <tr>
-<td><b>Outsource/special process SLA</b></td>
+<td><b>Outsource/công đoạn đặc biệt SLA</b></td>
 <td>Purchasing + Planner</td>
 <td>Mỗi Tier 2</td>
-<td>ETA bằng chứng (email/PO/ASN) CNC-IMS-HUB → QMS-Records.</td>
+<td>ETA bằng chứng (email/PO/ASN) CNC-IMS-HUB → QMS-Hồ sơ.</td>
 <td>S3 khi trễ ≥ 24h so ETA; Level 3 khi rủi ro miss ship</td>
 </tr>
 </tbody>
@@ -401,10 +401,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <label class="blabel"><h1 class="h1" style="margin-top:0;">6) Fail-fast rules + tiêu chí STOP/HOLD/BLOCK</h1></label>
 <ul class="tight">
-<li><b>STOP SHIP:</b> Khi thiếu packet/chứng từ/traceability/COC/nhãn; khi có hold CTQ; khi chưa có ship-release record. Không được “ship trước bổ sung sau”.</li>
-<li><b>HOLD JOB:</b> Khi chưa xác nhận revision/CTQ; khi program/setup chưa qua first-piece gate M365/SharePoint → HESEM-QMS-SSOT; khi gage dùng đo CTQ overdue/OOT.</li>
+<li><b>STOP SHIP:</b> Khi thiếu packet/chứng từ/traceability/COC/nhãn; khi có hold CTQ; khi chưa có ship-release hồ sơ. Không được “ship trước bổ sung sau”.</li>
+<li><b>HOLD JOB:</b> Khi chưa xác nhận revision/CTQ; khi program/setup chưa qua mẫu đầu cổng kiểm soát M365/SharePoint → HESEM-QMS-SSOT; khi gage dùng đo CTQ overdue/OOT.</li>
 <li><b>BLOCK MOVE:</b> Khi action trong FRM-OPS-005 quá hạn mà chưa có minh chứng; job Due ≤ 48h không có kế hoạch giờ/phút.</li>
-<li><b>ESCALATE NOW:</b> Khi S1/S2 xảy ra: dừng ship/CTQ/thiếu bằng chứng Tier 1; line stop/machine down; bypass gate; mix-up.</li>
+<li><b>ESCALATE NOW:</b> Khi S1/S2 xảy ra: dừng ship/CTQ/thiếu bằng chứng Tier 1; line stop/machine down; bypass cổng kiểm soát; mix-up.</li>
 </ul>
 <div class="note">
 <b>Luật sống còn:</b> Khi không có minh chứng, coi như chưa kiểm soát. Khi chưa kiểm soát, không được chuyển bước.
@@ -443,10 +443,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Thiếu chứng từ/packet</b></td>
 <td>
- 1) STOP SHIP. 2) Khoá shipment trên bảng ship. 3) Rà lại packet theo checklist. 4) Ghi S1 vào FRM-OPS-005 + escal QA.
+ 1) STOP SHIP. 2) Khoá shipment trên bảng ship. 3) Rà lại packet theo bảng kiểm. 4) Ghi S1 vào FRM-OPS-005 + escal QA.
  </td>
 <td>Warehouse + QA</td>
-<td>Checklist packet + ảnh packet + log FRM-OPS-005</td>
+<td>Bảng kiểm packet + ảnh packet + log FRM-OPS-005</td>
 </tr>
 <tr>
 <td><b>Gage OOT/overdue</b></td>
@@ -457,12 +457,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Ảnh tag gage + danh sách gage thay + đánh giá ảnh hưởng</td>
 </tr>
 <tr>
-<td><b>Bypass gate / ship risk</b></td>
+<td><b>Bypass cổng kiểm soát / rủi ro giao hàng</b></td>
 <td>
  1) BLOCK MOVE/SHIP ngay. 2) Supervisor thông báo Tier 2/Level 2 trong 15 phút. 3) QA xác nhận tình trạng phù hợp. 4) Ghi rõ quyết định GO/HOLD.
  </td>
 <td>Supervisor + QA</td>
-<td>Record quyết định + bằng chứng kiểm tra</td>
+<td>Hồ sơ quyết định + bằng chứng kiểm tra</td>
 </tr>
 </tbody>
 </table>
@@ -470,7 +470,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 8) Checklist vận hành -->
 <div class="card">
-<label class="blabel"><h1 class="h1" style="margin-top:0;">8) Checklist vận hành (≤ 15 bước) — mỗi bước có Chủ trách nhiệm, Minh chứng/MRR, điểm sai hay gặp</h1></label>
+<label class="blabel"><h1 class="h1" style="margin-top:0;">8) Bảng kiểm vận hành (≤ 15 bước) — mỗi bước có Chủ trách nhiệm, Minh chứng/MRR, điểm sai hay gặp</h1></label>
 <div class="table-card">
 <table class="table">
 <thead>
@@ -484,20 +484,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>1</td><td>Chuẩn bị bảng Tier 1: WIP/Dispatch, Due ≤ 48h, Blocked, Holds, Ship cutoff, Downtime</td><td>Supervisor + Planner + QC</td><td>Ảnh Tier board + dữ liệu WIP Nguồn: SSOT + Epicor + IntegrationLogs.</td><td>Thiếu danh sách Due ≤ 48h; thiếu blocker</td></tr>
-<tr><td>2</td><td>Mở họp đúng giờ, nhắc “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”, chốt timebox 15 phút</td><td>Supervisor</td><td>FRM-OPS-005 có giờ họp + điều phối</td><td>Họp kéo dài, lan man, không chốt output</td></tr>
-<tr><td>3</td><td>Rà Dispatch/WIP: job Due ≤ 48h và job Blocked</td><td>Planner + Supervisor</td><td>FRM-OPS-005 (Trigger/Aging/Ảnh hưởng)</td><td>Không ghi aging; không gán owner</td></tr>
-<tr><td>4</td><td>Rà Quality holds/NCR/MRB: quyết định GO/HOLD/BLOCK</td><td>QC/QA</td><td>Hold/NCR record + quyết định + containment</td><td>Ghi “đang chờ” không tiêu chí giải hold</td></tr>
-<tr><td>5</td><td>Rà Shipping readiness: packet, nhãn, traceability, cutoff</td><td>Warehouse + QA</td><td>Checklist packet + ảnh nhãn + COC</td><td>Cho đóng gói khi thiếu COC/nhãn</td></tr>
+<tr><td>2</td><td>Mở họp đúng giờ, nhắc “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”, chốt timebox 15 phút</td><td>Supervisor</td><td>FRM-OPS-005 có giờ họp + điều phối</td><td>Họp kéo dài, lan man, không chốt output</td></tr>
+<tr><td>3</td><td>Rà Dispatch/WIP: job Due ≤ 48h và job Blocked</td><td>Planner + Supervisor</td><td>FRM-OPS-005 (Trigger/Tuổi tồn/Ảnh hưởng)</td><td>Không ghi tuổi tồn; không gán người phụ trách</td></tr>
+<tr><td>4</td><td>Rà Quality holds/NCR/MRB: quyết định GO/HOLD/BLOCK</td><td>QC/QA</td><td>Hold/NCR hồ sơ + quyết định + containment</td><td>Ghi “đang chờ” không tiêu chí giải hold</td></tr>
+<tr><td>5</td><td>Rà Shipping mức sẵn sàng: packet, nhãn, traceability, cutoff</td><td>Warehouse + QA</td><td>Bảng kiểm packet + ảnh nhãn + COC</td><td>Cho đóng gói khi thiếu COC/nhãn</td></tr>
 <tr><td>6</td><td>Rà Downtime top 3 + gán hành động chống lặp</td><td>Maintenance + Supervisor</td><td>Downtime log + action + ảnh/phiếu</td><td>Chỉ ghi “sửa xong”, không chống lặp</td></tr>
 <tr><td>7</td><td>Ghi Action list theo chuẩn: Action–Chủ trách nhiệm–Due time–Status–Minh chứng link</td><td>Người ghi biên bản (Supervisor chỉ định)</td><td>FRM-OPS-005</td><td>Không ghi due time giờ/phút; thiếu link</td></tr>
 <tr><td>8</td><td>Áp “Escalation Ladder”: Level 1 xử lý trong 2 giờ</td><td>Chủ trách nhiệm hành động</td><td>Update status trong FRM-OPS-005</td><td>Để quá 2 giờ không escal</td></tr>
-<tr><td>9</td><td>Escal Level 2 khi: không giải trong 2 giờ hoặc ảnh hưởng Due ≤ 48h</td><td>Supervisor + QA Lead + Production Lead</td><td>Record escal (tag S1/S2/S3)</td><td>Escal miệng không record</td></tr>
+<tr><td>9</td><td>Escal Level 2 khi: không giải trong 2 giờ hoặc ảnh hưởng Due ≤ 48h</td><td>Supervisor + QA Lead + Production Lead</td><td>Hồ sơ escal (tag S1/S2/S3)</td><td>Escal miệng không hồ sơ</td></tr>
 <tr><td>10</td><td>Escal Level 3 khi: rủi ro miss ship date hoặc khách khiếu nại</td><td>Ops Head/GM + Estimator (SAL-03)</td><td>Biên bản/quyết định log Biểu mẫu: forms/index.html#dao-tao (FRM-Training/OJT/Assessment/Certificate).</td><td>Đổi ưu tiên không thông báo khách có dấu vết</td></tr>
-<tr><td>11</td><td>Đóng họp: đọc lại 5 action quan trọng nhất + xác nhận owner</td><td>Supervisor</td><td>FRM-OPS-005 cập nhật</td><td>Kết thúc mà không đọc lại action</td></tr>
-<tr><td>12</td><td>Handoff giữa ca: review action còn mở + bàn giao owner</td><td>Supervisor ca + Operator/Setup</td><td>Ảnh Tier board cuối ca + FRM-OPS-005</td><td>Chuyển ca mà không bàn giao action</td></tr>
-<tr><td>13</td><td>Đóng action bằng minh chứng: ảnh/phiếu/link record</td><td>Chủ trách nhiệm hành động</td><td>Minh chứng link trong FRM-OPS-005</td><td>Đóng action không có evidence</td></tr>
+<tr><td>11</td><td>Đóng họp: đọc lại 5 action quan trọng nhất + xác nhận người phụ trách</td><td>Supervisor</td><td>FRM-OPS-005 cập nhật</td><td>Kết thúc mà không đọc lại action</td></tr>
+<tr><td>12</td><td>Handoff giữa ca: review action còn mở + bàn giao người phụ trách</td><td>Supervisor ca + Operator/Setup</td><td>Ảnh Tier board cuối ca + FRM-OPS-005</td><td>Chuyển ca mà không bàn giao action</td></tr>
+<tr><td>13</td><td>Đóng action bằng minh chứng: ảnh/phiếu/link hồ sơ</td><td>Chủ trách nhiệm hành động</td><td>Minh chứng link trong FRM-OPS-005</td><td>Đóng action không có bằng chứng</td></tr>
 <tr><td>14</td><td>Rà action quá hạn: escal ngay theo level</td><td>Supervisor + QA/QMS</td><td>Danh sách overdue + escal log</td><td>Để overdue kéo dài</td></tr>
-<tr><td>15</td><td>Chuẩn bị Tier 2/Tier 3: tổng hợp pareto, trend, top risks</td><td>Planner + QA/QMS + Supervisor</td><td>Báo cáo tuần/tháng CNC-IMS-HUB → QMS-Records.</td><td>Đi họp Tier 2/3 không có dữ liệu</td></tr>
+<tr><td>15</td><td>Chuẩn bị Tier 2/Tier 3: tổng hợp pareto, trend, top risks</td><td>Planner + QA/QMS + Supervisor</td><td>Báo cáo tuần/tháng CNC-IMS-HUB → QMS-Hồ sơ.</td><td>Đi họp Tier 2/3 không có dữ liệu</td></tr>
 </tbody>
 </table>
 </div>
@@ -523,13 +523,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Chạy họp theo timebox</td>
-<td>Đi theo đúng thứ tự agenda; dừng mọi tranh luận dài; chuyển sang action + owner.</td>
+<td>Đi theo đúng thứ tự agenda; dừng mọi tranh luận dài; chuyển sang action + người phụ trách.</td>
 <td>Tier meeting là “điều hành trong thời gian thực”, không phải họp báo cáo.</td>
 </tr>
 <tr>
 <td>Ghi Action theo chuẩn</td>
-<td>Mỗi action có: Trigger (kích hoạt) / Aging (giờ) / Ảnh hưởng + Chủ trách nhiệm + Due time giờ/phút + Minh chứng link.</td>
-<td>Để truy xuất được và đóng vòng được; audit yêu cầu bằng chứng lưu vết, không dùng lời nói.</td>
+<td>Mỗi action có: Trigger (kích hoạt) / Tuổi tồn (giờ) / Ảnh hưởng + Chủ trách nhiệm + Due time giờ/phút + Minh chứng link.</td>
+<td>Để truy xuất được và đóng vòng được; đánh giá yêu cầu bằng chứng lưu vết, không dùng lời nói.</td>
 </tr>
 <tr>
 <td>Kích hoạt escal đúng ngưỡng</td>
@@ -537,7 +537,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Giảm thiểu lan rộng; vấn đề lớn phải lên quyết định nhanh.</td>
 </tr>
 <tr>
-<td>Đóng action bằng evidence</td>
+<td>Đóng action bằng bằng chứng</td>
 <td>Không đóng khi thiếu ảnh/phiếu/link; link phải truy cập được; file phải đúng rev.</td>
 <td>“Done” chỉ có nghĩa khi có bằng chứng.</td>
 </tr>
@@ -546,9 +546,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3>9.2 OJT output (sản phẩm đầu ra bắt buộc)</h3>
 <ul class="tight">
-<li>01 bộ <b>FRM-OPS-005</b> hoàn chỉnh cho 01 ca (có KPI tóm tắt + issue list + action list + evidence link).</li>
+<li>01 bộ <b>FRM-OPS-005</b> hoàn chỉnh cho 01 ca (có KPI tóm tắt + issue list + action list + bằng chứng link).</li>
 <li>01 ảnh Tier board đầu ca + 01 ảnh Tier board cuối ca (thể hiện action còn mở và bàn giao).</li>
-<li>01 escal record (tối thiểu 01 case) từ Level 1 lên Level 2 hoặc Level 3 (khi phát sinh).</li>
+<li>01 escal hồ sơ (tối thiểu 01 case) từ Level 1 lên Level 2 hoặc Level 3 (khi phát sinh).</li>
 </ul>
 <h3>9.3 Rubric L1–L4 (hành vi quan sát được) + quyền hạn khi đạt</h3>
 <div class="table-card">
@@ -564,7 +564,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>L1</b> — Biết &amp; làm theo</td>
-<td>Tham gia đúng giờ; nêu đúng issue; ghi đúng “Trigger (kích hoạt) / Aging (giờ) / Ảnh hưởng”.</td>
+<td>Tham gia đúng giờ; nêu đúng issue; ghi đúng “Trigger (kích hoạt) / Tuổi tồn (giờ) / Ảnh hưởng”.</td>
 <td>
  Operator/Setup: nêu issue tại chỗ kèm ảnh.<br/>
  QC/QA: phân loại hold/NCR đúng.<br/>
@@ -574,7 +574,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L2</b> — Tự vận hành</td>
-<td>Tự ghi action theo chuẩn; tự đóng action bằng evidence; escal đúng Level 2 khi vượt ngưỡng.</td>
+<td>Tự ghi action theo chuẩn; tự đóng action bằng bằng chứng; escal đúng Level 2 khi vượt ngưỡng.</td>
 <td>
  Programmer: phát hành bản sửa có dấu vết và xác nhận rev.<br/>
  Maintenance: tạo action chống lặp có bằng chứng.<br/>
@@ -587,7 +587,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Điều phối họp theo timebox; ép đóng action; chốt GO/HOLD/BLOCK dựa trên bằng chứng.</td>
 <td>
  Supervisor: bắt buộc đạt L3.<br/>
- QC/QA lead: chốt hold/phê duyệt giao hàng (ship release) theo gate.
+ QC/QA lead: chốt hold/phê duyệt giao hàng theo cổng kiểm soát.
  </td>
 <td>Được làm điều phối Tier 1 và kích hoạt escal Level 2.</td>
 </tr>
@@ -612,15 +612,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <label class="blabel"><h1 class="h1" style="margin-top:0;">10) Đánh giá (ĐẠT/KHÔNG ĐẠT) — Bài trắc nghiệm + Tình huống + Bài kiểm tra thực hành</h1></label>
 <h3>10.1 Bài trắc nghiệm (≥ 20 câu) — trắc nghiệm + tình huống ngắn</h3>
 <ol class="tight">
-<li>“không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” nghĩa là gì trong Tier meeting?</li>
+<li>“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)” nghĩa là gì trong Tier meeting?</li>
 <li>Ngưỡng escal Level 2 theo PROC-OPS-003 là gì?</li>
 <li>Trong FRM-OPS-005, tối thiểu phải có những cột nào để một action hợp lệ?</li>
 <li>Khi phát hiện sai phiên bản (wrong revision) đang chạy máy, bước đầu tiên phải làm là gì?</li>
 <li>Phân biệt STOP SHIP và HOLD JOB trong module này.</li>
 <li>Chọn đáp án đúng: Tier 1 tập trung vào (A) chiến lược năm (B) vấn đề trong ca và hành động giờ/phút (C) họp dài 2 giờ (D) trình bày slide.</li>
 <li>Khi hold CTQ xuất hiện, ai chịu trách nhiệm containment?</li>
-<li>Chọn đáp án đúng: job Due ≤ 48h không có owner action trong FRM-OPS-005 được coi là (A) OK (B) Blocked (C) Gate-OPS-01 FAIL (D) đóng.</li>
-<li>Thế nào là “bypass gate” trong bối cảnh phê duyệt giao hàng (ship release)?</li>
+<li>Chọn đáp án đúng: job Due ≤ 48h không có người phụ trách action trong FRM-OPS-005 được coi là (A) OK (B) Blocked (C) Cổng kiểm soát-OPS-01 FAIL (D) đóng.</li>
+<li>Thế nào là “bypass cổng kiểm soát” trong bối cảnh phê duyệt giao hàng?</li>
 <li>Kho phải kiểm gì để chặn mix-up trước khi ship?</li>
 <li>Khi gage overdue calibration, hành động trong 60 giây là gì?</li>
 <li>Chọn đáp án đúng: Tier 2 tập trung vào (A) backlog/capacity/outsource (B) trang trí bảng (C) kể chuyện (D) bỏ action.</li>
@@ -628,9 +628,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Ai có quyền chốt GO/HOLD/BLOCK tại Tier 1?</li>
 <li>Khi downtime lặp lại 3 lần/tuần, escal thuộc mức nào và vì sao?</li>
 <li>Tình huống ngắn: Job A Due trong 36h, thiếu tool. Nêu trigger, ảnh hưởng, và escal ngưỡng.</li>
-<li>Tình huống ngắn: Packet thiếu COC trước giờ cutoff. Quyết định gì và record ở đâu?</li>
+<li>Tình huống ngắn: Packet thiếu COC trước giờ cutoff. Quyết định gì và hồ sơ ở đâu?</li>
 <li>Tình huống ngắn: Outsource trễ ETA 24h, ảnh hưởng ship date. Escal theo tầng nào?</li>
-<li>Điểm khác nhau giữa Tier 3 và xem xét của lãnh đạo (management review) là gì trong thực hành record?</li>
+<li>Điểm khác nhau giữa Tier 3 và xem xét của lãnh đạo là gì trong thực hành hồ sơ?</li>
 <li>Tiêu chí PASS của Supervisor khác Operator ở điểm nào?</li>
 </ol>
 <h3>10.2 Tình huống (≥ 3 tình huống thật) — có dữ kiện, yêu cầu HOLD/GO và ghi MRR</h3>
@@ -652,16 +652,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>FRM-OPS-005 + ảnh tag HOLD + xác nhận rev đúng + đánh giá ảnh hưởng</td>
 </tr>
 <tr>
-<td><b>S2 — Ship risk</b></td>
+<td><b>S2 — Rủi ro giao hàng</b></td>
 <td>Kho chuẩn bị ship; thiếu COC và thiếu nhãn traceability; cutoff còn 30 phút.</td>
 <td>STOP SHIP; escal QA; chỉ GO khi packet đủ.</td>
-<td>Checklist packet + log FRM-OPS-005 + record ship release</td>
+<td>Bảng kiểm packet + log FRM-OPS-005 + hồ sơ phê duyệt giao hàng</td>
 </tr>
 <tr>
 <td><b>S3 — Outsource trễ</b></td>
-<td>Special process ETA trễ 24h; job Due trong 48h; khách xác nhận giao đúng ngày.</td>
+<td>Công đoạn đặc biệt ETA trễ 24h; job Due trong 48h; khách xác nhận giao đúng ngày.</td>
 <td>Escal Level 2 ngay; chuẩn bị Level 3 khi rủi ro miss ship.</td>
-<td>Minh chứng ETA + action plan backup + log escal</td>
+<td>Minh chứng ETA + kế hoạch hành động backup + log escal</td>
 </tr>
 </tbody>
 </table>
@@ -671,17 +671,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="danger">Bài test: Điều phối 01 Tier 1 thật trong xưởng (10–15 phút) + xử lý 01 escal case.</p>
 <ul class="tight">
 <li>Ứng viên mở họp đúng giờ, chốt agenda và timebox.</li>
-<li>Ứng viên dẫn qua 4 mảng tối thiểu: Dispatch/WIP, Holds, Shipping readiness, Downtime.</li>
+<li>Ứng viên dẫn qua 4 mảng tối thiểu: Dispatch/WIP, Holds, Shipping mức sẵn sàng, Downtime.</li>
 <li>Ứng viên ghi tối thiểu 5 action có đủ Chủ trách nhiệm + Due time + Minh chứng link trong FRM-OPS-005.</li>
 <li>Ứng viên xử lý 01 tình huống S1/S2 theo “Phản ứng 60 giây” và escal đúng level.</li>
 </ul>
-<p><b>PASS:</b> đủ 4 mảng + đủ action hợp lệ + escal đúng ngưỡng + không có action đóng khi thiếu evidence.<br/>
+<p><b>PASS:</b> đủ 4 mảng + đủ action hợp lệ + escal đúng ngưỡng + không có action đóng khi thiếu bằng chứng.<br/>
 <b>FAIL:</b> thiếu 1 mảng bắt buộc; due time mơ hồ; không escal khi vượt ngưỡng; cho GO/giao hàng khi thiếu hồ sơ.</p>
 </div>
 </div>
 <!-- 11) ĐẠT/KHÔNG ĐẠT -->
 <div class="card">
-<label class="blabel"><h1 class="h1" style="margin-top:0;">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”)</h1></label>
+<label class="blabel"><h1 class="h1" style="margin-top:0;">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”)</h1></label>
 <div class="table-card">
 <table class="table">
 <thead>
@@ -694,8 +694,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>
 <ul class="tight">
-<li>Thực hiện đúng checklist ≤ 15 bước.</li>
-<li>Ghi FRM-OPS-005 đầy đủ: Trigger (kích hoạt) / Aging (giờ) / Ảnh hưởng + Action + Chủ trách nhiệm + Due time + Status + Minh chứng link.</li>
+<li>Thực hiện đúng bảng kiểm ≤ 15 bước.</li>
+<li>Ghi FRM-OPS-005 đầy đủ: Trigger (kích hoạt) / Tuổi tồn (giờ) / Ảnh hưởng + Action + Chủ trách nhiệm + Due time + Status + Minh chứng link.</li>
 <li>Escal đúng ngưỡng theo PROC-OPS-003.</li>
 <li>Thực hiện đúng “Phản ứng 60 giây” khi có S1/S2.</li>
 <li>Đóng action bằng minh chứng truy xuất được.</li>
@@ -703,8 +703,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </td>
 <td>
 <ul class="tight">
-<li>Đóng action khi thiếu evidence.</li>
-<li>Cho GO/giao hàng khi thiếu packet/traceability/phê duyệt giao hàng (ship release) record.</li>
+<li>Đóng action khi thiếu bằng chứng.</li>
+<li>Cho GO/giao hàng khi thiếu packet/traceability/phê duyệt giao hàng hồ sơ.</li>
 <li>Không escal khi vượt ngưỡng 2 giờ hoặc ảnh hưởng Due ≤ 48h.</li>
 <li>Dùng gage OOT/overdue để đo CTQ.</li>
 <li>Không bàn giao action giữa ca.</li>
@@ -724,8 +724,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Ảnh Tier board</b>: đầu ca + cuối ca (mỗi ca).</li>
 <li><b>Escalation log</b> Level 2/3 (khi phát sinh).</li>
 <li><b>Hold/NCR/MRB hồ sơ</b> liên quan action (khi phát sinh).</li>
-<li><b>Shipping packet checklist</b> + phê duyệt giao hàng (ship release) record (mỗi lô).</li>
-<li><b>Weekly Tier 2 action plan</b> (mỗi tuần).</li>
+<li><b>Shipping packet bảng kiểm</b> + phê duyệt giao hàng hồ sơ (mỗi lô).</li>
+<li><b>Weekly Tier 2 kế hoạch hành động</b> (mỗi tuần).</li>
 <li><b>Monthly Tier 3 minutes</b> (mỗi tháng).</li>
 </ul>
 <h3>12.2 Quy tắc đặt tên (chuẩn)</h3>
@@ -745,20 +745,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → forms → FRM-OPS-005 (controlled)</li>
 </ul>
 <div class="note">
-<b>Quy tắc audit:</b> Khi không truy xuất được link/bằng chứng trong 60 giây → coi như không có bằng chứng.
+<b>Quy tắc đánh giá:</b> Khi không truy xuất được link/bằng chứng trong 60 giây → coi như không có bằng chứng.
  </div>
 </div>
 <!-- 13) Common audit findings -->
 <div class="card">
-<label class="blabel"><h1 class="h1" style="margin-top:0;">13) Common audit findings &amp; prevention (≥ 8 lỗi)</h1></label>
+<label class="blabel"><h1 class="h1" style="margin-top:0;">13) Common đánh giá findings &amp; prevention (≥ 8 lỗi)</h1></label>
 <ol class="tight">
 <li><b>Action list không có due time</b> → bắt buộc due time giờ/phút trong FRM-OPS-005.</li>
-<li><b>Action đóng nhưng không có evidence</b> → chặn đóng status khi thiếu link/ảnh/phiếu.</li>
+<li><b>Action đóng nhưng không có bằng chứng</b> → chặn đóng status khi thiếu link/ảnh/phiếu.</li>
 <li><b>Hold CTQ không có containment</b> → QA bắt buộc ghi containment + tiêu chí giải hold.</li>
-<li><b>phê duyệt giao hàng (ship release) không có record</b> → STOP SHIP cho đến khi record đủ.</li>
+<li><b>phê duyệt giao hàng không có hồ sơ</b> → STOP SHIP cho đến khi hồ sơ đủ.</li>
 <li><b>Không có bằng chứng bàn giao giữa ca</b> → bắt buộc ảnh Tier board cuối ca + review action.</li>
 <li><b>Escalation không theo SLA</b> → áp thang escal 2 giờ / Due ≤ 48h / miss ship.</li>
-<li><b>Mix-up do traceability yếu</b> → Warehouse bắt buộc check 100% trước ship, ghi evidence.</li>
+<li><b>Mix-up do traceability yếu</b> → Warehouse bắt buộc check 100% trước ship, ghi bằng chứng.</li>
 <li><b>Gage overdue vẫn dùng</b> → QC/QA kiểm trạng thái gage đầu ca; gắn tag DO NOT USE.</li>
 <li><b>Họp biến thành “báo cáo”</b> → timebox + agenda cố định + chốt action, không trình bày dài.</li>
 </ol>
@@ -780,13 +780,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Draft</b></td>
 <td>2026-02-09</td>
-<td>Chuẩn hoá format &amp; navigation; loại bỏ placeholder; cập nhật Doc-Control ISO 9001:2015 (tài liệu có kiểm soát); chuẩn hoá câu lệnh gate (KHI/PHẢI/STOP/HOLD/BLOCK).</td>
+<td>Chuẩn hoá format &amp; navigation; loại bỏ placeholder; cập nhật Doc-Control ISO 9001:2015 (tài liệu có kiểm soát); chuẩn hoá câu lệnh cổng kiểm soát (KHI/PHẢI/STOP/HOLD/BLOCK).</td>
 <td>Operations + QA/QMS</td>
 </tr>
 <tr>
 <td>Draft</td>
 <td>2026-02-04</td>
-<td>Khởi tạo module SYS-OPS-07: chuẩn Tier 1/2/3, escal SLA, checklist, OJT, rubric, MRR sẵn sàng đánh giá.</td>
+<td>Khởi tạo module SYS-OPS-07: chuẩn Tier 1/2/3, escal SLA, bảng kiểm, OJT, rubric, MRR sẵn sàng đánh giá.</td>
 <td>QA/QMS + Operations</td>
 </tr>
 </tbody>

@@ -59,7 +59,7 @@ ul.tight li {margin:4px 0;}
 <div class="row"><span><b>Mã:</b></span><span>WI-713</span></div>
 <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
 <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Chủ sở hữu:</b></span><span>QA Engineer / HSE / Clean Area Owner</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>QA Engineer / HSE / Clean Area Người phụ trách</span></div>
 <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
 </div>
 </div>
@@ -85,14 +85,14 @@ ul.tight li {margin:4px 0;}
 </div></div>
 <div class="section"><h2>4. Ma trận phản ứng tại hiện trường</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phản ứng bắt buộc</th><th>Quyền quyết định mở lại</th></tr></thead><tbody>
-<tr><td>Nhiệt ẩm vượt ngưỡng khu vực hàng nhạy</td><td>Giữ hàng nhạy, chặn mở túi/đóng gói, ghi log, gọi owner khu vực.</td><td>QA hoặc owner khu vực theo quyền hạn đã giao.</td></tr>
-<tr><td>Particle / fallout cao bất thường hoặc khu nhiều bụi nhìn thấy</td><td>Dừng thao tác sạch, thực hiện vệ sinh, thay vật tư phát bụi, re-check trước khi làm tiếp.</td><td>QA/clean area owner.</td></tr>
+<tr><td>Nhiệt ẩm vượt ngưỡng khu vực hàng nhạy</td><td>Giữ hàng nhạy, chặn mở túi/đóng gói, ghi log, gọi người phụ trách khu vực.</td><td>QA hoặc người phụ trách khu vực theo quyền hạn đã giao.</td></tr>
+<tr><td>Particle / fallout cao bất thường hoặc khu nhiều bụi nhìn thấy</td><td>Dừng thao tác sạch, thực hiện vệ sinh, thay vật tư phát bụi, re-check trước khi làm tiếp.</td><td>QA/clean area người phụ trách.</td></tr>
 <tr><td>Tacky mat/PPE station mất hiệu lực</td><td>Khôi phục ngay; nếu có người/part đã đi qua trong lúc mất kiểm soát, đánh giá phạm vi ảnh hưởng.</td><td>Supervisor khu vực.</td></tr>
 <tr><td>Phát hiện carton hở, vật lạ, hành vi vi phạm gowning</td><td>Line clearance, loại bỏ vật không được phép, đánh giá hàng mở.</td><td>Supervisor + QA khi ảnh hưởng sản phẩm.</td></tr>
 </tbody></table></div></div>
-<div class="section"><h2>5. Record, KPI và liên kết</h2>
+<div class="section"><h2>5. Hồ sơ, KPI và liên kết</h2>
 <div class="two-col">
-<div class="card"><h3>Record</h3><ul class="tight" style="padding-left:18px;">
+<div class="card"><h3>Hồ sơ</h3><ul class="tight" style="padding-left:18px;">
 <li><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx">FRM-708</a> và log đo theo khu vực.</li>
 <li>Ảnh bất thường khi có vi phạm housekeeping/bao gói/khu vực.</li>
 <li>Biên bản action và xác nhận khôi phục trước khi mở lại khu.</li>
@@ -122,9 +122,9 @@ ul.tight li {margin:4px 0;}
 <tr><td>T2 — Action excursion</td><td>Vượt giới hạn tác động hoặc vượt thời gian cho phép trong zone đang chứa S1/S2 stock.</td><td>Giữ stock bị ảnh hưởng, khoanh phạm vi thời gian và location, mở đánh giá condition.</td><td>HOLD cho affected stock cho đến khi có disposition.</td></tr>
 <tr><td>T3 — Monitoring gap / data uncertainty</td><td>Logger hỏng, mất kết nối, mất điện, quên đọc hoặc reading không tin cậy.</td><td>Ghi rõ thời gian gap, manual backup, phạm vi stock chịu rủi ro và độ tin cậy của dữ liệu thay thế.</td><td>Ít nhất Watch; với S2/S3/S4 mặc định HOLD cho affected stock cho đến khi có review.</td></tr>
 <tr><td>T4 — Clean / restricted storage breach</td><td>Khu sạch bị bụi/xâm nhập, HIC out-of-range, bag breach, door discipline fail hoặc stock restricted bị mở sai.</td><td>Dừng thao tác liên quan, chuyển clean-hold / quarantine, line-clearance và đánh giá lại pack / product.</td><td>HOLD / clean-hold bắt buộc.</td></tr>
-<tr><td>T5 — Repeated excursion / chronic condition</td><td>Lặp alert/action cùng cơ chế trong nhiều ca hoặc nhiều kỳ.</td><td>Mở preventive action / CI, xem xét resource gate, báo owner trong review kỳ.</td><td>Không chỉ “nhắc lại”; phải có owner khắc phục hệ thống.</td></tr>
+<tr><td>T5 — Repeated excursion / chronic condition</td><td>Lặp alert/action cùng cơ chế trong nhiều ca hoặc nhiều kỳ.</td><td>Mở preventive action / CI, xem xét resource cổng kiểm soát (gate), báo người phụ trách trong review kỳ.</td><td>Không chỉ “nhắc lại”; phải có người phụ trách khắc phục hệ thống.</td></tr>
 </tbody></table></div>
-<div class="note"><b>Rule mở lại khu</b><br/>Zone chỉ trở về trạng thái xanh khi có đủ ba yếu tố: <b>điều kiện môi trường đã khôi phục</b>, <b>affected stock đã có disposition rõ</b>, và <b>record FRM-708 đã phản ánh người chịu trách nhiệm mở lại</b>. Chỉ số đọc bình thường trở lại một mình không đủ để coi như mọi stock vẫn dùng được.
+<div class="note"><b>Rule mở lại khu</b><br/>Zone chỉ trở về trạng thái xanh khi có đủ ba yếu tố: <b>điều kiện môi trường đã khôi phục</b>, <b>affected stock đã có disposition rõ</b>, và <b>hồ sơ FRM-708 đã phản ánh người chịu trách nhiệm mở lại</b>. Chỉ số đọc bình thường trở lại một mình không đủ để coi như mọi stock vẫn dùng được.
 </div><!-- .page-body -->
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </div></div>

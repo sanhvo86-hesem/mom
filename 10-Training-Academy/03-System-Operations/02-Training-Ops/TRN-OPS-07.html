@@ -101,7 +101,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <li><a href="#workshop">5) Workshop tình huống (case-based)</a></li>
  <li><a href="#assessment">6) Đánh giá (Quiz + scenario)</a></li>
  <li><a href="#records">7) Hồ sơ bắt buộc (sẵn sàng đánh giá)</a></li>
- <li><a href="#DCR record">8) DCR record</a></li>
+ <li><a href="#DCR record">8) DCR hồ sơ</a></li>
  </ul>
  </div>
  </div>
@@ -141,7 +141,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <h3>3.2 PHẢI tránh</h3>
  <ul class="list">
  <li>PHẢI loại khỏi khay/bao gói sản phẩm mọi vật rời như ốc, giấy, giẻ, băng keo; không “để tạm” trong vùng đóng gói.</li>
- <li>PHẢI hoàn tất vệ sinh/FOD check và đủ chứng cứ gate trước khi đóng gói.</li>
+ <li>PHẢI hoàn tất vệ sinh/FOD check và đủ chứng cứ cổng kiểm soát (gate) trước khi đóng gói.</li>
  <li>PHẢI báo ngay mọi sự cố FOD như dao gãy, missing tool hoặc rơi vật; không che giấu.</li>
  </ul>
 
@@ -150,7 +150,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <ul class="list">
  <li>Phát hiện vật lạ có khả năng lọt vào sản phẩm/bao gói.</li>
  <li>Không chắc chắn về CTQ/safety requirement, hoặc nghi sai Rev/sai chứng chỉ.</li>
- <li>Thiếu bước vệ sinh cuối/thiếu record kiểm.</li>
+ <li>Thiếu bước vệ sinh cuối/thiếu hồ sơ kiểm.</li>
  </ul>
  <p class="mini"><b>Hành động ngay:</b> STOP → khoanh vùng → báo Supervisor/QA → mở QC Hold nếu cần.</p>
  </div>
@@ -161,12 +161,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="table-card">
  <table class="table tight">
  <colgroup><col style="width:22%"/><col style="width:58%"/><col style="width:20%"/></colgroup>
- <thead><tr><th>Vai trò</th><th>Trách nhiệm tối thiểu</th><th>Evidence</th></tr></thead>
+ <thead><tr><th>Vai trò</th><th>Trách nhiệm tối thiểu</th><th>Bằng chứng</th></tr></thead>
  <tbody>
- <tr><td><b>Operator/Setup</b></td><td>Thực hiện vệ sinh/FOD check; dừng khi nghi ngờ; ghi nhận bất thường</td><td>Traveler + checklist đóng gói</td></tr>
+ <tr><td><b>Operator/Setup</b></td><td>Thực hiện vệ sinh/FOD check; dừng khi nghi ngờ; ghi nhận bất thường</td><td>Traveler + bảng kiểm đóng gói</td></tr>
  <tr><td><b>QC/QA</b></td><td>Xác nhận sản phẩm sạch/bảo vệ; kiểm soát CTQ; quyết định HOLD/RELEASE</td><td>IR/FAI + QC Hold log</td></tr>
  <tr><td><b>Warehouse/Shipping</b></td><td>Đóng gói đúng chuẩn; chống FOD trong packing; đảm bảo nhãn/CoC</td><td><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-707_Packaging_Checklist.xlsx">FRM‑WHS‑007</a></td></tr>
- <tr><td><b>Supervisor</b></td><td>Thực thi stop-the-line; xử lý sự cố; đào tạo lại khi cần</td><td>Action log + training record</td></tr>
+ <tr><td><b>Supervisor</b></td><td>Thực thi stop-the-line; xử lý sự cố; đào tạo lại khi cần</td><td>Action log + training hồ sơ</td></tr>
  </tbody>
  </table>
  </div>
@@ -178,9 +178,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <li><b>Case 1:</b> Sau gia công có mạt trong lỗ ren. Bạn làm gì trước khi chuyển sang QC?</li>
  <li><b>Case 2:</b> Phát hiện dao gãy nhưng không biết mảnh dao có rơi vào khay sản phẩm hay không.</li>
  <li><b>Case 3:</b> Thấy nhãn Rev trên traveler khác với nhãn trên túi vật tư.</li>
- <li><b>Case 4:</b> Sản phẩm đã đóng gói nhưng thiếu record kiểm tra cuối (final inspection).</li>
+ <li><b>Case 4:</b> Sản phẩm đã đóng gói nhưng thiếu hồ sơ kiểm tra cuối.</li>
  </ol>
- <p class="mini"><b>Yêu cầu:</b> mỗi case phải nêu rõ “STOP/HOLD ở gate nào”, “ai quyết định”, và “bằng chứng cần tạo”.</p>
+ <p class="mini"><b>Yêu cầu:</b> mỗi case phải nêu rõ “STOP/HOLD ở cổng kiểm soát nào”, “ai quyết định”, và “bằng chứng cần tạo”.</p>
  </div>
 
  <div class="card" id="assessment">
@@ -192,13 +192,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <li>FOD là gì? nêu 3 ví dụ trong CNC.</li>
  <li>Khi nào phải STOP/HOLD vì product safety?</li>
  <li>Ai có quyền RELEASE khi có nghi ngờ FOD?</li>
- <li>Vì sao “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” quan trọng?</li>
- <li>Checklist đóng gói nào là bắt buộc trước ship?</li>
+ <li>Vì sao “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)” quan trọng?</li>
+ <li>Bảng kiểm đóng gói nào là bắt buộc trước ship?</li>
  </ol>
  </div>
  <div class="note">
  <h3>Scenario test</h3>
- <p class="mini">Giảng viên đưa 1 sản phẩm mẫu (hoặc ảnh) có bavia/mạt/tem nhãn lẫn. Học viên phải chỉ ra lỗi, mô tả hành động và bằng chứng cần tạo (QC Hold/NCR/gate).</p>
+ <p class="mini">Giảng viên đưa 1 sản phẩm mẫu (hoặc ảnh) có bavia/mạt/tem nhãn lẫn. Học viên phải chỉ ra lỗi, mô tả hành động và bằng chứng cần tạo (QC Hold/NCR/cổng kiểm soát).</p>
  <p class="mini"><b>Pass:</b> nêu đúng điểm chặn + bằng chứng + escalations. <b>Fail:</b> đề xuất “làm tạm/cho qua/ship trước”.</p>
  </div>
  </div>
@@ -212,7 +212,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <li>Scenario/pass-fail rubric (theo <a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-808_Performance_Review_Form.xlsx">FRM‑HR‑TRN‑010</a>)</li>
  </ul>
  <div class="note">
- <b>Nơi lưu chuẩn:</b> <span class="path">HR-Records/Training/TRN-OPS-07/&lt;YYYY&gt;/&lt;Batch&gt;</span> (lưu attendance + quiz + rubric). 
+ <b>Nơi lưu chuẩn:</b> <span class="path">HR-Hồ sơ/Training/TRN-OPS-07/&lt;YYYY&gt;/&lt;Batch&gt;</span> (lưu attendance + quiz + rubric). 
  <br/><span class="mini">Mục tiêu: truy xuất hồ sơ một nhân sự bất kỳ trong ≤60 giây.</span>
  </div>
  </div>

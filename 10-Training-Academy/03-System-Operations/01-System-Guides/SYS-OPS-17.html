@@ -113,31 +113,31 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><a href="#s5">5. Risk Controls (control points + bằng chứng)</a></li>
 <li><a href="#s6">6. Fail-fast rules + STOP/HOLD/BLOCK</a></li>
 <li><a href="#s7">7. Phản ứng 60 giây</a></li>
-<li><a href="#s8">8. Checklist vận hành (≤15 bước)</a></li>
+<li><a href="#s8">8. Bảng kiểm vận hành (≤15 bước)</a></li>
 <li><a href="#s9">9. OJT theo TWI (Job breakdown)</a></li>
 <li><a href="#s10">10. Rubric L1–L4 theo vai trò &amp; quyền hạn</a></li>
 <li><a href="#s11">11. Đánh giá: Quiz ≥20 • Scenario ≥3 • Bài kiểm tra thực hành</a></li>
 <li><a href="#s12">12. Tiêu chí PASS/FAIL</a></li>
-<li><a href="#s13">13. MRR tối thiểu + audit findings</a></li>
-<li><a href="#s14">14. DCR record</a></li>
+<li><a href="#s13">13. MRR tối thiểu + đánh giá findings</a></li>
+<li><a href="#s14">14. DCR hồ sơ</a></li>
 </ul>
 </div>
 </div>
 <!-- 1 -->
 <div class="card">
-<h2 class="h2" id="s1" style="margin-top:0">1. Mục đích module &amp; bối cảnh vận hành (gate/handoff; ai chịu trách nhiệm; khi nào kích hoạt)</h2>
+<h2 class="h2" id="s1" style="margin-top:0">1. Mục đích module &amp; bối cảnh vận hành (cổng kiểm soát (gate)/handoff; ai chịu trách nhiệm; khi nào kích hoạt)</h2>
 <p class="lead">NCR/CAPA là “phanh khẩn cấp” của xưởng. Module này biến lỗi thành hành động có kiểm soát: <b>chặn</b> → <b>quyết</b> → <b>sửa</b> → <b>ngăn tái diễn</b> → <b>chứng minh hiệu lực</b>.</p>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
-<div>Người học <b>PHẢI</b> vận hành được điểm chặn <b>HOLD</b>, tạo NCR đủ dữ kiện tối thiểu, tham gia MRB để ra quyết định disposition đúng rủi ro, mở 8D/CAPA đúng ngưỡng, và đóng hồ sơ khi có bằng chứng hiệu lực. Thiếu bằng chứng là <b>BLOCK</b> gate.</div>
+<div>Người học <b>PHẢI</b> vận hành được điểm chặn <b>HOLD</b>, tạo NCR đủ dữ kiện tối thiểu, tham gia MRB để ra quyết định disposition đúng rủi ro, mở 8D/CAPA đúng ngưỡng, và đóng hồ sơ khi có bằng chứng hiệu lực. Thiếu bằng chứng là <b>BLOCK</b> cổng kiểm soát.</div>
 </div>
 <h3 class="h3">1.1 Khi nào module kích hoạt (học / tái học)</h3>
 <ul style="line-height:1.9">
 <li>Khi nhận việc mới thuộc nhóm vai trò mục tiêu.</li>
 <li>Khi phát hành phiên bản mới của SOP-QMS-006 hoặc thay đổi schema list (ANNEX-QMS-005).</li>
-<li>Khi xảy ra stop-ship, ship risk, thoát lỗi, sai Rev, mix-up/lẫn lô, thiếu/giả chứng từ, OOT gage.</li>
+<li>Khi xảy ra stop-ship, rủi ro giao hàng, thoát lỗi, sai Rev, mix-up/lẫn lô, thiếu/giả chứng từ, OOT gage.</li>
 <li>Khi NCR lặp lại ≥ 2 lần / 90 ngày hoặc theo cảnh báo KPI (theo SOP-QMS-006).</li>
-<li>Khi audit finding liên quan 8.7 / 10.2 / 7.5.</li>
+<li>Khi đánh giá finding liên quan 8.7 / 10.2 / 7.5.</li>
 </ul>
 <h3 class="h3">1.2 “Lý do tồn tại” (Top rủi ro phải chặn)</h3>
 <div class="table-card">
@@ -148,7 +148,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Mix-up/lẫn lô</b></td><td>Mất truy xuất, lẫn trạng thái OK/NG</td><td>Segregation khu HOLD + nhãn trạng thái + truy xuất theo JobNum</td></tr>
 <tr><td><b>Missing / falsified outsource documents</b></td><td>Không đạt yêu cầu đặc biệt, rủi ro pháp lý</td><td>BLOCK phê duyệt giao hàng (ship release) khi thiếu cert; NCR+SCAR</td></tr>
 <tr><td><b>OOT gage/calibration quá hạn</b></td><td>Đo sai, lọt lỗi CTQ</td><td>HOLD + đánh giá ảnh hưởng + NCR/CAPA theo SOP-QMS-007</td></tr>
-<tr><td><b>Bypass gate</b></td><td>Giao nhầm, mất bằng chứng audit</td><td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát); mọi release có record</td></tr>
+<tr><td><b>Bypass cổng kiểm soát</b></td><td>Giao nhầm, mất bằng chứng đánh giá</td><td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát); mọi release có hồ sơ</td></tr>
 </tbody>
 </table>
 </div>
@@ -157,7 +157,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" id="s2" style="margin-top:0">2. Phạm vi &amp; vai trò (bắt buộc nêu phần áp dụng riêng cho từng role và tiêu chí đạt)</h2>
 <div class="note">
-<b>Nguyên tắc vận hành:</b> Vai trò nào “chạm vào sản phẩm/record” tại điểm HOLD, NCR, MRB, phê duyệt giao hàng (ship release) thì vai trò đó <b>PHẢI</b> hiểu phần áp dụng và <b>PHẢI</b> tạo được bằng chứng tối thiểu đúng nơi lưu.
+<b>Nguyên tắc vận hành:</b> Vai trò nào “chạm vào sản phẩm/hồ sơ” tại điểm HOLD, NCR, MRB, phê duyệt giao hàng thì vai trò đó <b>PHẢI</b> hiểu phần áp dụng và <b>PHẢI</b> tạo được bằng chứng tối thiểu đúng nơi lưu.
  </div>
 <h3 class="h3">2.1 Chuẩn thuật ngữ nội bộ để tránh lệch hệ thống</h3>
 <ul style="line-height:1.9">
@@ -179,7 +179,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Operator</b></td>
-<td>Phát hiện NC; dừng công đoạn; tách hàng; gắn nhãn; báo Supervisor/QC; không tự ý “sửa record”.</td>
+<td>Phát hiện NC; dừng công đoạn; tách hàng; gắn nhãn; báo Supervisor/QC; không tự ý “sửa hồ sơ”.</td>
 <td>Thực hiện đúng “60 giây” + tạo HOLD vật lý đúng nhãn + không để hàng rời trạng thái.</td>
 </tr>
 <tr>
@@ -194,13 +194,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>QC</b></td>
-<td>Đo/xác nhận NC; lập Inspection evidence; kích hoạt HOLD; cung cấp dữ kiện đo phục vụ NCR/MRB.</td>
+<td>Đo/xác nhận NC; lập Inspection bằng chứng; kích hoạt HOLD; cung cấp dữ kiện đo phục vụ NCR/MRB.</td>
 <td>Đo đúng dụng cụ &amp; trạng thái calibration; ghi rõ Job/Part/Rev; bằng chứng đủ để QA mở NCR trong ngày.</td>
 </tr>
 <tr>
 <td><b>QA</b></td>
 <td>Mở NCR; phân loại mức; điều phối MRB; quyết định mở CAPA; theo dõi hiệu lực; đóng hồ sơ.</td>
-<td>Không đóng NCR/CAPA khi thiếu evidence; chặn concession không có chấp thuận; đóng CAPA khi có effectiveness check.</td>
+<td>Không đóng NCR/CAPA khi thiếu bằng chứng; chặn concession không có chấp thuận; đóng CAPA khi có effectiveness check.</td>
 </tr>
 <tr>
 <td><b>Warehouse</b></td>
@@ -215,12 +215,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Planner</b></td>
 <td>Stop-ship và kế hoạch lại; khóa ưu tiên khi có HOLD; cập nhật Job status trên hệ thống (SoR).</td>
-<td>Không “đẩy” Job qua gate khi còn HOLD; cập nhật đúng trạng thái để không phát sinh ship nhầm.</td>
+<td>Không “đẩy” Job qua cổng kiểm soát khi còn HOLD; cập nhật đúng trạng thái để không phát sinh ship nhầm.</td>
 </tr>
 <tr>
 <td><b>Maintenance</b></td>
 <td>NC do máy/thiết bị: cô lập máy; khôi phục chuẩn; ghi log can thiệp; phối hợp hiệu lực (lỗi không tái diễn).</td>
-<td>Hành động có bằng chứng (log/ảnh/đo); bàn giao lại theo tiêu chí kiểm chứng (first-piece / capability) <b>M365/SharePoint → HESEM-QMS-SSOT</b>.</td>
+<td>Hành động có bằng chứng (log/ảnh/đo); bàn giao lại theo tiêu chí kiểm chứng (mẫu đầu (first piece) / capability) <b>M365/SharePoint → HESEM-QMS-SSOT</b>.</td>
 </tr>
 <tr>
 <td><b>EHS</b></td>
@@ -229,13 +229,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Estimator (SAL-03)</b></td>
-<td>Concession/khách hàng: chặn giao; thu bằng chứng chấp thuận; cập nhật bộ hồ sơ giao hàng (ship packet); chuyển SOP-QMS-012 khi có thoát lỗi.</td>
-<td>Mọi chấp thuận phải nằm trong SSOT; không dùng “đồng ý miệng”; bằng chứng chấp thuận nằm trong SSOT; mọi thay đổi yêu cầu có change record.</td>
+<td>Concession/khách hàng: chặn giao; thu bằng chứng chấp thuận; cập nhật bộ hồ sơ giao hàng; chuyển SOP-QMS-012 khi có thoát lỗi.</td>
+<td>Mọi chấp thuận phải nằm trong SSOT; không dùng “đồng ý miệng”; bằng chứng chấp thuận nằm trong SSOT; mọi thay đổi yêu cầu có change hồ sơ.</td>
 </tr>
 <tr>
 <td><b>Supervisor</b></td>
-<td>Kích hoạt containment; phân công owner; duy trì kỷ luật gate; điều phối nguồn lực MRB/CAPA.</td>
-<td>Không có bypass gate; phân công rõ owner &amp; deadline; escalates theo fail-fast khi quá hạn.</td>
+<td>Kích hoạt containment; phân công người phụ trách; duy trì kỷ luật cổng kiểm soát; điều phối nguồn lực MRB/CAPA.</td>
+<td>Không có bypass cổng kiểm soát; phân công rõ người phụ trách &amp; deadline; escalates theo fail-fast khi quá hạn.</td>
 </tr>
 </tbody>
 </table>
@@ -254,20 +254,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th style="width:220px">Bước</th><th>Input bắt buộc</th><th>Output bắt buộc</th><th style="width:220px">Điểm chặn</th></tr></thead>
 <tbody>
 <tr><td><b>Phát hiện NC</b></td><td>Job/Part/Rev + dấu hiệu lỗi + vị trí phát hiện</td><td>Hàng bị cô lập + HOLD vật lý + thông báo ca</td><td>HOLD tại hiện trường</td></tr>
-<tr><td><b>Hold log</b></td><td>JobNum + ReasonCode + Containment + Severity</td><td>Record QCHoldLog + link evidence folder</td><td>Không record = BLOCK</td></tr>
-<tr><td><b>NCR</b></td><td>DetectedAt + DefectType + QtyAffected + bằng chứng đo/ảnh/CMM</td><td>Record NCRLog + thư mục NCR_&lt;NCR-ID&gt;</td><td>NCR thiếu dữ kiện = HOLD kéo dài</td></tr>
+<tr><td><b>Hold log</b></td><td>JobNum + ReasonCode + Containment + Severity</td><td>Hồ sơ QCHoldLog + link bằng chứng folder</td><td>Không hồ sơ = BLOCK</td></tr>
+<tr><td><b>NCR</b></td><td>DetectedAt + DefectType + QtyAffected + bằng chứng đo/ảnh/CMM</td><td>Hồ sơ NCRLog + thư mục NCR_&lt;NCR-ID&gt;</td><td>NCR thiếu dữ kiện = HOLD kéo dài</td></tr>
 <tr><td><b>MRB</b></td><td>NCR đã đủ dữ kiện + phương án disposition + đánh giá rủi ro</td><td>Disposition được duyệt + tiêu chí rework/verification + phê duyệt concession (khi có)</td><td>Disposition chưa duyệt = MRB</td></tr>
-<tr><td><b>Rework/Verification</b></td><td>WI rework + điểm kiểm tra đo + người thực hiện</td><td>Rework evidence + IR/CMM PASS</td><td>Thiếu IR PASS = BLOCK release</td></tr>
-<tr><td><b>CAPA/8D</b></td><td>Ngưỡng bắt buộc mở CAPA + nguyên nhân gốc + điểm lọt</td><td>Record CAPA8D + hành động hệ thống + bằng chứng rollout</td><td>CAPA thiếu nguyên nhân gốc = FAIL</td></tr>
-<tr><td><b>Effectiveness check</b></td><td>Dữ liệu trước/sau + cửa sổ theo dõi + xác nhận không tái diễn</td><td>Evidence hiệu lực + đóng CAPA/NCR</td><td>Không hiệu lực = mở lại CAPA</td></tr>
+<tr><td><b>Rework/Verification</b></td><td>WI rework + điểm kiểm tra đo + người thực hiện</td><td>Rework bằng chứng + IR/CMM PASS</td><td>Thiếu IR PASS = BLOCK release</td></tr>
+<tr><td><b>CAPA/8D</b></td><td>Ngưỡng bắt buộc mở CAPA + nguyên nhân gốc + điểm lọt</td><td>Hồ sơ CAPA8D + hành động hệ thống + bằng chứng rollout</td><td>CAPA thiếu nguyên nhân gốc = FAIL</td></tr>
+<tr><td><b>Effectiveness check</b></td><td>Dữ liệu trước/sau + cửa sổ theo dõi + xác nhận không tái diễn</td><td>Bằng chứng hiệu lực + đóng CAPA/NCR</td><td>Không hiệu lực = mở lại CAPA</td></tr>
 </tbody>
 </table>
 </div>
-<h3 class="h3">3.3 Điểm chặn tối quan trọng (gate)</h3>
+<h3 class="h3">3.3 Điểm chặn tối quan trọng (cổng kiểm soát)</h3>
 <ul style="line-height:1.9">
-<li><b>Gate-HOLD:</b> hàng nghi ngờ rời khỏi line hoặc đi qua kho khi chưa được cô lập là <b>BLOCK</b>.</li>
-<li><b>Gate-Release:</b> release chỉ xảy ra khi có record (Hold Released/NCR Closed/ShipRelease Released) và bằng chứng nằm trong SSOT.</li>
-<li><b>Gate-Concession:</b> use-as-is chỉ xảy ra khi có chấp thuận bằng văn bản trước khi giao; thiếu chấp thuận là <b>BLOCK</b>.</li>
+<li><b>Cổng kiểm soát-HOLD:</b> hàng nghi ngờ rời khỏi line hoặc đi qua kho khi chưa được cô lập là <b>BLOCK</b>.</li>
+<li><b>Cổng kiểm soát-Release:</b> release chỉ xảy ra khi có hồ sơ (Hold Released/NCR Closed/ShipRelease Released) và bằng chứng nằm trong SSOT.</li>
+<li><b>Cổng kiểm soát-Concession:</b> use-as-is chỉ xảy ra khi có chấp thuận bằng văn bản trước khi giao; thiếu chấp thuận là <b>BLOCK</b>.</li>
 </ul>
 </div>
 <!-- 4 -->
@@ -280,28 +280,28 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>FP-04:</b> NCR thiếu Job/Part/Rev hoặc thiếu bằng chứng đo → MRB quyết theo cảm tính.</li>
 <li><b>FP-05:</b> Ghi nhầm DefectType/Disposition code trong list → sai thống kê Pareto, sai ưu tiên CAPA.</li>
 <li><b>FP-06:</b> MRB quyết rework nhưng không có WI/kế hoạch kiểm tra (inspection plan) cập nhật → rework tạo lỗi mới.</li>
-<li><b>FP-07:</b> Concession không có chấp thuận hoặc chấp thuận nằm ngoài SSOT → ship risk và đánh giá không đạt.</li>
+<li><b>FP-07:</b> Concession không có chấp thuận hoặc chấp thuận nằm ngoài SSOT → rủi ro giao hàng và đánh giá không đạt.</li>
 <li><b>FP-08:</b> Rework xong nhưng không kiểm chứng 100% CTQ hoặc không có IR PASS → release sai.</li>
 <li><b>FP-09:</b> Nguyên nhân gốc dừng ở “do thao tác” → không có hành động hệ thống, lỗi tái diễn.</li>
 <li><b>FP-10:</b> Điểm lọt không xác định → điểm kiểm tra không được bổ sung, QC tiếp tục lọt.</li>
 <li><b>FP-11:</b> OOT gage phát hiện muộn, không đánh giá ảnh hưởng → hàng đã giao bị nghi ngờ.</li>
-<li><b>FP-12:</b> CAPA đóng khi chưa có effectiveness check → audit finding 10.2.</li>
-<li><b>FP-13:</b> Evidence lưu trong máy cá nhân hoặc gửi chat → mất SSOT, không truy xuất.</li>
-<li><b>FP-14:</b> Planner/Warehouse “đẩy” ship vì áp lực due date → bypass gate.</li>
+<li><b>FP-12:</b> CAPA đóng khi chưa có effectiveness check → đánh giá finding 10.2.</li>
+<li><b>FP-13:</b> Bằng chứng lưu trong máy cá nhân hoặc gửi chat → mất SSOT, không truy xuất.</li>
+<li><b>FP-14:</b> Planner/Warehouse “đẩy” ship vì áp lực ngày đến hạn → bypass cổng kiểm soát.</li>
 </ol>
 </div>
 <!-- 5 -->
 <div class="card">
 <h2 class="h2" id="s5" style="margin-top:0">5. Risk Controls (liệt kê control points; ai làm; bằng chứng; tối thiểu 6)</h2>
 <div class="note">
-<b>Quy tắc:</b> Mỗi điểm kiểm soát (control point) có <b>Owner</b> rõ + <b>Evidence</b> rõ + <b>Tiêu chí đạt</b> rõ. Thiếu evidence là <b>BLOCK</b>.
+<b>Quy tắc:</b> Mỗi điểm kiểm soát (control point) có <b>Người phụ trách</b> rõ + <b>Bằng chứng</b> rõ + <b>Tiêu chí đạt</b> rõ. Thiếu bằng chứng là <b>BLOCK</b>.
  </div>
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
 <th style="width:190px">Control point</th>
-<th style="width:170px">Owner</th>
+<th style="width:170px">Người phụ trách</th>
 <th>Bằng chứng (MRR)</th>
 <th style="width:260px">Tiêu chí đạt</th>
 </tr>
@@ -316,47 +316,47 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP-02 QCHoldLog</b></td>
 <td>QC/QA</td>
-<td>Record QCHoldLog: JobNum, ReasonCode, Severity, Containment, Status, Owner</td>
-<td>Record tạo trong ca; Status=Open; Owner được giao trong ca</td>
+<td>Hồ sơ QCHoldLog: JobNum, ReasonCode, Severity, Containment, Status, Người phụ trách</td>
+<td>Hồ sơ tạo trong ca; Status=Open; Người phụ trách được giao trong ca</td>
 </tr>
 <tr>
 <td><b>CP-03 NCRLog + folder</b></td>
 <td>QA</td>
-<td>Record NCRLog + thư mục NCR_&lt;NCR-ID&gt; có ảnh/đo/CMM</td>
+<td>Hồ sơ NCRLog + thư mục NCR_&lt;NCR-ID&gt; có ảnh/đo/CMM</td>
 <td>NCR có DetectedAt + DefectType + QtyAffected; có link EvidenceFolderUrl</td>
 </tr>
 <tr>
 <td><b>CP-04 MRB decision</b></td>
-<td>QA + Process Owner + Engineering (khi cần)</td>
+<td>QA + chủ quá trình + Engineering (khi cần)</td>
 <td>Biên bản MRB (minutes) + disposition code + điều kiện release</td>
 <td>Disposition rõ; rework có WI; concession có chấp thuận trước giao</td>
 </tr>
 <tr>
 <td><b>CP-05 Rework &amp; verification</b></td>
 <td>Setup/Production + QC</td>
-<td>WI rework + IR/CMM PASS + cập nhật routing/transaction trên SoR</td>
+<td>WI rework + IR/CMM PASS + cập nhật routing/giao dịch trên SoR</td>
 <td>IR PASS trước release; CTQ đo 100% khi CTQ</td>
 </tr>
 <tr>
 <td><b>CP-06 CAPA8D</b></td>
-<td>QA (owner) + các bộ phận liên quan</td>
-<td>Record CAPA8D: SourceType/SourceID, Severity, Owner, Status; 8D có RootCause+EscapePoint</td>
+<td>QA (người phụ trách) + các bộ phận liên quan</td>
+<td>Hồ sơ CAPA8D: SourceType/SourceID, Severity, Người phụ trách, Status; 8D có RootCause+EscapePoint</td>
 <td>CAPA có hành động hệ thống + bằng chứng rollout + deadline</td>
 </tr>
 <tr>
 <td><b>CP-07 Effectiveness check</b></td>
 <td>QA + Supervisor</td>
-<td>Evidence trước/sau + dữ liệu trend + kết luận hiệu lực; CAPA8D.EffectivenessCheckDate</td>
+<td>Bằng chứng trước/sau + dữ liệu trend + kết luận hiệu lực; CAPA8D.EffectivenessCheckDate</td>
 <td>Không tái diễn trong cửa sổ theo dõi; điểm lọt đã bịt; training/WI cập nhật có bằng chứng</td>
 </tr>
 <tr>
-<td><b>CP-08 Outsource cert gate</b></td>
+<td><b>CP-08 Outsource cert cổng kiểm soát</b></td>
 <td>Purchasing + Receiving + QA</td>
-<td>Cert đầy đủ + trace lot/heat + link vào Job Dossier</td>
+<td>Cert đầy đủ + trace lot/heat + link vào Hồ sơ công việc (job dossier)</td>
 <td>Thiếu cert là BLOCK; nhận hàng tạm giữ khi DocsComplete=No</td>
 </tr>
 <tr>
-<td><b>CP-09 Ship release gate</b></td>
+<td><b>CP-09 Phê duyệt giao hàng cổng kiểm soát</b></td>
 <td>Warehouse + QA</td>
 <td>ShipRelease: PacketComplete=Yes, FinalIRPass=Yes, PackagingPass=Yes</td>
 <td>Status=Released mới xuất hàng; thiếu 1 điều kiện là Blocked</td>
@@ -396,7 +396,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>UAI</b> (Use-as-is)</td>
 <td>Không cần rework; đáp ứng yêu cầu; hoặc có concession chấp thuận</td>
-<td>Biên bản MRB + bằng chứng trong dung sai hoặc concession bằng văn bản; bộ hồ sơ giao hàng (ship packet) cập nhật</td>
+<td>Biên bản MRB + bằng chứng trong dung sai hoặc concession bằng văn bản; bộ hồ sơ giao hàng cập nhật</td>
 </tr>
 <tr>
 <td><b>SCR</b> (Scrap)</td>
@@ -411,7 +411,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>MRB</b> (Pending)</td>
 <td>Thiếu dữ kiện hoặc cần thử nghiệm</td>
-<td>Danh sách dữ kiện cần bổ sung + owner + deadline; HOLD duy trì đến khi có quyết định</td>
+<td>Danh sách dữ kiện cần bổ sung + người phụ trách + deadline; HOLD duy trì đến khi có quyết định</td>
 </tr>
 </tbody>
 </table>
@@ -445,18 +445,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>D0</b></td><td>Lập kế hoạch &amp; containment</td><td>Stop-ship/HOLD; khoanh vùng ảnh hưởng; kế hoạch dữ liệu cần thu</td></tr>
 <tr><td><b>D1</b></td><td>Lập nhóm 8D</td><td>Danh sách vai trò (QA/QC/Production/Engineering/PUR/Sales khi có); RACI</td></tr>
 <tr><td><b>D2</b></td><td>Mô tả vấn đề</td><td>5W2H; ảnh/đo/CMM; “có/không có” (phạm vi xảy ra / không xảy ra)</td></tr>
-<tr><td><b>D3</b></td><td>Containment tạm thời</td><td>Sort/re-kế hoạch kiểm tra (inspection plan); quarantine WIP/FG; chặn phê duyệt giao hàng (ship release); log kết quả</td></tr>
+<tr><td><b>D3</b></td><td>Containment tạm thời</td><td>Sort/re-kế hoạch kiểm tra (inspection plan); quarantine WIP/FG; chặn phê duyệt giao hàng; log kết quả</td></tr>
 <tr><td><b>D4</b></td><td>Nguyên nhân gốc &amp; điểm lọt</td><td>5-Why/Ishikawa; dữ liệu offset/tuổi dao (tool life)/setup; xác định điểm lọt cụ thể</td></tr>
 <tr><td><b>D5</b></td><td>Chọn hành động khắc phục</td><td>Hành động hệ thống (poka-yoke, program lock, fixture control, checkpoint); đánh giá rủi ro</td></tr>
-<tr><td><b>D6</b></td><td>Triển khai &amp; xác nhận</td><td>WI/Setup/kế hoạch kiểm tra (inspection plan) cập nhật có kiểm soát; bằng chứng rollout; training record</td></tr>
-<tr><td><b>D7</b></td><td>Ngăn tái diễn</td><td>Chuẩn hóa quy trình; cập nhật tài liệu; audit tại hiện trường; KPI theo dõi</td></tr>
-<tr><td><b>D8</b></td><td>Kết thúc &amp; ghi nhận</td><td>Hiệu lực đạt; lesson learned; đóng CAPA; phản hồi liên quan (khách hàng/NCC)</td></tr>
+<tr><td><b>D6</b></td><td>Triển khai &amp; xác nhận</td><td>WI/Setup/kế hoạch kiểm tra (inspection plan) cập nhật có kiểm soát; bằng chứng rollout; training hồ sơ</td></tr>
+<tr><td><b>D7</b></td><td>Ngăn tái diễn</td><td>Chuẩn hóa quy trình; cập nhật tài liệu; đánh giá tại hiện trường; KPI theo dõi</td></tr>
+<tr><td><b>D8</b></td><td>Kết thúc &amp; ghi nhận</td><td>Hiệu lực đạt; bài học kinh nghiệm; đóng CAPA; phản hồi liên quan (khách hàng/NCC)</td></tr>
 </tbody>
 </table>
 </div>
 <h3 class="h3">5.4 Kiểm tra hiệu lực (effectiveness check) — định nghĩa, cửa sổ theo dõi, khi nào mở lại</h3>
 <ul style="line-height:1.9">
-<li><b>Định nghĩa hiệu lực:</b> lỗi không tái diễn trong phạm vi đã khoanh + điểm lọt đã bịt + dữ liệu xác nhận (IR/CMM, trend KPI, audit tại line).</li>
+<li><b>Định nghĩa hiệu lực:</b> lỗi không tái diễn trong phạm vi đã khoanh + điểm lọt đã bịt + dữ liệu xác nhận (IR/CMM, trend KPI, đánh giá tại line).</li>
 <li><b>Cửa sổ theo dõi tối thiểu:</b> theo SOP-QMS-006 là 90 ngày đối với lỗi lặp; hiệu lực phải được đánh giá trong cửa sổ phù hợp với chu kỳ Job. <b>M365/SharePoint → HESEM-QMS-SSOT</b> quy định “số Job tối thiểu” theo nhóm sản phẩm.</li>
 <li><b>Mở lại CAPA:</b> khi tái diễn trong cửa sổ theo dõi, hoặc khi phát hiện điểm lọt chưa bịt, hoặc khi phát hiện hành động chỉ mang tính correction.</li>
 <li><b>Bằng chứng tối thiểu:</b> trước/sau, danh sách Job trong cửa sổ, biên bản kiểm tra tại line, và cập nhật CAPA8D.EffectivenessCheckDate.</li>
@@ -467,18 +467,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" id="s6" style="margin-top:0">6. Fail-fast rules (≥3) + tiêu chí STOP/HOLD/BLOCK</h2>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
-<div>Fail-fast nghĩa là <b>phát hiện sớm – chặn sớm – ghi record sớm</b>. Khi thấy dấu hiệu thuộc STOP/HOLD/BLOCK, người thấy là người kích hoạt. Không chờ “đủ chứng cứ”. Chứng cứ được bổ sung sau khi đã HOLD.</div>
+<div>Fail-fast nghĩa là <b>phát hiện sớm – chặn sớm – ghi hồ sơ sớm</b>. Khi thấy dấu hiệu thuộc STOP/HOLD/BLOCK, người thấy là người kích hoạt. Không chờ “đủ chứng cứ”. Chứng cứ được bổ sung sau khi đã HOLD.</div>
 </div>
 <h3 class="h3">6.1 STOP/HOLD/BLOCK criteria</h3>
 <div class="table-card">
 <table class="table">
-<thead><tr><th style="width:160px">Mức</th><th>Khi xảy ra</th><th style="width:260px">Hành động bắt buộc</th><th>Record bắt buộc</th></tr></thead>
+<thead><tr><th style="width:160px">Mức</th><th>Khi xảy ra</th><th style="width:260px">Hành động bắt buộc</th><th>Hồ sơ bắt buộc</th></tr></thead>
 <tbody>
 <tr>
 <td><b>STOP</b></td>
 <td>Rủi ro CTQ, sai Rev, mix-up, OOT gage, khả năng ship sai</td>
 <td>Dừng công đoạn; cô lập WIP; báo Supervisor+QC+QA trong ca</td>
-<td>QCHoldLog (Severity=CTQ) + ảnh evidence</td>
+<td>QCHoldLog (Severity=CTQ) + ảnh bằng chứng</td>
 </tr>
 <tr>
 <td><b>HOLD</b></td>
@@ -488,8 +488,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>BLOCK</b></td>
-<td>Yêu cầu release/giao hàng khi thiếu evidence hoặc thiếu phê duyệt</td>
-<td>Khóa phê duyệt giao hàng (ship release); escalates lên QA/Supervisor; ghi rõ lý do</td>
+<td>Yêu cầu release/giao hàng khi thiếu bằng chứng hoặc thiếu phê duyệt</td>
+<td>Khóa phê duyệt giao hàng; escalates lên QA/Supervisor; ghi rõ lý do</td>
 <td>ShipRelease=Blocked + link NCR/Hold</td>
 </tr>
 </tbody>
@@ -497,7 +497,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3 class="h3">6.2 Fail-fast rules (bắt buộc)</h3>
 <ul style="line-height:1.9">
-<li><b>FF-01 không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát):</b> khi thiếu IR PASS/CMM report/cert/approval, gate Final/Ship là <b>BLOCK</b>.</li>
+<li><b>FF-01 không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát):</b> khi thiếu IR PASS/CMM report/cert/approval, cổng kiểm soát Final/Ship là <b>BLOCK</b>.</li>
 <li><b>FF-02 Sai Rev là STOP:</b> khi phát hiện mismatch giữa Job pack và program/setup/print, thực hiện STOP và mở HOLD ngay.</li>
 <li><b>FF-03 Mix-up là STOP:</b> khi mất truy xuất lô/JobNum hoặc nhãn rơi, thực hiện STOP; quarantine toàn bộ khu vực liên quan.</li>
 <li><b>FF-04 Concession phải có chấp thuận trước giao:</b> khi chấp thuận chưa có, disposition UAI bị khóa và chuyển sang rework/scrap/return.</li>
@@ -506,13 +506,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 7 -->
 <div class="card">
-<h2 class="h2" id="s7" style="margin-top:0">7. Phản ứng 60 giây (khi sai Rev/mix-up/thiếu chứng từ/OOT gage/bypass gate/ship risk)</h2>
+<h2 class="h2" id="s7" style="margin-top:0">7. Phản ứng 60 giây (khi sai Rev/mix-up/thiếu chứng từ/OOT gage/bypass cổng kiểm soát/rủi ro giao hàng)</h2>
 <div class="note">
 <b>Mục tiêu:</b> 60 giây đầu khóa rủi ro “giao nhầm – lan rộng – mất truy xuất”. Sau 60 giây mới chuyển sang điều tra chi tiết.
  </div>
 <div class="table-card">
 <table class="table">
-<thead><tr><th style="width:220px">Tình huống</th><th>60 giây đầu PHẢI làm</th><th style="width:260px">Record/evidence ngay</th></tr></thead>
+<thead><tr><th style="width:220px">Tình huống</th><th>60 giây đầu PHẢI làm</th><th style="width:260px">Hồ sơ/bằng chứng ngay</th></tr></thead>
 <tbody>
 <tr>
 <td><b>Wrong revision</b></td>
@@ -535,7 +535,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>QCHoldLog ReasonCode=GAGE; gage ID + ngày hết hạn; ảnh tem calib</td>
 </tr>
 <tr>
-<td><b>Bypass gate / ship risk</b></td>
+<td><b>Bypass cổng kiểm soát / rủi ro giao hàng</b></td>
 <td>BLOCK ship; kéo lại packing về khu HOLD; báo QA+Supervisor+Estimator (SAL-03)</td>
 <td>ShipRelease=Blocked + link Hold/NCR; ảnh packing trạng thái HOLD</td>
 </tr>
@@ -544,44 +544,44 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
-<div>Người kích hoạt <b>PHẢI</b> hoàn tất 3 việc trong 60 giây: (1) cô lập vật lý; (2) thông báo đúng tuyến; (3) tạo record HOLD hoặc BLOCK. Không tạo record là FAIL.</div>
+<div>Người kích hoạt <b>PHẢI</b> hoàn tất 3 việc trong 60 giây: (1) cô lập vật lý; (2) thông báo đúng tuyến; (3) tạo hồ sơ HOLD hoặc BLOCK. Không tạo hồ sơ là FAIL.</div>
 </div>
 </div>
 <!-- 8 -->
 <div class="card">
-<h2 class="h2" id="s8" style="margin-top:0">8. Checklist vận hành (≤15 bước) — mỗi bước có Owner, Evidence/MRR, “điểm sai hay gặp”</h2>
-<p class="muted">Checklist áp dụng cho mọi ca khi phát sinh NC. Mỗi bước là 01 “điểm chặn”, thiếu 1 bước là tạo lỗ hổng audit và ship risk.</p>
+<h2 class="h2" id="s8" style="margin-top:0">8. Bảng kiểm vận hành (≤15 bước) — mỗi bước có Người phụ trách, Bằng chứng/MRR, “điểm sai hay gặp”</h2>
+<p class="muted">Bảng kiểm áp dụng cho mọi ca khi phát sinh NC. Mỗi bước là 01 “điểm chặn”, thiếu 1 bước là tạo lỗ hổng đánh giá và rủi ro giao hàng.</p>
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
 <th style="width:44px">#</th>
 <th>Bước vận hành</th>
-<th style="width:150px">Owner</th>
-<th style="width:260px">Evidence/MRR</th>
+<th style="width:150px">Người phụ trách</th>
+<th style="width:260px">Bằng chứng/MRR</th>
 <th style="width:260px">Điểm sai hay gặp</th>
 </tr>
 </thead>
 <tbody>
 <tr><td>1</td><td><b>STOP/HOLD vật lý</b>: tách hàng, gắn nhãn, đưa vào khu HOLD</td><td>Operator/Setup/WHS</td><td>Ảnh nhãn HOLD + vị trí</td><td>Để hàng “tạm” tại line; nhãn thiếu JobNum/ca</td></tr>
-<tr><td>2</td><td><b>Tạo QCHoldLog</b> với ReasonCode/Severity/Containment/Owner</td><td>QC/QA</td><td>QCHoldLog record</td><td>Ghi UNK nhưng không gán Owner; thiếu Containment</td></tr>
+<tr><td>2</td><td><b>Tạo QCHoldLog</b> với ReasonCode/Severity/Containment/Người phụ trách</td><td>QC/QA</td><td>QCHoldLog hồ sơ</td><td>Ghi UNK nhưng không gán Người phụ trách; thiếu Containment</td></tr>
 <tr><td>3</td><td><b>Khóa truy xuất</b>: xác nhận Job/Part/Rev; khóa program/print tại điểm sử dụng</td><td>Supervisor/Programmer</td><td>Ảnh màn hình/print + ghi Rev suspect</td><td>Đổi file ngoài kiểm soát; dùng file cũ tại máy</td></tr>
 <tr><td>4</td><td><b>Thu bằng chứng</b>: đo/ảnh/CMM; ghi rõ gage ID &amp; trạng thái calib</td><td>QC</td><td>IR/CMM report + ảnh + gage ID</td><td>Ảnh không có thước; không ghi gage ID</td></tr>
 <tr><td>5</td><td><b>Mở NCR</b> khi đủ dữ kiện tối thiểu</td><td>QA</td><td>NCRLog + thư mục NCR</td><td>Thiếu DetectedAt/QtyAffected; không link folder</td></tr>
 <tr><td>6</td><td><b>Đánh giá ảnh hưởng</b>: khoanh vùng WIP/FG/outsourcing/ship history</td><td>QA+Supervisor+Planner</td><td>Danh sách phạm vi ảnh hưởng + link Job/lot</td><td>Chỉ khoanh vùng line hiện tại; bỏ sót hàng chờ ship</td></tr>
 <tr><td>7</td><td><b>Triệu tập MRB</b>: chuẩn bị dữ kiện + phương án disposition</td><td>QA</td><td>MRB minutes + phương án</td><td>MRB họp không có dữ liệu đo; quyết theo cảm tính</td></tr>
 <tr><td>8</td><td><b>Ra disposition</b> + tiêu chí release rõ</td><td>MRB</td><td>Disposition code + điều kiện release</td><td>Không ghi tiêu chí đo lại; concession thiếu chấp thuận</td></tr>
-<tr><td>9</td><td><b>Thực hiện rework/sort/scrap/return</b> theo quyết định</td><td>Setup/WHS/PUR</td><td>WI rework + Epicor transaction <b>M365/SharePoint → HESEM-QMS-SSOT</b> mã giao dịch nội bộ</td><td>Rework không có WI; scrap không ghi nhận trên SoR</td></tr>
+<tr><td>9</td><td><b>Thực hiện rework/sort/scrap/return</b> theo quyết định</td><td>Setup/WHS/PUR</td><td>WI rework + Epicor giao dịch <b>M365/SharePoint → HESEM-QMS-SSOT</b> mã giao dịch nội bộ</td><td>Rework không có WI; scrap không ghi nhận trên SoR</td></tr>
 <tr><td>10</td><td><b>Verification</b>: IR/CMM PASS trước release</td><td>QC/QA</td><td>IR PASS + ảnh kết quả</td><td>Đo lại không theo plan; thiếu 100% khi CTQ</td></tr>
-<tr><td>11</td><td><b>Quyết định mở CAPA/8D</b> theo ngưỡng</td><td>QA</td><td>CAPA8D record + 8D file</td><td>Major/Critical nhưng không mở CAPA</td></tr>
-<tr><td>12</td><td><b>Nguyên nhân gốc + điểm lọt</b> + hành động hệ thống</td><td>Owner CAPA</td><td>5-Why/Ishikawa + action + bằng chứng rollout</td><td>Nguyên nhân gốc = “do người”; không có cơ chế ngăn</td></tr>
-<tr><td>13</td><td><b>Effectiveness check</b> và đóng hồ sơ</td><td>QA+Supervisor</td><td>Evidence trước/sau + CAPA status Closed</td><td>Đóng vì “đã làm xong” nhưng không có dữ liệu hiệu lực</td></tr>
-<tr><td>14</td><td><b>Release/Ship</b> chỉ khi gate PASS</td><td>QA+WHS</td><td>ShipRelease Released + packet complete</td><td>Xuất hàng khi thiếu packet; thiếu link NCR</td></tr>
+<tr><td>11</td><td><b>Quyết định mở CAPA/8D</b> theo ngưỡng</td><td>QA</td><td>CAPA8D hồ sơ + 8D file</td><td>Major/Critical nhưng không mở CAPA</td></tr>
+<tr><td>12</td><td><b>Nguyên nhân gốc + điểm lọt</b> + hành động hệ thống</td><td>Người phụ trách CAPA</td><td>5-Why/Ishikawa + action + bằng chứng rollout</td><td>Nguyên nhân gốc = “do người”; không có cơ chế ngăn</td></tr>
+<tr><td>13</td><td><b>Effectiveness check</b> và đóng hồ sơ</td><td>QA+Supervisor</td><td>Bằng chứng trước/sau + CAPA status Closed</td><td>Đóng vì “đã làm xong” nhưng không có dữ liệu hiệu lực</td></tr>
+<tr><td>14</td><td><b>Release/Ship</b> chỉ khi cổng kiểm soát PASS</td><td>QA+WHS</td><td>ShipRelease Released + packet complete</td><td>Xuất hàng khi thiếu packet; thiếu link NCR</td></tr>
 </tbody>
 </table>
 </div>
 <div class="note" style="margin-top:12px">
-<b>Phản ứng khi quá hạn:</b> Khi QCHoldLog hoặc NCR không có owner hoặc quá hạn xử lý, Supervisor kích hoạt escalation theo Tier cadence <b>M365/SharePoint → HESEM-QMS-SSOT</b> chuẩn escalation nội bộ.
+<b>Phản ứng khi quá hạn:</b> Khi QCHoldLog hoặc NCR không có người phụ trách hoặc quá hạn xử lý, Supervisor kích hoạt escalation theo Tier cadence <b>M365/SharePoint → HESEM-QMS-SSOT</b> chuẩn escalation nội bộ.
  </div>
 </div>
 <!-- 9 -->
@@ -604,15 +604,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>1</td><td>STOP/HOLD vật lý</td><td>Tách OK/NG; nhãn có JobNum/ca/ngày; đưa vào khu HOLD</td><td>Chặn lan rộng và chặn giao nhầm</td></tr>
-<tr><td>2</td><td>Tạo QCHoldLog</td><td>Chọn đúng ReasonCode/Severity; ghi Containment hành động ngay; gán Owner</td><td>Quy tắc điều hướng hoạt động; không “HOLD vô chủ”</td></tr>
+<tr><td>2</td><td>Tạo QCHoldLog</td><td>Chọn đúng ReasonCode/Severity; ghi Containment hành động ngay; gán Người phụ trách</td><td>Quy tắc điều hướng hoạt động; không “HOLD vô chủ”</td></tr>
 <tr><td>3</td><td>Khóa Job/Rev tại điểm sử dụng</td><td>So sánh Job pack ↔ program ↔ setup ↔ print; dán tag “Rev suspect”</td><td>Chặn sai Rev là rủi ro chết người</td></tr>
 <tr><td>4</td><td>Thu bằng chứng đo</td><td>Ghi rõ gage ID; ảnh có thước/scale; CMM report gắn đúng JobNum</td><td>MRB quyết dựa trên dữ liệu, không dựa cảm giác</td></tr>
-<tr><td>5</td><td>QA mở NCR</td><td>DetectedAt/DefectType/QtyAffected; link EvidenceFolderUrl; Status=Open</td><td>dấu vết kiểm toán (audit trail) đầy đủ; khoanh vùng ảnh hưởng</td></tr>
+<tr><td>5</td><td>QA mở NCR</td><td>DetectedAt/DefectType/QtyAffected; link EvidenceFolderUrl; Status=Open</td><td>dấu vết kiểm toán (đánh giá trail) đầy đủ; khoanh vùng ảnh hưởng</td></tr>
 <tr><td>6</td><td>Đánh giá ảnh hưởng</td><td>Khoanh WIP/FG/outsourcing/ship history; liệt kê lô suspect</td><td>Chặn lỗi “xảy ra nơi khác” theo ISO 10.2</td></tr>
 <tr><td>7</td><td>MRB quyết disposition</td><td>Quyết rõ rework/scrap/return/use-as-is; gắn tiêu chí verification</td><td>Không có tiêu chí thì release mù</td></tr>
-<tr><td>8</td><td>Thực hiện correction</td><td>Rework có WI; scrap có transaction; return có chứng từ</td><td>Truy vết và kiểm soát chi phí chất lượng</td></tr>
+<tr><td>8</td><td>Thực hiện correction</td><td>Rework có WI; scrap có giao dịch; return có chứng từ</td><td>Truy vết và kiểm soát chi phí chất lượng</td></tr>
 <tr><td>9</td><td>Verification</td><td>IR/CMM PASS; CTQ đo 100% khi CTQ; QA ký release</td><td>Release chỉ xảy ra khi phù hợp</td></tr>
-<tr><td>10</td><td>Quyết định mở CAPA/8D</td><td>Major/Critical, lặp, thoát lỗi, hệ thống; SourceType/SourceID đúng</td><td>Ngăn tái diễn và ngăn lọt gate</td></tr>
+<tr><td>10</td><td>Quyết định mở CAPA/8D</td><td>Major/Critical, lặp, thoát lỗi, hệ thống; SourceType/SourceID đúng</td><td>Ngăn tái diễn và ngăn lọt cổng kiểm soát</td></tr>
 <tr><td>11</td><td>Nguyên nhân gốc + điểm lọt</td><td>5-Why/Ishikawa; tách “cơ chế” và “hành vi”; hành động hệ thống</td><td>Không bịt cơ chế thì lỗi quay lại</td></tr>
 <tr><td>12</td><td>Effectiveness check</td><td>Định nghĩa thước đo trước/sau; theo dõi cửa sổ; cập nhật CAPA status</td><td>Đóng CAPA khi có dữ liệu hiệu lực</td></tr>
 </tbody>
@@ -620,11 +620,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3 class="h3">9.2 OJT output (sản phẩm đầu ra bắt buộc)</h3>
 <ul style="line-height:1.9">
-<li><b>01</b> record QCHoldLog đầy đủ (kèm ảnh nhãn HOLD và mô tả containment).</li>
+<li><b>01</b> hồ sơ QCHoldLog đầy đủ (kèm ảnh nhãn HOLD và mô tả containment).</li>
 <li><b>01</b> NCR package: NCRLog + thư mục NCR có tối thiểu 03 bằng chứng (ảnh + đo + liên quan Rev).</li>
-<li><b>01</b> MRB decision record: disposition + tiêu chí verification + route hành động (rework/scrap/return).</li>
-<li><b>01</b> CAPA/8D record khi tình huống đạt ngưỡng (hoặc mô phỏng): nguyên nhân gốc + điểm lọt + hành động hệ thống.</li>
-<li><b>01</b> effectiveness check evidence: dữ liệu trước/sau + kết luận; cập nhật EffectivenessCheckDate.</li>
+<li><b>01</b> MRB decision hồ sơ: disposition + tiêu chí verification + route hành động (rework/scrap/return).</li>
+<li><b>01</b> CAPA/8D hồ sơ khi tình huống đạt ngưỡng (hoặc mô phỏng): nguyên nhân gốc + điểm lọt + hành động hệ thống.</li>
+<li><b>01</b> effectiveness check bằng chứng: dữ liệu trước/sau + kết luận; cập nhật EffectivenessCheckDate.</li>
 </ul>
 </div>
 <!-- 10 -->
@@ -655,7 +655,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>QC</b></td>
 <td>Phân biệt defect type; đọc Rev</td>
-<td>Đo đúng gage; ghi evidence rõ</td>
+<td>Đo đúng gage; ghi bằng chứng rõ</td>
 <td>Tạo hold log đúng mã; cung cấp dữ kiện MRB</td>
 <td>Thiết kế điểm kiểm tra bịt điểm lọt; dẫn dắt sort/verification</td>
 </tr>
@@ -663,22 +663,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>QA</b></td>
 <td>Nhận biết ngưỡng mở CAPA</td>
 <td>Mở NCR đủ dữ kiện; điều phối MRB có dữ liệu</td>
-<td>Đóng NCR/CAPA đúng tiêu chí; không release khi thiếu evidence</td>
+<td>Đóng NCR/CAPA đúng tiêu chí; không release khi thiếu bằng chứng</td>
 <td>Dẫn dắt CAPA hệ thống; chuẩn hóa codes; chặn lỗi lặp bằng dữ liệu</td>
 </tr>
 <tr>
 <td><b>Programmer</b></td>
 <td>Nhận biết lỗi program phổ biến</td>
-<td>Khoá program/Rev; ghi evidence sửa</td>
+<td>Khoá program/Rev; ghi bằng chứng sửa</td>
 <td>Nguyên nhân gốc/điểm lọt cho PROG; rollout change có kiểm soát</td>
 <td>Thiết kế poka-yoke số hoá (program lock/checksum) <b>SSOT/Data-Model-Checksums (checksum.txt)</b></td>
 </tr>
 <tr>
 <td><b>WHS/PUR/Planner/Sales</b></td>
-<td>Nhận biết ship risk và chứng từ</td>
+<td>Nhận biết rủi ro giao hàng và chứng từ</td>
 <td>BLOCK giao hàng khi thiếu packet; khóa nhận hàng khi thiếu cert</td>
-<td>Vận hành gate đúng record; handoff rõ owner/deadline</td>
-<td>Chủ trì escalation liên phòng; chặn áp lực due date làm bypass gate</td>
+<td>Vận hành cổng kiểm soát đúng hồ sơ; handoff rõ người phụ trách/deadline</td>
+<td>Chủ trì escalation liên phòng; chặn áp lực ngày đến hạn làm bypass cổng kiểm soát</td>
 </tr>
 </tbody>
 </table>
@@ -686,8 +686,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">10.1 Quyền hạn sau khi đạt (ví dụ)</h3>
 <ul style="line-height:1.9">
 <li><b>Operator/Setup L3:</b> được quyền STOP tại máy và đưa WIP vào HOLD không cần xin phép trước.</li>
-<li><b>QC L3:</b> được quyền tạo QCHoldLog và yêu cầu kho BLOCK phê duyệt giao hàng (ship release) khi thiếu evidence.</li>
-<li><b>QA L3:</b> được quyền release khi IR PASS và hồ sơ đầy đủ; được quyền mở CAPA và đặt owner/deadline.</li>
+<li><b>QC L3:</b> được quyền tạo QCHoldLog và yêu cầu kho BLOCK phê duyệt giao hàng khi thiếu bằng chứng.</li>
+<li><b>QA L3:</b> được quyền release khi IR PASS và hồ sơ đầy đủ; được quyền mở CAPA và đặt người phụ trách/deadline.</li>
 <li><b>Supervisor L4:</b> được quyền điều phối MRB và escalates lên GM khi có concession/stop-ship.</li>
 </ul>
 </div>
@@ -696,14 +696,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" id="s11" style="margin-top:0">11. Đánh giá: Quiz ≥20 • Scenario ≥3 • Bài kiểm tra thực hành (bắt buộc)</h2>
 <h3 class="h3">11.1 Quiz (24 câu, trộn trắc nghiệm + tình huống ngắn)</h3>
 <ol style="line-height:1.9">
-<li>“không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” nghĩa là gì trong bối cảnh phê duyệt giao hàng (ship release)?</li>
-<li>QCHoldLog bắt buộc tối thiểu trường nào để record hợp lệ?</li>
+<li>“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)” nghĩa là gì trong bối cảnh phê duyệt giao hàng?</li>
+<li>QCHoldLog bắt buộc tối thiểu trường nào để hồ sơ hợp lệ?</li>
 <li>HoldReasonCode nào dùng khi phát hiện sai chương trình gia công? (MAT/PROC/PROG/GAGE/OUT/HAND/UNK)</li>
 <li>Khi phát hiện sai Rev tại máy, 60 giây đầu PHẢI làm 3 việc gì?</li>
 <li>DefectType “DIM” đại diện nhóm lỗi nào trong NCRLog?</li>
 <li>Phân biệt “correction” và “corrective action” bằng 01 ví dụ thực tế.</li>
 <li>Disposition “UAI” chỉ được dùng khi nào?</li>
-<li>Ai là owner bắt buộc để mở NCR theo SOP-QMS-006?</li>
+<li>Ai là người phụ trách bắt buộc để mở NCR theo SOP-QMS-006?</li>
 <li>Khi dụng cụ đo hết hạn hiệu chuẩn, hành động ngay là STOP/HOLD/BLOCK mức nào?</li>
 <li>MRB tối thiểu gồm những vai trò nào để quyết disposition không mù rủi ro?</li>
 <li>Nguyên nhân gốc khác điểm lọt ở điểm nào? Nêu 01 ví dụ “điểm lọt” trong CNC.</li>
@@ -712,35 +712,35 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Định nghĩa “mix-up” và hành động 60 giây đầu để khóa mix-up.</li>
 <li>Trường hợp nào bắt buộc mở CAPA/8D theo SOP-QMS-006?</li>
 <li>Tại sao chụp ảnh lỗi phải có thước/scale hoặc chỉ dấu đo?</li>
-<li>Planner phải làm gì để chống bypass gate khi có HOLD?</li>
+<li>Planner phải làm gì để chống bypass cổng kiểm soát khi có HOLD?</li>
 <li>Warehouse phải kiểm tra những điều kiện nào trước khi chuyển ShipRelease sang Released?</li>
 <li>Ghi sai mã Severity trong list gây hậu quả vận hành gì?</li>
 <li>Khi nguyên nhân gốc ghi “do người”, yêu cầu bắt buộc phải bổ sung là gì?</li>
 <li>Điều kiện PASS của verification khi tình huống là CTQ là gì?</li>
 <li>CAPA8D.SourceType dùng để làm gì? Nêu 3 nguồn.</li>
-<li>Thiếu EvidenceFolderUrl trong NCRLog gây lỗi gì trong audit và truy xuất?</li>
+<li>Thiếu EvidenceFolderUrl trong NCRLog gây lỗi gì trong đánh giá và truy xuất?</li>
 <li>Ai chịu trách nhiệm cuối cùng để chặn concession không có chấp thuận?</li>
 </ol>
 <h3 class="h3">11.2 Scenario (3 tình huống thật; có dữ kiện; yêu cầu quyết định HOLD/GO và ghi MRR)</h3>
 <div class="card" style="margin-top:12px">
 <h3 class="h3" style="margin-top:0">Scenario 1 — Sai Rev do program</h3>
 <p><b>Dữ kiện:</b> Job J-240215, Part P-881, Rev trên traveler = B. Tại máy, file program tên “P-881_REV-A.nc”. QC đo 3 pcs đầu: 2/3 vượt giới hạn CTQ chamfer.</p>
-<p><b>Decision required:</b> kích hoạt STOP/HOLD/BLOCK mức nào; chọn HoldReasonCode; liệt kê 05 bằng chứng tối thiểu phải có trong 30 phút đầu; xác định ai là owner nguyên nhân gốc và ai là owner điểm lọt.</p>
-<p><b>MRR bắt buộc:</b> ảnh nhãn HOLD + QCHoldLog + IR/CMM evidence + ghi chú Rev suspect + link thư mục NCR.</p>
+<p><b>Decision required:</b> kích hoạt STOP/HOLD/BLOCK mức nào; chọn HoldReasonCode; liệt kê 05 bằng chứng tối thiểu phải có trong 30 phút đầu; xác định ai là người phụ trách nguyên nhân gốc và ai là người phụ trách điểm lọt.</p>
+<p><b>MRR bắt buộc:</b> ảnh nhãn HOLD + QCHoldLog + IR/CMM bằng chứng + ghi chú Rev suspect + link thư mục NCR.</p>
 </div>
 <div class="card" style="margin-top:12px">
-<h3 class="h3" style="margin-top:0">Scenario 2 — Thiếu chứng từ outsource + ship risk</h3>
+<h3 class="h3" style="margin-top:0">Scenario 2 — Thiếu chứng từ outsource + rủi ro giao hàng</h3>
 <p><b>Dữ kiện:</b> Lô anodize về kho, label có JobNum nhưng không có cert thickness/lot. Planner đang chuẩn bị ship trong 24 giờ. Sales báo khách yêu cầu “ship đúng hẹn”.</p>
-<p><b>Decision required:</b> quyết định HOLD/GO; xác định điểm BLOCK; list ai phải nhận thông báo trong 60 giây; chọn record phải tạo trong ShipRelease; xác định đường lưu chứng từ trong SSOT.</p>
-<p><b>MRR bắt buộc:</b> QCHoldLog ReasonCode=OUT + DocsMissing evidence + ShipRelease=Blocked + yêu cầu cert gửi Purchasing.</p>
+<p><b>Decision required:</b> quyết định HOLD/GO; xác định điểm BLOCK; list ai phải nhận thông báo trong 60 giây; chọn hồ sơ phải tạo trong ShipRelease; xác định đường lưu chứng từ trong SSOT.</p>
+<p><b>MRR bắt buộc:</b> QCHoldLog ReasonCode=OUT + DocsMissing bằng chứng + ShipRelease=Blocked + yêu cầu cert gửi Purchasing.</p>
 </div>
 <div class="card" style="margin-top:12px">
 <h3 class="h3" style="margin-top:0">Scenario 3 — Repeat issue và CAPA không hiệu lực</h3>
 <p><b>Dữ kiện 6 tuần:</b> NCR “burr cạnh” lặp 3 lần trên 2 Job khác nhau; lần 1 rework; lần 2 thay dao; lần 3 lại tái diễn. CAPA trước đó ghi hành động “nhắc nhở Operator”.</p>
 <p><b>Decision required:</b> xác định nguyên nhân gốc và điểm lọt mới; định nghĩa hành động hệ thống bắt buộc; định nghĩa “effectiveness” bằng thước đo cụ thể; quyết định khi nào đóng CAPA và khi nào mở lại.</p>
-<p><b>MRR bắt buộc:</b> CAPA8D cập nhật RootCause+EscapePoint+CorrectiveAction; evidence rollout (WI/Setup update + training record); dữ liệu trước/sau.</p>
+<p><b>MRR bắt buộc:</b> CAPA8D cập nhật RootCause+EscapePoint+CorrectiveAction; bằng chứng rollout (WI/Setup update + training hồ sơ); dữ liệu trước/sau.</p>
 </div>
-<h3 class="h3" style="margin-top:14px">11.3 Bài kiểm tra thực hành (bắt buộc vì đây là module gate)</h3>
+<h3 class="h3" style="margin-top:14px">11.3 Bài kiểm tra thực hành (bắt buộc vì đây là module cổng kiểm soát)</h3>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
 <div>Người học <b>PHẢI</b> hoàn thành bài test tại hiện trường hoặc mô phỏng bằng hồ sơ thật: (1) kích hoạt HOLD đúng 60 giây; (2) tạo QCHoldLog đúng mã; (3) tạo NCR package đủ tối thiểu; (4) lập MRB decision với tiêu chí verification; (5) lập CAPA 8D (khi tình huống đạt ngưỡng hoặc tình huống mô phỏng) và thiết lập effectiveness check. Thiếu 1 phần là FAIL.</div>
@@ -750,9 +750,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:220px">Hạng mục</th><th>đạt khi</th><th>Không đạt khi</th></tr></thead>
 <tbody>
-<tr><td>HOLD 60 giây</td><td>Cô lập vật lý + báo đúng tuyến + record HOLD</td><td>Chỉ báo miệng; không có record; hàng rời khỏi line</td></tr>
-<tr><td>QCHoldLog</td><td>ReasonCode/Severity/Containment/Owner/Status đầy đủ</td><td>Thiếu owner hoặc containment; dùng sai code</td></tr>
-<tr><td>NCR package</td><td>NCRLog đủ trường + folder có ≥3 evidence</td><td>Thiếu Job/Rev hoặc thiếu evidence đo</td></tr>
+<tr><td>HOLD 60 giây</td><td>Cô lập vật lý + báo đúng tuyến + hồ sơ HOLD</td><td>Chỉ báo miệng; không có hồ sơ; hàng rời khỏi line</td></tr>
+<tr><td>QCHoldLog</td><td>ReasonCode/Severity/Containment/Người phụ trách/Status đầy đủ</td><td>Thiếu người phụ trách hoặc containment; dùng sai code</td></tr>
+<tr><td>NCR package</td><td>NCRLog đủ trường + folder có ≥3 bằng chứng</td><td>Thiếu Job/Rev hoặc thiếu bằng chứng đo</td></tr>
 <tr><td>MRB decision</td><td>Disposition rõ + tiêu chí verification + concession có phê duyệt (khi có)</td><td>Quyết mơ hồ; không có tiêu chí đo lại</td></tr>
 <tr><td>CAPA &amp; hiệu lực</td><td>Nguyên nhân gốc + điểm lọt + hành động hệ thống + kế hoạch effectiveness</td><td>Nguyên nhân gốc = “do người”; đóng CAPA không có dữ liệu</td></tr>
 </tbody>
@@ -761,26 +761,26 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 12 -->
 <div class="card">
-<h2 class="h2" id="s12" style="margin-top:0">12. Tiêu chí PASS/FAIL (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”)</h2>
+<h2 class="h2" id="s12" style="margin-top:0">12. Tiêu chí PASS/FAIL (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No cổng kiểm soát)”)</h2>
 <ul style="line-height:1.9">
-<li><b>PASS</b> khi: Quiz ≥ 85% <b>và</b> Scenario đạt ≥ 2/3 <b>và</b> Bài kiểm tra thực hành đạt 100% checklist.</li>
-<li><b>FAIL</b> khi: thiếu bất kỳ output artifact/MRR, hoặc vi phạm STOP/HOLD/BLOCK, hoặc release/giao hàng khi thiếu evidence.</li>
+<li><b>PASS</b> khi: Quiz ≥ 85% <b>và</b> Scenario đạt ≥ 2/3 <b>và</b> Bài kiểm tra thực hành đạt 100% bảng kiểm.</li>
+<li><b>FAIL</b> khi: thiếu bất kỳ output artifact/MRR, hoặc vi phạm STOP/HOLD/BLOCK, hoặc release/giao hàng khi thiếu bằng chứng.</li>
 <li><b>Tái đánh giá</b> xảy ra trong ca kế tiếp sau khi đã OJT bổ sung và hoàn tất thiếu hụt bằng chứng.</li>
 </ul>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
-<div>Trong mọi trường hợp, <b>thiếu bằng chứng</b> đồng nghĩa <b>không đạt</b> và đồng nghĩa <b>không qua gate</b>.</div>
+<div>Trong mọi trường hợp, <b>thiếu bằng chứng</b> đồng nghĩa <b>không đạt</b> và đồng nghĩa <b>không qua cổng kiểm soát</b>.</div>
 </div>
 </div>
 <!-- 13 -->
 <div class="card">
-<h2 class="h2" id="s13" style="margin-top:0">13. MRR tối thiểu (hồ sơ) + quy tắc đặt tên + nơi lưu + Common audit findings</h2>
+<h2 class="h2" id="s13" style="margin-top:0">13. MRR tối thiểu (hồ sơ) + quy tắc đặt tên + nơi lưu + Common đánh giá findings</h2>
 <h3 class="h3">13.1 Danh sách MRR bắt buộc cho module này</h3>
 <div class="note">
 <b>SSOT vận hành theo SOP-QMS-006:</b><br/>
- • Job Dossier: CNC-IMS-HUB/Job-Dossiers/&lt;JobNum&gt;/05_NCR-Hold-CAPA/NCR_&lt;NCR-ID&gt;/<br/>
- • CAPA: CNC-IMS-HUB/QMS-Records/05_NCR-Hold-CAPA/CAPA_&lt;CAPA-ID&gt;/<br/>
- • Hold: CNC-IMS-HUB/QMS-Records/05_NCR-Hold-CAPA/Hold-Log/<br/>
+ • Hồ sơ công việc: CNC-IMS-HUB/Job-Dossiers/&lt;JobNum&gt;/05_NCR-Hold-CAPA/NCR_&lt;NCR-ID&gt;/<br/>
+ • CAPA: CNC-IMS-HUB/QMS-Hồ sơ/05_NCR-Hold-CAPA/CAPA_&lt;CAPA-ID&gt;/<br/>
+ • Hold: CNC-IMS-HUB/QMS-Hồ sơ/05_NCR-Hold-CAPA/Hold-Log/<br/>
 <b>MRR đào tạo:</b> M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training → academy → system-ops → SYS-OPS-17<br/>
 <b>M365/SharePoint → HESEM-QMS-SSOT</b> Tên thư viện/quyền truy cập và cấu trúc thư mục đào tạo theo IT.
  </div>
@@ -788,22 +788,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead>
 <tr>
-<th style="width:220px">Record</th>
+<th style="width:220px">Hồ sơ</th>
 <th style="width:260px">Tên file/ID chuẩn</th>
 <th>Yêu cầu tối thiểu</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>QCHoldLog</td><td>HoldID = HOLD-YYYY-####</td><td>JobNum + ReasonCode + Severity + Containment + Status + Owner</td></tr>
+<tr><td>QCHoldLog</td><td>HoldID = HOLD-YYYY-####</td><td>JobNum + ReasonCode + Severity + Containment + Status + Người phụ trách</td></tr>
 <tr><td>NCRLog</td><td>NCRID = NCR-YYYY-####</td><td>DetectedAt + DefectType + QtyAffected + Status; link EvidenceFolderUrl</td></tr>
-<tr><td>CAPA8D</td><td>CAPAID = CAPA-YYYY-####</td><td>SourceType/SourceID + Severity + Owner + Status + EffectivenessCheckDate</td></tr>
-<tr><td>NCR evidence package</td><td>NCR_&lt;NCR-ID&gt;_EvidencePack.pdf</td><td>Ảnh + đo + CMM/IR + Rev evidence; không để file rời khỏi folder NCR</td></tr>
+<tr><td>CAPA8D</td><td>CAPAID = CAPA-YYYY-####</td><td>SourceType/SourceID + Severity + Người phụ trách + Status + EffectivenessCheckDate</td></tr>
+<tr><td>NCR bộ bằng chứng (evidence pack)</td><td>NCR_&lt;NCR-ID&gt;_EvidencePack.pdf</td><td>Ảnh + đo + CMM/IR + Rev bằng chứng; không để file rời khỏi folder NCR</td></tr>
 <tr><td>MRB minutes</td><td>MRB_Minutes_&lt;NCR-ID&gt;_YYYY-MM-DD.docx</td><td>Disposition + điều kiện release + quyết định mở CAPA</td></tr>
 <tr><td>Rework instruction</td><td>WI_Rework_&lt;NCR-ID&gt;_Vx.pdf</td><td>Step rõ + điểm kiểm tra đo + ai ký xác nhận</td></tr>
 <tr><td>Verification report</td><td>IR_&lt;JobNum&gt;_Verify_&lt;NCR-ID&gt;.pdf</td><td>PASS/FAIL + gage IDs; CTQ 100% khi CTQ</td></tr>
-<tr><td>OJT checklist</td><td>SYS-OPS-17_OJT_&lt;Name&gt;_YYYY-MM-DD.xlsx</td><td>12 bước job breakdown + ký người hướng dẫn + link tình huống</td></tr>
+<tr><td>OJT bảng kiểm</td><td>SYS-OPS-17_OJT_&lt;Name&gt;_YYYY-MM-DD.xlsx</td><td>12 bước job breakdown + ký người hướng dẫn + link tình huống</td></tr>
 <tr><td>Quiz result</td><td>SYS-OPS-17_Quiz_YYYY-MM-DD.xlsx</td><td>Điểm + câu sai + kế hoạch bù</td></tr>
-<tr><td>Effectiveness evidence</td><td>CAPA_&lt;CAPA-ID&gt;_Effectiveness_YYYY-MM-DD.pdf</td><td>Dữ liệu trước/sau + cửa sổ theo dõi + kết luận không tái diễn</td></tr>
+<tr><td>Effectiveness bằng chứng</td><td>CAPA_&lt;CAPA-ID&gt;_Effectiveness_YYYY-MM-DD.pdf</td><td>Dữ liệu trước/sau + cửa sổ theo dõi + kết luận không tái diễn</td></tr>
 </tbody>
 </table>
 </div>
@@ -813,17 +813,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Không dùng tên mơ hồ như “scan1.pdf”, “image.png”.</li>
 <li>EvidenceFolderUrl trong list trỏ tới thư mục SSOT; không đính file vào list.</li>
 </ul>
-<h3 class="h3">13.3 Common audit findings &amp; prevention (ít nhất 8)</h3>
+<h3 class="h3">13.3 Common đánh giá findings &amp; prevention (ít nhất 8)</h3>
 <ol style="line-height:1.9">
 <li><b>AF-01:</b> Không chứng minh kiểm soát đầu ra không phù hợp (8.7). <b>Chặn:</b> HOLD vật lý + QCHoldLog.</li>
-<li><b>AF-02:</b> NCR thiếu dữ kiện tối thiểu (Job/Rev/Qty/ảnh/đo). <b>Chặn:</b> rule mở NCR và checklist bước 4–5.</li>
-<li><b>AF-03:</b> Concession không có chấp thuận bằng văn bản trước giao. <b>Chặn:</b> Gate-Concession + BLOCK ship.</li>
+<li><b>AF-02:</b> NCR thiếu dữ kiện tối thiểu (Job/Rev/Qty/ảnh/đo). <b>Chặn:</b> rule mở NCR và bảng kiểm bước 4–5.</li>
+<li><b>AF-03:</b> Concession không có chấp thuận bằng văn bản trước giao. <b>Chặn:</b> Cổng kiểm soát-Concession + BLOCK ship.</li>
 <li><b>AF-04:</b> Rework không có WI hoặc không có verification report. <b>Chặn:</b> bắt buộc WI_Rework + IR Verify.</li>
 <li><b>AF-05:</b> Nguyên nhân gốc dừng ở mức “do người”. <b>Chặn:</b> bắt buộc xác định cơ chế + điểm lọt.</li>
-<li><b>AF-06:</b> CAPA đóng không có effectiveness check (10.2). <b>Chặn:</b> CAPA8D.EffectivenessCheckDate + evidence trước/sau.</li>
-<li><b>AF-07:</b> Evidence nằm ngoài SSOT hoặc thiếu link. <b>Chặn:</b> EvidenceFolderUrl + quy tắc liên kết, không sao chép.</li>
+<li><b>AF-06:</b> CAPA đóng không có effectiveness check (10.2). <b>Chặn:</b> CAPA8D.EffectivenessCheckDate + bằng chứng trước/sau.</li>
+<li><b>AF-07:</b> Bằng chứng nằm ngoài SSOT hoặc thiếu link. <b>Chặn:</b> EvidenceFolderUrl + quy tắc liên kết, không sao chép.</li>
 <li><b>AF-08:</b> OOT gage không đánh giá ảnh hưởng. <b>Chặn:</b> STOP theo FF-05 + mở NCR khi có rủi ro.</li>
-<li><b>AF-09:</b> Bypass gate do áp lực giao hàng. <b>Chặn:</b> ShipRelease gate + Supervisor escalation.</li>
+<li><b>AF-09:</b> Bypass cổng kiểm soát do áp lực giao hàng. <b>Chặn:</b> ShipRelease cổng kiểm soát + Supervisor escalation.</li>
 <li><b>AF-10:</b> Mã list sai (Severity/DefectType/Disposition) làm sai phân tích xu hướng. <b>Chặn:</b> mapping mục 2.1 + kiểm tra QA trước khi đóng.</li>
 </ol>
 </div>

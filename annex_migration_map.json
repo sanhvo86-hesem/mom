@@ -295,7 +295,7 @@
     "desc_slug": "controlled-excel-workbook-execution-model",
     "reason": "prefix=qms",
     "new_num": 125,
-    "new_code": "ANNEX-125",
+    "new_code": "(removed)",
     "new_file": "annex-125-controlled-excel-workbook-execution-model.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -307,7 +307,7 @@
     "desc_slug": "html-form-to-excel-workbook-crosswalk-and-impact-register",
     "reason": "prefix=qms",
     "new_num": 126,
-    "new_code": "ANNEX-126",
+    "new_code": "(removed)",
     "new_file": "annex-126-html-form-to-excel-workbook-crosswalk-and-impact-register.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -319,7 +319,7 @@
     "desc_slug": "excel-form-web-access-platform-options",
     "reason": "prefix=qms",
     "new_num": 127,
-    "new_code": "ANNEX-127",
+    "new_code": "(removed)",
     "new_file": "annex-127-excel-form-web-access-platform-options.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -331,7 +331,7 @@
     "desc_slug": "excel-form-version-control-and-release-workflow",
     "reason": "prefix=qms",
     "new_num": 128,
-    "new_code": "ANNEX-128",
+    "new_code": "(removed)",
     "new_file": "annex-128-excel-form-version-control-and-release-workflow.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -343,7 +343,7 @@
     "desc_slug": "excel-form-desktop-execution-macro-security-and-trusted-location-policy",
     "reason": "prefix=qms",
     "new_num": 129,
-    "new_code": "ANNEX-129",
+    "new_code": "(removed)",
     "new_file": "annex-129-excel-form-desktop-execution-macro-security-and-trusted-location-policy.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -355,7 +355,7 @@
     "desc_slug": "excel-form-download-only-delivery-profile-and-uat-gate",
     "reason": "prefix=qms",
     "new_num": 130,
-    "new_code": "ANNEX-130",
+    "new_code": "(removed)",
     "new_file": "annex-130-excel-form-download-only-delivery-profile-and-uat-gate.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -367,7 +367,7 @@
     "desc_slug": "excel-form-system-deep-audit-and-repair-closure",
     "reason": "prefix=qms",
     "new_num": 131,
-    "new_code": "ANNEX-131",
+    "new_code": "(removed)",
     "new_file": "annex-131-excel-form-system-deep-audit-and-repair-closure.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -379,7 +379,7 @@
     "desc_slug": "excel-form-download-only-runtime-rollout-and-server-checklist",
     "reason": "prefix=qms",
     "new_num": 132,
-    "new_code": "ANNEX-132",
+    "new_code": "(removed)",
     "new_file": "annex-132-excel-form-download-only-runtime-rollout-and-server-checklist.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -391,7 +391,7 @@
     "desc_slug": "excel-form-desktop-excel-endpoint-baseline-and-macro-trust-rollout",
     "reason": "prefix=qms",
     "new_num": 133,
-    "new_code": "ANNEX-133",
+    "new_code": "(removed)",
     "new_file": "annex-133-excel-form-desktop-excel-endpoint-baseline-and-macro-trust-rollout.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -403,7 +403,7 @@
     "desc_slug": "excel-form-production-acceptance-and-uat-matrix",
     "reason": "prefix=qms",
     "new_num": 134,
-    "new_code": "ANNEX-134",
+    "new_code": "(removed)",
     "new_file": "annex-134-excel-form-production-acceptance-and-uat-matrix.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -415,7 +415,7 @@
     "desc_slug": "excel-form-periodic-integrity-audit-and-control-cadence",
     "reason": "prefix=qms",
     "new_num": 135,
-    "new_code": "ANNEX-135",
+    "new_code": "(removed)",
     "new_file": "annex-135-excel-form-periodic-integrity-audit-and-control-cadence.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -427,7 +427,7 @@
     "desc_slug": "excel-form-server-stack-download-delivery-profiles",
     "reason": "prefix=qms",
     "new_num": 136,
-    "new_code": "ANNEX-136",
+    "new_code": "(removed)",
     "new_file": "annex-136-excel-form-server-stack-download-delivery-profiles.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -439,7 +439,7 @@
     "desc_slug": "excel-form-pilot-endpoint-rollout-and-save-path-control",
     "reason": "prefix=qms",
     "new_num": 137,
-    "new_code": "ANNEX-137",
+    "new_code": "(removed)",
     "new_file": "annex-137-excel-form-pilot-endpoint-rollout-and-save-path-control.html",
     "new_folder": "01-ANNEX-100"
   },
@@ -451,7 +451,7 @@
     "desc_slug": "excel-form-editorial-consistency-audit-and-final-repair-register",
     "reason": "prefix=qms",
     "new_num": 138,
-    "new_code": "ANNEX-138",
+    "new_code": "(removed)",
     "new_file": "annex-138-excel-form-editorial-consistency-audit-and-final-repair-register.html",
     "new_folder": "01-ANNEX-100"
   },

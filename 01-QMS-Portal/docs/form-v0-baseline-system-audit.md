@@ -14,7 +14,7 @@ Ngày chốt: **2026-03-21**
 1. Chỉ có workbook `.xlsx` là form active.
 2. Portal và link nội bộ phải tải trực tiếp workbook.
 3. Không duy trì thư mục archive/backups trong package V0.
-4. Mã không phát hành trong V0 chỉ được chuẩn hóa tại ANNEX-126 và Form Control Center.
+4. Mã không phát hành trong V0 chỉ được chuẩn hóa tại (removed) và Form Control Center.
 
 ## Mã không phát hành trong V0
 - **FRM-103** → bao phủ bởi: FRM-101, FRM-104

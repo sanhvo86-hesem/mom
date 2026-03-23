@@ -100,6 +100,86 @@ function customRule(key, re, handler) {
 }
 
 const RULES = [
+  commonRule(
+    "cleanup_quality_gate",
+    /cổng kiểm soát chất lượng\s*\(\s*quality cổng kiểm soát(?:\s*\(\s*gate\s*\))?\s*\)/gi,
+    "cổng kiểm soát chất lượng (quality gate)"
+  ),
+  commonRule(
+    "cleanup_quality_gate_loose",
+    /quality cổng kiểm soát(?:\s*\(\s*gate\s*\))?/gi,
+    "quality gate"
+  ),
+  commonRule(
+    "cleanup_stage_gate",
+    /theo từng cổng kiểm soát\s*\(\s*stage-cổng kiểm soát\s*\)/gi,
+    "theo từng cổng kiểm soát (stage-gate)"
+  ),
+  commonRule(
+    "cleanup_evidence_pack",
+    /bộ bằng chứng\s*\(\s*bằng chứng pack\s*\)|bằng chứng package/gi,
+    "bộ bằng chứng (evidence pack)"
+  ),
+  commonRule(
+    "cleanup_follow_up",
+    /theo dõi tiếp\s*\(\s*theo dõi tiếp\s*\)/gi,
+    "theo dõi tiếp"
+  ),
+  commonRule(
+    "cleanup_ship_release_pack",
+    /(?:bộ hồ sơ\s*)?(?:bộ hồ sơ\s*)?phê duyệt giao hàng\s*\(\s*phê duyệt giao hàng(?:\s*\(\s*ship release\s*\))?\s*pack(?:age)?\s*\)/gi,
+    "bộ hồ sơ phê duyệt giao hàng (ship release pack)"
+  ),
+  commonRule(
+    "cleanup_ship_confirm",
+    /xác nhận giao hàng\s*\(\s*(?:xác nhận giao hàng(?:\s*\(\s*ship confirm\s*\))?\s*\/\s*xác nhận giao hàng|ship confirm(?:\s*\/\s*xác nhận giao hàng)?)\s*\)/gi,
+    "xác nhận giao hàng (ship confirm)"
+  ),
+  commonRule(
+    "cleanup_access_phrase",
+    /quyền truy cậps,\s*access,\s*data governance,\s*contingency/gi,
+    "quyền truy cập, quản trị truy cập, quản trị dữ liệu và ứng phó gián đoạn"
+  ),
+  commonRule(
+    "cleanup_ksem",
+    /Knowledge.?Skill.?Bằng chứng.?Metric(?:\s*\(K.?S.?E.?M\))?/gi,
+    "Kiến thức – Kỹ năng – Bằng chứng – Chỉ số (K-S-E-M)"
+  ),
+  commonRule(
+    "cleanup_no_evidence_no_gate",
+    /không có bằng chứng thì không qua cổng kiểm soát\s*\(\s*No bằng chứng = No cổng kiểm soát(?:\s*\/\s*không có bằng chứng thì không qua cổng kiểm soát)?\s*\)|No bằng chứng = No cổng kiểm soát(?:\s*\/\s*không có bằng chứng thì không qua cổng kiểm soát)?|No evidence = No gate/gi,
+    "không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)"
+  ),
+  commonRule(
+    "cleanup_system_of_record",
+    /System of Hồ sơ/gi,
+    "nguồn chuẩn"
+  ),
+  commonRule(
+    "cleanup_60_second_audit_drill",
+    /60-second Đánh giá Drill|60-second đánh giá drill|60-second audit drill/gi,
+    "diễn tập đánh giá 60 giây"
+  ),
+  commonRule(
+    "cleanup_readiness_before_run",
+    /mức sẵn sàng\s+before run/gi,
+    "mức sẵn sàng trước khi chạy"
+  ),
+  commonRule(
+    "cleanup_gate_status",
+    /cổng kiểm soát\s+status/gi,
+    "trạng thái cổng kiểm soát"
+  ),
+  commonRule(
+    "cleanup_setup_record",
+    /setup\s+hồ sơ/gi,
+    "hồ sơ thiết lập"
+  ),
+  commonRule(
+    "cleanup_final_ship_release",
+    /Final phê duyệt giao hàng/gi,
+    "Phê duyệt giao hàng cuối cùng"
+  ),
   uncommonRule(
     "stage_gate",
     /\btheo từng cổng kiểm soát\s*\(\s*stage-gate\s*\)|\bstage-gate\b/gi,
@@ -114,7 +194,7 @@ const RULES = [
   ),
   uncommonRule(
     "gate",
-    /\bcổng kiểm soát\s*\(\s*gate\s*\)|\bgate\b/gi,
+    /\bcổng kiểm soát\s*\(\s*gate\s*\)|(?<!quality )(?<!stage-)\bgate\b/gi,
     "cổng kiểm soát (gate)",
     "cổng kiểm soát"
   ),
@@ -144,7 +224,7 @@ const RULES = [
   ),
   uncommonRule(
     "evidence_pack",
-    /\bbộ bằng chứng\s*\(\s*evidence pack\s*\)|\bevidence pack\b/gi,
+    /\bbộ bằng chứng\s*\(\s*evidence (?:pack|package)\s*\)|\bevidence (?:pack|package)\b/gi,
     "bộ bằng chứng (evidence pack)",
     "bộ bằng chứng"
   ),
@@ -156,7 +236,7 @@ const RULES = [
   ),
   uncommonRule(
     "ship_release_pack",
-    /\bbộ hồ sơ phê duyệt giao hàng\s*\(\s*ship release pack\s*\)|\bship release pack\b/gi,
+    /\bbộ hồ sơ phê duyệt giao hàng\s*\(\s*ship release pack\s*\)|\bphê duyệt giao hàng(?:\s*\(\s*ship release\s*\))?\s*pack(?:age)?\b|\bship release pack(?:age)?\b/gi,
     "bộ hồ sơ phê duyệt giao hàng (ship release pack)",
     "bộ hồ sơ phê duyệt giao hàng"
   ),
@@ -168,13 +248,13 @@ const RULES = [
   ),
   uncommonRule(
     "ship_confirm",
-    /\bxác nhận giao hàng\s*\(\s*ship confirm\s*\)|\bship confirm\b/gi,
+    /\bxác nhận giao hàng\s*\(\s*(?:xác nhận giao hàng\s*\(\s*ship confirm\s*\)\s*\/\s*xác nhận giao hàng|ship confirm(?:\s*\/\s*xác nhận giao hàng)?)\s*\)|\bship confirm\b/gi,
     "xác nhận giao hàng (ship confirm)",
     "xác nhận giao hàng"
   ),
   uncommonRule(
     "ship_release",
-    /\bphê duyệt giao hàng\s*\(\s*ship(?:ment)? release(?:\s*\/\s*phê duyệt giao hàng)?\s*\)|\bship(?:ment)? release\b/gi,
+    /\bphê duyệt giao hàng\s*\(\s*ship(?:ment)? release(?:\s*\/\s*phê duyệt giao hàng)?\s*\)(?!\s*pack(?:age)?\b)|\bship(?:ment)? release\b(?!\s*pack(?:age)?\b)/gi,
     "phê duyệt giao hàng (ship release)",
     "phê duyệt giao hàng"
   ),
@@ -267,10 +347,22 @@ const RULES = [
     /\blệnh sản xuất\s*\(\s*job[- ]order\s*\)|\bjob[- ]orders?\b/gi,
     "lệnh sản xuất"
   ),
+  commonRule("readiness_before_run", /\breadiness before run\b/gi, "mức sẵn sàng trước khi chạy"),
   commonRule(
     "setup_first_piece",
     /\bsetup\s*(?:and|&)\s*first[- ]piece\b/gi,
     "thiết lập và kiểm tra mẫu đầu"
+  ),
+  commonRule("setup_record", /\bsetup record\b/gi, "hồ sơ thiết lập"),
+  commonRule("gate_status", /\bgate status\b/gi, "trạng thái cổng kiểm soát"),
+  commonRule("final_ship_release", /\bfinal ship(?:ment)? release\b/gi, "phê duyệt giao hàng cuối cùng"),
+  commonRule("packing_list", /\bpacking list\b/gi, "phiếu kê đóng gói"),
+  commonRule("quarterly_access_review", /\brà soát quyền truy cập hàng quý\s*\(\s*quarterly access review(?:\s*\/\s*rà soát quyền truy cập hàng quý)?\s*\)|\bquarterly access review\b/gi, "rà soát quyền truy cập hàng quý"),
+  uncommonRule(
+    "risk_register",
+    /\bsổ đăng ký rủi ro\s*\(\s*risk register\s*\)|\brisk register\b/gi,
+    "sổ đăng ký rủi ro (risk register)",
+    "sổ đăng ký rủi ro"
   ),
   commonRule("access_control", /\baccess control\b/gi, "kiểm soát truy cập"),
   commonRule("approval_matrix", /\bapproval matrix\b/gi, "ma trận phê duyệt"),
@@ -312,7 +404,11 @@ const RULES = [
   commonRule("shipment_update", /\bshipment update\b/gi, "cập nhật giao hàng"),
   commonRule("delay_notice", /\bdelay notice\b/gi, "thông báo chậm"),
   commonRule("ship_mode", /\bmode ship\b/gi, "phương thức giao hàng"),
-  commonRule("follow_up", /\bfollow-up\b/gi, "theo dõi tiếp"),
+  commonRule(
+    "follow_up",
+    /\btheo dõi tiếp\s*\(\s*follow-up\s*\)|\bfollow-up\b/gi,
+    "theo dõi tiếp"
+  ),
   commonRule("workspace", /\bworkspace\b/gi, "không gian làm việc"),
   commonRule("offline_mode", /\boffline mode\b/gi, "chế độ ngoại tuyến"),
   commonRule("restore_test", /\brestore test\b/gi, "thử khôi phục"),
@@ -320,7 +416,7 @@ const RULES = [
   commonRule("source_revision", /\bsource revision\b/gi, "phiên bản nguồn"),
   commonRule("evidence_driven", /\bevidence-driven\b/gi, "dựa trên bằng chứng"),
   commonRule("evidence_requirements", /\bevidence requirements?\b/gi, "yêu cầu bằng chứng"),
-  commonRule("evidence", /\bevidence\b/gi, "bằng chứng"),
+  commonRule("evidence", /\bevidence\b(?!\s*pack\b)/gi, "bằng chứng"),
   commonRule("checklists", /\bchecklists\b/gi, "bảng kiểm"),
   commonRule("checklist", /\bchecklist\b/gi, "bảng kiểm"),
   commonRule("authority", /\bauthority\b/gi, "thẩm quyền"),
@@ -344,6 +440,13 @@ const RULES = [
   ),
   commonRule("owners", /\bowners\b/gi, "người phụ trách"),
   commonRule("owner", /\bowner\b/gi, "người phụ trách"),
+  commonRule("system_of_record", /\bSystem of Record\b/gi, "nguồn chuẩn"),
+  commonRule("special_process", /\bspecial process\b/gi, "công đoạn đặc biệt"),
+  commonRule("standards", /\bstandards\b/gi, "tiêu chuẩn"),
+  commonRule("metrics", /\bmetrics\b/gi, "chỉ số"),
+  commonRule("metric", /\bmetric\b/gi, "chỉ số"),
+  commonRule("processes", /\bprocesses\b/gi, "quy trình"),
+  commonRule("process", /\bprocess\b/gi, "quy trình"),
   commonRule("records", /\brecords\b/gi, "hồ sơ"),
   commonRule("record", /\brecord\b/gi, "hồ sơ"),
   commonRule("complaints", /\bcomplaints\b/gi, "khiếu nại"),
