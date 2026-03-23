@@ -52,8 +52,20 @@ LOGO_PATH = "C:/Users/TEST4/qms.hesem.com.vn/04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/h
 LOGO_ASPECT = 3.46
 TMPL_PATH = "C:/Users/TEST4/Desktop/frm-000-master-template.xlsx"
 
+from openpyxl.comments import Comment as XlComment
+
 def fi(c): return PatternFill(start_color=c, end_color=c, fill_type='solid')
 def fo(sz, bold=False, c='dk'): return Font(name='Segoe UI', size=sz, bold=bold, color=P[c])
+
+def cmt(vn_name, *details):
+    """Create cell comment: line1=Vietnamese name, line2+=description/examples"""
+    text = vn_name
+    for d in details:
+        text += '\n' + d
+    c = XlComment(text, 'QMS')
+    c.width = 280
+    c.height = max(100, 30 * (1 + len(details)))
+    return c
 AL = Alignment(horizontal='left', vertical='center', wrap_text=True)
 AC = Alignment(horizontal='center', vertical='center', wrap_text=True)
 AT = Alignment(horizontal='left', vertical='top', wrap_text=True)
@@ -164,7 +176,7 @@ def spacer(ws, r, nc):
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=nc)
     return r + 1
 
-def sect_header(ws, r, nc, text):
+def sect_header(ws, r, nc, text, sect_cmt=None):
     ws.row_dimensions[r].height = 17.0
     for col in range(1, nc+1):
         ws.cell(r, col).fill = fi(P['ice'])
@@ -174,9 +186,11 @@ def sect_header(ws, r, nc, text):
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=nc)
     c = ws.cell(r, 1); c.value = text; c.font = fo(9, True, 'primary')
     c.alignment = Alignment(horizontal='left', vertical='center', indent=1, wrap_text=True)
+    if sect_cmt: c.comment = sect_cmt
     return r + 1
 
-def data_pair(ws, r, nc, zones, lL, lR, first=False, last=False):
+def data_pair(ws, r, nc, zones, lL, lR, first=False, last=False, cmtL=None, cmtR=None):
+    """4-zone data pair. cmtL/cmtR = Comment objects for left/right LABELS."""
     ws.row_dimensions[r].height = 20.0
     _borders_section_row(ws, r, nc, zones, first, last)
     fills = [fi(P['fog']), fi(P['white']), fi(P['fog']), fi(P['white'])]
@@ -184,9 +198,11 @@ def data_pair(ws, r, nc, zones, lL, lR, first=False, last=False):
         for col in range(s, e+1): ws.cell(r, col).fill = zf
     for s, e in zones:
         ws.merge_cells(start_row=r, start_column=s, end_row=r, end_column=e)
-    ws.cell(r, zones[0][0]).value = lL; ws.cell(r, zones[0][0]).font = fo(8, True, 'mid'); ws.cell(r, zones[0][0]).alignment = AL
+    c = ws.cell(r, zones[0][0]); c.value = lL; c.font = fo(8, True, 'mid'); c.alignment = AL
+    if cmtL: c.comment = cmtL
     ws.cell(r, zones[1][0]).font = fo(8, False, 'dk'); ws.cell(r, zones[1][0]).alignment = AL
-    ws.cell(r, zones[2][0]).value = lR; ws.cell(r, zones[2][0]).font = fo(8, True, 'mid'); ws.cell(r, zones[2][0]).alignment = AL
+    c = ws.cell(r, zones[2][0]); c.value = lR; c.font = fo(8, True, 'mid'); c.alignment = AL
+    if cmtR: c.comment = cmtR
     ws.cell(r, zones[3][0]).font = fo(8, False, 'dk'); ws.cell(r, zones[3][0]).alignment = AL
     return r + 1
 
@@ -200,7 +216,7 @@ def col_header(ws, r, nc, zones, headers):
         c.font = Font(name='Segoe UI', size=9, bold=True, color='FFFFFF'); c.alignment = AC
     return r + 1
 
-def check_row(ws, r, nc, zones, num, cat, item, criteria, last=False, ck_start=None):
+def check_row(ws, r, nc, zones, num, cat, item, criteria, last=False, ck_start=None, item_cmt=None):
     ws.row_dimensions[r].height = 20.0
     _borders_table_row(ws, r, nc, zones, last)
     even = (num % 2 == 0)
@@ -218,7 +234,8 @@ def check_row(ws, r, nc, zones, num, cat, item, criteria, last=False, ck_start=N
     ws.cell(r, zones[0][0]).font = fo(8, True, 'mid'); ws.cell(r, zones[0][0]).alignment = AC
     c = ws.cell(r, zones[1][0]); c.value = cat; c.alignment = AC
     c.font = Font(name='Segoe UI', size=8, bold=True, color=catc[1]) if catc else fo(8, True, 'mid')
-    ws.cell(r, zones[2][0]).value = item; ws.cell(r, zones[2][0]).font = fo(8, False, 'dk'); ws.cell(r, zones[2][0]).alignment = AL
+    ic = ws.cell(r, zones[2][0]); ic.value = item; ic.font = fo(8, False, 'dk'); ic.alignment = AL
+    if item_cmt: ic.comment = item_cmt
     crit_col = zones[3][0]
     ws.cell(r, crit_col).value = criteria; ws.cell(r, crit_col).font = fo(7, False, 'muted'); ws.cell(r, crit_col).alignment = AL
     ws.cell(r, zones[4][0]).font = fo(8, False, 'dk'); ws.cell(r, zones[4][0]).alignment = AC
@@ -369,10 +386,17 @@ def generate_form(spec, output_path):
     r = spacer(ws, r, nc)
 
     # Reference section
-    r = sect_header(ws, r, nc, '  1.  REFERENCE INFORMATION')
+    ref_sect_title = spec.get('ref_title', '  1.  REFERENCE INFORMATION')
+    r = sect_header(ws, r, nc, ref_sect_title)
+    if spec.get('ref_sect_cmt'):
+        ws.cell(r-1, 1).comment = spec['ref_sect_cmt']
     ref = spec['ref_fields']
+    ref_cmts = spec.get('ref_comments', [None] * len(ref))
     for i, (lL, lR) in enumerate(ref):
-        r = data_pair(ws, r, nc, zones['pair'], lL, lR, first=(i==0), last=(i==len(ref)-1))
+        rc = ref_cmts[i] if i < len(ref_cmts) else None
+        cmtL = rc[0] if rc and len(rc) > 0 else None
+        cmtR = rc[1] if rc and len(rc) > 1 else None
+        r = data_pair(ws, r, nc, zones['pair'], lL, lR, first=(i==0), last=(i==len(ref)-1), cmtL=cmtL, cmtR=cmtR)
     r = spacer(ws, r, nc)
 
     # Content sections
@@ -380,21 +404,41 @@ def generate_form(spec, output_path):
     ck_start = ck_end = None
 
     for section in spec.get('sections', []):
-        r = sect_header(ws, r, nc, f'  {sect_num}.  {section["title"]}')
+        r = sect_header(ws, r, nc, f'  {sect_num}.  {section["title"]}', sect_cmt=section.get('sect_cmt'))
 
         if section['type'] == 'checklist':
             hdrs = section.get('headers', ['#','Cat.','Check Item','Acceptance Criteria','Result','Owner'])
-            r = col_header(ws, r, nc, zones['check'], hdrs)
+            # Allow custom check zones if headers count != standard 6
+            if len(hdrs) != len(zones['check']):
+                # Auto-generate equal-width zones for custom column count
+                n = len(hdrs)
+                w = nc // n
+                ck_zones = []
+                for ci in range(n):
+                    s = ci * w + 1
+                    e = (ci + 1) * w if ci < n - 1 else nc
+                    ck_zones.append((s, e))
+            else:
+                ck_zones = zones['check']
+            r = col_header(ws, r, nc, ck_zones, hdrs)
+            hdr_r = r - 1
+            # Add comments on column headers if provided
+            col_cmts = section.get('col_comments', {})
+            for idx, cm in col_cmts.items():
+                if idx < len(ck_zones):
+                    ws.cell(hdr_r, ck_zones[idx][0]).comment = cm
             ck_start = r
             items = section['items']
+            item_cmts = section.get('item_comments', {})
             total_rows = len(items) + section.get('blank_rows', 0)
             for i, (num, cat, item, criteria) in enumerate(items):
                 is_last = (i == len(items) - 1) and section.get('blank_rows', 0) == 0
-                r = check_row(ws, r, nc, zones['check'], num, cat, item, criteria, last=is_last, ck_start=ck_start)
+                ic = item_cmts.get(i)
+                r = check_row(ws, r, nc, ck_zones, num, cat, item, criteria, last=is_last, ck_start=ck_start, item_cmt=ic)
             for j in range(section.get('blank_rows', 0)):
                 bnum = len(items) + j + 1
                 is_last = (j == section.get('blank_rows', 0) - 1)
-                r = blank_check_row(ws, r, nc, zones['check'], bnum, last=is_last, ck_start=ck_start)
+                r = blank_check_row(ws, r, nc, ck_zones, bnum, last=is_last, ck_start=ck_start)
             ck_end = r - 1
 
         elif section['type'] == 'textarea':
@@ -407,8 +451,12 @@ def generate_form(spec, output_path):
 
         elif section['type'] == 'pairs':
             fields = section['fields']
+            pair_cmts = section.get('pair_comments', [None] * len(fields))
             for i, (lL, lR) in enumerate(fields):
-                r = data_pair(ws, r, nc, zones['pair'], lL, lR, first=(i==0), last=(i==len(fields)-1))
+                pc = pair_cmts[i] if i < len(pair_cmts) else None
+                cmtL = pc[0] if pc and len(pc) > 0 else None
+                cmtR = pc[1] if pc and len(pc) > 1 else None
+                r = data_pair(ws, r, nc, zones['pair'], lL, lR, first=(i==0), last=(i==len(fields)-1), cmtL=cmtL, cmtR=cmtR)
 
         r = spacer(ws, r, nc)
         sect_num += 1
