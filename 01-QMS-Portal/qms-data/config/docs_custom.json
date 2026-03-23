@@ -3267,7 +3267,7 @@
     {
       "code": "FRM-CONTROL-STACK-PROFILES",
       "title": "FRM Control — Server Stack Profile Library",
-      "path": "04-Bieu-Mau/10-FRM-CONTROL/server-stack-profile-library.html",
+      "path": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/server-stack-profile-library.html",
       "owner": "IT / QA-QMS",
       "category": "CONTROL",
       "cat": "CONTROL",
@@ -3276,7 +3276,7 @@
     {
       "code": "FRM-CONTROL-PILOT-ENDPOINT",
       "title": "FRM Control — Pilot Endpoint Rollout Pack",
-      "path": "04-Bieu-Mau/10-FRM-CONTROL/pilot-endpoint-rollout-pack.html",
+      "path": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/pilot-endpoint-rollout-pack.html",
       "owner": "IT / QA-QMS / Functional Owners",
       "category": "CONTROL",
       "cat": "CONTROL",
@@ -3285,7 +3285,7 @@
     {
       "code": "FRM-CONTROL-EDITORIAL-AUDIT",
       "title": "FRM Control — Editorial Consistency Audit",
-      "path": "04-Bieu-Mau/10-FRM-CONTROL/editorial-consistency-audit.html",
+      "path": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/editorial-consistency-audit.html",
       "owner": "QA-QMS / IT",
       "category": "CONTROL",
       "cat": "CONTROL",

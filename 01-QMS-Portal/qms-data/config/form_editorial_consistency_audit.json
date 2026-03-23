@@ -15,7 +15,7 @@
     "Bổ sung datasets JSON cho stack profiles, pilot rollout và editorial audit"
   ],
   "supporting_docs": {
-    "html_pack": "04-Bieu-Mau/10-FRM-CONTROL/editorial-consistency-audit.html",
+    "html_pack": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/editorial-consistency-audit.html",
     "portal_note": "01-QMS-Portal/docs/form-editorial-consistency-audit.md",
     "standard_ref": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-138-excel-form-editorial-consistency-audit-and-final-repair-register.html"
   },

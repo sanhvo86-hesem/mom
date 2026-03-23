@@ -60,8 +60,8 @@
   "04-Bieu-Mau/07-FRM-700": "Biểu mẫu kho vận — Receiving/IQC, Shipping, WIP Tag, Labels, Packaging, Cleanliness, Leak Test, FOD.",
   "04-Bieu-Mau/08-FRM-800": "Biểu mẫu nhân sự — Training Plan, OJT Checklist, Competence Assessment, Skills Matrix, Incident, Invoice.",
   "04-Bieu-Mau/09-FRM-900": "Biểu mẫu cải tiến — Internal Audit Checklist, Layered Process Audit, Management Review Minutes.",
-  "04-Bieu-Mau/10-FRM-CONTROL": "Trung tâm kiểm soát FRM — Form Register, Release Checklist, Version Control, Source Import, UAT.",
-  "04-Bieu-Mau/10-FRM-CONTROL/runtime-examples": "Ví dụ cấu hình triển khai download-only — Apache, Nginx, IIS, reverse proxy/CDN.",
+  "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM": "Trung tâm kiểm soát FRM — Form Register, Release Checklist, Version Control, Source Import, UAT.",
+  "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/runtime-examples": "Ví dụ cấu hình triển khai download-only — Apache, Nginx, IIS, reverse proxy/CDN.",
 
   "10-Training-Academy": "Học viện Đào tạo — Năng lực, Giáo trình, OJT, System Ops và Templates.",
   "10-Training-Academy/01-Competency-System": "Hệ thống năng lực — Framework, 19 Competencies (C01-C19), Level 1-4, Training Matrices.",
@@ -154,7 +154,7 @@
   "07-FRM-700": "Biểu mẫu kho vận — Receiving/IQC, Shipping, Labels, Packaging, Cleanliness, Leak Test, FOD.",
   "08-FRM-800": "Biểu mẫu nhân sự — Training Plan, OJT, Competence, Skills Matrix, Incident, Invoice.",
   "09-FRM-900": "Biểu mẫu cải tiến — Internal Audit Checklist, Layered Process Audit, Management Review.",
-  "10-FRM-CONTROL": "Trung tâm kiểm soát FRM — Register, Release Checklist, Version Control, Source Import, UAT.",
+  "00-FORM-DESIGN-SYSTEM": "Trung tâm kiểm soát FRM — Register, Release Checklist, Version Control, Source Import, UAT.",
 
   "01-Competency-System": "Hệ thống năng lực — Framework, 19 Competencies, Level 1-4, Training Matrices.",
   "01-Framework": "Khung năng lực nền tảng — Assessment Guide, Metrics, Skill Matrix & Bonus.",

@@ -30,10 +30,10 @@
 <div class="cardx"><div class="muted2">Preview rule</div><b>Không inline preview</b></div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table smalltable"><thead><tr><th>Stack</th><th>Điểm phải khóa</th><th>Bằng chứng tối thiểu</th><th>Example file</th></tr></thead><tbody>
-<tr><td>Apache</td><td>MIME cho `.xlsx`, `Content-Disposition: attachment`, `X-Content-Type-Options: nosniff`, tắt directory listing.</td><td>Header capture + config review</td><td><a href="../../../04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/apache-download-only-forms.conf.example">apache-download-only-forms.conf.example</a></td></tr>
-<tr><td>Nginx</td><td>Preserve attachment header, no preview rewrite, no public cache, no autoindex.</td><td>Header capture + location block review</td><td><a href="../../../04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/nginx-download-only-forms.conf.example">nginx-download-only-forms.conf.example</a></td></tr>
-<tr><td>IIS</td><td>MIME mapping, custom headers, disable directory browse, preserve attachment qua rewrite/reverse proxy.</td><td>Header capture + web.config / IIS setting review</td><td><a href="../../../04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/iis-download-only-forms.web.config.example">iis-download-only-forms.web.config.example</a></td></tr>
-<tr><td>Reverse proxy / CDN</td><td>Không strip attachment header, không biến workbook thành preview, không cache public, không content-transform.</td><td>Edge header capture + route review</td><td><a href="../../../04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/reverse-proxy-cdn-download-policy.md">reverse-proxy-cdn-download-policy.md</a></td></tr>
+<tr><td>Apache</td><td>MIME cho `.xlsx`, `Content-Disposition: attachment`, `X-Content-Type-Options: nosniff`, tắt directory listing.</td><td>Header capture + config review</td><td><a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/runtime-examples/apache-download-only-forms.conf.example">apache-download-only-forms.conf.example</a></td></tr>
+<tr><td>Nginx</td><td>Preserve attachment header, no preview rewrite, no public cache, no autoindex.</td><td>Header capture + location block review</td><td><a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/runtime-examples/nginx-download-only-forms.conf.example">nginx-download-only-forms.conf.example</a></td></tr>
+<tr><td>IIS</td><td>MIME mapping, custom headers, disable directory browse, preserve attachment qua rewrite/reverse proxy.</td><td>Header capture + web.config / IIS setting review</td><td><a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/runtime-examples/iis-download-only-forms.web.config.example">iis-download-only-forms.web.config.example</a></td></tr>
+<tr><td>Reverse proxy / CDN</td><td>Không strip attachment header, không biến workbook thành preview, không cache public, không content-transform.</td><td>Edge header capture + route review</td><td><a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/runtime-examples/reverse-proxy-cdn-download-policy.md">reverse-proxy-cdn-download-policy.md</a></td></tr>
 </tbody></table></div>
 <div class="card"><h3 class="h3">Mandatory response profile</h3>
 <ul class="tight">
@@ -44,7 +44,7 @@
 <li>Không cho phép rewrite hoặc plugin nào chuyển workbook sang inline preview.</li>
 <li>Không được tắt attachment chỉ vì tải qua portal, reverse proxy hoặc CDN.</li>
 </ul></div>
-<div class="note-soft"><b>Liên kết vận hành:</b> <a href="annex-130-excel-form-download-only-delivery-profile-and-uat-gate.html">ANNEX-130</a> • <a href="annex-132-excel-form-download-only-runtime-rollout-and-server-checklist.html">ANNEX-132</a> • <a href="../../../04-Bieu-Mau/10-FRM-CONTROL/server-stack-profile-library.html">Thư viện cấu hình máy chủ</a> • <a href="../../../04-Bieu-Mau/10-FRM-CONTROL/server-delivery-rollout-checklist.html">Server Delivery Rollout Checklist</a>.</div>
+<div class="note-soft"><b>Liên kết vận hành:</b> <a href="annex-130-excel-form-download-only-delivery-profile-and-uat-gate.html">ANNEX-130</a> • <a href="annex-132-excel-form-download-only-runtime-rollout-and-server-checklist.html">ANNEX-132</a> • <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/server-stack-profile-library.html">Thư viện cấu hình máy chủ</a> • <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/server-delivery-rollout-checklist.html">Server Delivery Rollout Checklist</a>.</div>
 
 </div>
 </div></div></div></body></html>

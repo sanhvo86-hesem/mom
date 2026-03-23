@@ -1,0 +1,1662 @@
+{
+  "filesScanned": 54,
+  "filesChanged": 54,
+  "totalReplacements": 2806,
+  "topRules": [
+    {
+      "rule": "owner",
+      "count": 282
+    },
+    {
+      "rule": "readiness",
+      "count": 204
+    },
+    {
+      "rule": "audit",
+      "count": 194
+    },
+    {
+      "rule": "record",
+      "count": 171
+    },
+    {
+      "rule": "evidence",
+      "count": 152
+    },
+    {
+      "rule": "records",
+      "count": 147
+    },
+    {
+      "rule": "gate",
+      "count": 137
+    },
+    {
+      "rule": "checklist",
+      "count": 124
+    },
+    {
+      "rule": "first_piece",
+      "count": 113
+    },
+    {
+      "rule": "complaint",
+      "count": 102
+    },
+    {
+      "rule": "transaction",
+      "count": 92
+    },
+    {
+      "rule": "authority",
+      "count": 81
+    },
+    {
+      "rule": "job_order",
+      "count": 70
+    },
+    {
+      "rule": "lead_time",
+      "count": 44
+    },
+    {
+      "rule": "contract_review",
+      "count": 42
+    },
+    {
+      "rule": "change_control",
+      "count": 42
+    },
+    {
+      "rule": "management_review",
+      "count": 41
+    },
+    {
+      "rule": "ship_release",
+      "count": 40
+    },
+    {
+      "rule": "aging",
+      "count": 39
+    },
+    {
+      "rule": "due_date",
+      "count": 38
+    },
+    {
+      "rule": "process_owner",
+      "count": 38
+    },
+    {
+      "rule": "high_mix",
+      "count": 31
+    },
+    {
+      "rule": "lesson_learned",
+      "count": 29
+    },
+    {
+      "rule": "control_tower",
+      "count": 27
+    },
+    {
+      "rule": "quality_gate",
+      "count": 26
+    },
+    {
+      "rule": "workflow",
+      "count": 24
+    },
+    {
+      "rule": "final_inspection",
+      "count": 24
+    },
+    {
+      "rule": "cert_pack",
+      "count": 22
+    },
+    {
+      "rule": "follow_up",
+      "count": 22
+    },
+    {
+      "rule": "root_cause",
+      "count": 20
+    },
+    {
+      "rule": "ship_risk",
+      "count": 19
+    },
+    {
+      "rule": "technical_release",
+      "count": 18
+    },
+    {
+      "rule": "job_dossier",
+      "count": 17
+    },
+    {
+      "rule": "owner_main",
+      "count": 16
+    },
+    {
+      "rule": "title_owner",
+      "count": 15
+    },
+    {
+      "rule": "evidence_pack",
+      "count": 13
+    },
+    {
+      "rule": "pre_run_verification",
+      "count": 12
+    },
+    {
+      "rule": "owners",
+      "count": 12
+    },
+    {
+      "rule": "job_packet",
+      "count": 12
+    },
+    {
+      "rule": "assumption_log",
+      "count": 11
+    },
+    {
+      "rule": "baseline_package",
+      "count": 11
+    },
+    {
+      "rule": "effectivity",
+      "count": 11
+    },
+    {
+      "rule": "pack_reconciliation",
+      "count": 11
+    },
+    {
+      "rule": "authority_matrix",
+      "count": 11
+    },
+    {
+      "rule": "record_integrity",
+      "count": 10
+    },
+    {
+      "rule": "signoff",
+      "count": 9
+    },
+    {
+      "rule": "business_owners",
+      "count": 9
+    },
+    {
+      "rule": "engineering_release",
+      "count": 9
+    },
+    {
+      "rule": "action_tracker",
+      "count": 9
+    },
+    {
+      "rule": "internal_audit",
+      "count": 8
+    },
+    {
+      "rule": "escalation_owner",
+      "count": 8
+    },
+    {
+      "rule": "job_traveler",
+      "count": 8
+    },
+    {
+      "rule": "release_package",
+      "count": 7
+    },
+    {
+      "rule": "ship_confirm",
+      "count": 7
+    },
+    {
+      "rule": "restore_test",
+      "count": 6
+    },
+    {
+      "rule": "inspection_program_release",
+      "count": 6
+    },
+    {
+      "rule": "review_pack",
+      "count": 6
+    },
+    {
+      "rule": "access_control",
+      "count": 6
+    },
+    {
+      "rule": "data_owner",
+      "count": 6
+    },
+    {
+      "rule": "approval_matrix",
+      "count": 6
+    },
+    {
+      "rule": "production_readiness",
+      "count": 4
+    },
+    {
+      "rule": "audit_evidence",
+      "count": 4
+    },
+    {
+      "rule": "record_retention",
+      "count": 4
+    },
+    {
+      "rule": "work_transfer",
+      "count": 4
+    },
+    {
+      "rule": "action_plan",
+      "count": 4
+    },
+    {
+      "rule": "order_ack",
+      "count": 4
+    },
+    {
+      "rule": "hold_point",
+      "count": 4
+    },
+    {
+      "rule": "process_owners",
+      "count": 3
+    },
+    {
+      "rule": "ship_packet",
+      "count": 3
+    },
+    {
+      "rule": "workspace",
+      "count": 3
+    },
+    {
+      "rule": "pending_approvals",
+      "count": 3
+    },
+    {
+      "rule": "contract_screening",
+      "count": 2
+    },
+    {
+      "rule": "support_functions",
+      "count": 2
+    },
+    {
+      "rule": "change_history",
+      "count": 2
+    },
+    {
+      "rule": "source_revision",
+      "count": 2
+    },
+    {
+      "rule": "offline_mode",
+      "count": 2
+    },
+    {
+      "rule": "owner_approval",
+      "count": 2
+    },
+    {
+      "rule": "open_orders",
+      "count": 2
+    },
+    {
+      "rule": "ship_release_pack",
+      "count": 2
+    },
+    {
+      "rule": "complaints",
+      "count": 2
+    },
+    {
+      "rule": "delay_notice",
+      "count": 2
+    },
+    {
+      "rule": "quote_package",
+      "count": 2
+    },
+    {
+      "rule": "hot_issues",
+      "count": 2
+    },
+    {
+      "rule": "low_mid_volume",
+      "count": 1
+    },
+    {
+      "rule": "evidence_driven",
+      "count": 1
+    },
+    {
+      "rule": "owner_giao_dien",
+      "count": 1
+    },
+    {
+      "rule": "source_control",
+      "count": 1
+    },
+    {
+      "rule": "stage_gate",
+      "count": 1
+    },
+    {
+      "rule": "reviewers",
+      "count": 1
+    },
+    {
+      "rule": "reviewed_requirements",
+      "count": 1
+    },
+    {
+      "rule": "department_owners",
+      "count": 1
+    },
+    {
+      "rule": "ship_mode",
+      "count": 1
+    },
+    {
+      "rule": "evidence_requirements",
+      "count": 1
+    },
+    {
+      "rule": "open_issues",
+      "count": 1
+    },
+    {
+      "rule": "internal_owner",
+      "count": 1
+    },
+    {
+      "rule": "shipment_update",
+      "count": 1
+    },
+    {
+      "rule": "high_risk_job",
+      "count": 1
+    },
+    {
+      "rule": "owner_main_lower",
+      "count": 1
+    }
+  ],
+  "changedFiles": [
+    {
+      "path": "02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html",
+      "total": 142,
+      "byRule": {
+        "gate": 14,
+        "evidence": 10,
+        "record": 9,
+        "authority": 6,
+        "effectivity": 5,
+        "management_review": 4,
+        "audit": 4,
+        "owner": 4,
+        "first_piece": 4,
+        "complaint": 3,
+        "workflow": 3,
+        "technical_release": 3,
+        "readiness": 3,
+        "production_readiness": 3,
+        "ship_release": 3,
+        "baseline_package": 3,
+        "job_dossier": 3,
+        "high_mix": 2,
+        "contract_review": 2,
+        "support_functions": 2,
+        "final_inspection": 2,
+        "cert_pack": 2,
+        "pack_reconciliation": 2,
+        "process_owners": 2,
+        "lesson_learned": 2,
+        "signoff": 2,
+        "records": 2,
+        "quality_gate": 1,
+        "job_order": 1,
+        "low_mid_volume": 1,
+        "evidence_driven": 1,
+        "owner_giao_dien": 1,
+        "source_control": 1,
+        "contract_screening": 1,
+        "lead_time": 1,
+        "stage_gate": 1,
+        "owner_main": 1,
+        "assumption_log": 1,
+        "reviewers": 1,
+        "due_date": 1,
+        "ship_packet": 1,
+        "reviewed_requirements": 1,
+        "change_history": 1,
+        "source_revision": 1,
+        "root_cause": 1,
+        "audit_evidence": 1,
+        "follow_up": 1,
+        "department_owners": 1,
+        "record_retention": 1,
+        "transaction": 1,
+        "workspace": 1,
+        "record_integrity": 1,
+        "offline_mode": 1,
+        "restore_test": 1,
+        "authority_matrix": 1,
+        "business_owners": 1,
+        "control_tower": 1,
+        "ship_risk": 1,
+        "engineering_release": 1,
+        "evidence_pack": 1,
+        "inspection_program_release": 1,
+        "release_package": 1,
+        "pre_run_verification": 1,
+        "work_transfer": 1,
+        "checklist": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html",
+      "total": 130,
+      "byRule": {
+        "transaction": 49,
+        "owner": 19,
+        "process_owner": 11,
+        "record": 8,
+        "evidence": 8,
+        "records": 5,
+        "audit": 4,
+        "title_owner": 4,
+        "workflow": 3,
+        "signoff": 3,
+        "root_cause": 2,
+        "owner_main": 2,
+        "owners": 2,
+        "access_control": 2,
+        "offline_mode": 1,
+        "change_control": 1,
+        "owner_approval": 1,
+        "business_owners": 1,
+        "process_owners": 1,
+        "pending_approvals": 1,
+        "escalation_owner": 1,
+        "authority": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html",
+      "total": 115,
+      "byRule": {
+        "complaint": 23,
+        "owner": 14,
+        "contract_review": 10,
+        "record": 8,
+        "change_control": 6,
+        "control_tower": 4,
+        "due_date": 3,
+        "evidence": 3,
+        "records": 3,
+        "order_ack": 2,
+        "delay_notice": 2,
+        "gate": 2,
+        "owner_main": 2,
+        "quote_package": 2,
+        "hot_issues": 2,
+        "ship_risk": 2,
+        "readiness": 2,
+        "lead_time": 1,
+        "root_cause": 1,
+        "assumption_log": 1,
+        "ship_mode": 1,
+        "evidence_requirements": 1,
+        "process_owner": 1,
+        "open_issues": 1,
+        "internal_owner": 1,
+        "follow_up": 1,
+        "complaints": 1,
+        "owner_approval": 1,
+        "effectivity": 1,
+        "shipment_update": 1,
+        "action_tracker": 1,
+        "high_mix": 1,
+        "audit": 1,
+        "title_owner": 1,
+        "open_orders": 1,
+        "pending_approvals": 1,
+        "escalation_owner": 1,
+        "owners": 1,
+        "job_dossier": 1,
+        "high_risk_job": 1,
+        "checklist": 1,
+        "authority_matrix": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html",
+      "total": 113,
+      "byRule": {
+        "gate": 17,
+        "complaint": 17,
+        "audit": 12,
+        "owner": 11,
+        "record": 9,
+        "evidence": 6,
+        "first_piece": 4,
+        "management_review": 4,
+        "ship_release": 4,
+        "records": 4,
+        "cert_pack": 3,
+        "quality_gate": 2,
+        "final_inspection": 2,
+        "ship_release_pack": 2,
+        "owner_main": 2,
+        "root_cause": 2,
+        "process_owner": 1,
+        "due_date": 1,
+        "technical_release": 1,
+        "ship_risk": 1,
+        "job_dossier": 1,
+        "high_mix": 1,
+        "record_integrity": 1,
+        "complaints": 1,
+        "escalation_owner": 1,
+        "release_package": 1,
+        "follow_up": 1,
+        "authority": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html",
+      "total": 111,
+      "byRule": {
+        "first_piece": 22,
+        "readiness": 13,
+        "owner": 12,
+        "gate": 11,
+        "evidence": 10,
+        "record": 9,
+        "quality_gate": 3,
+        "control_tower": 3,
+        "checklist": 3,
+        "ship_risk": 3,
+        "job_dossier": 2,
+        "owner_main": 2,
+        "due_date": 2,
+        "pre_run_verification": 2,
+        "high_mix": 1,
+        "job_order": 1,
+        "final_inspection": 1,
+        "pack_reconciliation": 1,
+        "authority": 1,
+        "cert_pack": 1,
+        "transaction": 1,
+        "workflow": 1,
+        "ship_release": 1,
+        "open_orders": 1,
+        "escalation_owner": 1,
+        "work_transfer": 1,
+        "job_packet": 1,
+        "authority_matrix": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-internal-auditor-outsource.html",
+      "total": 107,
+      "byRule": {
+        "audit": 59,
+        "process_owner": 8,
+        "owner": 7,
+        "management_review": 6,
+        "checklist": 6,
+        "evidence": 4,
+        "records": 3,
+        "internal_audit": 2,
+        "follow_up": 2,
+        "root_cause": 2,
+        "authority": 1,
+        "due_date": 1,
+        "job_order": 1,
+        "high_mix": 1,
+        "gate": 1,
+        "hold_point": 1,
+        "job_dossier": 1,
+        "record": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html",
+      "total": 102,
+      "byRule": {
+        "audit": 33,
+        "evidence": 11,
+        "process_owner": 9,
+        "owner": 7,
+        "management_review": 6,
+        "record": 6,
+        "evidence_pack": 5,
+        "records": 4,
+        "checklist": 4,
+        "authority": 3,
+        "record_retention": 3,
+        "readiness": 2,
+        "workflow": 2,
+        "record_integrity": 1,
+        "change_control": 1,
+        "complaint": 1,
+        "job_order": 1,
+        "high_mix": 1,
+        "job_dossier": 1,
+        "internal_audit": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html",
+      "total": 86,
+      "byRule": {
+        "audit": 18,
+        "complaint": 11,
+        "owner": 7,
+        "readiness": 6,
+        "gate": 6,
+        "ship_release": 5,
+        "management_review": 5,
+        "evidence": 5,
+        "records": 4,
+        "quality_gate": 3,
+        "internal_audit": 2,
+        "final_inspection": 2,
+        "authority": 2,
+        "record_integrity": 1,
+        "due_date": 1,
+        "action_tracker": 1,
+        "audit_evidence": 1,
+        "job_order": 1,
+        "high_mix": 1,
+        "hold_point": 1,
+        "job_dossier": 1,
+        "record": 1,
+        "checklist": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html",
+      "total": 83,
+      "byRule": {
+        "first_piece": 11,
+        "owner": 9,
+        "evidence": 7,
+        "baseline_package": 6,
+        "record": 5,
+        "effectivity": 5,
+        "audit": 4,
+        "readiness": 3,
+        "change_control": 3,
+        "checklist": 3,
+        "lead_time": 2,
+        "owner_main": 2,
+        "records": 2,
+        "lesson_learned": 2,
+        "signoff": 2,
+        "engineering_release": 2,
+        "work_transfer": 1,
+        "gate": 1,
+        "change_history": 1,
+        "assumption_log": 1,
+        "internal_audit": 1,
+        "root_cause": 1,
+        "release_package": 1,
+        "source_revision": 1,
+        "workspace": 1,
+        "contract_review": 1,
+        "pending_approvals": 1,
+        "escalation_owner": 1,
+        "control_tower": 1,
+        "inspection_program_release": 1,
+        "authority": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html",
+      "total": 82,
+      "byRule": {
+        "owner": 21,
+        "readiness": 10,
+        "record": 8,
+        "business_owners": 6,
+        "title_owner": 5,
+        "workflow": 4,
+        "restore_test": 4,
+        "evidence": 4,
+        "records": 4,
+        "change_control": 2,
+        "owner_main": 2,
+        "process_owner": 2,
+        "workspace": 1,
+        "gate": 1,
+        "signoff": 1,
+        "owners": 1,
+        "checklist": 1,
+        "transaction": 1,
+        "audit": 1,
+        "record_integrity": 1,
+        "escalation_owner": 1,
+        "authority": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html",
+      "total": 80,
+      "byRule": {
+        "readiness": 15,
+        "due_date": 9,
+        "gate": 9,
+        "aging": 7,
+        "owner": 6,
+        "transaction": 5,
+        "job_order": 4,
+        "record": 4,
+        "control_tower": 3,
+        "checklist": 3,
+        "ship_risk": 2,
+        "job_packet": 2,
+        "lead_time": 2,
+        "job_dossier": 2,
+        "ship_release": 1,
+        "authority": 1,
+        "quality_gate": 1,
+        "change_control": 1,
+        "records": 1,
+        "high_mix": 1,
+        "job_traveler": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html",
+      "total": 80,
+      "byRule": {
+        "complaint": 23,
+        "contract_review": 15,
+        "owner": 6,
+        "due_date": 5,
+        "change_control": 4,
+        "ship_release": 4,
+        "records": 4,
+        "job_order": 3,
+        "order_ack": 2,
+        "authority": 2,
+        "checklist": 2,
+        "contract_screening": 1,
+        "record": 1,
+        "assumption_log": 1,
+        "lead_time": 1,
+        "workflow": 1,
+        "ship_confirm": 1,
+        "control_tower": 1,
+        "readiness": 1,
+        "transaction": 1,
+        "final_inspection": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html",
+      "total": 76,
+      "byRule": {
+        "gate": 11,
+        "readiness": 10,
+        "record": 10,
+        "quality_gate": 10,
+        "final_inspection": 6,
+        "evidence": 4,
+        "first_piece": 4,
+        "records": 4,
+        "ship_release": 3,
+        "ship_risk": 2,
+        "owner": 2,
+        "record_integrity": 1,
+        "management_review": 1,
+        "audit": 1,
+        "authority": 1,
+        "action_tracker": 1,
+        "job_order": 1,
+        "high_mix": 1,
+        "hold_point": 1,
+        "job_dossier": 1,
+        "transaction": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html",
+      "total": 73,
+      "byRule": {
+        "evidence": 26,
+        "aging": 7,
+        "owner": 6,
+        "audit": 5,
+        "records": 4,
+        "due_date": 4,
+        "authority": 3,
+        "process_owner": 3,
+        "job_order": 2,
+        "follow_up": 2,
+        "readiness": 2,
+        "control_tower": 1,
+        "high_mix": 1,
+        "root_cause": 1,
+        "checklist": 1,
+        "evidence_pack": 1,
+        "data_owner": 1,
+        "title_owner": 1,
+        "owners": 1,
+        "authority_matrix": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
+      "total": 73,
+      "byRule": {
+        "record": 8,
+        "owner": 8,
+        "cert_pack": 7,
+        "gate": 5,
+        "readiness": 4,
+        "complaint": 3,
+        "owner_main": 3,
+        "evidence": 3,
+        "ship_release": 3,
+        "checklist": 3,
+        "transaction": 3,
+        "authority": 3,
+        "pack_reconciliation": 2,
+        "due_date": 2,
+        "follow_up": 2,
+        "evidence_pack": 2,
+        "ship_risk": 1,
+        "ship_packet": 1,
+        "root_cause": 1,
+        "audit": 1,
+        "action_plan": 1,
+        "records": 1,
+        "aging": 1,
+        "workflow": 1,
+        "signoff": 1,
+        "production_readiness": 1,
+        "escalation_owner": 1,
+        "management_review": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html",
+      "total": 70,
+      "byRule": {
+        "transaction": 11,
+        "records": 9,
+        "workflow": 7,
+        "owner": 7,
+        "evidence": 6,
+        "audit": 6,
+        "record": 5,
+        "readiness": 3,
+        "data_owner": 3,
+        "authority": 2,
+        "job_order": 2,
+        "business_owners": 1,
+        "process_owner": 1,
+        "root_cause": 1,
+        "review_pack": 1,
+        "restore_test": 1,
+        "action_tracker": 1,
+        "aging": 1,
+        "change_control": 1,
+        "checklist": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html",
+      "total": 69,
+      "byRule": {
+        "owner": 18,
+        "records": 8,
+        "readiness": 7,
+        "checklist": 7,
+        "record": 5,
+        "authority": 4,
+        "aging": 4,
+        "evidence": 3,
+        "audit": 3,
+        "action_tracker": 2,
+        "owners": 2,
+        "lesson_learned": 1,
+        "management_review": 1,
+        "root_cause": 1,
+        "title_owner": 1,
+        "review_pack": 1,
+        "authority_matrix": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html",
+      "total": 64,
+      "byRule": {
+        "first_piece": 15,
+        "readiness": 15,
+        "owner": 8,
+        "gate": 7,
+        "record": 6,
+        "quality_gate": 2,
+        "job_order": 2,
+        "evidence": 1,
+        "work_transfer": 1,
+        "authority": 1,
+        "change_control": 1,
+        "lesson_learned": 1,
+        "job_packet": 1,
+        "pre_run_verification": 1,
+        "aging": 1,
+        "job_traveler": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html",
+      "total": 63,
+      "byRule": {
+        "owner": 13,
+        "checklist": 6,
+        "readiness": 5,
+        "evidence": 5,
+        "records": 5,
+        "gate": 4,
+        "authority": 4,
+        "record": 3,
+        "owners": 3,
+        "follow_up": 2,
+        "title_owner": 2,
+        "high_mix": 1,
+        "job_order": 1,
+        "root_cause": 1,
+        "lesson_learned": 1,
+        "management_review": 1,
+        "internal_audit": 1,
+        "audit_evidence": 1,
+        "evidence_pack": 1,
+        "action_tracker": 1,
+        "audit": 1,
+        "action_plan": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html",
+      "total": 62,
+      "byRule": {
+        "change_control": 8,
+        "technical_release": 8,
+        "readiness": 6,
+        "owner": 6,
+        "first_piece": 5,
+        "lesson_learned": 4,
+        "authority": 3,
+        "baseline_package": 2,
+        "evidence": 2,
+        "ship_release": 2,
+        "root_cause": 2,
+        "records": 2,
+        "job_order": 2,
+        "checklist": 2,
+        "gate": 1,
+        "assumption_log": 1,
+        "release_package": 1,
+        "workflow": 1,
+        "review_pack": 1,
+        "job_packet": 1,
+        "pre_run_verification": 1,
+        "inspection_program_release": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html",
+      "total": 60,
+      "byRule": {
+        "readiness": 11,
+        "owner": 7,
+        "gate": 6,
+        "record": 5,
+        "aging": 4,
+        "control_tower": 4,
+        "transaction": 4,
+        "job_order": 3,
+        "first_piece": 3,
+        "ship_risk": 2,
+        "ship_release": 2,
+        "checklist": 2,
+        "quality_gate": 1,
+        "due_date": 1,
+        "authority": 1,
+        "change_control": 1,
+        "complaint": 1,
+        "records": 1,
+        "job_dossier": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html",
+      "total": 60,
+      "byRule": {
+        "first_piece": 22,
+        "record": 7,
+        "gate": 6,
+        "evidence": 3,
+        "readiness": 2,
+        "change_control": 2,
+        "pre_run_verification": 2,
+        "job_dossier": 2,
+        "checklist": 2,
+        "job_packet": 2,
+        "job_order": 2,
+        "owner": 1,
+        "authority": 1,
+        "due_date": 1,
+        "records": 1,
+        "lead_time": 1,
+        "high_mix": 1,
+        "inspection_program_release": 1,
+        "job_traveler": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html",
+      "total": 52,
+      "byRule": {
+        "lead_time": 7,
+        "checklist": 7,
+        "lesson_learned": 6,
+        "engineering_release": 5,
+        "contract_review": 5,
+        "owner": 5,
+        "assumption_log": 3,
+        "readiness": 3,
+        "technical_release": 3,
+        "gate": 2,
+        "complaint": 1,
+        "authority": 1,
+        "review_pack": 1,
+        "first_piece": 1,
+        "job_order": 1,
+        "control_tower": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html",
+      "total": 52,
+      "byRule": {
+        "readiness": 21,
+        "cert_pack": 7,
+        "owner": 5,
+        "control_tower": 4,
+        "ship_risk": 2,
+        "ship_release": 2,
+        "checklist": 2,
+        "lead_time": 1,
+        "record_integrity": 1,
+        "authority": 1,
+        "audit": 1,
+        "records": 1,
+        "review_pack": 1,
+        "job_order": 1,
+        "ship_confirm": 1,
+        "workflow": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html",
+      "total": 50,
+      "byRule": {
+        "gate": 8,
+        "record": 8,
+        "records": 6,
+        "evidence": 6,
+        "first_piece": 4,
+        "final_inspection": 4,
+        "readiness": 3,
+        "owner": 3,
+        "quality_gate": 2,
+        "record_integrity": 1,
+        "audit": 1,
+        "authority": 1,
+        "job_order": 1,
+        "high_mix": 1,
+        "transaction": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html",
+      "total": 47,
+      "byRule": {
+        "checklist": 17,
+        "pack_reconciliation": 4,
+        "readiness": 4,
+        "ship_release": 4,
+        "gate": 3,
+        "complaint": 2,
+        "evidence": 2,
+        "records": 2,
+        "job_order": 2,
+        "ship_risk": 1,
+        "owner": 1,
+        "authority": 1,
+        "record": 1,
+        "high_mix": 1,
+        "ship_confirm": 1,
+        "final_inspection": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html",
+      "total": 46,
+      "byRule": {
+        "first_piece": 9,
+        "readiness": 8,
+        "owner": 6,
+        "gate": 4,
+        "record": 3,
+        "record_integrity": 2,
+        "job_order": 2,
+        "control_tower": 1,
+        "ship_risk": 1,
+        "quality_gate": 1,
+        "authority": 1,
+        "follow_up": 1,
+        "records": 1,
+        "evidence": 1,
+        "high_mix": 1,
+        "job_packet": 1,
+        "pre_run_verification": 1,
+        "aging": 1,
+        "job_traveler": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html",
+      "total": 45,
+      "byRule": {
+        "records": 10,
+        "evidence": 7,
+        "access_control": 4,
+        "readiness": 4,
+        "checklist": 4,
+        "owner": 4,
+        "audit": 3,
+        "data_owner": 2,
+        "evidence_pack": 2,
+        "record": 2,
+        "authority": 1,
+        "action_plan": 1,
+        "change_control": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html",
+      "total": 40,
+      "byRule": {
+        "management_review": 7,
+        "owner": 7,
+        "audit": 6,
+        "gate": 2,
+        "due_date": 2,
+        "transaction": 2,
+        "complaint": 2,
+        "record": 1,
+        "contract_review": 1,
+        "escalation_owner": 1,
+        "authority": 1,
+        "ship_release": 1,
+        "evidence": 1,
+        "change_control": 1,
+        "job_order": 1,
+        "high_mix": 1,
+        "control_tower": 1,
+        "readiness": 1,
+        "checklist": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html",
+      "total": 40,
+      "byRule": {
+        "lead_time": 13,
+        "contract_review": 7,
+        "assumption_log": 3,
+        "record": 3,
+        "checklist": 3,
+        "job_order": 3,
+        "records": 2,
+        "due_date": 1,
+        "owner": 1,
+        "authority": 1,
+        "control_tower": 1,
+        "readiness": 1,
+        "transaction": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html",
+      "total": 37,
+      "byRule": {
+        "complaint": 11,
+        "records": 3,
+        "record": 3,
+        "owner": 2,
+        "root_cause": 2,
+        "gate": 2,
+        "due_date": 1,
+        "audit": 1,
+        "readiness": 1,
+        "first_piece": 1,
+        "lesson_learned": 1,
+        "ship_release": 1,
+        "process_owner": 1,
+        "evidence": 1,
+        "authority": 1,
+        "follow_up": 1,
+        "high_mix": 1,
+        "hold_point": 1,
+        "job_order": 1,
+        "transaction": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html",
+      "total": 37,
+      "byRule": {
+        "checklist": 7,
+        "records": 5,
+        "readiness": 4,
+        "final_inspection": 3,
+        "pack_reconciliation": 2,
+        "lead_time": 2,
+        "ship_confirm": 2,
+        "ship_release": 2,
+        "evidence": 2,
+        "job_order": 2,
+        "ship_packet": 1,
+        "complaint": 1,
+        "owner": 1,
+        "authority": 1,
+        "follow_up": 1,
+        "high_mix": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html",
+      "total": 36,
+      "byRule": {
+        "records": 10,
+        "owner": 8,
+        "readiness": 6,
+        "audit": 4,
+        "follow_up": 2,
+        "authority": 1,
+        "internal_audit": 1,
+        "management_review": 1,
+        "action_tracker": 1,
+        "evidence": 1,
+        "aging": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-engineer-industrial-engineer.html",
+      "total": 34,
+      "byRule": {
+        "owner": 6,
+        "aging": 5,
+        "job_order": 3,
+        "record": 2,
+        "first_piece": 2,
+        "lead_time": 2,
+        "checklist": 2,
+        "readiness": 1,
+        "management_review": 1,
+        "gate": 1,
+        "authority": 1,
+        "change_control": 1,
+        "review_pack": 1,
+        "action_tracker": 1,
+        "audit": 1,
+        "high_mix": 1,
+        "job_packet": 1,
+        "pre_run_verification": 1,
+        "job_traveler": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html",
+      "total": 32,
+      "byRule": {
+        "lesson_learned": 6,
+        "readiness": 3,
+        "checklist": 3,
+        "first_piece": 3,
+        "job_order": 3,
+        "high_mix": 2,
+        "change_control": 2,
+        "records": 2,
+        "lead_time": 1,
+        "owner": 1,
+        "authority": 1,
+        "record": 1,
+        "release_package": 1,
+        "job_packet": 1,
+        "pre_run_verification": 1,
+        "inspection_program_release": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html",
+      "total": 31,
+      "byRule": {
+        "records": 7,
+        "audit": 5,
+        "checklist": 5,
+        "gate": 4,
+        "authority": 3,
+        "readiness": 2,
+        "title_owner": 1,
+        "owner": 1,
+        "audit_evidence": 1,
+        "management_review": 1,
+        "action_plan": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-ap-ar-and-payments-accountant.html",
+      "total": 30,
+      "byRule": {
+        "records": 5,
+        "owner": 4,
+        "aging": 4,
+        "audit": 4,
+        "approval_matrix": 2,
+        "ship_release": 2,
+        "evidence": 2,
+        "authority": 2,
+        "job_order": 2,
+        "ship_confirm": 1,
+        "transaction": 1,
+        "final_inspection": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html",
+      "total": 29,
+      "byRule": {
+        "lead_time": 7,
+        "follow_up": 5,
+        "owner": 4,
+        "cert_pack": 2,
+        "records": 2,
+        "readiness": 2,
+        "gate": 2,
+        "authority": 1,
+        "job_order": 1,
+        "high_mix": 1,
+        "control_tower": 1,
+        "checklist": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html",
+      "total": 26,
+      "byRule": {
+        "job_order": 4,
+        "owner": 3,
+        "audit": 3,
+        "approval_matrix": 2,
+        "readiness": 2,
+        "aging": 2,
+        "records": 2,
+        "checklist": 2,
+        "technical_release": 1,
+        "authority": 1,
+        "record": 1,
+        "ship_confirm": 1,
+        "transaction": 1,
+        "final_inspection": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html",
+      "total": 24,
+      "byRule": {
+        "change_control": 4,
+        "lesson_learned": 3,
+        "checklist": 2,
+        "readiness": 2,
+        "job_order": 2,
+        "first_piece": 1,
+        "due_date": 1,
+        "owner": 1,
+        "authority": 1,
+        "release_package": 1,
+        "evidence": 1,
+        "records": 1,
+        "record": 1,
+        "engineering_release": 1,
+        "high_mix": 1,
+        "inspection_program_release": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html",
+      "total": 22,
+      "byRule": {
+        "record": 9,
+        "audit": 2,
+        "job_order": 2,
+        "first_piece": 1,
+        "owner": 1,
+        "authority": 1,
+        "checklist": 1,
+        "evidence": 1,
+        "records": 1,
+        "high_mix": 1,
+        "job_dossier": 1,
+        "job_traveler": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html",
+      "total": 22,
+      "byRule": {
+        "record": 5,
+        "readiness": 4,
+        "due_date": 2,
+        "owner": 2,
+        "lesson_learned": 2,
+        "gate": 2,
+        "complaint": 1,
+        "technical_release": 1,
+        "authority": 1,
+        "lead_time": 1,
+        "evidence": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-packaging-technician.html",
+      "total": 21,
+      "byRule": {
+        "checklist": 10,
+        "record": 6,
+        "job_order": 2,
+        "owner": 1,
+        "authority": 1,
+        "high_mix": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html",
+      "total": 21,
+      "byRule": {
+        "transaction": 6,
+        "records": 6,
+        "job_order": 2,
+        "owner": 2,
+        "gate": 1,
+        "authority": 1,
+        "readiness": 1,
+        "high_mix": 1,
+        "checklist": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-general-ledger-and-payroll-accountant.html",
+      "total": 20,
+      "byRule": {
+        "audit": 4,
+        "approval_matrix": 2,
+        "authority": 2,
+        "owner": 2,
+        "records": 2,
+        "checklist": 2,
+        "transaction": 2,
+        "job_order": 2,
+        "process_owner": 1,
+        "evidence": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/authority-matrix.html",
+      "total": 19,
+      "byRule": {
+        "authority": 5,
+        "authority_matrix": 4,
+        "owner": 4,
+        "gate": 2,
+        "owners": 1,
+        "technical_release": 1,
+        "owner_main_lower": 1,
+        "change_control": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html",
+      "total": 18,
+      "byRule": {
+        "owner": 4,
+        "root_cause": 2,
+        "evidence": 2,
+        "records": 2,
+        "checklist": 1,
+        "readiness": 1,
+        "authority": 1,
+        "evidence_pack": 1,
+        "job_order": 1,
+        "high_mix": 1,
+        "job_packet": 1,
+        "pre_run_verification": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html",
+      "total": 17,
+      "byRule": {
+        "readiness": 3,
+        "record": 3,
+        "owner": 2,
+        "aging": 1,
+        "ship_risk": 1,
+        "authority": 1,
+        "records": 1,
+        "audit": 1,
+        "job_order": 1,
+        "high_mix": 1,
+        "job_traveler": 1,
+        "checklist": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html",
+      "total": 17,
+      "byRule": {
+        "readiness": 4,
+        "records": 4,
+        "job_order": 2,
+        "owner": 1,
+        "authority": 1,
+        "record": 1,
+        "high_mix": 1,
+        "job_packet": 1,
+        "pre_run_verification": 1,
+        "first_piece": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-technician.html",
+      "total": 15,
+      "byRule": {
+        "record": 3,
+        "audit": 3,
+        "checklist": 2,
+        "job_order": 2,
+        "owner": 1,
+        "authority": 1,
+        "records": 1,
+        "high_mix": 1,
+        "job_traveler": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/raci-master-matrix.html",
+      "total": 9,
+      "byRule": {
+        "readiness": 2,
+        "evidence": 2,
+        "owners": 1,
+        "release_package": 1,
+        "change_control": 1,
+        "gate": 1,
+        "follow_up": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/02-Policies-Objectives/pol-qms-002-quality-objectives.html",
+      "total": 7,
+      "byRule": {
+        "audit": 2,
+        "complaint": 2,
+        "readiness": 1,
+        "lead_time": 1,
+        "management_review": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/02-Policies-Objectives/pol-qms-001-quality-policy.html",
+      "total": 5,
+      "byRule": {
+        "lead_time": 1,
+        "gate": 1,
+        "contract_review": 1,
+        "checklist": 1,
+        "management_review": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html",
+      "total": 4,
+      "byRule": {
+        "authority": 2,
+        "authority_matrix": 2
+      }
+    }
+  ]
+}
