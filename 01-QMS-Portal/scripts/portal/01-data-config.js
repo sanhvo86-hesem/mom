@@ -1082,9 +1082,11 @@ const FOLDER_ICON_MAP = {
   '01-WI-100':'📋','02-WI-200':'💰','03-WI-300':'🛠️','04-WI-400':'🛒',
   '05-WI-500':'🔧','06-WI-600':'🔬','07-WI-700':'📦','08-WI-800':'🦺',
   '09-WI-900':'📊',
-  // ANNEX (Reference)
+  // ANNEX series (by department — matches SOP/WI/FRM numbering)
   '03-Reference':'📚',
-  '01-ANNEX-System':'📖','02-ANNEX-Standards':'📏','03-ANNEX-Digital':'💻',
+  '01-ANNEX-100':'🏛️','02-ANNEX-200':'💼','03-ANNEX-300':'⚙️','04-ANNEX-400':'🔗',
+  '05-ANNEX-500':'🏭','06-ANNEX-600':'🔍','07-ANNEX-700':'📦','08-ANNEX-800':'👥',
+  '09-ANNEX-900':'♻️',
   // Forms series (by department)
   '01-FRM-100':'🏛️','02-FRM-200':'💼','03-FRM-300':'⚙️','04-FRM-400':'🔗',
   '05-FRM-500':'🏭','06-FRM-600':'🔍','07-FRM-700':'📦','08-FRM-800':'👥',
