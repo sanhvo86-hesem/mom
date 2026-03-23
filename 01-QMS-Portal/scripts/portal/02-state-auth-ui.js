@@ -7,6 +7,71 @@ let searchQuery = '';
 let currentFolderPath = []; // Hierarchical navigation: ['08-Organization','03-Job-Descriptions','01-JD-EXE']
 let folderEditMode = false; // Toggle for file manager edit mode
 let docHeaderMetaCollapsed = true;
+const PENDING_AUTH_TTL_MS = 10 * 60 * 1000;
+let pendingAuthTimer = null;
+
+function clearPendingAuthTimer(){
+  if(pendingAuthTimer){
+    clearTimeout(pendingAuthTimer);
+    pendingAuthTimer = null;
+  }
+}
+
+function getPendingAuthExpiredMessage(kind){
+  if(kind === 'enroll'){
+    return lang==='en'
+      ? 'Authenticator setup timed out. Please sign in again.'
+      : 'Phiên thiết lập Authenticator đã hết hạn. Vui lòng đăng nhập lại.';
+  }
+  return lang==='en'
+    ? 'Authenticator verification timed out. Please sign in again.'
+    : 'Phiên xác thực OTP đã hết hạn. Vui lòng đăng nhập lại.';
+}
+
+function schedulePendingAuthTimer(stage, pendingExpiresIn){
+  clearPendingAuthTimer();
+  if(stage !== 'mfa' && stage !== 'enroll') return;
+  const ttlSeconds = Number(pendingExpiresIn);
+  const ttlMs = Number.isFinite(ttlSeconds) && ttlSeconds > 0
+    ? Math.max(1000, ttlSeconds * 1000)
+    : PENDING_AUTH_TTL_MS;
+  pendingAuthTimer = setTimeout(()=>{
+    resetPortalToLogin({stage:'password', errorMsg:getPendingAuthExpiredMessage(stage)});
+  }, ttlMs + 250);
+}
+
+function resetPortalToLogin(options={}){
+  const opts = options || {};
+  const stage = opts.stage || 'password';
+  const stageMsg = opts.stageMsg || '';
+  const errorMsg = opts.errorMsg || '';
+  const preserveUsername = opts.preserveUsername !== false;
+
+  clearPendingAuthTimer();
+  currentUser = null;
+  csrfToken = null;
+  enrollInfo = null;
+
+  const app = document.getElementById('app');
+  if(app) app.classList.remove('active');
+  const login = document.getElementById('login-screen');
+  if(login) login.style.display = 'flex';
+  document.getElementById('doc-viewer')?.classList.remove('active');
+  document.getElementById('user-dropdown')?.classList.remove('show');
+  setDocHeaderToolbar('');
+
+  const savedUsername = preserveUsername ? (document.getElementById('inp-user')?.value || '') : '';
+  setLoginStage(stage, stageMsg, opts.pendingExpiresIn);
+  if(preserveUsername){
+    const user = document.getElementById('inp-user');
+    if(user) user.value = savedUsername;
+  }
+  if(errorMsg) showLoginError(errorMsg);
+}
+
+function showPendingAuthStage(stage, stageMsg='', pendingExpiresIn=null){
+  resetPortalToLogin({stage, stageMsg, pendingExpiresIn});
+}
 
 function setDocHeaderMetaCollapsed(collapsed){
   docHeaderMetaCollapsed = !!collapsed;
@@ -252,9 +317,10 @@ function clearLoginError(){
   el.style.display = 'none';
 }
 
-function setLoginStage(stage, msg=''){
+function setLoginStage(stage, msg='', pendingExpiresIn=null){
   loginStage = stage;
   clearLoginError();
+  schedulePendingAuthTimer(stage, pendingExpiresIn);
 
   const pass = document.getElementById('inp-pin');
   const user = document.getElementById('inp-user');
@@ -714,6 +780,219 @@ async function showApp(){
   // Load server-backed settings/lists before initial render
   await loadDocsFromServer(); // ★ LIVE: scan filesystem for documents
   await loadFolderDescriptions(); // ★ Load folder descriptions
+  await loadRolePermsFromServer();
+  await loadCustomDocsFromServer();
+  await loadDocVisibilityFromServer();
+  await refreshAllDocStatesFromServer();
+
+  renderSidebar();
+  syncSidebarToggleState();
+  navigateTo('dashboard');
+  loadUsersFromServerIfAdmin();
+}
+
+// Auth flow hardening override:
+// - keep MFA/enroll pending on the login screen only
+// - expire pending OTP/enroll sessions cleanly
+// - never render an "empty portal" when auth is incomplete
+async function doLogin(){
+  const u = document.getElementById('inp-user').value.trim();
+  const p = document.getElementById('inp-pin').value;
+  const otp = (document.getElementById('inp-otp')?.value || '').trim();
+  const recovery = (document.getElementById('inp-recovery')?.value || '').trim();
+
+  try{
+    if(loginStage === 'password'){
+      if(!u || !p){ showLoginError(lang==='en' ? 'Please enter username and password' : 'Vui lÃ²ng nháº­p tÃ i khoáº£n vÃ  máº­t kháº©u'); return; }
+
+      const res = await apiCall('auth_login', {username:u, password:p});
+      if(!res.ok){
+        showLoginError(res.error || T('login_error'));
+        return;
+      }
+      if(res.enroll_required){
+        enrollInfo = res;
+        csrfToken = res.csrf_token || csrfToken;
+        document.getElementById('enroll-issuer').textContent = res.issuer || '';
+        document.getElementById('enroll-username').textContent = res.username || u;
+        document.getElementById('enroll-secret').textContent = res.secret || '';
+        document.getElementById('enroll-otpauth').textContent = res.otpauth_url || '';
+        renderEnrollQR(res.otpauth_url || '');
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'BÆ°á»›c 2: Báº­t 2FA vÃ  nháº­p mÃ£ 6 sá»‘', res.pending_expires_in);
+        return;
+      }
+      if(res.mfa_required){
+        csrfToken = res.csrf_token || csrfToken;
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nháº­p mÃ£ xÃ¡c thá»±c 6 sá»‘ tá»« Authenticator', res.pending_expires_in);
+        return;
+      }
+      if(res.logged_in){
+        await onLoggedIn(res);
+        return;
+      }
+      showLoginError(res.error || T('login_error'));
+      return;
+    }
+
+    if(loginStage === 'enroll'){
+      if(!otp){ showLoginError(lang==='en' ? 'Enter 6-digit code to confirm' : 'Nháº­p mÃ£ 6 sá»‘ Ä‘á»ƒ xÃ¡c nháº­n'); return; }
+      const res = await apiCall('auth_enroll_verify', {code: otp});
+      if(!res.ok){
+        if(res.error === 'unauthorized' || res.error === 'enroll_expired'){
+          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator setup timed out. Please sign in again.' : 'PhiÃªn thiáº¿t láº­p Authenticator Ä‘Ã£ háº¿t háº¡n. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.'});
+        } else {
+          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mÃ£'));
+        }
+        return;
+      }
+      if(res.recovery_codes && Array.isArray(res.recovery_codes)){
+        showRecoveryCodes(res.recovery_codes);
+      }
+      await onLoggedIn(res);
+      return;
+    }
+
+    if(loginStage === 'mfa'){
+      if(!otp && !recovery){ showLoginError(lang==='en' ? 'Enter authenticator code or recovery code' : 'Nháº­p mÃ£ xÃ¡c thá»±c hoáº·c mÃ£ dá»± phÃ²ng'); return; }
+      const res = await apiCall('auth_mfa_verify', {username:u, password:p, code: otp, recovery: recovery});
+      if(!res.ok){
+        if(res.error === 'mfa_expired' || res.error === 'unauthorized'){
+          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator verification timed out. Please sign in again.' : 'PhiÃªn xÃ¡c thá»±c OTP Ä‘Ã£ háº¿t háº¡n. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.'});
+        } else {
+          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mÃ£'));
+        }
+        return;
+      }
+      await onLoggedIn(res);
+      return;
+    }
+  }catch(err){
+    console.error(err);
+    showLoginError(lang==='en' ? 'Cannot connect to server. Please try again.' : 'KhÃ´ng thá»ƒ káº¿t ná»‘i mÃ¡y chá»§. Vui lÃ²ng thá»­ láº¡i.');
+  }
+}
+
+async function doLogout(){
+  clearPendingAuthTimer();
+  try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
+
+  csrfToken = null;
+  currentUser = null;
+
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('inp-user').disabled = false;
+  document.getElementById('inp-pin').disabled = false;
+  document.getElementById('inp-user').value = '';
+  document.getElementById('inp-pin').value = '';
+  const otp = document.getElementById('inp-otp'); if(otp) otp.value='';
+  const r = document.getElementById('inp-recovery'); if(r) r.value='';
+  setLoginStage('password');
+}
+
+async function checkSession(){
+  setLoginChecking(true, lang==='en' ? 'Checking sessionâ€¦' : 'Äang kiá»ƒm tra phiÃªn Ä‘Äƒng nháº­pâ€¦');
+
+  let lastStatus = null;
+  const delays = [0, 350, 900, 1600];
+  for(let i=0;i<delays.length;i++){
+    if(delays[i]) await new Promise(r=>setTimeout(r, delays[i]));
+    try{
+      const s = await apiCall('status', null, 'GET', 8000);
+      lastStatus = s;
+      if(s && s.logged_in){
+        clearPendingAuthTimer();
+        csrfToken = s.csrf_token || null;
+        currentUser = s.user;
+        setLoginChecking(false, '');
+        const geo = await requireGeolocation().catch(()=>({ok:false}));
+        startActivityTracking(geo);
+        showApp();
+        return;
+      }
+      if(s && s.enroll_pending){
+        csrfToken = s.csrf_token || null;
+        enrollInfo = s;
+        document.getElementById('enroll-issuer').textContent = s.issuer || '';
+        document.getElementById('enroll-username').textContent = s.username || '';
+        document.getElementById('enroll-secret').textContent = s.secret || '';
+        document.getElementById('enroll-otpauth').textContent = s.otpauth_url || '';
+        renderEnrollQR(s.otpauth_url || '');
+        setLoginChecking(false, '');
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'BÆ°á»›c 2: Báº­t 2FA vÃ  nháº­p mÃ£ 6 sá»‘', s.pending_expires_in);
+        return;
+      }
+      if(s && s.mfa_pending){
+        csrfToken = s.csrf_token || null;
+        setLoginChecking(false, '');
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nháº­p mÃ£ xÃ¡c thá»±c 6 sá»‘ tá»« Authenticator', s.pending_expires_in);
+        return;
+      }
+      break;
+    }catch(e){
+      // retry
+    }
+  }
+
+  setLoginChecking(false, '');
+  if(lastStatus && lastStatus.auth_expired){
+    resetPortalToLogin({stage:'password', errorMsg:getPendingAuthExpiredMessage(lastStatus.auth_expired)});
+    return;
+  }
+  if(document.getElementById('app')?.classList.contains('active')){
+    resetPortalToLogin({stage:'password'});
+  }
+}
+
+async function showApp(){
+  if(!currentUser){
+    resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Login session is no longer valid.' : 'PhiÃªn Ä‘Äƒng nháº­p khÃ´ng cÃ²n há»£p lá»‡.'});
+    return;
+  }
+
+  clearPendingAuthTimer();
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  const r = ROLES[currentUser.role] || {label: currentUser.title||currentUser.role, labelEn: currentUser.title||currentUser.role};
+  document.getElementById('hdr-name').textContent = currentUser.name;
+  document.getElementById('hdr-title').textContent = (lang==='en' ? (r.labelEn||r.label||currentUser.title||'') : (r.label||currentUser.title||''));
+  document.getElementById('dd-name').textContent = currentUser.name;
+  document.getElementById('dd-title').textContent = (lang==='en'?(r.labelEn||currentUser.title):currentUser.title) + ' Â· ' + currentUser.dept;
+  document.getElementById('dd-access').textContent = lang==='en'?(r.labelEn||r.label):r.label;
+
+  const docsLoaded = await loadDocsFromServer();
+  if(!docsLoaded){
+    let status = null;
+    try{ status = await apiCall('status', null, 'GET', 8000); }catch(e){}
+    if(!(status && status.logged_in)){
+      if(status && status.enroll_pending){
+        csrfToken = status.csrf_token || null;
+        enrollInfo = status;
+        document.getElementById('enroll-issuer').textContent = status.issuer || '';
+        document.getElementById('enroll-username').textContent = status.username || '';
+        document.getElementById('enroll-secret').textContent = status.secret || '';
+        document.getElementById('enroll-otpauth').textContent = status.otpauth_url || '';
+        renderEnrollQR(status.otpauth_url || '');
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'BÆ°á»›c 2: Báº­t 2FA vÃ  nháº­p mÃ£ 6 sá»‘', status.pending_expires_in);
+        return;
+      }
+      if(status && status.mfa_pending){
+        csrfToken = status.csrf_token || null;
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nháº­p mÃ£ xÃ¡c thá»±c 6 sá»‘ tá»« Authenticator', status.pending_expires_in);
+        return;
+      }
+      resetPortalToLogin({
+        stage:'password',
+        errorMsg: status && status.auth_expired
+          ? getPendingAuthExpiredMessage(status.auth_expired)
+          : (lang==='en' ? 'Login session is no longer valid. Please sign in again.' : 'PhiÃªn Ä‘Äƒng nháº­p khÃ´ng cÃ²n há»£p lá»‡. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.')
+      });
+      return;
+    }
+    showToast(lang==='en' ? 'Document index is temporarily unavailable.' : 'Danh má»¥c tÃ i liá»‡u táº¡m thá»i chÆ°a táº£i Ä‘Æ°á»£c.');
+  }
+
+  await loadFolderDescriptions();
   await loadRolePermsFromServer();
   await loadCustomDocsFromServer();
   await loadDocVisibilityFromServer();
@@ -4827,4 +5106,3 @@ function reassignUserRole(){
 
 
 // ═══════════════════════════════════════════════════
-

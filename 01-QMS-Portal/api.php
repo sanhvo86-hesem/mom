@@ -47,6 +47,7 @@ $PORTAL_CONFIG_JS_FILE = $BASE_DIR . '/scripts/portal/01-data-config.js';
 $LOG_FILE   = $DATA_DIR . '/php_error.log';
 $RL_DIR     = $DATA_DIR . '/ratelimit';
 $MAX_FORM_UPLOAD_BYTES = 25 * 1024 * 1024;
+$PENDING_AUTH_TTL_SECONDS = 10 * 60;
 
 // Legacy (centralized) document version store (kept for backward compatibility / migration)
 $ARCHIVE_DIR = $ROOT_DIR . '/archive';
@@ -1425,10 +1426,37 @@ function client_ip(): string {
   return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 }
 
+function pending_auth_ttl_seconds(): int {
+  global $PENDING_AUTH_TTL_SECONDS;
+  return max(60, (int)$PENDING_AUTH_TTL_SECONDS);
+}
+
+function pending_auth_remaining_seconds(int $startedAt): int {
+  if ($startedAt <= 0) return 0;
+  return max(0, pending_auth_ttl_seconds() - (time() - $startedAt));
+}
+
+function clear_preauth_session_state(): void {
+  unset($_SESSION['preauth_user'], $_SESSION['preauth_started']);
+  if (empty($_SESSION['user'])) {
+    unset($_SESSION['mfa_ok']);
+  }
+}
+
+function clear_enroll_session_state(): void {
+  unset($_SESSION['enroll_user'], $_SESSION['enroll_secret'], $_SESSION['enroll_started']);
+}
+
+function clear_pending_auth_session_state(): void {
+  clear_enroll_session_state();
+  clear_preauth_session_state();
+}
+
 function clear_auth_session_state(): void {
   unset(
     $_SESSION['user'],
     $_SESSION['preauth_user'],
+    $_SESSION['preauth_started'],
     $_SESSION['mfa_ok'],
     $_SESSION['enroll_user'],
     $_SESSION['enroll_secret'],
@@ -1442,6 +1470,7 @@ function set_preauth_session(string $username): void {
   session_regenerate_id(true);
   clear_auth_session_state();
   $_SESSION['preauth_user'] = strtolower(trim($username));
+  $_SESSION['preauth_started'] = time();
   $_SESSION['mfa_ok'] = false;
 }
 
@@ -1801,6 +1830,8 @@ switch ($action) {
     $logged = false;
     $mfaPending = false;
     $enrollPending = false;
+    $pendingExpiresIn = null;
+    $authExpired = null;
     $user = null;
     if (!empty($_SESSION['user']) && is_array($store)) {
       $u = find_user_by_username($store, (string)$_SESSION['user']);
@@ -1815,7 +1846,13 @@ switch ($action) {
     $enrollUser = (string)($_SESSION['enroll_user'] ?? '');
     $enrollSecret = (string)($_SESSION['enroll_secret'] ?? '');
     $enrollStarted = (int)($_SESSION['enroll_started'] ?? 0);
-    if (!$logged && $enrollUser !== '' && $enrollSecret !== '' && (time() - $enrollStarted) <= 600) {
+    $enrollRemaining = pending_auth_remaining_seconds($enrollStarted);
+    if (
+      !$logged &&
+      $enrollUser !== '' &&
+      $enrollSecret !== '' &&
+      $enrollRemaining > 0
+    ) {
       $settings = is_array($store['settings'] ?? null) ? $store['settings'] : [];
       $issuer = (string)($settings['issuer'] ?? 'HESEM QMS');
       $mfaPending = false;
@@ -1832,15 +1869,33 @@ switch ($action) {
         'otpauth_url' => otpauth_url($issuer, $enrollUser, $enrollSecret),
         'user' => null,
         'csrf_token' => csrf_token(),
+        'pending_expires_in' => $enrollRemaining,
+        'auth_expired' => null,
         'server_time' => now_iso(),
         'initialized' => is_array($store),
       ]);
     }
+    if (!$logged && ($enrollUser !== '' || $enrollSecret !== '' || $enrollStarted > 0) && !$enrollPending) {
+      clear_pending_auth_session_state();
+      $authExpired = 'enroll';
+      $enrollUser = '';
+      $enrollSecret = '';
+      $enrollStarted = 0;
+    }
     $preauthUser = (string)($_SESSION['preauth_user'] ?? '');
+    $preauthStarted = (int)($_SESSION['preauth_started'] ?? 0);
+    $preauthRemaining = pending_auth_remaining_seconds($preauthStarted);
+    if (!$logged && !$enrollPending && $preauthUser !== '' && $preauthRemaining <= 0) {
+      clear_pending_auth_session_state();
+      $authExpired = $authExpired ?: 'mfa';
+      $preauthUser = '';
+      $preauthStarted = 0;
+    }
     if (!$logged && !$enrollPending && $preauthUser !== '' && is_array($store)) {
       $u = find_user_by_username($store, $preauthUser);
       if ($u && session_requires_completed_mfa($u, is_array($store['settings'] ?? null) ? $store['settings'] : []) && empty($_SESSION['mfa_ok'])) {
         $mfaPending = true;
+        $pendingExpiresIn = $preauthRemaining > 0 ? $preauthRemaining : null;
       }
     }
     api_json([
@@ -1848,6 +1903,8 @@ switch ($action) {
       'logged_in' => (bool)$logged,
       'mfa_pending' => (bool)$mfaPending,
       'enroll_pending' => (bool)$enrollPending,
+      'pending_expires_in' => $pendingExpiresIn,
+      'auth_expired' => $authExpired,
       'user' => $user,
       'csrf_token' => csrf_token(),
       'server_time' => now_iso(),
@@ -3887,6 +3944,7 @@ case 'auth_login': {
     'mfa_required' => true,
     'enroll_required' => false,
     'message' => 'Enter your authenticator code',
+    'pending_expires_in' => pending_auth_ttl_seconds(),
     'csrf_token' => csrf_token(),
   ]);
 }
@@ -3912,6 +3970,7 @@ case 'auth_login': {
         'secret' => $secretB32,
         'otpauth_url' => otpauth_url($issuer, $username, $secretB32),
         'message' => 'Enroll MFA in your Authenticator app',
+        'pending_expires_in' => pending_auth_ttl_seconds(),
         'csrf_token' => csrf_token(),
       ]);
     }
@@ -3945,6 +4004,11 @@ case 'auth_login': {
     rate_limit_check('mfa_' . client_ip(), 60, 300, $RL_DIR);
 
 $username = (string)($_SESSION['preauth_user'] ?? '');
+$preauthStarted = (int)($_SESSION['preauth_started'] ?? 0);
+if ($username !== '' && pending_auth_remaining_seconds($preauthStarted) <= 0) {
+  clear_pending_auth_session_state();
+  api_json(['ok' => false, 'error' => 'mfa_expired'], 401);
+}
 if ($username === '') {
   // Fallback (compatibility): if session was lost between steps, allow verify by re-supplying username/password.
   $u = strtolower(trim((string)($data['username'] ?? '')));
@@ -4004,8 +4068,9 @@ if ($username === '') {
     $secretB32 = (string)($_SESSION['enroll_secret'] ?? '');
     $started = (int)($_SESSION['enroll_started'] ?? 0);
 
-    if ($username === '' || $secretB32 === '' || (time() - $started) > 600) {
-      api_json(['ok' => false, 'error' => 'enroll_expired'], 400);
+    if ($username === '' || $secretB32 === '' || pending_auth_remaining_seconds($started) <= 0) {
+      clear_pending_auth_session_state();
+      api_json(['ok' => false, 'error' => 'enroll_expired'], 401);
     }
 
     if (!totp_verify($secretB32, $code, 1, 30, 6)) api_json(['ok' => false, 'error' => 'invalid_code'], 401);
