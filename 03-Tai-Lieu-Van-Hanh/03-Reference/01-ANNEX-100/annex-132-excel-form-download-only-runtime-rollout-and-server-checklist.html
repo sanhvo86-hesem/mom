@@ -28,7 +28,7 @@
   <div class="cardx"><div class="muted2">Reverse proxy/CDN</div><b>Không strip header</b></div>
   <div class="cardx"><div class="muted2">Portal behavior</div><b>Download on open</b></div>
 </div>
-<div class="table-card"><table class="table smalltable"><thead><tr><th>Hạng mục</th><th>Yêu cầu bắt buộc</th><th>Evidence chấp nhận</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table smalltable"><thead><tr><th>Hạng mục</th><th>Yêu cầu bắt buộc</th><th>Evidence chấp nhận</th></tr></thead><tbody>
 <tr><td>MIME types</td><td>`.xlsx`, `.xlsm`, `.xls` phải được server nhận diện đúng.</td><td>Header capture / server config snapshot.</td></tr>
 <tr><td>Attachment delivery</td><td>Workbook phải trả về dưới dạng attachment download.</td><td>`Content-Disposition: attachment` từ server thật.</td></tr>
 <tr><td>No sniff</td><td>Bật `X-Content-Type-Options: nosniff` cho workbook response.</td><td>Header capture.</td></tr>

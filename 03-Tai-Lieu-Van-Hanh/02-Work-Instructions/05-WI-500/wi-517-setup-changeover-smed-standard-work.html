@@ -48,7 +48,7 @@
 .lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
 ul.tight li {margin:4px 0;}
 hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
-@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix, .pill-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+@media (max-width: 960px; width: 100%; box-sizing: border-box) { .two-col, .three-col, .kpi-grid, .matrix, .pill-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 
 </style>
 </head>
@@ -80,7 +80,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-danger"><strong>QUYỀN DỪNG</strong><br/>Setup Lead, Supervisor, QA, Engineering và Maintenance có quyền dừng changeover ngay lập tức khi có một trong các tình huống sau: sai phiên bản (wrong revision) set; nghi ngờ sai chương trình; fixture/jaw không đủ điều kiện; offset/probe zero không tin cậy; gage CTQ chưa sẵn sàng; phát hiện nguy cơ crash, FOD hoặc rủi ro năng lượng chưa được kiểm soát. <b>PHẢI</b> xác minh điều kiện an toàn và readiness trước khi chạy thử.</div>
 <div class="keyline"><strong>Kết quả đầu ra bắt buộc</strong><br/>Kết thúc WI-517 phải tạo được 03 đầu ra: <b>(1)</b> máy ở trạng thái ready-to-run có sign-off, <b>(2)</b> hồ sơ setup/changeover được ghi vết đầy đủ, <b>(3)</b> lệnh chuyển qua <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> và <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a> để xác nhận first piece và pre-run trước Cycle Start.</div></div>
 <div class="section"><h2>2. Tình huống bắt buộc mở WI-517</h2>
-<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Mức changeover bắt buộc</th><th>Gate / hồ sơ tối thiểu</th><th>Không được chạy khi</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Mức changeover bắt buộc</th><th>Gate / hồ sơ tối thiểu</th><th>Không được chạy khi</th></tr></thead><tbody>
 <tr><td>Job mới hoặc Part/Rev mới</td><td>Full external + internal SMED</td><td><a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a> + <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-514_SMED_Changeover_Record.xlsx">FRM-514</a> + <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a></td><td>Thiếu release set, thiếu setup sheet, thiếu tool list, thiếu first-piece plan</td></tr>
 <tr><td>Đổi fixture, soft jaw, chuck jaw, collet, vise layout</td><td>Full internal setup + prove-out</td><td>FRM-514 + sign-off ready-to-run</td><td>Fixture chưa qualification hoặc orientation chưa xác nhận</td></tr>
 <tr><td>Đổi máy trong cùng WO hoặc work transfer</td><td>Full setup + work transfer validation</td><td><a href="wi-518-work-transfer-validation.html">WI-518</a> + WI-302</td><td>Chưa có xác nhận năng lực máy, datum, tool pack, route và gate</td></tr>
@@ -89,7 +89,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Job QPL-3/QPL-4, CTQ cao, customer overlay đặc biệt</td><td>Full setup với kiểm sâu hơn</td><td><a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a> + WI-302</td><td>Chưa khóa overlay khách hàng hoặc thiếu yêu cầu chứng từ/cert</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>3. Đầu vào bắt buộc trước khi dừng máy</h2>
-<div class="table-card"><table><thead><tr><th>Đầu vào</th><th>Tiêu chí PASS</th><th>Bằng chứng / nguồn</th><th>HOLD nếu</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Đầu vào</th><th>Tiêu chí PASS</th><th>Bằng chứng / nguồn</th><th>HOLD nếu</th></tr></thead><tbody>
 <tr><td>Revision set</td><td>Drawing/spec, traveler, setup sheet, tool list, kế hoạch kiểm tra (inspection plan), QPL và yêu cầu khách hàng cùng một Part/Rev hiệu lực</td><td><a href="../../03-Reference/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a> + traveler + Job Dossier</td><td>Có bất kỳ tài liệu nào khác revision hoặc không truy xuất được bản hiệu lực</td></tr>
 <tr><td>NC program release</td><td>Program ID/Rev/hash đúng; file lấy từ kho phát hành hoặc DNC/Vault kiểm soát; không dùng file cá nhân</td><td><a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td><td>Không chứng minh được nguồn phát hành hoặc hash không khớp</td></tr>
 <tr><td>Tool pack và tuổi dao (tool life)</td><td>ToolID, holder, insert grade, stick-out, preset data và tuổi dao còn lại đủ cho prove-out + first run</td><td>Tool list + log tuổi dao + kitting note</td><td>Thiếu tool quan trọng, thiếu preset data, tuổi dao (tool life) không đủ cho part đầu</td></tr>
@@ -101,7 +101,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-warn"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Hoàn tất external preparation trước khi dừng máy để changeover. Khi máy đã dừng, tool, fixture, gage và revision đúng phải sẵn sàng đầy đủ tại điểm dùng.</div></div>
 <div class="section"><h2>4. External SMED — chuẩn bị ngoài máy theo họ máy</h2>
 <p>External SMED là phần việc phải hoàn tất trước khi máy dừng. Mọi thứ có thể chuẩn bị ngoài máy đều phải kéo ra ngoài máy. Không để time internal bị chiếm bởi việc đi tìm dữ liệu, tool, fixture hoặc người ký.</p>
-<div class="table-card"><table><thead><tr><th>Họ máy</th><th>External bắt buộc</th><th>Điểm nhạy cảm phải khóa trước</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Họ máy</th><th>External bắt buộc</th><th>Điểm nhạy cảm phải khóa trước</th></tr></thead><tbody>
 <tr><td>3-axis vertical mill</td><td>Preset dao; chuẩn bị vise/soft jaw; xác nhận chiều cao đồ gá; chuẩn bị probe stylus; in rõ WCS và mặt chuẩn</td><td>Đường dao gần hàm kẹp, chiều dài dao dài, chip evacuation ở pocket sâu</td></tr>
 <tr><td>5-axis mill</td><td>Khóa fixture height, rotary orientation, pivot/reference set, safe home, collision envelope và model đồ gá</td><td>Va chạm trục quay, sai trật tự home, sai chiều gá gây crash ở prove-out</td></tr>
 <tr><td>CNC turning</td><td>Chuẩn bị chuck jaw/collet, stop length, tailstock/live center, insert grade, bar/slug feed length</td><td>Sai nhô phôi, sai jaw step, sai orientation insert làm xước bề mặt hoặc văng phôi</td></tr>
@@ -115,7 +115,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Chuẩn bị vật liệu và xử lý close-out job cũ.</strong><br/>Material lot phải chờ sẵn theo FIFO/FEFO và không lẫn với job khác. Job cũ phải làm xong close-out, dọn hết part/WIP/tool thừa, clear fixture state và clear FOD trước khi đưa job mới vào máy.</div>
 </div></div>
 <div class="section"><h2>5. Internal changeover — trình tự tại máy</h2>
-<div class="table-card"><table><thead><tr><th>Bước</th><th>Yêu cầu bắt buộc</th><th>PASS</th><th>HOLD</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bước</th><th>Yêu cầu bắt buộc</th><th>PASS</th><th>HOLD</th></tr></thead><tbody>
 <tr><td>1. Safe stop và line clearance</td><td>Dừng spindle/coolant đúng trình tự; làm sạch chip, bavia và vật lạ; xác nhận không còn part, tool, note, shim rời của job cũ</td><td>Machine zone sạch, clear, không có loose items</td><td>Còn đồ vật lạ hoặc chưa kiểm soát năng lượng phù hợp</td></tr>
 <tr><td>2. Lắp fixture/jaw/workholding</td><td>Lắp đúng ID, đúng orientation, đúng hardware; kiểm torque/bề mặt tựa; xác nhận không cấn đường dao</td><td>Fixture ổn định, không nghi ngờ lỏng lệch</td><td>Không xác nhận được orientation hoặc hardware thiếu</td></tr>
 <tr><td>3. Nạp program và gọi route</td><td>Gọi đúng Program ID/Rev/hash từ nguồn kiểm soát; đúng operation; đúng machine post</td><td>Program trên máy khớp release set</td><td>Program mismatch, không truy vết được nguồn, hoặc operator sửa tay không qua release</td></tr>
@@ -128,7 +128,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-info"><strong>Quy tắc prove-out</strong><br/>nhóm máy (machine family) càng phức tạp thì prove-out càng phải chậm và chia nhỏ. 5-axis và mill-turn phải prove-out cả vùng xoay, vùng transfer và vùng đổi kênh. Turning phải prove-out vùng chuck jaw, tailstock và clearance của tool ngoài/mặt đầu.</div></div>
 <div class="section"><h2>6. Ready-to-run sign-off và bàn giao ca</h2>
 <p><b>Ready-to-run</b> chỉ đạt khi người nhận máy có thể chạy part đầu một cách kiểm soát mà không cần hỏi lại dữ liệu nền. Không dùng câu “máy chạy được rồi” thay cho sign-off có trường dữ liệu.</p>
-<div class="table-card"><table><thead><tr><th>Trường phải bàn giao</th><th>Nội dung tối thiểu</th><th>Người xác nhận</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường phải bàn giao</th><th>Nội dung tối thiểu</th><th>Người xác nhận</th></tr></thead><tbody>
 <tr><td>Identity</td><td>Job, Operation, Part/Rev, MachineID, Shift, tên người setup</td><td>Setup Lead</td></tr>
 <tr><td>Program</td><td>Program ID/Rev/hash, nguồn phát hành, trạng thái prove-out</td><td>Setup Lead + Engineering khi job rủi ro</td></tr>
 <tr><td>WCS / datum</td><td>WCS đang dùng, datum logic, probe routine, điểm cần cẩn trọng</td><td>Setup Lead</td></tr>
@@ -139,7 +139,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div>
 <div class="callout-warn"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Bàn giao trực tiếp tại máy, cùng xem hồ sơ và cùng ký FRM-514 / FRM-511 khi changeover qua ca.</div></div>
 <div class="section"><h2>7. Restart sau bất thường hoặc sau crash</h2>
-<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Phải làm trước khi chạy lại</th><th>Ai mở lại release</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm trước khi chạy lại</th><th>Ai mở lại release</th></tr></thead><tbody>
 <tr><td>Tool gãy, insert sứt, offset điều chỉnh vì drift CTQ</td><td>Đổi tool, ghi tuổi dao, re-check offset, đo lại đặc tính chịu ảnh hưởng, cập nhật last-known-good</td><td>Supervisor; QA cùng ký nếu ảnh hưởng CTQ</td></tr>
 <tr><td>Alarm va chạm nhẹ / near-miss</td><td>Khoanh vùng part từ last-known-good, kiểm fixture, holder, tool nose, zero và prove-out lại vùng rủi ro</td><td>Supervisor + QA</td></tr>
 <tr><td>Crash, probe hit, va chạm rotary/chuck</td><td>HOLD máy; Maintenance/Engineering kiểm machine condition; re-setup toàn bộ; first piece lại từ đầu</td><td>Production Manager + QA + Engineering</td></tr>
@@ -148,7 +148,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div></div>
 <div class="section"><h2>8. Time study, loss coding và cải tiến SMED</h2>
 <p>Mọi changeover phải ghi rõ thời gian external, internal, first-piece và nguyên nhân mất thời gian. Không đo time study để báo cáo đẹp; đo để cắt lãng phí đúng điểm.</p>
-<div class="table-card"><table><thead><tr><th>Mã mất thời gian</th><th>Nghĩa</th><th>Hành động bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mã mất thời gian</th><th>Nghĩa</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td>L01</td><td>Chờ tool / preset / insert</td><td>Chuẩn hóa pull list, tool crib prep, tool preset trước giờ dừng máy</td></tr>
 <tr><td>L02</td><td>Fixture / jaw / hardware không sẵn</td><td>Chuẩn hóa kit đồ gá, pre-qualification ngoài máy</td></tr>
 <tr><td>L03</td><td>sai phiên bản (wrong revision) set / thiếu tài liệu</td><td>Khóa release set từ đầu, PHẢI chặn phát lệnh changeover khi hồ sơ chưa khóa</td></tr>
@@ -162,7 +162,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div>
 <div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Median internal changeover time; % external prep hoàn tất trước khi dừng máy; first-run FPY; số alarm/collision trong 10 part đầu; % ready-to-run sign-off đầy đủ.</div></div><div class="kpi-box"><strong>Records bắt buộc</strong><div class="tiny" style="margin-top:6px;"><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-514_SMED_Changeover_Record.xlsx">FRM-514</a>; <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a>; tuổi dao (tool life) log; traveler; ảnh/evidence khi job rủi ro; last-known-good record khi restart bất thường.</div></div></div></div>
 <div class="section"><h2>9. Tài liệu liên kết</h2>
-<div class="table-card"><table><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td><td>Chủ SOP của setup / release / work transfer.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a></td><td>Quy tắc thực thi gia công trong chạy máy.</td></tr>
 <tr><td><a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a></td><td>First piece / FAI / evidence pack sau setup.</td></tr>

@@ -44,7 +44,7 @@
 .lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
 ul.tight li {margin:4px 0;}
 hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
-@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+@media (max-width: 960px; width: 100%; box-sizing: border-box) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 </head>
 <body>
@@ -82,7 +82,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </ul></div>
 
 <div class="section"><h2>2. Các loại nhãn nội bộ và dữ liệu bắt buộc</h2>
-<div class="table-card"><table><thead><tr><th>Loại nhãn</th><th>Dùng khi</th><th>Dữ liệu bắt buộc</th><th>Owner in / xác nhận</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại nhãn</th><th>Dùng khi</th><th>Dữ liệu bắt buộc</th><th>Owner in / xác nhận</th></tr></thead><tbody>
 <tr><td>WIP Container Label</td><td>Chứa bán thành phẩm giữa các công đoạn</td><td>Jobhum, OpSeq hiện tại, Partho, Rev, Qty, UOM, ContainerID, trạng thái, ngày giờ in</td><td>Production / Planning</td></tr>
 <tr><td>Hold Label</td><td>Cách ly nghi ngờ hC, truy xuất sai, thiếu hồ sơ</td><td>ContainerID, Jobhum, mã hold reason, ngày giờ hold, người mở hold</td><td>QA / Supervisor</td></tr>
 <tr><td>Move Label</td><td>Chuyển máy, chuyển ca, chuyển cell, chuyển outsource</td><td>Jobhum, from/to operation, Qty good/suspect/scrap, next owner</td><td>Production / WHS</td></tr>
@@ -103,7 +103,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div></div>
 
 <div class="section"><h2>4. Luật trạng thái và phản ứng bắt buộc</h2>
-<div class="table-card"><table><thead><tr><th>Trạng thái</th><th>Ý nghĩa</th><th>Ai được đặt</th><th>Điều kiện rời trạng thái</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Ý nghĩa</th><th>Ai được đặt</th><th>Điều kiện rời trạng thái</th></tr></thead><tbody>
 <tr><td>RELEASED</td><td>Container sẵn sàng nhận việc</td><td>Planning / Production</td><td>Được quét START tại công đoạn hợp lệ</td></tr>
 <tr><td>Ih PROCESS</td><td>Đang gia công / đang kiểm / đang xử lý</td><td>Operator / QA</td><td>Complete, Hold hoặc Move</td></tr>
 <tr><td>HOLD</td><td>Bị chặn vì chất lượng, hồ sơ, nhầm revision, vật tư, tool/gage</td><td>QA / Supervisor</td><td>Có quyết định mở hold và bằng chứng kèm theo</td></tr>
@@ -127,7 +127,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="kpi-box"><strong>hPI-WI205-03</strong><br/>Số reprint/void trên 100 container. Mục tiêu: giảm liên tục; điều tra khi vượt ngưỡng nội bộ.</div>
 <div class="kpi-box"><strong>hPI-WI205-04</strong><br/>Tỷ lệ container chuyển bước mà không có move scan hợp lệ. Mục tiêu: 0.</div>
 </div>
-<div class="table-card"><table><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a></td><td>Quy tắc dùng biểu mẫu số, backfill và offline fallback.</td></tr>
 <tr><td><a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>hhóa Job Dossier, kiểm tính đầy đủ hồ sơ.</td></tr>
 <tr><td><a href="../../03-Reference/03-AhhEX-Digital/annex-108-m365-lists-and-field-mapping.html">AhhEX-QMS-005</a></td><td>Field mapping, validation rule và nguồn dữ liệu.</td></tr>

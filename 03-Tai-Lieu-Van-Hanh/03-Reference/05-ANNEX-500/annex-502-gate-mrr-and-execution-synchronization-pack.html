@@ -46,7 +46,7 @@ ul.tight li {margin:4px 0;}
 .step-item{position:relative;padding-left:48px;}
 .step-item:before{counter-increment:step;content:counter(step);position:absolute;left:12px;top:12px;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;}
 hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
-@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix, .photo-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+@media (max-width: 960px; width: 100%; box-sizing: border-box) { .two-col, .three-col, .kpi-grid, .matrix, .photo-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 
 </head>
@@ -83,7 +83,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div></div>
 
 <div class="section"><h2>2. Gate map G0–G5</h2>
-<div class="table-card"><table><thead><tr><th>Gate</th><th>Mục tiêu</th><th>Entry criteria</th><th>Decision owner</th><th>MRR tối thiểu</th><th>Hold signal mạnh nhất</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Gate</th><th>Mục tiêu</th><th>Entry criteria</th><th>Decision owner</th><th>MRR tối thiểu</th><th>Hold signal mạnh nhất</th></tr></thead><tbody>
 <tr><td><span class="badge-blue">G0 — RFQ / Contract kickoff</span></td><td>Khóa yêu cầu khách hàng, rev, CSR, qty, due date, QPL sơ bộ</td><td>RFQ/PO rõ, file kỹ thuật có thể đọc, assumption đã ghi</td><td>Sales / Engineering</td><td>RFQ register, contract review, kickoff checklist</td><td>Thiếu file kỹ thuật, rev mơ hồ, requirement conflict</td></tr>
 <tr><td><span class="badge-blue">G1 — Planning / Engineering release</span></td><td>Khóa baseline, route, setup, tool, program, inspection requirement</td><td>Baseline đã phát hành, planning release PASS</td><td>Engineering / Planning</td><td>Setup sheet, route, tool list, inspection requirement, planning release checklist</td><td>Mismatch giữa drawing/setup/program/control plan</td></tr>
 <tr><td><span class="badge-blue">G2 — Setup / first-piece / FAI release</span></td><td>Xác nhận máy có thể chạy lô theo CTQ đã phê duyệt</td><td>Job packet đủ, machine ready, gage ready, first-piece plan rõ</td><td>Production + QA</td><td>Setup & first-piece record, FAI/first-piece evidence</td><td>Thiếu gage, thiếu sign-off, sai offset / sai fixture / sai datum</td></tr>
@@ -93,7 +93,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </tbody></table></div></div>
 
 <div class="section"><h2>3. Bundle MRR bắt buộc theo từng gate</h2>
-<div class="table-card"><table><thead><tr><th>Gate</th><th>Bộ hồ sơ tối thiểu phải truy xuất được trong 60 giây</th><th>Nơi phải tìm thấy</th><th>Ai chịu trách nhiệm completeness</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Gate</th><th>Bộ hồ sơ tối thiểu phải truy xuất được trong 60 giây</th><th>Nơi phải tìm thấy</th><th>Ai chịu trách nhiệm completeness</th></tr></thead><tbody>
 <tr><td>G0</td><td>RFQ register, rà soát hợp đồng (contract review / rà soát hợp đồng), customer requirements / CSR, bản vẽ đang báo giá, assumption log</td><td>ERP + Job Dossier</td><td>Sales / Estimator</td></tr>
 <tr><td>G1</td><td>Baseline drawing/rev, route, setup sheet, program ID, tool list, control plan / inspection requirement, planning release</td><td>ERP + Engineering folder + Job Dossier</td><td>Engineering + Planning</td></tr>
 <tr><td>G2</td><td>Setup and first-piece record, balloon/FAI pack khi áp dụng, gage availability, machine ready sign-off, abnormal risk notes</td><td>Traveler + Job Dossier + machine-side packet</td><td>Production Supervisor + QA</td></tr>
@@ -103,7 +103,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </tbody></table></div></div>
 
 <div class="section"><h2>4. Trường dữ liệu handoff bắt buộc giữa các vai</h2>
-<div class="table-card"><table><thead><tr><th>Nhóm trường</th><th>Giao từ</th><th>Nhận bởi</th><th>Phải có</th><th>Không được để trống</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm trường</th><th>Giao từ</th><th>Nhận bởi</th><th>Phải có</th><th>Không được để trống</th></tr></thead><tbody>
 <tr><td>Job master</td><td>Sales / Planning</td><td>Engineering / Production / QA / WHS</td><td>Customer, Job, Part, Rev, Qty, due date, ship-to, priority class</td><td>Job, Part, Rev, Qty, due date</td></tr>
 <tr><td>Engineering release</td><td>Engineering</td><td>Planning / Production / QA</td><td>Program ID, setup sheet ID, fixture/tool requirement, CTQ list, datum logic, special notes</td><td>Program ID, setup sheet ID, CTQ / control reference</td></tr>
 <tr><td>Quality gate</td><td>QA</td><td>Production / WHS</td><td>First-piece result, FAI requirement, inspection frequency, hold/release result, cert requirement</td><td>Gate status, hold reason, release owner</td></tr>
@@ -112,7 +112,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </tbody></table></div></div>
 
 <div class="section"><h2>5. Dấu hiệu lệch revision-set và hành động bắt buộc</h2>
-<div class="table-card"><table><thead><tr><th>Dấu hiệu lệch</th><th>Ví dụ thực tế</th><th>Hành động bắt buộc</th><th>Ai phải biết ngay</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Dấu hiệu lệch</th><th>Ví dụ thực tế</th><th>Hành động bắt buộc</th><th>Ai phải biết ngay</th></tr></thead><tbody>
 <tr><td>Drawing Rev ≠ Setup sheet Rev</td><td>Bản vẽ Rev C nhưng setup sheet còn Rev B</td><td>HOLD G1/G2. Dừng setup. Thu hồi packet tại máy. Rebaseline lại trước khi chạy.</td><td>Engineering, Planning, Production, QA</td></tr>
 <tr><td>Program ID ≠ Program release list</td><td>Máy đang gọi chương trình cũ hoặc chương trình không nằm trong baseline</td><td>HOLD G2/G3. Không chạy first cut. Ghi abnormal restart / wrong program event.</td><td>Production Supervisor, Engineering, QA</td></tr>
 <tr><td>Traveler / barcode / WIP card không khớp lot</td><td>Lot trên khay khác với lot trong traveler</td><td>HOLD G3/G4. Cách ly lô, kiểm 100% trace, không trộn lại bằng tay.</td><td>Production, QA, WHS</td></tr>
@@ -121,7 +121,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>6. Retrieval drill 60 giây</h2>
 <div class="callout-info"><strong>Mục tiêu:</strong> tại mỗi gate, người phụ trách phải mở đúng bằng chứng trong 60 giây. Không tìm thấy trong 60 giây xem như chưa kiểm soát đủ.</div>
-<div class="table-card"><table><thead><tr><th>Gate</th><th>Phải truy xuất trong 60 giây</th><th>Đạt khi</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Gate</th><th>Phải truy xuất trong 60 giây</th><th>Đạt khi</th></tr></thead><tbody>
 <tr><td>G1</td><td>Setup sheet đúng Rev, Program ID, Planning release checklist</td><td>Mở đúng file / đúng bản đang hiệu lực / đúng Job</td></tr>
 <tr><td>G2</td><td>Setup and first-piece record, inspection points, gage status</td><td>Thấy rõ người ký, giờ ký và kết quả PASS/HOLD</td></tr>
 <tr><td>G3</td><td>Dispatch list, current WIP status, abnormal log mở gần nhất</td><td>Xác nhận được lô đang ở đâu, ai giữ và đang chờ gì</td></tr>
@@ -130,7 +130,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </tbody></table></div></div>
 
 <div class="section"><h2>7. Customer overlay và package đặc biệt</h2>
-<div class="table-card"><table><thead><tr><th>Overlay</th><th>Khi áp dụng</th><th>Phải cộng thêm vào MRR</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Overlay</th><th>Khi áp dụng</th><th>Phải cộng thêm vào MRR</th></tr></thead><tbody>
 <tr><td>Prototype / hot-job</td><td>thời gian dẫn (lead time / thời gian dẫn) cực ngắn, sample, urgent recovery</td><td>Risk note, deviation approval, expedited dispatch record</td></tr>
 <tr><td>Semiconductor / vacuum / cleanliness</td><td>Part có clean build, leak test, particle / moisture / vacuum requirement</td><td>Clean pack evidence, cleanliness verification, leak test record, preservation class</td></tr>
 <tr><td>Outsource-heavy</td><td>Có nhiều công đoạn thuê ngoài / special process</td><td>Dispatch checklist, processor cert, incoming verification, lot trace continuity</td></tr>
@@ -138,7 +138,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </tbody></table></div></div>
 
 <div class="section"><h2>8. Exception path: work transfer, rebaseline, split lot, partial ship</h2>
-<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Có được đi tiếp không</th><th>Điều kiện bắt buộc trước khi mở lại</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Có được đi tiếp không</th><th>Điều kiện bắt buộc trước khi mở lại</th></tr></thead><tbody>
 <tr><td>Work transfer sang máy / ca / người khác</td><td>Chỉ được đi tiếp sau G2 mini-check hoặc theo <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Handoff log, current offset/tool state, part sample retained, first 1–3 pcs verify lại</td></tr>
 <tr><td>Rebaseline do đổi rev / ECO</td><td>Không được dùng dữ liệu G2/G3 cũ nguyên xi</td><td>Thu hồi revision set cũ, baseline mới, đánh dấu cut-over time, re-sign engineering + QA</td></tr>
 <tr><td>Split lot / partial ship</td><td>Được nếu trace và label tách hoàn toàn</td><td>Mỗi lot con có pack reconciliation riêng, label riêng, qty balance rõ</td></tr>
@@ -163,7 +163,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div></div>
 
 <div class="section"><h2>10. Tài liệu liên kết</h2>
-<div class="table-card"><table><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a></td><td>Thực hiện gate, hold, release tại hiện trường.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Kiểm completeness hồ sơ theo gate.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Điều độ, WIP và cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch).</td></tr>

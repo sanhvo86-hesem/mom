@@ -67,7 +67,7 @@ ul.tight li {margin:4px 0;}
 <h1>WI-207 — Readiness review / control tower cho Job rủi ro cao, Job gấp và Job đặc biệt</h1>
 <div class="section"><h2>1. Mục đích, trigger và nguyên tắc kích hoạt</h2>
 <p>WI này bắt buộc dùng để kiểm tra mức sẵn sàng của những Job có rủi ro giao hàng hoặc rủi ro chất lượng cao trước khi thả vào nhịp chạy bình thường. Control tower không thay cho họp hằng ngày; control tower là cơ chế <strong>khóa điều kiện vào cuộc</strong> cho Job đặc biệt để tránh “đã phát lệnh rồi mới đi nhặt thiếu sót”.</p>
-<div class="table-card"><table><thead><tr><th>Trigger</th><th>Kích hoạt khi</th><th>Chủ trì</th><th>Kết quả bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trigger</th><th>Kích hoạt khi</th><th>Chủ trì</th><th>Kết quả bắt buộc</th></tr></thead><tbody>
 <tr><td>Job mới / part mới</td><td>Lần đầu gia công tại HESEM, phiên bản mới, tolerance chặt, process chain chưa có lịch sử ổn định.</td><td>Engineering + Planning</td><td>Ready / Blocked / Ready with controls.</td></tr>
 <tr><td>Job rủi ro giao hàng</td><td>thời gian dẫn (lead time / thời gian dẫn) ngắn, commit date sát, nhiều công đoạn outsource, thiếu vật tư/tool/gage hoặc open issue ảnh hưởng ship.</td><td>Program / Planning</td><td>Action list có owner và SLA.</td></tr>
 <tr><td>Job đặc biệt</td><td>QPL cao, cleanliness/vacuum, leak test, special process, customer property, first article/revalidation.</td><td>QA + Engineering</td><td>Gate matrix, evidence pack và escalation path rõ.</td></tr>
@@ -75,7 +75,7 @@ ul.tight li {margin:4px 0;}
 </tbody></table></div>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ kích hoạt control tower khi có trigger thật và luôn kết thúc bằng quyết định rõ: chạy, chạy có điều kiện hoặc dừng.</div></div>
 <div class="section"><h2>2. Gói dữ liệu phải có trước cuộc họp</h2>
-<div class="table-card"><table><thead><tr><th>Nhóm dữ liệu</th><th>Phải có</th><th>BLOCK khi</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm dữ liệu</th><th>Phải có</th><th>BLOCK khi</th></tr></thead><tbody>
 <tr><td>Commercial / customer</td><td>PO/forecast, commit ship date, customer-specific requirement, QPL, cert, packaging requirement.</td><td>Chưa chốt ngày giao, thiếu flow-down hoặc mâu thuẫn yêu cầu khách hàng.</td></tr>
 <tr><td>Engineering baseline</td><td>Drawing/3D/rev, router, NC/program readiness, setup sheet, tool list, control plan/FMEA mức cần thiết.</td><td>Revision chưa khóa, route chưa rõ, chưa chốt program/setup strategy.</td></tr>
 <tr><td>Material &amp; source</td><td>Tình trạng raw material, heat/lot, approved source, outsource processor, cert path.</td><td>Thiếu vật tư, thiếu cert, source chưa approved, special process chưa chốt.</td></tr>
@@ -93,7 +93,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-item"><strong>Bước 6 — Theo dõi sau họp.</strong><br/>Control tower review lại theo nhịp đã chốt cho đến khi Job về trạng thái xanh. Nếu phát sinh rủi ro mới làm thay đổi assumptions, phải họp lại; không được ngầm đổi plan trên shopfloor.</div>
 </div></div>
 <div class="section"><h2>4. Logic quyết định Ready / Blocked / Ship-risk</h2>
-<div class="table-card"><table><thead><tr><th>Trạng thái</th><th>Điều kiện</th><th>Hành động bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Điều kiện</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td><span class="badge-green">READY</span></td><td>Material, route, program, setup, gage, plan kiểm và hồ sơ release đều đã sẵn hoặc đã có bằng chứng xác nhận.</td><td>Cho vào dispatch board; kiểm theo gate chuẩn.</td></tr>
 <tr><td><span class="badge-amber">READY WITH CONTROLS</span></td><td>Có rủi ro đã biết nhưng đã có containment hợp lệ như alternate machine, split lot, staged material, tăng sampling, daily control tower.</td><td>Ghi rõ control bổ sung, owner, điều kiện dừng và thời điểm review tiếp.</td></tr>
 <tr><td><span class="badge-red">BLOCKED</span></td><td>Thiếu baseline, thiếu vật tư/chứng chỉ quan trọng, chưa chốt processor, chưa sẵn gage/fixture, open NCR ảnh hưởng CTQ, hoặc điều kiện first piece chưa sẵn.</td><td>Không dispatch; mở escalation theo <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</td></tr>
@@ -114,7 +114,7 @@ ul.tight li {margin:4px 0;}
 <li><strong>KPI-WI207-04</strong> Số ngày hold mở kéo dài trên Job high-risk.</li>
 </ul></div>
 </div>
-<div class="table-card"><table><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>Quản trị đơn hàng và commit ngày giao.</td></tr>
 <tr><td><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a></td><td>Readiness về baseline kỹ thuật.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Điều độ và dispatch.</td></tr>

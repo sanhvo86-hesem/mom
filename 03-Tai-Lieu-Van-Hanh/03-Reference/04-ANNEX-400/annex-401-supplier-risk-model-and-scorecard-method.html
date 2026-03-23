@@ -45,7 +45,7 @@
 .lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
 ul.tight li {margin:4px 0;}
 hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
-@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+@media (max-width: 960px; width: 100%; box-sizing: border-box) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 </head>
 <body>
@@ -75,7 +75,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <p>ANNEX này quy định hai lớp kiểm soát song song: <b>(1) rủi ro nền của nhà cung cấp</b> và <b>(2) hiệu năng thực tế theo scorecard</b>. Hai lớp này cùng quyết định supplier status, tần suất review, mức độ incoming verification, yêu cầu dual-source, trigger probation/block và điều kiện mở khóa lại.</p>
 <p>Tài liệu áp dụng cho raw material suppliers, customer-designated suppliers, special processors, subcontract machining houses, dịch vụ kiểm định/hiệu chuẩn ảnh hưởng sản phẩm, và các nguồn cung ảnh hưởng trực tiếp tới tiến độ/tuân thủ chất lượng của Job order CNC.</p>
 <h2>2. Phân loại family và rủi ro nền R1–R4</h2>
-<div class="table-card"><table>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Family</th><th>Ví dụ</th><th>Rủi ro nền mặc định</th><th>Kiểm soát tối thiểu bắt buộc</th></tr></thead>
 <tbody>
 <tr><td>Critical raw material</td><td>Bar/plate/tube/forging/casting, vật liệu đặc chủng, customer-specified grade</td><td><span class="badge-red">R1</span></td><td>Approved source, cert/MTR 100%, heat/lot trace, incoming verification, substitute control, periodic scorecard.</td></tr>
@@ -96,7 +96,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 <h2>4. Phương pháp scorecard và trọng số</h2>
 <p>Scorecard dùng thang điểm 0–100. Từng dimension chấm theo dữ liệu thực tế, không chấm cảm tính. Nếu không có đủ lịch sử, dùng trạng thái <b>New/Insufficient History</b> và áp mức kiểm soát chặt hơn thay vì tự động cho điểm cao.</p>
-<div class="table-card"><table>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Dimension</th><th>Mô tả bắt buộc</th><th>Raw material</th><th>Special processor</th><th>Subcontract machining</th><th>General supply</th></tr></thead>
 <tbody>
 <tr><td>Quality performance</td><td>Reject rate, repeat defect, SCAR, escape, complaint, lot hold</td><td>25%</td><td>25%</td><td>25%</td><td>20%</td></tr>
@@ -113,7 +113,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="card"><h3>5.2 Window đánh giá</h3><p>Dùng rolling 12 tháng cho supplier ổn định. Supplier mới dùng rolling 3 tháng hoặc 3 lô đầu tiên, tùy cái nào đến sau. Không kết luận supplier tốt/xấu chỉ bằng 1 lô nếu chưa đủ dữ liệu, trừ khi có gating event nghiêm trọng.</p></div>
 </div>
 <h2>6. Gating event có quyền ghi đè score</h2>
-<div class="table-card"><table>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Sự kiện</th><th>Hành động bắt buộc</th><th>Authority tối thiểu</th></tr></thead>
 <tbody>
 <tr><td>Falsified/altered cert, cert không truy được nguồn, sửa tay không kiểm soát</td><td>Block ngay; dừng PO mới; giữ toàn bộ lô liên quan; đánh giá boundary impact</td><td>QA Mgr + Pur Mgr, escalated tới GM</td></tr>
@@ -123,7 +123,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>OTD collapse kéo dài hoặc không đáp ứng expedite trên item nguồn đơn (single-source / nguồn đơn)</td><td>Kích hoạt contingency/dual-source; review capacity risk; tăng review frequency</td><td>Pla Mgr + Pur Mgr</td></tr>
 </tbody></table></div>
 <h2>7. Status, ngưỡng hành động và tần suất review</h2>
-<div class="table-card"><table>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Điểm / trạng thái</th><th>Ý nghĩa</th><th>Hành động bắt buộc</th><th>Tần suất review tối thiểu</th></tr></thead>
 <tbody>
 <tr><td><span class="badge-green">90–100 Preferred</span></td><td>Hiệu năng ổn định, dữ liệu sạch, không có gating event mở</td><td>Dùng theo route chuẩn; vẫn giữ kiểm soát nền theo R-class</td><td>R1 hàng tháng; R2 hàng quý; R3/R4 nửa năm</td></tr>
@@ -140,7 +140,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <li>Raw material supplier phải phù hợp với <a href="annex-302-approved-materials-list.html">ANNEX-302</a>; score tốt không cho phép tự ý substitute material/grade/condition.</li>
 </ul>
 <h2>8A. Quy tắc chấm 1–5 cho từng dimension</h2>
-<div class="table-card"><table>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Dimension</th><th>Điểm 5</th><th>Điểm 3</th><th>Điểm 1</th></tr></thead>
 <tbody>
 <tr><td>Quality performance</td><td>Không có reject/escape lặp, corrective action đóng đúng hạn, evidence sạch.</td><td>Có issue cục bộ nhưng đã containment và không tái diễn kéo dài.</td><td>Repeat defect, CTQ issue, escape hoặc lot reject kéo dài.</td></tr>
@@ -152,7 +152,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div>
 <h2>8B. Requalification sau probation hoặc block</h2>
 <p>Supplier đang ở trạng thái <b>Probation</b> hoặc <b>Block</b> chỉ được mở lại khi hoàn tất đầy đủ bộ requalification tương ứng với nguyên nhân đã bị hạ cấp. Bộ requalification tối thiểu gồm: nguyên nhân gốc đã xác minh, containment đã hiệu lực, bằng chứng corrective action, bằng chứng lô thử hoặc lô đầu tiên sau phục hồi, cert/scope/trace sạch, và xác nhận authority theo đúng family ảnh hưởng.</p>
-<div class="table-card"><table>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Trạng thái trước đó</th><th>Bằng chứng mở lại tối thiểu</th><th>Ai verify</th><th>Ai approve mở lại</th></tr></thead>
 <tbody>
 <tr><td>Conditional → Approved</td><td>Score hồi phục, không còn open issue quá hạn, incoming check tăng cường đã ổn</td><td>Purchasing + QA</td><td>Pur Mgr</td></tr>
@@ -176,7 +176,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 <div data-phase2i="true">
 <h2>Quy tắc điều hành — Score-to-action override rules</h2>
-<div class="table-card"><table><thead><tr><th>Trigger</th><th>Default action</th><th>Điểm score có còn quyết định chính?</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trigger</th><th>Default action</th><th>Điểm score có còn quyết định chính?</th></tr></thead><tbody>
 <tr><td>Customer escape / counterfeit suspicion / unauthorized site-process change</td><td>SCAR + event audit + source-status downgrade ngay cho scope bị ảnh hưởng.</td><td>Không. Gate event override thắng điểm tổng.</td></tr>
 <tr><td>Recurring cert / trace mismatch hoặc repeated receipt HOLD</td><td>Giữ Conditional / Probation và mở recovery path cụ thể.</td><td>Không, cho tới khi hiệu lực được chứng minh qua verification window.</td></tr>
 <tr><td>Chronic capacity / continuity risk ở source critical</td><td>Mở alternate source / contingency plan và escalte nếu cần.</td><td>Không hoàn toàn; risk continuity có thể giới hạn scope dù score khác còn ổn.</td></tr>

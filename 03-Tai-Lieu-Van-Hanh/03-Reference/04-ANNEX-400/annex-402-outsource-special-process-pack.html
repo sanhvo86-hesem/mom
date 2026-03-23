@@ -45,7 +45,7 @@
 .lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
 ul.tight li {margin:4px 0;}
 hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
-@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+@media (max-width: 960px; width: 100%; box-sizing: border-box) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 </head>
 <body>
@@ -76,7 +76,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Khóa đủ pack trước khi gửi hàng ra ngoài, chỉ nhận hàng outsource về như hàng tốt khi cert, report, trace và scope đã đủ theo pack, và phát hành lại pack hoặc addendum pack có kiểm soát cho mọi thay đổi part rev, spec rev, route, processor, lot, qty, clean hoặc vacuum class, customer note làm thay đổi yêu cầu kỹ thuật.</div>
 </div><div class="section">
 <h2>2. Bộ dữ liệu bìa pack bắt buộc</h2>
-<div class="table-card"><table><thead><tr><th>Trường dữ liệu</th><th>Bắt buộc</th><th>Mục đích</th><th>Gate tạm giữ khi thiếu hoặc sai</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường dữ liệu</th><th>Bắt buộc</th><th>Mục đích</th><th>Gate tạm giữ khi thiếu hoặc sai</th></tr></thead><tbody>
 <tr><td>WO/Job / PO / subcontract PO</td><td>PHẢI có</td><td>Khóa giao dịch và liên kết trách nhiệm.</td><td>Không xác định được nguồn phát hành hoặc không liên kết được với routing/job.</td></tr>
 <tr><td>Part no / Rev / qty / UOM</td><td>PHẢI có</td><td>Khóa revision và số lượng giao nhận.</td><td>Part/Rev/qty không đồng nhất giữa PO, pack và traveller.</td></tr>
 <tr><td>Process family / process spec / class</td><td>PHẢI có</td><td>Xác định đúng loại xử lý và scope cert cần nhận về.</td><td>Chỉ ghi tên process chung chung như “anodize” mà không có class/spec/revision.</td></tr>
@@ -88,7 +88,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div>
 </div><div class="section">
 <h2>3. Thành phần bắt buộc của Outsource Pack</h2>
-<div class="table-card"><table><thead><tr><th>Nhóm tài liệu</th><th>Phải có trong pack</th><th>Ghi chú dùng thực tế</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm tài liệu</th><th>Phải có trong pack</th><th>Ghi chú dùng thực tế</th></tr></thead><tbody>
 <tr><td>Khóa kỹ thuật</td><td>Drawing/spec đúng revision, note CTQ, spec process, acceptance criteria, hình minh họa vùng mask/unmask khi áp dụng.</td><td>Không gửi file cũ sửa tay. File pack phải chỉ về bản kiểm soát trong SSOT.</td></tr>
 <tr><td>Khóa giao dịch</td><td>Subcontract PO, dòng flow-down bắt buộc, due date, qty gửi, qty trả, partial ship rule, process route.</td><td>Không dùng email thay thế PO chính thức.</td></tr>
 <tr><td>Khóa truy vết</td><td>Traveller/routing extract, source lot/heat/batch, receipt reference, previous gate release evidence.</td><td>PHẢI chặn gửi hàng chưa PASS công đoạn trước đó.</td></tr>
@@ -98,7 +98,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div>
 </div><div class="section">
 <h2>4. Flow-down bắt buộc trên PO / pack</h2>
-<div class="table-card"><table><thead><tr><th>Điều khoản flow-down</th><th>Khi nào bắt buộc</th><th>Ý nghĩa vận hành</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điều khoản flow-down</th><th>Khi nào bắt buộc</th><th>Ý nghĩa vận hành</th></tr></thead><tbody>
 <tr><td>Part no / Rev / Process spec / Revision lock</td><td>Mọi outsource job</td><td>Khoá processor theo đúng bản vẽ và spec; ngăn xử lý theo rev cũ.</td></tr>
 <tr><td>Lot / heat / batch trace maintained end-to-end</td><td>Mọi raw / special process / customer-trace job</td><td>Giữ chain of custody khi nhận về và khi điều tra NCR.</td></tr>
 <tr><td>No substitution / no route change / no rework without written approval</td><td>Mọi outsource job</td><td>Ngăn processor tự đổi hoá chất, đổi route, đánh bóng sửa lỗi hoặc rework miệng.</td></tr>
@@ -111,7 +111,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-info"><strong>Nguyên tắc cert:</strong> eAuditNet/QML chỉ là nguồn tra cứu processor đã được chấp nhận theo scope; bản thân HESEM vẫn <strong>PHẢI</strong> kiểm cert/scope/site/date/evidence của processor cho từng job. QML không thay thế bộ chứng từ của job.</div>
 </div><div class="section">
 <h2>5. Add-on pack theo process family</h2>
-<div class="table-card"><table><thead><tr><th>Process family</th><th>Add-on bắt buộc</th><th>Receipt-back phải kiểm</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Process family</th><th>Add-on bắt buộc</th><th>Receipt-back phải kiểm</th></tr></thead><tbody>
 <tr><td>Heat treat</td><td>Material condition trước xử lý, hardness target/range, distortion concern, sample/coupon rule, furnace lot rule.</td><td>Cert có furnace lot, cycle hoặc reference tương đương; hardness/result đúng; part/lot map đúng.</td></tr>
 <tr><td>Anodize / plating / coating / passivation</td><td>Type/class/thickness, masking map, cosmetic zone, conductive area, color/finish class, corrosion note.</td><td>Thickness/class/result, masking vùng phải bảo vệ, visual/cosmetic, trace lot đúng.</td></tr>
 <tr><td>EP / special cleaning / vacuum-compatible finish</td><td>Ra target, cleanliness rule, chemistry restriction, outgassing/particle rule, bagging rule, no bare-hand rule.</td><td>Report bề mặt / cleanliness khi yêu cầu, bao gói sạch, no contamination, bagging còn nguyên.</td></tr>
@@ -121,7 +121,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-warning"><strong>Job clean / vacuum / semiconductor:</strong> ngoài pack tiêu chuẩn, phải gắn thêm yêu cầu từ <a href="annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>, <a href="annex-702-packaging-labeling-spec.html">ANNEX-702</a>, <a href="../../02-Work-Instructions/07-WI-700/wi-715-helium-leak-test-standard-work.html">WI-715</a> và <a href="../../02-Work-Instructions/07-WI-700/wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a> khi job có yêu cầu leak, clean pack hoặc vacuum compatibility.</div>
 </div><div class="section">
 <h2>6. Gate gửi đi và gate nhận về</h2>
-<div class="table-card"><table><thead><tr><th>Gate</th><th>đạt khi</th><th>tạm giữ khi</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Gate</th><th>đạt khi</th><th>tạm giữ khi</th></tr></thead><tbody>
 <tr><td>S0 — Pack release</td><td>Đủ cover data, technical lock, trace bundle, approved processor, packaging note, PO flow-down.</td><td>Thiếu rev lock, thiếu cert requirement, processor chưa approved hoặc hàng chưa pass công đoạn trước.</td></tr>
 <tr><td>S1 — Dispatch to processor</td><td>Qty/lot/box count đúng; pack phát hành đúng phiên bản; shipping label và seal đúng rule.</td><td>Nhầm qty, mixed lot chưa tách, label không map với pack, không có ảnh giao nhận khi job nhạy.</td></tr>
 <tr><td>S2 — In-process / overdue</td><td>ETA, promised date và delay action được theo dõi; có backup plan nếu chạm risk due date.</td><td>Quá hạn không escalation, processor thay đổi thông tin nhưng chưa chấp thuận lại.</td></tr>
@@ -139,7 +139,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Sửa pack bằng addendum có mã phiên bản, người phát hành, thời điểm hiệu lực và liên kết ngược về pack gốc; không phát hành thay đổi bằng email rời hoặc chat miệng.</div>
 </div><div class="section">
 <h2>8. Hồ sơ SSOT và tài liệu liên kết</h2>
-<div class="table-card"><table><thead><tr><th>Nhóm hồ sơ</th><th>Yêu cầu bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm hồ sơ</th><th>Yêu cầu bắt buộc</th></tr></thead><tbody>
 <tr><td>Biểu mẫu / checklist</td><td><a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx">FRM-403</a>, <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-404</a>, <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-408_Requirements_Flow_Down_Checklist.xlsx">FRM-408</a>, <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a>, <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-409_Supplier_Audit_Checklist.xlsx">FRM-409</a>.</td></tr>
 <tr><td>Register / pack path</td><td>Subcontract PO, pack cover, drawing/spec lock, cert/report, return photos, SCAR/NCR, processor evidence và risk review phải ở cùng job supplier folder; PHẢI giữ một nguồn hồ sơ thống nhất, không tách rời từng người giữ một bản.</td></tr>
 <tr><td>Liên kết bắt buộc</td><td><a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>, <a href="annex-401-supplier-risk-model-and-scorecard-method.html">ANNEX-401</a>, <a href="annex-403-approved-processor-list.html">ANNEX-403</a>, <a href="annex-302-approved-materials-list.html">ANNEX-302</a>, <a href="annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>, <a href="annex-702-packaging-labeling-spec.html">ANNEX-702</a>, <a href="../../02-Work-Instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a>, <a href="../../02-Work-Instructions/06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a>, <a href="../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</td></tr>

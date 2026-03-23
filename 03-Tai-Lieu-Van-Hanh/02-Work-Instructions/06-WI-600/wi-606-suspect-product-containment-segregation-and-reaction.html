@@ -45,7 +45,7 @@
 .lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
 ul.tight li {margin:4px 0;}
 hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
-@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+@media (max-width: 960px; width: 100%; box-sizing: border-box) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 </head>
 <body>
@@ -86,7 +86,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div><div class="section">
 <h2>3. Boundary lot logic và mixed-location sweep</h2>
 <p>Khi chưa xác định được biên ảnh hưởng, mặc định dùng nguyên tắc <strong>chặn rộng trước — thu hẹp sau</strong>. QA/OPS/WHS phải xác định <strong>last-known-good</strong>, <strong>first-known-bad</strong> hoặc điểm thay đổi có thể tạo ra lỗi, sau đó khoanh phạm vi theo thời gian, machine, tool, offset, gage, lot, processor batch, label batch và location.</p>
-<div class="table-card"><table><thead><tr><th>Nhóm sự cố</th><th>Phạm vi phải sweep</th><th>Điểm dừng / release lại</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm sự cố</th><th>Phạm vi phải sweep</th><th>Điểm dừng / release lại</th></tr></thead><tbody>
 <tr><td>Measurement / gage issue</td><td>Tất cả lô/CTQ đo bằng cùng gage từ lần verify tốt cuối cùng; mọi record dựa trên gage đó.</td><td>Chỉ release khi gage hợp lệ, phạm vi ảnh hưởng đã rà xong và dữ liệu đo lại chứng minh lô đạt.</td></tr>
 <tr><td>Tool wear / crash / setup drift</td><td>Từ last-known-good đến thời điểm phát hiện; cùng machine, cùng tool family, cùng offset nếu có nghi ngờ lan rộng.</td><td>Restart theo WI-517/WI-519; lô ảnh hưởng phải sort hoặc đo lại đủ đặc tính chịu tác động.</td></tr>
 <tr><td>Label / trace mismatch</td><td>Tất cả khay, pallet, box, bin, remnant, receipt line và location liên quan cùng thời điểm in nhãn hoặc cùng operator/label batch.</td><td>Release khi vật lý ↔ hệ thống ↔ hồ sơ trace khớp hoàn toàn và nhãn mới đã được QA chấp thuận.</td></tr>
@@ -97,7 +97,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-warning"><strong>Mixed-location sweep:</strong> phạm vi rà không dừng ở máy nơi phát hiện. PHẢI sweep ít nhất các location sau khi phù hợp với case: raw material rack, quarantine rack, WIP staging, finished goods shelf, packing area, dock/shipping lane, outsource return zone, customer property zone, remnant bin và pending-scan pallet.</div>
 </div><div class="section">
 <h2>4. Gắn trạng thái, cô lập vật lý và kiểm soát hệ thống</h2>
-<div class="table-card"><table><thead><tr><th>Trạng thái</th><th>Dùng khi</th><th>Quy tắc bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Dùng khi</th><th>Quy tắc bắt buộc</th></tr></thead><tbody>
 <tr><td>HOLD</td><td>Chưa đủ bằng chứng hoặc đang chờ đánh giá</td><td>Không issue, không move sang công đoạn kế, không ship; phải có owner và due cho bước tiếp.</td></tr>
 <tr><td>QUARANTINE</td><td>Cần tách vật lý khỏi hàng tốt</td><td>Đặt tại khu riêng; nhãn phải có reason code, qty, lot, người gắn, thời điểm.</td></tr>
 <tr><td>REVIEW</td><td>Đang chờ xác nhận QA/ENG hoặc waiting on supplier/customer</td><td>Không được coi là usable; status review không thay cho PASS.</td></tr>
@@ -134,7 +134,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <p>Khi phát hiện phoi, dị vật, bao sạch thủng, bag mở sai quy định, chạm tay trần vào vùng clean hoặc có environmental excursion, sweep toàn bộ batch sạch liên quan và dùng thêm <a href="../07-WI-700/wi-721-fod-prevention-line-clearance-and-tool-accountability.html">WI-721</a> để line clearance, tool accountability và recovery. Chỉ release lại sau khi khôi phục trạng thái sạch và kiểm chứng phù hợp.</p>
 </div><div class="section">
 <h2>7. Record, KPI và tài liệu liên kết</h2>
-<div class="table-card"><table><thead><tr><th>Nhóm hồ sơ / KPI</th><th>Yêu cầu bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm hồ sơ / KPI</th><th>Yêu cầu bắt buộc</th></tr></thead><tbody>
 <tr><td>Hồ sơ tối thiểu</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>, ảnh tình trạng ban đầu, danh sách lot/location sweep, hold/disposition log, kết quả re-inspect/sort, cert bổ sung khi áp dụng, communication log với supplier/customer khi có.</td></tr>
 <tr><td>KPI vận hành</td><td>KPI-WI606-01: thời gian từ phát hiện đến HOLD vật lý; KPI-WI606-02: thời gian đóng boundary lot; KPI-WI606-03: số sự cố mixed-location; KPI-WI606-04: số case release sai trước khi đủ evidence; KPI-WI606-05: escape tái diễn trong 30 ngày.</td></tr>
 <tr><td>Liên kết bắt buộc</td><td><a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>, <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>, <a href="wi-601-visual-inspection-and-defect-classification.html">WI-601</a>, <a href="wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a>, <a href="wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a>, <a href="../07-WI-700/wi-721-fod-prevention-line-clearance-and-tool-accountability.html">WI-721</a>.</td></tr>

@@ -42,7 +42,7 @@ ul.tight li {margin:4px 0;}
 .callout-info{background:#e7f5ff;border-color:#a5d8ff;}
 .callout-success{background:#ebfbee;border-color:#b2f2bb;}
 .keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
-@media (max-width: 900px) { .two-col, .three-col, .kpi-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+@media (max-width: 960px; width: 100%; box-sizing: border-box) { .two-col, .three-col, .kpi-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 
 </style>
 </head>
@@ -81,7 +81,7 @@ ul.tight li {margin:4px 0;}
 </ul></div>
 
 <div class="section"><h2>2. Ma trận chọn recipe chuẩn</h2>
-<div class="table-card"><table><thead><tr><th>Nhóm</th><th>Áp dụng điển hình</th><th>Tần số</th><th>Nhiệt độ</th><th>Dung dịch</th><th>Thời gian mỗi stage</th><th>Rinse</th><th>Sấy</th><th>Ghi chú bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm</th><th>Áp dụng điển hình</th><th>Tần số</th><th>Nhiệt độ</th><th>Dung dịch</th><th>Thời gian mỗi stage</th><th>Rinse</th><th>Sấy</th><th>Ghi chú bắt buộc</th></tr></thead><tbody>
 <tr><td>CL-A</td><td>Part vacuum-compatible, gas-path, clean-pack, leak-test, part có yêu cầu verify sạch cao</td><td>40–80 kHz</td><td>40–55°C</td><td>Alkaline cleaner pH 9–11 hoặc chemistry theo yêu cầu khách hàng</td><td>5–15 phút</td><td>3 stage: solution → DI → DI mới/overflow</td><td>N₂ sạch + oven sạch 60°C trong 15–30 phút khi cần</td><td>DI water phải đạt ≥ 10 MΩ·cm; không vượt 70°C; ưu tiên recipe dịu hơn với soft metal/polished part</td></tr>
 <tr><td>CL-B</td><td>Part tiêu chuẩn sau finishing, part không yêu cầu clean-pack mức cao</td><td>25–40 kHz</td><td>40–60°C</td><td>Alkaline hoặc neutral cleaner</td><td>5–10 phút</td><td>2 stage: solution → DI</td><td>N₂ sạch hoặc clean air theo route</td><td>Dùng khi không có yêu cầu chân không/khí sạch đặc biệt</td></tr>
 <tr><td>Recipe đặc biệt</td><td>Anodized, passivated, coated, thin-wall, mirror finish, lapped/polished, part có blind cavity sâu</td><td>Theo phê duyệt ENG/QA</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Không được tự ý suy diễn từ CL-A/CL-B chuẩn</td></tr>
@@ -89,7 +89,7 @@ ul.tight li {margin:4px 0;}
 <div class="callout-warning"><strong>Rule vật liệu:</strong> Aluminum mềm, bề mặt anodize, bề mặt electropolish, bề mặt sealing, chi tiết có marking nhạy hoặc polymer gắn kèm phải coi là recipe đặc biệt nếu chưa có phê duyệt dùng recipe chuẩn.</div></div>
 
 <div class="section"><h2>3. Kiểm readiness trước khi nạp mẻ</h2>
-<div class="table-card"><table><thead><tr><th>Hạng mục</th><th>Phải đạt</th><th>tạm giữ khi</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục</th><th>Phải đạt</th><th>tạm giữ khi</th></tr></thead><tbody>
 <tr><td>Job packet / route</td><td>Xác định rõ clean level, material family, finish state, bước sau cleaning và hồ sơ cần ghi</td><td>Thiếu clean level, thiếu route sau cleaning, không rõ có cần verify hay clean-pack hay không</td></tr>
 <tr><td>Tank ID và chemistry</td><td>Đúng tank theo recipe; dung dịch đúng loại, đúng nồng độ, đúng tuổi bể; không có dầu nổi, bọt bất thường hoặc cặn lớn</td><td>Không chứng minh được ngày thay bể, pH ngoài dải, dung dịch đổi màu/đục/bẩn</td></tr>
 <tr><td>Nhiệt độ / tần số / timer</td><td>Thiết bị đạt giá trị recipe; transducer hoạt động ổn; đồng hồ nhiệt và pH meter còn hiệu lực sử dụng</td><td>Thông số ngoài cửa sổ recipe hoặc thiết bị đo không đáng tin</td></tr>
@@ -107,7 +107,7 @@ ul.tight li {margin:4px 0;}
 </div></div>
 
 <div class="section"><h2>5. Chuẩn bị part và quy tắc xếp mẻ</h2>
-<div class="table-card"><table><thead><tr><th>Rule</th><th>Yêu cầu bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Rule</th><th>Yêu cầu bắt buộc</th></tr></thead><tbody>
 <tr><td>Tiền làm sạch</td><td>Loại bỏ chip lớn, burr rời, dầu mỡ nặng, nhãn/tape thừa trước khi vào bể. Không dùng bể siêu âm để xử lý chip thô.</td></tr>
 <tr><td>Phân nhóm part</td><td>Không trộn part khác material family, khác clean level, khác finish state hoặc khác customer-specific restriction khi chưa có phê duyệt.</td></tr>
 <tr><td>Hướng part</td><td>Blind hole, pocket sâu, tube, manifold hoặc cavity phải được đặt sao cho thoát bọt và thoát dung dịch; nếu không, part có thể ra bể nhưng vẫn bẩn bên trong.</td></tr>
@@ -128,7 +128,7 @@ ul.tight li {margin:4px 0;}
 </div></div>
 
 <div class="section"><h2>7. Kiểm soát thay bể và chống nhiễm chéo</h2>
-<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Không được làm</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Không được làm</th></tr></thead><tbody>
 <tr><td>Dung dịch đổi màu, có dầu nổi, mùi lạ, nhiều bọt, có cặn nhìn thấy</td><td>Dừng dùng cho mẻ tiếp theo; thay bể/lọc bể theo rule; ghi log thay bể</td><td>Không được “chạy thêm mẻ nữa cho hết ca”</td></tr>
 <tr><td>Part sau cleaning có residue / stain / water mark</td><td>Cô lập lô, điều tra chemistry, DI rinse, orientation, dry-down; chỉ re-clean khi đã rõ nguyên nhân</td><td>Không được chuyển qua clean-pack với lý do “vết nhỏ không sao”</td></tr>
 <tr><td>Mix dirty lot với clean lot hoặc mix material nhạy với material thường</td><td>Xem toàn bộ mẻ là nghi ngờ; đánh giá lại theo clean level cao hơn</td><td>Không được chỉ tách vài part ra rồi release phần còn lại</td></tr>
@@ -136,7 +136,7 @@ ul.tight li {margin:4px 0;}
 </tbody></table></div></div>
 
 <div class="section"><h2>8. HOLD, reject và xử lý bất thường</h2>
-<div class="table-card"><table><thead><tr><th>Dấu hiệu</th><th>Đánh giá</th><th>Hành động</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Dấu hiệu</th><th>Đánh giá</th><th>Hành động</th></tr></thead><tbody>
 <tr><td>Particle count/cleanliness verification FAIL</td><td>Có thể do chemistry bẩn, basket bẩn, rinse không đủ, contamination carryover hoặc handling sau bể</td><td>HOLD lô; điều tra và quyết định re-clean / scrap / concession theo QA</td></tr>
 <tr><td>Stain, discolor, etch nhẹ, water spot lặp lại</td><td>Nghi ngờ chemistry quá mạnh, nhiệt quá cao, DI không đạt hoặc drying không đúng</td><td>HOLD; không re-clean lặp lại khi chưa chỉnh recipe</td></tr>
 <tr><td>Bề mặt xước/cọ xát</td><td>Lỗi xếp mẻ, basket hoặc handling</td><td>Cô lập lô; đánh giá cosmetic/functional impact; sửa phương pháp xếp trước mẻ kế tiếp</td></tr>
@@ -160,7 +160,7 @@ ul.tight li {margin:4px 0;}
 <li>Số incident bề mặt hư hỏng sau ultrasonic cleaning</li>
 </ul></div>
 </div>
-<div class="table-card"><table><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html">SOP-505</a></td><td>Khung finishing, secondary operation và trách nhiệm công đoạn.</td></tr>
 <tr><td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td><td>Yêu cầu sạch, contamination control, môi trường sạch.</td></tr>
 <tr><td><a href="../../03-Reference/06-ANNEX-600/annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a></td><td>Rule vật liệu, bề mặt, vacuum compatibility, handling đặc biệt.</td></tr>

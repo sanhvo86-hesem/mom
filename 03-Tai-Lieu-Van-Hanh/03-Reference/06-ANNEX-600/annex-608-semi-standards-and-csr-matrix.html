@@ -53,7 +53,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 .doc-link{display:inline-block;padding:6px 10px;border:1px solid var(--ln);border-radius:999px;background:var(--bg2);font-size:12px;font-weight:600;color:var(--navy)}
 .small-table td,.small-table th{font-size:12px}
 .matrix-wrap{overflow:auto;max-width:100%}
-.matrix-wrap table{min-width:1000px}
+.matrix-wrap table{min-width:100%}
 .section-rule{height:1px;background:var(--ln);margin:18px 0}
 .note-list li{margin:6px 0}
 </style>
@@ -82,7 +82,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </p>
 </div>
 <h2 class="h2">1. SEMI Standards áp dụng</h2>
-<div class="table-card"><table class="table">
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table">
 <colgroup><col style="width:15%"/><col style="width:35%"/><col style="width:50%"/></colgroup>
 <thead><tr><th>SEMI Std</th><th>Tên đầy đủ</th><th>Phạm vi liên quan HESEM</th></tr></thead>
 <tbody>
@@ -95,7 +95,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody>
 </table></div>
 <h2 class="h2">2. ISO 9001 ↔ SEMI Mapping Matrix</h2>
-<div class="table-card"><table class="table iso-matrix">
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table iso-matrix">
 <colgroup><col style="width:12%"/><col style="width:25%"/><col style="width:15%"/><col style="width:48%"/></colgroup>
 <thead><tr><th>ISO Clause</th><th>Yêu cầu ISO</th><th>SEMI Ref</th><th>Triển khai tại HESEM</th></tr></thead>
 <tbody>
@@ -114,7 +114,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody>
 </table></div>
 <h2 class="h2">3. Customer-Specific Requirements (CSR) — Common Items</h2>
-<div class="table-card"><table class="table">
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table">
 <colgroup><col style="width:25%"/><col style="width:35%"/><col style="width:40%"/></colgroup>
 <thead><tr><th>CSR Category</th><th>Yêu cầu phổ biến</th><th>Tài liệu HESEM đáp ứng</th></tr></thead>
 <tbody>
@@ -129,7 +129,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="callout"><b>Điểm bắt buộc:</b> Mọi CSR cụ thể theo khách hàng phải được chuyển thành điều kiện thực thi tại rà soát hợp đồng (contract review / rà soát hợp đồng), baseline package, packaging/cleanliness plan và phê duyệt giao hàng (ship release) pack. Không để CSR chỉ nằm ở level tham khảo.</p>
 <h2 class="h2">Tài liệu điều hành liên kết</h2><div class="doc-link-row"><span class="doc-link">SOP-201</span><span class="doc-link">SOP-301</span><span class="doc-link">SOP-505</span><span class="doc-link">SOP-605</span><span class="doc-link">SOP-702</span><span class="doc-link">WI-715</span><span class="doc-link">WI-716</span><span class="doc-link">ANNEX-606</span></div>
 <h2 class="h2">4. Điều kiện kích hoạt bắt buộc tại HESEM</h2>
-<div class="table-card"><table class="table small-table"><thead><tr><th>Tình huống</th><th>Phải kích hoạt thêm kiểm soát nào</th><th>Tài liệu điều khiển</th><th>Bằng chứng bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table small-table"><thead><tr><th>Tình huống</th><th>Phải kích hoạt thêm kiểm soát nào</th><th>Tài liệu điều khiển</th><th>Bằng chứng bắt buộc</th></tr></thead><tbody>
 <tr><td>Job có yêu cầu cleanliness / particle-sensitive</td><td>Readiness review, kiểm soát vệ sinh, monitoring, clean pack, release pack phù hợp.</td><td>SOP-702; WI-711~716; ANNEX-606; ANNEX-702</td><td>Cleaning log, particle data, clean pack evidence, label đúng yêu cầu.</td></tr>
 <tr><td>Job có yêu cầu vacuum / UHV / surface-sensitive</td><td>Kiểm soát bề mặt, passivation/EP, packaging sạch và chứng chỉ xử lý.</td><td>SOP-505; SOP-605; ANNEX-606; ANNEX-403</td><td>Processor cert, inspection record, pack evidence.</td></tr>
 <tr><td>Job có CSR về thay đổi quy trình / vật liệu / địa điểm</td><td>Không thay đổi khi chưa có thông báo và phê duyệt theo yêu cầu khách hàng.</td><td>SOP-106; SOP-201; SOP-301</td><td>Change notice, customer approval, updated baseline.</td></tr>

@@ -29,7 +29,7 @@
 <div class="cardx"><div class="muted2">Runtime rule</div><b>Preserve attachment</b></div>
 <div class="cardx"><div class="muted2">Preview rule</div><b>Không inline preview</b></div>
 </div>
-<div class="table-card"><table class="table smalltable"><thead><tr><th>Stack</th><th>Điểm phải khóa</th><th>Bằng chứng tối thiểu</th><th>Example file</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table smalltable"><thead><tr><th>Stack</th><th>Điểm phải khóa</th><th>Bằng chứng tối thiểu</th><th>Example file</th></tr></thead><tbody>
 <tr><td>Apache</td><td>MIME cho `.xlsx`, `Content-Disposition: attachment`, `X-Content-Type-Options: nosniff`, tắt directory listing.</td><td>Header capture + config review</td><td><a href="../../../04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/apache-download-only-forms.conf.example">apache-download-only-forms.conf.example</a></td></tr>
 <tr><td>Nginx</td><td>Preserve attachment header, no preview rewrite, no public cache, no autoindex.</td><td>Header capture + location block review</td><td><a href="../../../04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/nginx-download-only-forms.conf.example">nginx-download-only-forms.conf.example</a></td></tr>
 <tr><td>IIS</td><td>MIME mapping, custom headers, disable directory browse, preserve attachment qua rewrite/reverse proxy.</td><td>Header capture + web.config / IIS setting review</td><td><a href="../../../04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/iis-download-only-forms.web.config.example">iis-download-only-forms.web.config.example</a></td></tr>

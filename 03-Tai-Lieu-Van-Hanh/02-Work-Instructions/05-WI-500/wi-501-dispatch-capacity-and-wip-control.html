@@ -45,7 +45,7 @@ ul.tight li {margin:4px 0;}
 .step-item{position:relative;padding-left:48px;}
 .step-item:before{counter-increment:step;content:counter(step);position:absolute;left:12px;top:12px;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;}
 hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
-@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix, .photo-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+@media (max-width: 960px; width: 100%; box-sizing: border-box) { .two-col, .three-col, .kpi-grid, .matrix, .photo-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 </head>
 <body>
@@ -92,7 +92,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>3. Checklist phát hành dispatch cho từng workcenter</h2>
-<div class="table-card"><table><thead><tr><th>Điểm kiểm</th><th>đạt khi</th><th>FAIL thì làm gì</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điểm kiểm</th><th>đạt khi</th><th>FAIL thì làm gì</th></tr></thead><tbody>
 <tr><td>Job/Rev/Op đúng SoR</td><td>Không có mismatch giữa traveler, dispatch, snapshot và engineering release</td><td>HOLD job; trả về ENG/Planning để sửa packet</td></tr>
 <tr><td>Material ready</td><td>Đủ qty, đúng lot/heat/condition, reservation hoặc staging đã xác nhận</td><td>Gắn HR01-MAT; không xếp vào vị trí chạy</td></tr>
 <tr><td>Setup / tool / fixture ready</td><td>Có setup sheet, tool list, prove-out plan, fixture/jaw đúng</td><td>Gắn HR03-TOL; dời lịch hoặc chuyển sang cell khác nếu hợp lệ</td></tr>
@@ -113,7 +113,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 
 <div class="section"><h2>4A. Quy tắc xếp thứ tự mặc định theo họ công đoạn</h2>
-<div class="table-card"><table><thead><tr><th>Họ công đoạn</th><th>Ưu tiên xếp thứ tự khi cùng class</th><th>Không được quên</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Họ công đoạn</th><th>Ưu tiên xếp thứ tự khi cùng class</th><th>Không được quên</th></tr></thead><tbody>
 <tr><td>5-axis / mill-turn</td><td>Ưu tiên job có readiness đầy đủ, fixture sẵn, prove-out ngắn hơn, và không làm đứt chuỗi QA/first-piece của ca</td><td>Không xếp xen job mới vào giữa hai prove-out đang mở nếu làm tăng rủi ro crash hoặc trễ bottleneck.</td></tr>
 <tr><td>3-axis / turning</td><td>Ưu tiên theo due + setup family gần nhau để giảm changeover, nhưng không được bỏ qua job P1 đã ready đầy đủ</td><td>Không gom tối ưu setup đến mức để job gần due bị trễ.</td></tr>
 <tr><td>Finishing / deburr / clean</td><td>Ưu tiên theo risk của bề mặt và downstream gate; part đã gần ship hoặc chờ QA phải được hút trước</td><td>Không đẩy part vacuum/clean chờ lẫn với part thường làm tăng handling risk.</td></tr>
@@ -123,7 +123,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>5. Finite capacity review trong ngày</h2>
 <p>Planner phải review lại năng lực khi xuất hiện một trong các trigger sau: machine down vượt ngưỡng reserve, P0 chen vào lịch, đổi revision, outsource return không về đúng hạn, QA hold phát sinh ở bottleneck, hoặc queued standard hours vượt cap theo ANNEX-501.</p>
-<div class="table-card"><table><thead><tr><th>Trigger</th><th>Phản ứng bắt buộc</th><th>Ai quyết định</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trigger</th><th>Phản ứng bắt buộc</th><th>Ai quyết định</th></tr></thead><tbody>
 <tr><td>Machine down / abnormality lớn</td><td>Ước lượng giờ mất, xác định jobs impacted, cập nhật board và chọn phương án: giữ lịch, chuyển tải, tăng ca hoặc outsource</td><td>Ops Manager + Planner</td></tr>
 <tr><td>P0 mới</td><td>Chỉ rõ job nào bị lùi; review lại setup reserve, QA gate, ship impact</td><td>Ops Manager hoặc cao hơn</td></tr>
 <tr><td>Queued hours vượt cap</td><td>Dừng phát thêm job; clear job đỏ trước; nếu cần split lot / resequence phải có note</td><td>Planner Lead</td></tr>
@@ -132,7 +132,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>6. Kỷ luật queue và WIP trong ca</h2>
-<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
 <tr><td>Queue trước bottleneck tăng nhanh</td><td>Chỉ giữ lượng staged cần cho ca hiện tại và phần kế tiếp đã được duyệt; phần còn lại giữ ở trạng thái plan hoặc hold có lý do</td><td>Không xả hàng ào ạt để “nhìn như đang bận”</td></tr>
 <tr><td>Job dở do chờ QA hoặc chờ tool</td><td>Gắn trạng thái rõ, owner rõ, next action rõ, snapshot vào tuổi tồn WIP (aging / tuổi tồn) log</td><td>Không để lẫn trong queue thường như job sẵn sàng</td></tr>
 <tr><td>Chuyển WIP giữa khu vực</td><td>Phải có tag/nhãn, điểm đến rõ, transaction/record liên quan và trách nhiệm nhận việc</td><td>Không di chuyển bằng miệng hoặc để bán thành phẩm vô chủ</td></tr>
@@ -141,6 +141,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>7. Hot-job và rule chen ngang</h2>
+<div style="background:#FEF9C3;border-left:4px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501 — Hot-job ladder, freeze window, WIP caps</a>. WI này tóm tắt các quy tắc chính để thao tác nhanh tại hiện trường.</div>
 <p>Khi một hot-job được duyệt chen ngang, Planner phải đi theo đúng chuỗi sau:</p>
 <div class="step-list">
 <div class="step-item"><strong>Xác nhận class P0/P1.</strong><br/>Ghi rõ vì sao job này đủ điều kiện chen ngang và ai duyệt.</div>
@@ -160,7 +161,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>9. Họp giữa ca, cuối ca và bàn giao</h2>
-<div class="table-card"><table><thead><tr><th>Thời điểm</th><th>Phải review</th><th>Output bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thời điểm</th><th>Phải review</th><th>Output bắt buộc</th></tr></thead><tbody>
 <tr><td>Giữa ca</td><td>P0/P1, machine down, WIP đỏ, readiness của nửa ca còn lại</td><td>Board cập nhật + nhật ký hành động (action log) + người chịu trách nhiệm</td></tr>
 <tr><td>Cuối ca</td><td>Job complete, job dở, aging phát sinh, abnormality chưa đóng, việc giao ca</td><td>Danh sách bàn giao có owner, next action và thời điểm đến hạn</td></tr>
 <tr><td>Đầu ca sau</td><td>Nhận lại open actions và xác minh trạng thái trên SoR</td><td>Tiếp nhận chính thức; không được bỏ trôi action qua ca</td></tr>
@@ -169,7 +170,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 
 <div class="section"><h2>11. Trigger bắt buộc phải mở escalation trong ngày</h2>
-<div class="table-card"><table><thead><tr><th>Trigger</th><th>Escalation tối thiểu</th><th>Bằng chứng phải có</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trigger</th><th>Escalation tối thiểu</th><th>Bằng chứng phải có</th></tr></thead><tbody>
 <tr><td>P0 không thể vào máy trong khung đã cam kết</td><td>L1 ngay; lên L2 nếu ảnh hưởng ship trong ngày</td><td>Hot-job note, owner, job bị lùi và plan recover</td></tr>
 <tr><td>Bottleneck cell vượt WIP cap hoặc queued hours vượt 1 ngày hữu dụng</td><td>L1</td><td>Snapshot queue, nguyên nhân và quyết định clear</td></tr>
 <tr><td>Outsource return trễ nhưng routing sau đó đã khóa slot</td><td>L1</td><td>ETA mới, decision rebalance/partial/hold</td></tr>
@@ -195,7 +196,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="kpi-box"><strong>KPI-PLAN-03</strong><br/>Tỷ lệ job chạy đúng dispatch đầu ca.</div>
 <div class="kpi-box"><strong>KPI-PLAN-04</strong><br/>Tỷ lệ xử lý sự kiện vượt cap trong SLA.</div>
 </div>
-<div class="table-card"><table><thead><tr><th>Hồ sơ / tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hồ sơ / tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>Rule điều độ, WIP cap, hot-job ladder, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch).</td></tr>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>Gate/MRR và rule bàn giao theo bước.</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation và SLA.</td></tr>

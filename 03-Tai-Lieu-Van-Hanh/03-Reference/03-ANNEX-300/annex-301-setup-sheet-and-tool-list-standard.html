@@ -44,7 +44,7 @@
 .callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
 .lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
 ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
-@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+@media (max-width: 960px; width: 100%; box-sizing: border-box) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 
 </head>
@@ -79,7 +79,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>2. Cấu trúc hồ sơ setup bắt buộc</h2>
-<div class="table-card"><table><thead><tr><th>Khối dữ liệu</th><th>Nội dung bắt buộc</th><th>Mục đích vận hành</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Khối dữ liệu</th><th>Nội dung bắt buộc</th><th>Mục đích vận hành</th></tr></thead><tbody>
 <tr><td>Header job</td><td>Customer, Job/WO, Part No., Part Name, Rev, Op No., routing step, QPL, machine family, site/workcenter</td><td>Chặn nhầm job, nhầm op, nhầm revision ngay từ điểm dùng.</td></tr>
 <tr><td>Source baseline</td><td>Drawing no., model/CAD ref, traveler ref, program ID/version, setup sheet version, tool list version, AML/processor constraints</td><td>Chứng minh bộ tài liệu release là bộ đúng và đầy đủ.</td></tr>
 <tr><td>Material &amp; condition</td><td>Material family, alloy/grade/temper, heat/lot ref khi áp dụng, rough/finish state, prior special process state, cleanliness/vacuum flags</td><td>Ngăn setup sai với part cần rule xử lý đặc biệt.</td></tr>
@@ -92,7 +92,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>3. Trường header bắt buộc và rule đặt tên</h2>
-<div class="table-card"><table><thead><tr><th>Trường</th><th>Rule bắt buộc</th><th>Reject khi</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường</th><th>Rule bắt buộc</th><th>Reject khi</th></tr></thead><tbody>
 <tr><td>Document ID</td><td>Mã file, revision, ngày phát hành, prepared/checked/released by phải hiện ngay trên trang đầu.</td><td>Không có dấu vết phát hành hoặc dùng file export không có metadata.</td></tr>
 <tr><td>Machine family</td><td>Chọn đúng một trong các họ: 3-axis VMC, 5-axis mill, CNC turning, mill-turn/multitask.</td><td>Ghi chung “CNC machine” hoặc không định danh họ máy.</td></tr>
 <tr><td>Operation intent</td><td>Rough / semi-finish / finish / drill-tap / deburr / transfer / rework / inspection cut.</td><td>Không nói rõ ý định công đoạn nên operator tự suy diễn.</td></tr>
@@ -105,7 +105,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 
 <div class="section"><h2>4. Dữ liệu công đoạn bắt buộc theo từng setup</h2>
 <p>Mỗi setup phải có một <strong>operation block</strong> riêng. Không dùng một sheet chung mô tả mơ hồ cho nhiều setup có logic WCS hoặc workholding khác nhau.</p>
-<div class="table-card"><table><thead><tr><th>Nhóm dữ liệu</th><th>Nội dung bắt buộc</th><th>Ghi chú</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm dữ liệu</th><th>Nội dung bắt buộc</th><th>Ghi chú</th></tr></thead><tbody>
 <tr><td>Operation block ID</td><td>Setup no., nhóm máy (machine family), machine size envelope nếu quan trọng, fixture ID/rev, program main/sub program list</td><td>Dùng để khóa đúng cấu hình thực tế của từng công đoạn.</td></tr>
 <tr><td>Orientation</td><td>Mặt A/B/C hoặc top/front/right; ảnh minh họa và mũi tên định hướng phải thống nhất với bản vẽ</td><td>Phải dùng ảnh minh họa và mũi tên định hướng; không mô tả chỉ bằng chữ khi có nguy cơ đảo mặt.</td></tr>
 <tr><td>Clamp strategy</td><td>Điểm tỳ, điểm kẹp, thứ tự kẹp, lực/torque, soft jaw profile, support/rest pad, anti-slip note</td><td>Phải chỉ rõ vùng phải tránh kẹp và vùng dễ biến dạng.</td></tr>
@@ -115,7 +115,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>5. Ma trận dữ liệu theo nhóm máy (machine family)</h2>
-<div class="table-card"><table><thead><tr><th>Machine family</th><th>Trường bắt buộc thêm</th><th>Điểm dừng phát hành</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Machine family</th><th>Trường bắt buộc thêm</th><th>Điểm dừng phát hành</th></tr></thead><tbody>
 <tr><td>3-axis VMC</td><td>Vise/fixture type, jaw projection, soft-jaw ID, stop location, top-of-stock, side stop, probe cycle, tool length source</td><td>Không chỉ ra top-of-stock và probe/WCS method.</td></tr>
 <tr><td>5-axis mill</td><td>Rotary orientation state, zero return condition, trunnion/table angle convention, machine limit/collision note, TCP/RTCP condition, singularity watchpoints</td><td>Không có safe angle / collision note / retract strategy.</td></tr>
 <tr><td>CNC turning</td><td>Chuck/jaw ID, clamp pressure range, part stick-out, tailstock/sub-spindle use, tool nose comp rule, cut-off catcher / part ejection rule</td><td>Thiếu clamp pressure, stick-out hoặc catcher/ejection note.</td></tr>
@@ -124,7 +124,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>6. Chuẩn Workholding và Fixture Validation</h2>
-<div class="table-card"><table><thead><tr><th>Field</th><th>Bắt buộc ghi</th><th>Mục đích</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Field</th><th>Bắt buộc ghi</th><th>Mục đích</th></tr></thead><tbody>
 <tr><td>Fixture identity</td><td>Fixture ID, rev, serial/no. hoặc location nếu fixture dùng nhiều bản giống nhau</td><td>Ngăn lấy nhầm fixture cũ hoặc nhầm fixture của job khác.</td></tr>
 <tr><td>Validation status</td><td>Ngày qualification gần nhất, tình trạng wear/damage, người xác nhận, photo chuẩn</td><td>Chứng minh fixture còn dùng được.</td></tr>
 <tr><td>Torque / clamp data</td><td>Torque setting, hydraulic/pneumatic pressure, contact confirmation, anti-backout feature</td><td>Ngăn trượt phôi và biến dạng do kẹp sai.</td></tr>
@@ -135,7 +135,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>7. Chuẩn Tool List chi tiết</h2>
-<div class="table-card"><table><thead><tr><th>Nhóm trường</th><th>Nội dung bắt buộc</th><th>Reject khi</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm trường</th><th>Nội dung bắt buộc</th><th>Reject khi</th></tr></thead><tbody>
 <tr><td>Nhận diện tool assembly</td><td>Tool no., pocket/station, holder/arbor/collet, cutter ID, insert grade, gauge length, stick-out, balance/torque note nếu có</td><td>Chỉ ghi “EM10” hoặc “drill 5mm” mà không có assembly context.</td></tr>
 <tr><td>Chức năng tool</td><td>Rough/finish/drill/tap/thread/chamfer/probe/cutoff, channel nếu máy nhiều channel</td><td>Không phân biệt tool rough và finish dẫn đến dùng nhầm tại prove-out.</td></tr>
 <tr><td>Preset data</td><td>Preset source, nominal length/radius, allowed wear band, zero reference, sister tool relationship</td><td>Preset bằng tay nhưng không có rule xác minh.</td></tr>
@@ -152,7 +152,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>8. Probing, WCS, critical offsets và prove-out</h2>
-<div class="table-card"><table><thead><tr><th>Mục</th><th>Yêu cầu dữ liệu</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục</th><th>Yêu cầu dữ liệu</th></tr></thead><tbody>
 <tr><td>Datum strategy</td><td>Phải chỉ rõ datum vật lý, datum logic trong chương trình, và mối liên hệ với bản vẽ/kế hoạch kiểm tra (inspection plan).</td></tr>
 <tr><td>Probe cycle</td><td>Mã cycle, bề mặt chạm, expected result, logic pass/fail, write-back allowed hay không.</td></tr>
 <tr><td>Critical offsets</td><td>Danh sách offset không được sửa bởi operator hoặc chỉ được sửa trong biên độ hẹp; nêu rõ ai được sửa và phải log ở đâu.</td></tr>
@@ -174,7 +174,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>10. Quy tắc thay đổi, supersede và reject conditions</h2>
-<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
 <tr><td>Đổi offset logic / WCS / datum / orientation</td><td>Phát hành phiên bản mới, cập nhật prove-out note và trigger gate liên quan.</td><td>Sửa miệng hoặc ghi bút tay tại máy rồi tiếp tục chạy hàng loạt.</td></tr>
 <tr><td>Đổi fixture / jaw / stop / clamp strategy</td><td>Cập nhật ảnh, torque, locator, risk note và phê duyệt lại.</td><td>Dùng fixture “gần giống” mà không cập nhật sheet.</td></tr>
 <tr><td>Đổi tool assembly / substitute</td><td>Cập nhật Tool List revision, sister tool logic, life band và required verification.</td><td>Đổi tool rồi chỉ báo miệng cho ca sau.</td></tr>

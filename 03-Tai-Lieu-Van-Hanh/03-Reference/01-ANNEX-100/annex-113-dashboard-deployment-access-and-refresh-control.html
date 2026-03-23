@@ -127,7 +127,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </div>
 
 <h2 class="h2" id="a2">2. Kiến trúc dashboard, owner và source hierarchy</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Dashboard family</th><th>Dùng để quyết định gì</th><th>Business owner</th><th>Data owner</th><th>SoR / nguồn chuẩn</th><th>Cadence / freeze mặc định</th><th>Fallback khi lỗi</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Dashboard family</th><th>Dùng để quyết định gì</th><th>Business owner</th><th>Data owner</th><th>SoR / nguồn chuẩn</th><th>Cadence / freeze mặc định</th><th>Fallback khi lỗi</th></tr></thead><tbody>
 <tr><td>Executive / QMS cockpit</td><td>OTD, risk delivery, complaints, CAPA aging, audit closure, trend T4</td><td>CEO / QA Manager</td><td>IT / QMS data owner</td><td>Epicor + controlled M365 registers + approved review pack</td><td>Daily, weekly, monthly, quarter-close</td><td>Export SoR + FRM-911 exception note</td></tr>
 <tr><td>Operations / planning dashboard</td><td>Dispatch, WIP aging, promise-date risk, capacity, bottleneck</td><td>Production Director / Planning Lead</td><td>IT / Planning data owner</td><td>Epicor operational tables + controlled dispatch boards</td><td>Shift / daily</td><td>Epicor standard report + T1/T2 board</td></tr>
 <tr><td>Quality dashboard</td><td>FPY, hold SLA, NCR repeat, calibration due, MSA / SPC status</td><td>QA Manager</td><td>IT / QA data owner</td><td>QA SoR lists, calibration register, Epicor references</td><td>Daily / weekly / month-end</td><td>QA register export + manual pack note</td></tr>
@@ -138,7 +138,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="note-warning"><b>Quy tắc hierarchy</b><br/>Dashboard <b>không thay thế source-of-record</b>. Khi số dashboard lệch với SoR, người điều hành phải dùng SoR để ra quyết định, đồng thời mở issue dữ liệu hoặc incident theo severity; PHẢI giữ một bộ số điều hành duy nhất theo SoR, không “chọn số nào có lợi hơn”.</div>
 
 <h2 class="h2" id="a3">3. Environment, deployment pipeline và release class</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Environment / lớp</th><th>Mục đích</th><th>Ai được sửa</th><th>Evidence tối thiểu</th><th>Khi nào được move lên</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Environment / lớp</th><th>Mục đích</th><th>Ai được sửa</th><th>Evidence tối thiểu</th><th>Khi nào được move lên</th></tr></thead><tbody>
 <tr><td>DEV</td><td>Build dataset, transform, measure, layout, pipeline thử nghiệm</td><td>Assigned maker / data owner</td><td>Change note, test case, sample output</td><td>Khi logic đã qua self-check và có owner business review</td></tr>
 <tr><td>UAT / PRE-PROD</td><td>Business validation, sign-off formula, drill-down, threshold, exception-note behavior</td><td>Assigned maker + owner được chỉ định</td><td>Test log, before/after snapshot, defect list</td><td>Khi owner business chấp thuận và rollback path đã sẵn</td></tr>
 <tr><td>PROD dataset / semantic model</td><td>Nguồn dữ liệu chính cho dashboard production</td><td>Data owner / admin được chỉ định</td><td>Approved change ID, deployment log, refresh test</td><td>Chỉ move sau sign-off và ngoài cửa sổ freeze nếu ảnh hưởng kỳ đang đóng</td></tr>
@@ -151,7 +151,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </div>
 
 <h2 class="h2" id="a4">4. Access model, role boundary và separation-of-duties</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Quyền</th><th>Dùng cho</th><th>Không được hiểu sai là</th><th>Approval tối thiểu</th><th>Control bổ sung</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Quyền</th><th>Dùng cho</th><th>Không được hiểu sai là</th><th>Approval tối thiểu</th><th>Control bổ sung</th></tr></thead><tbody>
 <tr><td>View</td><td>Xem dashboard / pack / export được phép</td><td>Quyền download toàn bộ raw data</td><td>Role-based theo portal / workspace</td><td>Rà định kỳ qua FRM-111</td></tr>
 <tr><td>Build</td><td>Tạo report cá nhân từ semantic model được mở</td><td>Quyền đổi logic KPI production</td><td>Owner business + data owner</td><td>Giới hạn dataset, không implicit Publish</td></tr>
 <tr><td>Publish</td><td>Đưa report/workspace ra production</td><td>Quyền Admin hoặc tự ý mở rộng audience</td><td>Business owner + system owner</td><td>Release evidence, communication, rollback</td></tr>
@@ -165,7 +165,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </ul>
 
 <h2 class="h2" id="a5">5. Refresh, freeze-date, exception note và pack control</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Ngữ cảnh</th><th>Refresh / cut-off chuẩn</th><th>Freeze-date / freeze rule</th><th>Khi nào cần exception note</th><th>Nơi ghi nhận</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Ngữ cảnh</th><th>Refresh / cut-off chuẩn</th><th>Freeze-date / freeze rule</th><th>Khi nào cần exception note</th><th>Nơi ghi nhận</th></tr></thead><tbody>
 <tr><td>T1/T2 điều hành trong ngày</td><td>Refresh trước họp tối thiểu 10–15 phút</td><td>Không freeze kỳ dài; freeze snapshot của cuộc họp</td><td>Refresh fail, stale data, manual override, missing drill-down</td><td>Board note / WI-901 ghi chú điều hành</td></tr>
 <tr><td>T3 tuần / tháng</td><td>Refresh theo lịch pack công bố</td><td>Freeze tại giờ chốt pack</td><td>Late posting, reclass data, missing customer/supplier update</td><td>Pack ghi chú điều hành + nhật ký hành động (action log)</td></tr>
 <tr><td>T4 / management review</td><td>Dùng snapshot đã freeze cho kỳ review</td><td>PHẢI giữ nguyên số kỳ đã freeze nếu chưa có change record</td><td>Backfill sau freeze, SoR correction sau close, dataset incident</td><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> + change record</td></tr>
@@ -177,7 +177,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </div>
 
 <h2 class="h2" id="a6">6. Failure handling, offline fallback, restore và backfill</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Failure / sự cố</th><th>Phản ứng ngay</th><th>Ai dẫn dắt</th><th>Điều hành tạm bằng gì</th><th>Đóng sự cố khi nào</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Failure / sự cố</th><th>Phản ứng ngay</th><th>Ai dẫn dắt</th><th>Điều hành tạm bằng gì</th><th>Đóng sự cố khi nào</th></tr></thead><tbody>
 <tr><td>Refresh fail / gateway down / credential expired</td><td>Freeze dashboard trạng thái cảnh báo; thông báo owner; chặn dùng dashboard nếu ảnh hưởng quyết định chính</td><td>IT admin + data owner</td><td>SoR export, approved manual pack</td><td>Khi refresh phục hồi, số reconcile và evidence được lưu</td></tr>
 <tr><td>Logic KPI sai / mapping sai / duplicated data</td><td>Đánh cờ issue nghiêm trọng; revert nếu có thể; không sửa chui trong production</td><td>Data owner + business owner</td><td>SoR + ghi chú điều hành note</td><td>Khi release corrected pack và review before/after xong</td></tr>
 <tr><td>Workspace / permission misconfiguration</td><td>Contain ngay: thu hẹp share, revoke access, snapshot impact</td><td>IT admin / system owner</td><td>N/A</td><td>Khi access được sửa, impact review hoàn tất</td></tr>
@@ -187,7 +187,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="note-warning"><b>Quy tắc cứng</b><br/>Khi dashboard đang ở trạng thái <b>Stale / Exception / Offline fallback</b>, người điều hành phải ghi rõ quyết định tạm thời dùng nguồn nào. Không chờ hệ số sửa xong rồi “hồi tố trí nhớ” về lý do đã ra quyết định.</div>
 
 <h2 class="h2" id="a7">7. Dashboard register tối thiểu</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Dashboard / dataset ID</th><th>Purpose / decision family</th><th>Business owner</th><th>Data owner</th><th>Environment</th><th>Default audience</th><th>Freeze / refresh class</th><th>Rollback path</th><th>Evidence link</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Dashboard / dataset ID</th><th>Purpose / decision family</th><th>Business owner</th><th>Data owner</th><th>Environment</th><th>Default audience</th><th>Freeze / refresh class</th><th>Rollback path</th><th>Evidence link</th></tr></thead><tbody>
 <tr><td style="height:38px"></td><td></td><td></td><td></td><td>DEV / UAT / PROD</td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="height:38px"></td><td></td><td></td><td></td><td>DEV / UAT / PROD</td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="height:38px"></td><td></td><td></td><td></td><td>DEV / UAT / PROD</td><td></td><td></td><td></td><td></td></tr>
@@ -203,7 +203,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
   <div class="kpi-card"><h3>MTTR của incident dữ liệu</h3><p>Đo tốc độ khôi phục khi refresh fail, mapping sai hoặc permission lỗi.</p></div>
   <div class="kpi-card"><h3>% privileged / publish access review đúng hạn</h3><p>Đo chất lượng RBAC, least privilege và closure của quarterly review.</p></div>
 </div>
-<div class="table-card"><table class="table"><thead><tr><th>Chỉ số</th><th>Fail signal</th><th>Phản ứng quản trị</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Chỉ số</th><th>Fail signal</th><th>Phản ứng quản trị</th></tr></thead><tbody>
 <tr><td>Refresh on-time</td><td>Dashboard critical trễ refresh nhiều kỳ liên tiếp</td><td>Review schedule, gateway, credential lifecycle, ownership và fallback plan</td></tr>
 <tr><td>Release discipline</td><td>Publish thay đổi nhưng không có ticket/approval/snapshot</td><td>Open finding, retrain, khóa quyền publish nếu tái diễn</td></tr>
 <tr><td>Access hygiene</td><td>Guest / service / privileged access không được rà hoặc không có owner</td><td>rà soát quyền truy cập hàng quý (quarterly access review / rà soát quyền truy cập hàng quý) + revoke / reassign owner</td></tr>

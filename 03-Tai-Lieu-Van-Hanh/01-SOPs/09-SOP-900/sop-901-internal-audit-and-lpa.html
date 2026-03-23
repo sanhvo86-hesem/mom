@@ -37,7 +37,7 @@
 table{max-width:100%;table-layout:auto}
 td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-align:top}
 @media print {.card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.metric-card,.gate-card,.field,.boxed-list,.callout-card{page-break-inside:avoid;break-inside:avoid}h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}}
-@media (max-width: 900px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+@media (max-width: 960px; width: 100%; box-sizing: border-box){.grid-2,.grid-3{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -84,7 +84,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ul></div>
 </div>
 <h2 class="h2" id="p3">3. Thuật ngữ &amp; nguyên tắc</h2>
-<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:34%"/><col style="width:50%"/></colgroup><thead><tr><th>Thuật ngữ</th><th>Định nghĩa áp dụng</th><th>Nguyên tắc dùng</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:34%"/><col style="width:50%"/></colgroup><thead><tr><th>Thuật ngữ</th><th>Định nghĩa áp dụng</th><th>Nguyên tắc dùng</th></tr></thead><tbody>
 <tr><td>Internal Audit</td><td>Đánh giá có kế hoạch theo tiêu chí, phạm vi và bằng chứng khách quan.</td><td>Dùng để đánh giá hệ thống, quy trình, tuân thủ tài liệu và tính hiệu lực kiểm soát.</td></tr>
 <tr><td>LPA</td><td>Đánh giá lớp tại hiện trường, tần suất cao, câu hỏi ngắn, nhìn trực tiếp standard work.</td><td>Dùng để bắt drift tại máy/cell trước khi drift trở thành NCR hoặc escape.</td></tr>
 <tr><td>Finding</td><td>Sai lệch được ghi nhận với bằng chứng cụ thể so với yêu cầu/tiêu chí.</td><td>Finding phải có owner, hạn hoàn thành, mức độ và hướng xử lý.</td></tr>
@@ -109,7 +109,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Delegation và backup phải tuân theo <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/01-ANNEX-100/annex-123-deputy-backup-matrix.html">ANNEX-123</a>. Không dùng “anh ấy đi vắng” làm lý do trễ containment hoặc trễ closure.</li>
 </ul></div>
 </div>
-<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:32%"/><col style="width:17%"/><col style="width:17%"/><col style="width:17%"/><col style="width:17%"/></colgroup><thead><tr><th>Hoạt động</th><th>QMS Engineer</th><th>QA Manager</th><th>Process Owner</th><th>Functional Head</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:32%"/><col style="width:17%"/><col style="width:17%"/><col style="width:17%"/><col style="width:17%"/></colgroup><thead><tr><th>Hoạt động</th><th>QMS Engineer</th><th>QA Manager</th><th>Process Owner</th><th>Functional Head</th></tr></thead><tbody>
 <tr><td>Lập chương trình audit theo rủi ro</td><td>R</td><td>A</td><td>C</td><td>C</td></tr>
 <tr><td>Phê duyệt lịch / bổ nhiệm auditor</td><td>R</td><td>A</td><td>I</td><td>I</td></tr>
 <tr><td>Thực hiện audit / LPA</td><td>R</td><td>C</td><td>C</td><td>I</td></tr>
@@ -228,7 +228,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Nếu closure evidence không đủ, finding quay lại trạng thái mở. Không gia hạn vô hạn; phải escalation theo SLA.</li>
 </ul>
 <h2 class="h2" id="p9">9. Hệ thống, hồ sơ &amp; dữ liệu</h2>
-<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:34%"/><col style="width:48%"/></colgroup><thead><tr><th>Nhóm hồ sơ</th><th>Lưu gì</th><th>Quy định</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:34%"/><col style="width:48%"/></colgroup><thead><tr><th>Nhóm hồ sơ</th><th>Lưu gì</th><th>Quy định</th></tr></thead><tbody>
 <tr><td>Audit Program</td><td>Lịch năm/quý/tháng, risk rationale, area scope, assigned auditor.</td><td>Phải truy vết được vì sao audit này được ưu tiên và ai là người phê duyệt.</td></tr>
 <tr><td>Audit / LPA Record</td><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-901_Internal_Audit_Checklist.xlsx">FRM-901</a>, <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-902_Layered_Process_Audit_Checklist.xlsx">FRM-902</a>, ảnh, note, sample list.</td><td>Mỗi hồ sơ phải có mã, ngày, auditor, khu vực, process owner và evidence path.</td></tr>
 <tr><td>Finding &amp; CAPA</td><td>Finding register, <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>, <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a>.</td><td>Finding major/critical phải link được tới containment và action plan.</td></tr>
@@ -236,7 +236,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td>Dashboard / KPI</td><td>Adherence, overdue, repeat, severity, pass rate, layer completion.</td><td>Định nghĩa và data model theo <a href="../../03-Reference/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>.</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="p10">10. Biểu mẫu, WI, ANNEX, SOP &amp; JD liên kết</h2>
-<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:38%"/><col style="width:46%"/></colgroup><thead><tr><th>Nhóm</th><th>Tài liệu</th><th>Mục đích sử dụng</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:38%"/><col style="width:46%"/></colgroup><thead><tr><th>Nhóm</th><th>Tài liệu</th><th>Mục đích sử dụng</th></tr></thead><tbody>
 <tr><td>Biểu mẫu</td><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-901_Internal_Audit_Checklist.xlsx">FRM-901</a>; <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-902_Layered_Process_Audit_Checklist.xlsx">FRM-902</a>; <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>; <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a>; <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM-163</a></td><td>Dùng cho lập checklist, audit/LPA, mở NCR/CAPA và audit cấu hình.</td></tr>
 <tr><td>WI</td><td><a href="../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>; <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a>; <a href="../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Nối audit với tier management, evidence, risk control tower và suspect containment.</td></tr>
 <tr><td>ANNEX</td><td><a href="../../03-Reference/01-ANNEX-100/annex-105-process-map-detailed.html">ANNEX-105</a>; <a href="../../03-Reference/01-ANNEX-100/annex-106-iso9001-matrix-full.html">ANNEX-106</a>; <a href="../../03-Reference/01-ANNEX-100/annex-107-audit-evidence-pack-master.html">ANNEX-107</a>; <a href="../../03-Reference/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>; <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/01-ANNEX-100/annex-120-authority-matrix.html">ANNEX-120</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/01-ANNEX-100/annex-121-raci-master-matrix.html">ANNEX-121</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/01-ANNEX-100/annex-122-kpi-cascade-dictionary.html">ANNEX-122</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/01-ANNEX-100/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td><td>Khóa process scope, clause mapping, evidence pack, KPI, escalation, authority, RACI và backup.</td></tr>
