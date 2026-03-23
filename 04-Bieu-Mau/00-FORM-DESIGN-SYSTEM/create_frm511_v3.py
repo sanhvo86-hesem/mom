@@ -33,8 +33,57 @@ NONE_S = Side()
 
 def fi(c): return PatternFill(start_color=c, end_color=c, fill_type='solid')
 def fo(sz, bold=False, c='dk'): return Font(name='Segoe UI', size=sz, bold=bold, color=P[c])
-AL = Alignment(horizontal='left', vertical='center', indent=1)
-AC = Alignment(horizontal='center', vertical='center')
+
+# ALIGNMENT: left without indent (save space), wrap_text=True always
+AL = Alignment(horizontal='left', vertical='center', wrap_text=True)
+AC = Alignment(horizontal='center', vertical='center', wrap_text=True)
+
+# Logo aspect ratio (from hesem-logo.png: 550x159px)
+LOGO_ASPECT = 3.46
+LOGO_PATH = "C:/Users/TEST4/qms.hesem.com.vn/04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/hesem-logo.png"
+PX_PER_COL = 19   # pixels per column at 96dpi
+PX_PER_ROW = 20   # pixels per header row
+EMU_PER_PX = 9525  # EMU per pixel
+
+def compute_logo_anchor(logo_cols, header_rows=5):
+    """
+    Compute logo size and centering offsets for any paper format.
+
+    RULE:
+      zone_w = logo_cols * PX_PER_COL
+      zone_h = header_rows * PX_PER_ROW
+      logo_w = floor(zone_w * 0.78)
+      logo_h = floor(logo_w / LOGO_ASPECT)
+      if logo_h > zone_h * 0.78: scale from height
+      center offsets in EMU
+
+    Paper formats:
+      A4P (40 cols): logo_cols=8  -> 152px zone -> 118x34 logo
+      A4L (56 cols): logo_cols=11 -> 209px zone -> 163x47 logo
+      A3P (56 cols): logo_cols=11 -> 209px zone -> 163x47 logo
+      A3L (82 cols): logo_cols=16 -> 304px zone -> 237x68 logo
+    """
+    zone_w = logo_cols * PX_PER_COL
+    zone_h = header_rows * PX_PER_ROW
+    logo_w = math.floor(zone_w * 0.78)
+    logo_h = math.floor(logo_w / LOGO_ASPECT)
+    if logo_h > zone_h * 0.78:
+        logo_h = math.floor(zone_h * 0.78)
+        logo_w = math.floor(logo_h * LOGO_ASPECT)
+    x_off = math.floor((zone_w - logo_w) / 2) * EMU_PER_PX
+    y_off = math.floor((zone_h - logo_h) / 2) * EMU_PER_PX
+    return logo_w, logo_h, x_off, y_off
+
+def embed_logo(ws, logo_cols=8):
+    """Embed logo image centered in the logo zone."""
+    logo_w, logo_h, x_off, y_off = compute_logo_anchor(logo_cols)
+    img = XlImage(LOGO_PATH)
+    marker = AnchorMarker(col=0, colOff=x_off, row=1, rowOff=y_off)
+    img.anchor = OneCellAnchor(
+        _from=marker,
+        ext=XDRPositiveSize2D(cx=logo_w * EMU_PER_PX, cy=logo_h * EMU_PER_PX)
+    )
+    ws.add_image(img)
 
 # =====================================================================
 # CORE: Apply borders to ALL 40 cells in a row
@@ -124,7 +173,7 @@ ws['AI6'].value = 'Production Director'
 # HELPERS
 # =====================================================================
 PAIR_ZONES = [(1,7), (8,20), (21,27), (28,NC)]
-CK_ZONES = [(1,2), (3,5), (6,19), (20,31), (32,35), (36,38), (39,NC)]
+CK_ZONES = [(1,2), (3,5), (6,21), (22,31), (32,35), (36,NC)]
 
 def spacer(r):
     ws.row_dimensions[r].height = 4.0
@@ -149,7 +198,7 @@ def sect(r, text):
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=NC)
     c = ws.cell(r, 1)
     c.value = text; c.font = fo(9, True, 'primary')
-    c.alignment = Alignment(horizontal='left', vertical='center', indent=1)
+    c.alignment = Alignment(horizontal='left', vertical='center', indent=1, wrap_text=True)
     return r+1
 
 def dpair(r, lL, lR, first=False, last=False):
@@ -199,8 +248,7 @@ def ckrow(r, num, cat, item, crit, catc=None, last=False):
                   ifill,                                                   # Item
                   fi(P['fog']),                                            # Criteria
                   fi(P['white']),                                          # Result
-                  fi(P['white']),                                          # Owner
-                  fi(P['white'])]                                          # Ref
+                  fi(P['white'])]                                          # Owner
     for (s, e), zf in zip(CK_ZONES, zone_fills):
         for col in range(s, e+1):
             ws.cell(r, col).fill = zf
@@ -215,7 +263,7 @@ def ckrow(r, num, cat, item, crit, catc=None, last=False):
     else:
         c.font = fo(8,True,'mid')
     ws.cell(r,6).value = item; ws.cell(r,6).font = fo(8,False,'dk'); ws.cell(r,6).alignment = AL
-    ws.cell(r,20).value = crit; ws.cell(r,20).font = fo(7,False,'muted'); ws.cell(r,20).alignment = AL
+    ws.cell(r,22).value = crit; ws.cell(r,22).font = fo(7,False,'muted'); ws.cell(r,22).alignment = AL
     for s in [32,36,39]:
         ws.cell(r,s).font = fo(8,False,'dk'); ws.cell(r,s).alignment = AC
     return r+1
@@ -302,9 +350,9 @@ r = spacer(r)
 
 # SECTION 2: CHECKLIST
 r = sect(r, '  2.  SETUP & FIRST-PIECE VERIFICATION')
-CKH = [(1,2,'#'),(3,5,'Cat.'),(6,19,'Setup / FP Check Item'),
-       (20,31,'Acceptance / Control Rule'),(32,35,'Result'),
-       (36,38,'Owner'),(39,NC,'Ref.')]
+CKH = [(1,2,'#'),(3,5,'Cat.'),(6,21,'Setup / FP Check Item'),
+       (22,31,'Acceptance / Control Rule'),(32,35,'Result'),
+       (36,NC,'Owner')]
 r = colhdr(r, CKH)
 ck_start = r
 
@@ -348,6 +396,16 @@ r = spacer(r)
 r = notice_bar(r,
     'NOTICE  \u2014  Enter data only in white input cells.  Do not add, delete or resize columns/rows.  '
     'One form per setup event.  Ref: SOP-504 / WI-517.  Retain: 10 years per QMS schedule.')
+
+# FIX header meta values: remove indent, add wrap_text
+META_VAL_ALIGN = Alignment(horizontal='left', vertical='center', indent=0, wrap_text=True)
+for hr in range(2, 7):
+    c = ws.cell(hr, 35)  # AI column = col 35 in A4P
+    if c.value is not None:
+        c.alignment = META_VAL_ALIGN
+
+# LOGO
+embed_logo(ws, logo_cols=8)  # A4P: 8 cols
 
 # DATA VALIDATION
 dv = DataValidation(type="list", formula1="=LISTS!$A$2:$A$5", allow_blank=True)
