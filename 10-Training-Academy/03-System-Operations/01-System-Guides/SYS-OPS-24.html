@@ -69,7 +69,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <div class="badge"><span class="dot"></span>Training Module SYS-OPS-24</div>
 <h1 style="margin-top:10px">SOP-QMS-012 Admin Handoff Build Sheet: SoD, evidence rules, acceptance tests</h1>
-<p class="muted">Đào tạo thực chiến để triển khai/kiểm soát Build Sheet quản trị M365 theo chuẩn sẵn sàng đánh giá. Nguyên tắc cứng: <b>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))</b>.</p>
+<p class="muted">Đào tạo thực chiến để triển khai/kiểm soát Build Sheet quản trị M365 theo chuẩn sẵn sàng đánh giá. Nguyên tắc cứng: <b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)</b>.</p>
 <div class="tag blue">Phiên bản</div>
 </div>
 <div class="note">
@@ -116,7 +116,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Maintenance</b></td><td>Lưu/calibration record; chặn sử dụng gage OOT; liên kết OOT với hold</td><td>Chạy phản ứng 60 giây cho case gage OOT + ghi MRR</td></tr>
 <tr><td><b>EHS</b></td><td>Lưu hồ sơ an toàn liên quan thay đổi layout/kiosk/thiết bị; chặn bypass PPE/LOTO</td><td>Kiểm tra evidence EHS trong change package + ký xác nhận</td></tr>
 <tr><td><b>Estimator (SAL-03)</b></td><td>Đưa điều khoản contract về retention/confidential; xác nhận external sharing scope</td><td>Xác nhận đúng 01 retention tier + guardrail external theo hợp đồng</td></tr>
-<tr><td><b>Supervisor</b></td><td>Quyết định HOLD/GO; cưỡng chế “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))”; phân công OJT</td><td>Thực hiện review 01 change package và ra quyết định dựa trên evidence</td></tr>
+<tr><td><b>Supervisor</b></td><td>Quyết định HOLD/GO; cưỡng chế “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”; phân công OJT</td><td>Thực hiện review 01 change package và ra quyết định dựa trên evidence</td></tr>
 </table>
 <div class="note">
 <strong>Liên kết HESEM nội bộ</strong>
@@ -249,7 +249,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>BLOCK GO-LIVE</b> khi thiếu Build Sheet trạng thái <b>Validated</b> hoặc thiếu evidence gốc cho bất kỳ Setting ID thuộc lớp Sharing/DLP/Retention/Access.</li>
 <li><b>HOLD JOB</b> khi phát hiện sai Rev (bản vẽ/program/setup sheet) hoặc user truy cập được Draft trong luồng sản xuất.</li>
-<li><b>chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP)))))))</b> khi bộ hồ sơ giao hàng (ship packet) thiếu bất kỳ thành phần bắt buộc (IR/COC/cal cert/special process cert/traceability label) hoặc khi hệ thống báo phê duyệt giao hàng (ship release) validator fail.</li>
+<li><b>chặn giao hàng (BLOCK SHIP / chặn giao hàng)</b> khi bộ hồ sơ giao hàng (ship packet) thiếu bất kỳ thành phần bắt buộc (IR/COC/cal cert/special process cert/traceability label) hoặc khi hệ thống báo phê duyệt giao hàng (ship release) validator fail.</li>
 <li><b>STOP CHANGE</b> khi thay đổi external sharing vượt baseline hoặc khi DLP test TC-03 fail.</li>
 <li><b>ROLLBACK</b> khi smoke test end-to-end fail sau cutover (5 jobs + 3 packs theo ANNEX-QMS-013).</li>
 </ul>
@@ -272,7 +272,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Thiếu bằng chứng/evidence không truy xuất</td>
-<td>BLOCK gate; ghi “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))”; mở ticket truy xuất; không tiếp tục bước kế tiếp.</td>
+<td>BLOCK gate; ghi “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”; mở ticket truy xuất; không tiếp tục bước kế tiếp.</td>
 <td>Bất kỳ role tại gate</td>
 <td>01 ticket + ghi chú gate + ảnh màn hình lỗi truy xuất</td>
 </tr>
@@ -290,7 +290,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Rủi ro ship sai/ship thiếu packet</td>
-<td>chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP)))))))); giữ hàng tại staging; thông báo Estimator (SAL-03) để chặn ETA; QC rà lại packet.</td>
+<td>chặn giao hàng (BLOCK SHIP / chặn giao hàng); giữ hàng tại staging; thông báo Estimator (SAL-03) để chặn ETA; QC rà lại packet.</td>
 <td>Warehouse + QC + Estimator (SAL-03)</td>
 <td>Ship block log + danh sách packet thiếu</td>
 </tr>
@@ -309,11 +309,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>7</td><td>Chạy acceptance tests bằng user thật (TC-01…TC-05 + case theo ANNEX)</td><td>QA</td><td>Bảng kết quả test + ảnh/log</td><td>Test bằng admin làm sai kết quả</td></tr>
 <tr><td>8</td><td>Ghi issue list và cưỡng chế HOLD/ROLLBACK khi không đạt</td><td>QA + Supervisor</td><td>Issue list + quyết định HOLD/ROLLBACK</td><td>Cho GO dù fail test</td></tr>
 <tr><td>9</td><td>Chốt Build Sheet final (Status=Validated) và ký sign-off</td><td>QA</td><td>Build Sheet final + chữ ký</td><td>Status chưa Validated</td></tr>
-<tr><td>10</td><td>Lập cutover plan: cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))), snapshot, smoke test, rollback</td><td>IT + Supervisor</td><td>ANNEX-QMS-013 bản ký</td><td>Không có snapshot trước cutover</td></tr>
+<tr><td>10</td><td>Lập cutover plan: cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), snapshot, smoke test, rollback</td><td>IT + Supervisor</td><td>ANNEX-QMS-013 bản ký</td><td>Không có snapshot trước cutover</td></tr>
 <tr><td>11</td><td>Go-live + thông báo policy + đào tạo điểm dùng (kiosk/line)</td><td>Supervisor + Process Owners</td><td>Go-live memo + training record</td><td>Không đào tạo điểm dùng gây bypass</td></tr>
 <tr><td>12</td><td>Bàn giao package IT → QA/IMS (snapshots quyền/retention/DLP, guests)</td><td>IT</td><td>Handover package + links evidence</td><td>Thiếu snapshot memberships hoặc guests</td></tr>
 <tr><td>13</td><td>phê duyệt giao hàng (ship release) Validator: chặn bộ hồ sơ giao hàng (ship packet) thiếu</td><td>Warehouse + QC</td><td>Ship checklist + block log</td><td>Ship trước khi packet đủ</td></tr>
-<tr><td>14</td><td>rà soát quyền truy cập hàng quý (rà soát quyền truy cập hàng quý (rà soát quyền truy cập hàng quý (rà soát quyền truy cập hàng quý (rà soát quyền truy cập hàng quý (rà soát quyền truy cập hàng quý (rà soát quyền truy cập hàng quý (rà soát quyền truy cập hàng quý (quarterly access review)))))))) + lưu FRM-QMS-016</td><td>QA + Process Owners</td><td>FRM-QMS-016 + snapshot</td><td>Không review định kỳ</td></tr>
+<tr><td>14</td><td>rà soát quyền truy cập hàng quý (quarterly access review / rà soát quyền truy cập hàng quý) + lưu FRM-QMS-016</td><td>QA + Process Owners</td><td>FRM-QMS-016 + snapshot</td><td>Không review định kỳ</td></tr>
 </table>
 </div>
 <div class="card" id="sec9">
@@ -364,7 +364,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>01 bộ evidence gốc cho 15 Setting ID, đúng naming rule, đúng kho lưu.</li>
 <li>01 bảng kết quả acceptance tests (TC-01…TC-05 + 02 test theo ANNEX-QMS-013).</li>
 <li>01 handover package IT → QA/IMS: snapshot groups/memberships, site permissions, retention labels/policies, DLP policies, external guests.</li>
-<li>01 quyết định gate (HOLD hoặc GO) dựa trên evidence; ghi rõ “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))”.</li>
+<li>01 quyết định gate (HOLD hoặc GO) dựa trên evidence; ghi rõ “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”.</li>
 </ul>
 <h3>9.3 Rubric L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn khi đạt)</h3>
 <table class="form-table">
@@ -385,7 +385,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L3</b></td>
 <td>Chạy acceptance tests độc lập; phát hiện fail và kích hoạt HOLD/BLOCK đúng 60 giây.</td>
 <td>Performance test PASS; tạo handover package đầy đủ; truy xuất evidence ≤ 3 phút.</td>
-<td>IT: được triển khai theo Build Sheet trên PROD khi có sign-off QA. QA/QMS: được ký sign-off từng setting. Warehouse/QC: được chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP)))))))) tại gate.</td>
+<td>IT: được triển khai theo Build Sheet trên PROD khi có sign-off QA. QA/QMS: được ký sign-off từng setting. Warehouse/QC: được chặn giao hàng (BLOCK SHIP / chặn giao hàng) tại gate.</td>
 </tr>
 <tr>
 <td><b>L4</b></td>
@@ -415,13 +415,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>(MC) Ai định nghĩa “đạt/không đạt” cho cấu hình ảnh hưởng QMS? A) IT B) QA/QMS C) Operator D) Sales</li>
 <li>(MC) Acceptance test TC-01 “Released vs Draft” kiểm tra điều gì? A) Màu file B) User tiêu chuẩn chỉ thấy Released, không publish major C) Tốc độ mạng D) In ấn</li>
 <li>(MC) Acceptance test TC-03 kiểm tra gì? A) DLP chặn share external cho tài liệu nhạy cảm B) 5S C) tuổi dao (tool life) D) Cycle time</li>
-<li>(MC) “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))” áp dụng trực tiếp tại đâu? A) Khu ăn B) Gate GO-LIVE/SHIP/QC release C) Chấm công D) Bảo trì</li>
+<li>(MC) “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” áp dụng trực tiếp tại đâu? A) Khu ăn B) Gate GO-LIVE/SHIP/QC release C) Chấm công D) Bảo trì</li>
 <li>(MC) khi không đạt acceptance test, hành động bắt buộc là gì? A) GO luôn B) HOLD/ROLLBACK C) Bỏ qua D) Chờ người khác</li>
 <li>(MC) “Break permission theo từng file” phải chặn vì lý do nào? A) Tốn màu B) Không review được quyền, tạo quyền rơi rớt C) File nặng D) In chậm</li>
 <li>(MC) Snapshot groups/memberships dùng để làm gì? A) Trang trí B) Chứng minh kiểm soát truy cập tại thời điểm audit C) Tăng dung lượng D) Tạo emoji</li>
-<li>(MC) phê duyệt giao hàng (ship release) Validator fail yêu cầu quyết định gì? A) GO ship B) chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP)))))))) C) Chuyển ca D) Chờ email</li>
+<li>(MC) phê duyệt giao hàng (ship release) Validator fail yêu cầu quyết định gì? A) GO ship B) chặn giao hàng (BLOCK SHIP / chặn giao hàng) C) Chuyển ca D) Chờ email</li>
 <li>(MC) Khi phát hiện gage OOT, bước 60 giây gồm gì? A) Dán thẻ OOT + khóa sử dụng + HOLD lot liên quan B) Tiếp tục đo C) Vứt gage D) Chờ tuần sau</li>
-<li>(MC) Cutover plan bắt buộc có nội dung nào? A) cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) + snapshot + smoke test + rollback B) Poster C) Nhạc D) Ảnh</li>
+<li>(MC) Cutover plan bắt buộc có nội dung nào? A) cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) + snapshot + smoke test + rollback B) Poster C) Nhạc D) Ảnh</li>
 <li>(Tình huống) Khi Operator mở Job Dossier và thấy 2 file bản vẽ cùng tên khác Rev, hành động gate là gì?</li>
 <li>(Tình huống) Khi Warehouse chuẩn bị ship và packet thiếu IR, quyết định là gì và MRR nào phải tạo?</li>
 <li>(Tình huống) Khi QA truy xuất evidence cho 1 Setting ID mà không tìm thấy file đúng naming rule, hành động là gì?</li>
@@ -442,7 +442,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Dữ kiện:</b> Packing P-2602-015; packet thiếu IR; có COC; có nhãn traceability; khách yêu cầu IR bắt buộc.</li>
 <li><b>Yêu cầu:</b> Ra quyết định HOLD/GO; ghi MRR; thông báo Estimator (SAL-03) để chặn ETA.</li>
-<li><b>Đáp án đạt:</b> chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP)))))))); tạo ship block log + yêu cầu QC bổ sung IR; không xuất hàng.</li>
+<li><b>Đáp án đạt:</b> chặn giao hàng (BLOCK SHIP / chặn giao hàng); tạo ship block log + yêu cầu QC bổ sung IR; không xuất hàng.</li>
 </ul>
 </div>
 <div class="note">
@@ -466,7 +466,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="card" id="sec11">
-<h2>11) PASS/FAIL criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))”)</h2>
+<h2>11) PASS/FAIL criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”)</h2>
 <ul>
 <li><b>PASS</b> khi đạt đồng thời: Quiz ≥ 80%; OJT output đầy đủ; Performance test PASS; không vi phạm SoD; không có bước nào thiếu evidence.</li>
 <li><b>FAIL</b> khi xảy ra 1 trong các điều kiện: thiếu evidence cho bất kỳ Setting ID; dùng sai Rev mà không HOLD; fail TC-03 hoặc TC-01; bộ hồ sơ giao hàng (ship packet) thiếu mà vẫn GO; vi phạm SoD.</li>
@@ -510,7 +510,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Record bị xoá/sửa sau closeout</b> → TC-02 record integrity + cơ chế recover + log.</li>
 <li><b>External sharing vượt baseline</b> → TC-03 DLP guardrail + STOP CHANGE khi không đạt.</li>
 <li><b>Thiếu snapshot quyền</b> → Mỗi lần change phải lưu snapshot before/after và FRM-QMS-015.</li>
-<li><b>bộ hồ sơ giao hàng (ship packet) thiếu</b> → phê duyệt giao hàng (ship release) Validator + chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (chặn giao hàng (BLOCK SHIP)))))))) và log đầy đủ.</li>
+<li><b>bộ hồ sơ giao hàng (ship packet) thiếu</b> → phê duyệt giao hàng (ship release) Validator + chặn giao hàng (BLOCK SHIP / chặn giao hàng) và log đầy đủ.</li>
 <li><b>Không review quyền định kỳ</b> → FRM-QMS-016 theo quý; thiếu review → NCR.</li>
 <li><b>Acceptance tests chạy bằng admin</b> → Test suite bắt buộc chạy bằng user thật theo role.</li>
 </ol>

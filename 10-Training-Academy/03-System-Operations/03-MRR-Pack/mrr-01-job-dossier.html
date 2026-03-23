@@ -132,7 +132,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
 <tr><td><span class="chk">☐</span> RFQ + yêu cầu khách hàng (bản gốc)</td><td>RFQ</td><td>G0</td><td>Sales</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RFQ_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review))))))))) (yêu cầu/CTQ/rủi ro/chấp nhận năng lực)</td><td>CR</td><td>G1</td><td>Sales+QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> rà soát hợp đồng (contract review / rà soát hợp đồng) (yêu cầu/CTQ/rủi ro/chấp nhận năng lực)</td><td>CR</td><td>G1</td><td>Sales+QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> PO/WO/JobCode được phát hành</td><td>WO</td><td>G1</td><td>Planning</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_WO_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Baseline bản vẽ + spec (REV kiểm soát)</td><td>DRAW/SPEC</td><td>G2</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_DRAWREV_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Route / Process Plan / CTQ map</td><td>PLAN</td><td>G2</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PLAN_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
@@ -154,7 +154,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
 <ul class="tight">
-<li>Sai REV bản vẽ hoặc thiếu baseline trong SSOT → BLOCK.</li><li>Thiếu rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review))))))))) hoặc thiếu CTQ map → HOLD tại G2.</li><li>Chạy máy khi chưa có NC Release Pack hoặc setup sheet → STOP.</li><li>FAI/IR chưa ký mà đã chạy hàng loạt → STOP và HOLD toàn bộ WIP.</li><li>giao hàng khi thiếu CoC/bộ hồ sơ giao hàng (ship packet) → BLOCK.</li>
+<li>Sai REV bản vẽ hoặc thiếu baseline trong SSOT → BLOCK.</li><li>Thiếu rà soát hợp đồng (contract review / rà soát hợp đồng) hoặc thiếu CTQ map → HOLD tại G2.</li><li>Chạy máy khi chưa có NC Release Pack hoặc setup sheet → STOP.</li><li>FAI/IR chưa ký mà đã chạy hàng loạt → STOP và HOLD toàn bộ WIP.</li><li>giao hàng khi thiếu CoC/bộ hồ sơ giao hàng (ship packet) → BLOCK.</li>
 </ul>
 </div>
 <div class="card">

@@ -82,7 +82,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Thời lượng chuẩn:</strong> 90 phút lý thuyết (ca 1/ca 2) • 120 phút workshop theo case xưởng • 120 phút OJT tại hiện trường + ký xác nhận</li>
 <li><strong>Nhịp triển khai:</strong> 2 ca/ngày, 6 ngày/tuần. Mỗi role học tối đa 2 ngày/tuần. Ca nào nghỉ học thì ca đó vẫn vận hành theo checklist.</li>
 <li><strong>Tài liệu nội bộ bắt buộc đã đọc:</strong> ANNEX-QMS-012; SOP-QMS-012; SOP-QMS-012; SOP-QMS-011; SOP-QMS-011; WI-OPS-008; WI-OPS-001</li>
-<li><strong>Nguyên tắc cứng:</strong> không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))))))). Không có MRR thì không được đưa vào PROD và không được dùng để chạy xưởng.</li>
+<li><strong>Nguyên tắc cứng:</strong> không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát). Không có MRR thì không được đưa vào PROD và không được dùng để chạy xưởng.</li>
 </ul>
 </div>
 </div>
@@ -250,7 +250,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>H5 — PROD deploy &amp; freeze</b><br/>Owner: Supervisor + QA + IT</td>
 <td>UAT sign-off + backup/export + access snapshot</td>
 <td>Deploy vào PROD qua pipeline; bật guardrails; lưu evidence pack</td>
-<td>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))))) → BLOCK</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát) → BLOCK</td>
 </tr>
 </table>
 <!-- 4) -->
@@ -539,7 +539,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>8</td>
 <td>QA sign-off và bàn giao evidence pack</td>
 <td>Sign-off theo mục • Evidence theo naming chuẩn • Lưu đúng kho</td>
-<td>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))))))); sẵn sàng đánh giá trong 3 phút</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát); sẵn sàng đánh giá trong 3 phút</td>
 </tr>
 </table>
 <h3>OJT output (sản phẩm đầu ra bắt buộc)</h3>
@@ -560,7 +560,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L1</b></td>
-<td>Nêu đúng khái niệm DEV/UAT/PROD, managed/unmanaged, DLP, zone dữ liệu; nhận biết “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))”.</td>
+<td>Nêu đúng khái niệm DEV/UAT/PROD, managed/unmanaged, DLP, zone dữ liệu; nhận biết “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”.</td>
 <td>Quiz ≥ 80% (phần kiến thức)</td>
 <td>Được phép dùng app theo quyền user</td>
 </tr>
@@ -595,7 +595,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>DLP policy chặn cái gì và chặn theo cơ chế nào?</li>
 <li>Quy tắc “không break permission theo từng file” chặn rủi ro gì?</li>
 <li>SoD là gì và vì sao audit quan tâm?</li>
-<li>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))))))) nghĩa là gì trong go-live?</li>
+<li>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát) nghĩa là gì trong go-live?</li>
 <li>Khi phát hiện app hiển thị sai Rev, hành động đầu tiên là gì?</li>
 <li>Khi có yêu cầu share dữ liệu Customer-Confidential ra ngoài, kênh đúng là gì?</li>
 <li>Vì sao acceptance test phải chạy bằng user thật?</li>

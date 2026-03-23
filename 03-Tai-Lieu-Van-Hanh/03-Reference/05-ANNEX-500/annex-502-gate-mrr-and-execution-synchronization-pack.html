@@ -94,7 +94,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>3. Bundle MRR bắt buộc theo từng gate</h2>
 <div class="table-card"><table><thead><tr><th>Gate</th><th>Bộ hồ sơ tối thiểu phải truy xuất được trong 60 giây</th><th>Nơi phải tìm thấy</th><th>Ai chịu trách nhiệm completeness</th></tr></thead><tbody>
-<tr><td>G0</td><td>RFQ register, rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review))))))))), customer requirements / CSR, bản vẽ đang báo giá, assumption log</td><td>ERP + Job Dossier</td><td>Sales / Estimator</td></tr>
+<tr><td>G0</td><td>RFQ register, rà soát hợp đồng (contract review / rà soát hợp đồng), customer requirements / CSR, bản vẽ đang báo giá, assumption log</td><td>ERP + Job Dossier</td><td>Sales / Estimator</td></tr>
 <tr><td>G1</td><td>Baseline drawing/rev, route, setup sheet, program ID, tool list, control plan / inspection requirement, planning release</td><td>ERP + Engineering folder + Job Dossier</td><td>Engineering + Planning</td></tr>
 <tr><td>G2</td><td>Setup and first-piece record, balloon/FAI pack khi áp dụng, gage availability, machine ready sign-off, abnormal risk notes</td><td>Traveler + Job Dossier + machine-side packet</td><td>Production Supervisor + QA</td></tr>
 <tr><td>G3</td><td>Dispatch list, traveler, WIP card, IPQC/SPC/AQL record, downtime / abnormal restart log, outsource transfer log khi áp dụng</td><td>Machine packet + ERP + SSOT</td><td>Production / Planning / QA</td></tr>
@@ -116,7 +116,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Drawing Rev ≠ Setup sheet Rev</td><td>Bản vẽ Rev C nhưng setup sheet còn Rev B</td><td>HOLD G1/G2. Dừng setup. Thu hồi packet tại máy. Rebaseline lại trước khi chạy.</td><td>Engineering, Planning, Production, QA</td></tr>
 <tr><td>Program ID ≠ Program release list</td><td>Máy đang gọi chương trình cũ hoặc chương trình không nằm trong baseline</td><td>HOLD G2/G3. Không chạy first cut. Ghi abnormal restart / wrong program event.</td><td>Production Supervisor, Engineering, QA</td></tr>
 <tr><td>Traveler / barcode / WIP card không khớp lot</td><td>Lot trên khay khác với lot trong traveler</td><td>HOLD G3/G4. Cách ly lô, kiểm 100% trace, không trộn lại bằng tay.</td><td>Production, QA, WHS</td></tr>
-<tr><td>Shipment label / SSCC ≠ pack record</td><td>Outer carton dán nhầm SSCC hoặc Pack ID</td><td>HOLD G5. Không xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))))))). Repack / relabel theo quyền hạn cho phép.</td><td>WHS, QA</td></tr>
+<tr><td>Shipment label / SSCC ≠ pack record</td><td>Outer carton dán nhầm SSCC hoặc Pack ID</td><td>HOLD G5. Không xác nhận giao hàng (ship confirm / xác nhận giao hàng). Repack / relabel theo quyền hạn cho phép.</td><td>WHS, QA</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>6. Retrieval drill 60 giây</h2>
@@ -131,7 +131,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>7. Customer overlay và package đặc biệt</h2>
 <div class="table-card"><table><thead><tr><th>Overlay</th><th>Khi áp dụng</th><th>Phải cộng thêm vào MRR</th></tr></thead><tbody>
-<tr><td>Prototype / hot-job</td><td>thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time))))))))) cực ngắn, sample, urgent recovery</td><td>Risk note, deviation approval, expedited dispatch record</td></tr>
+<tr><td>Prototype / hot-job</td><td>thời gian dẫn (lead time / thời gian dẫn) cực ngắn, sample, urgent recovery</td><td>Risk note, deviation approval, expedited dispatch record</td></tr>
 <tr><td>Semiconductor / vacuum / cleanliness</td><td>Part có clean build, leak test, particle / moisture / vacuum requirement</td><td>Clean pack evidence, cleanliness verification, leak test record, preservation class</td></tr>
 <tr><td>Outsource-heavy</td><td>Có nhiều công đoạn thuê ngoài / special process</td><td>Dispatch checklist, processor cert, incoming verification, lot trace continuity</td></tr>
 <tr><td>Customer-mandated cert pack</td><td>Khách yêu cầu material cert, CoC format riêng, serial-level trace</td><td>Customer-format cert, serial map, customer label / pack photo theo spec</td></tr>
@@ -166,7 +166,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a></td><td>Thực hiện gate, hold, release tại hiện trường.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Kiểm completeness hồ sơ theo gate.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Điều độ, WIP và cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))).</td></tr>
+<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Điều độ, WIP và cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch).</td></tr>
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Work transfer validation.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Pre-run verification tại máy.</td></tr>
 <tr><td><a href="annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a></td><td>Metadata và structure của dossier.</td></tr>

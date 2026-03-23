@@ -73,10 +73,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="title">
 <strong>WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</strong>
 </div><div class="meta"><div class="row"><span><b>Mã:</b></span><span>WI-101</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / IT System Administrator</span></div><div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div></div>
-</div><div class="doc-content" id="docContent"><div class="form-sheet"><div class="preface-block"><h2 class="h2">Điều kiện áp dụng và kiểm soát</h2><div class="grid-2"><div><p><b>ÁP DỤNG KHI</b></p><ul class="list"><li>Khi tài liệu được viện dẫn trong Job/Process/Forms liên quan.</li><li>Khi phát sinh thay đổi ảnh hưởng chất lượng hoặc yêu cầu khách hàng.</li><li>Khi cần xác định hold/release hoặc yêu cầu bằng chứng bắt buộc.</li></ul></div><div><p><b>Đầu vào / Đầu ra</b></p><ul class="list"><li><b>Input:</b> Epicor Kinetic (transaction)</li><li><b>Input:</b> M365/SharePoint (SSOT hồ sơ)</li><li><b>Output:</b> Record/Log đầy đủ tại SSOT</li><li><b>Output:</b> Trạng thái gate được mở hoặc giữ theo tiêu chí</li></ul></div></div><p class="callout"><b>Hold/Release:</b> Thiếu bằng chứng bắt buộc: áp dụng HOLD theo tiêu chí của tài liệu; không chuyển bước cho đến khi đủ bằng chứng.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết hồ sơ SSOT.</p></div><div class="card"><span class="badge"><span class="dot"></span>WI-101</span><h1 class="h1" style="margin-top:12px;">WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</h1><p class="lead">Tài liệu này quy định cách triển khai và sử dụng biểu mẫu số hoá trên M365 (SharePoint Lists/Power Apps/Power Automate) và cách lưu bằng chứng theo SSOT. Mọi giao dịch vận hành (time entry, trạng thái job, PO, xuất/nhập kho, xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm)))))))))) <b>chỉ</b> được ghi nhận trong <b>Epicor Kinetic</b>.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">1. Khi áp dụng</h2><ul>
+</div><div class="doc-content" id="docContent"><div class="form-sheet"><div class="preface-block"><h2 class="h2">Điều kiện áp dụng và kiểm soát</h2><div class="grid-2"><div><p><b>ÁP DỤNG KHI</b></p><ul class="list"><li>Khi tài liệu được viện dẫn trong Job/Process/Forms liên quan.</li><li>Khi phát sinh thay đổi ảnh hưởng chất lượng hoặc yêu cầu khách hàng.</li><li>Khi cần xác định hold/release hoặc yêu cầu bằng chứng bắt buộc.</li></ul></div><div><p><b>Đầu vào / Đầu ra</b></p><ul class="list"><li><b>Input:</b> Epicor Kinetic (transaction)</li><li><b>Input:</b> M365/SharePoint (SSOT hồ sơ)</li><li><b>Output:</b> Record/Log đầy đủ tại SSOT</li><li><b>Output:</b> Trạng thái gate được mở hoặc giữ theo tiêu chí</li></ul></div></div><p class="callout"><b>Hold/Release:</b> Thiếu bằng chứng bắt buộc: áp dụng HOLD theo tiêu chí của tài liệu; không chuyển bước cho đến khi đủ bằng chứng.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết hồ sơ SSOT.</p></div><div class="card"><span class="badge"><span class="dot"></span>WI-101</span><h1 class="h1" style="margin-top:12px;">WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</h1><p class="lead">Tài liệu này quy định cách triển khai và sử dụng biểu mẫu số hoá trên M365 (SharePoint Lists/Power Apps/Power Automate) và cách lưu bằng chứng theo SSOT. Mọi giao dịch vận hành (time entry, trạng thái job, PO, xuất/nhập kho, xác nhận giao hàng (ship confirm / xác nhận giao hàng)) <b>chỉ</b> được ghi nhận trong <b>Epicor Kinetic</b>.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">1. Khi áp dụng</h2><ul>
 <li><b>Phải</b> áp dụng khi thay thế biểu mẫu giấy bằng biểu mẫu số hoá để ghi nhận vận hành tại xưởng CNC: kiểm tra công đoạn, log hold, checklist đóng gói, nhật ký giao ca, yêu cầu hỗ trợ máy/tooling.</li>
 <li><b>Phải</b> áp dụng khi cần <b>phê duyệt điện tử</b> (Power Automate Approvals) cho các điểm dừng chất lượng/ship-release.</li>
-<li><b>Không được</b> dùng M365 để tạo “sổ” thay thế Epicor cho các giao dịch: time entry, xác nhận hoàn thành công đoạn, xuất kho, xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))))))), cập nhật PO.</li>
+<li><b>Không được</b> dùng M365 để tạo “sổ” thay thế Epicor cho các giao dịch: time entry, xác nhận hoàn thành công đoạn, xuất kho, xác nhận giao hàng (ship confirm / xác nhận giao hàng), cập nhật PO.</li>
 <li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Ghi nhận trực tiếp trên hệ thống đã chỉ định; không dùng file Excel làm nguồn ghi nhận vận hành.</li>
 </ul></div><div class="card"><h2 class="h2" style="margin-top:0;">2. Công cụ / vật tư</h2><ul>
 <li>M365: SharePoint Site <b>CNC-IMS-HUB</b>; SharePoint Lists; Document Libraries; Teams; Power Apps; Power Automate Approvals; Microsoft Purview (Retention/Legal hold).</li>
@@ -180,7 +180,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Bản ghi biểu mẫu số hoá (RecordID)</td>
 <td>SharePoint List theo từng form</td>
 <td><b>M365: CNC-IMS-HUB/QMS-Records/OPS/Online-Forms/</b></td>
-<td>Khi Job đóng trong Epicor <b>hoặc</b> khi Shipment xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))))))) (tuỳ loại record) + 10 năm</td>
+<td>Khi Job đóng trong Epicor <b>hoặc</b> khi Shipment xác nhận giao hàng (ship confirm / xác nhận giao hàng) (tuỳ loại record) + 10 năm</td>
 <td>OPS/QA/WHS/QMS theo RACI của form</td>
 </tr>
 <tr>
@@ -194,7 +194,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Thư mục bằng chứng theo Job</td>
 <td>Job Dossier Index</td>
 <td><b>M365: CNC-IMS-HUB/QMS-Records/OPS/Job-Dossier/&lt;JobNum&gt;/</b></td>
-<td>Khi Shipment xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))))))) trong Epicor + 10 năm</td>
+<td>Khi Shipment xác nhận giao hàng (ship confirm / xác nhận giao hàng) trong Epicor + 10 năm</td>
 <td>WHS (hồ sơ giao hàng) + QA (hồ sơ chất lượng)</td>
 </tr>
 <tr>
@@ -219,7 +219,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Epicor Kinetic</b></td>
 <td>System of Record (SoR) cho mọi transaction</td>
-<td>Time entry, trạng thái job/công đoạn, PO, inventory transaction, pack/shipment, xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (xác nhận giao hàng (ship confirm))))))))) <b>phải</b> thao tác trong Epicor.</td>
+<td>Time entry, trạng thái job/công đoạn, PO, inventory transaction, pack/shipment, xác nhận giao hàng (ship confirm / xác nhận giao hàng) <b>phải</b> thao tác trong Epicor.</td>
 </tr>
 <tr>
 <td><b>M365 (SharePoint/Teams/Power Platform/Purview)</b></td>

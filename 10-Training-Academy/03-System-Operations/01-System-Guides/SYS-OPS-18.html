@@ -110,13 +110,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th>Bước E2E</th><th>Input</th><th>Owner</th><th>Output</th><th>Điểm chặn (Gate)</th></tr></thead>
 <tbody>
-<tr><td>Quote/Contract</td><td>Yêu cầu khách về traceability, MSA, tiêu chuẩn hiệu chuẩn</td><td>Estimator (SAL-03)</td><td>Danh mục yêu cầu đo/hiệu chuẩn theo hợp đồng</td><td>Không có yêu cầu rõ = ghi M365/SharePoint → HESEM-QMS-SSOT vào Planning &amp; rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review)))))))))</td></tr>
+<tr><td>Quote/Contract</td><td>Yêu cầu khách về traceability, MSA, tiêu chuẩn hiệu chuẩn</td><td>Estimator (SAL-03)</td><td>Danh mục yêu cầu đo/hiệu chuẩn theo hợp đồng</td><td>Không có yêu cầu rõ = ghi M365/SharePoint → HESEM-QMS-SSOT vào Planning &amp; rà soát hợp đồng (contract review / rà soát hợp đồng)</td></tr>
 <tr><td>Planning</td><td>CTQ, tần suất kiểm, plan công đoạn</td><td>Planner</td><td>kế hoạch kiểm tra (inspection plan) + lịch tránh trùng hạn hiệu chuẩn</td><td>Plan dùng thiết bị quá hạn = BLOCK phát hành traveler</td></tr>
 <tr><td>Engineering</td><td>Bản vẽ Rev, phương pháp đo, đồ gá đo</td><td>Programmer/Engineering</td><td>Quy định gage + yêu cầu MSA cho CTQ</td><td>CTQ dung sai chặt không có yêu cầu MSA = HOLD FAI/Final decision</td></tr>
 <tr><td>Purchasing</td><td>Nhu cầu mua gage, dịch vụ hiệu chuẩn</td><td>Purchasing</td><td>PO + tiêu chí chứng chỉ + nhà cung cấp đủ năng lực</td><td>PO không ràng buộc traceability/uncertainty = HOLD đặt dịch vụ</td></tr>
 <tr><td>Receiving/Warehouse</td><td>Thiết bị mới / thiết bị về từ hiệu chuẩn</td><td>Warehouse</td><td>Gage được gán ID + nhãn trạng thái + chuyển QA review</td><td>Thiết bị về không cert/không nhãn = QUARANTINE</td></tr>
 <tr><td>Production</td><td>Thiết bị đo tại điểm dùng</td><td>Operator/Setup</td><td>Verification đầu ca + dùng đúng gage</td><td>Thiết bị không đạt verification = STOP đo, HOLD lot</td></tr>
-<tr><td>QC/QA</td><td>Kết quả đo + log hiệu chuẩn + cert</td><td>QC/QA</td><td>Quyết định PASS/FAIL + hồ sơ MRR</td><td>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))))))) (không có log/cert = BLOCK release)</td></tr>
+<tr><td>QC/QA</td><td>Kết quả đo + log hiệu chuẩn + cert</td><td>QC/QA</td><td>Quyết định PASS/FAIL + hồ sơ MRR</td><td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát) (không có log/cert = BLOCK release)</td></tr>
 <tr><td>NCR/MRB</td><td>Sự kiện OOT / nghi ngờ đo sai</td><td>QA + Supervisor</td><td>Impact assessment + containment + quyết định re-measure/recall</td><td>Chưa đóng OOT impact assessment = BLOCK ship mọi lot trong vùng ảnh hưởng</td></tr>
 <tr><td>Ship</td><td>Hồ sơ release</td><td>Supervisor + QA</td><td>Ship pack hoàn chỉnh</td><td>Thiếu chứng chỉ/IR/FAI liên quan đo = HOLD xuất hàng</td></tr>
 </tbody>
@@ -201,7 +201,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>12</td><td>Re-measure/100% sort theo quyết định MRB và cập nhật IR/FAI/Final</td><td>QC + Production</td><td>IR/FAI cập nhật + biên bản sort</td><td>Re-measure nhưng không ghi liên kết đến OOT case</td></tr>
 <tr><td>13</td><td>Kích hoạt MSA cho CTQ: chọn phương pháp, mẫu, người đo, tiêu chí PASS</td><td>QA + Engineering</td><td>Báo cáo MSA/Gage R&amp;R</td><td>Làm MSA nhưng không gắn CTQ cụ thể</td></tr>
 <tr><td>14</td><td>Review chương trình hằng năm: overdue rate, OOT rate, hiệu lực interval</td><td>QA + Supervisor</td><td>Biên bản review + KPI</td><td>Không điều chỉnh interval theo dữ liệu</td></tr>
-<tr><td>15</td><td>Đào tạo lại khi có OOT/vi phạm dùng thiết bị quá hạn</td><td>Supervisor</td><td>danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (OJT checklist))))))))) + record đào tạo lại</td><td>Nhắc miệng nhưng không có bằng chứng</td></tr>
+<tr><td>15</td><td>Đào tạo lại khi có OOT/vi phạm dùng thiết bị quá hạn</td><td>Supervisor</td><td>danh mục OJT (checklist / danh mục) + record đào tạo lại</td><td>Nhắc miệng nhưng không có bằng chứng</td></tr>
 </tbody>
 </table>
 </div>
@@ -256,7 +256,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Planner:</b> đạt khi lập lịch gửi hiệu chuẩn trước hạn, không tạo gián đoạn ca do thiếu gage.</li>
 <li><b>Maintenance:</b> đạt khi đảm bảo điều kiện bảo quản, xử lý hỏng hóc cơ khí và gửi kiểm tra lại sau sửa.</li>
 <li><b>EHS:</b> đạt khi kiểm soát hoá chất chống gỉ/lau rửa, PPE, và khu vực lưu giữ an toàn cho chuẩn.</li>
-<li><b>Estimator (SAL-03):</b> đạt khi chuyển yêu cầu khách về calibration/MSA vào rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review))))))))) và kích hoạt thông báo khách khi xảy ra OOT ảnh hưởng ship.</li>
+<li><b>Estimator (SAL-03):</b> đạt khi chuyển yêu cầu khách về calibration/MSA vào rà soát hợp đồng (contract review / rà soát hợp đồng) và kích hoạt thông báo khách khi xảy ra OOT ảnh hưởng ship.</li>
 <li><b>Supervisor:</b> đạt khi thực thi FF rules, chặn bypass gate, kiểm tra MRR trước ship.</li>
 </ul>
 </div>
@@ -272,7 +272,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>(MC) “Traceability” trên chứng chỉ hiệu chuẩn dùng để chứng minh: A) Có chữ ký đẹp B) Liên kết đến chuẩn quốc gia/quốc tế C) Có logo nhà cung cấp D) Có giá rẻ.</li>
 <li>(MC) Khi thiết bị bị rơi, hành động bắt buộc là: A) Lau sạch rồi dùng B) Zero lại rồi dùng C) HOLD và chuyển QA/QC kiểm tra D) Cất tủ.</li>
 <li>(MC) Khi cert báo OOT, bước đầu tiên của impact assessment là: A) Ship nhanh B) Xác định vùng ảnh hưởng theo thời gian C) Huỷ toàn bộ D) Bỏ qua.</li>
-<li>(MC) “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))” áp dụng trực tiếp với: A) IR/FAI/Final release B) Màu đồng phục C) Tên máy CNC D) Số điện thoại.</li>
+<li>(MC) “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” áp dụng trực tiếp với: A) IR/FAI/Final release B) Màu đồng phục C) Tên máy CNC D) Số điện thoại.</li>
 <li>(MC) Verification trước khi dùng bắt buộc ghi: A) Chỉ chữ ký B) Giá trị đo hoặc kết quả master check + ID thiết bị C) Chỉ ngày D) Không cần.</li>
 <li>(MC) MSA/Gage R&amp;R bắt buộc kích hoạt khi: A) CTQ dung sai chặt hoặc quyết định release B) Khi hết giấy in C) Khi trời mưa D) Khi có khách tham quan.</li>
 <li>(Tình huống ngắn) Khi Operator phát hiện caliper hết hạn trong lúc đang đo 10 pcs, phải ghi những record nào tối thiểu trước khi rời khỏi vị trí?</li>
@@ -334,7 +334,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="section">
-<h2>11) PASS/FAIL criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))”)</h2>
+<h2>11) PASS/FAIL criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”)</h2>
 <ul>
 <li><b>PASS:</b> Quiz ≥ 85% + Scenario quyết định đúng (HOLD/GO + MRR đúng) + Performance test PASS và 0 lỗi critical.</li>
 <li><b>FAIL:</b> Bất kỳ lỗi critical nào (dùng thiết bị quá hạn/không nhãn, phát hành cert lỗi, bỏ qua OOT impact) hoặc thiếu MRR bắt buộc.</li>
@@ -351,7 +351,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Báo cáo OOT impact assessment + NCR/MRB (FRM-QA-03) khi phát sinh.</li>
 <li>Báo cáo MSA/Gage R&amp;R cho CTQ khi kích hoạt.</li>
 <li>Ảnh nhãn trạng thái tại điểm dùng (trước khi ship hoặc khi audit nội bộ).</li>
-<li>danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (OJT checklist))))))))) ký xác nhận đạt cho từng role.</li>
+<li>danh mục OJT (checklist / danh mục) ký xác nhận đạt cho từng role.</li>
 </ul>
 <h3>12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
 <ul>
@@ -380,7 +380,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Không có impact assessment khi OOT → FF3 BLOCK ship + yêu cầu OOT report có vùng ảnh hưởng.</li>
 <li>Interval không có basis → bắt buộc ghi Basis trong FRM-QMS-04 và review hằng năm.</li>
 <li>Go/No-go gauge không kiểm soát mòn → lịch kiểm mòn + master check + thay thế theo điều kiện FAIL.</li>
-<li>Không có verification log → “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))” tại QC/Final/Ship.</li>
+<li>Không có verification log → “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” tại QC/Final/Ship.</li>
 <li>Thiếu MSA cho CTQ dung sai chặt → HOLD FAI/Final đến khi MSA PASS.</li>
 <li>Thiếu truy xuất gage ID trong IR/FAI → bắt buộc trường “Gage ID” trên form IR/FAI hoặc ghi trên traveler.</li>
 <li>Thiết bị sửa chữa xong quay lại dùng không kiểm tra → quy tắc: sửa/va đập = HOLD và kiểm tra lại trước khi OK.</li>

@@ -73,7 +73,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
       <h1>WI-501 — Điều độ hằng ca, rà soát năng lực và kiểm soát WIP</h1>
 
 <div class="section"><h2>1. Mục tiêu và quy tắc không thương lượng</h2>
-<p>WI này dùng để vận hành công tác điều độ hằng ca: lấy dữ liệu từ SoR, xác nhận readiness, phát hành dispatch, kiểm soát WIP, xử lý hot-job, quản lý cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) và bàn giao cuối ca. Mục tiêu là làm cho xưởng chạy đúng <b>job cần chạy</b>, đúng <b>thời điểm</b>, đúng <b>năng lực</b> và đúng <b>điều kiện release</b>.</p>
+<p>WI này dùng để vận hành công tác điều độ hằng ca: lấy dữ liệu từ SoR, xác nhận readiness, phát hành dispatch, kiểm soát WIP, xử lý hot-job, quản lý cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và bàn giao cuối ca. Mục tiêu là làm cho xưởng chạy đúng <b>job cần chạy</b>, đúng <b>thời điểm</b>, đúng <b>năng lực</b> và đúng <b>điều kiện release</b>.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span><br/>Chỉ kéo job vào máy khi readiness đã đủ. Giữ dispatch trên bảng và hệ thống điều độ chính thức. Mọi thay đổi thứ tự phải có đánh giá tác động tới bottleneck, first-piece, outsource, final release và OTD.</div>
 <ul class="tight">
 <li>Epicor là SoR. Dispatch board, snapshot và nhật ký hành động (action log) chỉ phản ánh lại dữ liệu điều hành và quyết định.</li>
@@ -106,7 +106,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="step-list">
 <div class="step-item"><strong>Phát hành board theo nhóm máy (machine family).</strong><br/>Tách riêng 3-axis, 5-axis, turning, mill-turn, finishing, clean/leak/final release và outsource queue. Không trộn tất cả lên một danh sách rồi yêu cầu Supervisor tự hiểu.</div>
 <div class="step-item"><strong>Khóa Top list.</strong><br/>Đầu mỗi ca phải xác định rõ Top P0/P1, job đầu tiên lên máy, job thứ hai đã staged, và các job P3/HOLD bị chặn.</div>
-<div class="step-item"><strong>Xác định cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))).</strong><br/>Sau khi công bố dispatch đầu ca, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) của ca có hiệu lực. Từ thời điểm này, mọi đổi lịch phải theo rule ở ANNEX-501.</div>
+<div class="step-item"><strong>Xác định cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch).</strong><br/>Sau khi công bố dispatch đầu ca, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) của ca có hiệu lực. Từ thời điểm này, mọi đổi lịch phải theo rule ở ANNEX-501.</div>
 <div class="step-item"><strong>Giao việc và xác nhận hiểu việc.</strong><br/>Supervisor/Cell Lead phải xác nhận người chạy máy hiểu job nào chạy trước, job nào chờ, job nào cần setup song song, và job nào có gate QA/ENG/WHS đi kèm.</div>
 </div>
 </div>
@@ -134,7 +134,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>6. Kỷ luật queue và WIP trong ca</h2>
 <div class="table-card"><table><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
 <tr><td>Queue trước bottleneck tăng nhanh</td><td>Chỉ giữ lượng staged cần cho ca hiện tại và phần kế tiếp đã được duyệt; phần còn lại giữ ở trạng thái plan hoặc hold có lý do</td><td>Không xả hàng ào ạt để “nhìn như đang bận”</td></tr>
-<tr><td>Job dở do chờ QA hoặc chờ tool</td><td>Gắn trạng thái rõ, owner rõ, next action rõ, snapshot vào tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging))))))))) log</td><td>Không để lẫn trong queue thường như job sẵn sàng</td></tr>
+<tr><td>Job dở do chờ QA hoặc chờ tool</td><td>Gắn trạng thái rõ, owner rõ, next action rõ, snapshot vào tuổi tồn WIP (aging / tuổi tồn) log</td><td>Không để lẫn trong queue thường như job sẵn sàng</td></tr>
 <tr><td>Chuyển WIP giữa khu vực</td><td>Phải có tag/nhãn, điểm đến rõ, transaction/record liên quan và trách nhiệm nhận việc</td><td>Không di chuyển bằng miệng hoặc để bán thành phẩm vô chủ</td></tr>
 <tr><td>Partial run / split lot</td><td>Phải xác định lot nào chạy trước, lot nào chờ, điểm kiểm CTQ và điều kiện ghép lại hồ sơ</td><td>Không trộn lot làm mất trace hoặc nhầm part-range</td></tr>
 </tbody></table></div>
@@ -181,9 +181,9 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>12. Hồ sơ điều độ tối thiểu của một ca</h2>
 <ul class="tight">
 <li>Dispatch list đã phát hành cho từng nhóm máy (machine family) hoặc cell.</li>
-<li>Snapshot tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging))))))))) có owner và action cho mọi item đỏ/đen.</li>
+<li>Snapshot tuổi tồn WIP (aging / tuổi tồn) có owner và action cho mọi item đỏ/đen.</li>
 <li>nhật ký hành động (action log) của họp đầu ca/giữa ca nếu có hot-job, machine down, shortage hoặc gate bất thường.</li>
-<li>Decision note cho mọi lần phá cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))), resequence, split lot, outsource khẩn hoặc partial ship.</li>
+<li>Decision note cho mọi lần phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), resequence, split lot, outsource khẩn hoặc partial ship.</li>
 <li>Handover list cuối ca với job đang chạy, job đang chờ, abnormality mở và việc giao ca chưa đóng.</li>
 </ul>
 </div>
@@ -191,17 +191,17 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>13. KPI, bằng chứng và tài liệu liên kết</h2>
 <div class="kpi-grid">
 <div class="kpi-box"><strong>KPI-PLAN-01</strong><br/>OTD theo line / gate / ship.</div>
-<div class="kpi-box"><strong>KPI-PLAN-02</strong><br/>Số job tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging))))))))) vượt ngưỡng đỏ/đen.</div>
+<div class="kpi-box"><strong>KPI-PLAN-02</strong><br/>Số job tuổi tồn WIP (aging / tuổi tồn) vượt ngưỡng đỏ/đen.</div>
 <div class="kpi-box"><strong>KPI-PLAN-03</strong><br/>Tỷ lệ job chạy đúng dispatch đầu ca.</div>
 <div class="kpi-box"><strong>KPI-PLAN-04</strong><br/>Tỷ lệ xử lý sự kiện vượt cap trong SLA.</div>
 </div>
 <div class="table-card"><table><thead><tr><th>Hồ sơ / tài liệu</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>Rule điều độ, WIP cap, hot-job ladder, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))).</td></tr>
+<tr><td><a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>Rule điều độ, WIP cap, hot-job ladder, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch).</td></tr>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>Gate/MRR và rule bàn giao theo bước.</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation và SLA.</td></tr>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Chuẩn họp tầng và nhật ký hành động (action log).</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a></td><td>Dispatch list hằng ca/ngày.</td></tr>
-<tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a></td><td>tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging))))))))) và action.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a></td><td>tuổi tồn WIP (aging / tuổi tồn) và action.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Khung thủ tục nền của planning/dispatch.</td></tr>
 </tbody></table></div>
 </div>

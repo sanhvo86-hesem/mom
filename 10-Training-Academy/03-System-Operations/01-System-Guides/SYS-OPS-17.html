@@ -147,7 +147,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Mix-up/lẫn lô</b></td><td>Mất truy xuất, lẫn trạng thái OK/NG</td><td>Segregation khu HOLD + nhãn trạng thái + truy xuất theo JobNum</td></tr>
 <tr><td><b>Missing / falsified outsource documents</b></td><td>Không đạt yêu cầu đặc biệt, rủi ro pháp lý</td><td>BLOCK phê duyệt giao hàng (ship release) khi thiếu cert; NCR+SCAR</td></tr>
 <tr><td><b>OOT gage/calibration quá hạn</b></td><td>Đo sai, lọt lỗi CTQ</td><td>HOLD + đánh giá ảnh hưởng + NCR/CAPA theo SOP-QMS-007</td></tr>
-<tr><td><b>Bypass gate</b></td><td>Giao nhầm, mất bằng chứng audit</td><td>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))))))); mọi release có record</td></tr>
+<tr><td><b>Bypass gate</b></td><td>Giao nhầm, mất bằng chứng audit</td><td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát); mọi release có record</td></tr>
 </tbody>
 </table>
 </div>
@@ -189,7 +189,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Programmer</b></td>
 <td>Phân tích lỗi PROG; xác định cơ chế sai (post, tool comp, origin, revision); cập nhật program theo Change Management.</td>
-<td>Tạo bằng chứng nguyên nhân gốc + bản sửa program + khóa revision; cập nhật bộ tài liệu điểm sử dụng (điểm sử dụng).</td>
+<td>Tạo bằng chứng nguyên nhân gốc + bản sửa program + khóa revision; cập nhật bộ tài liệu điểm sử dụng.</td>
 </tr>
 <tr>
 <td><b>QC</b></td>
@@ -496,7 +496,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3 class="h3">6.2 Fail-fast rules (bắt buộc)</h3>
 <ul style="line-height:1.9">
-<li><b>FF-01 không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))))):</b> khi thiếu IR PASS/CMM report/cert/approval, gate Final/Ship là <b>BLOCK</b>.</li>
+<li><b>FF-01 không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát):</b> khi thiếu IR PASS/CMM report/cert/approval, gate Final/Ship là <b>BLOCK</b>.</li>
 <li><b>FF-02 Sai Rev là STOP:</b> khi phát hiện mismatch giữa Job pack và program/setup/print, thực hiện STOP và mở HOLD ngay.</li>
 <li><b>FF-03 Mix-up là STOP:</b> khi mất truy xuất lô/JobNum hoặc nhãn rơi, thực hiện STOP; quarantine toàn bộ khu vực liên quan.</li>
 <li><b>FF-04 Concession phải có chấp thuận trước giao:</b> khi chấp thuận chưa có, disposition UAI bị khóa và chuyển sang rework/scrap/return.</li>
@@ -695,7 +695,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" id="s11" style="margin-top:0">11. Đánh giá: Quiz ≥20 • Scenario ≥3 • Bài kiểm tra thực hành (bắt buộc)</h2>
 <h3 class="h3">11.1 Quiz (24 câu, trộn trắc nghiệm + tình huống ngắn)</h3>
 <ol style="line-height:1.9">
-<li>“không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))” nghĩa là gì trong bối cảnh phê duyệt giao hàng (ship release)?</li>
+<li>“không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” nghĩa là gì trong bối cảnh phê duyệt giao hàng (ship release)?</li>
 <li>QCHoldLog bắt buộc tối thiểu trường nào để record hợp lệ?</li>
 <li>HoldReasonCode nào dùng khi phát hiện sai chương trình gia công? (MAT/PROC/PROG/GAGE/OUT/HAND/UNK)</li>
 <li>Khi phát hiện sai Rev tại máy, 60 giây đầu PHẢI làm 3 việc gì?</li>
@@ -760,7 +760,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 12 -->
 <div class="card">
-<h2 class="h2" id="s12" style="margin-top:0">12. Tiêu chí PASS/FAIL (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))”)</h2>
+<h2 class="h2" id="s12" style="margin-top:0">12. Tiêu chí PASS/FAIL (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”)</h2>
 <ul style="line-height:1.9">
 <li><b>PASS</b> khi: Quiz ≥ 85% <b>và</b> Scenario đạt ≥ 2/3 <b>và</b> Bài kiểm tra thực hành đạt 100% checklist.</li>
 <li><b>FAIL</b> khi: thiếu bất kỳ output artifact/MRR, hoặc vi phạm STOP/HOLD/BLOCK, hoặc release/giao hàng khi thiếu evidence.</li>

@@ -103,7 +103,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 id="purpose">2) Mục đích module &amp; bối cảnh vận hành</h2>
 <div class="req"><span class="req-tag shall">PHẢI</span>
 <div>
- Mọi rủi ro/cơ hội ảnh hưởng QCDSM (Quality–Cost–Delivery–Safety–Morale) <b>PHẢI</b> được quản trị bằng chấm <b>S‑O‑D</b>, áp <b>ngưỡng hành động</b>, và lưu <b>MRR</b> tại đúng gate. Vi phạm “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))” bị xem là <b>bypass gate</b>.
+ Mọi rủi ro/cơ hội ảnh hưởng QCDSM (Quality–Cost–Delivery–Safety–Morale) <b>PHẢI</b> được quản trị bằng chấm <b>S‑O‑D</b>, áp <b>ngưỡng hành động</b>, và lưu <b>MRR</b> tại đúng gate. Vi phạm “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” bị xem là <b>bypass gate</b>.
  </div>
 </div>
 <div class="grid-2">
@@ -118,7 +118,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <b>Khi module kích hoạt:</b>
 <ul>
-<li>Khi báo giá/rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review))))))))) cho part mới, CTQ mới, yêu cầu chứng chỉ đặc biệt, hoặc leadtime căng.</li>
+<li>Khi báo giá/rà soát hợp đồng (contract review / rà soát hợp đồng) cho part mới, CTQ mới, yêu cầu chứng chỉ đặc biệt, hoặc leadtime căng.</li>
 <li>Khi phát hành program lần đầu hoặc thay đổi program/dao/đồ gá/phương pháp đo.</li>
 <li>Khi phát sinh NCR/near‑miss/escape hoặc xu hướng KPI xấu đi.</li>
 <li>Khi thay đổi supplier/thuê ngoài/special process hoặc thay đổi yêu cầu khách hàng.</li>
@@ -374,7 +374,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Severe</b></td><td>&gt;75 hoặc <b>S=5</b></td><td><b>STOP/HOLD/BLOCK</b> cho tới khi có containment + control mới + phê duyệt bằng văn bản; kích hoạt NCR/CAPA/MRB khi liên quan.</td></tr>
 </tbody>
 </table>
-<h3 class="h3">5.2 Thư viện rủi ro gate CNC (CNC gate risk library)</h3>
+<h3 class="h3">5.2 Thư viện rủi ro gate CNC (gate risk library)</h3>
 <p class="muted">Thư viện này dùng làm “danh sách rủi ro chuẩn” để chấm nhanh tại gate. Mọi rủi ro không nằm trong thư viện vẫn phải ghi vào sổ đăng ký rủi ro (risk register) khi phát sinh.</p>
 <table class="table">
 <thead>
@@ -453,7 +453,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>FF1 — không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))</b></td>
+<td><b>FF1 — không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)</b></td>
 <td>Thiếu MRR tại gate (sign‑off, IR/FAI, cert, log)</td>
 <td><b>HOLD</b> tại bước đang chạy</td>
 <td>Ghi log HOLD; bổ sung minh chứng; Supervisor xác nhận mở khóa</td>
@@ -698,7 +698,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol class="iso-list">
 <li>S‑O‑D là gì? RPN tính bằng công thức nào?</li>
 <li>Điều kiện nào kích hoạt mức Nghiêm trọng theo ngưỡng của HESEM?</li>
-<li>“không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))” nghĩa là gì trong vận hành?</li>
+<li>“không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” nghĩa là gì trong vận hành?</li>
 <li>Viết đúng cấu trúc cause–event–impact cho rủi ro “sai rev”.</li>
 <li>Gate nào chặn rủi ro thiếu chứng chỉ outsource? Nêu MRR tối thiểu.</li>
 <li>Khi phát hiện gage OOT đang dùng để đo CTQ, bước đầu tiên là gì?</li>
@@ -746,7 +746,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Kết quả PASS:</b> STOP đo; cách ly gage; HOLD 30 pcs; tái kiểm bằng gage đạt; mở NCR khi có sai lệch hoặc mất khả năng chứng minh.</li>
 </ul>
 </div>
-<h3 class="h3">10.3 Bài thực hành bắt buộc (bắt buộc)</h3>
+<h3 class="h3">10.3 Bài thực hành bắt buộc</h3>
 <div class="note">
 <b>Bài test:</b> Thực hiện 01 “Rà soát rủi ro tại gate” cho một job thực tế hoặc case mô phỏng, bao gồm: (1) trích CTQ; (2) chấm S‑O‑D cho 3 rủi ro; (3) áp ngưỡng và ra quyết định GO/HOLD/BLOCK; (4) tạo MRR đầy đủ theo vai trò.
  </div>

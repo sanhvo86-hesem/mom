@@ -70,7 +70,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi chọn nguồn cung mới, tái đánh giá nhà cung cấp hiện hữu, review định kỳ, ra quyết định probation/block, xác định mức incoming control và quyết định dual-source hoặc contingency source.</div>
 <h1>ANNEX-401 — Mô hình rủi ro nhà cung cấp và phương pháp scorecard</h1>
-<div class="callout-info"><b>Nguyên tắc nền:</b> Nhà cung cấp không được đánh giá chỉ bằng giá và thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (thời gian dẫn (lead time))))))))). Mọi nhà cung cấp ảnh hưởng CTQ, traceability, cert integrity, special process, delivery stability hoặc customer requirement PHẢI đi qua mô hình rủi ro và scorecard này trước khi cấp PO hoặc cho phép release vào sản xuất.</div>
+<div class="callout-info"><b>Nguyên tắc nền:</b> Nhà cung cấp không được đánh giá chỉ bằng giá và thời gian dẫn (lead time / thời gian dẫn). Mọi nhà cung cấp ảnh hưởng CTQ, traceability, cert integrity, special process, delivery stability hoặc customer requirement PHẢI đi qua mô hình rủi ro và scorecard này trước khi cấp PO hoặc cho phép release vào sản xuất.</div>
 <h2>1. Mục đích và phạm vi áp dụng</h2>
 <p>ANNEX này quy định hai lớp kiểm soát song song: <b>(1) rủi ro nền của nhà cung cấp</b> và <b>(2) hiệu năng thực tế theo scorecard</b>. Hai lớp này cùng quyết định supplier status, tần suất review, mức độ incoming verification, yêu cầu dual-source, trigger probation/block và điều kiện mở khóa lại.</p>
 <p>Tài liệu áp dụng cho raw material suppliers, customer-designated suppliers, special processors, subcontract machining houses, dịch vụ kiểm định/hiệu chuẩn ảnh hưởng sản phẩm, và các nguồn cung ảnh hưởng trực tiếp tới tiến độ/tuân thủ chất lượng của Job order CNC.</p>
@@ -120,7 +120,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Special process cert/accreditation/scope hết hạn hoặc không đúng site/process</td><td>Hold ngay; không dispatch thêm tới processor đó cho scope bị ảnh hưởng</td><td>Pur Mgr + QA</td></tr>
 <tr><td>CTQ escape / customer complaint nghiêm trọng / repeat defect không kiểm soát</td><td>Probation hoặc Block; SCAR bắt buộc; review containment trước khi dùng lại</td><td>QA Mgr</td></tr>
 <tr><td>Supplier tự ý đổi nguồn, đổi vật liệu, đổi sub-tier hoặc đổi quy trình mà không thông báo</td><td>Hold toàn bộ Job/Lot bị ảnh hưởng; rescore ngay; xem xét block</td><td>Pur Mgr + Eng/QA</td></tr>
-<tr><td>OTD collapse kéo dài hoặc không đáp ứng expedite trên item nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (single-source)))))))))</td><td>Kích hoạt contingency/dual-source; review capacity risk; tăng review frequency</td><td>Pla Mgr + Pur Mgr</td></tr>
+<tr><td>OTD collapse kéo dài hoặc không đáp ứng expedite trên item nguồn đơn (single-source / nguồn đơn)</td><td>Kích hoạt contingency/dual-source; review capacity risk; tăng review frequency</td><td>Pla Mgr + Pur Mgr</td></tr>
 </tbody></table></div>
 <h2>7. Status, ngưỡng hành động và tần suất review</h2>
 <div class="table-card"><table>
@@ -134,7 +134,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div>
 <h2>8. Quy tắc đặc biệt cho nhà cung cấp critical và customer-specific</h2>
 <ul class="tight">
-<li>Supplier/processors thuộc <b>R1</b> và là nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (nguồn đơn (single-source))))))))) cho Job critical PHẢI có contingency note hoặc phương án thay thế được duyệt bởi Planning/Purchasing/Engineering.</li>
+<li>Supplier/processors thuộc <b>R1</b> và là nguồn đơn (single-source / nguồn đơn) cho Job critical PHẢI có contingency note hoặc phương án thay thế được duyệt bởi Planning/Purchasing/Engineering.</li>
 <li>Customer-approved hoặc customer-directed source chỉ hợp lệ trong phạm vi customer/scope được nêu. Không được dùng approval của customer A để suy ra approval cho customer B.</li>
 <li>Special processor phải được kiểm theo <a href="annex-403-approved-processor-list.html">ANNEX-403</a>; supplier risk score không thay thế việc kiểm scope/site/cert expiry.</li>
 <li>Raw material supplier phải phù hợp với <a href="annex-302-approved-materials-list.html">ANNEX-302</a>; score tốt không cho phép tự ý substitute material/grade/condition.</li>

@@ -83,7 +83,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  đường đi của thay đổi có dấu vết từ <b>yêu cầu</b> → <b>phê duyệt</b> → <b>phát hành</b> → <b>triển khai</b> → <b>thu hồi</b> → <b>lưu kho</b>.
  </p>
 <div class="qa-box">
-<div class="mini"><b>Nguyên tắc nền:</b> không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))</div>
+<div class="mini"><b>Nguyên tắc nền:</b> không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)</div>
 <div class="mini">Mỗi cổng tự kiểm (gate) chỉ mở khi có hồ sơ tối thiểu bắt buộc (MRR) và truy xuất trong ≤ 2 phút.</div>
 </div>
 </div>
@@ -187,7 +187,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Báo giá → PO/Contract</b></td>
 <td>PO, revision, yêu cầu flow-down, CTQ.</td>
 <td>Estimator (SAL-03) + QA</td>
-<td>rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review))))))))) có dấu vết: Rev/Date/Owner; lưu SSOT.</td>
+<td>rà soát hợp đồng (contract review / rà soát hợp đồng) có dấu vết: Rev/Date/Owner; lưu SSOT.</td>
 </tr>
 <tr>
 <td><b>Lập kế hoạch</b></td>
@@ -373,8 +373,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Estimator (SAL-03)</b></td>
-<td>Kiểm soát revision bản vẽ/spec từ khách; rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review))))))))); thông tin thay đổi tới phòng ban.</td>
-<td>Hồ sơ rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review))))))))) ghi rõ Rev/Date; thay đổi khách hàng được flow-down và có bằng chứng tiếp nhận.</td>
+<td>Kiểm soát revision bản vẽ/spec từ khách; rà soát hợp đồng (contract review / rà soát hợp đồng); thông tin thay đổi tới phòng ban.</td>
+<td>Hồ sơ rà soát hợp đồng (contract review / rà soát hợp đồng) ghi rõ Rev/Date; thay đổi khách hàng được flow-down và có bằng chứng tiếp nhận.</td>
 </tr>
 <tr>
 <td><b>Supervisor/Leader</b></td>
@@ -776,7 +776,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<h3 class="h3" style="margin-top:0;">9.2 danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (OJT checklist))))))))) ký xác nhận</h3>
+<h3 class="h3" style="margin-top:0;">9.2 danh mục OJT (checklist / danh mục) ký xác nhận</h3>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Học viên thực hiện checklist POU 12 bước tại 1 máy thực tế.</li>
 <li>Học viên kích hoạt phản ứng 60 giây theo tình huống giả lập “QR sai Rev”.</li>
@@ -816,7 +816,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>13</td><td>Kiểm soát nào chặn sửa ngoài ý muốn đối với hồ sơ?</td><td>A. Quyền truy cập + log phiên bản</td></tr>
 <tr><td>14</td><td>Khi job packet đã phát hành, thay đổi giữa ca được triển khai qua chuỗi nào?</td><td>B. DCN → rollout → Issue/Recall</td></tr>
 <tr><td>15</td><td>Biểu mẫu xác nhận triển khai thay đổi tại nhiều điểm dùng là mã nào?</td><td>C. FRM-QMS-012</td></tr>
-<tr><td>16</td><td>“không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))” áp dụng cho điều gì?</td><td>D. Mọi gate tự kiểm</td></tr>
+<tr><td>16</td><td>“không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” áp dụng cho điều gì?</td><td>D. Mọi gate tự kiểm</td></tr>
 <tr><td>17</td><td>Khi program chỉnh tại máy không cập nhật master, rủi ro chính là gì?</td><td>A. Mất traceability Rev</td></tr>
 <tr><td>18</td><td>Tài liệu bên ngoài cần kiểm soát gồm nhóm nào?</td><td>B. Bản vẽ/spec/standard khách</td></tr>
 <tr><td>19</td><td>Ai chịu trách nhiệm cập nhật Master List khi phát hành Rev mới?</td><td>C. QA/QMS</td></tr>
@@ -860,7 +860,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 11 -->
 <div class="card" id="s11">
 <h2 class="h2" style="margin-top:0;">11) 7 self-check gates + liên kết KPI/competency</h2>
-<p class="lead">7 gate dưới đây chạy theo vòng đời thay đổi; mỗi gate có MRR rõ ràng. không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))))))).</p>
+<p class="lead">7 gate dưới đây chạy theo vòng đời thay đổi; mỗi gate có MRR rõ ràng. không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát).</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
@@ -1050,7 +1050,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>7</td><td>Hồ sơ đo bị sửa đổi ngoài kiểm soát</td><td>Quyền truy cập + log phiên bản; lưu SSOT theo retention tier</td></tr>
 <tr><td>8</td><td>Hồ sơ lưu rải rác, truy xuất thất bại</td><td>MRR yêu cầu metadata; kiểm SLA truy xuất ≤ 2 phút</td></tr>
 <tr><td>9</td><td>Thiếu bằng chứng đào tạo khi thay đổi</td><td>Gate G4 buộc có hồ sơ đào tạo/OJT</td></tr>
-<tr><td>10</td><td>Kiểm soát tài liệu bên ngoài không rõ nguồn/Rev</td><td>Estimator (SAL-03) chốt Rev trong rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review))))))))); lưu SSOT và flow-down</td></tr>
+<tr><td>10</td><td>Kiểm soát tài liệu bên ngoài không rõ nguồn/Rev</td><td>Estimator (SAL-03) chốt Rev trong rà soát hợp đồng (contract review / rà soát hợp đồng); lưu SSOT và flow-down</td></tr>
 </tbody>
 </table>
 </div>

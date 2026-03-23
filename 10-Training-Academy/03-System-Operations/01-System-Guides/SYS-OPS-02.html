@@ -141,7 +141,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><span class="kpi">KPI-01</span>: Truy xuất bộ hồ sơ job (FAI/Final/bộ hồ sơ giao hàng (ship packet)) trong ≤ <b>60 giây</b>.</li>
 <li><span class="kpi">KPI-02</span>: 0 trường hợp “sai REV phát hành/ gia công/ đo kiểm”.</li>
 <li><span class="kpi">KPI-03</span>: 100% Tier-1 record có <b>metadata bắt buộc</b> + nhãn <b>LAM-T1-10Y-RECORD</b> (hoặc label override theo hợp đồng).</li>
-<li><span class="kpi">KPI-04</span>: 0 phê duyệt giao hàng (ship release) khi thiếu MRR (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))).</li>
+<li><span class="kpi">KPI-04</span>: 0 phê duyệt giao hàng (ship release) khi thiếu MRR (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát).</li>
 </ul>
 </div>
 </div>
@@ -560,7 +560,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>L2</b><div class="mini">Thực hiện độc lập (ổn định theo checklist)</div></td>
 <td>Tự thực hiện checklist 15 bước liên quan vai trò; upload đúng folder; đặt tên đúng; gắn đủ metadata bắt buộc theo content type.</td>
-<td>danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (danh mục OJT (OJT checklist))))))))) đạt (ký người hướng dẫn) + 01 tình huống xử lý đúng (Hold/Go).</td>
+<td>danh mục OJT (checklist / danh mục) đạt (ký người hướng dẫn) + 01 tình huống xử lý đúng (Hold/Go).</td>
 <td>Được phép tạo/hoàn thiện hồ sơ theo vai trò (QC/QA/WHS) nhưng vẫn phải qua approval ở gate.</td>
 </tr>
 <tr>
@@ -593,7 +593,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Planner</b></td><td>Tạo/đảm bảo dossier tồn tại; traveler có QR; routing/Rev đúng.</td><td>Rev đồng nhất giữa Epicor phản chiếu, traveler, Release Record.</td></tr>
 <tr><td><b>Maintenance</b></td><td>Khi có sự cố thiết bị ảnh hưởng job: lưu bằng chứng sự cố đúng nơi (khi được yêu cầu).</td><td>Không lưu time entry; chỉ lưu hồ sơ sự cố có approval.</td></tr>
 <tr><td><b>EHS</b></td><td>Khi có yêu cầu khách hàng về EHS hoặc sự cố: lưu hồ sơ liên quan đúng folder (01 hoặc 05).</td><td>Phân loại đúng Tier/label theo tính chất.</td></tr>
-<tr><td><b>Estimator (SAL-03)</b></td><td>Lưu yêu cầu khách hàng &amp; rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (rà soát hợp đồng (contract review))))))))) vào 01_Rfq-Contract.</td><td>Không để yêu cầu trong email cá nhân.</td></tr>
+<tr><td><b>Estimator (SAL-03)</b></td><td>Lưu yêu cầu khách hàng &amp; rà soát hợp đồng (contract review / rà soát hợp đồng) vào 01_Rfq-Contract.</td><td>Không để yêu cầu trong email cá nhân.</td></tr>
 <tr><td><b>Supervisor</b></td><td>Thực thi fail-fast; không bypass gate; điều phối escalation.</td><td>G5 là hard stop; phải có MRR + approval.</td></tr>
 </tbody>
 </table>
@@ -614,7 +614,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Folder nào trong Job Dossier chứa FAI/IR/CMM?</li>
 <li>Folder nào trong Job Dossier chứa bộ hồ sơ giao hàng (ship packet)?</li>
 <li>Dừng sớm (fail-fast) FF1 kích hoạt khi nào? Hành động bắt buộc là gì?</li>
-<li>“không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))” áp dụng mạnh nhất ở gate nào?</li>
+<li>“không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” áp dụng mạnh nhất ở gate nào?</li>
 <li>Outsource evidence tối thiểu cần những loại gì?</li>
 <li>00_Archive trong DATA dùng khi nào? Có được dùng để sản xuất không?</li>
 <li>Vì sao metadata giúp retention/search tốt hơn chỉ naming?</li>
@@ -683,7 +683,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Quiz</td>
 <td>≥ 80% (vai trò QA/WHS/Programmer/Planner) • ≥ 70% (vai trò còn lại)</td>
-<td>Dưới ngưỡng hoặc trả lời sai các câu “hard rule” (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate))))))))), Wrong REV, Tier-1 label)</td>
+<td>Dưới ngưỡng hoặc trả lời sai các câu “hard rule” (No evidence = No gate , Wrong REV, Tier-1 label / không có bằng chứng thì không qua cổng kiểm soát)</td>
 </tr>
 <tr>
 <td>Scenario</td>

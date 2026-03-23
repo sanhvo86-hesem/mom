@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) và giới hạn WIP | HESEM QMS</title>
+<title>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và giới hạn WIP | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
 @media print {
@@ -60,7 +60,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
             <span>Tài liệu vận hành • Annex</span>
           </div>
         </div>
-        <div class="title"><strong>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) và giới hạn WIP</strong></div>
+        <div class="title"><strong>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và giới hạn WIP</strong></div>
         <div class="meta">
           <div class="row"><span><b>Mã:</b></span><span>ANNEX-501</span></div>
           <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
@@ -69,8 +69,8 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
           <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
         </div>
       </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi quyết định dispatch, capacity review, WIP cap, resequence, hot-job, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) và escalation liên quan tới planning/OPS.</div>
-      <h1>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) và giới hạn WIP</h1>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi quyết định dispatch, capacity review, WIP cap, resequence, hot-job, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và escalation liên quan tới planning/OPS.</div>
+      <h1>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và giới hạn WIP</h1>
 
 <div class="section"><h2>1. Mục đích và nguyên tắc điều hành</h2>
 <p>ANNEX này khóa bộ rule dùng chung cho <b>điều độ</b>, <b>rà soát năng lực</b>, <b>giới hạn WIP</b>, <b>freeze window</b>, <b>resequence</b>, <b>hot-job</b> và <b>aging</b> ở toàn bộ xưởng CNC job order của HESEM. Planner, Dispatcher, Supervisor và Ops Manager phải dùng cùng một rule set để ra quyết định; không để mỗi ca hoặc mỗi cell dùng một cách hiểu khác nhau.</p>
@@ -80,15 +80,15 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>2. Hot-job ladder và rule ưu tiên</h2>
 <div class="table-card"><table><thead><tr><th>Class</th><th>Khi được gán</th><th>Ai có quyền gán</th><th>Rule bắt buộc</th></tr></thead><tbody>
-<tr><td>P0</td><td>Đã trễ cam kết hoặc sẽ vỡ giao hàng trong ≤ 24 giờ; hoặc customer / plant event buộc phải cứu ngay</td><td>Ops Manager hoặc cao hơn theo authority matrix</td><td>Được phép phá cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))); phải chỉ rõ job bị lùi, tác động OTD, owner và thời điểm recovery.</td></tr>
+<tr><td>P0</td><td>Đã trễ cam kết hoặc sẽ vỡ giao hàng trong ≤ 24 giờ; hoặc customer / plant event buộc phải cứu ngay</td><td>Ops Manager hoặc cao hơn theo authority matrix</td><td>Được phép phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch); phải chỉ rõ job bị lùi, tác động OTD, owner và thời điểm recovery.</td></tr>
 <tr><td>P1</td><td>Sẽ đến hạn trong 24–48 giờ; CTQ/final release đang chờ; part cho line-stop nội bộ hoặc job rủi ro cao</td><td>Planner Lead / Ops Manager</td><td>Được đẩy lên đầu ca hoặc giữa ca nhưng phải ghi lý do và cập nhật dispatch board.</td></tr>
-<tr><td>P2</td><td>Job chuẩn theo kế hoạch</td><td>Planner/Dispatcher theo lịch đã duyệt</td><td>Phải tuân thủ cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))). Không được hạ xuống P3 vì tiện đổi máy.</td></tr>
+<tr><td>P2</td><td>Job chuẩn theo kế hoạch</td><td>Planner/Dispatcher theo lịch đã duyệt</td><td>Phải tuân thủ cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch). Không được hạ xuống P3 vì tiện đổi máy.</td></tr>
 <tr><td>P3</td><td>Chờ vật tư, chờ ENG, chờ QA, chờ outsource, chờ máy/fixture/tool</td><td>Planner/Dispatcher khi có hold code hợp lệ</td><td>Không được phát vào queue chạy. Phải có hold code, owner, next action, ETA hoặc decision review.</td></tr>
 </tbody></table></div>
 <p>Một workcenter tại cùng một thời điểm chỉ nên có <b>01 P0 chủ động</b>. Nếu phát sinh P0 thứ hai mà không đóng P0 đang mở, Ops Manager phải ra quyết định bằng văn bản: chia nguồn lực, đổi nhóm máy (machine family), split lot, outsource hoặc renegotiate due. Không được để 3–4 P0 treo đồng thời rồi yêu cầu xưởng “tự sắp xếp”.</p>
 </div>
 
-<div class="section"><h2>3. cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) và rule đổi lịch</h2>
+<div class="section"><h2>3. cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và rule đổi lịch</h2>
 <div class="table-card"><table><thead><tr><th>Cửa sổ</th><th>Ý nghĩa</th><th>Khi nào được phá</th><th>Bằng chứng bắt buộc</th></tr></thead><tbody>
 <tr><td>Freeze của ca</td><td>Danh sách job đầu ca đã phát hành, dùng để giữ nhịp vận hành trong ca hiện tại</td><td>Chỉ P0 hoặc sự cố L1/L2: machine down, material miss, revision change, QA HOLD, safety event</td><td>Change note + owner + job bị lùi + thời điểm cập nhật Epicor/M365</td></tr>
 <tr><td>Freeze ngày</td><td>Kế hoạch ngày cho workcenter/cell</td><td>P0, bottleneck recovery, outsource overdue, customer special approval</td><td>Decision record trong tier meeting / action log</td></tr>
@@ -110,7 +110,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>5. WIP cap theo họ workcenter</h2>
 <div class="table-card"><table><thead><tr><th>Nhóm workcenter</th><th>Cap mặc định</th><th>Mục đích của cap</th><th>Khi vượt cap phải làm gì</th></tr></thead><tbody>
 <tr><td>5-axis / mill-turn / leak / clean bottleneck</td><td>Queued standard hours ≤ 1.0 ngày năng lực hữu dụng; setup staged ≤ 1 job kế tiếp / machine</td><td>Bảo vệ bottleneck, giảm đổi lịch và tránh tắc first-piece</td><td>Escalate L1 ngay; review split lot, chuyển tải, outsource, hoặc dời job chưa đủ readiness.</td></tr>
-<tr><td>3-axis / CNC turning / finishing cell</td><td>Queued standard hours ≤ 1.5 ngày năng lực hữu dụng; staged jobs ≤ 2 job / nhóm máy (machine family)</td><td>Giữ dòng chảy nhưng vẫn đủ việc cho ca tiếp theo</td><td>Review tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging))))))))), dừng phát hành thêm nếu chưa có plan clear.</td></tr>
+<tr><td>3-axis / CNC turning / finishing cell</td><td>Queued standard hours ≤ 1.5 ngày năng lực hữu dụng; staged jobs ≤ 2 job / nhóm máy (machine family)</td><td>Giữ dòng chảy nhưng vẫn đủ việc cho ca tiếp theo</td><td>Review tuổi tồn WIP (aging / tuổi tồn), dừng phát hành thêm nếu chưa có plan clear.</td></tr>
 <tr><td>Final inspection / ship release / clean pack</td><td>Ship-ready / final-inspect-ready ≤ 1 ngày output chuẩn</td><td>Không để QA/WHS thành bãi chờ cuối chuỗi</td><td>Review root cause ở upstream; không đẩy thêm job nếu output cuối không hút kịp.</td></tr>
 <tr><td>Outsource queue</td><td>Chỉ phát lot khi processor slot, route, cert expectation và return date đã xác nhận</td><td>Ngăn chất hàng chờ ngoài mà không biết ngày về</td><td>Planner + PUR quyết định theo PO/ETA/processor status; thiếu slot thì HOLD.</td></tr>
 </tbody></table></div>
@@ -170,7 +170,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>12. Hồ sơ điều độ bắt buộc</h2>
 <div class="table-card"><table><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Owner</th></tr></thead><tbody>
-<tr><td>Dispatch list theo ca/ngày</td><td>Khóa thứ tự chạy và cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (cửa sổ khóa kế hoạch (freeze window))))))))) cho từng workcenter</td><td>Planner / Dispatcher</td></tr>
+<tr><td>Dispatch list theo ca/ngày</td><td>Khóa thứ tự chạy và cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) cho từng workcenter</td><td>Planner / Dispatcher</td></tr>
 <tr><td>WIP aging snapshot</td><td>Nhìn rõ job đỏ/đen, owner và action</td><td>Planner</td></tr>
 <tr><td>Escalation / hot-job log</td><td>Chứng minh ai duyệt, job nào bị ảnh hưởng và plan recovery</td><td>Ops Manager</td></tr>
 <tr><td>Capacity review minutes</td><td>Ghi quyết định về OT, outsource, rebalance, re-plan</td><td>Ops Manager + Planning Lead</td></tr>
@@ -186,7 +186,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td><a href="annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Cadence họp tầng và nhật ký hành động (action log).</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Khung thủ tục planning/scheduling/dispatch.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a></td><td>Dispatch list hằng ca/ngày.</td></tr>
-<tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a></td><td>Snapshot tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (tuổi tồn WIP (WIP aging))))))))) và hành động.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a></td><td>Snapshot tuổi tồn WIP (aging / tuổi tồn) và hành động.</td></tr>
 </tbody></table></div>
 </div>
 

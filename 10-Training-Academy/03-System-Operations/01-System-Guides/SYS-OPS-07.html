@@ -88,7 +88,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li>Mọi vấn đề đi qua Tier meeting PHẢI có <b>Chủ trách nhiệm + Deadline (giờ/phút) + Kết quả + Minh chứng</b>.</li>
 <li>Không ghi “đang xử lý” chung chung. Không chuyển ca mà không có owner rõ.</li>
-<li><b>không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))</b>: không có MRR thì coi như chưa làm.</li>
+<li><b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)</b>: không có MRR thì coi như chưa làm.</li>
 </ul>
 </div>
 <p class="mini muted">
@@ -483,7 +483,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>1</td><td>Chuẩn bị bảng Tier 1: WIP/Dispatch, Due ≤ 48h, Blocked, Holds, Ship cutoff, Downtime</td><td>Supervisor + Planner + QC</td><td>Ảnh Tier board + dữ liệu WIP Nguồn: SSOT + Epicor + IntegrationLogs.</td><td>Thiếu danh sách Due ≤ 48h; thiếu blocker</td></tr>
-<tr><td>2</td><td>Mở họp đúng giờ, nhắc “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))”, chốt timebox 15 phút</td><td>Supervisor</td><td>FRM-OPS-005 có giờ họp + điều phối</td><td>Họp kéo dài, lan man, không chốt output</td></tr>
+<tr><td>2</td><td>Mở họp đúng giờ, nhắc “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”, chốt timebox 15 phút</td><td>Supervisor</td><td>FRM-OPS-005 có giờ họp + điều phối</td><td>Họp kéo dài, lan man, không chốt output</td></tr>
 <tr><td>3</td><td>Rà Dispatch/WIP: job Due ≤ 48h và job Blocked</td><td>Planner + Supervisor</td><td>FRM-OPS-005 (Trigger/Aging/Ảnh hưởng)</td><td>Không ghi aging; không gán owner</td></tr>
 <tr><td>4</td><td>Rà Quality holds/NCR/MRB: quyết định GO/HOLD/BLOCK</td><td>QC/QA</td><td>Hold/NCR record + quyết định + containment</td><td>Ghi “đang chờ” không tiêu chí giải hold</td></tr>
 <tr><td>5</td><td>Rà Shipping readiness: packet, nhãn, traceability, cutoff</td><td>Warehouse + QA</td><td>Checklist packet + ảnh nhãn + COC</td><td>Cho đóng gói khi thiếu COC/nhãn</td></tr>
@@ -611,7 +611,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <label class="blabel"><h1 class="h1" style="margin-top:0;">10) Đánh giá (ĐẠT/KHÔNG ĐẠT) — Bài trắc nghiệm + Tình huống + Bài kiểm tra thực hành</h1></label>
 <h3>10.1 Bài trắc nghiệm (≥ 20 câu) — trắc nghiệm + tình huống ngắn</h3>
 <ol class="tight">
-<li>“không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))” nghĩa là gì trong Tier meeting?</li>
+<li>“không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)” nghĩa là gì trong Tier meeting?</li>
 <li>Ngưỡng escal Level 2 theo PROC-OPS-003 là gì?</li>
 <li>Trong FRM-OPS-005, tối thiểu phải có những cột nào để một action hợp lệ?</li>
 <li>Khi phát hiện sai phiên bản (wrong revision) đang chạy máy, bước đầu tiên phải làm là gì?</li>
@@ -680,7 +680,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 11) ĐẠT/KHÔNG ĐẠT -->
 <div class="card">
-<label class="blabel"><h1 class="h1" style="margin-top:0;">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)))))))))”)</h1></label>
+<label class="blabel"><h1 class="h1" style="margin-top:0;">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate / không có bằng chứng thì không qua cổng kiểm soát)”)</h1></label>
 <div class="table-card">
 <table class="table">
 <thead>
