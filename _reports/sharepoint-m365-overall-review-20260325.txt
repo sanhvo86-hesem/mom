@@ -1,0 +1,47 @@
+SharePoint/M365 documentation overall review - 2026-03-25
+
+Status
+- Source HTML documentation scan for internal doc-code linking is clean.
+- Latest bulk link run result: changed_files=0, replacement_count=0, unresolved_files=0, doc_map_size=261.
+- Core governance/navigation/storage references for the M365 records model were updated in source documents.
+
+Core source documents updated for this review
+- 02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html
+- 02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/index.html
+- 02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html
+- 03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-101-document-and-data-control.html
+- 03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html
+- 03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-107-communication-management.html
+- 03-Tai-Lieu-Van-Hanh/01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html
+- 03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html
+- 03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html
+- 03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-111-document-writing-and-cross-reference-rules.html
+- 03-Tai-Lieu-Van-Hanh/03-Reference/06-ANNEX-600/annex-608-semi-standards-and-csr-matrix.html
+
+Governance changes applied
+- ANNEX-111 now states that every SOP/WI/ANNEX/FRM code in HTML must be internally linked.
+- SOP-101 now points users to Department Handbooks Index and WI-105 before document-level reading.
+- SOP-101 now explicitly binds document control to ANNEX-133, ANNEX-134 and ANNEX-135.
+- SOP-104 now states the mandatory 3-site M365 records model and forbids department-level shadow SSOTs.
+- QMS Manual now references ANNEX-131 to ANNEX-135 and WI-102 to WI-105 as the active digital control bundle.
+- Handbook index now points users from reading-path to file-plan and site implementation.
+- WI-101 now states where users enter the document set and where records must be stored.
+- SOP-303 now states the CustomerID -> PartNo -> REV master path and the M365 records routing model.
+- WI-701 now binds receiving/IQC to SOP-104, ANNEX-135, WI-105 and the Epicor SoR / M365 SSOT rule.
+
+Legacy references corrected in source docs
+- ANNEX-021 replaced with ANNEX-132 in jd-epicor-system-administrator.html.
+- ANNEX-020 and ANNEX-009 replaced with ANNEX-121 and ANNEX-123 in sop-107-communication-management.html.
+- SOP-024 replaced with SOP-804 in annex-608-semi-standards-and-csr-matrix.html.
+
+Remaining legacy-code hits after repo-wide scan
+- Remaining hits exist only in:
+  - .claude/worktrees/*
+  - _build/*
+  - historical _reports/*
+- These are generated, mirrored or historical artifacts, not the live source document set.
+
+Scripts used
+- tools/update_sharepoint_governance_20260325.mjs
+- tools/update_sharepoint_crossrefs_20260325.ps1
+- tools/bulk_link_doc_codes_20260325.mjs
