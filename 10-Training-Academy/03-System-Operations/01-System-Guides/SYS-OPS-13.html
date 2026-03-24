@@ -58,11 +58,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-13</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-13</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -177,17 +177,17 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 </tr>
 <tr>
 <td><b>Planner / Kế hoạch</b></td>
-<td>Người phụ trách OTD/WIP; vận hành Tier cadence; kích hoạt escalation theo ngưỡng; khóa ngày đến hạn theo kiểm soát thay đổi.</td>
+<td>Responsible Person OTD/WIP; vận hành Tier cadence; kích hoạt escalation theo ngưỡng; khóa ngày đến hạn theo kiểm soát thay đổi.</td>
 <td>FRM-OPS-06/07 • nhật ký hành động • due-date change hồ sơ.</td>
 </tr>
 <tr>
 <td><b>Production Leader / Supervisor</b></td>
-<td>Người phụ trách schedule adherence/FPY; chặn vượt qua cổng kiểm soát; đảm bảo dữ liệu shopfloor đúng; thực hiện containment khi lệch.</td>
+<td>Responsible Person schedule adherence/FPY; chặn vượt qua cổng kiểm soát; đảm bảo dữ liệu shopfloor đúng; thực hiện containment khi lệch.</td>
 <td>Standup nhật ký hành động • NCR link • bằng chứng tại hiện trường.</td>
 </tr>
 <tr>
 <td><b>QC/QA (thực thi)</b></td>
-<td>Người phụ trách FPY/hold SLA/NCR; kiểm soát CTQ cổng kiểm soát; phát hiện và kích hoạt stop-ship.</td>
+<td>Responsible Person FPY/hold SLA/NCR; kiểm soát CTQ cổng kiểm soát; phát hiện và kích hoạt stop-ship.</td>
 <td>FRM-QA-06 • FRM-QA-02/03/04 • disposition hồ sơ.</td>
 </tr>
 <tr>
@@ -206,7 +206,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <h3 class="h3">2.2 Trách nhiệm “không được bỏ qua” theo cấp</h3>
 <ul style="line-height:1.9">
 <li><b>Người tạo số (chủ dữ liệu)</b> PHẢI chứng minh dữ liệu truy xuất về hồ sơ.</li>
-<li><b>Người điều hành (chủ quá trình)</b> PHẢI có rule hành động theo ngưỡng KPI.</li>
+<li><b>Người điều hành (Process Owner)</b> PHẢI có rule hành động theo ngưỡng KPI.</li>
 <li><b>Người phê duyệt</b> PHẢI yêu cầu bằng chứng trước khi chốt “đạt/không đạt”.</li>
 </ul>
 </div>
@@ -221,7 +221,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <th style="width:170px">Chặng</th>
 <th>Cổng kiểm soát liên quan policy/objective</th>
 <th style="width:240px">KPI/Chỉ báo</th>
-<th style="width:220px">Người phụ trách đầu ra</th>
+<th style="width:220px">Responsible Person đầu ra</th>
 </tr>
 </thead>
 <tbody>
@@ -341,7 +341,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <tr>
 <th style="width:80px">RC</th>
 <th>Điểm kiểm soát</th>
-<th style="width:170px">Người phụ trách</th>
+<th style="width:170px">Responsible Person</th>
 <th style="width:260px">Bằng chứng (MRR)</th>
 <th style="width:220px">Escalation rule</th>
 </tr>
@@ -432,7 +432,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <ul>
 <li>Thiếu MRR cho kỳ KPI (minutes/nhật ký hành động/hồ sơ).</li>
 <li>Thiếu bằng chứng truyền thông policy cho nhóm vai trò.</li>
-<li>Thiếu Người phụ trách RACI cho KPI/cascading.</li>
+<li>Thiếu Responsible Person RACI cho KPI/cascading.</li>
 </ul>
 </div>
 </div>
@@ -455,7 +455,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <tr>
 <th style="width:260px">Sự cố</th>
 <th>60 giây đầu phải làm</th>
-<th style="width:180px">Người phụ trách dẫn</th>
+<th style="width:180px">Responsible Person dẫn</th>
 <th style="width:220px">Hồ sơ mở</th>
 </tr>
 </thead>
@@ -503,21 +503,21 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <!-- 9 -->
 <div class="card">
 <h2 class="h2" id="s9" style="margin-top:0">9. Bảng kiểm triển khai (≤15 bước)</h2>
-<p class="muted">Bảng kiểm áp dụng cho QMR/Planner/Leader để triển khai policy/objectives và giữ nhịp KPI. Mỗi bước có Người phụ trách, Bằng chứng (MRR) và lỗi hay gặp.</p>
+<p class="muted">Bảng kiểm áp dụng cho QMR/Planner/Leader để triển khai policy/objectives và giữ nhịp KPI. Mỗi bước có Responsible Person, Bằng chứng (MRR) và lỗi hay gặp.</p>
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
 <th style="width:50px">#</th>
 <th>Bước thực hiện</th>
-<th style="width:170px">Người phụ trách</th>
+<th style="width:170px">Responsible Person</th>
 <th style="width:260px">Bằng chứng/MRR</th>
 <th style="width:220px">Lỗi hay gặp</th>
 </tr>
 </thead>
 <tbody>
 <tr><td><b>1</b></td><td>Kiểm tra phiên bản POL-QMS-001/002 và SOP-102 đang “Released”.</td><td>QA/QMS</td><td>Master list + link controlled</td><td>Dùng bản gửi email (uncontrolled)</td></tr>
-<tr><td><b>2</b></td><td>Khóa 7 primary KPIs cấp Công ty và người phụ trách theo RACI; xác định rõ KPI dẫn xuất của từng bộ phận (ví dụ: tuổi tồn WIP (tuổi tồn / tuổi tồn), Hold SLA, hiệu chuẩn compliance).</td><td>QA/QMS + chủ quá trình</td><td>Objective Cascade Sheet</td><td>KPI không có người phụ trách, không truy ngược objective</td></tr>
+<tr><td><b>2</b></td><td>Khóa 7 primary KPIs cấp Công ty và người phụ trách theo RACI; xác định rõ KPI dẫn xuất của từng bộ phận (ví dụ: tuổi tồn WIP (tuổi tồn / tuổi tồn), Hold SLA, hiệu chuẩn compliance).</td><td>QA/QMS + Process Owner</td><td>Objective Cascade Sheet</td><td>KPI không có người phụ trách, không truy ngược objective</td></tr>
 <tr><td><b>3</b></td><td>Tạo/ cập nhật KPI Definition Card cho từng KPI core (formula/source/anti-gaming).</td><td>QA/QMS + IT</td><td>ANNEX-QMS-027 card + DCR hồ sơ</td><td>Một KPI nhiều công thức</td></tr>
 <tr><td><b>4</b></td><td>Thiết lập Tier cadence (T1/T2/T3) và agenda cố định.</td><td>Planner + Ops Lead</td><td>WI-502 + lịch họp</td><td>Họp không có agenda</td></tr>
 <tr><td><b>5</b></td><td>Thiết lập bảng KPI/board tại điểm sử dụng (xưởng/QC/kho) theo “1 trang – 1 hành động”.</td><td>Ops Lead + QA</td><td>Ảnh board + vị trí + version</td><td>Board có số nhưng không action</td></tr>
@@ -527,7 +527,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <tr><td><b>9</b></td><td>Chạy Tier 3 (monthly): review trend, resource, objective update đầu vào.</td><td>Top Mgmt/COO</td><td>T3 minutes + decision nhật ký</td><td>Không ra quyết định khi xung đột</td></tr>
 <tr><td><b>10</b></td><td>Thực hiện data health check cho nguồn dữ liệu KPI.</td><td>IT + chủ dữ liệu</td><td>Data health report</td><td>Null/duplicate làm sai KPI</td></tr>
 <tr><td><b>11</b></td><td>Khoá anti-gaming: ngày đến hạn change, đóng NCR/CAPA có bằng chứng.</td><td>Planner + QA</td><td>Dấu vết kiểm toán + nhật ký</td><td>Đổi ngày đến hạn không hồ sơ</td></tr>
-<tr><td><b>12</b></td><td>Khi KPI đỏ: kích hoạt CAPA/containment và gắn action vào Tier.</td><td>chủ quá trình</td><td>NCR/CAPA + nhật ký hành động link</td><td>CAPA không effectiveness</td></tr>
+<tr><td><b>12</b></td><td>Khi KPI đỏ: kích hoạt CAPA/containment và gắn action vào Tier.</td><td>Process Owner</td><td>NCR/CAPA + nhật ký hành động link</td><td>CAPA không effectiveness</td></tr>
 <tr><td><b>13</b></td><td>Tổng hợp “Quality Data Pack” cho MR (trend, đánh giá, risk, khiếu nại).</td><td>QA/QMS</td><td>MR đầu vào pack + FRM-QMS-03</td><td>MR thiếu dữ liệu khách hàng</td></tr>
 <tr><td><b>14</b></td><td>Họp xem xét của lãnh đạo: chốt mục tiêu, nguồn lực, action lớn.</td><td>Top Mgmt</td><td>FRM-QMS-03 + decision</td><td>Action MR không theo dõi</td></tr>
 <tr><td><b>15</b></td><td>Phát hành thay đổi (policy/objective/KPI) theo SOP-101 và rollout.</td><td>QA/QMS</td><td>FRM-QMS-10/12 + DCR hồ sơ</td><td>Không thu hồi bản cũ</td></tr>
@@ -660,7 +660,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <li>MRR nghĩa là gì? (A) Minimum Required Hồ sơ (B) Monthly Revenue Report (C) Machine Run Rate (D) Manual Revision Rule</li>
 <li>Cadence Tier đúng thứ tự nào? (A) T1 daily → T2 weekly → T3 monthly → MR annual (B) MR daily → T3 weekly → T2 monthly → T1 annual (C) Chỉ họp tháng (D) Không cần nhịp</li>
 <li>Khi KPI definition không thống nhất, hành động đúng là gì? (A) BLOCK KPI report (B) Tự chọn công thức (C) Bỏ KPI (D) Chờ đánh giá</li>
-<li>Người phụ trách của policy/objectives version control là ai? (A) QA/QMS (B) Operator (C) Khách hàng (D) NCC</li>
+<li>Responsible Person của policy/objectives version control là ai? (A) QA/QMS (B) Operator (C) Khách hàng (D) NCC</li>
 <li>Điều khoản ISO liên quan xem xét của lãnh đạo là? (A) 9.3 (B) 7.5 (C) 8.5 (D) 4.4</li>
 <li>Khi data health FAIL, hành động đúng là? (A) BLOCK quyết định dựa KPI (B) Vẫn báo cáo (C) Đổi màu (D) Ghi chú miệng</li>
 <li>Chứng minh awareness policy dùng bằng chứng nào? (A) Attendance + bài kiểm tra nhanh/ký nhận (B) Chỉ treo poster (C) Chỉ nói miệng (D) Chỉ gửi file</li>
@@ -721,7 +721,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <tbody>
 <tr><td>Objective Cascade Sheet</td><td>SYS-OPS-13_CascadeSheet_YYYY-MM.xlsx</td><td>RACI + ngưỡng + link KPI card</td></tr>
 <tr><td>KPI Definition Card</td><td>SYS-OPS-13_KPI_<i>KPIName</i>_Vx.pdf</td><td>Formula/source/người phụ trách/cadence/anti-gaming</td></tr>
-<tr><td>Tier 1 Nhật ký hành động</td><td>FRM-OPS-05_T1_YYYY-MM-DD.xlsx</td><td>Người phụ trách + due + bằng chứng link</td></tr>
+<tr><td>Tier 1 Nhật ký hành động</td><td>FRM-OPS-05_T1_YYYY-MM-DD.xlsx</td><td>Responsible Person + due + bằng chứng link</td></tr>
 <tr><td>T2/T3 Minutes</td><td>T2_T3_Minutes_YYYY-MM.docx</td><td>Decision + resource + escalation</td></tr>
 <tr><td>Awareness Bằng chứng</td><td>Policy_Awareness_YYYY-MM.xlsx</td><td>100% vai trò target + bài kiểm tra nhanh/ký nhận</td></tr>
 <tr><td>Xem xét của lãnh đạo Minutes</td><td>FRM-QMS-03_MR_YYYY.docx</td><td>Đầu vào pack + đầu ra action + người phụ trách</td></tr>

@@ -57,11 +57,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>C17-L3</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>C17-L3</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -109,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người phụ trách + bằng chứng)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>Điểm kiểm soát</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead>
+<thead><tr><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead>
 <tbody><tr><td><strong>Bộ hồ sơ chuẩn (baseline package) control</strong></td><td>ENG</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">PROC-ENG-002</a></td><td>sai phiên bản (wrong revision) = BLOCK</td></tr><tr><td><strong>Program/Setup release control</strong></td><td>ENG/CAM</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">PROC-CNC-002</a></td><td>Chỉ phát hành qua SSOT</td></tr><tr><td><strong>Setup sheet bắt buộc</strong></td><td>ENG/CAM</td><td><a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-302_Setup_Sheet.xlsx">FRM-ENG-002</a></td><td>Release thiếu setup sheet = HOLD</td></tr><tr><td><strong>Peer Review Log</strong></td><td>ENG/CAM</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-105_Peer_Review_Log.xlsx">FRM-QMS-007 Peer Review Log</a></td><td>Không rà soát đồng cấp = BLOCK</td></tr><tr><td><strong>Inspection Program Release Checklist</strong></td><td>QA/ENG</td><td><a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM-QA-016</a></td><td>Thiếu bảng kiểm = HOLD</td></tr><tr><td><strong>Control plan / CTQ</strong></td><td>QA/ENG</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-133_Control_Plan.xlsx">FRM-QA-012</a></td><td>CTQ phải có plan + reaction plan</td></tr><tr><td><strong>Yêu cầu thay đổi</strong></td><td>ENG/OPS</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-102_Document_Change_Request.xlsx">FRM-ENG-003</a></td><td>Mọi thay đổi = CR bắt buộc</td></tr><tr><td><strong>Archive version control</strong></td><td>Document Control</td><td>Kho archive trong SSOT</td><td>Không archive = đánh giá không đạt</td></tr></tbody>
 </table>
 </div>
@@ -120,7 +120,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Repeat vấn đề lại phải chặn</th></tr></thead>
+<thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Repeat vấn đề lại phải chặn</th></tr></thead>
 <tbody><tr><td>1</td><td>Xác nhận drawing/spec/CTQ revision set</td><td>CAM/ENG</td><td>Bộ hồ sơ chuẩn SSOT</td><td>sai phiên bản (wrong revision) = BLOCK</td></tr><tr><td>2</td><td>Chọn chiến lược đường chạy dao và dao</td><td>CAM</td><td>CAM file + tool list</td><td>Thiếu tool list = setup sai</td></tr><tr><td>3</td><td>Chạy mô phỏng collision/clearance</td><td>CAM</td><td>Ảnh/screenshot mô phỏng</td><td>Không mô phỏng = BLOCK</td></tr><tr><td>4</td><td>Kiểm travel limit + tool change</td><td>CAM</td><td>Bảng kiểm nội bộ</td><td>Overtravel risk</td></tr><tr><td>5</td><td>Post và xác minh code</td><td>CAM</td><td>NC file + xác minh note</td><td>Sai post = crash</td></tr><tr><td>6</td><td>Chuẩn hóa tên file/version</td><td>CAM</td><td>Naming rule</td><td>Tên sai = nạp nhầm</td></tr><tr><td>7</td><td>Rà soát đồng cấp và ghi nhật ký</td><td>CAM</td><td>FRM-QMS-007</td><td>Không rà soát đồng cấp = BLOCK</td></tr><tr><td>8</td><td>Soạn setup sheet</td><td>CAM/ENG</td><td>FRM-ENG-002</td><td>Thiếu setup sheet = HOLD</td></tr><tr><td>9</td><td>Xác định CTQ + kiểm tra points</td><td>QA/CAM</td><td>FRM-QA-012/FRM-QA-016</td><td>Thiếu CTQ = đo thiếu</td></tr><tr><td>10</td><td>Phát hành gói phát hành qua SSOT</td><td>CAM</td><td>SSOT link</td><td>File rời = STOP</td></tr><tr><td>11</td><td>Hỗ trợ prove-out và ghi phản hồi</td><td>CAM/Setup</td><td>Yêu cầu thay đổi</td><td>Không CR = mất truy xuất</td></tr><tr><td>12</td><td>Archive bản cũ</td><td>CAM/QMS</td><td>Archive hồ sơ</td><td>Không archive = đánh giá không đạt</td></tr></tbody>
 </table>
 </div>

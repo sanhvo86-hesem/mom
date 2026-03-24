@@ -65,11 +65,11 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>ANNEX-114</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Engineer / QA Manager</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>ANNEX-114</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QMS Engineer / QA Manager</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -82,7 +82,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2">1. Trình tự go-live</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Mốc</th><th>Hoạt động chính</th></tr></thead><tbody><tr><td>T-30 đến T-14</td><td>Chốt scope, người phụ trách, test tình huống, user list, cut-over bảng kiểm</td></tr><tr><td>T-7</td><td>Data freeze cục bộ, backup xác nhận, đào tạo người dùng, UAT sign-off, rollback rehearsal và check quyền production</td></tr><tr><td>T-1</td><td>Go/no-go review, hotline list, fallback criteria, snapshot dữ liệu</td></tr><tr><td>Go-live and cutover control Day</td><td>Mở quyền prod, theo dõi giao dịch đầu ca, nhật ký vấn đề theo mức độ</td></tr><tr><td>D+1 đến D+14</td><td>Hypercare, close action, lessons learned, baseline KPI sau triển khai</td></tr></tbody></table></div>
 <h2 class="h2">2. Bảng kiểm quyết định</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Câu hỏi</th><th>Đạt / Không</th></tr></thead><tbody><tr><td>Người phụ trách nghiệp vụ đã sign-off UAT?</td><td>____</td></tr><tr><td>Đào tạo người dùng đã hoàn tất và có attendance?</td><td>____</td></tr><tr><td>Backup dữ liệu / file cấu hình đã lưu?</td><td>____</td></tr><tr><td>Rollback plan đã kiểm thử tối thiểu 1 lần?</td><td>____</td></tr><tr><td>Danh sách liên hệ escalation ngày go-live đã phát hành?</td><td>____</td></tr></tbody></table></div>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Câu hỏi</th><th>Đạt / Không</th></tr></thead><tbody><tr><td>Responsible Person nghiệp vụ đã sign-off UAT?</td><td>____</td></tr><tr><td>Đào tạo người dùng đã hoàn tất và có attendance?</td><td>____</td></tr><tr><td>Backup dữ liệu / file cấu hình đã lưu?</td><td>____</td></tr><tr><td>Rollback plan đã kiểm thử tối thiểu 1 lần?</td><td>____</td></tr><tr><td>Danh sách liên hệ escalation ngày go-live đã phát hành?</td><td>____</td></tr></tbody></table></div>
 <h2 class="h2">3. Điều kiện rollback</h2>
 <p>Rollback PHẢI kích hoạt khi hệ thống gây mất khả năng truy hồ sơ, sai quyền truy cập, chặn release hàng, sai dữ liệu master hoặc làm gián đoạn vận hành xưởng vượt mức chấp nhận đã phê duyệt.</p>
 

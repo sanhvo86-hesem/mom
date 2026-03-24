@@ -61,11 +61,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
         </div>
         <div class="title"><strong>WI-205 — Mã vạch nội bộ, in nhãn, quét và cập nhật trạng thái công việc</strong></div>
         <div class="meta">
-          <div class="row"><span><b>Mã:</b></span><span>WI-205</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-          <div class="row"><span><b>hgày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>Planning Manager / WHS Manager / Production Manager</span></div>
-          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+          <div class="row"><span><b>Code:</b></span><span>WI-205</span></div>
+          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+          <div class="row"><span><b>hgày hiệu lực:</b></span><span>Per issuance decision</span></div>
+          <div class="row"><span><b>Owner:</b></span><span>Planning Manager / WHS Manager / Production Manager</span></div>
+          <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
         </div>
       </div>
       <div class="note"><strong>ÁP DỤhG hHI</strong><br/>Dùng khi in nhãn nội bộ, quét nhận việc, chuyển công đoạn, tạm dừng, split/merge container, rework, hoặc đóng trạng thái WIP trong xưởng.</div>
@@ -82,7 +82,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </ul></div>
 
 <div class="section"><h2>2. Các loại nhãn nội bộ và dữ liệu bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại nhãn</th><th>Dùng khi</th><th>Dữ liệu bắt buộc</th><th>Người phụ trách in / xác nhận</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại nhãn</th><th>Dùng khi</th><th>Dữ liệu bắt buộc</th><th>Responsible Person in / xác nhận</th></tr></thead><tbody>
 <tr><td>WIP Container Label</td><td>Chứa bán thành phẩm giữa các công đoạn</td><td>Jobhum, OpSeq hiện tại, Partho, Rev, Qty, UOM, ContainerID, trạng thái, ngày giờ in</td><td>Production / Planning</td></tr>
 <tr><td>Hold Label</td><td>Cách ly nghi ngờ hC, truy xuất sai, thiếu hồ sơ</td><td>ContainerID, Jobhum, mã hold reason, ngày giờ hold, người mở hold</td><td>QA / Supervisor</td></tr>
 <tr><td>Move Label</td><td>Chuyển máy, chuyển ca, chuyển cell, chuyển outsource</td><td>Jobhum, from/to operation, Qty good/suspect/scrap, next người phụ trách</td><td>Production / WHS</td></tr>

@@ -57,11 +57,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>C17-L2</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>C17-L2</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -109,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người phụ trách + bằng chứng)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>Điểm kiểm soát</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead>
+<thead><tr><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead>
 <tbody><tr><td><strong>Tooling/fixture control</strong></td><td>MNT/OPS</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html">PROC-MNT-001</a></td><td>Fixture/dao không đạt = BLOCK dùng</td></tr><tr><td><strong>Setup Sheet &amp; bảng kiểm</strong></td><td>ENG/OPS</td><td><a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-302_Setup_Sheet.xlsx">FRM-ENG-002</a></td><td>Không setup sheet = HOLD</td></tr><tr><td><strong>Program/Setup Release Control</strong></td><td>ENG/CAM</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">PROC-CNC-002</a></td><td>Chỉ dùng bản phát hành</td></tr><tr><td><strong>FAI report khi job mới/đổi quy trình</strong></td><td>QA/QC</td><td><a  download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-311_FAI_Report.xlsx">FRM-QA-007 FAI</a></td><td>FAI fail = HOLD</td></tr><tr><td><strong>Inspection Program Release Checklist</strong></td><td>QA/ENG</td><td><a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM-QA-016</a></td><td>Thiếu release bảng kiểm = HOLD</td></tr><tr><td><strong>Tool Life Log</strong></td><td>OPS</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-513_Tool_Life_Log.xlsx">FRM-OPS-003</a></td><td>Không nhật ký = drift khó truy xuất</td></tr><tr><td><strong>Yêu cầu thay đổi control</strong></td><td>ENG/OPS</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-102_Document_Change_Request.xlsx">FRM-ENG-003</a></td><td>Thay đổi không hồ sơ = BLOCK</td></tr><tr><td><strong>QC Hold/NCR</strong></td><td>QA/QC</td><td><a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-QA-006</a> + <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-QA-003</a></td><td>Sai lệch CTQ = HOLD</td></tr></tbody>
 </table>
 </div>
@@ -120,7 +120,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Repeat vấn đề lại phải chặn</th></tr></thead>
+<thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Repeat vấn đề lại phải chặn</th></tr></thead>
 <tbody><tr><td>1</td><td>Xác nhận job pack/CTQ/setup sheet</td><td>Setup</td><td>Hồ sơ công việc + FRM-ENG-002</td><td>Thiếu CTQ = đo thiếu</td></tr><tr><td>2</td><td>Chuẩn bị dao/fixture theo quy định</td><td>Setup/MNT</td><td>PROC-MNT-001</td><td>Dùng fixture hỏng = crash</td></tr><tr><td>3</td><td>Lắp fixture và kiểm clearance</td><td>Setup</td><td>Ảnh + bảng kiểm</td><td>Không clearance = crash</td></tr><tr><td>4</td><td>Set datum/probe và xác nhận work offset</td><td>Setup</td><td>Traveler note</td><td>Sai datum = sai hàng loạt</td></tr><tr><td>5</td><td>Set tool offsets và ghi hồ sơ</td><td>Setup</td><td>Traveler + tool list</td><td>Không hồ sơ = mất truy xuất</td></tr><tr><td>6</td><td>Chạy thử khô / single block khi áp dụng</td><td>Setup</td><td>OJT hồ sơ</td><td>Bỏ qua = crash</td></tr><tr><td>7</td><td>Chạy mẫu đầu và đo CTQ</td><td>Setup/QC</td><td>FRM-QA-007/FRM-QA-002</td><td>Thiếu đo CTQ = HOLD</td></tr><tr><td>8</td><td>Chỉnh offset trong phạm vi cho phép và ghi lại</td><td>Setup</td><td>Traveler</td><td>Chỉnh không hồ sơ = BLOCK</td></tr><tr><td>9</td><td>Khi vượt phạm vi: mở yêu cầu thay đổi</td><td>Setup/ENG</td><td>FRM-ENG-003</td><td>Không CR = BLOCK</td></tr><tr><td>10</td><td>Hoàn tất release bảng kiểm</td><td>QA/ENG</td><td>FRM-QA-016</td><td>Thiếu bảng kiểm = HOLD</td></tr><tr><td>11</td><td>Bàn giao cho operator: offset/tuổi dao (tool life)/điểm rủi ro</td><td>Setup</td><td>Bàn giao ca</td><td>Không bàn giao = lỗi lặp</td></tr><tr><td>12</td><td>Lưu bằng chứng vào SSOT</td><td>Setup</td><td>SSOT link</td><td>Chứng cứ rời = đánh giá không đạt</td></tr></tbody>
 </table>
 </div>

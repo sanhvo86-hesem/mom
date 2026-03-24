@@ -64,11 +64,11 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
         </div>
         <div class="title"><strong>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G5</strong></div>
         <div class="meta">
-          <div class="row"><span><b>Mã:</b></span><span>ANNEX-502</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>Operations Manager / QA Manager</span></div>
-          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+          <div class="row"><span><b>Code:</b></span><span>ANNEX-502</span></div>
+          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+          <div class="row"><span><b>Owner:</b></span><span>Operations Manager / QA Manager</span></div>
+          <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
         </div>
       </div>
       <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng để tra matrix cổng kiểm soát và MRR cho mọi lệnh sản xuất CNC từ RFQ đến giao hàng. Planner, Engineering, QA, Production, Warehouse và người đánh giá phải dùng cùng một matrix này khi kiểm cổng kiểm soát và khi bàn giao hồ sơ.</div>
@@ -83,7 +83,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div></div>
 
 <div class="section"><h2>2. Cổng kiểm soát map G0–G5</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Mục tiêu</th><th>Entry criteria</th><th>Người phụ trách Decision</th><th>MRR tối thiểu</th><th>Hold signal mạnh nhất</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Mục tiêu</th><th>Entry criteria</th><th>Responsible Person Decision</th><th>MRR tối thiểu</th><th>Hold signal mạnh nhất</th></tr></thead><tbody>
 <tr><td><span class="badge-blue">G0 — RFQ / Hợp đồng khởi động</span></td><td>Khóa yêu cầu khách hàng, rev, CSR, qty, ngày đến hạn, QPL sơ bộ</td><td>RFQ/PO rõ, file kỹ thuật có thể đọc, assumption đã ghi</td><td>Sales / Engineering</td><td>RFQ register, rà soát hợp đồng, khởi động bảng kiểm</td><td>Thiếu file kỹ thuật, rev mơ hồ, requirement conflict</td></tr>
 <tr><td><span class="badge-blue">G1 — Planning / Phát hành kỹ thuật</span></td><td>Khóa baseline, route, setup, tool, program, kiểm tra requirement</td><td>Baseline đã phát hành, planning release PASS</td><td>Engineering / Planning</td><td>Setup sheet, route, tool list, kiểm tra requirement, Planning Release Checklist</td><td>Mismatch giữa drawing/setup/program/control plan</td></tr>
 <tr><td><span class="badge-blue">G2 — Setup / mẫu đầu (first piece) / FAI release</span></td><td>Xác nhận máy có thể chạy lô theo CTQ đã phê duyệt</td><td>Bộ hồ sơ công việc (job packet) đủ, machine ready, gage ready, mẫu đầu plan rõ</td><td>Production + QA</td><td>Setup & mẫu đầu hồ sơ, FAI/mẫu đầu bằng chứng</td><td>Thiếu gage, thiếu sign-off, sai offset / sai fixture / sai datum</td></tr>

@@ -56,11 +56,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-04</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-04</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent"><div class="card">
@@ -250,7 +250,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>Điểm kiểm soát</th><th>Người phụ trách chính</th><th>Bằng chứng/MRR</th><th>Điều kiện PASS</th><th>Hành động khi không đạt</th></tr></thead>
+<thead><tr><th>Điểm kiểm soát</th><th>Responsible Person chính</th><th>Bằng chứng/MRR</th><th>Điều kiện PASS</th><th>Hành động khi không đạt</th></tr></thead>
 <tbody>
 <tr><td>CP1 — Delta+overlap + idempotent upsert</td><td>IT</td><td>IntegrationSettings + IntegrationLogs</td><td>Không trùng EpicorKey; LastSyncUtc chỉ update khi Success</td><td>Khóa sử dụng dữ liệu mirror; IT sửa và ghi incident</td></tr>
 <tr><td>CP2 — Đánh giá fields bắt buộc</td><td>QA/QMS</td><td>List schema đánh giá: Created/Modified + FlowRunId FlowRunId = cột bắt buộc trên mọi hồ sơ cổng kiểm soát (Power Automate Run ID).</td><td>Truy ra ai/giờ cho mọi hồ sơ cổng kiểm soát</td><td>Không qua cổng kiểm soát cho hồ sơ thiếu đánh giá fields</td></tr>
@@ -326,11 +326,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="section" id="checklist">
-<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Người phụ trách, Bằng chứng/MRR, điểm sai hay gặp</h2>
+<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Bằng chứng/MRR, điểm sai hay gặp</h2>
 <p class="muted">Bảng kiểm này chạy theo nhịp <b>đầu ca</b> và <b>trước khi ship</b>. Mục tiêu: phát hiện sớm, chặn sớm, không để lỗi đi tới customer.</p>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>#</th><th>Bước thao tác</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Điểm sai hay gặp</th></tr></thead>
+<thead><tr><th>#</th><th>Bước thao tác</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Điểm sai hay gặp</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Mở IntegrationLogs (24h) và lọc Failed/Warning</td><td>Supervisor</td><td>Ảnh chụp màn hình + link nhật ký</td><td>Bỏ sót lỗi do không lọc theo FlowName</td></tr>
 <tr><td>2</td><td>Kiểm tra IntegrationSettings.LastSyncUtc cho JobIndex/Labor/Shipments</td><td>Planner</td><td>Giá trị timestamp + ảnh chụp</td><td>Nhầm múi giờ; đọc nhầm ngày</td></tr>
@@ -339,10 +339,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>5</td><td>Kiểm tra backlog Approvals (Ship/NCR/CAPA/Hold)</td><td>QA</td><td>Danh sách approval quá hạn</td><td>Để trôi SLA; không escalation</td></tr>
 <tr><td>6</td><td>Kiểm tra SoD: người tạo hồ sơ không tự duyệt</td><td>QA + Supervisor</td><td>ApprovalHistory đối chiếu CreatedBy</td><td>Chấp nhận tự duyệt “cho nhanh”</td></tr>
 <tr><td>7</td><td>Rà ShipRelease trạng thái=BLOCKED và lý do thiếu</td><td>Warehouse</td><td>ShipRelease hồ sơ + missing reason</td><td>Chỉ xem trạng thái, không đọc lý do</td></tr>
-<tr><td>8</td><td>Bổ sung bằng chứng thiếu (packet/kiểm tra/packaging/SSCC)</td><td>Người phụ trách theo lý do</td><td>File trong dossier + URL gắn vào hồ sơ</td><td>Gắn link sai thư mục; file “mồ côi”</td></tr>
+<tr><td>8</td><td>Bổ sung bằng chứng thiếu (packet/kiểm tra/packaging/SSCC)</td><td>Responsible Person theo lý do</td><td>File trong dossier + URL gắn vào hồ sơ</td><td>Gắn link sai thư mục; file “mồ côi”</td></tr>
 <tr><td>9</td><td>Chạy lại xác nhận (FLOW_07) bằng cách cập nhật ShipRelease</td><td>Warehouse</td><td>IntegrationLogs run mới + PASS/BLOCK</td><td>Không ghi lại runId; không chứng minh revalidate</td></tr>
 <tr><td>10</td><td>Khi PASS: xác nhận có ApprovalHistory (khi luồng yêu cầu duyệt)</td><td>QA</td><td>ApprovalHistory.ApprovalID + DecisionTime</td><td>Release khi approval chưa nhật ký</td></tr>
-<tr><td>11</td><td>Đóng vòng lặp: tạo/đóng StandupAction cho mọi blocker</td><td>Supervisor</td><td>StandupActions (Người phụ trách/Due/Close)</td><td>Không có người phụ trách; không có due time</td></tr>
+<tr><td>11</td><td>Đóng vòng lặp: tạo/đóng StandupAction cho mọi blocker</td><td>Supervisor</td><td>StandupActions (Responsible Person/Due/Close)</td><td>Không có người phụ trách; không có due time</td></tr>
 <tr><td>12</td><td>Bàn giao ca: ghi “tình trạng cổng kiểm soát” (Blocked/Hold/Stop)</td><td>Supervisor</td><td>Biên bản bàn giao Biểu mẫu: forms/index.html#dao-tao (FRM-Training/OJT/Đánh giá/Certificate).</td><td>Truyền miệng; mất dấu vết</td></tr>
 </tbody>
 </table>

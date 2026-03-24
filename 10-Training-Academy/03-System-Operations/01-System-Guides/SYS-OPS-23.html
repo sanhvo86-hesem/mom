@@ -56,11 +56,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-23</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-23</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -116,7 +116,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>IT/M365 Admin:</b> cấu hình baseline tenant, labels/DLP/retention, đánh giá logging; cấp/thu hồi quyền; xuất bằng chứng cấu hình.</li>
 <li><b>QA/QMS:</b> định nghĩa yêu cầu bằng chứng‑ready, kiểm tra kiểm tra đột xuất “đúng Rev”, dựng bộ bằng chứng cho đánh giá; chặn cổng kiểm soát khi thiếu MRR.</li>
-<li><b>chủ quá trình/Supervisor:</b> chịu trách nhiệm vùng dữ liệu (Released/Hồ sơ/WIP) và kỷ luật lưu hồ sơ theo job.</li>
+<li><b>Process Owner/Supervisor:</b> chịu trách nhiệm vùng dữ liệu (Released/Hồ sơ/WIP) và kỷ luật lưu hồ sơ theo job.</li>
 <li><b>Toàn bộ vai trò vận hành:</b> tạo hồ sơ đúng thư viện, đúng tên, đúng nhãn; không tự ý chia sẻ external; không dùng file từ chat/email làm “bản đúng”.</li>
 </ul>
 </div>
@@ -209,7 +209,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead>
 <tr>
 <th style="width:200px">Điểm kiểm soát</th>
-<th>Người phụ trách</th>
+<th>Responsible Person</th>
 <th>Bằng chứng/MRR</th>
 <th>Điều kiện đạt (Test/Acceptance)</th>
 <th style="width:120px">Bằng chứng ID</th>
@@ -307,14 +307,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 </div>
 </div>
-<h2 class="h2" id="m8">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Người phụ trách, Bằng chứng/MRR, điểm sai hay gặp</h2>
+<h2 class="h2" id="m8">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Responsible Person, Bằng chứng/MRR, điểm sai hay gặp</h2>
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
 <th style="width:44px">#</th>
 <th>Bước</th>
-<th style="width:170px">Người phụ trách</th>
+<th style="width:170px">Responsible Person</th>
 <th style="width:260px">Bằng chứng/MRR bắt buộc</th>
 <th>Điểm sai hay gặp</th>
 </tr>
@@ -323,7 +323,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td>Xác nhận vai trò &amp; quyền truy cập theo ma trận</td><td>Supervisor + IT</td><td>Ảnh chụp nhóm quyền + nhật ký cấp quyền (FRM nhật ký)</td><td>Cấp quyền cá nhân, không theo group</td></tr>
 <tr><td>2</td><td>Bật MFA và kiểm tra đăng nhập thiết bị mới</td><td>IT</td><td>Ảnh cấu hình MFA + kết quả test</td><td>Dùng tài khoản admin chung, không tách vai trò</td></tr>
 <tr><td>3</td><td>Thiết lập sharing baseline: Specific people + expiry external</td><td>IT</td><td>Ảnh setting + test tạo link</td><td>Cho phép Anyone link</td></tr>
-<tr><td>4</td><td>Chuẩn hóa 3 vùng: Released / Hồ sơ / WIP-Job Không gian làm việc</td><td>QA/QMS + chủ quá trình</td><td>Sơ đồ site/library + danh mục thư viện</td><td>Lẫn WIP vào Hồ sơ, mất “freeze”</td></tr>
+<tr><td>4</td><td>Chuẩn hóa 3 vùng: Released / Hồ sơ / WIP-Job Không gian làm việc</td><td>QA/QMS + Process Owner</td><td>Sơ đồ site/library + danh mục thư viện</td><td>Lẫn WIP vào Hồ sơ, mất “freeze”</td></tr>
 <tr><td>5</td><td>Thiết lập Controlled Docs library: major/minor + approval</td><td>Doc Control + IT</td><td>Ảnh cấu hình versioning/approval + test publish</td><td>Draft xuất hiện như bản chính</td></tr>
 <tr><td>6</td><td>Thiết lập Hồ sơ library: retention label mặc định + hạn chế delete</td><td>QA/QMS + IT</td><td>Danh sách retention labels + mẫu hồ sơ có DCR hồ sơ</td><td>Sửa đè file IR/FAI</td></tr>
 <tr><td>7</td><td>Thiết lập taxonomy nhãn bảo mật: Internal/Confidential/Customer‑Confidential/Restricted</td><td>IT + QA/QMS</td><td>Ảnh labels + mapping nhóm dữ liệu</td><td>Không gắn nhãn cho dữ liệu khách</td></tr>
@@ -467,7 +467,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </td>
 <td>2 chu kỳ access review liên tiếp đạt + 1 cải tiến giảm rủi ro có bằng chứng</td>
 <td>Được phê duyệt thay đổi baseline M365 ảnh hưởng QMS (theo Kiểm soát thay đổi)</td>
-<td>IT/IMS Người phụ trách, QA/QMS Người phụ trách</td>
+<td>IT/IMS Responsible Person, QA/QMS Responsible Person</td>
 </tr>
 </tbody>
 </table>

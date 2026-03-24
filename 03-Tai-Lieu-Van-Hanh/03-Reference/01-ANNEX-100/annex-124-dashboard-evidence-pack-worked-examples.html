@@ -97,11 +97,11 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <span class="sub-vn">Ví dụ mẫu cho freeze-date pack, exception-note pack, quarterly access-bộ hồ sơ rà soát (bộ hồ sơ rà soát) và management-bộ hồ sơ rà soát.</span>
 </div>
 <div class="meta">
-<div class="row"><span><b>Mã:</b></span><span>ANNEX-124</span></div>
-<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / Bảng điều khiển người phụ trách / IT người phụ trách hệ thống</span></div>
-<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc / QA Manager theo thẩm quyền</span></div>
+<div class="row"><span><b>Code:</b></span><span>ANNEX-124</span></div>
+<div class="row"><span><b>Version:</b></span><span>V0</span></div>
+<div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+<div class="row"><span><b>Owner:</b></span><span>QMS Manager / Dashboard Responsible Person / IT System Responsible Person</span></div>
+<div class="row"><span><b>Approved by:</b></span><span>General Director / QA Manager theo thẩm quyền</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent"><div class="form-sheet">
@@ -114,16 +114,16 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="notice-item"><b>Không thay thế hồ sơ gốc</b>Pack chỉ là lớp trình bày / tổng hợp. SoR/SSOT vẫn nằm ở hệ hoặc thư mục nguồn chuẩn.</div>
 <div class="notice-item"><b>Dùng theo mức rủi ro</b>Không phải mọi bảng điều khiển đều cần full pack. Pack phải tỷ lệ với mức độ quyết định và độ nhạy dữ liệu.</div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Loại pack</th><th>Khi nào phải có</th><th>Người phụ trách tối thiểu</th><th>Consumer chính</th></tr></thead><tbody>
-<tr><td>Freeze-date pack</td><td>KPI pack dùng cho tier review, MR hoặc quyết định chính thức</td><td>Người phụ trách KPI + QMS</td><td>Lãnh đạo / chủ quá trình</td></tr>
-<tr><td>Exception-note pack</td><td>Có late posting, manual correction, offline event, missing source, restatement</td><td>Người phụ trách Bảng điều khiển + chủ dữ liệu</td><td>Người dùng pack / QMS / đánh giá</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Loại pack</th><th>Khi nào phải có</th><th>Responsible Person tối thiểu</th><th>Consumer chính</th></tr></thead><tbody>
+<tr><td>Freeze-date pack</td><td>KPI pack dùng cho tier review, MR hoặc quyết định chính thức</td><td>Responsible Person KPI + QMS</td><td>Lãnh đạo / Process Owner</td></tr>
+<tr><td>Exception-note pack</td><td>Có late posting, manual correction, offline event, missing source, restatement</td><td>Responsible Person Bảng điều khiển + chủ dữ liệu</td><td>Người dùng pack / QMS / đánh giá</td></tr>
 <tr><td>Quarterly access-bộ hồ sơ rà soát</td><td>Rà định kỳ quyền user, privileged account, deputy, service account</td><td>IT admin + người phụ trách hệ thống + người rà soát độc lập</td><td>IT / QMS / management</td></tr>
 <tr><td>Management-bộ hồ sơ rà soát</td><td>Họp xem xét của lãnh đạo theo SOP-902</td><td>QMS + KPI người phụ trách</td><td>Ban lãnh đạo</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="a2">2. Worked example A — freeze-date pack</h2>
 <div class="field-grid">
 <div class="field"><b>Suggested pack title</b><div class="blank">Site KPI Pack — Month 03/2026 — freeze 2026-03-17 17:00</div></div>
-<div class="field"><b>Metadata bắt buộc</b><div class="blank">Người phụ trách, source-of-hồ sơ, freeze-date, refresh cadence, file version, audience, approval path.</div></div>
+<div class="field"><b>Metadata bắt buộc</b><div class="blank">Responsible Person, source-of-hồ sơ, freeze-date, refresh cadence, file version, audience, approval path.</div></div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Thành phần pack</th><th>Nội dung ví dụ</th><th>Ghi chú kiểm soát</th></tr></thead><tbody>
 <tr><td>Cover page</td><td>Pack title, period, freeze-date, người phụ trách, audience, confidentiality, version</td><td>Không có cover = khó chứng minh đã bộ hồ sơ rà soát nào.</td></tr>
@@ -140,7 +140,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <tr><td>Affected KPI / bảng điều khiển</td><td>OTD dispatch, shipped revenue, overdue jobs</td><td>Chỉ rõ chỉ số nào bị ảnh hưởng.</td></tr>
 <tr><td>Data impact</td><td>3 shipments posted late after freeze; revenue restated +1.8%</td><td>Cho người đọc biết mức độ ảnh hưởng.</td></tr>
 <tr><td>Temporary treatment</td><td>Freeze giữ nguyên; ghi chú điều hành nêu riêng; restatement ở pack kỳ sau</td><td>Không được sửa âm thầm.</td></tr>
-<tr><td>Người phụ trách / người phê duyệt</td><td>Epicor admin / Finance manager / QA manager</td><td>Chỉ rõ ai chịu trách nhiệm giải trình.</td></tr>
+<tr><td>Responsible Person / người phê duyệt</td><td>Epicor admin / Finance manager / QA manager</td><td>Chỉ rõ ai chịu trách nhiệm giải trình.</td></tr>
 </tbody></table></div>
 <div class="field-grid">
 <div class="field"><b>Backfill / reconciliation path</b><div class="blank">Link tới raw extract, manual ledger, nhật ký sự cố (incident nhật ký), closure bằng chứng.</div></div>
@@ -160,7 +160,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <tr><td>Performance pack</td><td>KPI freeze-date summary + ghi chú điều hành + exception notes</td><td>Decision giữ / đổi target, escalation, special review</td></tr>
 <tr><td>Effectiveness of actions</td><td>Trạng thái NCR/CAPA/đánh giá actions, overdue items, repeat issues</td><td>Close / carry-over / re-open / leadership action</td></tr>
 <tr><td>Resource &amp; competence</td><td>Skill coverage, deputy gaps, hiring/training needs, system constraints</td><td>Resource plan / competency action</td></tr>
-<tr><td>Improvement agenda</td><td>Top improvement projects, kiểm soát dữ liệu và quyền truy cập, supplier actions, customer escalations</td><td>Người phụ trách Project, due, review date</td></tr>
+<tr><td>Improvement agenda</td><td>Top improvement projects, kiểm soát dữ liệu và quyền truy cập, supplier actions, customer escalations</td><td>Responsible Person Project, due, review date</td></tr>
 </tbody></table></div>
 <div class="note">Worked example này nên chảy trực tiếp sang <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a>. Biên bản chỉ có giá trị khi người đến sau lần ngược được pack nào đã được dùng để ra từng quyết định.</div>
 <h2 class="h2" id="a5e">5E. Worked example E — competence / deputy note cho KPI pack</h2>

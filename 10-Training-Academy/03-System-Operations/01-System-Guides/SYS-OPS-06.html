@@ -66,11 +66,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-06</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-06</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 
@@ -272,7 +272,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h4 style="margin-top:0">Bàn giao A — Tạo/Sửa KPI (định nghĩa)</h4>
 <ul>
-<li><span class="must">Đầu vào:</span> yêu cầu KPI từ Supervisor/chủ quá trình; mô tả quyết định cần chặn; rủi ro cần giảm.</li>
+<li><span class="must">Đầu vào:</span> yêu cầu KPI từ Supervisor/Process Owner; mô tả quyết định cần chặn; rủi ro cần giảm.</li>
 <li><span class="must">Đầu ra:</span> 01 bản ghi KPI dictionary (name/người phụ trách/cadence/source/drillthrough) + 01 bản ghi kiểm soát thay đổi.</li>
 <li><span class="must">Điểm chặn:</span> KPI không có người phụ trách hoặc không có nguồn dữ liệu bị khóa ở trạng thái <span class="block">BLOCK</span>.</li>
 </ul>
@@ -332,7 +332,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead>
 <tr>
 <th style="width:210px">Điểm kiểm soát</th>
-<th style="width:160px">Người phụ trách</th>
+<th style="width:160px">Responsible Person</th>
 <th>Quy tắc bắt buộc</th>
 <th style="width:240px">MRR/Bằng chứng tối thiểu</th>
 </tr>
@@ -472,14 +472,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 8) Checklist vận hành -->
 <div class="card" id="sec8">
-<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Người phụ trách, Bằng chứng/MRR, “điểm sai điển hình”</h2>
+<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Responsible Person, Bằng chứng/MRR, “điểm sai điển hình”</h2>
 <p class="muted">Bảng kiểm này dùng cho 2 tình huống: (A) tạo KPI mới, (B) sửa KPI/model đang chạy. Tổng bước ≤15 và dùng chung cho mọi vai trò bằng cách điền đúng người phụ trách.</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
 <tr>
 <th style="width:50px">#</th>
-<th style="width:160px">Người phụ trách</th>
+<th style="width:160px">Responsible Person</th>
 <th>Hành động bắt buộc</th>
 <th style="width:260px">Bằng chứng/MRR</th>
 <th style="width:230px">Điểm sai điển hình</th>
@@ -488,7 +488,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Supervisor</td><td>Chốt “quyết định cần chặn” + rủi ro cần giảm; gắn KPI vào bước E2E.</td><td>01 yêu cầu KPI (ticket) IT-HELPDESK</td><td>KPI đo “cho vui”, không gắn cổng kiểm soát/bàn giao</td></tr>
 <tr><td>2</td><td>QA/QMS</td><td>Đặt tên KPI duy nhất + định nghĩa 1 câu + phạm vi (job/pack/customer) + tiêu chí cổng kiểm soát.</td><td>Bản ghi KPI dictionary (draft)</td><td>Tên KPI trùng; định nghĩa dài, mơ hồ</td></tr>
-<tr><td>3</td><td>chủ quá trình</td><td>Chỉ định nguồn dữ liệu SSOT (bảng + cột khóa) và người phụ trách dữ liệu.</td><td>Map nguồn (table/column) trong KPI dictionary</td><td>Chọn dữ liệu “ngoài hệ thống”</td></tr>
+<tr><td>3</td><td>Process Owner</td><td>Chỉ định nguồn dữ liệu SSOT (bảng + cột khóa) và người phụ trách dữ liệu.</td><td>Map nguồn (table/column) trong KPI dictionary</td><td>Chọn dữ liệu “ngoài hệ thống”</td></tr>
 <tr><td>4</td><td>IT/BI</td><td>Khóa grain KPI và mô hình: fact nào, dim nào, join key nào.</td><td>Relationship map + mô tả grain</td><td>Join sai grain gây phình số</td></tr>
 <tr><td>5</td><td>QA/QMS</td><td>Định nghĩa minh chứng bắt buộc cho diễn tập‑down (hồ sơ link + bằng chứng link).</td><td>Quy tắc EvidenceFolderUrl/PacketFolderUrl</td><td>Quên link bằng chứng; link hỏng</td></tr>
 <tr><td>6</td><td>IT/BI</td><td>Xây measure theo định nghĩa; khóa tên measure và mô tả.</td><td>DAX measure + commit nhật ký M365/SharePoint → HESEM-QMS-SSOT</td><td>Measure đổi tên gây gãy report</td></tr>
@@ -498,7 +498,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>10</td><td>IT/BI</td><td>Ghi BI release note: version, thay đổi, risk, rollback.</td><td>BI_ReleaseNotes: SSOT/BI-ReleaseNotes (SharePoint List)</td><td>Không có rollback; không nhật ký</td></tr>
 <tr><td>11</td><td>IT/BI</td><td>Cấu hình refresh schedule và cảnh báo.</td><td>Ảnh cấu hình refresh + nhật ký alert Teams: QMS-ALERT + Ticket: IT-HELPDESK</td><td>Refresh ngoài giờ gây nhiễu</td></tr>
 <tr><td>12</td><td>Supervisor</td><td>Chạy 01 cuộc họp standup dùng KPI mới; tạo action cho bất ổn.</td><td>StandupActions hồ sơ + ảnh bảng job at‑risk</td><td>Không tạo action; chỉ “bàn”</td></tr>
-<tr><td>13</td><td>chủ quá trình</td><td>Đánh giá nhanh 10 hồ sơ: đúng khóa + có bằng chứng link.</td><td>Bảng kiểm đánh giá mẫu có ký</td><td>Chọn mẫu “đẹp”; bỏ mẫu fail</td></tr>
+<tr><td>13</td><td>Process Owner</td><td>Đánh giá nhanh 10 hồ sơ: đúng khóa + có bằng chứng link.</td><td>Bảng kiểm đánh giá mẫu có ký</td><td>Chọn mẫu “đẹp”; bỏ mẫu fail</td></tr>
 <tr><td>14</td><td>QA/QMS</td><td>Đóng vòng: cập nhật mô-đun training/OJT theo sai lỗi phát hiện.</td><td>Nhật ký cập nhật training + DCR hồ sơ</td><td>Không cập nhật đào tạo</td></tr>
 </tbody>
 </table>
@@ -522,7 +522,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>1</td><td>Chọn KPI gắn quyết định cổng kiểm soát</td><td>Gắn KPI vào bước E2E và quyết định GO/HOLD/BLOCK</td><td>Tránh KPI “đo cho đẹp” và bỏ rủi ro chết người</td></tr>
-<tr><td>2</td><td>Điền KPI dictionary</td><td>Name duy nhất • Người phụ trách • Cadence • Source tables • Diễn tập‑through</td><td>Tránh đa định nghĩa, tranh cãi số liệu</td></tr>
+<tr><td>2</td><td>Điền KPI dictionary</td><td>Name duy nhất • Responsible Person • Cadence • Source tables • Diễn tập‑through</td><td>Tránh đa định nghĩa, tranh cãi số liệu</td></tr>
 <tr><td>3</td><td>Xác định grain &amp; join key</td><td>Fact đúng • Dim đúng • JobNum là khóa tối thiểu</td><td>Tránh join sai gây phình số</td></tr>
 <tr><td>4</td><td>Thiết lập bằng chứng</td><td>Hồ sơ link + EvidenceFolderUrl/PacketFolderUrl phải tồn tại</td><td>Tránh đánh giá không đạt và vượt qua cổng kiểm soát</td></tr>
 <tr><td>5</td><td>Kiểm thử diễn tập‑down</td><td>Click KPI → bảng hồ sơ → mở bằng chứng link</td><td>Tránh KPI không truy vết</td></tr>

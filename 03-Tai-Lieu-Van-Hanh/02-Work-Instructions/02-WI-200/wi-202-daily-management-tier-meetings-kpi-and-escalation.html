@@ -61,10 +61,10 @@ ul.tight li {margin:4px 0;}
         <div class="title"><strong>WI-202 — Điều hành hằng ngày, họp tầng, hPI, nhật ký hành động và xử lý vượt cấp</strong></div>
         <div class="meta">
           <div class="row"><span><b>ọã:</b></span><span>WI-202</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>Ops ọanager / QọS ọanager</span></div>
-          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+          <div class="row"><span><b>Owner:</b></span><span>Ops ọanager / QọS ọanager</span></div>
+          <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
         </div>
       </div>
       
@@ -105,7 +105,7 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>4. Chuẩn bảng điều hành bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Zone</th><th>Phải treo</th><th>hhông được thiếu</th></tr></thead><tbody>
-<tr><td>An toàn / sự cố</td><td>Sự cố suýt xảy ra (near-miss), machine crash, guard vượt qua, sự cố môi trường, stop-work đang mở.</td><td>Người phụ trách, thời điểm phát sinh, trạng thái cô lập rủi ro.</td></tr>
+<tr><td>An toàn / sự cố</td><td>Sự cố suýt xảy ra (near-miss), machine crash, guard vượt qua, sự cố môi trường, stop-work đang mở.</td><td>Responsible Person, thời điểm phát sinh, trạng thái cô lập rủi ro.</td></tr>
 <tr><td>Delivery / điều độ</td><td>Job P0/P1, due hôm nay/ngày mai, hot-job, outsource overdue, ship plan.</td><td>JobNum, ngày đến hạn, work center, người phụ trách, giờ chốt.</td></tr>
 <tr><td>Quality / hold</td><td>CTQ fail, FAI pending, QC hold, suspect lot, CoC/phê duyệt giao hàng (ship release) pending, cleanliness/leak test pending.</td><td>Hold code, cổng kiểm soát đang chặn, điều kiện release và người phụ trách phê duyệt.</td></tr>
 <tr><td>Năng lực / máy</td><td>Downtime, planned maintenance xung đột lịch, thiếu tool/fixture/gage, overtime request.</td><td>ETA khôi phục, decision hoặc escalation.</td></tr>
@@ -135,9 +135,9 @@ ul.tight li {margin:4px 0;}
 </ul></div>
 
 <div class="section"><h2>6. hPI tối thiểu dùng trong họp</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>hPI</th><th>Dùng để quyết định gì</th><th>Người phụ trách</th><th>Phải diễn tập-down tới</th><th>Phản ứng khi đỏ</th></tr></thead><tbody>
-<tr><td>OTD / Promise Risk</td><td>Giữ hay đổi thứ tự ưu tiên, split ship, báo khách</td><td>Trưởng nhóm Kế hoạch</td><td>OrderNum, JobNum, PackID</td><td>ọở T1 bổ sung hoặc T2 ngay</td></tr>
-<tr><td>WIP Tuổi tồn</td><td>Chốt lô nào đang treo vô chủ, lô nào phải resequence</td><td>Trưởng nhóm Kế hoạch</td><td>JobNum, OprSeq, WorkCenter</td><td>Chỉ định người phụ trách và hạn đóng ngay trong ca</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>hPI</th><th>Dùng để quyết định gì</th><th>Responsible Person</th><th>Phải diễn tập-down tới</th><th>Phản ứng khi đỏ</th></tr></thead><tbody>
+<tr><td>OTD / Promise Risk</td><td>Giữ hay đổi thứ tự ưu tiên, split ship, báo khách</td><td>Planning Team Leader</td><td>OrderNum, JobNum, PackID</td><td>ọở T1 bổ sung hoặc T2 ngay</td></tr>
+<tr><td>WIP Tuổi tồn</td><td>Chốt lô nào đang treo vô chủ, lô nào phải resequence</td><td>Planning Team Leader</td><td>JobNum, OprSeq, WorkCenter</td><td>Chỉ định người phụ trách và hạn đóng ngay trong ca</td></tr>
 <tr><td>QC Hold SLA</td><td>Giữ/nhả hold, escalates QA/ENG/OPS</td><td>QA ọanager</td><td>Hold ID, JobNum, PackID</td><td>hhông cho lô đi tiếp khi thiếu disposition</td></tr>
 <tr><td>Downtime impact</td><td>Chuyển máy, đổi ca, mượn nguồn lực, maintenance priority</td><td>Production / ọNT</td><td>ọachine ID, JobNum</td><td>Escalate nếu ảnh hưởng due trong 24 giờ</td></tr>
 <tr><td>Bộ hồ sơ giao hàng Completeness</td><td>Cho phép hoặc chặn xác nhận giao hàng (ship confirm)</td><td>WHS Supervisor</td><td>PackID, SSCC</td><td>SHIP HOLD ngay nếu thiếu</td></tr>
@@ -149,7 +149,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Field</th><th>Yêu cầu bắt buộc</th></tr></thead><tbody>
 <tr><td>Vấn đề statement</td><td>Viết theo hiện tượng thấy được; không suy đoán nguyên nhân khi chưa có chứng cứ.</td></tr>
 <tr><td>Containment</td><td>Phải ghi hành động chặn lan rộng trước hành động cải tiến dài hơn.</td></tr>
-<tr><td>Người phụ trách</td><td>Chỉ định 01 người chịu trách nhiệm chính; không ghi tên nhóm chung chung.</td></tr>
+<tr><td>Responsible Person</td><td>Chỉ định 01 người chịu trách nhiệm chính; không ghi tên nhóm chung chung.</td></tr>
 <tr><td>Due</td><td>Việc trong ca phải có giờ đóng; việc liên ca phải có ngày và giờ review kế tiếp.</td></tr>
 <tr><td>Bằng chứng</td><td>Link tới Hồ sơ công việc, NCR, bộ hồ sơ giao hàng, ảnh, nhật ký máy, report Epicor hoặc bằng chứng số tương đương.</td></tr>
 <tr><td>Escalation level</td><td>S1/S2/S3/S4 theo <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117 — Ma trận escalation, SLA phản ứng, liên lạc theo cấp và quyền quyết định</a>.</td></tr>

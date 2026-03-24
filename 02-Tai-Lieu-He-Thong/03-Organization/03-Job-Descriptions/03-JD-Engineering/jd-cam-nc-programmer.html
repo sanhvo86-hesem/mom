@@ -91,11 +91,11 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <span class="sub-vn">Lập trình viên CAM / NC</span>
 </div>
 <div class="meta">
-<div class="row"><span><b>Mã:</b></span><span>JD-CAM-NC-PROGRAMMER</span></div>
-<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Chủ sở hữu:</b></span><span>HR Manager</span></div>
-<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+<div class="row"><span><b>Code:</b></span><span>JD-CAM-NC-PROGRAMMER</span></div>
+<div class="row"><span><b>Version:</b></span><span>V0</span></div>
+<div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+<div class="row"><span><b>Owner:</b></span><span>HR Manager</span></div>
+<div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -114,19 +114,19 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Nhóm vai trò</th><td>Kỹ thuật / CAM / quy trình engineering / standardization</td></tr>
 <tr><th>Báo cáo trực tiếp cho</th><td>Engineering Lead/Manager.</td></tr>
 <tr><th>Quản lý trực tiếp</th><td>Không có nhân sự báo cáo trực tiếp.</td></tr>
-<tr><th>Phối hợp chức năng chính</th><td>Phối hợp với DFM Engineer và Quy trình Engineer về assumption kỹ thuật / setup / tooling; với Setup Technician trong prove-out; với QA/QC khi chương trình liên quan đến measurement strategy; với IT / Epicor khi cần quản trị file / version / access.</td></tr>
+<tr><th>Phối hợp chức năng chính</th><td>Phối hợp với DFM Engineer và Process Engineer về assumption kỹ thuật / setup / tooling; với Setup Technician trong prove-out; với QA/QC khi chương trình liên quan đến measurement strategy; với IT / Epicor khi cần quản trị file / version / access.</td></tr>
 <tr><th>Hệ thống / công cụ vận hành chính</th><td>Epicor Part Master / Method / Routing / Revision; bản vẽ kỹ thuật, CAM/setup sheet, ECO/ECN, technical nhật ký và bài học kinh nghiệm.</td></tr>
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Sau DFM/quy trình release → lập trình CAM/NC → mô phỏng/xác minh → phát hành chương trình có revision → hỗ trợ prove-out.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Mission)</h2>
-<div class="jd-mission"><p>CAM/NC Programmer chịu trách nhiệm phát hành chương trình gia công đúng revision, an toàn và có khả năng lặp lại trên các hệ máy được phân công. Đây là vị trí bảo vệ “ngôn ngữ máy” của công ty.</p><p>Vị trí này phải khóa chắc phiên bản, mô phỏng, post-processor, phát hành chương trình (program release) pack và logic backup; tuyệt đối không để chương trình chưa xác minh hoặc chương trình lỗi thời lọt xuống xưởng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>NC program phát hành sạch lỗi logic cơ bản, có mô phỏng / rà soát đồng cấp phù hợp và đủ thông tin để setup dùng an toàn.</li><li>Revision control của chương trình được bảo vệ chặt; khi có sửa đổi đều truy được ai sửa, sửa gì, vì sao.</li><li>Phản ứng với lỗi hiện trường nhanh và có kỷ luật kiểm soát thay đổi, không “vá file” thiếu kiểm soát.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> CAM/NC Programmer sở hữu độ đúng và tính kiểm soát của NC program; không thay Quy trình Engineer trong định nghĩa phương pháp, không thay shopfloor trong điều độ và không cho phép sửa code vô kiểm soát tại máy.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Phát hành NC package an toàn, đúng revision, đúng nhóm máy (machine family)/post-processor và đủ bằng chứng prove-out để Setup/Operator chạy ổn định.</li><li>Mọi thay đổi program phải là controlled change; PHẢI giữ mọi thay đổi program trong controlled change, không “sửa tay ở máy” không dấu vết hoặc dùng file cũ vì tiện.</li><li>Hỗ trợ giải quyết bất thường bằng logic chương trình, chiến lược cắt và restart an toàn, không đẩy hết trách nhiệm cho vận hành.</li></ul></div>
+<div class="jd-mission"><p>CAM/NC Programmer chịu trách nhiệm phát hành chương trình gia công đúng revision, an toàn và có khả năng lặp lại trên các hệ máy được phân công. Đây là vị trí bảo vệ “ngôn ngữ máy” của công ty.</p><p>Vị trí này phải khóa chắc phiên bản, mô phỏng, post-processor, phát hành chương trình (program release) pack và logic backup; tuyệt đối không để chương trình chưa xác minh hoặc chương trình lỗi thời lọt xuống xưởng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>NC program phát hành sạch lỗi logic cơ bản, có mô phỏng / rà soát đồng cấp phù hợp và đủ thông tin để setup dùng an toàn.</li><li>Revision control của chương trình được bảo vệ chặt; khi có sửa đổi đều truy được ai sửa, sửa gì, vì sao.</li><li>Phản ứng với lỗi hiện trường nhanh và có kỷ luật kiểm soát thay đổi, không “vá file” thiếu kiểm soát.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> CAM/NC Programmer sở hữu độ đúng và tính kiểm soát của NC program; không thay Process Engineer trong định nghĩa phương pháp, không thay shopfloor trong điều độ và không cho phép sửa code vô kiểm soát tại máy.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Phát hành NC package an toàn, đúng revision, đúng nhóm máy (machine family)/post-processor và đủ bằng chứng prove-out để Setup/Operator chạy ổn định.</li><li>Mọi thay đổi program phải là controlled change; PHẢI giữ mọi thay đổi program trong controlled change, không “sửa tay ở máy” không dấu vết hoặc dùng file cũ vì tiện.</li><li>Hỗ trợ giải quyết bất thường bằng logic chương trình, chiến lược cắt và restart an toàn, không đẩy hết trách nhiệm cho vận hành.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
 <tr><th>Báo cáo trực tiếp</th><td>Engineering Lead/Manager.</td></tr>
 <tr><th>Nhân sự báo cáo trực tiếp</th><td>Không có nhân sự báo cáo trực tiếp.</td></tr>
-<tr><th>Tuyến phối hợp chức năng</th><td>Phối hợp với DFM Engineer và Quy trình Engineer về assumption kỹ thuật / setup / tooling; với Setup Technician trong prove-out; với QA/QC khi chương trình liên quan đến measurement strategy; với IT / Epicor khi cần quản trị file / version / access.</td></tr>
-<tr><th>Giao diện nội bộ chính</th><td>Engineering Lead; DFM Engineer; Quy trình Engineer; Setup Technician; CNC Workshop Manager; QC Inspector; Tool Crib.</td></tr>
+<tr><th>Tuyến phối hợp chức năng</th><td>Phối hợp với DFM Engineer và Process Engineer về assumption kỹ thuật / setup / tooling; với Setup Technician trong prove-out; với QA/QC khi chương trình liên quan đến measurement strategy; với IT / Epicor khi cần quản trị file / version / access.</td></tr>
+<tr><th>Giao diện nội bộ chính</th><td>Engineering Lead; DFM Engineer; Process Engineer; Setup Technician; CNC Workshop Manager; QC Inspector; Tool Crib.</td></tr>
 <tr><th>Giao diện bên ngoài</th><td>Nhà cung cấp post / CAM solution / tooling khi được phân công.</td></tr>
 <tr><th>Phạm vi vị trí</th><td>Vai trò chuyên môn của bộ phận Engineering; tập trung vào chuẩn hóa, phân tích dữ liệu, thực thi nghiệp vụ và phối hợp liên phòng ban.</td></tr>
 </tbody></table>
@@ -142,7 +142,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tbody>
 <tr>
 <th style="width:26%">Điểm kết thúc trách nhiệm</th>
-<td>CAM/NC Programmer sở hữu độ đúng và tính kiểm soát của NC program; không thay Quy trình Engineer trong định nghĩa phương pháp, không thay shopfloor trong điều độ và không cho phép sửa code vô kiểm soát tại máy.</td>
+<td>CAM/NC Programmer sở hữu độ đúng và tính kiểm soát của NC program; không thay Process Engineer trong định nghĩa phương pháp, không thay shopfloor trong điều độ và không cho phép sửa code vô kiểm soát tại máy.</td>
 </tr>
 <tr>
 <th style="width:26%">Không thuộc trách nhiệm chính / phải escalated</th>
@@ -170,7 +170,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </thead>
 <tbody>
 <tr>
-<th style="width:20%">Engineering Lead / Quy trình Engineer</th>
+<th style="width:20%">Engineering Lead / Process Engineer</th>
 <td><p>Nhận route, strategy gia công, setup concept, tool/fixture rule, tolerance/CTQ và điểm cần lưu ý trong prove-out.</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-r">R</span></td>
 <td>Program được xây trên nền phương pháp đã thống nhất.</td>

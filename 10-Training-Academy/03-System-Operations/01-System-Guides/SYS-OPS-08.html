@@ -70,11 +70,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-08</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-08</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 
@@ -243,7 +243,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="ok">
 <strong>Luồng bàn giao tối thiểu (bắt buộc)</strong>
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
-<li>chủ quá trình cập nhật list theo ca → dữ liệu hợp lệ theo schema.</li>
+<li>Process Owner cập nhật list theo ca → dữ liệu hợp lệ theo schema.</li>
 <li>IT/BI refresh dataset theo lịch ca → trạng thái refresh được giám sát.</li>
 <li>Supervisor dùng bảng điều khiển để quyết định → quyết định được ghi lại (MRR) tại list quyết định.</li>
 <li>QA/QMS kiểm tra diễn tập-through đến bằng chứng → kết luận sẵn sàng đánh giá.</li>
@@ -273,13 +273,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 5) Risk Controls -->
 <div class="card">
 <h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng)</h2>
-<p>Mỗi điểm kiểm soát (điểm kiểm soát) có Người phụ trách rõ ràng và MRR bắt buộc. Thiếu MRR → Cổng kiểm soát không công nhận.</p>
+<p>Mỗi điểm kiểm soát (điểm kiểm soát) có Responsible Person rõ ràng và MRR bắt buộc. Thiếu MRR → Cổng kiểm soát không công nhận.</p>
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
 <th>Điểm kiểm soát</th>
-<th>Người phụ trách</th>
+<th>Responsible Person</th>
 <th>Bằng chứng/MRR</th>
 <th>Điểm chặn</th>
 </tr>
@@ -287,7 +287,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>CP1 — Khóa schema list (cột/kiểu dữ liệu)</td>
-<td>QA/QMS + chủ quá trình</td>
+<td>QA/QMS + Process Owner</td>
 <td>Schema snapshot + nhật ký thay đổi (BI_ReleaseNotes)</td>
 <td>Đổi schema không có release note → BLOCK refresh PROD</td>
 </tr>
@@ -410,14 +410,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 8) Checklist -->
 <div class="card">
-<h2>8) Bảng kiểm vận hành (≤ 15 bước) — mỗi bước có Người phụ trách, Bằng chứng/MRR, điểm sai hay gặp</h2>
+<h2>8) Bảng kiểm vận hành (≤ 15 bước) — mỗi bước có Responsible Person, Bằng chứng/MRR, điểm sai hay gặp</h2>
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
 <th>#</th>
 <th>Bước</th>
-<th>Người phụ trách</th>
+<th>Responsible Person</th>
 <th>Bằng chứng/MRR</th>
 <th>Điểm sai hay gặp</th>
 </tr>
@@ -573,7 +573,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Trong measures_template, tên 2 bảng placeholder là gì và xử lý ra sao?</li>
 <li>Kiểu dữ liệu cho EpicorLastUpdated là gì và vì sao?</li>
 <li>Điểm chặn khi diễn tập-through không mở EvidenceFolderUrl.</li>
-<li>Người phụ trách Refresh account phải thuộc loại nào và vì sao?</li>
+<li>Responsible Person Refresh account phải thuộc loại nào và vì sao?</li>
 <li>Biên bản UAT tối thiểu phải chứng minh điều gì?</li>
 <li>điểm kiểm soát (điểm kiểm soát) nào khóa schema list và bằng chứng tương ứng?</li>
 <li>Chỉ ra 1 dấu hiệu dữ liệu “đúng cú pháp, sai thực tế”.</li>
@@ -617,7 +617,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3>10.3 Performance test (bắt buộc)</h3>
 <p>
- Performance test chia 2 đường: <b>Người phụ trách track</b> (IT/BI/QA/Supervisor) và <b>User track</b> (các vai trò còn lại).
+ Performance test chia 2 đường: <b>Responsible Person track</b> (IT/BI/QA/Supervisor) và <b>User track</b> (các vai trò còn lại).
  </p>
 <div class="table-wrap">
 <table>
@@ -631,7 +631,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>Người phụ trách track</b></td>
+<td><b>Responsible Person track</b></td>
 <td>Dựng DEV từ pack: tạo pSiteUrl, import functions/queries, sửa lỗi JobIndex.pq, tạo DimDate, relationships, dán measures và thay placeholder, tạo 01 page có diễn tập-through bằng chứng.</td>
 <td>Refresh pass; không lỗi DAX; diễn tập-through mở link; có BI_ReleaseNotes + UAT plan.</td>
 <td>Publish khi refresh fail; thiếu BI_ReleaseNotes; diễn tập-through trống.</td>

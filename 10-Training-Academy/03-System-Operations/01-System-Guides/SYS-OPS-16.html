@@ -57,11 +57,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-16</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-16</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -251,7 +251,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Chuẩn bị Data Pack</strong><div class="muted">QA/QMS khóa nguồn dữ liệu, chụp snapshot KPI.</div></div></div>
 <div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Họp MR (Tier 3)</strong><div class="muted">Review xu hướng, chốt quyết định, khóa action.</div></div></div>
 <div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Phát hành Minutes</strong><div class="muted">FRM-QMS-003 phát hành trong 24 giờ.</div></div></div>
-<div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Thực thi Action</strong><div class="muted">Người phụ trách triển khai, cập nhật trạng thái, gắn bằng chứng.</div></div></div>
+<div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Thực thi Action</strong><div class="muted">Responsible Person triển khai, cập nhật trạng thái, gắn bằng chứng.</div></div></div>
 <div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Xác nhận hiệu lực</strong><div class="muted">QA/QMS kiểm tra đóng action theo tiêu chí.</div></div></div>
 <div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>theo dõi tiếp kỳ sau</strong><div class="muted">Action chưa đóng là mục đầu tiên của MR kỳ sau.</div></div></div>
 </div>
@@ -260,10 +260,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <h3 style="margin-top:0;">4.2 Cadence áp dụng cho xưởng 02 ca</h3>
 <table class="table">
-<thead><tr><th style="width:110px;">Mốc</th><th>Nội dung</th><th style="width:150px;">Người phụ trách</th></tr></thead>
+<thead><tr><th style="width:110px;">Mốc</th><th>Nội dung</th><th style="width:150px;">Responsible Person</th></tr></thead>
 <tbody>
 <tr><td><b>T-2 ngày</b></td><td>Chốt danh sách KPI &amp; dữ liệu; gửi agenda; yêu cầu các bộ phận gửi đầu vào đúng định dạng.</td><td>QA/QMS</td></tr>
-<tr><td><b>T-1 ngày</b></td><td>Khóa Data Pack (snapshot) và phát hành link; đánh dấu điểm đỏ cần quyết định.</td><td>QA/QMS + Người phụ trách</td></tr>
+<tr><td><b>T-1 ngày</b></td><td>Khóa Data Pack (snapshot) và phát hành link; đánh dấu điểm đỏ cần quyết định.</td><td>QA/QMS + Responsible Person</td></tr>
 <tr><td><b>T0</b></td><td>Họp MR 45–60 phút; chốt quyết định + action; xác nhận người phụ trách + hạn.</td><td>General Manager (EXE-01)</td></tr>
 <tr><td><b>T+1 ngày</b></td><td>Phát hành FRM-QMS-003; action nhập bảng theo dõi; gửi thông báo.</td><td>QA/QMS</td></tr>
 <tr><td><b>Hàng tuần</b></td><td>theo dõi tiếp action quá hạn tại Tier 2; escalations theo SLA.</td><td>Leads + QA</td></tr>
@@ -299,7 +299,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Action (hành động)</b></td>
 <td>Công việc có người phụ trách, hạn, tiêu chí đóng, và bằng chứng. Action không có người phụ trách bị xem là không tồn tại.</td>
-<td>Action: “Cập nhật bảng kiểm phê duyệt giao hàng (ship release)” • Người phụ trách: Trưởng nhóm Kho • Due: 2026-03-05 • Bằng chứng: link file.</td>
+<td>Action: “Cập nhật bảng kiểm phê duyệt giao hàng (ship release)” • Responsible Person: Warehouse Team Leader • Due: 2026-03-05 • Bằng chứng: link file.</td>
 </tr>
 <tr>
 <td><b>MRR cho MR</b></td>
@@ -527,7 +527,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol style="line-height:1.9; margin:0 0 0 18px;">
 <li>QA/QMS hoàn thiện FRM-QMS-003, đính kèm link Data Pack snapshot và phát hành trong 24 giờ.</li>
 <li>QA/QMS nhập Action list vào bảng theo dõi; mỗi action có người phụ trách, hạn, tiêu chí đóng, và nơi lưu bằng chứng.</li>
-<li>Người phụ trách triển khai action và cập nhật trạng thái theo SLA; QA/QMS kiểm tra đóng action theo tiêu chí và bằng chứng.</li>
+<li>Responsible Person triển khai action và cập nhật trạng thái theo SLA; QA/QMS kiểm tra đóng action theo tiêu chí và bằng chứng.</li>
 </ol>
 <div class="req" style="margin-top:12px;">
 <span class="req-tag shall">PHẢI</span>
@@ -547,7 +547,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Điểm đứt gãy</th>
 <th>Hậu quả</th>
 <th>Kiểm soát bắt buộc</th>
-<th style="width:140px;">Người phụ trách</th>
+<th style="width:140px;">Responsible Person</th>
 <th style="width:220px;">Bằng chứng</th>
 </tr>
 </thead>
@@ -556,7 +556,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>2</td><td>Không review action kỳ trước</td><td>Action trôi, lặp lỗi</td><td>Mục A2 bắt buộc đứng đầu agenda</td><td>Chủ trì</td><td>Minutes có bảng action kỳ trước</td></tr>
 <tr><td>3</td><td>Action không có người phụ trách cá nhân</td><td>Không ai chịu trách nhiệm</td><td>Minutes chỉ chấp nhận người phụ trách cá nhân</td><td>QA/QMS</td><td>Action list có tên người</td></tr>
 <tr><td>4</td><td>Action không có hạn</td><td>Quá hạn kéo dài, mất kiểm soát</td><td>Không chốt action khi thiếu ngày đến hạn</td><td>Chủ trì</td><td>Action list có due</td></tr>
-<tr><td>5</td><td>Đóng action không có bằng chứng</td><td>đánh giá không đạt, lỗi lặp</td><td>Đóng action kèm link hồ sơ; QA/QMS kiểm tra hiệu lực</td><td>Người phụ trách + QA</td><td>Link bằng chứng trong bảng theo dõi</td></tr>
+<tr><td>5</td><td>Đóng action không có bằng chứng</td><td>đánh giá không đạt, lỗi lặp</td><td>Đóng action kèm link hồ sơ; QA/QMS kiểm tra hiệu lực</td><td>Responsible Person + QA</td><td>Link bằng chứng trong bảng theo dõi</td></tr>
 <tr><td>6</td><td>Minutes phát hành trễ</td><td>Mất nhịp triển khai, lệch thông tin 2 ca</td><td>Phát hành trong 24 giờ; KPI theo dõi</td><td>QA/QMS</td><td>Email/Teams thông báo + file</td></tr>
 <tr><td>7</td><td>Không review đánh giá phát hiện/CAPA</td><td>Repeat NC, khách đánh giá không đạt</td><td>Agenda có mục đánh giá + CAPA tuổi tồn</td><td>QA/QMS</td><td>CAPA list + trạng thái</td></tr>
 <tr><td>8</td><td>Bỏ qua phản hồi khách hàng/khiếu nại</td><td>Lọt lỗi, mất uy tín</td><td>Customer phản hồi là đầu vào bắt buộc</td><td>Sales/QA</td><td>Customer nhật ký + NCR/8D</td></tr>
@@ -572,7 +572,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:60px;">#</th>
 <th>Điểm kiểm soát</th>
-<th style="width:160px;">Người phụ trách</th>
+<th style="width:160px;">Responsible Person</th>
 <th style="width:260px;">Bằng chứng</th>
 <th>Tiêu chí đạt</th>
 </tr>
@@ -672,7 +672,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Đầu ra bắt buộc của MR gồm nội dung nào?<br/>
  A. Chỉ có KPI snapshot • B. Quyết định &amp; action &amp; nhu cầu nguồn lực • C. Chỉ có attendance • D. Chỉ có email mời họp</li>
 <li>Action MR hợp lệ phải có đủ thành phần nào?<br/>
- A. Người phụ trách phòng ban • B. Người phụ trách cá nhân + hạn + tiêu chí đóng + bằng chứng • C. Chỉ cần mô tả • D. Chỉ cần deadline</li>
+ A. Responsible Person phòng ban • B. Responsible Person cá nhân + hạn + tiêu chí đóng + bằng chứng • C. Chỉ cần mô tả • D. Chỉ cần deadline</li>
 <li>Khi KPI đỏ xuất hiện trong MR, hành động bắt buộc là gì?<br/>
  A. Ghi nhận để kỳ sau xử lý • B. Tạo action có người phụ trách/hạn/bằng chứng • C. Bỏ qua • D. Chờ khách nhắc</li>
 <li>MR Data Pack được “khóa snapshot” nhằm mục tiêu gì?<br/>
@@ -690,7 +690,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>MRR cho MR tối thiểu gồm gì?<br/>
  A. Agenda + attendance + Data Pack snapshot + minutes + bảng theo dõi hành động • B. Chỉ KPI • C. Chỉ email • D. Chỉ chữ ký</li>
 <li>Điều kiện đóng action đúng là gì?<br/>
- A. Người phụ trách nói đã làm • B. Có bằng chứng và kiểm tra hiệu lực • C. Quá hạn 01 tuần • D. Có ảnh chụp chat</li>
+ A. Responsible Person nói đã làm • B. Có bằng chứng và kiểm tra hiệu lực • C. Quá hạn 01 tuần • D. Có ảnh chụp chat</li>
 <li>Đầu vào “thay đổi nội bộ/ngoại bộ” nhằm mục tiêu gì?<br/>
  A. Trang trí báo cáo • B. Cập nhật rủi ro và thay đổi hệ thống phù hợp • C. Giảm số action • D. Tăng họp</li>
 <li>Ai có quyền chốt quyết định nguồn lực trong MR?<br/>
@@ -779,7 +779,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:60px;">#</th>
 <th>Bước triển khai</th>
-<th style="width:150px;">Người phụ trách</th>
+<th style="width:150px;">Responsible Person</th>
 <th style="width:260px;">Bằng chứng/MRR</th>
 <th>Lỗi hay gặp</th>
 </tr>
@@ -787,16 +787,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Phát hành agenda + template Data Pack</td><td>QA/QMS</td><td>Agenda file + template</td><td>Agenda không có mục action kỳ trước</td></tr>
 <tr><td>2</td><td>Khóa KPI dictionary cho kỳ MR</td><td>QA/QMS</td><td>Danh sách KPI + nguồn dữ liệu</td><td>KPI đổi định nghĩa giữa kỳ</td></tr>
-<tr><td>3</td><td>Thu đầu vào từ các bộ phận</td><td>Người phụ trách</td><td>Đầu vào file đúng format</td><td>Gửi số liệu không có kỳ/nguồn</td></tr>
+<tr><td>3</td><td>Thu đầu vào từ các bộ phận</td><td>Responsible Person</td><td>Đầu vào file đúng format</td><td>Gửi số liệu không có kỳ/nguồn</td></tr>
 <tr><td>4</td><td>Chụp snapshot bảng điều khiển (Data Pack)</td><td>QA/QMS</td><td>Data Pack versioned</td><td>Snapshot thiếu ngày/phiên bản</td></tr>
 <tr><td>5</td><td>Đánh dấu red items cần quyết định</td><td>QA/QMS</td><td>Danh sách red items</td><td>Không chuẩn bị câu hỏi quyết định</td></tr>
 <tr><td>6</td><td>Chạy MR theo agenda (45–60 phút)</td><td>Chủ trì</td><td>Attendance + minutes nháp</td><td>Sa đà tranh luận không chốt</td></tr>
-<tr><td>7</td><td>Chốt action: người phụ trách cá nhân + hạn + tiêu chí đóng</td><td>Chủ trì</td><td>Action list</td><td>Người phụ trách ghi phòng ban</td></tr>
+<tr><td>7</td><td>Chốt action: người phụ trách cá nhân + hạn + tiêu chí đóng</td><td>Chủ trì</td><td>Action list</td><td>Responsible Person ghi phòng ban</td></tr>
 <tr><td>8</td><td>Ghi quyết định nguồn lực</td><td>Chủ trì</td><td>Decision lines</td><td>Quyết định không gắn nguồn lực</td></tr>
 <tr><td>9</td><td>Hoàn thiện FRM-QMS-003</td><td>QA/QMS</td><td>FRM-QMS-003</td><td>Thiếu tham chiếu KPI/Đánh giá/Risk</td></tr>
 <tr><td>10</td><td>Phát hành minutes trong 24 giờ</td><td>QA/QMS</td><td>Minutes phát hành + thông báo</td><td>Phát hành trễ làm lệch ca</td></tr>
 <tr><td>11</td><td>Nhập action vào bảng theo dõi</td><td>QA/QMS</td><td>Bảng theo dõi hành động</td><td>Trạng thái không thống nhất</td></tr>
-<tr><td>12</td><td>Người phụ trách triển khai &amp; gắn bằng chứng</td><td>Người phụ trách</td><td>Bằng chứng link</td><td>Đóng action không có bằng chứng</td></tr>
+<tr><td>12</td><td>Responsible Person triển khai &amp; gắn bằng chứng</td><td>Responsible Person</td><td>Bằng chứng link</td><td>Đóng action không có bằng chứng</td></tr>
 <tr><td>13</td><td>QA/QMS kiểm tra hiệu lực</td><td>QA/QMS</td><td>Effectiveness check</td><td>Đóng mà không kiểm tra kết quả</td></tr>
 <tr><td>14</td><td>theo dõi tiếp action quá hạn tại Tier 2</td><td>Leads + QA</td><td>Biên bản Tier 2</td><td>Escalation không ghi nhận</td></tr>
 <tr><td>15</td><td>Đưa action chưa đóng vào MR kỳ sau</td><td>QA/QMS</td><td>Agenda MR kỳ sau</td><td>Reset action làm mất truy vết</td></tr>

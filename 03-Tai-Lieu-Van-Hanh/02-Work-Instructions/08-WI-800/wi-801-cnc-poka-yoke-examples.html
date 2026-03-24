@@ -60,11 +60,11 @@ ul.tight li {margin:4px 0;}
 
           <div class="row"><span><b>Phi&#234;n b&#7843;n:</b></span><span>V0</span></div>
 
-          <div class="row"><span><b>Ng&#224;y hi&#7879;u l&#7921;c:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Ng&#224;y hi&#7879;u l&#7921;c:</b></span><span>Per issuance decision</span></div>
 
-          <div class="row"><span><b>Ch&#7911; s&#7903; h&#7919;u:</b></span><span>QA Engineer / Production Supervisor / Quy trình Engineer</span></div>
+          <div class="row"><span><b>Ch&#7911; s&#7903; h&#7919;u:</b></span><span>QA Engineer / Production Supervisor / Process Engineer</span></div>
 
-          <div class="row"><span><b>Ph&#234; duy&#7879;t:</b></span><span>Tổng Giám Đốc</span></div>
+          <div class="row"><span><b>Ph&#234; duy&#7879;t:</b></span><span>General Director</span></div>
 
         </div>
       </div>
@@ -77,7 +77,7 @@ ul.tight li {margin:4px 0;}
 <div class="callout-danger"><strong>PHẢI</strong> triển khai giải pháp error-proofing thực chất cho lỗi lặp, lỗi có hậu quả lớn, sự cố suýt xảy ra nghiêm trọng hoặc lỗi dễ lọt qua cổng kiểm soát; không chỉ dừng ở “đào tạo lại”, “nhắc nhở cẩn thận hơn” hoặc “treo thêm bảng nhắc”.</div></div>
 
 <div class="section"><h2>2. Trigger bắt buộc phải triển khai poka-yoke</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trigger</th><th>Phải làm</th><th>Người phụ trách khởi tạo</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trigger</th><th>Phải làm</th><th>Responsible Person khởi tạo</th></tr></thead><tbody>
 <tr><td>Repeat vấn đề cùng cơ chế trong 2 kỳ / 2 job / 2 ca gần nhau</td><td>Mở đánh giá poka-yoke, không được đóng CAPA chỉ bằng đào tạo lại.</td><td>QA + khu vực phát sinh lỗi</td></tr>
 <tr><td>Sự cố suýt xảy ra có khả năng gây escape, crash, mixed part, sai phiên bản (wrong revision), sai material, sai CTQ</td><td>Phân tích ngay khả năng loại bỏ / liên động an toàn (interlock) / detect sớm tại nguồn.</td><td>Supervisor / QA</td></tr>
 <tr><td>New machine / new setup family / new route có rủi ro thao tác cao</td><td>Đánh giá trước khi sản xuất hàng loạt hoặc trước khi giao Job đầu tiên.</td><td>Engineering / Production</td></tr>

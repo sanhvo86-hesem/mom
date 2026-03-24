@@ -57,11 +57,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>C17-L4</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>C17-L4</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -109,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người phụ trách + bằng chứng)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>Điểm kiểm soát</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead>
+<thead><tr><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead>
 <tbody><tr><td><strong>Release governance (mô phỏng + rà soát đồng cấp + archive)</strong></td><td>ENG Lead</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-105_Peer_Review_Log.xlsx">FRM-QMS-007</a> + PROC-CNC-002</td><td>Không rà soát đồng cấp = BLOCK phát hành</td></tr><tr><td><strong>Template setup sheet &amp; tool list</strong></td><td>ENG Lead</td><td><a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-302_Setup_Sheet.xlsx">FRM-ENG-002</a></td><td>Không template = sai lệch theo người</td></tr><tr><td><strong>Control Plan cho CTQ</strong></td><td>QA/ENG</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-133_Control_Plan.xlsx">FRM-QA-012</a></td><td>CTQ không control plan = HOLD</td></tr><tr><td><strong>PFMEA-lite cho quy trình rủi ro</strong></td><td>QA/ENG</td><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-132_PFMEA_Lite.xlsx">FRM-QA-013</a></td><td>Quy trình mới/đổi lớn = PFMEA-lite bắt buộc</td></tr><tr><td><strong>SPC/Capability nhật ký</strong></td><td>QA</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-631_SPC_and_Process_Capability_Log.xlsx">FRM-QA-014</a></td><td>Capability dưới ngưỡng = action bắt buộc</td></tr><tr><td><strong>Gage R&amp;R cho đo CTQ</strong></td><td>QA</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-611_GRR_Study_Form.xlsx">FRM-QA-010</a></td><td>Đo không tin cậy = dữ liệu vô hiệu</td></tr><tr><td><strong>Training certification</strong></td><td>HR/QA</td><td><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-805_Skill_Level_Certificate.xlsx">FRM-HR-TRN-005</a></td><td>Không chứng nhận = không giao việc rủi ro</td></tr><tr><td><strong>Layered Quy trình Đánh giá</strong></td><td>QA/QMS</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-901-internal-audit-and-lpa.html">PROC-QA-002</a></td><td>Finding lặp = CAPA bắt buộc</td></tr></tbody>
 </table>
 </div>
@@ -120,7 +120,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Repeat vấn đề lại phải chặn</th></tr></thead>
+<thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Repeat vấn đề lại phải chặn</th></tr></thead>
 <tbody><tr><td>1</td><td>Chuẩn hóa CAM template + naming/version</td><td>ENG Lead</td><td>Template + SSOT rule</td><td>File rời = đánh giá không đạt</td></tr><tr><td>2</td><td>Chuẩn hóa setup sheet template</td><td>ENG Lead</td><td>FRM-ENG-002</td><td>Setup sai theo người</td></tr><tr><td>3</td><td>Thiết lập tool library &amp; fixture standard</td><td>ENG/MNT</td><td>PROC-MNT-001</td><td>Dao/fixture không đồng nhất</td></tr><tr><td>4</td><td>Xác định CTQ và tạo control plan</td><td>QA/ENG</td><td>FRM-QA-012</td><td>CTQ không plan = HOLD</td></tr><tr><td>5</td><td>Thiết lập SPC/capability nhật ký</td><td>QA</td><td>FRM-QA-014</td><td>Không SPC = drift</td></tr><tr><td>6</td><td>Xác nhận đo CTQ tin cậy (gage R&amp;R)</td><td>QA</td><td>FRM-QA-010</td><td>Đo sai = dữ liệu vô hiệu</td></tr><tr><td>7</td><td>Thiết kế lộ trình training theo vai trò</td><td>HR/ENG/QA</td><td>Training plan</td><td>Người mới không lên level</td></tr><tr><td>8</td><td>Thiết lập chứng nhận level và rule giao việc</td><td>HR/QA</td><td>FRM-HR-TRN-005</td><td>Giao việc sai năng lực</td></tr><tr><td>9</td><td>Triển khai đánh giá/LPA</td><td>QA/QMS</td><td>PROC-QA-002</td><td>Tiêu chuẩn không thực thi</td></tr><tr><td>10</td><td>Đóng vòng CAPA với xác minh</td><td>QMS</td><td>CAPA hồ sơ</td><td>Finding lặp</td></tr></tbody>
 </table>
 </div>

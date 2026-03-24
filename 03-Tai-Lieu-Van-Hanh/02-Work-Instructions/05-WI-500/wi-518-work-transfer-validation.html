@@ -61,11 +61,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
         </div>
         <div class="title"><strong>WI-518 — Xác nhận chuyển công đoạn, chuyển máy, chuyển ca và chuyển người vận hành</strong></div>
         <div class="meta">
-          <div class="row"><span><b>Mã:</b></span><span>WI-518</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>Production Manager / Planning Manager / QA Manager</span></div>
-          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+          <div class="row"><span><b>Code:</b></span><span>WI-518</span></div>
+          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+          <div class="row"><span><b>Owner:</b></span><span>Production Manager / Planning Manager / QA Manager</span></div>
+          <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
         </div>
       </div>
       <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi bàn giao Job giữa ca, giữa người vận hành, giữa máy, giữa công đoạn, hoặc khi chuyển WIP sang outsource/nhận lại từ outsource.</div>
@@ -79,7 +79,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại transfer</th><th>Khi xảy ra</th><th>Điều kiện vào</th><th>Người nhận xác nhận</th></tr></thead><tbody>
 <tr><td>Shift handover</td><td>Hết ca hoặc đổi người chạy cùng máy/cùng job</td><td>Máy an toàn, trạng thái job rõ, Qty cập nhật</td><td>Operator/Leader ca nhận</td></tr>
 <tr><td>Machine transfer</td><td>Chuyển cùng Op sang máy khác</td><td>Đã phê duyệt đổi machine, release set cập nhật</td><td>Setup/Production tại máy nhận</td></tr>
-<tr><td>Operation transfer</td><td>Chuyển sang OpSeq kế tiếp</td><td>Op hiện tại đầy đủ, hồ sơ đủ, label đúng</td><td>Người phụ trách công đoạn kế tiếp</td></tr>
+<tr><td>Operation transfer</td><td>Chuyển sang OpSeq kế tiếp</td><td>Op hiện tại đầy đủ, hồ sơ đủ, label đúng</td><td>Responsible Person công đoạn kế tiếp</td></tr>
 <tr><td>Outsource transfer</td><td>Gửi ra vendor/nhận từ vendor</td><td>PO flowdown, cert requirement, packaging đúng</td><td>WHS / PUR / QA</td></tr>
 <tr><td>Rework loop</td><td>Quay lại bước trước hoặc chuyển tuyến sửa</td><td>Có disposition rõ và route đặc biệt</td><td>QA + Production</td></tr>
 </tbody></table></div>
@@ -108,7 +108,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="matrix">
 <div class="card"><h3>5.1 Shift handover</h3><ul class="tight" style="padding-left:20px;"><li>Chốt part cuối cùng đang nằm ở trạng thái nào: good / suspect / đang đo / đang chờ quyết định.</li><li>Giao rõ tool sắp hết life, offset vừa chỉnh, đặc tính đang drift, lỗi vừa xảy ra.</li><li>Người nhận phải thực hiện quick-check theo <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a> trước khi bấm chạy lại.</li></ul></div>
 <div class="card"><h3>5.2 Machine transfer</h3><ul class="tight" style="padding-left:20px;"><li>Không dùng state của máy cũ để suy diễn máy mới.</li><li>Phải re-establish WCS/fixture/tooling trên máy mới và đánh giá lại mẫu đầu/FAI theo impact.</li><li>Routing/dispatch phải cập nhật trước khi chuyển WIP vật lý.</li></ul></div>
-<div class="card"><h3>5.3 Operation transfer</h3><ul class="tight" style="padding-left:20px;"><li>Container phải được move scan đúng công đoạn.</li><li>Điểm kiểm của công đoạn trước phải đóng đủ trước khi chuyển.</li><li>Người phụ trách công đoạn nhận kiểm tình trạng bề mặt, traceability và hồ sơ kèm theo.</li></ul></div>
+<div class="card"><h3>5.3 Operation transfer</h3><ul class="tight" style="padding-left:20px;"><li>Container phải được move scan đúng công đoạn.</li><li>Điểm kiểm của công đoạn trước phải đóng đủ trước khi chuyển.</li><li>Responsible Person công đoạn nhận kiểm tình trạng bề mặt, traceability và hồ sơ kèm theo.</li></ul></div>
 <div class="card"><h3>5.4 Outsource transfer</h3><ul class="tight" style="padding-left:20px;"><li>Phải có flowdown, packaging, label và cert requirement rõ.</li><li>Khi nhận về phải kiểm qty, tình trạng kiện, bộ chứng từ chứng nhận và trạng thái hold trước khi nhập.</li><li>Không nhập kho “treo chứng từ” cho job yêu cầu cert bắt buộc.</li></ul></div>
 </div></div>
 

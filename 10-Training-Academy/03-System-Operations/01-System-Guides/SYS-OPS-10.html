@@ -57,11 +57,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-10</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-10</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -218,37 +218,37 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:18%">Điểm chặn</th>
 </tr>
 <tr>
-<td><b>H0 — Yêu cầu thay đổi</b><br/>Người phụ trách: Supervisor/chủ quá trình</td>
+<td><b>H0 — Yêu cầu thay đổi</b><br/>Responsible Person: Supervisor/Process Owner</td>
 <td>Yêu cầu nghiệp vụ + rủi ro + phạm vi dữ liệu</td>
 <td>Ticket/Yêu cầu thay đổi + phân loại dữ liệu + môi trường mục tiêu</td>
 <td>Thiếu ticket → BLOCK</td>
 </tr>
 <tr>
-<td><b>H1 — Thiết kế &amp; Build Sheet</b><br/>Người phụ trách: IT + QA</td>
+<td><b>H1 — Thiết kế &amp; Build Sheet</b><br/>Responsible Person: IT + QA</td>
 <td>Baseline governance (SOP-QMS-011/012/013/014)</td>
 <td>Build Sheet Setting IDs + tiêu chí đạt + acceptance tests + kế hoạch rollback</td>
 <td>Thiếu Setting ID/Acceptance → HOLD</td>
 </tr>
 <tr>
-<td><b>H2 — DEV build</b><br/>Người phụ trách: Programmer</td>
+<td><b>H2 — DEV build</b><br/>Responsible Person: Programmer</td>
 <td>Solution structure + publisher + version rules</td>
 <td>Unmanaged solution trong DEV + export source + env vars + connection refs</td>
 <td>Hard-code connection/value → HOLD</td>
 </tr>
 <tr>
-<td><b>H3 — UAT deploy</b><br/>Người phụ trách: Programmer</td>
+<td><b>H3 — UAT deploy</b><br/>Responsible Person: Programmer</td>
 <td>Gói import-ready + deployment settings + bảng kiểm pre-import</td>
 <td>Managed package deploy vào UAT + nhật ký triển khai + bằng chứng thô</td>
 <td>Không chạy acceptance tests → BLOCK</td>
 </tr>
 <tr>
-<td><b>H4 — QA validate</b><br/>Người phụ trách: QA</td>
+<td><b>H4 — QA validate</b><br/>Responsible Person: QA</td>
 <td>Bằng chứng thô + Build Sheet + acceptance results</td>
 <td>QA sign-off theo mục + vấn đề list đóng hết hoặc được disposition</td>
 <td>Thiếu sign-off → BLOCK</td>
 </tr>
 <tr>
-<td><b>H5 — PROD deploy &amp; freeze</b><br/>Người phụ trách: Supervisor + QA + IT</td>
+<td><b>H5 — PROD deploy &amp; freeze</b><br/>Responsible Person: Supervisor + QA + IT</td>
 <td>UAT sign-off + backup/export + access snapshot</td>
 <td>Deploy vào PROD qua pipeline; bật guardrails; lưu bộ bằng chứng</td>
 <td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) → BLOCK</td>
@@ -276,7 +276,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="form-table">
 <tr>
 <th style="width:22%">Điểm kiểm soát</th>
-<th style="width:16%">Người phụ trách</th>
+<th style="width:16%">Responsible Person</th>
 <th>Bằng chứng (MRR)</th>
 <th style="width:18%">Rủi ro bị chặn</th>
 </tr>
@@ -376,19 +376,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </table>
 <!-- 8) -->
-<h2 id="sec8">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Người phụ trách, Bằng chứng/MRR, điểm sai hay gặp</h2>
+<h2 id="sec8">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Bằng chứng/MRR, điểm sai hay gặp</h2>
 <table class="form-table">
 <tr>
 <th style="width:6%">#</th>
 <th style="width:22%">Bước</th>
-<th style="width:16%">Người phụ trách</th>
+<th style="width:16%">Responsible Person</th>
 <th>Bằng chứng/MRR</th>
 <th style="width:22%">Điểm sai hay gặp</th>
 </tr>
 <tr>
 <td>1</td>
 <td>Tạo ticket/Yêu cầu thay đổi và phân loại dữ liệu</td>
-<td>Supervisor/chủ quá trình</td>
+<td>Supervisor/Process Owner</td>
 <td>Ticket ID + phạm vi thay đổi + mức dữ liệu (Internal/Customer-Confidential/Restricted)</td>
 <td>Thiếu phạm vi dữ liệu → DLP không đúng</td>
 </tr>

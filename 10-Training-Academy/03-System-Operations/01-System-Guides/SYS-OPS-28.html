@@ -67,11 +67,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-28</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-28</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 
@@ -141,7 +141,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead>
 <tr>
 <th style="width:220px">Kích hoạt (trigger)</th>
-<th style="width:220px">Người phụ trách chính</th>
+<th style="width:220px">Responsible Person chính</th>
 <th>Hành động bắt buộc</th>
 <th style="width:220px">MRR tối thiểu</th>
 </tr>
@@ -280,19 +280,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Zone01</b><div class="muted">Controlled</div></td>
-<td>QA/QMS (Người phụ trách), Supervisor (approve)</td>
+<td>QA/QMS (Responsible Person), Supervisor (approve)</td>
 <td>SOP/WI/Forms master; phiên bản released duy nhất; kho obsolete (read-only)</td>
 <td>Không lưu bằng chứng theo Job; không lưu draft dài ngày</td>
 </tr>
 <tr>
 <td><b>Zone02</b><div class="muted">Part/Rev</div></td>
-<td>Programmer/Engineering (Người phụ trách), QA (ack)</td>
+<td>Programmer/Engineering (Responsible Person), QA (ack)</td>
 <td>Drawing/CAD/CAM/Setup released theo PartNum-Rev; package release</td>
 <td>Không nhét bằng chứng theo Job; không chạy shopfloor từ tệp cục bộ (local file)/USB</td>
 </tr>
 <tr>
 <td><b>Zone03</b><div class="muted">Job Bằng chứng</div></td>
-<td>Planner/Production/QC/Warehouse (Contributor), QA (Người phụ trách)</td>
+<td>Planner/Production/QC/Warehouse (Contributor), QA (Responsible Person)</td>
 <td>Hồ sơ công việc + pack bằng chứng (kiểm tra, ship, cert, outsource)</td>
 <td>Không lưu master Part/Rev; không chỉnh sửa file sau khi declare hồ sơ</td>
 </tr>
@@ -415,7 +415,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead>
 <tr>
 <th style="width:210px">Điểm kiểm soát</th>
-<th style="width:200px">Người phụ trách</th>
+<th style="width:200px">Responsible Person</th>
 <th>Thao tác chặn rủi ro</th>
 <th style="width:240px">Bằng chứng (MRR)</th>
 </tr>
@@ -528,7 +528,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:200px">Tình huống</th>
 <th style="width:220px">Quyết định bắt buộc</th>
 <th>MRR phải tạo</th>
-<th style="width:180px">Người phụ trách chốt</th>
+<th style="width:180px">Responsible Person chốt</th>
 </tr>
 </thead>
 <tbody>
@@ -573,7 +573,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 8) Checklist -->
 <div class="card" id="checklist">
-<h2 class="h2" style="margin-top:0">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Người phụ trách, Bằng chứng/MRR, điểm sai hay gặp</h2>
+<h2 class="h2" style="margin-top:0">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Bằng chứng/MRR, điểm sai hay gặp</h2>
 <div class="note">
 <b>Luật bảng kiểm:</b> hoàn tất từng bước mới được chuyển bước kế tiếp trong E2E. Thiếu MRR = FAIL cổng kiểm soát.
  </div>
@@ -581,7 +581,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead>
 <tr>
 <th style="width:44px">#</th>
-<th style="width:160px">Người phụ trách</th>
+<th style="width:160px">Responsible Person</th>
 <th>Hành động bắt buộc</th>
 <th style="width:220px">Bằng chứng/MRR</th>
 <th style="width:220px">Điểm sai hay gặp</th>

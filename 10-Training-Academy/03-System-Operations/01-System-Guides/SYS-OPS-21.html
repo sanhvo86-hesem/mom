@@ -57,11 +57,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-21</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-21</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -157,7 +157,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Part bị lẫn lô (lẫn lộn (mix-up)) khi gửi đi hoặc khi nhận về; nhãn lot/serial không khớp.</li>
 <li>Thiếu chứng chỉ bắt buộc (CoC/CoA/heat treat/plating cert) hoặc chứng chỉ không khớp PO/Rev.</li>
 <li>Không đo CTQ bị ảnh hưởng bởi finishing (thickness/hardness/dimension drift) trước khi release.</li>
-<li>Đóng gói không bảo vệ bề mặt sau finishing; trầy xước làm phát sinh scrap/rework.</li>
+<li>Packaging không bảo vệ bề mặt sau finishing; trầy xước làm phát sinh scrap/rework.</li>
 <li>Bỏ qua cổng kiểm soát nhận về do áp lực tiến độ; hàng đi thẳng vào sản xuất/giao hàng khi chưa PASS.</li>
 <li>Không cập nhật thẻ điểm; không kích hoạt hành động khi KPI tụt; rủi ro lặp lại NCR.</li>
 <li>Không lưu hồ sơ đúng nơi; không truy xuất được trong 60 giây khi đánh giá/khách hàng hỏi.</li>
@@ -175,7 +175,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <table class="form-table">
-<tr><th>#</th><th>Điểm kiểm soát</th><th>Người phụ trách</th><th>Bằng chứng (MRR)</th><th>Điểm chặn</th></tr>
+<tr><th>#</th><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng (MRR)</th><th>Điểm chặn</th></tr>
 <tr>
 <td>CP1</td>
 <td>Phân loại rủi ro mua hàng/thuê ngoài và khóa NCC theo ASL/AVL</td>
@@ -283,9 +283,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Khoá cổng kiểm soát + điều tra nguyên nhân</td>
 </tr>
 </table>
-<h2 class="h2">8) Bảng kiểm vận hành (≤15 bước) — Người phụ trách + Bằng chứng/MRR + lỗi lặp lại</h2>
+<h2 class="h2">8) Bảng kiểm vận hành (≤15 bước) — Responsible Person + Bằng chứng/MRR + lỗi lặp lại</h2>
 <table class="form-table">
-<tr><th>#</th><th>Bước thao tác</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Điểm lỗi lặp</th></tr>
+<tr><th>#</th><th>Bước thao tác</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Điểm lỗi lặp</th></tr>
 <tr><td>1</td><td>Xác định công đoạn thuê ngoài &amp; rủi ro (special/critical)</td><td>Engineering + QA</td><td>CTQ list / note trên job pack</td><td>Không ghi rõ vùng CTQ hoặc yêu cầu masking</td></tr>
 <tr><td>2</td><td>Chọn NCC từ ASL/AVL; khóa sub‑tier</td><td>Purchasing</td><td>ASL/AVL entry + FRM-PUR-002</td><td>Dùng NCC “quen” nhưng chưa phê duyệt</td></tr>
 <tr><td>3</td><td>Hoàn tất FRM-PUR-003 (yêu cầu kỹ thuật + điều kiện chất lượng)</td><td>Purchasing + QA</td><td>FRM-PUR-003 ký</td><td>Thiếu spec/độ dày/màu/tiêu chuẩn</td></tr>

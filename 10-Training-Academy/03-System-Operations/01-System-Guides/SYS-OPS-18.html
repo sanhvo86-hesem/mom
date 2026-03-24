@@ -56,11 +56,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-18</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-18</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent"><div class="card">
@@ -93,7 +93,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Lý do tồn tại (Cổng kiểm soát Logic):</b> Kết quả đo là điều kiện mở cổng kiểm soát cho nhận hàng, chấp nhận công đoạn, FAI, Final, Ship. Thiết bị đo sai trạng thái tạo false-accept/false-reject, kéo theo ship sai, NCR/MRB, claim, đánh giá finding.</li>
 <li><b>Khi kích hoạt:</b> Khi đưa thiết bị đo mới vào xưởng; khi đến hạn hiệu chuẩn; khi thiết bị bị rơi/va đập/tiếp xúc dầu-nước; khi nhận chứng chỉ hiệu chuẩn; khi phát hiện OOT; khi đặc tính CTQ có dung sai chặt; khi khách hàng yêu cầu MSA/traceability.</li>
-<li><b>Chủ trách nhiệm chính:</b> QA/QMS (Metrology Người phụ trách) chịu trách nhiệm chương trình hiệu chuẩn end-to-end, quyết định HOLD/RELEASE trong sự kiện OOT.</li>
+<li><b>Chủ trách nhiệm chính:</b> QA/QMS (Metrology Responsible Person) chịu trách nhiệm chương trình hiệu chuẩn end-to-end, quyết định HOLD/RELEASE trong sự kiện OOT.</li>
 <li><b>Nguyên tắc vận hành:</b> Không có nhãn trạng thái hợp lệ tại điểm sử dụng = không được đo. Không có chứng chỉ traceability hợp lệ = không được dùng kết quả đo cho quyết định ĐẠT/KHÔNG ĐẠT.</li>
 </ul>
 <div class="note">
@@ -109,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p><b>Chuỗi E2E:</b> Báo giá/Hợp đồng → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Phản hồi/CI.</p>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>Bước E2E</th><th>Đầu vào</th><th>Người phụ trách</th><th>Đầu ra</th><th>Điểm chặn (Cổng kiểm soát)</th></tr></thead>
+<thead><tr><th>Bước E2E</th><th>Đầu vào</th><th>Responsible Person</th><th>Đầu ra</th><th>Điểm chặn (Cổng kiểm soát)</th></tr></thead>
 <tbody>
 <tr><td>Báo giá/Hợp đồng</td><td>Yêu cầu khách về traceability, MSA, tiêu chuẩn hiệu chuẩn</td><td>Estimator (SAL-03)</td><td>Danh mục yêu cầu đo/hiệu chuẩn theo hợp đồng</td><td>Không có yêu cầu rõ = ghi M365/SharePoint → HESEM-QMS-SSOT vào Planning &amp; rà soát hợp đồng</td></tr>
 <tr><td>Planning</td><td>CTQ, tần suất kiểm, plan công đoạn</td><td>Planner</td><td>kế hoạch kiểm tra (kiểm tra plan) + lịch tránh trùng hạn hiệu chuẩn</td><td>Plan dùng thiết bị quá hạn = BLOCK phát hành traveler</td></tr>
@@ -145,7 +145,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6 điểm kiểm soát)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>#</th><th>Điểm kiểm soát</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Điểm chặn</th></tr></thead>
+<thead><tr><th>#</th><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Điểm chặn</th></tr></thead>
 <tbody>
 <tr><td>CP1</td><td>Gage list bắt buộc có ID duy nhất, nhóm (Dimension/Go-NoGo/Precision/Tiêu chuẩn), vị trí dùng, người phụ trách, chu kỳ, ngày đến hạn</td><td>QA</td><td>FRM-QMS-04 Calibration Log (bản kiểm soát)</td><td>Thiết bị không nằm trong nhật ký = BLOCK dùng cho quyết định chất lượng</td></tr>
 <tr><td>CP2</td><td>Thiết lập chu kỳ theo rủi ro: tần suất dùng, môi trường, lịch sử ổn định, mức CTQ, yêu cầu khách</td><td>QA + Supervisor</td><td>Dòng “Basis/Reason” trong FRM-QMS-04 + biên bản review hằng năm</td><td>Không có basis = HOLD phê duyệt chu kỳ</td></tr>
@@ -183,10 +183,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="section">
-<h2>8) Bảng kiểm vận hành (≤15 bước; mỗi bước có Người phụ trách, Bằng chứng/MRR, điểm sai hay gặp)</h2>
+<h2>8) Bảng kiểm vận hành (≤15 bước; mỗi bước có Responsible Person, Bằng chứng/MRR, điểm sai hay gặp)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Điểm sai hay gặp</th></tr></thead>
+<thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Điểm sai hay gặp</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Gán ID duy nhất cho thiết bị mới và dán nhãn “NEW–QA REVIEW”</td><td>Warehouse</td><td>Phiếu nhận + ảnh nhãn</td><td>Dán nhãn nhưng không ghi ID trên chứng chỉ</td></tr>
 <tr><td>2</td><td>Đăng ký vào FRM-QMS-04: nhóm thiết bị, vị trí dùng, người phụ trách, interval, ngày đến hạn</td><td>QA</td><td>FRM-QMS-04 (bản kiểm soát)</td><td>Thiếu vị trí dùng → mất kiểm soát tại điểm sử dụng</td></tr>
@@ -277,7 +277,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>(MC) Xác minh trước khi dùng bắt buộc ghi: A) Chỉ chữ ký B) Giá trị đo hoặc kết quả master check + ID thiết bị C) Chỉ ngày D) Không cần.</li>
 <li>(MC) MSA/Gage R&amp;R bắt buộc kích hoạt khi: A) CTQ dung sai chặt hoặc quyết định release B) Khi hết giấy in C) Khi trời mưa D) Khi có khách tham quan.</li>
 <li>(Tình huống ngắn) Khi Operator phát hiện caliper hết hạn trong lúc đang đo 10 pcs, phải ghi những hồ sơ nào tối thiểu trước khi rời khỏi vị trí?</li>
-<li>(MC) Ai có quyền chốt quyết định containment trong OOT? A) Operator B) QA (Metrology Người phụ trách) C) Bất kỳ ai D) Khách bảo gì làm nấy.</li>
+<li>(MC) Ai có quyền chốt quyết định containment trong OOT? A) Operator B) QA (Metrology Responsible Person) C) Bất kỳ ai D) Khách bảo gì làm nấy.</li>
 <li>(MC) PO dịch vụ hiệu chuẩn bắt buộc ràng buộc: A) Thời gian giao B) Traceability + nội dung chứng chỉ C) Màu giấy D) Kích thước hộp.</li>
 <li>(MC) Thiết bị về từ hiệu chuẩn nhưng chưa QA review cert. Trạng thái bắt buộc: A) OK B) NEW–QA REVIEW C) Bỏ nhãn D) Dán nhãn của xưởng khác.</li>
 <li>(MC) Khi review cert, điểm nào là critical? A) ID khớp thiết bị B) as-found/as-left C) ngày + ngày đến hạn D) Tất cả các ý.</li>

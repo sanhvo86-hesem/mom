@@ -48,7 +48,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
 </div>
 <div class="title"><strong>SOP-901 — Đánh giá nội bộ và LPA</strong><span class="sub-vn">Đánh giá đúng rủi ro, đi gemba đúng trọng tâm, đóng finding tới hiệu lực</span></div>
-<div class="meta"><div class="row"><span><b>Mã:</b></span><span>SOP-901</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Engineer / QA Manager</span></div><div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div></div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span>SOP-901</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div><div class="row"><span><b>Owner:</b></span><span>QMS Engineer / QA Manager</span></div><div class="row"><span><b>Approved by:</b></span><span>General Director</span></div></div>
 </div>
 <div class="doc-content" id="docContent"><div class="form-sheet">
 <div class="iso-map"><div class="iso-title">Chuẩn mực điều hành bắt buộc</div>
@@ -98,18 +98,18 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="boxed-list"><div class="lane-title">Vai trò chính</div><ul class="tight">
 <li><b>QMS Engineer</b>: sở hữu chương trình đánh giá, lập lịch, đào tạo auditor, phát hành finding, theo dõi closure, báo cáo trend.</li>
 <li><b>QA Manager</b>: phê duyệt chương trình, phân cấp finding, kích hoạt escalation cho critical/major, khóa discipline về closure.</li>
-<li><b>chủ quá trình</b>: cung cấp hồ sơ, tiếp nhận finding, triển khai correction/corrective action, chứng minh hiệu lực.</li>
+<li><b>Process Owner</b>: cung cấp hồ sơ, tiếp nhận finding, triển khai correction/corrective action, chứng minh hiệu lực.</li>
 <li><b>Internal Auditor / LPA Assignee</b>: thực hiện đánh giá đúng phạm vi, đúng tiêu chí, độc lập, ghi bằng chứng chính xác.</li>
 <li><b>Production Director / Functional Head</b>: giải quyết nguồn lực, trade-off, backlog closure và repeat finding liên phòng ban.</li>
 </ul></div>
 <div class="boxed-list"><div class="lane-title">Quyền hạn bắt buộc</div><ul class="tight">
 <li>Auditor có quyền yêu cầu mở containment tức thời khi chạm risk lỗi lọt, clean break, sai phiên bản (wrong revision), sai label, sai truy xuất hoặc vi phạm safety/FOD.</li>
-<li>QMS Engineer có quyền yêu cầu chủ quá trình bổ sung bằng chứng, chỉ chấp nhận closure có bằng chứng hiệu lực.</li>
+<li>QMS Engineer có quyền yêu cầu Process Owner bổ sung bằng chứng, chỉ chấp nhận closure có bằng chứng hiệu lực.</li>
 <li>QA Manager có quyền nâng finding lên Major/Critical, yêu cầu war-room hoặc customer notification theo <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</li>
 <li>Delegation và backup phải tuân theo <a href="../../03-Reference/01-ANNEX-100/annex-123-deputy-backup-matrix.html">ANNEX-123</a>. Không dùng “anh ấy đi vắng” làm lý do trễ containment hoặc trễ closure.</li>
 </ul></div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:32%"/><col style="width:17%"/><col style="width:17%"/><col style="width:17%"/><col style="width:17%"/></colgroup><thead><tr><th>Hoạt động</th><th>QMS Engineer</th><th>QA Manager</th><th>chủ quá trình</th><th>Functional Head</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:32%"/><col style="width:17%"/><col style="width:17%"/><col style="width:17%"/><col style="width:17%"/></colgroup><thead><tr><th>Hoạt động</th><th>QMS Engineer</th><th>QA Manager</th><th>Process Owner</th><th>Functional Head</th></tr></thead><tbody>
 <tr><td>Lập chương trình đánh giá theo rủi ro</td><td>R</td><td>A</td><td>C</td><td>C</td></tr>
 <tr><td>Phê duyệt lịch / bổ nhiệm auditor</td><td>R</td><td>A</td><td>I</td><td>I</td></tr>
 <tr><td>Thực hiện đánh giá / LPA</td><td>R</td><td>C</td><td>C</td><td>I</td></tr>
@@ -166,7 +166,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ol>
 <h3 class="h3">7.3 Thực hiện Đánh giá nội bộ tại gemba</h3>
 <div class="callout-grid">
-<div class="callout-card"><h3>Chuỗi bắt buộc</h3><ul class="tight"><li>Open meeting ngắn, chốt objective.</li><li>Đi gemba tại cell/job thực tế.</li><li>Truy hồ sơ → hiện trường → hồ sơ ngược lại.</li><li>Chụp bằng chứng, ghi đầy đủ machine/cell/job/rev/op.</li><li>Đọc lại finding ngay với chủ quá trình để thống nhất hiểu cùng một vấn đề.</li></ul></div>
+<div class="callout-card"><h3>Chuỗi bắt buộc</h3><ul class="tight"><li>Open meeting ngắn, chốt objective.</li><li>Đi gemba tại cell/job thực tế.</li><li>Truy hồ sơ → hiện trường → hồ sơ ngược lại.</li><li>Chụp bằng chứng, ghi đầy đủ machine/cell/job/rev/op.</li><li>Đọc lại finding ngay với Process Owner để thống nhất hiểu cùng một vấn đề.</li></ul></div>
 <div class="callout-card"><h3>Điểm phải chạm</h3><ul class="tight"><li>Revision thực chạy có khớp traveler, setup sheet, bộ hồ sơ chuẩn (baseline package) và phát hành chương trình không.</li><li>Cổng kiểm soát quality, phê duyệt giao hàng, clean pack và traceability có được giữ đúng không.</li><li>Dữ liệu M365/ERP có phản ánh đúng sự kiện thực tế không, hay đang có shadow hồ sơ.</li><li>Thẩm quyền và escalation có được thực hiện đúng người, đúng thời điểm không.</li></ul></div>
 </div>
 <h3 class="h3">7.4 Thiết kế và thực hiện LPA</h3>
@@ -186,7 +186,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ol>
 <h3 class="h3">7.6 Containment, escalation và liên kết CAPA</h3>
 <ol class="tight">
-<li>Nếu finding chạm tới product suspect, label/trace mismatch, cổng kiểm soát vượt qua, leak/clean risk, revision mismatch hoặc out-of-control condition, auditor phải yêu cầu chủ quá trình containment ngay và mở đường dẫn tới <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>.</li>
+<li>Nếu finding chạm tới product suspect, label/trace mismatch, cổng kiểm soát vượt qua, leak/clean risk, revision mismatch hoặc out-of-control condition, auditor phải yêu cầu Process Owner containment ngay và mở đường dẫn tới <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>.</li>
 <li>Mọi critical/major quá hạn, repeat finding lần 2 trở lên, hoặc finding chạm khách hàng phải leo thang theo <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</li>
 <li>Job có khiếu nại/escape đang mở phải được ưu tiên đánh giá theo dõi tiếp theo trung tâm điều hành (control tower) của <a href="../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a>.</li>
 </ol>
@@ -201,7 +201,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <ol class="tight">
 <li>Hàng tháng, QMS Engineer phải xem bảng điều khiển: adherence, overdue, repeat, severity, by-quy trình, by-cell, closure pass rate.</li>
 <li>Nếu finding tập trung vào cùng một họ rủi ro, chương trình đánh giá phải đổi sampling hoặc đổi bảng kiểm. Không tiếp tục đánh giá giống cũ và mong kết quả khác.</li>
-<li>Hàng quý, Trưởng QA phải xem liệu chương trình đánh giá đã chạm đúng rủi ro lớn nhất của nhà máy chưa: ngày đến hạn miss, clean/vacuum risk, outsource risk, traceability risk, phê duyệt giao hàng risk, data governance risk.</li>
+<li>Hàng quý, QA Lead phải xem liệu chương trình đánh giá đã chạm đúng rủi ro lớn nhất của nhà máy chưa: ngày đến hạn miss, clean/vacuum risk, outsource risk, traceability risk, phê duyệt giao hàng risk, data governance risk.</li>
 <li>Kết quả này phải trở thành đầu vào chính thức cho <a href="sop-902-management-review.html">SOP-902</a> và kế hoạch cải tiến tại <a href="sop-903-continual-improvement-and-kaizen.html">SOP-903</a>.</li>
 </ol>
 
@@ -230,7 +230,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <h2 class="h2" id="p9">9. Hệ thống, hồ sơ &amp; dữ liệu</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:34%"/><col style="width:48%"/></colgroup><thead><tr><th>Nhóm hồ sơ</th><th>Lưu gì</th><th>Quy định</th></tr></thead><tbody>
 <tr><td>Đánh giá Program</td><td>Lịch năm/quý/tháng, risk rationale, area scope, assigned auditor.</td><td>Phải truy vết được vì sao đánh giá này được ưu tiên và ai là người phê duyệt.</td></tr>
-<tr><td>Đánh giá / LPA Hồ sơ</td><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-901_Internal_Audit_Checklist.xlsx">FRM-901</a>, <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-902_Layered_Process_Audit_Checklist.xlsx">FRM-902</a>, ảnh, note, sample list.</td><td>Mỗi hồ sơ phải có mã, ngày, auditor, khu vực, chủ quá trình và bằng chứng path.</td></tr>
+<tr><td>Đánh giá / LPA Hồ sơ</td><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-901_Internal_Audit_Checklist.xlsx">FRM-901</a>, <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-902_Layered_Process_Audit_Checklist.xlsx">FRM-902</a>, ảnh, note, sample list.</td><td>Mỗi hồ sơ phải có mã, ngày, auditor, khu vực, Process Owner và bằng chứng path.</td></tr>
 <tr><td>Finding &amp; CAPA</td><td>Finding register, <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>, <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a>.</td><td>Finding major/critical phải link được tới containment và kế hoạch hành động.</td></tr>
 <tr><td>Bộ bằng chứng</td><td>Ảnh, export, scan, bảng kiểm signed, escalation proof, closure proof.</td><td>Phải tuân theo naming/folder rule tại <a href="../../03-Reference/01-ANNEX-100/annex-107-audit-evidence-pack-master.html">ANNEX-107</a>.</td></tr>
 <tr><td>Bảng điều khiển / KPI</td><td>Adherence, overdue, repeat, severity, pass rate, layer completion.</td><td>Định nghĩa và data model theo <a href="../../03-Reference/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>.</td></tr>

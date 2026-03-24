@@ -57,11 +57,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-27</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-27</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -96,7 +96,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li><b>QA/QMS:</b> chủ lịch lưu trữ, phê duyệt thay đổi, quản trị disposition.</li>
 <li><b>QC/QA:</b> đảm bảo hồ sơ Tier-1 hoàn chỉnh trước phê duyệt giao hàng (ship release).</li>
-<li><b>OPS/Người phụ trách từng khu vực:</b> nộp hồ sơ đúng loại nội dung/metadata để tự dán nhãn chạy đúng.</li>
+<li><b>OPS/Responsible Person từng khu vực:</b> nộp hồ sơ đúng loại nội dung/metadata để tự dán nhãn chạy đúng.</li>
 </ul>
 <div class="small muted">Vai trò IT/M365 hỗ trợ cấu hình hệ thống được ghi trong bảng kiểm và MRR, không thuộc TargetRoles của mô-đun.</div>
 </div>
@@ -221,7 +221,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">7) Bảng kiểm vận hành (≤15 bước)</span>
 <h2 class="h2" style="margin-top:12px;">Bảng kiểm triển khai &amp; vận hành Purview retention</h2>
 <table class="form-table">
-<tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Điểm sai lặp lại</th></tr>
+<tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Điểm sai lặp lại</th></tr>
 <tr><td>1</td><td>Chốt taxonomy nhãn T1/T2/T3 và thời hạn lưu</td><td>QA/QMS</td><td>Trích xuất danh sách nhãn + phê duyệt</td><td>Đổi thời hạn lưu không có phê duyệt</td></tr>
 <tr><td>2</td><td>Chuẩn hóa site columns: JobNum/PartNum/RevisionNum/RecordType/RecordID</td><td>QA/QMS + Admin hệ thống</td><td>Danh mục cột + ảnh cấu hình</td><td>Đặt sai kiểu dữ liệu, không bắt buộc</td></tr>
 <tr><td>3</td><td>Tạo loại nội dungs theo bộ mẫu cấu hình (SSOT) (9 loại) và gán required columns</td><td>QA/QMS + Admin hệ thống</td><td>Bảng mapping loại nội dung</td><td>Tên loại nội dung không khớp → policy không match</td></tr>

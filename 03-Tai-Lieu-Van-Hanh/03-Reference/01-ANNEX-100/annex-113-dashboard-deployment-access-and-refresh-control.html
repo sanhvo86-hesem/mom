@@ -90,11 +90,11 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
     <span class="sub-vn">Khóa cách phát hành bảng điều khiển quản trị từ dataset đến người dùng cuối: người phụ trách, nguồn chuẩn, refresh, publish, rollback và phản ứng khi dữ liệu số không còn đáng tin.</span>
   </div>
   <div class="meta">
-    <div class="row"><span><b>Mã:</b></span><span>ANNEX-113</span></div>
-    <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-    <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-    <div class="row"><span><b>Chủ sở hữu:</b></span><span>IT Manager / QMS Manager / Bảng điều khiển Người phụ trách</span></div>
-    <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+    <div class="row"><span><b>Code:</b></span><span>ANNEX-113</span></div>
+    <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+    <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+    <div class="row"><span><b>Owner:</b></span><span>IT Manager / QMS Manager / Dashboard Responsible Person</span></div>
+    <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
   </div>
 </div>
 <div class="doc-content" id="docContent"><div class="form-sheet">
@@ -129,7 +129,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <h2 class="h2" id="a2">2. Kiến trúc bảng điều khiển, người phụ trách và source hierarchy</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Bảng điều khiển family</th><th>Dùng để quyết định gì</th><th>chủ nghiệp vụ</th><th>chủ dữ liệu</th><th>SoR / nguồn chuẩn</th><th>Cadence / freeze mặc định</th><th>Fallback khi lỗi</th></tr></thead><tbody>
 <tr><td>Executive / QMS cockpit</td><td>OTD, risk delivery, khiếu nại, CAPA tuổi tồn (aging), đánh giá closure, trend T4</td><td>CEO / QA Manager</td><td>IT / QMS chủ dữ liệu</td><td>Epicor + controlled M365 registers + approved bộ hồ sơ rà soát</td><td>Daily, weekly, monthly, quarter-close</td><td>Export SoR + FRM-911 exception note</td></tr>
-<tr><td>Operations / planning bảng điều khiển</td><td>Dispatch, WIP tuổi tồn, promise-date risk, capacity, bottleneck</td><td>Production Director / Trưởng nhóm Kế hoạch</td><td>IT / Planning chủ dữ liệu</td><td>Epicor operational tables + controlled dispatch boards</td><td>Shift / daily</td><td>Epicor standard report + T1/T2 board</td></tr>
+<tr><td>Operations / planning bảng điều khiển</td><td>Dispatch, WIP tuổi tồn, promise-date risk, capacity, bottleneck</td><td>Production Director / Planning Team Leader</td><td>IT / Planning chủ dữ liệu</td><td>Epicor operational tables + controlled dispatch boards</td><td>Shift / daily</td><td>Epicor standard report + T1/T2 board</td></tr>
 <tr><td>Quality bảng điều khiển</td><td>FPY, hold SLA, NCR repeat, hiệu chuẩn due, MSA / SPC trạng thái</td><td>QA Manager</td><td>IT / QA chủ dữ liệu</td><td>QA SoR lists, hiệu chuẩn register, Epicor references</td><td>Daily / weekly / month-end</td><td>QA register export + manual pack note</td></tr>
 <tr><td>Supply / shipment bảng điều khiển</td><td>PO ETA, processor delay, bộ hồ sơ giao hàng (ship packet) completeness, inventory accuracy</td><td>SCM Manager</td><td>IT / SCM chủ dữ liệu</td><td>Epicor PO / receipt / shipment SoR + bộ hồ sơ giao hàng SSOT</td><td>Daily / weekly</td><td>Epicor export + controlled shipment packet nhật ký</td></tr>
 <tr><td>People / competence bảng điều khiển</td><td>Certification due, OJT progress, coverage, deputy mức sẵn sàng</td><td>HR Manager + Department Heads</td><td>HR / Training admin</td><td>Training hồ sơ, certification các nhật ký, competency matrices</td><td>Weekly / monthly</td><td>Training master nhật ký + FRM-809 / FRM-806</td></tr>
@@ -140,7 +140,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <h2 class="h2" id="a3">3. Environment, deployment pipeline và release class</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Environment / lớp</th><th>Mục đích</th><th>Ai được sửa</th><th>Bằng chứng tối thiểu</th><th>Khi nào được move lên</th></tr></thead><tbody>
 <tr><td>DEV</td><td>Build dataset, transform, measure, layout, pipeline thử nghiệm</td><td>Assigned maker / chủ dữ liệu</td><td>Change note, test tình huống, sample đầu ra</td><td>Khi logic đã qua self-check và có người phụ trách business review</td></tr>
-<tr><td>UAT / PRE-PROD</td><td>Business xác nhận, sign-off formula, diễn tập-down, threshold, exception-note behavior</td><td>Assigned maker + người phụ trách được chỉ định</td><td>Test nhật ký, before/after snapshot, defect list</td><td>Người phụ trách Khi business chấp thuận và rollback path đã sẵn</td></tr>
+<tr><td>UAT / PRE-PROD</td><td>Business xác nhận, sign-off formula, diễn tập-down, threshold, exception-note behavior</td><td>Assigned maker + người phụ trách được chỉ định</td><td>Test nhật ký, before/after snapshot, defect list</td><td>Responsible Person Khi business chấp thuận và rollback path đã sẵn</td></tr>
 <tr><td>PROD dataset / semantic model</td><td>Nguồn dữ liệu chính cho bảng điều khiển production</td><td>chủ dữ liệu / admin được chỉ định</td><td>Approved change ID, deployment nhật ký, refresh test</td><td>Chỉ move sau sign-off và ngoài cửa sổ freeze nếu ảnh hưởng kỳ đang đóng</td></tr>
 <tr><td>PROD report / không gian làm việc / portal card</td><td>Lớp hiển thị cho người dùng cuối</td><td>Publisher / admin theo vai trò</td><td>Gói phát hành, communication note nếu ảnh hưởng người dùng</td><td>Sau khi semantic model PROD ổn định và refresh pass</td></tr>
 </tbody></table></div>
@@ -153,10 +153,10 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <h2 class="h2" id="a4">4. Access model, vai trò boundary và separation-of-duties</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Quyền</th><th>Dùng cho</th><th>Không được hiểu sai là</th><th>Approval tối thiểu</th><th>Control bổ sung</th></tr></thead><tbody>
 <tr><td>View</td><td>Xem bảng điều khiển / pack / export được phép</td><td>Quyền download toàn bộ raw data</td><td>Vai trò-based theo portal / không gian làm việc</td><td>Rà định kỳ qua FRM-111</td></tr>
-<tr><td>Build</td><td>Tạo report cá nhân từ semantic model được mở</td><td>Quyền đổi logic KPI production</td><td>Người phụ trách business + chủ dữ liệu</td><td>Giới hạn dataset, không implicit Publish</td></tr>
+<tr><td>Build</td><td>Tạo report cá nhân từ semantic model được mở</td><td>Quyền đổi logic KPI production</td><td>Responsible Person business + chủ dữ liệu</td><td>Giới hạn dataset, không implicit Publish</td></tr>
 <tr><td>Publish</td><td>Đưa report/không gian làm việc ra production</td><td>Quyền Admin hoặc tự ý mở rộng audience</td><td>chủ nghiệp vụ + người phụ trách hệ thống</td><td>Release bằng chứng, communication, rollback</td></tr>
 <tr><td>Admin</td><td>Quản trị không gian làm việc, gateway, credential, refresh, sharing policy</td><td>Quyền business sign-off</td><td>IT / admin thẩm quyền theo ANNEX-101</td><td>Privileged review, SoD, nhật ký retention</td></tr>
-<tr><td>Temporary / deputy</td><td>Cover nghỉ phép, cutover, incident, month-end close</td><td>Permanent elevation</td><td>Manager + chủ quá trình + expiry date</td><td>Close-out và thu hồi đúng hạn</td></tr>
+<tr><td>Temporary / deputy</td><td>Cover nghỉ phép, cutover, incident, month-end close</td><td>Permanent elevation</td><td>Manager + Process Owner + expiry date</td><td>Close-out và thu hồi đúng hạn</td></tr>
 </tbody></table></div>
 <ul class="tight">
   <li>Người xây KPI không tự là người phê duyệt thay đổi logic nếu change class B/C ảnh hưởng quyết định tài chính, quality release hoặc xem xét của lãnh đạo.</li>
@@ -181,8 +181,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <tr><td>Refresh fail / gateway down / credential expired</td><td>Freeze bảng điều khiển trạng thái cảnh báo; thông báo người phụ trách; chặn dùng bảng điều khiển nếu ảnh hưởng quyết định chính</td><td>IT admin + chủ dữ liệu</td><td>SoR export, approved manual pack</td><td>Khi refresh phục hồi, số reconcile và bằng chứng được lưu</td></tr>
 <tr><td>Logic KPI sai / mapping sai / duplicated data</td><td>Đánh cờ vấn đề nghiêm trọng; revert nếu có thể; không sửa chui trong production</td><td>chủ dữ liệu + chủ nghiệp vụ</td><td>SoR + ghi chú điều hành note</td><td>Khi release corrected pack và review before/after xong</td></tr>
 <tr><td>Không gian làm việc / permission misconfiguration</td><td>Contain ngay: thu hẹp share, revoke access, snapshot impact</td><td>IT admin / người phụ trách hệ thống</td><td>N/A</td><td>Khi access được sửa, impact review hoàn tất</td></tr>
-<tr><td>SoR unavailable / offline fallback</td><td>Kích hoạt offline kit theo contingency path</td><td>chủ quá trình + IT + deputy trigger người phụ trách</td><td><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a> pack được phê duyệt</td><td>Khi hệ chính phục hồi và backfill được review</td></tr>
-<tr><td>Backfill sau gián đoạn</td><td>Chạy backfill có nhật ký; không overwrite lặng lẽ dữ liệu lịch sử</td><td>chủ dữ liệu</td><td>Backfill nhật ký + reconciliation sheet</td><td>Người phụ trách Khi xác nhận không còn mismatch mở</td></tr>
+<tr><td>SoR unavailable / offline fallback</td><td>Kích hoạt offline kit theo contingency path</td><td>Process Owner + IT + deputy trigger người phụ trách</td><td><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a> pack được phê duyệt</td><td>Khi hệ chính phục hồi và backfill được review</td></tr>
+<tr><td>Backfill sau gián đoạn</td><td>Chạy backfill có nhật ký; không overwrite lặng lẽ dữ liệu lịch sử</td><td>chủ dữ liệu</td><td>Backfill nhật ký + reconciliation sheet</td><td>Responsible Person Khi xác nhận không còn mismatch mở</td></tr>
 </tbody></table></div>
 <div class="note-warning"><b>Quy tắc cứng</b><br/>Khi bảng điều khiển đang ở trạng thái <b>Stale / Exception / Offline fallback</b>, người điều hành phải ghi rõ quyết định tạm thời dùng nguồn nào. Không chờ hệ số sửa xong rồi “hồi tố trí nhớ” về lý do đã ra quyết định.</div>
 

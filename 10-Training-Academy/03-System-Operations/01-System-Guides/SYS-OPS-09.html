@@ -64,11 +64,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-09</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-09</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 
@@ -122,7 +122,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Operator / Setup</td><td>Chạy đúng Job/Rev/Op, dừng khi sai bằng chứng</td><td>JobIndex, JobOperIndex, Hồ sơ công việc (mở nhanh)</td></tr>
 <tr><td>Programmer</td><td>Phát hành chương trình đúng Rev, chống nhầm Rev</td><td>JobIndex.RevisionNum, Part/REV Master, Release hồ sơ</td></tr>
 <tr><td>QC / QA</td><td>Hold/NCR/CAPA, xác nhận ĐẠT/KHÔNG ĐẠT, đóng hồ sơ</td><td>QCHoldLog, NCRLog, InspectionReports, ApprovalHistory</td></tr>
-<tr><td>Warehouse</td><td>Đóng gói, in SSCC, cổng kiểm soát phê duyệt giao hàng</td><td>PackSSCCRegister, PackagingChecks, ShipRelease, ShipmentMirror</td></tr>
+<tr><td>Warehouse</td><td>Packaging, in SSCC, cổng kiểm soát phê duyệt giao hàng</td><td>PackSSCCRegister, PackagingChecks, ShipRelease, ShipmentMirror</td></tr>
 <tr><td>Planner</td><td>Ưu tiên WIP, OTD, giải phóng nghẽn</td><td>JobIndex.DueDate/Trạng thái, KPI dashboards</td></tr>
 <tr><td>Purchasing</td><td>Outsource/certs, tránh thiếu chứng từ</td><td>OutsourceMirror, Hồ sơ công việc (certs)</td></tr>
 <tr><td>Maintenance</td><td>Downtime Log chuẩn để phản ánh OEE</td><td>Downtime Log (list liên quan) IncidentLog (SharePoint List) + Teams: QMS-ALERT.</td></tr>
@@ -284,7 +284,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="mini">Bảng kiểm áp dụng cho ca trưởng/supervisor và người trực IT/QMS.</p>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng (MRR)</th><th>Lỗi hay gặp</th></tr></thead>
+<thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Bằng chứng (MRR)</th><th>Lỗi hay gặp</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Kiểm tra IntegrationLogs 3 luồng mirror (jobs/ops/ship) trạng thái SUCCESS/WARNING</td><td>Supervisor</td><td>Ảnh màn hình IntegrationLogs</td><td>Chỉ nhìn “luồng run success” mà bỏ ErrorSummary</td></tr>
 <tr><td>2</td><td>Kiểm tra IntegrationSettings watermark cập nhật đúng sau SUCCESS</td><td>IT</td><td>Hồ sơ IntegrationSettings + timestamp</td><td>Cursor nhảy khi run FAIL</td></tr>

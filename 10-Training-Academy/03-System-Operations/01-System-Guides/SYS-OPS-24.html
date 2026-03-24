@@ -57,11 +57,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-24</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-24</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -102,7 +102,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" id="sec2">
 <h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <p><b>Mô-đun tồn tại để chặn 3 nhóm rủi ro chết người:</b> (1) sai Rev/phiên bản dẫn tới chạy sai chương trình, dùng sai bản vẽ; (2) thiếu/giả bằng chứng làm đánh giá không đạt; (3) mở quyền sai dẫn tới lộ dữ liệu khách hàng, xoá hồ sơ, vượt qua cổng kiểm soát.</p>
-<p><b>Cổng kiểm soát/Bàn giao:</b> Build Sheet là <b>single source</b> cho mọi cấu hình ảnh hưởng QMS (SharePoint/Teams/Purview/Entra). IT cấu hình theo Build Sheet; QA/QMS xác nhận đạt theo acceptance tests; Supervisor/chủ quá trình chịu trách nhiệm nghiệp vụ và quyết định HOLD/GO theo bằng chứng.</p>
+<p><b>Cổng kiểm soát/Bàn giao:</b> Build Sheet là <b>single source</b> cho mọi cấu hình ảnh hưởng QMS (SharePoint/Teams/Purview/Entra). IT cấu hình theo Build Sheet; QA/QMS xác nhận đạt theo acceptance tests; Supervisor/Process Owner chịu trách nhiệm nghiệp vụ và quyết định HOLD/GO theo bằng chứng.</p>
 <h3>Trách nhiệm theo vai trò (áp dụng riêng + tiêu chí đạt khác nhau)</h3>
 <table class="form-table">
 <tr><th>Vai trò</th><th>Phần áp dụng riêng trong mô-đun</th><th>Tiêu chí đạt tối thiểu</th></tr>
@@ -135,11 +135,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p><b>Điểm chặn chính:</b> Không GO-LIVE cấu hình; không phát hành Released template; không ship; không mở external sharing khi thiếu Build Sheet validated + bộ bằng chứng.</p>
 <h3>3.2 Luồng bàn giao bắt buộc (Đầu vào → Đầu ra)</h3>
 <table class="form-table">
-<tr><th>Bước</th><th>Đầu vào</th><th>Người phụ trách</th><th>Đầu ra</th><th>Điểm chặn</th></tr>
+<tr><th>Bước</th><th>Đầu vào</th><th>Responsible Person</th><th>Đầu ra</th><th>Điểm chặn</th></tr>
 <tr>
 <td>1</td>
 <td>Yêu cầu thay đổi (CR) + điều khoản hợp đồng + phân loại dữ liệu</td>
-<td>chủ quá trình / Estimator (SAL-03) / Planner</td>
+<td>Process Owner / Estimator (SAL-03) / Planner</td>
 <td>Scope thay đổi + rủi ro + danh sách site/library/quy trình bị ảnh hưởng</td>
 <td>Thiếu scope rõ ràng → HOLD</td>
 </tr>
@@ -200,7 +200,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" id="sec5">
 <h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6)</h2>
 <table class="form-table">
-<tr><th>Điểm kiểm soát</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Điểm đạt</th></tr>
+<tr><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Điểm đạt</th></tr>
 <tr>
 <td>CP1 — SoD cưỡng chế (cấu hình ≠ phê duyệt)</td>
 <td>Supervisor + QA/QMS</td>
@@ -233,7 +233,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>CP6 — Quarterly rà soát quyền truy cập (access review)</td>
-<td>QA/QMS + chủ quá trình</td>
+<td>QA/QMS + Process Owner</td>
 <td>FRM-QMS-016 + snapshot groups/memberships</td>
 <td>Thiếu review kỳ → NCR</td>
 </tr>
@@ -258,7 +258,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" id="sec7">
 <h2>7) Phản ứng 60 giây (khi phát hiện rủi ro)</h2>
 <table class="form-table">
-<tr><th>Kích hoạt</th><th>Hành động 60 giây</th><th>Người phụ trách</th><th>MRR bắt buộc</th></tr>
+<tr><th>Kích hoạt</th><th>Hành động 60 giây</th><th>Responsible Person</th><th>MRR bắt buộc</th></tr>
 <tr>
 <td>Wrong revision (bản vẽ/program/setup sheet)</td>
 <td>DỪNG thao tác; treo thẻ HOLD; chụp ảnh màn hình vị trí file + Rev; thông báo Supervisor + QA.</td>
@@ -298,23 +298,23 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="card" id="sec8">
-<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Người phụ trách, Bằng chứng/MRR, “lỗi điển hình”</h2>
+<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Bằng chứng/MRR, “lỗi điển hình”</h2>
 <table class="form-table">
-<tr><th>#</th><th>Bước vận hành</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Lỗi điển hình cần chặn</th></tr>
+<tr><th>#</th><th>Bước vận hành</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Lỗi điển hình cần chặn</th></tr>
 <tr><td>1</td><td>Xác nhận scope thay đổi + điểm chặn (GO-LIVE/SHIP)</td><td>Supervisor</td><td>CR/Scope note + quyết định cổng kiểm soát</td><td>Scope mơ hồ, thiếu bước ảnh hưởng</td></tr>
 <tr><td>2</td><td>Khóa SoD: chỉ định người cấu hình và người phê duyệt khác nhau</td><td>Supervisor + QA</td><td>RACI + danh sách người tham gia</td><td>1 người làm cả 2 vai</td></tr>
 <tr><td>3</td><td>Tạo Build Sheet v0.9 theo cấu trúc bắt buộc (Setting ID, Acceptance Test, Bằng chứng Type)</td><td>IT</td><td>Build Sheet file kiểm soát</td><td>Thiếu Setting ID hoặc thiếu Acceptance Test</td></tr>
-<tr><td>4</td><td>Gắn Control Objective cho từng Setting ID (QMS/Risk/Hợp đồng)</td><td>QA + chủ quá trình</td><td>Build Sheet cập nhật cột Control Objective</td><td>Không gắn rủi ro → không xác định ưu tiên test</td></tr>
+<tr><td>4</td><td>Gắn Control Objective cho từng Setting ID (QMS/Risk/Hợp đồng)</td><td>QA + Process Owner</td><td>Build Sheet cập nhật cột Control Objective</td><td>Không gắn rủi ro → không xác định ưu tiên test</td></tr>
 <tr><td>5</td><td>Thực thi cấu hình theo Build Sheet và chụp bằng chứng gốc</td><td>IT</td><td>Ảnh/export/nhật ký theo Bằng chứng Type</td><td>Chụp thiếu ngữ cảnh/thiếu giá trị setting</td></tr>
 <tr><td>6</td><td>Lưu bằng chứng đúng naming rule + đúng kho</td><td>IT</td><td>YYYYQ#_SETTINGID_ShortName.ext + lưu vào QMS-Hồ sơ</td><td>Đặt tên tuỳ tiện, lưu sai thư mục</td></tr>
 <tr><td>7</td><td>Chạy acceptance tests bằng user thật (TC-01…TC-05 + tình huống theo ANNEX)</td><td>QA</td><td>Bảng kết quả test + ảnh/nhật ký</td><td>Test bằng admin làm sai kết quả</td></tr>
 <tr><td>8</td><td>Ghi vấn đề list và cưỡng chế HOLD/ROLLBACK khi không đạt</td><td>QA + Supervisor</td><td>Vấn đề list + quyết định HOLD/ROLLBACK</td><td>Cho GO dù fail test</td></tr>
 <tr><td>9</td><td>Chốt Build Sheet final (Trạng thái=Validated) và ký sign-off</td><td>QA</td><td>Build Sheet final + chữ ký</td><td>Trạng thái chưa Validated</td></tr>
 <tr><td>10</td><td>Lập cutover plan: cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), snapshot, smoke test, rollback</td><td>IT + Supervisor</td><td>ANNEX-QMS-013 bản ký</td><td>Không có snapshot trước cutover</td></tr>
-<tr><td>11</td><td>Go-live + thông báo policy + đào tạo điểm dùng (kiosk/line)</td><td>Supervisor + chủ quá trình</td><td>Go-live memo + training hồ sơ</td><td>Không đào tạo điểm dùng gây vượt qua</td></tr>
+<tr><td>11</td><td>Go-live + thông báo policy + đào tạo điểm dùng (kiosk/line)</td><td>Supervisor + Process Owner</td><td>Go-live memo + training hồ sơ</td><td>Không đào tạo điểm dùng gây vượt qua</td></tr>
 <tr><td>12</td><td>Bàn giao package IT → QA/IMS (snapshots quyền/retention/DLP, guests)</td><td>IT</td><td>Bàn giao package + links bằng chứng</td><td>Thiếu snapshot memberships hoặc guests</td></tr>
 <tr><td>13</td><td>phê duyệt giao hàng Validator: chặn bộ hồ sơ giao hàng thiếu</td><td>Warehouse + QC</td><td>Ship bảng kiểm + block nhật ký</td><td>Ship trước khi packet đủ</td></tr>
-<tr><td>14</td><td>rà soát quyền truy cập hàng quý + lưu FRM-QMS-016</td><td>QA + chủ quá trình</td><td>FRM-QMS-016 + snapshot</td><td>Không review định kỳ</td></tr>
+<tr><td>14</td><td>rà soát quyền truy cập hàng quý + lưu FRM-QMS-016</td><td>QA + Process Owner</td><td>FRM-QMS-016 + snapshot</td><td>Không review định kỳ</td></tr>
 </table>
 </div>
 <div class="card" id="sec9">

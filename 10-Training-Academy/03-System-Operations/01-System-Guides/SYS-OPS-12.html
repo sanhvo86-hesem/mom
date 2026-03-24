@@ -68,11 +68,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-12</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-12</span></div>
+  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -188,7 +188,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Báo giá → PO/Hợp đồng</b></td>
 <td>PO, revision, yêu cầu luồng-down, CTQ.</td>
 <td>Estimator (SAL-03) + QA</td>
-<td>rà soát hợp đồng có dấu vết: Rev/Date/Người phụ trách; lưu SSOT.</td>
+<td>rà soát hợp đồng có dấu vết: Rev/Date/Responsible Person; lưu SSOT.</td>
 </tr>
 <tr>
 <td><b>Lập kế hoạch</b></td>
@@ -227,7 +227,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Hồ sơ đo/không phù hợp lưu theo retention tier; khóa sửa ngoài ý muốn.</td>
 </tr>
 <tr>
-<td><b>Đóng gói &amp; giao</b></td>
+<td><b>Packaging &amp; giao</b></td>
 <td>Packaging spec, label, COA/COC, phê duyệt giao hàng (ship release).</td>
 <td>Warehouse + QA</td>
 <td>Chỉ phát hành khi gói hồ sơ đúng Rev; bản in COA có kiểm soát.</td>
@@ -235,7 +235,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Phản hồi/CI</b></td>
 <td>Khiếu nại khách, 8D/CAPA, thay đổi phòng ngừa.</td>
-<td>QA + chủ quá trình</td>
+<td>QA + Process Owner</td>
 <td>Thay đổi được formalize bằng DCN; rollout có đào tạo và thu hồi bản cũ.</td>
 </tr>
 </tbody>
@@ -414,7 +414,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:70px;">Bước</th>
 <th>Hoạt động bắt buộc</th>
 <th style="width:210px;">Biểu mẫu/hồ sơ</th>
-<th style="width:200px;">Người phụ trách chính</th>
+<th style="width:200px;">Responsible Person chính</th>
 </tr>
 </thead>
 <tbody>
@@ -422,13 +422,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>1</td>
 <td>Xác định nhu cầu: tài liệu mới hoặc thay đổi; ghi rõ phạm vi ảnh hưởng (job/lot/ca/xưởng).</td>
 <td>DCN <span class="k">FRM-QMS-022</span></td>
-<td>chủ quá trình</td>
+<td>Process Owner</td>
 </tr>
 <tr>
 <td>2</td>
 <td>Soạn bản master: mã tài liệu, Rev, ngày hiệu lực dự kiến; mô tả điểm thay đổi rõ ràng.</td>
 <td>File master + bản mark-up</td>
-<td>Người phụ trách soạn thảo</td>
+<td>Responsible Person soạn thảo</td>
 </tr>
 <tr>
 <td>3</td>
@@ -609,7 +609,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Vai trò: nguồn sự thật của mã tài liệu, Rev, hiệu lực, người phụ trách, location, trạng thái.</li>
 <li>Khi có tài liệu mới hoặc Rev mới: cập nhật 1 dòng; chuyển bản cũ sang Obsolete.</li>
-<li>Trường bắt buộc: Mã • Tên • Loại • Rev • Hiệu lực • Người phụ trách • Retention • Location • Trạng thái.</li>
+<li>Trường bắt buộc: Mã • Tên • Loại • Rev • Hiệu lực • Responsible Person • Retention • Location • Trạng thái.</li>
 </ul>
 </div>
 <div class="card">
@@ -646,7 +646,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3" style="margin-top:0;">6.6 Quy tắc ghi mã &amp; metadata</h3>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
-<li>Khóa truy xuất tối thiểu: <span class="k">JobNum</span> • <span class="k">PartNum-Rev</span> • <span class="k">Customer</span> • <span class="k">Người phụ trách</span> • <span class="k">RetentionTier</span>.</li>
+<li>Khóa truy xuất tối thiểu: <span class="k">JobNum</span> • <span class="k">PartNum-Rev</span> • <span class="k">Customer</span> • <span class="k">Responsible Person</span> • <span class="k">RetentionTier</span>.</li>
 <li>Hồ sơ không có metadata bị xem là không truy xuất; cổng kiểm soát không mở.</li>
 </ul>
 </div>
@@ -662,7 +662,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:60px;">#</th>
 <th>Bước thực hiện</th>
-<th style="width:160px;">Người phụ trách</th>
+<th style="width:160px;">Responsible Person</th>
 <th style="width:220px;">Bằng chứng</th>
 <th style="width:220px;">Lỗi hay gặp</th>
 </tr>
@@ -832,7 +832,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Chọn 1 máy thực tế; thực hiện đủ 12 bước bảng kiểm POU (Mục 7).</li>
 <li>Ghi bằng chứng: ảnh Rev, ảnh SSOT, dòng Vấn đề/Recall liên quan.</li>
-<li>Lưu bằng chứng theo metadata (JobNum/PartNum-Rev/Người phụ trách).</li>
+<li>Lưu bằng chứng theo metadata (JobNum/PartNum-Rev/Responsible Person).</li>
 </ol>
 <div class="note"><b>Pass:</b> 0 bước bỏ sót; 0 mismatch Rev; bằng chứng truy xuất trong ≤ 2 phút.</div>
 </div>
@@ -869,7 +869,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:60px;">Cổng kiểm soát</th>
 <th>Tên cổng kiểm soát</th>
 <th style="width:220px;">Khi kích hoạt</th>
-<th style="width:200px;">Người phụ trách cổng kiểm soát</th>
+<th style="width:200px;">Responsible Person cổng kiểm soát</th>
 <th style="width:240px;">MRR bắt buộc</th>
 </tr>
 </thead>
@@ -958,7 +958,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:260px;">RecordType</th>
 <th>MRR phải có</th>
-<th style="width:160px;">Người phụ trách</th>
+<th style="width:160px;">Responsible Person</th>
 <th style="width:160px;">RetentionTier</th>
 <th style="width:260px;">Nơi lưu (SSOT)</th>
 </tr>
@@ -988,7 +988,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>DCN</td>
 <td>FRM-QMS-022 ký duyệt + danh mục tài liệu bị ảnh hưởng</td>
-<td>chủ quá trình</td>
+<td>Process Owner</td>
 <td>T2/T1</td>
 <td>M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → hồ sơ → change-control <span class="k">M365/SharePoint → HESEM-QMS-SSOT</span></td>
 </tr>
