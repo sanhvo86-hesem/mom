@@ -86,18 +86,18 @@
               <tr><th>Nội bộ name</th><th>Hiển thị</th><th>Kiểu</th><th>Bắt buộc</th><th>Quy tắc</th></tr>
             </thead>
             <tbody>
-              <tr><td>RecordType</td><td>Loại hồ sơ</td><td>Lựa chọn</td><td>Có</td><td>Dùng đúng bộ mã <span class="code">RecordTypeCodes</span>.</td></tr>
-              <tr><td>RecordCode</td><td>Mã hồ sơ</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Không tự phát sinh theo text tự do nếu đã có khóa chuẩn.</td></tr>
+              <tr><td>RecordType</td><td>RecordType</td><td>Lựa chọn</td><td>Có</td><td>Dùng đúng bộ mã <span class="code">RecordTypeCodes</span>.</td></tr>
+              <tr><td>RecordCode</td><td>RecordCode</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Không tự phát sinh theo text tự do nếu đã có khóa chuẩn.</td></tr>
               <tr><td>StatusCode</td><td>Trạng thái</td><td>Lựa chọn</td><td>Có</td><td>Dùng <span class="code">StatusCodes</span>; không nhập text tự do.</td></tr>
               <tr><td>ResponsiblePerson</td><td>Chủ xử lý</td><td>Person</td><td>Có</td><td>1 owner chính, không bỏ trống.</td></tr>
               <tr><td>Người phê duyệt</td><td>Người phê duyệt</td><td>Person</td><td>Theo luồng</td><td>Phê duyệt flow ghi nhận người phê duyệt thực tế.</td></tr>
-              <tr><td>EventDate</td><td>Ngày sự kiện</td><td>Date</td><td>Theo hồ sơ</td><td>Dùng cho mốc quan trọng nghiệp vụ, không thay cho kích hoạt lưu giữ.</td></tr>
+              <tr><td>EventDate</td><td>EventDate</td><td>Date</td><td>Theo hồ sơ</td><td>Dùng cho mốc quan trọng nghiệp vụ, không thay cho kích hoạt lưu giữ.</td></tr>
               <tr><td>TriggerEventDate</td><td>Ngày kích hoạt lưu giữ</td><td>Date</td><td>Theo hồ sơ</td><td>Bắt buộc khi lưu giữ chạy theo sự kiện.</td></tr>
               <tr><td>JobNum</td><td>Mã Job</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Chỉ tham chiếu từ Epicor.</td></tr>
               <tr><td>PartNum</td><td>Mã part</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Không tự tạo part chủ / gốc ở list. Với Part-REV-Bản gốc, khóa tự nhiên là CustomerID + PartNum + Phiên bản.</td></tr>
               <tr><td>Phiên bản</td><td>Phiên bản</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Dùng giá trị phát hành đã được duyệt.</td></tr>
-              <tr><td>CustomerID</td><td>Mã khách hàng</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Chỉ tham chiếu. Bắt buộc với Part-REV-Bản gốc và các hồ sơ phải tách part trùng số giữa nhiều khách hàng.</td></tr>
-              <tr><td>SupplierID</td><td>Mã nhà cung cấp</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Chỉ tham chiếu.</td></tr>
+              <tr><td>CustomerID</td><td>CustomerID</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Chỉ tham chiếu. Bắt buộc với Part-REV-Bản gốc và các hồ sơ phải tách part trùng số giữa nhiều khách hàng.</td></tr>
+              <tr><td>SupplierID</td><td>SupplierID</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Chỉ tham chiếu.</td></tr>
               <tr><td>EvidenceUrl</td><td>Link bằng chứng</td><td>Siêu liên kết</td><td>Theo hồ sơ</td><td>Trỏ tới file SSOT trong được kiểm soát thư viện.</td></tr>
               <tr><td>đường dẫn SSOT (đường dẫn SSOT (SSOTPath))</td><td>Đường dẫn SSOT</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Ghi path đầy đủ theo phân loại hệ thống chuẩn.</td></tr>
               <tr><td>RetentionLabel</td><td>Nhãn lưu</td><td>Lựa chọn</td><td>Có</td><td>Chỉ dùng nhãn trong label plan đã phát hành.</td></tr>
