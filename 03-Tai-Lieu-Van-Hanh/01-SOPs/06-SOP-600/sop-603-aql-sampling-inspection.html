@@ -123,12 +123,12 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td>QC Inspector</td><td>Thực hiện lấy mẫu và kiểm tra theo plan/WI, ghi nhận defect đúng class và bằng chứng.</td><td>Được dừng thao tác và báo ngay khi phát hiện critical defect hoặc mismatch giữa plan và thực tế lot.</td></tr>
 <tr><td>Warehouse / IQC</td><td>Hỗ trợ xác định lot, condition, label, source, receipt trạng thái cho incoming/outsource-return sampling.</td><td>Được từ chối nhập hoặc chuyển lô nếu decision sampling chưa đóng hoặc bằng chứng nhận hàng (receipt bằng chứng / bằng chứng nhận hàng) chưa đủ.</td></tr>
 </tbody></table></div>
-<div class="role-note"><b>Quyền đặc biệt:</b> Chỉ QA Manager hoặc người được ủy quyền bằng ma trận thẩm quyền mới được phê duyệt waive/exception liên quan sampling, đổi logic decision, hoặc cho phép ship dưới trạng thái controlled concession nếu có quy định cho phép riêng.</div>
+<div class="role-note"><b>Quyền đặc biệt:</b> Chỉ QA Manager hoặc người được ủy quyền bằng ma trận authority mới được phê duyệt waive/exception liên quan sampling, đổi logic decision, hoặc cho phép ship dưới trạng thái controlled concession nếu có quy định cho phép riêng.</div>
 <h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2>
 <div class="field-grid">
 <div class="field"><b>Đầu vào bắt buộc</b><div class="blank">Lot definition, source/revision/route, kiểm tra context (incoming / outsource return / final), QPL/customer requirement, kiểm tra level, AQL, switching state, trực quan standard, gage trạng thái.</div></div>
 <div class="field"><b>Đầu ra bắt buộc</b><div class="blank">Ac/Re selection bằng chứng, sample trace, defect count by class, decision accept/reject/hold, switching history update, escalation pack khi reject/hold.</div></div>
-<div class="field"><b>Điều kiện tiên quyết</b><div class="blank">Lot phải đủ đồng nhất và chỉ được đưa vào sampling khi không thuộc nhóm phải HOLD hoặc phải chuyển sang phương án kiểm soát khác. Gage/trực quan standard phải sẵn sàng. Người thực hiện phải có competency cho class defect áp dụng.</div></div>
+<div class="field"><b>Điều kiện tiên quyết</b><div class="blank">Lot phải đủ đồng nhất và chỉ được đưa vào sampling khi không thuộc nhóm phải HOLD hoặc phải chuyển sang phương án kiểm soát khác. Gage/trực quan standard phải sẵn sàng. Performer phải có competency cho class defect áp dụng.</div></div>
 <div class="field"><b>Điểm dừng tự động</b><div class="blank">Mixed lot, uncertain traceability, missing trực quan standard, gage trạng thái không hợp lệ, quy trình drift rõ, CTQ/customer rule yêu cầu 100%.</div></div>
 </div>
 <h2 class="h2" id="p6">6. control gate (control control gate), mandatory hold point &amp; KPI</h2>
@@ -227,7 +227,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td>Reject lot nhưng chọn 100% sort</td><td>Sort phải có tiêu chí đạt/không đạt rõ, người sort được chỉ định, route nhận dạng riêng và bằng chứng cho từng sub-lot được release.</td><td>QA Lead</td><td>FRM-621 + FRM-651 + sort nhật ký</td></tr>
 <tr><td>Lot rework rồi resubmit</td><td>Phải xem là lot mới về decision state. Plan reinspection do QA quyết định theo risk, không tự động quay về Reduced/Normal như chưa có sự cố.</td><td>QA Manager</td><td>Rework disposition + FRM-621</td></tr>
 <tr><td>Partial lot ship</td><td>Chỉ allowed khi sub-lot ship có trace độc lập và không tạo nhầm lẫn cho phần còn lại. Mỗi sub-lot phải có disposition rõ.</td><td>QA Lead / Warehouse Supervisor</td><td>Pack nhật ký + phê duyệt giao hàng hồ sơ</td></tr>
-<tr><td>Customer-directed deviation</td><td>Chỉ áp dụng khi có customer waiver bằng chứng; deviation không được dùng để thay đổi enterprise rule vĩnh viễn.</td><td>General Director / QA Manager theo thẩm quyền</td><td>Deviation / customer approval</td></tr>
+<tr><td>Customer-directed deviation</td><td>Chỉ áp dụng khi có customer waiver bằng chứng; deviation không được dùng để thay đổi enterprise rule vĩnh viễn.</td><td>General Director / QA Manager theo authority</td><td>Deviation / customer approval</td></tr>
 </tbody></table></div>
 <h3 class="h3">7.14 Phản hồi bắt buộc từ kết quả AQL về supplier, quy trình và planning</h3>
 <ul class="tight">
@@ -237,9 +237,9 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ul><h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:38%"/><col style="width:16%"/><col style="width:14%"/><col style="width:14%"/></colgroup><thead><tr><th>Tình huống</th><th>Quy tắc xử lý</th><th>Chủ trì</th><th>Người gỡ hold</th><th>Hồ sơ</th></tr></thead><tbody>
 <tr><td>Lot không đồng nhất</td><td>Dừng sampling, tách lot theo logic traceability đúng rồi chọn plan lại. Không cố sample trên mixed lot.</td><td>QC Team Leader</td><td>Quality Engineer</td><td>FRM-621 update</td></tr>
-<tr><td>Mẫu bị hỏng / nhiễm bẩn / mislabel</td><td>HOLD và xác định lại sample trace. Không tự thay mẫu nếu không ghi reason và thẩm quyền.</td><td>QC Inspector</td><td>QC Team Leader</td><td>FRM-621 note</td></tr>
+<tr><td>Mẫu bị hỏng / nhiễm bẩn / mislabel</td><td>HOLD và xác định lại sample trace. Không tự thay mẫu nếu không ghi reason và authority.</td><td>QC Inspector</td><td>QC Team Leader</td><td>FRM-621 note</td></tr>
 <tr><td>Customer hoặc spec có plan riêng</td><td>Áp dụng plan theo customer/spec nếu đã được review và control; ghi rõ source rule trên hồ sơ.</td><td>Quality Engineer</td><td>QA Manager</td><td>FRM-621 / approval note</td></tr>
-<tr><td>Request giao gấp khi lot chưa decision</td><td>Không ship / không dùng lot trước khi decision và thẩm quyền hoàn tất. Áp lực lịch không phải waiver tự động.</td><td>Responsible Person lô</td><td>QA Manager</td><td>Hold/release note</td></tr>
+<tr><td>Request giao gấp khi lot chưa decision</td><td>Không ship / không dùng lot trước khi decision và authority hoàn tất. Áp lực lịch không phải waiver tự động.</td><td>Responsible Person lô</td><td>QA Manager</td><td>Hold/release note</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="p9">9. Hệ thống, hồ sơ &amp; dữ liệu</h2>
 <div class="field-grid">
