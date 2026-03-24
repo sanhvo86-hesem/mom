@@ -16,11 +16,7 @@ function replaceString(text, from, to) {
   return text.includes(from) ? text.split(from).join(to) : text;
 }
 
-function editFile(file, steps) {
-  const full = path.join(root, file);
-  let text = fs.readFileSync(full, 'utf8');
-  const original = text;
-
+function applySteps(text, steps) {
   for (const step of steps) {
     if (step.kind === 'string') {
       text = replaceString(text, step.from, step.to);
@@ -28,7 +24,33 @@ function editFile(file, steps) {
       text = text.replace(step.from, step.to);
     }
   }
+  return text;
+}
 
+function editFile(file, steps) {
+  const full = path.join(root, file);
+  let text = fs.readFileSync(full, 'utf8');
+  const original = text;
+  text = applySteps(text, steps);
+
+  if (text !== original) {
+    fs.writeFileSync(full, text, 'utf8');
+    changed.push(file);
+  }
+}
+
+function editVisibleText(file, steps) {
+  const full = path.join(root, file);
+  let text = fs.readFileSync(full, 'utf8');
+  const original = text;
+  const parts = text.split(/(<[^>]+>)/g);
+
+  for (let i = 0; i < parts.length; i += 1) {
+    if (!parts[i] || parts[i].startsWith('<')) continue;
+    parts[i] = applySteps(parts[i], steps);
+  }
+
+  text = parts.join('');
   if (text !== original) {
     fs.writeFileSync(full, text, 'utf8');
     changed.push(file);
@@ -204,6 +226,155 @@ editFile(
     { kind: 'string', from: 'part-rev-qty-date', to: 'part-rev-số lượng-ngày' },
     { kind: 'regex', from: /\brevision\b/g, to: 'mức sửa đổi' },
     { kind: 'regex', from: /\baccept\b/g, to: 'chấp nhận' },
+  ]
+);
+
+editVisibleText(
+  '03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-107-communication-management.html',
+  [
+    { kind: 'string', from: 'giao hàng, revision, stop-line, khiếu nại, dữ liệu, môi trường sạch, safety hoặc uy tín khách hàng', to: 'giao hàng, mức sửa đổi, dừng chuyền, khiếu nại, dữ liệu, môi trường sạch, an toàn hoặc uy tín khách hàng' },
+    { kind: 'string', from: 'khách hàng/job/part/rev', to: 'khách hàng/lệnh sản xuất/mã chi tiết/mức sửa đổi' },
+    { kind: 'string', from: 'lỗi từ processor ảnh hưởng đơn hàng', to: 'lỗi từ đơn vị gia công ngoài ảnh hưởng đơn hàng' },
+    { kind: 'string', from: 'Job/WO, máy, điểm nghẽn, ETA khôi phục, nhu cầu chuyển cấp', to: 'Lệnh sản xuất/WO, máy, điểm nghẽn, ETA khôi phục, nhu cầu chuyển cấp' },
+    { kind: 'string', from: 'Thông điệp phải đủ ID, job/part/rev, tác động, hành động, người phụ trách, thời hạn.', to: 'Thông điệp phải đủ ID, lệnh sản xuất/mã chi tiết/mức sửa đổi, tác động, hành động, người phụ trách, thời hạn.' },
+    { kind: 'string', from: 'Số vụ trễ escalation ngoài giờ', to: 'Số vụ trễ chuyển cấp ngoài giờ' },
+    { kind: 'string', from: '0 critical', to: '0 vụ nghiêm trọng' },
+    { kind: 'string', from: 'sự kiện gì, ở đâu, job/WO/mã chi tiết nào, mức sửa đổi nào,', to: 'sự kiện gì, ở đâu, lệnh sản xuất/WO/mã chi tiết nào, mức sửa đổi nào,' },
+    { kind: 'string', from: 'Nội dung tối thiểu khác nhau theo loại sự kiện nhưng luôn phải có ID, part/job/rev, tác động, hành động, người phụ trách và thời hạn.', to: 'Nội dung tối thiểu khác nhau theo loại sự kiện nhưng luôn phải có ID, mã chi tiết/lệnh sản xuất/mức sửa đổi, tác động, hành động, người phụ trách và thời hạn.' },
+    { kind: 'string', from: 'Với vấn đề về giao hàng/nhãn/truy xuất phải có lot/box/SSCC; với revision vấn đề phải có điểm phát hành tài liệu;', to: 'Với vấn đề về giao hàng/nhãn/truy xuất phải có lô/thùng/SSCC; với vấn đề mức sửa đổi phải có điểm phát hành tài liệu;' },
+    { kind: 'string', from: '>Escalation<', to: '>Chuyển cấp<' },
+    { kind: 'string', from: 'Dùng bộ offline đã phê duyệt,', to: 'Dùng bộ ngoại tuyến đã phê duyệt,' },
+    { kind: 'string', from: 'khi liên quan job/giao hàng/PO', to: 'khi liên quan lệnh sản xuất/giao hàng/PO' },
+    { kind: 'string', from: 'khách hàng/job/mã chi tiết/mức sửa đổi', to: 'khách hàng/lệnh sản xuất/mã chi tiết/mức sửa đổi' },
+  ]
+);
+
+editVisibleText(
+  '03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html',
+  [
+    { kind: 'string', from: 'danh sách job bị ảnh hưởng', to: 'danh sách lệnh sản xuất bị ảnh hưởng' },
+    { kind: 'string', from: 'Khi job hoặc khách hàng có luồng-down theo chuỗi hàng không / quốc phòng / bán dẫn chân không,', to: 'Khi lệnh sản xuất hoặc khách hàng có yêu cầu triển khai xuống theo chuỗi hàng không / quốc phòng / bán dẫn chân không,' },
+    { kind: 'string', from: 'khách hàng/job/mức độ trọng yếu của quy trình', to: 'khách hàng/lệnh sản xuất/mức độ trọng yếu của quy trình' },
+    { kind: 'string', from: 'trạng thái job/WIP/giao hàng', to: 'trạng thái lệnh sản xuất/WIP/giao hàng' },
+    { kind: 'string', from: 'Không cho Department tự xử lý kéo dài mà không khai báo sự kiện.', to: 'Không cho bộ phận tự xử lý kéo dài mà không khai báo sự kiện.' },
+    { kind: 'string', from: '108-G2 — Containment và bảo vệ người / sản phẩm / dữ liệu', to: '108-G2 — Khoanh giữ và bảo vệ người / sản phẩm / dữ liệu' },
+    { kind: 'string', from: 'Khôi phục hệ thống, máy, utility hoặc luồng vận hành; xác nhận đủ điều kiện mở lại.', to: 'Khôi phục hệ thống, máy, tiện ích hạ tầng hoặc luồng vận hành; xác nhận đủ điều kiện mở lại.' },
+    { kind: 'string', from: 'Kiểm tra trạng thái job/giao hàng', to: 'Kiểm tra trạng thái lệnh sản xuất/giao hàng' },
+    { kind: 'string', from: 'Downtime lặp lại', to: 'Thời gian dừng lặp lại' },
+    { kind: 'string', from: 'Ghi thời điểm, khu vực, job/khách hàng liên quan', to: 'Ghi thời điểm, khu vực, lệnh sản xuất/khách hàng liên quan' },
+    { kind: 'string', from: 'các job dở dang,', to: 'các lệnh sản xuất dở dang,' },
+    { kind: 'string', from: 'khách hàng/job/quy trình', to: 'khách hàng/lệnh sản xuất/quy trình' },
+    { kind: 'string', from: 'Nhập lại các giao dịch offline lên Epicor/M365;', to: 'Nhập lại các giao dịch ngoại tuyến lên Epicor/M365;' },
+    { kind: 'string', from: 'Kịch bản cho job có yêu cầu hàng không vũ trụ/không gian/quốc phòng', to: 'Kịch bản cho lệnh sản xuất có yêu cầu hàng không vũ trụ/không gian/quốc phòng' },
+    { kind: 'string', from: 'làm gãy mức sẵn sàng của nhiều job', to: 'làm gãy mức sẵn sàng của nhiều lệnh sản xuất' },
+    { kind: 'string', from: 'Job đang chạy bằng chế độ ngoại tuyến', to: 'Lệnh sản xuất đang chạy bằng chế độ ngoại tuyến' },
+    { kind: 'string', from: 'job chạy bình thường.', to: 'lệnh sản xuất chạy bình thường.' },
+    { kind: 'string', from: 'Với job có luồng-down hàng không vũ trụ/không gian/quốc phòng,', to: 'Với lệnh sản xuất có yêu cầu triển khai xuống của hàng không vũ trụ/không gian/quốc phòng,' },
+    { kind: 'string', from: 'Các job bị ảnh hưởng', to: 'Các lệnh sản xuất bị ảnh hưởng' },
+    { kind: 'string', from: 'Với job bị treo trong sự kiện,', to: 'Với lệnh sản xuất bị treo trong sự kiện,' },
+  ]
+);
+
+editVisibleText(
+  '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html',
+  [
+    { kind: 'string', from: 'mức bao phủ dự phòng (backup coverage) và quy tắc người thay thế (deputy rule)', to: 'mức bao phủ dự phòng và quy tắc người thay thế' },
+    { kind: 'string', from: 'điều kiện kích hoạt escalation', to: 'điều kiện kích hoạt chuyển cấp' },
+    { kind: 'string', from: 'Bao phủ tìm nguồn, mua hàng, quản trị PO và xác nhận năng lực supplier/processor, giao diện nhận hàng &amp; IQC, truy xuất vật tư, kho thành phẩm/bán thành phẩm/tool crib, kiểm soát FIFO/vị trí, dữ liệu đóng gói &amp; nhãn, đối soát giao hàng, đặt chỗ logistics, chứng từ xuất/giao hàng và kết quả thực hiện của nhà cung cấp / SCAR.', to: 'Bao phủ tìm nguồn, mua hàng, quản trị PO và xác nhận năng lực nhà cung cấp/đơn vị gia công ngoài, giao diện nhận hàng &amp; IQC, truy xuất vật tư, kho thành phẩm/bán thành phẩm/kho dụng cụ, kiểm soát FIFO/vị trí, dữ liệu đóng gói &amp; nhãn, đối soát giao hàng, đặt chỗ vận chuyển, chứng từ xuất/giao hàng và kết quả thực hiện của nhà cung cấp / SCAR.' },
+    { kind: 'string', from: 'Quản trị supplier &amp; processor', to: 'Quản trị nhà cung cấp &amp; đơn vị gia công ngoài' },
+    { kind: 'string', from: 'Không tự phê duyệt source mới ngoài rule hoặc bỏ qua source qualification.', to: 'Không tự phê duyệt nguồn mới ngoài quy định hoặc bỏ qua bước đánh giá nguồn.' },
+    { kind: 'string', from: 'Kiểm soát tool crib &amp; vật tư tiêu hao', to: 'Kiểm soát kho dụng cụ &amp; vật tư tiêu hao' },
+    { kind: 'string', from: 'Xuất-trả tool, mức tồn min/max, khả năng nhìn thấy tool trọng yếu, truy xuất vật tư tool liên quan job.', to: 'Xuất-trả dụng cụ, mức tồn min/max, khả năng nhìn thấy dụng cụ trọng yếu, truy xuất vật tư/dụng cụ liên quan job.' },
+    { kind: 'string', from: 'Không phát vật tư/tool substitute cho job critical nếu chưa đánh giá ảnh hưởng.', to: 'Không phát vật tư/dụng cụ thay thế cho job trọng yếu nếu chưa đánh giá ảnh hưởng.' },
+    { kind: 'string', from: 'quantity mismatch', to: 'lệch số lượng' },
+    { kind: 'string', from: 'Duy trì nguồn đã phê duyệt và góc nhìn rủi ro cho supplier/processor;', to: 'Duy trì nguồn đã phê duyệt và góc nhìn rủi ro cho nhà cung cấp/đơn vị gia công ngoài;' },
+    { kind: 'string', from: 'nguồn mới, nguồn tạm, processor quá tải', to: 'nguồn mới, nguồn tạm, đơn vị gia công ngoài quá tải' },
+    { kind: 'string', from: 'vật tư/part/lot', to: 'vật tư/chi tiết/lô' },
+    { kind: 'string', from: 'Triển khai đầy đủ yêu cầu cho processor:', to: 'Triển khai đầy đủ yêu cầu cho đơn vị gia công ngoài:' },
+    { kind: 'string', from: 'khiếu nại tới supplier, SCAR, nguyên nhân gốc của giao hàng trễ, chứng từ chứng nhận sai, hư hỏng bao gói, thiếu hụt lặp lại hay thiếu giấy tờ phải đi vào thẻ điểm và action theo dõi tiếp.', to: 'khiếu nại tới nhà cung cấp, SCAR, nguyên nhân gốc của giao hàng trễ, chứng từ chứng nhận sai, hư hỏng bao gói, thiếu hụt lặp lại hay thiếu giấy tờ phải đi vào thẻ điểm và hành động theo dõi tiếp.' },
+    { kind: 'string', from: 'Warehouse / IQC interface có quyền giữ hàng ở quarantine khi chứng từ chứng nhận, nhãn, lot, tình trạng bao gói hoặc số lượng chưa rõ.', to: 'Giao diện Warehouse / IQC có quyền giữ hàng ở khu cách ly khi chứng từ chứng nhận, nhãn, lot, tình trạng bao gói hoặc số lượng chưa rõ.' },
+    { kind: 'string', from: 'trừ khi có phê duyệt ngoại lệ theo rule.', to: 'trừ khi có phê duyệt ngoại lệ theo quy định.' },
+    { kind: 'string', from: 'pack list, quantity, label, bộ chứng từ chứng nhận hoặc customer instruction chưa khớp.', to: 'phiếu đóng gói, số lượng, nhãn, bộ chứng từ chứng nhận hoặc hướng dẫn của khách hàng chưa khớp.' },
+    { kind: 'string', from: 'với supplier: đẩy nhanh, đổi nguồn, SCAR, đánh giá tại chỗ hoặc đóng băng nguồn khi rủi ro vượt ngưỡng.', to: 'với nhà cung cấp: đẩy nhanh, đổi nguồn, SCAR, đánh giá tại chỗ hoặc đóng băng nguồn khi rủi ro vượt ngưỡng.' },
+    { kind: 'string', from: 'Quyết định / boundary', to: 'Quyết định / ranh giới' },
+    { kind: 'string', from: 'Quality / IQC theo rule', to: 'Quality / IQC theo quy định' },
+    { kind: 'string', from: 'Không giao hàng khi gói phát hành chưa đủ hoặc label chưa đúng', to: 'Không giao hàng khi gói phát hành chưa đủ hoặc nhãn chưa đúng' },
+    { kind: 'string', from: 'Không dùng source tạm mà không có quyết định rủi ro được ghi nhận', to: 'Không dùng nguồn tạm mà không có quyết định rủi ro được ghi nhận' },
+    { kind: 'string', from: 'PO / supplier package / processor pack', to: 'PO / bộ hồ sơ nhà cung cấp / bộ hồ sơ gia công ngoài' },
+    { kind: 'string', from: 'Mỗi lần mua / outsource', to: 'Mỗi lần mua / thuê ngoài' },
+    { kind: 'string', from: 'packaging/return note', to: 'ghi chú đóng gói/hoàn trả' },
+    { kind: 'string', from: 'Receiving / IQC / warehouse trạng thái hồ sơ', to: 'Hồ sơ trạng thái nhận hàng / IQC / kho' },
+    { kind: 'string', from: 'quantity, package condition, location, trạng thái, cert link', to: 'số lượng, tình trạng bao gói, vị trí, trạng thái, liên kết chứng từ chứng nhận' },
+    { kind: 'string', from: 'Xuất-trả tool crib / trạng thái tồn kho', to: 'Xuất-trả dụng cụ / trạng thái tồn kho' },
+    { kind: 'string', from: 'Trước ship', to: 'Trước khi giao' },
+    { kind: 'string', from: 'quantity reconciliation, label data, booking, packing bảng kiểm, carrier bàn giao hồ sơ', to: 'đối soát số lượng, dữ liệu nhãn, đặt chỗ, bảng kiểm đóng gói, bàn giao hồ sơ cho đơn vị vận chuyển' },
+    { kind: 'string', from: 'Supplier product folder / bộ chứng từ chứng nhận', to: 'Thư mục hồ sơ nhà cung cấp / bộ chứng từ chứng nhận' },
+    { kind: 'string', from: 'Trước material release hoặc ship customer', to: 'Trước khi phê duyệt vật tư hoặc giao cho khách hàng' },
+    { kind: 'string', from: 'Có MTC/CoA, processor cert, deviation approval, historical folder index theo SSOT supplier bộ bằng chứng / .', to: 'Có MTC/CoA, chứng từ của đơn vị gia công ngoài, phê duyệt sai lệch và chỉ mục thư mục lưu trữ theo SSOT của bộ bằng chứng nhà cung cấp.' },
+    { kind: 'string', from: 'OTIF supplier / processor', to: 'OTIF nhà cung cấp / đơn vị gia công ngoài' },
+    { kind: 'string', from: 'Số giao đúng hạn và đủ qty / tổng PO due', to: 'Số lô giao đúng hạn và đủ số lượng / tổng PO đến hạn' },
+    { kind: 'string', from: 'Warehouse accuracy', to: 'Độ chính xác tồn kho' },
+    { kind: 'string', from: 'Chênh lệch count/location/trạng thái / tổng dòng kiểm', to: 'Chênh lệch kiểm đếm/vị trí/trạng thái / tổng dòng kiểm' },
+    { kind: 'string', from: 'Shipment accuracy', to: 'Độ chính xác giao hàng' },
+    { kind: 'string', from: '0 major miss', to: '0 lỗi nghiêm trọng' },
+    { kind: 'string', from: 'Số shipment sai qty/label/cert/booking / tổng shipment', to: 'Số lô giao sai số lượng/nhãn/chứng từ chứng nhận/đặt chỗ / tổng lô giao' },
+    { kind: 'string', from: 'Supplier corrective closure', to: 'Đóng khắc phục của nhà cung cấp' },
+    { kind: 'string', from: 'SCAR/action đóng đúng hạn / tổng action mở', to: 'SCAR/hành động đóng đúng hạn / tổng hành động mở' },
+    { kind: 'string', from: 'Supplier vấn đề / khiếu nại loop', to: 'Vòng phản hồi vấn đề / khiếu nại nhà cung cấp' },
+    { kind: 'string', from: 'quantity impact, urgency, cost, replacement need', to: 'mức ảnh hưởng về số lượng, mức khẩn, chi phí, nhu cầu thay thế' },
+    { kind: 'string', from: 'Supply Chain phải tham gia rà soát Tier với 4 tín hiệu đỏ: thiếu vật tư trọng yếu, thiếu gói chứng từ/processor, rủi ro nguồn cung tăng và đối soát giao hàng chưa sạch.', to: 'Supply Chain phải tham gia rà soát Tier với 4 tín hiệu đỏ: thiếu vật tư trọng yếu, thiếu gói chứng từ/đơn vị gia công ngoài, rủi ro nguồn cung tăng và đối soát giao hàng chưa sạch.' },
+    { kind: 'string', from: 'Không dùng email/Excel rời làm SSOT cuối cùng cho quantity/trạng thái/location;', to: 'Không dùng email/Excel rời làm SSOT cuối cùng cho số lượng/trạng thái/vị trí;' },
+    { kind: 'string', from: 'Khi offline, receiving/ship/warehouse phải kích hoạt kit dự phòng nhưng vẫn giữ nhãn – lot – qty – trạng thái – xác nhận phê duyệt để nhập bù chính xác theo ', to: 'Khi ngoại tuyến, nhận hàng/giao hàng/kho phải kích hoạt bộ dự phòng nhưng vẫn giữ nhãn – lô – số lượng – trạng thái – xác nhận phê duyệt để nhập bù chính xác theo ' },
+    { kind: 'string', from: 'PO / supplier due trạng thái', to: 'Trạng thái PO / ngày đến hạn của nhà cung cấp' },
+    { kind: 'string', from: 'ERP / PO bảng theo dõi / expedite nhật ký', to: 'ERP / bảng theo dõi PO / nhật ký đẩy nhanh' },
+    { kind: 'string', from: 'Expedite, re-source, mức sẵn sàng sản xuất', to: 'Đẩy nhanh, đổi nguồn, mức sẵn sàng sản xuất' },
+    { kind: 'string', from: 'Material cert &amp; lot trạng thái', to: 'Trạng thái chứng từ vật liệu &amp; lô' },
+    { kind: 'string', from: 'Supplier folder + receiving hồ sơ', to: 'Thư mục nhà cung cấp + hồ sơ nhận hàng' },
+    { kind: 'string', from: 'Cho phép IQC/release hay giữ quarantine', to: 'Cho phép IQC/phê duyệt hay giữ khu cách ly' },
+    { kind: 'string', from: 'Warehouse location/trạng thái accuracy', to: 'Độ chính xác vị trí/trạng thái kho' },
+    { kind: 'string', from: 'Vấn đề to job, pick/pack, shortage investigation', to: 'Cấp vật tư cho job, lấy hàng/đóng gói, điều tra thiếu hụt' },
+    { kind: 'string', from: 'Release carrier bàn giao hoặc hold shipment', to: 'Phê duyệt bàn giao cho đơn vị vận chuyển hoặc tạm giữ lô giao' },
+    { kind: 'string', from: 'Rủi ro nhà cung cấp, PO triển khai yêu cầu xuống, đọc hiểu kỹ thuật đủ để mua đúng, nguyên tắc đẩy nhanh tiến độ', to: 'Rủi ro nhà cung cấp, triển khai yêu cầu xuống trong PO, đọc hiểu kỹ thuật đủ để mua đúng, nguyên tắc đẩy nhanh tiến độ' },
+    { kind: 'string', from: 'OJT + supplier tình huống review + thẻ điểm management', to: 'OJT + rà soát tình huống nhà cung cấp + quản trị thẻ điểm' },
+    { kind: 'string', from: 'Khi thêm nhóm source/quy trình mới hoặc khiếu nại supplier lặp lại', to: 'Khi thêm nhóm nguồn/quy trình mới hoặc khiếu nại nhà cung cấp lặp lại' },
+    { kind: 'string', from: 'Training + cycle count accuracy + shipping accuracy', to: 'Đào tạo + độ chính xác kiểm đếm chu kỳ + độ chính xác giao hàng' },
+    { kind: 'string', from: 'Khi layout/kho mới, WMS/ERP change hoặc mismatch tăng', to: 'Khi đổi layout/kho, thay đổi WMS/ERP hoặc mức lệch tăng' },
+    { kind: 'string', from: 'Tool identity, min-max, critical vấn đề-return, substitution awareness', to: 'Nhận diện dụng cụ, min-max, nhận-trả hạng mục trọng yếu, nhận biết thay thế' },
+    { kind: 'string', from: 'Vấn đề-return accuracy + downtime/tool shortage history', to: 'Độ chính xác nhận-trả + lịch sử dừng máy/thiếu dụng cụ' },
+    { kind: 'string', from: 'Khi đổi nhóm máy (machine family)/tooling concept', to: 'Khi đổi nhóm máy/khái niệm dụng cụ' },
+    { kind: 'string', from: 'Pack spec, label data, export docs, carrier bàn giao, damage/claim response', to: 'Quy cách đóng gói, dữ liệu nhãn, chứng từ xuất khẩu, bàn giao cho đơn vị vận chuyển, phản ứng với hư hỏng/khiếu nại' },
+    { kind: 'string', from: 'Shipment accuracy + claim response + customer-specific ship requirements', to: 'Độ chính xác giao hàng + phản ứng với khiếu nại + yêu cầu giao hàng riêng của khách hàng' },
+    { kind: 'string', from: 'Khi customer route guide hoặc market requirement đổi', to: 'Khi hướng dẫn tuyến giao hàng của khách hàng hoặc yêu cầu thị trường thay đổi' },
+    { kind: 'string', from: 'Deputy/backup:', to: 'Người thay thế/dự phòng:' },
+    { kind: 'string', from: 'PO spike, source crisis', to: 'PO tăng đột biến, khủng hoảng nguồn cung' },
+    { kind: 'string', from: 'Bàn giao open PO, expedites, source risk, pending cert and processor slots.', to: 'Bàn giao PO đang mở, các yêu cầu đẩy nhanh, rủi ro nguồn cung, chứng từ chứng nhận còn chờ và suất của đơn vị gia công ngoài còn chờ.' },
+    { kind: 'string', from: 'end-month ship rush', to: 'cao điểm giao hàng cuối tháng' },
+    { kind: 'string', from: 'Bàn giao hold/quarantine bins, urgent picks, mismatch under investigation, cycle count exceptions.', to: 'Bàn giao kệ tạm giữ/khu cách ly, các yêu cầu lấy hàng khẩn, các lệch đang điều tra và ngoại lệ kiểm đếm chu kỳ.' },
+    { kind: 'string', from: 'Nhiều shipment cùng lúc hoặc sự cố carrier', to: 'Nhiều lô giao cùng lúc hoặc sự cố đơn vị vận chuyển' },
+    { kind: 'string', from: 'Bàn giao bookings, labels pending, export docs, customer instructions and cut-off times.', to: 'Bàn giao đặt chỗ, nhãn còn chờ, chứng từ xuất khẩu, hướng dẫn của khách hàng và giờ cắt chuyến.' },
+    { kind: 'string', from: 'Rủi ro / trigger', to: 'Rủi ro / dấu hiệu kích hoạt' },
+    { kind: 'string', from: 'người phụ trách leo thang', to: 'người phụ trách chuyển cấp' },
+    { kind: 'string', from: 'cert thiếu, label mờ, pack damage khi nhận', to: 'thiếu chứng từ chứng nhận, nhãn mờ, hư hỏng bao gói khi nhận' },
+    { kind: 'string', from: 'Tool không đủ cho hot job, min-max không còn, substitute chưa đánh giá', to: 'Dụng cụ không đủ cho job nóng, min-max không còn, phương án thay thế chưa được đánh giá' },
+    { kind: 'string', from: 'Escalate Production/Engineering/SCM, quyết định expedite hoặc resequence', to: 'Chuyển cấp cho Production/Engineering/SCM, quyết định đẩy nhanh hoặc sắp xếp lại thứ tự' },
+    { kind: 'string', from: '14. Workbook-control cho khối Supply Chain / Warehouse', to: '13. Kiểm soát tệp theo dõi cho khối Supply Chain / Warehouse' },
+    { kind: 'string', from: 'Khối Supply Chain là nơi chịu thay đổi boundary lớn nhất của pack Excel mới. FRM-701 workbook trở thành hồ sơ active hợp nhất cho receiving/IQC cổng kiểm soát, put-away và storage bàn giao; là mã không phát hành trong danh mục hiện hành và được chuẩn hóa tại . Đồng thời cũng là mã không phát hành trong danh mục hiện hành; phạm vi supplier bằng chứng được bao phủ bởi ANNEX-403, FRM-405, FRM-409 và FRM-411.', to: 'Khối Supply Chain là nơi chịu thay đổi ranh giới lớn nhất của bộ tệp Excel mới. FRM-701 trở thành hồ sơ đang dùng hợp nhất cho cổng kiểm soát nhận hàng/IQC, bàn giao put-away và trạng thái lưu kho; mã này không phát hành riêng trong danh mục hiện hành mà được chuẩn hóa theo phạm vi sử dụng. Phần bằng chứng nhà cung cấp được bao phủ bởi ANNEX-403, FRM-405, FRM-409 và FRM-411.' },
+    { kind: 'string', from: 'Form / workbook', to: 'Biểu mẫu / tệp theo dõi' },
+    { kind: 'string', from: 'Boundary mới', to: 'Ranh giới mới' },
+    { kind: 'string', from: 'Rule dùng thật', to: 'Quy tắc sử dụng thực tế' },
+    { kind: 'string', from: 'Dùng như workbook hiện hành cho receipt route, traceability header, PASS/HOLD/REJECT, bàn giao và storage trạng thái; không đẩy quyết định quality ra ngoài workbook này.', to: 'Dùng như tệp theo dõi hiện hành cho tuyến nhận hàng, đầu mục truy xuất, PASS/HOLD/REJECT, bàn giao và trạng thái lưu kho; không tách quyết định chất lượng ra ngoài tệp này.' },
+    { kind: 'string', from: 'Hold / disposition / release thẩm quyền', to: 'Thẩm quyền tạm giữ / xử lý / phê duyệt' },
+    { kind: 'string', from: 'Giữ suspect stock, disposition lane, concession/release note và thẩm quyền trail sau khi cổng kiểm soát receipt phát hiện bất thường.', to: 'Giữ tồn nghi ngờ, luồng xử lý, ghi chú nhượng bộ/phê duyệt và dấu vết thẩm quyền sau khi cổng kiểm soát nhận hàng phát hiện bất thường.' },
+    { kind: 'string', from: 'Chỉ dùng để chuẩn hóa tham chiếu phạm vi mã; supplier bộ bằng chứng chạy qua ANNEX-403, FRM-405, FRM-409 và FRM-411.', to: 'Chỉ dùng để chuẩn hóa tham chiếu phạm vi mã; bộ bằng chứng nhà cung cấp được quản lý qua ANNEX-403, FRM-405, FRM-409 và FRM-411.' },
+    { kind: 'string', from: 'Cleanroom / ultrasonic / vacuum build / FOD line clearance', to: 'Phòng sạch / rửa siêu âm / lắp dựng chân không / giải phóng chuyền FOD' },
+    { kind: 'string', from: 'Dùng cho các lane sạch và high-sensitivity thay vì chèn thủ công vào nhật ký nhận hàng chung.', to: 'Dùng cho các luồng sạch và công việc có độ nhạy cao thay vì chèn thủ công vào nhật ký nhận hàng chung.' },
+    { kind: 'string', from: 'Handbook này chuẩn hóa Supply Chain như một hệ thống đảm bảo mức sẵn sàng và traceability, không chỉ là chức năng mua hàng/kho. Khi đổi source model, warehouse logic, bộ hồ sơ phê duyệt giao hàng hoặc ranh giới trách nhiệm, tài liệu phải được rà lại đồng thời với thẩm quyền, RACI, KPI và deputy matrix.', to: 'Handbook này chuẩn hóa Supply Chain như một hệ thống bảo đảm mức sẵn sàng và truy xuất, không chỉ là chức năng mua hàng/kho. Khi đổi mô hình nguồn cung, logic kho, bộ hồ sơ phê duyệt giao hàng hoặc ranh giới trách nhiệm, tài liệu phải được rà lại đồng thời với thẩm quyền, RACI, KPI và ma trận người thay thế.' },
+    { kind: 'string', from: '13. Inbound / outsource / warehouse boundary model', to: '14. Mô hình ranh giới nhận hàng / thuê ngoài / kho' },
+    { kind: 'string', from: 'Supplier / processor request setup', to: 'Thiết lập yêu cầu cho nhà cung cấp / đơn vị gia công ngoài' },
+    { kind: 'string', from: 'Receipt cổng kiểm soát', to: 'Cổng kiểm soát nhận hàng' },
+    { kind: 'string', from: 'Không để ERP/location trở thành bằng chứng quality release.', to: 'Không để ERP/vị trí trở thành bằng chứng phê duyệt chất lượng.' },
+    { kind: 'string', from: 'Supplier / source escalation', to: 'Chuyển cấp nguồn cung / nhà cung cấp' },
+    { kind: 'string', from: 'Repeated source vấn đề phải đi vào recurrence watch và MR pack.', to: 'Vấn đề nguồn cung lặp lại phải đi vào danh sách theo dõi tái diễn và bộ hồ sơ Management Review.' },
   ]
 );
 
