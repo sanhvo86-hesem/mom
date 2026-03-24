@@ -222,7 +222,7 @@ Bảng dưới xác định “khi nào đào tạo trở thành cổng”.
 <tr>
 <td><b>Báo giá/Hợp đồng</b></td>
 <td>Khi hợp đồng thêm yêu cầu chứng chỉ/CTQ/traceability → HR/Training mở Training ID, lập kế hoạch theo ca.</td>
-<td>FRM-HR-TRN-001 (kế hoạch) + danh sách vai trò liên quan + log quyết định GO/HOLD.</td>
+<td>FRM-HR-TRN-001 (kế hoạch) + danh sách vai trò liên quan + nhật ký quyết định GO/HOLD.</td>
 </tr>
 <tr>
 <td><b>Planning</b></td>
@@ -251,8 +251,8 @@ Bảng dưới xác định “khi nào đào tạo trở thành cổng”.
 </tr>
 <tr>
 <td><b>QC/QA</b></td>
-<td>Khi thay gage/hiệu chuẩn status/tiêu chí đo → lớp đo kiểm &amp; kiểm soát hiệu chuẩn.</td>
-<td>Attendance + bài test đo + log xác nhận trạng thái gage.</td>
+<td>Khi thay gage/hiệu chuẩn trạng thái/tiêu chí đo → lớp đo kiểm &amp; kiểm soát hiệu chuẩn.</td>
+<td>Attendance + bài test đo + nhật ký xác nhận trạng thái gage.</td>
 </tr>
 <tr>
 <td><b>NCR/MRB</b></td>
@@ -354,13 +354,13 @@ Bảng dưới xác định “khi nào đào tạo trở thành cổng”.
 <tr>
 <td><b>CP6 — Performance test tại job thật</b></td>
 <td>Supervisor + QA/QC</td>
-<td>Rubric ĐẠT/KHÔNG ĐẠT + minh chứng (ảnh/phiếu theo dõi công việc (job traveler)/inspection hồ sơ)</td>
+<td>Rubric ĐẠT/KHÔNG ĐẠT + minh chứng (ảnh/phiếu theo dõi công việc (job traveler)/kiểm tra hồ sơ)</td>
 <td>FAIL → HOLD quyền</td>
 </tr>
 <tr>
 <td><b>CP7 — Cập nhật ma trận &amp; cấp quyền</b></td>
 <td>HR/Training</td>
-<td>Log cập nhật ma trận đào tạo (training matrix) + chứng nhận level</td>
+<td>Nhật ký cập nhật ma trận đào tạo (training matrix) + chứng nhận level</td>
 <td>Chưa cập nhật → BLOCK cấp quyền</td>
 </tr>
 <tr>
@@ -414,7 +414,7 @@ Bảng dưới xác định “khi nào đào tạo trở thành cổng”.
 <tr>
 <td>Lẫn nhóm ca A/ca B, thiếu người học nhưng vẫn ký đủ</td>
 <td>Đóng sổ điểm danh • Đối chiếu danh sách nhân sự thực tế • Tổ chức lại điểm danh tại chỗ</td>
-<td>Attendance điều chỉnh (ký lại) + log nguyên nhân</td>
+<td>Attendance điều chỉnh (ký lại) + nhật ký nguyên nhân</td>
 </tr>
 <tr>
 <td>Thiếu mục tiêu/tiêu chí đạt trên attendance</td>
@@ -424,12 +424,12 @@ Bảng dưới xác định “khi nào đào tạo trở thành cổng”.
 <tr>
 <td>Gage OOT/hiệu chuẩn hết hạn xuất hiện trong phần thực hành</td>
 <td>Ngừng thực hành • Cách ly gage • Gọi QC/QA kiểm tra trạng thái • Đổi gage đạt</td>
-<td>Ảnh tag cách ly + log đổi gage + kết quả tái đo</td>
+<td>Ảnh tag cách ly + nhật ký đổi gage + kết quả tái đo</td>
 </tr>
 <tr>
 <td>Nguy cơ ship rủi ro do người chưa đạt level đang thực hiện bước phê duyệt giao hàng</td>
 <td>Dừng xuất • Gọi QA/Supervisor • Chuyển giao bước cho người đạt • Mở hành động đào tạo lại</td>
-<td>Log HOLD ship + attendance bổ sung + quyết định mở khóa</td>
+<td>Nhật ký HOLD ship + attendance bổ sung + quyết định mở khóa</td>
 </tr>
 </tbody>
 </table>
@@ -452,13 +452,13 @@ Bảng dưới xác định “khi nào đào tạo trở thành cổng”.
 <tr><td>3</td><td>QA</td><td>Khóa tài liệu tham chiếu và Rev hiện hành.</td><td>Danh mục SOP/WI/FRM/Drawing/Spec + Rev</td><td>Thiếu Rev hoặc dùng bản in cũ</td></tr>
 <tr><td>4</td><td>Supervisor</td><td>Lập kế hoạch theo 2 ca, giữ giới hạn 2 ngày/tuần/vai trò, chốt người thay line.</td><td>FRM-HR-TRN-001 (kế hoạch) + roster thay line</td><td>Không có người thay line, gây đứt sản xuất</td></tr>
 <tr><td>5</td><td>HR/Training</td><td>Chuẩn bị danh sách tham dự theo từng ca.</td><td>FRM-HR-TRN-002 (mỗi ca 01 bản)</td><td>Dùng 01 bản cho 2 ca, lẫn người</td></tr>
-<tr><td>6</td><td>Trainer/Mentor</td><td>Giảng phần “cổng” (Rev/CTQ/traceability) và yêu cầu minh chứng.</td><td>Tài liệu giảng dạy + ảnh lớp + log phát tài liệu</td><td>Giảng lý thuyết rời rạc, không gắn cổng kiểm soát</td></tr>
+<tr><td>6</td><td>Trainer/Mentor</td><td>Giảng phần “cổng” (Rev/CTQ/traceability) và yêu cầu minh chứng.</td><td>Tài liệu giảng dạy + ảnh lớp + nhật ký phát tài liệu</td><td>Giảng lý thuyết rời rạc, không gắn cổng kiểm soát</td></tr>
 <tr><td>7</td><td>Trainer</td><td>Tổ chức bài kiểm tra nhanh ngay cuối lớp, chốt điểm tối thiểu theo mục 11.</td><td>Bài bài kiểm tra nhanh + bảng điểm ký xác nhận</td><td>Không lưu bài, chỉ ghi điểm miệng</td></tr>
 <tr><td>8</td><td>Supervisor + QA/QC</td><td>Tổ chức scenario quyết định HOLD/GO và yêu cầu ghi MRR.</td><td>Phiếu scenario + quyết định + minh chứng kèm</td><td>Không ghi quyết định, không tạo bằng chứng</td></tr>
 <tr><td>9</td><td>Mentor</td><td>OJT theo TWI trên job thật (chia 2 lần theo ca), ghi job breakdown.</td><td>FRM-HR-TRN-003 + ảnh/hồ sơ job</td><td>OJT không có job thật hoặc không quan sát</td></tr>
 <tr><td>10</td><td>Supervisor</td><td>Performance test: học viên tự lập kế hoạch 2 ca và hoàn tất attendance mẫu.</td><td>Bài test + rubric ĐẠT/KHÔNG ĐẠT</td><td>Đánh giá cảm tính, không theo rubric</td></tr>
 <tr><td>11</td><td>Trainer</td><td>Chốt kết luận Đạt/Chưa đạt cho từng học viên, ký đủ các bên.</td><td>FRM-HR-TRN-002 có đầy đủ chữ ký</td><td>Thiếu chữ ký QA khi có CTQ</td></tr>
-<tr><td>12</td><td>HR/Training</td><td>Cập nhật ma trận đào tạo (training matrix) + chứng nhận level + log cấp quyền.</td><td>Log cập nhật + FRM-HR-TRN-005</td><td>Cấp quyền trước khi cập nhật</td></tr>
+<tr><td>12</td><td>HR/Training</td><td>Cập nhật ma trận đào tạo (training matrix) + chứng nhận level + nhật ký cấp quyền.</td><td>Nhật ký cập nhật + FRM-HR-TRN-005</td><td>Cấp quyền trước khi cập nhật</td></tr>
 <tr><td>13</td><td>Supervisor</td><td>Khóa quyền người FAIL và lên lịch đào tạo lại trong ca.</td><td>Danh sách khóa quyền + lịch tái đào tạo</td><td>FAIL nhưng vẫn giao việc</td></tr>
 <tr><td>14</td><td>Supervisor + QA</td><td>theo dõi tiếp 30–60 ngày: kiểm tra lỗi lặp, kiểm tra hồ sơ, đánh giá tại line.</td><td>Báo cáo theo dõi tiếp + hành động đóng</td><td>Không theo dõi hiệu lực</td></tr>
 <tr><td>15</td><td>HR/Training</td><td>Lưu hồ sơ theo quy tắc đặt tên và kho lưu; đảm bảo truy xuất trong 5 phút.</td><td>Thư mục lưu + index hồ sơ + kiểm tra truy xuất</td><td>Lưu rải rác, tên file lộn xộn</td></tr>
@@ -514,7 +514,7 @@ Bảng dưới xác định “khi nào đào tạo trở thành cổng”.
 <ul class="tight">
 <li>01 bộ <b>Training Plan</b> theo FRM-HR-TRN-001 cho 01 tuần (có ca A/ca B, có người thay line, có mục tiêu &amp; tiêu chí đạt).</li>
 <li>02 bản <b>Attendance</b> theo FRM-HR-TRN-002 (mỗi ca 01 bản) có đầy đủ chữ ký và kết quả bài kiểm tra nhanh/scenario.</li>
-<li>01 bộ <b>OJT bảng kiểm</b> theo FRM-HR-TRN-003 kèm job breakdown và quan sát tại job thật.</li>
+<li>01 bộ <b>OJT Checklist</b> theo FRM-HR-TRN-003 kèm job breakdown và quan sát tại job thật.</li>
 <li>01 bản <b>quyết định cấp quyền</b> (mở khóa/khóa quyền) theo kết quả ĐẠT/KHÔNG ĐẠT; cập nhật ma trận đào tạo (training matrix).</li>
 </ul>
 </div>
@@ -586,7 +586,7 @@ Bảng dưới xác định “khi nào đào tạo trở thành cổng”.
 <tbody>
 <tr><td>Operator</td><td>L1</td><td>Đạt bài kiểm tra nhanh + hoàn tất attendance + tham gia OJT đúng ca; không ký hộ.</td></tr>
 <tr><td>Setup</td><td>L1</td><td>Đạt scenario về Rev/cổng kiểm soát; ghi MRR đúng khi đổi setup sheet.</td></tr>
-<tr><td>Programmer</td><td>L1</td><td>Ghi Rev toolpath/post vào bằng chứng; xử lý thay đổi Rev có biên bản.</td></tr>
+<tr><td>Programmer</td><td>L1</td><td>Ghi Rev đường chạy dao/post vào bằng chứng; xử lý thay đổi Rev có biên bản.</td></tr>
 <tr><td>QC</td><td>L2</td><td>Chốt tiêu chí đo/CTQ trong lớp; không xác nhận khi thiếu Rev gage.</td></tr>
 <tr><td>QA</td><td>L2</td><td>Khóa Rev và quyết định STOP khi sai Rev; mở NCR khi gian dối minh chứng.</td></tr>
 <tr><td>Warehouse</td><td>L1</td><td>Áp dụng quy tắc “hồ sơ đi cùng hàng”; HOLD giao hàng khi thiếu bằng chứng.</td></tr>
@@ -648,7 +648,7 @@ Bảng dưới xác định “khi nào đào tạo trở thành cổng”.
 <td>1</td>
 <td><b>Khi</b> Engineering phát hành Rev mới cho WI setup, ca A đã học Rev mới, ca B đang cầm bản in Rev cũ tại máy. Job chạy trong 2 giờ nữa.</td>
 <td>Ra quyết định <b>STOP</b> hay <b>HOLD</b> phần nào; phân công ai xử lý trong 60 giây.</td>
-<td>Biên bản thu hồi bản cũ + attendance bổ sung cho ca B + log xác nhận Rev đúng.</td>
+<td>Biên bản thu hồi bản cũ + attendance bổ sung cho ca B + nhật ký xác nhận Rev đúng.</td>
 </tr>
 <tr>
 <td>2</td>
@@ -660,7 +660,7 @@ Bảng dưới xác định “khi nào đào tạo trở thành cổng”.
 <td>3</td>
 <td><b>Khi</b> Warehouse chuẩn bị xuất hàng, phát hiện người ký phê duyệt giao hàng vừa đổi ca và chưa có chứng nhận level theo ma trận đào tạo (training matrix), nhưng chứng từ giao hàng đã hoàn tất.</td>
 <td>Ra quyết định <b>HOLD</b> ship; điều phối người đạt thay thế; kích hoạt đào tạo bổ sung.</td>
-<td>Log HOLD ship + bằng chứng bàn giao người thay thế + kế hoạch đào tạo theo ca.</td>
+<td>Nhật ký HOLD ship + bằng chứng bàn giao người thay thế + kế hoạch đào tạo theo ca.</td>
 </tr>
 </tbody>
 </table>
@@ -751,10 +751,10 @@ Bảng dưới xác định “khi nào đào tạo trở thành cổng”.
 <li>FRM-HR-TRN-001 — Training Plan (kế hoạch theo tháng/quý/tuần, có phân bổ 2 ca)</li>
 <li>FRM-HR-TRN-002 — Attendance List (mỗi ca 01 bản)</li>
 <li>FRM-HR-TRN-003 — Bảng kiểm OJT (kèm job breakdown)</li>
-<li>FRM-HR-TRN-004 — Competency Đánh giá (khi cấp level)</li>
-<li>FRM-HR-TRN-005 — Level Certification (khi PASS)</li>
+<li>FRM-HR-TRN-004 — Competence Assessment (khi cấp level)</li>
+<li>FRM-HR-TRN-005 — Skill Level Certificate (khi PASS)</li>
 <li>Bảng điểm bài kiểm tra nhanh + scenario + performance test (kèm minh chứng ảnh/hồ sơ tại job)</li>
-<li>Log cập nhật ma trận đào tạo (training matrix) và log khóa/mở quyền</li>
+<li>Nhật ký cập nhật ma trận đào tạo (training matrix) và nhật ký khóa/mở quyền</li>
 <li>Báo cáo theo dõi tiếp 30–60 ngày (hiệu lực đào tạo)</li>
 </ul>
 <h3 class="h3">12.2 Quy tắc đặt tên (bắt buộc)</h3>
@@ -781,7 +781,7 @@ Cấu trúc chuẩn:
 <div class="card" id="sec13">
 <h2 class="h2" style="margin-top:0;">13) Common đánh giá phát hiện &amp; phòng ngừa (≥ 8 lỗi hay gặp)</h2>
 <ol class="tight">
-<li><b>Không chứng minh năng lực theo vị trí</b> → ma trận đào tạo (training matrix) không cập nhật. <b>Chặn:</b> CP7 bắt buộc, log cập nhật theo Training ID.</li>
+<li><b>Không chứng minh năng lực theo vị trí</b> → ma trận đào tạo (training matrix) không cập nhật. <b>Chặn:</b> CP7 bắt buộc, nhật ký cập nhật theo Training ID.</li>
 <li><b>Thiếu attendance có chữ ký</b> → fail bằng chứng. <b>Chặn:</b> CP4, BLOCK công nhận level.</li>
 <li><b>Thiếu Rev tài liệu tham chiếu</b> → sai phiên bản. <b>Chặn:</b> CP2, STOP lớp khi sai Rev.</li>
 <li><b>Không có đánh giá hiệu lực</b> → đào tạo không chứng minh hiệu quả. <b>Chặn:</b> CP8, theo dõi tiếp 30–60 ngày.</li>

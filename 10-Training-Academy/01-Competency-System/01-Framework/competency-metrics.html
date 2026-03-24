@@ -105,7 +105,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <hr class="sep"/>
-<p class="muted">Yêu cầu triển khai: dùng tài liệu này như <strong>data dictionary</strong> để thiết kế dashboard KPI theo phòng ban và làm “gating rules” trong biểu mẫu chấm năng lực.</p>
+<p class="muted">Yêu cầu triển khai: dùng tài liệu này như <strong>data dictionary</strong> để thiết kế bảng điều khiển KPI theo phòng ban và làm “gating rules” trong biểu mẫu chấm năng lực.</p>
 </div><section class="card" id="C01">
 <div class="grid-2">
 <div>
@@ -155,7 +155,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Tỷ lệ tuân thủ PPE</strong></td>
 <td>Tỷ lệ ca làm việc/quan sát đạt PPE đầy đủ theo quy định vị trí.</td>
 <td><code>(Số quan sát đạt PPE / Tổng quan sát) * 100</code></td>
-<td>Gemba walk / Safety observation log</td>
+<td>Gemba walk / Safety observation nhật ký</td>
 <td>Tuần</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=95%</td>
@@ -343,7 +343,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>First Pass Yield (FPY) cá nhân/tổ</strong></td>
 <td>Tỷ lệ sản phẩm đạt ngay lần đầu không cần sửa/rework.</td>
 <td><code>FPY = (Số OK lần đầu / Tổng sản phẩm) * 100</code></td>
-<td>QC result + NCR log</td>
+<td>QC result + NCR nhật ký</td>
 <td>Tuần/Tháng</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=90%</td>
@@ -385,7 +385,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Tỷ lệ hoàn tất kiểm tra CTQ đúng chuẩn</strong></td>
 <td>Tỷ lệ đặc tính CTQ được kiểm tra &amp; ghi nhận đúng theo plan.</td>
 <td><code>(CTQ kiểm đủ / CTQ yêu cầu) * 100</code></td>
-<td>Inspection plan + report</td>
+<td>Kiểm tra plan + report</td>
 <td>Tuần</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=95%</td>
@@ -399,7 +399,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Tỷ lệ phát hiện sớm (internal detection)</strong></td>
 <td>Tỷ lệ lỗi phát hiện ở nội bộ trước khi giao (ưu tiên phát hiện càng sớm càng tốt).</td>
 <td><code>(Lỗi phát hiện nội bộ / Tổng lỗi) * 100</code></td>
-<td>NCR log</td>
+<td>NCR nhật ký</td>
 <td>Tháng</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=80%</td>
@@ -457,8 +457,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><code>C04-M2</code></td>
 <td><strong>Thời gian phản hồi yêu cầu nội bộ</strong></td>
 <td>Thời gian trung bình phản hồi ticket/nhắn tin/email nội bộ theo SLA.</td>
-<td><code>Avg(Response time)</code></td>
-<td>Zalo/Email log (đo thủ công) / ticket sheet</td>
+<td><code>Avg(Thời gian phản hồi)</code></td>
+<td>Zalo/Email nhật ký (đo thủ công) / ticket sheet</td>
 <td>Tuần</td>
 <td style="text-align:center">↓</td>
 <td>&lt;=24h</td>
@@ -559,7 +559,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Chỉ số chủ động (Proactive actions)</strong></td>
 <td>Số lần chủ động phát hiện rủi ro/lập yêu cầu giải pháp trước khi lỗi xảy ra.</td>
 <td><code>Đếm # action được ghi nhận</code></td>
-<td>Kaizen log / leader hồ sơ</td>
+<td>Kaizen nhật ký / leader hồ sơ</td>
 <td>Tháng</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=1/quý</td>
@@ -587,7 +587,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Số lần tái nhắc việc (reminder) bởi quản lý</strong></td>
 <td>Số lần quản lý phải nhắc lại cùng 1 việc do chậm/không làm.</td>
 <td><code>Đếm #</code></td>
-<td>Leader log</td>
+<td>Leader nhật ký</td>
 <td>Tháng</td>
 <td style="text-align:center">↓</td>
 <td>&lt;=4</td>
@@ -660,7 +660,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Thời gian phản ứng containment</strong></td>
 <td>Thời gian từ lúc phát hiện lỗi đến khi cô lập/containment hoàn tất.</td>
 <td><code>Avg(hours)</code></td>
-<td>NCR/CAPA log</td>
+<td>NCR/CAPA nhật ký</td>
 <td>Tháng</td>
 <td style="text-align:center">↓</td>
 <td>&lt;=24h</td>
@@ -747,7 +747,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Số Kaizen/Tháng (hợp lệ)</strong></td>
 <td>Số lập yêu cầu cải tiến có mô tả vấn đề–giải pháp–lợi ích–thử nghiệm.</td>
 <td><code>Đếm # kaizen được duyệt</code></td>
-<td>Kaizen log</td>
+<td>Kaizen nhật ký</td>
 <td>Tháng</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=1/quý</td>
@@ -761,7 +761,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Tỷ lệ Kaizen được triển khai</strong></td>
 <td>Tỷ lệ lập yêu cầu cải tiến được triển khai thực tế (không chỉ ý tưởng).</td>
 <td><code>(Kaizen triển khai / Kaizen duyệt) * 100</code></td>
-<td>Kaizen log</td>
+<td>Kaizen nhật ký</td>
 <td>Quý</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=50%</td>
@@ -848,7 +848,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Tỷ lệ nhập liệu ERP đúng &amp; đủ</strong></td>
 <td>Tỷ lệ giao dịch/phiếu được nhập đúng trường bắt buộc, đúng thời điểm.</td>
 <td><code>(Giao dịch đúng/đủ / Tổng giao dịch) * 100</code></td>
-<td>ERP logs / kiểm tra chéo</td>
+<td>ERP các nhật ký / kiểm tra chéo</td>
 <td>Tuần</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=90%</td>
@@ -977,7 +977,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Tỷ lệ đổi ưu tiên không kiểm soát</strong></td>
 <td>Số lần đổi ưu tiên gây gián đoạn mà không có lý do/duyệt.</td>
 <td><code>Đếm #</code></td>
-<td>Planner log</td>
+<td>Planner nhật ký</td>
 <td>Tháng</td>
 <td style="text-align:center">↓</td>
 <td>&lt;=4</td>
@@ -1151,7 +1151,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Báo giá turnaround time</strong></td>
 <td>Thời gian từ khi nhận RFQ đến khi gửi báo giá.</td>
 <td><code>Avg(hours) hoặc % trong SLA</code></td>
-<td>CRM/Email log</td>
+<td>CRM/Email nhật ký</td>
 <td>Tuần</td>
 <td style="text-align:center">↓</td>
 <td>&lt;=72h</td>
@@ -1193,7 +1193,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Thời gian xử lý khiếu nại</strong></td>
 <td>Thời gian từ khi nhận khiếu nại đến khi phản hồi containment &amp; 8D sơ bộ.</td>
 <td><code>Avg(days)</code></td>
-<td>8D log</td>
+<td>8D nhật ký</td>
 <td>Tháng</td>
 <td style="text-align:center">↓</td>
 <td>&lt;=7d</td>
@@ -1280,7 +1280,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Tool cost per part</strong></td>
 <td>Chi phí dao cụ/chi tiết theo nhóm máy/công đoạn.</td>
 <td><code>(Tổng chi phí dao / Số sp) </code></td>
-<td>tuổi dao (tool life) log + mua hàng</td>
+<td>tuổi dao (tool life) nhật ký + mua hàng</td>
 <td>Tháng</td>
 <td style="text-align:center">↓</td>
 <td>&lt;=std*</td>
@@ -1364,10 +1364,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><code>C13-M2</code></td>
-<td><strong>Tỷ lệ ECO/Change request xử lý đúng hạn</strong></td>
+<td><strong>Tỷ lệ ECO/Yêu cầu thay đổi xử lý đúng hạn</strong></td>
 <td>Tỷ lệ yêu cầu thay đổi được xử lý đúng hạn (review–phê duyệt–thông báo).</td>
 <td><code>(ECO đúng hạn / Tổng ECO) * 100</code></td>
-<td>ECO log</td>
+<td>ECO nhật ký</td>
 <td>Tháng</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=80%</td>
@@ -1409,7 +1409,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Thời gian cập nhật hồ sơ sau thay đổi</strong></td>
 <td>Thời gian từ khi duyệt ECO đến khi update router, QC plan, work instruction.</td>
 <td><code>Avg(days)</code></td>
-<td>ECO log</td>
+<td>ECO nhật ký</td>
 <td>Tháng</td>
 <td style="text-align:center">↓</td>
 <td>&lt;=5d</td>
@@ -1583,7 +1583,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Điểm chọn thông số cắt phù hợp vật liệu</strong></td>
 <td>Điểm đánh giá lựa chọn speed/feed, dao, dung dịch làm mát (coolant) theo vật liệu.</td>
 <td><code>Chấm theo review (0–100)</code></td>
-<td>CAM review / machining log</td>
+<td>CAM review / machining nhật ký</td>
 <td>Theo job</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=70</td>
@@ -1654,9 +1654,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><code>C16-M1</code></td>
 <td><strong>Tỷ lệ kiểm tra theo plan</strong></td>
-<td>Tỷ lệ đặc tính trong kế hoạch kiểm tra (inspection plan) được kiểm tra &amp; ghi nhận đúng.</td>
+<td>Tỷ lệ đặc tính trong kế hoạch kiểm tra (kiểm tra plan) được kiểm tra &amp; ghi nhận đúng.</td>
 <td><code>(Đặc tính đo đủ / Đặc tính yêu cầu) * 100</code></td>
-<td>Inspection report</td>
+<td>Kiểm tra report</td>
 <td>Tuần</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=95%</td>
@@ -1695,10 +1695,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><code>C16-M4</code></td>
-<td><strong>FAI/Inspection report đúng hạn</strong></td>
+<td><strong>FAI/Kiểm tra report đúng hạn</strong></td>
 <td>Tỷ lệ báo cáo FAI/IR phát hành đúng hạn theo cam kết giao hàng.</td>
 <td><code>(IR đúng hạn / Tổng IR) * 100</code></td>
-<td>QA log</td>
+<td>QA nhật ký</td>
 <td>Tháng</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=85%</td>
@@ -1757,7 +1757,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Tỷ lệ machine crash / sự cố nghiêm trọng</strong></td>
 <td>Số sự cố va chạm, gãy dao lớn, hỏng spindle do thao tác.</td>
 <td><code>Đếm #</code></td>
-<td>Downtime log</td>
+<td>Downtime Log</td>
 <td>Tháng</td>
 <td style="text-align:center">↓</td>
 <td>&lt;=1</td>
@@ -1799,7 +1799,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Tool life stability</strong></td>
 <td>Độ ổn định tuổi dao (giảm biến động, giảm gãy dao).</td>
 <td><code>CV(tuổi dao (tool life)) hoặc # gãy dao/100h</code></td>
-<td>Tool life log</td>
+<td>Tool Life Log</td>
 <td>Tháng</td>
 <td style="text-align:center">↓</td>
 <td>&lt;=5/100h</td>
@@ -1858,7 +1858,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Receiving accuracy</strong></td>
 <td>Tỷ lệ nhận hàng đúng số lượng, đúng mã, đúng chứng từ.</td>
 <td><code>(Lô nhận đúng / Tổng lô) * 100</code></td>
-<td>Incoming log</td>
+<td>Incoming nhật ký</td>
 <td>Tuần</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=95%</td>
@@ -1886,7 +1886,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>OTD của nhà cung cấp</strong></td>
 <td>Tỷ lệ giao hàng đúng hạn của nhà cung cấp chủ lực.</td>
 <td><code>(PO line đúng hạn / Tổng PO line) * 100</code></td>
-<td>Purchasing log</td>
+<td>Purchasing nhật ký</td>
 <td>Tháng</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=80%</td>
@@ -1900,7 +1900,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Shipping accuracy</strong></td>
 <td>Tỷ lệ xuất hàng đúng mã, đúng qty, đúng label, đúng doc pack.</td>
 <td><code>(Shipment đúng / Tổng shipment) * 100</code></td>
-<td>Shipping bảng kiểm</td>
+<td>Shipping Checklist</td>
 <td>Tuần</td>
 <td style="text-align:center">↑</td>
 <td>&gt;=98%</td>

@@ -83,7 +83,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-daily-management-tier.html"><b>DRL-08</b> — Bài diễn tập Daily Management (Tier Meeting)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Bài diễn tập Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet))</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-daily-management-tier.html">DRL-08 — TRN-Bài diễn tập ACA-DRL-08 — Daily Management (Tier Meeting) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet)) | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
@@ -94,7 +94,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><ul><li>Hiểu vai trò leader tuyến đầu trong Safety–Quality–Delivery.</li><li>Hiểu họp đầu ca/tier meeting và escalation cơ bản.</li><li>Hiểu kèm cặp phát triển cơ bản (SBI/TWI).</li></ul></td>
 <td><ul><li>Tổ chức họp đầu ca đúng agenda; cập nhật board.</li><li>Escalate CTQ/safety đúng kênh.</li><li>Kèm cặp phát triển đơn giản và ghi lại action.</li></ul></td>
-<td><ul><li>Ảnh board + nhật ký hành động (nhật ký hành động).</li><li>Log escalation.</li><li>Kèm cặp phát triển note (1:1).</li></ul></td>
+<td><ul><li>Ảnh board + nhật ký hành động.</li><li>Nhật ký escalation.</li><li>Kèm cặp phát triển note (1:1).</li></ul></td>
 <td><ul><li>Tier meeting ≥90%.</li><li>Escalate CTQ ≤30'.</li><li>Action closure ≥80%.</li></ul></td>
 </tr>
 </tbody>
@@ -114,7 +114,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag shall">PHẢI</span>
 <div class="text">
 <div><strong>Tổ chức PHẢI đảm bảo năng lực nhân sự bằng đào tạo/đánh giá; leader tuyến đầu PHẢI duy trì competence/awareness.</strong> <span class="iso">ISO 7.2 &amp; 7.3</span></div>
-<p>Bằng chứng: ma trận kỹ năng (skill matrix), OJT hồ sơ, kèm cặp phát triển log.</p>
+<p>Bằng chứng: ma trận kỹ năng (skill matrix), OJT hồ sơ, kèm cặp phát triển nhật ký.</p>
 </div>
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
@@ -132,7 +132,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag may">ĐƯỢC PHÉP</span>
 <div class="text">
 <div><strong>Lãnh đạo ĐƯỢC PHÉP triển khai DMS/tier meeting/LPA để tăng kỷ luật và minh bạch vận hành.</strong> <span class="iso">ISO 10.3</span></div>
-<p>Bằng chứng: tier meeting hồ sơ, LPA dashboard, KPI trends.</p>
+<p>Bằng chứng: tier meeting hồ sơ, LPA bảng điều khiển, KPI trends.</p>
 </div>
 </div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><h3>3.1 Lãnh đạo tuyến đầu trong xưởng CNC: “điều khiển hệ thống” chứ không “điều khiển con người”</h3><p>Trong vận hành lệnh sản xuất, leader tuyến đầu (tổ trưởng/ca trưởng/line leader) là “bộ điều khiển thời gian thực” của hệ thống: đảm bảo an toàn, ổn định chất lượng, giữ nhịp giao hàng. Lãnh đạo tốt không dựa vào la mắng; lãnh đạo tốt dựa vào <strong>tiêu chuẩn, dữ liệu và kèm cặp phát triển</strong>.</p><h3>3.2 Daily Management System (DMS): chuẩn hóa nhịp quản trị</h3><ul>
 <li><strong>Tier 1 (tại line/cell)</strong>: họp nhanh 5–10 phút mỗi ca – Safety/Quality/Delivery/People.</li>
@@ -226,12 +226,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>≥95%</td>
 <td>≥98%</td>
 <td>≥99%</td>
-<td>Không có nhật ký hành động (nhật ký hành động) = Không tính</td>
+<td>Không có nhật ký hành động = Không tính</td>
 </tr>
 <tr>
 <td><strong>Escalation timeliness (CTQ issues)</strong></td>
 <td class="mono">Median phút từ phát hiện → escalate</td>
-<td>Issue log/Andon</td>
+<td>Vấn đề nhật ký/Andon</td>
 <td>Tuần</td>
 <td>≤30'</td>
 <td>≤20'</td>
@@ -242,7 +242,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>Kèm cặp phát triển 1:1 completion</strong></td>
 <td class="mono">#nhân sự có 1:1/tháng / tổng</td>
-<td>Kèm cặp phát triển log</td>
+<td>Kèm cặp phát triển nhật ký</td>
 <td>Tháng</td>
 <td>N/A</td>
 <td>≥90%</td>
@@ -273,22 +273,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Action quá hạn lặp = escalation; ảnh hưởng xét level</td>
 </tr></tbody></table><div class="kpi-gate">
 <strong>Gating bắt buộc để công nhận Level:</strong>
-<ul><li>Không giấu lỗi/không trì hoãn escalation với vấn đề CTQ/safety.</li><li>Họp đầu ca/tier meeting phải có nhật ký hành động (nhật ký hành động) (người phụ trách + ngày đến hạn); không họp “cho có”.</li><li>Đánh giá người lao động dựa trên tiêu chuẩn &amp; bằng chứng; không dựa cảm tính.</li></ul>
+<ul><li>Không giấu lỗi/không trì hoãn escalation với vấn đề CTQ/safety.</li><li>Họp đầu ca/tier meeting phải có nhật ký hành động (người phụ trách + ngày đến hạn); không họp “cho có”.</li><li>Đánh giá người lao động dựa trên tiêu chuẩn &amp; bằng chứng; không dựa cảm tính.</li></ul>
 <p class="small">Gating ưu tiên an toàn – chất lượng – tuân thủ hồ sơ. Vi phạm gating có nguy cơ dẫn tới không công nhận level/bonus dù điểm bài kiểm tra cao.</p>
 </div><h2>6. Bài tập theo Level (Nghiên cứu tình huống HESEM)</h2><p class="small">Mỗi tình huống được thiết kế theo tinh thần học thuật ứng dụng: có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (bằng chứng) để chấm.</p><div class="card">
 <h3>Tình huống 1: Vận hành Daily Management khi xảy ra downtime – giữ nhịp giao hàng</h3>
 <p class="small">Trong ca, máy chính downtime 2 giờ, job CTQ đang gấp. Khi xử lý sai sẽ trễ OTD và có nguy cơ chất lượng. Bạn phải điều phối và escalate đúng.</p>
 <div class="grid">
 <div class="dl"><h4>Dữ liệu/đầu vào</h4><ul><li>Downtime: spindle alarm.</li><li>Job CTQ: deadline hôm nay.</li><li>Nguồn lực: 2 máy phụ, 1 nhân sự mới.</li></ul></div>
-<div class="dl"><h4>Nhiệm vụ</h4><ul><li>Vận hành họp đầu ca 5–10 phút theo agenda Safety–Quality–Delivery.</li><li>Ghi top 3 vấn đề và action người phụ trách trên bảng trực quan.</li><li>Escalate đúng khi có CTQ issue (không tự xử lý vượt thẩm quyền).</li></ul></div>
-<div class="dl"><h4>Đầu ra/Bằng chứng</h4><ul><li>Ảnh bảng họp đầu ca + action list.</li><li>Log escalation (thời gian, người nhận).</li><li>Báo cáo ngắn 5W1H cho 1 vấn đề.</li></ul></div>
+<div class="dl"><h4>Nhiệm vụ</h4><ul><li>Vận hành họp đầu ca 5–10 phút theo agenda Safety–Quality–Delivery.</li><li>Ghi top 3 vấn đề và action người phụ trách trên bảng trực quan.</li><li>Escalate đúng khi có CTQ vấn đề (không tự xử lý vượt thẩm quyền).</li></ul></div>
+<div class="dl"><h4>Đầu ra/Bằng chứng</h4><ul><li>Ảnh bảng họp đầu ca + action list.</li><li>Nhật ký escalation (thời gian, người nhận).</li><li>Báo cáo ngắn 5W1H cho 1 vấn đề.</li></ul></div>
 <div class="dl"><h4>Tiêu chí chấm</h4><ul><li>Họp đúng nhịp, không lan man.</li><li>Action có người phụ trách &amp; ngày đến hạn.</li><li>Escalate kịp thời, đúng kênh.</li></ul></div>
 </div>
 </div><div class="card">
 <h3>Tình huống 2: Đào tạo người mới &amp; kèm cặp phát triển – giảm lỗi do thiếu năng lực</h3>
 <p class="small">Một nhân sự mới vào xưởng, hay quên line clearance và ghi chép thiếu. Khi không dạy đúng, sẽ tạo lỗi lẫn và đánh giá fail. Bạn phải huấn luyện và kiểm soát.</p>
 <div class="grid">
-<div class="dl"><h4>Dữ liệu/đầu vào</h4><ul><li>Người mới: 2 tuần.</li><li>Repeat issue: quên line clearance, ghi thiếu hồ sơ.</li><li>Rủi ro: lẫn lộn (mix-up), đánh giá finding.</li></ul></div>
+<div class="dl"><h4>Dữ liệu/đầu vào</h4><ul><li>Người mới: 2 tuần.</li><li>Repeat vấn đề: quên line clearance, ghi thiếu hồ sơ.</li><li>Rủi ro: lẫn lộn (mix-up), đánh giá finding.</li></ul></div>
 <div class="dl"><h4>Nhiệm vụ</h4><ul><li>Hướng dẫn người mới theo TWI JI: chuẩn bị – trình bày – thực hành – kiểm tra.</li><li>Không bỏ qua an toàn (PPE, lockout khi cần).</li><li>Ghi bảng kiểm OJT và báo cáo khi người mới chưa đạt.</li></ul></div>
 <div class="dl"><h4>Đầu ra/Bằng chứng</h4><ul><li>danh mục OJT (bảng kiểm / danh mục) có chữ ký.</li><li>Ghi chú lỗi hay gặp của người mới.</li><li>Kế hoạch luyện thêm (khi cần).</li></ul></div>
 <div class="dl"><h4>Tiêu chí chấm</h4><ul><li>Dạy đúng trình tự TWI.</li><li>Không để người mới tự làm khi chưa đạt.</li><li>Ghi chép rõ ràng.</li></ul></div>
@@ -298,7 +298,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="small">Khách/CB đánh giá sắp đến, nhưng mục tiêu không phải 'đối phó' mà là kiểm chứng hệ thống. Bạn phải chuẩn bị hồ sơ, hành vi, và đóng action để tránh lặp lỗi.</p>
 <div class="grid">
 <div class="dl"><h4>Dữ liệu/đầu vào</h4><ul><li>Đánh giá type: khách hàng + ISO.</li><li>Khu vực: xưởng + kho + QA.</li><li>Điểm yếu: hồ sơ thiếu, action trễ.</li></ul></div>
-<div class="dl"><h4>Nhiệm vụ</h4><ul><li>Chuẩn bị hồ sơ ca: bảng kiểm, log sự cố, action closure.</li><li>Trả lời đánh giá theo sự thật và theo WI (không đoán).</li><li>Khi không biết: escalate để tìm bằng chứng.</li></ul></div>
+<div class="dl"><h4>Nhiệm vụ</h4><ul><li>Chuẩn bị hồ sơ ca: bảng kiểm, nhật ký sự cố, action closure.</li><li>Trả lời đánh giá theo sự thật và theo WI (không đoán).</li><li>Khi không biết: escalate để tìm bằng chứng.</li></ul></div>
 <div class="dl"><h4>Đầu ra/Bằng chứng</h4><ul><li>Bộ hồ sơ ca (đủ mục).</li><li>Minh chứng trả lời đánh giá (ghi lại câu hỏi/đáp).</li><li>Danh sách điểm cần cải tiến.</li></ul></div>
 <div class="dl"><h4>Tiêu chí chấm</h4><ul><li>Hồ sơ đủ và truy xuất được.</li><li>Trả lời nhất quán với WI.</li><li>Biết escalate đúng.</li></ul></div>
 </div>
@@ -309,7 +309,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody><tr><td><strong>Chuẩn bị ca &amp; họp đầu ca</strong></td><td>Agenda rõ; review KPI; phân công; nhắc an toàn/CTQ</td><td>Đồng bộ mục tiêu và giảm sự cố</td></tr><tr><td><strong>Gemba + kèm cặp phát triển trong ca</strong></td><td>Quan sát theo bảng kiểm; phản hồi SBI; dạy theo TWI; escalates đúng</td><td>Tạo kỷ luật và nâng năng lực thực</td></tr><tr><td><strong>Đóng ca &amp; cải tiến</strong></td><td>Review action; cập nhật board; bàn giao; rút kinh nghiệm</td><td>Đóng vòng PDCA và duy trì hệ thống</td></tr></tbody>
 </table><h3>7.2 danh mục OJT (bảng kiểm / danh mục) (quan sát tại hiện trường)</h3><table class="table">
 <thead><tr><th>#</th><th>Nội dung danh mục OJT (bảng kiểm / danh mục)</th><th>Kết quả</th><th>Ghi chú</th></tr></thead>
-<tbody><tr><td>1</td><td>Tổ chức họp đầu ca (tier 1) đúng agenda; cập nhật KPI và nhật ký hành động (nhật ký hành động).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>2</td><td>Thực hiện gemba walk theo bảng kiểm; phát hiện và ghi issue đúng format.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>3</td><td>Escalate CTQ/safety đúng ngưỡng và thời gian; không giấu lỗi.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>4</td><td>Thực hiện kèm cặp phát triển theo SBI hoặc TWI JI cho 1 nhân sự; có action theo dõi tiếp.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>5</td><td>Theo dõi đóng action đúng hạn; xác minh hiệu lực.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>6</td><td>Cập nhật ma trận kỹ năng (skill matrix)/đào tạo theo kế hoạch (khi phụ trách).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>7</td><td>Xử lý xung đột/vi phạm tiêu chuẩn theo quy định công bằng.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>8</td><td>Bàn giao ca: trạng thái job, rủi ro, action còn mở.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr></tbody>
+<tbody><tr><td>1</td><td>Tổ chức họp đầu ca (tier 1) đúng agenda; cập nhật KPI và nhật ký hành động.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>2</td><td>Thực hiện gemba walk theo bảng kiểm; phát hiện và ghi vấn đề đúng format.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>3</td><td>Escalate CTQ/safety đúng ngưỡng và thời gian; không giấu lỗi.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>4</td><td>Thực hiện kèm cặp phát triển theo SBI hoặc TWI JI cho 1 nhân sự; có action theo dõi tiếp.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>5</td><td>Theo dõi đóng action đúng hạn; xác minh hiệu lực.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>6</td><td>Cập nhật ma trận kỹ năng (skill matrix)/đào tạo theo kế hoạch (khi phụ trách).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>7</td><td>Xử lý xung đột/vi phạm tiêu chuẩn theo quy định công bằng.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>8</td><td>Bàn giao ca: trạng thái job, rủi ro, action còn mở.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr></tbody>
 </table><h2>8. Kiểm tra đánh giá (bản thiết kế kiểm thử (test blueprint) + bài kiểm tra nhanh mẫu)</h2><h3>8.1 Test blueprint</h3><table class="table">
 <thead><tr><th>Nhóm nội dung</th><th>Số câu</th><th>Tỷ trọng</th></tr></thead>
 <tbody><tr><td>Daily management basics</td><td>6</td><td>30%</td></tr><tr><td>Escalation &amp; safety/CTQ</td><td>6</td><td>30%</td></tr><tr><td>Kèm cặp phát triển basics (SBI/TWI)</td><td>6</td><td>30%</td></tr><tr><td>Tình huống mini</td><td>2</td><td>10%</td></tr></tbody>
@@ -334,7 +334,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>Tiêu chí</th><th>Tỷ trọng</th><th>Mô tả đạt</th></tr></thead>
 <tbody><tr><td><strong>Bài kiểm tra kiến thức</strong></td><td>35%</td><td>Đạt ≥ 80% câu hỏi; hiểu thuật ngữ, tuân thủ WI, nhận diện rủi ro.</td></tr><tr><td><strong>Thực hành/OJT tại hiện trường</strong></td><td>45%</td><td>Thực hiện đúng thao tác; an toàn; hồ sơ đúng; phản ứng đúng khi sai lệch.</td></tr><tr><td><strong>Tình huống mini</strong></td><td>20%</td><td>Giải quyết tình huống cơ bản; nêu được lý do và hành động đúng.</td></tr></tbody>
 </table><div class="callout"><strong>Ngưỡng đạt:</strong> Tổng điểm ≥ 80/100 và không vi phạm gating bắt buộc (an toàn/chất lượng/tuân thủ hồ sơ).</div><h2>10. Bảng kiểm tự đánh giá trước khi đề nghị xét Level</h2><div class="card">
-<ul><li>Tôi có đủ bằng chứng (form/hồ sơ/log) chứng minh năng lực – không chỉ ‘nói được’.</li><li>Tôi hiểu các gating bắt buộc và không có vi phạm trong kỳ đánh giá.</li><li>Tôi truy xuất hồ sơ liên quan trong thời gian mục tiêu (đánh giá diễn tập).</li><li>Tôi vận hành họp đầu ca/tier meeting có nhật ký hành động (nhật ký hành động) và theo dõi tiếp.</li><li>Tôi kèm cặp phát triển theo SBI/TWI, xử lý vấn đề theo PDCA, không đổ lỗi.</li></ul>
+<ul><li>Tôi có đủ bằng chứng (form/hồ sơ/nhật ký) chứng minh năng lực – không chỉ ‘nói được’.</li><li>Tôi hiểu các gating bắt buộc và không có vi phạm trong kỳ đánh giá.</li><li>Tôi truy xuất hồ sơ liên quan trong thời gian mục tiêu (đánh giá diễn tập).</li><li>Tôi vận hành họp đầu ca/tier meeting có nhật ký hành động và theo dõi tiếp.</li><li>Tôi kèm cặp phát triển theo SBI/TWI, xử lý vấn đề theo PDCA, không đổ lỗi.</li></ul>
 </div><hr/><p class="small"><strong>Ghi chú triển khai:</strong> Tài liệu này được thiết kế để tích hợp trực tiếp vào sổ tay vận hành/đào tạo của HESEM. Khi đưa vào áp dụng, cần gắn mã SOP/WI/FRM thực tế, người phê duyệt và ngày hiệu lực, đồng thời liên kết ma trận kỹ năng (skill matrix) + chính sách thưởng/level.</p></div></div></div>
 </div>
 <script src="../../../../assets/app.js"></script>

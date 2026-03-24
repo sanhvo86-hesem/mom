@@ -66,7 +66,7 @@ ul.tight li {margin:4px 0;}
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho khu clean-pack, khu staging sạch, khu lưu kho nhạy môi trường và các điểm giám sát môi trường được xác định trong kế hoạch hiện hành.</div>
 <h1>WI-713 — Theo dõi môi trường, lấy mẫu, đọc kết quả và phản ứng khi lệch chuẩn</h1>
 <div class="section"><h2>1. Mục đích và nguyên tắc giám sát</h2>
-<p>WI này biến kế hoạch giám sát môi trường thành thao tác tại điểm dùng: đo đúng chỗ, đúng thời điểm, đọc đúng kết quả và phản ứng ngay khi lệch chuẩn. Monitoring không phải hoạt động “ghi log cho đủ”; nó là công cụ để ngăn hàng sạch bị đẩy vào điều kiện xấu rồi mới phát hiện ở bước release.</p>
+<p>WI này biến kế hoạch giám sát môi trường thành thao tác tại điểm dùng: đo đúng chỗ, đúng thời điểm, đọc đúng kết quả và phản ứng ngay khi lệch chuẩn. Monitoring không phải hoạt động “ghi nhật ký cho đủ”; nó là công cụ để ngăn hàng sạch bị đẩy vào điều kiện xấu rồi mới phát hiện ở bước release.</p>
 <div class="callout-info"><strong>Nguyên tắc:</strong> mọi kết quả monitor phải gắn với hành động rõ ràng. Chỉ ghi số mà không có phản ứng khi vượt ngưỡng được xem là không kiểm soát.</div></div>
 <div class="section"><h2>2. Thông số theo dõi và tần suất</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thông số</th><th>Khu áp dụng</th><th>Tần suất tối thiểu</th><th>Phản ứng mức Alert / Action</th></tr></thead><tbody>
@@ -85,7 +85,7 @@ ul.tight li {margin:4px 0;}
 </div></div>
 <div class="section"><h2>4. Ma trận phản ứng tại hiện trường</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phản ứng bắt buộc</th><th>Quyền quyết định mở lại</th></tr></thead><tbody>
-<tr><td>Nhiệt ẩm vượt ngưỡng khu vực hàng nhạy</td><td>Giữ hàng nhạy, chặn mở túi/đóng gói, ghi log, gọi người phụ trách khu vực.</td><td>QA hoặc người phụ trách khu vực theo quyền hạn đã giao.</td></tr>
+<tr><td>Nhiệt ẩm vượt ngưỡng khu vực hàng nhạy</td><td>Giữ hàng nhạy, chặn mở túi/đóng gói, ghi nhật ký, gọi người phụ trách khu vực.</td><td>QA hoặc người phụ trách khu vực theo quyền hạn đã giao.</td></tr>
 <tr><td>Particle / fallout cao bất thường hoặc khu nhiều bụi nhìn thấy</td><td>Dừng thao tác sạch, thực hiện vệ sinh, thay vật tư phát bụi, re-check trước khi làm tiếp.</td><td>QA/clean area người phụ trách.</td></tr>
 <tr><td>Tacky mat/PPE station mất hiệu lực</td><td>Khôi phục ngay; nếu có người/part đã đi qua trong lúc mất kiểm soát, đánh giá phạm vi ảnh hưởng.</td><td>Supervisor khu vực.</td></tr>
 <tr><td>Phát hiện carton hở, vật lạ, hành vi vi phạm gowning</td><td>Line clearance, loại bỏ vật không được phép, đánh giá hàng mở.</td><td>Supervisor + QA khi ảnh hưởng sản phẩm.</td></tr>
@@ -93,7 +93,7 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>5. Hồ sơ, KPI và liên kết</h2>
 <div class="two-col">
 <div class="card"><h3>Hồ sơ</h3><ul class="tight" style="padding-left:18px;">
-<li><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx">FRM-708</a> và log đo theo khu vực.</li>
+<li><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx">FRM-708</a> và nhật ký đo theo khu vực.</li>
 <li>Ảnh bất thường khi có vi phạm housekeeping/bao gói/khu vực.</li>
 <li>Biên bản action và xác nhận khôi phục trước khi mở lại khu.</li>
 </ul></div>
@@ -110,15 +110,15 @@ ul.tight li {margin:4px 0;}
 <tr><td><a href="wi-711-cleanroom-entry-and-gowning.html">WI-711</a></td><td>Kỷ luật người vào khu sạch.</td></tr>
 <tr><td><a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td><td>Thao tác đóng gói sạch phụ thuộc môi trường đạt.</td></tr>
 </tbody></table></div></div>
-<h2 class="h2 phase3a-workbook-alignment" id="phase3a-wi713-clean-workbooks">10. Biểu mẫu Excel đang hiệu lực — Workbook lane cho clean / vacuum / FOD response</h2><div class="note phase3a-workbook-alignment"><b>Điểm thay đổi</b><br/>WI-713 không còn chỉ phản ứng bằng narrative note hoặc environmental log tổng quát. Với clean/vacuum-sensitive jobs, hành động response phải nối sang các workbook chuyên biệt: <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-713_Cleanroom_Entry_and_Gowning_Log.xlsx">FRM-713</a> (cleanroom entry &amp; gowning), <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-714_Ultrasonic_Cleaning_Batch_Record.xlsx">FRM-714</a> (ultrasonic cleaning batch), <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-715_Vacuum_Compatible_Clean_Build_and_Bagging_Record.xlsx">FRM-715</a> (vacuum clean-build &amp; bagging) và <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-721_FOD_Line_Clearance_and_Tool_Accountability_Log.xlsx">FRM-721</a> (FOD line clearance &amp; tool accountability).</div>
+<h2 class="h2 phase3a-workbook-alignment" id="phase3a-wi713-clean-workbooks">10. Biểu mẫu Excel đang hiệu lực — Workbook lane cho clean / vacuum / FOD response</h2><div class="note phase3a-workbook-alignment"><b>Điểm thay đổi</b><br/>WI-713 không còn chỉ phản ứng bằng narrative note hoặc environmental nhật ký tổng quát. Với clean/vacuum-sensitive jobs, hành động response phải nối sang các workbook chuyên biệt: <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-713_Cleanroom_Entry_and_Gowning_Log.xlsx">FRM-713</a> (cleanroom entry &amp; gowning), <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-714_Ultrasonic_Cleaning_Batch_Record.xlsx">FRM-714</a> (ultrasonic cleaning batch), <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-715_Vacuum_Compatible_Clean_Build_and_Bagging_Record.xlsx">FRM-715</a> (vacuum clean-build &amp; bagging) và <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-721_FOD_Line_Clearance_and_Tool_Accountability_Log.xlsx">FRM-721</a> (FOD line clearance &amp; tool accountability).</div>
 
 
 <!-- .page-body -->
 
 <div class="section" data-phase2i="true"><h2>6. Quy tắc điều hành — Alert / Action / Monitoring-gap trigger classes</h2>
-<div style="background:#FEF9C3;border-left:4px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Điều kiện môi trường theo zone</a>. WI này tóm tắt các quy tắc chính để thao tác nhanh tại hiện trường.</div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trigger class</th><th>Khi nào dùng</th><th>Phản ứng tối thiểu</th><th>Default stock status</th></tr></thead><tbody>
-<tr><td>T1 — Alert drift</td><td>Reading chạm vùng cảnh báo nhưng chưa vượt action limit, chưa có affected stock đặc biệt.</td><td>Ghi log, xác nhận sensor/door/load, tăng tần suất đọc trong ca và review nguyên nhân gần.</td><td>Watch; chưa HOLD nếu risk thấp và không có class nhạy.</td></tr>
+<div style="background:#FEF9C3;border-left:4px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Quy tắc vị trí kho, zoning, FIFO/FEFO, staging và cycle count</a>. WI này tóm tắt các quy tắc chính để thao tác nhanh tại hiện trường.</div>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trigger class</th><th>Khi nào dùng</th><th>Phản ứng tối thiểu</th><th>Default stock trạng thái</th></tr></thead><tbody>
+<tr><td>T1 — Alert drift</td><td>Reading chạm vùng cảnh báo nhưng chưa vượt action limit, chưa có affected stock đặc biệt.</td><td>Ghi nhật ký, xác nhận sensor/door/load, tăng tần suất đọc trong ca và review nguyên nhân gần.</td><td>Watch; chưa HOLD nếu risk thấp và không có class nhạy.</td></tr>
 <tr><td>T2 — Action excursion</td><td>Vượt giới hạn tác động hoặc vượt thời gian cho phép trong zone đang chứa S1/S2 stock.</td><td>Giữ stock bị ảnh hưởng, khoanh phạm vi thời gian và location, mở đánh giá condition.</td><td>HOLD cho affected stock cho đến khi có disposition.</td></tr>
 <tr><td>T3 — Monitoring gap / data uncertainty</td><td>Logger hỏng, mất kết nối, mất điện, quên đọc hoặc reading không tin cậy.</td><td>Ghi rõ thời gian gap, manual backup, phạm vi stock chịu rủi ro và độ tin cậy của dữ liệu thay thế.</td><td>Ít nhất Watch; với S2/S3/S4 mặc định HOLD cho affected stock cho đến khi có review.</td></tr>
 <tr><td>T4 — Clean / restricted storage breach</td><td>Khu sạch bị bụi/xâm nhập, HIC out-of-range, bag breach, door discipline fail hoặc stock restricted bị mở sai.</td><td>Dừng thao tác liên quan, chuyển clean-hold / quarantine, line-clearance và đánh giá lại pack / product.</td><td>HOLD / clean-hold bắt buộc.</td></tr>

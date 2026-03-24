@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>HR-TRN-11 — Skill Matrix & Bonus Mapping — Cơ chế chặn theo KPI (KPI gating) by Level | HESEM OS</title>
+<title>HR-TRN-11 — Skills Matrix & Bonus Mapping — Cơ chế chặn theo KPI (KPI gating) by Level | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -51,7 +51,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>SKILL-MATRIX-BONUS — Skill Matrix & Bonus Mapping — Cơ chế chặn theo KPI by Level</strong>
+  <strong>SKILL-MATRIX-BONUS — Skills Matrix & Bonus Mapping — Cơ chế chặn theo KPI by Level</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -76,7 +76,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="muted">Ngôn ngữ ISO: <b>PHẢI</b> (bắt buộc), <b>PHẢI</b>, <b>ĐƯỢC PHÉP</b> (theo chọn) — áp dụng xuyên suốt khi viết.</div>
 </div><section class="card">
 <h2>1) Khái niệm &amp; cấu trúc dữ liệu ma trận kỹ năng (skill matrix)</h2>
-<p><b>Skill Matrix</b> là bảng mapping giữa:</p>
+<p><b>Skills Matrix</b> là bảng mapping giữa:</p>
 <ul>
 <li><b>Vị trí</b> (Job/Vai trò) → <b>mức Level yêu cầu</b> theo từng năng lực (C01…C19), kèm <b>trọng số</b> (Weight) theo mức độ quan trọng.</li>
 <li><b>Nhân sự</b> → <b>Level hiện tại</b> (đã chứng nhận) + <b>bằng chứng</b> + <b>chỉ số định lượng</b> + <b>gating</b>.</li>
@@ -97,8 +97,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Knowledge</b>: hiểu đúng khái niệm/tiêu chuẩn/quy định liên quan.</li>
 <li><b>Skill</b>: thao tác/ra quyết định đúng trong bối cảnh thực tế.</li>
-<li><b>Bằng chứng</b>: hồ sơ chứng minh (FRM, log, ảnh, test, đánh giá hồ sơ…).</li>
-<li><b>Chỉ số</b>: định lượng bằng công thức + nguồn dữ liệu (MES/ERP, QC log, OEE, NCR, OT, attendance…).</li>
+<li><b>Bằng chứng</b>: hồ sơ chứng minh (FRM, nhật ký, ảnh, test, đánh giá hồ sơ…).</li>
+<li><b>Chỉ số</b>: định lượng bằng công thức + nguồn dữ liệu (MES/ERP, QC nhật ký, OEE, NCR, OT, attendance…).</li>
 </ul>
 </div>
 </div>
@@ -113,7 +113,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Không đạt</b> ở bất kỳ <b>tiêu chí “Critical Cổng kiểm soát”</b> ⇒ <b>không cấp mới Level</b> trong kỳ và <b>khóa thưởng kỹ năng (skill bonus)</b> (K<sub>cổng kiểm soát</sub>=0) trong kỳ.</li>
 <li><b>Không đạt</b> ở <b>tiêu chí “Major Cổng kiểm soát”</b> ⇒ <b>giới hạn</b> thưởng kỹ năng (skill bonus) (ví dụ K<sub>cổng kiểm soát</sub>=0.5) hoặc giữ Level nhưng bắt buộc CAPA/OJT bổ sung.</li>
-<li>Cổng kiểm soát phải dựa trên <b>dữ liệu khách quan</b> (điểm đánh giá, NCR, customer escape, log an toàn, tuân thủ revision…) và được lưu <b>thông tin dạng văn bản (Documented Information, ISO 7.5)</b>.</li>
+<li>Cổng kiểm soát phải dựa trên <b>dữ liệu khách quan</b> (điểm đánh giá, NCR, customer escape, nhật ký an toàn, tuân thủ revision…) và được lưu <b>thông tin dạng văn bản (Documented Information, ISO 7.5)</b>.</li>
 </ul>
 </div>
 <h3>2.1 Cổng kiểm soát cấp công ty (Company-wide gates)</h3>
@@ -137,7 +137,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p>
  Mỗi năng lực (C01…C19) có bộ <b>chỉ số năng lực</b> định lượng theo Level.
  Trong bảng từ điển KPI, cột <b>Cổng kiểm soát</b> chỉ rõ chỉ số nào là “cổng”.
- Xem: <a href="competency-metrics.html">Từ điển KPI/Chỉ số theo năng lực</a>.
+ Xem: <a href="competency-metrics.html">TRN-MET-01 — KPI/Chỉ số Dictionary by 19 Competencies | HESEM OS</a>.
  </p>
 <div class="note">
 <strong>Nguyên tắc (PHẢI):</strong>
@@ -193,8 +193,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Mẫu theo phòng ban (Vai trò Targets)</h3>
 <ul>
 <li><a href="../../01-Competency-System/03-Matrices/training-matrix-estimating.html">Kinh doanh</a></li>
-<li><a href="../../01-Competency-System/03-Matrices/training-matrix-engineering.html">Kỹ thuật</a></li>
-<li><a href="../../01-Competency-System/03-Matrices/training-matrix-production.html">Sản xuất/OPS</a></li>
+<li><a href="../../01-Competency-System/03-Matrices/training-matrix-engineering.html">TRN-MTX-02 — Training Matrix – Engineering Department | HESEM OS</a></li>
+<li><a href="../../01-Competency-System/03-Matrices/training-matrix-production.html">TRN-MTX-04 — Training Matrix – Production | HESEM OS</a></li>
 <li><a href="../../01-Competency-System/03-Matrices/training-matrix-quality.html">Quality</a></li>
 <li><a href="../../01-Competency-System/03-Matrices/training-matrix-warehouse.html">Warehouse/Logistics</a></li>
 <li><a href="../../01-Competency-System/03-Matrices/training-matrix-finance-hr.html">Finance/HR/Admin</a></li>
@@ -208,7 +208,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <b>(iv)</b> tự động ra K_skill, K_gate và mức thưởng.
  </p>
 <ul>
-<li>HTML Form: <a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-HR-TRN-11 (Skill Matrix &amp; Bonus Map)</a></li>
+<li>HTML Form: <a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-HR-TRN-11 (Skills Matrix &amp; Bonus Map)</a></li>
 <li>Excel: </li>
 </ul>
 </div>

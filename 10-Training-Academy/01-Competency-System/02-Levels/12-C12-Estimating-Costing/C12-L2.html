@@ -80,7 +80,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cost-waste-tool-scrap.html"><b>DRL-10</b> — Bài diễn tập Cost &amp; Waste (Tool life • Scrap • Rework)</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Bài diễn tập Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet))</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cost-waste-tool-scrap.html">DRL-10 — TRN-Bài diễn tập ACA-DRL-10 — Cost &amp;amp; Waste (Tool life • Scrap • Rework) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet)) | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
@@ -139,12 +139,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L2: ước tính độc lập – biết dùng dữ liệu mô phỏng/lịch sử – kiểm soát assumptions.</strong></div><h3>3.1. Estimating trong CNC xưởng gia công theo đơn (job shop): “báo giá là dự báo có kiểm soát”</h3><p>Estimating không phải đoán. Estimating là <strong>mô hình hóa</strong> công việc để ra quyết định thương mại: có phải nhận job không, nhận với giá nào, cam kết thời gian dẫn (lead time) nào, rủi ro ở đâu. Trong lệnh sản xuất CNC, sai estimate xuất phát từ 3 nguồn:</p><ul>
 <li><strong>Thiếu dữ liệu đầu vào:</strong> chưa chốt CTQ, chưa chốt finish/packaging/docs.</li>
-<li><strong>Định mức sai:</strong> setup underestimated, toolpath thực tế khác giả định, đo kiểm bị bỏ sót.</li>
+<li><strong>Định mức sai:</strong> setup underestimated, đường chạy dao thực tế khác giả định, đo kiểm bị bỏ sót.</li>
 <li><strong>Hệ thống rate sai:</strong> dùng rate “cảm tính” không phản ánh overhead và utilization.</li>
 </ul><h3>3.2. Cấu trúc giá chuẩn của HESEM</h3><div class="figure">
 <ul>
 <li><strong>NRE/Tooling (one-time):</strong> lập trình, thiết kế/ gia công đồ gá, gage đặc biệt, FAI ballooning.</li>
-<li><strong>Unit price:</strong> vật liệu + gia công (setup + run) + QC/inspection + finishing/thuê ngoài + packaging + overhead + margin.</li>
+<li><strong>Unit price:</strong> vật liệu + gia công (setup + run) + QC/kiểm tra + finishing/thuê ngoài + packaging + overhead + margin.</li>
 <li><strong>Điều kiện:</strong> thời gian dẫn definition, MOQ, validity, Incoterms, payment, change policy.</li>
 </ul>
 <div class="cap">Tách NRE giúp minh bạch: prototype tốn setup cao nhưng run thấp; production thì ngược lại.</div>
@@ -157,7 +157,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Quy tắc HESEM:</strong> MHR do Finance/OPS ban hành; Estimator không tự đổi MHR.</li>
 </ul><h3>3.4. Ước tính thời gian gia công: 3 lớp phương pháp</h3><ol>
 <li><strong>Rule-of-thumb (L1):</strong> dựa trên routing chuẩn và kinh nghiệm (vd: khoan/taro theo số lỗ, phay mặt theo diện tích).</li>
-<li><strong>CAM Mô phỏng (L2):</strong> dùng thời gian mô phỏng toolpath; hiệu chỉnh bởi hệ số thực tế (feed override, tool change, probing).</li>
+<li><strong>CAM Mô phỏng (L2):</strong> dùng thời gian mô phỏng đường chạy dao; hiệu chỉnh bởi hệ số thực tế (feed override, tool change, probing).</li>
 <li><strong>Historical/Parametric (L3):</strong> dùng dữ liệu job tương tự (family) + mô hình tham số (diện tích cắt, volume removal, số lần setup) để dự báo.</li>
 </ol><p>Estimator giỏi không chọn 1 phương pháp duy nhất. Họ dùng <strong>tam giác kiểm chứng</strong>: rule-of-thumb ↔ mô phỏng ↔ lịch sử. Khi 3 cái lệch nhau quá lớn, đó là tín hiệu rủi ro.</p><h3>3.5. Tính vật liệu theo yield: đừng quên “phần bị mất”</h3><p>Trong CNC, vật liệu không chỉ là “khối phôi”. Yield bị ảnh hưởng bởi: allowance cắt phôi, kẹp giữ, phay mặt, phế phẩm đầu, và lỗi do vật liệu. Công thức Áp dụng: </p><div class="codeblock">Material Cost = (Giá/kg x Khối lượng phôi) x (1 + Scrap Allowance)</div><ul>
 <li><strong>Scrap allowance</strong> không được dùng theo tiện. Phải dựa trên dữ liệu scrap theo vật liệu/khách/công nghệ.</li>
@@ -178,7 +178,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vnum">2</div>
 <div class="vtext">
 <strong>Phân rã công đoạn (routing)</strong>
-<p>Xác định số lần setup, máy/cell, công đoạn phụ (deburr, wash, inspection, thuê ngoài).</p>
+<p>Xác định số lần setup, máy/cell, công đoạn phụ (deburr, wash, kiểm tra, thuê ngoài).</p>
 </div>
 </div>
 <div class="vstep">
@@ -317,7 +317,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>Under-báo giá Incident</strong></td>
 <td class="mono">Count job lỗ do estimate thiếu dòng/ sai rate</td>
-<td>Finance exception log</td>
+<td>Finance exception nhật ký</td>
 <td>Quý</td>
 <td>&lt;=1</td>
 <td>0</td>
@@ -422,7 +422,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Check completeness; xin phê duyệt; lưu version và bằng chứng.</td>
 <td>Đáp ứng ISO và chống tranh chấp nội bộ.</td>
 </tr>
-</tbody></table><h3>7.2. OJT Bảng kiểm (Level 2)</h3><p class="small">Tick ✓ khi hoàn thành; lưu bảng kiểm như documented information. Người hướng dẫn ký xác nhận.</p><table class="table">
+</tbody></table><h3>7.2. OJT Checklist (Level 2)</h3><p class="small">Tick ✓ khi hoàn thành; lưu bảng kiểm như documented information. Người hướng dẫn ký xác nhận.</p><table class="table">
 <thead><tr><th>#</th><th>Hạng mục</th><th>Tiêu chí đạt</th><th>Kết quả</th><th>Ghi chú</th></tr></thead>
 <tbody>
 <tr>
@@ -533,7 +533,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Không theo dõi actual; không học.</td>
 <td>Có so sánh đơn giản.</td>
 <td>Variance report có nguyên nhân &amp; action.</td>
-<td>Hệ thống governance + dashboard + đánh giá pass.</td>
+<td>Hệ thống governance + bảng điều khiển + đánh giá pass.</td>
 </tr>
 <tr>
 <td><strong>Đạo đức dữ liệu &amp; kiểm soát thay đổi</strong></td>

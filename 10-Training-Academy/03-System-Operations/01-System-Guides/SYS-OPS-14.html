@@ -104,7 +104,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 id="purpose">2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="req"><span class="req-tag shall">PHẢI</span>
 <div>
- Mọi rủi ro/cơ hội ảnh hưởng QCDSM (Quality–Cost–Delivery–Safety–Morale) <b>PHẢI</b> được quản trị bằng chấm <b>S‑O‑D</b>, áp <b>ngưỡng hành động</b>, và lưu <b>MRR</b> tại đúng cổng kiểm soát. Vi phạm “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” bị xem là <b>vượt qua cổng kiểm soát</b>.
+ Mọi rủi ro/cơ hội ảnh hưởng QCDSM (Quality–Cost–Delivery–Safety–Morale) <b>PHẢI</b> được quản trị bằng chấm <b>S‑O‑D</b>, áp <b>ngưỡng hành động</b>, và lưu <b>MRR</b> tại đúng cổng kiểm soát. Vi phạm “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” bị xem là <b>vượt qua cổng kiểm soát</b>.
  </div>
 </div>
 <div class="grid-2">
@@ -138,7 +138,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td><b>Operator</b></td><td>Thực thi phản ứng 60 giây; báo rủi ro tại shopfloor; không vượt qua cổng kiểm soát; ghi minh chứng trên traveler/checksheet.</td><td><b>L2</b> (độc lập theo bảng kiểm) + performance test PASS</td></tr>
 <tr><td><b>Setup</b></td><td>Chấm S‑O‑D cho rủi ro gá đặt/dao/offset; kích hoạt HOLD tại setup/first‑piece; bảo vệ datum &amp; CTQ.</td><td><b>L3</b> + performance test PASS</td></tr>
-<tr><td><b>Programmer</b></td><td>Quản trị rủi ro phát hành chương trình (program release); chuẩn hóa tên file/rev; khóa bản lỗi thời; cập nhật risk khi đổi post/toolpath.</td><td><b>L3</b> + scenario PASS</td></tr>
+<tr><td><b>Programmer</b></td><td>Quản trị rủi ro phát hành chương trình (program release); chuẩn hóa tên file/rev; khóa bản lỗi thời; cập nhật risk khi đổi post/đường chạy dao.</td><td><b>L3</b> + scenario PASS</td></tr>
 <tr><td><b>QC</b></td><td>Quy định D (Detection) theo phương pháp đo; chặn gage OOT; xác nhận plan đo cho CTQ; giữ IR/FAI.</td><td><b>L3</b> + performance test PASS</td></tr>
 <tr><td><b>QA</b></td><td>Risk steward: chuẩn hóa tiêu chí S‑O‑D, ngưỡng; review dữ liệu sổ đăng ký rủi ro (risk register); đánh giá cổng kiểm soát; kích hoạt NCR/CAPA/MRB.</td><td><b>L3</b> (L4 cho người đào tạo) + bài kiểm tra nhanh ≥ 90%</td></tr>
 <tr><td><b>Warehouse</b></td><td>Chặn lẫn lộn (mix-up); kiểm soát traceability; kiểm tra chứng từ đi kèm; phê duyệt giao hàng chỉ khi đủ MRR.</td><td><b>L2</b> + performance test PASS</td></tr>
@@ -191,7 +191,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>G3 Engineering</b><br/><span class="muted">Người phụ trách: Programmer</span></td>
 <td>CTQ list; datum; yêu cầu finish; quy định đo</td>
-<td>Phát hành chương trình bảng kiểm; mô phỏng/pilot log; cập nhật rủi ro program</td>
+<td>Phát hành chương trình bảng kiểm; mô phỏng/pilot nhật ký; cập nhật rủi ro program</td>
 <td>MRR: Phát hành chương trình hồ sơ<br/>BLOCK khi sai rev/program</td>
 </tr>
 <tr>
@@ -209,12 +209,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>G6 Production/Setup</b><br/><span class="muted">Người phụ trách: Setup/Operator</span></td>
 <td>Phát hành chương trình; setup sheet; tool list; traveler; kế hoạch đo</td>
-<td>First‑piece/FAI sign‑off; log offset/dao; cập nhật rủi ro setup</td>
+<td>First‑piece/FAI sign‑off; nhật ký offset/dao; cập nhật rủi ro setup</td>
 <td>MRR: First‑piece hồ sơ + ảnh/IR<br/>BLOCK khi CTQ fail</td>
 </tr>
 <tr>
 <td><b>G7 QC/QA</b><br/><span class="muted">Người phụ trách: QC/QA</span></td>
-<td>FAI/IPQC/FQC plan; gage status; tiêu chí accept</td>
+<td>FAI/IPQC/FQC plan; gage trạng thái; tiêu chí accept</td>
 <td>IR/FAI/FQC report; quyết định MRB/NCR khi NG</td>
 <td>MRR: IR/FAI + NCR/MRB (khi áp dụng)<br/>STOP khi gage OOT</td>
 </tr>
@@ -239,7 +239,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Không luồng‑down</b> yêu cầu chứng chỉ/công đoạn đặc biệt vào PO.</li>
 <li><b>Thiếu/nhầm heat/lot</b> khi nhận vật liệu gây mất traceability.</li>
 <li><b>Nhầm program</b> do tên file không chuẩn hoặc không khóa bản lỗi thời.</li>
-<li><b>Thiếu mô phỏng/pilot</b> cho toolpath mới làm crash/dao gãy.</li>
+<li><b>Thiếu mô phỏng/pilot</b> cho đường chạy dao mới làm crash/dao gãy.</li>
 <li><b>Setup datum sai</b> làm CTQ lệch; phát hiện muộn tại FQC.</li>
 <li><b>Đo sai phương pháp</b> (D rating bị đánh sai) làm lọt NG.</li>
 <li><b>Dùng gage OOT</b> hoặc gage không có trạng thái hiệu chuẩn.</li>
@@ -253,7 +253,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 <h2 id="controls">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng)</h2>
 <div class="note">
-<b>Khung kiểm soát bắt buộc:</b> (1) Ngăn lỗi từ nguồn (poka‑yoke) → (2) Cổng kiểm soát bảng kiểm → (3) Xác nhận độc lập (peer review/QC) → (4) Chuẩn hóa hồ sơ. Control nào không tạo MRR bị xem là “không tồn tại”.
+<b>Khung kiểm soát bắt buộc:</b> (1) Ngăn lỗi từ nguồn (poka‑yoke) → (2) Cổng kiểm soát bảng kiểm → (3) Xác nhận độc lập (rà soát đồng cấp/QC) → (4) Chuẩn hóa hồ sơ. Control nào không tạo MRR bị xem là “không tồn tại”.
  </div>
 <table class="table">
 <thead>
@@ -268,20 +268,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP1 — Chuẩn chấm S‑O‑D</b></td>
 <td>QA phát hành bảng tiêu chí S‑O‑D (1–5) + ví dụ CNC; mọi phòng ban dùng chung.</td>
-<td>Bảng S‑O‑D + log đào tạo ký nhận</td>
+<td>Bảng S‑O‑D + nhật ký đào tạo ký nhận</td>
 <td>Áp cho mọi sổ đăng ký rủi ro entry</td>
 </tr>
 <tr>
 <td><b>CP2 — sổ đăng ký rủi ro vòng đời</b></td>
 <td>Người phụ trách rủi ro ghi cause–event–impact, S‑O‑D, action, ngày đến hạn, effectiveness.</td>
-<td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx">FRM‑QMS‑005 Sổ đăng ký rủi ro</a></td>
+<td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx">Risks and Opportunities Register</a></td>
 <td>RPN ≥ 41 hoặc S=5 kích hoạt escalate</td>
 </tr>
 <tr>
 <td><b>CP3 — Phát hành chương trình cổng kiểm soát</b></td>
 <td>Programmer dùng bảng kiểm release; khóa bản lỗi thời; xác nhận rev; lưu mô phỏng/pilot.</td>
 <td>Release hồ sơ + <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-106_Pilot_Dry_Run_Log.xlsx">FRM‑QMS‑008 Pilot/Dry‑run</a></td>
-<td>Part mới/CTQ mới/toolpath mới</td>
+<td>Part mới/CTQ mới/đường chạy dao mới</td>
 </tr>
 <tr>
 <td><b>CP4 — Setup/FAI cổng kiểm soát</b></td>
@@ -290,8 +290,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>S=5 hoặc CTQ liên quan fit/function</td>
 </tr>
 <tr>
-<td><b>CP5 — Hiệu chuẩn &amp; gage status</b></td>
-<td>QC/QA chặn dùng gage OOT; Warehouse không xuất gage OOT; log segregate.</td>
+<td><b>CP5 — Hiệu chuẩn &amp; gage trạng thái</b></td>
+<td>QC/QA chặn dùng gage OOT; Warehouse không xuất gage OOT; nhật ký segregate.</td>
 <td>Danh sách gage + tem trạng thái + hồ sơ cách ly</td>
 <td>Gage OOT → STOP ngay</td>
 </tr>
@@ -371,7 +371,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td><b>Low</b></td><td>1–20</td><td>Ghi nhận; giữ control hiện hữu; review theo định kỳ MR.</td></tr>
 <tr><td><b>Medium</b></td><td>21–40</td><td>Gắn người phụ trách + ngày đến hạn; bổ sung control tại đúng cổng kiểm soát; kiểm chứng hiệu lực.</td></tr>
-<tr><td><b>Cao</b></td><td>41–75</td><td>Escalate Dept Head; bắt buộc thêm cổng kiểm soát/bảng kiểm/validation; review hằng tuần đến khi giảm.</td></tr>
+<tr><td><b>Cao</b></td><td>41–75</td><td>Escalate Dept Head; bắt buộc thêm cổng kiểm soát/bảng kiểm/xác nhận; review hằng tuần đến khi giảm.</td></tr>
 <tr><td><b>Severe</b></td><td>&gt;75 hoặc <b>S=5</b></td><td><b>STOP/HOLD/BLOCK</b> cho tới khi có containment + control mới + phê duyệt bằng văn bản; kích hoạt NCR/CAPA/MRB khi liên quan.</td></tr>
 </tbody>
 </table>
@@ -403,7 +403,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Đo kiểm / hiệu chuẩn</b></td>
 <td>Gage OOT; phương pháp đo không valid; thiếu IR/FAI</td>
 <td>G7, G6</td>
-<td>IR/FAI + gage status</td>
+<td>IR/FAI + gage trạng thái</td>
 </tr>
 <tr>
 <td><b>Outsource / công đoạn đặc biệt</b></td>
@@ -415,7 +415,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Vượt qua cổng kiểm soát</b></td>
 <td>Bỏ FAI; bỏ IPQC; giao hàng khi thiếu chứng từ</td>
 <td>Mọi cổng kiểm soát</td>
-<td>Cổng kiểm soát sign‑off + log HOLD/BLOCK</td>
+<td>Cổng kiểm soát sign‑off + nhật ký HOLD/BLOCK</td>
 </tr>
 <tr>
 <td><b>Change không kiểm soát</b></td>
@@ -454,10 +454,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>FF1 — không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</b></td>
-<td>Thiếu MRR tại cổng kiểm soát (sign‑off, IR/FAI, cert, log)</td>
+<td><b>FF1 — không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</b></td>
+<td>Thiếu MRR tại cổng kiểm soát (sign‑off, IR/FAI, cert, nhật ký)</td>
 <td><b>HOLD</b> tại bước đang chạy</td>
-<td>Ghi log HOLD; bổ sung minh chứng; Supervisor xác nhận mở khóa</td>
+<td>Ghi nhật ký HOLD; bổ sung minh chứng; Supervisor xác nhận mở khóa</td>
 </tr>
 <tr>
 <td><b>FF2 — S=5 hoặc RPN&gt;75</b></td>
@@ -501,7 +501,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Sai Rev / phiên bản</b></td>
 <td>STOP máy; dán HOLD; giữ toàn bộ WIP liên quan; báo Supervisor + Programmer + QA; xác nhận rev đúng.</td>
-<td>Ảnh tem HOLD + ghi log traveler “Rev mismatch”</td>
+<td>Ảnh tem HOLD + ghi nhật ký traveler “Rev mismatch”</td>
 </tr>
 <tr>
 <td><b>Lẫn lộn / lẫn lô</b></td>
@@ -511,7 +511,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Thiếu chứng từ</b></td>
 <td>BLOCK ship; truy hồi chứng chỉ; báo Purchasing + QA + Estimator (SAL-03); cập nhật trạng thái giao.</td>
-<td>bộ hồ sơ giao hàng bảng kiểm đánh dấu thiếu + log BLOCK</td>
+<td>bộ hồ sơ giao hàng bảng kiểm đánh dấu thiếu + nhật ký BLOCK</td>
 </tr>
 <tr>
 <td><b>Gage OOT</b></td>
@@ -521,7 +521,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Vượt qua cổng kiểm soát</b></td>
 <td>STOP luồng; khóa bước tiếp theo; báo Supervisor + QA; truy vết lô đã đi qua; mở NCR khi có escape.</td>
-<td>Log vượt qua + danh sách bước bị ảnh hưởng</td>
+<td>Nhật ký vượt qua + danh sách bước bị ảnh hưởng</td>
 </tr>
 <tr>
 <td><b>Rủi ro giao hàng (nghi ngờ NG)</b></td>
@@ -543,10 +543,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Xác nhận đúng Rev/spec (bản vẽ–traveler–program–PO)</td><td>Estimator (SAL-03) + Programmer</td><td>“Rev‑confirmed” log + bản vẽ rev</td><td>Dùng bản in cũ; program không đồng bộ</td></tr>
+<tr><td>1</td><td>Xác nhận đúng Rev/spec (bản vẽ–traveler–program–PO)</td><td>Estimator (SAL-03) + Programmer</td><td>“Rev‑confirmed” nhật ký + bản vẽ rev</td><td>Dùng bản in cũ; program không đồng bộ</td></tr>
 <tr><td>2</td><td>Trích CTQ + yêu cầu chứng chỉ/công đoạn đặc biệt</td><td>Estimator (SAL-03) + QA</td><td>CTQ list + Sổ đăng ký rủi ro entry</td><td>Bỏ sót yêu cầu notes/finish</td></tr>
 <tr><td>3</td><td>Chấm S‑O‑D theo cause–event–impact</td><td>Người phụ trách Risk</td><td>FRM‑QMS‑005</td><td>Chấm theo cảm giác; không viết cause</td></tr>
-<tr><td>4</td><td>Áp ngưỡng hành động và quyết định GO/HOLD/BLOCK</td><td>Supervisor + QA</td><td>Log quyết định + chữ ký</td><td>Không ghi lý do; không ghi người phụ trách</td></tr>
+<tr><td>4</td><td>Áp ngưỡng hành động và quyết định GO/HOLD/BLOCK</td><td>Supervisor + QA</td><td>Nhật ký quyết định + chữ ký</td><td>Không ghi lý do; không ghi người phụ trách</td></tr>
 <tr><td>5</td><td>Thiết kế control tại đúng cổng kiểm soát (phát hành chương trình, setup/FAI, receiving, ship)</td><td>chủ quá trình</td><td>Bảng kiểm/cổng kiểm soát plan cập nhật</td><td>Đặt control sai chỗ; thiếu MRR</td></tr>
 <tr><td>6</td><td>Luồng‑down yêu cầu vào PO &amp; supplier (khi outsource/công đoạn đặc biệt)</td><td>Purchasing</td><td>PO + yêu cầu chứng chỉ</td><td>PO thiếu luồng‑down; thiếu spec</td></tr>
 <tr><td>7</td><td>Nhận hàng: xác nhận traceability &amp; chứng từ</td><td>Warehouse</td><td>Receiving hồ sơ + scan chứng từ</td><td>Lẫn lô; thiếu heat/lot</td></tr>
@@ -554,7 +554,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>9</td><td>Setup/first‑piece: xác nhận datum/offset/tool list</td><td>Setup</td><td>Setup sign‑off + ảnh setup</td><td>Datum sai; nhầm dao/offset</td></tr>
 <tr><td>10</td><td>FAI/IPQC/FQC: xác nhận phương pháp đo + D rating</td><td>QC</td><td>IR/FAI/FQC report</td><td>Đo sai; thiếu ghi số seri gage</td></tr>
 <tr><td>11</td><td>Chặn gage OOT và đánh giá tác động</td><td>QC/QA</td><td>Hồ sơ cách ly + NCR (khi áp dụng)</td><td>Tiếp tục dùng gage; không truy hồi lô</td></tr>
-<tr><td>12</td><td>Quản trị thay đổi: cập nhật sổ đăng ký rủi ro + đào tạo trước effective date</td><td>QA + Người phụ trách change</td><td>FRM‑QMS‑006 + log đào tạo</td><td>Change làm xong mới cập nhật</td></tr>
+<tr><td>12</td><td>Quản trị thay đổi: cập nhật sổ đăng ký rủi ro + đào tạo trước effective date</td><td>QA + Người phụ trách change</td><td>FRM‑QMS‑006 + nhật ký đào tạo</td><td>Change làm xong mới cập nhật</td></tr>
 <tr><td>13</td><td>NCR/MRB: containment + quyết định MRB bằng văn bản</td><td>QA + Supervisor</td><td>SOP‑QMS‑006 + MRB hồ sơ</td><td>Tự rework; thiếu quyết định MRB</td></tr>
 <tr><td>14</td><td>phê duyệt giao hàng: kiểm “đủ MRR” trước xuất</td><td>Warehouse + QA</td><td>Bộ hồ sơ giao hàng bảng kiểm</td><td>Thiếu chứng chỉ; thiếu FQC pass</td></tr>
 <tr><td>15</td><td>Review hiệu lực: RPN giảm + KPI ổn định + cập nhật thư viện rủi ro</td><td>QA + Supervisor</td><td>Effectiveness note + trend KPI</td><td>Đóng rủi ro khi chưa có dữ liệu</td></tr>
@@ -566,7 +566,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>OJT đầu ra (sản phẩm đầu ra bắt buộc)</b>
 <ul>
 <li>01 entry sổ đăng ký rủi ro hoàn chỉnh (cause–event–impact, S‑O‑D, ngưỡng, action, người phụ trách, ngày đến hạn).</li>
-<li>01 quyết định GO/HOLD/BLOCK có log, chữ ký và MRR kèm theo.</li>
+<li>01 quyết định GO/HOLD/BLOCK có nhật ký, chữ ký và MRR kèm theo.</li>
 <li>01 bộ minh chứng cổng kiểm soát theo vai trò (release hồ sơ / receiving packet / IR/FAI / bộ hồ sơ giao hàng).</li>
 </ul>
 </div>
@@ -699,7 +699,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol class="iso-list">
 <li>S‑O‑D là gì? RPN tính bằng công thức nào?</li>
 <li>Điều kiện nào kích hoạt mức Nghiêm trọng theo ngưỡng của HESEM?</li>
-<li>“không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” nghĩa là gì trong vận hành?</li>
+<li>“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” nghĩa là gì trong vận hành?</li>
 <li>Viết đúng cấu trúc cause–event–impact cho rủi ro “sai rev”.</li>
 <li>Cổng kiểm soát nào chặn rủi ro thiếu chứng chỉ outsource? Nêu MRR tối thiểu.</li>
 <li>Khi phát hiện gage OOT đang dùng để đo CTQ, bước đầu tiên là gì?</li>
@@ -728,7 +728,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Dữ kiện:</b> Traveler ghi Rev B; bản vẽ trong bộ hồ sơ công việc (job packet) là Rev C; program file name không có rev; lô đang ở bước setup first‑piece.</li>
 <li><b>Yêu cầu:</b> Quyết định STOP/HOLD/BLOCK; xác định người phụ trách xử lý; ghi MRR tối thiểu trong 30 phút đầu.</li>
-<li><b>Kết quả PASS:</b> STOP ngay; segregate WIP; phát hành lại “rev‑confirmed”; phát hành chương trình lại; log đầy đủ.</li>
+<li><b>Kết quả PASS:</b> STOP ngay; segregate WIP; phát hành lại “rev‑confirmed”; phát hành chương trình lại; nhật ký đầy đủ.</li>
 </ul>
 </div>
 <div class="card">
@@ -773,7 +773,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Quyết định theo ngưỡng</td>
 <td>Áp đúng Thấp/Trung bình/Cao/Nghiêm trọng; chọn STOP/HOLD/BLOCK đúng</td>
-<td>Log quyết định + chữ ký Supervisor/QA</td>
+<td>Nhật ký quyết định + chữ ký Supervisor/QA</td>
 </tr>
 <tr>
 <td>MRR vòng kín</td>
@@ -825,9 +825,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Programmer</td>
 </tr>
 <tr>
-<td>Pilot/Dry‑run log</td>
+<td>Pilot/Dry‑run nhật ký</td>
 <td><code>PILOT-[WO]-[Op]-[YYYYMMDD]</code></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT QMS/Quality logs</td>
+<td>M365/SharePoint → HESEM-QMS-SSOT QMS/Quality các nhật ký</td>
 <td>Programmer + Setup</td>
 </tr>
 <tr>
@@ -839,7 +839,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>IR/FAI/IPQC/FQC</td>
 <td><code>IR-[WO]-[Op]-[YYYYMMDD]</code></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT QC inspection hồ sơ</td>
+<td>M365/SharePoint → HESEM-QMS-SSOT QC kiểm tra hồ sơ</td>
 <td>QC</td>
 </tr>
 <tr>
@@ -883,7 +883,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Thiếu chứng chỉ outsource/công đoạn đặc biệt:</b> bộ hồ sơ giao hàng bảng kiểm bắt buộc; BLOCK giao hàng khi thiếu.</li>
 <li><b>Traceability không đầy đủ:</b> receiving packet thiếu heat/lot → STOP nhận và segregate.</li>
 <li><b>Gage OOT vẫn sử dụng:</b> chặn tại QC; cách ly gage và giữ lô; đánh giá tác động bằng IR tái kiểm.</li>
-<li><b>Vượt qua cổng kiểm soát FAI/IPQC:</b> log vượt qua; mở NCR khi có escape; đào tạo lại bắt buộc.</li>
+<li><b>Vượt qua cổng kiểm soát FAI/IPQC:</b> nhật ký vượt qua; mở NCR khi có escape; đào tạo lại bắt buộc.</li>
 <li><b>phê duyệt giao hàng thiếu bằng chứng FQC pass:</b> Warehouse chỉ xuất khi đủ sign‑off.</li>
 </ol>
 <div class="card">
@@ -891,10 +891,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-103-risk-opportunity-fmea-and-control-plan.html">SOP‑QMS‑003 — Risk &amp; Opportunity</a></li>
 <li><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-162_Change_Impact_Matrix.xlsx">FRM‑QMS‑006 — Change Impact Matrix</a></li>
-<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP‑QMS‑008 — Quản trị thay đổi</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP-106 — Quản trị thay đổi và cấu hình</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//06-SOP-600//sop-606-ncr-capa-and-ipqc-reaction.html">SOP‑QMS‑006 — NC/CAPA</a></li>
-<li><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx">FRM‑QMS‑005 — Sổ đăng ký rủi ro</a></li>
-<li><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM‑HR‑TRN‑03 — Bảng kiểm OJT (TWI)</a></li>
+<li><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx">Risks and Opportunities Register</a></li>
+<li><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">OJT Checklist</a></li>
 <li><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-808_Performance_Review_Form.xlsx">FRM‑HR‑TRN‑08 — Test Blueprint</a></li>
 <li><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-808_Performance_Review_Form.xlsx">FRM‑HR‑TRN‑10 — Evaluation Rubric</a></li>
 </ul>

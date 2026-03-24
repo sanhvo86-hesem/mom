@@ -72,7 +72,7 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>2. Phân vùng FOD và mức kiểm soát tại HESEM</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Zone</th><th>Khu vực điển hình</th><th>Mức kiểm soát bắt buộc</th><th>Bằng chứng tối thiểu</th></tr></thead><tbody>
 <tr><td><span class="badge-red">FOD-A</span></td><td>Khu clean build, clean-pack, kiểm tra cuối nhạy sạch, helium leak test, khu đóng inner bag/clean bag, staging trước ship đối với job clean/vacuum</td><td>Dụng cụ chuyên dùng theo khu; PHẢI loại trừ giấy carton, băng keo lộ keo và khăn bẩn; kiểm soát vật tư sạch và vật tư phải loại trừ; line clearance trước nhận ca, trước mở bao, trước đóng bao, trước bàn giao</td><td>FOD card hoặc bảng kiểm bàn giao khu; ảnh/biên bản khi có abnormal; xác nhận last-look trước đóng kín</td></tr>
-<tr><td><span class="badge-amber">FOD-B</span></td><td>Máy CNC, khu setup, bàn deburr/finishing, bàn đo kiểm, staging giữa công đoạn, chuyển giao công việc</td><td>Bảng treo bóng dụng cụ (shadow board) hoặc vị trí chuẩn cho tool; kiểm vật tư tiêu hao; thu hồi mảnh dao gãy; line clearance trước chạy, sau gãy dao, sau đổi job, trước chuyển công đoạn</td><td>Traveler / bảng kiểm / log abnormal / hold log khi có sự cố</td></tr>
+<tr><td><span class="badge-amber">FOD-B</span></td><td>Máy CNC, khu setup, bàn deburr/finishing, bàn đo kiểm, staging giữa công đoạn, chuyển giao công việc</td><td>Bảng treo bóng dụng cụ (shadow board) hoặc vị trí chuẩn cho tool; kiểm vật tư tiêu hao; thu hồi mảnh dao gãy; line clearance trước chạy, sau gãy dao, sau đổi job, trước chuyển công đoạn</td><td>Traveler / bảng kiểm / nhật ký abnormal / hold nhật ký khi có sự cố</td></tr>
 <tr><td><span class="badge-green">FOD-C</span></td><td>Kho nội bộ, khu outer pack, lối luân chuyển pallet, khu chờ outsource/nhập kho</td><td>Housekeeping, quy tắc vị trí, kiểm pallet/thùng/liner/nhãn, FIFO/zone discipline, PHẢI loại trừ vật lạ trên khay và trong thùng sản phẩm</td><td>Bảng kiểm kho/packaging khi tài liệu liên quan yêu cầu</td></tr>
 </tbody></table></div>
 <p class="tiny">Khi một job đi qua nhiều zone, phải áp dụng mức kiểm soát cao nhất đang hiệu lực cho bước đó. Job clean/vacuum đi qua khu machine vẫn phải tuân thủ logic nâng cấp khi chuyển sang FOD-A.</p></div>
@@ -113,12 +113,12 @@ ul.tight li {margin:4px 0;}
 <div class="step-item"><strong>Khoanh vùng last-known-good đến suspect range.</strong><br/>Xác định thời điểm còn chắc chắn sạch gần nhất, sau đó khoanh mọi part/khay/công đoạn có khả năng bị ảnh hưởng.</div>
 <div class="step-item"><strong>Tìm kiếm có phương pháp.</strong><br/>Tìm theo thứ tự: vị trí thao tác trực tiếp → đồ gá/fixture → cavity/pocket/bore → khay/tray → chip/dung dịch làm mát trap → packaging/liner nếu đã chuyển bước. Khi nghi có mảnh nhỏ, dùng đèn/soi gương/borescope/dụng cụ thích hợp.</div>
 <div class="step-item"><strong>Đánh giá ảnh hưởng và quyết định containment.</strong><br/>Nếu chưa chứng minh sạch, mở HOLD theo WI-606 hoặc route tương ứng. Nếu part có chức năng sealing, vacuum, cleanliness hoặc safety-sensitive, mặc định nâng mức containment.</div>
-<div class="step-item"><strong>Chỉ release khi vòng bằng chứng đóng kín.</strong><br/>Release phải có bằng chứng đã tìm đủ hoặc đã kiểm chứng vùng ảnh hưởng bằng phương pháp thích hợp; có người chịu trách nhiệm ký; và traveler/log/hold được cập nhật.</div>
+<div class="step-item"><strong>Chỉ release khi vòng bằng chứng đóng kín.</strong><br/>Release phải có bằng chứng đã tìm đủ hoặc đã kiểm chứng vùng ảnh hưởng bằng phương pháp thích hợp; có người chịu trách nhiệm ký; và traveler/nhật ký/hold được cập nhật.</div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Xử lý bắt buộc</th><th>Thẩm quyền release</th></tr></thead><tbody>
 <tr><td>Thiếu insert/screw/shim/mảnh dao</td><td>HOLD vùng ảnh hưởng, tìm theo phương pháp, kiểm 100% vùng nghi ngờ</td><td>Production Supervisor + QA</td></tr>
 <tr><td>Phát hiện vật lạ trong bao gói</td><td>Dừng ship, mở lại dưới kiểm soát sạch, repack toàn bộ phạm vi liên quan</td><td>QA + Warehouse</td></tr>
-<tr><td>FOD lặp lại cùng máy/khu trong 1 ca</td><td>Mở hành động tại nguồn: xem lại tool board, consumable issue, line-clear pattern, housekeeping ownership</td><td>Production Supervisor / QA</td></tr>
+<tr><td>FOD lặp lại cùng máy/khu trong 1 ca</td><td>Mở hành động tại nguồn: xem lại tool board, consumable vấn đề, line-clear pattern, housekeeping ownership</td><td>Production Supervisor / QA</td></tr>
 <tr><td>FOD có khả năng escape tới khách hàng</td><td>Kích hoạt NCR/escape path, khóa shipment liên quan, truy ngược lot</td><td>QA Manager theo SOP liên quan</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>7. Bằng chứng, KPI và tài liệu liên kết</h2>
@@ -129,7 +129,7 @@ ul.tight li {margin:4px 0;}
 <li>Người giao – người nhận – thời điểm bàn giao</li>
 <li>Abnormal / missing item / broken tool / found object</li>
 <li>Phạm vi suspect và quyết định HOLD hoặc RELEASE</li>
-<li>Ảnh hoặc link log khi sự cố xảy ra</li>
+<li>Ảnh hoặc link nhật ký khi sự cố xảy ra</li>
 </ul></div>
 <div class="card"><h3>KPI</h3><ul class="tight" style="padding-left:18px;">
 <li>KPI-WI721-01: số incident FOD theo khu/công đoạn</li>

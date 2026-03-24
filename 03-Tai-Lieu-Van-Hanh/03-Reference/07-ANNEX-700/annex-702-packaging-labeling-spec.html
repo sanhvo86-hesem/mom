@@ -85,7 +85,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td><span class="badge-blue">P2 — bề mặt / hình học nhạy</span></td><td>Anodize, polished, bead blast, mép sắc, chi tiết mỏng dễ cong, chi tiết dễ cấn</td><td>Bọc riêng từng chiếc hoặc từng lớp bằng vật liệu không phát bụi; spacer / partition / corner protector</td><td>PHẢI ngăn tuyệt đối kim loại chạm kim loại; ảnh lớp phân cách; dán cảnh báo “Do not stack” khi áp dụng</td></tr>
 <tr><td><span class="badge-navy">P3 — chống ẩm / chống gỉ / vacuum-compatible</span></td><td>Part cần VCI, desiccant, HIC, purge hoặc seal kín; linh kiện yêu cầu moisture control / vacuum compatibility</td><td>Inner bag + desiccant/HIC + outer bag hoặc thùng kín; vật tư không phát bụi, không silicone nếu khách không cho phép</td><td>Ghi loại desiccant, số lượng, HIC, thời gian đóng gói, thời hạn preservation; ảnh HIC và seal</td></tr>
 <tr><td><span class="badge-amber">P4 — ESD</span></td><td>Part / sub-assembly nhạy ESD hoặc khách yêu cầu EPA-only handling</td><td>Túi shielding / vật tư ESD + nhãn ESD + cách ly với vật tư thường</td><td>Dán nhãn ESD trên lớp trong và lớp ngoài; không trộn với vật tư không ESD</td></tr>
-<tr><td><span class="badge-red">P5 — clean pack / clean build</span></td><td>Part cleanliness, semiconductor, vacuum clean, leak-tested, yêu cầu double-bag hoặc clean pack</td><td>Đóng gói sạch theo <a href="../../02-Work-Instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a>; double-bag khi route yêu cầu; vật tư sạch đủ cấp</td><td>Last-look, log môi trường, ảnh inner bag / outer bag / seal, quy tắc mở lại và reseal, preservation window</td></tr>
+<tr><td><span class="badge-red">P5 — clean pack / clean build</span></td><td>Part cleanliness, semiconductor, vacuum clean, leak-tested, yêu cầu double-bag hoặc clean pack</td><td>Đóng gói sạch theo <a href="../../02-Work-Instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a>; double-bag khi route yêu cầu; vật tư sạch đủ cấp</td><td>Last-look, nhật ký môi trường, ảnh inner bag / outer bag / seal, quy tắc mở lại và reseal, preservation window</td></tr>
 </tbody></table></div>
 <p class="tiny">Khi một part thỏa nhiều điều kiện, <strong>PHẢI</strong> chọn cấp cao hơn. Ví dụ: part anodize đồng thời cần moisture control thì áp dụng tối thiểu P3, không được chỉ dùng P2.</p></div>
 <div class="section"><h2>3. Vật tư được phép và vật tư phải loại trừ</h2>
@@ -94,7 +94,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Vật tư chống ẩm</td><td>Desiccant còn hạn, HIC còn hạn, túi barrier / túi kín đúng route</td><td>Desiccant không nhãn, đã no ẩm, HIC đổi màu trước khi dùng, túi thủng / seal lỗi</td><td>Phải ghi số lượng và vị trí đặt trên bảng kiểm</td></tr>
 <tr><td>Vật tư ESD</td><td>Túi shielding, foam ESD, nhãn ESD, seal sạch</td><td>Túi PE thường thay cho shielding bag, bubble wrap không kiểm soát ESD</td><td>Chỉ mở gói ESD tại khu được kiểm soát theo WI liên quan</td></tr>
 <tr><td>Carton / thùng / crate</td><td>Carton đúng tải, thùng gỗ / crate sạch khô, pallet đạt tải, đệm chống xê dịch</td><td>Carton mềm, ướt, móp, pallet nứt mục, crate có đinh lộ, vật liệu bẩn có mùn</td><td>Heavy part phải có blocking, bracing và kiểm soát tâm tải</td></tr>
-<tr><td>Seal / tape / label</td><td>Tape đúng bề mặt, nhãn quét được, không che mã vạch</td><td>Tape rách, nhãn lem, dán chồng lên seam cần kiểm tra, băng keo bẩn phát bụi trong clean pack</td><td>Nhãn phải đọc được ngay sau dán; lỗi in phải hủy và ghi log reprint</td></tr>
+<tr><td>Seal / tape / label</td><td>Tape đúng bề mặt, nhãn quét được, không che mã vạch</td><td>Tape rách, nhãn lem, dán chồng lên seam cần kiểm tra, băng keo bẩn phát bụi trong clean pack</td><td>Nhãn phải đọc được ngay sau dán; lỗi in phải hủy và ghi nhật ký reprint</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>4. Quy tắc cấu trúc lớp đóng gói</h2>
 <div class="matrix">
@@ -164,7 +164,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>P1 / P2 thông thường</td><td>30 ngày nếu lưu trong kho khô, sạch, FIFO</td><td>Carton rách, nhãn mất, vật tư đệm xô lệch, dấu ẩm hoặc part dịch chuyển</td></tr>
 <tr><td>P3 chống ẩm / chống gỉ</td><td>90 ngày hoặc theo yêu cầu khách hàng, tùy điều kiện nào nghiêm hơn</td><td>HIC ngoài ngưỡng, desiccant hết hạn, túi mất kín, mở lại quá thời gian cho phép</td></tr>
 <tr><td>P4 ESD</td><td>180 ngày nếu shielding bag nguyên vẹn và kho đúng điều kiện</td><td>Shielding bag thủng / rách / mất nhãn ESD / bị mở ngoài khu kiểm soát</td></tr>
-<tr><td>P5 clean pack / clean build</td><td>Theo <a href="../../02-Work-Instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a>; nếu không có route riêng thì tối đa 30 ngày khi bag kín và log môi trường đạt</td><td>Bag hở, seal lỗi, vật tư bẩn, khu lưu không đạt, part bị chạm bởi găng / bề mặt bẩn</td></tr>
+<tr><td>P5 clean pack / clean build</td><td>Theo <a href="../../02-Work-Instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a>; nếu không có route riêng thì tối đa 30 ngày khi bag kín và nhật ký môi trường đạt</td><td>Bag hở, seal lỗi, vật tư bẩn, khu lưu không đạt, part bị chạm bởi găng / bề mặt bẩn</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>9. HOLD / REJECT criteria và KPI phải theo dõi</h2>
 <div class="two-col">
@@ -184,8 +184,8 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div></div>
 <div class="section"><h2>10. Tài liệu liên kết</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò sử dụng</th></tr></thead><tbody>
-<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a></td><td>Quy tắc in nhãn, scan-to-action và log reprint.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td><td>bộ hồ sơ phê duyệt giao hàng (ship release pack), SSCC và đối soát kiện trước xác nhận giao hàng.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a></td><td>Quy tắc in nhãn, scan-to-action và nhật ký reprint.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td><td>bộ hồ sơ phê duyệt giao hàng (ship gói phát hành), SSCC và đối soát kiện trước xác nhận giao hàng.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td><td>Step-by-step clean pack, double-bag, purge, reseal và preservation.</td></tr>
 <tr><td><a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a></td><td>Dictionary SSCC và đối soát pack.</td></tr>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-506-fod-prevention-program.html">ANNEX-506</a></td><td>Chương trình FOD cho đóng gói và bàn giao.</td></tr>

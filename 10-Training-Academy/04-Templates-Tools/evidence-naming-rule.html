@@ -78,7 +78,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card danger">
 <span class="badge">Cổng kiểm soát (gate)</span>
 <ul class="tight">
-<li><b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</b>: thiếu MRR trong SSOT → khóa chuyển bước.</li>
+<li><b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</b>: thiếu MRR trong SSOT → khóa chuyển bước.</li>
 <li><b>Sai REV</b> hoặc <b>file rời ngoài SSOT</b> → HOLD/FAIL.</li>
 <li><b>Đặt tên sai chuẩn</b> → hồ sơ không được công nhận trong đánh giá năng lực.</li>
 </ul>
@@ -87,7 +87,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">1) Nguyên tắc SSOT</span>
 <ul class="tight">
-<li><b>Source of Hồ sơ (SoR)</b>: Epicor/MES/thiết bị đo (log gốc).</li>
+<li><b>Source of Hồ sơ (SoR)</b>: Epicor/MES/thiết bị đo (nhật ký gốc).</li>
 <li><b>Single Source of Truth (SSOT)</b>: M365/SharePoint → <b>HESEM-QMS-SSOT</b>.</li>
 <li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Lưu hồ sơ chính trong SSOT đã chỉ định; không dùng máy cá nhân, USB, Zalo hoặc Email làm nơi lưu chính.</li>
 <li><b>KHI</b> bắt buộc chụp màn hình (sự cố hệ thống) → tạo <b>Incident Note</b> và nộp vào SSOT.</li>
@@ -112,7 +112,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  JOB-2602-001_BRACKET-123_REV-C/
  <br/>├── 00_Input/ (PO, RFQ, Drawing, Spec)
  <br/>├── 10_Engineering/ (Bộ hồ sơ chuẩn (baseline package), CAM, Setup sheet)
- <br/>├── 20_Production/ (Traveler, Setup photos, Trong quá trình log)
+ <br/>├── 20_Production/ (Traveler, Setup photos, Trong quá trình nhật ký)
  <br/>├── 30_QC/ (IR, FAI, Final, NCR)
  <br/>├── 40_Supplier/ (MTR, CoC, Outsource cert)
  <br/>├── 50_Shipping/ (bộ hồ sơ giao hàng (ship packet), CoC, Packing, Label)
@@ -162,10 +162,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>RFQ</b></td><td>Yêu cầu báo giá</td><td>RFQ + drawing/spec</td></tr>
 <tr><td><b>PO</b></td><td>Đơn hàng khách hàng</td><td>PO + terms</td></tr>
 <tr><td><b>CR</b></td><td>Rà soát hợp đồng</td><td>FRM-QA-001</td></tr>
-<tr><td><b>BASELINE</b></td><td>Bộ hồ sơ chuẩn</td><td>Setup sheet + inspection plan</td></tr>
+<tr><td><b>BASELINE</b></td><td>Bộ hồ sơ chuẩn</td><td>Setup sheet + kiểm tra plan</td></tr>
 <tr><td><b>TRV</b></td><td>Traveler/Route</td><td>FRM-OPS-001</td></tr>
-<tr><td><b>IR</b></td><td>Inspection Report</td><td>Trong quá trình/Final IR</td></tr>
-<tr><td><b>FAI</b></td><td>Kiểm tra sản phẩm đầu tiên (first article) Inspection</td><td>FAI report</td></tr>
+<tr><td><b>IR</b></td><td>Kiểm tra Report</td><td>Trong quá trình/Final IR</td></tr>
+<tr><td><b>FAI</b></td><td>Kiểm tra sản phẩm đầu tiên (first article) Kiểm tra</td><td>FAI report</td></tr>
 <tr><td><b>NCR</b></td><td>Nonconformity Report</td><td>NCR + disposition</td></tr>
 <tr><td><b>CAPA</b></td><td>Corrective action</td><td>CAPA hồ sơ + effectiveness</td></tr>
 <tr><td><b>MTR</b></td><td>Material test report</td><td>Mill cert</td></tr>
@@ -173,7 +173,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>COC</b></td><td>Certificate of Conformance</td><td>CoC</td></tr>
 <tr><td><b>PACK</b></td><td>Packing/Label</td><td>Phiếu kê đóng gói + label photo</td></tr>
 <tr><td><b>SHIP</b></td><td>Shipping bằng chứng</td><td>Delivery note, POD</td></tr>
-<tr><td><b>OJT</b></td><td>Đào tạo tại hiện trường</td><td>OJT log + bảng kiểm</td></tr>
+<tr><td><b>OJT</b></td><td>Đào tạo tại hiện trường</td><td>OJT nhật ký + bảng kiểm</td></tr>
 <tr><td><b>CỔNG KIỂM SOÁT</b></td><td>Cổng kiểm soát test</td><td>Vai trò cổng kiểm soát test pack</td></tr>
 <tr><td><b>CERT</b></td><td>Chứng nhận level</td><td>Certificate scan + register</td></tr>
 </tbody>

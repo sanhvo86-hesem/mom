@@ -110,7 +110,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hành vi</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
 <tr><td>Quan sát chu kỳ đầu</td><td>Đứng ở vị trí quan sát an toàn, theo dõi clamp, chip evacuation, tiếng cắt, spindle load, dung dịch làm mát coverage và transfer motion.</td><td>Rời máy quá sớm ở chu kỳ prove-out hoặc chu kỳ đầu sau đổi tool/chỉnh offset.</td></tr>
 <tr><td>Override</td><td>Dùng override theo plan prove-out và giảm dần/ tăng dần có kiểm soát.</td><td>Đẩy nhanh override để bắt kịp tiến độ khi chưa có bằng chứng máy ổn định.</td></tr>
-<tr><td>Offset / wear</td><td>Chỉnh wear theo rule cho phép; mọi chỉnh geometry/zero phải có thẩm quyền đúng.</td><td>Ghi offset ra giấy rời, sửa geometry không log, hoặc sửa bù để che lỗi quy trình.</td></tr>
+<tr><td>Offset / wear</td><td>Chỉnh wear theo rule cho phép; mọi chỉnh geometry/zero phải có thẩm quyền đúng.</td><td>Ghi offset ra giấy rời, sửa geometry không nhật ký, hoặc sửa bù để che lỗi quy trình.</td></tr>
 <tr><td>Tool life</td><td>Ghi nhận tool warning, thay đúng trước ngưỡng end-of-life, kiểm part đầu tiên sau thay dao.</td><td>Ép chạy quá life, bỏ qua warning, hoặc thay dao nhưng không reset/confirm pocket dữ liệu.</td></tr>
 <tr><td>Door / guard</td><td>Chỉ mở khi spindle/axes ở trạng thái an toàn cho phép.</td><td>Mở cửa khi còn chuyển động nguy hiểm hoặc vô hiệu liên động an toàn để can thiệp tay.</td></tr>
 <tr><td>Chip / dung dịch làm mát</td><td>Duy trì dòng chip thoát, nồng độ dung dịch làm mát, nozzle direction và vệ sinh định kỳ an toàn.</td><td>Dùng khí nén bừa bãi vào vùng có chip bay vào mắt/người khác hoặc thổi trực tiếp vào ổ trục/sensor không đúng quy cách.</td></tr>
@@ -136,7 +136,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <h3>5.3 Cuối ca / shutdown có kiểm soát</h3>
 <ul>
 <li>Trả máy về trạng thái sạch, an toàn, dễ tiếp quản; không để chip, đồ gá rời, dụng cụ đo hoặc vật lạ trong enclosure.</li>
-<li>Hoàn tất việc backup hồ sơ cần thiết, ảnh bất thường, reason code và log sản lượng.</li>
+<li>Hoàn tất việc backup hồ sơ cần thiết, ảnh bất thường, reason code và nhật ký sản lượng.</li>
 <li>Nếu còn HOLD machine hoặc HOLD part, phải gắn nhãn trạng thái nhìn thấy ngay từ ngoài máy.</li>
 </ul>
 </div>
@@ -170,7 +170,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="section"><h2>7. Hồ sơ bắt buộc, thẩm quyền và KPI</h2>
 <div class="two-col">
 <div class="card"><h3>7.1 Hồ sơ bắt buộc</h3><ul class="tight">
-<li>Alarm log / ảnh màn hình / ảnh hiện trường khi có bất thường.</li>
+<li>Alarm nhật ký / ảnh màn hình / ảnh hiện trường khi có bất thường.</li>
 <li>Shift handover note cho mọi machine đang chạy dở, prove-out hoặc HOLD.</li>
 <li>Reason code cho downtime, short stop, tool change bất thường, crash/sự cố suýt xảy ra (near-miss).</li>
 <li>Liên kết tới Hồ sơ công việc (job dossier) nếu bất thường có thể ảnh hưởng chất lượng.</li>

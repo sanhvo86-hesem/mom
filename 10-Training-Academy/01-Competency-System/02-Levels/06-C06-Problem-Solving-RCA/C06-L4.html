@@ -71,7 +71,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-ncr-capa-response.html"><b>DRL-06</b> — Bài diễn tập NCR + CAPA Quick Response</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Bài diễn tập Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet))</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-ncr-capa-response.html">DRL-06 — TRN-Bài diễn tập ACA-DRL-06 — NCR + CAPA Quick Response | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet)) | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
@@ -82,7 +82,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div><h2>1. Chuẩn đầu ra Level 4 theo K–S–E–M</h2><table class="table">
 <thead><tr><th>Knowledge (K)</th><th>Skill (S)</th><th>Bằng chứng (E)</th><th>Chỉ số (M)</th></tr></thead>
 <tbody>
-<tr><td>Thiết kế hệ thống/tiêu chuẩn; hiểu yêu cầu đánh giá ISO và cách chứng minh bằng documented information; quản trị rủi ro cấp hệ thống.</td><td>Chủ quá trình: thiết kế – triển khai – kiểm soát – cải tiến; dẫn dắt đa phòng ban; xây dashboard và reaction plan.</td><td>SOP/WI/FRM được ban hành &amp; đào tạo; đánh giá pack đầy đủ; kế hoạch phát triển năng lực; CAPA đóng vòng hiệu lực.</td><td>KPI đạt mức mục tiêu L4 và duy trì ổn định; không phát sinh major NC liên quan phạm vi.</td></tr>
+<tr><td>Thiết kế hệ thống/tiêu chuẩn; hiểu yêu cầu đánh giá ISO và cách chứng minh bằng documented information; quản trị rủi ro cấp hệ thống.</td><td>Chủ quá trình: thiết kế – triển khai – kiểm soát – cải tiến; dẫn dắt đa phòng ban; xây bảng điều khiển và reaction plan.</td><td>SOP/WI/FRM được ban hành &amp; đào tạo; đánh giá pack đầy đủ; kế hoạch phát triển năng lực; CAPA đóng vòng hiệu lực.</td><td>KPI đạt mức mục tiêu L4 và duy trì ổn định; không phát sinh major NC liên quan phạm vi.</td></tr>
 </tbody>
 </table><h2>2. Yêu cầu chuẩn ISO tích hợp (PHẢI/PHẢI/ĐƯỢC PHÉP) + mapping clause</h2><p class="small">Các yêu cầu dưới đây được viết theo ngôn ngữ ISO để dùng trực tiếp trong SOP/WI/FRM và làm căn cứ đánh giá.</p><div class="req">
 <span class="tag shall">PHẢI</span>
@@ -93,7 +93,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
 <div class="text">
-<div><strong>Mọi hoạt động thuộc C06 PHẢI được ghi nhận bằng documented information phù hợp (bảng kiểm/log/biên bản) và lưu theo quy định.</strong> <span class="iso">ISO 8.7</span></div>
+<div><strong>Mọi hoạt động thuộc C06 PHẢI được ghi nhận bằng documented information phù hợp (bảng kiểm/nhật ký/biên bản) và lưu theo quy định.</strong> <span class="iso">ISO 8.7</span></div>
 <p>Nguyên tắc ALCOA+: ghi ngay, đọc được, có người chịu trách nhiệm.</p>
 </div>
 </div><div class="req">
@@ -136,7 +136,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>5Why</strong>: đào sâu nguyên nhân chuỗi; mỗi Why phải có bằng chứng xác nhận.</li>
 <li><strong>Ishikawa</strong>: mở rộng nguyên nhân theo 6M (Man/Machine/Method/Material/Measurement/Milieu).</li>
 <li><strong>8D</strong>: cấu trúc hóa báo cáo và hành động (containment → CA → PA → xác minh).</li>
-</ol><p>Cảnh báo: “Lỗi người” không được coi là nguyên nhân gốc khi hệ thống (WI, poka‑yoke, training) chưa được kiểm chứng.</p><h3>Corrective vs Preventive &amp; Xác minh hiệu lực</h3><p><strong>Corrective action</strong> xử lý nguyên nhân gốc để lỗi không tái diễn. <strong>Preventive action</strong> mở rộng để lỗi tương tự không xảy ra ở nơi khác (job khác, máy khác).</p><p>Xác minh hiệu lực phải dựa trên chỉ số (repeat NCR, FPY, OTD). Khi chỉ số không cải thiện, RCA chưa đúng hoặc action chưa đủ mạnh.</p><div class="callout"><strong>Trọng tâm Level 4:</strong> Thiết kế hệ thống. Chuẩn hóa SOP/WI/FRM, xây dashboard KPI + reaction plan, đảm bảo đánh giá mức sẵn sàng và phát triển năng lực đội ngũ.</div><hr class="sep"/><h3>3.5 Chuyên đề nâng cao (L4): Kiến trúc CAPA theo ISO – từ dữ liệu đến Xem xét của lãnh đạo</h3><p>Level 4 yêu cầu bạn biến RCA từ “kỹ thuật cá nhân” thành “năng lực tổ chức”. Điều đó đòi hỏi một kiến trúc CAPA rõ ràng: nguồn vào → phân loại rủi ro → xử lý → xác minh → tri thức tổ chức → xem xét của lãnh đạo.</p><div class="figure">
+</ol><p>Cảnh báo: “Lỗi người” không được coi là nguyên nhân gốc khi hệ thống (WI, poka‑yoke, training) chưa được kiểm chứng.</p><h3>Corrective vs Preventive &amp; Xác minh hiệu lực</h3><p><strong>Corrective action</strong> xử lý nguyên nhân gốc để lỗi không tái diễn. <strong>Preventive action</strong> mở rộng để lỗi tương tự không xảy ra ở nơi khác (job khác, máy khác).</p><p>Xác minh hiệu lực phải dựa trên chỉ số (repeat NCR, FPY, OTD). Khi chỉ số không cải thiện, RCA chưa đúng hoặc action chưa đủ mạnh.</p><div class="callout"><strong>Trọng tâm Level 4:</strong> Thiết kế hệ thống. Chuẩn hóa SOP/WI/FRM, xây bảng điều khiển KPI + reaction plan, đảm bảo đánh giá mức sẵn sàng và phát triển năng lực đội ngũ.</div><hr class="sep"/><h3>3.5 Chuyên đề nâng cao (L4): Kiến trúc CAPA theo ISO – từ dữ liệu đến Xem xét của lãnh đạo</h3><p>Level 4 yêu cầu bạn biến RCA từ “kỹ thuật cá nhân” thành “năng lực tổ chức”. Điều đó đòi hỏi một kiến trúc CAPA rõ ràng: nguồn vào → phân loại rủi ro → xử lý → xác minh → tri thức tổ chức → xem xét của lãnh đạo.</p><div class="figure">
 <strong>Thiết kế KPI CAPA cân bằng (tránh gaming)</strong>
 <table class="table">
 <thead><tr><th>KPI</th><th>Ý nghĩa</th><th>Rủi ro gaming</th><th>Biện pháp chống gaming</th></tr></thead>
@@ -152,7 +152,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>“Lỗi này đã CA 2 tháng trước. Hôm nay cổng kiểm soát (gate) nào ngăn lỗi quay lại?”</li>
 <li>“Bạn biết giới hạn wear offset? Khi vượt thì reaction plan là gì?”</li>
 <li>“Cho tôi xem dữ liệu xác minh hiệu lực và cách bạn kết luận.”</li>
-</ul><h3>3.7 Chuyên đề (L4): Xây “organizational knowledge” từ CAPA</h3><p>Organizational knowledge không phải là file lưu trên máy tính cá nhân. Hãy tạo <strong>knowledge base</strong> với taxonomy lỗi, “bài học kinh nghiệm 1 trang”, bảng kiểm hội nhập nhân sự mới (onboarding) bắt buộc đọc, và tích hợp vào WI/ma trận đào tạo (training matrix).</p><h2>4. Quy trình thao tác chuẩn (luồng dọc, dễ đọc)</h2><p class="small">Lưu đồ được thiết kế theo hướng dọc để đọc rõ khi in A4. chỉnh trực tiếp bằng HTML/CSS.</p><div class="vflow">
+</ul><h3>3.7 Chuyên đề (L4): Xây “organizational knowledge” từ CAPA</h3><p>Organizational knowledge không phải là file lưu trên máy tính cá nhân. Hãy tạo <strong>knowledge base</strong> với taxonomy lỗi, “bài học kinh nghiệm 1 trang”, bảng kiểm hội nhập nhân sự mới bắt buộc đọc, và tích hợp vào WI/ma trận đào tạo (training matrix).</p><h2>4. Quy trình thao tác chuẩn (luồng dọc, dễ đọc)</h2><p class="small">Lưu đồ được thiết kế theo hướng dọc để đọc rõ khi in A4. chỉnh trực tiếp bằng HTML/CSS.</p><div class="vflow">
 <div class="vstep">
 <div class="vnum">1</div>
 <div class="vtext">
@@ -171,7 +171,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vnum">3</div>
 <div class="vtext">
 <strong>Thu thập dữ liệu &amp; phân tầng</strong>
-<p>Thu thập dữ liệu đo, ảnh, log máy, tuổi dao (tool life); phân tầng theo máy/ca/dao/người/vật liệu.</p>
+<p>Thu thập dữ liệu đo, ảnh, nhật ký máy, tuổi dao (tool life); phân tầng theo máy/ca/dao/người/vật liệu.</p>
 </div>
 </div>
 <div class="vstep">
@@ -195,7 +195,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p>Theo dõi chỉ số trước/sau; khi không cải thiện phải quay lại bước phân tích.</p>
 </div>
 </div>
-</div><h2>5. KPI/Chỉ số áp dụng cho C06 theo Level (có công thức + nguồn dữ liệu)</h2><p class="small-note">Xem trang tổng hợp: <a href="../../01-Framework/competency-metrics.html#C06">Competency Chỉ số – C06</a>.</p><p class="small">Bảng dưới dùng để “định lượng” năng lực. Khi áp dụng thực tế, HESEM hiệu chỉnh target theo chiến lược năm và năng lực máy/nhân sự.</p><table class="table">
+</div><h2>5. KPI/Chỉ số áp dụng cho C06 theo Level (có công thức + nguồn dữ liệu)</h2><p class="small-note">Xem trang tổng hợp: <a href="../../01-Framework/competency-metrics.html#C06">TRN-MET-01 — KPI/Chỉ số Dictionary by 19 Competencies | HESEM OS</a>.</p><p class="small">Bảng dưới dùng để “định lượng” năng lực. Khi áp dụng thực tế, HESEM hiệu chỉnh target theo chiến lược năm và năng lực máy/nhân sự.</p><table class="table">
 <thead>
 <tr>
 <th>Chỉ số/KPI</th>
@@ -224,18 +224,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>Tỷ lệ lỗi lặp (Repeat NCR)</strong></td>
 <td class="mono">Repeat NCR / tổng NCR</td>
-<td>NCR log</td>
+<td>NCR nhật ký</td>
 <td>Quý</td>
 <td>&lt;=15%</td>
 <td>&lt;=10%</td>
 <td>&lt;=6%</td>
 <td>&lt;=4%</td>
-<td>Repeat issue CTQ → không đạt</td>
+<td>Repeat vấn đề CTQ → không đạt</td>
 </tr>
 <tr>
 <td><strong>Hiệu lực CAPA</strong></td>
 <td class="mono">CAPA hiệu lực / tổng CAPA</td>
-<td>CAPA verification</td>
+<td>CAPA xác minh</td>
 <td>Quý</td>
 <td>&gt;=70%</td>
 <td>&gt;=80%</td>
@@ -245,7 +245,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </tbody></table><div class="kpi-gate">
 <strong>Gating bắt buộc để công nhận Level 4:</strong>
-<ul><li>NCR quá hạn do cá nhân → treo</li><li>Repeat issue CTQ → không đạt</li><li>Không xác minh hiệu lực → không đạt</li></ul>
+<ul><li>NCR quá hạn do cá nhân → treo</li><li>Repeat vấn đề CTQ → không đạt</li><li>Không xác minh hiệu lực → không đạt</li></ul>
 <p class="small">Quy định: gating ưu tiên an toàn – chất lượng – tuân thủ hồ sơ. Vi phạm gating có nguy cơ dẫn tới không công nhận level/bonus dù điểm bài kiểm tra cao.</p>
 </div><h2>6. Bài tập theo Level (Nghiên cứu tình huống HESEM)</h2><p class="small">Mỗi tình huống được thiết kế theo tinh thần học thuật ứng dụng: có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (bằng chứng) để chấm.</p><div class="card">
 <h3>Tình huống 1: Tình huống 1 – Sai lỗ khoan do lệch đồ gá</h3>
@@ -256,7 +256,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Nhiệm vụ theo Level 4:</strong>
 <ul><li>Thiết kế giải pháp theo hướng poka‑yoke/standardization; đánh giá rủi ro (FMEA rút gọn) trước khi triển khai rộng.</li><li>Thiết lập KPI theo dõi hiệu lực (trước/sau) và lịch đánh giá duy trì; phân công người chịu trách nhiệm hệ thống.</li><li>Đưa bài học vào hệ thống đào tạo (bài học kinh nghiệm + training refresh) và kiểm tra lại sau 30/60 ngày.</li></ul>
 <strong>Sản phẩm đầu ra (Bằng chứng):</strong>
-<ul><li>Thiết kế poka‑yoke hoặc tiêu chuẩn hóa</li><li>Dashboard KPI + kế hoạch đánh giá</li><li>Kế hoạch đào tạo refresh + bài kiểm tra</li></ul>
+<ul><li>Thiết kế poka‑yoke hoặc tiêu chuẩn hóa</li><li>Bảng điều khiển KPI + kế hoạch đánh giá</li><li>Kế hoạch đào tạo refresh + bài kiểm tra</li></ul>
 </div>
 </div><div class="card">
 <h3>Tình huống 2: Tình huống 2 – Bavia nhiều sai lệch</h3>
@@ -267,7 +267,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Nhiệm vụ theo Level 4:</strong>
 <ul><li>Thiết kế giải pháp theo hướng poka‑yoke/standardization; đánh giá rủi ro (FMEA rút gọn) trước khi triển khai rộng.</li><li>Thiết lập KPI theo dõi hiệu lực (trước/sau) và lịch đánh giá duy trì; phân công người chịu trách nhiệm hệ thống.</li><li>Đưa bài học vào hệ thống đào tạo (bài học kinh nghiệm + training refresh) và kiểm tra lại sau 30/60 ngày.</li></ul>
 <strong>Sản phẩm đầu ra (Bằng chứng):</strong>
-<ul><li>Thiết kế poka‑yoke hoặc tiêu chuẩn hóa</li><li>Dashboard KPI + kế hoạch đánh giá</li><li>Kế hoạch đào tạo refresh + bài kiểm tra</li></ul>
+<ul><li>Thiết kế poka‑yoke hoặc tiêu chuẩn hóa</li><li>Bảng điều khiển KPI + kế hoạch đánh giá</li><li>Kế hoạch đào tạo refresh + bài kiểm tra</li></ul>
 </div>
 </div><div class="card">
 <h3>Tình huống 3: Tình huống 3 – Khách khiếu nại thiếu CoC</h3>
@@ -278,7 +278,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Nhiệm vụ theo Level 4:</strong>
 <ul><li>Thiết kế giải pháp theo hướng poka‑yoke/standardization; đánh giá rủi ro (FMEA rút gọn) trước khi triển khai rộng.</li><li>Thiết lập KPI theo dõi hiệu lực (trước/sau) và lịch đánh giá duy trì; phân công người chịu trách nhiệm hệ thống.</li><li>Đưa bài học vào hệ thống đào tạo (bài học kinh nghiệm + training refresh) và kiểm tra lại sau 30/60 ngày.</li></ul>
 <strong>Sản phẩm đầu ra (Bằng chứng):</strong>
-<ul><li>Thiết kế poka‑yoke hoặc tiêu chuẩn hóa</li><li>Dashboard KPI + kế hoạch đánh giá</li><li>Kế hoạch đào tạo refresh + bài kiểm tra</li></ul>
+<ul><li>Thiết kế poka‑yoke hoặc tiêu chuẩn hóa</li><li>Bảng điều khiển KPI + kế hoạch đánh giá</li><li>Kế hoạch đào tạo refresh + bài kiểm tra</li></ul>
 </div>
 </div><h2>7. OJT theo TWI (Job Breakdown + bảng kiểm)</h2><h3>7.1 Job Breakdown Sheet (bản tiêu chuẩn dạy việc)</h3><table class="table">
 <thead>
@@ -292,7 +292,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><strong>Thu thập bằng chứng</strong></td>
-<td>Ảnh/đo/scan<br/>Log máy/dao<br/>Mẫu NG/OK</td>
+<td>Ảnh/đo/scan<br/>Nhật ký máy/dao<br/>Mẫu NG/OK</td>
 <td>Không dựa vào cảm tính<br/>Đảm bảo truy xuất</td>
 </tr>
 <tr>
@@ -308,7 +308,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody>
 </table><h3>7.2 danh mục OJT (bảng kiểm / danh mục) (quan sát tại hiện trường)</h3><table class="table">
 <thead><tr><th>#</th><th>Nội dung danh mục OJT (bảng kiểm / danh mục)</th><th>Kết quả</th><th>Ghi chú</th></tr></thead>
-<tbody><tr><td>1</td><td>Thực hiện bước: Xác định vấn đề theo tiêu chuẩn và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>2</td><td>Thực hiện bước: Khoanh vùng &amp; containment và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>3</td><td>Thực hiện bước: Thu thập dữ liệu &amp; phân tầng và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>4</td><td>Thực hiện bước: Phân tích nguyên nhân gốc và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>5</td><td>Thực hiện bước: Hành động khắc phục &amp; phòng ngừa và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>6</td><td>Thực hiện bước: Xác nhận hiệu lực và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>7</td><td>Xây hoặc cập nhật 1 SOP/WI/FRM liên quan và triển khai đào tạo lại.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>8</td><td>Thiết kế dashboard KPI/chỉ số và cơ chế phản ứng (reaction plan).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>9</td><td>Chủ trì đánh giá nội bộ / mức sẵn sàng check và đóng vòng CAPA.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr></tbody>
+<tbody><tr><td>1</td><td>Thực hiện bước: Xác định vấn đề theo tiêu chuẩn và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>2</td><td>Thực hiện bước: Khoanh vùng &amp; containment và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>3</td><td>Thực hiện bước: Thu thập dữ liệu &amp; phân tầng và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>4</td><td>Thực hiện bước: Phân tích nguyên nhân gốc và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>5</td><td>Thực hiện bước: Hành động khắc phục &amp; phòng ngừa và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>6</td><td>Thực hiện bước: Xác nhận hiệu lực và ghi nhận bằng chứng theo form.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>7</td><td>Xây hoặc cập nhật 1 SOP/WI/FRM liên quan và triển khai đào tạo lại.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>8</td><td>Thiết kế bảng điều khiển KPI/chỉ số và cơ chế phản ứng (reaction plan).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>9</td><td>Chủ trì đánh giá nội bộ / mức sẵn sàng check và đóng vòng CAPA.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr></tbody>
 </table><h2>8. Kiểm tra đánh giá (bản thiết kế kiểm thử (test blueprint) + bài kiểm tra nhanh mẫu)</h2><h3>8.1 bản thiết kế kiểm thử (test blueprint) (20 câu chuẩn)</h3><table class="table">
 <thead><tr><th>Nhóm nội dung</th><th>Số câu</th><th>Tỷ trọng</th></tr></thead>
 <tbody><tr><td>Thiết kế hệ thống</td><td>6</td><td>30%</td></tr><tr><td>KPI &amp; kiểm soát rủi ro</td><td>6</td><td>30%</td></tr><tr><td>Đánh giá/corrective action</td><td>6</td><td>30%</td></tr><tr><td>Kèm cặp phát triển (coaching) &amp; đào tạo</td><td>2</td><td>10%</td></tr></tbody>
@@ -326,7 +326,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <ol type="A"><li><strong>A.</strong> Chỉ cần tài liệu, không cần hồ sơ</li><li><strong>B.</strong> Cần kiểm soát cả tài liệu và hồ sơ làm bằng chứng</li><li><strong>C.</strong> Chỉ cần email</li><li><strong>D.</strong> Chỉ cần ký khi đánh giá</li></ol>
 </div><div class="card">
 <strong>Câu 5 (MCQ):</strong> Chọn phát biểu đúng về ‘bằng chứng’ trong đào tạo năng lực:
- <ol type="A"><li><strong>A.</strong> Bằng chứng là cảm nhận của cấp trên</li><li><strong>B.</strong> Bằng chứng là bằng chứng kiểm tra/đối chiếu (hồ sơ, ảnh, log...)</li><li><strong>C.</strong> Bằng chứng là lời hứa</li><li><strong>D.</strong> Bằng chứng là số giờ làm</li></ol>
+ <ol type="A"><li><strong>A.</strong> Bằng chứng là cảm nhận của cấp trên</li><li><strong>B.</strong> Bằng chứng là bằng chứng kiểm tra/đối chiếu (hồ sơ, ảnh, nhật ký...)</li><li><strong>C.</strong> Bằng chứng là lời hứa</li><li><strong>D.</strong> Bằng chứng là số giờ làm</li></ol>
 </div><div class="card">
 <strong>Câu 6 (MCQ):</strong> Tần suất thu thập dữ liệu KPI phải:
  <ol type="A"><li><strong>A.</strong> Càng thưa càng tốt</li><li><strong>B.</strong> Phù hợp chu kỳ quản trị và đủ để phản ứng kịp</li><li><strong>C.</strong> Chỉ làm khi khách hỏi</li><li><strong>D.</strong> Chỉ làm cuối năm</li></ol>
@@ -357,7 +357,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table><div class="callout"><strong>Ngưỡng đạt:</strong> Tổng điểm ≥ 80/100 và không vi phạm gating bắt buộc (an toàn/chất lượng/tuân thủ hồ sơ).</div><h2>10. Bảng kiểm tự đánh giá trước khi đề nghị xét Level</h2><div class="card">
 <ul>
 <li>Tôi hiểu mục tiêu năng lực C06 và giải thích lại bằng ví dụ thực tế tại HESEM.</li>
-<li>Tôi có đủ bằng chứng theo yêu cầu (hồ sơ, ảnh, log, báo cáo) và bằng chứng được lưu đúng nơi.</li>
+<li>Tôi có đủ bằng chứng theo yêu cầu (hồ sơ, ảnh, nhật ký, báo cáo) và bằng chứng được lưu đúng nơi.</li>
 <li>Tôi đạt KPI tối thiểu (Chỉ số) và không vi phạm gating bắt buộc.</li>
 <li>Tôi đã hoàn thành danh mục OJT (bảng kiểm / danh mục) và được người hướng dẫn xác nhận.</li>
 <li>Tôi vượt qua bài kiểm tra nhanh/đánh giá theo rubric với tổng điểm ≥ 80.</li>

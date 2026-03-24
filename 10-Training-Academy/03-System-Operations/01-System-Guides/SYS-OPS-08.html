@@ -107,7 +107,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="gate">
 <div class="smallcaps">Cổng kiểm soát (gate) bắt buộc</div>
 <p style="margin:6px 0 0 0">
-<b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate).</b> KPI hiển thị trên báo cáo không được dùng để quyết định GO/giao hàng khi thiếu MRR tại SharePoint (dossier/packet/log phê duyệt).
+<b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate).</b> KPI hiển thị trên báo cáo không được dùng để quyết định GO/giao hàng khi thiếu MRR tại SharePoint (dossier/packet/nhật ký phê duyệt).
  </p>
 </div>
 </div>
@@ -135,7 +135,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>QA/QMS:</b> chủ sở hữu Cổng kiểm soát bằng chứng, phê duyệt thay đổi KPI &amp; diễn tập-through đánh giá.</li>
 <li><b>IT/BI:</b> dựng Power Query, model, DAX, refresh, monitoring, quyền truy cập.</li>
 <li><b>Chủ quá trình (Planner/QC/Warehouse/Maintenance...):</b> sở hữu dữ liệu đầu vào list, đóng ticket sai dữ liệu trong ca.</li>
-<li><b>Supervisor:</b> quyết định HOLD/BLOCK khi dashboard báo rủi ro và MRR thiếu.</li>
+<li><b>Supervisor:</b> quyết định HOLD/BLOCK khi bảng điều khiển báo rủi ro và MRR thiếu.</li>
 </ul>
 </div>
 </div>
@@ -143,8 +143,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Điểm không thương lượng</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Publish PROD không đi qua bảng kiểm phát hành và không có BI_ReleaseNotes → <b>BLOCK</b>.</li>
-<li>Refresh fail không có hồ sơ xử lý trong ca → <b>HOLD</b> quyết định dựa trên dashboard.</li>
-<li>Diễn tập-through không mở được bằng chứng folder/hồ sơ công việc (job dossier) → <b>dashboard không được dùng làm cổng kiểm soát</b>.</li>
+<li>Refresh fail không có hồ sơ xử lý trong ca → <b>HOLD</b> quyết định dựa trên bảng điều khiển.</li>
+<li>Diễn tập-through không mở được bằng chứng folder/hồ sơ công việc (job dossier) → <b>bảng điều khiển không được dùng làm cổng kiểm soát</b>.</li>
 </ul>
 </div>
 </div>
@@ -160,7 +160,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th>Chặng E2E</th>
 <th>Đầu vào chính</th>
-<th>Đầu ra/dashboard dùng</th>
+<th>Đầu ra/bảng điều khiển dùng</th>
 <th>Điểm chặn (Cổng kiểm soát)</th>
 </tr>
 </thead>
@@ -245,7 +245,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>chủ quá trình cập nhật list theo ca → dữ liệu hợp lệ theo schema.</li>
 <li>IT/BI refresh dataset theo lịch ca → trạng thái refresh được giám sát.</li>
-<li>Supervisor dùng dashboard để quyết định → quyết định được ghi lại (MRR) tại list quyết định.</li>
+<li>Supervisor dùng bảng điều khiển để quyết định → quyết định được ghi lại (MRR) tại list quyết định.</li>
 <li>QA/QMS kiểm tra diễn tập-through đến bằng chứng → kết luận sẵn sàng đánh giá.</li>
 </ol>
 </div>
@@ -264,10 +264,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>DAX dùng bảng placeholder</b> (DispatchPlan/WIPTracker) chưa tồn tại → model publish được nhưng KPI lỗi.</li>
 <li><b>Quan hệ model sai hướng lọc</b> → KPI đếm chồng, báo “Lam Ready” sai.</li>
 <li><b>Refresh chạy bằng tài khoản cá nhân</b> → khi đổi mật khẩu/nhân sự nghỉ → refresh fail.</li>
-<li><b>Refresh schedule lệch ca</b> → dashboard dùng dữ liệu cũ trong thời điểm quyết định.</li>
+<li><b>Refresh schedule lệch ca</b> → bảng điều khiển dùng dữ liệu cũ trong thời điểm quyết định.</li>
 <li><b>Publish thẳng PROD</b> → vượt qua UAT, không có BI_ReleaseNotes, không rollback.</li>
 <li><b>RLS cấu hình sai</b> → rò dữ liệu khách hàng, vi phạm bảo mật.</li>
-<li><b>Không khóa “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”</b> → dùng KPI thay bằng chứng, tạo customer escape.</li>
+<li><b>Không khóa “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”</b> → dùng KPI thay bằng chứng, tạo customer escape.</li>
 </ol>
 </div>
 <!-- 5) Risk Controls -->
@@ -288,7 +288,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>CP1 — Khóa schema list (cột/kiểu dữ liệu)</td>
 <td>QA/QMS + chủ quá trình</td>
-<td>Schema snapshot + log thay đổi (BI_ReleaseNotes)</td>
+<td>Schema snapshot + nhật ký thay đổi (BI_ReleaseNotes)</td>
 <td>Đổi schema không có release note → BLOCK refresh PROD</td>
 </tr>
 <tr>
@@ -301,10 +301,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>CP3 — Chuẩn hóa hyperlink/person expand</td>
 <td>IT/BI</td>
 <td>01 trang diễn tập-through mở được EvidenceFolderUrl</td>
-<td>Link không mở → dashboard không được dùng làm cổng kiểm soát</td>
+<td>Link không mở → bảng điều khiển không được dùng làm cổng kiểm soát</td>
 </tr>
 <tr>
-<td>CP4 — Peer review DAX/KPI (2 người)</td>
+<td>CP4 — Rà soát đồng cấp DAX/KPI (2 người)</td>
 <td>QA/QMS + Supervisor</td>
 <td>BI_ReleaseNotes có mục “KPI changed” + người duyệt</td>
 <td>KPI đổi không duyệt → BLOCK PROD</td>
@@ -313,7 +313,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>CP5 — Refresh governance (account + lịch ca + cửa sổ)</td>
 <td>IT</td>
 <td>Refresh schedule screenshot + refresh người phụ trách account</td>
-<td>Refresh fail &gt; 1 lần/ca không có xử lý → HOLD quyết định dựa dashboard</td>
+<td>Refresh fail &gt; 1 lần/ca không có xử lý → HOLD quyết định dựa bảng điều khiển</td>
 </tr>
 <tr>
 <td>CP6 — Monitor &amp; Alert (refresh + anomaly)</td>
@@ -343,7 +343,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="stop">
 <strong>STOP (dừng ngay trong 60 giây)</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
-<li>Khi dashboard dùng dữ liệu cũ hơn ngưỡng ca (timestamp không cập nhật) và vẫn có quyết định SHIP/GO đang chờ.</li>
+<li>Khi bảng điều khiển dùng dữ liệu cũ hơn ngưỡng ca (timestamp không cập nhật) và vẫn có quyết định SHIP/GO đang chờ.</li>
 <li>Khi diễn tập-through không mở tới EvidenceFolderUrl hoặc link bằng chứng chính (bộ hồ sơ giao hàng (ship packet)/IR/FAI) trống.</li>
 <li>Khi phát hiện KPI “Lam Ready %” tăng đột biến trong lúc QCHold/NCR mở tăng.</li>
 </ul>
@@ -368,7 +368,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 7) 60-second reaction -->
 <div class="card">
 <h2>7) Phản ứng 60 giây (khi phát hiện rủi ro dữ liệu/cổng kiểm soát)</h2>
-<p>Mục tiêu: dập rủi ro trong ca, không để dashboard dẫn dắt quyết định sai.</p>
+<p>Mục tiêu: dập rủi ro trong ca, không để bảng điều khiển dẫn dắt quyết định sai.</p>
 <div class="table-wrap">
 <table>
 <thead>
@@ -482,7 +482,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>DAX/KPI</td>
-<td>Dán template; thay placeholder; khóa logic “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”</td>
+<td>Dán template; thay placeholder; khóa logic “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”</td>
 <td>KPI sai hoặc thiếu cổng kiểm soát tạo customer escape</td>
 </tr>
 <tr>
@@ -504,7 +504,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>01 biên bản UAT có diễn tập-through tới EvidenceFolderUrl cho ít nhất 05 job.</li>
 <li>01 BI_ReleaseNotes cho bản phát hành (có rollback).</li>
 <li>01 hồ sơ test alert (refresh fail giả lập hoặc anomaly giả lập) trong BI_IncidentLog.</li>
-<li>Với nhóm người dùng (Operator/Setup/QC/Warehouse/...): 01 quyết định HOLD/GO dựa dashboard kèm hồ sơ MRR.</li>
+<li>Với nhóm người dùng (Operator/Setup/QC/Warehouse/...): 01 quyết định HOLD/GO dựa bảng điều khiển kèm hồ sơ MRR.</li>
 </ul>
 <h3>9.3 Rubric L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn khi đạt)</h3>
 <div class="table-wrap">
@@ -520,9 +520,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>L1</b></td>
-<td>Đọc đúng ý nghĩa KPI/field (JobNum, RevisionNum, DueDate, Status) và chỉ ra vị trí bằng chứng.</td>
+<td>Đọc đúng ý nghĩa KPI/field (JobNum, RevisionNum, DueDate, Trạng thái) và chỉ ra vị trí bằng chứng.</td>
 <td>Bài kiểm tra nhanh đạt chuẩn; 02 lần thực hành mở diễn tập-through đúng.</td>
-<td>Được dùng dashboard để theo dõi cá nhân/ca (không quyết định cổng kiểm soát).</td>
+<td>Được dùng bảng điều khiển để theo dõi cá nhân/ca (không quyết định cổng kiểm soát).</td>
 </tr>
 <tr>
 <td><b>L2</b></td>
@@ -539,8 +539,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>L4</b></td>
 <td>Thiết lập governance hoàn chỉnh: release notes, rollback, monitor/alert; đào tạo lại người khác và đánh giá diễn tập-down pass.</td>
-<td>01 lần phát hành PROD không phát sinh incident nghiêm trọng trong 30 ngày SSOT/EHS-Incident-Log (SharePoint List).</td>
-<td>Được làm approver thay đổi KPI/refresh theo ma trận quyền.</td>
+<td>01 lần phát hành PROD không phát sinh incident nghiêm trọng trong 30 ngày SSOT/EHS-Incident-Nhật ký (SharePoint List).</td>
+<td>Được làm người phê duyệt thay đổi KPI/refresh theo ma trận quyền.</td>
 </tr>
 </tbody>
 </table>
@@ -551,7 +551,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>IT/BI:</b> bắt buộc đạt L3 để publish DEV/UAT; bắt buộc đạt L4 để publish PROD.</li>
 <li><b>QA/QMS + Supervisor:</b> bắt buộc đạt L3 để ký UAT và quyết định cổng kiểm soát; đạt L4 để phê duyệt KPI/refresh.</li>
 <li><b>Planner/Warehouse/QC/Maintenance:</b> bắt buộc đạt L2 để tạo hồ sơ incident theo ca; đạt L3 để ký dữ liệu trang chuyên môn.</li>
-<li><b>Operator/Setup/Programmer/EHS/Estimator (SAL-03)/Purchasing:</b> bắt buộc đạt L1 để dùng dashboard; đạt L2 khi tạo hồ sơ anomaly đúng.</li>
+<li><b>Operator/Setup/Programmer/EHS/Estimator (SAL-03)/Purchasing:</b> bắt buộc đạt L1 để dùng bảng điều khiển; đạt L2 khi tạo hồ sơ anomaly đúng.</li>
 </ul>
 </div>
 </div>
@@ -564,7 +564,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi fnGetSharePointList báo “not found or duplicated”, hành động chặn là gì?</li>
 <li>Trường hợp DueDate là text, KPI nào hỏng trước và dấu hiệu nhận biết?</li>
 <li>Vì sao cần expand hyperlink column trước khi dùng diễn tập-through?</li>
-<li>Định nghĩa “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” trong Trung tâm điều hành.</li>
+<li>Định nghĩa “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” trong Trung tâm điều hành.</li>
 <li>Điều kiện BLOCK publish PROD.</li>
 <li>Khi refresh fail trong ca, ai ra quyết định và MRR nào bắt buộc?</li>
 <li>Giải thích vì sao star schema làm KPI ổn định hơn (một ý).</li>
@@ -577,7 +577,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Biên bản UAT tối thiểu phải chứng minh điều gì?</li>
 <li>điểm kiểm soát (điểm kiểm soát) nào khóa schema list và bằng chứng tương ứng?</li>
 <li>Chỉ ra 1 dấu hiệu dữ liệu “đúng cú pháp, sai thực tế”.</li>
-<li>Quy tắc STOP khi dashboard dùng dữ liệu cũ hơn ngưỡng ca.</li>
+<li>Quy tắc STOP khi bảng điều khiển dùng dữ liệu cũ hơn ngưỡng ca.</li>
 <li>NCR/CAPA tuổi tồn dùng để chặn rủi ro gì trong xưởng?</li>
 <li>Khi ShipRelease blocked tăng, 4 cột cổng kiểm soát phải kiểm tra là gì?</li>
 </ol>
@@ -585,7 +585,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" style="margin-top:10px">
 <b>Scenario 1 — Rev mismatch</b>
 <p class="muted" style="margin:6px 0 0 0">
- Dashboard hiển thị JobNum = J-2401, RevisionNum = B. Hồ sơ công việc thư mục bằng chứng hiển thị Rev = A. Job đang chờ chạy ca đêm.
+ Bảng điều khiển hiển thị JobNum = J-2401, RevisionNum = B. Hồ sơ công việc thư mục bằng chứng hiển thị Rev = A. Job đang chờ chạy ca đêm.
  </p>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Quyết định: HOLD/GO?</li>
@@ -601,7 +601,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Quyết định: HOLD/GO/SHIP?</li>
 <li>Chuyển sang bằng chứng nào để quyết định?</li>
-<li>MRR: log xử lý refresh + quyết định ship lưu ở đâu?</li>
+<li>MRR: nhật ký xử lý refresh + quyết định ship lưu ở đâu?</li>
 </ul>
 </div>
 <div class="card" style="margin-top:10px">
@@ -706,7 +706,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Dùng tài khoản cá nhân chạy refresh</b> → chuyển sang account vận hành/service principal M365/SharePoint → HESEM-QMS-SSOT.</li>
 <li><b>RLS không chứng minh được</b> → RLS_Test_Record 3 vai trò.</li>
 <li><b>Model không nhất quán với schema list</b> → CP1 khóa schema + CP2 kiểm query.</li>
-<li><b>Dashboard dẫn dắt quyết định giao hàng khi thiếu chứng từ</b> → khóa không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate); STOP khi thiếu link bằng chứng.</li>
+<li><b>Bảng điều khiển dẫn dắt quyết định giao hàng khi thiếu chứng từ</b> → khóa không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate); STOP khi thiếu link bằng chứng.</li>
 <li><b>Không có kế hoạch rollback</b> → bắt buộc rollback trong release notes + test.</li>
 <li><b>Không có chủ sở hữu dữ liệu</b> → RACI ngắn và người phụ trách list trong hồ sơ.</li>
 </ol>

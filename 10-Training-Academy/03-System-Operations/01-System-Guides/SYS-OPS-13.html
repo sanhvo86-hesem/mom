@@ -137,12 +137,12 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <ul style="line-height:1.9">
 <li><b>01</b> “Objective Cascade Sheet” (Công ty → Phòng ban → Tổ/Cell → Ca/Job) có RACI + ngưỡng hành động.</li>
 <li><b>01</b> “KPI Definition Card” cho 01 KPI được giao (theo ANNEX-QMS-027): công thức, nguồn dữ liệu, khóa số, anti-gaming.</li>
-<li><b>01</b> “Tier Meeting Đầu ra” cho kỳ gần nhất: nhật ký hành động (nhật ký hành động) có người phụ trách + due + bằng chứng (theo WI-502).</li>
+<li><b>01</b> “Tier Meeting Đầu ra” cho kỳ gần nhất: nhật ký hành động có người phụ trách + due + bằng chứng (theo WI-502).</li>
 <li><b>01</b> “Awareness Bằng chứng”: bằng chứng truyền thông policy cho vai trò liên quan (attendance + bài kiểm tra nhanh hoặc ký nhận).</li>
 </ul>
 <h3 class="h3">Điều kiện kích hoạt học &amp; tái học</h3>
 <ul style="line-height:1.9">
-<li>Khi nhận việc mới (hội nhập nhân sự mới (onboarding)) thuộc nhóm vai trò mục tiêu.</li>
+<li>Khi nhận việc mới (hội nhập nhân sự mới) thuộc nhóm vai trò mục tiêu.</li>
 <li>Khi phát hành phiên bản mới của POL-QMS-001 hoặc POL-QMS-002.</li>
 <li>Khi KPI “đỏ” liên tiếp 2 kỳ đo hoặc có sự cố nghiêm trọng (stop-ship/CTQ escape/wrong revision).</li>
 <li>Khi đánh giá finding liên quan đến 5.2/6.2/9.1/9.3/7.5.</li>
@@ -173,7 +173,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <tr>
 <td><b>QA/QMS (QMR)</b></td>
 <td>Quản trị phiên bản policy/objective; chuẩn hóa KPI dictionary; kiểm tra nhận biết; tổng hợp phân tích xu hướng; kiểm tra anti-gaming.</td>
-<td>Master list • ANNEX-QMS-027 • đánh giá log • bộ bằng chứng (evidence pack).</td>
+<td>Master list • ANNEX-QMS-027 • đánh giá nhật ký • bộ bằng chứng.</td>
 </tr>
 <tr>
 <td><b>Planner / Kế hoạch</b></td>
@@ -183,7 +183,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <tr>
 <td><b>Production Leader / Supervisor</b></td>
 <td>Người phụ trách schedule adherence/FPY; chặn vượt qua cổng kiểm soát; đảm bảo dữ liệu shopfloor đúng; thực hiện containment khi lệch.</td>
-<td>Standup nhật ký hành động (nhật ký hành động) • NCR link • bằng chứng tại hiện trường.</td>
+<td>Standup nhật ký hành động • NCR link • bằng chứng tại hiện trường.</td>
 </tr>
 <tr>
 <td><b>QC/QA (thực thi)</b></td>
@@ -193,7 +193,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <tr>
 <td><b>Operator</b></td>
 <td>Tuân thủ policy tại point-of-use; ghi dữ liệu đúng; báo rủi ro sớm; không tự ý sửa hồ sơ.</td>
-<td>Traveler/inspection hồ sơ ký xác nhận • escalation log.</td>
+<td>Traveler/kiểm tra hồ sơ ký xác nhận • escalation nhật ký.</td>
 </tr>
 <tr>
 <td><b>Sales</b></td>
@@ -229,7 +229,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <td><b>RFQ → Báo giá</b></td>
 <td>Báo giá turnaround + nhận diện CTQ, risk, và ngày đến hạn chuẩn.</td>
 <td>Báo giá TAT • RFQ tuổi tồn</td>
-<td>Sales/Quoting: log RFQ + hồ sơ review.</td>
+<td>Sales/Quoting: nhật ký RFQ + hồ sơ review.</td>
 </tr>
 <tr>
 <td><b>PO/Rà soát hợp đồng</b></td>
@@ -319,7 +319,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <tr><td><b>F02</b></td><td>Mục tiêu không đo được (không công thức/nguồn)</td><td>KPI tranh cãi, số không khớp</td><td>Đánh giá NC 6.2/9.1</td><td>ANNEX-QMS-027 KPI card + data trace</td></tr>
 <tr><td><b>F03</b></td><td>Không có người phụ trách KPI</td><td>Không ai mở action khi KPI “đỏ”</td><td>Trễ giao hàng kéo dài</td><td>RACI cascade sheet + nhật ký hành động</td></tr>
 <tr><td><b>F04</b></td><td>Đổi ngày đến hạn để “đạt OTD”</td><td>Ngày đến hạn thay đổi không có hồ sơ</td><td>Anti-gaming fail, mất niềm tin dữ liệu</td><td>Kiểm soát thay đổi hồ sơ + dấu vết kiểm toán (audit trail)</td></tr>
-<tr><td><b>F05</b></td><td>Không chạy Tier cadence đúng nhịp</td><td>Thiếu minutes/nhật ký hành động (nhật ký hành động)</td><td>KPI “đỏ” không có hành động</td><td>FRM-OPS-05 nhật ký hành động + Tier agenda</td></tr>
+<tr><td><b>F05</b></td><td>Không chạy Tier cadence đúng nhịp</td><td>Thiếu minutes/nhật ký hành động</td><td>KPI “đỏ” không có hành động</td><td>FRM-OPS-05 nhật ký hành động + Tier agenda</td></tr>
 <tr><td><b>F06</b></td><td>KPI đo nhưng không có rule hành động</td><td>Báo cáo số xong dừng</td><td>Không cải tiến, MR không hiệu lực</td><td>Rule-by-threshold + action bằng chứng</td></tr>
 <tr><td><b>F07</b></td><td>Không khóa phiên bản KPI definition</td><td>Cùng KPI nhiều công thức</td><td>Đánh giá NC 7.5</td><td>DCR hồ sơ KPI dictionary + version</td></tr>
 <tr><td><b>F08</b></td><td>Thiếu bằng chứng “đóng action”</td><td>Action overdue, không bằng chứng</td><td>OTD/Quality không cải thiện</td><td>Action closure bằng chứng (ảnh/hồ sơ)</td></tr>
@@ -365,14 +365,14 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <td><b>RC-03</b></td>
 <td>Tier cadence &amp; escalation standard work theo WI-502</td>
 <td>Planner + Ops Lead</td>
-<td>FRM-OPS-05 nhật ký hành động (nhật ký hành động) + minutes + ảnh board</td>
+<td>FRM-OPS-05 nhật ký hành động + minutes + ảnh board</td>
 <td>T1 thiếu đầu ra trong ngày → escalate T2 cùng ngày</td>
 </tr>
 <tr>
 <td><b>RC-04</b></td>
 <td>Anti-gaming: khoá ngày đến hạn change, khoá đóng NCR/CAPA</td>
 <td>Planner + QA</td>
-<td>Kiểm soát thay đổi hồ sơ + NCR/CAPA log + bằng chứng</td>
+<td>Kiểm soát thay đổi hồ sơ + NCR/CAPA nhật ký + bằng chứng</td>
 <td>Phát hiện “làm đẹp số” → block KPI report + đánh giá nội bộ</td>
 </tr>
 <tr>
@@ -430,7 +430,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <div class="card">
 <h3 class="h3" style="margin-top:0">HOLD (Giữ, không chuyển bước)</h3>
 <ul>
-<li>Thiếu MRR cho kỳ KPI (minutes/nhật ký hành động (nhật ký hành động)/hồ sơ).</li>
+<li>Thiếu MRR cho kỳ KPI (minutes/nhật ký hành động/hồ sơ).</li>
 <li>Thiếu bằng chứng truyền thông policy cho nhóm vai trò.</li>
 <li>Thiếu Người phụ trách RACI cho KPI/cascading.</li>
 </ul>
@@ -470,13 +470,13 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <td><b>Lẫn lộn (mix-up) part/lot/label</b></td>
 <td>HOLD lô • cô lập khu vực • kiểm tra traceability • mở NCR • thông báo WHS.</td>
 <td>WHS + QA</td>
-<td>NCR + hold log</td>
+<td>NCR + hold nhật ký</td>
 </tr>
 <tr>
 <td><b>Thiếu hồ sơ cổng kiểm soát (QC release/shipping pack)</b></td>
-<td>HOLD • yêu cầu hồ sơ từ người phụ trách • không ship • ghi vào nhật ký hành động (nhật ký hành động) T1.</td>
+<td>HOLD • yêu cầu hồ sơ từ người phụ trách • không ship • ghi vào nhật ký hành động T1.</td>
 <td>QA/WHS</td>
-<td>QC Hold Log + nhật ký hành động</td>
+<td>QC Hold Nhật ký + nhật ký hành động</td>
 </tr>
 <tr>
 <td><b>Gage OOT / hiệu chuẩn quá hạn</b></td>
@@ -486,7 +486,7 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 </tr>
 <tr>
 <td><b>Bỏ qua cổng kiểm soát (vượt qua)</b></td>
-<td>STOP • cô lập sản phẩm • báo GM/QA • mở NCR • giữ bằng chứng (ảnh/log).</td>
+<td>STOP • cô lập sản phẩm • báo GM/QA • mở NCR • giữ bằng chứng (ảnh/nhật ký).</td>
 <td>QA + Ops</td>
 <td>NCR + incident report</td>
 </tr>
@@ -521,12 +521,12 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <tr><td><b>3</b></td><td>Tạo/ cập nhật KPI Definition Card cho từng KPI core (formula/source/anti-gaming).</td><td>QA/QMS + IT</td><td>ANNEX-QMS-027 card + DCR hồ sơ</td><td>Một KPI nhiều công thức</td></tr>
 <tr><td><b>4</b></td><td>Thiết lập Tier cadence (T1/T2/T3) và agenda cố định.</td><td>Planner + Ops Lead</td><td>WI-502 + lịch họp</td><td>Họp không có agenda</td></tr>
 <tr><td><b>5</b></td><td>Thiết lập bảng KPI/board tại điểm sử dụng (xưởng/QC/kho) theo “1 trang – 1 hành động”.</td><td>Ops Lead + QA</td><td>Ảnh board + vị trí + version</td><td>Board có số nhưng không action</td></tr>
-<tr><td><b>6</b></td><td>Truyền thông policy cho 100% vai trò mục tiêu (hội nhập nhân sự mới (onboarding) + toolbox talk).</td><td>HR/TRN + Dept Heads</td><td>Attendance + bài kiểm tra nhanh/ ký nhận</td><td>Không có bằng chứng nhận biết</td></tr>
+<tr><td><b>6</b></td><td>Truyền thông policy cho 100% vai trò mục tiêu (hội nhập nhân sự mới + toolbox talk).</td><td>HR/TRN + Dept Heads</td><td>Attendance + bài kiểm tra nhanh/ ký nhận</td><td>Không có bằng chứng nhận biết</td></tr>
 <tr><td><b>7</b></td><td>Chạy Tier 1 (daily/shift): review KPI đỏ và mở action trong ngày.</td><td>Planner + Leader</td><td>FRM-OPS-05 + ảnh board</td><td>Action thiếu người phụ trách/due</td></tr>
 <tr><td><b>8</b></td><td>Chạy Tier 2 (weekly): Pareto top 3, chốt cải tiến có người phụ trách.</td><td>Ops Lead</td><td>Minutes + A3/Kaizen ID</td><td>Cải tiến không đo hiệu lực</td></tr>
-<tr><td><b>9</b></td><td>Chạy Tier 3 (monthly): review trend, resource, objective update đầu vào.</td><td>Top Mgmt/COO</td><td>T3 minutes + decision log</td><td>Không ra quyết định khi xung đột</td></tr>
+<tr><td><b>9</b></td><td>Chạy Tier 3 (monthly): review trend, resource, objective update đầu vào.</td><td>Top Mgmt/COO</td><td>T3 minutes + decision nhật ký</td><td>Không ra quyết định khi xung đột</td></tr>
 <tr><td><b>10</b></td><td>Thực hiện data health check cho nguồn dữ liệu KPI.</td><td>IT + chủ dữ liệu</td><td>Data health report</td><td>Null/duplicate làm sai KPI</td></tr>
-<tr><td><b>11</b></td><td>Khoá anti-gaming: ngày đến hạn change, đóng NCR/CAPA có bằng chứng.</td><td>Planner + QA</td><td>Dấu vết kiểm toán + log</td><td>Đổi ngày đến hạn không hồ sơ</td></tr>
+<tr><td><b>11</b></td><td>Khoá anti-gaming: ngày đến hạn change, đóng NCR/CAPA có bằng chứng.</td><td>Planner + QA</td><td>Dấu vết kiểm toán + nhật ký</td><td>Đổi ngày đến hạn không hồ sơ</td></tr>
 <tr><td><b>12</b></td><td>Khi KPI đỏ: kích hoạt CAPA/containment và gắn action vào Tier.</td><td>chủ quá trình</td><td>NCR/CAPA + nhật ký hành động link</td><td>CAPA không effectiveness</td></tr>
 <tr><td><b>13</b></td><td>Tổng hợp “Quality Data Pack” cho MR (trend, đánh giá, risk, khiếu nại).</td><td>QA/QMS</td><td>MR đầu vào pack + FRM-QMS-03</td><td>MR thiếu dữ liệu khách hàng</td></tr>
 <tr><td><b>14</b></td><td>Họp xem xét của lãnh đạo: chốt mục tiêu, nguồn lực, action lớn.</td><td>Top Mgmt</td><td>FRM-QMS-03 + decision</td><td>Action MR không theo dõi</td></tr>
@@ -617,13 +617,13 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <tr>
 <td><b>L1</b></td>
 <td>Nhắc lại policy bằng 1 phút; làm đúng bảng kiểm; báo rủi ro khi KPI/cổng kiểm soát lệch.</td>
-<td>Ký nhận policy • 1 KPI card đọc hiểu • 1 lần escalation log</td>
+<td>Ký nhận policy • 1 KPI card đọc hiểu • 1 lần escalation nhật ký</td>
 <td>Được dừng công việc tại điểm sử dụng khi thấy wrong revision/thiếu hồ sơ.</td>
 </tr>
 <tr>
 <td><b>L2</b></td>
 <td>Thực hiện được cascade sheet cho nhóm; cập nhật KPI board; chạy Tier 1 đúng agenda.</td>
-<td>01 cascade sheet • 01 Tier 1 minutes/nhật ký hành động (nhật ký hành động) • bằng chứng đóng 1 action</td>
+<td>01 cascade sheet • 01 Tier 1 minutes/nhật ký hành động • bằng chứng đóng 1 action</td>
 <td>Được HOLD job khi thiếu MRR; được mở action và giao người phụ trách.</td>
 </tr>
 <tr>
@@ -653,9 +653,9 @@ Lớp 2 là <b>system-enabler KPIs</b> và derived KPIs như hiệu chuẩn, MSA
 <ol style="line-height:1.9">
 <li>Quality Policy thuộc điều khoản ISO nào? (A) 5.2 (B) 6.2 (C) 9.1 (D) 10.2</li>
 <li>Quality Objectives bắt buộc có thành phần nào? (A) Chỉ số + người phụ trách + cadence + bằng chứng (B) Chỉ cần target (C) Chỉ cần biểu đồ (D) Chỉ cần họp</li>
-<li>từ điển KPI (dictionary) dùng để khóa điều gì? (A) Một KPI nhiều định nghĩa (B) Đổi màu dashboard (C) In poster (D) Gửi email</li>
+<li>từ điển KPI (dictionary) dùng để khóa điều gì? (A) Một KPI nhiều định nghĩa (B) Đổi màu bảng điều khiển (C) In poster (D) Gửi email</li>
 <li>Khi thiếu hồ sơ cho cổng kiểm soát QC release, trạng thái đúng là gì? (A) Ship (B) HOLD (C) Ignore (D) Delay hồ sơ</li>
-<li>Tier 1 đầu ra bắt buộc là gì? (A) Slide đẹp (B) nhật ký hành động (nhật ký hành động) có người phụ trách + due (C) Ảnh nhóm (D) Email</li>
+<li>Tier 1 đầu ra bắt buộc là gì? (A) Slide đẹp (B) nhật ký hành động có người phụ trách + due (C) Ảnh nhóm (D) Email</li>
 <li>Anti-gaming liên quan trực tiếp tới quy tắc nào? (A) Đổi ngày đến hạn không hồ sơ (B) In thêm form (C) Mua dụng cụ (D) Tăng giờ họp</li>
 <li>MRR nghĩa là gì? (A) Minimum Required Hồ sơ (B) Monthly Revenue Report (C) Machine Run Rate (D) Manual Revision Rule</li>
 <li>Cadence Tier đúng thứ tự nào? (A) T1 daily → T2 weekly → T3 monthly → MR annual (B) MR daily → T3 weekly → T2 monthly → T1 annual (C) Chỉ họp tháng (D) Không cần nhịp</li>

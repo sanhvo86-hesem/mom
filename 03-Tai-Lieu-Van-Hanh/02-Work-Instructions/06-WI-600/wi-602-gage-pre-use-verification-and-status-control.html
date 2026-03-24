@@ -81,7 +81,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>G3 — Zero / reference</td><td>Zero tại điều kiện dùng; kiểm bằng chuẩn reference hoặc master phù hợp.</td><td>Zero ổn định, lặp lại tốt, master check đạt.</td><td>Zero trôi, lặp lại kém, sai trên master.</td></tr>
 <tr><td>G4 — Điều kiện đo</td><td>Nhiệt độ, sạch bề mặt, lực đo, đơn vị mm/inch, mode absolute/incremental.</td><td>Điều kiện đo phù hợp method và dụng cụ.</td><td>Chi tiết/gage còn nóng, bẩn, đơn vị sai, operator không hiểu method.</td></tr>
 </tbody></table></div></div>
-<div class="section"><h2>3. Quick verification theo nhóm gage</h2>
+<div class="section"><h2>3. Quick xác minh theo nhóm gage</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm gage</th><th>Kiểm trước khi dùng</th><th>Lưu ý thực chiến</th></tr></thead><tbody>
 <tr><td>Caliper / height gauge</td><td>Zero, trượt êm, không hở mỏ, kiểm 1–2 block/reference point.</td><td>Không dùng caliper cho CTQ dung sai rất chặt nếu method đã yêu cầu micrometer/CMM.</td></tr>
 <tr><td>Micrometer ngoài/trong</td><td>Vệ sinh mặt đo, zero bằng standard, kiểm ratchet/force, kiểm repeat 3 lần.</td><td>Nếu cảm giác siết khác thường hoặc mỏ đo trượt, dừng dùng ngay.</td></tr>
@@ -95,17 +95,17 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Dừng dùng ngay.</strong><br/>Đặt trạng thái HOLD vật lý; không tiếp tục đo để “kiểm thử thêm”.</div>
 <div class="step-item"><strong>Khóa ảnh hưởng.</strong><br/>Xác định phép đo nào đã dùng gage này từ lần xác minh cuối cùng; nếu đã dùng cho CTQ/release thì kích hoạt <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
 <div class="step-item"><strong>Đổi phương pháp đo.</strong><br/>Chuyển sang gage khác đã xác minh hoặc sang CMM/fixture/reference method được QA phê duyệt.</div>
-<div class="step-item"><strong>Ghi nhận sự cố.</strong><br/>Log sự cố phải có gage ID, hiện tượng, thời điểm, người phát hiện, job liên quan và hành động tạm thời.</div>
+<div class="step-item"><strong>Ghi nhận sự cố.</strong><br/>Nhật ký sự cố phải có gage ID, hiện tượng, thời điểm, người phát hiện, job liên quan và hành động tạm thời.</div>
 </div>
 <div class="callout-warn"><strong>Rule:</strong> Nếu gage fail trên master hoặc có seal broken, mọi kết quả đang chờ release dựa trên gage đó phải dừng lại đến khi có quyết định của QA/Metrology.</div></div>
 <div class="section"><h2>5. Khi nào phải gọi QA / Metrology</h2>
 <div class="two-col">
-<div class="card"><h3>Phải escalation ngay</h3><ul class="tight" style="padding-left:18px;"><li>Gage đo CTQ/release final bị fail quick verification.</li><li>Gage rơi, va đập, ngâm dầu/dung dịch hoặc nghi nhiễm bẩn.</li><li>Đọc số không lặp lại, sai master, hoặc khác nhau giữa hai gage vượt ngưỡng nội bộ.</li><li>Không tìm thấy standard/master hợp lệ để xác minh.</li></ul></div>
+<div class="card"><h3>Phải escalation ngay</h3><ul class="tight" style="padding-left:18px;"><li>Gage đo CTQ/release final bị fail quick xác minh.</li><li>Gage rơi, va đập, ngâm dầu/dung dịch hoặc nghi nhiễm bẩn.</li><li>Đọc số không lặp lại, sai master, hoặc khác nhau giữa hai gage vượt ngưỡng nội bộ.</li><li>Không tìm thấy standard/master hợp lệ để xác minh.</li></ul></div>
 <div class="card"><h3>Cho phép xử lý tại chỗ</h3><ul class="tight" style="padding-left:18px;"><li>Lau sạch bề mặt đo theo chuẩn.</li><li>Thay pin hoặc reset mode khi không ảnh hưởng integrity của thiết bị.</li><li>Thực hiện zero lại sau khi đã xác minh nguyên nhân là do thao tác.</li></ul></div>
 </div></div>
 <div class="section"><h2>6. Hồ sơ, KPI và tài liệu liên kết</h2>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>KPI-WI602-01</strong><br/>Tỷ lệ gage fail quick verification trên tổng số lần sử dụng.</div>
+<div class="kpi-box"><strong>KPI-WI602-01</strong><br/>Tỷ lệ gage fail quick xác minh trên tổng số lần sử dụng.</div>
 <div class="kpi-box"><strong>KPI-WI602-02</strong><br/>Số lô bị ảnh hưởng do dùng gage nghi ngờ/hết hạn/seal broken.</div>
 <div class="kpi-box"><strong>KPI-WI602-03</strong><br/>Tỷ lệ CTQ measurement có bằng chứng xác minh đầy đủ trước khi đo.</div>
 <div class="kpi-box"><strong>KPI-WI602-04</strong><br/>Số lần operator phải đổi method đo do measurement system không phù hợp.</div>

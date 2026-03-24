@@ -105,7 +105,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Notification of change</td><td>Công đoạn đặc biệt, clean/vacuum job, customer-specific job</td><td>Processor phải báo khi đổi site, line, chemistry, furnace, tank, masking method hoặc người phụ trách chứng chỉ.</td></tr>
 <tr><td>Cert/report minimum fields</td><td>Mọi job có yêu cầu chứng từ</td><td>Trả về đúng part/rev/lot/spec/result/date/site/signer; thiếu trường nào thì receipt HOLD.</td></tr>
 <tr><td>Packaging / cleanliness / handling prohibition</td><td>Part nhạy bề mặt, clean/vacuum, part mỏng/dài</td><td>Ngăn trầy, nhiễm bẩn, nhầm orientation, bể góc, oil mark, fingerprint.</td></tr>
-<tr><td>Right of access / source inspection / customer witness</td><td>Khi CSR/PO khách yêu cầu</td><td>Khóa quyền kiểm tại processor và tránh mất quyền truy cập hồ sơ.</td></tr>
+<tr><td>Right of access / source kiểm tra / customer witness</td><td>Khi CSR/PO khách yêu cầu</td><td>Khóa quyền kiểm tại processor và tránh mất quyền truy cập hồ sơ.</td></tr>
 <tr><td>Partial ship / mixed lot prohibited unless approved</td><td>Khi lot phải đi cùng nhau hoặc risk cao</td><td>Ngăn trộn batch và giao về thiếu kiểm soát.</td></tr>
 </tbody></table></div>
 <div class="callout-info"><strong>Nguyên tắc cert:</strong> eAuditNet/QML chỉ là nguồn tra cứu processor đã được chấp nhận theo scope; bản thân HESEM vẫn <strong>PHẢI</strong> kiểm cert/scope/site/date/bằng chứng của processor cho từng job. QML không thay thế bộ chứng từ của job.</div>
@@ -115,7 +115,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Heat treat</td><td>Material condition trước xử lý, hardness target/range, distortion concern, sample/coupon rule, furnace lot rule.</td><td>Cert có furnace lot, cycle hoặc reference tương đương; hardness/result đúng; part/lot map đúng.</td></tr>
 <tr><td>Anodize / plating / coating / passivation</td><td>Type/class/thickness, masking map, cosmetic zone, conductive area, color/finish class, corrosion note.</td><td>Thickness/class/result, masking vùng phải bảo vệ, trực quan/cosmetic, trace lot đúng.</td></tr>
 <tr><td>EP / special cleaning / vacuum-compatible finish</td><td>Ra target, cleanliness rule, chemistry restriction, outgassing/particle rule, bagging rule, no bare-hand rule.</td><td>Report bề mặt / cleanliness khi yêu cầu, bao gói sạch, no nhiễm bẩn, bagging còn nguyên.</td></tr>
-<tr><td>NDT / testing / inspection outsource</td><td>Method/level, operator certification requirement, report format, hiệu chuẩn/accreditation requirement.</td><td>Report đầy đủ method/level/result/date/operator/site, hiệu chuẩn status khi khách yêu cầu.</td></tr>
+<tr><td>NDT / testing / kiểm tra outsource</td><td>Method/level, operator certification requirement, report format, hiệu chuẩn/accreditation requirement.</td><td>Report đầy đủ method/level/result/date/operator/site, hiệu chuẩn trạng thái khi khách yêu cầu.</td></tr>
 <tr><td>Laser marking / engraving / ID quy trình</td><td>Marking content, font/size, position, orientation, no-mark zone, sample approval rule.</td><td>Nhãn/mark đúng nội dung, đúng vị trí, không gây damage vùng phải bảo vệ.</td></tr>
 </tbody></table></div>
 <div class="callout-warning"><strong>Job clean / vacuum / semiconductor:</strong> ngoài pack tiêu chuẩn, phải gắn thêm yêu cầu từ <a href="annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>, <a href="annex-702-packaging-labeling-spec.html">ANNEX-702</a>, <a href="../../02-Work-Instructions/07-WI-700/wi-715-helium-leak-test-standard-work.html">WI-715</a> và <a href="../../02-Work-Instructions/07-WI-700/wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a> khi job có yêu cầu leak, clean pack hoặc vacuum compatibility.</div>
@@ -125,14 +125,14 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>S0 — Pack release</td><td>Đủ cover data, technical lock, trace bundle, approved processor, packaging note, PO luồng-down.</td><td>Thiếu rev lock, thiếu cert requirement, processor chưa approved hoặc hàng chưa pass công đoạn trước.</td></tr>
 <tr><td>S1 — Dispatch to processor</td><td>Qty/lot/box count đúng; pack phát hành đúng phiên bản; shipping label và seal đúng rule.</td><td>Nhầm qty, mixed lot chưa tách, label không map với pack, không có ảnh giao nhận khi job nhạy.</td></tr>
 <tr><td>S2 — Trong quá trình / overdue</td><td>ETA, promised date và delay action được theo dõi; có backup plan nếu chạm risk ngày đến hạn.</td><td>Quá hạn không escalation, processor thay đổi thông tin nhưng chưa chấp thuận lại.</td></tr>
-<tr><td>S3 — Receipt-back verification</td><td>Qty đúng; cert/report đúng; pack integrity đạt; trực quan sơ bộ đạt; trace chain còn nguyên.</td><td>Cert thiếu/sai, site/scope không hợp lệ, bao gói hỏng, sạch/vacuum bag breach, mixed lot.</td></tr>
-<tr><td>S4 — Release to job / ship</td><td>QA chấp nhận full bộ bằng chứng (evidence pack), receipt đã PASS trong FRM-411 / FRM-701, trace đã nhập SSOT.</td><td>Receipt còn issue mở, thiếu bằng chứng, cần test/sort/review bổ sung hoặc đang chờ concession.</td></tr>
+<tr><td>S3 — Receipt-back xác minh</td><td>Qty đúng; cert/report đúng; pack integrity đạt; trực quan sơ bộ đạt; trace chain còn nguyên.</td><td>Cert thiếu/sai, site/scope không hợp lệ, bao gói hỏng, sạch/vacuum bag breach, mixed lot.</td></tr>
+<tr><td>S4 — Release to job / ship</td><td>QA chấp nhận full bộ bằng chứng, receipt đã PASS trong FRM-411 / FRM-701, trace đã nhập SSOT.</td><td>Receipt còn vấn đề mở, thiếu bằng chứng, cần test/sort/review bổ sung hoặc đang chờ concession.</td></tr>
 </tbody></table></div>
 </div><div class="section">
 <h2>7. Khi nào pack phải phát hành lại hoặc bổ sung addendum</h2>
 <ul class="tight" style="padding-left:18px;">
 <li>Đổi Part/Rev, đổi spec quy trình revision, đổi yêu cầu cleanliness/packaging, đổi processor/site hoặc đổi route.</li>
-<li>Phát sinh split lot, partial ship, rework, salvage, concession, customer witness hoặc source inspection mà bản pack cũ chưa nêu.</li>
+<li>Phát sinh split lot, partial ship, rework, salvage, concession, customer witness hoặc source kiểm tra mà bản pack cũ chưa nêu.</li>
 <li>Processor báo đổi chemistry, line, furnace/tank, fixture, masking method, người phụ trách chứng chỉ hoặc thay đổi có thể ảnh hưởng kết quả.</li>
 <li>Receipt back có NCR/SCAR và lô kế tiếp vẫn sử dụng cùng processor/quy trình family nhưng control plan đã tăng mức kiểm.</li>
 </ul>

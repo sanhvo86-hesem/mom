@@ -85,7 +85,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li>STOP/HOLD đúng thời điểm.</li>
 <li>NCR đúng cấu trúc và có containment.</li>
-<li>CAPA cập nhật standard và có verification.</li>
+<li>CAPA cập nhật standard và có xác minh.</li>
 </ul>
 </div>
 <div class="card">
@@ -109,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Người phụ trách</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Phát hiện lỗi tại IPQC/Final: cô lập sản phẩm, gắn HOLD tag và cập nhật WIP status.</td><td>QC/Operator</td><td>Ảnh HOLD tag + ERP/WIP log</td><td>STOP</td></tr><tr><td>2</td><td>Mở NCR theo 5W1H: mô tả, vị trí, số lượng ảnh hưởng, ảnh kèm theo.</td><td>QC/QA</td><td>NCR hồ sơ + ảnh</td><td>HOLD</td></tr><tr><td>3</td><td>Containment: xác định lô liên quan, chặn chuyển bước, kiểm tra 100% (KHI cần).</td><td>Supervisor + QC</td><td>Containment bảng kiểm + kết quả</td><td>HOLD</td></tr><tr><td>4</td><td>Nguyên nhân gốc: 5Why + xác định nguyên nhân gốc thuộc người/máy/phương pháp/vật liệu.</td><td>QA/ENG/OPS</td><td>5Why sheet (ký)</td><td>HOLD</td></tr><tr><td>5</td><td>Corrective action: chốt hành động + người phụ trách + due, cập nhật standard (setup sheet/SOP/parameter).</td><td>Người phụ trách + QA</td><td>CAPA hồ sơ + updated standard</td><td>BLOCK</td></tr><tr><td>6</td><td>Effectiveness: chạy verification (first-off) và ghi IR xác nhận không tái phát.</td><td>QC</td><td>Verification IR + link</td><td>FAIL</td></tr><tr><td>7</td><td>Lưu toàn bộ hồ sơ vào 30_QC/ theo naming rule và tạo link bàn giao.</td><td>QA</td><td>Links SSOT</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Phát hiện lỗi tại IPQC/Final: cô lập sản phẩm, gắn HOLD tag và cập nhật WIP trạng thái.</td><td>QC/Operator</td><td>Ảnh HOLD tag + ERP/WIP nhật ký</td><td>STOP</td></tr><tr><td>2</td><td>Mở NCR theo 5W1H: mô tả, vị trí, số lượng ảnh hưởng, ảnh kèm theo.</td><td>QC/QA</td><td>NCR hồ sơ + ảnh</td><td>HOLD</td></tr><tr><td>3</td><td>Containment: xác định lô liên quan, chặn chuyển bước, kiểm tra 100% (KHI cần).</td><td>Supervisor + QC</td><td>Containment bảng kiểm + kết quả</td><td>HOLD</td></tr><tr><td>4</td><td>Nguyên nhân gốc: 5Why + xác định nguyên nhân gốc thuộc người/máy/phương pháp/vật liệu.</td><td>QA/ENG/OPS</td><td>5Why sheet (ký)</td><td>HOLD</td></tr><tr><td>5</td><td>Corrective action: chốt hành động + người phụ trách + due, cập nhật standard (setup sheet/SOP/parameter).</td><td>Người phụ trách + QA</td><td>CAPA hồ sơ + updated standard</td><td>BLOCK</td></tr><tr><td>6</td><td>Effectiveness: chạy xác minh (first-off) và ghi IR xác nhận không tái phát.</td><td>QC</td><td>Xác minh IR + link</td><td>FAIL</td></tr><tr><td>7</td><td>Lưu toàn bộ hồ sơ vào 30_QC/ theo naming rule và tạo link bàn giao.</td><td>QA</td><td>Links SSOT</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
@@ -120,7 +120,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Không cô lập HOLD ngay tại điểm phát hiện.</li>
 <li>NCR thiếu 5W1H hoặc thiếu ảnh.</li>
 <li>CAPA không cập nhật standard (chỉ hứa miệng).</li>
-<li>Không có verification hồ sơ.</li>
+<li>Không có xác minh hồ sơ.</li>
 </ul>
 </div>
 <div class="card">
@@ -130,7 +130,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Containment</b></td><td>Cô lập đúng; scope rõ; không để customer escape.</td><td>0/1/2</td></tr><tr><td><b>NCR quality</b></td><td>5W1H đầy đủ; có ảnh; có quantity; có disposition.</td><td>0/1/2</td></tr><tr><td><b>Nguyên nhân gốc</b></td><td>5Why logic; không dừng ở triệu chứng; có bằng chứng supporting.</td><td>0/1/2</td></tr><tr><td><b>Corrective action</b></td><td>Hành động chặn lặp gắn vào standard; có người phụ trách + due.</td><td>0/1/2</td></tr><tr><td><b>Effectiveness</b></td><td>Có verification hồ sơ; kết quả PASS; lưu SSOT đúng chuẩn.</td><td>0/1/2</td></tr>
+<tr><td><b>Containment</b></td><td>Cô lập đúng; scope rõ; không để customer escape.</td><td>0/1/2</td></tr><tr><td><b>NCR quality</b></td><td>5W1H đầy đủ; có ảnh; có quantity; có disposition.</td><td>0/1/2</td></tr><tr><td><b>Nguyên nhân gốc</b></td><td>5Why logic; không dừng ở triệu chứng; có bằng chứng supporting.</td><td>0/1/2</td></tr><tr><td><b>Corrective action</b></td><td>Hành động chặn lặp gắn vào standard; có người phụ trách + due.</td><td>0/1/2</td></tr><tr><td><b>Effectiveness</b></td><td>Có xác minh hồ sơ; kết quả PASS; lưu SSOT đúng chuẩn.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>
@@ -138,10 +138,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">MRR tối thiểu</span>
 <ul class="tight">
-<li>HOLD tag photo + WIP/ERP log.</li>
+<li>HOLD tag photo + WIP/ERP nhật ký.</li>
 <li>NCR + ảnh + containment bảng kiểm.</li>
 <li>5Why sheet + CAPA hồ sơ.</li>
-<li>Verification IR.</li>
+<li>Xác minh IR.</li>
 </ul>
 </div>
 </div>

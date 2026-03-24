@@ -80,7 +80,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html"><b>DRL-11</b> — Bài diễn tập Customer Requirement → CTQ Translation</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Bài diễn tập Shipping Packet + CoC</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Bài diễn tập Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet))</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html">DRL-11 — TRN-Bài diễn tập ACA-DRL-11 — Customer Requirement → CTQ Translation | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html">DRL-07 — TRN-Bài diễn tập ACA-DRL-07 — Shipping Packet + CoC | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet)) | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
@@ -91,7 +91,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Hiểu cấu trúc một gói báo giá chuyên nghiệp cho khách hàng quốc tế: assumptions/exclusions, định nghĩa thời gian dẫn, Incoterms, yêu cầu chứng từ, điều kiện thanh toán. Biết khái niệm DFM và các rủi ro phổ biến trong CNC (tool access, fixturing, burr, distortion, measurement).</td>
 <td>Thực hiện độc lập rà soát hợp đồng mức trung bình: tạo RFQ summary, đặt câu hỏi làm rõ theo CTQ, phối hợp Eng/QA để đưa DFM phản hồi, và tạo “bàn giao pack” đầy đủ cho Estimating/Kế hoạch.</td>
-<td>(1) 05 RFQ xử lý độc lập có RFQ summary + clarification log; (2) 01 tình huống có DFM phản hồi có số liệu/ảnh minh chứng; (3) 01 báo giá hoàn chỉnh theo mẫu HESEM; (4) danh mục OJT (bảng kiểm / danh mục) + review của Estimating Function Manager/QA.</td>
+<td>(1) 05 RFQ xử lý độc lập có RFQ summary + nhật ký làm rõ; (2) 01 tình huống có DFM phản hồi có số liệu/ảnh minh chứng; (3) 01 báo giá hoàn chỉnh theo mẫu HESEM; (4) danh mục OJT (bảng kiểm / danh mục) + review của Estimating Function Manager/QA.</td>
 <td>Báo giá Turnaround Time (median) ≤ 24h với RFQ chuẩn; tỷ lệ báo giá phải sửa do thiếu yêu cầu ≤ 5%; tỷ lệ 'no-surprise' (không phát sinh điều kiện mới sau PO) ≥ 90%.</td>
 </tr>
 </tbody>
@@ -99,7 +99,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag shall">PHẢI</span>
 <div class="text">
 <div><strong>Tổ chức PHẢI duy trì quy trình xác định yêu cầu khách hàng trước khi cam kết (rà soát hợp đồng / rà soát hợp đồng), bao gồm yêu cầu kỹ thuật, chất lượng, giao hàng và pháp lý/thương mại.</strong> <span class="iso">ISO 8.2.2</span></div>
-<p>Bằng chứng tối thiểu: RFQ log + bảng kiểm hoàn chỉnh + bản báo giá/PO review có phê duyệt theo thẩm quyền.</p>
+<p>Bằng chứng tối thiểu: RFQ nhật ký + bảng kiểm hoàn chỉnh + bản báo giá/PO review có phê duyệt theo thẩm quyền.</p>
 </div>
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
@@ -117,7 +117,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag shall">PHẢI</span>
 <div class="text">
 <div><strong>Mọi thay đổi yêu cầu sau khi chấp nhận đơn (PO/contract) PHẢI được kiểm soát và truyền đạt đến các bộ phận liên quan trước khi thực hiện.</strong> <span class="iso">ISO 8.5.6</span></div>
-<p>Tối thiểu: thông báo thay đổi + đánh giá tác động (cost/thời gian dẫn/quality) + cập nhật traveler/program/kế hoạch kiểm tra (inspection plan).</p>
+<p>Tối thiểu: thông báo thay đổi + đánh giá tác động (cost/thời gian dẫn/quality) + cập nhật traveler/program/kế hoạch kiểm tra (kiểm tra plan).</p>
 </div>
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
@@ -134,7 +134,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div><div class="req">
 <span class="tag may">ĐƯỢC PHÉP</span>
 <div class="text">
-<div><strong>Tổ chức ĐƯỢC PHÉP áp dụng chuẩn hóa biểu mẫu/CRM/ERP để tự động hóa RFQ log, kiểm soát phiên bản và phê duyệt điện tử.</strong> <span class="iso">ISO 7.1.3</span></div>
+<div><strong>Tổ chức ĐƯỢC PHÉP áp dụng chuẩn hóa biểu mẫu/CRM/ERP để tự động hóa RFQ nhật ký, kiểm soát phiên bản và phê duyệt điện tử.</strong> <span class="iso">ISO 7.1.3</span></div>
 <p>Khi số hóa, phải đảm bảo phân quyền, backup, dấu vết kiểm toán (audit trail); tránh tạo 'hệ thống rác' nhiều phiên bản.</p>
 </div>
 </div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L2: làm chủ bảng kiểm + biết đặt câu hỏi CTQ + tạo bàn giao pack sạch cho nội bộ.</strong></div><h3>3.1. Vì sao C11 là “cổng chất lượng” của xưởng CNC lệnh sản xuất?</h3><p>Trong mô hình <em>chủng loại cao (high-mix) / sản lượng thấp đến trung bình (low-to-mid volume)</em>, sai lệch xuất phát từ khâu đầu (RFQ/PO) khó sửa ở cuối vì đã “đóng băng” trên: đường chạy dao, đồ gá, vật tư, lịch máy và thậm chí cả chứng từ xuất khẩu. Thực tế đánh giá ISO cho thấy nhiều <em>nonconformity</em> không nằm ở máy móc mà nằm ở “hệ thống thông tin”: dùng sai phiên bản (wrong revision), hiểu sai note, không kiểm soát thay đổi, không lưu hồ sơ rà soát hợp đồng.</p><p><strong>Nguyên lý:</strong> lỗi “nhận sai yêu cầu” có chi phí cao nhất (COPQ cao) vì tạo ra lãng phí kép: <em>sai ngay lần đầu</em> + <em>điều chỉnh muộn</em>. Do đó, C11 phải được vận hành như một quy trình có dữ liệu, có gating, có phản ứng.</p><h3>3.2. Thuật ngữ cốt lõi (dùng thống nhất trong HESEM)</h3><ul>
@@ -177,7 +177,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>CTQ: dung sai chặt, surface finish, sealing surfaces, hole patterns, datums.</li>
 <li>Material: grade, condition, traceability need (MTR/heat).</li>
 <li>Quy trình: heat treat/coating/marking/cleaning; approved supplier list?</li>
-<li>Quality docs: CoC, MTR, inspection report, FAI.</li>
+<li>Quality docs: CoC, MTR, kiểm tra report, FAI.</li>
 <li>Packaging/Label: WIP label, bagging, desiccant, shock indicator, shipping label content.</li>
 <li>Quantity &amp; schedule: proto/production, ngày đến hạn, forecast.</li>
 <li>Commercial: Incoterms, payment, currency, special terms.</li>
@@ -195,7 +195,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Detectability:</strong> có đo được không? có kiểm 100% không? có dấu hiệu sớm không?</li>
 </ul><p>Điểm rủi ro cao → bắt buộc họp liên phòng + QA sign-off + kế hoạch kiểm soát tăng.</p><h3>3.7. Bàn giao pack: bàn giao “sạch” để xưởng chạy không cần đoán</h3><p>Bàn giao pack là “bộ hồ sơ nội bộ” đi cùng job. Thiếu bàn giao pack, xưởng sẽ tự phỏng đoán và rủi ro tăng. Bàn giao pack tối thiểu gồm:</p><ol>
 <li>Drawing/3D controlled (Rev), spec, notes; danh sách CTQ highlight.</li>
-<li>Clarification log đã đóng (ai hỏi – ai trả lời – ngày – file/email).</li>
+<li>Nhật ký làm rõ đã đóng (ai hỏi – ai trả lời – ngày – file/email).</li>
 <li>Yêu cầu chứng từ: MTR, CoC, CMM report, FAI; mẫu khách hàng khi có.</li>
 <li>Packaging/Label instruction: WIP label, shipping label, kitting list.</li>
 <li>Assumptions/exclusions của báo giá: cái gì đã/ chưa bao gồm.</li>
@@ -217,8 +217,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vstep">
 <div class="vnum">3</div>
 <div class="vtext">
-<strong>RFQ log &amp; phân loại rủi ro</strong>
-<p>Điền RFQ log; đánh giá rủi ro (Impact x Likelihood x Detectability). Rủi ro cao → bắt buộc full review + họp liên phòng.</p>
+<strong>RFQ nhật ký &amp; phân loại rủi ro</strong>
+<p>Điền RFQ nhật ký; đánh giá rủi ro (Impact x Likelihood x Detectability). Rủi ro cao → bắt buộc full review + họp liên phòng.</p>
 </div>
 </div>
 <div class="vstep">
@@ -293,20 +293,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><strong>RFQ Log Timeliness</strong></td>
-<td class="mono">% RFQ được log trong ≤ 30 phút kể từ khi nhận</td>
-<td>RFQ log/CRM timestamp</td>
+<td><strong>RFQ Nhật ký Timeliness</strong></td>
+<td class="mono">% RFQ được nhật ký trong ≤ 30 phút kể từ khi nhận</td>
+<td>RFQ nhật ký/CRM timestamp</td>
 <td>Tuần</td>
 <td>&gt;=95%</td>
 <td>&gt;=98%</td>
 <td>&gt;=99%</td>
 <td>100%</td>
-<td>Không log → coi như không kiểm soát</td>
+<td>Không nhật ký → coi như không kiểm soát</td>
 </tr>
 <tr>
 <td><strong>RFQ Completeness after Round-1 Clarification</strong></td>
 <td class="mono">RFQ đủ dữ liệu sau vòng 1 ÷ tổng RFQ</td>
-<td>Bảng kiểm + clarification log</td>
+<td>Bảng kiểm + nhật ký làm rõ</td>
 <td>Tháng</td>
 <td>&gt;=80%</td>
 <td>&gt;=90%</td>
@@ -317,7 +317,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>Báo giá Turnaround Time (median)</strong></td>
 <td class="mono">Median(ngày gửi báo giá – ngày nhận RFQ đủ dữ liệu)</td>
-<td>CRM/Email log</td>
+<td>CRM/Email nhật ký</td>
 <td>Tháng</td>
 <td>≤48h</td>
 <td>≤24h</td>
@@ -339,7 +339,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>Requirement Escape Rate</strong></td>
 <td class="mono"># lỗi do thiếu/hiểu sai yêu cầu phát hiện sau khi release job</td>
-<td>NCR/8D log</td>
+<td>NCR/8D nhật ký</td>
 <td>Tháng</td>
 <td>&lt;=2</td>
 <td>&lt;=1</td>
@@ -372,7 +372,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>Customer Khiếu nại – Miscommunication</strong></td>
 <td class="mono">Count (claim do hiểu sai yêu cầu/thiếu chứng từ)</td>
-<td>Customer claim log</td>
+<td>Customer claim nhật ký</td>
 <td>Quý</td>
 <td>0–1</td>
 <td>0</td>
@@ -447,7 +447,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Tránh dùng sai phiên bản (wrong revision); tạo truy vết (dấu vết kiểm toán).</td>
 </tr>
 <tr>
-<td><strong>2) Điền RFQ log + bảng kiểm</strong></td>
+<td><strong>2) Điền RFQ nhật ký + bảng kiểm</strong></td>
 <td>Không bỏ trống trường bắt buộc; đánh dấu CTQ/thiếu dữ liệu.</td>
 <td>Bảng kiểm là poka-yoke; dữ liệu đầu vào quyết định đúng/sai của báo giá.</td>
 </tr>
@@ -466,7 +466,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>So sánh PO vs báo giá; xin phê duyệt theo thẩm quyền; lưu hồ sơ.</td>
 <td>Đáp ứng ISO 8.2; tránh nhận điều kiện bất lợi.</td>
 </tr>
-</tbody></table><h3>7.2. OJT Bảng kiểm (Level 2)</h3><p class="small">Tick ✓ khi hoàn thành; lưu bảng kiểm như documented information. Người hướng dẫn ký xác nhận.</p><table class="table">
+</tbody></table><h3>7.2. OJT Checklist (Level 2)</h3><p class="small">Tick ✓ khi hoàn thành; lưu bảng kiểm như documented information. Người hướng dẫn ký xác nhận.</p><table class="table">
 <thead><tr><th>#</th><th>Hạng mục</th><th>Tiêu chí đạt</th><th>Kết quả</th><th>Ghi chú</th></tr></thead>
 <tbody>
 <tr>
@@ -541,7 +541,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Giải thích cấu trúc một DFM phản hồi tốt theo mô hình: vấn đề → hậu quả → đưa ra.</li>
 <li>Tình huống: PO ghi Incoterms khác báo giá. Quy trình xử lý đúng là gì? Bằng chứng nào phải lưu?</li>
 <li>thời gian dẫn phải được định nghĩa thế nào để tránh tranh chấp? Nêu 3 bẫy hay gặp.</li>
-<li>Bàn giao pack gồm những gì? Khi thiếu clarification log sẽ gây hậu quả nào ở xưởng?</li>
+<li>Bàn giao pack gồm những gì? Khi thiếu nhật ký làm rõ sẽ gây hậu quả nào ở xưởng?</li>
 <li>Nêu 5 rủi ro phổ biến của CNC làm phát sinh cost/thời gian dẫn và cách nhận diện sớm khi rà soát hợp đồng.</li>
 <li>Phân biệt 'assumptions' và 'exclusions' trong báo giá. Cho ví dụ 2 assumptions HESEM phải luôn ghi.</li>
 <li>Tình huống: khách yêu cầu 'clean for semiconductor' nhưng không có tiêu chuẩn. Bạn phải hỏi gì và đưa ra gì?</li>

@@ -70,7 +70,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <div class="badge"><span class="dot"></span>Training Mô-đun SYS-OPS-24</div>
 <h1 style="margin-top:10px">SOP-QMS-012 Admin Bàn giao Build Sheet: SoD, bằng chứng rules, acceptance tests</h1>
-<p class="muted">Đào tạo thực chiến để triển khai/kiểm soát Build Sheet quản trị M365 theo chuẩn sẵn sàng đánh giá. Nguyên tắc cứng: <b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</b>.</p>
+<p class="muted">Đào tạo thực chiến để triển khai/kiểm soát Build Sheet quản trị M365 theo chuẩn sẵn sàng đánh giá. Nguyên tắc cứng: <b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</b>.</p>
 <div class="tag blue">Phiên bản</div>
 </div>
 <div class="note">
@@ -110,21 +110,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Setup</b></td><td>Đối chiếu Rev giữa bản vẽ–setup sheet–program; khóa thay đổi sau closeout; nộp bằng chứng setup</td><td>Hoàn tất bảng kiểm step liên quan setup + tạo đủ bằng chứng theo naming rule</td></tr>
 <tr><td><b>Programmer</b></td><td>Quy tắc quản lý chương trình CNC theo Released/Draft; traceable program đầu ra; chặn chạy program chưa Released</td><td>Thiết lập 01 tình huống “Released vs Draft” đạt acceptance test TC-01</td></tr>
 <tr><td><b>QC</b></td><td>Kiểm tra tính toàn vẹn hồ sơ; truy xuất hồ sơ ≤3 phút; phát hiện thiếu packet thì BLOCK Ship</td><td>Chạy 01 scenario “bộ hồ sơ giao hàng (ship packet) thiếu IR” và ra quyết định BLOCK + ghi MRR</td></tr>
-<tr><td><b>QA</b></td><td>Định nghĩa đạt/không đạt; chạy acceptance tests; ký sign-off go-live; quản trị bộ bằng chứng (evidence pack)</td><td>Ký đúng 01 bộ kết quả UAT/Acceptance + phát hành đánh giá pack</td></tr>
+<tr><td><b>QA</b></td><td>Định nghĩa đạt/không đạt; chạy acceptance tests; ký sign-off go-live; quản trị bộ bằng chứng</td><td>Ký đúng 01 bộ kết quả UAT/Acceptance + phát hành đánh giá pack</td></tr>
 <tr><td><b>Warehouse</b></td><td>phê duyệt giao hàng (ship release) Validator; kiểm tra packet; kiểm soát nhãn/traceability; block rủi ro giao hàng</td><td>Chứng minh 0 lần ship thiếu packet trong bài test + lưu bằng chứng</td></tr>
 <tr><td><b>Purchasing</b></td><td>Kiểm soát tài liệu nhà cung cấp; điều kiện đặc biệt (công đoạn đặc biệt); lưu chứng từ đúng nơi</td><td>Gắn đúng yêu cầu chứng từ vào planning packet + lưu đúng path</td></tr>
 <tr><td><b>Planner</b></td><td>Khởi tạo Hồ sơ công việc đúng template; kiểm soát lẫn lộn; kích hoạt hold đúng điểm chặn</td><td>Tạo 01 Hồ sơ công việc mẫu đúng cấu trúc + tạo MRR closeout</td></tr>
 <tr><td><b>Maintenance</b></td><td>Lưu/hiệu chuẩn hồ sơ; chặn sử dụng gage OOT; liên kết OOT với hold</td><td>Chạy phản ứng 60 giây cho tình huống gage OOT + ghi MRR</td></tr>
 <tr><td><b>EHS</b></td><td>Lưu hồ sơ an toàn liên quan thay đổi layout/kiosk/thiết bị; chặn vượt qua PPE/LOTO</td><td>Kiểm tra bằng chứng EHS trong change package + ký xác nhận</td></tr>
 <tr><td><b>Estimator (SAL-03)</b></td><td>Đưa điều khoản contract về retention/confidential; xác nhận external sharing scope</td><td>Xác nhận đúng 01 retention tier + guardrail external theo hợp đồng</td></tr>
-<tr><td><b>Supervisor</b></td><td>Quyết định HOLD/GO; cưỡng chế “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”; phân công OJT</td><td>Thực hiện review 01 change package và ra quyết định dựa trên bằng chứng</td></tr>
+<tr><td><b>Supervisor</b></td><td>Quyết định HOLD/GO; cưỡng chế “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”; phân công OJT</td><td>Thực hiện review 01 change package và ra quyết định dựa trên bằng chứng</td></tr>
 </table>
 <div class="note">
 <strong>Liên kết HESEM nội bộ</strong>
 <ul>
 <li>SOP-QMS-011 (Data Governance), SOP-QMS-012 (M365 sẵn sàng cho đánh giá Configuration), SOP-QMS-012 (Admin Bàn giao Build Sheet)</li>
 <li>ANNEX-QMS-013 (Go-live Runbook, Testing, Cutover Plan)</li>
-<li>FRM-QMS-014 (Unified Access &amp; Data Matrix — Access + EDAM), FRM-QMS-015 (Access DCR hồ sơ), FRM-QMS-015 (M365 Configuration Bảng kiểm), FRM-QMS-016 (Quarterly rà soát quyền truy cập (access review) Bộ bằng chứng)</li>
+<li>FRM-QMS-014 (Unified Access &amp; Data Matrix — Access + EDAM), FRM-QMS-015 (Access DCR hồ sơ), FRM-QMS-015 (M365 Configuration Checklist), FRM-QMS-016 (Quarterly rà soát quyền truy cập (access review) Bộ bằng chứng)</li>
 </ul>
 </div>
 </div>
@@ -161,7 +161,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>4</td>
 <td>Bằng chứng thô + FRM-QMS-015</td>
 <td>QA/QMS</td>
-<td>Kết quả acceptance tests + issue list + sign-off từng setting</td>
+<td>Kết quả acceptance tests + vấn đề list + sign-off từng setting</td>
 <td>Fail test bất kỳ → HOLD/ROLLBACK</td>
 </tr>
 <tr>
@@ -204,7 +204,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>CP1 — SoD cưỡng chế (cấu hình ≠ phê duyệt)</td>
 <td>Supervisor + QA/QMS</td>
-<td>RACI + sign-off QA trên Build Sheet + log phê duyệt</td>
+<td>RACI + sign-off QA trên Build Sheet + nhật ký phê duyệt</td>
 <td>Không có chữ ký QA → BLOCK</td>
 </tr>
 <tr>
@@ -222,13 +222,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>CP4 — Acceptance tests bằng user thật (không admin)</td>
 <td>QA/QMS</td>
-<td>Kết quả test TC-01…TC-05 + ảnh/log</td>
+<td>Kết quả test TC-01…TC-05 + ảnh/nhật ký</td>
 <td>Fail test bất kỳ → HOLD/ROLLBACK</td>
 </tr>
 <tr>
 <td>CP5 — phê duyệt giao hàng Validator chặn rủi ro giao hàng</td>
 <td>Warehouse + QC</td>
-<td>Bảng kiểm bộ hồ sơ giao hàng + block log + notification</td>
+<td>Bảng kiểm bộ hồ sơ giao hàng + block nhật ký + notification</td>
 <td>Packet thiếu → BLOCK</td>
 </tr>
 <tr>
@@ -263,17 +263,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Wrong revision (bản vẽ/program/setup sheet)</td>
 <td>DỪNG thao tác; treo thẻ HOLD; chụp ảnh màn hình vị trí file + Rev; thông báo Supervisor + QA.</td>
 <td>Operator/Setup/Programmer</td>
-<td>01 log HOLD + ảnh bằng chứng “Released vs Draft” + link Hồ sơ công việc</td>
+<td>01 nhật ký HOLD + ảnh bằng chứng “Released vs Draft” + link Hồ sơ công việc</td>
 </tr>
 <tr>
 <td>Lẫn lộn/lẫn lô hoặc nhãn traceability sai</td>
 <td>DỪNG luồng; cô lập vật tư/part; khoá trạng thái job; gọi QC xác nhận.</td>
 <td>Operator/Warehouse/QC</td>
-<td>01 NCR hoặc log hold theo quy định nội bộ + ảnh nhãn</td>
+<td>01 NCR hoặc nhật ký hold theo quy định nội bộ + ảnh nhãn</td>
 </tr>
 <tr>
 <td>Thiếu bằng chứng/bằng chứng không truy xuất</td>
-<td>BLOCK cổng kiểm soát; ghi “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”; mở ticket truy xuất; không tiếp tục bước kế tiếp.</td>
+<td>BLOCK cổng kiểm soát; ghi “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”; mở ticket truy xuất; không tiếp tục bước kế tiếp.</td>
 <td>Bất kỳ vai trò tại cổng kiểm soát</td>
 <td>01 ticket + ghi chú cổng kiểm soát + ảnh màn hình lỗi truy xuất</td>
 </tr>
@@ -281,7 +281,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Gage OOT hoặc thiếu cal cert</td>
 <td>DÁN thẻ OOT; khóa sử dụng; HOLD lot liên quan; báo Maintenance + QA.</td>
 <td>QC/Maintenance</td>
-<td>01 log OOT + link cal cert + danh sách job bị ảnh hưởng</td>
+<td>01 nhật ký OOT + link cal cert + danh sách job bị ảnh hưởng</td>
 </tr>
 <tr>
 <td>Vượt qua cổng kiểm soát (tự ý mở quyền, tự ý ship, tự ý publish)</td>
@@ -293,7 +293,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Rủi ro ship sai/ship thiếu packet</td>
 <td>chặn giao hàng (BLOCK SHIP / chặn giao hàng); giữ hàng tại staging; thông báo Estimator (SAL-03) để chặn ETA; QC rà lại packet.</td>
 <td>Warehouse + QC + Estimator (SAL-03)</td>
-<td>Ship block log + danh sách packet thiếu</td>
+<td>Ship block nhật ký + danh sách packet thiếu</td>
 </tr>
 </table>
 </div>
@@ -305,15 +305,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>2</td><td>Khóa SoD: chỉ định người cấu hình và người phê duyệt khác nhau</td><td>Supervisor + QA</td><td>RACI + danh sách người tham gia</td><td>1 người làm cả 2 vai</td></tr>
 <tr><td>3</td><td>Tạo Build Sheet v0.9 theo cấu trúc bắt buộc (Setting ID, Acceptance Test, Bằng chứng Type)</td><td>IT</td><td>Build Sheet file kiểm soát</td><td>Thiếu Setting ID hoặc thiếu Acceptance Test</td></tr>
 <tr><td>4</td><td>Gắn Control Objective cho từng Setting ID (QMS/Risk/Hợp đồng)</td><td>QA + chủ quá trình</td><td>Build Sheet cập nhật cột Control Objective</td><td>Không gắn rủi ro → không xác định ưu tiên test</td></tr>
-<tr><td>5</td><td>Thực thi cấu hình theo Build Sheet và chụp bằng chứng gốc</td><td>IT</td><td>Ảnh/export/log theo Bằng chứng Type</td><td>Chụp thiếu ngữ cảnh/thiếu giá trị setting</td></tr>
+<tr><td>5</td><td>Thực thi cấu hình theo Build Sheet và chụp bằng chứng gốc</td><td>IT</td><td>Ảnh/export/nhật ký theo Bằng chứng Type</td><td>Chụp thiếu ngữ cảnh/thiếu giá trị setting</td></tr>
 <tr><td>6</td><td>Lưu bằng chứng đúng naming rule + đúng kho</td><td>IT</td><td>YYYYQ#_SETTINGID_ShortName.ext + lưu vào QMS-Hồ sơ</td><td>Đặt tên tuỳ tiện, lưu sai thư mục</td></tr>
-<tr><td>7</td><td>Chạy acceptance tests bằng user thật (TC-01…TC-05 + tình huống theo ANNEX)</td><td>QA</td><td>Bảng kết quả test + ảnh/log</td><td>Test bằng admin làm sai kết quả</td></tr>
-<tr><td>8</td><td>Ghi issue list và cưỡng chế HOLD/ROLLBACK khi không đạt</td><td>QA + Supervisor</td><td>Issue list + quyết định HOLD/ROLLBACK</td><td>Cho GO dù fail test</td></tr>
-<tr><td>9</td><td>Chốt Build Sheet final (Status=Validated) và ký sign-off</td><td>QA</td><td>Build Sheet final + chữ ký</td><td>Status chưa Validated</td></tr>
+<tr><td>7</td><td>Chạy acceptance tests bằng user thật (TC-01…TC-05 + tình huống theo ANNEX)</td><td>QA</td><td>Bảng kết quả test + ảnh/nhật ký</td><td>Test bằng admin làm sai kết quả</td></tr>
+<tr><td>8</td><td>Ghi vấn đề list và cưỡng chế HOLD/ROLLBACK khi không đạt</td><td>QA + Supervisor</td><td>Vấn đề list + quyết định HOLD/ROLLBACK</td><td>Cho GO dù fail test</td></tr>
+<tr><td>9</td><td>Chốt Build Sheet final (Trạng thái=Validated) và ký sign-off</td><td>QA</td><td>Build Sheet final + chữ ký</td><td>Trạng thái chưa Validated</td></tr>
 <tr><td>10</td><td>Lập cutover plan: cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), snapshot, smoke test, rollback</td><td>IT + Supervisor</td><td>ANNEX-QMS-013 bản ký</td><td>Không có snapshot trước cutover</td></tr>
 <tr><td>11</td><td>Go-live + thông báo policy + đào tạo điểm dùng (kiosk/line)</td><td>Supervisor + chủ quá trình</td><td>Go-live memo + training hồ sơ</td><td>Không đào tạo điểm dùng gây vượt qua</td></tr>
 <tr><td>12</td><td>Bàn giao package IT → QA/IMS (snapshots quyền/retention/DLP, guests)</td><td>IT</td><td>Bàn giao package + links bằng chứng</td><td>Thiếu snapshot memberships hoặc guests</td></tr>
-<tr><td>13</td><td>phê duyệt giao hàng Validator: chặn bộ hồ sơ giao hàng thiếu</td><td>Warehouse + QC</td><td>Ship bảng kiểm + block log</td><td>Ship trước khi packet đủ</td></tr>
+<tr><td>13</td><td>phê duyệt giao hàng Validator: chặn bộ hồ sơ giao hàng thiếu</td><td>Warehouse + QC</td><td>Ship bảng kiểm + block nhật ký</td><td>Ship trước khi packet đủ</td></tr>
 <tr><td>14</td><td>rà soát quyền truy cập hàng quý + lưu FRM-QMS-016</td><td>QA + chủ quá trình</td><td>FRM-QMS-016 + snapshot</td><td>Không review định kỳ</td></tr>
 </table>
 </div>
@@ -361,11 +361,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 <h3>9.2 OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
 <ul>
-<li>01 Build Sheet bản final (Status = Validated) có tối thiểu 15 Setting ID cho tình huống đào tạo.</li>
+<li>01 Build Sheet bản final (Trạng thái = Validated) có tối thiểu 15 Setting ID cho tình huống đào tạo.</li>
 <li>01 bộ bằng chứng gốc cho 15 Setting ID, đúng naming rule, đúng kho lưu.</li>
 <li>01 bảng kết quả acceptance tests (TC-01…TC-05 + 02 test theo ANNEX-QMS-013).</li>
 <li>01 bàn giao package IT → QA/IMS: snapshot groups/memberships, site permissions, retention labels/policies, DLP policies, external guests.</li>
-<li>01 quyết định cổng kiểm soát (HOLD hoặc GO) dựa trên bằng chứng; ghi rõ “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”.</li>
+<li>01 quyết định cổng kiểm soát (HOLD hoặc GO) dựa trên bằng chứng; ghi rõ “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”.</li>
 </ul>
 <h3>9.3 Rubric L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn khi đạt)</h3>
 <table class="form-table">
@@ -416,7 +416,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>(MC) Ai định nghĩa “đạt/không đạt” cho cấu hình ảnh hưởng QMS? A) IT B) QA/QMS C) Operator D) Sales</li>
 <li>(MC) Acceptance test TC-01 “Released vs Draft” kiểm tra điều gì? A) Màu file B) User tiêu chuẩn chỉ thấy Released, không publish major C) Tốc độ mạng D) In ấn</li>
 <li>(MC) Acceptance test TC-03 kiểm tra gì? A) DLP chặn share external cho tài liệu nhạy cảm B) 5S C) tuổi dao (tool life) D) Cycle time</li>
-<li>(MC) “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” áp dụng trực tiếp tại đâu? A) Khu ăn B) Cổng kiểm soát GO-LIVE/SHIP/QC release C) Chấm công D) Bảo trì</li>
+<li>(MC) “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” áp dụng trực tiếp tại đâu? A) Khu ăn B) Cổng kiểm soát GO-LIVE/SHIP/QC release C) Chấm công D) Bảo trì</li>
 <li>(MC) khi không đạt acceptance test, hành động bắt buộc là gì? A) GO luôn B) HOLD/ROLLBACK C) Bỏ qua D) Chờ người khác</li>
 <li>(MC) “Break permission theo từng file” phải chặn vì lý do nào? A) Tốn màu B) Không review được quyền, tạo quyền rơi rớt C) File nặng D) In chậm</li>
 <li>(MC) Snapshot groups/memberships dùng để làm gì? A) Trang trí B) Chứng minh kiểm soát truy cập tại thời điểm đánh giá C) Tăng dung lượng D) Tạo emoji</li>
@@ -443,7 +443,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Dữ kiện:</b> Packing P-2602-015; packet thiếu IR; có COC; có nhãn traceability; khách yêu cầu IR bắt buộc.</li>
 <li><b>Yêu cầu:</b> Ra quyết định HOLD/GO; ghi MRR; thông báo Estimator (SAL-03) để chặn ETA.</li>
-<li><b>Đáp án đạt:</b> chặn giao hàng (BLOCK SHIP / chặn giao hàng); tạo ship block log + yêu cầu QC bổ sung IR; không xuất hàng.</li>
+<li><b>Đáp án đạt:</b> chặn giao hàng (BLOCK SHIP / chặn giao hàng); tạo ship block nhật ký + yêu cầu QC bổ sung IR; không xuất hàng.</li>
 </ul>
 </div>
 <div class="note">
@@ -455,19 +455,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <h3>10.3 Performance test (bắt buộc vì có thao tác/cổng kiểm soát/duyệt)</h3>
-<p><b>Bài test:</b> Học viên nhận 01 change request và phải tạo đầy đủ “Validated Build Sheet + Bằng chứng + Acceptance Tests + Bàn giao”. Thời gian tối đa 45 phút cho phần chuẩn bị hồ sơ + 30 phút cho phần trình bày và truy xuất bằng chứng.</p>
+<p><b>Bài test:</b> Học viên nhận 01 yêu cầu thay đổi và phải tạo đầy đủ “Validated Build Sheet + Bằng chứng + Acceptance Tests + Bàn giao”. Thời gian tối đa 45 phút cho phần chuẩn bị hồ sơ + 30 phút cho phần trình bày và truy xuất bằng chứng.</p>
 <table class="form-table">
 <tr><th>Tiêu chí</th><th>PASS</th><th>FAIL</th></tr>
 <tr><td>SoD</td><td>Người cấu hình khác người phê duyệt; có bằng chứng ký</td><td>1 người làm cả 2 vai hoặc thiếu chữ ký</td></tr>
 <tr><td>Build Sheet</td><td>≥15 Setting ID; đủ cột bắt buộc; có Acceptance Test cho từng setting</td><td>Thiếu Setting ID hoặc thiếu Acceptance Test</td></tr>
 <tr><td>Bằng chứng</td><td>100% bằng chứng gốc có ngữ cảnh; đúng naming rule; đúng kho lưu</td><td>Bằng chứng thiếu ngữ cảnh hoặc đặt tên sai hoặc lưu sai kho</td></tr>
-<tr><td>Acceptance tests</td><td>TC-01…TC-05 PASS; ghi rõ ĐẠT/KHÔNG ĐẠT theo bằng chứng</td><td>Fail test nhưng vẫn GO hoặc không có log</td></tr>
+<tr><td>Acceptance tests</td><td>TC-01…TC-05 PASS; ghi rõ ĐẠT/KHÔNG ĐẠT theo bằng chứng</td><td>Fail test nhưng vẫn GO hoặc không có nhật ký</td></tr>
 <tr><td>Bàn giao</td><td>Đủ snapshots quyền/retention/DLP/guests</td><td>Thiếu snapshot bất kỳ</td></tr>
 <tr><td>Truy xuất</td><td>QA truy xuất 01 bằng chứng + 01 hồ sơ công việc + 01 cal cert ≤ 3 phút</td><td>Không truy xuất được hoặc vượt thời gian</td></tr>
 </table>
 </div>
 <div class="card" id="sec11">
-<h2>11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)”)</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”)</h2>
 <ul>
 <li><b>PASS</b> khi đạt đồng thời: Bài kiểm tra nhanh ≥ 80%; OJT đầu ra đầy đủ; Performance test PASS; không vi phạm SoD; không có bước nào thiếu bằng chứng.</li>
 <li><b>FAIL</b> khi xảy ra 1 trong các điều kiện: thiếu bằng chứng cho bất kỳ Setting ID; dùng sai Rev mà không HOLD; fail TC-03 hoặc TC-01; bộ hồ sơ giao hàng thiếu mà vẫn GO; vi phạm SoD.</li>
@@ -479,8 +479,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
 <ul>
 <li>Build Sheet final (Validated) + lịch sử chỉnh sửa.</li>
-<li>FRM-QMS-015 (M365 Configuration Bảng kiểm) đã tick.</li>
-<li>Bằng chứng files theo từng Setting ID (ảnh/export/log).</li>
+<li>FRM-QMS-015 (M365 Configuration Checklist) đã tick.</li>
+<li>Bằng chứng files theo từng Setting ID (ảnh/export/nhật ký).</li>
 <li>Kết quả acceptance tests (TC-01…TC-05 + test theo ANNEX-QMS-013).</li>
 <li>Snapshot: groups + memberships + site permissions; danh sách retention labels/policies; danh sách DLP policies; danh sách external guests + expiry + mục đích.</li>
 <li>Go-live memo + cutover plan + rollback plan + hypercare plan.</li>
@@ -508,11 +508,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Bằng chứng thiếu ngữ cảnh</b> → Dùng bảng kiểm “ảnh phải thấy tenant/site/library + giá trị” và lưu bản gốc.</li>
 <li><b>Thiếu SoD</b> → RACI bắt buộc trong package; đánh giá kiểm tra chữ ký khác người.</li>
 <li><b>Obsolete document dùng tại điểm thao tác</b> → Point-of-use chỉ hiển thị Released; banner cảnh báo Draft.</li>
-<li><b>Hồ sơ bị xoá/sửa sau closeout</b> → TC-02 tính toàn vẹn hồ sơ + cơ chế recover + log.</li>
+<li><b>Hồ sơ bị xoá/sửa sau closeout</b> → TC-02 tính toàn vẹn hồ sơ + cơ chế recover + nhật ký.</li>
 <li><b>External sharing vượt baseline</b> → TC-03 DLP guardrail + STOP CHANGE khi không đạt.</li>
 <li><b>Thiếu snapshot quyền</b> → Mỗi lần change phải lưu snapshot before/after và FRM-QMS-015.</li>
-<li><b>bộ hồ sơ giao hàng thiếu</b> → phê duyệt giao hàng Validator + chặn giao hàng (BLOCK SHIP / chặn giao hàng) và log đầy đủ.</li>
-<li><b>Không review quyền định kỳ</b> → FRM-QMS-016 theo quý; thiếu review → NCR.</li>
+<li><b>bộ hồ sơ giao hàng thiếu</b> → phê duyệt giao hàng Validator + chặn giao hàng (BLOCK SHIP / chặn giao hàng) và nhật ký đầy đủ.</li>
+<li><b>Không rà soát quyền truy cập định kỳ</b> → FRM-QMS-016 theo quý; thiếu review → NCR.</li>
 <li><b>Acceptance tests chạy bằng admin</b> → Test suite bắt buộc chạy bằng user thật theo vai trò.</li>
 </ol>
 </div>

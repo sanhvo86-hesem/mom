@@ -71,7 +71,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-ncr-capa-response.html"><b>DRL-06</b> — Bài diễn tập NCR + CAPA Quick Response</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Bài diễn tập Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet))</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-ncr-capa-response.html">DRL-06 — TRN-Bài diễn tập ACA-DRL-06 — NCR + CAPA Quick Response | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet)) | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
@@ -93,7 +93,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
 <div class="text">
-<div><strong>Mọi hoạt động thuộc C06 PHẢI được ghi nhận bằng documented information phù hợp (bảng kiểm/log/biên bản) và lưu theo quy định.</strong> <span class="iso">ISO 8.7</span></div>
+<div><strong>Mọi hoạt động thuộc C06 PHẢI được ghi nhận bằng documented information phù hợp (bảng kiểm/nhật ký/biên bản) và lưu theo quy định.</strong> <span class="iso">ISO 8.7</span></div>
 <p>Nguyên tắc ALCOA+: ghi ngay, đọc được, có người chịu trách nhiệm.</p>
 </div>
 </div><div class="req">
@@ -142,13 +142,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>Why #</th><th>Phát biểu “vì sao”</th><th>Bằng chứng hiện có</th><th>Cách kiểm chứng bổ sung</th><th>Kết luận</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Vì kích thước Ø25 đo được 25.018 &gt; USL</td><td>Bảng đo + ảnh dụng cụ đo</td><td>Đo lại bằng dụng cụ khác; kiểm tra bavia</td><td>Đúng/Sai</td></tr>
-<tr><td>2</td><td>Vì wear offset tăng quá giới hạn</td><td>Log offset</td><td>So sánh offset theo pcs; kiểm tra tuổi dao (tool life)</td><td>Đúng/Sai</td></tr>
+<tr><td>2</td><td>Vì wear offset tăng quá giới hạn</td><td>Nhật ký offset</td><td>So sánh offset theo pcs; kiểm tra tuổi dao (tool life)</td><td>Đúng/Sai</td></tr>
 <tr><td>3</td><td>Vì không có rule dừng khi tool đạt life</td><td>Setup sheet thiếu</td><td>Đánh giá WI; phỏng vấn 2 ca</td><td>Đúng/Sai</td></tr>
 </tbody>
 </table>
 <p class="cap">Chỉ được “chốt” Why khi có bằng chứng xác nhận hoặc phép kiểm chứng rõ ràng.</p>
-</div><h3>3.6 Chuyên đề (L2): Ishikawa 6M + “kế hoạch kiểm chứng” (verification plan)</h3><p>Xương cá dùng để <strong>mở rộng</strong> không gian nguyên nhân. Kế hoạch kiểm chứng dùng để <strong>đóng</strong> nguyên nhân bằng dữ liệu. Với mỗi nhánh 6M, gắn 1–2 phép kiểm chứng cụ thể.</p><ul>
-<li><strong>Machine:</strong> kiểm tra runout spindle, alarm history, dung dịch làm mát (coolant) pressure log.</li>
+</div><h3>3.6 Chuyên đề (L2): Ishikawa 6M + “kế hoạch kiểm chứng” (xác minh plan)</h3><p>Xương cá dùng để <strong>mở rộng</strong> không gian nguyên nhân. Kế hoạch kiểm chứng dùng để <strong>đóng</strong> nguyên nhân bằng dữ liệu. Với mỗi nhánh 6M, gắn 1–2 phép kiểm chứng cụ thể.</p><ul>
+<li><strong>Machine:</strong> kiểm tra runout spindle, alarm history, dung dịch làm mát (coolant) pressure nhật ký.</li>
 <li><strong>Method:</strong> đánh giá bảng kiểm setup, trình tự đổi job, safe start line.</li>
 <li><strong>Material:</strong> đối chiếu chứng chỉ vật liệu, hardness, lot traceability.</li>
 <li><strong>Measurement:</strong> tình trạng hiệu chuẩn, phương pháp đo, bavia/cosine error.</li>
@@ -183,7 +183,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vnum">3</div>
 <div class="vtext">
 <strong>Thu thập dữ liệu &amp; phân tầng</strong>
-<p>Thu thập dữ liệu đo, ảnh, log máy, tuổi dao (tool life); phân tầng theo máy/ca/dao/người/vật liệu.</p>
+<p>Thu thập dữ liệu đo, ảnh, nhật ký máy, tuổi dao (tool life); phân tầng theo máy/ca/dao/người/vật liệu.</p>
 </div>
 </div>
 <div class="vstep">
@@ -207,7 +207,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p>Theo dõi chỉ số trước/sau; khi không cải thiện phải quay lại bước phân tích.</p>
 </div>
 </div>
-</div><h2>5. KPI/Chỉ số áp dụng cho C06 theo Level (có công thức + nguồn dữ liệu)</h2><p class="small-note">Xem trang tổng hợp: <a href="../../01-Framework/competency-metrics.html#C06">Competency Chỉ số – C06</a>.</p><p class="small">Bảng dưới dùng để “định lượng” năng lực. Khi áp dụng thực tế, HESEM hiệu chỉnh target theo chiến lược năm và năng lực máy/nhân sự.</p><table class="table">
+</div><h2>5. KPI/Chỉ số áp dụng cho C06 theo Level (có công thức + nguồn dữ liệu)</h2><p class="small-note">Xem trang tổng hợp: <a href="../../01-Framework/competency-metrics.html#C06">TRN-MET-01 — KPI/Chỉ số Dictionary by 19 Competencies | HESEM OS</a>.</p><p class="small">Bảng dưới dùng để “định lượng” năng lực. Khi áp dụng thực tế, HESEM hiệu chỉnh target theo chiến lược năm và năng lực máy/nhân sự.</p><table class="table">
 <thead>
 <tr>
 <th>Chỉ số/KPI</th>
@@ -236,18 +236,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>Tỷ lệ lỗi lặp (Repeat NCR)</strong></td>
 <td class="mono">Repeat NCR / tổng NCR</td>
-<td>NCR log</td>
+<td>NCR nhật ký</td>
 <td>Quý</td>
 <td>&lt;=15%</td>
 <td>&lt;=10%</td>
 <td>&lt;=6%</td>
 <td>&lt;=4%</td>
-<td>Repeat issue CTQ → không đạt</td>
+<td>Repeat vấn đề CTQ → không đạt</td>
 </tr>
 <tr>
 <td><strong>Hiệu lực CAPA</strong></td>
 <td class="mono">CAPA hiệu lực / tổng CAPA</td>
-<td>CAPA verification</td>
+<td>CAPA xác minh</td>
 <td>Quý</td>
 <td>&gt;=70%</td>
 <td>&gt;=80%</td>
@@ -257,7 +257,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </tbody></table><div class="kpi-gate">
 <strong>Gating bắt buộc để công nhận Level 2:</strong>
-<ul><li>NCR quá hạn do cá nhân → treo</li><li>Repeat issue CTQ → không đạt</li><li>Không xác minh hiệu lực → không đạt</li></ul>
+<ul><li>NCR quá hạn do cá nhân → treo</li><li>Repeat vấn đề CTQ → không đạt</li><li>Không xác minh hiệu lực → không đạt</li></ul>
 <p class="small">Quy định: gating ưu tiên an toàn – chất lượng – tuân thủ hồ sơ. Vi phạm gating có nguy cơ dẫn tới không công nhận level/bonus dù điểm bài kiểm tra cao.</p>
 </div><h2>6. Bài tập theo Level (Nghiên cứu tình huống HESEM)</h2><p class="small">Mỗi tình huống được thiết kế theo tinh thần học thuật ứng dụng: có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (bằng chứng) để chấm.</p><div class="card">
 <h3>Tình huống 1: Tình huống 1 – Sai lỗ khoan do lệch đồ gá</h3>
@@ -266,9 +266,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Dữ liệu/Áp dụng: </strong>
 <ul><li>Máy: VMC</li><li>Gá: đồ gá custom</li><li>Dao: khoan carbide</li><li>Quan sát: chốt định vị mòn</li><li>Lot vật liệu mới</li></ul>
 <strong>Nhiệm vụ theo Level 2:</strong>
-<ul><li>Thực hiện containment: cô lập lot, dán nhãn trạng thái, cập nhật người liên quan.</li><li>Thu thập dữ liệu tối thiểu 10 mẫu (đo/ảnh/log) và phân tầng theo 2 yếu tố (máy/dao/ca/vật liệu...).</li><li>Đưa ra 1 hành động khắc phục ngắn hạn + 1 hành động phòng ngừa, có người phụ trách và ngày đến hạn.</li></ul>
+<ul><li>Thực hiện containment: cô lập lot, dán nhãn trạng thái, cập nhật người liên quan.</li><li>Thu thập dữ liệu tối thiểu 10 mẫu (đo/ảnh/nhật ký) và phân tầng theo 2 yếu tố (máy/dao/ca/vật liệu...).</li><li>Đưa ra 1 hành động khắc phục ngắn hạn + 1 hành động phòng ngừa, có người phụ trách và ngày đến hạn.</li></ul>
 <strong>Sản phẩm đầu ra (Bằng chứng):</strong>
-<ul><li>Log containment + danh sách lot ảnh hưởng</li><li>Bảng dữ liệu phân tầng (&gt;=10 mẫu)</li><li>Kế hoạch hành động 2 mục (CA/PA)</li></ul>
+<ul><li>Nhật ký containment + danh sách lot ảnh hưởng</li><li>Bảng dữ liệu phân tầng (&gt;=10 mẫu)</li><li>Kế hoạch hành động 2 mục (CA/PA)</li></ul>
 </div>
 </div><div class="card">
 <h3>Tình huống 2: Tình huống 2 – Bavia nhiều sai lệch</h3>
@@ -277,9 +277,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Dữ liệu/Áp dụng: </strong>
 <ul><li>Dao phay endmill 4F</li><li>Chế độ cắt không đổi</li><li>tuổi dao (tool life) chưa reset</li><li>Dung dịch làm mát nồng độ thấp</li></ul>
 <strong>Nhiệm vụ theo Level 2:</strong>
-<ul><li>Thực hiện containment: cô lập lot, dán nhãn trạng thái, cập nhật người liên quan.</li><li>Thu thập dữ liệu tối thiểu 10 mẫu (đo/ảnh/log) và phân tầng theo 2 yếu tố (máy/dao/ca/vật liệu...).</li><li>Đưa ra 1 hành động khắc phục ngắn hạn + 1 hành động phòng ngừa, có người phụ trách và ngày đến hạn.</li></ul>
+<ul><li>Thực hiện containment: cô lập lot, dán nhãn trạng thái, cập nhật người liên quan.</li><li>Thu thập dữ liệu tối thiểu 10 mẫu (đo/ảnh/nhật ký) và phân tầng theo 2 yếu tố (máy/dao/ca/vật liệu...).</li><li>Đưa ra 1 hành động khắc phục ngắn hạn + 1 hành động phòng ngừa, có người phụ trách và ngày đến hạn.</li></ul>
 <strong>Sản phẩm đầu ra (Bằng chứng):</strong>
-<ul><li>Log containment + danh sách lot ảnh hưởng</li><li>Bảng dữ liệu phân tầng (&gt;=10 mẫu)</li><li>Kế hoạch hành động 2 mục (CA/PA)</li></ul>
+<ul><li>Nhật ký containment + danh sách lot ảnh hưởng</li><li>Bảng dữ liệu phân tầng (&gt;=10 mẫu)</li><li>Kế hoạch hành động 2 mục (CA/PA)</li></ul>
 </div>
 </div><div class="card">
 <h3>Tình huống 3: Tình huống 3 – Khách khiếu nại thiếu CoC</h3>
@@ -288,9 +288,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Dữ liệu/Áp dụng: </strong>
 <ul><li>Kinh doanh gửi thiếu file</li><li>Không có bảng kiểm hồ sơ ship</li><li>Không có người phụ trách duyệt pack docs</li></ul>
 <strong>Nhiệm vụ theo Level 2:</strong>
-<ul><li>Thực hiện containment: cô lập lot, dán nhãn trạng thái, cập nhật người liên quan.</li><li>Thu thập dữ liệu tối thiểu 10 mẫu (đo/ảnh/log) và phân tầng theo 2 yếu tố (máy/dao/ca/vật liệu...).</li><li>Đưa ra 1 hành động khắc phục ngắn hạn + 1 hành động phòng ngừa, có người phụ trách và ngày đến hạn.</li></ul>
+<ul><li>Thực hiện containment: cô lập lot, dán nhãn trạng thái, cập nhật người liên quan.</li><li>Thu thập dữ liệu tối thiểu 10 mẫu (đo/ảnh/nhật ký) và phân tầng theo 2 yếu tố (máy/dao/ca/vật liệu...).</li><li>Đưa ra 1 hành động khắc phục ngắn hạn + 1 hành động phòng ngừa, có người phụ trách và ngày đến hạn.</li></ul>
 <strong>Sản phẩm đầu ra (Bằng chứng):</strong>
-<ul><li>Log containment + danh sách lot ảnh hưởng</li><li>Bảng dữ liệu phân tầng (&gt;=10 mẫu)</li><li>Kế hoạch hành động 2 mục (CA/PA)</li></ul>
+<ul><li>Nhật ký containment + danh sách lot ảnh hưởng</li><li>Bảng dữ liệu phân tầng (&gt;=10 mẫu)</li><li>Kế hoạch hành động 2 mục (CA/PA)</li></ul>
 </div>
 </div><h2>7. OJT theo TWI (Job Breakdown + bảng kiểm)</h2><h3>7.1 Job Breakdown Sheet (bản tiêu chuẩn dạy việc)</h3><table class="table">
 <thead>
@@ -304,7 +304,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><strong>Thu thập bằng chứng</strong></td>
-<td>Ảnh/đo/scan<br/>Log máy/dao<br/>Mẫu NG/OK</td>
+<td>Ảnh/đo/scan<br/>Nhật ký máy/dao<br/>Mẫu NG/OK</td>
 <td>Không dựa vào cảm tính<br/>Đảm bảo truy xuất</td>
 </tr>
 <tr>
@@ -338,7 +338,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <ol type="A"><li><strong>A.</strong> Chỉ cần tài liệu, không cần hồ sơ</li><li><strong>B.</strong> Cần kiểm soát cả tài liệu và hồ sơ làm bằng chứng</li><li><strong>C.</strong> Chỉ cần email</li><li><strong>D.</strong> Chỉ cần ký khi đánh giá</li></ol>
 </div><div class="card">
 <strong>Câu 5 (MCQ):</strong> Chọn phát biểu đúng về ‘bằng chứng’ trong đào tạo năng lực:
- <ol type="A"><li><strong>A.</strong> Bằng chứng là cảm nhận của cấp trên</li><li><strong>B.</strong> Bằng chứng là bằng chứng kiểm tra/đối chiếu (hồ sơ, ảnh, log...)</li><li><strong>C.</strong> Bằng chứng là lời hứa</li><li><strong>D.</strong> Bằng chứng là số giờ làm</li></ol>
+ <ol type="A"><li><strong>A.</strong> Bằng chứng là cảm nhận của cấp trên</li><li><strong>B.</strong> Bằng chứng là bằng chứng kiểm tra/đối chiếu (hồ sơ, ảnh, nhật ký...)</li><li><strong>C.</strong> Bằng chứng là lời hứa</li><li><strong>D.</strong> Bằng chứng là số giờ làm</li></ol>
 </div><div class="card">
 <strong>Câu 6 (MCQ):</strong> Tần suất thu thập dữ liệu KPI phải:
  <ol type="A"><li><strong>A.</strong> Càng thưa càng tốt</li><li><strong>B.</strong> Phù hợp chu kỳ quản trị và đủ để phản ứng kịp</li><li><strong>C.</strong> Chỉ làm khi khách hỏi</li><li><strong>D.</strong> Chỉ làm cuối năm</li></ol>
@@ -369,7 +369,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table><div class="callout"><strong>Ngưỡng đạt:</strong> Tổng điểm ≥ 80/100 và không vi phạm gating bắt buộc (an toàn/chất lượng/tuân thủ hồ sơ).</div><h2>10. Bảng kiểm tự đánh giá trước khi đề nghị xét Level</h2><div class="card">
 <ul>
 <li>Tôi hiểu mục tiêu năng lực C06 và giải thích lại bằng ví dụ thực tế tại HESEM.</li>
-<li>Tôi có đủ bằng chứng theo yêu cầu (hồ sơ, ảnh, log, báo cáo) và bằng chứng được lưu đúng nơi.</li>
+<li>Tôi có đủ bằng chứng theo yêu cầu (hồ sơ, ảnh, nhật ký, báo cáo) và bằng chứng được lưu đúng nơi.</li>
 <li>Tôi đạt KPI tối thiểu (Chỉ số) và không vi phạm gating bắt buộc.</li>
 <li>Tôi đã hoàn thành danh mục OJT (bảng kiểm / danh mục) và được người hướng dẫn xác nhận.</li>
 <li>Tôi vượt qua bài kiểm tra nhanh/đánh giá theo rubric với tổng điểm ≥ 80.</li>

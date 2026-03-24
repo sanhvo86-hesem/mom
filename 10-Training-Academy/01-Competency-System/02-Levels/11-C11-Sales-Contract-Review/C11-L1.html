@@ -80,7 +80,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html"><b>DRL-11</b> — Bài diễn tập Customer Requirement → CTQ Translation</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Bài diễn tập Shipping Packet + CoC</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Bài diễn tập Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet))</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html">DRL-11 — TRN-Bài diễn tập ACA-DRL-11 — Customer Requirement → CTQ Translation | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html">DRL-07 — TRN-Bài diễn tập ACA-DRL-07 — Shipping Packet + CoC | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet)) | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
@@ -90,16 +90,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Nêu được mục tiêu của Rà soát hợp đồng và phân biệt RFQ – Báo giá – PO – Hợp đồng. Hiểu tối thiểu 8 nhóm thông tin bắt buộc của RFQ CNC (bản vẽ/rev, vật liệu, dung sai/CTQ, số lượng, finish, yêu cầu kiểm tra &amp; chứng từ, đóng gói/nhãn, lịch giao).</td>
-<td>Thực hiện đúng quy trình tiếp nhận RFQ theo bảng kiểm: lưu file đúng revision, kiểm tra thiếu dữ liệu, điền RFQ log, và biết <em>dừng – báo</em> khi gặp CTQ/điều kiện vượt khả năng.</td>
+<td>Thực hiện đúng quy trình tiếp nhận RFQ theo bảng kiểm: lưu file đúng revision, kiểm tra thiếu dữ liệu, điền RFQ nhật ký, và biết <em>dừng – báo</em> khi gặp CTQ/điều kiện vượt khả năng.</td>
 <td>(1) Bài kiểm tra nhanh đạt ≥ 75%; (2) 03 RFQ được xử lý bằng bảng kiểm không thiếu trường bắt buộc; (3) 01 email/biên bản clarification do học viên soạn (được trưởng nhóm duyệt); (4) danh mục OJT (bảng kiểm / danh mục) ký xác nhận.</td>
-<td>Trong 4 tuần: % RFQ được log trong ≤ 30 phút ≥ 95%; % RFQ đầy đủ dữ liệu đầu vào (sau clarification vòng 1) ≥ 80%; 0 lần dùng sai phiên bản (wrong revision) khi bàn giao.</td>
+<td>Trong 4 tuần: % RFQ được nhật ký trong ≤ 30 phút ≥ 95%; % RFQ đầy đủ dữ liệu đầu vào (sau clarification vòng 1) ≥ 80%; 0 lần dùng sai phiên bản (wrong revision) khi bàn giao.</td>
 </tr>
 </tbody>
 </table><h2>2. Yêu cầu chuẩn ISO tích hợp (PHẢI/PHẢI/ĐƯỢC PHÉP) + mapping clause</h2><p class="small">Các yêu cầu dưới đây viết theo ngôn ngữ ISO để dùng trực tiếp trong SOP/WI/FRM và làm căn cứ đánh giá. Mỗi yêu cầu gắn clause (điều khoản) để truy vết.</p><div class="req">
 <span class="tag shall">PHẢI</span>
 <div class="text">
 <div><strong>Tổ chức PHẢI duy trì quy trình xác định yêu cầu khách hàng trước khi cam kết (rà soát hợp đồng / rà soát hợp đồng), bao gồm yêu cầu kỹ thuật, chất lượng, giao hàng và pháp lý/thương mại.</strong> <span class="iso">ISO 8.2.2</span></div>
-<p>Bằng chứng tối thiểu: RFQ log + bảng kiểm hoàn chỉnh + bản báo giá/PO review có phê duyệt theo thẩm quyền.</p>
+<p>Bằng chứng tối thiểu: RFQ nhật ký + bảng kiểm hoàn chỉnh + bản báo giá/PO review có phê duyệt theo thẩm quyền.</p>
 </div>
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
@@ -117,7 +117,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag shall">PHẢI</span>
 <div class="text">
 <div><strong>Mọi thay đổi yêu cầu sau khi chấp nhận đơn (PO/contract) PHẢI được kiểm soát và truyền đạt đến các bộ phận liên quan trước khi thực hiện.</strong> <span class="iso">ISO 8.5.6</span></div>
-<p>Tối thiểu: thông báo thay đổi + đánh giá tác động (cost/thời gian dẫn/quality) + cập nhật traveler/program/kế hoạch kiểm tra (inspection plan).</p>
+<p>Tối thiểu: thông báo thay đổi + đánh giá tác động (cost/thời gian dẫn/quality) + cập nhật traveler/program/kế hoạch kiểm tra (kiểm tra plan).</p>
 </div>
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
@@ -134,7 +134,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div><div class="req">
 <span class="tag may">ĐƯỢC PHÉP</span>
 <div class="text">
-<div><strong>Tổ chức ĐƯỢC PHÉP áp dụng chuẩn hóa biểu mẫu/CRM/ERP để tự động hóa RFQ log, kiểm soát phiên bản và phê duyệt điện tử.</strong> <span class="iso">ISO 7.1.3</span></div>
+<div><strong>Tổ chức ĐƯỢC PHÉP áp dụng chuẩn hóa biểu mẫu/CRM/ERP để tự động hóa RFQ nhật ký, kiểm soát phiên bản và phê duyệt điện tử.</strong> <span class="iso">ISO 7.1.3</span></div>
 <p>Khi số hóa, phải đảm bảo phân quyền, backup, dấu vết kiểm toán (audit trail); tránh tạo 'hệ thống rác' nhiều phiên bản.</p>
 </div>
 </div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L1: biết nhận đúng dữ liệu – ghi đúng hồ sơ – báo đúng người. Không tự suy đoán.</strong></div><h3>3.1. Vì sao C11 là “cổng chất lượng” của xưởng CNC lệnh sản xuất?</h3><p>Trong mô hình <em>chủng loại cao (high-mix) / sản lượng thấp đến trung bình (low-to-mid volume)</em>, sai lệch xuất phát từ khâu đầu (RFQ/PO) khó sửa ở cuối vì đã “đóng băng” trên: đường chạy dao, đồ gá, vật tư, lịch máy và thậm chí cả chứng từ xuất khẩu. Thực tế đánh giá ISO cho thấy nhiều <em>nonconformity</em> không nằm ở máy móc mà nằm ở “hệ thống thông tin”: dùng sai phiên bản (wrong revision), hiểu sai note, không kiểm soát thay đổi, không lưu hồ sơ rà soát hợp đồng.</p><p><strong>Nguyên lý:</strong> lỗi “nhận sai yêu cầu” có chi phí cao nhất (COPQ cao) vì tạo ra lãng phí kép: <em>sai ngay lần đầu</em> + <em>điều chỉnh muộn</em>. Do đó, C11 phải được vận hành như một quy trình có dữ liệu, có gating, có phản ứng.</p><h3>3.2. Thuật ngữ cốt lõi (dùng thống nhất trong HESEM)</h3><ul>
@@ -177,7 +177,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>CTQ: dung sai chặt, surface finish, sealing surfaces, hole patterns, datums.</li>
 <li>Material: grade, condition, traceability need (MTR/heat).</li>
 <li>Quy trình: heat treat/coating/marking/cleaning; approved supplier list?</li>
-<li>Quality docs: CoC, MTR, inspection report, FAI.</li>
+<li>Quality docs: CoC, MTR, kiểm tra report, FAI.</li>
 <li>Packaging/Label: WIP label, bagging, desiccant, shock indicator, shipping label content.</li>
 <li>Quantity &amp; schedule: proto/production, ngày đến hạn, forecast.</li>
 <li>Commercial: Incoterms, payment, currency, special terms.</li>
@@ -211,8 +211,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vstep">
 <div class="vnum">3</div>
 <div class="vtext">
-<strong>RFQ log &amp; phân loại rủi ro</strong>
-<p>Điền RFQ log; đánh giá rủi ro (Impact x Likelihood x Detectability). Rủi ro cao → bắt buộc full review + họp liên phòng.</p>
+<strong>RFQ nhật ký &amp; phân loại rủi ro</strong>
+<p>Điền RFQ nhật ký; đánh giá rủi ro (Impact x Likelihood x Detectability). Rủi ro cao → bắt buộc full review + họp liên phòng.</p>
 </div>
 </div>
 <div class="vstep">
@@ -287,20 +287,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><strong>RFQ Log Timeliness</strong></td>
-<td class="mono">% RFQ được log trong ≤ 30 phút kể từ khi nhận</td>
-<td>RFQ log/CRM timestamp</td>
+<td><strong>RFQ Nhật ký Timeliness</strong></td>
+<td class="mono">% RFQ được nhật ký trong ≤ 30 phút kể từ khi nhận</td>
+<td>RFQ nhật ký/CRM timestamp</td>
 <td>Tuần</td>
 <td>&gt;=95%</td>
 <td>&gt;=98%</td>
 <td>&gt;=99%</td>
 <td>100%</td>
-<td>Không log → coi như không kiểm soát</td>
+<td>Không nhật ký → coi như không kiểm soát</td>
 </tr>
 <tr>
 <td><strong>RFQ Completeness after Round-1 Clarification</strong></td>
 <td class="mono">RFQ đủ dữ liệu sau vòng 1 ÷ tổng RFQ</td>
-<td>Bảng kiểm + clarification log</td>
+<td>Bảng kiểm + nhật ký làm rõ</td>
 <td>Tháng</td>
 <td>&gt;=80%</td>
 <td>&gt;=90%</td>
@@ -311,7 +311,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>Báo giá Turnaround Time (median)</strong></td>
 <td class="mono">Median(ngày gửi báo giá – ngày nhận RFQ đủ dữ liệu)</td>
-<td>CRM/Email log</td>
+<td>CRM/Email nhật ký</td>
 <td>Tháng</td>
 <td>≤48h</td>
 <td>≤24h</td>
@@ -333,7 +333,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>Requirement Escape Rate</strong></td>
 <td class="mono"># lỗi do thiếu/hiểu sai yêu cầu phát hiện sau khi release job</td>
-<td>NCR/8D log</td>
+<td>NCR/8D nhật ký</td>
 <td>Tháng</td>
 <td>&lt;=2</td>
 <td>&lt;=1</td>
@@ -366,7 +366,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>Customer Khiếu nại – Miscommunication</strong></td>
 <td class="mono">Count (claim do hiểu sai yêu cầu/thiếu chứng từ)</td>
-<td>Customer claim log</td>
+<td>Customer claim nhật ký</td>
 <td>Quý</td>
 <td>0–1</td>
 <td>0</td>
@@ -388,12 +388,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div>
 <strong>Nhiệm vụ theo Level 1:</strong>
-<ol><li>Điền RFQ log và đánh dấu các trường thiếu.</li><li>Dùng mẫu RFI để hỏi tối thiểu 6 thông tin bắt buộc.</li><li>Escalate khi khách yêu cầu dung sai chặt nhưng không có 2D.</li></ol>
+<ol><li>Điền RFQ nhật ký và đánh dấu các trường thiếu.</li><li>Dùng mẫu RFI để hỏi tối thiểu 6 thông tin bắt buộc.</li><li>Escalate khi khách yêu cầu dung sai chặt nhưng không có 2D.</li></ol>
 </div>
 </div>
 <hr class="sep"/>
 <strong>Sản phẩm đầu ra (Bằng chứng):</strong>
-<ul><li>RFQ log + bảng kiểm</li><li>Email RFI (bản chính thức)</li><li>Ghi chú escalation (khi có)</li></ul>
+<ul><li>RFQ nhật ký + bảng kiểm</li><li>Email RFI (bản chính thức)</li><li>Ghi chú escalation (khi có)</li></ul>
 <div class="callout"><strong>Tiêu chí chấm điểm:</strong> RFI phải rõ ràng, lịch sự, có cấu trúc; không hỏi lan man; tuyệt đối không 'tự đoán' dung sai.
  </div>
 </div><div class="card">
@@ -416,7 +416,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
 </div><div class="card">
 <h3>Tình huống 3: Yêu cầu chứng từ – khách yêu cầu CoC + Material Cert nhưng Kinh doanh bỏ sót</h3>
-<p class="small">Khách thuộc ngành bán dẫn yêu cầu: CoC, MTR, và inspection report. Khi thiếu sẽ bị reject khi nhập kho.</p>
+<p class="small">Khách thuộc ngành bán dẫn yêu cầu: CoC, MTR, và kiểm tra report. Khi thiếu sẽ bị reject khi nhập kho.</p>
 <div class="cols-2">
 <div>
 <strong>Dữ liệu (Đầu vào):</strong>
@@ -441,7 +441,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Tránh dùng sai phiên bản (wrong revision); tạo truy vết (dấu vết kiểm toán).</td>
 </tr>
 <tr>
-<td><strong>2) Điền RFQ log + bảng kiểm</strong></td>
+<td><strong>2) Điền RFQ nhật ký + bảng kiểm</strong></td>
 <td>Không bỏ trống trường bắt buộc; đánh dấu CTQ/thiếu dữ liệu.</td>
 <td>Bảng kiểm là poka-yoke; dữ liệu đầu vào quyết định đúng/sai của báo giá.</td>
 </tr>
@@ -460,13 +460,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>So sánh PO vs báo giá; xin phê duyệt theo thẩm quyền; lưu hồ sơ.</td>
 <td>Đáp ứng ISO 8.2; tránh nhận điều kiện bất lợi.</td>
 </tr>
-</tbody></table><h3>7.2. OJT Bảng kiểm (Level 1)</h3><p class="small">Tick ✓ khi hoàn thành; lưu bảng kiểm như documented information. Người hướng dẫn ký xác nhận.</p><table class="table">
+</tbody></table><h3>7.2. OJT Checklist (Level 1)</h3><p class="small">Tick ✓ khi hoàn thành; lưu bảng kiểm như documented information. Người hướng dẫn ký xác nhận.</p><table class="table">
 <thead><tr><th>#</th><th>Hạng mục</th><th>Tiêu chí đạt</th><th>Kết quả</th><th>Ghi chú</th></tr></thead>
 <tbody>
 <tr>
 <td>1</td>
 <td>Tạo mã RFQ và lưu file đúng quy định</td>
-<td>File nằm đúng folder, tên có Rev, không trùng; có log nhận</td>
+<td>File nằm đúng folder, tên có Rev, không trùng; có nhật ký nhận</td>
 <td>□ Đạt □ Chưa</td>
 <td>…</td>
 </tr>

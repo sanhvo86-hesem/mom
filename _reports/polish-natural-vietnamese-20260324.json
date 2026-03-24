@@ -1,0 +1,2020 @@
+{
+  "targets": [
+    "01-QMS-Portal",
+    "02-Tai-Lieu-He-Thong",
+    "03-Tai-Lieu-Van-Hanh",
+    "04-Bieu-Mau",
+    "10-Training-Academy"
+  ],
+  "filesScanned": 411,
+  "filesChanged": 226,
+  "totalReplacements": 1483,
+  "topRules": [
+    {
+      "rule": "title_restore",
+      "count": 531
+    },
+    {
+      "rule": "anchor_title_normalize",
+      "count": 245
+    },
+    {
+      "rule": "word_checklist_singular",
+      "count": 148
+    },
+    {
+      "rule": "cleanup_action_log_dup",
+      "count": 127
+    },
+    {
+      "rule": "word_log",
+      "count": 115
+    },
+    {
+      "rule": "cleanup_evidence_pack_dup",
+      "count": 82
+    },
+    {
+      "rule": "word_record",
+      "count": 69
+    },
+    {
+      "rule": "cleanup_onboarding_dup",
+      "count": 67
+    },
+    {
+      "rule": "word_inspection",
+      "count": 35
+    },
+    {
+      "rule": "phrase_release_pack",
+      "count": 22
+    },
+    {
+      "rule": "word_verification",
+      "count": 11
+    },
+    {
+      "rule": "word_dashboard",
+      "count": 9
+    },
+    {
+      "rule": "phrase_change_request",
+      "count": 7
+    },
+    {
+      "rule": "phrase_peer_review",
+      "count": 7
+    },
+    {
+      "rule": "word_evidence",
+      "count": 4
+    },
+    {
+      "rule": "word_evidence_pack",
+      "count": 2
+    },
+    {
+      "rule": "cleanup_workbook_active_dup",
+      "count": 1
+    },
+    {
+      "rule": "cleanup_validation_phrase",
+      "count": 1
+    }
+  ],
+  "changedFiles": [
+    {
+      "path": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html",
+      "total": 113,
+      "byRule": {
+        "title_restore": 62,
+        "word_checklist_singular": 19,
+        "word_log": 15,
+        "word_record": 8,
+        "word_verification": 3,
+        "phrase_change_request": 2,
+        "word_inspection": 2,
+        "phrase_peer_review": 1,
+        "word_evidence": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html",
+      "total": 41,
+      "byRule": {
+        "title_restore": 20,
+        "word_log": 11,
+        "word_checklist_singular": 6,
+        "word_inspection": 3,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "04-Bieu-Mau/01-FRM-100/index.html",
+      "total": 23,
+      "byRule": {
+        "title_restore": 13,
+        "word_checklist_singular": 4,
+        "word_log": 3,
+        "phrase_change_request": 1,
+        "phrase_peer_review": 1,
+        "word_record": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C07.html",
+      "total": 21,
+      "byRule": {
+        "title_restore": 8,
+        "anchor_title_normalize": 6,
+        "word_record": 4,
+        "cleanup_onboarding_dup": 1,
+        "word_log": 1,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html",
+      "total": 20,
+      "byRule": {
+        "cleanup_action_log_dup": 11,
+        "anchor_title_normalize": 9
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html",
+      "total": 19,
+      "byRule": {
+        "title_restore": 11,
+        "word_checklist_singular": 3,
+        "word_inspection": 2,
+        "phrase_release_pack": 1,
+        "word_log": 1,
+        "word_verification": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-engineer-industrial-engineer.html",
+      "total": 19,
+      "byRule": {
+        "title_restore": 8,
+        "word_record": 4,
+        "word_checklist_singular": 2,
+        "word_log": 2,
+        "anchor_title_normalize": 2,
+        "cleanup_action_log_dup": 1
+      }
+    },
+    {
+      "path": "04-Bieu-Mau/05-FRM-500/index.html",
+      "total": 19,
+      "byRule": {
+        "title_restore": 10,
+        "word_log": 4,
+        "word_checklist_singular": 2,
+        "word_record": 2,
+        "word_verification": 1
+      }
+    },
+    {
+      "path": "04-Bieu-Mau/07-FRM-700/index.html",
+      "total": 19,
+      "byRule": {
+        "title_restore": 10,
+        "word_checklist_singular": 3,
+        "word_record": 3,
+        "word_log": 2,
+        "word_verification": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/17-C17-CNC-Setup-CAM/C17-L1.html",
+      "total": 19,
+      "byRule": {
+        "title_restore": 12,
+        "word_log": 5,
+        "phrase_release_pack": 1,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/index.html",
+      "total": 19,
+      "byRule": {
+        "anchor_title_normalize": 16,
+        "cleanup_onboarding_dup": 1,
+        "word_checklist_singular": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html",
+      "total": 17,
+      "byRule": {
+        "title_restore": 6,
+        "cleanup_action_log_dup": 3,
+        "word_log": 3,
+        "word_checklist_singular": 2,
+        "anchor_title_normalize": 2,
+        "word_record": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html",
+      "total": 16,
+      "byRule": {
+        "cleanup_onboarding_dup": 9,
+        "title_restore": 3,
+        "cleanup_action_log_dup": 1,
+        "word_checklist_singular": 1,
+        "word_log": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L3.html",
+      "total": 16,
+      "byRule": {
+        "cleanup_action_log_dup": 15,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/17-C17-CNC-Setup-CAM/C17-L3.html",
+      "total": 16,
+      "byRule": {
+        "title_restore": 10,
+        "phrase_peer_review": 2,
+        "word_log": 2,
+        "phrase_release_pack": 1,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C13.html",
+      "total": 16,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 5,
+        "word_checklist_singular": 2,
+        "phrase_release_pack": 1,
+        "cleanup_onboarding_dup": 1,
+        "phrase_change_request": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C17.html",
+      "total": 16,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 5,
+        "word_log": 2,
+        "phrase_release_pack": 1,
+        "cleanup_onboarding_dup": 1,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C18.html",
+      "total": 16,
+      "byRule": {
+        "title_restore": 6,
+        "anchor_title_normalize": 6,
+        "word_checklist_singular": 2,
+        "cleanup_onboarding_dup": 1,
+        "word_log": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html",
+      "total": 15,
+      "byRule": {
+        "word_record": 7,
+        "title_restore": 7,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C01.html",
+      "total": 15,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 5,
+        "word_checklist_singular": 3,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C03.html",
+      "total": 15,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 5,
+        "cleanup_onboarding_dup": 1,
+        "word_inspection": 1,
+        "word_log": 1,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C08.html",
+      "total": 15,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 5,
+        "word_log": 2,
+        "cleanup_onboarding_dup": 1,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C10.html",
+      "total": 15,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 5,
+        "word_checklist_singular": 3,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C12.html",
+      "total": 15,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 5,
+        "word_log": 2,
+        "cleanup_onboarding_dup": 1,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html",
+      "total": 14,
+      "byRule": {
+        "title_restore": 5,
+        "word_inspection": 3,
+        "word_log": 2,
+        "word_record": 2,
+        "cleanup_evidence_pack_dup": 1,
+        "word_verification": 1
+      }
+    },
+    {
+      "path": "04-Bieu-Mau/02-FRM-200/index.html",
+      "total": 14,
+      "byRule": {
+        "title_restore": 8,
+        "word_checklist_singular": 3,
+        "word_evidence": 1,
+        "phrase_change_request": 1,
+        "word_log": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C02.html",
+      "total": 14,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 4,
+        "word_checklist_singular": 2,
+        "phrase_release_pack": 1,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-index.html",
+      "total": 14,
+      "byRule": {
+        "anchor_title_normalize": 13,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html",
+      "total": 13,
+      "byRule": {
+        "title_restore": 5,
+        "word_log": 2,
+        "cleanup_action_log_dup": 1,
+        "phrase_release_pack": 1,
+        "word_checklist_singular": 1,
+        "phrase_change_request": 1,
+        "word_inspection": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C04.html",
+      "total": 13,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 4,
+        "word_checklist_singular": 2,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C05.html",
+      "total": 13,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 4,
+        "word_checklist_singular": 2,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C09.html",
+      "total": 13,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 4,
+        "word_checklist_singular": 2,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C14.html",
+      "total": 13,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 4,
+        "cleanup_onboarding_dup": 1,
+        "word_inspection": 1,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C16.html",
+      "total": 13,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 4,
+        "cleanup_onboarding_dup": 1,
+        "word_inspection": 1,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C19.html",
+      "total": 13,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 4,
+        "word_checklist_singular": 2,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "01-QMS-Portal/index.html",
+      "total": 12,
+      "byRule": {
+        "anchor_title_normalize": 4,
+        "title_restore": 3,
+        "word_dashboard": 2,
+        "word_evidence": 2,
+        "word_log": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html",
+      "total": 12,
+      "byRule": {
+        "title_restore": 5,
+        "word_log": 3,
+        "anchor_title_normalize": 2,
+        "cleanup_action_log_dup": 1,
+        "word_record": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html",
+      "total": 12,
+      "byRule": {
+        "title_restore": 5,
+        "word_log": 3,
+        "anchor_title_normalize": 2,
+        "cleanup_action_log_dup": 1,
+        "word_record": 1
+      }
+    },
+    {
+      "path": "04-Bieu-Mau/06-FRM-600/index.html",
+      "total": 12,
+      "byRule": {
+        "title_restore": 7,
+        "word_inspection": 2,
+        "word_log": 1,
+        "word_verification": 1,
+        "word_record": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/07-C07-Kaizen-Lean/C07-L3.html",
+      "total": 12,
+      "byRule": {
+        "title_restore": 6,
+        "word_record": 5,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-packaging-technician.html",
+      "total": 11,
+      "byRule": {
+        "title_restore": 6,
+        "word_checklist_singular": 3,
+        "word_log": 1,
+        "word_verification": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html",
+      "total": 11,
+      "byRule": {
+        "title_restore": 5,
+        "word_record": 2,
+        "word_checklist_singular": 1,
+        "word_inspection": 1,
+        "word_log": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html",
+      "total": 11,
+      "byRule": {
+        "title_restore": 6,
+        "word_log": 2,
+        "word_verification": 1,
+        "word_record": 1,
+        "word_inspection": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C06.html",
+      "total": 11,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 3,
+        "cleanup_onboarding_dup": 1,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C11.html",
+      "total": 11,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 3,
+        "cleanup_onboarding_dup": 1,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/01-Modules/C15.html",
+      "total": 11,
+      "byRule": {
+        "anchor_title_normalize": 6,
+        "title_restore": 3,
+        "cleanup_onboarding_dup": 1,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-13.html",
+      "total": 11,
+      "byRule": {
+        "cleanup_action_log_dup": 8,
+        "cleanup_onboarding_dup": 2,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "01-QMS-Portal/site-map.html",
+      "total": 10,
+      "byRule": {
+        "word_dashboard": 3,
+        "anchor_title_normalize": 3,
+        "cleanup_onboarding_dup": 2,
+        "cleanup_evidence_pack_dup": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html",
+      "total": 10,
+      "byRule": {
+        "title_restore": 3,
+        "cleanup_action_log_dup": 2,
+        "word_inspection": 2,
+        "cleanup_evidence_pack_dup": 1,
+        "word_checklist_singular": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html",
+      "total": 10,
+      "byRule": {
+        "word_inspection": 4,
+        "title_restore": 3,
+        "cleanup_action_log_dup": 1,
+        "word_record": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html",
+      "total": 10,
+      "byRule": {
+        "title_restore": 5,
+        "word_inspection": 2,
+        "word_record": 2,
+        "word_log": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html",
+      "total": 10,
+      "byRule": {
+        "title_restore": 6,
+        "word_checklist_singular": 2,
+        "phrase_release_pack": 1,
+        "word_inspection": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html",
+      "total": 9,
+      "byRule": {
+        "cleanup_onboarding_dup": 8,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html",
+      "total": 9,
+      "byRule": {
+        "title_restore": 4,
+        "word_log": 2,
+        "word_checklist_singular": 2,
+        "phrase_release_pack": 1
+      }
+    },
+    {
+      "path": "04-Bieu-Mau/04-FRM-400/index.html",
+      "total": 9,
+      "byRule": {
+        "title_restore": 5,
+        "word_log": 2,
+        "word_checklist_singular": 2
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html",
+      "total": 8,
+      "byRule": {
+        "title_restore": 3,
+        "word_checklist_singular": 2,
+        "word_inspection": 1,
+        "word_log": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html",
+      "total": 8,
+      "byRule": {
+        "title_restore": 7,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-03.html",
+      "total": 8,
+      "byRule": {
+        "cleanup_action_log_dup": 7,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/04-Templates-Tools/qms-ops-map.html",
+      "total": 8,
+      "byRule": {
+        "title_restore": 3,
+        "phrase_change_request": 1,
+        "word_log": 1,
+        "word_inspection": 1,
+        "cleanup_evidence_pack_dup": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html",
+      "total": 7,
+      "byRule": {
+        "word_checklist_singular": 2,
+        "title_restore": 2,
+        "cleanup_evidence_pack_dup": 1,
+        "cleanup_action_log_dup": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html",
+      "total": 7,
+      "byRule": {
+        "word_log": 2,
+        "title_restore": 2,
+        "cleanup_onboarding_dup": 1,
+        "cleanup_action_log_dup": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-101-document-and-data-control.html",
+      "total": 7,
+      "byRule": {
+        "word_checklist_singular": 2,
+        "title_restore": 2,
+        "cleanup_evidence_pack_dup": 1,
+        "cleanup_action_log_dup": 1,
+        "cleanup_workbook_active_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html",
+      "total": 7,
+      "byRule": {
+        "word_log": 2,
+        "title_restore": 2,
+        "cleanup_evidence_pack_dup": 1,
+        "word_evidence_pack": 1,
+        "word_dashboard": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/01-Framework/assessment-matrix.html",
+      "total": 7,
+      "byRule": {
+        "word_record": 2,
+        "title_restore": 2,
+        "anchor_title_normalize": 2,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/07-C07-Kaizen-Lean/C07-L1.html",
+      "total": 7,
+      "byRule": {
+        "word_record": 3,
+        "title_restore": 3,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/07-C07-Kaizen-Lean/C07-L2.html",
+      "total": 7,
+      "byRule": {
+        "word_record": 3,
+        "title_restore": 3,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/07-C07-Kaizen-Lean/C07-L4.html",
+      "total": 7,
+      "byRule": {
+        "word_record": 3,
+        "title_restore": 3,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/13-C13-Risk-Revision-Control/C13-L1.html",
+      "total": 7,
+      "byRule": {
+        "phrase_peer_review": 2,
+        "word_log": 2,
+        "title_restore": 2,
+        "phrase_release_pack": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-05.html",
+      "total": 7,
+      "byRule": {
+        "title_restore": 3,
+        "word_checklist_singular": 2,
+        "cleanup_evidence_pack_dup": 1,
+        "cleanup_action_log_dup": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html",
+      "total": 6,
+      "byRule": {
+        "cleanup_action_log_dup": 3,
+        "word_checklist_singular": 1,
+        "title_restore": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html",
+      "total": 6,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "word_log": 1,
+        "word_evidence_pack": 1,
+        "word_checklist_singular": 1,
+        "title_restore": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html",
+      "total": 6,
+      "byRule": {
+        "title_restore": 3,
+        "word_checklist_singular": 2,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html",
+      "total": 6,
+      "byRule": {
+        "word_dashboard": 3,
+        "cleanup_action_log_dup": 1,
+        "title_restore": 1,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html",
+      "total": 6,
+      "byRule": {
+        "cleanup_action_log_dup": 6
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/17-C17-CNC-Setup-CAM/C17-L2.html",
+      "total": 6,
+      "byRule": {
+        "title_restore": 3,
+        "phrase_release_pack": 1,
+        "cleanup_evidence_pack_dup": 1,
+        "word_log": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/03-MRR-Pack/mrr-06-daily-management.html",
+      "total": 6,
+      "byRule": {
+        "cleanup_action_log_dup": 3,
+        "title_restore": 3
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html",
+      "total": 5,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "cleanup_action_log_dup": 1,
+        "word_log": 1,
+        "title_restore": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-ap-ar-and-payments-accountant.html",
+      "total": 5,
+      "byRule": {
+        "title_restore": 2,
+        "phrase_release_pack": 1,
+        "word_inspection": 1,
+        "word_log": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html",
+      "total": 5,
+      "byRule": {
+        "title_restore": 2,
+        "phrase_release_pack": 1,
+        "word_checklist_singular": 1,
+        "word_inspection": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html",
+      "total": 5,
+      "byRule": {
+        "title_restore": 2,
+        "cleanup_action_log_dup": 2,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html",
+      "total": 5,
+      "byRule": {
+        "title_restore": 3,
+        "word_record": 2
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-105-process-map-detailed.html",
+      "total": 5,
+      "byRule": {
+        "title_restore": 2,
+        "cleanup_evidence_pack_dup": 1,
+        "word_log": 1,
+        "word_verification": 1
+      }
+    },
+    {
+      "path": "04-Bieu-Mau/03-FRM-300/index.html",
+      "total": 5,
+      "byRule": {
+        "title_restore": 3,
+        "word_checklist_singular": 1,
+        "word_record": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/09-C09-Time-Management/C09-L3.html",
+      "total": 5,
+      "byRule": {
+        "cleanup_action_log_dup": 4,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/19-C19-Leadership-Coaching/C19-L1.html",
+      "total": 5,
+      "byRule": {
+        "cleanup_action_log_dup": 5
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-24.html",
+      "total": 5,
+      "byRule": {
+        "word_checklist_singular": 2,
+        "title_restore": 2,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-06.html",
+      "total": 5,
+      "byRule": {
+        "word_log": 2,
+        "title_restore": 2,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/04-Templates-Tools/role-roadmaps.html",
+      "total": 5,
+      "byRule": {
+        "anchor_title_normalize": 2,
+        "cleanup_onboarding_dup": 1,
+        "word_checklist_singular": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html",
+      "total": 4,
+      "byRule": {
+        "word_log": 1,
+        "word_checklist_singular": 1,
+        "title_restore": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html",
+      "total": 4,
+      "byRule": {
+        "anchor_title_normalize": 3,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-103-risk-opportunity-fmea-and-control-plan.html",
+      "total": 4,
+      "byRule": {
+        "cleanup_action_log_dup": 3,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html",
+      "total": 4,
+      "byRule": {
+        "anchor_title_normalize": 3,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html",
+      "total": 4,
+      "byRule": {
+        "title_restore": 3,
+        "word_checklist_singular": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html",
+      "total": 4,
+      "byRule": {
+        "cleanup_action_log_dup": 4
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L4.html",
+      "total": 4,
+      "byRule": {
+        "cleanup_action_log_dup": 3,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/11-C11-Sales-Contract-Review/C11-L4.html",
+      "total": 4,
+      "byRule": {
+        "cleanup_onboarding_dup": 2,
+        "word_checklist_singular": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/13-C13-Risk-Revision-Control/C13-L2.html",
+      "total": 4,
+      "byRule": {
+        "phrase_release_pack": 1,
+        "phrase_peer_review": 1,
+        "word_log": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/19-C19-Leadership-Coaching/C19-L2.html",
+      "total": 4,
+      "byRule": {
+        "cleanup_action_log_dup": 4
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/19-C19-Leadership-Coaching/C19-L3.html",
+      "total": 4,
+      "byRule": {
+        "cleanup_action_log_dup": 4
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/19-C19-Leadership-Coaching/C19-L4.html",
+      "total": 4,
+      "byRule": {
+        "cleanup_action_log_dup": 4
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/index.html",
+      "total": 4,
+      "byRule": {
+        "anchor_title_normalize": 3,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/03-Practice-Drills/drill-daily-management-tier.html",
+      "total": 4,
+      "byRule": {
+        "cleanup_action_log_dup": 4
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-17.html",
+      "total": 4,
+      "byRule": {
+        "title_restore": 2,
+        "cleanup_evidence_pack_dup": 1,
+        "word_log": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-23.html",
+      "total": 4,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "cleanup_onboarding_dup": 1,
+        "word_checklist_singular": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/04-Templates-Tools/trainee-workbook.html",
+      "total": 4,
+      "byRule": {
+        "anchor_title_normalize": 2,
+        "word_record": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
+      "total": 3,
+      "byRule": {
+        "title_restore": 2,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html",
+      "total": 3,
+      "byRule": {
+        "word_record": 1,
+        "title_restore": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html",
+      "total": 3,
+      "byRule": {
+        "cleanup_onboarding_dup": 2,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-107-communication-management.html",
+      "total": 3,
+      "byRule": {
+        "cleanup_action_log_dup": 2,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html",
+      "total": 3,
+      "byRule": {
+        "title_restore": 2,
+        "word_log": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html",
+      "total": 3,
+      "byRule": {
+        "title_restore": 3
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-104-org-chart-fullpage.html",
+      "total": 3,
+      "byRule": {
+        "anchor_title_normalize": 2,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-122-kpi-cascade-dictionary.html",
+      "total": 3,
+      "byRule": {
+        "title_restore": 3
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-401-supplier-risk-model-and-scorecard-method.html",
+      "total": 3,
+      "byRule": {
+        "cleanup_onboarding_dup": 2,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/01-Framework/competency-metrics.html",
+      "total": 3,
+      "byRule": {
+        "title_restore": 3
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L4.html",
+      "total": 3,
+      "byRule": {
+        "cleanup_onboarding_dup": 2,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/15-C15-Material-Science/C15-L1.html",
+      "total": 3,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "word_log": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/15-C15-Material-Science/C15-L2.html",
+      "total": 3,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "word_checklist_singular": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix.html",
+      "total": 3,
+      "byRule": {
+        "anchor_title_normalize": 3
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/03-Practice-Drills/drill-safety-5s-hazards.html",
+      "total": 3,
+      "byRule": {
+        "cleanup_action_log_dup": 3
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-03.html",
+      "total": 3,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "cleanup_onboarding_dup": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-07.html",
+      "total": 3,
+      "byRule": {
+        "title_restore": 2,
+        "cleanup_action_log_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-09.html",
+      "total": 3,
+      "byRule": {
+        "title_restore": 2,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-14.html",
+      "total": 3,
+      "byRule": {
+        "word_checklist_singular": 1,
+        "title_restore": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-18.html",
+      "total": 3,
+      "byRule": {
+        "title_restore": 3
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/03-MRR-Pack/mrr-07-training-cert.html",
+      "total": 3,
+      "byRule": {
+        "anchor_title_normalize": 2,
+        "word_log": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/04-Templates-Tools/authorization-library.html",
+      "total": 3,
+      "byRule": {
+        "anchor_title_normalize": 2,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/04-Templates-Tools/certificate-template.html",
+      "total": 3,
+      "byRule": {
+        "word_log": 1,
+        "cleanup_evidence_pack_dup": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html",
+      "total": 2,
+      "byRule": {
+        "title_restore": 2
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html",
+      "total": 2,
+      "byRule": {
+        "title_restore": 2
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_action_log_dup": 1,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html",
+      "total": 2,
+      "byRule": {
+        "title_restore": 1,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-116-m365-folder-structure-blueprint.html",
+      "total": 2,
+      "byRule": {
+        "title_restore": 2
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_action_log_dup": 1,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-123-deputy-backup-matrix.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_onboarding_dup": 2
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-124-dashboard-evidence-pack-worked-examples.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_action_log_dup": 2
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/06-C06-Problem-Solving-RCA/C06-L4.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_onboarding_dup": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/09-C09-Time-Management/C09-L1.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_action_log_dup": 2
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/17-C17-CNC-Setup-CAM/C17-L4.html",
+      "total": 2,
+      "byRule": {
+        "phrase_release_pack": 1,
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-planner-dispatcher.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_action_log_dup": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-16.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-25.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-04.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-05.html",
+      "total": 2,
+      "byRule": {
+        "title_restore": 2
+      }
+    },
+    {
+      "path": "10-Training-Academy/04-Templates-Tools/certification-register.html",
+      "total": 2,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/04-Templates-Tools/role-gate-tests.html",
+      "total": 2,
+      "byRule": {
+        "title_restore": 1,
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/04-Templates-Tools/trainer-guide.html",
+      "total": 2,
+      "byRule": {
+        "word_log": 1,
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "01-QMS-Portal/book.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html",
+      "total": 1,
+      "byRule": {
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-general-ledger-and-payroll-accountant.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_action_log_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/03-SOP-300/sop-302-first-article-inspection-fai.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html",
+      "total": 1,
+      "byRule": {
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-601-calibration-and-gage-control.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/07-SOP-700/sop-703-product-safety-conformity-and-fod-prevention.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-802-incident-near-miss-and-ehs.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_action_log_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-901-internal-audit-and-lpa.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_validation_phrase": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-103-org-raci-matrix.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-106-iso9001-matrix-full.html",
+      "total": 1,
+      "byRule": {
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-107-audit-evidence-pack-master.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-113-dashboard-deployment-access-and-refresh-control.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_action_log_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-115-epicor-transaction-and-interface-map.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-120-authority-matrix.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-402-outsource-special-process-pack.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/06-ANNEX-600/annex-608-semi-standards-and-csr-matrix.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/01-Framework/skill-matrix-bonus.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L1.html",
+      "total": 1,
+      "byRule": {
+        "phrase_release_pack": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L2.html",
+      "total": 1,
+      "byRule": {
+        "phrase_release_pack": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L3.html",
+      "total": 1,
+      "byRule": {
+        "phrase_release_pack": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L4.html",
+      "total": 1,
+      "byRule": {
+        "phrase_release_pack": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/06-C06-Problem-Solving-RCA/C06-L1.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/06-C06-Problem-Solving-RCA/C06-L2.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/06-C06-Problem-Solving-RCA/C06-L3.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L1.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/08-C08-Data-Driven-ERP/C08-L2.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/13-C13-Risk-Revision-Control/C13-L3.html",
+      "total": 1,
+      "byRule": {
+        "phrase_release_pack": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/13-C13-Risk-Revision-Control/C13-L4.html",
+      "total": 1,
+      "byRule": {
+        "phrase_release_pack": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/15-C15-Material-Science/C15-L3.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/15-C15-Material-Science/C15-L4.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/18-C18-Supply-Chain/C18-L1.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-engineering.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-estimating.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-finance-hr.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-hse.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-maintenance.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-planning-purchasing.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-production.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-quality.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-warehouse.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-cam-nc.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-operator.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-purchasing.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-qa-qms.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-qc-inspector.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-setup-teamlead.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-warehouse-receiving.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-tracker.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/02-Training-Content/03-Practice-Drills/index.html",
+      "total": 1,
+      "byRule": {
+        "phrase_release_pack": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-01.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-02.html",
+      "total": 1,
+      "byRule": {
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-10.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-15.html",
+      "total": 1,
+      "byRule": {
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-20.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-21.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-22.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_onboarding_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-26.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_evidence_pack_dup": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-01.html",
+      "total": 1,
+      "byRule": {
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/03-System-Operations/03-MRR-Pack/mrr-g4-final-ship-packet.html",
+      "total": 1,
+      "byRule": {
+        "title_restore": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/04-Templates-Tools/competency-metrics.html",
+      "total": 1,
+      "byRule": {
+        "anchor_title_normalize": 1
+      }
+    }
+  ]
+}

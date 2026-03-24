@@ -78,7 +78,7 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>2. Trigger bắt buộc phải triển khai poka-yoke</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trigger</th><th>Phải làm</th><th>Người phụ trách khởi tạo</th></tr></thead><tbody>
-<tr><td>Repeat issue cùng cơ chế trong 2 kỳ / 2 job / 2 ca gần nhau</td><td>Mở đánh giá poka-yoke, không được đóng CAPA chỉ bằng đào tạo lại.</td><td>QA + khu vực phát sinh lỗi</td></tr>
+<tr><td>Repeat vấn đề cùng cơ chế trong 2 kỳ / 2 job / 2 ca gần nhau</td><td>Mở đánh giá poka-yoke, không được đóng CAPA chỉ bằng đào tạo lại.</td><td>QA + khu vực phát sinh lỗi</td></tr>
 <tr><td>Sự cố suýt xảy ra có khả năng gây escape, crash, mixed part, sai phiên bản (wrong revision), sai material, sai CTQ</td><td>Phân tích ngay khả năng loại bỏ / liên động an toàn (interlock) / detect sớm tại nguồn.</td><td>Supervisor / QA</td></tr>
 <tr><td>New machine / new setup family / new route có rủi ro thao tác cao</td><td>Đánh giá trước khi sản xuất hàng loạt hoặc trước khi giao Job đầu tiên.</td><td>Engineering / Production</td></tr>
 <tr><td>Manual entry / manual select / manual count tại điểm có hậu quả lớn</td><td>Ưu tiên scan, lock, keying, liên động an toàn hoặc forced data completeness.</td><td>IT / Production / QA</td></tr>
@@ -89,7 +89,7 @@ ul.tight li {margin:4px 0;}
 <tr><td><span class="badge-green">M1 — Loại bỏ</span></td><td>Làm cho thao tác sai là không thể hoặc không có đường vào.</td><td>Fixture keying, anti-rev lock, one-way orientation, khóa program theo part-rev.</td><td>Người dùng vẫn có thể vượt qua dễ dàng bằng một thao tác thường ngày.</td></tr>
 <tr><td><span class="badge-blue">M2 — Ngăn chặn</span></td><td>Bắt buộc điều kiện đúng xảy ra trước khi bước tiếp theo chạy.</td><td>Scan-to-open đúng traveler, forced bảng kiểm, liên động an toàn offset/door/probe.</td><td>Hệ thống vẫn cho chạy dù thiếu điều kiện nhưng chỉ hiện cảnh báo nhẹ.</td></tr>
 <tr><td><span class="badge-amber">M3 — Phát hiện tức thời</span></td><td>Phát hiện sai ngay tại điểm dùng và buộc người thao tác dừng lại.</td><td>Màu gage, witness mark, alarm mismatch, count mismatch trước seal.</td><td>Lỗi chỉ được phát hiện ở công đoạn sau hoặc ở kiểm tra cuối.</td></tr>
-<tr><td><span class="badge-red">M4 — Giảm hậu quả</span></td><td>Khi chưa thể chặn từ đầu, phải cô lập phạm vi và truy được ngay.</td><td>Unique lot separation, scan log, segregated bin, abnormal event flag.</td><td>Không khóa được phạm vi ảnh hưởng hoặc không giúp containment nhanh hơn.</td></tr>
+<tr><td><span class="badge-red">M4 — Giảm hậu quả</span></td><td>Khi chưa thể chặn từ đầu, phải cô lập phạm vi và truy được ngay.</td><td>Unique lot separation, scan nhật ký, segregated bin, abnormal event flag.</td><td>Không khóa được phạm vi ảnh hưởng hoặc không giúp containment nhanh hơn.</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>4. Quy trình triển khai poka-yoke tại công đoạn</h2>

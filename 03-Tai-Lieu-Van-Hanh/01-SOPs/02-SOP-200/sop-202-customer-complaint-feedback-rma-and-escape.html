@@ -76,7 +76,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="doc-content" id="docContent">
 <div class="form-sheet">
 <div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi khiếu nại, phản hồi tiêu cực, field escape, lỗi chứng từ/nhãn/giao thiếu, warranty issue và RMA phải được log và có acknowledgement trong vòng <b>24 giờ làm việc</b> hoặc nhanh hơn theo cam kết khách hàng.</div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi khiếu nại, phản hồi tiêu cực, field escape, lỗi chứng từ/nhãn/giao thiếu, warranty vấn đề và RMA phải được nhật ký và có acknowledgement trong vòng <b>24 giờ làm việc</b> hoặc nhanh hơn theo cam kết khách hàng.</div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Containment phải bao phủ <b>hàng đã giao</b>, <b>hàng tồn</b>, <b>WIP</b>, <b>hàng đang outsource</b> và <b>các lô cùng genealogy hoặc cùng điều kiện tạo lỗi</b> khi có nguy cơ lan rộng. Không được chỉ chặn phần hàng khách đã chỉ ra.</div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi khiếu nại có bản chất chất lượng phải nối sang <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> để mở NCR/CAPA nội bộ. SOP-202 sở hữu tình huống đối ngoại với khách hàng và điều phối toàn bộ dòng khiếu nại/RMA/escape.</div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Không phát hành kết luận nguyên nhân gốc, concession, replacement, credit hoặc ngày giao lại khi chưa có bằng chứng và thẩm quyền đúng. Mọi phản hồi khách hàng phải có hồ sơ và cadence cập nhật rõ ràng.</div></div>
@@ -107,7 +107,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <ul class="tight">
 <li>Chặn lan rộng lỗi ra khách hàng hoặc tái phát trong cùng điều kiện sản xuất.</li>
 <li>Giữ một người phụ trách đối ngoại duy nhất cho mỗi tình huống để tránh trả lời mâu thuẫn.</li>
-<li>Liên kết khiếu nại với genealogy, bộ hồ sơ phê duyệt giao hàng (ship release pack), quality hồ sơ và inventory/WIP/outsource status.</li>
+<li>Liên kết khiếu nại với genealogy, bộ hồ sơ phê duyệt giao hàng (ship gói phát hành), quality hồ sơ và inventory/WIP/outsource trạng thái.</li>
 <li>Khóa chu trình warranty/RMA/credit/replacement/rework để không thất thoát thông tin và chi phí.</li>
 </ul>
 <h2 class="h2" id="p2">2. Phạm vi</h2>
@@ -133,15 +133,15 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td><b>Khiếu nại</b></td><td>Mọi phản ánh không hài lòng có liên quan đến chất lượng, giao hàng, chứng từ, nhãn, damage, traceability hoặc hành vi xử lý của HESEM.</td></tr>
 <tr><td><b>Escape / field escape</b></td><td>Sản phẩm hoặc điều kiện không phù hợp đã lọt ra khách hàng hoặc đã qua cổng release mà chưa bị chặn.</td></tr>
 <tr><td><b>Containment</b></td><td>Hành động khẩn cấp để dừng lan rộng: hold inventory, stop-ship, freeze WIP, block outsource, notify customer, retrieve data, identify suspect population.</td></tr>
-<tr><td><b>Genealogy sweep</b></td><td>Rà phạm vi ảnh hưởng theo customer, part, rev, WO, machine, operator, inspection device, raw material heat/lot, processor, shift và khoảng thời gian.</td></tr>
+<tr><td><b>Genealogy sweep</b></td><td>Rà phạm vi ảnh hưởng theo customer, part, rev, WO, machine, operator, kiểm tra device, raw material heat/lot, processor, shift và khoảng thời gian.</td></tr>
 <tr><td><b>RMA</b></td><td>Quyền cho phép trả hàng về HESEM hoặc xử lý claim bằng đường controlled return. Không nhận hàng trả về “miệng” mà không có hồ sơ.</td></tr>
-<tr><td><b>Warranty issue</b></td><td>Khiếu nại sau giao hàng có thể kéo theo replacement, repair, credit, sort cost hoặc claim cost khác. Warranty vẫn phải đi qua containment và bằng chứng như khiếu nại bình thường.</td></tr>
+<tr><td><b>Warranty vấn đề</b></td><td>Khiếu nại sau giao hàng có thể kéo theo replacement, repair, credit, sort cost hoặc claim cost khác. Warranty vẫn phải đi qua containment và bằng chứng như khiếu nại bình thường.</td></tr>
 <tr><td><b>No close without bằng chứng</b></td><td>Tình huống không được đóng nếu chưa có acknowledgement, containment, điều tra/disposition, phản hồi cuối và hồ sơ đủ bằng chứng.</td></tr>
 </tbody></table></div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:25%"/><col style="width:19%"/><col style="width:18%"/><col style="width:20%"/></colgroup><thead><tr><th>Mức độ</th><th>Tiêu chí điển hình</th><th>ACK khách hàng</th><th>Containment nội bộ</th><th>Escalation</th></tr></thead><tbody>
-<tr><td>Critical</td><td>Field escape nghiêm trọng, safety/cleanliness/vacuum issue, stop-ship toàn job/customer, nguy cơ lan rộng lớn</td><td>Ngay / ≤ 24h</td><td>Ngay lập tức</td><td>QA Manager + Production Director + CEO theo ANNEX-117</td></tr>
+<tr><td>Critical</td><td>Field escape nghiêm trọng, safety/cleanliness/vacuum vấn đề, stop-ship toàn job/customer, nguy cơ lan rộng lớn</td><td>Ngay / ≤ 24h</td><td>Ngay lập tức</td><td>QA Manager + Production Director + CEO theo ANNEX-117</td></tr>
 <tr><td>Major</td><td>Nonconformance ảnh hưởng nhiều lô/WO, return lớn, claim cost đáng kể, partial ship bị đe dọa</td><td>≤ 24h</td><td>Trong ngày</td><td>QA Manager + Planner + CS</td></tr>
-<tr><td>Minor</td><td>Lỗi chứng từ/nhãn/giao thiếu đơn lẻ, issue nhỏ nhưng vẫn cần theo dõi</td><td>≤ 24h</td><td>Theo risk nhưng không quá ca kế tiếp</td><td>Người phụ trách Tình huống + supervisor liên quan</td></tr>
+<tr><td>Minor</td><td>Lỗi chứng từ/nhãn/giao thiếu đơn lẻ, vấn đề nhỏ nhưng vẫn cần theo dõi</td><td>≤ 24h</td><td>Theo risk nhưng không quá ca kế tiếp</td><td>Người phụ trách Tình huống + supervisor liên quan</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:30%"/><col style="width:14%"/><col style="width:14%"/><col style="width:14%"/><col style="width:28%"/></colgroup><thead><tr><th>Hoạt động</th><th>R</th><th>A</th><th>C</th><th>Yêu cầu quyền hạn</th></tr></thead><tbody>
@@ -153,14 +153,14 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </tbody></table></div>
 <h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2>
 <div class="field-grid">
-<div class="field"><b>Đầu vào bắt buộc</b><div class="blank">Khiếu nại email/call/portal, thẻ điểm (scorecard) negative, returned part, ảnh/video, inspection report khách hàng, shipment/label/doc issue, customer sort result, return request, field failure.</div></div>
+<div class="field"><b>Đầu vào bắt buộc</b><div class="blank">Khiếu nại email/call/portal, thẻ điểm (scorecard) negative, returned part, ảnh/video, kiểm tra report khách hàng, shipment/label/doc vấn đề, customer sort result, return request, field failure.</div></div>
 <div class="field"><b>Điều kiện tiên quyết</b><div class="blank">Mỗi tình huống phải có tình huống ID, customer, part/job/PO/rev, mô tả lỗi/sự kiện, ngày phát hiện, mức độ, người phụ trách, mốc ACK đầu tiên và trạng thái hàng liên quan.</div></div>
-<div class="field"><b>Đầu ra bắt buộc</b><div class="blank">Khiếu nại log, ACK, containment plan, genealogy sweep result, NCR/CAPA link, RMA hồ sơ nếu có, customer updates, disposition, closure note và bài học kinh nghiệm.</div></div>
+<div class="field"><b>Đầu ra bắt buộc</b><div class="blank">Complaint Log, ACK, containment plan, genealogy sweep result, NCR/CAPA link, RMA hồ sơ nếu có, customer updates, disposition, closure note và bài học kinh nghiệm.</div></div>
 <div class="field"><b>Điều kiện không cho phép chuyển bước</b><div class="blank">Không được đóng tình huống nếu chưa rõ population ảnh hưởng, chưa quyết định disposition, chưa phát hành update cuối cho khách hàng hoặc chưa đóng đường nối với SOP-606 khi có bản chất chất lượng.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát (control cổng kiểm soát), điểm dừng bắt buộc &amp; KPI</h2>
 <div class="gate-grid">
-<div class="gate-card"><h3>202-G1 — Intake &amp; acknowledgement</h3><p>Log khiếu nại, mở tình huống và ACK trong 24 giờ làm việc hoặc nhanh hơn theo hợp đồng. <b>HOLD</b> nếu tình huống chưa có người phụ trách hoặc chưa có mốc phản hồi đầu tiên.</p></div>
+<div class="gate-card"><h3>202-G1 — Intake &amp; acknowledgement</h3><p>Nhật ký khiếu nại, mở tình huống và ACK trong 24 giờ làm việc hoặc nhanh hơn theo hợp đồng. <b>HOLD</b> nếu tình huống chưa có người phụ trách hoặc chưa có mốc phản hồi đầu tiên.</p></div>
 <div class="gate-card"><h3>202-G2 — Containment &amp; genealogy sweep</h3><p>Khóa hàng, stop-ship, freeze WIP, check outsource, xác định population suspect. <b>HOLD</b> nếu chưa biết phạm vi ảnh hưởng.</p></div>
 <div class="gate-card"><h3>202-G3 — Technical đánh giá / NCR-CAPA / RMA decision</h3><p>Xác định loại lỗi, severity, need-for-RMA, need-for-8D, need-for-customer notice bổ sung.</p></div>
 <div class="gate-card"><h3>202-G4 — Customer reporting cadence &amp; disposition</h3><p>Phản hồi tiến độ đúng nhịp đã cam kết; chốt replace/rework/credit/return/sort. <b>HOLD</b> nếu có người hứa với khách nhưng nội bộ chưa phê duyệt.</p></div>
@@ -186,14 +186,14 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <p>Ngay sau intake, QA cùng Planner, Production và WHS phải đánh giá có cần hold hay stop-ship hay không. Khi nghi có field escape, scope containment không dừng ở lô bị khách hàng phát hiện mà phải rà đủ hàng đã ship, hàng tồn, WIP, hàng đang outsource, và các lô sinh ra từ cùng điều kiện máy/ca/vật tư/processor/revision hoặc phương pháp đo liên quan.</p>
 <ul class="tight">
 <li>Hàng suspect phải được nhận diện, segregate và khóa trạng thái rõ ràng.</li>
-<li>Genealogy sweep phải dựa trên dữ liệu thật: ship hồ sơ, WO, inspection hồ sơ, raw material lots, outsource hồ sơ, machine/operator/time window.</li>
+<li>Genealogy sweep phải dựa trên dữ liệu thật: ship hồ sơ, WO, kiểm tra hồ sơ, raw material lots, outsource hồ sơ, machine/operator/time window.</li>
 <li>Nếu có SSCC/box trace, phải dùng để thu hẹp hoặc mở rộng phạm vi ảnh hưởng.</li>
-<li>Containment tại khách hàng hoặc tại hiện trường phải có decision log và người phụ trách.</li>
+<li>Containment tại khách hàng hoặc tại hiện trường phải có decision nhật ký và người phụ trách.</li>
 </ul>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:22%"/><col style="width:78%"/></colgroup><thead><tr><th>Genealogy sweep phải rà</th><th>Nội dung bắt buộc</th></tr></thead><tbody>
-<tr><td>Customer / shipment</td><td>Shipment date, box/SSCC, qty, phiếu kê đóng gói (phiếu kê đóng gói), CoC/CoA, người release, carrier status.</td></tr>
+<tr><td>Customer / shipment</td><td>Shipment date, box/SSCC, qty, phiếu kê đóng gói (phiếu kê đóng gói), CoC/CoA, người release, carrier trạng thái.</td></tr>
 <tr><td>Job / WO / routing</td><td>WO, operation, machine/workcenter, operator, ca, traveler, move history, rework history.</td></tr>
-<tr><td>Inspection / release</td><td>Mẫu đầu (first piece), trong quá trình, kiểm tra cuối, gage/CMM used, sampling mode, release point, exception history.</td></tr>
+<tr><td>Kiểm tra / release</td><td>Mẫu đầu (first piece), trong quá trình, kiểm tra cuối, gage/CMM used, sampling mode, release point, exception history.</td></tr>
 <tr><td>Material / outsource</td><td>Heat/lot, mill cert, processor, outsource PO/dispatch, receiving result, công đoạn đặc biệt cert scope.</td></tr>
 <tr><td>Time window</td><td>Khoảng thời gian mà điều kiện có thể tạo lỗi tồn tại; phải dùng để mở rộng hoặc thu hẹp phạm vi suspect population.</td></tr>
 </tbody></table></div>
@@ -216,7 +216,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ul>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:22%"/><col style="width:28%"/><col style="width:18%"/><col style="width:32%"/></colgroup><thead><tr><th>Disposition / xử lý tài chính</th><th>Khi áp dụng</th><th>Thẩm quyền</th><th>Bằng chứng tối thiểu</th></tr></thead><tbody>
 <tr><td>Replace / remake</td><td>Khách cần hàng thay thế, lỗi xác nhận thuộc HESEM hoặc được chấp thuận xử lý theo risk</td><td>Người phụ trách Commercial + QA</td><td>Tình huống ID, qty, ngày đến hạn, release route mới, cost note</td></tr>
-<tr><td>Repair / rework tại HESEM</td><td>Part trả về hoặc có thể thu hồi xử lý</td><td>QA + Engineering + Production</td><td>Disposition instruction, re-inspection plan, shipment decision</td></tr>
+<tr><td>Repair / rework tại HESEM</td><td>Part trả về hoặc có thể thu hồi xử lý</td><td>QA + Engineering + Production</td><td>Disposition instruction, re-kiểm tra plan, shipment decision</td></tr>
 <tr><td>Sort tại khách hàng / tại kho</td><td>Khi cần containment nhanh trước khi có replacement</td><td>QA Manager / Production Director</td><td>Sort criteria, người phụ trách chi phí, acceptance of results, affected population</td></tr>
 <tr><td>Credit / debit / claim cost</td><td>Warranty, freight, sort cost, return cost, penalty hoặc chi phí khác</td><td>Người phụ trách Commercial + Finance + GM theo giá trị</td><td>Claim basis, bằng chứng, approval, accounting treatment</td></tr>
 </tbody></table></div>
@@ -229,13 +229,13 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Nếu customer chưa phản hồi nhưng HESEM đã hoàn tất, tình huống chỉ chuyển sang pending-customer, không được tự đóng nếu hợp đồng đòi xác nhận hai bên.</li>
 </ul>
 <h3>7.6 Kéo bài học vào hệ thống</h3>
-<p>SOP-202 không kết thúc ở email cuối cho khách hàng. Khi khiếu nại lộ ra lỗ hổng release, traceability, setup, inspection, packaging, supplier control, communication hoặc training, tình huống người phụ trách và QMS Engineer phải mở action cập nhật SOP/WI/ANNEX/KPI/FORM liên quan. Khiếu nại mà không kéo được bài học về hệ thống sẽ tái diễn dưới dạng khác.</p>
+<p>SOP-202 không kết thúc ở email cuối cho khách hàng. Khi khiếu nại lộ ra lỗ hổng release, traceability, setup, kiểm tra, packaging, supplier control, communication hoặc training, tình huống người phụ trách và QMS Engineer phải mở action cập nhật SOP/WI/ANNEX/KPI/FORM liên quan. Khiếu nại mà không kéo được bài học về hệ thống sẽ tái diễn dưới dạng khác.</p>
 
 <h3>7.7 Ma trận mức độ và ngưỡng escalation của khiếu nại / escape</h3>
 <p>Không được coi mọi khiếu nại là như nhau. Tình huống phải được phân cấp ít nhất theo 4 mức: C1 thông tin/phản hồi nhẹ; C2 khiếu nại thương mại hoặc chứng từ không chạm chất lượng thành phẩm; C3 khiếu nại chất lượng có containment nội bộ và chưa xác nhận lan rộng; C4 field escape nghiêm trọng, line stop, product safety, clean/vacuum breach, suspect counterfeit, revision/configuration mismatch hoặc khách hàng trọng yếu. Mức tình huống quyết định thời gian ACK, người phê duyệt phản hồi, phạm vi genealogy sweep và việc có cần thông báo lãnh đạo ngay hay không.</p>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:34%"/><col style="width:20%"/><col style="width:32%"/></colgroup><thead><tr><th>Mức</th><th>Đặc trưng</th><th>ACK / update</th><th>Escalation bắt buộc</th></tr></thead><tbody>
 <tr><td>C1</td><td>Phản hồi, nhận xét, yêu cầu giải thích không có defect bằng chứng</td><td>1 ngày làm việc</td><td>Người phụ trách Tình huống + CS</td></tr>
-<tr><td>C2</td><td>Label/doc/qty/commercial issue; chưa chạm conformity sản phẩm</td><td>Trong ngày làm việc</td><td>CS + Finance/Shipping tùy bản chất</td></tr>
+<tr><td>C2</td><td>Label/doc/qty/commercial vấn đề; chưa chạm conformity sản phẩm</td><td>Trong ngày làm việc</td><td>CS + Finance/Shipping tùy bản chất</td></tr>
 <tr><td>C3</td><td>Khiếu nại chất lượng, RMA tiềm năng, lỗi tái diễn, cần containment nội bộ</td><td>Trong ngày làm việc; cập nhật plan trong 24 giờ</td><td>CS + QA Manager + chủ quá trình</td></tr>
 <tr><td>C4</td><td>Field escape nghiêm trọng, line stop, product safety, suspect counterfeit, clean/vacuum breach, ASD luồng-down</td><td>ACK ngay; cập nhật containment cùng ngày</td><td>QA Manager + Tổng Giám Đốc / người được ủy quyền + ANNEX-117</td></tr>
 </tbody></table></div>
@@ -253,29 +253,29 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:42%"/><col style="width:14%"/><col style="width:12%"/><col style="width:14%"/></colgroup><thead><tr><th>Tình huống</th><th>Cách xử lý bắt buộc</th><th>Đầu mối</th><th>Escalation</th><th>Hồ sơ</th></tr></thead><tbody>
 <tr><td>Khách hàng chưa cung cấp đủ bằng chứng</td><td>Vẫn ACK tình huống, yêu cầu dữ liệu cụ thể còn thiếu, đồng thời chạy containment theo mức rủi ro có thể đánh giá được.</td><td>CS / QA</td><td>QA Manager</td><td>FRM-211</td></tr>
-<tr><td>Không nhận được returned part</td><td>Dùng bằng chứng thay thế, có quyết định rõ mức tin cậy của đánh giá và cập nhật khách hàng theo cadence.</td><td>QA</td><td>QA Manager</td><td>Tình huống bộ bằng chứng (evidence pack)</td></tr>
-<tr><td>Khiếu nại ngoài giờ / ngày nghỉ</td><td>Áp dụng ladder trong <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>; nếu chạm rủi ro giao hàng same-day hoặc field escape nghiêm trọng phải kích hoạt ngay.</td><td>Người trực</td><td>Production Director / QA Manager</td><td>Escalation log</td></tr>
+<tr><td>Không nhận được returned part</td><td>Dùng bằng chứng thay thế, có quyết định rõ mức tin cậy của đánh giá và cập nhật khách hàng theo cadence.</td><td>QA</td><td>QA Manager</td><td>Tình huống bộ bằng chứng</td></tr>
+<tr><td>Khiếu nại ngoài giờ / ngày nghỉ</td><td>Áp dụng ladder trong <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>; nếu chạm rủi ro giao hàng same-day hoặc field escape nghiêm trọng phải kích hoạt ngay.</td><td>Người trực</td><td>Production Director / QA Manager</td><td>Escalation nhật ký</td></tr>
 <tr><td>Mixed lot / unclear genealogy</td><td>Mở rộng containment theo nguyên tắc an toàn hơn; không thu hẹp phạm vi khi chưa có chứng cứ chắc chắn.</td><td>QA / Planner</td><td>QA Manager</td><td>Genealogy sweep note</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="p9">9. Hệ thống, hồ sơ &amp; dữ liệu</h2>
 <div class="field-grid">
-<div class="field"><b>Hệ thống / SSOT</b><div class="blank">Khiếu nại/RMA bằng chứng và communication log phải về M365/SharePoint; giao dịch ship/inventory/credit phải đi qua Epicor theo SoR.</div></div>
-<div class="field"><b>Trường dữ liệu bắt buộc</b><div class="blank">Tình huống ID, customer, part/job/PO/rev, event family, severity, ACK due, người phụ trách, population affected, containment status, NCR/CAPA link, RMA status, closure status.</div></div>
+<div class="field"><b>Hệ thống / SSOT</b><div class="blank">Khiếu nại/RMA bằng chứng và communication nhật ký phải về M365/SharePoint; giao dịch ship/inventory/credit phải đi qua Epicor theo SoR.</div></div>
+<div class="field"><b>Trường dữ liệu bắt buộc</b><div class="blank">Tình huống ID, customer, part/job/PO/rev, event family, severity, ACK due, người phụ trách, population affected, containment trạng thái, NCR/CAPA link, RMA trạng thái, closure trạng thái.</div></div>
 <div class="field"><b>Điều kiện đóng hồ sơ</b><div class="blank">Containment xong, customer update cuối đã gửi, technical route đã chốt, financial/disposition đã quyết, bộ bằng chứng đầy đủ và learning action đã mở nếu cần.</div></div>
 <div class="field"><b>Điều kiện legal hold / giữ hồ sơ</b><div class="blank">Claim lớn, dispute, chargeback, field failure nghiêm trọng hoặc yêu cầu pháp lý/khách hàng phải khóa hồ sơ theo SOP-104.</div></div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:25%"/><col style="width:23%"/><col style="width:14%"/><col style="width:20%"/></colgroup><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Nơi lưu / nguồn</th><th>Chủ trì</th><th>Điều kiện đóng</th></tr></thead><tbody>
-<tr><td><a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a></td><td>Khiếu nại register và người phụ trách / due / severity / status.</td><td>Khiếu nại library / list</td><td>CS</td><td>Khi khiếu nại tình huống đóng.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a></td><td>Khiếu nại register và người phụ trách / due / severity / trạng thái.</td><td>Khiếu nại library / list</td><td>CS</td><td>Khi khiếu nại tình huống đóng.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a></td><td>RMA / return / warranty tracking.</td><td>RMA library / list</td><td>CS / WHS</td><td>Khi return / replacement / credit đóng.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a></td><td>NCR nội bộ cho khiếu nại chất lượng.</td><td>QMS hồ sơ</td><td>QA</td><td>Khi NCR xử lý xong hoặc chuyển CAPA.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a></td><td>CAPA / 8D khi khiếu nại cần corrective action hệ thống.</td><td>QMS hồ sơ</td><td>QA</td><td>Khi xác minh hiệu lực hoàn tất.</td></tr>
-<tr><td>Bộ bằng chứng</td><td>Email, ảnh, returned part log, measurement, ship data, genealogy sweep, customer update.</td><td><a href="../../03-Reference/01-ANNEX-100/annex-107-audit-evidence-pack-master.html">ANNEX-107</a> + tình huống dossier</td><td>CS + QA</td><td>Khi closure note hoàn tất.</td></tr>
+<tr><td>Bộ bằng chứng</td><td>Email, ảnh, returned part nhật ký, measurement, ship data, genealogy sweep, customer update.</td><td><a href="../../03-Reference/01-ANNEX-100/annex-107-audit-evidence-pack-master.html">ANNEX-107</a> + tình huống dossier</td><td>CS + QA</td><td>Khi closure note hoàn tất.</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="p10">10. Biểu mẫu, WI, ANNEX, SOP &amp; JD liên kết</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:44%"/><col style="width:40%"/></colgroup><thead><tr><th>Nhóm</th><th>Tài liệu liên quan</th><th>Vai trò trong SOP</th></tr></thead><tbody>
-<tr><td>Biểu mẫu</td><td><a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a>; <a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a>; <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>; <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a>; <a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-654_Customer_Satisfaction_Survey.xlsx">FRM-654</a></td><td>Log khiếu nại, RMA, NCR, CAPA và phản hồi hài lòng khách hàng.</td></tr>
+<tr><td>Biểu mẫu</td><td><a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a>; <a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a>; <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>; <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a>; <a  download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-654_Customer_Satisfaction_Survey.xlsx">FRM-654</a></td><td>Nhật ký khiếu nại, RMA, NCR, CAPA và phản hồi hài lòng khách hàng.</td></tr>
 <tr><td>WI</td><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a>; <a href="../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Khóa bộ bằng chứng, ship trace và suspect containment.</td></tr>
-<tr><td>ANNEX</td><td><a href="../../03-Reference/01-ANNEX-100/annex-107-audit-evidence-pack-master.html">ANNEX-107</a>; <a href="../../03-Reference/02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>; <a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>; <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/01-ANNEX-100/annex-120-authority-matrix.html">ANNEX-120</a></td><td>Dùng cho bộ bằng chứng, metadata dossier, traceability/SSCC, escalation và thẩm quyền.</td></tr>
+<tr><td>ANNEX</td><td><a href="../../03-Reference/01-ANNEX-100/annex-107-audit-evidence-pack-master.html">ANNEX-107</a>; <a href="../../03-Reference/02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>; <a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>; <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>; <a href="../../03-Reference/01-ANNEX-100/annex-120-authority-matrix.html">ANNEX-120</a></td><td>Dùng cho bộ bằng chứng, metadata dossier, traceability/SSCC, escalation và thẩm quyền.</td></tr>
 <tr><td>SOP liên đới</td><td><a href="../01-SOP-100/sop-107-communication-management.html">SOP-107</a>; <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>; <a href="../08-SOP-800/sop-803-invoicing-job-costing-and-arap.html">SOP-803</a>; <a href="../09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Khóa communication, NCR/CAPA, xử lý chi phí/credit và bài học kinh nghiệm.</td></tr>
 <tr><td>JD cascade</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">JD-Customer-Service</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html">JD-Estimator</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">JD-QA-Manager</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html">JD-Quality-Engineer</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html">JD-Production-Planner</a></td><td>JD phải mô tả rõ ACK SLA, thẩm quyền phát hành update ra ngoài, containment ownership, genealogy sweep và closure logic.</td></tr>
 </tbody></table></div>

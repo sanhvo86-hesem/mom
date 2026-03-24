@@ -71,7 +71,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-material-cert-specialprocess.html"><b>DRL-03</b> — Bài diễn tập Material Cert &amp; Công đoạn đặc biệt Outsource</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html"><b>DRL-07</b> — Bài diễn tập Shipping Packet + CoC</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html"><b>DRL-01</b> — Bài diễn tập Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet))</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-material-cert-specialprocess.html">DRL-03 — TRN-Bài diễn tập ACA-DRL-03 — Material Cert &amp;amp; Công đoạn đặc biệt Outsource | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html">DRL-07 — TRN-Bài diễn tập ACA-DRL-07 — Shipping Packet + CoC | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet)) | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
@@ -94,7 +94,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Cổng kiểm soát (gate) bắt buộc (không vượt)</strong>
 <div>Xuất sai vật liệu/thiếu chứng từ/nhầm revision/nhầm lô = <b>không đạt Level</b> và kích hoạt NCR/CAPA.</div>
-<div class="small muted" style="margin-top:8px;">Tham chiếu: <a href="../../01-Framework/competency-metrics.html#C18">KPI/Chỉ số Dictionary – C18</a>.</div>
+<div class="small muted" style="margin-top:8px;">Tham chiếu: <a href="../../01-Framework/competency-metrics.html#C18">TRN-MET-01 — KPI/Chỉ số Dictionary by 19 Competencies | HESEM OS</a>.</div>
 </div>
 </div>
 </section><h2 class="h2">1) Chuẩn đầu ra (K-S-E-M)</h2><table class="table">
@@ -112,8 +112,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>E</b> (Minh chứng)</td>
-<td>Ghi nhận log và cập nhật theo luồng thống nhất (PO bảng theo dõi, kho, QA hold khi có sai lệch).</td>
-<td>FRM-PUR-001/Log nhận hàng, ảnh nhãn, log HOLD.</td>
+<td>Ghi nhận nhật ký và cập nhật theo luồng thống nhất (PO bảng theo dõi, kho, QA hold khi có sai lệch).</td>
+<td>FRM-PUR-001/Nhật ký nhận hàng, ảnh nhãn, nhật ký HOLD.</td>
 </tr>
 <tr>
 <td><b>M</b> (Chỉ số)</td>
@@ -127,7 +127,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Đối chiếu <b>PO</b> ↔ <b>Phiếu kê đóng gói/MTR/CoC</b> ↔ <b>nhãn/heat/qty</b> trước khi nhập kho.</li>
 <li>Gắn <b>HOLD</b> ngay khi thiếu chứng từ, nhãn không đọc được, heat/lot không khớp, bao bì hư hỏng.</li>
-<li>Dán nhãn truy xuất tối thiểu: <b>Supplier</b>, <b>Material/Part No</b>, <b>Heat/Lot</b>, <b>Qty</b>, <b>Date</b>, <b>Status</b>.</li>
+<li>Dán nhãn truy xuất tối thiểu: <b>Supplier</b>, <b>Material/Part No</b>, <b>Heat/Lot</b>, <b>Qty</b>, <b>Date</b>, <b>Trạng thái</b>.</li>
 <li>Lưu chứng từ theo cấu trúc thư mục đã chuẩn hoá (Supplier Folder Index).</li>
 </ul>
 </div>
@@ -166,7 +166,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="step">
 <div class="cap">B4 — Dán nhãn kho + định vị</div>
 <ul>
-<li>Dán nhãn kho, ghi location, cập nhật log/PO bảng theo dõi.</li>
+<li>Dán nhãn kho, ghi location, cập nhật nhật ký/PO bảng theo dõi.</li>
 <li>Không để vật tư “không vị trí”.</li>
 </ul>
 </div>
@@ -184,7 +184,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Đã có PO + phiếu kê đóng gói (phiếu kê đóng gói) + MTR/CoC (khi áp dụng).</li>
 <li>Heat/Lot trên chứng từ khớp nhãn hàng.</li>
 <li>Số lượng khớp; bao bì không hư hỏng.</li>
-<li>Đã gắn status OK/HOLD/NG; vật tư HOLD để đúng khu.</li>
+<li>Đã gắn trạng thái OK/HOLD/NG; vật tư HOLD để đúng khu.</li>
 <li>Đã cập nhật <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-PUR-001 — PO Bảng theo dõi</a>.</li>
 <li>Đã lưu chứng từ theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html">FRM-PUR-007 — Supplier Product Folder Index</a>.</li>
 </ul>
@@ -196,7 +196,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Trạng thái đã Release (QA/OPS), không có HOLD.</li>
 <li>Đóng gói theo quy định bảo quản; nhãn shipping đầy đủ.</li>
 <li>Dossier: CoC/IR/FAI (khi yêu cầu) + phiếu kê đóng gói (phiếu kê đóng gói).</li>
-<li>Ghi log phát hành CoC: <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-QA-011</a>.</li>
+<li>Ghi nhật ký phát hành CoC: <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-QA-011</a>.</li>
 </ul>
 </div>
 </div><div class="card">
@@ -236,7 +236,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li>PO/Spec ↔ Chứng từ (MTR/CoC/phiếu kê đóng gói (phiếu kê đóng gói)) ↔ Hàng thực tế (nhãn/heat/qty).</li>
 <li>HOLD.</li>
-<li>Supplier; Material/Part No; Heat/Lot; Qty; Date; Status (bổ sung Location khi áp dụng).</li>
+<li>Supplier; Material/Part No; Heat/Lot; Qty; Date; Trạng thái (bổ sung Location khi áp dụng).</li>
 <li>OK: đủ dữ liệu và khớp; HOLD: thiếu dữ liệu hoặc có sai lệch cần xác minh.</li>
 <li>Gắn HOLD và cô lập lô.</li>
 <li>Khi có quy tắc truy xuất + hồ sơ gộp lô được phê duyệt.</li>
@@ -254,7 +254,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">Tiêu chí đạt</h3>
 <ul>
 <li>Không sai khác PO/phiếu kê đóng gói (phiếu kê đóng gói)/nhãn/qty/heat.</li>
-<li>HOLD xử lý đúng (cô lập + log + báo cấp).</li>
+<li>HOLD xử lý đúng (cô lập + nhật ký + báo cấp).</li>
 <li>Hồ sơ truy xuất mở ra được trong 5 phút.</li>
 </ul>
 </div></div></div></div>

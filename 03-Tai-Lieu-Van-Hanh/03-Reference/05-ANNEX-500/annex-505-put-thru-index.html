@@ -77,14 +77,14 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>2. Chỉ mục tuyến đặc biệt</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Route code</th><th>Tuyến</th><th>Khi dùng</th><th>Hồ sơ tăng cường bắt buộc</th><th>Cổng kiểm soát / người phụ trách</th></tr></thead><tbody>
-<tr><td>PT-01</td><td>Pass-through inspection only</td><td>Job không gia công, chỉ kiểm/đóng gói/chuyển tiếp theo yêu cầu</td><td>Customer instruction, xác minh đầu vào, release decision</td><td>QA + WHS</td></tr>
+<tr><td>PT-01</td><td>Pass-through kiểm tra only</td><td>Job không gia công, chỉ kiểm/đóng gói/chuyển tiếp theo yêu cầu</td><td>Customer instruction, xác minh đầu vào, release decision</td><td>QA + WHS</td></tr>
 <tr><td>PT-02</td><td>Outsource-only / vendor route</td><td>Part đi thẳng vendor công đoạn đặc biệt hoặc finishing</td><td>PO flowdown, bộ chứng từ chứng nhận, receiving release, packaging spec</td><td>PUR + WHS + QA</td></tr>
 <tr><td>PT-03</td><td>Clean-pack direct</td><td>Part sau final đi thẳng clean pack/ship, không qua staging thường</td><td>Cleanliness hồ sơ, packaging photo, seal/label bằng chứng</td><td>QA + WHS</td></tr>
-<tr><td>PT-04</td><td>Customer material / customer property return</td><td>Dùng vật tư hoặc tài sản khách hàng; có thể trả lại phần dư/fixture</td><td>Material/property log, traceability, return pack</td><td>WHS + Sales + QA</td></tr>
+<tr><td>PT-04</td><td>Customer material / customer property return</td><td>Dùng vật tư hoặc tài sản khách hàng; có thể trả lại phần dư/fixture</td><td>Material/property nhật ký, traceability, return pack</td><td>WHS + Sales + QA</td></tr>
 <tr><td>PT-05</td><td>Rework loop</td><td>Job quay lại bước trước hoặc sang tuyến sửa</td><td>Disposition/NCR, revised route, hold-release bằng chứng</td><td>QA + Production + ENG</td></tr>
-<tr><td>PT-06</td><td>Split shipment / partial release</td><td>Giao từng phần theo lịch / hot lot</td><td>Qty split log, bộ hồ sơ giao hàng (ship packet) riêng từng phần, customer confirm nếu cần</td><td>Sales + WHS + QA</td></tr>
+<tr><td>PT-06</td><td>Split shipment / partial release</td><td>Giao từng phần theo lịch / hot lot</td><td>Qty split nhật ký, bộ hồ sơ giao hàng (ship packet) riêng từng phần, customer confirm nếu cần</td><td>Sales + WHS + QA</td></tr>
 <tr><td>PT-07</td><td>Trial run / prove-out / engineering lot</td><td>Lot thử để xác nhận quy trình trước lô chính</td><td>Trial objective, result, approval to convert or stop</td><td>ENG + QA + Production</td></tr>
-<tr><td>PT-08</td><td>Containment / suspect segregation</td><td>Job có containment đặc biệt sau issue/khiếu nại</td><td>Containment plan, suspect map, release criteria</td><td>QA + QMS + Production</td></tr>
+<tr><td>PT-08</td><td>Containment / suspect segregation</td><td>Job có containment đặc biệt sau vấn đề/khiếu nại</td><td>Containment plan, suspect map, release criteria</td><td>QA + QMS + Production</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>3. Quy tắc dùng route đặc biệt</h2>
@@ -99,7 +99,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Khách gửi vật tư, gia công một phần rồi trả lại cả part và vật tư dư</td><td>PT-04</td><td>Phải truy vết vật tư khách hàng, ghi qty nhận-dùng-trả, giữ pack trả lại riêng.</td></tr>
 <tr><td>Part không cần machining, chỉ nhận hàng outsource về kiểm và ship</td><td>PT-02 + PT-01</td><td>Receiving release, bộ chứng từ chứng nhận và bộ hồ sơ giao hàng phải đủ dù không có traveler sản xuất nội bộ.</td></tr>
 <tr><td>Lot đầu chỉ chạy 3 pcs để prove-out trước khi mở lô 200 pcs</td><td>PT-07</td><td>3 pcs đầu là trial lot; kết quả trial phải đóng và có quyết định chuyển sang production lot.</td></tr>
-<tr><td>Job bị khiếu nại, phải containment 100% inspection cho 2 lô tiếp theo</td><td>PT-08</td><td>Phải có containment plan, log 100% inspection và điều kiện kết thúc containment.</td></tr>
+<tr><td>Job bị khiếu nại, phải containment 100% kiểm tra cho 2 lô tiếp theo</td><td>PT-08</td><td>Phải có containment plan, nhật ký 100% kiểm tra và điều kiện kết thúc containment.</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>5. Tài liệu liên kết</h2>

@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SYS-OPS-20 — SOP-QMS-09 Kiểm tra sản phẩm đầu tiên (first article) Inspection: triggers, AS9102-style discipline, bằng chứng | HESEM OS</title>
+<title>SYS-OPS-20 — SOP-QMS-09 Kiểm tra sản phẩm đầu tiên (first article) Kiểm tra: triggers, AS9102-style discipline, bằng chứng | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
 /* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
@@ -53,7 +53,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-20 — SOP-QMS-09 Kiểm tra sản phẩm đầu tiên Inspection: triggers, AS9102-style discipline, bằng chứng</strong>
+  <strong>SYS-OPS-20 — SOP-QMS-09 Kiểm tra sản phẩm đầu tiên Kiểm tra: triggers, AS9102-style discipline, bằng chứng</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -72,17 +72,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h1 class="h1">SYS-OPS-20</h1>
 <p class="lead">
  Mô-đun này khóa chặt rủi ro “lọt lỗi ngay từ sản phẩm đầu”: sai REV, sai setup, sai dụng cụ đo, thiếu chứng chỉ vật liệu/công đoạn đặc biệt,
- và vượt qua cổng kiểm soát dẫn tới ship sai. Chuẩn áp dụng: kỷ luật FAI kiểu AS9102 (Form 1–2–3, balloon, truy xuất) kết hợp Bộ bằng chứng (evidence pack) của HESEM.
+ và vượt qua cổng kiểm soát dẫn tới ship sai. Chuẩn áp dụng: kỷ luật FAI kiểu AS9102 (Form 1–2–3, balloon, truy xuất) kết hợp Bộ bằng chứng của HESEM.
  </p>
 <div class="grid-2">
 <div class="note">
 <strong>Tài liệu nội bộ áp dụng trực tiếp</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
-<li>SOP-QMS-009 — Kiểm tra sản phẩm đầu tiên Inspection / Mẫu đầu (first piece) Control</li>
+<li>SOP-QMS-009 — Kiểm tra sản phẩm đầu tiên Kiểm tra / Mẫu đầu (first piece) Control</li>
 <li>ANNEX-QMS-003 — Bộ bằng chứng (Hồ sơ công việc (job dossier) + Data Governance)</li>
 </ul>
 <div class="small muted" style="margin-top:8px">
- Mục tiêu vận hành: <b>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</b> tại điểm chặn FAI và trước phê duyệt giao hàng (ship release).
+ Mục tiêu vận hành: <b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</b> tại điểm chặn FAI và trước phê duyệt giao hàng (ship release).
  </div>
 </div>
 <div class="note">
@@ -108,7 +108,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 2) Mục đích module & bối cảnh vận hành -->
 <h2 class="h2">2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card">
-<p><strong>Mục đích:</strong> Chuẩn hóa cách kích hoạt, thực hiện, đánh giá và lưu bằng chứng Kiểm tra sản phẩm đầu tiên Inspection (FAI) / Mẫu đầu Control theo SOP-QMS-09,
+<p><strong>Mục đích:</strong> Chuẩn hóa cách kích hoạt, thực hiện, đánh giá và lưu bằng chứng Kiểm tra sản phẩm đầu tiên Kiểm tra (FAI) / Mẫu đầu Control theo SOP-QMS-09,
  đạt kỷ luật kiểu AS9102 để chống “lọt lỗi” và chống “thiếu hồ sơ” khi đánh giá/khách hàng kiểm tra.</p>
 <div class="grid-2">
 <div class="note">
@@ -233,7 +233,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>QC/QA</b></td>
-<td>Ballooned drawing/inspection plan</td>
+<td>Ballooned drawing/kiểm tra plan</td>
 <td><b>FAI Cổng kiểm soát</b>: ĐẠT/KHÔNG ĐẠT + quyết định HOLD/GO</td>
 <td>FAI pack (Form 1–2–3 hoặc hồ sơ tương đương) + ký duyệt</td>
 </tr>
@@ -247,7 +247,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Packing/Ship</b></td>
 <td>bộ hồ sơ giao hàng (ship packet), CoC, FAI/IR khi yêu cầu</td>
 <td><b>Phê duyệt giao hàng Cổng kiểm soát</b></td>
-<td>bộ hồ sơ giao hàng đầy đủ + log phê duyệt giao hàng</td>
+<td>bộ hồ sơ giao hàng đầy đủ + nhật ký phê duyệt giao hàng</td>
 </tr>
 </tbody>
 </table>
@@ -303,10 +303,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>CP2 — Balloon &amp; Plan</b></td>
 <td>QC + QA</td>
 <td>Mọi đặc tính yêu cầu được đánh số và có dòng đo tương ứng</td>
-<td>Ballooned drawing + inspection plan + form characteristic list</td>
+<td>Ballooned drawing + kiểm tra plan + form characteristic list</td>
 </tr>
 <tr>
-<td><b>CP3 — Gage Status</b></td>
+<td><b>CP3 — Gage Trạng thái</b></td>
 <td>QC + Maintenance</td>
 <td>Gage/CMM ở trạng thái hiệu lực; truy xuất tem hiệu chuẩn rõ</td>
 <td>Ảnh tem + link danh mục hiệu chuẩn M365/SharePoint → HESEM-QMS-SSOT</td>
@@ -315,7 +315,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>CP4 — Material Trace</b></td>
 <td>Warehouse</td>
 <td>Heat/lot được dán nhãn; vật liệu đúng spec; chứng chỉ đầy đủ</td>
-<td>Material cert (PDF) + nhãn heat/lot + log cấp phát</td>
+<td>Material cert (PDF) + nhãn heat/lot + nhật ký cấp phát</td>
 </tr>
 <tr>
 <td><b>CP5 — Công đoạn đặc biệt Cert</b></td>
@@ -398,7 +398,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Lẫn lộn lô vật liệu</td>
 <td>Đóng khay/box → dán HOLD “LOT MIX” → ngăn cấp phát thêm</td>
 <td>Warehouse → Supervisor → QA</td>
-<td>Ảnh nhãn heat/lot + log cấp phát</td>
+<td>Ảnh nhãn heat/lot + nhật ký cấp phát</td>
 </tr>
 <tr>
 <td>Thiếu chứng chỉ</td>
@@ -416,7 +416,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Vượt qua cổng kiểm soát / áp lực tiến độ</td>
 <td>BLOCK job tại hiện trường → báo Supervisor + QA → dừng chuyển công đoạn</td>
 <td>Bất kỳ ai → Supervisor → QA/Manager</td>
-<td>Log sự kiện + chữ ký xác nhận dừng</td>
+<td>Nhật ký sự kiện + chữ ký xác nhận dừng</td>
 </tr>
 </tbody>
 </table>
@@ -439,7 +439,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Xác nhận yêu cầu FAI theo PO/contract và đánh dấu trong Job Pack</td><td>Estimator (SAL-03) + Planner</td><td>Trang PO highlight yêu cầu FAI + routing có Cổng kiểm soát</td><td>Bỏ sót yêu cầu FAI trong PO</td></tr>
 <tr><td>2</td><td>Khóa REV: drawing/spec/model/routing/program/setup sheet thống nhất</td><td>Programmer + Planner</td><td>Release hồ sơ + ảnh trang REV</td><td>Program chạy “bản cũ”</td></tr>
-<tr><td>3</td><td>Chuẩn bị ballooned drawing/kế hoạch kiểm tra (inspection plan) (đánh số duy nhất)</td><td>QC + QA</td><td>Ballooned drawing + plan</td><td>Số balloon không khớp hồ sơ</td></tr>
+<tr><td>3</td><td>Chuẩn bị ballooned drawing/kế hoạch kiểm tra (kiểm tra plan) (đánh số duy nhất)</td><td>QC + QA</td><td>Ballooned drawing + plan</td><td>Số balloon không khớp hồ sơ</td></tr>
 <tr><td>4</td><td>Kiểm tra vật liệu: spec + heat/lot + cert đủ trường</td><td>Warehouse</td><td>Material cert + nhãn heat/lot</td><td>Nhầm heat/lot do nhãn mờ</td></tr>
 <tr><td>5</td><td>Kiểm tra công đoạn đặc biệt (khi có): supplier đã phê duyệt + cert theo spec</td><td>Purchasing + QA</td><td>Cert công đoạn đặc biệt + PO/spec</td><td>Cert thiếu lot/serial</td></tr>
 <tr><td>6</td><td>Kiểm tra tình trạng gage/CMM và phương pháp đo CTQ</td><td>QC + Maintenance</td><td>Ảnh tem + gage list M365/SharePoint → HESEM-QMS-SSOT</td><td>Dùng gage độ phân giải thiếu</td></tr>
@@ -494,7 +494,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Cổng kiểm soát decision</td>
 <td>ĐẠT/KHÔNG ĐẠT bằng chữ ký; FAIL mở NCR, không có “pass miệng”</td>
-<td>không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate); chống vượt qua</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate); chống vượt qua</td>
 </tr>
 <tr>
 <td>Lưu Bộ bằng chứng</td>
@@ -572,7 +572,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Warehouse</td><td>Traceability heat/lot, material cert</td><td>L2</td></tr>
 <tr><td>Purchasing</td><td>Công đoạn đặc biệt cert, approved supplier discipline</td><td>L2; L3 khi xử lý cert thiếu trường</td></tr>
 <tr><td>Planner</td><td>Chèn cổng kiểm soát vào routing, lịch QC, không “đẩy job” qua cổng kiểm soát</td><td>L2</td></tr>
-<tr><td>Maintenance</td><td>Gage/CMM status, cách ly OOT</td><td>L2</td></tr>
+<tr><td>Maintenance</td><td>Gage/CMM trạng thái, cách ly OOT</td><td>L2</td></tr>
 <tr><td>EHS</td><td>An toàn khu vực đo, hóa chất vệ sinh, ergonomic khi đo</td><td>L1 (nhận biết) + ký xác nhận bảng kiểm khu vực khi yêu cầu</td></tr>
 <tr><td>Estimator (SAL-03)</td><td>Nhận diện yêu cầu FAI trong PO, giao tiếp thay đổi tiến độ do cổng kiểm soát</td><td>L1</td></tr>
 <tr><td>Supervisor</td><td>Thực thi STOP/HOLD/BLOCK, ký cổng kiểm soát release</td><td>L4</td></tr>
@@ -687,7 +687,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <!-- 11) PASS/FAIL criteria -->
-<h2 class="h2">11) ĐẠT/KHÔNG ĐẠT criteria của mô-đun (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)</h2>
+<h2 class="h2">11) ĐẠT/KHÔNG ĐẠT criteria của mô-đun (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</h2>
 <div class="card">
 <div class="grid-2">
 <div class="callout">
@@ -714,7 +714,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>12.1 Danh sách hồ sơ bắt buộc</h3>
 <ul style="margin:0; padding-left:18px; line-height:1.75">
 <li>FAI pack: Form 1–2–3 hoặc hồ sơ tương đương (PDF).</li>
-<li>Ballooned drawing / inspection plan.</li>
+<li>Ballooned drawing / kiểm tra plan.</li>
 <li>Mẫu đầu label (HOLD/PASS) — ảnh chụp.</li>
 <li>CMM report / dữ liệu đo (khi áp dụng).</li>
 <li>Material cert + traceability (heat/lot).</li>
@@ -747,7 +747,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Part/REV Dữ liệu gốc</td>
 <td>M365/SharePoint → DATA → 03_Production → 00_Programming → {CustomerCode} → {CustomerPartNo} → <code>REV {Rev}</code> → <code>10_Quality</code></td>
-<td>Chứa balloon/kế hoạch kiểm tra (inspection plan) “chuẩn REV”</td>
+<td>Chứa balloon/kế hoạch kiểm tra (kiểm tra plan) “chuẩn REV”</td>
 </tr>
 <tr>
 <td>Danh mục hiệu chuẩn/approved supplier</td>
@@ -815,13 +815,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>FAI thiếu đặc tính</b> (bỏ sót note/spec) → chặn bằng CP2, kiểm tra “characteristic completeness” trước ký.</li>
 <li><b>Không truy xuất được balloon</b> → bắt buộc ballooned drawing đính kèm trong Part/REV Master + link trong hồ sơ công việc.</li>
 <li><b>Thiếu chữ ký/ngày</b> → cổng kiểm soát sign-off chỉ mở khi field đầy đủ; thiếu field = BLOCK.</li>
-<li><b>Gage status không chứng minh</b> → lưu ảnh tem + link danh mục hiệu chuẩn; OOT = cách ly.</li>
-<li><b>Material cert không khớp heat/lot</b> → kho dán nhãn heat/lot, log cấp phát và đối chiếu cert.</li>
-<li><b>Công đoạn đặc biệt cert thiếu trường</b> → Purchasing yêu cầu re-issue; không giao hàng khi chưa đủ.</li>
+<li><b>Gage trạng thái không chứng minh</b> → lưu ảnh tem + link danh mục hiệu chuẩn; OOT = cách ly.</li>
+<li><b>Material cert không khớp heat/lot</b> → kho dán nhãn heat/lot, nhật ký cấp phát và đối chiếu cert.</li>
+<li><b>Công đoạn đặc biệt cert thiếu trường</b> → Purchasing yêu cầu re-vấn đề; không giao hàng khi chưa đủ.</li>
 <li><b>FAI không đại diện cho quá trình</b> (đo mẫu đã rework) → kỷ luật mẫu đầu “giữ nguyên trạng”.</li>
 <li><b>Lưu hồ sơ sai chỗ/sai tên</b> → áp dụng naming rule ANNEX-QMS-003; kiểm tra truy xuất 60 giây.</li>
 <li><b>Delta FAI làm sai phạm vi</b> → bắt buộc change impact review có chữ ký Programmer + QA.</li>
-<li><b>Vượt qua cổng kiểm soát do tiến độ</b> → Supervisor chịu trách nhiệm chặn; log sự kiện; đánh giá lại năng lực.</li>
+<li><b>Vượt qua cổng kiểm soát do tiến độ</b> → Supervisor chịu trách nhiệm chặn; nhật ký sự kiện; đánh giá lại năng lực.</li>
 </ol>
 </div>
 <!-- 14) DCR record -->

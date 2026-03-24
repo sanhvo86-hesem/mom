@@ -89,15 +89,15 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div></div>
 <div class="section"><h2>3. Bảy điểm bắt buộc tại máy</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điểm kiểm</th><th>Phải xác nhận</th><th>Bằng chứng tối thiểu</th><th>Không đạt khi</th></tr></thead><tbody>
-<tr><td>1. Revision set</td><td>Drawing/spec, traveler, setup sheet, tool list, inspection method, customer overlay cùng Part/Rev</td><td>Traveler + setup sheet + link hồ sơ</td><td>sai phiên bản (wrong revision), thiếu tài liệu hiệu lực, hoặc không biết bản nào đang chạy</td></tr>
+<tr><td>1. Revision set</td><td>Drawing/spec, traveler, setup sheet, tool list, kiểm tra method, customer overlay cùng Part/Rev</td><td>Traveler + setup sheet + link hồ sơ</td><td>sai phiên bản (wrong revision), thiếu tài liệu hiệu lực, hoặc không biết bản nào đang chạy</td></tr>
 <tr><td>2. Material lot / traceability</td><td>Material tag, heat/lot, qty, condition khớp traveler và yêu cầu job</td><td>Tag vật liệu + traveler</td><td>Lot không khớp, không truy vết được hoặc lẫn vật liệu</td></tr>
-<tr><td>3. Tool list / tool life</td><td>ToolID đúng, tool CTQ còn life, insert/holder/stick-out đúng, không có tool hỏng</td><td>Tool list + log tuổi dao</td><td>Tool thiếu, sai vị trí, hết life, hoặc holder/runout nghi ngờ</td></tr>
+<tr><td>3. Tool list / tool life</td><td>ToolID đúng, tool CTQ còn life, insert/holder/stick-out đúng, không có tool hỏng</td><td>Tool list + nhật ký tuổi dao</td><td>Tool thiếu, sai vị trí, hết life, hoặc holder/runout nghi ngờ</td></tr>
 <tr><td>4. Offsets / probe zero / WCS</td><td>WCS đúng, probe/zero ổn định, offset giải thích được, không có giá trị lạ chưa xác nhận</td><td>Setup screen / zero check / note bàn giao</td><td>Offset không tin cậy, zero vừa đổi nhưng chưa re-xác minh</td></tr>
 <tr><td>5. Workholding / orientation</td><td>Fixture/jaw/clamp đúng ID, part hướng đúng, lực kẹp và chống rung phù hợp</td><td>Kiểm trực quan + fixture ID</td><td>Orientation sai, part nhô bất thường, clamp scheme không chắc chắn</td></tr>
 <tr><td>6. Dung dịch làm mát (coolant) / chip evacuation / FOD</td><td>Dung dịch làm mát đúng loại và đúng vị trí phun; chip conveyor hoặc thu phoi hoạt động; vùng cắt sạch</td><td>Kiểm trực quan + máy ở trạng thái sạch</td><td>Chip kẹt, dung dịch làm mát yếu/sai hướng, còn vật lạ trong machine zone</td></tr>
 <tr><td>7. Dry-run / single block / first cut</td><td>Đã prove-out đoạn rủi ro; đã kiểm vùng gần clamp/rotary/transfer; có kế hoạch dừng kiểm part đầu</td><td>FRM-511 hoặc hồ sơ first cut</td><td>Chưa prove-out, chưa kiểm vùng rủi ro, hoặc first cut không có người theo dõi</td></tr>
 </tbody></table></div>
-<div class="callout-info"><strong>Kiểm bổ sung bắt buộc</strong><br/>Job QPL-3/QPL-4, part có CTQ cao, part lần đầu, part có yêu cầu vacuum/clean/leak hoặc customer overlay đặc biệt phải kiểm thêm: gage mức sẵn sàng, inspection method, bằng chứng path và người nhận đo part đầu.</div></div>
+<div class="callout-info"><strong>Kiểm bổ sung bắt buộc</strong><br/>Job QPL-3/QPL-4, part có CTQ cao, part lần đầu, part có yêu cầu vacuum/clean/leak hoặc customer overlay đặc biệt phải kiểm thêm: gage mức sẵn sàng, kiểm tra method, bằng chứng path và người nhận đo part đầu.</div></div>
 <div class="section"><h2>4. Ba mức kiểm trước khi chạy</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mức kiểm</th><th>Mục tiêu</th><th>Nội dung</th><th>Không đạt thì làm gì</th></tr></thead><tbody>
 <tr><td>Mức A — Packet</td><td>Chặn sai phiên bản (wrong revision), sai job, sai vật liệu, sai route</td><td>Kiểm tài liệu, traveler, material lot, QPL, customer overlay, previous hold/NCR</td><td>HOLD bộ hồ sơ công việc; báo Supervisor / QA / Engineering</td></tr>
@@ -113,7 +113,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div></div>
 <div class="section"><h2>6. Restart sau bất thường</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Kiểm lại tối thiểu</th><th>Phải giữ lại bằng chứng gì</th></tr></thead><tbody>
-<tr><td>Sau thay tool hoặc insert</td><td>Điểm 3, 4, 7; đo đặc tính bị ảnh hưởng; cập nhật log tuổi dao</td><td>FRM-511 / log tool change</td></tr>
+<tr><td>Sau thay tool hoặc insert</td><td>Điểm 3, 4, 7; đo đặc tính bị ảnh hưởng; cập nhật nhật ký tuổi dao</td><td>FRM-511 / nhật ký tool change</td></tr>
 <tr><td>Sau offset edit / re-zero / probe hiệu chuẩn</td><td>Điểm 4, 5, 7; chạy single block ở đoạn rủi ro</td><td>Ghi rõ offset changed by / time / reason</td></tr>
 <tr><td>Sau alarm hoặc power loss</td><td>Điểm 1, 3, 4, 6, 7; khoanh vùng WIP từ last-known-good</td><td>Hồ sơ thời điểm dừng và trạng thái WIP</td></tr>
 <tr><td>Sau thay lot vật liệu</td><td>Điểm 2, 5, 7; xác nhận lot mới và part đầu của lot mới</td><td>Traveler / lot trace</td></tr>

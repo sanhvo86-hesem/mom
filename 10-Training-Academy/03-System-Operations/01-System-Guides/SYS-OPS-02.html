@@ -84,7 +84,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h1 style="margin-top:10px">Kiến trúc dữ liệu Hồ sơ công việc &amp; Part/REV Master (SharePoint + Purview)</h1>
 <p class="lead"><b>Từ “giấy tờ rời rạc” → “bằng chứng truy xuất 60 giây”.</b> Mô-đun này chuẩn hoá cách <b>tạo, lưu, liên kết, gắn metadata, gắn nhãn lưu trữ</b> để đảm bảo mọi phòng ban làm đúng một chuẩn và không bao giờ “lạc REV”.</p>
 <div class="callout">
-<b>Quy tắc ranh giới (bắt buộc):</b> Dữ liệu <b>MES time entry</b> nằm trong Epicor (Nguồn chuẩn) → M365 chỉ phản chiếu để dashboard/điều tra; <b>không lưu bản copy time entry</b> trong SharePoint trừ khi là hồ sơ sự cố có phê duyệt.
+<b>Quy tắc ranh giới (bắt buộc):</b> Dữ liệu <b>MES time entry</b> nằm trong Epicor (Nguồn chuẩn) → M365 chỉ phản chiếu để bảng điều khiển/điều tra; <b>không lưu bản copy time entry</b> trong SharePoint trừ khi là hồ sơ sự cố có phê duyệt.
  </div>
 </div>
 <div class="note">
@@ -142,7 +142,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><span class="kpi">KPI-01</span>: Truy xuất bộ hồ sơ job (FAI/Final/bộ hồ sơ giao hàng (ship packet)) trong ≤ <b>60 giây</b>.</li>
 <li><span class="kpi">KPI-02</span>: 0 trường hợp “sai REV phát hành/ gia công/ đo kiểm”.</li>
 <li><span class="kpi">KPI-03</span>: 100% Tier-1 hồ sơ có <b>metadata bắt buộc</b> + nhãn <b>LAM-T1-10Y-HỒ SƠ</b> (hoặc label override theo hợp đồng).</li>
-<li><span class="kpi">KPI-04</span>: 0 phê duyệt giao hàng khi thiếu MRR (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate).</li>
+<li><span class="kpi">KPI-04</span>: 0 phê duyệt giao hàng khi thiếu MRR (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate).</li>
 </ul>
 </div>
 </div>
@@ -215,7 +215,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Chặn “gia công khi chưa release”</td>
 </tr>
 <tr>
-<td>Inspection / Metrology</td>
+<td>Kiểm tra / Metrology</td>
 <td>QC → QA</td>
 <td>FAI/IR/CMM (Tier-1)</td>
 <td>Hồ sơ công việc / <b>04_Inspection-FAI</b></td>
@@ -285,7 +285,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td>Folder job đặt sai <b>RevisionNum</b></td><td>JobNum đúng nhưng Rev sai trong tên/metadata</td><td>Gia công/đo theo Rev sai → scrap, rework, stop-ship</td><td>Bảng kiểm bước 2–3, G1</td></tr>
 <tr><td>2</td><td>Copy CAM/DWG vào Hồ sơ công việc thay vì link</td><td>03_Programs-Setup chứa file master “giống” DATA</td><td>2 nguồn dữ liệu → lệch phiên bản, đánh giá không đạt</td><td>Rule “Job chỉ lưu Release Hồ sơ”</td></tr>
 <tr><td>3</td><td>Không cập nhật <b>00_Archive</b> khi đổi REV</td><td>Rev mới &amp; cũ lẫn trong cùng folder</td><td>Nguy cơ “lấy nhầm file”, không truy vết supersede</td><td>Change Mgmt + Doc Control</td></tr>
-<tr><td>4</td><td>Thiếu metadata bắt buộc Tier-1</td><td>File FAI/IR/CMM không có JobNum/RecordID…</td><td>Không search được, auto-label fail → đánh giá finding</td><td>G2/G4 validation</td></tr>
+<tr><td>4</td><td>Thiếu metadata bắt buộc Tier-1</td><td>File FAI/IR/CMM không có JobNum/RecordID…</td><td>Không search được, auto-label fail → đánh giá finding</td><td>G2/G4 xác nhận</td></tr>
 <tr><td>5</td><td>Không gắn nhãn Purview / không declare hồ sơ</td><td>Tier-1 nằm đúng folder nhưng label không áp</td><td>Rủi ro xoá/sửa ngoài kiểm soát</td><td>Purview auto-apply + QA check</td></tr>
 <tr><td>6</td><td>RecordType/DocType dùng “tự chế”</td><td>RecordType không nằm trong danh mục chuẩn</td><td>Báo cáo Pareto sai, retention sai</td><td>Choice codes + training</td></tr>
 <tr><td>7</td><td>bộ hồ sơ giao hàng “đủ giấy” nhưng thiếu <b>approval history</b></td><td>Không chứng minh ai release</td><td>đánh giá không đạt, rủi ro tranh chấp khách hàng</td><td>G5 Phê duyệt giao hàng</td></tr>
@@ -344,8 +344,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Xoá/sửa ngoài kiểm soát</td>
 </tr>
 <tr>
-<td><b>CP6</b> – MRR validation theo cổng kiểm soát</td>
-<td>Cổng chỉ release khi MRR đủ; thiếu → HOLD + ghi log (ShipRelease/QCHold/NCR)</td>
+<td><b>CP6</b> – MRR xác nhận theo cổng kiểm soát</td>
+<td>Cổng chỉ release khi MRR đủ; thiếu → HOLD + ghi nhật ký (ShipRelease/QCHold/NCR)</td>
 <td>QA + Supervisor + WHS</td>
 <td>Bảng kiểm MRR + approval history</td>
 <td>Ship thiếu bằng chứng</td>
@@ -381,7 +381,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>FF1 — Wrong REV</b></td>
 <td>RevisionNum trên job/traveler ≠ REV của file master (DATA) hoặc ≠ Epicor PartRev</td>
-<td>DỪNG gia công/đo kiểm; HOLD WIP; tạo Hold log; chỉ tiếp tục khi có release đúng</td>
+<td>DỪNG gia công/đo kiểm; HOLD WIP; tạo Hold nhật ký; chỉ tiếp tục khi có release đúng</td>
 <td>Operator/Setup/QC</td>
 <td>QCHoldLog + ảnh + link file sai/đúng</td>
 </tr>
@@ -390,14 +390,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Thiếu FAI/Final IR/CMM/ShipPacket theo MRR trước cổng kiểm soát</td>
 <td>Không release cổng kiểm soát; WHS không ship; mở NCR khi đã trễ/đã lỡ làm sai</td>
 <td>QA/WHS/Supervisor</td>
-<td>ShipRelease log + approval history</td>
+<td>ShipRelease nhật ký + approval history</td>
 </tr>
 <tr>
 <td><b>FF3 — Metadata/Label fail</b></td>
 <td>Tier-1 file thiếu metadata bắt buộc hoặc không có label Tier-1</td>
 <td>Không accept hồ sơ; yêu cầu sửa metadata/đúng content type; khi đã declare hồ sơ sai cách → Doc Control xử lý</td>
 <td>QA + Hồ sơ Manager</td>
-<td>Bảng kiểm validation + ticket IT (khi lỗi auto-apply)</td>
+<td>Bảng kiểm xác nhận + ticket IT (khi lỗi auto-apply)</td>
 </tr>
 <tr>
 <td><b>FF4 — Outsource traceability fail</b></td>
@@ -421,7 +421,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Scan QR mở Hồ sơ công việc → xem <b>RevisionNum</b> của job.</li>
 <li>Mở Release Hồ sơ ở <b>03_Programs-Setup</b> → click link tới DATA.</li>
 <li>Đối chiếu REV folder + tên file master (<span class="path">REV-X</span>).</li>
-<li>Khi mismatch → kích hoạt <b>FF1</b> (HOLD + log).</li>
+<li>Khi mismatch → kích hoạt <b>FF1</b> (HOLD + nhật ký).</li>
 </ol>
 </div>
 <div class="note">
@@ -615,13 +615,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Folder nào trong Hồ sơ công việc chứa FAI/IR/CMM?</li>
 <li>Folder nào trong Hồ sơ công việc chứa bộ hồ sơ giao hàng?</li>
 <li>Dừng sớm (fail-fast) FF1 kích hoạt khi nào? Hành động bắt buộc là gì?</li>
-<li>“không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate)” áp dụng mạnh nhất ở cổng kiểm soát nào?</li>
+<li>“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” áp dụng mạnh nhất ở cổng kiểm soát nào?</li>
 <li>Outsource bằng chứng tối thiểu cần những loại gì?</li>
 <li>00_Archive trong DATA dùng khi nào? Có được dùng để sản xuất không?</li>
 <li>Vì sao metadata giúp retention/search tốt hơn chỉ naming?</li>
 <li>Trong Tier-1, khi file đã declare hồ sơ mà phát hiện lỗi, phải xử lý như thế nào?</li>
 <li>Ai chịu trách nhiệm kiểm tra label Tier-1 trước phê duyệt giao hàng?</li>
-<li>Ví dụ RecordType chuẩn cho inspection report là gì?</li>
+<li>Ví dụ RecordType chuẩn cho kiểm tra report là gì?</li>
 <li>Ví dụ DocType chuẩn cho bản vẽ là gì?</li>
 <li>Tại sao không lưu bản copy MES time entry trong SharePoint?</li>
 <li>Hệ quả đánh giá khi thiếu approval history ở phê duyệt giao hàng là gì?</li>
@@ -641,14 +641,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Nghi sai REV trước khi chạy máy</b></td>
 <td>Traveler ghi Rev D, Release Hồ sơ link tới DATA/REV E</td>
 <td>HOLD (FF1) + chỉ tiếp tục khi thống nhất Rev theo JobIndex/Epicor</td>
-<td>Hold log + ảnh traveler + link Release Hồ sơ</td>
+<td>Hold nhật ký + ảnh traveler + link Release Hồ sơ</td>
 </tr>
 <tr>
 <td>2</td>
 <td><b>Chuẩn bị phê duyệt giao hàng nhưng thiếu CoC</b></td>
 <td>07_Shipping-Packing có ship bảng kiểm &amp; photos, thiếu CoC/Cert</td>
 <td>Không release G5; yêu cầu bổ sung; khi trễ cam kết → mở NCR (tuỳ mức)</td>
-<td>ShipRelease log (PacketIncomplete) + action người phụ trách</td>
+<td>ShipRelease nhật ký (PacketIncomplete) + action người phụ trách</td>
 </tr>
 <tr>
 <td>3</td>
@@ -684,7 +684,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Bài kiểm tra nhanh</td>
 <td>≥ 80% (vai trò QA/WHS/Programmer/Planner) • ≥ 70% (vai trò còn lại)</td>
-<td>Dưới ngưỡng hoặc trả lời sai các câu “hard rule” (Không có bằng chứng thì không qua cổng kiểm soát (No evidence = No gate) , Wrong REV, Tier-1 label / không có bằng chứng thì không qua cổng kiểm soát)</td>
+<td>Dưới ngưỡng hoặc trả lời sai các câu “hard rule” (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) , Wrong REV, Tier-1 label / không có bằng chứng thì không qua cổng kiểm soát)</td>
 </tr>
 <tr>
 <td>Scenario</td>
@@ -698,7 +698,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Kỷ luật cổng kiểm soát</td>
-<td>Thực hiện đúng tuyến escalate; ghi nhận đúng log/bằng chứng</td>
+<td>Thực hiện đúng tuyến escalate; ghi nhận đúng nhật ký/bằng chứng</td>
 <td>Bỏ qua cổng kiểm soát hoặc “sửa hồ sơ cho đủ” sau khi đã release</td>
 </tr>
 </tbody>
@@ -758,7 +758,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>G4 Final / Pack</b></td>
-<td>Final IR (Pass) + CMM report (khi có) + packaging bảng kiểm (Pass)</td>
+<td>Final IR (Pass) + CMM report (khi có) + Packaging Checklist (Pass)</td>
 <td><b>T1</b></td>
 <td>04_Inspection-FAI + 07_Shipping-Packing</td>
 <td>QA + WHS</td>
@@ -784,7 +784,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>CMM Report</b></td><td>T1</td><td>LAM-T1-10Y-HỒ SƠ</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID; Result</td><td>04_Inspection-FAI</td></tr>
 <tr><td><b>Bộ hồ sơ giao hàng</b></td><td>T1</td><td>LAM-T1-10Y-HỒ SƠ</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID</td><td>07_Shipping-Packing</td></tr>
 <tr><td><b>CoC / Certificate</b></td><td>T1</td><td>LAM-T1-10Y-HỒ SƠ</td><td>Yes</td><td>JobNum; Customer; RecordType; RecordID</td><td>07_Shipping-Packing</td></tr>
-<tr><td><b>NCR / CAPA Closure</b></td><td>T1</td><td>LAM-T1-10Y-HỒ SƠ</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID; Status</td><td>05_NCR-Hold-CAPA</td></tr>
+<tr><td><b>NCR / CAPA Closure</b></td><td>T1</td><td>LAM-T1-10Y-HỒ SƠ</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID; Trạng thái</td><td>05_NCR-Hold-CAPA</td></tr>
 <tr><td><b>Receiving IQC</b></td><td>T2</td><td>HESEM-T2-5Y</td><td>No</td><td>RecordType; RecordID; Supplier; LotNumber; Result</td><td>06_Outsource</td></tr>
 <tr><td><b>Outsource Bằng chứng</b></td><td>T2</td><td>HESEM-T2-5Y</td><td>No</td><td>JobNum; Supplier; RecordType; RecordID</td><td>06_Outsource</td></tr>
 <tr><td><b>Operational Photo</b></td><td>T3</td><td>HESEM-T3-3Y</td><td>No</td><td>JobNum; RecordType; Cổng</td><td>08_Photos</td></tr>

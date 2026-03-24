@@ -84,7 +84,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Qty / UOM</td><td>Có</td><td>Epicor + packing count thực tế</td><td>Tổng qty trên mọi PackID phải khớp shipment lines.</td></tr>
 <tr><td>Child-Parent mapping</td><td>Có khi pallet/carton nhiều tầng</td><td>WHS scan logic</td><td>Phải nhìn được quan hệ pallet ↔ carton ↔ inner pack.</td></tr>
 <tr><td>LabelPrintVersion</td><td>Có</td><td>Label service</td><td>Giúp truy vết layout/template đang dùng.</td></tr>
-<tr><td>ReprintCount / VoidFlag</td><td>Có</td><td>Reprint/Void log</td><td>Mỗi reprint/void phải có reason code và người phê duyệt.</td></tr>
+<tr><td>ReprintCount / VoidFlag</td><td>Có</td><td>Reprint/Void nhật ký</td><td>Mỗi reprint/void phải có reason code và người phê duyệt.</td></tr>
 <tr><td>PacketComplete</td><td>Có</td><td>SSOT bộ hồ sơ giao hàng (ship packet)</td><td>Chỉ đạt khi đủ hồ sơ bắt buộc theo QPL và yêu cầu khách hàng.</td></tr>
 <tr><td>ReconciliationStatus</td><td>Có</td><td>Validator logic</td><td>PASS / FAIL / BLOCKED. BLOCKED chặn xác nhận giao hàng.</td></tr>
 </tbody></table></div></div>
@@ -94,7 +94,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Cấp mã.</strong><br/>PackID được tạo trong giao dịch đã phê duyệt. SSCC chỉ được cấp cho logistic unit thực sự tồn tại. Không cấp mã “dự trữ” để dán sau.</div>
 <div class="step-item"><strong>In và quét xác nhận.</strong><br/>Sau in, phải quét xác nhận đúng parser, đúng PackID và đúng shipment context. Nhãn không đọc được hoặc đọc sai AI phải hủy ngay.</div>
 <div class="step-item"><strong>Split / merge.</strong><br/>Split tạo PackID/SSCC con mới, giữ liên hệ cha-con và điều chỉnh Qty. Merge phải giữ một parent unit rõ ràng; không mất dấu container thành phần.</div>
-<div class="step-item"><strong>Reprint / void.</strong><br/>Reprint chỉ cho phép khi nhãn hỏng, mất hoặc đổi vật lý container hợp lệ. Void dùng khi container bị hủy, gộp lại, dán sai, hoặc shipment đổi cấu trúc. Mọi hành động phải lưu log.</div>
+<div class="step-item"><strong>Reprint / void.</strong><br/>Reprint chỉ cho phép khi nhãn hỏng, mất hoặc đổi vật lý container hợp lệ. Void dùng khi container bị hủy, gộp lại, dán sai, hoặc shipment đổi cấu trúc. Mọi hành động phải lưu nhật ký.</div>
 <div class="step-item"><strong>Xác nhận giao hàng.</strong><br/>Chỉ cho phép khi PacketComplete = PASS, ReconciliationStatus = PASS, không có hold mở và bộ hồ sơ giao hàng đủ.</div>
 </div></div>
 
@@ -104,7 +104,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Revision reconciliation</td><td>Part/Rev trên nhãn khớp release set và bộ hồ sơ giao hàng</td><td>Sai rev hoặc lẫn nhiều rev trong một logistic unit không được phép</td></tr>
 <tr><td>Child-parent relationship</td><td>Cấu trúc carton/pallet rõ ràng và quét ra đúng</td><td>Parent không mở được child hoặc child mất quan hệ</td></tr>
 <tr><td>Bằng chứng reconciliation</td><td>CoC/cert/packing bảng kiểm/ảnh kiện đầy đủ khi áp dụng</td><td>Thiếu hồ sơ bắt buộc hoặc link hỏng</td></tr>
-<tr><td>Status reconciliation</td><td>Không còn hold, không còn suspect chưa xử lý</td><td>Có hold mở hoặc issue chưa disposition</td></tr>
+<tr><td>Trạng thái reconciliation</td><td>Không còn hold, không còn suspect chưa xử lý</td><td>Có hold mở hoặc vấn đề chưa disposition</td></tr>
 </tbody></table></div>
 <p>Chi tiết đóng gói vật lý và label layout xem <a href="../07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>. Hướng dẫn thao tác tại điểm dùng sẽ theo WI phê duyệt giao hàng (ship release) tương ứng.</p></div>
 

@@ -74,21 +74,21 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
       <h1>WI-603 — Thực hiện lấy mẫu AQL, chọn mẫu và quyết định accept/reject lô</h1>
       
 <div class="section"><h2>1. Mục đích, phạm vi và logic lô kiểm</h2>
-<p>WI này hướng dẫn lấy mẫu AQL và quyết định accept/reject lô theo inspection by attributes. AQL dùng để ra quyết định với <strong>lô</strong>, không dùng thay cho kiểm soát quá trình và không được dùng để hợp thức hóa lô có defect critical. Kế hoạch lấy mẫu chỉ được chọn từ bảng tra đã được HESEM kiểm soát; không chụp, chép hoặc tự dựng bảng rời ngoài hệ thống.</p>
+<p>WI này hướng dẫn lấy mẫu AQL và quyết định accept/reject lô theo kiểm tra by attributes. AQL dùng để ra quyết định với <strong>lô</strong>, không dùng thay cho kiểm soát quá trình và không được dùng để hợp thức hóa lô có defect critical. Kế hoạch lấy mẫu chỉ được chọn từ bảng tra đã được HESEM kiểm soát; không chụp, chép hoặc tự dựng bảng rời ngoài hệ thống.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Giữ nguyên sampling plan đã phát hành, lấy mẫu ngẫu nhiên đại diện và tách biệt từng lot theo part, revision, heat và quy trình state.</div></div>
 
 <div class="section"><h2>2. Điều kiện trước khi lấy mẫu</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điều kiện</th><th>Phải có</th><th>tạm giữ khi</th></tr></thead><tbody>
 <tr><td>Định nghĩa lot</td><td>Cùng part/rev, cùng condition, cùng nguồn/ca/quy trình state, cùng phạm vi submit cho quyết định.</td><td>Lot trộn part/rev, trộn rework/suspect với sản phẩm thường.</td></tr>
 <tr><td>Defect classification</td><td>Áp dụng từ <a href="wi-601-visual-inspection-and-defect-classification.html">WI-601</a>, QPL và customer requirement.</td><td>Chưa chốt critical/major/minor hoặc còn tranh cãi tiêu chí.</td></tr>
-<tr><td>Kế hoạch AQL</td><td>Mức kiểm, inspection level, switching status và Ac/Re từ <a href="../../03-Reference/06-ANNEX-600/annex-601-aql-method-reference.html">ANNEX-601</a>.</td><td>Không xác định được plan hiệu lực.</td></tr>
+<tr><td>Kế hoạch AQL</td><td>Mức kiểm, kiểm tra level, switching trạng thái và Ac/Re từ <a href="../../03-Reference/06-ANNEX-600/annex-601-aql-method-reference.html">ANNEX-601</a>.</td><td>Không xác định được plan hiệu lực.</td></tr>
 <tr><td>Measurement system</td><td>Gage hợp lệ và đã quick xác minh theo <a href="wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a>.</td><td>Gage nghi ngờ/hết hạn/chưa xác minh.</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>3. Trình tự thực hiện AQL</h2>
 <div class="step-list">
-<div class="step-item"><strong>Chốt lot và đơn vị kiểm.</strong><br/>Ghi rõ lot size, inspection unit, QPL/customer level, trạng thái normal/tightened/reduced và nguồn plan sử dụng.</div>
-<div class="step-item"><strong>Tra cỡ mẫu và Ac/Re.</strong><br/>Tra theo lot size và inspection level trong bảng đã phê duyệt. Nếu lot nhỏ hoặc customer chỉ định 100% thì không dùng AQL để giảm mẫu.</div>
+<div class="step-item"><strong>Chốt lot và đơn vị kiểm.</strong><br/>Ghi rõ lot size, kiểm tra unit, QPL/customer level, trạng thái normal/tightened/reduced và nguồn plan sử dụng.</div>
+<div class="step-item"><strong>Tra cỡ mẫu và Ac/Re.</strong><br/>Tra theo lot size và kiểm tra level trong bảng đã phê duyệt. Nếu lot nhỏ hoặc customer chỉ định 100% thì không dùng AQL để giảm mẫu.</div>
 <div class="step-item"><strong>Lấy mẫu ngẫu nhiên.</strong><br/>Mẫu phải rải đều qua toàn lô hoặc toàn kiện; không lấy liên tiếp trong một khay duy nhất nếu lot phân bố nhiều vị trí/thời điểm. Với lot có nhiều pallet/box/khay, phải có quy tắc random hóa từng tầng chứa.</div>
 <div class="step-item"><strong>Kiểm và ghi defect.</strong><br/>Kiểm theo plan, phân loại defect từng chiếc, từng loại. Không được cộng dồn mơ hồ. Defect critical tách riêng khỏi major/minor.</div>
 <div class="step-item"><strong>Quyết định accept/reject.</strong><br/>So defect count với Ac/Re; reject lô khi vượt Re hoặc khi xuất hiện bất kỳ critical defect thuộc rule zero acceptance. Nếu plan nhiều bước yêu cầu sample tiếp theo, phải tuân đúng logic.</div>
@@ -98,7 +98,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>4. Switching rules, reinspection và lỗi thường gặp</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Quy định HESEM</th></tr></thead><tbody>
 <tr><td>Normal → Tightened</td><td>Chuyển khi có reject liên tiếp, khiếu nại, defect trend xấu hoặc QPL/customer yêu cầu tăng cường.</td></tr>
-<tr><td>Tightened → Reduced</td><td>Chỉ giảm khi có lịch sử ổn định đủ dài và không có open issue; không áp dụng cho Job mới, Job high-risk, clean/vacuum hoặc sau containment gần đây.</td></tr>
+<tr><td>Tightened → Reduced</td><td>Chỉ giảm khi có lịch sử ổn định đủ dài và không có open vấn đề; không áp dụng cho Job mới, Job high-risk, clean/vacuum hoặc sau containment gần đây.</td></tr>
 <tr><td>Reinspection sau rework/sort</td><td>QA phải xác định lại lot boundary và plan mới; không mặc định dùng lại y nguyên sample cũ.</td></tr>
 <tr><td>Mixed defect types</td><td>Critical/major/minor phải đếm riêng theo plan áp dụng; không bù trừ giữa các mức.</td></tr>
 <tr><td>Sampling bias</td><td>Nếu phát hiện bias mẫu, kết quả kiểm vô hiệu; phải HOLD và lấy mẫu lại.</td></tr>
@@ -107,7 +107,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>5. Hồ sơ, KPI và liên kết</h2>
 <div class="two-col">
-<div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Lot definition, lot size, source plan, switching status.</li><li>Sample size, cách random hóa, defect count theo class.</li><li>Ac/Re decision, người kiểm, thời điểm, lệnh hold/release nếu có.</li><li>Liên kết NCR/100% sort/reinspection khi reject.</li></ul></div>
+<div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Lot definition, lot size, source plan, switching trạng thái.</li><li>Sample size, cách random hóa, defect count theo class.</li><li>Ac/Re decision, người kiểm, thời điểm, lệnh hold/release nếu có.</li><li>Liên kết NCR/100% sort/reinspection khi reject.</li></ul></div>
 <div class="card"><h3>HOLD bắt buộc</h3><ul class="tight" style="padding-left:18px;"><li>Không xác định được lot boundary hoặc mixed lot.</li><li>Không xác định được plan hiệu lực.</li><li>Measurement system nghi ngờ hoặc defect class còn tranh cãi.</li><li>Phát hiện critical defect hoặc dấu hiệu sample bias.</li></ul></div>
 </div>
 <div class="kpi-grid">

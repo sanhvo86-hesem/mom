@@ -75,11 +75,11 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>1. Mục đích và nguyên tắc điều hành</h2>
 <p>ANNEX này khóa bộ rule dùng chung cho <b>điều độ</b>, <b>rà soát năng lực</b>, <b>giới hạn WIP</b>, <b>freeze window</b>, <b>resequence</b>, <b>hot-job</b> và <b>tuổi tồn (aging)</b> ở toàn bộ xưởng CNC lệnh sản xuất của HESEM. Planner, Dispatcher, Supervisor và Ops Manager phải dùng cùng một rule set để ra quyết định; không để mỗi ca hoặc mỗi cell dùng một cách hiểu khác nhau.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span><br/>Giữ lịch bằng cơ chế dispatch chính thức, tôn trọng trạng thái HOLD, giới hạn số hot-job đồng thời và kiểm soát WIP trước bottleneck trong ngưỡng đã phát hành.</div>
-<div class="callout-info"><strong>Nguồn chuẩn</strong><br/>Epicor là SoR cho trạng thái Job/Op, queue, labor/move/đầy đủ, reservation, ship. M365 chỉ là SSOT cho snapshot, nhật ký hành động (nhật ký hành động), meeting minutes, decision hồ sơ và bằng chứng đi kèm.</div>
+<div class="callout-info"><strong>Nguồn chuẩn</strong><br/>Epicor là SoR cho trạng thái Job/Op, queue, labor/move/đầy đủ, reservation, ship. M365 chỉ là SSOT cho snapshot, nhật ký hành động, meeting minutes, decision hồ sơ và bằng chứng đi kèm.</div>
 </div>
 
 <div class="section"><h2>2. Hot-job ladder và rule ưu tiên</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Class</th><th>Khi được gán</th><th>Ai có quyền gán</th><th>Rule bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Class</th><th>Khi được gán</th><th>Ai có quyền gán</th><th>Quy tắc bắt buộc</th></tr></thead><tbody>
 <tr><td>P0</td><td>Đã trễ cam kết hoặc sẽ vỡ giao hàng trong ≤ 24 giờ; hoặc customer / plant event buộc phải cứu ngay</td><td>Ops Manager hoặc cao hơn theo ma trận thẩm quyền</td><td>Được phép phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch); phải chỉ rõ job bị lùi, tác động OTD, người phụ trách và thời điểm recovery.</td></tr>
 <tr><td>P1</td><td>Sẽ đến hạn trong 24–48 giờ; CTQ/final release đang chờ; part cho line-stop nội bộ hoặc job rủi ro cao</td><td>Planner Lead / Ops Manager</td><td>Được đẩy lên đầu ca hoặc giữa ca nhưng phải ghi lý do và cập nhật dispatch board.</td></tr>
 <tr><td>P2</td><td>Job chuẩn theo kế hoạch</td><td>Planner/Dispatcher theo lịch đã duyệt</td><td>Phải tuân thủ cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch). Không được hạ xuống P3 vì tiện đổi máy.</td></tr>
@@ -112,7 +112,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>5-axis / mill-turn / leak / clean bottleneck</td><td>Queued standard hours ≤ 1.0 ngày năng lực hữu dụng; setup staged ≤ 1 job kế tiếp / machine</td><td>Bảo vệ bottleneck, giảm đổi lịch và tránh tắc mẫu đầu</td><td>Escalate L1 ngay; review split lot, chuyển tải, outsource, hoặc dời job chưa đủ mức sẵn sàng.</td></tr>
 <tr><td>3-axis / CNC turning / finishing cell</td><td>Queued standard hours ≤ 1.5 ngày năng lực hữu dụng; staged jobs ≤ 2 job / nhóm máy (machine family)</td><td>Giữ dòng chảy nhưng vẫn đủ việc cho ca tiếp theo</td><td>Review tuổi tồn WIP (tuổi tồn / tuổi tồn), dừng phát hành thêm nếu chưa có plan clear.</td></tr>
 <tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship release) / clean pack</td><td>Ship-ready / final-inspect-ready ≤ 1 ngày đầu ra chuẩn</td><td>Không để QA/WHS thành bãi chờ cuối chuỗi</td><td>Review nguyên nhân gốc ở upstream; không đẩy thêm job nếu đầu ra cuối không hút kịp.</td></tr>
-<tr><td>Outsource queue</td><td>Chỉ phát lot khi processor slot, route, cert expectation và return date đã xác nhận</td><td>Ngăn chất hàng chờ ngoài mà không biết ngày về</td><td>Planner + PUR quyết định theo PO/ETA/processor status; thiếu slot thì HOLD.</td></tr>
+<tr><td>Outsource queue</td><td>Chỉ phát lot khi processor slot, route, cert expectation và return date đã xác nhận</td><td>Ngăn chất hàng chờ ngoài mà không biết ngày về</td><td>Planner + PUR quyết định theo PO/ETA/processor trạng thái; thiếu slot thì HOLD.</td></tr>
 </tbody></table></div>
 <p>Cap là <b>giới hạn phát hành</b>, không phải KPI để nhồi đầy. Khi vượt cap, ưu tiên đầu tiên là <b>ngừng mở thêm việc</b> và <b>dọn hàng đang kẹt</b>, không phải tạo thêm bảng theo dõi.</p>
 </div>
@@ -143,7 +143,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>8. Dispatch board và review bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường dữ liệu tối thiểu</th><th>Phải có</th></tr></thead><tbody>
 <tr><td>Thông tin định danh</td><td>JobNum, Part, Rev, OpSeq, Workcenter/Machine family, Qty open, Ngày đến hạn, Priority class</td></tr>
-<tr><td>Mức sẵn sàng</td><td>Khởi động/Planning release status, hold code, material ready, setup ready, QA ready, outsource status</td></tr>
+<tr><td>Mức sẵn sàng</td><td>Khởi động/Planning release trạng thái, hold code, material ready, setup ready, QA ready, outsource trạng thái</td></tr>
 <tr><td>Điều độ</td><td>Dispatch sequence, planned start, planned finish, người phụ trách cell, next cổng kiểm soát</td></tr>
 <tr><td>Rủi ro</td><td>Tuổi tồn bucket, bottleneck flag, special handling flag, customer overlay flag, hot-job note</td></tr>
 <tr><td>Hành động</td><td>Next action, người phụ trách, due time, escalation level, bằng chứng link khi đóng</td></tr>
@@ -172,9 +172,9 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Người phụ trách</th></tr></thead><tbody>
 <tr><td>Dispatch list theo ca/ngày</td><td>Khóa thứ tự chạy và cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) cho từng workcenter</td><td>Planner / Dispatcher</td></tr>
 <tr><td>WIP tuổi tồn snapshot</td><td>Nhìn rõ job đỏ/đen, người phụ trách và action</td><td>Planner</td></tr>
-<tr><td>Escalation / hot-job log</td><td>Chứng minh ai duyệt, job nào bị ảnh hưởng và plan recovery</td><td>Ops Manager</td></tr>
+<tr><td>Escalation / hot-job nhật ký</td><td>Chứng minh ai duyệt, job nào bị ảnh hưởng và plan recovery</td><td>Ops Manager</td></tr>
 <tr><td>Capacity review minutes</td><td>Ghi quyết định về OT, outsource, rebalance, re-plan</td><td>Ops Manager + Trưởng nhóm Kế hoạch</td></tr>
-<tr><td>Shortage / constraint log</td><td>Theo dõi material, tool, machine, QA cổng kiểm soát và ETA khôi phục</td><td>Planner + Supervisor</td></tr>
+<tr><td>Shortage / constraint nhật ký</td><td>Theo dõi material, tool, machine, QA cổng kiểm soát và ETA khôi phục</td><td>Planner + Supervisor</td></tr>
 </tbody></table></div>
 </div>
 
@@ -183,7 +183,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Hướng dẫn thao tác điều độ hằng ca.</td></tr>
 <tr><td><a href="annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>MRR, cổng kiểm soát và đồng bộ bàn giao.</td></tr>
 <tr><td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation chain và SLA xử lý.</td></tr>
-<tr><td><a href="annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Cadence họp tầng và nhật ký hành động (nhật ký hành động).</td></tr>
+<tr><td><a href="annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Cadence họp tầng và nhật ký hành động.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Khung thủ tục planning/scheduling/dispatch.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a></td><td>Dispatch list hằng ca/ngày.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a></td><td>Snapshot tuổi tồn WIP (tuổi tồn / tuổi tồn) và hành động.</td></tr>

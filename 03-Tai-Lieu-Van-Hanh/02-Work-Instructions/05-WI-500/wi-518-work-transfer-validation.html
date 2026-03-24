@@ -73,7 +73,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
       
 <div class="section"><h2>1. Mục đích và phạm vi</h2>
 <p>Bất kỳ bàn giao nào làm thay đổi người chịu trách nhiệm trực tiếp với Job đều phải được xác nhận. Bàn giao không chỉ là chuyển WIP; đó là chuyển đầy đủ thông tin để người nhận có thể tiếp tục đúng revision, đúng điều kiện máy và đúng điểm kiểm soát mà không phải đoán.</p>
-<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Bàn giao bằng hồ sơ và xác nhận trực tiếp. Chốt Qty good, suspect và scrap trước khi chuyển container. Người nhận phải được bàn giao đầy đủ offset, tool state và open issue.</div></div>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Bàn giao bằng hồ sơ và xác nhận trực tiếp. Chốt Qty good, suspect và scrap trước khi chuyển container. Người nhận phải được bàn giao đầy đủ offset, tool state và open vấn đề.</div></div>
 
 <div class="section"><h2>2. Các loại chuyển giao công việc phải xác nhận</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại transfer</th><th>Khi xảy ra</th><th>Điều kiện vào</th><th>Người nhận xác nhận</th></tr></thead><tbody>
@@ -90,17 +90,17 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Nhận dạng Job</td><td>JobNum, PartNo, Rev, OpSeq, route code, QPL</td></tr>
 <tr><td>Số lượng</td><td>Qty good, qty suspect, qty scrap, qty còn lại, số container</td></tr>
 <tr><td>Điều kiện kỹ thuật</td><td>Program ID/Rev, setup sheet rev, tool/fixture đang dùng, offset lock/current state</td></tr>
-<tr><td>Điểm kiểm soát</td><td>Mẫu đầu (first piece)/FAI status, CTQ đang theo dõi, IPQC tần suất, open hold/open issue</td></tr>
-<tr><td>Hồ sơ đi kèm</td><td>Traveler, label, bộ bằng chứng (evidence pack) bắt buộc, cert/coc khi áp dụng</td></tr>
+<tr><td>Điểm kiểm soát</td><td>Mẫu đầu (first piece)/FAI trạng thái, CTQ đang theo dõi, IPQC tần suất, open hold/open vấn đề</td></tr>
+<tr><td>Hồ sơ đi kèm</td><td>Traveler, label, bộ bằng chứng bắt buộc, cert/coc khi áp dụng</td></tr>
 <tr><td>Rủi ro / do-not-do</td><td>Điểm nhạy cảm, lỗi vừa xảy ra, cảnh báo clamp/tool/path, last known good</td></tr>
 </tbody></table></div>
 <div class="callout-warn"><strong>Không đủ gói thông tin</strong> thì người nhận phải từ chối nhận việc và đặt HOLD cho đến khi người bàn giao bổ sung đủ.</div></div>
 
 <div class="section"><h2>4. Trình tự xác nhận transfer</h2>
 <div class="step-list">
-<div class="step-item"><strong>Người bàn giao chốt hiện trạng.</strong><br/>Dừng công đoạn ở điểm an toàn; cập nhật giao dịch và nhãn; chốt good/suspect/scrap; ghi open issue và last known good. Không bàn giao lúc tình trạng còn mơ hồ.</div>
+<div class="step-item"><strong>Người bàn giao chốt hiện trạng.</strong><br/>Dừng công đoạn ở điểm an toàn; cập nhật giao dịch và nhãn; chốt good/suspect/scrap; ghi open vấn đề và last known good. Không bàn giao lúc tình trạng còn mơ hồ.</div>
 <div class="step-item"><strong>Người nhận đối chiếu vật lý và hồ sơ.</strong><br/>Đối chiếu JobNum, PartNo, Rev, Qty, container, nhãn, traveler, và hồ sơ/bằng chứng liên quan. Nếu là machine transfer, phải đối chiếu thêm release set của máy nhận.</div>
-<div class="step-item"><strong>Kiểm điều kiện tiếp tục chạy.</strong><br/>Xem mẫu đầu/FAI status, IPQC status, tuổi dao (tool life), offset state, open hold/open NCR. Nếu có thay đổi machine/fixture/tool ảnh hưởng part thì phải quay về setup/mẫu đầu tương ứng.</div>
+<div class="step-item"><strong>Kiểm điều kiện tiếp tục chạy.</strong><br/>Xem mẫu đầu/FAI trạng thái, IPQC trạng thái, tuổi dao (tool life), offset state, open hold/open NCR. Nếu có thay đổi machine/fixture/tool ảnh hưởng part thì phải quay về setup/mẫu đầu tương ứng.</div>
 <div class="step-item"><strong>Ký nhận hoặc từ chối nhận.</strong><br/>Chỉ ký nhận khi đủ thông tin, đủ hồ sơ và điều kiện vật lý phù hợp. Nếu từ chối, ghi rõ lý do và escalates ngay trong ca.</div>
 </div></div>
 
@@ -114,7 +114,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>6. Hồ sơ, KPI và tài liệu liên kết</h2>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>KPI-WI518-01</strong><br/>Tỷ lệ transfer có handover log / scan / qty reconciliation đầy đủ.</div>
+<div class="kpi-box"><strong>KPI-WI518-01</strong><br/>Tỷ lệ transfer có handover nhật ký / scan / qty reconciliation đầy đủ.</div>
 <div class="kpi-box"><strong>KPI-WI518-02</strong><br/>Số lỗi phát sinh do bàn giao thiếu thông tin hoặc chuyển sai route.</div>
 <div class="kpi-box"><strong>KPI-WI518-03</strong><br/>Tỷ lệ machine transfer phải làm lại mẫu đầu do release set sai hoặc thiếu.</div>
 <div class="kpi-box"><strong>KPI-WI518-04</strong><br/>Thời gian phản ứng khi transfer bị từ chối vì thiếu điều kiện.</div>

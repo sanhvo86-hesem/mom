@@ -112,11 +112,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <thead><tr><th>Điểm lỗi</th><th>Ví dụ</th><th>Control bắt buộc</th></tr></thead>
  <tbody>
  <tr><td><b>PO / Drawing</b></td><td>Khách gửi bản vẽ mới nhưng PO ghi cũ</td><td>Rà soát hợp đồng <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM‑QA‑001</a> + freeze</td></tr>
- <tr><td><b>CAM source</b></td><td>File CAM/NC lấy từ folder cá nhân</td><td>Bộ hồ sơ chuẩn (SSOT) + manifest checksum</td></tr>
+ <tr><td><b>CAM source</b></td><td>File CAM/NC lấy từ folder cá nhân</td><td>Bộ hồ sơ chuẩn (SSOT) + bảng kê checksum</td></tr>
  <tr><td><b>Post / Machine</b></td><td>Chạy nhầm post, nhầm machine config</td><td>Phát hành chương trình (program release) control (PROC‑CNC‑002)</td></tr>
- <tr><td><b>Setup sheet</b></td><td>Setup sheet không cập nhật rev</td><td>Setup sheet phát hành &amp; peer review</td></tr>
+ <tr><td><b>Setup sheet</b></td><td>Setup sheet không cập nhật rev</td><td>Setup sheet phát hành &amp; rà soát đồng cấp</td></tr>
  <tr><td><b>On-machine program</b></td><td>Operator dùng program cũ lưu trên máy</td><td>Chỉ chạy program từ location kiểm soát; xác minh ID/Rev</td></tr>
- <tr><td><b>CMM program</b></td><td>Chương trình đo mismatch drawing rev</td><td>Phát hành chương trình kiểm tra (inspection phát hành chương trình) <a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM‑QA‑016</a></td></tr>
+ <tr><td><b>CMM program</b></td><td>Chương trình đo mismatch drawing rev</td><td>Phát hành chương trình kiểm tra (kiểm tra phát hành chương trình) <a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM‑QA‑016</a></td></tr>
  <tr><td><b>As-built hồ sơ</b></td><td>Bộ hồ sơ giao hàng (ship packet) thiếu chứng chỉ outsource đúng scope</td><td>Config đánh giá <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a> + cổng kiểm soát G5</td></tr>
  </tbody>
  </table>
@@ -129,7 +129,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="callout">
  <h3>(1) Bộ hồ sơ chuẩn</h3>
  <ul class="list">
- <li>Tập file “đúng Rev” được phát hành 1 lần, có manifest/checksum.</li>
+ <li>Tập file “đúng Rev” được phát hành 1 lần, có bảng kê/checksum.</li>
  <li>Không dùng file rời (email/zalo/USB) để chạy sản xuất.</li>
  <li>Được đối chiếu tại: Planning release → Job khởi động → Mẫu đầu.</li>
  </ul>
@@ -137,7 +137,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="note">
  <h3>(2) Configuration Đánh giá</h3>
  <ul class="list">
- <li>Đối chiếu requirement ↔ program/setup/inspection ↔ chứng chỉ ↔ as‑built.</li>
+ <li>Đối chiếu requirement ↔ program/setup/kiểm tra ↔ chứng chỉ ↔ as‑built.</li>
  <li>Thực hiện nhanh bằng <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a>.</li>
  <li>Áp dụng tối thiểu cho job có: Rev mới, CTQ, outsource công đoạn đặc biệt, hoặc khách yêu cầu.</li>
  </ul>
@@ -148,7 +148,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <p class="mini">Gates là cơ chế cưỡng chế không vượt qua. Tham chiếu <a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//02-WI-200//">WI‑OPS‑001</a>.</p>
  <ul class="list">
  <li><b>G0:</b> Hợp đồng freeze (đúng bản vẽ/rev, CTQ nhận diện)</li>
- <li><b>Planning Release:</b> FRM‑PLA‑001 đối chiếu baseline manifest</li>
+ <li><b>Planning Release:</b> FRM‑PLA‑001 đối chiếu baseline bảng kê</li>
  <li><b>G1:</b> FRM‑OPS‑008 + setup sheet + phát hành chương trình</li>
  <li><b>G2:</b> Mẫu đầu/FAI + (nếu có) FRM‑QA‑016 CMM phát hành chương trình</li>
  <li><b>G4/G5:</b> Config đánh giá + bộ hồ sơ giao hàng completeness</li>
@@ -160,10 +160,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <h2>4) Bảng kiểm 10 điểm (job‑level)</h2>
  <ol class="list">
  <li>Part/Rev trên PO = Part/Rev trên drawing/spec?</li>
- <li>Bộ hồ sơ chuẩn có manifest/checksum và đúng Part/Rev?</li>
+ <li>Bộ hồ sơ chuẩn có bảng kê/checksum và đúng Part/Rev?</li>
  <li>Setup sheet hiển thị Program ID/Rev/Tool list/zero point?</li>
  <li>Chương trình trên máy = program phát hành (ID/Rev)?</li>
- <li>kế hoạch kiểm tra (inspection plan) có CTQ method + gage “green”?</li>
+ <li>kế hoạch kiểm tra (kiểm tra plan) có CTQ method + gage “green”?</li>
  <li>Nếu dùng CMM: FRM‑QA‑016 pass và báo cáo đo có Program ID/Rev?</li>
  <li>Nếu outsource: APL/scope/cert trace đầy đủ?</li>
  <li>Traveler/labels phản ánh đúng Rev &amp; trace lot?</li>
@@ -178,7 +178,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <ul class="list">
  <li>Nhóm 1: requirement (drawing/spec/CTQ)</li>
  <li>Nhóm 2: program/setup (CAM/NC/setup sheet)</li>
- <li>Nhóm 3: inspection/hồ sơ (IR/FAI/CMM program)</li>
+ <li>Nhóm 3: kiểm tra/hồ sơ (IR/FAI/CMM program)</li>
  <li>Nhóm 4: bộ hồ sơ giao hàng (labels/CoC/certs)</li>
  </ul>
  </div>
@@ -199,7 +199,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="note">
  <h3>Scenario</h3>
  <p class="mini">Giảng viên đưa 1 bộ job pack có 1 lỗi “mismatch” (ví dụ: drawing Rev B, setup sheet Rev A). Học viên phải phát hiện và nêu đúng cổng kiểm soát/hồ sơ để HOLD.</p>
- <p class="mini"><b>Pass:</b> phát hiện mismatch + nêu đúng cổng kiểm soát + tạo đúng bằng chứng (QC hold/log). <b>Fail:</b> đề xuất “chạy tạm rồi sửa sau”.</p>
+ <p class="mini"><b>Pass:</b> phát hiện mismatch + nêu đúng cổng kiểm soát + tạo đúng bằng chứng (QC hold/nhật ký). <b>Fail:</b> đề xuất “chạy tạm rồi sửa sau”.</p>
  </div>
  </div>
  </div>
