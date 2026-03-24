@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../../assets/style.css"/>
 <style>
 
 @media print {
@@ -52,9 +52,9 @@ ul.tight li {margin:4px 0;}
     <div class="page-body">
       <div class="form-header">
         <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
           <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
             <span>Document operation • Annex hệ thống</span>
           </div>
         </div>
@@ -191,23 +191,23 @@ ul.tight li {margin:4px 0;}
 
 <div class="section" id="a10"><h2>10. Bảng điều khiển pack, freeze-date và exception-note mapping</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:22%"/><col style="width:30%"/><col style="width:24%"/><col style="width:24%"/></colgroup><thead><tr><th>Field / note mở rộng</th><th>Khi nào bắt buộc ghi</th><th>Ý nghĩa quản trị</th><th>Cross-link</th></tr></thead><tbody><tr><td>People dependency note</td><td>KPI chịu ảnh hưởng bởi skill, certification, authorization hoặc deputy gap.</td><td>Ngăn việc giải thích KPI sai theo hướng “thiếu người” chung chung.</td><td>ANNEX-801, FRM-807, ANNEX-123</td></tr><tr><td>Carry-over action reference</td><td>KPI đỏ kéo dài qua kỳ hoặc chưa đóng containment.</td><td>Buộc pack nói rõ lịch sử quyết định và trạng thái hiệu lực.</td><td>FRM-911, CAPA / kaizen / log hành động</td></tr><tr><td>Comparability break flag</td><td>Đổi source, đổi logic, backfill, manual adjustment hoặc freeze-date reset.</td><td>Bảo vệ quyết định khỏi việc so sánh sai giữa các kỳ.</td><td>ANNEX-113, WI-901</td></tr></tbody></table></div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Pack / ngữ cảnh dùng</th><th>Responsible Person chuẩn bị</th><th>Freeze-date / cut-off</th><th>Khi nào cần exception note</th><th>Record / WI dùng để giữ vết</th></tr></thead><tbody>
-<tr><td>T1/T2 board trong ngày</td><td>Planning / Production / Responsible Person QA của board</td><td>Trước họp 10–15 phút</td><td>Refresh fail, late posting, thiếu diễn tập-down, dùng export SoR thay bảng điều khiển</td><td><a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> ghi chú điều hành / board note</td></tr>
+<tr><td>T1/T2 board trong ngày</td><td>Planning / Production / Responsible Person QA của board</td><td>Trước họp 10–15 phút</td><td>Refresh fail, late posting, thiếu diễn tập-down, dùng export SoR thay bảng điều khiển</td><td><a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> ghi chú điều hành / board note</td></tr>
 <tr><td>T3 tuần / tháng</td><td>Responsible Person Bảng điều khiển + Process Owner</td><td>Theo lịch pack đã công bố</td><td>Dữ liệu chưa đầy đủ, có reclass/backfill sau cut-off, vấn đề mapping còn mở</td><td>WI-901 + data vấn đề / change record</td></tr>
-<tr><td>T4 / management review</td><td>QMS / Process Owner / bảng điều khiển người phụ trách</td><td>Freeze snapshot theo kỳ review</td><td>Số đã freeze nhưng cần giải thích ngoại lệ, offline fallback, manual pack hoặc SoR correction sau close</td><td><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> + <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td></tr>
+<tr><td>T4 / management review</td><td>QMS / Process Owner / bảng điều khiển người phụ trách</td><td>Freeze snapshot theo kỳ review</td><td>Số đã freeze nhưng cần giải thích ngoại lệ, offline fallback, manual pack hoặc SoR correction sau close</td><td><a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> + <a  download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td></tr>
 <tr><td>Customer / external disclosure pack</td><td>Process Owner + authorized approver</td><td>Freeze theo revision được gửi</td><td>Nội bộ chưa khớp external pack hoặc phải dùng approved exception logic</td><td>Gói release / communication record</td></tr>
 </tbody></table></div>
 <div class="callout-info">Khi bảng điều khiển pack bị gắn exception note, người phụ trách phải chỉ rõ <b>phạm vi KPI bị ảnh hưởng</b>, <b>nguồn tạm thời dùng để ra quyết định</b>, <b>ETA khôi phục</b> và <b>thời điểm backfill/re-review</b>. Không để bảng điều khiển đang lỗi nhưng pack vẫn được trình bày như dữ liệu bình thường.</div></div>
 
 <div class="section" id="a11"><h2>11. Liên kết dùng trong operation</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mã document</th><th>Vai trò sử dụng</th></tr></thead><tbody>
-<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a></td><td>Dùng KPI để điều hành họp tầng và đóng action.</td></tr>
-<tr><td><a href="annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Cadence họp, thành phần, board layout, severity ladder.</td></tr>
+<tr><td><a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a></td><td>Dùng KPI để điều hành họp tầng và đóng action.</td></tr>
+<tr><td><a href="../../05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Cadence họp, thành phần, board layout, severity ladder.</td></tr>
 <tr><td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Response SLA, sau giờ, deputy backup.</td></tr>
-<tr><td><a href="annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>Queue tuổi tồn, finite capacity, freeze window, hot-job ladder.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Cách Planning dùng KPI luồng/capacity để ra quyết định trong ngày.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Quy tắc evidence, retention, completeness và linkage của record số.</td></tr>
-<tr><td><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> / <a href="../../01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Review xu hướng và đóng vòng lặp cải tiến.</td></tr>
-<tr><td><a href="../01-ANNEX-100/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a></td><td>Khóa publish, access, refresh, failure control và rollback của bảng điều khiển production.</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> / <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></td><td>Rà access định kỳ, request cấp/đổi/recall quyền và privileged/deputy governance.</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td><td>Khóa pack control, freeze-date, exception note và quyết định ở management review.</td></tr></tbody></table></div></div>
+<tr><td><a href="../../05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>Queue tuổi tồn, finite capacity, freeze window, hot-job ladder.</td></tr>
+<tr><td><a href="../../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Cách Planning dùng KPI luồng/capacity để ra quyết định trong ngày.</td></tr>
+<tr><td><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Quy tắc evidence, retention, completeness và linkage của record số.</td></tr>
+<tr><td><a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> / <a href="../../../01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Review xu hướng và đóng vòng lặp cải tiến.</td></tr>
+<tr><td><a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a></td><td>Khóa publish, access, refresh, failure control và rollback của bảng điều khiển production.</td></tr><tr><td><a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> / <a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></td><td>Rà access định kỳ, request cấp/đổi/recall quyền và privileged/deputy governance.</td></tr><tr><td><a  download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td><td>Khóa pack control, freeze-date, exception note và quyết định ở management review.</td></tr></tbody></table></div></div>
 
     </div>
   </div>
@@ -215,5 +215,9 @@ ul.tight li {margin:4px 0;}
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
+
+
+
+
 
 

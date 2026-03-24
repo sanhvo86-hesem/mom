@@ -1,4 +1,4 @@
-# Natural Vietnamese Polish - 2026-03-24
+﻿# Natural Vietnamese Polish - 2026-03-24
 
 - Target roots: `01-QMS-Portal`, `02-Tai-Lieu-He-Thong`, `03-Tai-Lieu-Van-Hanh`, `04-Bieu-Mau`, `10-Training-Academy`
 - Files scanned: 411
@@ -29,7 +29,7 @@
 ## Top Changed Files
 
 - `04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html`: 113 thay đổi (title_restore=62, word_checklist_singular=19, word_log=15, word_record=8, word_verification=3, phrase_change_request=2)
-- `03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html`: 41 thay đổi (title_restore=20, word_log=11, word_checklist_singular=6, word_inspection=3, cleanup_evidence_pack_dup=1)
+- `03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html`: 41 thay đổi (title_restore=20, word_log=11, word_checklist_singular=6, word_inspection=3, cleanup_evidence_pack_dup=1)
 - `04-Bieu-Mau/01-FRM-100/index.html`: 23 thay đổi (title_restore=13, word_checklist_singular=4, word_log=3, phrase_change_request=1, phrase_peer_review=1, word_record=1)
 - `10-Training-Academy/02-Training-Content/01-Modules/C07.html`: 21 thay đổi (title_restore=8, anchor_title_normalize=6, word_record=4, cleanup_onboarding_dup=1, word_log=1, word_checklist_singular=1)
 - `03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html`: 20 thay đổi (cleanup_action_log_dup=11, anchor_title_normalize=9)

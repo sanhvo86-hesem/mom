@@ -1,4 +1,4 @@
-﻿// DOCUMENT WORKFLOW & EDITING ENGINE
+// DOCUMENT WORKFLOW & EDITING ENGINE
 // ═══════════════════════════════════════════════════
 
 // States: draft | in_review | pending_approval | approved | obsolete
@@ -1757,11 +1757,11 @@ function edImgResize100(){if(edSelectedImg){edSelectedImg.style.width='100%';edS
 // TABLE CONTEXT MENU (Right-click)
 // ═══════════════════════════════════════════════════
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ────────────────────────────────────────────────
 // TABLE COLUMN WIDTH ENGINE (colgroup-based)
 // Fix: support tables WITH <colgroup> widths, allow drag + numeric width edits
 // Applied globally in editor mode
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ────────────────────────────────────────────────
 const _edTableDefaults = new WeakMap();
 
 function edTableSetAutofitState(table, mode, lock){

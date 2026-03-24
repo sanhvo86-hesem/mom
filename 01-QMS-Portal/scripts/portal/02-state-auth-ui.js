@@ -803,7 +803,7 @@ async function doLogin(){
 
   try{
     if(loginStage === 'password'){
-      if(!u || !p){ showLoginError(lang==='en' ? 'Please enter username and password' : 'Vui lÃ²ng nháº­p tÃ i khoáº£n vÃ  máº­t kháº©u'); return; }
+      if(!u || !p){ showLoginError(lang==='en' ? 'Please enter username and password' : 'Vui lòng nhập tài khoản và mật khẩu'); return; }
 
       const res = await apiCall('auth_login', {username:u, password:p});
       if(!res.ok){
@@ -818,12 +818,12 @@ async function doLogin(){
         document.getElementById('enroll-secret').textContent = res.secret || '';
         document.getElementById('enroll-otpauth').textContent = res.otpauth_url || '';
         renderEnrollQR(res.otpauth_url || '');
-        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'BÆ°á»›c 2: Báº­t 2FA vÃ  nháº­p mÃ£ 6 sá»‘', res.pending_expires_in);
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số', res.pending_expires_in);
         return;
       }
       if(res.mfa_required){
         csrfToken = res.csrf_token || csrfToken;
-        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nháº­p mÃ£ xÃ¡c thá»±c 6 sá»‘ tá»« Authenticator', res.pending_expires_in);
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', res.pending_expires_in);
         return;
       }
       if(res.logged_in){
@@ -835,13 +835,13 @@ async function doLogin(){
     }
 
     if(loginStage === 'enroll'){
-      if(!otp){ showLoginError(lang==='en' ? 'Enter 6-digit code to confirm' : 'Nháº­p mÃ£ 6 sá»‘ Ä‘á»ƒ xÃ¡c nháº­n'); return; }
+      if(!otp){ showLoginError(lang==='en' ? 'Enter 6-digit code to confirm' : 'Nhập mã 6 số để xác nhận'); return; }
       const res = await apiCall('auth_enroll_verify', {code: otp});
       if(!res.ok){
         if(res.error === 'unauthorized' || res.error === 'enroll_expired'){
-          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator setup timed out. Please sign in again.' : 'PhiÃªn thiáº¿t láº­p Authenticator Ä‘Ã£ háº¿t háº¡n. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.'});
+          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator setup timed out. Please sign in again.' : 'Phiên thiết lập Authenticator đã hết hạn. Vui lòng đăng nhập lại.'});
         } else {
-          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mÃ£'));
+          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã'));
         }
         return;
       }
@@ -853,13 +853,13 @@ async function doLogin(){
     }
 
     if(loginStage === 'mfa'){
-      if(!otp && !recovery){ showLoginError(lang==='en' ? 'Enter authenticator code or recovery code' : 'Nháº­p mÃ£ xÃ¡c thá»±c hoáº·c mÃ£ dá»± phÃ²ng'); return; }
+      if(!otp && !recovery){ showLoginError(lang==='en' ? 'Enter authenticator code or recovery code' : 'Nhập mã xác thực hoặc mã dự phòng'); return; }
       const res = await apiCall('auth_mfa_verify', {username:u, password:p, code: otp, recovery: recovery});
       if(!res.ok){
         if(res.error === 'mfa_expired' || res.error === 'unauthorized'){
-          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator verification timed out. Please sign in again.' : 'PhiÃªn xÃ¡c thá»±c OTP Ä‘Ã£ háº¿t háº¡n. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.'});
+          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator verification timed out. Please sign in again.' : 'Phiên xác thực OTP đã hết hạn. Vui lòng đăng nhập lại.'});
         } else {
-          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mÃ£'));
+          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã'));
         }
         return;
       }
@@ -868,7 +868,7 @@ async function doLogin(){
     }
   }catch(err){
     console.error(err);
-    showLoginError(lang==='en' ? 'Cannot connect to server. Please try again.' : 'KhÃ´ng thá»ƒ káº¿t ná»‘i mÃ¡y chá»§. Vui lÃ²ng thá»­ láº¡i.');
+    showLoginError(lang==='en' ? 'Cannot connect to server. Please try again.' : 'Không thể kết nối máy chủ. Vui lòng thử lại.');
   }
 }
 
@@ -891,7 +891,7 @@ async function doLogout(){
 }
 
 async function checkSession(){
-  setLoginChecking(true, lang==='en' ? 'Checking sessionâ€¦' : 'Äang kiá»ƒm tra phiÃªn Ä‘Äƒng nháº­pâ€¦');
+  setLoginChecking(true, lang==='en' ? 'Checking session…' : 'Đang kiểm tra phiên đăng nhập…');
 
   let lastStatus = null;
   const delays = [0, 350, 900, 1600];
@@ -919,13 +919,13 @@ async function checkSession(){
         document.getElementById('enroll-otpauth').textContent = s.otpauth_url || '';
         renderEnrollQR(s.otpauth_url || '');
         setLoginChecking(false, '');
-        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'BÆ°á»›c 2: Báº­t 2FA vÃ  nháº­p mÃ£ 6 sá»‘', s.pending_expires_in);
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số', s.pending_expires_in);
         return;
       }
       if(s && s.mfa_pending){
         csrfToken = s.csrf_token || null;
         setLoginChecking(false, '');
-        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nháº­p mÃ£ xÃ¡c thá»±c 6 sá»‘ tá»« Authenticator', s.pending_expires_in);
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', s.pending_expires_in);
         return;
       }
       break;
@@ -946,7 +946,7 @@ async function checkSession(){
 
 async function showApp(){
   if(!currentUser){
-    resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Login session is no longer valid.' : 'PhiÃªn Ä‘Äƒng nháº­p khÃ´ng cÃ²n há»£p lá»‡.'});
+    resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Login session is no longer valid.' : 'Phiên đăng nhập không còn hợp lệ.'});
     return;
   }
 
@@ -957,7 +957,7 @@ async function showApp(){
   document.getElementById('hdr-name').textContent = currentUser.name;
   document.getElementById('hdr-title').textContent = (lang==='en' ? (r.labelEn||r.label||currentUser.title||'') : (r.label||currentUser.title||''));
   document.getElementById('dd-name').textContent = currentUser.name;
-  document.getElementById('dd-title').textContent = (lang==='en'?(r.labelEn||currentUser.title):currentUser.title) + ' Â· ' + currentUser.dept;
+  document.getElementById('dd-title').textContent = (lang==='en'?(r.labelEn||currentUser.title):currentUser.title) + ' · ' + currentUser.dept;
   document.getElementById('dd-access').textContent = lang==='en'?(r.labelEn||r.label):r.label;
 
   const docsLoaded = await loadDocsFromServer();
@@ -973,23 +973,23 @@ async function showApp(){
         document.getElementById('enroll-secret').textContent = status.secret || '';
         document.getElementById('enroll-otpauth').textContent = status.otpauth_url || '';
         renderEnrollQR(status.otpauth_url || '');
-        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'BÆ°á»›c 2: Báº­t 2FA vÃ  nháº­p mÃ£ 6 sá»‘', status.pending_expires_in);
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số', status.pending_expires_in);
         return;
       }
       if(status && status.mfa_pending){
         csrfToken = status.csrf_token || null;
-        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nháº­p mÃ£ xÃ¡c thá»±c 6 sá»‘ tá»« Authenticator', status.pending_expires_in);
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', status.pending_expires_in);
         return;
       }
       resetPortalToLogin({
         stage:'password',
         errorMsg: status && status.auth_expired
           ? getPendingAuthExpiredMessage(status.auth_expired)
-          : (lang==='en' ? 'Login session is no longer valid. Please sign in again.' : 'PhiÃªn Ä‘Äƒng nháº­p khÃ´ng cÃ²n há»£p lá»‡. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.')
+          : (lang==='en' ? 'Login session is no longer valid. Please sign in again.' : 'Phiên đăng nhập không còn hợp lệ. Vui lòng đăng nhập lại.')
       });
       return;
     }
-    showToast(lang==='en' ? 'Document index is temporarily unavailable.' : 'Danh má»¥c tÃ i liá»‡u táº¡m thá»i chÆ°a táº£i Ä‘Æ°á»£c.');
+    showToast(lang==='en' ? 'Document index is temporarily unavailable.' : 'Danh mục tài liệu tạm thời chưa tải được.');
   }
 
   await loadFolderDescriptions();

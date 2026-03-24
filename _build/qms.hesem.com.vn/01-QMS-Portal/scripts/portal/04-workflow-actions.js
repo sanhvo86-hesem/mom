@@ -1,4 +1,4 @@
-﻿// WORKFLOW ACTIONS
+// WORKFLOW ACTIONS
 // ═══════════════════════════════════════════════════
 function startEdit(code){
   try{
@@ -491,7 +491,7 @@ function rgbToHex(rgb){
   return '#'+(1<<24|m[0]<<16|m[1]<<8|+m[2]).toString(16).slice(1);
 }
 
-// â”€â”€ Unsaved Changes Dialog â”€â”€
+// ── Unsaved Changes Dialog ──
 function showUnsavedDialog(editingCode, targetCode){
   try{ document.querySelectorAll('.unsaved-modal-overlay').forEach(el=>el.remove()); }catch(e){}
   const editDoc = DOCS.find(d=>d.code===editingCode);
@@ -609,7 +609,7 @@ async function saveDraftSilent(code){
   }
 }
 
-// â”€â”€ Collapsible Property Panel â”€â”€
+// ── Collapsible Property Panel ──
 let edPropsCollapsed = false;
 function edTogglePropsPanel(){
   edPropsCollapsed = !edPropsCollapsed;
@@ -1019,7 +1019,7 @@ const innerHtml = _getCurrentEditorInnerHtml();
           edMarkSaved(lang==='en'?('\u2713 Draft saved \u2014 v'+revision):('\u2713 \u0110\u00e3 l\u01b0u nh\u00e1p \u2014 v'+revision));
         }
       }catch(e){}
-      showToast(lang==='en'?'💾 Draft saved — v'+revision:'💾 Đã lÆ°u nháp — v'+revision);
+      showToast(lang==='en'?'💾 Draft saved — v'+revision:'💾 Đã lưu nháp — v'+revision);
       // refresh workflow panel/DCR record in preview
       try{ renderWorkflowPanel(doc); }catch(e){}
       try{ renderVersionHistory(doc); }catch(e){}

@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ANNEX-101 — Role-Based Access Map| HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../../assets/style.css" rel="stylesheet"/>
 <style>
 
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
@@ -48,9 +48,9 @@
     <div class="page-body">
       <div class="form-header">
         <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+          <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
           <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
             <span>Document operation • Annex số hóa</span>
           </div>
         </div>
@@ -72,7 +72,7 @@
 <div class="iso-map">
   <div class="iso-title">Nguyên tắc bắt buộc</div>
   <div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi quyền truy cập được cấp theo <b>vai trò công việc</b>, có người phụ trách nghiệp vụ, có hạn dùng khi cần và có dấu vết review; không cấp theo thói quen cá nhân hoặc “cấp giống người trước”.</div></div>
-  <div class="req"><span class="req-tag shall">PHẢI</span><div>Quyền nhạy cảm, quyền đặc quyền và quyền liên quan separation-of-duties phải gắn với <a href="annex-120-authority-matrix.html">ANNEX-120</a>, <a href="annex-123-deputy-backup-matrix.html">ANNEX-123</a> và request có đủ dữ liệu tại <a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a>.</div></div>
+  <div class="req"><span class="req-tag shall">PHẢI</span><div>Quyền nhạy cảm, quyền đặc quyền và quyền liên quan separation-of-duties phải gắn với <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>, <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a> và request có đủ dữ liệu tại <a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a>.</div></div>
   <div class="req"><span class="req-tag shall">PHẢI</span><div>Thiết kế quyền theo nguyên tắc “smallest viable access”: đủ để làm việc và chứng minh được, nhưng không thừa quyền để né kiểm soát hoặc vượt boundary của vai trò.</div></div>
 </div>
 
@@ -80,7 +80,7 @@
 <h2 class="h2" id="a1">1. Mục đích và phạm vi</h2>
 
 <p>ANNEX này khóa logic cấp quyền theo vai trò cho M365 / SharePoint / Portal, Power Platform, Power BI, Epicor và các hệ hỗ trợ tại HESEM. Mục tiêu là giữ <b>least privilege</b>, <b>separation of duties</b>, <b>source-of-tính toàn vẹn record</b> và khả năng đánh giá/trace khi người dùng đổi vị trí, kích hoạt deputy, nghỉ việc, xử lý incident hoặc chạy review quyền truy cập định kỳ.</p>
-<p>Document này dùng để quyết định <b>quyền trần</b> mà một vai trò family được phép có. Chi tiết dữ liệu request, approval route, reject code và evidence request nằm tại <a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a> và <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141 IT Access Request / Change / Revocation</a>.</p>
+<p>Document này dùng để quyết định <b>quyền trần</b> mà một vai trò family được phép có. Chi tiết dữ liệu request, approval route, reject code và evidence request nằm tại <a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a> và <a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141 IT Access Request / Change / Revocation</a>.</p>
 <div class="callout"><b>Quy tắc cứng</b><br/>Không dùng chung tài khoản. Không cấp quyền “full access cho tiện”. Không giữ quyền cũ sau khi đổi vị trí. Không để người requirement tự duyệt quyền nhạy cảm của chính mình. Không để deputy hoặc người hỗ trợ mang quyền cao hơn vai trò gốc nếu chưa có approval và thời hạn rõ.</div>
 
 <h2 class="h2" id="a2">2. Miền hệ thống và mức quyền chuẩn</h2>
@@ -93,21 +93,21 @@
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:18%"/><col style="width:18%"/><col style="width:24%"/><col style="width:22%"/><col style="width:18%"/></colgroup><thead><tr><th>Loại quyền</th><th>Người đề nghị</th><th>Người xác nhận nghiệp vụ</th><th>Người triển khai / xác minh</th><th>Khi nào cần escalated</th></tr></thead><tbody><tr><td>Read / contribute thông thường</td><td>Line Manager / người phụ trách process</td><td>Department head hoặc delegate hợp lệ</td><td>IT thực hiện, requester xác nhận dùng đủ</td><td>Khi vai trò chưa có trong matrix hoặc phạm vi dữ liệu khác thường.</td></tr><tr><td>Approve / publish / release trong business system</td><td>Department head / Process Owner</td><td>Authority người phụ trách theo decision family</td><td>IT hoặc system admin triển khai; QMS/người phụ trách xác minh</td><td>Khi đụng boundary liên phòng ban hoặc thay đổi control người phụ trách.</td></tr><tr><td>Dữ liệu gốc / privileged / security admin</td><td>Responsible Person System + chủ nghiệp vụ đồng ký</td><td>Top management / authorized executive theo mức độ</td><td>IT/Epicor admin triển khai có ticket, evidence, backout plan</td><td>Luôn escalated nếu PROD, quyền không time-bound hoặc ảnh hưởng nhiều process.</td></tr><tr><td>Deputy / temporary access</td><td>Line Manager / deputy trigger người phụ trách</td><td>Department head + Process Owner</td><td>IT triển khai với expiry date</td><td>Khi thời hạn > chuẩn nội bộ, scope vượt vai trò gốc hoặc đụng quyền đỏ.</td></tr></tbody></table></div>
 <h2 class="h2" id="a6">6. Deputy / backup access</h2>
 
-<p>Deputy access không phải bản sao cố định của vai trò gốc. Chỉ kích hoạt khi tên deputy đã có trong <a href="annex-123-deputy-backup-matrix.html">ANNEX-123</a>, competence/chứng nhận phù hợp đã được xác nhận và request ghi rõ: vai trò thay thế, lý do, phạm vi, ngày bắt đầu, ngày kết thúc, người phụ trách chịu trách nhiệm và cách recall sau khi kết thúc.</p>
+<p>Deputy access không phải bản sao cố định của vai trò gốc. Chỉ kích hoạt khi tên deputy đã có trong <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>, competence/chứng nhận phù hợp đã được xác nhận và request ghi rõ: vai trò thay thế, lý do, phạm vi, ngày bắt đầu, ngày kết thúc, người phụ trách chịu trách nhiệm và cách recall sau khi kết thúc.</p>
 <p>Nguyên tắc: deputy nhận <b>đúng phần quyền cần để duy trì hoạt động</b>, không nhận “full admin” để xử lý cho nhanh. Nếu deputy cần quyền vượt vai trò gốc của mình, phải coi như temporary elevated access và dùng approval ladder tương ứng.</p>
 
 <h2 class="h2" id="a7">7. Quyền tạm thời, break-glass, service account</h2>
 <ul class="tight"><li>Quyền tạm thời phải có ngày hết hạn, ticket / request ID, chủ nghiệp vụ, technical người phụ trách và evidence recall sau khi hoàn tất.</li><li>Break-glass chỉ dùng cho incident khẩn cấp ảnh hưởng production, quality, delivery hoặc an toàn hệ thống; mọi lần dùng phải ghi vào contingency / log incident (incident log) và review hậu incident.</li><li>Service / machine account phải có người phụ trách rõ, scope rõ, không dùng để operation end user và phải được rà định kỳ như privileged account.</li><li>Guest / contractor account chỉ được cấp đúng library/app cần thiết, mặc định time-bound và phải revoke ngay khi kết thúc hợp đồng hoặc nhiệm vụ.</li></ul>
 <h2 class="h2" id="a8">8. Review quyền truy cập và phản ứng theo sự kiện</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:28%"/><col style="width:72%"/></colgroup><thead><tr><th>Tình huống</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td>Review định kỳ</td><td>Rà theo chu kỳ bằng <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111 — Quarterly Access Review</a> hoặc công cụ tương đương; xác nhận quyền còn cần, còn đúng scope và còn đúng SoD.</td></tr><tr><td>Thay đổi vị trí / department / reporting line</td><td>Rà ngay quyền cũ, quyền mới và recall các quyền không còn phù hợp trước hoặc cùng ngày hiệu lực.</td></tr><tr><td>Offboarding / nghỉ dài ngày / contractor end</td><td>Revoke đúng hạn, vô hiệu hóa access, xử lý token/device và giữ evidence hoàn tất.</td></tr><tr><td>Incident, nghi ngờ misuse, đánh giá finding</td><td>Contain ngay, review log, tạm khóa quyền nếu cần, đánh giá impact và cập nhật matrix nếu phát hiện lỗ hổng thiết kế quyền.</td></tr></tbody></table></div>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:28%"/><col style="width:72%"/></colgroup><thead><tr><th>Tình huống</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td>Review định kỳ</td><td>Rà theo chu kỳ bằng <a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111 — Quarterly Access Review</a> hoặc công cụ tương đương; xác nhận quyền còn cần, còn đúng scope và còn đúng SoD.</td></tr><tr><td>Thay đổi vị trí / department / reporting line</td><td>Rà ngay quyền cũ, quyền mới và recall các quyền không còn phù hợp trước hoặc cùng ngày hiệu lực.</td></tr><tr><td>Offboarding / nghỉ dài ngày / contractor end</td><td>Revoke đúng hạn, vô hiệu hóa access, xử lý token/device và giữ evidence hoàn tất.</td></tr><tr><td>Incident, nghi ngờ misuse, đánh giá finding</td><td>Contain ngay, review log, tạm khóa quyền nếu cần, đánh giá impact và cập nhật matrix nếu phát hiện lỗ hổng thiết kế quyền.</td></tr></tbody></table></div>
 <h2 class="h2" id="a9">9. Evidence, KPI và reject signals</h2>
 <div class="grid-2">
-<div class="card"><div class="card-title">Evidence tối thiểu</div><p><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> / ticket ID; mô tả vai trò và hệ; approval hợp lệ; thời hạn nếu temporary; xác nhận triển khai; xác nhận người dùng; log review nếu privileged/deputy.</p></div>
+<div class="card"><div class="card-title">Evidence tối thiểu</div><p><a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> / ticket ID; mô tả vai trò và hệ; approval hợp lệ; thời hạn nếu temporary; xác nhận triển khai; xác nhận người dùng; log review nếu privileged/deputy.</p></div>
 <div class="card"><div class="card-title">Reject signals</div><p>Request ghi “cấp full access”, “cấp giống người A”, thiếu vai trò/JD/người phụ trách, thiếu ngày hết hạn cho quyền tạm thời, hoặc requirement xung đột SoD mà không có escalated approval đều phải trả lại.</p></div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:40%"/><col style="width:60%"/></colgroup><thead><tr><th>KPI / chỉ số giám sát</th><th>Ý nghĩa</th></tr></thead><tbody><tr><td>% request đầy đủ ngay lần đầu</td><td>Đo quality dữ liệu request và mức độ chuẩn hóa của chủ nghiệp vụ.</td></tr><tr><td>% privileged access có expiry date và close-out đúng hạn</td><td>Đo tính kỷ luật của quyền nâng cao / tạm thời.</td></tr><tr><td>Số finding SoD / quarter</td><td>Đo mức độ lộ rủi ro từ thiết kế quyền.</td></tr><tr><td>% revoke hoàn tất đúng SLA khi offboarding / vai trò change</td><td>Đo nguy cơ giữ quyền dư.</td></tr></tbody></table></div>
 <h2 class="h2" id="a10">10. Document liên kết</h2>
-<ul class="tight"><li><a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a> — field dictionary và approval route cho request quyền.</li><li><a href="annex-120-authority-matrix.html">ANNEX-120</a> / <a href="annex-121-raci-master-matrix.html">ANNEX-121</a> / <a href="annex-123-deputy-backup-matrix.html">ANNEX-123</a> — lớp governance liên quan vai trò, decision family và coverage.</li><li><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> / <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> / <a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a> — nền tảng data governance, change control, contingency.</li><li><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> / <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> — evidence request và review định kỳ.</li></ul>
+<ul class="tight"><li><a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a> — field dictionary và approval route cho request quyền.</li><li><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a> / <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a> / <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a> — lớp governance liên quan vai trò, decision family và coverage.</li><li><a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> / <a href="../../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> / <a href="../../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a> — nền tảng data governance, change control, contingency.</li><li><a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> / <a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> — evidence request và review định kỳ.</li></ul>
 <div class="footer-note">ANNEX-101 là ma trận trần quyền theo vai trò. Khi hệ thống, vai trò family hoặc decision family thay đổi, annex này phải được rà đồng thời với request dictionary, ma trận authority và deputy matrix.</div>
         </div>
       </div>
@@ -116,3 +116,7 @@
 </div>
 </body>
 </html>
+
+
+
+

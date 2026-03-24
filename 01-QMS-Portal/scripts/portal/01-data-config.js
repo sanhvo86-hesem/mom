@@ -1,4 +1,4 @@
-﻿// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // DATABASE
 // ═══════════════════════════════════════════════════
 
@@ -856,7 +856,7 @@ const ROLE_DOCS = {
   epicor_admin: [
     ..._UNI, ..._MGR,
     "SOP-104-*","SOP-105-*",
-    "ANNEX-108*","ANNEX-109*","ANNEX-110*","ANNEX-113*","ANNEX-114*","ANNEX-115*","ANNEX-117*","ANNEX-101*","ANNEX-102*","ANNEX-503*",
+    "ANNEX-131*","ANNEX-132*","ANNEX-133*","ANNEX-134*","ANNEX-110*","ANNEX-113*","ANNEX-114*","ANNEX-115*","ANNEX-117*","ANNEX-101*","ANNEX-102*","ANNEX-503*",
     "SOP-201-*","SOP-501-*",
     "SOP-401-*","SOP-803-*",
     "FRM-1*","FRM-2*","FRM-4*","FRM-5*",
@@ -875,17 +875,21 @@ function normalizeDocPattern(pattern){
     'RACI-MASTER-MATRIX':'ANNEX-121',
     'ANNEX-HR-LAB*':'LAB*',
     'ANNEX-JOB*':'JD*',
+    'ANNEX-108*':'ANNEX-131*',
+    'ANNEX-109*':'ANNEX-132*',
+    'ANNEX-116*':'ANNEX-133*',
+    'ANNEX-125*':'ANNEX-134*',
     'REF-001*':'ANNEX-105*',
     'REF-002*':'ANNEX-106*',
     'REF-005*':'ANNEX-117*',
     'REF-006*':'ANNEX-607*',
     'REF-007*':'ANNEX-112*',
     'REF-008*':'ANNEX-608*',
-    'REF-010*':'ANNEX-108*',
-    'REF-011*':'ANNEX-109*',
+    'REF-010*':'ANNEX-131*',
+    'REF-011*':'ANNEX-132*',
     'REF-012*':'ANNEX-113*',
     'REF-013*':'ANNEX-115*',
-    'REF-014*':'ANNEX-109*',
+    'REF-014*':'ANNEX-132*',
     'REF-015*':'ANNEX-114*',
     'REF-020*':'ANNEX-503*',
     'REF-021*':'ANNEX-119*'
@@ -893,7 +897,7 @@ function normalizeDocPattern(pattern){
   if(aliasMap[base]) out.add(aliasMap[base]);
   if(base === 'REF*' || base === 'REF-*') out.add('ANNEX*');
   if(base === 'REF-01*'){
-    ['ANNEX-108*','ANNEX-109*','ANNEX-110*','ANNEX-113*','ANNEX-114*','ANNEX-115*','ANNEX-101*','ANNEX-102*'].forEach(v=>out.add(v));
+    ['ANNEX-131*','ANNEX-132*','ANNEX-133*','ANNEX-134*','ANNEX-110*','ANNEX-113*','ANNEX-114*','ANNEX-115*','ANNEX-101*','ANNEX-102*'].forEach(v=>out.add(v));
   }
   return Array.from(out);
 }
@@ -1085,6 +1089,10 @@ const FOLDER_ICON_MAP = {
   // ANNEX series (by department — matches SOP/WI/FRM numbering)
   '03-Reference':'📚',
   '01-ANNEX-100':'🏛️','02-ANNEX-200':'💼','03-ANNEX-300':'⚙️','04-ANNEX-400':'🔗',
+  '10-ANNEX-100-Foundation-Maps-and-Control':'🧭',
+  '11-ANNEX-110-Digital-Control-and-Resilience':'🖥️',
+  '12-ANNEX-120-Authority-KPI-and-Deputy-Control':'🧩',
+  '13-ANNEX-130-M365-Records-Control':'🗂️',
   '05-ANNEX-500':'🏭','06-ANNEX-600':'🔍','07-ANNEX-700':'📦','08-ANNEX-800':'👥',
   '09-ANNEX-900':'♻️',
   // Forms series (by department)

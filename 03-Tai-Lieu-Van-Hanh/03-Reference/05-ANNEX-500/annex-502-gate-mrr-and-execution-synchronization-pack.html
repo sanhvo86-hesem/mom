@@ -113,10 +113,10 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>5. Dấu hiệu lệch revision-set và hành động bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Dấu hiệu lệch</th><th>Ví dụ thực tế</th><th>Hành động bắt buộc</th><th>Ai phải biết ngay</th></tr></thead><tbody>
-<tr><td>Drawing Rev ≠ Setup sheet Rev</td><td>Bản vẽ Rev C nhưng setup sheet còn Rev B</td><td>HOLD G1/G2. Dừng setup. Recall packet tại máy. Rebaseline lại trước khi chạy.</td><td>Engineering, Planning, Production, QA</td></tr>
-<tr><td>Program ID ≠ Release chương trình (program release) list</td><td>Máy đang gọi chương trình cũ hoặc chương trình không nằm trong baseline</td><td>HOLD G2/G3. Không chạy first cut. Ghi abnormal restart / wrong program event.</td><td>Production Supervisor, Engineering, QA</td></tr>
+<tr><td>Drawing Rev â‰  Setup sheet Rev</td><td>Bản vẽ Rev C nhưng setup sheet còn Rev B</td><td>HOLD G1/G2. Dừng setup. Recall packet tại máy. Rebaseline lại trước khi chạy.</td><td>Engineering, Planning, Production, QA</td></tr>
+<tr><td>Program ID â‰  Release chương trình (program release) list</td><td>Máy đang gọi chương trình cũ hoặc chương trình không nằm trong baseline</td><td>HOLD G2/G3. Không chạy first cut. Ghi abnormal restart / wrong program event.</td><td>Production Supervisor, Engineering, QA</td></tr>
 <tr><td>Traveler / barcode / WIP card không khớp lot</td><td>Lot trên khay khác với lot trong traveler</td><td>HOLD G3/G4. Cách ly lô, kiểm 100% trace, không trộn lại bằng tay.</td><td>Production, QA, WHS</td></tr>
-<tr><td>Shipment label / SSCC ≠ pack record</td><td>Outer carton dán nhầm SSCC hoặc Pack ID</td><td>HOLD G5. Không xác nhận delivery (ship confirm). Repack / relabel theo quyền hạn cho phép.</td><td>WHS, QA</td></tr>
+<tr><td>Shipment label / SSCC â‰  pack record</td><td>Outer carton dán nhầm SSCC hoặc Pack ID</td><td>HOLD G5. Không xác nhận delivery (ship confirm). Repack / relabel theo quyền hạn cho phép.</td><td>WHS, QA</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>6. Retrieval diễn tập 60 giây</h2>
@@ -170,9 +170,9 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Chuyển giao công việc xác nhận.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Xác minh trước khi chạy tại máy.</td></tr>
 <tr><td><a href="annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a></td><td>Metadata và structure của dossier.</td></tr>
-<tr><td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation và SLA.</td></tr>
-<tr><td><a href="../01-ANNEX-100/annex-120-authority-matrix.html">ANNEX-120</a></td><td>Ma trận authority.</td></tr>
-<tr><td><a href="../01-ANNEX-100/annex-121-raci-master-matrix.html">ANNEX-121</a></td><td>RACI master matrix.</td></tr>
+<tr><td><a href="../01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation và SLA.</td></tr>
+<tr><td><a href="../01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td><td>Ma trận authority.</td></tr>
+<tr><td><a href="../01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a></td><td>RACI master matrix.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-501_Planning_Release_Checklist.xlsx">FRM-501</a></td><td>Planning Release Checklist.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a></td><td>Setup and mẫu đầu record.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a></td><td>Inspection cuối report.</td></tr>
@@ -185,3 +185,5 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
+
+

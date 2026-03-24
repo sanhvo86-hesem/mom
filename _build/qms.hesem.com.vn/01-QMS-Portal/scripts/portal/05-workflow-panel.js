@@ -1,4 +1,4 @@
-﻿// RENDER WORKFLOW UI
+// RENDER WORKFLOW UI
 // ═══════════════════════════════════════════════════
 function renderWorkflowPanel(doc){
   if(!doc) return;

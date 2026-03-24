@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ANNEX-113 — Dashboard Deployment, Access and Refresh Control| HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../../assets/style.css" rel="stylesheet"/>
 <style>
 
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
@@ -79,9 +79,9 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
   <div class="fh-left">
-    <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+    <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
     <div class="fh-company">
-      <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+      <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
       <span>Document operation • Annex số hóa</span>
     </div>
   </div>
@@ -107,11 +107,11 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="req-grid">
   <div class="req"><span class="req-tag must">PHẢI</span><div>Bảng điều khiển production chỉ publish từ dataset / semantic model có <b>chủ nghiệp vụ</b>, <b>chủ dữ liệu</b>, <b>environment</b> và <b>release evidence</b> rõ.</div></div>
   <div class="req"><span class="req-tag must">PHẢI</span><div>Mọi bảng điều khiển dùng để ra quyết định ở T1/T2/T3/T4 phải chỉ rõ <b>source-of-record</b>, <b>freeze-date</b>, thời điểm refresh gần nhất và cách xử lý khi refresh fail.</div></div>
-  <div class="req"><span class="req-tag must">PHẢI</span><div>Quyền <b>Publish / Admin / Build</b> không được cấp kiểu “cho tiện”; phải bám <a href="annex-101-role-based-access-map.html">ANNEX-101</a>, <a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a> và <a href="annex-120-authority-matrix.html">ANNEX-120</a>.</div></div>
+  <div class="req"><span class="req-tag must">PHẢI</span><div>Quyền <b>Publish / Admin / Build</b> không được cấp kiểu “cho tiện”; phải bám <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a>, <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-102-access-request-field-dictionary.html">ANNEX-102</a> và <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>.</div></div>
   <div class="req"><span class="req-tag shall">PHẢI</span><div>Dùng pipeline DEV → UAT → PROD và rollback nhanh thay vì sửa thẳng report production trong giờ họp hoặc cuối kỳ.</div></div>
 </div>
 
-<div class="note"><b>Boundary của ANNEX</b><br/>ANNEX-113 khóa lớp kiểm soát số. Định nghĩa KPI, formula, dimension, cut-off logic và SoR precedence chi tiết nằm tại <a href="../01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>. Cách tổ chức bảng điều khiển pack, ghi chú điều hành, exception note và management-bộ record review (bộ record review) nằm tại <a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> và <a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a>.</div>
+<div class="note"><b>Boundary của ANNEX</b><br/>ANNEX-113 khóa lớp kiểm soát số. Định nghĩa KPI, formula, dimension, cut-off logic và SoR precedence chi tiết nằm tại <a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>. Cách tổ chức bảng điều khiển pack, ghi chú điều hành, exception note và management-bộ record review (bộ record review) nằm tại <a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> và <a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a>.</div>
 
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#a1">1. Mục đích, phạm vi và boundary</a><a href="#a2">2. Kiến trúc bảng điều khiển, người phụ trách và source hierarchy</a><a href="#a3">3. Environment, deployment pipeline và release class</a><a href="#a4">4. Access model, vai trò boundary và separation-of-duties</a><a href="#a5">5. Refresh, freeze-date, exception note và pack control</a><a href="#a6">6. Failure handling, offline fallback, restore và backfill</a><a href="#a7">7. Bảng điều khiển register tối thiểu</a><a href="#a8">8. KPI của chính hệ bảng điều khiển governance</a><a href="#a9">9. Document liên kết và evidence bắt buộc</a></div></div>
 
@@ -168,7 +168,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Ngữ cảnh</th><th>Refresh / cut-off chuẩn</th><th>Freeze-date / freeze rule</th><th>Khi nào cần exception note</th><th>Nơi ghi nhận</th></tr></thead><tbody>
 <tr><td>T1/T2 điều hành trong ngày</td><td>Refresh trước họp tối thiểu 10–15 phút</td><td>Không freeze kỳ dài; freeze snapshot của cuộc họp</td><td>Refresh fail, stale data, manual override, missing diễn tập-down</td><td>Board note / WI-901 ghi chú điều hành</td></tr>
 <tr><td>T3 tuần / tháng</td><td>Refresh theo lịch pack công bố</td><td>Freeze tại giờ chốt pack</td><td>Late posting, reclass data, missing customer/supplier update</td><td>Pack ghi chú điều hành + log hành động</td></tr>
-<tr><td>T4 / management review</td><td>Dùng snapshot đã freeze cho kỳ review</td><td>PHẢI giữ nguyên số kỳ đã freeze nếu chưa có change record</td><td>Backfill sau freeze, SoR correction sau close, dataset incident</td><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> + change record</td></tr>
+<tr><td>T4 / management review</td><td>Dùng snapshot đã freeze cho kỳ review</td><td>PHẢI giữ nguyên số kỳ đã freeze nếu chưa có change record</td><td>Backfill sau freeze, SoR correction sau close, dataset incident</td><td><a  download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> + change record</td></tr>
 <tr><td>Customer / external pack</td><td>Theo pack đã approval</td><td>Freeze theo revision gửi ra ngoài</td><td>Số nội bộ chưa khớp external disclosure pack</td><td>Gói release + communication log</td></tr>
 </tbody></table></div>
 <div class="field-grid">
@@ -212,10 +212,10 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 
 <h2 class="h2" id="a9">9. Document liên kết và evidence bắt buộc</h2>
 <div class="link-grid">
-  <div class="link-card"><h3>Định nghĩa KPI và data model</h3><ul class="link-list"><li><a href="../01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></li><li><a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></li><li><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a></li></ul></div>
-  <div class="link-card"><h3>Access / RBAC / authority</h3><ul class="link-list"><li><a href="annex-101-role-based-access-map.html">ANNEX-101</a></li><li><a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a></li><li><a href="annex-120-authority-matrix.html">ANNEX-120</a></li><li><a href="annex-123-deputy-backup-matrix.html">ANNEX-123</a></li></ul></div>
-  <div class="link-card"><h3>Forms / record bắt buộc</h3><ul class="link-list"><li><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> — requirement cấp/đổi/recall quyền</li><li><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> — review quyền định kỳ</li><li><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> — pack control và exception note ở management review</li><li><a href="annex-124-dashboard-evidence-pack-worked-examples.html">ANNEX-124</a> — ví dụ mẫu evidence packs để training người phụ trách và pre-bộ record review</li></ul></div>
-  <div class="link-card"><h3>Continuity / fallback</h3><ul class="link-list"><li><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a></li><li><a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></li><li><a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></li></ul></div>
+  <div class="link-card"><h3>Định nghĩa KPI và data model</h3><ul class="link-list"><li><a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></li><li><a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></li><li><a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a></li></ul></div>
+  <div class="link-card"><h3>Access / RBAC / authority</h3><ul class="link-list"><li><a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></li><li><a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-102-access-request-field-dictionary.html">ANNEX-102</a></li><li><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></li><li><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></li></ul></div>
+  <div class="link-card"><h3>Forms / record bắt buộc</h3><ul class="link-list"><li><a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> — requirement cấp/đổi/recall quyền</li><li><a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> — review quyền định kỳ</li><li><a  download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> — pack control và exception note ở management review</li><li><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-124-dashboard-evidence-pack-worked-examples.html">ANNEX-124</a> — ví dụ mẫu evidence packs để training người phụ trách và pre-bộ record review</li></ul></div>
+  <div class="link-card"><h3>Continuity / fallback</h3><ul class="link-list"><li><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a></li><li><a href="../../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></li><li><a href="../../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></li></ul></div>
 </div>
 
 <div class="footer-note">ANNEX-113 là lớp khóa để bảng điều khiển không chỉ “đẹp để xem” mà đủ điều kiện dùng để điều hành: biết ai sở hữu, biết lúc nào dữ liệu được chốt, biết khi nào phải dừng tin bảng điều khiển và quay về SoR, biết ai được publish và biết rollback ra sao.</div>
@@ -223,3 +223,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </div></div></div></div></div>
 </body>
 </html>
+
+
+
+

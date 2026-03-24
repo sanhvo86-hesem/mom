@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ANNEX-133 - M365 records site topology, libraries and folder blueprint | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../../assets/style.css"/>
 <style>
 @media print {
   .card, .table-card, .callout, .note, .box, .iso-map, .lane, .legend, .req, .auth-grid, .backup-grid { break-inside: avoid; page-break-inside: avoid; }
@@ -37,9 +37,9 @@
 
 <div class="form-header">
   <div class="fh-left">
-    <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+    <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
     <div class="fh-company">
-      <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+      <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
       <span>Document operation • Annex số hóa</span>
     </div>
   </div>
@@ -60,7 +60,7 @@
         <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
         <p style="margin:8px 0;">ANNEX này khóa cấu trúc lưu trữ M365 cho toàn bộ HESEM ở ba lớp đồng thời: lớp công ty và QMS, lớp phòng ban và quá trình vận hành, và lớp hồ sơ cá nhân hoặc hồ sơ hệ thống có kiểm soát cao. Mọi record phát sinh từ handbook phòng ban, SOP, WI, form workbook, dashboard control và workflow phải có đúng một vị trí SSOT trong blueprint này.</p>
         <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: không tồn tại record chính thức nằm ngoài blueprint; không có hai SSOT cho cùng một loại record; mọi folder có owner rõ, permission boundary rõ, retention basis rõ và rule đặt tên rõ.</div>
-        <div class="keyline"><strong>Ranh giới tài liệu:</strong> ANNEX-133 là nguồn chuẩn cho <b>path, folder tree, retention basis và zone quyền</b>. Dictionary field/list nằm tại <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>. Permission boundary theo vai trò nằm tại <a href="annex-101-role-based-access-map.html">ANNEX-101</a>. Kiến trúc provisioning/automation thực thi nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>.</div>
+        <div class="keyline"><strong>Ranh giới tài liệu:</strong> ANNEX-133 là nguồn chuẩn cho <b>path, folder tree, retention basis và zone quyền</b>. Dictionary field/list nằm tại <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>. Permission boundary theo vai trò nằm tại <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a>. Kiến trúc provisioning/automation thực thi nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>.</div>
       </div>
 
       <div class="section">
@@ -96,7 +96,7 @@
                 <td>Hồ sơ thực thi theo JobNum, gate G0–G5, snapshot đóng job và evidence xuyên suốt order-to-ship.</td>
                 <td>Production Director / QA Manager</td>
                 <td>Cross-functional</td>
-                <td>Phải tương thích <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> và <a href="../02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>.</td>
+                <td>Phải tương thích <a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> và <a href="../../02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>.</td>
               </tr>
               <tr>
                 <td><span class="code">04-Training-Records</span></td>
@@ -558,5 +558,9 @@
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
+
+
+
+
 
 

@@ -1,4 +1,4 @@
-﻿// APP STATE
+// APP STATE
 // ═══════════════════════════════════════════════════
 let currentUser = null;
 let currentPage = 'dashboard';
@@ -725,7 +725,7 @@ async function openDoc(code){
   }
   if(!canAccessDoc(doc.code)) return;
 
-  // â”€â”€ Unsaved Changes Guard â”€â”€
+  // ── Unsaved Changes Guard ──
   if(editMode && editingDoc && editingDoc !== code){
     let hasUnsaved=true;
     try{
@@ -1779,7 +1779,7 @@ function showIconPickerInline(targetType, targetId, btnId){
   if(!btn) return;
   const rect = btn.getBoundingClientRect();
   
-  const catLabels={docs:'📄 Tài liệu',folders:'📁 ThÆ° mục',departments:'🏢 Phòng ban',tools:'🔧 Công cụ',industry:'🏭 Ngành',objects:'🎪 Đối tượng',symbols:'✨ Biểu tượng',nature:'🌍 Tự nhiên',flags:'🏳️ Cờ',food:'🍜 Ẩm thực',hands:'🤝 Biểu cảm'};
+  const catLabels={docs:'📄 Tài liệu',folders:'📁 Thư mục',departments:'🏢 Phòng ban',tools:'🔧 Công cụ',industry:'🏭 Ngành',objects:'🎪 Đối tượng',symbols:'✨ Biểu tượng',nature:'🌍 Tự nhiên',flags:'🏳️ Cờ',food:'🍜 Ẩm thực',hands:'🤝 Biểu cảm'};
   let gridHtml='';
   Object.entries(ICON_LIBRARY).forEach(([catKey,icons])=>{
     gridHtml+=`<div style="margin-bottom:8px">
@@ -2389,7 +2389,7 @@ async function submitCreateDoc(cat){
       // Also refresh dashboard counters
       renderDashboard();
     }else{
-      showToast((res && res.error) ? ('âš  '+res.error) : (lang==='en'?'âš  Create failed':'âš  Tạo thất bại'));
+      showToast((res && res.error) ? ('⚠ '+res.error) : (lang==='en'?'⚠ Create failed':'⚠ Tạo thất bại'));
     }
   }catch(err){
     showToast('Error: '+(err && err.message ? err.message : err));
@@ -2633,9 +2633,9 @@ function handleDictSearch(q){
   renderDictBody();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────
 // DICTIONARY CRUD (Admin only)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────
 function openDictTermModal(term){
   if(!isAdmin()){
     showToast(lang==='en'?'Not permitted':'Không có quyền');
@@ -2686,15 +2686,15 @@ async function saveDictTerm(originalTerm){
   try{
     const res = await apiCall('dict_upsert',{term,vi,meaning,cat,def,ctx,rec,originalTerm});
     if(!(res && res.ok)){
-      showToast((res && res.error)?('âš  '+res.error):(lang==='en'?'âš  Save failed':'âš  LÆ°u thất bại'));
+      showToast((res && res.error)?('⚠ '+res.error):(lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
       return;
     }
     dictData = res.items || dictData;
     closeModal();
     renderDictBody();
-    showToast(lang==='en'?'✓ Saved':'✓ Đã lÆ°u');
+    showToast(lang==='en'?'✓ Saved':'✓ Đã lưu');
   }catch(e){
-    showToast(lang==='en'?'âš  Save failed':'âš  LÆ°u thất bại');
+    showToast(lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại');
   }
 }
 
@@ -2704,14 +2704,14 @@ async function deleteDictTerm(term){
   try{
     const res = await apiCall('dict_delete',{term});
     if(!(res && res.ok)){
-      showToast((res && res.error)?('âš  '+res.error):(lang==='en'?'âš  Delete failed':'âš  Xóa thất bại'));
+      showToast((res && res.error)?('⚠ '+res.error):(lang==='en'?'⚠ Delete failed':'⚠ Xóa thất bại'));
       return;
     }
     dictData = res.items || dictData;
     renderDictBody();
     showToast(lang==='en'?'✓ Deleted':'✓ Đã xóa');
   }catch(e){
-    showToast(lang==='en'?'âš  Delete failed':'âš  Xóa thất bại');
+    showToast(lang==='en'?'⚠ Delete failed':'⚠ Xóa thất bại');
   }
 }
 
@@ -2802,16 +2802,16 @@ async function adminSaveAll(){
   try{
     const resRole = await saveRolePermsToServer();
     if(!(resRole && resRole.ok)){
-      showToast((resRole && resRole.error) ? ('âš  '+resRole.error) : (lang==='en'?'âš  Save failed':'âš  LÆ°u thất bại'));
+      showToast((resRole && resRole.error) ? ('⚠ '+resRole.error) : (lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
       return;
     }
     const resDocs = await saveDocVisibilityToServer();
     if(!(resDocs && resDocs.ok)){
-      showToast((resDocs && resDocs.error) ? ('âš  '+resDocs.error) : (lang==='en'?'âš  Save failed':'âš  LÆ°u thất bại'));
+      showToast((resDocs && resDocs.error) ? ('⚠ '+resDocs.error) : (lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
       return;
     }
   }catch(e){
-    showToast(lang==='en'?'âš  Save failed':'âš  LÆ°u thất bại');
+    showToast(lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại');
     return;
   }
 
@@ -3350,7 +3350,7 @@ function showUserModal(userId){
 
       <div class="modal-actions">
         <button class="btn-admin" onclick="closeModal()">${lang==='en'?'Cancel':'Hủy'}</button>
-        <button class="btn-admin primary" onclick="saveUserFromModal(${isEdit?`'${escapeHtml(u0.id)}'`:"''"})">${lang==='en'?'Save':'LÆ°u'}</button>
+        <button class="btn-admin primary" onclick="saveUserFromModal(${isEdit?`'${escapeHtml(u0.id)}'`:"''"})">${lang==='en'?'Save':'Lưu'}</button>
       </div>
     </div>
   `;
@@ -3409,7 +3409,7 @@ async function saveUserFromModal(userId){
     const personal_email = String(document.getElementById('um-personal-email')?.value||'').trim();
 
     if(!username){
-      showToast(lang==='en'?'âš  Username is required':'âš  Username là bắt buộc');
+      showToast(lang==='en'?'⚠ Username is required':'⚠ Username là bắt buộc');
       return;
     }
     if(!name){
@@ -3432,7 +3432,7 @@ async function saveUserFromModal(userId){
           wrap.style.display = 'block';
         }
       }
-      showToast(lang==='en'?'✅ Saved':'✅ Đã lÆ°u');
+      showToast(lang==='en'?'✅ Saved':'✅ Đã lưu');
       closeModal();
       await loadUsersFromServerIfAdmin();
       renderAdminUsers();
@@ -4155,7 +4155,7 @@ function renderAdminOrgChart(){
 }
 
 function exportOrgChartSVG(){
-  showToast(lang==='en'?'💡 Use Print (Ctrl+P) to save as PDF':'💡 Dùng In (Ctrl+P) để lÆ°u PDF');
+  showToast(lang==='en'?'💡 Use Print (Ctrl+P) to save as PDF':'💡 Dùng In (Ctrl+P) để lưu PDF');
 }
 
 // ═══════════════════════════════════════════════════

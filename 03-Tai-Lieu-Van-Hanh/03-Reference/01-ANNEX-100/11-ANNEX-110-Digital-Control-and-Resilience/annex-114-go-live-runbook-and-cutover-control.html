@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-111 — Document Writing and Cross-Reference Rules | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<title>ANNEX-114 — Go-live and cutover control Runbook and Cutover Control | HESEM QMS</title>
+<link href="../../../../assets/style.css" rel="stylesheet"/>
 <style>
 /* PAGE BREAK & OVERFLOW FIX */
 @media print {
@@ -54,18 +54,18 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
     <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+  <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+    <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
     <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
-  <strong>ANNEX-111 — Document Writing and Cross-Reference Rules</strong>
+  <strong>ANNEX-114 — Go-live and cutover control Runbook and Cutover Control</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>ANNEX-111</span></div>
+  <div class="row"><span><b>Code:</b></span><span>ANNEX-114</span></div>
   <div class="row"><span><b>Version:</b></span><span>V0</span></div>
   <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
   <div class="row"><span><b>Owner:</b></span><span>QMS Engineer / QA Manager</span></div>
@@ -76,15 +76,15 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
         <div class="form-sheet">
 
 <div class="iso-map">
-  <div class="iso-title">Quy tắc viết document và cross-reference</div>
-  <div class="req"><span class="req-tag shall">PHẢI</span><div>Document HESEM viết tiếng Việt kỹ thuật; thuật ngữ kỹ thuật giữ tiếng Anh trong ngoặc khi cần. Không viết chung chung, không dùng câu mơ hồ, không ghi lịch sử thay đổi cho bộ V0.</div></div>
+  <div class="iso-title">Go-live and cutover control</div>
+  <div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi go-live liên quan QMS điện tử, bảng điều khiển, field mapping hoặc release portal phải đi theo runbook được chốt trước ngày triển khai.</div></div>
 </div>
-<h2 class="h2">1. Quy ước từ khóa</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Từ khóa</th><th>Ý nghĩa</th><th>Cách dùng</th></tr></thead><tbody><tr><td>PHẢI</td><td>Requirement bắt buộc, không có tùy nghi</td><td>Câu phải nêu điều kiện và kết quả cần đạt</td></tr><tr><td>CHỈ ĐƯỢC LỆCH KHI CÓ PHÊ DUYỆT</td><td>Điều kiện ngoại lệ có kiểm soát</td><td>Chỉ dùng khi văn bản quy định rõ authority cho phép lệch và điều kiện áp dụng</td></tr><tr><td>ĐƯỢC PHÉP</td><td>Tùy chọn, cho phép linh hoạt trong giới hạn kiểm soát</td><td>Chỉ dùng khi hậu quả đã được kiểm soát</td></tr></tbody></table></div>
-<h2 class="h2">2. Quy tắc soạn SOP / WI / Form</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Loại document</th><th>Bố cục bắt buộc</th><th>Ghi chú</th></tr></thead><tbody><tr><td>SOP</td><td>iso-map → preface-block → 1.Mục đích → 2.Phạm vi → 3.Thuật ngữ → 4.RACI → 5+ Process → Form liên quan → Document liên quan</td><td>Mỗi SOP đúng 1 A trong RACI</td></tr><tr><td>WI</td><td>Header → Mục đích → PPE → Dụng cụ → Các bước → Tiêu chí → Xử lý bất thường → SOP liên quan</td><td>Tập trung operation tại hiện trường</td></tr><tr><td>Form</td><td>Header → Bảng ô trống → Ký duyệt → Footer (SOP chủ quản)</td><td>Ưu tiên trường đủ để số hóa M365 / Epicor</td></tr></tbody></table></div>
-<h2 class="h2">3. Quy ước cross-reference</h2>
-<p>Chỉ dùng mã 100-900 series, WI-xxx, FRM-xxx, SOP-xxx, ANNEX-xxx và JD. PHẢI viện dẫn mã document hiện hành; không ghi “xem document cũ” và không dùng REF cho document nội bộ có hiệu lực.</p>
+<h2 class="h2">1. Trình tự go-live</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Mốc</th><th>Hoạt động chính</th></tr></thead><tbody><tr><td>T-30 đến T-14</td><td>Chốt scope, người phụ trách, test tình huống, user list, cut-over checklist</td></tr><tr><td>T-7</td><td>Data freeze cục bộ, backup xác nhận, training người dùng, UAT sign-off, rollback rehearsal và check quyền production</td></tr><tr><td>T-1</td><td>Go/no-go review, hotline list, fallback criteria, snapshot dữ liệu</td></tr><tr><td>Go-live and cutover control Day</td><td>Mở quyền prod, theo dõi giao dịch đầu ca, log vấn đề theo mức độ</td></tr><tr><td>D+1 đến D+14</td><td>Hypercare, close action, lessons learned, baseline KPI sau triển khai</td></tr></tbody></table></div>
+<h2 class="h2">2. Checklist quyết định</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Câu hỏi</th><th>Đạt / Không</th></tr></thead><tbody><tr><td>Responsible Person nghiệp vụ đã sign-off UAT?</td><td>____</td></tr><tr><td>Training người dùng đã hoàn tất và có attendance?</td><td>____</td></tr><tr><td>Backup dữ liệu / file cấu hình đã lưu?</td><td>____</td></tr><tr><td>Rollback plan đã kiểm thử tối thiểu 1 lần?</td><td>____</td></tr><tr><td>Danh sách liên hệ escalation ngày go-live đã release?</td><td>____</td></tr></tbody></table></div>
+<h2 class="h2">3. Điều kiện rollback</h2>
+<p>Rollback PHẢI kích hoạt khi hệ thống gây mất khả năng truy record, sai quyền truy cập, chặn release hàng, sai dữ liệu master hoặc làm gián đoạn operation workshop vượt mức chấp nhận đã approval.</p>
 
         </div>
       </div>
@@ -93,4 +93,3 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </div>
 </body>
 </html>
-
