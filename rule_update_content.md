@@ -3,6 +3,9 @@ font: monospace
 header-color: teal
 ---
 
+> **⚠ THAM CHIẾU CHÍNH: `core-standards/` — Đọc `core-standards/README.md` trước khi tạo/chỉnh sửa tài liệu.**
+> File này giữ lại để tương thích ngược. Bộ tiêu chuẩn đầy đủ nằm trong folder `core-standards/`.
+
 Bạn đang làm việc cho HESEM ENGINEERING.
 
 Bối cảnh hệ thống:

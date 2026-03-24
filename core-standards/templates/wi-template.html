@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{{CODE}} — {{TITLE}} | HESEM QMS</title>
+<link href="{{RELATIVE_PATH}}/assets/style.css" rel="stylesheet"/>
+<style>
+.tight li{margin:4px 0;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.note-soft{border-left:4px solid #eab308;background:#fffbeb;padding:12px 14px;border-radius:8px;margin:12px 0;}
+.note-blue{border-left:4px solid var(--blue);background:var(--blue-l);padding:12px 14px;border-radius:8px;margin:12px 0;}
+.role-note{border-left:4px solid #94a3b8;background:#f8fafc;padding:12px 14px;border-radius:8px;margin-top:10px}
+.chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;font-weight:600;}
+.legend-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0;}
+table{max-width:100%;table-layout:auto}
+td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-align:top}
+@media print{.card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet{page-break-inside:avoid;break-inside:avoid}h1,h2,h3{page-break-after:avoid;break-after:avoid}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}}
+@media(max-width:960px){.grid-2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="{{RELATIVE_PATH}}/assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu kiểm soát</span>
+</div>
+</div>
+<div class="title">
+<strong>{{CODE}} — {{TITLE}}</strong>
+<span class="sub-vn">{{SUBTITLE}}</span>
+</div>
+<div class="meta">
+<div class="row"><span><b>Code:</b></span><span>{{CODE}}</span></div>
+<div class="row"><span><b>Version:</b></span><span>V0</span></div>
+<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Owner:</b></span><span>{{OWNER}}</span></div>
+<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+</div>
+</div>
+<div class="doc-content" id="docContent"><div class="form-sheet">
+
+<!-- ── ISO Requirements ── -->
+<div class="iso-map">
+<div class="iso-title">Chuẩn mực áp dụng</div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>{{YÊU CẦU BẮT BUỘC}}</div></div>
+</div>
+
+<!-- ── Preface ── -->
+<div class="preface-block"><div class="callout">
+<div class="card-title">Hướng dẫn vận hành</div>
+<p>{{MÔ TẢ NGẮN}}</p>
+<div class="legend-row">
+<span class="chip">SOP gốc: <a href="{{ĐƯỜNG DẪN SOP}}">{{MÃ SOP}}</a></span>
+<span class="chip">Biểu mẫu: {{DANH SÁCH FRM}}</span>
+</div>
+</div></div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1 — Mục đích                                          -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h2 class="h2" id="p1">1. Mục đích</h2>
+<p>{{MỤC ĐÍCH CỦA WI}}</p>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2 — Phạm vi & đối tượng áp dụng                      -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h2 class="h2" id="p2">2. Phạm vi &amp; đối tượng áp dụng</h2>
+<p>{{PHẠM VI VÀ ĐỐI TƯỢNG}}</p>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3 — Công cụ, vật tư & tài liệu cần thiết             -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h2 class="h2" id="p3">3. Công cụ, vật tư &amp; tài liệu cần thiết</h2>
+<ul class="tight">
+<li>{{CÔNG CỤ / VẬT TƯ / TÀI LIỆU}}</li>
+</ul>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4 — Điều kiện tiên quyết                              -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h2 class="h2" id="p4">4. Điều kiện tiên quyết</h2>
+<ul class="tight">
+<li>{{ĐIỀU KIỆN PHẢI ĐÁP ỨNG TRƯỚC KHI BẮT ĐẦU}}</li>
+</ul>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 5 — Các bước thực hiện                                -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h2 class="h2" id="p5">5. Các bước thực hiện</h2>
+
+<h3>Bước 1 — {{TÊN BƯỚC}}</h3>
+<p>{{MÔ TẢ}}</p>
+<ul class="tight">
+<li>{{CHI TIẾT THAO TÁC}}</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng:</b> {{ĐIỀU KIỆN CHẶN}}</div>
+
+<h3>Bước 2 — {{TÊN BƯỚC}}</h3>
+<p>{{MÔ TẢ}}</p>
+<ul class="tight">
+<li>{{CHI TIẾT THAO TÁC}}</li>
+</ul>
+
+<!-- Lặp lại cho mỗi bước -->
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 6 — Hồ sơ & bằng chứng                               -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h2 class="h2" id="p6">6. Hồ sơ &amp; bằng chứng</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Hồ sơ</th><th>Nơi lưu</th><th>Trách nhiệm</th></tr></thead>
+<tbody>
+<tr><td>{{TÊN HỒ SƠ}}</td><td>{{NƠI LƯU}}</td><td>{{VAI TRÒ}}</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 7 — Tài liệu liên quan                               -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h2 class="h2" id="p7">7. Tài liệu liên quan</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Mã</th><th>Tên tài liệu</th></tr></thead>
+<tbody>
+<tr><td><a href="{{ĐƯỜNG DẪN}}">{{MÃ}}</a></td><td>{{TÊN}}</td></tr>
+</tbody>
+</table>
+</div>
+
+</div></div>
+</div></div></div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

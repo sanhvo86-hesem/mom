@@ -1,5 +1,8 @@
 # 📋 HESEM eQMS — General Note for AI & Editors
 
+> **⚠ THAM CHIẾU CHÍNH: `core-standards/` — Đọc `core-standards/README.md` trước khi tạo/chỉnh sửa tài liệu.**
+> File này giữ lại để tương thích ngược. Bộ tiêu chuẩn đầy đủ nằm trong folder `core-standards/`.
+
 > **Mọi tài liệu chỉnh sửa hoặc tạo mới PHẢI tuân thủ đầy đủ các quy luật dưới đây.**
 > Bộ tài liệu hiện tại **chưa phát hành** — tất cả đều là **bản nháp V0**.
 
