@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>SYS-OPS-21 — External Provider &amp; Outsourcing Control: Luồng-Down, QC Cổng kiểm soát (gate), Thẻ điểm (scorecard) | HESEM OS</title>
+<title>SYS-OPS-21 — External Provider &amp; Outsourcing Control: Luồng-Down, QC Control gate (gate), Thẻ điểm (scorecard) | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
 /* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
@@ -53,7 +53,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-21 — External Provider &amp; Outsourcing Control: Luồng-Down, QC Cổng kiểm soát, Thẻ điểm</strong>
+  <strong>SYS-OPS-21 — External Provider &amp; Outsourcing Control: Luồng-Down, QC Control gate, Thẻ điểm</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -75,18 +75,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 </div>
-<h1 class="h1">SYS-OPS-21 — Kiểm soát NCC &amp; outsourcing (luồng‑down, QC cổng kiểm soát, thẻ điểm)</h1>
-<p class="small">Tài liệu này biến SOP-QMS-010 + các biểu mẫu FRM thành thao tác vận hành có điểm chặn, có OJT, có đánh giá ĐẠT/KHÔNG ĐẠT và có bằng chứng MRR truy xuất trong 60 giây.</p>
+<h1 class="h1">SYS-OPS-21 — Kiểm soát NCC &amp; outsourcing (luồng‑down, QC control gate, thẻ điểm)</h1>
+<p class="small">Tài liệu này biến SOP-QMS-010 + các biểu mẫu FRM thành thao tác vận hành có hold point, có OJT, có đánh giá ĐẠT/KHÔNG ĐẠT và có bằng chứng MRR truy xuất trong 60 giây.</p>
 </div>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
 <div>
- Khi sử dụng nhà cung cấp bên ngoài (NCC) hoặc thuê ngoài công đoạn (finishing/công đoạn đặc biệt), bộ phận liên quan PHẢI kiểm soát đủ 03 lớp: <b>(1) Luồng‑down yêu cầu</b> → <b>(2) Cổng kiểm soát kiểm soát gửi/nhận</b> → <b>(3) Đánh giá &amp; thẻ điểm theo dữ liệu</b>.
+ Khi sử dụng nhà cung cấp bên ngoài (NCC) hoặc thuê ngoài công đoạn (finishing/công đoạn đặc biệt), bộ phận liên quan PHẢI kiểm soát đủ 03 lớp: <b>(1) Luồng‑down yêu cầu</b> → <b>(2) Control gate kiểm soát gửi/nhận</b> → <b>(3) Đánh giá &amp; thẻ điểm theo dữ liệu</b>.
  </div>
 </div>
 <h2 class="h2">2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card">
-<p><b>Mục đích:</b> Chặn rủi ro “ship sai/ship lỗi” phát sinh từ NCC và thuê ngoài; bảo toàn traceability; khóa vượt qua cổng kiểm soát; đảm bảo chứng từ hợp lệ; tạo bằng chứng sẵn sàng đánh giá theo ISO 9001 điều khoản 8.4 &amp; 7.5.</p>
+<p><b>Mục đích:</b> Chặn rủi ro “ship sai/ship lỗi” phát sinh từ NCC và thuê ngoài; bảo toàn traceability; khóa vượt qua control gate; đảm bảo chứng từ hợp lệ; tạo bằng chứng sẵn sàng đánh giá theo ISO 9001 điều khoản 8.4 &amp; 7.5.</p>
 <p><b>Kích hoạt (trigger):</b></p>
 <ul>
 <li>Khi tạo NCC mới, thay đổi NCC, thay đổi sub‑tier hoặc thay đổi công đoạn/tiêu chuẩn.</li>
@@ -98,18 +98,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p><b>Vai trò chịu trách nhiệm (điểm chốt):</b></p>
 <ul>
 <li><b>Purchasing</b>: duyệt NCC/duyệt điều kiện PO/Job Pack; duy trì ASL/AVL; vận hành FRM-PUR-002/005; phát hành SCAR theo quy trình liên quan.</li>
-<li><b>QA/QC</b>: xác nhận CTQ/KPC; định nghĩa phương pháp kiểm; vận hành cổng kiểm soát kiểm tra nhận về FRM-QA-005; quyết định HOLD/REJECT khi chứng từ/đo kiểm không đạt.</li>
+<li><b>QA/QC</b>: xác nhận CTQ/KPC; định nghĩa phương pháp kiểm; vận hành control gate kiểm tra nhận về FRM-QA-005; quyết định HOLD/REJECT khi chứng từ/đo kiểm không đạt.</li>
 <li><b>Warehouse</b>: kiểm đếm – đóng gói – nhãn lot/serial; vận hành dispatch bảng kiểm FRM-PUR-004; cách ly lô HOLD.</li>
-<li><b>Planner/Supervisor</b>: khóa lịch, buffer thời gian dẫn (lead time); không cho chạy “tắt” khi cổng kiểm soát chưa PASS.</li>
+<li><b>Planner/Supervisor</b>: khóa lịch, buffer thời gian dẫn (lead time); không cho chạy “tắt” khi control gate chưa PASS.</li>
 <li><b>Engineering/Programmer/Setup/Operator</b>: xác định yêu cầu kỹ thuật/finish/masking; bảo vệ bề mặt; cung cấp thông tin kỹ thuật đúng revision cho Purchasing.</li>
 <li><b>Estimator (SAL-03)</b>: khóa yêu cầu khách hàng/hợp đồng; xác nhận yêu cầu chứng chỉ; phát tín hiệu thay đổi.</li>
 </ul>
 </div>
-<h2 class="h2">3) Vị trí trong chuỗi E2E + luồng bàn giao + “điểm chặn”</h2>
+<h2 class="h2">3) Vị trí trong chuỗi E2E + luồng bàn giao + “hold point”</h2>
 <div class="card">
 <p><b>Vị trí trong chuỗi end‑to‑end:</b> Mô-đun nằm trọng tâm tại <b>Purchasing → Receiving → QC/QA</b>, có liên kết trực tiếp với <b>Engineering/Production</b> khi luồng‑down yêu cầu và bảo toàn traceability.</p>
 <table class="form-table">
-<tr><th>Bước E2E</th><th>Đầu vào tối thiểu</th><th>Đầu ra bắt buộc</th><th>Điểm chặn (Cổng kiểm soát)</th></tr>
+<tr><th>Bước E2E</th><th>Đầu vào tối thiểu</th><th>Đầu ra bắt buộc</th><th>Hold point (Control gate)</th></tr>
 <tr>
 <td>Engineering</td>
 <td>Bản vẽ + Rev; spec finishing; CTQ/KPC; yêu cầu chứng chỉ</td>
@@ -144,7 +144,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Final/Ship</td>
 <td>Hồ sơ NCC đầy đủ</td>
 <td>Bộ bằng chứng sẵn sàng đánh giá</td>
-<td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</td>
+<td>không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</td>
 </tr>
 </table>
 </div>
@@ -158,7 +158,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiếu chứng chỉ bắt buộc (CoC/CoA/heat treat/plating cert) hoặc chứng chỉ không khớp PO/Rev.</li>
 <li>Không đo CTQ bị ảnh hưởng bởi finishing (thickness/hardness/dimension drift) trước khi release.</li>
 <li>Packaging không bảo vệ bề mặt sau finishing; trầy xước làm phát sinh scrap/rework.</li>
-<li>Bỏ qua cổng kiểm soát nhận về do áp lực tiến độ; hàng đi thẳng vào sản xuất/giao hàng khi chưa PASS.</li>
+<li>Bỏ qua control gate nhận về do áp lực tiến độ; hàng đi thẳng vào sản xuất/giao hàng khi chưa PASS.</li>
 <li>Không cập nhật thẻ điểm; không kích hoạt hành động khi KPI tụt; rủi ro lặp lại NCR.</li>
 <li>Không lưu hồ sơ đúng nơi; không truy xuất được trong 60 giây khi đánh giá/khách hàng hỏi.</li>
 <li>Không có tiêu chí HOLD/REJECT rõ; quyết định theo cảm tính; không nhất quán giữa ca.</li>
@@ -169,13 +169,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <b>Nguyên tắc khóa rủi ro:</b>
 <ul>
-<li>Kiểm soát theo rủi ro: công đoạn càng đặc biệt/sai càng khó phát hiện → cổng kiểm soát càng cứng.</li>
+<li>Kiểm soát theo rủi ro: công đoạn càng đặc biệt/sai càng khó phát hiện → control gate càng cứng.</li>
 <li>Bằng chứng đi trước quyết định: mọi “GO/RELEASE” phải có file/chữ ký/hồ sơ.</li>
 <li>Traceability xuyên suốt: lot/serial/heat phải nối từ gửi đi → nhận về → ship.</li>
 </ul>
 </div>
 <table class="form-table">
-<tr><th>#</th><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng (MRR)</th><th>Điểm chặn</th></tr>
+<tr><th>#</th><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng (MRR)</th><th>Hold point</th></tr>
 <tr>
 <td>CP1</td>
 <td>Phân loại rủi ro mua hàng/thuê ngoài và khóa NCC theo ASL/AVL</td>
@@ -199,14 +199,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>CP4</td>
-<td>Cổng kiểm soát trước khi gửi: xác nhận part condition, lot/serial, đóng gói bảo vệ bề mặt, ảnh hiện trạng</td>
+<td>Control gate trước khi gửi: xác nhận part condition, lot/serial, đóng gói bảo vệ bề mặt, ảnh hiện trạng</td>
 <td>Warehouse + QA</td>
 <td><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-PUR-004</a> + ảnh + nhãn</td>
 <td>Không đủ nhãn/ảnh/đóng gói → HOLD tại kho</td>
 </tr>
 <tr>
 <td>CP5</td>
-<td>Cổng kiểm soát nhận về: đối chiếu số lượng, chứng chỉ, ngoại quan 100%, đo CTQ bị ảnh hưởng</td>
+<td>Control gate nhận về: đối chiếu số lượng, chứng chỉ, ngoại quan 100%, đo CTQ bị ảnh hưởng</td>
 <td>QA/IQC + Warehouse</td>
 <td><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-QA-005</a> + file cert</td>
 <td>Thiếu cert hoặc đo NG → HOLD/REJECT</td>
@@ -233,7 +233,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <table class="form-table">
 <tr><th>Thực hành</th><th>Lý do chọn</th><th>Nguồn lực</th><th>Bằng chứng-ready</th></tr>
 <tr><td>Luồng‑down bảng kiểm trên PO/Job Pack</td><td>Giảm sai Rev/spec ngay từ đầu</td><td>0 phần mềm; dùng mẫu PO/Job Pack</td><td>PO + bảng kiểm</td></tr>
-<tr><td>Cổng kiểm soát gửi/nhận bằng bảng kiểm + ảnh</td><td>Chặn lẫn lộn &amp; hư hỏng bề mặt</td><td>Kho + điện thoại chụp ảnh</td><td>FRM-PUR-004 + ảnh</td></tr>
+<tr><td>Control gate gửi/nhận bằng bảng kiểm + ảnh</td><td>Chặn lẫn lộn &amp; hư hỏng bề mặt</td><td>Kho + điện thoại chụp ảnh</td><td>FRM-PUR-004 + ảnh</td></tr>
 <tr><td>Kiểm tra đầu vào theo CTQ</td><td>Chặn ship lỗi finishing khó sửa</td><td>QA/IQC + dụng cụ đo</td><td>FRM-QA-005</td></tr>
 <tr><td>Thẻ điểm theo KPI tối thiểu</td><td>Quản trị NCC bằng dữ liệu</td><td>Excel/FRM-PUR-005</td><td>FRM-PUR-005 + kế hoạch hành động</td></tr>
 <tr><td>SCAR khi vượt ngưỡng</td><td>Chặn lặp NCR</td><td>QA/PUR phối hợp</td><td>SCAR hồ sơ</td></tr>
@@ -247,7 +247,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>BLOCK đặt hàng/thuê ngoài:</b> NCC không nằm trong ASL/AVL hoặc chưa có FRM-PUR-002 đầy đủ minh chứng.</li>
 <li><b>HOLD tại kho (không rời xưởng):</b> Hàng gửi đi thiếu nhãn lot/serial, thiếu ảnh hiện trạng, thiếu đóng gói bảo vệ bề mặt/CTQ, thiếu FRM-PUR-003/004 ký duyệt.</li>
 <li><b>HOLD tại Receiving:</b> Hàng nhận về thiếu chứng chỉ bắt buộc hoặc chứng chỉ không khớp Rev/spec/PO; bao bì hư; số lượng lệch.</li>
-<li><b>BLOCK release sang công đoạn tiếp theo/ship:</b> FRM-QA-005 chưa hoàn tất; đo CTQ NG; traceability đứt đoạn; phát hiện vượt qua cổng kiểm soát.</li>
+<li><b>BLOCK release sang công đoạn tiếp theo/ship:</b> FRM-QA-005 chưa hoàn tất; đo CTQ NG; traceability đứt đoạn; phát hiện vượt qua control gate.</li>
 <li><b>STOP &amp; ESCALATE:</b> Phát hiện NCC thay đổi sub‑tier/quy trình/material khi chưa có phê duyệt; kích hoạt điều tra + containment ngay.</li>
 </ol>
 </div>
@@ -278,9 +278,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>BLOCK cho tới khi phê duyệt thay đổi</td>
 </tr>
 <tr>
-<td>Vượt qua cổng kiểm soát / hàng đi thẳng vào sản xuất</td>
+<td>Vượt qua control gate / hàng đi thẳng vào sản xuất</td>
 <td>STOP dây chuyền liên quan → thu hồi lô → báo Supervisor → ghi nhận sự cố</td>
-<td>Khoá cổng kiểm soát + điều tra nguyên nhân</td>
+<td>Khoá control gate + điều tra nguyên nhân</td>
 </tr>
 </table>
 <h2 class="h2">8) Bảng kiểm vận hành (≤15 bước) — Responsible Person + Bằng chứng/MRR + lỗi lặp lại</h2>
@@ -293,7 +293,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>5</td><td>Chuẩn bị hàng gửi: nhãn lot/serial, bảo vệ bề mặt, tách lô</td><td>Warehouse</td><td>Ảnh + nhãn + packing bằng chứng</td><td>Gộp nhiều lô vào 1 thùng không phân tách</td></tr>
 <tr><td>6</td><td>QA xác nhận part condition &amp; CTQ liên quan finishing trước khi gửi</td><td>QA/QC</td><td>Hồ sơ đo/ngoại quan + ký trên FRM-PUR-004</td><td>Không chụp ảnh hiện trạng</td></tr>
 <tr><td>7</td><td>Hoàn tất FRM-PUR-004 và bàn giao cho NCC (ký nhận)</td><td>Warehouse + Purchasing</td><td>FRM-PUR-004</td><td>Thiếu tracking/Ref; thiếu số lượng</td></tr>
-<tr><td>8</td><td>Nhận hàng về: kiểm thùng, kiểm số lượng, cách ly khu vực Receiving</td><td>Warehouse</td><td>Receiving nhật ký + ảnh thùng</td><td>Cho hàng vào line khi chưa cổng kiểm soát</td></tr>
+<tr><td>8</td><td>Nhận hàng về: kiểm thùng, kiểm số lượng, cách ly khu vực Receiving</td><td>Warehouse</td><td>Receiving nhật ký + ảnh thùng</td><td>Cho hàng vào line khi chưa control gate</td></tr>
 <tr><td>9</td><td>Kiểm tra chứng chỉ: khớp PO/Rev/spec/lot</td><td>QA</td><td>File cert + tick trên FRM-QA-005</td><td>Nhận cert nhưng không đối chiếu nội dung</td></tr>
 <tr><td>10</td><td>Kiểm ngoại quan 100% sau finishing; kiểm CTQ bề mặt</td><td>QA/IQC</td><td>FRM-QA-005</td><td>Lấy mẫu ít; bỏ qua vùng CTQ</td></tr>
 <tr><td>11</td><td>Đo CTQ bị ảnh hưởng (thickness/hardness/dimension drift) theo plan</td><td>QA/IQC</td><td>Hồ sơ đo + FRM-QA-005</td><td>Dùng gage OOT; không ghi đơn vị/độ phân giải</td></tr>
@@ -310,7 +310,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3</td><td>Điền FRM-PUR-003 đủ spec/masking/cert/traceability</td><td>NCC nhận 1 yêu cầu rõ, đo được</td></tr>
 <tr><td>4</td><td>PO/Job Pack phải phản chiếu y hệt FRM-PUR-003</td><td>Tránh mâu thuẫn tài liệu</td></tr>
 <tr><td>5</td><td>Trước khi gửi: chụp ảnh hiện trạng + nhãn lot/serial</td><td>Chặn tranh chấp và lẫn lộn</td></tr>
-<tr><td>6</td><td>Nhận về: giữ tại Receiving cho tới khi cert + FRM-QA-005 PASS</td><td>Chặn vượt qua cổng kiểm soát</td></tr>
+<tr><td>6</td><td>Nhận về: giữ tại Receiving cho tới khi cert + FRM-QA-005 PASS</td><td>Chặn vượt qua control gate</td></tr>
 <tr><td>7</td><td>Đối chiếu cert theo Rev/spec/lot; không chỉ “có cert”</td><td>Chặn cert sai/giả</td></tr>
 <tr><td>8</td><td>Đo CTQ theo plan; ghi đầy đủ đơn vị/kết quả/thiết bị</td><td>Đảm bảo bằng chứng sẵn sàng đánh giá</td></tr>
 <tr><td>9</td><td>Cập nhật thẻ điểm và kích hoạt kế hoạch hành động khi KPI tụt</td><td>Chặn tái diễn rủi ro</td></tr>
@@ -346,8 +346,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>L3</td>
-<td>Đánh giá rủi ro và khóa cổng kiểm soát hợp lệ; lập kế hoạch hành động thẻ điểm; mở SCAR đúng trigger; chứng minh truy xuất hồ sơ trong 60 giây.</td>
-<td>02 tình huống thực chiến liên tiếp không lỗi cổng kiểm soát</td>
+<td>Đánh giá rủi ro và khóa control gate hợp lệ; lập kế hoạch hành động thẻ điểm; mở SCAR đúng trigger; chứng minh truy xuất hồ sơ trong 60 giây.</td>
+<td>02 tình huống thực chiến liên tiếp không lỗi control gate</td>
 <td>Được phê duyệt outsource request rủi ro thấp‑trung bình theo phân quyền (Purchasing/QA)</td>
 </tr>
 <tr>
@@ -362,7 +362,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Purchasing:</b> đạt khi tự hoàn tất FRM-PUR-002/003/005 và phát hành PO có luồng‑down, không lỗi Rev/cert/traceability.</li>
 <li><b>QA/QC:</b> đạt khi tự vận hành FRM-QA-005 và ra quyết định HOLD/REJECT đúng tiêu chí, không bỏ sót chứng chỉ.</li>
-<li><b>Warehouse:</b> đạt khi vận hành FRM-PUR-004, nhãn lot/serial chuẩn, ảnh hiện trạng đầy đủ, không để vượt qua cổng kiểm soát.</li>
+<li><b>Warehouse:</b> đạt khi vận hành FRM-PUR-004, nhãn lot/serial chuẩn, ảnh hiện trạng đầy đủ, không để vượt qua control gate.</li>
 <li><b>Engineering/Programmer/Setup/Operator:</b> đạt khi cung cấp yêu cầu finishing/CTQ rõ và bảo vệ bề mặt đúng hướng dẫn khi bàn giao kho.</li>
 <li><b>Planner/Supervisor:</b> đạt khi khóa lịch không cho “chạy tắt” và xử lý escalation theo fail-fast rules.</li>
 <li><b>Estimator (SAL-03):</b> đạt khi xác nhận yêu cầu chứng chỉ và chuyển thông tin thay đổi tới Purchasing/QA trong ngày phát sinh.</li>
@@ -372,7 +372,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">10.1 Bài kiểm tra nhanh (≥20 câu)</h3>
 <div class="card">
 <ol>
-<li>Điểm chặn số 1 trước khi thuê ngoài công đoạn là gì?</li>
+<li>Hold point số 1 trước khi thuê ngoài công đoạn là gì?</li>
 <li>Luồng‑down tối thiểu trên PO/Job Pack gồm những trường nào bắt buộc?</li>
 <li>Hành động bắt buộc khi PO ghi “latest” thay vì Rev cụ thể?</li>
 <li>02 bằng chứng tối thiểu khi gửi hàng đi outsource finishing?</li>
@@ -383,7 +383,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>FRM-PUR-004 dùng để kiểm soát giai đoạn nào?</li>
 <li>FRM-QA-005 dùng để kiểm soát giai đoạn nào?</li>
 <li>FRM-PUR-005 dùng để làm gì và ai chịu trách nhiệm cập nhật?</li>
-<li>Định nghĩa “vượt qua cổng kiểm soát” trong bối cảnh outsourcing?</li>
+<li>Định nghĩa “vượt qua control gate” trong bối cảnh outsourcing?</li>
 <li>Liệt kê 03 điểm đứt gãy gây ship lỗi liên quan NCC.</li>
 <li>Khi NCC thay đổi sub‑tier/quy trình/material, hành động đúng là gì?</li>
 <li>Ngưỡng kích hoạt SCAR khi thời gian phản hồi vượt bao lâu (theo SOP-QMS-010)?</li>
@@ -406,20 +406,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>HOLD tại Receiving; không release.</li>
 <li>Nhãn lot/serial không nối được với cert/PO; không đối chiếu được từ gửi đi tới nhận về.</li>
 <li>Thông tin job/part + yêu cầu kỹ thuật tối thiểu + điều kiện chất lượng + phê duyệt.</li>
-<li>Cổng kiểm soát trước khi gửi (dispatch).</li>
-<li>Cổng kiểm soát nhận về (kiểm tra đầu vào).</li>
+<li>Control gate trước khi gửi (dispatch).</li>
+<li>Control gate nhận về (kiểm tra đầu vào).</li>
 <li>Thẻ điểm KPI NCC; Purchasing chủ trì, QA đồng ký.</li>
-<li>Hàng đi/nhận/chạy khi chưa PASS cổng kiểm soát và chưa có hồ sơ.</li>
-<li>Sai Rev; thiếu cert; lẫn lộn/lẫn lô; vượt qua cổng kiểm soát; đóng gói trầy xước; sub-tier không phê duyệt…</li>
+<li>Hàng đi/nhận/chạy khi chưa PASS control gate và chưa có hồ sơ.</li>
+<li>Sai Rev; thiếu cert; lẫn lộn/lẫn lô; vượt qua control gate; đóng gói trầy xước; sub-tier không phê duyệt…</li>
 <li>STOP &amp; ESCALATE; BLOCK lô/PO; đánh giá lại và phê duyệt thay đổi trước khi tiếp tục.</li>
 <li>&gt; 5 ngày làm việc.</li>
 <li>&lt; 90%.</li>
 <li>Mở SCAR + tăng kiểm tra đầu vào + escalation Purchasing → QA → GD.</li>
-<li>Tại mọi quyết định GO/RELEASE (cổng kiểm soát gửi/nhận/release).</li>
+<li>Tại mọi quyết định GO/RELEASE (control gate gửi/nhận/release).</li>
 <li>Không khớp Rev/spec/lot; thiếu nội dung bắt buộc; không truy xuất được nguồn/lot.</li>
 <li>Warehouse (đóng gói/nhãn) + Supervisor kiểm soát.</li>
 <li>STOP → gom thùng → khóa khu vực → kiểm đếm → HOLD 100% → NCR.</li>
-<li>FRM-PUR-004 đầy đủ + nhãn/ảnh đúng + không vượt qua cổng kiểm soát.</li>
+<li>FRM-PUR-004 đầy đủ + nhãn/ảnh đúng + không vượt qua control gate.</li>
 </ol>
 </details>
 </div>
@@ -428,7 +428,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li><b>Scenario 1 — Sai Rev trên cert:</b> Job J-2411, P/N ABC-123, Rev C. NCC gửi cert ghi Rev B. Hàng đã về kho, chưa kiểm. Bạn quyết định <b>HOLD/GO</b> và liệt kê 04 MRR phải tạo ngay (tên file chuẩn).</li>
 <li><b>Scenario 2 — Thiếu masking vùng CTQ:</b> FRM-PUR-003 không ghi masking, NCC anodize phủ toàn bộ; vùng lắp ghép CTQ bị thay đổi kích thước. Bạn quyết định <b>HOLD/REJECT</b>, kích hoạt hồ sơ nào, và cập nhật thẻ điểm ra sao.</li>
-<li><b>Scenario 3 — Lẫn lộn lẫn lô:</b> 02 lô cùng P/N nhưng khác lot; NCC trả về 01 thùng không phân tách. Nhãn lot mờ. Bạn thực hiện phản ứng 60 giây và quyết định cổng kiểm soát. Nêu tiêu chí release khi nào.</li>
+<li><b>Scenario 3 — Lẫn lộn lẫn lô:</b> 02 lô cùng P/N nhưng khác lot; NCC trả về 01 thùng không phân tách. Nhãn lot mờ. Bạn thực hiện phản ứng 60 giây và quyết định control gate. Nêu tiêu chí release khi nào.</li>
 </ol>
 </div>
 <h3 class="h3">10.3 Performance Test (bắt buộc)</h3>
@@ -445,16 +445,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 <b>Rubric ĐẠT/KHÔNG ĐẠT:</b>
 <ul>
-<li><b>FAIL ngay</b> khi: release không cert; không đối chiếu Rev/spec; vượt qua cổng kiểm soát; traceability đứt; thiếu hồ sơ bắt buộc.</li>
-<li><b>PASS</b> khi: 0 lỗi “critical”; 0 thiếu MRR; quyết định cổng kiểm soát đúng 100% theo fail-fast rules.</li>
+<li><b>FAIL ngay</b> khi: release không cert; không đối chiếu Rev/spec; vượt qua control gate; traceability đứt; thiếu hồ sơ bắt buộc.</li>
+<li><b>PASS</b> khi: 0 lỗi “critical”; 0 thiếu MRR; quyết định control gate đúng 100% theo fail-fast rules.</li>
 </ul>
 </div>
 </div>
-<h2 class="h2">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”)</h2>
+<h2 class="h2">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”)</h2>
 <div class="card">
 <ul>
 <li><b>Bài kiểm tra nhanh:</b> ≥ 85% đúng.</li>
-<li><b>Scenario:</b> 03/03 quyết định cổng kiểm soát đúng và liệt kê đúng MRR bắt buộc; không có câu trả lời “để sau”.</li>
+<li><b>Scenario:</b> 03/03 quyết định control gate đúng và liệt kê đúng MRR bắt buộc; không có câu trả lời “để sau”.</li>
 <li><b>Performance test:</b> PASS theo rubric; không vi phạm lỗi critical.</li>
 <li><b>Chuẩn bằng chứng:</b> Không có file/hồ sơ/chữ ký theo MRR → xem như <b>không thực hiện</b> → FAIL.</li>
 </ul>
@@ -480,7 +480,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <p><b>Nơi lưu (bắt buộc):</b></p>
 <ul>
-<li>Hồ sơ công việc (job dossier): <code>M365/SharePoint → HESEM-QMS-SSOT /Job-Dossier/{JOBNO}/Outsource/</code></li>
+<li>Job dossier (job dossier): <code>M365/SharePoint → HESEM-QMS-SSOT /Job-Dossier/{JOBNO}/Outsource/</code></li>
 <li>Supplier master: <code>M365/SharePoint → HESEM-QMS-SSOT /Suppliers/{SUPPLIER}/Qualification/</code></li>
 <li>Thẻ điểm: <code>M365/SharePoint → HESEM-QMS-SSOT /Suppliers/{SUPPLIER}/Thẻ điểm/{YYYY}/</code></li>
 </ul>
@@ -494,10 +494,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Không chứng minh traceability</b> → nhãn lot/serial bắt buộc + liên kết trên FRM-PUR-004/FRM-QA-005.</li>
 <li><b>Thiếu kiểm tra đầu vào hồ sơ</b> → FRM-QA-005 là điều kiện release.</li>
 <li><b>Chứng chỉ không khớp yêu cầu</b> → QA đối chiếu nội dung; không chỉ kiểm “có giấy”.</li>
-<li><b>Vượt qua cổng kiểm soát do tiến độ</b> → fail-fast rules + Supervisor khóa release.</li>
+<li><b>Vượt qua control gate do tiến độ</b> → fail-fast rules + Supervisor khóa release.</li>
 <li><b>Không có thẻ điểm/kế hoạch hành động</b> → FRM-PUR-005 cập nhật theo kỳ và lưu đúng nơi.</li>
 <li><b>Không kiểm soát sub‑tier</b> → yêu cầu phê duyệt thay đổi trước; lưu email/phiếu phê duyệt.</li>
-<li><b>Hồ sơ lưu rải rác</b> → chuẩn hóa naming + nơi lưu; kiểm tra truy xuất 60 giây trong đánh giá nội bộ.</li>
+<li><b>Hồ sơ lưu rải rác</b> → chuẩn hóa naming + nơi lưu; kiểm tra truy xuất 60 giây trong internal audit.</li>
 </ol>
 </div>
 </div>

@@ -69,11 +69,11 @@ ul.tight li {margin:4px 0;}
         </div>
       </div>
       <div class="doc-content" id="docContent"><div class="form-sheet">
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi lựa chọn ý tưởng chống sai cho máy, setup, kiểm tra, clean-pack, shipping và FOD control. Đây là thư viện giải pháp, không thay WI tại điểm dùng.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi lựa chọn ý tưởng chống sai cho máy, setup, kiểm tra, clean-pack, shipping và FOD control. Đây là thư viện giải pháp, không thay WI tại point-of-use.</div>
       <h1>ANNEX-507 — Thư viện ví dụ poka-yoke CNC, anti-mix, anti-rev, anti-tooling error</h1>
       
 <div class="section"><h2>1. Cách dùng thư viện</h2>
-<p>ANNEX này là thư viện lựa chọn giải pháp. Không dùng ANNEX này để thay WI tại máy. Khi chọn được giải pháp phù hợp, phải triển khai theo <a href="../../02-Work-Instructions/08-WI-800/wi-801-cnc-poka-yoke-examples.html">WI-801</a>, cập nhật đúng điểm dùng và theo dõi hiệu lực sau release.</p>
+<p>ANNEX này là thư viện lựa chọn giải pháp. Không dùng ANNEX này để thay WI tại máy. Khi chọn được giải pháp phù hợp, phải triển khai theo <a href="../../02-Work-Instructions/08-WI-800/wi-801-cnc-poka-yoke-examples.html">WI-801</a>, cập nhật đúng point-of-use và theo dõi hiệu lực sau release.</p>
 <div class="callout-info"><strong>QUY TẮC DÙNG</strong> Chọn lỗi cần chặn → chọn nhóm giải pháp → đánh giá khả năng vượt qua → pilot tại point-of-use → chuẩn hóa vào WI / layout / dữ liệu / thiết bị.</div></div>
 
 <div class="section"><h2>2. Ma trận chọn hướng chống sai theo loại lỗi</h2>
@@ -93,9 +93,9 @@ ul.tight li {margin:4px 0;}
 <tr><td>PY-003</td><td>Sai jaw / sai soft jaw set</td><td>Mã jaw + hộc cất riêng + photo standard tại máy.</td><td>Turning / mill-turn setup</td><td>M2</td><td>Jaw set được quản lý riêng theo part family.</td></tr>
 <tr><td>PY-004</td><td>Sai tool loaded / sai tool life</td><td>Bảng treo bóng dụng cụ (shadow board) + tool ID + rule không mở cycle nếu danh sách tool chưa đủ.</td><td>Setup cart / pre-run</td><td>M2</td><td>Tool list chuẩn từ engineering và shop-floor giữ đúng vị trí.</td></tr>
 <tr><td>PY-005</td><td>Sai offset / quên dry-run</td><td>Dual xác minh offset + bắt buộc dry-run / single-block trước part đầu tiên.</td><td>First setup / changeover</td><td>M2</td><td>Trưởng nhóm hoặc người đủ điều kiện cùng xác nhận.</td></tr>
-<tr><td>PY-006</td><td>Bỏ sót đặc tính CTQ ở mẫu đầu (first piece)</td><td>Balloon drawing + bảng kiểm bắt buộc đóng tất cả CTQ trước khi mở cổng kiểm soát G2.</td><td>Mẫu đầu / FAI</td><td>M2</td><td>Drawing balloon đúng revision, đủ CTQ, đủ hồ sơ field.</td></tr>
+<tr><td>PY-006</td><td>Bỏ sót đặc tính CTQ ở mẫu đầu (first piece)</td><td>Balloon drawing + bảng kiểm bắt buộc đóng tất cả CTQ trước khi mở control gate G2.</td><td>Mẫu đầu / FAI</td><td>M2</td><td>Drawing balloon đúng revision, đủ CTQ, đủ hồ sơ field.</td></tr>
 <tr><td>PY-007</td><td>Dùng sai gage family</td><td>Màu gage + ảnh đúng/sai ngay tại điểm đo + khoá tủ gage theo nhóm.</td><td>Trong quá trình / kiểm tra cuối</td><td>M3</td><td>Metrology duy trì màu và vị trí đồng nhất.</td></tr>
-<tr><td>PY-008</td><td>Ghi thiếu dữ liệu release</td><td>Form số không cho gửi khi thiếu field CTQ/qty/lot/người phê duyệt bắt buộc.</td><td>QA release / shipping pack</td><td>M2</td><td>Field mapping và luồng approval phải ổn định.</td></tr>
+<tr><td>PY-008</td><td>Ghi thiếu dữ liệu release</td><td>Form số không cho gửi khi thiếu field CTQ/qty/lot/approver bắt buộc.</td><td>QA release / shipping pack</td><td>M2</td><td>Field mapping và luồng approval phải ổn định.</td></tr>
 <tr><td>PY-009</td><td>Nhầm material / mixed alloy</td><td>Bin màu + scan material cert / heat number trước khi cấp vào máy.</td><td>Receiving / vấn đề to job</td><td>M2</td><td>Kho phân khu và label nhiệt luyện/heat number rõ ràng.</td></tr>
 <tr><td>PY-010</td><td>Mixed part / mixed revision trên cùng khay</td><td>Khay 1 mã part-rev; mỗi vị trí khay có placard cố định; phải giữ tách tuyệt đối.</td><td>WIP staging</td><td>M1</td><td>Planning và operator tuân thủ rule WIP separation.</td></tr>
 <tr><td>PY-011</td><td>Quên cap / plug trước clean pack</td><td>Witness position + bảng kiểm 4 mắt cho cap/plug/desiccant/humidity card.</td><td>Clean pack</td><td>M2</td><td>Danh sách phụ kiện của từng job được chốt trước.</td></tr>
@@ -104,7 +104,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>PY-014</td><td>Bỏ sót bàn giao thông tin ca</td><td>Board giao ca bắt buộc có machine trạng thái, hold lot, tool concern, abnormal note.</td><td>Shift handover</td><td>M3</td><td>Người giao / nhận ca cùng ký và cùng đọc.</td></tr>
 <tr><td>PY-015</td><td>Mở sai van / cổng test</td><td>Keyed connector + đánh số cổng + trạng thái valve lock theo recipe.</td><td>Leak test / cleaning system</td><td>M1</td><td>Fixture và connector chuẩn hóa đồng bộ.</td></tr>
 <tr><td>PY-016</td><td>Nhầm part family ở machine gần nhau</td><td>Job board điện tử hoặc placard lớn + màu family + khu staging tách biệt.</td><td>Cell nhiều máy / hot-job area</td><td>M2</td><td>Dispatch giữ đúng layout và cập nhật trạng thái thời gian thực.</td></tr>
-<tr><td>PY-017</td><td>Bỏ sót kiểm pre-run</td><td>Bộ hồ sơ công việc (job packet) quick-check card treo tại máy; chưa tick đủ không được gọi mẫu đầu.</td><td>Xác minh trước khi chạy</td><td>M2</td><td>Card ngắn, rõ và gắn với đúng nhóm máy (machine family).</td></tr>
+<tr><td>PY-017</td><td>Bỏ sót kiểm pre-run</td><td>Bộ job dossier (job packet) quick-check card treo tại máy; chưa tick đủ không được gọi mẫu đầu.</td><td>Xác minh trước khi chạy</td><td>M2</td><td>Card ngắn, rõ và gắn với đúng nhóm máy (machine family).</td></tr>
 <tr><td>PY-018</td><td>Dùng sai vật tư clean build</td><td>Whitelist vật tư tại station và mã vật tư clean-zone riêng.</td><td>Cleanroom / clean build</td><td>M2</td><td>Kho cấp đúng mã và không để vật tư trôi nổi trong khu.</td></tr>
 <tr><td>PY-019</td><td>Chạy nhầm recipe leak test</td><td>Recipe lock theo part family + revision; người test không tự sửa limit tại máy.</td><td>Leak test station</td><td>M1</td><td>Engineering/QA kiểm soát recipe master.</td></tr>
 <tr><td>PY-020</td><td>Đưa nhầm part đã HOLD vào ship</td><td>Trạng thái HOLD đỏ trên hệ thống + khu HOLD tách vật lý + scan phải khóa in ship label.</td><td>QA / Warehouse / Shipping</td><td>M1</td><td>Hold trạng thái phải đồng bộ giữa hồ sơ và khu vực vật lý.</td></tr>
@@ -123,7 +123,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../02-Work-Instructions/08-WI-800/wi-801-cnc-poka-yoke-examples.html">WI-801</a></td><td>Quy trình triển khai, pilot, xác nhận hiệu lực và release.</td></tr>
 <tr><td><a href="../../01-SOPs/08-SOP-800/sop-804-human-factors-and-error-proofing.html">SOP-804</a></td><td>Khung điều hành yếu tố con người và phòng sai lỗi.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a> / <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a> / <a href="../../02-Work-Instructions/07-WI-700/wi-721-fod-prevention-line-clearance-and-tool-accountability.html">WI-721</a></td><td>Các điểm dùng có nhu cầu chống sai cao.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a> / <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a> / <a href="../../02-Work-Instructions/07-WI-700/wi-721-fod-prevention-line-clearance-and-tool-accountability.html">WI-721</a></td><td>Các point-of-use có nhu cầu chống sai cao.</td></tr>
 </tbody></table></div></div>
 
     </div>

@@ -118,7 +118,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <h2 class="h2" id="a1">1. Mục đích, phạm vi và boundary</h2>
 <div class="grid-2">
   <div class="callout-card"><h3>Mục đích</h3><p>Giữ cho bảng điều khiển production là <b>một lớp hiển thị đáng tin để điều hành</b>, không trở thành nguồn tạo số “mạnh ai nấy sửa”. Khi dữ liệu số lỗi hoặc chậm, ANNEX này buộc tổ chức quay về SoR, khóa exception note và backfill có kiểm soát.</p></div>
-  <div class="callout-card"><h3>Phạm vi</h3><p>Áp dụng cho Power BI, portal thẻ điểm (scorecard), exported review packs, monthly / quarterly KPI packs, semantic model/dataset, automation liên quan refresh và các bảng điều hành dùng cho T1/T2/T3/T4, xem xét của lãnh đạo, customer review hoặc internal governance packs.</p></div>
+  <div class="callout-card"><h3>Phạm vi</h3><p>Áp dụng cho Power BI, portal thẻ điểm (scorecard), exported review packs, monthly / quarterly KPI packs, semantic model/dataset, automation liên quan refresh và các bảng điều hành dùng cho T1/T2/T3/T4, management review, customer review hoặc internal governance packs.</p></div>
 </div>
 <div class="notice-strip">
   <div class="notice-item"><b>Không thuộc ANNEX này</b>KPI definition sâu, quy trình capture rule và dataset field dictionary đã được khóa tại ANNEX-110 và các annex kỹ thuật liên quan.</div>
@@ -147,7 +147,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="callout-grid">
   <div class="callout-card"><h3>Release class A — cosmetic / ghi chú điều hành</h3><p>Đổi nhãn, format, layout, grouping hoặc ghi chú điều hành text không thay nghĩa KPI. Vẫn cần change note và người phụ trách.</p></div>
   <div class="callout-card"><h3>Release class B — logic / threshold</h3><p>Đổi formula, threshold, cut-off, precedence, diễn tập-down keys hoặc mapping có thể ảnh hưởng quyết định. Bắt buộc test, người phụ trách sign-off và snapshot trước/sau.</p></div>
-  <div class="callout-card"><h3>Release class C — source / environment / security</h3><p>Đổi nguồn, connector, không gian làm việc, permission boundary, refresh pipeline hoặc service principal. Bắt buộc rollback path, người phê duyệt cao hơn và review hậu phát hành.</p></div>
+  <div class="callout-card"><h3>Release class C — source / environment / security</h3><p>Đổi nguồn, connector, không gian làm việc, permission boundary, refresh pipeline hoặc service principal. Bắt buộc rollback path, approver cao hơn và review hậu phát hành.</p></div>
 </div>
 
 <h2 class="h2" id="a4">4. Access model, vai trò boundary và separation-of-duties</h2>
@@ -159,7 +159,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <tr><td>Temporary / deputy</td><td>Cover nghỉ phép, cutover, incident, month-end close</td><td>Permanent elevation</td><td>Manager + Process Owner + expiry date</td><td>Close-out và thu hồi đúng hạn</td></tr>
 </tbody></table></div>
 <ul class="tight">
-  <li>Người xây KPI không tự là người phê duyệt thay đổi logic nếu change class B/C ảnh hưởng quyết định tài chính, quality release hoặc xem xét của lãnh đạo.</li>
+  <li>Người xây KPI không tự là approver thay đổi logic nếu change class B/C ảnh hưởng quyết định tài chính, quality release hoặc management review.</li>
   <li>Bảng điều khiển chứa dữ liệu nhạy cảm theo người dùng, lương, giá mua, chi phí hoặc privileged các nhật ký phải tách audience, export rule và retention rule.</li>
   <li>Access review phải nhìn cả <b>human accounts</b>, <b>guest accounts</b>, <b>service accounts</b> và <b>scheduled refresh credentials</b>, không chỉ user nội bộ.</li>
 </ul>
@@ -168,7 +168,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Ngữ cảnh</th><th>Refresh / cut-off chuẩn</th><th>Freeze-date / freeze rule</th><th>Khi nào cần exception note</th><th>Nơi ghi nhận</th></tr></thead><tbody>
 <tr><td>T1/T2 điều hành trong ngày</td><td>Refresh trước họp tối thiểu 10–15 phút</td><td>Không freeze kỳ dài; freeze snapshot của cuộc họp</td><td>Refresh fail, stale data, manual override, missing diễn tập-down</td><td>Board note / WI-901 ghi chú điều hành</td></tr>
 <tr><td>T3 tuần / tháng</td><td>Refresh theo lịch pack công bố</td><td>Freeze tại giờ chốt pack</td><td>Late posting, reclass data, missing customer/supplier update</td><td>Pack ghi chú điều hành + nhật ký hành động</td></tr>
-<tr><td>T4 / xem xét của lãnh đạo</td><td>Dùng snapshot đã freeze cho kỳ review</td><td>PHẢI giữ nguyên số kỳ đã freeze nếu chưa có change hồ sơ</td><td>Backfill sau freeze, SoR correction sau close, dataset incident</td><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> + change hồ sơ</td></tr>
+<tr><td>T4 / management review</td><td>Dùng snapshot đã freeze cho kỳ review</td><td>PHẢI giữ nguyên số kỳ đã freeze nếu chưa có change hồ sơ</td><td>Backfill sau freeze, SoR correction sau close, dataset incident</td><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> + change hồ sơ</td></tr>
 <tr><td>Customer / external pack</td><td>Theo pack đã phê duyệt</td><td>Freeze theo phiên bản gửi ra ngoài</td><td>Số nội bộ chưa khớp external disclosure pack</td><td>Gói phát hành + communication nhật ký</td></tr>
 </tbody></table></div>
 <div class="field-grid">
@@ -199,7 +199,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <h2 class="h2" id="a8">8. KPI của chính hệ bảng điều khiển governance</h2>
 <div class="grid-4">
   <div class="kpi-card"><h3>% refresh đúng cửa sổ</h3><p>Đo độ ổn định vận hành bảng điều khiển; tách theo bảng điều khiển critical vs non-critical.</p></div>
-  <div class="kpi-card"><h3>% release có đủ pack</h3><p>Đo kỷ luật kiểm soát thay đổi trước khi publish lên production.</p></div>
+  <div class="kpi-card"><h3>% release có đủ pack</h3><p>Đo kỷ luật change control trước khi publish lên production.</p></div>
   <div class="kpi-card"><h3>MTTR của incident dữ liệu</h3><p>Đo tốc độ khôi phục khi refresh fail, mapping sai hoặc permission lỗi.</p></div>
   <div class="kpi-card"><h3>% privileged / publish access review đúng hạn</h3><p>Đo chất lượng RBAC, least privilege và closure của quarterly review.</p></div>
 </div>
@@ -214,7 +214,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="link-grid">
   <div class="link-card"><h3>Định nghĩa KPI và data model</h3><ul class="link-list"><li><a href="../01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></li><li><a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></li><li><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a></li></ul></div>
   <div class="link-card"><h3>Access / RBAC / thẩm quyền</h3><ul class="link-list"><li><a href="annex-101-role-based-access-map.html">ANNEX-101</a></li><li><a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a></li><li><a href="annex-120-authority-matrix.html">ANNEX-120</a></li><li><a href="annex-123-deputy-backup-matrix.html">ANNEX-123</a></li></ul></div>
-  <div class="link-card"><h3>Forms / hồ sơ bắt buộc</h3><ul class="link-list"><li><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> — yêu cầu cấp/đổi/thu hồi quyền</li><li><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> — rà soát quyền định kỳ</li><li><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> — pack control và exception note ở xem xét của lãnh đạo</li><li><a href="annex-124-dashboard-evidence-pack-worked-examples.html">ANNEX-124</a> — ví dụ mẫu bằng chứng packs để training người phụ trách và pre-bộ hồ sơ rà soát</li></ul></div>
+  <div class="link-card"><h3>Forms / hồ sơ bắt buộc</h3><ul class="link-list"><li><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> — yêu cầu cấp/đổi/thu hồi quyền</li><li><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> — rà soát quyền định kỳ</li><li><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> — pack control và exception note ở management review</li><li><a href="annex-124-dashboard-evidence-pack-worked-examples.html">ANNEX-124</a> — ví dụ mẫu bằng chứng packs để training người phụ trách và pre-bộ hồ sơ rà soát</li></ul></div>
   <div class="link-card"><h3>Continuity / fallback</h3><ul class="link-list"><li><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a></li><li><a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></li><li><a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></li></ul></div>
 </div>
 

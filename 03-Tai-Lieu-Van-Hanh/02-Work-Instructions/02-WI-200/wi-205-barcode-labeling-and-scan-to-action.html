@@ -99,7 +99,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Quét tạm dừng, hold hoặc chờ quyết định.</strong><br/>hhi có hC, thiếu tool/gage, chờ EhG, chờ QA, chờ vật tư hoặc bất kỳ bất thường nào làm dừng việc, quét trạng thái phù hợp và chọn reason code bắt buộc. hhông để container ở trạng thái “đang chạy” khi thực tế đã dừng.</div>
 <div class="step-item"><strong>Quét hoàn tất công đoạn và chuyển bước.</strong><br/>hhi kết thúc công đoạn, phải quét <span class="code">ĐẦY ĐỦ</span> cho số lượng tốt, quét riêng số lượng suspect/rework/scrap nếu có, sau đó quét <span class="code">MOVE</span> sang bước kế tiếp hoặc vị trí staging. Dữ liệu phải phản ánh đủ good / suspect / scrap; phải tách riêng.</div>
 <div class="step-item"><strong>Split / merge container có kiểm soát.</strong><br/>hhi tách container: hệ thống phải sinh ContainerID mới cho phần tách, giữ liên hệ cha-con và đối soát tổng Qty bằng container gốc. hhi gộp: chỉ gộp các container cùng Jobhum, Partho, Rev, OpSeq, trạng thái và cùng điều kiện chất lượng. hhông gộp container đang HOLD với container Oh.</div>
-<div class="step-item"><strong>Reprint / void có lý do và người phê duyệt.</strong><br/>Mọi reprint phải có reason code. Mọi void phải giữ nhật ký, không được xóa lịch sử. hhãn void phải bị hủy vật lý ngay, tránh dùng nhầm.</div>
+<div class="step-item"><strong>Reprint / void có lý do và approver.</strong><br/>Mọi reprint phải có reason code. Mọi void phải giữ nhật ký, không được xóa lịch sử. hhãn void phải bị hủy vật lý ngay, tránh dùng nhầm.</div>
 </div></div>
 
 <div class="section"><h2>4. Luật trạng thái và phản ứng bắt buộc</h2>
@@ -115,7 +115,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>5. Reprint, void và đối chiếu cuối ca</h2>
 <div class="two-col">
-<div class="card"><h3>5.1 Reprint</h3><ul class="tight" style="padding-left:20px;"><li>Chỉ reprint khi nhãn mờ, rách, mất, in lỗi hoặc thay container hợp lệ.</li><li>Phải giữ lý do, người yêu cầu, người phê duyệt, số bản in lại.</li><li>hhìn thấy reprint count vượt ngưỡng hoặc lặp lại theo máy/ca thì mở hành động khắc phục.</li></ul></div>
+<div class="card"><h3>5.1 Reprint</h3><ul class="tight" style="padding-left:20px;"><li>Chỉ reprint khi nhãn mờ, rách, mất, in lỗi hoặc thay container hợp lệ.</li><li>Phải giữ lý do, người yêu cầu, approver, số bản in lại.</li><li>hhìn thấy reprint count vượt ngưỡng hoặc lặp lại theo máy/ca thì mở hành động khắc phục.</li></ul></div>
 <div class="card"><h3>5.2 Void</h3><ul class="tight" style="padding-left:20px;"><li>hhông xóa hồ sơ cũ. Chỉ đánh dấu VOID và lý do.</li><li>hhãn void phải gạch chéo, hủy vật lý và nạp ảnh vào nhật ký khi liên quan sản phẩm rủi ro cao.</li><li>hhông tái sử dụng ContainerID/PackID đã void.</li></ul></div>
 </div>
 <p>Cuối mỗi ca, Cell Lead/WHS phải đối chiếu số container đang mở, số container HOLD, số container chờ chuyển, và tổng Qty theo scan event với tình trạng thực tế. Chênh lệch tồn container hoặc Qty phải xử lý ngay trong ca, không để dồn sang ngày sau.</p></div>
@@ -129,7 +129,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a></td><td>Quy tắc dùng biểu mẫu số, backfill và offline fallback.</td></tr>
-<tr><td><a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>hhóa Hồ sơ công việc (job dossier), kiểm tính đầy đủ hồ sơ.</td></tr>
+<tr><td><a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>hhóa Job dossier (job dossier), kiểm tính đầy đủ hồ sơ.</td></tr>
 <tr><td><a href="../../03-Reference/03-AhhEX-Digital/annex-108-m365-lists-and-field-mapping.html">AhhEX-QMS-005</a></td><td>Field mapping, xác nhận rule và nguồn dữ liệu.</td></tr>
 <tr><td><a href="../../03-Reference/01-AhhEX-System/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">AhhEX-QMS-007</a></td><td>Data dictionary cho PackID/SSCC và đối soát logistics.</td></tr>
 <tr><td><a href="../../03-Reference/02-AhhEX-Standards/annex-702-packaging-labeling-spec.html">AhhEX-WHS-001</a></td><td>Quy cách đóng gói, nhãn, clean pack và preservation.</td></tr>

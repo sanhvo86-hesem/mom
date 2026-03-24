@@ -90,8 +90,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Hiểu sâu hệ thống GPS/ASME Y14.5 và cách chuẩn hóa trong công ty: quy ước đọc, thư viện ví dụ, hệ thống đào tạo, và cơ chế đánh giá năng lực. Biết thiết kế tiêu chuẩn nội bộ về dung sai gia công theo capability HESEM.</td>
-<td>Thiết kế hệ thống C14: chuẩn hóa 'drawing review cổng kiểm soát' trong C11/C12, xây thư viện GD&amp;T tình huống, training program, định nghĩa capability chart (tolerance vs quy trình), và tư vấn chiến lược DFM để nâng năng lực cạnh tranh.</td>
-<td>Capability chart phát hành; thư viện tình huống GD&amp;T chương trình đào tạo &amp; chứng nhận; 2 đợt đánh giá nội bộ năng lực; cải tiến KPI.</td>
+<td>Thiết kế hệ thống C14: chuẩn hóa 'drawing review control gate' trong C11/C12, xây thư viện GD&amp;T tình huống, training program, định nghĩa capability chart (tolerance vs quy trình), và tư vấn chiến lược DFM để nâng năng lực cạnh tranh.</td>
+<td>Capability chart phát hành; thư viện tình huống GD&amp;T chương trình đào tạo &amp; chứng nhận; 2 đợt internal audit năng lực; cải tiến KPI.</td>
 <td>Giảm lỗi do đọc bản vẽ về ~0; giảm thời gian NPI; tăng FAI pass rate; đánh giá khách hàng ghi nhận năng lực kỹ thuật.</td>
 </tr>
 </tbody>
@@ -319,7 +319,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div>
 <strong>Nhiệm vụ theo Level 4:</strong>
-<ol><li>Thu thập dữ liệu thực tế (FAI, CMM) theo quy trình.</li><li>Xây capability chart (tolerance vs quy trình/length) và phương pháp cập nhật.</li><li>Tích hợp chart vào bảng kiểm C11/C12 như một cổng kiểm soát.</li></ol>
+<ol><li>Thu thập dữ liệu thực tế (FAI, CMM) theo quy trình.</li><li>Xây capability chart (tolerance vs quy trình/length) và phương pháp cập nhật.</li><li>Tích hợp chart vào bảng kiểm C11/C12 như một control gate.</li></ol>
 </div>
 </div>
 <hr class="sep"/>
@@ -346,8 +346,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi thư viện gắn với lỗi thật của HESEM và có bài học kinh nghiệm.
  </div>
 </div><div class="card">
-<h3>Tình huống 3: Chuẩn hóa 'drawing review cổng kiểm soát' trong quy trình NPI</h3>
-<p class="small">NPI job mới trễ vì phát hiện vấn đề muộn. Cần cổng kiểm soát review trước khi báo giá và trước khi chạy.</p>
+<h3>Tình huống 3: Chuẩn hóa 'drawing review control gate' trong quy trình NPI</h3>
+<p class="small">NPI job mới trễ vì phát hiện vấn đề muộn. Cần control gate review trước khi báo giá và trước khi chạy.</p>
 <div class="cols-2">
 <div>
 <strong>Dữ liệu (Đầu vào):</strong>
@@ -355,13 +355,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div>
 <strong>Nhiệm vụ theo Level 4:</strong>
-<ol><li>Thiết kế cổng kiểm soát 1 (pre-báo giá) và cổng kiểm soát 2 (pre-production) với bảng kiểm &amp; trách nhiệm.</li><li>Định nghĩa KPI đo hiệu lực: giảm rework, tăng FAI pass rate.</li></ol>
+<ol><li>Thiết kế control gate 1 (pre-báo giá) và control gate 2 (pre-production) với bảng kiểm &amp; trách nhiệm.</li><li>Định nghĩa KPI đo hiệu lực: giảm rework, tăng FAI pass rate.</li></ol>
 </div>
 </div>
 <hr class="sep"/>
 <strong>Sản phẩm đầu ra (Bằng chứng):</strong>
-<ul><li>SOP cổng kiểm soát</li><li>KPI plan</li></ul>
-<div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi cổng kiểm soát không làm chậm quá mức nhưng ngăn lỗi lớn.
+<ul><li>SOP control gate</li><li>KPI plan</li></ul>
+<div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi control gate không làm chậm quá mức nhưng ngăn lỗi lớn.
  </div>
 </div><h2>7. OJT theo TWI (Job Breakdown + bảng kiểm)</h2><p class="small">TWI (Training Within Industry) nhấn mạnh: <strong>chia nhỏ công việc</strong> → <strong>điểm then chốt</strong> → <strong>lý do</strong>. OJT của HESEM phải tạo được “thói quen đúng” và bằng chứng (hồ sơ) để sẵn sàng đánh giá.</p><h3>7.1. Job Breakdown Sheet (mẫu)</h3><table class="table">
 <thead><tr><th>Bước</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead>
@@ -389,7 +389,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>5) Clarification/DFM &amp; lưu bằng chứng</strong></td>
 <td>Khi không rõ/không đo được: phát hành clarification; lưu hồ sơ.</td>
-<td>ISO yêu cầu review &amp; kiểm soát thay đổi.</td>
+<td>ISO yêu cầu review &amp; change control.</td>
 </tr>
 </tbody></table><h3>7.2. OJT Checklist (Level 4)</h3><p class="small">Tick ✓ khi hoàn thành; lưu bảng kiểm như documented information. Người hướng dẫn ký xác nhận.</p><table class="table">
 <thead><tr><th>#</th><th>Hạng mục</th><th>Tiêu chí đạt</th><th>Kết quả</th><th>Ghi chú</th></tr></thead>
@@ -410,8 +410,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>3</td>
-<td>Chuẩn hóa drawing review cổng kiểm soát</td>
-<td>SOP cổng kiểm soát; KPI; trách nhiệm</td>
+<td>Chuẩn hóa drawing review control gate</td>
+<td>SOP control gate; KPI; trách nhiệm</td>
 <td>□ Đạt □ Chưa</td>
 <td>…</td>
 </tr>
@@ -464,7 +464,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li>Bạn xây capability chart dựa trên dữ liệu thật như thế nào?</li>
 <li>Thiết kế thư viện GD&amp;T tình huống: cấu trúc metadata nào để tìm nhanh?</li>
-<li>Drawing review cổng kiểm soát 1 vs cổng kiểm soát 2 khác nhau ở mục tiêu nào?</li>
+<li>Drawing review control gate 1 vs control gate 2 khác nhau ở mục tiêu nào?</li>
 <li>Bạn đo hiệu lực hệ thống C14 bằng KPI nào để tránh gaming?</li>
 <li>Nêu 3 chiến lược DFM giúp HESEM tăng cạnh tranh mà vẫn tuân thủ bản vẽ.</li>
 <li>Bạn đánh giá năng lực đọc bản vẽ của tổ chức như thế nào?</li>

@@ -70,7 +70,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
           <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
         </div>
       </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng tại Incoming, IPQC, Final, khiếu nại review, containment review hoặc bất kỳ cổng kiểm soát nào cần quyết định defect class bằng ngoại quan.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng tại Incoming, IPQC, Final, khiếu nại review, containment review hoặc bất kỳ control gate nào cần quyết định defect class bằng ngoại quan.</div>
       <h1>WI-601 — Kiểm tra ngoại quan, phân loại lỗi và ghi nhận bằng chứng</h1>
       
 <div class="section"><h2>1. Mục đích, ranh giới và điều kiện quan sát</h2>
@@ -97,7 +97,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-list">
 <div class="step-item"><strong>Xác định tiêu chí.</strong><br/>Mở drawing/spec, traveler, QPL và yêu cầu đóng gói/sạch liên quan. Đánh dấu rõ bề mặt chức năng, bề mặt khách nhìn thấy, vùng phải loại trừ burr, vùng phải tránh chạm tay và vùng cần ảnh chụp chứng cứ.</div>
 <div class="step-item"><strong>Chuẩn bị chi tiết.</strong><br/>Làm sạch bề mặt theo mức cho phép. Với chi tiết clean/vacuum, chỉ dùng phương pháp làm sạch được phép; không tự ý chùi bằng giẻ bẩn hoặc dung môi không phê duyệt.</div>
-<div class="step-item"><strong>Kiểm theo vùng.</strong><br/>Kiểm lần lượt: nhận diện part/rev/label → bề mặt ngoài → cạnh/ren/bo góc → bề mặt kín khít/seat → lỗ, rãnh, khoang khuất → lớp phủ/màu/anodize/passivation → bao gói/nhãn kiện nếu là cổng kiểm soát shipping.</div>
+<div class="step-item"><strong>Kiểm theo vùng.</strong><br/>Kiểm lần lượt: nhận diện part/rev/label → bề mặt ngoài → cạnh/ren/bo góc → bề mặt kín khít/seat → lỗ, rãnh, khoang khuất → lớp phủ/màu/anodize/passivation → bao gói/nhãn kiện nếu là control gate shipping.</div>
 <div class="step-item"><strong>Chụp ảnh và mô tả.</strong><br/>Ảnh phải có toàn cảnh và cận cảnh; mô tả phải có vị trí, kích thước/ước lượng, hướng nhìn, số lượng chiếc bị ảnh hưởng và mức lỗi dự kiến.</div>
 <div class="step-item"><strong>Ra quyết định.</strong><br/>Nếu còn nghi ngờ giữa hai mức lỗi, phải escalation cho QA Lead/Quality Engineer; không tự hạ mức. Lỗi critical/major gắn ngay HOLD trạng thái và đi <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
 </div></div>
@@ -118,17 +118,17 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="card"><h3>HOLD bắt buộc</h3><ul class="tight" style="padding-left:18px;"><li>Không xác định được defect class hoặc tiêu chí chuẩn.</li><li>Lỗi critical/major ở bề mặt chức năng, clean, vacuum, gas path hoặc customer-facing.</li><li>Thiếu truy vết, thiếu cert, sai label, nghi nhầm part/rev.</li><li>Phát hiện lỗi lặp có xu hướng tăng nhưng chưa khoanh được nguyên nhân.</li></ul></div>
 </div>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>KPI-WI601-01</strong><br/>Tỷ lệ escape do trực quan defect phát hiện sau cổng kiểm soát cuối.</div>
+<div class="kpi-box"><strong>KPI-WI601-01</strong><br/>Tỷ lệ escape do trực quan defect phát hiện sau control gate cuối.</div>
 <div class="kpi-box"><strong>KPI-WI601-02</strong><br/>Tỷ lệ classification mismatch giữa Inspector và QA review.</div>
 <div class="kpi-box"><strong>KPI-WI601-03</strong><br/>Tỷ lệ lô phải tái kiểm do bằng chứng ảnh/mô tả không đủ.</div>
 <div class="kpi-box"><strong>KPI-WI601-04</strong><br/>Top 5 defect type theo part family / quy trình family.</div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/06-SOP-600/sop-603-aql-sampling-inspection.html">SOP-603</a></td><td>Khung AQL cho lot kiểm tra.</td></tr>
-<tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>Cổng kiểm soát kiểm cuối và phát hành giao hàng.</td></tr>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>Control gate kiểm cuối và phát hành giao hàng.</td></tr>
 <tr><td><a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td><td>Containment, NCR và phản ứng khi lỗi phát hiện.</td></tr>
 <tr><td><a href="wi-603-aql-sampling-inspection-execution.html">WI-603</a></td><td>Hướng dẫn lấy mẫu AQL và quyết định accept/reject.</td></tr>
-<tr><td><a href="wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a></td><td>Cổng kiểm soát kiểm cuối, CoC/CofC và bàn giao shipment.</td></tr>
+<tr><td><a href="wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a></td><td>Control gate kiểm cuối, CoC/CofC và bàn giao shipment.</td></tr>
 </tbody></table></div></div>
 
     </div>

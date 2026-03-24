@@ -90,7 +90,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Hiểu sâu hệ thống quản trị thương mại–kỹ thuật của xưởng gia công theo đơn (job shop): chính sách báo giá, ma trận phê duyệt, quản trị năng lực (capability) và chiến lược chọn khách hàng/đơn hàng. Nắm phương pháp xây bảng điều khiển KPI, dấu vết kiểm toán (audit trail) và cải tiến hệ thống theo PDCA.</td>
-<td>Thiết kế/chuẩn hóa hệ thống C11: SOP/WI/FRM, RFQ database, báo giá mẫu, ma trận phê duyệt, cơ chế đo hiệu lực (báo giá hit rate, margin leakage, requirement escape), đào tạo &amp; đánh giá nội bộ để đảm bảo hệ thống vận hành ổn định.</td>
+<td>Thiết kế/chuẩn hóa hệ thống C11: SOP/WI/FRM, RFQ database, báo giá mẫu, ma trận phê duyệt, cơ chế đo hiệu lực (báo giá hit rate, margin leakage, requirement escape), đào tạo &amp; internal audit để đảm bảo hệ thống vận hành ổn định.</td>
 <td>(1) Bộ SOP/WI/FRM C11 phát hành chính thức; (2) Bảng điều khiển KPI + định nghĩa dữ liệu; (3) 02 đợt internal đánh giá và CAPA cải tiến; (4) Chương trình đào tạo hội nhập nhân sự mới cho Kinh doanh/Estimator.</td>
 <td>Báo giá hit rate theo phân khúc tăng ≥ X%/năm; margin leakage giảm ≥ Y%; 0 major NC đánh giá liên quan 8.2/7.5; độ hài lòng khách hàng (survey) ≥ mục tiêu.</td>
 </tr>
@@ -137,11 +137,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><strong>Tổ chức ĐƯỢC PHÉP áp dụng chuẩn hóa biểu mẫu/CRM/ERP để tự động hóa RFQ nhật ký, kiểm soát phiên bản và phê duyệt điện tử.</strong> <span class="iso">ISO 7.1.3</span></div>
 <p>Khi số hóa, phải đảm bảo phân quyền, backup, dấu vết kiểm toán; tránh tạo 'hệ thống rác' nhiều phiên bản.</p>
 </div>
-</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L4: thiết kế hệ thống rà soát hợp đồng + KPI + đánh giá + năng lực tổ chức (capability) để mở rộng thị trường.</strong></div><h3>3.1. Vì sao C11 là “cổng chất lượng” của xưởng CNC lệnh sản xuất?</h3><p>Trong mô hình <em>chủng loại cao (high-mix) / sản lượng thấp đến trung bình (low-to-mid volume)</em>, sai lệch xuất phát từ khâu đầu (RFQ/PO) khó sửa ở cuối vì đã “đóng băng” trên: đường chạy dao, đồ gá, vật tư, lịch máy và thậm chí cả chứng từ xuất khẩu. Thực tế đánh giá ISO cho thấy nhiều <em>nonconformity</em> không nằm ở máy móc mà nằm ở “hệ thống thông tin”: dùng sai phiên bản (wrong revision), hiểu sai note, không kiểm soát thay đổi, không lưu hồ sơ rà soát hợp đồng.</p><p><strong>Nguyên lý:</strong> lỗi “nhận sai yêu cầu” có chi phí cao nhất (COPQ cao) vì tạo ra lãng phí kép: <em>sai ngay lần đầu</em> + <em>điều chỉnh muộn</em>. Do đó, C11 phải được vận hành như một quy trình có dữ liệu, có gating, có phản ứng.</p><h3>3.2. Thuật ngữ cốt lõi (dùng thống nhất trong HESEM)</h3><ul>
+</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L4: thiết kế hệ thống rà soát hợp đồng + KPI + đánh giá + năng lực tổ chức (capability) để mở rộng thị trường.</strong></div><h3>3.1. Vì sao C11 là “cổng chất lượng” của xưởng CNC lệnh sản xuất?</h3><p>Trong mô hình <em>chủng loại cao (high-mix) / sản lượng thấp đến trung bình (low-to-mid volume)</em>, sai lệch xuất phát từ khâu đầu (RFQ/PO) khó sửa ở cuối vì đã “đóng băng” trên: đường chạy dao, đồ gá, vật tư, lịch máy và thậm chí cả chứng từ xuất khẩu. Thực tế đánh giá ISO cho thấy nhiều <em>nonconformity</em> không nằm ở máy móc mà nằm ở “hệ thống thông tin”: dùng sai phiên bản (wrong revision), hiểu sai note, không change control, không lưu hồ sơ rà soát hợp đồng.</p><p><strong>Nguyên lý:</strong> lỗi “nhận sai yêu cầu” có chi phí cao nhất (COPQ cao) vì tạo ra lãng phí kép: <em>sai ngay lần đầu</em> + <em>điều chỉnh muộn</em>. Do đó, C11 phải được vận hành như một quy trình có dữ liệu, có gating, có phản ứng.</p><h3>3.2. Thuật ngữ cốt lõi (dùng thống nhất trong HESEM)</h3><ul>
 <li><strong>RFQ (Request for Quotation):</strong> yêu cầu báo giá – chưa tạo cam kết. RFQ thiếu dữ liệu; nhiệm vụ của HESEM là “đóng gói yêu cầu” bằng clarification.</li>
 <li><strong>RFI/Clarification:</strong> câu hỏi làm rõ; phải có <em>documented bằng chứng</em> (email/biên bản) và phải “đóng” trước khi báo giá khi là CTQ.</li>
 <li><strong>Báo giá:</strong> báo giá – chứa assumptions/exclusions. Báo giá phải có version và người duyệt (approval).</li>
-<li><strong>PO/Hợp đồng:</strong> đơn hàng/ hợp đồng. Khi PO đã phát hành, thay đổi phải theo ECO/Kiểm soát thay đổi.</li>
+<li><strong>PO/Hợp đồng:</strong> đơn hàng/ hợp đồng. Khi PO đã phát hành, thay đổi phải theo ECO/Change control.</li>
 <li><strong>CTQ (Critical-to-Quality):</strong> đặc tính ảnh hưởng chức năng/lắp ráp/an toàn/độ kín/hiệu suất. CTQ không chỉ là “dung sai chặt” mà còn là: nhám, sạch, không bavia, chứng từ, đóng gói.</li>
 </ul><h3>3.3. Mô hình “3 lớp yêu cầu” trong rà soát hợp đồng</h3><div class="cols-2">
 <div class="figure">
@@ -203,7 +203,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Method:</strong> đo bằng gì (CMM, mic, bore gage, height gage, functional gage)?</li>
 <li><strong>Frequency:</strong> 100% / 1st piece / theo sampling (n=5 mỗi 20 pcs)?</li>
 <li><strong>Reaction plan:</strong> vượt ngưỡng thì làm gì (stop, segregate, NCR, adjust offset, inform QA)?</li>
-</ul><p>Điểm quan trọng: khi CTQ không đo được với hệ đo hiện có, phải quyết định: (1) mua gage, (2) thuê ngoài CMM, hoặc (3) thương lượng thay đổi yêu cầu.</p><h3>3.9. Kiểm soát thay đổi sau PO: “đừng để xưởng biết tin cuối cùng”</h3><p>Thay đổi sau PO đến từ: phiên bản mới, thay đổi quantity, thay đổi finish, thay đổi ngày đến hạn. Quy tắc vận hành:</p><ol>
+</ul><p>Điểm quan trọng: khi CTQ không đo được với hệ đo hiện có, phải quyết định: (1) mua gage, (2) thuê ngoài CMM, hoặc (3) thương lượng thay đổi yêu cầu.</p><h3>3.9. Change control sau PO: “đừng để xưởng biết tin cuối cùng”</h3><p>Thay đổi sau PO đến từ: phiên bản mới, thay đổi quantity, thay đổi finish, thay đổi ngày đến hạn. Quy tắc vận hành:</p><ol>
 <li>Tiếp nhận thay đổi → tạo Change Notice (mã số) và lưu bằng chứng.</li>
 <li>Đánh giá tác động: cost/thời gian dẫn/quality ( cần re-program/re-fixture).</li>
 <li>Phê duyệt theo thẩm quyền (ma trận phê duyệt) → cập nhật tất cả tài liệu: traveler, program, kế hoạch kiểm tra (kiểm tra plan), packaging.</li>
@@ -288,7 +288,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vstep">
 <div class="vnum">11</div>
 <div class="vtext">
-<strong>Kiểm soát thay đổi (khi phát sinh)</strong>
+<strong>Change control (khi phát sinh)</strong>
 <p>Mọi thay đổi sau PO đi qua Change Notice; đánh giá tác động; cập nhật tài liệu; truyền đạt đến xưởng.</p>
 </div>
 </div>
@@ -515,7 +515,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>5</td>
 <td>Đào tạo &amp; kèm cặp phát triển (coaching) hệ thống</td>
-<td>Có chương trình đào tạo; bằng chứng năng lực; cải tiến liên tục</td>
+<td>Có chương trình đào tạo; bằng chứng năng lực; continual improvement</td>
 <td>□ Đạt □ Chưa</td>
 <td>…</td>
 </tr>
@@ -544,7 +544,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>6</td>
 </tr>
 <tr>
-<td><strong>Bàn giao/Kiểm soát thay đổi/Communication</strong></td>
+<td><strong>Bàn giao/Change control/Communication</strong></td>
 <td>25%</td>
 <td>Apply/Evaluate</td>
 <td>Tình huống + writing</td>
@@ -560,7 +560,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Theo góc nhìn đánh giáor, 3 'major finding' hay gặp ở rà soát hợp đồng là gì? Cách phòng ngừa bằng hệ thống?</li>
 <li>Thiết kế chương trình đào tạo hội nhập nhân sự mới cho Kinh doanh/Estimator: mô-đun nào trước, mô-đun nào sau? Vì sao?</li>
 <li>Bạn định nghĩa 'capability' của HESEM thế nào và cách cập nhật khi mua máy/đo mới?</li>
-<li>Nêu cách tích hợp kiểm soát thay đổi (8.5.6) vào dòng chảy CRM/ERP để không bị bỏ sót.</li>
+<li>Nêu cách tích hợp change control (8.5.6) vào dòng chảy CRM/ERP để không bị bỏ sót.</li>
 <li>Viết 1 đoạn policy (ISO language) về việc không nhận PO khi chưa đóng clarification CTQ.</li>
 </ol>
 </div><h2>9. Rubric chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Rubric giúp chấm công bằng và chống “cảm tính”. chuẩn chấm bởi 2 người (Line Manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
@@ -598,7 +598,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Xử lý thay đổi &amp; thương mại</strong></td>
 <td>Chấp nhận thay đổi không kiểm soát.</td>
 <td>Biết escalations; lưu bằng chứng.</td>
-<td>Kiểm soát thay đổi đúng; đánh giá tác động.</td>
+<td>Change control đúng; đánh giá tác động.</td>
 <td>Thiết kế ma trận phê duyệt; tối ưu win rate &amp; margin.</td>
 </tr>
 </tbody></table><div class="callout"><strong>Điều kiện công nhận Level 4:</strong> Được công nhận bởi Management Board/QA Manager (QA-01): hệ thống vận hành ≥ 3 tháng, KPI cải thiện có bằng chứng, đánh giá pass.</div><h2>10. Bảng kiểm tự đánh giá trước khi đề nghị xét Level</h2><ul>

@@ -76,7 +76,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <p class="muted">
  Mục tiêu: giảm “wrong revision / wrong program” về <b>0</b> bằng 3 lớp kiểm soát:
  <b>(1) Bộ hồ sơ chuẩn (baseline package)</b> (đúng file, đúng Rev),
- <b>(2) Cổng kiểm soát (gate) checks</b> (Planning release → Job khởi động → Mẫu đầu (first piece)),
+ <b>(2) Control gate (gate) checks</b> (Planning release → Job khởi động → Mẫu đầu (first piece)),
  <b>(3) Configuration đánh giá</b> (đối chiếu as‑built ↔ requirement).
  </p>
  </div>
@@ -117,7 +117,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <tr><td><b>Setup sheet</b></td><td>Setup sheet không cập nhật rev</td><td>Setup sheet phát hành &amp; rà soát đồng cấp</td></tr>
  <tr><td><b>On-machine program</b></td><td>Operator dùng program cũ lưu trên máy</td><td>Chỉ chạy program từ location kiểm soát; xác minh ID/Rev</td></tr>
  <tr><td><b>CMM program</b></td><td>Chương trình đo mismatch drawing rev</td><td>Phát hành chương trình kiểm tra (kiểm tra phát hành chương trình) <a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM‑QA‑016</a></td></tr>
- <tr><td><b>As-built hồ sơ</b></td><td>Bộ hồ sơ giao hàng (ship packet) thiếu chứng chỉ outsource đúng scope</td><td>Config đánh giá <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a> + cổng kiểm soát G5</td></tr>
+ <tr><td><b>As-built hồ sơ</b></td><td>Bộ hồ sơ giao hàng (ship packet) thiếu chứng chỉ outsource đúng scope</td><td>Config đánh giá <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a> + control gate G5</td></tr>
  </tbody>
  </table>
  </div>
@@ -144,7 +144,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
  </div>
  <div class="callout">
- <h3>(3) Cổng kiểm soát enforcement</h3>
+ <h3>(3) Control gate enforcement</h3>
  <p class="mini">Gates là cơ chế cưỡng chế không vượt qua. Tham chiếu <a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//02-WI-200//">WI‑OPS‑001</a>.</p>
  <ul class="list">
  <li><b>G0:</b> Hợp đồng freeze (đúng bản vẽ/rev, CTQ nhận diện)</li>
@@ -167,7 +167,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <li>Nếu dùng CMM: FRM‑QA‑016 pass và báo cáo đo có Program ID/Rev?</li>
  <li>Nếu outsource: APL/scope/cert trace đầy đủ?</li>
  <li>Traveler/labels phản ánh đúng Rev &amp; trace lot?</li>
- <li>Hồ sơ công việc (job dossier) đặt đúng folder &amp; naming?</li>
+ <li>Job dossier (job dossier) đặt đúng folder &amp; naming?</li>
  <li>Nếu phát hiện mismatch ở bất kỳ điểm nào → STOP/HOLD &amp; escalate.</li>
  </ol>
  </div>
@@ -198,8 +198,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
  <div class="note">
  <h3>Scenario</h3>
- <p class="mini">Giảng viên đưa 1 bộ job pack có 1 lỗi “mismatch” (ví dụ: drawing Rev B, setup sheet Rev A). Học viên phải phát hiện và nêu đúng cổng kiểm soát/hồ sơ để HOLD.</p>
- <p class="mini"><b>Pass:</b> phát hiện mismatch + nêu đúng cổng kiểm soát + tạo đúng bằng chứng (QC hold/nhật ký). <b>Fail:</b> đề xuất “chạy tạm rồi sửa sau”.</p>
+ <p class="mini">Giảng viên đưa 1 bộ job pack có 1 lỗi “mismatch” (ví dụ: drawing Rev B, setup sheet Rev A). Học viên phải phát hiện và nêu đúng control gate/hồ sơ để HOLD.</p>
+ <p class="mini"><b>Pass:</b> phát hiện mismatch + nêu đúng control gate + tạo đúng bằng chứng (QC hold/nhật ký). <b>Fail:</b> đề xuất “chạy tạm rồi sửa sau”.</p>
  </div>
  </div>
  </div>

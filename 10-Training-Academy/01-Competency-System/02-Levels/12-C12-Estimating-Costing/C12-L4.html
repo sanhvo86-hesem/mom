@@ -89,9 +89,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>Knowledge (K)</th><th>Skill (S)</th><th>Bằng chứng (E)</th><th>Chỉ số (M)</th></tr></thead>
 <tbody>
 <tr>
-<td>Hiểu sâu hệ thống tài chính–vận hành của xưởng gia công theo đơn (job shop): cấu trúc P&amp;L theo cell/nhóm máy (machine family), quy tắc định giá theo chiến lược thị trường, cơ chế kiểm soát thay đổi cost model, và governance dữ liệu (gốc dữ liệu gốc , dấu vết kiểm toán (audit trail)).</td>
+<td>Hiểu sâu hệ thống tài chính–vận hành của xưởng gia công theo đơn (job shop): cấu trúc P&amp;L theo cell/nhóm máy (machine family), quy tắc định giá theo chiến lược thị trường, cơ chế change control cost model, và governance dữ liệu (gốc dữ liệu gốc , dấu vết kiểm toán (audit trail)).</td>
 <td>Thiết kế hệ thống estimating/job costing cấp công ty: policy rate/markup, approval, thư viện định mức (routing library), tích hợp ERP/MES, bảng điều khiển margin &amp; capacity, đào tạo + đánh giá để đảm bảo tính nhất quán và chống 'gaming'.</td>
-<td>Chính sách cost model phát hành; hệ thống dữ liệu gốc (dữ liệu gốc)/ routing library; bảng điều khiển GM &amp; variance; 02 đợt đánh giá nội bộ; chương trình đào tạo estimator.</td>
+<td>Chính sách cost model phát hành; hệ thống dữ liệu gốc (dữ liệu gốc)/ routing library; bảng điều khiển GM &amp; variance; 02 đợt internal audit; chương trình đào tạo estimator.</td>
 <td>GM% ổn định và tăng theo mục tiêu; margin leakage giảm; thời gian dẫn (lead time) báo giá giảm; đánh giá không có major NC về kiểm soát dữ liệu cost.</td>
 </tr>
 </tbody>
@@ -116,7 +116,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
 <div class="text">
-<div><strong>Khi thay đổi cost model (rate, overhead driver, định mức), tổ chức PHẢI kiểm soát thay đổi và thông báo các bên liên quan.</strong> <span class="iso">ISO 8.5.6</span></div>
+<div><strong>Khi thay đổi cost model (rate, overhead driver, định mức), tổ chức PHẢI change control và thông báo các bên liên quan.</strong> <span class="iso">ISO 8.5.6</span></div>
 <p>DCR hồ sơ + phê duyệt; tránh thay đổi ngầm dẫn tới báo giá không nhất quán.</p>
 </div>
 </div><div class="req">
@@ -384,12 +384,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div>
 <strong>Nhiệm vụ theo Level 4:</strong>
-<ol><li>Đưa ra chuẩn dữ liệu gốc (dữ liệu gốc): routing code, downtime code, scrap code.</li><li>Thiết kế quy trình kiểm soát thay đổi dữ liệu gốc (dữ liệu gốc) (DC).</li><li>Thiết kế đánh giá plan để đảm bảo dữ liệu tin cậy.</li></ol>
+<ol><li>Đưa ra chuẩn dữ liệu gốc (dữ liệu gốc): routing code, downtime code, scrap code.</li><li>Thiết kế quy trình change control dữ liệu gốc (dữ liệu gốc) (DC).</li><li>Thiết kế đánh giá plan để đảm bảo dữ liệu tin cậy.</li></ol>
 </div>
 </div>
 <hr class="sep"/>
 <strong>Sản phẩm đầu ra (Bằng chứng):</strong>
-<ul><li>Data governance plan</li><li>Kiểm soát thay đổi procedure</li><li>Đánh giá bảng kiểm</li></ul>
+<ul><li>Data governance plan</li><li>Change control procedure</li><li>Đánh giá bảng kiểm</li></ul>
 <div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi kế hoạch triển khai theo giai đoạn, có quick wins.
  </div>
 </div><div class="card">
@@ -518,7 +518,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Nêu 3 rủi ro khi chỉ dùng cost-plus và bỏ qua bottleneck/capacity.</li>
 <li>Bạn đào tạo estimator mới ra sao để họ không 'copy rate' sai từ job cũ?</li>
 <li>Đưa ra cơ chế review định kỳ MHR và utilization. Ai tham gia? Data nào dùng?</li>
-<li>Viết 1 đoạn policy (ISO language) về kiểm soát thay đổi cost model.</li>
+<li>Viết 1 đoạn policy (ISO language) về change control cost model.</li>
 </ol>
 </div><h2>9. Rubric chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Rubric giúp chấm công bằng và chống “cảm tính”. chuẩn chấm bởi 2 người (Line Manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
 <thead><tr><th>Tiêu chí</th><th>0 – Không đạt</th><th>1 – Đạt tối thiểu</th><th>2 – Tốt</th><th>3 – Xuất sắc</th></tr></thead>
@@ -552,7 +552,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Hệ thống governance + bảng điều khiển + đánh giá pass.</td>
 </tr>
 <tr>
-<td><strong>Đạo đức dữ liệu &amp; kiểm soát thay đổi</strong></td>
+<td><strong>Đạo đức dữ liệu &amp; change control</strong></td>
 <td>Sửa số để đẹp; không dấu vết kiểm toán.</td>
 <td>Lưu version; không sửa hồi tố.</td>
 <td>DCR hồ sơ có phê duyệt.</td>

@@ -72,11 +72,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
       <h1>ANNEX-505 — Chỉ mục put-thru / pass-through / tuyến đặc biệt và yêu cầu hồ sơ đi kèm</h1>
       
 <div class="section"><h2>1. Mục đích và cách dùng</h2>
-<p>ANNEX này là chỉ mục cho các Job không đi tuyến chuẩn. Khi Job có route đặc biệt, người dùng phải tra đúng loại tuyến, bộ hồ sơ tăng cường, cổng kiểm soát bổ sung và người có thẩm quyền cho phép. Annex này không thay routing/traveler; nó xác định <strong>phải mang thêm gì</strong> để Job vẫn kiểm soát được.</p>
+<p>ANNEX này là chỉ mục cho các Job không đi tuyến chuẩn. Khi Job có route đặc biệt, người dùng phải tra đúng loại tuyến, bộ hồ sơ tăng cường, control gate bổ sung và người có thẩm quyền cho phép. Annex này không thay routing/traveler; nó xác định <strong>phải mang thêm gì</strong> để Job vẫn kiểm soát được.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Gắn mọi route đặc biệt bằng hồ sơ đã phát hành và giữ đủ bộ hồ sơ tăng cường cho job đặc biệt. Job càng gấp càng phải khóa rõ điều kiện trước khi chạy.</div></div>
 
 <div class="section"><h2>2. Chỉ mục tuyến đặc biệt</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Route code</th><th>Tuyến</th><th>Khi dùng</th><th>Hồ sơ tăng cường bắt buộc</th><th>Cổng kiểm soát / người phụ trách</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Route code</th><th>Tuyến</th><th>Khi dùng</th><th>Hồ sơ tăng cường bắt buộc</th><th>Control gate / người phụ trách</th></tr></thead><tbody>
 <tr><td>PT-01</td><td>Pass-through kiểm tra only</td><td>Job không gia công, chỉ kiểm/đóng gói/chuyển tiếp theo yêu cầu</td><td>Customer instruction, xác minh đầu vào, release decision</td><td>QA + WHS</td></tr>
 <tr><td>PT-02</td><td>Outsource-only / vendor route</td><td>Part đi thẳng vendor công đoạn đặc biệt hoặc finishing</td><td>PO flowdown, bộ chứng từ chứng nhận, receiving release, packaging spec</td><td>PUR + WHS + QA</td></tr>
 <tr><td>PT-03</td><td>Clean-pack direct</td><td>Part sau final đi thẳng clean pack/ship, không qua staging thường</td><td>Cleanliness hồ sơ, packaging photo, seal/label bằng chứng</td><td>QA + WHS</td></tr>
@@ -90,7 +90,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>3. Quy tắc dùng route đặc biệt</h2>
 <div class="matrix">
 <div class="card"><h3>3.1 Gắn route code</h3><ul class="tight" style="padding-left:20px;"><li>Route code phải xuất hiện trên traveler/dispatch/label nơi người vận hành nhìn thấy.</li><li>Nếu Job có nhiều route code, phải ghi thứ tự áp dụng và route nào là route chi phối release.</li><li>Không được tạo route code mới ngoài danh mục này nếu chưa có phê duyệt thay đổi hệ thống.</li></ul></div>
-<div class="card"><h3>3.2 Hồ sơ tăng cường</h3><ul class="tight" style="padding-left:20px;"><li>Mỗi route code phải kéo theo bộ bằng chứng tương ứng trong Hồ sơ công việc (job dossier).</li><li>Thiếu một hồ sơ tăng cường bắt buộc thì cổng kiểm soát tương ứng không được mở.</li><li>Route code không thay thế QPL; nếu QPL cao và route đặc biệt cùng áp dụng thì lấy mức cưỡng chế cao hơn.</li></ul></div>
+<div class="card"><h3>3.2 Hồ sơ tăng cường</h3><ul class="tight" style="padding-left:20px;"><li>Mỗi route code phải kéo theo bộ bằng chứng tương ứng trong Job dossier (job dossier).</li><li>Thiếu một hồ sơ tăng cường bắt buộc thì control gate tương ứng không được mở.</li><li>Route code không thay thế QPL; nếu QPL cao và route đặc biệt cùng áp dụng thì lấy mức cưỡng chế cao hơn.</li></ul></div>
 </div>
 <p>Hồ sơ Job và completeness theo <a href="annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a> và <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>.</p></div>
 
@@ -105,8 +105,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>5. Tài liệu liên kết</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Quick-check card nhận biết route đặc biệt trước khi chạy.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Hồ sơ công việc và completeness logic.</td></tr>
-<tr><td><a href="../06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>QPL và cưỡng chế hồ sơ/cổng kiểm soát.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Job dossier và completeness logic.</td></tr>
+<tr><td><a href="../06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>QPL và cưỡng chế hồ sơ/control gate.</td></tr>
 <tr><td><a href="../07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a></td><td>Packaging/labeling cho route ship đặc biệt.</td></tr>
 <tr><td><a href="annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a></td><td>SSCC/đối chiếu đóng gói cho split shipment.</td></tr>
 </tbody></table></div></div>

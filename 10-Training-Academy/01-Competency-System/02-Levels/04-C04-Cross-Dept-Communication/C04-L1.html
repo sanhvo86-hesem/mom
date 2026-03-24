@@ -88,7 +88,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <p class="small"><a href="../../index.html">TRN-ACA-COMP-INDEX — Competency System</a></p>
 </div><h2 class="h2">1) Mục tiêu &amp; phạm vi</h2><div class="card">
-<p><strong>Mục tiêu năng lực:</strong> Tạo luồng thông tin đúng – đủ – kịp thời giữa Kinh doanh/Kế hoạch/Kỹ thuật/Sản xuất/QC/Warehouse để giảm chờ đợi, tránh hiểu sai, kiểm soát thay đổi và giao hàng đúng hẹn.</p>
+<p><strong>Mục tiêu năng lực:</strong> Tạo luồng thông tin đúng – đủ – kịp thời giữa Kinh doanh/Kế hoạch/Kỹ thuật/Sản xuất/QC/Warehouse để giảm chờ đợi, tránh hiểu sai, change control và giao hàng đúng hẹn.</p>
 <p><strong>Level này dành cho:</strong> Nhân sự mới / học việc / vị trí vận hành mức cơ bản</p>
 <p><strong>Mức tư duy/kỹ năng:</strong> Nhớ – Hiểu – Làm theo hướng dẫn</p>
 <div><strong>Trọng tâm Level:</strong><ul><li>Làm đúng chuẩn tối thiểu</li><li>Không gây rủi ro cho người/thiết bị</li><li>Ghi nhận bằng chứng cơ bản</li></ul></div>
@@ -126,7 +126,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag iso">ISO 8.5.6</span>
 </div>
 </div>
-<div class="body">Khi thay đổi yêu cầu/điều kiện sản xuất, <strong>phải</strong> truyền thông và kiểm soát thay đổi để tránh hiểu sai.</div>
+<div class="body">Khi thay đổi yêu cầu/điều kiện sản xuất, <strong>phải</strong> truyền thông và change control để tránh hiểu sai.</div>
 </div>
 <div class="req">
 <div class="title">
@@ -205,10 +205,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody><tr><td>Báo cáo theo cấu trúc (SBAR/5W1H)</td><td>Ngắn gọn, đủ dữ kiện, có đưa ra</td><td>Mơ hồ, thiếu dữ kiện</td></tr>
 <tr><td>Bàn giao &amp; hồ sơ</td><td>Bàn giao đầy đủ; nhật ký rõ; action người phụ trách/due</td><td>Thiếu thông tin; gây lặp sự cố</td></tr>
 <tr><td>Tuân thủ kênh escalation</td><td>Báo đúng cấp, đúng thời điểm; closed-loop</td><td>Im lặng hoặc báo sai kênh</td></tr></tbody>
-</table><h2 class="h2">11) KPI Cổng kiểm soát (gate) &amp; Chỉ số theo dõi</h2><div class="kpi-gate">
-<strong>KPI Cổng kiểm soát / Điều kiện loại trừ (Fail-fast):</strong>
+</table><h2 class="h2">11) KPI Control gate (gate) &amp; Chỉ số theo dõi</h2><div class="kpi-gate">
+<strong>KPI Control gate / Điều kiện loại trừ (Fail-fast):</strong>
 <ul><li>Không báo cáo sai lệch quan trọng (ẩn lỗi) dẫn đến ảnh hưởng chất lượng/OTD → KHÔNG đạt Level.</li><li>Thông tin bàn giao ca thiếu làm gây sự cố lặp lại → KHÔNG đạt Level (L1–L2).</li><li>Không tuân thủ kênh/escalation dẫn tới chậm phản ứng &gt; SLA nội bộ → KHÔNG đạt Level (L3–L4).</li></ul>
-<div class="small">Ghi chú: Cổng kiểm soát là điều kiện ưu tiên cao hơn điểm số. Khi vi phạm cổng kiểm soát → không xét đạt level dù điểm lý thuyết cao.</div>
+<div class="small">Ghi chú: Control gate là điều kiện ưu tiên cao hơn điểm số. Khi vi phạm control gate → không xét đạt level dù điểm lý thuyết cao.</div>
 </div><h3 class="h3">11.1 Bộ chỉ số theo dõi (tham khảo)</h3><table class="table">
 <thead><tr><th>Chỉ số</th><th>Công thức đo</th><th>Nguồn dữ liệu</th><th>Tần suất</th><th>Ngưỡng/Target (L1)</th></tr></thead>
 <tbody><tr><td>Bàn giao completeness score</td><td><span class="mono">(Điểm đạt / điểm chuẩn)x100%</span></td><td>Bảng kiểm bàn giao ca</td><td>Hàng tuần</td><td><strong>≥85%</strong></td></tr>

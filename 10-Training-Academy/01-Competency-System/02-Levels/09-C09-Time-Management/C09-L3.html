@@ -66,16 +66,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="doc-content" id="docContent">
 <h1>C09 — Quản lý thời gian – ưu tiên – đúng hạn — Level 3</h1>
-<p class="lead"><strong>Level 3 — Điều phối ưu tiên trong nhóm &amp; quản trị nghẽn.</strong> Mô-đun này tạo thói quen đúng hạn và ưu tiên đúng để giữ OTD mà không phá cổng kiểm soát chất lượng (cổng kiểm soát chất lượng).</p>
+<p class="lead"><strong>Level 3 — Điều phối ưu tiên trong nhóm &amp; quản trị nghẽn.</strong> Mô-đun này tạo thói quen đúng hạn và ưu tiên đúng để giữ OTD mà không phá control gate chất lượng (control gate chất lượng).</p>
 <div class="hero">
 <h2>Chuẩn thực chiến – Level 3</h2>
 <div class="meta">
 <div><strong>Vai trò mục tiêu</strong><br/>Supervisor, Trưởng nhóm Điều độ, Cell Leader</div>
 <div><strong>Đầu ra bắt buộc</strong><ul><li>Điều phối ưu tiên trong nhóm; xử lý nghẽn và phân bổ nguồn lực.</li><li>Thiết lập cơ chế theo dõi tiến độ: WIP board, tuổi tồn (aging) bucket, nhật ký hành động.</li><li>Huấn luyện kỹ năng quản lý thời gian cho nhân viên.</li></ul></div>
-<div><strong>Cổng kiểm soát (gate) trọng yếu</strong><br/><span class="badge bad">Vượt qua HOLD/REV/QC</span> = FAIL</div>
+<div><strong>Control gate (gate) trọng yếu</strong><br/><span class="badge bad">Vượt qua HOLD/REV/QC</span> = FAIL</div>
 <div><strong>Thời lượng</strong><br/>Lý thuyết 90 phút • Workshop 90 phút • OJT 1 tuần</div>
 </div>
-<p class="small-note">Nguyên tắc vận hành: làm đúng việc trước (priority), làm đúng cách (cổng kiểm soát), và báo sớm (escal) khi bị chặn.</p>
+<p class="small-note">Nguyên tắc vận hành: làm đúng việc trước (priority), làm đúng cách (control gate), và báo sớm (escal) khi bị chặn.</p>
 </div><div class="card">
 <span class="badge">Bộ diễn tập (Job CNC)</span>
 <p class="lead" style="margin-top:10px;">
@@ -93,15 +93,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <ul>
 <li>Giữ cam kết giao hàng (OTD) bằng kỷ luật dispatch, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), tuổi tồn WIP (tuổi tồn / tuổi tồn), escal ladder.</li>
-<li>Chặn 2 nhóm rủi ro song song: (1) trễ đơn; (2) chạy nhanh nhưng phá cổng kiểm soát gây lỗi chất lượng.</li>
+<li>Chặn 2 nhóm rủi ro song song: (1) trễ đơn; (2) chạy nhanh nhưng phá control gate gây lỗi chất lượng.</li>
 <li>Biến quản lý thời gian thành hành vi quan sát được: bảng kiểm, OJT, performance test, ĐẠT/KHÔNG ĐẠT.</li>
 </ul>
 </div>
-<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + hold point</h2>
 <p>C09-L3 nối Planning ↔ Production ↔ QC ↔ WHS, vận hành Tier cadence và escalation ladder.</p>
 <div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Phát hành dispatch</strong><p>Cut-off + timestamp; priority class rõ.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Freeze window</strong><p>Chốt kế hoạch ca; thay đổi có nhật ký.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>WIP board &amp; tuổi tồn</strong><p>Theo dõi bucket; hành động theo ngưỡng.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Escalation ladder</strong><p>Level 0–3; SLA phản hồi; closure xác minh.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Rebalance nguồn lực</strong><p>Chuyển người/máy/ca/outsource theo quyết định.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Coach</strong><p>Quan sát hành vi; chấm rubric; tái chứng nhận.</p></div></div></div>
 <h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
-<ol><li>Dispatch phát hành không rõ priority class; nhóm làm rối.</li><li>Không tuân thủ cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch); thay đổi liên tục.</li><li>WIP board không cập nhật; mất hình ảnh thật.</li><li>Không áp dụng bucket tuổi tồn; phát hiện trễ muộn.</li><li>Escal muộn; không có nhật ký; không closure xác minh.</li><li>Không rebalance nguồn lực; nghẽn kéo dài.</li><li>Không coach; nhân sự lặp lại hành vi xấu.</li><li>Không tách HOLD; vượt qua cổng kiểm soát.</li><li>Không phối hợp QC/WHS; job chờ release.</li><li>Không kiểm soát WIP limit; overload.</li></ol>
+<ol><li>Dispatch phát hành không rõ priority class; nhóm làm rối.</li><li>Không tuân thủ cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch); thay đổi liên tục.</li><li>WIP board không cập nhật; mất hình ảnh thật.</li><li>Không áp dụng bucket tuổi tồn; phát hiện trễ muộn.</li><li>Escal muộn; không có nhật ký; không closure xác minh.</li><li>Không rebalance nguồn lực; nghẽn kéo dài.</li><li>Không coach; nhân sự lặp lại hành vi xấu.</li><li>Không tách HOLD; vượt qua control gate.</li><li>Không phối hợp QC/WHS; job chờ release.</li><li>Không kiểm soát WIP limit; overload.</li></ol>
 <h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người phụ trách + bằng chứng)</h2>
 <div class="table-card"><table class="table"><thead><tr><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Dispatch theo WI-OPS-003 + ANNEX-OPS-001</strong></td><td>Dispatcher/Supervisor</td><td>FRM-OPS-006</td><td>Priority class và HOLD rõ</td></tr><tr><td><strong>Freeze window &amp; DCR hồ sơ</strong></td><td>Supervisor</td><td>Nhật ký thay đổi dispatch</td><td>Thay đổi phải có phê duyệt</td></tr><tr><td><strong>WIP tuổi tồn bucket + action</strong></td><td>Supervisor</td><td>FRM-OPS-007</td><td>RED/BLACK phải escal</td></tr><tr><td><strong>Escalation ladder</strong></td><td>Supervisor/Ops Mgr</td><td>PROC-OPS-003</td><td>SLA phản hồi bắt buộc</td></tr><tr><td><strong>Rebalance quyết định trong ngày</strong></td><td>Supervisor</td><td>nhật ký hành động + quyết định</td><td>Không để nghẽn trôi</td></tr><tr><td><strong>Kèm cặp phát triển (coaching) theo TWI</strong></td><td>Supervisor</td><td>OJT Checklist + rubric</td><td>Không coach = năng lực giảm</td></tr></tbody></table></div>
 <h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
@@ -119,7 +119,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Trong ca</td><td>Theo dispatch; escal đúng</td></tr><tr><td><strong>L2</strong></td><td>Plan &amp; mức sẵn sàng</td><td>Chuẩn bị trước; nhật ký risk sớm</td></tr><tr><td><strong>L3</strong></td><td>Điều phối nhóm</td><td>Dispatch/freeze/board/tuổi tồn/action/escal/coach</td></tr><tr><td><strong>L4</strong></td><td>Thiết kế hệ thống</td><td>Cadence; KPI; capacity; governance</td></tr></tbody></table></div>
 <h2>10) Đánh giá</h2>
 <h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
-<div class="quiz"><ol><li>cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) bắt đầu từ thời điểm nào?</li><li>P0 được phép phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) khi nào?</li><li>Bucket BLACK yêu cầu due trong bao lâu?</li><li>Escal Level 2 phản hồi trong bao lâu?</li><li>WIP board cập nhật tối thiểu bao nhiêu lần trong ca?</li><li>Vì sao không nhật ký thay đổi ưu tiên là fail đánh giá?</li><li>Ai phê duyệt job P0?</li><li>HOLD phải tách ra khỏi dispatch ra sao?</li><li>Rebalance nguồn lực gồm các lựa chọn nào?</li><li>Closure xác minh là gì?</li><li>Nêu 03 dữ liệu bắt buộc của dispatch list.</li><li>Khi job queue &gt; 24 giờ, hành động bắt buộc là gì?</li><li>Khi job chờ QC &gt; 16 giờ làm việc, hành động là gì?</li><li>Khi outsource chờ &gt; 48 giờ, PUR phải làm gì?</li><li>Vì sao coach theo rubric giúp OTD tăng?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) áp dụng cho escal ra sao?</li><li>Khi board lệch hiện trường, ai chịu trách nhiệm sửa?</li><li>Nêu 02 điều kiện để split-lot.</li><li>Khi job RED không có action, kết luận gì?</li><li>Khi Estimator (SAL-03) cần thông báo khách, trigger là gì?</li><li>Vì sao escalation không phải đổ lỗi?</li><li>Khi job P1 bị dời xuống P2, cần phê duyệt gì?</li></ol></div>
+<div class="quiz"><ol><li>cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) bắt đầu từ thời điểm nào?</li><li>P0 được phép phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) khi nào?</li><li>Bucket BLACK yêu cầu due trong bao lâu?</li><li>Escal Level 2 phản hồi trong bao lâu?</li><li>WIP board cập nhật tối thiểu bao nhiêu lần trong ca?</li><li>Vì sao không nhật ký thay đổi ưu tiên là fail đánh giá?</li><li>Ai phê duyệt job P0?</li><li>HOLD phải tách ra khỏi dispatch ra sao?</li><li>Rebalance nguồn lực gồm các lựa chọn nào?</li><li>Closure xác minh là gì?</li><li>Nêu 03 dữ liệu bắt buộc của dispatch list.</li><li>Khi job queue &gt; 24 giờ, hành động bắt buộc là gì?</li><li>Khi job chờ QC &gt; 16 giờ làm việc, hành động là gì?</li><li>Khi outsource chờ &gt; 48 giờ, PUR phải làm gì?</li><li>Vì sao coach theo rubric giúp OTD tăng?</li><li>không có bằng chứng thì không qua control gate (No bằng chứng = No gate) áp dụng cho escal ra sao?</li><li>Khi board lệch hiện trường, ai chịu trách nhiệm sửa?</li><li>Nêu 02 điều kiện để split-lot.</li><li>Khi job RED không có action, kết luận gì?</li><li>Khi Estimator (SAL-03) cần thông báo khách, trigger là gì?</li><li>Vì sao escalation không phải đổ lỗi?</li><li>Khi job P1 bị dời xuống P2, cần phê duyệt gì?</li></ol></div>
 <h3>Scenario (≥ 3 tình huống thật)</h3>
 <details>
 <summary>Job BLACK nhưng không ai nhận action</summary>
@@ -152,10 +152,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h2>11) ĐẠT/KHÔNG ĐẠT criteria</h2>
 <div class="kpi-gate">
-<strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</strong>
+<strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</strong>
 <ul>
 <li>đạt khi hoàn thành OJT đầu ra và performance test đạt; tuân thủ dispatch/freeze/escal; có nhật ký và closure.</li>
-<li>FAIL ngay khi vượt qua cổng kiểm soát (REV/HOLD/QC), giấu blocker, không escal theo SLA, hoặc không có bằng chứng bàn giao.</li>
+<li>FAIL ngay khi vượt qua control gate (REV/HOLD/QC), giấu blocker, không escal theo SLA, hoặc không có bằng chứng bàn giao.</li>
 </ul>
 </div>
 <h2>12) MRR tối thiểu (hồ sơ bắt buộc + naming + nơi lưu)</h2>

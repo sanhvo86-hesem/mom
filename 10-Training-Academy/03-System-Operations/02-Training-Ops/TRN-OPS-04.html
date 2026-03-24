@@ -71,7 +71,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="lead">
  Mô-đun này thiết lập kỷ luật “đánh giá năng lực có kiểm soát” để cấp quyền làm việc theo vai trò.
  Mọi bài kiểm tra phải bám rủi ro vận hành, có bằng chứng, có kiểm soát phiên bản và có cơ chế chống gian lận.
- Quy tắc cứng: <b>Không có bằng chứng = Không qua cổng kiểm soát</b>.
+ Quy tắc cứng: <b>Không có bằng chứng = Không qua control gate</b>.
  </p>
 <div class="callout">
 <b>Tài liệu HESEM bắt buộc dùng trong mô-đun:</b>
@@ -81,7 +81,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-808_Performance_Review_Form.xlsx">FRM-HR-TRN-009 — Performance Review Form</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-101-document-and-data-control.html">SOP-QMS-001 — SOP-101 — Kiểm soát tài liệu và dữ liệu điều hành</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP-QMS-008 — SOP-106 — Quản trị thay đổi và cấu hình</a></li>
-<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//09-SOP-900//sop-901-internal-audit-and-lpa.html">SOP-QMS-004 — SOP-901 — Đánh giá nội bộ và LPA</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//09-SOP-900//sop-901-internal-audit-and-lpa.html">SOP-QMS-004 — SOP-901 — Internal audit và LPA</a></li>
 </ul>
 </div>
 <hr/>
@@ -93,14 +93,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="line-height:1.85;">
 <li>Khi phát hành mới hoặc thay đổi <b>SOP/WI/FRM</b> ảnh hưởng thao tác, tiêu chí chấp nhận, hồ sơ.</li>
 <li>Khi có <b>sản phẩm mới / khách hàng mới / yêu cầu chứng từ mới</b> tạo rủi ro “thiếu/giả bằng chứng”.</li>
-<li>Khi có <b>NCR/MRB/khiếu nại</b> liên quan “không đủ năng lực” hoặc “bỏ qua cổng kiểm soát”.</li>
-<li>Khi bổ nhiệm/luân chuyển nhân sự vào vai trò có quyền ký/duyệt/cổng kiểm soát.</li>
+<li>Khi có <b>NCR/MRB/khiếu nại</b> liên quan “không đủ năng lực” hoặc “bỏ qua control gate”.</li>
+<li>Khi bổ nhiệm/luân chuyển nhân sự vào vai trò có quyền ký/duyệt/control gate.</li>
 </ul>
 <div class="note">
 <strong>Trách nhiệm (RACI rút gọn)</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li><b>QA/QMS:</b> sở hữu hệ thống đánh giá; kiểm soát phiên bản đề/đáp án; kiểm tra bằng chứng.</li>
-<li><b>Supervisor:</b> xác nhận năng lực, ký ĐẠT/KHÔNG ĐẠT, cấp quyền thao tác/cổng kiểm soát theo Level.</li>
+<li><b>Supervisor:</b> xác nhận năng lực, ký ĐẠT/KHÔNG ĐẠT, cấp quyền thao tác/control gate theo Level.</li>
 <li><b>SME theo phòng:</b> viết câu hỏi &amp; scenario theo rủi ro thực tế của công đoạn.</li>
 <li><b>Trainer/Người coi thi:</b> tổ chức thi, kiểm soát chống gian lận, lập hồ sơ thi.</li>
 <li><b>Học viên:</b> tuân thủ quy tắc thi; xuất trình bằng chứng OJT/Performance test.</li>
@@ -109,9 +109,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Phạm vi vai trò bắt buộc</h3>
 <p>Mô-đun áp dụng cho đầy đủ các vai trò sau: <b>Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor</b>.</p>
 <hr/>
-<h2>2) Vị trí trong chuỗi E2E &amp; luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
+<h2>2) Vị trí trong chuỗi E2E &amp; luồng bàn giao (đầu vào/đầu ra) + hold point</h2>
 <p>
- TRN-OPS-04 là “cổng kiểm soát hỗ trợ” xuyên suốt chuỗi E2E: nó không thay thế cổng kiểm soát vận hành,
+ TRN-OPS-04 là “control gate hỗ trợ” xuyên suốt chuỗi E2E: nó không thay thế control gate vận hành,
  mà tạo cơ chế chứng minh <b>ai được phép làm gì</b> tại từng bước.
  </p>
 <div class="table-card">
@@ -121,7 +121,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:170px;">Bước E2E</th>
 <th>Điểm kích hoạt đào tạo/đánh giá</th>
 <th style="width:220px;">Đầu ra bắt buộc (MRR)</th>
-<th style="width:190px;">Điểm chặn</th>
+<th style="width:190px;">Hold point</th>
 </tr>
 </thead>
 <tbody>
@@ -134,13 +134,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Planning</b></td>
 <td>Khi phát hành route, CTQ, kế hoạch kiểm tra (kiểm tra plan).</td>
-<td>Blueprint theo CTQ; danh mục câu hỏi “Fail-Cổng kiểm soát”.</td>
+<td>Blueprint theo CTQ; danh mục câu hỏi “Fail-Control gate”.</td>
 <td>Chặn phát hành kế hoạch khi thiếu blueprint hoặc sai phiên bản (wrong revision) tài liệu.</td>
 </tr>
 <tr>
 <td><b>Engineering</b></td>
 <td>Khi phát hành program/setup sheet/FAI yêu cầu mới.</td>
-<td>Scenario kiểm soát thay đổi; ngân hàng câu hỏi theo revision.</td>
+<td>Scenario change control; ngân hàng câu hỏi theo revision.</td>
 <td>Chặn “Released” khi đề/đáp án chưa được kiểm soát phiên bản.</td>
 </tr>
 <tr>
@@ -163,7 +163,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>NCR/MRB</b></td>
-<td>Khi lỗi do “thiếu năng lực / bỏ cổng kiểm soát”.</td>
+<td>Khi lỗi do “thiếu năng lực / bỏ control gate”.</td>
 <td>Bổ sung câu hỏi vào bank; cập nhật blueprint theo failure mode.</td>
 <td>Chặn đóng NCR khi không cập nhật bank/blueprint (CAPA thiếu).</td>
 </tr>
@@ -184,13 +184,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:150px;">Hạng mục</th>
 <th>Đầu vào bắt buộc</th>
 <th>Đầu ra bắt buộc</th>
-<th style="width:240px;">Bàn giao &amp; điểm chặn</th>
+<th style="width:240px;">Bàn giao &amp; hold point</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><b>Blueprint</b></td>
-<td>SOP/WI/FRM có hiệu lực + rủi ro CTQ + cổng kiểm soát liên quan.</td>
+<td>SOP/WI/FRM có hiệu lực + rủi ro CTQ + control gate liên quan.</td>
 <td>FRM-HR-TRN-008 đã điền đủ, có ký duyệt, có version.</td>
 <td>Không có blueprint → không tạo đề → không được tổ chức thi.</td>
 </tr>
@@ -202,7 +202,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Bài kiểm tra nhanh/Scenario</b></td>
-<td>Blueprint + bank + quy tắc Fail-Cổng kiểm soát.</td>
+<td>Blueprint + bank + quy tắc Fail-Control gate.</td>
 <td>FRM-HR-TRN-009 (đề) + key chấm (tách quyền truy cập).</td>
 <td>Đề không có key/không có dấu kiểm soát → BLOCK.</td>
 </tr>
@@ -219,9 +219,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>3) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế)</h2>
 <ol style="line-height:1.85; padding-left:18px;">
 <li>Ra đề dựa trên SOP/WI bản cũ (wrong revision) dẫn đến “đúng bài – sai vận hành”.</li>
-<li>Blueprint không bám rủi ro CTQ/cổng kiểm soát dẫn đến thi đạt nhưng vẫn lọt lỗi chất lượng.</li>
+<li>Blueprint không bám rủi ro CTQ/control gate dẫn đến thi đạt nhưng vẫn lọt lỗi chất lượng.</li>
 <li>Không gắn tag theo vai trò → ngân hàng câu hỏi dùng sai đối tượng.</li>
-<li>Không phân loại “Fail-Cổng kiểm soát” → học viên sai câu chặn nhưng vẫn PASS theo tổng điểm.</li>
+<li>Không phân loại “Fail-Control gate” → học viên sai câu chặn nhưng vẫn PASS theo tổng điểm.</li>
 <li>Không có key chấm/giải thích → chấm lệch giữa ca/người chấm.</li>
 <li>Không kiểm soát truy cập key/đề → rò rỉ đáp án, mất giá trị đánh giá.</li>
 <li>Dùng lại 1 đề quá lâu → học viên truyền miệng, điểm cao giả tạo.</li>
@@ -251,10 +251,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Phiếu kiểm revision + link SOP/WI/FRM + ngày kiểm.</td>
 </tr>
 <tr>
-<td><b>Danh mục Fail-Cổng kiểm soát</b></td>
+<td><b>Danh mục Fail-Control gate</b></td>
 <td>QA + Supervisor</td>
-<td>Khi xác định cổng kiểm soát an toàn/chất lượng/chứng từ.</td>
-<td>Danh sách câu “Fail-Cổng kiểm soát” kèm lý do + phê duyệt.</td>
+<td>Khi xác định control gate an toàn/chất lượng/chứng từ.</td>
+<td>Danh sách câu “Fail-Control gate” kèm lý do + phê duyệt.</td>
 </tr>
 <tr>
 <td><b>Rà soát đồng cấp câu hỏi</b></td>
@@ -330,9 +330,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Biên bản vô hiệu + kế hoạch thi lại + bảng kiểm cập nhật.</td>
 </tr>
 <tr>
-<td><b>Bỏ qua cổng kiểm soát do “thi đạt nhưng làm sai”</b></td>
+<td><b>Bỏ qua control gate do “thi đạt nhưng làm sai”</b></td>
 <td>STOP công việc; mở HOLD sản phẩm; truy vết người thao tác; kích hoạt MRB khi cần.</td>
-<td>QC Hold Nhật ký/NCR + truy vết + cập nhật câu hỏi Fail-Cổng kiểm soát.</td>
+<td>QC Hold Nhật ký/NCR + truy vết + cập nhật câu hỏi Fail-Control gate.</td>
 </tr>
 </tbody>
 </table>
@@ -353,15 +353,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Xác định mô-đun/vai trò cần đánh giá + Level mục tiêu + quyền hạn sau khi đạt.</td><td>Supervisor</td><td>Danh sách vai trò-level + phê duyệt.</td><td>Không định nghĩa quyền hạn → thi xong không dùng được.</td></tr>
 <tr><td>2</td><td>Khoá revision nguồn: SOP/WI/FRM/Spec áp dụng; ghi rõ Rev + ngày hiệu lực.</td><td>QA/QMS</td><td>Bảng kiểm revision nguồn.</td><td>Thi theo bản cũ → wrong revision.</td></tr>
-<tr><td>3</td><td>Lập blueprint bằng FRM-HR-TRN-008: mục tiêu, tỷ trọng, Fail-Cổng kiểm soát, dạng câu.</td><td>QA + SME</td><td>FRM-HR-TRN-008 đã ký.</td><td>Blueprint thiếu Fail-Cổng kiểm soát.</td></tr>
-<tr><td>4</td><td>Thiết lập Question Bank: ID, tag (vai trò/level/chủ đề/cổng kiểm soát), người phụ trách, nơi lưu.</td><td>QA/QMS</td><td>Register bank + phân quyền.</td><td>Bank “trôi nổi” không ai chịu trách nhiệm.</td></tr>
-<tr><td>5</td><td>Viết câu hỏi theo blueprint; mỗi câu có đáp án + giải thích + tag Fail-Cổng kiểm soát.</td><td>SME</td><td>Bản nháp câu hỏi + nhật ký review.</td><td>Câu hỏi mơ hồ, không kiểm chứng được.</td></tr>
+<tr><td>3</td><td>Lập blueprint bằng FRM-HR-TRN-008: mục tiêu, tỷ trọng, Fail-Control gate, dạng câu.</td><td>QA + SME</td><td>FRM-HR-TRN-008 đã ký.</td><td>Blueprint thiếu Fail-Control gate.</td></tr>
+<tr><td>4</td><td>Thiết lập Question Bank: ID, tag (vai trò/level/chủ đề/control gate), người phụ trách, nơi lưu.</td><td>QA/QMS</td><td>Register bank + phân quyền.</td><td>Bank “trôi nổi” không ai chịu trách nhiệm.</td></tr>
+<tr><td>5</td><td>Viết câu hỏi theo blueprint; mỗi câu có đáp án + giải thích + tag Fail-Control gate.</td><td>SME</td><td>Bản nháp câu hỏi + nhật ký review.</td><td>Câu hỏi mơ hồ, không kiểm chứng được.</td></tr>
 <tr><td>6</td><td>Rà soát đồng cấp: kiểm tính đúng, rõ, bám rủi ro; loại câu “mẹo nhớ”.</td><td>SME + Supervisor</td><td>Biên bản review.</td><td>Đề thiên về lý thuyết, không đo hành vi.</td></tr>
 <tr><td>7</td><td>Tạo đề theo FRM-HR-TRN-009 từ bank; tạo tối thiểu 2 version A/B.</td><td>QA/QMS</td><td>FRM-HR-TRN-009 (A/B) + version.</td><td>Dùng 1 version kéo dài → lộ đề.</td></tr>
 <tr><td>8</td><td>Tách lưu “đề” và “key chấm”; key chỉ cấp cho người chấm/QA.</td><td>QA/QMS</td><td>Folder quyền hạn + nhật ký phát hành.</td><td>Key nằm chung với đề → rò rỉ.</td></tr>
 <tr><td>9</td><td>Thiết lập anti-cheat: xác thực người thi, giám sát, kiểm soát tài liệu/điện thoại.</td><td>Trainer</td><td>Proctor bảng kiểm + quy tắc thi ký nhận.</td><td>Thi “tự do” → bằng chứng bị bác.</td></tr>
 <tr><td>10</td><td>Tổ chức thi: ghi version, thời gian, attempt #, người coi thi.</td><td>Trainer</td><td>Attendance + proctor nhật ký + bài làm.</td><td>Thi không ghi version → truy vết đứt.</td></tr>
-<tr><td>11</td><td>Chấm theo key + đánh dấu Fail-Cổng kiểm soát; kết luận ĐẠT/KHÔNG ĐẠT.</td><td>Supervisor/QA</td><td>Phiếu kết quả ký.</td><td>Chấm theo cảm tính.</td></tr>
+<tr><td>11</td><td>Chấm theo key + đánh dấu Fail-Control gate; kết luận ĐẠT/KHÔNG ĐẠT.</td><td>Supervisor/QA</td><td>Phiếu kết quả ký.</td><td>Chấm theo cảm tính.</td></tr>
 <tr><td>12</td><td>Thực hiện OJT/performance test theo kết quả; thu đủ bằng chứng.</td><td>Trainer + Supervisor</td><td>Bảng kiểm OJT + đầu ra bắt buộc.</td><td>Chỉ thi lý thuyết, bỏ thực hành.</td></tr>
 <tr><td>13</td><td>Lưu hồ sơ theo quy tắc đặt tên; gắn retention theo SOP-QMS-011/016.</td><td>QA/QMS</td><td>Folder bằng chứng + nhãn lưu trữ.</td><td>Lưu rải rác, thiếu metadata.</td></tr>
 <tr><td>14</td><td>Phân tích kết quả; cập nhật bank/blueprint khi có lỗi lặp lại.</td><td>QA/QMS</td><td>Báo cáo phân tích + DCR hồ sơ.</td><td>Thi xong bỏ qua cải tiến → lỗi quay lại.</td></tr>
@@ -389,19 +389,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>1</td>
 <td>Khoá revision nguồn</td>
-<td>Ghi Rev + ngày hiệu lực; đối chiếu Master List; xác nhận “điểm sử dụng”.</td>
+<td>Ghi Rev + ngày hiệu lực; đối chiếu Master List; xác nhận “point-of-use”.</td>
 <td>Chặn wrong revision; sai 1 lần tạo Major NC.</td>
 </tr>
 <tr>
 <td>2</td>
 <td>Lập blueprint</td>
-<td>Gắn mục tiêu – rủi ro – cổng kiểm soát – tỷ trọng; đánh dấu Fail-Cổng kiểm soát.</td>
+<td>Gắn mục tiêu – rủi ro – control gate – tỷ trọng; đánh dấu Fail-Control gate.</td>
 <td>Đảm bảo đề đo đúng rủi ro vận hành.</td>
 </tr>
 <tr>
 <td>3</td>
 <td>Xây bank &amp; tag</td>
-<td>Mỗi câu có tag vai trò/level/chủ đề/cổng kiểm soát; có đáp án + giải thích.</td>
+<td>Mỗi câu có tag vai trò/level/chủ đề/control gate; có đáp án + giải thích.</td>
 <td>Cho phép tạo nhiều version, chấm nhất quán, truy xuất khi đánh giá.</td>
 </tr>
 <tr>
@@ -419,7 +419,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>6</td>
 <td>Chấm &amp; cấp quyền</td>
-<td>Chấm theo key; Fail-Cổng kiểm soát = FAIL; cấp quyền theo Level.</td>
+<td>Chấm theo key; Fail-Control gate = FAIL; cấp quyền theo Level.</td>
 <td>Đảm bảo “được phép làm” dựa trên minh chứng, không dựa cảm tính.</td>
 </tr>
 </tbody>
@@ -427,7 +427,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3>8.2 OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
 <ul style="line-height:1.9;">
-<li>01 bộ <b>FRM-HR-TRN-008</b> hoàn chỉnh cho 01 mô-đun cụ thể (có mục tiêu, tỷ trọng, Fail-Cổng kiểm soát).</li>
+<li>01 bộ <b>FRM-HR-TRN-008</b> hoàn chỉnh cho 01 mô-đun cụ thể (có mục tiêu, tỷ trọng, Fail-Control gate).</li>
 <li>01 bộ <b>FRM-HR-TRN-009</b> gồm 02 version A/B, mỗi version ≥ 20 câu, có key chấm tách quyền.</li>
 <li>01 <b>Question Bank Register</b> (ID, version, tag schema, người phụ trách, phân quyền, nơi lưu).</li>
 <li>01 <b>Proctor Nhật ký</b> + Attendance cho 01 buổi thi thật.</li>
@@ -450,7 +450,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Setup, Maintenance</td><td><b>L2</b></td><td>Được viết câu hỏi chuyên môn theo mẫu; được tham gia review; không được tự phát hành version.</td></tr>
 <tr><td>Programmer, QC, Purchasing, Planner, EHS, Estimator (SAL-03)</td><td><b>L2</b></td><td>Được xây scenario theo rủi ro công đoạn; được chấm phần chuyên môn khi có uỷ quyền.</td></tr>
 <tr><td>QA</td><td><b>L3</b></td><td>Được quản trị bank; phát hành version đề; thu hồi/đánh dấu OBSOLETE; kiểm tra bằng chứng.</td></tr>
-<tr><td>Supervisor</td><td><b>L4</b></td><td>Được phê duyệt blueprint; ký ĐẠT/KHÔNG ĐẠT; cấp quyền thao tác/cổng kiểm soát; kích hoạt STOP/HOLD/BLOCK.</td></tr>
+<tr><td>Supervisor</td><td><b>L4</b></td><td>Được phê duyệt blueprint; ký ĐẠT/KHÔNG ĐẠT; cấp quyền thao tác/control gate; kích hoạt STOP/HOLD/BLOCK.</td></tr>
 </tbody>
 </table>
 </div>
@@ -470,7 +470,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L1</b></td>
 <td>
 <ul style="margin:0; padding-left:18px; line-height:1.75;">
-<li>Nhận biết quy tắc thi, Fail-Cổng kiểm soát, kỷ luật bằng chứng.</li>
+<li>Nhận biết quy tắc thi, Fail-Control gate, kỷ luật bằng chứng.</li>
 <li>Tra cứu đúng revision SOP/WI/FRM trước khi làm bài.</li>
 <li>Ghi đầy đủ thông tin bắt buộc trên bài làm (tên, ca, ngày, version).</li>
 <li>Bàn giao bài làm theo đúng quy trình; không giữ đề/không chụp ảnh.</li>
@@ -479,7 +479,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>
 <ul style="margin:0; padding-left:18px; line-height:1.75;">
 <li>Bài kiểm tra nhanh đạt ≥ 85%.</li>
-<li>Fail-Cổng kiểm soát đúng 100%.</li>
+<li>Fail-Control gate đúng 100%.</li>
 <li>Tuân thủ proctoring, không vi phạm anti-cheat.</li>
 </ul>
 </td>
@@ -495,7 +495,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>
 <ul style="margin:0; padding-left:18px; line-height:1.75;">
 <li>Viết được câu hỏi theo blueprint, câu rõ, có đáp án + giải thích.</li>
-<li>Gắn tag vai trò/level/chủ đề/cổng kiểm soát đúng quy ước.</li>
+<li>Gắn tag vai trò/level/chủ đề/control gate đúng quy ước.</li>
 <li>Thực hiện rà soát đồng cấp chéo và ghi nhận sửa đổi.</li>
 <li>Viết được 01 scenario có dữ kiện thật, yêu cầu quyết định GO/HOLD.</li>
 </ul>
@@ -517,7 +517,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L3</b></td>
 <td>
 <ul style="margin:0; padding-left:18px; line-height:1.75;">
-<li>Thiết lập blueprint hoàn chỉnh theo FRM-HR-TRN-008, có Fail-Cổng kiểm soát.</li>
+<li>Thiết lập blueprint hoàn chỉnh theo FRM-HR-TRN-008, có Fail-Control gate.</li>
 <li>Quản trị bank: ID, version, phân quyền, thu hồi/obsoleting.</li>
 <li>Tạo tối thiểu 2 version đề A/B từ bank; đảm bảo độ phủ blueprint.</li>
 <li>Phân tích kết quả sau thi và cập nhật bank theo lỗi thực tế.</li>
@@ -573,7 +573,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Quy tắc chấm</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Mỗi câu 1 điểm, tổng 20 điểm.</li>
-<li>Câu gắn nhãn <b>Fail-Cổng kiểm soát</b> sai 1 câu → <b>FAIL</b> dù tổng điểm đạt.</li>
+<li>Câu gắn nhãn <b>Fail-Control gate</b> sai 1 câu → <b>FAIL</b> dù tổng điểm đạt.</li>
 </ul>
 </div>
 <div class="table-card">
@@ -583,30 +583,30 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:55px;">#</th>
 <th>Câu hỏi</th>
 <th style="width:170px;">Đáp án</th>
-<th style="width:110px;">Fail-Cổng kiểm soát</th>
+<th style="width:110px;">Fail-Control gate</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” nghĩa là gì trong bối cảnh đánh giá năng lực?</td><td>A. Không có bằng chứng thì không được công nhận PASS</td><td>Fail-Cổng kiểm soát</td></tr>
-<tr><td>2</td><td>Tài liệu nào bắt buộc kiểm tra revision trước khi lập blueprint?</td><td>D. SOP/WI/FRM/Spec có hiệu lực</td><td>Fail-Cổng kiểm soát</td></tr>
+<tr><td>1</td><td>“không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” nghĩa là gì trong bối cảnh đánh giá năng lực?</td><td>A. Không có bằng chứng thì không được công nhận PASS</td><td>Fail-Control gate</td></tr>
+<tr><td>2</td><td>Tài liệu nào bắt buộc kiểm tra revision trước khi lập blueprint?</td><td>D. SOP/WI/FRM/Spec có hiệu lực</td><td>Fail-Control gate</td></tr>
 <tr><td>3</td><td>Thành phần nào PHẢI có trong mỗi câu hỏi thuộc ngân hàng?</td><td>C. Tag + đáp án + giải thích</td><td></td></tr>
 <tr><td>4</td><td>Mục tiêu chính của “test blueprint” là gì?</td><td>B. Liên kết mục tiêu học với tỷ trọng câu hỏi theo rủi ro</td><td></td></tr>
-<tr><td>5</td><td>Khi phát hành version đề mới, hành động bắt buộc với bản cũ là gì?</td><td>C. Thu hồi và đánh dấu OBSOLETE</td><td>Fail-Cổng kiểm soát</td></tr>
-<tr><td>6</td><td>Ai có quyền phát hành version đề (A/B) và tách quyền truy cập key chấm?</td><td>B. QA/QMS (theo phân quyền)</td><td>Fail-Cổng kiểm soát</td></tr>
-<tr><td>7</td><td>Điều gì làm bằng chứng thi bị vô hiệu trong đánh giá?</td><td>D. Thi không có proctor nhật ký/attendance/version</td><td>Fail-Cổng kiểm soát</td></tr>
-<tr><td>8</td><td>Tag “Fail-Cổng kiểm soát” áp dụng cho nhóm câu nào?</td><td>A. Câu liên quan cổng kiểm soát an toàn/chất lượng/chứng từ/revision</td><td></td></tr>
+<tr><td>5</td><td>Khi phát hành version đề mới, hành động bắt buộc với bản cũ là gì?</td><td>C. Thu hồi và đánh dấu OBSOLETE</td><td>Fail-Control gate</td></tr>
+<tr><td>6</td><td>Ai có quyền phát hành version đề (A/B) và tách quyền truy cập key chấm?</td><td>B. QA/QMS (theo phân quyền)</td><td>Fail-Control gate</td></tr>
+<tr><td>7</td><td>Điều gì làm bằng chứng thi bị vô hiệu trong đánh giá?</td><td>D. Thi không có proctor nhật ký/attendance/version</td><td>Fail-Control gate</td></tr>
+<tr><td>8</td><td>Tag “Fail-Control gate” áp dụng cho nhóm câu nào?</td><td>A. Câu liên quan control gate an toàn/chất lượng/chứng từ/revision</td><td></td></tr>
 <tr><td>9</td><td>Trong FRM-HR-TRN-009, phần nào chỉ cấp quyền cho người chấm?</td><td>B. Key chấm + giải thích</td><td></td></tr>
-<tr><td>10</td><td>Tình huống ngắn: Học viên làm bài xong nhưng không ghi version đề. Kết quả xử lý đúng là gì?</td><td>C. BLOCK kết quả, tổ chức thi lại có kiểm soát</td><td>Fail-Cổng kiểm soát</td></tr>
-<tr><td>11</td><td>Tình huống ngắn: Phát hiện đề dùng SOP/WI bản cũ. Hành động 60 giây là gì?</td><td>A. STOP, thu hồi, mở NCR nội bộ</td><td>Fail-Cổng kiểm soát</td></tr>
+<tr><td>10</td><td>Tình huống ngắn: Học viên làm bài xong nhưng không ghi version đề. Kết quả xử lý đúng là gì?</td><td>C. BLOCK kết quả, tổ chức thi lại có kiểm soát</td><td>Fail-Control gate</td></tr>
+<tr><td>11</td><td>Tình huống ngắn: Phát hiện đề dùng SOP/WI bản cũ. Hành động 60 giây là gì?</td><td>A. STOP, thu hồi, mở NCR nội bộ</td><td>Fail-Control gate</td></tr>
 <tr><td>12</td><td>Vai trò tối thiểu L3 trong mô-đun này là vai trò nào?</td><td>D. QA</td><td></td></tr>
 <tr><td>13</td><td>Anti-cheat bắt buộc phải kiểm soát tối thiểu điều gì?</td><td>A. Danh tính, tài liệu tham chiếu, thiết bị chụp ảnh</td><td></td></tr>
 <tr><td>14</td><td>Điểm khác nhau cốt lõi giữa “bài kiểm tra nhanh” và “performance test” là gì?</td><td>C. Performance test tạo ra sản phẩm/bằng chứng thực hành</td><td></td></tr>
-<tr><td>15</td><td>Khi có NCR do lỗi “thi đạt nhưng làm sai”, hành động bắt buộc với bank là gì?</td><td>B. Cập nhật câu hỏi/scenario và ghi DCR hồ sơ</td><td>Fail-Cổng kiểm soát</td></tr>
-<tr><td>16</td><td>Thông tin nào PHẢI có trong proctor nhật ký?</td><td>D. Thời gian, người coi thi, version, attempt #</td><td>Fail-Cổng kiểm soát</td></tr>
+<tr><td>15</td><td>Khi có NCR do lỗi “thi đạt nhưng làm sai”, hành động bắt buộc với bank là gì?</td><td>B. Cập nhật câu hỏi/scenario và ghi DCR hồ sơ</td><td>Fail-Control gate</td></tr>
+<tr><td>16</td><td>Thông tin nào PHẢI có trong proctor nhật ký?</td><td>D. Thời gian, người coi thi, version, attempt #</td><td>Fail-Control gate</td></tr>
 <tr><td>17</td><td>Đâu là mục tiêu của rà soát đồng cấp câu hỏi?</td><td>A. Chặn câu mơ hồ/sai kỹ thuật, bám rủi ro</td><td></td></tr>
-<tr><td>18</td><td>Tình huống ngắn: Nghi vấn rò rỉ đáp án. Cụm hành động đúng là gì?</td><td>B. HOLD, cô lập version, đổi version, lập biên bản</td><td>Fail-Cổng kiểm soát</td></tr>
+<tr><td>18</td><td>Tình huống ngắn: Nghi vấn rò rỉ đáp án. Cụm hành động đúng là gì?</td><td>B. HOLD, cô lập version, đổi version, lập biên bản</td><td>Fail-Control gate</td></tr>
 <tr><td>19</td><td>Thông tin nào bắt buộc phải lưu để truy xuất lịch sử thi?</td><td>C. Attempt # + ngày + version đề</td><td></td></tr>
-<tr><td>20</td><td>Điều kiện PASS L1 gồm những gì?</td><td>A. ≥ 85% &amp; 0 lỗi Fail-Cổng kiểm soát &amp; đủ bằng chứng coi thi</td><td>Fail-Cổng kiểm soát</td></tr>
+<tr><td>20</td><td>Điều kiện PASS L1 gồm những gì?</td><td>A. ≥ 85% &amp; 0 lỗi Fail-Control gate &amp; đủ bằng chứng coi thi</td><td>Fail-Control gate</td></tr>
 </tbody>
 </table>
 </div>
@@ -641,7 +641,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>2</td>
 <td>
-<b>Nghi vấn rò rỉ đáp án:</b> Trong nhóm chat ca đêm xuất hiện ảnh chụp 3 câu Fail-Cổng kiểm soát trùng với đề version A.
+<b>Nghi vấn rò rỉ đáp án:</b> Trong nhóm chat ca đêm xuất hiện ảnh chụp 3 câu Fail-Control gate trùng với đề version A.
  Ca ngày đang chuẩn bị thi.
  </td>
 <td><b>HOLD</b></td>
@@ -668,9 +668,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Bài test</strong>
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Chọn 01 SOP/WI/FRM đang có hiệu lực (theo chỉ định Supervisor) và khoá revision nguồn.</li>
-<li>Lập FRM-HR-TRN-008 hoàn chỉnh (mục tiêu, tỷ trọng, Fail-Cổng kiểm soát, dạng câu).</li>
+<li>Lập FRM-HR-TRN-008 hoàn chỉnh (mục tiêu, tỷ trọng, Fail-Control gate, dạng câu).</li>
 <li>Tạo tối thiểu 25 câu trong bank, đủ tag schema, có đáp án + giải thích.</li>
-<li>Tạo đề theo FRM-HR-TRN-009: version A và B (mỗi version ≥ 20 câu, có Fail-Cổng kiểm soát).</li>
+<li>Tạo đề theo FRM-HR-TRN-009: version A và B (mỗi version ≥ 20 câu, có Fail-Control gate).</li>
 <li>Thiết lập anti-cheat + proctor bảng kiểm; mô phỏng 01 buổi thi và tạo đủ hồ sơ.</li>
 <li>Phát hành version, đánh dấu thu hồi/obsoleting bản cũ; cập nhật DCR hồ sơ.</li>
 </ol>
@@ -686,7 +686,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>Revision nguồn</td><td>Truy ra được Rev + ngày hiệu lực; trích đúng điểm thay đổi ảnh hưởng nội dung thi.</td><td>ĐẠT/KHÔNG ĐẠT</td></tr>
-<tr><td>Blueprint</td><td>FRM-HR-TRN-008 đủ mục; tỷ trọng hợp lý theo rủi ro; có Fail-Cổng kiểm soát.</td><td>ĐẠT/KHÔNG ĐẠT</td></tr>
+<tr><td>Blueprint</td><td>FRM-HR-TRN-008 đủ mục; tỷ trọng hợp lý theo rủi ro; có Fail-Control gate.</td><td>ĐẠT/KHÔNG ĐẠT</td></tr>
 <tr><td>Question bank</td><td>Câu rõ, đo được; tag đầy đủ; key chấm nhất quán; có nhật ký review.</td><td>ĐẠT/KHÔNG ĐẠT</td></tr>
 <tr><td>Versioning</td><td>Có version A/B; có dấu phát hành; có nhật ký thu hồi/obsoleting.</td><td>ĐẠT/KHÔNG ĐẠT</td></tr>
 <tr><td>Anti-cheat</td><td>Có bảng kiểm coi thi; có quy tắc kiểm soát thiết bị/tài liệu; có proctor nhật ký.</td><td>ĐẠT/KHÔNG ĐẠT</td></tr>
@@ -695,11 +695,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <hr/>
-<h2>10) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”)</h2>
+<h2>10) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”)</h2>
 <div class="callout">
 <ul style="margin:0; padding-left:18px; line-height:1.9;">
-<li><b>PASS</b> khi: (1) đạt điểm theo ngưỡng; (2) 0 lỗi Fail-Cổng kiểm soát; (3) có đủ MRR; (4) hoàn tất OJT/performance theo yêu cầu vai trò.</li>
-<li><b>FAIL</b> khi: (1) sai 1 câu Fail-Cổng kiểm soát; hoặc (2) thiếu bằng chứng; hoặc (3) vi phạm anti-cheat; hoặc (4) không truy ra revision nguồn.</li>
+<li><b>PASS</b> khi: (1) đạt điểm theo ngưỡng; (2) 0 lỗi Fail-Control gate; (3) có đủ MRR; (4) hoàn tất OJT/performance theo yêu cầu vai trò.</li>
+<li><b>FAIL</b> khi: (1) sai 1 câu Fail-Control gate; hoặc (2) thiếu bằng chứng; hoặc (3) vi phạm anti-cheat; hoặc (4) không truy ra revision nguồn.</li>
 <li><b>Thiếu MRR</b> được xử lý như <b>FAIL</b> ngay lập tức. Không có ngoại lệ.</li>
 </ul>
 </div>
@@ -738,7 +738,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>11.3 Nơi lưu (SharePoint library/list/path)</h3>
 <div class="note">
 <ul style="margin:0; padding-left:18px; line-height:1.85;">
-<li>Kho tài liệu kiểm soát: <b>M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training</b> → academy → system-ops <b>RBAC: QA/QMS approve • OPS execute • IT admin • sửa hồ sơ cổng kiểm soát = QA/QMS.</b>.</li>
+<li>Kho tài liệu kiểm soát: <b>M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training</b> → academy → system-ops <b>RBAC: QA/QMS approve • OPS execute • IT admin • sửa hồ sơ control gate = QA/QMS.</b>.</li>
 <li>Kho bằng chứng thi/OJT: <b>M365/SharePoint → CNC-IMS-HUB → Training-Hồ sơ</b> <b>M365/SharePoint → HESEM-QMS-SSOT</b>.</li>
 <li>Question Bank &amp; Key chấm: lưu trong thư mục phân quyền; không lưu trên máy cá nhân/USB.</li>
 </ul>
@@ -750,7 +750,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Không có bằng chứng coi thi</b> (attendance/proctor nhật ký) → coi như không có đánh giá.</li>
 <li><b>Đề/đáp án không kiểm soát phiên bản</b> → áp dụng SOP-QMS-001, có thu hồi/obsoleting.</li>
 <li><b>Chấm lệch giữa người chấm</b> → bắt buộc key chấm + hiệu chuẩn định kỳ.</li>
-<li><b>Không có tiêu chí FAIL cho cổng kiểm soát</b> → bắt buộc tag Fail-Cổng kiểm soát và quy tắc “sai 1 câu = FAIL”.</li>
+<li><b>Không có tiêu chí FAIL cho control gate</b> → bắt buộc tag Fail-Control gate và quy tắc “sai 1 câu = FAIL”.</li>
 <li><b>Hồ sơ lưu rải rác, không truy xuất</b> → bắt buộc quy tắc đặt tên + nơi lưu + retention.</li>
 <li><b>Rò rỉ đề/đáp án</b> → bắt buộc phân quyền, tách key, xoay version, thu hồi bản in.</li>
 <li><b>Thi đạt nhưng không có OJT/performance</b> → bắt buộc gắn quyền hạn theo Level + bằng chứng đầu ra.</li>

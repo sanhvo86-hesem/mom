@@ -69,17 +69,17 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </div>
 <div class="doc-content" id="docContent"><div class="form-sheet">
 <div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Chỉ có <b>một lịch và một dispatch chính thức</b> được dùng để điều hành. Không được tạo hệ thống song song bằng file riêng, chat riêng hoặc bảng riêng không phản ánh về nguồn điều hành chính thức.</div></div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Job chỉ được Planning Release khi <b>mức sẵn sàng tối thiểu</b> đã đạt: baseline khóa, vật tư/processor ETA rõ, route đúng, cổng kiểm soát (gate) chất lượng nhìn thấy và rủi ro còn lại đã được chấp thuận.</div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Job chỉ được Planning Release khi <b>mức sẵn sàng tối thiểu</b> đã đạt: baseline khóa, vật tư/processor ETA rõ, route đúng, control gate (gate) chất lượng nhìn thấy và rủi ro còn lại đã được chấp thuận.</div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Điều độ phải dựa trên <b>năng lực hữu hạn</b> và WIP cap. Không được release quá tải rồi đẩy bài toán xuống xưởng tự xử.</div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi thay đổi ưu tiên phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), mọi hot-job override và mọi recovery plan ảnh hưởng ngày đến hạn phải có người phụ trách, bằng chứng quyết định và escalation đúng cấp.</div></div></div>
-<div class="preface-block"><div class="callout"><div class="card-title">Lệnh điều hành</div><p>SOP-501 là nhịp tim điều hành của nhà máy. Nếu release không sạch, dispatch không kỷ luật hoặc WIP không có giới hạn, xưởng sẽ chạy nhiều nhưng không giao đúng. Thực hiện 501-G1 → 501-G5 như chuỗi điều hành bắt buộc để bảo vệ ngày đến hạn, năng lực và chất lượng quyết định.</p><div class="legend-row"><span class="chip">Control cổng kiểm soát: 501-G1 → 501-G5</span><span class="chip">Biểu mẫu bắt buộc: <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-501_Planning_Release_Checklist.xlsx">FRM-501</a> / <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a> / <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a> / <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> / <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-512_Downtime_Log.xlsx">FRM-512</a></span><span class="chip">WI liên đới: <a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a> / <a href="../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a> / <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> / <a href="../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a></span><span class="chip">ANNEX liên đới: <a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a> / <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> / <a href="../../03-Reference/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a> / <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></span></div></div></div>
+<div class="preface-block"><div class="callout"><div class="card-title">Lệnh điều hành</div><p>SOP-501 là nhịp tim điều hành của nhà máy. Nếu release không sạch, dispatch không kỷ luật hoặc WIP không có giới hạn, xưởng sẽ chạy nhiều nhưng không giao đúng. Thực hiện 501-G1 → 501-G5 như chuỗi điều hành bắt buộc để bảo vệ ngày đến hạn, năng lực và chất lượng quyết định.</p><div class="legend-row"><span class="chip">Control control gate: 501-G1 → 501-G5</span><span class="chip">Biểu mẫu bắt buộc: <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-501_Planning_Release_Checklist.xlsx">FRM-501</a> / <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a> / <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a> / <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> / <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-512_Downtime_Log.xlsx">FRM-512</a></span><span class="chip">WI liên đới: <a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a> / <a href="../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a> / <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> / <a href="../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a></span><span class="chip">ANNEX liên đới: <a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a> / <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> / <a href="../../03-Reference/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a> / <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></span></div></div></div>
 <div class="toc"><div class="toc-title">Mục lục</div><div class="toc-grid">
 <a href="#p1">1. Mục đích</a>
 <a href="#p2">2. Phạm vi</a>
 <a href="#p3">3. Thuật ngữ &amp; nguyên tắc</a>
 <a href="#p4">4. Vai trò, quyền hạn &amp; RACI</a>
 <a href="#p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</a>
-<a href="#p6">6. cổng kiểm soát (control cổng kiểm soát), điểm dừng bắt buộc &amp; KPI</a>
+<a href="#p6">6. control gate (control control gate), mandatory hold point &amp; KPI</a>
 <a href="#p7">7. Quy trình chi tiết</a>
 <a href="#p8">8. Ngoại lệ, thay đổi &amp; làm lại</a>
 <a href="#p9">9. Hệ thống, hồ sơ &amp; dữ liệu</a>
@@ -88,7 +88,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <h2 class="h2" id="p1">1. Mục đích</h2>
 <p>Thiết lập cơ chế điều hành thống nhất cho <b>master planning → planning release → dispatch → WIP control → recovery → handover</b> để toàn nhà máy dùng <b>một lịch chính thức</b>, một bộ rule đổi ưu tiên và một hệ thống escalation khi tiến độ rời khỏi kế hoạch.</p>
 <ul class="tight">
-<li>Khóa đầu vào trước khi job vào lịch: baseline kỹ thuật, vật tư, outsource ETA, machine/tool mức sẵn sàng, competency và cổng kiểm soát chất lượng liên quan.</li>
+<li>Khóa đầu vào trước khi job vào lịch: baseline kỹ thuật, vật tư, outsource ETA, machine/tool mức sẵn sàng, competency và control gate chất lượng liên quan.</li>
 <li>Khóa cách phát hành lịch và dispatch để xưởng không bị đảo ưu tiên bằng miệng, chat riêng hoặc file rời.</li>
 <li>Khóa WIP limit, queue tuổi tồn (aging), bottleneck review và hot-job override để Planning giữ được nhịp điều hành ngay cả khi biến động cao.</li>
 <li>Khóa hồ sơ bằng chứng và KPI để mọi thay đổi lịch, delay, recovery plan, overtime, outsource hoặc split lot đều truy được ai quyết, vì sao quyết và hiệu quả sau quyết định.</li>
@@ -111,8 +111,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </tbody></table></div>
 <div class="callout-grid">
 <div class="callout-card"><h3>Nguyên tắc 1 — Một lịch chính thức</h3><ul class="tight"><li>Thứ tự ưu tiên, ngày chạy, trạng thái job/op chỉ có một nguồn điều hành chính thức. Không điều hành bằng nhiều file hoặc nhiều danh sách song song.</li><li>Mọi thay đổi ưu tiên phải phản ánh về dispatch chính thức và có bằng chứng thẩm quyền.</li></ul></div>
-<div class="callout-card"><h3>Nguyên tắc 2 — Chỉ release khi đủ mức sẵn sàng</h3><ul class="tight"><li>Job chưa đủ baseline, chưa đủ vật tư, chưa qua cổng kiểm soát cần thiết, chưa có processor ETA hoặc chưa có machine/operator mức sẵn sàng thì không được Planning Release.</li><li>Planning không dùng release để đẩy rủi ro từ phòng này sang xưởng.</li></ul></div>
-<div class="callout-card"><h3>Nguyên tắc 3 — Năng lực là hữu hạn</h3><ul class="tight"><li>Điều độ phải nhìn theo năng lực hữu hạn: machine hours, setup/changeover, labor, QA bottleneck, outsource cycle, cleanroom slots, shipping windows.</li><li>Không cam kết lại dựa trên “hy vọng chạy kịp”; phải có logic tải, cổng kiểm soát và recovery rõ.</li></ul></div>
+<div class="callout-card"><h3>Nguyên tắc 2 — Chỉ release khi đủ mức sẵn sàng</h3><ul class="tight"><li>Job chưa đủ baseline, chưa đủ vật tư, chưa qua control gate cần thiết, chưa có processor ETA hoặc chưa có machine/operator mức sẵn sàng thì không được Planning Release.</li><li>Planning không dùng release để đẩy rủi ro từ phòng này sang xưởng.</li></ul></div>
+<div class="callout-card"><h3>Nguyên tắc 3 — Năng lực là hữu hạn</h3><ul class="tight"><li>Điều độ phải nhìn theo năng lực hữu hạn: machine hours, setup/changeover, labor, QA bottleneck, outsource cycle, cleanroom slots, shipping windows.</li><li>Không cam kết lại dựa trên “hy vọng chạy kịp”; phải có logic tải, control gate và recovery rõ.</li></ul></div>
 <div class="callout-card"><h3>Nguyên tắc 4 — WIP phải có giới hạn và phản ứng nhanh</h3><ul class="tight"><li>WIP cap, queue tuổi tồn và hot-job ladder là Quy tắc bắt buộc. Khi vượt ngưỡng, Planning phải mở hành động thay vì chỉ “cập nhật chậm”.</li><li>Dispatch tốt không chỉ là ra danh sách, mà là ra danh sách có thể thực thi và có phản ứng nhanh khi thực tế lệch kế hoạch.</li></ul></div>
 </div>
 <h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2>
@@ -121,8 +121,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td>Production Director / CNC Workshop Manager</td><td>Xác nhận năng lực xưởng, nguồn lực ca, bottleneck, thực thi dispatch và phản hồi tình trạng cản trở thực tế.</td><td>Được dừng dispatch tại cell khi safety/quality/mức sẵn sàng không đạt; được yêu cầu reschedule/recovery khi overload hoặc breakdown.</td></tr>
 <tr><td>Trưởng ca</td><td>Thực thi điều độ đầu ca, xác nhận machine/operator mức sẵn sàng, phản hồi progress/downtime/end-of-shift handover.</td><td>Được trả job về HOLD nếu thực tế không đạt mức sẵn sàng hoặc thiếu chứng cứ release bắt buộc.</td></tr>
 <tr><td>Engineering Lead</td><td>Xác nhận baseline khóa, route đúng, NC/program/tooling mức sẵn sàng theo phạm vi liên quan.</td><td>Được chặn Planning Release khi dữ liệu kỹ thuật chưa sạch.</td></tr>
-<tr><td>Supply Chain / Buyer</td><td>Xác nhận vật tư, outsource ETA, receipt trạng thái, source vấn đề và tác động supplier lên lịch.</td><td>Được yêu cầu giữ/đổi lịch khi material / outsource cổng kiểm soát chưa đạt.</td></tr>
-<tr><td>QA Manager / Quality Engineer</td><td>Xác nhận cổng kiểm soát chất lượng ảnh hưởng release, hold/disposition, bottleneck metrology/final release, escalation khi risk to ship.</td><td>Được dừng hoặc không cho dispatch/continue khi cổng kiểm soát chất lượng (quality gate) hoặc containment chưa đóng.</td></tr>
+<tr><td>Supply Chain / Buyer</td><td>Xác nhận vật tư, outsource ETA, receipt trạng thái, source vấn đề và tác động supplier lên lịch.</td><td>Được yêu cầu giữ/đổi lịch khi material / outsource control gate chưa đạt.</td></tr>
+<tr><td>QA Manager / Quality Engineer</td><td>Xác nhận control gate chất lượng ảnh hưởng release, hold/disposition, bottleneck metrology/final release, escalation khi risk to ship.</td><td>Được dừng hoặc không cho dispatch/continue khi control gate chất lượng (quality gate) hoặc containment chưa đóng.</td></tr>
 </tbody></table></div>
 <div class="role-note"><b>Thẩm quyền ladder về đổi ưu tiên:</b> đổi thứ tự trong cùng bucket do Planner + Trưởng ca xử lý; phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) do Planner + Production Director; hot-job kéo liên department hoặc ảnh hưởng phê duyệt giao hàng phải qua Supply Chain/QA/Production thẩm quyền theo <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</div>
 <h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2>
@@ -132,8 +132,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="field"><b>Điều kiện tiên quyết</b><div class="blank">Không được phát hành nếu thiếu baseline, thiếu nguồn vật tư/processor ETA, thiếu mẫu đầu strategy, hoặc job đang ở hold state chưa được gỡ.</div></div>
 <div class="field"><b>Điểm dừng tự động</b><div class="blank">Engineering hold, material hold, supplier event, quality hold, machine breakdown vượt recovery threshold, no-operator / no-tool mức sẵn sàng, freeze-window override chưa được phê duyệt.</div></div>
 </div>
-<h2 class="h2" id="p6">6. cổng kiểm soát (control cổng kiểm soát), điểm dừng bắt buộc &amp; KPI</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:28%"/><col style="width:20%"/><col style="width:18%"/><col style="width:20%"/></colgroup><thead><tr><th>Cổng</th><th>Tiêu chí mở cổng</th><th>Điểm dừng bắt buộc</th><th>Responsible Person</th><th>KPI chính</th></tr></thead><tbody>
+<h2 class="h2" id="p6">6. control gate (control control gate), mandatory hold point &amp; KPI</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:28%"/><col style="width:20%"/><col style="width:18%"/><col style="width:20%"/></colgroup><thead><tr><th>Cổng</th><th>Tiêu chí mở cổng</th><th>Mandatory hold point</th><th>Responsible Person</th><th>KPI chính</th></tr></thead><tbody>
 <tr><td><b>501-G1</b><br/>Mức sẵn sàng to plan</td><td>Demand rõ; baseline đã khóa; vật tư / outsource ETA khả dụng; risk flags đã nhìn thấy.</td><td>Engineering hold; source hold; unresolved customer requirement; no realistic path to run.</td><td>Planner</td><td>% job đủ mức sẵn sàng ngay lần đầu; mức sẵn sàng pass rate.</td></tr>
 <tr><td><b>501-G2</b><br/>Planning Release</td><td>FRM-501 pass; ngày đến hạn logic khả thi; load model cập nhật; bottleneck slot đã xem xét.</td><td>FRM-501 fail; hidden constraint; missing critical operation / routing mismatch.</td><td>Planner + Production</td><td>Planning release cycle time; release rework rate.</td></tr>
 <tr><td><b>501-G3</b><br/>Dispatch &amp; freeze window</td><td>Dispatch list phát hành đúng giờ; hot jobs theo ladder; cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) respected.</td><td>Unapproved priority change; over-capacity dispatch; job chưa đủ run mức sẵn sàng.</td><td>Planner</td><td>Dispatch stability; on-time vấn đề of dispatch; hot-job override count.</td></tr>
@@ -155,13 +155,13 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ol>
 <h3 class="h3">7.2 Định nghĩa mức sẵn sàng trước Planning Release</h3>
 <ol class="tight">
-<li>Job chỉ được vào Planning Release khi bộ hồ sơ chuẩn, route, drawing/spec, material trạng thái, outsource path, measurement strategy và cổng kiểm soát đặc biệt đã rõ tới mức xưởng có thể chạy mà không phải hỏi lại điều kiện cơ bản.</li>
-<li>Mức sẵn sàng tối thiểu gồm: baseline đã khóa, vật tư/processor ETA đáng tin cậy, route và workcenter đúng, mẫu đầu strategy rõ, công đoạn đặc biệt / QA cổng kiểm soát nhìn thấy trong plan.</li>
+<li>Job chỉ được vào Planning Release khi bộ hồ sơ chuẩn, route, drawing/spec, material trạng thái, outsource path, measurement strategy và control gate đặc biệt đã rõ tới mức xưởng có thể chạy mà không phải hỏi lại điều kiện cơ bản.</li>
+<li>Mức sẵn sàng tối thiểu gồm: baseline đã khóa, vật tư/processor ETA đáng tin cậy, route và workcenter đúng, mẫu đầu strategy rõ, công đoạn đặc biệt / QA control gate nhìn thấy trong plan.</li>
 <li>Job high-risk phải đi qua <a href="../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a> trước khi release.</li>
 </ol>
 <h3 class="h3">7.3 Planning Release bằng FRM-501</h3>
 <div class="callout-grid">
-<div class="callout-card"><h3>FRM-501 phải khóa tối thiểu</h3><ul class="tight"><li>Part/rev/job/route/workcenter.</li><li>Material / outsource mức sẵn sàng.</li><li>Critical cổng kiểm soát: FAI, công đoạn đặc biệt, kiểm tra cuối, ship logic.</li><li>Target ngày đến hạn, lot strategy, split lot/partial ship nếu có.</li><li>Responsible Person và reaction plan nếu assumption fail.</li></ul></div>
+<div class="callout-card"><h3>FRM-501 phải khóa tối thiểu</h3><ul class="tight"><li>Part/rev/job/route/workcenter.</li><li>Material / outsource mức sẵn sàng.</li><li>Critical control gate: FAI, công đoạn đặc biệt, kiểm tra cuối, ship logic.</li><li>Target ngày đến hạn, lot strategy, split lot/partial ship nếu có.</li><li>Responsible Person và reaction plan nếu assumption fail.</li></ul></div>
 <div class="callout-card"><h3>Không được release khi</h3><ul class="tight"><li>Ngày đến hạn chỉ dựa trên kỳ vọng, chưa có chứng cứ vật tư hoặc processor.</li><li>Engineering còn vấn đề mở ảnh hưởng route / tolerance / quy trình note.</li><li>Có quality hold hoặc open NCR chưa xác định được đường đi tiếp.</li></ul></div>
 </div>
 <h3 class="h3">7.4 Phát hành dispatch, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và hot-job override</h3>
@@ -172,9 +172,9 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ol>
 <h3 class="h3">7.5 Daily kick-off, mức sẵn sàng tại cell và trung tâm điều hành (control tower)</h3>
 <ol class="tight">
-<li>Đầu ca, Trưởng ca xác nhận machine trạng thái, operator availability, tool/gage trạng thái, kit/bộ hồ sơ công việc (job packet), quality hold và bottleneck event. Job thiếu một thành phần bắt buộc phải trả về trạng thái hold/replan.</li>
+<li>Đầu ca, Trưởng ca xác nhận machine trạng thái, operator availability, tool/gage trạng thái, kit/bộ job dossier (job packet), quality hold và bottleneck event. Job thiếu một thành phần bắt buộc phải trả về trạng thái hold/replan.</li>
 <li>Daily management và tier meeting phải dùng cùng KPI, cùng escalation path theo <a href="../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>.</li>
-<li>Trung tâm điều hành áp dụng cho job high-risk, rủi ro giao hàng, clean/vacuum job, job có nhiều outsource hop hoặc job đang chạm nhiều cổng kiểm soát cùng lúc.</li>
+<li>Trung tâm điều hành áp dụng cho job high-risk, rủi ro giao hàng, clean/vacuum job, job có nhiều outsource hop hoặc job đang chạm nhiều control gate cùng lúc.</li>
 </ol>
 <h3 class="h3">7.6 Thực thi dispatch, WIP cap và queue tuổi tồn</h3>
 <ol class="tight">
@@ -203,13 +203,13 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ol>
 <h3 class="h3">7.10 Gemba phản hồi, học lại mức sẵn sàng và sửa lỗi điều hành lặp</h3>
 <ol class="tight">
-<li>Planner phải coi phản hồi từ cell là một nguồn dữ liệu điều hành chính thức. Các lý do fail-start, thiếu kit, setup delay, kiểm tra wait, material mismatch và paperwork gap phải được gom và xem như đầu vào cải tiến cho FRM-501, WI-519 và các cổng kiểm soát liên quan.</li>
+<li>Planner phải coi phản hồi từ cell là một nguồn dữ liệu điều hành chính thức. Các lý do fail-start, thiếu kit, setup delay, kiểm tra wait, material mismatch và paperwork gap phải được gom và xem như đầu vào cải tiến cho FRM-501, WI-519 và các control gate liên quan.</li>
 <li>Khi một lỗi mức sẵn sàng lặp từ 3 lần trở lên trong cửa sổ review, SOP này yêu cầu phải sửa rule hoặc bảng kiểm nguồn, không dừng ở mức chỉ nhắc người vận hành “chú ý hơn”; rule hoặc bảng kiểm nguồn phải được sửa.</li>
 <li>Những decision override tạo ra hệ quả lớn về schedule instability phải được xem lại sau sự kiện: override đó có thật sự đáng không, có job nào bị thiệt không, có cần đổi ladder hoặc freeze rule không.</li>
 </ol>
 <h3 class="h3">7.11 Quy tắc hứa lại ngày giao và thay đổi cam kết với khách hàng</h3>
 <ol class="tight">
-<li>Planning không được hứa lại do ngày giao trực tiếp ra ngoài nếu chưa khóa logic phục hồi với Supply Chain, Production, QA và các cổng kiểm soát còn lại. Mọi commit mới phải bám năng lực thật, không bám mong muốn.</li>
+<li>Planning không được hứa lại do ngày giao trực tiếp ra ngoài nếu chưa khóa logic phục hồi với Supply Chain, Production, QA và các control gate còn lại. Mọi commit mới phải bám năng lực thật, không bám mong muốn.</li>
 <li>Khi ngày đến hạn mới phụ thuộc vào supplier recovery, công đoạn đặc biệt recovery hoặc ship window đặc thù, decision commit lại phải chỉ rõ assumption nào còn đang mở và thời điểm assumption đó sẽ được xác nhận.</li>
 <li>Nếu assumption không được xác nhận đúng hạn, job phải tự động quay lại escalation chứ không để trạng thái “đang cố gắng” kéo dài qua nhiều ngày.</li>
 </ol>
@@ -217,19 +217,19 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:18%"/><col style="width:34%"/><col style="width:30%"/></colgroup><thead><tr><th>Đòn bẩy</th><th>Khi dùng</th><th>Lợi ích</th><th>Ràng buộc bắt buộc phải nhìn</th></tr></thead><tbody>
 <tr><td>Resequence nội bộ</td><td>Load lệch ngắn hạn, material/QA slot cho phép</td><td>Giảm trễ nhanh mà không mở thêm chi phí ngoài</td><td>Không được phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) hoặc đẩy rủi ro sang job ưu tiên cao hơn mà không có thẩm quyền.</td></tr>
 <tr><td>OT / tăng ca</td><td>Thiếu giờ công ngắn hạn, bottleneck chủ yếu do labor</td><td>Kéo lại tiến độ nhanh cho nhóm job hữu hạn</td><td>Phải nhìn safety, fatigue, QA support, material availability và hiệu quả thực tế; OT không chữa được dữ liệu sai hoặc setup fail.</td></tr>
-<tr><td>Outsource support</td><td>Bottleneck kéo dài, quy trình family có nguồn ngoài đủ điều kiện</td><td>Giảm tải cục bộ cho cell trọng điểm</td><td>Phải quay lại cổng kiểm soát của SOP-401; không dùng outsource như giải pháp ảo khi source chưa thật sự sẵn sàng.</td></tr>
+<tr><td>Outsource support</td><td>Bottleneck kéo dài, quy trình family có nguồn ngoài đủ điều kiện</td><td>Giảm tải cục bộ cho cell trọng điểm</td><td>Phải quay lại control gate của SOP-401; không dùng outsource như giải pháp ảo khi source chưa thật sự sẵn sàng.</td></tr>
 <tr><td>Split lot / partial release</td><td>Có lợi rõ về ship window hoặc giảm queue congestion</td><td>Cho phép cứu ngày đến hạn cho một phần lô</td><td>Phải kiểm soát traceability, setup cost, QA load và rule ship/pack tương ứng.</td></tr>
 <tr><td>Re-promise ngày đến hạn</td><td>Không còn đường phục hồi đáng tin</td><td>Giảm hứa sai và bảo vệ uy tín</td><td>Chỉ thực hiện khi assumption đã nhìn đủ và thẩm quyền đã chấp thuận; không đẩy promise mới ra ngoài chỉ vì mong sẽ kịp.</td></tr>
 </tbody></table></div>
 <h3 class="h3">7.13 Review chân trời 72 giờ và rule chốt cuối ngày</h3>
 <ol class="tight">
-<li>Cuối mỗi ngày, Planner phải nhìn tối thiểu chân trời <b>72 giờ</b> cho các job có rủi ro giao hàng, bottleneck risk, cleanroom slot risk, outsource-return risk và final-kiểm tra risk. Không đợi tới ngày giao mới xem các cổng kiểm soát này.</li>
+<li>Cuối mỗi ngày, Planner phải nhìn tối thiểu chân trời <b>72 giờ</b> cho các job có rủi ro giao hàng, bottleneck risk, cleanroom slot risk, outsource-return risk và final-kiểm tra risk. Không đợi tới ngày giao mới xem các control gate này.</li>
 <li>Review 72 giờ phải chốt rõ các câu hỏi: job nào tưởng đang an toàn nhưng thực ra đang thiếu một assumption; job nào cần recovery ngay sáng hôm sau; job nào cần customer communication; job nào nên chuyển priority trước khi vào cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) mới.</li>
 <li>Nếu ngày hôm sau dự báo nhiều hot-job cùng lúc, Planner phải chốt trước ladder ưu tiên và nguồn lực hỗ trợ để tránh mở đầu ngày bằng một cuộc thương lượng lại từ đầu.</li>
 </ol>
 <div class="note-blue"><b>Rule cuối ngày:</b> Không kết thúc ngày làm việc bằng một dispatch “đẹp trên giấy” nhưng chưa nhìn bottleneck của 72 giờ kế tiếp. Planning chỉ được xem là hoàn thành khi next-shift và next-horizon đã được nhìn, không chỉ khi file dispatch đã gửi.</div><h3 class="h3">7.14 Trường dữ liệu tối thiểu bắt buộc trên dispatch và handover</h3>
 <ol class="tight">
-<li>Dispatch chính thức phải đủ để người nhận lệnh không phải đoán: job/operation, workcenter/cell, priority bucket, due/need-by, mức sẵn sàng note, cổng kiểm soát note, quantity/lot strategy, và contact escalation khi có fail-start.</li>
+<li>Dispatch chính thức phải đủ để người nhận lệnh không phải đoán: job/operation, workcenter/cell, priority bucket, due/need-by, mức sẵn sàng note, control gate note, quantity/lot strategy, và contact escalation khi có fail-start.</li>
 <li>Handover cuối ca phải thể hiện rõ công việc nào đang chạy, công việc nào fail-start, bottleneck nào còn mở, assumption nào cần xác nhận sáng hôm sau và ai là người phụ trách của từng action. Handover không được chỉ ghi “đã bàn giao”.</li>
 <li>Nếu một quyết định trong ca đã làm thay đổi đáng kể schedule của ngày hôm sau, decision đó phải hiện trên handover và trên dispatch kế tiếp. Không để ca sau tự phát hiện bằng việc ra xưởng rồi mới thấy lịch đã bị đảo.</li>
 </ol>

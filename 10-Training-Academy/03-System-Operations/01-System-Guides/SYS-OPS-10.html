@@ -83,7 +83,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Thời lượng chuẩn:</strong> 90 phút lý thuyết (ca 1/ca 2) • 120 phút workshop theo tình huống xưởng • 120 phút OJT tại hiện trường + ký xác nhận</li>
 <li><strong>Nhịp triển khai:</strong> 2 ca/ngày, 6 ngày/tuần. Mỗi vai trò học tối đa 2 ngày/tuần. Ca nào nghỉ học thì ca đó vẫn vận hành theo bảng kiểm.</li>
 <li><strong>Tài liệu nội bộ bắt buộc đã đọc:</strong> ANNEX-QMS-012; SOP-QMS-012; SOP-QMS-012; SOP-QMS-011; SOP-QMS-011; WI-OPS-008; WI-OPS-001</li>
-<li><strong>Nguyên tắc cứng:</strong> không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate). Không có MRR thì không được đưa vào PROD và không được dùng để chạy xưởng.</li>
+<li><strong>Nguyên tắc cứng:</strong> không có bằng chứng thì không qua control gate (No bằng chứng = No gate). Không có MRR thì không được đưa vào PROD và không được dùng để chạy xưởng.</li>
 </ul>
 </div>
 </div>
@@ -91,7 +91,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Mục lục nhanh</strong>
 <ul>
 <li><a href="#sec2">2) Mục đích &amp; bối cảnh vận hành</a></li>
-<li><a href="#sec3">3) Vị trí E2E + bàn giao + điểm chặn</a></li>
+<li><a href="#sec3">3) Vị trí E2E + bàn giao + hold point</a></li>
 <li><a href="#sec4">4) Điểm đứt gãy</a></li>
 <li><a href="#sec5">5) Biện pháp kiểm soát rủi ro</a></li>
 <li><a href="#sec6">6) Fail-fast rules + STOP/HOLD/BLOCK</a></li>
@@ -109,13 +109,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 id="sec2">2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <p>
  Mô-đun này tồn tại để khóa các rủi ro “chết người” khi xưởng dùng Power Platform (app/luồng/report) làm hệ thống vận hành:
- sai phiên bản (Rev), sai môi trường (DEV/UAT/PROD), lẫn dữ liệu khách hàng, vượt qua cổng kiểm soát, và thiếu bằng chứng khi đánh giá.
+ sai phiên bản (Rev), sai môi trường (DEV/UAT/PROD), lẫn dữ liệu khách hàng, vượt qua control gate, và thiếu bằng chứng khi đánh giá.
  Khi hệ thống số sai, xưởng chạy sai: mua sai vật tư, gia công sai Rev, đo sai tiêu chí, ship sai, hoặc không kéo được hồ sơ đúng trong 3 phút.
  </p>
 <div class="note">
 <strong>Khi nào kích hoạt mô-đun</strong>
 <ul>
-<li>Khi tạo mới hoặc thay đổi solution/app/luồng/report liên quan vận hành xưởng (Hồ sơ công việc (job dossier), QC, phê duyệt giao hàng (ship release), Supplier control, NCR/MRB, EHS).</li>
+<li>Khi tạo mới hoặc thay đổi solution/app/luồng/report liên quan vận hành xưởng (Job dossier (job dossier), QC, phê duyệt giao hàng (ship release), Supplier control, NCR/MRB, EHS).</li>
 <li>Khi có nhu cầu đưa thay đổi vào UAT hoặc PROD.</li>
 <li>Khi thay đổi mô hình quyền, nhóm truy cập, DLP, nhãn phân loại dữ liệu, hoặc retention/hồ sơ.</li>
 <li>Khi bàn giao hệ thống (admin bàn giao) từ IT sang QA/QMS/IMS hoặc khi nhận yêu cầu đánh giá bộ bằng chứng từ khách hàng.</li>
@@ -137,7 +137,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Setup</b></td>
-<td>Kiểm tra phiên bản tài liệu/setup sheet liên quan app; đính kèm ảnh/setup bằng chứng vào Hồ sơ công việc đúng quy tắc đặt tên.</td>
+<td>Kiểm tra phiên bản tài liệu/setup sheet liên quan app; đính kèm ảnh/setup bằng chứng vào Job dossier đúng quy tắc đặt tên.</td>
 <td>01 bảng kiểm đính kèm bằng chứng đúng chuẩn + 01 phản ứng 60 giây khi phát hiện sai Rev.</td>
 <td>L2</td>
 </tr>
@@ -155,13 +155,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>QA</b></td>
-<td>Đặt cổng kiểm soát kiểm soát; review bằng chứng; chạy acceptance tests; phê duyệt go-live; sẵn sàng đánh giá trong 3 phút.</td>
+<td>Đặt control gate kiểm soát; review bằng chứng; chạy acceptance tests; phê duyệt go-live; sẵn sàng đánh giá trong 3 phút.</td>
 <td>01 sign-off UAT/PROD + 01 bộ bằng chứng hoàn chỉnh theo SOP-QMS-012.</td>
 <td>L4</td>
 </tr>
 <tr>
 <td><b>Warehouse</b></td>
-<td>Dùng app phê duyệt giao hàng theo cổng kiểm soát; chặn giao hàng khi thiếu MRR; không share external ngoài kênh đánh giá pack.</td>
+<td>Dùng app phê duyệt giao hàng theo control gate; chặn giao hàng khi thiếu MRR; không share external ngoài kênh đánh giá pack.</td>
 <td>01 tình huống phê duyệt giao hàng bị BLOCK do thiếu MRR + biên bản xử lý.</td>
 <td>L3</td>
 </tr>
@@ -173,8 +173,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Planner</b></td>
-<td>Tạo/đảm bảo Hồ sơ công việc tồn tại; kiểm tra Rev/routing; báo lỗi hệ thống làm lệch dữ liệu WO/Lot.</td>
-<td>01 biên bản tạo Hồ sơ công việc đúng template + 01 phản ứng 60 giây khi mismatch Rev.</td>
+<td>Tạo/đảm bảo Job dossier tồn tại; kiểm tra Rev/routing; báo lỗi hệ thống làm lệch dữ liệu WO/Lot.</td>
+<td>01 biên bản tạo Job dossier đúng template + 01 phản ứng 60 giây khi mismatch Rev.</td>
 <td>L3</td>
 </tr>
 <tr>
@@ -197,13 +197,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Supervisor</b></td>
-<td>Giữ kỷ luật cổng kiểm soát: chỉ cho GO khi đủ MRR; kiểm soát SoD; quyết định HOLD/BLOCK khi rủi ro tồn tại.</td>
+<td>Giữ kỷ luật control gate: chỉ cho GO khi đủ MRR; kiểm soát SoD; quyết định HOLD/BLOCK khi rủi ro tồn tại.</td>
 <td>01 quyết định GO/HOLD có căn cứ + bảng kiểm hoàn tất.</td>
 <td>L4</td>
 </tr>
 </table>
 <!-- 3) -->
-<h2 id="sec3">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
+<h2 id="sec3">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + hold point</h2>
 <p>
  SYS-OPS-10 không đứng riêng lẻ. Mô-đun này là “hệ thống chặn rủi ro” xuyên suốt chuỗi:
  <b>Báo giá/Hợp đồng → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Phản hồi/CI</b>.
@@ -215,7 +215,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:22%">Bước</th>
 <th style="width:22%">Đầu vào bắt buộc</th>
 <th>Đầu ra bắt buộc</th>
-<th style="width:18%">Điểm chặn</th>
+<th style="width:18%">Hold point</th>
 </tr>
 <tr>
 <td><b>H0 — Yêu cầu thay đổi</b><br/>Responsible Person: Supervisor/Process Owner</td>
@@ -251,7 +251,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>H5 — PROD deploy &amp; freeze</b><br/>Responsible Person: Supervisor + QA + IT</td>
 <td>UAT sign-off + backup/export + access snapshot</td>
 <td>Deploy vào PROD qua pipeline; bật guardrails; lưu bộ bằng chứng</td>
-<td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) → BLOCK</td>
+<td>không có bằng chứng thì không qua control gate (No bằng chứng = No gate) → BLOCK</td>
 </tr>
 </table>
 <!-- 4) -->
@@ -268,7 +268,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Không có snapshot quyền</b>: không chứng minh ai có quyền gì tại thời điểm ship/đánh giá.</li>
 <li><b>Không có backup/export trước deploy</b>: lỗi xảy ra không rollback được trong ca sản xuất.</li>
 <li><b>Không có acceptance test bằng user thật</b>: test bằng admin làm “ảo giác đạt”, user thật vào là fail.</li>
-<li><b>Không đóng Hồ sơ công việc</b>: sau closeout vẫn sửa được hồ sơ, phá tính bất biến của bằng chứng.</li>
+<li><b>Không đóng Job dossier</b>: sau closeout vẫn sửa được hồ sơ, phá tính bất biến của bằng chứng.</li>
 </ol>
 <!-- 5) -->
 <h2 id="sec5">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng)</h2>
@@ -342,7 +342,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <!-- 7) -->
-<h2 id="sec7">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn (mix-up)/thiếu chứng từ/vượt qua cổng kiểm soát/rủi ro giao hàng)</h2>
+<h2 id="sec7">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn (mix-up)/thiếu chứng từ/vượt qua control gate/rủi ro giao hàng)</h2>
 <table class="form-table">
 <tr>
 <th style="width:26%">Tình huống kích hoạt</th>
@@ -351,23 +351,23 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Sai Rev</b> giữa app và WO/Lot/drawing</td>
-<td>HOLD công việc tại điểm sử dụng • Báo Supervisor + QA • Chụp màn hình mismatch • Xác nhận Rev chuẩn theo nguồn Released</td>
+<td>HOLD công việc tại point-of-use • Báo Supervisor + QA • Chụp màn hình mismatch • Xác nhận Rev chuẩn theo nguồn Released</td>
 <td>01 nhật ký sự cố + 01 ảnh bằng chứng + link hồ sơ Released</td>
 </tr>
 <tr>
 <td><b>Lẫn lộn lẫn lô</b> do app hiển thị sai lot</td>
 <td>BLOCK tách vật lý container • Gắn nhãn HOLD • QC/QA kiểm tra truy vết • Không được ship</td>
-<td>01 biên bản HOLD + cập nhật Hồ sơ công việc</td>
+<td>01 biên bản HOLD + cập nhật Job dossier</td>
 </tr>
 <tr>
 <td><b>Thiếu chứng từ</b> khi cần đánh giá pack/phê duyệt giao hàng</td>
-<td>BLOCK ship • Warehouse báo QA • QA kiểm tra MRR theo cổng kiểm soát • Tạo danh sách thiếu và giao người phụ trách đóng</td>
+<td>BLOCK ship • Warehouse báo QA • QA kiểm tra MRR theo control gate • Tạo danh sách thiếu và giao người phụ trách đóng</td>
 <td>01 bảng kiểm MRR thiếu + 01 quyết định BLOCK có chữ ký</td>
 </tr>
 <tr>
-<td><b>Vượt qua cổng kiểm soát</b> (deploy bỏ UAT hoặc không sign-off)</td>
+<td><b>Vượt qua control gate</b> (deploy bỏ UAT hoặc không sign-off)</td>
 <td>STOP pipeline • Thu hồi quyền deploy tạm thời • Mở điều tra SoD • Khôi phục theo bản đã sign-off gần nhất</td>
-<td>01 biên bản vi phạm cổng kiểm soát + snapshot quyền</td>
+<td>01 biên bản vi phạm control gate + snapshot quyền</td>
 </tr>
 <tr>
 <td><b>Rủi ro ship sai</b> do hệ thống số lệch dữ liệu</td>
@@ -403,7 +403,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>3</td>
 <td>Chốt SoD: ai build, ai validate, ai phê duyệt</td>
 <td>Supervisor + QA</td>
-<td>RACI + danh sách người phê duyệt độc lập</td>
+<td>RACI + danh sách approver độc lập</td>
 <td>Một người làm cả 3 vai → đánh giá không đạt</td>
 </tr>
 <tr>
@@ -528,7 +528,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>6</td>
 <td>Deploy UAT theo pipeline stage</td>
 <td>Không deploy tay • Nhật ký pipeline phải lưu</td>
-<td>Khóa vượt qua cổng kiểm soát và chứng minh chuỗi deploy</td>
+<td>Khóa vượt qua control gate và chứng minh chuỗi deploy</td>
 </tr>
 <tr>
 <td>7</td>
@@ -540,7 +540,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>8</td>
 <td>QA sign-off và bàn giao bộ bằng chứng</td>
 <td>Sign-off theo mục • Bằng chứng theo naming chuẩn • Lưu đúng kho</td>
-<td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate); sẵn sàng đánh giá trong 3 phút</td>
+<td>không có bằng chứng thì không qua control gate (No bằng chứng = No gate); sẵn sàng đánh giá trong 3 phút</td>
 </tr>
 </table>
 <h3>OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
@@ -561,7 +561,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L1</b></td>
-<td>Nêu đúng khái niệm DEV/UAT/PROD, managed/unmanaged, DLP, zone dữ liệu; nhận biết “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”.</td>
+<td>Nêu đúng khái niệm DEV/UAT/PROD, managed/unmanaged, DLP, zone dữ liệu; nhận biết “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”.</td>
 <td>Bài kiểm tra nhanh ≥ 80% (phần kiến thức)</td>
 <td>Được phép dùng app theo quyền user</td>
 </tr>
@@ -573,7 +573,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L3</b></td>
-<td>Thực hành quản trị cổng kiểm soát: chặn giao hàng khi thiếu MRR; kiểm tra quyền theo group; xác nhận closeout freeze của Hồ sơ công việc.</td>
+<td>Thực hành quản trị control gate: chặn giao hàng khi thiếu MRR; kiểm tra quyền theo group; xác nhận closeout freeze của Job dossier.</td>
 <td>Performance test phần vai trò đạt PASS</td>
 <td>Được phép ra quyết định HOLD/BLOCK trong phạm vi bộ phận (QC/Warehouse/Planner/Estimator (SAL-03))</td>
 </tr>
@@ -596,12 +596,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>DLP policy chặn cái gì và chặn theo cơ chế nào?</li>
 <li>Quy tắc “không break permission theo từng file” chặn rủi ro gì?</li>
 <li>SoD là gì và vì sao đánh giá quan tâm?</li>
-<li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) nghĩa là gì trong go-live?</li>
+<li>không có bằng chứng thì không qua control gate (No bằng chứng = No gate) nghĩa là gì trong go-live?</li>
 <li>Khi phát hiện app hiển thị sai Rev, hành động đầu tiên là gì?</li>
 <li>Khi có yêu cầu share dữ liệu Customer-Confidential ra ngoài, kênh đúng là gì?</li>
 <li>Vì sao acceptance test phải chạy bằng user thật?</li>
 <li>Tình huống: luồng gửi email ra ngoài kèm file “Customer-Confidential”. Quyết định HOLD/GO? Ghi MRR nào?</li>
-<li>Tình huống: deploy UAT xong nhưng chưa có sign-off. Có được deploy PROD không? Trả lời theo cổng kiểm soát.</li>
+<li>Tình huống: deploy UAT xong nhưng chưa có sign-off. Có được deploy PROD không? Trả lời theo control gate.</li>
 <li>Tình huống: Warehouse chuẩn bị ship nhưng thiếu 01 IR. Quyết định? MRR phải tạo?</li>
 <li>Tình huống: phát hiện unmanaged edit trong PROD. STOP/HOLD/BLOCK? Vì sao?</li>
 <li>Tình huống: QC không kéo được CMM report trong 3 phút. Lỗi nằm ở đâu trong governance?</li>
@@ -611,7 +611,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 <h3>10.2 Scenario (≥ 3 tình huống thật; có dữ kiện; quyết định HOLD/GO và ghi MRR)</h3>
 <div class="note">
-<strong>Scenario 1 — Sai Rev tại điểm sử dụng</strong><br/>
+<strong>Scenario 1 — Sai Rev tại point-of-use</strong><br/>
  Dữ kiện: Operator mở app “Job Tracking Sheet” hiển thị PartNo PN-7750 Rev B, trong khi drawing Released tại QMS-Controlled-Documents là Rev C.
  Lot đang ở ca 2, máy đã set tool.<br/>
  Yêu cầu: ra quyết định HOLD/GO, mô tả phản ứng 60 giây, và liệt kê MRR phải tạo ngay.
@@ -629,7 +629,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Yêu cầu: ra quyết định STOP/HOLD/BLOCK, mô tả rollback, và liệt kê MRR + trách nhiệm từng vai trò.
  </div>
 <h3>10.3 Performance test (bắt buộc)</h3>
-<p><b>Mô tả bài test:</b> triển khai 01 thay đổi nhỏ (ví dụ: thêm 01 trường “Rev” bắt buộc trong app Hồ sơ công việc) theo đúng bảng kiểm 1→14, qua UAT, có sign-off, và tạo bộ bằng chứng hoàn chỉnh.</p>
+<p><b>Mô tả bài test:</b> triển khai 01 thay đổi nhỏ (ví dụ: thêm 01 trường “Rev” bắt buộc trong app Job dossier) theo đúng bảng kiểm 1→14, qua UAT, có sign-off, và tạo bộ bằng chứng hoàn chỉnh.</p>
 <table class="form-table">
 <tr>
 <th style="width:22%">Nhóm vai trò</th>
@@ -663,7 +663,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Điều kiện PASS</strong>
 <ul>
 <li>Hoàn tất OJT đầu ra theo vai trò và có chữ ký xác nhận.</li>
-<li>Bài kiểm tra nhanh đạt ≥ 80% và scenario quyết định HOLD/GO đúng theo cổng kiểm soát.</li>
+<li>Bài kiểm tra nhanh đạt ≥ 80% và scenario quyết định HOLD/GO đúng theo control gate.</li>
 <li>Performance test đạt PASS theo rubric nhóm vai trò.</li>
 <li>Bộ bằng chứng đủ: mapping theo Setting ID, đặt tên đúng, lưu đúng kho, truy xuất trong 3 phút.</li>
 </ul>
@@ -716,7 +716,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 13) -->
 <h2 id="sec13">13) Common đánh giá phát hiện &amp; phòng ngừa (≥ 8 lỗi)</h2>
 <ol>
-<li><b>Không chứng minh được chuỗi deploy</b> → lưu nhật ký pipeline + sign-off theo cổng kiểm soát.</li>
+<li><b>Không chứng minh được chuỗi deploy</b> → lưu nhật ký pipeline + sign-off theo control gate.</li>
 <li><b>Unmanaged trong PROD</b> → bắt buộc managed + khóa quyền maker trong PROD.</li>
 <li><b>Bằng chứng không có ngữ cảnh</b> → screenshot phải thấy tên site/library + setting value.</li>
 <li><b>Quyền truy cập không kiểm soát</b> → dùng group baseline; không tách quyền per-file; có snapshot quyền.</li>
@@ -724,7 +724,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>DLP không phù hợp mức dữ liệu</b> → map zone + classification với DLP connectors; có test tình huống chặn share.</li>
 <li><b>Hard-code env values</b> → dùng env vars; có bảng kiểm pre-import; có mapping theo environment.</li>
 <li><b>Không có backup/rollback</b> → export trước release và lưu đúng kho bằng chứng.</li>
-<li><b>Không đóng Hồ sơ công việc</b> → freeze khi closeout; hồ sơ hạn chế sửa/xóa; truy xuất trong 3 phút.</li>
+<li><b>Không đóng Job dossier</b> → freeze khi closeout; hồ sơ hạn chế sửa/xóa; truy xuất trong 3 phút.</li>
 </ol>
 <!-- 14) -->
 </div>

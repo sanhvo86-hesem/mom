@@ -89,7 +89,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li>Mọi vấn đề đi qua Tier meeting PHẢI có <b>Chủ trách nhiệm + Deadline (giờ/phút) + Kết quả + Minh chứng</b>.</li>
 <li>Không ghi “đang xử lý” chung chung. Không chuyển ca mà không có người phụ trách rõ.</li>
-<li><b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</b>: không có MRR thì coi như chưa làm.</li>
+<li><b>không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</b>: không có MRR thì coi như chưa làm.</li>
 </ul>
 </div>
 <p class="mini muted">
@@ -137,7 +137,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Programmer</b></td>
 <td>Tier 1 (khi có blocker kỹ thuật) + Tier 2</td>
 <td>Chốt revision, CTQ, strategy kiểm soát chương trình; phát hành bản sửa với dấu vết; không cho chạy khi chưa rõ rev/CTQ.</td>
-<td>Đạt khi: mọi thay đổi chương trình có dấu vết + link file đúng rev + xác nhận mẫu đầu (first piece) cổng kiểm soát M365/SharePoint → HESEM-QMS-SSOT theo WI liên quan.</td>
+<td>Đạt khi: mọi thay đổi chương trình có dấu vết + link file đúng rev + xác nhận mẫu đầu (first piece) control gate M365/SharePoint → HESEM-QMS-SSOT theo WI liên quan.</td>
 </tr>
 <tr>
 <td><b>QC / QA</b></td>
@@ -192,7 +192,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Mục đích (bắt buộc)</h3>
 <ul class="tight">
 <li>Khóa “điểm mù” giữa các bộ phận: mọi blocker phải được thấy trong <b>Tier 1</b>, quyết trong <b>Tier 2</b>, và chốt nguồn lực trong <b>Tier 3</b>.</li>
-<li>Chặn rủi ro “vượt qua cổng kiểm soát”: không chuyển trạng thái job/WO khi thiếu minh chứng.</li>
+<li>Chặn rủi ro “vượt qua control gate”: không chuyển trạng thái job/WO khi thiếu minh chứng.</li>
 <li>Chuẩn hóa leo thang theo SLA: vấn đề không được tự “chết dần” trong im lặng.</li>
 <li>Tạo bằng chứng vận hành (MRR) đủ để đánh giá: truy xuất được “ai quyết – khi nào – dựa trên gì – kết quả gì”.</li>
 </ul>
@@ -252,7 +252,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 3) Vị trí trong chuỗi E2E + luồng handoff -->
 <div class="card">
-<label class="blabel"><h1 class="h1" style="margin-top:0;">3) Vị trí trong chuỗi E2E + luồng bàn giao + điểm chặn</h1></label>
+<label class="blabel"><h1 class="h1" style="margin-top:0;">3) Vị trí trong chuỗi E2E + luồng bàn giao + hold point</h1></label>
 <p><b>Chuỗi E2E:</b> Báo giá/Hợp đồng → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Phản hồi/CI.</p>
 <div class="table-card">
 <table class="table">
@@ -261,7 +261,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Bước E2E</th>
 <th>Đầu vào vào Tier meeting</th>
 <th>Đầu ra/Bàn giao</th>
-<th>Điểm chặn (Cổng kiểm soát) trong mô-đun này</th>
+<th>Hold point (Control gate) trong mô-đun này</th>
 </tr>
 </thead>
 <tbody>
@@ -269,37 +269,37 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Planning → Production</td>
 <td>Dispatch/WIP + job Due ≤ 48h + blocker</td>
 <td>Action để giải blocker / đổi ưu tiên / đổi route</td>
-<td><b>Cổng kiểm soát-OPS-01:</b> Job Due ≤ 48h bắt buộc có người phụ trách và kế hoạch giờ/phút trong FRM-OPS-005.</td>
+<td><b>Control gate-OPS-01:</b> Job Due ≤ 48h bắt buộc có người phụ trách và kế hoạch giờ/phút trong FRM-OPS-005.</td>
 </tr>
 <tr>
 <td>Engineering → Production/QC</td>
 <td>Rev/CTQ/Program trạng thái</td>
-<td>Release program + mẫu đầu cổng kiểm soát</td>
-<td><b>Cổng kiểm soát-ENG-01:</b> Khi chưa xác nhận rev/CTQ → HOLD, không chạy.</td>
+<td>Release program + mẫu đầu control gate</td>
+<td><b>Control gate-ENG-01:</b> Khi chưa xác nhận rev/CTQ → HOLD, không chạy.</td>
 </tr>
 <tr>
 <td>Purchasing/Outsource → Receiving</td>
 <td>ETA NCC + tình trạng chứng từ công đoạn đặc biệt</td>
 <td>Escal NCC / backup route</td>
-<td><b>Cổng kiểm soát-SUP-01:</b> Khi outsource/công đoạn đặc biệt thiếu chứng từ → HOLD lô, không nhập “OK”.</td>
+<td><b>Control gate-SUP-01:</b> Khi outsource/công đoạn đặc biệt thiếu chứng từ → HOLD lô, không nhập “OK”.</td>
 </tr>
 <tr>
 <td>Production → QC/QA</td>
 <td>Holds, NCR, MRB queue</td>
 <td>Containment + disposition + rework plan</td>
-<td><b>Cổng kiểm soát-Q-01:</b> Hold CTQ chưa có containment + tiêu chí giải hold → BLOCK.</td>
+<td><b>Control gate-Q-01:</b> Hold CTQ chưa có containment + tiêu chí giải hold → BLOCK.</td>
 </tr>
 <tr>
 <td>Final → Packing → Ship</td>
 <td>Shipping mức sẵn sàng + packet completeness</td>
 <td>Phê duyệt giao hàng / shipment block</td>
-<td><b>Cổng kiểm soát-SHIP-01:</b> Khi thiếu packet/chứng từ/nhãn/traceability → STOP SHIP ngay.</td>
+<td><b>Control gate-SHIP-01:</b> Khi thiếu packet/chứng từ/nhãn/traceability → STOP SHIP ngay.</td>
 </tr>
 <tr>
 <td>Ship → Phản hồi/CI</td>
 <td>Late/khiếu nại/returns</td>
 <td>CAPA + management decision</td>
-<td><b>Cổng kiểm soát-CAPA-01:</b> Khi CAPA quá hạn → escal Tier 3; không đóng khi thiếu bằng chứng hiệu lực.</td>
+<td><b>Control gate-CAPA-01:</b> Khi CAPA quá hạn → escal Tier 3; không đóng khi thiếu bằng chứng hiệu lực.</td>
 </tr>
 </tbody>
 </table>
@@ -317,7 +317,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Missing / falsified outsource documents/công đoạn đặc biệt</b> vì Tier 2 không rà packet → mất bằng chứng đánh giá.</li>
 <li><b>Job “đứng im” qua đêm</b> vì không gán người phụ trách + deadline giờ/phút → trễ giao hàng.</li>
 <li><b>Quality hold bị bỏ quên</b> vì không có rule escal khi hold vượt SLA → rủi ro giao hàng.</li>
-<li><b>Vượt qua cổng kiểm soát QC</b> vì áp lực tiến độ + không có STOP/HOLD rõ → nonconforming product.</li>
+<li><b>Vượt qua control gate QC</b> vì áp lực tiến độ + không có STOP/HOLD rõ → nonconforming product.</li>
 <li><b>Gage OOT/Overdue hiệu chuẩn</b> nhưng vẫn đo vì Tier 1 không xem trạng thái gage → dữ liệu đo không hợp lệ.</li>
 <li><b>Downtime lặp lại</b> vì Maintenance xử lý “chữa cháy” không có action chống lặp + không ghi bằng chứng.</li>
 <li><b>Backlog QC</b> vì không ưu tiên theo ship cutoff → miss giao hàng khi chờ FQC.</li>
@@ -326,7 +326,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Escalation sai ngưỡng</b> (đợi đến họp tuần) khi vấn đề thuộc S1/S2 → thiệt hại lan rộng trong cùng ngày.</li>
 </ol>
 <div class="callout-strong">
-<b>Điểm chặn bắt buộc:</b> Khi phát sinh 1 điểm gãy thuộc nhóm <span class="danger">Rev/Lẫn lộn/Rủi ro giao hàng/CTQ hold/OOT gage</span> → kích hoạt mục “Phản ứng 60 giây” và ghi nhật ký ngay trong FRM-OPS-005.
+<b>Hold point bắt buộc:</b> Khi phát sinh 1 điểm gãy thuộc nhóm <span class="danger">Rev/Lẫn lộn/Rủi ro giao hàng/CTQ hold/OOT gage</span> → kích hoạt mục “Phản ứng 60 giây” và ghi nhật ký ngay trong FRM-OPS-005.
  </div>
 </div>
 <!-- 5) Risk Controls -->
@@ -402,9 +402,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <label class="blabel"><h1 class="h1" style="margin-top:0;">6) Fail-fast rules + tiêu chí STOP/HOLD/BLOCK</h1></label>
 <ul class="tight">
 <li><b>STOP SHIP:</b> Khi thiếu packet/chứng từ/traceability/COC/nhãn; khi có hold CTQ; khi chưa có ship-release hồ sơ. Không được “ship trước bổ sung sau”.</li>
-<li><b>HOLD JOB:</b> Khi chưa xác nhận revision/CTQ; khi program/setup chưa qua mẫu đầu cổng kiểm soát M365/SharePoint → HESEM-QMS-SSOT; khi gage dùng đo CTQ overdue/OOT.</li>
+<li><b>HOLD JOB:</b> Khi chưa xác nhận revision/CTQ; khi program/setup chưa qua mẫu đầu control gate M365/SharePoint → HESEM-QMS-SSOT; khi gage dùng đo CTQ overdue/OOT.</li>
 <li><b>BLOCK MOVE:</b> Khi action trong FRM-OPS-005 quá hạn mà chưa có minh chứng; job Due ≤ 48h không có kế hoạch giờ/phút.</li>
-<li><b>ESCALATE NOW:</b> Khi S1/S2 xảy ra: dừng ship/CTQ/thiếu bằng chứng Tier 1; line stop/machine down; vượt qua cổng kiểm soát; lẫn lộn.</li>
+<li><b>ESCALATE NOW:</b> Khi S1/S2 xảy ra: dừng ship/CTQ/thiếu bằng chứng Tier 1; line stop/machine down; vượt qua control gate; lẫn lộn.</li>
 </ul>
 <div class="note">
 <b>Luật sống còn:</b> Khi không có minh chứng, coi như chưa kiểm soát. Khi chưa kiểm soát, không được chuyển bước.
@@ -457,7 +457,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Ảnh tag gage + danh sách gage thay + đánh giá ảnh hưởng</td>
 </tr>
 <tr>
-<td><b>Vượt qua cổng kiểm soát / rủi ro giao hàng</b></td>
+<td><b>Vượt qua control gate / rủi ro giao hàng</b></td>
 <td>
  1) BLOCK MOVE/SHIP ngay. 2) Supervisor thông báo Tier 2/Level 2 trong 15 phút. 3) QA xác nhận tình trạng phù hợp. 4) Ghi rõ quyết định GO/HOLD.
  </td>
@@ -484,7 +484,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>1</td><td>Chuẩn bị bảng Tier 1: WIP/Dispatch, Due ≤ 48h, Blocked, Holds, Ship cutoff, Downtime</td><td>Supervisor + Planner + QC</td><td>Ảnh Tier board + dữ liệu WIP Nguồn: SSOT + Epicor + IntegrationLogs.</td><td>Thiếu danh sách Due ≤ 48h; thiếu blocker</td></tr>
-<tr><td>2</td><td>Mở họp đúng giờ, nhắc “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”, chốt timebox 15 phút</td><td>Supervisor</td><td>FRM-OPS-005 có giờ họp + điều phối</td><td>Họp kéo dài, lan man, không chốt đầu ra</td></tr>
+<tr><td>2</td><td>Mở họp đúng giờ, nhắc “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”, chốt timebox 15 phút</td><td>Supervisor</td><td>FRM-OPS-005 có giờ họp + điều phối</td><td>Họp kéo dài, lan man, không chốt đầu ra</td></tr>
 <tr><td>3</td><td>Rà Dispatch/WIP: job Due ≤ 48h và job Blocked</td><td>Planner + Supervisor</td><td>FRM-OPS-005 (Trigger/Tuổi tồn/Ảnh hưởng)</td><td>Không ghi tuổi tồn; không gán người phụ trách</td></tr>
 <tr><td>4</td><td>Rà Quality holds/NCR/MRB: quyết định GO/HOLD/BLOCK</td><td>QC/QA</td><td>Hold/NCR hồ sơ + quyết định + containment</td><td>Ghi “đang chờ” không tiêu chí giải hold</td></tr>
 <tr><td>5</td><td>Rà Shipping mức sẵn sàng: packet, nhãn, traceability, cutoff</td><td>Warehouse + QA</td><td>Bảng kiểm packet + ảnh nhãn + COC</td><td>Cho đóng gói khi thiếu COC/nhãn</td></tr>
@@ -587,7 +587,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Điều phối họp theo timebox; ép đóng action; chốt GO/HOLD/BLOCK dựa trên bằng chứng.</td>
 <td>
  Supervisor: bắt buộc đạt L3.<br/>
- QC/QA lead: chốt hold/phê duyệt giao hàng theo cổng kiểm soát.
+ QC/QA lead: chốt hold/phê duyệt giao hàng theo control gate.
  </td>
 <td>Được làm điều phối Tier 1 và kích hoạt escal Level 2.</td>
 </tr>
@@ -612,15 +612,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <label class="blabel"><h1 class="h1" style="margin-top:0;">10) Đánh giá (ĐẠT/KHÔNG ĐẠT) — Bài trắc nghiệm + Tình huống + Bài kiểm tra thực hành</h1></label>
 <h3>10.1 Bài trắc nghiệm (≥ 20 câu) — trắc nghiệm + tình huống ngắn</h3>
 <ol class="tight">
-<li>“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” nghĩa là gì trong Tier meeting?</li>
+<li>“không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” nghĩa là gì trong Tier meeting?</li>
 <li>Ngưỡng escal Level 2 theo PROC-OPS-003 là gì?</li>
 <li>Trong FRM-OPS-005, tối thiểu phải có những cột nào để một action hợp lệ?</li>
 <li>Khi phát hiện sai phiên bản (wrong revision) đang chạy máy, bước đầu tiên phải làm là gì?</li>
 <li>Phân biệt STOP SHIP và HOLD JOB trong mô-đun này.</li>
 <li>Chọn đáp án đúng: Tier 1 tập trung vào (A) chiến lược năm (B) vấn đề trong ca và hành động giờ/phút (C) họp dài 2 giờ (D) trình bày slide.</li>
 <li>Khi hold CTQ xuất hiện, ai chịu trách nhiệm containment?</li>
-<li>Chọn đáp án đúng: job Due ≤ 48h không có người phụ trách action trong FRM-OPS-005 được coi là (A) OK (B) Blocked (C) Cổng kiểm soát-OPS-01 FAIL (D) đóng.</li>
-<li>Thế nào là “vượt qua cổng kiểm soát” trong bối cảnh phê duyệt giao hàng?</li>
+<li>Chọn đáp án đúng: job Due ≤ 48h không có người phụ trách action trong FRM-OPS-005 được coi là (A) OK (B) Blocked (C) Control gate-OPS-01 FAIL (D) đóng.</li>
+<li>Thế nào là “vượt qua control gate” trong bối cảnh phê duyệt giao hàng?</li>
 <li>Kho phải kiểm gì để chặn lẫn lộn trước khi ship?</li>
 <li>Khi gage overdue hiệu chuẩn, hành động trong 60 giây là gì?</li>
 <li>Chọn đáp án đúng: Tier 2 tập trung vào (A) backlog/capacity/outsource (B) trang trí bảng (C) kể chuyện (D) bỏ action.</li>
@@ -630,7 +630,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Tình huống ngắn: Job A Due trong 36h, thiếu tool. Nêu trigger, ảnh hưởng, và escal ngưỡng.</li>
 <li>Tình huống ngắn: Packet thiếu COC trước giờ cutoff. Quyết định gì và hồ sơ ở đâu?</li>
 <li>Tình huống ngắn: Outsource trễ ETA 24h, ảnh hưởng ship date. Escal theo tầng nào?</li>
-<li>Điểm khác nhau giữa Tier 3 và xem xét của lãnh đạo là gì trong thực hành hồ sơ?</li>
+<li>Điểm khác nhau giữa Tier 3 và management review là gì trong thực hành hồ sơ?</li>
 <li>Tiêu chí PASS của Supervisor khác Operator ở điểm nào?</li>
 </ol>
 <h3>10.2 Tình huống (≥ 3 tình huống thật) — có dữ kiện, yêu cầu HOLD/GO và ghi MRR</h3>
@@ -681,7 +681,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 11) ĐẠT/KHÔNG ĐẠT -->
 <div class="card">
-<label class="blabel"><h1 class="h1" style="margin-top:0;">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”)</h1></label>
+<label class="blabel"><h1 class="h1" style="margin-top:0;">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”)</h1></label>
 <div class="table-card">
 <table class="table">
 <thead>
@@ -780,7 +780,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Draft</b></td>
 <td>2026-02-09</td>
-<td>Chuẩn hoá format &amp; navigation; loại bỏ placeholder; cập nhật Doc-Control ISO 9001:2015 (tài liệu có kiểm soát); chuẩn hoá câu lệnh cổng kiểm soát (KHI/PHẢI/STOP/HOLD/BLOCK).</td>
+<td>Chuẩn hoá format &amp; navigation; loại bỏ placeholder; cập nhật Doc-Control ISO 9001:2015 (tài liệu có kiểm soát); chuẩn hoá câu lệnh control gate (KHI/PHẢI/STOP/HOLD/BLOCK).</td>
 <td>Operations + QA/QMS</td>
 </tr>
 <tr>

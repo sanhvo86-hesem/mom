@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>TRN-ACA-MRR-G0 — Cổng kiểm soát (gate) G0 Pack (RFQ &amp; Báo giá) | HESEM Academy</title>
+<title>TRN-ACA-MRR-G0 — Control gate (gate) G0 Pack (RFQ &amp; Báo giá) | HESEM Academy</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -64,7 +64,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>MRR-G0-RFQ-BÁO GIÁ — Cổng kiểm soát G0 Pack (RFQ &amp; Báo giá) | HESEM Academy</strong>
+  <strong>MRR-G0-RFQ-BÁO GIÁ — Control gate G0 Pack (RFQ &amp; Báo giá) | HESEM Academy</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -77,16 +77,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="doc-content" id="docContent">
 <div class="cover">
-<div class="kicker">MRR Cổng kiểm soát Pack</div>
-<h1 class="h1">Cổng kiểm soát G0 Pack — RFQ &amp; Báo giá</h1>
-<p class="lead">Bảng kiểm MRR cho cổng kiểm soát G0 để chốt yêu cầu khách hàng, CTQ và hồ sơ báo giá trước khi chuyển rà soát hợp đồng.</p>
+<div class="kicker">MRR Control gate Pack</div>
+<h1 class="h1">Control gate G0 Pack — RFQ &amp; Báo giá</h1>
+<p class="lead">Bảng kiểm MRR cho control gate G0 để chốt yêu cầu khách hàng, CTQ và hồ sơ báo giá trước khi chuyển rà soát hợp đồng.</p>
 <div class="grid-2">
 <div class="note">
 <strong>Áp dụng</strong>
 <ul class="tight">
 <li><b>Vai trò:</b> Sales • ENG • QA/QMS</li>
 <li><b>Chuẩn lưu:</b> SSOT theo <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a></li>
-<li><b>Cổng kiểm soát:</b> G0. Thiếu MRR → STOP/HOLD/BLOCK.</li>
+<li><b>Control gate:</b> G0. Thiếu MRR → STOP/HOLD/BLOCK.</li>
 </ul>
 </div>
 <div class="note">
@@ -112,7 +112,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="min-width:220px;">SSOT path</th>
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
-<tr><td><span class="chk">☐</span> RFQ + email/portal yêu cầu khách hàng (bản gốc)</td><td>RFQ</td><td>Sales</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RFQ_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> RFQ + email/portal yêu cầu khách hàng (master copy)</td><td>RFQ</td><td>Sales</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RFQ_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Bản vẽ / spec / note (bundle) đúng REV</td><td>SPEC</td><td>Sales</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SPEC_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> CTQ list (trích yêu cầu quan trọng + tiêu chí chấp nhận)</td><td>CTQ</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CTQ_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Bảng báo giá (cost model + thời gian dẫn (lead time) + assumptions)</td><td>QTE</td><td>Sales</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_QTE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
@@ -129,14 +129,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Rủi ro “không làm được” không được ghi nhận → <b>BLOCK</b> (không nhận job).</li>
 </ul>
 <div class="note mini">
-<b>Nguyên tắc:</b> Thiếu MRR ở cổng kiểm soát hiện tại → <b>không</b> được chuyển sang cổng kiểm soát tiếp theo. Cập nhật nhật ký và gửi escal theo SYS-OPS.
+<b>Nguyên tắc:</b> Thiếu MRR ở control gate hiện tại → <b>không</b> được chuyển sang control gate tiếp theo. Cập nhật nhật ký và gửi escal theo SYS-OPS.
  </div>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Đánh giá 60 giây</h2>
 <ol class="tight">
-<li>Mở SSOT Hồ sơ công việc (job dossier) theo JobCode.</li>
-<li>Mở đúng thư mục cổng kiểm soát G0 theo “Folder Map” (MRR-01).</li>
+<li>Mở SSOT Job dossier (job dossier) theo JobCode.</li>
+<li>Mở đúng thư mục control gate G0 theo “Folder Map” (MRR-01).</li>
 <li>Đối chiếu bảng bảng kiểm: mỗi dòng phải có file đúng tên, đúng REV, đúng chữ ký số/scan.</li>
 <li>Chỉ ra 03 file ngẫu nhiên trong 20 giây và đọc được <b>REV + ngày + người ký</b>.</li>
 </ol>

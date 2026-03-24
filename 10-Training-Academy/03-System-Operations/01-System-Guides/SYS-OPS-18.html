@@ -89,12 +89,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div class="section">
-<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành (cổng kiểm soát/bàn giao; ai chịu trách nhiệm; khi nào kích hoạt)</h2>
+<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành (control gate/bàn giao; ai chịu trách nhiệm; khi nào kích hoạt)</h2>
 <ul>
-<li><b>Lý do tồn tại (Cổng kiểm soát Logic):</b> Kết quả đo là điều kiện mở cổng kiểm soát cho nhận hàng, chấp nhận công đoạn, FAI, Final, Ship. Thiết bị đo sai trạng thái tạo false-accept/false-reject, kéo theo ship sai, NCR/MRB, claim, đánh giá finding.</li>
+<li><b>Lý do tồn tại (Control gate Logic):</b> Kết quả đo là điều kiện mở control gate cho nhận hàng, chấp nhận công đoạn, FAI, Final, Ship. Thiết bị đo sai trạng thái tạo false-accept/false-reject, kéo theo ship sai, NCR/MRB, claim, đánh giá finding.</li>
 <li><b>Khi kích hoạt:</b> Khi đưa thiết bị đo mới vào xưởng; khi đến hạn hiệu chuẩn; khi thiết bị bị rơi/va đập/tiếp xúc dầu-nước; khi nhận chứng chỉ hiệu chuẩn; khi phát hiện OOT; khi đặc tính CTQ có dung sai chặt; khi khách hàng yêu cầu MSA/traceability.</li>
 <li><b>Chủ trách nhiệm chính:</b> QA/QMS (Metrology Responsible Person) chịu trách nhiệm chương trình hiệu chuẩn end-to-end, quyết định HOLD/RELEASE trong sự kiện OOT.</li>
-<li><b>Nguyên tắc vận hành:</b> Không có nhãn trạng thái hợp lệ tại điểm sử dụng = không được đo. Không có chứng chỉ traceability hợp lệ = không được dùng kết quả đo cho quyết định ĐẠT/KHÔNG ĐẠT.</li>
+<li><b>Nguyên tắc vận hành:</b> Không có nhãn trạng thái hợp lệ tại point-of-use = không được đo. Không có chứng chỉ traceability hợp lệ = không được dùng kết quả đo cho quyết định ĐẠT/KHÔNG ĐẠT.</li>
 </ul>
 <div class="note">
 <b>Khoảng trống/không nhất quán nội bộ &amp; cách chặn ngay trong mô-đun:</b>
@@ -105,19 +105,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="section">
-<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + hold point</h2>
 <p><b>Chuỗi E2E:</b> Báo giá/Hợp đồng → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Phản hồi/CI.</p>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>Bước E2E</th><th>Đầu vào</th><th>Responsible Person</th><th>Đầu ra</th><th>Điểm chặn (Cổng kiểm soát)</th></tr></thead>
+<thead><tr><th>Bước E2E</th><th>Đầu vào</th><th>Responsible Person</th><th>Đầu ra</th><th>Hold point (Control gate)</th></tr></thead>
 <tbody>
 <tr><td>Báo giá/Hợp đồng</td><td>Yêu cầu khách về traceability, MSA, tiêu chuẩn hiệu chuẩn</td><td>Estimator (SAL-03)</td><td>Danh mục yêu cầu đo/hiệu chuẩn theo hợp đồng</td><td>Không có yêu cầu rõ = ghi M365/SharePoint → HESEM-QMS-SSOT vào Planning &amp; rà soát hợp đồng</td></tr>
 <tr><td>Planning</td><td>CTQ, tần suất kiểm, plan công đoạn</td><td>Planner</td><td>kế hoạch kiểm tra (kiểm tra plan) + lịch tránh trùng hạn hiệu chuẩn</td><td>Plan dùng thiết bị quá hạn = BLOCK phát hành traveler</td></tr>
 <tr><td>Engineering</td><td>Bản vẽ Rev, phương pháp đo, đồ gá đo</td><td>Programmer/Engineering</td><td>Quy định gage + yêu cầu MSA cho CTQ</td><td>CTQ dung sai chặt không có yêu cầu MSA = HOLD FAI/Final decision</td></tr>
 <tr><td>Purchasing</td><td>Nhu cầu mua gage, dịch vụ hiệu chuẩn</td><td>Purchasing</td><td>PO + tiêu chí chứng chỉ + nhà cung cấp đủ năng lực</td><td>PO không ràng buộc traceability/uncertainty = HOLD đặt dịch vụ</td></tr>
 <tr><td>Receiving/Warehouse</td><td>Thiết bị mới / thiết bị về từ hiệu chuẩn</td><td>Warehouse</td><td>Gage được gán ID + nhãn trạng thái + chuyển QA review</td><td>Thiết bị về không cert/không nhãn = QUARANTINE</td></tr>
-<tr><td>Production</td><td>Thiết bị đo tại điểm dùng</td><td>Operator/Setup</td><td>Xác minh đầu ca + dùng đúng gage</td><td>Thiết bị không đạt xác minh = STOP đo, HOLD lot</td></tr>
-<tr><td>QC/QA</td><td>Kết quả đo + nhật ký hiệu chuẩn + cert</td><td>QC/QA</td><td>Quyết định ĐẠT/KHÔNG ĐẠT + hồ sơ MRR</td><td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) (không có nhật ký/cert = BLOCK release)</td></tr>
+<tr><td>Production</td><td>Thiết bị đo tại point-of-use</td><td>Operator/Setup</td><td>Xác minh đầu ca + dùng đúng gage</td><td>Thiết bị không đạt xác minh = STOP đo, HOLD lot</td></tr>
+<tr><td>QC/QA</td><td>Kết quả đo + nhật ký hiệu chuẩn + cert</td><td>QC/QA</td><td>Quyết định ĐẠT/KHÔNG ĐẠT + hồ sơ MRR</td><td>không có bằng chứng thì không qua control gate (No bằng chứng = No gate) (không có nhật ký/cert = BLOCK release)</td></tr>
 <tr><td>NCR/MRB</td><td>Sự kiện OOT / nghi ngờ đo sai</td><td>QA + Supervisor</td><td>Impact đánh giá + containment + quyết định re-measure/recall</td><td>Chưa đóng OOT impact đánh giá = BLOCK ship mọi lot trong vùng ảnh hưởng</td></tr>
 <tr><td>Ship</td><td>Hồ sơ release</td><td>Supervisor + QA</td><td>Bộ hồ sơ giao hàng (ship packet) hoàn chỉnh</td><td>Thiếu chứng chỉ/IR/FAI liên quan đo = HOLD xuất hàng</td></tr>
 </tbody>
@@ -145,7 +145,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6 điểm kiểm soát)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>#</th><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Điểm chặn</th></tr></thead>
+<thead><tr><th>#</th><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Hold point</th></tr></thead>
 <tbody>
 <tr><td>CP1</td><td>Gage list bắt buộc có ID duy nhất, nhóm (Dimension/Go-NoGo/Precision/Tiêu chuẩn), vị trí dùng, người phụ trách, chu kỳ, ngày đến hạn</td><td>QA</td><td>FRM-QMS-04 Calibration Log (bản kiểm soát)</td><td>Thiết bị không nằm trong nhật ký = BLOCK dùng cho quyết định chất lượng</td></tr>
 <tr><td>CP2</td><td>Thiết lập chu kỳ theo rủi ro: tần suất dùng, môi trường, lịch sử ổn định, mức CTQ, yêu cầu khách</td><td>QA + Supervisor</td><td>Dòng “Basis/Reason” trong FRM-QMS-04 + biên bản review hằng năm</td><td>Không có basis = HOLD phê duyệt chu kỳ</td></tr>
@@ -163,12 +163,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>FF1 — STOP đo:</b> Khi thiết bị không có nhãn trạng thái hợp lệ hoặc quá hạn → dừng đo ngay, gắn thẻ HOLD, báo QC trong 5 phút.</li>
 <li><b>FF2 — HOLD lot:</b> Khi phát hiện thiết bị OOT hoặc nghi ngờ drift (zero sai, sai số nhảy) → HOLD toàn bộ lot đang đo/đã đo trong ca, khoanh vùng theo thời gian dùng thiết bị.</li>
-<li><b>FF3 — BLOCK ship:</b> Khi hồ sơ hiệu chuẩn/xác minh/impact đánh giá thiếu → phải khóa cổng kiểm soát Final/Ship cho mọi job bị ảnh hưởng.</li>
+<li><b>FF3 — BLOCK ship:</b> Khi hồ sơ hiệu chuẩn/xác minh/impact đánh giá thiếu → phải khóa control gate Final/Ship cho mọi job bị ảnh hưởng.</li>
 <li><b>FF4 — BLOCK thay đổi chu kỳ:</b> Khi thay đổi interval không có dữ liệu lịch sử hoặc đánh giá rủi ro → không được sửa nhật ký, chuyển QA review + Supervisor ký.</li>
 </ul>
 </div>
 <div class="section">
-<h2>7) Phản ứng 60 giây (khi sai Rev/lẫn lộn (mix-up)/thiếu chứng từ/OOT gage/vượt qua cổng kiểm soát/rủi ro giao hàng)</h2>
+<h2>7) Phản ứng 60 giây (khi sai Rev/lẫn lộn (mix-up)/thiếu chứng từ/OOT gage/vượt qua control gate/rủi ro giao hàng)</h2>
 <div class="table-card">
 <table class="table">
 <thead><tr><th>Tín hiệu</th><th>60 giây phải làm</th><th>MRR phải tạo</th></tr></thead>
@@ -177,7 +177,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Phát hiện OOT trên chứng chỉ</td><td>Ngừng dùng thiết bị • khoanh vùng “từ lần đạt cuối đến lúc phát hiện” • HOLD các lot liên quan</td><td>Báo cáo OOT impact đánh giá + NCR/MRB ticket</td></tr>
 <tr><td>Nghi ngờ dùng sai Rev bản vẽ khi đo</td><td>Dừng quyết định ĐẠT/KHÔNG ĐẠT • đối chiếu Rev trên traveler/bản vẽ • HOLD kết quả đo</td><td>Biên bản đối chiếu Rev + cập nhật IR/FAI trạng thái HOLD</td></tr>
 <tr><td>Rơi/va đập mạnh</td><td>Gắn HOLD • chuyển QA kiểm tra • không tự “zero lại” rồi dùng tiếp</td><td>Nhật ký sự cố thiết bị + yêu cầu xác minh/hiệu chuẩn lại</td></tr>
-<tr><td>Nguy cơ vượt qua cổng kiểm soát để ship</td><td>Supervisor chặn xuất hàng • yêu cầu QA xác minh MRR đủ • mở MRB khi thiếu</td><td>Bảng kiểm ship-release + hồ sơ HOLD/RELEASE</td></tr>
+<tr><td>Nguy cơ vượt qua control gate để ship</td><td>Supervisor chặn xuất hàng • yêu cầu QA xác minh MRR đủ • mở MRB khi thiếu</td><td>Bảng kiểm ship-release + hồ sơ HOLD/RELEASE</td></tr>
 </tbody>
 </table>
 </div>
@@ -189,7 +189,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Điểm sai hay gặp</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Gán ID duy nhất cho thiết bị mới và dán nhãn “NEW–QA REVIEW”</td><td>Warehouse</td><td>Phiếu nhận + ảnh nhãn</td><td>Dán nhãn nhưng không ghi ID trên chứng chỉ</td></tr>
-<tr><td>2</td><td>Đăng ký vào FRM-QMS-04: nhóm thiết bị, vị trí dùng, người phụ trách, interval, ngày đến hạn</td><td>QA</td><td>FRM-QMS-04 (bản kiểm soát)</td><td>Thiếu vị trí dùng → mất kiểm soát tại điểm sử dụng</td></tr>
+<tr><td>2</td><td>Đăng ký vào FRM-QMS-04: nhóm thiết bị, vị trí dùng, người phụ trách, interval, ngày đến hạn</td><td>QA</td><td>FRM-QMS-04 (bản kiểm soát)</td><td>Thiếu vị trí dùng → mất kiểm soát tại point-of-use</td></tr>
 <tr><td>3</td><td>Xác định interval theo rủi ro và ghi “Basis” (dữ liệu/lý do)</td><td>QA + Supervisor</td><td>Dòng Basis trong FRM-QMS-04</td><td>Sửa interval không có chữ ký phê duyệt</td></tr>
 <tr><td>4</td><td>Thiết lập xác minh trước khi dùng cho shop-floor (mẫu nhật ký + master)</td><td>QC</td><td>Xác minh Nhật ký template</td><td>Thiếu master/chuẩn nội bộ cho bước check</td></tr>
 <tr><td>5</td><td>Kiểm tra nhãn trạng thái trước khi đo ở đầu ca và trước mỗi job CTQ</td><td>Operator/Setup</td><td>Xác minh Nhật ký + chữ ký ca</td><td>Chỉ nhìn “tháng” mà không nhìn “ngày đến hạn”</td></tr>
@@ -216,7 +216,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1. Nhận diện thiết bị</td><td>Đọc ID • đối chiếu nhóm • xác nhận vị trí dùng</td><td>Chặn lẫn thiết bị và lẫn chứng chỉ</td></tr>
 <tr><td>2. Kiểm tra trạng thái</td><td>Cal date • Ngày đến hạn • trạng thái OK/HOLD • nhãn rõ</td><td>Chặn dùng quá hạn gây false-accept</td></tr>
-<tr><td>3. Xác minh trước khi dùng</td><td>Zero • master check • ghi giá trị đo • ký xác nhận</td><td>Tạo bằng chứng tại điểm dùng, phát hiện drift sớm</td></tr>
+<tr><td>3. Xác minh trước khi dùng</td><td>Zero • master check • ghi giá trị đo • ký xác nhận</td><td>Tạo bằng chứng tại point-of-use, phát hiện drift sớm</td></tr>
 <tr><td>4. Sử dụng đúng điều kiện</td><td>Sạch • nhiệt độ ổn định • thao tác đúng lực</td><td>Giảm sai số do môi trường và người đo</td></tr>
 <tr><td>5. Ghi nhận &amp; truy xuất</td><td>Ghi ID thiết bị trong IR/FAI • lưu nhật ký theo ca/job</td><td>Truy hồi nhanh khi phát hiện OOT</td></tr>
 <tr><td>6. Xử lý sự cố</td><td>Khi rơi/va đập: HOLD ngay • không tự sửa • báo QC/QA</td><td>Chặn kéo dài vùng ảnh hưởng</td></tr>
@@ -240,8 +240,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>L1</td><td>Gọi đúng tên trạng thái, đọc đúng Ngày đến hạn, nhận diện đúng ID</td><td>Bài kiểm tra nhanh ≥ 85% và 0 lỗi “dùng thiết bị quá hạn” trong buổi thực hành</td><td>Được dùng thiết bị theo danh mục dưới giám sát</td></tr>
 <tr><td>L2</td><td>Thực hiện xác minh, ghi nhật ký đúng, phát hiện nhãn lỗi và HOLD</td><td>Performance test PASS và nhật ký không thiếu trường bắt buộc</td><td>Được tự thực hiện xác minh và ghi nhận MRR</td></tr>
-<tr><td>L3</td><td>Đóng vòng gửi/nhận/QA review cert đúng luồng, không vượt qua cổng kiểm soát</td><td>Hoàn thành OJT đầu ra đầy đủ + 0 lỗi critical trong 2 ca liên tiếp</td><td>Được điều phối thiết bị trong khu vực và yêu cầu HOLD lot</td></tr>
-<tr><td>L4</td><td>Chủ trì xử lý OOT và/hoặc MSA (theo phân quyền vai trò), đánh giá nội bộ theo bảng kiểm</td><td>Đóng 01 tình huống OOT hoặc 01 báo cáo MSA đạt tiêu chí và được QA phê duyệt</td><td>Được đào tạo lại người khác, ký xác nhận OJT (theo phân quyền)</td></tr>
+<tr><td>L3</td><td>Đóng vòng gửi/nhận/QA review cert đúng luồng, không vượt qua control gate</td><td>Hoàn thành OJT đầu ra đầy đủ + 0 lỗi critical trong 2 ca liên tiếp</td><td>Được điều phối thiết bị trong khu vực và yêu cầu HOLD lot</td></tr>
+<tr><td>L4</td><td>Chủ trì xử lý OOT và/hoặc MSA (theo phân quyền vai trò), internal audit theo bảng kiểm</td><td>Đóng 01 tình huống OOT hoặc 01 báo cáo MSA đạt tiêu chí và được QA phê duyệt</td><td>Được đào tạo lại người khác, ký xác nhận OJT (theo phân quyền)</td></tr>
 </tbody>
 </table>
 </div>
@@ -258,7 +258,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Maintenance:</b> đạt khi đảm bảo điều kiện bảo quản, xử lý hỏng hóc cơ khí và gửi kiểm tra lại sau sửa.</li>
 <li><b>EHS:</b> đạt khi kiểm soát hoá chất chống gỉ/lau rửa, PPE, và khu vực lưu giữ an toàn cho chuẩn.</li>
 <li><b>Estimator (SAL-03):</b> đạt khi chuyển yêu cầu khách về hiệu chuẩn/MSA vào rà soát hợp đồng và kích hoạt thông báo khách khi xảy ra OOT ảnh hưởng ship.</li>
-<li><b>Supervisor:</b> đạt khi thực thi FF rules, chặn vượt qua cổng kiểm soát, kiểm tra MRR trước ship.</li>
+<li><b>Supervisor:</b> đạt khi thực thi FF rules, chặn vượt qua control gate, kiểm tra MRR trước ship.</li>
 </ul>
 </div>
 </div>
@@ -266,14 +266,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>10) Đánh giá (ĐẠT/KHÔNG ĐẠT + bài kiểm tra nhanh + scenario + performance test)</h2>
 <h3>9.1 Bài kiểm tra nhanh (≥20 câu; trắc nghiệm + tình huống ngắn)</h3>
 <ol>
-<li>(MC) Thiết bị đo không có nhãn trạng thái tại điểm dùng. Hành động đúng là gì? A) Dùng tạm rồi ghi sau B) STOP đo và HOLD thiết bị C) Hỏi đồng nghiệp rồi dùng D) Ghi “OK” vào nhật ký.</li>
+<li>(MC) Thiết bị đo không có nhãn trạng thái tại point-of-use. Hành động đúng là gì? A) Dùng tạm rồi ghi sau B) STOP đo và HOLD thiết bị C) Hỏi đồng nghiệp rồi dùng D) Ghi “OK” vào nhật ký.</li>
 <li>(MC) FRM-QMS-04 dùng để: A) Báo cáo NCR B) Nhật ký hiệu chuẩn thiết bị đo C) Phiếu xuất kho D) Kế hoạch giao hàng.</li>
 <li>(MC) Chu kỳ hiệu chuẩn phải dựa trên: A) Sở thích cá nhân B) Rủi ro &amp; dữ liệu sử dụng C) Lịch rảnh của nhà cung cấp D) Chỉ yêu cầu ISO.</li>
 <li>(MC) Với pin/thread gauge, điểm kiểm soát trọng tâm là: A) Màu sơn B) Kiểm soát mòn và bảo quản chống gỉ C) Chỉ cần dán tem D) Đặt trong hộp bất kỳ.</li>
 <li>(MC) “Traceability” trên chứng chỉ hiệu chuẩn dùng để chứng minh: A) Có chữ ký đẹp B) Liên kết đến chuẩn quốc gia/quốc tế C) Có logo nhà cung cấp D) Có giá rẻ.</li>
 <li>(MC) Khi thiết bị bị rơi, hành động bắt buộc là: A) Lau sạch rồi dùng B) Zero lại rồi dùng C) HOLD và chuyển QA/QC kiểm tra D) Cất tủ.</li>
 <li>(MC) Khi cert báo OOT, bước đầu tiên của impact đánh giá là: A) Ship nhanh B) Xác định vùng ảnh hưởng theo thời gian C) Huỷ toàn bộ D) Bỏ qua.</li>
-<li>(MC) “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” áp dụng trực tiếp với: A) IR/FAI/Final release B) Màu đồng phục C) Tên máy CNC D) Số điện thoại.</li>
+<li>(MC) “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” áp dụng trực tiếp với: A) IR/FAI/Final release B) Màu đồng phục C) Tên máy CNC D) Số điện thoại.</li>
 <li>(MC) Xác minh trước khi dùng bắt buộc ghi: A) Chỉ chữ ký B) Giá trị đo hoặc kết quả master check + ID thiết bị C) Chỉ ngày D) Không cần.</li>
 <li>(MC) MSA/Gage R&amp;R bắt buộc kích hoạt khi: A) CTQ dung sai chặt hoặc quyết định release B) Khi hết giấy in C) Khi trời mưa D) Khi có khách tham quan.</li>
 <li>(Tình huống ngắn) Khi Operator phát hiện caliper hết hạn trong lúc đang đo 10 pcs, phải ghi những hồ sơ nào tối thiểu trước khi rời khỏi vị trí?</li>
@@ -284,7 +284,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>(Tình huống ngắn) Khi nhận yêu cầu khách “cần MSA cho đặc tính Ø10 ±0.01”, Estimator (SAL-03) phải kích hoạt bàn giao nào trong E2E?</li>
 <li>(MC) Thiết bị đo dùng cho quyết định ĐẠT/KHÔNG ĐẠT nhưng không nằm trong gage list. Hành động: A) Dùng tiếp B) STOP và đăng ký vào nhật ký C) Đợi cuối tuần D) Che nhãn.</li>
 <li>(MC) Khi thay đổi interval, bằng chứng bắt buộc là: A) Lời nói B) Dòng Basis + phê duyệt QA/Supervisor C) Sticker mới D) Ảnh chụp.</li>
-<li>(Tình huống ngắn) Khi phát hiện khả năng vượt qua cổng kiểm soát để ship, Supervisor phải yêu cầu bộ MRR nào trước khi RELEASE?</li>
+<li>(Tình huống ngắn) Khi phát hiện khả năng vượt qua control gate để ship, Supervisor phải yêu cầu bộ MRR nào trước khi RELEASE?</li>
 <li>(MC) Thiết bị chuẩn nội bộ (gauge blocks/master) phải được quản lý: A) Lỏng lẻo B) Nghiêm hơn thiết bị shop-floor C) Không cần hiệu chuẩn D) Cho mượn tự do.</li>
 <li>(MC) Mục tiêu của xác minh là: A) Trang trí B) Phát hiện drift trước khi tạo kết quả đo C) Tạo thêm giấy tờ vô ích D) Giảm tốc độ làm việc.</li>
 <li>(Tình huống ngắn) Khi OOT ảnh hưởng đến hàng đã ship, vai trò nào chịu trách nhiệm giao tiếp khách và hồ sơ nào phải đính kèm?</li>
@@ -326,7 +326,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th>Tiêu chí</th><th>PASS</th><th>FAIL (critical)</th></tr></thead>
 <tbody>
-<tr><td>Nhận diện trạng thái tại điểm dùng</td><td>Đọc đúng ID/ngày đến hạn, dừng đúng khi thiếu nhãn</td><td>Dùng thiết bị quá hạn/không nhãn</td></tr>
+<tr><td>Nhận diện trạng thái tại point-of-use</td><td>Đọc đúng ID/ngày đến hạn, dừng đúng khi thiếu nhãn</td><td>Dùng thiết bị quá hạn/không nhãn</td></tr>
 <tr><td>Xác minh nhật ký</td><td>Ghi đủ giá trị/nhận định + chữ ký + thời điểm</td><td>Ghi “OK” không có giá trị hoặc thiếu ID</td></tr>
 <tr><td>Review cert</td><td>Phát hiện thiếu traceability/as-found/as-left và HOLD đúng</td><td>Chấp nhận cert lỗi và phát hành thiết bị</td></tr>
 <tr><td>OOT impact</td><td>Khoanh vùng theo thời gian và liệt kê job/lot/serial đầy đủ</td><td>Không khoanh vùng hoặc không tạo NCR/MRB</td></tr>
@@ -335,11 +335,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="section">
-<h2>11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”)</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”)</h2>
 <ul>
 <li><b>PASS:</b> Bài kiểm tra nhanh ≥ 85% + Scenario quyết định đúng (HOLD/GO + MRR đúng) + Performance test PASS và 0 lỗi critical.</li>
 <li><b>FAIL:</b> Bất kỳ lỗi critical nào (dùng thiết bị quá hạn/không nhãn, phát hành cert lỗi, bỏ qua OOT impact) hoặc thiếu MRR bắt buộc.</li>
-<li><b>Quy tắc mở cổng kiểm soát:</b> Không có MRR đúng tên/đúng chỗ lưu = không được ký RELEASE tại QC/QA/Ship.</li>
+<li><b>Quy tắc mở control gate:</b> Không có MRR đúng tên/đúng chỗ lưu = không được ký RELEASE tại QC/QA/Ship.</li>
 </ul>
 </div>
 <div class="section">
@@ -351,7 +351,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>PDF chứng chỉ hiệu chuẩn + bảng kiểm review cert.</li>
 <li>Báo cáo OOT impact đánh giá + NCR/MRB (FRM-QA-03) khi phát sinh.</li>
 <li>Báo cáo MSA/Gage R&amp;R cho CTQ khi kích hoạt.</li>
-<li>Ảnh nhãn trạng thái tại điểm dùng (trước khi ship hoặc khi đánh giá nội bộ).</li>
+<li>Ảnh nhãn trạng thái tại point-of-use (trước khi ship hoặc khi internal audit).</li>
 <li>danh mục OJT (bảng kiểm / danh mục) ký xác nhận đạt cho từng vai trò.</li>
 </ul>
 <h3>12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
@@ -376,12 +376,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="section">
 <h2>13) Common đánh giá phát hiện &amp; phòng ngừa (điểm đánh giá hay gặp &amp; cách chặn; ≥8)</h2>
 <ol>
-<li>Thiết bị quá hạn vẫn ở điểm dùng → kiểm tra nhãn đầu ca + FF1 STOP đo + đánh giá walk hằng tuần.</li>
+<li>Thiết bị quá hạn vẫn ở point-of-use → kiểm tra nhãn đầu ca + FF1 STOP đo + đánh giá walk hằng tuần.</li>
 <li>Chứng chỉ không traceability/không khớp ID → bảng kiểm review cert bắt buộc trước khi phát hành thiết bị.</li>
 <li>Không có impact đánh giá khi OOT → FF3 BLOCK ship + yêu cầu OOT report có vùng ảnh hưởng.</li>
 <li>Interval không có basis → bắt buộc ghi Basis trong FRM-QMS-04 và review hằng năm.</li>
 <li>Go/No-go gauge không kiểm soát mòn → lịch kiểm mòn + master check + thay thế theo điều kiện FAIL.</li>
-<li>Không có xác minh nhật ký → “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” tại QC/Final/Ship.</li>
+<li>Không có xác minh nhật ký → “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” tại QC/Final/Ship.</li>
 <li>Thiếu MSA cho CTQ dung sai chặt → HOLD FAI/Final đến khi MSA PASS.</li>
 <li>Thiếu truy xuất gage ID trong IR/FAI → bắt buộc trường “Gage ID” trên form IR/FAI hoặc ghi trên traveler.</li>
 <li>Thiết bị sửa chữa xong quay lại dùng không kiểm tra → quy tắc: sửa/va đập = HOLD và kiểm tra lại trước khi OK.</li>

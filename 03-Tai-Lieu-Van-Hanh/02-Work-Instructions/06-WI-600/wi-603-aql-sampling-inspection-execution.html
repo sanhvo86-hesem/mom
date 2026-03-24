@@ -92,7 +92,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Lấy mẫu ngẫu nhiên.</strong><br/>Mẫu phải rải đều qua toàn lô hoặc toàn kiện; không lấy liên tiếp trong một khay duy nhất nếu lot phân bố nhiều vị trí/thời điểm. Với lot có nhiều pallet/box/khay, phải có quy tắc random hóa từng tầng chứa.</div>
 <div class="step-item"><strong>Kiểm và ghi defect.</strong><br/>Kiểm theo plan, phân loại defect từng chiếc, từng loại. Không được cộng dồn mơ hồ. Defect critical tách riêng khỏi major/minor.</div>
 <div class="step-item"><strong>Quyết định accept/reject.</strong><br/>So defect count với Ac/Re; reject lô khi vượt Re hoặc khi xuất hiện bất kỳ critical defect thuộc rule zero acceptance. Nếu plan nhiều bước yêu cầu sample tiếp theo, phải tuân đúng logic.</div>
-<div class="step-item"><strong>Xử lý sau quyết định.</strong><br/>Accept thì release lô theo cổng kiểm soát tương ứng. Reject thì giữ lô, mở containment/NCR nếu cần và xác định hướng 100% sort/rework/reinspect dưới quyền QA.</div>
+<div class="step-item"><strong>Xử lý sau quyết định.</strong><br/>Accept thì release lô theo control gate tương ứng. Reject thì giữ lô, mở containment/NCR nếu cần và xác định hướng 100% sort/rework/reinspect dưới quyền QA.</div>
 </div></div>
 
 <div class="section"><h2>4. Switching rules, reinspection và lỗi thường gặp</h2>
@@ -119,7 +119,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/06-SOP-600/sop-603-aql-sampling-inspection.html">SOP-603</a></td><td>Khung AQL và scope áp dụng.</td></tr>
 <tr><td><a href="../../03-Reference/06-ANNEX-600/annex-601-aql-method-reference.html">ANNEX-601</a></td><td>Quy tắc plan, mức kiểm và switching rule.</td></tr>
-<tr><td><a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>QPL và bộ bằng chứng/cổng kiểm soát tương ứng.</td></tr>
+<tr><td><a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>QPL và bộ bằng chứng/control gate tương ứng.</td></tr>
 <tr><td><a href="wi-601-visual-inspection-and-defect-classification.html">WI-601</a></td><td>Phân loại defect và bằng chứng ảnh.</td></tr>
 <tr><td><a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Cô lập lô reject hoặc nghi ngờ.</td></tr>
 </tbody></table></div></div>

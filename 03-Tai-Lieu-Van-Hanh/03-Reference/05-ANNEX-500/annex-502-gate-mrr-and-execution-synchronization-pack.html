@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G5 | HESEM QMS</title>
+<title>ANNEX-502 — MRR theo control gate, điều kiện đồng bộ thực thi và rule bàn giao G0–G5 | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 
 <style>
@@ -62,7 +62,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
             <span>Tài liệu vận hành • Annex</span>
           </div>
         </div>
-        <div class="title"><strong>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G5</strong></div>
+        <div class="title"><strong>ANNEX-502 — MRR theo control gate, điều kiện đồng bộ thực thi và rule bàn giao G0–G5</strong></div>
         <div class="meta">
           <div class="row"><span><b>Code:</b></span><span>ANNEX-502</span></div>
           <div class="row"><span><b>Version:</b></span><span>V0</span></div>
@@ -71,32 +71,32 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
           <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
         </div>
       </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng để tra matrix cổng kiểm soát và MRR cho mọi lệnh sản xuất CNC từ RFQ đến giao hàng. Planner, Engineering, QA, Production, Warehouse và người đánh giá phải dùng cùng một matrix này khi kiểm cổng kiểm soát và khi bàn giao hồ sơ.</div>
-      <h1>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G5</h1>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng để tra matrix control gate và MRR cho mọi lệnh sản xuất CNC từ RFQ đến giao hàng. Planner, Engineering, QA, Production, Warehouse và người đánh giá phải dùng cùng một matrix này khi kiểm control gate và khi bàn giao hồ sơ.</div>
+      <h1>ANNEX-502 — MRR theo control gate, điều kiện đồng bộ thực thi và rule bàn giao G0–G5</h1>
       
 <div class="section"><h2>1. Mục đích, cách dùng và ranh giới</h2>
-<p>ANNEX này là bộ matrix dùng chung để đồng bộ <strong>cổng kiểm soát, MRR, bàn giao field, vai trò ownership và điều kiện đồng bộ dữ liệu</strong> từ G0 đến G5. ANNEX này <strong>không thay</strong> WI thao tác tại điểm dùng. Người sử dụng tra ANNEX này để biết mỗi cổng kiểm soát cần bộ hồ sơ nào, ai được quyền mở/giữ/nhả cổng kiểm soát, phải bàn giao trường dữ liệu nào và khi nào phải dừng vì lệch revision hoặc lệch nguồn dữ liệu.</p>
-<div class="callout-warning"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ đóng cổng kiểm soát khi đủ entry criteria, đủ MRR tối thiểu và trạng thái giữa SoR, SSOT, traveler và barcode đã đồng nhất.</div>
+<p>ANNEX này là bộ matrix dùng chung để đồng bộ <strong>control gate, MRR, bàn giao field, vai trò ownership và điều kiện đồng bộ dữ liệu</strong> từ G0 đến G5. ANNEX này <strong>không thay</strong> WI thao tác tại point-of-use. Người sử dụng tra ANNEX này để biết mỗi control gate cần bộ hồ sơ nào, ai được quyền mở/giữ/nhả control gate, phải bàn giao trường dữ liệu nào và khi nào phải dừng vì lệch revision hoặc lệch nguồn dữ liệu.</p>
+<div class="callout-warning"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ đóng control gate khi đủ entry criteria, đủ MRR tối thiểu và trạng thái giữa SoR, SSOT, traveler và barcode đã đồng nhất.</div>
 <div class="two-col">
 <div class="card"><h3>SoR</h3><p>Nguồn chuẩn cho giao dịch gốc: ERP / shipment / routing / pack / inventory.</p></div>
 <div class="card"><h3>SSOT</h3><p>Single Source of Truth cho bộ bằng chứng, dossier, ảnh, bảng kiểm, phê duyệt số, exception nhật ký.</p></div>
 </div></div>
 
-<div class="section"><h2>2. Cổng kiểm soát map G0–G5</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Mục tiêu</th><th>Entry criteria</th><th>Responsible Person Decision</th><th>MRR tối thiểu</th><th>Hold signal mạnh nhất</th></tr></thead><tbody>
+<div class="section"><h2>2. Control gate map G0–G5</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Control gate</th><th>Mục tiêu</th><th>Entry criteria</th><th>Responsible Person Decision</th><th>MRR tối thiểu</th><th>Hold signal mạnh nhất</th></tr></thead><tbody>
 <tr><td><span class="badge-blue">G0 — RFQ / Hợp đồng khởi động</span></td><td>Khóa yêu cầu khách hàng, rev, CSR, qty, ngày đến hạn, QPL sơ bộ</td><td>RFQ/PO rõ, file kỹ thuật có thể đọc, assumption đã ghi</td><td>Sales / Engineering</td><td>RFQ register, rà soát hợp đồng, khởi động bảng kiểm</td><td>Thiếu file kỹ thuật, rev mơ hồ, requirement conflict</td></tr>
 <tr><td><span class="badge-blue">G1 — Planning / Phát hành kỹ thuật</span></td><td>Khóa baseline, route, setup, tool, program, kiểm tra requirement</td><td>Baseline đã phát hành, planning release PASS</td><td>Engineering / Planning</td><td>Setup sheet, route, tool list, kiểm tra requirement, Planning Release Checklist</td><td>Mismatch giữa drawing/setup/program/control plan</td></tr>
-<tr><td><span class="badge-blue">G2 — Setup / mẫu đầu (first piece) / FAI release</span></td><td>Xác nhận máy có thể chạy lô theo CTQ đã phê duyệt</td><td>Bộ hồ sơ công việc (job packet) đủ, machine ready, gage ready, mẫu đầu plan rõ</td><td>Production + QA</td><td>Setup & mẫu đầu hồ sơ, FAI/mẫu đầu bằng chứng</td><td>Thiếu gage, thiếu sign-off, sai offset / sai fixture / sai datum</td></tr>
+<tr><td><span class="badge-blue">G2 — Setup / mẫu đầu (first piece) / FAI release</span></td><td>Xác nhận máy có thể chạy lô theo CTQ đã phê duyệt</td><td>Bộ job dossier (job packet) đủ, machine ready, gage ready, mẫu đầu plan rõ</td><td>Production + QA</td><td>Setup & mẫu đầu hồ sơ, FAI/mẫu đầu bằng chứng</td><td>Thiếu gage, thiếu sign-off, sai offset / sai fixture / sai datum</td></tr>
 <tr><td><span class="badge-blue">G3 — Production execution / IPQC control</span></td><td>Giữ ổn định trong chạy lô, phản ứng nhanh khi drift</td><td>G2 đã nhả, dispatch list hợp lệ, WIP rule rõ</td><td>Production Supervisor / QA</td><td>Dispatch list, traveler, IPQC/SPC/AQL hồ sơ khi áp dụng</td><td>WIP không trace được, missed check, drift nhưng không phản ứng</td></tr>
 <tr><td><span class="badge-blue">G4 — Kiểm tra cuối / shipment packet ready</span></td><td>Khóa kết quả cuối, CoC/cert/pack requirement</td><td>Lot hoàn tất, rework đóng, cert thu đủ</td><td>QA + WHS</td><td>Kiểm tra cuối report, kiểm tra cuối register, shipment bảng kiểm draft</td><td>Thiếu cert, trace broken, pack level không đúng</td></tr>
 <tr><td><span class="badge-blue">G5 — Phê duyệt giao hàng (ship release) / closeout</span></td><td>Cho phép giao hàng và khóa bằng chứng để closeout / billing</td><td>Shipment packet PASS, đối chiếu đóng gói PASS, thẩm quyền đúng</td><td>WHS + QA + Finance khi closeout</td><td>Shipping Checklist, ship label, đối chiếu đóng gói, CoC, proof of pickup</td><td>SSCC / label / phiếu kê đóng gói (phiếu kê đóng gói) / CoC không khớp hoặc shipment chưa RELEASED</td></tr>
 </tbody></table></div></div>
 
-<div class="section"><h2>3. Bundle MRR bắt buộc theo từng cổng kiểm soát</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Bộ hồ sơ tối thiểu phải truy xuất được trong 60 giây</th><th>Nơi phải tìm thấy</th><th>Ai chịu trách nhiệm completeness</th></tr></thead><tbody>
-<tr><td>G0</td><td>RFQ register, rà soát hợp đồng, customer requirements / CSR, bản vẽ đang báo giá, nhật ký giả định</td><td>ERP + Hồ sơ công việc (job dossier)</td><td>Sales / Estimator</td></tr>
-<tr><td>G1</td><td>Baseline drawing/rev, route, setup sheet, program ID, tool list, control plan / kiểm tra requirement, planning release</td><td>ERP + Engineering folder + Hồ sơ công việc</td><td>Engineering + Planning</td></tr>
-<tr><td>G2</td><td>Setup and mẫu đầu hồ sơ, balloon/FAI pack khi áp dụng, gage availability, machine ready sign-off, abnormal risk notes</td><td>Traveler + Hồ sơ công việc + machine-side packet</td><td>Production Supervisor + QA</td></tr>
+<div class="section"><h2>3. Bundle MRR bắt buộc theo từng control gate</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Control gate</th><th>Bộ hồ sơ tối thiểu phải truy xuất được trong 60 giây</th><th>Nơi phải tìm thấy</th><th>Ai chịu trách nhiệm completeness</th></tr></thead><tbody>
+<tr><td>G0</td><td>RFQ register, rà soát hợp đồng, customer requirements / CSR, bản vẽ đang báo giá, nhật ký giả định</td><td>ERP + Job dossier (job dossier)</td><td>Sales / Estimator</td></tr>
+<tr><td>G1</td><td>Baseline drawing/rev, route, setup sheet, program ID, tool list, control plan / kiểm tra requirement, planning release</td><td>ERP + Engineering folder + Job dossier</td><td>Engineering + Planning</td></tr>
+<tr><td>G2</td><td>Setup and mẫu đầu hồ sơ, balloon/FAI pack khi áp dụng, gage availability, machine ready sign-off, abnormal risk notes</td><td>Traveler + Job dossier + machine-side packet</td><td>Production Supervisor + QA</td></tr>
 <tr><td>G3</td><td>Dispatch list, traveler, WIP card, IPQC/SPC/AQL hồ sơ, downtime / abnormal restart nhật ký, outsource transfer nhật ký khi áp dụng</td><td>Machine packet + ERP + SSOT</td><td>Production / Planning / QA</td></tr>
 <tr><td>G4</td><td>kiểm tra cuối report, cert bundle, material / outsource cert, deviation / NCR disposition nếu có, packaging level</td><td>QA packet + Shipping Packet draft</td><td>QA</td></tr>
 <tr><td>G5</td><td>Shipping Checklist, shipping label / SSCC, đối chiếu đóng gói, CoC, proof of pickup, invoice request trigger</td><td>Shipping Packet + ERP shipment</td><td>WHS + QA</td></tr>
@@ -106,7 +106,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm trường</th><th>Giao từ</th><th>Nhận bởi</th><th>Phải có</th><th>Không được để trống</th></tr></thead><tbody>
 <tr><td>Job master</td><td>Sales / Planning</td><td>Engineering / Production / QA / WHS</td><td>Customer, Job, Part, Rev, Qty, ngày đến hạn, ship-to, priority class</td><td>Job, Part, Rev, Qty, ngày đến hạn</td></tr>
 <tr><td>Phát hành kỹ thuật</td><td>Engineering</td><td>Planning / Production / QA</td><td>Program ID, setup sheet ID, fixture/tool requirement, CTQ list, datum logic, special notes</td><td>Program ID, setup sheet ID, CTQ / control reference</td></tr>
-<tr><td>Cổng kiểm soát chất lượng (cổng kiểm soát chất lượng)</td><td>QA</td><td>Production / WHS</td><td>Mẫu đầu result, FAI requirement, kiểm tra frequency, tạm giữ/phê duyệt result, cert requirement</td><td>Trạng thái cổng kiểm soát, hold reason, release người phụ trách</td></tr>
+<tr><td>Control gate chất lượng (control gate chất lượng)</td><td>QA</td><td>Production / WHS</td><td>Mẫu đầu result, FAI requirement, kiểm tra frequency, tạm giữ/phê duyệt result, cert requirement</td><td>Trạng thái control gate, hold reason, release người phụ trách</td></tr>
 <tr><td>Dispatch / WIP</td><td>Planning</td><td>Production</td><td>Machine assignment, sequence, lot split rule, hot-job flag, freeze window, outsource legs</td><td>Machine / work center, sequence, lot split rule</td></tr>
 <tr><td>Shipment</td><td>QA / WHS</td><td>WHS / Finance</td><td>QPL / packaging class, label requirement, SSCC need, CoC bundle, invoice trigger</td><td>Packaging class, shipment trạng thái, shipping packet completeness</td></tr>
 </tbody></table></div></div>
@@ -120,8 +120,8 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </tbody></table></div></div>
 
 <div class="section"><h2>6. Retrieval diễn tập 60 giây</h2>
-<div class="callout-info"><strong>Mục tiêu:</strong> tại mỗi cổng kiểm soát, người phụ trách phải mở đúng bằng chứng trong 60 giây. Không tìm thấy trong 60 giây xem như chưa kiểm soát đủ.</div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Phải truy xuất trong 60 giây</th><th>Đạt khi</th></tr></thead><tbody>
+<div class="callout-info"><strong>Mục tiêu:</strong> tại mỗi control gate, người phụ trách phải mở đúng bằng chứng trong 60 giây. Không tìm thấy trong 60 giây xem như chưa kiểm soát đủ.</div>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Control gate</th><th>Phải truy xuất trong 60 giây</th><th>Đạt khi</th></tr></thead><tbody>
 <tr><td>G1</td><td>Setup sheet đúng Rev, Program ID, Planning Release Checklist</td><td>Mở đúng file / đúng bản đang hiệu lực / đúng Job</td></tr>
 <tr><td>G2</td><td>Setup and mẫu đầu hồ sơ, kiểm tra points, gage trạng thái</td><td>Thấy rõ người ký, giờ ký và kết quả PASS/HOLD</td></tr>
 <tr><td>G3</td><td>Dispatch list, current WIP trạng thái, abnormal nhật ký mở gần nhất</td><td>Xác nhận được lô đang ở đâu, ai giữ và đang chờ gì</td></tr>
@@ -149,14 +149,14 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>9. KPI phải theo dõi và câu hỏi đánh giá nhanh</h2>
 <div class="two-col">
 <div class="card"><h3>KPI</h3><ul class="tight">
-<li>% cổng kiểm soát đóng đúng hạn theo plan.</li>
+<li>% control gate đóng đúng hạn theo plan.</li>
 <li>% retrieval diễn tập PASS trong 60 giây.</li>
 <li>% packet thiếu MRR tại G4/G5.</li>
 <li>Số sự cố mismatch revision / packet / shipment theo tháng.</li>
 </ul></div>
 <div class="card"><h3>Đánh giá nhanh</h3><ul class="tight">
-<li>Cổng kiểm soát hiện tại là gì? Ai có quyền nhả cổng kiểm soát?</li>
-<li>MRR tối thiểu của cổng kiểm soát này nằm ở đâu?</li>
+<li>Control gate hiện tại là gì? Ai có quyền nhả control gate?</li>
+<li>MRR tối thiểu của control gate này nằm ở đâu?</li>
 <li>Nếu drawing rev và setup rev khác nhau thì ai phải biết trước tiên?</li>
 <li>Trong 60 giây có mở ra được đúng bằng chứng không?</li>
 </ul></div>
@@ -164,8 +164,8 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>10. Tài liệu liên kết</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a></td><td>Thực hiện cổng kiểm soát, hold, release tại hiện trường.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Kiểm completeness hồ sơ theo cổng kiểm soát.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a></td><td>Thực hiện control gate, hold, release tại hiện trường.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Kiểm completeness hồ sơ theo control gate.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Điều độ, WIP và cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch).</td></tr>
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Chuyển giao công việc xác nhận.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Xác minh trước khi chạy tại máy.</td></tr>

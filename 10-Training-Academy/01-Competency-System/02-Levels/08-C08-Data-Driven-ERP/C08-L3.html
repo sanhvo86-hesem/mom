@@ -72,7 +72,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="meta">
 <div><strong>Vai trò mục tiêu</strong><br/>QA/QC Team Leader, Planner lead, Supervisor, Engineer, Estimator (SAL-03) lead</div>
 <div><strong>Đầu ra bắt buộc</strong><ul><li>Phân tích dữ liệu: Pareto lỗi, trend OTD, downtime, scrap cost.</li><li>Chuẩn hóa template báo cáo và huấn luyện người khác dùng đúng.</li><li>Thiết lập control dữ liệu: quyền truy cập, kiểm tra chéo, đánh giá dữ liệu.</li></ul></div>
-<div><strong>Cổng kiểm soát (gate) trọng yếu</strong><br/><span class="badge bad">Sai REV / sai Job / mất SSOT</span> = HOLD ngay</div>
+<div><strong>Control gate (gate) trọng yếu</strong><br/><span class="badge bad">Sai REV / sai Job / mất SSOT</span> = HOLD ngay</div>
 <div><strong>Thời lượng</strong><br/>Lý thuyết 90 phút • Workshop 90 phút • OJT 240 phút</div>
 </div>
 <p class="small-note">Chuẩn vận hành: dữ liệu dùng cho quyết định phải truy vết được nguồn (SoR), nằm trong SSOT, có timestamp, có người chịu trách nhiệm.</p>
@@ -94,14 +94,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Chặn rủi ro sai REV, lẫn Job, thiếu chứng từ, mất truy vết bằng kỷ luật dữ liệu và SSOT.</li>
 <li>Biến “học xong” thành “làm được”: có bảng kiểm, OJT, performance test, MRR rõ.</li>
-<li>Đảm bảo sẵn sàng đánh giá theo ISO 9001:2015 (tài liệu có kiểm soát): hồ sơ truy xuất trong 60 giây, có kiểm soát thay đổi và phân quyền.</li>
+<li>Đảm bảo sẵn sàng đánh giá theo ISO 9001:2015 (tài liệu có kiểm soát): hồ sơ truy xuất trong 60 giây, có change control và phân quyền.</li>
 </ul>
 </div>
-<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + hold point</h2>
 <p>C08-L3 tập trung tại lớp ra quyết định: cải tiến chất lượng, điều độ, giảm scrap, tối ưu bottleneck.</p>
 <div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Chốt KPI dictionary</strong><p>Công thức + nguồn + người phụ trách + tần suất.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Dataset chuẩn</strong><p>SoR + timestamp + field mapping.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Phân tích Pareto/trend</strong><p>Xác định driver; gắn hành động.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Chuẩn hóa template</strong><p>Version control + change notice.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Kiểm tra chéo</strong><p>2 nguồn/1 KPI; xử lý sai lệch.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Huấn luyện</strong><p>OJT + rubric; nhân bản năng lực.</p></div></div></div>
 <h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
-<ol><li>KPI không có định nghĩa dữ liệu; mỗi phòng hiểu khác.</li><li>Dataset trộn nhiều nguồn không kiểm soát; không truy vết.</li><li>Pareto/trend làm xong không gắn hành động và chủ sở hữu.</li><li>Không khóa template; báo cáo bị sửa lẻ tẻ.</li><li>Huấn luyện không có rubric; người học làm sai mà vẫn “đạt”.</li><li>Không có kiểm tra chéo; KPI bị sai kéo theo quyết định sai.</li><li>Quyền truy cập rộng làm rò rỉ hoặc sửa nhầm.</li><li>Không có retention; dataset bị xóa làm mất chuỗi bằng chứng.</li><li>Không có nhật ký hành động; lỗi lặp lại không giảm.</li><li>Không đưa kết quả phân tích vào review cadence; phân tích bị bỏ.</li></ol>
+<ol><li>KPI không có định nghĩa dữ liệu; mỗi phòng hiểu khác.</li><li>Dataset trộn nhiều nguồn không kiểm soát; không truy vết.</li><li>Pareto/trend làm xong không gắn hành động và owner.</li><li>Không khóa template; báo cáo bị sửa lẻ tẻ.</li><li>Huấn luyện không có rubric; người học làm sai mà vẫn “đạt”.</li><li>Không có kiểm tra chéo; KPI bị sai kéo theo quyết định sai.</li><li>Quyền truy cập rộng làm rò rỉ hoặc sửa nhầm.</li><li>Không có retention; dataset bị xóa làm mất chuỗi bằng chứng.</li><li>Không có nhật ký hành động; lỗi lặp lại không giảm.</li><li>Không đưa kết quả phân tích vào review cadence; phân tích bị bỏ.</li></ol>
 <h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người phụ trách + bằng chứng)</h2>
 <div class="table-card"><table class="table"><thead><tr><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Data dictionary cho KPI</strong></td><td>Responsible Person KPI</td><td>ANNEX-QMS-008 hoặc trang KPI dictionary</td><td>Không định nghĩa = không dùng</td></tr><tr><td><strong>Dataset có nguồn SoR + timestamp</strong></td><td>Responsible Person report</td><td>Dataset header ghi nguồn</td><td>Không rõ nguồn = HOLD</td></tr><tr><td><strong>nhật ký hành động bắt buộc cho Pareto/trend</strong></td><td>QA/OPS</td><td>Danh sách hành động + due</td><td>Không action = không đóng review</td></tr><tr><td><strong>Template controlled + change notice</strong></td><td>QA/QMS</td><td>FRM-QMS-022</td><td>Template là tài liệu kiểm soát</td></tr><tr><td><strong>Kiểm tra chéo 2 nguồn cho KPI trọng yếu</strong></td><td>Responsible Person KPI</td><td>Biên bản đối soát</td><td>Sai lệch phải có closure</td></tr><tr><td><strong>Access/retention governance</strong></td><td>IT/QA</td><td>FRM-QMS-014 (EDAM) + SOP-QMS-013</td><td>Không có governance = incident</td></tr></tbody></table></div>
 <h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
@@ -119,7 +119,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Kỷ luật hồ sơ</td><td>Ghi đúng/lưu đúng/đúng REV</td></tr><tr><td><strong>L2</strong></td><td>Báo cáo &amp; đối soát</td><td>Report có timestamp + xác nhận</td></tr><tr><td><strong>L3</strong></td><td>Phân tích &amp; chuẩn hóa</td><td>Pareto/trend + nhật ký hành động + template controlled + huấn luyện</td></tr><tr><td><strong>L4</strong></td><td>Governance &amp; tích hợp</td><td>Bảng điều khiển liên phòng + data model + access/retention + incident cẩm nang triển khai (playbook)</td></tr></tbody></table></div>
 <h2>10) Đánh giá</h2>
 <h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
-<div class="quiz"><ol><li>Data dictionary của KPI phải có các trường nào?</li><li>Pareto dùng để trả lời câu hỏi gì trong xưởng CNC?</li><li>Trend chart dùng để phát hiện điều gì?</li><li>Vì sao nhật ký hành động bắt buộc đi kèm phân tích?</li><li>Khi template báo cáo đổi, hồ sơ nào phải tạo?</li><li>KPI trọng yếu phải kiểm tra chéo theo nguyên tắc nào?</li><li>Nêu 02 rủi ro khi quyền truy cập dataset quá rộng.</li><li>Bucket tuổi tồn WIP (tuổi tồn / tuổi tồn) BLACK kích hoạt escalation nào?</li><li>Sai định nghĩa KPI gây hậu quả gì cho OTD?</li><li>Nêu 03 trường hợp phải gắn nhãn UNDER REVIEW.</li><li>dấu vết kiểm toán (audit trail) của báo cáo thể hiện ở đâu?</li><li>Vì sao report phải ghi nguồn SoR?</li><li>Nêu 03 ví dụ KPI phù hợp cho xưởng CNC gia công theo đơn (job shop).</li><li>Scrap cost cần liên kết với dữ liệu nào?</li><li>Downtime analysis cần dữ liệu đầu vào nào?</li><li>Nêu 02 cách khóa template để tránh sửa lẻ tẻ.</li><li>Một hành động tốt phải có những thuộc tính nào?</li><li>Huấn luyện báo cáo theo OJT khác gì hướng dẫn miệng?</li><li>Khi KPI tranh cãi, quyết định đúng là gì?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) áp dụng cho phân tích ra sao?</li><li>Vì sao giữ version report là yêu cầu sẵn sàng đánh giá?</li><li>Khi phát hiện KPI sai 3 tuần liên tiếp, bước xử lý là gì?</li></ol></div>
+<div class="quiz"><ol><li>Data dictionary của KPI phải có các trường nào?</li><li>Pareto dùng để trả lời câu hỏi gì trong xưởng CNC?</li><li>Trend chart dùng để phát hiện điều gì?</li><li>Vì sao nhật ký hành động bắt buộc đi kèm phân tích?</li><li>Khi template báo cáo đổi, hồ sơ nào phải tạo?</li><li>KPI trọng yếu phải kiểm tra chéo theo nguyên tắc nào?</li><li>Nêu 02 rủi ro khi quyền truy cập dataset quá rộng.</li><li>Bucket tuổi tồn WIP (tuổi tồn / tuổi tồn) BLACK kích hoạt escalation nào?</li><li>Sai định nghĩa KPI gây hậu quả gì cho OTD?</li><li>Nêu 03 trường hợp phải gắn nhãn UNDER REVIEW.</li><li>dấu vết kiểm toán (audit trail) của báo cáo thể hiện ở đâu?</li><li>Vì sao report phải ghi nguồn SoR?</li><li>Nêu 03 ví dụ KPI phù hợp cho xưởng CNC gia công theo đơn (job shop).</li><li>Scrap cost cần liên kết với dữ liệu nào?</li><li>Downtime analysis cần dữ liệu đầu vào nào?</li><li>Nêu 02 cách khóa template để tránh sửa lẻ tẻ.</li><li>Một hành động tốt phải có những thuộc tính nào?</li><li>Huấn luyện báo cáo theo OJT khác gì hướng dẫn miệng?</li><li>Khi KPI tranh cãi, quyết định đúng là gì?</li><li>không có bằng chứng thì không qua control gate (No bằng chứng = No gate) áp dụng cho phân tích ra sao?</li><li>Vì sao giữ version report là yêu cầu sẵn sàng đánh giá?</li><li>Khi phát hiện KPI sai 3 tuần liên tiếp, bước xử lý là gì?</li></ol></div>
 <h3>Scenario (≥ 3 tình huống thật)</h3>
 <details>
 <summary>KPI OTD bị tranh cãi giữa Planning và Sales</summary>
@@ -152,7 +152,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h2>11) ĐẠT/KHÔNG ĐẠT criteria</h2>
 <div class="kpi-gate">
-<strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</strong>
+<strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</strong>
 <ul>
 <li>đạt khi hoàn thành OJT đầu ra và performance test đạt, toàn bộ bằng chứng nằm trong SSOT, đúng REV, đúng tên file.</li>
 <li>FAIL ngay khi sai REV, lẫn lộn (mix-up) Job/Part, vượt qua HOLD, chỉnh sửa hồ sơ đã phát hành không có nhật ký, hoặc không truy xuất được bằng chứng.</li>
@@ -166,10 +166,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol><li>KPI không có định nghĩa; số liệu tranh cãi.</li><li>Không có nguồn SoR/timestamp trong dataset.</li><li>Phân tích không có nhật ký hành động.</li><li>Template báo cáo không controlled, không version.</li><li>Không có kiểm tra chéo cho KPI trọng yếu.</li><li>Quyền truy cập dataset rộng; không có access review.</li><li>Không có retention; dataset mất.</li><li>Huấn luyện không có bằng chứng OJT.</li></ol>
 <h2>Tài liệu liên quan</h2>
 <ul>
-<li><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/">ANNEX-QMS-003 — Bộ bằng chứng (Hồ sơ công việc (job dossier) + Data Governance)</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/">ANNEX-QMS-003 — Bộ bằng chứng (Job dossier (job dossier) + Data Governance)</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Quản trị dữ liệu &amp; phân quyền truy cập</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Data Classification &amp; Storage</a></li>
-<li><a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//">WI-OPS-008 — Quản trị Hồ sơ công việc &amp; gói chứng cứ</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//">WI-OPS-008 — Quản trị Job dossier &amp; gói chứng cứ</a></li>
 </ul>
 </div></div></div>
 </div>

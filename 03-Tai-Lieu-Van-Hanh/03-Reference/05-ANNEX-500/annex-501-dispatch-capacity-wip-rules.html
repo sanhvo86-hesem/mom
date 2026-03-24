@@ -132,10 +132,10 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>HR01-MAT</td><td>Material</td><td>Thiếu vật tư, lot/heat, cert hoặc reservation</td><td>WHS xác nhận tồn/lot/cert và SoR đã cập nhật</td></tr>
 <tr><td>HR02-PRG</td><td>Program</td><td>Program hoặc controlled copy chưa phát hành / sai phiên bản (wrong revision)</td><td>ENG phát hành controlled copy và link hồ sơ đúng</td></tr>
 <tr><td>HR03-TOL</td><td>Tooling / Fixture</td><td>Thiếu tool, fixture, jaw, holder, prove-out plan</td><td>Setup Lead xác nhận đủ điều kiện chạy</td></tr>
-<tr><td>HR04-QA</td><td>Quality</td><td>QA hold, FAI chưa xong, gage chưa sẵn, NCR chưa đóng</td><td>QA release bằng bằng chứng đúng cổng kiểm soát</td></tr>
+<tr><td>HR04-QA</td><td>Quality</td><td>QA hold, FAI chưa xong, gage chưa sẵn, NCR chưa đóng</td><td>QA release bằng bằng chứng đúng control gate</td></tr>
 <tr><td>HR05-MCH</td><td>Machine</td><td>Máy down, PM hold, crash, repeat abnormality</td><td>Maintenance/OPS xác nhận machine ready</td></tr>
 <tr><td>HR06-OUT</td><td>Outsource</td><td>Chờ processor, chờ receipt, chờ cert, overdue return</td><td>PUR/WHS xác nhận hàng về và đủ hồ sơ</td></tr>
-<tr><td>HR07-ENG</td><td>Engineering</td><td>Rev change, ECO, thiếu snapshot, unclear requirement</td><td>ENG release set mới và cập nhật bộ hồ sơ công việc (job packet)</td></tr>
+<tr><td>HR07-ENG</td><td>Engineering</td><td>Rev change, ECO, thiếu snapshot, unclear requirement</td><td>ENG release set mới và cập nhật bộ job dossier (job packet)</td></tr>
 <tr><td>HR08-SHIP</td><td>Shipping</td><td>Thiếu bộ hồ sơ giao hàng (ship packet), CoC, label, customer release</td><td>WHS/QA hoàn tất packet và phê duyệt giao hàng</td></tr>
 </tbody></table></div>
 </div>
@@ -144,7 +144,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường dữ liệu tối thiểu</th><th>Phải có</th></tr></thead><tbody>
 <tr><td>Thông tin định danh</td><td>JobNum, Part, Rev, OpSeq, Workcenter/Machine family, Qty open, Ngày đến hạn, Priority class</td></tr>
 <tr><td>Mức sẵn sàng</td><td>Khởi động/Planning release trạng thái, hold code, material ready, setup ready, QA ready, outsource trạng thái</td></tr>
-<tr><td>Điều độ</td><td>Dispatch sequence, planned start, planned finish, người phụ trách cell, next cổng kiểm soát</td></tr>
+<tr><td>Điều độ</td><td>Dispatch sequence, planned start, planned finish, người phụ trách cell, next control gate</td></tr>
 <tr><td>Rủi ro</td><td>Tuổi tồn bucket, bottleneck flag, special handling flag, customer overlay flag, hot-job note</td></tr>
 <tr><td>Hành động</td><td>Next action, người phụ trách, due time, escalation level, bằng chứng link khi đóng</td></tr>
 </tbody></table></div>
@@ -153,7 +153,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>9. Rule coupling với outsource, clean-pack và final release</h2>
 <ul class="tight">
-<li>Không phát job ra outsource nếu processor chưa được duyệt đúng family quy trình, route chưa rõ return cổng kiểm soát hoặc packaging để gửi đi chưa đúng.</li>
+<li>Không phát job ra outsource nếu processor chưa được duyệt đúng family quy trình, route chưa rõ return control gate hoặc packaging để gửi đi chưa đúng.</li>
 <li>Không đẩy job tới clean-pack / final release nếu upstream chưa khóa xong bằng chứng mẫu đầu, CTQ, NCR, leak/clean requirement hoặc bộ hồ sơ giao hàng.</li>
 <li>Khi một decision ở Planning làm thay đổi clean-pack, leak-test, FAI hoặc ship-release window, Planner phải đồng bộ ngay với QA/WHS/ENG; không được coi đây là việc của “khâu sau”.</li>
 </ul>
@@ -161,8 +161,8 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 
 <div class="section"><h2>11. Decision tree khi thiếu năng lực</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Thứ tự ưu tiên quyết định</th><th>Điểm chặn không được vượt</th></tr></thead><tbody>
-<tr><td>Thiếu năng lực ngắn hạn trong 1 ca</td><td>1) clear abnormality; 2) đổi sequence trong cùng family; 3) dời job chưa ready; 4) mở OT ngắn nếu được duyệt</td><td>Không được đẩy job chưa qua mẫu đầu/QA cổng kiểm soát lên chạy chỉ để giữ đầu ra.</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Thứ tự ưu tiên quyết định</th><th>Hold point không được vượt</th></tr></thead><tbody>
+<tr><td>Thiếu năng lực ngắn hạn trong 1 ca</td><td>1) clear abnormality; 2) đổi sequence trong cùng family; 3) dời job chưa ready; 4) mở OT ngắn nếu được duyệt</td><td>Không được đẩy job chưa qua mẫu đầu/QA control gate lên chạy chỉ để giữ đầu ra.</td></tr>
 <tr><td>Thiếu năng lực do bottleneck 2–5 ngày</td><td>1) rebalance giữa nhóm máy (machine family); 2) split lot có kiểm soát; 3) đổi route được ENG/QA chấp thuận; 4) outsource phần phù hợp</td><td>Không làm split lot nếu làm mất trace hoặc làm đứt requirement clean/leak/FAI.</td></tr>
 <tr><td>Thiếu năng lực kéo dài / overload tuần</td><td>1) capacity review cấp L2; 2) reset cam kết; 3) quyết định outsource, OT có kế hoạch, hoặc giới hạn nhận việc mới</td><td>Không để Planner tự hứa lại due với Sales hoặc khách hàng nếu chưa có quyết định điều hành.</td></tr>
 </tbody></table></div>
@@ -174,14 +174,14 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>WIP tuổi tồn snapshot</td><td>Nhìn rõ job đỏ/đen, người phụ trách và action</td><td>Planner</td></tr>
 <tr><td>Escalation / hot-job nhật ký</td><td>Chứng minh ai duyệt, job nào bị ảnh hưởng và plan recovery</td><td>Ops Manager</td></tr>
 <tr><td>Capacity review minutes</td><td>Ghi quyết định về OT, outsource, rebalance, re-plan</td><td>Ops Manager + Planning Team Leader</td></tr>
-<tr><td>Shortage / constraint nhật ký</td><td>Theo dõi material, tool, machine, QA cổng kiểm soát và ETA khôi phục</td><td>Planner + Supervisor</td></tr>
+<tr><td>Shortage / constraint nhật ký</td><td>Theo dõi material, tool, machine, QA control gate và ETA khôi phục</td><td>Planner + Supervisor</td></tr>
 </tbody></table></div>
 </div>
 
 <div class="section"><h2>13. Tài liệu liên kết</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Hướng dẫn thao tác điều độ hằng ca.</td></tr>
-<tr><td><a href="annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>MRR, cổng kiểm soát và đồng bộ bàn giao.</td></tr>
+<tr><td><a href="annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>MRR, control gate và đồng bộ bàn giao.</td></tr>
 <tr><td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation chain và SLA xử lý.</td></tr>
 <tr><td><a href="annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Cadence họp tầng và nhật ký hành động.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Khung thủ tục planning/scheduling/dispatch.</td></tr>

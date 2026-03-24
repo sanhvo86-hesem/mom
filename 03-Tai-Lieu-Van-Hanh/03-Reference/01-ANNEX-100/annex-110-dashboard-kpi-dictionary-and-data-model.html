@@ -68,11 +68,11 @@ ul.tight li {margin:4px 0;}
         </div>
       </div>
       
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết kế bảng điều khiển, xây board điều hành, họp tầng, xem xét của lãnh đạo, đánh giá hiệu lực cải tiến, hoặc khi cần thống nhất định nghĩa KPI giữa phòng ban, báo cáo khách hàng và dữ liệu số.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết kế bảng điều khiển, xây board điều hành, họp tầng, management review, đánh giá hiệu lực cải tiến, hoặc khi cần thống nhất định nghĩa KPI giữa phòng ban, báo cáo khách hàng và dữ liệu số.</div>
 <h1>ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</h1>
 
 <div class="section"><h2>1. Vai trò bắt buộc của ANNEX này</h2>
-<p>ANNEX này là tài liệu chuẩn duy nhất cho định nghĩa KPI, công thức tính, diễn tập-down key, cut-off, refresh rule, nguồn dữ liệu và người phụ trách của board điều hành. Tất cả bảng điều khiển số, bảng họp tầng, report tuần/tháng và slide xem xét của lãnh đạo phải bám đúng ANNEX này.</p>
+<p>ANNEX này là tài liệu chuẩn duy nhất cho định nghĩa KPI, công thức tính, diễn tập-down key, cut-off, refresh rule, nguồn dữ liệu và người phụ trách của board điều hành. Tất cả bảng điều khiển số, bảng họp tầng, report tuần/tháng và slide management review phải bám đúng ANNEX này.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Dùng đúng công thức KPI đã phát hành, lấy số từ đúng nguồn SoR hoặc SSOT, chỉ dùng dữ liệu đã có gói phát hành để ra quyết định và duy trì khả năng diễn tập-down tới đối tượng tác nghiệp.</div>
 <ul class="tight" style="padding-left:18px;">
 <li>Một KPI chỉ tồn tại khi trả lời được 5 câu hỏi: đo cái gì, để quyết định gì, dùng nguồn nào, ai chịu trách nhiệm và khi nào phải hành động.</li>
@@ -93,11 +93,11 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>3. KPI lõi dùng cho điều hành nhà máy</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>KPI ID</th><th>KPI</th><th>Mục đích quyết định</th><th>Numerator / Basis</th><th>Exclusion / lưu ý tính</th><th>SoR / SSOT</th><th>Responsible Person</th><th>Cadence</th><th>Diễn tập-down key</th></tr></thead><tbody>
 <tr><td>KPI-01</td><td>OTD Release</td><td>Quyết định giữ lịch, split ship, đổi ưu tiên, báo khách</td><td>Số release giao đúng hạn / tổng release đến hạn</td><td>Không tính các due đã được khách chấp thuận đổi chính thức; partial ship phải tính theo release đã cam kết</td><td>Epicor ShipHead/ShipDtl / SSOT bộ hồ sơ giao hàng (ship packet)</td><td>Planning Team Leader</td><td>Ngày/tuần</td><td>OrderNum, JobNum, PackID</td></tr>
-<tr><td>KPI-02</td><td>Promise-Date Risk</td><td>Nhìn sớm lô có nguy cơ trễ trước khi trễ thật</td><td>Số release có remaining work vượt khả năng thời gian còn lại</td><td>Đánh giá trên due hiện hành, load thực tế và các cổng kiểm soát (gate) còn mở</td><td>Epicor Job/Dispatch + ANNEX-501</td><td>Planning Team Leader</td><td>Mỗi ca</td><td>JobNum, OprSeq, WorkCenter</td></tr>
+<tr><td>KPI-02</td><td>Promise-Date Risk</td><td>Nhìn sớm lô có nguy cơ trễ trước khi trễ thật</td><td>Số release có remaining work vượt khả năng thời gian còn lại</td><td>Đánh giá trên due hiện hành, load thực tế và các control gate (gate) còn mở</td><td>Epicor Job/Dispatch + ANNEX-501</td><td>Planning Team Leader</td><td>Mỗi ca</td><td>JobNum, OprSeq, WorkCenter</td></tr>
 <tr><td>KPI-03</td><td>WIP Tuổi tồn (aging)</td><td>Nhận diện Job treo vô chủ, queue tắc, hold kéo dài</td><td>Số job/operation theo bucket 0–2, 3–7, 8–14, &gt;14 ngày</td><td>Tuổi tồn bắt đầu từ last move hoặc release theo rule trong ANNEX-501</td><td>Epicor JobHead/JobOper</td><td>Planning Team Leader</td><td>Mỗi ca / ngày</td><td>JobNum, OprSeq, WorkCenter, HoldCode</td></tr>
 <tr><td>KPI-04</td><td>Dispatch Adherence</td><td>Kiểm kỷ luật điều độ và tính ổn định của plan</td><td>Số operation chạy đúng cửa sổ dispatch / tổng operation đã phát hành</td><td>Không loại trừ hot-job nếu hot-job đã được phê duyệt đúng ladder</td><td>Epicor dispatch execution + M365 action bằng chứng</td><td>Planning + Production</td><td>Ngày</td><td>JobNum, Machine, Shift</td></tr>
 <tr><td>KPI-05</td><td>FPY</td><td>Đánh giá khả năng làm đúng ngay lần đầu</td><td>Số lô đạt lần đầu / tổng lô vào công đoạn kiểm</td><td>Re-inspect cùng lỗi không được tính là pass mới</td><td>M365 NCR/Hold + Epicor reference</td><td>QA Manager</td><td>Tuần</td><td>JobNum, PartNum, Rev, NCR ID</td></tr>
-<tr><td>KPI-06</td><td>QC Hold SLA</td><td>Quyết định nâng cấp xử lý hold và ưu tiên nguồn lực</td><td>Số hold xử lý đúng SLA / tổng hold mở đến hạn</td><td>SLA tính theo severity và loại cổng kiểm soát; stop-ship thiếu chứng từ luôn là đỏ</td><td>M365 QC Hold Register + Epicor reference</td><td>QA Manager</td><td>Ngày</td><td>Hold ID, JobNum, PackID</td></tr>
+<tr><td>KPI-06</td><td>QC Hold SLA</td><td>Quyết định nâng cấp xử lý hold và ưu tiên nguồn lực</td><td>Số hold xử lý đúng SLA / tổng hold mở đến hạn</td><td>SLA tính theo severity và loại control gate; stop-ship thiếu chứng từ luôn là đỏ</td><td>M365 QC Hold Register + Epicor reference</td><td>QA Manager</td><td>Ngày</td><td>Hold ID, JobNum, PackID</td></tr>
 <tr><td>KPI-07</td><td>NCR Repeat Rate</td><td>Nhìn lỗi lặp lại và kích hoạt CAPA / đổi hệ thống</td><td>Số NCR repeat cùng failure mode / tổng NCR</td><td>Repeat phải nhìn theo defect family, work center, tool/fixture, supplier hoặc processor</td><td>M365 NCR Register</td><td>QA/QMS</td><td>Tuần/tháng</td><td>NCR ID, defect family, work center</td></tr>
 <tr><td>KPI-08</td><td>Downtime Impact</td><td>Quyết định chuyển máy, tăng ca, ưu tiên maintenance</td><td>Giờ dừng làm ảnh hưởng due / tổng giờ kế hoạch</td><td>Phải tách planned maintenance khỏi unplanned downtime</td><td>Epicor labor/machine nhật ký + maintenance nhật ký</td><td>Production / Maintenance</td><td>Ca/ngày</td><td>Machine ID, JobNum, reason code</td></tr>
 <tr><td>KPI-09</td><td>Bộ hồ sơ giao hàng Completeness</td><td>Cho phép hoặc chặn xác nhận giao hàng (ship confirm)</td><td>Số lô đủ packet / tổng lô dự kiến ship</td><td>Thiếu 1 field CoC bắt buộc hoặc thiếu SSCC đối soát cũng tính fail</td><td>Bộ hồ sơ giao hàng SSOT + Epicor phê duyệt giao hàng (ship release)</td><td>WHS Supervisor</td><td>Ngày</td><td>PackID, SSCC, CoC ID</td></tr>
@@ -150,7 +150,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Ngữ cảnh dùng</th><th>Cut-off / refresh</th><th>Nguồn ưu tiên</th><th>Rule khi mismatch</th></tr></thead><tbody>
 <tr><td>T1 đầu ca</td><td>Chốt trước họp tối thiểu 15 phút</td><td>Epicor report / bảng điều khiển đã refresh</td><td>Dùng Epicor để quyết định, mở Data Vấn đề, không chờ bảng điều khiển sửa xong</td></tr>
 <tr><td>T2/T3</td><td>Chốt theo lịch họp trong ANNEX-504</td><td>Bảng điều khiển + export SoR</td><td>Nếu số trend lệch SoR, vấn đề người phụ trách phải giải trình ngay trong cuộc họp</td></tr>
-<tr><td>T4 / Xem xét của lãnh đạo</td><td>Snapshot đã freeze theo tháng/quý</td><td>Gói phát hành đã phê duyệt</td><td>Mọi sửa số của kỳ đã freeze phải đi qua change hồ sơ</td></tr>
+<tr><td>T4 / Management review</td><td>Snapshot đã freeze theo tháng/quý</td><td>Gói phát hành đã phê duyệt</td><td>Mọi sửa số của kỳ đã freeze phải đi qua change hồ sơ</td></tr>
 <tr><td>Customer report</td><td>Theo kỳ khách hàng yêu cầu</td><td>Dataset release đã phê duyệt</td><td>Không gửi report ngoài gói phát hành</td></tr>
 </tbody></table></div>
 <ul class="tight" style="padding-left:18px;">
@@ -159,8 +159,8 @@ ul.tight li {margin:4px 0;}
 <li>Tất cả bảng điều khiển phải hiển thị <strong>lần refresh gần nhất</strong>, <strong>người phụ trách dữ liệu</strong> và <strong>số vấn đề dữ liệu đang mở</strong>.</li>
 </ul></div>
 
-<div class="section"><h2>8. Data cổng kiểm soát chất lượng (quality gate)</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Kiểm cái gì</th><th>Không đạt khi</th><th>Phản ứng</th></tr></thead><tbody>
+<div class="section"><h2>8. Data control gate chất lượng (quality gate)</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Control gate</th><th>Kiểm cái gì</th><th>Không đạt khi</th><th>Phản ứng</th></tr></thead><tbody>
 <tr><td>Completeness</td><td>Field bắt buộc có đủ không</td><td>Thiếu JobNum, OprSeq, PackID, due, người phụ trách hoặc severity</td><td>Không publish KPI liên quan; mở Data Vấn đề</td></tr>
 <tr><td>Timeliness</td><td>Dữ liệu có đúng cửa sổ refresh không</td><td>Refresh quá cut-off đã công bố</td><td>Đánh cờ đỏ “stale data”</td></tr>
 <tr><td>Uniqueness</td><td>Bản ghi có bị duplicate không</td><td>Trùng giao dịch/key gây double count</td><td>Chặn gói phát hành</td></tr>
@@ -168,7 +168,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>Reasonableness</td><td>Số có nằm trong logic vận hành không</td><td>OTD >100%, WIP âm, hold SLA âm, uptime bất khả thi</td><td>Fail release và giữ bảng điều khiển ở trạng thái cảnh báo</td></tr>
 </tbody></table></div></div>
 
-<div class="section"><h2>9. Gói phát hành và kiểm soát thay đổi</h2>
+<div class="section"><h2>9. Gói phát hành và change control</h2>
 <div class="two-col">
 <div class="card"><h3>Gói phát hành tối thiểu</h3><ul class="tight" style="padding-left:18px;">
 <li>Yêu cầu thay đổi được phê duyệt</li>
@@ -193,8 +193,8 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Pack / ngữ cảnh dùng</th><th>Responsible Person chuẩn bị</th><th>Freeze-date / cut-off</th><th>Khi nào cần exception note</th><th>Hồ sơ / WI dùng để giữ vết</th></tr></thead><tbody>
 <tr><td>T1/T2 board trong ngày</td><td>Planning / Production / Responsible Person QA của board</td><td>Trước họp 10–15 phút</td><td>Refresh fail, late posting, thiếu diễn tập-down, dùng export SoR thay bảng điều khiển</td><td><a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> ghi chú điều hành / board note</td></tr>
 <tr><td>T3 tuần / tháng</td><td>Responsible Person Bảng điều khiển + Process Owner</td><td>Theo lịch pack đã công bố</td><td>Dữ liệu chưa đầy đủ, có reclass/backfill sau cut-off, vấn đề mapping còn mở</td><td>WI-901 + data vấn đề / change hồ sơ</td></tr>
-<tr><td>T4 / xem xét của lãnh đạo</td><td>QMS / Process Owner / bảng điều khiển người phụ trách</td><td>Freeze snapshot theo kỳ review</td><td>Số đã freeze nhưng cần giải thích ngoại lệ, offline fallback, manual pack hoặc SoR correction sau close</td><td><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> + <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td></tr>
-<tr><td>Customer / external disclosure pack</td><td>Process Owner + authorized người phê duyệt</td><td>Freeze theo phiên bản được gửi</td><td>Nội bộ chưa khớp external pack hoặc phải dùng approved exception logic</td><td>Gói phát hành / communication hồ sơ</td></tr>
+<tr><td>T4 / management review</td><td>QMS / Process Owner / bảng điều khiển người phụ trách</td><td>Freeze snapshot theo kỳ review</td><td>Số đã freeze nhưng cần giải thích ngoại lệ, offline fallback, manual pack hoặc SoR correction sau close</td><td><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> + <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td></tr>
+<tr><td>Customer / external disclosure pack</td><td>Process Owner + authorized approver</td><td>Freeze theo phiên bản được gửi</td><td>Nội bộ chưa khớp external pack hoặc phải dùng approved exception logic</td><td>Gói phát hành / communication hồ sơ</td></tr>
 </tbody></table></div>
 <div class="callout-info">Khi bảng điều khiển pack bị gắn exception note, người phụ trách phải chỉ rõ <b>phạm vi KPI bị ảnh hưởng</b>, <b>nguồn tạm thời dùng để ra quyết định</b>, <b>ETA khôi phục</b> và <b>thời điểm backfill/re-review</b>. Không để bảng điều khiển đang lỗi nhưng pack vẫn được trình bày như dữ liệu bình thường.</div></div>
 
@@ -207,7 +207,7 @@ ul.tight li {margin:4px 0;}
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Cách Planning dùng KPI luồng/capacity để ra quyết định trong ngày.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Quy tắc bằng chứng, retention, completeness và linkage của hồ sơ số.</td></tr>
 <tr><td><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> / <a href="../../01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Review xu hướng và đóng vòng lặp cải tiến.</td></tr>
-<tr><td><a href="../01-ANNEX-100/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a></td><td>Khóa publish, access, refresh, failure control và rollback của bảng điều khiển production.</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> / <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></td><td>Rà access định kỳ, request cấp/đổi/thu hồi quyền và privileged/deputy governance.</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td><td>Khóa pack control, freeze-date, exception note và quyết định ở xem xét của lãnh đạo.</td></tr></tbody></table></div></div>
+<tr><td><a href="../01-ANNEX-100/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a></td><td>Khóa publish, access, refresh, failure control và rollback của bảng điều khiển production.</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> / <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></td><td>Rà access định kỳ, request cấp/đổi/thu hồi quyền và privileged/deputy governance.</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td><td>Khóa pack control, freeze-date, exception note và quyết định ở management review.</td></tr></tbody></table></div></div>
 
     </div>
   </div>

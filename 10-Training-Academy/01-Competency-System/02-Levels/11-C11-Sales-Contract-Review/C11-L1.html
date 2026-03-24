@@ -137,11 +137,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><strong>Tổ chức ĐƯỢC PHÉP áp dụng chuẩn hóa biểu mẫu/CRM/ERP để tự động hóa RFQ nhật ký, kiểm soát phiên bản và phê duyệt điện tử.</strong> <span class="iso">ISO 7.1.3</span></div>
 <p>Khi số hóa, phải đảm bảo phân quyền, backup, dấu vết kiểm toán (audit trail); tránh tạo 'hệ thống rác' nhiều phiên bản.</p>
 </div>
-</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L1: biết nhận đúng dữ liệu – ghi đúng hồ sơ – báo đúng người. Không tự suy đoán.</strong></div><h3>3.1. Vì sao C11 là “cổng chất lượng” của xưởng CNC lệnh sản xuất?</h3><p>Trong mô hình <em>chủng loại cao (high-mix) / sản lượng thấp đến trung bình (low-to-mid volume)</em>, sai lệch xuất phát từ khâu đầu (RFQ/PO) khó sửa ở cuối vì đã “đóng băng” trên: đường chạy dao, đồ gá, vật tư, lịch máy và thậm chí cả chứng từ xuất khẩu. Thực tế đánh giá ISO cho thấy nhiều <em>nonconformity</em> không nằm ở máy móc mà nằm ở “hệ thống thông tin”: dùng sai phiên bản (wrong revision), hiểu sai note, không kiểm soát thay đổi, không lưu hồ sơ rà soát hợp đồng.</p><p><strong>Nguyên lý:</strong> lỗi “nhận sai yêu cầu” có chi phí cao nhất (COPQ cao) vì tạo ra lãng phí kép: <em>sai ngay lần đầu</em> + <em>điều chỉnh muộn</em>. Do đó, C11 phải được vận hành như một quy trình có dữ liệu, có gating, có phản ứng.</p><h3>3.2. Thuật ngữ cốt lõi (dùng thống nhất trong HESEM)</h3><ul>
+</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L1: biết nhận đúng dữ liệu – ghi đúng hồ sơ – báo đúng người. Không tự suy đoán.</strong></div><h3>3.1. Vì sao C11 là “cổng chất lượng” của xưởng CNC lệnh sản xuất?</h3><p>Trong mô hình <em>chủng loại cao (high-mix) / sản lượng thấp đến trung bình (low-to-mid volume)</em>, sai lệch xuất phát từ khâu đầu (RFQ/PO) khó sửa ở cuối vì đã “đóng băng” trên: đường chạy dao, đồ gá, vật tư, lịch máy và thậm chí cả chứng từ xuất khẩu. Thực tế đánh giá ISO cho thấy nhiều <em>nonconformity</em> không nằm ở máy móc mà nằm ở “hệ thống thông tin”: dùng sai phiên bản (wrong revision), hiểu sai note, không change control, không lưu hồ sơ rà soát hợp đồng.</p><p><strong>Nguyên lý:</strong> lỗi “nhận sai yêu cầu” có chi phí cao nhất (COPQ cao) vì tạo ra lãng phí kép: <em>sai ngay lần đầu</em> + <em>điều chỉnh muộn</em>. Do đó, C11 phải được vận hành như một quy trình có dữ liệu, có gating, có phản ứng.</p><h3>3.2. Thuật ngữ cốt lõi (dùng thống nhất trong HESEM)</h3><ul>
 <li><strong>RFQ (Request for Quotation):</strong> yêu cầu báo giá – chưa tạo cam kết. RFQ thiếu dữ liệu; nhiệm vụ của HESEM là “đóng gói yêu cầu” bằng clarification.</li>
 <li><strong>RFI/Clarification:</strong> câu hỏi làm rõ; phải có <em>documented bằng chứng</em> (email/biên bản) và phải “đóng” trước khi báo giá khi là CTQ.</li>
 <li><strong>Báo giá:</strong> báo giá – chứa assumptions/exclusions. Báo giá phải có version và người duyệt (approval).</li>
-<li><strong>PO/Hợp đồng:</strong> đơn hàng/ hợp đồng. Khi PO đã phát hành, thay đổi phải theo ECO/Kiểm soát thay đổi.</li>
+<li><strong>PO/Hợp đồng:</strong> đơn hàng/ hợp đồng. Khi PO đã phát hành, thay đổi phải theo ECO/Change control.</li>
 <li><strong>CTQ (Critical-to-Quality):</strong> đặc tính ảnh hưởng chức năng/lắp ráp/an toàn/độ kín/hiệu suất. CTQ không chỉ là “dung sai chặt” mà còn là: nhám, sạch, không bavia, chứng từ, đóng gói.</li>
 </ul><h3>3.3. Mô hình “3 lớp yêu cầu” trong rà soát hợp đồng</h3><div class="cols-2">
 <div class="figure">
@@ -267,7 +267,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vstep">
 <div class="vnum">11</div>
 <div class="vtext">
-<strong>Kiểm soát thay đổi (khi phát sinh)</strong>
+<strong>Change control (khi phát sinh)</strong>
 <p>Mọi thay đổi sau PO đi qua Change Notice; đánh giá tác động; cập nhật tài liệu; truyền đạt đến xưởng.</p>
 </div>
 </div>
@@ -523,7 +523,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>6</td>
 </tr>
 <tr>
-<td><strong>Bàn giao/Kiểm soát thay đổi/Communication</strong></td>
+<td><strong>Bàn giao/Change control/Communication</strong></td>
 <td>25%</td>
 <td>Apply/Evaluate</td>
 <td>Tình huống + writing</td>
@@ -577,7 +577,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>Xử lý thay đổi &amp; thương mại</strong></td>
 <td>Chấp nhận thay đổi không kiểm soát.</td>
 <td>Biết escalations; lưu bằng chứng.</td>
-<td>Kiểm soát thay đổi đúng; đánh giá tác động.</td>
+<td>Change control đúng; đánh giá tác động.</td>
 <td>Thiết kế ma trận phê duyệt; tối ưu win rate &amp; margin.</td>
 </tr>
 </tbody></table><div class="callout"><strong>Điều kiện công nhận Level 1:</strong> Tổng điểm rubric ≥ 70% và <strong>không vi phạm gating</strong> (sai phiên bản (wrong revision)/thiếu hồ sơ).</div><h2>10. Bảng kiểm tự đánh giá trước khi đề nghị xét Level</h2><ul>

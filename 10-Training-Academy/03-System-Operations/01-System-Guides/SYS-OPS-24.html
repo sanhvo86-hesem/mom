@@ -70,7 +70,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <div class="badge"><span class="dot"></span>Training Mô-đun SYS-OPS-24</div>
 <h1 style="margin-top:10px">SOP-QMS-012 Admin Bàn giao Build Sheet: SoD, bằng chứng rules, acceptance tests</h1>
-<p class="muted">Đào tạo thực chiến để triển khai/kiểm soát Build Sheet quản trị M365 theo chuẩn sẵn sàng đánh giá. Nguyên tắc cứng: <b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</b>.</p>
+<p class="muted">Đào tạo thực chiến để triển khai/kiểm soát Build Sheet quản trị M365 theo chuẩn sẵn sàng đánh giá. Nguyên tắc cứng: <b>không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</b>.</p>
 <div class="tag blue">Phiên bản</div>
 </div>
 <div class="note">
@@ -78,7 +78,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><strong>TargetRoles:</strong> Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor</li>
 <li><strong>Thời lượng chuẩn:</strong> Lý thuyết 90 phút • Workshop 90 phút • OJT theo vai trò 60–120 phút • Performance test 45 phút</li>
-<li><strong>Kích hoạt đào tạo:</strong> Khi tạo mới Site/Library/Hồ sơ công việc (job dossier) template; khi thay đổi Sharing/DLP/Retention/Access; khi chuẩn bị customer đánh giá; khi phát hiện vượt qua cổng kiểm soát hoặc thiếu bằng chứng.</li>
+<li><strong>Kích hoạt đào tạo:</strong> Khi tạo mới Site/Library/Job dossier (job dossier) template; khi thay đổi Sharing/DLP/Retention/Access; khi chuẩn bị customer đánh giá; khi phát hiện vượt qua control gate hoặc thiếu bằng chứng.</li>
 <li><strong>Điều kiện trước:</strong> Có tài khoản M365 đúng vai trò; truy cập được QMS-Hồ sơ; có 01 tình huống thay đổi thật hoặc tình huống mô phỏng có dữ kiện.</li>
 </ul>
 </div>
@@ -101,23 +101,23 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card" id="sec2">
 <h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
-<p><b>Mô-đun tồn tại để chặn 3 nhóm rủi ro chết người:</b> (1) sai Rev/phiên bản dẫn tới chạy sai chương trình, dùng sai bản vẽ; (2) thiếu/giả bằng chứng làm đánh giá không đạt; (3) mở quyền sai dẫn tới lộ dữ liệu khách hàng, xoá hồ sơ, vượt qua cổng kiểm soát.</p>
-<p><b>Cổng kiểm soát/Bàn giao:</b> Build Sheet là <b>single source</b> cho mọi cấu hình ảnh hưởng QMS (SharePoint/Teams/Purview/Entra). IT cấu hình theo Build Sheet; QA/QMS xác nhận đạt theo acceptance tests; Supervisor/Process Owner chịu trách nhiệm nghiệp vụ và quyết định HOLD/GO theo bằng chứng.</p>
+<p><b>Mô-đun tồn tại để chặn 3 nhóm rủi ro chết người:</b> (1) sai Rev/phiên bản dẫn tới chạy sai chương trình, dùng sai bản vẽ; (2) thiếu/giả bằng chứng làm đánh giá không đạt; (3) mở quyền sai dẫn tới lộ dữ liệu khách hàng, xoá hồ sơ, vượt qua control gate.</p>
+<p><b>Control gate/Bàn giao:</b> Build Sheet là <b>single source</b> cho mọi cấu hình ảnh hưởng QMS (SharePoint/Teams/Purview/Entra). IT cấu hình theo Build Sheet; QA/QMS xác nhận đạt theo acceptance tests; Supervisor/Process Owner chịu trách nhiệm nghiệp vụ và quyết định HOLD/GO theo bằng chứng.</p>
 <h3>Trách nhiệm theo vai trò (áp dụng riêng + tiêu chí đạt khác nhau)</h3>
 <table class="form-table">
 <tr><th>Vai trò</th><th>Phần áp dụng riêng trong mô-đun</th><th>Tiêu chí đạt tối thiểu</th></tr>
-<tr><td><b>Operator</b></td><td>Dùng đúng bản Released; tạo bằng chứng tại điểm dùng (kiosk/line); phản ứng 60 giây khi phát hiện sai Rev/lẫn lộn (mix-up)</td><td>Thực hiện đúng 5 bước kiểm tra Rev trước thao tác + ghi MRR 01 tình huống HOLD</td></tr>
+<tr><td><b>Operator</b></td><td>Dùng đúng bản Released; tạo bằng chứng tại point-of-use (kiosk/line); phản ứng 60 giây khi phát hiện sai Rev/lẫn lộn (mix-up)</td><td>Thực hiện đúng 5 bước kiểm tra Rev trước thao tác + ghi MRR 01 tình huống HOLD</td></tr>
 <tr><td><b>Setup</b></td><td>Đối chiếu Rev giữa bản vẽ–setup sheet–program; khóa thay đổi sau closeout; nộp bằng chứng setup</td><td>Hoàn tất bảng kiểm step liên quan setup + tạo đủ bằng chứng theo naming rule</td></tr>
 <tr><td><b>Programmer</b></td><td>Quy tắc quản lý chương trình CNC theo Released/Draft; traceable program đầu ra; chặn chạy program chưa Released</td><td>Thiết lập 01 tình huống “Released vs Draft” đạt acceptance test TC-01</td></tr>
 <tr><td><b>QC</b></td><td>Kiểm tra tính toàn vẹn hồ sơ; truy xuất hồ sơ ≤3 phút; phát hiện thiếu packet thì BLOCK Ship</td><td>Chạy 01 scenario “bộ hồ sơ giao hàng (ship packet) thiếu IR” và ra quyết định BLOCK + ghi MRR</td></tr>
 <tr><td><b>QA</b></td><td>Định nghĩa đạt/không đạt; chạy acceptance tests; ký sign-off go-live; quản trị bộ bằng chứng</td><td>Ký đúng 01 bộ kết quả UAT/Acceptance + phát hành đánh giá pack</td></tr>
 <tr><td><b>Warehouse</b></td><td>phê duyệt giao hàng (ship release) Validator; kiểm tra packet; kiểm soát nhãn/traceability; block rủi ro giao hàng</td><td>Chứng minh 0 lần ship thiếu packet trong bài test + lưu bằng chứng</td></tr>
 <tr><td><b>Purchasing</b></td><td>Kiểm soát tài liệu nhà cung cấp; điều kiện đặc biệt (công đoạn đặc biệt); lưu chứng từ đúng nơi</td><td>Gắn đúng yêu cầu chứng từ vào planning packet + lưu đúng path</td></tr>
-<tr><td><b>Planner</b></td><td>Khởi tạo Hồ sơ công việc đúng template; kiểm soát lẫn lộn; kích hoạt hold đúng điểm chặn</td><td>Tạo 01 Hồ sơ công việc mẫu đúng cấu trúc + tạo MRR closeout</td></tr>
+<tr><td><b>Planner</b></td><td>Khởi tạo Job dossier đúng template; kiểm soát lẫn lộn; kích hoạt hold đúng hold point</td><td>Tạo 01 Job dossier mẫu đúng cấu trúc + tạo MRR closeout</td></tr>
 <tr><td><b>Maintenance</b></td><td>Lưu/hiệu chuẩn hồ sơ; chặn sử dụng gage OOT; liên kết OOT với hold</td><td>Chạy phản ứng 60 giây cho tình huống gage OOT + ghi MRR</td></tr>
 <tr><td><b>EHS</b></td><td>Lưu hồ sơ an toàn liên quan thay đổi layout/kiosk/thiết bị; chặn vượt qua PPE/LOTO</td><td>Kiểm tra bằng chứng EHS trong change package + ký xác nhận</td></tr>
 <tr><td><b>Estimator (SAL-03)</b></td><td>Đưa điều khoản contract về retention/confidential; xác nhận external sharing scope</td><td>Xác nhận đúng 01 retention tier + guardrail external theo hợp đồng</td></tr>
-<tr><td><b>Supervisor</b></td><td>Quyết định HOLD/GO; cưỡng chế “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”; phân công OJT</td><td>Thực hiện review 01 change package và ra quyết định dựa trên bằng chứng</td></tr>
+<tr><td><b>Supervisor</b></td><td>Quyết định HOLD/GO; cưỡng chế “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”; phân công OJT</td><td>Thực hiện review 01 change package và ra quyết định dựa trên bằng chứng</td></tr>
 </table>
 <div class="note">
 <strong>Liên kết HESEM nội bộ</strong>
@@ -129,13 +129,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card" id="sec3">
-<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + “điểm chặn”</h2>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + “hold point”</h2>
 <h3>3.1 Vị trí trong chuỗi E2E</h3>
 <p>Mô-đun kích hoạt mạnh nhất tại các đoạn: <b>Báo giá/Hợp đồng → Planning → Engineering</b> (định nghĩa yêu cầu, IA, retention, access) và kéo xuyên suốt đến <b>Ship</b> (phê duyệt giao hàng packet). Mô-đun này tạo “hạ tầng bằng chứng” cho toàn chuỗi.</p>
-<p><b>Điểm chặn chính:</b> Không GO-LIVE cấu hình; không phát hành Released template; không ship; không mở external sharing khi thiếu Build Sheet validated + bộ bằng chứng.</p>
+<p><b>Hold point chính:</b> Không GO-LIVE cấu hình; không phát hành Released template; không ship; không mở external sharing khi thiếu Build Sheet validated + bộ bằng chứng.</p>
 <h3>3.2 Luồng bàn giao bắt buộc (Đầu vào → Đầu ra)</h3>
 <table class="form-table">
-<tr><th>Bước</th><th>Đầu vào</th><th>Responsible Person</th><th>Đầu ra</th><th>Điểm chặn</th></tr>
+<tr><th>Bước</th><th>Đầu vào</th><th>Responsible Person</th><th>Đầu ra</th><th>Hold point</th></tr>
 <tr>
 <td>1</td>
 <td>Yêu cầu thay đổi (CR) + điều khoản hợp đồng + phân loại dữ liệu</td>
@@ -187,7 +187,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Build Sheet thiếu Acceptance Test → QA không có chuẩn đạt/không đạt → go-live cảm tính.</li>
 <li>IT vừa cấu hình vừa tự ký “đạt” → vi phạm SoD → đánh giá không đạt.</li>
 <li>Bằng chứng chụp thiếu ngữ cảnh (không thấy site/library/giá trị setting) → bằng chứng vô hiệu.</li>
-<li>Bằng chứng bị cắt/ghi chú đè lên bản gốc → mất tính toàn vẹn hồ sơ.</li>
+<li>Bằng chứng bị cắt/ghi chú đè lên master copy → mất tính toàn vẹn hồ sơ.</li>
 <li>Retention label gắn sai scope → hồ sơ hết hạn sớm hoặc không khoá xoá → mất hồ sơ.</li>
 <li>External sharing mở vượt baseline → rò dữ liệu khách hàng → NCR/MRB + vi phạm hợp đồng.</li>
 <li>Permission “break” theo từng file → quyền rơi rớt, không review được → lộ/thiếu quyền.</li>
@@ -263,7 +263,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Wrong revision (bản vẽ/program/setup sheet)</td>
 <td>DỪNG thao tác; treo thẻ HOLD; chụp ảnh màn hình vị trí file + Rev; thông báo Supervisor + QA.</td>
 <td>Operator/Setup/Programmer</td>
-<td>01 nhật ký HOLD + ảnh bằng chứng “Released vs Draft” + link Hồ sơ công việc</td>
+<td>01 nhật ký HOLD + ảnh bằng chứng “Released vs Draft” + link Job dossier</td>
 </tr>
 <tr>
 <td>Lẫn lộn/lẫn lô hoặc nhãn traceability sai</td>
@@ -273,9 +273,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Thiếu bằng chứng/bằng chứng không truy xuất</td>
-<td>BLOCK cổng kiểm soát; ghi “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”; mở ticket truy xuất; không tiếp tục bước kế tiếp.</td>
-<td>Bất kỳ vai trò tại cổng kiểm soát</td>
-<td>01 ticket + ghi chú cổng kiểm soát + ảnh màn hình lỗi truy xuất</td>
+<td>BLOCK control gate; ghi “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”; mở ticket truy xuất; không tiếp tục bước kế tiếp.</td>
+<td>Bất kỳ vai trò tại control gate</td>
+<td>01 ticket + ghi chú control gate + ảnh màn hình lỗi truy xuất</td>
 </tr>
 <tr>
 <td>Gage OOT hoặc thiếu cal cert</td>
@@ -284,7 +284,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>01 nhật ký OOT + link cal cert + danh sách job bị ảnh hưởng</td>
 </tr>
 <tr>
-<td>Vượt qua cổng kiểm soát (tự ý mở quyền, tự ý ship, tự ý publish)</td>
+<td>Vượt qua control gate (tự ý mở quyền, tự ý ship, tự ý publish)</td>
 <td>STOP ngay; chụp bằng chứng hoạt động; thu hồi quyền tạm thời theo quy trình; báo Supervisor.</td>
 <td>Supervisor + IT + QA</td>
 <td>Access DCR hồ sơ (FRM-QMS-015) + snapshot before/after</td>
@@ -301,8 +301,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Bằng chứng/MRR, “lỗi điển hình”</h2>
 <table class="form-table">
 <tr><th>#</th><th>Bước vận hành</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Lỗi điển hình cần chặn</th></tr>
-<tr><td>1</td><td>Xác nhận scope thay đổi + điểm chặn (GO-LIVE/SHIP)</td><td>Supervisor</td><td>CR/Scope note + quyết định cổng kiểm soát</td><td>Scope mơ hồ, thiếu bước ảnh hưởng</td></tr>
-<tr><td>2</td><td>Khóa SoD: chỉ định người cấu hình và người phê duyệt khác nhau</td><td>Supervisor + QA</td><td>RACI + danh sách người tham gia</td><td>1 người làm cả 2 vai</td></tr>
+<tr><td>1</td><td>Xác nhận scope thay đổi + hold point (GO-LIVE/SHIP)</td><td>Supervisor</td><td>CR/Scope note + quyết định control gate</td><td>Scope mơ hồ, thiếu bước ảnh hưởng</td></tr>
+<tr><td>2</td><td>Khóa SoD: chỉ định người cấu hình và approver khác nhau</td><td>Supervisor + QA</td><td>RACI + danh sách người tham gia</td><td>1 người làm cả 2 vai</td></tr>
 <tr><td>3</td><td>Tạo Build Sheet v0.9 theo cấu trúc bắt buộc (Setting ID, Acceptance Test, Bằng chứng Type)</td><td>IT</td><td>Build Sheet file kiểm soát</td><td>Thiếu Setting ID hoặc thiếu Acceptance Test</td></tr>
 <tr><td>4</td><td>Gắn Control Objective cho từng Setting ID (QMS/Risk/Hợp đồng)</td><td>QA + Process Owner</td><td>Build Sheet cập nhật cột Control Objective</td><td>Không gắn rủi ro → không xác định ưu tiên test</td></tr>
 <tr><td>5</td><td>Thực thi cấu hình theo Build Sheet và chụp bằng chứng gốc</td><td>IT</td><td>Ảnh/export/nhật ký theo Bằng chứng Type</td><td>Chụp thiếu ngữ cảnh/thiếu giá trị setting</td></tr>
@@ -311,7 +311,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>8</td><td>Ghi vấn đề list và cưỡng chế HOLD/ROLLBACK khi không đạt</td><td>QA + Supervisor</td><td>Vấn đề list + quyết định HOLD/ROLLBACK</td><td>Cho GO dù fail test</td></tr>
 <tr><td>9</td><td>Chốt Build Sheet final (Trạng thái=Validated) và ký sign-off</td><td>QA</td><td>Build Sheet final + chữ ký</td><td>Trạng thái chưa Validated</td></tr>
 <tr><td>10</td><td>Lập cutover plan: cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), snapshot, smoke test, rollback</td><td>IT + Supervisor</td><td>ANNEX-QMS-013 bản ký</td><td>Không có snapshot trước cutover</td></tr>
-<tr><td>11</td><td>Go-live + thông báo policy + đào tạo điểm dùng (kiosk/line)</td><td>Supervisor + Process Owner</td><td>Go-live memo + training hồ sơ</td><td>Không đào tạo điểm dùng gây vượt qua</td></tr>
+<tr><td>11</td><td>Go-live + thông báo policy + đào tạo point-of-use (kiosk/line)</td><td>Supervisor + Process Owner</td><td>Go-live memo + training hồ sơ</td><td>Không đào tạo point-of-use gây vượt qua</td></tr>
 <tr><td>12</td><td>Bàn giao package IT → QA/IMS (snapshots quyền/retention/DLP, guests)</td><td>IT</td><td>Bàn giao package + links bằng chứng</td><td>Thiếu snapshot memberships hoặc guests</td></tr>
 <tr><td>13</td><td>phê duyệt giao hàng Validator: chặn bộ hồ sơ giao hàng thiếu</td><td>Warehouse + QC</td><td>Ship bảng kiểm + block nhật ký</td><td>Ship trước khi packet đủ</td></tr>
 <tr><td>14</td><td>rà soát quyền truy cập hàng quý + lưu FRM-QMS-016</td><td>QA + Process Owner</td><td>FRM-QMS-016 + snapshot</td><td>Không review định kỳ</td></tr>
@@ -324,13 +324,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="form-table">
 <tr><th>Step</th><th>Điểm then chốt</th><th>Lý do (lý do vận hành)</th></tr>
 <tr>
-<td>1) Chốt scope + cổng kiểm soát</td>
-<td>Gắn rõ GO-LIVE/SHIP cổng kiểm soát; xác định rủi ro sai Rev/lẫn lộn/external share/tính toàn vẹn hồ sơ</td>
-<td>Không chốt cổng kiểm soát → xử lý cảm tính → vượt qua</td>
+<td>1) Chốt scope + control gate</td>
+<td>Gắn rõ GO-LIVE/SHIP control gate; xác định rủi ro sai Rev/lẫn lộn/external share/tính toàn vẹn hồ sơ</td>
+<td>Không chốt control gate → xử lý cảm tính → vượt qua</td>
 </tr>
 <tr>
 <td>2) Khóa SoD</td>
-<td>Người cấu hình khác người phê duyệt; ghi RACI ngay trong package</td>
+<td>Người cấu hình khác approver; ghi RACI ngay trong package</td>
 <td>SoD fail → đánh giá không đạt; lỗi nội bộ khó truy</td>
 </tr>
 <tr>
@@ -340,7 +340,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>4) Thực thi + chụp bằng chứng gốc</td>
-<td>Ảnh phải thấy tenant/site/library + giá trị; lưu bản gốc trước bản chú thích</td>
+<td>Ảnh phải thấy tenant/site/library + giá trị; lưu master copy trước bản chú thích</td>
 <td>Bằng chứng thiếu ngữ cảnh → vô hiệu</td>
 </tr>
 <tr>
@@ -365,14 +365,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>01 bộ bằng chứng gốc cho 15 Setting ID, đúng naming rule, đúng kho lưu.</li>
 <li>01 bảng kết quả acceptance tests (TC-01…TC-05 + 02 test theo ANNEX-QMS-013).</li>
 <li>01 bàn giao package IT → QA/IMS: snapshot groups/memberships, site permissions, retention labels/policies, DLP policies, external guests.</li>
-<li>01 quyết định cổng kiểm soát (HOLD hoặc GO) dựa trên bằng chứng; ghi rõ “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”.</li>
+<li>01 quyết định control gate (HOLD hoặc GO) dựa trên bằng chứng; ghi rõ “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”.</li>
 </ul>
 <h3>9.3 Rubric L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn khi đạt)</h3>
 <table class="form-table">
 <tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện lên level</th><th>Quyền hạn được cấp</th></tr>
 <tr>
 <td><b>L1</b></td>
-<td>Đọc được Build Sheet; tìm được Setting ID; nêu đúng điểm chặn và fail-fast rules.</td>
+<td>Đọc được Build Sheet; tìm được Setting ID; nêu đúng hold point và fail-fast rules.</td>
 <td>Bài kiểm tra nhanh ≥ 80% và trả lời đúng 3 câu hỏi tình huống ngắn.</td>
 <td>Được tham gia thao tác dưới giám sát; không tự quyết định GO-LIVE/SHIP.</td>
 </tr>
@@ -380,25 +380,25 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L2</b></td>
 <td>Thực hiện bảng kiểm bước 1–8 với giám sát; lưu đúng bằng chứng theo naming rule.</td>
 <td>OJT đầu ra đạt 100% naming rule + bằng chứng có ngữ cảnh; không sai SoD.</td>
-<td>Được thực hiện cấu hình trong sandbox hoặc thực hiện thao tác điểm dùng (kiosk) theo quy trình.</td>
+<td>Được thực hiện cấu hình trong sandbox hoặc thực hiện thao tác point-of-use (kiosk) theo quy trình.</td>
 </tr>
 <tr>
 <td><b>L3</b></td>
 <td>Chạy acceptance tests độc lập; phát hiện fail và kích hoạt HOLD/BLOCK đúng 60 giây.</td>
 <td>Performance test PASS; tạo bàn giao package đầy đủ; truy xuất bằng chứng ≤ 3 phút.</td>
-<td>IT: được triển khai theo Build Sheet trên PROD khi có sign-off QA. QA/QMS: được ký sign-off từng setting. Warehouse/QC: được chặn giao hàng (BLOCK SHIP / chặn giao hàng) tại cổng kiểm soát.</td>
+<td>IT: được triển khai theo Build Sheet trên PROD khi có sign-off QA. QA/QMS: được ký sign-off từng setting. Warehouse/QC: được chặn giao hàng (BLOCK SHIP / chặn giao hàng) tại control gate.</td>
 </tr>
 <tr>
 <td><b>L4</b></td>
-<td>Huấn luyện người khác theo TWI; thiết kế test suite; đánh giá nội bộ mini cho 1 change package.</td>
-<td>Huấn luyện 01 người đạt L2; chạy 01 review theo FRM-QMS-016; không phát sinh NCR từ vượt qua cổng kiểm soát trong 30 ngày vận hành.</td>
+<td>Huấn luyện người khác theo TWI; thiết kế test suite; internal audit mini cho 1 change package.</td>
+<td>Huấn luyện 01 người đạt L2; chạy 01 review theo FRM-QMS-016; không phát sinh NCR từ vượt qua control gate trong 30 ngày vận hành.</td>
 <td>Supervisor/QA: được chủ trì GO-LIVE mức sẵn sàng review. IT: được chủ trì cutover + rollback diễn tập. Lead vai trò: được dừng line khi sai Rev/lẫn lộn.</td>
 </tr>
 </table>
 <div class="note">
 <strong>Giới hạn theo vai trò (điểm khác nhau theo vai trò)</strong>
 <ul>
-<li>Operator/Setup/Warehouse: đạt L3 để được quyền BLOCK tại cổng kiểm soát; L4 chỉ áp dụng cho Lead.</li>
+<li>Operator/Setup/Warehouse: đạt L3 để được quyền BLOCK tại control gate; L4 chỉ áp dụng cho Lead.</li>
 <li>Programmer/IT: đạt L3 để thao tác PROD theo Build Sheet; mọi sign-off QMS do QA thực hiện.</li>
 <li>QA/QMS: đạt L3 để ký sign-off setting; đạt L4 để chủ trì go-live mức sẵn sàng review.</li>
 </ul>
@@ -416,14 +416,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>(MC) Ai định nghĩa “đạt/không đạt” cho cấu hình ảnh hưởng QMS? A) IT B) QA/QMS C) Operator D) Sales</li>
 <li>(MC) Acceptance test TC-01 “Released vs Draft” kiểm tra điều gì? A) Màu file B) User tiêu chuẩn chỉ thấy Released, không publish major C) Tốc độ mạng D) In ấn</li>
 <li>(MC) Acceptance test TC-03 kiểm tra gì? A) DLP chặn share external cho tài liệu nhạy cảm B) 5S C) tuổi dao (tool life) D) Cycle time</li>
-<li>(MC) “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” áp dụng trực tiếp tại đâu? A) Khu ăn B) Cổng kiểm soát GO-LIVE/SHIP/QC release C) Chấm công D) Bảo trì</li>
+<li>(MC) “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” áp dụng trực tiếp tại đâu? A) Khu ăn B) Control gate GO-LIVE/SHIP/QC release C) Chấm công D) Bảo trì</li>
 <li>(MC) khi không đạt acceptance test, hành động bắt buộc là gì? A) GO luôn B) HOLD/ROLLBACK C) Bỏ qua D) Chờ người khác</li>
 <li>(MC) “Break permission theo từng file” phải chặn vì lý do nào? A) Tốn màu B) Không review được quyền, tạo quyền rơi rớt C) File nặng D) In chậm</li>
 <li>(MC) Snapshot groups/memberships dùng để làm gì? A) Trang trí B) Chứng minh kiểm soát truy cập tại thời điểm đánh giá C) Tăng dung lượng D) Tạo emoji</li>
 <li>(MC) phê duyệt giao hàng Validator fail yêu cầu quyết định gì? A) GO ship B) chặn giao hàng (BLOCK SHIP / chặn giao hàng) C) Chuyển ca D) Chờ email</li>
 <li>(MC) Khi phát hiện gage OOT, bước 60 giây gồm gì? A) Dán thẻ OOT + khóa sử dụng + HOLD lot liên quan B) Tiếp tục đo C) Vứt gage D) Chờ tuần sau</li>
 <li>(MC) Cutover plan bắt buộc có nội dung nào? A) cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) + snapshot + smoke test + rollback B) Poster C) Nhạc D) Ảnh</li>
-<li>(Tình huống) Khi Operator mở Hồ sơ công việc và thấy 2 file bản vẽ cùng tên khác Rev, hành động cổng kiểm soát là gì?</li>
+<li>(Tình huống) Khi Operator mở Job dossier và thấy 2 file bản vẽ cùng tên khác Rev, hành động control gate là gì?</li>
 <li>(Tình huống) Khi Warehouse chuẩn bị ship và packet thiếu IR, quyết định là gì và MRR nào phải tạo?</li>
 <li>(Tình huống) Khi QA truy xuất bằng chứng cho 1 Setting ID mà không tìm thấy file đúng naming rule, hành động là gì?</li>
 <li>(Tình huống) Khi Estimator (SAL-03) nhận hợp đồng yêu cầu “No external sharing”, Build Sheet phải phản ánh ở cột nào?</li>
@@ -454,24 +454,24 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Đáp án đạt:</b> STOP CHANGE + ROLLBACK về baseline; ghi rõ Setting ID; lưu ảnh bằng chứng; khóa external sharing.</li>
 </ul>
 </div>
-<h3>10.3 Performance test (bắt buộc vì có thao tác/cổng kiểm soát/duyệt)</h3>
+<h3>10.3 Performance test (bắt buộc vì có thao tác/control gate/duyệt)</h3>
 <p><b>Bài test:</b> Học viên nhận 01 yêu cầu thay đổi và phải tạo đầy đủ “Validated Build Sheet + Bằng chứng + Acceptance Tests + Bàn giao”. Thời gian tối đa 45 phút cho phần chuẩn bị hồ sơ + 30 phút cho phần trình bày và truy xuất bằng chứng.</p>
 <table class="form-table">
 <tr><th>Tiêu chí</th><th>PASS</th><th>FAIL</th></tr>
-<tr><td>SoD</td><td>Người cấu hình khác người phê duyệt; có bằng chứng ký</td><td>1 người làm cả 2 vai hoặc thiếu chữ ký</td></tr>
+<tr><td>SoD</td><td>Người cấu hình khác approver; có bằng chứng ký</td><td>1 người làm cả 2 vai hoặc thiếu chữ ký</td></tr>
 <tr><td>Build Sheet</td><td>≥15 Setting ID; đủ cột bắt buộc; có Acceptance Test cho từng setting</td><td>Thiếu Setting ID hoặc thiếu Acceptance Test</td></tr>
 <tr><td>Bằng chứng</td><td>100% bằng chứng gốc có ngữ cảnh; đúng naming rule; đúng kho lưu</td><td>Bằng chứng thiếu ngữ cảnh hoặc đặt tên sai hoặc lưu sai kho</td></tr>
 <tr><td>Acceptance tests</td><td>TC-01…TC-05 PASS; ghi rõ ĐẠT/KHÔNG ĐẠT theo bằng chứng</td><td>Fail test nhưng vẫn GO hoặc không có nhật ký</td></tr>
 <tr><td>Bàn giao</td><td>Đủ snapshots quyền/retention/DLP/guests</td><td>Thiếu snapshot bất kỳ</td></tr>
-<tr><td>Truy xuất</td><td>QA truy xuất 01 bằng chứng + 01 hồ sơ công việc + 01 cal cert ≤ 3 phút</td><td>Không truy xuất được hoặc vượt thời gian</td></tr>
+<tr><td>Truy xuất</td><td>QA truy xuất 01 bằng chứng + 01 job dossier + 01 cal cert ≤ 3 phút</td><td>Không truy xuất được hoặc vượt thời gian</td></tr>
 </table>
 </div>
 <div class="card" id="sec11">
-<h2>11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”)</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”)</h2>
 <ul>
 <li><b>PASS</b> khi đạt đồng thời: Bài kiểm tra nhanh ≥ 80%; OJT đầu ra đầy đủ; Performance test PASS; không vi phạm SoD; không có bước nào thiếu bằng chứng.</li>
 <li><b>FAIL</b> khi xảy ra 1 trong các điều kiện: thiếu bằng chứng cho bất kỳ Setting ID; dùng sai Rev mà không HOLD; fail TC-03 hoặc TC-01; bộ hồ sơ giao hàng thiếu mà vẫn GO; vi phạm SoD.</li>
-<li><b>Quy tắc cưỡng chế:</b> Thiếu bằng chứng → <b>BLOCK</b> cổng kiểm soát tương ứng (GO-LIVE/SHIP/QC release). Không có ngoại lệ vận hành.</li>
+<li><b>Quy tắc cưỡng chế:</b> Thiếu bằng chứng → <b>BLOCK</b> control gate tương ứng (GO-LIVE/SHIP/QC release). Không có ngoại lệ vận hành.</li>
 </ul>
 </div>
 <div class="card" id="sec12">
@@ -497,7 +497,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Bằng chứng IT:</b> QMS-Hồ sơ/J_IT_Backup_and_Access_Evidence/YYYY/Q#</li>
 <li><b>Đánh giá pack:</b> QMS-Hồ sơ/Z_Audit_Evidence_Pack/YYYY/Q#</li>
-<li><b>Hồ sơ công việc mẫu cho test:</b> <span class="muted">CNC-IMS-HUB → QMS-SSOT → Job-Dossier.</span></li>
+<li><b>Job dossier mẫu cho test:</b> <span class="muted">CNC-IMS-HUB → QMS-SSOT → Job-Dossier.</span></li>
 <li><b>Nơi lưu Build Sheet kiểm soát:</b> <span class="muted">Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint).</span></li>
 </ul>
 </div>
@@ -505,7 +505,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>13) Common đánh giá phát hiện &amp; phòng ngừa (≥8 lỗi)</h2>
 <ol>
 <li><b>Không chứng minh kiểm soát phiên bản</b> → Cưỡng chế TC-01 Released vs Draft + khoá publish quyền.</li>
-<li><b>Bằng chứng thiếu ngữ cảnh</b> → Dùng bảng kiểm “ảnh phải thấy tenant/site/library + giá trị” và lưu bản gốc.</li>
+<li><b>Bằng chứng thiếu ngữ cảnh</b> → Dùng bảng kiểm “ảnh phải thấy tenant/site/library + giá trị” và lưu master copy.</li>
 <li><b>Thiếu SoD</b> → RACI bắt buộc trong package; đánh giá kiểm tra chữ ký khác người.</li>
 <li><b>Obsolete document dùng tại điểm thao tác</b> → Point-of-use chỉ hiển thị Released; banner cảnh báo Draft.</li>
 <li><b>Hồ sơ bị xoá/sửa sau closeout</b> → TC-02 tính toàn vẹn hồ sơ + cơ chế recover + nhật ký.</li>

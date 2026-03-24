@@ -73,7 +73,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="title">
 <strong>WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</strong>
 </div><div class="meta"><div class="row"><span><b>Code:</b></span><span>WI-101</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div><div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Administrator</span></div><div class="row"><span><b>Approved by:</b></span><span>General Director</span></div></div>
-</div><div class="doc-content" id="docContent"><div class="form-sheet"><div class="preface-block"><h2 class="h2">Điều kiện áp dụng và kiểm soát</h2><div class="grid-2"><div><p><b>ÁP DỤNG KHI</b></p><ul class="list"><li>Khi tài liệu được viện dẫn trong Job/Quy trình/Forms liên quan.</li><li>Khi phát sinh thay đổi ảnh hưởng chất lượng hoặc yêu cầu khách hàng.</li><li>Khi cần xác định hold/release hoặc yêu cầu bằng chứng bắt buộc.</li></ul></div><div><p><b>Đầu vào / Đầu ra</b></p><ul class="list"><li><b>Đầu vào:</b> Epicor Kinetic (giao dịch)</li><li><b>Đầu vào:</b> M365/SharePoint (SSOT hồ sơ)</li><li><b>Đầu ra:</b> Hồ sơ/Nhật ký đầy đủ tại SSOT</li><li><b>Đầu ra:</b> Trạng thái cổng kiểm soát (gate) được mở hoặc giữ theo tiêu chí</li></ul></div></div><p class="callout"><b>Hold/Release:</b> Thiếu bằng chứng bắt buộc: áp dụng HOLD theo tiêu chí của tài liệu; không chuyển bước cho đến khi đủ bằng chứng.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết hồ sơ SSOT.</p></div><div class="card"><span class="badge"><span class="dot"></span>WI-101</span><h1 class="h1" style="margin-top:12px;">WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</h1><p class="lead">Tài liệu này quy định cách triển khai và sử dụng biểu mẫu số hoá trên M365 (SharePoint Lists/Power Apps/Power Automate) và cách lưu bằng chứng theo SSOT. Mọi giao dịch vận hành (time entry, trạng thái job, PO, xuất/nhập kho, xác nhận giao hàng (ship confirm)) <b>chỉ</b> được ghi nhận trong <b>Epicor Kinetic</b>.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">1. Khi áp dụng</h2><ul>
+</div><div class="doc-content" id="docContent"><div class="form-sheet"><div class="preface-block"><h2 class="h2">Điều kiện áp dụng và kiểm soát</h2><div class="grid-2"><div><p><b>ÁP DỤNG KHI</b></p><ul class="list"><li>Khi tài liệu được viện dẫn trong Job/Quy trình/Forms liên quan.</li><li>Khi phát sinh thay đổi ảnh hưởng chất lượng hoặc yêu cầu khách hàng.</li><li>Khi cần xác định hold/release hoặc yêu cầu bằng chứng bắt buộc.</li></ul></div><div><p><b>Đầu vào / Đầu ra</b></p><ul class="list"><li><b>Đầu vào:</b> Epicor Kinetic (giao dịch)</li><li><b>Đầu vào:</b> M365/SharePoint (SSOT hồ sơ)</li><li><b>Đầu ra:</b> Hồ sơ/Nhật ký đầy đủ tại SSOT</li><li><b>Đầu ra:</b> Trạng thái control gate (gate) được mở hoặc giữ theo tiêu chí</li></ul></div></div><p class="callout"><b>Hold/Release:</b> Thiếu bằng chứng bắt buộc: áp dụng HOLD theo tiêu chí của tài liệu; không chuyển bước cho đến khi đủ bằng chứng.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết hồ sơ SSOT.</p></div><div class="card"><span class="badge"><span class="dot"></span>WI-101</span><h1 class="h1" style="margin-top:12px;">WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</h1><p class="lead">Tài liệu này quy định cách triển khai và sử dụng biểu mẫu số hoá trên M365 (SharePoint Lists/Power Apps/Power Automate) và cách lưu bằng chứng theo SSOT. Mọi giao dịch vận hành (time entry, trạng thái job, PO, xuất/nhập kho, xác nhận giao hàng (ship confirm)) <b>chỉ</b> được ghi nhận trong <b>Epicor Kinetic</b>.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">1. Khi áp dụng</h2><ul>
 <li><b>Phải</b> áp dụng khi thay thế biểu mẫu giấy bằng biểu mẫu số hoá để ghi nhận vận hành tại xưởng CNC: kiểm tra công đoạn, nhật ký hold, bảng kiểm đóng gói, nhật ký giao ca, yêu cầu hỗ trợ máy/tooling.</li>
 <li><b>Phải</b> áp dụng khi cần <b>phê duyệt điện tử</b> (Power Automate Approvals) cho các điểm dừng chất lượng/ship-release.</li>
 <li><b>Không được</b> dùng M365 để tạo “sổ” thay thế Epicor cho các giao dịch: time entry, xác nhận hoàn thành công đoạn, xuất kho, xác nhận giao hàng, cập nhật PO.</li>
@@ -99,7 +99,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </li>
 <li><b>Phải</b> cấu hình Power Automate:
  <ul>
-<li>Luồng phê duyệt cho từng Cổng kiểm soát (Hold Release, phê duyệt giao hàng (ship release)…).</li>
+<li>Luồng phê duyệt cho từng Control gate (Hold Release, phê duyệt giao hàng (ship release)…).</li>
 <li>Ghi kết quả phê duyệt vào “ApprovalHistory” (List) và khoá trạng thái bản ghi theo kết quả.</li>
 <li>Gắn nhãn retention/hồ sơ theo SOP-104 cho các thư mục bằng chứng Tier-1.</li>
 </ul>
@@ -110,15 +110,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Phải</b> gắn liên kết bằng chứng (EvidenceUrl) trỏ tới thư mục/tệp trên M365 theo SSOT; <b>không được</b> đính kèm bản sao phân tán ngoài SSOT.</li>
 <li><b>Phải</b> bấm “Gửi/Submit” để tạo bản ghi; hệ thống tự cấp mã RecordID.</li>
 </ol><h3 class="h3">3.3 Phê duyệt điện tử và điểm dừng</h3><ol>
-<li><b>Phải</b> thiết lập Cổng kiểm soát theo loại nghiệp vụ:
+<li><b>Phải</b> thiết lập Control gate theo loại nghiệp vụ:
  <ul>
-<li>Cổng kiểm soát chất lượng: QA phê duyệt release cho Hold/NCR/IR fail.</li>
-<li>Cổng kiểm soát giao hàng: WHS + QA phê duyệt phê duyệt giao hàng theo WI-OPS-010.</li>
+<li>Control gate chất lượng: QA phê duyệt release cho Hold/NCR/IR fail.</li>
+<li>Control gate giao hàng: WHS + QA phê duyệt phê duyệt giao hàng theo WI-OPS-010.</li>
 </ul>
 </li>
 <li><b>Điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (hold point)))))))):</b> Khi thiếu EvidenceUrl hoặc bằng chứng không truy cập được → <b>phải</b> giữ trạng thái “HOLD” và <b>không được</b> chuyển sang “RELEASE/SHIP”.</li>
-<li><b>Phải</b> lưu dấu vết phê duyệt (người phê duyệt, thời gian, nội dung, quyết định) trong ApprovalHistory.</li>
-</ol><h3 class="h3">3.4 Kiểm soát thay đổi biểu mẫu số hoá</h3><ul>
+<li><b>Phải</b> lưu dấu vết phê duyệt (approver, thời gian, nội dung, quyết định) trong ApprovalHistory.</li>
+</ol><h3 class="h3">3.4 Change control biểu mẫu số hoá</h3><ul>
 <li><b>Không được</b> tự ý thêm/xoá/sửa cột SharePoint List khi chưa có phê duyệt kiểm soát tài liệu.</li>
 <li><b>Phải</b> cập nhật WI/FRM/ANNEX liên quan trước khi triển khai thay đổi; <b>phải</b> ghi nhận Revision và ngày hiệu lực.</li>
 <li><b>Phải</b> lưu DCR hồ sơ cấu hình (Power App/Luồng) tại: <b>M365: CNC-IMS-HUB/QMS-Hồ sơ/IT-OPS/Config-Change-Nhật ký/</b>.</li>
@@ -146,19 +146,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>EvidenceUrl trỏ đúng SSOT, truy cập được</td>
 <td>Thiếu link/đường dẫn sai → HOLD</td>
 <td>QA Lead hoặc Process Owner theo RACI</td>
-<td>Link thư mục/tệp trong Hồ sơ công việc (job dossier)</td>
+<td>Link thư mục/tệp trong Job dossier (job dossier)</td>
 </tr>
 <tr>
 <td>CỔNG KIỂM SOÁT-101.3 — Phê duyệt</td>
 <td>Kết quả Approve có nhật ký trong ApprovalHistory</td>
 <td>Không có nhật ký/Reject → HOLD</td>
-<td>Người phê duyệt được phân quyền</td>
+<td>Approver được phân quyền</td>
 <td>ApprovalHistory + bản ghi trạng thái</td>
 </tr>
 <tr>
 <td>CP-101.4 — Retention/Hồ sơ</td>
 <td>Nhãn retention áp đúng theo SOP-104</td>
-<td>Chưa áp nhãn → HOLD cho các cổng kiểm soát Tier‑1</td>
+<td>Chưa áp nhãn → HOLD cho các control gate Tier‑1</td>
 <td>QA/QMS (Document Control)</td>
 <td>Retention label nhật ký (Purview)</td>
 </tr>
@@ -192,7 +192,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Thư mục bằng chứng theo Job</td>
-<td>Hồ sơ công việc Index</td>
+<td>Job dossier Index</td>
 <td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/OPS/Job-Dossier/&lt;JobNum&gt;/</b></td>
 <td>Khi Shipment xác nhận giao hàng trong Epicor + 10 năm</td>
 <td>WHS (hồ sơ giao hàng) + QA (hồ sơ chất lượng)</td>
@@ -201,7 +201,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Bản xuất PDF snapshot (nếu xuất)</td>
 <td>Daily Snapshot Register</td>
 <td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/OPS/Snapshots/&lt;YYYY&gt;/&lt;MM&gt;/</b></td>
-<td>Khi tháng kết thúc + 3 năm (trừ hồ sơ gắn Hồ sơ công việc)</td>
+<td>Khi tháng kết thúc + 3 năm (trừ hồ sơ gắn Job dossier)</td>
 <td>OPS</td>
 </tr>
 </tbody>
@@ -235,7 +235,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div></div><h2 class="h2">Tài liệu điều hành liên kết</h2><div class="doc-link-row"><span class="doc-link">SOP-101</span><span class="doc-link">SOP-104</span><span class="doc-link">SOP-107</span><span class="doc-link">SOP-108</span><span class="doc-link">ANNEX-108</span><span class="doc-link">ANNEX-109</span><span class="doc-link">ANNEX-116</span><span class="doc-link">ANNEX-118</span></div>
 <h2 class="h2">8. Kiểm soát tài khoản, chữ ký điện tử và quyền sửa dữ liệu</h2>
-<div class="callout-strong"><b>Nguyên tắc bắt buộc:</b> Phải dùng đúng tài khoản cá nhân đã được cấp quyền. Người tạo bản ghi không được tự phê duyệt bản ghi của chính mình tại các cổng kiểm soát cần phê duyệt độc lập. Mọi sửa đổi sau khi phê duyệt phải để lại dấu vết kiểm toán (audit trail) gồm người sửa, thời điểm sửa, nội dung trước/sau và lý do sửa.</div>
+<div class="callout-strong"><b>Nguyên tắc bắt buộc:</b> Phải dùng đúng tài khoản cá nhân đã được cấp quyền. Người tạo bản ghi không được tự phê duyệt bản ghi của chính mình tại các control gate cần phê duyệt độc lập. Mọi sửa đổi sau khi phê duyệt phải để lại dấu vết kiểm toán (audit trail) gồm người sửa, thời điểm sửa, nội dung trước/sau và lý do sửa.</div>
 <ul class="tight note-list">
 <li>Phải dùng đúng vai trò được cấp quyền. Không được mượn tài khoản của người khác để gửi, duyệt, backfill hoặc mở hold.</li>
 <li>Hồ sơ ở trạng thái <b>Approved / Released / Closed</b> chỉ được sửa khi có quyền override theo <b>ANNEX-120</b> và phải tạo nhật ký lý do.</li>
@@ -249,7 +249,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="kpi-card"><h3>KPI-DIG-03 — Tỷ lệ backfill đóng trong hạn</h3><div class="mini-note">Số hồ sơ offline được backfill đúng thời hạn ÷ tổng hồ sơ offline. Mục tiêu: ≥ 95% trong cùng ca hoặc ca kế tiếp theo rule đã duyệt.</div></div>
 <div class="kpi-card"><h3>KPI-DIG-04 — Tỷ lệ phê duyệt có nhật ký đầy đủ</h3><div class="mini-note">Số quyết định Release/Reject có đủ người duyệt, mốc thời gian, comment và trạng thái cuối ÷ tổng quyết định cần duyệt. Mục tiêu: 100%.</div></div>
 </div>
-</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-workbook-usage">11. Biểu mẫu Excel đang hiệu lực — Cách dùng form khi form active đã chuyển hoàn toàn sang workbook Excel</h2><div class="note phase3a-workbook-alignment"><b>Thao tác chuẩn</b><br/>Người dùng mở FRM qua portal hoặc link tài liệu hệ thống phải được tải trực tiếp workbook hiện hành. Không dùng HTML form cũ để nhập liệu hoặc xác nhận phê duyệt; nếu cần xem trạng thái RELEASED / mã không phát hành trong danh mục hiện hành, revision, người phụ trách hoặc phạm vi mã / phạm vi quy trình thì dùng  và <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Form Control Register</a>.</div><ol class="tight phase3a-workbook-alignment"><li>Mở trực tiếp workbook của mã FRM đang RELEASED từ portal hoặc từ link trong SOP/WI/handbook/JD.</li><li>Nếu cần kiểm revision, người phụ trách, đường dẫn phát hành, checksum hoặc bảng kê, tra <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Form Control Register</a>.</li><li>Nếu mã FRM không phát hành trong danh mục hiện hành, không tạo hồ sơ mới dưới mã đó; tra phạm vi mã / phạm vi quy trình trong .</li><li>Ví dụ: FRM-412 không phát hành trong danh mục hiện hành; người dùng phải tải và dùng <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> workbook cho receipt/IQC cổng kiểm soát và <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> cho HOLD/disposition.</li></ol></div></div></div></div>
+</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-workbook-usage">11. Biểu mẫu Excel đang hiệu lực — Cách dùng form khi form active đã chuyển hoàn toàn sang workbook Excel</h2><div class="note phase3a-workbook-alignment"><b>Thao tác chuẩn</b><br/>Người dùng mở FRM qua portal hoặc link tài liệu hệ thống phải được tải trực tiếp workbook hiện hành. Không dùng HTML form cũ để nhập liệu hoặc xác nhận phê duyệt; nếu cần xem trạng thái RELEASED / mã không phát hành trong danh mục hiện hành, revision, người phụ trách hoặc phạm vi mã / phạm vi quy trình thì dùng  và <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Form Control Register</a>.</div><ol class="tight phase3a-workbook-alignment"><li>Mở trực tiếp workbook của mã FRM đang RELEASED từ portal hoặc từ link trong SOP/WI/handbook/JD.</li><li>Nếu cần kiểm revision, người phụ trách, đường dẫn phát hành, checksum hoặc bảng kê, tra <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Form Control Register</a>.</li><li>Nếu mã FRM không phát hành trong danh mục hiện hành, không tạo hồ sơ mới dưới mã đó; tra phạm vi mã / phạm vi quy trình trong .</li><li>Ví dụ: FRM-412 không phát hành trong danh mục hiện hành; người dùng phải tải và dùng <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> workbook cho receipt/IQC control gate và <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> cho HOLD/disposition.</li></ol></div></div></div></div>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 <script src="../../../assets/app.js"></script>
 </body>

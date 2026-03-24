@@ -99,7 +99,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>QA</td><td>QC hold list, FAI pending, NCR mở, suspect lot, final release risk, cleanliness/leak test pending.</td><td>ọ365 QA register + Epicor reference</td><td>Hold/FAI trạng thái mơ hồ, không rõ điều kiện release.</td></tr>
 <tr><td>WHS/Shipping</td><td>Ship plan, bộ hồ sơ giao hàng completeness, SSCC/label pending, receipt discrepancy, thiếu chứng từ.</td><td>Epicor Ship/Receipt + bộ hồ sơ giao hàng SSOT</td><td>Lô chuẩn bị ship nhưng bộ hồ sơ giao hàng chưa đủ hoặc receipt discrepancy chưa khép.</td></tr>
 <tr><td>Purchasing/Outsource</td><td>PO overdue, processor overdue, material ETA, supplier vấn đề ảnh hưởng Job đường găng.</td><td>Epicor PO/Receipt + approved processor pack</td><td>hhông có ETA tin cậy cho vật tư/quy trình đường găng.</td></tr>
-<tr><td>ENG</td><td>Revision change, baseline mismatch, setup/program pending release, chuyển giao công việc approval.</td><td>Phát hành kỹ thuật pack / Hồ sơ công việc (job dossier)</td><td>sai phiên bản (wrong revision), chưa rõ baseline hoặc chưa phê duyệt release.</td></tr>
+<tr><td>ENG</td><td>Revision change, baseline mismatch, setup/program pending release, chuyển giao công việc approval.</td><td>Phát hành kỹ thuật pack / Job dossier (job dossier)</td><td>sai phiên bản (wrong revision), chưa rõ baseline hoặc chưa phê duyệt release.</td></tr>
 </tbody></table></div>
 <div class="callout-warning"><strong>Quy tắc cut-off:</strong> dữ liệu dùng cho họp phải được chốt trước giờ họp tối thiểu 15 phút. Nếu bảng điều khiển chậm hơn cut-off, dùng báo cáo SoR để ra quyết định và mở ngay Data Vấn đề theo <a href="../../03-Reference/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</a>.</div></div>
 
@@ -107,7 +107,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Zone</th><th>Phải treo</th><th>hhông được thiếu</th></tr></thead><tbody>
 <tr><td>An toàn / sự cố</td><td>Sự cố suýt xảy ra (near-miss), machine crash, guard vượt qua, sự cố môi trường, stop-work đang mở.</td><td>Responsible Person, thời điểm phát sinh, trạng thái cô lập rủi ro.</td></tr>
 <tr><td>Delivery / điều độ</td><td>Job P0/P1, due hôm nay/ngày mai, hot-job, outsource overdue, ship plan.</td><td>JobNum, ngày đến hạn, work center, người phụ trách, giờ chốt.</td></tr>
-<tr><td>Quality / hold</td><td>CTQ fail, FAI pending, QC hold, suspect lot, CoC/phê duyệt giao hàng (ship release) pending, cleanliness/leak test pending.</td><td>Hold code, cổng kiểm soát đang chặn, điều kiện release và người phụ trách phê duyệt.</td></tr>
+<tr><td>Quality / hold</td><td>CTQ fail, FAI pending, QC hold, suspect lot, CoC/phê duyệt giao hàng (ship release) pending, cleanliness/leak test pending.</td><td>Hold code, control gate đang chặn, điều kiện release và người phụ trách phê duyệt.</td></tr>
 <tr><td>Năng lực / máy</td><td>Downtime, planned maintenance xung đột lịch, thiếu tool/fixture/gage, overtime request.</td><td>ETA khôi phục, decision hoặc escalation.</td></tr>
 <tr><td>Hành động</td><td>Top 5 action đang mở, việc quá hạn, việc chuyển tầng.</td><td>1 người phụ trách, 1 due, 1 bằng chứng đóng việc.</td></tr>
 </tbody></table></div>
@@ -119,7 +119,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-item"><strong>ọở họp bằng mục tiêu giao hàng.</strong><br/>Người chủ trì nói rõ ca này phải giao Job nào, công đoạn nào phải xong, lô nào phải sang QA/WHS, và lô nào tuyệt đối không được chậm.</div>
 <div class="step-item"><strong>Đi từ đỏ tới vàng.</strong><br/>Xử lý theo thứ tự: an toàn → quality/hold → delivery → máy/năng lực → action tồn. hhông dành quá 2 phút cho việc xanh.</div>
 <div class="step-item"><strong>Chốt quyết định tại chỗ.</strong><br/>hhi phải đổi thứ tự, đổi máy, chuyển người, mở tăng ca, giữ lô, gọi supplier, gọi processor hoặc báo khách, người chủ trì phải chốt ngay ai làm gì sau cuộc họp.</div>
-<div class="step-item"><strong>hhóa bằng bằng chứng.</strong><br/>ọọi quyết định ảnh hưởng Job phải được phản ánh vào Epicor, nhật ký hành động hoặc Hồ sơ công việc ngay sau họp. hhông chấp nhận “đã nhắc miệng”.</div>
+<div class="step-item"><strong>hhóa bằng bằng chứng.</strong><br/>ọọi quyết định ảnh hưởng Job phải được phản ánh vào Epicor, nhật ký hành động hoặc Job dossier ngay sau họp. hhông chấp nhận “đã nhắc miệng”.</div>
 </div>
 <h3>5.2 T2 — điều hành liên phòng ban</h3>
 <ul class="tight" style="padding-left:18px;">
@@ -151,7 +151,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>Containment</td><td>Phải ghi hành động chặn lan rộng trước hành động cải tiến dài hơn.</td></tr>
 <tr><td>Responsible Person</td><td>Chỉ định 01 người chịu trách nhiệm chính; không ghi tên nhóm chung chung.</td></tr>
 <tr><td>Due</td><td>Việc trong ca phải có giờ đóng; việc liên ca phải có ngày và giờ review kế tiếp.</td></tr>
-<tr><td>Bằng chứng</td><td>Link tới Hồ sơ công việc, NCR, bộ hồ sơ giao hàng, ảnh, nhật ký máy, report Epicor hoặc bằng chứng số tương đương.</td></tr>
+<tr><td>Bằng chứng</td><td>Link tới Job dossier, NCR, bộ hồ sơ giao hàng, ảnh, nhật ký máy, report Epicor hoặc bằng chứng số tương đương.</td></tr>
 <tr><td>Escalation level</td><td>S1/S2/S3/S4 theo <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117 — Ma trận escalation, SLA phản ứng, liên lạc theo cấp và quyền quyết định</a>.</td></tr>
 </tbody></table></div>
 <div class="two-col">

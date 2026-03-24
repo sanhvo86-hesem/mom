@@ -82,7 +82,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div><h2>1. Chuẩn đầu ra Level 3 theo K–S–E–M</h2><table class="table">
 <thead><tr><th>Knowledge (K)</th><th>Skill (S)</th><th>Bằng chứng (E)</th><th>Chỉ số (M)</th></tr></thead>
 <tbody>
-<tr><td>Biết phân tích dữ liệu, xác định xu hướng; hiểu công cụ cải tiến/RCA phù hợp với bối cảnh; hiểu liên kết KPI–quá trình.</td><td>Dẫn dắt nhóm/ca; chủ trì xử lý ngoại lệ; huấn luyện L1/L2; phối hợp liên phòng ban để đạt mục tiêu.</td><td>Báo cáo A3/8D/Kaizen; bằng chứng đào tạo/mentor; kết quả đánh giá nội bộ khu vực; cập nhật WI/plan khi cần.</td><td>KPI cải thiện có chứng minh (trước/sau) và duy trì ≥ 1 chu kỳ.</td></tr>
+<tr><td>Biết phân tích dữ liệu, xác định xu hướng; hiểu công cụ cải tiến/RCA phù hợp với bối cảnh; hiểu liên kết KPI–quá trình.</td><td>Dẫn dắt nhóm/ca; chủ trì xử lý ngoại lệ; huấn luyện L1/L2; phối hợp liên phòng ban để đạt mục tiêu.</td><td>Báo cáo A3/8D/Kaizen; bằng chứng đào tạo/mentor; kết quả internal audit khu vực; cập nhật WI/plan khi cần.</td><td>KPI cải thiện có chứng minh (trước/sau) và duy trì ≥ 1 chu kỳ.</td></tr>
 </tbody>
 </table><h2>2. Yêu cầu chuẩn ISO tích hợp (PHẢI/PHẢI/ĐƯỢC PHÉP) + mapping clause</h2><p class="small">Các yêu cầu dưới đây được viết theo ngôn ngữ ISO để dùng trực tiếp trong SOP/WI/FRM và làm căn cứ đánh giá.</p><div class="req">
 <span class="tag shall">PHẢI</span>
@@ -142,14 +142,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Checkpoint nào lẽ ra phải bắt được lỗi? (op nào, ai kiểm, bằng dụng cụ gì?)</li>
 <li>Tần suất đo có đủ để bắt drift không? (1/10, 1/5, 100%?)</li>
 <li>Gage có đủ khả năng? (resolution, method, bavia ảnh hưởng?)</li>
-<li>Release cổng kiểm soát có bị “bỏ qua” khi rush order không?</li>
+<li>Release control gate có bị “bỏ qua” khi rush order không?</li>
 </ul>
-<p class="cap">Countermeasure mạnh nhất tập trung ở ở việc <em>chặn escape</em> bằng cổng kiểm soát/automation/SPC.</p>
+<p class="cap">Countermeasure mạnh nhất tập trung ở ở việc <em>chặn escape</em> bằng control gate/automation/SPC.</p>
 </div><h3>3.6 Chuyên đề (L3): Thiết kế poka‑yoke cho CNC – 4 nhóm giải pháp</h3><ol>
 <li><strong>Cơ khí/định vị:</strong> then chốt 1 hướng, cữ chặn, keyway; “không thể kẹp sai”.</li>
 <li><strong>Logic/soft‑poka:</strong> macro kiểm tra offset/dao; liên động an toàn (interlock) không cho chạy khi thiếu xác nhận.</li>
 <li><strong>Cảm biến:</strong> cảm biến hiện diện phôi, áp suất kẹp, tool break detection.</li>
-<li><strong>Cổng kiểm soát dữ liệu:</strong> bắt buộc nhập/scan job‑rev trước khi chạy; barcode traveler.</li>
+<li><strong>Control gate dữ liệu:</strong> bắt buộc nhập/scan job‑rev trước khi chạy; barcode traveler.</li>
 </ol><div class="callout">
 <strong>Chốt thiết kế:</strong> poka‑yoke phải gắn với “mode lỗi” cụ thể, không làm tăng rủi ro mới (ví dụ: sensor false alarm gây dừng giả).
 </div><h3>3.7 Chuyên đề (L3): Xác minh hiệu lực – chọn “cửa sổ thời gian” đủ dài</h3><p>Xác minh hiệu lực không chỉ đo 1–2 ngày. Với lỗi hiếm nhưng nghiêm trọng, cửa sổ xác minh phải đủ chu kỳ (theo số job/lot) và có tiêu chí rõ ràng: recurrence = 0 trong 90 ngày, khiếu nại = 0, FPY tăng, đánh giá finding = 0.</p><h3>3.8 mẫu (L3): 8D review bảng kiểm (để tránh close ảo)</h3><ul>
@@ -337,7 +337,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <ol type="A"><li><strong>A.</strong> Càng thưa càng tốt</li><li><strong>B.</strong> Phù hợp chu kỳ quản trị và đủ để phản ứng kịp</li><li><strong>C.</strong> Chỉ làm khi khách hỏi</li><li><strong>D.</strong> Chỉ làm cuối năm</li></ol>
 </div><div class="card">
 <strong>Câu 7 (MCQ):</strong> Khi có thay đổi (change) ảnh hưởng chất lượng/tiến độ, nguyên tắc đúng là:
- <ol type="A"><li><strong>A.</strong> Ai cũng tự đổi được</li><li><strong>B.</strong> Phải theo kiểm soát thay đổi, có phê duyệt và lưu dấu</li><li><strong>C.</strong> Chỉ cần nói miệng</li><li><strong>D.</strong> Chỉ cần cập nhật sau khi xong</li></ol>
+ <ol type="A"><li><strong>A.</strong> Ai cũng tự đổi được</li><li><strong>B.</strong> Phải theo change control, có phê duyệt và lưu dấu</li><li><strong>C.</strong> Chỉ cần nói miệng</li><li><strong>D.</strong> Chỉ cần cập nhật sau khi xong</li></ol>
 </div><div class="card">
 <strong>Câu 8 (MCQ):</strong> Gating KPI dùng để:
  <ol type="A"><li><strong>A.</strong> Loại bỏ thưởng của tất cả</li><li><strong>B.</strong> Đặt điều kiện tối thiểu để được công nhận level/bonus</li><li><strong>C.</strong> Chỉ trang trí</li><li><strong>D.</strong> Chỉ áp dụng cho quản lý</li></ol>
@@ -367,7 +367,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Tôi đã hoàn thành danh mục OJT (bảng kiểm / danh mục) và được người hướng dẫn xác nhận.</li>
 <li>Tôi vượt qua bài kiểm tra nhanh/đánh giá theo rubric với tổng điểm ≥ 80.</li>
 </ul>
-</div><hr/><p class="small"><strong>Ghi chú triển khai:</strong> Tài liệu này được thiết kế để tích hợp trực tiếp vào sổ tay vận hành/đào tạo của HESEM. Khi đưa vào áp dụng, cần gắn mã SOP/WI/FRM thực tế, tên người phê duyệt và ngày hiệu lực, đồng thời liên kết với ma trận kỹ năng (skill matrix) + chính sách thưởng/level.</p></div></div></div>
+</div><hr/><p class="small"><strong>Ghi chú triển khai:</strong> Tài liệu này được thiết kế để tích hợp trực tiếp vào sổ tay vận hành/đào tạo của HESEM. Khi đưa vào áp dụng, cần gắn mã SOP/WI/FRM thực tế, tên approver và ngày hiệu lực, đồng thời liên kết với ma trận kỹ năng (skill matrix) + chính sách thưởng/level.</p></div></div></div>
 </div>
 <script src="../../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>

@@ -96,11 +96,11 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="section"><h2>3. Điều kiện bắt đầu cắt phoi</h2>
 <p>Không được bấm cycle start chỉ vì chương trình đã nạp. Phải chứng minh đủ 6 điều kiện dưới đây:</p>
 <div class="matrix">
-<div class="card"><strong>A. Bộ hồ sơ công việc (job packet) đúng.</strong><br/>Job/Op/Part/Rev, material lot, tool list, setup sheet, QPL và cổng kiểm soát đang đúng theo <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>.</div>
+<div class="card"><strong>A. Bộ job dossier (job packet) đúng.</strong><br/>Job/Op/Part/Rev, material lot, tool list, setup sheet, QPL và control gate đang đúng theo <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>.</div>
 <div class="card"><strong>B. Setup đủ điều kiện.</strong><br/>Tool preset, holder, fixture, torque, clamp logic, dung dịch làm mát mode, sister tool và wear start value đã khóa theo <a href="wi-517-setup-changeover-smed-standard-work.html">WI-517</a>.</div>
 <div class="card"><strong>C. Machine state an toàn.</strong><br/>Home/reference đúng, warm-up hoàn thành, offset nền xác minh, probe/tool setter không lỗi, guard hoạt động.</div>
 <div class="card"><strong>D. Run strategy rõ.</strong><br/>Biết rõ đoạn prove-out, single block/override, điểm quan sát đầu tiên, nơi có nguy cơ va chạm và điểm dừng an toàn.</div>
-<div class="card"><strong>E. CTQ đầu tiên đã nhận diện.</strong><br/>Người vận hành biết rõ đặc tính đầu tiên phải kiểm, dụng cụ đo, ngưỡng phản ứng và người ký mở cổng kiểm soát.</div>
+<div class="card"><strong>E. CTQ đầu tiên đã nhận diện.</strong><br/>Người vận hành biết rõ đặc tính đầu tiên phải kiểm, dụng cụ đo, ngưỡng phản ứng và người ký mở control gate.</div>
 <div class="card"><strong>F. Bất thường đã đóng.</strong><br/>Mọi alarm, maintenance tag, HOLD part hoặc HOLD machine của ca trước đã được đóng hoặc có lệnh mở rõ ràng.</div>
 </div>
 <div class="callout-warn"><strong>Quy tắc prove-out:</strong> setup mới, chương trình mới, machine transfer, tool substitute, fixture substitute, offset reset sau crash hoặc restart sau mất điện đều phải quay về prove-out có kiểm soát. Không được nhảy cóc sang chạy sản lượng.</div>
@@ -131,7 +131,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <tr><td>Trạng thái WIP</td><td>Last-known-good, first-affected nếu có, số lượng đạt/chờ/chịu nghi ngờ.</td></tr>
 <tr><td>Trạng thái tool</td><td>Dao nào gần hết life, dao nào vừa thay, sister tool đã sẵn hay chưa.</td></tr>
 <tr><td>Offset &amp; lưu ý</td><td>Chỉnh wear đã thực hiện, lưu ý tiếng cắt/rung/chip/dung dịch làm mát, điểm phải quan sát ở chu kỳ tới.</td></tr>
-<tr><td>Cổng kiểm soát / release</td><td>Cổng kiểm soát nào đã mở, cổng kiểm soát nào đang chờ, ai là người ký bước tiếp theo.</td></tr>
+<tr><td>Control gate / release</td><td>Control gate nào đã mở, control gate nào đang chờ, ai là người ký bước tiếp theo.</td></tr>
 </tbody></table></div>
 <h3>5.3 Cuối ca / shutdown có kiểm soát</h3>
 <ul>
@@ -173,7 +173,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <li>Alarm nhật ký / ảnh màn hình / ảnh hiện trường khi có bất thường.</li>
 <li>Shift handover note cho mọi machine đang chạy dở, prove-out hoặc HOLD.</li>
 <li>Reason code cho downtime, short stop, tool change bất thường, crash/sự cố suýt xảy ra (near-miss).</li>
-<li>Liên kết tới Hồ sơ công việc (job dossier) nếu bất thường có thể ảnh hưởng chất lượng.</li>
+<li>Liên kết tới Job dossier (job dossier) nếu bất thường có thể ảnh hưởng chất lượng.</li>
 </ul></div>
 <div class="card"><h3>7.2 KPI kỷ luật vận hành</h3><ul class="tight">
 <li>Số lần restart không đúng quy tắc.</li>

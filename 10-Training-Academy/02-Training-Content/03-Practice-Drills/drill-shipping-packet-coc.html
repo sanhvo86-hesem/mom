@@ -75,7 +75,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="kicker">Bộ diễn tập</div>
 <h1 class="h1">DRL-Bài diễn tập 07 — Shipping Packet + CoC</h1>
 <p class="lead">
- Diễn tập này khóa điểm chết: <b>ship thiếu chứng từ</b>. Mục tiêu: bộ hồ sơ giao hàng (ship packet) hoàn chỉnh, CoC đúng, traceability đủ, GO-SHIP đúng cổng kiểm soát.
+ Diễn tập này khóa điểm chết: <b>ship thiếu chứng từ</b>. Mục tiêu: bộ hồ sơ giao hàng (ship packet) hoàn chỉnh, CoC đúng, traceability đủ, GO-SHIP đúng control gate.
  </p>
 </div>
 <div class="grid-2">
@@ -105,10 +105,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Control gate</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Đọc PO/rà soát hợp đồng: chốt danh mục bộ hồ sơ giao hàng bắt buộc.</td><td>QA/CS</td><td>Bộ hồ sơ giao hàng bảng kiểm (job-specific)</td><td>HOLD</td></tr><tr><td>2</td><td>Reconciliation Final IR/FAI: quantity, serial/lot (KHI có), CTQ PASS.</td><td>QC</td><td>Final IR/FAI link</td><td>HOLD</td></tr><tr><td>3</td><td>Reconciliation chứng từ vật liệu/outsource: MTR + supplier cert khớp spec/REV.</td><td>QA/WHS</td><td>MTR/Cert links</td><td>HOLD</td></tr><tr><td>4</td><td>Tạo CoC theo template: JobNum/PartNo/REV/Qty/Spec, ký số hoặc ký scan.</td><td>QA</td><td>CoC PDF</td><td>HOLD</td></tr><tr><td>5</td><td>Packing/label: chụp ảnh label + packing, đối soát yêu cầu đặc biệt.</td><td>WHS</td><td>Label photo + phiếu kê đóng gói</td><td>HOLD</td></tr><tr><td>6</td><td>Lưu toàn bộ bộ hồ sơ giao hàng tại 50_Shipping/ theo naming rule + tạo 01 link tổng.</td><td>QA</td><td>Bộ hồ sơ giao hàng folder link</td><td>FAIL</td></tr><tr><td>7</td><td>Cổng kiểm soát GO-SHIP: ký release (QA + WHS) và cập nhật ERP/dispatch.</td><td>QA + WHS</td><td>Phê duyệt giao hàng (ship release) hồ sơ</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Đọc PO/rà soát hợp đồng: chốt danh mục bộ hồ sơ giao hàng bắt buộc.</td><td>QA/CS</td><td>Bộ hồ sơ giao hàng bảng kiểm (job-specific)</td><td>HOLD</td></tr><tr><td>2</td><td>Reconciliation Final IR/FAI: quantity, serial/lot (KHI có), CTQ PASS.</td><td>QC</td><td>Final IR/FAI link</td><td>HOLD</td></tr><tr><td>3</td><td>Reconciliation chứng từ vật liệu/outsource: MTR + supplier cert khớp spec/REV.</td><td>QA/WHS</td><td>MTR/Cert links</td><td>HOLD</td></tr><tr><td>4</td><td>Tạo CoC theo template: JobNum/PartNo/REV/Qty/Spec, ký số hoặc ký scan.</td><td>QA</td><td>CoC PDF</td><td>HOLD</td></tr><tr><td>5</td><td>Packing/label: chụp ảnh label + packing, đối soát yêu cầu đặc biệt.</td><td>WHS</td><td>Label photo + phiếu kê đóng gói</td><td>HOLD</td></tr><tr><td>6</td><td>Lưu toàn bộ bộ hồ sơ giao hàng tại 50_Shipping/ theo naming rule + tạo 01 link tổng.</td><td>QA</td><td>Bộ hồ sơ giao hàng folder link</td><td>FAIL</td></tr><tr><td>7</td><td>Control gate GO-SHIP: ký release (QA + WHS) và cập nhật ERP/dispatch.</td><td>QA + WHS</td><td>Phê duyệt giao hàng (ship release) hồ sơ</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>

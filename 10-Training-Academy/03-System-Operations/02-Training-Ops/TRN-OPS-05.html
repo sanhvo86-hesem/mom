@@ -85,7 +85,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="badge"><span class="dot"></span>System Ops Mô-đun</div>
 <h1 style="margin-top:10px">OJT Standard Work theo TWI Hướng dẫn công việc</h1>
 <p class="muted">
- Mục tiêu: biến đào tạo thành <b>quy trình vận hành có cổng kiểm soát</b>. Không có bằng chứng → không cấp quyền thao tác → không mở cổng bàn giao.
+ Mục tiêu: biến đào tạo thành <b>quy trình vận hành có control gate</b>. Không có bằng chứng → không cấp quyền thao tác → không mở cổng bàn giao.
  </p>
 <div class="tag blue">Phiên bản</div>
 <div style="height:10px">Draft</div>
@@ -108,12 +108,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Thông tin triển khai (bắt buộc)</strong>
 <ul class="tight">
-<li><strong>Đối tượng:</strong> toàn bộ vị trí có thao tác/cổng kiểm soát/bàn giao trong chuỗi Lệnh sản xuất.</li>
+<li><strong>Đối tượng:</strong> toàn bộ vị trí có thao tác/control gate/bàn giao trong chuỗi Lệnh sản xuất.</li>
 <li><strong>Thời lượng chuẩn:</strong> 45 phút briefing + 60 phút workshop (Job Breakdown) + 01 phiên OJT tại hiện trường (60–120 phút) + theo dõi tiếp trong ca (tối thiểu 02 lần quan sát trong 01 tuần).</li>
 <li><strong>Ràng buộc triển khai:</strong> vận hành 02 ca, 06 ngày/tuần; mỗi vai trò tham gia tối đa 02 ngày/tuần; tổ chức theo block 60–120 phút/phiên để không phá vỡ kế hoạch sản xuất.</li>
 <li><strong>Kích hoạt mô-đun:</strong> nhận việc mới; đổi công đoạn; máy/đồ gá/dao mới; thay đổi bản vẽ/Rev; thay đổi quy trình; phát sinh NCR/MRB do thao tác; đánh giá phát hiện thiếu bằng chứng năng lực.</li>
 <li><strong>Biểu mẫu bắt buộc:</strong> <span class="mono">FRM-HR-TRN-003</span> (OJT Checklist – TWI-JI / danh mục OJT).</li>
-<li><strong>Quy tắc cứng:</strong> “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”.</li>
+<li><strong>Quy tắc cứng:</strong> “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”.</li>
 </ul>
 </div>
 </div>
@@ -121,7 +121,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Mục lục nhanh</strong>
 <ul>
 <li><a href="#mucdich">2) Mục đích &amp; bối cảnh vận hành</a></li>
-<li><a href="#e2e">3) Vị trí trong chuỗi E2E + luồng bàn giao + điểm chặn</a></li>
+<li><a href="#e2e">3) Vị trí trong chuỗi E2E + luồng bàn giao + hold point</a></li>
 <li><a href="#failure">4) Điểm đứt gãy (điểm gãy thực tế)</a></li>
 <li><a href="#controls">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + bằng chứng)</a></li>
 <li><a href="#failfast">6) Fail-fast rules + STOP/HOLD/BLOCK</a></li>
@@ -137,13 +137,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <!-- 2) Mục đích module & bối cảnh vận hành -->
-<h2 id="mucdich">2) Mục đích mô-đun &amp; bối cảnh vận hành (cổng kiểm soát/bàn giao; trách nhiệm; khi kích hoạt)</h2>
+<h2 id="mucdich">2) Mục đích mô-đun &amp; bối cảnh vận hành (control gate/bàn giao; trách nhiệm; khi kích hoạt)</h2>
 <div class="grid-2">
 <div class="note">
-<strong>Lý do tồn tại (Cổng kiểm soát Logic)</strong>
+<strong>Lý do tồn tại (Control gate Logic)</strong>
 <ul class="tight">
 <li>OJT không chuẩn hóa tạo “nhiều cách làm” → trôi chuẩn → lỗi lặp lại.</li>
-<li>Bàn giao không gắn bằng chứng năng lực → bàn giao sai người → vượt qua cổng kiểm soát.</li>
+<li>Bàn giao không gắn bằng chứng năng lực → bàn giao sai người → vượt qua control gate.</li>
 <li>Đánh giá hỏi “Ai đủ năng lực làm bước này?” → không chứng minh được → lỗi hệ thống (7.2, 7.5).</li>
 <li>OJT không có phản hồi theo hành vi → sai lặp → tăng scrap, tăng NCR/MRB, tăng rủi ro giao hàng.</li>
 </ul>
@@ -152,7 +152,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Trách nhiệm bắt buộc theo vai trò (tóm tắt)</strong>
 <ul class="tight">
 <li><b>Supervisor:</b> kích hoạt OJT, chỉ định mentor, chặn quyền khi chưa đạt, xác nhận cấp quyền theo phạm vi.</li>
-<li><b>QA/QMS:</b> thiết lập cổng kiểm soát “no bằng chứng”, kiểm tra hồ sơ, mở đánh giá định kỳ về năng lực.</li>
+<li><b>QA/QMS:</b> thiết lập control gate “no bằng chứng”, kiểm tra hồ sơ, mở đánh giá định kỳ về năng lực.</li>
 <li><b>Mentor/OJT Trainer:</b> dạy theo TWI, ghi nhận bằng chứng, phản hồi theo hành vi, ký xác nhận đúng sự thật.</li>
 <li><b>Người học:</b> thực hành đúng chuẩn, nhắc lại điểm then chốt, lưu bằng chứng theo quy tắc đặt tên.</li>
 </ul>
@@ -165,16 +165,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
 </div>
 <!-- 3) Vị trí trong chuỗi E2E + luồng handoff -->
-<h2 id="e2e">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
+<h2 id="e2e">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + hold point</h2>
 <p>
- TRN-OPS-05 là <b>mô-đun nền</b> áp dụng xuyên suốt chuỗi end-to-end. Mô-đun này không tạo sản phẩm trực tiếp; mô-đun này tạo <b>điều kiện cấp quyền</b> để từng vai trò được phép thực hiện các cổng kiểm soát/bàn giao trong quy trình.
+ TRN-OPS-05 là <b>mô-đun nền</b> áp dụng xuyên suốt chuỗi end-to-end. Mô-đun này không tạo sản phẩm trực tiếp; mô-đun này tạo <b>điều kiện cấp quyền</b> để từng vai trò được phép thực hiện các control gate/bàn giao trong quy trình.
  </p>
 <table class="table">
 <thead>
 <tr>
 <th style="width:170px">Bước chuỗi E2E</th>
-<th>Cổng kiểm soát/Bàn giao điển hình</th>
-<th style="width:240px">Điểm chặn (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</th>
+<th>Control gate/Bàn giao điển hình</th>
+<th style="width:240px">Hold point (Không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</th>
 </tr>
 </thead>
 <tbody>
@@ -186,7 +186,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Planning</b></td>
 <td>Planner phát hành Job Tracking Sheet/route</td>
-<td>Planner đạt TRN-OPS-05 (L2) trước khi phát hành traveler có cổng kiểm soát QC/QA</td>
+<td>Planner đạt TRN-OPS-05 (L2) trước khi phát hành traveler có control gate QC/QA</td>
 </tr>
 <tr>
 <td><b>Engineering</b></td>
@@ -261,7 +261,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div class="note">
-<strong>Điểm chặn bắt buộc</strong>
+<strong>Hold point bắt buộc</strong>
 <ul class="tight">
 <li>Thiếu 01 item trong MRR → HOLD cấp quyền.</li>
 <li>Mentor không đủ level/không được ủy quyền bằng văn bản → BLOCK OJT.</li>
@@ -285,12 +285,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>F2</td><td>Chọn mentor theo thâm niên, không theo chứng nhận level</td><td>Dạy sai chuẩn; hợp thức hóa sai lệch; đánh giá bác bỏ</td></tr>
 <tr><td>F3</td><td>OJT dùng tài liệu cũ (sai Rev) hoặc thiếu tài liệu tham chiếu</td><td>Sai đặc tính; sai CTQ; tạo customer escape</td></tr>
 <tr><td>F4</td><td>Bảng kiểm ký đủ nhưng không có quan sát thực tế</td><td>Hồ sơ giả; rủi ro pháp lý; mất uy tín hệ thống</td></tr>
-<tr><td>F5</td><td>Không định nghĩa rõ “quyền thao tác theo phạm vi” (task/máy/công đoạn)</td><td>Người chưa đủ năng lực làm việc ngoài phạm vi; vượt qua cổng kiểm soát</td></tr>
+<tr><td>F5</td><td>Không định nghĩa rõ “quyền thao tác theo phạm vi” (task/máy/công đoạn)</td><td>Người chưa đủ năng lực làm việc ngoài phạm vi; vượt qua control gate</td></tr>
 <tr><td>F6</td><td>Thiếu theo dõi tiếp sau OJT (không quan sát trong ca)</td><td>Sai tái diễn sau lớp; mentor tưởng đã đạt</td></tr>
 <tr><td>F7</td><td>Phản hồi mang tính phán xét con người, không bám hành vi</td><td>Tranh cãi; người học né lỗi; mất tín hiệu rủi ro</td></tr>
-<tr><td>F8</td><td>Không gắn OJT với cổng kiểm soát/bàn giao thực tế</td><td>Học xong vẫn làm sai; thiếu “điểm chặn” trong quy trình</td></tr>
+<tr><td>F8</td><td>Không gắn OJT với control gate/bàn giao thực tế</td><td>Học xong vẫn làm sai; thiếu “hold point” trong quy trình</td></tr>
 <tr><td>F9</td><td>MRR lưu sai chỗ, đặt tên không truy xuất</td><td>Đánh giá không tìm thấy; “no bằng chứng”; mất quyền thao tác</td></tr>
-<tr><td>F10</td><td>Không có performance test cho task có thao tác/cổng kiểm soát/đo/duyệt</td><td>Không chứng minh được “làm được”; tăng scrap/NCR</td></tr>
+<tr><td>F10</td><td>Không có performance test cho task có thao tác/control gate/đo/duyệt</td><td>Không chứng minh được “làm được”; tăng scrap/NCR</td></tr>
 <tr><td>F11</td><td>Không kích hoạt đào tạo lại khi có NCR/MRB do thao tác</td><td>Repeat vấn đề; CAPA không đóng; đánh giá năng lực sai</td></tr>
 <tr><td>F12</td><td>Không có kiểm tra định kỳ (LPA/đánh giá tầng) về tuân thủ OJT</td><td>Trôi chuẩn theo thời gian; lệch chuẩn thành “chuẩn mới”</td></tr>
 </tbody>
@@ -300,7 +300,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <div class="iso-map">
 <div class="iso-title">Điểm kiểm soát bắt buộc (gắn bằng chứng – sẵn sàng đánh giá)</div>
-<div class="small muted"><b>Nhóm rủi ro:</b> sai Rev/phiên bản • vượt qua cổng kiểm soát • thiếu/giả hồ sơ • lẫn lộn/traceability • đo kiểm/hiệu chuẩn • rủi ro giao hàng</div>
+<div class="small muted"><b>Nhóm rủi ro:</b> sai Rev/phiên bản • vượt qua control gate • thiếu/giả hồ sơ • lẫn lộn/traceability • đo kiểm/hiệu chuẩn • rủi ro giao hàng</div>
 <div class="req"><span class="req-tag shall">PHẢI</span>
 <div><b>CP1 — Chốt tài liệu tham chiếu đúng revision</b>: Supervisor/QA/QMS <b>PHẢI</b> xác nhận danh mục SOP/WI/Phiếu theo dõi công việc/Drawing dùng cho OJT trước khi bắt đầu. Bằng chứng: bảng kiểm “Revision Verified” kèm ảnh/đường dẫn tài liệu. </div>
 </div>
@@ -311,10 +311,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><b>CP3 — TWI Job Breakdown Sheet</b>: Mentor <b>PHẢI</b> lập Job Breakdown (Step/Điểm then chốt/Lý do) cho task trước khi dạy. Bằng chứng: file Job Breakdown ký tên và ngày. </div>
 </div>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div><b>CP4 — Performance test cho task có thao tác/cổng kiểm soát/đo/duyệt</b>: Mentor + QA/QC <b>PHẢI</b> thực hiện bài test theo rubric và kết luận ĐẠT/KHÔNG ĐẠT. Bằng chứng: phiếu test + kết quả đo/hồ sơ. </div>
+<div><b>CP4 — Performance test cho task có thao tác/control gate/đo/duyệt</b>: Mentor + QA/QC <b>PHẢI</b> thực hiện bài test theo rubric và kết luận ĐẠT/KHÔNG ĐẠT. Bằng chứng: phiếu test + kết quả đo/hồ sơ. </div>
 </div>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div><b>CP5 — không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</b>: Supervisor <b>PHẢI</b> khóa quyền thao tác khi thiếu MRR, kể cả học viên đã làm tốt tại hiện trường. Bằng chứng: danh sách quyền được cấp theo phạm vi và trạng thái (GO/HOLD/BLOCK). </div>
+<div><b>CP5 — không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</b>: Supervisor <b>PHẢI</b> khóa quyền thao tác khi thiếu MRR, kể cả học viên đã làm tốt tại hiện trường. Bằng chứng: danh sách quyền được cấp theo phạm vi và trạng thái (GO/HOLD/BLOCK). </div>
 </div>
 <div class="req"><span class="req-tag shall">PHẢI</span>
 <div><b>CP6 — theo dõi tiếp quan sát trong ca</b>: Mentor <b>PHẢI</b> quan sát tối thiểu 02 lần trong 01 tuần sau OJT và ghi nhận hành vi theo rubric. Bằng chứng: nhật ký quan sát + hành động chỉnh sửa. </div>
@@ -350,13 +350,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight mini">
 <li>Mentor không đạt level/không có ủy quyền.</li>
 <li>Phát hiện ký khống hoặc ghi hồ sơ sai sự thật.</li>
-<li>Task thuộc CTQ/cổng kiểm soát chất lượng nhưng không có QA/QC tham gia chứng kiến.</li>
+<li>Task thuộc CTQ/control gate chất lượng nhưng không có QA/QC tham gia chứng kiến.</li>
 </ul>
 <div class="mini"><b>Hành động bắt buộc:</b> khóa OJT → mở NCR hệ thống → chỉ mở lại khi có người đủ thẩm quyền và bằng chứng corrective action.</div>
 </div>
 </div>
 <!-- 7) 60-second reaction -->
-<h2 id="react60">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua cổng kiểm soát/rủi ro giao hàng)</h2>
+<h2 id="react60">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua control gate/rủi ro giao hàng)</h2>
 <div class="card">
 <div class="kpi-gate">
 <strong>Phản ứng 60 giây — 6 bước cố định</strong>
@@ -366,7 +366,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>CHỐT DỮ KIỆN</b>: chụp ảnh màn hình/file rev; ghi mã job/part/rev/lot; ghi ID gage (khi liên quan đo).</li>
 <li><b>BÁO ĐÚNG CẤP</b>: báo Supervisor + QA/QC; báo EHS khi liên quan an toàn; báo Planner/Estimator (SAL-03) khi liên quan ship.</li>
 <li><b>GHI MRR</b>: tạo “Stop Nhật ký” theo mẫu nội bộ M365/SharePoint → HESEM-QMS-SSOT hoặc ghi vào phần “Ghi chú/Hành động” của FRM-HR-TRN-003.</li>
-<li><b>CHẶN CỔNG</b>: xác nhận cổng kiểm soát bị khóa cho tới khi có kết luận rõ (GO/HOLD/BLOCK) và cập nhật hồ sơ.</li>
+<li><b>CHẶN CỔNG</b>: xác nhận control gate bị khóa cho tới khi có kết luận rõ (GO/HOLD/BLOCK) và cập nhật hồ sơ.</li>
 </ol>
 <div class="small">Nguyên tắc: hành động trong 60 giây để “đóng cửa rủi ro”, sau đó mới phân tích sâu.</div>
 </div>
@@ -389,11 +389,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3</td><td><b>Chọn mentor đủ năng lực/ủy quyền</b></td><td>Supervisor</td><td>Bằng chứng level/ủy quyền</td><td>Chọn người rảnh ca; không có chứng nhận</td></tr>
 <tr><td>4</td><td><b>Lập Job Breakdown Sheet</b> (Step/Điểm then chốt/Lý do)</td><td>Mentor</td><td>Job Breakdown ký tên/ngày</td><td>Viết chung chung; thiếu “điểm then chốt”</td></tr>
 <tr><td>5</td><td><b>Chuẩn bị hiện trường OJT</b> (an toàn, dụng cụ, mẫu, gage đạt chuẩn)</td><td>Mentor + EHS/QC</td><td>Ảnh hiện trường + ID gage</td><td>Thiếu dụng cụ; gage quá hạn; khu vực bừa</td></tr>
-<tr><td>6</td><td><b>TWI Step 1 — Chuẩn bị người học</b> (mục tiêu, rủi ro, tiêu chí ĐẠT/KHÔNG ĐẠT)</td><td>Mentor</td><td>Biên bản briefing</td><td>Không nói rõ rủi ro; không nêu cổng kiểm soát</td></tr>
-<tr><td>7</td><td><b>TWI Step 2 — Trình diễn thao tác</b> (đúng chuẩn + điểm then chốt + lý do)</td><td>Mentor</td><td>Ghi nhận “đã trình diễn”</td><td>Chỉ làm nhanh; không giải thích điểm chặn</td></tr>
+<tr><td>6</td><td><b>TWI Step 1 — Chuẩn bị người học</b> (mục tiêu, rủi ro, tiêu chí ĐẠT/KHÔNG ĐẠT)</td><td>Mentor</td><td>Biên bản briefing</td><td>Không nói rõ rủi ro; không nêu control gate</td></tr>
+<tr><td>7</td><td><b>TWI Step 2 — Trình diễn thao tác</b> (đúng chuẩn + điểm then chốt + lý do)</td><td>Mentor</td><td>Ghi nhận “đã trình diễn”</td><td>Chỉ làm nhanh; không giải thích hold point</td></tr>
 <tr><td>8</td><td><b>TWI Step 3 — Học viên làm lại</b> (nhắc lại điểm then chốt)</td><td>Người học</td><td>Quan sát trực tiếp + ghi nhận lỗi</td><td>Học viên làm nhưng không nói lại điểm then chốt</td></tr>
 <tr><td>9</td><td><b>Kèm cặp phát triển (coaching) &amp; phản hồi theo hành vi</b> (S–B–I: tình huống–hành vi–tác động)</td><td>Mentor</td><td>Nhật ký phản hồi 1–1</td><td>Phản hồi chung chung; đánh giá con người</td></tr>
-<tr><td>10</td><td><b>Performance test</b> (task có thao tác/cổng kiểm soát/đo/duyệt)</td><td>Mentor + QC/QA</td><td>Phiếu test + hồ sơ đo</td><td>Test thiếu tiêu chí; không có ĐẠT/KHÔNG ĐẠT</td></tr>
+<tr><td>10</td><td><b>Performance test</b> (task có thao tác/control gate/đo/duyệt)</td><td>Mentor + QC/QA</td><td>Phiếu test + hồ sơ đo</td><td>Test thiếu tiêu chí; không có ĐẠT/KHÔNG ĐẠT</td></tr>
 <tr><td>11</td><td><b>Chốt rubric L1–L4</b> (hành vi quan sát được)</td><td>Mentor + Supervisor</td><td>Rubric ký tên</td><td>Chấm theo cảm giác; thiếu dẫn chứng</td></tr>
 <tr><td>12</td><td><b>Hoàn tất FRM-HR-TRN-003</b> (ký thật, đúng ngày)</td><td>Mentor + Người học</td><td>FRM-HR-TRN-003</td><td>Ký dồn; thiếu ngày; thiếu nội dung CTQ</td></tr>
 <tr><td>13</td><td><b>Lưu MRR đúng nơi + đặt tên chuẩn</b></td><td>HR/QA/QMS</td><td>Đường dẫn lưu + kiểm tra truy xuất</td><td>Lưu rải rác; tên file không truy xuất</td></tr>
@@ -404,15 +404,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout" style="margin-top:12px">
 <strong>Self-check 7 gates (tự kiểm trước khi cấp quyền)</strong>
 <ol class="tight">
-<li><b>Cổng kiểm soát 1 — Scope</b>: phạm vi (vai trò × task × máy/công đoạn) được khai báo rõ.</li>
-<li><b>Cổng kiểm soát 2 — Revision</b>: tài liệu tham chiếu đúng revision, có bằng chứng Rev Verified.</li>
-<li><b>Cổng kiểm soát 3 — Mentor</b>: mentor đủ level/ủy quyền theo phạm vi, có hồ sơ chứng minh.</li>
-<li><b>Cổng kiểm soát 4 — Job Breakdown</b>: Job Breakdown Sheet có Step/Điểm then chốt/Lý do cho task.</li>
-<li><b>Cổng kiểm soát 5 — TWI</b>: đủ 4 bước TWI, có kèm cặp phát triển theo hành vi và ghi nhật ký.</li>
-<li><b>Cổng kiểm soát 6 — Test</b>: performance test PASS (khi task có thao tác/cổng kiểm soát/đo/duyệt), có hồ sơ.</li>
-<li><b>Cổng kiểm soát 7 — MRR</b>: MRR đủ 100%, lưu đúng nơi, đặt tên chuẩn, cập nhật danh sách quyền (GO/HOLD/BLOCK).</li>
+<li><b>Control gate 1 — Scope</b>: phạm vi (vai trò × task × máy/công đoạn) được khai báo rõ.</li>
+<li><b>Control gate 2 — Revision</b>: tài liệu tham chiếu đúng revision, có bằng chứng Rev Verified.</li>
+<li><b>Control gate 3 — Mentor</b>: mentor đủ level/ủy quyền theo phạm vi, có hồ sơ chứng minh.</li>
+<li><b>Control gate 4 — Job Breakdown</b>: Job Breakdown Sheet có Step/Điểm then chốt/Lý do cho task.</li>
+<li><b>Control gate 5 — TWI</b>: đủ 4 bước TWI, có kèm cặp phát triển theo hành vi và ghi nhật ký.</li>
+<li><b>Control gate 6 — Test</b>: performance test PASS (khi task có thao tác/control gate/đo/duyệt), có hồ sơ.</li>
+<li><b>Control gate 7 — MRR</b>: MRR đủ 100%, lưu đúng nơi, đặt tên chuẩn, cập nhật danh sách quyền (GO/HOLD/BLOCK).</li>
 </ol>
-<div class="mini"><b>Quy tắc:</b> thiếu 01 cổng kiểm soát → giữ trạng thái HOLD hoặc BLOCK theo mục 6.</div>
+<div class="mini"><b>Quy tắc:</b> thiếu 01 control gate → giữ trạng thái HOLD hoặc BLOCK theo mục 6.</div>
 </div>
 <!-- 9) OJT theo TWI -->
 <h2 id="twi">9) OJT thực chiến theo TWI</h2>
@@ -428,9 +428,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>1) Xác định phạm vi &amp; cổng kiểm soát của task</b></td>
+<td><b>1) Xác định phạm vi &amp; control gate của task</b></td>
 <td>Vai trò × task × máy/công đoạn; CTQ; điều kiện STOP/HOLD/BLOCK</td>
-<td>Chặn vượt qua cổng kiểm soát; cấp quyền đúng phạm vi</td>
+<td>Chặn vượt qua control gate; cấp quyền đúng phạm vi</td>
 </tr>
 <tr>
 <td><b>2) Chốt tài liệu đúng revision</b></td>
@@ -444,7 +444,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>4) Trình diễn theo “một cách tốt nhất”</b></td>
-<td>Làm chậm; chỉ điểm chặn; nói rõ điểm then chốt + lý do</td>
+<td>Làm chậm; chỉ hold point; nói rõ điểm then chốt + lý do</td>
 <td>Người học hiểu “vì sao”; giảm lỗi do thói quen</td>
 </tr>
 <tr>
@@ -473,8 +473,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <ul class="tight">
 <li>01 <b>FRM-HR-TRN-003</b> hoàn chỉnh cho mỗi người học × mỗi nhóm task.</li>
-<li>01 <b>Job Breakdown Sheet</b> cho mỗi task/cổng kiểm soát có rủi ro cao (CTQ/đo kiểm/revision/traceability).</li>
-<li>01 <b>Performance test hồ sơ</b> cho task có thao tác/cổng kiểm soát/đo/duyệt.</li>
+<li>01 <b>Job Breakdown Sheet</b> cho mỗi task/control gate có rủi ro cao (CTQ/đo kiểm/revision/traceability).</li>
+<li>01 <b>Performance test hồ sơ</b> cho task có thao tác/control gate/đo/duyệt.</li>
 <li>01 <b>Nhật ký phản hồi 1–1</b> theo hành vi (tối thiểu 02 lần trong tuần).</li>
 <li>01 <b>Danh sách quyền thao tác theo phạm vi</b> (GO/HOLD/BLOCK) cập nhật sau kết luận.</li>
 </ul>
@@ -493,12 +493,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L1</b><div class="muted">Nhận biết &amp; làm theo hướng dẫn (giám sát trực tiếp)</div></td>
 <td>
 <ul class="tight">
-<li>Nhắc đúng “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” và nêu đúng 6 bước phản ứng 60 giây.</li>
+<li>Nhắc đúng “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” và nêu đúng 6 bước phản ứng 60 giây.</li>
 <li>Thực hiện task khi mentor đứng kèm; dừng ngay khi gặp điều kiện STOP.</li>
 <li>Ghi nhận bằng chứng cơ bản: ảnh/ghi chú, đúng mã job/part/rev.</li>
 </ul>
 </td>
-<td>Chỉ được thực hành trong phạm vi có mentor giám sát trực tiếp; không ký bất kỳ hồ sơ chấp nhận/cổng kiểm soát.</td>
+<td>Chỉ được thực hành trong phạm vi có mentor giám sát trực tiếp; không ký bất kỳ hồ sơ chấp nhận/control gate.</td>
 </tr>
 <tr>
 <td><b>L2</b><div class="muted">Thực hiện ổn định theo chuẩn (giám sát theo ca)</div></td>
@@ -520,7 +520,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiết kế Job Breakdown cho task mới; tổ chức performance test có chứng cứ.</li>
 </ul>
 </td>
-<td>Được làm mentor cho task trong phạm vi; được quyền yêu cầu khóa cổng kiểm soát khi phát hiện sai rev/thiếu chứng cứ.</td>
+<td>Được làm mentor cho task trong phạm vi; được quyền yêu cầu khóa control gate khi phát hiện sai rev/thiếu chứng cứ.</td>
 </tr>
 <tr>
 <td><b>L4</b><div class="muted">Thiết kế hệ thống &amp; kiểm soát trôi chuẩn</div></td>
@@ -531,7 +531,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Chuyển bài học NCR/MRB thành cập nhật WI/OJT và tái chứng nhận.</li>
 </ul>
 </td>
-<td>Được phê duyệt cấp quyền theo phạm vi, thiết lập cổng kiểm soát, yêu cầu tái đào tạo và mở NCR hệ thống khi vi phạm.</td>
+<td>Được phê duyệt cấp quyền theo phạm vi, thiết lập control gate, yêu cầu tái đào tạo và mở NCR hệ thống khi vi phạm.</td>
 </tr>
 </tbody>
 </table>
@@ -567,7 +567,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>QA</b></td>
-<td>OJT cho cổng kiểm soát phê duyệt FAI/release; điều phối NCR/MRB do năng lực</td>
+<td>OJT cho control gate phê duyệt FAI/release; điều phối NCR/MRB do năng lực</td>
 <td>L3; thực hiện 01 scenario NCR/MRB và kết luận đúng GO/HOLD/BLOCK</td>
 </tr>
 <tr>
@@ -582,8 +582,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Planner</b></td>
-<td>OJT cho phát hành traveler/route; điểm chặn revision; bàn giao sản xuất</td>
-<td>L2; phát hành 01 traveler đúng rev; ghi rõ cổng kiểm soát QC/QA và MRR kèm</td>
+<td>OJT cho phát hành traveler/route; hold point revision; bàn giao sản xuất</td>
+<td>L2; phát hành 01 traveler đúng rev; ghi rõ control gate QC/QA và MRR kèm</td>
 </tr>
 <tr>
 <td><b>Maintenance</b></td>
@@ -612,16 +612,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">10.1 Bài kiểm tra nhanh (≥20 câu; trắc nghiệm + tình huống ngắn)</h3>
 <div class="quiz">
 <strong>Bài kiểm tra nhanh TRN-OPS-05</strong>
-<div class="small">Thời gian: 25–35 phút • Yêu cầu: trả lời theo quy tắc cổng kiểm soát và ghi bằng chứng.</div>
+<div class="small">Thời gian: 25–35 phút • Yêu cầu: trả lời theo quy tắc control gate và ghi bằng chứng.</div>
 <ol>
 <li>(Trắc nghiệm) Quy tắc lõi của mô-đun là gì?<br/>
- A. Học xong là làm được • B. không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) • C. Làm nhanh hơn là đủ • D. Ký bảng kiểm là xong</li>
+ A. Học xong là làm được • B. không có bằng chứng thì không qua control gate (No bằng chứng = No gate) • C. Làm nhanh hơn là đủ • D. Ký bảng kiểm là xong</li>
 <li>(Trắc nghiệm) TWI hướng dẫn công việc gồm mấy bước?<br/>
  A. 3 • B. 4 • C. 5 • D. 6</li>
 <li>(Trắc nghiệm) Bước nào bắt buộc chốt “vì sao việc này quan trọng” trước khi dạy?<br/>
  A. Step 1 • B. Step 2 • C. Step 3 • D. Step 4</li>
 <li>(Trắc nghiệm) “Điểm then chốt” trong Job Breakdown là gì?<br/>
- A. Mô tả dài • B. Điểm chặn/rủi ro/điểm dễ sai • C. Danh sách vật tư • D. Lịch ca</li>
+ A. Mô tả dài • B. Hold point/rủi ro/điểm dễ sai • C. Danh sách vật tư • D. Lịch ca</li>
 <li>(Trắc nghiệm) Khi phát hiện tài liệu tham chiếu sai phiên bản (wrong revision) trong lúc OJT, hành động đúng là gì?<br/>
  A. Tiếp tục để kịp tiến độ • B. STOP và báo đúng cấp • C. Đổi người học • D. Ký trước hồ sơ</li>
 <li>(Trắc nghiệm) Thiếu 01 hồ sơ trong MRR dẫn tới trạng thái gì?<br/>
@@ -642,11 +642,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  A. Operator • B. Warehouse • C. Supervisor • D. Estimator (SAL-03)</li>
 <li>(Tự luận ngắn) Viết 4 câu phản hồi theo cấu trúc S–B–I cho tình huống: học viên bỏ bước kiểm revision.</li>
 <li>(Trắc nghiệm) Performance test bắt buộc khi nào?<br/>
- A. Task có thao tác/cổng kiểm soát/đo/duyệt • B. Task văn phòng • C. Task nhẹ • D. Khi có thời gian</li>
-<li>(Tự luận ngắn) Nêu 2 cách chặn “vượt qua cổng kiểm soát” liên quan đào tạo.</li>
+ A. Task có thao tác/control gate/đo/duyệt • B. Task văn phòng • C. Task nhẹ • D. Khi có thời gian</li>
+<li>(Tự luận ngắn) Nêu 2 cách chặn “vượt qua control gate” liên quan đào tạo.</li>
 <li>(Trắc nghiệm) Điều kiện nào đủ để cấp GO quyền thao tác?<br/>
  A. Điểm bài kiểm tra nhanh cao • B. Có MRR đầy đủ + performance test PASS (khi có) • C. Mentor nói đạt • D. Học viên tự tin</li>
-<li>(Tự luận ngắn) Nêu 3 dấu hiệu cho thấy OJT đang “trôi chuẩn” và phải khóa cổng kiểm soát.</li>
+<li>(Tự luận ngắn) Nêu 3 dấu hiệu cho thấy OJT đang “trôi chuẩn” và phải khóa control gate.</li>
 </ol>
 <details class="print-hide">
 <summary><strong>Đáp án khung (dành cho trainer)</strong></summary>
@@ -734,9 +734,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Thiếu bước; học viên làm nhưng không hiểu điểm then chốt</td>
 </tr>
 <tr>
-<td>Cổng kiểm soát &amp; STOP/HOLD/BLOCK</td>
+<td>Control gate &amp; STOP/HOLD/BLOCK</td>
 <td>Phân loại đúng; kích hoạt phản ứng 60 giây đúng</td>
-<td>Bỏ qua cổng kiểm soát; tiếp tục thao tác khi có điều kiện STOP</td>
+<td>Bỏ qua control gate; tiếp tục thao tác khi có điều kiện STOP</td>
 </tr>
 <tr>
 <td>MRR</td>
@@ -747,23 +747,23 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <!-- 11) PASS/FAIL criteria -->
-<h2 id="passfail">11) ĐẠT/KHÔNG ĐẠT criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”)</h2>
+<h2 id="passfail">11) ĐẠT/KHÔNG ĐẠT criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”)</h2>
 <div class="kpi-gate">
 <strong>Điều kiện PASS (đồng thời phải thỏa)</strong>
 <ul class="tight">
-<li>Bài kiểm tra nhanh đạt ≥ <b>85%</b> (đúng khái niệm cổng kiểm soát, TWI, MRR, phản ứng 60 giây).</li>
+<li>Bài kiểm tra nhanh đạt ≥ <b>85%</b> (đúng khái niệm control gate, TWI, MRR, phản ứng 60 giây).</li>
 <li>Scenario: quyết định đúng GO/HOLD/BLOCK và ghi đúng MRR tối thiểu.</li>
-<li>Performance test: kết luận <b>PASS</b> theo rubric (khi vai trò có thao tác/cổng kiểm soát/đo/duyệt).</li>
+<li>Performance test: kết luận <b>PASS</b> theo rubric (khi vai trò có thao tác/control gate/đo/duyệt).</li>
 <li>MRR đủ 100% và truy xuất được theo đường dẫn trong mục 12.</li>
 <li>theo dõi tiếp: đủ 02 lần quan sát trong ca và không vi phạm điều kiện STOP.</li>
 </ul>
-<div class="small"><b>Quy tắc cứng:</b> thiếu bằng chứng → FAIL cổng kiểm soát, kể cả khi điểm bài kiểm tra nhanh cao.</div>
+<div class="small"><b>Quy tắc cứng:</b> thiếu bằng chứng → FAIL control gate, kể cả khi điểm bài kiểm tra nhanh cao.</div>
 </div>
 <div class="card" style="margin-top:12px">
 <strong>Điều kiện FAIL (chỉ cần 01 điều kiện)</strong>
 <ul class="tight">
 <li>Ký khống/ghi hồ sơ sai sự thật.</li>
-<li>Vi phạm STOP: sai phiên bản (wrong revision), OOT gage, lẫn lộn, vượt qua cổng kiểm soát.</li>
+<li>Vi phạm STOP: sai phiên bản (wrong revision), OOT gage, lẫn lộn, vượt qua control gate.</li>
 <li>Thiếu MRR hoặc MRR không truy xuất được.</li>
 <li>Mentor không đủ thẩm quyền hoặc không có ủy quyền theo phạm vi.</li>
 </ul>
@@ -840,7 +840,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>A1</td><td>Không chứng minh được năng lực người ký/nguời thao tác</td><td>ma trận kỹ năng (skill matrix) + danh sách quyền theo phạm vi + MRR truy xuất</td></tr>
 <tr><td>A2</td><td>Hồ sơ đào tạo thiếu chữ ký/thiếu ngày/thiếu phạm vi</td><td>FRM-HR-TRN-003 bắt buộc điền phạm vi; ký tại hiện trường; không ký dồn</td></tr>
 <tr><td>A3</td><td>OJT dùng tài liệu sai phiên bản (wrong revision)</td><td>CP1 Rev Verified bắt buộc; STOP khi phát hiện sai rev</td></tr>
-<tr><td>A4</td><td>Không có performance test cho task có cổng kiểm soát/đo/duyệt</td><td>CP4 bắt buộc; không có test → HOLD cấp quyền</td></tr>
+<tr><td>A4</td><td>Không có performance test cho task có control gate/đo/duyệt</td><td>CP4 bắt buộc; không có test → HOLD cấp quyền</td></tr>
 <tr><td>A5</td><td>MRR lưu rải rác, đặt tên không truy xuất</td><td>Áp dụng quy tắc đặt tên; kiểm tra truy xuất định kỳ</td></tr>
 <tr><td>A6</td><td>Ký khống/ghi hồ sơ sai sự thật</td><td>BLOCK + mở NCR hệ thống + tái chứng nhận mentor</td></tr>
 <tr><td>A7</td><td>Không kích hoạt đào tạo lại sau NCR/MRB do thao tác</td><td>Gắn trigger “NCR do thao tác” → bắt buộc OJT lại theo TRN-OPS-05</td></tr>

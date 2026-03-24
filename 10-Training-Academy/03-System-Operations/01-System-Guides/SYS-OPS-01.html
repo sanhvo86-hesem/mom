@@ -81,7 +81,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="title">
 <strong>SYS-OPS-01 — Tiêu chuẩn Bộ bằng chứng &amp; bài diễn tập đánh giá 60 giây</strong><br/>
 <span class="sub-vn"></span>
-<span class="muted">Chuẩn quốc tế Bộ bằng chứng &amp; diễn tập đánh giá 60 giây • “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” • Đào tạo thực chiến cho xưởng CNC gia công theo đơn (job shop)</span>
+<span class="muted">Chuẩn quốc tế Bộ bằng chứng &amp; diễn tập đánh giá 60 giây • “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” • Đào tạo thực chiến cho xưởng CNC gia công theo đơn (job shop)</span>
 </div>
 <div class="meta">
 <div class="row"><span><b>Code:</b></span><span>SYS-OPS-01</span></div>
@@ -116,32 +116,32 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card danger">
 <strong>Nguyên tắc cứng:</strong>
 <ul class="tight">
-<li><b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate).</b> Thiếu MRR → <b>BLOCK/HOLD</b> (đặc biệt trước phê duyệt giao hàng (ship release)).</li>
+<li><b>không có bằng chứng thì không qua control gate (No bằng chứng = No gate).</b> Thiếu MRR → <b>BLOCK/HOLD</b> (đặc biệt trước phê duyệt giao hàng (ship release)).</li>
 <li><b>Epicor/MES = Nguồn chuẩn</b> cho dữ liệu giao dịch (Job/Routing/Shipment/Time entry) → <b>không lưu “bản chụp” time entry</b> vào Bộ bằng chứng trừ khi điều tra và có phê duyệt.</li>
-<li><b>Part/REV Master = 1 nguồn đúng</b> cho dữ liệu kỹ thuật; Hồ sơ công việc (job dossier) chỉ lưu bằng chứng phát sinh theo job + hồ sơ phát hành.</li>
+<li><b>Part/REV Master = 1 nguồn đúng</b> cho dữ liệu kỹ thuật; Job dossier (job dossier) chỉ lưu bằng chứng phát sinh theo job + hồ sơ phát hành.</li>
 </ul>
 </div>
 <!-- ===================================================== -->
-<h2 class="h2">2) Mục đích mô-đun &amp; bối cảnh vận hành (cổng kiểm soát/bàn giao; ai chịu trách nhiệm; khi nào kích hoạt)</h2>
+<h2 class="h2">2) Mục đích mô-đun &amp; bối cảnh vận hành (control gate/bàn giao; ai chịu trách nhiệm; khi nào kích hoạt)</h2>
 <div class="card">
-<p><b>Lý do tồn tại (Cổng kiểm soát Logic):</b> Xưởng CNC gia công theo đơn có rủi ro “chết người” ở <b>Rev</b>, <b>lẫn lộn (mix-up)</b>, <b>thiếu chứng từ</b>, <b>hiệu chuẩn</b>, <b>vượt qua cổng kiểm soát</b>, <b>ship sai</b>. Các rủi ro này không thể “dò lại” bằng trí nhớ; phải chặn bằng <b>MRR có cấu trúc</b>.</p>
+<p><b>Lý do tồn tại (Control gate Logic):</b> Xưởng CNC gia công theo đơn có rủi ro “chết người” ở <b>Rev</b>, <b>lẫn lộn (mix-up)</b>, <b>thiếu chứng từ</b>, <b>hiệu chuẩn</b>, <b>vượt qua control gate</b>, <b>ship sai</b>. Các rủi ro này không thể “dò lại” bằng trí nhớ; phải chặn bằng <b>MRR có cấu trúc</b>.</p>
 <p><b>Khi nào kích hoạt:</b></p>
 <ul class="tight">
-<li><span class="gate g1">G1</span> Mở job / nhận PO / khởi động → tạo Hồ sơ công việc &amp; gắn Part/REV master link.</li>
+<li><span class="gate g1">G1</span> Mở job / nhận PO / khởi động → tạo Job dossier &amp; gắn Part/REV master link.</li>
 <li><span class="gate g2">G2</span> Trước khi chạy lô đầu tiên / setup mới / đổi Rev → xác nhận Rev + phát hành chương trình + setup sheet.</li>
 <li><span class="gate g3">G3</span> Trước khi đóng NCR/MRB / rework → đảm bảo hồ sơ &amp; phê duyệt đủ.</li>
 <li><span class="gate g5">G5</span> phê duyệt giao hàng → bộ hồ sơ giao hàng (ship packet) &amp; Tier‑1 bằng chứng đầy đủ (BLOCK khi thiếu).</li>
 <li><span class="gate g4">G4</span> Khi đánh giá/khách hàng yêu cầu hoặc diễn tập nội bộ → kích hoạt “bài diễn tập đánh giá 60 giây”.</li>
 </ul>
-<p><b>Chủ sở hữu vận hành:</b> QA/QMS điều phối chuẩn; Supervisor là người “đóng cổng kiểm soát” trên sàn; mỗi vai trò chịu trách nhiệm bằng chứng phần mình tạo ra.</p>
+<p><b>Owner vận hành:</b> QA/QMS điều phối chuẩn; Supervisor là người “đóng control gate” trên sàn; mỗi vai trò chịu trách nhiệm bằng chứng phần mình tạo ra.</p>
 </div>
 <!-- ===================================================== -->
-<h2 class="h2">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + “điểm chặn”</h2>
+<h2 class="h2">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + “hold point”</h2>
 <div class="card">
 <div class="mono-block">
  Báo giá/Hợp đồng → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Phản hồi/CI
  </div>
-<p class="mini">Mô-đun này “đi ngang” toàn chuỗi, nhưng có <b>điểm chặn</b> rõ ở: <b>Khởi động Planning</b>, <b>Phát hành chương trình (program release)</b>, <b>Kiểm tra/FAI</b>, <b>NCR/MRB</b>, <b>Packing/Phê duyệt giao hàng</b>.</p>
+<p class="mini">Mô-đun này “đi ngang” toàn chuỗi, nhưng có <b>hold point</b> rõ ở: <b>Khởi động Planning</b>, <b>Phát hành chương trình (program release)</b>, <b>Kiểm tra/FAI</b>, <b>NCR/MRB</b>, <b>Packing/Phê duyệt giao hàng</b>.</p>
 </div>
 <table class="table">
 <thead>
@@ -149,7 +149,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Bước E2E</th>
 <th>Đầu vào bắt buộc</th>
 <th>Đầu ra/Bàn giao</th>
-<th>Cổng kiểm soát &amp; MRR tối thiểu</th>
+<th>Control gate &amp; MRR tối thiểu</th>
 </tr>
 </thead>
 <tbody>
@@ -163,7 +163,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Planning</b> (Planner)</td>
 <td>Job tạo trên ERP, PartNum/Rev, routing</td>
 <td>02_Planning-Routing + traveler/kế hoạch điều phối</td>
-<td><span class="gate g1">G1</span> Hồ sơ công việc được tạo; link Part/REV master đúng; priority &amp; ngày đến hạn rõ</td>
+<td><span class="gate g1">G1</span> Job dossier được tạo; link Part/REV master đúng; priority &amp; ngày đến hạn rõ</td>
 </tr>
 <tr>
 <td><b>Engineering/Programming</b> (Programmer/Setup)</td>
@@ -219,7 +219,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Outsource/Công đoạn đặc biệt</b> không có bộ hồ sơ gửi nhà cung cấp hoặc không có xác minh đầu vào (Purchasing/QC).</li>
 <li><b>Traceability đứt</b>: không nối được JobNum ↔ PartNum ↔ Rev ↔ lot (toàn chuỗi).</li>
 <li><b>Hiệu chuẩn/measurement</b>: dùng gage OOT/không có sticker; CMM program không khóa version (QC/QA).</li>
-<li><b>Vượt qua cổng kiểm soát</b>: chạy lô/đóng gói khi chưa có first‑off/IR; “cho qua để kịp tiến độ” (Supervisor/Production).</li>
+<li><b>Vượt qua control gate</b>: chạy lô/đóng gói khi chưa có first‑off/IR; “cho qua để kịp tiến độ” (Supervisor/Production).</li>
 <li><b>File đúng nhưng lưu sai chỗ</b>: bằng chứng nằm trong máy cá nhân/Zalo/email; đánh giá không truy xuất được (tất cả).</li>
 <li><b>Đặt tên file sai</b>: thiếu REV/thiếu JobNum → search fail; nhầm file giữa jobs (tất cả).</li>
 <li><b>Không khóa hồ sơ</b>: IR/CMM chưa ký/không PDF đã khóa; thay đổi sau ship (QC/QA).</li>
@@ -241,10 +241,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>Tạo hồ sơ công việc</b></td>
+<td><b>Tạo job dossier</b></td>
 <td>Planner + QA (xác minh)</td>
 <td>Khi job được tạo</td>
-<td>Folder đúng template + metadata tối thiểu (JobNum/PartNum/Rev/Cổng kiểm soát)</td>
+<td>Folder đúng template + metadata tối thiểu (JobNum/PartNum/Rev/Control gate)</td>
 <td>Không có dossier → <b>HOLD khởi động</b></td>
 </tr>
 <tr>
@@ -262,7 +262,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Chưa phát hành → <b>BLOCK run</b></td>
 </tr>
 <tr>
-<td><b>CP4 — Hiệu chuẩn cổng kiểm soát</b></td>
+<td><b>CP4 — Hiệu chuẩn control gate</b></td>
 <td>QC + Maintenance (system), Operator (check)</td>
 <td>Trước đo/FAI/Final</td>
 <td>Danh sách gage OK + “OOT handling” nhật ký khi phát hiện</td>
@@ -303,7 +303,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <!-- ===================================================== -->
-<h2 class="h2">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua cổng kiểm soát/rủi ro giao hàng…)</h2>
+<h2 class="h2">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua control gate/rủi ro giao hàng…)</h2>
 <div class="card">
 <p><b>Mục tiêu:</b> Trong 60 giây, người được hỏi phải trả lời bằng <b>bằng chứng</b> (mở đúng vị trí/đúng file/đúng metadata), không trả lời bằng “tôi nhớ”.</p>
 <div class="vflow">
@@ -317,7 +317,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vstep">
 <div class="vnum">2</div>
 <div class="vtext">
-<strong>Mở Hồ sơ công việc đúng job trong 15 giây</strong>
+<strong>Mở Job dossier đúng job trong 15 giây</strong>
 <p>Mở thư mục <span class="path">Job-Dossiers / JOB-{JobNum}_..._REV-{Rev}</span> (hoặc theo chuẩn thư viện). Không tìm thấy → FAIL.</p>
 </div>
 </div>
@@ -339,7 +339,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout">
 <strong>Quy tắc “đúng người – đúng kênh” khi không đạt:</strong>
 <ul class="tight">
-<li>Sai Rev / vượt qua cổng kiểm soát / rủi ro giao hàng → gọi <b>Supervisor + QA</b> ngay.</li>
+<li>Sai Rev / vượt qua control gate / rủi ro giao hàng → gọi <b>Supervisor + QA</b> ngay.</li>
 <li>OOT gage / đo sai → gọi <b>QC + Maintenance</b>.</li>
 <li>Thiếu cert/outsource → gọi <b>Purchasing + QA</b>.</li>
 </ul>
@@ -358,7 +358,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Tạo Hồ sơ công việc theo template</td><td>Planner</td><td>Folder structure + metadata tối thiểu</td><td>Tạo sai Rev folder / đặt tên không có Rev</td></tr>
+<tr><td>1</td><td>Tạo Job dossier theo template</td><td>Planner</td><td>Folder structure + metadata tối thiểu</td><td>Tạo sai Rev folder / đặt tên không có Rev</td></tr>
 <tr><td>2</td><td>Đính PO/RFQ + yêu cầu đặc biệt</td><td>Estimator (SAL-03)</td><td>01_Rfq-Hợp đồng: PO/contract + special requirements</td><td>Yêu cầu cert/công đoạn đặc biệt bị “mất” trong email</td></tr>
 <tr><td>3</td><td>Link Part/REV Master đúng Rev</td><td>Programmer</td><td>Link DWG/CAM/SPEC trong DATA (REV đúng)</td><td>Copy file vào job thay vì link → trùng &amp; sai Rev</td></tr>
 <tr><td>4</td><td>Lập &amp; phát hành chương trình</td><td>Programmer</td><td>Release hồ sơ trong 03_Programs-Setup</td><td>Chạy NC “đang thử” chưa phát hành</td></tr>
@@ -402,7 +402,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Ngăn “sai Rev” — lỗi gây customer escape &amp; rework lớn</td>
 </tr>
 <tr>
-<td><b>2</b> Mở đúng Hồ sơ công việc</td>
+<td><b>2</b> Mở đúng Job dossier</td>
 <td>Tìm theo JobNum; kiểm tra folder có REV-*</td>
 <td>Đánh giá hỏi là mở ngay; giảm thời gian tìm kiếm</td>
 </tr>
@@ -454,7 +454,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>L1</b> (Nhận thức &amp; làm theo)</td>
-<td>Biết mở đúng Hồ sơ công việc; đặt tên file đúng khung; hiểu “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”.</td>
+<td>Biết mở đúng Job dossier; đặt tên file đúng khung; hiểu “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”.</td>
 <td>Bài kiểm tra nhanh ≥80% + hoàn thành 01 diễn tập có hướng dẫn (≤90s).</td>
 <td>Được phép upload bằng chứng theo vai trò dưới giám sát.</td>
 </tr>
@@ -466,7 +466,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L3</b> (Dẫn dắt &amp; chặn lỗi)</td>
-<td>Chủ động kích hoạt tạm giữ khi thiếu bằng chứng; hướng dẫn người khác; đóng được “mini cổng kiểm soát” trong phạm vi vai trò.</td>
+<td>Chủ động kích hoạt tạm giữ khi thiếu bằng chứng; hướng dẫn người khác; đóng được “mini control gate” trong phạm vi vai trò.</td>
 <td>Thực hiện 1 tình huống fail-fast thật hoặc mô phỏng, ra quyết định đúng + nhật ký đầy đủ.</td>
 <td>Được phép làm “buddy trainer” cho L1–L2; lập yêu cầu CAPA.</td>
 </tr>
@@ -501,7 +501,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th>Vai trò</th>
 <th>Phạm vi bằng chứng phải tạo</th>
-<th>“Điểm chặn” vai trò sở hữu</th>
+<th>“Hold point” vai trò sở hữu</th>
 <th>Tiêu chí đạt tối thiểu (khác nhau theo vai trò)</th>
 </tr>
 </thead>
@@ -514,8 +514,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Planner</b></td>
-<td>02_Planning-Routing: routing/traveler/dispatch; link hồ sơ công việc; ưu tiên &amp; ngày đến hạn</td>
-<td>CP1 Tạo hồ sơ công việc</td>
+<td>02_Planning-Routing: routing/traveler/dispatch; link job dossier; ưu tiên &amp; ngày đến hạn</td>
+<td>CP1 Tạo job dossier</td>
 <td>2 job liên tiếp tạo đúng dossier (đúng Rev) + metadata đủ; diễn tập PASS ≤60s</td>
 </tr>
 <tr>
@@ -539,7 +539,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>QC</b></td>
 <td>04_Inspection-FAI: IR/CMM/FAI; hiệu chuẩn check hồ sơ; measurement bằng chứng</td>
-<td>CP4/CP5 Hiệu chuẩn cổng kiểm soát &amp; hồ sơ locking</td>
+<td>CP4/CP5 Hiệu chuẩn control gate &amp; hồ sơ locking</td>
 <td>IR/CMM phải đã ký/đã khóa; diễn tập: gọi IR/CMM trong ≤45s; quyết định HOLD đúng khi gage OOT</td>
 </tr>
 <tr>
@@ -574,8 +574,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Supervisor</b></td>
-<td>Điều phối cổng kiểm soát; đánh giá diễn tập; escalation nhật ký; xác minh vượt qua cổng kiểm soát phòng ngừa</td>
-<td>Responsible Person CP7 Đánh giá Diễn tập &amp; cổng kiểm soát discipline</td>
+<td>Điều phối control gate; đánh giá diễn tập; escalation nhật ký; xác minh vượt qua control gate phòng ngừa</td>
+<td>Responsible Person CP7 Đánh giá Diễn tập &amp; control gate discipline</td>
 <td>Tổ chức diễn tập đạt ≥90% PASS (team); fail lặp phải có CAPA hệ thống</td>
 </tr>
 </tbody>
@@ -591,25 +591,25 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><th>#</th><th>Câu hỏi</th><th>Đáp án</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” nghĩa là gì trong thực tế phê duyệt giao hàng?</td><td><b>B</b> (Thiếu MRR → BLOCK/HOLD dù đã làm xong)</td></tr>
+<tr><td>1</td><td>“không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” nghĩa là gì trong thực tế phê duyệt giao hàng?</td><td><b>B</b> (Thiếu MRR → BLOCK/HOLD dù đã làm xong)</td></tr>
 <tr><td>2</td><td>Đâu là “Nguồn chuẩn” cho time entry (MES) theo chuẩn HESEM?</td><td><b>C</b> Epicor/MES</td></tr>
 <tr><td>3</td><td>Khi đánh giá hỏi “đúng Rev”, bằng chứng ưu tiên phải nằm ở đâu?</td><td><b>A</b> Link Part/REV Master (DATA) + release hồ sơ</td></tr>
 <tr><td>4</td><td>File bằng chứng đặt tên đúng chuẩn phải có tối thiểu những thành phần nào?</td><td><b>D</b> JobNum/RecordType/Ngày/REV + mô tả ngắn</td></tr>
-<tr><td>5</td><td>Vì sao không PHẢI lưu ảnh chụp time entry vào Hồ sơ công việc?</td><td><b>B</b> Trùng dữ liệu, dễ sai lệch; Epicor là nguồn đúng</td></tr>
+<tr><td>5</td><td>Vì sao không PHẢI lưu ảnh chụp time entry vào Job dossier?</td><td><b>B</b> Trùng dữ liệu, dễ sai lệch; Epicor là nguồn đúng</td></tr>
 <tr><td>6</td><td>(Vai trò‑specific: Programmer) “Phát hành chương trình Hồ sơ” tối thiểu cần gì?</td><td><b>C</b> Người phát hành + ngày + tên file + phiên bản/REV</td></tr>
 <tr><td>7</td><td>(Vai trò‑specific: QC) Khi phát hiện gage hết hạn hiệu chuẩn, hành động đúng là?</td><td><b>A</b> HOLD measurement, báo QC/Maintenance, đánh giá ảnh hưởng</td></tr>
 <tr><td>8</td><td>Điều nào là dấu hiệu lẫn lộn risk?</td><td><b>D</b> WIP không nhãn/nhãn thiếu JobNum/Rev</td></tr>
 <tr><td>9</td><td>Tier‑1 bằng chứng hay gặp gồm nhóm nào?</td><td><b>A</b> FAI/Final IR/CMM/Bộ hồ sơ giao hàng/CoC</td></tr>
-<tr><td>10</td><td>(Tình huống) Bạn mở Hồ sơ công việc nhưng không thấy folder 07_Shipping-Packing. Bạn làm gì?</td><td><b>B</b> HOLD/STOP ship, tạo đúng folder + escalate QA, ghi nhật ký</td></tr>
-<tr><td>11</td><td>(Tình huống) Có file IR nhưng nằm trong “Downloads” máy cá nhân. Đúng hay sai?</td><td><b>C</b> Sai — phải upload vào Hồ sơ công việc đúng chỗ + khóa hồ sơ</td></tr>
+<tr><td>10</td><td>(Tình huống) Bạn mở Job dossier nhưng không thấy folder 07_Shipping-Packing. Bạn làm gì?</td><td><b>B</b> HOLD/STOP ship, tạo đúng folder + escalate QA, ghi nhật ký</td></tr>
+<tr><td>11</td><td>(Tình huống) Có file IR nhưng nằm trong “Downloads” máy cá nhân. Đúng hay sai?</td><td><b>C</b> Sai — phải upload vào Job dossier đúng chỗ + khóa hồ sơ</td></tr>
 <tr><td>12</td><td>(Vai trò‑specific: Warehouse) Chứng chỉ vật liệu (cert) phải khớp gì để dùng cho bộ hồ sơ giao hàng?</td><td><b>D</b> Lot/heat + part + yêu cầu PO</td></tr>
 <tr><td>13</td><td>Trong “bài diễn tập đánh giá 60 giây”, bước đầu tiên là gì?</td><td><b>A</b> Chốt JobNum/PartNum/Rev từ traveler/ERP</td></tr>
-<tr><td>14</td><td>(Tình huống) Planning nói “Rev chưa cập nhật nhưng cứ chạy”. Quyết định đúng?</td><td><b>A</b> STOP + escalate; mismatch Rev là cổng kiểm soát violation</td></tr>
+<tr><td>14</td><td>(Tình huống) Planning nói “Rev chưa cập nhật nhưng cứ chạy”. Quyết định đúng?</td><td><b>A</b> STOP + escalate; mismatch Rev là control gate violation</td></tr>
 <tr><td>15</td><td>Quy tắc ngôn ngữ đặt tên file theo chuẩn bằng chứng-naming-cheatsheet là?</td><td><b>B</b> English only, không dấu, ngày ISO 8601</td></tr>
 <tr><td>16</td><td>(Vai trò‑specific: QA) Khi nào được phép “GO ship”?</td><td><b>C</b> Khi Tier‑1 bằng chứng đủ &amp; phê duyệt giao hàng validator PASS</td></tr>
 <tr><td>17</td><td>(Tình huống) CMM report có nhưng chưa ký/khóa. Có được ship không?</td><td><b>B</b> Không — hồ sơ chưa khóa = thiếu bằng chứng</td></tr>
 <tr><td>18</td><td>(Tình huống) Outsource công đoạn đặc biệt về nhưng thiếu cert. Làm gì?</td><td><b>A</b> HOLD receiving + gọi Purchasing/QA; không nhập/không dùng</td></tr>
-<tr><td>19</td><td>Vì sao cần metadata (JobNum/Rev/RecordType) ngoài tên file?</td><td><b>D</b> Search, retention, và validator/cổng kiểm soát automation</td></tr>
+<tr><td>19</td><td>Vì sao cần metadata (JobNum/Rev/RecordType) ngoài tên file?</td><td><b>D</b> Search, retention, và validator/control gate automation</td></tr>
 <tr><td>20</td><td>(Vai trò‑specific: Supervisor) Khi diễn tập fail lặp lại, yêu cầu tối thiểu là?</td><td><b>C</b> OJT lại + CAPA hệ thống + cập nhật chuẩn khi cần</td></tr>
 <tr><td>21</td><td>(Tình huống) Đánh giá hỏi “NCR/MRB quyết định gì?” nhưng bạn chỉ có email. Đúng hay sai?</td><td><b>B</b> Sai — cần NCR package + MRB disposition/approval trong 05_NCR-Hold-CAPA</td></tr>
 <tr><td>22</td><td>(Tình huống) Bạn không tìm được bằng chứng trong 60 giây. Kết luận diễn tập?</td><td><b>A</b> FAIL (dù thực tế được đã làm)</td></tr>
@@ -621,21 +621,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <ol class="tight">
 <li><b>Scenario A — Sai Rev nghi ngờ (G2):</b><br/>
-<span class="mini">Dữ kiện:</span> Traveler ghi Rev E, trong máy CNC đang nạp chương trình tên <span class="path">..._REV-D_...</span>. Hồ sơ công việc có 03_Programs-Setup nhưng release hồ sơ mới nhất là tuần trước. <br/>
+<span class="mini">Dữ kiện:</span> Traveler ghi Rev E, trong máy CNC đang nạp chương trình tên <span class="path">..._REV-D_...</span>. Job dossier có 03_Programs-Setup nhưng release hồ sơ mới nhất là tuần trước. <br/>
 <span class="mini">Yêu cầu:</span> Quyết định <b>STOP/HOLD/GO</b>; nêu 3 bằng chứng phải mở trong 60s; ghi nhật ký tối thiểu (ai–khi nào–lý do–hành động).</li>
 <li><b>Scenario B — Thiếu bộ hồ sơ giao hàng (G5):</b><br/>
 <span class="mini">Dữ kiện:</span> Final IR đã có, nhưng 07_Shipping-Packing thiếu CoC và thiếu cert vật liệu. Estimator (SAL-03) hối giao vì xe đến cổng. <br/>
 <span class="mini">Yêu cầu:</span> Quyết định <b>BLOCK/GO</b>; liệt kê ai cần gọi; MRR cần tạo ngay trong 15 phút để hợp thức.</li>
 <li><b>Scenario C — OOT gage &amp; đo lại (G3):</b><br/>
 <span class="mini">Dữ kiện:</span> QC phát hiện panme hết hạn hiệu chuẩn 2 tuần, đã dùng để đo in‑quy trình cho 20 pcs đang WIP. <br/>
-<span class="mini">Yêu cầu:</span> Quyết định <b>HOLD</b> phạm vi nào; cần tạo NCR hay không (giải thích); bằng chứng nào cần bổ sung vào Hồ sơ công việc.</li>
+<span class="mini">Yêu cầu:</span> Quyết định <b>HOLD</b> phạm vi nào; cần tạo NCR hay không (giải thích); bằng chứng nào cần bổ sung vào Job dossier.</li>
 </ol>
 </div>
 <h3>10.3 Performance Test (bắt buộc)</h3>
 <div class="card">
 <p><b>Bài test:</b> Trainer chọn ngẫu nhiên 01 job đang chạy hoặc vừa ship (không báo trước). Học viên phải:</p>
 <ol class="tight">
-<li>Trong <b>60 giây</b>: mở đúng Hồ sơ công việc và đưa ra 3 bằng chứng cốt lõi theo vai trò.</li>
+<li>Trong <b>60 giây</b>: mở đúng Job dossier và đưa ra 3 bằng chứng cốt lõi theo vai trò.</li>
 <li>Trong <b>10 phút</b>: chạy bảng kiểm 8–12 bước (phần mình) và chỉ ra 2 điểm rủi ro khi thiếu bằng chứng.</li>
 <li>Khi phát hiện thiếu: tạo “nhật ký HOLD/Action” và chỉ rõ nơi lưu MRR.</li>
 </ol>
@@ -646,11 +646,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <!-- ===================================================== -->
-<h2 class="h2">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”)</h2>
+<h2 class="h2">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”)</h2>
 <div class="card danger">
 <ul class="tight">
 <li><b>Điều kiện PASS chung:</b> Bài kiểm tra nhanh ≥80% (vai trò‑specific câu bắt buộc đúng ≥70%) + Performance test PASS.</li>
-<li><b>Điều kiện FAIL tức thì:</b> (a) sai Rev hoặc không chứng minh Rev; (b) cho giao hàng khi thiếu Tier‑1; (c) vượt qua cổng kiểm soát có chủ ý; (d) giả mạo/điền khống bằng chứng.</li>
+<li><b>Điều kiện FAIL tức thì:</b> (a) sai Rev hoặc không chứng minh Rev; (b) cho giao hàng khi thiếu Tier‑1; (c) vượt qua control gate có chủ ý; (d) giả mạo/điền khống bằng chứng.</li>
 <li><b>Nguyên tắc chấm:</b> “Đã làm” nhưng “không có bằng chứng” → tính như <b>chưa làm</b>.</li>
 </ul>
 </div>
@@ -690,7 +690,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Traceability đứt</b> (lot/heat không khớp cert) → Warehouse/Purchasing phải cross‑check lot/heat.</li>
 <li><b>Gage OOT</b> → CP4; nhật ký OOT + đánh giá ảnh hưởng + đo lại.</li>
 <li><b>NCR/MRB không rõ quyết định</b> → bắt buộc có MRB disposition + approval trong 05_NCR-Hold-CAPA.</li>
-<li><b>Vượt qua cổng kiểm soát vì tiến độ</b> → Supervisor chịu trách nhiệm; diễn tập fail lặp phải CAPA hệ thống.</li>
+<li><b>Vượt qua control gate vì tiến độ</b> → Supervisor chịu trách nhiệm; diễn tập fail lặp phải CAPA hệ thống.</li>
 <li><b>Đặt tên file không chuẩn</b> → dùng cheat sheet; đánh giá diễn tập sẽ Không đạt khi search không ra.</li>
 <li><b>Outsource thiếu chứng từ</b> → không nhận hàng/không dùng; phải có bộ hồ sơ gửi nhà cung cấp + xác minh đầu vào.</li>
 </ol>

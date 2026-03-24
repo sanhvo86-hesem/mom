@@ -74,7 +74,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><strong>Đầu ra bắt buộc</strong>
 <ul><li>Ban hành chuẩn kỹ thuật: thư viện dao/fixturing, template setup sheet, template CAM, rule release/rà soát đồng cấp.</li><li>Thiết lập capability: CTQ → control plan → SPC/capability nhật ký; định nghĩa ngưỡng hành động.</li><li>Xây hệ thống đào tạo theo vai trò (operator/setup/CAM) và chứng nhận level; đánh giá/LPA để bảo đảm thực thi.</li></ul>
 </div>
-<div><strong>Cổng kiểm soát (gate) trọng yếu</strong><br/><span class="badge warn">HOLD</span> Quy trình không đạt capability/không có control plan • <span class="badge warn">BLOCK</span> Không tuân thủ release governance</div>
+<div><strong>Control gate (gate) trọng yếu</strong><br/><span class="badge warn">HOLD</span> Quy trình không đạt capability/không có control plan • <span class="badge warn">BLOCK</span> Không tuân thủ release governance</div>
 <div><strong>Thời lượng</strong><br/>Workshop 4 giờ • Triển khai 4–8 tuần (theo kế hoạch)</div>
 </div>
 </div><div class="card">
@@ -84,7 +84,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-setup-firstarticle-ir.html">DRL-04 — TRN-Bài diễn tập ACA-DRL-04 — Setup + Kiểm tra sản phẩm đầu tiên (first article) + IR/FAI | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cam-release-changecontrol.html">DRL-05 — TRN-Bài diễn tập ACA-DRL-05 — CAM Gói phát hành + Kiểm soát thay đổi | HESEM Academy</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-setup-firstarticle-ir.html">DRL-04 — TRN-Bài diễn tập ACA-DRL-04 — Setup + Kiểm tra sản phẩm đầu tiên (first article) + IR/FAI | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cam-release-changecontrol.html">DRL-05 — TRN-Bài diễn tập ACA-DRL-05 — CAM Gói phát hành + Change control | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
@@ -92,15 +92,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card"><ul><li>Ở Level 4, mục tiêu là “hệ thống tạo ra kết quả”, không phụ thuộc cá nhân. Người mới vào vẫn chạy được theo chuẩn.</li><li>Cần quản trị 3 lớp: (1) tiêu chuẩn kỹ thuật (CAM/Setup/Tooling), (2) dữ liệu &amp; capability (SPC), (3) đào tạo &amp; đánh giá thực thi.</li><li>Bám quy trình: <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">PROC-CNC-001</a> • <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">PROC-CNC-002</a> • <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-901-internal-audit-and-lpa.html">PROC-QA-002 LPA</a>.</li></ul></div>
-<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
-<p>Mô-đun này bám theo các quy trình nội bộ liên quan và yêu cầu “không có bằng chứng = không qua cổng kiểm soát”. Link tham chiếu: 
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + hold point</h2>
+<p>Mô-đun này bám theo các quy trình nội bộ liên quan và yêu cầu “không có bằng chứng = không qua control gate”. Link tham chiếu: 
 <a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//02-WI-200//">WI-OPS-001 Quality Gates</a> •
-<a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//">WI-OPS-008 Hồ sơ công việc (job dossier) &amp; Bộ bằng chứng</a>.
+<a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//">WI-OPS-008 Job dossier (job dossier) &amp; Bộ bằng chứng</a>.
 </p>
-<div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Standardize</strong><p>Chuẩn hóa CAM template, setup sheet, tool library, fixture standard, naming/versioning.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Capability framework</strong><p>Xác định CTQ, thiết lập control plan, đo capability/SPC và ngưỡng hành động.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Training system</strong><p>Lộ trình training theo vai trò và chứng nhận level; OJT theo TWI.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Đánh giá execution</strong><p>LPA/đánh giá: kiểm chương trình, setup sheet, tuổi dao (tool life), kiểm tra hồ sơ, SSOT bằng chứng.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Continuous improvement</strong><p>Kaizen dựa dữ liệu: scrap/rework, downtime, cycle time, capability.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Change governance</strong><p>Yêu cầu thay đổi + rà soát đồng cấp + archive; không phát hành ngoài hệ thống.</p></div></div><div class="vstep"><div class="vnum">7</div><div class="vtext"><strong>Xem xét của lãnh đạo</strong><p>Review KPI và quyết định ưu tiên/nguồn lực.</p></div></div></div>
+<div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Standardize</strong><p>Chuẩn hóa CAM template, setup sheet, tool library, fixture standard, naming/versioning.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Capability framework</strong><p>Xác định CTQ, thiết lập control plan, đo capability/SPC và ngưỡng hành động.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Training system</strong><p>Lộ trình training theo vai trò và chứng nhận level; OJT theo TWI.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Đánh giá execution</strong><p>LPA/đánh giá: kiểm chương trình, setup sheet, tuổi dao (tool life), kiểm tra hồ sơ, SSOT bằng chứng.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Continuous improvement</strong><p>Kaizen dựa dữ liệu: scrap/rework, downtime, cycle time, capability.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Change governance</strong><p>Yêu cầu thay đổi + rà soát đồng cấp + archive; không phát hành ngoài hệ thống.</p></div></div><div class="vstep"><div class="vnum">7</div><div class="vtext"><strong>Management review</strong><p>Review KPI và quyết định ưu tiên/nguồn lực.</p></div></div></div>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>Bàn giao</th><th>Nhận (đầu vào)</th><th>Bàn giao (đầu ra)</th><th>Điểm chặn</th></tr></thead>
+<thead><tr><th>Bàn giao</th><th>Nhận (đầu vào)</th><th>Bàn giao (đầu ra)</th><th>Hold point</th></tr></thead>
 <tbody><tr><td><strong>ENG Lead → CAM/Setup</strong></td><td>Chuẩn kỹ thuật + template</td><td>Gói phát hành chuẩn hóa</td><td>Không chuẩn = chất lượng phụ thuộc cá nhân</td></tr><tr><td><strong>QA → ENG/OPS</strong></td><td>Dữ liệu capability/SPC</td><td>Quyết định hành động</td><td>Không dữ liệu = không cải tiến</td></tr><tr><td><strong>Training → Production</strong></td><td>Chứng nhận level theo vai trò</td><td>Giao việc theo level</td><td>Không chứng nhận = không giao việc rủi ro</td></tr><tr><td><strong>Đánh giá/LPA → CAPA</strong></td><td>Finding thực thi</td><td>CAPA + xác minh</td><td>Finding lặp = lỗi hệ thống</td></tr><tr><td><strong>ENG Lead → Management</strong></td><td>Lộ trình kỹ thuật</td><td>Kế hoạch đầu tư/nhân lực</td><td>Không lộ trình = cải tiến rời rạc</td></tr></tbody>
 </table>
 </div>
@@ -114,9 +114,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
-<ul><li><span class="badge warn">HOLD</span> Khi CTQ không đạt capability/ngưỡng SPC hoặc không có control plan.</li><li><span class="badge warn">BLOCK</span> Khi phát hành chương trình không tuân thủ mô phỏng/rà soát đồng cấp/SSOT.</li><li><span class="badge warn">STOP</span> Khi đánh giá/LPA phát hiện vượt qua cổng kiểm soát hoặc sửa chương trình tại máy không có kiểm soát thay đổi.</li><li><span class="badge warn">HOLD</span> Khi đào tạo/certification không đủ mà vẫn giao việc rủi ro cao.</li></ul>
+<ul><li><span class="badge warn">HOLD</span> Khi CTQ không đạt capability/ngưỡng SPC hoặc không có control plan.</li><li><span class="badge warn">BLOCK</span> Khi phát hành chương trình không tuân thủ mô phỏng/rà soát đồng cấp/SSOT.</li><li><span class="badge warn">STOP</span> Khi đánh giá/LPA phát hiện vượt qua control gate hoặc sửa chương trình tại máy không có change control.</li><li><span class="badge warn">HOLD</span> Khi đào tạo/certification không đủ mà vẫn giao việc rủi ro cao.</li></ul>
 <h2>7) Phản ứng 60 giây</h2>
-<ol><li>KÍCH HOẠT containment: chặn phát hành mới, HOLD job liên quan CTQ drift, cô lập part chịu ảnh hưởng.</li><li>PH�N TÍCH dữ liệu SPC/capability và đánh giá finding; xác định nguyên nhân hệ thống (standard/training/tooling).</li><li>MỞ CAPA cấp hệ thống và gán người phụ trách; định nghĩa xác minh đo được.</li><li>CẬP NHẬT tiêu chuẩn/template và triển khai đào tạo lại theo vai trò; chứng nhận lại khi cần.</li><li>REVIEW trong tier meeting/xem xét của lãnh đạo: KPI, quyết định nguồn lực, mốc hoàn thành.</li></ol>
+<ol><li>KÍCH HOẠT containment: chặn phát hành mới, HOLD job liên quan CTQ drift, cô lập part chịu ảnh hưởng.</li><li>PH�N TÍCH dữ liệu SPC/capability và đánh giá finding; xác định nguyên nhân hệ thống (standard/training/tooling).</li><li>MỞ CAPA cấp hệ thống và gán người phụ trách; định nghĩa xác minh đo được.</li><li>CẬP NHẬT tiêu chuẩn/template và triển khai đào tạo lại theo vai trò; chứng nhận lại khi cần.</li><li>REVIEW trong tier meeting/management review: KPI, quyết định nguồn lực, mốc hoàn thành.</li></ol>
 <h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
 <div class="table-card">
 <table class="table">
@@ -138,7 +138,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead>
-<tbody><tr><td><strong>L1</strong></td><td>Operator chạy đúng theo chuẩn</td><td>Không vượt qua cổng kiểm soát</td></tr><tr><td><strong>L2</strong></td><td>Setup/prove-out ổn định</td><td>FAI đạt, bàn giao chuẩn</td></tr><tr><td><strong>L3</strong></td><td>CAM/NC release governance</td><td>Mô phỏng + rà soát đồng cấp + kiểm soát thay đổi</td></tr><tr><td><strong>L4</strong></td><td>Hệ thống tiêu chuẩn hóa + capability + đào tạo</td><td>KPI cải tiến bền, đánh giá đạt</td></tr></tbody>
+<tbody><tr><td><strong>L1</strong></td><td>Operator chạy đúng theo chuẩn</td><td>Không vượt qua control gate</td></tr><tr><td><strong>L2</strong></td><td>Setup/prove-out ổn định</td><td>FAI đạt, bàn giao chuẩn</td></tr><tr><td><strong>L3</strong></td><td>CAM/NC release governance</td><td>Mô phỏng + rà soát đồng cấp + change control</td></tr><tr><td><strong>L4</strong></td><td>Hệ thống tiêu chuẩn hóa + capability + đào tạo</td><td>KPI cải tiến bền, đánh giá đạt</td></tr></tbody>
 </table>
 </div>
 <h2>10) Đánh giá</h2>
@@ -160,7 +160,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul><li>Bộ tiêu chuẩn CAM/Setup/Tooling (template + bảng kiểm)</li><li><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-133_Control_Plan.xlsx">FRM-QA-012 Control Plan</a></li><li><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-132_PFMEA_Lite.xlsx">FRM-QA-013 PFMEA-lite</a></li><li><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-631_SPC_and_Process_Capability_Log.xlsx">FRM-QA-014 SPC/Capability Nhật ký</a></li><li><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-611_GRR_Study_Form.xlsx">FRM-QA-010 Gage R&amp;R</a></li><li><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-805_Skill_Level_Certificate.xlsx">FRM-HR-TRN-005 Skill Level Certificate</a></li><li>Đánh giá/LPA hồ sơ (PROC-QA-002) + CAPA xác minh</li></ul>
 <p class="small-note"><strong>SSOT:</strong> M365/SharePoint → CNC-IMS-HUB → JobDossier → JobNum → EvidencePack. Quy tắc đặt tên bám theo WI-OPS-008.</p>
 <h2>13) Common đánh giá phát hiện &amp; phòng ngừa</h2>
-<ul><li>Không có tiêu chuẩn CAM/Setup; phụ thuộc cá nhân.</li><li>File chương trình không theo SSOT/naming; nạp nhầm.</li><li>Không có control plan/SPC cho CTQ; drift không phát hiện.</li><li>Dữ liệu đo không tin cậy (không gage R&amp;R).</li><li>Training không gắn chứng nhận level; giao việc sai năng lực.</li><li>Đánh giá/LPA không thực hiện; vượt qua cổng kiểm soát xảy ra.</li><li>Finding lặp nhưng không có CAPA cấp hệ thống.</li><li>Không có rà soát đồng cấp/archiving cho chương trình.</li></ul>
+<ul><li>Không có tiêu chuẩn CAM/Setup; phụ thuộc cá nhân.</li><li>File chương trình không theo SSOT/naming; nạp nhầm.</li><li>Không có control plan/SPC cho CTQ; drift không phát hiện.</li><li>Dữ liệu đo không tin cậy (không gage R&amp;R).</li><li>Training không gắn chứng nhận level; giao việc sai năng lực.</li><li>Đánh giá/LPA không thực hiện; vượt qua control gate xảy ra.</li><li>Finding lặp nhưng không có CAPA cấp hệ thống.</li><li>Không có rà soát đồng cấp/archiving cho chương trình.</li></ul>
 </div></div></div>
 </div>
 <script src="../../../../assets/app.js"></script>

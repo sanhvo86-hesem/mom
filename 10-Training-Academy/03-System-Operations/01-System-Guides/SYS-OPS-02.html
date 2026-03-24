@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SYS-OPS-02 — Hồ sơ công việc (job dossier) Data Architecture & Part/Rev Master (SharePoint + Purview) | HESEM OS</title>
+<title>SYS-OPS-02 — Job dossier (job dossier) Data Architecture & Part/Rev Master (SharePoint + Purview) | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
  .path{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; font-size:12px;}
@@ -63,7 +63,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-02 — Hồ sơ công việc Data Architecture & Part/Rev Master (SharePoint + Purview)</strong>
+  <strong>SYS-OPS-02 — Job dossier Data Architecture & Part/Rev Master (SharePoint + Purview)</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -81,7 +81,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="grid-2">
 <div>
 <div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-02</div>
-<h1 style="margin-top:10px">Kiến trúc dữ liệu Hồ sơ công việc &amp; Part/REV Master (SharePoint + Purview)</h1>
+<h1 style="margin-top:10px">Kiến trúc dữ liệu Job dossier &amp; Part/REV Master (SharePoint + Purview)</h1>
 <p class="lead"><b>Từ “giấy tờ rời rạc” → “bằng chứng truy xuất 60 giây”.</b> Mô-đun này chuẩn hoá cách <b>tạo, lưu, liên kết, gắn metadata, gắn nhãn lưu trữ</b> để đảm bảo mọi phòng ban làm đúng một chuẩn và không bao giờ “lạc REV”.</p>
 <div class="callout">
 <b>Quy tắc ranh giới (bắt buộc):</b> Dữ liệu <b>MES time entry</b> nằm trong Epicor (Nguồn chuẩn) → M365 chỉ phản chiếu để bảng điều khiển/điều tra; <b>không lưu bản copy time entry</b> trong SharePoint trừ khi là hồ sơ sự cố có phê duyệt.
@@ -96,11 +96,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="role-tag">Estimator (SAL-03)</span><span class="role-tag">Supervisor</span>
 </li>
 <li><b>Thời lượng YÊU CẦU:</b> Lý thuyết 90 phút • Thực hành 90 phút • OJT 120 phút (chia 2 ca/ngày, tối đa 2 ngày/tuần/nhân sự).</li>
-<li><b>Điều kiện trước:</b> Đã học WI-OPS-008 (Hồ sơ công việc Governance) và nắm quy tắc đặt tên file (ANNEX-QMS-003).</li>
+<li><b>Điều kiện trước:</b> Đã học WI-OPS-008 (Job dossier Governance) và nắm quy tắc đặt tên file (ANNEX-QMS-003).</li>
 <li><b>Kích hoạt học:</b> (1) có job mới, (2) có Part/REV mới hoặc đổi REV, (3) chuẩn bị outsource/phê duyệt giao hàng (ship release).</li>
 </ul>
 <div class="warn" style="margin-top:10px">
-<b>Nguyên tắc kiểm soát:</b> Khi thiếu hồ sơ tối thiểu (MRR) hoặc metadata bắt buộc → <b>HOLD</b> ngay tại cổng kiểm soát, không “linh động”.
+<b>Nguyên tắc kiểm soát:</b> Khi thiếu hồ sơ tối thiểu (MRR) hoặc metadata bắt buộc → <b>HOLD</b> ngay tại control gate, không “linh động”.
  </div>
 </div>
 </div>
@@ -108,7 +108,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Mục lục nhanh</strong>
 <ul>
 <li><a href="#s2">2) Mục tiêu &amp; bối cảnh (vì sao phải làm đúng)</a></li>
-<li><a href="#s3">3) Vị trí trong chuỗi E2E Lệnh sản xuất (bàn giao &amp; điểm chặn)</a></li>
+<li><a href="#s3">3) Vị trí trong chuỗi E2E Lệnh sản xuất (bàn giao &amp; hold point)</a></li>
 <li><a href="#s4">4) Điểm đứt gãy hay gặp gặp (≥ 10) – dấu hiệu &amp; hậu quả</a></li>
 <li><a href="#s5">5) Biện pháp kiểm soát rủi ro (≥ 6) – kiểm soát trọng yếu theo vai trò</a></li>
 <li><a href="#s6">6) Dừng sớm (fail-fast) rules (≥ 3) – điều kiện dừng việc</a></li>
@@ -128,12 +128,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>2) Mục tiêu &amp; bối cảnh (vì sao phải làm đúng)</h2>
 <div class="grid-2">
 <div>
-<p><b>Hồ sơ công việc</b> là “túi bằng chứng” theo từng job/shipments. <b>Part/REV Master (DATA)</b> là “nguồn đúng” cho bản vẽ/CAM/BOM/spec theo <b>REV</b>. Hai kho này liên kết với nhau để:</p>
+<p><b>Job dossier</b> là “túi bằng chứng” theo từng job/shipments. <b>Part/REV Master (DATA)</b> là “nguồn đúng” cho bản vẽ/CAM/BOM/spec theo <b>REV</b>. Hai kho này liên kết với nhau để:</p>
 <ul>
 <li><b>Chống nhầm REV:</b> mọi bằng chứng job phải tham chiếu đúng Rev kỹ thuật.</li>
 <li><b>sẵn sàng cho đánh giá:</b> mở đúng thư mục, đủ hồ sơ, đúng nhãn lưu trữ và hồ sơ declaration.</li>
 <li><b>Không trùng dữ liệu:</b> Epicor là SoR cho giao dịch (MES/ERP); SharePoint lưu bằng chứng + master theo chuẩn.</li>
-<li><b>Cổng discipline:</b> cổng kiểm soát không đạt thì không được release (đặc biệt G5 phê duyệt giao hàng).</li>
+<li><b>Cổng discipline:</b> control gate không đạt thì không được release (đặc biệt G5 phê duyệt giao hàng).</li>
 </ul>
 </div>
 <div class="ok">
@@ -142,7 +142,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><span class="kpi">KPI-01</span>: Truy xuất bộ hồ sơ job (FAI/Final/bộ hồ sơ giao hàng (ship packet)) trong ≤ <b>60 giây</b>.</li>
 <li><span class="kpi">KPI-02</span>: 0 trường hợp “sai REV phát hành/ gia công/ đo kiểm”.</li>
 <li><span class="kpi">KPI-03</span>: 100% Tier-1 hồ sơ có <b>metadata bắt buộc</b> + nhãn <b>LAM-T1-10Y-HỒ SƠ</b> (hoặc label override theo hợp đồng).</li>
-<li><span class="kpi">KPI-04</span>: 0 phê duyệt giao hàng khi thiếu MRR (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate).</li>
+<li><span class="kpi">KPI-04</span>: 0 phê duyệt giao hàng khi thiếu MRR (Không có bằng chứng thì không qua control gate (No bằng chứng = No gate).</li>
 </ul>
 </div>
 </div>
@@ -171,8 +171,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 3) E2E POSITION -->
 <div class="card" id="s3">
-<h2>3) Vị trí trong chuỗi E2E Lệnh sản xuất (bàn giao &amp; điểm chặn)</h2>
-<p class="muted">Mục này trả lời 3 câu hỏi: (1) “ai bàn giao cho ai”, (2) “dữ liệu nằm ở đâu”, (3) “cổng kiểm soát nào chặn được rủi ro sai REV/thiếu bằng chứng”.</p>
+<h2>3) Vị trí trong chuỗi E2E Lệnh sản xuất (bàn giao &amp; hold point)</h2>
+<p class="muted">Mục này trả lời 3 câu hỏi: (1) “ai bàn giao cho ai”, (2) “dữ liệu nằm ở đâu”, (3) “control gate nào chặn được rủi ro sai REV/thiếu bằng chứng”.</p>
 <h3>3.1 Chuỗi E2E (tóm tắt theo đối tượng dữ liệu)</h3>
 <div class="table-wrap">
 <table class="tight">
@@ -182,7 +182,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Bàn giao chính</th>
 <th>Đối tượng dữ liệu</th>
 <th>Nơi lưu (chuẩn)</th>
-<th>Cổng/Điểm chặn</th>
+<th>Cổng/Hold point</th>
 </tr>
 </thead>
 <tbody>
@@ -190,7 +190,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>RFQ → Rà soát hợp đồng</td>
 <td>Estimator (SAL-03) → Planner/QA</td>
 <td>Yêu cầu khách hàng, PO/contract, spec</td>
-<td>Hồ sơ công việc / <b>01_Rfq-Hợp đồng</b></td>
+<td>Job dossier / <b>01_Rfq-Hợp đồng</b></td>
 <td>Chặn “thiếu yêu cầu đặc biệt” trước khi plan</td>
 </tr>
 <tr>
@@ -204,35 +204,35 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Planning / Routing</td>
 <td>Planner → OPS/QC</td>
 <td>Routing, setup plan, risk notes</td>
-<td>Hồ sơ công việc / <b>02_Planning-Routing</b></td>
+<td>Job dossier / <b>02_Planning-Routing</b></td>
 <td><b>G1 Ready-to-Run</b> (đúng Rev + đủ release)</td>
 </tr>
 <tr>
 <td>Production / Setup</td>
 <td>Setup → Operator/QC</td>
 <td>Release Hồ sơ + link CAM master, setup proof</td>
-<td>Hồ sơ công việc / <b>03_Programs-Setup</b></td>
+<td>Job dossier / <b>03_Programs-Setup</b></td>
 <td>Chặn “gia công khi chưa release”</td>
 </tr>
 <tr>
 <td>Kiểm tra / Metrology</td>
 <td>QC → QA</td>
 <td>FAI/IR/CMM (Tier-1)</td>
-<td>Hồ sơ công việc / <b>04_Inspection-FAI</b></td>
+<td>Job dossier / <b>04_Inspection-FAI</b></td>
 <td><b>G2/G3/G4</b> (Đạt/không đạt/Hold)</td>
 </tr>
 <tr>
 <td>Outsource (khi có)</td>
 <td>Purchasing/WHS → QA</td>
 <td>Bộ hồ sơ gửi nhà cung cấp (dispatch packet), certs, xác minh đầu vào</td>
-<td>Hồ sơ công việc / <b>06_Outsource</b></td>
+<td>Job dossier / <b>06_Outsource</b></td>
 <td>Chặn “thiếu chứng chỉ/lot” trước khi nhận hàng</td>
 </tr>
 <tr>
 <td>Shipping</td>
 <td>WHS → QA/Supervisor</td>
 <td>Bộ hồ sơ giao hàng, CoC/Cert, photos (Tier-1)</td>
-<td>Hồ sơ công việc / <b>07_Shipping-Packing</b></td>
+<td>Job dossier / <b>07_Shipping-Packing</b></td>
 <td><b>G5 Phê duyệt giao hàng</b> (hard stop)</td>
 </tr>
 </tbody>
@@ -241,7 +241,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>3.2 Hai template folder (bắt buộc dùng đúng chuẩn)</h3>
 <div class="grid-2">
 <div class="note">
-<strong>Hồ sơ công việc template (Job-Dossiers)</strong>
+<strong>Job dossier template (Job-Dossiers)</strong>
 <p class="mini">Tên folder job (YÊU CẦU): <span class="path">{JobNum}_{PartNum}_{RevisionNum}</span></p>
 <pre style="white-space:pre-wrap">01_Rfq-Hợp đồng
 02_Planning-Routing
@@ -283,7 +283,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>1</td><td>Folder job đặt sai <b>RevisionNum</b></td><td>JobNum đúng nhưng Rev sai trong tên/metadata</td><td>Gia công/đo theo Rev sai → scrap, rework, stop-ship</td><td>Bảng kiểm bước 2–3, G1</td></tr>
-<tr><td>2</td><td>Copy CAM/DWG vào Hồ sơ công việc thay vì link</td><td>03_Programs-Setup chứa file master “giống” DATA</td><td>2 nguồn dữ liệu → lệch phiên bản, đánh giá không đạt</td><td>Rule “Job chỉ lưu Release Hồ sơ”</td></tr>
+<tr><td>2</td><td>Copy CAM/DWG vào Job dossier thay vì link</td><td>03_Programs-Setup chứa file master “giống” DATA</td><td>2 nguồn dữ liệu → lệch phiên bản, đánh giá không đạt</td><td>Rule “Job chỉ lưu Release Hồ sơ”</td></tr>
 <tr><td>3</td><td>Không cập nhật <b>00_Archive</b> khi đổi REV</td><td>Rev mới &amp; cũ lẫn trong cùng folder</td><td>Nguy cơ “lấy nhầm file”, không truy vết supersede</td><td>Change Mgmt + Doc Control</td></tr>
 <tr><td>4</td><td>Thiếu metadata bắt buộc Tier-1</td><td>File FAI/IR/CMM không có JobNum/RecordID…</td><td>Không search được, auto-label fail → đánh giá finding</td><td>G2/G4 xác nhận</td></tr>
 <tr><td>5</td><td>Không gắn nhãn Purview / không declare hồ sơ</td><td>Tier-1 nằm đúng folder nhưng label không áp</td><td>Rủi ro xoá/sửa ngoài kiểm soát</td><td>Purview auto-apply + QA check</td></tr>
@@ -293,7 +293,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>9</td><td>Estimator (SAL-03) không đưa “special requirement” vào dossier</td><td>Spec/PO note nằm trong email cá nhân</td><td>Sai yêu cầu, trễ giao, NCR</td><td>01_Rfq-Rà soát hợp đồng</td></tr>
 <tr><td>10</td><td>Planner phát hành traveler không có QR/link dossier</td><td>Không scan được đến folder bằng chứng</td><td>Bàn giao chậm, đánh giá mất thời gian</td><td>Print rule + G1</td></tr>
 <tr><td>11</td><td>QC upload report nhưng “file name” không theo chuẩn</td><td>Không có JobNum/REV/Date</td><td>Export/email mất truy vết, đánh giá hỏi lại</td><td>Naming enforcement</td></tr>
-<tr><td>12</td><td>Supervisor “bỏ qua cổng kiểm soát” vì gấp</td><td>Ship đi khi thiếu MRR</td><td>Stop-ship, chargeback, mất khách</td><td>Dừng sớm (fail-fast) rule + escalation</td></tr>
+<tr><td>12</td><td>Supervisor “bỏ qua control gate” vì gấp</td><td>Ship đi khi thiếu MRR</td><td>Stop-ship, chargeback, mất khách</td><td>Dừng sớm (fail-fast) rule + escalation</td></tr>
 </tbody>
 </table>
 </div>
@@ -309,7 +309,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>CP1</b> – Tạo Hồ sơ công việc chuẩn</td>
+<td><b>CP1</b> – Tạo Job dossier chuẩn</td>
 <td>Tạo folder job đúng template + đúng <b>JobNum/PartNum/RevisionNum</b>; lưu URL vào JobIndex</td>
 <td>Planner/IT</td>
 <td>Folder tồn tại + metadata JobNum/PartNum/RevisionNum</td>
@@ -344,7 +344,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Xoá/sửa ngoài kiểm soát</td>
 </tr>
 <tr>
-<td><b>CP6</b> – MRR xác nhận theo cổng kiểm soát</td>
+<td><b>CP6</b> – MRR xác nhận theo control gate</td>
 <td>Cổng chỉ release khi MRR đủ; thiếu → HOLD + ghi nhật ký (ShipRelease/QCHold/NCR)</td>
 <td>QA + Supervisor + WHS</td>
 <td>Bảng kiểm MRR + approval history</td>
@@ -367,7 +367,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="callout" style="margin-top:12px">
-<b>Nguyên tắc “1 nguồn đúng”:</b> Part/REV Master (DATA) là nguồn đúng cho DWG/CAM/SPEC. Hồ sơ công việc chỉ lưu bằng chứng theo job + Release Hồ sơ + link master.
+<b>Nguyên tắc “1 nguồn đúng”:</b> Part/REV Master (DATA) là nguồn đúng cho DWG/CAM/SPEC. Job dossier chỉ lưu bằng chứng theo job + Release Hồ sơ + link master.
  </div>
 </div>
 <!-- 6) FAIL-FAST -->
@@ -387,8 +387,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>FF2 — Missing Tier-1 hồ sơ</b></td>
-<td>Thiếu FAI/Final IR/CMM/ShipPacket theo MRR trước cổng kiểm soát</td>
-<td>Không release cổng kiểm soát; WHS không ship; mở NCR khi đã trễ/đã lỡ làm sai</td>
+<td>Thiếu FAI/Final IR/CMM/ShipPacket theo MRR trước control gate</td>
+<td>Không release control gate; WHS không ship; mở NCR khi đã trễ/đã lỡ làm sai</td>
 <td>QA/WHS/Supervisor</td>
 <td>ShipRelease nhật ký + approval history</td>
 </tr>
@@ -418,7 +418,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Tình huống A: nghi sai REV (phổ biến nhất)</strong>
 <ol>
 <li>Ngừng thao tác (Stop) và giữ nguyên WIP.</li>
-<li>Scan QR mở Hồ sơ công việc → xem <b>RevisionNum</b> của job.</li>
+<li>Scan QR mở Job dossier → xem <b>RevisionNum</b> của job.</li>
 <li>Mở Release Hồ sơ ở <b>03_Programs-Setup</b> → click link tới DATA.</li>
 <li>Đối chiếu REV folder + tên file master (<span class="path">REV-X</span>).</li>
 <li>Khi mismatch → kích hoạt <b>FF1</b> (HOLD + nhật ký).</li>
@@ -428,7 +428,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Tình huống B: chuẩn bị phê duyệt giao hàng nhưng thiếu hồ sơ</strong>
 <ol>
 <li>Mở <b>07_Shipping-Packing</b> và <b>04_Inspection-FAI</b>.</li>
-<li>Đối chiếu bảng MRR theo cổng kiểm soát (mục <a href="#s12">12</a>).</li>
+<li>Đối chiếu bảng MRR theo control gate (mục <a href="#s12">12</a>).</li>
 <li>Thiếu Tier-1 → kích hoạt <b>FF2</b>.</li>
 <li>Khi có nhưng thiếu metadata/label → kích hoạt <b>FF3</b>.</li>
 </ol>
@@ -456,7 +456,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 8) CHECKLIST <=15 -->
 <div class="card" id="s8">
 <h2>8) Bảng kiểm triển khai (≤ 15 bước) – ai làm, minh chứng, lỗi hay gặp</h2>
-<p class="muted">Bảng kiểm này dùng cho triển khai tại hiện trường và cho đánh giá nội bộ. Mỗi bước phải có “dấu vết” (bằng chứng).</p>
+<p class="muted">Bảng kiểm này dùng cho triển khai tại hiện trường và cho internal audit. Mỗi bước phải có “dấu vết” (bằng chứng).</p>
 <div class="table-wrap">
 <table class="tight">
 <thead>
@@ -470,20 +470,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>1</td><td>Xác nhận JobNum/PartNum/RevisionNum từ Epicor phản chiếu (JobIndex)</td><td>Planner</td><td>JobIndex có hồ sơ + Rev đúng</td><td>Copy nhầm Rev từ email</td></tr>
-<tr><td>2</td><td>Tạo Hồ sơ công việc folder theo template + đặt tên chuẩn</td><td>IT/Planner</td><td>Folder tồn tại + cấu trúc 01→08</td><td>Thiếu folder 05/06/07</td></tr>
+<tr><td>2</td><td>Tạo Job dossier folder theo template + đặt tên chuẩn</td><td>IT/Planner</td><td>Folder tồn tại + cấu trúc 01→08</td><td>Thiếu folder 05/06/07</td></tr>
 <tr><td>3</td><td>Gắn metadata cơ bản cho dossier (JobNum, PartNum, RevisionNum, Customer)</td><td>Planner/QA</td><td>Cột metadata có giá trị</td><td>Để trống Customer → retention sai</td></tr>
 <tr><td>4</td><td>Kiểm tra/khởi tạo Part/REV folder trong DATA đúng Rev</td><td>ENG/Programmer</td><td><span class="path">.../REV {Rev}/</span> có template đầy đủ</td><td>Đặt Rev không thống nhất (RevE/REV-E)</td></tr>
 <tr><td>5</td><td>Upload DWG/SOL/SPEC theo naming chuẩn Part/REV</td><td>ENG</td><td>File có <span class="path">_{DocType}_{DocID}_{YYYY-MM-DD}_REV-{Rev}_</span></td><td>Thiếu DocID/Date</td></tr>
 <tr><td>6</td><td>Upload CAM master theo naming chuẩn + ghi EffectiveDate</td><td>Programmer</td><td>File CAM nằm trong <b>04_CAM</b></td><td>Để CAM ở Desktop/USB</td></tr>
-<tr><td>7</td><td>Tạo Release Hồ sơ trong Hồ sơ công việc (03_Programs-Setup) + link tới master</td><td>Programmer/Setup</td><td>Release Hồ sơ + link + người phát hành</td><td>Copy file master vào Hồ sơ công việc</td></tr>
+<tr><td>7</td><td>Tạo Release Hồ sơ trong Job dossier (03_Programs-Setup) + link tới master</td><td>Programmer/Setup</td><td>Release Hồ sơ + link + người phát hành</td><td>Copy file master vào Job dossier</td></tr>
 <tr><td>8</td><td>Estimator (SAL-03) lưu PO/contract/special requirement vào 01_Rfq-Hợp đồng</td><td>Estimator (SAL-03)</td><td>File/spec nằm đúng folder</td><td>Giữ trong email cá nhân</td></tr>
-<tr><td>9</td><td>Planner phát hành traveler có QR mở Hồ sơ công việc</td><td>Planner</td><td>Traveler/label có QR</td><td>QR sai link hoặc thiếu QR</td></tr>
+<tr><td>9</td><td>Planner phát hành traveler có QR mở Job dossier</td><td>Planner</td><td>Traveler/label có QR</td><td>QR sai link hoặc thiếu QR</td></tr>
 <tr><td>10</td><td>QC/QA upload FAI/IR/CMM đúng folder 04_Inspection-FAI</td><td>QC/QA</td><td>File theo naming chuẩn Job + đủ metadata</td><td>Đặt sai RecordType</td></tr>
 <tr><td>11</td><td>Gắn Content Type cho Tier-1 (FAI/Final/CMM/ShipPacket…)</td><td>QA/WHS</td><td>Content Type đúng</td><td>Để default “Document”</td></tr>
 <tr><td>12</td><td>Kiểm tra Purview label auto-apply (Tier-1 phải có LAM-T1-10Y-HỒ SƠ)</td><td>QA/IT</td><td>Label hiển thị đúng</td><td>Label không áp do thiếu metadata</td></tr>
 <tr><td>13</td><td>Outsource: lưu bộ hồ sơ gửi nhà cung cấp + cert + incoming IR ở 06_Outsource</td><td>PUR/WHS/QA</td><td>OS bằng chứng + Lot/Heat đầy đủ</td><td>Không map được JobNum</td></tr>
 <tr><td>14</td><td>WHS lập bộ hồ sơ giao hàng (07_Shipping-Packing) + ảnh + CoC/Cert</td><td>WHS</td><td>Bộ hồ sơ giao hàng đầy đủ</td><td>Thiếu approval history</td></tr>
-<tr><td>15</td><td>QA/Supervisor validate MRR &amp; release G5 Phê duyệt giao hàng</td><td>QA + Supervisor</td><td>MRR PASS + approval</td><td>“Linh động” bỏ qua cổng kiểm soát</td></tr>
+<tr><td>15</td><td>QA/Supervisor validate MRR &amp; release G5 Phê duyệt giao hàng</td><td>QA + Supervisor</td><td>MRR PASS + approval</td><td>“Linh động” bỏ qua control gate</td></tr>
 </tbody>
 </table>
 </div>
@@ -494,8 +494,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 9) OJT TWI + RUBRIC -->
 <div class="card" id="s9">
 <h2>9) OJT (TWI) + rubric đánh giá L1–L4 theo vai trò</h2>
-<p class="muted">OJT tập trung vào “các bước then chốt dễ sai” (REV, link master, metadata, label, cổng kiểm soát). Áp dụng TWI hướng dẫn công việc: <b>Bước</b> • <b>Điểm then chốt</b> • <b>Lý do</b>.</p>
-<h3>9.1 TWI Job Breakdown — Công việc lõi: “Tạo &amp; duy trì liên kết Hồ sơ công việc ↔ Part/REV đúng REV”</h3>
+<p class="muted">OJT tập trung vào “các bước then chốt dễ sai” (REV, link master, metadata, label, control gate). Áp dụng TWI hướng dẫn công việc: <b>Bước</b> • <b>Điểm then chốt</b> • <b>Lý do</b>.</p>
+<h3>9.1 TWI Job Breakdown — Công việc lõi: “Tạo &amp; duy trì liên kết Job dossier ↔ Part/REV đúng REV”</h3>
 <div class="table-wrap">
 <table class="tight">
 <thead><tr><th style="width:55px">Bước</th><th>Làm gì</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead>
@@ -520,7 +520,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>4</td>
-<td>Tạo Release Hồ sơ ở Hồ sơ công việc</td>
+<td>Tạo Release Hồ sơ ở Job dossier</td>
 <td>Release Hồ sơ chứa: người phát hành, ngày, filename, REV, link</td>
 <td>Job không chứa file master; chỉ chứa quyết định phát hành</td>
 </tr>
@@ -554,21 +554,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>L1</b><div class="mini">Biết &amp; làm theo hướng dẫn (có giám sát)</div></td>
-<td>Biết mở đúng Hồ sơ công việc; biết phân biệt Hồ sơ công việc vs DATA; biết quy tắc naming cơ bản; biết báo khi nghi sai REV.</td>
+<td>Biết mở đúng Job dossier; biết phân biệt Job dossier vs DATA; biết quy tắc naming cơ bản; biết báo khi nghi sai REV.</td>
 <td>Bài kiểm tra nhanh ≥ 70% + 01 bài thực hành mở đúng folder/REV dưới giám sát.</td>
-<td>Được phép upload Tier-3 (ảnh) đúng folder; chưa tự release cổng kiểm soát.</td>
+<td>Được phép upload Tier-3 (ảnh) đúng folder; chưa tự release control gate.</td>
 </tr>
 <tr>
 <td><b>L2</b><div class="mini">Thực hiện độc lập (ổn định theo bảng kiểm)</div></td>
 <td>Tự thực hiện bảng kiểm 15 bước liên quan vai trò; upload đúng folder; đặt tên đúng; gắn đủ metadata bắt buộc theo content type.</td>
 <td>danh mục OJT (bảng kiểm / danh mục) đạt (ký người hướng dẫn) + 01 tình huống xử lý đúng (Hold/Go).</td>
-<td>Được phép tạo/hoàn thiện hồ sơ theo vai trò (QC/QA/WHS) nhưng vẫn phải qua approval ở cổng kiểm soát.</td>
+<td>Được phép tạo/hoàn thiện hồ sơ theo vai trò (QC/QA/WHS) nhưng vẫn phải qua approval ở control gate.</td>
 </tr>
 <tr>
 <td><b>L3</b><div class="mini">Nâng cao (xử lý tình huống + hướng dẫn)</div></td>
 <td>Phát hiện sai lệch hệ thống (label không áp, metadata lệch); xử lý theo fail-fast; hướng dẫn người mới; thực hiện diễn tập đánh giá 60s.</td>
 <td>01 báo cáo bài học kinh nghiệm hoặc đánh giá mini (≥ 5 mẫu kiểm).</td>
-<td>Được giao vai trò “người kiểm tra” ở cổng kiểm soát nội bộ (tuỳ phòng) và tham gia cải tiến quy tắc.</td>
+<td>Được giao vai trò “người kiểm tra” ở control gate nội bộ (tuỳ phòng) và tham gia cải tiến quy tắc.</td>
 </tr>
 <tr>
 <td><b>L4</b><div class="mini">Chuyên gia/hệ thống (chuẩn hoá &amp; cải tiến)</div></td>
@@ -584,18 +584,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="tight">
 <thead><tr><th>Vai trò</th><th>Phải làm được sau mô-đun</th><th>Điểm kiểm tra trọng yếu</th></tr></thead>
 <tbody>
-<tr><td><b>Operator</b></td><td>Scan QR mở đúng Hồ sơ công việc; nhận biết sai REV; upload ảnh T3 đúng folder.</td><td>Thực hành tình huống FF1 trong 60 giây.</td></tr>
+<tr><td><b>Operator</b></td><td>Scan QR mở đúng Job dossier; nhận biết sai REV; upload ảnh T3 đúng folder.</td><td>Thực hành tình huống FF1 trong 60 giây.</td></tr>
 <tr><td><b>Setup</b></td><td>Đọc Release Hồ sơ; xác nhận link master; lưu setup proof đúng nơi.</td><td>Không dùng file từ USB/Desktop; chỉ dùng file từ DATA/REV đúng.</td></tr>
-<tr><td><b>Programmer</b></td><td>Phát hành CAM master + naming + metadata; tạo Release Hồ sơ (link) cho job.</td><td>Không copy CAM vào Hồ sơ công việc; biết archive khi đổi Rev.</td></tr>
+<tr><td><b>Programmer</b></td><td>Phát hành CAM master + naming + metadata; tạo Release Hồ sơ (link) cho job.</td><td>Không copy CAM vào Job dossier; biết archive khi đổi Rev.</td></tr>
 <tr><td><b>QC</b></td><td>Upload IR/FAI/CMM đúng folder + naming; gắn Result; kích hoạt Hold/NCR khi không đạt.</td><td>Metadata bắt buộc Tier-1 và RecordType chuẩn.</td></tr>
-<tr><td><b>QA</b></td><td>Validate MRR theo cổng kiểm soát; kiểm tra label/hồ sơ declaration; approve release theo quy định.</td><td>Không release G5 khi thiếu Tier-1 hồ sơ/approval.</td></tr>
+<tr><td><b>QA</b></td><td>Validate MRR theo control gate; kiểm tra label/hồ sơ declaration; approve release theo quy định.</td><td>Không release G5 khi thiếu Tier-1 hồ sơ/approval.</td></tr>
 <tr><td><b>Warehouse</b></td><td>Lập bộ hồ sơ giao hàng; lưu CoC/certs; đảm bảo approval history; ảnh đóng gói.</td><td>bộ hồ sơ giao hàng là Tier-1; phải có label Tier-1.</td></tr>
 <tr><td><b>Purchasing</b></td><td>Outsource: bộ hồ sơ gửi nhà cung cấp + supplier certs + traceability.</td><td>Lot/Heat phải map được JobNum/PO.</td></tr>
 <tr><td><b>Planner</b></td><td>Tạo/đảm bảo dossier tồn tại; traveler có QR; routing/Rev đúng.</td><td>Rev đồng nhất giữa Epicor phản chiếu, traveler, Release Hồ sơ.</td></tr>
 <tr><td><b>Maintenance</b></td><td>Khi có sự cố thiết bị ảnh hưởng job: lưu bằng chứng sự cố đúng nơi (khi được yêu cầu).</td><td>Không lưu time entry; chỉ lưu hồ sơ sự cố có approval.</td></tr>
 <tr><td><b>EHS</b></td><td>Khi có yêu cầu khách hàng về EHS hoặc sự cố: lưu hồ sơ liên quan đúng folder (01 hoặc 05).</td><td>Phân loại đúng Tier/label theo tính chất.</td></tr>
 <tr><td><b>Estimator (SAL-03)</b></td><td>Lưu yêu cầu khách hàng &amp; rà soát hợp đồng vào 01_Rfq-Hợp đồng.</td><td>Không để yêu cầu trong email cá nhân.</td></tr>
-<tr><td><b>Supervisor</b></td><td>Thực thi fail-fast; không vượt qua cổng kiểm soát; điều phối escalation.</td><td>G5 là hard stop; phải có MRR + approval.</td></tr>
+<tr><td><b>Supervisor</b></td><td>Thực thi fail-fast; không vượt qua control gate; điều phối escalation.</td><td>G5 là hard stop; phải có MRR + approval.</td></tr>
 </tbody>
 </table>
 </div>
@@ -606,16 +606,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>10.1 Bài kiểm tra nhanh (tối thiểu 20 câu)</h3>
 <p class="mini">Thời lượng áp dụng: 25 phút, làm trên điện thoại/PC. đạt khi đạt ngưỡng theo mục <a href="#s11">11</a>.</p>
 <ol>
-<li>Phân biệt đúng: “Hồ sơ công việc” dùng để làm gì? “DATA Part/REV” dùng để làm gì?</li>
-<li>Vì sao không được copy CAM master vào Hồ sơ công việc?</li>
+<li>Phân biệt đúng: “Job dossier” dùng để làm gì? “DATA Part/REV” dùng để làm gì?</li>
+<li>Vì sao không được copy CAM master vào Job dossier?</li>
 <li>Định dạng tên file chuẩn cho Part/REV master là gì?</li>
-<li>Định dạng tên file chuẩn cho Hồ sơ công việc bằng chứng là gì?</li>
+<li>Định dạng tên file chuẩn cho Job dossier bằng chứng là gì?</li>
 <li>3 metadata bắt buộc tối thiểu cho Tier-1 bằng chứng là gì?</li>
 <li>Nhãn lưu trữ mặc định cho Tier-1 (Lam-ready) là gì? Có declare hồ sơ không?</li>
-<li>Folder nào trong Hồ sơ công việc chứa FAI/IR/CMM?</li>
-<li>Folder nào trong Hồ sơ công việc chứa bộ hồ sơ giao hàng?</li>
+<li>Folder nào trong Job dossier chứa FAI/IR/CMM?</li>
+<li>Folder nào trong Job dossier chứa bộ hồ sơ giao hàng?</li>
 <li>Dừng sớm (fail-fast) FF1 kích hoạt khi nào? Hành động bắt buộc là gì?</li>
-<li>“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” áp dụng mạnh nhất ở cổng kiểm soát nào?</li>
+<li>“không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” áp dụng mạnh nhất ở control gate nào?</li>
 <li>Outsource bằng chứng tối thiểu cần những loại gì?</li>
 <li>00_Archive trong DATA dùng khi nào? Có được dùng để sản xuất không?</li>
 <li>Vì sao metadata giúp retention/search tốt hơn chỉ naming?</li>
@@ -625,7 +625,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Ví dụ DocType chuẩn cho bản vẽ là gì?</li>
 <li>Tại sao không lưu bản copy MES time entry trong SharePoint?</li>
 <li>Hệ quả đánh giá khi thiếu approval history ở phê duyệt giao hàng là gì?</li>
-<li>Kể tên ít nhất 2 điểm chặn trong chuỗi E2E giúp chống nhầm REV.</li>
+<li>Kể tên ít nhất 2 hold point trong chuỗi E2E giúp chống nhầm REV.</li>
 <li>Trong bảng kiểm, bước nào đảm bảo traveler có QR? Chủ trì là ai?</li>
 <li>Khi label Tier-1 không tự áp, kiểm tra gì trước khi gọi IT?</li>
 <li>Truy xuất hồ sơ job trong 60 giây cần mở 2 folder nào trước?</li>
@@ -660,18 +660,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody>
 </table>
 </div>
-<h3>10.3 Bài thực hành đánh giá (bắt buộc – vì liên quan cổng kiểm soát/approval)</h3>
+<h3>10.3 Bài thực hành đánh giá (bắt buộc – vì liên quan control gate/approval)</h3>
 <div class="note">
 <strong>Bài thực hành (30–40 phút/nhóm)</strong>
 <ol>
-<li>Tạo (hoặc kiểm tra) đúng cấu trúc folder Hồ sơ công việc cho 1 job mẫu.</li>
+<li>Tạo (hoặc kiểm tra) đúng cấu trúc folder Job dossier cho 1 job mẫu.</li>
 <li>Upload 01 file master (DWG hoặc CAM) vào DATA/REV đúng với naming chuẩn.</li>
-<li>Tạo 01 Release Hồ sơ trong Hồ sơ công việc (03_Programs-Setup) có link tới master.</li>
+<li>Tạo 01 Release Hồ sơ trong Job dossier (03_Programs-Setup) có link tới master.</li>
 <li>Upload 01 file Tier-1 (FAI/Final IR/CMM/ShipPacket) vào đúng folder và gắn đủ metadata bắt buộc.</li>
 <li>Chứng minh label Tier-1 đã áp và file đã declare hồ sơ (hoặc báo đúng khi chưa áp do thiếu metadata).</li>
 <li>Thực hiện “diễn tập đánh giá 60 giây”: mở và chỉ ra FAI/Final + bộ hồ sơ giao hàng.</li>
 </ol>
-<p class="mini"><b>Chấm theo rubric:</b> đúng REV (40%) • đúng nơi lưu/link (25%) • đúng metadata/label (25%) • tốc độ &amp; kỷ luật cổng kiểm soát (10%).</p>
+<p class="mini"><b>Chấm theo rubric:</b> đúng REV (40%) • đúng nơi lưu/link (25%) • đúng metadata/label (25%) • tốc độ &amp; kỷ luật control gate (10%).</p>
 </div>
 </div>
 <!-- 11) ĐẠT/KHÔNG ĐẠT (PASS/FAIL) -->
@@ -684,7 +684,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Bài kiểm tra nhanh</td>
 <td>≥ 80% (vai trò QA/WHS/Programmer/Planner) • ≥ 70% (vai trò còn lại)</td>
-<td>Dưới ngưỡng hoặc trả lời sai các câu “hard rule” (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) , Wrong REV, Tier-1 label / không có bằng chứng thì không qua cổng kiểm soát)</td>
+<td>Dưới ngưỡng hoặc trả lời sai các câu “hard rule” (Không có bằng chứng thì không qua control gate (No bằng chứng = No gate) , Wrong REV, Tier-1 label / không có bằng chứng thì không qua control gate)</td>
 </tr>
 <tr>
 <td>Scenario</td>
@@ -693,13 +693,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Bài thực hành đánh giá</td>
-<td>Đạt ≥ 85/100 và không vi phạm hard rule (copy master vào job, vượt qua cổng kiểm soát, dùng Rev archive)</td>
+<td>Đạt ≥ 85/100 và không vi phạm hard rule (copy master vào job, vượt qua control gate, dùng Rev archive)</td>
 <td>Không chứng minh được link master đúng REV hoặc thiếu metadata/label Tier-1</td>
 </tr>
 <tr>
-<td>Kỷ luật cổng kiểm soát</td>
+<td>Kỷ luật control gate</td>
 <td>Thực hiện đúng tuyến escalate; ghi nhận đúng nhật ký/bằng chứng</td>
-<td>Bỏ qua cổng kiểm soát hoặc “sửa hồ sơ cho đủ” sau khi đã release</td>
+<td>Bỏ qua control gate hoặc “sửa hồ sơ cho đủ” sau khi đã release</td>
 </tr>
 </tbody>
 </table>
@@ -709,7 +709,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Gia công/đo kiểm khi nghi sai REV mà không HOLD (FF1).</li>
 <li>Release Ship (G5) khi thiếu Tier-1 hồ sơ hoặc thiếu approval history.</li>
-<li>Copy CAM/DWG master vào Hồ sơ công việc để “tiện dùng” (tạo 2 nguồn dữ liệu).</li>
+<li>Copy CAM/DWG master vào Job dossier để “tiện dùng” (tạo 2 nguồn dữ liệu).</li>
 <li>Sửa file Tier-1 đã declare hồ sơ ngoài quy trình kiểm soát.</li>
 </ul>
 </div>
@@ -717,7 +717,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 12) MRR -->
 <div class="card" id="s12">
 <h2>12) MRR tối thiểu (hồ sơ) – loại hồ sơ, naming, nơi lưu</h2>
-<p class="muted">MRR là “hàng rào” cho cổng kiểm soát. Dưới đây là tối thiểu; khách hàng/hợp đồng được yêu cầu thêm (ghi rõ trong 01_Rfq-Hợp đồng).</p>
+<p class="muted">MRR là “hàng rào” cho control gate. Dưới đây là tối thiểu; khách hàng/hợp đồng được yêu cầu thêm (ghi rõ trong 01_Rfq-Hợp đồng).</p>
 <h3>12.1 Quy tắc đặt tên file (chuẩn, bắt buộc)</h3>
 <div class="grid-2">
 <div class="callout">
@@ -725,12 +725,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <code>{CustomerPartNo}_{DocType}_{DocID}_{YYYY-MM-DD}_REV-{Rev}_{ShortDesc}.{ext}</code>
 </div>
 <div class="callout">
-<b>Hồ sơ công việc (Job-Dossiers)</b><br/>
+<b>Job dossier (Job-Dossiers)</b><br/>
 <code>JOB-{JobNum}_{RecordType}-{RecordID}_{YYYY-MM-DD}_REV-{Rev}_{ShortDesc}.{ext}</code>
 </div>
 </div>
 <p class="mini">Không dùng tiếng Việt có dấu trong filename. Tránh ký tự: <span class="path">/ \ : * ? " &lt; &gt; |</span>.</p>
-<h3>12.2 Bảng MRR tối thiểu theo cổng kiểm soát (chuẩn vận hành)</h3>
+<h3>12.2 Bảng MRR tối thiểu theo control gate (chuẩn vận hành)</h3>
 <div class="table-wrap">
 <table class="tight">
 <thead><tr><th>Cổng</th><th>MRR tối thiểu</th><th>Tier</th><th>Nơi lưu</th><th>Ai chịu trách nhiệm</th></tr></thead>
@@ -804,15 +804,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>#</th><th>Finding</th><th>Vì sao bị hỏi</th><th>Cách phòng ngừa (hành động cụ thể)</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Không chứng minh “đúng REV”</td><td>Khách/đánh giá hỏi file master &amp; job bằng chứng có khớp Rev không</td><td>Release Hồ sơ phải link DATA/REV đúng; diễn tập đánh giá 60 giây</td></tr>
-<tr><td>2</td><td>Thiếu Tier-1 hồ sơ hoặc thiếu metadata bắt buộc</td><td>Không search/retention được; rủi ro thất lạc</td><td>Enforce content type + required columns; QA validate trước cổng kiểm soát</td></tr>
+<tr><td>2</td><td>Thiếu Tier-1 hồ sơ hoặc thiếu metadata bắt buộc</td><td>Không search/retention được; rủi ro thất lạc</td><td>Enforce content type + required columns; QA validate trước control gate</td></tr>
 <tr><td>3</td><td>Tier-1 không có retention label / không declare hồ sơ</td><td>Hồ sơ được bị xoá/sửa</td><td>Auto-apply rule theo path + content type; kiểm tra label sau upload</td></tr>
 <tr><td>4</td><td>dữ liệu gốc (dữ liệu gốc) nằm rải rác (email/USB/local)</td><td>Không kiểm soát phiên bản</td><td>Draft</td></tr>
-<tr><td>5</td><td>Hồ sơ công việc chứa file master “bản copy”</td><td>2 nguồn dữ liệu → sai lệch</td><td>Job chỉ lưu Release Hồ sơ + link; khi cần “freeze” phải có approval &amp; lý do</td></tr>
+<tr><td>5</td><td>Job dossier chứa file master “bản copy”</td><td>2 nguồn dữ liệu → sai lệch</td><td>Job chỉ lưu Release Hồ sơ + link; khi cần “freeze” phải có approval &amp; lý do</td></tr>
 <tr><td>6</td><td>bộ hồ sơ giao hàng thiếu approval history</td><td>Không chứng minh ai release/ai chịu trách nhiệm</td><td>ShipRelease phải có approval; Supervisor kiểm tra trước ship</td></tr>
 <tr><td>7</td><td>Outsource thiếu chứng chỉ/lot/heat</td><td>Traceability là yêu cầu bắt buộc</td><td>WHS/QA kiểm trước nhận; lưu đầy đủ ở 06_Outsource</td></tr>
 <tr><td>8</td><td>Không kiểm soát Rev cũ (không có 00_Archive hoặc archive sai)</td><td>Không truy vết supersede</td><td>Đổi Rev phải chuyển Rev cũ vào 00_Archive + change hồ sơ</td></tr>
 <tr><td>9</td><td>Tên file không theo chuẩn, khó export</td><td>Đánh giá yêu cầu export/offline pack</td><td>Áp naming chuẩn ANNEX-QMS-003; training + spot check</td></tr>
-<tr><td>10</td><td>Bỏ qua cổng kiểm soát vì gấp</td><td>Rủi ro stop-ship cao</td><td>Dừng sớm (fail-fast) + hard stop G5; KPI theo “cổng kiểm soát compliance”</td></tr>
+<tr><td>10</td><td>Bỏ qua control gate vì gấp</td><td>Rủi ro stop-ship cao</td><td>Dừng sớm (fail-fast) + hard stop G5; KPI theo “control gate compliance”</td></tr>
 </tbody>
 </table>
 </div>

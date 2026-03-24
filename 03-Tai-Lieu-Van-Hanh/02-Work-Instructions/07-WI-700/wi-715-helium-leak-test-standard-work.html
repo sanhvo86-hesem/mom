@@ -78,7 +78,7 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>2. Điều kiện trước khi đưa part vào test</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục</th><th>Phải có</th><th>tạm giữ khi</th><th>Hồ sơ</th></tr></thead><tbody>
-<tr><td>Yêu cầu kỹ thuật</td><td>Drawing / customer spec / routing note đã chỉ rõ giới hạn rò, đơn vị đo, phương pháp ưu tiên và trạng thái part khi test.</td><td>Thiếu spec, thiếu đơn vị, chỉ ghi chung chung “leak test” nhưng không có limit.</td><td>Traveler / bộ hồ sơ công việc (job packet) / QPL / customer spec.</td></tr>
+<tr><td>Yêu cầu kỹ thuật</td><td>Drawing / customer spec / routing note đã chỉ rõ giới hạn rò, đơn vị đo, phương pháp ưu tiên và trạng thái part khi test.</td><td>Thiếu spec, thiếu đơn vị, chỉ ghi chung chung “leak test” nhưng không có limit.</td><td>Traveler / bộ job dossier (job packet) / QPL / customer spec.</td></tr>
 <tr><td>Tình trạng part</td><td>Part đã hoàn tất công đoạn trước, đã làm sạch phần dầu/bụi, khô, có nhận dạng part-rev-lot và đã đóng kín các port theo đúng cấu hình test.</td><td>Part còn ẩm, còn solvent, còn burr/phoi/FOD, thiếu cap/plug hoặc chưa xác nhận đúng cấu hình test.</td><td>Traveler + kiểm cuối trước test.</td></tr>
 <tr><td>Thiết bị</td><td>Leak detector, standard leak, bơm, probe, adapter và fixture còn hạn, phù hợp dải đo và được nhận diện rõ ID.</td><td>Bất kỳ thiết bị nào quá hạn, hỏng, không có ID hoặc standard leak không truy xuất được.</td><td>FRM-712 + nhãn thiết bị.</td></tr>
 <tr><td>Người thực hiện</td><td>Người test có <span class="code">Authorized-to-work</span> cho leak test theo <a href="../../03-Reference/08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html">ANNEX-801</a>.</td><td>Người chưa được ủy quyền hoặc đã hết hiệu lực chứng nhận.</td><td>Training / certification nhật ký.</td></tr>
@@ -130,7 +130,7 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>6. Đọc kết quả và quyết định</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Kết quả</th><th>Quyết định</th><th>Hành động bắt buộc</th><th>Phạm vi test lại</th></tr></thead><tbody>
-<tr><td>Nhỏ hơn limit rõ ràng và tín hiệu ổn định</td><td><span class="badge-green">PASS</span></td><td>Ký hồ sơ, nạp hồ sơ vào hồ sơ công việc (job dossier) và chuyển bước tiếp theo.</td><td>Không cần, trừ khi có yêu cầu lặp trên nhiều orientation/port.</td></tr>
+<tr><td>Nhỏ hơn limit rõ ràng và tín hiệu ổn định</td><td><span class="badge-green">PASS</span></td><td>Ký hồ sơ, nạp hồ sơ vào job dossier (job dossier) và chuyển bước tiếp theo.</td><td>Không cần, trừ khi có yêu cầu lặp trên nhiều orientation/port.</td></tr>
 <tr><td>Nằm trong vùng cảnh báo nội bộ hoặc dao động sát limit</td><td><span class="badge-amber">CẢNH BÁO</span></td><td>Re-check cùng method, xác nhận lại fixture/background, chạy lặp theo số lần quy định. Chỉ đạt khi kết quả ổn định và QA chấp nhận.</td><td>Test lại vị trí hoặc toàn bộ cụm theo quyết định QA.</td></tr>
 <tr><td>Vượt limit</td><td><span class="badge-red">FAIL</span></td><td>HOLD ngay, đánh dấu vị trí nghi rò, mở NCR/rework, phải chặn chuyển đóng gói hoặc giao hàng.</td><td>Sau rework phải test lại đủ phạm vi chịu ảnh hưởng; nếu có thay seal/weld/joint trọng yếu thì test lại toàn bộ cụm.</td></tr>
 <tr><td>Background/standard leak/session check không đạt</td><td><span class="badge-blue">TEST VOID</span></td><td>Không dùng dữ liệu session để release. Sửa máy/điều kiện test trước khi chạy lại.</td><td>Chạy lại đầy đủ từ đầu.</td></tr>
@@ -151,7 +151,7 @@ ul.tight li {margin:4px 0;}
 <li>Ảnh/scan spec hoặc routing note nếu limit đến từ yêu cầu riêng của khách hàng.</li>
 <li>Hồ sơ pre-use check của detector / standard leak cho session.</li>
 <li>NCR / rework hồ sơ nếu FAIL.</li>
-<li>Link lên hồ sơ công việc theo <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>.</li>
+<li>Link lên job dossier theo <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>.</li>
 </ul></div>
 <div class="kpi-box"><h3>KPI</h3><ul class="tight" style="padding-left:18px;">
 <li>KPI-WI715-01: tỷ lệ PASS ngay lần test đầu.</li>

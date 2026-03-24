@@ -93,8 +93,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><ul><li>Hiểu ma trận kỹ năng (skill matrix) &amp; xây năng lực đội ngũ.</li><li>Hiểu LPA/internal đánh giá và CAPA.</li><li>Hiểu change management tại line.</li></ul></td>
-<td><ul><li>Vận hành ma trận kỹ năng (skill matrix) + kế hoạch đào tạo chéo.</li><li>Thiết kế LPA và bảng điều khiển closure.</li><li>Kiểm soát thay đổi WI tại point-of-use.</li></ul></td>
-<td><ul><li>Ma trận năng lực + bằng chứng đào tạo.</li><li>LPA hồ sơ + Pareto phát hiện.</li><li>Kiểm soát thay đổi hồ sơ cho WI.</li></ul></td>
+<td><ul><li>Vận hành ma trận kỹ năng (skill matrix) + kế hoạch đào tạo chéo.</li><li>Thiết kế LPA và bảng điều khiển closure.</li><li>Change control WI tại point-of-use.</li></ul></td>
+<td><ul><li>Ma trận năng lực + bằng chứng đào tạo.</li><li>LPA hồ sơ + Pareto phát hiện.</li><li>Change control hồ sơ cho WI.</li></ul></td>
 <td><ul><li>Skill coverage ≥80%.</li><li>LPA closure ≥95%.</li><li>Escalate CTQ ≤15'.</li></ul></td>
 </tr>
 </tbody>
@@ -119,13 +119,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
 <div class="text">
-<div><strong>Tổ chức PHẢI thực hiện đánh giá nội bộ và hành động theo kết quả để cải tiến hệ thống.</strong> <span class="iso">ISO 9.2</span></div>
+<div><strong>Tổ chức PHẢI thực hiện internal audit và hành động theo kết quả để cải tiến hệ thống.</strong> <span class="iso">ISO 9.2</span></div>
 <p>Bằng chứng: đánh giá plan, NC/OFI, action closure.</p>
 </div>
 </div><div class="req">
 <span class="tag shall">PHẢI</span>
 <div class="text">
-<div><strong>Lãnh đạo PHẢI thực hiện xem xét của lãnh đạo và theo dõi action để cải tiến hiệu lực QMS.</strong> <span class="iso">ISO 9.3</span></div>
+<div><strong>Lãnh đạo PHẢI thực hiện management review và theo dõi action để cải tiến hiệu lực QMS.</strong> <span class="iso">ISO 9.3</span></div>
 <p>Bằng chứng: MR minutes, bảng theo dõi hành động (action bảng theo dõi), quyết định nguồn lực.</p>
 </div>
 </div><div class="req">
@@ -171,7 +171,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Map năng lực ↔ vị trí ↔ Cơ chế chặn theo KPI.</li>
 <li>OJT có bảng kiểm + bằng chứng, không dạy “truyền miệng”.</li>
 <li>Đánh giá định kỳ: 1–3 tháng/lần theo vị trí.</li>
-</ul><h3>3.7 Change management tại xưởng: đổi quy trình mà không vỡ hệ thống</h3><p>Thay đổi (fixture mới, WI mới, máy mới, layout mới) luôn tạo rủi ro. Level 3 phải kiểm soát thay đổi theo nguyên tắc:</p><ol>
+</ul><h3>3.7 Change management tại xưởng: đổi quy trình mà không vỡ hệ thống</h3><p>Thay đổi (fixture mới, WI mới, máy mới, layout mới) luôn tạo rủi ro. Level 3 phải change control theo nguyên tắc:</p><ol>
 <li>Thử nghiệm (trial) có kế hoạch, có tiêu chí đạt/không đạt.</li>
 <li>Đào tạo &amp; chứng nhận lại (khi thay đổi ảnh hưởng CTQ).</li>
 <li>Update documented information (7.5) + thu hồi bản cũ tại point-of-use.</li>
@@ -310,11 +310,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="dl"><h4>Tiêu chí chấm</h4><ul><li>Matrix phản ánh đúng reality và có redundancy.</li><li>Đánh giá level công bằng, minh bạch.</li><li>Xử lý xung đột giữ được hiệu suất &amp; văn hóa.</li></ul></div>
 </div>
 </div><div class="card">
-<h3>Tình huống 3: Đánh giá mức sẵn sàng &amp; Xem xét của lãnh đạo – biến đánh giá thành cơ hội nâng hệ thống</h3>
+<h3>Tình huống 3: Đánh giá mức sẵn sàng &amp; Management review – biến đánh giá thành cơ hội nâng hệ thống</h3>
 <p class="small">Khách/CB đánh giá sắp đến, nhưng mục tiêu không phải 'đối phó' mà là kiểm chứng hệ thống. Bạn phải chuẩn bị hồ sơ, hành vi, và đóng action để tránh lặp lỗi.</p>
 <div class="grid">
 <div class="dl"><h4>Dữ liệu/đầu vào</h4><ul><li>Đánh giá type: khách hàng + ISO.</li><li>Khu vực: xưởng + kho + QA.</li><li>Điểm yếu: hồ sơ thiếu, action trễ.</li></ul></div>
-<div class="dl"><h4>Nhiệm vụ</h4><ul><li>Thiết kế chương trình LPA và liên kết với CAPA (10.2).</li><li>Phân tích xu hướng NC theo Pareto và đưa ra cải tiến hệ thống.</li><li>Chuẩn bị đầu vào cho xem xét của lãnh đạo (9.3) từ dữ liệu hiện trường.</li></ul></div>
+<div class="dl"><h4>Nhiệm vụ</h4><ul><li>Thiết kế chương trình LPA và liên kết với CAPA (10.2).</li><li>Phân tích xu hướng NC theo Pareto và đưa ra cải tiến hệ thống.</li><li>Chuẩn bị đầu vào cho management review (9.3) từ dữ liệu hiện trường.</li></ul></div>
 <div class="dl"><h4>Đầu ra/Bằng chứng</h4><ul><li>LPA program + bảng điều khiển.</li><li>Pareto NC + đưa ra cải tiến.</li><li>Đầu vào MR (trend, risk, resource).</li></ul></div>
 <div class="dl"><h4>Tiêu chí chấm</h4><ul><li>Chương trình LPA tạo kỷ luật.</li><li>Phân tích xu hướng có insight.</li><li>Đầu vào MR có chất lượng và hành động.</li></ul></div>
 </div>
@@ -339,7 +339,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Câu 2 (Tự luận):</strong> Thiết kế chương trình LPA: tần suất, bảng kiểm, escalation, action closure và xác minh hiệu lực.
 </div>
 <div class="card">
-<strong>Câu 3 (Tự luận):</strong> Thiết kế quy trình kiểm soát thay đổi WI tại line để tránh dùng bản cũ (point-of-use control).
+<strong>Câu 3 (Tự luận):</strong> Thiết kế quy trình change control WI tại line để tránh dùng bản cũ (point-of-use control).
 </div>
 </div><details class="no-print"><summary>Đáp án/định hướng chấm (ẩn khi in)</summary>
 <div class="mono">1:B
@@ -349,7 +349,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody><tr><td><strong>Bài kiểm tra (có tính toán/tình huống)</strong></td><td>25%</td><td>Hiểu sâu, phân tích uncertainty/capability/risk hoặc hệ thống tương ứng.</td></tr><tr><td><strong>Nghiên cứu tình huống nâng cao</strong></td><td>45%</td><td>Thiết kế giải pháp tối ưu + có tiêu chí đo hiệu lực; đưa vào WI/plan.</td></tr><tr><td><strong>OJT + cố vấn phát triển</strong></td><td>30%</td><td>Thực hành độc lập; kèm 1 hoạt động hướng dẫn người khác/chuẩn hóa.</td></tr></tbody>
 </table><div class="callout"><strong>Ngưỡng đạt:</strong> Tổng điểm ≥ 80/100 và không vi phạm gating bắt buộc (an toàn/chất lượng/tuân thủ hồ sơ).</div><h2>10. Bảng kiểm tự đánh giá trước khi đề nghị xét Level</h2><div class="card">
 <ul><li>Tôi có đủ bằng chứng (form/hồ sơ/nhật ký) chứng minh năng lực – không chỉ ‘nói được’.</li><li>Tôi hiểu các gating bắt buộc và không có vi phạm trong kỳ đánh giá.</li><li>Tôi truy xuất hồ sơ liên quan trong thời gian mục tiêu (đánh giá diễn tập).</li><li>Tôi vận hành họp đầu ca/tier meeting có nhật ký hành động và theo dõi tiếp.</li><li>Tôi kèm cặp phát triển theo SBI/TWI, xử lý vấn đề theo PDCA, không đổ lỗi.</li><li>Tôi vận hành ma trận kỹ năng (skill matrix) và LPA/đánh giá action closure.</li></ul>
-</div><hr/><p class="small"><strong>Ghi chú triển khai:</strong> Tài liệu này được thiết kế để tích hợp trực tiếp vào sổ tay vận hành/đào tạo của HESEM. Khi đưa vào áp dụng, cần gắn mã SOP/WI/FRM thực tế, người phê duyệt và ngày hiệu lực, đồng thời liên kết ma trận kỹ năng (skill matrix) + chính sách thưởng/level.</p></div></div></div>
+</div><hr/><p class="small"><strong>Ghi chú triển khai:</strong> Tài liệu này được thiết kế để tích hợp trực tiếp vào sổ tay vận hành/đào tạo của HESEM. Khi đưa vào áp dụng, cần gắn mã SOP/WI/FRM thực tế, approver và ngày hiệu lực, đồng thời liên kết ma trận kỹ năng (skill matrix) + chính sách thưởng/level.</p></div></div></div>
 </div>
 <script src="../../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>

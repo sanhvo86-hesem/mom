@@ -66,16 +66,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="doc-content" id="docContent">
 <h1>C09 — Quản lý thời gian – ưu tiên – đúng hạn — Level 2</h1>
-<p class="lead"><strong>Level 2 — Lập kế hoạch tuần/ngày &amp; chuẩn bị trước để giữ đúng hạn.</strong> Mô-đun này tạo thói quen đúng hạn và ưu tiên đúng để giữ OTD mà không phá cổng kiểm soát chất lượng (cổng kiểm soát chất lượng).</p>
+<p class="lead"><strong>Level 2 — Lập kế hoạch tuần/ngày &amp; chuẩn bị trước để giữ đúng hạn.</strong> Mô-đun này tạo thói quen đúng hạn và ưu tiên đúng để giữ OTD mà không phá control gate chất lượng (control gate chất lượng).</p>
 <div class="hero">
 <h2>Chuẩn thực chiến – Level 2</h2>
 <div class="meta">
 <div><strong>Vai trò mục tiêu</strong><br/>Operator senior, Setup leader, QC senior, Warehouse Team Leader</div>
 <div><strong>Đầu ra bắt buộc</strong><ul><li>Tự lập kế hoạch tuần/ngày; ưu tiên theo ngày đến hạn và ảnh hưởng.</li><li>Chuẩn bị trước vật tư/dao/gá/chương trình/đồ đo để tránh chờ.</li><li>Giữ cam kết cá nhân: tỷ lệ đúng hạn cao và có nhật ký khi rủi ro trễ.</li></ul></div>
-<div><strong>Cổng kiểm soát (gate) trọng yếu</strong><br/><span class="badge bad">Vượt qua HOLD/REV/QC</span> = FAIL</div>
+<div><strong>Control gate (gate) trọng yếu</strong><br/><span class="badge bad">Vượt qua HOLD/REV/QC</span> = FAIL</div>
 <div><strong>Thời lượng</strong><br/>Lý thuyết 60 phút • Workshop 60 phút • OJT 240 phút</div>
 </div>
-<p class="small-note">Nguyên tắc vận hành: làm đúng việc trước (priority), làm đúng cách (cổng kiểm soát), và báo sớm (escal) khi bị chặn.</p>
+<p class="small-note">Nguyên tắc vận hành: làm đúng việc trước (priority), làm đúng cách (control gate), và báo sớm (escal) khi bị chặn.</p>
 </div><div class="card">
 <span class="badge">Bộ diễn tập (Job CNC)</span>
 <p class="lead" style="margin-top:10px;">
@@ -93,11 +93,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <ul>
 <li>Giữ cam kết giao hàng (OTD) bằng kỷ luật dispatch, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), tuổi tồn WIP (tuổi tồn (aging) / tuổi tồn), escal ladder.</li>
-<li>Chặn 2 nhóm rủi ro song song: (1) trễ đơn; (2) chạy nhanh nhưng phá cổng kiểm soát gây lỗi chất lượng.</li>
+<li>Chặn 2 nhóm rủi ro song song: (1) trễ đơn; (2) chạy nhanh nhưng phá control gate gây lỗi chất lượng.</li>
 <li>Biến quản lý thời gian thành hành vi quan sát được: bảng kiểm, OJT, performance test, ĐẠT/KHÔNG ĐẠT.</li>
 </ul>
 </div>
-<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + hold point</h2>
 <p>C09-L2 nằm tại Planning execution: chuẩn bị trước giúp giảm queue/wait tại Production/QC/WHS.</p>
 <div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Nhìn tuần</strong><p>Xem due list 7 ngày + tuổi tồn WIP (tuổi tồn / tuổi tồn); xác định P0/P1/P2.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Xây daily plan</strong><p>Chốt 3 job trọng tâm/ngày; giữ WIP limit.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Chuẩn bị trước</strong><p>Tool/material/program/fixture/kế hoạch kiểm tra (kiểm tra plan) sẵn trước khi máy trống.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Chốt mức sẵn sàng</strong><p>Tất cả điều kiện pre-start đạt trước giờ vào máy.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Theo dõi cam kết</strong><p>Nhật ký rủi ro trễ và escal trước 24–48h.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Kết ca</strong><p>Review plan vs actual; cập nhật bài học và hành động.</p></div></div></div>
 <h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
@@ -116,10 +116,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>OJT đầu ra bắt buộc</h3>
 <ul><li>01 kế hoạch tuần + 01 kế hoạch ngày có ưu tiên và thời điểm.</li><li>01 mức sẵn sàng bảng kiểm cho 2 job (hiện tại và kế tiếp).</li><li>01 nhật ký escal sớm (trước khi trễ) và closure.</li></ul>
 <h3>Rubric L1–L4 (hành vi quan sát được)</h3>
-<div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Kỷ luật trong ca</td><td>Theo dispatch; pre-start cổng kiểm soát; escal đúng</td></tr><tr><td><strong>L2</strong></td><td>Plan &amp; chuẩn bị trước</td><td>Plan tuần/ngày; mức sẵn sàng; WIP thấp; nhật ký risk sớm</td></tr><tr><td><strong>L3</strong></td><td>Điều phối nhóm</td><td>Quản trị bottleneck; WIP board; huấn luyện</td></tr><tr><td><strong>L4</strong></td><td>Thiết kế hệ thống OTD</td><td>Cadence; KPI; capacity; escalation</td></tr></tbody></table></div>
+<div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Kỷ luật trong ca</td><td>Theo dispatch; pre-start control gate; escal đúng</td></tr><tr><td><strong>L2</strong></td><td>Plan &amp; chuẩn bị trước</td><td>Plan tuần/ngày; mức sẵn sàng; WIP thấp; nhật ký risk sớm</td></tr><tr><td><strong>L3</strong></td><td>Điều phối nhóm</td><td>Quản trị bottleneck; WIP board; huấn luyện</td></tr><tr><td><strong>L4</strong></td><td>Thiết kế hệ thống OTD</td><td>Cadence; KPI; capacity; escalation</td></tr></tbody></table></div>
 <h2>10) Đánh giá</h2>
 <h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
-<div class="quiz"><ol><li>WIP limit giúp giảm loại lãng phí nào?</li><li>Kế hoạch tuần phải dựa trên dữ liệu nào?</li><li>Mức sẵn sàng bảng kiểm bắt buộc gồm những gì?</li><li>Risk window 72h dùng để kích hoạt hành động gì?</li><li>Bucket AMBER yêu cầu action trong bao lâu?</li><li>Vì sao chuẩn bị trước 1 job khi máy đang chạy làm OTD tăng?</li><li>Nêu 02 dấu hiệu plan ngày bị quá tải.</li><li>Khi job chờ QC quá 16 giờ làm việc, ai phải escal?</li><li>Nêu 03 ví dụ việc chuẩn bị trước cho CNC.</li><li>Vì sao review plan vs actual là cổng kiểm soát học tập?</li><li>Khi thiếu vật tư, hành động sớm phải làm là gì?</li><li>Khi outsource có rủi ro trễ, escal đi đâu?</li><li>Nêu 02 hậu quả khi đổi ưu tiên liên tục.</li><li>Giữ WIP thấp giúp giảm rủi ro nào?</li><li>Khi plan tuần đổi, cần cập nhật bằng chứng gì?</li><li>Ai chịu trách nhiệm chốt plan ngày?</li><li>Khi mức sẵn sàng thiếu chương trình NC, phải làm gì?</li><li>Khi job RED xuất hiện, hành động tối thiểu là gì?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) áp dụng cho plan ra sao?</li><li>Nêu 02 cách để tránh chờ dao/gá.</li><li>Khi có 2 job cùng due, ưu tiên theo nguyên tắc nào?</li><li>Khi phát hiện plan ngày không đạt, bước sửa là gì?</li></ol></div>
+<div class="quiz"><ol><li>WIP limit giúp giảm loại lãng phí nào?</li><li>Kế hoạch tuần phải dựa trên dữ liệu nào?</li><li>Mức sẵn sàng bảng kiểm bắt buộc gồm những gì?</li><li>Risk window 72h dùng để kích hoạt hành động gì?</li><li>Bucket AMBER yêu cầu action trong bao lâu?</li><li>Vì sao chuẩn bị trước 1 job khi máy đang chạy làm OTD tăng?</li><li>Nêu 02 dấu hiệu plan ngày bị quá tải.</li><li>Khi job chờ QC quá 16 giờ làm việc, ai phải escal?</li><li>Nêu 03 ví dụ việc chuẩn bị trước cho CNC.</li><li>Vì sao review plan vs actual là control gate học tập?</li><li>Khi thiếu vật tư, hành động sớm phải làm là gì?</li><li>Khi outsource có rủi ro trễ, escal đi đâu?</li><li>Nêu 02 hậu quả khi đổi ưu tiên liên tục.</li><li>Giữ WIP thấp giúp giảm rủi ro nào?</li><li>Khi plan tuần đổi, cần cập nhật bằng chứng gì?</li><li>Ai chịu trách nhiệm chốt plan ngày?</li><li>Khi mức sẵn sàng thiếu chương trình NC, phải làm gì?</li><li>Khi job RED xuất hiện, hành động tối thiểu là gì?</li><li>không có bằng chứng thì không qua control gate (No bằng chứng = No gate) áp dụng cho plan ra sao?</li><li>Nêu 02 cách để tránh chờ dao/gá.</li><li>Khi có 2 job cùng due, ưu tiên theo nguyên tắc nào?</li><li>Khi phát hiện plan ngày không đạt, bước sửa là gì?</li></ol></div>
 <h3>Scenario (≥ 3 tình huống thật)</h3>
 <details>
 <summary>Máy trống nhưng chờ dao</summary>
@@ -152,10 +152,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h2>11) ĐẠT/KHÔNG ĐẠT criteria</h2>
 <div class="kpi-gate">
-<strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</strong>
+<strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</strong>
 <ul>
 <li>đạt khi hoàn thành OJT đầu ra và performance test đạt; tuân thủ dispatch/freeze/escal; có nhật ký và closure.</li>
-<li>FAIL ngay khi vượt qua cổng kiểm soát (REV/HOLD/QC), giấu blocker, không escal theo SLA, hoặc không có bằng chứng bàn giao.</li>
+<li>FAIL ngay khi vượt qua control gate (REV/HOLD/QC), giấu blocker, không escal theo SLA, hoặc không có bằng chứng bàn giao.</li>
 </ul>
 </div>
 <h2>12) MRR tối thiểu (hồ sơ bắt buộc + naming + nơi lưu)</h2>

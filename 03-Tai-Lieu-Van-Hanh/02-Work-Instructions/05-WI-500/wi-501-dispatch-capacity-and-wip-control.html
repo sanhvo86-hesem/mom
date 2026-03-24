@@ -96,7 +96,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Job/Rev/Op đúng SoR</td><td>Không có mismatch giữa traveler, dispatch, snapshot và phát hành kỹ thuật</td><td>HOLD job; trả về ENG/Planning để sửa packet</td></tr>
 <tr><td>Material ready</td><td>Đủ qty, đúng lot/heat/condition, reservation hoặc staging đã xác nhận</td><td>Gắn HR01-MAT; không xếp vào vị trí chạy</td></tr>
 <tr><td>Setup / tool / fixture ready</td><td>Có setup sheet, tool list, prove-out plan, fixture/jaw đúng</td><td>Gắn HR03-TOL; dời lịch hoặc chuyển sang cell khác nếu hợp lệ</td></tr>
-<tr><td>QA / cổng kiểm soát ready</td><td>QPL, CTQ plan, mẫu đầu / FAI / leak / clean cổng kiểm soát đã rõ người nhận</td><td>Gắn HR04-QA; không phát hành chạy mù</td></tr>
+<tr><td>QA / control gate ready</td><td>QPL, CTQ plan, mẫu đầu / FAI / leak / clean control gate đã rõ người nhận</td><td>Gắn HR04-QA; không phát hành chạy mù</td></tr>
 <tr><td>Machine / capacity ready</td><td>Machine không down/hard hold; queued hours sau khi thêm job vẫn trong cap</td><td>Dừng phát hành thêm; review resequence hoặc rebalance</td></tr>
 <tr><td>Outsource / downstream coupling ready</td><td>Job không đẩy nghẽn sang công đoạn sau hoặc outsource chưa có slot</td><td>Giữ lại hoặc phát hành có điều kiện kèm quyết định rõ</td></tr>
 </tbody></table></div>
@@ -107,7 +107,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="step-item"><strong>Phát hành board theo nhóm máy (machine family).</strong><br/>Tách riêng 3-axis, 5-axis, turning, mill-turn, finishing, clean/leak/final release và outsource queue. Không trộn tất cả lên một danh sách rồi yêu cầu Supervisor tự hiểu.</div>
 <div class="step-item"><strong>Khóa Top list.</strong><br/>Đầu mỗi ca phải xác định rõ Top P0/P1, job đầu tiên lên máy, job thứ hai đã staged, và các job P3/HOLD bị chặn.</div>
 <div class="step-item"><strong>Xác định cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch).</strong><br/>Sau khi công bố dispatch đầu ca, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) của ca có hiệu lực. Từ thời điểm này, mọi đổi lịch phải theo rule ở ANNEX-501.</div>
-<div class="step-item"><strong>Giao việc và xác nhận hiểu việc.</strong><br/>Supervisor/Cell Lead phải xác nhận người chạy máy hiểu job nào chạy trước, job nào chờ, job nào cần setup song song, và job nào có cổng kiểm soát QA/ENG/WHS đi kèm.</div>
+<div class="step-item"><strong>Giao việc và xác nhận hiểu việc.</strong><br/>Supervisor/Cell Lead phải xác nhận người chạy máy hiểu job nào chạy trước, job nào chờ, job nào cần setup song song, và job nào có control gate QA/ENG/WHS đi kèm.</div>
 </div>
 </div>
 
@@ -116,8 +116,8 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Họ công đoạn</th><th>Ưu tiên xếp thứ tự khi cùng class</th><th>Không được quên</th></tr></thead><tbody>
 <tr><td>5-axis / mill-turn</td><td>Ưu tiên job có mức sẵn sàng đầy đủ, fixture sẵn, prove-out ngắn hơn, và không làm đứt chuỗi QA/mẫu đầu của ca</td><td>Không xếp xen job mới vào giữa hai prove-out đang mở nếu làm tăng rủi ro crash hoặc trễ bottleneck.</td></tr>
 <tr><td>3-axis / turning</td><td>Ưu tiên theo due + setup family gần nhau để giảm changeover, nhưng không được bỏ qua job P1 đã ready đầy đủ</td><td>Không gom tối ưu setup đến mức để job gần due bị trễ.</td></tr>
-<tr><td>Finishing / deburr / clean</td><td>Ưu tiên theo risk của bề mặt và downstream cổng kiểm soát; part đã gần ship hoặc chờ QA phải được hút trước</td><td>Không đẩy part vacuum/clean chờ lẫn với part thường làm tăng handling risk.</td></tr>
-<tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship release)</td><td>Ưu tiên theo ship window, cổng kiểm soát đã đủ hồ sơ và mức độ ảnh hưởng customer</td><td>Không nhận thêm lot khi packet còn thiếu; phải trả về người phụ trách upstream để đóng hồ sơ.</td></tr>
+<tr><td>Finishing / deburr / clean</td><td>Ưu tiên theo risk của bề mặt và downstream control gate; part đã gần ship hoặc chờ QA phải được hút trước</td><td>Không đẩy part vacuum/clean chờ lẫn với part thường làm tăng handling risk.</td></tr>
+<tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship release)</td><td>Ưu tiên theo ship window, control gate đã đủ hồ sơ và mức độ ảnh hưởng customer</td><td>Không nhận thêm lot khi packet còn thiếu; phải trả về người phụ trách upstream để đóng hồ sơ.</td></tr>
 </tbody></table></div>
 </div>
 
@@ -125,7 +125,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <p>Planner phải review lại năng lực khi xuất hiện một trong các trigger sau: machine down vượt ngưỡng reserve, P0 chen vào lịch, đổi revision, outsource return không về đúng hạn, QA hold phát sinh ở bottleneck, hoặc queued standard hours vượt cap theo ANNEX-501.</p>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trigger</th><th>Phản ứng bắt buộc</th><th>Ai quyết định</th></tr></thead><tbody>
 <tr><td>Machine down / abnormality lớn</td><td>Ước lượng giờ mất, xác định jobs impacted, cập nhật board và chọn phương án: giữ lịch, chuyển tải, tăng ca hoặc outsource</td><td>Ops Manager + Planner</td></tr>
-<tr><td>P0 mới</td><td>Chỉ rõ job nào bị lùi; review lại setup reserve, QA cổng kiểm soát, ship impact</td><td>Ops Manager hoặc cao hơn</td></tr>
+<tr><td>P0 mới</td><td>Chỉ rõ job nào bị lùi; review lại setup reserve, QA control gate, ship impact</td><td>Ops Manager hoặc cao hơn</td></tr>
 <tr><td>Queued hours vượt cap</td><td>Dừng phát thêm job; clear job đỏ trước; nếu cần split lot / resequence phải có note</td><td>Planner Lead</td></tr>
 <tr><td>Outsource overdue</td><td>Đánh giá impact vào routing sau đó; không phát thêm upstream nếu downstream đã nghẽn</td><td>Planner + PUR + Ops</td></tr>
 </tbody></table></div>
@@ -183,7 +183,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <ul class="tight">
 <li>Dispatch list đã phát hành cho từng nhóm máy (machine family) hoặc cell.</li>
 <li>Snapshot tuổi tồn WIP (tuổi tồn / tuổi tồn) có người phụ trách và action cho mọi item đỏ/đen.</li>
-<li>nhật ký hành động của họp đầu ca/giữa ca nếu có hot-job, machine down, shortage hoặc cổng kiểm soát bất thường.</li>
+<li>nhật ký hành động của họp đầu ca/giữa ca nếu có hot-job, machine down, shortage hoặc control gate bất thường.</li>
 <li>Decision note cho mọi lần phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), resequence, split lot, outsource khẩn hoặc giao hàng một phần.</li>
 <li>Handover list cuối ca với job đang chạy, job đang chờ, abnormality mở và việc giao ca chưa đóng.</li>
 </ul>
@@ -191,14 +191,14 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>13. KPI, bằng chứng và tài liệu liên kết</h2>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>KPI-PLAN-01</strong><br/>OTD theo line / cổng kiểm soát / ship.</div>
+<div class="kpi-box"><strong>KPI-PLAN-01</strong><br/>OTD theo line / control gate / ship.</div>
 <div class="kpi-box"><strong>KPI-PLAN-02</strong><br/>Số job tuổi tồn WIP (tuổi tồn / tuổi tồn) vượt ngưỡng đỏ/đen.</div>
 <div class="kpi-box"><strong>KPI-PLAN-03</strong><br/>Tỷ lệ job chạy đúng dispatch đầu ca.</div>
 <div class="kpi-box"><strong>KPI-PLAN-04</strong><br/>Tỷ lệ xử lý sự kiện vượt cap trong SLA.</div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hồ sơ / tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>Rule điều độ, WIP cap, hot-job ladder, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch).</td></tr>
-<tr><td><a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>Cổng kiểm soát/MRR và rule bàn giao theo bước.</td></tr>
+<tr><td><a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>Control gate/MRR và rule bàn giao theo bước.</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation và SLA.</td></tr>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Chuẩn họp tầng và nhật ký hành động.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a></td><td>Dispatch list hằng ca/ngày.</td></tr>

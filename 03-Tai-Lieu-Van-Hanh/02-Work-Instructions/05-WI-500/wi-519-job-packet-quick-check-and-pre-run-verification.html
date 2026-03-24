@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>WI-519 — Kiểm nhanh bộ hồ sơ công việc (job packet), xác minh trước khi chạy, first cut và restart sau bất thường | HESEM QMS</title>
+<title>WI-519 — Kiểm nhanh bộ job dossier (job packet), xác minh trước khi chạy, first cut và restart sau bất thường | HESEM QMS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
 
@@ -64,7 +64,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <span>Tài liệu vận hành • Work Instruction</span>
 </div>
 </div>
-<div class="title"><strong>WI-519 — Kiểm nhanh bộ hồ sơ công việc, xác minh trước khi chạy, first cut và restart sau bất thường</strong></div>
+<div class="title"><strong>WI-519 — Kiểm nhanh bộ job dossier, xác minh trước khi chạy, first cut và restart sau bất thường</strong></div>
 <div class="meta">
 <div class="row"><span><b>Code:</b></span><span>WI-519</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
@@ -74,7 +74,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 </div>
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng ngay trước Cycle Start, sau setup/changeover, sau tool change ảnh hưởng CTQ, sau offset edit/WCS reset, sau power loss/alarm, sau chuyển giao công việc hoặc bất kỳ lần nào phải chạy lại máy sau trạng thái không ổn định.</div>
-<h1>WI-519 — Kiểm nhanh bộ hồ sơ công việc, xác minh trước khi chạy, first cut và restart sau bất thường</h1>
+<h1>WI-519 — Kiểm nhanh bộ job dossier, xác minh trước khi chạy, first cut và restart sau bất thường</h1>
 <div class="section"><h2>1. Quy tắc 60 giây trước Cycle Start</h2>
 <p>WI này là cổng chặn cuối cùng trước khi nhấn <b>Cycle Start</b>. Trong vòng 60 giây, Operator hoặc Setup Lead phải xác nhận đủ 07 điểm bắt buộc tại máy. Nếu có 01 điểm không PASS hoặc không chứng minh được, máy phải vào <b>HOLD</b>.</p>
 <div class="callout-danger"><strong>STOP-THE-LINE</strong><br/>Không được chạy máy để “test tạm” khi chưa qua WI-519. Không được bỏ qua bước kiểm vì job lặp, vì đã từng chạy, vì gần đến giờ giao, hoặc vì người setup nói “ổn rồi”.</div></div>
@@ -100,7 +100,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-info"><strong>Kiểm bổ sung bắt buộc</strong><br/>Job QPL-3/QPL-4, part có CTQ cao, part lần đầu, part có yêu cầu vacuum/clean/leak hoặc customer overlay đặc biệt phải kiểm thêm: gage mức sẵn sàng, kiểm tra method, bằng chứng path và người nhận đo part đầu.</div></div>
 <div class="section"><h2>4. Ba mức kiểm trước khi chạy</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mức kiểm</th><th>Mục tiêu</th><th>Nội dung</th><th>Không đạt thì làm gì</th></tr></thead><tbody>
-<tr><td>Mức A — Packet</td><td>Chặn sai phiên bản (wrong revision), sai job, sai vật liệu, sai route</td><td>Kiểm tài liệu, traveler, material lot, QPL, customer overlay, previous hold/NCR</td><td>HOLD bộ hồ sơ công việc; báo Supervisor / QA / Engineering</td></tr>
+<tr><td>Mức A — Packet</td><td>Chặn sai phiên bản (wrong revision), sai job, sai vật liệu, sai route</td><td>Kiểm tài liệu, traveler, material lot, QPL, customer overlay, previous hold/NCR</td><td>HOLD bộ job dossier; báo Supervisor / QA / Engineering</td></tr>
 <tr><td>Mức B — Machine static</td><td>Chặn sai setup phần cứng</td><td>Kiểm WCS, tool map, fixture orientation, dung dịch làm mát, chip/FOD, safety zone</td><td>HOLD machine; xử lý setup trước khi prove-out</td></tr>
 <tr><td>Mức C — Dynamic / first cut</td><td>Chặn crash, sai đường dao, drift sớm</td><td>Dry-run, single block, prove-out, part đầu, đặc tính chịu ảnh hưởng sau thay đổi</td><td>Dừng cycle; khoanh vùng last-known-good; chuyển WI-302 hoặc NCR nếu cần</td></tr>
 </tbody></table></div></div>
@@ -137,8 +137,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 <div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">% pre-run PASS lần đầu; số restart sau bất thường; số sự cố wrong-rev/wrong-tool/wrong-offset bị chặn trước Cycle Start; số alarm trong 10 part đầu.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="wi-517-setup-changeover-smed-standard-work.html">WI-517</a>; <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>; <a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a>; <a href="../../03-Reference/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>.</div></div></div></div>
 <div data-phase2f="true">
-<h2 class="h2" id="phase2f-job-packet-gate">Kiểm soát bổ sung — Bộ hồ sơ công việc quick-check to decision hồ sơ</h2>
-<div class="note"><b>Làm rõ vai trò</b><br/>WI-519 là quick-check tiêu chuẩn hoá bước chuẩn bị; kết quả chuẩn bị này phải được chốt thành decision hồ sơ trên <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> khi setup / restart / chuyển giao công việc thực sự mở cổng kiểm soát chạy.</div>
+<h2 class="h2" id="phase2f-job-packet-gate">Kiểm soát bổ sung — Bộ job dossier quick-check to decision hồ sơ</h2>
+<div class="note"><b>Làm rõ vai trò</b><br/>WI-519 là quick-check tiêu chuẩn hoá bước chuẩn bị; kết quả chuẩn bị này phải được chốt thành decision hồ sơ trên <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> khi setup / restart / chuyển giao công việc thực sự mở control gate chạy.</div>
 </div></div>
 </div>
 </div>
