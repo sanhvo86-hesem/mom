@@ -931,7 +931,7 @@ const CATEGORIES = [
   // ── Tài liệu vận hành ── (03-Tai-Lieu-Van-Hanh + 04-Bieu-Mau)
   {id:"SOP",icon:"📋",label:"Quy trình (SOP)",color:"#0369a1",dept:"QMS",section:"ops"},
   {id:"WI",icon:"📖",label:"Hướng dẫn công việc (WI)",color:"#059669",dept:"OPS",section:"ops"},
-  {id:"ANNEX",icon:"📚",label:"Phụ lục & Tham chiếu (ANNEX)",color:"#6366f1",dept:"QMS",section:"ops"},
+  {id:"ANNEX",icon:"📚",label:"Phụ lục (ANNEX)",color:"#6366f1",dept:"QMS",section:"ops"},
   {id:"FRM",icon:"📝",label:"Biểu mẫu & Hồ sơ (Forms)",color:"#d97706",dept:"FRM",section:"ops"},
   // ── Đào tạo & Năng lực ── (10)
   {id:"TRN",icon:"🎓",label:"Đào tạo & Năng lực (Training)",color:"#9333ea",dept:"TRN",section:"train"},
@@ -2038,7 +2038,7 @@ const I = {
   cat_PROC:{vi:'Quy trình vận hành (PROC)',en:'Procedures (PROC)'},
   cat_WI:{vi:'Hướng dẫn (WI/OPS)',en:'Work Instructions (WI)'},
   cat_FRM:{vi:'Biểu mẫu (Forms)',en:'Forms'},
-  cat_ANNEX:{vi:'Phụ lục & Tham chiếu (ANNEX)',en:'Annexes & References (ANNEX)'},
+  cat_ANNEX:{vi:'Phụ lục (ANNEX)',en:'Annexes (ANNEX)'},
   cat_DEP:{vi:'Phòng ban (Dept)',en:'Departments'},
   cat_ORG:{vi:'Tổ chức & RACI',en:'Organization & RACI'},
   cat_TRN:{vi:'Đào tạo (Training)',en:'Training'},

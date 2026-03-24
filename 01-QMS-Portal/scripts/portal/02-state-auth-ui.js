@@ -2665,7 +2665,7 @@ const CAT_OPTIONS = [
   {id:'WI',   label:'WI — Hướng dẫn công việc',   labelEn:'WI — Work Instruction'},
   {id:'FRM',  label:'FRM — Biểu mẫu / Hồ sơ',    labelEn:'FRM — Forms & Records'},
   {id:'ORG',  label:'ORG — Tổ chức & Nhân sự',    labelEn:'ORG — Organization & HR'},
-  {id:'ANNEX',label:'ANNEX — Phụ lục / Tài liệu tham chiếu',labelEn:'ANNEX — Annexes & References'},
+  {id:'ANNEX',label:'ANNEX — Phụ lục',labelEn:'ANNEX — Annexes'},
   {id:'POL',  label:'POL — Chính sách',            labelEn:'POL — Policy'},
   {id:'MAN',  label:'MAN — Sổ tay chất lượng',    labelEn:'MAN — Quality Manual'},
   {id:'TRN',  label:'TRN — Đào tạo & Năng lực',   labelEn:'TRN — Training & Competency'},
