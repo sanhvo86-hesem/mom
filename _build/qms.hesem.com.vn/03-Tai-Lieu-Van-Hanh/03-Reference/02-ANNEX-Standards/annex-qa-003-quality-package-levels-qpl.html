@@ -69,11 +69,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
 </div>
 </div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi xác định <span class="code">Base QPL</span>, mã overlay chất lượng, bộ bằng chứng bắt buộc theo gate, và thẩm quyền nâng/hạ/giữ mức kiểm soát cho từng Job, lot, partial shipment hoặc work transfer.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi xác định <span class="code">Base QPL</span>, mã overlay chất lượng, bộ bằng chứng bắt buộc theo gate, và thẩm quyền nâng/hạ/giữ mức kiểm soát cho từng Job, lot, giao hàng một phầnment hoặc work transfer.</div>
 <h1>ANNEX-QA-003 — QPL-1 đến QPL-4, bộ bằng chứng bắt buộc và quy tắc nâng/hạ cấp</h1>
 <div class="section"><h2>1. Mục đích và nguyên tắc cứng</h2>
 <p>ANNEX này quy định cách chọn <strong>Quality Package Level (QPL)</strong> cho từng Job và cách cộng thêm gói chứng cứ bắt buộc theo rủi ro, theo route, theo yêu cầu khách hàng và theo đặc thù giao hàng. QPL điều khiển độ sâu hồ sơ, độ chặt của gate, mức review trước release và mức cưỡng chế đối với FAI, sampling, final release, packaging và ship release.</p>
-<div class="callout-danger"><strong>Quy tắc cứng:</strong> (1) mọi Job phải có Base QPL trước khi planning release; (2) overlay chỉ được cộng thêm, không được dùng để giảm yêu cầu; (3) thiếu 1 mục bằng chứng bắt buộc theo QPL/overlay = HOLD gate; (4) partial ship không phải là lý do để hạ QPL; (5) QPL do khách hàng hoặc do route đặc biệt áp đặt chỉ được hạ khi có chấp thuận đúng thẩm quyền và đã cập nhật toàn bộ hồ sơ liên quan.</div>
+<div class="callout-danger"><strong>Quy tắc cứng:</strong> (1) mọi Job phải có Base QPL trước khi planning release; (2) overlay chỉ được cộng thêm, không được dùng để giảm yêu cầu; (3) thiếu 1 mục bằng chứng bắt buộc theo QPL/overlay = HOLD gate; (4) giao hàng một phần không phải là lý do để hạ QPL; (5) QPL do khách hàng hoặc do route đặc biệt áp đặt chỉ được hạ khi có chấp thuận đúng thẩm quyền và đã cập nhật toàn bộ hồ sơ liên quan.</div>
 </div>
 <div class="section"><h2>2. Cách xác định Base QPL</h2>
 <div class="table-card"><table><thead><tr><th>Điều kiện chính</th><th>Base QPL tối thiểu</th><th>Giải thích vận hành</th></tr></thead><tbody>
@@ -112,7 +112,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>G5 – Ship release</td><td>CoC/packing list/ship release handoff</td><td>Partial-ship logic nếu có</td><td>Open balance tracking, release review sâu hơn</td><td>SSCC reconciliation, source inspection closure, customer pack index, cấm ship khi thiếu một mục mandatory</td></tr>
 </tbody></table></div>
 <div class="callout-warn"><strong>Thiếu bằng chứng bắt buộc theo phase</strong> không được coi là “bổ sung sau”. Gate không đóng, traveler không release, shipment không confirm.</div></div>
-<div class="section"><h2>6. Quy tắc mixed-QPL, partial shipment, work transfer và rebaseline</h2>
+<div class="section"><h2>6. Quy tắc mixed-QPL, giao hàng một phầnment, work transfer và rebaseline</h2>
 <div class="table-card"><table><thead><tr><th>Tình huống</th><th>Quy tắc áp dụng</th></tr></thead><tbody>
 <tr><td>Job có nhiều route, mức rủi ro khác nhau</td><td>Dùng Base QPL cho toàn job và cộng overlay cho route nhạy. Shared gates dùng mức yêu cầu cao nhất đang có hiệu lực.</td></tr>
 <tr><td>Partial shipment</td><td>Không hạ QPL cho lô ship trước. Lô ship trước phải có full evidence tương ứng phần đã giao và phải giữ trace với open balance còn lại.</td></tr>

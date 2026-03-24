@@ -96,7 +96,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Luồng Lệnh sản xuất từ PO đến giao</td>
 <td><a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/index.html">SOP Library</a> • <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">PROC-OPS-001</a></td>
 <td>Bàn giao phòng ban đúng RACI</td>
-<td>Không có WO/Traveler/CTQ → KHÔNG được chạy máy</td>
+<td>Không có WO/Phiếu theo dõi công đoạn/CTQ → KHÔNG được chạy máy</td>
 </tr>
 <tr>
 <td>Điều hành tiến độ &amp; chất lượng</td>
@@ -108,7 +108,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Biểu mẫu và hồ sơ</td>
 <td><a href="../04-Bieu-Mau/index.html">Forms</a></td>
 <td>Hồ sơ được lưu đúng SSOT</td>
-<td>Thiếu hồ sơ bắt buộc → dừng release/ship</td>
+<td>Thiếu hồ sơ bắt buộc → dừng phê duyệt/giao hàng</td>
 </tr>
 <tr>
 <td>Thuật ngữ thống nhất</td>
@@ -123,7 +123,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" style="margin-top:12px;">
 <h2 class="h2" style="margin-top:0;">3. Quy tắc hệ thống bắt buộc</h2>
 <ul>
-<li><b>Epicor Kinetic là Nguồn chuẩn</b> cho mọi giao dịch: time entry, job trạng thái, PO/receipt, xác nhận giao hàng (ship confirm), inventory giao dịch, job cost. Phải ghi nhận trực tiếp trên Epicor; không dùng file hoặc bảng cá nhân để thay giao dịch chính thức.</li>
+<li><b>Epicor Kinetic là Nguồn chuẩn</b> cho mọi giao dịch: ghi nhận thời gian, trạng thái job, PO/nhận hàng, xác nhận giao hàng, giao dịch tồn kho, chi phí job. Phải ghi nhận trực tiếp trên Epicor; không dùng file hoặc bảng cá nhân để thay giao dịch chính thức.</li>
 <li><b>M365 là nơi lưu Bằng chứng/Hồ sơ</b>. Hồ sơ PHẢI lưu theo SSOT; chỉ chia sẻ bằng liên kết; retention event-based; legal hold theo <a href="../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-013</a>.</li>
 <li>Trước khi dùng tài liệu, người dùng PHẢI kiểm tra doc-control: mã, revision, ngày hiệu lực, phạm vi áp dụng.</li>
 <li>Khi phát sinh ngoại lệ (rework/waiver/deviation), phải thực hiện theo quy trình NCR/Deviation của QMS và lưu hồ sơ đúng thư viện M365.</li>
@@ -146,7 +146,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td>Hồ sơ công việc (job dossier) / Bộ bằng chứng (theo WO)</td>
+<td>Hồ sơ công việc / Bộ bằng chứng theo WO</td>
 <td>Job Register (Epicor WO) + Bằng chứng Index</td>
 <td>M365: CNC-IMS-HUB/QMS-Hồ sơ/Hồ sơ/Operations/Job-Dossier/&lt;WO&gt;/</td>
 <td>Event = WO đóng (Close Job)</td>
@@ -154,7 +154,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Theo SOP-QMS-013</td>
 </tr>
 <tr>
-<td>QC Hold Nhật ký + quyết định release</td>
+<td>Nhật ký QC HOLD + quyết định phê duyệt</td>
 <td>QC Hold Register</td>
 <td>M365: CNC-IMS-HUB/QMS-Hồ sơ/Hồ sơ/Quality/QC-Hold/&lt;YYYY&gt;/</td>
 <td>Event = QC Hold đóng</td>

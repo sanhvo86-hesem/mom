@@ -122,7 +122,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>0–1 shift</td><td>Bình thường</td><td>Cell Lead</td><td>Theo dõi theo dispatch; chưa cần escalation nếu job vẫn trong nhịp cam kết.</td></tr>
 <tr><td>&gt;1 đến 3 shift</td><td>Cảnh báo</td><td>Planner + Supervisor</td><td>Phải chỉ ra lý do: thiếu material, thiếu setup, chờ QA, chờ machine, chờ outsource, chờ decision.</td></tr>
 <tr><td>&gt;3 shift đến 7 ngày</td><td>Đỏ</td><td>Ops Manager</td><td>Escalate L1; phải có plan clear kèm due/time và người phụ trách.</td></tr>
-<tr><td>&gt;7 ngày hoặc có nguy cơ vỡ giao</td><td>Đen</td><td>Plant Head / GM theo thẩm quyền</td><td>Escalate L2; phải quyết định chuyển tải, outsource, split lot, partial ship hoặc re-plan cam kết.</td></tr>
+<tr><td>&gt;7 ngày hoặc có nguy cơ vỡ giao</td><td>Đen</td><td>Plant Head / GM theo thẩm quyền</td><td>Escalate L2; phải quyết định chuyển tải, outsource, split lot, giao hàng một phần hoặc re-plan cam kết.</td></tr>
 </tbody></table></div>
 <p>Tuổi tồn được tính theo <b>lần giao dịch gần nhất trong SoR</b> hoặc theo mốc release/move có ý nghĩa sản xuất. Không được xóa tuổi tồn bằng move giả, time entry giả hoặc thay đổi thủ công ngày snapshot.</p>
 </div>
@@ -132,7 +132,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>HR01-MAT</td><td>Material</td><td>Thiếu vật tư, lot/heat, cert hoặc reservation</td><td>WHS xác nhận tồn/lot/cert và SoR đã cập nhật</td></tr>
 <tr><td>HR02-PRG</td><td>Program</td><td>Program hoặc controlled copy chưa phát hành / sai phiên bản (wrong revision)</td><td>ENG phát hành controlled copy và link hồ sơ đúng</td></tr>
 <tr><td>HR03-TOL</td><td>Tooling / Fixture</td><td>Thiếu tool, fixture, jaw, holder, prove-out plan</td><td>Setup Lead xác nhận đủ điều kiện chạy</td></tr>
-<tr><td>HR04-QA</td><td>Quality</td><td>QA hold, FAI chưa xong, gage chưa sẵn, NCR chưa đóng</td><td>QA release bằng bằng chứng đúng cổng kiểm soát (gate)</td></tr>
+<tr><td>HR04-QA</td><td>Quality</td><td>QA hold, FAI chưa xong, gage chưa sẵn, NCR chưa đóng</td><td>QA release bằng bằng chứng đúng cổng kiểm soát</td></tr>
 <tr><td>HR05-MCH</td><td>Machine</td><td>Máy down, PM hold, crash, repeat abnormality</td><td>Maintenance/OPS xác nhận machine ready</td></tr>
 <tr><td>HR06-OUT</td><td>Outsource</td><td>Chờ processor, chờ receipt, chờ cert, overdue return</td><td>PUR/WHS xác nhận hàng về và đủ hồ sơ</td></tr>
 <tr><td>HR07-ENG</td><td>Engineering</td><td>Rev change, ECO, thiếu snapshot, unclear requirement</td><td>ENG release set mới và cập nhật bộ hồ sơ công việc (job packet)</td></tr>

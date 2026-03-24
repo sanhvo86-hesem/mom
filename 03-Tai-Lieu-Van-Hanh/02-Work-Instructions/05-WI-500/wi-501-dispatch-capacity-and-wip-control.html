@@ -96,7 +96,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Job/Rev/Op đúng SoR</td><td>Không có mismatch giữa traveler, dispatch, snapshot và phát hành kỹ thuật</td><td>HOLD job; trả về ENG/Planning để sửa packet</td></tr>
 <tr><td>Material ready</td><td>Đủ qty, đúng lot/heat/condition, reservation hoặc staging đã xác nhận</td><td>Gắn HR01-MAT; không xếp vào vị trí chạy</td></tr>
 <tr><td>Setup / tool / fixture ready</td><td>Có setup sheet, tool list, prove-out plan, fixture/jaw đúng</td><td>Gắn HR03-TOL; dời lịch hoặc chuyển sang cell khác nếu hợp lệ</td></tr>
-<tr><td>QA / cổng kiểm soát (gate) ready</td><td>QPL, CTQ plan, mẫu đầu / FAI / leak / clean cổng kiểm soát đã rõ người nhận</td><td>Gắn HR04-QA; không phát hành chạy mù</td></tr>
+<tr><td>QA / cổng kiểm soát ready</td><td>QPL, CTQ plan, mẫu đầu / FAI / leak / clean cổng kiểm soát đã rõ người nhận</td><td>Gắn HR04-QA; không phát hành chạy mù</td></tr>
 <tr><td>Machine / capacity ready</td><td>Machine không down/hard hold; queued hours sau khi thêm job vẫn trong cap</td><td>Dừng phát hành thêm; review resequence hoặc rebalance</td></tr>
 <tr><td>Outsource / downstream coupling ready</td><td>Job không đẩy nghẽn sang công đoạn sau hoặc outsource chưa có slot</td><td>Giữ lại hoặc phát hành có điều kiện kèm quyết định rõ</td></tr>
 </tbody></table></div>
@@ -156,7 +156,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <ul class="tight">
 <li>Không phát hành thêm upstream nếu processor đã full slot hoặc outbound lot chưa có route/ETA rõ.</li>
 <li>Không để kiểm tra cuối / phê duyệt giao hàng trở thành “kho đệm cuối cùng”. Nếu ship-ready queue vượt 1 ngày năng lực, Planner phải quay ngược upstream để hãm phát hành.</li>
-<li>Khi ngày đến hạn buộc phải partial ship, quyết định phải chốt rõ part-range/qty/document pack/label logic và người phụ trách xác nhận.</li>
+<li>Khi ngày đến hạn buộc phải giao hàng một phần, quyết định phải chốt rõ part-range/qty/document pack/label logic và người phụ trách xác nhận.</li>
 </ul>
 </div>
 
@@ -184,7 +184,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <li>Dispatch list đã phát hành cho từng nhóm máy (machine family) hoặc cell.</li>
 <li>Snapshot tuổi tồn WIP (tuổi tồn / tuổi tồn) có người phụ trách và action cho mọi item đỏ/đen.</li>
 <li>nhật ký hành động của họp đầu ca/giữa ca nếu có hot-job, machine down, shortage hoặc cổng kiểm soát bất thường.</li>
-<li>Decision note cho mọi lần phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), resequence, split lot, outsource khẩn hoặc partial ship.</li>
+<li>Decision note cho mọi lần phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), resequence, split lot, outsource khẩn hoặc giao hàng một phần.</li>
 <li>Handover list cuối ca với job đang chạy, job đang chờ, abnormality mở và việc giao ca chưa đóng.</li>
 </ul>
 </div>
