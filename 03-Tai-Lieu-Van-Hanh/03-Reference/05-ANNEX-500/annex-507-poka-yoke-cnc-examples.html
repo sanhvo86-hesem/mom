@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-507 — Thư viện ví dụ poka (chống sai)-giá đỡ (yoke) CNC, chống-mix, chống-rev, chống-tooling lỗi | HESEM QMS</title>
+<title>ANNEX-507 — Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) CNC, chống-mix, chống-rev, chống-tooling lỗi | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
 @media print {
@@ -53,7 +53,7 @@ ul.tight li {margin:4px 0;}
             <span>Tài liệu vận hành • Annex</span>
           </div>
         </div>
-        <div class="title"><strong>ANNEX-507 — Thư viện ví dụ poka (chống sai)-giá đỡ (yoke) CNC, chống-mix, chống-rev, chống-tooling lỗi</strong></div>
+        <div class="title"><strong>ANNEX-507 — Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) CNC, chống-mix, chống-rev, chống-tooling lỗi</strong></div>
         <div class="meta">
 
           <div class="row"><span><b>M&#227;:</b></span><span>ANNEX-507</span></div>
@@ -70,7 +70,7 @@ ul.tight li {margin:4px 0;}
       </div>
       <div class="doc-content" id="docContent"><div class="form-sheet">
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi lựa chọn ý tưởng chống sai cho máy, setup, kiểm tra, clean-pack, giao vận và FOD control. Đây là thư viện giải pháp, không thay WI tại điểm sử dụng.</div>
-      <h1>ANNEX-507 — Thư viện ví dụ poka (chống sai)-giá đỡ (yoke) CNC, chống-mix, chống-rev, chống-tooling lỗi</h1>
+      <h1>ANNEX-507 — Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) CNC, chống-mix, chống-rev, chống-tooling lỗi</h1>
       
 <div class="section"><h2>1. Cách dùng thư viện</h2>
 <p>ANNEX này là thư viện lựa chọn giải pháp. Không dùng ANNEX này để thay WI tại máy. Khi chọn được giải pháp phù hợp, phải triển khai theo <a href="../../02-Work-Instructions/08-WI-800/wi-801-cnc-poka-yoke-examples.html">WI-801</a>, cập nhật đúng điểm sử dụng và theo dõi hiệu lực sau phát hành.</p>
@@ -80,27 +80,27 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại lỗi</th><th>Ưu tiên 1</th><th>Ưu tiên 2</th><th>Chỉ dùng bổ trợ</th></tr></thead><tbody>
 <tr><td>Nhầm phiên bản / nhầm program / nhầm lộ trình gia công</td><td>khóa / scan / liên động an toàn (khóa liên động) dữ liệu</td><td>Trực quan xác nhận tại máy</td><td>Nhắc miệng / đào tạo lại</td></tr>
 <tr><td>Lắp ngược / lắp sai định hướng / đào tạo hội nhập / sai mặt chuẩn</td><td>nhập liệu cơ khí / one-way fixture</td><td>Go-NoGo template / chứng kiến đánh dấu</td><td>Ảnh treo tường đơn lẻ</td></tr>
-<tr><td>Sai tool / sai bù trừ (offset) / bỏ sót bước setup</td><td>bắt buộc xác minh / đứng cạnh học việc / bảng kiểm ép buộc</td><td>Dry-run liên động an toàn / setup ảnh chụp</td><td>Kiểm tra bằng trí nhớ</td></tr>
+<tr><td>Sai tool / sai bù trừ (bù trừ (offset)) / bỏ sót bước setup</td><td>bắt buộc xác minh / đứng cạnh học việc / bảng kiểm ép buộc</td><td>Dry-run liên động an toàn / setup ảnh chụp</td><td>Kiểm tra bằng trí nhớ</td></tr>
 <tr><td>Nhầm nguyên vật liệu / hỗn hợp / lẫn lộn part / hỗn hợp / lẫn lộn lot</td><td>cách ly + scan + bin control</td><td>Màu / nhãn / layout</td><td>Để chung rồi “nhìn kỹ”</td></tr>
 <tr><td>Sai gage / sai data mục nhập / bỏ sót CTQ</td><td>Gage nhóm sản phẩm control / bắt buộc tính đầy đủ</td><td>Balloon / bảng kiểm / đồng cấp xác minh</td><td>Kiểm ngẫu hứng</td></tr>
 <tr><td>Sai clean-pack / sai giao vận label / thiếu phụ kiện</td><td>Pack lộ trình gia công + count khóa + scan-to-print</td><td>chứng kiến đánh dấu / mù / ẩn count</td><td>Đếm miệng / nhớ tay</td></tr>
 </tbody></table></div></div>
 
-<div class="section"><h2>3. Thư viện ví dụ poka (chống sai)-giá đỡ (yoke) CNC / QA / WHS / clean-pack</h2>
+<div class="section"><h2>3. Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) CNC / QA / WHS / clean-pack</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>ID</th><th>Lỗi mục tiêu</th><th>Giải pháp mẫu</th><th>Áp dụng tốt nhất tại</th><th>Mức ưu tiên</th><th>Điều kiện để hiệu quả</th></tr></thead><tbody>
 <tr><td>PY-001</td><td>Nhầm program / nhầm phiên bản</td><td>Scan traveler chỉ mở đúng thư mục program theo part-rev hiện hành; khóa chọn tay ngoài danh sách phát hành.</td><td>Machine nạp / tải / program cuộc gọi</td><td>M1</td><td>Phát hành chương trình (program phát hành) và part-rev chủ / gốc phải sạch dữ liệu.</td></tr>
-<tr><td>PY-002</td><td>Nhầm fixture định hướng / đào tạo hội nhập</td><td>bất đối xứng key / pin / stop chặn / khóa làm cho part chỉ vào một chiều.</td><td>Setup fixture</td><td>M1</td><td>Thiết kế fixture từ đầu hoặc nâng cấp / cải tạo được mà không làm mất mốc chuẩn (datum).</td></tr>
+<tr><td>PY-002</td><td>Nhầm fixture định hướng / đào tạo hội nhập</td><td>bất đối xứng key / pin / stop chặn / khóa làm cho part chỉ vào một chiều.</td><td>Setup fixture</td><td>M1</td><td>Thiết kế fixture từ đầu hoặc nâng cấp / cải tạo được mà không làm mất mốc chuẩn (mốc chuẩn (datum)).</td></tr>
 <tr><td>PY-003</td><td>Sai jaw / sai mềm jaw set</td><td>Mã jaw + hộc cất riêng + ảnh chụp standard tại máy.</td><td>tiện / phay-lượt / quay setup</td><td>M2</td><td>Jaw set được quản lý riêng theo part nhóm sản phẩm.</td></tr>
 <tr><td>PY-004</td><td>Sai tool đã nạp / sai tool tuổi thọ / vòng đời</td><td>Bảng treo bóng dụng cụ (đứng cạnh học việc bảng) + tool ID + rule không mở cycle nếu danh sách tool chưa đủ.</td><td>Setup xe đẩy / pre-run</td><td>M2</td><td>Tool list chuẩn từ kỹ thuật và xưởng-sàn / tầng giữ đúng vị trí.</td></tr>
-<tr><td>PY-005</td><td>Sai bù trừ (offset) / quên dry-run</td><td>kép xác minh bù trừ (offset) + bắt buộc dry-run / đơn lẻ-chặn / khóa trước part đầu tiên.</td><td>Đầu tiên setup / chuyển đổi (changeover)</td><td>M2</td><td>Trưởng nhóm hoặc người đủ điều kiện cùng xác nhận.</td></tr>
+<tr><td>PY-005</td><td>Sai bù trừ (bù trừ (offset)) / quên dry-run</td><td>kép xác minh bù trừ (bù trừ (offset)) + bắt buộc dry-run / đơn lẻ-chặn / khóa trước part đầu tiên.</td><td>Đầu tiên setup / chuyển đổi (chuyển đổi (changeover))</td><td>M2</td><td>Trưởng nhóm hoặc người đủ điều kiện cùng xác nhận.</td></tr>
 <tr><td>PY-006</td><td>Bỏ sót đặc tính CTQ ở mẫu đầu (đầu tiên chi tiết / sản phẩm)</td><td>Balloon drawing + bảng kiểm bắt buộc đóng tất cả CTQ trước khi mở cổng kiểm soát G2.</td><td>Mẫu đầu / FAI</td><td>M2</td><td>Drawing balloon đúng phiên bản, đủ CTQ, đủ hồ sơ field.</td></tr>
 <tr><td>PY-007</td><td>Dùng sai gage nhóm sản phẩm</td><td>Màu gage + ảnh đúng/sai ngay tại điểm đo + khoá tủ gage theo nhóm.</td><td>Trong quá trình / kiểm tra cuối</td><td>M3</td><td>Đo lường duy trì màu và vị trí đồng nhất.</td></tr>
 <tr><td>PY-008</td><td>Ghi thiếu dữ liệu phát hành</td><td>Biểu mẫu số không cho gửi khi thiếu field CTQ/qty/lot/người phê duyệt bắt buộc.</td><td>QA phát hành / giao vận pack</td><td>M2</td><td>Field sơ đồ ánh xạ và luồng phê duyệt phải ổn định.</td></tr>
-<tr><td>PY-009</td><td>Nhầm nguyên vật liệu / hỗn hợp / lẫn lộn hợp kim</td><td>Bin màu + scan nguyên vật liệu cert / mẻ nấu (heat) số trước khi cấp vào máy.</td><td>Nhận hàng / vấn đề to job</td><td>M2</td><td>Kho phân khu và label nhiệt luyện/mẻ nấu (heat) số rõ ràng.</td></tr>
+<tr><td>PY-009</td><td>Nhầm nguyên vật liệu / hỗn hợp / lẫn lộn hợp kim</td><td>Bin màu + scan nguyên vật liệu cert / mẻ nấu (mẻ nấu (heat)) số trước khi cấp vào máy.</td><td>Nhận hàng / vấn đề to job</td><td>M2</td><td>Kho phân khu và label nhiệt luyện/mẻ nấu (mẻ nấu (heat)) số rõ ràng.</td></tr>
 <tr><td>PY-010</td><td>Hỗn hợp part / hỗn hợp / lẫn lộn phiên bản trên cùng khay</td><td>Khay 1 mã part-rev; mỗi vị trí khay có biển báo cố định; phải giữ tách tuyệt đối.</td><td>WIP khu vực chuẩn bị / sắp xếp</td><td>M1</td><td>Kế hoạch và người vận hành tuân thủ rule WIP phân tách.</td></tr>
 <tr><td>PY-011</td><td>Quên cap / nút bịt trước clean pack</td><td>chứng kiến vị trí / chức vụ + bảng kiểm 4 mắt cho cap/nút bịt/chất hút ẩm/độ ẩm card.</td><td>Clean pack</td><td>M2</td><td>Danh sách phụ kiện của từng job được chốt trước.</td></tr>
-<tr><td>PY-012</td><td>Sai số thùng carton / sai kiện</td><td>mù / ẩn count + scan-to-print chỉ cho in label ngoài khi count đủ.</td><td>Đóng gói / giao vận</td><td>M2</td><td>Không in label trước khi hoàn tất đóng gói thực.</td></tr>
-<tr><td>PY-013</td><td>FOD còn sót trong machine / khay / buồng / khoang</td><td>Dòng / Chuyền-thông quan / giải phóng mã thông báo (token) + tool accountability + chứng kiến khu sạch trước đóng cửa.</td><td>Machine đóng-out / clean xây dựng</td><td>M2</td><td>Tool list và dòng / chuyền-thông quan / giải phóng bảng kiểm luôn sẵn dùng.</td></tr>
+<tr><td>PY-012</td><td>Sai số thùng thùng carton / sai kiện</td><td>mù / ẩn count + scan-to-print chỉ cho in label ngoài khi count đủ.</td><td>Đóng gói / giao vận</td><td>M2</td><td>Không in label trước khi hoàn tất đóng gói thực.</td></tr>
+<tr><td>PY-013</td><td>FOD còn sót trong machine / khay / buồng / khoang</td><td>Dòng / Chuyền-thông quan / giải phóng mã thông báo (mã thông báo (token)) + tool accountability + chứng kiến khu sạch trước đóng cửa.</td><td>Machine đóng-out / clean xây dựng</td><td>M2</td><td>Tool list và dòng / chuyền-thông quan / giải phóng bảng kiểm luôn sẵn dùng.</td></tr>
 <tr><td>PY-014</td><td>Bỏ sót bàn giao thông tin ca</td><td>Bảng giao ca bắt buộc có machine trạng thái, hold lot, tool lo ngại / vấn đề, bất thường note.</td><td>Shift bàn giao</td><td>M3</td><td>Người giao / nhận ca cùng ký và cùng đọc.</td></tr>
 <tr><td>PY-015</td><td>Mở sai van / cổng test</td><td>có rãnh then đầu nối + đánh số cổng + trạng thái van khóa theo công thức / chương trình gia công.</td><td>rò rỉ test / làm sạch system</td><td>M1</td><td>Fixture và đầu nối chuẩn hóa đồng bộ.</td></tr>
 <tr><td>PY-016</td><td>Nhầm part nhóm sản phẩm ở machine gần nhau</td><td>Job bảng điện tử hoặc biển báo lớn + màu nhóm sản phẩm + khu khu vực chuẩn bị / sắp xếp tách biệt.</td><td>Cell nhiều máy / hot-job khu vực</td><td>M2</td><td>Điều phối giữ đúng layout và cập nhật trạng thái thời gian thực.</td></tr>

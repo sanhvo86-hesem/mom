@@ -174,7 +174,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <ol class="tight">
 <li>Mọi chấp nhận/từ chối/hold phải cập nhật lịch sử theo nhà cung cấp/quy trình/nhóm sản phẩm để điều khiển chuyển đổi trạng thái ở lô sau.</li>
 <li>Từ chối lặp hoặc xu hướng xấu phải kích hoạt siết chặt / thắt chặt kiểm tra, nhà cung cấp hành động, quy trình rà soát hoặc 100% kiểm tra theo rule. Không để lấy mẫu trở thành lớp lọc cố định che dấu quy trình xuống cấp.</li>
-<li>Kết quả lấy mẫu phải bước tiến (feed) sang <a href="../04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> với đầu vào / nhận hàng/outsource vấn đề và sang <a href="sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> khi cần ngăn chặn/NCR.</li>
+<li>Kết quả lấy mẫu phải bước tiến (bước tiến (feed)) sang <a href="../04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> với đầu vào / nhận hàng/outsource vấn đề và sang <a href="sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> khi cần ngăn chặn/NCR.</li>
 </ol>
 <h3 class="h3">7.6 Ranh giới với SPC, năng lực / khả năng và final phát hành</h3>
 <ol class="tight">
@@ -202,7 +202,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Không dùng quyết định chấp nhận của một lot để suy diễn toàn bộ quy trình đã ổn định nếu SPC/năng lực / khả năng đang cho tín hiệu xấu.</li>
 </ul><h3 class="h3">7.10 Chuẩn hóa định nghĩa lot, mẫu đơn vị và phạm vi áp dụng plan</h3>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table rule-table"><colgroup><col style="width:20%"/><col style="width:36%"/><col style="width:18%"/><col style="width:26%"/></colgroup><thead><tr><th>Bối cảnh</th><th>Lot được hiểu là gì</th><th>mẫu đơn vị</th><th>Điều kiện bắt buộc phải giữ</th></tr></thead><tbody>
-<tr><td>đầu vào / nhận hàng / IQC</td><td>Cùng part-rev, cùng nhà cung cấp site, cùng PO/phiếu nhận / biên nhận dòng / chuyền và cùng mẻ nấu (heat)/batch nếu có yêu cầu truy vết.</td><td>1 đơn vị nhận hoặc 1 gói đóng gói theo kiểm soát IQC</td><td>PHẢI tách riêng phiếu nhận / biên nhận của từng nhà cung cấp, từng mẻ nấu (heat) và từng ngày nhận; không gom chung vào một plan AQL.</td></tr>
+<tr><td>đầu vào / nhận hàng / IQC</td><td>Cùng part-rev, cùng nhà cung cấp site, cùng PO/phiếu nhận / biên nhận dòng / chuyền và cùng mẻ nấu (mẻ nấu (heat))/batch nếu có yêu cầu truy vết.</td><td>1 đơn vị nhận hoặc 1 gói đóng gói theo kiểm soát IQC</td><td>PHẢI tách riêng phiếu nhận / biên nhận của từng nhà cung cấp, từng mẻ nấu (mẻ nấu (heat)) và từng ngày nhận; không gom chung vào một plan AQL.</td></tr>
 <tr><td>IPQC / trong quá trình</td><td>Cùng job-vận hành, cùng trạng thái setup, cùng nhóm máy (machine nhóm sản phẩm) và không có thay đổi sự kiện chưa tái xác nhận.</td><td>1 chi tiết / 1 hốc / lòng khuôn / 1 vị trí / chức vụ theo kế hoạch kiểm tra (kiểm tra plan)</td><td>PHẢI tách lot và mở lot mới khi quy trình thay đổi bản chất; lot AQL không được dùng để che lấp quy trình đang trôi / sai lệch.</td></tr>
 <tr><td>Final / lô giao hàng</td><td>Cùng part-rev, cùng phát hành trạng thái, cùng pack plan và cùng chất lượng gói hàng level.</td><td>1 chi tiết hoặc 1 pack đơn vị tùy kiểm tra hướng dẫn</td><td>PHẢI tách riêng lot đã làm lại với lot chưa làm lại trừ khi đã có đã phê duyệt nộp lại rule cho phép dùng một plan chung.</td></tr>
 <tr><td>Lot sau làm lại / 100% sort</td><td>Chỉ mở lot mới sau khi sort/làm lại hoàn tất và lộ trình gia công/disposition đã khóa.</td><td>1 đơn vị sau làm lại</td><td>PHẢI đánh giá lại plan nếu đặc tính lỗi, khuyết tật nhóm sản phẩm hoặc rủi ro hồ sơ / biên dạng đã đổi; không tái sử dụng nguyên trạng plan cũ.</td></tr>
@@ -231,8 +231,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </tbody></table></div>
 <h3 class="h3">7.14 Phản hồi bắt buộc từ kết quả AQL về nhà cung cấp, quy trình và lập kế hoạch</h3>
 <ul class="tight">
-<li>Từ chối lịch sử và chuyển đổi xu hướng phải bước tiến (feed) về <a href="../04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> khi liên quan nhà cung cấp hoặc thuê ngoài công đoạn đặc biệt.</li>
-<li>False-chấp nhận, hỗn hợp / lẫn lộn-lot nhầm lẫn hoặc khuyết tật thoát / bỏ qua sau AQL acceptance phải bước tiến (feed) về <a href="sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a> và <a href="sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> để siết lại phát hành rule.</li>
+<li>Từ chối lịch sử và chuyển đổi xu hướng phải bước tiến (bước tiến (feed)) về <a href="../04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> khi liên quan nhà cung cấp hoặc thuê ngoài công đoạn đặc biệt.</li>
+<li>False-chấp nhận, hỗn hợp / lẫn lộn-lot nhầm lẫn hoặc khuyết tật thoát / bỏ qua sau AQL acceptance phải bước tiến (bước tiến (feed)) về <a href="sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a> và <a href="sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> để siết lại phát hành rule.</li>
 <li>Nếu plan phải tăng từ bình thường sang siết chặt / thắt chặt hoặc chuyển về 100% kiểm tra kéo dài, Planner và Sản xuất phải được thông báo vì điều này làm đổi năng lực kiểm và khả năng giao hàng.</li>
 </ul><h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:38%"/><col style="width:16%"/><col style="width:14%"/><col style="width:14%"/></colgroup><thead><tr><th>Tình huống</th><th>Quy tắc xử lý</th><th>Chủ trì</th><th>Người gỡ hold</th><th>Hồ sơ</th></tr></thead><tbody>

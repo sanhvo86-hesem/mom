@@ -68,7 +68,7 @@
           <div class="keyline"><b>2.1 Một sự kiện – một người phụ trách điều phối</b><br/>Mỗi sự kiện chỉ có một người điều phối chính để giữ log hành động, nhịp thông báo, quyết định họp war phòng và đóng sự kiện. Người điều phối không được đẩy trách nhiệm sang nhiều đầu mối song song.</div>
           <div class="keyline"><b>2.2 Ngăn chặn đi trước phân tích</b><br/>Khi sự kiện có nguy cơ lan rộng, ưu tiên đầu tiên là chặn lan rộng: TẠM GIỮ lot, cách ly part, dừng công đoạn, khóa lô giao hàng, đóng quyền truy cập, khóa phiên bản hoặc chặn use-to-tồn kho.</div>
           <div class="keyline"><b>2.3 Escalation theo ngưỡng, không theo cảm tính</b><br/>Nếu chạm ngưỡng của bảng kích hoạt thì escalation tự động có hiệu lực, kể cả khi người phụ trách cho rằng “có thể tự xử lý”.</div>
-          <div class="keyline"><b>2.4 Sau giờ vẫn phải xử lý</b><br/>Sự kiện phát sinh ngoài giờ, ngày nghỉ, ngày lễ vẫn áp dụng SLA. Không được đợi đến sáng hôm sau nếu sự kiện chạm ngưỡng Quan trọng, ảnh hưởng lô giao hàng, an toàn, data tính toàn vẹn hoặc khách hàng-tiện mặt đầu (facing) cam kết.</div>
+          <div class="keyline"><b>2.4 Sau giờ vẫn phải xử lý</b><br/>Sự kiện phát sinh ngoài giờ, ngày nghỉ, ngày lễ vẫn áp dụng SLA. Không được đợi đến sáng hôm sau nếu sự kiện chạm ngưỡng Quan trọng, ảnh hưởng lô giao hàng, an toàn, data tính toàn vẹn hoặc khách hàng-tiện mặt đầu (tiện mặt đầu (facing)) cam kết.</div>
         </div>
       </div>
 
@@ -97,7 +97,7 @@
             <tr><td>Nhà cung cấp / Bên ngoài nhà cung cấp dịch vụ</td><td>Chậm cert, chậm người xử lý khe / vị trí, thiếu bằng chứng khi phiếu nhận / biên nhận.</td><td>Người xử lý scope không phù hợp; công đoạn đặc biệt fail; đã phê duyệt trạng thái xuống thử việc.</td><td>NCC gây thoát / bỏ qua lớn, vi phạm pháp lý, mất cert/phê duyệt bắt buộc cho job đang chạy.</td><td>Mua hàng / QA</td></tr>
             <tr><td>Data / System / Truy cập</td><td>Luồng công việc lỗi làm chậm phê duyệt; thư mục sai path; người dùng truy cập không khớp cục bộ.</td><td>Data tính toàn vẹn rủi ro giữa Epicor và M365; hồ sơ không khôi phục được; quyền cao cấp cấp sai cho người dùng đang active.</td><td>Mất dữ liệu phát hành/lô giao hàng; nghi ngờ an ninh mạng sự kiện; thay đổi trái phép ảnh hưởng quyết định chất lượng/giao hàng.</td><td>IT / QMS</td></tr>
             <tr><td>Khách hàng / Khiếu nại / Thương mại</td><td>Khiếu nại cần phản hồi trong ngày; sai điều kiện giao hàng cần xác nhận lại.</td><td>RMA/bảo hành sự kiện; khiếu nại có nguy cơ lan sang nhiều lô giao hàng.</td><td>Thu hồi, stop-ship, khách hàng điều hành escalation, pháp lý mức độ tiếp xúc / phơi nhiễm.</td><td>Kinh doanh-CS / QA</td></tr>
-            <tr><td>An toàn / EHS</td><td>Sự cố suýt xảy ra (gần / suýt-thiếu / bỏ sót) nghiêm trọng; PPE fail ở công việc nguy cơ cao.</td><td>có thể ghi nhận chấn thương, hóa chất tràn / đổ, nén-air lạm dụng, nâng sự kiện có nguy cơ tái diễn.</td><td>nghiêm trọng chấn thương, cháy / hỏa hoạn, sơ tán, cơ quan quản lý-tiện mặt đầu (facing) sự kiện.</td><td>HSE / Ops</td></tr>
+            <tr><td>An toàn / EHS</td><td>Sự cố suýt xảy ra (gần / suýt-thiếu / bỏ sót) nghiêm trọng; PPE fail ở công việc nguy cơ cao.</td><td>có thể ghi nhận chấn thương, hóa chất tràn / đổ, nén-air lạm dụng, nâng sự kiện có nguy cơ tái diễn.</td><td>nghiêm trọng chấn thương, cháy / hỏa hoạn, sơ tán, cơ quan quản lý-tiện mặt đầu (tiện mặt đầu (facing)) sự kiện.</td><td>HSE / Ops</td></tr>
           </tbody>
         </table></div>
       </div>
@@ -134,7 +134,7 @@
         </table></div>
         <div class="two-col">
           <div class="keyline"><b>Liên kết thẩm quyền</b><br/>Mọi quyền duyệt cuối cùng phải phù hợp với <b><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></b> và quy tắc phó/backup của <b><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></b>. Không viện cớ “vắng người ký” để mở dòng / chuyền hoặc giao hàng sai thẩm quyền.</div>
-          <div class="keyline"><b>Liên kết hàng ngày quản lý</b><br/>Sự kiện L2/L3 kéo dài qua ca phải được đưa vào <b><a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a></b> và bảng hành động của ca/ngày. Sự kiện không được biến mất khỏi biểu đồ radar chỉ vì đã chat xong trên Teams.</div>
+          <div class="keyline"><b>Liên kết hàng ngày quản lý</b><br/>Sự kiện L2/L3 kéo dài qua ca phải được đưa vào <b><a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a></b> và bảng hành động của ca/ngày. Sự kiện không được biến mất khỏi biểu đồ biểu đồ radar chỉ vì đã chat xong trên Teams.</div>
         </div>
       </div>
 

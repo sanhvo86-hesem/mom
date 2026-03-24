@@ -257,10 +257,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 4) -->
 <h2 id="sec4">4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế)</h2>
 <ol>
-<li><b>Nhập nhầm phiên bản giải pháp</b>: import gói cũ, thiếu bản vá nóng (hotfix), hoặc lệch version so với DCR hồ sơ.</li>
+<li><b>Nhập nhầm phiên bản giải pháp</b>: import gói cũ, thiếu bản vá nóng (bản vá nóng (hotfix)), hoặc lệch version so với DCR hồ sơ.</li>
 <li><b>Nhập nhầm môi trường</b>: triển khai thẳng vào PROD, bỏ qua UAT, hoặc chạy thử bằng dữ liệu thật.</li>
 <li><b>Không được quản lý tồn tại trong PROD</b>: người dùng chỉnh trực tiếp trong PROD, tạo “độ lệch” không truy vết.</li>
-<li><b>kết nối Tham chiếu trỏ sai</b>: luồng/app gọi nhầm site/thư viện, nhầm list, nhầm tổ chức thuê (tenant).</li>
+<li><b>kết nối Tham chiếu trỏ sai</b>: luồng/app gọi nhầm site/thư viện, nhầm list, nhầm tổ chức thuê (tổ chức thuê (tenant)).</li>
 <li><b>Môi trường biến số / biến thiên bị cứng / khó-code</b>: copy/paste URL, GUID, hộp thư, khiến dữ liệu chảy sai vùng.</li>
 <li><b>DLP bị bỏ qua</b>: đầu nối ngoài danh sách cho phép kéo dữ liệu khách ra kênh ngoài.</li>
 <li><b>SoD bị phá</b>: cùng một người vừa cấu hình vừa tự phê duyệt go-vận hành thực.</li>
@@ -431,7 +431,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>7</td>
 <td>Export được quản lý gói hàng để triển khai UAT</td>
 <td>Lập trình viên (CNC)</td>
-<td>File được quản lý export + mã băm (hash)/size + ngày export</td>
+<td>File được quản lý export + mã băm (mã băm (hash))/size + ngày export</td>
 <td>Nhầm gói không được quản lý</td>
 </tr>
 <tr>
@@ -521,7 +521,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>5</td>
 <td>Export được quản lý gói hàng</td>
-<td>Export đúng dạng được quản lý cho UAT/PROD • Lưu mã băm (hash)/size</td>
+<td>Export đúng dạng được quản lý cho UAT/PROD • Lưu mã băm (mã băm (hash))/size</td>
 <td>được quản lý bảo vệ khỏi chỉnh trực tiếp và hỗ trợ gỡ cài đặt/nâng cấp</td>
 </tr>
 <tr>
@@ -533,7 +533,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>7</td>
 <td>Chạy acceptance kiểm nghiệm bằng người dùng thật</td>
-<td>Test đúng vai trò người dùng (persona) (Người vận hành/QC/Kho) • Test “bằng chứng trong 3 phút”</td>
+<td>Test đúng vai trò người dùng (vai trò người dùng (persona)) (Người vận hành/QC/Kho) • Test “bằng chứng trong 3 phút”</td>
 <td>Admin đạt không đồng nghĩa người dùng đạt</td>
 </tr>
 <tr>
@@ -653,7 +653,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Người vận hành/Setup/QC/Kho/Mua hàng/Planner/Bảo trì/EHS/Kinh doanh-CS</b></td>
-<td>Thực hành đúng theo vai trò người dùng (persona): truy xuất nguồn gốc hồ sơ đã phát hành, tìm bằng chứng trong 3 phút, tạo log sự cố, không chia sẻ sai kênh</td>
+<td>Thực hành đúng theo vai trò người dùng (vai trò người dùng (persona)): truy xuất nguồn gốc hồ sơ đã phát hành, tìm bằng chứng trong 3 phút, tạo log sự cố, không chia sẻ sai kênh</td>
 <td>đạt khi vận hành đúng và tạo MRR đúng yêu cầu</td>
 </tr>
 </table>
@@ -720,7 +720,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Không được quản lý trong PROD</b> → bắt buộc được quản lý + khóa quyền người tạo / nhà sản xuất trong PROD.</li>
 <li><b>Bằng chứng không có ngữ cảnh</b> → ảnh chụp màn hình phải thấy tên site/thư viện + cài đặt value.</li>
 <li><b>Quyền truy cập không kiểm soát</b> → dùng group mốc chuẩn; không tách quyền per-file; có ảnh chụp trạng thái quyền.</li>
-<li><b>Không có acceptance kiểm nghiệm bằng người dùng thật</b> → chạy test theo vai trò người dùng (persona) (Người vận hành/QC/Kho).</li>
+<li><b>Không có acceptance kiểm nghiệm bằng người dùng thật</b> → chạy test theo vai trò người dùng (vai trò người dùng (persona)) (Người vận hành/QC/Kho).</li>
 <li><b>DLP không phù hợp mức dữ liệu</b> → map khu vực + phân loại với DLP đầu nối; có test tình huống chặn chia sẻ.</li>
 <li><b>cứng / khó-code env giá trị</b> → dùng env biến số; có bảng kiểm pre-import; có sơ đồ ánh xạ theo môi trường.</li>
 <li><b>Không có backup/hoàn tác / quay lại</b> → export trước phát hành và lưu đúng kho bằng chứng.</li>

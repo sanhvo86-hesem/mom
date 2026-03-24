@@ -217,8 +217,9 @@ CORE_DICT = OrderedDict([
     ('Administrator', 'Quản trị viên'),
 ])
 
-# ── ABBREVIATIONS TO KEEP IN ENGLISH ──
+# ── ABBREVIATIONS & PROPER NOUNS TO KEEP IN ENGLISH ──
 KEEP_ENGLISH = {
+    # QMS abbreviations
     'QMS','QA','QC','IT','HR','EHS','ENG','PRO','PUR','WHS','MNT','SAL','FIN','HSE',
     'CNC','OPS','PLA','NCR','CAPA','DCR','SOP','WI','FRM','ANNEX','REC','RPT','CERT',
     'RFQ','PO','CSR','CoC','CoA','POD','BOM','KPI','OTD','FPY','COPQ','MSA','SPC',
@@ -234,7 +235,52 @@ KEEP_ENGLISH = {
     'SOP-101','SOP-102','SOP-103','SOP-104','SOP-105','SOP-106',
     'ANNEX-111','ANNEX-112','ANNEX-113','ANNEX-114','ANNEX-115',
     'ANNEX-131','ANNEX-132',
+    # ── Internal field names (SharePoint/Epicor columns) — NEVER translate ──
+    'RecordType','RecordCode','StatusCode','ResponsiblePerson',
+    'EventDate','TriggerEventDate','JobNum','PartNum','CustomerID',
+    'SupplierID','EvidenceUrl','StatusText','RecordID','IRID','DTID',
+    'CAPAStatus','PartDescription','RevisionNum','QuoteNum','OrderNum',
+    'BatchID','LotNum','SerialNum','InspectorID','AuditorID',
+    'ReviewerID','ApproverID','CreatedBy','ModifiedBy','AssignedTo',
+    'DueDate','ClosedDate','TargetDate','CompletionDate',
+    'RiskLevel','SeverityLevel','PriorityLevel','ImpactLevel',
+    'RootCause','CorrectiveAction','PreventiveAction',
+    'FindingType','AuditType','NonConformanceType',
+    'DocumentType','DocumentCode','DocumentTitle',
+    'WorkflowStatus','ApprovalStatus','ReviewStatus',
+    # ── SharePoint site names — NEVER translate ──
+    'HESEM-QMS','HESEM-Con','HESEM-Số','Control',
+    # ── Industry proper nouns ──
+    'Hastelloy','Inconel','Monel','Stellite','Titanium','Invar','Kovar',
+    'Honeywell','Parker','Swagelok','Emerson','Siemens','Fanuc','Mazak',
+    'Mitutoyo','Renishaw','Zeiss','Keyence','Omron',
 }
+
+# ── Patterns to COMPLETELY SKIP (regex) ──
+# These are internal names, site names, field names that must never be translated
+SKIP_PATTERNS = [
+    re.compile(r'HESEM-QMS-[^\s<]+'),           # SharePoint site names
+    re.compile(r'HESEM-Con người-[^\s<]+'),       # SharePoint site names
+    re.compile(r'HESEM-Số hóa-[^\s<]+'),          # SharePoint site names
+    re.compile(r'QMS-Chủ sở hữu'),               # SharePoint owner
+    re.compile(r'[A-Z][a-z]+[A-Z][a-zA-Z]*'),    # CamelCase internal names (RecordType, JobNum...)
+    re.compile(r'[A-Z]{2,}-\d+'),                 # Code patterns (FRM-101, SOP-201...)
+    re.compile(r'\b[A-Z][a-z]+ID\b'),             # IDs (CustomerID, SupplierID...)
+    re.compile(r'\b[A-Z][a-z]+Num\b'),            # Numbers (JobNum, PartNum...)
+    re.compile(r'\b[A-Z][a-z]+Date\b'),           # Dates (EventDate, DueDate...)
+    re.compile(r'\b[A-Z][a-z]+Status\b'),         # Statuses (CAPAStatus, WorkflowStatus...)
+    re.compile(r'\b[A-Z][a-z]+Type\b'),           # Types (RecordType, FindingType...)
+    re.compile(r'\b[A-Z][a-z]+Code\b'),           # Codes (RecordCode, StatusCode...)
+    re.compile(r'\b[A-Z][a-z]+Level\b'),          # Levels (RiskLevel, SeverityLevel...)
+    re.compile(r'\b[A-Z][a-z]+Action\b'),         # Actions (CorrectiveAction...)
+    re.compile(r'\b[A-Z][a-z]+Url\b'),            # URLs (EvidenceUrl...)
+    re.compile(r'\b[A-Z][a-z]+By\b'),             # By (CreatedBy, ModifiedBy...)
+    re.compile(r'\b[A-Z][a-z]+To\b'),             # To (AssignedTo...)
+    re.compile(r'\b[A-Z][a-z]+Person\b'),         # Person (ResponsiblePerson...)
+    re.compile(r'\b[A-Z][a-z]+Text\b'),           # Text (StatusText...)
+    re.compile(r'\b[A-Z][a-z]+Title\b'),          # Title (DocumentTitle...)
+    re.compile(r'\b[A-Z][a-z]+Description\b'),    # Description (PartDescription...)
+]
 
 # ── LOAD DICTIONARY FROM EXCEL FILES ──
 def load_dictionary():
@@ -328,19 +374,39 @@ def translate_html(html, patterns):
             original = parts[i]
             if not original.strip():
                 continue
-            # Skip if it looks like it's inside an attribute (shouldn't happen after split, but safety)
+
             text = original
+
+            # Step 1: Protect internal names / CamelCase / site names
+            # Replace them with placeholders so they don't get translated
+            text_protected = {}
+            tc = [0]
+            def protect_internal(m):
+                pkey = f'\x01INT_{tc[0]}\x01'
+                text_protected[pkey] = m.group(0)
+                tc[0] += 1
+                return pkey
+
+            for skip_pat in SKIP_PATTERNS:
+                text = skip_pat.sub(protect_internal, text)
+
+            # Step 2: Apply translation patterns
             for pattern, en, vi in patterns:
                 new_text = pattern.sub(vi, text)
                 if new_text != text:
                     text = new_text
+
+            # Step 3: Restore protected internal names
+            for pkey, pval in text_protected.items():
+                text = text.replace(pkey, pval)
+
             if text != original:
                 parts[i] = text
                 changed = True
 
     result = ''.join(parts)
 
-    # Restore protected blocks
+    # Restore protected blocks (style/script)
     for key, value in protected.items():
         result = result.replace(key, value)
 

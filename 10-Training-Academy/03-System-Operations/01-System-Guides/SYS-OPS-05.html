@@ -210,7 +210,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>ReconciliationStatus</td><td>LUỒNG-WHS-13</td><td>Yes</td><td>Pass / Fail / Đã chặn</td><td>ShipRelease</td></tr>
 <tr><td>Trạng thái</td><td>WHS</td><td>Yes</td><td>Draft/Đã in/Đã xác minh/đã phát hành/Đã giao hàng/Đã hủy</td><td>PackSSCCRegister</td></tr>
 <tr><td>PrintVersion</td><td>LUỒNG-WHS-12</td><td>Yes</td><td>1 = in lần đầu; tăng 1 cho mỗi lần in lại</td><td>PackSSCCRegister</td></tr>
-<tr><td>ReprintReasonCode</td><td>Tổ trưởng kho/QA</td><td>điều kiện (Cond).</td><td>Bắt buộc khi PrintVersion &gt; 1</td><td>PackSSCCRegister</td></tr>
+<tr><td>ReprintReasonCode</td><td>Tổ trưởng kho/QA</td><td>điều kiện (điều kiện (Cond)).</td><td>Bắt buộc khi PrintVersion &gt; 1</td><td>PackSSCCRegister</td></tr>
 <tr><td>PacketFolderUrl</td><td>Hồ sơ công việc</td><td>Yes</td><td>Trỏ đúng 07_Shipping-Đóng gói</td><td>ShipRelease / PackSSCCRegister</td></tr>
 <tr><td>liên kết QR phát hành giao hàng</td><td>LUỒNG-WHS-11</td><td>Yes</td><td>Quét mở đúng màn hình ShipRelease</td><td>PackSSCCRegister</td></tr>
 <tr><td>liên kết QR gói giao hàng</td><td>LUỒNG-WHS-11</td><td>Yes</td><td>Quét mở đúng thư mục bộ hồ sơ giao hàng</td><td>PackSSCCRegister</td></tr>
@@ -317,7 +317,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>An toàn đóng gói</td>
 <td>Kiểm soát dao cắt/băng dính / băng keo gun/xe nâng; nhãn cảnh báo; xử lý vật liệu nguy hại khi áp dụng</td>
 <td>EHS bảng kiểm; đào tạo hồ sơ</td>
-<td>An toàn đi kiểm tra (gemba walk) + ký‑off</td>
+<td>An toàn đi kiểm tra (gemba (thực địa) đi kiểm tra (gemba walk)) + ký‑off</td>
 </tr>
 <tr>
 <td class="role">Người vận hành / Setup / Lập trình viên (CNC)</td>
@@ -378,8 +378,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>gộp / hợp nhất pallet</b></td>
-<td>pallet có SSCC riêng; thùng carton có SSCC riêng; sơ đồ ánh xạ thùng carton‑to‑pallet rõ</td>
-<td>Ảnh pallet 4 mặt + ảnh nhãn pallet + sơ đồ ánh xạ thùng carton list</td>
+<td>pallet có SSCC riêng; thùng thùng carton có SSCC riêng; sơ đồ ánh xạ thùng thùng carton‑to‑pallet rõ</td>
+<td>Ảnh pallet 4 mặt + ảnh nhãn pallet + sơ đồ ánh xạ thùng thùng carton list</td>
 <td>PackSSCCRegister.Trạng thái theo vòng đời; ShipRelease lưu GS1Payload</td>
 </tr>
 <tr>

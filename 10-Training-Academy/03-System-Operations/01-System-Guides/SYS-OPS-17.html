@@ -352,7 +352,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP-08 Outsource cert cổng kiểm soát</b></td>
 <td>Mua hàng + Nhận hàng + QA</td>
-<td>Cert đầy đủ + truy vết lot/mẻ nấu (heat) + link vào Hồ sơ công việc (hồ sơ công việc)</td>
+<td>Cert đầy đủ + truy vết lot/mẻ nấu (mẻ nấu (heat)) + link vào Hồ sơ công việc (hồ sơ công việc)</td>
 <td>Thiếu cert là CHẶN; nhận hàng hold khi DocsComplete=No</td>
 </tr>
 <tr>
@@ -446,8 +446,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>D1</b></td><td>Lập nhóm 8D</td><td>Danh sách vai trò (QA/QC/Sản xuất/Kỹ thuật/PUR/Kinh doanh khi có); RACI</td></tr>
 <tr><td><b>D2</b></td><td>Mô tả vấn đề</td><td>5W2H; ảnh/đo/CMM; “có/không có” (phạm vi xảy ra / không xảy ra)</td></tr>
 <tr><td><b>D3</b></td><td>Ngăn chặn tạm thời</td><td>Sort/re-kế hoạch kiểm tra (kiểm tra plan); cách ly / biệt trữ WIP/FG; chặn phê duyệt giao hàng; log kết quả</td></tr>
-<tr><td><b>D4</b></td><td>Nguyên nhân gốc &amp; điểm lọt</td><td>5-Why/Ishikawa; dữ liệu bù trừ (offset)/tuổi dao (tool tuổi thọ / vòng đời)/setup; xác định điểm lọt cụ thể</td></tr>
-<tr><td><b>D5</b></td><td>Chọn hành động khắc phục</td><td>Hành động hệ thống (poka (chống sai)-giá đỡ (yoke), program khóa, fixture control, điểm kiểm tra); đánh giá rủi ro</td></tr>
+<tr><td><b>D4</b></td><td>Nguyên nhân gốc &amp; điểm lọt</td><td>5-Why/Ishikawa; dữ liệu bù trừ (bù trừ (offset))/tuổi dao (tool tuổi thọ / vòng đời)/setup; xác định điểm lọt cụ thể</td></tr>
+<tr><td><b>D5</b></td><td>Chọn hành động khắc phục</td><td>Hành động hệ thống (poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)), program khóa, fixture control, điểm kiểm tra); đánh giá rủi ro</td></tr>
 <tr><td><b>D6</b></td><td>Triển khai &amp; xác nhận</td><td>WI/Setup/kế hoạch kiểm tra (kiểm tra plan) cập nhật có kiểm soát; bằng chứng triển khai; đào tạo hồ sơ</td></tr>
 <tr><td><b>D7</b></td><td>Ngăn tái diễn</td><td>Chuẩn hóa quy trình; cập nhật tài liệu; đánh giá tại hiện trường; KPI theo dõi</td></tr>
 <tr><td><b>D8</b></td><td>Kết thúc &amp; ghi nhận</td><td>Hiệu lực đạt; bài học kinh nghiệm; đóng CAPA; phản hồi liên quan (khách hàng/NCC)</td></tr>
@@ -516,7 +516,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Sai phiên bản</b></td>
-<td>STOP máy; giữ phôi/bán thành phẩm; khóa program/bù trừ (offset); báo Supervisor+QC; gắn TẠM GIỮ lên toàn bộ khay</td>
+<td>STOP máy; giữ phôi/bán thành phẩm; khóa program/bù trừ (bù trừ (offset)); báo Supervisor+QC; gắn TẠM GIỮ lên toàn bộ khay</td>
 <td>Ảnh nhãn TẠM GIỮ + QCHoldLog ReasonCode=PROG hoặc PROC; ghi rõ Rev nghi ngờ</td>
 </tr>
 <tr>
@@ -671,7 +671,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Nhận biết lỗi program phổ biến</td>
 <td>Khoá program/Rev; ghi bằng chứng sửa</td>
 <td>Nguyên nhân gốc/điểm lọt cho PROG; triển khai thay đổi có kiểm soát</td>
-<td>Thiết kế poka (chống sai)-giá đỡ (yoke) số hoá (program khóa/tổng kiểm tra) <b>SSOT/Data-Mô hình-giá trị kiểm tra (tổng kiểm tra) (tổng kiểm tra.txt)</b></td>
+<td>Thiết kế poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) số hoá (program khóa/tổng kiểm tra) <b>SSOT/Data-Mô hình-giá trị kiểm tra (tổng kiểm tra) (tổng kiểm tra.txt)</b></td>
 </tr>
 <tr>
 <td><b>WHS/PUR/Planner/Kinh doanh</b></td>
@@ -730,7 +730,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card" style="margin-top:12px">
 <h3 class="h3" style="margin-top:0">Tình huống 2 — Thiếu chứng từ outsource + rủi ro giao hàng</h3>
-<p><b>Dữ kiện:</b> Lô xi mạ anốt (anodize) về kho, label có JobNum nhưng không có cert độ dày/lot. Planner đang chuẩn bị ship trong 24 giờ. Kinh doanh báo khách yêu cầu “ship đúng hẹn”.</p>
+<p><b>Dữ kiện:</b> Lô xi mạ anốt (xi mạ anốt (anodize)) về kho, label có JobNum nhưng không có cert độ dày/lot. Planner đang chuẩn bị ship trong 24 giờ. Kinh doanh báo khách yêu cầu “ship đúng hẹn”.</p>
 <p><b>Quyết định bắt buộc:</b> quyết định TẠM GIỮ/GO; xác định điểm CHẶN; list ai phải nhận thông báo trong 60 giây; chọn hồ sơ phải tạo trong ShipRelease; xác định đường lưu chứng từ trong SSOT.</p>
 <p><b>MRR bắt buộc:</b> QCHoldLog ReasonCode=OUT + DocsMissing bằng chứng + ShipRelease=Đã chặn + yêu cầu cert gửi Mua hàng.</p>
 </div>

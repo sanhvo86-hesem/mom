@@ -147,7 +147,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>đơn vị giá:</strong> vật liệu + gia công (setup + run) + QC/kiểm tra + hoàn thiện bề mặt/thuê ngoài + đóng gói + chi phí gián tiếp + biên lợi nhuận.</li>
 <li><strong>Điều kiện:</strong> thời gian dẫn định nghĩa, MOQ, hiệu lực, Incoterms, thanh toán, thay đổi policy.</li>
 </ul>
-<div class="cap">Tách NRE giúp minh bạch: mẫu thử (prototype) tốn setup cao nhưng run thấp; sản xuất thì ngược lại.</div>
+<div class="cap">Tách NRE giúp minh bạch: mẫu thử (mẫu thử (prototype)) tốn setup cao nhưng run thấp; sản xuất thì ngược lại.</div>
 </div><h3>3.3. Machine Giờ Tỷ lệ: công thức và bẫy hay gặp</h3><p><strong>Machine Giờ Tỷ lệ (MHR)</strong> là chi phí 1 giờ máy “ bán” (tính phí giờ), không phải 1 giờ đồng hồ. Một cách tính thực dụng:</p><div class="codeblock">
  MHR = (Chi phí sở hữu máy/năm + bảo trì + điện + khấu hao + phần lao động trực tiếp gắn với máy + chi phí gián tiếp phân bổ)
  / (Giờ máy khả dụng/năm x tỷ lệ sử dụng x Hiệu suất)
@@ -156,8 +156,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Hiệu suất</strong> phản ánh thực tế: đổi job nhiều, setup dài, tool thay đổi, chờ QC…</li>
 <li><strong>Quy tắc HESEM:</strong> MHR do Finance/OPS ban hành; Người định giá không tự đổi MHR.</li>
 </ul><h3>3.4. Ước tính thời gian gia công: 3 lớp phương pháp</h3><ol>
-<li><strong>Rule-of-ngón cái / quy tắc nhanh (L1):</strong> dựa trên lộ trình gia công chuẩn và kinh nghiệm (vd: khoan/tarô (taro ren) theo số lỗ, phay mặt theo diện tích).</li>
-<li><strong>CAM Mô phỏng (L2):</strong> dùng thời gian mô phỏng đường chạy dao; hiệu chỉnh bởi hệ số thực tế (bước tiến (feed) ghi đè / bỏ qua, tool thay đổi, đo bằng đầu dò).</li>
+<li><strong>Rule-of-ngón cái / quy tắc nhanh (L1):</strong> dựa trên lộ trình gia công chuẩn và kinh nghiệm (vd: khoan/tarô (tarô (taro ren) ren) theo số lỗ, phay mặt theo diện tích).</li>
+<li><strong>CAM Mô phỏng (L2):</strong> dùng thời gian mô phỏng đường chạy dao; hiệu chỉnh bởi hệ số thực tế (bước tiến (bước tiến (feed)) ghi đè / bỏ qua, tool thay đổi, đo bằng đầu dò).</li>
 <li><strong>lịch sử/tham số (L3):</strong> dùng dữ liệu job tương tự (nhóm sản phẩm) + mô hình tham số (diện tích cắt, khối lượng loại bỏ, số lần setup) để dự báo.</li>
 </ol><p>Người định giá giỏi không chọn 1 phương pháp duy nhất. Họ dùng <strong>tam giác kiểm chứng</strong>: rule-of-ngón cái / quy tắc nhanh ↔ mô phỏng ↔ lịch sử. Khi 3 cái lệch nhau quá lớn, đó là tín hiệu rủi ro.</p><h3>3.5. Tính vật liệu theo tỷ lệ đạt: đừng quên “phần bị mất”</h3><p>Trong CNC, vật liệu không chỉ là “khối phôi”. tỷ lệ đạt bị ảnh hưởng bởi: dung sai cho phép cắt phôi, kẹp giữ, phay mặt, phế phẩm đầu, và lỗi do vật liệu. Công thức Áp dụng: </p><div class="codeblock">Nguyên vật liệu Chi phí = (Giá/kg x Khối lượng phôi) x (1 + Phế phẩm dung sai cho phép)</div><ul>
 <li><strong>Phế phẩm dung sai cho phép</strong> không được dùng theo tiện. Phải dựa trên dữ liệu phế phẩm theo vật liệu/khách/công nghệ.</li>
@@ -199,7 +199,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vnum">5</div>
 <div class="vtext">
 <strong>Tính vật liệu &amp; tỷ lệ đạt</strong>
-<p>Tính phôi, dung sai cho phép, phế phẩm dung sai cho phép theo dữ liệu; cộng chi phí cắt phôi/mẻ nấu (heat) số truy vết khi cần.</p>
+<p>Tính phôi, dung sai cho phép, phế phẩm dung sai cho phép theo dữ liệu; cộng chi phí cắt phôi/mẻ nấu (mẻ nấu (heat)) số truy vết khi cần.</p>
 </div>
 </div>
 <div class="vstep">
@@ -359,8 +359,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi tách rõ setup và đưa cơ sở lý luận cho hệ số hiệu chỉnh.
  </div>
 </div><div class="card">
-<h3>Tình huống 2: Thuê ngoài công đoạn đặc biệt – mẻ nấu (heat) xử lý + mài</h3>
-<p class="small">Part thép cần mẻ nấu (heat) xử lý HRC 58–60 và mài đạt Ra 0.4. HESEM phải thuê ngoài.</p>
+<h3>Tình huống 2: Thuê ngoài công đoạn đặc biệt – mẻ nấu (mẻ nấu (heat)) xử lý + mài</h3>
+<p class="small">Part thép cần mẻ nấu (mẻ nấu (heat)) xử lý HRC 58–60 và mài đạt Ra 0.4. HESEM phải thuê ngoài.</p>
 <div class="cols-2">
 <div>
 <strong>Dữ liệu (Đầu vào):</strong>
@@ -497,7 +497,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Bạn sẽ hiệu chỉnh time mô phỏng CAM như thế nào để sát thực tế? Nêu ít nhất 4 yếu tố.</li>
 <li>Bài toán: phôi 2.5 kg, giá 120k/kg, phế phẩm dung sai cho phép 5%. Nguyên vật liệu chi phí là bao nhiêu?</li>
 <li>Tình huống: job có CMM báo cáo bắt buộc. Bạn tính thêm chi phí như thế nào và ghi giả định ra sao?</li>
-<li>Thuê ngoài mẻ nấu (heat) xử lý thời gian dẫn 7 ngày nhưng khách yêu cầu ship 10 ngày. Bạn phản ánh trong báo giá thế nào?</li>
+<li>Thuê ngoài mẻ nấu (mẻ nấu (heat)) xử lý thời gian dẫn 7 ngày nhưng khách yêu cầu ship 10 ngày. Bạn phản ánh trong báo giá thế nào?</li>
 <li>Giải thích dự phòng: mục đích, ngưỡng, và cách ghi lý do để đánh giá được.</li>
 <li>Tình huống: thực tế setup gấp đôi ước tính do đồ gá. Bạn làm báo cáo chênh lệch / phương sai và cập nhật định mức ra sao?</li>
 <li>Nêu 3 bẫy khiến người định giá dưới-báo giá khi job có hoàn thiện bề mặt/đóng gói đặc biệt.</li>
@@ -512,7 +512,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Thiếu nhiều dòng; không theo mẫu.</td>
 <td>Đủ dòng chính; theo mẫu.</td>
 <td>Đầy đủ, rõ giả định; dễ rà soát.</td>
-<td>Thiết kế poka (chống sai)-giá đỡ (yoke); giảm thiếu sót hệ thống.</td>
+<td>Thiết kế poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)); giảm thiếu sót hệ thống.</td>
 </tr>
 <tr>
 <td><strong>Ước tính time (setup/run)</strong></td>

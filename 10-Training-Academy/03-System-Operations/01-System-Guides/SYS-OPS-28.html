@@ -129,7 +129,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol style="margin:10px 0 0 18px">
 <li><b>Sai Rev / sai bản vẽ / sai chương trình</b> → gia công sai → phế phẩm/làm lại → giao sai.</li>
 <li><b>Lẫn lộn lẫn Job/lot</b> → mất truy xuất nguồn gốc → ship sai → khiếu nại/đánh giá không đạt.</li>
-<li><b>Thiếu/giả chứng từ</b> (COA/Cert/outsource/cali (đo)) → không chứng minh phù hợp → “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”.</li>
+<li><b>Thiếu/giả chứng từ</b> (COA/Cert/outsource/cali (đo) (đo)) → không chứng minh phù hợp → “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”.</li>
 </ol>
 <div class="muted" style="margin-top:8px">
  Khi một bộ phận lưu sai nơi hoặc copy file để “tiện”, hệ thống mất SSOT và mọi vai trò phía sau mất thời gian truy xuất nguồn gốc.
@@ -221,7 +221,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Mua hàng</td>
-<td>nhà thầu phụ (Subcon) yêu cầu / nguyên vật liệu spec</td>
+<td>nhà thầu phụ (nhà thầu phụ (Subcon)) yêu cầu / nguyên vật liệu spec</td>
 <td>PO + cert yêu cầu + nhà cung cấp bằng chứng</td>
 <td>Zone05 (Nhà cung cấp) + link sang Job pack</td>
 <td>Mua hàng khóa yêu cầu cert theo PO; thiếu cert = TẠM GIỮ</td>
@@ -392,7 +392,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Hiệu chuẩn</td>
-<td>Giấy cali (đo) lưu theo “tên người” hoặc “tên máy”, không theo AssetID</td>
+<td>Giấy cali (đo) (đo) lưu theo “tên người” hoặc “tên máy”, không theo AssetID</td>
 <td>Không chứng minh thiết bị đo hợp lệ tại thời điểm đo</td>
 <td>Bảo trì/QA lưu theo AssetID ở Zone04; gắn hiệu lực và OOT xử lý / vận chuyển</td>
 </tr>
@@ -490,7 +490,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <b>TẠM GIỮ</b> (giữ trạng thái, không chuyển bước)
  <ul style="margin:10px 0 0 18px">
-<li>Khi chứng từ vật liệu/outsource thiếu hoặc không map được lot/mẻ nấu (heat).</li>
+<li>Khi chứng từ vật liệu/outsource thiếu hoặc không map được lot/mẻ nấu (mẻ nấu (heat)).</li>
 <li>Khi kiểm tra pack chưa ký hoặc chưa khai báo hồ sơ.</li>
 <li>Khi job có NCR mở mà bộ hồ sơ giao hàng không gắn link NCR disposition.</li>
 </ul>
@@ -551,9 +551,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Mua hàng + QA</td>
 </tr>
 <tr>
-<td>Gage OOT / hết hạn cali (đo)</td>
+<td>Gage OOT / hết hạn cali (đo) (đo)</td>
 <td>STOP đo; TẠM GIỮ kết quả đo liên quan</td>
-<td>AssetID + trạng thái cali (đo) + danh sách job bị ảnh hưởng</td>
+<td>AssetID + trạng thái cali (đo) (đo) + danh sách job bị ảnh hưởng</td>
 <td>Bảo trì + QA</td>
 </tr>
 <tr>
@@ -640,7 +640,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>8</td>
 <td>Kho</td>
-<td>Scan/upload cert vào Job pack; gắn lot/mẻ nấu (heat); không cấp khi thiếu.</td>
+<td>Scan/upload cert vào Job pack; gắn lot/mẻ nấu (mẻ nấu (heat)); không cấp khi thiếu.</td>
 <td>Bộ chứng từ chứng nhận + nhận hàng log</td>
 <td>Cert nằm Zone05; không link Job; thiếu lot</td>
 </tr>
@@ -661,7 +661,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>11</td>
 <td>Bảo trì</td>
-<td>Bảo đảm gage/tài sản có hồ sơ cali (đo) theo AssetID; xử lý OOT theo tình huống.</td>
+<td>Bảo đảm gage/tài sản có hồ sơ cali (đo) (đo) theo AssetID; xử lý OOT theo tình huống.</td>
 <td>Hiệu chuẩn hồ sơ + OOT log</td>
 <td>Lưu theo tên người; không map job ảnh hưởng</td>
 </tr>
@@ -800,7 +800,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Lập trình viên (CNC):</b> tạo CFG gói hàng có bảng kê và PackageID.</li>
 <li><b>QA:</b> kiểm “đủ key” và yêu cầu sửa ngay khi thiếu.</li>
-<li><b>Bảo trì:</b> gắn AssetID và hiệu lực cali (đo) vào hồ sơ.</li>
+<li><b>Bảo trì:</b> gắn AssetID và hiệu lực cali (đo) (đo) vào hồ sơ.</li>
 </ul>
 </td>
 <td>Được quyền <b>công bố / phát hành</b> từ Zone06 sang Chính / Sơ cấp Home theo vai trò</td>
@@ -896,7 +896,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>2</td>
 <td>
- Hàng outsource mẻ nấu (heat) xử lý về đủ số lượng. Cert đính kèm không có lot/mẻ nấu (heat) sơ đồ ánh xạ và không có PO tham chiếu.
+ Hàng outsource mẻ nấu (mẻ nấu (heat)) xử lý về đủ số lượng. Cert đính kèm không có lot/mẻ nấu (mẻ nấu (heat)) sơ đồ ánh xạ và không có PO tham chiếu.
  </td>
 <td>TẠM GIỮ nhận hàng; không cấp cho sản xuất; yêu cầu cert đúng</td>
 <td>Cert yêu cầu log + nhận hàng hold hồ sơ + link PO</td>
@@ -1192,7 +1192,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>4</td>
-<td>Không chứng minh truy xuất nguồn gốc lot/mẻ nấu (heat)</td>
+<td>Không chứng minh truy xuất nguồn gốc lot/mẻ nấu (mẻ nấu (heat))</td>
 <td>Bộ chứng từ chứng nhận bắt buộc map lot/PO/Job; nhận hàng hold khi thiếu</td>
 <td>Bộ chứng từ chứng nhận + nhận hàng acceptance</td>
 </tr>

@@ -63,6 +63,24 @@
 
 ---
 
+## A+. Danh từ riêng nội bộ — TUYỆT ĐỐI KHÔNG dịch
+
+> ⚠ Xem chi tiết đầy đủ tại `01-immutable-rules.md` mục B3.
+
+Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá vỡ liên kết:
+
+| Loại | Ví dụ | Lý do không dịch |
+|------|-------|------------------|
+| Tên SharePoint Site | `HESEM-QMS-Cốt lõi`, `HESEM-Con người-Hạn chế`, `HESEM-Số hóa-Control` | Tên định danh site trên M365 |
+| Chủ sở hữu site | `QMS-Chủ sở hữu` | Tên nhóm bảo mật M365 |
+| Tên cột CamelCase | `RecordType`, `StatusCode`, `JobNum`, `CustomerID`, `EvidenceUrl` | Tên cột kỹ thuật trong M365 Lists/Epicor |
+| Tên cột tiếng Việt đặt sẵn | `Người phê duyệt`, `Phiên bản` (khi là tên cột) | Tên cột đã cấu hình trong hệ thống |
+| Tên tài khoản/nhóm | `QMS-Chủ sở hữu`, `HESEM-Admin` | Tên security group |
+
+**Cách nhận dạng:** Từ viết dạng CamelCase (chữ hoa xen kẽ) → tên cột kỹ thuật → KHÔNG dịch.
+
+---
+
 ## B. Quy tắc chi tiết cho từng loại phần tử
 
 ### B1. Heading và tiêu đề
@@ -539,6 +557,37 @@ ERP, MES, TIMWOODS, SBAR, SSCC, YYYYMMDD
 ---
 
 ## H. Quy tắc phong cách viết
+
+### H0. Tiếng Việt BẮT BUỘC có dấu đầy đủ
+
+> ⚠ **QUY TẮC BẮT BUỘC:** Mọi nội dung tiếng Việt trong tài liệu **PHẢI** có dấu đầy đủ, chính xác.
+
+- **KHÔNG** viết tiếng Việt không dấu: ~~"Kiem tra chat luong"~~ → ✅ "Kiểm tra chất lượng"
+- **KHÔNG** viết thiếu dấu: ~~"Kiêm tra"~~ → ✅ "Kiểm tra"
+- **KHÔNG** viết sai dấu: ~~"Kiểm trà"~~ → ✅ "Kiểm tra"
+- Áp dụng cho: tiêu đề, nội dung, bảng, ghi chú, tooltip, alt text — mọi nơi hiển thị tiếng Việt
+- Ngoại lệ DUY NHẤT: viết tắt tiếng Anh (SOP, NCR, CAPA...) và danh từ riêng
+
+### H0.1 Danh từ riêng — KHÔNG dịch
+
+> ⚠ Xem danh sách đầy đủ tại `01-immutable-rules.md` mục B3.
+
+Danh từ riêng là tên **định danh duy nhất** trong hệ thống. Dịch sẽ phá vỡ liên kết.
+
+| Loại | Ví dụ | Quy tắc |
+|------|-------|---------|
+| Tên SharePoint Site | `HESEM-QMS-Cốt lõi`, `HESEM-Con người-Hạn chế` | Giữ nguyên 100% |
+| Tên chủ sở hữu | `QMS-Chủ sở hữu` | Giữ nguyên 100% |
+| Tên cột CamelCase | `RecordType`, `JobNum`, `CustomerID` | Giữ nguyên 100% |
+| Tên cột VN đặt sẵn | `Người phê duyệt`, `Phiên bản` (khi là tên cột) | Giữ nguyên 100% |
+| Tên thương hiệu | Epicor, SharePoint, M365, HESEM | Giữ nguyên 100% |
+| Tên phần mềm/hệ thống | Power Automate, Power BI, Azure | Giữ nguyên 100% |
+
+**Cách nhận dạng danh từ riêng:**
+1. Viết CamelCase (chữ hoa xen kẽ) → tên cột kỹ thuật
+2. Có tiền tố `HESEM-` → tên site/nhóm
+3. Kết thúc bằng `ID`, `Num`, `Date`, `Code`, `Type`, `Status`, `Url` → tên cột
+4. Là tên sản phẩm/thương hiệu → danh từ riêng
 
 ### H1. Giọng văn
 
