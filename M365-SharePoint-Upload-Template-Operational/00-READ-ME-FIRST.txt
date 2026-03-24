@@ -1,0 +1,108 @@
+HESEM M365 SHAREPOINT UPLOAD TEMPLATE
+
+THIS IS THE CURRENT PACK TO USE.
+- Use this pack instead of older template folders in the workspace.
+
+ALIGNED DOCUMENTS
+- ANNEX-131
+- ANNEX-132
+- ANNEX-133
+- ANNEX-134
+- ANNEX-135
+- WI-102
+- WI-103
+- WI-104
+- WI-203
+- SOP-303
+
+UPLOAD ORDER
+- Upload HESEM-QMS-Core into the SharePoint site HESEM-QMS-Core.
+- Upload HESEM-People-Restricted into the SharePoint site HESEM-People-Restricted.
+- Upload HESEM-Digital-Control into the SharePoint site HESEM-Digital-Control.
+
+CURRENT BUILD
+- Year-based folders in this pack were created for 2026.
+
+KEY OPERATION RULE
+- Department roots are not year-based.
+- Non-year operational data goes into:
+  - 00-Live-Control-and-Master-Data
+  - 00-Current
+  - 00-Active
+- Working drafts, review copies, temporary exports, and promote queues go into:
+  - 06-Working-Transitory-and-Draft
+- Received files, standards, convenience copies, and external references go into:
+  - 07-Reference-and-Received-External
+- Only periodic outputs, closed logs, snapshots, and history go into {YYYY}.
+
+DEPARTMENT FILE PLAN GRAMMAR
+- Each department has role workbenches under:
+  - 06-Working-Transitory-and-Draft/ROLE-{RoleCode}/
+- Each role workbench contains:
+  - 00-Inbox
+  - 01-Draft
+  - 02-Review
+  - 03-Promote-to-Official-Record
+  - 99-Clear-Within-90d
+- Each department reference zone contains:
+  - 01-Customer-Received
+  - 02-Supplier-Received
+  - 03-Standards-and-Manuals
+  - 04-Convenience-Copies
+  - 05-To-Be-Culled
+- Each department Operations folder contains:
+  - 01-Inputs-and-Requests
+  - 02-Working-Control
+  - 03-Issued-Outputs
+  - 04-Photos-External-Evidence-and-Exports
+  - 05-Follow-Up-and-Closure
+- Each department Logs folder contains:
+  - 01-Live-Register
+  - 02-Supporting-Evidence
+  - 03-Review-and-Close
+- Each department Interfaces folder contains:
+  - 01-Outgoing-Released
+  - 02-Returned-Acknowledgements
+  - 03-Reissue-and-Change-History
+
+JOB DOSSIER GRAMMAR
+- Job dossiers now include detailed subfolders under every gate.
+- Example:
+  - 02_G1-Setup-Release/01-Router-and-Traveler
+  - 02_G1-Setup-Release/02-Setup-Sheets-and-Tool-Lists
+  - 03_G2-FAI-First-Piece/03-Raw-Measurement-Data
+  - 06_G5-Ship-Release/04-Customer-Shipment-Pack
+- Use ANNEX-135 and WI-203 as the routing rule for every job file.
+
+TRAINING AND ADOPTION
+- Use WI-103 to train users by role, shift, and job-flow.
+- Use WI-104 as point-of-use quick cards by role, printer station, and QR link.
+- Do not go live with this folder model until supervisors, champions, and end users have passed WI-103 training and OJT.
+
+PART MASTER RULE
+- Part-REV-Master is customer-scoped.
+- Use Part-REV-Master/{CustomerID}/{PartNo}/REV-{Rev}/.
+- Do not store two different customer baselines under the same PartNo branch.
+
+PLACEHOLDER FOLDERS
+- Folders wrapped in braces are templates and must be copied or renamed for real use.
+- Examples:
+  - {CustomerID}
+  - {PartNo}
+  - REV-{Rev}
+  - {JobNum}-{PartNo}-REV-{Revision}
+  - {EmployeeID}-{FullName}
+  - {Population}
+  - {VisitType}
+  - {VisitorName}
+  - {Function}
+  - {TemplateType}
+
+IMPORTANT UPLOAD NOTE
+- SharePoint browser upload may skip empty folders.
+- Prefer OneDrive sync or File Explorer copy when you need the full empty tree to appear in SharePoint.
+- If you upload by browser, put at least one real file into each branch that must exist.
+
+REBUILD
+- To recreate this pack, run:
+  powershell -ExecutionPolicy Bypass -File tools\\generate_m365_sharepoint_upload_template.ps1

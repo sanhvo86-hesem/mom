@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -60,7 +60,7 @@
         <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
         <p style="margin:8px 0;">ANNEX này khóa cấu trúc lưu trữ M365 cho toàn bộ HESEM ở ba lớp đồng thời: lớp công ty và QMS, lớp phòng ban và quá trình vận hành, và lớp hồ sơ cá nhân hoặc hồ sơ hệ thống có kiểm soát cao. Mọi hồ sơ phát sinh từ sổ tay phòng ban, SOP, WI, biểu mẫu sổ tay thực hành, dashboard control và quy trình làm việc phải có đúng một vị trí SSOT trong bản thiết kế này.</p>
         <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: không tồn tại hồ sơ chính thức nằm ngoài bản thiết kế; không có hai SSOT cho cùng một loại hồ sơ; mọi thư mục có owner rõ, quyền / sự cho phép ranh giới rõ, lưu giữ cơ sở rõ và rule đặt tên rõ.</div>
-        <div class="keyline"><strong>Ranh giới tài liệu:</strong> ANNEX-133 là nguồn chuẩn cho <b>path, thư mục cây / sơ đồ cây, lưu giữ cơ sở và khu vực quyền</b>. Từ điển field/list nằm tại <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>. quyền / sự cho phép ranh giới theo vai trò nằm tại <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a>. Kiến trúc cung cấp / cấp phát/tự động hóa thực thi nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>.</div>
+        <div class="keyline"><strong>Ranh giới tài liệu:</strong> ANNEX-133 là nguồn chuẩn cho <b>path, thư mục cây / sơ đồ cây, lưu giữ cơ sở và khu vực quyền</b>. Từ điển field/list nằm tại <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>. quyền / sự cho phép ranh giới theo vai trò nằm tại <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a>. Kiến trúc cung cấp / cấp phát/tự động hóa thực thi nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>. File plan chi tiết theo phòng ban, JD và job gate nằm tại <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>.</div>
       </div>
 
       <div class="section">
@@ -274,14 +274,43 @@
         <h2>7. khung sườn chuẩn trong 05-Phòng ban-Hồ sơ</h2>
         <p style="margin:8px 0;">Mọi phòng ban bắt buộc dùng cùng một khung sườn ở cấp đầu để tự động hóa và quyền chạy đồng nhất.</p>
         <div class="figure-box">
-          <p style="margin:0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/01-Quản trị/</p>
-          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/02-Operations/</p>
-          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/03-Registers-and-Logs/</p>
-          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/04-dự án-and-Cải tiến/</p>
-          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/05-Giao diện-and-đã phát hành-Gói/</p>
+          <p style="margin:0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/01-Quản trị/00-Current/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/01-Quản trị/{YYYY}/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/02-Operations/00-Current/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/02-Operations/{YYYY}/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/03-Registers-and-Logs/00-Current/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/03-Registers-and-Logs/{YYYY}/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/04-dự án-and-Cải tiến/00-Active/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/04-dự án-and-Cải tiến/{YYYY}/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/05-Giao diện-and-đã phát hành-Gói/00-Current/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/05-Giao diện-and-đã phát hành-Gói/{YYYY}/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/</p>
           <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/99-Lưu trữ/</p>
         </div>
         <div class="muted">Các thư mục cấp 2 dưới đây là bắt buộc cho từng phòng ban code. Nếu một hồ sơ đã có SSOT ở thư viện khác, thư mục phòng ban chỉ giữ giao diện log hoặc link index, không sao chép bản gốc.</div>
+        <div class="keyline"><strong>Quy tắc lớp dữ liệu phòng ban:</strong> dữ liệu vận hành không gắn năm như live board, current queue, master list, mapping, dashboard source view, open issue tracker và controlled link index phải nằm trong <span class="code">00-Live-Control-and-Master-Data</span> hoặc các nhánh <span class="code">00-Current</span>/<span class="code">00-Active</span>. Bản nháp, file tạm, file review, file đang soạn và file đang chờ promote phải nằm trong <span class="code">06-Working-Transitory-and-Draft</span>. File nhận từ ngoài, convenience copy, tài liệu tham khảo và tài liệu tra cứu không phải SSOT phải nằm trong <span class="code">07-Reference-and-Received-External</span>. Chỉ review pack, closed-period log, snapshot, history và output theo kỳ mới đi vào nhánh <span class="code">{YYYY}</span>. Giao dịch gốc / SoR trong Epicor hoặc hệ thống khác không được dump sang SharePoint để thay SoR.</div>
+        <div class="figure-box">
+          <p style="margin:0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/01-Current-Boards-and-Queues/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/02-Master-Lists-and-Mappings/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/03-Live-Dashboards-and-Source-Views/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/04-Open-Issues-and-Action-Trackers/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/05-Link-Indexes-and-Controlled-Views/</p>
+        </div>
+        <div class="figure-box">
+          <p style="margin:0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/00-Inbox/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/01-Draft/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/02-Review/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/03-Promote-to-Official-Record/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/99-Clear-Within-90d/</p>
+          <p style="margin:8px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/01-Customer-Received/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/02-Supplier-Received/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/03-Standards-and-Manuals/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/04-Convenience-Copies/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/05-To-Be-Culled/</p>
+        </div>
+        <div class="keyline"><strong>Điểm sử dụng bắt buộc:</strong> thư mục <span class="code">06-Working-Transitory-and-Draft</span> và <span class="code">07-Reference-and-Received-External</span> là một phần của bản thiết kế chuẩn, không phải thư mục tùy chọn. Nội dung chi tiết theo từng phòng ban, từng JD và từng job gate nằm tại <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>.</div>
       </div>
 
       <div class="section">
@@ -292,7 +321,7 @@
               <tr>
                 <th>DEP code</th>
                 <th>Path chuẩn</th>
-                <th>thư mục con bắt buộc dưới 02-Operations / 03-Registers-and-Logs / 05-Giao diện-and-đã phát hành-Gói</th>
+                <th>thư mục con bắt buộc dưới 02-Operations / 03-Registers-and-Logs / 05-Giao diện-and-đã phát hành-Gói, dùng trong cả 00-Current và {YYYY} khi áp dụng</th>
                 <th>Ghi chú SSOT</th>
               </tr>
             </thead>
@@ -559,9 +588,6 @@
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
-
-
-
 
 
 

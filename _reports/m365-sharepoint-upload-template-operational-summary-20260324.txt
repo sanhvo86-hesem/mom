@@ -1,0 +1,4 @@
+﻿M365 OPERATIONAL TEMPLATE SUMMARY
+Root: C:\Users\TEST4\qms.hesem.com.vn\M365-SharePoint-Upload-Template-Operational
+Directory count: 2302
+Generated on: 2026-03-24

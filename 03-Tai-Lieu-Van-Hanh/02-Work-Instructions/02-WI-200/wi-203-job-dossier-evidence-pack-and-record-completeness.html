@@ -88,6 +88,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>07_NCR-CAPA-Sai lệch</td><td>NCR, concession, miễn trừ, thoát / bỏ qua, CAPA, làm lại chuỗi, khách hàng sai lệch phê duyệt</td><td>QA</td><td>Ngay khi sự kiện phát sinh</td></tr>
 <tr><td>99_Archive-Đã khóa</td><td>Ảnh chụp trạng thái cuối, đã ký bảng kê, export gói / bó, lưu trữ note</td><td>QA/QMS</td><td>Sau ship hoặc job đóng</td></tr>
 </tbody></table></div>
+<div class="keyline"><strong>Quy định file plan chi tiết cấp job:</strong> mỗi gate ở trên phải tiếp tục tách theo subfolder nghiệp vụ bên trong. File phải đi đúng <b>gate trước, loại nội dung sau</b>. Ví dụ: ảnh setup, FRM-519 và work transfer validation không được để chung dưới <span class="code">02_G1-Setup-Release</span> mà phải đi vào đúng nhánh con theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>. Việc tạo folder job mới, kiểm tra đầy đủ hồ sơ và nộp evidence phải bám đúng subfolder model đã khóa trong ANNEX này.</div>
 <div class="keyline"><strong>SLA nạp hồ sơ:</strong> hồ sơ vận hành tạo trong ca phải được nạp vào hồ sơ trong chính ca đó hoặc chậm nhất trước khi đóng cổng kiểm soát kế tiếp. PHẢI chuyển ảnh, phiếu giấy và file đo vào hồ sơ đúng hạn; không giữ ở máy cá nhân để “cuối tuần nhập một lần”.</div></div>
 <div class="section"><h2>4. Tiêu chí chấp nhận cho từng loại bằng chứng</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại hồ sơ</th><th>Được chấp nhận khi</th><th>PHẢI trả lại khi</th></tr></thead><tbody>
@@ -165,6 +166,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../03-Reference/02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a></td><td>Template hồ sơ, siêu dữ liệu từ điển, hồ sơ class</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></td><td>Bản thiết kế thư mục M365 và sơ đồ ánh xạ hồ sơ</td></tr>
+<tr><td><a href="../01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a></td><td>Đào tạo, chứng nhận năng lực và sử dụng cấu trúc folder M365 trong vận hành CNC job order</td></tr>
+<tr><td><a href="../01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a></td><td>Thẻ nhanh route file M365 theo vai trò cho CNC job order</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></td><td>Bộ dự phòng ngoại tuyến và nhập bù</td></tr>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>MRR tối thiểu theo cổng kiểm soát và bàn giao trường dữ liệu</td></tr>
 <tr><td><a href="wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td><td>bộ hồ sơ phê duyệt giao hàng (ship gói phát hành), SSCC và đối soát</td></tr>
@@ -185,7 +188,4 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 </body>
 </html>
-
-
-
 

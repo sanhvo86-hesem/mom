@@ -1,0 +1,42 @@
+HESEM M365 SHAREPOINT UPLOAD TEMPLATE
+
+This folder pack is aligned to:
+- ANNEX-131: M365 records metadata, list schema, value sets and register catalog
+- ANNEX-133: M365 records site topology, libraries and folder blueprint
+- ANNEX-134: M365 records provisioning, permissions and automation architecture
+- WI-203: Job dossier evidence pack and record completeness
+- SOP-303: Engineering release baseline package and job snapshot control
+
+UPLOAD ORDER
+- Upload HESEM-QMS-Core into the SharePoint site HESEM-QMS-Core.
+- Upload HESEM-People-Restricted into the SharePoint site HESEM-People-Restricted.
+- Upload HESEM-Digital-Control into the SharePoint site HESEM-Digital-Control.
+
+CURRENT BUILD
+- Year-based folders in this pack were created for 2026.
+
+PLACEHOLDER FOLDERS
+- Folders wrapped in braces are templates and must be copied or renamed for real use.
+- Examples:
+  - {JobNum}-{PartNo}-REV-{Revision}
+  - {CustomerID}
+  - {EmployeeID}-{FullName}
+  - {Population}
+  - {VisitType}
+  - {VisitorName}
+  - {PartNo}
+  - REV-{Rev}
+
+PART MASTER RULE
+- Part-REV-Master is customer-scoped.
+- Use Part-REV-Master/{CustomerID}/{PartNo}/REV-{Rev}/.
+- Do not store two different customer baselines under the same PartNo branch.
+
+IMPORTANT UPLOAD NOTE
+- SharePoint browser upload may skip empty folders.
+- Prefer OneDrive sync or File Explorer copy when you need the full empty tree to appear in SharePoint.
+- If you upload by browser, put at least one real file into each folder branch that must exist.
+
+REBUILD
+- To recreate this folder pack, run:
+  powershell -ExecutionPolicy Bypass -File tools\\generate_m365_sharepoint_upload_template.ps1

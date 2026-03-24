@@ -47,7 +47,7 @@
   </div>
 </div>
 
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi tạo mới hoặc tái cấu trúc SharePoint hồ sơ kiến trúc cho HESEM theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>, <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a></span> và <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span>. Tài liệu này là bản thao tác trực tiếp trên M365 Admin trung tâm và SharePoint Admin trung tâm.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi tạo mới hoặc tái cấu trúc SharePoint hồ sơ kiến trúc cho HESEM theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>, <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a></span>, <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></span> và <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span>. Tài liệu này là bản thao tác trực tiếp trên M365 Admin trung tâm và SharePoint Admin trung tâm.</div>
 <h1>WI-102 — Thiết lập SharePoint hồ sơ địa điểm / site, thư viện và quyền truy cập click-by-click</h1>
 
 <div class="toc">
@@ -329,7 +329,7 @@
     <ul>
       <li>Vào từng thư viện.</li>
       <li>Tạo gốc / căn nguyên thư mục và năm thư mục đúng theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>.</li>
-      <li>Với <span class="code">05-Phòng ban-Hồ sơ</span>, tạo phòng ban khu vực trước rồi tạo năm thư mục.</li>
+      <li>Với <span class="code">05-Phòng ban-Hồ sơ</span>, tạo phòng ban khu vực trước, sau đó tạo <span class="code">00-Live-Control-and-Master-Data</span>, các nhánh <span class="code">00-Current</span>/<span class="code">00-Active</span>, các nhánh <span class="code">06-Working-Transitory-and-Draft</span> và <span class="code">07-Reference-and-Received-External</span>, rồi mới tạo các thư mục <span class="code">{YYYY}</span> trong những nhánh có history theo năm. Trong từng nhánh <span class="code">Operations</span>, <span class="code">Logs</span> và <span class="code">Interfaces</span>, phải tạo tiếp grammar chuẩn theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>; trong nhánh <span class="code">06</span> phải tạo workbench theo từng role/JD.</li>
       <li>Với <span class="code">08-Con người-Hồ sơ</span>, tạo các gốc / căn nguyên khu vực: active, trước đây, nhà thầu-and-thực tập sinh, khách tham quan-and-tạm thời-truy cập.</li>
       <li>Với <span class="code">09-Số hóa-System-Hồ sơ</span>, tạo đủ 8 khu vực hệ thống theo bản thiết kế.</li>
     </ul>
@@ -354,7 +354,7 @@
       </tbody>
     </table>
   </div>
-  <div class="keyline"><strong>Tài liệu liên kết:</strong> <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>.</div>
+<div class="keyline"><strong>Tài liệu liên kết:</strong> <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>, <a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>, <a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a>.</div>
   <div class="keyline"><strong>Tham chiếu Microsoft hiện hành:</strong> <a href="https://learn.microsoft.com/en-us/sharepoint/create-site-collection" target="_blank" rel="noreferrer">Tạo a site - SharePoint in Microsoft 365</a>; <a href="https://learn.microsoft.com/en-us/sharepoint/manage-site-creation" target="_blank" rel="noreferrer">quản lý site tạo mới in SharePoint</a>; <a href="https://learn.microsoft.com/en-us/microsoft-365/enterprise/media/teams-sharepoint-online-sites-highly-regulated-data/SharePointSitesHighlyRegulatedData.pdf" target="_blank" rel="noreferrer">SharePoint địa điểm / site for cao được quản lý data</a>; <a href="https://learn.microsoft.com/en-us/sharepoint/library-version-limits" target="_blank" rel="noreferrer">Set version giới hạn for a tài liệu thư viện</a>; <a href="https://support.microsoft.com/en-us/office/what-permissions-do-i-need-for-sharepoint-versioning-95bce34c-db77-4fd4-8449-9ad7ce0363c0" target="_blank" rel="noreferrer">quyền truy cập for SharePoint quản lý phiên bản</a>.</div>
 </div>
 
@@ -363,7 +363,3 @@
 </div>
 </body>
 </html>
-
-
-
-
