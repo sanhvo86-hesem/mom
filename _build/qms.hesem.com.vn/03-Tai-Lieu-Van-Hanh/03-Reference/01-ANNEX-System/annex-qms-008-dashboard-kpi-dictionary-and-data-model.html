@@ -92,7 +92,7 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>3. KPI lõi dùng cho điều hành nhà máy</h2>
 <div class="table-card"><table><thead><tr><th>KPI ID</th><th>KPI</th><th>Mục đích quyết định</th><th>Numerator / Basis</th><th>Exclusion / lưu ý tính</th><th>SoR / SSOT</th><th>Owner</th><th>Cadence</th><th>Drill-down key</th></tr></thead><tbody>
-<tr><td>KPI-01</td><td>OTD Release</td><td>Quyết định giữ lịch, split ship, đổi ưu tiên, báo khách</td><td>Số release giao đúng hạn / tổng release đến hạn</td><td>Không tính các due đã được khách chấp thuận đổi chính thức; partial ship phải tính theo release đã cam kết</td><td>Epicor ShipHead/ShipDtl / SSOT ship packet</td><td>Planning Lead</td><td>Ngày/tuần</td><td>OrderNum, JobNum, PackID</td></tr>
+<tr><td>KPI-01</td><td>OTD Release</td><td>Quyết định giữ lịch, split ship, đổi ưu tiên, báo khách</td><td>Số release giao đúng hạn / tổng release đến hạn</td><td>Không tính các due đã được khách chấp thuận đổi chính thức; giao hàng một phần phải tính theo release đã cam kết</td><td>Epicor ShipHead/ShipDtl / SSOT ship packet</td><td>Planning Lead</td><td>Ngày/tuần</td><td>OrderNum, JobNum, PackID</td></tr>
 <tr><td>KPI-02</td><td>Promise-Date Risk</td><td>Nhìn sớm lô có nguy cơ trễ trước khi trễ thật</td><td>Số release có remaining work vượt khả năng thời gian còn lại</td><td>Đánh giá trên due hiện hành, load thực tế và các gate còn mở</td><td>Epicor Job/Dispatch + ANNEX-OPS-001</td><td>Planning Lead</td><td>Mỗi ca</td><td>JobNum, OprSeq, WorkCenter</td></tr>
 <tr><td>KPI-03</td><td>WIP Aging</td><td>Nhận diện Job treo vô chủ, queue tắc, hold kéo dài</td><td>Số job/operation theo bucket 0–2, 3–7, 8–14, &gt;14 ngày</td><td>Aging bắt đầu từ last move hoặc release theo rule trong ANNEX-OPS-001</td><td>Epicor JobHead/JobOper</td><td>Planning Lead</td><td>Mỗi ca / ngày</td><td>JobNum, OprSeq, WorkCenter, HoldCode</td></tr>
 <tr><td>KPI-04</td><td>Dispatch Adherence</td><td>Kiểm kỷ luật điều độ và tính ổn định của plan</td><td>Số operation chạy đúng cửa sổ dispatch / tổng operation đã phát hành</td><td>Không loại trừ hot-job nếu hot-job đã được phê duyệt đúng ladder</td><td>Epicor dispatch execution + M365 action evidence</td><td>Planning + Production</td><td>Ngày</td><td>JobNum, Machine, Shift</td></tr>
@@ -159,7 +159,7 @@ ul.tight li {margin:4px 0;}
 <li>Tất cả dashboard phải hiển thị <strong>lần refresh gần nhất</strong>, <strong>owner dữ liệu</strong> và <strong>số issue dữ liệu đang mở</strong>.</li>
 </ul></div>
 
-<div class="section"><h2>8. Data quality gate</h2>
+<div class="section"><h2>8. Data cổng kiểm soát chất lượng</h2>
 <div class="table-card"><table><thead><tr><th>Gate</th><th>Kiểm cái gì</th><th>Fail khi</th><th>Phản ứng</th></tr></thead><tbody>
 <tr><td>Completeness</td><td>Field bắt buộc có đủ không</td><td>Thiếu JobNum, OprSeq, PackID, due, owner hoặc severity</td><td>Không publish KPI liên quan; mở Data Issue</td></tr>
 <tr><td>Timeliness</td><td>Dữ liệu có đúng cửa sổ refresh không</td><td>Refresh quá cut-off đã công bố</td><td>Đánh cờ đỏ “stale data”</td></tr>

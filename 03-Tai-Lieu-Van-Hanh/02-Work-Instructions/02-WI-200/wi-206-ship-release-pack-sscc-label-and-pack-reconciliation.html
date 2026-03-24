@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>WI-206 — bộ hồ sơ phê duyệt giao hàng (ship gói phát hành), nhãn SSCC, đối soát kiện và bàn giao xác nhận giao hàng (ship confirm) | HESEM QMS</title>
+<title>WI-206 — Ship Release Pack, SSCC Label and Pack Reconciliation | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
 
@@ -63,7 +63,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
             <span>Tài liệu vận hành • Work Instruction</span>
           </div>
         </div>
-        <div class="title"><strong>WI-206 — bộ hồ sơ phê duyệt giao hàng, nhãn SSCC, đối soát kiện và bàn giao xác nhận giao hàng</strong></div>
+        <div class="title"><strong>WI-206 — Ship Release Pack, SSCC Label and Pack Reconciliation</strong></div>
         <div class="meta">
           <div class="row"><span><b>Mã:</b></span><span>WI-206</span></div>
           <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
@@ -72,91 +72,91 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
           <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
         </div>
       </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi lô giao hàng có cổng kiểm soát (gate) release; bắt buộc áp dụng khi có PackID/Shipment, khi có yêu cầu SSCC hoặc customer label, khi có partial shipment, relabel, repack, split shipment hoặc khi phải bàn giao bộ chứng từ giao hàng cho khách/vận chuyển.</div>
-      <h1>WI-206 — bộ hồ sơ phê duyệt giao hàng, nhãn SSCC, đối soát kiện và bàn giao xác nhận giao hàng</h1>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi lô giao hàng có cổng kiểm soát phê duyệt; bắt buộc áp dụng khi có PackID/lô giao hàng, khi có yêu cầu SSCC hoặc nhãn theo yêu cầu khách hàng, khi có giao hàng từng phần, dán nhãn lại, đóng gói lại, chia lô giao hàng hoặc khi phải bàn giao bộ chứng từ giao hàng cho khách hàng/đơn vị vận chuyển.</div>
+      <h1>WI-206 — Ship Release Pack, SSCC Label and Pack Reconciliation</h1>
       
 <div class="section"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
-<p>WI này quy định cách lập <b>Bộ hồ sơ phê duyệt giao hàng</b>, gán <b>SSCC</b>, đối soát inner-pack/outer-pack/logistic unit và bàn giao sang bước <b>Xác nhận giao hàng</b>. WI này áp dụng cho mọi lô xuất có kiểm soát chất lượng và áp dụng thêm khi khách hàng yêu cầu GS1/SSCC, customer label overlay, chứng từ vật liệu, chứng từ công đoạn đặc biệt, hoặc partial shipment.</p>
-<div class="callout-danger"><strong>QUYỀN DỪNG</strong><br/>QA, Warehouse, Shipping, Sales/Customer Service và người có thẩm quyền release có quyền dừng xuất khi phát hiện sai part, sai rev, sai qty, sai lot/serial, sai SSCC, sai nhãn khách hàng, thiếu chứng từ, bao gói hỏng, hoặc bộ bằng chứng chưa đủ. <b>PHẢI</b> hoàn tất hồ sơ trước khi xác nhận giao hàng.</div></div>
+<p>WI này quy định cách lập <b>Bộ hồ sơ phê duyệt giao hàng</b>, gán <b>SSCC</b>, đối soát kiện trong/kiện ngoài/đơn vị logistics và bàn giao sang bước <b>Xác nhận giao hàng</b>. WI này áp dụng cho mọi lô xuất có kiểm soát chất lượng và áp dụng thêm khi khách hàng yêu cầu GS1/SSCC, nhãn bổ sung theo yêu cầu khách hàng, chứng từ vật liệu, chứng từ công đoạn đặc biệt, hoặc giao hàng từng phần.</p>
+<div class="callout-danger"><strong>QUYỀN DỪNG</strong><br/>QA, Warehouse, Shipping, Sales/Customer Service và người có thẩm quyền phê duyệt có quyền dừng xuất khi phát hiện sai mã chi tiết, sai mức sửa đổi, sai số lượng, sai lô/số sê-ri, sai SSCC, sai nhãn khách hàng, thiếu chứng từ, bao gói hỏng, hoặc bộ bằng chứng chưa đủ. <b>PHẢI</b> hoàn tất hồ sơ trước khi xác nhận giao hàng.</div></div>
 
 <div class="section"><h2>2. Thuật ngữ vận hành bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thuật ngữ</th><th>Ý nghĩa dùng trong HESEM</th></tr></thead><tbody>
-<tr><td>Logistic unit</td><td>Một đơn vị vận chuyển được nhận diện độc nhất: carton, crate, pallet hoặc pack tương đương.</td></tr>
-<tr><td>Inner pack / outer pack</td><td>Inner pack là lớp chứa trực tiếp part; outer pack là lớp vận chuyển nhìn thấy từ ngoài. Một outer pack có thể chứa nhiều inner pack nhưng mỗi logistic unit chỉ có 01 SSCC hiệu lực.</td></tr>
-<tr><td>Partial shipment</td><td>Giao một phần quantity của SO/line/WO. Mỗi lần giao phải có PackID, shipment data và bằng chứng riêng; không dùng lại hồ sơ cũ.</td></tr>
-<tr><td>Relabel</td><td>In lại nhãn do lỗi in, hỏng nhãn hoặc thay dữ liệu được phê duyệt. Nhãn cũ phải VOID và giữ bằng chứng.</td></tr>
-<tr><td>Repack</td><td>Thay cấu trúc bao gói hoặc đổi logistic unit sau khi đã đóng gói. Repack luôn yêu cầu đối soát lại và review lại bằng chứng.</td></tr>
-<tr><td>Bộ hồ sơ phê duyệt giao hàng</td><td>Bộ bằng chứng chứng minh lô hàng đủ điều kiện giao: phiếu kê đóng gói (phiếu kê đóng gói), CoC/CoA/MTR/cert, kiểm tra release, ảnh kiện, reconciliation, approval history và các hồ sơ bắt buộc khác.</td></tr>
+<tr><td>Đơn vị logistics</td><td>Một đơn vị vận chuyển được nhận diện độc nhất: thùng carton, thùng gỗ, pallet hoặc đơn vị tương đương.</td></tr>
+<tr><td>Kiện trong / kiện ngoài</td><td>Kiện trong là lớp chứa trực tiếp chi tiết; kiện ngoài là lớp vận chuyển nhìn thấy từ ngoài. Một kiện ngoài có thể chứa nhiều kiện trong nhưng mỗi đơn vị logistics chỉ có 01 SSCC hiệu lực.</td></tr>
+<tr><td>Giao hàng từng phần</td><td>Giao một phần số lượng của SO/dòng/WO. Mỗi lần giao phải có PackID, dữ liệu lô giao hàng và bằng chứng riêng; không dùng lại hồ sơ cũ.</td></tr>
+<tr><td>Dán nhãn lại</td><td>In lại nhãn do lỗi in, hỏng nhãn hoặc thay dữ liệu được phê duyệt. Nhãn cũ phải ĐÁNH DẤU HỦY và giữ bằng chứng.</td></tr>
+<tr><td>Đóng gói lại</td><td>Thay cấu trúc bao gói hoặc đổi đơn vị logistics sau khi đã đóng gói. Đóng gói lại luôn yêu cầu đối soát lại và rà soát lại bằng chứng.</td></tr>
+<tr><td>Bộ hồ sơ phê duyệt giao hàng</td><td>Bộ bằng chứng chứng minh lô hàng đủ điều kiện giao: phiếu đóng gói, CoC/CoA/MTR/chứng từ chứng nhận, kiểm tra phê duyệt, ảnh kiện, đối soát, lịch sử phê duyệt và các hồ sơ bắt buộc khác.</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>3. Đầu vào bắt buộc trước khi lập bộ hồ sơ phê duyệt giao hàng</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Đầu vào</th><th>PASS</th><th>tạm giữ khi</th></tr></thead><tbody>
-<tr><td>Trạng thái lô</td><td>kiểm tra cuối pass; không còn hold/NCR mở ảnh hưởng shipment; quantity đủ điều kiện giao</td><td>Còn suspect product, còn disposition mở hoặc quantity chưa khóa</td></tr>
-<tr><td>QPL / customer package</td><td>Xác định rõ mức QPL, overlay khách hàng, yêu cầu cert, label, pack spec và release thẩm quyền</td><td>Chưa xác định QPL hoặc chưa rõ tài liệu khách hàng nào đang hiệu lực</td></tr>
-<tr><td>Pack structure</td><td>Đã xác định số inner pack, outer pack, pallet/crate, qty theo từng logistic unit và rule partial shipment</td><td>Chưa rõ cấu trúc kiện hoặc còn thay đổi chưa khóa</td></tr>
-<tr><td>Source data</td><td>Part, Rev, Qty, Lot/Serial, SO/PO, Ship-to, carrier/service, customer PN nếu áp dụng, dữ liệu label đều lấy từ SoR/SSOT hiệu lực</td><td>Dữ liệu lấy từ email/chat/Excel rời hoặc có nhiều nguồn mâu thuẫn</td></tr>
-<tr><td>Packaging condition</td><td>Bao gói đáp ứng <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a> và yêu cầu khách hàng; kiện sạch, không FOD, không hỏng</td><td>Bao gói chưa đạt, thiếu vật tư, thiếu ảnh/bằng chứng hoặc còn nguy cơ nhiễm bẩn</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Đầu vào</th><th>ĐẠT</th><th>tạm giữ khi</th></tr></thead><tbody>
+<tr><td>Trạng thái lô</td><td>kiểm tra cuối đạt; không còn tạm giữ/NCR mở ảnh hưởng lô giao hàng; số lượng đủ điều kiện giao</td><td>Còn suspect product, còn disposition mở hoặc số lượng chưa khóa</td></tr>
+<tr><td>QPL / bộ hồ sơ giao khách</td><td>Xác định rõ mức QPL, nhãn bổ sung theo yêu cầu khách hàng, yêu cầu chứng từ chứng nhận, nhãn, quy cách đóng gói và thẩm quyền phê duyệt</td><td>Chưa xác định QPL hoặc chưa rõ tài liệu khách hàng nào đang hiệu lực</td></tr>
+<tr><td>Cấu trúc kiện</td><td>Đã xác định số kiện trong, kiện ngoài, pallet/thùng gỗ, số lượng theo từng đơn vị logistics và quy tắc giao hàng từng phần</td><td>Chưa rõ cấu trúc kiện hoặc còn thay đổi chưa khóa</td></tr>
+<tr><td>Dữ liệu nguồn</td><td>Mã chi tiết, Rev, số lượng, lô/số sê-ri, SO/PO, địa điểm giao hàng, đơn vị vận chuyển/dịch vụ, mã chi tiết khách hàng nếu áp dụng, dữ liệu nhãn đều lấy từ SoR/SSOT đang hiệu lực</td><td>Dữ liệu lấy từ email/chat/Excel rời hoặc có nhiều nguồn mâu thuẫn</td></tr>
+<tr><td>Tình trạng bao gói</td><td>Bao gói đáp ứng <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a> và yêu cầu khách hàng; kiện sạch, không dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (FOD)))))))))), không hỏng</td><td>Bao gói chưa đạt, thiếu vật tư, thiếu ảnh/bằng chứng hoặc còn nguy cơ nhiễm bẩn</td></tr>
 </tbody></table></div>
-<div class="callout-info"><strong>SoR / SSOT</strong><br/>Trạng thái shipment, PackID, quantity, allocation và xác nhận giao hàng phải lấy từ SoR giao dịch. Bằng chứng, ảnh, bảng kiểm, approval history và link chứng từ phải nằm trong SSOT hồ sơ. Không được duy trì “bộ ship riêng” ngoài hệ thống.</div></div>
+<div class="callout-info"><strong>SoR / SSOT</strong><br/>Trạng thái lô giao hàng, PackID, số lượng, phân bổ và xác nhận giao hàng phải lấy từ SoR giao dịch. Bằng chứng, ảnh, bảng kiểm, lịch sử phê duyệt và liên kết chứng từ phải nằm trong SSOT hồ sơ. Không được duy trì “bộ hồ sơ giao hàng riêng” ngoài hệ thống.</div></div>
 
 <div class="section"><h2>4. Lập cấu trúc kiện và gán SSCC</h2>
 <div class="step-list">
-<div class="step-item"><strong>Khóa quantity đủ điều kiện giao.</strong><br/>Chốt quantity theo line / lot / serial / WO. Nếu là partial shipment phải ghi rõ quantity còn lại và quantity kỳ này; không gộp lẫn giữa quantity đã release và quantity chưa release.</div>
-<div class="step-item"><strong>Xác định cấu trúc pack.</strong><br/>Xác định mỗi logistic unit chứa gì, bao nhiêu, thuộc lot nào, serial range nào, có inner pack nào bên trong, có item lẻ hoặc accessory kèm theo hay không.</div>
-<div class="step-item"><strong>Cấp PackID và SSCC.</strong><br/>Mỗi logistic unit phải có PackID và khi job áp dụng GS1 phải có 01 SSCC duy nhất. SSCC không được tái sử dụng; nhãn lỗi phải VOID chứ không xóa dấu vết.</div>
-<div class="step-item"><strong>In nhãn từ template kiểm soát.</strong><br/>Nhãn phải lấy từ mẫu được kiểm soát, đọc được bằng mắt và bằng scan, không che barcode bằng băng keo mờ, không in tạm bằng file cá nhân.</div>
-<div class="step-item"><strong>Quét và xác minh 100%.</strong><br/>Quét từng nhãn sau in và sau dán. Chuỗi SSCC, human-readable text, Part/Rev/Qty/Ship-to và reference dữ liệu phải khớp với pack structure đã khóa.</div>
+<div class="step-item"><strong>Khóa số lượng đủ điều kiện giao.</strong><br/>Chốt số lượng theo dòng / lô / số sê-ri / WO. Nếu là giao hàng từng phần phải ghi rõ số lượng còn lại và số lượng kỳ này; không gộp lẫn giữa số lượng đã phê duyệt và số lượng chưa phê duyệt.</div>
+<div class="step-item"><strong>Xác định cấu trúc kiện.</strong><br/>Xác định mỗi đơn vị logistics chứa gì, bao nhiêu, thuộc lô nào, dải số sê-ri nào, có kiện trong nào bên trong, có chi tiết lẻ hoặc phụ kiện kèm theo hay không.</div>
+<div class="step-item"><strong>Cấp PackID và SSCC.</strong><br/>Mỗi đơn vị logistics phải có PackID và khi lô áp dụng GS1 phải có 01 SSCC duy nhất. SSCC không được tái sử dụng; nhãn lỗi phải ĐÁNH DẤU HỦY chứ không xóa dấu vết.</div>
+<div class="step-item"><strong>In nhãn từ mẫu kiểm soát.</strong><br/>Nhãn phải lấy từ mẫu được kiểm soát, đọc được bằng mắt và bằng quét mã, không che mã vạch bằng băng keo mờ, không in tạm bằng file cá nhân.</div>
+<div class="step-item"><strong>Quét và xác minh 100%.</strong><br/>Quét từng nhãn sau in và sau dán. Chuỗi SSCC, chuỗi ký tự đọc được, Mã chi tiết/Rev/số lượng/địa điểm giao hàng và tham chiếu dữ liệu phải khớp với cấu trúc kiện đã khóa.</div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống pack</th><th>Quy tắc bắt buộc</th><th>Thẩm quyền tối thiểu</th></tr></thead><tbody>
-<tr><td>Một line — một logistic unit</td><td>01 PackID / 01 SSCC / 01 bộ bằng chứng</td><td>Warehouse/Shipping</td></tr>
-<tr><td>Một line — nhiều logistic unit</td><td>Mỗi kiện/pallet có SSCC riêng; outer-pack summary phải cộng đúng inner-pack</td><td>Warehouse/Shipping</td></tr>
-<tr><td>Partial shipment</td><td>Tách riêng qty giao kỳ này, qty còn lại, reason code và chứng từ áp dụng; không dùng nhãn của full shipment</td><td>Warehouse Manager + QA</td></tr>
-<tr><td>Repack sau khi đã dán nhãn</td><td>VOID nhãn cũ, tạo lại mapping inner ↔ outer ↔ pallet, chụp lại bằng chứng, review lại pack completeness</td><td>Warehouse Manager + QA</td></tr>
-<tr><td>Customer overlay label hoặc thay Ship-to</td><td>Phải có xác nhận từ Sales/Customer Service và QA; không tự sửa tay trên nhãn</td><td>Sales/CS + QA + Warehouse</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống đóng gói</th><th>Quy tắc bắt buộc</th><th>Thẩm quyền tối thiểu</th></tr></thead><tbody>
+<tr><td>Một dòng giao hàng — một đơn vị logistics</td><td>01 PackID / 01 SSCC / 01 bộ bằng chứng</td><td>Warehouse/Shipping</td></tr>
+<tr><td>Một dòng giao hàng — nhiều đơn vị logistics</td><td>Mỗi kiện/pallet có SSCC riêng; kiện ngoài tóm tắt phải cộng đúng kiện trong</td><td>Warehouse/Shipping</td></tr>
+<tr><td>Giao hàng từng phần</td><td>Tách riêng số lượng giao kỳ này, số lượng còn lại, mã lý do và chứng từ áp dụng; không dùng nhãn của lô giao hàng đầy đủ</td><td>Warehouse Manager + QA</td></tr>
+<tr><td>Đóng gói lại sau khi đã dán nhãn</td><td>ĐÁNH DẤU HỦY nhãn cũ, tạo lại ánh xạ kiện trong ↔ kiện ngoài ↔ pallet, chụp lại bằng chứng, rà soát lại độ đầy đủ của bộ hồ sơ</td><td>Warehouse Manager + QA</td></tr>
+<tr><td>Nhãn bổ sung theo yêu cầu khách hàng hoặc thay Địa điểm giao hàng</td><td>Phải có xác nhận từ Sales/Customer Service và QA; không tự sửa tay trên nhãn</td><td>Sales/CS + QA + Warehouse</td></tr>
 </tbody></table></div></div>
 
-<div class="section"><h2>5. Xây bộ bộ hồ sơ phê duyệt giao hàng</h2>
-<p>Bộ bộ hồ sơ phê duyệt giao hàng phải phản ánh đúng shipment đang giao. Không kéo link nhầm từ shipment cũ, không gộp nhiều shipment vào cùng một bộ hồ sơ khi dữ liệu và thẩm quyền khác nhau.</p>
+<div class="section"><h2>5. Xây bộ hồ sơ phê duyệt giao hàng</h2>
+<p>Bộ hồ sơ phê duyệt giao hàng phải phản ánh đúng lô giao hàng đang giao. Không kéo link nhầm từ lô giao hàng cũ, không gộp nhiều lô giao hàng vào cùng một bộ hồ sơ khi dữ liệu và thẩm quyền khác nhau.</p>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm chứng từ</th><th>Bắt buộc khi</th><th>Ví dụ hồ sơ phải có</th></tr></thead><tbody>
-<tr><td>Shipment core</td><td>Mọi shipment</td><td>phiếu kê đóng gói (phiếu kê đóng gói), shipment/pack hồ sơ, ảnh nhãn, ảnh kiện, ship bảng kiểm</td></tr>
-<tr><td>Quality release</td><td>Mọi shipment có cổng kiểm soát release</td><td>Kiểm tra cuối release, CoC, kiểm tra nhật ký, approval history</td></tr>
-<tr><td>QPL-driven bằng chứng</td><td>Theo <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>FAI, control plan, CTQ bằng chứng, special acceptance nếu có</td></tr>
-<tr><td>Material / outsource</td><td>Khi khách hàng hoặc spec yêu cầu</td><td>MTR/CoC vật liệu, cert công đoạn đặc biệt, outsource pack, heat/lot chain</td></tr>
-<tr><td>Carrier / export / customer docs</td><td>Khi áp dụng</td><td>AWB/BOL/tracking, customer label pack, commercial docs, country-of-origin</td></tr>
+<tr><td>Hồ sơ cốt lõi của lô giao hàng</td><td>Mọi lô giao hàng</td><td>phiếu đóng gói, lô giao hàng/hồ sơ đóng gói, ảnh nhãn, ảnh kiện, bảng kiểm giao hàng</td></tr>
+<tr><td>Phê duyệt chất lượng</td><td>Mọi lô giao hàng có cổng kiểm soát phê duyệt</td><td>Kiểm tra cuối phê duyệt, CoC, kiểm tra nhật ký, lịch sử phê duyệt</td></tr>
+<tr><td>bằng chứng theo QPL</td><td>Theo <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>FAI, kế hoạch kiểm soát, CTQ bằng chứng, chấp thuận đặc biệt nếu có</td></tr>
+<tr><td>Vật liệu / thuê ngoài</td><td>Khi khách hàng hoặc yêu cầu kỹ thuật yêu cầu</td><td>MTR/CoC vật liệu, chứng từ chứng nhận công đoạn đặc biệt, bộ hồ sơ thuê ngoài, chuỗi mẻ nhiệt/lô</td></tr>
+<tr><td>Vận chuyển / xuất khẩu / chứng từ khách hàng</td><td>Khi áp dụng</td><td>AWB/BOL/theo dõi, nhãn theo yêu cầu khách hàng, chứng từ thương mại, xuất xứ hàng hóa</td></tr>
 </tbody></table></div>
-<div class="callout-warn"><strong>Rule chứng từ</strong><br/>Nếu shipment chia nhiều đợt, mỗi đợt phải có bộ bộ hồ sơ phê duyệt giao hàng riêng. Chứng từ chung chỉ được dùng lại khi quy định khách hàng cho phép và phải trỏ đúng shipment hiện tại.</div></div>
+<div class="callout-warn"><strong>Quy tắc chứng từ</strong><br/>Nếu lô giao hàng chia nhiều đợt, mỗi đợt phải có bộ hồ sơ phê duyệt giao hàng riêng. Chứng từ chung chỉ được dùng lại khi quy định khách hàng cho phép và phải trỏ đúng lô giao hàng hiện tại.</div></div>
 
-<div class="section"><h2>6. Reconciliation inner-pack ↔ outer-pack ↔ shipment</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bước đối soát</th><th>Yêu cầu PASS</th><th>Người thực hiện</th></tr></thead><tbody>
-<tr><td>Part / Rev / customer PN</td><td>Mọi inner pack và nhãn ngoài khớp part/rev/customer PN của shipment</td><td>Warehouse/Shipping</td></tr>
-<tr><td>Qty / UOM</td><td>Tổng qty từng inner pack = outer pack = pallet summary = shipment line</td><td>Warehouse/Shipping</td></tr>
-<tr><td>Lot / serial / heat</td><td>Mapping lot/serial đầy đủ; không lẫn lot trái rule; trace chain truy về traveler/cert được</td><td>Warehouse + QA</td></tr>
-<tr><td>SSCC / PackID</td><td>Mỗi logistic unit có 01 mã duy nhất; scan mở đúng pack hồ sơ; không trùng, không rỗng, không scan sai</td><td>Warehouse/Shipping</td></tr>
-<tr><td>Packaging condition</td><td>Seal, cushioning, desiccant/VCI/ESD/clean-pack theo spec; kiện không bẹp, không rách, không bẩn</td><td>Warehouse</td></tr>
-<tr><td>Bằng chứng completeness</td><td>Ảnh nhãn, ảnh kiện, bảng kiểm, release hồ sơ và cert links truy cập được</td><td>QA / Warehouse</td></tr>
+<div class="section"><h2>6. Đối soát kiện trong ↔ kiện ngoài ↔ lô giao hàng</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bước đối soát</th><th>Yêu cầu ĐẠT</th><th>Người thực hiện</th></tr></thead><tbody>
+<tr><td>Mã chi tiết / Rev / mã chi tiết khách hàng</td><td>Mọi kiện trong và nhãn ngoài khớp mã chi tiết/rev/mã chi tiết khách hàng của lô giao hàng</td><td>Warehouse/Shipping</td></tr>
+<tr><td>Số lượng / UOM</td><td>Tổng số lượng từng kiện trong = kiện ngoài = pallet tóm tắt = dòng lô giao hàng</td><td>Warehouse/Shipping</td></tr>
+<tr><td>Lô / số sê-ri / mẻ vật liệu</td><td>Ánh xạ lô/số sê-ri đầy đủ; không lẫn lô trái quy tắc; chuỗi truy xuất phải truy về phiếu theo dõi công đoạn/chứng từ chứng nhận</td><td>Warehouse + QA</td></tr>
+<tr><td>SSCC / PackID</td><td>Mỗi đơn vị logistics có 01 mã duy nhất; quét mở đúng hồ sơ đóng gói; không trùng, không rỗng, không quét sai</td><td>Warehouse/Shipping</td></tr>
+<tr><td>Tình trạng bao gói</td><td>Seal, cushioning, desiccant/VCI/ESD/bao gói sạch theo yêu cầu kỹ thuật; kiện không bẹp, không rách, không bẩn</td><td>Warehouse</td></tr>
+<tr><td>Độ đầy đủ của bằng chứng</td><td>Ảnh nhãn, ảnh kiện, bảng kiểm, phê duyệt hồ sơ và liên kết chứng từ chứng nhận truy cập được</td><td>QA / Warehouse</td></tr>
 </tbody></table></div>
-<div class="keyline"><strong>Mixed lot / mixed part rule</strong><br/>Không trộn part khác nhau vào cùng logistic unit trừ khi có pack spec hoặc customer instruction cho phép bằng văn bản. Không trộn lot/serial nếu traceability hoặc chứng từ yêu cầu tách riêng. Khi buộc phải giao kèm accessory, phải thể hiện rõ trên pack structure và phiếu kê đóng gói (phiếu kê đóng gói).</div></div>
+<div class="keyline"><strong>Quy tắc trộn lô / trộn mã</strong><br/>Không trộn mã chi tiết khác nhau vào cùng đơn vị logistics trừ khi có quy cách đóng gói hoặc hướng dẫn của khách hàng cho phép bằng văn bản. Không trộn lô/số sê-ri nếu truy xuất nguồn gốc hoặc chứng từ yêu cầu tách riêng. Khi buộc phải giao kèm phụ kiện, phải thể hiện rõ trên cấu trúc kiện và phiếu đóng gói.</div></div>
 
-<div class="section"><h2>7. Phê duyệt, relabel/repack và bàn giao xác nhận giao hàng</h2>
+<div class="section"><h2>7. Phê duyệt, dán nhãn lại/đóng gói lại và bàn giao xác nhận giao hàng</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thay đổi phát sinh</th><th>Được phép làm gì</th><th>Ai phê duyệt</th><th>Hồ sơ phải cập nhật</th></tr></thead><tbody>
-<tr><td>Nhãn in lỗi nhưng dữ liệu gốc không đổi</td><td>In lại nhãn cùng dữ liệu, VOID nhãn lỗi, chụp bằng chứng nhãn mới</td><td>Shipping Lead</td><td>Reprint nhật ký + ảnh nhãn</td></tr>
-<tr><td>Đổi cấu trúc kiện / repack</td><td>Đóng lại, cấp lại mapping, scan lại, chụp lại bằng chứng</td><td>Warehouse Manager + QA</td><td>Repack hồ sơ + reconciliation mới</td></tr>
-<tr><td>Đổi qty do partial shipment</td><td>Tạo pack structure mới cho qty giao thực tế; cập nhật chứng từ và remaining balance</td><td>Warehouse Manager + QA + Sales/CS khi ảnh hưởng khách</td><td>phiếu kê đóng gói (phiếu kê đóng gói) mới + bằng chứng mới</td></tr>
-<tr><td>Đổi Ship-to, customer label, carrier label overlay</td><td>Chỉ thay sau khi có xác nhận từ nguồn yêu cầu hợp lệ</td><td>Sales/CS + QA + Warehouse</td><td>Approval history + label bằng chứng mới</td></tr>
-<tr><td>Thiếu cert hoặc mismatch release data</td><td>Không được relabel để ship tạm; phải HOLD shipment</td><td>QA thẩm quyền</td><td>Hold nhật ký / NCR / corrective hồ sơ</td></tr>
+<tr><td>Nhãn in lỗi nhưng dữ liệu gốc không đổi</td><td>In lại nhãn cùng dữ liệu, ĐÁNH DẤU HỦY nhãn lỗi, chụp bằng chứng nhãn mới</td><td>Shipping Lead</td><td>Nhật ký in lại + ảnh nhãn</td></tr>
+<tr><td>Đổi cấu trúc kiện / đóng gói lại</td><td>Đóng lại, cấp lại ánh xạ, quét lại, chụp lại bằng chứng</td><td>Warehouse Manager + QA</td><td>Đóng gói lại hồ sơ + đối soát mới</td></tr>
+<tr><td>Đổi số lượng do giao hàng từng phần</td><td>Tạo cấu trúc kiện mới cho số lượng giao thực tế; cập nhật chứng từ và số lượng còn lại</td><td>Warehouse Manager + QA + Sales/CS khi ảnh hưởng khách</td><td>phiếu đóng gói mới + bằng chứng mới</td></tr>
+<tr><td>Đổi Địa điểm giao hàng, nhãn theo yêu cầu khách hàng, nhãn chồng của đơn vị vận chuyển</td><td>Chỉ thay sau khi có xác nhận từ nguồn yêu cầu hợp lệ</td><td>Sales/CS + QA + Warehouse</td><td>Lịch sử phê duyệt + bằng chứng nhãn mới</td></tr>
+<tr><td>Thiếu chứng từ chứng nhận hoặc không khớp dữ liệu phê duyệt</td><td>Không được dán nhãn lại để giao tạm; phải TẠM GIỮ lô giao hàng</td><td>QA thẩm quyền</td><td>Tạm giữ nhật ký / NCR / hồ sơ khắc phục</td></tr>
 </tbody></table></div>
-<p>Sau khi QA/thẩm quyền release, Warehouse/Shipping mới được thực hiện bàn giao sang bước xác nhận giao hàng. Bàn giao chỉ hoàn tất khi shipment line, pack hồ sơ, label hồ sơ, reconciliation hồ sơ và bộ hồ sơ phê duyệt giao hàng cùng tham chiếu được với nhau.</p></div>
+<p>Sau khi QA/thẩm quyền phê duyệt, Warehouse/Shipping mới được thực hiện bàn giao sang bước xác nhận giao hàng. Bàn giao chỉ hoàn tất khi dòng lô giao hàng, hồ sơ đóng gói, hồ sơ nhãn, hồ sơ đối soát và bộ hồ sơ phê duyệt giao hàng tham chiếu được với nhau.</p></div>
 
 <div class="section"><h2>8. Xử lý sai lệch</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Sai lệch</th><th>Phản ứng bắt buộc</th></tr></thead><tbody>
-<tr><td>Sai part / rev / customer PN</td><td>HOLD toàn bộ logistic unit liên quan; khoanh vùng mọi kiện cùng batch; kiểm 100%; không giao một phần khi chưa rõ phạm vi.</td></tr>
-<tr><td>Sai qty / thiếu kiện / sai UOM</td><td>Dừng xuất; đếm lại; khóa pack; cập nhật lại phiếu kê đóng gói (phiếu kê đóng gói) và reconciliation từ đầu.</td></tr>
-<tr><td>Sai SSCC hoặc scan không mở đúng pack</td><td>VOID nhãn cũ; cấp lại SSCC nếu cần; scan xác nhận 100%; lưu reprint/relabel bằng chứng.</td></tr>
-<tr><td>Nhãn đúng nhưng bao gói hỏng hoặc có FOD</td><td>Repack toàn bộ logistic unit bị ảnh hưởng; chụp lại bằng chứng; review lại clean pack / preservation window.</td></tr>
-<tr><td>Thiếu CoC/MTR/cert/công đoạn đặc biệt hồ sơ</td><td>Không ship; giữ HOLD cho đến khi hồ sơ đủ và thẩm quyền release lại.</td></tr>
-<tr><td>Mismatch giữa bộ bằng chứng và shipment thực tế</td><td>Review lại toàn bộ shipment; không sửa lẻ từng file để “cho khớp”.</td></tr>
+<tr><td>Sai mã chi tiết / mức sửa đổi / mã chi tiết khách hàng</td><td>TẠM GIỮ toàn bộ đơn vị logistics liên quan; khoanh vùng mọi kiện cùng lô; kiểm 100%; không giao một phần khi chưa rõ phạm vi.</td></tr>
+<tr><td>Sai số lượng / thiếu kiện / sai UOM</td><td>Dừng xuất; đếm lại; khóa hồ sơ đóng gói; cập nhật lại phiếu đóng gói và đối soát từ đầu.</td></tr>
+<tr><td>Sai SSCC hoặc quét không mở đúng hồ sơ đóng gói</td><td>ĐÁNH DẤU HỦY nhãn cũ; cấp lại SSCC nếu cần; quét xác nhận 100%; lưu bằng chứng in lại/dán nhãn lại.</td></tr>
+<tr><td>Nhãn đúng nhưng bao gói hỏng hoặc có dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (FOD))))))))))</td><td>Đóng gói lại toàn bộ đơn vị logistics bị ảnh hưởng; chụp lại bằng chứng; rà soát lại bao gói sạch / thời hạn bảo quản.</td></tr>
+<tr><td>Thiếu CoC/MTR/chứng từ chứng nhận/công đoạn đặc biệt trong hồ sơ</td><td>Không giao; giữ TẠM GIỮ cho đến khi hồ sơ đủ và thẩm quyền phê duyệt lại.</td></tr>
+<tr><td>Không khớp giữa bộ bằng chứng và lô giao hàng thực tế</td><td>Rà soát lại toàn bộ lô giao hàng; không sửa lẻ từng file để “cho khớp”.</td></tr>
 </tbody></table></div>
-<div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">On-time phê duyệt giao hàng (ship release); số shipment HOLD do pack/doc mismatch; số relabel/repack; số ship escape do label/doc; thời gian từ final release đến xác nhận giao hàng.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>; <a href="wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>; <a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>; <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>; <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a>; <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx">FRM-702</a>; <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-706_Shipping_Label.xlsx">FRM-706</a>.</div></div></div></div>
+<div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Phê duyệt giao hàng đúng hạn; số lô giao hàng TẠM GIỮ do đóng gói/chứng từ không khớp; số dán nhãn lại/đóng gói lại; số lọt lỗi giao hàng do nhãn/chứng từ; thời gian từ phê duyệt cuối cùng đến xác nhận giao hàng.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>; <a href="wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>; <a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>; <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>; <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a>; <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx">FRM-702</a>; <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-706_Shipping_Label.xlsx">FRM-706</a>.</div></div></div></div>
 
     </div>
   </div>

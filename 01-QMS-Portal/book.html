@@ -69,7 +69,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Tất cả nhân sự văn phòng và xưởng PHẢI dùng sổ tay này để xác định: <b>ai chịu trách nhiệm</b>, <b>quy trình đang áp dụng</b>, <b>điểm dừng (điểm giữ)</b>, <b>tiêu chí chấp nhận</b> và <b>hồ sơ bắt buộc</b>.</li>
 <li>Sổ tay áp dụng cho toàn bộ mô hình <b>Lệnh sản xuất CNC</b>: báo giá → PO/WO → gia công → kiểm tra → đóng gói → giao hàng → nghiệm thu/hóa đơn.</li>
-<li>Sổ tay không thay thế SOP/PROC/WI/FRM. Khi có xung đột nội dung, PHẢI ưu tiên tài liệu cấp cao hơn theo doc-control và báo QA/QMS.</li>
+<li>Sổ tay không thay thế SOP/PROC/WI/FRM. Khi có xung đột nội dung, PHẢI ưu tiên tài liệu cấp cao hơn theo cơ chế kiểm soát tài liệu và báo QA/QMS.</li>
 </ul>
 </div>
 <div class="card" style="margin-top:12px;">
@@ -90,25 +90,25 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Tra cứu nhanh tài liệu</td>
 <td><a href="site-map.html">ANNEX-50491 — Quick Lookup</a></td>
 <td>Mở đúng SOP/PROC/WI/FRM theo mã</td>
-<td>Dừng sử dụng nếu Ngày hiệu lực/Revision không khớp</td>
+<td>Dừng sử dụng nếu Ngày hiệu lực/mức sửa đổi không khớp</td>
 </tr>
 <tr>
 <td>Luồng Lệnh sản xuất từ PO đến giao</td>
 <td><a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/index.html">SOP Library</a> • <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">PROC-OPS-001</a></td>
 <td>Bàn giao phòng ban đúng RACI</td>
-<td>Không có WO/Traveler/CTQ → KHÔNG được chạy máy</td>
+<td>Không có WO/Phiếu theo dõi công đoạn/CTQ → KHÔNG được chạy máy</td>
 </tr>
 <tr>
 <td>Điều hành tiến độ &amp; chất lượng</td>
 <td><a href="../10-Training-Academy/03-System-Operations/01-System-Guides/index.html">Operations</a> • <a href="../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//">WI-OPS-004</a></td>
 <td>KPI được cập nhật, có hành động khắc phục</td>
-<td>tuổi tồn WIP (tuổi tồn (aging) / tuổi tồn) vượt ngưỡng hoặc QC Hold mở → phải escalations theo WI-OPS-001</td>
+<td>tuổi tồn WIP vượt ngưỡng hoặc QC Hold mở → phải chuyển cấp xử lý theo WI-OPS-001</td>
 </tr>
 <tr>
 <td>Biểu mẫu và hồ sơ</td>
 <td><a href="../04-Bieu-Mau/index.html">Forms</a></td>
 <td>Hồ sơ được lưu đúng SSOT</td>
-<td>Thiếu hồ sơ bắt buộc → dừng release/ship</td>
+<td>Thiếu hồ sơ bắt buộc → dừng phê duyệt/giao hàng</td>
 </tr>
 <tr>
 <td>Thuật ngữ thống nhất</td>
@@ -123,39 +123,39 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" style="margin-top:12px;">
 <h2 class="h2" style="margin-top:0;">3. Quy tắc hệ thống bắt buộc</h2>
 <ul>
-<li><b>Epicor Kinetic là Nguồn chuẩn</b> cho mọi giao dịch: time entry, job trạng thái, PO/receipt, xác nhận giao hàng (ship confirm), inventory giao dịch, job cost. Phải ghi nhận trực tiếp trên Epicor; không dùng file hoặc bảng cá nhân để thay giao dịch chính thức.</li>
-<li><b>M365 là nơi lưu Bằng chứng/Hồ sơ</b>. Hồ sơ PHẢI lưu theo SSOT; chỉ chia sẻ bằng liên kết; retention event-based; legal hold theo <a href="../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-013</a>.</li>
-<li>Trước khi dùng tài liệu, người dùng PHẢI kiểm tra doc-control: mã, revision, ngày hiệu lực, phạm vi áp dụng.</li>
+<li><b>Epicor Kinetic là Nguồn chuẩn</b> cho mọi giao dịch: ghi nhận thời gian, trạng thái lệnh sản xuất, PO/nhận hàng, xác nhận giao hàng, giao dịch tồn kho, chi phí lệnh sản xuất. Phải ghi nhận trực tiếp trên Epicor; không dùng tệp hoặc bảng cá nhân để thay giao dịch chính thức.</li>
+<li><b>M365 là nơi lưu Bằng chứng/Hồ sơ</b>. Hồ sơ PHẢI lưu theo SSOT; chỉ chia sẻ bằng liên kết; lưu giữ theo sự kiện; tạm khóa phục vụ pháp lý theo <a href="../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-013</a>.</li>
+<li>Trước khi dùng tài liệu, người dùng PHẢI kiểm tra kiểm soát tài liệu: mã, mức sửa đổi, ngày hiệu lực, phạm vi áp dụng.</li>
 <li>Khi phát sinh ngoại lệ (rework/waiver/deviation), phải thực hiện theo quy trình NCR/Deviation của QMS và lưu hồ sơ đúng thư viện M365.</li>
 </ul>
 </div>
 <div class="card" style="margin-top:12px;">
-<h2 class="h2" style="margin-top:0;">4. Hồ sơ &amp; Registers tối thiểu theo mô hình Lệnh sản xuất</h2>
+<h2 class="h2" style="margin-top:0;">4. Hồ sơ &amp; sổ theo dõi tối thiểu theo mô hình Lệnh sản xuất</h2>
 <p>Các hồ sơ dưới đây là tối thiểu. chủ quá trình ĐƯỢC PHÉP bổ sung theo yêu cầu khách hàng nhưng không được tạo SSOT mới ngoài M365.</p>
 <div class="table-card">
 <table class="table">
 <colgroup><col style="width:17.54%;"/><col style="width:19.43%;"/><col style="width:33.65%;"/><col style="width:12.80%;"/><col style="width:9.00%;"/><col style="width:7.58%;"/></colgroup><thead>
 <tr>
 <th>Hồ sơ</th>
-<th>Register/List</th>
+<th>Sổ theo dõi/Danh sách</th>
 <th>SSOT (M365)</th>
-<th>Retention trigger</th>
+<th>Điểm kích hoạt lưu giữ</th>
 <th>Người phụ trách</th>
-<th>Legal hold</th>
+<th>Tạm khóa pháp lý</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Hồ sơ công việc (job dossier) / Bộ bằng chứng (theo WO)</td>
-<td>Job Register (Epicor WO) + Bằng chứng Index</td>
+<td>Hồ sơ công việc / Bộ bằng chứng theo WO</td>
+<td>Sổ theo dõi lệnh sản xuất (Epicor WO) + chỉ mục bằng chứng</td>
 <td>M365: CNC-IMS-HUB/QMS-Hồ sơ/Hồ sơ/Operations/Job-Dossier/&lt;WO&gt;/</td>
-<td>Event = WO đóng (Close Job)</td>
+<td>Sự kiện = WO đóng (đóng lệnh sản xuất)</td>
 <td>Operations</td>
 <td>Theo SOP-QMS-013</td>
 </tr>
 <tr>
-<td>QC Hold Nhật ký + quyết định release</td>
-<td>QC Hold Register</td>
+<td>Nhật ký QC HOLD + quyết định phê duyệt</td>
+<td>Sổ theo dõi QC tạm giữ</td>
 <td>M365: CNC-IMS-HUB/QMS-Hồ sơ/Hồ sơ/Quality/QC-Hold/&lt;YYYY&gt;/</td>
 <td>Event = QC Hold đóng</td>
 <td>Tổ trưởng QC</td>
@@ -163,7 +163,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>NCR/Corrective Action hồ sơ</td>
-<td>NCR Register</td>
+<td>Sổ theo dõi NCR</td>
 <td>M365: CNC-IMS-HUB/QMS-Hồ sơ/Hồ sơ/Quality/NCR/&lt;YYYY&gt;/</td>
 <td>Event = NCR đóng</td>
 <td>QA/QC</td>
@@ -171,7 +171,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>KPI Scoreboard (tháng/tuần)</td>
-<td>KPI Register</td>
+<td>Sổ theo dõi KPI</td>
 <td>M365: CNC-IMS-HUB/QMS-Hồ sơ/Hồ sơ/Operations/KPI-Scoreboard/&lt;YYYY&gt;/</td>
 <td>Event = chốt kỳ KPI</td>
 <td>Operations Director</td>
@@ -186,8 +186,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" style="margin-top:0;">5. Quy tắc cập nhật và kiểm soát thay đổi</h2>
 <ul>
 <li>Chủ sở hữu PHẢI rà soát nội dung sổ tay theo chu kỳ hoặc khi có thay đổi quy trình/biểu mẫu.</li>
-<li><b>Điểm giữ:</b> Phải giữ nguyên revision hiện hành cho đến khi đủ: (1) DCR hồ sơ; (2) LINK_MAP; (3) TEST_REPORT; và mọi link nội bộ đã được kiểm tra không gãy.</li>
-<li>Mọi thay đổi phải đồng bộ: title + form-header + H1 + doc-control.</li>
+<li><b>Điểm giữ:</b> Phải giữ nguyên mức sửa đổi hiện hành cho đến khi đủ: (1) DCR hồ sơ; (2) LINK_MAP; (3) TEST_REPORT; và mọi liên kết nội bộ đã được kiểm tra không gãy.</li>
+<li>Mọi thay đổi phải đồng bộ: tiêu đề + khối tiêu đề + H1 + kiểm soát tài liệu.</li>
 </ul>
 </div>
 <div class="card" style="margin-top:12px;">

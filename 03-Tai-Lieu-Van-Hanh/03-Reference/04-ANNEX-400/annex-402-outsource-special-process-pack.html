@@ -72,7 +72,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng mỗi lần gửi công đoạn outsource hoặc công đoạn đặc biệt ra ngoài và khi nhận hàng về cần kiểm cert/scope/pack.</div>
 <h1>ANNEX-402 — Gói kiểm soát outsource / công đoạn đặc biệt / cert luồng-down</h1><div class="section">
 <h2>1. Mục đích, cách dùng và ranh giới của pack outsource / công đoạn đặc biệt</h2>
-<p>ANNEX này là <strong>bộ rule-pack dùng chung</strong> cho mọi trường hợp gửi gia công ngoài, thuê công đoạn đặc biệt, thuê kiểm tra bên thứ ba hoặc nhận hàng outsource quay về. ANNEX này <strong>không thay SOP/WI</strong>; nó quy định gói hồ sơ tối thiểu, dữ liệu tối thiểu, luồng-down tối thiểu và cổng kiểm soát (gate) tối thiểu để WHS, PUR, ENG, QA dùng chung một chuẩn khi gửi đi và nhận về.</p>
+<p>ANNEX này là <strong>bộ rule-pack dùng chung</strong> cho mọi trường hợp gửi gia công ngoài, thuê công đoạn đặc biệt, thuê kiểm tra bên thứ ba hoặc nhận hàng outsource quay về. ANNEX này <strong>không thay SOP/WI</strong>; nó quy định gói hồ sơ tối thiểu, dữ liệu tối thiểu, luồng-down tối thiểu và cổng kiểm soát tối thiểu để WHS, PUR, ENG, QA dùng chung một chuẩn khi gửi đi và nhận về.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Khóa đủ pack trước khi gửi hàng ra ngoài, chỉ nhận hàng outsource về như hàng tốt khi cert, report, trace và scope đã đủ theo pack, và phát hành lại pack hoặc addendum pack có kiểm soát cho mọi thay đổi part rev, spec rev, route, processor, lot, qty, clean hoặc vacuum class, customer note làm thay đổi yêu cầu kỹ thuật.</div>
 </div><div class="section">
 <h2>2. Bộ dữ liệu bìa pack bắt buộc</h2>
@@ -90,7 +90,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <h2>3. Thành phần bắt buộc của Outsource Pack</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm tài liệu</th><th>Phải có trong pack</th><th>Ghi chú dùng thực tế</th></tr></thead><tbody>
 <tr><td>Khóa kỹ thuật</td><td>Drawing/spec đúng revision, note CTQ, spec quy trình, acceptance criteria, hình minh họa vùng mask/unmask khi áp dụng.</td><td>Không gửi file cũ sửa tay. File pack phải chỉ về bản kiểm soát trong SSOT.</td></tr>
-<tr><td>Khóa giao dịch</td><td>Subcontract PO, dòng luồng-down bắt buộc, ngày đến hạn, qty gửi, qty trả, partial ship rule, quy trình route.</td><td>Không dùng email thay thế PO chính thức.</td></tr>
+<tr><td>Khóa giao dịch</td><td>Subcontract PO, dòng luồng-down bắt buộc, ngày đến hạn, qty gửi, qty trả, giao hàng một phần rule, quy trình route.</td><td>Không dùng email thay thế PO chính thức.</td></tr>
 <tr><td>Khóa truy vết</td><td>Traveller/routing extract, source lot/heat/batch, receipt reference, previous cổng kiểm soát release bằng chứng.</td><td>PHẢI chặn gửi hàng chưa PASS công đoạn trước đó.</td></tr>
 <tr><td>Khóa chứng từ trả về</td><td>Danh mục cert/report phải trả về: CoC/CoA/MTR/quy trình cert/thickness-hardness-test report/photo pack khi áp dụng.</td><td>Phải nêu rõ trường nào bắt buộc: part, rev, lot, spec, result, date, processor site.</td></tr>
 <tr><td>Khóa bảo vệ và logistics</td><td>Packaging rule, label format, orientation, tray/box qty, desiccant/HIC/purge rule khi áp dụng, SSCC/logistic label rule nếu dùng.</td><td>Part clean/vacuum, part bề mặt bóng, part mỏng hoặc dễ cong phải có rule riêng.</td></tr>
@@ -132,7 +132,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <h2>7. Khi nào pack phải phát hành lại hoặc bổ sung addendum</h2>
 <ul class="tight" style="padding-left:18px;">
 <li>Đổi Part/Rev, đổi spec quy trình revision, đổi yêu cầu cleanliness/packaging, đổi processor/site hoặc đổi route.</li>
-<li>Phát sinh split lot, partial ship, rework, salvage, concession, customer witness hoặc source kiểm tra mà bản pack cũ chưa nêu.</li>
+<li>Phát sinh split lot, giao hàng một phần, rework, salvage, concession, customer witness hoặc source kiểm tra mà bản pack cũ chưa nêu.</li>
 <li>Processor báo đổi chemistry, line, furnace/tank, fixture, masking method, người phụ trách chứng chỉ hoặc thay đổi có thể ảnh hưởng kết quả.</li>
 <li>Receipt back có NCR/SCAR và lô kế tiếp vẫn sử dụng cùng processor/quy trình family nhưng control plan đã tăng mức kiểm.</li>
 </ul>
