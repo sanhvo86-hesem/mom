@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>TRN-Bài diễn tập ACA-DRL-05 — CAM Gói release + Change control | HESEM Academy</title>
+<title>TRN-Bài diễn tập ACA-DRL-05 — CAM Gói phát hành + Kiểm soát thay đổi | HESEM Academy</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -55,49 +55,49 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Document kiểm soát</span>
+    <span>Tài liệu kiểm soát</span>
   </div>
 </div>
 <div class="title">
-  <strong>DIỄN TẬP-Bài diễn tập CAM-RELEASE-CHANGECONTRO — CAM Gói release + Change control | HESEM Academy</strong>
+  <strong>DIỄN TẬP-Bài diễn tập CAM-PHÁT HÀNH-kiểm soát thay đổi (CHANGECONTRO) — CAM Gói phát hành + Kiểm soát thay đổi | HESEM Academy</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>DIỄN TẬP-CAM-RELEASE-CHANGECONTRO</span></div>
+  <div class="row"><span><b>Code:</b></span><span>DIỄN TẬP-CAM-PHÁT HÀNH-kiểm soát thay đổi (CHANGECONTRO)</span></div>
   <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
   <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
 <div class="cover">
 <div class="kicker">Bộ diễn tập</div>
-<h1 class="h1">DRL-Bài diễn tập 05 — CAM Gói release + Change control</h1>
+<h1 class="h1">DRL-Bài diễn tập 05 — CAM Gói phát hành + Kiểm soát thay đổi</h1>
 <p class="lead">
- Diễn tập này biến “lập trình xong” thành <b>release đúng hệ thống</b>: pack đầy đủ, có DCR record, có xác minh và bàn giao bằng SSOT.
+ Diễn tập này biến “lập trình xong” thành <b>phát hành đúng hệ thống</b>: pack đầy đủ, có DCR hồ sơ, có xác minh và bàn giao bằng SSOT.
  </p>
 </div>
 <div class="grid-2">
 <div class="card">
 <span class="badge">Mục tiêu</span>
 <ul class="tight">
-<li>Release chương trình (program release) có đủ pack và evidence mô phỏng.</li>
-<li>Change REV không làm chạy sai chương trình.</li>
-<li>Pack cũ được archive và traceability được.</li>
+<li>Phát hành chương trình (program phát hành) có đủ pack và bằng chứng mô phỏng.</li>
+<li>Thay đổi REV không làm chạy sai chương trình.</li>
+<li>Pack cũ được lưu trữ và truy xuất nguồn gốc được.</li>
 </ul>
 </div>
 <div class="card">
-<span class="badge">Competence kích hoạt</span>
+<span class="badge">Năng lực kích hoạt</span>
 <ul class="tight"><li><a href="../../01-Competency-System/02-Levels/index.html#C17"><b>C17</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C13"><b>C13</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C08"><b>C08</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C02"><b>C02</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C10"><b>C10</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C04"><b>C04</b></a></li></ul>
 </div>
 </div>
 <div class="card">
 <span class="badge">Chuẩn bị</span>
 <ul class="tight">
-<li>01 job có drawing/spec và có thay đổi REV và tạo change scenario.</li>
-<li>Template baseline pack tại 10_Engineering/.</li>
-<li>Quy tắc naming: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
+<li>01 job có drawing/spec và có thay đổi REV và tạo thay đổi tình huống.</li>
+<li>Template mốc chuẩn pack tại 10_Engineering/.</li>
+<li>Quy tắc đặt tên: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
 </ul>
 </div>
 <div class="card">
@@ -105,30 +105,30 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Control gate (gate)</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Xác nhận input: drawing/spec đúng REV và CTQ list đã chốt.</td><td>CAM/ENG</td><td>Link input files + REV confirmation note</td><td>STOP</td></tr><tr><td>2</td><td>Tạo program + tool list + setup sheet theo template baseline.</td><td>CAM</td><td>Program file + tool list + setup sheet</td><td>HOLD</td></tr><tr><td>3</td><td>Chạy mô phỏng/xác minh và lưu evidence (ảnh hoặc report).</td><td>CAM</td><td>Mô phỏng report/ảnh</td><td>HOLD</td></tr><tr><td>4</td><td>Gói release: đặt tên file đúng chuẩn, tạo DCR record (REV, date, reason).</td><td>CAM/ENG</td><td>Release log + link pack</td><td>BLOCK</td></tr><tr><td>5</td><td>Release: cập nhật Job dossier (job dossier)/10_Engineering/ và gửi link cho Setup/Production.</td><td>CAM</td><td>SharePoint link + bàn giao log</td><td>FAIL</td></tr><tr><td>6</td><td>Change scenario: nhận drawing REV mới → recall pack cũ, archive, tạo pack mới và chạy xác minh lại.</td><td>CAM/ENG + QA</td><td>Change notice + new pack + archive proof</td><td>BLOCK</td></tr>
+<tr><td>1</td><td>Xác nhận đầu vào: drawing/spec đúng REV và CTQ list đã chốt.</td><td>CAM/ENG</td><td>Link đầu vào tập tin + REV xác nhận note</td><td>STOP</td></tr><tr><td>2</td><td>Tạo program + danh sách dao cụ + phiếu cài đặt theo template mốc chuẩn.</td><td>CAM</td><td>Program file + danh sách dao cụ + phiếu cài đặt</td><td>TẠM GIỮ</td></tr><tr><td>3</td><td>Chạy mô phỏng/xác minh và lưu bằng chứng (ảnh hoặc báo cáo).</td><td>CAM</td><td>Mô phỏng báo cáo/ảnh</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Gói phát hành: đặt tên file đúng chuẩn, tạo DCR hồ sơ (REV, date, lý do).</td><td>CAM/ENG</td><td>Phát hành log + link pack</td><td>CHẶN</td></tr><tr><td>5</td><td>Phát hành: cập nhật Hồ sơ công việc (hồ sơ công việc)/10_Engineering/ và gửi link cho Setup/Sản xuất.</td><td>CAM</td><td>SharePoint link + bàn giao log</td><td>FAIL</td></tr><tr><td>6</td><td>Thay đổi tình huống: nhận drawing REV mới → thu hồi pack cũ, lưu trữ, tạo pack mới và chạy xác minh lại.</td><td>CAM/ENG + QA</td><td>Thay đổi thông báo + new pack + lưu trữ bằng chứng</td><td>CHẶN</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="card danger">
-<span class="badge">Fail-fast</span>
+<span class="badge">Fail-nhanh</span>
 <ul class="tight">
-<li>Release program khi chưa có mô phỏng/xác minh evidence.</li>
-<li>Không có DCR record khi thay đổi REV.</li>
-<li>Pack cũ không archive dẫn tới nhầm lẫn tại workshop.</li>
+<li>Phát hành program khi chưa có mô phỏng/xác minh bằng chứng.</li>
+<li>Không có DCR hồ sơ khi thay đổi REV.</li>
+<li>Pack cũ không lưu trữ dẫn tới nhầm lẫn tại phân xưởng.</li>
 </ul>
 </div>
 <div class="card">
-<span class="badge">Rubric chấm điểm (10 điểm)</span>
-<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. đạt khi tổng ≥ 8/10 và không vi phạm fail-fast.</p>
+<span class="badge">Tiêu chí đánh giá chấm điểm (10 điểm)</span>
+<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. đạt khi tổng ≥ 8/10 và không vi phạm fail-nhanh.</p>
 <div class="table-card">
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Input control</b></td><td>Input file controlled và đúng REV; CTQ list có dấu vết.</td><td>0/1/2</td></tr><tr><td><b>Release completeness</b></td><td>Program + tool list + setup sheet + mô phỏng evidence đầy đủ.</td><td>0/1/2</td></tr><tr><td><b>Change discipline</b></td><td>Pack cũ được archive; pack mới có DCR record và xác minh lại.</td><td>0/1/2</td></tr><tr><td><b>Bàn giao</b></td><td>Setup/Production nhận link SSOT; không gửi file đính kèm qua chat.</td><td>0/1/2</td></tr><tr><td><b>Record quality</b></td><td>Tên file đúng chuẩn; không có trùng tên/overwrite.</td><td>0/1/2</td></tr>
+<tr><td><b>Đầu vào control</b></td><td>Đầu vào file được kiểm soát và đúng REV; CTQ list có dấu vết.</td><td>0/1/2</td></tr><tr><td><b>Phát hành tính đầy đủ</b></td><td>Program + danh sách dao cụ + phiếu cài đặt + mô phỏng bằng chứng đầy đủ.</td><td>0/1/2</td></tr><tr><td><b>Thay đổi kỷ luật / chuyên ngành</b></td><td>Pack cũ được lưu trữ; pack mới có DCR hồ sơ và xác minh lại.</td><td>0/1/2</td></tr><tr><td><b>Bàn giao</b></td><td>Setup/Sản xuất nhận link SSOT; không gửi file đính kèm qua chat.</td><td>0/1/2</td></tr><tr><td><b>Hồ sơ chất lượng</b></td><td>Tên file đúng chuẩn; không có trùng tên/ghi đè.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>
@@ -136,10 +136,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">MRR tối thiểu</span>
 <ul class="tight">
-<li>Program file + tool list + setup sheet theo naming rule.</li>
-<li>Mô phỏng/xác minh evidence.</li>
-<li>Release log + DCR record.</li>
-<li>Proof archive pack cũ tại 90_Archive/ (link SSOT).</li>
+<li>Program file + danh sách dao cụ + phiếu cài đặt theo đặt tên rule.</li>
+<li>Mô phỏng/xác minh bằng chứng.</li>
+<li>Phát hành log + DCR hồ sơ.</li>
+<li>bằng chứng lưu trữ pack cũ tại 90_Archive/ (link SSOT).</li>
 </ul>
 </div>
 </div>
@@ -147,6 +147,6 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

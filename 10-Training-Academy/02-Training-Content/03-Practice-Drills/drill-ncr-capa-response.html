@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>TRN-Bài diễn tập ACA-DRL-06 — NCR + CAPA Quick Response | HESEM Academy</title>
+<title>TRN-Bài diễn tập ACA-DRL-06 — NCR + CAPA Nhanh Phản hồi | HESEM Academy</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -55,41 +55,41 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Document kiểm soát</span>
+    <span>Tài liệu kiểm soát</span>
   </div>
 </div>
 <div class="title">
-  <strong>DIỄN TẬP-Bài diễn tập NCR-CAPA-RESPONSE — NCR + CAPA Quick Response | HESEM Academy</strong>
+  <strong>DIỄN TẬP-Bài diễn tập NCR-CAPA-phản hồi — NCR + CAPA Nhanh Phản hồi | HESEM Academy</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>DIỄN TẬP-NCR-CAPA-RESPONSE</span></div>
+  <div class="row"><span><b>Code:</b></span><span>DIỄN TẬP-NCR-CAPA-phản hồi</span></div>
   <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
   <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
 <div class="cover">
 <div class="kicker">Bộ diễn tập</div>
-<h1 class="h1">DRL-Bài diễn tập 06 — NCR + CAPA Quick Response</h1>
+<h1 class="h1">DRL-Bài diễn tập 06 — NCR + CAPA Nhanh Phản hồi</h1>
 <p class="lead">
  Diễn tập này luyện phản xạ <b>chặn lỗi lan rộng</b> và <b>đóng CAPA có hiệu lực</b>.
- Mục tiêu: không để lỗi thoát ra customer và không để lỗi lặp lại trong 30 ngày.
+ Mục tiêu: không để lỗi thoát ra khách hàng và không để lỗi lặp lại trong 30 ngày.
  </p>
 </div>
 <div class="grid-2">
 <div class="card">
 <span class="badge">Mục tiêu</span>
 <ul class="tight">
-<li>STOP/HOLD đúng thời điểm.</li>
-<li>NCR đúng cấu trúc và có containment.</li>
+<li>STOP/TẠM GIỮ đúng thời điểm.</li>
+<li>NCR đúng cấu trúc và có ngăn chặn.</li>
 <li>CAPA cập nhật standard và có xác minh.</li>
 </ul>
 </div>
 <div class="card">
-<span class="badge">Competence kích hoạt</span>
+<span class="badge">Năng lực kích hoạt</span>
 <ul class="tight"><li><a href="../../01-Competency-System/02-Levels/index.html#C03"><b>C03</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C06"><b>C06</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C04"><b>C04</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C13"><b>C13</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C08"><b>C08</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C02"><b>C02</b></a></li></ul>
 </div>
 </div>
@@ -97,8 +97,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">Chuẩn bị</span>
 <ul class="tight">
 <li>01 lỗi thật hoặc 01 tình huống mô phỏng (có mẫu NG, ảnh, số lượng ảnh hưởng).</li>
-<li>NCR form + CAPA form + HOLD tag.</li>
-<li>Quy tắc naming: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
+<li>NCR biểu mẫu + CAPA biểu mẫu + TẠM GIỮ tag.</li>
+<li>Quy tắc đặt tên: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
 </ul>
 </div>
 <div class="card">
@@ -106,31 +106,31 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Control gate (gate)</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Phát hiện lỗi tại IPQC/Final: cô lập sản phẩm, gắn HOLD tag và cập nhật WIP trạng thái.</td><td>QC/Operator</td><td>Ảnh HOLD tag + ERP/WIP log</td><td>STOP</td></tr><tr><td>2</td><td>Mở NCR theo 5W1H: mô tả, vị trí, số lượng ảnh hưởng, ảnh kèm theo.</td><td>QC/QA</td><td>NCR record + ảnh</td><td>HOLD</td></tr><tr><td>3</td><td>Containment: xác định lô liên quan, chặn chuyển bước, inspection 100% (KHI cần).</td><td>Supervisor + QC</td><td>Containment checklist + kết quả</td><td>HOLD</td></tr><tr><td>4</td><td>Nguyên nhân gốc: 5Why + xác định nguyên nhân gốc thuộc người/máy/phương pháp/vật liệu.</td><td>QA/ENG/OPS</td><td>5Why sheet (ký)</td><td>HOLD</td></tr><tr><td>5</td><td>Corrective action: chốt hành động + người phụ trách + due, cập nhật standard (setup sheet/SOP/parameter).</td><td>Responsible Person + QA</td><td>CAPA record + updated standard</td><td>BLOCK</td></tr><tr><td>6</td><td>Effectiveness: chạy xác minh (first-off) và ghi IR xác nhận không tái phát.</td><td>QC</td><td>Xác minh IR + link</td><td>FAIL</td></tr><tr><td>7</td><td>Lưu toàn bộ record vào 30_QC/ theo naming rule và tạo link bàn giao.</td><td>QA</td><td>Links SSOT</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Phát hiện lỗi tại IPQC/Final: cô lập sản phẩm, gắn TẠM GIỮ tag và cập nhật WIP trạng thái.</td><td>QC/Người vận hành</td><td>Ảnh TẠM GIỮ tag + ERP/WIP log</td><td>STOP</td></tr><tr><td>2</td><td>Mở NCR theo 5W1H: mô tả, vị trí, số lượng ảnh hưởng, ảnh kèm theo.</td><td>QC/QA</td><td>NCR hồ sơ + ảnh</td><td>TẠM GIỮ</td></tr><tr><td>3</td><td>Ngăn chặn: xác định lô liên quan, chặn chuyển bước, kiểm tra 100% (KHI cần).</td><td>Supervisor + QC</td><td>Ngăn chặn bảng kiểm + kết quả</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Nguyên nhân gốc: 5Why + xác định nguyên nhân gốc thuộc người/máy/phương pháp/vật liệu.</td><td>QA/ENG/OPS</td><td>5Why sheet (ký)</td><td>TẠM GIỮ</td></tr><tr><td>5</td><td>khắc phục hành động: chốt hành động + người phụ trách + due, cập nhật standard (phiếu cài đặt/SOP/thông số).</td><td>Responsible Person + QA</td><td>CAPA hồ sơ + đã cập nhật standard</td><td>CHẶN</td></tr><tr><td>6</td><td>Effectiveness: chạy xác minh (đầu tiên-off) và ghi IR xác nhận không tái phát.</td><td>QC</td><td>Xác minh IR + link</td><td>FAIL</td></tr><tr><td>7</td><td>Lưu toàn bộ hồ sơ vào 30_QC/ theo đặt tên rule và tạo link bàn giao.</td><td>QA</td><td>liên kết SSOT</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="card danger">
-<span class="badge">Fail-fast</span>
+<span class="badge">Fail-nhanh</span>
 <ul class="tight">
-<li>Không cô lập HOLD ngay tại điểm phát hiện.</li>
+<li>Không cô lập TẠM GIỮ ngay tại điểm phát hiện.</li>
 <li>NCR thiếu 5W1H hoặc thiếu ảnh.</li>
 <li>CAPA không cập nhật standard (chỉ hứa miệng).</li>
-<li>Không có xác minh record.</li>
+<li>Không có xác minh hồ sơ.</li>
 </ul>
 </div>
 <div class="card">
-<span class="badge">Rubric chấm điểm (10 điểm)</span>
-<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. đạt khi tổng ≥ 8/10 và không vi phạm fail-fast.</p>
+<span class="badge">Tiêu chí đánh giá chấm điểm (10 điểm)</span>
+<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. đạt khi tổng ≥ 8/10 và không vi phạm fail-nhanh.</p>
 <div class="table-card">
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Containment</b></td><td>Cô lập đúng; scope rõ; không để customer escape.</td><td>0/1/2</td></tr><tr><td><b>NCR quality</b></td><td>5W1H đầy đủ; có ảnh; có quantity; có disposition.</td><td>0/1/2</td></tr><tr><td><b>Nguyên nhân gốc</b></td><td>5Why logic; không dừng ở triệu chứng; có evidence supporting.</td><td>0/1/2</td></tr><tr><td><b>Corrective action</b></td><td>Hành động chặn lặp gắn vào standard; có người phụ trách + due.</td><td>0/1/2</td></tr><tr><td><b>Effectiveness</b></td><td>Có xác minh record; kết quả PASS; lưu SSOT đúng chuẩn.</td><td>0/1/2</td></tr>
+<tr><td><b>Ngăn chặn</b></td><td>Cô lập đúng; scope rõ; không để khách hàng thoát / bỏ qua.</td><td>0/1/2</td></tr><tr><td><b>NCR chất lượng</b></td><td>5W1H đầy đủ; có ảnh; có số lượng; có disposition.</td><td>0/1/2</td></tr><tr><td><b>Nguyên nhân gốc</b></td><td>5Why logic; không dừng ở triệu chứng; có bằng chứng hỗ trợ.</td><td>0/1/2</td></tr><tr><td><b>khắc phục hành động</b></td><td>Hành động chặn lặp gắn vào standard; có người phụ trách + due.</td><td>0/1/2</td></tr><tr><td><b>Effectiveness</b></td><td>Có xác minh hồ sơ; kết quả PASS; lưu SSOT đúng chuẩn.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>
@@ -138,9 +138,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">MRR tối thiểu</span>
 <ul class="tight">
-<li>HOLD tag photo + WIP/ERP log.</li>
-<li>NCR + ảnh + containment checklist.</li>
-<li>5Why sheet + CAPA record.</li>
+<li>TẠM GIỮ tag ảnh chụp + WIP/ERP log.</li>
+<li>NCR + ảnh + ngăn chặn bảng kiểm.</li>
+<li>5Why sheet + CAPA hồ sơ.</li>
 <li>Xác minh IR.</li>
 </ul>
 </div>
@@ -149,6 +149,6 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

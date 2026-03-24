@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SYS-OPS-11 — Go-live Runbook: UAT, Cutover, Hypercare, Rollback | HESEM OS</title>
+<title>SYS-OPS-11 — Go-vận hành thực Sổ tay vận hành: UAT, Chuyển giao hệ thống, Hỗ trợ tăng cường (Hypercare), hoàn tác / quay lại | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
 /* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
@@ -45,50 +45,50 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Document kiểm soát</span>
+    <span>Tài liệu kiểm soát</span>
   </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-11 — Go-live Runbook: UAT, Cutover, Hypercare, Rollback</strong>
+  <strong>SYS-OPS-11 — Go-vận hành thực Sổ tay vận hành: UAT, Chuyển giao hệ thống, Hỗ trợ tăng cường (Hypercare), hoàn tác / quay lại</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
   <div class="row"><span><b>Code:</b></span><span>SYS-OPS-11</span></div>
   <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
   <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
   <div class="form-sheet">
     <div class="card">
-      <span class="badge">SYSTEM GUIDE</span>
-      <h1 class="h1" style="margin-top:12px;">Go-live Runbook</h1>
-      <p class="muted">Document hướng dẫn operation go-live theo 4 pha. Mỗi bước phải có evidence lưu tại SSOT (M365/SharePoint). Không dùng DCR record trong document; mọi thay đổi kiểm soát qua SOP-QMS-001.</p>
+      <span class="badge">SYSTEM hướng dẫn</span>
+      <h1 class="h1" style="margin-top:12px;">Go-vận hành thực Sổ tay vận hành</h1>
+      <p class="muted">Tài liệu hướng dẫn vận hành go-vận hành thực theo 4 pha. Mỗi bước phải có bằng chứng lưu tại SSOT (M365/SharePoint). Không dùng DCR hồ sơ trong tài liệu; mọi thay đổi kiểm soát qua SOP-QMS-001.</p>
 
-      <h2 class="h2">1. UAT (User Acceptance Testing)</h2>
+      <h2 class="h2">1. UAT (Người dùng Acceptance kiểm thử)</h2>
       <ul class="list">
-        <li><b>Thực hiện:</b> System Administrator (IT-02) phối hợp Process Owner liên quan (QA/OPS/ENG/PUR/FIN/WHS).</li>
-        <li><b>Evidence:</b> UAT test cases, defect log, sign-off.</li>
+        <li><b>Thực hiện:</b> System Quản trị viên (IT-02) phối hợp Quy trình Owner liên quan (QA/OPS/ENG/PUR/FIN/WHS).</li>
+        <li><b>Bằng chứng:</b> UAT test trường hợp, khuyết tật log, ký-off.</li>
       </ul>
 
-      <h2 class="h2">2. Cutover</h2>
+      <h2 class="h2">2. Chuyển giao hệ thống</h2>
       <ul class="list">
-        <li><b>Thực hiện:</b> System Administrator (IT-02).</li>
-        <li><b>Evidence:</b> Cutover checklist, backup confirmation, access xác minh.</li>
+        <li><b>Thực hiện:</b> System Quản trị viên (IT-02).</li>
+        <li><b>Bằng chứng:</b> Chuyển giao hệ thống bảng kiểm, backup xác nhận, truy cập xác minh.</li>
       </ul>
 
-      <h2 class="h2">3. Hypercare</h2>
+      <h2 class="h2">3. Hỗ trợ tăng cường (Hypercare)</h2>
       <ul class="list">
-        <li><b>Thực hiện:</b> System Administrator (IT-02) + QA Manager (QA-01).</li>
-        <li><b>Evidence:</b> Hypercare vấn đề log, fix xác nhận notes, training updates nếu có.</li>
+        <li><b>Thực hiện:</b> System Quản trị viên (IT-02) + QA Manager (QA-01).</li>
+        <li><b>Bằng chứng:</b> Hỗ trợ tăng cường (Hypercare) vấn đề log, fix xác nhận ghi chú, đào tạo cập nhật nếu có.</li>
       </ul>
 
-      <h2 class="h2">4. Rollback</h2>
+      <h2 class="h2">4. hoàn tác / quay lại</h2>
       <ul class="list">
-        <li><b>Thực hiện:</b> System Administrator (IT-02) (kích hoạt khi không đạt criteria đạt ngưỡng).</li>
-        <li><b>Evidence:</b> Rollback decision record, restore các log, post-mortem action list.</li>
+        <li><b>Thực hiện:</b> System Quản trị viên (IT-02) (kích hoạt khi không đạt tiêu chí đạt ngưỡng).</li>
+        <li><b>Bằng chứng:</b> hoàn tác / quay lại quyết định hồ sơ, khôi phục các log, ghi sổ / đăng-sau sự cố (ghi sổ / đăng-mortem) hành động list.</li>
       </ul>
     </div>
   </div>
@@ -96,7 +96,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 
 </div></div></div>
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

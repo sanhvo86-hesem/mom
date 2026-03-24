@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>WI-702 — Bảo quản, môi trường kho/workshop, vị trí, FIFO/FEFO và kiểm soát chạm hỏng | HESEM QMS</title>
+<title>WI-702 — Bảo quản, môi trường kho/phân xưởng, vị trí, FIFO/FEFO và kiểm soát chạm hỏng | HESEM QMS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
 @media print {
@@ -51,124 +51,124 @@ ul.tight li {margin:4px 0;}
 <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-<span>Document operation • Work Instruction</span>
+<span>Tài liệu vận hành • Công việc Hướng dẫn</span>
 </div>
 </div>
-<div class="title"><strong>WI-702 — Bảo quản, môi trường kho/workshop, vị trí, FIFO/FEFO và kiểm soát chạm hỏng</strong></div>
+<div class="title"><strong>WI-702 — Bảo quản, môi trường kho/phân xưởng, vị trí, FIFO/FEFO và kiểm soát chạm hỏng</strong></div>
 <div class="meta">
 <div class="row"><span><b>Code:</b></span><span>WI-702</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
-<div class="row"><span><b>Owner:</b></span><span>Warehouse Supervisor / Production Supervisor / QA</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
+<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Owner:</b></span><span>Kho Supervisor / Sản xuất Supervisor / QA</span></div>
+<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi khu vực lưu kho, staging, WIP, khu clean hold và thành phẩm chờ giao để duy trì đúng điều kiện, vị trí và thứ tự cấp phát.</div>
-<h1>WI-702 — Bảo quản, môi trường kho/workshop, vị trí, FIFO/FEFO và kiểm soát chạm hỏng</h1><div class="section"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
-<p>WI này khóa cách lưu kho, staging, giữ môi trường, bố trí vị trí, cấp phát FIFO/FEFO, hoàn trả hàng và phản ứng khi phát hiện bất thường đối với raw material, bán thành phẩm, thành phẩm, hàng clean-pack và vật tư packaging có kiểm soát. Mục tiêu là giữ đúng <strong>truy vết</strong>, đúng <strong>tình trạng bảo quản</strong>, đúng <strong>vị trí</strong> và đúng <strong>thứ tự cấp phát</strong> từ lúc hàng được nhập vị trí cho đến khi vấn đề cho công đoạn hoặc giao cho khách.</p>
-<p><strong>QUYỀN DỪNG:</strong> Warehouse, IQC, QA, Planning, Production Supervisor và người có authority release được quyền dừng cấp phát hoặc dừng chuyển vị trí khi phát hiện sai nhãn trạng thái, thiếu lot/heat, lệch môi trường, lô clean-pack mất seal, dấu hiệu ăn mòn, lẫn revision, lẫn location hoặc tồn già vượt rule.</p>
-<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Lưu hàng cách nền, cách tường, trong giới hạn chịu tải, ghi nhận mọi vị trí tạm, cấp phát theo FIFO hoặc FEFO đã xác nhận và dùng đúng vật liệu ngăn cách cho part đã hoàn thiện bề mặt.</div></div><div class="section"><h2>2. Rule phân vùng, trạng thái và quyền operation theo zone</h2>
-<div style="background:#FEF9C3;border-left:4px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Quy tắc vị trí kho, zoning, FIFO/FEFO, staging và cycle count</a>. WI này tóm tắt các quy tắc chính để operation nhanh tại hiện trường.</div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Zone</th><th>Dùng cho</th><th>Ai được đặt / lấy</th><th>Nhãn bắt buộc</th><th>Điều kiện được rời zone</th></tr></thead><tbody>
-<tr><td>RM</td><td>Raw material đã PASS và đủ truy vết</td><td>Warehouse; IQC chỉ xác nhận trạng thái</td><td>Part/Material family, size, heat/lot, qty, location</td><td>Chỉ vấn đề theo WO/Job đã được dispatch và theo FIFO/heat plan</td></tr>
-<tr><td>IQC</td><td>Hàng mới nhận chờ xác nhận chứng từ hoặc kiểm input</td><td>Receiving/IQC</td><td>PO/ASN, supplier, part, qty, trạng thái IQC</td><td>Phải có PASS hoặc quyết định xử lý hợp lệ</td></tr>
-<tr><td>QH</td><td>Hold / quarantine / suspect / chờ MRB</td><td>QA hoặc người được QA ủy quyền</td><td>Nhãn đỏ lớn, lý do hold, người phụ trách, ngày hold</td><td>Chỉ rời zone khi có release theo <a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> hoặc quyết định xử lý được ghi nhận</td></tr>
-<tr><td>WIP</td><td>Bán thành phẩm giữa các công đoạn</td><td>Warehouse / Production theo quy định line-side</td><td>Job no, operation, qty tốt/NG, revision, người phụ trách</td><td>Chỉ chuyển tiếp khi traveler và trạng thái operation khớp</td></tr>
-<tr><td>FG</td><td>Thành phẩm đã final release nhưng chưa ship</td><td>QA release xong mới bàn giao cho Warehouse/Shipping</td><td>Part/Rev, qty, ship set, release trạng thái</td><td>Chỉ rời zone khi vào luồng packaging/approval delivery (ship release)</td></tr>
-<tr><td>CLEAN</td><td>Hàng sạch, vacuum, low-particle, clean-pack</td><td>Nhân sự được chỉ định, có gowning/PPE phù hợp</td><td>Clean trạng thái, seal trạng thái, open time nếu có, handling note</td><td>Chỉ được mở/đóng lại theo <a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a> hoặc <a href="wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a></td></tr>
-<tr><td>OVF</td><td>Overflow / vị trí tạm khi location chuẩn đầy tải</td><td>Warehouse Supervisor approval</td><td>Location chuẩn gốc, location overflow, ngày bắt đầu, người phụ trách</td><td>Phải được đưa về location chuẩn ngay khi có chỗ; không được để overflow trở thành kho chính</td></tr>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi khu vực lưu kho, khu vực chuẩn bị / sắp xếp, WIP, khu clean hold và thành phẩm chờ giao để duy trì đúng điều kiện, vị trí và thứ tự cấp phát.</div>
+<h1>WI-702 — Bảo quản, môi trường kho/phân xưởng, vị trí, FIFO/FEFO và kiểm soát chạm hỏng</h1><div class="section"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
+<p>WI này khóa cách lưu kho, khu vực chuẩn bị / sắp xếp, giữ môi trường, bố trí vị trí, cấp phát FIFO/FEFO, hoàn trả hàng và phản ứng khi phát hiện bất thường đối với raw nguyên vật liệu, bán thành phẩm, thành phẩm, hàng clean-pack và vật tư đóng gói có kiểm soát. Mục tiêu là giữ đúng <strong>truy vết</strong>, đúng <strong>tình trạng bảo quản</strong>, đúng <strong>vị trí</strong> và đúng <strong>thứ tự cấp phát</strong> từ lúc hàng được nhập vị trí cho đến khi vấn đề cho công đoạn hoặc giao cho khách.</p>
+<p><strong>QUYỀN DỪNG:</strong> Kho, IQC, QA, Kế hoạch, Sản xuất Supervisor và người có thẩm quyền phát hành được quyền dừng cấp phát hoặc dừng chuyển vị trí khi phát hiện sai nhãn trạng thái, thiếu lot/mẻ nấu (heat), lệch môi trường, lô clean-pack mất niêm phong, dấu hiệu ăn mòn, lẫn phiên bản, lẫn vị trí hoặc tồn già vượt rule.</p>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Lưu hàng cách nền, cách tường, trong giới hạn chịu tải, ghi nhận mọi vị trí tạm, cấp phát theo FIFO hoặc FEFO đã xác nhận và dùng đúng vật liệu ngăn cách cho part đã hoàn thiện bề mặt.</div></div><div class="section"><h2>2. Rule phân vùng, trạng thái và quyền vận hành theo khu vực</h2>
+<div style="background:#FEF9C3;border-left:4px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Quy tắc vị trí kho, phân vùng, FIFO/FEFO, khu vực chuẩn bị / sắp xếp và cycle count</a>. WI này tóm tắt các quy tắc chính để vận hành nhanh tại hiện trường.</div>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Khu vực</th><th>Dùng cho</th><th>Ai được đặt / lấy</th><th>Nhãn bắt buộc</th><th>Điều kiện được rời khu vực</th></tr></thead><tbody>
+<tr><td>RM</td><td>Raw nguyên vật liệu đã PASS và đủ truy vết</td><td>Kho; IQC chỉ xác nhận trạng thái</td><td>Part/Nguyên vật liệu nhóm sản phẩm, size, mẻ nấu (heat)/lot, qty, vị trí</td><td>Chỉ vấn đề theo WO/Job đã được điều phối xuất hàng và theo FIFO/mẻ nấu (heat) plan</td></tr>
+<tr><td>IQC</td><td>Hàng mới nhận chờ xác nhận chứng từ hoặc kiểm đầu vào</td><td>Nhận hàng/IQC</td><td>PO/ASN, nhà cung cấp, part, qty, trạng thái IQC</td><td>Phải có PASS hoặc quyết định xử lý hợp lệ</td></tr>
+<tr><td>QH</td><td>Hold / cách ly / biệt trữ / nghi ngờ / chờ MRB</td><td>QA hoặc người được QA ủy quyền</td><td>Nhãn đỏ lớn, lý do hold, người phụ trách, ngày hold</td><td>Chỉ rời khu vực khi có phát hành theo <a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> hoặc quyết định xử lý được ghi nhận</td></tr>
+<tr><td>WIP</td><td>Bán thành phẩm giữa các công đoạn</td><td>Kho / Sản xuất theo quy định dòng / chuyền-cạnh / mặt bên</td><td>Job no, vận hành, qty tốt/NG, phiên bản, người phụ trách</td><td>Chỉ chuyển tiếp khi traveler và trạng thái vận hành khớp</td></tr>
+<tr><td>FG</td><td>Thành phẩm đã final phát hành nhưng chưa ship</td><td>QA phát hành xong mới bàn giao cho Kho/Giao vận</td><td>Part/Rev, qty, ship set, phát hành trạng thái</td><td>Chỉ rời khu vực khi vào luồng đóng gói/phê duyệt giao hàng (ship phát hành)</td></tr>
+<tr><td>CLEAN</td><td>Hàng sạch, chân không, low-hạt / phần tử, clean-pack</td><td>Nhân sự được chỉ định, có mặc đồ bảo hộ (gowning)/PPE phù hợp</td><td>Clean trạng thái, niêm phong trạng thái, mở time nếu có, xử lý / vận chuyển note</td><td>Chỉ được mở/đóng lại theo <a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a> hoặc <a href="wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a></td></tr>
+<tr><td>OVF</td><td>tràn / vị trí tạm khi vị trí chuẩn đầy tải</td><td>Kho Supervisor phê duyệt</td><td>Vị trí chuẩn gốc, vị trí tràn, ngày bắt đầu, người phụ trách</td><td>Phải được đưa về vị trí chuẩn ngay khi có chỗ; không được để tràn trở thành kho chính</td></tr>
 </tbody></table></div>
-<p>Mọi thay đổi vị trí PHẢI được cập nhật trong giao dịch hoặc form quy định trước khi hàng rời tay người operation. Thay đổi miệng, giấy nháp rời, ảnh chụp gửi chat hoặc trí nhớ cá nhân không được coi là cập nhật vị trí hợp lệ.</p></div><div class="section"><h2>3. Điều kiện môi trường và bảo quản theo nhóm hàng</h2>
+<p>Mọi thay đổi vị trí PHẢI được cập nhật trong giao dịch hoặc biểu mẫu quy định trước khi hàng rời tay người vận hành. Thay đổi miệng, giấy nháp rời, ảnh chụp gửi chat hoặc trí nhớ cá nhân không được coi là cập nhật vị trí hợp lệ.</p></div><div class="section"><h2>3. Điều kiện môi trường và bảo quản theo nhóm hàng</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm hàng</th><th>Điều kiện giữ tối thiểu</th><th>Điểm kiểm bắt buộc</th><th>Phản ứng khi lệch</th></tr></thead><tbody>
-<tr><td>Raw material dạng cây/tấm/forging</td><td>Khu khô, sạch, kê khỏi nền, có chặn chống lăn; nhãn heat/lot luôn nhìn thấy được</td><td>Racking tải trọng, oil/protection film, dấu hiệu ẩm/rỉ, đầu thanh được bảo vệ</td><td>HOLD lô ảnh hưởng; tách khỏi usable stock; QA đánh giá lại khả năng dùng</td></tr>
-<tr><td>WIP đã gia công thô</td><td>Khay/box có ngăn, không chồng ép vào bề mặt CTQ, không để chung với đồ rời</td><td>WIP tag, operation trạng thái, part count, contact damage, chip/dung dịch làm mát (coolant) carryover</td><td>Dừng chuyển bước; phân loại OK/NG/rework; làm sạch hoặc đóng khay lại trước khi đưa đi</td></tr>
-<tr><td>WIP / FG đã có bề mặt hoàn thiện, anodize, plating, passivation, cosmetic face</td><td>Dùng separator phù hợp, túi/khay sạch, không cạ xước, không chạm tay trần vào vùng nhạy</td><td>Interleaf, sleeve/cap bảo vệ, xước mép, va chạm cạnh, nhãn orientation nếu có</td><td>Khoanh vùng 100%; đánh giá lại toàn bộ khay chứa cùng lô nếu phát hiện một chi tiết bị chạm hỏng</td></tr>
-<tr><td>Hàng clean-pack / vacuum-sensitive</td><td>Khu CLEAN hoặc tủ/kệ quy định; không để carton hở, bụi, dầu, mảnh chip, băng keo rời</td><td>Seal nguyên vẹn, open time, desiccant/HIC khi có requirement, clean label</td><td>HOLD ngay; đánh giá tái làm sạch / re-pack / tái kiểm sạch trước khi release lại</td></tr>
-<tr><td>Vật tư packaging, nhãn, túi, desiccant, HIC</td><td>Giữ khô, sạch, có FEFO/hạn dùng nếu áp dụng; tách khỏi khu có dầu/bụi/ẩm</td><td>Lot vật tư, shelf life, tình trạng bao nguyên, nhiễm bẩn risk</td><td>Loại khỏi line-side nếu ướt, rách, nhiễm bẩn hoặc hết hạn</td></tr>
-<tr><td>Customer property / customer-returned items</td><td>Tách zone nhận diện riêng, gắn nhãn rõ owner và tình trạng inspection</td><td>Qty, identity, damage-at-receipt, customer ref, special handling note</td><td>Không được nhập chung với stock HESEM; lệch phải báo customer và QA</td></tr>
+<tr><td>Raw nguyên vật liệu dạng cây/tấm/rèn</td><td>Khu khô, sạch, kê khỏi nền, có chặn chống lăn; nhãn mẻ nấu (heat)/lot luôn nhìn thấy được</td><td>kệ chứa tải trọng, oil/bảo vệ màng, dấu hiệu ẩm/rỉ, đầu thanh được bảo vệ</td><td>TẠM GIỮ lô ảnh hưởng; tách khỏi có thể sử dụng tồn kho; QA đánh giá lại khả năng dùng</td></tr>
+<tr><td>WIP đã gia công thô</td><td>Khay/box có ngăn, không chồng ép vào bề mặt CTQ, không để chung với đồ rời</td><td>WIP tag, vận hành trạng thái, part count, liên hệ hư hỏng, phoi (chip)/dung dịch làm mát (dung dịch làm nguội) mang sang / tồn dư</td><td>Dừng chuyển bước; phân loại OK/NG/làm lại; làm sạch hoặc đóng khay lại trước khi đưa đi</td></tr>
+<tr><td>WIP / FG đã có bề mặt hoàn thiện, xi mạ anốt (anodize), mạ, thụ động hóa (passivation), ngoại quan / bề ngoài mặt / bề mặt</td><td>Dùng tấm ngăn phù hợp, túi/khay sạch, không cạ xước, không chạm tay trần vào vùng nhạy</td><td>lót xen kẽ, ống lót (sleeve)/cap bảo vệ, xước mép, va chạm cạnh, nhãn định hướng / đào tạo hội nhập nếu có</td><td>Khoanh vùng 100%; đánh giá lại toàn bộ khay chứa cùng lô nếu phát hiện một chi tiết bị chạm hỏng</td></tr>
+<tr><td>Hàng clean-pack / chân không-nhạy cảm</td><td>Khu CLEAN hoặc tủ/kệ quy định; không để thùng carton hở, bụi, dầu, mảnh phoi (chip), băng keo rời</td><td>niêm phong nguyên vẹn, mở time, chất hút ẩm/HIC khi có yêu cầu, clean label</td><td>TẠM GIỮ ngay; đánh giá tái làm sạch / re-pack / tái kiểm sạch trước khi phát hành lại</td></tr>
+<tr><td>Vật tư đóng gói, nhãn, túi, chất hút ẩm, HIC</td><td>Giữ khô, sạch, có FEFO/hạn dùng nếu áp dụng; tách khỏi khu có dầu/bụi/ẩm</td><td>Lot vật tư, kệ tuổi thọ / vòng đời, tình trạng bao nguyên, nhiễm bẩn rủi ro</td><td>Loại khỏi dòng / chuyền-cạnh / mặt bên nếu ướt, rách, nhiễm bẩn hoặc hết hạn</td></tr>
+<tr><td>Khách hàng thuộc tính / tài sản / khách hàng-đã trả lại mục / hạng mục</td><td>Tách khu vực nhận diện riêng, gắn nhãn rõ owner và tình trạng kiểm tra</td><td>Qty, nhận dạng, hư hỏng-at-phiếu nhận / biên nhận, khách hàng ref, đặc biệt xử lý / vận chuyển note</td><td>Không được nhập chung với tồn kho HESEM; lệch phải báo khách hàng và QA</td></tr>
 </tbody></table></div>
-<div class="callout-warning"><strong>Rule mặc định:</strong> nếu bản vẽ, spec vật liệu, customer requirement hoặc rule clean/vacuum nghiêm hơn Annex này thì quy định nghiêm hơn được ưu tiên áp dụng. Khi không có spec riêng, dùng dải kiểm soát và zoning mặc định theo <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a>.</div></div><div class="section"><h2>4. Chuẩn put-away, relocation, return-to-stock và staging</h2>
+<div class="callout-warning"><strong>Rule mặc định:</strong> nếu bản vẽ, spec vật liệu, khách hàng yêu cầu hoặc rule clean/chân không nghiêm hơn Annex này thì quy định nghiêm hơn được ưu tiên áp dụng. Khi không có spec riêng, dùng dải kiểm soát và phân vùng mặc định theo <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a>.</div></div><div class="section"><h2>4. Chuẩn put-cách xa / rời, di dời, trả lại-to-tồn kho và khu vực chuẩn bị / sắp xếp</h2>
 <div class="step-list">
-<div class="step-item"><strong>Put-away sau nhận hàng.</strong><br/>Chỉ put-away vào zone usable khi <a href="wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a> đã hoàn tất: hàng được nhận diện đúng, cert/trace đạt, nhãn truy vết đã dán và trạng thái không còn ở IQC/HOLD. Lô chưa rõ chứng từ chỉ được để tại zone IQC hoặc QH.</div>
-<div class="step-item"><strong>Relocation.</strong><br/>Mọi chuyển vị trí từ kệ này sang kệ khác, từ kho sang line-side, từ line-side về staging hoặc từ vị trí chuẩn sang overflow PHẢI kèm cập nhật location ngay trong cùng nhịp operation. Không được chuyển hàng trước, cập nhật sau theo kiểu “khi nào rảnh sẽ sửa”.</div>
-<div class="step-item"><strong>Temporary staging.</strong><br/>Staging phục vụ giao ca, gom đủ lô hoặc chờ xe nội bộ chỉ được dùng ngắn hạn. Nếu hàng nằm tại staging quá 1 ca hoặc qua đêm, Warehouse/Production PHẢI gán người phụ trách, lý do và ngày hết hạn staging; quá hạn mà chưa xử lý phải escalate cho Planning.</div>
-<div class="step-item"><strong>Return từ production.</strong><br/>Hàng dư sau khi vấn đề, remnant nguyên liệu, balance của partial lot hoặc part chưa gia công hết operation không được trả vào stock dùng chung nếu thiếu nhãn balance. Nhãn balance tối thiểu phải có Job/WO, part/rev, lot/heat, qty còn lại, công đoạn hiện tại và tình trạng usable / hold / rework.</div>
-<div class="step-item"><strong>Overflow / emergency move.</strong><br/>Khi phải dùng location overflow do đầy tải hoặc incident mặt bằng, Warehouse Supervisor PHẢI mở quyền overflow, ghi location chuẩn gốc, thời gian bắt đầu và điều kiện đưa hàng trở lại. Hàng clean-pack hoặc hàng đã final release không được đẩy vào overflow bừa bãi cùng hàng thường.</div>
-</div></div><div class="section"><h2>5. FIFO/FEFO, split lot, remnant và cấp phát theo Job</h2>
+<div class="step-item"><strong>Put-cách xa / rời sau nhận hàng.</strong><br/>Chỉ put-cách xa / rời vào khu vực có thể sử dụng khi <a href="wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a> đã hoàn tất: hàng được nhận diện đúng, cert/truy vết đạt, nhãn truy vết đã dán và trạng thái không còn ở IQC/TẠM GIỮ. Lô chưa rõ chứng từ chỉ được để tại khu vực IQC hoặc QH.</div>
+<div class="step-item"><strong>di dời.</strong><br/>Mọi chuyển vị trí từ kệ này sang kệ khác, từ kho sang dòng / chuyền-cạnh / mặt bên, từ dòng / chuyền-cạnh / mặt bên về khu vực chuẩn bị / sắp xếp hoặc từ vị trí chuẩn sang tràn PHẢI kèm cập nhật vị trí ngay trong cùng nhịp vận hành. Không được chuyển hàng trước, cập nhật sau theo kiểu “khi nào rảnh sẽ sửa”.</div>
+<div class="step-item"><strong>tạm thời khu vực chuẩn bị / sắp xếp.</strong><br/>khu vực chuẩn bị / sắp xếp phục vụ giao ca, gom đủ lô hoặc chờ xe nội bộ chỉ được dùng ngắn hạn. Nếu hàng nằm tại khu vực chuẩn bị / sắp xếp quá 1 ca hoặc qua đêm, Kho/Sản xuất PHẢI gán người phụ trách, lý do và ngày hết hạn khu vực chuẩn bị / sắp xếp; quá hạn mà chưa xử lý phải báo cáo vượt cấp cho Kế hoạch.</div>
+<div class="step-item"><strong>Trả lại từ sản xuất.</strong><br/>Hàng dư sau khi vấn đề, vật liệu thừa nguyên liệu, cân bằng / số dư của một phần lot hoặc part chưa gia công hết vận hành không được trả vào tồn kho dùng chung nếu thiếu nhãn cân bằng / số dư. Nhãn cân bằng / số dư tối thiểu phải có Job/WO, part/rev, lot/mẻ nấu (heat), qty còn lại, công đoạn hiện tại và tình trạng có thể sử dụng / hold / làm lại.</div>
+<div class="step-item"><strong>tràn / khẩn cấp di chuyển.</strong><br/>Khi phải dùng vị trí tràn do đầy tải hoặc sự cố mặt bằng, Kho Supervisor PHẢI mở quyền tràn, ghi vị trí chuẩn gốc, thời gian bắt đầu và điều kiện đưa hàng trở lại. Hàng clean-pack hoặc hàng đã final phát hành không được đẩy vào tràn bừa bãi cùng hàng thường.</div>
+</div></div><div class="section"><h2>5. FIFO/FEFO, tách / chia lot, vật liệu thừa và cấp phát theo Job</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Rule điều hành bắt buộc</th><th>Ai được quyết định ngoại lệ</th></tr></thead><tbody>
-<tr><td>Raw material cùng family, nhiều heat/lô</td><td>Ưu tiên lô cũ nhất đủ điều kiện; nếu Job requirement heat plan hoặc customer freeze lot thì heat plan thắng FIFO thuần.</td><td>Planning + QA + Warehouse Supervisor theo authority</td></tr>
-<tr><td>Consumable / desiccant / HIC / vật tư có hạn dùng</td><td>FEFO bắt buộc; lô gần hết hạn được dùng trước nếu còn trong window cho phép.</td><td>Không có ngoại lệ nếu lô đã quá hạn</td></tr>
-<tr><td>Split lot cho cùng một Job</td><td>Phải ghi rõ lot sequence, qty từng lot, balance còn lại và lệnh vấn đề. PHẢI tách lô bằng vách ngăn và nhãn riêng, không để chung trong một khay.</td><td>Warehouse + Production Supervisor</td></tr>
-<tr><td>Remnant / dư đầu thanh / tấm cắt lẻ</td><td>Chỉ được trả kho nếu còn nhãn heat/lot, nhận diện kích thước hữu dụng và không có nghi ngờ trộn lẫn. Mất truy vết thì chỉ được đưa vào HOLD.</td><td>QA đánh giá khả năng dùng lại</td></tr>
-<tr><td>Hot job / expedite</td><td>Expedite không được phá FIFO nếu làm mất trace hoặc gây đói lệnh đã commit. Muốn resequence phải theo ladder tại <a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a>.</td><td>Planning / Ops Manager theo authority</td></tr>
+<tr><td>Raw nguyên vật liệu cùng nhóm sản phẩm, nhiều mẻ nấu (heat)/lô</td><td>Ưu tiên lô cũ nhất đủ điều kiện; nếu Job yêu cầu mẻ nấu (heat) plan hoặc khách hàng đóng băng lot thì mẻ nấu (heat) plan thắng FIFO thuần.</td><td>Kế hoạch + QA + Kho Supervisor theo thẩm quyền</td></tr>
+<tr><td>vật tư tiêu hao / chất hút ẩm / HIC / vật tư có hạn dùng</td><td>FEFO bắt buộc; lô gần hết hạn được dùng trước nếu còn trong cửa sổ / khung thời gian cho phép.</td><td>Không có ngoại lệ nếu lô đã quá hạn</td></tr>
+<tr><td>tách / chia lot cho cùng một Job</td><td>Phải ghi rõ lot trình tự, qty từng lot, cân bằng / số dư còn lại và lệnh vấn đề. PHẢI tách lô bằng vách ngăn và nhãn riêng, không để chung trong một khay.</td><td>Kho + Sản xuất Supervisor</td></tr>
+<tr><td>vật liệu thừa / dư đầu thanh / tấm cắt lẻ</td><td>Chỉ được trả kho nếu còn nhãn mẻ nấu (heat)/lot, nhận diện kích thước hữu dụng và không có nghi ngờ trộn lẫn. Mất truy vết thì chỉ được đưa vào TẠM GIỮ.</td><td>QA đánh giá khả năng dùng lại</td></tr>
+<tr><td>Hot job / đẩy nhanh tiến độ</td><td>đẩy nhanh tiến độ không được phá FIFO nếu làm mất truy vết hoặc gây đói lệnh đã cam kết. Muốn sắp xếp lại phải theo bậc thang năng lực tại <a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a>.</td><td>Kế hoạch / Ops Manager theo thẩm quyền</td></tr>
 </tbody></table></div>
-<p>Khi vấn đề cho Job, Warehouse PHẢI ghi nhận lot/heat thực cấp phát. Nếu Job dùng nhiều heat hoặc nhiều balance remnant, traveler hoặc evidence vấn đề PHẢI cho phép truy ngược từng qty đã cấp cho từng lệnh công việc (Work Order)/operation. Không được dùng “xuất tổng” rồi để người ngoài workshop tự chia tay.</p></div><div class="section"><h2>6. Kiểm soát chạm hỏng, lẫn lộn và mất sạch trong kho/workshop</h2>
+<p>Khi vấn đề cho Job, Kho PHẢI ghi nhận lot/mẻ nấu (heat) thực cấp phát. Nếu Job dùng nhiều mẻ nấu (heat) hoặc nhiều cân bằng / số dư vật liệu thừa, traveler hoặc bằng chứng vấn đề PHẢI cho phép truy ngược từng qty đã cấp cho từng lệnh công việc (Công việc Đơn hàng)/vận hành. Không được dùng “xuất tổng” rồi để người ngoài phân xưởng tự chia tay.</p></div><div class="section"><h2>6. Kiểm soát chạm hỏng, lẫn lộn và mất sạch trong kho/phân xưởng</h2>
 <div class="two-col">
 <div class="card"><h3>Điều phải làm</h3><ul class="tight" style="padding-left:18px;">
-<li>Dùng pallet, tote, khay, divider, foam, sleeve hoặc cap phù hợp với hình dạng part và bề mặt cần bảo vệ.</li>
-<li>Part có mặt cosmetic hoặc sealing face PHẢI đặt theo chiều đã quy định; nếu chưa có quy định thì mặt quan trọng không được làm mặt tỳ.</li>
-<li>Thanh tròn, ống, bar stock PHẢI có chặn chống lăn; bó vật liệu dài PHẢI dùng rack hoặc giá đỡ đúng tải.</li>
-<li>Hàng clean-pack chỉ được operation bởi người có PPE/gowning phù hợp và khu operation đã line-clear.</li>
+<li>Dùng pallet, thùng chứa, khay, vách ngăn, xốp / bọt, ống lót (sleeve) hoặc cap phù hợp với hình dạng part và bề mặt cần bảo vệ.</li>
+<li>Part có mặt ngoại quan / bề ngoài hoặc niêm phong / bịt kín mặt / bề mặt PHẢI đặt theo chiều đã quy định; nếu chưa có quy định thì mặt quan trọng không được làm mặt tỳ.</li>
+<li>Thanh tròn, ống, bar tồn kho PHẢI có chặn chống lăn; bó vật liệu dài PHẢI dùng giá đỡ / khung hoặc giá đỡ đúng tải.</li>
+<li>Hàng clean-pack chỉ được vận hành bởi người có PPE/mặc đồ bảo hộ (gowning) phù hợp và khu vận hành đã dòng / chuyền-clear.</li>
 </ul></div>
 <div class="card"><h3>Điều phải tránh</h3><ul class="tight" style="padding-left:18px;">
 <li>Kéo lê part trên mặt bàn, mặt pallet hoặc mép kệ.</li>
-<li>Đặt part trực tiếp trên carton bụi, gỗ thô phát bụi, giẻ bẩn hoặc khay có dính chip/dung dịch làm mát.</li>
+<li>Đặt part trực tiếp trên thùng carton bụi, gỗ thô phát bụi, giẻ bẩn hoặc khay có dính phoi (chip)/dung dịch làm mát.</li>
 <li>Để WIP/FG chung với tooling, dụng cụ cầm tay, bu lông rời, giấy nhám hoặc vật lạ.</li>
-<li>Đảo vị trí khay mà không giữ nguyên nhãn operation / lot / revision đi cùng hàng.</li>
+<li>Đảo vị trí khay mà không giữ nguyên nhãn vận hành / lot / phiên bản đi cùng hàng.</li>
 </ul></div>
 </div>
-<div class="callout-info"><strong>Rule inspection cuối ca:</strong> trước khi giao ca, khu kho và line-side PHẢI xác nhận không còn khay vô danh, không còn hàng “để tạm”, không còn seal breach chưa xử lý, và không còn bundle/bar stock đặt sai rack gây nguy cơ lăn đổ.</div></div><div class="section"><h2>7. Phản ứng khi phát hiện bất thường</h2>
+<div class="callout-info"><strong>Rule kiểm tra cuối ca:</strong> trước khi giao ca, khu kho và dòng / chuyền-cạnh / mặt bên PHẢI xác nhận không còn khay vô danh, không còn hàng “để tạm”, không còn niêm phong vi phạm chưa xử lý, và không còn gói / bó/bar tồn kho đặt sai giá đỡ / khung gây nguy cơ lăn đổ.</div></div><div class="section"><h2>7. Phản ứng khi phát hiện bất thường</h2>
 <div class="step-list">
-<div class="step-item"><strong>Thiếu nhãn / mất trace.</strong><br/>Dừng cấp phát ngay. Chuyển lô sang QH, dán lý do hold, khoanh vùng toàn bộ khay/kệ liên quan và truy lại giao dịch gần nhất. Không được tự viết tay lại lot/heat nếu chưa chứng minh được nguồn gốc.</div>
-<div class="step-item"><strong>Ướt, rỉ, mốc, seal breach, bao rách.</strong><br/>Tách lô ảnh hưởng, chụp evidence, đánh giá mức lan rộng. Đối với clean-pack hoặc vacuum-sensitive, seal breach đồng nghĩa mất tình trạng clean trước đó cho đến khi QA quyết định tái làm sạch và re-pack.</div>
-<div class="step-item"><strong>Location mismatch / mixed lot / mixed revision.</strong><br/>Dừng mọi vấn đề từ vị trí đó. Thực hiện sweep cùng aisle/kệ liên quan, đối chiếu count thực tế với giao dịch và đóng lại only after mismatch nguyên nhân gốc đã được ghi nhận.</div>
-<div class="step-item"><strong>Lệch nhiệt độ / độ ẩm / điều kiện môi trường.</strong><br/>Ghi vào <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx"  download="">FRM-708</a>, xác định vật liệu hoặc hàng nào bị ảnh hưởng, tăng mức hold nếu có nguy cơ tới bề mặt/sạch/hạn dùng. Không tiếp tục vấn đề lô nằm trong exposure window nghi vấn nếu chưa có đánh giá.</div>
-</div></div><div class="section"><h2>8. Record tối thiểu, HOLD và KPI</h2>
+<div class="step-item"><strong>Thiếu nhãn / mất truy vết.</strong><br/>Dừng cấp phát ngay. Chuyển lô sang QH, dán lý do hold, khoanh vùng toàn bộ khay/kệ liên quan và truy lại giao dịch gần nhất. Không được tự viết tay lại lot/mẻ nấu (heat) nếu chưa chứng minh được nguồn gốc.</div>
+<div class="step-item"><strong>Ướt, rỉ, mốc, niêm phong vi phạm, bao rách.</strong><br/>Tách lô ảnh hưởng, chụp bằng chứng, đánh giá mức lan rộng. Đối với clean-pack hoặc chân không-nhạy cảm, niêm phong vi phạm đồng nghĩa mất tình trạng clean trước đó cho đến khi QA quyết định tái làm sạch và re-pack.</div>
+<div class="step-item"><strong>Vị trí không khớp / hỗn hợp / lẫn lộn lot / hỗn hợp / lẫn lộn phiên bản.</strong><br/>Dừng mọi vấn đề từ vị trí đó. Thực hiện quét / dọn dẹp cùng lối đi/kệ liên quan, đối chiếu count thực tế với giao dịch và đóng lại chỉ / duy nhất sau không khớp nguyên nhân gốc đã được ghi nhận.</div>
+<div class="step-item"><strong>Lệch nhiệt độ / độ ẩm / điều kiện môi trường.</strong><br/>Ghi vào <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx"  download="">FRM-708</a>, xác định vật liệu hoặc hàng nào bị ảnh hưởng, tăng mức hold nếu có nguy cơ tới bề mặt/sạch/hạn dùng. Không tiếp tục vấn đề lô nằm trong mức độ tiếp xúc / phơi nhiễm cửa sổ / khung thời gian nghi vấn nếu chưa có đánh giá.</div>
+</div></div><div class="section"><h2>8. Hồ sơ tối thiểu, TẠM GIỮ và KPI</h2>
 <div class="two-col">
-<div class="card"><h3>Record tối thiểu</h3><ul class="tight" style="padding-left:18px;">
-<li><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx"  download="">FRM-701</a> hoặc evidence receiving/put-away tương đương.</li>
+<div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;">
+<li><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx"  download="">FRM-701</a> hoặc bằng chứng nhận hàng/put-cách xa / rời tương đương.</li>
 <li><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx"  download="">FRM-708</a> cho nhiệt độ/độ ẩm và sự kiện lệch chuẩn.</li>
-<li>Record relocation/overflow/balance return khi phát sinh.</li>
-<li>Evidence hold/approval cho lô nghi ngờ hoặc clean-pack bị ảnh hưởng.</li>
+<li>Hồ sơ di dời/tràn/cân bằng / số dư trả lại khi phát sinh.</li>
+<li>Bằng chứng hold/phê duyệt cho lô nghi ngờ hoặc clean-pack bị ảnh hưởng.</li>
 </ul></div>
-<div class="card"><h3>HOLD bắt buộc</h3><ul class="tight" style="padding-left:18px;">
-<li>Không có lot/heat/revision/location rõ ràng.</li>
-<li>Mix lot, mix revision, mix trạng thái trong cùng khay/kệ mà không có phân tách hợp lệ.</li>
-<li>Lô clean-pack mất seal, quá open time hoặc có dấu hiệu tái nhiễm bẩn.</li>
-<li>Tồn già hoặc vật tư shelf-life controlled vượt rule nhưng chưa có quyết định xử lý.</li>
+<div class="card"><h3>TẠM GIỮ bắt buộc</h3><ul class="tight" style="padding-left:18px;">
+<li>Không có lot/mẻ nấu (heat)/phiên bản/vị trí rõ ràng.</li>
+<li>Mix lot, mix phiên bản, mix trạng thái trong cùng khay/kệ mà không có phân tách hợp lệ.</li>
+<li>Lô clean-pack mất niêm phong, quá mở time hoặc có dấu hiệu tái nhiễm bẩn.</li>
+<li>Tồn già hoặc vật tư kệ-tuổi thọ / vòng đời được kiểm soát vượt rule nhưng chưa có quyết định xử lý.</li>
 </ul></div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>KPI</th><th>Định nghĩa</th><th>Responsible Person</th></tr></thead><tbody>
-<tr><td>KPI-WI702-01</td><td>Tỷ lệ location mismatch phát hiện trong cycle count hoặc vấn đề.</td><td>Warehouse Manager</td></tr>
-<tr><td>KPI-WI702-02</td><td>Tỷ lệ vấn đề sai FIFO/FEFO hoặc dùng remnant không đủ trace.</td><td>Warehouse Supervisor / Planning</td></tr>
-<tr><td>KPI-WI702-03</td><td>Số incident contact damage / seal breach / exposure breach trong kho và staging.</td><td>Warehouse + QA</td></tr>
-<tr><td>KPI-WI702-04</td><td>Số lô staging quá hạn, tồn già, overflow quá thời hạn cho phép.</td><td>Warehouse + Planning</td></tr>
+<tr><td>KPI-WI702-01</td><td>Tỷ lệ vị trí không khớp phát hiện trong cycle count hoặc vấn đề.</td><td>Kho Manager</td></tr>
+<tr><td>KPI-WI702-02</td><td>Tỷ lệ vấn đề sai FIFO/FEFO hoặc dùng vật liệu thừa không đủ truy vết.</td><td>Kho Supervisor / Kế hoạch</td></tr>
+<tr><td>KPI-WI702-03</td><td>Số sự cố liên hệ hư hỏng / niêm phong vi phạm / mức độ tiếp xúc / phơi nhiễm vi phạm trong kho và khu vực chuẩn bị / sắp xếp.</td><td>Kho + QA</td></tr>
+<tr><td>KPI-WI702-04</td><td>Số lô khu vực chuẩn bị / sắp xếp quá hạn, tồn già, tràn quá thời hạn cho phép.</td><td>Kho + Kế hoạch</td></tr>
 </tbody></table></div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Document liên kết</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a></td><td>Khung quản trị receiving, storage, handling và preservation.</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a></td><td>Khung quản trị nhận hàng, lưu kho / lưu trữ, xử lý / vận chuyển và bảo quản.</td></tr>
 <tr><td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td><td>Kiểm soát sạch và ngăn tái nhiễm bẩn.</td></tr>
-<tr><td><a href="wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a></td><td>Nhận hàng, IQC, traceability và nhập vị trí ban đầu.</td></tr>
-<tr><td><a href="wi-713-environmental-monitoring-and-response.html">WI-713</a></td><td>Monitoring nhiệt ẩm, alarm và phản ứng khi lệch môi trường.</td></tr>
-<tr><td><a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td><td>Luật clean-pack, preservation và seal/open/reseal.</td></tr>
-<tr><td><a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a></td><td>Schema location, zoning, FIFO/FEFO, cycle count và overflow chi tiết.</td></tr>
-<tr><td><a href="../../03-Reference/08-ANNEX-800/annex-803-ppe-and-hazard-matrix.html">ANNEX-803</a></td><td>PPE và hazard theo operation xếp dỡ/bảo quản.</td></tr>
+<tr><td><a href="wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a></td><td>Nhận hàng, IQC, truy xuất nguồn gốc và nhập vị trí ban đầu.</td></tr>
+<tr><td><a href="wi-713-environmental-monitoring-and-response.html">WI-713</a></td><td>Giám sát nhiệt ẩm, cảnh báo và phản ứng khi lệch môi trường.</td></tr>
+<tr><td><a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td><td>Luật clean-pack, bảo quản và niêm phong/mở/niêm phong lại.</td></tr>
+<tr><td><a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a></td><td>sơ đồ cấu trúc vị trí, phân vùng, FIFO/FEFO, cycle count và tràn chi tiết.</td></tr>
+<tr><td><a href="../../03-Reference/08-ANNEX-800/annex-803-ppe-and-hazard-matrix.html">ANNEX-803</a></td><td>PPE và mối nguy theo vận hành xếp dỡ/bảo quản.</td></tr>
 </tbody></table></div></div>
 
 
 <!-- .page-body -->
 
-<div class="section" data-phase2i="true"><h2>9. Quy tắc điều hành — Restricted storage classes và authority-to-release</h2>
-<div style="background:#FEF9C3;border-left:4px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Restricted storage classes S0-S4</a>. WI này tóm tắt các quy tắc chính để operation nhanh tại hiện trường.</div>
-<p>Warehouse không được đối xử mọi location như nhau. Ngay tại thời điểm receipt / put-away phải gán <b>storage class</b> cho lô hoặc khu: <b>S0</b> standard controlled stock, <b>S1</b> shelf-life/FEFO, <b>S2</b> nhiệt ẩm nhạy, <b>S3</b> clean-pack/vacuum-sensitive, <b>S4</b> quarantine/restricted access. Mỗi class kéo theo rule riêng về vị trí được phép, người được chạm, điều kiện relocation và người có quyền nhả HOLD.</p>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Record chính</th><th>Hành động bắt buộc</th><th>Ai được mở lại</th></tr></thead><tbody>
-<tr><td>Excursion ngắn dưới action limit ở S0 và chưa thấy ảnh hưởng vật lý</td><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx"  download="">FRM-708</a></td><td>Ghi log, tăng theo dõi, xác nhận không có stock đặc biệt lẫn trong zone.</td><td>Responsible Person Warehouse theo quyền hạn được giao.</td></tr>
-<tr><td>Excursion hoặc monitoring gap trên S1 / S2</td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx">FRM-708</a> + log affected stock</td><td>Gắn HOLD cho lô bị nghi ảnh hưởng; kiểm expiry / window / condition trước mọi cấp phát.</td><td>QA hoặc material/Process Owner.</td></tr>
-<tr><td>Breach trên S3 clean-pack / vacuum-sensitive</td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx">FRM-708</a> + <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-709_Clean_Packaging_Checklist.xlsx"  download="">FRM-709</a> khi liên quan pack sạch</td><td>Chuyển clean-hold; PHẢI chặn vấn đề, chặn ship và đánh giá re-clean / re-pack / re-xác minh.</td><td>QA / clean-area người phụ trách theo <a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a>.</td></tr>
-<tr><td>Restricted stock / quarantine bị di chuyển sai zone hoặc mở bao ngoài kiểm soát</td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx">FRM-708</a> / hold log tương ứng</td><td>Khoanh phạm vi, dán lại trạng thái, điều tra movement và đánh giá integrity.</td><td>Đúng người phụ trách của vấn đề đó; Warehouse không tự release.</td></tr>
+<div class="section" data-phase2i="true"><h2>9. Quy tắc điều hành — Hạn chế lưu kho / lưu trữ lớp / phân loại và thẩm quyền-to-phát hành</h2>
+<div style="background:#FEF9C3;border-left:4px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Hạn chế lưu kho / lưu trữ lớp / phân loại S0-S4</a>. WI này tóm tắt các quy tắc chính để vận hành nhanh tại hiện trường.</div>
+<p>Kho không được đối xử mọi vị trí như nhau. Ngay tại thời điểm phiếu nhận / biên nhận / put-cách xa / rời phải gán <b>lưu kho / lưu trữ class</b> cho lô hoặc khu: <b>S0</b> standard được kiểm soát tồn kho, <b>S1</b> kệ-tuổi thọ / vòng đời/FEFO, <b>S2</b> nhiệt ẩm nhạy, <b>S3</b> clean-pack/chân không-nhạy cảm, <b>S4</b> cách ly / biệt trữ/hạn chế truy cập. Mỗi class kéo theo rule riêng về vị trí được phép, người được chạm, điều kiện di dời và người có quyền nhả TẠM GIỮ.</p>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Hồ sơ chính</th><th>Hành động bắt buộc</th><th>Ai được mở lại</th></tr></thead><tbody>
+<tr><td>vượt ngưỡng ngắn dưới hành động giới hạn ở S0 và chưa thấy ảnh hưởng vật lý</td><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx"  download="">FRM-708</a></td><td>Ghi log, tăng theo dõi, xác nhận không có tồn kho đặc biệt lẫn trong khu vực.</td><td>Responsible Person Kho theo quyền hạn được giao.</td></tr>
+<tr><td>vượt ngưỡng hoặc giám sát gap trên S1 / S2</td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx">FRM-708</a> + log bị ảnh hưởng tồn kho</td><td>Gắn TẠM GIỮ cho lô bị nghi ảnh hưởng; kiểm hết hạn / cửa sổ / khung thời gian / điều kiện trước mọi cấp phát.</td><td>QA hoặc nguyên vật liệu/Quy trình Owner.</td></tr>
+<tr><td>vi phạm trên S3 clean-pack / chân không-nhạy cảm</td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx">FRM-708</a> + <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-709_Clean_Packaging_Checklist.xlsx"  download="">FRM-709</a> khi liên quan pack sạch</td><td>Chuyển clean-hold; PHẢI chặn vấn đề, chặn ship và đánh giá re-clean / re-pack / re-xác minh.</td><td>QA / clean-khu vực người phụ trách theo <a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a>.</td></tr>
+<tr><td>Hạn chế tồn kho / cách ly / biệt trữ bị di chuyển sai khu vực hoặc mở bao ngoài kiểm soát</td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx">FRM-708</a> / hold log tương ứng</td><td>Khoanh phạm vi, dán lại trạng thái, điều tra di chuyển / dịch chuyển và đánh giá tính toàn vẹn.</td><td>Đúng người phụ trách của vấn đề đó; Kho không tự phát hành.</td></tr>
 </tbody></table></div>
-<div class="note-warning"><b>Điểm bắt buộc</b><br/>PHẢI giữ nguyên class kiểm soát của hàng cho đến khi có record chứng minh điều kiện release đã đạt và người có authority đã chấp thuận. Không chỉ đổi vị trí hoặc thay nhãn để hạ class.
+<div class="note-warning"><b>Điểm bắt buộc</b><br/>PHẢI giữ nguyên class kiểm soát của hàng cho đến khi có hồ sơ chứng minh điều kiện phát hành đã đạt và người có thẩm quyền đã chấp thuận. Không chỉ đổi vị trí hoặc thay nhãn để hạ class.
 </div><!-- .page-body -->
-<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </div></div>
 </div>
 </div>

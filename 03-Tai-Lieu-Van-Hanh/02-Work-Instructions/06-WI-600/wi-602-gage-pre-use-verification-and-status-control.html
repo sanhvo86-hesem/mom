@@ -57,78 +57,78 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-<span>Document operation • Work Instruction</span>
+<span>Tài liệu vận hành • Công việc Hướng dẫn</span>
 </div>
 </div>
 <div class="title"><strong>WI-602 — Kiểm trước khi dùng dụng cụ đo, trạng thái CAL và xử lý nghi ngờ</strong></div>
 <div class="meta">
 <div class="row"><span><b>Code:</b></span><span>WI-602</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
-<div class="row"><span><b>Owner:</b></span><span>QA Manager / Metrology Lead / Maintenance Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
+<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Owner:</b></span><span>QA Manager / Đo lường Lead / Bảo trì Manager</span></div>
+<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng trước mọi phép đo đạt/không đạt, CTQ, FAI, SPC, final release hoặc bất kỳ phép đo nào ảnh hưởng quyết định quality.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng trước mọi phép đo đạt/không đạt, CTQ, FAI, SPC, final phát hành hoặc bất kỳ phép đo nào ảnh hưởng quyết định chất lượng.</div>
 <h1>WI-602 — Kiểm trước khi dùng dụng cụ đo, trạng thái CAL và xử lý nghi ngờ</h1>
 <div class="section"><h2>1. Mục đích và nguyên tắc sử dụng dụng cụ đo</h2>
-<p>WI này chuẩn hóa kiểm trước khi dùng dụng cụ đo tại point-of-use. Mọi phép đo dùng để quyết định đạt/không đạt, set offset, release mẫu đầu (first piece), release final hoặc xác nhận CTQ đều phải đi qua control gate này. Không nhãn trạng thái, nhãn mờ, seal hỏng, gage vừa rơi hoặc không chứng minh được chuẩn so sánh thì coi như <span class="badge-red">HOLD</span>.</p>
-<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Sign-out mọi gage dùng liên công đoạn, chỉ đo CTQ bằng gage đã zero và xác minh, và khai báo ngay mọi incident rơi, va đập, pin yếu, màn hình lỗi hoặc reading bất thường.</div></div>
-<div class="section"><h2>2. Control gate kiểm trước khi dùng</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Control gate</th><th>Phải kiểm</th><th>đạt khi</th><th>hold khi</th></tr></thead><tbody>
-<tr><td>G1 — Nhận diện</td><td>Gage ID, serial, trạng thái CAL, ngày hết hạn, người phụ trách/vị trí cấp phát.</td><td>Nhãn rõ, đúng gage, còn hiệu lực.</td><td>Không nhãn, sai ID, quá hạn, không truy ra record.</td></tr>
-<tr><td>G2 — Tình trạng vật lý</td><td>Mặt đo, mỏ đo, đầu dò, dây cáp, màn hình, pin, seal, hộp bảo quản.</td><td>Không sứt mẻ, không rỉ, không bavia, không seal broken.</td><td>Rơi/va đập, seal hỏng, mặt đo trầy, ren gauge mẻ, pin yếu gây mất ổn định.</td></tr>
-<tr><td>G3 — Zero / reference</td><td>Zero tại điều kiện dùng; kiểm bằng chuẩn reference hoặc master phù hợp.</td><td>Zero ổn định, lặp lại tốt, master check đạt.</td><td>Zero trôi, lặp lại kém, sai trên master.</td></tr>
-<tr><td>G4 — Điều kiện đo</td><td>Nhiệt độ, sạch bề mặt, lực đo, đơn vị mm/inch, mode absolute/incremental.</td><td>Điều kiện đo phù hợp method và dụng cụ.</td><td>Chi tiết/gage còn nóng, bẩn, đơn vị sai, operator không hiểu method.</td></tr>
+<p>WI này chuẩn hóa kiểm trước khi dùng dụng cụ đo tại điểm sử dụng. Mọi phép đo dùng để quyết định đạt/không đạt, set bù trừ (offset), phát hành mẫu đầu (đầu tiên chi tiết / sản phẩm), phát hành final hoặc xác nhận CTQ đều phải đi qua cổng kiểm soát này. Không nhãn trạng thái, nhãn mờ, niêm phong hỏng, gage vừa rơi hoặc không chứng minh được chuẩn so sánh thì coi như <span class="badge-red">TẠM GIỮ</span>.</p>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> ký-out mọi gage dùng liên công đoạn, chỉ đo CTQ bằng gage đã không / bằng không và xác minh, và khai báo ngay mọi sự cố rơi, va đập, pin yếu, màn hình lỗi hoặc đọc / chỉ số đo bất thường.</div></div>
+<div class="section"><h2>2. Cổng kiểm soát kiểm trước khi dùng</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Phải kiểm</th><th>đạt khi</th><th>hold khi</th></tr></thead><tbody>
+<tr><td>G1 — Nhận diện</td><td>Gage ID, số sê-ri, trạng thái CAL, ngày hết hạn, người phụ trách/vị trí cấp phát.</td><td>Nhãn rõ, đúng gage, còn hiệu lực.</td><td>Không nhãn, sai ID, quá hạn, không truy ra hồ sơ.</td></tr>
+<tr><td>G2 — Tình trạng vật lý</td><td>Mặt đo, mỏ đo, đầu dò, dây cáp, màn hình, pin, niêm phong, hộp bảo quản.</td><td>Không sứt mẻ, không rỉ, không bavia, không niêm phong hỏng / gãy.</td><td>Rơi/va đập, niêm phong hỏng, mặt đo trầy, ren dưỡng đo / đồng hồ đo mẻ, pin yếu gây mất ổn định.</td></tr>
+<tr><td>G3 — không / bằng không / tham chiếu</td><td>không / bằng không tại điều kiện dùng; kiểm bằng chuẩn tham chiếu hoặc chủ / gốc phù hợp.</td><td>không / bằng không ổn định, lặp lại tốt, chủ / gốc kiểm tra đạt.</td><td>không / bằng không trôi, lặp lại kém, sai trên chủ / gốc.</td></tr>
+<tr><td>G4 — Điều kiện đo</td><td>Nhiệt độ, sạch bề mặt, lực đo, đơn vị mm/inch, chế độ tuyệt đối/gia tăng.</td><td>Điều kiện đo phù hợp phương pháp và dụng cụ.</td><td>Chi tiết/gage còn nóng, bẩn, đơn vị sai, người vận hành không hiểu phương pháp.</td></tr>
 </tbody></table></div></div>
-<div class="section"><h2>3. Quick xác minh theo nhóm gage</h2>
+<div class="section"><h2>3. Nhanh xác minh theo nhóm gage</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm gage</th><th>Kiểm trước khi dùng</th><th>Lưu ý thực chiến</th></tr></thead><tbody>
-<tr><td>Caliper / height gauge</td><td>Zero, trượt êm, không hở mỏ, kiểm 1–2 block/reference point.</td><td>Không dùng caliper cho CTQ dung sai rất chặt nếu method đã requirement micrometer/CMM.</td></tr>
-<tr><td>Micrometer ngoài/trong</td><td>Vệ sinh mặt đo, zero bằng standard, kiểm ratchet/force, kiểm repeat 3 lần.</td><td>Nếu cảm giác siết khác thường hoặc mỏ đo trượt, dừng dùng ngay.</td></tr>
-<tr><td>Bore gauge / air gage</td><td>Set bằng ring/setting master đúng size, xác minh điểm zero và repeatability.</td><td>Luôn ghi size master đã dùng. Sai master hoặc master chưa nhiệt ổn định là HOLD.</td></tr>
-<tr><td>Indicator / dial test</td><td>Kiểm hành trình, độ trơn, kim về 0, đầu tiếp xúc không mẻ.</td><td>Không dùng indicator có hysteresis rõ hoặc kim giật.</td></tr>
-<tr><td>Pin/thread plug / ring gauge</td><td>Kiểm tình trạng bề mặt, mã size/class, hướng GO/NO-GO, sạch phoi.</td><td>Không dùng pin/ring mòn không truy được lịch sử hoặc lẫn bộ.</td></tr>
-<tr><td>Surface roughness / leak / special test instrument</td><td>Kiểm trạng thái CAL, self-test, reference specimen/zero block, phụ kiện đúng.</td><td>Nếu method requirement warm-up hoặc environment stabilization thì phải chờ đủ thời gian.</td></tr>
+<tr><td>thước cặp / height dưỡng đo / đồng hồ đo</td><td>không / bằng không, trượt êm, không hở mỏ, kiểm 1–2 chặn / khóa/tham chiếu điểm.</td><td>Không dùng thước cặp cho CTQ dung sai rất chặt nếu phương pháp đã yêu cầu panme / thước đo vi lượng/CMM.</td></tr>
+<tr><td>panme / thước đo vi lượng ngoài/trong</td><td>Vệ sinh mặt đo, không / bằng không bằng standard, kiểm cóc (ratchet)/lực, kiểm lặp lại 3 lần.</td><td>Nếu cảm giác siết khác thường hoặc mỏ đo trượt, dừng dùng ngay.</td></tr>
+<tr><td>lỗ khoan dưỡng đo / đồng hồ đo / air gage</td><td>Set bằng vòng / khuyên/cài đặt chủ / gốc đúng size, xác minh điểm không / bằng không và độ lặp lại.</td><td>Luôn ghi size chủ / gốc đã dùng. Sai chủ / gốc hoặc chủ / gốc chưa nhiệt ổn định là TẠM GIỮ.</td></tr>
+<tr><td>chỉ số / đồng hồ so test</td><td>Kiểm hành trình, độ trơn, kim về 0, đầu tiếp xúc không mẻ.</td><td>Không dùng chỉ số có trễ (hysteresis) rõ hoặc kim giật.</td></tr>
+<tr><td>Pin/ren nút bịt / vòng / khuyên dưỡng đo / đồng hồ đo</td><td>Kiểm tình trạng bề mặt, mã size/class, hướng GO/NO-GO, sạch phoi.</td><td>Không dùng pin/vòng / khuyên mòn không truy được lịch sử hoặc lẫn bộ.</td></tr>
+<tr><td>Bề mặt độ nhám / rò rỉ / đặc biệt test dụng cụ đo</td><td>Kiểm trạng thái CAL, tự-test, tham chiếu mẫu thử/không / bằng không chặn / khóa, phụ kiện đúng.</td><td>Nếu phương pháp yêu cầu ấm / làm nóng trước-up hoặc môi trường ổn định hóa thì phải chờ đủ thời gian.</td></tr>
 </tbody></table></div></div>
-<div class="section"><h2>4. Phản ứng khi gage nghi ngờ hoặc fail control gate</h2>
+<div class="section"><h2>4. Phản ứng khi gage nghi ngờ hoặc fail cổng kiểm soát</h2>
 <div class="step-list">
-<div class="step-item"><strong>Dừng dùng ngay.</strong><br/>Đặt trạng thái HOLD vật lý; không tiếp tục đo để “kiểm thử thêm”.</div>
-<div class="step-item"><strong>Khóa ảnh hưởng.</strong><br/>Xác định phép đo nào đã dùng gage này từ lần xác minh cuối cùng; nếu đã dùng cho CTQ/release thì kích hoạt <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
-<div class="step-item"><strong>Đổi phương pháp đo.</strong><br/>Chuyển sang gage khác đã xác minh hoặc sang CMM/fixture/reference method được QA approval.</div>
-<div class="step-item"><strong>Ghi nhận incident.</strong><br/>Log incident phải có gage ID, hiện tượng, thời điểm, người phát hiện, job liên quan và hành động tạm thời.</div>
+<div class="step-item"><strong>Dừng dùng ngay.</strong><br/>Đặt trạng thái TẠM GIỮ vật lý; không tiếp tục đo để “kiểm thử thêm”.</div>
+<div class="step-item"><strong>Khóa ảnh hưởng.</strong><br/>Xác định phép đo nào đã dùng gage này từ lần xác minh cuối cùng; nếu đã dùng cho CTQ/phát hành thì kích hoạt <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
+<div class="step-item"><strong>Đổi phương pháp đo.</strong><br/>Chuyển sang gage khác đã xác minh hoặc sang CMM/fixture/tham chiếu phương pháp được QA phê duyệt.</div>
+<div class="step-item"><strong>Ghi nhận sự cố.</strong><br/>Log sự cố phải có gage ID, hiện tượng, thời điểm, người phát hiện, job liên quan và hành động tạm thời.</div>
 </div>
-<div class="callout-warn"><strong>Rule:</strong> Nếu gage fail trên master hoặc có seal broken, mọi kết quả đang chờ release dựa trên gage đó phải dừng lại đến khi có quyết định của QA/Metrology.</div></div>
-<div class="section"><h2>5. Khi nào phải gọi QA / Metrology</h2>
+<div class="callout-warn"><strong>Rule:</strong> Nếu gage fail trên chủ / gốc hoặc có niêm phong hỏng / gãy, mọi kết quả đang chờ phát hành dựa trên gage đó phải dừng lại đến khi có quyết định của QA/Đo lường.</div></div>
+<div class="section"><h2>5. Khi nào phải gọi QA / Đo lường</h2>
 <div class="two-col">
-<div class="card"><h3>Phải escalation ngay</h3><ul class="tight" style="padding-left:18px;"><li>Gage đo CTQ/release final bị fail quick xác minh.</li><li>Gage rơi, va đập, ngâm dầu/dung dịch hoặc nghi nhiễm bẩn.</li><li>Đọc số không lặp lại, sai master, hoặc khác nhau giữa hai gage vượt ngưỡng nội bộ.</li><li>Không tìm thấy standard/master hợp lệ để xác minh.</li></ul></div>
-<div class="card"><h3>Cho phép xử lý tại chỗ</h3><ul class="tight" style="padding-left:18px;"><li>Lau sạch bề mặt đo theo chuẩn.</li><li>Thay pin hoặc reset mode khi không ảnh hưởng integrity của equipment.</li><li>Thực hiện zero lại sau khi đã xác minh nguyên nhân là do operation.</li></ul></div>
+<div class="card"><h3>Phải escalation ngay</h3><ul class="tight" style="padding-left:18px;"><li>Gage đo CTQ/phát hành final bị fail nhanh xác minh.</li><li>Gage rơi, va đập, ngâm dầu/dung dịch hoặc nghi nhiễm bẩn.</li><li>Đọc số không lặp lại, sai chủ / gốc, hoặc khác nhau giữa hai gage vượt ngưỡng nội bộ.</li><li>Không tìm thấy standard/chủ / gốc hợp lệ để xác minh.</li></ul></div>
+<div class="card"><h3>Cho phép xử lý tại chỗ</h3><ul class="tight" style="padding-left:18px;"><li>Lau sạch bề mặt đo theo chuẩn.</li><li>Thay pin hoặc reset chế độ khi không ảnh hưởng tính toàn vẹn của thiết bị.</li><li>Thực hiện không / bằng không lại sau khi đã xác minh nguyên nhân là do vận hành.</li></ul></div>
 </div></div>
-<div class="section"><h2>6. Record, KPI và document liên kết</h2>
+<div class="section"><h2>6. Hồ sơ, KPI và tài liệu liên kết</h2>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>KPI-WI602-01</strong><br/>Tỷ lệ gage fail quick xác minh trên tổng số lần sử dụng.</div>
-<div class="kpi-box"><strong>KPI-WI602-02</strong><br/>Số lô bị ảnh hưởng do dùng gage nghi ngờ/hết hạn/seal broken.</div>
-<div class="kpi-box"><strong>KPI-WI602-03</strong><br/>Tỷ lệ CTQ measurement có evidence xác minh đầy đủ trước khi đo.</div>
-<div class="kpi-box"><strong>KPI-WI602-04</strong><br/>Số lần operator phải đổi method đo do measurement system không phù hợp.</div>
+<div class="kpi-box"><strong>KPI-WI602-01</strong><br/>Tỷ lệ gage fail nhanh xác minh trên tổng số lần sử dụng.</div>
+<div class="kpi-box"><strong>KPI-WI602-02</strong><br/>Số lô bị ảnh hưởng do dùng gage nghi ngờ/hết hạn/niêm phong hỏng / gãy.</div>
+<div class="kpi-box"><strong>KPI-WI602-03</strong><br/>Tỷ lệ CTQ đo lường có bằng chứng xác minh đầy đủ trước khi đo.</div>
+<div class="kpi-box"><strong>KPI-WI602-04</strong><br/>Số lần người vận hành phải đổi phương pháp đo do đo lường system không phù hợp.</div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Document liên kết</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../01-SOPs/06-SOP-600/sop-601-calibration-and-gage-control.html">SOP-601</a></td><td>Quản lý calibration và vòng đời gage.</td></tr>
-<tr><td><a href="../../01-SOPs/06-SOP-600/sop-602-measurement-system-analysis-msagr-r.html">SOP-602</a></td><td>MSA, Gage R&amp;R và competence hệ thống đo.</td></tr>
-<tr><td><a href="../../03-Reference/06-ANNEX-600/annex-602-msa-acceptance-criteria.html">ANNEX-602</a></td><td>Tiêu chí chấp nhận MSA và guide xác nhận gage.</td></tr>
-<tr><td><a href="wi-604-spc-chart-use-process-capability-and-reaction.html">WI-604</a></td><td>SPC/capability chỉ hợp lệ khi measurement system đạt.</td></tr>
-<tr><td><a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Containment khi measurement result không còn đáng tin.</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-601-calibration-and-gage-control.html">SOP-601</a></td><td>Quản lý hiệu chuẩn và vòng đời gage.</td></tr>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-602-measurement-system-analysis-msagr-r.html">SOP-602</a></td><td>MSA, Gage R&amp;R và năng lực hệ thống đo.</td></tr>
+<tr><td><a href="../../03-Reference/06-ANNEX-600/annex-602-msa-acceptance-criteria.html">ANNEX-602</a></td><td>Tiêu chí chấp nhận MSA và hướng dẫn xác nhận gage.</td></tr>
+<tr><td><a href="wi-604-spc-chart-use-process-capability-and-reaction.html">WI-604</a></td><td>SPC/năng lực / khả năng chỉ hợp lệ khi đo lường system đạt.</td></tr>
+<tr><td><a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Ngăn chặn khi đo lường kết quả không còn đáng tin.</td></tr>
 </tbody></table></div></div>
 <div data-phase2f="true">
-<h2 class="h2" id="phase2f-study-selection">Kiểm soát bổ sung — Study selection guide</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Khi nào</th><th>Dùng record nào</th><th>Boundary</th></tr></thead><tbody>
-<tr><td>Pre-use check / shift check / after event</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-602_Gage_Verification_Log.xlsx"  download="">FRM-602</a></td><td>Không thay cho calibration hay MSA đầy đủ.</td></tr>
-<tr><td>Nghi ngờ người đo + equipment variation</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-611_GRR_Study_Form.xlsx"  download="">FRM-611</a></td><td>Dùng khi quyết định cần nhìn repeatability / reproducibility.</td></tr>
-<tr><td>Nghi ngờ bias / linearity / drift</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-612_Bias_Linearity_Stability_Study_Form.xlsx"  download="">FRM-612</a></td><td>Dùng khi GR&amp;R không trả lời đủ rủi ro.</td></tr>
-<tr><td>Trực quan đạt/không đạt hoặc CMM qualification</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-613_Attribute_MSA_and_CMM_Qualification_Record.xlsx"  download="">FRM-613</a></td><td>Khóa consistency của attribute decision hoặc release chương trình (program release).</td></tr>
+<h2 class="h2" id="phase2f-study-selection">Kiểm soát bổ sung — nghiên cứu lựa chọn hướng dẫn</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Khi nào</th><th>Dùng hồ sơ nào</th><th>Ranh giới</th></tr></thead><tbody>
+<tr><td>Pre-use kiểm tra / shift kiểm tra / sau sự kiện</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-602_Gage_Verification_Log.xlsx"  download="">FRM-602</a></td><td>Không thay cho hiệu chuẩn hay MSA đầy đủ.</td></tr>
+<tr><td>Nghi ngờ người đo + thiết bị biến thiên</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-611_GRR_Study_Form.xlsx"  download="">FRM-611</a></td><td>Dùng khi quyết định cần nhìn độ lặp lại / độ tái lập.</td></tr>
+<tr><td>Nghi ngờ sai lệch hệ thống / độ tuyến tính / trôi / sai lệch</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-612_Bias_Linearity_Stability_Study_Form.xlsx"  download="">FRM-612</a></td><td>Dùng khi GR&amp;R không trả lời đủ rủi ro.</td></tr>
+<tr><td>Trực quan đạt/không đạt hoặc CMM đánh giá năng lực</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-613_Attribute_MSA_and_CMM_Qualification_Record.xlsx"  download="">FRM-613</a></td><td>Khóa tính nhất quán của thuộc tính quyết định hoặc phát hành chương trình (program phát hành).</td></tr>
 </tbody></table></div>
 </div></div>
 </div>
 </div>
-<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

@@ -3,7 +3,7 @@
 <head>
  <meta charset="utf-8"/>
  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
- <title>TRN-OPS-09 — Tool Life &amp; Setup Changeover (SMED Changeover Record) | HESEM OS</title>
+ <title>TRN-OPS-09 — Tool tuổi thọ / vòng đời &amp; Setup Chuyển đổi (changeover) (SMED Chuyển đổi (changeover) Hồ sơ) | HESEM OS</title>
  <link href="../../../assets/style.css" rel="stylesheet"/>
  <style>
  .mini{font-size:12px;color:#374151;}
@@ -52,68 +52,68 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Document kiểm soát</span>
+    <span>Tài liệu kiểm soát</span>
   </div>
 </div>
 <div class="title">
-  <strong>TRN-OPS-09 — Tool Life &amp; Setup Changeover (SMED Changeover Record)</strong>
+  <strong>TRN-OPS-09 — Tool tuổi thọ / vòng đời &amp; Setup Chuyển đổi (changeover) (SMED Chuyển đổi (changeover) Hồ sơ)</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
   <div class="row"><span><b>Code:</b></span><span>TRN-OPS-09</span></div>
   <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
   <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent"><div class="form-sheet">
 
  <div class="card">
  <span class="badge">SYSTEM‑OPS • CNC</span>
- <h1 class="h1" style="margin-top:12px;">TRN-OPS-09 — Tool Life &amp; Setup Changeover (SMED Changeover Record)</h1>
- <p class="lead">Mục tiêu: (1) không để “mòn dao” thành NG hàng loạt; (2) không để “đổi job” tạo ra sai REV/offset/tool; (3) tạo evidence traceability trong 60 giây.</p>
+ <h1 class="h1" style="margin-top:12px;">TRN-OPS-09 — Tool tuổi thọ / vòng đời &amp; Setup Chuyển đổi (changeover) (SMED Chuyển đổi (changeover) Hồ sơ)</h1>
+ <p class="lead">Mục tiêu: (1) không để “mòn dao” thành NG hàng loạt; (2) không để “đổi job” tạo ra sai REV/bù trừ (offset)/tool; (3) tạo bằng chứng truy xuất nguồn gốc trong 60 giây.</p>
  </div>
 
  <div class="card" style="margin-top:12px;">
  <h2 class="h2" style="margin-top:0;">1) Tại sao phải học khoá này?</h2>
  <div class="grid-2">
  <div class="note">
- <b>Kịch bản 1 — Drift CTQ</b>
+ <b>Kịch bản 1 — trôi / sai lệch CTQ</b>
  <ul class="list">
  <li>Part đầu OK, part thứ 20 bắt đầu lệch 0.01–0.02mm.</li>
  <li>Nếu không có rule → NG hàng loạt, mất thời gian dẫn (lead time).</li>
  </ul>
  </div>
  <div class="note">
- <b>Kịch bản 2 — Wrong setup</b>
+ <b>Kịch bản 2 — Sai setup</b>
  <ul class="list">
  <li>Đổi job gấp, thiếu gage, load nhầm program Rev cũ.</li>
- <li>Nếu không có checklist → “escape” tới khách.</li>
+ <li>Nếu không có bảng kiểm → “thoát / bỏ qua” tới khách.</li>
  </ul>
  </div>
  </div>
  </div>
 
  <div class="card" style="margin-top:12px;">
- <h2 class="h2" style="margin-top:0;">2) tuổi dao (tool life) — quy tắc tối thiểu</h2>
+ <h2 class="h2" style="margin-top:0;">2) tuổi dao (tool tuổi thọ / vòng đời) — quy tắc tối thiểu</h2>
  <ol class="list">
- <li>Tool phải có <b>ToolID</b> rõ ràng trong setup sheet/tool list.</li>
- <li>ToolID quan trọng phải có <b>baseline</b> và phải được ghi bằng <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-513_Tool_Life_Log.xlsx">FRM-OPS-003</a>.</li>
- <li>Gãy dao/insert sứt mẻ → <b>Stop-the-line</b> + truy ngược “last known good”.</li>
- <li>Drift kích thước/nhám/bavia tăng → thay tool trước khi NG lan rộng.</li>
+ <li>Tool phải có <b>ToolID</b> rõ ràng trong phiếu cài đặt/danh sách dao cụ.</li>
+ <li>ToolID quan trọng phải có <b>mốc chuẩn</b> và phải được ghi bằng <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-513_Tool_Life_Log.xlsx">FRM-OPS-003</a>.</li>
+ <li>Gãy dao/mảnh dao (insert) sứt mẻ → <b>Stop-the-dòng / chuyền</b> + truy ngược “cuối cùng đã biết tốt / đạt”.</li>
+ <li>trôi / sai lệch kích thước/nhám/bavia tăng → thay tool trước khi NG lan rộng.</li>
  </ol>
- <div class="mini">Document chuẩn: <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html">PROC-MNT-005</a></div>
+ <div class="mini">Tài liệu chuẩn: <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html">PROC-MNT-005</a></div>
  </div>
 
  <div class="card" style="margin-top:12px;">
- <h2 class="h2" style="margin-top:0;">3) Setup Changeover (SMED Changeover Record) — làm nhanh nhưng không sai</h2>
+ <h2 class="h2" style="margin-top:0;">3) Setup Chuyển đổi (changeover) (SMED Chuyển đổi (changeover) Hồ sơ) — làm nhanh nhưng không sai</h2>
  <ul class="list">
- <li>Tách <b>External</b> (chuẩn bị ngoài máy) và <b>Internal</b> (khi máy dừng).</li>
- <li>Không đủ job package/SSOT link → <b>HOLD</b>.</li>
- <li>Bắt buộc có record: <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-514_SMED_Changeover_Record.xlsx">FRM-OPS-011</a> + <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-CNC-001</a>.</li>
+ <li>Tách <b>Bên ngoài</b> (chuẩn bị ngoài máy) và <b>Nội bộ</b> (khi máy dừng).</li>
+ <li>Không đủ job gói hàng/SSOT link → <b>TẠM GIỮ</b>.</li>
+ <li>Bắt buộc có hồ sơ: <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-514_SMED_Changeover_Record.xlsx">FRM-OPS-011</a> + <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-CNC-001</a>.</li>
  </ul>
- <div class="mini">Document chuẩn: <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html">WI-OPS-015</a></div>
+ <div class="mini">Tài liệu chuẩn: <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html">WI-OPS-015</a></div>
  </div>
 
  <div class="card" style="margin-top:12px;">
@@ -124,26 +124,26 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <thead><tr><th>Bài tập</th><th>Kết quả</th></tr></thead>
  <tbody>
  <tr><td><span class="chk"></span> Nhận 1 job pack giả lập và chỉ ra đâu là SSOT link đúng Rev</td><td>☐ Pass ☐ Fail</td></tr>
- <tr><td><span class="chk"></span> Chọn 3 tool tạo CTQ và xác định baseline + trigger thay dao</td><td>☐ Pass ☐ Fail</td></tr>
- <tr><td><span class="chk"></span> Điền thử FRM-OPS-011 (external/internal) và chỉ ra 1 điểm giảm thời gian</td><td>☐ Pass ☐ Fail</td></tr>
+ <tr><td><span class="chk"></span> Chọn 3 tool tạo CTQ và xác định mốc chuẩn + kích hoạt thay dao</td><td>☐ Pass ☐ Fail</td></tr>
+ <tr><td><span class="chk"></span> Điền thử FRM-OPS-011 (bên ngoài/nội bộ) và chỉ ra 1 điểm giảm thời gian</td><td>☐ Pass ☐ Fail</td></tr>
  </tbody>
  </table>
  </div>
  </div>
 
  <div class="card" style="margin-top:12px;">
- <h2 class="h2" style="margin-top:0;">5) Bài inspection nhanh nhanh (5 câu)</h2>
+ <h2 class="h2" style="margin-top:0;">5) Bài kiểm tra nhanh nhanh (5 câu)</h2>
  <ol class="list">
  <li>Gãy dao trong lúc chạy: hành động đầu tiên là gì? (dừng máy/cách ly/đo lại CTQ/…)</li>
- <li>ToolID phải lấy ở đâu để tránh nhầm? (setup sheet/tool list)</li>
- <li>2 record bắt buộc khi changeover là gì?</li>
- <li>External setup khác internal changeover thế nào?</li>
- <li>Khi drift kích thước theo xu hướng, có cần log không?</li>
+ <li>ToolID phải lấy ở đâu để tránh nhầm? (phiếu cài đặt/danh sách dao cụ)</li>
+ <li>2 hồ sơ bắt buộc khi chuyển đổi (changeover) là gì?</li>
+ <li>Bên ngoài setup khác nội bộ chuyển đổi (changeover) thế nào?</li>
+ <li>Khi trôi / sai lệch kích thước theo xu hướng, có cần log không?</li>
  </ol>
- <div class="mini">Đánh giá hoàn thành: Leader ký nhận trong training register theo quy định HR/Training.</div>
+ <div class="mini">Đánh giá hoàn thành: Trưởng nhóm ký nhận trong đào tạo sổ đăng ký theo quy định HR/Đào tạo.</div>
  </div>
 
- <div class="small muted">Bổ sung theo báo cáo phân tích: 2026-02-12 (đóng gap “tuổi dao (tool life) SOP” và “SMED Changeover Record setup reduction”).</div>
+ <div class="small muted">Bổ sung theo báo cáo phân tích: 2026-02-12 (đóng gap “tuổi dao (tool tuổi thọ / vòng đời) SOP” và “SMED Chuyển đổi (changeover) Hồ sơ setup giảm”).</div>
 
 </div></div>
 

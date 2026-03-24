@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>WI-101 — Form số, approval điện tử và evidence điện tử | HESEM QMS</title>
+<title>WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử | HESEM QMS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
 /* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
@@ -67,149 +67,149 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-<span>Document operation • Workshop CNC</span>
+<span>Tài liệu vận hành • Phân xưởng CNC</span>
 </div>
 </div>
 <div class="title">
-<strong>WI-101 — Form số, approval điện tử và evidence điện tử</strong>
-</div><div class="meta"><div class="row"><span><b>Code:</b></span><span>WI-101</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div><div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Administrator</span></div><div class="row"><span><b>Approved by:</b></span><span>General Director</span></div></div>
-</div><div class="doc-content" id="docContent"><div class="form-sheet"><div class="preface-block"><h2 class="h2">Điều kiện áp dụng và kiểm soát</h2><div class="grid-2"><div><p><b>ÁP DỤNG KHI</b></p><ul class="list"><li>Khi document được viện dẫn trong Job/Process/Forms liên quan.</li><li>Khi phát sinh thay đổi ảnh hưởng quality hoặc requirement customer.</li><li>Khi cần xác định hold/release hoặc requirement evidence bắt buộc.</li></ul></div><div><p><b>Input / Output</b></p><ul class="list"><li><b>Input:</b> Epicor Kinetic (giao dịch)</li><li><b>Input:</b> M365/SharePoint (SSOT record)</li><li><b>Output:</b> Record/Log đầy đủ tại SSOT</li><li><b>Output:</b> Trạng thái control gate (gate) được mở hoặc giữ theo tiêu chí</li></ul></div></div><p class="callout"><b>Hold/Release:</b> Thiếu evidence bắt buộc: áp dụng HOLD theo tiêu chí của document; không chuyển bước cho đến khi đủ evidence.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết record SSOT.</p></div><div class="card"><span class="badge"><span class="dot"></span>WI-101</span><h1 class="h1" style="margin-top:12px;">WI-101 — Form số, approval điện tử và evidence điện tử</h1><p class="lead">Document này quy định cách triển khai và sử dụng form số hoá trên M365 (SharePoint Lists/Power Apps/Power Automate) và cách lưu evidence theo SSOT. Mọi giao dịch operation (time entry, trạng thái job, PO, xuất/nhập kho, xác nhận delivery (ship confirm)) <b>chỉ</b> được ghi nhận trong <b>Epicor Kinetic</b>.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">1. Khi áp dụng</h2><ul>
-<li><b>Phải</b> áp dụng khi thay thế form giấy bằng form số hoá để ghi nhận operation tại workshop CNC: inspection công đoạn, log hold, checklist packaging, log giao ca, requirement hỗ trợ máy/tooling.</li>
-<li><b>Phải</b> áp dụng khi cần <b>approval điện tử</b> (Power Automate Approvals) cho các điểm dừng quality/ship-release.</li>
-<li><b>Không được</b> dùng M365 để tạo “sổ” thay thế Epicor cho các giao dịch: time entry, xác nhận hoàn thành công đoạn, xuất kho, xác nhận delivery, cập nhật PO.</li>
-<li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Ghi nhận trực tiếp trên hệ thống đã chỉ định; không dùng file Excel làm nguồn ghi nhận operation.</li>
+<strong>WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</strong>
+</div><div class="meta"><div class="row"><span><b>Code:</b></span><span>WI-101</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Quản trị viên</span></div><div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div></div>
+</div><div class="doc-content" id="docContent"><div class="form-sheet"><div class="preface-block"><h2 class="h2">Điều kiện áp dụng và kiểm soát</h2><div class="grid-2"><div><p><b>ÁP DỤNG KHI</b></p><ul class="list"><li>Khi tài liệu được viện dẫn trong Job/Quy trình/Biểu mẫu liên quan.</li><li>Khi phát sinh thay đổi ảnh hưởng chất lượng hoặc yêu cầu khách hàng.</li><li>Khi cần xác định hold/phát hành hoặc yêu cầu bằng chứng bắt buộc.</li></ul></div><div><p><b>Đầu vào / Đầu ra</b></p><ul class="list"><li><b>Đầu vào:</b> Epicor Kinetic (Epicor) (giao dịch)</li><li><b>Đầu vào:</b> M365/SharePoint (SSOT hồ sơ)</li><li><b>Đầu ra:</b> Hồ sơ/Log đầy đủ tại SSOT</li><li><b>Đầu ra:</b> Trạng thái cổng kiểm soát (gate) được mở hoặc giữ theo tiêu chí</li></ul></div></div><p class="callout"><b>Hold/Phát hành:</b> Thiếu bằng chứng bắt buộc: áp dụng TẠM GIỮ theo tiêu chí của tài liệu; không chuyển bước cho đến khi đủ bằng chứng.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết hồ sơ SSOT.</p></div><div class="card"><span class="badge"><span class="dot"></span>WI-101</span><h1 class="h1" style="margin-top:12px;">WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</h1><p class="lead">Tài liệu này quy định cách triển khai và sử dụng biểu mẫu số hoá trên M365 (SharePoint Danh sách/Power ứng dụng/Power Automate) và cách lưu bằng chứng theo SSOT. Mọi giao dịch vận hành (time mục nhập, trạng thái job, PO, xuất/nhập kho, xác nhận giao hàng (ship xác nhận)) <b>chỉ</b> được ghi nhận trong <b>Epicor Kinetic (Epicor)</b>.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">1. Khi áp dụng</h2><ul>
+<li><b>Phải</b> áp dụng khi thay thế biểu mẫu giấy bằng biểu mẫu số hoá để ghi nhận vận hành tại phân xưởng CNC: kiểm tra công đoạn, log hold, bảng kiểm đóng gói, log giao ca, yêu cầu hỗ trợ máy/tooling.</li>
+<li><b>Phải</b> áp dụng khi cần <b>phê duyệt điện tử</b> (Power Automate Approvals) cho các điểm dừng chất lượng/ship-phát hành.</li>
+<li><b>Không được</b> dùng M365 để tạo “sổ” thay thế Epicor cho các giao dịch: time mục nhập, xác nhận hoàn thành công đoạn, xuất kho, xác nhận giao hàng, cập nhật PO.</li>
+<li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Ghi nhận trực tiếp trên hệ thống đã chỉ định; không dùng file Excel làm nguồn ghi nhận vận hành.</li>
 </ul></div><div class="card"><h2 class="h2" style="margin-top:0;">2. Công cụ / vật tư</h2><ul>
-<li>M365: SharePoint Site <b>CNC-IMS-HUB</b>; SharePoint Lists; Document Libraries; Teams; Power Apps; Power Automate Approvals; Microsoft Purview (Retention/Legal hold).</li>
-<li>Equipment: PC/kiosk tại workshop; máy quét mã vạch 1D/2D (USB keyboard-wedge); mạng nội bộ ổn định; máy in nhãn (nếu form có nhãn).</li>
-<li>Hệ thống SoR: <b>Epicor Kinetic</b> (Job, Operation, Inventory, PO, Shipment, Pack, Xác nhận delivery).</li>
-</ul></div><div class="card"><h2 class="h2" style="margin-top:0;">3. Các bước thực hiện</h2><h3 class="h3">3.1 Khởi tạo form số hoá (bắt buộc theo kiểm soát document)</h3><ol>
-<li><b>Phải</b> sử dụng FRM/ WI bản HTML trong thư viện document kiểm soát làm <b>mẫu chuẩn</b> (controlled template). <b>Không được</b> tạo mẫu Excel.</li>
-<li><b>Phải</b> tạo SharePoint List tương ứng với form, bao gồm:
+<li>M365: SharePoint Site <b>CNC-IMS-HUB</b>; SharePoint Danh sách; Tài liệu thư viện; Teams; Power ứng dụng; Power Automate Approvals; Microsoft Phạm vi quản lý (Lưu giữ/Giữ pháp lý).</li>
+<li>Thiết bị: PC/ki-ốt tại phân xưởng; máy quét mã vạch 1D/2D (USB bàn phím-nêm); mạng nội bộ ổn định; máy in nhãn (nếu biểu mẫu có nhãn).</li>
+<li>Hệ thống SoR: <b>Epicor Kinetic (Epicor)</b> (Job, Vận hành, Hàng tồn kho, PO, Lô giao hàng, Pack, Xác nhận giao hàng).</li>
+</ul></div><div class="card"><h2 class="h2" style="margin-top:0;">3. Các bước thực hiện</h2><h3 class="h3">3.1 Khởi tạo biểu mẫu số hoá (bắt buộc theo kiểm soát tài liệu)</h3><ol>
+<li><b>Phải</b> sử dụng FRM/ WI bản HTML trong thư viện tài liệu kiểm soát làm <b>mẫu chuẩn</b> (được kiểm soát template). <b>Không được</b> tạo mẫu Excel.</li>
+<li><b>Phải</b> tạo SharePoint List tương ứng với biểu mẫu, bao gồm:
  <ul>
-<li>Trường bắt buộc (required), kiểu dữ liệu, danh mục mã (choice codes) và quy tắc inspection.</li>
+<li>Trường bắt buộc (bắt buộc), kiểu dữ liệu, danh mục mã (lựa chọn mã) và quy tắc kiểm tra.</li>
 <li>Trường tham chiếu Epicor: JobNum/PartNum/PackNum/ShipmentNum… <b>chỉ</b> là tham chiếu, <b>không</b> là nơi chốt giao dịch.</li>
-<li>Trường “EvidenceUrl” bắt buộc cho các trạng thái Hold/Release/Ship.</li>
+<li>Trường “EvidenceUrl” bắt buộc cho các trạng thái Hold/Phát hành/Ship.</li>
 </ul>
 </li>
-<li><b>Phải</b> tạo Power App giao diện kiosk theo vai trò (OPS/QA/WHS/QMS):
+<li><b>Phải</b> tạo Power App giao diện ki-ốt theo vai trò (OPS/QA/WHS/QMS):
  <ul>
-<li>Scan mã → tự điền JobNum/PackNum (nếu có) → chọn form → nhập dữ liệu → gửi.</li>
-<li><b>Không được</b> cho phép người dùng sửa bản ghi sau khi đã “Approved/Released”, trừ vai trò QA/QMS được phân quyền.</li>
+<li>Scan mã → tự điền JobNum/PackNum (nếu có) → chọn biểu mẫu → nhập dữ liệu → gửi.</li>
+<li><b>Không được</b> cho phép người dùng sửa bản ghi sau khi đã “Đã phê duyệt/đã phát hành”, trừ vai trò QA/QMS được phân quyền.</li>
 </ul>
 </li>
 <li><b>Phải</b> cấu hình Power Automate:
  <ul>
-<li>Luồng approval cho từng Control gate (Hold Release, approval delivery (ship release)…).</li>
-<li>Ghi kết quả approval vào “ApprovalHistory” (List) và khoá trạng thái bản ghi theo kết quả.</li>
-<li>Gắn nhãn retention/record theo SOP-104 cho các thư mục evidence Tier-1.</li>
+<li>Luồng phê duyệt cho từng Cổng kiểm soát (Hold Phát hành, phê duyệt giao hàng (ship phát hành)…).</li>
+<li>Ghi kết quả phê duyệt vào “ApprovalHistory” (List) và khoá trạng thái bản ghi theo kết quả.</li>
+<li>Gắn nhãn lưu giữ/hồ sơ theo SOP-104 cho các thư mục bằng chứng Tier-1.</li>
 </ul>
 </li>
-</ol><h3 class="h3">3.2 Ghi nhận tại hiện trường (kiosk/PC)</h3><ol>
-<li><b>Phải</b> scan mã Job Tracking Sheet/WIP Tag để mở đúng màn hình theo “scan-to-action”.</li>
+</ol><h3 class="h3">3.2 Ghi nhận tại hiện trường (ki-ốt/PC)</h3><ol>
+<li><b>Phải</b> scan mã Job Theo dõi Sheet/WIP Tag để mở đúng màn hình theo “scan-to-hành động”.</li>
 <li><b>Phải</b> điền đủ trường bắt buộc; <b>không được</b> dùng ký hiệu “—/N/A” cho trường bắt buộc nếu chưa có dữ liệu.</li>
-<li><b>Phải</b> gắn liên kết evidence (EvidenceUrl) trỏ tới thư mục/tệp trên M365 theo SSOT; <b>không được</b> đính kèm bản sao phân tán ngoài SSOT.</li>
+<li><b>Phải</b> gắn liên kết bằng chứng (EvidenceUrl) trỏ tới thư mục/tệp trên M365 theo SSOT; <b>không được</b> đính kèm bản sao phân tán ngoài SSOT.</li>
 <li><b>Phải</b> bấm “Gửi/Submit” để tạo bản ghi; hệ thống tự cấp mã RecordID.</li>
-</ol><h3 class="h3">3.3 Approval điện tử và điểm dừng</h3><ol>
-<li><b>Phải</b> thiết lập Control gate theo loại nghiệp vụ:
+</ol><h3 class="h3">3.3 Phê duyệt điện tử và điểm dừng</h3><ol>
+<li><b>Phải</b> thiết lập Cổng kiểm soát theo loại nghiệp vụ:
  <ul>
-<li>Control gate quality: QA approval release cho Hold/NCR/IR fail.</li>
-<li>Control gate delivery: WHS + QA approval approval delivery theo WI-OPS-010.</li>
+<li>Cổng kiểm soát chất lượng: QA phê duyệt phát hành cho Hold/NCR/IR fail.</li>
+<li>Cổng kiểm soát giao hàng: WHS + QA phê duyệt phê duyệt giao hàng theo WI-OPS-010.</li>
 </ul>
 </li>
-<li><b>Điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (hold point)))))))):</b> Khi thiếu EvidenceUrl hoặc evidence không truy cập được → <b>phải</b> giữ trạng thái “HOLD” và <b>không được</b> chuyển sang “RELEASE/SHIP”.</li>
-<li><b>Phải</b> lưu dấu vết approval (approver, thời gian, nội dung, quyết định) trong ApprovalHistory.</li>
-</ol><h3 class="h3">3.4 Change control form số hoá</h3><ul>
-<li><b>Không được</b> tự ý thêm/xoá/sửa cột SharePoint List khi chưa có approval kiểm soát document.</li>
-<li><b>Phải</b> cập nhật WI/FRM/ANNEX liên quan trước khi triển khai thay đổi; <b>phải</b> ghi nhận Revision và ngày hiệu lực.</li>
-<li><b>Phải</b> lưu DCR record cấu hình (Power App/Luồng) tại: <b>M365: CNC-IMS-HUB/QMS-Record/IT-OPS/Config-Change-Log/</b>.</li>
-</ul></div><div class="card"><h2 class="h2" style="margin-top:0;">4. Checkpoints &amp; Điểm giữ</h2><div class="table-card">
+<li><b>Điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm chặn)))))))):</b> Khi thiếu EvidenceUrl hoặc bằng chứng không truy cập được → <b>phải</b> giữ trạng thái “TẠM GIỮ” và <b>không được</b> chuyển sang “PHÁT HÀNH/SHIP”.</li>
+<li><b>Phải</b> lưu dấu vết phê duyệt (người phê duyệt, thời gian, nội dung, quyết định) trong ApprovalHistory.</li>
+</ol><h3 class="h3">3.4 Kiểm soát thay đổi biểu mẫu số hoá</h3><ul>
+<li><b>Không được</b> tự ý thêm/xoá/sửa cột SharePoint List khi chưa có phê duyệt kiểm soát tài liệu.</li>
+<li><b>Phải</b> cập nhật WI/FRM/ANNEX liên quan trước khi triển khai thay đổi; <b>phải</b> ghi nhận Phiên bản và ngày hiệu lực.</li>
+<li><b>Phải</b> lưu DCR hồ sơ cấu hình (Power App/Luồng) tại: <b>M365: CNC-IMS-HUB/QMS-Hồ sơ/IT-OPS/cấu hình-Thay đổi-Log/</b>.</li>
+</ul></div><div class="card"><h2 class="h2" style="margin-top:0;">4. điểm kiểm tra &amp; Điểm giữ</h2><div class="table-card">
 <table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table">
 <colgroup><col style="width:13.68%;"/><col style="width:23.16%;"/><col style="width:20.53%;"/><col style="width:23.68%;"/><col style="width:18.95%;"/></colgroup><thead>
 <tr>
 <th>Mốc kiểm soát</th>
 <th>Tiêu chí chấp nhận</th>
-<th>Điểm dừng (HOLD)</th>
-<th>Quyền mở (RELEASE)</th>
-<th>Record bắt buộc</th>
+<th>Điểm dừng (TẠM GIỮ)</th>
+<th>Quyền mở (PHÁT HÀNH)</th>
+<th>Hồ sơ bắt buộc</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>CP-101.1 — Trường bắt buộc</td>
-<td>100% trường required có dữ liệu hợp lệ</td>
+<td>100% trường bắt buộc có dữ liệu hợp lệ</td>
 <td>Thiếu/không hợp lệ → không cho Submit</td>
-<td>Hệ thống (xác nhận) + Chủ form (OPS/QA/WHS/QMS)</td>
+<td>Hệ thống (xác nhận) + Chủ biểu mẫu (OPS/QA/WHS/QMS)</td>
 <td>Bản ghi List (RecordID)</td>
 </tr>
 <tr>
-<td>CP-101.2 — Evidence</td>
+<td>CP-101.2 — Bằng chứng</td>
 <td>EvidenceUrl trỏ đúng SSOT, truy cập được</td>
-<td>Thiếu link/đường dẫn sai → HOLD</td>
-<td>QA Lead hoặc Process Owner theo RACI</td>
-<td>Link thư mục/tệp trong Job dossier (job dossier)</td>
+<td>Thiếu link/đường dẫn sai → TẠM GIỮ</td>
+<td>QA Lead hoặc Quy trình Owner theo RACI</td>
+<td>Link thư mục/tệp trong Hồ sơ công việc (hồ sơ công việc)</td>
 </tr>
 <tr>
-<td>CỔNG KIỂM SOÁT-101.3 — Approval</td>
-<td>Kết quả Approve có log trong ApprovalHistory</td>
-<td>Không có log/Reject → HOLD</td>
-<td>Approver được phân quyền</td>
+<td>CỔNG KIỂM SOÁT-101.3 — Phê duyệt</td>
+<td>Kết quả phê duyệt có log trong ApprovalHistory</td>
+<td>Không có log/Từ chối → TẠM GIỮ</td>
+<td>Người phê duyệt được phân quyền</td>
 <td>ApprovalHistory + bản ghi trạng thái</td>
 </tr>
 <tr>
-<td>CP-101.4 — Retention/Record</td>
-<td>Nhãn retention áp đúng theo SOP-104</td>
-<td>Chưa áp nhãn → HOLD cho các control gate Tier‑1</td>
-<td>QA/QMS (Document Control)</td>
-<td>Retention label log (Purview)</td>
+<td>CP-101.4 — Lưu giữ/Hồ sơ</td>
+<td>Nhãn lưu giữ áp đúng theo SOP-104</td>
+<td>Chưa áp nhãn → TẠM GIỮ cho các cổng kiểm soát Tier‑1</td>
+<td>QA/QMS (Tài liệu Control)</td>
+<td>Lưu giữ label log (Phạm vi quản lý)</td>
 </tr>
 </tbody>
 </table>
-</div></div><div class="card"><h2 class="h2" style="margin-top:0;">5. Output &amp; record (Record)</h2><div class="table-card">
+</div></div><div class="card"><h2 class="h2" style="margin-top:0;">5. Đầu ra &amp; hồ sơ (Hồ sơ)</h2><div class="table-card">
 <table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table">
 <colgroup><col style="width:13.88%;"/><col style="width:12.24%;"/><col style="width:22.86%;"/><col style="width:32.65%;"/><col style="width:18.37%;"/></colgroup><thead>
 <tr>
-<th>Record</th>
-<th>Register/List</th>
+<th>Hồ sơ</th>
+<th>Sổ đăng ký/List</th>
 <th>Nơi lưu SSOT</th>
-<th>Retention (event-based)</th>
+<th>Lưu giữ (sự kiện-dựa trên)</th>
 <th>Responsible Person</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Bản ghi form số hoá (RecordID)</td>
-<td>SharePoint List theo từng form</td>
-<td><b>M365: CNC-IMS-HUB/QMS-Record/OPS/Online-Forms/</b></td>
-<td>Khi Job đóng trong Epicor <b>hoặc</b> khi Shipment xác nhận delivery (tuỳ loại record) + 10 năm</td>
-<td>OPS/QA/WHS/QMS theo RACI của form</td>
+<td>Bản ghi biểu mẫu số hoá (RecordID)</td>
+<td>SharePoint List theo từng biểu mẫu</td>
+<td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/OPS/Online-Biểu mẫu/</b></td>
+<td>Khi Job đóng trong Epicor <b>hoặc</b> khi Lô giao hàng xác nhận giao hàng (tuỳ loại hồ sơ) + 10 năm</td>
+<td>OPS/QA/WHS/QMS theo RACI của biểu mẫu</td>
 </tr>
 <tr>
-<td>Log approval</td>
+<td>Log phê duyệt</td>
 <td>ApprovalHistory</td>
-<td><b>M365: CNC-IMS-HUB/QMS-Record/QMS/Approvals/</b></td>
-<td>Khi record được đóng (Closed) + 10 năm</td>
+<td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/QMS/Approvals/</b></td>
+<td>Khi hồ sơ được đóng (Closed) + 10 năm</td>
 <td>QA/QMS</td>
 </tr>
 <tr>
-<td>Thư mục evidence theo Job</td>
-<td>Job dossier Index</td>
-<td><b>M365: CNC-IMS-HUB/QMS-Record/OPS/Job-Dossier/&lt;JobNum&gt;/</b></td>
-<td>Khi Shipment xác nhận delivery trong Epicor + 10 năm</td>
-<td>WHS (record delivery) + QA (record quality)</td>
+<td>Thư mục bằng chứng theo Job</td>
+<td>Hồ sơ công việc Index</td>
+<td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/OPS/Job-Hồ sơ/&lt;JobNum&gt;/</b></td>
+<td>Khi Lô giao hàng xác nhận giao hàng trong Epicor + 10 năm</td>
+<td>WHS (hồ sơ giao hàng) + QA (hồ sơ chất lượng)</td>
 </tr>
 <tr>
-<td>Bản xuất PDF snapshot (nếu xuất)</td>
-<td>Daily Snapshot Register</td>
-<td><b>M365: CNC-IMS-HUB/QMS-Record/OPS/Snapshots/&lt;YYYY&gt;/&lt;MM&gt;/</b></td>
-<td>Khi tháng kết thúc + 3 năm (trừ record gắn Job dossier)</td>
+<td>Bản xuất PDF ảnh chụp trạng thái (nếu xuất)</td>
+<td>Hàng ngày Ảnh chụp trạng thái Sổ đăng ký</td>
+<td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/OPS/ảnh chụp trạng thái/&lt;YYYY&gt;/&lt;MM&gt;/</b></td>
+<td>Khi tháng kết thúc + 3 năm (trừ hồ sơ gắn Hồ sơ công việc)</td>
 <td>OPS</td>
 </tr>
 </tbody>
 </table>
-</div><p><b>Legal hold:</b> Khi có legal hold theo SOP-104, record thuộc phạm vi hold <b>phải</b> được giữ nguyên trạng cho tới khi được gỡ hold.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">6. An toàn / ESD / FOD</h2><ul>
-<li><b>Phải</b> bố trí kiosk không cản lối đi và không nằm trong vùng nguy hiểm máy đang chạy.</li>
+</div><p><b>Giữ pháp lý:</b> Khi có giữ pháp lý theo SOP-104, hồ sơ thuộc phạm vi hold <b>phải</b> được giữ nguyên trạng cho tới khi được gỡ hold.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">6. An toàn / ESD / FOD</h2><ul>
+<li><b>Phải</b> bố trí ki-ốt không cản lối đi và không nằm trong vùng nguy hiểm máy đang chạy.</li>
 <li><b>Phải</b> giữ sạch khu vực scan/ghi nhận và giữ mã vạch luôn nhìn thấy rõ, không bị giấy vụn hoặc bụi phoi che khuất (FOD).</li>
-<li><b>Phải</b> compliance quy định ESD khi ghi nhận tại khu vực có linh kiện nhạy ESD; <b>không được</b> đặt equipment cá nhân lên bàn operation.</li>
+<li><b>Phải</b> tuân thủ quy định ESD khi ghi nhận tại khu vực có linh kiện nhạy ESD; <b>không được</b> đặt thiết bị cá nhân lên bàn vận hành.</li>
 </ul></div><div class="card"><h2 class="h2" style="margin-top:0;">7. Hệ thống áp dụng (SoR / SSOT)</h2><div class="table-card">
 <table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table">
 <colgroup><col style="width:27.38%;"/><col style="width:25.00%;"/><col style="width:47.62%;"/></colgroup><thead>
@@ -217,14 +217,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>Epicor Kinetic</b></td>
+<td><b>Epicor Kinetic (Epicor)</b></td>
 <td>Nguồn chuẩn (SoR) cho mọi giao dịch</td>
-<td>Time entry, trạng thái job/công đoạn, PO, inventory giao dịch, pack/shipment, xác nhận delivery <b>phải</b> operation trong Epicor.</td>
+<td>Time mục nhập, trạng thái job/công đoạn, PO, hàng tồn kho giao dịch, pack/lô giao hàng, xác nhận giao hàng <b>phải</b> vận hành trong Epicor.</td>
 </tr>
 <tr>
-<td><b>M365 (SharePoint/Teams/Power Platform/Purview)</b></td>
-<td>Evidence/Record SSOT</td>
-<td>Record và evidence <b>phải</b> lưu tại SSOT như một nguồn chuẩn duy nhất; retention event-based và legal hold theo SOP-104.</td>
+<td><b>M365 (SharePoint/Teams/Power nền tảng/Phạm vi quản lý)</b></td>
+<td>Bằng chứng/Hồ sơ SSOT</td>
+<td>Hồ sơ và bằng chứng <b>phải</b> lưu tại SSOT như một nguồn chuẩn duy nhất; lưu giữ sự kiện-dựa trên và giữ pháp lý theo SOP-104.</td>
 </tr>
 <tr>
 <td>Power BI</td>
@@ -233,24 +233,24 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </tbody>
 </table>
-</div></div><h2 class="h2">Document điều hành liên kết</h2><div class="doc-link-row"><span class="doc-link">SOP-101</span><span class="doc-link">SOP-104</span><span class="doc-link">SOP-107</span><span class="doc-link">SOP-108</span><span class="doc-link">ANNEX-131</span><span class="doc-link">ANNEX-132</span><span class="doc-link">ANNEX-133</span><span class="doc-link">ANNEX-118</span></div>
+</div></div><h2 class="h2">Tài liệu điều hành liên kết</h2><div class="doc-link-row"><span class="doc-link">SOP-101</span><span class="doc-link">SOP-104</span><span class="doc-link">SOP-107</span><span class="doc-link">SOP-108</span><span class="doc-link">ANNEX-131</span><span class="doc-link">ANNEX-132</span><span class="doc-link">ANNEX-133</span><span class="doc-link">ANNEX-118</span></div>
 <h2 class="h2">8. Kiểm soát tài khoản, chữ ký điện tử và quyền sửa dữ liệu</h2>
-<div class="callout-strong"><b>Nguyên tắc bắt buộc:</b> Phải dùng đúng tài khoản cá nhân đã được cấp quyền. Người tạo bản ghi không được tự approval bản ghi của chính mình tại các control gate cần approval độc lập. Mọi sửa đổi sau khi approval phải để lại dấu vết kiểm toán (audit trail) gồm người sửa, thời điểm sửa, nội dung trước/sau và lý do sửa.</div>
+<div class="callout-strong"><b>Nguyên tắc bắt buộc:</b> Phải dùng đúng tài khoản cá nhân đã được cấp quyền. Người tạo bản ghi không được tự phê duyệt bản ghi của chính mình tại các cổng kiểm soát cần phê duyệt độc lập. Mọi sửa đổi sau khi phê duyệt phải để lại dấu vết kiểm toán gồm người sửa, thời điểm sửa, nội dung trước/sau và lý do sửa.</div>
 <ul class="tight note-list">
-<li>Phải dùng đúng vai trò được cấp quyền. Không được mượn tài khoản của người khác để gửi, duyệt, backfill hoặc mở hold.</li>
-<li>Record ở trạng thái <b>Approved / Released / Closed</b> chỉ được sửa khi có quyền override theo <b>ANNEX-120</b> và phải tạo log lý do.</li>
-<li>Mọi file evidence phải mở được từ SSOT; không nhúng link cá nhân, link local path hoặc link email tạm.</li>
-<li>Khi requirement customer đòi chữ ký điện tử hoặc log approval mức cao hơn, Process Owner phải cấu hình luồng duyệt trước khi form được phép dùng tại hiện trường.</li>
+<li>Phải dùng đúng vai trò được cấp quyền. Không được mượn tài khoản của người khác để gửi, duyệt, bổ sung / thay thế hoặc mở hold.</li>
+<li>Hồ sơ ở trạng thái <b>Đã phê duyệt / đã phát hành / Closed</b> chỉ được sửa khi có quyền ghi đè / bỏ qua theo <b>ANNEX-120</b> và phải tạo log lý do.</li>
+<li>Mọi file bằng chứng phải mở được từ SSOT; không nhúng link cá nhân, link nội bộ / tại chỗ path hoặc link email tạm.</li>
+<li>Khi yêu cầu khách hàng đòi chữ ký điện tử hoặc log phê duyệt mức cao hơn, Quy trình Owner phải cấu hình luồng duyệt trước khi biểu mẫu được phép dùng tại hiện trường.</li>
 </ul>
 <h2 class="h2">9. Chỉ số theo dõi bắt buộc</h2>
 <div class="kpi-grid">
-<div class="kpi-card"><h3>KPI-DIG-01 — Tỷ lệ submit hợp lệ ngay lần đầu</h3><div class="mini-note">Số bản ghi submit không lỗi inspection hợp lệ ÷ tổng submit. Mục tiêu operation: ≥ 98%.</div></div>
-<div class="kpi-card"><h3>KPI-DIG-02 — Tỷ lệ bản ghi có evidence truy cập được</h3><div class="mini-note">Số record có EvidenceUrl mở được và đúng dossier ÷ tổng record có requirement evidence. Mục tiêu: 100%.</div></div>
-<div class="kpi-card"><h3>KPI-DIG-03 — Tỷ lệ backfill đóng trong hạn</h3><div class="mini-note">Số record offline được backfill đúng thời hạn ÷ tổng record offline. Mục tiêu: ≥ 95% trong cùng ca hoặc ca kế tiếp theo rule đã duyệt.</div></div>
-<div class="kpi-card"><h3>KPI-DIG-04 — Tỷ lệ approval có log đầy đủ</h3><div class="mini-note">Số quyết định Release/Reject có đủ người duyệt, mốc thời gian, comment và trạng thái cuối ÷ tổng quyết định cần duyệt. Mục tiêu: 100%.</div></div>
+<div class="kpi-card"><h3>KPI-DIG-01 — Tỷ lệ submit hợp lệ ngay lần đầu</h3><div class="mini-note">Số bản ghi submit không lỗi kiểm tra hợp lệ ÷ tổng submit. Mục tiêu vận hành: ≥ 98%.</div></div>
+<div class="kpi-card"><h3>KPI-DIG-02 — Tỷ lệ bản ghi có bằng chứng truy cập được</h3><div class="mini-note">Số hồ sơ có EvidenceUrl mở được và đúng hồ sơ ÷ tổng hồ sơ có yêu cầu bằng chứng. Mục tiêu: 100%.</div></div>
+<div class="kpi-card"><h3>KPI-DIG-03 — Tỷ lệ bổ sung / thay thế đóng trong hạn</h3><div class="mini-note">Số hồ sơ offline được bổ sung / thay thế đúng thời hạn ÷ tổng hồ sơ offline. Mục tiêu: ≥ 95% trong cùng ca hoặc ca kế tiếp theo rule đã duyệt.</div></div>
+<div class="kpi-card"><h3>KPI-DIG-04 — Tỷ lệ phê duyệt có log đầy đủ</h3><div class="mini-note">Số quyết định Phát hành/Từ chối có đủ người duyệt, mốc thời gian, nhận xét và trạng thái cuối ÷ tổng quyết định cần duyệt. Mục tiêu: 100%.</div></div>
 </div>
-</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-workbook-usage">11. Form Excel đang hiệu lực — Cách dùng form khi form active đã chuyển hoàn toàn sang workbook Excel</h2><div class="note phase3a-workbook-alignment"><b>Operation chuẩn</b><br/>Người dùng mở FRM qua portal hoặc link document hệ thống phải được tải trực tiếp workbook hiện hành. Không dùng HTML form cũ để nhập liệu hoặc xác nhận approval; nếu cần xem trạng thái RELEASED / mã không release trong danh mục hiện hành, revision, người phụ trách hoặc phạm vi mã / phạm vi process thì dùng  và <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Form Control Register</a>.</div><ol class="tight phase3a-workbook-alignment"><li>Mở trực tiếp workbook của mã FRM đang RELEASED từ portal hoặc từ link trong SOP/WI/handbook/JD.</li><li>Nếu cần kiểm revision, người phụ trách, đường dẫn release, checksum hoặc bảng kê, tra <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Form Control Register</a>.</li><li>Nếu mã FRM không release trong danh mục hiện hành, không tạo record mới dưới mã đó; tra phạm vi mã / phạm vi process trong .</li><li>Ví dụ: FRM-412 không release trong danh mục hiện hành; người dùng phải tải và dùng <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> workbook cho receipt/IQC control gate và <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> cho HOLD/disposition.</li></ol></div></div></div></div>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
+</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-workbook-usage">11. Biểu mẫu Excel đang hiệu lực — Cách dùng biểu mẫu khi biểu mẫu active đã chuyển hoàn toàn sang sổ tay thực hành Excel</h2><div class="note phase3a-workbook-alignment"><b>Vận hành chuẩn</b><br/>Người dùng mở FRM qua portal hoặc link tài liệu hệ thống phải được tải trực tiếp sổ tay thực hành hiện hành. Không dùng HTML biểu mẫu cũ để nhập liệu hoặc xác nhận phê duyệt; nếu cần xem trạng thái ĐÃ PHÁT HÀNH / mã không phát hành trong danh mục hiện hành, phiên bản, người phụ trách hoặc phạm vi mã / phạm vi quy trình thì dùng  và <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Biểu mẫu Control Sổ đăng ký</a>.</div><ol class="tight phase3a-workbook-alignment"><li>Mở trực tiếp sổ tay thực hành của mã FRM đang ĐÃ PHÁT HÀNH từ portal hoặc từ link trong SOP/WI/sổ tay/JD.</li><li>Nếu cần kiểm phiên bản, người phụ trách, đường dẫn phát hành, tổng kiểm tra hoặc bảng kê, tra <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Biểu mẫu Control Sổ đăng ký</a>.</li><li>Nếu mã FRM không phát hành trong danh mục hiện hành, không tạo hồ sơ mới dưới mã đó; tra phạm vi mã / phạm vi quy trình trong .</li><li>Ví dụ: FRM-412 không phát hành trong danh mục hiện hành; người dùng phải tải và dùng <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> sổ tay thực hành cho phiếu nhận / biên nhận/IQC cổng kiểm soát và <a  download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> cho TẠM GIỮ/disposition.</li></ol></div></div></div></div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 <script src="../../../assets/app.js"></script>
 </body>
 </html>

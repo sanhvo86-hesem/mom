@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>C10-L3 — Process Lệnh production CNC (RFQ → Cash) — Lead | HESEM Academy</title>
+<title>C10-L3 — Quy trình Lệnh sản xuất CNC (RFQ → Tiền mặt) — Lead | HESEM Academy</title>
 <link href="../../../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -49,36 +49,36 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Document kiểm soát</span>
+    <span>Tài liệu kiểm soát</span>
   </div>
 </div>
 <div class="title">
-  <strong>C10-L3 — Process Lệnh production CNC (RFQ → Cash) — Lead | HESEM Academy</strong>
+  <strong>C10-L3 — Quy trình Lệnh sản xuất CNC (RFQ → Tiền mặt) — Lead | HESEM Academy</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
   <div class="row"><span><b>Code:</b></span><span>C10-L3</span></div>
   <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
   <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
-<div class="doc-content" id="docContent"><h1>C10 — Hiểu process Lệnh production CNC (RFQ → Cash) — Level 3</h1>
-<p class="lead"><strong>Level 3 — Điều phối liên phòng cho 10–30 job song song (cadence &amp; escalation).</strong> Mô-đun này giúp nhân sự hiểu và operation chuỗi RFQ → Cash bằng “control gate + record”, giữ đúng revision set và bàn giao không mất thông tin.</p>
+<div class="doc-content" id="docContent"><h1>C10 — Hiểu quy trình Lệnh sản xuất CNC (RFQ → Tiền mặt) — Level 3</h1>
+<p class="lead"><strong>Level 3 — Điều phối liên phòng cho 10–30 job song song (nhịp độ / chu kỳ họp &amp; escalation).</strong> Mô-đun này giúp nhân sự hiểu và vận hành chuỗi RFQ → Tiền mặt bằng “cổng kiểm soát + hồ sơ”, giữ đúng phiên bản set và bàn giao không mất thông tin.</p>
 <div class="hero">
 <h2>Chuẩn thực chiến – Level 3</h2>
 <div class="meta">
-<div><strong>Vai trò mục tiêu</strong><br/>Planning Team Leader, Production supervisor, Trưởng nhóm QA, Engineering lead, Estimator (SAL-03) lead</div>
-<div><strong>Output bắt buộc</strong>
+<div><strong>Vai trò mục tiêu</strong><br/>Kế hoạch Tổ trưởng, Sản xuất supervisor, Trưởng nhóm QA, Kỹ thuật lead, Người định giá (SAL-03) lead</div>
+<div><strong>Đầu ra bắt buộc</strong>
 <ul>
-<li>Thiết lập cadence (daily/weekly) và điều phối ưu tiên dựa trên dữ liệu: ngày đến hạn, readiness level, bottleneck, rủi ro customer.</li><li>Khóa ‘revision set’ cho từng Job và change control bằng change control; không release bản rời.</li><li>Dùng KPI pack để ra quyết định: OTD, tuổi tồn WIP (tuổi tồn (aging) / tuổi tồn), FPY, NCR rate, outsource thời gian dẫn (lead time).</li>
+<li>Thiết lập nhịp độ / chu kỳ họp (hàng ngày/hàng tuần) và điều phối ưu tiên dựa trên dữ liệu: ngày đến hạn, mức sẵn sàng, nút thắt / điểm nghẽn, rủi ro khách hàng.</li><li>Khóa ‘phiên bản set’ cho từng Job và kiểm soát thay đổi bằng kiểm soát thay đổi; không phát hành bản rời.</li><li>Dùng KPI pack để ra quyết định: OTD, tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn), FPY, NCR tỷ lệ, outsource thời gian dẫn (lead time).</li>
 </ul>
 </div>
-<div><strong>Control gate trọng yếu</strong><br/><span class="badge bad">Ưu tiên sai / tuổi tồn WIP (tuổi tồn / tuổi tồn) vượt ngưỡng / change ngoài kiểm soát</span> = HOLD/FAIL</div>
+<div><strong>Cổng kiểm soát trọng yếu</strong><br/><span class="badge bad">Ưu tiên sai / tuổi tồn WIP (tuổi tồn / tuổi tồn) vượt ngưỡng / thay đổi ngoài kiểm soát</span> = TẠM GIỮ/FAIL</div>
 <div><strong>Thời lượng</strong><br/>Lý thuyết 75 phút • OJT 150 phút</div>
 </div>
-<p class="small-note">Nguyên tắc operation: không nhảy control gate, không dùng file rời làm nguồn, không delivery khi thiếu bộ record delivery (ship packet).</p>
+<p class="small-note">Nguyên tắc vận hành: không nhảy cổng kiểm soát, không dùng file rời làm nguồn, không giao hàng khi thiếu bộ hồ sơ giao hàng (ship gói hồ sơ).</p>
 </div><div class="card">
 <span class="badge">Bộ diễn tập (Job CNC)</span>
 <p class="lead" style="margin-top:10px;">
@@ -86,131 +86,131 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh production E2E (RFQ → Bộ record delivery (ship packet)) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html">DRL-07 — TRN-Bài diễn tập ACA-DRL-07 — Shipping Packet + CoC | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html">DRL-02 — TRN-Bài diễn tập ACA-DRL-02 — Revision &amp;amp; SSOT (Đánh giá 60-Second) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html">DRL-11 — TRN-Bài diễn tập ACA-DRL-11 — Customer Requirement → CTQ Translation | HESEM Academy</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship gói hồ sơ)) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html">DRL-07 — TRN-Bài diễn tập ACA-DRL-07 — Giao vận Gói hồ sơ + CoC | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html">DRL-02 — TRN-Bài diễn tập ACA-DRL-02 — Phiên bản &amp;amp; SSOT (Đánh giá 60-Thứ hai / Giây) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html">DRL-11 — TRN-Bài diễn tập ACA-DRL-11 — Khách hàng Yêu cầu → CTQ Dịch thuật | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
- Lưu evidence theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
  </p>
 </div>
-<h2>2) Mục đích mô-đun &amp; bối cảnh operation</h2>
+<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card">
 <ul>
-<li>Đưa mọi người về cùng một “bản đồ công việc”: RFQ → Báo giá → Khởi động → ENG release → Execute → QC → Ship → Invoice.</li>
-<li>Chặn 3 rủi ro lớn của workshop gia công theo đơn (job shop) CNC: <strong>sai revision (wrong revision)</strong>, <strong>thiếu chứng từ</strong>, <strong>bàn giao mất thông tin</strong>.</li>
-<li>Biến hiểu biết thành hành động: checklist + OJT + performance test + MRR để operation QMS hàng ngày.</li>
+<li>Đưa mọi người về cùng một “bản đồ công việc”: RFQ → Báo giá → Khởi động → ENG phát hành → Thực thi → QC → Ship → Hóa đơn.</li>
+<li>Chặn 3 rủi ro lớn của phân xưởng gia công theo đơn (job xưởng) CNC: <strong>sai phiên bản</strong>, <strong>thiếu chứng từ</strong>, <strong>bàn giao mất thông tin</strong>.</li>
+<li>Biến hiểu biết thành hành động: bảng kiểm + OJT + hiệu suất test + MRR để vận hành QMS hàng ngày.</li>
 </ul>
 </div>
-<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (input/output) + hold point</h2>
-<p>Chuỗi Lệnh production operation theo control gate G0–G5. Mỗi control gate có điều kiện vào/ra và record tối thiểu (MRR). Khi thiếu MRR hoặc sai revision (wrong revision) set: kích hoạt HOLD.</p>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
+<p>Chuỗi Lệnh sản xuất vận hành theo cổng kiểm soát G0–G5. Mỗi cổng kiểm soát có điều kiện vào/ra và hồ sơ tối thiểu (MRR). Khi thiếu MRR hoặc sai phiên bản set: kích hoạt TẠM GIỮ.</p>
 <div class="vflow">
-<div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Cadence</strong><p>Thiết lập cadence daily/weekly để điều phối đa job.</p></div></div>
-<div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Readiness level review</strong><p>Đánh giá readiness level theo control gate: input, material, program, QA capacity.</p></div></div>
-<div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Freeze window</strong><p>Khóa kế hoạch ngắn hạn; thay đổi đi qua escal + change control.</p></div></div>
-<div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Bottleneck control</strong><p>Quản trị bottleneck và tuổi tồn WIP (tuổi tồn / tuổi tồn) theo ngưỡng.</p></div></div>
-<div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Delivery review</strong><p>Review OTD theo rủi ro; kích hoạt recovery plan.</p></div></div>
-<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Learning loop</strong><p>Đóng vòng phản hồi: claim → containment → CAPA → update standard.</p></div></div>
+<div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Nhịp độ</strong><p>Thiết lập nhịp độ / chu kỳ họp hàng ngày/hàng tuần để điều phối đa job.</p></div></div>
+<div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Mức sẵn sàng rà soát</strong><p>Đánh giá mức sẵn sàng theo cổng kiểm soát: đầu vào, nguyên vật liệu, program, QA công suất.</p></div></div>
+<div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Đóng băng cửa sổ / khung thời gian</strong><p>Khóa kế hoạch ngắn hạn; thay đổi đi qua escal + kiểm soát thay đổi.</p></div></div>
+<div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>nút thắt / điểm nghẽn control</strong><p>Quản trị nút thắt / điểm nghẽn và tuổi tồn WIP (tuổi tồn / tuổi tồn) theo ngưỡng.</p></div></div>
+<div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Giao hàng rà soát</strong><p>Rà soát OTD theo rủi ro; kích hoạt khôi phục / thu hồi plan.</p></div></div>
+<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>học tập vòng lặp</strong><p>Đóng vòng phản hồi: khiếu nại / yêu cầu bồi thường → ngăn chặn → CAPA → cập nhật standard.</p></div></div>
 </div>
 <h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
-<ol><li>Ưu tiên theo cảm tính; không có dispatch snapshot và rule đổi ưu tiên.</li><li>tuổi tồn WIP (tuổi tồn / tuổi tồn) tăng nhưng không có action; bottleneck bị che.</li><li>Kế hoạch bị thay liên tục; không có cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch); workshop mất nhịp.</li><li>Release kỹ thuật trễ nhưng vẫn release production; lỗi revision/control gate bùng phát.</li><li>QA capacity không được tính; FAI/final bị nghẽn gây trễ ship.</li><li>Outsource thời gian dẫn không theo dõi; phát hiện trễ khi đã sát ship.</li><li>Escal log không được đóng; hành động không có người phụ trách/due.</li><li>Tồn tại nhiều version của job pack; SSOT bị phá.</li><li>Không đo OTD theo control gate; chỉ đo cuối cùng phải không thấy nguyên nhân sớm.</li><li>Claim khách lặp lại nhưng không update standard/bài học kinh nghiệm.</li><li>Margin erosion do rework/OT nhưng không phản ứng.</li></ol>
-<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người phụ trách + evidence)</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Evidence/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Daily Tier cadence</strong></td><td>OPS/Planning</td><td>Tier meeting log + snapshot KPI</td><td>Không họp = không đổi ưu tiên</td></tr><tr><td><strong>Readiness level score theo control gate</strong></td><td>Planning</td><td>Readiness level checklist (G0–G3)</td><td>Readiness level &lt; 80% = escal</td></tr><tr><td><strong>Freeze window 24–72h</strong></td><td>Ops Manager</td><td>Rule + log override</td><td>Override phải có lý do và approval</td></tr><tr><td><strong>Bottleneck &amp; WIP tuổi tồn thresholds</strong></td><td>OPS</td><td>WIP tuổi tồn report</td><td>Tuổi tồn vượt ngưỡng = recovery plan</td></tr><tr><td><strong>QA capacity planning</strong></td><td>Trưởng nhóm QA</td><td>FAI/final capacity board</td><td>Không release delivery khi QA chưa release</td></tr><tr><td><strong>Supplier thời gian dẫn bảng điều khiển</strong></td><td>PUR</td><td>Supplier confirmation log</td><td>Trễ thời gian dẫn = escal + option NCC</td></tr><tr><td><strong>Control gate-based OTD chỉ số</strong></td><td>Planning</td><td>OTD by control gate report</td><td>OTD giảm = điều tra nguyên nhân theo control gate</td></tr><tr><td><strong>Learning loop (CAPA)</strong></td><td>QA/QMS</td><td>SOP-QMS-006 CAPA + updated standard</td><td>Repeat vấn đề = update WI/form/training</td></tr></tbody></table></div>
-<h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Sai REV hoặc không xác định được revision set của job.</strong></td><td>Dừng operation; gắn HOLD; báo Supervisor + QA; mở Change Notice khi có thay đổi.</td></tr><tr><td><span class="badge warn">HOLD</span></td><td><strong>Thiếu MRR bắt buộc tại control gate (review hợp đồng , khởi động, baseline, FAI, bộ record delivery bộ record delivery / review hợp đồng).</strong></td><td>Không chuyển công đoạn/không ship; cập nhật log; escal theo PROC-OPS-003.</td></tr><tr><td><span class="badge bad">BLOCK</span></td><td><strong>Thay đổi program/setup/spec/đổi NCC mà không có record hoặc không có approval.</strong></td><td>Khóa release; recall bản rời; mở change package; chạy xác minh; cập nhật SSOT.</td></tr></tbody></table></div>
+<ol><li>Ưu tiên theo cảm tính; không có điều phối xuất hàng ảnh chụp trạng thái và rule đổi ưu tiên.</li><li>tuổi tồn WIP (tuổi tồn / tuổi tồn) tăng nhưng không có hành động; nút thắt / điểm nghẽn bị che.</li><li>Kế hoạch bị thay liên tục; không có cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch); phân xưởng mất nhịp.</li><li>Phát hành kỹ thuật trễ nhưng vẫn phát hành sản xuất; lỗi phiên bản/cổng kiểm soát bùng phát.</li><li>QA công suất không được tính; FAI/final bị nghẽn gây trễ ship.</li><li>Outsource thời gian dẫn không theo dõi; phát hiện trễ khi đã sát ship.</li><li>Escal log không được đóng; hành động không có người phụ trách/due.</li><li>Tồn tại nhiều version của job pack; SSOT bị phá.</li><li>Không đo OTD theo cổng kiểm soát; chỉ đo cuối cùng phải không thấy nguyên nhân sớm.</li><li>khiếu nại / yêu cầu bồi thường khách lặp lại nhưng không cập nhật standard/bài học kinh nghiệm.</li><li>Biên lợi nhuận xói mòn do làm lại/OT nhưng không phản ứng.</li></ol>
+<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người phụ trách + bằng chứng)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Điểm kiểm soát</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Hàng ngày Tier nhịp độ / chu kỳ họp</strong></td><td>OPS/Kế hoạch</td><td>Tier cuộc họp log + ảnh chụp trạng thái KPI</td><td>Không họp = không đổi ưu tiên</td></tr><tr><td><strong>Mức sẵn sàng score theo cổng kiểm soát</strong></td><td>Kế hoạch</td><td>Mức sẵn sàng bảng kiểm (G0–G3)</td><td>Mức sẵn sàng &lt; 80% = escal</td></tr><tr><td><strong>Đóng băng cửa sổ / khung thời gian 24–72h</strong></td><td>Ops Manager</td><td>Rule + log ghi đè / bỏ qua</td><td>ghi đè / bỏ qua phải có lý do và phê duyệt</td></tr><tr><td><strong>nút thắt / điểm nghẽn &amp; WIP tuổi tồn ngưỡng</strong></td><td>OPS</td><td>WIP tuổi tồn báo cáo</td><td>Tuổi tồn vượt ngưỡng = khôi phục / thu hồi plan</td></tr><tr><td><strong>QA công suất lập kế hoạch</strong></td><td>Trưởng nhóm QA</td><td>FAI/final công suất bảng</td><td>Không phát hành giao hàng khi QA chưa phát hành</td></tr><tr><td><strong>Nhà cung cấp thời gian dẫn bảng điều khiển</strong></td><td>PUR</td><td>Nhà cung cấp xác nhận log</td><td>Trễ thời gian dẫn = escal + option NCC</td></tr><tr><td><strong>Cổng kiểm soát-dựa trên OTD chỉ số</strong></td><td>Kế hoạch</td><td>OTD by cổng kiểm soát báo cáo</td><td>OTD giảm = điều tra nguyên nhân theo cổng kiểm soát</td></tr><tr><td><strong>học tập vòng lặp (CAPA)</strong></td><td>QA/QMS</td><td>SOP-QMS-006 CAPA + đã cập nhật standard</td><td>Lặp lại vấn đề = cập nhật WI/biểu mẫu/đào tạo</td></tr></tbody></table></div>
+<h2>6) Fail-nhanh quy tắc (STOP/TẠM GIỮ/CHẶN)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Sai REV hoặc không xác định được phiên bản set của job.</strong></td><td>Dừng vận hành; gắn TẠM GIỮ; báo Supervisor + QA; mở Thay đổi Thông báo khi có thay đổi.</td></tr><tr><td><span class="badge warn">TẠM GIỮ</span></td><td><strong>Thiếu MRR bắt buộc tại cổng kiểm soát (rà soát hợp đồng , khởi động, mốc chuẩn, FAI, bộ hồ sơ giao hàng bộ hồ sơ giao hàng / rà soát hợp đồng).</strong></td><td>Không chuyển công đoạn/không ship; cập nhật log; escal theo PROC-OPS-003.</td></tr><tr><td><span class="badge bad">CHẶN</span></td><td><strong>Thay đổi program/setup/spec/đổi NCC mà không có hồ sơ hoặc không có phê duyệt.</strong></td><td>Khóa phát hành; thu hồi bản rời; mở thay đổi gói hàng; chạy xác minh; cập nhật SSOT.</td></tr></tbody></table></div>
 <h2>7) Phản ứng 60 giây</h2>
 <ol>
-<li>Xác định loại rủi ro: sai revision (wrong revision) / thiếu record / sai bàn giao / change không kiểm soát.</li>
-<li>Kích hoạt HOLD ngay tại điểm phát hiện (tag + cập nhật log/ERP).</li>
-<li>Chụp 01 evidence thời điểm phát hiện (màn hình ERP có timestamp hoặc link SSOT).</li>
-<li>Báo theo ladder: cell người phụ trách → supervisor → QA/QMS (≤ 10 phút).</li>
+<li>Xác định loại rủi ro: sai phiên bản / thiếu hồ sơ / sai bàn giao / thay đổi không kiểm soát.</li>
+<li>Kích hoạt TẠM GIỮ ngay tại điểm phát hiện (tag + cập nhật log/ERP).</li>
+<li>Chụp 01 bằng chứng thời điểm phát hiện (màn hình ERP có dấu thời gian hoặc link SSOT).</li>
+<li>Báo theo bậc thang năng lực: cell người phụ trách → supervisor → QA/QMS (≤ 10 phút).</li>
 <li>Mở 01 hành động có người phụ trách + due trong ngày và liên kết SSOT.</li>
 </ol>
-<h2>8) Checklist operation (≤ 15 bước)</h2>
-<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Evidence/MRR</th><th>Repeat vấn đề lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Chốt cadence: daily tier + weekly plan; lưu minutes vào SSOT.</strong></td><td>Planning Team Leader</td><td>Tier minutes</td><td>Không có minutes</td></tr><tr><td>2</td><td><strong>Tạo tuổi tồn WIP (tuổi tồn / tuổi tồn) report theo nhóm công đoạn và bottleneck.</strong></td><td>Planning</td><td>WIP tuổi tồn report</td><td>Không nhìn thấy tuổi tồn</td></tr><tr><td>3</td><td><strong>Đánh giá readiness level top 10 job sắp ship (input/material/program/QA).</strong></td><td>Planning/QA</td><td>Readiness level checklist</td><td>Ship gấp nhưng readiness level thấp</td></tr><tr><td>4</td><td><strong>Thiết lập cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) 24–72h; log mọi override.</strong></td><td>Ops Manager</td><td>Override log</td><td>Kế hoạch thay liên tục</td></tr><tr><td>5</td><td><strong>Khi machine down: mở escal; cập nhật recovery plan trong 2h.</strong></td><td>OPS</td><td>Escal log + recovery plan</td><td>Chờ đến cuối ca</td></tr><tr><td>6</td><td><strong>Theo dõi outsource critical path và thời gian dẫn bằng bảng điều khiển.</strong></td><td>PUR</td><td>Supplier log</td><td>Phát hiện trễ sát ship</td></tr><tr><td>7</td><td><strong>Review OTD theo control gate (G0–G5) và xác định nguyên nhân top 3.</strong></td><td>Planning</td><td>OTD by control gate</td><td>Chỉ đo cuối</td></tr><tr><td>8</td><td><strong>Đóng learning loop: claim/NCR lặp → CAPA → update standard.</strong></td><td>QA/QMS</td><td>CAPA + WI update</td><td>Repeat vấn đề không cải tiến</td></tr></tbody></table></div>
+<h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Bằng chứng/MRR</th><th>Lặp lại vấn đề lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Chốt nhịp độ / chu kỳ họp: hàng ngày tier + hàng tuần plan; lưu biên bản họp vào SSOT.</strong></td><td>Kế hoạch Tổ trưởng</td><td>Tier biên bản họp</td><td>Không có biên bản họp</td></tr><tr><td>2</td><td><strong>Tạo tuổi tồn WIP (tuổi tồn / tuổi tồn) báo cáo theo nhóm công đoạn và nút thắt / điểm nghẽn.</strong></td><td>Kế hoạch</td><td>WIP tuổi tồn báo cáo</td><td>Không nhìn thấy tuổi tồn</td></tr><tr><td>3</td><td><strong>Đánh giá mức sẵn sàng top 10 job sắp ship (đầu vào/nguyên vật liệu/program/QA).</strong></td><td>Kế hoạch/QA</td><td>Mức sẵn sàng bảng kiểm</td><td>Ship gấp nhưng mức sẵn sàng thấp</td></tr><tr><td>4</td><td><strong>Thiết lập cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) 24–72h; log mọi ghi đè / bỏ qua.</strong></td><td>Ops Manager</td><td>ghi đè / bỏ qua log</td><td>Kế hoạch thay liên tục</td></tr><tr><td>5</td><td><strong>Khi machine xuống / ngừng: mở escal; cập nhật khôi phục / thu hồi plan trong 2h.</strong></td><td>OPS</td><td>Escal log + khôi phục / thu hồi plan</td><td>Chờ đến cuối ca</td></tr><tr><td>6</td><td><strong>Theo dõi outsource quan trọng / nghiêm trọng path và thời gian dẫn bằng bảng điều khiển.</strong></td><td>PUR</td><td>Nhà cung cấp log</td><td>Phát hiện trễ sát ship</td></tr><tr><td>7</td><td><strong>Rà soát OTD theo cổng kiểm soát (G0–G5) và xác định nguyên nhân top 3.</strong></td><td>Kế hoạch</td><td>OTD by cổng kiểm soát</td><td>Chỉ đo cuối</td></tr><tr><td>8</td><td><strong>Đóng học tập vòng lặp: khiếu nại / yêu cầu bồi thường/NCR lặp → CAPA → cập nhật standard.</strong></td><td>QA/QMS</td><td>CAPA + WI cập nhật</td><td>Lặp lại vấn đề không cải tiến</td></tr></tbody></table></div>
 <h2>9) OJT thực chiến theo TWI</h2>
-<h3>Job breakdown (Step / Điểm then chốt / Lý do)</h3>
-<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Operation</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Đọc job pack</td><td>Xác nhận JobNum/PartNo/REV và requirement đặc biệt</td><td>Ngăn sai revision (wrong revision) và bỏ sót CTQ</td></tr><tr><td>2</td><td>Nhận diện control gate</td><td>Xác định control gate hiện tại và điều kiện ra control gate</td><td>Không nhảy control gate</td></tr><tr><td>3</td><td>Chuẩn bị record</td><td>Mở đúng form, điền đúng trường bắt buộc</td><td>sẵn sàng cho đánh giá</td></tr><tr><td>4</td><td>Thực thi &amp; ghi nhận</td><td>Ghi theo thời điểm phát sinh; lưu SSOT</td><td>Dữ liệu có giá trị</td></tr><tr><td>5</td><td>HOLD &amp; escal</td><td>Kích hoạt HOLD/STOP/BLOCK đúng rule</td><td>Chặn lỗi lan rộng</td></tr><tr><td>6</td><td>Bàn giao</td><td>Bàn giao bằng link SSOT + checklist + người nhận xác nhận</td><td>Không mất thông tin</td></tr></tbody></table></div>
-<h3>OJT output bắt buộc</h3>
+<h3>Job sự cố hỏng máy (Step / Điểm then chốt / Lý do)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Vận hành</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Đọc job pack</td><td>Xác nhận JobNum/PartNo/REV và yêu cầu đặc biệt</td><td>Ngăn sai phiên bản và bỏ sót CTQ</td></tr><tr><td>2</td><td>Nhận diện cổng kiểm soát</td><td>Xác định cổng kiểm soát hiện tại và điều kiện ra cổng kiểm soát</td><td>Không nhảy cổng kiểm soát</td></tr><tr><td>3</td><td>Chuẩn bị hồ sơ</td><td>Mở đúng biểu mẫu, điền đúng trường bắt buộc</td><td>sẵn sàng cho đánh giá</td></tr><tr><td>4</td><td>Thực thi &amp; ghi nhận</td><td>Ghi theo thời điểm phát sinh; lưu SSOT</td><td>Dữ liệu có giá trị</td></tr><tr><td>5</td><td>TẠM GIỮ &amp; escal</td><td>Kích hoạt TẠM GIỮ/STOP/CHẶN đúng rule</td><td>Chặn lỗi lan rộng</td></tr><tr><td>6</td><td>Bàn giao</td><td>Bàn giao bằng link SSOT + bảng kiểm + người nhận xác nhận</td><td>Không mất thông tin</td></tr></tbody></table></div>
+<h3>OJT đầu ra bắt buộc</h3>
 <ul>
 <li>01 trang “Job 5 dòng” (JobNum/PartNo/REV/CTQ/ngày đến hạn/công đoạn đặc biệt) lưu vào SSOT.</li>
-<li>01 checklist xác nhận control gate readiness level (G0/G1/G2 theo phạm vi) và link SSOT.</li>
-<li>01 record HOLD + 01 hành động đóng trong ngày cho tình huống giả lập thiếu MRR.</li>
+<li>01 bảng kiểm xác nhận cổng kiểm soát mức sẵn sàng (G0/G1/G2 theo phạm vi) và link SSOT.</li>
+<li>01 hồ sơ TẠM GIỮ + 01 hành động đóng trong ngày cho tình huống giả lập thiếu MRR.</li>
 </ul>
-<h3>Rubric L1–L4 (hành vi quan sát được)</h3>
+<h3>Tiêu chí đánh giá L1–L4 (hành vi quan sát được)</h3>
 <div class="table-card"><table class="table rubric">
 <thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead>
 <tbody>
-<tr><td><strong>L1</strong></td><td>Nhận diện đúng luồng và control gate; làm đúng tại điểm làm việc</td><td>Không sai JobNum/REV; biết HOLD; traceability record ≤ 60 giây</td></tr>
-<tr><td><strong>L2</strong></td><td>Chạy job segment và bàn giao chuẩn evidence</td><td>Không thiếu MRR trong phạm vi; escal đúng SLA; bàn giao có xác nhận</td></tr>
-<tr><td><strong>L3</strong></td><td>Điều phối đa job theo cadence và dữ liệu</td><td>tuổi tồn WIP (tuổi tồn / tuổi tồn) kiểm soát; ưu tiên đúng; change được kiểm soát</td></tr>
-<tr><td><strong>L4</strong></td><td>Thiết kế hệ thống RFQ→Cash</td><td>Control gate governance + KPI + đánh giá plan; enforcement SSOT/ERP</td></tr>
+<tr><td><strong>L1</strong></td><td>Nhận diện đúng luồng và cổng kiểm soát; làm đúng tại điểm làm việc</td><td>Không sai JobNum/REV; biết TẠM GIỮ; truy xuất nguồn gốc hồ sơ ≤ 60 giây</td></tr>
+<tr><td><strong>L2</strong></td><td>Chạy job phân khúc và bàn giao chuẩn bằng chứng</td><td>Không thiếu MRR trong phạm vi; escal đúng SLA; bàn giao có xác nhận</td></tr>
+<tr><td><strong>L3</strong></td><td>Điều phối đa job theo nhịp độ / chu kỳ họp và dữ liệu</td><td>tuổi tồn WIP (tuổi tồn / tuổi tồn) kiểm soát; ưu tiên đúng; thay đổi được kiểm soát</td></tr>
+<tr><td><strong>L4</strong></td><td>Thiết kế hệ thống RFQ→Tiền mặt</td><td>Cổng kiểm soát quản trị + KPI + đánh giá plan; thực thi / cưỡng chế SSOT/ERP</td></tr>
 </tbody></table></div>
 <h2>10) Đánh giá</h2>
-<h3>Bài inspection nhanh (≥ 20 câu)</h3>
-<div class="quiz"><ol><li>Readiness level score gồm những yếu tố nào trong workshop gia công theo đơn CNC?</li><li>cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) dùng để chặn rủi ro gì?</li><li>tuổi tồn WIP (tuổi tồn / tuổi tồn) đo như thế nào và ngưỡng escal là gì?</li><li>OTD by control gate khác gì OTD cuối cùng?</li><li>Bottleneck control cần dữ liệu nào từ ERP?</li><li>Khi QA capacity nghẽn, phản ứng đúng là gì?</li><li>Rule đổi ưu tiên trong ngày cần evidence gì?</li><li>Outsource critical path được theo dõi ra sao?</li><li>Margin erosion nhìn thấy qua chỉ số nào?</li><li>Tier cadence gồm những cuộc họp nào và mục tiêu từng cuộc?</li><li>Escal log cần các trường nào để đóng được?</li><li>Khi Release kỹ thuật trễ, control gate nào bị ảnh hưởng?</li><li>Tại sao SSOT là cưỡng chế trong điều phối đa job?</li><li>Khi OTD giảm, process điều tra theo control gate là gì?</li><li>Chỉ ra 3 dấu hiệu ‘workshop mất nhịp’ do planning.</li><li>Learning loop requirement cập nhật document nào?</li><li>Khi claim khách lặp, CAPA phải làm gì?</li><li>Phân biệt recovery plan và re-plan.</li><li>KPI pack tối thiểu cho weekly plan gồm những gì?</li><li>Định nghĩa ‘critical path’ trong lệnh production CNC.</li><li>Khi có expedite, điều gì không được phá?</li><li>Cách đánh giá hiệu lực của cadence.</li></ol></div>
-<h3>Scenario (≥ 3 tình huống thật)</h3>
+<h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
+<div class="quiz"><ol><li>Mức sẵn sàng score gồm những yếu tố nào trong phân xưởng gia công theo đơn CNC?</li><li>cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) dùng để chặn rủi ro gì?</li><li>tuổi tồn WIP (tuổi tồn / tuổi tồn) đo như thế nào và ngưỡng escal là gì?</li><li>OTD by cổng kiểm soát khác gì OTD cuối cùng?</li><li>nút thắt / điểm nghẽn control cần dữ liệu nào từ ERP?</li><li>Khi QA công suất nghẽn, phản ứng đúng là gì?</li><li>Rule đổi ưu tiên trong ngày cần bằng chứng gì?</li><li>Outsource quan trọng / nghiêm trọng path được theo dõi ra sao?</li><li>Biên lợi nhuận xói mòn nhìn thấy qua chỉ số nào?</li><li>Tier nhịp độ / chu kỳ họp gồm những cuộc họp nào và mục tiêu từng cuộc?</li><li>Escal log cần các trường nào để đóng được?</li><li>Khi Phát hành kỹ thuật trễ, cổng kiểm soát nào bị ảnh hưởng?</li><li>Tại sao SSOT là cưỡng chế trong điều phối đa job?</li><li>Khi OTD giảm, quy trình điều tra theo cổng kiểm soát là gì?</li><li>Chỉ ra 3 dấu hiệu ‘phân xưởng mất nhịp’ do lập kế hoạch.</li><li>học tập vòng lặp yêu cầu cập nhật tài liệu nào?</li><li>Khi khiếu nại / yêu cầu bồi thường khách lặp, CAPA phải làm gì?</li><li>Phân biệt khôi phục / thu hồi plan và re-plan.</li><li>KPI pack tối thiểu cho hàng tuần plan gồm những gì?</li><li>Định nghĩa ‘quan trọng / nghiêm trọng path’ trong lệnh sản xuất CNC.</li><li>Khi có đẩy nhanh tiến độ, điều gì không được phá?</li><li>Cách đánh giá hiệu lực của nhịp độ / chu kỳ họp.</li></ol></div>
+<h3>Tình huống (≥ 3 tình huống thật)</h3>
 <details>
-<summary>Máy bottleneck dừng 6 giờ, ảnh hưởng 7 job sắp ship</summary>
+<summary>Máy nút thắt / điểm nghẽn dừng 6 giờ, ảnh hưởng 7 job sắp ship</summary>
 <div class="grid">
-<div class="dl"><h4>Dữ kiện</h4><ul><li>Máy 5-axis down do crash</li><li>7 job đang chờ OP40 trên máy này</li><li>3 job có due trong 2 ngày</li></ul></div>
-<div class="dl"><h4>Requirement</h4><p><strong>Hành động điều phối trong 2 giờ đầu và evidence cần có.</strong></p><h4>Đáp án chuẩn operation</h4><ul><li>Mở escal; cập nhật downtime + ETA; tạo recovery plan.</li><li>Re-prioritize bằng dispatch snapshot; log override.</li><li>Engineering/OPS đánh giá option: chuyển máy, OT, outsource, split lot.</li><li>Estimator (SAL-03) cập nhật khách theo SLA; không hứa vượt control gate QA.</li></ul></div>
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Máy 5-trục xuống / ngừng do sự cố nghiêm trọng</li><li>7 job đang chờ OP40 trên máy này</li><li>3 job có due trong 2 ngày</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Hành động điều phối trong 2 giờ đầu và bằng chứng cần có.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Mở escal; cập nhật thời gian ngừng máy + ETA; tạo khôi phục / thu hồi plan.</li><li>Re-ưu tiên hóa bằng điều phối xuất hàng ảnh chụp trạng thái; log ghi đè / bỏ qua.</li><li>Kỹ thuật/OPS đánh giá option: chuyển máy, OT, outsource, tách / chia lot.</li><li>Người định giá (SAL-03) cập nhật khách theo SLA; không hứa vượt cổng kiểm soát QA.</li></ul></div>
 </div>
 </details>
 <details>
-<summary>Release kỹ thuật trễ nhưng production muốn chạy trước</summary>
+<summary>Phát hành kỹ thuật trễ nhưng sản xuất muốn chạy trước</summary>
 <div class="grid">
-<div class="dl"><h4>Dữ kiện</h4><ul><li>Job J24031 đã có vật liệu và tool</li><li>Bộ record chuẩn (baseline package) chưa release</li><li>OPS muốn chạy để giữ OTD</li></ul></div>
-<div class="dl"><h4>Requirement</h4><p><strong>Quyết định và control gate bị ảnh hưởng.</strong></p><h4>Đáp án chuẩn operation</h4><ul><li>HOLD release; bộ record chuẩn là điều kiện control gate G1.</li><li>Escal Release kỹ thuật; đặt due trong ngày.</li><li>Chỉ chạy khi revision set khóa và program/setup release theo PROC-CNC-002.</li><li>Log quyết định; tránh tạo song song 2 version.</li></ul></div>
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Job J24031 đã có vật liệu và tool</li><li>Bộ hồ sơ chuẩn (mốc chuẩn gói hàng) chưa phát hành</li><li>OPS muốn chạy để giữ OTD</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Quyết định và cổng kiểm soát bị ảnh hưởng.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>TẠM GIỮ phát hành; bộ hồ sơ chuẩn là điều kiện cổng kiểm soát G1.</li><li>Escal Phát hành kỹ thuật; đặt due trong ngày.</li><li>Chỉ chạy khi phiên bản set khóa và program/setup phát hành theo PROC-CNC-002.</li><li>Log quyết định; tránh tạo song song 2 version.</li></ul></div>
 </div>
 </details>
 <details>
-<summary>Outsource finishing lặp lỗi bề mặt, ảnh hưởng 4 job</summary>
+<summary>Outsource hoàn thiện bề mặt lặp lỗi bề mặt, ảnh hưởng 4 job</summary>
 <div class="grid">
-<div class="dl"><h4>Dữ kiện</h4><ul><li>4 job trả về có dấu xước/đốm</li><li>Supplier nói do rack mới</li><li>Ngày đến hạn sát</li></ul></div>
-<div class="dl"><h4>Requirement</h4><p><strong>Cách điều phối theo risk và change control.</strong></p><h4>Đáp án chuẩn operation</h4><ul><li>Cô lập lot; mở NCR và containment; đánh giá rework option.</li><li>Mở supplier CAPA; requirement điều tra rack change.</li><li>Planning cập nhật OTD risk; Estimator (SAL-03) cập nhật khách theo SLA.</li><li>Xem xét đổi NCC qua change board; impact matrix bắt buộc.</li></ul></div>
+<div class="dl"><h4>Dữ kiện</h4><ul><li>4 job trả về có dấu xước/đốm</li><li>Nhà cung cấp nói do giá đỡ / khung mới</li><li>Ngày đến hạn sát</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Cách điều phối theo rủi ro và kiểm soát thay đổi.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Cô lập lot; mở NCR và ngăn chặn; đánh giá làm lại option.</li><li>Mở nhà cung cấp CAPA; yêu cầu điều tra giá đỡ / khung thay đổi.</li><li>Kế hoạch cập nhật OTD rủi ro; Người định giá (SAL-03) cập nhật khách theo SLA.</li><li>Xem xét đổi NCC qua thay đổi bảng; tác động matrix bắt buộc.</li></ul></div>
 </div>
 </details>
-<h3>Performance test</h3>
+<h3>Hiệu suất test</h3>
 <div class="card">
-<h3>Bài test tay nghề — Điều phối 10–30 job theo dữ liệu và control gate</h3>
+<h3>Bài test tay nghề — Điều phối 10–30 job theo dữ liệu và cổng kiểm soát</h3>
 <h4>Bài làm bắt buộc</h4>
 <ol>
-<li>Chuẩn bị 01 báo cáo tuổi tồn WIP (tuổi tồn / tuổi tồn) + bottleneck cho tuần hiện tại.</li><li>Chọn 05 job rủi ro OTD và tạo recovery plan có người phụ trách + due + control gate impact.</li><li>Thiết lập rule đổi ưu tiên và chứng minh bằng dispatch snapshot + log override.</li>
+<li>Chuẩn bị 01 báo cáo tuổi tồn WIP (tuổi tồn / tuổi tồn) + nút thắt / điểm nghẽn cho tuần hiện tại.</li><li>Chọn 05 job rủi ro OTD và tạo khôi phục / thu hồi plan có người phụ trách + due + cổng kiểm soát tác động.</li><li>Thiết lập rule đổi ưu tiên và chứng minh bằng điều phối xuất hàng ảnh chụp trạng thái + log ghi đè / bỏ qua.</li>
 </ol>
 <h4>ĐẠT/KHÔNG ĐẠT</h4>
 <ul>
-<li>đạt khi: control gate quyết định đúng; evidence đủ; SSOT sạch; escal đúng SLA.</li>
-<li>Không đạt khi: vượt qua control gate; sai REV; delivery khi thiếu bộ record delivery; change không record.</li>
+<li>đạt khi: cổng kiểm soát quyết định đúng; bằng chứng đủ; SSOT sạch; escal đúng SLA.</li>
+<li>Không đạt khi: vượt qua cổng kiểm soát; sai REV; giao hàng khi thiếu bộ hồ sơ giao hàng; thay đổi không hồ sơ.</li>
 </ul>
 </div>
-<h2>11) ĐẠT/KHÔNG ĐẠT criteria</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT tiêu chí</h2>
 <div class="kpi-gate">
-<strong>ĐẠT/KHÔNG ĐẠT (Không có evidence thì không qua control gate (No evidence = No gate)</strong>
+<strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</strong>
 <ul>
-<li>đạt khi hoàn thành OJT output và performance test đạt; evidence nằm SSOT và traceability ≤ 60 giây.</li>
-<li>FAIL ngay khi: vượt qua control gate; sai revision (wrong revision); delivery khi thiếu bộ record delivery; change không record.</li>
+<li>đạt khi hoàn thành OJT đầu ra và hiệu suất test đạt; bằng chứng nằm SSOT và truy xuất nguồn gốc ≤ 60 giây.</li>
+<li>FAIL ngay khi: vượt qua cổng kiểm soát; sai phiên bản; giao hàng khi thiếu bộ hồ sơ giao hàng; thay đổi không hồ sơ.</li>
 </ul>
 </div>
-<h2>12) MRR tối thiểu (record bắt buộc + naming + nơi lưu)</h2>
+<h2>12) MRR tối thiểu (hồ sơ bắt buộc + đặt tên + nơi lưu)</h2>
 <p><strong>Quy tắc đặt tên:</strong> <span class="mono">JobNum_PartNo_REV_DocType_YYYYMMDD_##.ext (chỉ A–Z,0–9, '-', '_'; không dùng dấu cách).</span></p>
 <ul>
-<li>Daily tier minutes + KPI snapshot.</li><li>Weekly plan + freeze window rule + override log.</li><li>WIP tuổi tồn report + bottleneck action list.</li><li>Readiness level checklist top jobs.</li><li>Recovery plan (người phụ trách + due + control gate impact).</li><li>Supplier thời gian dẫn bảng điều khiển + CAPA khi phát sinh.</li><li>OTD by control gate report.</li><li>CAPA/standard update evidence (WI/form/training).</li>
+<li>Hàng ngày tier biên bản họp + KPI ảnh chụp trạng thái.</li><li>hàng tuần plan + đóng băng cửa sổ / khung thời gian rule + ghi đè / bỏ qua log.</li><li>WIP tuổi tồn báo cáo + nút thắt / điểm nghẽn hành động list.</li><li>Mức sẵn sàng bảng kiểm top công việc / đơn hàng.</li><li>Khôi phục plan (người phụ trách + due + cổng kiểm soát tác động).</li><li>Nhà cung cấp thời gian dẫn bảng điều khiển + CAPA khi phát sinh.</li><li>OTD by cổng kiểm soát báo cáo.</li><li>CAPA/standard cập nhật bằng chứng (WI/biểu mẫu/đào tạo).</li>
 </ul>
-<div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → <span class="mono">Job-Dossiers</span>.</div>
-<h2>13) Common đánh giá phát hiện &amp; phòng ngừa</h2>
+<div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → <span class="mono">Job-Hồ sơ</span>.</div>
+<h2>13) Chung đánh giá phát hiện &amp; phòng ngừa</h2>
 <ol>
-<li>Thiếu evidence control gate (review hợp đồng /khởi động/baseline/FAI/final/bộ record delivery bộ record delivery / review hợp đồng).</li>
-<li>Revision set không được khóa; dùng file rời; tồn tại nhiều bản.</li>
-<li>Traveler/kế hoạch inspection (inspection plan) không đồng bộ CTQ và điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (hold point))))))))))))))))))))).</li>
-<li>Outsource finishing thiếu cert hoặc spec mismatch nhưng vẫn release.</li>
-<li>WIP trạng thái lệch hiện trường; dispatch sai ưu tiên.</li>
+<li>Thiếu bằng chứng cổng kiểm soát (rà soát hợp đồng /khởi động/mốc chuẩn/FAI/final/bộ hồ sơ giao hàng bộ hồ sơ giao hàng / rà soát hợp đồng).</li>
+<li>Phiên bản set không được khóa; dùng file rời; tồn tại nhiều bản.</li>
+<li>Traveler/kế hoạch kiểm tra (kiểm tra plan) không đồng bộ CTQ và điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm chặn))))))))))))))))))))).</li>
+<li>Outsource hoàn thiện bề mặt thiếu cert hoặc spec không khớp nhưng vẫn phát hành.</li>
+<li>WIP trạng thái lệch hiện trường; điều phối xuất hàng sai ưu tiên.</li>
 <li>Escal log không có hoặc không đóng; rủi ro OTD không nhìn thấy.</li>
-<li>Evidence không traceability ≤ 60 giây do sai tên/sai thư mục.</li>
+<li>Bằng chứng không truy xuất nguồn gốc ≤ 60 giây do sai tên/sai thư mục.</li>
 </ol>
-<h2>Document liên quan</h2>
-<ul><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">PROC-PLA-001 — Production Planning &amp; Scheduling</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">PROC-PLA-002 — Dispatch Control &amp; Capacity Review</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-901-internal-audit-and-lpa.html">PROC-QA-002 — Layered Process Đánh giá (LPA)</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//06-SOP-600//sop-606-ncr-capa-and-ipqc-reaction.html">SOP-QMS-006 — NC/CAPA</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html">PROC-FIN-002 — Job Costing &amp; Margin Review</a></li></ul></div></div></div>
+<h2>Tài liệu liên quan</h2>
+<ul><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">PROC-PLA-001 — Sản xuất Kế hoạch &amp; lập lịch</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">PROC-PLA-002 — Điều phối Control &amp; Công suất Rà soát</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-901-internal-audit-and-lpa.html">PROC-QA-002 — Phân tầng Quy trình Đánh giá (LPA)</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//06-SOP-600//sop-606-ncr-capa-and-ipqc-reaction.html">SOP-QMS-006 — NC/CAPA</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html">PROC-FIN-002 — Job Tính giá thành &amp; Biên lợi nhuận Rà soát</a></li></ul></div></div></div>
 </div>
 <script src="../../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

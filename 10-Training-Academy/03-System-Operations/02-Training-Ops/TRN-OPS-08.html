@@ -3,7 +3,7 @@
 <head>
  <meta charset="utf-8"/>
  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
- <title>TRN-OPS-08 — Configuration & Revision Control for CNC (Wrong-Rev Phòng ngừa) | HESEM OS</title>
+ <title>TRN-OPS-08 — Cấu hình & Phiên bản Control for CNC (Sai-Rev Phòng ngừa) | HESEM OS</title>
  <link href="../../../assets/style.css" rel="stylesheet"/>
  <style>
  .mini{font-size:12px;color:#374151;}
@@ -51,19 +51,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Document kiểm soát</span>
+    <span>Tài liệu kiểm soát</span>
   </div>
 </div>
 <div class="title">
-  <strong>TRN-OPS-08 — Configuration & Revision Control for CNC (Wrong-Rev Phòng ngừa)</strong>
+  <strong>TRN-OPS-08 — Cấu hình & Phiên bản Control for CNC (Sai-Rev Phòng ngừa)</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
   <div class="row"><span><b>Code:</b></span><span>TRN-OPS-08</span></div>
   <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
   <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
+  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -72,22 +72,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="grid-2">
  <div>
  <div class="badge"><span class="dot"></span>Mô-đun TRN-OPS-08</div>
- <h1 style="margin-top:10px">Configuration &amp; Revision Control for CNC (Wrong‑Rev Phòng ngừa)</h1>
+ <h1 style="margin-top:10px">Cấu hình &amp; Phiên bản Control for CNC (Sai‑Rev Phòng ngừa)</h1>
  <p class="muted">
- Mục tiêu: giảm “wrong revision / wrong program” về <b>0</b> bằng 3 lớp kiểm soát:
- <b>(1) Bộ record chuẩn (baseline package)</b> (đúng file, đúng Rev),
- <b>(2) Control gate (gate) checks</b> (Planning release → Job khởi động → Mẫu đầu (first piece)),
- <b>(3) Configuration đánh giá</b> (đối chiếu as‑built ↔ requirement).
+ Mục tiêu: giảm “sai phiên bản / sai program” về <b>0</b> bằng 3 lớp kiểm soát:
+ <b>(1) Bộ hồ sơ chuẩn (mốc chuẩn gói hàng)</b> (đúng file, đúng Rev),
+ <b>(2) Cổng kiểm soát (gate) kiểm tra</b> (Kế hoạch phát hành → Job khởi động → Mẫu đầu (đầu tiên chi tiết / sản phẩm)),
+ <b>(3) Cấu hình đánh giá</b> (đối chiếu as‑đã xây dựng ↔ yêu cầu).
  </p>
  </div>
  <div class="note">
  <strong>Thông tin triển khai</strong>
  <ul>
- <li><strong>Đối tượng (bắt buộc):</strong> Programmer/CAM, Setup/Leader, QC/QA (CMM), Planner/Dispatcher, Supervisor.</li>
- <li><strong>Thời lượng:</strong> 60’ lý thuyết + 60’ workshop trên 1 job thật + 15’ bài inspection nhanh.</li>
- <li><strong>Document nền:</strong> <a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP‑QMS‑020</a>, <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">PROC‑CNC‑002</a>, <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a>, <a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//02-WI-200//">WI‑OPS‑001</a>.</li>
+ <li><strong>Đối tượng (bắt buộc):</strong> Lập trình viên (CNC)/CAM, Setup/Trưởng nhóm, QC/QA (CMM), Planner/Nhân viên điều phối, Supervisor.</li>
+ <li><strong>Thời lượng:</strong> 60’ lý thuyết + 60’ phân xưởng trên 1 job thật + 15’ bài kiểm tra nhanh.</li>
+ <li><strong>Tài liệu nền:</strong> <a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP‑QMS‑020</a>, <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">PROC‑CNC‑002</a>, <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a>, <a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//02-WI-200//">WI‑OPS‑001</a>.</li>
  </ul>
- <div class="mini"><b>Thông điệp:</b> Nếu không chứng minh được đúng Rev → <b>STOP/HOLD</b>.</div>
+ <div class="mini"><b>Thông điệp:</b> Nếu không chứng minh được đúng Rev → <b>STOP/TẠM GIỮ</b>.</div>
  </div>
  </div>
 
@@ -95,11 +95,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <strong>Mục lục nhanh</strong>
  <ul>
  <li><a href="#where">2) Rev có thể sai ở đâu? (điểm đứt gãy)</a></li>
- <li><a href="#controls">3) Controls thực chiến (baseline + gates + đánh giá)</a></li>
- <li><a href="#checklist">4) Checklist 10 điểm (job‑level)</a></li>
- <li><a href="#workshop">5) Workshop: làm config đánh giá trong 15 phút</a></li>
- <li><a href="#assessment">6) Đánh giá (bài inspection nhanh + scenario)</a></li>
- <li><a href="#records">7) Record bắt buộc</a></li>
+ <li><a href="#controls">3) kiểm soát thực chiến (mốc chuẩn + cổng + đánh giá)</a></li>
+ <li><a href="#checklist">4) Bảng kiểm 10 điểm (job‑level)</a></li>
+ <li><a href="#workshop">5) Phân xưởng: làm cấu hình đánh giá trong 15 phút</a></li>
+ <li><a href="#assessment">6) Đánh giá (bài kiểm tra nhanh + tình huống)</a></li>
+ <li><a href="#records">7) Hồ sơ bắt buộc</a></li>
  </ul>
  </div>
  </div>
@@ -111,108 +111,108 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <colgroup><col style="width:26%"/><col style="width:44%"/><col style="width:30%"/></colgroup>
  <thead><tr><th>Điểm lỗi</th><th>Ví dụ</th><th>Control bắt buộc</th></tr></thead>
  <tbody>
- <tr><td><b>PO / Drawing</b></td><td>Khách gửi bản vẽ mới nhưng PO ghi cũ</td><td>Review hợp đồng <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM‑QA‑001</a> + freeze</td></tr>
- <tr><td><b>CAM source</b></td><td>File CAM/NC lấy từ folder cá nhân</td><td>Bộ record chuẩn (SSOT) + bảng kê checksum</td></tr>
- <tr><td><b>Post / Machine</b></td><td>Chạy nhầm post, nhầm machine config</td><td>Release chương trình (program release) control (PROC‑CNC‑002)</td></tr>
- <tr><td><b>Setup sheet</b></td><td>Setup sheet không cập nhật rev</td><td>Setup sheet release &amp; review đồng cấp</td></tr>
- <tr><td><b>On-machine program</b></td><td>Operator dùng program cũ lưu trên máy</td><td>Chỉ chạy program từ location kiểm soát; xác minh ID/Rev</td></tr>
- <tr><td><b>CMM program</b></td><td>Chương trình đo mismatch drawing rev</td><td>Release chương trình inspection (inspection release chương trình) <a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM‑QA‑016</a></td></tr>
- <tr><td><b>As-built record</b></td><td>Bộ record delivery (ship packet) thiếu chứng chỉ outsource đúng scope</td><td>Config đánh giá <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a> + control gate G5</td></tr>
+ <tr><td><b>PO / Drawing</b></td><td>Khách gửi bản vẽ mới nhưng PO ghi cũ</td><td>Rà soát hợp đồng <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM‑QA‑001</a> + đóng băng</td></tr>
+ <tr><td><b>CAM source</b></td><td>File CAM/NC lấy từ thư mục cá nhân</td><td>Bộ hồ sơ chuẩn (SSOT) + bảng kê tổng kiểm tra</td></tr>
+ <tr><td><b>Đăng / Ghi sổ / Machine</b></td><td>Chạy nhầm ghi sổ / đăng, nhầm machine cấu hình</td><td>Phát hành chương trình (program phát hành) control (PROC‑CNC‑002)</td></tr>
+ <tr><td><b>Setup sheet</b></td><td>Setup sheet không cập nhật rev</td><td>Setup sheet phát hành &amp; rà soát đồng cấp</td></tr>
+ <tr><td><b>On-machine program</b></td><td>Người vận hành dùng program cũ lưu trên máy</td><td>Chỉ chạy program từ vị trí kiểm soát; xác minh ID/Rev</td></tr>
+ <tr><td><b>CMM program</b></td><td>Chương trình đo không khớp drawing rev</td><td>Phát hành chương trình kiểm tra (kiểm tra phát hành chương trình) <a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM‑QA‑016</a></td></tr>
+ <tr><td><b>As-đã xây dựng hồ sơ</b></td><td>Bộ hồ sơ giao hàng (ship gói hồ sơ) thiếu chứng chỉ outsource đúng scope</td><td>cấu hình đánh giá <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a> + cổng kiểm soát G5</td></tr>
  </tbody>
  </table>
  </div>
  </div>
 
  <div class="card" id="controls">
- <h2>3) Controls thực chiến (baseline + gates + đánh giá)</h2>
+ <h2>3) kiểm soát thực chiến (mốc chuẩn + cổng + đánh giá)</h2>
  <div class="grid-2">
  <div class="callout">
- <h3>(1) Bộ record chuẩn</h3>
+ <h3>(1) Bộ hồ sơ chuẩn</h3>
  <ul class="list">
- <li>Tập file “đúng Rev” được release 1 lần, có bảng kê/checksum.</li>
- <li>Không dùng file rời (email/zalo/USB) để chạy production.</li>
- <li>Được đối chiếu tại: Planning release → Job khởi động → Mẫu đầu.</li>
+ <li>Tập file “đúng Rev” được phát hành 1 lần, có bảng kê/tổng kiểm tra.</li>
+ <li>Không dùng file rời (email/Zalo/USB) để chạy sản xuất.</li>
+ <li>Được đối chiếu tại: Kế hoạch phát hành → Job khởi động → Mẫu đầu.</li>
  </ul>
  </div>
  <div class="note">
- <h3>(2) Configuration Đánh giá</h3>
+ <h3>(2) Cấu hình Đánh giá</h3>
  <ul class="list">
- <li>Đối chiếu requirement ↔ program/setup/inspection ↔ chứng chỉ ↔ as‑built.</li>
+ <li>Đối chiếu yêu cầu ↔ program/setup/kiểm tra ↔ chứng chỉ ↔ as‑đã xây dựng.</li>
  <li>Thực hiện nhanh bằng <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a>.</li>
- <li>Áp dụng tối thiểu cho job có: Rev mới, CTQ, outsource công đoạn đặc biệt, hoặc khách requirement.</li>
+ <li>Áp dụng tối thiểu cho job có: Rev mới, CTQ, outsource công đoạn đặc biệt, hoặc khách yêu cầu.</li>
  </ul>
  </div>
  </div>
  <div class="callout">
- <h3>(3) Control gate enforcement</h3>
- <p class="mini">Gates là cơ chế cưỡng chế không vượt qua. Tham chiếu <a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//02-WI-200//">WI‑OPS‑001</a>.</p>
+ <h3>(3) Cổng kiểm soát thực thi / cưỡng chế</h3>
+ <p class="mini">cổng là cơ chế cưỡng chế không vượt qua. Tham chiếu <a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//02-WI-200//">WI‑OPS‑001</a>.</p>
  <ul class="list">
- <li><b>G0:</b> Hợp đồng freeze (đúng bản vẽ/rev, CTQ nhận diện)</li>
- <li><b>Planning Release:</b> FRM‑PLA‑001 đối chiếu baseline bảng kê</li>
- <li><b>G1:</b> FRM‑OPS‑008 + setup sheet + release chương trình</li>
- <li><b>G2:</b> Mẫu đầu/FAI + (nếu có) FRM‑QA‑016 CMM release chương trình</li>
- <li><b>G4/G5:</b> Config đánh giá + bộ record delivery completeness</li>
+ <li><b>G0:</b> Hợp đồng đóng băng (đúng bản vẽ/rev, CTQ nhận diện)</li>
+ <li><b>Kế hoạch Phát hành:</b> FRM‑PLA‑001 đối chiếu mốc chuẩn bảng kê</li>
+ <li><b>G1:</b> FRM‑OPS‑008 + phiếu cài đặt + phát hành chương trình</li>
+ <li><b>G2:</b> Mẫu đầu/FAI + (nếu có) FRM‑QA‑016 CMM phát hành chương trình</li>
+ <li><b>G4/G5:</b> cấu hình đánh giá + bộ hồ sơ giao hàng tính đầy đủ</li>
  </ul>
  </div>
  </div>
 
  <div class="card" id="checklist">
- <h2>4) Checklist 10 điểm (job‑level)</h2>
+ <h2>4) Bảng kiểm 10 điểm (job‑level)</h2>
  <ol class="list">
  <li>Part/Rev trên PO = Part/Rev trên drawing/spec?</li>
- <li>Bộ record chuẩn có bảng kê/checksum và đúng Part/Rev?</li>
- <li>Setup sheet hiển thị Program ID/Rev/Tool list/zero point?</li>
- <li>Chương trình trên máy = program release (ID/Rev)?</li>
- <li>kế hoạch inspection (inspection plan) có CTQ method + gage “green”?</li>
+ <li>Bộ hồ sơ chuẩn có bảng kê/tổng kiểm tra và đúng Part/Rev?</li>
+ <li>Setup sheet hiển thị Program ID/Rev/Tool list/không / bằng không điểm?</li>
+ <li>Chương trình trên máy = program phát hành (ID/Rev)?</li>
+ <li>kế hoạch kiểm tra (kiểm tra plan) có CTQ phương pháp + gage “xanh lá”?</li>
  <li>Nếu dùng CMM: FRM‑QA‑016 pass và báo cáo đo có Program ID/Rev?</li>
- <li>Nếu outsource: APL/scope/cert trace đầy đủ?</li>
- <li>Traveler/labels phản ánh đúng Rev &amp; trace lot?</li>
- <li>Job dossier (job dossier) đặt đúng folder &amp; naming?</li>
- <li>Nếu phát hiện mismatch ở bất kỳ điểm nào → STOP/HOLD &amp; escalate.</li>
+ <li>Nếu outsource: APL/scope/cert truy vết đầy đủ?</li>
+ <li>Traveler/nhãn phản ánh đúng Rev &amp; truy vết lot?</li>
+ <li>Hồ sơ công việc (hồ sơ công việc) đặt đúng thư mục &amp; đặt tên?</li>
+ <li>Nếu phát hiện không khớp ở bất kỳ điểm nào → STOP/TẠM GIỮ &amp; báo cáo vượt cấp.</li>
  </ol>
  </div>
 
  <div class="card" id="workshop">
- <h2>5) Workshop: làm config đánh giá trong 15 phút</h2>
- <p class="mini">Chọn 1 job thật (hoặc job mẫu), thực hiện FRM‑QA‑017 theo nhóm. Mục tiêu: tìm ít nhất 2 điểm mismatch tiềm ẩn và đề xuất control.</p>
+ <h2>5) Phân xưởng: làm cấu hình đánh giá trong 15 phút</h2>
+ <p class="mini">Chọn 1 job thật (hoặc job mẫu), thực hiện FRM‑QA‑017 theo nhóm. Mục tiêu: tìm ít nhất 2 điểm không khớp tiềm ẩn và đề xuất control.</p>
  <ul class="list">
- <li>Nhóm 1: requirement (drawing/spec/CTQ)</li>
- <li>Nhóm 2: program/setup (CAM/NC/setup sheet)</li>
- <li>Nhóm 3: inspection/record (IR/FAI/CMM program)</li>
- <li>Nhóm 4: bộ record delivery (labels/CoC/certs)</li>
+ <li>Nhóm 1: yêu cầu (drawing/spec/CTQ)</li>
+ <li>Nhóm 2: program/setup (CAM/NC/phiếu cài đặt)</li>
+ <li>Nhóm 3: kiểm tra/hồ sơ (IR/FAI/CMM program)</li>
+ <li>Nhóm 4: bộ hồ sơ giao hàng (nhãn/CoC/chứng chỉ)</li>
  </ul>
  </div>
 
  <div class="card" id="assessment">
- <h2>6) Đánh giá (bài inspection nhanh + scenario)</h2>
+ <h2>6) Đánh giá (bài kiểm tra nhanh + tình huống)</h2>
  <div class="grid-2">
  <div class="callout">
- <h3>Bài inspection nhanh (10 câu — bắt buộc)</h3>
+ <h3>Bài kiểm tra nhanh (10 câu — bắt buộc)</h3>
  <ol class="list">
- <li>“One source of truth” nghĩa là gì trong config?</li>
+ <li>“One source of sự thật” nghĩa là gì trong cấu hình?</li>
  <li>Nêu 3 điểm dễ sai Rev nhất trong CNC.</li>
  <li>FRM‑QA‑017 dùng khi nào?</li>
  <li>Tại sao cần hiển thị Program ID/Rev trên báo cáo đo?</li>
- <li>Khi thấy program trên máy không khớp setup sheet, bạn làm gì?</li>
+ <li>Khi thấy program trên máy không khớp phiếu cài đặt, bạn làm gì?</li>
  </ol>
  </div>
  <div class="note">
- <h3>Scenario</h3>
- <p class="mini">Giảng viên đưa 1 bộ job pack có 1 lỗi “mismatch” (ví dụ: drawing Rev B, setup sheet Rev A). Học viên phải phát hiện và nêu đúng control gate/record để HOLD.</p>
- <p class="mini"><b>Pass:</b> phát hiện mismatch + nêu đúng control gate + tạo đúng evidence (QC hold/log). <b>Fail:</b> đề xuất “chạy tạm rồi sửa sau”.</p>
+ <h3>Tình huống</h3>
+ <p class="mini">Giảng viên đưa 1 bộ job pack có 1 lỗi “không khớp” (ví dụ: drawing Rev B, phiếu cài đặt Rev A). Học viên phải phát hiện và nêu đúng cổng kiểm soát/hồ sơ để TẠM GIỮ.</p>
+ <p class="mini"><b>Pass:</b> phát hiện không khớp + nêu đúng cổng kiểm soát + tạo đúng bằng chứng (QC hold/log). <b>Fail:</b> đề xuất “chạy tạm rồi sửa sau”.</p>
  </div>
  </div>
  </div>
 
  <div class="card" id="records">
- <h2>7) Record bắt buộc</h2>
+ <h2>7) Hồ sơ bắt buộc</h2>
  <ul class="list">
- <li><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-802_Attendance_List.xlsx">FRM‑HR‑TRN‑002 Attendance List</a></li>
- <li>Bài inspection nhanh + kết quả (FRM‑HR‑TRN‑009)</li>
- <li>Workshop output: 01 bản FRM‑QA‑017 đã điền (job mẫu) + action list</li>
+ <li><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-802_Attendance_List.xlsx">FRM‑HR‑TRN‑002 Chuyên cần List</a></li>
+ <li>Bài kiểm tra nhanh + kết quả (FRM‑HR‑TRN‑009)</li>
+ <li>Phân xưởng đầu ra: 01 bản FRM‑QA‑017 đã điền (job mẫu) + hành động list</li>
  </ul>
  <div class="note">
- <b>Nơi lưu chuẩn:</b> <span class="path">HR-Record/Training/TRN-OPS-08/&lt;YYYY&gt;/&lt;Batch&gt;</span>
+ <b>Nơi lưu chuẩn:</b> <span class="path">HR-Hồ sơ/Đào tạo/TRN-OPS-08/&lt;YYYY&gt;/&lt;Batch&gt;</span>
  </div>
  </div>
 
@@ -221,7 +221,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div></div></div>
 
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">
- ⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.
+ ⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.
 </div>
 <script src="../../../assets/app.js"></script>
 </body>

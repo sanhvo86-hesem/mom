@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-113 — Dashboard Deployment, Access and Refresh Control| HESEM QMS</title>
+<title>ANNEX-113 — Dashboard Triển khai, Truy cập and Làm mới Control| HESEM QMS</title>
 <link href="../../../../assets/style.css" rel="stylesheet"/>
 <style>
 
@@ -82,143 +82,143 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
     <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
     <div class="fh-company">
       <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-      <span>Document operation • Annex số hóa</span>
+      <span>Tài liệu vận hành • Annex số hóa</span>
     </div>
   </div>
   <div class="title">
-    <strong>ANNEX-113 — Dashboard Deployment, Access and Refresh Control</strong>
-    <span class="sub-vn">Khóa cách release bảng điều khiển quản trị từ dataset đến end user: người phụ trách, nguồn chuẩn, refresh, publish, rollback và phản ứng khi dữ liệu số không còn đáng tin.</span>
+    <strong>ANNEX-113 — Dashboard Triển khai, Truy cập and Làm mới Control</strong>
+    <span class="sub-vn">Khóa cách phát hành bảng điều khiển quản trị từ bộ dữ liệu đến người dùng cuối: người phụ trách, nguồn chuẩn, làm mới, công bố / phát hành, hoàn tác / quay lại và phản ứng khi dữ liệu số không còn đáng tin.</span>
   </div>
   <div class="meta">
     <div class="row"><span><b>Code:</b></span><span>ANNEX-113</span></div>
     <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-    <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+    <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
     <div class="row"><span><b>Owner:</b></span><span>IT Manager / QMS Manager / Dashboard Responsible Person</span></div>
-    <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
+    <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
   </div>
 </div>
 <div class="doc-content" id="docContent"><div class="form-sheet">
 
 <div class="hero">
-  <h1>ANNEX-113 — Dashboard Deployment, Access and Refresh Control</h1>
-  <p>ANNEX này không chỉ quy định “bảng điều khiển nào nên có”, mà khóa toàn bộ đường đi từ <b>source-of-record → dataset → semantic model → report/không gian làm việc → pack review → quyết định điều hành</b>. Một bảng điều khiển production chỉ được coi là dùng được khi có người phụ trách, boundary quyền, refresh rule, failure cẩm nang triển khai (playbook), rollback path và release evidence rõ.</p>
+  <h1>ANNEX-113 — Dashboard Triển khai, Truy cập and Làm mới Control</h1>
+  <p>ANNEX này không chỉ quy định “bảng điều khiển nào nên có”, mà khóa toàn bộ đường đi từ <b>source-of-hồ sơ → bộ dữ liệu → ngữ nghĩa mô hình → báo cáo/không gian làm việc → pack rà soát → quyết định điều hành</b>. Một bảng điều khiển sản xuất chỉ được coi là dùng được khi có người phụ trách, ranh giới quyền, làm mới rule, hỏng / lỗi cẩm nang triển khai (sách hướng dẫn), hoàn tác / quay lại path và phát hành bằng chứng rõ.</p>
 </div>
 
 <div class="req-grid">
-  <div class="req"><span class="req-tag must">PHẢI</span><div>Bảng điều khiển production chỉ publish từ dataset / semantic model có <b>chủ nghiệp vụ</b>, <b>chủ dữ liệu</b>, <b>environment</b> và <b>release evidence</b> rõ.</div></div>
-  <div class="req"><span class="req-tag must">PHẢI</span><div>Mọi bảng điều khiển dùng để ra quyết định ở T1/T2/T3/T4 phải chỉ rõ <b>source-of-record</b>, <b>freeze-date</b>, thời điểm refresh gần nhất và cách xử lý khi refresh fail.</div></div>
-  <div class="req"><span class="req-tag must">PHẢI</span><div>Quyền <b>Publish / Admin / Build</b> không được cấp kiểu “cho tiện”; phải bám <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a>, <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-102-access-request-field-dictionary.html">ANNEX-102</a> và <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>.</div></div>
-  <div class="req"><span class="req-tag shall">PHẢI</span><div>Dùng pipeline DEV → UAT → PROD và rollback nhanh thay vì sửa thẳng report production trong giờ họp hoặc cuối kỳ.</div></div>
+  <div class="req"><span class="req-tag must">PHẢI</span><div>Bảng điều khiển sản xuất chỉ công bố / phát hành từ bộ dữ liệu / ngữ nghĩa mô hình có <b>chủ nghiệp vụ</b>, <b>chủ dữ liệu</b>, <b>môi trường</b> và <b>phát hành bằng chứng</b> rõ.</div></div>
+  <div class="req"><span class="req-tag must">PHẢI</span><div>Mọi bảng điều khiển dùng để ra quyết định ở T1/T2/T3/T4 phải chỉ rõ <b>source-of-hồ sơ</b>, <b>đóng băng-date</b>, thời điểm làm mới gần nhất và cách xử lý khi làm mới fail.</div></div>
+  <div class="req"><span class="req-tag must">PHẢI</span><div>Quyền <b>Công bố / Admin / Xây dựng</b> không được cấp kiểu “cho tiện”; phải bám <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a>, <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-102-access-request-field-dictionary.html">ANNEX-102</a> và <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>.</div></div>
+  <div class="req"><span class="req-tag shall">PHẢI</span><div>Dùng quy trình / luồng công việc DEV → UAT → PROD và hoàn tác / quay lại nhanh thay vì sửa thẳng báo cáo sản xuất trong giờ họp hoặc cuối kỳ.</div></div>
 </div>
 
-<div class="note"><b>Boundary của ANNEX</b><br/>ANNEX-113 khóa lớp kiểm soát số. Định nghĩa KPI, formula, dimension, cut-off logic và SoR precedence chi tiết nằm tại <a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>. Cách tổ chức bảng điều khiển pack, ghi chú điều hành, exception note và management-bộ record review (bộ record review) nằm tại <a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> và <a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a>.</div>
+<div class="note"><b>Ranh giới của ANNEX</b><br/>ANNEX-113 khóa lớp kiểm soát số. Định nghĩa KPI, công thức, kích thước, cut-off logic và SoR ưu tiên / thứ tự chi tiết nằm tại <a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>. Cách tổ chức bảng điều khiển pack, ghi chú điều hành, ngoại lệ note và quản lý-bộ hồ sơ rà soát (bộ hồ sơ rà soát) nằm tại <a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> và <a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a>.</div>
 
-<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#a1">1. Mục đích, phạm vi và boundary</a><a href="#a2">2. Kiến trúc bảng điều khiển, người phụ trách và source hierarchy</a><a href="#a3">3. Environment, deployment pipeline và release class</a><a href="#a4">4. Access model, vai trò boundary và separation-of-duties</a><a href="#a5">5. Refresh, freeze-date, exception note và pack control</a><a href="#a6">6. Failure handling, offline fallback, restore và backfill</a><a href="#a7">7. Bảng điều khiển register tối thiểu</a><a href="#a8">8. KPI của chính hệ bảng điều khiển governance</a><a href="#a9">9. Document liên kết và evidence bắt buộc</a></div></div>
+<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#a1">1. Mục đích, phạm vi và ranh giới</a><a href="#a2">2. Kiến trúc bảng điều khiển, người phụ trách và source phân cấp</a><a href="#a3">3. Môi trường, triển khai quy trình / luồng công việc và phát hành class</a><a href="#a4">4. Truy cập mô hình, vai trò ranh giới và phân tách-of-nhiệm vụ</a><a href="#a5">5. Làm mới, đóng băng-date, ngoại lệ note và pack control</a><a href="#a6">6. hỏng / lỗi xử lý / vận chuyển, offline phương án dự phòng, khôi phục và bổ sung / thay thế</a><a href="#a7">7. Bảng điều khiển sổ đăng ký tối thiểu</a><a href="#a8">8. KPI của chính hệ bảng điều khiển quản trị</a><a href="#a9">9. Tài liệu liên kết và bằng chứng bắt buộc</a></div></div>
 
-<h2 class="h2" id="a1">1. Mục đích, phạm vi và boundary</h2>
+<h2 class="h2" id="a1">1. Mục đích, phạm vi và ranh giới</h2>
 <div class="grid-2">
-  <div class="callout-card"><h3>Mục đích</h3><p>Giữ cho bảng điều khiển production là <b>một lớp hiển thị đáng tin để điều hành</b>, không trở thành nguồn tạo số “mạnh ai nấy sửa”. Khi dữ liệu số lỗi hoặc chậm, ANNEX này buộc tổ chức quay về SoR, khóa exception note và backfill có kiểm soát.</p></div>
-  <div class="callout-card"><h3>Phạm vi</h3><p>Áp dụng cho Power BI, portal thẻ điểm (scorecard), exported review packs, monthly / quarterly KPI packs, semantic model/dataset, automation liên quan refresh và các bảng điều hành dùng cho T1/T2/T3/T4, management review, customer review hoặc internal governance packs.</p></div>
+  <div class="callout-card"><h3>Mục đích</h3><p>Giữ cho bảng điều khiển sản xuất là <b>một lớp hiển thị đáng tin để điều hành</b>, không trở thành nguồn tạo số “mạnh ai nấy sửa”. Khi dữ liệu số lỗi hoặc chậm, ANNEX này buộc tổ chức quay về SoR, khóa ngoại lệ note và bổ sung / thay thế có kiểm soát.</p></div>
+  <div class="callout-card"><h3>Phạm vi</h3><p>Áp dụng cho Power BI, portal thẻ điểm (bảng điểm), đã xuất rà soát gói, hàng tháng / hàng quý KPI gói, ngữ nghĩa mô hình/bộ dữ liệu, tự động hóa liên quan làm mới và các bảng điều hành dùng cho T1/T2/T3/T4, xem xét của lãnh đạo, khách hàng rà soát hoặc nội bộ quản trị gói.</p></div>
 </div>
 <div class="notice-strip">
-  <div class="notice-item"><b>Không thuộc ANNEX này</b>KPI definition sâu, process capture rule và dataset field dictionary đã được khóa tại <a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a> và các annex kỹ thuật liên quan.</div>
-  <div class="notice-item"><b>Điểm giao</b>ANNEX-113 bắt đầu từ lúc một chỉ số được đưa vào bảng điều khiển pack, được refresh, được publish, được review và/hoặc được dùng để quyết định.</div>
-  <div class="notice-item"><b>Output bắt buộc</b>Bảng điều khiển register, gói release, refresh evidence, log incident (incident log), exception note, backfill close-out và access review evidence.</div>
+  <div class="notice-item"><b>Không thuộc ANNEX này</b>KPI định nghĩa sâu, quy trình ghi nhận rule và bộ dữ liệu field từ điển đã được khóa tại <a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a> và các annex kỹ thuật liên quan.</div>
+  <div class="notice-item"><b>Điểm giao</b>ANNEX-113 bắt đầu từ lúc một chỉ số được đưa vào bảng điều khiển pack, được làm mới, được công bố / phát hành, được rà soát và/hoặc được dùng để quyết định.</div>
+  <div class="notice-item"><b>Đầu ra bắt buộc</b>Bảng điều khiển sổ đăng ký, gói phát hành, làm mới bằng chứng, log sự cố (sự cố log), ngoại lệ note, bổ sung / thay thế đóng-out và truy cập rà soát bằng chứng.</div>
 </div>
 
-<h2 class="h2" id="a2">2. Kiến trúc bảng điều khiển, người phụ trách và source hierarchy</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Bảng điều khiển family</th><th>Dùng để quyết định gì</th><th>chủ nghiệp vụ</th><th>chủ dữ liệu</th><th>SoR / nguồn chuẩn</th><th>Cadence / freeze mặc định</th><th>Fallback khi lỗi</th></tr></thead><tbody>
-<tr><td>Executive / QMS cockpit</td><td>OTD, risk delivery, complaint, CAPA tuổi tồn (aging), đánh giá closure, trend T4</td><td>CEO / QA Manager</td><td>IT / QMS chủ dữ liệu</td><td>Epicor + controlled M365 registers + approved bộ record review</td><td>Daily, weekly, monthly, quarter-close</td><td>Export SoR + <a download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> exception note</td></tr>
-<tr><td>Operations / planning bảng điều khiển</td><td>Dispatch, WIP tuổi tồn, promise-date risk, capacity, bottleneck</td><td>Production Director / Planning Team Leader</td><td>IT / Planning chủ dữ liệu</td><td>Epicor operational tables + controlled dispatch boards</td><td>Shift / daily</td><td>Epicor standard report + T1/T2 board</td></tr>
-<tr><td>Quality bảng điều khiển</td><td>FPY, hold SLA, NCR repeat, calibration due, MSA / SPC trạng thái</td><td>QA Manager</td><td>IT / QA chủ dữ liệu</td><td>QA SoR lists, calibration register, Epicor references</td><td>Daily / weekly / month-end</td><td>QA register export + manual pack note</td></tr>
-<tr><td>Supply / shipment bảng điều khiển</td><td>PO ETA, processor delay, bộ record delivery (ship packet) completeness, inventory accuracy</td><td>SCM Manager</td><td>IT / SCM chủ dữ liệu</td><td>Epicor PO / receipt / shipment SoR + bộ record delivery SSOT</td><td>Daily / weekly</td><td>Epicor export + controlled shipment packet log</td></tr>
-<tr><td>People / competence bảng điều khiển</td><td>Certification due, OJT progress, coverage, deputy readiness level</td><td>HR Manager + Department Heads</td><td>HR / Training admin</td><td>Training record, certification các log, competency matrices</td><td>Weekly / monthly</td><td>Training master log + <a download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-809</a> / <a download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-806_Certification_Tracking_Log.xlsx">FRM-806</a></td></tr>
-<tr><td>Digital governance bảng điều khiển</td><td>Refresh health, stale datasets, overdue access review, privileged-access expiry</td><td>IT Manager / QMS Manager</td><td>IT admin</td><td>Portal các log, access review record, dataset refresh các log</td><td>Weekly / monthly</td><td>Admin log export + incident register</td></tr>
+<h2 class="h2" id="a2">2. Kiến trúc bảng điều khiển, người phụ trách và source phân cấp</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Bảng điều khiển nhóm sản phẩm</th><th>Dùng để quyết định gì</th><th>chủ nghiệp vụ</th><th>chủ dữ liệu</th><th>SoR / nguồn chuẩn</th><th>Nhịp độ / đóng băng mặc định</th><th>phương án dự phòng khi lỗi</th></tr></thead><tbody>
+<tr><td>Điều hành / QMS bảng điều khiển tổng quan</td><td>OTD, rủi ro giao hàng, khiếu nại, CAPA tuổi tồn (lão hóa / cũ), đánh giá kết thúc / đóng, xu hướng T4</td><td>CEO / QA Manager</td><td>IT / QMS chủ dữ liệu</td><td>Epicor + được kiểm soát M365 registers + đã phê duyệt bộ hồ sơ rà soát</td><td>Hàng ngày, hàng tuần, hàng tháng, quý-đóng</td><td>Export SoR + <a download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> ngoại lệ note</td></tr>
+<tr><td>Operations / lập kế hoạch bảng điều khiển</td><td>Điều phối, WIP tuổi tồn, cam kết-date rủi ro, công suất, nút thắt / điểm nghẽn</td><td>Sản xuất Giám đốc / Kế hoạch Tổ trưởng</td><td>IT / Kế hoạch chủ dữ liệu</td><td>Epicor vận hành bảng + được kiểm soát điều phối xuất hàng bảng</td><td>Shift / hàng ngày</td><td>Epicor standard báo cáo + T1/T2 bảng</td></tr>
+<tr><td>Chất lượng bảng điều khiển</td><td>FPY, hold SLA, NCR lặp lại, hiệu chuẩn due, MSA / SPC trạng thái</td><td>QA Manager</td><td>IT / QA chủ dữ liệu</td><td>QA SoR danh sách, hiệu chuẩn sổ đăng ký, Epicor tham chiếu</td><td>Hàng ngày / hàng tuần / tháng-end</td><td>QA sổ đăng ký export + sổ tay / thủ công pack note</td></tr>
+<tr><td>Cung ứng / lô giao hàng bảng điều khiển</td><td>PO ETA, người xử lý chậm trễ, bộ hồ sơ giao hàng (ship gói hồ sơ) tính đầy đủ, hàng tồn kho độ chính xác</td><td>SCM Manager</td><td>IT / SCM chủ dữ liệu</td><td>Epicor PO / phiếu nhận / biên nhận / lô giao hàng SoR + bộ hồ sơ giao hàng SSOT</td><td>Hàng ngày / hàng tuần</td><td>Epicor export + được kiểm soát lô giao hàng gói hồ sơ log</td></tr>
+<tr><td>Con người / năng lực bảng điều khiển</td><td>Chứng nhận due, OJT tiến độ, phạm vi bao phủ, phó mức sẵn sàng</td><td>HR Manager + Phòng ban Trưởng bộ phận</td><td>HR / Đào tạo admin</td><td>Đào tạo hồ sơ, chứng nhận các log, năng lực ma trận</td><td>hàng tuần / hàng tháng</td><td>Đào tạo chủ / gốc log + <a download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-809</a> / <a download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-806_Certification_Tracking_Log.xlsx">FRM-806</a></td></tr>
+<tr><td>Số hóa quản trị bảng điều khiển</td><td>Làm mới sức khỏe, cũ / lỗi thời bộ dữ liệu, quá hạn truy cập rà soát, có đặc quyền-truy cập hết hạn</td><td>IT Manager / QMS Manager</td><td>IT admin</td><td>Portal các log, truy cập rà soát hồ sơ, bộ dữ liệu làm mới các log</td><td>hàng tuần / hàng tháng</td><td>Admin log export + sự cố sổ đăng ký</td></tr>
 </tbody></table></div>
-<div class="note-warning"><b>Quy tắc hierarchy</b><br/>Bảng điều khiển <b>không thay thế source-of-record</b>. Khi số bảng điều khiển lệch với SoR, người điều hành phải dùng SoR để ra quyết định, đồng thời mở vấn đề dữ liệu hoặc incident theo severity; PHẢI giữ một bộ số điều hành duy nhất theo SoR, không “chọn số nào có lợi hơn”.</div>
+<div class="note-warning"><b>Quy tắc phân cấp</b><br/>Bảng điều khiển <b>không thay thế source-of-hồ sơ</b>. Khi số bảng điều khiển lệch với SoR, người điều hành phải dùng SoR để ra quyết định, đồng thời mở vấn đề dữ liệu hoặc sự cố theo mức nghiêm trọng; PHẢI giữ một bộ số điều hành duy nhất theo SoR, không “chọn số nào có lợi hơn”.</div>
 
-<h2 class="h2" id="a3">3. Environment, deployment pipeline và release class</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Environment / lớp</th><th>Mục đích</th><th>Ai được sửa</th><th>Evidence tối thiểu</th><th>Khi nào được move lên</th></tr></thead><tbody>
-<tr><td>DEV</td><td>Build dataset, transform, measure, layout, pipeline thử nghiệm</td><td>Assigned maker / chủ dữ liệu</td><td>Change note, test tình huống, sample output</td><td>Khi logic đã qua self-check và có người phụ trách business review</td></tr>
-<tr><td>UAT / PRE-PROD</td><td>Business xác nhận, sign-off formula, diễn tập-down, threshold, exception-note behavior</td><td>Assigned maker + người phụ trách được chỉ định</td><td>Test log, before/after snapshot, defect list</td><td>Responsible Person Khi business chấp thuận và rollback path đã sẵn</td></tr>
-<tr><td>PROD dataset / semantic model</td><td>Nguồn dữ liệu chính cho bảng điều khiển production</td><td>chủ dữ liệu / admin được chỉ định</td><td>Approved change ID, deployment log, refresh test</td><td>Chỉ move sau sign-off và ngoài cửa sổ freeze nếu ảnh hưởng kỳ đang đóng</td></tr>
-<tr><td>PROD report / không gian làm việc / portal card</td><td>Lớp hiển thị cho end user</td><td>Publisher / admin theo vai trò</td><td>Gói release, communication note nếu ảnh hưởng người dùng</td><td>Sau khi semantic model PROD ổn định và refresh pass</td></tr>
+<h2 class="h2" id="a3">3. Môi trường, triển khai quy trình / luồng công việc và phát hành class</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Môi trường / lớp</th><th>Mục đích</th><th>Ai được sửa</th><th>Bằng chứng tối thiểu</th><th>Khi nào được di chuyển lên</th></tr></thead><tbody>
+<tr><td>DEV</td><td>Xây dựng bộ dữ liệu, chuyển đổi, đo lường, layout, quy trình / luồng công việc thử nghiệm</td><td>đã phân công người tạo / nhà sản xuất / chủ dữ liệu</td><td>Thay đổi note, test tình huống, mẫu đầu ra</td><td>Khi logic đã qua tự-kiểm tra và có người phụ trách kinh doanh rà soát</td></tr>
+<tr><td>UAT / PRE-PROD</td><td>Kinh doanh xác nhận, ký-off công thức, diễn tập-xuống / ngừng, ngưỡng, ngoại lệ-note hành vi</td><td>đã phân công người tạo / nhà sản xuất + người phụ trách được chỉ định</td><td>Test log, trước/sau ảnh chụp trạng thái, khuyết tật list</td><td>Responsible Person Khi kinh doanh chấp thuận và hoàn tác / quay lại path đã sẵn</td></tr>
+<tr><td>PROD bộ dữ liệu / ngữ nghĩa mô hình</td><td>Nguồn dữ liệu chính cho bảng điều khiển sản xuất</td><td>chủ dữ liệu / admin được chỉ định</td><td>Đã phê duyệt thay đổi ID, triển khai log, làm mới test</td><td>Chỉ di chuyển sau ký-off và ngoài cửa sổ đóng băng nếu ảnh hưởng kỳ đang đóng</td></tr>
+<tr><td>PROD báo cáo / không gian làm việc / portal card</td><td>Lớp hiển thị cho người dùng cuối</td><td>nhà xuất bản / người đăng / admin theo vai trò</td><td>Gói phát hành, truyền đạt / giao tiếp note nếu ảnh hưởng người dùng</td><td>Sau khi ngữ nghĩa mô hình PROD ổn định và làm mới pass</td></tr>
 </tbody></table></div>
 <div class="callout-grid">
-  <div class="callout-card"><h3>Release class A — cosmetic / ghi chú điều hành</h3><p>Đổi nhãn, format, layout, grouping hoặc ghi chú điều hành text không thay nghĩa KPI. Vẫn cần change note và người phụ trách.</p></div>
-  <div class="callout-card"><h3>Release class B — logic / threshold</h3><p>Đổi formula, threshold, cut-off, precedence, diễn tập-down keys hoặc mapping có thể ảnh hưởng quyết định. Bắt buộc test, người phụ trách sign-off và snapshot trước/sau.</p></div>
-  <div class="callout-card"><h3>Release class C — source / environment / security</h3><p>Đổi nguồn, connector, không gian làm việc, permission boundary, refresh pipeline hoặc service principal. Bắt buộc rollback path, approver cao hơn và review hậu release.</p></div>
+  <div class="callout-card"><h3>Phát hành class A — ngoại quan / bề ngoài / ghi chú điều hành</h3><p>Đổi nhãn, định dạng, layout, nhóm hoặc ghi chú điều hành text không thay nghĩa KPI. Vẫn cần thay đổi note và người phụ trách.</p></div>
+  <div class="callout-card"><h3>Phát hành class B — logic / ngưỡng</h3><p>Đổi công thức, ngưỡng, cut-off, ưu tiên / thứ tự, diễn tập-xuống / ngừng khóa / phím hoặc sơ đồ ánh xạ có thể ảnh hưởng quyết định. Bắt buộc test, người phụ trách ký-off và ảnh chụp trạng thái trước/sau.</p></div>
+  <div class="callout-card"><h3>Phát hành class C — source / môi trường / bảo mật</h3><p>Đổi nguồn, đầu nối, không gian làm việc, quyền / sự cho phép ranh giới, làm mới quy trình / luồng công việc hoặc dịch vụ chính / người ủy quyền. Bắt buộc hoàn tác / quay lại path, người phê duyệt cao hơn và rà soát hậu phát hành.</p></div>
 </div>
 
-<h2 class="h2" id="a4">4. Access model, vai trò boundary và separation-of-duties</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Quyền</th><th>Dùng cho</th><th>Không được hiểu sai là</th><th>Approval tối thiểu</th><th>Control bổ sung</th></tr></thead><tbody>
-<tr><td>View</td><td>Xem bảng điều khiển / pack / export được phép</td><td>Quyền download toàn bộ raw data</td><td>Vai trò-based theo portal / không gian làm việc</td><td>Rà định kỳ qua <a download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a></td></tr>
-<tr><td>Build</td><td>Tạo report cá nhân từ semantic model được mở</td><td>Quyền đổi logic KPI production</td><td>Responsible Person business + chủ dữ liệu</td><td>Giới hạn dataset, không implicit Publish</td></tr>
-<tr><td>Publish</td><td>Đưa report/không gian làm việc ra production</td><td>Quyền Admin hoặc tự ý mở rộng audience</td><td>chủ nghiệp vụ + người phụ trách hệ thống</td><td>Release evidence, communication, rollback</td></tr>
-<tr><td>Admin</td><td>Quản trị không gian làm việc, gateway, credential, refresh, sharing policy</td><td>Quyền business sign-off</td><td>IT / admin authority theo <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></td><td>Privileged review, SoD, log retention</td></tr>
-<tr><td>Temporary / deputy</td><td>Cover nghỉ phép, cutover, incident, month-end close</td><td>Permanent elevation</td><td>Manager + Process Owner + expiry date</td><td>Close-out và recall đúng hạn</td></tr>
+<h2 class="h2" id="a4">4. Truy cập mô hình, vai trò ranh giới và phân tách-of-nhiệm vụ</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Quyền</th><th>Dùng cho</th><th>Không được hiểu sai là</th><th>Phê duyệt tối thiểu</th><th>Control bổ sung</th></tr></thead><tbody>
+<tr><td>View</td><td>Xem bảng điều khiển / pack / export được phép</td><td>Quyền download toàn bộ raw data</td><td>Vai trò-dựa trên theo portal / không gian làm việc</td><td>Rà định kỳ qua <a download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a></td></tr>
+<tr><td>Xây dựng</td><td>Tạo báo cáo cá nhân từ ngữ nghĩa mô hình được mở</td><td>Quyền đổi logic KPI sản xuất</td><td>Responsible Person kinh doanh + chủ dữ liệu</td><td>Giới hạn bộ dữ liệu, không ngầm định Công bố</td></tr>
+<tr><td>Công bố</td><td>Đưa báo cáo/không gian làm việc ra sản xuất</td><td>Quyền Admin hoặc tự ý mở rộng đối tượng</td><td>chủ nghiệp vụ + người phụ trách hệ thống</td><td>Phát hành bằng chứng, truyền đạt / giao tiếp, hoàn tác / quay lại</td></tr>
+<tr><td>Admin</td><td>Quản trị không gian làm việc, cổng kết nối (gateway), thông tin xác thực, làm mới, chia sẻ policy</td><td>Quyền kinh doanh ký-off</td><td>IT / admin thẩm quyền theo <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></td><td>có đặc quyền rà soát, SoD, log lưu giữ</td></tr>
+<tr><td>tạm thời / phó</td><td>bao phủ / che nghỉ phép, chuyển giao hệ thống, sự cố, tháng-end đóng</td><td>vĩnh viễn nâng cao</td><td>Manager + Quy trình Owner + hết hạn date</td><td>Đóng-out và thu hồi đúng hạn</td></tr>
 </tbody></table></div>
 <ul class="tight">
-  <li>Người xây KPI không tự là approver thay đổi logic nếu change class B/C ảnh hưởng quyết định tài chính, quality release hoặc management review.</li>
-  <li>Bảng điều khiển chứa dữ liệu nhạy cảm theo người dùng, lương, giá mua, chi phí hoặc privileged các log phải tách audience, export rule và retention rule.</li>
-  <li>Access review phải nhìn cả <b>human accounts</b>, <b>guest accounts</b>, <b>service accounts</b> và <b>scheduled refresh credentials</b>, không chỉ user nội bộ.</li>
+  <li>Người xây KPI không tự là người phê duyệt thay đổi logic nếu thay đổi class B/C ảnh hưởng quyết định tài chính, chất lượng phát hành hoặc xem xét của lãnh đạo.</li>
+  <li>Bảng điều khiển chứa dữ liệu nhạy cảm theo người dùng, lương, giá mua, chi phí hoặc có đặc quyền các log phải tách đối tượng, export rule và lưu giữ rule.</li>
+  <li>Truy cập rà soát phải nhìn cả <b>con người tài khoản</b>, <b>khách tài khoản</b>, <b>dịch vụ tài khoản</b> và <b>đã lên lịch làm mới thông tin xác thực</b>, không chỉ người dùng nội bộ.</li>
 </ul>
 
-<h2 class="h2" id="a5">5. Refresh, freeze-date, exception note và pack control</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Ngữ cảnh</th><th>Refresh / cut-off chuẩn</th><th>Freeze-date / freeze rule</th><th>Khi nào cần exception note</th><th>Nơi ghi nhận</th></tr></thead><tbody>
-<tr><td>T1/T2 điều hành trong ngày</td><td>Refresh trước họp tối thiểu 10–15 phút</td><td>Không freeze kỳ dài; freeze snapshot của cuộc họp</td><td>Refresh fail, stale data, manual override, missing diễn tập-down</td><td>Board note / <a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> ghi chú điều hành</td></tr>
-<tr><td>T3 tuần / tháng</td><td>Refresh theo lịch pack công bố</td><td>Freeze tại giờ chốt pack</td><td>Late posting, reclass data, missing customer/supplier update</td><td>Pack ghi chú điều hành + log hành động</td></tr>
-<tr><td>T4 / management review</td><td>Dùng snapshot đã freeze cho kỳ review</td><td>PHẢI giữ nguyên số kỳ đã freeze nếu chưa có change record</td><td>Backfill sau freeze, SoR correction sau close, dataset incident</td><td><a href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx"  download="">FRM-911</a> + change record</td></tr>
-<tr><td>Customer / external pack</td><td>Theo pack đã approval</td><td>Freeze theo revision gửi ra ngoài</td><td>Số nội bộ chưa khớp external disclosure pack</td><td>Gói release + communication log</td></tr>
+<h2 class="h2" id="a5">5. Làm mới, đóng băng-date, ngoại lệ note và pack control</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Ngữ cảnh</th><th>Làm mới / cut-off chuẩn</th><th>Đóng băng-date / đóng băng rule</th><th>Khi nào cần ngoại lệ note</th><th>Nơi ghi nhận</th></tr></thead><tbody>
+<tr><td>T1/T2 điều hành trong ngày</td><td>Làm mới trước họp tối thiểu 10–15 phút</td><td>Không đóng băng kỳ dài; đóng băng ảnh chụp trạng thái của cuộc họp</td><td>Làm mới fail, cũ / lỗi thời data, sổ tay / thủ công ghi đè / bỏ qua, thiếu diễn tập-xuống / ngừng</td><td>Bảng note / <a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> ghi chú điều hành</td></tr>
+<tr><td>T3 tuần / tháng</td><td>Làm mới theo lịch pack công bố</td><td>Đóng băng tại giờ chốt pack</td><td>muộn / trễ ghi sổ / đăng, phân loại lại (reclass) data, thiếu khách hàng/nhà cung cấp cập nhật</td><td>Pack ghi chú điều hành + log hành động</td></tr>
+<tr><td>T4 / xem xét của lãnh đạo</td><td>Dùng ảnh chụp trạng thái đã đóng băng cho kỳ rà soát</td><td>PHẢI giữ nguyên số kỳ đã đóng băng nếu chưa có thay đổi hồ sơ</td><td>bổ sung / thay thế sau đóng băng, SoR sửa chữa / hiệu chính sau đóng, bộ dữ liệu sự cố</td><td><a href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx"  download="">FRM-911</a> + thay đổi hồ sơ</td></tr>
+<tr><td>Khách hàng / bên ngoài pack</td><td>Theo pack đã phê duyệt</td><td>Đóng băng theo phiên bản gửi ra ngoài</td><td>Số nội bộ chưa khớp bên ngoài công bố pack</td><td>Gói phát hành + truyền đạt / giao tiếp log</td></tr>
 </tbody></table></div>
 <div class="field-grid">
-  <div class="field"><b>3 thông tin tối thiểu phải hiển thị trên mọi bảng điều khiển production</b><div class="blank">1) Last refresh timestamp<br/>2) chủ nghiệp vụ / chủ dữ liệu<br/>3) Trạng thái badge: Current / Stale / Exception / Offline fallback</div></div>
-  <div class="field"><b>Exception note tối thiểu</b><div class="blank">Vấn đề ID, phạm vi KPI bị ảnh hưởng, SoR thay thế, quyết định tạm thời được phép, người phụ trách khắc phục, ETA khôi phục, thời điểm backfill review.</div></div>
+  <div class="field"><b>3 thông tin tối thiểu phải hiển thị trên mọi bảng điều khiển sản xuất</b><div class="blank">1) cuối cùng làm mới dấu thời gian<br/>2) chủ nghiệp vụ / chủ dữ liệu<br/>3) Trạng thái badge: hiện tại / cũ / lỗi thời / Ngoại lệ / Offline phương án dự phòng</div></div>
+  <div class="field"><b>Ngoại lệ note tối thiểu</b><div class="blank">Vấn đề ID, phạm vi KPI bị ảnh hưởng, SoR thay thế, quyết định tạm thời được phép, người phụ trách khắc phục, ETA khôi phục, thời điểm bổ sung / thay thế rà soát.</div></div>
 </div>
 
-<h2 class="h2" id="a6">6. Failure handling, offline fallback, restore và backfill</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Failure / incident</th><th>Phản ứng ngay</th><th>Ai dẫn dắt</th><th>Điều hành tạm bằng gì</th><th>Đóng incident khi nào</th></tr></thead><tbody>
-<tr><td>Refresh fail / gateway down / credential expired</td><td>Freeze bảng điều khiển trạng thái cảnh báo; thông báo người phụ trách; chặn dùng bảng điều khiển nếu ảnh hưởng quyết định chính</td><td>IT admin + chủ dữ liệu</td><td>SoR export, approved manual pack</td><td>Khi refresh phục hồi, số reconcile và evidence được lưu</td></tr>
-<tr><td>Logic KPI sai / mapping sai / duplicated data</td><td>Đánh cờ vấn đề nghiêm trọng; revert nếu có thể; không sửa chui trong production</td><td>chủ dữ liệu + chủ nghiệp vụ</td><td>SoR + ghi chú điều hành note</td><td>Khi release corrected pack và review before/after xong</td></tr>
-<tr><td>Không gian làm việc / permission misconfiguration</td><td>Contain ngay: thu hẹp share, revoke access, snapshot impact</td><td>IT admin / người phụ trách hệ thống</td><td>N/A</td><td>Khi access được sửa, impact review hoàn tất</td></tr>
-<tr><td>SoR unavailable / offline fallback</td><td>Kích hoạt offline kit theo contingency path</td><td>Process Owner + IT + deputy trigger người phụ trách</td><td><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a> pack được approval</td><td>Khi hệ chính phục hồi và backfill được review</td></tr>
-<tr><td>Backfill sau gián đoạn</td><td>Chạy backfill có log; không overwrite lặng lẽ dữ liệu lịch sử</td><td>chủ dữ liệu</td><td>Backfill log + reconciliation sheet</td><td>Responsible Person Khi xác nhận không còn mismatch mở</td></tr>
+<h2 class="h2" id="a6">6. hỏng / lỗi xử lý / vận chuyển, offline phương án dự phòng, khôi phục và bổ sung / thay thế</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>hỏng / lỗi / sự cố</th><th>Phản ứng ngay</th><th>Ai dẫn dắt</th><th>Điều hành tạm bằng gì</th><th>Đóng sự cố khi nào</th></tr></thead><tbody>
+<tr><td>Làm mới fail / cổng kết nối (gateway) xuống / ngừng / thông tin xác thực đã hết hạn</td><td>Đóng băng bảng điều khiển trạng thái cảnh báo; thông báo người phụ trách; chặn dùng bảng điều khiển nếu ảnh hưởng quyết định chính</td><td>IT admin + chủ dữ liệu</td><td>SoR export, đã phê duyệt sổ tay / thủ công pack</td><td>Khi làm mới phục hồi, số đối soát và bằng chứng được lưu</td></tr>
+<tr><td>Logic KPI sai / sơ đồ ánh xạ sai / trùng lặp data</td><td>Đánh cờ vấn đề nghiêm trọng; hoàn nguyên nếu có thể; không sửa chui trong sản xuất</td><td>chủ dữ liệu + chủ nghiệp vụ</td><td>SoR + ghi chú điều hành note</td><td>Khi phát hành đã sửa pack và rà soát trước/sau xong</td></tr>
+<tr><td>Không gian làm việc / quyền / sự cho phép cấu hình sai</td><td>Ngăn chặn ngay: thu hẹp chia sẻ, thu hồi / hủy bỏ truy cập, ảnh chụp trạng thái tác động</td><td>IT admin / người phụ trách hệ thống</td><td>N/A</td><td>Khi truy cập được sửa, tác động rà soát hoàn tất</td></tr>
+<tr><td>SoR không khả dụng / offline phương án dự phòng</td><td>Kích hoạt offline kit theo dự phòng path</td><td>Quy trình Owner + IT + phó kích hoạt người phụ trách</td><td><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a> pack được phê duyệt</td><td>Khi hệ chính phục hồi và bổ sung / thay thế được rà soát</td></tr>
+<tr><td>bổ sung / thay thế sau gián đoạn</td><td>Chạy bổ sung / thay thế có log; không ghi đè lặng lẽ dữ liệu lịch sử</td><td>chủ dữ liệu</td><td>bổ sung / thay thế log + đối soát sheet</td><td>Responsible Person Khi xác nhận không còn không khớp mở</td></tr>
 </tbody></table></div>
-<div class="note-warning"><b>Quy tắc cứng</b><br/>Khi bảng điều khiển đang ở trạng thái <b>Stale / Exception / Offline fallback</b>, người điều hành phải ghi rõ quyết định tạm thời dùng nguồn nào. Không chờ hệ số sửa xong rồi “hồi tố trí nhớ” về lý do đã ra quyết định.</div>
+<div class="note-warning"><b>Quy tắc cứng</b><br/>Khi bảng điều khiển đang ở trạng thái <b>cũ / lỗi thời / Ngoại lệ / Offline phương án dự phòng</b>, người điều hành phải ghi rõ quyết định tạm thời dùng nguồn nào. Không chờ hệ số sửa xong rồi “hồi tố trí nhớ” về lý do đã ra quyết định.</div>
 
-<h2 class="h2" id="a7">7. Bảng điều khiển register tối thiểu</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Bảng điều khiển / dataset ID</th><th>Purpose / decision family</th><th>chủ nghiệp vụ</th><th>chủ dữ liệu</th><th>Environment</th><th>Default audience</th><th>Freeze / refresh class</th><th>Rollback path</th><th>Evidence link</th></tr></thead><tbody>
+<h2 class="h2" id="a7">7. Bảng điều khiển sổ đăng ký tối thiểu</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Bảng điều khiển / bộ dữ liệu ID</th><th>Purpose / quyết định nhóm sản phẩm</th><th>chủ nghiệp vụ</th><th>chủ dữ liệu</th><th>Môi trường</th><th>Mặc định đối tượng</th><th>Đóng băng / làm mới class</th><th>hoàn tác / quay lại path</th><th>Bằng chứng link</th></tr></thead><tbody>
 <tr><td style="height:38px"></td><td></td><td></td><td></td><td>DEV / UAT / PROD</td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="height:38px"></td><td></td><td></td><td></td><td>DEV / UAT / PROD</td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="height:38px"></td><td></td><td></td><td></td><td>DEV / UAT / PROD</td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="height:38px"></td><td></td><td></td><td></td><td>DEV / UAT / PROD</td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="height:38px"></td><td></td><td></td><td></td><td>DEV / UAT / PROD</td><td></td><td></td><td></td><td></td></tr>
 </tbody></table></div>
-<div class="small">Register này có thể được quản trị trên hệ số hoặc một list kiểm soát riêng, nhưng phải truy được mỗi bảng điều khiển production về người phụ trách, version, environment, release log và rollback path.</div>
+<div class="small">Sổ đăng ký này có thể được quản trị trên hệ số hoặc một list kiểm soát riêng, nhưng phải truy được mỗi bảng điều khiển sản xuất về người phụ trách, version, môi trường, phát hành log và hoàn tác / quay lại path.</div>
 
-<h2 class="h2" id="a8">8. KPI của chính hệ bảng điều khiển governance</h2>
+<h2 class="h2" id="a8">8. KPI của chính hệ bảng điều khiển quản trị</h2>
 <div class="grid-4">
-  <div class="kpi-card"><h3>% refresh đúng cửa sổ</h3><p>Đo độ ổn định operation bảng điều khiển; tách theo bảng điều khiển critical vs non-critical.</p></div>
-  <div class="kpi-card"><h3>% release có đủ pack</h3><p>Đo kỷ luật change control trước khi publish lên production.</p></div>
-  <div class="kpi-card"><h3>MTTR của incident dữ liệu</h3><p>Đo tốc độ khôi phục khi refresh fail, mapping sai hoặc permission lỗi.</p></div>
-  <div class="kpi-card"><h3>% privileged / publish access review đúng hạn</h3><p>Đo quality RBAC, least privilege và closure của quarterly review.</p></div>
+  <div class="kpi-card"><h3>% làm mới đúng cửa sổ</h3><p>Đo độ ổn định vận hành bảng điều khiển; tách theo bảng điều khiển quan trọng / nghiêm trọng vs non-quan trọng / nghiêm trọng.</p></div>
+  <div class="kpi-card"><h3>% phát hành có đủ pack</h3><p>Đo kỷ luật kiểm soát thay đổi trước khi công bố / phát hành lên sản xuất.</p></div>
+  <div class="kpi-card"><h3>MTTR của sự cố dữ liệu</h3><p>Đo tốc độ khôi phục khi làm mới fail, sơ đồ ánh xạ sai hoặc quyền / sự cho phép lỗi.</p></div>
+  <div class="kpi-card"><h3>% có đặc quyền / công bố / phát hành truy cập rà soát đúng hạn</h3><p>Đo chất lượng RBAC, ít nhất quyền hạn và kết thúc / đóng của hàng quý rà soát.</p></div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Chỉ số</th><th>Fail signal</th><th>Phản ứng quản trị</th></tr></thead><tbody>
-<tr><td>Refresh on-time</td><td>Bảng điều khiển critical trễ refresh nhiều kỳ liên tiếp</td><td>Review schedule, gateway, credential lifecycle, ownership và fallback plan</td></tr>
-<tr><td>Release discipline</td><td>Publish thay đổi nhưng không có ticket/approval/snapshot</td><td>Open finding, retrain, khóa quyền publish nếu tái diễn</td></tr>
-<tr><td>Access hygiene</td><td>Guest / service / privileged access không được rà hoặc không có người phụ trách</td><td>review quyền truy cập hàng quý + revoke / reassign người phụ trách</td></tr>
-<tr><td>Data incident closure</td><td>Vấn đề đóng nhưng không reconcile hoặc không có backfill evidence</td><td>Không cho remove exception badge cho đến khi close-out đủ evidence</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Chỉ số</th><th>Fail tín hiệu</th><th>Phản ứng quản trị</th></tr></thead><tbody>
+<tr><td>Làm mới on-time</td><td>Bảng điều khiển quan trọng / nghiêm trọng trễ làm mới nhiều kỳ liên tiếp</td><td>Rà soát lịch trình, cổng kết nối (gateway), thông tin xác thực vòng đời, quyền sở hữu và phương án dự phòng plan</td></tr>
+<tr><td>Phát hành kỷ luật / chuyên ngành</td><td>Công bố thay đổi nhưng không có phiếu yêu cầu/phê duyệt/ảnh chụp trạng thái</td><td>Mở phát hiện, đào tạo lại, khóa quyền công bố / phát hành nếu tái diễn</td></tr>
+<tr><td>Truy cập vệ sinh</td><td>Khách / dịch vụ / có đặc quyền truy cập không được rà hoặc không có người phụ trách</td><td>rà soát quyền truy cập hàng quý + thu hồi / hủy bỏ / phân công lại người phụ trách</td></tr>
+<tr><td>Data sự cố kết thúc / đóng</td><td>Vấn đề đóng nhưng không đối soát hoặc không có bổ sung / thay thế bằng chứng</td><td>Không cho loại bỏ ngoại lệ badge cho đến khi đóng-out đủ bằng chứng</td></tr>
 </tbody></table></div>
 
-<h2 class="h2" id="a9">9. Document liên kết và evidence bắt buộc</h2>
+<h2 class="h2" id="a9">9. Tài liệu liên kết và bằng chứng bắt buộc</h2>
 <div class="link-grid">
-  <div class="link-card"><h3>Định nghĩa KPI và data model</h3><ul class="link-list"><li><a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></li><li><a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></li><li><a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a></li></ul></div>
-  <div class="link-card"><h3>Access / RBAC / authority</h3><ul class="link-list"><li><a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></li><li><a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-102-access-request-field-dictionary.html">ANNEX-102</a></li><li><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></li><li><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></li></ul></div>
-  <div class="link-card"><h3>Forms / record bắt buộc</h3><ul class="link-list"><li><a href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx"  download="">FRM-141</a> — requirement cấp/đổi/recall quyền</li><li><a href="../../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx"  download="">FRM-111</a> — review quyền định kỳ</li><li><a href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx"  download="">FRM-911</a> — pack control và exception note ở management review</li><li><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-124-dashboard-evidence-pack-worked-examples.html">ANNEX-124</a> — ví dụ mẫu evidence packs để training người phụ trách và pre-bộ record review</li></ul></div>
-  <div class="link-card"><h3>Continuity / fallback</h3><ul class="link-list"><li><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a></li><li><a href="../../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></li><li><a href="../../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></li></ul></div>
+  <div class="link-card"><h3>Định nghĩa KPI và data mô hình</h3><ul class="link-list"><li><a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></li><li><a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></li><li><a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a></li></ul></div>
+  <div class="link-card"><h3>Truy cập / RBAC / thẩm quyền</h3><ul class="link-list"><li><a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></li><li><a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-102-access-request-field-dictionary.html">ANNEX-102</a></li><li><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></li><li><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></li></ul></div>
+  <div class="link-card"><h3>Biểu mẫu / hồ sơ bắt buộc</h3><ul class="link-list"><li><a href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx"  download="">FRM-141</a> — yêu cầu cấp/đổi/thu hồi quyền</li><li><a href="../../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx"  download="">FRM-111</a> — rà soát quyền định kỳ</li><li><a href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx"  download="">FRM-911</a> — pack control và ngoại lệ note ở xem xét của lãnh đạo</li><li><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-124-dashboard-evidence-pack-worked-examples.html">ANNEX-124</a> — ví dụ mẫu bằng chứng gói để đào tạo người phụ trách và pre-bộ hồ sơ rà soát</li></ul></div>
+  <div class="link-card"><h3>tính liên tục / phương án dự phòng</h3><ul class="link-list"><li><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a></li><li><a href="../../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></li><li><a href="../../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></li></ul></div>
 </div>
 
-<div class="footer-note">ANNEX-113 là lớp khóa để bảng điều khiển không chỉ “đẹp để xem” mà đủ điều kiện dùng để điều hành: biết ai sở hữu, biết lúc nào dữ liệu được chốt, biết khi nào phải dừng tin bảng điều khiển và quay về SoR, biết ai được publish và biết rollback ra sao.</div>
+<div class="footer-note">ANNEX-113 là lớp khóa để bảng điều khiển không chỉ “đẹp để xem” mà đủ điều kiện dùng để điều hành: biết ai sở hữu, biết lúc nào dữ liệu được chốt, biết khi nào phải dừng tin bảng điều khiển và quay về SoR, biết ai được công bố / phát hành và biết hoàn tác / quay lại ra sao.</div>
 
 </div></div></div></div></div>
 </body>
