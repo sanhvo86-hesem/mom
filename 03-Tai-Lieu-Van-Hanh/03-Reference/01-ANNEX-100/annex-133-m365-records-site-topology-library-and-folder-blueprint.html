@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-116 — Blueprint cấu trúc thư mục M365, quyền thư mục và quy tắc lưu record | HESEM QMS</title>
+<title>ANNEX-133 - M365 records site topology, libraries and folder blueprint | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
 @media print {
@@ -43,9 +43,9 @@
       <span>Document operation • Annex số hóa</span>
     </div>
   </div>
-  <div class="title"><strong>ANNEX-116 — Blueprint cấu trúc thư mục M365, quyền thư mục và quy tắc lưu record</strong></div>
+  <div class="title"><strong>ANNEX-133 - M365 records site topology, libraries and folder blueprint</strong></div>
   <div class="meta">
-    <div class="row"><span><b>Code:</b></span><span>ANNEX-116</span></div>
+    <div class="row"><span><b>Code:</b></span><span>ANNEX-133</span></div>
     <div class="row"><span><b>Version:</b></span><span>V1</span></div>
     <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
     <div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Administrator</span></div>
@@ -54,13 +54,13 @@
 </div>
 
       <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết kế site, library, folder, retention, metadata và quyền lưu trữ trên M365 cho toàn công ty. ANNEX này là nguồn chuẩn cho vị trí lưu record, folder path, vùng nhạy cảm và logic lưu trữ theo vòng đời record.</div>
-      <h1>ANNEX-116 — Blueprint cấu trúc thư mục M365, quyền thư mục và quy tắc lưu record</h1>
+      <h1>ANNEX-133 - M365 records site topology, libraries and folder blueprint</h1>
 
       <div class="section">
         <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
         <p style="margin:8px 0;">ANNEX này khóa cấu trúc lưu trữ M365 cho toàn bộ HESEM ở ba lớp đồng thời: lớp công ty và QMS, lớp phòng ban và quá trình vận hành, và lớp hồ sơ cá nhân hoặc hồ sơ hệ thống có kiểm soát cao. Mọi record phát sinh từ handbook phòng ban, SOP, WI, form workbook, dashboard control và workflow phải có đúng một vị trí SSOT trong blueprint này.</p>
         <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: không tồn tại record chính thức nằm ngoài blueprint; không có hai SSOT cho cùng một loại record; mọi folder có owner rõ, permission boundary rõ, retention basis rõ và rule đặt tên rõ.</div>
-        <div class="keyline"><strong>Ranh giới tài liệu:</strong> ANNEX-116 là nguồn chuẩn cho <b>path, folder tree, retention basis và zone quyền</b>. Dictionary field/list nằm tại <a href="annex-108-m365-lists-and-field-mapping.html">ANNEX-108</a>. Permission boundary theo vai trò nằm tại <a href="annex-101-role-based-access-map.html">ANNEX-101</a>. Kiến trúc provisioning/automation thực thi nằm tại <a href="annex-125-m365-auto.html">ANNEX-125</a>.</div>
+        <div class="keyline"><strong>Ranh giới tài liệu:</strong> ANNEX-133 là nguồn chuẩn cho <b>path, folder tree, retention basis và zone quyền</b>. Dictionary field/list nằm tại <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>. Permission boundary theo vai trò nằm tại <a href="annex-101-role-based-access-map.html">ANNEX-101</a>. Kiến trúc provisioning/automation thực thi nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>.</div>
       </div>
 
       <div class="section">
@@ -150,6 +150,7 @@
             </tbody>
           </table>
         </div>
+        <div class="keyline"><strong>Site topology bắt buộc:</strong> <span class="code">01-QMS-Records</span>, <span class="code">02-Quality-Records</span>, <span class="code">03-Job-Dossiers</span>, <span class="code">04-Training-Records</span>, <span class="code">05-Department-Records</span>, <span class="code">06-Archive</span>, <span class="code">07-Templates-Working</span> và <span class="code">Part-REV-Master</span> đặt trong site <span class="code">HESEM-QMS-Core</span>. <span class="code">08-People-Records</span> đặt trong site <span class="code">HESEM-People-Restricted</span>. <span class="code">09-Digital-System-Records</span> đặt trong site <span class="code">HESEM-Digital-Control</span>. Cơ chế provisioning theo site và trình tự triển khai nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>.</div>
       </div>
 
       <div class="section">
@@ -473,7 +474,7 @@
               <tr><td>{JobNum}</td><td>Mã job theo Epicor, không được thay bằng nickname nội bộ.</td><td>J240315</td></tr>
               <tr><td>{PartNo}</td><td>Mã part chuẩn theo master.</td><td>PN7788</td></tr>
               <tr><td>{Revision}</td><td>Revision engineering theo chuẩn release.</td><td>B</td></tr>
-              <tr><td>{RecordType}</td><td>Mã record theo dictionary ở ANNEX-108.</td><td>NCR, CAPA, RFQ, INCIDENT</td></tr>
+              <tr><td>{RecordType}</td><td>Mã record theo dictionary ở ANNEX-131.</td><td>NCR, CAPA, RFQ, INCIDENT</td></tr>
               <tr><td>{Description}</td><td>Slug ngắn, không dấu tiếng Việt, không khoảng trắng, dùng dấu gạch nối.</td><td>customer-change-pack</td></tr>
             </tbody>
           </table>
@@ -557,3 +558,5 @@
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
+
+

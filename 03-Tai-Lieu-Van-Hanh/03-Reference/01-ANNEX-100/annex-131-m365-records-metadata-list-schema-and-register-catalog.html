@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-108 — Field mapping M365/List, value set, register catalog và source of record | HESEM QMS</title>
+<title>ANNEX-131 - M365 records metadata, list schema, value sets and register catalog | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
 @media print {
@@ -42,9 +42,9 @@
       <span>Document operation • Annex số hóa</span>
     </div>
   </div>
-  <div class="title"><strong>ANNEX-108 — Field mapping M365/List, value set, register catalog và source of record</strong></div>
+  <div class="title"><strong>ANNEX-131 - M365 records metadata, list schema, value sets and register catalog</strong></div>
   <div class="meta">
-    <div class="row"><span><b>Code:</b></span><span>ANNEX-108</span></div>
+    <div class="row"><span><b>Code:</b></span><span>ANNEX-131</span></div>
     <div class="row"><span><b>Version:</b></span><span>V2</span></div>
     <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
     <div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Administrator</span></div>
@@ -53,11 +53,11 @@
 </div>
 
       <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi tạo mới hoặc sửa M365 List/Register, content type, form, Power Automate flow, dashboard, integration và metadata schema cho toàn bộ QMS số hóa. ANNEX này là nguồn chuẩn cho internal name, choice code, list catalog, lookup source, validation rule và source-of-record boundary.</div>
-      <h1>ANNEX-108 — Field mapping M365/List, value set, register catalog và source of record</h1>
+      <h1>ANNEX-131 - M365 records metadata, list schema, value sets and register catalog</h1>
 
       <div class="section">
         <h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
-        <p style="margin:8px 0;">ANNEX này chuẩn hóa field mapping cho M365/List, content type, lookup, xác nhận rule và source-of-record cho toàn bộ record model cấp công ty, cấp phòng ban, cấp nhân sự, cấp job và cấp hệ thống số. Mục tiêu là loại bỏ dữ liệu rời, loại bỏ bộ mã trùng nghĩa, khóa logic provisioning của <span class="code">ANNEX-125</span> vào cùng một từ điển dữ liệu và đảm bảo mọi list/register đều có owner, khóa tự nhiên, retention trigger và linkage tới SSOT rõ ràng.</p>
+        <p style="margin:8px 0;">ANNEX này chuẩn hóa field mapping cho M365/List, content type, lookup, xác nhận rule và source-of-record cho toàn bộ record model cấp công ty, cấp phòng ban, cấp nhân sự, cấp job và cấp hệ thống số. Mục tiêu là loại bỏ dữ liệu rời, loại bỏ bộ mã trùng nghĩa, khóa logic provisioning của <span class="code">ANNEX-134</span> vào cùng một từ điển dữ liệu và đảm bảo mọi list/register đều có owner, khóa tự nhiên, retention trigger và linkage tới SSOT rõ ràng.</p>
         <div class="keyline"><strong>Quy tắc cứng:</strong> Epicor là SoR cho giao dịch Job, Inventory, PO/Receipt, Shipment, Labor và master data giao dịch. M365 không tái tạo giao dịch để thay thế Epicor. M365 lưu record điều hành, evidence, approval, metadata chỉ mục, decision pack và logs điều khiển.</div>
       </div>
 
@@ -119,6 +119,7 @@
             <tbody>
               <tr><td>RequestType</td><td>Loại yêu cầu</td><td>Choice</td><td>Có</td><td>Provisioning, external share, archive, exception</td></tr>
               <tr><td>LibraryCode</td><td>Library</td><td>Choice</td><td>Có</td><td>Provisioning requests, zone catalogs</td></tr>
+              <tr><td>SiteCode</td><td>SharePoint site</td><td>Choice</td><td>Theo request</td><td>Provisioning requests, zone catalogs, share logs</td></tr>
               <tr><td>RecordZone</td><td>Vùng record</td><td>Choice</td><td>Có</td><td>Provisioning requests, catalog, archive log</td></tr>
               <tr><td>DeptCode</td><td>Mã phòng ban</td><td>Choice</td><td>Theo record</td><td>Department records, employee records, approval routing</td></tr>
               <tr><td>FunctionArea</td><td>Phân vùng chức năng</td><td>Choice</td><td>Theo record</td><td>Dashboard, zone catalog, reports</td></tr>
@@ -147,8 +148,9 @@
             </thead>
             <tbody>
               <tr><td>DeptCodeCodes</td><td>EXEC, QMS, QA, ENG, PRO, SCM, SAL, FIN, HR, EHS, IT, ERP</td><td>Không dùng biến thể tự đặt như Sales, Production, Warehouse nếu chưa map chính thức.</td></tr>
-              <tr><td>LibraryCodes</td><td>01-QMS-Records, 02-Quality-Records, 03-Job-Dossiers, 04-Training-Records, 05-Department-Records, 06-Archive, 07-Templates-Working, 08-People-Records, 09-Digital-System-Records, Part-REV-Master</td><td>Khớp taxonomy trong <span class="code">ANNEX-116</span>.</td></tr>
-              <tr><td>RequestTypeCodes</td><td>CreateCompanyRecordZone, CreateDepartmentZone, CreateDepartmentYearFolder, CreateJobDossier, CreateEmployeeDossier, CreateContractorDossier, CreateVisitorAccessRecord, CreateSystemRecordZone, ExternalSharePackage, ArchiveLock, PermissionException</td><td>Khớp orchestration trong <span class="code">ANNEX-125</span>.</td></tr>
+              <tr><td>LibraryCodes</td><td>01-QMS-Records, 02-Quality-Records, 03-Job-Dossiers, 04-Training-Records, 05-Department-Records, 06-Archive, 07-Templates-Working, 08-People-Records, 09-Digital-System-Records, Part-REV-Master</td><td>Khớp taxonomy trong <span class="code">ANNEX-133</span>.</td></tr>
+              <tr><td>SiteCodeCodes</td><td>HESEM-QMS-Core, HESEM-People-Restricted, HESEM-Digital-Control</td><td>Khớp site topology trong <span class="code">ANNEX-134</span>.</td></tr>
+              <tr><td>RequestTypeCodes</td><td>CreateCompanyRecordZone, CreateDepartmentZone, CreateDepartmentYearFolder, CreateJobDossier, CreateEmployeeDossier, CreateContractorDossier, CreateVisitorAccessRecord, CreateSystemRecordZone, ExternalSharePackage, ArchiveLock, PermissionException</td><td>Khớp orchestration trong <span class="code">ANNEX-134</span>.</td></tr>
               <tr><td>RecordZoneCodes</td><td>CompanyGovernance, QualityFormal, JobDossier, TrainingSSOT, DepartmentOperations, PeopleRestricted, SystemAdmin, ArchiveLocked, TemplateWorking, PartMaster</td><td>Dùng cho catalog, dashboard và provisioning logic.</td></tr>
               <tr><td>FunctionAreaCodes</td><td>Governance, Operations, RegistersLogs, ProjectsImprovement, InterfacesReleasedPacks, RestrictedPeople, SystemAdministration</td><td>Không tạo label trùng nghĩa.</td></tr>
               <tr><td>ConfidentialityClassCodes</td><td>Public-Controlled, Internal-Controlled, Confidential, Restricted-People, Restricted-Payroll, Restricted-Medical, Restricted-SystemAdmin, External-Package</td><td>Map với sensitivity label và permission model.</td></tr>
@@ -251,3 +253,5 @@
 </div>
 </body>
 </html>
+
+

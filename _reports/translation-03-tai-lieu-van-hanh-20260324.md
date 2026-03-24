@@ -1,4 +1,4 @@
-# Translation Batch - 03-Tai-Lieu-Van-Hanh - 2026-03-24
+﻿# Translation Batch - 03-Tai-Lieu-Van-Hanh - 2026-03-24
 
 - Target directory: `03-Tai-Lieu-Van-Hanh`
 - Files scanned: 141
@@ -19,7 +19,7 @@
 - `03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html`: 1 thay thế (hold_point=1)
 - `03-Tai-Lieu-Van-Hanh/02-Work-Instructions/06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html`: 1 thay thế (hold_point=1)
 - `03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-105-process-map-detailed.html`: 1 thay thế (hold_point=1)
-- `03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-109-power-automate-flows-and-approvals-spec.html`: 1 thay thế (hold_point=1)
+- `03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-132-m365-records-flow-approval-sharing-and-exception-control.html`: 1 thay thế (hold_point=1)
 - `03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html`: 1 thay thế (hold_point=1)
 - `03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-300/annex-302-approved-materials-list.html`: 1 thay thế (hold_point=1)
 - `03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html`: 1 thay thế (hold_point=1)
