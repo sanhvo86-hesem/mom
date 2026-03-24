@@ -121,7 +121,30 @@ Các tên cột sau là định danh kỹ thuật trong M365 Lists / Epicor. **K
 
 **Nhận dạng nhanh tên cột nội bộ:** Bất kỳ từ nào viết dạng **CamelCase** (như `RecordType`, `JobNum`, `CustomerID`) đều là tên cột kỹ thuật — **KHÔNG dịch**.
 
-#### B3.3 Tên chủ sở hữu SharePoint — giữ nguyên 100%
+#### B3.3 Tên SharePoint List — giữ nguyên 100%
+
+| Tên List gốc | Mô tả |
+|---------------|--------|
+| `QMS-Document-Register` | Sổ đăng ký tài liệu |
+| `QMS-Change-Register` | Sổ đăng ký thay đổi |
+| `QMS-NCR-Register` | Sổ đăng ký NCR |
+| `QMS-CAPA-Register` | Sổ đăng ký CAPA |
+| `QMS-Training-Register` | Sổ đăng ký đào tạo |
+| `QMS-Competence-Matrix` | Ma trận năng lực |
+| `OPS-Job-Dossier-Index` | Danh mục hồ sơ Job |
+| `PUR-Supplier-Register` | Sổ đăng ký nhà cung cấp |
+| `M365-Record-Provisioning-Requests` | Yêu cầu cấp phát hồ sơ |
+| `M365-Record-Series-Catalog` | Danh mục chuỗi hồ sơ |
+| `Department-Zone-Catalog` | Danh mục phòng ban/khu vực |
+| `People-Dossier-Index` | Danh mục hồ sơ nhân sự |
+| `System-Record-Request-Log` | Nhật ký yêu cầu hồ sơ hệ thống |
+| `External-Share-Approval-Log` | Nhật ký duyệt chia sẻ bên ngoài |
+| `Automation-Run-Log` | Nhật ký chạy tự động |
+| `Archive-Lock-Register` | Sổ đăng ký khóa lưu trữ |
+
+**Quy tắc:** Tên List là định danh hệ thống — dịch sẽ phá vỡ Power Automate flows và lookup columns.
+
+#### B3.4 Tên chủ sở hữu SharePoint — giữ nguyên 100%
 
 `QMS-Owner` là tên tài khoản/nhóm bảo mật trong M365 — **KHÔNG** dịch thành "QMS-Chủ sở hữu" hay bất kỳ dạng nào khác.
 

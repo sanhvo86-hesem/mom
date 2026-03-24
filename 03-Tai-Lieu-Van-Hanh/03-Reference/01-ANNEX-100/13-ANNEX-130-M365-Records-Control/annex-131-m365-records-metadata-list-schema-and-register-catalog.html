@@ -181,22 +181,22 @@
               <tr><th>List / Sổ đăng ký</th><th>Phạm vi</th><th>Khoá tự nhiên</th><th>Responsible</th><th>Lưu giữ kích hoạt</th></tr>
             </thead>
             <tbody>
-              <tr><td>QMS-Tài liệu-Sổ đăng ký</td><td>Được kiểm soát tài liệu sổ đăng ký</td><td>DocCode + Phiên bản</td><td>QMS</td><td>SupersededDate</td></tr>
-              <tr><td>QMS-Thay đổi-Sổ đăng ký</td><td>System and quy trình thay đổi</td><td>ChangeId</td><td>QMS</td><td>ClosedDate</td></tr>
-              <tr><td>QMS-NCR-Sổ đăng ký</td><td>NCR trường hợp</td><td>mã NCR (mã NCR (NCRId))</td><td>QA</td><td>DispositionApprovedDate</td></tr>
-              <tr><td>QMS-CAPA-Sổ đăng ký</td><td>CAPA trường hợp</td><td>mã CAPA (mã CAPA (CAPAId))</td><td>QMS</td><td>EffectivenessVerifiedDate</td></tr>
-              <tr><td>OPS-Job-Hồ sơ-Index</td><td>Hồ sơ index for all công việc / đơn hàng</td><td>Công ty + Nhà máy + JobNum</td><td>Kế hoạch</td><td>JobClosedDate</td></tr>
-              <tr><td>QMS-Đào tạo-Sổ đăng ký</td><td>Đào tạo sự kiện and bằng chứng sổ đăng ký</td><td>TrainingCode + SessionDate</td><td>HR / QA</td><td>TrainingEventDate or nhân viên phân tách per rule</td></tr>
-              <tr><td>QMS-Năng lực-Matrix</td><td>Năng lực and đánh giá năng lực index</td><td>EmployeeID + SkillCode</td><td>HR / Dept owner</td><td>Nhân viên phân tách or được thay thế đánh giá năng lực</td></tr>
-              <tr><td>PUR-Nhà cung cấp-Sổ đăng ký</td><td>Nhà cung cấp đánh giá năng lực and bảng điểm</td><td>SupplierID</td><td>SCM</td><td>SupplierOffboardDate</td></tr>
-              <tr><td>M365-Hồ sơ-cung cấp / cấp phát-yêu cầu</td><td>All cung cấp / cấp phát yêu cầu</td><td>RequestId</td><td>IT / QMS</td><td>ClosedDate</td></tr>
-              <tr><td>Phòng ban-Khu vực-danh mục</td><td>danh mục of phòng ban khu vực</td><td>DeptCode + Năm + RecordZone</td><td>QMS</td><td>SupersededDate or lưu trữ sự kiện</td></tr>
+              <tr><td>QMS-Document-Register</td><td>Được kiểm soát tài liệu sổ đăng ký</td><td>DocCode + Phiên bản</td><td>QMS</td><td>SupersededDate</td></tr>
+              <tr><td>QMS-Change-Register</td><td>System and quy trình thay đổi</td><td>ChangeId</td><td>QMS</td><td>ClosedDate</td></tr>
+              <tr><td>QMS-NCR-Register</td><td>NCR trường hợp</td><td>mã NCR (mã NCR (NCRId))</td><td>QA</td><td>DispositionApprovedDate</td></tr>
+              <tr><td>QMS-CAPA-Register</td><td>CAPA trường hợp</td><td>mã CAPA (mã CAPA (CAPAId))</td><td>QMS</td><td>EffectivenessVerifiedDate</td></tr>
+              <tr><td>OPS-Job-Dossier-Index</td><td>Hồ sơ index for all công việc / đơn hàng</td><td>Công ty + Nhà máy + JobNum</td><td>Kế hoạch</td><td>JobClosedDate</td></tr>
+              <tr><td>QMS-Training-Register</td><td>Đào tạo sự kiện and bằng chứng sổ đăng ký</td><td>TrainingCode + SessionDate</td><td>HR / QA</td><td>TrainingEventDate or nhân viên phân tách per rule</td></tr>
+              <tr><td>QMS-Competence-Matrix</td><td>Năng lực and đánh giá năng lực index</td><td>EmployeeID + SkillCode</td><td>HR / Dept owner</td><td>Nhân viên phân tách or được thay thế đánh giá năng lực</td></tr>
+              <tr><td>PUR-Supplier-Register</td><td>Nhà cung cấp đánh giá năng lực and bảng điểm</td><td>SupplierID</td><td>SCM</td><td>SupplierOffboardDate</td></tr>
+              <tr><td>M365-Record-Provisioning-Requests</td><td>All cung cấp / cấp phát yêu cầu</td><td>RequestId</td><td>IT / QMS</td><td>ClosedDate</td></tr>
+              <tr><td>Department-Zone-Catalog</td><td>danh mục of phòng ban khu vực</td><td>DeptCode + Năm + RecordZone</td><td>QMS</td><td>SupersededDate or lưu trữ sự kiện</td></tr>
               <tr><td>M365-Hồ sơ-chuỗi / loạt-danh mục</td><td>Danh mục hồ sơ chuỗi / loạt theo <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td><td>RecordSeriesCode</td><td>QMS / IT</td><td>SupersededDate</td></tr>
-              <tr><td>Con người-Hồ sơ-Index</td><td>Con người hồ sơ index</td><td>EmployeeID or PopulationKey</td><td>HR</td><td>EmploymentEndDate or tham quan / kiểm tra end</td></tr>
-              <tr><td>System-Hồ sơ-Yêu cầu-Log</td><td>System-khu vực cung cấp / cấp phát and admin yêu cầu</td><td>SystemReqId</td><td>IT / ERP</td><td>ClosedDate</td></tr>
-              <tr><td>Bên ngoài-chia sẻ-Phê duyệt-Log</td><td>All bên ngoài chia sẻ and khách liên kết</td><td>ShareRequestId</td><td>QMS / IT</td><td>ExpiryDate or thu hồi / hủy bỏ date</td></tr>
+              <tr><td>People-Dossier-Index</td><td>Con người hồ sơ index</td><td>EmployeeID or PopulationKey</td><td>HR</td><td>EmploymentEndDate or tham quan / kiểm tra end</td></tr>
+              <tr><td>System-Record-Request-Log</td><td>System-khu vực cung cấp / cấp phát and admin yêu cầu</td><td>SystemReqId</td><td>IT / ERP</td><td>ClosedDate</td></tr>
+              <tr><td>External-Share-Approval-Log</td><td>All bên ngoài chia sẻ and khách liên kết</td><td>ShareRequestId</td><td>QMS / IT</td><td>ExpiryDate or thu hồi / hủy bỏ date</td></tr>
               <tr><td>Lưu trữ-khóa-Sổ đăng ký</td><td>Lưu trữ khóa and mở lại log</td><td>ArchiveLockId</td><td>QMS</td><td>TriggerEventDate</td></tr>
-              <tr><td>tự động hóa-Run-Log</td><td>Flow run and thử lại log</td><td>RunId</td><td>IT</td><td>RunDate</td></tr>
+              <tr><td>Automation-Run-Log</td><td>Flow run and thử lại log</td><td>RunId</td><td>IT</td><td>RunDate</td></tr>
             </tbody>
           </table>
         </div>

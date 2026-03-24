@@ -250,6 +250,15 @@ KEEP_ENGLISH = {
     'WorkflowStatus','ApprovalStatus','ReviewStatus',
     # ── SharePoint site names — NEVER translate ──
     'HESEM-QMS','HESEM-Con','HESEM-Số','Control',
+    # ── SharePoint List names — NEVER translate ──
+    'QMS-Document-Register','QMS-Change-Register','QMS-NCR-Register',
+    'QMS-CAPA-Register','QMS-Training-Register','QMS-Competence-Matrix',
+    'OPS-Job-Dossier-Index','PUR-Supplier-Register',
+    'M365-Record-Provisioning-Requests','M365-Record-Series-Catalog',
+    'Department-Zone-Catalog','People-Dossier-Index',
+    'System-Record-Request-Log','External-Share-Approval-Log',
+    'Automation-Run-Log','Archive-Lock-Register',
+    'Register','Dossier',
     # ── Industry proper nouns ──
     'Hastelloy','Inconel','Monel','Stellite','Titanium','Invar','Kovar',
     'Honeywell','Parker','Swagelok','Emerson','Siemens','Fanuc','Mazak',
