@@ -7,7 +7,7 @@
 <title>SYS-OPS-28 — Enterprise File Plan & Department Filing Matrix | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
- /* SYS-OPS-28: ưu tiên bảng gọn, đọc nhanh trên xưởng */
+ /* SYS-OPS-28: ưu tiên bảng gọn, đọc nhanh trên workshop */
  .table { table-layout: fixed; }
  .table th, .table td { vertical-align: top; word-break: normal; overflow-wrap: anywhere; }
  .table code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 0.95em; }
@@ -59,7 +59,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+    <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
@@ -83,13 +83,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-28</div>
 <h1 style="margin-top:10px">SOP-QMS-17 — Enterprise File Plan &amp; Department Filing Matrix</h1>
 <p class="muted">
- Trọng tâm: <b>Primary Home</b> (nơi gốc duy nhất) • <b>Routing</b> (luồng publish &amp; bàn giao) • <b>Đánh giá retrieval</b> (truy xuất theo key).
- Mọi hành động trong mô-đun này tạo bằng chứng vận hành (MRR) và tạo hold point chống sai Rev/lẫn lộn (mix-up).
+ Trọng tâm: <b>Primary Home</b> (nơi gốc duy nhất) • <b>Routing</b> (luồng publish &amp; bàn giao) • <b>Đánh giá retrieval</b> (traceability theo key).
+ Mọi hành động trong mô-đun này tạo evidence operation (MRR) và tạo hold point chống sai Rev/lẫn lộn (mix-up).
  </p>
 <div class="kpi">
-<div class="tag blue">KPI: truy xuất Job/PartRev/Bằng chứng ≤ 3 phút</div>
+<div class="tag blue">KPI: traceability Job/PartRev/Evidence ≤ 3 phút</div>
 <div class="tag">Nguyên tắc: 01 đối tượng = 01 Primary Home</div>
-<div class="tag">Luật: không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</div>
+<div class="tag">Luật: không có evidence thì không qua control gate (No evidence = No gate)</div>
 </div>
 </div>
 <div class="note">
@@ -98,42 +98,42 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Đối tượng (bắt buộc):</strong> Operator, Setup, Programmer, QC, QA, Warehouse, Purchasing, Planner, Maintenance, EHS, Estimator (SAL-03), Supervisor</li>
 <li><strong>Thời lượng:</strong> Lý thuyết 90 phút • Workshop 60 phút • OJT 120 phút (theo ca)</li>
 <li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền tối thiểu theo vai trò; đã học Orientation + quy tắc an toàn dữ liệu nội bộ.</li>
-<li><strong>Hold point:</strong> Release Part/Rev • Nhận chứng từ vật liệu/outsource • Đóng kiểm tra • bộ hồ sơ giao hàng (ship packet)</li>
+<li><strong>Hold point:</strong> Release Part/Rev • Nhận chứng từ vật liệu/outsource • Đóng inspection • bộ record delivery (ship packet)</li>
 </ul>
 </div>
 </div>
 <div class="toc" style="margin-top:14px">
 <strong>Mục lục nhanh</strong>
 <ul>
-<li><a href="#purpose">2) Mục đích &amp; bối cảnh vận hành</a></li>
+<li><a href="#purpose">2) Mục đích &amp; bối cảnh operation</a></li>
 <li><a href="#e2e">3) Vị trí trong chuỗi E2E + luồng bàn giao + hold point</a></li>
 <li><a href="#failure">4) Điểm đứt gãy (&gt;=10)</a></li>
 <li><a href="#controls">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát)</a></li>
 <li><a href="#failfast">6) Fail-fast rules + STOP/HOLD/BLOCK</a></li>
 <li><a href="#60s">7) Phản ứng 60 giây</a></li>
-<li><a href="#checklist">8) Bảng kiểm vận hành (≤15 bước)</a></li>
-<li><a href="#ojt">9) OJT theo TWI (Job breakdown + đầu ra + rubric L1–L4)</a></li>
-<li><a href="#assessment">10) Đánh giá (bài kiểm tra nhanh + scenario + performance test)</a></li>
+<li><a href="#checklist">8) Checklist operation (≤15 bước)</a></li>
+<li><a href="#ojt">9) OJT theo TWI (Job breakdown + output + rubric L1–L4)</a></li>
+<li><a href="#assessment">10) Đánh giá (bài inspection nhanh + scenario + performance test)</a></li>
 <li><a href="#passfail">11) ĐẠT/KHÔNG ĐẠT criteria</a></li>
-<li><a href="#mrr">12) MRR tối thiểu (hồ sơ • đặt tên • nơi lưu)</a></li>
+<li><a href="#mrr">12) MRR tối thiểu (record • đặt tên • nơi lưu)</a></li>
 <li><a href="#audit">13) Lỗi đánh giá hay gặp &amp; cách chặn</a></li>
-<li><a href="#DCR record">14) DCR hồ sơ</a></li>
+<li><a href="#DCR record">14) DCR record</a></li>
 </ul>
 </div>
 </div>
 <!-- 2) Purpose -->
 <div class="card" id="purpose">
-<h2 class="h2" style="margin-top:0">2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
+<h2 class="h2" style="margin-top:0">2) Mục đích mô-đun &amp; bối cảnh operation</h2>
 <div class="callout">
-<b>Mô-đun này tồn tại để khóa 03 rủi ro sống còn của xưởng CNC gia công theo đơn (job shop):</b>
+<b>Mô-đun này tồn tại để khóa 03 rủi ro sống còn của workshop CNC gia công theo đơn (job shop):</b>
 <ol style="margin:10px 0 0 18px">
 <li><b>Sai Rev / sai bản vẽ / sai chương trình</b> → gia công sai → scrap/rework → giao sai.</li>
-<li><b>Lẫn lộn lẫn Job/lot</b> → mất traceability → ship sai → khiếu nại/đánh giá không đạt.</li>
-<li><b>Thiếu/giả chứng từ</b> (COA/Cert/outsource/cali) → không chứng minh phù hợp → “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”.</li>
+<li><b>Lẫn lộn lẫn Job/lot</b> → mất traceability → ship sai → complaint/đánh giá không đạt.</li>
+<li><b>Thiếu/giả chứng từ</b> (COA/Cert/outsource/cali) → không chứng minh phù hợp → “không có evidence thì không qua control gate (No evidence = No gate)”.</li>
 </ol>
 <div class="muted" style="margin-top:8px">
- Khi một bộ phận lưu sai nơi hoặc copy file để “tiện”, hệ thống mất SSOT và mọi vai trò phía sau mất thời gian truy xuất.
- Mô-đun này biến “lưu trữ” thành <b>control gate vận hành</b> và <b>kỹ năng bắt buộc</b>.
+ Khi một bộ phận lưu sai nơi hoặc copy file để “tiện”, hệ thống mất SSOT và mọi vai trò phía sau mất thời gian traceability.
+ Mô-đun này biến “lưu trữ” thành <b>control gate operation</b> và <b>kỹ năng bắt buộc</b>.
  </div>
 </div>
 <h3 class="h3">Ai chịu trách nhiệm và khi nào kích hoạt</h3>
@@ -150,13 +150,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Mở Job / nhận PO / tạo traveler</td>
 <td>Planner + Supervisor</td>
-<td>Tạo Job dossier (job dossier) đúng skeleton; gắn JobNum/PartRev; chốt Primary Home cho bằng chứng theo Job.</td>
+<td>Tạo Job dossier (job dossier) đúng skeleton; gắn JobNum/PartRev; chốt Primary Home cho evidence theo Job.</td>
 <td>Folder Job dossier + Index (danh mục pack)</td>
 </tr>
 <tr>
 <td>Release Part/Rev (drawing/CAM/setup)</td>
 <td>Programmer + Setup + QA</td>
-<td>Release theo Package; snapshot xuống xưởng; khóa bản cũ (obsolete) và chặn copy tay.</td>
+<td>Release theo Package; snapshot xuống workshop; khóa bản cũ (obsolete) và chặn copy tay.</td>
 <td>CFG package + proof release + SnapshotID</td>
 </tr>
 <tr>
@@ -166,33 +166,33 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Bộ chứng từ chứng nhận + receiving acceptance</td>
 </tr>
 <tr>
-<td>Đóng kiểm tra / chuẩn bị ship</td>
+<td>Đóng inspection / chuẩn bị ship</td>
 <td>QC + QA + Warehouse</td>
-<td>Hoàn tất report; tạo bộ hồ sơ giao hàng theo PackID; kiểm link tới pack bắt buộc; declare hồ sơ.</td>
-<td>IR/CMM/FAI pack + Bộ hồ sơ giao hàng + CoC</td>
+<td>Hoàn tất report; tạo bộ record delivery theo PackID; kiểm link tới pack bắt buộc; declare record.</td>
+<td>IR/CMM/FAI pack + Bộ record delivery + CoC</td>
 </tr>
 </tbody>
 </table>
 <div class="note">
 <b>Điều kiện sống còn:</b> mọi file “đúng” mà nằm sai nơi vẫn bị xem là <b>không tồn tại</b> ở góc nhìn control gate.
- Truy xuất đánh giá phải bắt đầu từ <b>key</b> (JobNum / PartNum-Rev / CaseID / AssetID) và dẫn tới <b>Primary Home</b>.
+ Traceability đánh giá phải bắt đầu từ <b>key</b> (JobNum / PartNum-Rev / CaseID / AssetID) và dẫn tới <b>Primary Home</b>.
  </div>
 </div>
 <!-- 3) E2E -->
 <div class="card" id="e2e">
-<h2 class="h2" style="margin-top:0">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + hold point</h2>
+<h2 class="h2" style="margin-top:0">3) Vị trí trong chuỗi E2E + luồng bàn giao (input/output) + hold point</h2>
 <p>
  Mô-đun SYS-OPS-28 chạy xuyên suốt chuỗi:
  <b>Báo giá/Hợp đồng → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Phản hồi/CI</b>.
- Mỗi điểm tạo hồ sơ đều có <b>Primary Home</b> và <b>routing</b> rõ ràng.
+ Mỗi điểm tạo record đều có <b>Primary Home</b> và <b>routing</b> rõ ràng.
  </p>
 <h3 class="h3">3.1 Luồng bàn giao theo key</h3>
 <table class="table">
 <thead>
 <tr>
 <th style="width:160px">Bước</th>
-<th style="width:200px">Đầu vào (nhận)</th>
-<th style="width:210px">Đầu ra (bàn giao)</th>
+<th style="width:200px">Input (nhận)</th>
+<th style="width:210px">Output (bàn giao)</th>
 <th style="width:220px">Primary Home</th>
 <th style="width:190px">Hold point (control gate)</th>
 </tr>
@@ -200,17 +200,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Báo giá/Hợp đồng</td>
-<td>RFQ + yêu cầu kỹ thuật + điều khoản</td>
+<td>RFQ + requirement kỹ thuật + điều khoản</td>
 <td>Hợp đồng/PO clauses + obligations summary</td>
 <td>Zone05_Commercial (Customer)</td>
-<td>Estimator (SAL-03) xác nhận “điều khoản hồ sơ” trước khi nhận đơn</td>
+<td>Estimator (SAL-03) xác nhận “điều khoản record” trước khi nhận đơn</td>
 </tr>
 <tr>
 <td>Planning</td>
 <td>PO đã nhận + BOM/routing trong ERP</td>
 <td>Job mở + Job dossier skeleton + link PartRev</td>
 <td>Zone03_Operations_Evidence_Job</td>
-<td>Planner tạo Job dossier trước khi phát hành xuống xưởng</td>
+<td>Planner tạo Job dossier trước khi release xuống workshop</td>
 </tr>
 <tr>
 <td>Engineering</td>
@@ -222,50 +222,50 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Purchasing</td>
 <td>Subcon requirement / material spec</td>
-<td>PO + cert requirement + supplier bằng chứng</td>
+<td>PO + cert requirement + supplier evidence</td>
 <td>Zone05 (Supplier) + link sang Job pack</td>
-<td>Purchasing khóa yêu cầu cert theo PO; thiếu cert = HOLD</td>
+<td>Purchasing khóa requirement cert theo PO; thiếu cert = HOLD</td>
 </tr>
 <tr>
 <td>Receiving</td>
 <td>Hàng về + cert + lot</td>
 <td>Receiving acceptance + bộ chứng từ chứng nhận gắn Job/PO/lot</td>
-<td>Zone03 (Job bằng chứng) / series vật tư</td>
-<td>QC/QA ký pass trước khi cấp cho sản xuất</td>
+<td>Zone03 (Job evidence) / series vật tư</td>
+<td>QC/QA ký pass trước khi cấp cho production</td>
 </tr>
 <tr>
 <td>Production</td>
 <td>SnapshotID + traveler + vật tư pass</td>
-<td>Bằng chứng ngoại lệ + setup proof + ảnh theo yêu cầu</td>
-<td>Zone03 (Job bằng chứng)</td>
+<td>Evidence ngoại lệ + setup proof + ảnh theo requirement</td>
+<td>Zone03 (Job evidence)</td>
 <td>Supervisor chặn chạy khi mở sai Rev/sai snapshot</td>
 </tr>
 <tr>
 <td>QC/QA</td>
 <td>Part produced + CTQ</td>
-<td>IR/CMM/FAI + NCR bằng chứng (khi phát sinh)</td>
+<td>IR/CMM/FAI + NCR evidence (khi phát sinh)</td>
 <td>Zone03 (Job) + Zone04 (Tình huống closure)</td>
 <td>Report phải có JobNum/PartRev/Date; thiếu = HOLD</td>
 </tr>
 <tr>
 <td>Packing/Ship</td>
 <td>Part pass + ship instructions</td>
-<td>Bộ hồ sơ giao hàng theo PackID + CoC + link bằng chứng</td>
-<td>Zone03/Bộ hồ sơ giao hàng</td>
-<td>Ship control gate: đủ pack bắt buộc + declare hồ sơ</td>
+<td>Bộ record delivery theo PackID + CoC + link evidence</td>
+<td>Zone03/Bộ record delivery</td>
+<td>Ship control gate: đủ pack bắt buộc + declare record</td>
 </tr>
 <tr>
 <td>Phản hồi/CI</td>
-<td>Khiếu nại / đánh giá finding</td>
+<td>Complaint / đánh giá finding</td>
 <td>CAPA pack + lessons learned</td>
 <td>Zone04 (Tình huống) + Zone01 (controlled updates)</td>
-<td>QA đóng CAPA khi đủ bằng chứng hiệu lực</td>
+<td>QA đóng CAPA khi đủ evidence hiệu lực</td>
 </tr>
 </tbody>
 </table>
 <div class="note">
 <b>Hold point chống trùng lặp:</b> “master copy” nằm ở Primary Home; mọi nơi khác chỉ dùng <b>link</b>.
- Copy file tạo “đa phiên bản” và làm hỏng truy xuất đánh giá.
+ Copy file tạo “đa revision” và làm hỏng traceability đánh giá.
  </div>
 <h3 class="h3">3.2 Khung Zone &amp; quy tắc SSOT</h3>
 <table class="table compact">
@@ -281,38 +281,38 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Zone01</b><div class="muted">Controlled</div></td>
 <td>QA/QMS (Responsible Person), Supervisor (approve)</td>
-<td>SOP/WI/Forms master; phiên bản released duy nhất; kho obsolete (read-only)</td>
-<td>Không lưu bằng chứng theo Job; không lưu draft dài ngày</td>
+<td>SOP/WI/Forms master; revision released duy nhất; kho obsolete (read-only)</td>
+<td>Không lưu evidence theo Job; không lưu draft dài ngày</td>
 </tr>
 <tr>
 <td><b>Zone02</b><div class="muted">Part/Rev</div></td>
 <td>Programmer/Engineering (Responsible Person), QA (ack)</td>
 <td>Drawing/CAD/CAM/Setup released theo PartNum-Rev; package release</td>
-<td>Không nhét bằng chứng theo Job; không chạy shopfloor từ tệp cục bộ (local file)/USB</td>
+<td>Không nhét evidence theo Job; không chạy shopfloor từ tệp cục bộ (local file)/USB</td>
 </tr>
 <tr>
-<td><b>Zone03</b><div class="muted">Job Bằng chứng</div></td>
+<td><b>Zone03</b><div class="muted">Job Evidence</div></td>
 <td>Planner/Production/QC/Warehouse (Contributor), QA (Responsible Person)</td>
-<td>Job dossier + pack bằng chứng (kiểm tra, ship, cert, outsource)</td>
-<td>Không lưu master Part/Rev; không chỉnh sửa file sau khi declare hồ sơ</td>
+<td>Job dossier + pack evidence (inspection, ship, cert, outsource)</td>
+<td>Không lưu master Part/Rev; không chỉnh sửa file sau khi declare record</td>
 </tr>
 <tr>
-<td><b>Zone04</b><div class="muted">Enterprise Hồ sơ</div></td>
+<td><b>Zone04</b><div class="muted">Enterprise Record</div></td>
 <td>QA/QMS/HR/Maintenance/EHS</td>
-<td>NCR/CAPA closure; training hồ sơ; hiệu chuẩn; asset history; EHS hồ sơ</td>
-<td>Không dùng làm “kho tạm”; không để hồ sơ thiếu key</td>
+<td>NCR/CAPA closure; training record; calibration; asset history; EHS record</td>
+<td>Không dùng làm “kho tạm”; không để record thiếu key</td>
 </tr>
 <tr>
 <td><b>Zone05</b><div class="muted">Commercial</div></td>
 <td>Estimator (SAL-03) + Purchasing</td>
 <td>Customer/supplier contracts, NDAs, clauses; mapping obligations</td>
-<td>Không chứa bằng chứng theo Job; không chứa bản released Part/Rev</td>
+<td>Không chứa evidence theo Job; không chứa bản released Part/Rev</td>
 </tr>
 <tr>
 <td><b>Zone06</b><div class="muted">Working</div></td>
 <td>Tất cả vai trò</td>
 <td>Inbox/Draft/Staging/ToPublish; dọn tự động theo retention T3</td>
-<td>Không giữ “bản chính”; không coi là hồ sơ</td>
+<td>Không giữ “bản chính”; không coi là record</td>
 </tr>
 </tbody>
 </table>
@@ -332,15 +332,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Báo giá/Hợp đồng</td>
-<td>Điều khoản hồ sơ nằm trong email rải rác, không có “obligations summary”</td>
+<td>Điều khoản record nằm trong email rải rác, không có “obligations summary”</td>
 <td>Thiếu pack khi ship, đánh giá hỏi không trả lời</td>
 <td>Estimator (SAL-03) bắt buộc publish điều khoản vào Zone05 và gắn tag “EvidenceRequired”</td>
 </tr>
 <tr>
 <td>Planning</td>
 <td>Không tạo Job dossier hoặc đặt tên sai key</td>
-<td>Bằng chứng rơi, không truy xuất theo JobNum</td>
-<td>Planner tạo skeleton theo template trước khi phát hành traveler</td>
+<td>Evidence rơi, không traceability theo JobNum</td>
+<td>Planner tạo skeleton theo template trước khi release traveler</td>
 </tr>
 <tr>
 <td>Engineering</td>
@@ -350,9 +350,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Purchasing</td>
-<td>PO thiếu yêu cầu cert/lot mapping</td>
+<td>PO thiếu requirement cert/lot mapping</td>
 <td>Vật tư về không có chứng từ; HOLD toàn job</td>
-<td>Purchasing khóa cert requirement trong PO + bảng kiểm nhận hàng</td>
+<td>Purchasing khóa cert requirement trong PO + checklist nhận hàng</td>
 </tr>
 <tr>
 <td>Receiving</td>
@@ -368,7 +368,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Setup</td>
-<td>Setup sheet update tại xưởng nhưng không tạo PackageID mới</td>
+<td>Setup sheet update tại workshop nhưng không tạo PackageID mới</td>
 <td>Không trace thay đổi; đánh giá không đạt</td>
 <td>Setup tạo package mới và publish; bản cũ chuyển obsolete</td>
 </tr>
@@ -380,57 +380,57 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>NCR/MRB</td>
-<td>NCR bằng chứng nằm trong Teams chat/ảnh điện thoại không upload</td>
-<td>Không có containment bằng chứng; tình huống không đóng</td>
-<td>QA buộc upload bằng chứng vào Zone03 + closure pack ở Zone04</td>
+<td>NCR evidence nằm trong Teams chat/ảnh điện thoại không upload</td>
+<td>Không có containment evidence; tình huống không đóng</td>
+<td>QA buộc upload evidence vào Zone03 + closure pack ở Zone04</td>
 </tr>
 <tr>
 <td>Packing/Ship</td>
-<td>bộ hồ sơ giao hàng gom nhiều shipment vào 1 pack, không theo PackID</td>
-<td>Lẫn lộn shipment; truy xuất sai</td>
+<td>bộ record delivery gom nhiều shipment vào 1 pack, không theo PackID</td>
+<td>Lẫn lộn shipment; traceability sai</td>
 <td>Warehouse tạo 1 pack = 1 PackID; index mapping item</td>
 </tr>
 <tr>
-<td>Hiệu chuẩn</td>
+<td>Calibration</td>
 <td>Giấy cali lưu theo “tên người” hoặc “tên máy”, không theo AssetID</td>
-<td>Không chứng minh thiết bị đo hợp lệ tại thời điểm đo</td>
+<td>Không chứng minh equipment đo hợp lệ tại thời điểm đo</td>
 <td>Maintenance/QA lưu theo AssetID ở Zone04; gắn hiệu lực và OOT handling</td>
 </tr>
 <tr>
 <td>Đánh giá retrieval</td>
-<td>Truy xuất bằng cách lục folder thủ công</td>
+<td>Traceability bằng cách lục folder thủ công</td>
 <td>Mất thời gian; lộ khoảng trống</td>
-<td>Bắt đầu từ Register/Index → link tới pack/bằng chứng</td>
+<td>Bắt đầu từ Register/Index → link tới pack/evidence</td>
 </tr>
 </tbody>
 </table>
 <div class="note">
-<b>Thông điệp bắt buộc:</b> file “đúng nội dung” nhưng “sai nơi lưu” = <b>không có bằng chứng</b> ở control gate.
+<b>Thông điệp bắt buộc:</b> file “đúng nội dung” nhưng “sai nơi lưu” = <b>không có evidence</b> ở control gate.
  </div>
 </div>
 <!-- 5) Risk Controls -->
 <div class="card" id="controls">
-<h2 class="h2" style="margin-top:0">5) Biện pháp kiểm soát rủi ro (liệt kê điểm kiểm soát; ai làm; bằng chứng)</h2>
+<h2 class="h2" style="margin-top:0">5) Biện pháp kiểm soát rủi ro (liệt kê điểm kiểm soát; ai làm; evidence)</h2>
 <table class="table">
 <thead>
 <tr>
 <th style="width:210px">Điểm kiểm soát</th>
 <th style="width:200px">Responsible Person</th>
-<th>Thao tác chặn rủi ro</th>
-<th style="width:240px">Bằng chứng (MRR)</th>
+<th>Operation chặn rủi ro</th>
+<th style="width:240px">Evidence (MRR)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><b>CP1 — Primary Home lock</b></td>
 <td>QA/QMS + IT/Data</td>
-<td>Thiết lập Zone &amp; quyền: mỗi hồ sơ type có nơi gốc duy nhất; nơi khác chỉ link.</td>
-<td>Permission matrix + đánh giá nhật ký truy cập + danh mục Zone</td>
+<td>Thiết lập Zone &amp; quyền: mỗi record type có nơi gốc duy nhất; nơi khác chỉ link.</td>
+<td>Permission matrix + đánh giá log truy cập + danh mục Zone</td>
 </tr>
 <tr>
-<td><b>CP2 — Part/Rev bộ hồ sơ phát hành</b></td>
+<td><b>CP2 — Part/Rev bộ record release</b></td>
 <td>Programmer + Setup + QA</td>
-<td>Release theo PackageID; snapshot read-only xuống xưởng; bản cũ chuyển obsolete.</td>
+<td>Release theo PackageID; snapshot read-only xuống workshop; bản cũ chuyển obsolete.</td>
 <td>CFG package + chữ ký điện tử/ack + SnapshotID</td>
 </tr>
 <tr>
@@ -442,37 +442,37 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP4 — Receiving cert control gate</b></td>
 <td>Warehouse + QC/QA</td>
-<td>Không cấp vật tư/outsource cho sản xuất khi cert thiếu; cert gắn Job/PO/lot.</td>
+<td>Không cấp vật tư/outsource cho production khi cert thiếu; cert gắn Job/PO/lot.</td>
 <td>Bộ chứng từ chứng nhận + receiving acceptance + link PO/lot</td>
 </tr>
 <tr>
-<td><b>CP5 — Kiểm tra report completeness</b></td>
+<td><b>CP5 — Inspection report completeness</b></td>
 <td>QC + QA</td>
 <td>Report phải có key + Rev + điều kiện đo; thiếu trường = HOLD.</td>
-<td>IR/CMM/FAI pack + xác nhận phê duyệt + timestamp</td>
+<td>IR/CMM/FAI pack + xác nhận approval + timestamp</td>
 </tr>
 <tr>
-<td><b>CP6 — Bộ hồ sơ giao hàng control gate</b></td>
+<td><b>CP6 — Bộ record delivery control gate</b></td>
 <td>Warehouse + QA</td>
-<td>bộ hồ sơ giao hàng theo PackID; bảng kiểm “đủ pack bắt buộc”; declare hồ sơ trước ship.</td>
-<td>Bộ hồ sơ giao hàng + CoC + bảng kiểm + hồ sơ trạng thái</td>
+<td>bộ record delivery theo PackID; checklist “đủ pack bắt buộc”; declare record trước ship.</td>
+<td>Bộ record delivery + CoC + checklist + record trạng thái</td>
 </tr>
 <tr>
 <td><b>CP7 — Obsolete quarantine</b></td>
 <td>QA/QMS</td>
-<td>Thu hồi bản obsolete; kho obsolete chỉ đọc; PHẢI loại khỏi point-of-use tại xưởng.</td>
-<td>Danh mục obsolete + nhật ký thay đổi + thông báo phát hành</td>
+<td>Recall bản obsolete; kho obsolete chỉ đọc; PHẢI loại khỏi point-of-use tại workshop.</td>
+<td>Danh mục obsolete + log thay đổi + thông báo release</td>
 </tr>
 <tr>
 <td><b>CP8 — Access review</b></td>
 <td>IT/Data + Supervisor</td>
-<td>Rà soát quyền theo vai trò; tách quyền đọc/ghi theo Zone; khóa chia sẻ ngoài.</td>
-<td>Biên bản rà soát quyền truy cập + danh sách nhóm truy cập</td>
+<td>Review quyền theo vai trò; tách quyền đọc/ghi theo Zone; khóa chia sẻ ngoài.</td>
+<td>Biên bản review quyền truy cập + danh sách nhóm truy cập</td>
 </tr>
 </tbody>
 </table>
 <div class="callout">
-<b>Đánh dấu mức “bằng chứng-ready”:</b> hồ sơ đã declare (read-only) + có index + có key + có người phụ trách. Thiếu 01 yếu tố = FAIL control gate.
+<b>Đánh dấu mức “evidence-ready”:</b> record đã declare (read-only) + có index + có key + có người phụ trách. Thiếu 01 yếu tố = FAIL control gate.
  </div>
 </div>
 <!-- 6) Fail-fast rules -->
@@ -480,19 +480,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" style="margin-top:0">6) Fail-fast rules (&gt;=3) + tiêu chí STOP/HOLD/BLOCK</h2>
 <div class="grid-2">
 <div class="note">
-<b>STOP</b> (dừng thao tác ngay)
+<b>STOP</b> (dừng operation ngay)
  <ul style="margin:10px 0 0 18px">
-<li>Khi phát hiện Rev trên máy/xưởng khác Rev trên snapshot hoặc traveler.</li>
+<li>Khi phát hiện Rev trên máy/workshop khác Rev trên snapshot hoặc traveler.</li>
 <li>Khi mở file không nằm trong Primary Home (tệp cục bộ (local file), USB, email attachment).</li>
-<li>Khi report/bộ hồ sơ giao hàng thiếu key (JobNum/PartRev/Date/PackID).</li>
+<li>Khi report/bộ record delivery thiếu key (JobNum/PartRev/Date/PackID).</li>
 </ul>
 </div>
 <div class="note">
 <b>HOLD</b> (giữ trạng thái, không chuyển bước)
  <ul style="margin:10px 0 0 18px">
 <li>Khi chứng từ vật liệu/outsource thiếu hoặc không map được lot/heat.</li>
-<li>Khi kiểm tra pack chưa ký hoặc chưa declare hồ sơ.</li>
-<li>Khi job có NCR mở mà bộ hồ sơ giao hàng không gắn link NCR disposition.</li>
+<li>Khi inspection pack chưa ký hoặc chưa declare record.</li>
+<li>Khi job có NCR mở mà bộ record delivery không gắn link NCR disposition.</li>
 </ul>
 </div>
 </div>
@@ -500,7 +500,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>BLOCK</b> (khóa hành vi, chặn hệ thống)
  <ul style="margin:10px 0 0 18px">
 <li>Khi người dùng tạo bản copy “Revised_final_vX” ở ngoài Primary Home.</li>
-<li>Khi người dùng sửa nội dung file đã declare hồ sơ.</li>
+<li>Khi người dùng sửa nội dung file đã declare record.</li>
 <li>Khi người dùng share link ra ngoài phạm vi nội bộ hoặc cấp quyền trái vai trò.</li>
 </ul>
 <div class="muted" style="margin-top:6px">
@@ -510,15 +510,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 7) 60-second reaction -->
 <div class="card" id="60s">
-<h2 class="h2" style="margin-top:0">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua control gate/rủi ro giao hàng)</h2>
+<h2 class="h2" style="margin-top:0">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua control gate/rủi ro delivery)</h2>
 <div class="callout">
 <b>Mẫu phản ứng 60 giây (áp dụng cho mọi vai trò):</b>
 <ol style="margin:10px 0 0 18px">
 <li><b>DỪNG</b> ngay tại điểm phát hiện; không “làm tiếp cho xong”.</li>
 <li><b>CÔ LẬP</b>: treo thẻ HOLD; khóa vật tư/part nghi ngờ; tách khỏi luồng tiêu chuẩn.</li>
 <li><b>CHỤP BẰNG CHỨNG</b>: ảnh màn hình/file path + mã Job/PartRev/PackID; upload vào Zone03/Job dossier mục <span class="mono">05_NCR-Hold-CAPA</span>.</li>
-<li><b>BÁO</b> theo tuyến: Supervisor → QA (khi liên quan chất lượng) → IT (khi liên quan quyền/hệ thống) → Purchasing (khi liên quan outsource/cert).</li>
-<li><b>GHI MRR</b>: tạo 01 dòng nhật ký “Hold Event” trong pack NCR/Hold (time, ai phát hiện, lý do, quyết định).</li>
+<li><b>BÁO</b> theo tuyến: Supervisor → QA (khi liên quan quality) → IT (khi liên quan quyền/hệ thống) → Purchasing (khi liên quan outsource/cert).</li>
+<li><b>GHI MRR</b>: tạo 01 dòng log “Hold Event” trong pack NCR/Hold (time, ai phát hiện, lý do, quyết định).</li>
 </ol>
 </div>
 <h3 class="h3">Các tình huống bắt buộc có phản ứng</h3>
@@ -535,19 +535,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Sai Rev (drawing/CAM/setup)</td>
 <td>STOP + HOLD lô; chỉ mở từ SnapshotID đúng</td>
-<td>Ảnh/path + link snapshot đúng + nhật ký hold</td>
+<td>Ảnh/path + link snapshot đúng + log hold</td>
 <td>Supervisor + QA</td>
 </tr>
 <tr>
 <td>Lẫn lộn Job/lot</td>
-<td>STOP + tách vật lý + kiểm trace</td>
+<td>STOP + tách vật lý + inspectionce</td>
 <td>Ảnh + danh sách serial/lot + quyết định MRB</td>
 <td>QA</td>
 </tr>
 <tr>
 <td>Thiếu cert vật liệu/outsource</td>
-<td>HOLD receiving/ship; không cấp cho sản xuất</td>
-<td>Cert request nhật ký + link PO + receiving hold</td>
+<td>HOLD receiving/ship; không cấp cho production</td>
+<td>Cert request log + link PO + receiving hold</td>
 <td>Purchasing + QA</td>
 </tr>
 <tr>
@@ -558,14 +558,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Vượt qua control gate (copy file local)</td>
-<td>BLOCK hành vi; thu hồi file; đánh giá ảnh hưởng</td>
-<td>Nhật ký hệ thống + danh mục file bị thu hồi</td>
+<td>BLOCK hành vi; recall file; đánh giá ảnh hưởng</td>
+<td>Log hệ thống + danh mục file bị recall</td>
 <td>IT/Data + Supervisor</td>
 </tr>
 <tr>
-<td>Rủi ro giao hàng (bộ hồ sơ giao hàng thiếu link)</td>
+<td>Rủi ro delivery (bộ record delivery thiếu link)</td>
 <td>HOLD ship; hoàn thiện pack</td>
-<td>Bảng kiểm ship control gate + link pack bắt buộc</td>
+<td>Checklist ship control gate + link pack bắt buộc</td>
 <td>Warehouse + QA</td>
 </tr>
 </tbody>
@@ -573,9 +573,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 8) Checklist -->
 <div class="card" id="checklist">
-<h2 class="h2" style="margin-top:0">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Bằng chứng/MRR, điểm sai hay gặp</h2>
+<h2 class="h2" style="margin-top:0">8) Checklist operation (≤15 bước) — mỗi bước có Responsible Person, Evidence/MRR, điểm sai hay gặp</h2>
 <div class="note">
-<b>Luật bảng kiểm:</b> hoàn tất từng bước mới được chuyển bước kế tiếp trong E2E. Thiếu MRR = FAIL control gate.
+<b>Luật checklist:</b> hoàn tất từng bước mới được chuyển bước kế tiếp trong E2E. Thiếu MRR = FAIL control gate.
  </div>
 <table class="table">
 <thead>
@@ -583,7 +583,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:44px">#</th>
 <th style="width:160px">Responsible Person</th>
 <th>Hành động bắt buộc</th>
-<th style="width:220px">Bằng chứng/MRR</th>
+<th style="width:220px">Evidence/MRR</th>
 <th style="width:220px">Điểm sai hay gặp</th>
 </tr>
 </thead>
@@ -598,7 +598,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>2</td>
 <td>Estimator (SAL-03)</td>
-<td>Publish điều khoản hồ sơ khách hàng vào Zone05 và gắn link vào Job index.</td>
+<td>Publish điều khoản record customer vào Zone05 và gắn link vào Job index.</td>
 <td>Obligations summary + link</td>
 <td>Điều khoản nằm trong email; không có bản tóm tắt</td>
 </tr>
@@ -612,79 +612,79 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>4</td>
 <td>Setup</td>
-<td>Xác nhận setup sheet đúng Rev; tạo SnapshotID cho xưởng.</td>
+<td>Xác nhận setup sheet đúng Rev; tạo SnapshotID cho workshop.</td>
 <td>SnapshotID + ack</td>
 <td>Chạy từ tệp cục bộ (local file); không có SnapshotID</td>
 </tr>
 <tr>
 <td>5</td>
 <td>Supervisor</td>
-<td>Control gate trước chạy: chỉ cho phép mở từ SnapshotID; thu hồi bản obsolete.</td>
-<td>Nhật ký control gate/briefing ca</td>
+<td>Control gate trước chạy: chỉ cho phép mở từ SnapshotID; recall bản obsolete.</td>
+<td>Log control gate/briefing ca</td>
 <td>Cho chạy “tạm”; bỏ qua control gate đầu ca</td>
 </tr>
 <tr>
 <td>6</td>
 <td>Production (Operator)</td>
-<td>Ghi bằng chứng ngoại lệ (downtime/thiết lập lại) vào Job dossier theo đúng mục.</td>
-<td>Ảnh/nhật ký + mô tả ngắn</td>
+<td>Ghi evidence ngoại lệ (downtime/thiết lập lại) vào Job dossier theo đúng mục.</td>
+<td>Ảnh/log + mô tả ngắn</td>
 <td>Ảnh nằm điện thoại; không upload; thiếu JobNum</td>
 </tr>
 <tr>
 <td>7</td>
 <td>Purchasing</td>
-<td>Khóa yêu cầu cert/outsource theo PO; gắn JobNum/PO vào yêu cầu.</td>
-<td>PO note + bảng kiểm cert</td>
-<td>Yêu cầu cert nói miệng; không có dòng PO</td>
+<td>Khóa requirement cert/outsource theo PO; gắn JobNum/PO vào requirement.</td>
+<td>PO note + checklist cert</td>
+<td>Requirement cert nói miệng; không có dòng PO</td>
 </tr>
 <tr>
 <td>8</td>
 <td>Warehouse</td>
 <td>Scan/upload cert vào Job pack; gắn lot/heat; không cấp khi thiếu.</td>
-<td>Bộ chứng từ chứng nhận + receiving nhật ký</td>
+<td>Bộ chứng từ chứng nhận + receiving log</td>
 <td>Cert nằm Zone05; không link Job; thiếu lot</td>
 </tr>
 <tr>
 <td>9</td>
 <td>QC</td>
 <td>Tạo IR/CMM/FAI report có key đầy đủ; ký; publish PDF vào Job pack.</td>
-<td>Report PDF + xác nhận phê duyệt</td>
+<td>Report PDF + xác nhận approval</td>
 <td>Thiếu Rev/Date; file raw thay PDF</td>
 </tr>
 <tr>
 <td>10</td>
 <td>QA</td>
-<td>Declare hồ sơ cho pack cần lưu; mở NCR khi phát sinh; tạo closure pack khi đóng.</td>
-<td>Hồ sơ trạng thái + NCR/closure pack</td>
+<td>Declare record cho pack cần lưu; mở NCR khi phát sinh; tạo closure pack khi đóng.</td>
+<td>Record trạng thái + NCR/closure pack</td>
 <td>Sửa file sau khi declare; closure thiếu approvals</td>
 </tr>
 <tr>
 <td>11</td>
 <td>Maintenance</td>
-<td>Bảo đảm gage/asset có hồ sơ cali theo AssetID; xử lý OOT theo tình huống.</td>
-<td>Hiệu chuẩn hồ sơ + OOT nhật ký</td>
+<td>Bảo đảm gage/asset có record cali theo AssetID; xử lý OOT theo tình huống.</td>
+<td>Calibration record + OOT log</td>
 <td>Lưu theo tên người; không map job ảnh hưởng</td>
 </tr>
 <tr>
 <td>12</td>
 <td>EHS</td>
-<td>Đính kèm hồ sơ EHS liên quan job (khi có): SDS, permit, incident report.</td>
-<td>EHS hồ sơ + link job</td>
-<td>SDS nằm rải rác; không kiểm soát phiên bản</td>
+<td>Đính kèm record EHS liên quan job (khi có): SDS, permit, incident report.</td>
+<td>EHS record + link job</td>
+<td>SDS nằm rải rác; không kiểm soát revision</td>
 </tr>
 <tr>
 <td>13</td>
 <td>Warehouse + QA</td>
-<td>Tạo bộ hồ sơ giao hàng theo PackID; bảng kiểm đủ pack; tạm giữ khi thiếu.</td>
-<td>Bộ hồ sơ giao hàng + bảng kiểm + CoC</td>
+<td>Tạo bộ record delivery theo PackID; checklist đủ pack; hold khi thiếu.</td>
+<td>Bộ record delivery + checklist + CoC</td>
 <td>Gom nhiều shipment vào 1 pack; thiếu link IR</td>
 </tr>
 <tr>
 <td>14</td>
 <td>Supervisor</td>
-<td>Kiểm “đóng hồ sơ job”: index đủ pack; pack ở trạng thái hồ sơ; truy xuất thử trong ≤ 3 phút.</td>
-<td>Biên bản đóng hồ sơ + thời gian truy xuất</td>
-<td>Đóng job khi chưa đủ pack; không test truy xuất</td>
+<td>Kiểm “đóng record job”: index đủ pack; pack ở trạng thái record; traceability thử trong ≤ 3 phút.</td>
+<td>Biên bản đóng record + thời gian traceability</td>
+<td>Đóng job khi chưa đủ pack; không test traceability</td>
 </tr>
 </tbody>
 </table>
@@ -693,7 +693,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" id="ojt">
 <h2 class="h2" style="margin-top:0">9) OJT thực chiến theo TWI</h2>
 <h3 class="h3">9.1 Job breakdown (Step / Điểm then chốt / Lý do)</h3>
-<p class="muted">OJT tập trung vào 01 năng lực lõi: tạo – publish – truy xuất hồ sơ theo key và Primary Home, không tạo bản copy ngoài luồng.</p>
+<p class="muted">OJT tập trung vào 01 competence lõi: tạo – publish – traceability record theo key và Primary Home, không tạo bản copy ngoài luồng.</p>
 <table class="table">
 <thead>
 <tr>
@@ -706,14 +706,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>1</td>
-<td>Xác định key của hồ sơ</td>
+<td>Xác định key của record</td>
 <td>Luôn chọn 01 key chính: JobNum hoặc PartNum-Rev hoặc CaseID hoặc AssetID.</td>
-<td>Key là trục truy xuất; thiếu key = không truy xuất = fail đánh giá.</td>
+<td>Key là trục traceability; thiếu key = không traceability = fail đánh giá.</td>
 </tr>
 <tr>
 <td>2</td>
 <td>Chọn Primary Home đúng Zone</td>
-<td>Controlled → Zone01; Part/Rev → Zone02; Bằng chứng Job → Zone03; Enterprise hồ sơ → Zone04; Commercial → Zone05.</td>
+<td>Controlled → Zone01; Part/Rev → Zone02; Evidence Job → Zone03; Enterprise record → Zone04; Commercial → Zone05.</td>
 <td>SSOT: 01 đối tượng chỉ có 01 nơi gốc.</td>
 </tr>
 <tr>
@@ -732,30 +732,30 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>5</td>
 <td>Publish (routing) đúng luồng</td>
 <td>Làm ở Zone06 → publish sang Zone01/02/03/04/05; nơi khác chỉ link.</td>
-<td>Ngăn copy tay và tạo đa phiên bản.</td>
+<td>Ngăn copy tay và tạo đa revision.</td>
 </tr>
 <tr>
 <td>6</td>
-<td>Khóa &amp; declare hồ sơ khi đủ</td>
-<td>Pack có index + xác nhận phê duyệt + hồ sơ trạng thái; PHẢI khóa nội dung sau declare.</td>
-<td>Hồ sơ bảo vệ bằng chứng; đánh giá yêu cầu tính toàn vẹn.</td>
+<td>Khóa &amp; declare record khi đủ</td>
+<td>Pack có index + xác nhận approval + record trạng thái; PHẢI khóa nội dung sau declare.</td>
+<td>Record bảo vệ evidence; đánh giá requirement tính toàn vẹn.</td>
 </tr>
 <tr>
 <td>7</td>
-<td>Truy xuất đánh giá theo 3 phút</td>
+<td>Traceability đánh giá theo 3 phút</td>
 <td>Bắt đầu từ index/register; mở link tới pack; chứng minh key + Rev.</td>
 <td>đánh giá không đạt khi mất thời gian và không chứng minh tính kiểm soát.</td>
 </tr>
 </tbody>
 </table>
-<h3 class="h3">9.2 OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
+<h3 class="h3">9.2 OJT output (sản phẩm output bắt buộc)</h3>
 <div class="note">
-<b>OJT đầu ra tối thiểu (mỗi học viên tạo đúng 01 bộ):</b>
+<b>OJT output tối thiểu (mỗi học viên tạo đúng 01 bộ):</b>
 <ul style="margin:10px 0 0 18px">
 <li>01 Job dossier theo template (JobNum + PartNum + Rev) với đủ 08 thư mục.</li>
 <li>01 Part/Rev container (PartNum-Rev) có <b>CFG package</b> (bảng kê + file) và 01 SnapshotID.</li>
-<li>01 pack bằng chứng mẫu (IR hoặc Cert hoặc bộ hồ sơ giao hàng) có tên đúng quy tắc + có index + có xác nhận phê duyệt (giả lập).</li>
-<li>01 bài truy xuất: tìm đúng pack theo key trong ≤ 3 phút và chụp ảnh màn hình làm bằng chứng hoàn tất OJT.</li>
+<li>01 pack evidence mẫu (IR hoặc Cert hoặc bộ record delivery) có tên đúng quy tắc + có index + có xác nhận approval (giả lập).</li>
+<li>01 bài traceability: tìm đúng pack theo key trong ≤ 3 phút và chụp ảnh màn hình làm evidence hoàn tất OJT.</li>
 </ul>
 </div>
 <h3 class="h3">9.3 Rubric L1–L4 (hành vi quan sát được) + quyền hạn theo level</h3>
@@ -773,7 +773,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L1</b><div class="muted">Làm theo hướng dẫn (có giám sát)</div></td>
 <td>
 <ul>
-<li>Chỉ ra đúng Zone theo loại hồ sơ.</li>
+<li>Chỉ ra đúng Zone theo loại record.</li>
 <li>Tạo đúng tên folder theo key khi có mẫu.</li>
 <li>Upload đúng nơi khi có link sẵn.</li>
 </ul>
@@ -793,14 +793,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Đặt tên file đúng quy tắc không dấu + ISO date + REV.</li>
 <li>Tạo index đơn giản cho pack (danh sách file + key).</li>
-<li>Thực hiện truy xuất theo key trong ≤ 3 phút.</li>
+<li>Thực hiện traceability theo key trong ≤ 3 phút.</li>
 </ul>
 </td>
 <td>
 <ul>
 <li><b>Programmer:</b> tạo CFG package có bảng kê và PackageID.</li>
-<li><b>QA:</b> kiểm “đủ key” và yêu cầu sửa ngay khi thiếu.</li>
-<li><b>Maintenance:</b> gắn AssetID và hiệu lực cali vào hồ sơ.</li>
+<li><b>QA:</b> kiểm “đủ key” và requirement sửa ngay khi thiếu.</li>
+<li><b>Maintenance:</b> gắn AssetID và hiệu lực cali vào record.</li>
 </ul>
 </td>
 <td>Được quyền <b>publish</b> từ Zone06 sang Primary Home theo vai trò</td>
@@ -817,29 +817,29 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>
 <ul>
 <li><b>Supervisor:</b> chốt control gate đầu ca và control gate trước ship.</li>
-<li><b>QA:</b> mở NCR và tạo closure pack đủ bằng chứng.</li>
-<li><b>Warehouse:</b> chặn giao hàng khi thiếu pack bắt buộc.</li>
+<li><b>QA:</b> mở NCR và tạo closure pack đủ evidence.</li>
+<li><b>Warehouse:</b> chặn delivery khi thiếu pack bắt buộc.</li>
 </ul>
 </td>
-<td>Được quyền <b>control gate xác nhận phê duyệt</b> (ký bảng kiểm) theo phạm vi bộ phận</td>
+<td>Được quyền <b>control gate xác nhận approval</b> (ký checklist) theo phạm vi bộ phận</td>
 </tr>
 <tr>
 <td><b>L4</b><div class="muted">Chuẩn hóa &amp; huấn luyện lại</div></td>
 <td>
 <ul>
 <li>Thiết kế/chuẩn hóa template cho bộ phận; khóa “đường tắt”.</li>
-<li>Internal audit: truy xuất ngẫu nhiên 5 job và ghi kết quả.</li>
-<li>Đào tạo lại người mới bằng OJT theo TWI.</li>
+<li>Internal audit: traceability ngẫu nhiên 5 job và ghi kết quả.</li>
+<li>Training lại người mới bằng OJT theo TWI.</li>
 </ul>
 </td>
 <td>
 <ul>
 <li><b>QA/QMS:</b> quản trị Zone01 + obsolete.</li>
-<li><b>IT/Data:</b> quản trị quyền + nhật ký + retention labels.</li>
+<li><b>IT/Data:</b> quản trị quyền + log + retention labels.</li>
 <li><b>Supervisor:</b> duy trì kỷ luật control gate theo ca.</li>
 </ul>
 </td>
-<td>Được quyền <b>người phụ trách</b> template/zone và phê duyệt thay đổi cấu trúc</td>
+<td>Được quyền <b>người phụ trách</b> template/zone và approval thay đổi cấu trúc</td>
 </tr>
 </tbody>
 </table>
@@ -847,30 +847,30 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 10) Assessment -->
 <div class="card" id="assessment">
 <h2 class="h2" style="margin-top:0">10) Đánh giá</h2>
-<h3 class="h3">10.1 Bài kiểm tra nhanh (≥20 câu) — trắc nghiệm + tình huống ngắn</h3>
+<h3 class="h3">10.1 Bài inspection nhanh (≥20 câu) — trắc nghiệm + tình huống ngắn</h3>
 <ol style="margin:10px 0 0 18px">
 <li>Primary Home nghĩa là gì?</li>
 <li>Luật “01 đối tượng = 01 Primary Home” chặn rủi ro nào?</li>
-<li>Zone02 chứa nhóm hồ sơ nào? Nêu 02 ví dụ.</li>
-<li>Hành vi nào bị BLOCK: (A) upload vào Zone03 đúng mục; (B) sửa file đã declare hồ sơ; (C) tạo index pack; (D) truy xuất theo key.</li>
+<li>Zone02 chứa nhóm record nào? Nêu 02 ví dụ.</li>
+<li>Hành vi nào bị BLOCK: (A) upload vào Zone03 đúng mục; (B) sửa file đã declare record; (C) tạo index pack; (D) traceability theo key.</li>
 <li>Khi phát hiện Rev trên máy khác Rev trên snapshot, hành động đầu tiên là gì?</li>
 <li>Chọn cấu trúc tên file đúng (chọn 1): (A) final.pdf; (B) JOB-123_IR-01_2026-02-04_REV-A_Final.pdf; (C) report new.pdf; (D) IR_Job123.pdf.</li>
 <li>Tại sao Zone06 không được coi là kho chính?</li>
 <li>Chứng chỉ vật liệu thuộc Primary Home nào khi cần chứng minh cho job?</li>
-<li>Điều kiện tối thiểu để gọi một pack là “bằng chứng-ready” gồm những gì?</li>
+<li>Điều kiện tối thiểu để gọi một pack là “evidence-ready” gồm những gì?</li>
 <li>PackID dùng để chặn lỗi gì ở bước Ship?</li>
 <li>Hành động nào là “link-not-copy” đúng?</li>
 <li>Khi thiếu cert outsource, quyết định bắt buộc là STOP hay HOLD?</li>
-<li>Vai trò nào chốt control gate bộ hồ sơ giao hàng?</li>
-<li>AssetID có vai trò gì trong hồ sơ hiệu chuẩn?</li>
-<li>Nêu 03 thông tin bắt buộc phải có trên kiểm tra report.</li>
-<li>Hồ sơ đã declare còn được phép chỉnh sửa nội dung không?</li>
-<li>“không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” áp dụng rõ nhất ở những bước nào trong E2E?</li>
-<li>NCR bằng chứng theo job nằm ở đâu? Closure pack nằm ở đâu?</li>
-<li>Điểm khác nhau giữa Part/Rev master và Job bằng chứng là gì?</li>
+<li>Vai trò nào chốt control gate bộ record delivery?</li>
+<li>AssetID có vai trò gì trong record calibration?</li>
+<li>Nêu 03 thông tin bắt buộc phải có trên inspection report.</li>
+<li>Record đã declare còn được phép chỉnh sửa nội dung không?</li>
+<li>“không có evidence thì không qua control gate (No evidence = No gate)” áp dụng rõ nhất ở những bước nào trong E2E?</li>
+<li>NCR evidence theo job nằm ở đâu? Closure pack nằm ở đâu?</li>
+<li>Điểm khác nhau giữa Part/Rev master và Job evidence là gì?</li>
 <li>Trong 60 giây, học viên phải ghi MRR gì khi phát hiện vượt qua control gate?</li>
 </ol>
-<h3 class="h3" style="margin-top:14px">10.2 Scenario (≥3) — tình huống thật, yêu cầu quyết định HOLD/GO và ghi MRR</h3>
+<h3 class="h3" style="margin-top:14px">10.2 Scenario (≥3) — tình huống thật, requirement quyết định HOLD/GO và ghi MRR</h3>
 <div class="table-card">
 <table class="table">
 <thead>
@@ -890,7 +890,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  File đang nằm trong ổ D: của máy.
  </td>
 <td>STOP + BLOCK tệp cục bộ (local file); chỉ chạy từ SnapshotID đúng Rev</td>
-<td>Ảnh màn hình path + nhật ký hold + link SnapshotID đúng</td>
+<td>Ảnh màn hình path + log hold + link SnapshotID đúng</td>
 <td>Operator → Supervisor → Programmer + QA</td>
 </tr>
 <tr>
@@ -898,17 +898,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>
  Hàng outsource heat treat về đủ số lượng. Cert đính kèm không có lot/heat mapping và không có PO reference.
  </td>
-<td>HOLD receiving; không cấp cho sản xuất; yêu cầu cert đúng</td>
-<td>Cert request nhật ký + receiving hold hồ sơ + link PO</td>
+<td>HOLD receiving; không cấp cho production; requirement cert đúng</td>
+<td>Cert request log + receiving hold record + link PO</td>
 <td>Warehouse + Purchasing + QA</td>
 </tr>
 <tr>
 <td>3</td>
 <td>
- QC đã đo xong và xuất report, nhưng report thiếu JobNum. Warehouse chuẩn bị ship và bộ hồ sơ giao hàng chưa có link IR.
+ QC đã đo xong và xuất report, nhưng report thiếu JobNum. Warehouse chuẩn bị ship và bộ record delivery chưa có link IR.
  </td>
 <td>HOLD ship; QC sửa report theo quy tắc; QA control gate lại</td>
-<td>Report PDF mới + xác nhận phê duyệt + bảng kiểm ship control gate cập nhật</td>
+<td>Report PDF mới + xác nhận approval + checklist ship control gate cập nhật</td>
 <td>QC + QA + Warehouse</td>
 </tr>
 </tbody>
@@ -920,8 +920,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <ol style="margin:10px 0 0 18px">
 <li>Tạo Job dossier đúng template và đặt tên đúng key.</li>
 <li>Tạo Part/Rev container và publish 01 CFG package (bảng kê + file) với PackageID.</li>
-<li>Tạo 01 pack bằng chứng (IR hoặc Cert hoặc bộ hồ sơ giao hàng) có index và đặt tên đúng quy tắc.</li>
-<li>Truy xuất: theo key mở đúng pack trong ≤ 3 phút và chứng minh “Primary Home” (không mở từ nơi khác).</li>
+<li>Tạo 01 pack evidence (IR hoặc Cert hoặc bộ record delivery) có index và đặt tên đúng quy tắc.</li>
+<li>Traceability: theo key mở đúng pack trong ≤ 3 phút và chứng minh “Primary Home” (không mở từ nơi khác).</li>
 </ol>
 </div>
 <table class="table compact">
@@ -951,10 +951,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Control gate decision</td>
 <td>Áp dụng STOP/HOLD/BLOCK đúng tình huống và ghi MRR</td>
-<td>Cho chạy/giao hàng khi thiếu bằng chứng; không ghi MRR</td>
+<td>Cho chạy/delivery khi thiếu evidence; không ghi MRR</td>
 </tr>
 <tr>
-<td>Thời gian truy xuất</td>
+<td>Thời gian traceability</td>
 <td>≤ 3 phút</td>
 <td>&gt; 3 phút hoặc tìm sai nơi</td>
 </tr>
@@ -963,24 +963,24 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 11) PASS/FAIL -->
 <div class="card" id="passfail">
-<h2 class="h2" style="margin-top:0">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”)</h2>
+<h2 class="h2" style="margin-top:0">11) ĐẠT/KHÔNG ĐẠT criteria (nhấn mạnh “không có evidence thì không qua control gate (No evidence = No gate)”)</h2>
 <div class="grid-2">
 <div class="note">
 <b>PASS</b>
 <ul style="margin:10px 0 0 18px">
-<li>Bài kiểm tra nhanh ≥ 80%.</li>
+<li>Bài inspection nhanh ≥ 80%.</li>
 <li>Hoàn tất performance test: tất cả tiêu chí PASS.</li>
-<li>OJT đầu ra đủ 04 sản phẩm đầu ra và truy xuất ≤ 3 phút.</li>
+<li>OJT output đủ 04 sản phẩm output và traceability ≤ 3 phút.</li>
 <li>Không phát sinh hành vi BLOCK trong quá trình học.</li>
 </ul>
 </div>
 <div class="note">
 <b>FAIL</b>
 <ul style="margin:10px 0 0 18px">
-<li>Bất kỳ hồ sơ nào thiếu key hoặc lưu sai Primary Home.</li>
-<li>Bất kỳ hành vi copy file ra ngoài luồng hoặc sửa file đã declare hồ sơ.</li>
-<li>Không áp dụng STOP/tạm giữ khi phát hiện sai Rev/thiếu chứng từ.</li>
-<li>Không tạo MRR: <b>không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</b>.</li>
+<li>Bất kỳ record nào thiếu key hoặc lưu sai Primary Home.</li>
+<li>Bất kỳ hành vi copy file ra ngoài luồng hoặc sửa file đã declare record.</li>
+<li>Không áp dụng STOP/hold khi phát hiện sai Rev/thiếu chứng từ.</li>
+<li>Không tạo MRR: <b>không có evidence thì không qua control gate (No evidence = No gate)</b>.</li>
 </ul>
 </div>
 </div>
@@ -988,7 +988,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 12) MRR -->
 <div class="card" id="mrr">
 <h2 class="h2" style="margin-top:0">12) MRR tối thiểu</h2>
-<h3 class="h3">12.1 Danh sách hồ sơ bắt buộc tạo/đính kèm (theo vai trò)</h3>
+<h3 class="h3">12.1 Danh sách record bắt buộc tạo/đính kèm (theo vai trò)</h3>
 <table class="table">
 <thead>
 <tr>
@@ -1000,12 +1000,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Operator</td>
-<td>Ảnh/nhật ký ngoại lệ theo Job; bằng chứng mở đúng SnapshotID khi được yêu cầu</td>
+<td>Ảnh/log ngoại lệ theo Job; evidence mở đúng SnapshotID khi được requirement</td>
 <td>Zone03 / Job dossier</td>
 </tr>
 <tr>
 <td>Setup</td>
-<td>Setup proof + SnapshotID; nhật ký thay đổi kẹp/dao gắn PackageID</td>
+<td>Setup proof + SnapshotID; log thay đổi kẹp/dao gắn PackageID</td>
 <td>Zone02 (package) + Zone03 (snapshot)</td>
 </tr>
 <tr>
@@ -1015,23 +1015,23 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>QC</td>
-<td>IR/CMM/FAI report PDF có key + xác nhận phê duyệt; link vào ship control gate</td>
-<td>Zone03 / Kiểm tra series</td>
+<td>IR/CMM/FAI report PDF có key + xác nhận approval; link vào ship control gate</td>
+<td>Zone03 / Inspection series</td>
 </tr>
 <tr>
 <td>QA</td>
-<td>NCR bằng chứng + closure pack; declare hồ sơ cho pack bắt buộc</td>
-<td>Zone03 (bằng chứng) + Zone04 (closure)</td>
+<td>NCR evidence + closure pack; declare record cho pack bắt buộc</td>
+<td>Zone03 (evidence) + Zone04 (closure)</td>
 </tr>
 <tr>
 <td>Warehouse</td>
-<td>Receiving bộ chứng từ chứng nhận; bộ hồ sơ giao hàng theo PackID + bảng kiểm</td>
+<td>Receiving bộ chứng từ chứng nhận; bộ record delivery theo PackID + checklist</td>
 <td>Zone03 / Material + Ship</td>
 </tr>
 <tr>
 <td>Purchasing</td>
 <td>Supplier contract/qualification; cert outsource theo Job/PO</td>
-<td>Zone05 (commercial) + Zone03 (job bằng chứng)</td>
+<td>Zone05 (commercial) + Zone03 (job evidence)</td>
 </tr>
 <tr>
 <td>Planner</td>
@@ -1040,8 +1040,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Maintenance</td>
-<td>Hiệu chuẩn hồ sơ theo AssetID; OOT handling nhật ký</td>
-<td>Zone04 / Asset &amp; Hiệu chuẩn</td>
+<td>Calibration record theo AssetID; OOT handling log</td>
+<td>Zone04 / Asset &amp; Calibration</td>
 </tr>
 <tr>
 <td>EHS</td>
@@ -1050,13 +1050,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Estimator (SAL-03)</td>
-<td>Hợp đồng/PO clauses + obligations summary; mapping yêu cầu hồ sơ</td>
+<td>Hợp đồng/PO clauses + obligations summary; mapping requirement record</td>
 <td>Zone05 / Customer</td>
 </tr>
 <tr>
 <td>Supervisor</td>
-<td>Control gate nhật ký đầu ca + control gate ship; biên bản đóng hồ sơ job (truy xuất thử)</td>
-<td>Zone03 / Job dossier + Zone04 (khi là hồ sơ quản trị)</td>
+<td>Control gate log đầu ca + control gate ship; biên bản đóng record job (traceability thử)</td>
+<td>Zone03 / Job dossier + Zone04 (khi là record quản trị)</td>
 </tr>
 </tbody>
 </table>
@@ -1071,19 +1071,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="muted">DocType: DWG/SOL/CAM/BOM/SPEC/ECN/RPT… (theo danh mục nội bộ)</div>
 </div>
 <div>
-<p><b>Job bằng chứng (Zone03)</b></p>
+<p><b>Job evidence (Zone03)</b></p>
 <pre><code>JOB-{JobNum}_{RecordType}-{RecordID}_{YYYY-MM-DD}_REV-{Rev}_{ShortDesc}.{ext}</code></pre>
 <div class="muted">RecordType: IR/CMM/FAI/NCR/CAPA/PACK/SHIP… (theo pack)</div>
 </div>
 </div>
 <h3 class="h3">12.3 Nơi lưu (SharePoint library/list/path)</h3>
 <div class="callout">
-<b>Đường dẫn vận hành tối thiểu:</b>
+<b>Đường dẫn operation tối thiểu:</b>
 <ul style="margin:10px 0 0 18px">
 <li><b>Zone01 Controlled:</b> M365/SharePoint → CNC-IMS-HUB → 01_QMS-Controlled-Documents</li>
 <li><b>Zone02 Part/Rev:</b> M365/SharePoint → CNC-IMS-HUB → 02_Product-Config-PartRev</li>
-<li><b>Zone03 Job Bằng chứng:</b> M365/SharePoint → CNC-IMS-HUB → 03_Operations-Bằng chứng-Job</li>
-<li><b>Zone04 Enterprise Hồ sơ:</b> M365/SharePoint → CNC-IMS-HUB → 04_Enterprise-Hồ sơ</li>
+<li><b>Zone03 Job Evidence:</b> M365/SharePoint → CNC-IMS-HUB → 03_Operations-Evidence-Job</li>
+<li><b>Zone04 Enterprise Record:</b> M365/SharePoint → CNC-IMS-HUB → 04_Enterprise-Record</li>
 <li><b>Zone05 Commercial:</b> M365/SharePoint → CNC-IMS-HUB → 05_Commercial</li>
 <li><b>Zone06 Working:</b> M365/SharePoint → CNC-IMS-HUB → 06_Working-Triage</li>
 </ul>
@@ -1126,7 +1126,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  11_Reports/</code></pre>
 </div>
 </div>
-<h3 class="h3">12.5 Retention (nhãn lưu trữ) theo mức độ hồ sơ</h3>
+<h3 class="h3">12.5 Retention (nhãn lưu trữ) theo mức độ record</h3>
 <table class="table compact">
 <thead>
 <tr>
@@ -1138,26 +1138,26 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>T1</b><div class="muted">Hồ sơ</div></td>
+<td><b>T1</b><div class="muted">Record</div></td>
 <td>LAM-T1-10Y-HỒ SƠ</td>
 <td>10 năm</td>
-<td>Kiểm tra/Shipping packs; hồ sơ khách yêu cầu; NCR/CAPA closure</td>
+<td>Inspection/Shipping packs; record khách requirement; NCR/CAPA closure</td>
 </tr>
 <tr>
 <td><b>T2</b><div class="muted">General</div></td>
 <td>HESEM-T2-5Y</td>
 <td>5 năm</td>
-<td>Bằng chứng chung không thuộc T1</td>
+<td>Evidence chung không thuộc T1</td>
 </tr>
 <tr>
 <td><b>T3</b><div class="muted">Working</div></td>
 <td>HESEM-T3-3Y</td>
 <td>3 năm</td>
-<td>Zone06 working; ảnh/nhật ký vận hành phục vụ phân tích</td>
+<td>Zone06 working; ảnh/log operation phục vụ phân tích</td>
 </tr>
 </tbody>
 </table>
-<div class="muted">Khi hợp đồng khách yêu cầu lớn hơn 10 năm, áp dụng nhãn T1 theo hợp đồng: <b>Chu kỳ tái đánh giá: 12 tháng (L1–L2) • 24 tháng (L3–L4).</b>.</div>
+<div class="muted">Khi hợp đồng khách requirement lớn hơn 10 năm, áp dụng nhãn T1 theo hợp đồng: <b>Chu kỳ tái đánh giá: 12 tháng (L1–L2) • 24 tháng (L3–L4).</b>.</div>
 </div>
 <!-- 13) Audit findings -->
 <div class="card" id="audit">
@@ -1167,63 +1167,63 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:54px">#</th>
 <th>Lỗi đánh giá</th>
-<th style="width:340px">Cách chặn trong vận hành</th>
+<th style="width:340px">Cách chặn trong operation</th>
 <th style="width:240px">MRR chứng minh đã chặn</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>1</td>
-<td>Dùng bản vẽ/Rev obsolete tại xưởng</td>
+<td>Dùng bản vẽ/Rev obsolete tại workshop</td>
 <td>Obsolete quarantine + chỉ mở từ snapshot; kiểm control gate đầu ca</td>
-<td>Nhật ký control gate + danh mục obsolete + SnapshotID</td>
+<td>Log control gate + danh mục obsolete + SnapshotID</td>
 </tr>
 <tr>
 <td>2</td>
-<td>Hồ sơ thiếu key (JobNum/PartRev/CaseID)</td>
+<td>Record thiếu key (JobNum/PartRev/CaseID)</td>
 <td>Template bắt buộc trường key; QA reject khi thiếu</td>
-<td>Bảng kiểm review + bản report có key</td>
+<td>Checklist review + bản report có key</td>
 </tr>
 <tr>
 <td>3</td>
-<td>Bằng chứng nằm sai Primary Home</td>
-<td>Rà soát định kỳ; di chuyển về đúng Zone và thay bằng link</td>
-<td>Biên bản cleanup + nhật ký di chuyển</td>
+<td>Evidence nằm sai Primary Home</td>
+<td>Review định kỳ; di chuyển về đúng Zone và thay bằng link</td>
+<td>Biên bản cleanup + log di chuyển</td>
 </tr>
 <tr>
 <td>4</td>
 <td>Không chứng minh traceability lot/heat</td>
-<td>Bộ chứng từ chứng nhận bắt buộc map lot/PO/Job; receiving tạm giữ khi thiếu</td>
+<td>Bộ chứng từ chứng nhận bắt buộc map lot/PO/Job; receiving hold khi thiếu</td>
 <td>Bộ chứng từ chứng nhận + receiving acceptance</td>
 </tr>
 <tr>
 <td>5</td>
-<td>bộ hồ sơ giao hàng thiếu link tới IR/CMM/FAI</td>
-<td>Ship control gate bảng kiểm; HOLD giao hàng khi thiếu</td>
-<td>Bảng kiểm ship control gate + pack links</td>
+<td>bộ record delivery thiếu link tới IR/CMM/FAI</td>
+<td>Ship control gate checklist; HOLD delivery khi thiếu</td>
+<td>Checklist ship control gate + pack links</td>
 </tr>
 <tr>
 <td>6</td>
-<td>Sửa file sau khi declare hồ sơ</td>
-<td>Declare hồ sơ (read-only) + BLOCK quyền sửa</td>
-<td>Hồ sơ trạng thái + đánh giá nhật ký</td>
+<td>Sửa file sau khi declare record</td>
+<td>Declare record (read-only) + BLOCK quyền sửa</td>
+<td>Record trạng thái + đánh giá log</td>
 </tr>
 <tr>
 <td>7</td>
-<td>Hiệu chuẩn hồ sơ không theo AssetID hoặc OOT xử lý mờ</td>
+<td>Calibration record không theo AssetID hoặc OOT xử lý mờ</td>
 <td>Lưu theo AssetID; khi OOT lập tình huống và map job ảnh hưởng</td>
-<td>Asset hồ sơ + OOT nhật ký + danh sách job ảnh hưởng</td>
+<td>Asset record + OOT log + danh sách job ảnh hưởng</td>
 </tr>
 <tr>
 <td>8</td>
-<td>Truy xuất mất thời gian, không theo index/register</td>
-<td>Index bắt buộc cho pack; test truy xuất khi đóng hồ sơ job</td>
-<td>Biên bản truy xuất ≤ 3 phút</td>
+<td>Traceability mất thời gian, không theo index/register</td>
+<td>Index bắt buộc cho pack; test traceability khi đóng record job</td>
+<td>Biên bản traceability ≤ 3 phút</td>
 </tr>
 </tbody>
 </table>
 <div class="callout">
-<b>Quy tắc sẵn sàng đánh giá:</b> auditor hỏi “chứng minh” → trả lời bằng <b>link tới Primary Home</b> + <b>pack index</b> + <b>hồ sơ trạng thái</b>.
+<b>Quy tắc sẵn sàng đánh giá:</b> auditor hỏi “chứng minh” → trả lời bằng <b>link tới Primary Home</b> + <b>pack index</b> + <b>record trạng thái</b>.
  Khi không có ba thứ này, control gate bị xem là không đạt.
  </div>
 </div>
@@ -1231,7 +1231,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" id="DCR record">
 </div></div></div>
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

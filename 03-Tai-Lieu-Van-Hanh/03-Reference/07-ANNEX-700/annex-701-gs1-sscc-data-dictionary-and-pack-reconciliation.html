@@ -56,7 +56,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
           <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
           <div class="fh-company">
             <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Annex</span>
+            <span>Document operation • Annex</span>
           </div>
         </div>
         <div class="title"><strong>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</strong></div>
@@ -68,47 +68,47 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
           <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
         </div>
       </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi cấp PackID/SSCC, in nhãn logistics, split/merge kiện, reprint/void nhãn, và đối soát trước xác nhận giao hàng (ship confirm).</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi cấp PackID/SSCC, in nhãn logistics, split/merge kiện, reprint/void nhãn, và đối soát trước xác nhận delivery (ship confirm).</div>
       <h1>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</h1>
       
 <div class="section"><h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
-<p>ANNEX này giữ toàn bộ quy tắc dữ liệu cho PackID và SSCC. Mọi thao tác in nhãn, quét, reprint, void, split/merge và đối soát kiện hàng phải bám đúng Annex này. Dữ liệu logistics không được tự chế ngoài hệ thống.</p>
-<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì SSCC duy nhất cho từng pack, chỉ giao hàng khi ReconciliationStatus không ở trạng thái BLOCKED và chỉnh PackID hoặc SSCC bằng dữ liệu hệ thống đã kiểm soát, không sửa tay trên nhãn.</div></div>
+<p>ANNEX này giữ toàn bộ quy tắc dữ liệu cho PackID và SSCC. Mọi operation in nhãn, quét, reprint, void, split/merge và đối soát kiện hàng phải bám đúng Annex này. Dữ liệu logistics không được tự chế ngoài hệ thống.</p>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì SSCC duy nhất cho từng pack, chỉ delivery khi ReconciliationStatus không ở trạng thái BLOCKED và chỉnh PackID hoặc SSCC bằng dữ liệu hệ thống đã kiểm soát, không sửa tay trên nhãn.</div></div>
 
 <div class="section"><h2>2. Từ điển dữ liệu bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Field</th><th>Bắt buộc</th><th>Nguồn dữ liệu chuẩn</th><th>Quy tắc</th></tr></thead><tbody>
-<tr><td>PackID</td><td>Có</td><td>Epicor/WHS giao dịch</td><td>Duy nhất trong shipment scope; không đổi sau xác nhận giao hàng.</td></tr>
+<tr><td>PackID</td><td>Có</td><td>Epicor/WHS giao dịch</td><td>Duy nhất trong shipment scope; không đổi sau xác nhận delivery.</td></tr>
 <tr><td>SSCC (AI 00)</td><td>Có khi dùng logistics label</td><td>Service cấp mã được kiểm soát</td><td>18 số, check digit hợp lệ, duy nhất toàn cục trong vòng đời quản lý của công ty.</td></tr>
-<tr><td>Shipment / Order / Release</td><td>Có</td><td>Epicor</td><td>Phải khớp ship-to, bill-to, điều kiện giao hàng.</td></tr>
-<tr><td>JobNum / PartNo / Rev</td><td>Có</td><td>Epicor + controlled release set</td><td>Không được ship sai phiên bản (wrong revision); revision phải khớp hồ sơ quality release.</td></tr>
+<tr><td>Shipment / Order / Release</td><td>Có</td><td>Epicor</td><td>Phải khớp ship-to, bill-to, điều kiện delivery.</td></tr>
+<tr><td>JobNum / PartNo / Rev</td><td>Có</td><td>Epicor + controlled release set</td><td>Không được ship sai revision (wrong revision); revision phải khớp record quality release.</td></tr>
 <tr><td>Qty / UOM</td><td>Có</td><td>Epicor + packing count thực tế</td><td>Tổng qty trên mọi PackID phải khớp shipment lines.</td></tr>
 <tr><td>Child-Parent mapping</td><td>Có khi pallet/carton nhiều tầng</td><td>WHS scan logic</td><td>Phải nhìn được quan hệ pallet ↔ carton ↔ inner pack.</td></tr>
 <tr><td>LabelPrintVersion</td><td>Có</td><td>Label service</td><td>Giúp truy vết layout/template đang dùng.</td></tr>
-<tr><td>ReprintCount / VoidFlag</td><td>Có</td><td>Reprint/Void nhật ký</td><td>Mỗi reprint/void phải có reason code và approver.</td></tr>
-<tr><td>PacketComplete</td><td>Có</td><td>SSOT bộ hồ sơ giao hàng (ship packet)</td><td>Chỉ đạt khi đủ hồ sơ bắt buộc theo QPL và yêu cầu khách hàng.</td></tr>
-<tr><td>ReconciliationStatus</td><td>Có</td><td>Validator logic</td><td>PASS / FAIL / BLOCKED. BLOCKED chặn xác nhận giao hàng.</td></tr>
+<tr><td>ReprintCount / VoidFlag</td><td>Có</td><td>Reprint/Void log</td><td>Mỗi reprint/void phải có reason code và approver.</td></tr>
+<tr><td>PacketComplete</td><td>Có</td><td>SSOT bộ record delivery (ship packet)</td><td>Chỉ đạt khi đủ record bắt buộc theo QPL và requirement customer.</td></tr>
+<tr><td>ReconciliationStatus</td><td>Có</td><td>Validator logic</td><td>PASS / FAIL / BLOCKED. BLOCKED chặn xác nhận delivery.</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>3. Quy tắc vòng đời PackID / SSCC</h2>
 <div class="step-list">
-<div class="step-item"><strong>Cấp mã.</strong><br/>PackID được tạo trong giao dịch đã phê duyệt. SSCC chỉ được cấp cho logistic unit thực sự tồn tại. Không cấp mã “dự trữ” để dán sau.</div>
+<div class="step-item"><strong>Cấp mã.</strong><br/>PackID được tạo trong giao dịch đã approval. SSCC chỉ được cấp cho logistic unit thực sự tồn tại. Không cấp mã “dự trữ” để dán sau.</div>
 <div class="step-item"><strong>In và quét xác nhận.</strong><br/>Sau in, phải quét xác nhận đúng parser, đúng PackID và đúng shipment context. Nhãn không đọc được hoặc đọc sai AI phải hủy ngay.</div>
 <div class="step-item"><strong>Split / merge.</strong><br/>Split tạo PackID/SSCC con mới, giữ liên hệ cha-con và điều chỉnh Qty. Merge phải giữ một parent unit rõ ràng; không mất dấu container thành phần.</div>
-<div class="step-item"><strong>Reprint / void.</strong><br/>Reprint chỉ cho phép khi nhãn hỏng, mất hoặc đổi vật lý container hợp lệ. Void dùng khi container bị hủy, gộp lại, dán sai, hoặc shipment đổi cấu trúc. Mọi hành động phải lưu nhật ký.</div>
-<div class="step-item"><strong>Xác nhận giao hàng.</strong><br/>Chỉ cho phép khi PacketComplete = PASS, ReconciliationStatus = PASS, không có hold mở và bộ hồ sơ giao hàng đủ.</div>
+<div class="step-item"><strong>Reprint / void.</strong><br/>Reprint chỉ cho phép khi nhãn hỏng, mất hoặc đổi vật lý container hợp lệ. Void dùng khi container bị hủy, gộp lại, dán sai, hoặc shipment đổi cấu trúc. Mọi hành động phải lưu log.</div>
+<div class="step-item"><strong>Xác nhận delivery.</strong><br/>Chỉ cho phép khi PacketComplete = PASS, ReconciliationStatus = PASS, không có hold mở và bộ record delivery đủ.</div>
 </div></div>
 
 <div class="section"><h2>4. Quy tắc đối soát kiện hàng</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục đối soát</th><th>đạt khi</th><th>BLOCK khi</th></tr></thead><tbody>
-<tr><td>Qty reconciliation</td><td>Tổng Qty theo PackID = shipment line = phiếu kê đóng gói (phiếu kê đóng gói)</td><td>Chênh số lượng hoặc UOM</td></tr>
-<tr><td>Revision reconciliation</td><td>Part/Rev trên nhãn khớp release set và bộ hồ sơ giao hàng</td><td>Sai rev hoặc lẫn nhiều rev trong một logistic unit không được phép</td></tr>
+<tr><td>Qty reconciliation</td><td>Tổng Qty theo PackID = shipment line = phiếu kê packaging (phiếu kê packaging)</td><td>Chênh số lượng hoặc UOM</td></tr>
+<tr><td>Revision reconciliation</td><td>Part/Rev trên nhãn khớp release set và bộ record delivery</td><td>Sai rev hoặc lẫn nhiều rev trong một logistic unit không được phép</td></tr>
 <tr><td>Child-parent relationship</td><td>Cấu trúc carton/pallet rõ ràng và quét ra đúng</td><td>Parent không mở được child hoặc child mất quan hệ</td></tr>
-<tr><td>Bằng chứng reconciliation</td><td>CoC/cert/packing bảng kiểm/ảnh kiện đầy đủ khi áp dụng</td><td>Thiếu hồ sơ bắt buộc hoặc link hỏng</td></tr>
+<tr><td>Evidence reconciliation</td><td>CoC/cert/packing checklist/ảnh kiện đầy đủ khi áp dụng</td><td>Thiếu record bắt buộc hoặc link hỏng</td></tr>
 <tr><td>Trạng thái reconciliation</td><td>Không còn hold, không còn suspect chưa xử lý</td><td>Có hold mở hoặc vấn đề chưa disposition</td></tr>
 </tbody></table></div>
-<p>Chi tiết đóng gói vật lý và label layout xem <a href="../07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>. Hướng dẫn thao tác tại point-of-use sẽ theo WI phê duyệt giao hàng (ship release) tương ứng.</p></div>
+<p>Chi tiết packaging vật lý và label layout xem <a href="../07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>. Hướng dẫn operation tại point-of-use sẽ theo WI approval delivery (ship release) tương ứng.</p></div>
 
-<div class="section"><h2>5. Ngoại lệ bắt buộc phải có phê duyệt</h2>
+<div class="section"><h2>5. Ngoại lệ bắt buộc phải có approval</h2>
 <ul class="tight" style="padding-left:20px; margin:8px 0;">
 <li><strong>Split shipment:</strong> phải đối chiếu riêng theo từng phần giao, giữ rõ shipment line và chứng từ tương ứng.</li>
 <li><strong>Merge pallet:</strong> phải có parent-child mapping và ảnh kiện cuối.</li>
@@ -116,18 +116,18 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <li><strong>Manual fallback:</strong> khi hệ thống offline, dùng bộ dự phòng theo <a href="../01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118</a> và đồng bộ lại ngay khi hệ thống phục hồi.</li>
 </ul></div>
 
-<div class="section"><h2>6. Tài liệu liên kết</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="section"><h2>6. Document liên kết</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Document</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a></td><td>Packaging spec, label layout, clean pack và preservation.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a></td><td>Barcode nội bộ, scan-to-action và quản lý label trong xưởng.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a></td><td>Barcode nội bộ, scan-to-action và quản lý label trong workshop.</td></tr>
 <tr><td><a href="../01-ANNEX-100/annex-108-m365-lists-and-field-mapping.html">ANNEX-108</a></td><td>Field mapping của hệ thống số.</td></tr>
 <tr><td><a href="../01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118</a></td><td>Offline fallback kit.</td></tr>
-<tr><td><a href="../06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>Mức hồ sơ bắt buộc theo QPL.</td></tr>
+<tr><td><a href="../06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>Mức record bắt buộc theo QPL.</td></tr>
 </tbody></table></div></div>
 
     </div>
   </div>
 </div>
-<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

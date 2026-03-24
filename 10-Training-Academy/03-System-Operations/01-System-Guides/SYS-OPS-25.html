@@ -49,7 +49,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+    <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
@@ -69,7 +69,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="title">
 <strong>SYS-OPS-25 — SOP-QMS-14 Enterprise Data Classification &amp; Storage: sensitivity, DLP, storage rules</strong><br/>
 <span class="sub-vn"></span>
-<span class="muted">Đào tạo thực chiến để vận hành dữ liệu sẵn sàng đánh giá: phân loại độ nhạy, lưu đúng nơi, khóa hồ sơ, kiểm soát chia sẻ, DLP và bằng chứng (MRR).</span>
+<span class="muted">Training thực chiến để operation dữ liệu sẵn sàng đánh giá: phân loại độ nhạy, lưu đúng nơi, khóa record, kiểm soát chia sẻ, DLP và evidence (MRR).</span>
 </div>
 <div class="meta">
 <div class="row"><span><b>Code:</b></span><span>SYS-OPS-25</span></div>
@@ -87,9 +87,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-25</div>
 <h1 style="margin-top:10px">SOP-QMS-14 Enterprise Data Classification &amp; Storage: sensitivity, DLP, storage rules</h1>
-<div class="tag blue">Phiên bản • sẵn sàng cho đánh giá</div>
+<div class="tag blue">Revision • sẵn sàng cho đánh giá</div>
 <p class="muted" style="margin-top:10px">
- Mô-đun này chuyển SOP thành thao tác vận hành: <b>lưu đúng nơi</b> – <b>đúng quyền</b> – <b>đúng phiên bản</b> – <b>đúng trạng thái kiểm soát</b>, và tạo <b>bằng chứng truy xuất ≤ 3 phút</b>.
+ Mô-đun này chuyển SOP thành operation operation: <b>lưu đúng nơi</b> – <b>đúng quyền</b> – <b>đúng revision</b> – <b>đúng trạng thái kiểm soát</b>, và tạo <b>evidence traceability ≤ 3 phút</b>.
  </p>
 </div>
 <div class="note">
@@ -102,12 +102,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Thời lượng triển khai (khả thi 2 ca/ngày)</strong>
 <ul>
 <li>Lý thuyết tập trung: 90 phút (đúng thuật ngữ, đúng zone, đúng classification).</li>
-<li>Workshop thao tác: 60 phút (đặt tên, lưu đúng kho, tạo gói minh chứng).</li>
+<li>Workshop operation: 60 phút (đặt tên, lưu đúng kho, tạo gói minh chứng).</li>
 <li>OJT tại hiện trường: 120 phút (trên 01 WO/Lot thật hoặc mô phỏng).</li>
-<li>Giới hạn vận hành: mỗi vai trò học tối đa 02 buổi/tuần; phần còn lại thực hiện tại job và nộp MRR.</li>
+<li>Giới hạn operation: mỗi vai trò học tối đa 02 buổi/tuần; phần còn lại thực hiện tại job và nộp MRR.</li>
 </ul>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div>Không có MRR (bằng chứng) thì không có cổng chặn: <b>No bằng chứng = No cổng chặn</b>.</div>
+<div>Không có MRR (evidence) thì không có cổng chặn: <b>No evidence = No cổng chặn</b>.</div>
 </div>
 </div>
 </div>
@@ -115,35 +115,35 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="toc">
 <strong>Mục lục nhanh</strong>
 <ul>
-<li><a href="#s2">2) Mục đích &amp; bối cảnh vận hành</a></li>
+<li><a href="#s2">2) Mục đích &amp; bối cảnh operation</a></li>
 <li><a href="#s3">3) Vị trí trong chuỗi E2E + bàn giao + hold point</a></li>
 <li><a href="#s4">4) Điểm đứt gãy (≥10)</a></li>
 <li><a href="#s5">5) Biện pháp kiểm soát rủi ro (≥6)</a></li>
 <li><a href="#s6">6) Fail-fast rules (STOP/HOLD/BLOCK)</a></li>
 <li><a href="#s7">7) Phản ứng 60 giây</a></li>
-<li><a href="#s8">8) Bảng kiểm vận hành (≤15 bước)</a></li>
+<li><a href="#s8">8) Checklist operation (≤15 bước)</a></li>
 <li><a href="#s9">9) OJT theo TWI (Job Breakdown + Rubric L1–L4)</a></li>
-<li><a href="#s10">10) Đánh giá (Trắc nghiệm + Tình huống + Bài kiểm tra thực hành)</a></li>
+<li><a href="#s10">10) Đánh giá (Trắc nghiệm + Tình huống + Bài inspection thực hành)</a></li>
 <li><a href="#s11">11) ĐẠT/KHÔNG ĐẠT criteria</a></li>
 <li><a href="#s12">12) MRR tối thiểu + nơi lưu</a></li>
 <li><a href="#s13">13) Đánh giá phát hiện &amp; phòng ngừa</a></li>
-<li><a href="#s14">14) DCR hồ sơ</a></li>
+<li><a href="#s14">14) DCR record</a></li>
 </ul>
 </div>
 </div>
-<!-- 2) Mục đích module & bối cảnh vận hành -->
-<h2 class="h2" id="s2">2) Mục đích mô-đun &amp; bối cảnh vận hành (cổng chặn/bàn giao; kích hoạt; trách nhiệm)</h2>
+<!-- 2) Mục đích module & bối cảnh operation -->
+<h2 class="h2" id="s2">2) Mục đích mô-đun &amp; bối cảnh operation (cổng chặn/bàn giao; kích hoạt; trách nhiệm)</h2>
 <div class="callout">
-<b>Lý do tồn tại (Cổng chặn logic):</b> sai vị trí lưu / sai quyền / sai phiên bản (wrong revision) tạo lỗi chạy máy, lỗi kiểm tra, lỗi giao hàng và lỗi đánh giá. Mô-đun này là “cổng chặn hệ thống” để chặn 6 rủi ro chết người: <b>sai Rev</b>, <b>lẫn lộn (mix-up)/lẫn lô</b>, <b>thiếu/giả chứng từ</b>, <b>chỉnh sửa âm thầm hồ sơ</b>, <b>rò rỉ dữ liệu khách hàng</b>, <b>vượt qua cổng chặn giao hàng</b>.
+<b>Lý do tồn tại (Cổng chặn logic):</b> sai vị trí lưu / sai quyền / sai revision (wrong revision) tạo lỗi chạy máy, lỗi inspection, lỗi delivery và lỗi đánh giá. Mô-đun này là “cổng chặn hệ thống” để chặn 6 rủi ro chết người: <b>sai Rev</b>, <b>lẫn lộn (mix-up)/lẫn lô</b>, <b>thiếu/giả chứng từ</b>, <b>chỉnh sửa âm thầm record</b>, <b>rò rỉ dữ liệu customer</b>, <b>vượt qua cổng chặn delivery</b>.
  </div>
 <div class="grid-2">
 <div class="card">
 <h3 class="h3" style="margin-top:0">Khi nào kích hoạt</h3>
 <ul class="iso-list">
-<li>Khi tạo mới hoặc cập nhật bất kỳ file thuộc WO/Lot (Job dossier (job dossier)), đặc biệt: bản vẽ/spec, CAD/CAM, CNC program, setup pack, kiểm tra hồ sơ.</li>
-<li>Khi phát hành tài liệu kiểm soát (Released) hoặc đóng băng hồ sơ (Hồ sơ).</li>
-<li>Khi chia sẻ ngoài công ty (khách hàng/auditor) hoặc cấp quyền truy cập vượt baseline.</li>
-<li>Khi phát hiện rủi ro sai Rev, nghi ngờ rò rỉ dữ liệu, nghi ngờ chỉnh sửa hồ sơ.</li>
+<li>Khi tạo mới hoặc cập nhật bất kỳ file thuộc WO/Lot (Job dossier (job dossier)), đặc biệt: bản vẽ/spec, CAD/CAM, CNC program, setup pack, inspection record.</li>
+<li>Khi release document kiểm soát (Released) hoặc đóng băng record (Record).</li>
+<li>Khi chia sẻ ngoài công ty (customer/auditor) hoặc cấp quyền truy cập vượt baseline.</li>
+<li>Khi phát hiện rủi ro sai Rev, nghi ngờ rò rỉ dữ liệu, nghi ngờ chỉnh sửa record.</li>
 </ul>
 </div>
 <div class="card">
@@ -151,17 +151,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:220px">Vai trò</th><th>Trách nhiệm bắt buộc</th></tr></thead>
 <tbody>
-<tr><td><b>QA/QMS</b></td><td>Thiết lập chuẩn kiểm soát (Released/Hồ sơ/WIP), spot-check tuân thủ, lập gói minh chứng đánh giá.</td></tr>
-<tr><td><b>IT/M365 Admin</b></td><td>Thiết lập cấu trúc sites/libraries, versioning/approval, retention/DLP, nhóm quyền, xuất đánh giá các nhật ký.</td></tr>
-<tr><td><b>Process Owner/Dept Head</b></td><td>Phê duyệt quyền truy cập, thu hồi quyền, chấp thuận ngoại lệ có thời hạn.</td></tr>
-<tr><td><b>All users</b></td><td>Lưu đúng nơi, đúng tên, đúng phân loại; không tự ý chia sẻ ngoài; báo cáo sự cố ngay.</td></tr>
+<tr><td><b>QA/QMS</b></td><td>Thiết lập chuẩn kiểm soát (Released/Record/WIP), spot-check compliance, lập gói minh chứng đánh giá.</td></tr>
+<tr><td><b>IT/M365 Admin</b></td><td>Thiết lập cấu trúc sites/libraries, versioning/approval, retention/DLP, nhóm quyền, xuất đánh giá các log.</td></tr>
+<tr><td><b>Process Owner/Dept Head</b></td><td>Approval quyền truy cập, recall quyền, chấp thuận ngoại lệ có thời hạn.</td></tr>
+<tr><td><b>All users</b></td><td>Lưu đúng nơi, đúng tên, đúng phân loại; không tự ý chia sẻ ngoài; báo cáo incident ngay.</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="kpi-cổng chặn">
-<strong>Cổng chặn cam kết vận hành:</strong>
- Từ thời điểm mô-đun có hiệu lực, mọi WO/Lot phải truy xuất được hồ sơ theo chuẩn trong ≤ <b>3 phút</b> (từ Document Set → folder chuẩn → file đúng tên), và mọi chia sẻ external có nhật ký + thời hạn + thu hồi.
+<strong>Cổng chặn cam kết operation:</strong>
+ Từ thời điểm mô-đun có hiệu lực, mọi WO/Lot phải traceability được record theo chuẩn trong ≤ <b>3 phút</b> (từ Document Set → folder chuẩn → file đúng tên), và mọi chia sẻ external có log + thời hạn + recall.
  </div>
 <div class="card">
 <h3 class="h3" style="margin-top:0">Chuẩn bắt buộc: 3 zone + 4 mức phân loại + quy tắc DLP</h3>
@@ -172,27 +172,27 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th style="width:160px">Zone</th><th>Nơi lưu chuẩn</th><th>Quy tắc khóa</th></tr></thead>
 <tbody>
 <tr><td><b>Released</b></td><td>QMS-Controlled-Documents</td><td>Versioning + approval; bản obsolete chỉ đọc</td></tr>
-<tr><td><b>Hồ sơ</b></td><td>QMS-Hồ sơ hoặc Job dossier (gắn WO/Lot)</td><td>Không sửa nội dung; đính chính bằng file mới có lý do; retention</td></tr>
-<tr><td><b>WIP</b></td><td>OPS-Job-Dossiers (Document Set theo WO/Lot)</td><td>Cho phép cập nhật theo quyền; khi closeout phải freeze → Hồ sơ và khóa</td></tr>
+<tr><td><b>Record</b></td><td>QMS-Record hoặc Job dossier (gắn WO/Lot)</td><td>Không sửa nội dung; đính chính bằng file mới có lý do; retention</td></tr>
+<tr><td><b>WIP</b></td><td>OPS-Job-Dossiers (Document Set theo WO/Lot)</td><td>Cho phép cập nhật theo quyền; khi closeout phải freeze → Record và khóa</td></tr>
 </tbody>
 </table>
 <div class="callout warn" style="margin-top:10px">
-<b>Quy tắc đóng hồ sơ:</b> Khi WO/Lot closeout, toàn bộ WIP phải được <b>đóng băng</b> thành Hồ sơ và khóa. Mọi thay đổi sau closeout đi qua NCR/CAPA hoặc Yêu cầu thay đổi.
+<b>Quy tắc đóng record:</b> Khi WO/Lot closeout, toàn bộ WIP phải được <b>đóng băng</b> thành Record và khóa. Mọi thay đổi sau closeout đi qua NCR/CAPA hoặc Requirement thay đổi.
  </div>
 </div>
 <div>
 <h4 style="margin:0 0 8px 0">4 mức phân loại (gắn DLP)</h4>
 <table class="table">
-<thead><tr><th style="width:160px">Mức</th><th>Ví dụ CNC xưởng gia công theo đơn (job shop)</th><th>Quy tắc lưu &amp; chia sẻ tối thiểu</th></tr></thead>
+<thead><tr><th style="width:160px">Mức</th><th>Ví dụ CNC workshop gia công theo đơn (job shop)</th><th>Quy tắc lưu &amp; chia sẻ tối thiểu</th></tr></thead>
 <tbody>
-<tr><td><b>Public</b></td><td>Catalog năng lực, brochure</td><td>Chỉ dùng cho catalog năng lực, brochure; PHẢI giữ hồ sơ QMS/WO ở mức phân loại cao hơn</td></tr>
-<tr><td><b>Internal</b></td><td>SOP/WI nội bộ, biểu mẫu không chứa dữ liệu khách</td><td>Chỉ share external khi đã có phê duyệt</td></tr>
-<tr><td><b>Customer-Confidential</b></td><td>Drawing/spec/model, dữ liệu đo, khiếu nại, CoC theo yêu cầu khách</td><td>Chỉ share external qua gói minh chứng; link có expiry; chỉ đọc</td></tr>
-<tr><td><b>Restricted</b></td><td>CNC programs/post, pricing/margin, đánh giá các nhật ký, HR/Finance nhạy cảm</td><td>PHẢI chặn share external; giới hạn nghiêm ngặt theo nhóm; DLP chặn xuất dữ liệu</td></tr>
+<tr><td><b>Public</b></td><td>Catalog competence, brochure</td><td>Chỉ dùng cho catalog competence, brochure; PHẢI giữ record QMS/WO ở mức phân loại cao hơn</td></tr>
+<tr><td><b>Internal</b></td><td>SOP/WI nội bộ, form không chứa dữ liệu khách</td><td>Chỉ share external khi đã có approval</td></tr>
+<tr><td><b>Customer-Confidential</b></td><td>Drawing/spec/model, dữ liệu đo, complaint, CoC theo requirement khách</td><td>Chỉ share external qua gói minh chứng; link có expiry; chỉ đọc</td></tr>
+<tr><td><b>Restricted</b></td><td>CNC programs/post, pricing/margin, đánh giá các log, HR/Finance nhạy cảm</td><td>PHẢI chặn share external; giới hạn nghiêm ngặt theo nhóm; DLP chặn xuất dữ liệu</td></tr>
 </tbody>
 </table>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div>DLP thực thi 3 chặn cứng: (1) <b>BLOCK</b> share external cho Restricted; (2) <b>BLOCK</b> share khi chưa có classification; (3) <b>NHẬT KÝ</b> mọi chia sẻ Customer-Confidential qua gói minh chứng. <span class="muted">Label: Controlled/Internal/Restricted • chặn share ngoài • đánh giá nhật ký bật.</span></div>
+<div>DLP thực thi 3 chặn cứng: (1) <b>BLOCK</b> share external cho Restricted; (2) <b>BLOCK</b> share khi chưa có classification; (3) <b>NHẬT KÝ</b> mọi chia sẻ Customer-Confidential qua gói minh chứng. <span class="muted">Label: Controlled/Internal/Restricted • chặn share ngoài • đánh giá log bật.</span></div>
 </div>
 </div>
 </div>
@@ -208,45 +208,45 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td><b>Operator</b></td><td>Chỉ sử dụng bản Released/WIP đúng nguồn; không sao chép file ra ngoài; nộp IPQC các nhật ký đúng nơi.</td><td>Hoàn thành 01 ca làm: IPQC nhật ký + ảnh/scan bảng kiểm lưu đúng Job dossier; không phát sinh “local master”.</td></tr>
-<tr><td><b>Setup</b></td><td>Lưu setup sheet, tool list, offset nhật ký đúng folder; khóa theo closeout.</td><td>01 bộ setup pack đúng chuẩn tên + folder; xác nhận dùng đúng Rev từ Job dossier.</td></tr>
-<tr><td><b>Programmer</b></td><td>Quản trị CNC program/CAM/post trong thư viện Restricted; kiểm soát revision, phát hành bản chạy.</td><td>Bài kiểm tra thực hành đạt 100% điểm “Program source &amp; release”; không có file program nằm ngoài thư viện Restricted.</td></tr>
-<tr><td><b>QC</b></td><td>Lưu FAI/CMM/FQC đúng Hồ sơ; bảo toàn tính toàn vẹn hồ sơ.</td><td>01 bộ kiểm tra hồ sơ “chỉ đọc/retention” sau phát hành; truy xuất ≤ 3 phút.</td></tr>
-<tr><td><b>QA</b></td><td>Thiết lập gói minh chứng, NCR/CAPA, đánh giá các nhật ký; kiểm tra tuân thủ.</td><td>Thực hiện 01 spot-check job dossier + lập biên bản; tạo 01 gói minh chứng share chỉ đọc có expiry.</td></tr>
-<tr><td><b>Warehouse</b></td><td>Lưu traceability, CoC vật liệu, packing/shipping pack đúng folder; không sửa âm thầm.</td><td>01 shipping pack đủ: CoC/traceability/phiếu kê đóng gói (phiếu kê đóng gói) lưu đúng nơi; không thiếu MRR.</td></tr>
-<tr><td><b>Purchasing</b></td><td>Lưu supplier approvals/certs đúng QMS-Hồ sơ; link vào Job dossier/Material.</td><td>01 bộ chứng từ nhà cung cấp: lưu đúng QMS-Hồ sơ và gắn link vào WO/Lot.</td></tr>
-<tr><td><b>Planner</b></td><td>Lưu planning snapshots và thay đổi lịch có dấu vết; tránh dùng file cá nhân làm master.</td><td>01 planning hồ sơ có versioning và nhật ký thay đổi liên quan WO/Lot.</td></tr>
-<tr><td><b>Maintenance</b></td><td>Lưu PM các nhật ký, machine các nhật ký đúng QMS-Hồ sơ/Maintenance; giữ lịch sử.</td><td>01 bộ PM hồ sơ: tên đúng chuẩn + không bị overwrite.</td></tr>
-<tr><td><b>EHS</b></td><td>Lưu sự cố/sự cố suýt xảy ra (near-miss)/đào tạo EHS đúng khu vực Hồ sơ; quyền truy cập theo phân loại.</td><td>01 hồ sơ EHS được phân loại đúng và giới hạn quyền truy cập.</td></tr>
-<tr><td><b>Estimator (SAL-03)</b></td><td>Lưu RFQ/PO/rà soát hợp đồng đúng zone; chia sẻ khách hàng theo cơ chế kiểm soát.</td><td>01 rà soát hợp đồng hồ sơ gắn WO/Lot; chia sẻ khách hàng qua gói minh chứng có nhật ký.</td></tr>
-<tr><td><b>Supervisor</b></td><td>Thực thi cổng chặn: không cho chạy/giao hàng khi hồ sơ sai vị trí/sai quyền/sai Rev.</td><td>Đạt L3: thực hiện 02 lần đánh giá nhanh + xử lý 01 tình huống vi phạm theo chặn lỗi tức thì.</td></tr>
+<tr><td><b>Operator</b></td><td>Chỉ sử dụng bản Released/WIP đúng nguồn; không sao chép file ra ngoài; nộp IPQC các log đúng nơi.</td><td>Hoàn thành 01 ca làm: IPQC log + ảnh/scan checklist lưu đúng Job dossier; không phát sinh “local master”.</td></tr>
+<tr><td><b>Setup</b></td><td>Lưu setup sheet, tool list, offset log đúng folder; khóa theo closeout.</td><td>01 bộ setup pack đúng chuẩn tên + folder; xác nhận dùng đúng Rev từ Job dossier.</td></tr>
+<tr><td><b>Programmer</b></td><td>Quản trị CNC program/CAM/post trong thư viện Restricted; kiểm soát revision, release bản chạy.</td><td>Bài inspection thực hành đạt 100% điểm “Program source &amp; release”; không có file program nằm ngoài thư viện Restricted.</td></tr>
+<tr><td><b>QC</b></td><td>Lưu FAI/CMM/FQC đúng Record; bảo toàn tính toàn vẹn record.</td><td>01 bộ inspection record “chỉ đọc/retention” sau release; traceability ≤ 3 phút.</td></tr>
+<tr><td><b>QA</b></td><td>Thiết lập gói minh chứng, NCR/CAPA, đánh giá các log; inspection compliance.</td><td>Thực hiện 01 spot-check job dossier + lập biên bản; tạo 01 gói minh chứng share chỉ đọc có expiry.</td></tr>
+<tr><td><b>Warehouse</b></td><td>Lưu traceability, CoC vật liệu, packing/shipping pack đúng folder; không sửa âm thầm.</td><td>01 shipping pack đủ: CoC/traceability/phiếu kê packaging (phiếu kê packaging) lưu đúng nơi; không thiếu MRR.</td></tr>
+<tr><td><b>Purchasing</b></td><td>Lưu supplier approvals/certs đúng QMS-Record; link vào Job dossier/Material.</td><td>01 bộ chứng từ supplier: lưu đúng QMS-Record và gắn link vào WO/Lot.</td></tr>
+<tr><td><b>Planner</b></td><td>Lưu planning snapshots và thay đổi lịch có dấu vết; tránh dùng file cá nhân làm master.</td><td>01 planning record có versioning và log thay đổi liên quan WO/Lot.</td></tr>
+<tr><td><b>Maintenance</b></td><td>Lưu PM các log, machine các log đúng QMS-Record/Maintenance; giữ lịch sử.</td><td>01 bộ PM record: tên đúng chuẩn + không bị overwrite.</td></tr>
+<tr><td><b>EHS</b></td><td>Lưu incident/incident suýt xảy ra (near-miss)/training EHS đúng khu vực Record; quyền truy cập theo phân loại.</td><td>01 record EHS được phân loại đúng và giới hạn quyền truy cập.</td></tr>
+<tr><td><b>Estimator (SAL-03)</b></td><td>Lưu RFQ/PO/review hợp đồng đúng zone; chia sẻ customer theo cơ chế kiểm soát.</td><td>01 review hợp đồng record gắn WO/Lot; chia sẻ customer qua gói minh chứng có log.</td></tr>
+<tr><td><b>Supervisor</b></td><td>Thực thi cổng chặn: không cho chạy/delivery khi record sai vị trí/sai quyền/sai Rev.</td><td>Đạt L3: thực hiện 02 lần đánh giá nhanh + xử lý 01 tình huống vi phạm theo chặn lỗi tức thì.</td></tr>
 </tbody>
 </table>
 </div>
 <!-- 3) Vị trí trong chuỗi E2E + handoff -->
-<h2 class="h2" id="s3">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + “hold point”</h2>
+<h2 class="h2" id="s3">3) Vị trí trong chuỗi E2E + luồng bàn giao (input/output) + “hold point”</h2>
 <div class="vflow">
 <div class="vstep">
 <div class="vnum">1</div>
 <div class="vbody">
 <div class="vtitle">Báo giá/Hợp đồng</div>
-<div class="vdesc"><b>Đầu vào:</b> RFQ, NDA, PO • <b>Đầu ra:</b> rà soát hợp đồng Hồ sơ (s) gắn WO/Lot</div>
-<div class="small muted">Hold point: không tạo WO khi file khách hàng chưa lưu đúng zone + chưa gắn REV.</div>
+<div class="vdesc"><b>Input:</b> RFQ, NDA, PO • <b>Output:</b> review hợp đồng Record (s) gắn WO/Lot</div>
+<div class="small muted">Hold point: không tạo WO khi file customer chưa lưu đúng zone + chưa gắn REV.</div>
 </div>
 </div>
 <div class="vstep">
 <div class="vnum">2</div>
 <div class="vbody">
 <div class="vtitle">Planning → Engineering</div>
-<div class="vdesc"><b>Đầu vào:</b> drawing/spec/model • <b>Đầu ra:</b> router/setup pack/phát hành chương trình (program release)</div>
-<div class="small muted">Hold point: program/setup sheet thuộc <b>Restricted</b> và chỉ phát hành từ thư viện Programs (Restricted).</div>
+<div class="vdesc"><b>Input:</b> drawing/spec/model • <b>Output:</b> router/setup pack/release chương trình (program release)</div>
+<div class="small muted">Hold point: program/setup sheet thuộc <b>Restricted</b> và chỉ release từ thư viện Programs (Restricted).</div>
 </div>
 </div>
 <div class="vstep">
 <div class="vnum">3</div>
 <div class="vbody">
 <div class="vtitle">Purchasing → Receiving</div>
-<div class="vdesc"><b>Đầu vào:</b> supplier cert/CoC • <b>Đầu ra:</b> traceability + material pack trong Job dossier</div>
+<div class="vdesc"><b>Input:</b> supplier cert/CoC • <b>Output:</b> traceability + material pack trong Job dossier</div>
 <div class="small muted">Hold point: không nhập kho/không phát vật tư khi cert lưu sai nơi hoặc thiếu liên kết WO/Lot.</div>
 </div>
 </div>
@@ -254,37 +254,37 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vnum">4</div>
 <div class="vbody">
 <div class="vtitle">Production → QC/QA</div>
-<div class="vdesc"><b>Đầu vào:</b> Released/WIP đúng nguồn • <b>Đầu ra:</b> IPQC/FAI/CMM/FQC Hồ sơ</div>
-<div class="small muted">Hold point: không chạy máy khi nguồn program không truy xuất được từ thư viện Restricted; không phát hành QC khi hồ sơ chưa khóa.</div>
+<div class="vdesc"><b>Input:</b> Released/WIP đúng nguồn • <b>Output:</b> IPQC/FAI/CMM/FQC Record</div>
+<div class="small muted">Hold point: không chạy máy khi nguồn program không traceability được từ thư viện Restricted; không release QC khi record chưa khóa.</div>
 </div>
 </div>
 <div class="vstep">
 <div class="vnum">5</div>
 <div class="vbody">
 <div class="vtitle">NCR/MRB → Final → Packing → Ship</div>
-<div class="vdesc"><b>Đầu vào:</b> NCR/CAPA hồ sơ + closeout • <b>Đầu ra:</b> Shipping pack (Hồ sơ) + gói minh chứng</div>
-<div class="small muted">Hold point: HOLD shipment khi thiếu shipping pack / thiếu closeout lock / thiếu bằng chứng phân loại &amp; quyền chia sẻ.</div>
+<div class="vdesc"><b>Input:</b> NCR/CAPA record + closeout • <b>Output:</b> Shipping pack (Record) + gói minh chứng</div>
+<div class="small muted">Hold point: HOLD shipment khi thiếu shipping pack / thiếu closeout lock / thiếu evidence phân loại &amp; quyền chia sẻ.</div>
 </div>
 </div>
 <div class="vstep">
 <div class="vnum">6</div>
 <div class="vbody">
 <div class="vtitle">Phản hồi/CI</div>
-<div class="vdesc"><b>Đầu vào:</b> đánh giá phát hiện/incident các nhật ký • <b>Đầu ra:</b> cập nhật quyền/retention/DLP + đào tạo lại</div>
-<div class="small muted">Hold point: không đóng CAPA khi chưa có bằng chứng kiểm soát dữ liệu hiệu lực.</div>
+<div class="vdesc"><b>Input:</b> đánh giá phát hiện/incident các log • <b>Output:</b> cập nhật quyền/retention/DLP + training lại</div>
+<div class="small muted">Hold point: không đóng CAPA khi chưa có evidence kiểm soát dữ liệu hiệu lực.</div>
 </div>
 </div>
 </div>
 <div class="card">
-<h3 class="h3" style="margin-top:0">Đầu vào/Đầu ra bắt buộc cho mô-đun này</h3>
+<h3 class="h3" style="margin-top:0">Input/Output bắt buộc cho mô-đun này</h3>
 <table class="table">
-<thead><tr><th style="width:260px">Bàn giao</th><th>Đầu vào tối thiểu</th><th>Đầu ra/MRR bắt buộc</th></tr></thead>
+<thead><tr><th style="width:260px">Bàn giao</th><th>Input tối thiểu</th><th>Output/MRR bắt buộc</th></tr></thead>
 <tbody>
-<tr><td><b>Estimator (SAL-03) → Planning</b></td><td>RFQ/PO/NDA + drawing/spec + Rev</td><td>rà soát hợp đồng Hồ sơ + Customer Đầu vào lưu trong Job dossier (đúng folder + tên)</td></tr>
-<tr><td><b>Engineering → Production</b></td><td>Router/setup sheet + program released</td><td>Link “source of truth” program từ thư viện Restricted + dấu phát hành (release note)</td></tr>
+<tr><td><b>Estimator (SAL-03) → Planning</b></td><td>RFQ/PO/NDA + drawing/spec + Rev</td><td>review hợp đồng Record + Customer Input lưu trong Job dossier (đúng folder + tên)</td></tr>
+<tr><td><b>Engineering → Production</b></td><td>Router/setup sheet + program released</td><td>Link “source of truth” program từ thư viện Restricted + dấu release (release note)</td></tr>
 <tr><td><b>Receiving → Production</b></td><td>CoC/certs vật liệu</td><td>Material pack: CoC + traceability link đúng WO/Lot</td></tr>
-<tr><td><b>Production → QC/QA</b></td><td>IPQC các nhật ký + setup bằng chứng</td><td>IPQC hồ sơ + ảnh/bảng kiểm, lưu đúng zone, khóa khi closeout</td></tr>
-<tr><td><b>QA → External (đánh giá/customer)</b></td><td>Scope đánh giá + danh mục bằng chứng</td><td>Bộ bằng chứng chỉ đọc có expiry + nhật ký quyền truy cập (FRM-QMS-15/17)</td></tr>
+<tr><td><b>Production → QC/QA</b></td><td>IPQC các log + setup evidence</td><td>IPQC record + ảnh/checklist, lưu đúng zone, khóa khi closeout</td></tr>
+<tr><td><b>QA → External (đánh giá/customer)</b></td><td>Scope đánh giá + danh mục evidence</td><td>Bộ evidence chỉ đọc có expiry + log quyền truy cập (FRM-QMS-15/17)</td></tr>
 </tbody>
 </table>
 </div>
@@ -294,35 +294,35 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:46px">#</th><th>Điểm gãy</th><th>Hậu quả trực tiếp</th><th>Cổng chặn bị phá</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Lưu bản vẽ/spec trên OneDrive cá nhân hoặc máy local làm “bản chính”.</td><td>Chạy sai Rev; không truy xuất đánh giá.</td><td>Báo giá/Hợp đồng → Engineering</td></tr>
-<tr><td>2</td><td>Gửi file khách hàng qua email/chat ngoài kiểm soát, không nhật ký.</td><td>Rò rỉ dữ liệu; vi phạm NDA.</td><td>External sharing</td></tr>
-<tr><td>3</td><td>Trộn Released/WIP/Hồ sơ trong cùng folder, không phân zone.</td><td>Đúng nội dung nhưng sai trạng thái kiểm soát; chỉnh sửa hồ sơ.</td><td>Hồ sơ integrity</td></tr>
+<tr><td>1</td><td>Lưu bản vẽ/spec trên OneDrive cá nhân hoặc máy local làm “bản chính”.</td><td>Chạy sai Rev; không traceability đánh giá.</td><td>Báo giá/Hợp đồng → Engineering</td></tr>
+<tr><td>2</td><td>Gửi file customer qua email/chat ngoài kiểm soát, không log.</td><td>Rò rỉ dữ liệu; vi phạm NDA.</td><td>External sharing</td></tr>
+<tr><td>3</td><td>Trộn Released/WIP/Record trong cùng folder, không phân zone.</td><td>Đúng nội dung nhưng sai trạng thái kiểm soát; chỉnh sửa record.</td><td>Record integrity</td></tr>
 <tr><td>4</td><td>CNC program nằm ngoài thư viện Restricted; copy USB giữa máy.</td><td>Chạy nhầm chương trình; không truy vết.</td><td>Engineering → Production</td></tr>
-<tr><td>5</td><td>Không gắn REV/WO/Lot trong tên file; dùng “final_v3”.</td><td>Lẫn lộn/lẫn lô; truy xuất chậm.</td><td>Traceability</td></tr>
-<tr><td>6</td><td>Bẻ quyền theo file để “tiện”, không có phê duyệt và thời hạn.</td><td>Không kiểm soát ai truy cập; đánh giá không đạt.</td><td>Kiểm soát truy cập</td></tr>
-<tr><td>7</td><td>Không freeze Job dossier khi closeout; tiếp tục sửa file sau giao hàng.</td><td>Hồ sơ không toàn vẹn; dispute khách hàng.</td><td>Closeout lock</td></tr>
-<tr><td>8</td><td>Share link không expiry hoặc share cả thư viện thay vì gói minh chứng.</td><td>Rò rỉ dữ liệu kéo dài; không thu hồi.</td><td>External sharing</td></tr>
-<tr><td>9</td><td>Hồ sơ bị overwrite thay vì tạo bản đính chính có lý do.</td><td>Mất lịch sử; mất non-repudiation.</td><td>Hồ sơ integrity</td></tr>
+<tr><td>5</td><td>Không gắn REV/WO/Lot trong tên file; dùng “final_v3”.</td><td>Lẫn lộn/lẫn lô; traceability chậm.</td><td>Traceability</td></tr>
+<tr><td>6</td><td>Bẻ quyền theo file để “tiện”, không có approval và thời hạn.</td><td>Không kiểm soát ai truy cập; đánh giá không đạt.</td><td>Kiểm soát truy cập</td></tr>
+<tr><td>7</td><td>Không freeze Job dossier khi closeout; tiếp tục sửa file sau delivery.</td><td>Record không toàn vẹn; dispute customer.</td><td>Closeout lock</td></tr>
+<tr><td>8</td><td>Share link không expiry hoặc share cả thư viện thay vì gói minh chứng.</td><td>Rò rỉ dữ liệu kéo dài; không recall.</td><td>External sharing</td></tr>
+<tr><td>9</td><td>Record bị overwrite thay vì tạo bản đính chính có lý do.</td><td>Mất lịch sử; mất non-repudiation.</td><td>Record integrity</td></tr>
 <tr><td>10</td><td>Thiếu chứng từ CoC/certs trong Job dossier/Material.</td><td>HOLD shipment; NCR/MRB.</td><td>Receiving → Ship</td></tr>
-<tr><td>11</td><td>Kiểm tra data lưu sai nơi, thiếu liên kết WO/Lot.</td><td>Không chứng minh phù hợp; đánh giá không đạt.</td><td>QC/QA → Ship</td></tr>
-<tr><td>12</td><td>Không thực hiện rà soát quyền truy cập hàng quý; guest access tồn tại vô hạn.</td><td>Rủi ro truy cập trái phép; đánh giá không đạt.</td><td>Governance</td></tr>
+<tr><td>11</td><td>Inspection data lưu sai nơi, thiếu liên kết WO/Lot.</td><td>Không chứng minh phù hợp; đánh giá không đạt.</td><td>QC/QA → Ship</td></tr>
+<tr><td>12</td><td>Không thực hiện review quyền truy cập hàng quý; guest access tồn tại vô hạn.</td><td>Rủi ro truy cập trái phép; đánh giá không đạt.</td><td>Governance</td></tr>
 </tbody>
 </table>
 </div>
 <!-- 5) Risk Controls -->
-<h2 class="h2" id="s5">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6)</h2>
+<h2 class="h2" id="s5">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; evidence; tối thiểu 6)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th style="width:46px">#</th><th>điểm kiểm soát (điểm kiểm soát) bắt buộc</th><th style="width:180px">Responsible Person</th><th>Bằng chứng (MRR)</th><th style="width:160px">Tần suất</th></tr></thead>
+<thead><tr><th style="width:46px">#</th><th>điểm kiểm soát (điểm kiểm soát) bắt buộc</th><th style="width:180px">Responsible Person</th><th>Evidence (MRR)</th><th style="width:160px">Tần suất</th></tr></thead>
 <tbody>
-<tr><td>1</td><td><b>Single source of truth</b>: Released docs chỉ nằm trong <b>QMS-Controlled-Documents</b>; nơi khác chỉ link.</td><td>QA/QMS</td><td>Link Released + trang doc-control + nhật ký phát hành</td><td>Mỗi lần phát hành</td></tr>
-<tr><td>2</td><td><b>Job dossier Document Set</b> theo WO/Lot + folder chuẩn; WIP → Hồ sơ theo closeout.</td><td>Process Owner</td><td>01 Document Set đúng cấu trúc + Closeout bảng kiểm ký</td><td>Mỗi WO/Lot</td></tr>
-<tr><td>3</td><td><b>Programs Restricted Library</b>: CNC programs/post/setup chỉ phát hành từ thư viện Restricted; PROD chỉ Read/Use.</td><td>Engineering + IT</td><td>Release note + đường dẫn program + quyền nhóm</td><td>Mỗi lần release</td></tr>
-<tr><td>4</td><td><b>Least privilege &amp; group-based</b>: cấp quyền qua nhóm; mọi thay đổi có nhật ký và thời hạn.</td><td>IT + chủ dữ liệu</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#DCR record">FRM-QMS-15</a> + cập nhật Access Matrix (<a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html">FRM-QMS-14</a>/<a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#edam">FRM-QMS-18</a>)</td><td>Mỗi thay đổi</td></tr>
-<tr><td>5</td><td><b>rà soát quyền truy cập hàng quý</b>: rà soát quyền + guest expiry + gói minh chứng.</td><td>IT + QA/QMS</td><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-QMS-17</a> (gói minh chứng) + danh sách thu hồi</td><td>Hàng quý</td></tr>
-<tr><td>6</td><td><b>Hồ sơ integrity</b>: hồ sơ không chỉnh sửa; đính chính bằng file mới có lý do; retention label áp dụng.</td><td>QA/QMS</td><td>Phiên bản/retention + nhật ký đính chính</td><td>Mỗi hồ sơ</td></tr>
-<tr><td>7</td><td><b>External sharing cổng chặn</b>: chỉ share qua gói minh chứng; link chỉ đọc có expiry; PHẢI chặn share Restricted.</td><td>QA/QMS + Estimator (SAL-03)</td><td>Bộ bằng chứng link + FRM-QMS-15 + screenshot expiry</td><td>Mỗi lần share</td></tr>
-<tr><td>8</td><td><b>Spot-check tuân thủ</b>: chọn mẫu WO/Lot kiểm tra vị trí lưu, tên file, quyền truy cập, khóa closeout.</td><td>QA/QMS</td><td>Biên bản spot-check + NCR/CAPA khi phát hiện</td><td>Hàng tháng</td></tr>
+<tr><td>1</td><td><b>Single source of truth</b>: Released docs chỉ nằm trong <b>QMS-Controlled-Documents</b>; nơi khác chỉ link.</td><td>QA/QMS</td><td>Link Released + trang doc-control + log release</td><td>Mỗi lần release</td></tr>
+<tr><td>2</td><td><b>Job dossier Document Set</b> theo WO/Lot + folder chuẩn; WIP → Record theo closeout.</td><td>Process Owner</td><td>01 Document Set đúng cấu trúc + Closeout checklist ký</td><td>Mỗi WO/Lot</td></tr>
+<tr><td>3</td><td><b>Programs Restricted Library</b>: CNC programs/post/setup chỉ release từ thư viện Restricted; PROD chỉ Read/Use.</td><td>Engineering + IT</td><td>Release note + đường dẫn program + quyền nhóm</td><td>Mỗi lần release</td></tr>
+<tr><td>4</td><td><b>Least privilege &amp; group-based</b>: cấp quyền qua nhóm; mọi thay đổi có log và thời hạn.</td><td>IT + chủ dữ liệu</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#DCR record">FRM-QMS-15</a> + cập nhật Access Matrix (<a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html">FRM-QMS-14</a>/<a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#edam">FRM-QMS-18</a>)</td><td>Mỗi thay đổi</td></tr>
+<tr><td>5</td><td><b>review quyền truy cập hàng quý</b>: review quyền + guest expiry + gói minh chứng.</td><td>IT + QA/QMS</td><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-QMS-17</a> (gói minh chứng) + danh sách recall</td><td>Hàng quý</td></tr>
+<tr><td>6</td><td><b>Record integrity</b>: record không chỉnh sửa; đính chính bằng file mới có lý do; retention label áp dụng.</td><td>QA/QMS</td><td>Revision/retention + log đính chính</td><td>Mỗi record</td></tr>
+<tr><td>7</td><td><b>External sharing cổng chặn</b>: chỉ share qua gói minh chứng; link chỉ đọc có expiry; PHẢI chặn share Restricted.</td><td>QA/QMS + Estimator (SAL-03)</td><td>Bộ evidence link + FRM-QMS-15 + screenshot expiry</td><td>Mỗi lần share</td></tr>
+<tr><td>8</td><td><b>Spot-check compliance</b>: chọn mẫu WO/Lot inspection vị trí lưu, tên file, quyền truy cập, khóa closeout.</td><td>QA/QMS</td><td>Biên bản spot-check + NCR/CAPA khi phát hiện</td><td>Hàng tháng</td></tr>
 </tbody>
 </table>
 </div>
@@ -330,81 +330,81 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" id="s6">6) Fail-fast rules (≥3) + tiêu chí STOP/HOLD/BLOCK</h2>
 <div class="card">
 <div class="req"><span class="req-tag shall">STOP</span>
-<div><b>Dừng gia công ngay</b> khi CNC program/setup sheet không truy xuất được nguồn từ thư viện <b>Programs (Restricted)</b> hoặc không khớp REV/WO/Lot. MRR: ảnh chụp màn hình đường dẫn + báo Supervisor + Engineering trong ≤ 5 phút.</div>
+<div><b>Dừng gia công ngay</b> khi CNC program/setup sheet không traceability được nguồn từ thư viện <b>Programs (Restricted)</b> hoặc không khớp REV/WO/Lot. MRR: ảnh chụp màn hình đường dẫn + báo Supervisor + Engineering trong ≤ 5 phút.</div>
 </div>
 <div class="req"><span class="req-tag shall">HOLD</span>
-<div><b>Giữ lô/giữ giao hàng</b> khi thiếu bất kỳ hồ sơ bắt buộc trong shipping pack (CoC/certs/kiểm tra/closeout lock) hoặc hồ sơ nằm sai zone. MRR: nhật ký HOLD + danh sách thiếu + người chịu trách nhiệm.</div>
+<div><b>Giữ lô/giữ delivery</b> khi thiếu bất kỳ record bắt buộc trong shipping pack (CoC/certs/inspection/closeout lock) hoặc record nằm sai zone. MRR: log HOLD + danh sách thiếu + người chịu trách nhiệm.</div>
 </div>
 <div class="req"><span class="req-tag shall">BLOCK</span>
-<div><b>Chặn chia sẻ external</b> khi file chưa được phân loại (Public/Internal/Customer-Confidential/Restricted) hoặc file thuộc <b>Restricted</b>. MRR: ticket/FRM-QMS-15 + quyết định phê duyệt/không phê duyệt.</div>
+<div><b>Chặn chia sẻ external</b> khi file chưa được phân loại (Public/Internal/Customer-Confidential/Restricted) hoặc file thuộc <b>Restricted</b>. MRR: ticket/FRM-QMS-15 + quyết định approval/không approval.</div>
 </div>
 <div class="req"><span class="req-tag shall">STOP</span>
-<div><b>Dừng sử dụng hồ sơ</b> khi phát hiện dấu hiệu chỉnh sửa âm thầm hồ sơ (đổi nội dung thay vì đính chính). MRR: xuất DCR hồ sơ/đánh giá nhật ký + mở NCR/CAPA.</div>
+<div><b>Dừng sử dụng record</b> khi phát hiện dấu hiệu chỉnh sửa âm thầm record (đổi nội dung thay vì đính chính). MRR: xuất DCR record/đánh giá log + mở NCR/CAPA.</div>
 </div>
 </div>
 <!-- 7) 60-second reaction -->
-<h2 class="h2" id="s7">7) Phản ứng 60 giây (sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua cổng chặn/rủi ro giao hàng…)</h2>
+<h2 class="h2" id="s7">7) Phản ứng 60 giây (sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua cổng chặn/rủi ro delivery…)</h2>
 <div class="card">
 <h3 class="h3" style="margin-top:0">Chuỗi phản ứng 60 giây (bắt buộc thuộc lòng)</h3>
 <ol class="iso-list">
-<li><b>Khoanh vùng ngay</b>: dừng thao tác đang tạo rủi ro (STOP/HOLD/BLOCK theo mục 6).</li>
-<li><b>Chụp bằng chứng tức thì</b>: ảnh màn hình đường dẫn file, REV/WO/Lot, quyền chia sẻ, DCR hồ sơ.</li>
-<li><b>Freeze trạng thái</b>: không sửa file; tạo bản sao “Evidence_YYYYMMDD_HHMM” trong khu vực gói minh chứng nội bộ (chỉ đọc) để điều tra. <span class="muted">CNC-IMS-HUB → QMS-SSOT → Bằng chứng-Pack.</span></li>
+<li><b>Khoanh vùng ngay</b>: dừng operation đang tạo rủi ro (STOP/HOLD/BLOCK theo mục 6).</li>
+<li><b>Chụp evidence tức thì</b>: ảnh màn hình đường dẫn file, REV/WO/Lot, quyền chia sẻ, DCR record.</li>
+<li><b>Freeze trạng thái</b>: không sửa file; tạo bản sao “Evidence_YYYYMMDD_HHMM” trong khu vực gói minh chứng nội bộ (chỉ đọc) để điều tra. <span class="muted">CNC-IMS-HUB → QMS-SSOT → Evidence-Pack.</span></li>
 <li><b>Báo đúng tuyến</b> trong ≤ 60 giây: Supervisor + QA/QMS + IT (khi liên quan quyền/chia sẻ) + Engineering (khi liên quan program/rev).</li>
-<li><b>Ghi nhật ký sự cố</b>: mở NCR hoặc risk nhật ký theo quy định QMS, gắn WO/Lot và đính kèm ảnh chứng cứ.</li>
+<li><b>Ghi log incident</b>: mở NCR hoặc risk log theo quy định QMS, gắn WO/Lot và đính kèm ảnh chứng cứ.</li>
 </ol>
 <div class="callout warn">
-<b>Nguyên tắc:</b> xử lý trước – phân tích sau. Không tranh luận tại hiện trường. Không “sửa cho xong” trước khi lưu bằng chứng.
+<b>Nguyên tắc:</b> xử lý trước – phân tích sau. Không tranh luận tại hiện trường. Không “sửa cho xong” trước khi lưu evidence.
  </div>
 </div>
-<!-- 8) Checklist vận hành -->
-<h2 class="h2" id="s8">8) Bảng kiểm vận hành (≤15 bước) — Responsible Person, Bằng chứng/MRR, “điểm sai phổ biến”</h2>
+<!-- 8) Checklist operation -->
+<h2 class="h2" id="s8">8) Checklist operation (≤15 bước) — Responsible Person, Evidence/MRR, “điểm sai phổ biến”</h2>
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
 <th style="width:46px">#</th>
-<th>Bước thao tác bắt buộc</th>
+<th>Bước operation bắt buộc</th>
 <th style="width:160px">Responsible Person</th>
-<th style="width:260px">Bằng chứng/MRR</th>
+<th style="width:260px">Evidence/MRR</th>
 <th>Điểm sai phổ biến (phải tránh)</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Xác định file thuộc zone nào: Released / WIP / Hồ sơ.</td><td>Người tạo file</td><td>Tag/nhãn zone trong metadata hoặc folder chuẩn</td><td>Trộn WIP và Hồ sơ trong 1 folder</td></tr>
+<tr><td>1</td><td>Xác định file thuộc zone nào: Released / WIP / Record.</td><td>Người tạo file</td><td>Tag/nhãn zone trong metadata hoặc folder chuẩn</td><td>Trộn WIP và Record trong 1 folder</td></tr>
 <tr><td>2</td><td>Gán mức phân loại: Public / Internal / Customer-Confidential / Restricted.</td><td>Người tạo file</td><td>Nhãn phân loại trên file/library</td><td>Để trống phân loại; gán sai “Internal” cho dữ liệu khách</td></tr>
-<tr><td>3</td><td>Lưu file vào đúng nơi theo SOP: QMS-Controlled-Documents / QMS-Hồ sơ / OPS-Job-Dossiers.</td><td>Người tạo file</td><td>Đường dẫn đúng site/library/folder</td><td>Lưu OneDrive cá nhân/máy local làm bản chính</td></tr>
+<tr><td>3</td><td>Lưu file vào đúng nơi theo SOP: QMS-Controlled-Documents / QMS-Record / OPS-Job-Dossiers.</td><td>Người tạo file</td><td>Đường dẫn đúng site/library/folder</td><td>Lưu OneDrive cá nhân/máy local làm bản chính</td></tr>
 <tr><td>4</td><td>Đặt tên file có đủ: Customer, Part No, Revision, WO/Lot, DocType, ngày.</td><td>Người tạo file</td><td>Tên file theo chuẩn</td><td>Dùng “final_v3”; thiếu REV/WO</td></tr>
-<tr><td>5</td><td>Đối với drawing/spec: chỉ lưu “Customer Đầu vào” trong Job dossier; mọi release copy nội bộ chỉ link.</td><td>Engineering</td><td>Link “source of truth” + hồ sơ nhận file</td><td>Sao chép bản vẽ sang folder riêng để tiện</td></tr>
-<tr><td>6</td><td>Đối với CNC program/CAM/post: lưu trong Programs (Restricted) và phát hành bản chạy.</td><td>Programmer</td><td>Release note + đường dẫn program</td><td>Copy program qua USB giữa máy; chỉnh tại máy</td></tr>
-<tr><td>7</td><td>Đối với kiểm tra hồ sơ: phát hành vào Hồ sơ; khóa không sửa; đính chính bằng file mới có lý do.</td><td>QC/QA</td><td>DCR hồ sơ/retention + nhật ký đính chính</td><td>Overwrite file để “đẹp số”</td></tr>
-<tr><td>8</td><td>Đối với supplier cert/CoC: lưu QMS-Hồ sơ/Suppliers và gắn link vào Job dossier/Material.</td><td>Purchasing/Warehouse</td><td>Link cert + dấu nhận hàng</td><td>Để cert trong email/scan rời không truy xuất</td></tr>
+<tr><td>5</td><td>Đối với drawing/spec: chỉ lưu “Customer Input” trong Job dossier; mọi release copy nội bộ chỉ link.</td><td>Engineering</td><td>Link “source of truth” + record nhận file</td><td>Sao chép bản vẽ sang folder riêng để tiện</td></tr>
+<tr><td>6</td><td>Đối với CNC program/CAM/post: lưu trong Programs (Restricted) và release bản chạy.</td><td>Programmer</td><td>Release note + đường dẫn program</td><td>Copy program qua USB giữa máy; chỉnh tại máy</td></tr>
+<tr><td>7</td><td>Đối với inspection record: release vào Record; khóa không sửa; đính chính bằng file mới có lý do.</td><td>QC/QA</td><td>DCR record/retention + log đính chính</td><td>Overwrite file để “đẹp số”</td></tr>
+<tr><td>8</td><td>Đối với supplier cert/CoC: lưu QMS-Record/Suppliers và gắn link vào Job dossier/Material.</td><td>Purchasing/Warehouse</td><td>Link cert + dấu nhận hàng</td><td>Để cert trong email/scan rời không traceability</td></tr>
 <tr><td>9</td><td>Không bẻ quyền theo file; mọi thay đổi quyền qua FRM-QMS-15 và nhóm quyền.</td><td>IT + chủ dữ liệu</td><td>FRM-QMS-15 + nhóm quyền</td><td>Chia sẻ trực tiếp cho cá nhân, không thời hạn</td></tr>
-<tr><td>10</td><td>Chia sẻ external chỉ qua gói minh chứng chỉ đọc có expiry; PHẢI chặn share Restricted.</td><td>QA + Estimator (SAL-03)</td><td>Link expiry + nhật ký share</td><td>Share cả thư viện hoặc folder WO</td></tr>
-<tr><td>11</td><td>Khi closeout WO/Lot: freeze WIP thành Hồ sơ và khóa chỉ đọc/retention.</td><td>QA + Supervisor</td><td>Closeout bảng kiểm ký + trạng thái đã khóa</td><td>Tiếp tục sửa hồ sơ sau giao hàng</td></tr>
-<tr><td>12</td><td>Thực hiện spot-check định kỳ: 01 WO/Lot/tuần theo lịch QMS.</td><td>QA/QMS</td><td>Biên bản spot-check + hành động</td><td>Kiểm tra “cho có” không có bằng chứng</td></tr>
-<tr><td>13</td><td>Thực hiện rà soát quyền truy cập hàng quý + thu hồi quyền trong ≤ 24h khi kết thúc đánh giá/dự án.</td><td>IT + QA/QMS</td><td>FRM-QMS-17 + danh sách thu hồi</td><td>Guest access tồn tại vô hạn</td></tr>
-<tr><td>14</td><td>Kích hoạt phản ứng 60 giây khi phát hiện sai Rev/rò rỉ/chỉnh sửa hồ sơ.</td><td>Tất cả</td><td>Ảnh chứng cứ + nhật ký NCR/risk</td><td>Sửa trước rồi mới báo</td></tr>
-<tr><td>15</td><td>Đóng bài học: cập nhật training hồ sơ và gắn MRR vào hồ sơ đào tạo.</td><td>QA/QMS</td><td>Training hồ sơ + rubric ký</td><td>Chỉ có điểm trắc nghiệm, không có performance bằng chứng</td></tr>
+<tr><td>10</td><td>Chia sẻ external chỉ qua gói minh chứng chỉ đọc có expiry; PHẢI chặn share Restricted.</td><td>QA + Estimator (SAL-03)</td><td>Link expiry + log share</td><td>Share cả thư viện hoặc folder WO</td></tr>
+<tr><td>11</td><td>Khi closeout WO/Lot: freeze WIP thành Record và khóa chỉ đọc/retention.</td><td>QA + Supervisor</td><td>Closeout checklist ký + trạng thái đã khóa</td><td>Tiếp tục sửa record sau delivery</td></tr>
+<tr><td>12</td><td>Thực hiện spot-check định kỳ: 01 WO/Lot/tuần theo lịch QMS.</td><td>QA/QMS</td><td>Biên bản spot-check + hành động</td><td>Inspection “cho có” không có evidence</td></tr>
+<tr><td>13</td><td>Thực hiện review quyền truy cập hàng quý + recall quyền trong ≤ 24h khi kết thúc đánh giá/dự án.</td><td>IT + QA/QMS</td><td>FRM-QMS-17 + danh sách recall</td><td>Guest access tồn tại vô hạn</td></tr>
+<tr><td>14</td><td>Kích hoạt phản ứng 60 giây khi phát hiện sai Rev/rò rỉ/chỉnh sửa record.</td><td>Tất cả</td><td>Ảnh chứng cứ + log NCR/risk</td><td>Sửa trước rồi mới báo</td></tr>
+<tr><td>15</td><td>Đóng bài học: cập nhật training record và gắn MRR vào record training.</td><td>QA/QMS</td><td>Training record + rubric ký</td><td>Chỉ có điểm trắc nghiệm, không có performance evidence</td></tr>
 </tbody>
 </table>
 </div>
 <!-- 9) OJT theo TWI -->
-<h2 class="h2" id="s9">9) OJT thực chiến theo TWI (Job Breakdown + OJT đầu ra + Rubric L1–L4)</h2>
+<h2 class="h2" id="s9">9) OJT thực chiến theo TWI (Job Breakdown + OJT output + Rubric L1–L4)</h2>
 <div class="card">
-<h3 class="h3" style="margin-top:0">OJT Đầu ra bắt buộc (Đầu ra yêu cầu)</h3>
+<h3 class="h3" style="margin-top:0">OJT Output bắt buộc (Output requirement)</h3>
 <ul class="iso-list">
-<li><b>01 WO/Lot Document Set hoàn chỉnh</b> (cấu trúc folder chuẩn) gồm tối thiểu: Customer Đầu vào, Router/Setup, Programs (Restricted link), IPQC, Kiểm tra, Material/CoC, Shipping, Closeout Lock.</li>
-<li><b>01 Access DCR hồ sơ</b> hoàn chỉnh (khi có cấp quyền/chia sẻ) theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#DCR record">FRM-QMS-15</a>.</li>
+<li><b>01 WO/Lot Document Set hoàn chỉnh</b> (cấu trúc folder chuẩn) gồm tối thiểu: Customer Input, Router/Setup, Programs (Restricted link), IPQC, Inspection, Material/CoC, Shipping, Closeout Lock.</li>
+<li><b>01 Access DCR record</b> hoàn chỉnh (khi có cấp quyền/chia sẻ) theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#DCR record">FRM-QMS-15</a>.</li>
 <li><b>01 Gói minh chứng</b> chỉ đọc có expiry (mô phỏng đánh giá/customer) + ảnh chụp cấu hình expiry + danh sách người được cấp quyền.</li>
 </ul>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div>OJT kết thúc khi đủ 3 đầu ra trên và QA/QMS ký xác nhận. Không đủ đầu ra thì KHÔNG ĐẠT.</div>
+<div>OJT kết thúc khi đủ 3 output trên và QA/QMS ký xác nhận. Không đủ output thì KHÔNG ĐẠT.</div>
 </div>
 </div>
 <div class="card">
 <h3 class="h3" style="margin-top:0">Job Breakdown (TWI Hướng dẫn công việc)</h3>
-<p class="muted">Mục tiêu: thao tác đúng <b>zone</b> + đúng <b>classification</b> + đúng <b>nơi lưu</b> + đúng <b>tên file</b> + đúng <b>quyền</b> + đúng <b>khóa closeout</b>.</p>
+<p class="muted">Mục tiêu: operation đúng <b>zone</b> + đúng <b>classification</b> + đúng <b>nơi lưu</b> + đúng <b>tên file</b> + đúng <b>quyền</b> + đúng <b>khóa closeout</b>.</p>
 <div class="table-card">
 <table class="table">
 <thead>
@@ -417,7 +417,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>1. Nhận diện zone</b></td>
-<td>Gắn đúng Released/WIP/Hồ sơ trước khi lưu.</td>
+<td>Gắn đúng Released/WIP/Record trước khi lưu.</td>
 <td>Chặn “đúng nội dung nhưng sai trạng thái kiểm soát”.</td>
 </tr>
 <tr>
@@ -427,8 +427,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>3. Lưu đúng kho</b></td>
-<td>Released vào QMS-Controlled-Documents; Hồ sơ vào QMS-Hồ sơ; WIP theo WO/Lot vào OPS-Job-Dossiers.</td>
-<td>Single source of truth + đánh giá truy xuất nhanh.</td>
+<td>Released vào QMS-Controlled-Documents; Record vào QMS-Record; WIP theo WO/Lot vào OPS-Job-Dossiers.</td>
+<td>Single source of truth + đánh giá traceability nhanh.</td>
 </tr>
 <tr>
 <td><b>4. Đặt tên chuẩn</b></td>
@@ -437,23 +437,23 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>5. Program cổng chặn</b></td>
-<td>Programs nằm trong thư viện Restricted; phát hành bản chạy; PROD chỉ dùng release copy.</td>
+<td>Programs nằm trong thư viện Restricted; release bản chạy; PROD chỉ dùng release copy.</td>
 <td>Chặn chạy nhầm program, chặn chỉnh tại máy.</td>
 </tr>
 <tr>
-<td><b>6. Hồ sơ integrity</b></td>
-<td>Hồ sơ không sửa; đính chính bằng file mới có lý do; giữ lịch sử.</td>
+<td><b>6. Record integrity</b></td>
+<td>Record không sửa; đính chính bằng file mới có lý do; giữ lịch sử.</td>
 <td>Non-repudiation, chặn gian lận/che lỗi.</td>
 </tr>
 <tr>
 <td><b>7. Share external đúng cổng chặn</b></td>
-<td>Chỉ share gói minh chứng chỉ đọc có expiry; ghi nhật ký FRM-QMS-15; PHẢI chặn share Restricted.</td>
-<td>Thu hồi được, đáp ứng NDA và đánh giá.</td>
+<td>Chỉ share gói minh chứng chỉ đọc có expiry; ghi log FRM-QMS-15; PHẢI chặn share Restricted.</td>
+<td>Recall được, đáp ứng NDA và đánh giá.</td>
 </tr>
 <tr>
 <td><b>8. Closeout lock</b></td>
-<td>Khi đóng WO/Lot: freeze WIP → Hồ sơ + khóa chỉ đọc/retention.</td>
-<td>Hồ sơ toàn vẹn sau giao hàng, chống tranh chấp.</td>
+<td>Khi đóng WO/Lot: freeze WIP → Record + khóa chỉ đọc/retention.</td>
+<td>Record toàn vẹn sau delivery, chống tranh chấp.</td>
 </tr>
 </tbody>
 </table>
@@ -475,33 +475,33 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>L1</b></td>
 <td>Lưu đúng folder theo hướng dẫn; đặt tên đúng; không tạo bản chính ở local. Thực hiện phản ứng 60 giây khi phát hiện sai.</td>
-<td>Trắc nghiệm ≥ 80% + hoàn thành 01 OJT đầu ra có giám sát.</td>
+<td>Trắc nghiệm ≥ 80% + hoàn thành 01 OJT output có giám sát.</td>
 <td>Được Contribute trong Job dossier theo vai trò; không được share external.</td>
 </tr>
 <tr>
 <td><b>L2</b></td>
-<td>Thực hiện độc lập: gán classification đúng; tạo hồ sơ không bị overwrite; gắn link đúng giữa QMS-Hồ sơ và Job dossier.</td>
-<td>2 WO/Lot liên tiếp không lỗi lưu trữ + bài kiểm tra thực hành ĐẠT.</td>
-<td>Được tạo hồ sơ theo phạm vi; được khởi tạo yêu cầu cấp quyền qua FRM-QMS-15.</td>
+<td>Thực hiện độc lập: gán classification đúng; tạo record không bị overwrite; gắn link đúng giữa QMS-Record và Job dossier.</td>
+<td>2 WO/Lot liên tiếp không lỗi lưu trữ + bài inspection thực hành ĐẠT.</td>
+<td>Được tạo record theo phạm vi; được khởi tạo requirement cấp quyền qua FRM-QMS-15.</td>
 </tr>
 <tr>
 <td><b>L3</b></td>
-<td>Phát hiện và chặn lỗi của người khác tại hiện trường; thực hiện spot-check; mở NCR/CAPA khi phát hiện chỉnh sửa hồ sơ.</td>
+<td>Phát hiện và chặn lỗi của người khác tại hiện trường; thực hiện spot-check; mở NCR/CAPA khi phát hiện chỉnh sửa record.</td>
 <td>Thực hiện 02 spot-check có biên bản + xử lý 01 tình huống HOLD/STOP đúng chuẩn.</td>
-<td>Được làm “buddy trainer”; được phê duyệt nội bộ cấp quyền trong phạm vi chủ dữ liệu uỷ quyền.</td>
+<td>Được làm “buddy trainer”; được approval nội bộ cấp quyền trong phạm vi chủ dữ liệu uỷ quyền.</td>
 </tr>
 <tr>
 <td><b>L4</b></td>
-<td>Thiết kế/chuẩn hóa cấu trúc dữ liệu; xử lý sự cố rò rỉ; điều phối access review; cung cấp gói minh chứng đánh giá theo scope.</td>
-<td>Chủ trì 01 rà soát quyền truy cập hàng quý + 01 incident diễn tập + đánh giá pass không finding trọng yếu.</td>
-<td>Được làm Data Steward/Process Owner; được yêu cầu IT thay đổi cấu hình baseline (có phê duyệt).</td>
+<td>Thiết kế/chuẩn hóa cấu trúc dữ liệu; xử lý incident rò rỉ; điều phối access review; cung cấp gói minh chứng đánh giá theo scope.</td>
+<td>Chủ trì 01 review quyền truy cập hàng quý + 01 incident diễn tập + đánh giá pass không finding trọng yếu.</td>
+<td>Được làm Data Steward/Process Owner; được requirement IT thay đổi cấu hình baseline (có approval).</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <!-- 10) Đánh giá -->
-<h2 class="h2" id="s10">10) Đánh giá: Trắc nghiệm (≥20) + Tình huống (≥3) + Bài kiểm tra thực hành (bắt buộc)</h2>
+<h2 class="h2" id="s10">10) Đánh giá: Trắc nghiệm (≥20) + Tình huống (≥3) + Bài inspection thực hành (bắt buộc)</h2>
 <div class="card" id="trắc nghiệm">
 <h3 class="h3" style="margin-top:0">10.1 Trắc nghiệm (25 câu) — trắc nghiệm + tình huống ngắn</h3>
 <ol class="iso-list">
@@ -509,74 +509,74 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Kho “nguồn sự thật duy nhất” cho Released/Controlled Docs là kho nào?</li>
 <li>Mức phân loại nào áp dụng cho CNC programs/post/pricing/margin theo SOP-QMS-011?</li>
 <li>Khi file thuộc Customer-Confidential, hành vi chia sẻ external bắt buộc đi qua cơ chế nào?</li>
-<li>Quy tắc bắt buộc số 1 liên quan lưu trữ hồ sơ là gì?</li>
-<li>Ý nghĩa vận hành của “freeze WIP thành Hồ sơ khi closeout” là gì?</li>
-<li>Khi phát hiện program không truy xuất được đường dẫn thư viện Restricted, hành động chặn lỗi tức thì là gì?</li>
+<li>Quy tắc bắt buộc số 1 liên quan lưu trữ record là gì?</li>
+<li>Ý nghĩa operation của “freeze WIP thành Record khi closeout” là gì?</li>
+<li>Khi phát hiện program không traceability được đường dẫn thư viện Restricted, hành động chặn lỗi tức thì là gì?</li>
 <li>Least privilege được thực thi bằng cách cấp quyền qua gì?</li>
-<li>FRM nào dùng để ghi nhật ký cấp quyền/chia sẻ ngoài?</li>
-<li>FRM nào là bằng chứng access review hàng quý?</li>
-<li>Vì sao “đính chính hồ sơ bằng file mới có lý do” bắt buộc?</li>
-<li>4 key tối thiểu gắn với hồ sơ theo SOP-QMS-011 là gì?</li>
+<li>FRM nào dùng để ghi log cấp quyền/chia sẻ ngoài?</li>
+<li>FRM nào là evidence access review hàng quý?</li>
+<li>Vì sao “đính chính record bằng file mới có lý do” bắt buộc?</li>
+<li>4 key tối thiểu gắn với record theo SOP-QMS-011 là gì?</li>
 <li>DocType chuẩn dùng trong tên file job gồm những loại nào? Nêu tối thiểu 5 loại.</li>
 <li>Khi nhận CoC vật liệu, file phải lưu ở đâu và gắn vào đâu?</li>
 <li>Khi cần share cho auditor, đối tượng share là thư viện WO/Lot hay gói minh chứng? Vì sao?</li>
 <li>Khi thấy người khác bẻ quyền theo file “cho tiện”, hành động bắt buộc là gì?</li>
 <li>Rủi ro “đúng nội dung nhưng sai trạng thái kiểm soát” xuất hiện khi nào?</li>
 <li>Retention policy không được “né” bằng cách tạo folder nào?</li>
-<li>Khi WO/Lot đã giao hàng, sửa file kiểm tra hồ sơ có được phép không? Mô tả cách xử lý đúng.</li>
+<li>Khi WO/Lot đã delivery, sửa file inspection record có được phép không? Mô tả cách xử lý đúng.</li>
 <li>Trong Job dossier, Programs folder được kiểm soát theo nguyên tắc quyền nào giữa ENG và PROD?</li>
 <li>Khi phát hiện nghi ngờ rò rỉ dữ liệu, 2 hành động đầu tiên trong 60 giây là gì?</li>
-<li>Chỉ số vận hành “truy xuất hồ sơ ≤ 3 phút” đo bằng cách nào trong thực tế?</li>
+<li>Chỉ số operation “traceability record ≤ 3 phút” đo bằng cách nào trong thực tế?</li>
 <li>Khi file chưa được gán classification, hành động share link là GO hay BLOCK?</li>
 <li>Những nhóm quyền baseline trong SOP-QMS-011 gồm nhóm nào? Nêu tối thiểu 3 nhóm.</li>
-<li>“No bằng chứng = No cổng chặn” áp dụng vào quyết định nào trong chuỗi E2E?</li>
+<li>“No evidence = No cổng chặn” áp dụng vào quyết định nào trong chuỗi E2E?</li>
 </ol>
 <div class="note">
 <b>Chấm điểm:</b> đúng ≥ 80% mới qua phần trắc nghiệm. Dưới ngưỡng là KHÔNG ĐẠT và học lại ngay trong ca tiếp theo.
  </div>
 </div>
 <div class="card">
-<h3 class="h3" style="margin-top:0">10.2 Tình huống (3 tình huống thật) — yêu cầu quyết định HOLD/GO và ghi MRR</h3>
+<h3 class="h3" style="margin-top:0">10.2 Tình huống (3 tình huống thật) — requirement quyết định HOLD/GO và ghi MRR</h3>
 <details>
 <summary>Tình huống 1 — Sai Rev (Engineering → Production)</summary>
 <p><b>Dữ kiện:</b> Operator đang chuẩn bị chạy WO-31245, Part PN-8821. Trong Job dossier có 2 file drawing: <code>WO31245_PN8821_RevA_DRAW_20260112.pdf</code> và <code>WO31245_PN8821_RevB_DRAW_20260201.pdf</code>. Setup sheet đang tham chiếu RevA. Programmer báo đã release program theo RevB.</p>
-<p><b>Yêu cầu:</b> Ra quyết định <b>STOP/HOLD/GO</b>. Ghi tối thiểu 3 MRR phải tạo ngay.</p>
+<p><b>Requirement:</b> Ra quyết định <b>STOP/HOLD/GO</b>. Ghi tối thiểu 3 MRR phải tạo ngay.</p>
 <ul class="iso-list">
 <li>Quyết định bắt buộc: <b>STOP</b> cho tới khi setup sheet và drawing thống nhất Rev.</li>
-<li>MRR: ảnh đường dẫn file + nhật ký dừng + cập nhật setup sheet bản mới có lý do + xác nhận release program.</li>
+<li>MRR: ảnh đường dẫn file + log dừng + cập nhật setup sheet bản mới có lý do + xác nhận release program.</li>
 </ul>
 </details>
 <details>
 <summary>Tình huống 2 — Chia sẻ external sai cổng chặn (QA → Auditor)</summary>
-<p><b>Dữ kiện:</b> Auditor yêu cầu xem 01 job dossier mẫu và 01 báo cáo FQC. Supervisor yêu cầu QA gửi link ngay trong 10 phút. QA thấy share nhanh bằng cách share cả folder WO/Lot.</p>
-<p><b>Yêu cầu:</b> Ra quyết định <b>BLOCK/GO</b>. Nêu cấu hình share bắt buộc (chỉ đọc/expiry/nhật ký). Ghi MRR.</p>
+<p><b>Dữ kiện:</b> Auditor requirement xem 01 job dossier mẫu và 01 báo cáo FQC. Supervisor requirement QA gửi link ngay trong 10 phút. QA thấy share nhanh bằng cách share cả folder WO/Lot.</p>
+<p><b>Requirement:</b> Ra quyết định <b>BLOCK/GO</b>. Nêu cấu hình share bắt buộc (chỉ đọc/expiry/log). Ghi MRR.</p>
 <ul class="iso-list">
 <li>Quyết định bắt buộc: <b>BLOCK</b> share folder WO/Lot; chỉ share <b>Gói minh chứng</b> chỉ đọc có expiry.</li>
-<li>MRR: link gói minh chứng + ảnh expiry + FRM-QMS-15 + danh sách người được cấp quyền + thời điểm thu hồi.</li>
+<li>MRR: link gói minh chứng + ảnh expiry + FRM-QMS-15 + danh sách người được cấp quyền + thời điểm recall.</li>
 </ul>
 </details>
 <details>
 <summary>Tình huống 3 — Thiếu CoC vật liệu (Receiving → Ship)</summary>
-<p><b>Dữ kiện:</b> Lô đã hoàn tất, chuẩn bị ship. Trong Job dossier/Material có phiếu nhập kho và traceability, thiếu CoC vật liệu. Purchasing xác nhận CoC nằm trong email, chưa upload vào QMS-Hồ sơ.</p>
-<p><b>Yêu cầu:</b> Ra quyết định <b>HOLD/GO</b>. Nêu 5 bước xử lý trong ca hiện tại và MRR tương ứng.</p>
+<p><b>Dữ kiện:</b> Lô đã hoàn tất, chuẩn bị ship. Trong Job dossier/Material có phiếu nhập kho và traceability, thiếu CoC vật liệu. Purchasing xác nhận CoC nằm trong email, chưa upload vào QMS-Record.</p>
+<p><b>Requirement:</b> Ra quyết định <b>HOLD/GO</b>. Nêu 5 bước xử lý trong ca hiện tại và MRR tương ứng.</p>
 <ul class="iso-list">
 <li>Quyết định bắt buộc: <b>HOLD shipment</b> cho tới khi CoC được lưu đúng zone + link đúng WO/Lot.</li>
-<li>MRR: CoC upload QMS-Hồ sơ/Suppliers + link vào Job dossier/Material + cập nhật Shipping Checklist + nhật ký HOLD/Release.</li>
+<li>MRR: CoC upload QMS-Record/Suppliers + link vào Job dossier/Material + cập nhật Shipping Checklist + log HOLD/Release.</li>
 </ul>
 </details>
 </div>
 <div class="card">
-<h3 class="h3" style="margin-top:0">10.3 Bài kiểm tra thực hành (bắt buộc) — bài test + rubric + ĐẠT/KHÔNG ĐẠT</h3>
+<h3 class="h3" style="margin-top:0">10.3 Bài inspection thực hành (bắt buộc) — bài test + rubric + ĐẠT/KHÔNG ĐẠT</h3>
 <div class="callout">
-<b>Mô tả bài test:</b> Người học thực hiện trên 01 WO/Lot mô phỏng: nhận 6 file (drawing/spec, router, setup sheet, CAM file, CNC program, FQC report) và 1 yêu cầu share cho “khách hàng” phạm vi 2 file. Người học phải lưu đúng zone, gán classification, đặt tên đúng, tạo gói minh chứng share chỉ đọc có expiry, ghi nhật ký FRM-QMS-15, và thực hiện closeout lock.
+<b>Mô tả bài test:</b> Người học thực hiện trên 01 WO/Lot mô phỏng: nhận 6 file (drawing/spec, router, setup sheet, CAM file, CNC program, FQC report) và 1 requirement share cho “customer” phạm vi 2 file. Người học phải lưu đúng zone, gán classification, đặt tên đúng, tạo gói minh chứng share chỉ đọc có expiry, ghi log FRM-QMS-15, và thực hiện closeout lock.
  </div>
 <table class="table">
 <thead><tr><th style="width:280px">Hạng mục chấm</th><th>Tiêu chí ĐẠT</th><th style="width:220px">Lỗi KHÔNG ĐẠT ngay</th></tr></thead>
 <tbody>
 <tr>
 <td><b>Zone &amp; Location</b></td>
-<td>6/6 file vào đúng kho (Released/WIP/Hồ sơ) theo SOP; đường dẫn truy xuất được.</td>
-<td>Lưu file vào OneDrive cá nhân/máy local làm bản chính; trộn Hồ sơ với WIP.</td>
+<td>6/6 file vào đúng kho (Released/WIP/Record) theo SOP; đường dẫn traceability được.</td>
+<td>Lưu file vào OneDrive cá nhân/máy local làm bản chính; trộn Record với WIP.</td>
 </tr>
 <tr>
 <td><b>Classification</b></td>
@@ -590,57 +590,57 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>External sharing cổng chặn</b></td>
-<td>Chỉ share gói minh chứng; chỉ đọc; expiry; có nhật ký FRM-QMS-15.</td>
-<td>Share cả WO/Lot folder; share không expiry; không có nhật ký.</td>
+<td>Chỉ share gói minh chứng; chỉ đọc; expiry; có log FRM-QMS-15.</td>
+<td>Share cả WO/Lot folder; share không expiry; không có log.</td>
 </tr>
 <tr>
 <td><b>Closeout lock</b></td>
-<td>Freeze WIP → Hồ sơ và khóa; lưu closeout bảng kiểm.</td>
+<td>Freeze WIP → Record và khóa; lưu closeout checklist.</td>
 <td>Không khóa; sửa file sau closeout.</td>
 </tr>
 </tbody>
 </table>
 </div>
 <!-- 11) ĐẠT/KHÔNG ĐẠT -->
-<h2 class="h2" id="s11">11) ĐẠT/KHÔNG ĐẠT criteria (rõ ràng; “No bằng chứng = No cổng chặn”)</h2>
+<h2 class="h2" id="s11">11) ĐẠT/KHÔNG ĐẠT criteria (rõ ràng; “No evidence = No cổng chặn”)</h2>
 <div class="card">
 <ul class="iso-list">
 <li><b>ĐẠT</b> khi đồng thời đạt:
  <ul class="iso-list">
 <li>Trắc nghiệm ≥ <b>80%</b>.</li>
 <li>Tình huống: 3/3 quyết định đúng (STOP/HOLD/BLOCK/GO) và ghi đủ MRR.</li>
-<li>Bài kiểm tra thực hành: đạt ĐẠT cho tất cả hạng mục; không có lỗi KHÔNG ĐẠT ngay.</li>
-<li>OJT đầu ra đủ 3 đầu ra yêu cầu (WO/Lot Document Set + FRM-QMS-15 + Gói minh chứng) có chữ ký QA/QMS.</li>
+<li>Bài inspection thực hành: đạt ĐẠT cho tất cả hạng mục; không có lỗi KHÔNG ĐẠT ngay.</li>
+<li>OJT output đủ 3 output requirement (WO/Lot Document Set + FRM-QMS-15 + Gói minh chứng) có chữ ký QA/QMS.</li>
 </ul>
 </li>
 <li><b>KHÔNG ĐẠT</b> khi xảy ra 1 trong các lỗi:
  <ul class="iso-list">
 <li>Share external dữ liệu <b>Restricted</b> hoặc share không expiry.</li>
-<li>Không truy xuất được “source of truth” program từ thư viện Restricted.</li>
-<li>Chỉnh sửa/overwrite hồ sơ thay vì đính chính có lý do.</li>
-<li>Thiếu MRR cho quyết định cổng chặn (No bằng chứng = No cổng chặn).</li>
+<li>Không traceability được “source of truth” program từ thư viện Restricted.</li>
+<li>Chỉnh sửa/overwrite record thay vì đính chính có lý do.</li>
+<li>Thiếu MRR cho quyết định cổng chặn (No evidence = No cổng chặn).</li>
 </ul>
 </li>
 </ul>
 </div>
 <!-- 12) MRR -->
-<h2 class="h2" id="s12">12) MRR tối thiểu: hồ sơ phải tạo/đính kèm + quy tắc đặt tên + nơi lưu</h2>
+<h2 class="h2" id="s12">12) MRR tối thiểu: record phải tạo/đính kèm + quy tắc đặt tên + nơi lưu</h2>
 <div class="card">
 <h3 class="h3" style="margin-top:0">12.1 Danh sách MRR tối thiểu (bắt buộc)</h3>
 <table class="table">
 <thead><tr><th style="width:280px">MRR</th><th>Nội dung</th><th style="width:220px">Nơi lưu</th></tr></thead>
 <tbody>
 <tr><td><b>MRR-25-01</b></td><td>Ảnh chụp đường dẫn “source of truth” cho drawing/spec và program (Restricted).</td><td>Job dossier/Closeout_Lock</td></tr>
-<tr><td><b>MRR-25-02</b></td><td>Bảng kiểm vận hành mục 8 ký xác nhận (theo vai trò).</td><td>QMS-Hồ sơ/Training</td></tr>
-<tr><td><b>MRR-25-03</b></td><td>FRM-QMS-15 Access DCR hồ sơ (cấp quyền/chia sẻ).</td><td>QMS-Hồ sơ/IT_Evidence</td></tr>
+<tr><td><b>MRR-25-02</b></td><td>Checklist operation mục 8 ký xác nhận (theo vai trò).</td><td>QMS-Record/Training</td></tr>
+<tr><td><b>MRR-25-03</b></td><td>FRM-QMS-15 Access DCR record (cấp quyền/chia sẻ).</td><td>QMS-Record/IT_Evidence</td></tr>
 <tr><td><b>MRR-25-04</b></td><td>Gói minh chứng share chỉ đọc có expiry + danh sách người được cấp.</td><td>Z_Audit_Evidence_Pack</td></tr>
-<tr><td><b>MRR-25-05</b></td><td>Biên bản spot-check tuân thủ (mẫu WO/Lot).</td><td>QMS-Hồ sơ/Audits</td></tr>
-<tr><td><b>MRR-25-06</b></td><td>Closeout bảng kiểm + trạng thái lock/retention của WO/Lot.</td><td>Job dossier/Closeout_Lock</td></tr>
+<tr><td><b>MRR-25-05</b></td><td>Biên bản spot-check compliance (mẫu WO/Lot).</td><td>QMS-Record/Audits</td></tr>
+<tr><td><b>MRR-25-06</b></td><td>Closeout checklist + trạng thái lock/retention của WO/Lot.</td><td>Job dossier/Closeout_Lock</td></tr>
 </tbody>
 </table>
 <h3 class="h3">12.2 Quy tắc đặt tên (bắt buộc)</h3>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div>Tên file hồ sơ gắn WO/Lot có tối thiểu: <b>WO</b>, <b>Lot</b>, <b>Part No</b>, <b>Revision</b>, <b>DocType</b>, <b>YYYYMMDD</b>.</div>
+<div>Tên file record gắn WO/Lot có tối thiểu: <b>WO</b>, <b>Lot</b>, <b>Part No</b>, <b>Revision</b>, <b>DocType</b>, <b>YYYYMMDD</b>.</div>
 </div>
 <pre class="code">WO####_LOT##_PartNo_Rev##_DocType_YYYYMMDD.ext</pre>
 <h3 class="h3">12.3 Nơi lưu (SharePoint) — bắt buộc xác định rõ</h3>
@@ -648,9 +648,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th style="width:260px">Zone/Kho</th><th>Đường dẫn chuẩn</th><th style="width:240px">Ghi chú</th></tr></thead>
 <tbody>
 <tr><td><b>Released</b></td><td>M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents</td><td>Chỉ link từ nơi khác</td></tr>
-<tr><td><b>Hồ sơ</b></td><td>M365/SharePoint → CNC-IMS-HUB → QMS-Hồ sơ</td><td>Retention + hạn chế overwrite</td></tr>
-<tr><td><b>WIP → Hồ sơ</b></td><td>M365/SharePoint → CNC-IMS-HUB → OPS-Job-Dossiers</td><td>Document Set per WO/Lot</td></tr>
-<tr><td><b>Bộ bằng chứng</b></td><td>M365/SharePoint → CNC-IMS-HUB → Z_Audit_Evidence_Pack</td><td>Read-only; share có expiry</td></tr>
+<tr><td><b>Record</b></td><td>M365/SharePoint → CNC-IMS-HUB → QMS-Record</td><td>Retention + hạn chế overwrite</td></tr>
+<tr><td><b>WIP → Record</b></td><td>M365/SharePoint → CNC-IMS-HUB → OPS-Job-Dossiers</td><td>Document Set per WO/Lot</td></tr>
+<tr><td><b>Bộ evidence</b></td><td>M365/SharePoint → CNC-IMS-HUB → Z_Audit_Evidence_Pack</td><td>Read-only; share có expiry</td></tr>
 <tr><td><b>Training repository</b></td><td>M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training → academy → system-ops</td><td>Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint).</td></tr>
 </tbody>
 </table>
@@ -662,15 +662,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th style="width:46px">#</th><th>Finding phổ biến</th><th>Vì sao bị fail</th><th>Phòng ngừa bắt buộc</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Không chứng minh được “nguồn sự thật duy nhất” cho Released docs.</td><td>Auditor thấy nhiều bản SOP/WI rải rác.</td><td>Chỉ lưu Released trong QMS-Controlled-Documents; nơi khác chỉ link; spot-check hàng tháng.</td></tr>
-<tr><td>2</td><td>Job dossier thiếu cấu trúc chuẩn hoặc thiếu folder bắt buộc.</td><td>Không truy xuất đủ bằng chứng theo WO/Lot.</td><td>Template Document Set chuẩn + bảng kiểm closeout bắt buộc.</td></tr>
-<tr><td>3</td><td>Hồ sơ chỉnh sửa/overwrite, không có lịch sử đính chính.</td><td>Mất non-repudiation.</td><td>Đính chính bằng file mới có lý do; giữ bản cũ; retention.</td></tr>
-<tr><td>4</td><td>Cấp quyền theo cá nhân; không có nhật ký thay đổi quyền.</td><td>Không kiểm soát least privilege.</td><td>Chỉ cấp qua group; mọi thay đổi ghi FRM-QMS-15.</td></tr>
-<tr><td>5</td><td>Guest/external access không có expiry hoặc không thu hồi sau đánh giá.</td><td>Rủi ro rò rỉ kéo dài.</td><td>Bộ bằng chứng share có expiry; quarterly review + thu hồi ≤ 24h.</td></tr>
-<tr><td>6</td><td>Dữ liệu nhạy cảm (program/pricing) được chia sẻ hoặc lưu sai mức.</td><td>Vi phạm phân loại dữ liệu.</td><td>PHẢI chặn share Restricted; library Restricted giới hạn download; kiểm tra định kỳ.</td></tr>
+<tr><td>2</td><td>Job dossier thiếu cấu trúc chuẩn hoặc thiếu folder bắt buộc.</td><td>Không traceability đủ evidence theo WO/Lot.</td><td>Template Document Set chuẩn + checklist closeout bắt buộc.</td></tr>
+<tr><td>3</td><td>Record chỉnh sửa/overwrite, không có lịch sử đính chính.</td><td>Mất non-repudiation.</td><td>Đính chính bằng file mới có lý do; giữ bản cũ; retention.</td></tr>
+<tr><td>4</td><td>Cấp quyền theo cá nhân; không có log thay đổi quyền.</td><td>Không kiểm soát least privilege.</td><td>Chỉ cấp qua group; mọi thay đổi ghi FRM-QMS-15.</td></tr>
+<tr><td>5</td><td>Guest/external access không có expiry hoặc không recall sau đánh giá.</td><td>Rủi ro rò rỉ kéo dài.</td><td>Bộ evidence share có expiry; quarterly review + recall ≤ 24h.</td></tr>
+<tr><td>6</td><td>Dữ liệu nhạy cảm (program/pricing) được chia sẻ hoặc lưu sai mức.</td><td>Vi phạm phân loại dữ liệu.</td><td>PHẢI chặn share Restricted; library Restricted giới hạn download; inspection định kỳ.</td></tr>
 <tr><td>7</td><td>Thiếu CoC/certs/traceability liên kết WO/Lot.</td><td>Không chứng minh nguồn gốc vật liệu.</td><td>Cổng chặn Receiving → Production: không phát vật tư khi thiếu cert đúng nơi.</td></tr>
-<tr><td>8</td><td>Không chứng minh rà soát quyền truy cập hàng quý (không có gói minh chứng).</td><td>đánh giá không đạt governance.</td><td>FRM-QMS-17 bắt buộc hàng quý; lưu trong QMS-Hồ sơ/IT_Evidence.</td></tr>
-<tr><td>9</td><td>Chia sẻ external ngoài gói minh chứng (share cả folder/job dossier).</td><td>Phạm vi lộ dữ liệu vượt scope.</td><td>Fail-fast BLOCK; đào tạo lại bắt buộc; nhật ký incident.</td></tr>
-<tr><td>10</td><td>Không đóng băng (freeze) WIP thành hồ sơ khi closeout.</td><td>Hồ sơ thay đổi sau giao hàng.</td><td>Closeout lock bắt buộc; Supervisor ký; QA kiểm tra.</td></tr>
+<tr><td>8</td><td>Không chứng minh review quyền truy cập hàng quý (không có gói minh chứng).</td><td>đánh giá không đạt governance.</td><td>FRM-QMS-17 bắt buộc hàng quý; lưu trong QMS-Record/IT_Evidence.</td></tr>
+<tr><td>9</td><td>Chia sẻ external ngoài gói minh chứng (share cả folder/job dossier).</td><td>Phạm vi lộ dữ liệu vượt scope.</td><td>Fail-fast BLOCK; training lại bắt buộc; log incident.</td></tr>
+<tr><td>10</td><td>Không đóng băng (freeze) WIP thành record khi closeout.</td><td>Record thay đổi sau delivery.</td><td>Closeout lock bắt buộc; Supervisor ký; QA inspection.</td></tr>
 </tbody>
 </table>
 </div>
@@ -680,7 +680,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- Doc Control (tách rời) -->
 </div>
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

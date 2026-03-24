@@ -62,7 +62,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+    <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
@@ -84,8 +84,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="badge"><span class="dot"></span>SYS-OPS-08</div>
 <h1 style="margin-top:10px">SYS-OPS-08 — Gói triển khai Power BI (thực chiến, sẵn sàng đánh giá)</h1>
 <p class="lead">
- Mô-đun này khóa chặt cách dựng <b>Trung tâm điều hành (control tower)</b> bằng Power BI theo chuẩn xưởng CNC gia công theo đơn (job shop):
- <b>đúng dữ liệu</b> → <b>đúng mô hình</b> → <b>đúng KPI</b> → <b>refresh ổn định</b> → <b>bằng chứng truy xuất được</b>.
+ Mô-đun này khóa chặt cách dựng <b>Trung tâm điều hành (control tower)</b> bằng Power BI theo chuẩn workshop CNC gia công theo đơn (job shop):
+ <b>đúng dữ liệu</b> → <b>đúng mô hình</b> → <b>đúng KPI</b> → <b>refresh ổn định</b> → <b>evidence traceability được</b>.
  </p>
 <div class="grid-2">
 <div class="note">
@@ -107,34 +107,34 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="gate">
 <div class="smallcaps">Control gate (gate) bắt buộc</div>
 <p style="margin:6px 0 0 0">
-<b>không có bằng chứng thì không qua control gate (No bằng chứng = No gate).</b> KPI hiển thị trên báo cáo không được dùng để quyết định GO/giao hàng khi thiếu MRR tại SharePoint (dossier/packet/nhật ký phê duyệt).
+<b>không có evidence thì không qua control gate (No evidence = No gate).</b> KPI hiển thị trên báo cáo không được dùng để quyết định GO/delivery khi thiếu MRR tại SharePoint (dossier/packet/log approval).
  </p>
 </div>
 </div>
 <!-- 2) Mục đích & bối cảnh -->
 <div class="card">
-<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
+<h2>2) Mục đích mô-đun &amp; bối cảnh operation</h2>
 <p>
- SYS-OPS-08 tồn tại để chặn 4 nhóm hỏng hóc gây “thoát lỗi” khỏi xưởng:
- <b>sai phiên bản (Rev)</b>, <b>lẫn lô/lẫn lộn (mix-up)</b>, <b>thiếu/giả chứng từ</b>, <b>vượt qua control gate</b>.
+ SYS-OPS-08 tồn tại để chặn 4 nhóm hỏng hóc gây “thoát lỗi” khỏi workshop:
+ <b>sai revision (Rev)</b>, <b>lẫn lô/lẫn lộn (mix-up)</b>, <b>thiếu/giả chứng từ</b>, <b>vượt qua control gate</b>.
  Power BI được dùng như <b>bảng điều khiển điều hành</b>, không phải “báo cáo đẹp”.
  </p>
 <div class="grid-2">
 <div class="note">
 <strong>Khi kích hoạt</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
-<li>Khi tạo mới hoặc thay đổi schema SharePoint lists phục vụ vận hành (JobIndex, ShipRelease, NCRLog...).</li>
-<li>Khi publish lần đầu dataset/report lên không gian làm việc vận hành.</li>
+<li>Khi tạo mới hoặc thay đổi schema SharePoint lists phục vụ operation (JobIndex, ShipRelease, NCRLog...).</li>
+<li>Khi publish lần đầu dataset/report lên không gian làm việc operation.</li>
 <li>Khi thay đổi KPI/DAX, quan hệ model, refresh schedule, quyền truy cập.</li>
-<li>Khi chuẩn bị internal audit/khách hàng và cần diễn tập-down tới MRR.</li>
+<li>Khi chuẩn bị internal audit/customer và cần diễn tập-down tới MRR.</li>
 </ul>
 </div>
 <div class="note">
 <strong>Ai chịu trách nhiệm (RACI ngắn)</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
-<li><b>QA/QMS:</b> owner Control gate bằng chứng, phê duyệt thay đổi KPI &amp; diễn tập-through đánh giá.</li>
+<li><b>QA/QMS:</b> owner Control gate evidence, approval thay đổi KPI &amp; diễn tập-through đánh giá.</li>
 <li><b>IT/BI:</b> dựng Power Query, model, DAX, refresh, monitoring, quyền truy cập.</li>
-<li><b>Chủ quá trình (Planner/QC/Warehouse/Maintenance...):</b> sở hữu dữ liệu đầu vào list, đóng ticket sai dữ liệu trong ca.</li>
+<li><b>Chủ quá trình (Planner/QC/Warehouse/Maintenance...):</b> sở hữu dữ liệu input list, đóng ticket sai dữ liệu trong ca.</li>
 <li><b>Supervisor:</b> quyết định HOLD/BLOCK khi bảng điều khiển báo rủi ro và MRR thiếu.</li>
 </ul>
 </div>
@@ -142,9 +142,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="risk">
 <strong>Điểm không thương lượng</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
-<li>Publish PROD không đi qua bảng kiểm phát hành và không có BI_ReleaseNotes → <b>BLOCK</b>.</li>
-<li>Refresh fail không có hồ sơ xử lý trong ca → <b>HOLD</b> quyết định dựa trên bảng điều khiển.</li>
-<li>Diễn tập-through không mở được bằng chứng folder/job dossier (job dossier) → <b>bảng điều khiển không được dùng làm control gate</b>.</li>
+<li>Publish PROD không đi qua checklist release và không có BI_ReleaseNotes → <b>BLOCK</b>.</li>
+<li>Refresh fail không có record xử lý trong ca → <b>HOLD</b> quyết định dựa trên bảng điều khiển.</li>
+<li>Diễn tập-through không mở được evidence folder/job dossier (job dossier) → <b>bảng điều khiển không được dùng làm control gate</b>.</li>
 </ul>
 </div>
 </div>
@@ -159,17 +159,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead>
 <tr>
 <th>Chặng E2E</th>
-<th>Đầu vào chính</th>
-<th>Đầu ra/bảng điều khiển dùng</th>
+<th>Input chính</th>
+<th>Output/bảng điều khiển dùng</th>
 <th>Hold point (Control gate)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Báo giá/Hợp đồng</td>
-<td>Thông tin khách hàng, yêu cầu chứng từ</td>
+<td>Thông tin customer, requirement chứng từ</td>
 <td>Customer view (Estimator (SAL-03))</td>
-<td>Thiếu yêu cầu bằng chứng → BLOCK nhận cam kết giao</td>
+<td>Thiếu requirement evidence → BLOCK nhận cam kết giao</td>
 </tr>
 <tr>
 <td>Planning</td>
@@ -181,7 +181,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Engineering</td>
 <td>RevisionNum, CTQLevel, RequiresFAI</td>
 <td>Job diễn tập-through (Rev/CTQ)</td>
-<td>Rev mismatch giữa JobIndex và hồ sơ chương trình → BLOCK chạy</td>
+<td>Rev mismatch giữa JobIndex và record chương trình → BLOCK chạy</td>
 </tr>
 <tr>
 <td>Purchasing</td>
@@ -205,25 +205,25 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>QC/QA</td>
 <td>NCRLog, QCHoldLog, CAPA8D</td>
 <td>Quality Cockpit</td>
-<td>HOLD CTQ chưa đóng + vẫn “Lam Ready” → chặn giao hàng (BLOCK SHIP / chặn giao hàng)</td>
+<td>HOLD CTQ chưa đóng + vẫn “Lam Ready” → chặn delivery (BLOCK SHIP / chặn delivery)</td>
 </tr>
 <tr>
 <td>NCR/MRB</td>
-<td>NCRID, MRB decision hồ sơ M365/SharePoint → HESEM-QMS-SSOT</td>
+<td>NCRID, MRB decision record M365/SharePoint → HESEM-QMS-SSOT</td>
 <td>NCR diễn tập-through</td>
-<td>Thiếu hồ sơ quyết định → BLOCK dùng rework/ship</td>
+<td>Thiếu record quyết định → BLOCK dùng rework/ship</td>
 </tr>
 <tr>
 <td>Final</td>
 <td>FinalInspection M365/SharePoint → HESEM-QMS-SSOT</td>
-<td>Lam mức sẵn sàng</td>
+<td>Lam readiness level</td>
 <td>Thiếu IR link → BLOCK ShipRelease approval</td>
 </tr>
 <tr>
 <td>Packing</td>
 <td>PackagingChecks</td>
 <td>Warehouse &amp; Shipping</td>
-<td>PackagingPass = FAIL → BLOCK đóng gói</td>
+<td>PackagingPass = FAIL → BLOCK packaging</td>
 </tr>
 <tr>
 <td>Ship</td>
@@ -246,7 +246,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Process Owner cập nhật list theo ca → dữ liệu hợp lệ theo schema.</li>
 <li>IT/BI refresh dataset theo lịch ca → trạng thái refresh được giám sát.</li>
 <li>Supervisor dùng bảng điều khiển để quyết định → quyết định được ghi lại (MRR) tại list quyết định.</li>
-<li>QA/QMS kiểm tra diễn tập-through đến bằng chứng → kết luận sẵn sàng đánh giá.</li>
+<li>QA/QMS inspection diễn tập-through đến evidence → kết luận sẵn sàng đánh giá.</li>
 </ol>
 </div>
 </div>
@@ -260,19 +260,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Cột SharePoint có khoảng trắng</b> nhưng model dùng tên đã bỏ khoảng trắng → measure lỗi, trực quan trống.</li>
 <li><b>Kiểu dữ liệu sai</b> (DueDate dạng text) → lọc ngày hỏng, KPI OTD sai.</li>
 <li><b>Power Query lỗi cú pháp</b> trong file baseline: <span class="mono">JobIndex.pq</span> thiếu dấu phẩy sau bước <span class="mono">Typed</span> → refresh fail toàn bộ.</li>
-<li><b>Expand hyperlink/person không đồng nhất</b> → diễn tập-through link trống, đánh giá không truy xuất.</li>
+<li><b>Expand hyperlink/person không đồng nhất</b> → diễn tập-through link trống, đánh giá không traceability.</li>
 <li><b>DAX dùng bảng placeholder</b> (DispatchPlan/WIPTracker) chưa tồn tại → model publish được nhưng KPI lỗi.</li>
 <li><b>Quan hệ model sai hướng lọc</b> → KPI đếm chồng, báo “Lam Ready” sai.</li>
 <li><b>Refresh chạy bằng tài khoản cá nhân</b> → khi đổi mật khẩu/nhân sự nghỉ → refresh fail.</li>
 <li><b>Refresh schedule lệch ca</b> → bảng điều khiển dùng dữ liệu cũ trong thời điểm quyết định.</li>
 <li><b>Publish thẳng PROD</b> → vượt qua UAT, không có BI_ReleaseNotes, không rollback.</li>
-<li><b>RLS cấu hình sai</b> → rò dữ liệu khách hàng, vi phạm bảo mật.</li>
-<li><b>Không khóa “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”</b> → dùng KPI thay bằng chứng, tạo customer escape.</li>
+<li><b>RLS cấu hình sai</b> → rò dữ liệu customer, vi phạm bảo mật.</li>
+<li><b>Không khóa “không có evidence thì không qua control gate (No evidence = No gate)”</b> → dùng KPI thay evidence, tạo customer escape.</li>
 </ol>
 </div>
 <!-- 5) Risk Controls -->
 <div class="card">
-<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng)</h2>
+<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; evidence)</h2>
 <p>Mỗi điểm kiểm soát (điểm kiểm soát) có Responsible Person rõ ràng và MRR bắt buộc. Thiếu MRR → Control gate không công nhận.</p>
 <div class="table-wrap">
 <table>
@@ -280,7 +280,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th>Điểm kiểm soát</th>
 <th>Responsible Person</th>
-<th>Bằng chứng/MRR</th>
+<th>Evidence/MRR</th>
 <th>Hold point</th>
 </tr>
 </thead>
@@ -288,13 +288,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>CP1 — Khóa schema list (cột/kiểu dữ liệu)</td>
 <td>QA/QMS + Process Owner</td>
-<td>Schema snapshot + nhật ký thay đổi (BI_ReleaseNotes)</td>
+<td>Schema snapshot + log thay đổi (BI_ReleaseNotes)</td>
 <td>Đổi schema không có release note → BLOCK refresh PROD</td>
 </tr>
 <tr>
-<td>CP2 — Kiểm tra lỗi cú pháp Power Query (baseline pack)</td>
+<td>CP2 — Inspection lỗi cú pháp Power Query (baseline pack)</td>
 <td>IT/BI</td>
-<td>Bảng kiểm SYS-OPS-08 ký + ảnh màn hình Advanced Editor</td>
+<td>Checklist SYS-OPS-08 ký + ảnh màn hình Advanced Editor</td>
 <td>Query lỗi → HOLD publish</td>
 </tr>
 <tr>
@@ -304,7 +304,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Link không mở → bảng điều khiển không được dùng làm control gate</td>
 </tr>
 <tr>
-<td>CP4 — Rà soát đồng cấp DAX/KPI (2 người)</td>
+<td>CP4 — Review đồng cấp DAX/KPI (2 người)</td>
 <td>QA/QMS + Supervisor</td>
 <td>BI_ReleaseNotes có mục “KPI changed” + người duyệt</td>
 <td>KPI đổi không duyệt → BLOCK PROD</td>
@@ -344,14 +344,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>STOP (dừng ngay trong 60 giây)</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Khi bảng điều khiển dùng dữ liệu cũ hơn ngưỡng ca (timestamp không cập nhật) và vẫn có quyết định SHIP/GO đang chờ.</li>
-<li>Khi diễn tập-through không mở tới EvidenceFolderUrl hoặc link bằng chứng chính (bộ hồ sơ giao hàng (ship packet)/IR/FAI) trống.</li>
+<li>Khi diễn tập-through không mở tới EvidenceFolderUrl hoặc link evidence chính (bộ record delivery (ship packet)/IR/FAI) trống.</li>
 <li>Khi phát hiện KPI “Lam Ready %” tăng đột biến trong lúc QCHold/NCR mở tăng.</li>
 </ul>
 </div>
 <div class="gate">
-<strong>HOLD (giữ trạng thái, không phát hành)</strong>
+<strong>HOLD (giữ trạng thái, không release)</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
-<li>Khi refresh fail và chưa có hồ sơ xử lý trong ca.</li>
+<li>Khi refresh fail và chưa có record xử lý trong ca.</li>
 <li>Khi schema list vừa đổi nhưng model/DAX chưa cập nhật đồng bộ.</li>
 <li>Khi measure tham chiếu bảng placeholder chưa được thay bằng bảng thật.</li>
 </ul>
@@ -381,22 +381,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Refresh fail / dataset không cập nhật</td>
-<td>Supervisor chuyển quyết định sang kiểm tra bằng chứng trực tiếp (SharePoint dossier). IT tạo ticket và chạy refresh lại theo bảng kiểm.</td>
+<td>Supervisor chuyển quyết định sang inspection evidence trực tiếp (SharePoint dossier). IT tạo ticket và chạy refresh lại theo checklist.</td>
 <td>BI_IncidentLog item + ảnh Monitor hub</td>
 </tr>
 <tr>
-<td>Rev mismatch (JobIndex[RevisionNum] ≠ hồ sơ chương trình)</td>
+<td>Rev mismatch (JobIndex[RevisionNum] ≠ record chương trình)</td>
 <td>Programmer + QC khóa job, gắn tag HOLD tại job dossier, cập nhật list anomaly.</td>
-<td>Anomaly hồ sơ + ảnh màn hình Rev tại job dossier</td>
+<td>Anomaly record + ảnh màn hình Rev tại job dossier</td>
 </tr>
 <tr>
 <td>ShipRelease bị BLOCK tăng đột biến</td>
-<td>Warehouse kiểm tra các cột control gate (PacketComplete/PackagingPass/FinalInspectionPass/ReconciliationStatus) và xác định “thiếu bằng chứng” hay “lỗi dữ liệu”.</td>
-<td>ShipRelease block reason + link bằng chứng bổ sung</td>
+<td>Warehouse inspection các cột control gate (PacketComplete/PackagingPass/FinalInspectionPass/ReconciliationStatus) và xác định “thiếu evidence” hay “lỗi dữ liệu”.</td>
+<td>ShipRelease block reason + link evidence bổ sung</td>
 </tr>
 <tr>
 <td>Hold/NCR mở tăng trong khi KPI “Ready” tăng</td>
-<td>QA chạy kiểm tra chéo: QCHoldLog/NCRLog/CAPA8D đối chiếu ShipRelease list; xác định vượt qua control gate.</td>
+<td>QA chạy inspection chéo: QCHoldLog/NCRLog/CAPA8D đối chiếu ShipRelease list; xác định vượt qua control gate.</td>
 <td>BI_IncidentLog + biên bản quyết định HOLD</td>
 </tr>
 <tr>
@@ -410,7 +410,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 8) Checklist -->
 <div class="card">
-<h2>8) Bảng kiểm vận hành (≤ 15 bước) — mỗi bước có Responsible Person, Bằng chứng/MRR, điểm sai hay gặp</h2>
+<h2>8) Checklist operation (≤ 15 bước) — mỗi bước có Responsible Person, Evidence/MRR, điểm sai hay gặp</h2>
 <div class="table-wrap">
 <table>
 <thead>
@@ -418,7 +418,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>#</th>
 <th>Bước</th>
 <th>Responsible Person</th>
-<th>Bằng chứng/MRR</th>
+<th>Evidence/MRR</th>
 <th>Điểm sai hay gặp</th>
 </tr>
 </thead>
@@ -433,10 +433,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>8</td><td>Tạo DimDate và mark as Date table</td><td>IT/BI</td><td>Ảnh model view</td><td>Không mark date table</td></tr>
 <tr><td>9</td><td>Thiết lập quan hệ theo template (facts → JobIndex/DimDate)</td><td>IT/BI</td><td>Ảnh relationships</td><td>Cross filter sai</td></tr>
 <tr><td>10</td><td>Dán measures template và thay bảng placeholder bằng bảng thật</td><td>IT/BI</td><td>Danh sách measure pass</td><td>Giữ DispatchPlan/WIPTracker placeholder</td></tr>
-<tr><td>11</td><td>Dựng pages theo spec (Executive/Planner/Quality/Equipment/Warehouse/Lam mức sẵn sàng)</td><td>IT/BI + Chủ quá trình</td><td>Ảnh từng page + diễn tập-through</td><td>Thiếu bảng detail</td></tr>
-<tr><td>12</td><td>Chạy UAT theo 3 vai trò (QA/WHS/Planner) và ký kết quả</td><td>Supervisor + QA</td><td>Biên bản UAT + lỗi đã đóng</td><td>UAT chỉ xem KPI, không mở bằng chứng</td></tr>
-<tr><td>13</td><td>Publish DEV → UAT → PROD theo bảng kiểm phát hành</td><td>IT + QA</td><td>BI_ReleaseNotes + chữ ký duyệt</td><td>Publish thẳng PROD</td></tr>
-<tr><td>14</td><td>Cấu hình refresh schedule theo cửa sổ ca + account vận hành</td><td>IT</td><td>Ảnh schedule + người phụ trách account</td><td>Dùng account cá nhân</td></tr>
+<tr><td>11</td><td>Dựng pages theo spec (Executive/Planner/Quality/Equipment/Warehouse/Lam readiness level)</td><td>IT/BI + Chủ quá trình</td><td>Ảnh từng page + diễn tập-through</td><td>Thiếu bảng detail</td></tr>
+<tr><td>12</td><td>Chạy UAT theo 3 vai trò (QA/WHS/Planner) và ký kết quả</td><td>Supervisor + QA</td><td>Biên bản UAT + lỗi đã đóng</td><td>UAT chỉ xem KPI, không mở evidence</td></tr>
+<tr><td>13</td><td>Publish DEV → UAT → PROD theo checklist release</td><td>IT + QA</td><td>BI_ReleaseNotes + chữ ký duyệt</td><td>Publish thẳng PROD</td></tr>
+<tr><td>14</td><td>Cấu hình refresh schedule theo cửa sổ ca + account operation</td><td>IT</td><td>Ảnh schedule + người phụ trách account</td><td>Dùng account cá nhân</td></tr>
 <tr><td>15</td><td>Kích hoạt monitor + alert và test 01 lần trong ca</td><td>IT + Supervisor</td><td>BI_IncidentLog test alert</td><td>Không test alert</td></tr>
 </tbody>
 </table>
@@ -472,7 +472,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Chuẩn hóa dữ liệu</td>
-<td>Ép type; expand hyperlink/person; kiểm tra cột khóa (JobNum/PackID)</td>
+<td>Ép type; expand hyperlink/person; inspection cột khóa (JobNum/PackID)</td>
 <td>Diễn tập-through và traceability phụ thuộc cột khóa</td>
 </tr>
 <tr>
@@ -482,13 +482,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>DAX/KPI</td>
-<td>Dán template; thay placeholder; khóa logic “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”</td>
+<td>Dán template; thay placeholder; khóa logic “không có evidence thì không qua control gate (No evidence = No gate)”</td>
 <td>KPI sai hoặc thiếu control gate tạo customer escape</td>
 </tr>
 <tr>
 <td>Thiết kế page</td>
-<td>Mỗi KPI có detail table + diễn tập-through tới bằng chứng</td>
-<td>Đánh giá yêu cầu truy xuất; KPI không đủ</td>
+<td>Mỗi KPI có detail table + diễn tập-through tới evidence</td>
+<td>Đánh giá requirement traceability; KPI không đủ</td>
 </tr>
 <tr>
 <td>Governance</td>
@@ -498,13 +498,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody>
 </table>
 </div>
-<h3>9.2 OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
+<h3>9.2 OJT output (sản phẩm output bắt buộc)</h3>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
 <li>01 dataset/report DEV chạy refresh pass liên tục 02 ca.</li>
 <li>01 biên bản UAT có diễn tập-through tới EvidenceFolderUrl cho ít nhất 05 job.</li>
 <li>01 BI_ReleaseNotes cho release copy (có rollback).</li>
-<li>01 hồ sơ test alert (refresh fail giả lập hoặc anomaly giả lập) trong BI_IncidentLog.</li>
-<li>Với nhóm người dùng (Operator/Setup/QC/Warehouse/...): 01 quyết định HOLD/GO dựa bảng điều khiển kèm hồ sơ MRR.</li>
+<li>01 record test alert (refresh fail giả lập hoặc anomaly giả lập) trong BI_IncidentLog.</li>
+<li>Với nhóm người dùng (Operator/Setup/QC/Warehouse/...): 01 quyết định HOLD/GO dựa bảng điều khiển kèm record MRR.</li>
 </ul>
 <h3>9.3 Rubric L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn khi đạt)</h3>
 <div class="table-wrap">
@@ -520,26 +520,26 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>L1</b></td>
-<td>Đọc đúng ý nghĩa KPI/field (JobNum, RevisionNum, DueDate, Trạng thái) và chỉ ra vị trí bằng chứng.</td>
-<td>Bài kiểm tra nhanh đạt chuẩn; 02 lần thực hành mở diễn tập-through đúng.</td>
+<td>Đọc đúng ý nghĩa KPI/field (JobNum, RevisionNum, DueDate, Trạng thái) và chỉ ra vị trí evidence.</td>
+<td>Bài inspection nhanh đạt chuẩn; 02 lần thực hành mở diễn tập-through đúng.</td>
 <td>Được dùng bảng điều khiển để theo dõi cá nhân/ca (không quyết định control gate).</td>
 </tr>
 <tr>
 <td><b>L2</b></td>
-<td>Thực hiện đúng quy trình 60 giây: phát hiện dữ liệu đột biến và tạo hồ sơ incident/anomaly.</td>
-<td>02 ca liên tiếp tạo hồ sơ đúng, đủ link bằng chứng.</td>
-<td>Được ghi nhận blocker và yêu cầu cập nhật list trong ca.</td>
+<td>Thực hiện đúng process 60 giây: phát hiện dữ liệu đột biến và tạo record incident/anomaly.</td>
+<td>02 ca liên tiếp tạo record đúng, đủ link evidence.</td>
+<td>Được ghi nhận blocker và requirement cập nhật list trong ca.</td>
 </tr>
 <tr>
 <td><b>L3</b></td>
-<td>Với vai trò người phụ trách: sửa query/model/DAX trong DEV và chứng minh UAT pass; với vai trò vận hành: ra quyết định HOLD/GO kèm MRR đầy đủ.</td>
+<td>Với vai trò người phụ trách: sửa query/model/DAX trong DEV và chứng minh UAT pass; với vai trò operation: ra quyết định HOLD/GO kèm MRR đầy đủ.</td>
 <td>Performance test pass; không vi phạm STOP/BLOCK.</td>
 <td>Được tham gia UAT và ký xác nhận dữ liệu theo vai trò.</td>
 </tr>
 <tr>
 <td><b>L4</b></td>
-<td>Thiết lập governance hoàn chỉnh: release notes, rollback, monitor/alert; đào tạo lại người khác và đánh giá diễn tập-down pass.</td>
-<td>01 lần phát hành PROD không phát sinh incident nghiêm trọng trong 30 ngày SSOT/EHS-Incident-Nhật ký (SharePoint List).</td>
+<td>Thiết lập governance hoàn chỉnh: release notes, rollback, monitor/alert; training lại người khác và đánh giá diễn tập-down pass.</td>
+<td>01 lần release PROD không phát sinh incident nghiêm trọng trong 30 ngày SSOT/EHS-Incident-Log (SharePoint List).</td>
 <td>Được làm approver thay đổi KPI/refresh theo ma trận quyền.</td>
 </tr>
 </tbody>
@@ -549,22 +549,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Gắn vai trò vào rubric (điểm đạt khác nhau theo vai trò)</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li><b>IT/BI:</b> bắt buộc đạt L3 để publish DEV/UAT; bắt buộc đạt L4 để publish PROD.</li>
-<li><b>QA/QMS + Supervisor:</b> bắt buộc đạt L3 để ký UAT và quyết định control gate; đạt L4 để phê duyệt KPI/refresh.</li>
-<li><b>Planner/Warehouse/QC/Maintenance:</b> bắt buộc đạt L2 để tạo hồ sơ incident theo ca; đạt L3 để ký dữ liệu trang chuyên môn.</li>
-<li><b>Operator/Setup/Programmer/EHS/Estimator (SAL-03)/Purchasing:</b> bắt buộc đạt L1 để dùng bảng điều khiển; đạt L2 khi tạo hồ sơ anomaly đúng.</li>
+<li><b>QA/QMS + Supervisor:</b> bắt buộc đạt L3 để ký UAT và quyết định control gate; đạt L4 để approval KPI/refresh.</li>
+<li><b>Planner/Warehouse/QC/Maintenance:</b> bắt buộc đạt L2 để tạo record incident theo ca; đạt L3 để ký dữ liệu trang chuyên môn.</li>
+<li><b>Operator/Setup/Programmer/EHS/Estimator (SAL-03)/Purchasing:</b> bắt buộc đạt L1 để dùng bảng điều khiển; đạt L2 khi tạo record anomaly đúng.</li>
 </ul>
 </div>
 </div>
 <!-- 10) Đánh giá -->
 <div class="card">
 <h2>10) Đánh giá</h2>
-<h3>10.1 Bài kiểm tra nhanh (≥ 20 câu; trắc nghiệm + tình huống ngắn)</h3>
+<h3>10.1 Bài inspection nhanh (≥ 20 câu; trắc nghiệm + tình huống ngắn)</h3>
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
 <li>pSiteUrl dùng để làm gì và đặt ở đâu trong Power BI?</li>
 <li>Khi fnGetSharePointList báo “not found or duplicated”, hành động chặn là gì?</li>
 <li>Trường hợp DueDate là text, KPI nào hỏng trước và dấu hiệu nhận biết?</li>
 <li>Vì sao cần expand hyperlink column trước khi dùng diễn tập-through?</li>
-<li>Định nghĩa “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” trong Trung tâm điều hành.</li>
+<li>Định nghĩa “không có evidence thì không qua control gate (No evidence = No gate)” trong Trung tâm điều hành.</li>
 <li>Điều kiện BLOCK publish PROD.</li>
 <li>Khi refresh fail trong ca, ai ra quyết định và MRR nào bắt buộc?</li>
 <li>Giải thích vì sao star schema làm KPI ổn định hơn (một ý).</li>
@@ -575,33 +575,33 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Hold point khi diễn tập-through không mở EvidenceFolderUrl.</li>
 <li>Responsible Person Refresh account phải thuộc loại nào và vì sao?</li>
 <li>Biên bản UAT tối thiểu phải chứng minh điều gì?</li>
-<li>điểm kiểm soát (điểm kiểm soát) nào khóa schema list và bằng chứng tương ứng?</li>
+<li>điểm kiểm soát (điểm kiểm soát) nào khóa schema list và evidence tương ứng?</li>
 <li>Chỉ ra 1 dấu hiệu dữ liệu “đúng cú pháp, sai thực tế”.</li>
 <li>Quy tắc STOP khi bảng điều khiển dùng dữ liệu cũ hơn ngưỡng ca.</li>
-<li>NCR/CAPA tuổi tồn dùng để chặn rủi ro gì trong xưởng?</li>
-<li>Khi ShipRelease blocked tăng, 4 cột control gate phải kiểm tra là gì?</li>
+<li>NCR/CAPA tuổi tồn dùng để chặn rủi ro gì trong workshop?</li>
+<li>Khi ShipRelease blocked tăng, 4 cột control gate phải inspection là gì?</li>
 </ol>
-<h3>10.2 Scenario (≥ 3 tình huống thật; yêu cầu quyết định HOLD/GO và ghi MRR)</h3>
+<h3>10.2 Scenario (≥ 3 tình huống thật; requirement quyết định HOLD/GO và ghi MRR)</h3>
 <div class="card" style="margin-top:10px">
 <b>Scenario 1 — Rev mismatch</b>
 <p class="muted" style="margin:6px 0 0 0">
- Bảng điều khiển hiển thị JobNum = J-2401, RevisionNum = B. Job dossier thư mục bằng chứng hiển thị Rev = A. Job đang chờ chạy ca đêm.
+ Bảng điều khiển hiển thị JobNum = J-2401, RevisionNum = B. Job dossier thư mục evidence hiển thị Rev = A. Job đang chờ chạy ca đêm.
  </p>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Quyết định: HOLD/GO?</li>
 <li>Hành động 60 giây: ai làm gì?</li>
-<li>MRR: hồ sơ nào được tạo, chứa link nào?</li>
+<li>MRR: record nào được tạo, chứa link nào?</li>
 </ul>
 </div>
 <div class="card" style="margin-top:10px">
 <b>Scenario 2 — Refresh fail trước giờ ship</b>
 <p class="muted" style="margin:6px 0 0 0">
- 30 phút trước giờ pickup, trang Warehouse &amp; Shipping không cập nhật từ đầu ca. Supervisor cần quyết định ship 3 pack cho khách hàng.
+ 30 phút trước giờ pickup, trang Warehouse &amp; Shipping không cập nhật từ đầu ca. Supervisor cần quyết định ship 3 pack cho customer.
  </p>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Quyết định: HOLD/GO/SHIP?</li>
-<li>Chuyển sang bằng chứng nào để quyết định?</li>
-<li>MRR: nhật ký xử lý refresh + quyết định ship lưu ở đâu?</li>
+<li>Chuyển sang evidence nào để quyết định?</li>
+<li>MRR: log xử lý refresh + quyết định ship lưu ở đâu?</li>
 </ul>
 </div>
 <div class="card" style="margin-top:10px">
@@ -611,7 +611,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </p>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Quyết định: STOP/HOLD/BLOCK áp dụng mức nào?</li>
-<li>Kiểm tra chéo list nào và cột khóa nào?</li>
+<li>Inspection chéo list nào và cột khóa nào?</li>
 <li>MRR: biên bản điều tra và kết luận lưu ở đâu?</li>
 </ul>
 </div>
@@ -632,15 +632,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Responsible Person track</b></td>
-<td>Dựng DEV từ pack: tạo pSiteUrl, import functions/queries, sửa lỗi JobIndex.pq, tạo DimDate, relationships, dán measures và thay placeholder, tạo 01 page có diễn tập-through bằng chứng.</td>
+<td>Dựng DEV từ pack: tạo pSiteUrl, import functions/queries, sửa lỗi JobIndex.pq, tạo DimDate, relationships, dán measures và thay placeholder, tạo 01 page có diễn tập-through evidence.</td>
 <td>Refresh pass; không lỗi DAX; diễn tập-through mở link; có BI_ReleaseNotes + UAT plan.</td>
 <td>Publish khi refresh fail; thiếu BI_ReleaseNotes; diễn tập-through trống.</td>
 </tr>
 <tr>
 <td><b>User track</b></td>
-<td>Thực hiện phản ứng 60 giây cho 01 anomaly và tạo hồ sơ MRR đầy đủ (incident/anomaly + link bằng chứng).</td>
-<td>Chọn đúng HOLD/GO; hồ sơ đủ trường bắt buộc; link bằng chứng mở được.</td>
-<td>Ra quyết định GO/giao hàng khi thiếu bằng chứng; không tạo hồ sơ.</td>
+<td>Thực hiện phản ứng 60 giây cho 01 anomaly và tạo record MRR đầy đủ (incident/anomaly + link evidence).</td>
+<td>Chọn đúng HOLD/GO; record đủ trường bắt buộc; link evidence mở được.</td>
+<td>Ra quyết định GO/delivery khi thiếu evidence; không tạo record.</td>
 </tr>
 </tbody>
 </table>
@@ -652,7 +652,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="gate">
 <strong>PASS</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
-<li>Bài kiểm tra nhanh ≥ 85% và không sai các câu control gate (No bằng chứng, publish PROD, refresh fail).</li>
+<li>Bài inspection nhanh ≥ 85% và không sai các câu control gate (No evidence, publish PROD, refresh fail).</li>
 <li>Scenario: tất cả quyết định HOLD/GO đúng theo STOP/HOLD/BLOCK và có MRR.</li>
 <li>Performance test: đạt tất cả mục rubric PASS theo track.</li>
 <li>Diễn tập-through tới EvidenceFolderUrl mở được trên ít nhất 05 job.</li>
@@ -664,21 +664,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Không có MRR cho bất kỳ quyết định control gate nào.</li>
 <li>Publish PROD không có release note/duyệt.</li>
 <li>Dùng tài khoản cá nhân làm refresh người phụ trách.</li>
-<li>RLS fail hoặc rò dữ liệu khách hàng.</li>
+<li>RLS fail hoặc rò dữ liệu customer.</li>
 </ul>
 </div>
 </div>
 <!-- 12) MRR -->
 <div class="card">
 <h2>12) MRR tối thiểu</h2>
-<h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
+<h3>12.1 Danh sách record cần tạo/đính kèm</h3>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
 <li><b>BI_ReleaseNotes</b> (SharePoint list): version, author, ngày, mô tả thay đổi, rủi ro, rollback, người duyệt.</li>
 <li><b>BI_IncidentLog</b> (SharePoint list) M365/SharePoint → HESEM-QMS-SSOT: refresh fail, anomaly, hành động, người phụ trách, thời điểm đóng.</li>
-<li><b>UAT_Minutes</b> (hồ sơ): kết quả test theo vai trò, diễn tập-through bằng chứng, danh sách lỗi và trạng thái đóng.</li>
+<li><b>UAT_Minutes</b> (record): kết quả test theo vai trò, diễn tập-through evidence, danh sách lỗi và trạng thái đóng.</li>
 <li><b>Refresh_Schedule_Snapshot</b>: ảnh cấu hình refresh + cửa sổ ca.</li>
 <li><b>RLS_Test_Record</b>: kết quả test 3 vai trò + tài khoản test.</li>
-<li><b>Governance_Checklist_SYS-OPS-08</b>: bảng kiểm bước 1–15 có chữ ký.</li>
+<li><b>Governance_Checklist_SYS-OPS-08</b>: checklist bước 1–15 có chữ ký.</li>
 </ul>
 <h3>12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
@@ -692,7 +692,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
 <li>Controlled docs: <span class="mono">M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → (root)</span></li>
 <li>Power BI pack &amp; release artifacts: <span class="mono">M365/SharePoint → CNC-IMS-HUB → OPS-ANALYTICS → PowerBI-ControlTower</span> M365/SharePoint → HESEM-QMS-SSOT</li>
-<li>Lists: <span class="mono">JobIndex, ShipRelease, PackagingChecks, NCRLog, QCHoldLog, CAPA8D, DowntimeEvents, StandupActions</span> (trong site vận hành)</li>
+<li>Lists: <span class="mono">JobIndex, ShipRelease, PackagingChecks, NCRLog, QCHoldLog, CAPA8D, DowntimeEvents, StandupActions</span> (trong site operation)</li>
 </ul>
 </div>
 </div>
@@ -700,22 +700,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2>13) Common đánh giá phát hiện &amp; phòng ngừa (≥ 8 lỗi đánh giá hay gặp)</h2>
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
-<li><b>Không truy xuất được bằng chứng từ KPI</b> → bắt buộc diễn tập-through link; UAT kiểm bằng chứng.</li>
+<li><b>Không traceability được evidence từ KPI</b> → bắt buộc diễn tập-through link; UAT kiểm evidence.</li>
 <li><b>Thay đổi KPI không có kiểm soát</b> → BI_ReleaseNotes + chữ ký duyệt.</li>
 <li><b>Refresh fail nhưng không có xử lý</b> → BI_IncidentLog theo ca, Supervisor ký đóng.</li>
-<li><b>Dùng tài khoản cá nhân chạy refresh</b> → chuyển sang account vận hành/service principal M365/SharePoint → HESEM-QMS-SSOT.</li>
+<li><b>Dùng tài khoản cá nhân chạy refresh</b> → chuyển sang account operation/service principal M365/SharePoint → HESEM-QMS-SSOT.</li>
 <li><b>RLS không chứng minh được</b> → RLS_Test_Record 3 vai trò.</li>
 <li><b>Model không nhất quán với schema list</b> → CP1 khóa schema + CP2 kiểm query.</li>
-<li><b>Bảng điều khiển dẫn dắt quyết định giao hàng khi thiếu chứng từ</b> → khóa không có bằng chứng thì không qua control gate (No bằng chứng = No gate); STOP khi thiếu link bằng chứng.</li>
+<li><b>Bảng điều khiển dẫn dắt quyết định delivery khi thiếu chứng từ</b> → khóa không có evidence thì không qua control gate (No evidence = No gate); STOP khi thiếu link evidence.</li>
 <li><b>Không có kế hoạch rollback</b> → bắt buộc rollback trong release notes + test.</li>
-<li><b>Không có owner dữ liệu</b> → RACI ngắn và người phụ trách list trong hồ sơ.</li>
+<li><b>Không có owner dữ liệu</b> → RACI ngắn và người phụ trách list trong record.</li>
 </ol>
 </div>
 <!-- 14) DCR record -->
 <div class="card">
 </div></div>
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

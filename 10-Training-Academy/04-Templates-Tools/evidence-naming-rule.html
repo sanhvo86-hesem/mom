@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>TRN-ACA-EVID-01 — Bằng chứng Naming Convention & Storage Rules (SSOT) | HESEM OS</title>
+<title>TRN-ACA-EVID-01 — Evidence Naming Convention & Storage Rules (SSOT) | HESEM OS</title>
 <link href="../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -51,11 +51,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+    <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
-  <strong>BẰNG CHỨNG-NAMING-RULE — Bằng chứng Naming Convention & Storage Rules (SSOT)</strong>
+  <strong>BẰNG CHỨNG-NAMING-RULE — Evidence Naming Convention & Storage Rules (SSOT)</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -69,28 +69,28 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="doc-content" id="docContent">
 <div class="cover">
 <div class="kicker">HESEM CNC Academy</div>
-<h1 class="h1">Quy tắc đặt tên &amp; lưu bằng chứng (SSOT)</h1>
+<h1 class="h1">Quy tắc đặt tên &amp; lưu evidence (SSOT)</h1>
 <p class="lead">
- Trang này chuẩn hóa <b>cách đặt tên file</b>, <b>cấu trúc Job dossier (job dossier)</b> và <b>quy tắc lưu bằng chứng</b>.
- Mục tiêu: truy xuất hồ sơ <b>≤ 60 giây</b> trong đánh giá khách hàng và internal audit.
+ Trang này chuẩn hóa <b>cách đặt tên file</b>, <b>cấu trúc Job dossier (job dossier)</b> và <b>quy tắc lưu evidence</b>.
+ Mục tiêu: traceability record <b>≤ 60 giây</b> trong đánh giá customer và internal audit.
  </p>
 </div>
 <div class="card danger">
 <span class="badge">Control gate (gate)</span>
 <ul class="tight">
-<li><b>không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</b>: thiếu MRR trong SSOT → khóa chuyển bước.</li>
+<li><b>không có evidence thì không qua control gate (No evidence = No gate)</b>: thiếu MRR trong SSOT → khóa chuyển bước.</li>
 <li><b>Sai REV</b> hoặc <b>file rời ngoài SSOT</b> → HOLD/FAIL.</li>
-<li><b>Đặt tên sai chuẩn</b> → hồ sơ không được công nhận trong đánh giá năng lực.</li>
+<li><b>Đặt tên sai chuẩn</b> → record không được công nhận trong đánh giá competence.</li>
 </ul>
 </div>
 <div class="grid-2">
 <div class="card">
 <span class="badge">1) Nguyên tắc SSOT</span>
 <ul class="tight">
-<li><b>Source of Hồ sơ (SoR)</b>: Epicor/MES/thiết bị đo (nhật ký gốc).</li>
+<li><b>Source of Record (SoR)</b>: Epicor/MES/equipment đo (log gốc).</li>
 <li><b>Single Source of Truth (SSOT)</b>: M365/SharePoint → <b>HESEM-QMS-SSOT</b>.</li>
-<li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Lưu hồ sơ chính trong SSOT đã chỉ định; không dùng máy cá nhân, USB, Zalo hoặc Email làm nơi lưu chính.</li>
-<li><b>KHI</b> bắt buộc chụp màn hình (sự cố hệ thống) → tạo <b>Incident Note</b> và nộp vào SSOT.</li>
+<li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Lưu record chính trong SSOT đã chỉ định; không dùng máy cá nhân, USB, Zalo hoặc Email làm nơi lưu chính.</li>
+<li><b>KHI</b> bắt buộc chụp màn hình (incident hệ thống) → tạo <b>Incident Note</b> và nộp vào SSOT.</li>
 </ul>
 </div>
 <div class="card">
@@ -111,11 +111,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="mono-block" style="margin-top:10px;">
  JOB-2602-001_BRACKET-123_REV-C/
  <br/>├── 00_Input/ (PO, RFQ, Drawing, Spec)
- <br/>├── 10_Engineering/ (Bộ hồ sơ chuẩn (baseline package), CAM, Setup sheet)
- <br/>├── 20_Production/ (Traveler, Setup photos, Trong quá trình nhật ký)
+ <br/>├── 10_Engineering/ (Bộ record chuẩn (baseline package), CAM, Setup sheet)
+ <br/>├── 20_Production/ (Traveler, Setup photos, Trong quá trình log)
  <br/>├── 30_QC/ (IR, FAI, Final, NCR)
  <br/>├── 40_Supplier/ (MTR, CoC, Outsource cert)
- <br/>├── 50_Shipping/ (bộ hồ sơ giao hàng (ship packet), CoC, Packing, Label)
+ <br/>├── 50_Shipping/ (bộ record delivery (ship packet), CoC, Packing, Label)
  <br/>└── 90_Archive/ (obsolete versions, superseded)
  </div>
 <p class="small muted" style="margin-top:10px;">
@@ -137,7 +137,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>JobNum</b></td><td>Mã job</td><td>JOB-2602-001</td></tr>
 <tr><td><b>PartNum</b></td><td>Mã part</td><td>BRACKET-123</td></tr>
 <tr><td><b>REV</b></td><td>Revision set</td><td>REV-C</td></tr>
-<tr><td><b>RecordType</b></td><td>Loại hồ sơ</td><td>IR / FAI / NCR / CoC</td></tr>
+<tr><td><b>RecordType</b></td><td>Loại record</td><td>IR / FAI / NCR / CoC</td></tr>
 <tr><td><b>Date</b></td><td>Ngày tạo</td><td>2026-02-09</td></tr>
 <tr><td><b>Seq</b></td><td>Thứ tự</td><td>01 / 02</td></tr>
 <tr><td><b>Responsible Person</b></td><td>Người tạo</td><td>QC / SET / CAM</td></tr>
@@ -157,23 +157,23 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">5) RecordType Dictionary</span>
 <div class="table-card">
 <table class="table">
-<thead><tr><th style="width:160px;">RecordType</th><th>Ý nghĩa</th><th>Ví dụ hồ sơ</th></tr></thead>
+<thead><tr><th style="width:160px;">RecordType</th><th>Ý nghĩa</th><th>Ví dụ record</th></tr></thead>
 <tbody>
-<tr><td><b>RFQ</b></td><td>Yêu cầu báo giá</td><td>RFQ + drawing/spec</td></tr>
-<tr><td><b>PO</b></td><td>Đơn hàng khách hàng</td><td>PO + terms</td></tr>
-<tr><td><b>CR</b></td><td>Rà soát hợp đồng</td><td>FRM-QA-001</td></tr>
-<tr><td><b>BASELINE</b></td><td>Bộ hồ sơ chuẩn</td><td>Setup sheet + kiểm tra plan</td></tr>
+<tr><td><b>RFQ</b></td><td>Requirement báo giá</td><td>RFQ + drawing/spec</td></tr>
+<tr><td><b>PO</b></td><td>Đơn hàng customer</td><td>PO + terms</td></tr>
+<tr><td><b>CR</b></td><td>Review hợp đồng</td><td>FRM-QA-001</td></tr>
+<tr><td><b>BASELINE</b></td><td>Bộ record chuẩn</td><td>Setup sheet + inspection plan</td></tr>
 <tr><td><b>TRV</b></td><td>Traveler/Route</td><td>FRM-OPS-001</td></tr>
-<tr><td><b>IR</b></td><td>Kiểm tra Report</td><td>Trong quá trình/Final IR</td></tr>
-<tr><td><b>FAI</b></td><td>Kiểm tra sản phẩm đầu tiên (first article) Kiểm tra</td><td>FAI report</td></tr>
+<tr><td><b>IR</b></td><td>Inspection Report</td><td>Trong quá trình/Final IR</td></tr>
+<tr><td><b>FAI</b></td><td>Inspection sản phẩm đầu tiên (first article) Inspection</td><td>FAI report</td></tr>
 <tr><td><b>NCR</b></td><td>Nonconformity Report</td><td>NCR + disposition</td></tr>
-<tr><td><b>CAPA</b></td><td>Corrective action</td><td>CAPA hồ sơ + effectiveness</td></tr>
+<tr><td><b>CAPA</b></td><td>Corrective action</td><td>CAPA record + effectiveness</td></tr>
 <tr><td><b>MTR</b></td><td>Material test report</td><td>Mill cert</td></tr>
 <tr><td><b>SUP-CERT</b></td><td>Supplier certificate</td><td>Anodize/heat treat cert</td></tr>
 <tr><td><b>COC</b></td><td>Certificate of Conformance</td><td>CoC</td></tr>
-<tr><td><b>PACK</b></td><td>Packing/Label</td><td>Phiếu kê đóng gói + label photo</td></tr>
-<tr><td><b>SHIP</b></td><td>Shipping bằng chứng</td><td>Delivery note, POD</td></tr>
-<tr><td><b>OJT</b></td><td>Đào tạo tại hiện trường</td><td>OJT nhật ký + bảng kiểm</td></tr>
+<tr><td><b>PACK</b></td><td>Packing/Label</td><td>Phiếu kê packaging + label photo</td></tr>
+<tr><td><b>SHIP</b></td><td>Shipping evidence</td><td>Delivery note, POD</td></tr>
+<tr><td><b>OJT</b></td><td>Training tại hiện trường</td><td>OJT log + checklist</td></tr>
 <tr><td><b>CỔNG KIỂM SOÁT</b></td><td>Control gate test</td><td>Vai trò control gate test pack</td></tr>
 <tr><td><b>CERT</b></td><td>Chứng nhận level</td><td>Certificate scan + register</td></tr>
 </tbody>
@@ -181,7 +181,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<span class="badge">6) Quy tắc đặt tên hồ sơ đào tạo</span>
+<span class="badge">6) Quy tắc đặt tên record training</span>
 <p class="lead" style="margin-top:10px;">Áp dụng cho OJT/Control gate Test/Certificate.</p>
 <div class="mono-block">
  EMP-{EmpID}_{RecordType}_{CxxLx}_{YYYY-MM-DD}_{Seq}_{Assessor}.{ext}
@@ -201,17 +201,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiếu <b>REV</b> trong tên file → FAIL.</li>
 <li>Không nằm trong <b>Job dossier</b> hoặc <b>Training SSOT</b> → FAIL.</li>
 <li>Ghi chồng file cũ (overwrite) → FAIL, bắt buộc tạo Seq mới.</li>
-<li>Không truy xuất được trong 60 giây → FAIL control gate.</li>
+<li>Không traceability được trong 60 giây → FAIL control gate.</li>
 </ul>
 </div>
 <div class="card">
-<span class="badge">8) Diễn tập truy xuất 60 giây</span>
+<span class="badge">8) Diễn tập traceability 60 giây</span>
 <ol style="margin:10px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Mở Job dossier theo JobNum.</li>
 <li>Xác nhận REV tại folder name.</li>
 <li>Tìm RecordType theo thư mục: 30_QC, 50_Shipping, 40_Supplier…</li>
-<li>Mở đúng file theo mẫu tên; kiểm tra ngày và Seq.</li>
-<li>Copy link file (SharePoint link) và dán vào form/hồ sơ cần bàn giao.</li>
+<li>Mở đúng file theo mẫu tên; inspection ngày và Seq.</li>
+<li>Copy link file (SharePoint link) và dán vào form/record cần bàn giao.</li>
 </ol>
 </div>
 </div>
@@ -219,6 +219,6 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <script src="../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

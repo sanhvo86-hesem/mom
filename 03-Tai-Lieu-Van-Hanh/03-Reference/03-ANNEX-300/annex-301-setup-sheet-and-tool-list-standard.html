@@ -57,7 +57,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
           <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
           <div class="fh-company">
             <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Annex</span>
+            <span>Document operation • Annex</span>
           </div>
         </div>
         <div class="title"><strong>ANNEX-301 — Chuẩn Setup Sheet và Tool List CNC</strong></div>
@@ -69,38 +69,38 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
           <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
         </div>
       </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi Engineering phát hành setup sheet, tool list, addendum machine transfer, prove-out note hoặc bản sửa đổi có ảnh hưởng tới setup/WCS/tooling/control gate.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi Engineering release setup sheet, tool list, addendum machine transfer, prove-out note hoặc bản sửa đổi có ảnh hưởng tới setup/WCS/tooling/control gate.</div>
       <h1>ANNEX-301 — Chuẩn Setup Sheet và Tool List CNC</h1>
       
 <div class="section"><h2>1. Mục đích và quy tắc quản trị dữ liệu setup</h2>
-<p>ANNEX này khóa cấu trúc dữ liệu bắt buộc của <strong>Setup Sheet</strong>, <strong>Tool List</strong> và các phụ lục setup liên quan. Mọi gói release dùng để setup, prove-out, mẫu đầu (first piece), chuyển giao công việc, machine restart sau crash hoặc rebaseline đều phải dùng đúng cấu trúc dữ liệu này. Không được phát hành setup sheet theo kiểu mô tả tự do, thiếu trường khóa hoặc dựa vào trí nhớ của người setup.</p>
-<div class="callout-danger"><strong>Điểm dừng phát hành:</strong> thiếu Part/Rev, thiếu nhóm máy (machine family), thiếu fixture logic, thiếu WCS/probing method, thiếu tool list hoặc thiếu prove-out note là <strong>không được phát hành</strong>. Nếu release thiếu dữ liệu rồi mới bù bằng miệng ở xưởng thì release đó không có giá trị.</div>
+<p>ANNEX này khóa cấu trúc dữ liệu bắt buộc của <strong>Setup Sheet</strong>, <strong>Tool List</strong> và các phụ lục setup liên quan. Mọi gói release dùng để setup, prove-out, mẫu đầu (first piece), chuyển giao công việc, machine restart sau crash hoặc rebaseline đều phải dùng đúng cấu trúc dữ liệu này. Không được release setup sheet theo kiểu mô tả tự do, thiếu trường khóa hoặc dựa vào trí nhớ của người setup.</p>
+<div class="callout-danger"><strong>Điểm dừng release:</strong> thiếu Part/Rev, thiếu nhóm máy (machine family), thiếu fixture logic, thiếu WCS/probing method, thiếu tool list hoặc thiếu prove-out note là <strong>không được release</strong>. Nếu release thiếu dữ liệu rồi mới bù bằng miệng ở workshop thì release đó không có giá trị.</div>
 <div class="callout-info"><strong>Nguyên tắc:</strong> một setup sheet chỉ được dùng khi nó trả lời được đầy đủ 6 câu hỏi: <strong>chạy job nào</strong>, <strong>trên máy nào</strong>, <strong>kẹp như thế nào</strong>, <strong>lấy chuẩn ở đâu</strong>, <strong>dùng tool nào</strong>, và <strong>mở chu kỳ đầu như thế nào</strong>.</div>
 </div>
 
-<div class="section"><h2>2. Cấu trúc hồ sơ setup bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Khối dữ liệu</th><th>Nội dung bắt buộc</th><th>Mục đích vận hành</th></tr></thead><tbody>
+<div class="section"><h2>2. Cấu trúc record setup bắt buộc</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Khối dữ liệu</th><th>Nội dung bắt buộc</th><th>Mục đích operation</th></tr></thead><tbody>
 <tr><td>Header job</td><td>Customer, Job/WO, Part No., Part Name, Rev, Op No., routing step, QPL, machine family, site/workcenter</td><td>Chặn nhầm job, nhầm op, nhầm revision ngay từ point-of-use.</td></tr>
-<tr><td>Source baseline</td><td>Drawing no., model/CAD ref, traveler ref, program ID/version, setup sheet version, tool list version, AML/processor constraints</td><td>Chứng minh bộ tài liệu release là bộ đúng và đầy đủ.</td></tr>
+<tr><td>Source baseline</td><td>Drawing no., model/CAD ref, traveler ref, program ID/version, setup sheet version, tool list version, AML/processor constraints</td><td>Chứng minh bộ document release là bộ đúng và đầy đủ.</td></tr>
 <tr><td>Material &amp; condition</td><td>Material family, alloy/grade/temper, heat/lot ref khi áp dụng, rough/finish state, prior công đoạn đặc biệt state, cleanliness/vacuum flags</td><td>Ngăn setup sai với part cần rule xử lý đặc biệt.</td></tr>
 <tr><td>Workholding</td><td>Fixture ID/rev, jaw type/rev, locator scheme, stop pin, clamp points, torque values, support points, photos</td><td>Khóa logic gá và điều kiện giữ part ổn định.</td></tr>
 <tr><td>WCS / probing</td><td>Datum strategy, orientation, WCS name, master zero source, probing cycle, allowable offset write-back, critical offsets</td><td>Khóa logic lấy chuẩn, tránh drift và tránh viết bù offset vô kiểm soát.</td></tr>
 <tr><td>Tool list</td><td>Tool assembly data, pocket/station, sister tool, preset data, wear/life rule, dung dịch làm mát (coolant) mode, backup tooling</td><td>Khóa cấu hình dao để setup và prove-out lặp lại được.</td></tr>
-<tr><td>Kiểm tra mapping</td><td>CTQ đầu tiên, checkpoint trong quá trình, required gage/CMM/trực quan aid, sampling trigger, mẫu đầu note</td><td>Nối dữ liệu setup với control gate chất lượng và hồ sơ đo.</td></tr>
+<tr><td>Inspection mapping</td><td>CTQ đầu tiên, checkpoint trong quá trình, required gage/CMM/trực quan aid, sampling trigger, mẫu đầu note</td><td>Nối dữ liệu setup với control gate quality và record đo.</td></tr>
 <tr><td>Prove-out / release</td><td>Cycle start mode, override cap, dry-run route, first-cut conditions, required sign-off, revalidation trigger</td><td>Khóa cách mở máy an toàn và đúng control gate.</td></tr>
 </tbody></table></div>
 </div>
 
 <div class="section"><h2>3. Trường header bắt buộc và rule đặt tên</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường</th><th>Quy tắc bắt buộc</th><th>Reject khi</th></tr></thead><tbody>
-<tr><td>Document ID</td><td>Mã file, revision, ngày phát hành, prepared/checked/released by phải hiện ngay trên trang đầu.</td><td>Không có dấu vết phát hành hoặc dùng file export không có metadata.</td></tr>
+<tr><td>Document ID</td><td>Mã file, revision, ngày release, prepared/checked/released by phải hiện ngay trên trang đầu.</td><td>Không có dấu vết release hoặc dùng file export không có metadata.</td></tr>
 <tr><td>Machine family</td><td>Chọn đúng một trong các họ: 3-axis VMC, 5-axis mill, CNC turning, mill-turn/multitask.</td><td>Ghi chung “CNC machine” hoặc không định danh họ máy.</td></tr>
-<tr><td>Operation intent</td><td>Rough / semi-finish / finish / diễn tập-tap / deburr / transfer / rework / kiểm tra cut.</td><td>Không nói rõ ý định công đoạn nên operator tự suy diễn.</td></tr>
-<tr><td>Revision state</td><td>Part Rev và Program Version phải đồng nhất với bộ hồ sơ chuẩn (baseline package).</td><td>Part Rev ≠ Program Rev logic; setup sheet không chỉ ra version đang hiệu lực.</td></tr>
-<tr><td>Customer flag</td><td>Nêu rõ job có yêu cầu đặc biệt về traceability, cleanliness, processor, surface, leak test, packaging hay không.</td><td>Job có overlay nhưng setup sheet không gắn cờ cảnh báo.</td></tr>
-<tr><td>Photo pack</td><td>Ảnh định hướng part, gá đặt, mặt chuẩn, vị trí clamp, vị trí tool đặc biệt phải có chất lượng đủ nhìn.</td><td>Ảnh thiếu góc nhìn quan trọng, mờ, cũ hoặc không đúng revision fixture.</td></tr>
+<tr><td>Operation intent</td><td>Rough / semi-finish / finish / diễn tập-tap / deburr / transfer / rework / inspection cut.</td><td>Không nói rõ ý định công đoạn nên operator tự suy diễn.</td></tr>
+<tr><td>Revision state</td><td>Part Rev và Program Version phải đồng nhất với bộ record chuẩn (baseline package).</td><td>Part Rev ≠ Program Rev logic; setup sheet không chỉ ra version đang hiệu lực.</td></tr>
+<tr><td>Customer flag</td><td>Nêu rõ job có requirement đặc biệt về traceability, cleanliness, processor, surface, leak test, packaging hay không.</td><td>Job có overlay nhưng setup sheet không gắn cờ cảnh báo.</td></tr>
+<tr><td>Photo pack</td><td>Ảnh định hướng part, gá đặt, mặt chuẩn, vị trí clamp, vị trí tool đặc biệt phải có quality đủ nhìn.</td><td>Ảnh thiếu góc nhìn quan trọng, mờ, cũ hoặc không đúng revision fixture.</td></tr>
 </tbody></table></div>
-<div class="keyline"><strong>Rule file name và view name:</strong> tên hiển thị tại point-of-use phải chứa tối thiểu <span class="code">PartNo_Op_MachineFamily_Rev_SetupRev</span>. Không được phát hành file có tên không đủ nhận dạng.</div>
+<div class="keyline"><strong>Rule file name và view name:</strong> tên hiển thị tại point-of-use phải chứa tối thiểu <span class="code">PartNo_Op_MachineFamily_Rev_SetupRev</span>. Không được release file có tên không đủ nhận dạng.</div>
 </div>
 
 <div class="section"><h2>4. Dữ liệu công đoạn bắt buộc theo từng setup</h2>
@@ -115,7 +115,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>5. Ma trận dữ liệu theo nhóm máy (machine family)</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Machine family</th><th>Trường bắt buộc thêm</th><th>Điểm dừng phát hành</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Machine family</th><th>Trường bắt buộc thêm</th><th>Điểm dừng release</th></tr></thead><tbody>
 <tr><td>3-axis VMC</td><td>Vise/fixture type, jaw projection, soft-jaw ID, stop location, top-of-stock, side stop, probe cycle, tool length source</td><td>Không chỉ ra top-of-stock và probe/WCS method.</td></tr>
 <tr><td>5-axis mill</td><td>Rotary orientation state, zero return condition, trunnion/table angle convention, machine limit/collision note, TCP/RTCP condition, singularity watchpoints</td><td>Không có safe angle / collision note / retract strategy.</td></tr>
 <tr><td>CNC turning</td><td>Chuck/jaw ID, clamp pressure range, part stick-out, tailstock/sub-spindle use, tool nose comp rule, cut-off catcher / part ejection rule</td><td>Thiếu clamp pressure, stick-out hoặc catcher/ejection note.</td></tr>
@@ -141,29 +141,29 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <tr><td>Preset data</td><td>Preset source, nominal length/radius, allowed wear band, zero reference, sister tool relationship</td><td>Preset bằng tay nhưng không có rule xác minh.</td></tr>
 <tr><td>Tool life</td><td>Initial life, warning threshold, end-of-life threshold, replacement action, required xác minh after change</td><td>Không có ngưỡng hoặc không có hành động sau khi chạm ngưỡng.</td></tr>
 <tr><td>Dung dịch làm mát / chip note</td><td>Flood/MQL/through-spindle/air blast, nozzle requirement, chip evacuation concern</td><td>Tool đặc biệt nhưng không nêu dung dịch làm mát mode.</td></tr>
-<tr><td>Kiểm tra coupling</td><td>Tool nào cắt CTQ đầu tiên, tool nào phải kiểm ngay sau thay, tool nào yêu cầu surface check riêng</td><td>Không nối Tool List với control gate chất lượng.</td></tr>
+<tr><td>Inspection coupling</td><td>Tool nào cắt CTQ đầu tiên, tool nào phải kiểm ngay sau thay, tool nào requirement surface check riêng</td><td>Không nối Tool List với control gate quality.</td></tr>
 </tbody></table></div>
 <h3>7.1 Backup tooling và substitute</h3>
 <ul>
 <li>Mọi sister tool hoặc substitute phải được ghi rõ trạng thái: <span class="code">approved</span>, <span class="code">conditional</span>, hoặc <span class="code">not allowed</span>.</li>
 <li>Tool substitute chỉ được dùng khi Engineering đã chỉ ra phạm vi part/feature cho phép và bước revalidation kèm theo.</li>
-<li>Không thay holder/arbor/insert grade rồi coi như không đổi quy trình.</li>
+<li>Không thay holder/arbor/insert grade rồi coi như không đổi process.</li>
 </ul>
 </div>
 
 <div class="section"><h2>8. Probing, WCS, critical offsets và prove-out</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục</th><th>Yêu cầu dữ liệu</th></tr></thead><tbody>
-<tr><td>Datum strategy</td><td>Phải chỉ rõ datum vật lý, datum logic trong chương trình, và mối liên hệ với bản vẽ/kế hoạch kiểm tra (kiểm tra plan).</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục</th><th>Requirement dữ liệu</th></tr></thead><tbody>
+<tr><td>Datum strategy</td><td>Phải chỉ rõ datum vật lý, datum logic trong chương trình, và mối liên hệ với bản vẽ/kế hoạch inspection (inspection plan).</td></tr>
 <tr><td>Probe cycle</td><td>Mã cycle, bề mặt chạm, expected result, logic đạt/không đạt, write-back allowed hay không.</td></tr>
-<tr><td>Critical offsets</td><td>Danh sách offset không được sửa bởi operator hoặc chỉ được sửa trong biên độ hẹp; nêu rõ ai được sửa và phải nhật ký ở đâu.</td></tr>
+<tr><td>Critical offsets</td><td>Danh sách offset không được sửa bởi operator hoặc chỉ được sửa trong biên độ hẹp; nêu rõ ai được sửa và phải log ở đâu.</td></tr>
 <tr><td>Prove-out mode</td><td>Dry-run / graphics / single block / rapid cap / spindle cap / first-cut watchpoint / feature-by-feature release.</td></tr>
 <tr><td>Restart note</td><td>Rule quay lại prove-out khi machine reset, chuyển giao công việc, tool substitute, crash, fixture re-clamp hoặc rebaseline revision.</td></tr>
 </tbody></table></div>
 <div class="keyline"><strong>Điểm bắt buộc:</strong> setup sheet phải chỉ ra chính xác <em>điểm bắt đầu prove-out</em>, <em>điểm kết thúc prove-out</em> và <em>điều kiện chuyển sang chạy sản lượng</em>. Không được ghi chung chung “run carefully”.</div>
 </div>
 
-<div class="section"><h2>9. Mapping với đo kiểm và hồ sơ bằng chứng</h2>
-<p>Setup Sheet và Tool List phải nối trực tiếp sang control gate chất lượng. Ít nhất phải có các trường sau:</p>
+<div class="section"><h2>9. Mapping với measurement và record evidence</h2>
+<p>Setup Sheet và Tool List phải nối trực tiếp sang control gate quality. Ít nhất phải có các trường sau:</p>
 <ul>
 <li>CTQ đầu tiên cần xác nhận sau first cut.</li>
 <li>Đặc tính cần đo sau khi thay dao hoặc sau khi chỉnh wear vượt ngưỡng.</li>
@@ -175,21 +175,21 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 
 <div class="section"><h2>10. Quy tắc thay đổi, supersede và reject conditions</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
-<tr><td>Đổi offset logic / WCS / datum / orientation</td><td>Phát hành phiên bản mới, cập nhật prove-out note và trigger control gate liên quan.</td><td>Sửa miệng hoặc ghi bút tay tại máy rồi tiếp tục chạy hàng loạt.</td></tr>
-<tr><td>Đổi fixture / jaw / stop / clamp strategy</td><td>Cập nhật ảnh, torque, locator, risk note và phê duyệt lại.</td><td>Dùng fixture “gần giống” mà không cập nhật sheet.</td></tr>
+<tr><td>Đổi offset logic / WCS / datum / orientation</td><td>Release revision mới, cập nhật prove-out note và trigger control gate liên quan.</td><td>Sửa miệng hoặc ghi bút tay tại máy rồi tiếp tục chạy hàng loạt.</td></tr>
+<tr><td>Đổi fixture / jaw / stop / clamp strategy</td><td>Cập nhật ảnh, torque, locator, risk note và approval lại.</td><td>Dùng fixture “gần giống” mà không cập nhật sheet.</td></tr>
 <tr><td>Đổi tool assembly / substitute</td><td>Cập nhật Tool List revision, sister tool logic, life band và required xác minh.</td><td>Đổi tool rồi chỉ báo miệng cho ca sau.</td></tr>
 <tr><td>Machine transfer</td><td>Tạo addendum hoặc setup block mới cho nhóm máy (machine family) đích.</td><td>Dùng nguyên setup sheet của nhóm máy (machine family) khác.</td></tr>
-<tr><td>Hot fix tại xưởng</td><td>Quay về controlled change; mọi bản in cũ phải được thu hồi hoặc đánh dấu superseded.</td><td>Chạy theo bản cũ và hứa “sẽ sửa sau”.</td></tr>
+<tr><td>Hot fix tại workshop</td><td>Quay về controlled change; mọi bản in cũ phải được recall hoặc đánh dấu superseded.</td><td>Chạy theo bản cũ và hứa “sẽ sửa sau”.</td></tr>
 </tbody></table></div>
-<div class="callout-danger"><strong>Reject conditions tổng hợp:</strong> thiếu trường bắt buộc; ảnh không đúng fixture; Tool List không khớp pocket; không có prove-out note; không chỉ ra CTQ đầu tiên; không xác định nhóm máy (machine family); không có người release. Gặp một trong các điều kiện này, Document Control/ENG phải từ chối phát hành.</div>
+<div class="callout-danger"><strong>Reject conditions tổng hợp:</strong> thiếu trường bắt buộc; ảnh không đúng fixture; Tool List không khớp pocket; không có prove-out note; không chỉ ra CTQ đầu tiên; không xác định nhóm máy (machine family); không có người release. Gặp một trong các điều kiện này, Document Control/ENG phải từ chối release.</div>
 </div>
 
-<div class="section"><h2>11. KPI, đánh giá hooks và tài liệu liên kết</h2>
+<div class="section"><h2>11. KPI, đánh giá hooks và document liên kết</h2>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>KPI</strong><div class="tiny" style="margin-top:6px;">Tỷ lệ setup sheet phát hành đúng ngay lần đầu; số lỗi setup do thiếu field; số lần machine transfer phải sửa sheet; số incident liên quan sai WCS/tool list/fixture note.</div></div>
+<div class="kpi-box"><strong>KPI</strong><div class="tiny" style="margin-top:6px;">Tỷ lệ setup sheet release đúng ngay lần đầu; số lỗi setup do thiếu field; số lần machine transfer phải sửa sheet; số incident liên quan sai WCS/tool list/fixture note.</div></div>
 <div class="kpi-box"><strong>Đánh giá hooks</strong><div class="tiny" style="margin-top:6px;">Random check 3 job đang chạy: header đúng, nhóm máy (machine family) đúng, fixture photo đúng, tool list khớp pocket, prove-out note đủ, CTQ đầu tiên được chỉ rõ.</div></div>
 </div>
-<div class="callout-info"><strong>Tài liệu liên kết:</strong> <a href="../02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>, <a href="../05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-512-3-axis-vertical-milling-guide.html">WI-512</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-513-5-axis-milling-guide.html">WI-513</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-514-cnc-turning-guide.html">WI-514</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-515-mill-turn-guide.html">WI-515</a>, <a href="../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a>, <a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>.</div>
+<div class="callout-info"><strong>Document liên kết:</strong> <a href="../02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>, <a href="../05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-512-3-axis-vertical-milling-guide.html">WI-512</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-513-5-axis-milling-guide.html">WI-513</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-514-cnc-turning-guide.html">WI-514</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-515-mill-turn-guide.html">WI-515</a>, <a href="../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a>, <a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>.</div>
 </div>
 
     </div>

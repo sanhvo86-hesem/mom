@@ -60,7 +60,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+    <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
@@ -79,7 +79,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="cover">
 <div class="kicker">MRR Pack</div>
 <h1 class="h1">Job dossier Pack (RFQ → Cash)</h1>
-<p class="lead">Bộ bảng kiểm MRR theo control gate G0→G5 để vận hành job CNC và truy xuất đánh giá 60 giây.</p>
+<p class="lead">Bộ checklist MRR theo control gate G0→G5 để operation job CNC và traceability đánh giá 60 giây.</p>
 <div class="grid-2">
 <div class="note">
 <strong>Áp dụng</strong>
@@ -90,10 +90,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Control gate Packs:</b> <a href="mrr-g0-rfq-quote.html"><b>G0</b></a> <a href="mrr-g1-contract-kickoff.html"><b>G1</b></a> <a href="mrr-g2-engineering-release.html"><b>G2</b></a> <a href="mrr-g3-production-fai-release.html"><b>G3</b></a> <a href="mrr-g4-final-ship-packet.html"><b>G4</b></a> <a href="mrr-g5-closeout-billing.html"><b>G5</b></a></li></ul>
 </div>
 <div class="note">
-<strong>Thông tin Job / Hồ sơ</strong>
+<strong>Thông tin Job / Record</strong>
 <div class="mini">
  JobCode: <span class="formline"> </span><br/>
- Khách hàng: <span class="formline"> </span><br/>
+ Customer: <span class="formline"> </span><br/>
  Part No: <span class="formline"> </span>   Rev: <span class="formline"> </span><br/>
  Số lượng: <span class="formline"> </span>   Due: <span class="formline"> </span><br/>
 </div>
@@ -102,66 +102,66 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Job dossier Folder Map (SSOT)</h2>
-<p class="mini muted2">Dùng đúng thư mục để truy xuất đánh giá 60 giây. MRR theo control gate nằm trong Control gate Packs G0→G5.</p>
+<p class="mini muted2">Dùng đúng thư mục để traceability đánh giá 60 giây. MRR theo control gate nằm trong Control gate Packs G0→G5.</p>
 <div style="overflow:auto;">
 <table class="form-table">
 <tr><th style="min-width:260px;">Thư mục</th><th>Mục đích</th><th style="min-width:260px;">MRR chính</th></tr>
 <tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td>RFQ, spec bundle, CTQ, báo giá</td><td class="mini">RFQ • SPEC • CTQ • QTE • RISK0</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td>PO/Hợp đồng, rà soát hợp đồng, khởi động</td><td class="mini">PO/CON • CR • REVBASE • KOM • PLAN0</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td>Engineering baseline, CAM/NC, control plan, DCR hồ sơ</td><td class="mini">DRW • PP • NCREL • CTRL • CHG</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/</td><td>Traveler, setup, machine mức sẵn sàng, bàn giao</td><td class="mini">TRV • SETUP • MCH • HO</td></tr>
+<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td>PO/Hợp đồng, review hợp đồng, khởi động</td><td class="mini">PO/CON • CR • REVBASE • KOM • PLAN0</td></tr>
+<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td>Engineering baseline, CAM/NC, control plan, DCR record</td><td class="mini">DRW • PP • NCREL • CTRL • CHG</td></tr>
+<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/</td><td>Traveler, setup, machine readiness level, bàn giao</td><td class="mini">TRV • SETUP • MCH • HO</td></tr>
 <tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/</td><td>FAI/IPQC/Final, NCR/CAPA</td><td class="mini">FAI/IR • IPQC • FIR • DIM • NCR/CAPA</td></tr>
 <tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/05_SUPPLIER/</td><td>Supplier/subcontract, cert bundle</td><td class="mini">PO • SUBCON • MTR/COC • CERT</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/06_SHIPPING/</td><td>Bộ hồ sơ giao hàng (ship packet), CoC, packing, waybill</td><td class="mini">COC • SHPK • PACK • SHIP</td></tr>
+<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/06_SHIPPING/</td><td>Bộ record delivery (ship packet), CoC, packing, waybill</td><td class="mini">COC • SHPK • PACK • SHIP</td></tr>
 <tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/07_FINANCE/</td><td>Invoice, POD</td><td class="mini">INV • POD</td></tr>
 <tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/99_CLOSEOUT/</td><td>Cost capture, lessons learned, job review</td><td class="mini">COST • LL</td></tr>
 </table>
 </div>
-<div class="note mini"><b>Rule:</b> File nằm sai thư mục hoặc sai tên → FAIL (không công nhận bằng chứng).</div>
+<div class="note mini"><b>Rule:</b> File nằm sai thư mục hoặc sai tên → FAIL (không công nhận evidence).</div>
 </div>
 <div class="card">
-<h2 class="h2" style="margin-top:0;">Bảng kiểm MRR (Minimum Required Hồ sơ)</h2>
-<p class="mini muted2">Tick đủ các dòng dưới đây. Mỗi dòng phải có bằng chứng trong SSOT và đặt tên file đúng chuẩn.</p>
+<h2 class="h2" style="margin-top:0;">Checklist MRR (Minimum Required Record)</h2>
+<p class="mini muted2">Tick đủ các dòng dưới đây. Mỗi dòng phải có evidence trong SSOT và đặt tên file đúng chuẩn.</p>
 <div style="overflow:auto;">
 <table class="form-table">
 <tr>
-<th style="min-width:320px;">MRR / Bằng chứng</th>
+<th style="min-width:320px;">MRR / Evidence</th>
 <th style="min-width:140px;">RecordType</th>
 <th style="min-width:110px;">Control gate</th>
 <th style="min-width:120px;">Responsible Person</th>
 <th style="min-width:220px;">SSOT path</th>
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
-<tr><td><span class="chk">☐</span> RFQ + yêu cầu khách hàng (master copy)</td><td>RFQ</td><td>G0</td><td>Sales</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RFQ_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> rà soát hợp đồng (yêu cầu/CTQ/rủi ro/chấp nhận năng lực)</td><td>CR</td><td>G1</td><td>Sales+QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> PO/WO/JobCode được phát hành</td><td>WO</td><td>G1</td><td>Planning</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_WO_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> RFQ + requirement customer (master copy)</td><td>RFQ</td><td>G0</td><td>Sales</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RFQ_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> review hợp đồng (requirement/CTQ/rủi ro/chấp nhận competence)</td><td>CR</td><td>G1</td><td>Sales+QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> PO/WO/JobCode được release</td><td>WO</td><td>G1</td><td>Planning</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_WO_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Baseline bản vẽ + spec (REV kiểm soát)</td><td>DRAW/SPEC</td><td>G2</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_DRAWREV_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Route / Quy trình Plan / CTQ map</td><td>PLAN</td><td>G2</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PLAN_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> sổ đăng ký rủi ro (risk register) (job-level) + hành động chặn</td><td>RISK</td><td>G2</td><td>QA+OPS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RISK_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> NC Gói phát hành (mô phỏng + bảng kiểm release)</td><td>NCREL</td><td>G2</td><td>CAM/ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/NC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCREL_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Route / Process Plan / CTQ map</td><td>PLAN</td><td>G2</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PLAN_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> register rủi ro (risk register) (job-level) + hành động chặn</td><td>RISK</td><td>G2</td><td>QA+OPS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RISK_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> NC Gói release (mô phỏng + checklist release)</td><td>NCREL</td><td>G2</td><td>CAM/ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/NC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCREL_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Traveler / Job Pack (theo route)</td><td>TRV</td><td>G3</td><td>Planning</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_TRV_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Setup Sheet + Tool list + Offset list</td><td>SETUP</td><td>G3</td><td>Setup</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/SETUP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SETUP_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> FAI/IR (mẫu đầu (first piece)) được QC ký xác nhận</td><td>FAI/IR</td><td>G3</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FAI/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FAI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> IPQC hồ sơ theo tần suất/CTQ</td><td>IPQC</td><td>G3</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/IPQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> IPQC record theo tần suất/CTQ</td><td>IPQC</td><td>G3</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/IPQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> NCR (khi phát hiện NG) + disposition (HOLD/REWORK/SCRAP)</td><td>NCR</td><td>G3</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> CAPA (khi NCR lặp/escape) + xác minh</td><td>CAPA</td><td>G4</td><td>QA/QMS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CAPA_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Final Inspection Report + acceptance</td><td>FQC</td><td>G4</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> CoC/CoA + Bộ hồ sơ giao hàng (phiếu kê đóng gói/label)</td><td>COC/SHIP</td><td>G5</td><td>QA+WHS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/05_SHIP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SHIP_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> CoC/CoA + Bộ record delivery (phiếu kê packaging/label)</td><td>COC/SHIP</td><td>G5</td><td>QA+WHS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/05_SHIP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SHIP_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Invoice/Costing close-out</td><td>INV</td><td>G5</td><td>Finance</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/06_CLOSE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_INV_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 </table>
 </div>
-<div class="note mini"><strong>Gắn với mô-đun</strong>: C10 (RFQ→Cash), C13 (Change control), C08 (SSOT), C09 (OTD), C15 (Material/Quy trình), C17 (Setup/CAM), C18 (Supply chain).</div>
+<div class="note mini"><strong>Gắn với mô-đun</strong>: C10 (RFQ→Cash), C13 (Change control), C08 (SSOT), C09 (OTD), C15 (Material/Process), C17 (Setup/CAM), C18 (Supply chain).</div>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
 <ul class="tight">
-<li>Sai REV bản vẽ hoặc thiếu baseline trong SSOT → BLOCK.</li><li>Thiếu rà soát hợp đồng hoặc thiếu CTQ map → HOLD tại G2.</li><li>Chạy máy khi chưa có NC Gói phát hành hoặc setup sheet → STOP.</li><li>FAI/IR chưa ký mà đã chạy hàng loạt → STOP và HOLD toàn bộ WIP.</li><li>giao hàng khi thiếu CoC/bộ hồ sơ giao hàng → BLOCK.</li>
+<li>Sai REV bản vẽ hoặc thiếu baseline trong SSOT → BLOCK.</li><li>Thiếu review hợp đồng hoặc thiếu CTQ map → HOLD tại G2.</li><li>Chạy máy khi chưa có NC Gói release hoặc setup sheet → STOP.</li><li>FAI/IR chưa ký mà đã chạy hàng loạt → STOP và HOLD toàn bộ WIP.</li><li>delivery khi thiếu CoC/bộ record delivery → BLOCK.</li>
 </ul>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Đánh giá 60 giây</h2>
 <ol class="tight">
-<li>Mở SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/ và xác nhận có đủ thư mục 00→06.</li><li>Mở file baseline DRAWREV và kiểm tra REV trùng PO/WO.</li><li>Mở NCREL bảng kiểm và xác nhận mô phỏng + release sign-off.</li><li>Mở FAI/IR và đối chiếu CTQ map.</li><li>Mở bộ hồ sơ giao hàng và kiểm tra CoC/phiếu kê đóng gói (phiếu kê đóng gói)/label khớp JobCode.</li>
+<li>Mở SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/ và xác nhận có đủ thư mục 00→06.</li><li>Mở file baseline DRAWREV và inspection REV trùng PO/WO.</li><li>Mở NCREL checklist và xác nhận mô phỏng + release sign-off.</li><li>Mở FAI/IR và đối chiếu CTQ map.</li><li>Mở bộ record delivery và inspection CoC/phiếu kê packaging (phiếu kê packaging)/label khớp JobCode.</li>
 </ol>
 </div>
 <div class="card">
@@ -176,7 +176,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div></div></div>
 
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

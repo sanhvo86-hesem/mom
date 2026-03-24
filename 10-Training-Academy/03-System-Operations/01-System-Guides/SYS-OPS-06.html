@@ -58,7 +58,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+    <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
@@ -81,8 +81,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-06</div>
 <h1 style="margin-top:10px">Từ điển KPI &amp; Mô hình dữ liệu (Power BI Trung tâm điều hành)</h1>
-<p class="muted">Đào tạo thực chiến để vận hành xưởng CNC gia công theo đơn (job shop) theo dữ liệu “một sự thật”, có diễn tập‑down về hồ sơ và minh chứng (MRR). Mọi quyết định control gate/ship/quality sử dụng KPI bắt buộc truy vết được.</p>
-<div class="tag blue">Phiên bản</div>
+<p class="muted">Training thực chiến để operation workshop CNC gia công theo đơn (job shop) theo dữ liệu “một sự thật”, có diễn tập‑down về record và minh chứng (MRR). Mọi quyết định control gate/ship/quality sử dụng KPI bắt buộc truy vết được.</p>
+<div class="tag blue">Revision</div>
 </div>
 <div class="note">
 <strong>Thông tin triển khai (khóa này KHÔNG học kiểu lý thuyết)</strong>
@@ -91,7 +91,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="pill">Operator</span><span class="pill">Setup</span><span class="pill">Programmer</span><span class="pill">QC</span><span class="pill">QA</span><span class="pill">Warehouse</span><span class="pill">Purchasing</span><span class="pill">Planner</span><span class="pill">Maintenance</span><span class="pill">EHS</span><span class="pill">Estimator (SAL-03)</span><span class="pill">Supervisor</span>
 </li>
 <li><strong>Thời lượng chuẩn:</strong> 2.5 giờ lớp chung (mục 2–7) • 1.5 giờ thực hành theo vai trò (mục 8–10) • OJT 1 ca làm việc (mục 9).</li>
-<li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền truy cập danh sách vận hành; đã hoàn tất Orientation về “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”.</li>
+<li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền truy cập danh sách operation; đã hoàn tất Orientation về “không có evidence thì không qua control gate (No evidence = No gate)”.</li>
 <li><strong>Kích hoạt:</strong> Khi tạo KPI mới, khi sửa công thức KPI, khi thay đổi quan hệ mô hình, khi refresh lỗi, khi đánh giá hỏi “đo KPI bằng gì”.</li>
 </ul>
 </div>
@@ -99,26 +99,26 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="toc">
 <strong>Mục lục nhanh</strong>
 <ul>
-<li><a href="#sec2">2) Mục đích mô-đun &amp; bối cảnh vận hành</a></li>
+<li><a href="#sec2">2) Mục đích mô-đun &amp; bối cảnh operation</a></li>
 <li><a href="#sec3">3) Vị trí trong chuỗi E2E + bàn giao + hold point</a></li>
 <li><a href="#sec4">4) Điểm đứt gãy (&gt;=10)</a></li>
 <li><a href="#sec5">5) Biện pháp kiểm soát rủi ro (&gt;=6)</a></li>
 <li><a href="#sec6">6) Fail-fast rules + STOP/HOLD/BLOCK</a></li>
 <li><a href="#sec7">7) Phản ứng 60 giây</a></li>
-<li><a href="#sec8">8) Bảng kiểm vận hành (&lt;=15 bước)</a></li>
+<li><a href="#sec8">8) Checklist operation (&lt;=15 bước)</a></li>
 <li><a href="#sec9">9) OJT theo TWI</a></li>
-<li><a href="#sec10">10) Đánh giá (Bài kiểm tra nhanh + Scenario + Performance test)</a></li>
+<li><a href="#sec10">10) Đánh giá (Bài inspection nhanh + Scenario + Performance test)</a></li>
 <li><a href="#sec11">11) ĐẠT/KHÔNG ĐẠT criteria</a></li>
 <li><a href="#sec12">12) MRR tối thiểu</a></li>
 <li><a href="#sec13">13) Common đánh giá phát hiện &amp; phòng ngừa</a></li>
-<li><a href="#sec14">14) DCR hồ sơ</a></li>
+<li><a href="#sec14">14) DCR record</a></li>
 </ul>
 </div>
 </div>
-<!-- 2) Mục đích module & bối cảnh vận hành -->
+<!-- 2) Mục đích module & bối cảnh operation -->
 <div class="card" id="sec2">
-<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành (control gate/bàn giao; trách nhiệm; kích hoạt)</h2>
-<p><span class="must">Mục tiêu duy nhất:</span> KPI dùng để điều hành xưởng phải có <span class="must">định nghĩa duy nhất</span>, <span class="must">công thức duy nhất</span>, <span class="must">owner rõ</span>, <span class="must">nguồn dữ liệu rõ</span>, và <span class="must">diễn tập‑down về hồ sơ + MRR</span>. KPI nào không truy vết được bị xem là <span class="must">không hợp lệ</span> trong mọi cuộc họp và mọi quyết định control gate.</p>
+<h2>2) Mục đích mô-đun &amp; bối cảnh operation (control gate/bàn giao; trách nhiệm; kích hoạt)</h2>
+<p><span class="must">Mục tiêu duy nhất:</span> KPI dùng để điều hành workshop phải có <span class="must">định nghĩa duy nhất</span>, <span class="must">công thức duy nhất</span>, <span class="must">owner rõ</span>, <span class="must">nguồn dữ liệu rõ</span>, và <span class="must">diễn tập‑down về record + MRR</span>. KPI nào không truy vết được bị xem là <span class="must">không hợp lệ</span> trong mọi cuộc họp và mọi quyết định control gate.</p>
 <div class="kpi-box">
 <div class="grid-2">
 <div>
@@ -126,16 +126,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Điều hành theo KPI nhưng mỗi phòng hiểu 1 kiểu tạo ra quyết định sai và phá control gate.</li>
 <li>Bảng điều khiển hiển thị “xanh” khi dữ liệu thiếu/đúp tạo ra ship sai, NCR trễ, vượt qua hold.</li>
-<li>Đánh giá hỏi “bằng chứng đâu” mà KPI không có hồ sơ gốc và không có đường dẫn minh chứng.</li>
+<li>Đánh giá hỏi “evidence đâu” mà KPI không có record gốc và không có đường dẫn minh chứng.</li>
 </ul>
 </div>
 <div>
 <strong>Trách nhiệm bắt buộc (không né trách nhiệm)</strong>
 <ul>
-<li><span class="must">QA/QMS</span>: khóa định nghĩa KPI, khóa logic control gate “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”, change control.</li>
+<li><span class="must">QA/QMS</span>: khóa định nghĩa KPI, khóa logic control gate “không có evidence thì không qua control gate (No evidence = No gate)”, change control.</li>
 <li><span class="must">IT/BI</span>: khóa mô hình dữ liệu, khóa đo Data Health/Refresh/Latency, khóa quyền truy cập (RLS).</li>
 <li><span class="must">Supervisor</span>: dùng KPI để chặn quyết định, ép ghi nhận hành động và MRR trong standup.</li>
-<li><span class="must">Mọi vai trò vận hành</span>: tạo dữ liệu đúng khóa (JobNum/Rev/Date), gắn link minh chứng, không tạo “Excel riêng”.</li>
+<li><span class="must">Mọi vai trò operation</span>: tạo dữ liệu đúng khóa (JobNum/Rev/Date), gắn link minh chứng, không tạo “Excel riêng”.</li>
 </ul>
 </div>
 </div>
@@ -155,12 +155,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>Operator</strong></td>
 <td>Nhập dữ liệu thực thi theo ca (downtime, hoàn thành công đoạn, chứng từ kèm JobNum/Rev). Khi bảng điều khiển báo thiếu minh chứng phải dừng và báo.</td>
-<td>Ghi đủ <span class="path">JobNum + RevisionNum</span> trong hồ sơ; gắn link minh chứng; xử lý “data missing” theo phản ứng 60 giây.</td>
+<td>Ghi đủ <span class="path">JobNum + RevisionNum</span> trong record; gắn link minh chứng; xử lý “data missing” theo phản ứng 60 giây.</td>
 </tr>
 <tr>
 <td><strong>Setup</strong></td>
-<td>Ghi tuổi dao (tool life) / setup event / xác nhận chạy mẫu theo đúng JobNum/OprSeq; khi thay dao/offset có liên quan downtime &amp; chất lượng phải ghi hồ sơ.</td>
-<td>Hồ sơ có <span class="path">JobNum + OprSeq + MachineID</span>; mô tả nguyên nhân theo ReasonCode; có ảnh/biên bản kèm link.</td>
+<td>Ghi tuổi dao (tool life) / setup event / xác nhận chạy mẫu theo đúng JobNum/OprSeq; khi thay dao/offset có liên quan downtime &amp; quality phải ghi record.</td>
+<td>Record có <span class="path">JobNum + OprSeq + MachineID</span>; mô tả nguyên nhân theo ReasonCode; có ảnh/biên bản kèm link.</td>
 </tr>
 <tr>
 <td><strong>Programmer</strong></td>
@@ -170,22 +170,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>QC</strong></td>
 <td>Ghi IR/FAI/hold theo JobNum; gắn kết quả đo và minh chứng; không cho pass miệng.</td>
-<td>IR/FAI có link minh chứng; hold có containment; không có “pass không hồ sơ”.</td>
+<td>IR/FAI có link minh chứng; hold có containment; không có “pass không record”.</td>
 </tr>
 <tr>
 <td><strong>QA</strong></td>
-<td>Quản trị Hold/NCR/CAPA; khóa logic control gate; phê duyệt định nghĩa KPI; xác nhận diễn tập‑down chạy đến hồ sơ và bằng chứng.</td>
-<td>Thiết lập ĐẠT/KHÔNG ĐẠT control gate trong KPI dictionary; mọi hold/NCR/CAPA có trạng thái + người phụ trách + bằng chứng link.</td>
+<td>Quản trị Hold/NCR/CAPA; khóa logic control gate; approval định nghĩa KPI; xác nhận diễn tập‑down chạy đến record và evidence.</td>
+<td>Thiết lập ĐẠT/KHÔNG ĐẠT control gate trong KPI dictionary; mọi hold/NCR/CAPA có trạng thái + người phụ trách + evidence link.</td>
 </tr>
 <tr>
 <td><strong>Warehouse</strong></td>
-<td>Ghi ShipRelease/Packaging/SSCC; khóa “Ship Mức sẵn sàng” theo packet đầy đủ + reconciliation; không phát hành khi thiếu.</td>
+<td>Ghi ShipRelease/Packaging/SSCC; khóa “Ship Readiness level” theo packet đầy đủ + reconciliation; không release khi thiếu.</td>
 <td>ShipRelease có đủ cờ control gate (PacketComplete/PackagingPass/FinalIRPass/ReconciliationStatus) và link dossier/packet.</td>
 </tr>
 <tr>
 <td><strong>Purchasing</strong></td>
-<td>Ghi ReceivingIQC/Outsource; khóa vendor bằng chứng; không nhập hàng khi thiếu chứng từ bắt buộc.</td>
-<td>IQC/outsource hồ sơ có JobNum/Part/Rev và link COA/biên bản; vi phạm tạo HOLD.</td>
+<td>Ghi ReceivingIQC/Outsource; khóa vendor evidence; không nhập hàng khi thiếu chứng từ bắt buộc.</td>
+<td>IQC/outsource record có JobNum/Part/Rev và link COA/biên bản; vi phạm tạo HOLD.</td>
 </tr>
 <tr>
 <td><strong>Planner</strong></td>
@@ -194,23 +194,23 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><strong>Maintenance</strong></td>
-<td>Ghi DowntimeEvents; khóa CauseCode/DowntimeGroup; gắn bằng chứng sửa chữa; khi downtime spike phải mở hành động.</td>
-<td>Downtime hồ sơ đủ start/end/minutes; cause code rõ; bằng chứng link có.</td>
+<td>Ghi DowntimeEvents; khóa CauseCode/DowntimeGroup; gắn evidence sửa chữa; khi downtime spike phải mở hành động.</td>
+<td>Downtime record đủ start/end/minutes; cause code rõ; evidence link có.</td>
 </tr>
 <tr>
 <td><strong>EHS</strong></td>
-<td>Chỉ sử dụng KPI khi dữ liệu incident/sự cố suýt xảy ra (near-miss) có SSOT. Khi chưa có bảng dữ liệu chuẩn phải ghi M365/SharePoint → HESEM-QMS-SSOT.</td>
+<td>Chỉ sử dụng KPI khi dữ liệu incident/incident suýt xảy ra (near-miss) có SSOT. Khi chưa có bảng dữ liệu chuẩn phải ghi M365/SharePoint → HESEM-QMS-SSOT.</td>
 <td>Không đưa KPI EHS vào thẻ điểm (scorecard) khi chưa có SSOT và naming rule; mục thiếu phải gắn M365/SharePoint → HESEM-QMS-SSOT.</td>
 </tr>
 <tr>
 <td><strong>Estimator (SAL-03)</strong></td>
-<td>Chỉ sử dụng KPI khi có dữ liệu khiếu nại/phản hồi có hồ sơ và bằng chứng. Khi khách hỏi KPI phải trả bằng định nghĩa chuẩn.</td>
-<td>Không báo KPI CS khi thiếu hồ sơ; mọi khiếu nại có ID + bằng chứng link theo MRR.</td>
+<td>Chỉ sử dụng KPI khi có dữ liệu complaint/phản hồi có record và evidence. Khi khách hỏi KPI phải trả bằng định nghĩa chuẩn.</td>
+<td>Không báo KPI CS khi thiếu record; mọi complaint có ID + evidence link theo MRR.</td>
 </tr>
 <tr>
 <td><strong>Supervisor</strong></td>
-<td>Dẫn dắt Trung tâm điều hành; ép dùng KPI dictionary; chặn quyết định khi KPI không đủ bằng chứng; ghi action &amp; người phụ trách.</td>
-<td>Standup dùng KPI có diễn tập‑down; mọi bất ổn có action hồ sơ; không có action bị xem là FAIL.</td>
+<td>Dẫn dắt Trung tâm điều hành; ép dùng KPI dictionary; chặn quyết định khi KPI không đủ evidence; ghi action &amp; người phụ trách.</td>
+<td>Standup dùng KPI có diễn tập‑down; mọi bất ổn có action record; không có action bị xem là FAIL.</td>
 </tr>
 </tbody>
 </table>
@@ -218,7 +218,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 3) Vị trí E2E + handoff + hold point -->
 <div class="card" id="sec3">
-<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + “hold point”</h2>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (input/output) + “hold point”</h2>
 <p>Mô-đun này là “lớp kiểm soát” chạy xuyên suốt chuỗi E2E. KPI chỉ được dùng khi <span class="must">đi qua 3 lớp</span>: (1) định nghĩa trong KPI dictionary, (2) mô hình dữ liệu có khóa truy vết, (3) minh chứng (MRR) có đường dẫn.</p>
 <div class="card">
 <h3>Chuỗi E2E (mô-đun bám vào bước nào)</h3>
@@ -228,8 +228,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead>
 <tr>
 <th style="width:220px">Bước</th>
-<th>Đầu vào dữ liệu (tối thiểu)</th>
-<th>Đầu ra KPI/hold point</th>
+<th>Input dữ liệu (tối thiểu)</th>
+<th>Output KPI/hold point</th>
 </tr>
 </thead>
 <tbody>
@@ -246,78 +246,78 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>QC/QA</strong></td>
 <td>InspectionReports, FAIReports, QCHoldLog, NCRLog, CAPA8D, ApprovalHistory</td>
-<td>Hold SLA, NCR Rate, CAPA Tuổi tồn <span class="must">→ chặn</span> khi không có bằng chứng link hoặc vượt qua hold.</td>
+<td>Hold SLA, NCR Rate, CAPA Tuổi tồn <span class="must">→ chặn</span> khi không có evidence link hoặc vượt qua hold.</td>
 </tr>
 <tr>
 <td><strong>Packing/Ship</strong></td>
 <td>PackagingChecks, PackSSCCRegister, ShipRelease, ShipmentMirror</td>
-<td>Ship Mức sẵn sàng, OTD <span class="must">→ chặn</span> khi PacketComplete/ReconciliationStatus không PASS.</td>
+<td>Ship Readiness level, OTD <span class="must">→ chặn</span> khi PacketComplete/ReconciliationStatus không PASS.</td>
 </tr>
 <tr>
 <td><strong>Phản hồi/CI</strong></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT bảng Khiếu nại/Phản hồi SSOT</td>
-<td>KPI CS chỉ được bật khi SSOT tồn tại và có bằng chứng link.</td>
+<td>M365/SharePoint → HESEM-QMS-SSOT bảng Complaint/Phản hồi SSOT</td>
+<td>KPI CS chỉ được bật khi SSOT tồn tại và có evidence link.</td>
 </tr>
 <tr>
 <td><strong>EHS</strong></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT bảng Incident/Sự cố suýt xảy ra SSOT</td>
-<td>KPI EHS chỉ được bật khi SSOT tồn tại và có bằng chứng link.</td>
+<td>M365/SharePoint → HESEM-QMS-SSOT bảng Incident/Incident suýt xảy ra SSOT</td>
+<td>KPI EHS chỉ được bật khi SSOT tồn tại và có evidence link.</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<h3>Luồng bàn giao (đầu vào/đầu ra) bắt buộc</h3>
+<h3>Luồng bàn giao (input/output) bắt buộc</h3>
 <div class="grid-2">
 <div class="card">
 <h4 style="margin-top:0">Bàn giao A — Tạo/Sửa KPI (định nghĩa)</h4>
 <ul>
-<li><span class="must">Đầu vào:</span> yêu cầu KPI từ Supervisor/Process Owner; mô tả quyết định cần chặn; rủi ro cần giảm.</li>
-<li><span class="must">Đầu ra:</span> 01 bản ghi KPI dictionary (name/người phụ trách/cadence/source/drillthrough) + 01 bản ghi change control.</li>
+<li><span class="must">Input:</span> requirement KPI từ Supervisor/Process Owner; mô tả quyết định cần chặn; rủi ro cần giảm.</li>
+<li><span class="must">Output:</span> 01 bản ghi KPI dictionary (name/người phụ trách/cadence/source/drillthrough) + 01 bản ghi change control.</li>
 <li><span class="must">Hold point:</span> KPI không có người phụ trách hoặc không có nguồn dữ liệu bị khóa ở trạng thái <span class="block">BLOCK</span>.</li>
 </ul>
 </div>
 <div class="card">
 <h4 style="margin-top:0">Bàn giao B — Sửa mô hình dữ liệu (relationship / measure)</h4>
 <ul>
-<li><span class="must">Đầu vào:</span> KPI dictionary đã phê duyệt + map bảng dữ liệu + khóa join.</li>
-<li><span class="must">Đầu ra:</span> BI release note + kết quả Data Health + diễn tập‑down proof (ảnh/đường dẫn hồ sơ).</li>
+<li><span class="must">Input:</span> KPI dictionary đã approval + map bảng dữ liệu + khóa join.</li>
+<li><span class="must">Output:</span> BI release note + kết quả Data Health + diễn tập‑down proof (ảnh/đường dẫn record).</li>
 <li><span class="must">Hold point:</span> quan hệ không qua kiểm thử “job drillthrough” bị khóa publish <span class="stop">STOP</span>.</li>
 </ul>
 </div>
 </div>
-<h3>Hold point cốt lõi (Không có bằng chứng thì không qua control gate (No bằng chứng = No gate)</h3>
+<h3>Hold point cốt lõi (Không có evidence thì không qua control gate (No evidence = No gate)</h3>
 <ul>
 <li><span class="must">Control gate 1 — Định nghĩa:</span> Bảng điều khiển chỉ được dùng KPI nằm trong KPI dictionary.</li>
-<li><span class="must">Control gate 2 — Truy vết:</span> KPI không diễn tập‑down đến danh sách hồ sơ (Job/Pack/NCR) bị xem là “không đo”.</li>
-<li><span class="must">Control gate 3 — Minh chứng:</span> hồ sơ không có link minh chứng (EvidenceFolderUrl/PacketFolderUrl) bị gắn trạng thái <span class="hold">HOLD</span> cho quyết định liên quan.</li>
+<li><span class="must">Control gate 2 — Truy vết:</span> KPI không diễn tập‑down đến danh sách record (Job/Pack/NCR) bị xem là “không đo”.</li>
+<li><span class="must">Control gate 3 — Minh chứng:</span> record không có link minh chứng (EvidenceFolderUrl/PacketFolderUrl) bị gắn trạng thái <span class="hold">HOLD</span> cho quyết định liên quan.</li>
 </ul>
 </div>
 <!-- 4) Failure Points -->
 <div class="card" id="sec4">
 <h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
-<p class="muted">Mỗi điểm gãy phải có “dấu hiệu” và “hậu quả vận hành”. Khi thấy dấu hiệu phải kích hoạt Fail‑fast (mục 6) và phản ứng 60 giây (mục 7).</p>
+<p class="muted">Mỗi điểm gãy phải có “dấu hiệu” và “hậu quả operation”. Khi thấy dấu hiệu phải kích hoạt Fail‑fast (mục 6) và phản ứng 60 giây (mục 7).</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
 <tr>
 <th style="width:220px">Điểm gãy</th>
 <th>Dấu hiệu (quan sát được)</th>
-<th>Hậu quả (vận hành/đánh giá)</th>
+<th>Hậu quả (operation/đánh giá)</th>
 </tr>
 </thead>
 <tbody>
 <tr><td><strong>1) KPI trùng tên, khác định nghĩa</strong></td><td>Hai phòng báo OTD khác nhau trong cùng ngày</td><td>Quyết định sai; đánh giá kết luận “không kiểm soát đo lường”</td></tr>
-<tr><td><strong>2) Wrong revision</strong></td><td>JobIndex[RevisionNum] khác dữ liệu thực thi/bộ hồ sơ giao hàng (ship packet)</td><td>Ship sai; NCR nặng; truy vết gãy</td></tr>
-<tr><td><strong>3) Lẫn lộn (mix-up) JobNum</strong></td><td>Hồ sơ thiếu JobNum hoặc JobNum không tồn tại</td><td>KPI lệch; diễn tập‑down đứt; mất chứng cứ</td></tr>
-<tr><td><strong>4) Duplicate hồ sơ</strong></td><td>Hai ShipRelease cùng PackID/SSCC; hoặc NCR trùng</td><td>KPI “đếm đôi”; báo động giả</td></tr>
-<tr><td><strong>5) Missing bằng chứng link</strong></td><td>EvidenceFolderUrl/PacketFolderUrl trống</td><td>Không chứng minh; control gate không hợp lệ</td></tr>
+<tr><td><strong>2) Wrong revision</strong></td><td>JobIndex[RevisionNum] khác dữ liệu thực thi/bộ record delivery (ship packet)</td><td>Ship sai; NCR nặng; truy vết gãy</td></tr>
+<tr><td><strong>3) Lẫn lộn (mix-up) JobNum</strong></td><td>Record thiếu JobNum hoặc JobNum không tồn tại</td><td>KPI lệch; diễn tập‑down đứt; mất chứng cứ</td></tr>
+<tr><td><strong>4) Duplicate record</strong></td><td>Hai ShipRelease cùng PackID/SSCC; hoặc NCR trùng</td><td>KPI “đếm đôi”; báo động giả</td></tr>
+<tr><td><strong>5) Missing evidence link</strong></td><td>EvidenceFolderUrl/PacketFolderUrl trống</td><td>Không chứng minh; control gate không hợp lệ</td></tr>
 <tr><td><strong>6) Vượt qua hold</strong></td><td>ShipRelease trạng thái “Approved” khi QCHoldLog còn “Open”</td><td>Ship rủi ro; vi phạm QMS</td></tr>
 <tr><td><strong>7) Refresh lỗi/độ trễ</strong></td><td>Bảng điều khiển đứng số; last refresh vượt SLA</td><td>Họp dựa trên dữ liệu cũ; quyết định sai</td></tr>
 <tr><td><strong>8) Sai grain mô hình</strong></td><td>Measure join fact‑to‑fact tạo số phình bất ổn</td><td>KPI sai hệ thống; đánh giá bác bỏ</td></tr>
 <tr><td><strong>9) Không có DimDate chuẩn</strong></td><td>Time intelligence lệch; tuần/tháng sai</td><td>Trend sai; KPI mục tiêu sai</td></tr>
-<tr><td><strong>10) Quyền truy cập sai (RLS)</strong></td><td>User thấy dữ liệu không thuộc phạm vi</td><td>Rủi ro bảo mật; mất kiểm soát khách hàng</td></tr>
-<tr><td><strong>11) KPI không có “coverage/health”</strong></td><td>KPI xanh nhưng nhiều hồ sơ thiếu khóa</td><td>Ảo giác số liệu; đánh giá đánh FAIL</td></tr>
+<tr><td><strong>10) Quyền truy cập sai (RLS)</strong></td><td>User thấy dữ liệu không thuộc phạm vi</td><td>Rủi ro bảo mật; mất kiểm soát customer</td></tr>
+<tr><td><strong>11) KPI không có “coverage/health”</strong></td><td>KPI xanh nhưng nhiều record thiếu khóa</td><td>Ảo giác số liệu; đánh giá đánh FAIL</td></tr>
 <tr><td><strong>12) Dữ liệu ngoài hệ thống</strong></td><td>Phòng ban dùng Excel riêng, không đẩy vào SSOT</td><td>Không đồng nhất; không truy vết; quyết định sai</td></tr>
 </tbody>
 </table>
@@ -325,8 +325,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 5) Risk Controls -->
 <div class="card" id="sec5">
-<h2>5) Biện pháp kiểm soát rủi ro (liệt kê điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6 điểm kiểm soát)</h2>
-<p>điểm kiểm soát (điểm kiểm soát) là “cá»­a chặn có bằng chứng”. Mọi điểm kiểm soát (điểm kiểm soát) có người phụ trách, trigger, và MRR bắt buộc.</p>
+<h2>5) Biện pháp kiểm soát rủi ro (liệt kê điểm kiểm soát; ai làm; evidence; tối thiểu 6 điểm kiểm soát)</h2>
+<p>điểm kiểm soát (điểm kiểm soát) là “cá»­a chặn có evidence”. Mọi điểm kiểm soát (điểm kiểm soát) có người phụ trách, trigger, và MRR bắt buộc.</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
@@ -334,7 +334,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:210px">Điểm kiểm soát</th>
 <th style="width:160px">Responsible Person</th>
 <th>Quy tắc bắt buộc</th>
-<th style="width:240px">MRR/Bằng chứng tối thiểu</th>
+<th style="width:240px">MRR/Evidence tối thiểu</th>
 </tr>
 </thead>
 <tbody>
@@ -342,7 +342,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>CP1 — từ điển KPI (dictionary) Lock</strong></td>
 <td>QA/QMS</td>
 <td>Chỉ KPI có ID duy nhất, người phụ trách, cadence, source tables, diễn tập‑through mới được publish.</td>
-<td>01 bản ghi KPI dictionary + 01 phê duyệt (ApprovalHistory).</td>
+<td>01 bản ghi KPI dictionary + 01 approval (ApprovalHistory).</td>
 </tr>
 <tr>
 <td><strong>CP2 — BI Release Notes</strong></td>
@@ -354,19 +354,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>CP3 — Data Health Page</strong></td>
 <td>IT/BI</td>
 <td>Bảng điều khiển phải có chỉ số: null key, duplicate, latency, mismatch Rev.</td>
-<td>Ảnh chụp Data Health + nhật ký kiểm tra ngày/ca.</td>
+<td>Ảnh chụp Data Health + log inspection ngày/ca.</td>
 </tr>
 <tr>
-<td><strong>CP4 — Bằng chứng Completeness Validator</strong></td>
+<td><strong>CP4 — Evidence Completeness Validator</strong></td>
 <td>QA + Warehouse</td>
 <td>ShipRelease chỉ “Approved” khi PacketComplete + PackagingPass + FinalIRPass + ReconciliationStatus đều PASS.</td>
-<td>ShipRelease hồ sơ + link PacketFolderUrl + PackagingChecks + IR/FAI link.</td>
+<td>ShipRelease record + link PacketFolderUrl + PackagingChecks + IR/FAI link.</td>
 </tr>
 <tr>
 <td><strong>CP5 — Refresh &amp; Alerting</strong></td>
 <td>IT/BI</td>
 <td>Refresh thất bại hoặc vượt SLA phải phát cảnh báo và khóa quyết định bằng bảng điều khiển.</td>
-<td>Nhật ký refresh (Power BI service) + thông báo Teams: QMS-ALERT + tạo Ticket: IT-HELPDESK.</td>
+<td>Log refresh (Power BI service) + thông báo Teams: QMS-ALERT + tạo Ticket: IT-HELPDESK.</td>
 </tr>
 <tr>
 <td><strong>CP6 — RLS &amp; Kiểm soát truy cập</strong></td>
@@ -377,8 +377,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>CP7 — Key Governance</strong></td>
 <td>Supervisor + Chủ quá trình</td>
-<td>Mọi hồ sơ execution bắt buộc có JobNum; hồ sơ chất lượng/hold bắt buộc có OprSeq/ReasonCode.</td>
-<td>Đánh giá mẫu 10 hồ sơ/tuần (bảng kiểm ký) + tỉ lệ thiếu khóa.</td>
+<td>Mọi record execution bắt buộc có JobNum; record quality/hold bắt buộc có OprSeq/ReasonCode.</td>
+<td>Đánh giá mẫu 10 record/tuần (checklist ký) + tỉ lệ thiếu khóa.</td>
 </tr>
 </tbody>
 </table>
@@ -403,31 +403,31 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>FF1 — KPI không có SSOT</strong></td>
 <td>KPI xuất hiện trên bảng điều khiển nhưng không có bản ghi trong KPI dictionary hoặc không có source tables.</td>
 <td><span class="block">BLOCK</span></td>
-<td>Gỡ KPI khỏi bảng điều khiển ngay; mở change hồ sơ; QA/QMS khóa publish.</td>
+<td>Gỡ KPI khỏi bảng điều khiển ngay; mở change record; QA/QMS khóa publish.</td>
 </tr>
 <tr>
 <td><strong>FF2 — Không diễn tập‑down</strong></td>
-<td>KPI card không click tới bảng chi tiết (Job/Pack/NCR) hoặc không có đường dẫn hồ sơ.</td>
+<td>KPI card không click tới bảng chi tiết (Job/Pack/NCR) hoặc không có đường dẫn record.</td>
 <td><span class="stop">STOP</span></td>
 <td>Dừng dùng KPI để quyết định; IT/BI sửa model/measure; kiểm thử lại diễn tập‑through.</td>
 </tr>
 <tr>
-<td><strong>FF3 — Missing bằng chứng</strong></td>
-<td>Hồ sơ control gate (ShipRelease/Hold/NCR/CAPA) không có EvidenceFolderUrl/PacketFolderUrl hoặc link hỏng.</td>
+<td><strong>FF3 — Missing evidence</strong></td>
+<td>Record control gate (ShipRelease/Hold/NCR/CAPA) không có EvidenceFolderUrl/PacketFolderUrl hoặc link hỏng.</td>
 <td><span class="hold">HOLD</span></td>
-<td>Giữ hàng/giữ quyết định; người phụ trách hồ sơ bổ sung MRR; Supervisor xác nhận đóng.</td>
+<td>Hold/giữ quyết định; người phụ trách record bổ sung MRR; Supervisor xác nhận đóng.</td>
 </tr>
 <tr>
 <td><strong>FF4 — Mismatch Rev</strong></td>
-<td>JobIndex[RevisionNum] khác Rev trên hồ sơ QC/bộ hồ sơ giao hàng.</td>
+<td>JobIndex[RevisionNum] khác Rev trên record QC/bộ record delivery.</td>
 <td><span class="stop">STOP</span></td>
-<td>Dừng xử lý/ship; QA mở NCR/containment; Programmer/Planner xác minh rev; cập nhật hồ sơ.</td>
+<td>Dừng xử lý/ship; QA mở NCR/containment; Programmer/Planner xác minh rev; cập nhật record.</td>
 </tr>
 <tr>
 <td><strong>FF5 — Refresh vượt SLA</strong></td>
 <td>Last refresh vượt SLA ca làm việc hoặc refresh lỗi liên tiếp.</td>
 <td><span class="block">BLOCK</span></td>
-<td>Khóa họp dựa KPI; chuyển sang bảng standup manual có ký xác nhận; IT/BI xử lý refresh và ghi nhật ký.</td>
+<td>Khóa họp dựa KPI; chuyển sang bảng standup manual có ký xác nhận; IT/BI xử lý refresh và ghi log.</td>
 </tr>
 </tbody>
 </table>
@@ -435,25 +435,25 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 7) 60-second reaction -->
 <div class="card" id="sec7">
-<h2>7) Phản ứng 60 giây (khi sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua control gate/rủi ro giao hàng…)</h2>
+<h2>7) Phản ứng 60 giây (khi sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua control gate/rủi ro delivery…)</h2>
 <p class="muted">Mục tiêu: chặn lan rộng trong 60 giây. Không tranh luận. Không chờ họp.</p>
 <div class="grid-2">
 <div class="card">
 <h3 style="margin-top:0">Khi phát hiện sai Rev hoặc lẫn lộn</h3>
 <ol>
-<li><span class="must">DỪNG</span> thao tác liên quan; gắn nhãn HOLD tại khu vực.</li>
+<li><span class="must">DỪNG</span> operation liên quan; gắn nhãn HOLD tại khu vực.</li>
 <li>Chụp ảnh nhãn/JobNum/Rev; ghi thời điểm.</li>
-<li>Tạo hồ sơ Hold hoặc NCR theo phạm vi; điền <span class="path">JobNum + Rev + OprSeq</span>.</li>
-<li>Gắn link minh chứng vào hồ sơ (EvidenceFolderUrl).</li>
+<li>Tạo record Hold hoặc NCR theo phạm vi; điền <span class="path">JobNum + Rev + OprSeq</span>.</li>
+<li>Gắn link minh chứng vào record (EvidenceFolderUrl).</li>
 <li>Báo Supervisor + QA; chờ quyết định GO/HOLD có chữ ký số/ApprovalHistory.</li>
 </ol>
 </div>
 <div class="card">
-<h3 style="margin-top:0">Khi phát hiện thiếu chứng từ bộ hồ sơ giao hàng hoặc vượt qua control gate</h3>
+<h3 style="margin-top:0">Khi phát hiện thiếu chứng từ bộ record delivery hoặc vượt qua control gate</h3>
 <ol>
 <li><span class="must">KHÓA</span> ShipRelease ở trạng thái HOLD; không in nhãn/không xuất hàng.</li>
-<li>Kiểm tra 4 cờ control gate: PacketComplete, PackagingPass, FinalIRPass, ReconciliationStatus.</li>
-<li>Tạo action hồ sơ (StandupActions) giao người phụ trách bổ sung MRR và due time.</li>
+<li>Inspection 4 cờ control gate: PacketComplete, PackagingPass, FinalIRPass, ReconciliationStatus.</li>
+<li>Tạo action record (StandupActions) giao người phụ trách bổ sung MRR và due time.</li>
 <li>QA/Warehouse xác nhận link PacketFolderUrl và SSCC hợp lệ.</li>
 <li>Chỉ đổi trạng thái Approved khi đủ MRR và có ApprovalHistory.</li>
 </ol>
@@ -470,10 +470,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 </div>
 </div>
-<!-- 8) Checklist vận hành -->
+<!-- 8) Checklist operation -->
 <div class="card" id="sec8">
-<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Responsible Person, Bằng chứng/MRR, “điểm sai điển hình”</h2>
-<p class="muted">Bảng kiểm này dùng cho 2 tình huống: (A) tạo KPI mới, (B) sửa KPI/model đang chạy. Tổng bước ≤15 và dùng chung cho mọi vai trò bằng cách điền đúng người phụ trách.</p>
+<h2>8) Checklist operation (≤15 bước) — mỗi bước có: Responsible Person, Evidence/MRR, “điểm sai điển hình”</h2>
+<p class="muted">Checklist này dùng cho 2 tình huống: (A) tạo KPI mới, (B) sửa KPI/model đang chạy. Tổng bước ≤15 và dùng chung cho mọi vai trò bằng cách điền đúng người phụ trách.</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
@@ -481,25 +481,25 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:50px">#</th>
 <th style="width:160px">Responsible Person</th>
 <th>Hành động bắt buộc</th>
-<th style="width:260px">Bằng chứng/MRR</th>
+<th style="width:260px">Evidence/MRR</th>
 <th style="width:230px">Điểm sai điển hình</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Supervisor</td><td>Chốt “quyết định cần chặn” + rủi ro cần giảm; gắn KPI vào bước E2E.</td><td>01 yêu cầu KPI (ticket) IT-HELPDESK</td><td>KPI đo “cho vui”, không gắn control gate/bàn giao</td></tr>
+<tr><td>1</td><td>Supervisor</td><td>Chốt “quyết định cần chặn” + rủi ro cần giảm; gắn KPI vào bước E2E.</td><td>01 requirement KPI (ticket) IT-HELPDESK</td><td>KPI đo “cho vui”, không gắn control gate/bàn giao</td></tr>
 <tr><td>2</td><td>QA/QMS</td><td>Đặt tên KPI duy nhất + định nghĩa 1 câu + phạm vi (job/pack/customer) + tiêu chí control gate.</td><td>Bản ghi KPI dictionary (draft)</td><td>Tên KPI trùng; định nghĩa dài, mơ hồ</td></tr>
 <tr><td>3</td><td>Process Owner</td><td>Chỉ định nguồn dữ liệu SSOT (bảng + cột khóa) và người phụ trách dữ liệu.</td><td>Map nguồn (table/column) trong KPI dictionary</td><td>Chọn dữ liệu “ngoài hệ thống”</td></tr>
 <tr><td>4</td><td>IT/BI</td><td>Khóa grain KPI và mô hình: fact nào, dim nào, join key nào.</td><td>Relationship map + mô tả grain</td><td>Join sai grain gây phình số</td></tr>
-<tr><td>5</td><td>QA/QMS</td><td>Định nghĩa minh chứng bắt buộc cho diễn tập‑down (hồ sơ link + bằng chứng link).</td><td>Quy tắc EvidenceFolderUrl/PacketFolderUrl</td><td>Quên link bằng chứng; link hỏng</td></tr>
-<tr><td>6</td><td>IT/BI</td><td>Xây measure theo định nghĩa; khóa tên measure và mô tả.</td><td>DAX measure + commit nhật ký M365/SharePoint → HESEM-QMS-SSOT</td><td>Measure đổi tên gây gãy report</td></tr>
-<tr><td>7</td><td>IT/BI</td><td>Thiết lập diễn tập‑through: KPI → bảng chi tiết → link dossier/bằng chứng.</td><td>Ảnh diễn tập‑through proof (Job/Pack/NCR)</td><td>Không click tới danh sách hồ sơ</td></tr>
-<tr><td>8</td><td>IT/BI</td><td>Chạy Data Health: null keys, duplicates, latency, mismatch Rev.</td><td>Ảnh Data Health + nhật ký ca</td><td>Chỉ nhìn KPI, bỏ qua health</td></tr>
-<tr><td>9</td><td>QA/QMS</td><td>Phê duyệt KPI dictionary và control gate rule; ghi ApprovalHistory.</td><td>ApprovalHistory hồ sơ</td><td>Publish trước khi phê duyệt</td></tr>
-<tr><td>10</td><td>IT/BI</td><td>Ghi BI release note: version, thay đổi, risk, rollback.</td><td>BI_ReleaseNotes: SSOT/BI-ReleaseNotes (SharePoint List)</td><td>Không có rollback; không nhật ký</td></tr>
-<tr><td>11</td><td>IT/BI</td><td>Cấu hình refresh schedule và cảnh báo.</td><td>Ảnh cấu hình refresh + nhật ký alert Teams: QMS-ALERT + Ticket: IT-HELPDESK</td><td>Refresh ngoài giờ gây nhiễu</td></tr>
-<tr><td>12</td><td>Supervisor</td><td>Chạy 01 cuộc họp standup dùng KPI mới; tạo action cho bất ổn.</td><td>StandupActions hồ sơ + ảnh bảng job at‑risk</td><td>Không tạo action; chỉ “bàn”</td></tr>
-<tr><td>13</td><td>Process Owner</td><td>Đánh giá nhanh 10 hồ sơ: đúng khóa + có bằng chứng link.</td><td>Bảng kiểm đánh giá mẫu có ký</td><td>Chọn mẫu “đẹp”; bỏ mẫu fail</td></tr>
-<tr><td>14</td><td>QA/QMS</td><td>Đóng vòng: cập nhật mô-đun training/OJT theo sai lỗi phát hiện.</td><td>Nhật ký cập nhật training + DCR hồ sơ</td><td>Không cập nhật đào tạo</td></tr>
+<tr><td>5</td><td>QA/QMS</td><td>Định nghĩa minh chứng bắt buộc cho diễn tập‑down (record link + evidence link).</td><td>Quy tắc EvidenceFolderUrl/PacketFolderUrl</td><td>Quên link evidence; link hỏng</td></tr>
+<tr><td>6</td><td>IT/BI</td><td>Xây measure theo định nghĩa; khóa tên measure và mô tả.</td><td>DAX measure + commit log M365/SharePoint → HESEM-QMS-SSOT</td><td>Measure đổi tên gây gãy report</td></tr>
+<tr><td>7</td><td>IT/BI</td><td>Thiết lập diễn tập‑through: KPI → bảng chi tiết → link dossier/evidence.</td><td>Ảnh diễn tập‑through proof (Job/Pack/NCR)</td><td>Không click tới danh sách record</td></tr>
+<tr><td>8</td><td>IT/BI</td><td>Chạy Data Health: null keys, duplicates, latency, mismatch Rev.</td><td>Ảnh Data Health + log ca</td><td>Chỉ nhìn KPI, bỏ qua health</td></tr>
+<tr><td>9</td><td>QA/QMS</td><td>Approval KPI dictionary và control gate rule; ghi ApprovalHistory.</td><td>ApprovalHistory record</td><td>Publish trước khi approval</td></tr>
+<tr><td>10</td><td>IT/BI</td><td>Ghi BI release note: version, thay đổi, risk, rollback.</td><td>BI_ReleaseNotes: SSOT/BI-ReleaseNotes (SharePoint List)</td><td>Không có rollback; không log</td></tr>
+<tr><td>11</td><td>IT/BI</td><td>Cấu hình refresh schedule và cảnh báo.</td><td>Ảnh cấu hình refresh + log alert Teams: QMS-ALERT + Ticket: IT-HELPDESK</td><td>Refresh ngoài giờ gây nhiễu</td></tr>
+<tr><td>12</td><td>Supervisor</td><td>Chạy 01 cuộc họp standup dùng KPI mới; tạo action cho bất ổn.</td><td>StandupActions record + ảnh bảng job at‑risk</td><td>Không tạo action; chỉ “bàn”</td></tr>
+<tr><td>13</td><td>Process Owner</td><td>Đánh giá nhanh 10 record: đúng khóa + có evidence link.</td><td>Checklist đánh giá mẫu có ký</td><td>Chọn mẫu “đẹp”; bỏ mẫu fail</td></tr>
+<tr><td>14</td><td>QA/QMS</td><td>Đóng vòng: cập nhật mô-đun training/OJT theo sai lỗi phát hiện.</td><td>Log cập nhật training + DCR record</td><td>Không cập nhật training</td></tr>
 </tbody>
 </table>
 </div>
@@ -507,9 +507,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 9) OJT theo TWI -->
 <div class="card" id="sec9">
 <h2>9) OJT thực chiến theo TWI</h2>
-<p class="muted">OJT diễn ra tại hiện trường hoặc tại máy tính có Power BI + SharePoint list. OJT kết thúc khi có đủ đầu ra và rubric đạt.</p>
+<p class="muted">OJT diễn ra tại hiện trường hoặc tại máy tính có Power BI + SharePoint list. OJT kết thúc khi có đủ output và rubric đạt.</p>
 <div class="card">
-<h3 style="margin-top:0">Job breakdown (TWI) — Công việc: “Tạo mới hoặc sửa 01 KPI và chứng minh diễn tập‑down + bằng chứng”</h3>
+<h3 style="margin-top:0">Job breakdown (TWI) — Công việc: “Tạo mới hoặc sửa 01 KPI và chứng minh diễn tập‑down + evidence”</h3>
 <div class="table-card">
 <table class="table tight">
 <thead>
@@ -524,22 +524,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td>Chọn KPI gắn quyết định control gate</td><td>Gắn KPI vào bước E2E và quyết định GO/HOLD/BLOCK</td><td>Tránh KPI “đo cho đẹp” và bỏ rủi ro chết người</td></tr>
 <tr><td>2</td><td>Điền KPI dictionary</td><td>Name duy nhất • Responsible Person • Cadence • Source tables • Diễn tập‑through</td><td>Tránh đa định nghĩa, tranh cãi số liệu</td></tr>
 <tr><td>3</td><td>Xác định grain &amp; join key</td><td>Fact đúng • Dim đúng • JobNum là khóa tối thiểu</td><td>Tránh join sai gây phình số</td></tr>
-<tr><td>4</td><td>Thiết lập bằng chứng</td><td>Hồ sơ link + EvidenceFolderUrl/PacketFolderUrl phải tồn tại</td><td>Tránh đánh giá không đạt và vượt qua control gate</td></tr>
-<tr><td>5</td><td>Kiểm thử diễn tập‑down</td><td>Click KPI → bảng hồ sơ → mở bằng chứng link</td><td>Tránh KPI không truy vết</td></tr>
+<tr><td>4</td><td>Thiết lập evidence</td><td>Record link + EvidenceFolderUrl/PacketFolderUrl phải tồn tại</td><td>Tránh đánh giá không đạt và vượt qua control gate</td></tr>
+<tr><td>5</td><td>Kiểm thử diễn tập‑down</td><td>Click KPI → bảng record → mở evidence link</td><td>Tránh KPI không truy vết</td></tr>
 <tr><td>6</td><td>Chạy Data Health</td><td>Null key = 0 • Duplicate = 0 • Latency trong SLA</td><td>Tránh KPI xanh giả do dữ liệu bẩn</td></tr>
-<tr><td>7</td><td>Ghi release note + phê duyệt</td><td>ApprovalHistory + BI release note đầy đủ</td><td>Tránh thay đổi không kiểm soát</td></tr>
-<tr><td>8</td><td>Vận hành 1 ca</td><td>Họp standup sử dụng KPI và tạo action cho bất ổn</td><td>Tránh số liệu không tạo hành động</td></tr>
+<tr><td>7</td><td>Ghi release note + approval</td><td>ApprovalHistory + BI release note đầy đủ</td><td>Tránh thay đổi không kiểm soát</td></tr>
+<tr><td>8</td><td>Operation 1 ca</td><td>Họp standup sử dụng KPI và tạo action cho bất ổn</td><td>Tránh số liệu không tạo hành động</td></tr>
 </tbody>
 </table>
 </div>
 </div>
-<h3>OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
+<h3>OJT output (sản phẩm output bắt buộc)</h3>
 <ul>
-<li>01 bản ghi KPI dictionary (đã phê duyệt hoặc ở trạng thái draft có lý do).</li>
-<li>01 ảnh chứng minh diễn tập‑down chạy đến bảng hồ sơ và mở được bằng chứng link.</li>
-<li>01 nhật ký Data Health (ảnh) thể hiện null key/duplicate/latency.</li>
-<li>01 StandupActions hồ sơ cho bất ổn phát hiện trong ca.</li>
-<li>01 bản ghi ApprovalHistory cho quyết định phê duyệt KPI hoặc quyết định HOLD/BLOCK.</li>
+<li>01 bản ghi KPI dictionary (đã approval hoặc ở trạng thái draft có lý do).</li>
+<li>01 ảnh chứng minh diễn tập‑down chạy đến bảng record và mở được evidence link.</li>
+<li>01 log Data Health (ảnh) thể hiện null key/duplicate/latency.</li>
+<li>01 StandupActions record cho bất ổn phát hiện trong ca.</li>
+<li>01 bản ghi ApprovalHistory cho quyết định approval KPI hoặc quyết định HOLD/BLOCK.</li>
 </ul>
 <h3>Rubric L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn khi đạt)</h3>
 <div class="table-card">
@@ -554,27 +554,27 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><strong>L1</strong><div class="muted">Nhận biết &amp; làm theo bảng kiểm (có giám sát)</div></td>
-<td>Đọc đúng định nghĩa KPI; xác định đúng người phụ trách; mở được diễn tập‑down đến bảng hồ sơ theo hướng dẫn.</td>
-<td>Bài kiểm tra nhanh đạt; thực hiện được bảng kiểm bước 1–6 có kèm minh chứng.</td>
+<td><strong>L1</strong><div class="muted">Nhận biết &amp; làm theo checklist (có giám sát)</div></td>
+<td>Đọc đúng định nghĩa KPI; xác định đúng người phụ trách; mở được diễn tập‑down đến bảng record theo hướng dẫn.</td>
+<td>Bài inspection nhanh đạt; thực hiện được checklist bước 1–6 có kèm minh chứng.</td>
 <td>Được xem bảng điều khiển và báo lỗi dữ liệu theo phản ứng 60 giây.</td>
 </tr>
 <tr>
 <td><strong>L2</strong><div class="muted">Thực hiện độc lập (ổn định)</div></td>
-<td>Tạo/sửa KPI dictionary đúng trường; kiểm tra Data Health; tạo action hồ sơ khi thấy bất ổn.</td>
-<td>Hoàn tất OJT đầu ra đầy đủ; không có lỗi thiếu bằng chứng link.</td>
+<td>Tạo/sửa KPI dictionary đúng trường; inspection Data Health; tạo action record khi thấy bất ổn.</td>
+<td>Hoàn tất OJT output đầy đủ; không có lỗi thiếu evidence link.</td>
 <td>Được làm “data steward” cho bảng dữ liệu của vai trò và chịu đánh giá mẫu.</td>
 </tr>
 <tr>
 <td><strong>L3</strong><div class="muted">Dẫn dắt và chặn rủi ro</div></td>
-<td>Chỉ ra mismatch rev, duplicate, latency; kích hoạt STOP/HOLD/BLOCK đúng; hướng dẫn người khác sửa hồ sơ.</td>
-<td>Ít nhất 2 ca vận hành không lỗi; đóng 1 vòng CAPA hoặc fix data quality có nhật ký.</td>
-<td>Được tham gia phê duyệt thay đổi KPI/mô hình với QA/QMS.</td>
+<td>Chỉ ra mismatch rev, duplicate, latency; kích hoạt STOP/HOLD/BLOCK đúng; hướng dẫn người khác sửa record.</td>
+<td>Ít nhất 2 ca operation không lỗi; đóng 1 vòng CAPA hoặc fix data quality có log.</td>
+<td>Được tham gia approval thay đổi KPI/mô hình với QA/QMS.</td>
 </tr>
 <tr>
 <td><strong>L4</strong><div class="muted">Chuẩn hoá hệ thống</div></td>
-<td>Chuẩn hoá naming, quy tắc bằng chứng, và data health; giảm lỗi tái diễn bằng điểm kiểm soát (điểm kiểm soát).</td>
-<td>Chứng minh giảm lỗi dữ liệu trong 4 tuần 4 tuần liên tục và cập nhật mô-đun đào tạo.</td>
+<td>Chuẩn hoá naming, quy tắc evidence, và data health; giảm lỗi tái diễn bằng điểm kiểm soát (điểm kiểm soát).</td>
+<td>Chứng minh giảm lỗi dữ liệu trong 4 tuần 4 tuần liên tục và cập nhật mô-đun training.</td>
 <td>Được ủy quyền làm trainer nội bộ cho SYS-OPS-06.</td>
 </tr>
 </tbody>
@@ -584,27 +584,27 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 10) Đánh giá -->
 <div class="card" id="sec10">
 <h2>10) Đánh giá</h2>
-<h3>10.1 Bài kiểm tra nhanh (≥20 câu — trắc nghiệm + tình huống ngắn)</h3>
-<p class="muted">Câu trả lời phải dựa trên “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)” và cấu trúc KPI dictionary/data model. Câu trả lời phải bám bằng chứng và cấu trúc dữ liệu, không suy diễn cảm tính.</p>
+<h3>10.1 Bài inspection nhanh (≥20 câu — trắc nghiệm + tình huống ngắn)</h3>
+<p class="muted">Câu trả lời phải dựa trên “không có evidence thì không qua control gate (No evidence = No gate)” và cấu trúc KPI dictionary/data model. Câu trả lời phải bám evidence và cấu trúc dữ liệu, không suy diễn cảm tính.</p>
 <ol>
 <li>KPI được phép xuất hiện trên bảng điều khiển khi nào?</li>
 <li>Trường nào trong KPI dictionary bắt buộc để ngăn “đa định nghĩa”?</li>
 <li>Khóa tối thiểu để nối dữ liệu fact về JobIndex là gì?</li>
-<li>Hậu quả vận hành của hồ sơ thiếu EvidenceFolderUrl là gì?</li>
+<li>Hậu quả operation của record thiếu EvidenceFolderUrl là gì?</li>
 <li>Phân biệt <span class="path">ShipRelease</span> và <span class="path">ShipmentMirror</span> theo mục đích và thời điểm.</li>
-<li>Khi diễn tập‑down không chạy tới danh sách hồ sơ, hành động bắt buộc là gì?</li>
+<li>Khi diễn tập‑down không chạy tới danh sách record, hành động bắt buộc là gì?</li>
 <li>Nêu 3 chỉ số Data Health bắt buộc có trên Trung tâm điều hành.</li>
-<li>Khi phát hiện mismatch Rev giữa JobIndex và bộ hồ sơ giao hàng, ai là người phụ trách xử lý containment?</li>
+<li>Khi phát hiện mismatch Rev giữa JobIndex và bộ record delivery, ai là người phụ trách xử lý containment?</li>
 <li>Vì sao “join fact‑to‑fact” tạo rủi ro KPI sai?</li>
 <li>Trong mô hình star schema, “Fact” và “Dim” khác nhau điểm nào?</li>
 <li>Cadence của KPI dùng để làm gì trong điều hành ca?</li>
 <li>Điều kiện tối thiểu để ShipRelease chuyển sang Approved là gì?</li>
-<li>Hồ sơ nào lưu quyết định phê duyệt thay đổi KPI?</li>
+<li>Record nào lưu quyết định approval thay đổi KPI?</li>
 <li>Khi refresh vượt SLA, cuộc họp điều hành chuyển sang chế độ nào?</li>
 <li>Vai trò nào sở hữu KPI OTD và WIP Tuổi tồn theo chuẩn HESEM?</li>
 <li>RLS dùng để chặn rủi ro nào?</li>
 <li>Nêu 2 lỗi dữ liệu làm KPI “xanh giả”.</li>
-<li>Nguyên tắc đặt tên KPI phải đáp ứng điều gì để truy xuất đánh giá?</li>
+<li>Nguyên tắc đặt tên KPI phải đáp ứng điều gì để traceability đánh giá?</li>
 <li>Điều kiện để công nhận L2 của SYS-OPS-06 là gì?</li>
 <li>Khi một phòng ban dùng Excel riêng để báo KPI, hành động bắt buộc là gì?</li>
 <li>Trường dữ liệu nào trong ShipRelease liên quan trực tiếp tới reconciliation SSCC?</li>
@@ -612,62 +612,62 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi xuất hiện duplicate ShipRelease theo PackID/SSCC, hành động fail-fast nào được kích hoạt?</li>
 <li>Ai chịu trách nhiệm tạo StandupActions khi KPI báo bất ổn trong ca?</li>
 </ol>
-<h3>10.2 Scenario (≥3 tình huống thật — có dữ kiện; yêu cầu quyết định HOLD/GO và ghi MRR)</h3>
+<h3>10.2 Scenario (≥3 tình huống thật — có dữ kiện; requirement quyết định HOLD/GO và ghi MRR)</h3>
 <div class="card">
-<h4 style="margin-top:0">Scenario 1 — KPI OTD “xanh” nhưng đánh giá hỏi bằng chứng</h4>
-<p><strong>Dữ kiện:</strong> Bảng điều khiển OTD = 96%. Diễn tập‑down tới danh sách shipment mở được, nhưng 4 dòng thiếu Tracking và link bằng chứng (PacketFolderUrl trống).</p>
-<p><strong>Yêu cầu:</strong> Quyết định <span class="hold">HOLD</span>/<span class="block">BLOCK</span>/<span class="stop">STOP</span> cho việc dùng KPI OTD trong họp và cho việc ship; liệt kê MRR phải bổ sung và người phụ trách.</p>
-<p><strong>MRR bắt buộc:</strong> cập nhật PacketFolderUrl/Tracking; đánh giá mẫu 10 hồ sơ; nhật ký Data Health.</p>
+<h4 style="margin-top:0">Scenario 1 — KPI OTD “xanh” nhưng đánh giá hỏi evidence</h4>
+<p><strong>Dữ kiện:</strong> Bảng điều khiển OTD = 96%. Diễn tập‑down tới danh sách shipment mở được, nhưng 4 dòng thiếu Tracking và link evidence (PacketFolderUrl trống).</p>
+<p><strong>Requirement:</strong> Quyết định <span class="hold">HOLD</span>/<span class="block">BLOCK</span>/<span class="stop">STOP</span> cho việc dùng KPI OTD trong họp và cho việc ship; liệt kê MRR phải bổ sung và người phụ trách.</p>
+<p><strong>MRR bắt buộc:</strong> cập nhật PacketFolderUrl/Tracking; đánh giá mẫu 10 record; log Data Health.</p>
 </div>
 <div class="card">
 <h4 style="margin-top:0">Scenario 2 — Mismatch Rev trước khi ship</h4>
-<p><strong>Dữ kiện:</strong> JobIndex[RevisionNum]=B. bộ hồ sơ giao hàng trong thư mục dossier ghi Rev=C. ShipRelease đã ở trạng thái “Approved”.</p>
-<p><strong>Yêu cầu:</strong> Ra quyết định ngay (<span class="stop">STOP</span> + <span class="hold">HOLD</span>), nêu chuỗi hành động 60 giây, hồ sơ cần tạo (Hold/NCR/ApprovalHistory/StandupActions), và điều kiện mở lại.</p>
+<p><strong>Dữ kiện:</strong> JobIndex[RevisionNum]=B. bộ record delivery trong thư mục dossier ghi Rev=C. ShipRelease đã ở trạng thái “Approved”.</p>
+<p><strong>Requirement:</strong> Ra quyết định ngay (<span class="stop">STOP</span> + <span class="hold">HOLD</span>), nêu chuỗi hành động 60 giây, record cần tạo (Hold/NCR/ApprovalHistory/StandupActions), và điều kiện mở lại.</p>
 </div>
 <div class="card">
 <h4 style="margin-top:0">Scenario 3 — Refresh lỗi trong ca</h4>
 <p><strong>Dữ kiện:</strong> Power BI refresh fail 2 lần liên tiếp. Last refresh vượt SLA. Supervisor chuẩn bị họp standup 8:00.</p>
-<p><strong>Yêu cầu:</strong> Kích hoạt fail-fast nào; chuyển họp sang “manual mode”; liệt kê MRR (ảnh lỗi, nhật ký alert, bảng standup ký) và trách nhiệm IT/BI.</p>
+<p><strong>Requirement:</strong> Kích hoạt fail-fast nào; chuyển họp sang “manual mode”; liệt kê MRR (ảnh lỗi, log alert, bảng standup ký) và trách nhiệm IT/BI.</p>
 </div>
-<h3>10.3 Performance test (bắt buộc — mô-đun có thao tác/control gate/duyệt)</h3>
+<h3>10.3 Performance test (bắt buộc — mô-đun có operation/control gate/duyệt)</h3>
 <div class="card">
-<h4 style="margin-top:0">Bài test: “Từ KPI card tới hồ sơ và minh chứng trong 10 phút”</h4>
-<p><strong>Nhiệm vụ:</strong> Chọn 1 KPI bất kỳ trên Trung tâm điều hành (OTD/WIP/Hold/NCR/Ship Mức sẵn sàng). Thực hiện 5 bước:</p>
+<h4 style="margin-top:0">Bài test: “Từ KPI card tới record và minh chứng trong 10 phút”</h4>
+<p><strong>Nhiệm vụ:</strong> Chọn 1 KPI bất kỳ trên Trung tâm điều hành (OTD/WIP/Hold/NCR/Ship Readiness level). Thực hiện 5 bước:</p>
 <ol>
 <li>Đọc đúng định nghĩa KPI theo KPI dictionary (nêu người phụ trách + cadence).</li>
-<li>Click diễn tập‑down tới bảng chi tiết hồ sơ (Job/Pack/NCR).</li>
-<li>Mở 1 hồ sơ và xác minh khóa JobNum/Rev.</li>
-<li>Mở link minh chứng (EvidenceFolderUrl/PacketFolderUrl) và xác minh tài liệu tồn tại.</li>
+<li>Click diễn tập‑down tới bảng chi tiết record (Job/Pack/NCR).</li>
+<li>Mở 1 record và xác minh khóa JobNum/Rev.</li>
+<li>Mở link minh chứng (EvidenceFolderUrl/PacketFolderUrl) và xác minh document tồn tại.</li>
 <li>Ghi 1 bất ổn (thiếu link, mismatch rev, duplicate) và tạo StandupActions hoặc Hold theo đúng quy tắc.</li>
 </ol>
 <h5>Rubric ĐẠT/KHÔNG ĐẠT</h5>
 <ul>
-<li><span class="must">PASS:</span> hoàn tất đủ 5 bước; không sai định nghĩa; link minh chứng mở được; hồ sơ tạo đúng loại và đúng khóa.</li>
-<li><span class="must">FAIL:</span> không diễn tập‑down được; không mở được minh chứng; dùng KPI khi thiếu bằng chứng; tạo hồ sơ thiếu JobNum/Rev.</li>
+<li><span class="must">PASS:</span> hoàn tất đủ 5 bước; không sai định nghĩa; link minh chứng mở được; record tạo đúng loại và đúng khóa.</li>
+<li><span class="must">FAIL:</span> không diễn tập‑down được; không mở được minh chứng; dùng KPI khi thiếu evidence; tạo record thiếu JobNum/Rev.</li>
 </ul>
 </div>
 </div>
 <!-- 11) PASS/FAIL criteria -->
 <div class="card" id="sec11">
-<h2>11) ĐẠT/KHÔNG ĐẠT criteria (rõ ràng; nhấn mạnh “không có bằng chứng thì không qua control gate (No bằng chứng = No gate)”)</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT criteria (rõ ràng; nhấn mạnh “không có evidence thì không qua control gate (No evidence = No gate)”)</h2>
 <div class="kpi-box">
 <ul>
-<li><span class="must">PASS (tối thiểu):</span> Bài kiểm tra nhanh ≥ 80% <span class="mini">Ngưỡng: OTD ≥ 95% • NCR repeat = 0 • Đánh giá finding repeat = 0.</span> + hoàn tất Performance test PASS + nộp đủ OJT đầu ra (mục 9) có link minh chứng.</li>
-<li><span class="must">FAIL ngay (Control gate Fail):</span> dùng KPI để quyết định khi diễn tập‑down không tới hồ sơ; hoặc hồ sơ control gate thiếu bằng chứng link; hoặc phát hành giao hàng khi vi phạm control gate.</li>
-<li><span class="must">Quy tắc bằng chứng:</span> <span class="must">Không có bằng chứng = Không có control gate.</span> Mọi quyết định GO/HOLD/BLOCK phải có hồ sơ (ApprovalHistory hoặc hồ sơ tương đương) và có thời điểm.</li>
+<li><span class="must">PASS (tối thiểu):</span> Bài inspection nhanh ≥ 80% <span class="mini">Ngưỡng: OTD ≥ 95% • NCR repeat = 0 • Đánh giá finding repeat = 0.</span> + hoàn tất Performance test PASS + nộp đủ OJT output (mục 9) có link minh chứng.</li>
+<li><span class="must">FAIL ngay (Control gate Fail):</span> dùng KPI để quyết định khi diễn tập‑down không tới record; hoặc record control gate thiếu evidence link; hoặc release delivery khi vi phạm control gate.</li>
+<li><span class="must">Quy tắc evidence:</span> <span class="must">Không có evidence = Không có control gate.</span> Mọi quyết định GO/HOLD/BLOCK phải có record (ApprovalHistory hoặc record tương đương) và có thời điểm.</li>
 </ul>
 </div>
 </div>
 <!-- 12) MRR tối thiểu -->
 <div class="card" id="sec12">
 <h2>12) MRR tối thiểu</h2>
-<p class="muted">MRR là “bằng chứng vận hành” để sẵn sàng đánh giá. MRR phải có ID, có người chịu trách nhiệm, có đường dẫn lưu, và truy vết được theo JobNum/PackID/NCRID.</p>
-<h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
+<p class="muted">MRR là “evidence operation” để sẵn sàng đánh giá. MRR phải có ID, có người chịu trách nhiệm, có đường dẫn lưu, và truy vết được theo JobNum/PackID/NCRID.</p>
+<h3>12.1 Danh sách record cần tạo/đính kèm</h3>
 <ul>
 <li><strong>KPI dictionary</strong> (CSV/List): tên KPI, định nghĩa, công thức, người phụ trách, cadence, source, diễn tập‑through.</li>
-<li><strong>BI_ReleaseNotes</strong> (List) SSOT/BI-ReleaseNotes (SharePoint List): version, thay đổi, risk, rollback, người thực hiện, ngày.</li>
-<li><strong>ApprovalHistory</strong>: phê duyệt KPI/control gate, phê duyệt đổi model, quyết định HOLD/GO.</li>
-<li><strong>Data Health nhật ký</strong> SSOT/Data-Health-Nhật ký (SharePoint List + ảnh kiểm tra): ảnh/đầu ra kiểm tra null key/duplicate/latency/mismatch Rev.</li>
+<li><strong>BI_ReleaseNotes</strong> (List) SSOT/BI-ReleaseNotes (SharePoint List): version, thay đổi, risk, rollback, performer, ngày.</li>
+<li><strong>ApprovalHistory</strong>: approval KPI/control gate, approval đổi model, quyết định HOLD/GO.</li>
+<li><strong>Data Health log</strong> SSOT/Data-Health-Log (SharePoint List + ảnh inspection): ảnh/output inspection null key/duplicate/latency/mismatch Rev.</li>
 <li><strong>StandupActions</strong>: hành động xử lý bất ổn KPI (người phụ trách, ngày đến hạn, trạng thái).</li>
 </ul>
 <h3>12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
@@ -675,7 +675,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table tight">
 <thead>
 <tr>
-<th>Hồ sơ</th>
+<th>Record</th>
 <th>Quy tắc đặt tên</th>
 <th>Khóa truy vết</th>
 </tr>
@@ -683,9 +683,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>KPI dictionary entry</td><td><span class="path">KPI-&lt;Area&gt;-&lt;Name&gt;-V&lt;Rev&gt;</span></td><td>KPI ID</td></tr>
 <tr><td>BI release note</td><td><span class="path">BI-RN-&lt;YYYYMMDD&gt;-V&lt;Rev&gt;</span></td><td>Model version</td></tr>
-<tr><td>Data Health nhật ký</td><td><span class="path">BI-DH-&lt;YYYYMMDD&gt;-Shift&lt;A|B&gt;</span></td><td>Refresh timestamp</td></tr>
+<tr><td>Data Health log</td><td><span class="path">BI-DH-&lt;YYYYMMDD&gt;-Shift&lt;A|B&gt;</span></td><td>Refresh timestamp</td></tr>
 <tr><td>Standup action</td><td><span class="path">ACT-&lt;YYYYMMDD&gt;-&lt;JobNum|PackID|NCRID&gt;</span></td><td>JobNum/PackID/NCRID</td></tr>
-<tr><td>Approval hồ sơ</td><td><span class="path">APR-&lt;Source&gt;-&lt;ID&gt;-&lt;YYYYMMDDHHMM&gt;</span></td><td>SourceRecordID</td></tr>
+<tr><td>Approval record</td><td><span class="path">APR-&lt;Source&gt;-&lt;ID&gt;-&lt;YYYYMMDDHHMM&gt;</span></td><td>SourceRecordID</td></tr>
 </tbody>
 </table>
 </div>
@@ -693,8 +693,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><strong>SharePoint site:</strong> M365/SharePoint → HESEM-QMS-SSOT</li>
 <li><strong>Lists:</strong> JobIndex, ShipRelease, PackagingChecks, NCRLog, QCHoldLog, CAPA8D, DowntimeEvents, DispatchPlan, WIPTracker, StandupActions, ApprovalHistory.</li>
-<li><strong>Libraries:</strong> Job dossier (job dossier) (bằng chứng folders) SharePoint Site: CNC-IMS-HUB..</li>
-<li><strong>Kho tài liệu kiểm soát:</strong> <span class="path">M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training → academy → system-ops</span> (mô-đun HTML).</li>
+<li><strong>Libraries:</strong> Job dossier (job dossier) (evidence folders) SharePoint Site: CNC-IMS-HUB..</li>
+<li><strong>Kho document kiểm soát:</strong> <span class="path">M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training → academy → system-ops</span> (mô-đun HTML).</li>
 </ul>
 </div>
 <!-- 13) Common audit findings -->
@@ -711,11 +711,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td><strong>1) KPI không có định nghĩa kiểm soát</strong></td><td>Mỗi phòng nói 1 kiểu</td><td>KPI dictionary lock + ApprovalHistory (CP1)</td></tr>
-<tr><td><strong>2) KPI không truy vết hồ sơ</strong></td><td>Không diễn tập‑down</td><td>Fail‑fast FF2 + diễn tập thử‑through bắt buộc</td></tr>
-<tr><td><strong>3) Thiếu minh chứng</strong></td><td>Link bằng chứng trống/hỏng</td><td>Validator bằng chứng + đánh giá mẫu (CP4, CP7)</td></tr>
+<tr><td><strong>2) KPI không truy vết record</strong></td><td>Không diễn tập‑down</td><td>Fail‑fast FF2 + diễn tập thử‑through bắt buộc</td></tr>
+<tr><td><strong>3) Thiếu minh chứng</strong></td><td>Link evidence trống/hỏng</td><td>Validator evidence + đánh giá mẫu (CP4, CP7)</td></tr>
 <tr><td><strong>4) Thay đổi không kiểm soát</strong></td><td>Measure đổi, không release note</td><td>BI_ReleaseNotes + rollback plan (CP2)</td></tr>
-<tr><td><strong>5) Dữ liệu bẩn</strong></td><td>Null key/duplicate cao</td><td>Data Health page + nhật ký ca (CP3)</td></tr>
-<tr><td><strong>6) Vượt qua control gate quality</strong></td><td>giao hàng khi hold mở</td><td>Fail‑fast FF3 + CP4 control gate flags</td></tr>
+<tr><td><strong>5) Dữ liệu bẩn</strong></td><td>Null key/duplicate cao</td><td>Data Health page + log ca (CP3)</td></tr>
+<tr><td><strong>6) Vượt qua control gate quality</strong></td><td>delivery khi hold mở</td><td>Fail‑fast FF3 + CP4 control gate flags</td></tr>
 <tr><td><strong>7) Refresh/latency không kiểm soát</strong></td><td>Bảng điều khiển số cũ</td><td>Refresh SLA + cảnh báo + manual mode (CP5)</td></tr>
 <tr><td><strong>8) Quyền truy cập sai</strong></td><td>Xem dữ liệu vượt phạm vi</td><td>RLS + vai trò Viewer + kiểm thử user (CP6)</td></tr>
 </tbody>
@@ -728,7 +728,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- Doc-Control (tách rời) -->
 
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

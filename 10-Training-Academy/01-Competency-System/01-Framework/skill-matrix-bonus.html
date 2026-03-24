@@ -47,7 +47,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+    <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
@@ -63,13 +63,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="doc-content" id="docContent"><h1>ma trận kỹ năng (skill matrix) &amp; Bonus Mapping — Cơ chế chặn theo KPI liên kết Level/Thưởng</h1><p class="lead">
- Tài liệu này thiết kế một <b>ma trận kỹ năng (skill matrix) (19 năng lực x 4 Level)</b> được đo – chứng minh – và quy đổi trực tiếp sang <b>Level/Bonus</b>,
- đồng thời tích hợp cơ chế <b>gating KPI/chỉ số</b> để đảm bảo thưởng chỉ trả khi <i>đúng năng lực + đúng kỷ luật vận hành</i>.
+ Document này thiết kế một <b>ma trận kỹ năng (skill matrix) (19 competence x 4 Level)</b> được đo – chứng minh – và quy đổi trực tiếp sang <b>Level/Bonus</b>,
+ đồng thời tích hợp cơ chế <b>gating KPI/chỉ số</b> để đảm bảo thưởng chỉ trả khi <i>đúng competence + đúng kỷ luật operation</i>.
  </p><div class="note">
 <strong>ISO 9001 clauses liên quan (tích hợp trực tiếp trong cơ chế):</strong>
 <ul>
 <li><b>7.1.2</b> People • <b>7.2</b> Competence • <b>7.3</b> Awareness</li>
-<li><b>8.1</b> Operational planning &amp; control • <b>8.5</b> Sản xuất/service provision</li>
+<li><b>8.1</b> Operational planning &amp; control • <b>8.5</b> Production/service provision</li>
 <li><b>9.1</b> Monitoring, measurement, analysis &amp; evaluation • <b>9.2</b> Internal đánh giá • <b>9.3</b> Management review</li>
 <li><b>10.2</b> Nonconformity &amp; corrective action • <b>10.3</b> Continual improvement</li>
 </ul>
@@ -78,34 +78,34 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>1) Khái niệm &amp; cấu trúc dữ liệu ma trận kỹ năng (skill matrix)</h2>
 <p><b>Skills Matrix</b> là bảng mapping giữa:</p>
 <ul>
-<li><b>Vị trí</b> (Job/Vai trò) → <b>mức Level yêu cầu</b> theo từng năng lực (C01…C19), kèm <b>trọng số</b> (Weight) theo mức độ quan trọng.</li>
-<li><b>Nhân sự</b> → <b>Level hiện tại</b> (đã chứng nhận) + <b>bằng chứng</b> + <b>chỉ số định lượng</b> + <b>gating</b>.</li>
+<li><b>Vị trí</b> (Job/Vai trò) → <b>mức Level requirement</b> theo từng competence (C01…C19), kèm <b>trọng số</b> (Weight) theo mức độ quan trọng.</li>
+<li><b>Nhân sự</b> → <b>Level hiện tại</b> (đã chứng nhận) + <b>evidence</b> + <b>chỉ số định lượng</b> + <b>gating</b>.</li>
 <li><b>Quy đổi thưởng</b> → hệ số/tiền thưởng theo mô hình thưởng hiệu suất HESEM (không đưa OT vào đóng BHXH; OT hoạch toán qua thưởng hiệu suất).</li>
 </ul>
 <div class="grid-2">
 <div>
 <h3>Định nghĩa Level (L1–L4)</h3>
 <ul>
-<li><b>L1 – Fundamental</b>: biết/hiểu &amp; làm theo hướng dẫn, bảng kiểm.</li>
+<li><b>L1 – Fundamental</b>: biết/hiểu &amp; làm theo hướng dẫn, checklist.</li>
 <li><b>L2 – Practitioner</b>: làm độc lập, ổn định, kiểm soát rủi ro cơ bản.</li>
 <li><b>L3 – Advanced</b>: tối ưu, xử lý ngoại lệ, huấn luyện người khác.</li>
 <li><b>L4 – Expert</b>: thiết kế hệ thống, cải tiến mạnh, chuẩn hóa &amp; đánh giá được.</li>
 </ul>
 </div>
 <div>
-<h3>Chuẩn đầu ra (Kiến thức – Kỹ năng – Bằng chứng – Chỉ số (K-S-E-M))</h3>
+<h3>Chuẩn output (Kiến thức – Kỹ năng – Evidence – Chỉ số (K-S-E-M))</h3>
 <ul>
 <li><b>Knowledge</b>: hiểu đúng khái niệm/tiêu chuẩn/quy định liên quan.</li>
-<li><b>Skill</b>: thao tác/ra quyết định đúng trong bối cảnh thực tế.</li>
-<li><b>Bằng chứng</b>: hồ sơ chứng minh (FRM, nhật ký, ảnh, test, đánh giá hồ sơ…).</li>
-<li><b>Chỉ số</b>: định lượng bằng công thức + nguồn dữ liệu (MES/ERP, QC nhật ký, OEE, NCR, OT, attendance…).</li>
+<li><b>Skill</b>: operation/ra quyết định đúng trong bối cảnh thực tế.</li>
+<li><b>Evidence</b>: record chứng minh (FRM, log, ảnh, test, đánh giá record…).</li>
+<li><b>Chỉ số</b>: định lượng bằng công thức + nguồn dữ liệu (MES/ERP, QC log, OEE, NCR, OT, attendance…).</li>
 </ul>
 </div>
 </div>
 </section><section class="card">
 <h2>2) Cơ chế chặn theo KPI: “cổng” điều kiện để khóa/mở Level &amp; Bonus</h2>
 <p>
-<b>Gating KPI/chỉ số</b> là cơ chế “cổng an toàn” để tránh trường hợp nhân sự đạt điểm kỹ năng nhưng vi phạm kỷ luật chất lượng/an toàn/tuân thủ.
+<b>Gating KPI/chỉ số</b> là cơ chế “cổng an toàn” để tránh trường hợp nhân sự đạt điểm kỹ năng nhưng vi phạm kỷ luật quality/an toàn/compliance.
  Cơ chế này tích hợp trực tiếp vào: <b>(i) chứng nhận Level</b> và <b>(ii) tính thưởng theo ma trận kỹ năng (skill matrix)</b>.
  </p>
 <div class="note">
@@ -113,7 +113,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Không đạt</b> ở bất kỳ <b>tiêu chí “Critical Control gate”</b> ⇒ <b>không cấp mới Level</b> trong kỳ và <b>khóa thưởng kỹ năng (skill bonus)</b> (K<sub>control gate</sub>=0) trong kỳ.</li>
 <li><b>Không đạt</b> ở <b>tiêu chí “Major Control gate”</b> ⇒ <b>giới hạn</b> thưởng kỹ năng (skill bonus) (ví dụ K<sub>control gate</sub>=0.5) hoặc giữ Level nhưng bắt buộc CAPA/OJT bổ sung.</li>
-<li>Control gate phải dựa trên <b>dữ liệu khách quan</b> (điểm đánh giá, NCR, customer escape, nhật ký an toàn, tuân thủ revision…) và được lưu <b>thông tin dạng văn bản (Documented Information, ISO 7.5)</b>.</li>
+<li>Control gate phải dựa trên <b>dữ liệu khách quan</b> (điểm đánh giá, NCR, customer escape, log an toàn, compliance revision…) và được lưu <b>thông tin dạng văn bản (Documented Information, ISO 7.5)</b>.</li>
 </ul>
 </div>
 <h3>2.1 Control gate cấp công ty (Company-wide gates)</h3>
@@ -121,28 +121,28 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <ul>
 <li><b>An toàn</b>: tai nạn lao động nghiêm trọng / vi phạm LOTO / bỏ PPE.</li>
-<li><b>Chất lượng</b>: customer escape / ship sai phiên bản (wrong revision) / sai vật liệu / sai kích thước nghiêm trọng.</li>
-<li><b>Tuân thủ</b>: dùng sai bản vẽ, sửa file không theo ECO, thiếu traceability.</li>
+<li><b>Quality</b>: customer escape / ship sai revision (wrong revision) / sai vật liệu / sai kích thước nghiêm trọng.</li>
+<li><b>Compliance</b>: dùng sai bản vẽ, sửa file không theo ECO, thiếu traceability.</li>
 </ul>
 </div>
 <div>
 <ul>
-<li><b>Thiết bị đo</b>: sử dụng thiết bị đo quá hạn hiệu chuẩn cho sản phẩm.</li>
+<li><b>Equipment đo</b>: sử dụng equipment đo quá hạn calibration cho sản phẩm.</li>
 <li><b>Kho &amp; Shipping</b>: sai nhãn, sai packing, thiếu CO/CQ, sai chứng từ.</li>
 <li><b>5S/Discipline</b>: cảnh báo lặp lại, đánh giá fail liên tiếp không CAPA.</li>
 </ul>
 </div>
 </div>
-<h3>2.2 Control gate theo năng lực (Competency gates)</h3>
+<h3>2.2 Control gate theo competence (Competency gates)</h3>
 <p>
- Mỗi năng lực (C01…C19) có bộ <b>chỉ số năng lực</b> định lượng theo Level.
+ Mỗi competence (C01…C19) có bộ <b>chỉ số competence</b> định lượng theo Level.
  Trong bảng từ điển KPI, cột <b>Control gate</b> chỉ rõ chỉ số nào là “cổng”.
  Xem: <a href="competency-metrics.html">TRN-MET-01 — KPI/Chỉ số Dictionary by 19 Competencies | HESEM OS</a>.
  </p>
 <div class="note">
 <strong>Nguyên tắc (PHẢI):</strong>
 <ul>
-<li>Control gate PHẢI ưu tiên chỉ số có “hậu quả lớn” (an toàn, customer escape, sai phiên bản (wrong revision), sai vật liệu, sai traceability).</li>
+<li>Control gate PHẢI ưu tiên chỉ số có “hậu quả lớn” (an toàn, customer escape, sai revision (wrong revision), sai vật liệu, sai traceability).</li>
 <li>Control gate phải có <b>công thức</b> + <b>nguồn dữ liệu</b> rõ ràng để đánh giá được.</li>
 </ul>
 </div>
@@ -158,7 +158,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3>3.2 Hệ số kỹ năng (K<sub>skill</sub>) theo vị trí</h3>
 <p>
- Với một vị trí, chỉ chọn các năng lực liên quan + gán trọng số.
+ Với một vị trí, chỉ chọn các competence liên quan + gán trọng số.
  Công thức (PHẢI):
  </p>
 <pre class="codeblock">K_skill = SUM( Weight_i * MIN(Level_current_i / Level_required_i, 1) ) / SUM(Weight_i)</pre>
@@ -185,8 +185,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </section><section class="card">
 <h2>4) ma trận kỹ năng (skill matrix) theo phòng ban + vị trí (mẫu) &amp; liên kết level/bonus</h2>
 <p>
- HESEM đã có các bảng <b>ma trận đào tạo (training matrix) theo phòng ban</b> (mức yêu cầu Level theo vị trí).
- ma trận kỹ năng (skill matrix) “đủ chuẩn” sẽ lấy Level yêu cầu từ các bảng này và gán thêm: <b>Weight + Control gate + Bonus mapping</b>.
+ HESEM đã có các bảng <b>ma trận training (training matrix) theo phòng ban</b> (mức requirement Level theo vị trí).
+ ma trận kỹ năng (skill matrix) “đủ chuẩn” sẽ lấy Level requirement từ các bảng này và gán thêm: <b>Weight + Control gate + Bonus mapping</b>.
  </p>
 <div class="grid-2">
 <div>
@@ -204,7 +204,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Mẫu đánh giá từng nhân sự (Employee ma trận kỹ năng (skill matrix))</h3>
 <p>
  Dùng form chuẩn để:
- <b>(i)</b> lấy Level yêu cầu theo vị trí, <b>(ii)</b> ghi Level hiện tại + bằng chứng, <b>(iii)</b> đối chiếu control gate chỉ số,
+ <b>(i)</b> lấy Level requirement theo vị trí, <b>(ii)</b> ghi Level hiện tại + evidence, <b>(iii)</b> đối chiếu control gate chỉ số,
  <b>(iv)</b> tự động ra K_skill, K_gate và mức thưởng.
  </p>
 <ul>
@@ -215,35 +215,35 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </section><section class="card">
 <h2>5) Ví dụ tính (Nghiên cứu tình huống HESEM)</h2>
-<p><b>Tình huống:</b> Nhân sự A là CNC Operator (Lệnh sản xuất) — tháng 01/2026.</p>
+<p><b>Tình huống:</b> Nhân sự A là CNC Operator (Lệnh production) — tháng 01/2026.</p>
 <ul>
 <li>BaseSalary = 9,500,000 VND</li>
 <li>Rate_skill_pool = 6%</li>
 <li>K_skill (từ ma trận kỹ năng (skill matrix)) = 0.87</li>
-<li>Control gate: không có Critical FAIL, có 1 Major FAIL (trễ hiệu chuẩn check) ⇒ K_gate = 0.5</li>
+<li>Control gate: không có Critical FAIL, có 1 Major FAIL (trễ calibration check) ⇒ K_gate = 0.5</li>
 </ul>
 <pre class="codeblock">Bonus_skill = 9,500,000 * 0.06 * 0.87 * 0.5
  ≈ 247,650 VND</pre>
 <div class="note">
 <strong>Diễn giải để đánh giá/giải trình:</strong>
 <ul>
-<li>K_skill dựa trên Level đã chứng nhận + bằng chứng.</li>
-<li>K_gate dựa trên Control gate chỉ số (có hồ sơ) ⇒ minh bạch, không “chấm cảm tính”.</li>
+<li>K_skill dựa trên Level đã chứng nhận + evidence.</li>
+<li>K_gate dựa trên Control gate chỉ số (có record) ⇒ minh bạch, không “chấm cảm tính”.</li>
 <li>Major FAIL buộc OJT bù + CAPA để mở lại control gate kỳ sau.</li>
 </ul>
 </div>
 </section><section class="card">
-<h2>6) Yêu cầu triển khai &amp; kiểm soát phiên bản (ISO 7.5)</h2>
+<h2>6) Requirement triển khai &amp; kiểm soát revision (ISO 7.5)</h2>
 <ul>
-<li>Tài liệu ma trận kỹ năng (skill matrix) &amp; Bonus Map <b>PHẢI</b> có mã, phiên bản, ngày hiệu lực, người phụ trách, và lịch review.</li>
+<li>Document ma trận kỹ năng (skill matrix) &amp; Bonus Map <b>PHẢI</b> có mã, revision, ngày hiệu lực, người phụ trách, và lịch review.</li>
 <li>Dữ liệu KPI/chỉ số <b>PHẢI</b> có nguồn, định nghĩa, công thức, và lưu vết.</li>
-<li>Cấp Level <b>PHẢI</b> dựa trên: Test + danh mục OJT (bảng kiểm / danh mục) + Rubric + Bằng chứng + Control gate PASS.</li>
-<li>Thay đổi định nghĩa Level/Chỉ số <b>PHẢI</b> đi qua quy trình ECO/Kiểm soát tài liệu (SOP-QMS-01).</li>
+<li>Cấp Level <b>PHẢI</b> dựa trên: Test + danh mục OJT (checklist / danh mục) + Rubric + Evidence + Control gate PASS.</li>
+<li>Thay đổi định nghĩa Level/Chỉ số <b>PHẢI</b> đi qua process ECO/Kiểm soát document (SOP-QMS-01).</li>
 </ul>
 </section></div></div></div>
 </div>
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

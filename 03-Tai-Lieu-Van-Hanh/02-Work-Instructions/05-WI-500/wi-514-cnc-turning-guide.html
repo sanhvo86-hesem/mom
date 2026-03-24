@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>WI-514 — Hướng dẫn vận hành tiện CNC | HESEM QMS</title>
+<title>WI-514 — Hướng dẫn operation tiện CNC | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
 @media print {
@@ -56,10 +56,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
           <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
           <div class="fh-company">
             <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Work Instruction</span>
+            <span>Document operation • Work Instruction</span>
           </div>
         </div>
-        <div class="title"><strong>WI-514 — Hướng dẫn vận hành tiện CNC</strong></div>
+        <div class="title"><strong>WI-514 — Hướng dẫn operation tiện CNC</strong></div>
         <div class="meta">
           <div class="row"><span><b>Code:</b></span><span>WI-514</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
@@ -69,8 +69,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
         </div>
       </div>
       <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho máy tiện CNC, turning center và nguyên công turning trên máy có live tooling khi logic kẹp quay/phôi quay vẫn là rủi ro chính.</div>
-      <h1>WI-514 — Hướng dẫn vận hành tiện CNC</h1>
-      <div class="section"><h2>1. Mục đích và rủi ro đặc thù</h2><p>WI này chuẩn hóa vận hành tiện CNC và các nguyên công turning/live-tooling mức tiện. Trọng tâm là kiểm soát grip length, runout, stick-out, tailstock/steady rest, tool nose radius compensation và các điểm dễ gây parting/thread failure.</p><div class="callout-danger"><strong>NGUY HIỂM CAO</strong> phôi quay tốc độ cao có thể gây văng phôi, cuốn vật lạ và gây chấn thương nghiêm trọng. Không đo, không gạt chip, không chỉnh tay gần chuck khi spindle đang quay.</div></div><div class="section"><h2>2. Setup chuck/collet và prove-out</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục</th><th>Yêu cầu</th><th>Điểm dừng</th></tr></thead><tbody><tr><td>Jaw/collet</td><td>Chọn đúng dải kẹp, đúng hình dáng và chiều kẹp; mặt kẹp sạch và không nứt</td><td>Jaw/collet không phù hợp hoặc bẩn = không chạy</td></tr>
+      <h1>WI-514 — Hướng dẫn operation tiện CNC</h1>
+      <div class="section"><h2>1. Mục đích và rủi ro đặc thù</h2><p>WI này chuẩn hóa operation tiện CNC và các nguyên công turning/live-tooling mức tiện. Trọng tâm là kiểm soát grip length, runout, stick-out, tailstock/steady rest, tool nose radius compensation và các điểm dễ gây parting/thread failure.</p><div class="callout-danger"><strong>NGUY HIỂM CAO</strong> phôi quay tốc độ cao có thể gây văng phôi, cuốn vật lạ và gây chấn thương nghiêm trọng. Không đo, không gạt chip, không chỉnh tay gần chuck khi spindle đang quay.</div></div><div class="section"><h2>2. Setup chuck/collet và prove-out</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục</th><th>Requirement</th><th>Điểm dừng</th></tr></thead><tbody><tr><td>Jaw/collet</td><td>Chọn đúng dải kẹp, đúng hình dáng và chiều kẹp; mặt kẹp sạch và không nứt</td><td>Jaw/collet không phù hợp hoặc bẩn = không chạy</td></tr>
 <tr><td>Grip length / stick-out</td><td>Phải chứng minh đủ grip, đủ support; L/D cao phải có tailstock/steady rest nếu cần</td><td>Stick-out vượt kiểm soát mà chưa có support = HOLD</td></tr>
 <tr><td>Runout / concentricity</td><td>Kiểm runout theo setup sheet và risk của feature</td><td>Runout không đạt = không cắt tinh/không cắt ren</td></tr>
 <tr><td>Tool nose radius comp</td><td>Gọi đúng hướng dao và TNR comp; xác minh trên mẫu đầu (first piece)</td><td>Nghi ngờ TNR comp = dừng prove-out</td></tr>
@@ -78,7 +78,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Thread pitch nghi ngờ, crest/root bất thường</td><td>Dừng và xác minh ngay bằng phép kiểm phù hợp; không tiếp tục chạy theo giả định</td></tr>
 <tr><td>Parting phát tiếng rít, kẹt chip, nhiệt tăng</td><td>Dừng; kiểm tool, dung dịch làm mát, speed/feed và support</td></tr>
 <tr><td>Bar feeder/remnant bất thường</td><td>Dừng nhận liệu; cô lập part có thể ảnh hưởng</td></tr>
-</tbody></table></div><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Tỷ lệ parting fail; số tình huống phôi trượt/rung; mẫu đầu pass cho thread/OD/ID critical; số lần dùng sai TNR comp.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;">SOP-502, SOP-504, SOP-503, WI-302, WI-517, WI-516, ANNEX-803.</div></div></div></div>
+</tbody></table></div><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Tỷ lệ parting fail; số tình huống phôi trượt/rung; mẫu đầu pass cho thread/OD/ID critical; số lần dùng sai TNR comp.</div></div><div class="kpi-box"><strong>Document liên kết</strong><div class="tiny" style="margin-top:6px;">SOP-502, SOP-504, SOP-503, WI-302, WI-517, WI-516, ANNEX-803.</div></div></div></div>
     </div>
   </div>
 </div>

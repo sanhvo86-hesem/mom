@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship packet)) | HESEM Academy</title>
+<title>TRN-Bài diễn tập ACA-DRL-01 — Lệnh production E2E (RFQ → Bộ record delivery (ship packet)) | HESEM Academy</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 
 <style>
@@ -55,11 +55,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+    <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
-  <strong>DIỄN TẬP-Bài diễn tập JOBORDER-E2E — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng) | HESEM Academy</strong>
+  <strong>DIỄN TẬP-Bài diễn tập JOBORDER-E2E — Lệnh production E2E (RFQ → Bộ record delivery) | HESEM Academy</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -73,22 +73,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="doc-content" id="docContent">
 <div class="cover">
 <div class="kicker">Bộ diễn tập</div>
-<h1 class="h1">DRL-Bài diễn tập 01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng)</h1>
+<h1 class="h1">DRL-Bài diễn tập 01 — Lệnh production E2E (RFQ → Bộ record delivery)</h1>
 <p class="lead">
- Diễn tập này mô phỏng chuỗi <b>RFQ → Cash</b> bằng 01 job thật: khóa REV, chốt CTQ, chạy control gate sản xuất, tạo bộ hồ sơ giao hàng và kiểm tra truy xuất 60 giây.
+ Diễn tập này mô phỏng chuỗi <b>RFQ → Cash</b> bằng 01 job thật: khóa REV, chốt CTQ, chạy control gate production, tạo bộ record delivery và inspection traceability 60 giây.
  </p>
 </div>
 <div class="grid-2">
 <div class="card">
 <span class="badge">Mục tiêu</span>
 <ul class="tight">
-<li>Không nhảy control gate. Không giao hàng khi thiếu bộ hồ sơ giao hàng.</li>
-<li>MRR nằm đúng SSOT và truy xuất ≤ 60 giây.</li>
+<li>Không nhảy control gate. Không delivery khi thiếu bộ record delivery.</li>
+<li>MRR nằm đúng SSOT và traceability ≤ 60 giây.</li>
 <li>Bàn giao rõ: ai nhận gì, ai bàn giao gì.</li>
 </ul>
 </div>
 <div class="card">
-<span class="badge">Năng lực kích hoạt</span>
+<span class="badge">Competence kích hoạt</span>
 <ul class="tight"><li><a href="../../01-Competency-System/02-Levels/index.html#C02"><b>C02</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C03"><b>C03</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C04"><b>C04</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C08"><b>C08</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C09"><b>C09</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C10"><b>C10</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C13"><b>C13</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C14"><b>C14</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C15"><b>C15</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C16"><b>C16</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C17"><b>C17</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C18"><b>C18</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C11"><b>C11</b></a></li></ul>
 <p class="small muted" style="margin-top:8px;">Mentor chấm theo hành vi + MRR, không chấm theo cảm tính.</p>
 </div>
@@ -98,7 +98,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li>01 job thật đang chạy hoặc job vừa hoàn tất (có dossier đủ: PO, drawing/spec, traveler, baseline).</li>
 <li>Quy tắc naming: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
-<li>Các biểu mẫu liên quan: rà soát hợp đồng, Job Khởi động, IR/FAI, NCR/CAPA, bộ hồ sơ giao hàng.</li>
+<li>Các form liên quan: review hợp đồng, Job Khởi động, IR/FAI, NCR/CAPA, bộ record delivery.</li>
 </ul>
 </div>
 <div class="card">
@@ -114,10 +114,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR (bằng chứng)</th><th style="width:90px;">Control gate</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR (evidence)</th><th style="width:90px;">Control gate</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Mở Job dossier (job dossier), xác nhận JobNum/PartNo/REV và lock revision set.</td><td>Tất cả vai trò</td><td>Screenshot đường dẫn dossier + REV tại folder name</td><td>STOP</td></tr><tr><td>2</td><td>Rà soát hợp đồng/PO: chốt CTQ + chứng từ bắt buộc (FAI/MTR/CoC/pack).</td><td>Estimator (SAL-03) + QA</td><td>CR form + CTQ list (PDF)</td><td>HOLD</td></tr><tr><td>3</td><td>Khởi động: routing + điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (hold point))))))))))))))))))))) + risk rating + outsource needs.</td><td>Planning/OPS</td><td>Job khởi động bảng kiểm + Traveler</td><td>HOLD</td></tr><tr><td>4</td><td>Engineering baseline: phát hành setup sheet + kế hoạch kiểm tra (kiểm tra plan) + CAM release link.</td><td>ENG/CAM</td><td>Baseline pack + release nhật ký</td><td>BLOCK</td></tr><tr><td>5</td><td>Pre-start + safety: PPE/5S + xác nhận tool/gage trong hạn.</td><td>Supervisor + Setup</td><td>Pre-start bảng kiểm + ảnh setup</td><td>STOP</td></tr><tr><td>6</td><td>Setup + chạy mẫu đầu (first piece): đo CTQ và lập IR/FAI.</td><td>Setup + QC</td><td>IR/FAI ký + ảnh mẫu đầu</td><td>HOLD</td></tr><tr><td>7</td><td>Trong quá trình: ghi IPQC nhật ký theo reaction plan.</td><td>Operator + QC</td><td>IPQC nhật ký (PDF)</td><td>HOLD</td></tr><tr><td>8</td><td>Outsource (KHI có): đối soát spec + nhận cert + traceability.</td><td>PUR + WHS + QA</td><td>PO note + Supplier cert + receiving hồ sơ</td><td>HOLD</td></tr><tr><td>9</td><td>Final + bộ hồ sơ giao hàng: CoC + final IR + packing/label photo.</td><td>QA/QC + WHS</td><td>Bộ hồ sơ giao hàng bảng kiểm + CoC + packing photo</td><td>HOLD</td></tr><tr><td>10</td><td>bài diễn tập đánh giá 60 giây: mentor gọi 01 hồ sơ bất kỳ và yêu cầu mở đúng file.</td><td>Assessor</td><td>Link SSOT mở đúng ≤ 60s</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Mở Job dossier (job dossier), xác nhận JobNum/PartNo/REV và lock revision set.</td><td>Tất cả vai trò</td><td>Screenshot đường dẫn dossier + REV tại folder name</td><td>STOP</td></tr><tr><td>2</td><td>Review hợp đồng/PO: chốt CTQ + chứng từ bắt buộc (FAI/MTR/CoC/pack).</td><td>Estimator (SAL-03) + QA</td><td>CR form + CTQ list (PDF)</td><td>HOLD</td></tr><tr><td>3</td><td>Khởi động: routing + điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (hold point))))))))))))))))))))) + risk rating + outsource needs.</td><td>Planning/OPS</td><td>Job khởi động checklist + Traveler</td><td>HOLD</td></tr><tr><td>4</td><td>Engineering baseline: release setup sheet + kế hoạch inspection (inspection plan) + CAM release link.</td><td>ENG/CAM</td><td>Baseline pack + release log</td><td>BLOCK</td></tr><tr><td>5</td><td>Pre-start + safety: PPE/5S + xác nhận tool/gage trong hạn.</td><td>Supervisor + Setup</td><td>Pre-start checklist + ảnh setup</td><td>STOP</td></tr><tr><td>6</td><td>Setup + chạy mẫu đầu (first piece): đo CTQ và lập IR/FAI.</td><td>Setup + QC</td><td>IR/FAI ký + ảnh mẫu đầu</td><td>HOLD</td></tr><tr><td>7</td><td>Trong quá trình: ghi IPQC log theo reaction plan.</td><td>Operator + QC</td><td>IPQC log (PDF)</td><td>HOLD</td></tr><tr><td>8</td><td>Outsource (KHI có): đối soát spec + nhận cert + traceability.</td><td>PUR + WHS + QA</td><td>PO note + Supplier cert + receiving record</td><td>HOLD</td></tr><tr><td>9</td><td>Final + bộ record delivery: CoC + final IR + packing/label photo.</td><td>QA/QC + WHS</td><td>Bộ record delivery checklist + CoC + packing photo</td><td>HOLD</td></tr><tr><td>10</td><td>bài diễn tập đánh giá 60 giây: mentor gọi 01 record bất kỳ và requirement mở đúng file.</td><td>Assessor</td><td>Link SSOT mở đúng ≤ 60s</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
@@ -126,8 +126,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">Fail-fast</span>
 <ul class="tight">
 <li>Sai REV hoặc không chứng minh được REV trong SSOT.</li>
-<li>Thiếu 01 hồ sơ bắt buộc tại control gate: CR, Traveler, Baseline, IR/FAI, CoC/bộ hồ sơ giao hàng.</li>
-<li>Bằng chứng đặt sai tên hoặc nằm ngoài dossier.</li>
+<li>Thiếu 01 record bắt buộc tại control gate: CR, Traveler, Baseline, IR/FAI, CoC/bộ record delivery.</li>
+<li>Evidence đặt sai tên hoặc nằm ngoài dossier.</li>
 </ul>
 </div>
 <div class="card">
@@ -137,7 +137,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Revision control</b></td><td>Không dùng file rời; REV đúng; DCR hồ sơ có dấu vết.</td><td>0/1/2</td></tr><tr><td><b>CTQ translation</b></td><td>CTQ rõ, có kiểm tra method và điểm giữ.</td><td>0/1/2</td></tr><tr><td><b>Bằng chứng discipline</b></td><td>MRR đủ, tên file đúng chuẩn, nằm đúng thư mục.</td><td>0/1/2</td></tr><tr><td><b>Control gate decision</b></td><td>STOP/HOLD/BLOCK kích hoạt đúng khi thiếu hồ sơ hoặc lệch chuẩn.</td><td>0/1/2</td></tr><tr><td><b>Bàn giao quality</b></td><td>Bàn giao bằng link SSOT + người nhận xác nhận; không bàn giao bằng lời.</td><td>0/1/2</td></tr>
+<tr><td><b>Revision control</b></td><td>Không dùng file rời; REV đúng; DCR record có dấu vết.</td><td>0/1/2</td></tr><tr><td><b>CTQ translation</b></td><td>CTQ rõ, có inspection method và điểm giữ.</td><td>0/1/2</td></tr><tr><td><b>Evidence discipline</b></td><td>MRR đủ, tên file đúng chuẩn, nằm đúng thư mục.</td><td>0/1/2</td></tr><tr><td><b>Control gate decision</b></td><td>STOP/HOLD/BLOCK kích hoạt đúng khi thiếu record hoặc lệch chuẩn.</td><td>0/1/2</td></tr><tr><td><b>Bàn giao quality</b></td><td>Bàn giao bằng link SSOT + người nhận xác nhận; không bàn giao bằng lời.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>
@@ -155,6 +155,6 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

@@ -60,7 +60,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+    <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
@@ -90,10 +90,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div class="note">
-<strong>Thông tin Job / Hồ sơ</strong>
+<strong>Thông tin Job / Record</strong>
 <div class="mini">
  JobCode: <span class="formline"> </span><br/>
- Khách hàng: <span class="formline"> </span><br/>
+ Customer: <span class="formline"> </span><br/>
  Part No: <span class="formline"> </span>   Rev: <span class="formline"> </span><br/>
  Số lượng: <span class="formline"> </span>   Due: <span class="formline"> </span><br/>
 </div>
@@ -101,40 +101,40 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<h2 class="h2" style="margin-top:0;">Bảng kiểm MRR (Minimum Required Hồ sơ)</h2>
-<p class="mini muted2">Tick đủ các dòng dưới đây. Mỗi dòng phải có bằng chứng trong SSOT và đặt tên file đúng chuẩn.</p>
+<h2 class="h2" style="margin-top:0;">Checklist MRR (Minimum Required Record)</h2>
+<p class="mini muted2">Tick đủ các dòng dưới đây. Mỗi dòng phải có evidence trong SSOT và đặt tên file đúng chuẩn.</p>
 <div style="overflow:auto;">
 <table class="form-table">
 <tr>
-<th style="min-width:320px;">MRR / Bằng chứng</th>
+<th style="min-width:320px;">MRR / Evidence</th>
 <th style="min-width:140px;">RecordType</th>
 <th style="min-width:110px;">Control gate</th>
 <th style="min-width:120px;">Responsible Person</th>
 <th style="min-width:220px;">SSOT path</th>
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
-<tr><td><span class="chk">☐</span> PO/PR có CTQ + yêu cầu chứng từ (MTR/CoC/CoA)</td><td>PO</td><td>S0</td><td>PUR</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/PO/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PO_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Subcontract pack (drawing/spec/route/packing) phát hành</td><td>SUBPACK</td><td>S0</td><td>PUR+QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/07_SUPPLIER/SUBPACK/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SUBPACK_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.zip</td></tr>
+<tr><td><span class="chk">☐</span> PO/PR có CTQ + requirement chứng từ (MTR/CoC/CoA)</td><td>PO</td><td>S0</td><td>PUR</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/PO/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PO_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Subcontract pack (drawing/spec/route/packing) release</td><td>SUBPACK</td><td>S0</td><td>PUR+QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/07_SUPPLIER/SUBPACK/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SUBPACK_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.zip</td></tr>
 <tr><td><span class="chk">☐</span> Supplier certificate (MTR/CoC/CoA) nhận về</td><td>MTR/COC</td><td>S1</td><td>WHS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/07_SUPPLIER/CERT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CERT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Receiving/IQC hồ sơ cho vật tư/finishing</td><td>IQC</td><td>S1</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/07_SUPPLIER/IQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Receiving/IQC record cho vật tư/finishing</td><td>IQC</td><td>S1</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/07_SUPPLIER/IQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Traceability link (lot/batch/serial) cập nhật vào Job dossier (job dossier)</td><td>TRACE</td><td>S1</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/07_SUPPLIER/TRACE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_TRACE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Supplier NCR/SCAR khi NG</td><td>SCAR</td><td>S2</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/07_SUPPLIER/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SCAR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Supplier thẻ điểm (scorecard) cập nhật KPI (OTD/quality/response)</td><td>SCORE</td><td>S3</td><td>PUR</td><td class="mini">SSOT/Suppliers/<sup>/SCORE/</sup></td><td class="mini">SCORE_<sup>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</sup></td></tr>
 <tr><td><span class="chk">☐</span> Change control khi đổi supplier/finishing/route</td><td>CHANGE</td><td>S3</td><td>QA/QMS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/CHANGE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CHANGE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 </table>
 </div>
-<div class="note mini"><strong>Gắn với mô-đun</strong>: C18 (Supply chain), C15 (Material/Quy trình), C13 (Change control), C10 (Job control gate).</div>
+<div class="note mini"><strong>Gắn với mô-đun</strong>: C18 (Supply chain), C15 (Material/Process), C13 (Change control), C10 (Job control gate).</div>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
 <ul class="tight">
-<li>Nhận hàng không có certificate khi PO yêu cầu → HOLD tại receiving.</li><li>Không IQC mà đưa thẳng vào sản xuất → STOP.</li><li>Đổi supplier/finishing không change control → BLOCK.</li><li>Traceability lot/batch mất liên kết → HOLD.</li>
+<li>Nhận hàng không có certificate khi PO requirement → HOLD tại receiving.</li><li>Không IQC mà đưa thẳng vào production → STOP.</li><li>Đổi supplier/finishing không change control → BLOCK.</li><li>Traceability lot/batch mất liên kết → HOLD.</li>
 </ul>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Đánh giá 60 giây</h2>
 <ol class="tight">
-<li>Mở PO và xác nhận CTQ/certificate requirement.</li><li>Mở CERT và đối chiếu lot/batch trên nhãn vật tư.</li><li>Mở IQC hồ sơ và đối chiếu kết quả.</li><li>Mở TRACE link và kiểm tra liên kết tới Job dossier.</li>
+<li>Mở PO và xác nhận CTQ/certificate requirement.</li><li>Mở CERT và đối chiếu lot/batch trên nhãn vật tư.</li><li>Mở IQC record và đối chiếu kết quả.</li><li>Mở TRACE link và inspection liên kết tới Job dossier.</li>
 </ol>
 </div>
 <div class="card">
@@ -149,7 +149,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div></div></div>
 
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

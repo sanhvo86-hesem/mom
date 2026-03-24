@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và giới hạn WIP | HESEM QMS</title>
+<title>ANNEX-501 — Quy tắc điều độ, review competence, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và giới hạn WIP | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
 @media print {
@@ -57,10 +57,10 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
           <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
           <div class="fh-company">
             <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Annex</span>
+            <span>Document operation • Annex</span>
           </div>
         </div>
-        <div class="title"><strong>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và giới hạn WIP</strong></div>
+        <div class="title"><strong>ANNEX-501 — Quy tắc điều độ, review competence, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và giới hạn WIP</strong></div>
         <div class="meta">
           <div class="row"><span><b>Code:</b></span><span>ANNEX-501</span></div>
           <div class="row"><span><b>Version:</b></span><span>V0</span></div>
@@ -70,51 +70,51 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
         </div>
       </div>
       <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi quyết định dispatch, capacity review, WIP cap, resequence, hot-job, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và escalation liên quan tới planning/OPS.</div>
-      <h1>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và giới hạn WIP</h1>
+      <h1>ANNEX-501 — Quy tắc điều độ, review competence, cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và giới hạn WIP</h1>
 
 <div class="section"><h2>1. Mục đích và nguyên tắc điều hành</h2>
-<p>ANNEX này khóa bộ rule dùng chung cho <b>điều độ</b>, <b>rà soát năng lực</b>, <b>giới hạn WIP</b>, <b>freeze window</b>, <b>resequence</b>, <b>hot-job</b> và <b>tuổi tồn (aging)</b> ở toàn bộ xưởng CNC lệnh sản xuất của HESEM. Planner, Dispatcher, Supervisor và Ops Manager phải dùng cùng một rule set để ra quyết định; không để mỗi ca hoặc mỗi cell dùng một cách hiểu khác nhau.</p>
-<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span><br/>Giữ lịch bằng cơ chế dispatch chính thức, tôn trọng trạng thái HOLD, giới hạn số hot-job đồng thời và kiểm soát WIP trước bottleneck trong ngưỡng đã phát hành.</div>
-<div class="callout-info"><strong>Nguồn chuẩn</strong><br/>Epicor là SoR cho trạng thái Job/Op, queue, labor/move/đầy đủ, reservation, ship. M365 chỉ là SSOT cho snapshot, nhật ký hành động, meeting minutes, decision hồ sơ và bằng chứng đi kèm.</div>
+<p>ANNEX này khóa bộ rule dùng chung cho <b>điều độ</b>, <b>review competence</b>, <b>giới hạn WIP</b>, <b>freeze window</b>, <b>resequence</b>, <b>hot-job</b> và <b>tuổi tồn (aging)</b> ở toàn bộ workshop CNC lệnh production của HESEM. Planner, Dispatcher, Supervisor và Ops Manager phải dùng cùng một rule set để ra quyết định; không để mỗi ca hoặc mỗi cell dùng một cách hiểu khác nhau.</p>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span><br/>Giữ lịch bằng cơ chế dispatch chính thức, tôn trọng trạng thái HOLD, giới hạn số hot-job đồng thời và kiểm soát WIP trước bottleneck trong ngưỡng đã release.</div>
+<div class="callout-info"><strong>Nguồn chuẩn</strong><br/>Epicor là SoR cho trạng thái Job/Op, queue, labor/move/đầy đủ, reservation, ship. M365 chỉ là SSOT cho snapshot, log hành động, meeting minutes, decision record và evidence đi kèm.</div>
 </div>
 
 <div class="section"><h2>2. Hot-job ladder và rule ưu tiên</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Class</th><th>Khi được gán</th><th>Ai có quyền gán</th><th>Quy tắc bắt buộc</th></tr></thead><tbody>
-<tr><td>P0</td><td>Đã trễ cam kết hoặc sẽ vỡ giao hàng trong ≤ 24 giờ; hoặc customer / plant event buộc phải cứu ngay</td><td>Ops Manager hoặc cao hơn theo ma trận thẩm quyền</td><td>Được phép phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch); phải chỉ rõ job bị lùi, tác động OTD, người phụ trách và thời điểm recovery.</td></tr>
+<tr><td>P0</td><td>Đã trễ cam kết hoặc sẽ vỡ delivery trong ≤ 24 giờ; hoặc customer / plant event buộc phải cứu ngay</td><td>Ops Manager hoặc cao hơn theo ma trận authority</td><td>Được phép phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch); phải chỉ rõ job bị lùi, tác động OTD, người phụ trách và thời điểm recovery.</td></tr>
 <tr><td>P1</td><td>Sẽ đến hạn trong 24–48 giờ; CTQ/final release đang chờ; part cho line-stop nội bộ hoặc job rủi ro cao</td><td>Planner Lead / Ops Manager</td><td>Được đẩy lên đầu ca hoặc giữa ca nhưng phải ghi lý do và cập nhật dispatch board.</td></tr>
-<tr><td>P2</td><td>Job chuẩn theo kế hoạch</td><td>Planner/Dispatcher theo lịch đã duyệt</td><td>Phải tuân thủ cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch). Không được hạ xuống P3 vì tiện đổi máy.</td></tr>
+<tr><td>P2</td><td>Job chuẩn theo kế hoạch</td><td>Planner/Dispatcher theo lịch đã duyệt</td><td>Phải compliance cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch). Không được hạ xuống P3 vì tiện đổi máy.</td></tr>
 <tr><td>P3</td><td>Chờ vật tư, chờ ENG, chờ QA, chờ outsource, chờ máy/fixture/tool</td><td>Planner/Dispatcher khi có hold code hợp lệ</td><td>Không được phát vào queue chạy. Phải có hold code, người phụ trách, next action, ETA hoặc decision review.</td></tr>
 </tbody></table></div>
-<p>Một workcenter tại cùng một thời điểm chỉ nên có <b>01 P0 chủ động</b>. Nếu phát sinh P0 thứ hai mà không đóng P0 đang mở, Ops Manager phải ra quyết định bằng văn bản: chia nguồn lực, đổi nhóm máy (machine family), split lot, outsource hoặc renegotiate due. Không được để 3–4 P0 treo đồng thời rồi yêu cầu xưởng “tự sắp xếp”.</p>
+<p>Một workcenter tại cùng một thời điểm chỉ nên có <b>01 P0 chủ động</b>. Nếu phát sinh P0 thứ hai mà không đóng P0 đang mở, Ops Manager phải ra quyết định bằng văn bản: chia nguồn lực, đổi nhóm máy (machine family), split lot, outsource hoặc renegotiate due. Không được để 3–4 P0 treo đồng thời rồi requirement workshop “tự sắp xếp”.</p>
 </div>
 
 <div class="section"><h2>3. cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) và rule đổi lịch</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cửa sổ</th><th>Ý nghĩa</th><th>Khi nào được phá</th><th>Bằng chứng bắt buộc</th></tr></thead><tbody>
-<tr><td>Freeze của ca</td><td>Danh sách job đầu ca đã phát hành, dùng để giữ nhịp vận hành trong ca hiện tại</td><td>Chỉ P0 hoặc sự cố L1/L2: machine down, material miss, revision change, QA HOLD, safety event</td><td>Change note + người phụ trách + job bị lùi + thời điểm cập nhật Epicor/M365</td></tr>
-<tr><td>Freeze ngày</td><td>Kế hoạch ngày cho workcenter/cell</td><td>P0, bottleneck recovery, outsource overdue, customer special approval</td><td>Decision hồ sơ trong tier meeting / nhật ký hành động</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cửa sổ</th><th>Ý nghĩa</th><th>Khi nào được phá</th><th>Evidence bắt buộc</th></tr></thead><tbody>
+<tr><td>Freeze của ca</td><td>Danh sách job đầu ca đã release, dùng để giữ nhịp operation trong ca hiện tại</td><td>Chỉ P0 hoặc incident L1/L2: machine down, material miss, revision change, QA HOLD, safety event</td><td>Change note + người phụ trách + job bị lùi + thời điểm cập nhật Epicor/M365</td></tr>
+<tr><td>Freeze ngày</td><td>Kế hoạch ngày cho workcenter/cell</td><td>P0, bottleneck recovery, outsource overdue, customer special approval</td><td>Decision record trong tier meeting / log hành động</td></tr>
 <tr><td>Freeze tuần</td><td>Kế hoạch chuẩn để bảo vệ thời gian dẫn (lead time) và vật tư/nguồn lực đã khóa</td><td>Chỉ L2 hoặc quyết định plant-level</td><td>Biên bản capacity review hoặc quyết định điều hành</td></tr>
 </tbody></table></div>
 <div class="callout-warn"><strong>Rule resequence</strong><br/>Được phép resequence chỉ khi job phía trước chưa vào setup/cycle hoặc khi việc đổi lịch làm giảm tổng rủi ro trễ giao. Không được resequence nếu làm đứt chain của material reservation, customer kit, outsourced return, clean-pack window hoặc mẫu đầu (first piece) plan mà chưa xử lý hệ quả.</div>
 </div>
 
-<div class="section"><h2>4. Mô hình năng lực hữu dụng</h2>
-<p>Năng lực dùng để dispatch không phải là công suất lý thuyết của máy. Planner phải tính <b>năng lực hữu dụng</b> theo công thức sau: <span class="code">Available Hours – planned downtime – PM / hiệu chuẩn hold – meeting / handover reserve – setup reserve – abnormality reserve = dispatchable hours</span>. Khi nhóm máy (machine family) có OEE history đủ tin cậy, Planner được dùng hệ số hiệu lực; nếu không có dữ liệu đủ sạch, phải dùng mức thận trọng hơn thay vì vẽ năng lực đẹp.</p>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thành phần</th><th>Cách hiểu bắt buộc</th><th>Ghi chú vận hành</th></tr></thead><tbody>
-<tr><td>Available Hours</td><td>Giờ máy thực sự mở cho sản xuất theo calendar đã duyệt</td><td>Không tính cả thời gian PM, đào tạo, đánh giá, hoặc line stop đã biết trước.</td></tr>
+<div class="section"><h2>4. Mô hình competence hữu dụng</h2>
+<p>Competence dùng để dispatch không phải là công suất lý thuyết của máy. Planner phải tính <b>competence hữu dụng</b> theo công thức sau: <span class="code">Available Hours – planned downtime – PM / calibration hold – meeting / handover reserve – setup reserve – abnormality reserve = dispatchable hours</span>. Khi nhóm máy (machine family) có OEE history đủ tin cậy, Planner được dùng hệ số hiệu lực; nếu không có dữ liệu đủ sạch, phải dùng mức thận trọng hơn thay vì vẽ competence đẹp.</p>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thành phần</th><th>Cách hiểu bắt buộc</th><th>Ghi chú operation</th></tr></thead><tbody>
+<tr><td>Available Hours</td><td>Giờ máy thực sự mở cho production theo calendar đã duyệt</td><td>Không tính cả thời gian PM, training, đánh giá, hoặc line stop đã biết trước.</td></tr>
 <tr><td>Setup Reserve</td><td>Phần thời gian dành cho changeover/prove-out/mẫu đầu</td><td>Không được coi setup là “chạy sản lượng”. Chủng loại cao (high-mix) cell phải giữ reserve cao hơn cell lặp.</td></tr>
-<tr><td>Abnormality Reserve</td><td>Biên độ để hấp thụ lỗi nhỏ, recovery, tool change, minor stoppage</td><td>Bottleneck cell phải có reserve rõ; không được load 100% rồi mong xưởng tự xoay.</td></tr>
+<tr><td>Abnormality Reserve</td><td>Biên độ để hấp thụ lỗi nhỏ, recovery, tool change, minor stoppage</td><td>Bottleneck cell phải có reserve rõ; không được load 100% rồi mong workshop tự xoay.</td></tr>
 <tr><td>Dispatchable Hours</td><td>Giờ thật sự có thể xếp job</td><td>Dùng để so với queued standard hours khi quyết định mở thêm việc.</td></tr>
 </tbody></table></div>
 </div>
 
 <div class="section"><h2>5. WIP cap theo họ workcenter</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm workcenter</th><th>Cap mặc định</th><th>Mục đích của cap</th><th>Khi vượt cap phải làm gì</th></tr></thead><tbody>
-<tr><td>5-axis / mill-turn / leak / clean bottleneck</td><td>Queued standard hours ≤ 1.0 ngày năng lực hữu dụng; setup staged ≤ 1 job kế tiếp / machine</td><td>Bảo vệ bottleneck, giảm đổi lịch và tránh tắc mẫu đầu</td><td>Escalate L1 ngay; review split lot, chuyển tải, outsource, hoặc dời job chưa đủ mức sẵn sàng.</td></tr>
-<tr><td>3-axis / CNC turning / finishing cell</td><td>Queued standard hours ≤ 1.5 ngày năng lực hữu dụng; staged jobs ≤ 2 job / nhóm máy (machine family)</td><td>Giữ dòng chảy nhưng vẫn đủ việc cho ca tiếp theo</td><td>Review tuổi tồn WIP (tuổi tồn / tuổi tồn), dừng phát hành thêm nếu chưa có plan clear.</td></tr>
-<tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship release) / clean pack</td><td>Ship-ready / final-inspect-ready ≤ 1 ngày đầu ra chuẩn</td><td>Không để QA/WHS thành bãi chờ cuối chuỗi</td><td>Review nguyên nhân gốc ở upstream; không đẩy thêm job nếu đầu ra cuối không hút kịp.</td></tr>
+<tr><td>5-axis / mill-turn / leak / clean bottleneck</td><td>Queued standard hours ≤ 1.0 ngày competence hữu dụng; setup staged ≤ 1 job kế tiếp / machine</td><td>Bảo vệ bottleneck, giảm đổi lịch và tránh tắc mẫu đầu</td><td>Escalate L1 ngay; review split lot, chuyển tải, outsource, hoặc dời job chưa đủ readiness level.</td></tr>
+<tr><td>3-axis / CNC turning / finishing cell</td><td>Queued standard hours ≤ 1.5 ngày competence hữu dụng; staged jobs ≤ 2 job / nhóm máy (machine family)</td><td>Giữ dòng chảy nhưng vẫn đủ việc cho ca tiếp theo</td><td>Review tuổi tồn WIP (tuổi tồn / tuổi tồn), dừng release thêm nếu chưa có plan clear.</td></tr>
+<tr><td>Inspection cuối / approval delivery (ship release) / clean pack</td><td>Ship-ready / final-inspect-ready ≤ 1 ngày output chuẩn</td><td>Không để QA/WHS thành bãi chờ cuối chuỗi</td><td>Review nguyên nhân gốc ở upstream; không đẩy thêm job nếu output cuối không hút kịp.</td></tr>
 <tr><td>Outsource queue</td><td>Chỉ phát lot khi processor slot, route, cert expectation và return date đã xác nhận</td><td>Ngăn chất hàng chờ ngoài mà không biết ngày về</td><td>Planner + PUR quyết định theo PO/ETA/processor trạng thái; thiếu slot thì HOLD.</td></tr>
 </tbody></table></div>
-<p>Cap là <b>giới hạn phát hành</b>, không phải KPI để nhồi đầy. Khi vượt cap, ưu tiên đầu tiên là <b>ngừng mở thêm việc</b> và <b>dọn hàng đang kẹt</b>, không phải tạo thêm bảng theo dõi.</p>
+<p>Cap là <b>giới hạn release</b>, không phải KPI để nhồi đầy. Khi vượt cap, ưu tiên đầu tiên là <b>ngừng mở thêm việc</b> và <b>dọn hàng đang kẹt</b>, không phải tạo thêm tracking register.</p>
 </div>
 
 <div class="section"><h2>6. Queue discipline, tuổi tồn và phản ứng</h2>
@@ -122,68 +122,68 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>0–1 shift</td><td>Bình thường</td><td>Cell Lead</td><td>Theo dõi theo dispatch; chưa cần escalation nếu job vẫn trong nhịp cam kết.</td></tr>
 <tr><td>&gt;1 đến 3 shift</td><td>Cảnh báo</td><td>Planner + Supervisor</td><td>Phải chỉ ra lý do: thiếu material, thiếu setup, chờ QA, chờ machine, chờ outsource, chờ decision.</td></tr>
 <tr><td>&gt;3 shift đến 7 ngày</td><td>Đỏ</td><td>Ops Manager</td><td>Escalate L1; phải có plan clear kèm due/time và người phụ trách.</td></tr>
-<tr><td>&gt;7 ngày hoặc có nguy cơ vỡ giao</td><td>Đen</td><td>Plant Head / GM theo thẩm quyền</td><td>Escalate L2; phải quyết định chuyển tải, outsource, split lot, giao hàng một phần hoặc re-plan cam kết.</td></tr>
+<tr><td>&gt;7 ngày hoặc có nguy cơ vỡ giao</td><td>Đen</td><td>Plant Head / GM theo authority</td><td>Escalate L2; phải quyết định chuyển tải, outsource, split lot, delivery một phần hoặc re-plan cam kết.</td></tr>
 </tbody></table></div>
-<p>Tuổi tồn được tính theo <b>lần giao dịch gần nhất trong SoR</b> hoặc theo mốc release/move có ý nghĩa sản xuất. Không được xóa tuổi tồn bằng move giả, time entry giả hoặc thay đổi thủ công ngày snapshot.</p>
+<p>Tuổi tồn được tính theo <b>lần giao dịch gần nhất trong SoR</b> hoặc theo mốc release/move có ý nghĩa production. Không được xóa tuổi tồn bằng move giả, time entry giả hoặc thay đổi thủ công ngày snapshot.</p>
 </div>
 
 <div class="section"><h2>7. Hold reason code chuẩn</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mã</th><th>Nhóm</th><th>Điều kiện mở</th><th>Điều kiện release</th></tr></thead><tbody>
 <tr><td>HR01-MAT</td><td>Material</td><td>Thiếu vật tư, lot/heat, cert hoặc reservation</td><td>WHS xác nhận tồn/lot/cert và SoR đã cập nhật</td></tr>
-<tr><td>HR02-PRG</td><td>Program</td><td>Program hoặc controlled copy chưa phát hành / sai phiên bản (wrong revision)</td><td>ENG phát hành controlled copy và link hồ sơ đúng</td></tr>
+<tr><td>HR02-PRG</td><td>Program</td><td>Program hoặc controlled copy chưa release / sai revision (wrong revision)</td><td>ENG release controlled copy và link record đúng</td></tr>
 <tr><td>HR03-TOL</td><td>Tooling / Fixture</td><td>Thiếu tool, fixture, jaw, holder, prove-out plan</td><td>Setup Lead xác nhận đủ điều kiện chạy</td></tr>
-<tr><td>HR04-QA</td><td>Quality</td><td>QA hold, FAI chưa xong, gage chưa sẵn, NCR chưa đóng</td><td>QA release bằng bằng chứng đúng control gate</td></tr>
+<tr><td>HR04-QA</td><td>Quality</td><td>QA hold, FAI chưa xong, gage chưa sẵn, NCR chưa đóng</td><td>QA release bằng evidence đúng control gate</td></tr>
 <tr><td>HR05-MCH</td><td>Machine</td><td>Máy down, PM hold, crash, repeat abnormality</td><td>Maintenance/OPS xác nhận machine ready</td></tr>
-<tr><td>HR06-OUT</td><td>Outsource</td><td>Chờ processor, chờ receipt, chờ cert, overdue return</td><td>PUR/WHS xác nhận hàng về và đủ hồ sơ</td></tr>
+<tr><td>HR06-OUT</td><td>Outsource</td><td>Chờ processor, chờ receipt, chờ cert, overdue return</td><td>PUR/WHS xác nhận hàng về và đủ record</td></tr>
 <tr><td>HR07-ENG</td><td>Engineering</td><td>Rev change, ECO, thiếu snapshot, unclear requirement</td><td>ENG release set mới và cập nhật bộ job dossier (job packet)</td></tr>
-<tr><td>HR08-SHIP</td><td>Shipping</td><td>Thiếu bộ hồ sơ giao hàng (ship packet), CoC, label, customer release</td><td>WHS/QA hoàn tất packet và phê duyệt giao hàng</td></tr>
+<tr><td>HR08-SHIP</td><td>Shipping</td><td>Thiếu bộ record delivery (ship packet), CoC, label, customer release</td><td>WHS/QA hoàn tất packet và approval delivery</td></tr>
 </tbody></table></div>
 </div>
 
 <div class="section"><h2>8. Dispatch board và review bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường dữ liệu tối thiểu</th><th>Phải có</th></tr></thead><tbody>
 <tr><td>Thông tin định danh</td><td>JobNum, Part, Rev, OpSeq, Workcenter/Machine family, Qty open, Ngày đến hạn, Priority class</td></tr>
-<tr><td>Mức sẵn sàng</td><td>Khởi động/Planning release trạng thái, hold code, material ready, setup ready, QA ready, outsource trạng thái</td></tr>
+<tr><td>Readiness level</td><td>Khởi động/Planning release trạng thái, hold code, material ready, setup ready, QA ready, outsource trạng thái</td></tr>
 <tr><td>Điều độ</td><td>Dispatch sequence, planned start, planned finish, người phụ trách cell, next control gate</td></tr>
 <tr><td>Rủi ro</td><td>Tuổi tồn bucket, bottleneck flag, special handling flag, customer overlay flag, hot-job note</td></tr>
-<tr><td>Hành động</td><td>Next action, người phụ trách, due time, escalation level, bằng chứng link khi đóng</td></tr>
+<tr><td>Hành động</td><td>Next action, người phụ trách, due time, escalation level, evidence link khi đóng</td></tr>
 </tbody></table></div>
 <p>Dispatch board phải được review tối thiểu ở 3 thời điểm: <b>đầu ca</b>, <b>giữa ca</b> và <b>cuối ca/chuẩn bị bàn giao</b>. Nếu ngày đó có P0, machine down lớn, revision change hoặc outsource overdue, phải mở thêm review bất thường trong ngày thay vì chờ đến cuối ca.</p>
 </div>
 
 <div class="section"><h2>9. Rule coupling với outsource, clean-pack và final release</h2>
 <ul class="tight">
-<li>Không phát job ra outsource nếu processor chưa được duyệt đúng family quy trình, route chưa rõ return control gate hoặc packaging để gửi đi chưa đúng.</li>
-<li>Không đẩy job tới clean-pack / final release nếu upstream chưa khóa xong bằng chứng mẫu đầu, CTQ, NCR, leak/clean requirement hoặc bộ hồ sơ giao hàng.</li>
+<li>Không phát job ra outsource nếu processor chưa được duyệt đúng family process, route chưa rõ return control gate hoặc packaging để gửi đi chưa đúng.</li>
+<li>Không đẩy job tới clean-pack / final release nếu upstream chưa khóa xong evidence mẫu đầu, CTQ, NCR, leak/clean requirement hoặc bộ record delivery.</li>
 <li>Khi một decision ở Planning làm thay đổi clean-pack, leak-test, FAI hoặc ship-release window, Planner phải đồng bộ ngay với QA/WHS/ENG; không được coi đây là việc của “khâu sau”.</li>
 </ul>
 </div>
 
 
-<div class="section"><h2>11. Decision tree khi thiếu năng lực</h2>
+<div class="section"><h2>11. Decision tree khi thiếu competence</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Thứ tự ưu tiên quyết định</th><th>Hold point không được vượt</th></tr></thead><tbody>
-<tr><td>Thiếu năng lực ngắn hạn trong 1 ca</td><td>1) clear abnormality; 2) đổi sequence trong cùng family; 3) dời job chưa ready; 4) mở OT ngắn nếu được duyệt</td><td>Không được đẩy job chưa qua mẫu đầu/QA control gate lên chạy chỉ để giữ đầu ra.</td></tr>
-<tr><td>Thiếu năng lực do bottleneck 2–5 ngày</td><td>1) rebalance giữa nhóm máy (machine family); 2) split lot có kiểm soát; 3) đổi route được ENG/QA chấp thuận; 4) outsource phần phù hợp</td><td>Không làm split lot nếu làm mất trace hoặc làm đứt requirement clean/leak/FAI.</td></tr>
-<tr><td>Thiếu năng lực kéo dài / overload tuần</td><td>1) capacity review cấp L2; 2) reset cam kết; 3) quyết định outsource, OT có kế hoạch, hoặc giới hạn nhận việc mới</td><td>Không để Planner tự hứa lại due với Sales hoặc khách hàng nếu chưa có quyết định điều hành.</td></tr>
+<tr><td>Thiếu competence ngắn hạn trong 1 ca</td><td>1) clear abnormality; 2) đổi sequence trong cùng family; 3) dời job chưa ready; 4) mở OT ngắn nếu được duyệt</td><td>Không được đẩy job chưa qua mẫu đầu/QA control gate lên chạy chỉ để giữ output.</td></tr>
+<tr><td>Thiếu competence do bottleneck 2–5 ngày</td><td>1) rebalance giữa nhóm máy (machine family); 2) split lot có kiểm soát; 3) đổi route được ENG/QA chấp thuận; 4) outsource phần phù hợp</td><td>Không làm split lot nếu làm mất trace hoặc làm đứt requirement clean/leak/FAI.</td></tr>
+<tr><td>Thiếu competence kéo dài / overload tuần</td><td>1) capacity review cấp L2; 2) reset cam kết; 3) quyết định outsource, OT có kế hoạch, hoặc giới hạn nhận việc mới</td><td>Không để Planner tự hứa lại due với Sales hoặc customer nếu chưa có quyết định điều hành.</td></tr>
 </tbody></table></div>
 </div>
 
-<div class="section"><h2>12. Hồ sơ điều độ bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Responsible Person</th></tr></thead><tbody>
+<div class="section"><h2>12. Record điều độ bắt buộc</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Record</th><th>Mục đích</th><th>Responsible Person</th></tr></thead><tbody>
 <tr><td>Dispatch list theo ca/ngày</td><td>Khóa thứ tự chạy và cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) cho từng workcenter</td><td>Planner / Dispatcher</td></tr>
 <tr><td>WIP tuổi tồn snapshot</td><td>Nhìn rõ job đỏ/đen, người phụ trách và action</td><td>Planner</td></tr>
-<tr><td>Escalation / hot-job nhật ký</td><td>Chứng minh ai duyệt, job nào bị ảnh hưởng và plan recovery</td><td>Ops Manager</td></tr>
+<tr><td>Escalation / hot-job log</td><td>Chứng minh ai duyệt, job nào bị ảnh hưởng và plan recovery</td><td>Ops Manager</td></tr>
 <tr><td>Capacity review minutes</td><td>Ghi quyết định về OT, outsource, rebalance, re-plan</td><td>Ops Manager + Planning Team Leader</td></tr>
-<tr><td>Shortage / constraint nhật ký</td><td>Theo dõi material, tool, machine, QA control gate và ETA khôi phục</td><td>Planner + Supervisor</td></tr>
+<tr><td>Shortage / constraint log</td><td>Theo dõi material, tool, machine, QA control gate và ETA khôi phục</td><td>Planner + Supervisor</td></tr>
 </tbody></table></div>
 </div>
 
-<div class="section"><h2>13. Tài liệu liên kết</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Hướng dẫn thao tác điều độ hằng ca.</td></tr>
+<div class="section"><h2>13. Document liên kết</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Document</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Hướng dẫn operation điều độ hằng ca.</td></tr>
 <tr><td><a href="annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>MRR, control gate và đồng bộ bàn giao.</td></tr>
 <tr><td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation chain và SLA xử lý.</td></tr>
-<tr><td><a href="annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Cadence họp tầng và nhật ký hành động.</td></tr>
+<tr><td><a href="annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Cadence họp tầng và log hành động.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Khung thủ tục planning/scheduling/dispatch.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a></td><td>Dispatch list hằng ca/ngày.</td></tr>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a></td><td>Snapshot tuổi tồn WIP (tuổi tồn / tuổi tồn) và hành động.</td></tr>
@@ -193,7 +193,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
     </div>
   </div>
 </div>
-<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

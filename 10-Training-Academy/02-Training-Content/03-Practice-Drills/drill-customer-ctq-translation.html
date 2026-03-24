@@ -55,7 +55,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+    <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
@@ -75,8 +75,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="kicker">Bộ diễn tập</div>
 <h1 class="h1">DRL-Bài diễn tập 11 — Customer Requirement → CTQ Translation</h1>
 <p class="lead">
- Diễn tập này khóa lỗi gốc của nhiều claim: <b>đọc yêu cầu không hết</b> và <b>dịch yêu cầu sai</b>.
- Đầu ra của diễn tập là 01 CTQ list + kế hoạch kiểm tra (kiểm tra plan) + rà soát hợp đồng summary nằm đúng SSOT.
+ Diễn tập này khóa lỗi gốc của nhiều claim: <b>đọc requirement không hết</b> và <b>dịch requirement sai</b>.
+ Output của diễn tập là 01 CTQ list + kế hoạch inspection (inspection plan) + review hợp đồng summary nằm đúng SSOT.
  </p>
 </div>
 <div class="grid-2">
@@ -84,12 +84,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">Mục tiêu</span>
 <ul class="tight">
 <li>CTQ list rõ và dùng làm chuẩn cho toàn job.</li>
-<li>kế hoạch kiểm tra (kiểm tra plan) có reaction plan.</li>
-<li>rà soát hợp đồng có sign-off và link SSOT.</li>
+<li>kế hoạch inspection (inspection plan) có reaction plan.</li>
+<li>review hợp đồng có sign-off và link SSOT.</li>
 </ul>
 </div>
 <div class="card">
-<span class="badge">Năng lực kích hoạt</span>
+<span class="badge">Competence kích hoạt</span>
 <ul class="tight"><li><a href="../../01-Competency-System/02-Levels/index.html#C11"><b>C11</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C10"><b>C10</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C14"><b>C14</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C03"><b>C03</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C04"><b>C04</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C02"><b>C02</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C13"><b>C13</b></a></li></ul>
 </div>
 </div>
@@ -97,7 +97,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">Chuẩn bị</span>
 <ul class="tight">
 <li>01 RFQ/PO thật hoặc mô phỏng có đầy đủ drawing/spec/terms.</li>
-<li>Template CTQ list và kế hoạch kiểm tra (kiểm tra plan).</li>
+<li>Template CTQ list và kế hoạch inspection (inspection plan).</li>
 <li>Quy tắc naming: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
 </ul>
 </div>
@@ -109,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Control gate (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Nhận RFQ/PO/drawing/spec và xác nhận REV set của khách hàng.</td><td>Estimator (SAL-03)</td><td>Đầu vào package link + REV note</td><td>STOP</td></tr><tr><td>2</td><td>Trích xuất yêu cầu: CTQ dim/tol, finish/spec, packaging/label, cert/FAI, công đoạn đặc biệt.</td><td>Sales/QA/ENG</td><td>Requirement list (1 trang)</td><td>HOLD</td></tr><tr><td>3</td><td>Dịch yêu cầu thành CTQ list: đặc tính – phương pháp đo – tần suất – tiêu chí ĐẠT/KHÔNG ĐẠT.</td><td>QA/QC/ENG</td><td>CTQ list + kiểm tra method</td><td>HOLD</td></tr><tr><td>4</td><td>Tạo kế hoạch kiểm tra (kiểm tra plan) + reaction plan (STOP/tạm giữ khi lệch CTQ).</td><td>QA/QC</td><td>Kiểm tra plan (PDF)</td><td>HOLD</td></tr><tr><td>5</td><td>rà soát hợp đồng summary: xác nhận năng lực đáp ứng và điểm cần outsource.</td><td>Sales/QA/OPS</td><td>CR summary + sign-off</td><td>HOLD</td></tr><tr><td>6</td><td>Bàn giao cho planning/production: điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (hold point))))))))))))))))))))) + link baseline + bảng kiểm.</td><td>QA/Planning</td><td>Bàn giao note + links</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Nhận RFQ/PO/drawing/spec và xác nhận REV set của customer.</td><td>Estimator (SAL-03)</td><td>Input package link + REV note</td><td>STOP</td></tr><tr><td>2</td><td>Trích xuất requirement: CTQ dim/tol, finish/spec, packaging/label, cert/FAI, công đoạn đặc biệt.</td><td>Sales/QA/ENG</td><td>Requirement list (1 trang)</td><td>HOLD</td></tr><tr><td>3</td><td>Dịch requirement thành CTQ list: đặc tính – phương pháp đo – tần suất – tiêu chí ĐẠT/KHÔNG ĐẠT.</td><td>QA/QC/ENG</td><td>CTQ list + inspection method</td><td>HOLD</td></tr><tr><td>4</td><td>Tạo kế hoạch inspection (inspection plan) + reaction plan (STOP/hold khi lệch CTQ).</td><td>QA/QC</td><td>Inspection plan (PDF)</td><td>HOLD</td></tr><tr><td>5</td><td>review hợp đồng summary: xác nhận competence đáp ứng và điểm cần outsource.</td><td>Sales/QA/OPS</td><td>CR summary + sign-off</td><td>HOLD</td></tr><tr><td>6</td><td>Bàn giao cho planning/production: điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (hold point))))))))))))))))))))) + link baseline + checklist.</td><td>QA/Planning</td><td>Bàn giao note + links</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
@@ -118,8 +118,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">Fail-fast</span>
 <ul class="tight">
 <li>CTQ list thiếu phương pháp đo hoặc thiếu tiêu chí ĐẠT/KHÔNG ĐẠT.</li>
-<li>kế hoạch kiểm tra (kiểm tra plan) không có reaction plan.</li>
-<li>Không có sign-off rà soát hợp đồng.</li>
+<li>kế hoạch inspection (inspection plan) không có reaction plan.</li>
+<li>Không có sign-off review hợp đồng.</li>
 <li>CTQ list nằm rời ngoài SSOT.</li>
 </ul>
 </div>
@@ -130,7 +130,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Requirement extraction</b></td><td>Không bỏ sót yêu cầu đặc biệt (finish/pack/cert/FAI).</td><td>0/1/2</td></tr><tr><td><b>CTQ clarity</b></td><td>CTQ có phương pháp đo, tần suất, tiêu chí rõ.</td><td>0/1/2</td></tr><tr><td><b>Reaction plan</b></td><td>STOP/HOLD rule rõ và gắn vào quy trình step.</td><td>0/1/2</td></tr><tr><td><b>Alignment</b></td><td>Sales/ENG/QA/OPS cùng dùng 1 bản CTQ list trong SSOT.</td><td>0/1/2</td></tr><tr><td><b>Hồ sơ quality</b></td><td>CR summary có chữ ký; link SSOT đầy đủ.</td><td>0/1/2</td></tr>
+<tr><td><b>Requirement extraction</b></td><td>Không bỏ sót requirement đặc biệt (finish/pack/cert/FAI).</td><td>0/1/2</td></tr><tr><td><b>CTQ clarity</b></td><td>CTQ có phương pháp đo, tần suất, tiêu chí rõ.</td><td>0/1/2</td></tr><tr><td><b>Reaction plan</b></td><td>STOP/HOLD rule rõ và gắn vào process step.</td><td>0/1/2</td></tr><tr><td><b>Alignment</b></td><td>Sales/ENG/QA/OPS cùng dùng 1 bản CTQ list trong SSOT.</td><td>0/1/2</td></tr><tr><td><b>Record quality</b></td><td>CR summary có chữ ký; link SSOT đầy đủ.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>
@@ -139,8 +139,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">MRR tối thiểu</span>
 <ul class="tight">
 <li>Requirement list (1 trang) + CTQ list.</li>
-<li>Kiểm tra plan + reaction plan.</li>
-<li>rà soát hợp đồng summary có sign-off.</li>
+<li>Inspection plan + reaction plan.</li>
+<li>review hợp đồng summary có sign-off.</li>
 <li>Bàn giao note có link SSOT.</li>
 </ul>
 </div>
@@ -149,6 +149,6 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

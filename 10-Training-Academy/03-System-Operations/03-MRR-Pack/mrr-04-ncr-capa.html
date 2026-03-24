@@ -60,7 +60,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
   <div class="fh-company">
     <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
+    <span>Document kiểm soát</span>
   </div>
 </div>
 <div class="title">
@@ -90,10 +90,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div class="note">
-<strong>Thông tin Job / Hồ sơ</strong>
+<strong>Thông tin Job / Record</strong>
 <div class="mini">
  JobCode: <span class="formline"> </span><br/>
- Khách hàng: <span class="formline"> </span><br/>
+ Customer: <span class="formline"> </span><br/>
  Part No: <span class="formline"> </span>   Rev: <span class="formline"> </span><br/>
  Số lượng: <span class="formline"> </span>   Due: <span class="formline"> </span><br/>
 </div>
@@ -101,25 +101,25 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<h2 class="h2" style="margin-top:0;">Bảng kiểm MRR (Minimum Required Hồ sơ)</h2>
-<p class="mini muted2">Tick đủ các dòng dưới đây. Mỗi dòng phải có bằng chứng trong SSOT và đặt tên file đúng chuẩn.</p>
+<h2 class="h2" style="margin-top:0;">Checklist MRR (Minimum Required Record)</h2>
+<p class="mini muted2">Tick đủ các dòng dưới đây. Mỗi dòng phải có evidence trong SSOT và đặt tên file đúng chuẩn.</p>
 <div style="overflow:auto;">
 <table class="form-table">
 <tr>
-<th style="min-width:320px;">MRR / Bằng chứng</th>
+<th style="min-width:320px;">MRR / Evidence</th>
 <th style="min-width:140px;">RecordType</th>
 <th style="min-width:110px;">Control gate</th>
 <th style="min-width:120px;">Responsible Person</th>
 <th style="min-width:220px;">SSOT path</th>
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
-<tr><td><span class="chk">☐</span> QC HOLD tag/hồ sơ (cô lập vật tư/WIP/FG)</td><td>HOLD</td><td>N0</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/HOLD/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_HOLD_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> NCR hồ sơ (mô tả NG + ảnh + kích thước + số lượng)</td><td>NCR</td><td>N0</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> QC HOLD tag/record (cô lập vật tư/WIP/FG)</td><td>HOLD</td><td>N0</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/HOLD/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_HOLD_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> NCR record (mô tả NG + ảnh + kích thước + số lượng)</td><td>NCR</td><td>N0</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Containment action (chặn thoát) + danh sách lô ảnh hưởng</td><td>CONT</td><td>N0</td><td>OPS+QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CONT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> Disposition (REWORK/SCRAP/USE-AS-IS/RETURN) + phê duyệt</td><td>DISP</td><td>N1</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_DISP_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Disposition (REWORK/SCRAP/USE-AS-IS/RETURN) + approval</td><td>DISP</td><td>N1</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_DISP_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Nguyên nhân gốc (5Why / Fishbone) + xác nhận bằng dữ liệu</td><td>RCA</td><td>N2</td><td>QA+ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RCA_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> CAPA plan (hành động + người phụ trách + due + control update)</td><td>CAPA</td><td>N2</td><td>QA/QMS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CAPA_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> Xác minh bằng chứng (đo lại/FAI lại/SPC/3 lô liên tiếp)</td><td>VERI</td><td>N3</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_VERI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Xác minh evidence (đo lại/FAI lại/SPC/3 lô liên tiếp)</td><td>VERI</td><td>N3</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_VERI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Closure sign-off + bài học kinh nghiệm (update WI/Training)</td><td>CLOSE</td><td>N3</td><td>QA/QMS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CLOSE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 </table>
 </div>
@@ -128,13 +128,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
 <ul class="tight">
-<li>Không cô lập sản phẩm NG hoặc không dán HOLD → STOP.</li><li>Không mở NCR mà xử lý miệng → BLOCK.</li><li>Disposition thiếu phê duyệt QA/Customer (khi yêu cầu) → HOLD.</li><li>Đóng CAPA khi chưa có xác minh bằng chứng → HOLD.</li>
+<li>Không cô lập sản phẩm NG hoặc không dán HOLD → STOP.</li><li>Không mở NCR mà xử lý miệng → BLOCK.</li><li>Disposition thiếu approval QA/Customer (khi requirement) → HOLD.</li><li>Đóng CAPA khi chưa có xác minh evidence → HOLD.</li>
 </ul>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Đánh giá 60 giây</h2>
 <ol class="tight">
-<li>Mở thư mục NCR và xác nhận có ảnh + số lượng + lot/serial.</li><li>Mở CAPA plan và đối chiếu người phụ trách/due.</li><li>Mở xác minh bằng chứng và đối chiếu tiêu chí đạt.</li><li>Mở closure và kiểm tra WI/Training đã cập nhật.</li>
+<li>Mở thư mục NCR và xác nhận có ảnh + số lượng + lot/serial.</li><li>Mở CAPA plan và đối chiếu người phụ trách/due.</li><li>Mở xác minh evidence và đối chiếu tiêu chí đạt.</li><li>Mở closure và inspection WI/Training đã cập nhật.</li>
 </ol>
 </div>
 <div class="card">
@@ -149,7 +149,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div></div></div>
 
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
 

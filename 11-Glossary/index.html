@@ -59,7 +59,7 @@
       <div class="form-header">
         <div class="fh-left">
           <a class="brand-logo" href="../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../assets/hesem-logo.svg"/></a>
-          <div class="fh-company"><a href="../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
+          <div class="fh-company"><a href="../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Document kiểm soát</span></div>
         </div>
         <div class="title">
           <strong>ANNEX-QMS-970 — Dictionary</strong><br/>
@@ -80,22 +80,22 @@
         <div class="muted" style="margin-bottom:12px;">Trang này PHẢI được dùng để tra cứu viết tắt/thuật ngữ và định nghĩa thống nhất trong HESEM QMS. Khi soạn SOP/WI/FRM/REF, author PHẢI dùng đúng thuật ngữ đã chuẩn hóa tại đây.</div>
 
         <div class="callout" style="margin-bottom:12px;">
-          <b>Quy tắc hiển thị bắt buộc cho viết tắt:</b> ví dụ <b>SPC</b> → <b>Statistical Process Control</b> → <b>Kiểm soát quá trình bằng thống kê</b> → định nghĩa, bối cảnh sử dụng và hồ sơ liên quan. Không được dùng thuật ngữ nửa Anh nửa Việt trong cột thuật ngữ.
+          <b>Quy tắc hiển thị bắt buộc cho viết tắt:</b> ví dụ <b>SPC</b> → <b>Statistical Process Control</b> → <b>Kiểm soát quá trình bằng thống kê</b> → định nghĩa, bối cảnh sử dụng và record liên quan. Không được dùng thuật ngữ nửa Anh nửa Việt trong cột thuật ngữ.
           Nếu một cụm là một đơn vị nghĩa hoàn chỉnh, phải chọn một trong hai cách: dịch trọn cụm sang tiếng Việt hoặc giữ trọn cụm bằng tiếng Anh; không được ghép nửa Anh nửa Việt.
         </div>
 
         <div class="card" style="margin-top:10px;">
           <h2 class="h2" style="margin-top:0;">1. Mục đích sử dụng</h2>
           <ul>
-            <li>Chuẩn hóa thuật ngữ dùng trong toàn bộ tài liệu kiểm soát.</li>
-            <li>Giảm sai lệch giao tiếp giữa Sales, Planning, Production, Quality, Engineering, Supply Chain, Finance, HR và IT.</li>
-            <li>Làm nguồn tham chiếu duy nhất cho định nghĩa viết tắt, chỉ số KPI, thuật ngữ chất lượng, thuật ngữ kỹ thuật CNC và thuật ngữ hệ thống.</li>
+            <li>Chuẩn hóa thuật ngữ dùng trong toàn bộ document kiểm soát.</li>
+            <li>Giảm deviation giao tiếp giữa Sales, Planning, Production, Quality, Engineering, Supply Chain, Finance, HR và IT.</li>
+            <li>Làm nguồn tham chiếu duy nhất cho định nghĩa viết tắt, chỉ số KPI, thuật ngữ quality, thuật ngữ kỹ thuật CNC và thuật ngữ hệ thống.</li>
           </ul>
           <h2 class="h2">2. Quy tắc sử dụng bắt buộc</h2>
           <ol>
-            <li>Khi gặp viết tắt hoặc thuật ngữ trong tài liệu, người dùng PHẢI tra cứu tại trang này trước khi áp dụng.</li>
-            <li>Nếu viết tắt chưa có trong từ điển, author PHẢI dừng phát hành và gửi yêu cầu bổ sung cho QA/QMS.</li>
-            <li>Không được tự đặt nghĩa khác với định nghĩa đã phát hành.</li>
+            <li>Khi gặp viết tắt hoặc thuật ngữ trong document, người dùng PHẢI tra cứu tại trang này trước khi áp dụng.</li>
+            <li>Nếu viết tắt chưa có trong từ điển, author PHẢI dừng release và gửi requirement bổ sung cho QA/QMS.</li>
+            <li>Không được tự đặt nghĩa khác với định nghĩa đã release.</li>
             <li>Với mọi mục từ, trường <b>term</b> PHẢI là tiếng Anh hoàn toàn; tiếng Việt chỉ được đặt ở <b>vi</b>, <b>def</b>, <b>ctx</b> hoặc <b>rec</b>.</li>
           </ol>
           <h2 class="h2">3. Cấu trúc mục từ</h2>
@@ -105,10 +105,10 @@
               <tbody>
                 <tr><td>term</td><td>Viết tắt hoặc thuật ngữ chuẩn.</td></tr>
                 <tr><td>meaning</td><td>Tên đầy đủ tiếng Anh. Nếu term đã là cụm tiếng Anh đầy đủ, PHẢI lặp lại cụm chuẩn tại trường này.</td></tr>
-                <tr><td>vi</td><td>Dịch nghĩa tiếng Việt dùng thống nhất trong tài liệu HESEM.</td></tr>
+                <tr><td>vi</td><td>Dịch nghĩa tiếng Việt dùng thống nhất trong document HESEM.</td></tr>
                 <tr><td>def</td><td>Định nghĩa ngắn gọn, nêu điểm kiểm soát quan trọng.</td></tr>
                 <tr><td>ctx</td><td>Bối cảnh sử dụng trong HESEM: ai dùng, ở bước nào, điều kiện nào.</td></tr>
-                <tr><td>rec</td><td>Hồ sơ / bằng chứng / biểu mẫu liên quan (nếu có).</td></tr>
+                <tr><td>rec</td><td>Record / evidence / form liên quan (nếu có).</td></tr>
                 <tr><td>cat</td><td>Nhóm phân loại để lọc và tra cứu.</td></tr>
               </tbody>
             </table>
@@ -139,7 +139,7 @@
               <tr>
                 <th class="col-term"><div class="th-en">Term</div><div class="th-vn">Viết tắt / thuật ngữ chuẩn</div></th>
                 <th class="col-meaning"><div class="th-en">Full English (EN)</div><div class="th-vn">Tên đầy đủ tiếng Anh</div></th>
-                <th class="col-def"><div class="th-en">Vietnamese + Details</div><div class="th-vn">Dịch tiếng Việt • Định nghĩa • Bối cảnh • Hồ sơ</div></th>
+                <th class="col-def"><div class="th-en">Vietnamese + Details</div><div class="th-vn">Dịch tiếng Việt • Định nghĩa • Bối cảnh • Record</div></th>
               </tr>
             </thead>
             <tbody id="rows"></tbody>
@@ -222,7 +222,7 @@
         (vi ? '<div class="detail-body"><span class="detail-label">Tiếng Việt</span>'+esc(vi)+'</div>' : '') +
         (def ? '<div class="detail-body"><span class="detail-label">Định nghĩa</span>'+esc(def)+'</div>' : '') +
         (ctx ? '<div class="detail-body"><span class="detail-label">Bối cảnh sử dụng</span>'+esc(ctx)+'</div>' : '') +
-        (rec ? '<div class="detail-body"><span class="detail-label">Hồ sơ / bằng chứng</span>'+esc(rec)+'</div>' : '') +
+        (rec ? '<div class="detail-body"><span class="detail-label">Record / evidence</span>'+esc(rec)+'</div>' : '') +
       '</td>' +
     '</tr>';
   }
