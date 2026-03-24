@@ -77,12 +77,12 @@ ul.tight li {margin:4px 0;}
 <ul class="tight" style="padding-left:18px;">
 <li>Ultrasonic cleaning không thay cho việc loại bỏ bavia lớn, chip lớn, dầu mỡ nặng hoặc nhãn bẩn trước bể.</li>
 <li>Part có coating, adhesive, O-ring, bearing, grease, trapped cavity, bề mặt đánh bóng gương hoặc feature dễ xước chỉ được chạy khi recipe đã phê duyệt.</li>
-<li>Mẻ chỉ được mở khi đã biết rõ part thuộc nhóm <span class="code">CL-A</span> hay <span class="code">CL-B</span> và biết rõ clean-state sau cleaning sẽ đi đâu: verify, clean-pack, leak test hay lưu chờ.</li>
+<li>Mẻ chỉ được mở khi đã biết rõ part thuộc nhóm <span class="code">CL-A</span> hay <span class="code">CL-B</span> và biết rõ clean-state sau cleaning sẽ đi đâu: xác minh, clean-pack, leak test hay lưu chờ.</li>
 </ul></div>
 
 <div class="section"><h2>2. Ma trận chọn recipe chuẩn</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm</th><th>Áp dụng điển hình</th><th>Tần số</th><th>Nhiệt độ</th><th>Dung dịch</th><th>Thời gian mỗi stage</th><th>Rinse</th><th>Sấy</th><th>Ghi chú bắt buộc</th></tr></thead><tbody>
-<tr><td>CL-A</td><td>Part vacuum-compatible, gas-path, clean-pack, leak-test, part có yêu cầu verify sạch cao</td><td>40–80 kHz</td><td>40–55°C</td><td>Alkaline cleaner pH 9–11 hoặc chemistry theo yêu cầu khách hàng</td><td>5–15 phút</td><td>3 stage: solution → DI → DI mới/overflow</td><td>N₂ sạch + oven sạch 60°C trong 15–30 phút khi cần</td><td>DI water phải đạt ≥ 10 MΩ·cm; không vượt 70°C; ưu tiên recipe dịu hơn với soft metal/polished part</td></tr>
+<tr><td>CL-A</td><td>Part vacuum-compatible, gas-path, clean-pack, leak-test, part có yêu cầu xác minh sạch cao</td><td>40–80 kHz</td><td>40–55°C</td><td>Alkaline cleaner pH 9–11 hoặc chemistry theo yêu cầu khách hàng</td><td>5–15 phút</td><td>3 stage: solution → DI → DI mới/overflow</td><td>N₂ sạch + oven sạch 60°C trong 15–30 phút khi cần</td><td>DI water phải đạt ≥ 10 MΩ·cm; không vượt 70°C; ưu tiên recipe dịu hơn với soft metal/polished part</td></tr>
 <tr><td>CL-B</td><td>Part tiêu chuẩn sau finishing, part không yêu cầu clean-pack mức cao</td><td>25–40 kHz</td><td>40–60°C</td><td>Alkaline hoặc neutral cleaner</td><td>5–10 phút</td><td>2 stage: solution → DI</td><td>N₂ sạch hoặc clean air theo route</td><td>Dùng khi không có yêu cầu chân không/khí sạch đặc biệt</td></tr>
 <tr><td>Recipe đặc biệt</td><td>Anodized, passivated, coated, thin-wall, mirror finish, lapped/polished, part có blind cavity sâu</td><td>Theo phê duyệt ENG/QA</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Không được tự ý suy diễn từ CL-A/CL-B chuẩn</td></tr>
 </tbody></table></div>
@@ -90,7 +90,7 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>3. Kiểm mức sẵn sàng trước khi nạp mẻ</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục</th><th>Phải đạt</th><th>tạm giữ khi</th></tr></thead><tbody>
-<tr><td>Bộ hồ sơ công việc (job packet) / route</td><td>Xác định rõ clean level, material family, finish state, bước sau cleaning và hồ sơ cần ghi</td><td>Thiếu clean level, thiếu route sau cleaning, không rõ có cần verify hay clean-pack hay không</td></tr>
+<tr><td>Bộ hồ sơ công việc (job packet) / route</td><td>Xác định rõ clean level, material family, finish state, bước sau cleaning và hồ sơ cần ghi</td><td>Thiếu clean level, thiếu route sau cleaning, không rõ có cần xác minh hay clean-pack hay không</td></tr>
 <tr><td>Tank ID và chemistry</td><td>Đúng tank theo recipe; dung dịch đúng loại, đúng nồng độ, đúng tuổi bể; không có dầu nổi, bọt bất thường hoặc cặn lớn</td><td>Không chứng minh được ngày thay bể, pH ngoài dải, dung dịch đổi màu/đục/bẩn</td></tr>
 <tr><td>Nhiệt độ / tần số / timer</td><td>Thiết bị đạt giá trị recipe; transducer hoạt động ổn; đồng hồ nhiệt và pH meter còn hiệu lực sử dụng</td><td>Thông số ngoài cửa sổ recipe hoặc thiết bị đo không đáng tin</td></tr>
 <tr><td>DI rinse</td><td>Có final rinse phù hợp; DI water đạt ngưỡng cho route đang chạy</td><td>DI water không đạt, bể rinse bẩn hoặc không có rinse mới cho CL-A</td></tr>
@@ -124,7 +124,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-item"><strong>Bước 3 — Rinse 1.</strong><br/>Chuyển part sang rinse đầu tiên trong thời gian ngắn nhất, tránh để hóa chất khô lại trên bề mặt. Với CL-A, không được bỏ qua bước này.</div>
 <div class="step-item"><strong>Bước 4 — Rinse cuối.</strong><br/>CL-A phải có rinse cuối bằng DI mới hoặc overflow rinse; part phải được lắc/đảo/định hướng để xả hết dung dịch kẹt trong lỗ, pocket và khe ren. Nếu part giữ nước, phải dùng thời gian chảy/rút phù hợp trước khi qua bước dry.</div>
 <div class="step-item"><strong>Bước 5 — Dry-down.</strong><br/>Thổi N₂ sạch theo hướng đẩy nước ra khỏi cavity, không thổi ngược bụi lên part. Khi route yêu cầu, đưa vào oven sạch 60°C trong 15–30 phút hoặc theo recipe. Không để part khô tự do trong môi trường bẩn.</div>
-<div class="step-item"><strong>Bước 6 — Kiểm sau cleaning.</strong><br/>Kiểm water mark, stain, residue, retained water, chip sót, dấu cọ xát và bề mặt bất thường. Nếu Job yêu cầu verify sạch, chuyển ngay sang form/hồ sơ verify tương ứng; nếu không, chuyển ngay sang clean-pack hoặc bước kế tiếp được chỉ định.</div>
+<div class="step-item"><strong>Bước 6 — Kiểm sau cleaning.</strong><br/>Kiểm water mark, stain, residue, retained water, chip sót, dấu cọ xát và bề mặt bất thường. Nếu Job yêu cầu xác minh sạch, chuyển ngay sang form/hồ sơ xác minh tương ứng; nếu không, chuyển ngay sang clean-pack hoặc bước kế tiếp được chỉ định.</div>
 </div></div>
 
 <div class="section"><h2>7. Kiểm soát thay bể và chống nhiễm chéo</h2>
@@ -137,20 +137,20 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>8. HOLD, reject và xử lý bất thường</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Dấu hiệu</th><th>Đánh giá</th><th>Hành động</th></tr></thead><tbody>
-<tr><td>Particle count/cleanliness verification FAIL</td><td>Có thể do chemistry bẩn, basket bẩn, rinse không đủ, contamination carryover hoặc handling sau bể</td><td>HOLD lô; điều tra và quyết định re-clean / scrap / concession theo QA</td></tr>
+<tr><td>Particle count/cleanliness verification FAIL</td><td>Có thể do chemistry bẩn, basket bẩn, rinse không đủ, nhiễm bẩn carryover hoặc handling sau bể</td><td>HOLD lô; điều tra và quyết định re-clean / scrap / concession theo QA</td></tr>
 <tr><td>Stain, discolor, etch nhẹ, water spot lặp lại</td><td>Nghi ngờ chemistry quá mạnh, nhiệt quá cao, DI không đạt hoặc drying không đúng</td><td>HOLD; không re-clean lặp lại khi chưa chỉnh recipe</td></tr>
 <tr><td>Bề mặt xước/cọ xát</td><td>Lỗi xếp mẻ, basket hoặc handling</td><td>Cô lập lô; đánh giá cosmetic/functional impact; sửa phương pháp xếp trước mẻ kế tiếp</td></tr>
-<tr><td>Retained water trong hole/cavity</td><td>Rủi ro contamination, corrosion hoặc ảnh hưởng leak test/clean pack</td><td>Tăng bước drain/dry; verify lại trước release</td></tr>
+<tr><td>Retained water trong hole/cavity</td><td>Rủi ro nhiễm bẩn, corrosion hoặc ảnh hưởng leak test/clean pack</td><td>Tăng bước drain/dry; xác minh lại trước release</td></tr>
 <tr><td>Transducer yếu / vùng chết / cavitation không đều</td><td>Bể không còn hiệu lực ổn định</td><td>Ngừng dùng bể; mở yêu cầu maintenance</td></tr>
 </tbody></table></div>
-<div class="callout-warning"><strong>Rule reject:</strong> mọi part sau cleaning mà vẫn còn chip, residue, stain khó lau, retained water hoặc bằng chứng cho thấy recipe sai phải xem là chưa đạt. Không đẩy trách nhiệm sang bước verify/packaging kế tiếp.</div></div>
+<div class="callout-warning"><strong>Rule reject:</strong> mọi part sau cleaning mà vẫn còn chip, residue, stain khó lau, retained water hoặc bằng chứng cho thấy recipe sai phải xem là chưa đạt. Không đẩy trách nhiệm sang bước xác minh/packaging kế tiếp.</div></div>
 
 <div class="section"><h2>9. Hồ sơ, KPI và liên kết</h2>
 <div class="two-col">
 <div class="card"><h3>Hồ sơ bắt buộc</h3><ul class="tight" style="padding-left:18px;">
 <li>Job/lot, material family, clean level, tank ID, recipe ID</li>
 <li>Nhiệt độ, pH hoặc chemistry reference, thời gian chạy, thời gian dry</li>
-<li>Ngày thay bể, người vận hành, kết quả verify hoặc lý do không verify</li>
+<li>Ngày thay bể, người vận hành, kết quả xác minh hoặc lý do không xác minh</li>
 <li>Disposition khi không đạt hoặc re-clean</li>
 </ul></div>
 <div class="card"><h3>KPI theo dõi</h3><ul class="tight" style="padding-left:18px;">
@@ -162,12 +162,12 @@ ul.tight li {margin:4px 0;}
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html">SOP-505</a></td><td>Khung finishing, secondary operation và trách nhiệm công đoạn.</td></tr>
-<tr><td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td><td>Yêu cầu sạch, contamination control, môi trường sạch.</td></tr>
+<tr><td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td><td>Yêu cầu sạch, nhiễm bẩn control, môi trường sạch.</td></tr>
 <tr><td><a href="../../03-Reference/06-ANNEX-600/annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a></td><td>Rule vật liệu, bề mặt, vacuum compatibility, handling đặc biệt.</td></tr>
 <tr><td><a href="wi-711-cleanroom-entry-and-gowning.html">WI-711</a></td><td>Chuẩn vào khu sạch / gowning trước và sau cleaning sạch.</td></tr>
 <tr><td><a href="wi-713-environmental-monitoring-and-response.html">WI-713</a></td><td>Điều kiện môi trường và phản ứng khi môi trường lệch chuẩn.</td></tr>
 <tr><td><a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td><td>Đóng gói sạch và bảo quản sau cleaning.</td></tr>
-<tr><td><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-711_Cleanliness_Verification_Form.xlsx">FRM-711</a></td><td>Ghi kết quả verify sạch khi route yêu cầu.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-711_Cleanliness_Verification_Form.xlsx">FRM-711</a></td><td>Ghi kết quả xác minh sạch khi route yêu cầu.</td></tr>
 </tbody></table></div></div>
 
     </div>

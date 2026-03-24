@@ -62,7 +62,7 @@ ul.tight li {margin:4px 0;}
 
           <div class="row"><span><b>Ng&#224;y hi&#7879;u l&#7921;c:</b></span><span>Theo quyết định ban hành</span></div>
 
-          <div class="row"><span><b>Ch&#7911; s&#7903; h&#7919;u:</b></span><span>QC Lead / QA Engineer / QC Operator</span></div>
+          <div class="row"><span><b>Ch&#7911; s&#7903; h&#7919;u:</b></span><span>Tổ trưởng QC / QA Engineer / QC Operator</span></div>
 
           <div class="row"><span><b>Ph&#234; duy&#7879;t:</b></span><span>Tổng Giám Đốc</span></div>
 
@@ -82,7 +82,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>Tình trạng part</td><td>Part đã hoàn tất công đoạn trước, đã làm sạch phần dầu/bụi, khô, có nhận dạng part-rev-lot và đã đóng kín các port theo đúng cấu hình test.</td><td>Part còn ẩm, còn solvent, còn burr/phoi/FOD, thiếu cap/plug hoặc chưa xác nhận đúng cấu hình test.</td><td>Traveler + kiểm cuối trước test.</td></tr>
 <tr><td>Thiết bị</td><td>Leak detector, standard leak, bơm, probe, adapter và fixture còn hạn, phù hợp dải đo và được nhận diện rõ ID.</td><td>Bất kỳ thiết bị nào quá hạn, hỏng, không có ID hoặc standard leak không truy xuất được.</td><td>FRM-712 + nhãn thiết bị.</td></tr>
 <tr><td>Người thực hiện</td><td>Người test có <span class="code">Authorized-to-work</span> cho leak test theo <a href="../../03-Reference/08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html">ANNEX-801</a>.</td><td>Người chưa được ủy quyền hoặc đã hết hiệu lực chứng nhận.</td><td>Training / certification log.</td></tr>
-<tr><td>Môi trường</td><td>Khu test ổn định, không có gió tạt mạnh vào đầu sniff, không vừa xả He tại station lân cận, nhiệt độ part và fixture đã ổn định.</td><td>Background He cao bất thường, khu test đang có sự cố hút xả hoặc part vừa từ công đoạn nóng sang.</td><td>Pre-test check.</td></tr>
+<tr><td>Môi trường</td><td>Khu test ổn định, không có gió tạt mạnh vào đầu sniff, không vừa xả He tại station lân cận, nhiệt độ part và fixture đã ổn định.</td><td>Background He cao bất thường, khu test đang có sự cố hút xả hoặc part vừa từ công đoạn nóng sang.</td><td>Kiểm tra trước check.</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>3. Chọn đúng phương pháp test</h2>
@@ -98,7 +98,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-list">
 <div class="step-item"><strong>Bước 1 — Warm-up và kiểm trạng thái máy.</strong> Khởi động detector theo hướng dẫn thiết bị. Chỉ bắt đầu khi turbo/pump đã ổn định, không còn alarm và không còn cảnh báo service.</div>
 <div class="step-item"><strong>Bước 2 — Background check.</strong> Thực hiện blank/background check trước khi lắp part. Nếu background không hạ về vùng chấp nhận của máy hoặc vượt ngưỡng nội bộ cho method đang dùng, dừng test và xử lý nguồn nhiễu.</div>
-<div class="step-item"><strong>Bước 3 — Calibration / standard leak response.</strong> Kiểm standard leak ở đầu ca và sau mọi lần nghi ngờ drift. Nếu độ lệch vượt giới hạn nội bộ hoặc vượt ±20% so với giá trị chấp nhận đã chốt cho session, dừng dùng máy cho release.</div>
+<div class="step-item"><strong>Bước 3 — Hiệu chuẩn / standard leak response.</strong> Kiểm standard leak ở đầu ca và sau mọi lần nghi ngờ drift. Nếu độ lệch vượt giới hạn nội bộ hoặc vượt ±20% so với giá trị chấp nhận đã chốt cho session, dừng dùng máy cho release.</div>
 <div class="step-item"><strong>Bước 4 — Probe / fixture / adapter check.</strong> Kiểm lưu lượng sniff probe, độ kín adapter, tình trạng O-ring, blank flange và đường ống. Không dùng fixture bẩn, rách seal hoặc lẫn He tồn dư từ session trước.</div>
 <div class="step-item"><strong>Bước 5 — Session authorization.</strong> Chỉ mở session test khi bốn bước trên đã đạt và được ghi vào <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-712_Helium_Leak_Test_Record.xlsx">FRM-712</a>.</div>
 </div></div>

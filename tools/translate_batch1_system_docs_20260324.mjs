@@ -829,26 +829,78 @@ const RULES = [
   commonRule("checklists", /\bchecklists\b/gi, "bảng kiểm"),
   commonRule("checklist", /\bchecklist\b/gi, "bảng kiểm"),
   commonRule("authority", /\bauthority\b/gi, "thẩm quyền"),
-  customRule("department_owners", /\bDepartment owners\b/g, () => "Người phụ trách bộ phận"),
+  commonRule(
+    "cleanup_document_owner_mixed",
+    /\bdocument\s+(?:đầu mối phụ trách|người phụ trách)\b/gi,
+    "người phụ trách tài liệu"
+  ),
+  commonRule(
+    "cleanup_system_owner_mixed",
+    /\bsystem\s+người phụ trách\b/gi,
+    "người phụ trách hệ thống"
+  ),
+  commonRule(
+    "cleanup_business_system_owner_mixed",
+    /\bbusiness system\s+người phụ trách\b/gi,
+    "người phụ trách hệ thống nghiệp vụ"
+  ),
+  commonRule(
+    "cleanup_department_owner_mixed",
+    /\bdepartment\s+người phụ trách\b/gi,
+    "người phụ trách bộ phận"
+  ),
+  commonRule("cleanup_owner_he_thong", /\bowner hệ thống\b/gi, "người phụ trách hệ thống"),
+  commonRule("cleanup_owner_nguon", /\bowner nguồn\b/gi, "người phụ trách nguồn"),
+  commonRule("cleanup_owner_giao_dich", /\bowner giao dịch\b/gi, "người phụ trách giao dịch"),
+  commonRule("cleanup_owner_giao_dien", /\bowner giao diện\b/gi, "người phụ trách giao diện"),
+  commonRule("cleanup_department_folder_mixed", /\bDepartment thư mục\b/g, "Thư mục bộ phận"),
+  commonRule("cleanup_department_folder_mixed_lower", /\bdepartment thư mục\b/g, "thư mục bộ phận"),
+  commonRule("cleanup_primary_departments", /bộ phận chủ trìs/gi, "các bộ phận chủ trì"),
+  commonRule(
+    "cleanup_customer_service_owner_mixed",
+    /\bNgười phụ trách Customer Service\b/g,
+    "Trưởng bộ phận Customer Service"
+  ),
+  customRule("department_owners", /\bDepartment owners?\b/gi, () => "người phụ trách bộ phận"),
   customRule("process_owners", /\bProcess owners\b/g, () => "Chủ quá trình"),
   customRule("process_owner", /\bprocess owners?\b/gi, () => "chủ quá trình"),
   customRule("business_owners", /\bbusiness owners?\b/gi, () => "chủ nghiệp vụ"),
-  customRule("document_owner", /\bdocument owners?\b/gi, () => "chủ tài liệu"),
-  customRule("data_owner", /\bdata owners?\b/gi, () => "chủ dữ liệu"),
-  customRule("record_owner", /\brecord owners?\b/gi, () => "chủ hồ sơ"),
+  customRule("document_owner", /\bdocument owners?\b/gi, () => "người phụ trách tài liệu"),
+  customRule("data_owner", /\bdata owners?\b/gi, () => "người phụ trách dữ liệu"),
+  customRule("record_owner", /\brecord owners?\b/gi, () => "người phụ trách hồ sơ"),
+  customRule("system_owner", /\bsystem owners?\b/gi, () => "người phụ trách hệ thống"),
+  customRule("function_owner", /\bfunction owners?\b/gi, () => "người phụ trách chức năng"),
+  customRule("source_owner", /\bsource owners?\b/gi, () => "người phụ trách nguồn"),
+  customRule("action_owner", /\baction owners?\b/gi, () => "người phụ trách hành động"),
+  customRule("capa_owner", /\bcapa owners?\b/gi, () => "người phụ trách CAPA"),
   customRule("owner_approval", /\bowner approval\b/gi, () => "phê duyệt của người phụ trách"),
   customRule("internal_owner", /\binternal owner\b/gi, () => "người phụ trách nội bộ"),
-  customRule("owner_giao_dien", /\bowner giao diện\b/gi, () => "đầu mối phụ trách giao diện"),
-  customRule("escalation_owner", /\bescalation owner\b/gi, () => "người phụ trách leo thang"),
+  customRule("owner_giao_dien_role", /\bowner giao diện\b/gi, () => "người phụ trách giao diện"),
+  customRule("escalation_owner", /\bescalation owner\b/gi, () => "người phụ trách xử lý"),
   customRule("owner_main", /\bOwner chính\b/g, () => "Người phụ trách chính"),
   customRule("owner_main_lower", /\bowner chính\b/g, () => "người phụ trách chính"),
-  customRule(
-    "title_owner",
-    /\b([A-Z][A-Za-z0-9/&.-]*(?: [A-Z][A-Za-z0-9/&.-]*){0,4}) owner\b/g,
-    (_, title) => `Người phụ trách ${title}`
-  ),
   commonRule("owners", /\bowners\b/gi, "người phụ trách"),
   commonRule("owner", /\bowner\b/gi, "người phụ trách"),
+  commonRule("kho_lead", /\bKho Lead\b/g, "Trưởng nhóm Kho"),
+  commonRule("warehouse_team_leader", /\bWarehouse Team Leader\b/gi, "Trưởng nhóm Kho"),
+  commonRule("warehouse_lead", /\bWarehouse Lead\b/gi, "Trưởng nhóm Kho"),
+  commonRule("qc_lead", /\bQC Lead\b/gi, "Tổ trưởng QC"),
+  commonRule("shift_leader", /\bShift Leader\b/gi, "Trưởng ca"),
+  commonRule("team_leader", /\bTeam leader\b/gi, "Trưởng nhóm"),
+  commonRule("production_team_leader", /\bProduction Team Leader\b/gi, "Trưởng nhóm Sản xuất"),
+  commonRule("maintenance_team_leader", /\bMaintenance Team Leader\b/gi, "Trưởng nhóm Bảo trì"),
+  commonRule("planning_lead", /\bPlanning lead\b/gi, "Trưởng nhóm Kế hoạch"),
+  commonRule("qa_leader", /\bQA leader\b/gi, "Trưởng nhóm QA"),
+  commonRule("qa_qms_lead", /\bQA\/QMS lead\b/gi, "Trưởng nhóm QA/QMS"),
+  commonRule("warehouse_iqc_lead", /\bWarehouse\/IQC lead\b/gi, "Trưởng nhóm Kho / IQC"),
+  commonRule("dispatcher_lead", /\bDispatcher lead\b/gi, "Trưởng nhóm Điều độ"),
+  commonRule("iqc_lead", /\bIQC Lead\b/gi, "Tổ trưởng IQC"),
+  commonRule("whs_lead", /\bWHS Lead\b/gi, "Trưởng nhóm Kho"),
+  commonRule("warehouse_supervisor", /\bWarehouse Supervisor\b/gi, "Giám sát Kho"),
+  commonRule("lead_trainer", /\blead trainer\b/gi, "Lead Trainer"),
+  commonRule("cell_leader", /\bCell leader\b/gi, "Cell Leader"),
+  commonRule("line_manager", /\bline manager\b/gi, "Line Manager"),
+  commonRule("functional_manager", /\bfunctional manager\b/gi, "Functional Manager"),
   commonRule("system_of_record", /\bSystem of Record\b/gi, "nguồn chuẩn"),
   commonRule("special_process", /\bspecial process\b/gi, "công đoạn đặc biệt"),
   commonRule("standards", /\bstandards\b/gi, "tiêu chuẩn"),
@@ -860,7 +912,23 @@ const RULES = [
   commonRule("record", /\brecord\b/gi, "hồ sơ"),
   commonRule("complaints", /\bcomplaints\b/gi, "khiếu nại"),
   commonRule("complaint", /\bcomplaint\b/gi, "khiếu nại"),
-  commonRule("audit", /\baudit\b/gi, "đánh giá"),
+  commonRule(
+    "cleanup_audit_trail_nested",
+    /dấu vết kiểm toán\s*\(\s*dấu vết kiểm toán\s*\(\s*audit trail\s*\)\s*\)/gi,
+    "dấu vết kiểm toán (audit trail)"
+  ),
+  commonRule(
+    "cleanup_audit_trail_duplicate",
+    /dấu vết kiểm toán\s*\(\s*dấu vết kiểm toán\s*\)/gi,
+    "dấu vết kiểm toán"
+  ),
+  uncommonRule(
+    "audit_trail",
+    /dấu vết kiểm toán\s*\(\s*đánh giá trail\s*\)|(?<!dấu vết kiểm toán \()đánh giá trail|(?<!dấu vết kiểm toán \()audit trail\b/gi,
+    "dấu vết kiểm toán (audit trail)",
+    "dấu vết kiểm toán"
+  ),
+  commonRule("audit", /\baudit\b(?!\s*trail\b)/gi, "đánh giá"),
   customRule(
     "drill_title_suffix",
     /([—-]\s*)([^<>\n]{1,120}?)\s+Drill\b/g,
@@ -900,6 +968,11 @@ const RULES = [
   commonRule(
     "cleanup_post_right_first_time_nested",
     /\bĐúng ngay từ lần đầu\s*\(\s*Đúng ngay từ lần đầu\s*\(\s*Right First Time\s*\)\s*\)/g,
+    "Đúng ngay từ lần đầu (Right First Time)"
+  ),
+  commonRule(
+    "cleanup_post_right_first_time_deep_nested",
+    /Đúng ngay từ lần đầu(?:\s*\(\s*Đúng ngay từ lần đầu)*\s*\(\s*Right First Time\s*\)(?:\s*\))+/g,
     "Đúng ngay từ lần đầu (Right First Time)"
   ),
   commonRule(

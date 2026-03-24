@@ -76,7 +76,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
       <h1>WI-206 — bộ hồ sơ phê duyệt giao hàng, nhãn SSCC, đối soát kiện và bàn giao xác nhận giao hàng</h1>
       
 <div class="section"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
-<p>WI này quy định cách lập <b>Bộ hồ sơ phê duyệt giao hàng</b>, gán <b>SSCC</b>, đối soát inner-pack/outer-pack/logistic unit và bàn giao sang bước <b>Xác nhận giao hàng</b>. WI này áp dụng cho mọi lô xuất có kiểm soát chất lượng và áp dụng thêm khi khách hàng yêu cầu GS1/SSCC, customer label overlay, chứng từ vật liệu, chứng từ special process, hoặc partial shipment.</p>
+<p>WI này quy định cách lập <b>Bộ hồ sơ phê duyệt giao hàng</b>, gán <b>SSCC</b>, đối soát inner-pack/outer-pack/logistic unit và bàn giao sang bước <b>Xác nhận giao hàng</b>. WI này áp dụng cho mọi lô xuất có kiểm soát chất lượng và áp dụng thêm khi khách hàng yêu cầu GS1/SSCC, customer label overlay, chứng từ vật liệu, chứng từ công đoạn đặc biệt, hoặc partial shipment.</p>
 <div class="callout-danger"><strong>QUYỀN DỪNG</strong><br/>QA, Warehouse, Shipping, Sales/Customer Service và người có thẩm quyền release có quyền dừng xuất khi phát hiện sai part, sai rev, sai qty, sai lot/serial, sai SSCC, sai nhãn khách hàng, thiếu chứng từ, bao gói hỏng, hoặc bộ bằng chứng (evidence pack) chưa đủ. <b>PHẢI</b> hoàn tất hồ sơ trước khi xác nhận giao hàng.</div></div>
 
 <div class="section"><h2>2. Thuật ngữ vận hành bắt buộc</h2>
@@ -95,7 +95,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>QPL / customer package</td><td>Xác định rõ mức QPL, overlay khách hàng, yêu cầu cert, label, pack spec và release thẩm quyền</td><td>Chưa xác định QPL hoặc chưa rõ tài liệu khách hàng nào đang hiệu lực</td></tr>
 <tr><td>Pack structure</td><td>Đã xác định số inner pack, outer pack, pallet/crate, qty theo từng logistic unit và rule partial shipment</td><td>Chưa rõ cấu trúc kiện hoặc còn thay đổi chưa khóa</td></tr>
 <tr><td>Source data</td><td>Part, Rev, Qty, Lot/Serial, SO/PO, Ship-to, carrier/service, customer PN nếu áp dụng, dữ liệu label đều lấy từ SoR/SSOT hiệu lực</td><td>Dữ liệu lấy từ email/chat/Excel rời hoặc có nhiều nguồn mâu thuẫn</td></tr>
-<tr><td>Packaging condition</td><td>Bao gói đáp ứng <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a> và yêu cầu khách hàng; kiện sạch, không FOD, không hỏng</td><td>Bao gói chưa đạt, thiếu vật tư, thiếu ảnh/bằng chứng hoặc còn nguy cơ contamination</td></tr>
+<tr><td>Packaging condition</td><td>Bao gói đáp ứng <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a> và yêu cầu khách hàng; kiện sạch, không FOD, không hỏng</td><td>Bao gói chưa đạt, thiếu vật tư, thiếu ảnh/bằng chứng hoặc còn nguy cơ nhiễm bẩn</td></tr>
 </tbody></table></div>
 <div class="callout-info"><strong>SoR / SSOT</strong><br/>Trạng thái shipment, PackID, quantity, allocation và xác nhận giao hàng phải lấy từ SoR giao dịch. Bằng chứng, ảnh, bảng kiểm, approval history và link chứng từ phải nằm trong SSOT hồ sơ. Không được duy trì “bộ ship riêng” ngoài hệ thống.</div></div>
 
@@ -105,7 +105,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Xác định cấu trúc pack.</strong><br/>Xác định mỗi logistic unit chứa gì, bao nhiêu, thuộc lot nào, serial range nào, có inner pack nào bên trong, có item lẻ hoặc accessory kèm theo hay không.</div>
 <div class="step-item"><strong>Cấp PackID và SSCC.</strong><br/>Mỗi logistic unit phải có PackID và khi job áp dụng GS1 phải có 01 SSCC duy nhất. SSCC không được tái sử dụng; nhãn lỗi phải VOID chứ không xóa dấu vết.</div>
 <div class="step-item"><strong>In nhãn từ template kiểm soát.</strong><br/>Nhãn phải lấy từ mẫu được kiểm soát, đọc được bằng mắt và bằng scan, không che barcode bằng băng keo mờ, không in tạm bằng file cá nhân.</div>
-<div class="step-item"><strong>Quét và verify 100%.</strong><br/>Quét từng nhãn sau in và sau dán. Chuỗi SSCC, human-readable text, Part/Rev/Qty/Ship-to và reference dữ liệu phải khớp với pack structure đã khóa.</div>
+<div class="step-item"><strong>Quét và xác minh 100%.</strong><br/>Quét từng nhãn sau in và sau dán. Chuỗi SSCC, human-readable text, Part/Rev/Qty/Ship-to và reference dữ liệu phải khớp với pack structure đã khóa.</div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống pack</th><th>Rule bắt buộc</th><th>Thẩm quyền tối thiểu</th></tr></thead><tbody>
 <tr><td>Một line — một logistic unit</td><td>01 PackID / 01 SSCC / 01 bộ bằng chứng</td><td>Warehouse/Shipping</td></tr>
@@ -121,7 +121,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Shipment core</td><td>Mọi shipment</td><td>phiếu kê đóng gói (phiếu kê đóng gói), shipment/pack hồ sơ, ảnh nhãn, ảnh kiện, ship bảng kiểm</td></tr>
 <tr><td>Quality release</td><td>Mọi shipment có cổng kiểm soát release</td><td>Kiểm tra cuối release, CoC, inspection log, approval history</td></tr>
 <tr><td>QPL-driven bằng chứng</td><td>Theo <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>FAI, control plan, CTQ bằng chứng, special acceptance nếu có</td></tr>
-<tr><td>Material / outsource</td><td>Khi khách hàng hoặc spec yêu cầu</td><td>MTR/CoC vật liệu, cert special process, outsource pack, heat/lot chain</td></tr>
+<tr><td>Material / outsource</td><td>Khi khách hàng hoặc spec yêu cầu</td><td>MTR/CoC vật liệu, cert công đoạn đặc biệt, outsource pack, heat/lot chain</td></tr>
 <tr><td>Carrier / export / customer docs</td><td>Khi áp dụng</td><td>AWB/BOL/tracking, customer label pack, commercial docs, country-of-origin</td></tr>
 </tbody></table></div>
 <div class="callout-warn"><strong>Rule chứng từ</strong><br/>Nếu shipment chia nhiều đợt, mỗi đợt phải có bộ bộ hồ sơ phê duyệt giao hàng riêng. Chứng từ chung chỉ được dùng lại khi quy định khách hàng cho phép và phải trỏ đúng shipment hiện tại.</div></div>
@@ -145,7 +145,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Đổi Ship-to, customer label, carrier label overlay</td><td>Chỉ thay sau khi có xác nhận từ nguồn yêu cầu hợp lệ</td><td>Sales/CS + QA + Warehouse</td><td>Approval history + label bằng chứng mới</td></tr>
 <tr><td>Thiếu cert hoặc mismatch release data</td><td>Không được relabel để ship tạm; phải HOLD shipment</td><td>QA thẩm quyền</td><td>Hold log / NCR / corrective hồ sơ</td></tr>
 </tbody></table></div>
-<p>Sau khi QA/thẩm quyền release, Warehouse/Shipping mới được thực hiện handoff sang bước xác nhận giao hàng. Handoff chỉ hoàn tất khi shipment line, pack hồ sơ, label hồ sơ, reconciliation hồ sơ và bộ hồ sơ phê duyệt giao hàng cùng tham chiếu được với nhau.</p></div>
+<p>Sau khi QA/thẩm quyền release, Warehouse/Shipping mới được thực hiện bàn giao sang bước xác nhận giao hàng. Bàn giao chỉ hoàn tất khi shipment line, pack hồ sơ, label hồ sơ, reconciliation hồ sơ và bộ hồ sơ phê duyệt giao hàng cùng tham chiếu được với nhau.</p></div>
 
 <div class="section"><h2>8. Xử lý sai lệch</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Sai lệch</th><th>Phản ứng bắt buộc</th></tr></thead><tbody>
@@ -153,7 +153,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Sai qty / thiếu kiện / sai UOM</td><td>Dừng xuất; đếm lại; khóa pack; cập nhật lại phiếu kê đóng gói (phiếu kê đóng gói) và reconciliation từ đầu.</td></tr>
 <tr><td>Sai SSCC hoặc scan không mở đúng pack</td><td>VOID nhãn cũ; cấp lại SSCC nếu cần; scan xác nhận 100%; lưu reprint/relabel bằng chứng.</td></tr>
 <tr><td>Nhãn đúng nhưng bao gói hỏng hoặc có FOD</td><td>Repack toàn bộ logistic unit bị ảnh hưởng; chụp lại bằng chứng; review lại clean pack / preservation window.</td></tr>
-<tr><td>Thiếu CoC/MTR/cert/special process hồ sơ</td><td>Không ship; giữ HOLD cho đến khi hồ sơ đủ và thẩm quyền release lại.</td></tr>
+<tr><td>Thiếu CoC/MTR/cert/công đoạn đặc biệt hồ sơ</td><td>Không ship; giữ HOLD cho đến khi hồ sơ đủ và thẩm quyền release lại.</td></tr>
 <tr><td>Mismatch giữa bộ bằng chứng và shipment thực tế</td><td>Review lại toàn bộ shipment; không sửa lẻ từng file để “cho khớp”.</td></tr>
 </tbody></table></div>
 <div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">On-time phê duyệt giao hàng (ship release); số shipment HOLD do pack/doc mismatch; số relabel/repack; số ship escape do label/doc; thời gian từ final release đến xác nhận giao hàng.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>; <a href="wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>; <a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>; <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>; <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a>; <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx">FRM-702</a>; <a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-706_Shipping_Label.xlsx">FRM-706</a>.</div></div></div></div>

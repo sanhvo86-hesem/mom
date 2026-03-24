@@ -70,7 +70,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="hero">
 <h2>Chuẩn thực chiến – Level 1</h2>
 <div class="meta">
-<div><strong>Vai trò mục tiêu</strong><br/>Operator • Warehouse • IQC/QC • Team leader</div>
+<div><strong>Vai trò mục tiêu</strong><br/>Operator • Warehouse • IQC/QC • Trưởng nhóm</div>
 <div><strong>Đầu ra bắt buộc</strong>
 <ul><li>Đọc được vật liệu/temper/heat number trên tem vật tư hoặc MTR/CoC và đối chiếu với Job Pack.</li><li>Giữ traceability: ghi nhận heat/lot vào Phiếu theo dõi công việc (job traveler) hoặc thẻ WIP; không làm rơi mất tem/nhãn.</li><li>Kích hoạt HOLD ngay khi thiếu chứng từ, sai vật liệu, sai trạng thái, hoặc vật tư không nhận diện được.</li></ul>
 </div>
@@ -116,7 +116,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
 <ul><li><span class="badge warn">STOP</span> Khi phát hiện phôi/part không nhận diện được (mất tem/nhãn) tại máy hoặc tại kho.</li><li><span class="badge warn">HOLD</span> Khi MTR/CoC/certificate thiếu hoặc không khớp spec/REV/PO.</li><li><span class="badge warn">BLOCK</span> Khi outsource request không có spec/CTQ/cert requirement hoặc không có dispatch bảng kiểm.</li><li><span class="badge warn">HOLD</span> Khi part sau xử lý bề mặt có dấu hiệu lệch chuẩn ngoại quan hoặc thiếu kiểm tra incoming.</li></ul>
 <h2>7) Phản ứng 60 giây</h2>
-<ol><li>DỪNG thao tác đang làm (máy/kho) và đặt vật tư/part vào khu vực HOLD có nhãn rõ.</li><li>CHỤP ảnh tem/nhãn/chứng từ hiện có và lưu vào Hồ sơ công việc (EvidencePack/Material).</li><li>BÁO ngay Team leader + QA/IQC theo escalation; ghi vào QC Hold Log.</li><li>KHÓA phạm vi: kiểm tra các part/phôi cùng vị trí kệ hoặc cùng Job đang chạy để tránh lan lỗi.</li><li>MỞ NCR khi xác định mismatch; không tự ý “sửa giấy tờ” hoặc thay tem.</li></ol>
+<ol><li>DỪNG thao tác đang làm (máy/kho) và đặt vật tư/part vào khu vực HOLD có nhãn rõ.</li><li>CHỤP ảnh tem/nhãn/chứng từ hiện có và lưu vào Hồ sơ công việc (EvidencePack/Material).</li><li>BÁO ngay Trưởng nhóm + QA/IQC theo escalation; ghi vào QC Hold Log.</li><li>KHÓA phạm vi: kiểm tra các part/phôi cùng vị trí kệ hoặc cùng Job đang chạy để tránh lan lỗi.</li><li>MỞ NCR khi xác định mismatch; không tự ý “sửa giấy tờ” hoặc thay tem.</li></ol>
 <h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
 <div class="table-card">
 <table class="table">

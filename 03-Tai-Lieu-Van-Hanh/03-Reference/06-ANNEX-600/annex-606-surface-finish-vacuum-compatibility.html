@@ -82,8 +82,8 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điều kiện của Job</th><th>Lớp kiểm soát phải áp dụng</th><th>Hệ quả bắt buộc</th></tr></thead><tbody>
 <tr><td>Bề mặt tiếp xúc wafer, high-purity contact, sealing face, vacuum-side, internal passage hoặc customer gọi rõ “critical surface”</td><td>Surface Critical</td><td>Phải có vùng đo xác định rõ; phải có chuẩn nhám mục tiêu; phải có bằng chứng đo/kiểm theo cấp QPL.</td></tr>
 <tr><td>Part có đường khí, manifold, fitting, chamber, cover, gland, bore, cavity hoặc chức năng kín khí/chân không</td><td>Leak / Vacuum Critical</td><td>Phải xác định leak class, method, acceptance và bằng chứng release; phải kiểm soát handling/packaging nghiêm hơn job thường.</td></tr>
-<tr><td>Part sau EP, passivation, anodize, coating, outsource special process hoặc clean build</td><td>Finish / Clean Critical</td><td>Phải kiểm cả cert từ processor lẫn tình trạng bề mặt sau nhận hàng; không release chỉ dựa vào cert.</td></tr>
-<tr><td>Part semiconductor, vacuum-sensitive, high-purity, clean pack, customer CSR đặc biệt</td><td>Special Handling</td><td>Phải áp dụng vật tư sạch, rule contamination, mở túi/reseal và preservation window đúng WI/ANNEX liên quan.</td></tr>
+<tr><td>Part sau EP, passivation, anodize, coating, outsource công đoạn đặc biệt hoặc clean build</td><td>Finish / Clean Critical</td><td>Phải kiểm cả cert từ processor lẫn tình trạng bề mặt sau nhận hàng; không release chỉ dựa vào cert.</td></tr>
+<tr><td>Part semiconductor, vacuum-sensitive, high-purity, clean pack, customer CSR đặc biệt</td><td>Special Handling</td><td>Phải áp dụng vật tư sạch, rule nhiễm bẩn, mở túi/reseal và preservation window đúng WI/ANNEX liên quan.</td></tr>
 </tbody></table></div>
 <p>Khi một Job thỏa nhiều điều kiện, phải áp dụng <b>lớp kiểm soát cao nhất</b>. Ví dụ: manifold 316L đã EP dùng cho chân không và yêu cầu clean-pack thì phải đồng thời áp dụng chuẩn nhám, leak class, cleanliness, packaging và preservation của cả bốn nhóm.</p>
 </div>
@@ -104,7 +104,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>High vacuum chamber / seal critical</td><td>Đến mức 1×10⁻⁹ mbar·L/s khi customer spec yêu cầu</td><td>Ưu tiên bề mặt đã EP hoặc finish tương đương; clean handling chặt; packaging sạch.</td><td>Kết quả He leak test đúng method, hồ sơ thiết bị, trạng thái after-clean/after-bake khi áp dụng, bằng chứng bao gói.</td></tr>
 <tr><td>Gas delivery / manifold / high-purity line</td><td>Thường 1×10⁻⁸ mbar·L/s hoặc theo spec</td><td>Đường khí phải sạch, không có cặn; processor cert và cleanliness bằng chứng phải nối chuỗi.</td><td>Leak hồ sơ + cert xử lý bề mặt + photo bằng chứng vùng đóng gói.</td></tr>
 <tr><td>General vacuum fitting / controlled enclosure</td><td>Thường 1×10⁻⁷ mbar·L/s hoặc theo spec</td><td>Không cho handling breach sau khi leak pass; mở túi phải theo reseal rule.</td><td>Leak hồ sơ, traveler, ship-release reconciliation.</td></tr>
-<tr><td>Clean build / vacuum-compatible nhưng không có leak spec riêng</td><td>Theo spec assembly hoặc cổng kiểm soát (gate) nội bộ</td><td>Ưu tiên quản lý contamination và handling; outgassing material review bắt buộc cho polymer/adhesive dùng trong vùng nhạy.</td><td>Bằng chứng clean build, bagging, preservation, material compatibility review.</td></tr>
+<tr><td>Clean build / vacuum-compatible nhưng không có leak spec riêng</td><td>Theo spec assembly hoặc cổng kiểm soát (gate) nội bộ</td><td>Ưu tiên quản lý nhiễm bẩn và handling; outgassing material review bắt buộc cho polymer/adhesive dùng trong vùng nhạy.</td><td>Bằng chứng clean build, bagging, preservation, material compatibility review.</td></tr>
 </tbody></table></div>
 <p>Đối với polymer, sealant, adhesive hoặc vật tư phụ tiếp xúc vùng chân không / high-purity, Engineering phải có bằng chứng tương thích trước khi release. Khi không có dữ liệu khách hàng, baseline nội bộ phải bám dữ liệu outgassing / vacuum compatibility đã được duyệt cho family vật liệu đó.</p>
 </div>
@@ -117,7 +117,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Hastelloy C-276 / alloy đặc biệt</td><td>Môi trường ăn mòn cao, gas/chemical đặc biệt, customer overlay chặt</td><td>Không thay bằng SS nếu chưa có Engineering approval</td><td>Passivation; EP nếu spec yêu cầu</td><td>Giá cao, khó gia công, phải giữ trace rất chặt theo heat và processor.</td></tr>
 <tr><td>Titanium grade phù hợp theo AML</td><td>Special corrosive/weight-sensitive service hoặc customer-specific application</td><td>Không dùng nếu chưa review galling / particle / surface reaction</td><td>Theo spec và processor approval</td><td>Không tự thêm vật liệu này vào BOM job thường nếu chưa qua AML.</td></tr>
 <tr><td>PEEK / polymer kỹ thuật</td><td>Insulator, spacer, fixture không trực tiếp là high-vacuum gas path</td><td>Chỉ dùng có điều kiện cho vùng vacuum-sensitive; phải review outgassing, nhiệt và hóa chất</td><td>Bake-out / clean handling theo family material khi được duyệt</td><td>Không mặc định coi polymer là “sạch”; phải có material review và handling rule riêng.</td></tr>
-<tr><td>PTFE / FKM / seal polymer</td><td>Gasket, seal, liner hoặc part mềm theo spec</td><td>Không dùng gần plasma / nhiệt / hóa chất ngoài dải vật liệu; không tự thay family seal</td><td>Theo spec nhà sản xuất và review ứng dụng</td><td>Seal polymer phải quản lý shelf-life, bag opening, contamination và lẫn loại vật liệu.</td></tr>
+<tr><td>PTFE / FKM / seal polymer</td><td>Gasket, seal, liner hoặc part mềm theo spec</td><td>Không dùng gần plasma / nhiệt / hóa chất ngoài dải vật liệu; không tự thay family seal</td><td>Theo spec nhà sản xuất và review ứng dụng</td><td>Seal polymer phải quản lý shelf-life, bag opening, nhiễm bẩn và lẫn loại vật liệu.</td></tr>
 </tbody></table></div>
 </div>
 
@@ -126,9 +126,9 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Electropolish (EP)</td><td>High-purity, wetted, vacuum, cần giảm roughness và cải thiện cleanability</td><td>Bề mặt đồng đều; không pit, không orange peel, không burn, không smear; cert/lot trace đầy đủ; vùng chức năng đạt target Ra theo spec.</td><td>Color bất thường, patchy finish, pit mở, cert không đủ scope hoặc processor ngoài approved scope.</td></tr>
 <tr><td>Passivation</td><td>SS cần khử sắt tự do và nâng chống ăn mòn</td><td>Không stain, không đổi màu bất thường, không water-break Không đạt khi yêu cầu, chứng cứ xử lý rõ lot/batch.</td><td>Rust flash, stain, trace batch đứt hoặc mismatch giữa cert và lot part.</td></tr>
 <tr><td>Anodize / hard anodize</td><td>Aluminum cần wear/corrosion protection hoặc isolation theo spec</td><td>Độ phủ đều, không nứt, không bong, không biến dạng làm ảnh hưởng tolerance chức năng.</td><td>Flaking, burn mark, scratch lộ nền, masking sai vùng hoặc thickness out-of-spec.</td></tr>
-<tr><td>PVD / coating đặc biệt</td><td>Surface functional theo customer/process spec</td><td>Adhesion đạt, vùng phải bảo vệ khỏi coat được kiểm soát, cert + coupon + visual acceptance nối chuỗi.</td><td>Coating mẻ, patchy, overspray vào vùng phải tránh phủ, thiếu cert/coupon.</td></tr>
+<tr><td>PVD / coating đặc biệt</td><td>Surface functional theo customer/quy trình spec</td><td>Adhesion đạt, vùng phải bảo vệ khỏi coat được kiểm soát, cert + coupon + trực quan acceptance nối chuỗi.</td><td>Coating mẻ, patchy, overspray vào vùng phải tránh phủ, thiếu cert/coupon.</td></tr>
 </tbody></table></div>
-<p>Đối với công đoạn đặc biệt thuê ngoài (special process outsource / công đoạn đặc biệt thuê ngoài), cert chỉ là <b>điều kiện cần</b>. Điều kiện đủ là part thực tế sau nhận hàng phải qua visual, traceability và rule acceptance của HESEM trước khi chuyển bước.</p>
+<p>Đối với công đoạn đặc biệt thuê ngoài (công đoạn đặc biệt outsource / công đoạn đặc biệt thuê ngoài), cert chỉ là <b>điều kiện cần</b>. Điều kiện đủ là part thực tế sau nhận hàng phải qua trực quan, traceability và rule acceptance của HESEM trước khi chuyển bước.</p>
 </div>
 
 <div class="section"><h2>7. Bề mặt phải loại trừ, vật tư phải loại trừ và trạng thái không được release</h2>
@@ -160,23 +160,23 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Không được làm</th></tr></thead><tbody>
 <tr><td>Rework vùng seal / surface critical</td><td>Đánh giá lại nhám, profile, leak risk và cleanliness; cập nhật bằng chứng theo cổng kiểm soát liên quan.</td><td>Không được đánh bóng chữa cháy rồi ship nếu chưa review lại ảnh hưởng chức năng.</td></tr>
 <tr><td>Part đã leak-pass nhưng bị mở túi / chạm tay / rơi / va chạm</td><td>Đánh giá lại clean-state, packaging state và khi cần phải retest leak hoặc re-clean/re-pack theo WI liên quan.</td><td>Không dùng lập luận “chỉ mở xem một chút” để bỏ qua re-evaluation.</td></tr>
-<tr><td>Part sau outsource surface treatment</td><td>Kiểm cert, lot trace, visual acceptance, vùng phải bảo vệ khỏi coat và quy cách bao gói khi nhận về.</td><td>Không nhập kho/không chuyển bước chỉ dựa vào phiếu giao hàng.</td></tr>
-<tr><td>Part vacuum-sensitive chờ giao</td><td>Áp dụng preservation window, seal status, label trạng thái và điều kiện lưu trữ theo ANNEX-702 / WI-714.</td><td>Không để tồn mở quá cửa sổ bảo quản mà không re-pack/re-verify.</td></tr>
+<tr><td>Part sau outsource surface treatment</td><td>Kiểm cert, lot trace, trực quan acceptance, vùng phải bảo vệ khỏi coat và quy cách bao gói khi nhận về.</td><td>Không nhập kho/không chuyển bước chỉ dựa vào phiếu giao hàng.</td></tr>
+<tr><td>Part vacuum-sensitive chờ giao</td><td>Áp dụng preservation window, seal status, label trạng thái và điều kiện lưu trữ theo ANNEX-702 / WI-714.</td><td>Không để tồn mở quá cửa sổ bảo quản mà không re-pack/re-xác minh.</td></tr>
 </tbody></table></div>
 </div>
 
 <div class="section"><h2>9. Bằng chứng tối thiểu theo nhóm Job</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm Job</th><th>Bằng chứng tối thiểu</th><th>Cổng kiểm soát giữ</th></tr></thead><tbody>
-<tr><td>Surface finish critical</td><td>Profilometer hồ sơ hoặc bằng chứng vùng đo, visual hồ sơ vùng chức năng, rule acceptance rõ trên traveler/kế hoạch kiểm tra (inspection plan).</td><td>Thiếu hồ sơ, vị trí đo sai, hoặc bằng chứng không chỉ rõ feature chức năng.</td></tr>
+<tr><td>Surface finish critical</td><td>Profilometer hồ sơ hoặc bằng chứng vùng đo, trực quan hồ sơ vùng chức năng, rule acceptance rõ trên traveler/kế hoạch kiểm tra (inspection plan).</td><td>Thiếu hồ sơ, vị trí đo sai, hoặc bằng chứng không chỉ rõ feature chức năng.</td></tr>
 <tr><td>Vacuum / leak-sensitive</td><td>Leak test hồ sơ đúng method, trạng thái after-clean/after-pack, trace thiết bị, packaging bằng chứng.</td><td>Leak hồ sơ thiếu, method sai, thiết bị hết hiệu lực hoặc chuỗi bằng chứng bị đứt.</td></tr>
-<tr><td>Outsource surface treatment</td><td>Processor cert, scope đúng family process, lot/batch trace, incoming visual acceptance, decision hồ sơ khi có anomaly.</td><td>Processor ngoài danh sách được duyệt, cert thiếu, mismatch lot hoặc finish lỗi.</td></tr>
+<tr><td>Outsource surface treatment</td><td>Processor cert, scope đúng family quy trình, lot/batch trace, incoming trực quan acceptance, decision hồ sơ khi có anomaly.</td><td>Processor ngoài danh sách được duyệt, cert thiếu, mismatch lot hoặc finish lỗi.</td></tr>
 <tr><td>Clean packaging required</td><td>Bagging bằng chứng, label trạng thái, preservation data, người đóng gói và thời điểm seal.</td><td>Bagging sai vật tư, label sai, seal mở lại không có reseal hồ sơ.</td></tr>
 </tbody></table></div>
 </div>
 
 <div class="section"><h2>10. Tài liệu liên kết</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td><td>Khung kiểm soát sạch và contamination.</td></tr>
+<tr><td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td><td>Khung kiểm soát sạch và nhiễm bẩn.</td></tr>
 <tr><td><a href="../../01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a></td><td>Rule vật liệu, truy vết và kiểm soát giả mạo.</td></tr>
 <tr><td><a href="annex-302-approved-materials-list.html">ANNEX-302</a></td><td>Danh mục vật liệu được phê duyệt.</td></tr>
 <tr><td><a href="annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>Chọn cấp quality package và mức bằng chứng.</td></tr>

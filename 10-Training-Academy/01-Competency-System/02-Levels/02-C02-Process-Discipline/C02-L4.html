@@ -146,9 +146,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag iso">ISO 7.5</span>
 </div>
 </div>
-<div class="body">Tổ chức <strong></strong> số hoá traveller/hồ sơ khi đảm bảo đánh giá trail, phân quyền và data integrity.</div>
+<div class="body">Tổ chức <strong></strong> số hoá traveller/hồ sơ khi đảm bảo dấu vết kiểm toán (audit trail), phân quyền và data integrity.</div>
 </div>
-</div><h2 class="h2">6) Lý thuyết ứng dụng chuyên sâu</h2><h3 class="h3">Vì sao kỷ luật quy trình là 'bảo hiểm' của nhà máy lệnh sản xuất</h3><div><p>Trong xưởng gia công theo đơn (job shop), mỗi job có bản vẽ/revision riêng, yêu cầu riêng. Một lỗi nhỏ như dùng sai phiên bản (wrong revision) có nguy cơ tạo scrap toàn lô và phá uy tín. Kỷ luật quy trình là cơ chế bảo vệ: <strong>làm đúng phiên bản – đúng trình tự – đúng bằng chứng</strong>.</p></div><h3 class="h3">Khung tài liệu: SOP – WI – FRM và 'documented information'</h3><div><ul><li><strong>SOP</strong>: quy định cách quản trị quá trình (ai làm gì, khi nào, tiêu chuẩn).</li><li><strong>WI</strong>: hướng dẫn thao tác chi tiết tại điểm làm việc.</li><li><strong>FRM/Hồ sơ</strong>: bằng chứng đã làm đúng (traveler, bảng kiểm, report).</li></ul><p>Điểm đánh giá tập trung ở ở hồ sơ: làm rồi nhưng không có bằng chứng → xem như chưa làm.</p></div><h3 class="h3">Thiết kế Kiểm soát tài liệu: master list và vòng đời tài liệu</h3><div><p>L4 cần thiết kế: tạo – review – phê duyệt – phát hành – đào tạo – thu hồi – lưu trữ. Mỗi tài liệu có mã, version, người phụ trách, và lịch xem xét lại.</p></div><h3 class="h3">Đánh giá nội bộ &amp; CAPA: biến phát hiện thành cải tiến</h3><div><p>Đánh giá không phải để bắt lỗi mà để tìm cơ hội cải tiến. Nhưng phát hiện phải có CAPA và phải kiểm chứng hiệu lực.</p></div><h3 class="h3">Số hoá hồ sơ: nguyên tắc truy vết &amp; bảo mật</h3><div><p>Khi số hoá, phải đảm bảo quyền truy cập, đánh giá trail, backup, và tránh 'file rác'. Một nguồn sự thật (single source of truth) là bắt buộc.</p></div><h2 class="h2">7) Luồng thao tác chuẩn (khung thực hành)</h2><div class="note">
+</div><h2 class="h2">6) Lý thuyết ứng dụng chuyên sâu</h2><h3 class="h3">Vì sao kỷ luật quy trình là 'bảo hiểm' của nhà máy lệnh sản xuất</h3><div><p>Trong xưởng gia công theo đơn (job shop), mỗi job có bản vẽ/revision riêng, yêu cầu riêng. Một lỗi nhỏ như dùng sai phiên bản (wrong revision) có nguy cơ tạo scrap toàn lô và phá uy tín. Kỷ luật quy trình là cơ chế bảo vệ: <strong>làm đúng phiên bản – đúng trình tự – đúng bằng chứng</strong>.</p></div><h3 class="h3">Khung tài liệu: SOP – WI – FRM và 'documented information'</h3><div><ul><li><strong>SOP</strong>: quy định cách quản trị quá trình (ai làm gì, khi nào, tiêu chuẩn).</li><li><strong>WI</strong>: hướng dẫn thao tác chi tiết tại điểm làm việc.</li><li><strong>FRM/Hồ sơ</strong>: bằng chứng đã làm đúng (traveler, bảng kiểm, report).</li></ul><p>Điểm đánh giá tập trung ở ở hồ sơ: làm rồi nhưng không có bằng chứng → xem như chưa làm.</p></div><h3 class="h3">Thiết kế Kiểm soát tài liệu: master list và vòng đời tài liệu</h3><div><p>L4 cần thiết kế: tạo – review – phê duyệt – phát hành – đào tạo – thu hồi – lưu trữ. Mỗi tài liệu có mã, version, người phụ trách, và lịch xem xét lại.</p></div><h3 class="h3">Đánh giá nội bộ &amp; CAPA: biến phát hiện thành cải tiến</h3><div><p>Đánh giá không phải để bắt lỗi mà để tìm cơ hội cải tiến. Nhưng phát hiện phải có CAPA và phải kiểm chứng hiệu lực.</p></div><h3 class="h3">Số hoá hồ sơ: nguyên tắc truy vết &amp; bảo mật</h3><div><p>Khi số hoá, phải đảm bảo quyền truy cập, dấu vết kiểm toán, backup, và tránh 'file rác'. Một nguồn sự thật (single source of truth) là bắt buộc.</p></div><h2 class="h2">7) Luồng thao tác chuẩn (khung thực hành)</h2><div class="note">
 <strong>Tổ chức đào tạo:</strong> Trainer cho học viên chạy luồng này trên 1 tình huống giả lập trước khi xuống xưởng.
  </div><div class="flow">
 <div class="step">
@@ -165,7 +165,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="step">
 <div class="s-title">4. Số hoá &amp; truy vết</div>
-<div class="s-desc">dấu vết kiểm toán (đánh giá trail), phân quyền, backup, bảo mật.</div>
+<div class="s-desc">dấu vết kiểm toán, phân quyền, backup, bảo mật.</div>
 </div>
 <div class="step">
 <div class="s-title">5. Xem xét của lãnh đạo</div>
@@ -177,9 +177,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div style="margin-top:10px;"><strong>Nhiệm vụ học viên:</strong><ol><li>Thiết kế master list theo loại: SOP/WI/FRM.</li><li>Thiết kế quy trình phát hành–đào tạo–thu hồi.</li><li>Thiết kế cấu trúc folder &amp; phân quyền truy cập.</li><li>Thiết kế đánh giá program và CAPA luồng công việc.</li></ol></div>
 <div style="margin-top:10px;"><strong>Đầu ra yêu cầu:</strong><ul><li>Master list mẫu</li><li>SOP Kiểm soát tài liệu</li><li>Cấu trúc folder</li><li>Đánh giá program</li></ul></div>
 </div><div class="card" style="margin-top:12px;">
-<div style="font-weight:800;">Tình huống 2 — Số hoá hồ sơ traveler nhưng đảm bảo đánh giá trail</div>
+<div style="font-weight:800;">Tình huống 2 — Số hoá hồ sơ traveler nhưng đảm bảo dấu vết kiểm toán</div>
 <div class="small" style="margin-top:4px;"><strong>Bối cảnh:</strong> HESEM muốn chuyển traveler giấy sang điện tử để giảm lỗi ghi chép.</div>
-<div style="margin-top:10px;"><strong>Nhiệm vụ học viên:</strong><ol><li>Xác định yêu cầu đánh giá trail và data integrity.</li><li>Thiết kế user vai trò (operator/QC/ENG/QA).</li><li>Đưa ra kế hoạch chuyển đổi và quản trị thay đổi.</li></ol></div>
+<div style="margin-top:10px;"><strong>Nhiệm vụ học viên:</strong><ol><li>Xác định yêu cầu dấu vết kiểm toán và data integrity.</li><li>Thiết kế user vai trò (operator/QC/ENG/QA).</li><li>Đưa ra kế hoạch chuyển đổi và quản trị thay đổi.</li></ol></div>
 <div style="margin-top:10px;"><strong>Đầu ra yêu cầu:</strong><ul><li>Yêu cầu hệ thống (URS)</li><li>RACI user vai trò</li><li>Kế hoạch chuyển đổi</li></ul></div>
 </div><div class="card" style="margin-top:12px;">
 <div style="font-weight:800;">Tình huống 3 — Đánh giá nội bộ phát hiện ghi chép thiếu trung thực</div>
@@ -190,7 +190,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>Bước công việc</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead>
 <tbody><tr><td>Document control system</td><td>Master list; phát hành; thu hồi; lưu trữ</td><td>Kiểm soát phiên bản</td></tr>
 <tr><td>Internal đánh giá</td><td>Đánh giá plan; bảng kiểm; NCR; CAPA</td><td>Phát hiện &amp; cải tiến</td></tr>
-<tr><td>Digitalization</td><td>dấu vết kiểm toán (đánh giá trail); phân quyền; backup; security</td><td>Bền vững &amp; truy vết</td></tr></tbody>
+<tr><td>Digitalization</td><td>dấu vết kiểm toán; phân quyền; backup; security</td><td>Bền vững &amp; truy vết</td></tr></tbody>
 </table><h3 class="h3">Bảng kiểm OJT theo TWI (dành cho trainer)</h3><table class="table">
 <thead><tr><th>Giai đoạn TWI</th><th>Bảng kiểm trainer (phải làm)</th></tr></thead>
 <tbody><tr><td>1. Chuẩn bị người học</td><td>Tạo tâm thế, kiểm tra PPE, nêu mục tiêu, liên hệ rủi ro khi làm sai.</td></tr>
@@ -205,16 +205,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table><h3 class="h3">10.2 Bài kiểm tra nhanh (kiến thức &amp; tình huống)</h3><div class="quiz">
 <strong>Bài kiểm tra nhanh</strong>
 <div class="small">Yêu cầu: làm trong 20–30 phút. Dùng làm kiểm tra trước và kiểm tra sau.</div>
-<ol><li>Thiết kế master list tài liệu cần có những cột nào?</li><li>Quy trình phát hành–thu hồi tài liệu gồm các bước nào?</li><li>Đánh giá nội bộ khác gì LPA? Khi nào dùng cái nào?</li><li>Thiết kế CAPA luồng công việc từ NCR đến xác minh hiệu lực.</li><li>Số hoá traveler cần các yêu cầu đánh giá trail gì?</li><li>Phân quyền truy cập tài liệu/hồ sơ theo vai trò phải thiết kế ra sao?</li><li>Thiết kế dashboard compliance KPI: chọn 8 KPI và mục đích mỗi KPI.</li><li>Làm sao xử lý tình huống hồ sơ thiếu trung thực ở cấp hệ thống?</li><li>Thiết kế chương trình đào tạo kỷ luật quy trình toàn công ty theo level.</li><li>Nêu 3 rủi ro lớn khi không kiểm soát revision và cách phòng ngừa.</li></ol>
+<ol><li>Thiết kế master list tài liệu cần có những cột nào?</li><li>Quy trình phát hành–thu hồi tài liệu gồm các bước nào?</li><li>Đánh giá nội bộ khác gì LPA? Khi nào dùng cái nào?</li><li>Thiết kế CAPA luồng công việc từ NCR đến xác minh hiệu lực.</li><li>Số hoá traveler cần các yêu cầu dấu vết kiểm toán gì?</li><li>Phân quyền truy cập tài liệu/hồ sơ theo vai trò phải thiết kế ra sao?</li><li>Thiết kế dashboard compliance KPI: chọn 8 KPI và mục đích mỗi KPI.</li><li>Làm sao xử lý tình huống hồ sơ thiếu trung thực ở cấp hệ thống?</li><li>Thiết kế chương trình đào tạo kỷ luật quy trình toàn công ty theo level.</li><li>Nêu 3 rủi ro lớn khi không kiểm soát revision và cách phòng ngừa.</li></ol>
 <details class="print-hide">
 <summary><strong>Đáp án tham khảo (dành cho trainer)</strong></summary>
-<div class="answer-key"><ol><li>Mã, tên, loại, người phụ trách, version, hiệu lực, nơi lưu, lịch review, người phê duyệt.</li><li>Soạn→review→phê duyệt→phát hành→đào tạo→thu hồi bản cũ→lưu trữ.</li><li>Đánh giá nội bộ theo chương trình ISO, sâu và có NCR; LPA nhanh, định kỳ chống trôi chuẩn.</li><li>NCR→phân tích→action→thực hiện→xác minh→close→bài học kinh nghiệm.</li><li>Log sửa đổi, ai làm gì khi nào, không xoá vết, backup, phân quyền.</li><li>Operator chỉ xem; lead có quyền đưa ra; QA/Doc control phát hành; đánh giá trail đầy đủ.</li><li>Hồ sơ completeness, revision errors, đánh giá phát hiện, CAPA tuổi tồn (aging), training completion…</li><li>Điều tra nguyên nhân hệ thống + kỷ luật; thiết kế lại hồ sơ/điểm đo; giảm áp lực sai; tăng kiểm soát.</li><li>Matrix theo vị trí; OJT; chứng nhận; đánh giá định kỳ.</li><li>Sai rev gây scrap, mất truy vết, khách reject; phòng ngừa bằng single source, controlled copy, thu hồi.</li></ol></div>
+<div class="answer-key"><ol><li>Mã, tên, loại, người phụ trách, version, hiệu lực, nơi lưu, lịch review, người phê duyệt.</li><li>Soạn→review→phê duyệt→phát hành→đào tạo→thu hồi bản cũ→lưu trữ.</li><li>Đánh giá nội bộ theo chương trình ISO, sâu và có NCR; LPA nhanh, định kỳ chống trôi chuẩn.</li><li>NCR→phân tích→action→thực hiện→xác minh→close→bài học kinh nghiệm.</li><li>Log sửa đổi, ai làm gì khi nào, không xoá vết, backup, phân quyền.</li><li>Operator chỉ xem; lead có quyền đưa ra; QA/Doc control phát hành; dấu vết kiểm toán đầy đủ.</li><li>Hồ sơ completeness, revision errors, đánh giá phát hiện, CAPA tuổi tồn (aging), training completion…</li><li>Điều tra nguyên nhân hệ thống + kỷ luật; thiết kế lại hồ sơ/điểm đo; giảm áp lực sai; tăng kiểm soát.</li><li>Matrix theo vị trí; OJT; chứng nhận; đánh giá định kỳ.</li><li>Sai rev gây scrap, mất truy vết, khách reject; phòng ngừa bằng single source, controlled copy, thu hồi.</li></ol></div>
 </details>
 </div><h3 class="h3">10.3 Rubric chấm thực hành (đạt/không đạt)</h3><table class="table">
 <thead><tr><th>Tiêu chí</th><th>Đạt (Pass)</th><th>Không đạt (Fail)</th></tr></thead>
 <tbody><tr><td>Document control system</td><td>Master list hoạt động; phát hành/thu hồi/đào tạo đầy đủ</td><td>Không kiểm soát phiên bản</td></tr>
 <tr><td>Đánh giá nội bộ &amp; CAPA governance</td><td>Đánh giá tạo NCR đúng; CAPA hiệu lực; dữ liệu cải tiến</td><td>Đánh giá không có tác dụng</td></tr>
-<tr><td>Digitalization &amp; data integrity</td><td>dấu vết kiểm toán (đánh giá trail), phân quyền, backup; giảm lỗi hồ sơ</td><td>Số hoá nhưng mất kiểm soát</td></tr></tbody>
+<tr><td>Digitalization &amp; data integrity</td><td>dấu vết kiểm toán, phân quyền, backup; giảm lỗi hồ sơ</td><td>Số hoá nhưng mất kiểm soát</td></tr></tbody>
 </table><h2 class="h2">11) KPI Cổng kiểm soát &amp; Chỉ số theo dõi</h2><div class="kpi-gate">
 <strong>KPI Cổng kiểm soát / Điều kiện loại trừ (Fail-fast):</strong>
 <ul><li>Dùng sai phiên bản bản vẽ/WI gây NG/scrap/rework → KHÔNG đạt Level (ít nhất 1 chu kỳ đánh giá).</li><li>Ghi chép sai sự thật/thiếu trung thực (data integrity) → KHÔNG đạt Level và xử lý kỷ luật theo quy định công ty.</li><li>Tự ý thay đổi quy trình (làm tắt) khi chưa có phê duyệt deviation → KHÔNG đạt Level.</li></ul>

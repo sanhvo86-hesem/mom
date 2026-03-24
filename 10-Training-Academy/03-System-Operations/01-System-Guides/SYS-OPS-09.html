@@ -171,7 +171,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Watermark (cursor)</b></td><td>Thời điểm đồng bộ cuối; lưu trong IntegrationSettings</td><td>Đẩy cursor khi lỗi → mất dữ liệu</td></tr>
 <tr><td><b>Idempotent upsert</b></td><td>Upsert theo khoá tự nhiên (EpicorKey/JobNum+OprSeq…); chạy lại cho ra cùng kết quả</td><td>Khoá sai → trùng/ghi đè nhầm</td></tr>
 <tr><td><b>Throttling 429/503</b></td><td>SharePoint giới hạn; cần retry + backoff + batch</td><td>Retry dồn dập → fail dây chuyền</td></tr>
-<tr><td><b>Đánh giá trail</b></td><td>ApprovalHistory + Bằng chứng link + IntegrationLogs</td><td>Thiếu log → không đánh giá được</td></tr>
+<tr><td><b>Dấu vết kiểm toán (audit trail)</b></td><td>ApprovalHistory + Bằng chứng link + IntegrationLogs</td><td>Thiếu log → không đánh giá được</td></tr>
 <tr><td><b>MRR</b></td><td>Minimum Required Hồ sơ: bằng chứng tối thiểu để qua cổng kiểm soát</td><td>Đính thiếu/đính sai folder</td></tr>
 </tbody>
 </table>
@@ -326,7 +326,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>Bước</th><th>Điểm chính (Điểm then chốt)</th><th>Lý do</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Dừng thao tác; gắn tag HOLD vào lô/chi tiết</td><td>Chặn sai hỏng lan rộng</td></tr>
-<tr><td>2</td><td>Tạo QCHoldLog: JobNum, ReasonCode, Containment, Severity</td><td>dấu vết kiểm toán (đánh giá trail) + SLA xử lý</td></tr>
+<tr><td>2</td><td>Tạo QCHoldLog: JobNum, ReasonCode, Containment, Severity</td><td>dấu vết kiểm toán + SLA xử lý</td></tr>
 <tr><td>3</td><td>Đính bằng chứng: ảnh traveler + link file Rev đúng</td><td>Giảm tranh luận, tăng tốc quyết định</td></tr>
 <tr><td>4</td><td>Thông báo supervisor; cập nhật StandupAction khi Severity CTQ</td><td>Ưu tiên xử lý theo Tier</td></tr>
 </tbody>

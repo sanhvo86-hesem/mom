@@ -70,25 +70,25 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>1. Mục đích và mô hình 2 tầng của bộ bằng chứng (evidence pack)</h2>
 <p>ANNEX này quy định cấu trúc bằng chứng để bất kỳ đánh giá nào cũng truy được hồ sơ đúng chỗ trong thời gian ngắn. HESEM dùng mô hình hai tầng:</p>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tầng</th><th>Dùng cho</th><th>Nội dung cốt lõi</th></tr></thead><tbody>
-<tr><td>System Bộ bằng chứng</td><td>Chứng minh QMS, process, vai trò, KPI, review, năng lực, đánh giá, cải tiến.</td><td>SOP/WI/ANNEX hiệu lực, KPI, họp, đánh giá, CAPA, review, phân quyền, hồ sơ đào tạo.</td></tr>
+<tr><td>System Bộ bằng chứng</td><td>Chứng minh QMS, quy trình, vai trò, KPI, review, năng lực, đánh giá, cải tiến.</td><td>SOP/WI/ANNEX hiệu lực, KPI, họp, đánh giá, CAPA, review, phân quyền, hồ sơ đào tạo.</td></tr>
 <tr><td>Job Bộ bằng chứng</td><td>Chứng minh một Job/lot/part cụ thể từ baseline đến ship.</td><td>Dossier, route, mẫu đầu (first piece)/FAI, inspection, cert, label, release, bộ hồ sơ giao hàng (ship packet), traceability.</td></tr>
 </tbody></table></div>
 <p>Không được trộn lẫn hai tầng này thành một đống thư mục không chuẩn. Auditor hỏi hệ thống thì mở system pack. Auditor hỏi Job thì mở job pack. Cả hai phải liên kết được với nhau qua code, path và hồ sơ ID.</p></div>
 
 <div class="section"><h2>2. Cấu trúc bằng chứng bắt buộc theo chủ đề</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Chủ đề</th><th>Bằng chứng tối thiểu</th><th>Nơi lưu chuẩn</th><th>Người phụ trách</th></tr></thead><tbody>
-<tr><td>Scope, process map, thẩm quyền</td><td>Scope, process map, ma trận thẩm quyền, RACI, KPI cascade.</td><td>System pack / QMS governance.</td><td>QMS + EXE.</td></tr>
+<tr><td>Scope, quy trình map, thẩm quyền</td><td>Scope, quy trình map, ma trận thẩm quyền, RACI, KPI cascade.</td><td>System pack / QMS governance.</td><td>QMS + EXE.</td></tr>
 <tr><td>Document control</td><td>Revision history, approval, change log, superseded control, portal publish bằng chứng.</td><td>System pack / document control.</td><td>Document Control.</td></tr>
-<tr><td>Operations by Job</td><td>PO, baseline, route, mẫu đầu/FAI, in-process/kiểm tra cuối, cert, bộ hồ sơ phê duyệt giao hàng (ship release pack).</td><td>Hồ sơ công việc (job dossier) theo <a href="annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>.</td><td>Planning + QA + Warehouse.</td></tr>
-<tr><td>External provider / special process</td><td>Approved list, cert, scorecard, processor scope, incoming verification.</td><td>System pack + job cert folder.</td><td>Purchasing + QA.</td></tr>
-<tr><td>Improvement &amp; review</td><td>Đánh giá report, CAPA, xem xét của lãnh đạo input/output, KPI trend, action closure.</td><td>System pack / improvement.</td><td>QMS + chủ quá trình.</td></tr>
+<tr><td>Operations by Job</td><td>PO, baseline, route, mẫu đầu/FAI, trong quá trình/kiểm tra cuối, cert, bộ hồ sơ phê duyệt giao hàng (ship release pack).</td><td>Hồ sơ công việc (job dossier) theo <a href="annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>.</td><td>Planning + QA + Warehouse.</td></tr>
+<tr><td>External provider / công đoạn đặc biệt</td><td>Approved list, cert, thẻ điểm (scorecard), processor scope, xác minh đầu vào.</td><td>System pack + job cert folder.</td><td>Purchasing + QA.</td></tr>
+<tr><td>Improvement &amp; review</td><td>Đánh giá report, CAPA, xem xét của lãnh đạo đầu vào/đầu ra, KPI trend, action closure.</td><td>System pack / improvement.</td><td>QMS + chủ quá trình.</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>3. Rule đặt tên, index và truy xuất 60 giây</h2>
 <div class="step-list">
 <div class="step-item"><strong>Quy tắc tên file.</strong><br/>Tên file phải đọc được bằng mắt: <span class="code">YYYYMMDD_Job-Part-Rev_RecordType_Version</span> hoặc schema đã chốt trong <a href="annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>. Không dùng tên kiểu <span class="code">scan001</span>, <span class="code">new file</span>, <span class="code">IMG_...</span> làm hồ sơ chính thức.</div>
 <div class="step-item"><strong>Quy tắc index.</strong><br/>Mỗi bộ bằng chứng phải có index hoặc metadata đủ để trả lời 4 câu: hồ sơ gì, của Job nào/hệ thống nào, đang ở đâu, ai chịu trách nhiệm.</div>
-<div class="step-item"><strong>60-second retrieval drill.</strong><br/>QMS phải có khả năng truy bất kỳ bằng chứng đã khai báo trong tối đa 60 giây bằng đường dẫn, metadata, filter hoặc search hợp lệ. Tìm không ra trong 60 giây thì coi như hệ thống chưa sẵn sàng đánh giá.</div>
+<div class="step-item"><strong>60-second retrieval diễn tập.</strong><br/>QMS phải có khả năng truy bất kỳ bằng chứng đã khai báo trong tối đa 60 giây bằng đường dẫn, metadata, filter hoặc search hợp lệ. Tìm không ra trong 60 giây thì coi như hệ thống chưa sẵn sàng đánh giá.</div>
 </div>
 <div class="callout-warning"><strong>PHẢI</strong> đưa bằng chứng vào SSOT có link/hồ sơ kiểm soát; không để bằng chứng chỉ tồn tại trong email cá nhân, chat, điện thoại cá nhân hoặc desktop local.</div></div>
 
@@ -97,9 +97,9 @@ ul.tight li {margin:4px 0;}
 <tr><td>Cho tôi xem một Job từ PO đến ship</td><td>Hồ sơ công việc đầy đủ, link tới cert, inspection, label, phiếu kê đóng gói (phiếu kê đóng gói), CoC và bằng chứng release.</td></tr>
 <tr><td>Làm sao chứng minh người này có quyền và có năng lực?</td><td>Ma trận thẩm quyền, RACI, JD/ủy quyền, training/certification hồ sơ, access map khi là hệ thống số.</td></tr>
 <tr><td>Khi có sự cố, anh phản ứng và cải tiến thế nào?</td><td>NCR/CAPA, containment, KPI trend, xem xét của lãnh đạo action và verification of effectiveness.</td></tr>
-<tr><td>Làm sao kiểm soát supplier/process ngoài?</td><td>Approved processor list, scorecard, cert flow-down, incoming verification, issue history.</td></tr>
+<tr><td>Làm sao kiểm soát supplier/quy trình ngoài?</td><td>Approved processor list, thẻ điểm, cert luồng-down, xác minh đầu vào, issue history.</td></tr>
 </tbody></table></div>
-<p>Trước đánh giá nội bộ/khách hàng/chứng nhận, QMS phải kiểm ít nhất một lần drill trên các chủ đề trên. Không đợi auditor tới mới chạy tìm hồ sơ.</p></div>
+<p>Trước đánh giá nội bộ/khách hàng/chứng nhận, QMS phải kiểm ít nhất một lần diễn tập trên các chủ đề trên. Không đợi auditor tới mới chạy tìm hồ sơ.</p></div>
 
 <div class="section"><h2>5. Liên kết</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>

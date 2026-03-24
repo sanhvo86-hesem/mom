@@ -100,7 +100,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="row"><span><b>Mã:</b></span><span>ANNEX-124</span></div>
 <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
 <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / Dashboard người phụ trách / IT system người phụ trách</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / Dashboard người phụ trách / IT người phụ trách hệ thống</span></div>
 <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc / QA Manager theo thẩm quyền</span></div>
 </div>
 </div>
@@ -117,7 +117,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Loại pack</th><th>Khi nào phải có</th><th>Người phụ trách tối thiểu</th><th>Consumer chính</th></tr></thead><tbody>
 <tr><td>Freeze-date pack</td><td>KPI pack dùng cho tier review, MR hoặc quyết định chính thức</td><td>Người phụ trách KPI + QMS</td><td>Lãnh đạo / chủ quá trình</td></tr>
 <tr><td>Exception-note pack</td><td>Có late posting, manual correction, offline event, missing source, restatement</td><td>Người phụ trách Dashboard + chủ dữ liệu</td><td>Người dùng pack / QMS / đánh giá</td></tr>
-<tr><td>Quarterly access-bộ hồ sơ rà soát</td><td>Rà định kỳ quyền user, privileged account, deputy, service account</td><td>IT admin + system người phụ trách + reviewer độc lập</td><td>IT / QMS / management</td></tr>
+<tr><td>Quarterly access-bộ hồ sơ rà soát</td><td>Rà định kỳ quyền user, privileged account, deputy, service account</td><td>IT admin + người phụ trách hệ thống + reviewer độc lập</td><td>IT / QMS / management</td></tr>
 <tr><td>Management-bộ hồ sơ rà soát</td><td>Họp xem xét của lãnh đạo theo SOP-902</td><td>QMS + KPI người phụ trách</td><td>Ban lãnh đạo</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="a2">2. Worked example A — freeze-date pack</h2>
@@ -127,7 +127,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Thành phần pack</th><th>Nội dung ví dụ</th><th>Ghi chú kiểm soát</th></tr></thead><tbody>
 <tr><td>Cover page</td><td>Pack title, period, freeze-date, người phụ trách, audience, confidentiality, version</td><td>Không có cover = khó chứng minh đã bộ hồ sơ rà soát nào.</td></tr>
-<tr><td>Metric summary</td><td>OTD, FPY, NCR rate, overdue CAPA, training completion, supplier on-time</td><td>Chỉ dùng số đã freeze; không kéo live data sau thời điểm khóa.</td></tr>
+<tr><td>Chỉ số summary</td><td>OTD, FPY, NCR rate, overdue CAPA, training completion, supplier on-time</td><td>Chỉ dùng số đã freeze; không kéo live data sau thời điểm khóa.</td></tr>
 <tr><td>Ghi chú điều hành</td><td>3–5 bullet về biến động, cause nổi bật, risk và action</td><td>Ghi chú điều hành phải tách với raw data.</td></tr>
 <tr><td>Bằng chứng index</td><td>Link đến extract, query, list, report, cert log, NCR log</td><td>Link phải trỏ tới SoR/SSOT, không trỏ bản copy không kiểm soát.</td></tr>
 <tr><td>Exception note (nếu có)</td><td>Gắn sang worked example B</td><td>Nếu có bất thường, freeze-date pack không được giả vờ “số sạch”.</td></tr>
@@ -137,7 +137,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Trường</th><th>Ví dụ</th><th>Mục đích</th></tr></thead><tbody>
 <tr><td>Event ID</td><td>OFL-2026-004</td><td>Khóa truy vết sang incident / offline log.</td></tr>
 <tr><td>Issue summary</td><td>Shipment postings 12-Mar chưa đồng bộ do outage ERP 09:10–11:45</td><td>Giải thích vì sao số liệu pack lệch so với live view.</td></tr>
-<tr><td>Affected KPI / dashboard</td><td>OTD dispatch, shipped revenue, overdue jobs</td><td>Chỉ rõ metric nào bị ảnh hưởng.</td></tr>
+<tr><td>Affected KPI / dashboard</td><td>OTD dispatch, shipped revenue, overdue jobs</td><td>Chỉ rõ chỉ số nào bị ảnh hưởng.</td></tr>
 <tr><td>Data impact</td><td>3 shipments posted late after freeze; revenue restated +1.8%</td><td>Cho người đọc biết mức độ ảnh hưởng.</td></tr>
 <tr><td>Temporary treatment</td><td>Freeze giữ nguyên; ghi chú điều hành nêu riêng; restatement ở pack kỳ sau</td><td>Không được sửa âm thầm.</td></tr>
 <tr><td>Người phụ trách / approver</td><td>Epicor admin / Finance manager / QA manager</td><td>Chỉ rõ ai chịu trách nhiệm giải trình.</td></tr>
@@ -149,13 +149,13 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <h2 class="h2" id="a4">4. Worked example C — quarterly access-bộ hồ sơ rà soát</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Pack section</th><th>Nội dung ví dụ</th><th>Dùng cùng</th></tr></thead><tbody>
 <tr><td>Population summary</td><td>Total active users, privileged accounts, leavers not revoked, service accounts, dormant accounts</td><td>FRM-111 section 1–2</td></tr>
-<tr><td>Reviewer worksheet</td><td>User, role, dept, access set, business need, deputy status, SoD concern, action</td><td>FRM-111 section 3–4</td></tr>
+<tr><td>Reviewer worksheet</td><td>User, vai trò, dept, access set, business need, deputy status, SoD concern, action</td><td>FRM-111 section 3–4</td></tr>
 <tr><td>Action register</td><td>Revoke, reduce privilege, validate service account, người phụ trách confirmation, overdue theo dõi tiếp</td><td>FRM-111 section 5</td></tr>
 <tr><td>Bằng chứng bundle</td><td>System export, approval hồ sơ, FRM-141 request, exceptions, screenshots</td><td>FRM-111 / FRM-141</td></tr>
 </tbody></table></div>
 <div class="small">Deputy access không nên được “bật miệng”. Worked example giả định deputy activation đi qua FRM-141 hoặc override có phê duyệt và vẫn bị rà trong pack định kỳ.</div>
 <h2 class="h2" id="a5">5. Worked example D — management-bộ hồ sơ rà soát</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Section</th><th>Nội dung ví dụ</th><th>Output phải tạo ra</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Section</th><th>Nội dung ví dụ</th><th>Đầu ra phải tạo ra</th></tr></thead><tbody>
 <tr><td>Context &amp; risk shifts</td><td>Top business/customer/supply/people risks, changes since prior review</td><td>Decision về ưu tiên và nguồn lực</td></tr>
 <tr><td>Performance pack</td><td>KPI freeze-date summary + ghi chú điều hành + exception notes</td><td>Decision giữ / đổi target, escalation, special review</td></tr>
 <tr><td>Effectiveness of actions</td><td>Status NCR/CAPA/đánh giá actions, overdue items, repeat issues</td><td>Close / carry-over / re-open / leadership action</td></tr>
@@ -164,7 +164,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </tbody></table></div>
 <div class="note">Worked example này nên chảy trực tiếp sang <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a>. Biên bản chỉ có giá trị khi người đến sau lần ngược được pack nào đã được dùng để ra từng quyết định.</div>
 <h2 class="h2" id="a5e">5E. Worked example E — competence / deputy note cho KPI pack</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:24%"/><col style="width:26%"/><col style="width:24%"/><col style="width:26%"/></colgroup><thead><tr><th>Scenario</th><th>Ghi chú điều hành chuẩn</th><th>Bằng chứng đính kèm</th><th>Decision ask lên xem xét của lãnh đạo</th></tr></thead><tbody><tr><td>OTD giảm vì chỉ một người đủ điều kiện chạy setup / mẫu đầu (first piece)</td><td>Nêu rõ đây là gap về bố trí người thay thế, không phải chỉ là lịch làm việc. Ghi tên vai trò, công việc bị nghẽn và ngày risk sẽ thành critical.</td><td>FRM-807 skill matrix, FRM-805 level certification, FRM-806 tracking log, ANNEX-123 deputy matrix.</td><td>Phê duyệt kế hoạch requalification / temporary restriction / overtime containment / hiring or cross-training.</td></tr><tr><td>Defect lặp lại sau đào tạo lại</td><td>Ghi rõ người liên quan đã attend training nhưng bằng chứng competency và authorization còn thiếu hoặc chưa chứng minh hiệu lực trên sản phẩm thật.</td><td>FRM-803 OJT bảng kiểm, FRM-804 competency assessment, NCR/CAPA link.</td><td>Yêu cầu đổi phương pháp đào tạo, supervisor sign-off, revalidation on-job hoặc stop-release cho tới khi đủ điều kiện.</td></tr><tr><td>CMM / final release phụ thuộc một cá nhân duy nhất</td><td>Ghi rõ đây là continuity risk và đánh giá-mức sẵn sàng risk; nêu điều kiện tạm chấp nhận và ngày hết hiệu lực.</td><td>Certification log, access / authorization hồ sơ, deputy plan.</td><td>Mở action về bố trí người thay thế, succession, recertification cadence và escalation class.</td></tr></tbody></table></div>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><colgroup><col style="width:24%"/><col style="width:26%"/><col style="width:24%"/><col style="width:26%"/></colgroup><thead><tr><th>Scenario</th><th>Ghi chú điều hành chuẩn</th><th>Bằng chứng đính kèm</th><th>Decision ask lên xem xét của lãnh đạo</th></tr></thead><tbody><tr><td>OTD giảm vì chỉ một người đủ điều kiện chạy setup / mẫu đầu (first piece)</td><td>Nêu rõ đây là gap về bố trí người thay thế, không phải chỉ là lịch làm việc. Ghi tên vai trò, công việc bị nghẽn và ngày risk sẽ thành critical.</td><td>FRM-807 skill matrix, FRM-805 level certification, FRM-806 tracking log, ANNEX-123 deputy matrix.</td><td>Phê duyệt kế hoạch requalification / temporary restriction / overtime containment / hiring or cross-training.</td></tr><tr><td>Defect lặp lại sau đào tạo lại</td><td>Ghi rõ người liên quan đã attend training nhưng bằng chứng competency và authorization còn thiếu hoặc chưa chứng minh hiệu lực trên sản phẩm thật.</td><td>FRM-803 OJT bảng kiểm, FRM-804 competency đánh giá, NCR/CAPA link.</td><td>Yêu cầu đổi phương pháp đào tạo, supervisor sign-off, revalidation on-job hoặc stop-release cho tới khi đủ điều kiện.</td></tr><tr><td>CMM / final release phụ thuộc một cá nhân duy nhất</td><td>Ghi rõ đây là continuity risk và đánh giá-mức sẵn sàng risk; nêu điều kiện tạm chấp nhận và ngày hết hiệu lực.</td><td>Certification log, access / authorization hồ sơ, deputy plan.</td><td>Mở action về bố trí người thay thế, succession, recertification cadence và escalation class.</td></tr></tbody></table></div>
 <div class="note"><b>Cách dùng</b><br/>Worked example này dùng khi KPI ghi chú điều hành chạm tới yếu tố con người. Mục đích là để pack trình bày đúng bản chất vấn đề: không nhầm <b>đã học</b> với <b>đã đủ năng lực và được phép làm</b>.</div>
 <h2 class="h2" id="a6">6. Naming, metadata và bằng chứng rules</h2>
 <div class="check-grid">
@@ -197,7 +197,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="note"><b>Mục đích</b><br/>Dùng khi xem xét của lãnh đạo hoặc tier review không chỉ cần danh sách action đang mở mà cần biết action nào đang bị chặn bởi nguồn lực, action nào đã đủ bằng chứng effectiveness, và action nào cần nâng lên recurrence watch.</div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Sheet / tab</th><th>Nội dung tối thiểu</th><th>Ghi chú đặt tên</th></tr></thead><tbody>
 <tr><td>01_action-register</td><td>Action ID, origin, người phụ trách, due, current status, linked KPI / NCR / hold / khiếu nại.</td><td>Khóa freeze-date cho snapshot review.</td></tr>
-<tr><td>02_effectiveness-check</td><td>Criterion, measured result, pass/fail, bằng chứng path, reviewer.</td><td>PHẢI có basis đo cho ô “effective”; không để trống căn cứ.</td></tr>
+<tr><td>02_effectiveness-check</td><td>Criterion, measured result, đạt/không đạt, bằng chứng path, reviewer.</td><td>PHẢI có basis đo cho ô “effective”; không để trống căn cứ.</td></tr>
 <tr><td>03_resource-gates</td><td>Budget / tooling / IT / vendor / headcount cổng kiểm soát, blocker, fallback, decision requested.</td><td>Dùng để tách action yếu do execution với action đang chờ resource.</td></tr>
 <tr><td>04_carry-over-watch</td><td>Overdue, tuổi tồn (aging) bucket, recurrence watch, next escalation level.</td><td>Tránh carry-over mơ hồ qua nhiều kỳ review.</td></tr>
 </tbody></table></div>

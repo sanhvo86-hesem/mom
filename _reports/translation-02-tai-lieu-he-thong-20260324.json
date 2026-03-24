@@ -1,0 +1,157 @@
+{
+  "filesScanned": 54,
+  "filesChanged": 17,
+  "totalReplacements": 34,
+  "topRules": [
+    {
+      "rule": "right_first_time",
+      "count": 15
+    },
+    {
+      "rule": "cleanup_post_right_first_time_deep_nested",
+      "count": 15
+    },
+    {
+      "rule": "hold_point",
+      "count": 4
+    }
+  ],
+  "changedFiles": [
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html",
+      "total": 3,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1,
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html",
+      "total": 3,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1,
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/02-Policies-Objectives/pol-qms-001-quality-policy.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-packaging-technician.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-technician.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-internal-auditor-outsource.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    }
+  ]
+}

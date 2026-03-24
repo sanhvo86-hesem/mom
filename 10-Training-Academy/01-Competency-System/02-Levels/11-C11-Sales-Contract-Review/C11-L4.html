@@ -89,7 +89,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>Knowledge (K)</th><th>Skill (S)</th><th>Bằng chứng (E)</th><th>Chỉ số (M)</th></tr></thead>
 <tbody>
 <tr>
-<td>Hiểu sâu hệ thống quản trị thương mại–kỹ thuật của xưởng gia công theo đơn (job shop): chính sách báo giá, ma trận phê duyệt, quản trị năng lực (capability) và chiến lược chọn khách hàng/đơn hàng. Nắm phương pháp xây dashboard KPI, đánh giá trail và cải tiến hệ thống theo PDCA.</td>
+<td>Hiểu sâu hệ thống quản trị thương mại–kỹ thuật của xưởng gia công theo đơn (job shop): chính sách báo giá, ma trận phê duyệt, quản trị năng lực (capability) và chiến lược chọn khách hàng/đơn hàng. Nắm phương pháp xây dashboard KPI, dấu vết kiểm toán (audit trail) và cải tiến hệ thống theo PDCA.</td>
 <td>Thiết kế/chuẩn hóa hệ thống C11: SOP/WI/FRM, RFQ database, báo giá mẫu, ma trận phê duyệt, cơ chế đo hiệu lực (báo giá hit rate, margin leakage, requirement escape), đào tạo &amp; đánh giá nội bộ để đảm bảo hệ thống vận hành ổn định.</td>
 <td>(1) Bộ SOP/WI/FRM C11 phát hành chính thức; (2) Dashboard KPI + định nghĩa dữ liệu; (3) 02 đợt internal đánh giá và CAPA cải tiến; (4) Chương trình đào tạo hội nhập nhân sự mới (onboarding) cho Kinh doanh/Estimator.</td>
 <td>Báo giá hit rate theo phân khúc tăng ≥ X%/năm; margin leakage giảm ≥ Y%; 0 major NC đánh giá liên quan 8.2/7.5; độ hài lòng khách hàng (survey) ≥ mục tiêu.</td>
@@ -135,7 +135,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag may">ĐƯỢC PHÉP</span>
 <div class="text">
 <div><strong>Tổ chức ĐƯỢC PHÉP áp dụng chuẩn hóa biểu mẫu/CRM/ERP để tự động hóa RFQ log, kiểm soát phiên bản và phê duyệt điện tử.</strong> <span class="iso">ISO 7.1.3</span></div>
-<p>Khi số hóa, phải đảm bảo phân quyền, backup, đánh giá trail; tránh tạo 'hệ thống rác' nhiều phiên bản.</p>
+<p>Khi số hóa, phải đảm bảo phân quyền, backup, dấu vết kiểm toán; tránh tạo 'hệ thống rác' nhiều phiên bản.</p>
 </div>
 </div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L4: thiết kế hệ thống rà soát hợp đồng + KPI + đánh giá + năng lực tổ chức (capability) để mở rộng thị trường.</strong></div><h3>3.1. Vì sao C11 là “cổng chất lượng” của xưởng CNC lệnh sản xuất?</h3><p>Trong mô hình <em>chủng loại cao (high-mix) / sản lượng thấp đến trung bình (low-to-mid volume)</em>, sai lệch xuất phát từ khâu đầu (RFQ/PO) khó sửa ở cuối vì đã “đóng băng” trên: đường chạy dao, đồ gá, vật tư, lịch máy và thậm chí cả chứng từ xuất khẩu. Thực tế đánh giá ISO cho thấy nhiều <em>nonconformity</em> không nằm ở máy móc mà nằm ở “hệ thống thông tin”: dùng sai phiên bản (wrong revision), hiểu sai note, không kiểm soát thay đổi, không lưu hồ sơ rà soát hợp đồng.</p><p><strong>Nguyên lý:</strong> lỗi “nhận sai yêu cầu” có chi phí cao nhất (COPQ cao) vì tạo ra lãng phí kép: <em>sai ngay lần đầu</em> + <em>điều chỉnh muộn</em>. Do đó, C11 phải được vận hành như một quy trình có dữ liệu, có gating, có phản ứng.</p><h3>3.2. Thuật ngữ cốt lõi (dùng thống nhất trong HESEM)</h3><ul>
 <li><strong>RFQ (Request for Quotation):</strong> yêu cầu báo giá – chưa tạo cam kết. RFQ thiếu dữ liệu; nhiệm vụ của HESEM là “đóng gói yêu cầu” bằng clarification.</li>
@@ -415,7 +415,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <hr class="sep"/>
 <strong>Sản phẩm đầu ra (Bằng chứng):</strong>
 <ul><li>Ma trận phê duyệt (bảng)</li><li>SOP/WI/FRM </li><li>KPI dictionary + dashboard mock</li></ul>
-<div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi thiết kế có tính vận hành: không quá phức tạp, có 'reaction plan', và có cơ chế đánh giá trail.
+<div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi thiết kế có tính vận hành: không quá phức tạp, có 'reaction plan', và có cơ chế dấu vết kiểm toán.
  </div>
 </div><div class="card">
 <h3>Tình huống 2: Đánh giá mô phỏng (mock đánh giá) clause 8.2 – tìm lỗ hổng hệ thống</h3>
@@ -459,7 +459,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>1) Nhận RFQ và lưu file controlled</strong></td>
 <td>Lưu đúng folder, đặt tên có Rev, đánh dấu nguồn (email/portal).</td>
-<td>Tránh dùng sai phiên bản (wrong revision); tạo truy vết (đánh giá trail).</td>
+<td>Tránh dùng sai phiên bản (wrong revision); tạo truy vết (dấu vết kiểm toán).</td>
 </tr>
 <tr>
 <td><strong>2) Điền RFQ log + bảng kiểm</strong></td>
@@ -563,7 +563,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Nêu cách tích hợp kiểm soát thay đổi (8.5.6) vào dòng chảy CRM/ERP để không bị bỏ sót.</li>
 <li>Viết 1 đoạn policy (ISO language) về việc không nhận PO khi chưa đóng clarification CTQ.</li>
 </ol>
-</div><h2>9. Rubric chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Rubric giúp chấm công bằng và chống “cảm tính”. chuẩn chấm bởi 2 người (line manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
+</div><h2>9. Rubric chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Rubric giúp chấm công bằng và chống “cảm tính”. chuẩn chấm bởi 2 người (Line Manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
 <thead><tr><th>Tiêu chí</th><th>0 – Không đạt</th><th>1 – Đạt tối thiểu</th><th>2 – Tốt</th><th>3 – Xuất sắc</th></tr></thead>
 <tbody>
 <tr>

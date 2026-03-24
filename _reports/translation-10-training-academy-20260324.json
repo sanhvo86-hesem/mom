@@ -1,23 +1,15 @@
 {
   "filesScanned": 197,
-  "filesChanged": 103,
-  "totalReplacements": 173,
+  "filesChanged": 49,
+  "totalReplacements": 89,
   "topRules": [
-    {
-      "rule": "cleanup_post_key_points_dup",
-      "count": 83
-    },
     {
       "rule": "right_first_time",
       "count": 40
     },
     {
-      "rule": "cleanup_post_assessment_dup",
-      "count": 21
-    },
-    {
-      "rule": "cleanup_post_output_note",
-      "count": 20
+      "rule": "cleanup_post_right_first_time_deep_nested",
+      "count": 40
     },
     {
       "rule": "hold_point",
@@ -26,193 +18,163 @@
   ],
   "changedFiles": [
     {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/01-C01-Safety-5S/C01-L1.html",
-      "total": 4,
+      "path": "10-Training-Academy/01-Competency-System/01-Framework/assessment-matrix.html",
+      "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/01-Framework/competency-framework.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/01-Framework/competency-metrics.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
+      }
+    },
+    {
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/01-C01-Safety-5S/C01-L1.html",
+      "total": 2,
+      "byRule": {
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
       "path": "10-Training-Academy/01-Competency-System/02-Levels/01-C01-Safety-5S/C01-L2.html",
-      "total": 4,
+      "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
       "path": "10-Training-Academy/01-Competency-System/02-Levels/01-C01-Safety-5S/C01-L3.html",
-      "total": 4,
+      "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
       "path": "10-Training-Academy/01-Competency-System/02-Levels/01-C01-Safety-5S/C01-L4.html",
-      "total": 4,
+      "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L1.html",
-      "total": 4,
-      "byRule": {
-        "hold_point": 1,
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L2.html",
-      "total": 4,
-      "byRule": {
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "hold_point": 1,
-        "cleanup_post_assessment_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
       "path": "10-Training-Academy/01-Competency-System/02-Levels/03-C03-Right-First-Time/C03-L1.html",
-      "total": 4,
+      "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
       "path": "10-Training-Academy/01-Competency-System/02-Levels/03-C03-Right-First-Time/C03-L2.html",
-      "total": 4,
+      "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
       "path": "10-Training-Academy/01-Competency-System/02-Levels/03-C03-Right-First-Time/C03-L3.html",
-      "total": 4,
+      "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
       "path": "10-Training-Academy/01-Competency-System/02-Levels/03-C03-Right-First-Time/C03-L4.html",
-      "total": 4,
+      "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L3.html",
-      "total": 3,
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-engineering.html",
+      "total": 2,
       "byRule": {
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L4.html",
-      "total": 3,
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-estimating.html",
+      "total": 2,
       "byRule": {
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/04-C04-Cross-Dept-Communication/C04-L1.html",
-      "total": 3,
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-finance-hr.html",
+      "total": 2,
       "byRule": {
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/04-C04-Cross-Dept-Communication/C04-L2.html",
-      "total": 3,
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-hse.html",
+      "total": 2,
       "byRule": {
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/04-C04-Cross-Dept-Communication/C04-L3.html",
-      "total": 3,
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-maintenance.html",
+      "total": 2,
       "byRule": {
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/04-C04-Cross-Dept-Communication/C04-L4.html",
-      "total": 3,
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-planning-purchasing.html",
+      "total": 2,
       "byRule": {
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/05-C05-Customer-Service-B2B/C05-L1.html",
-      "total": 3,
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-production.html",
+      "total": 2,
       "byRule": {
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/05-C05-Customer-Service-B2B/C05-L2.html",
-      "total": 3,
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-quality.html",
+      "total": 2,
       "byRule": {
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/05-C05-Customer-Service-B2B/C05-L3.html",
-      "total": 3,
+      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-warehouse.html",
+      "total": 2,
       "byRule": {
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/05-C05-Customer-Service-B2B/C05-L4.html",
-      "total": 3,
-      "byRule": {
-        "cleanup_post_output_note": 1,
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -220,7 +182,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -228,7 +190,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -236,7 +198,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -244,7 +206,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -252,7 +214,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -260,7 +222,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -268,7 +230,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -276,7 +238,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -284,7 +246,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -292,7 +254,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -300,7 +262,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -308,7 +270,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -316,7 +278,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -324,7 +286,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -332,7 +294,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -340,7 +302,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -348,7 +310,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -356,7 +318,7 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
@@ -364,92 +326,29 @@
       "total": 2,
       "byRule": {
         "right_first_time": 1,
-        "cleanup_post_key_points_dup": 1
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-03.html",
+      "path": "10-Training-Academy/04-Templates-Tools/trainee-workbook.html",
       "total": 2,
       "byRule": {
-        "cleanup_post_key_points_dup": 1,
-        "cleanup_post_assessment_dup": 1
+        "right_first_time": 1,
+        "cleanup_post_right_first_time_deep_nested": 1
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/01-Framework/assessment-matrix.html",
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L1.html",
       "total": 1,
       "byRule": {
-        "right_first_time": 1
+        "hold_point": 1
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/01-Framework/competency-framework.html",
+      "path": "10-Training-Academy/01-Competency-System/02-Levels/02-C02-Process-Discipline/C02-L2.html",
       "total": 1,
       "byRule": {
-        "right_first_time": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/01-Framework/competency-metrics.html",
-      "total": 1,
-      "byRule": {
-        "right_first_time": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/06-C06-Problem-Solving-RCA/C06-L1.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/06-C06-Problem-Solving-RCA/C06-L2.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/06-C06-Problem-Solving-RCA/C06-L3.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/06-C06-Problem-Solving-RCA/C06-L4.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/07-C07-Kaizen-Lean/C07-L1.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/07-C07-Kaizen-Lean/C07-L2.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/07-C07-Kaizen-Lean/C07-L3.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/07-C07-Kaizen-Lean/C07-L4.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
+        "hold_point": 1
       }
     },
     {
@@ -481,209 +380,6 @@
       }
     },
     {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/11-C11-Sales-Contract-Review/C11-L1.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/11-C11-Sales-Contract-Review/C11-L2.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/11-C11-Sales-Contract-Review/C11-L3.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/11-C11-Sales-Contract-Review/C11-L4.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/12-C12-Estimating-Costing/C12-L1.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/12-C12-Estimating-Costing/C12-L2.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/12-C12-Estimating-Costing/C12-L3.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/12-C12-Estimating-Costing/C12-L4.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/14-C14-Drawing-GDT/C14-L1.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/14-C14-Drawing-GDT/C14-L2.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/14-C14-Drawing-GDT/C14-L3.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/14-C14-Drawing-GDT/C14-L4.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/16-C16-Advanced-Metrology/C16-L1.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/16-C16-Advanced-Metrology/C16-L2.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/16-C16-Advanced-Metrology/C16-L3.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/16-C16-Advanced-Metrology/C16-L4.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/19-C19-Leadership-Coaching/C19-L1.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/19-C19-Leadership-Coaching/C19-L2.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/19-C19-Leadership-Coaching/C19-L3.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/02-Levels/19-C19-Leadership-Coaching/C19-L4.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-engineering.html",
-      "total": 1,
-      "byRule": {
-        "right_first_time": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-estimating.html",
-      "total": 1,
-      "byRule": {
-        "right_first_time": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-finance-hr.html",
-      "total": 1,
-      "byRule": {
-        "right_first_time": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-hse.html",
-      "total": 1,
-      "byRule": {
-        "right_first_time": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-maintenance.html",
-      "total": 1,
-      "byRule": {
-        "right_first_time": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-planning-purchasing.html",
-      "total": 1,
-      "byRule": {
-        "right_first_time": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-production.html",
-      "total": 1,
-      "byRule": {
-        "right_first_time": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-quality.html",
-      "total": 1,
-      "byRule": {
-        "right_first_time": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/01-Competency-System/03-Matrices/training-matrix-warehouse.html",
-      "total": 1,
-      "byRule": {
-        "right_first_time": 1
-      }
-    },
-    {
       "path": "10-Training-Academy/02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html",
       "total": 1,
       "byRule": {
@@ -698,122 +394,10 @@
       }
     },
     {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-02.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-04.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-13.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-14.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-16.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-17.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-20.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-21.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-23.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-24.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-25.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/01-System-Guides/SYS-OPS-28.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-01.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-03.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/03-System-Operations/02-Training-Ops/TRN-OPS-05.html",
-      "total": 1,
-      "byRule": {
-        "cleanup_post_key_points_dup": 1
-      }
-    },
-    {
       "path": "10-Training-Academy/04-Templates-Tools/role-gate-tests.html",
       "total": 1,
       "byRule": {
         "hold_point": 1
-      }
-    },
-    {
-      "path": "10-Training-Academy/04-Templates-Tools/trainee-workbook.html",
-      "total": 1,
-      "byRule": {
-        "right_first_time": 1
       }
     }
   ]

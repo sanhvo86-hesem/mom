@@ -69,11 +69,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
 </div>
 </div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng trước mọi phép đo pass/fail, CTQ, FAI, SPC, final release hoặc bất kỳ phép đo nào ảnh hưởng quyết định chất lượng.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng trước mọi phép đo đạt/không đạt, CTQ, FAI, SPC, final release hoặc bất kỳ phép đo nào ảnh hưởng quyết định chất lượng.</div>
 <h1>WI-602 — Kiểm trước khi dùng dụng cụ đo, trạng thái CAL và xử lý nghi ngờ</h1>
 <div class="section"><h2>1. Mục đích và nguyên tắc sử dụng dụng cụ đo</h2>
-<p>WI này chuẩn hóa kiểm trước khi dùng dụng cụ đo tại điểm dùng. Mọi phép đo dùng để quyết định pass/fail, set offset, release mẫu đầu (first piece), release final hoặc xác nhận CTQ đều phải đi qua cổng kiểm soát (gate) này. Không nhãn trạng thái, nhãn mờ, seal hỏng, gage vừa rơi hoặc không chứng minh được chuẩn so sánh thì coi như <span class="badge-red">HOLD</span>.</p>
-<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Sign-out mọi gage dùng liên công đoạn, chỉ đo CTQ bằng gage đã zero và verify, và khai báo ngay mọi sự cố rơi, va đập, pin yếu, màn hình lỗi hoặc reading bất thường.</div></div>
+<p>WI này chuẩn hóa kiểm trước khi dùng dụng cụ đo tại điểm dùng. Mọi phép đo dùng để quyết định đạt/không đạt, set offset, release mẫu đầu (first piece), release final hoặc xác nhận CTQ đều phải đi qua cổng kiểm soát (gate) này. Không nhãn trạng thái, nhãn mờ, seal hỏng, gage vừa rơi hoặc không chứng minh được chuẩn so sánh thì coi như <span class="badge-red">HOLD</span>.</p>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Sign-out mọi gage dùng liên công đoạn, chỉ đo CTQ bằng gage đã zero và xác minh, và khai báo ngay mọi sự cố rơi, va đập, pin yếu, màn hình lỗi hoặc reading bất thường.</div></div>
 <div class="section"><h2>2. Cổng kiểm soát kiểm trước khi dùng</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Phải kiểm</th><th>đạt khi</th><th>tạm giữ khi</th></tr></thead><tbody>
 <tr><td>G1 — Nhận diện</td><td>Gage ID, serial, trạng thái CAL, ngày hết hạn, người phụ trách/vị trí cấp phát.</td><td>Nhãn rõ, đúng gage, còn hiệu lực.</td><td>Không nhãn, sai ID, quá hạn, không truy ra hồ sơ.</td></tr>
@@ -93,21 +93,21 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>4. Phản ứng khi gage nghi ngờ hoặc fail cổng kiểm soát</h2>
 <div class="step-list">
 <div class="step-item"><strong>Dừng dùng ngay.</strong><br/>Đặt trạng thái HOLD vật lý; không tiếp tục đo để “kiểm thử thêm”.</div>
-<div class="step-item"><strong>Khóa ảnh hưởng.</strong><br/>Xác định phép đo nào đã dùng gage này từ lần verify cuối cùng; nếu đã dùng cho CTQ/release thì kích hoạt <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
-<div class="step-item"><strong>Đổi phương pháp đo.</strong><br/>Chuyển sang gage khác đã verify hoặc sang CMM/fixture/reference method được QA phê duyệt.</div>
+<div class="step-item"><strong>Khóa ảnh hưởng.</strong><br/>Xác định phép đo nào đã dùng gage này từ lần xác minh cuối cùng; nếu đã dùng cho CTQ/release thì kích hoạt <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
+<div class="step-item"><strong>Đổi phương pháp đo.</strong><br/>Chuyển sang gage khác đã xác minh hoặc sang CMM/fixture/reference method được QA phê duyệt.</div>
 <div class="step-item"><strong>Ghi nhận sự cố.</strong><br/>Log sự cố phải có gage ID, hiện tượng, thời điểm, người phát hiện, job liên quan và hành động tạm thời.</div>
 </div>
 <div class="callout-warn"><strong>Rule:</strong> Nếu gage fail trên master hoặc có seal broken, mọi kết quả đang chờ release dựa trên gage đó phải dừng lại đến khi có quyết định của QA/Metrology.</div></div>
 <div class="section"><h2>5. Khi nào phải gọi QA / Metrology</h2>
 <div class="two-col">
-<div class="card"><h3>Phải escalation ngay</h3><ul class="tight" style="padding-left:18px;"><li>Gage đo CTQ/release final bị fail quick verification.</li><li>Gage rơi, va đập, ngâm dầu/dung dịch hoặc nghi nhiễm bẩn.</li><li>Đọc số không lặp lại, sai master, hoặc khác nhau giữa hai gage vượt ngưỡng nội bộ.</li><li>Không tìm thấy standard/master hợp lệ để verify.</li></ul></div>
+<div class="card"><h3>Phải escalation ngay</h3><ul class="tight" style="padding-left:18px;"><li>Gage đo CTQ/release final bị fail quick verification.</li><li>Gage rơi, va đập, ngâm dầu/dung dịch hoặc nghi nhiễm bẩn.</li><li>Đọc số không lặp lại, sai master, hoặc khác nhau giữa hai gage vượt ngưỡng nội bộ.</li><li>Không tìm thấy standard/master hợp lệ để xác minh.</li></ul></div>
 <div class="card"><h3>Cho phép xử lý tại chỗ</h3><ul class="tight" style="padding-left:18px;"><li>Lau sạch bề mặt đo theo chuẩn.</li><li>Thay pin hoặc reset mode khi không ảnh hưởng integrity của thiết bị.</li><li>Thực hiện zero lại sau khi đã xác minh nguyên nhân là do thao tác.</li></ul></div>
 </div></div>
 <div class="section"><h2>6. Hồ sơ, KPI và tài liệu liên kết</h2>
 <div class="kpi-grid">
 <div class="kpi-box"><strong>KPI-WI602-01</strong><br/>Tỷ lệ gage fail quick verification trên tổng số lần sử dụng.</div>
 <div class="kpi-box"><strong>KPI-WI602-02</strong><br/>Số lô bị ảnh hưởng do dùng gage nghi ngờ/hết hạn/seal broken.</div>
-<div class="kpi-box"><strong>KPI-WI602-03</strong><br/>Tỷ lệ CTQ measurement có bằng chứng verify đầy đủ trước khi đo.</div>
+<div class="kpi-box"><strong>KPI-WI602-03</strong><br/>Tỷ lệ CTQ measurement có bằng chứng xác minh đầy đủ trước khi đo.</div>
 <div class="kpi-box"><strong>KPI-WI602-04</strong><br/>Số lần operator phải đổi method đo do measurement system không phù hợp.</div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
@@ -120,10 +120,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div data-phase2f="true">
 <h2 class="h2" id="phase2f-study-selection">Kiểm soát bổ sung — Study selection guide</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Khi nào</th><th>Dùng hồ sơ nào</th><th>Boundary</th></tr></thead><tbody>
-<tr><td>Pre-use check / shift check / after event</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-602_Gage_Verification_Log.xlsx">FRM-602</a></td><td>Không thay cho calibration hay MSA đầy đủ.</td></tr>
+<tr><td>Pre-use check / shift check / after event</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-602_Gage_Verification_Log.xlsx">FRM-602</a></td><td>Không thay cho hiệu chuẩn hay MSA đầy đủ.</td></tr>
 <tr><td>Nghi ngờ người đo + thiết bị variation</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-611_GRR_Study_Form.xlsx">FRM-611</a></td><td>Dùng khi quyết định cần nhìn repeatability / reproducibility.</td></tr>
 <tr><td>Nghi ngờ bias / linearity / drift</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-612_Bias_Linearity_Stability_Study_Form.xlsx">FRM-612</a></td><td>Dùng khi GR&amp;R không trả lời đủ rủi ro.</td></tr>
-<tr><td>Visual pass/fail hoặc CMM qualification</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-613_Attribute_MSA_and_CMM_Qualification_Record.xlsx">FRM-613</a></td><td>Khóa consistency của attribute decision hoặc program release.</td></tr>
+<tr><td>Trực quan đạt/không đạt hoặc CMM qualification</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-613_Attribute_MSA_and_CMM_Qualification_Record.xlsx">FRM-613</a></td><td>Khóa consistency của attribute decision hoặc phát hành chương trình (program release).</td></tr>
 </tbody></table></div>
 </div></div>
 </div>

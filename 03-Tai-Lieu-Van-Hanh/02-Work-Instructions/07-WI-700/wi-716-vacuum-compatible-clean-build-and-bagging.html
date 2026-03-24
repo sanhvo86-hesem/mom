@@ -79,7 +79,7 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>2. Kích hoạt và điều kiện vào tuyến clean build</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điều kiện</th><th>Phải có</th><th>tạm giữ khi</th></tr></thead><tbody>
 <tr><td>Kích hoạt route</td><td>Drawing, PO, QPL, routing note hoặc customer spec ghi rõ clean build / vacuum-compatible / particle-sensitive / double-bagging.</td><td>Nhân sự tự hiểu “hàng quan trọng” rồi tự ý đưa vào clean route mà không có căn cứ kỹ thuật.</td></tr>
-<tr><td>Tình trạng part</td><td>Đã PASS cleaning/inspection liên quan; bề mặt khô; không còn solvent, residue, burr, free chips.</td><td>Thiếu bằng chứng PASS hoặc part vừa rework nhưng chưa re-verify.</td></tr>
+<tr><td>Tình trạng part</td><td>Đã PASS cleaning/inspection liên quan; bề mặt khô; không còn solvent, residue, burr, free chips.</td><td>Thiếu bằng chứng PASS hoặc part vừa rework nhưng chưa re-xác minh.</td></tr>
 <tr><td>Khu vực</td><td>Khu clean build đạt điều kiện entry/gowning và monitoring theo <a href="wi-711-cleanroom-entry-and-gowning.html">WI-711</a> / <a href="wi-713-environmental-monitoring-and-response.html">WI-713</a>.</td><td>Khu đang open action, housekeeping không đạt, có vật phát bụi hoặc đang làm công việc bẩn song song.</td></tr>
 <tr><td>Người thao tác</td><td>Được ủy quyền clean build / clean pack theo <a href="../../03-Reference/08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html">ANNEX-801</a>.</td><td>Chưa được ủy quyền, đã hết hạn, hoặc vi phạm gowning/handling trong ca hiện tại.</td></tr>
 <tr><td>Vật tư</td><td>Vật tư bao gói đúng <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>; vật liệu tiếp xúc part phù hợp <a href="../../03-Reference/06-ANNEX-600/annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>.</td><td>Dùng vật tư không rõ spec, tái sử dụng, rách, bẩn, quá hạn hoặc có nguy cơ outgassing / shedding.</td></tr>
@@ -98,18 +98,18 @@ ul.tight li {margin:4px 0;}
 <div class="step-list">
 <div class="step-item"><strong>Bước 1 — Line clearance.</strong> Chỉ để lại đúng Job đang làm tại station. Loại khỏi station mọi vật tư và nhãn của Job khác. Kiểm tool count, cap/plug count và trạng thái tray sạch trước khi mở part.</div>
 <div class="step-item"><strong>Bước 2 — Mở bao đúng lớp.</strong> Nếu part về dưới dạng double-bag, chỉ tháo outer bag tại vùng chuyển tiếp; inner bag chỉ được mở trong clean zone hoặc station đã được phê chuẩn.</div>
-<div class="step-item"><strong>Bước 3 — Last-look trước lắp sạch.</strong> Kiểm visual cuối về stain, residue, scratch, chip tự do, burr, seal face, orientation mark và part/rev/qty. Bất kỳ nghi ngờ nào đều HOLD trước khi tiếp tục.</div>
+<div class="step-item"><strong>Bước 3 — Last-look trước lắp sạch.</strong> Kiểm trực quan cuối về stain, residue, scratch, chip tự do, burr, seal face, orientation mark và part/rev/qty. Bất kỳ nghi ngờ nào đều HOLD trước khi tiếp tục.</div>
 <div class="step-item"><strong>Bước 4 — Lắp / chụp / bảo vệ.</strong> Lắp cap, plug, cover, protector, gasket phụ hoặc phần tử clean-build theo route. Không đặt part trực tiếp lên mặt bàn trần. Dùng khay lót sạch đúng spec.</div>
 <div class="step-item"><strong>Bước 5 — Bagging.</strong> Thực hiện route bao gói theo mức yêu cầu: single bag, double bag hoặc double bag + barrier/desiccant/humidity card. Primary bag chỉ chứa part sạch và vật tư được phép nằm chung với part.</div>
 <div class="step-item"><strong>Bước 6 — Seal và nhận diện.</strong> Seal đủ kín, không kẹp nếp gây rách, không để nhãn che mất nhận diện part/rev/qty/lot. Label logistics gắn ở lớp ngoài, không phá tuyến sạch.</div>
-<div class="step-item"><strong>Bước 7 — Handoff bảo quản.</strong> Chuyển sang kho hoặc khu staging theo <a href="wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>. Không đặt kiện clean build cùng pallet bẩn, cùng lối đi phoi hoặc dưới vị trí dễ rơi bụi.</div>
+<div class="step-item"><strong>Bước 7 — Bàn giao bảo quản.</strong> Chuyển sang kho hoặc khu staging theo <a href="wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>. Không đặt kiện clean build cùng pallet bẩn, cùng lối đi phoi hoặc dưới vị trí dễ rơi bụi.</div>
 </div></div>
 
 <div class="section"><h2>5. Quy tắc mở lại túi, re-bag và xử lý vi phạm</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phản ứng bắt buộc</th><th>Ai quyết định mở lại</th></tr></thead><tbody>
 <tr><td>Bag rách / seal hở / mất cap khi chưa giao</td><td>HOLD ngay; đánh giá lại tình trạng sạch; re-clean hoặc re-pack theo kết quả đánh giá. PHẢI loại bỏ mọi giải pháp vá tạm trước khi giao.</td><td>QA + người phụ trách của clean build route.</td></tr>
 <tr><td>Part chạm vật bẩn hoặc do người chưa đủ điều kiện thao tác</td><td>HOLD; coi như nghi tái nhiễm bẩn; đánh giá lại toàn bộ route trước khi mở tiếp.</td><td>QA.</td></tr>
-<tr><td>Vượt exposure limit ngoài clean zone</td><td>HOLD; quyết định re-clean / re-verify / re-bag theo QPL và spec khách hàng.</td><td>QA + Engineering khi spec đặc biệt.</td></tr>
+<tr><td>Vượt exposure limit ngoài clean zone</td><td>HOLD; quyết định re-clean / re-xác minh / re-bag theo QPL và spec khách hàng.</td><td>QA + Engineering khi spec đặc biệt.</td></tr>
 <tr><td>Cần mở túi để bổ sung chứng từ / đếm / chụp ảnh</td><td>PHẢI giữ nguyên primary bag khi lý do chỉ là hành chính. Xử lý ở lớp bao ngoài hoặc dùng hồ sơ có sẵn.</td><td>Không ai được tự mở nếu không có lý do kỹ thuật.</td></tr>
 </tbody></table></div></div>
 

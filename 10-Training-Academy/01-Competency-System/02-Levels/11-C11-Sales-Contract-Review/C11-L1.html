@@ -135,7 +135,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="tag may">ĐƯỢC PHÉP</span>
 <div class="text">
 <div><strong>Tổ chức ĐƯỢC PHÉP áp dụng chuẩn hóa biểu mẫu/CRM/ERP để tự động hóa RFQ log, kiểm soát phiên bản và phê duyệt điện tử.</strong> <span class="iso">ISO 7.1.3</span></div>
-<p>Khi số hóa, phải đảm bảo phân quyền, backup, đánh giá trail; tránh tạo 'hệ thống rác' nhiều phiên bản.</p>
+<p>Khi số hóa, phải đảm bảo phân quyền, backup, dấu vết kiểm toán (audit trail); tránh tạo 'hệ thống rác' nhiều phiên bản.</p>
 </div>
 </div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L1: biết nhận đúng dữ liệu – ghi đúng hồ sơ – báo đúng người. Không tự suy đoán.</strong></div><h3>3.1. Vì sao C11 là “cổng chất lượng” của xưởng CNC lệnh sản xuất?</h3><p>Trong mô hình <em>chủng loại cao (high-mix) / sản lượng thấp đến trung bình (low-to-mid volume)</em>, sai lệch xuất phát từ khâu đầu (RFQ/PO) khó sửa ở cuối vì đã “đóng băng” trên: đường chạy dao, đồ gá, vật tư, lịch máy và thậm chí cả chứng từ xuất khẩu. Thực tế đánh giá ISO cho thấy nhiều <em>nonconformity</em> không nằm ở máy móc mà nằm ở “hệ thống thông tin”: dùng sai phiên bản (wrong revision), hiểu sai note, không kiểm soát thay đổi, không lưu hồ sơ rà soát hợp đồng.</p><p><strong>Nguyên lý:</strong> lỗi “nhận sai yêu cầu” có chi phí cao nhất (COPQ cao) vì tạo ra lãng phí kép: <em>sai ngay lần đầu</em> + <em>điều chỉnh muộn</em>. Do đó, C11 phải được vận hành như một quy trình có dữ liệu, có gating, có phản ứng.</p><h3>3.2. Thuật ngữ cốt lõi (dùng thống nhất trong HESEM)</h3><ul>
 <li><strong>RFQ (Request for Quotation):</strong> yêu cầu báo giá – chưa tạo cam kết. RFQ thiếu dữ liệu; nhiệm vụ của HESEM là “đóng gói yêu cầu” bằng clarification.</li>
@@ -438,7 +438,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>1) Nhận RFQ và lưu file controlled</strong></td>
 <td>Lưu đúng folder, đặt tên có Rev, đánh dấu nguồn (email/portal).</td>
-<td>Tránh dùng sai phiên bản (wrong revision); tạo truy vết (đánh giá trail).</td>
+<td>Tránh dùng sai phiên bản (wrong revision); tạo truy vết (dấu vết kiểm toán).</td>
 </tr>
 <tr>
 <td><strong>2) Điền RFQ log + bảng kiểm</strong></td>
@@ -542,7 +542,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Bạn cần làm gì để đảm bảo dùng đúng revision trong bàn giao nội bộ?</li>
 <li>Nêu 2 lỗi phổ biến khiến đánh giá ISO phát hiện ở khâu rà soát hợp đồng.</li>
 </ol>
-</div><h2>9. Rubric chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Rubric giúp chấm công bằng và chống “cảm tính”. chuẩn chấm bởi 2 người (line manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
+</div><h2>9. Rubric chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Rubric giúp chấm công bằng và chống “cảm tính”. chuẩn chấm bởi 2 người (Line Manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
 <thead><tr><th>Tiêu chí</th><th>0 – Không đạt</th><th>1 – Đạt tối thiểu</th><th>2 – Tốt</th><th>3 – Xuất sắc</th></tr></thead>
 <tbody>
 <tr>

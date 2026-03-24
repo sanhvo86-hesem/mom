@@ -65,11 +65,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="doc-content" id="docContent"><h1>C13 — Quản lý rủi ro &amp; kiểm soát thay đổi (Revision) — Level 3</h1>
-<p class="lead"><strong>Level 3 — Lead change board &amp; risk review liên phòng.</strong> Mô-đun này tạo kỷ luật rủi ro &amp; revision: phát hiện nhanh, ghi nhận đúng, phê duyệt đúng cấp, triển khai có verification và dấu vết kiểm toán (đánh giá trail).</p>
+<p class="lead"><strong>Level 3 — Lead change board &amp; risk review liên phòng.</strong> Mô-đun này tạo kỷ luật rủi ro &amp; revision: phát hiện nhanh, ghi nhận đúng, phê duyệt đúng cấp, triển khai có verification và dấu vết kiểm toán (audit trail).</p>
 <div class="hero">
 <h2>Chuẩn thực chiến – Level 3</h2>
 <div class="meta">
-<div><strong>Vai trò mục tiêu</strong><br/>QA/QMS lead, Engineering lead, Planning lead, Ops supervisor, Estimator (SAL-03) lead</div>
+<div><strong>Vai trò mục tiêu</strong><br/>Trưởng nhóm QA/QMS, Engineering lead, Trưởng nhóm Kế hoạch, Ops supervisor, Estimator (SAL-03) lead</div>
 <div><strong>Đầu ra bắt buộc</strong>
 <ul>
 <li>Vận hành change board: triage → impact → approve → implement → xác minh → close.</li><li>Quản trị sổ đăng ký rủi ro (risk register) theo CTQ/OTD/cost, có người phụ trách và ngày đến hạn.</li><li>Giảm emergency change và tránh escape bằng verification plan và LPA.</li>
@@ -126,7 +126,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Repeat issue lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Thiết lập change board: lịch họp, thành phần, rule triage.</strong></td><td>QMS lead</td><td>Change board charter</td><td>Không có charter</td></tr><tr><td>2</td><td><strong>Chốt approval thresholds theo loại change (CTQ/quy trình/supplier/data).</strong></td><td>GM/QMS</td><td>Threshold table</td><td>Đổi CTQ sai cấp</td></tr><tr><td>3</td><td><strong>Đo change thời gian dẫn theo class và trigger escal khi vượt SLA.</strong></td><td>QMS</td><td>Dashboard</td><td>Change treo</td></tr><tr><td>4</td><td><strong>Quản trị sổ đăng ký rủi ro theo job/nhóm job; review hàng tuần.</strong></td><td>QMS/OPS</td><td>Risk review minutes</td><td>Risk treo</td></tr><tr><td>5</td><td><strong>Chuẩn hóa verification template và acceptance criteria.</strong></td><td>QA</td><td>Verification template</td><td>Xác minh tranh cãi</td></tr><tr><td>6</td><td><strong>Triển khai LPA tập trung điểm change: revision check, phát hành chương trình (program release), bộ hồ sơ giao hàng.</strong></td><td>QA</td><td>LPA log</td><td>Escape tăng</td></tr><tr><td>7</td><td><strong>Đóng learning loop: change gây NCR/claim → CAPA → update standard/training.</strong></td><td>QMS</td><td>CAPA + update bằng chứng</td><td>Repeat issue</td></tr></tbody></table></div>
 <h2>9) OJT thực chiến theo TWI</h2>
 <h3>Job breakdown (Step / Điểm then chốt / Lý do)</h3>
-<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Nhận diện trigger</td><td>Đọc dữ kiện và xác định loại change</td><td>Đặt đúng quy trình xử lý</td></tr><tr><td>2</td><td>Dừng &amp; giữ</td><td>HOLD tại điểm phát hiện</td><td>Chặn lỗi lan rộng</td></tr><tr><td>3</td><td>Mở hồ sơ</td><td>Tạo Change Notice + impact matrix</td><td>Có dấu vết kiểm toán (đánh giá trail)</td></tr><tr><td>4</td><td>Phê duyệt</td><td>Lấy đúng cấp phê duyệt</td><td>Tránh change ngoài kiểm soát</td></tr><tr><td>5</td><td>Triển khai</td><td>Cập nhật baseline + thu hồi bản cũ + thông báo</td><td>Không tồn tại 2 bản</td></tr><tr><td>6</td><td>Xác minh &amp; close</td><td>Verification + đóng hồ sơ + bài học kinh nghiệm</td><td>Ngăn lỗi lặp</td></tr></tbody></table></div>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Thao tác</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Nhận diện trigger</td><td>Đọc dữ kiện và xác định loại change</td><td>Đặt đúng quy trình xử lý</td></tr><tr><td>2</td><td>Dừng &amp; giữ</td><td>HOLD tại điểm phát hiện</td><td>Chặn lỗi lan rộng</td></tr><tr><td>3</td><td>Mở hồ sơ</td><td>Tạo Change Notice + impact matrix</td><td>Có dấu vết kiểm toán</td></tr><tr><td>4</td><td>Phê duyệt</td><td>Lấy đúng cấp phê duyệt</td><td>Tránh change ngoài kiểm soát</td></tr><tr><td>5</td><td>Triển khai</td><td>Cập nhật baseline + thu hồi bản cũ + thông báo</td><td>Không tồn tại 2 bản</td></tr><tr><td>6</td><td>Xác minh &amp; close</td><td>Verification + đóng hồ sơ + bài học kinh nghiệm</td><td>Ngăn lỗi lặp</td></tr></tbody></table></div>
 <h3>OJT đầu ra bắt buộc</h3>
 <ul>
 <li>01 change package đầy đủ (Change Notice + impact + approval + implement + xác minh + close).</li>
@@ -185,7 +185,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>ĐẠT/KHÔNG ĐẠT (No bằng chứng = No change)</strong>
 <ul>
 <li>đạt khi: change package đầy đủ; chỉ 1 bản phát hành; verification có dữ liệu; training hồ sơ đủ; truy xuất ≤ 60 giây.</li>
-<li>FAIL ngay khi: thực thi change trước phê duyệt; dùng sai REV; không có impact/verification; không có dấu vết kiểm toán (đánh giá trail).</li>
+<li>FAIL ngay khi: thực thi change trước phê duyệt; dùng sai REV; không có impact/verification; không có dấu vết kiểm toán.</li>
 </ul>
 </div>
 <h2>12) MRR tối thiểu (hồ sơ bắt buộc + naming + nơi lưu)</h2>

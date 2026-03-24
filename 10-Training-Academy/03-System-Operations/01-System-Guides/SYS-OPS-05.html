@@ -210,7 +210,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>ReconciliationStatus</td><td>LUỒNG-WHS-13</td><td>Yes</td><td>Pass / Fail / Blocked</td><td>ShipRelease</td></tr>
 <tr><td>Status</td><td>WHS</td><td>Yes</td><td>Draft/Printed/Verified/Released/Shipped/Voided</td><td>PackSSCCRegister</td></tr>
 <tr><td>PrintVersion</td><td>LUỒNG-WHS-12</td><td>Yes</td><td>1 = in lần đầu; tăng 1 cho mỗi lần in lại</td><td>PackSSCCRegister</td></tr>
-<tr><td>ReprintReasonCode</td><td>WHS Lead/QA</td><td>Cond.</td><td>Bắt buộc khi PrintVersion &gt; 1</td><td>PackSSCCRegister</td></tr>
+<tr><td>ReprintReasonCode</td><td>Trưởng nhóm Kho/QA</td><td>Cond.</td><td>Bắt buộc khi PrintVersion &gt; 1</td><td>PackSSCCRegister</td></tr>
 <tr><td>PacketFolderUrl</td><td>Hồ sơ công việc</td><td>Yes</td><td>Trỏ đúng 07_Shipping-Packing</td><td>ShipRelease / PackSSCCRegister</td></tr>
 <tr><td>QRLinkShipRelease</td><td>LUỒNG-WHS-11</td><td>Yes</td><td>Quét mở đúng màn hình ShipRelease</td><td>PackSSCCRegister</td></tr>
 <tr><td>QRLinkShipPacket</td><td>LUỒNG-WHS-11</td><td>Yes</td><td>Quét mở đúng thư mục bộ hồ sơ giao hàng</td><td>PackSSCCRegister</td></tr>
@@ -357,7 +357,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>10</td><td>Tạo/hoàn thiện ShipRelease hồ sơ; gắn PacketFolderUrl; đặt PacketComplete</td><td>WHS</td><td>ShipRelease row: PacketFolderUrl + PacketComplete</td><td>Link folder sai; PacketComplete đặt sai</td></tr>
 <tr><td>11</td><td>Submit ShipRelease để chạy LUỒNG-WHS-13; nhận ReconciliationStatus</td><td>WHS</td><td>ReconciliationStatus Đạt/không đạt/Blocked; log time</td><td>Submit thiếu trường; status không cập nhật</td></tr>
 <tr><td>12</td><td>khi không đạt/Blocked: mở StandupAction S1; khoanh vùng; sửa nguyên nhân và re‑validate</td><td>Supervisor + QA + WHS</td><td>nhật ký hành động (nhật ký hành động) + bằng chứng sửa lỗi; re‑run validator</td><td>Vượt qua; ship “tạm”; sửa không có log</td></tr>
-<tr><td>13</td><td>Khi Pass: WHS + QA phê duyệt; ShipRelease.Status = Released</td><td>WHS Lead + QA</td><td>ApprovalHistory; đánh giá trail</td><td>Thiếu chữ ký; phê duyệt sai người</td></tr>
+<tr><td>13</td><td>Khi Pass: WHS + QA phê duyệt; ShipRelease.Status = Released</td><td>Trưởng nhóm Kho + QA</td><td>ApprovalHistory; dấu vết kiểm toán (audit trail)</td><td>Thiếu chữ ký; phê duyệt sai người</td></tr>
 <tr><td>14</td><td>Bàn giao carrier; cập nhật Carrier/Tracking/ShipDate; PackSSCCRegister.Status = Shipped</td><td>WHS</td><td>Carrier/Tracking; ảnh bàn giao; timestamp</td><td>Tracking sai; thiếu ảnh bàn giao</td></tr>
 <tr><td>15</td><td>Lưu POD/Proof; khóa hồ sơ Tier 1; đóng shipment</td><td>QA + Estimator (SAL-03)</td><td>POD file; retention label Tier 1 ≥ 10 năm</td><td>POD thất lạc; retention không áp</td></tr>
 </tbody>
@@ -390,9 +390,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Reprint</b></td>
-<td>Chỉ WHS Lead hoặc QA thực hiện; PrintVersion tăng; bắt buộc ReprintReasonCode</td>
+<td>Chỉ Trưởng nhóm Kho hoặc QA thực hiện; PrintVersion tăng; bắt buộc ReprintReasonCode</td>
 <td>ReprintReasonCode + comment + ảnh nhãn mới</td>
-<td>PackSSCCRegister.PrintVersion&gt;1; dấu vết kiểm toán (đánh giá trail) đầy đủ</td>
+<td>PackSSCCRegister.PrintVersion&gt;1; dấu vết kiểm toán đầy đủ</td>
 </tr>
 </tbody>
 </table>
@@ -408,7 +408,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>2</td><td>Qty nhãn khác ShipmentMirror</td><td>Thiếu/thừa</td><td>Validator so Qty; status Blocked</td><td>WHS</td></tr>
 <tr><td>3</td><td>Thiếu Final IR/CMM PASS</td><td>giao hàng khi chưa đạt</td><td>PacketComplete = No; Blocked</td><td>QC + QA</td></tr>
 <tr><td>4</td><td>Thiếu CoC/cert theo PO</td><td>Reject tại khách</td><td>MRR check + PacketComplete cổng kiểm soát</td><td>QA</td></tr>
-<tr><td>5</td><td>Reprint không có reason</td><td>Mất dấu vết kiểm toán (đánh giá trail)</td><td>LUỒNG-WHS-12 bắt buộc ReprintReasonCode</td><td>WHS Lead</td></tr>
+<tr><td>5</td><td>Reprint không có reason</td><td>Mất dấu vết kiểm toán</td><td>LUỒNG-WHS-12 bắt buộc ReprintReasonCode</td><td>Trưởng nhóm Kho</td></tr>
 <tr><td>6</td><td>SSCC trùng hoặc tái sử dụng</td><td>Mất traceability</td><td>SSCC uniqueness check + Status Voided</td><td>IT + WHS</td></tr>
 <tr><td>7</td><td>Quét barcode không mở đúng màn hình</td><td>Lẫn lộn khi ship</td><td>LabelScanVerified=True trước khi seal</td><td>WHS</td></tr>
 <tr><td>8</td><td>Ảnh đóng gói thiếu hoặc mờ</td><td>Không chứng minh khi claim</td><td>FRM-WHS-007 yêu cầu ảnh tối thiểu; đánh giá spot check</td><td>WHS + QA</td></tr>
@@ -479,8 +479,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Tuần 1 – Ngày 1</td><td>Tổng quan Step 3A + Data dictionary + cổng kiểm soát logic</td><td>All vai trò</td><td>2.0h</td><td>Bài kiểm tra nhanh baseline + ký cam kết cổng kiểm soát discipline</td></tr>
 <tr><td>Tuần 1 – Ngày 2</td><td>Thao tác WHS: Assign SSCC, Print, Scan test, FRM-WHS-007</td><td>WHS + Maintenance + QA</td><td>3.0h</td><td>OJT demo + 01 shipment giả lập/nhóm</td></tr>
 <tr><td>Tuần 2 – Ngày 3</td><td>Bộ hồ sơ giao hàng: MRR Tier 1 + naming + retention + CoC/cert</td><td>QA + QC + Estimator (SAL-03)</td><td>2.5h</td><td>MRR bảng kiểm hoàn chỉnh + 01 bộ hồ sơ mẫu</td></tr>
-<tr><td>Tuần 2 – Ngày 4</td><td>Reconciliation cổng kiểm soát: xử lý Fail/Blocked + ngoại lệ split/merge/void/reprint</td><td>WHS Lead + Supervisor + QA</td><td>3.0h</td><td>03 scenario diễn tập đạt PASS</td></tr>
-<tr><td>Tuần 3 – Ngày 5</td><td>OJT tại hiện trường: chạy thật 2 job (mỗi ca 1 job)</td><td>WHS + QA + Planner</td><td>4.0h</td><td>02 ShipRelease Pass + dấu vết kiểm toán (đánh giá trail) đầy đủ</td></tr>
+<tr><td>Tuần 2 – Ngày 4</td><td>Reconciliation cổng kiểm soát: xử lý Fail/Blocked + ngoại lệ split/merge/void/reprint</td><td>Trưởng nhóm Kho + Supervisor + QA</td><td>3.0h</td><td>03 scenario diễn tập đạt PASS</td></tr>
+<tr><td>Tuần 3 – Ngày 5</td><td>OJT tại hiện trường: chạy thật 2 job (mỗi ca 1 job)</td><td>WHS + QA + Planner</td><td>4.0h</td><td>02 ShipRelease Pass + dấu vết kiểm toán đầy đủ</td></tr>
 <tr><td>Tuần 3 – Ngày 6</td><td>Thi đánh giá: bài kiểm tra nhanh + performance test + đánh giá mô phỏng</td><td>Vai trò‑based</td><td>2.5h</td><td>Chứng nhận L2/L3 theo rubric</td></tr>
 </tbody>
 </table>
@@ -530,7 +530,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L3</b></td>
 <td>Tự vận hành và xử lý ngoại lệ</td>
 <td>Xử lý 02 scenario Fail/Blocked thành Pass với log đầy đủ; không phát sinh vượt qua</td>
-<td>Reprint không reason; void sai; sửa không có dấu vết kiểm toán (đánh giá trail)</td>
+<td>Reprint không reason; void sai; sửa không có dấu vết kiểm toán</td>
 </tr>
 <tr>
 <td><b>L4</b></td>
@@ -556,7 +556,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Trạng thái nào của PackSSCCRegister được dùng khi huỷ nhãn? (A) Released (B) Voided (C) Shipped (D) Printed</li>
 <li>Scan test thực hiện trước thời điểm nào? (A) Sau khi bàn giao carrier (B) Trước khi seal kiện (C) Sau khi ship (D) Sau khi đánh giá</li>
 <li>bộ hồ sơ giao hàng phải nằm trong folder nào của Hồ sơ công việc? (A) 03_Programs-Setup (B) 04_Inspection-FAI (C) 07_Shipping-Packing (D) 08_Photos</li>
-<li>Ai được phép reprint nhãn theo rule? (A) Bất kỳ ai (B) WHS Lead hoặc QA (C) Sales (D) Customer</li>
+<li>Ai được phép reprint nhãn theo rule? (A) Bất kỳ ai (B) Trưởng nhóm Kho hoặc QA (C) Sales (D) Customer</li>
 <li>Khi SSCC đã Voided, xử lý đúng là gì? (A) Tái sử dụng SSCC (B) Xoá hồ sơ (C) Giữ hồ sơ + không tái sử dụng (D) Đổi customer</li>
 <li>Mục tiêu chính của đối soát là gì? (A) Tăng giấy tờ (B) Ngăn ship sai/thiếu + tạo bằng chứng đánh giá (C) Tăng thời gian (D) Giảm ảnh chụp</li>
 <li>Reconciliation cổng kiểm soát chạy khi nào? (A) Khi ShipRelease submit (B) Khi in nhãn (C) Khi tạo PO (D) Khi nhận vật tư</li>
@@ -601,7 +601,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="badge"><span class="dot"></span>SCENARIO 3</div>
 <h3 class="h3">Nhãn bị rách sau khi dán</h3>
 <p class="mini"><b>Tình huống:</b> Nhãn PackID/SSCC bị rách; barcode không quét được.</p>
-<p class="mini"><b>Hành động bắt buộc:</b> WHS Lead reprint; ghi ReprintReasonCode=LabelDamaged; dán nhãn mới; chụp ảnh; scan test lại.</p>
+<p class="mini"><b>Hành động bắt buộc:</b> Trưởng nhóm Kho reprint; ghi ReprintReasonCode=LabelDamaged; dán nhãn mới; chụp ảnh; scan test lại.</p>
 <p class="mini"><b>Bằng chứng:</b> PrintVersion tăng; reason + ảnh nhãn mới + LabelScanVerified=True.</p>
 </div>
 </div>

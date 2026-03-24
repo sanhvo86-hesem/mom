@@ -1,0 +1,105 @@
+{
+  "filesScanned": 141,
+  "filesChanged": 12,
+  "totalReplacements": 12,
+  "topRules": [
+    {
+      "rule": "hold_point",
+      "count": 10
+    },
+    {
+      "rule": "cleanup_audit_trail_duplicate",
+      "count": 1
+    },
+    {
+      "rule": "right_first_time",
+      "count": 1
+    }
+  ],
+  "changedFiles": [
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html",
+      "total": 1,
+      "byRule": {
+        "cleanup_audit_trail_duplicate": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/01-SOPs/03-SOP-300/sop-302-first-article-inspection-fai.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-105-process-map-detailed.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-109-power-automate-flows-and-approvals-spec.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-300/annex-302-approved-materials-list.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html",
+      "total": 1,
+      "byRule": {
+        "hold_point": 1
+      }
+    },
+    {
+      "path": "03-Tai-Lieu-Van-Hanh/03-Reference/08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html",
+      "total": 1,
+      "byRule": {
+        "right_first_time": 1
+      }
+    }
+  ]
+}
