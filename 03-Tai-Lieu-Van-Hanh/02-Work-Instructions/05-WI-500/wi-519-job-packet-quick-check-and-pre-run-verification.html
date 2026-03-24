@@ -95,14 +95,14 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>4. Offsets / probe zero / WCS</td><td>WCS đúng, probe/zero ổn định, offset giải thích được, không có giá trị lạ chưa xác nhận</td><td>Setup screen / zero check / note bàn giao</td><td>Offset không tin cậy, zero vừa đổi nhưng chưa re-xác minh</td></tr>
 <tr><td>5. Workholding / orientation</td><td>Fixture/jaw/clamp đúng ID, part hướng đúng, lực kẹp và chống rung phù hợp</td><td>Kiểm trực quan + fixture ID</td><td>Orientation sai, part nhô bất thường, clamp scheme không chắc chắn</td></tr>
 <tr><td>6. Dung dịch làm mát (coolant) / chip evacuation / FOD</td><td>Dung dịch làm mát đúng loại và đúng vị trí phun; chip conveyor hoặc thu phoi hoạt động; vùng cắt sạch</td><td>Kiểm trực quan + máy ở trạng thái sạch</td><td>Chip kẹt, dung dịch làm mát yếu/sai hướng, còn vật lạ trong machine zone</td></tr>
-<tr><td>7. Dry-run / single block / first cut</td><td>Đã prove-out đoạn rủi ro; đã kiểm vùng gần clamp/rotary/transfer; có kế hoạch dừng kiểm part đầu</td><td>FRM-511 hoặc record first cut</td><td>Chưa prove-out, chưa kiểm vùng rủi ro, hoặc first cut không có người theo dõi</td></tr>
+<tr><td>7. Dry-run / single block / first cut</td><td>Đã prove-out đoạn rủi ro; đã kiểm vùng gần clamp/rotary/transfer; có kế hoạch dừng kiểm part đầu</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> hoặc record first cut</td><td>Chưa prove-out, chưa kiểm vùng rủi ro, hoặc first cut không có người theo dõi</td></tr>
 </tbody></table></div>
 <div class="callout-info"><strong>Kiểm bổ sung bắt buộc</strong><br/>Job QPL-3/QPL-4, part có CTQ cao, part lần đầu, part có requirement vacuum/clean/leak hoặc customer overlay đặc biệt phải kiểm thêm: gage readiness level, inspection method, evidence path và người nhận đo part đầu.</div></div>
 <div class="section"><h2>4. Ba mức kiểm trước khi chạy</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mức kiểm</th><th>Mục tiêu</th><th>Nội dung</th><th>Không đạt thì làm gì</th></tr></thead><tbody>
 <tr><td>Mức A — Packet</td><td>Chặn sai revision (wrong revision), sai job, sai vật liệu, sai route</td><td>Kiểm document, traveler, material lot, QPL, customer overlay, previous hold/NCR</td><td>HOLD bộ job dossier; báo Supervisor / QA / Engineering</td></tr>
 <tr><td>Mức B — Machine static</td><td>Chặn sai setup phần cứng</td><td>Kiểm WCS, tool map, fixture orientation, dung dịch làm mát, chip/FOD, safety zone</td><td>HOLD machine; xử lý setup trước khi prove-out</td></tr>
-<tr><td>Mức C — Dynamic / first cut</td><td>Chặn crash, sai đường dao, drift sớm</td><td>Dry-run, single block, prove-out, part đầu, đặc tính chịu ảnh hưởng sau thay đổi</td><td>Dừng cycle; khoanh vùng last-known-good; chuyển WI-302 hoặc NCR nếu cần</td></tr>
+<tr><td>Mức C — Dynamic / first cut</td><td>Chặn crash, sai đường dao, drift sớm</td><td>Dry-run, single block, prove-out, part đầu, đặc tính chịu ảnh hưởng sau thay đổi</td><td>Dừng cycle; khoanh vùng last-known-good; chuyển <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> hoặc NCR nếu cần</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>5. Add-on bắt buộc theo họ máy</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Họ máy</th><th>Phải kiểm thêm trước Cycle Start</th></tr></thead><tbody>
@@ -113,7 +113,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div></div>
 <div class="section"><h2>6. Restart sau bất thường</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Kiểm lại tối thiểu</th><th>Phải giữ lại evidence gì</th></tr></thead><tbody>
-<tr><td>Sau thay tool hoặc insert</td><td>Điểm 3, 4, 7; đo đặc tính bị ảnh hưởng; cập nhật log tuổi dao</td><td>FRM-511 / log tool change</td></tr>
+<tr><td>Sau thay tool hoặc insert</td><td>Điểm 3, 4, 7; đo đặc tính bị ảnh hưởng; cập nhật log tuổi dao</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> / log tool change</td></tr>
 <tr><td>Sau offset edit / re-zero / probe calibration</td><td>Điểm 4, 5, 7; chạy single block ở đoạn rủi ro</td><td>Ghi rõ offset changed by / time / reason</td></tr>
 <tr><td>Sau alarm hoặc power loss</td><td>Điểm 1, 3, 4, 6, 7; khoanh vùng WIP từ last-known-good</td><td>Record thời điểm dừng và trạng thái WIP</td></tr>
 <tr><td>Sau thay lot vật liệu</td><td>Điểm 2, 5, 7; xác nhận lot mới và part đầu của lot mới</td><td>Traveler / lot trace</td></tr>
@@ -123,9 +123,9 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>7. Sign-off và evidence tối thiểu</h2>
 <p>Machine chỉ được xem là qua WI-519 khi <b>người chạy máy</b> và <b>người setup/giám sát</b> cùng xác nhận. Job có requirement QA release, CTQ cao hoặc mẫu đầu (first piece) nhạy cảm phải có xác nhận của QA theo rule job.</p>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại job</th><th>Evidence tối thiểu</th><th>Người phải ký</th></tr></thead><tbody>
-<tr><td>Job tiêu chuẩn QPL-1/QPL-2</td><td><a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> hoặc record số tương đương, traveler, last-known-good khi có restart</td><td>Operator + Setup Lead/Supervisor</td></tr>
-<tr><td>Job CTQ cao, QPL-3/QPL-4, customer overlay</td><td>FRM-511 + mẫu đầu/FAI evidence + link record đo</td><td>Operator + Setup Lead + QA</td></tr>
-<tr><td>Job sau crash/abnormal restart</td><td>FRM-511 + ghi rõ phạm vi suspect WIP + hành động restart</td><td>Supervisor + QA; Engineering/Maintenance khi có machine impact</td></tr>
+<tr><td>Job tiêu chuẩn QPL-1/QPL-2</td><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx"  download="">FRM-511</a> hoặc record số tương đương, traveler, last-known-good khi có restart</td><td>Operator + Setup Lead/Supervisor</td></tr>
+<tr><td>Job CTQ cao, QPL-3/QPL-4, customer overlay</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> + mẫu đầu/FAI evidence + link record đo</td><td>Operator + Setup Lead + QA</td></tr>
+<tr><td>Job sau crash/abnormal restart</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> + ghi rõ phạm vi suspect WIP + hành động restart</td><td>Supervisor + QA; Engineering/Maintenance khi có machine impact</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>8. Phản ứng khi không đạt</h2>
 <div class="step-list">
@@ -138,7 +138,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">% pre-run PASS lần đầu; số restart sau bất thường; số incident wrong-rev/wrong-tool/wrong-offset bị chặn trước Cycle Start; số alarm trong 10 part đầu.</div></div><div class="kpi-box"><strong>Document liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="wi-517-setup-changeover-smed-standard-work.html">WI-517</a>; <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>; <a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a>; <a href="../../03-Reference/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>.</div></div></div></div>
 <div data-phase2f="true">
 <h2 class="h2" id="phase2f-job-packet-gate">Kiểm soát bổ sung — Bộ job dossier quick-check to decision record</h2>
-<div class="note"><b>Làm rõ vai trò</b><br/>WI-519 là quick-check tiêu chuẩn hoá bước chuẩn bị; kết quả chuẩn bị này phải được chốt thành decision record trên <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> khi setup / restart / chuyển giao công việc thực sự mở control gate chạy.</div>
+<div class="note"><b>Làm rõ vai trò</b><br/>WI-519 là quick-check tiêu chuẩn hoá bước chuẩn bị; kết quả chuẩn bị này phải được chốt thành decision record trên <a href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx"  download="">FRM-511</a> khi setup / restart / chuyển giao công việc thực sự mở control gate chạy.</div>
 </div></div>
 </div>
 </div>

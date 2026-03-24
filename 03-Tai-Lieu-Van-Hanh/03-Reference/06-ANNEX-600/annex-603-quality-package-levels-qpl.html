@@ -86,7 +86,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 <div class="section"><h2>3. Overlay quality bắt buộc cộng thêm vào Base QPL</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mã overlay</th><th>Khi nào kích hoạt</th><th>Evidence phải cộng thêm</th></tr></thead><tbody>
-<tr><td><span class="code">O-FAI</span></td><td>FAI/mẫu đầu bắt buộc theo part mới, rev mới, setup mới, thay đổi đáng kể, customer request</td><td>WI-302 pack, balloon/characteristic list, report đo, quyết định PASS/HOLD/FAIL, revalidation khi chạy lại sau thay đổi trọng yếu</td></tr>
+<tr><td><span class="code">O-FAI</span></td><td>FAI/mẫu đầu bắt buộc theo part mới, rev mới, setup mới, thay đổi đáng kể, customer request</td><td><a href="../../02-Work-Instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> pack, balloon/characteristic list, report đo, quyết định PASS/HOLD/FAIL, revalidation khi chạy lại sau thay đổi trọng yếu</td></tr>
 <tr><td><span class="code">O-SP</span></td><td>Có outsource công đoạn đặc biệt hoặc in-house special xác minh nhạy cao</td><td>Pack processor/route/cert, receipt xác minh, cert trace, processor trạng thái, release check</td></tr>
 <tr><td><span class="code">O-MAT</span></td><td>Material/heat trace sâu, customer-supplied material, split lot, substitute risk</td><td>Heat/lot chain, cert mapping, split-lot map, substitute approval nếu có</td></tr>
 <tr><td><span class="code">O-CLEAN</span></td><td>Cleanliness / vacuum / leak-sensitive / clean-pack requirement nghiêm</td><td>Cleaning, clean build, packaging spec, danh mục vật tư được phép và vật tư phải loại trừ, preservation evidence, photo/record theo route</td></tr>
@@ -116,7 +116,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Quy tắc áp dụng</th></tr></thead><tbody>
 <tr><td>Job có nhiều route, mức rủi ro khác nhau</td><td>Dùng Base QPL cho toàn job và cộng overlay cho route nhạy. Shared gates dùng mức requirement cao nhất đang có hiệu lực.</td></tr>
 <tr><td>Partial shipment</td><td>Không hạ QPL cho lô ship trước. Lô ship trước phải có full evidence tương ứng phần đã giao và phải giữ trace với open balance còn lại.</td></tr>
-<tr><td>Chuyển giao công việc / đổi máy / đổi cell / đổi operator chính</td><td>Không đổi Base QPL, nhưng bắt buộc cộng review và evidence theo WI-518; QPL-3/QPL-4 coi chuyển giao công việc là trigger tăng độ chặt tại G1/G2/G3.</td></tr>
+<tr><td>Chuyển giao công việc / đổi máy / đổi cell / đổi operator chính</td><td>Không đổi Base QPL, nhưng bắt buộc cộng review và evidence theo <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a>; QPL-3/QPL-4 coi chuyển giao công việc là trigger tăng độ chặt tại G1/G2/G3.</td></tr>
 <tr><td>Thay đổi revision giữa chừng / rebaseline</td><td>Revision change không tự động cho phép giữ mức cũ. Phải đánh giá lại Base QPL và overlay; ít nhất giữ hoặc nâng, không được tự hạ.</td></tr>
 <tr><td>Complaint / escape / repeated drift</td><td>Job đang mở phải nâng mức nếu risk tăng. Job cùng family/rev cũng phải review lại Base QPL cho các lô kế tiếp.</td></tr>
 </tbody></table></div></div>
@@ -136,8 +136,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td><a href="annex-604-control-plan-guide.html">ANNEX-604</a></td><td>Control plan guide</td></tr>
 <tr><td><a href="annex-605-spc-lite-and-reaction-plan.html">ANNEX-605</a></td><td>SPC-lite và reaction plan</td></tr>
 <tr><td><a href="../05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a></td><td>Put-thru / route đặc biệt tác động mức record</td></tr>
-<tr><td><a href="annex-402-outsource-special-process-pack.html">ANNEX-402</a></td><td>Gói chứng từ outsource/công đoạn đặc biệt</td></tr>
-<tr><td><a href="annex-702-packaging-labeling-spec.html">ANNEX-702</a></td><td>Packaging, preservation và label spec</td></tr>
+<tr><td><a href="../04-ANNEX-400/annex-402-outsource-special-process-pack.html">ANNEX-402</a></td><td>Gói chứng từ outsource/công đoạn đặc biệt</td></tr>
+<tr><td><a href="../07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a></td><td>Packaging, preservation và label spec</td></tr>
 </tbody></table></div></div>
 </div>
 </div>

@@ -47,7 +47,7 @@
   </div>
 </div>
 
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi tạo mới hoặc tái cấu trúc SharePoint records architecture cho HESEM theo <span class="code">ANNEX-133</span>, <span class="code">ANNEX-134</span> và <span class="code">ANNEX-131</span>. Tài liệu này là bản thao tác trực tiếp trên M365 Admin Center và SharePoint Admin Center.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi tạo mới hoặc tái cấu trúc SharePoint records architecture cho HESEM theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>, <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a></span> và <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span>. Tài liệu này là bản thao tác trực tiếp trên M365 Admin Center và SharePoint Admin Center.</div>
 <h1>WI-102 — Thiết lập SharePoint records sites, libraries và permissions click-by-click</h1>
 
 <div class="toc">
@@ -96,9 +96,9 @@
   <h2>3. Điều kiện trước khi làm</h2>
   <ul>
     <li>Bạn phải có quyền tối thiểu <span class="code">SharePoint Administrator</span>; nếu tạo hoặc quản lý groups thì cần thêm quyền quản trị Entra/Microsoft 365 groups phù hợp.</li>
-    <li>Chuẩn tên site, library và group phải theo <span class="code">ANNEX-134</span>; không tự đổi tên ngắn gọn cho “dễ nhớ”.</li>
-    <li>Chuẩn folder tree và home zone phải theo <span class="code">ANNEX-133</span>.</li>
-    <li>Field names, request lists và value sets phải theo <span class="code">ANNEX-131</span>.</li>
+    <li>Chuẩn tên site, library và group phải theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a></span>; không tự đổi tên ngắn gọn cho “dễ nhớ”.</li>
+    <li>Chuẩn folder tree và home zone phải theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>.</li>
+    <li>Field names, request lists và value sets phải theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span>.</li>
   </ul>
   <div class="keyline"><strong>Lưu ý về giao diện:</strong> tên nút trong M365 Admin có thể chênh nhẹ giữa tenant, nhưng phải đi đúng các khu chức năng sau: <span class="code">Admin centers</span>, <span class="code">SharePoint admin center</span>, <span class="code">Active sites</span>, <span class="code">Settings</span>, <span class="code">Site creation</span>, <span class="code">Site permissions</span>, <span class="code">Library settings</span>, <span class="code">Permissions for this document library</span>.</div>
 </div>
@@ -316,7 +316,7 @@
   <div class="step-card">
     <h3>Bước 13.2 — Retention và sensitivity</h3>
     <ul>
-      <li>Áp retention labels theo mapping của <span class="code">ANNEX-131</span> và <span class="code">ANNEX-133</span>.</li>
+      <li>Áp retention labels theo mapping của <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span> và <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>.</li>
       <li>People site và Digital site phải có sensitivity/permission boundary nghiêm ngặt hơn core site.</li>
     </ul>
   </div>
@@ -328,7 +328,7 @@
     <h3>Bước 14.1 — Root folders</h3>
     <ul>
       <li>Vào từng library.</li>
-      <li>Tạo root folders và year folders đúng theo <span class="code">ANNEX-133</span>.</li>
+      <li>Tạo root folders và year folders đúng theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>.</li>
       <li>Với <span class="code">05-Department-Records</span>, tạo department zones trước rồi tạo year folders.</li>
       <li>Với <span class="code">08-People-Records</span>, tạo các root zones: active, former, contractors-and-interns, visitors-and-temporary-access.</li>
       <li>Với <span class="code">09-Digital-System-Records</span>, tạo đủ 8 zones hệ thống theo blueprint.</li>
@@ -345,12 +345,12 @@
       </thead>
       <tbody>
         <tr><td>Số site</td><td>Đúng 3 sites: Core, People, Digital</td></tr>
-        <tr><td>Tên libraries</td><td>Đúng theo ANNEX-134, không sai chính tả</td></tr>
+        <tr><td>Tên libraries</td><td>Đúng theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>, không sai chính tả</td></tr>
         <tr><td>Site permissions</td><td>Owners/Members/Visitors đúng mapping</td></tr>
         <tr><td>Library permissions</td><td>Không còn cấp lẻ user ngoài exception đã duyệt</td></tr>
         <tr><td>Sharing</td><td>People và Digital không share ngoài; Core không có anonymous link</td></tr>
         <tr><td>Versioning/labels</td><td>Bật đúng trên từng library controlled</td></tr>
-        <tr><td>Root folders</td><td>Đúng blueprint trong ANNEX-133</td></tr>
+        <tr><td>Root folders</td><td>Đúng blueprint trong <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></td></tr>
       </tbody>
     </table>
   </div>

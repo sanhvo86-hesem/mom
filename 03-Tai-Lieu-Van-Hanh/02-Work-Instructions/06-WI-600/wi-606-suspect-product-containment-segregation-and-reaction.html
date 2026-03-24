@@ -81,14 +81,14 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Bước 2 — Cô lập vật lý.</strong><br/>Đưa vật tư/WIP/FG vào khu <span class="code">HOLD</span> hoặc <span class="code">QUARANTINE</span> đã định danh; dán tag nhận diện rõ part, lot, qty, reason, time, người gắn.</div>
 <div class="step-item"><strong>Bước 3 — Giữ nguyên chứng cứ.</strong><br/>Không được tự ý đánh bóng, đổi nhãn, tháo bag, dỡ pallet, sửa offset, reset counter, xóa dữ liệu, hoặc tách kiện trước khi chụp ảnh và ghi nhận tình trạng ban đầu.</div>
 <div class="step-item"><strong>Bước 4 — Gọi đúng người.</strong><br/>Báo Supervisor, QA, WHS và người phụ trách công đoạn. Nếu nghi đã chạm shipping/customer risk, escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> trong cùng ca, không chờ họp sáng hôm sau.</div>
-<div class="step-item"><strong>Bước 5 — Mở record.</strong><br/>Mở <a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a> hoặc log hold tương đương; ghi thời điểm phát hiện, part/rev, lot/serial, qty ảnh hưởng, vị trí phát hiện, trạng thái hiện tại và nguyên nhân sơ bộ.</div>
+<div class="step-item"><strong>Bước 5 — Mở record.</strong><br/>Mở <a href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx"  download="">FRM-651</a> hoặc log hold tương đương; ghi thời điểm phát hiện, part/rev, lot/serial, qty ảnh hưởng, vị trí phát hiện, trạng thái hiện tại và nguyên nhân sơ bộ.</div>
 </div>
 </div><div class="section">
 <h2>3. Boundary lot logic và mixed-location sweep</h2>
 <p>Khi chưa xác định được biên ảnh hưởng, mặc định dùng nguyên tắc <strong>chặn rộng trước — thu hẹp sau</strong>. QA/OPS/WHS phải xác định <strong>last-known-good</strong>, <strong>first-known-bad</strong> hoặc điểm thay đổi có thể tạo ra lỗi, sau đó khoanh phạm vi theo thời gian, machine, tool, offset, gage, lot, processor batch, label batch và location.</p>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm incident</th><th>Phạm vi phải sweep</th><th>Điểm dừng / release lại</th></tr></thead><tbody>
 <tr><td>Measurement / gage vấn đề</td><td>Tất cả lô/CTQ đo bằng cùng gage từ lần xác minh tốt cuối cùng; mọi record dựa trên gage đó.</td><td>Chỉ release khi gage hợp lệ, phạm vi ảnh hưởng đã rà xong và dữ liệu đo lại chứng minh lô đạt.</td></tr>
-<tr><td>Tool wear / crash / setup drift</td><td>Từ last-known-good đến thời điểm phát hiện; cùng machine, cùng tool family, cùng offset nếu có nghi ngờ lan rộng.</td><td>Restart theo WI-517/WI-519; lô ảnh hưởng phải sort hoặc đo lại đủ đặc tính chịu tác động.</td></tr>
+<tr><td>Tool wear / crash / setup drift</td><td>Từ last-known-good đến thời điểm phát hiện; cùng machine, cùng tool family, cùng offset nếu có nghi ngờ lan rộng.</td><td>Restart theo <a href="../05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a>/<a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>; lô ảnh hưởng phải sort hoặc đo lại đủ đặc tính chịu tác động.</td></tr>
 <tr><td>Label / trace mismatch</td><td>Tất cả khay, pallet, box, bin, remnant, receipt line và location liên quan cùng thời điểm in nhãn hoặc cùng operator/label batch.</td><td>Release khi vật lý ↔ hệ thống ↔ record trace khớp hoàn toàn và nhãn mới đã được QA chấp thuận.</td></tr>
 <tr><td>Cert / supplier / processor vấn đề</td><td>Toàn bộ receipt, WIP, FG và shipment có chung supplier shipment, processor batch, cert number hoặc heat/lot liên quan.</td><td>Release khi đủ cert/scope/evidence hoặc có disposition được approval bằng văn bản.</td></tr>
 <tr><td>FOD / nhiễm bẩn / clean breach</td><td>Khu vực, tool, tray, bag, clean zone, cùng ca và cùng batch sạch; hàng đang ở ship staging hoặc clean pack cũng phải rà.</td><td>Release khi line clearance, clean recovery và inspection lại đạt; phần ảnh hưởng không phục hồi được phải disposition riêng.</td></tr>
@@ -117,7 +117,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </ul></div>
 <div class="card"><h3>Điều kiện release lại</h3><ul class="tight" style="padding-left:18px;">
 <li>Đã xác định rõ phạm vi ảnh hưởng và số lượng còn lại.</li>
-<li>FRM-651 và record HOLD/containment đã đủ ảnh, lot, qty, reason, người phụ trách.</li>
+<li><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a> và record HOLD/containment đã đủ ảnh, lot, qty, reason, người phụ trách.</li>
 <li>Kết quả sort / đo lại / cert bổ sung / review supplier đã đóng đủ.</li>
 <li>Tag vật lý, trạng thái hệ thống, nhãn mới và location đã đồng bộ.</li>
 <li>QA approval release; các concession bắt buộc đã có văn bản hợp lệ.</li>
@@ -135,7 +135,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div><div class="section">
 <h2>7. Record, KPI và document liên kết</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm record / KPI</th><th>Requirement bắt buộc</th></tr></thead><tbody>
-<tr><td>Record tối thiểu</td><td><a  download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>, ảnh tình trạng ban đầu, danh sách lot/location sweep, hold/disposition log, kết quả re-inspect/sort, cert bổ sung khi áp dụng, communication log với supplier/customer khi có.</td></tr>
+<tr><td>Record tối thiểu</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx"  download="">FRM-651</a>, ảnh tình trạng ban đầu, danh sách lot/location sweep, hold/disposition log, kết quả re-inspect/sort, cert bổ sung khi áp dụng, communication log với supplier/customer khi có.</td></tr>
 <tr><td>KPI operation</td><td>KPI-WI606-01: thời gian từ phát hiện đến HOLD vật lý; KPI-WI606-02: thời gian đóng boundary lot; KPI-WI606-03: số incident mixed-location; KPI-WI606-04: số tình huống release sai trước khi đủ evidence; KPI-WI606-05: escape tái diễn trong 30 ngày.</td></tr>
 <tr><td>Liên kết bắt buộc</td><td><a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>, <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>, <a href="wi-601-visual-inspection-and-defect-classification.html">WI-601</a>, <a href="wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a>, <a href="wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a>, <a href="../07-WI-700/wi-721-fod-prevention-line-clearance-and-tool-accountability.html">WI-721</a>.</td></tr>
 </tbody></table></div>

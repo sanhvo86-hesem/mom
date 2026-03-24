@@ -1,0 +1,12 @@
+﻿Actionable unresolved internal links after final pass (2026-03-24)
+
+1. C:\Users\TEST4\qms.hesem.com.vn\03-Tai-Lieu-Van-Hanh\01-SOPs\01-SOP-100\sop-101-document-and-data-control.html
+   - FRM-103
+   - FRM-108
+   - FRM-109
+   Reason: no live source file found under C:\Users\TEST4\qms.hesem.com.vn\04-Bieu-Mau
+
+Notes
+- SOP-201, SOP-302, SOP-502 and SOP-504 still appear as plain text in their own end-section rows only because they are self-references inside the same document.
+- WI-501 to WI-505 folder links have been converted to file links.
+- Nested anchor patterns have been cleared from 02-Tai-Lieu-He-Thong and 03-Tai-Lieu-Van-Hanh.

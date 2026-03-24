@@ -60,7 +60,7 @@
       <div class="section">
         <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
         <p style="margin:8px 0;">ANNEX này xác lập cơ chế vận hành bắt buộc để mọi record phát sinh trong quá trình điều hành, hỗ trợ, sản xuất, giao hàng, đào tạo, quản trị nhân sự và quản trị hệ thống đều có vị trí lưu chuẩn ngay từ lúc tạo. Kết quả bắt buộc là: không còn record vận hành bị lưu tự phát ngoài cấu trúc chuẩn; mọi folder được tạo qua request có kiểm soát; mọi permission đi qua group model; mọi record family có retention basis, metadata và audit trail đầy đủ.</p>
-        <div class="keyline"><strong>Ranh giới tài liệu:</strong> <span class="code">ANNEX-133</span> là blueprint vị trí lưu và folder taxonomy; <span class="code">ANNEX-131</span> là nguồn chuẩn cho field dictionary, value set, list schema và source-of-record rule; <span class="code">ANNEX-132</span> là chuẩn luồng approval/logging; <span class="code">ANNEX-101</span> là nguồn chuẩn quyền theo vai trò và nguyên tắc least privilege. <span class="code">ANNEX-134</span> là tài liệu orchestration thực thi các nguồn chuẩn này thành provisioning architecture end-to-end.</div>
+        <div class="keyline"><strong>Ranh giới tài liệu:</strong> <span class="code"><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span> là blueprint vị trí lưu và folder taxonomy; <span class="code"><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span> là nguồn chuẩn cho field dictionary, value set, list schema và source-of-record rule; <span class="code"><a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a></span> là chuẩn luồng approval/logging; <span class="code"><a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></span> là nguồn chuẩn quyền theo vai trò và nguyên tắc least privilege. <span class="code">ANNEX-134</span> là tài liệu orchestration thực thi các nguồn chuẩn này thành provisioning architecture end-to-end.</div>
       </div>
 
       <div class="section">
@@ -73,7 +73,7 @@
             <tbody>
               <tr><td>One request, one controlled output</td><td>Mỗi yêu cầu tạo zone, folder, dossier, external share hoặc archive lock phải đi qua một request record có trạng thái, chủ sở hữu, run log và URL đầu ra.</td></tr>
               <tr><td>Group-based access</td><td>Không cấp quyền thủ công cho từng user ở cấu trúc chuẩn. Quyền được áp qua SharePoint group hoặc Entra ID group đã được đăng ký trong permission catalog.</td></tr>
-              <tr><td>Blueprint first</td><td>Folder, metadata và retention phải được sinh từ mapping chuẩn trong <span class="code">ANNEX-133</span> và <span class="code">ANNEX-131</span>; không tự đặt path ngoài taxonomy chuẩn.</td></tr>
+              <tr><td>Blueprint first</td><td>Folder, metadata và retention phải được sinh từ mapping chuẩn trong <span class="code"><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span> và <span class="code"><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span>; không tự đặt path ngoài taxonomy chuẩn.</td></tr>
               <tr><td>Link-not-copy</td><td>Training SSOT, job dossier SSOT, part baseline SSOT, payroll restricted record và system admin record không được copy chéo giữa các library. Chỉ dùng index, link, reference pack hoặc sealed package được phê duyệt.</td></tr>
               <tr><td>Default-deny for sensitive zones</td><td><span class="code">08-People-Records</span>, restricted subzones của HR/EHS/Finance và các khu system admin luôn chạy theo mô hình deny-by-default; chỉ nhóm đã đăng ký mới có quyền đọc hoặc sửa.</td></tr>
               <tr><td>Automation with exception control</td><td>Luồng tự động tạo chỗ lưu cho trường hợp chuẩn; mọi ngoại lệ về path, permission, guest sharing hoặc archive reopen phải tạo exception record và approval rõ ràng.</td></tr>
@@ -294,7 +294,7 @@
             <p style="margin:8px 0;">Tối thiểu phải có các list: <span class="code">M365-Record-Provisioning-Requests</span>, <span class="code">Department-Zone-Catalog</span>, <span class="code">People-Dossier-Index</span>, <span class="code">System-Record-Request-Log</span>, <span class="code">External-Share-Approval-Log</span>, <span class="code">Archive-Lock-Register</span>, <span class="code">Automation-Run-Log</span>.</p>
           </div>
         </div>
-        <div class="keyline"><strong>Rule dữ liệu:</strong> internal name, choice code, lookup source, validation rule và value set lấy theo <span class="code">ANNEX-131</span>. Không tạo field trùng nghĩa dưới tên khác. Không dùng text tự do cho <span class="code">DeptCode</span>, <span class="code">RequestType</span>, <span class="code">LibraryCode</span>, <span class="code">RecordZone</span>, <span class="code">ConfidentialityClass</span>, <span class="code">PersonRecordClass</span> hoặc <span class="code">SystemArea</span>.</div>
+        <div class="keyline"><strong>Rule dữ liệu:</strong> internal name, choice code, lookup source, validation rule và value set lấy theo <span class="code"><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span>. Không tạo field trùng nghĩa dưới tên khác. Không dùng text tự do cho <span class="code">DeptCode</span>, <span class="code">RequestType</span>, <span class="code">LibraryCode</span>, <span class="code">RecordZone</span>, <span class="code">ConfidentialityClass</span>, <span class="code">PersonRecordClass</span> hoặc <span class="code">SystemArea</span>.</div>
       </div>
 
       <div class="section">
@@ -374,16 +374,16 @@
       <div class="section">
         <h2>16. Tài liệu liên kết bắt buộc</h2>
         <ul>
-          <li><span class="code">ANNEX-101</span> — Role-based access map và nguyên tắc least privilege</li>
-          <li><span class="code">ANNEX-131</span> — Field mapping M365/List, value set, register catalog và source-of-record rule</li>
-          <li><span class="code">ANNEX-132</span> — Flow and approval spec cho digital forms và Power Automate</li>
-          <li><span class="code">ANNEX-133</span> — Folder structure blueprint và record home taxonomy</li>
-          <li><span class="code">SOP-104</span> — Data governance, record security và IP protection</li>
-          <li><span class="code">SOP-303</span> — Engineering release, baseline package và job snapshot control</li>
-          <li><span class="code">WI-203</span> — Job dossier evidence pack và record completeness</li>
-          <li><span class="code">SOP-801</span> — Competence, training and certification</li>
-          <li><span class="code">SOP-802</span> — Incident, near miss and EHS</li>
-          <li><span class="code">SOP-803</span> — Invoicing, job costing and AR/AP</li>
+          <li><span class="code"><a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></span> — Role-based access map và nguyên tắc least privilege</li>
+          <li><span class="code"><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span> — Field mapping M365/List, value set, register catalog và source-of-record rule</li>
+          <li><span class="code"><a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a></span> — Flow and approval spec cho digital forms và Power Automate</li>
+          <li><span class="code"><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span> — Folder structure blueprint và record home taxonomy</li>
+          <li><span class="code"><a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></span> — Data governance, record security và IP protection</li>
+          <li><span class="code"><a href="../../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></span> — Engineering release, baseline package và job snapshot control</li>
+          <li><span class="code"><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></span> — Job dossier evidence pack và record completeness</li>
+          <li><span class="code"><a href="../../../01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a></span> — Competence, training and certification</li>
+          <li><span class="code"><a href="../../../01-SOPs/08-SOP-800/sop-802-incident-near-miss-and-ehs.html">SOP-802</a></span> — Incident, near miss and EHS</li>
+          <li><span class="code"><a href="../../../01-SOPs/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html">SOP-803</a></span> — Invoicing, job costing and AR/AP</li>
         </ul>
       </div>
 
