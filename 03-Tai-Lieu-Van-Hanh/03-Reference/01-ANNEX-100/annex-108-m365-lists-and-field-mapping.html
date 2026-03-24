@@ -1,50 +1,39 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-108 — Field mapping M365/List, content type, lookup, xác nhận rule và source of record | HESEM QMS</title>
+<title>ANNEX-108 — Field mapping M365/List, value set, register catalog và source of record | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
-
 <style>
 @media print {
- .card, .table-card, .callout, .note, .box, .iso-map, .lane, .legend, .req, .auth-grid, .backup-grid { break-inside: avoid; page-break-inside: avoid; }
- h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
- tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+  .card, .table-card, .callout, .note, .box, .keyline, .figure-box { break-inside: avoid; page-break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  tr, td, th { break-inside: avoid; page-break-inside: avoid; }
 }
-.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
-.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
-.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
-.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
-.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
-.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
-.small {font-size:12px;}
-.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
-.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
-.badge-red,.badge-amber,.badge-green,.badge-blue {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
-.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
-.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
-.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
-.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
+.page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color:var(--navy);}
+.page-body h3 {font-size:14px; line-height:1.5; margin:12px 0 6px; color:var(--ink);}
+.table-card table {width:100%; border-collapse:collapse; font-size:12px;}
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align:top;}
+.table-card th {background:var(--th-bg); border-color:var(--th-bdr); text-align:left;}
 .two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
-.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
-.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
-.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
-.path {font-family: var(--mono); font-size:11px; color: var(--ink2);}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius:var(--r); background:#fcfcfd;}
+.code {font-family:var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.path {font-family:var(--mono); font-size:11px; color:var(--ink2);}
 .figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
-.step-list {counter-reset: step; margin: 10px 0;}
-.step-item {position:relative; padding-left:40px; margin:12px 0;}
-.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
-hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
-@media (max-width: 960px; width: 100%; box-sizing: border-box) { .two-col, .three-col, .kpi-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+.section ul {margin:8px 0; padding-left:20px;}
+@media (max-width:960px) {
+  .two-col {grid-template-columns:1fr;}
+  .page-body {padding:24px 18px 36px;}
+}
 </style>
-
 </head>
 <body>
 <div class="container">
   <div class="page">
     <div class="page-body">
-      
+
 <div class="form-header">
   <div class="fh-left">
     <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
@@ -53,22 +42,212 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
       <span>Document operation • Annex số hóa</span>
     </div>
   </div>
-  <div class="title"><strong>ANNEX-108 — Field mapping M365/List, content type, lookup, xác nhận rule và source of record</strong></div>
+  <div class="title"><strong>ANNEX-108 — Field mapping M365/List, value set, register catalog và source of record</strong></div>
   <div class="meta">
     <div class="row"><span><b>Code:</b></span><span>ANNEX-108</span></div>
-    <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+    <div class="row"><span><b>Version:</b></span><span>V2</span></div>
     <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
     <div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Administrator</span></div>
     <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
   </div>
 </div>
 
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi tạo mới hoặc sửa M365 List/Register, khi nối dữ liệu với Epicor, khi build form/luồng/bảng điều khiển và khi đánh giá data governance.</div>
-      <h1>ANNEX-108 — Field mapping M365/List, content type, lookup, xác nhận rule và source of record</h1>
-      <div class="section"><h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2><p style="margin:8px 0;">ANNEX này chuẩn hóa field mapping cho M365/List, content type, lookup, xác nhận rule và ranh giới SoR/SSOT. Mục tiêu là tránh sinh nhiều danh mục dữ liệu rời, tránh nhập tay lặp, tránh mâu thuẫn giữa Epicor và M365.</p><div class="callout"><strong>QUY TẮC CỨNG</strong>: giao dịch nằm ở Epicor thì không tái tạo giao dịch ở M365. M365 chỉ tham chiếu và điều khiển record/evidence/quyết định. Mọi list phải dùng khóa tự nhiên và value set chuẩn.</div></div><div class="section"><h2>2. Quy tắc nền SoR / SSOT / link-not-copy</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Hạng mục</th><th>Quy định bắt buộc</th></tr></thead><tbody><tr><td>Nguồn chuẩn (giao dịch)</td><td>Epicor Kinetic là SoR duy nhất cho Job, Labor/Time, Inventory giao dịch, PO/Receipt, Shipment/xác nhận delivery (ship confirm).</td></tr><tr><td>Evidence/Record SSOT</td><td>M365 SharePoint là SSOT cho record/evidence; áp nhãn lưu theo sự kiện (event-based) và legal hold theo SOP-QMS-013.</td></tr><tr><td>Link-not-copy</td><td>List item phải lưu EvidenceUrl trỏ tới file SSOT; file phải được link-not-copy; không copy qua nhiều thư viện.</td></tr></tbody></table></div></div><div class="section"><h2>3. Common Field Dictionary dùng chung toàn hệ thống</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Internal name</th><th>Hiển thị</th><th>Kiểu</th><th>Bắt buộc</th><th>Quy tắc/giá trị</th></tr></thead><tbody><tr><td>RecordType</td><td>Loại record</td><td>Choice</td><td>Có</td><td>Chỉ dùng bộ mã “RecordTypeCodes”.</td></tr><tr><td>RecordCode</td><td>Mã record</td><td>Single line</td><td>Có</td><td>Format: QMS-<TYPE>-YYYY-NNNN hoặc theo mã document liên quan.</td></tr><tr><td>Trạng thái</td><td>Trạng thái</td><td>Choice</td><td>Có</td><td>Chỉ dùng “StatusCodes”. Không dùng text tự do.</td></tr><tr><td>Responsible Person</td><td>Chủ xử lý</td><td>Person</td><td>Có</td><td>1 người chịu trách nhiệm chính.</td></tr><tr><td>Approver</td><td>Approver</td><td>Person</td><td>Theo luồng</td><td>Luồng phải ghi nhận Approver khi tạo Approval.</td></tr><tr><td>EventDate</td><td>Ngày sự kiện</td><td>Date</td><td>Có</td><td>Ngày kích hoạt retention event. Không được để trống.</td></tr><tr><td>EpicorCompany</td><td>Công ty (Epicor)</td><td>Single line</td><td>Có</td><td>Giá trị cố định theo tenant/plant.</td></tr><tr><td>Plant</td><td>Nhà máy</td><td>Single line</td><td>Có</td><td>Ví dụ: HES-CNC.</td></tr><tr><td>JobNum</td><td>Mã Job</td><td>Single line</td><td>Theo record</td><td>Chỉ ghi tham chiếu; dữ liệu Job là SoR trong Epicor.</td></tr><tr><td>PONum</td><td>Mã PO</td><td>Number/String</td><td>Theo record</td><td>Chỉ ghi tham chiếu; trạng thái PO là SoR trong Epicor.</td></tr><tr><td>PartNum</td><td>Mã vật tư/chi tiết</td><td>Single line</td><td>Theo record</td><td>Chỉ ghi tham chiếu.</td></tr><tr><td>CustomerID</td><td>Mã customer</td><td>Single line</td><td>Theo record</td><td>Chỉ ghi tham chiếu.</td></tr><tr><td>SupplierID</td><td>Mã NCC</td><td>Single line</td><td>Theo record</td><td>Chỉ ghi tham chiếu.</td></tr><tr><td>EvidenceUrl</td><td>Link evidence</td><td>Hyperlink</td><td>Có</td><td>Trỏ tới file trong SSOT library. Không dùng link cá nhân OneDrive.</td></tr><tr><td>SSOTPath</td><td>Đường dẫn SSOT</td><td>Single line</td><td>Có</td><td>Format: M365: <Site>/<Library>/<Zone>/<Path>.</td></tr><tr><td>RetentionLabel</td><td>Nhãn lưu</td><td>Choice</td><td>Có</td><td>Chỉ dùng nhãn trong retention-label-plan.csv.</td></tr><tr><td>LegalHoldFlag</td><td>Legal hold</td><td>Yes/No</td><td>Có</td><td>Luồng chỉ được set theo tín hiệu hold từ Purview/Legal.</td></tr><tr><td>FlowRunId</td><td>Mã chạy Luồng</td><td>Single line</td><td>Có</td><td>Power Automate phải ghi nhận cho mọi cập nhật.</td></tr></tbody></table></div><p style="margin:8px 0;">Các field choice phải dùng chung value set. Không được để cùng một khái niệm nhưng mỗi list dùng một bộ mã khác nhau.</p></div><div class="section"><h2>4. Danh mục List / Register tối thiểu phải có</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>List</th><th>Register/Phạm vi</th><th>Khoá tự nhiên</th><th>Responsible Person</th><th>SSOT (List location)</th><th>Retention trigger (event-based)</th></tr></thead><tbody><tr><td>QMS-Document-Register</td><td>Danh mục document kiểm soát</td><td>DocCode + Revision</td><td>QA/QMS</td><td>M365: CNC-IMS-HUB/Lists/QMS-Document-Register</td><td>SupersededDate (khi release revision thay thế) + tối thiểu 10 năm</td></tr><tr><td>QMS-Change-Register</td><td>Đề nghị thay đổi (DCR/ECR)</td><td>ChangeId</td><td>QA/QMS</td><td>M365: CNC-IMS-HUB/Lists/QMS-Change-Register</td><td>ClosedDate (khi đóng thay đổi) + tối thiểu 7 năm</td></tr><tr><td>QMS-NCR-Register</td><td>Nonconformance (NCR)</td><td>NCRId</td><td>QA/QC</td><td>M365: CNC-IMS-HUB/Lists/QMS-NCR-Register</td><td>DispositionApprovedDate (khi approval xử lý) + tối thiểu 10 năm</td></tr><tr><td>QMS-CAPA-Register</td><td>CAPA</td><td>CAPAId</td><td>QA/QMS</td><td>M365: CNC-IMS-HUB/Lists/QMS-CAPA-Register</td><td>EffectivenessVerifiedDate (khi xác nhận hiệu lực) + tối thiểu 10 năm</td></tr><tr><td>OPS-Job-Dossier-Index</td><td>Chỉ mục Job dossier (job dossier) (không chứa giao dịch)</td><td>Company + Plant + JobNum</td><td>Production</td><td>M365: CNC-IMS-HUB/Lists/OPS-Job-Dossier-Index</td><td>JobClosedDate (lấy từ Epicor) + tối thiểu 3 năm</td></tr><tr><td>PUR-Supplier-Register</td><td>Danh mục NCC + đánh giá</td><td>SupplierID</td><td>Purchasing</td><td>M365: CNC-IMS-HUB/Lists/PUR-Supplier-Register</td><td>SupplierOffboardDate (khi ngừng NCC) + tối thiểu 7 năm</td></tr><tr><td>IT-Automation-Run-Log</td><td>Log chạy Luồng/Integration</td><td>RunId</td><td>IT</td><td>M365: CNC-IMS-HUB/Lists/IT-Automation-Run-Log</td><td>RunDate (ngày chạy) + tối thiểu 12 tháng</td></tr></tbody></table></div><p style="margin:8px 0;">Mỗi register phải có người phụ trách, khóa tự nhiên, retention trigger và nơi lưu SSOT rõ ràng. Không cho phép list 'tạm' hoạt động lâu dài mà không vào catalog.</p></div><div class="section"><h2>5. Mapping tham chiếu với Epicor</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Epicor entity (SoR)</th><th>Khoá/thuộc tính</th><th>M365 field</th><th>Hướng dữ liệu</th><th>Ghi chú bắt buộc</th></tr></thead><tbody><tr><td>JobHead</td><td>JobNum, PartNum, ReqDueDate, JobClosed</td><td>JobNum, PartNum, DueDate, JobStatus</td><td>Epicor → M365</td><td>JobStatus chỉ dùng cho hiển thị/điều kiện nhắc việc; release/close là giao dịch trong Epicor.</td></tr><tr><td>JobOper</td><td>AssemblySeq, OprSeq, OpComplete</td><td>AssemblySeq, OprSeq, OperationStatus</td><td>Epicor → M365</td><td>Không tạo “bảng chấm công” trong M365.</td></tr><tr><td>PORel/POHeader</td><td>PONum, OpenOrder, Approved</td><td>PONum, POStatus</td><td>Epicor → M365</td><td>Approval PO là giao dịch trong Epicor; M365 chỉ lưu record approval nội bộ (nếu có).</td></tr><tr><td>Part</td><td>PartNum, Description, UOM</td><td>PartNum, PartDesc, UOM</td><td>Epicor → M365</td><td>Chỉ tham chiếu.</td></tr><tr><td>Customer</td><td>CustID, Name</td><td>CustomerID, CustomerName</td><td>Epicor → M365</td><td>Chỉ tham chiếu.</td></tr><tr><td>Vendor</td><td>VendorID, Name</td><td>SupplierID, SupplierName</td><td>Epicor → M365</td><td>Chỉ tham chiếu.</td></tr><tr><td>Shipment/Pack</td><td>PackNum, ShipDate, Shipped</td><td>PackNum, ShipDate, ShipStatus</td><td>Epicor → M365</td><td>xác nhận delivery là giao dịch trong Epicor.</td></tr></tbody></table></div><div class="callout">Khi Epicor là SoR, M365 chỉ đọc/nhận tham chiếu. Người dùng không được sửa trạng thái Job, PO, Shipment, Labor ở M365 để thay cho giao dịch.</div></div><div class="section"><h2>6. Kế hoạch nhãn lưu và event-based retention</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Retention label</th><th>Áp dụng cho</th><th>Sự kiện kích hoạt</th><th>Tối thiểu</th><th>Record declaration</th></tr></thead><tbody><tr><td>QMS-CTRL-10Y-After-Superseded</td><td>Controlled documents</td><td>SupersededDate</td><td>10 năm</td><td>Không</td></tr><tr><td>QMS-NCR-10Y-After-Disposition</td><td>NCR register + evidence</td><td>DispositionApprovedDate</td><td>10 năm</td><td>Có (Tier 1)</td></tr><tr><td>QMS-CAPA-10Y-After-Effectiveness</td><td>CAPA register + evidence</td><td>EffectivenessVerifiedDate</td><td>10 năm</td><td>Có (Tier 1)</td></tr><tr><td>OPS-JOB-3Y-After-Closed</td><td>Job dossier (Record zone)</td><td>JobClosedDate (Epicor)</td><td>3 năm</td><td>Không</td></tr><tr><td>IT-RUNLOG-12M-After-Run</td><td>Automation run log</td><td>RunDate</td><td>12 tháng</td><td>Không</td></tr></tbody></table></div><p style="margin:8px 0;">Retention trigger phải bám sự kiện nghiệp vụ như SupersededDate, JobClosedDate, DispositionApprovedDate, ShipConfirm; không dùng mốc tạo file nếu không thật sự cần.</p></div><div class="section"><h2>7. Register mở rộng phải quản trị cùng một chuẩn dữ liệu</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>List/Register</th><th>Mục đích</th><th>Trường bắt buộc</th><th>Liên kết</th></tr></thead><tbody><tr><td>Context-Interested-Parties Register</td><td>Quản trị FRM-QMS-020/023</td><td>Period, Party, Requirement, Decision, Responsible Person, Review date, Evidence link</td><td>FRM-QMS-020 • FRM-QMS-021</td></tr><tr><td>Communications Register</td><td>Kế hoạch và log truyền thông</td><td>CommID, Topic, Audience, Channel, Responsible Person, Due, Trạng thái, Evidence link</td><td>FRM-QMS-018 • FRM-QMS-018 (Log)</td></tr><tr><td>Contingency Events Register</td><td>Log gián đoạn và hành động khôi phục</td><td>EventID, Severity, Start/End, Impact, Holds, Recovery actions, Approval</td><td>FRM-QMS-019</td></tr><tr><td>QPL Register</td><td>Quy tắc QPL theo customer/part</td><td>Customer/Part, QPL, Triggers, Required record</td><td>ANNEX-603</td></tr><tr><td>Control Plan Register</td><td>Control Plan theo job/part</td><td>CP-ID, Part, Rev, CTQ, Sampling, Reaction plan, Trạng thái</td><td>FRM-QA-012</td></tr><tr><td>PFMEA-lite Register</td><td>PFMEA-lite theo job/part</td><td>PF-ID, Process step, Failure mode, S/O/D, Actions, Xác minh</td><td>FRM-QA-013</td></tr><tr><td>SPC/Capability Register</td><td>SPC log cho CTQ/job lặp</td><td>SPC-ID, CTQ, Subgroup, Cpk, Reaction plan, Trạng thái</td><td>FRM-QA-014</td></tr></tbody></table></div></div><div class="section"><h2>8. Rule thiết kế list mới hoặc sửa list đang chạy</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Điểm kiểm</th><th>Requirement bắt buộc</th></tr></thead><tbody><tr><td>Tên list</td><td>Theo chuẩn dễ nhận biết, có người phụ trách, có phạm vi, không viết tắt khó hiểu</td></tr><tr><td>Khóa tự nhiên</td><td>Phải xác định ngay từ đầu; không chờ tới khi trùng dữ liệu mới xử lý</td></tr><tr><td>Lookup</td><td>Chỉ dùng tới list chuẩn; không tạo lookup vòng lặp phức tạp làm chậm operation</td></tr><tr><td>Xác nhận</td><td>Field bắt buộc, format, choice code, logic ngày-thời gian phải được cấu hình trước khi go-live</td></tr><tr><td>EvidenceUrl</td><td>List điều hành bắt buộc có trường link về SSOT nếu quyết định dựa trên record/evidence</td></tr><tr><td>Change control</td><td>Mọi thay đổi field/list đang dùng thật phải qua approval và có test trước khi lên PROD</td></tr></tbody></table></div><ul style="padding-left:20px; margin:8px 0;"><li>Không tạo trường tự do để 'ghi cho tiện' nếu có thể dùng choice/look-up chuẩn.</li><li>Không cho phép xóa field đang có dữ liệu hoạt động mà không có kế hoạch migration.</li><li>Khi đổi internal name, phải đánh giá ảnh hưởng tới Luồng, Bảng điều khiển, export và training.</li></ul></div><div class="section"><h2>9. Responsible Person và cơ chế cập nhật</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Hạng mục</th><th>Responsible Person chính</th><th>Người phối hợp</th></tr></thead><tbody><tr><td>Common Field Dictionary</td><td>QMS/IT</td><td>Tất cả Process Owner</td></tr><tr><td>List Catalog</td><td>QMS</td><td>IT + Process Owner</td></tr><tr><td>Epicor reference mapping</td><td>IT/ERP</td><td>Planning + QA + Finance + Purchasing</td></tr><tr><td>Retention label plan</td><td>QMS/IT</td><td>Legal/Management khi áp dụng</td></tr></tbody></table></div></div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi tạo mới hoặc sửa M365 List/Register, content type, form, Power Automate flow, dashboard, integration và metadata schema cho toàn bộ QMS số hóa. ANNEX này là nguồn chuẩn cho internal name, choice code, list catalog, lookup source, validation rule và source-of-record boundary.</div>
+      <h1>ANNEX-108 — Field mapping M365/List, value set, register catalog và source of record</h1>
+
+      <div class="section">
+        <h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
+        <p style="margin:8px 0;">ANNEX này chuẩn hóa field mapping cho M365/List, content type, lookup, xác nhận rule và source-of-record cho toàn bộ record model cấp công ty, cấp phòng ban, cấp nhân sự, cấp job và cấp hệ thống số. Mục tiêu là loại bỏ dữ liệu rời, loại bỏ bộ mã trùng nghĩa, khóa logic provisioning của <span class="code">ANNEX-125</span> vào cùng một từ điển dữ liệu và đảm bảo mọi list/register đều có owner, khóa tự nhiên, retention trigger và linkage tới SSOT rõ ràng.</p>
+        <div class="keyline"><strong>Quy tắc cứng:</strong> Epicor là SoR cho giao dịch Job, Inventory, PO/Receipt, Shipment, Labor và master data giao dịch. M365 không tái tạo giao dịch để thay thế Epicor. M365 lưu record điều hành, evidence, approval, metadata chỉ mục, decision pack và logs điều khiển.</div>
+      </div>
+
+      <div class="section">
+        <h2>2. SoR, SSOT và link-not-copy</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Hạng mục</th><th>Quy định bắt buộc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Epicor SoR</td><td>Job, Labor/Time, Inventory transactions, PO/Receipt, Shipment confirmation, customer/vendor masters, transactional status.</td></tr>
+              <tr><td>M365 SSOT</td><td>Controlled documents, quality evidence, job dossier evidence, training evidence, department operating packs, people dossiers, admin system records.</td></tr>
+              <tr><td>Link-not-copy</td><td>List item phải lưu <span class="code">EvidenceUrl</span> hoặc <span class="code">ProvisionedUrl</span> trỏ tới file/folder SSOT. Không copy bản trùng giữa <span class="code">04-Training-Records</span>, <span class="code">08-People-Records</span>, <span class="code">03-Job-Dossiers</span>, <span class="code">09-Digital-System-Records</span> và <span class="code">Part-REV-Master</span>.</td></tr>
+              <tr><td>Restricted data</td><td>Payroll, legal, discipline, medical, admin security records và guest share logs dùng confidentiality class riêng và group-based access riêng.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>3. Common field dictionary dùng chung toàn hệ thống</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Internal name</th><th>Hiển thị</th><th>Kiểu</th><th>Bắt buộc</th><th>Quy tắc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>RecordType</td><td>Loại record</td><td>Choice</td><td>Có</td><td>Dùng đúng bộ mã <span class="code">RecordTypeCodes</span>.</td></tr>
+              <tr><td>RecordCode</td><td>Mã record</td><td>Single line</td><td>Theo record</td><td>Không tự phát sinh theo text tự do nếu đã có khóa chuẩn.</td></tr>
+              <tr><td>StatusCode</td><td>Trạng thái</td><td>Choice</td><td>Có</td><td>Dùng <span class="code">StatusCodes</span>; không nhập text tự do.</td></tr>
+              <tr><td>ResponsiblePerson</td><td>Chủ xử lý</td><td>Person</td><td>Có</td><td>1 owner chính, không bỏ trống.</td></tr>
+              <tr><td>Approver</td><td>Approver</td><td>Person</td><td>Theo luồng</td><td>Approval flow ghi nhận approver thực tế.</td></tr>
+              <tr><td>EventDate</td><td>Ngày sự kiện</td><td>Date</td><td>Theo record</td><td>Dùng cho milestone nghiệp vụ, không thay cho trigger retention.</td></tr>
+              <tr><td>TriggerEventDate</td><td>Ngày kích hoạt retention</td><td>Date</td><td>Theo record</td><td>Bắt buộc khi retention chạy theo event.</td></tr>
+              <tr><td>JobNum</td><td>Mã Job</td><td>Single line</td><td>Theo record</td><td>Chỉ tham chiếu từ Epicor.</td></tr>
+              <tr><td>PartNum</td><td>Mã part</td><td>Single line</td><td>Theo record</td><td>Không tự tạo part master ở list.</td></tr>
+              <tr><td>Revision</td><td>Revision</td><td>Single line</td><td>Theo record</td><td>Dùng giá trị release đã được duyệt.</td></tr>
+              <tr><td>CustomerID</td><td>Mã khách hàng</td><td>Single line</td><td>Theo record</td><td>Chỉ tham chiếu.</td></tr>
+              <tr><td>SupplierID</td><td>Mã nhà cung cấp</td><td>Single line</td><td>Theo record</td><td>Chỉ tham chiếu.</td></tr>
+              <tr><td>EvidenceUrl</td><td>Link evidence</td><td>Hyperlink</td><td>Theo record</td><td>Trỏ tới file SSOT trong controlled libraries.</td></tr>
+              <tr><td>SSOTPath</td><td>Đường dẫn SSOT</td><td>Single line</td><td>Theo record</td><td>Ghi path đầy đủ theo taxonomy chuẩn.</td></tr>
+              <tr><td>RetentionLabel</td><td>Nhãn lưu</td><td>Choice</td><td>Có</td><td>Chỉ dùng nhãn trong label plan đã phát hành.</td></tr>
+              <tr><td>LegalHoldFlag</td><td>Legal hold</td><td>Yes/No</td><td>Có</td><td>Chỉ thay đổi qua control đã được phê duyệt.</td></tr>
+              <tr><td>FlowRunId</td><td>Mã chạy luồng</td><td>Single line</td><td>Theo luồng</td><td>Bắt buộc với mọi automation write-back.</td></tr>
+              <tr><td>ProvisionedUrl</td><td>URL đầu ra</td><td>Hyperlink</td><td>Theo request</td><td>Link tới folder/library/package được tạo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>4. Extended field dictionary cho provisioning enterprise</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Internal name</th><th>Hiển thị</th><th>Kiểu</th><th>Bắt buộc</th><th>Áp dụng</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>RequestType</td><td>Loại yêu cầu</td><td>Choice</td><td>Có</td><td>Provisioning, external share, archive, exception</td></tr>
+              <tr><td>LibraryCode</td><td>Library</td><td>Choice</td><td>Có</td><td>Provisioning requests, zone catalogs</td></tr>
+              <tr><td>RecordZone</td><td>Vùng record</td><td>Choice</td><td>Có</td><td>Provisioning requests, catalog, archive log</td></tr>
+              <tr><td>DeptCode</td><td>Mã phòng ban</td><td>Choice</td><td>Theo record</td><td>Department records, employee records, approval routing</td></tr>
+              <tr><td>FunctionArea</td><td>Phân vùng chức năng</td><td>Choice</td><td>Theo record</td><td>Dashboard, zone catalog, reports</td></tr>
+              <tr><td>SystemArea</td><td>Khu hệ thống</td><td>Choice</td><td>Theo request</td><td>09-Digital-System-Records</td></tr>
+              <tr><td>ConfidentialityClass</td><td>Mức nhạy cảm</td><td>Choice</td><td>Có</td><td>Tất cả request/list controlled</td></tr>
+              <tr><td>PrimaryOwnerGroup</td><td>Nhóm sở hữu chính</td><td>Single line</td><td>Theo request</td><td>Provisioning requests, zone catalogs</td></tr>
+              <tr><td>SecondaryOwnerGroup</td><td>Nhóm phối hợp</td><td>Single line</td><td>Theo request</td><td>Provisioning requests</td></tr>
+              <tr><td>ArchiveState</td><td>Trạng thái archive</td><td>Choice</td><td>Theo archive</td><td>Archive register</td></tr>
+              <tr><td>EmployeeID</td><td>Mã nhân viên</td><td>Single line</td><td>Theo people record</td><td>People dossiers, training links</td></tr>
+              <tr><td>EmploymentStatus</td><td>Trạng thái nhân sự</td><td>Choice</td><td>Theo people record</td><td>People dossiers</td></tr>
+              <tr><td>PersonRecordClass</td><td>Phân loại hồ sơ cá nhân</td><td>Choice</td><td>Theo people record</td><td>Employee, contractor, visitor, former employee</td></tr>
+              <tr><td>Population</td><td>Population</td><td>Choice</td><td>Theo people record</td><td>Contractor, intern, visitor, vendor access</td></tr>
+              <tr><td>ExpiryDate</td><td>Ngày hết hạn</td><td>Date</td><td>Theo share/exception</td><td>External share, permission exception</td></tr>
+              <tr><td>ExceptionReasonCode</td><td>Mã lý do ngoại lệ</td><td>Choice</td><td>Theo exception</td><td>Permission, sealed copy, archive reopen</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>5. Value set chuẩn dùng thống nhất</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Bộ mã</th><th>Giá trị bắt buộc</th><th>Ghi chú</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>DeptCodeCodes</td><td>EXEC, QMS, QA, ENG, PRO, SCM, SAL, FIN, HR, EHS, IT, ERP</td><td>Không dùng biến thể tự đặt như Sales, Production, Warehouse nếu chưa map chính thức.</td></tr>
+              <tr><td>LibraryCodes</td><td>01-QMS-Records, 02-Quality-Records, 03-Job-Dossiers, 04-Training-Records, 05-Department-Records, 06-Archive, 07-Templates-Working, 08-People-Records, 09-Digital-System-Records, Part-REV-Master</td><td>Khớp taxonomy trong <span class="code">ANNEX-116</span>.</td></tr>
+              <tr><td>RequestTypeCodes</td><td>CreateCompanyRecordZone, CreateDepartmentZone, CreateDepartmentYearFolder, CreateJobDossier, CreateEmployeeDossier, CreateContractorDossier, CreateVisitorAccessRecord, CreateSystemRecordZone, ExternalSharePackage, ArchiveLock, PermissionException</td><td>Khớp orchestration trong <span class="code">ANNEX-125</span>.</td></tr>
+              <tr><td>RecordZoneCodes</td><td>CompanyGovernance, QualityFormal, JobDossier, TrainingSSOT, DepartmentOperations, PeopleRestricted, SystemAdmin, ArchiveLocked, TemplateWorking, PartMaster</td><td>Dùng cho catalog, dashboard và provisioning logic.</td></tr>
+              <tr><td>FunctionAreaCodes</td><td>Governance, Operations, RegistersLogs, ProjectsImprovement, InterfacesReleasedPacks, RestrictedPeople, SystemAdministration</td><td>Không tạo label trùng nghĩa.</td></tr>
+              <tr><td>ConfidentialityClassCodes</td><td>Public-Controlled, Internal-Controlled, Confidential, Restricted-People, Restricted-Payroll, Restricted-Medical, Restricted-SystemAdmin, External-Package</td><td>Map với sensitivity label và permission model.</td></tr>
+              <tr><td>EmploymentStatusCodes</td><td>Active, Probation, Leave, Suspended, Terminated, Contractor, Intern, Visitor</td><td>Dùng cho people dossiers và onboarding/offboarding workflow.</td></tr>
+              <tr><td>PersonRecordClassCodes</td><td>Employee, FormerEmployee, Contractor, Intern, Visitor, VendorAccess, TemporaryWorker</td><td>Điều khiển folder path và retention logic.</td></tr>
+              <tr><td>SystemAreaCodes</td><td>AccessIdentity, M365Config, EpicorRoleMasterData, DeploymentCutover, BackupRecovery, IncidentProblem, AssetEndpoint, AutomationRunLogs</td><td>Điều khiển path trong <span class="code">09-Digital-System-Records</span>.</td></tr>
+              <tr><td>StatusCodes</td><td>Requested, InReview, Approved, InProgress, Provisioned, Failed, Closed, Expired, Locked, ExceptionOpen, ExceptionClosed</td><td>Dùng cho request/approval/register vận hành.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>6. Danh mục list / register tối thiểu phải có</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>List / Register</th><th>Phạm vi</th><th>Khoá tự nhiên</th><th>Responsible</th><th>Retention trigger</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>QMS-Document-Register</td><td>Controlled document register</td><td>DocCode + Revision</td><td>QMS</td><td>SupersededDate</td></tr>
+              <tr><td>QMS-Change-Register</td><td>System and process changes</td><td>ChangeId</td><td>QMS</td><td>ClosedDate</td></tr>
+              <tr><td>QMS-NCR-Register</td><td>NCR cases</td><td>NCRId</td><td>QA</td><td>DispositionApprovedDate</td></tr>
+              <tr><td>QMS-CAPA-Register</td><td>CAPA cases</td><td>CAPAId</td><td>QMS</td><td>EffectivenessVerifiedDate</td></tr>
+              <tr><td>OPS-Job-Dossier-Index</td><td>Dossier index for all jobs</td><td>Company + Plant + JobNum</td><td>Planning</td><td>JobClosedDate</td></tr>
+              <tr><td>QMS-Training-Register</td><td>Training event and evidence register</td><td>TrainingCode + SessionDate</td><td>HR / QA</td><td>TrainingEventDate or employee separation per rule</td></tr>
+              <tr><td>QMS-Competence-Matrix</td><td>Competence and qualification index</td><td>EmployeeID + SkillCode</td><td>HR / Dept owner</td><td>Employee separation or superseded qualification</td></tr>
+              <tr><td>PUR-Supplier-Register</td><td>Supplier qualification and scorecard</td><td>SupplierID</td><td>SCM</td><td>SupplierOffboardDate</td></tr>
+              <tr><td>M365-Record-Provisioning-Requests</td><td>All provisioning requests</td><td>RequestId</td><td>IT / QMS</td><td>ClosedDate</td></tr>
+              <tr><td>Department-Zone-Catalog</td><td>Catalog of department zones</td><td>DeptCode + Year + RecordZone</td><td>QMS</td><td>SupersededDate or archive event</td></tr>
+              <tr><td>People-Dossier-Index</td><td>People dossier index</td><td>EmployeeID or PopulationKey</td><td>HR</td><td>EmploymentEndDate or visit end</td></tr>
+              <tr><td>System-Record-Request-Log</td><td>System-area provisioning and admin requests</td><td>SystemReqId</td><td>IT / ERP</td><td>ClosedDate</td></tr>
+              <tr><td>External-Share-Approval-Log</td><td>All external shares and guest links</td><td>ShareRequestId</td><td>QMS / IT</td><td>ExpiryDate or revoke date</td></tr>
+              <tr><td>Archive-Lock-Register</td><td>Archive lock and reopen log</td><td>ArchiveLockId</td><td>QMS</td><td>TriggerEventDate</td></tr>
+              <tr><td>Automation-Run-Log</td><td>Flow run and retry log</td><td>RunId</td><td>IT</td><td>RunDate</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>7. Mapping tham chiếu với Epicor</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Epicor entity</th><th>Khoá/thuộc tính</th><th>M365 field</th><th>Hướng dữ liệu</th><th>Rule</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>JobHead</td><td>JobNum, PartNum, ReqDueDate, JobClosed</td><td>JobNum, PartNum, DueDate, JobStatus</td><td>Epicor → M365</td><td>Chỉ dùng hiển thị, điều kiện workflow và retention trigger.</td></tr>
+              <tr><td>JobOper</td><td>AssemblySeq, OprSeq, OpComplete</td><td>AssemblySeq, OprSeq, OperationStatus</td><td>Epicor → M365</td><td>Không lập bảng chấm công M365 thay cho giao dịch labor.</td></tr>
+              <tr><td>POHeader / PORel</td><td>PONum, OpenOrder, Approved</td><td>PONum, POStatus</td><td>Epicor → M365</td><td>M365 chỉ lưu local follow-up, approval pack và evidence.</td></tr>
+              <tr><td>Part</td><td>PartNum, Description, UOM</td><td>PartNum, PartDesc, UOM</td><td>Epicor → M365</td><td>Part baseline master ở <span class="code">Part-REV-Master</span>; không tạo shadow master trong list.</td></tr>
+              <tr><td>Customer</td><td>CustID, Name</td><td>CustomerID, CustomerName</td><td>Epicor → M365</td><td>Chỉ tham chiếu.</td></tr>
+              <tr><td>Vendor</td><td>VendorID, Name</td><td>SupplierID, SupplierName</td><td>Epicor → M365</td><td>Chỉ tham chiếu.</td></tr>
+              <tr><td>Shipment / Pack</td><td>PackNum, ShipDate, Shipped</td><td>PackNum, ShipDate, ShipStatus</td><td>Epicor → M365</td><td>Shipment confirmation vẫn là giao dịch trong Epicor.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>8. Rule thiết kế list mới hoặc thay đổi list đang chạy</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Điểm kiểm</th><th>Requirement bắt buộc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Tên list</td><td>Phải phản ánh rõ phạm vi và owner; không tạo list “temp”, “misc”, “other”.</td></tr>
+              <tr><td>Khóa tự nhiên</td><td>Phải xác định ngay khi thiết kế; không chờ tới lúc phát sinh trùng dữ liệu.</td></tr>
+              <tr><td>Choice / lookup</td><td>Dùng đúng value set chuẩn hoặc lookup vào catalog chuẩn; không dựng choice riêng cho cùng một khái niệm.</td></tr>
+              <tr><td>Validation</td><td>Field bắt buộc, logic ngày, regex mã và cross-field rules phải hoàn tất trước go-live.</td></tr>
+              <tr><td>Evidence linking</td><td>List điều hành dựa trên record/evidence phải có <span class="code">EvidenceUrl</span> hoặc <span class="code">ProvisionedUrl</span>.</td></tr>
+              <tr><td>Change control</td><td>Mọi thay đổi field/list/flow đang chạy thật phải có approval, test chứng minh và rollback plan.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>9. Ownership và chu kỳ cập nhật ANNEX này</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Hạng mục</th><th>Owner chính</th><th>Đồng kiểm</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Common / extended field dictionary</td><td>QMS / IT</td><td>Process owners</td></tr>
+              <tr><td>Value set catalog</td><td>QMS</td><td>IT / Department heads</td></tr>
+              <tr><td>Provisioning register catalog</td><td>QMS / IT</td><td>HR / ERP / Finance theo phạm vi</td></tr>
+              <tr><td>Epicor reference mapping</td><td>IT / ERP</td><td>Planning / QA / SCM / Finance</td></tr>
+              <tr><td>Retention-related field governance</td><td>QMS</td><td>IT / Management</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
-<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

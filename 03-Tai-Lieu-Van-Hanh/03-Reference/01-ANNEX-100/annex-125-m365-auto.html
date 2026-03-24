@@ -3,36 +3,39 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-125 — M365 Automation Model | HESEM QMS</title>
+<title>ANNEX-125 — Kiến trúc provisioning M365 cho toàn công ty, phòng ban, nhân sự và record vận hành | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
 @media print {
- .card, .table-card, .callout, .note, .box, .iso-map, .lane, .legend, .req, .auth-grid, .backup-grid { break-inside: avoid; page-break-inside: avoid; }
- h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
- tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+  .card, .table-card, .callout, .note, .box, .keyline, .figure-box { break-inside: avoid; page-break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  tr, td, th { break-inside: avoid; page-break-inside: avoid; }
 }
-.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
-.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
-.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
-.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
-.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
-.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
-.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
-.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
+.page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color:var(--navy);}
+.page-body h3 {font-size:14px; line-height:1.5; margin:12px 0 6px; color:var(--ink);}
+.table-card table {width:100%; border-collapse:collapse; font-size:12px;}
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align:top;}
+.table-card th {background:var(--th-bg); border-color:var(--th-bdr); text-align:left;}
 .two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
-.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
-.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius:var(--r); background:#fcfcfd;}
+.code {font-family:var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.path {font-family:var(--mono); font-size:11px; color:var(--ink2);}
+.muted {color:var(--ink2); font-size:12px;}
 .figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
-.step-list {counter-reset: step; margin: 10px 0;}
-.step-item {position:relative; padding-left:40px; margin:12px 0;}
-.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
-@media (max-width: 960px; width: 100%; box-sizing: border-box) { .two-col, .kpi-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+.section ul {margin:8px 0; padding-left:20px;}
+@media (max-width:960px) {
+  .two-col, .three-col {grid-template-columns:1fr;}
+  .page-body {padding:24px 18px 36px;}
+}
 </style>
 </head>
 <body>
 <div class="container">
   <div class="page">
     <div class="page-body">
+
 <div class="form-header">
   <div class="fh-left">
     <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
@@ -41,60 +44,351 @@
       <span>Document operation • Annex số hóa</span>
     </div>
   </div>
-  <div class="title"><strong>ANNEX-125 — Kiến trúc tự động tạo thư mục record, phân quyền, retention và chia sẻ có kiểm soát trên M365</strong></div>
+  <div class="title"><strong>ANNEX-125 — Kiến trúc provisioning M365 cho toàn công ty, phòng ban, nhân sự và record vận hành</strong></div>
   <div class="meta">
     <div class="row"><span><b>Code:</b></span><span>ANNEX-125</span></div>
-    <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+    <div class="row"><span><b>Version:</b></span><span>V2</span></div>
     <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
     <div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Administrator</span></div>
     <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
   </div>
 </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết kế, triển khai, kiểm thử, go-live và đánh giá mô hình tự động tạo nơi lưu record, job dossier, quyền truy cập, retention label, external sharing và archive control trên M365/SharePoint.</div>
-      <h1>ANNEX-125 — Kiến trúc tự động tạo thư mục record, phân quyền, retention và chia sẻ có kiểm soát trên M365</h1>
 
-      <div class="section"><h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2><p style="margin:8px 0;">ANNEX này hướng dẫn chi tiết cách thiết kế một mô hình M365 tự động hóa để người dùng chỉ cần gửi requirement hoặc điền form, còn hệ thống sẽ tự chọn đúng library, đúng cấu trúc thư mục, đúng metadata, đúng quyền, đúng retention và đúng cơ chế chia sẻ. Mục tiêu là loại bỏ việc tạo folder thủ công không kiểm soát, cấp quyền bằng tay, gửi link tùy ý và lưu record sai chỗ.</p><div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: mọi record phải đi vào đúng SSOT theo <a href="annex-116-m365-folder-structure-blueprint.html">ANNEX-116</a>; mọi quyền phải đi qua role/group thay vì cấp rời cho từng user; mọi external share phải có approval, expiry date và run log; mọi record phải truy ra được theo mục tiêu của <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> và <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>.</div><div class="keyline"><strong>Ranh giới document:</strong> ANNEX-125 là document <b>thiết kế triển khai và orchestration</b>. Ma trận trần quyền chuẩn nằm tại <a href="annex-101-role-based-access-map.html">ANNEX-101</a>. Dictionary field/list chuẩn nằm tại <a href="annex-108-m365-lists-and-field-mapping.html">ANNEX-108</a>. Folder blueprint, naming và retention chuẩn nằm tại <a href="annex-116-m365-folder-structure-blueprint.html">ANNEX-116</a>. Nếu có khác biệt, các annex nguồn này luôn được ưu tiên.</div></div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết kế, build, kiểm thử và vận hành cơ chế tạo library, folder, permission, retention, metadata, request form và approval flow cho toàn bộ company record trên M365. ANNEX này điều khiển cách hệ thống tự tạo đúng chỗ lưu cho record cấp công ty, cấp phòng ban, cấp nhân sự, cấp job và cấp hệ thống số.</div>
+      <h1>ANNEX-125 — Kiến trúc provisioning M365 cho toàn công ty, phòng ban, nhân sự và record vận hành</h1>
 
-      <div class="section"><h2>2. Nguyên tắc kiến trúc không được vi phạm</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Nguyên tắc</th><th>Quy định bắt buộc</th></tr></thead><tbody><tr><td>Single Source of Truth</td><td>Không cho phép một loại record có hai nơi lưu chính thức hoạt động song song. SharePoint là SSOT của record số; Epicor là SoR của giao dịch nghiệp vụ.</td></tr><tr><td>Automation before manual</td><td>Người dùng không tự tạo cấu trúc record mới trong production nếu loại record đó đã được map trong hệ thống requirement tự động.</td></tr><tr><td>Role-based access</td><td>Không cấp quyền trực tiếp cho cá nhân. Quyền phải được cấp qua SharePoint Group, Entra Group hoặc nhóm vai trò đã được duyệt.</td></tr><tr><td>Least privilege</td><td>Chỉ cấp quyền đọc/sửa đúng theo vai trò, đúng khu vực, đúng thời gian và đúng mục đích. Guest/external access luôn là ngoại lệ có kiểm soát.</td></tr><tr><td>Retention by business event</td><td>Retention label phải gắn theo loại record và trigger nghiệp vụ; không gắn theo cảm tính hoặc theo ngày người dùng upload.</td></tr><tr><td>No uncontrolled sharing</td><td>Không sử dụng anonymous link, public link hoặc “anyone with the link” cho controlled data, customer data, engineering data, quality data và job evidence.</td></tr><tr><td>Auditability</td><td>Mọi tạo folder, thay quyền, tạo link, approval, từ chối, hết hạn và archive lock phải có dấu vết truy được.</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
+        <p style="margin:8px 0;">ANNEX này xác lập cơ chế vận hành bắt buộc để mọi record phát sinh trong quá trình điều hành, hỗ trợ, sản xuất, giao hàng, đào tạo, quản trị nhân sự và quản trị hệ thống đều có vị trí lưu chuẩn ngay từ lúc tạo. Kết quả bắt buộc là: không còn record vận hành bị lưu tự phát ngoài cấu trúc chuẩn; mọi folder được tạo qua request có kiểm soát; mọi permission đi qua group model; mọi record family có retention basis, metadata và audit trail đầy đủ.</p>
+        <div class="keyline"><strong>Ranh giới tài liệu:</strong> <span class="code">ANNEX-116</span> là blueprint vị trí lưu và folder taxonomy; <span class="code">ANNEX-108</span> là nguồn chuẩn cho field dictionary, value set, list schema và source-of-record rule; <span class="code">ANNEX-109</span> là chuẩn luồng approval/logging; <span class="code">ANNEX-101</span> là nguồn chuẩn quyền theo vai trò và nguyên tắc least privilege. <span class="code">ANNEX-125</span> là tài liệu orchestration thực thi các nguồn chuẩn này thành provisioning architecture end-to-end.</div>
+      </div>
 
-      <div class="section"><h2>3. Kiến trúc tổng thể</h2><div class="figure-box"><p style="margin:0 0 8px;"><strong>Luồng tổng quát:</strong></p><p style="margin:0;">User Request Form/List → Validation Flow → Path Resolver → Folder/Metadata Provisioning → Permission Assignment → Retention Assignment → Approval for External Share → Audit Log / Notification → Periodic Review / Archive.</p></div><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Tầng</th><th>Thành phần</th><th>Vai trò</th></tr></thead><tbody><tr><td>Presentation</td><td>SharePoint List form / Power Apps form / Microsoft Forms nội bộ</td><td>Nơi người dùng gửi requirement tạo record, job dossier hoặc external share.</td></tr><tr><td>Workflow</td><td>Power Automate</td><td>Thực hiện inspection dữ liệu, xác định path, tạo folder, gán metadata, tạo approval, gán quyền và gửi thông báo.</td></tr><tr><td>Storage</td><td>SharePoint Document Libraries</td><td>Lưu record chuẩn, job dossier, archive, templates và part/rev master.</td></tr><tr><td>Access Control</td><td>SharePoint Groups / Entra ID Groups</td><td>Quản lý quyền theo vai trò thay vì theo từng user.</td></tr><tr><td>Governance</td><td>Retention Labels / Site Policies / Quarterly Review</td><td>Khóa retention, kiểm review, archive và external share expiration.</td></tr><tr><td>Audit</td><td>Request Log / Approval History / Automation Run Log</td><td>Ghi đầy đủ evidence cấu hình và hành động hệ thống.</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>2. Nguyên tắc kiến trúc không được vi phạm</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Nguyên tắc</th><th>Yêu cầu bắt buộc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>One request, one controlled output</td><td>Mỗi yêu cầu tạo zone, folder, dossier, external share hoặc archive lock phải đi qua một request record có trạng thái, chủ sở hữu, run log và URL đầu ra.</td></tr>
+              <tr><td>Group-based access</td><td>Không cấp quyền thủ công cho từng user ở cấu trúc chuẩn. Quyền được áp qua SharePoint group hoặc Entra ID group đã được đăng ký trong permission catalog.</td></tr>
+              <tr><td>Blueprint first</td><td>Folder, metadata và retention phải được sinh từ mapping chuẩn trong <span class="code">ANNEX-116</span> và <span class="code">ANNEX-108</span>; không tự đặt path ngoài taxonomy chuẩn.</td></tr>
+              <tr><td>Link-not-copy</td><td>Training SSOT, job dossier SSOT, part baseline SSOT, payroll restricted record và system admin record không được copy chéo giữa các library. Chỉ dùng index, link, reference pack hoặc sealed package được phê duyệt.</td></tr>
+              <tr><td>Default-deny for sensitive zones</td><td><span class="code">08-People-Records</span>, restricted subzones của HR/EHS/Finance và các khu system admin luôn chạy theo mô hình deny-by-default; chỉ nhóm đã đăng ký mới có quyền đọc hoặc sửa.</td></tr>
+              <tr><td>Automation with exception control</td><td>Luồng tự động tạo chỗ lưu cho trường hợp chuẩn; mọi ngoại lệ về path, permission, guest sharing hoặc archive reopen phải tạo exception record và approval rõ ràng.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <div class="section"><h2>4. Library chuẩn phải có trên site</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Library</th><th>Mục đích</th><th>Quyền nền tảng</th><th>Ghi chú</th></tr></thead><tbody><tr><td>01-QMS-Records</td><td>Audit, Management Review, Risk, Change, CI, Contingency, Document Control</td><td>QMS-centric</td><td>Map retention theo từng record type trong ANNEX-116.</td></tr><tr><td>02-Quality-Records</td><td>NCR, CAPA, complaints, calibration, FAI, inspection, SPC, control plan</td><td>QA-centric</td><td>Không cho user tự thêm record class ngoài catalog được duyệt.</td></tr><tr><td>03-Job-Dossiers</td><td>Dossier theo JobNum/Gate</td><td>Cross-functional</td><td>Phải tương thích WI-203 và ANNEX-502.</td></tr><tr><td>04-Training-Records</td><td>Attendance, competence, certification</td><td>HR-centric</td><td>Dữ liệu nhân sự nhạy cảm, không share ngoài.</td></tr><tr><td>05-Department-Records</td><td>Governance và operational records theo phòng ban</td><td>Department Head owned</td><td>Chỉ cho cấu trúc chuẩn DEP-{CODE}.</td></tr><tr><td>06-Archive</td><td>Superseded documents, closed jobs, legal/locked packages</td><td>Read-only after lock</td><td>Không dùng như working area.</td></tr><tr><td>07-Templates-Working</td><td>Template working, draft assets</td><td>Controlled edit</td><td>Không phải nơi lưu released records.</td></tr><tr><td>Part-REV-Master</td><td>Part/revision baseline, engineering controlled package</td><td>ENG update, QA/OPS read</td><td>Không lưu evidence lot/job-specific tại đây. Giữ nguyên không tiền tố số vì đây là namespace master theo PartNo/Rev.</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>3. Kiến trúc điều khiển provisioning cấp enterprise</h2>
+        <div class="three-col">
+          <div class="figure-box">
+            <h3>Request Layer</h3>
+            <p style="margin:8px 0;">Người dùng không tạo cấu trúc vận hành bằng tay ngoài blueprint. Mọi yêu cầu đi qua list điều khiển như <span class="code">M365-Record-Provisioning-Requests</span>, <span class="code">External-Share-Approval-Log</span> hoặc <span class="code">Archive-Lock-Register</span>.</p>
+          </div>
+          <div class="figure-box">
+            <h3>Decision Layer</h3>
+            <p style="margin:8px 0;">Flow đọc <span class="code">RecordType</span>, <span class="code">DeptCode</span>, <span class="code">RequestType</span>, <span class="code">LibraryCode</span>, <span class="code">ConfidentialityClass</span>, retention map và permission map để xác định path đầu ra, content skeleton, group access và control points.</p>
+          </div>
+          <div class="figure-box">
+            <h3>Execution Layer</h3>
+            <p style="margin:8px 0;">Power Automate hoặc integration service tạo folder/library path, gán metadata, break inheritance đúng rule, tạo share link đúng loại, log run result, phát hành URL cho requester và gửi cảnh báo khi run fail.</p>
+          </div>
+        </div>
+        <div class="keyline"><strong>Control Layer:</strong> Purview retention, audit log, access review, quarterly permission recertification, expired share cleanup, archive lock review và exception closure là tầng kiểm soát bắt buộc sau khi provisioning hoàn tất.</div>
+      </div>
 
-      <div class="section"><h2>5. Mô hình nhóm quyền triển khai</h2><p style="margin:8px 0;">Tất cả permission phải được cấp trước hết ở mức nhóm. Người dùng được thêm vào nhóm theo vai trò đã được duyệt. Cấp quyền trực tiếp cho user chỉ được dùng cho trường hợp tạm thời, có expiry, có approval và phải được làm sạch trong review quý.</p><div class="keyline"><strong>Lưu ý:</strong> bảng dưới đây là <b>mô hình nhóm triển khai chuẩn</b> dùng để hiện thực hóa vai trò trong <a href="annex-101-role-based-access-map.html">ANNEX-101</a>; không thay thế matrix trần quyền của ANNEX-101.</div><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Nhóm</th><th>Mức quyền mặc định</th><th>Phạm vi áp dụng</th><th>Không được phép</th></tr></thead><tbody><tr><td>QMS-Owners</td><td>Full Control</td><td>Toàn site hoặc library theo owner matrix</td><td>Không dùng làm nhóm operation hàng ngày cho user thường.</td></tr><tr><td>QMS-QA-Editors</td><td>Edit</td><td>QMS/Quality/Job dossier zones theo nhu cầu</td><td>Không sửa Part-REV-Master nếu không thuộc ENG release.</td></tr><tr><td>QMS-ENG-Editors</td><td>Edit</td><td>Part-REV-Master, engineering sections, selected dossier folders</td><td>Không archive hoặc dispose record quality.</td></tr><tr><td>QMS-Planning-Editors</td><td>Edit</td><td>Job dossier admin, G0/G1 planning folders</td><td>Không tự release technical baseline.</td></tr><tr><td>QMS-Production-Editors</td><td>Edit</td><td>G1/G3 production evidence zones</td><td>Không xóa standard folders hoặc final release evidence.</td></tr><tr><td>QMS-WHS-Editors</td><td>Edit</td><td>G4/G5 packaging/shipping records</td><td>Không sửa record engineering master.</td></tr><tr><td>QMS-ReadOnly</td><td>Read</td><td>Người xem nội bộ có nhu cầu traceability</td><td>Không download/share nếu sensitivity rule chặn.</td></tr><tr><td>QMS-External-Guest-Restricted</td><td>Read hoặc View only</td><td>Guest cụ thể đã được duyệt</td><td>Không browse toàn site, không anonymous access, không permanent access.</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>4. Danh mục request type bắt buộc</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>RequestType</th><th>Mục đích</th><th>Đầu vào tối thiểu</th><th>Đầu ra bắt buộc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>CreateCompanyRecordZone</td><td>Tạo vùng record chuẩn cấp công ty trong <span class="code">01-QMS-Records</span> hoặc vùng cross-functional chuẩn khác.</td><td>LibraryCode, RecordZone, Year, OwnerGroup</td><td>Folder root, metadata mặc định, permission chuẩn, run log</td></tr>
+              <tr><td>CreateDepartmentZone</td><td>Tạo root zone cho một phòng ban trong <span class="code">05-Department-Records</span>.</td><td>DeptCode, Year, PrimaryOwnerGroup</td><td>Skeleton chuẩn 01-05-99, department subfolders, URL zone</td></tr>
+              <tr><td>CreateDepartmentYearFolder</td><td>Tạo năm làm việc mới trong zone phòng ban.</td><td>DeptCode, Year</td><td>Year folder, inherited subfolders theo matrix</td></tr>
+              <tr><td>CreateJobDossier</td><td>Tạo dossier job theo gate logic.</td><td>JobNum, PartNo, Revision, CustomerID, Year</td><td>Job dossier full skeleton, permission groups, link index</td></tr>
+              <tr><td>CreateEmployeeDossier</td><td>Tạo hồ sơ nhân sự active employee.</td><td>EmployeeID, FullName, DeptCode, EmploymentStatus</td><td>Restricted people dossier, owner group, metadata</td></tr>
+              <tr><td>CreateContractorDossier</td><td>Tạo hồ sơ contractor, intern hoặc temporary labor.</td><td>Population, IDName, SponsorDept, Year</td><td>Restricted people dossier theo population</td></tr>
+              <tr><td>CreateVisitorAccessRecord</td><td>Tạo hồ sơ visitor, vendor visit hoặc temporary access.</td><td>VisitType, HostDept, VisitorName, VisitDate</td><td>Visitor record folder, expiry date, access log entry</td></tr>
+              <tr><td>CreateSystemRecordZone</td><td>Tạo zone record cho M365, IT, ERP, access review, deployment, backup.</td><td>SystemArea, Year, OwnerGroup</td><td>System zone path, template subfolders, run log</td></tr>
+              <tr><td>ExternalSharePackage</td><td>Tạo gói chia sẻ ra ngoài trên controlled path.</td><td>TargetUrl, Recipient, Reason, ExpiryDate, Approver</td><td>Specific-people link, approval record, expiry cleanup entry</td></tr>
+              <tr><td>ArchiveLock</td><td>Khóa folder khi kết thúc vòng đời vận hành.</td><td>TargetUrl, ArchiveState, TriggerEventDate</td><td>Read-only state, archive label, archive log</td></tr>
+              <tr><td>PermissionException</td><td>Xử lý trường hợp quyền khác chuẩn.</td><td>TargetUrl, RequestedDeviation, RiskReason, Approver</td><td>Exception record, expiry/review date, audit note</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <div class="section"><h2>6. Ma trận quyền triển khai theo vùng record</h2><div class="keyline"><strong>Lưu ý:</strong> đây là matrix triển khai cho library/folder zone. Nguồn chuẩn về boundary vai trò vẫn là <a href="annex-101-role-based-access-map.html">ANNEX-101</a>; nguồn chuẩn về folder zone vẫn là <a href="annex-116-m365-folder-structure-blueprint.html">ANNEX-116</a>.</div><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Vùng record</th><th>Nhóm được cấp</th><th>Quyền</th><th>Requirement bổ sung</th></tr></thead><tbody><tr><td>01-QMS-Records</td><td>QMS-Owners, QMS-QA-Editors, Process Owner specific group</td><td>Owners Full; QA Edit; others Read/Edit theo record type</td><td>Không external share trực tiếp nếu không có approval flow.</td></tr><tr><td>02-Quality-Records</td><td>QMS-Owners, QMS-QA-Editors, SAL/PUR/MNT specific groups</td><td>QA Edit; linked functions Read/Edit có điều kiện</td><td>NCR/CAPA/customer complaint phải giữ audit trail đầy đủ.</td></tr><tr><td>03-Job-Dossiers</td><td>QMS-Owners, QA, ENG, Planning, Production, WHS groups</td><td>Edit theo vai trò; Read cho viewer</td><td>Nếu break inheritance ở cấp job, phải log lý do và owner.</td></tr><tr><td>04-Training-Records</td><td>QMS-Owners, HR group</td><td>HR Edit; others hạn chế</td><td>Dữ liệu nhân sự không được chia sẻ ngoài công ty.</td></tr><tr><td>05-Department-Records</td><td>QMS-Owners, Department group</td><td>Dept Head/assigned users Edit</td><td>Không biến thành kho record cá nhân ngoài chuẩn.</td></tr><tr><td>06-Archive</td><td>QMS-Owners, Archive Custodian</td><td>Read-only sau lock</td><td>Không dùng để operation sửa record đang hiệu lực.</td></tr><tr><td>Part-REV-Master</td><td>QMS-Owners, QMS-ENG-Editors, QA/OPS readers</td><td>ENG Edit; QA/OPS Read</td><td>Chỉ ENG được release revision chuẩn.</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>5. Mô hình library provisioning toàn công ty</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Library</th><th>Chức năng</th><th>Điểm tạo tự động</th><th>Owner/Editor mặc định</th><th>Rule bắt buộc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="code">01-QMS-Records</span></td><td>Record quản trị hệ thống, context, policy, objective, audit, management review, change governance, communication, contingency.</td><td>CreateCompanyRecordZone, CreateDepartmentYearFolder</td><td>QMS-Owners / QMS-QA-Editors</td><td>Không lưu giao dịch Epicor; chỉ lưu record điều khiển và bằng chứng quản trị.</td></tr>
+              <tr><td><span class="code">02-Quality-Records</span></td><td>Inspection, calibration, MSA, NCR, CAPA, complaint, ship release, customer property quality evidence.</td><td>CreateCompanyRecordZone, CreateDepartmentYearFolder, CreateJobDossier</td><td>QMS-Owners / QMS-QA-Editors</td><td>Record lot-specific phải link với job, part hoặc complaint case.</td></tr>
+              <tr><td><span class="code">03-Job-Dossiers</span></td><td>Dossier xuyên suốt từ contract review tới ship release của từng job.</td><td>CreateJobDossier</td><td>QMS-Planning-Editors / QMS-QA-Editors / QMS-ENG-Editors / QMS-PRO-Editors / QMS-SCM-Editors</td><td>Gate folders là cố định; không đổi tên sau go-live.</td></tr>
+              <tr><td><span class="code">04-Training-Records</span></td><td>Đào tạo, OJT, certification, skill matrix, attendance, evaluation.</td><td>CreateCompanyRecordZone, CreateEmployeeDossier</td><td>QMS-Owners / QMS-HR-Restricted / QMS-QA-Editors</td><td>Đây là SSOT cho evidence đào tạo; people dossier chỉ giữ chỉ mục và access link.</td></tr>
+              <tr><td><span class="code">05-Department-Records</span></td><td>Record vận hành của từng phòng ban theo skeleton chuẩn.</td><td>CreateDepartmentZone, CreateDepartmentYearFolder</td><td>Department owner group tương ứng</td><td>Không dùng làm kho tự do; mọi zone phải đúng DeptCode và year structure.</td></tr>
+              <tr><td><span class="code">06-Archive</span></td><td>Khu đóng băng record sau khi kết thúc lifecycle hoặc khi chuyển archive.</td><td>ArchiveLock</td><td>QMS-Owners / designated archive custodians</td><td>Chỉ nhận sealed/locked folders; không tiếp tục vận hành tại đây.</td></tr>
+              <tr><td><span class="code">07-Templates-Working</span></td><td>Template, work draft và release staging chưa phải record chính thức.</td><td>CreateCompanyRecordZone</td><td>QMS-Owners / process template owner</td><td>Không được xem là SSOT của record vận hành đã phát hành.</td></tr>
+              <tr><td><span class="code">08-People-Records</span></td><td>Hồ sơ active employee, former employee, contractor, visitor và các tập restricted liên quan nhân sự.</td><td>CreateEmployeeDossier, CreateContractorDossier, CreateVisitorAccessRecord</td><td>QMS-HR-Restricted / subgroup restricted</td><td>Payroll, legal, discipline, medical, fit-to-work, offboarding evidence chỉ nằm ở đây.</td></tr>
+              <tr><td><span class="code">09-Digital-System-Records</span></td><td>Record hệ thống số, M365 config, access control, Epicor role/master data governance, deployment, backup, recovery, automation run log.</td><td>CreateSystemRecordZone, PermissionException, ArchiveLock</td><td>QMS-IT-Admins / QMS-ERP-Admins</td><td>Department folder chỉ giữ interface pack; admin evidence gốc phải ở library này.</td></tr>
+              <tr><td><span class="code">Part-REV-Master</span></td><td>Master namespace theo PartNo/Revision để lưu baseline package kỹ thuật đã release.</td><td>CreateCompanyRecordZone</td><td>QMS-ENG-Editors / QMS-QA-Editors</td><td>Không đánh số phía trước vì đây là namespace master theo Part/Rev, không phải dải zone record tuần tự; job-specific snapshot được kiểm soát ở <span class="code">03-Job-Dossiers</span>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <div class="section"><h2>7. Mô hình request input bắt buộc</h2><p style="margin:8px 0;">Để hệ thống tự động tạo đúng nơi lưu và đúng quyền, người dùng phải gửi request qua một list hoặc app có cấu trúc chuẩn. Không dùng email tự do, chat hoặc miệng để requirement cấp quyền/tạo folder.</p><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Field</th><th>Kiểu</th><th>Bắt buộc</th><th>Quy tắc</th></tr></thead><tbody><tr><td>RequestId</td><td>Text/Auto</td><td>Có</td><td>Mã duy nhất cho mỗi requirement.</td></tr><tr><td>RequestType</td><td>Choice</td><td>Có</td><td>Create Record Folder / Create Job Dossier / Request External Share / Archive Lock / Permission Change.</td></tr><tr><td>RecordType</td><td>Choice</td><td>Có</td><td>Chỉ chọn từ catalog map ANNEX-116.</td></tr><tr><td>Year</td><td>Number</td><td>Theo loại</td><td>Dùng cho path year-based.</td></tr><tr><td>JobNum</td><td>Text</td><td>Theo loại</td><td>Bắt buộc cho job dossier và record job-specific.</td></tr><tr><td>PartNo</td><td>Text</td><td>Theo loại</td><td>Bắt buộc khi path phụ thuộc part/revision.</td></tr><tr><td>Revision</td><td>Text/Choice</td><td>Theo loại</td><td>Phải theo chuẩn ENG.</td></tr><tr><td>Department</td><td>Choice</td><td>Theo loại</td><td>Map tới DEP-{CODE} hoặc role group.</td></tr><tr><td>OwnerEmail</td><td>Person</td><td>Có</td><td>Người chịu trách nhiệm nghiệp vụ cho nơi lưu được tạo.</td></tr><tr><td>NeedExternalShare</td><td>Yes/No</td><td>Có</td><td>Nếu Yes thì phải đi tiếp approval branch.</td></tr><tr><td>ExternalRecipient</td><td>Text/Person</td><td>Theo nhu cầu</td><td>Bắt buộc khi NeedExternalShare = Yes.</td></tr><tr><td>ExternalExpiryDate</td><td>Date</td><td>Theo nhu cầu</td><td>Bắt buộc với guest/external access.</td></tr><tr><td>BusinessJustification</td><td>Multiline</td><td>Có</td><td>Mô tả lý do nghiệp vụ, không để trống.</td></tr><tr><td>Status</td><td>Choice</td><td>Có</td><td>New / Validating / Pending Approval / Provisioned / Rejected / Failed / Archived.</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>6. Matrix record family và nơi lưu bắt buộc</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Record family</th><th>Home library / zone</th><th>Ví dụ record</th><th>Không được lưu ở</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Context, policy, objective, communication, contingency, management review, internal audit</td><td><span class="code">01-QMS-Records</span></td><td>Quality policy, KPI review pack, audit plan/report, contingency event, interested parties register.</td><td>Department working folders không kiểm soát</td></tr>
+              <tr><td>Inspection, calibration, MSA, NCR, CAPA, complaint, CoC, ship release</td><td><span class="code">02-Quality-Records</span> và linked dossier zones</td><td>FAI report, calibration cert, IPQC reaction, ship release package.</td><td>Personal OneDrive, email attachment folders</td></tr>
+              <tr><td>Job gate evidence, setup, first piece, IPQC, packaging, ship release handoff</td><td><span class="code">03-Job-Dossiers</span></td><td>Setup checklist, pre-run verification, G4 inspection pack, ship release evidence.</td><td><span class="code">05-Department-Records</span> như SSOT chính</td></tr>
+              <tr><td>Training, OJT, certification, competence matrix</td><td><span class="code">04-Training-Records</span></td><td>Attendance list, training slide, test result, certification evidence.</td><td><span class="code">08-People-Records</span> dưới dạng bản sao</td></tr>
+              <tr><td>Department governance, local logs, local operating packs, improvement actions</td><td><span class="code">05-Department-Records</span></td><td>Shift handover, supplier follow-up, sales pipeline evidence, monthly close checklist.</td><td><span class="code">01-QMS-Records</span> nếu không phải record cấp công ty</td></tr>
+              <tr><td>Employee legal files, payroll restricted, discipline, visitor access, offboarding</td><td><span class="code">08-People-Records</span></td><td>Offer letter, contract, resignation pack, exit checklist, visitor NDA.</td><td>Department share chung</td></tr>
+              <tr><td>Access control, deployment, backup, restore, incident, automation logs</td><td><span class="code">09-Digital-System-Records</span></td><td>M365 permission template, Epicor role review, restore test evidence, flow failure log.</td><td>HR/Finance/Department local folders</td></tr>
+              <tr><td>Part baseline master</td><td><span class="code">Part-REV-Master</span></td><td>Released drawing pack, CAM baseline, approved setup master.</td><td>Job dossier path như master gốc</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <div class="section"><h2>8. Bảng map triển khai RecordType tới path, retention và nhóm quyền</h2><div class="keyline"><strong>Lưu ý:</strong> bảng này là bảng orchestration dùng cho flow. Path và retention phải đồng bộ từ <a href="annex-116-m365-folder-structure-blueprint.html">ANNEX-116</a>; field/catalog phải đồng bộ từ <a href="annex-108-m365-lists-and-field-mapping.html">ANNEX-108</a>.</div><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>RecordType</th><th>Path chuẩn</th><th>Retention</th><th>Nhóm quyền tối thiểu</th></tr></thead><tbody><tr><td>Internal Audit</td><td>01-QMS-Records/01-Internal-Audits/{YYYY}/</td><td>RET-QMS-AUDIT-5Y</td><td>QMS-Owners, QMS-QA-Editors</td></tr><tr><td>Management Review</td><td>01-QMS-Records/02-Management-Review/{YYYY}/</td><td>RET-QMS-MR-5Y</td><td>QMS-Owners, QMS-QA-Editors</td></tr><tr><td>NCR</td><td>02-Quality-Records/01-NCR/{YYYY}/</td><td>RET-QMS-NCR-7Y</td><td>QMS-Owners, QMS-QA-Editors</td></tr><tr><td>CAPA</td><td>02-Quality-Records/02-CAPA/{YYYY}/</td><td>RET-QMS-CAPA-7Y</td><td>QMS-Owners, QMS-QA-Editors</td></tr><tr><td>Customer Complaint</td><td>02-Quality-Records/03-Customer-Complaints/{YYYY}/</td><td>RET-QMS-CUST-7Y</td><td>QMS-Owners, QMS-QA-Editors, SAL as approved</td></tr><tr><td>Calibration</td><td>02-Quality-Records/04-Calibration/</td><td>RET-QMS-CAL-LIFEPLUS2Y</td><td>QMS-Owners, QA, MNT</td></tr><tr><td>FAI</td><td>02-Quality-Records/06-FAI/{YYYY}/</td><td>RET-QMS-FAI-10Y</td><td>QMS-Owners, QA</td></tr><tr><td>Inspection Record</td><td>02-Quality-Records/07-Inspection-Records/{YYYY}/</td><td>RET-QMS-INSP-10Y</td><td>QMS-Owners, QA</td></tr><tr><td>Job Dossier</td><td>03-Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/</td><td>RET-JOB-* by gate/content</td><td>QMS-Owners, QA, ENG, Planning, Production, WHS</td></tr><tr><td>Training Attendance</td><td>04-Training-Records/Attendance-Records/{YYYY}/</td><td>RET-HR-ATTEND-5Y</td><td>QMS-Owners, HR</td></tr></tbody></table></div><p style="margin:8px 0;">Nếu RecordType không có trong bảng này, request phải bị chặn và chuyển về QMS/IT để review thiết kế thay vì cho user tạo cấu trúc mới bằng tay.</p></div>
+      <div class="section">
+        <h2>7. Provisioning chi tiết cho toàn bộ phòng ban trong 05-Department-Records</h2>
+        <p style="margin:8px 0;">Mọi zone phòng ban được tạo theo path gốc <span class="code">05-Department-Records/{DeptCode}-{DepartmentName}/{YYYY}/</span>. Flow luôn tạo đủ skeleton chuẩn <span class="code">01-Governance</span>, <span class="code">02-Operations</span>, <span class="code">03-Registers-and-Logs</span>, <span class="code">04-Projects-and-Improvement</span>, <span class="code">05-Interfaces-and-Released-Packs</span>, <span class="code">99-Archive</span> trước khi thêm các subfolder đặc thù.</p>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>DeptCode</th><th>Subfolder bắt buộc trong 02-Operations</th><th>Subfolder bắt buộc trong 03-Registers-and-Logs</th><th>Biên giới record</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>EXEC</td><td>01-Strategy-Deployment, 02-Management-Review-Inputs, 03-Board-and-Customer-Commitments, 04-Risk-and-Escalation</td><td>01-Objective-Tracking, 02-Decision-Log, 03-Action-Tracking, 04-Stakeholder-Commitments</td><td>Controlled docs, internal audit và management review record gốc vẫn ở <span class="code">01-QMS-Records</span>; EXEC zone giữ operating pack của lãnh đạo.</td></tr>
+              <tr><td>QMS</td><td>01-Document-Control-Operations, 02-Change-Control-Coordination, 03-Management-System-Maintenance, 04-Improvement-Coordination</td><td>01-Document-Issue-Log, 02-Training-Effectiveness-Log, 03-System-Review-Log, 04-Retention-Review</td><td>NCR/CAPA/Audit SSOT không nằm ở đây nếu đã có home zone trong <span class="code">01-QMS-Records</span> hoặc <span class="code">02-Quality-Records</span>.</td></tr>
+              <tr><td>QA</td><td>01-Incoming-and-In-Process-Control, 02-Final-Inspection-and-Release, 03-Calibration-Coordination, 04-Customer-Complaint-Response</td><td>01-Hold-Release-Log, 02-Gage-Status-Log, 03-Deviation-Reaction-Log, 04-Inspection-Coverage-Log</td><td>Formal quality records lưu tại <span class="code">02-Quality-Records</span>; department zone giữ local control board, workload pack và follow-up logs.</td></tr>
+              <tr><td>ENG</td><td>01-Feasibility-and-DFM, 02-CAM-and-Method-Release, 03-Tooling-and-Fixture-Control, 04-Technical-Change-Execution</td><td>01-Release-Queue, 02-Revision-Change-Log, 03-Fixture-Status-Log, 04-Programming-Error-Learnings</td><td>Baseline master nằm ở <span class="code">Part-REV-Master</span>; job snapshot nằm ở <span class="code">03-Job-Dossiers</span>.</td></tr>
+              <tr><td>PRO</td><td>01-Dispatch-and-Readiness, 02-Setup-and-First-Piece, 03-Shift-Handover-and-WIP, 04-Secondary-Operations-and-Clean-Pack, 05-Tooling-Maintenance-and-Breakdown</td><td>01-Machine-History-Log, 02-Downtime-Log, 03-Shift-Handover-Log, 04-Tool-Life-Log, 05-Line-Clearance-Log</td><td>Lot/job evidence chính phải vào <span class="code">03-Job-Dossiers</span>; PRO zone giữ operational control board và machine-centric logs.</td></tr>
+              <tr><td>SCM</td><td>01-Supplier-Qualification-and-Performance, 02-PO-and-Subcontract-Follow-Up, 03-Receiving-and-IQC-Handoff, 04-Warehouse-and-Traceability, 05-Shipping-and-Packing-Coordination</td><td>01-Expedite-Log, 02-Shortage-Risk-Log, 03-Receiving-Exception-Log, 04-Lot-Traceability-Log, 05-Carrier-Performance-Log</td><td>Receipt/PO shipment transactions vẫn là SoR trong Epicor; SCM zone chỉ giữ evidence, communication packs và local operational logs.</td></tr>
+              <tr><td>SAL</td><td>01-RFQ-and-Quote-Pack, 02-Contract-Review-and-Order-Ack, 03-Customer-Change-and-Escalation, 04-Complaint-and-RMA-Coordination</td><td>01-Quote-Lead-Time-Log, 02-Commitment-Change-Log, 03-Customer-Communication-Log, 04-RMA-Tracking</td><td>Customer complaint formal case nằm tại <span class="code">02-Quality-Records</span>; SAL zone giữ communication and commercial operating packs.</td></tr>
+              <tr><td>FIN</td><td>01-Invoice-Pack-and-AR, 02-AP-and-Payment-Proposal, 03-Job-Costing-and-Margin, 04-Period-Close-and-Reconciliation, 05-Tax-and-Statutory-Submission</td><td>01-Collection-Log, 02-Payment-Release-Log, 03-Close-Issue-Log, 04-Cash-Forecast-Log, 05-Financial-Control-Review</td><td>Employee payroll restricted record không để ở đây; payroll-sensitive packs nằm trong <span class="code">08-People-Records</span> khu restricted.</td></tr>
+              <tr><td>HR</td><td>01-Manpower-and-Recruitment, 02-Onboarding-and-Induction, 03-Performance-and-Probation, 04-Employee-Relations-and-Discipline, 05-Offboarding-and-Revocation</td><td>01-Headcount-Log, 02-Recruitment-Funnel-Log, 03-Leave-and-Attendance-Interface, 04-Asset-Return-Tracking, 05-Access-Revocation-Tracking</td><td>Employee dossier chính ở <span class="code">08-People-Records</span>; HR zone giữ governance, trackers, planning pack và approved interface logs.</td></tr>
+              <tr><td>EHS</td><td>01-Risk-and-Hazard-Control, 02-Permit-and-PPE-Control, 03-Incident-and-Near-Miss-Response, 04-Emergency-Preparedness, 05-Environmental-Monitoring</td><td>01-Incident-Log, 02-Unsafe-Condition-Log, 03-PPE-Issue-Log, 04-Inspection-Log, 05-Waste-and-Environment-Log</td><td>Medical restricted hoặc individual health record không lưu ở share chung; đưa sang <span class="code">08-People-Records</span> restricted zone nếu thuộc cá nhân.</td></tr>
+              <tr><td>IT</td><td>01-Service-Request-and-Endpoint, 02-Identity-and-Access-Coordination, 03-M365-Configuration-Change, 04-Backup-Restore-and-Recovery, 05-Security-and-Incident-Response</td><td>01-Ticket-Log, 02-Asset-Compliance-Log, 03-Backup-Job-Exception-Log, 04-Access-Review-Tracker, 05-Security-Issue-Log</td><td>Admin evidence gốc phải nằm tại <span class="code">09-Digital-System-Records</span>; IT department zone chỉ giữ operating board, work queue và interface pack.</td></tr>
+              <tr><td>ERP</td><td>01-Role-and-Access-Governance, 02-Master-Data-Control, 03-UAT-Deployment-and-Cutover, 04-Transaction-Error-and-Recovery, 05-Report-and-Interface-Control</td><td>01-SoD-Review-Log, 02-Master-Data-Change-Tracker, 03-Deployment-Calendar, 04-Error-Reentry-Log, 05-Integration-Monitoring-Log</td><td>Formal ERP admin record gốc vẫn ở <span class="code">09-Digital-System-Records</span>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <div class="section"><h2>9. Cấu trúc job dossier phải được tạo tự động như thế nào</h2><p style="margin:8px 0;">Khi <span class="code">RequestType = Create Job Dossier</span>, flow phải tự tạo toàn bộ cấu trúc dưới đây để bảo toàn gate logic và tính nhất quán với WI-203.</p><div class="keyline"><strong>Lưu ý:</strong> cấu trúc này là bản triển khai tự động hóa cho dossier; blueprint gốc vẫn nằm tại <a href="annex-116-m365-folder-structure-blueprint.html">ANNEX-116</a> và quy tắc sử dụng record nằm tại <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>.</div><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Folder</th><th>Mục đích</th><th>Owner chính</th></tr></thead><tbody><tr><td>00_Admin-Control</td><td>Index, checklist, approval history, change log, dossier status</td><td>Planning / QA</td></tr><tr><td>01_G0-Contract-Kickoff</td><td>PO, contract review, kickoff package, planning release</td><td>Sales / Planning / Engineering</td></tr><tr><td>02_G1-Setup-Release</td><td>Setup sheet, tool list, program links, readiness evidence</td><td>Engineering / Production</td></tr><tr><td>03_G2-FAI-First-Piece</td><td>FAI, first-piece report, balloon, photos, release decision</td><td>QA / Engineering</td></tr><tr><td>04_G3-IPQC-Production</td><td>Traveler, IPQC, hold/restart, in-process evidence</td><td>Production / QA</td></tr><tr><td>05_G4-Final-QC-Packaging</td><td>Final inspection, certs, processor receipt, pack evidence</td><td>QA / WHS</td></tr><tr><td>06_G5-Ship-Release</td><td>Ship checklist, CoC/CoA, packing list, label, POD, customer pack</td><td>QA / WHS / Shipping</td></tr><tr><td>07_NCR-CAPA-Deviation</td><td>NCR, CAPA, deviation, concession, rework chain</td><td>QA</td></tr><tr><td>99_Archive-Locked</td><td>Final snapshot, signed manifest, export bundle</td><td>QA/QMS</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>8. Blueprint chi tiết hồ sơ nhân sự và population cá nhân trong 08-People-Records</h2>
+        <div class="two-col">
+          <div>
+            <p style="margin:0;" class="path">08-People-Records/01-Active-Employees/{EmployeeID}-{FullName}/</p>
+            <p style="margin:4px 0 0;" class="path">08-People-Records/02-Former-Employees/{YYYY}/{EmployeeID}-{FullName}/</p>
+            <p style="margin:4px 0 0;" class="path">08-People-Records/03-Contractors-and-Interns/{YYYY}/{Population}/{ID-Name}/</p>
+            <p style="margin:4px 0 0;" class="path">08-People-Records/04-Visitors-and-Temporary-Access/{YYYY}/{VisitType}/{VisitorName}/</p>
+          </div>
+          <div class="figure-box">
+            <h3>Population điều khiển</h3>
+            <p style="margin:8px 0;">Flow phân biệt tối thiểu các class: <span class="code">Employee</span>, <span class="code">FormerEmployee</span>, <span class="code">Contractor</span>, <span class="code">Intern</span>, <span class="code">Visitor</span>, <span class="code">VendorAccess</span>, <span class="code">TemporaryWorker</span>. Mỗi class có retention, quyền và folder set riêng.</p>
+          </div>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Subfolder</th><th>Nội dung bắt buộc</th><th>Quyền tối thiểu</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="code">00-Personnel-Profile</span></td><td>ID profile, organization placement, emergency contact summary, approved personal profile sheet.</td><td>HR core restricted</td></tr>
+              <tr><td><span class="code">01-Contract-and-Legal</span></td><td>Offer letter, labor contract, NDA, amendment, legal identification pack, work permit cho các trường hợp pháp luật yêu cầu.</td><td>HR legal restricted</td></tr>
+              <tr><td><span class="code">02-Onboarding-and-Access</span></td><td>Onboarding checklist, induction completion, asset issue, access request/revoke evidence, probation starter pack.</td><td>HR + IT interface restricted</td></tr>
+              <tr><td><span class="code">03-Training-and-Certification-Link</span></td><td>Training index, certification index, skill matrix link, critical qualification reference. Đây là link/index zone, không chứa bản sao training SSOT.</td><td>HR + QA restricted</td></tr>
+              <tr><td><span class="code">04-Performance-and-Probation</span></td><td>Probation review, performance review, coaching records, promotion/role change approval.</td><td>HR manager restricted</td></tr>
+              <tr><td><span class="code">05-Compensation-and-Payroll-Restricted</span></td><td>Salary proposal, payroll adjustment, allowance, tax and insurance support pack, sensitive payroll evidence.</td><td>HR-Payroll-Restricted; Finance chỉ truy cập qua approval record hợp lệ</td></tr>
+              <tr><td><span class="code">06-Health-PPE-and-Fit-to-Work-Restricted</span></td><td>Medical fit-to-work, occupational health restriction, PPE-specific eligibility, exposure follow-up where lawfully retained.</td><td>HR medical restricted / EHS restricted</td></tr>
+              <tr><td><span class="code">07-Discipline-and-Grievance-Restricted</span></td><td>Warning letters, investigation records, grievance handling, case closure evidence.</td><td>HR legal restricted / management by approval</td></tr>
+              <tr><td><span class="code">08-Assets-and-Issued-Items</span></td><td>Laptop issue/return, badge, locker, special tool issue, uniform/PPE issue references.</td><td>HR + IT/EHS interface restricted</td></tr>
+              <tr><td><span class="code">09-Offboarding-and-Handover</span></td><td>Resignation, termination, exit interview, knowledge handover, asset return, account revoke, final clearance.</td><td>HR core restricted</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Quy tắc cứng:</strong> <span class="code">08-People-Records</span> không giữ bản sao NCR, CAPA, job dossier, training class evidence hoặc system admin evidence trừ khi văn bản pháp lý yêu cầu sealed copy. Trong trường hợp đó sealed copy phải có reason code, approver, retention riêng và không được thay thế SSOT gốc.</div>
+      </div>
 
-      <div class="section"><h2>10. Metadata bắt buộc phải gắn ngay khi tạo</h2><div class="keyline"><strong>Lưu ý:</strong> đây là bộ metadata tối thiểu cho orchestration. Tên field, internal name, value set và common dictionary phải lấy từ <a href="annex-108-m365-lists-and-field-mapping.html">ANNEX-108</a>.</div><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Field</th><th>Áp dụng</th><th>Mục đích</th><th>Quy tắc</th></tr></thead><tbody><tr><td>RecordType</td><td>Tất cả</td><td>Điều hướng retention và permission logic</td><td>Chỉ nhận giá trị từ catalog.</td></tr><tr><td>JobNum</td><td>Job-specific</td><td>Traceability và liên kết Epicor</td><td>Không để trống nếu record gắn job.</td></tr><tr><td>PartNo</td><td>Job/engineering-specific</td><td>Traceability part-level</td><td>Phải khớp master data.</td></tr><tr><td>Revision</td><td>Job/engineering-specific</td><td>Chống nhầm revision</td><td>Phải theo quy tắc release ENG.</td></tr><tr><td>Department</td><td>Theo loại</td><td>Map quyền và owner</td><td>Dùng mã chuẩn, ví dụ QA, ENG, PRO, WHS.</td></tr><tr><td>ResponsibleOwner</td><td>Tất cả</td><td>Chủ record/người chịu trách nhiệm nghiệp vụ</td><td>Phải là user nội bộ đang hoạt động.</td></tr><tr><td>RecordDate</td><td>Tất cả</td><td>Ngày record có hiệu lực nghiệp vụ</td><td>Không thay bằng ngày upload nếu khác.</td></tr><tr><td>RetentionTrigger</td><td>Tất cả</td><td>Điểm bắt đầu retention</td><td>Phải theo ANNEX-116.</td></tr><tr><td>SensitivityClass</td><td>Tất cả</td><td>Điều kiện chia sẻ và download</td><td>Internal / Controlled / Confidential / Customer Restricted.</td></tr><tr><td>ExternalShareAllowed</td><td>Tất cả</td><td>Chặn share trái phép</td><td>Mặc định No trừ khi approval branch set Yes.</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>9. Blueprint chi tiết record hệ thống trong 09-Digital-System-Records</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>Nội dung bắt buộc</th><th>Owner group</th><th>Lưu ý</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">09-Digital-System-Records/01-Access-and-Identity/{YYYY}/</td><td>Account request, role assignment, revoke evidence, quarterly review, sensitive role review, break-glass control.</td><td>QMS-IT-Admins / QMS-ERP-Admins</td><td>Guest access approval record liên kết với <span class="code">External-Share-Approval-Log</span>.</td></tr>
+              <tr><td class="path">09-Digital-System-Records/02-M365-and-SharePoint-Config/{YYYY}/</td><td>Site/library config, permission templates, metadata schema release, sensitivity label release, sharing policy evidence.</td><td>QMS-IT-Admins</td><td>Mọi thay đổi config phải có change identifier.</td></tr>
+              <tr><td class="path">09-Digital-System-Records/03-Epicor-Master-Data-and-Role-Control/{YYYY}/</td><td>Role matrix, SoD exception, master data change package, approval evidence, role cleanup.</td><td>QMS-ERP-Admins</td><td>Không lưu transaction extracts như SSOT thay cho Epicor.</td></tr>
+              <tr><td class="path">09-Digital-System-Records/04-Deployment-UAT-Cutover/{YYYY}/</td><td>Requirement pack, UAT scripts, deployment plan, rollback plan, go-live approval, hypercare log.</td><td>QMS-IT-Admins / QMS-ERP-Admins</td><td>Mọi release phải truy được bản test và approver.</td></tr>
+              <tr><td class="path">09-Digital-System-Records/05-Backup-Restore-and-Recovery/{YYYY}/</td><td>Backup job results, restore tests, recovery drill evidence, offline re-entry packs, continuity proof.</td><td>QMS-IT-Admins</td><td>Failure run phải tạo CAPA hoặc incident link khi vượt ngưỡng.</td></tr>
+              <tr><td class="path">09-Digital-System-Records/06-Incident-and-Problem-Management/{YYYY}/</td><td>System incident record, root cause, containment, corrective action, trend review.</td><td>QMS-IT-Admins / QMS-ERP-Admins</td><td>Security incident giữ linkage tới legal/management escalation.</td></tr>
+              <tr><td class="path">09-Digital-System-Records/07-Asset-and-Endpoint-Control/{YYYY}/</td><td>Asset register snapshot, endpoint compliance evidence, encryption status, approved exception.</td><td>QMS-IT-Admins</td><td>Thiết bị đã cấp cho nhân viên chỉ giữ link tham chiếu qua people dossier.</td></tr>
+              <tr><td class="path">09-Digital-System-Records/08-Automation-Run-Logs/{YYYY}/</td><td>Provisioning run, flow failure, retry history, expired link cleanup, archive job log.</td><td>QMS-IT-Admins</td><td>FlowRunId là khóa liên kết bắt buộc với request list.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <div class="section"><h2>11. Thuật toán xử lý của flow provisioning</h2><div class="step-list"><div class="step-item"><strong>Nhận requirement mới.</strong><br/>Trigger từ SharePoint List hoặc Power Apps form khi Status = New.</div><div class="step-item"><strong>Kiểm dữ liệu bắt buộc.</strong><br/>Flow kiểm RequestType, RecordType, owner, year/job/part/revision, justification và thông tin external share nếu có. Thiếu dữ liệu thì set Status = Rejected hoặc Needs Correction.</div><div class="step-item"><strong>Tính path đích.</strong><br/>Dựa trên RecordType map, flow tạo <span class="code">TargetLibrary</span> và <span class="code">TargetRelativePath</span>. Không tính path bằng text tự do từ người dùng.</div><div class="step-item"><strong>Kiểm tồn tại.</strong><br/>Nếu folder đã tồn tại, flow không tạo trùng; thay vào đó ghi lại URL có sẵn và kiểm xem quyền/metadata đã đủ chưa.</div><div class="step-item"><strong>Tạo folder chuẩn.</strong><br/>Nếu chưa tồn tại, tạo folder cha rồi folder con. Với Job Dossier, tạo toàn bộ 9 thư mục chuẩn trong một transaction logic có log.</div><div class="step-item"><strong>Gán metadata mặc định.</strong><br/>Ghi owner, record type, department, retention trigger, sensitivity và liên kết request ID.</div><div class="step-item"><strong>Gán retention.</strong><br/>Set retention label hoặc đưa vào queue cho retention policy processor tùy competence tenant.</div><div class="step-item"><strong>Gán quyền.</strong><br/>Mặc định ưu tiên kế thừa từ library. Chỉ break inheritance ở cấp folder nếu thiết kế đó đã được duyệt trước và có lý do.</div><div class="step-item"><strong>Xử lý external share nếu được requirement.</strong><br/>Nếu NeedExternalShare = Yes thì không share ngay; chuyển approval branch theo authority matrix.</div><div class="step-item"><strong>Ghi log và gửi thông báo.</strong><br/>Flow cập nhật Status = Provisioned, lưu URL, thời gian thực hiện, người/flow run ID và gửi link cho requester.</div></div></div>
+      <div class="section">
+        <h2>10. Nhóm quyền và matrix phân quyền bắt buộc</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Group</th><th>Chức năng</th><th>Vùng áp dụng</th><th>Rule</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>QMS-Owners</td><td>Full control governance</td><td>Tất cả library controlled</td><td>Không dùng cho vận hành thường ngày ngoài owner duty.</td></tr>
+              <tr><td>QMS-QA-Editors</td><td>QA/QMS edit</td><td>01, 02, 03, 04 theo zone</td><td>Không vào payroll/medical restricted nếu không có subgroup approval.</td></tr>
+              <tr><td>QMS-ENG-Editors</td><td>Engineering edit</td><td>03, 05-ENG, Part-REV-Master</td><td>Chỉ sửa baseline qua release flow.</td></tr>
+              <tr><td>QMS-Planning-Editors</td><td>Planning coordination edit</td><td>03, 05-SCM interfaces</td><td>Không vào restricted people zones.</td></tr>
+              <tr><td>QMS-PRO-Editors</td><td>Production edit</td><td>03, 05-PRO</td><td>Không sửa ship release QA records sau approval.</td></tr>
+              <tr><td>QMS-SCM-Editors</td><td>Supply chain edit</td><td>03, 05-SCM</td><td>Không chỉnh quality formal decision records.</td></tr>
+              <tr><td>QMS-SAL-Editors</td><td>Sales/CS edit</td><td>05-SAL, linked zones</td><td>Chỉ truy cập complaint pack khi được gán case.</td></tr>
+              <tr><td>QMS-FIN-Editors</td><td>Finance edit</td><td>05-FIN</td><td>Payroll-sensitive subzones đi qua restricted subgroup.</td></tr>
+              <tr><td>QMS-HR-Restricted</td><td>HR restricted access</td><td>08-People-Records, 05-HR local trackers</td><td>Không mở rộng read cho line managers bằng direct permission.</td></tr>
+              <tr><td>HR-Payroll-Restricted</td><td>Payroll-sensitive access</td><td>08/05 salary-payroll zones</td><td>Quarterly review bắt buộc.</td></tr>
+              <tr><td>HR-Medical-Restricted</td><td>Medical-fit-to-work access</td><td>08 medical zones</td><td>Không copy ra department share.</td></tr>
+              <tr><td>QMS-EHS-Editors</td><td>EHS edit</td><td>05-EHS, linked training and incident zones</td><td>Medical restricted chỉ truy cập khi duty justified.</td></tr>
+              <tr><td>QMS-IT-Admins</td><td>System admin edit</td><td>09, selected config zones</td><td>Admin actions phải có run log/change record.</td></tr>
+              <tr><td>QMS-ERP-Admins</td><td>ERP admin edit</td><td>09 ERP zones</td><td>SoD exception phải review định kỳ.</td></tr>
+              <tr><td>QMS-ReadOnly</td><td>Read-only shared visibility</td><td>Public controlled zones only</td><td>Không dùng cho restricted people hoặc system admin areas.</td></tr>
+              <tr><td>QMS-External-Guest-Restricted</td><td>Guest access via specific-share package</td><td>Chỉ package/folder approved</td><td>Luôn có expiry date, owner, reason, cleanup job.</td></tr>
+              <tr><td>DEP-{DeptCode}-Editors</td><td>Department operating editors</td><td>05-Department-Records zone tương ứng</td><td>Không vượt ranh giới sang library khác bằng inheritance phá chuẩn.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <div class="section"><h2>12. Luồng approval cho external sharing</h2><p style="margin:8px 0;">External share là nhánh riêng, không được trộn lẫn với nhánh tạo folder. Một nơi lưu được tạo thành công không đồng nghĩa requirement chia sẻ ra ngoài được chấp thuận.</p><div class="keyline"><strong>Lưu ý:</strong> logic approval, logging và exception path của flow phải compliance <a href="annex-109-power-automate-flows-and-approvals-spec.html">ANNEX-109</a>; boundary dữ liệu và sharing control phải compliance <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>.</div><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Bước</th><th>Điều kiện</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td>Validate recipient</td><td>Có email người nhận ngoài công ty</td><td>Kiểm domain, tính hợp lệ, đối tượng nhận và mục đích nhận.</td></tr><tr><td>Classify data</td><td>SensitivityClass đã được xác định</td><td>Nếu Controlled/Confidential thì route người duyệt cao hơn.</td></tr><tr><td>Approval</td><td>Authority matrix phù hợp</td><td>Requirement owner + QA/IT hoặc cấp duyệt được chỉ định xác nhận.</td></tr><tr><td>Generate share link</td><td>Approval = Approved</td><td>Chỉ dùng Specific People; đặt expiry date; mặc định view-only nếu không cần edit.</td></tr><tr><td>Log share evidence</td><td>Sau khi tạo link</td><td>Lưu who/what/when/expiry/link type/approver vào log list.</td></tr><tr><td>Expiry cleanup</td><td>Đến ngày hết hạn</td><td>Flow định kỳ kiểm link đã hết hạn, revoke access và log completion.</td></tr></tbody></table></div><div class="keyline"><strong>Chặn cứng:</strong> không cho anonymous link; không cho guest browse toàn site; không cho external access không expiry date; không share nhầm folder có dữ liệu của nhiều customer trong cùng một vùng.</div></div>
+      <div class="section">
+        <h2>11. Metadata và register điều khiển bắt buộc</h2>
+        <div class="two-col">
+          <div class="figure-box">
+            <h3>Field bắt buộc trong provisioning request</h3>
+            <p style="margin:8px 0;">Mọi request phải có tối thiểu các field: <span class="code">RequestType</span>, <span class="code">LibraryCode</span>, <span class="code">RecordType</span>, <span class="code">RecordZone</span>, <span class="code">DeptCode</span>, <span class="code">Year</span>, <span class="code">PrimaryOwnerGroup</span>, <span class="code">ConfidentialityClass</span>, <span class="code">RetentionLabel</span>, <span class="code">TriggerEventDate</span>, <span class="code">RequestedBy</span>, <span class="code">Approver</span>, <span class="code">FlowRunId</span>, <span class="code">ProvisionedUrl</span>.</p>
+          </div>
+          <div class="figure-box">
+            <h3>Register catalog bắt buộc</h3>
+            <p style="margin:8px 0;">Tối thiểu phải có các list: <span class="code">M365-Record-Provisioning-Requests</span>, <span class="code">Department-Zone-Catalog</span>, <span class="code">People-Dossier-Index</span>, <span class="code">System-Record-Request-Log</span>, <span class="code">External-Share-Approval-Log</span>, <span class="code">Archive-Lock-Register</span>, <span class="code">Automation-Run-Log</span>.</p>
+          </div>
+        </div>
+        <div class="keyline"><strong>Rule dữ liệu:</strong> internal name, choice code, lookup source, validation rule và value set lấy theo <span class="code">ANNEX-108</span>. Không tạo field trùng nghĩa dưới tên khác. Không dùng text tự do cho <span class="code">DeptCode</span>, <span class="code">RequestType</span>, <span class="code">LibraryCode</span>, <span class="code">RecordZone</span>, <span class="code">ConfidentialityClass</span>, <span class="code">PersonRecordClass</span> hoặc <span class="code">SystemArea</span>.</div>
+      </div>
 
-      <div class="section"><h2>13. Thiết kế log bắt buộc</h2><div class="two-col"><div class="card"><h3>Request Log</h3><p style="margin:8px 0;">Lưu toàn bộ vòng đời request: ai requirement, loại gì, dữ liệu input, kết quả, URL được tạo, lỗi nếu có, thời gian xử lý và người duyệt.</p></div><div class="card"><h3>Provisioning Run Log</h3><p style="margin:8px 0;">Lưu FlowRunId, RequestId, action thực hiện, path được tạo, retention applied, permission template được gán, outcome và error detail.</p></div></div><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Field</th><th>Run Log</th><th>Share Log</th></tr></thead><tbody><tr><td>RequestId</td><td>Bắt buộc</td><td>Bắt buộc</td></tr><tr><td>FlowRunId</td><td>Bắt buộc</td><td>Bắt buộc</td></tr><tr><td>ActionType</td><td>CreateFolder / SetMetadata / SetPermission / SetRetention</td><td>CreateShare / RevokeShare / ExpireShare</td></tr><tr><td>TargetUrl</td><td>URL folder/file/list item</td><td>URL được chia sẻ</td></tr><tr><td>Outcome</td><td>PASS / FAIL / PARTIAL</td><td>APPROVED / REJECTED / REVOKED / EXPIRED</td></tr><tr><td>PerformedAt</td><td>UTC datetime</td><td>UTC datetime</td></tr><tr><td>PerformedBy</td><td>Service account / flow / admin</td><td>Flow + approver chain</td></tr><tr><td>ErrorDetail</td><td>Ghi khi fail</td><td>Ghi khi fail</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>12. Thuật toán provisioning theo từng nhóm request</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Nhóm request</th><th>Thuật toán bắt buộc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>CreateDepartmentZone / CreateDepartmentYearFolder</td><td>1) Validate DeptCode và Year; 2) Lookup skeleton matrix; 3) Create root zone nếu chưa có; 4) Create year folder; 5) Create fixed subfolders 01-05-99; 6) Add department-specific subfolders theo matrix; 7) Apply group-based permissions; 8) Stamp metadata; 9) Log URL và status.</td></tr>
+              <tr><td>CreateJobDossier</td><td>1) Validate JobNum, PartNo, Revision; 2) Create dossier root; 3) Create gate folders G0-G5, deviation zone, archive zone; 4) Apply gate permission set; 5) Link dossier index; 6) Set retention trigger from job closed event; 7) Notify Planning, QA, ENG, Production, SCM.</td></tr>
+              <tr><td>CreateEmployeeDossier / CreateContractorDossier</td><td>1) Validate population class; 2) Determine path active/former/contractor/visitor; 3) Create restricted dossier with fixed subfolders 00-09; 4) Apply HR core, payroll, medical and interface subgroup rights; 5) Create index record; 6) Create training link zone, not copy; 7) Stamp confidentiality class and retention basis.</td></tr>
+              <tr><td>CreateSystemRecordZone</td><td>1) Validate SystemArea, Year, owner group; 2) Create correct path in 09; 3) Add template subfolders or case folders; 4) Apply IT/ERP admin rights; 5) Create run log and change/control ID link.</td></tr>
+              <tr><td>ExternalSharePackage</td><td>1) Confirm target in controlled library; 2) Confirm reason and recipient; 3) Require approver; 4) Create specific-people link only; 5) Set expiry date; 6) Register share in log; 7) Schedule cleanup; 8) Close or escalate if recipient/expiry missing.</td></tr>
+              <tr><td>ArchiveLock</td><td>1) Validate lifecycle trigger; 2) Freeze edit rights; 3) Move or seal target according to archive state; 4) Apply archive retention/record declaration; 5) Update archive register; 6) Notify custodian.</td></tr>
+              <tr><td>PermissionException</td><td>1) Validate requester and approver; 2) Record risk reason; 3) Apply deviation with expiry date; 4) Flag for periodic review; 5) Remove on expiry hoặc chuyển qua baseline mới đã duyệt.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <div class="section"><h2>14. Quy tắc break inheritance</h2><p style="margin:8px 0;">Break inheritance là điểm dễ gây lỗi và khó review nhất. Mặc định toàn bộ giải pháp phải ưu tiên permission kế thừa ở cấp library. Chỉ break inheritance cho cấp folder/job khi có requirement thật sự về tách customer, legal hold, restricted project hoặc dữ liệu nhạy cảm đặc biệt.</p><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Tình huống</th><th>Có được break không</th><th>Requirement bổ sung</th></tr></thead><tbody><tr><td>Library chuẩn đang dùng role chung</td><td>Không được</td><td>Giữ inheritance để review đơn giản.</td></tr><tr><td>Job dossier của customer nhạy cảm</td><td>Chỉ được khi có approval</td><td>Phải log owner, lý do, nhóm được cấp và ngày review kế tiếp.</td></tr><tr><td>Temporary project room</td><td>Chỉ được khi có thời hạn</td><td>Phải có expiry date hoặc archive plan.</td></tr><tr><td>External share folder tách riêng</td><td>Chỉ được khi tách vùng độc lập</td><td>Phải tạo package/folder tách riêng thay vì break inheritance trên vùng record gốc.</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>13. External sharing, sealed package và exception handling</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Trường hợp</th><th>Control bắt buộc</th><th>Không chấp nhận</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Customer/Supplier share</td><td>Specific people link, named recipient, expiry date, owner, approval, share log, cleanup job.</td><td>Anonymous link, no-expiry share, share từ personal OneDrive</td></tr>
+              <tr><td>Sealed copy for legal/payroll/discipline</td><td>Copy only when legal hoặc management-approved reason exists; sealed copy tagged with reason code and separate retention.</td><td>Copy đại trà để “dễ tìm”</td></tr>
+              <tr><td>Restricted exception</td><td>PermissionException record, risk owner, review date, explicit removal condition.</td><td>Break inheritance thủ công không log</td></tr>
+              <tr><td>Archive reopen</td><td>Approved exception, reopen log, version/change trace.</td><td>Mở khóa rồi tiếp tục vận hành không có record</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <div class="section"><h2>15. Kiểm thử bắt buộc trước go-live</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Test case</th><th>Kỳ vọng</th></tr></thead><tbody><tr><td>Create NCR folder với dữ liệu đầy đủ</td><td>Folder tạo đúng path, retention đúng, QA group có quyền, requester nhận link.</td></tr><tr><td>Create Job Dossier</td><td>Tạo đủ 9 folder chuẩn, metadata đúng, không tạo trùng khi submit lần hai.</td></tr><tr><td>Submit thiếu JobNum/PartNo/Owner</td><td>Request bị từ chối hoặc trả về sửa, không tạo folder rác.</td></tr><tr><td>External share không có expiry date</td><td>Flow chặn ở validation/approval, không tạo link.</td></tr><tr><td>User không có authority nhưng xin edit vùng restricted</td><td>Request không được approve; log ghi rõ lý do.</td></tr><tr><td>Path đã tồn tại</td><td>Flow không tạo trùng; trả về link hiện hữu và ghi status tương ứng.</td></tr><tr><td>Flow fail giữa chừng</td><td>Log đủ chi tiết; không để trạng thái mồ côi mà không biết owner xử lý.</td></tr><tr><td>Review external share expiry</td><td>Link hết hạn được revoke và có log hoàn tất.</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>14. Điều kiện UAT, go-live và không chấp nhận phát hành</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Điểm kiểm</th><th>Pass condition</th><th>Điều kiện fail</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Department zone creation</td><td>Tạo đúng skeleton và subfolders của DeptCode, đúng permissions, đúng metadata.</td><td>Thiếu folder, sai group, sai year path</td></tr>
+              <tr><td>People dossier creation</td><td>Restricted rights đúng subgroup, no inherited open access, training zone ở dạng link/index.</td><td>Anyone with link, Members edit, training copied vào dossier</td></tr>
+              <tr><td>System zone creation</td><td>Flow tạo đúng SystemArea path, log đủ run ID, có change link.</td><td>Không log, path sai, role admin rộng quá mức</td></tr>
+              <tr><td>External share</td><td>Link đúng recipient, đúng expiry, có approval và cleanup entry.</td><td>Recipient trống, expiry trống, anonymous link</td></tr>
+              <tr><td>Archive lock</td><td>Folder chuyển read-only, retention updated, register synced.</td><td>Vẫn edit được, archive register không khớp</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Không được go-live</strong> nếu bất kỳ record family nào của company operations chưa có home zone rõ ràng, nếu People restricted zones chưa tách quyền, nếu admin evidence còn nằm rải ở department share, hoặc nếu request list chưa ghi được <span class="code">FlowRunId</span> và <span class="code">ProvisionedUrl</span>.</div>
+      </div>
 
-      <div class="section"><h2>16. Operation định kỳ sau go-live</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Chu kỳ</th><th>Hoạt động bắt buộc</th><th>Owner</th></tr></thead><tbody><tr><td>Hàng ngày</td><td>Review request fail, flow fail, external share pending, duplicate folder cảnh báo</td><td>IT Admin</td></tr><tr><td>Hàng tuần</td><td>Kiểm log quyền bị break inheritance, guest links gần hết hạn, orphan requests</td><td>IT + QMS</td></tr><tr><td>Hàng tháng</td><td>Kiểm mẫu traceability 3-minute test, kiểm naming, metadata missing, retention mapping</td><td>QMS Engineer</td></tr><tr><td>Hàng quý</td><td>Access review, guest review, break inheritance review, restore/test evidence review</td><td>IT Admin / QA Manager</td></tr><tr><td>Khi có change</td><td>Update map, update flow, UAT lại, release note, rollback point</td><td>IT + Process Owner</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>15. Kiểm soát vận hành định kỳ sau go-live</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Chu kỳ</th><th>Hoạt động</th><th>Output</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Hàng ngày</td><td>Review failed flow, stuck approval, expired share cleanup, orphan request detection.</td><td>Daily admin action list</td></tr>
+              <tr><td>Hàng tuần</td><td>Review folder tạo mới, kiểm tra sai path, kiểm tra exception mở quá hạn, đối chiếu run log với request list.</td><td>Weekly governance review log</td></tr>
+              <tr><td>Hàng tháng</td><td>Department zone health check, people dossier access scan, archive lock verification, retention application spot-check.</td><td>Monthly records health report</td></tr>
+              <tr><td>Hàng quý</td><td>Permission recertification cho HR payroll, medical, IT admin, ERP admin, guest packages và sensitive zones.</td><td>Quarterly access review pack</td></tr>
+              <tr><td>Hàng năm</td><td>Taxonomy review, department matrix update, retention review, obsolete zone cleanup, go-forward roadmap.</td><td>Annual architecture review record</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <div class="section"><h2>17. Điều kiện không được chuyển production</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Điều kiện fail</th><th>Lý do chặn</th></tr></thead><tbody><tr><td>Chưa có map RecordType → Path → Retention → Permission</td><td>Hệ thống sẽ tạo folder sai chỗ hoặc sai quyền.</td></tr><tr><td>Chưa có nhóm quyền chuẩn</td><td>Dẫn tới cấp quyền trực tiếp tràn lan và khó review.</td></tr><tr><td>External share chưa có approval chain</td><td>Rủi ro IP/customer data leakage.</td></tr><tr><td>Chưa có run log và share log</td><td>Không truy được nguyên nhân lỗi và evidence kiểm soát.</td></tr><tr><td>Job dossier template chưa khớp WI-203</td><td>Phá gate logic và dossier completeness.</td></tr><tr><td>Chưa test duplicate/idempotency</td><td>Dễ sinh folder trùng và lỗi record mồ côi.</td></tr></tbody></table></div></div>
+      <div class="section">
+        <h2>16. Tài liệu liên kết bắt buộc</h2>
+        <ul>
+          <li><span class="code">ANNEX-101</span> — Role-based access map và nguyên tắc least privilege</li>
+          <li><span class="code">ANNEX-108</span> — Field mapping M365/List, value set, register catalog và source-of-record rule</li>
+          <li><span class="code">ANNEX-109</span> — Flow and approval spec cho digital forms và Power Automate</li>
+          <li><span class="code">ANNEX-116</span> — Folder structure blueprint và record home taxonomy</li>
+          <li><span class="code">SOP-104</span> — Data governance, record security và IP protection</li>
+          <li><span class="code">SOP-303</span> — Engineering release, baseline package và job snapshot control</li>
+          <li><span class="code">WI-203</span> — Job dossier evidence pack và record completeness</li>
+          <li><span class="code">SOP-801</span> — Competence, training and certification</li>
+          <li><span class="code">SOP-802</span> — Incident, near miss and EHS</li>
+          <li><span class="code">SOP-803</span> — Invoicing, job costing and AR/AP</li>
+        </ul>
+      </div>
 
-      <div class="section"><h2>18. KPI kiểm soát của giải pháp</h2><div class="kpi-grid"><div class="kpi-box"><strong>KPI-125-01</strong><br/>Tỷ lệ request tạo nơi lưu thành công ngay lần đầu ≥ 95%.</div><div class="kpi-box"><strong>KPI-125-02</strong><br/>Tỷ lệ folder tạo đúng path/retention/quyền = 100% trên mẫu audit.</div><div class="kpi-box"><strong>KPI-125-03</strong><br/>Tỷ lệ external share có expiry date và approval log = 100%.</div><div class="kpi-box"><strong>KPI-125-04</strong><br/>Tỷ lệ review quyền hàng quý hoàn tất = 100%.</div></div></div>
-
-      <div class="section"><h2>19. Lộ trình triển khai bắt buộc</h2><div class="step-list"><div class="step-item"><strong>Phase 1 — Foundation.</strong><br/>Tạo libraries, nhóm quyền, retention labels, request list và log lists.</div><div class="step-item"><strong>Phase 2 — Core automation.</strong><br/>Triển khai flow create folder cho NCR, CAPA, Internal Audit và Job Dossier.</div><div class="step-item"><strong>Phase 3 — External share control.</strong><br/>Thêm approval flow, expiry cleanup, share log và dashboard theo dõi.</div><div class="step-item"><strong>Phase 4 — Review and archive.</strong><br/>Thêm flow review định kỳ, archive lock, orphan permission cleanup và KPI reporting.</div></div></div>
-
-      <div class="section"><h2>20. Document liên kết</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table"><thead><tr><th>Document</th><th>Vai trò sử dụng</th></tr></thead><tbody><tr><td><a href="annex-101-role-based-access-map.html">ANNEX-101</a></td><td>Role-based access map nền tảng cho permission model.</td></tr><tr><td><a href="annex-108-m365-lists-and-field-mapping.html">ANNEX-108</a></td><td>Map field/list/catalog dùng cho request, metadata và log.</td></tr><tr><td><a href="annex-109-power-automate-flows-and-approvals-spec.html">ANNEX-109</a></td><td>Quy tắc thiết kế flow, approval log và exception handling.</td></tr><tr><td><a href="annex-116-m365-folder-structure-blueprint.html">ANNEX-116</a></td><td>Folder structure blueprint, retention labels và naming rules.</td></tr><tr><td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation khi flow fail, share sai hoặc phát sinh incident dữ liệu.</td></tr><tr><td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td><td>Data governance, security, IP protection, access review và sharing control.</td></tr><tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Chuẩn dossier, completeness, archive lock và retrieval SLA.</td></tr></tbody></table></div></div>
     </div>
   </div>
 </div>
-<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên HESEM QMS.</div>
 </body>
 </html>

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ANNEX-116 — Blueprint cấu trúc thư mục M365, quyền thư mục và quy tắc lưu record | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css"/>
+<style>
+@media print {
+  .card, .table-card, .callout, .note, .box, .iso-map, .lane, .legend, .req, .auth-grid, .backup-grid { break-inside: avoid; page-break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
+.page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
+.page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color:var(--navy);}
+.page-body h3 {font-size:14px; line-height:1.5; margin:12px 0 6px; color:var(--ink);}
+.table-card table {width:100%; border-collapse:collapse; font-size:12px;}
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align:top;}
+.table-card th {background:var(--th-bg); border-color:var(--th-bdr); text-align:left;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius:var(--r); background:#fcfcfd;}
+.code {font-family:var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.path {font-family:var(--mono); font-size:11px; color:var(--ink2);}
+.muted {color:var(--ink2); font-size:12px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.section ul {margin:8px 0; padding-left:20px;}
+@media (max-width:960px; width:100%; box-sizing:border-box) {
+  .two-col {grid-template-columns:1fr;}
+  .page-body {padding:24px 18px 36px;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+
+<div class="form-header">
+  <div class="fh-left">
+    <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+    <div class="fh-company">
+      <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+      <span>Document operation • Annex số hóa</span>
+    </div>
+  </div>
+  <div class="title"><strong>ANNEX-116 — Blueprint cấu trúc thư mục M365, quyền thư mục và quy tắc lưu record</strong></div>
+  <div class="meta">
+    <div class="row"><span><b>Code:</b></span><span>ANNEX-116</span></div>
+    <div class="row"><span><b>Version:</b></span><span>V1</span></div>
+    <div class="row"><span><b>Effective Date:</b></span><span>Per issuance decision</span></div>
+    <div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Administrator</span></div>
+    <div class="row"><span><b>Approved by:</b></span><span>General Director</span></div>
+  </div>
+</div>
+
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết kế site, library, folder, retention, metadata và quyền lưu trữ trên M365 cho toàn công ty. ANNEX này là nguồn chuẩn cho vị trí lưu record, folder path, vùng nhạy cảm và logic lưu trữ theo vòng đời record.</div>
+      <h1>ANNEX-116 — Blueprint cấu trúc thư mục M365, quyền thư mục và quy tắc lưu record</h1>
+
+      <div class="section">
+        <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
+        <p style="margin:8px 0;">ANNEX này khóa cấu trúc lưu trữ M365 cho toàn bộ HESEM ở ba lớp đồng thời: lớp công ty và QMS, lớp phòng ban và quá trình vận hành, và lớp hồ sơ cá nhân hoặc hồ sơ hệ thống có kiểm soát cao. Mọi record phát sinh từ handbook phòng ban, SOP, WI, form workbook, dashboard control và workflow phải có đúng một vị trí SSOT trong blueprint này.</p>
+        <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: không tồn tại record chính thức nằm ngoài blueprint; không có hai SSOT cho cùng một loại record; mọi folder có owner rõ, permission boundary rõ, retention basis rõ và rule đặt tên rõ.</div>
+        <div class="keyline"><strong>Ranh giới tài liệu:</strong> ANNEX-116 là nguồn chuẩn cho <b>path, folder tree, retention basis và zone quyền</b>. Dictionary field/list nằm tại <a href="annex-108-m365-lists-and-field-mapping.html">ANNEX-108</a>. Permission boundary theo vai trò nằm tại <a href="annex-101-role-based-access-map.html">ANNEX-101</a>. Kiến trúc provisioning/automation thực thi nằm tại <a href="annex-125-m365-auto.html">ANNEX-125</a>.</div>
+      </div>
+
+      <div class="section">
+        <h2>2. Mô hình library chuẩn toàn công ty</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Library</th>
+                <th>Mục đích</th>
+                <th>Owner chuẩn</th>
+                <th>Zone quyền nền</th>
+                <th>Ghi chú bắt buộc</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="code">01-QMS-Records</span></td>
+                <td>Governance cấp công ty, audit, MR, risk, change, communication, legal/compliance, knowledge, contingency.</td>
+                <td>QMS Manager</td>
+                <td>QMS-centric</td>
+                <td>Đây là nơi lưu record cấp hệ thống và record điều hành toàn công ty, không dùng để lưu hồ sơ tác nghiệp riêng của từng phòng ban.</td>
+              </tr>
+              <tr>
+                <td><span class="code">02-Quality-Records</span></td>
+                <td>Quality planning, inspection, calibration, MSA, NCR, CAPA, customer complaint, release packs.</td>
+                <td>QA Manager</td>
+                <td>QA-centric</td>
+                <td>Record complaint và release vẫn nằm ở đây dù Sales-CS hoặc Logistics có log giao tiếp riêng.</td>
+              </tr>
+              <tr>
+                <td><span class="code">03-Job-Dossiers</span></td>
+                <td>Hồ sơ thực thi theo JobNum, gate G0–G5, snapshot đóng job và evidence xuyên suốt order-to-ship.</td>
+                <td>Production Director / QA Manager</td>
+                <td>Cross-functional</td>
+                <td>Phải tương thích <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> và <a href="../02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>.</td>
+              </tr>
+              <tr>
+                <td><span class="code">04-Training-Records</span></td>
+                <td>Kế hoạch training, attendance, OJT, đánh giá competence, tracking chứng nhận, matrix và academy evidence.</td>
+                <td>HR Manager</td>
+                <td>HR-centric</td>
+                <td>Đây là SSOT cho training/certification; hồ sơ nhân sự cá nhân chỉ giữ link hoặc index, không nhân đôi evidence ở nhiều nơi.</td>
+              </tr>
+              <tr>
+                <td><span class="code">05-Department-Records</span></td>
+                <td>Record tác nghiệp và governance theo từng phòng ban.</td>
+                <td>Department Head</td>
+                <td>Department-owned</td>
+                <td>Mọi phòng ban dùng cùng một skeleton chuẩn <span class="code">01-Governance</span> đến <span class="code">99-Archive</span>.</td>
+              </tr>
+              <tr>
+                <td><span class="code">06-Archive</span></td>
+                <td>Superseded records, locked packages, closed-year archives, legal hold bundles.</td>
+                <td>QMS Custodian</td>
+                <td>Read-only after lock</td>
+                <td>Không dùng làm working area; record chỉ đi vào đây qua flow archive hoặc archive plan đã duyệt.</td>
+              </tr>
+              <tr>
+                <td><span class="code">07-Templates-Working</span></td>
+                <td>Templates, draft assets, workbook staging và file làm việc chưa release.</td>
+                <td>QMS / Process Owner</td>
+                <td>Controlled edit</td>
+                <td>Không được chứa record release chính thức hoặc evidence production đã dùng để quyết định.</td>
+              </tr>
+              <tr>
+                <td><span class="code">08-People-Records</span></td>
+                <td>Hồ sơ nhân sự cá nhân, payroll restricted, medical/PPE restricted, offboarding và contractor dossiers.</td>
+                <td>HR Manager</td>
+                <td>Restricted HR</td>
+                <td>Tách khỏi <span class="code">04-Training-Records</span> để giữ boundary dữ liệu nhạy cảm, quyền xem hẹp và audit rõ.</td>
+              </tr>
+              <tr>
+                <td><span class="code">09-Digital-System-Records</span></td>
+                <td>Access logs, M365/IT/Epicor configuration records, backup/restore evidence, deployment packs, reconciliation logs.</td>
+                <td>IT Admin / Epicor System Administrator</td>
+                <td>Restricted admin</td>
+                <td>Không trộn với record business của phòng ban; chỉ lưu record điều hành hệ thống và evidence kỹ thuật.</td>
+              </tr>
+              <tr>
+                <td><span class="code">Part-REV-Master</span></td>
+                <td>Namespace master theo PartNo/Rev cho baseline engineering và nguồn sinh snapshot/job package.</td>
+                <td>Engineering Lead</td>
+                <td>ENG update, QA/OPS read</td>
+                <td>Giữ nguyên không tiền tố số vì đây là master namespace theo <span class="code">PartNo/Rev</span>, không phải dải record tuần tự như <span class="code">01-...</span> đến <span class="code">09-...</span>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>3. Blueprint cấp công ty trong 01-QMS-Records</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Folder chuẩn</th>
+                <th>Nội dung bắt buộc</th>
+                <th>Owner</th>
+                <th>Retention basis</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">01-QMS-Records/01-Management-Review/{YYYY}/</td><td>Minutes, action tracker, KPI pack, risk escalations, review inputs từ các phòng ban.</td><td>QMS</td><td>RET-QMS-MR</td></tr>
+              <tr><td class="path">01-QMS-Records/02-Internal-Audits/{YYYY}/</td><td>Plan, checklist, evidence index, findings, closure proofs, auditor notes.</td><td>QMS</td><td>RET-QMS-AUDIT</td></tr>
+              <tr><td class="path">01-QMS-Records/03-External-Audits-and-CB/{YYYY}/</td><td>Customer audit, CB audit, government or external compliance audit packs.</td><td>QMS</td><td>RET-QMS-EXTAUDIT</td></tr>
+              <tr><td class="path">01-QMS-Records/04-Risk-and-Opportunity/{YYYY}/</td><td>Context reviews, risk registers, mitigation plans, risk reviews, escalation inputs.</td><td>QMS</td><td>RET-QMS-RISK</td></tr>
+              <tr><td class="path">01-QMS-Records/05-Change-Control/{YYYY}/</td><td>ECR/ECO governance records, configuration changes, controlled implementation packs.</td><td>QMS</td><td>RET-QMS-CHANGE</td></tr>
+              <tr><td class="path">01-QMS-Records/06-Document-Control-and-Issuance/{YYYY}/</td><td>Issue records, supersede logs, obsolete recall evidence, document master register evidence.</td><td>QMS</td><td>RET-QMS-DOCCTRL</td></tr>
+              <tr><td class="path">01-QMS-Records/07-Communication-and-Leadership/{YYYY}/</td><td>Communication plans, leadership notices, mandatory cascades, campaign evidence.</td><td>QMS</td><td>RET-QMS-COMM</td></tr>
+              <tr><td class="path">01-QMS-Records/08-Context-and-Interested-Parties/{YYYY}/</td><td>SWOT, interested party reviews, compliance expectations, strategic context evidence.</td><td>QMS</td><td>RET-QMS-CONTEXT</td></tr>
+              <tr><td class="path">01-QMS-Records/09-Continual-Improvement-and-Kaizen/{YYYY}/</td><td>CI pipeline, kaizen notes, project closure, verified benefit evidence.</td><td>QMS</td><td>RET-QMS-CI</td></tr>
+              <tr><td class="path">01-QMS-Records/10-Contingency-and-Disruption/{YYYY}/</td><td>Disruption event logs, fallback tests, recovery evidence, BCP reviews.</td><td>QMS + IT</td><td>RET-QMS-BCP</td></tr>
+              <tr><td class="path">01-QMS-Records/11-Legal-and-Compliance/{YYYY}/</td><td>Compliance notices, permits, statutory correspondence, legal hold triggers, policy exceptions.</td><td>QMS + Leadership</td><td>RET-QMS-LEGAL</td></tr>
+              <tr><td class="path">01-QMS-Records/12-Knowledge-and-Lessons-Learned/</td><td>Lessons learned register, standard updates, recurrence watch, approved knowledge base.</td><td>QMS</td><td>RET-QMS-KNOWLEDGE</td></tr>
+              <tr><td class="path">01-QMS-Records/13-Authority-RACI-Deputy/</td><td>Authority matrix evidence, RACI updates, deputy coverage review records.</td><td>Leadership + QMS</td><td>RET-QMS-GOV</td></tr>
+              <tr><td class="path">01-QMS-Records/14-KPI-and-Dashboard-Control/{YYYY}/</td><td>Dashboard source review, refresh control evidence, KPI sign-off packs, exceptions.</td><td>QMS + IT</td><td>RET-QMS-KPI</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>4. Blueprint cấp Quality trong 02-Quality-Records</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Folder chuẩn</th>
+                <th>Nội dung bắt buộc</th>
+                <th>Owner</th>
+                <th>Retention basis</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">02-Quality-Records/01-Quality-Planning/{YYYY}/</td><td>QPL, control plan, PFMEA-lite, inspection strategy, special characteristic packs.</td><td>QE</td><td>RET-QMS-QPLAN</td></tr>
+              <tr><td class="path">02-Quality-Records/02-Inspection-Execution/{YYYY}/</td><td>IQC, in-process, final inspection workbooks, result packs, release evidence.</td><td>QA / QC</td><td>RET-QMS-INSP</td></tr>
+              <tr><td class="path">02-Quality-Records/03-Calibration-and-MSA/{YYYY}/</td><td>Calibration logs, gage verification, GR&amp;R, bias/linearity/stability, CMM qualification.</td><td>Metrology</td><td>RET-QMS-MSA</td></tr>
+              <tr><td class="path">02-Quality-Records/04-NCR/{YYYY}/</td><td>NCR reports, hold/disposition evidence, genealogy scope, containment attachments.</td><td>QA</td><td>RET-QMS-NCR</td></tr>
+              <tr><td class="path">02-Quality-Records/05-CAPA/{YYYY}/</td><td>8D packs, effectiveness checks, recurrence review, linked lessons learned.</td><td>QMS / QA</td><td>RET-QMS-CAPA</td></tr>
+              <tr><td class="path">02-Quality-Records/06-Customer-Complaints/{YYYY}/</td><td>Complaint intake, analysis pack, linked NCR/CAPA, customer response evidence.</td><td>QA + Sales-CS</td><td>RET-QMS-COMPLAINT</td></tr>
+              <tr><td class="path">02-Quality-Records/07-FAI-and-First-Piece/{YYYY}/</td><td>FAI reports, first-piece approval evidence, balloons, measurement packs.</td><td>QA + ENG</td><td>RET-QMS-FAI</td></tr>
+              <tr><td class="path">02-Quality-Records/08-SPC-and-Capability/{YYYY}/</td><td>SPC logs, capability studies, reaction plan evidence, chronic instability review.</td><td>QE</td><td>RET-QMS-SPC</td></tr>
+              <tr><td class="path">02-Quality-Records/09-Product-Safety-and-FOD/{YYYY}/</td><td>Product safety registers, FOD observations, cleanliness-related release evidence.</td><td>QA + Production</td><td>RET-QMS-SAFETY</td></tr>
+              <tr><td class="path">02-Quality-Records/10-Ship-Release-and-CoC/{YYYY}/</td><td>CoC/CoA registers, final release packs, customer-required cert bundles.</td><td>QA Final</td><td>RET-QMS-SHIPREL</td></tr>
+              <tr><td class="path">02-Quality-Records/11-Supplier-Quality-and-SCAR/{YYYY}/</td><td>Supplier issues, SCAR, incoming discrepancy escalation, supplier corrective actions.</td><td>QA + SCM</td><td>RET-QMS-SUPQ</td></tr>
+              <tr><td class="path">02-Quality-Records/12-Audit-and-MR-Quality-Inputs/{YYYY}/</td><td>Quality trend packs, MR inputs, quality dashboard control evidence.</td><td>QMS / QA</td><td>RET-QMS-QSYS</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>5. Blueprint Job dossier trong 03-Job-Dossiers</h2>
+        <div class="figure-box">
+          <p style="margin:0 0 8px;"><strong>Path chuẩn:</strong> <span class="path">03-Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/</span></p>
+          <p style="margin:0;">Nếu customer cần tách biệt dữ liệu, bổ sung lớp <span class="code">{CustomerID}</span> trước thư mục job. Không thay đổi logic G0–G5, không rút gọn tên folder, không thêm folder làm phá gate logic.</p>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Folder chuẩn</th>
+                <th>Nội dung bắt buộc</th>
+                <th>Owner chính</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>00_Admin-Control</td><td>FRM-205, index, dossier status, approval history, change log, customer summary.</td><td>Planning / QA</td></tr>
+              <tr><td>01_G0-Contract-Kickoff</td><td>RFQ link, contract review, kickoff checklist, high-risk readiness records.</td><td>Sales-CS / Planning</td></tr>
+              <tr><td>02_G1-Setup-Release</td><td>Routing, traveler, setup sheet, tool list, pre-run check, work transfer validation.</td><td>Engineering / Production</td></tr>
+              <tr><td>03_G2-FAI-First-Piece</td><td>FAI, first-piece results, balloon drawings, approval or rework decisions.</td><td>QA / Engineering</td></tr>
+              <tr><td>04_G3-IPQC-Production</td><td>In-process records, shift handover, SPC reactions, abnormality evidence, restart proofs.</td><td>Production / QA</td></tr>
+              <tr><td>05_G4-Final-QC-Packaging</td><td>Final inspection, clean-pack, packaging checklists, processor returns, cert collection.</td><td>QA / Clean-Pack / WHS</td></tr>
+              <tr><td>06_G5-Ship-Release</td><td>Shipping checklist, labels, booking, CoC/CoA, POD, customer ship pack.</td><td>WHS / Logistics / QA</td></tr>
+              <tr><td>07_NCR-CAPA-Deviation</td><td>NCR, CAPA, concessions, deviations, rework chains, complaint linkage.</td><td>QA</td></tr>
+              <tr><td>99_Archive-Locked</td><td>Final locked snapshot, signed export bundle, closeout manifest.</td><td>QA / QMS</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>6. Blueprint Training trong 04-Training-Records</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Folder chuẩn</th>
+                <th>Nội dung bắt buộc</th>
+                <th>Owner</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">04-Training-Records/01-Training-Plans/{YYYY}/</td><td>FRM-801, annual/monthly plans, mandatory training calendars, backlog plans.</td><td>HR</td></tr>
+              <tr><td class="path">04-Training-Records/02-Attendance-and-Class-Records/{YYYY}/</td><td>FRM-802, class rosters, induction attendance, toolbox talk attendance.</td><td>HR / Trainer</td></tr>
+              <tr><td class="path">04-Training-Records/03-OJT-Evidence/{YYYY}/</td><td>FRM-803, OJT packs, point-of-use coaching evidence, machine-family training.</td><td>Line Manager</td></tr>
+              <tr><td class="path">04-Training-Records/04-Competence-Assessments/{YYYY}/</td><td>FRM-804, assessment results, authorization evidence, reassessment packs.</td><td>HR + Dept Head</td></tr>
+              <tr><td class="path">04-Training-Records/05-Certification-Register/{YYYY}/</td><td>FRM-805 and FRM-806, current validity, recertification watchlist.</td><td>HR</td></tr>
+              <tr><td class="path">04-Training-Records/06-Skill-Matrix-and-Coverage/{YYYY}/</td><td>FRM-807, FRM-809, matrix snapshots, coverage reviews, deputy readiness.</td><td>HR + Dept Head</td></tr>
+              <tr><td class="path">04-Training-Records/07-Academy-Content-Control/</td><td>Controlled exports from academy, role roadmaps, gate tests, training templates.</td><td>HR / QMS</td></tr>
+              <tr><td class="path">04-Training-Records/08-Safety-Induction-and-Special-Briefings/{YYYY}/</td><td>EHS induction, contractor induction, cleanroom/FOD special briefings.</td><td>HR + EHS</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>7. Skeleton chuẩn trong 05-Department-Records</h2>
+        <p style="margin:8px 0;">Mọi phòng ban bắt buộc dùng cùng một skeleton ở cấp đầu để automation và quyền chạy đồng nhất.</p>
+        <div class="figure-box">
+          <p style="margin:0;" class="path">05-Department-Records/DEP-{CODE}/01-Governance/</p>
+          <p style="margin:4px 0 0;" class="path">05-Department-Records/DEP-{CODE}/02-Operations/</p>
+          <p style="margin:4px 0 0;" class="path">05-Department-Records/DEP-{CODE}/03-Registers-and-Logs/</p>
+          <p style="margin:4px 0 0;" class="path">05-Department-Records/DEP-{CODE}/04-Projects-and-Improvement/</p>
+          <p style="margin:4px 0 0;" class="path">05-Department-Records/DEP-{CODE}/05-Interfaces-and-Released-Packs/</p>
+          <p style="margin:4px 0 0;" class="path">05-Department-Records/DEP-{CODE}/99-Archive/</p>
+        </div>
+        <div class="muted">Các folder cấp 2 dưới đây là bắt buộc cho từng department code. Nếu một record đã có SSOT ở library khác, folder department chỉ giữ interface log hoặc link index, không sao chép bản gốc.</div>
+      </div>
+
+      <div class="section">
+        <h2>8. Folder chi tiết cho từng phòng ban trong 05-Department-Records</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>DEP code</th>
+                <th>Path chuẩn</th>
+                <th>Subfolder bắt buộc dưới 02-Operations / 03-Registers-and-Logs / 05-Interfaces-and-Released-Packs</th>
+                <th>Ghi chú SSOT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>EXEC</td>
+                <td class="path">05-Department-Records/DEP-EXEC/</td>
+                <td>02-Operations: 01-Strategy-and-Objectives, 02-Leadership-Decisions, 03-Investment-and-Priority, 04-Business-Reviews. 03-Registers-and-Logs: 01-Decision-Register, 02-Exception-Register. 05-Interfaces-and-Released-Packs: 01-Leadership-Communication, 02-Board-and-Management-Packs.</td>
+                <td>Record MR/audit/risk gốc vẫn nằm ở <span class="code">01-QMS-Records</span>.</td>
+              </tr>
+              <tr>
+                <td>QMS</td>
+                <td class="path">05-Department-Records/DEP-QMS/</td>
+                <td>02-Operations: 01-QMS-Deployment, 02-Document-Upgrade, 03-Process-Mapping, 04-KPI-Control, 05-System-Improvement. 03-Registers-and-Logs: 01-Action-Tracker, 02-Issue-Tracker. 05-Interfaces-and-Released-Packs: 01-Audit-Input-Packs, 02-MR-Input-Packs.</td>
+                <td>System-level QMS records gốc ở <span class="code">01-QMS-Records</span>.</td>
+              </tr>
+              <tr>
+                <td>QA</td>
+                <td class="path">05-Department-Records/DEP-QA/</td>
+                <td>02-Operations: 01-Quality-Planning, 02-Inspection-Execution, 03-Calibration-MSA, 04-NCR-CAPA-Response, 05-Ship-Release, 06-Product-Safety-FOD. 03-Registers-and-Logs: 01-Control-Plan-Register, 02-SPC-Watchlist, 03-Release-Exception-Log. 05-Interfaces-and-Released-Packs: 01-Customer-Complaint-Response, 02-Supplier-Quality-Pack.</td>
+                <td>Complaint/NCR/CAPA/inspection gốc ở <span class="code">02-Quality-Records</span>.</td>
+              </tr>
+              <tr>
+                <td>ENG</td>
+                <td class="path">05-Department-Records/DEP-ENG/</td>
+                <td>02-Operations: 01-Feasibility-DFM, 02-Baseline-Packages, 03-NC-and-Setup, 04-FAI-Support, 05-Technical-Changes, 06-Knowledge-Reuse. 03-Registers-and-Logs: 01-Assumption-Log, 02-Change-Implementation-Log, 03-Prove-Out-Watchlist. 05-Interfaces-and-Released-Packs: 01-RFQ-Response-Pack, 02-Process-Readiness-Pack, 03-CAPA-Engineering-Response.</td>
+                <td>Part master ở <span class="code">Part-REV-Master</span>; job-specific release pack ở <span class="code">03-Job-Dossiers</span>.</td>
+              </tr>
+              <tr>
+                <td>PRO</td>
+                <td class="path">05-Department-Records/DEP-PRO/</td>
+                <td>02-Operations: 01-Planning-and-Dispatch, 02-Setup-and-First-Piece, 03-Shift-Handover, 04-Downtime-and-Maintenance, 05-Tool-Life-and-Tooling, 06-Deburr-Clean-Pack, 07-WIP-and-Abnormality. 03-Registers-and-Logs: 01-Dispatch-Snapshot, 02-Downtime-History, 03-WIP-Aging, 04-Tool-Life. 05-Interfaces-and-Released-Packs: 01-Readiness-Control-Tower, 02-Pack-Ready-Handover.</td>
+                <td>Execution evidence gốc theo job nằm ở <span class="code">03-Job-Dossiers</span>.</td>
+              </tr>
+              <tr>
+                <td>SCM</td>
+                <td class="path">05-Department-Records/DEP-SCM/</td>
+                <td>02-Operations: 01-Supplier-Qualification-and-Scorecards, 02-PO-and-Outsource-Packs, 03-Receiving-and-Traceability, 04-Warehouse-and-FIFO, 05-Tool-Crib, 06-Shipping-and-Booking, 07-Supplier-Recovery. 03-Registers-and-Logs: 01-PO-Tracking, 02-Expedite-Log, 03-Quarantine-Aging, 04-Shipment-Exception-Log. 05-Interfaces-and-Released-Packs: 01-Processor-Flowdown-Pack, 02-Ship-Pack-Interface, 03-SCAR-Response-Pack.</td>
+                <td>Shipment/job-specific ship records gốc ở <span class="code">03-Job-Dossiers</span>; supplier quality events gốc ở <span class="code">02-Quality-Records</span>.</td>
+              </tr>
+              <tr>
+                <td>SAL</td>
+                <td class="path">05-Department-Records/DEP-SAL/</td>
+                <td>02-Operations: 01-RFQ-and-Quotes, 02-Contract-Review-and-Acknowledgement, 03-Customer-Changes, 04-Customer-Property, 05-Complaint-Interface, 06-Customer-Satisfaction, 07-Ship-Communication. 03-Registers-and-Logs: 01-RFQ-Register, 02-Order-Mismatch-Log, 03-Customer-Update-Cadence, 04-RMA-Tracker. 05-Interfaces-and-Released-Packs: 01-Order-Release-Pack, 02-Customer-Communication-Pack.</td>
+                <td>Complaint quality pack gốc ở <span class="code">02-Quality-Records</span>; order-specific evidence gốc ở <span class="code">03-Job-Dossiers</span>.</td>
+              </tr>
+              <tr>
+                <td>FIN</td>
+                <td class="path">05-Department-Records/DEP-FIN/</td>
+                <td>02-Operations: 01-Invoice-and-AR, 02-AP-and-Payments, 03-Costing-and-Margin, 04-Payroll-Accounting, 05-Close-and-Reconciliation, 06-Cash-and-Exposure, 07-Financial-Controls. 03-Registers-and-Logs: 01-AR-Aging, 02-AP-Due-Tracker, 03-Close-Checklist-Status, 04-SoD-Exception-Log. 05-Interfaces-and-Released-Packs: 01-Invoice-Pack-Interface, 02-Payroll-Input-Receipt, 03-Costing-Review-Packs.</td>
+                <td>Payroll employee-sensitive files tách sang <span class="code">08-People-Records</span>; ERP transaction SoR ở Epicor.</td>
+              </tr>
+              <tr>
+                <td>HR</td>
+                <td class="path">05-Department-Records/DEP-HR/</td>
+                <td>02-Operations: 01-Workforce-Planning-and-Recruitment, 02-Onboarding, 03-Personnel-Administration, 04-Employee-Relations, 05-Payroll-Input-Control, 06-Offboarding-and-Handover, 07-Succession-and-Deputy. 03-Registers-and-Logs: 01-Vacancy-Tracker, 02-Onboarding-Tracker, 03-Offboarding-Tracker, 04-Authorized-to-Work-Exceptions. 05-Interfaces-and-Released-Packs: 01-Access-Request-Pack, 02-Payroll-Input-Pack, 03-Disciplinary-and-Grievance-Pack.</td>
+                <td>Training/certification SSOT ở <span class="code">04-Training-Records</span>; hồ sơ cá nhân nhạy cảm ở <span class="code">08-People-Records</span>.</td>
+              </tr>
+              <tr>
+                <td>EHS</td>
+                <td class="path">05-Department-Records/DEP-EHS/</td>
+                <td>02-Operations: 01-Hazard-PPE-Permits, 02-Incident-and-Near-Miss, 03-Inspections-and-Unsafe-Conditions, 04-Emergency-Readiness, 05-Environmental-and-Cleanroom, 06-Contractor-Visitor-Safety, 07-EHS-Campaigns-and-Learning. 03-Registers-and-Logs: 01-Incident-Register, 02-Unsafe-Condition-Log, 03-Permit-Register, 04-Emergency-Drill-Tracker. 05-Interfaces-and-Released-Packs: 01-Restart-Release-Pack, 02-EHS-MR-Input-Pack.</td>
+                <td>Incident packs có thể nối sang CAPA/NCR nhưng EHS record gốc vẫn do DEP-EHS giữ.</td>
+              </tr>
+              <tr>
+                <td>IT</td>
+                <td class="path">05-Department-Records/DEP-IT/</td>
+                <td>02-Operations: 01-Access-and-Identity, 02-Config-and-Change, 03-Backup-and-Restore, 04-Asset-and-Endpoint, 05-Incident-and-Recovery, 06-Platform-Operations, 07-Offline-Fallback-Kits. 03-Registers-and-Logs: 01-Access-Review-Status, 02-Backup-Health, 03-Endpoint-Exceptions, 04-Change-Calendar. 05-Interfaces-and-Released-Packs: 01-Deployment-Packs, 02-Recovery-Packs.</td>
+                <td>Admin evidence gốc nằm ở <span class="code">09-Digital-System-Records</span>; department folder chỉ giữ operating packs và interface copies.</td>
+              </tr>
+              <tr>
+                <td>ERP</td>
+                <td class="path">05-Department-Records/DEP-ERP/</td>
+                <td>02-Operations: 01-Transaction-Governance, 02-Master-Data-Requests, 03-Deployment-UAT-Cutover, 04-Error-and-Reconciliation, 05-Interface-and-Data-Exchange, 06-Sensitive-Role-Control. 03-Registers-and-Logs: 01-Role-Review, 02-Master-Data-Log, 03-Interface-Error-Log, 04-Re-entry-Queue. 05-Interfaces-and-Released-Packs: 01-UAT-Pack, 02-Cutover-Pack, 03-Reconciliation-Pack.</td>
+                <td>ERP admin records gốc nằm ở <span class="code">09-Digital-System-Records</span>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>9. Blueprint hồ sơ nhân sự trong 08-People-Records</h2>
+        <div class="figure-box">
+          <p style="margin:0;" class="path">08-People-Records/01-Active-Employees/{EmployeeID}-{FullName}/</p>
+          <p style="margin:4px 0 0;" class="path">08-People-Records/02-Former-Employees/{YYYY}/{EmployeeID}-{FullName}/</p>
+          <p style="margin:4px 0 0;" class="path">08-People-Records/03-Contractors-and-Interns/{YYYY}/{Population}/{ID-Name}/</p>
+          <p style="margin:4px 0 0;" class="path">08-People-Records/04-Visitors-and-Temporary-Access/{YYYY}/</p>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Folder cá nhân chuẩn</th>
+                <th>Nội dung bắt buộc</th>
+                <th>Ghi chú quyền</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>00-Personnel-Profile</td><td>Identity sheet, employee index, organization placement, emergency contacts as allowed.</td><td>HR restricted</td></tr>
+              <tr><td>01-Contract-and-Legal</td><td>Contracts, appendices, statutory employment records, NDA and confidentiality records.</td><td>HR restricted</td></tr>
+              <tr><td>02-Onboarding-and-Access</td><td>Onboarding checklist, FRM-141 linkage, system/equipment issue records, induction completion index.</td><td>HR + IT restricted</td></tr>
+              <tr><td>03-Training-and-Certification-Link</td><td>Index or pointer to 04-Training-Records, critical authorization summary, expiry watchlist.</td><td>No duplicate core evidence</td></tr>
+              <tr><td>04-Performance-and-Probation</td><td>Probation review, performance evaluation, development plans where controlled.</td><td>HR + manager restricted</td></tr>
+              <tr><td>05-Compensation-and-Payroll-Restricted</td><td>Payroll-sensitive documents, compensation adjustments, restricted payroll support evidence.</td><td>Highest HR/Finance restriction</td></tr>
+              <tr><td>06-Health-PPE-and-Fit-to-Work-Restricted</td><td>Medical fitness or fit-to-work restrictions, PPE issuance where personal, health surveillance outputs.</td><td>Need-to-know only</td></tr>
+              <tr><td>07-Discipline-and-Grievance-Restricted</td><td>Disciplinary records, grievances, investigations, closure evidence.</td><td>Restricted and auditable</td></tr>
+              <tr><td>08-Assets-and-Issued-Items</td><td>Badge, laptop, phone, tool or special asset issue/return index.</td><td>HR + IT + owner as needed</td></tr>
+              <tr><td>09-Offboarding-and-Handover</td><td>Exit checklist, recall of access/assets, handover notes, unresolved items.</td><td>HR restricted</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Quy tắc cứng:</strong> <span class="code">08-People-Records</span> không lưu bản sao trùng của training SSOT hoặc job dossier SSOT. Khi cần tham chiếu, dùng index/link, không copy record qua nhiều library.</div>
+      </div>
+
+      <div class="section">
+        <h2>10. Blueprint record hệ thống trong 09-Digital-System-Records</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Folder chuẩn</th>
+                <th>Nội dung bắt buộc</th>
+                <th>Owner</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">09-Digital-System-Records/01-Access-and-Identity/{YYYY}/</td><td>FRM-141, access change, revoke evidence, quarterly access reviews, sensitive role reviews.</td><td>IT / ERP</td></tr>
+              <tr><td class="path">09-Digital-System-Records/02-M365-and-SharePoint-Config/{YYYY}/</td><td>Site/library config, permission templates, flow releases, metadata schema changes.</td><td>IT</td></tr>
+              <tr><td class="path">09-Digital-System-Records/03-Epicor-Master-Data-and-Role-Control/{YYYY}/</td><td>Master data change packs, role packs, SoD exceptions, transaction governance evidence.</td><td>Epicor Admin</td></tr>
+              <tr><td class="path">09-Digital-System-Records/04-Deployment-UAT-Cutover/{YYYY}/</td><td>UAT scripts, deployment packs, rollback plans, go-live approvals, cutover evidence.</td><td>IT / ERP</td></tr>
+              <tr><td class="path">09-Digital-System-Records/05-Backup-Restore-and-Recovery/{YYYY}/</td><td>Backup jobs, restore tests, recovery drills, offline re-entry evidence.</td><td>IT</td></tr>
+              <tr><td class="path">09-Digital-System-Records/06-Incident-and-Problem-Management/{YYYY}/</td><td>System incident logs, containment evidence, corrective actions, root cause reviews.</td><td>IT / ERP</td></tr>
+              <tr><td class="path">09-Digital-System-Records/07-Asset-and-Endpoint-Control/{YYYY}/</td><td>Asset registers, endpoint status, compliance exceptions, recovery keys where approved.</td><td>IT</td></tr>
+              <tr><td class="path">09-Digital-System-Records/08-Automation-Run-Logs/{YYYY}/</td><td>Provisioning logs, run history, flow failures, share link expiry cleanup logs.</td><td>IT</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>11. Archive, templates và master namespace</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Zone</th>
+                <th>Path chuẩn</th>
+                <th>Rule sử dụng</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Archive year close</td><td class="path">06-Archive/01-Closed-Year-Archive/{YYYY}/</td><td>Chứa bản đóng năm theo library hoặc function, chỉ đọc sau khi lock.</td></tr>
+              <tr><td>Superseded records</td><td class="path">06-Archive/02-Superseded-and-Obsolete/</td><td>Chứa bundle superseded có link tới release record, không xóa tay khỏi vùng active mà không có archive trace.</td></tr>
+              <tr><td>Legal hold</td><td class="path">06-Archive/03-Legal-Hold/</td><td>Dùng cho legal/compliance hold, giữ read-only và tách owner rõ.</td></tr>
+              <tr><td>Locked job packages</td><td class="path">06-Archive/04-Locked-Job-Packages/{YYYY}/</td><td>Snapshot cuối của dossier sau close và archive lock.</td></tr>
+              <tr><td>Templates</td><td class="path">07-Templates-Working/{Function}/{TemplateType}/</td><td>Template work-in-progress, workbook staging, draft asset, không dùng làm record release.</td></tr>
+              <tr><td>Part master</td><td class="path">Part-REV-Master/{PartNo}/REV-{Rev}/</td><td>Master package theo PartNo/Rev; snapshot dùng cho từng job phải link hoặc extract có kiểm soát, không sửa tại chỗ trong dossier.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>12. Token đặt tên folder và file</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Quy tắc</th>
+                <th>Ví dụ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>{YYYY}</td><td>Năm 4 chữ số.</td><td>2026</td></tr>
+              <tr><td>{DeptCode}</td><td>Mã phòng ban chuẩn: EXEC, QMS, QA, ENG, PRO, SCM, SAL, FIN, HR, EHS, IT, ERP.</td><td>ENG</td></tr>
+              <tr><td>{EmployeeID}</td><td>Mã nhân sự duy nhất, không dùng tên đơn lẻ làm khóa.</td><td>E0247</td></tr>
+              <tr><td>{JobNum}</td><td>Mã job theo Epicor, không được thay bằng nickname nội bộ.</td><td>J240315</td></tr>
+              <tr><td>{PartNo}</td><td>Mã part chuẩn theo master.</td><td>PN7788</td></tr>
+              <tr><td>{Revision}</td><td>Revision engineering theo chuẩn release.</td><td>B</td></tr>
+              <tr><td>{RecordType}</td><td>Mã record theo dictionary ở ANNEX-108.</td><td>NCR, CAPA, RFQ, INCIDENT</td></tr>
+              <tr><td>{Description}</td><td>Slug ngắn, không dấu tiếng Việt, không khoảng trắng, dùng dấu gạch nối.</td><td>customer-change-pack</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Pattern file release:</strong> <span class="code">REC-{DeptCode}-{YYYY}-{NNNN}-{Description}.pdf</span>, <span class="code">{RecordType}-{JobNum}-{PartNo}-{Description}.pdf</span>, <span class="code">PHOTO-{YYYYMMDD}-{JobNum}-{Description}.jpg</span>.</div>
+      </div>
+
+      <div class="section">
+        <h2>13. Retention basis và trigger nhóm record</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Nhóm record</th>
+                <th>Label family</th>
+                <th>Trigger chuẩn</th>
+                <th>Ghi chú</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>QMS governance</td><td>RET-QMS-*</td><td>Approved date, closed date, superseded date hoặc MR close.</td><td>Day-count chi tiết theo retention plan quản trị bởi QMS/IT.</td></tr>
+              <tr><td>Quality execution</td><td>RET-QMS-NCR / CAPA / INSP / FAI / SPC / MSA / SHIPREL</td><td>Closed date, effectiveness verified, job close hoặc release approval.</td><td>Record quyết định không được gắn retention theo ngày upload nếu có business event chuẩn.</td></tr>
+              <tr><td>Job dossier</td><td>RET-JOB-*</td><td>Job closed / ship confirmed / closeout approved.</td><td>Ảnh hiện trường tạm thời nếu có thể dùng label ngắn hơn nhưng phải link với dossier.</td></tr>
+              <tr><td>Training/certification</td><td>RET-HR-TRAIN / COMP / CERT</td><td>Session complete, assessment complete, certification issued or expired.</td><td>Training SSOT ở 04; employee folder chỉ giữ link/index.</td></tr>
+              <tr><td>People records</td><td>RET-HR-PERSONNEL / PAYROLL / DISCIPLINE / MEDICAL / OFFBOARD</td><td>Employment status change, payroll close, case close, offboarding complete.</td><td>Chi tiết thời hạn do retention plan pháp lý của HR/Legal quản trị.</td></tr>
+              <tr><td>Department operational records</td><td>RET-DEPT-OPS / GOV</td><td>Record close, month-end close, project close hoặc supersede.</td><td>Dùng cho dashboard packs, meeting packs, trackers không có label đặc thù riêng.</td></tr>
+              <tr><td>Digital system records</td><td>RET-IT-ACCESS / CONFIG / BACKUP / INCIDENT / ERP-CHANGE</td><td>Request close, deployment close, restore test complete, issue close.</td><td>Phải hỗ trợ audit trail và forensic review.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>14. Permission zones và vùng nhạy cảm</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Zone</th>
+                <th>Quyền nền</th>
+                <th>Không được làm</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Company governance zones</td><td>QMS edit, leadership read/edit theo authority.</td><td>Không external share trực tiếp khi chưa có approval route.</td></tr>
+              <tr><td>Department operations</td><td>Department group edit, cross-functional read/edit theo RACI.</td><td>Không biến thành kho cá nhân; không cấp trực tiếp từng user tràn lan.</td></tr>
+              <tr><td>People restricted</td><td>HR-only hoặc HR+Finance/IT hạn chế theo subfolder.</td><td>Không browse rộng toàn library, không share ngoài công ty, không copy ra Teams/email làm SSOT mới.</td></tr>
+              <tr><td>Digital system restricted</td><td>IT/ERP admin groups, read-only review cho audit when needed.</td><td>Không cho user business sửa admin evidence hoặc run logs.</td></tr>
+              <tr><td>Part-REV-Master</td><td>ENG edit, QA/OPS read.</td><td>Không lưu lot-specific evidence hoặc chỉnh revision trực tiếp ngoài release flow.</td></tr>
+              <tr><td>Archive locked</td><td>Read-only sau lock.</td><td>Không mở lại edit trừ khi có approved exception với trace đầy đủ.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>15. Kiểm tra định kỳ và xử lý sai chỗ</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Tình huống sai</th>
+                <th>Hành động bắt buộc</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Record nằm sai library hoặc sai department zone</td><td>Di chuyển về đúng SSOT, cập nhật link/index, log reason nếu record đã được dùng trong decision.</td></tr>
+              <tr><td>Record cá nhân bị lưu trong department share chung</td><td>Chuyển sang <span class="code">08-People-Records</span>, thu hẹp quyền và review toàn bộ population tương tự.</td></tr>
+              <tr><td>IT/Epicor evidence bị lưu lẫn trong department working folder</td><td>Chuyển sang <span class="code">09-Digital-System-Records</span>; department folder chỉ giữ interface pack hoặc link.</td></tr>
+              <tr><td>Department tự tạo subfolder ngoài skeleton chuẩn</td><td>Đánh giá nếu record type mới thật sự phát sinh; nếu không, dọn về cấu trúc chuẩn và khóa quyền tạo không kiểm soát.</td></tr>
+              <tr><td>Training evidence bị copy sang employee folder</td><td>Giữ lại index/link trong employee folder, xóa bản trùng sau khi xác nhận SSOT ở <span class="code">04-Training-Records</span>.</td></tr>
+              <tr><td>Folder job thiếu gate folder hoặc thiếu archive lock</td><td>Provision bổ sung ngay theo WI-203 và log gap để review automation/provisioning.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát revision thì document này không có giá trị. Chỉ sử dụng revision hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
