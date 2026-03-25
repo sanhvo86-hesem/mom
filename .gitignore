@@ -1,0 +1,8 @@
+# Runtime-generated portal data (keep README markers tracked)
+01-QMS-Portal/qms-data/php_error.log
+01-QMS-Portal/qms-data/scan_cache.json
+01-QMS-Portal/qms-data/form-workflow/**
+01-QMS-Portal/qms-data/ratelimit/**
+!01-QMS-Portal/qms-data/ratelimit/README.md
+01-QMS-Portal/qms-data/sessions/**
+!01-QMS-Portal/qms-data/sessions/README.md

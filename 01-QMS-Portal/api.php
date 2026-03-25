@@ -1610,6 +1610,70 @@ function split_nonempty_lines(string $text): array {
   return array_values(array_filter(array_map('trim', $lines), static fn($line) => $line !== ''));
 }
 
+function git_status_entry_path(string $line): string {
+  $raw = trim(substr($line, 3));
+  if ($raw === '') return '';
+  if (str_contains($raw, ' -> ')) {
+    $parts = explode(' -> ', $raw);
+    $raw = (string)end($parts);
+  }
+  $raw = trim($raw);
+  if ($raw !== '' && $raw[0] === '"' && substr($raw, -1) === '"') {
+    $raw = stripcslashes(substr($raw, 1, -1));
+  }
+  return str_replace('\\', '/', $raw);
+}
+
+function git_is_runtime_noise_path(string $path): bool {
+  $p = ltrim(str_replace('\\', '/', trim($path)), '/');
+  if ($p === '') return false;
+  if ($p === '01-QMS-Portal/qms-data/config/users.json') return true;
+  if ($p === '01-QMS-Portal/qms-data/php_error.log') return true;
+  if ($p === '01-QMS-Portal/qms-data/scan_cache.json') return true;
+  if (str_starts_with($p, '01-QMS-Portal/qms-data/sessions/')) {
+    return basename($p) !== 'README.md';
+  }
+  if (str_starts_with($p, '01-QMS-Portal/qms-data/ratelimit/')) {
+    return basename($p) !== 'README.md';
+  }
+  if (str_starts_with($p, '01-QMS-Portal/qms-data/form-workflow/')) return true;
+  return false;
+}
+
+function git_filter_non_runtime_status_lines(array $statusLines): array {
+  $kept = [];
+  foreach ($statusLines as $line) {
+    if (!is_string($line) || trim($line) === '') continue;
+    $path = git_status_entry_path($line);
+    if (!git_is_runtime_noise_path($path)) {
+      $kept[] = $line;
+    }
+  }
+  return $kept;
+}
+
+function git_filter_non_runtime_paths(array $paths): array {
+  $kept = [];
+  foreach ($paths as $path) {
+    if (!is_string($path) || trim($path) === '') continue;
+    $norm = str_replace('\\', '/', trim($path));
+    if (!git_is_runtime_noise_path($norm)) {
+      $kept[] = $norm;
+    }
+  }
+  return $kept;
+}
+
+function git_collect_paths_from_status_lines(array $statusLines): array {
+  $paths = [];
+  foreach ($statusLines as $line) {
+    if (!is_string($line) || trim($line) === '') continue;
+    $path = git_status_entry_path($line);
+    if ($path !== '') $paths[] = $path;
+  }
+  return array_values(array_unique($paths));
+}
+
 function git_sync_commit_author(array $me): array {
   $name = trim((string)($me['name'] ?? $me['username'] ?? 'Portal Sync'));
   if ($name === '') $name = 'Portal Sync';
@@ -1628,34 +1692,6 @@ function git_sync_commit_author(array $me): array {
   ];
 }
 
-function git_sync_allowed_targets(string $repoDir): array {
-  $targets = [
-    '02-Tai-Lieu-He-Thong',
-    '03-Tai-Lieu-Van-Hanh',
-    '04-Bieu-Mau',
-    '10-Training-Academy',
-    '11-Glossary',
-    '01-QMS-Portal/docs',
-  ];
-
-  $repoNorm = rtrim(str_replace('\\', '/', $repoDir), '/');
-  $configDir = $repoNorm . '/01-QMS-Portal/qms-data/config';
-  if (is_dir($configDir)) {
-    $configFiles = glob($configDir . '/*.json');
-    if (is_array($configFiles)) {
-      sort($configFiles, SORT_STRING);
-      foreach ($configFiles as $file) {
-        $fileNorm = str_replace('\\', '/', (string)$file);
-        $rel = ltrim(substr($fileNorm, strlen($repoNorm)), '/');
-        if ($rel === '' || basename($rel) === 'users.json') continue;
-        $targets[] = $rel;
-      }
-    }
-  }
-
-  return array_values(array_unique($targets));
-}
-
 function git_sync_documents(array $me, string $repoDir): array {
   $repoReal = realpath($repoDir);
   if ($repoReal === false || !is_dir($repoReal)) {
@@ -1668,29 +1704,17 @@ function git_sync_documents(array $me, string $repoDir): array {
     throw new RuntimeException('not_a_git_repo');
   }
 
-  $stagedCode = 0;
-  $stagedOut = git_command(['diff', '--cached', '--name-only'], $repoReal, $stagedCode);
-  if ($stagedCode !== 0) {
-    throw new RuntimeException('git_index_check_failed');
-  }
-  $stagedFiles = split_nonempty_lines($stagedOut);
-  if (!empty($stagedFiles)) {
-    throw new RuntimeException('staged_changes_present');
-  }
-
   $branchCode = 0;
   $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
   if ($branchCode !== 0 || $branch === '') $branch = 'main';
 
-  $targets = git_sync_allowed_targets($repoReal);
-  $statusArgs = ['status', '--porcelain', '--untracked-files=all', '--'];
-  array_push($statusArgs, ...$targets);
+  $statusArgs = ['status', '--porcelain', '--untracked-files=all'];
   $statusCode = 0;
   $statusOut = git_command($statusArgs, $repoReal, $statusCode);
   if ($statusCode !== 0) {
     throw new RuntimeException('git_status_failed');
   }
-  $statusLines = split_nonempty_lines($statusOut);
+  $statusLines = git_filter_non_runtime_status_lines(split_nonempty_lines($statusOut));
   if (empty($statusLines)) {
     $aheadCode = 0;
     $aheadOut = git_command(['rev-list', '--count', 'origin/' . $branch . '..' . $branch], $repoReal, $aheadCode);
@@ -1715,15 +1739,28 @@ function git_sync_documents(array $me, string $repoDir): array {
       'pushed' => false,
       'branch' => $branch,
       'files' => [],
-      'message' => 'No allowed document changes to sync.',
+      'message' => 'No non-runtime changes to sync.',
       'status' => [],
       'commit_output' => '',
       'push_output' => '',
     ];
   }
 
+  $candidatePaths = git_collect_paths_from_status_lines($statusLines);
+  if (empty($candidatePaths)) {
+    return [
+      'pushed' => false,
+      'branch' => $branch,
+      'files' => [],
+      'message' => 'No non-runtime changes to sync.',
+      'status' => $statusLines,
+      'commit_output' => '',
+      'push_output' => '',
+    ];
+  }
+
   $addArgs = ['add', '--'];
-  array_push($addArgs, ...$targets);
+  array_push($addArgs, ...$candidatePaths);
   $addCode = 0;
   $addOut = git_command($addArgs, $repoReal, $addCode);
   if ($addCode !== 0) {
@@ -1735,13 +1772,13 @@ function git_sync_documents(array $me, string $repoDir): array {
   if ($filesCode !== 0) {
     throw new RuntimeException('git_diff_cached_failed');
   }
-  $files = split_nonempty_lines($filesOut);
+  $files = git_filter_non_runtime_paths(split_nonempty_lines($filesOut));
   if (empty($files)) {
     return [
       'pushed' => false,
       'branch' => $branch,
       'files' => [],
-      'message' => 'No staged document changes to sync.',
+      'message' => 'No staged non-runtime changes to sync.',
       'status' => $statusLines,
       'commit_output' => '',
       'push_output' => '',
@@ -1757,7 +1794,7 @@ function git_sync_documents(array $me, string $repoDir): array {
   $commitOut = git_command([
     '-c', 'user.name=' . (string)$author['name'],
     '-c', 'user.email=' . (string)$author['email'],
-    'commit', '-m', $commitMessage
+    'commit', '-m', $commitMessage, '--', ...$candidatePaths
   ], $repoReal, $commitCode);
   if ($commitCode !== 0) {
     throw new RuntimeException('git_commit_failed' . ($commitOut !== '' ? ': ' . $commitOut : ''));
@@ -1797,16 +1834,18 @@ function git_pull_portal(string $repoDir): array {
   if ($stagedCode !== 0) {
     throw new RuntimeException('git_index_check_failed');
   }
-  if (!empty(split_nonempty_lines($stagedOut))) {
+  $stagedFiles = split_nonempty_lines($stagedOut);
+  $stagedMeaningful = git_filter_non_runtime_paths($stagedFiles);
+  if (!empty($stagedMeaningful)) {
     throw new RuntimeException('staged_changes_present');
   }
 
   $statusCode = 0;
-  $statusOut = git_command(['status', '--porcelain'], $repoReal, $statusCode);
+  $statusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $statusCode);
   if ($statusCode !== 0) {
     throw new RuntimeException('git_status_failed');
   }
-  $dirtyLines = split_nonempty_lines($statusOut);
+  $dirtyLines = git_filter_non_runtime_status_lines(split_nonempty_lines($statusOut));
   if (!empty($dirtyLines)) {
     throw new RuntimeException('working_tree_dirty');
   }
