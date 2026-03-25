@@ -1,0 +1,36 @@
+﻿M365 ENTERPRISE FILE PLAN RESEARCH BASIS
+
+Date: 2026-03-25
+
+Official and primary references used for the redesign
+- Microsoft Support: Plan the content for your SharePoint site
+  https://support.microsoft.com/en-au/office/plan-the-content-for-your-sharepoint-site-6cfc059e-2c45-46d5-8d7d-507d3dace301
+- Microsoft Learn: Retention
+  https://learn.microsoft.com/en-us/purview/retention
+- Microsoft Learn: Manage permission scope
+  https://learn.microsoft.com/en-us/sharepoint/manage-permission-scope
+- Microsoft: SharePoint sites for highly regulated data
+  https://learn.microsoft.com/en-us/microsoft-365/enterprise/media/teams-sharepoint-online-sites-highly-regulated-data/SharePointSitesHighlyRegulatedData.pdf
+- ISO TC46/SC11: ISO 15489 records management
+  https://committee.iso.org/sites/tc46sc11/home/projects/published/iso-15489-records-management.html
+- NARA scheduling implementation guidance
+  https://www.archives.gov/records-mgmt/scheduling/implementation
+- OPM personnel recordkeeping references
+  https://www.opm.gov/
+
+Applied design principles
+- Official records are classified by function and record series, not by person name or desktop location.
+- Employee-specific working material is separated into named workbenches so collaboration can happen without turning the official file plan into personal silos.
+- Restricted personal records are split into a dedicated people site and shared restricted operations, rather than overusing folder-level permission breaks in general department areas.
+- Digital administration records are split into 00-Current and {YYYY} so living controls and frozen history do not get mixed.
+- Controlled source is separated from runtime/admin evidence, and mirrored from SharePoint local sync into Git and then server deployment, with reverse sync recorded back.
+- Current data, active projects, year-based history, drafts, references, and archive are separated structurally to keep the template durable over many years.
+
+Structural conclusions adopted in the template
+- 3 site roots: HESEM-QMS-Core, HESEM-People-Restricted, HESEM-Digital-Control.
+- Every employee has up to 3 storage loci: official record destination, named employee workbench, restricted people dossier when required.
+- Every department has team workbenches plus named employee workbenches under role roots.
+- People records include active employees, pending starters, former employees, contractor populations, visitors/vendor access, and restricted shared operations.
+- Digital system records include both 00-Current and {YYYY} in every system area.
+- Source control mirrors approved repo roots and excludes runtime payload, secrets, and transaction data.
+- Job dossiers are customer-scoped and follow the gate structure G0 to G7 plus NCR/CAPA and archive lock.

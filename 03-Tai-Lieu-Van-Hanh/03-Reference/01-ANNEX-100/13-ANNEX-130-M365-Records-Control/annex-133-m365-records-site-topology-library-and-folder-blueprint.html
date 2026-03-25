@@ -301,25 +301,35 @@
         <div class="muted">Các thư mục cấp 2 dưới đây là bắt buộc cho từng phòng ban code. Nếu một hồ sơ đã có SSOT ở thư viện khác, thư mục phòng ban chỉ giữ giao diện log hoặc link index, không sao chép bản gốc.</div>
         <div class="keyline"><strong>Quy tắc lớp dữ liệu phòng ban:</strong> dữ liệu vận hành không gắn năm như live board, current queue, master list, mapping, dashboard source view, open issue tracker và controlled link index phải nằm trong <span class="code">00-Live-Control-and-Master-Data</span> hoặc các nhánh <span class="code">00-Current</span>/<span class="code">00-Active</span>. Bản nháp, file tạm, file review, file đang soạn và file đang chờ promote phải nằm trong <span class="code">06-Working-Transitory-and-Draft</span>. File nhận từ ngoài, convenience copy, tài liệu tham khảo và tài liệu tra cứu không phải SSOT phải nằm trong <span class="code">07-Reference-and-Received-External</span>. Chỉ review pack, closed-period log, snapshot, history và output theo kỳ mới đi vào nhánh <span class="code">{YYYY}</span>. Giao dịch gốc / SoR trong Epicor hoặc hệ thống khác không được dump sang SharePoint để thay SoR.</div>
         <div class="figure-box">
-          <p style="margin:0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/01-Current-Boards-and-Queues/</p>
+          <p style="margin:0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/01-Boards-and-Queues/</p>
           <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/02-Master-Lists-and-Mappings/</p>
-          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/03-Live-Dashboards-and-Source-Views/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/03-Dashboards-and-Views/</p>
           <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/04-Open-Issues-and-Action-Trackers/</p>
           <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/05-Link-Indexes-and-Controlled-Views/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/06-Department-Calendar-and-Roster/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/07-Shared-Reference-Indexes/</p>
         </div>
         <div class="figure-box">
-          <p style="margin:0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/00-Inbox/</p>
-          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/01-Draft/</p>
-          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/02-Review/</p>
-          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/03-Promote-to-Official-Record/</p>
-          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/99-Clear-Within-90d/</p>
+          <p style="margin:0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/00-Team-Inbox/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/01-Team-Draft/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/02-Team-Review/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/03-Team-Promote/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/04-Team-Offline/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/05-Team-Ref/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}/00-My-Inbox/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}/03-My-Handoff/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/91-Deputy-Handover/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/ROLE-{RoleCode}/99-Clear-90d/</p>
           <p style="margin:8px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/01-Customer-Received/</p>
           <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/02-Supplier-Received/</p>
           <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/03-Standards-and-Manuals/</p>
-          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/04-Convenience-Copies/</p>
-          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/05-To-Be-Culled/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/04-Department-Work-Aids-and-Visuals/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/05-Portal-Exports-and-System-Downloads/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/06-Convenience-Copies/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/07-To-Be-Culled/</p>
         </div>
-        <div class="keyline"><strong>Điểm sử dụng bắt buộc:</strong> thư mục <span class="code">06-Working-Transitory-and-Draft</span> và <span class="code">07-Reference-and-Received-External</span> là một phần của bản thiết kế chuẩn, không phải thư mục tùy chọn. Nội dung chi tiết theo từng phòng ban, từng JD và từng job gate nằm tại <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>.</div>
+        <div class="keyline"><strong>Điểm sử dụng bắt buộc:</strong> mỗi nhân viên có 03 lớp nơi lưu: hồ sơ chức năng chung của phòng ban, workbench cá nhân theo role tại <span class="code">90-Employee-WB</span>, và nếu thuộc phạm vi nhân sự hạn chế thì có thêm dossier vòng đời tại <span class="code">08-Con người-Hồ sơ</span>. Thư mục <span class="code">06-Working-Transitory-and-Draft</span> và <span class="code">07-Reference-and-Received-External</span> là một phần của bản thiết kế chuẩn, không phải thư mục tùy chọn. Nội dung chi tiết theo từng phòng ban, từng JD và từng job gate nằm tại <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>.</div>
+        <div class="keyline"><strong>Quy tắc độ dài path để đồng bộ local:</strong> nhánh sâu trong template phải dùng segment ngắn có kiểm soát như <span class="code">90-Employee-WB</span>, <span class="code">03-Team-Promote</span>, <span class="code">04-My-Offline-Pack</span>, <span class="code">02-Pending-Starters</span> và <span class="code">06-Restricted-Shared-Ops</span>. Không đổi các segment này thành câu dài hơn trong triển khai thực tế. Mọi bổ sung folder mới phải giữ nguyên tắc sync-safe cho SharePoint/OneDrive/Windows: segment ngắn, không thêm từ lặp, không ghép nhiều danh từ dài khi có thể route bằng metadata.</div>
       </div>
 
       <div class="section">
@@ -416,9 +426,11 @@
         <h2>9. Bản thiết kế hồ sơ nhân sự trong 08-Con người-Hồ sơ</h2>
         <div class="figure-box">
           <p style="margin:0;" class="path">08-Con người-Hồ sơ/01-Active-Nhân viên/{EmployeeID}-{FullName}/</p>
-          <p style="margin:4px 0 0;" class="path">08-Con người-Hồ sơ/02-trước đây-Nhân viên/{YYYY}/{EmployeeID}-{FullName}/</p>
-          <p style="margin:4px 0 0;" class="path">08-Con người-Hồ sơ/03-nhà thầu-and-thực tập sinh/{YYYY}/{tập hợp / dân số}/{ID-Name}/</p>
-          <p style="margin:4px 0 0;" class="path">08-Con người-Hồ sơ/04-Khách tham quan-and-tạm thời-Truy cập/{YYYY}/</p>
+          <p style="margin:4px 0 0;" class="path">08-Con người-Hồ sơ/02-Pending-Starters/{YYYY}/{Population}/{CandidateOrPersonID}-{Name}/</p>
+          <p style="margin:4px 0 0;" class="path">08-Con người-Hồ sơ/03-Former-Employees/{YYYY}/{EmployeeID}-{FullName}/</p>
+          <p style="margin:4px 0 0;" class="path">08-Con người-Hồ sơ/04-Contractors-Interns-Temps/{YYYY}/{Population}/{ID-Name}/</p>
+          <p style="margin:4px 0 0;" class="path">08-Con người-Hồ sơ/05-Visitors-and-Vendors/{YYYY}/{VisitType}/{VisitorName}/</p>
+          <p style="margin:4px 0 0;" class="path">08-Con người-Hồ sơ/06-Restricted-Shared-Ops/{RestrictedProcess}/00-Current/</p>
         </div>
         <div class="table-card">
           <table>
@@ -430,20 +442,24 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td>00-Nhân sự-hồ sơ / biên dạng</td><td>nhận dạng sheet, nhân viên index, tổ chức bố trí, khẩn cấp liên hệ as cho phép.</td><td>HR hạn chế</td></tr>
-              <tr><td>01-hợp đồng-and-pháp lý</td><td>hợp đồng, phụ lục, luật định việc làm hồ sơ, NDA and bảo mật hồ sơ.</td><td>HR hạn chế</td></tr>
-              <tr><td>02-hội nhập nhân viên mới-and-Truy cập</td><td>hội nhập nhân viên mới bảng kiểm, <a download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> liên kết, system/thiết bị vấn đề / phát hành hồ sơ, đào tạo hội nhập hoàn thành index.</td><td>HR + IT hạn chế</td></tr>
-              <tr><td>03-Đào tạo-and-Chứng nhận-Link</td><td>Index or con trỏ / gợi ý to 04-Đào tạo-Hồ sơ, quan trọng / nghiêm trọng ủy quyền tóm tắt, hết hạn danh sách theo dõi.</td><td>No trùng lặp cốt lõi bằng chứng</td></tr>
-              <tr><td>04-Performance-and-Probation</td><td>Thử việc rà soát, hiệu suất đánh giá, phát triển kế hoạch ở đâu / nơi nào được kiểm soát.</td><td>HR + manager hạn chế</td></tr>
-              <tr><td>05-lương thưởng-and-Bảng lương-Hạn chế</td><td>Bảng lương-nhạy cảm tài liệu, bù trừ điều chỉnh, hạn chế bảng lương hỗ trợ bằng chứng.</td><td>cao nhất HR/Finance hạn chế</td></tr>
-              <tr><td>06-Sức khỏe-PPE-and-Fit-to-Công việc-Hạn chế</td><td>y tế sự phù hợp or fit-to-công việc hạn chế, PPE phát hành ở đâu / nơi nào cá nhân, sức khỏe giám sát outputs.</td><td>cần-to-biết chỉ / duy nhất</td></tr>
-              <tr><td>07-Kỷ luật-and-khiếu nại-Hạn chế</td><td>kỷ luật hồ sơ, khiếu nại, điều tra, kết thúc / đóng bằng chứng.</td><td>Hạn chế and có thể kiểm toán</td></tr>
-              <tr><td>08-tài sản-and-đã phát hành-mục / hạng mục</td><td>Badge, máy tính xách tay, điện thoại, tool or đặc biệt tài sản vấn đề / phát hành/trả lại index.</td><td>HR + IT + owner as cần thiết</td></tr>
-              <tr><td>09-thôi việc / rời công ty-and-Bàn giao</td><td>thoát / ra bảng kiểm, thu hồi of truy cập/tài sản, bàn giao ghi chú, chưa giải quyết mục / hạng mục.</td><td>HR hạn chế</td></tr>
+              <tr><td>00-Identity-and-Employment-Profile</td><td>Identity sheet, mã nhân viên, chức danh, home department, emergency contact summary và hồ sơ tóm tắt đã duyệt.</td><td>HR core restricted</td></tr>
+              <tr><td>01-Recruitment-and-Offer</td><td>Offer letter, candidate handover, pre-employment screening, headcount approval và hồ sơ chuyển từ tuyển dụng sang onboarding.</td><td>HR restricted</td></tr>
+              <tr><td>02-Employment-Contract-and-Legal</td><td>Hợp đồng, phụ lục, NDA, work-permit, hồ sơ pháp lý lao động và sealed copy khi có yêu cầu pháp luật.</td><td>HR legal restricted</td></tr>
+              <tr><td>03-Onboarding-Role-and-Access</td><td>Checklist hội nhập, <a download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> link, issue thiết bị, access approvals, orientation and day-1 readiness pack.</td><td>HR + IT interface restricted</td></tr>
+              <tr><td>04-Training-and-Certification-Link</td><td>Chỉ mục/link sang <span class="code">04-Đào tạo-Hồ sơ</span>, certification index, expiry tracker và competence summary; không copy bằng chứng SSOT.</td><td>HR + QA restricted</td></tr>
+              <tr><td>05-Probation-Performance-and-Development</td><td>Probation reviews, appraisal records, development plans, coaching summaries và succession/promotion readiness pack.</td><td>HR + manager restricted</td></tr>
+              <tr><td>06-Payroll-and-Benefits-Restricted</td><td>Lương, thưởng, benefit enrollment, payroll adjustment support, tax and insurance pack.</td><td>Payroll highest restricted</td></tr>
+              <tr><td>07-Leave-Attendance-and-Time-Case</td><td>Leave case, attendance exception, approved timesheet dispute pack và supporting approvals.</td><td>HR restricted</td></tr>
+              <tr><td>08-Medical-and-Fit-to-Work-Restricted</td><td>Occupational health, fit-to-work, medical restriction, exposure follow-up and PPE eligibility records.</td><td>Medical need-to-know only</td></tr>
+              <tr><td>09-Assets-Access-and-Issued-Items</td><td>Badge, laptop, phone, locker, tooling issue/return index và interface evidence với IT/EHS.</td><td>HR + IT/EHS restricted</td></tr>
+              <tr><td>10-Role-Change-Transfer-and-Promotion</td><td>Transfer, promotion, department change, salary/grade change approval và handover between managers.</td><td>HR manager restricted</td></tr>
+              <tr><td>11-Disciplinary-and-Legal-Restricted</td><td>Kỷ luật, grievance, investigation, warning letters, legal hold case and closure evidence.</td><td>Strict restricted and auditable</td></tr>
+              <tr><td>12-Offboarding-and-Exit</td><td>Exit checklist, resignation/termination, revocation, knowledge handover, asset return and final release.</td><td>HR core restricted</td></tr>
+              <tr><td>13-Sealed-Copies-and-Legal-Hold</td><td>Sealed copy được phép giữ riêng theo yêu cầu pháp lý hoặc litigation hold; không thay thế SSOT gốc.</td><td>Legal hold only</td></tr>
             </tbody>
           </table>
         </div>
-        <div class="keyline"><strong>Quy tắc cứng:</strong> <span class="code">08-Con người-Hồ sơ</span> không lưu bản sao trùng của đào tạo SSOT hoặc hồ sơ công việc SSOT. Khi cần tham chiếu, dùng index/link, không copy hồ sơ qua nhiều thư viện.</div>
+        <div class="keyline"><strong>Quy tắc cứng:</strong> <span class="code">08-Con người-Hồ sơ</span> không lưu bản sao trùng của đào tạo SSOT hoặc hồ sơ công việc SSOT. Mỗi người có tối đa 03 nơi lưu: hồ sơ nhân sự hạn chế tại đây, workbench công việc theo role trong <span class="code">05-Phòng ban-Hồ sơ</span>, và bằng chứng đào tạo SSOT trong <span class="code">04-Đào tạo-Hồ sơ</span>. Shared HR files nhạy cảm như payroll cycle, medical case control, grievance case control và offboarding control phải nằm trong <span class="code">06-Restricted-Shared-Ops</span>, không đặt ở shared department area.</div>
       </div>
 
       <div class="section">
@@ -466,14 +482,14 @@
               <tr><td class="path">09-Số hóa-System-Hồ sơ/06-Sự cố-and-Vấn đề-Quản lý/{YYYY}/</td><td>System sự cố logs, ngăn chặn bằng chứng, khắc phục hành động, gốc / căn nguyên nguyên nhân reviews.</td><td>IT / ERP</td></tr>
               <tr><td class="path">09-Số hóa-System-Hồ sơ/07-Tài sản-and-điểm cuối-Control/{YYYY}/</td><td>Tài sản registers, điểm cuối status, tuân thủ ngoại lệ, khôi phục / thu hồi khóa / phím ở đâu / nơi nào đã phê duyệt.</td><td>IT</td></tr>
               <tr><td class="path">09-Số hóa-System-Hồ sơ/08-tự động hóa-Run-Logs/{YYYY}/</td><td>cung cấp / cấp phát logs, run lịch sử, flow hỏng hóc, chia sẻ link hết hạn dọn dẹp logs.</td><td>IT</td></tr>
-              <tr><td class="path">10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</td><td>Source docs, portal source, static assets, released form definitions, approved templates và config baselines được phép đi qua Git.</td><td>QMS / IT</td></tr>
+              <tr><td class="path">10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</td><td>Controlled source root phản chiếu cấu trúc local worktree của bộ tài liệu này: <span class="code">01-QMS-Portal</span>, <span class="code">02-Tai-Lieu-He-Thong</span>, <span class="code">03-Tai-Lieu-Van-Hanh</span>, <span class="code">04-Bieu-Mau</span>, <span class="code">10-Training-Academy</span>, <span class="code">11-Glossary</span>, <span class="code">assets</span>, <span class="code">core-standards</span>, <span class="code">tools</span>; chỉ các source artifact được phép đi qua Git mới nằm ở đây.</td><td>QMS / IT</td></tr>
               <tr><td class="path">10-QMS-Source-Control/02-Release-Manifests/{YYYY}/</td><td>Release manifest, commit map, tag/branch note, approved release notes, deploy scope và change bundle evidence.</td><td>QMS / IT</td></tr>
               <tr><td class="path">10-QMS-Source-Control/03-Server-Deploy-Receipts/{YYYY}/</td><td>Server pull/deploy receipts, smoke test, rollback evidence, point-of-use verification sau phát hành.</td><td>IT</td></tr>
               <tr><td class="path">10-QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</td><td>Server hotfix intake, reverse-sync justification, commit quay ngược, local pull confirmation và close-out log.</td><td>IT / QMS</td></tr>
             </tbody>
           </table>
         </div>
-        <div class="keyline"><strong>Rule source:</strong> <span class="code">10-QMS-Source-Control</span> là thư viện source được kiểm soát, không thay cho <span class="code">09-Số hóa-System-Hồ sơ</span>. Ranh giới SharePoint sync, Git, server deployment và runtime exclusions bắt buộc theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>.</div>
+        <div class="keyline"><strong>Rule source:</strong> <span class="code">10-QMS-Source-Control</span> là thư viện source được kiểm soát, không thay cho <span class="code">09-Số hóa-System-Hồ sơ</span>. Mỗi <span class="code">SystemArea</span> trong <span class="code">09-Số hóa-System-Hồ sơ</span> phải có cả nhánh <span class="code">00-Current</span> cho control đang sống và nhánh <span class="code">{YYYY}</span> cho history đã chốt. Ranh giới SharePoint sync, Git, server deployment và runtime exclusions bắt buộc theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>.</div>
       </div>
 
       <div class="section">
@@ -604,6 +620,8 @@
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
+
+
 
 
 

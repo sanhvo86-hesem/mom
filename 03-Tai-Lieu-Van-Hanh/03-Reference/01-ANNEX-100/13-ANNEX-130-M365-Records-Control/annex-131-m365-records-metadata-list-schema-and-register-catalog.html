@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -126,6 +126,10 @@
               <tr><td>RecordClass</td><td>Phân loại hồ sơ</td><td>Lựa chọn</td><td>Theo hồ sơ</td><td>Phân biệt official record, working, reference, restricted và system-admin record để flow gán đúng path, quyền và lưu giữ.</td></tr>
               <tr><td>RecordSeriesCode</td><td>Mã record series</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Khớp danh mục record series trong ANNEX-135; không dùng text tự do cho series chính thức.</td></tr>
               <tr><td>OriginatingRoleCode</td><td>Mã vai trò phát sinh</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Map tới JD/role catalog để biết file do vai trò nào tạo ra và route về workbench nào nếu là draft/transitory.</td></tr>
+              <tr><td>HomeDeptCode</td><td>Ma phong ban goc</td><td>Lua chon</td><td>Theo workbench / con nguoi ho so</td><td>Dung cho employee workbench, people index, role coverage va quyen so huu duong dan goc.</td></tr>
+              <tr><td>HomeRoleCode</td><td>Ma vai tro goc</td><td>Don le dong / chuyen</td><td>Theo workbench / con nguoi ho so</td><td>Chi ra named workbench nao thuoc ve nhan vien do trong department zone.</td></tr>
+              <tr><td>LifecycleStage</td><td>Giai doan vong doi</td><td>Lua chon</td><td>Theo con nguoi ho so</td><td>Phan biet PendingStarter, Active, Former, Contractor, TemporaryWorker hoac Visitor de route dung thu muc goc.</td></tr>
+              <tr><td>EmployeeWorkbenchUrl</td><td>Lien ket workbench ca nhan</td><td>Sieu lien ket</td><td>Theo workbench / index</td><td>Tro tu people index hoac competence matrix toi dung named workbench trong <span class="code">05-Phong ban-Ho so</span>.</td></tr>
               <tr><td>FolderSegment</td><td>Phân đoạn thư mục</td><td>Lựa chọn</td><td>Theo Requests</td><td>Department provisioning, zone catalog, live/current/year/archive routing</td></tr>
               <tr><td>SourceSystemCode</td><td>Hệ nguồn</td><td>Lựa chọn</td><td>Theo hồ sơ</td><td>Xác định file đến từ SharePoint, Epicor, email, Power BI, máy CNC, nhà cung cấp portal hay nguồn khác.</td></tr>
               <tr><td>PromotionState</td><td>Trạng thái promote</td><td>Lựa chọn</td><td>Theo hồ sơ</td><td>Dùng cho working/transitory file để biết còn ở bản nháp, đang review hay đã promote vào official record series.</td></tr>
@@ -135,8 +139,10 @@
               <tr><td>SecondaryOwnerGroup</td><td>Nhóm phối hợp</td><td>Đơn lẻ dòng / chuyền</td><td>Theo Requests</td><td>cung cấp / cấp phát Requests</td></tr>
               <tr><td>ArchiveState</td><td>Trạng thái lưu trữ</td><td>Lựa chọn</td><td>Theo lưu trữ</td><td>Lưu trữ sổ đăng ký</td></tr>
               <tr><td>EmployeeID</td><td>Mã nhân viên</td><td>Đơn lẻ dòng / chuyền</td><td>Theo con người hồ sơ</td><td>Con người hồ sơ, đào tạo liên kết</td></tr>
-              <tr><td>EmploymentStatus</td><td>Trạng thái nhân sự</td><td>Lựa chọn</td><td>Theo con người hồ sơ</td><td>Con người hồ sơ</td></tr>
-              <tr><td>PersonRecordClass</td><td>Phân loại hồ sơ cá nhân</td><td>Lựa chọn</td><td>Theo con người hồ sơ</td><td>Nhân viên, nhà thầu, khách tham quan, trước đây nhân viên</td></tr>
+              
+              <tr><td>Population</td><td>Population</td><td>Lua chon</td><td>Theo con nguoi ho so</td><td>Nha thau, thuc tap sinh, temporary worker, khach tham quan, vendor access.</td></tr>
+              <tr><td>CandidateOrPersonID</td><td>Ma candidate hoac person</td><td>Don le dong / chuyen</td><td>Theo pending starter / visitor</td><td>Dung cho recruitment handover, pending start control va visitor/vendor access records khi chua co EmployeeID.</td></tr>
+              <tr><td>RestrictedProcess</td><td>Quy trinh han che dung chung</td><td>Lua chon</td><td>Theo shared restricted operations</td><td>Map toi payroll cycle, medical control, disciplinary case control, offboarding control hoac recruitment pending-start control.</td></tr>
               <tr><td>tập hợp / dân số</td><td>tập hợp / dân số</td><td>Lựa chọn</td><td>Theo con người hồ sơ</td><td>nhà thầu, thực tập sinh, khách tham quan, nhà cung cấp truy cập</td></tr>
               <tr><td>ExpiryDate</td><td>Ngày hết hạn</td><td>Date</td><td>Theo chia sẻ/ngoại lệ</td><td>Bên ngoài chia sẻ, quyền / sự cho phép ngoại lệ</td></tr>
               <tr><td>ExceptionReasonCode</td><td>Mã lý do ngoại lệ</td><td>Lựa chọn</td><td>Theo ngoại lệ</td><td>quyền / sự cho phép, đã niêm phong copy, lưu trữ mở lại</td></tr>
@@ -161,16 +167,16 @@
               <tr><td>DeptCodeCodes</td><td>EXEC, QMS, QA, ENG, PRO, SCM, SAL, FIN, HR, EHS, IT, ERP</td><td>Không dùng biến thể tự đặt như Kinh doanh, Sản xuất, Kho nếu chưa map chính thức.</td></tr>
               <tr><td>LibraryCodes</td><td>01-QMS-Hồ sơ, 02-Chất lượng-Hồ sơ, 03-Job-Hồ sơ, 04-Đào tạo-Hồ sơ, 05-Phòng ban-Hồ sơ, 06-Lưu trữ, 07-Mẫu-Làm việc, 08-Con người-Hồ sơ, 09-Số hóa-System-Hồ sơ, 10-QMS-Source-Control, Part-REV-Bản gốc</td><td>Khớp phân loại hệ thống trong <span class="code">ANNEX-133</span>.</td></tr>
               <tr><td>SiteCodeCodes</td><td>HESEM-QMS-Cốt lõi, HESEM-Con người-Hạn chế, HESEM-Số hóa-Control</td><td>Khớp site cấu trúc liên kết trong <span class="code">ANNEX-134</span>.</td></tr>
-              <tr><td>RequestTypeCodes</td><td>CreateCompanyRecordZone, CreateDepartmentZone, CreateDepartmentYearFolder, CreateJobDossier, CreateEmployeeDossier, CreateContractorDossier, CreateVisitorAccessRecord, CreateSystemRecordZone, CreateSourceWorkspace, PromoteSourceChange, RegisterServerDeploy, RegisterReverseSync, ExternalSharePackage, ArchiveLock, PermissionException</td><td>Khớp điều phối trong <span class="code">ANNEX-134</span>.</td></tr>
+              <tr><td>RequestTypeCodes</td><td>CreateCompanyRecordZone, CreateDepartmentZone, CreateDepartmentYearFolder, CreateJobDossier, CreateEmployeeDossier, CreateEmployeeWorkbench, CreateContractorDossier, CreateVisitorAccessRecord, CreateSystemRecordZone, CreateSourceWorkspace, PromoteSourceChange, RegisterServerDeploy, RegisterReverseSync, ExternalSharePackage, ArchiveLock, PermissionException</td><td>Khớp điều phối trong <span class="code">ANNEX-134</span>.</td></tr>
               <tr><td>RecordZoneCodes</td><td>CompanyGovernance, QualityFormal, JobDossier, TrainingSSOT, DepartmentOperations, PeopleRestricted, SystemAdmin, SourceControl, ArchiveLocked, TemplateWorking, PartMaster</td><td>Dùng cho danh mục, dashboard và cung cấp / cấp phát logic.</td></tr>
               <tr><td>FunctionAreaCodes</td><td>Quản trị, Operations, RegistersLogs, ProjectsImprovement, InterfacesReleasedPacks, WorkingTransitory, ReferenceReceived, RestrictedPeople, SystemAdministration</td><td>Không tạo label trùng nghĩa.</td></tr>
               <tr><td>RecordClassCodes</td><td>OfficialRecord, OperationalCurrent, RegisterLog, ReleasedPack, ProjectImprovement, WorkingTransitory, ReferenceReceived, ConvenienceCopy, SoRSnapshot, RestrictedPeopleRecord, SystemAdminRecord</td><td>Khóa rule route, retention, permission và culling.</td></tr>
-              <tr><td>FolderSegmentCodes</td><td>LiveControl, Current, YearlyHistory, Active, Working, Reference, Archive</td><td>Dùng cho department live data, current control zones, workbench zones, reference zones và year-based history zones.</td></tr>
+              <tr><td>FolderSegmentCodes</td><td>LiveControl, Current, YearlyHistory, Active, Working, TeamWorkbench, EmployeeWorkbench, Reference, RestrictedSharedOps, Archive, SourceMirror</td><td>Dùng cho department live data, current control zones, workbench zones, reference zones và year-based history zones.</td></tr>
               <tr><td>SourceSystemCodes</td><td>SharePoint, Epicor, OutlookEmail, Teams, PowerBI, MachineController, SupplierPortal, CustomerEmail, ManualUpload, ExternalMedia</td><td>Bắt buộc khi file là snapshot, export hoặc received-from-outside.</td></tr>
               <tr><td>PromotionStateCodes</td><td>Draft, InReview, PendingPromotion, Promoted, Culled, ReferenceOnly</td><td>Dùng cho working/transitory/reference records.</td></tr>
               <tr><td>ConfidentialityClassCodes</td><td>Công khai-Được kiểm soát, Nội bộ-Được kiểm soát, Bảo mật, Hạn chế-Con người, Hạn chế-Bảng lương, Hạn chế-y tế, Hạn chế-SystemAdmin, Bên ngoài-Gói hàng</td><td>Map với độ nhạy label và quyền / sự cho phép mô hình.</td></tr>
-              <tr><td>EmploymentStatusCodes</td><td>Active, Thử việc, rời / nghỉ phép, Tạm ngưng, đã chấm dứt, nhà thầu, thực tập sinh, khách tham quan</td><td>Dùng cho con người hồ sơ và hội nhập nhân viên mới/thôi việc / rời công ty quy trình làm việc.</td></tr>
-              <tr><td>PersonRecordClassCodes</td><td>Nhân viên, FormerEmployee, nhà thầu, thực tập sinh, khách tham quan, VendorAccess, TemporaryWorker</td><td>Điều khiển thư mục path và lưu giữ logic.</td></tr>
+              <tr><td>EmploymentStatusCodes</td><td>PendingStart, Active, Probation, LeaveOfAbsence, Suspended, Former, Contractor, Intern, TemporaryWorker, Visitor</td><td>Dùng cho con người hồ sơ và hội nhập nhân viên mới/thôi việc / rời công ty quy trình làm việc.</td></tr>
+              <tr><td>PersonRecordClassCodes</td><td>Employee, PendingStarter, FormerEmployee, Contractor, Intern, Visitor, VendorAccess, TemporaryWorker</td><td>Điều khiển thư mục path và lưu giữ logic.</td></tr>
               <tr><td>SystemAreaCodes</td><td>AccessIdentity, M365Config, EpicorRoleMasterData, DeploymentCutover, BackupRecovery, IncidentProblem, AssetEndpoint, AutomationRunLogs</td><td>Điều khiển path trong <span class="code">09-Số hóa-System-Hồ sơ</span>.</td></tr>
               <tr><td>SyncBoundaryClassCodes</td><td>ControlledSource, ReleaseManifest, DeployReceipt, ReverseSyncRecord, RuntimeRecord, RuntimeNoise, ServerOnlySecret</td><td>Dùng để khóa ranh giới SharePoint sync, Git, server runtime và record areas theo <span class="code">ANNEX-136</span>.</td></tr>
               <tr><td>DeployStateCodes</td><td>Prepared, Pulled, Deployed, SmokeVerified, RolledBack, Closed</td><td>Dùng cho release manifest và server deploy receipt.</td></tr>
@@ -200,7 +206,8 @@
               <tr><td>M365-Hồ sơ-cung cấp / cấp phát-Requests</td><td>All cung cấp / cấp phát Requests</td><td>RequestId</td><td>IT / QMS</td><td>ClosedDate</td></tr>
               <tr><td>Phòng ban-Khu vực-danh mục</td><td>danh mục of phòng ban khu vực</td><td>DeptCode + Năm + RecordZone</td><td>QMS</td><td>SupersededDate or lưu trữ sự kiện</td></tr>
               <tr><td>M365-Record-Series-Catalog</td><td>Danh mục record series theo ANNEX-135</td><td>RecordSeriesCode</td><td>QMS / IT</td><td>SupersededDate</td></tr>
-              <tr><td>Con người-Hồ sơ-Index</td><td>Con người hồ sơ index</td><td>EmployeeID or PopulationKey</td><td>HR</td><td>EmploymentEndDate or tham quan / kiểm tra end</td></tr>
+              <tr><td>Con người-Hồ sơ-Index</td><td>Con người hồ sơ index</td><td>EmployeeID or CandidateOrPersonID or PopulationKey</td><td>HR</td><td>EmploymentEndDate or tham quan / kiểm tra end</td></tr>
+              <tr><td>Employee-Workbench-Index</td><td>Named workbench index theo nhan vien va role</td><td>EmployeeID + HomeRoleCode</td><td>HR / Dept owner</td><td>EmploymentEndDate hoặc role reassignment date</td></tr>
               <tr><td>System-Hồ sơ-Yêu cầu-Log</td><td>System-khu vực cung cấp / cấp phát and admin Requests</td><td>SystemReqId</td><td>IT / ERP</td><td>ClosedDate</td></tr>
               <tr><td>QMS-Source-Promotion-Sổ đăng ký</td><td>Source workspace provisioning, release manifests và source promotion log</td><td>SourceChangeId</td><td>QMS / IT</td><td>ClosedDate</td></tr>
               <tr><td>Server-Deploy-Sổ đăng ký</td><td>Server pull/deploy receipts, smoke verification và rollback close-out</td><td>DeployId</td><td>IT</td><td>DeployDate</td></tr>
@@ -275,3 +282,4 @@
 </div>
 </body>
 </html>
+

@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>WI-102 — Thiết lập SharePoint hồ sơ địa điểm / site, thư viện và quyền truy cập click-by-click | HESEM QMS</title>
+<title>WI-102 â€” Thiáº¿t láº­p SharePoint há»“ sÆ¡ Ä‘á»‹a Ä‘iá»ƒm / site, thÆ° viá»‡n vÃ  quyá»n truy cáº­p click-by-click | HESEM QMS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
 @media print {
@@ -34,333 +34,339 @@
     <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
     <div class="fh-company">
       <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-      <span>Tài liệu vận hành • SharePoint xây dựng hướng dẫn</span>
+      <span>TÃ i liá»‡u váº­n hÃ nh â€¢ SharePoint xÃ¢y dá»±ng hÆ°á»›ng dáº«n</span>
     </div>
   </div>
-  <div class="title"><strong>WI-102 — Thiết lập SharePoint hồ sơ địa điểm / site, thư viện và quyền truy cập click-by-click</strong></div>
+  <div class="title"><strong>WI-102 â€” Thiáº¿t láº­p SharePoint há»“ sÆ¡ Ä‘á»‹a Ä‘iá»ƒm / site, thÆ° viá»‡n vÃ  quyá»n truy cáº­p click-by-click</strong></div>
   <div class="meta">
     <div class="row"><span><b>Code:</b></span><span>WI-102</span></div>
     <div class="row"><span><b>Version:</b></span><span>V1</span></div>
-    <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-    <div class="row"><span><b>Owner:</b></span><span>IT System Governance viên / QMS Manager</span></div>
-    <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+    <div class="row"><span><b>Effective Date:</b></span><span>Theo quyáº¿t Ä‘á»‹nh ban hÃ nh</span></div>
+    <div class="row"><span><b>Owner:</b></span><span>IT System Governance viÃªn / QMS Manager</span></div>
+    <div class="row"><span><b>Approved by:</b></span><span>Tá»•ng GiÃ¡m Ä‘á»‘c</span></div>
   </div>
 </div>
 
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi tạo mới hoặc tái cấu trúc SharePoint hồ sơ kiến trúc cho HESEM theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>, <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a></span>, <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></span> và <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span>. Tài liệu này là bản thao tác trực tiếp trên M365 Admin trung tâm và SharePoint Admin trung tâm.</div>
-<h1>WI-102 — Thiết lập SharePoint hồ sơ địa điểm / site, thư viện và quyền truy cập click-by-click</h1>
+<div class="note"><strong>ÃP Dá»¤NG KHI</strong><br/>DÃ¹ng khi táº¡o má»›i hoáº·c tÃ¡i cáº¥u trÃºc SharePoint há»“ sÆ¡ kiáº¿n trÃºc cho HESEM theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>, <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a></span>, <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></span> vÃ  <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span>. TÃ i liá»‡u nÃ y lÃ  báº£n thao tÃ¡c trá»±c tiáº¿p trÃªn M365 Admin trung tÃ¢m vÃ  SharePoint Admin trung tÃ¢m.</div>
+<h1>WI-102 â€” Thiáº¿t láº­p SharePoint há»“ sÆ¡ Ä‘á»‹a Ä‘iá»ƒm / site, thÆ° viá»‡n vÃ  quyá»n truy cáº­p click-by-click</h1>
 
 <div class="toc">
-  <div class="toc-title">Mục lục nhanh</div>
+  <div class="toc-title">Má»¥c lá»¥c nhanh</div>
   <div class="toc-grid">
-    <a href="#sec-1">1. Kết quả phải đạt</a>
-    <a href="#sec-2">2. Kiến trúc phải tạo</a>
-    <a href="#sec-3">3. Điều kiện trước khi làm</a>
-    <a href="#sec-4">4. Khóa site tạo mới và trang phụ (trang phụ (subsite))</a>
-    <a href="#sec-5">5. Tạo site HESEM-QMS-Cốt lõi</a>
-    <a href="#sec-6">6. Tạo thư viện cốt lõi</a>
-    <a href="#sec-7">7. Tạo site People</a>
-    <a href="#sec-8">8. Tạo site Digital</a>
-    <a href="#sec-9">9. Tạo nhóm</a>
-    <a href="#sec-10">10. Áp quyền site</a>
-    <a href="#sec-11">11. Áp quyền thư viện</a>
-    <a href="#sec-12">12. Cấu hình chia sẻ</a>
-    <a href="#sec-13">13. Quản lý phiên bản và nhãn</a>
-    <a href="#sec-14">14. Root Folder rễ</a>
-    <a href="#sec-15">15. Bảng kiểm nghiệm thu</a>
+    <a href="#sec-1">1. Káº¿t quáº£ pháº£i Ä‘áº¡t</a>
+    <a href="#sec-2">2. Kiáº¿n trÃºc pháº£i táº¡o</a>
+    <a href="#sec-3">3. Äiá»u kiá»‡n trÆ°á»›c khi lÃ m</a>
+    <a href="#sec-4">4. KhÃ³a site táº¡o má»›i vÃ  trang phá»¥ (trang phá»¥ (subsite))</a>
+    <a href="#sec-5">5. Táº¡o site HESEM-QMS-Cá»‘t lÃµi</a>
+    <a href="#sec-6">6. Táº¡o thÆ° viá»‡n cá»‘t lÃµi</a>
+    <a href="#sec-7">7. Táº¡o site People</a>
+    <a href="#sec-8">8. Táº¡o site Digital</a>
+    <a href="#sec-9">9. Táº¡o nhÃ³m</a>
+    <a href="#sec-10">10. Ãp quyá»n site</a>
+    <a href="#sec-11">11. Ãp quyá»n thÆ° viá»‡n</a>
+    <a href="#sec-12">12. Cáº¥u hÃ¬nh chia sáº»</a>
+    <a href="#sec-13">13. Quáº£n lÃ½ phiÃªn báº£n vÃ  nhÃ£n</a>
+    <a href="#sec-14">14. Root Folder rá»…</a>
+    <a href="#sec-15">15. Báº£ng kiá»ƒm nghiá»‡m thu</a>
   </div>
 </div>
 
 <div class="section" id="sec-1">
-  <h2>1. Kết quả phải đạt</h2>
-  <p style="margin:8px 0;">Sau khi hoàn tất WI này, tổ chức thuê (tổ chức thuê (tenant)) phải có đúng <strong>03 SharePoint hồ sơ địa điểm / site</strong>, đúng thư viện, đúng nhóm quyền, đúng chia sẻ ranh giới và đúng Root Folder rễ. Người dùng vận hành không phải tự dựng chỗ lưu mới ngoài cấu trúc chuẩn.</p>
+  <h2>1. Káº¿t quáº£ pháº£i Ä‘áº¡t</h2>
+  <p style="margin:8px 0;">Sau khi hoÃ n táº¥t WI nÃ y, tá»• chá»©c thuÃª (tá»• chá»©c thuÃª (tenant)) pháº£i cÃ³ Ä‘Ãºng <strong>03 SharePoint há»“ sÆ¡ Ä‘á»‹a Ä‘iá»ƒm / site</strong>, Ä‘Ãºng thÆ° viá»‡n, Ä‘Ãºng nhÃ³m quyá»n, Ä‘Ãºng chia sáº» ranh giá»›i vÃ  Ä‘Ãºng Root Folder rá»…. NgÆ°á»i dÃ¹ng váº­n hÃ nh khÃ´ng pháº£i tá»± dá»±ng chá»— lÆ°u má»›i ngoÃ i cáº¥u trÃºc chuáº©n.</p>
 </div>
 
 <div class="section" id="sec-2">
-  <h2>2. Kiến trúc phải tạo</h2>
+  <h2>2. Kiáº¿n trÃºc pháº£i táº¡o</h2>
   <div class="table-card">
     <table>
       <thead>
-        <tr><th>Site</th><th>thư viện</th><th>Ranh giới</th></tr>
+        <tr><th>Site</th><th>thÆ° viá»‡n</th><th>Ranh giá»›i</th></tr>
       </thead>
       <tbody>
-        <tr><td><span class="code">HESEM-QMS-Cốt lõi</span></td><td><span class="code">01-QMS-Records</span>, <span class="code">02-Quality-Records</span>, <span class="code">03-Job-Records</span>, <span class="code">04-Training-Records</span>, <span class="code">05-Department-Records</span>, <span class="code">06-Archive</span>, <span class="code">07-Mẫu-Working</span>, <span class="code">Part-REV-Bản gốc</span></td><td>Site lõi cho hồ sơ điều hành.</td></tr>
-        <tr><td><span class="code">HESEM-People-Hạn chế</span></td><td><span class="code">08-People-Records</span></td><td>Site hạn chế cho hồ sơ nhân sự nhạy cảm.</td></tr>
-        <tr><td><span class="code">HESEM-Digital-Control</span></td><td><span class="code">09-Digital-System-Records</span>, <span class="code">10-QMS-Source-Control</span></td><td>Site hạn chế cho hồ sơ M365, IT, Epicor, truy cập, backup, triển khai và controlled source QMS/portal.</td></tr>
+        <tr><td><span class="code">HESEM-QMS-Cá»‘t lÃµi</span></td><td><span class="code">01-QMS-Records</span>, <span class="code">02-Quality-Records</span>, <span class="code">03-Job-Records</span>, <span class="code">04-Training-Records</span>, <span class="code">05-Department-Records</span>, <span class="code">06-Archive</span>, <span class="code">07-Máº«u-Working</span>, <span class="code">Part-REV-Báº£n gá»‘c</span></td><td>Site lÃµi cho há»“ sÆ¡ Ä‘iá»u hÃ nh.</td></tr>
+        <tr><td><span class="code">HESEM-People-Háº¡n cháº¿</span></td><td><span class="code">08-People-Records</span></td><td>Site háº¡n cháº¿ cho há»“ sÆ¡ nhÃ¢n sá»± nháº¡y cáº£m.</td></tr>
+        <tr><td><span class="code">HESEM-Digital-Control</span></td><td><span class="code">09-Digital-System-Records</span>, <span class="code">10-QMS-Source-Control</span></td><td>Site háº¡n cháº¿ cho há»“ sÆ¡ M365, IT, Epicor, truy cáº­p, backup, triá»ƒn khai vÃ  controlled source QMS/portal.</td></tr>
       </tbody>
     </table>
   </div>
 </div>
 
 <div class="section" id="sec-3">
-  <h2>3. Điều kiện trước khi làm</h2>
+  <h2>3. Äiá»u kiá»‡n trÆ°á»›c khi lÃ m</h2>
   <ul>
-    <li>Bạn phải có quyền tối thiểu <span class="code">SharePoint Governance viên</span>; nếu tạo hoặc quản lý nhóm thì cần thêm quyền quản trị Entra/Microsoft 365 nhóm phù hợp.</li>
-    <li>Chuẩn tên site, thư viện và group phải theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a></span>; không tự đổi tên ngắn gọn cho “dễ nhớ”.</li>
-      <li>Chuẩn thư mục cây / sơ đồ cây và home khu vực phải theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>.</li>
-      <li>Ranh giới SharePoint local sync, Git, server deploy, reverse sync và runtime exclusions phải theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></span>.</li>
-    <li>Field tên, Requests danh sách và value bộ / tập hợp phải theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span>.</li>
+    <li>Báº¡n pháº£i cÃ³ quyá»n tá»‘i thiá»ƒu <span class="code">SharePoint Governance viÃªn</span>; náº¿u táº¡o hoáº·c quáº£n lÃ½ nhÃ³m thÃ¬ cáº§n thÃªm quyá»n quáº£n trá»‹ Entra/Microsoft 365 nhÃ³m phÃ¹ há»£p.</li>
+    <li>Chuáº©n tÃªn site, thÆ° viá»‡n vÃ  group pháº£i theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a></span>; khÃ´ng tá»± Ä‘á»•i tÃªn ngáº¯n gá»n cho â€œdá»… nhá»›â€.</li>
+      <li>Chuáº©n thÆ° má»¥c cÃ¢y / sÆ¡ Ä‘á»“ cÃ¢y vÃ  home khu vá»±c pháº£i theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>.</li>
+      <li>Ranh giá»›i SharePoint local sync, Git, server deploy, reverse sync vÃ  runtime exclusions pháº£i theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></span>.</li>
+    <li>Field tÃªn, Requests danh sÃ¡ch vÃ  value bá»™ / táº­p há»£p pháº£i theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span>.</li>
   </ul>
-  <div class="keyline"><strong>Lưu ý về giao diện:</strong> tên nút trong M365 Admin có thể chênh nhẹ giữa tổ chức thuê (tổ chức thuê (tenant)), nhưng phải đi đúng các khu chức năng sau: <span class="code">Admin trung tâm</span>, <span class="code">SharePoint admin trung tâm</span>, <span class="code">Active địa điểm / site</span>, <span class="code">cài đặt</span>, <span class="code">Site tạo mới</span>, <span class="code">Site quyền truy cập</span>, <span class="code">Thư viện cài đặt</span>, <span class="code">quyền truy cập for này tài liệu thư viện</span>.</div>
+  <div class="keyline"><strong>LÆ°u Ã½ vá» giao diá»‡n:</strong> tÃªn nÃºt trong M365 Admin cÃ³ thá»ƒ chÃªnh nháº¹ giá»¯a tá»• chá»©c thuÃª (tá»• chá»©c thuÃª (tenant)), nhÆ°ng pháº£i Ä‘i Ä‘Ãºng cÃ¡c khu chá»©c nÄƒng sau: <span class="code">Admin trung tÃ¢m</span>, <span class="code">SharePoint admin trung tÃ¢m</span>, <span class="code">Active Ä‘á»‹a Ä‘iá»ƒm / site</span>, <span class="code">cÃ i Ä‘áº·t</span>, <span class="code">Site táº¡o má»›i</span>, <span class="code">Site quyá»n truy cáº­p</span>, <span class="code">ThÆ° viá»‡n cÃ i Ä‘áº·t</span>, <span class="code">quyá»n truy cáº­p for nÃ y tÃ i liá»‡u thÆ° viá»‡n</span>.</div>
 </div>
 
 <div class="section" id="sec-4">
-  <h2>4. Khóa quyền tạo site và trang phụ (trang phụ (subsite)) trước khi triển khai</h2>
+  <h2>4. KhÃ³a quyá»n táº¡o site vÃ  trang phá»¥ (trang phá»¥ (subsite)) trÆ°á»›c khi triá»ƒn khai</h2>
   <div class="step-card">
-    <h3>Bước 4.1 — Mở SharePoint admin trung tâm</h3>
+    <h3>BÆ°á»›c 4.1 â€” Má»Ÿ SharePoint admin trung tÃ¢m</h3>
     <ul>
-      <li>Vào <span class="code">admin.microsoft.com</span>.</li>
-      <li>Chọn <span class="code">Admin trung tâm</span> → <span class="code">SharePoint</span>.</li>
+      <li>VÃ o <span class="code">admin.microsoft.com</span>.</li>
+      <li>Chá»n <span class="code">Admin trung tÃ¢m</span> â†’ <span class="code">SharePoint</span>.</li>
     </ul>
   </div>
   <div class="step-card">
-    <h3>Bước 4.2 — Giới hạn quyền tạo site</h3>
+    <h3>BÆ°á»›c 4.2 â€” Giá»›i háº¡n quyá»n táº¡o site</h3>
     <ul>
-      <li>Trong SharePoint admin trung tâm, vào <span class="code">cài đặt</span>.</li>
-      <li>Mở mục <span class="code">Site tạo mới</span>.</li>
-      <li>Chỉ để quyền tạo site cho nhóm quản trị được công ty phê duyệt.</li>
-      <li>Chọn <span class="code">Save</span>.</li>
+      <li>Trong SharePoint admin trung tÃ¢m, vÃ o <span class="code">cÃ i Ä‘áº·t</span>.</li>
+      <li>Má»Ÿ má»¥c <span class="code">Site táº¡o má»›i</span>.</li>
+      <li>Chá»‰ Ä‘á»ƒ quyá»n táº¡o site cho nhÃ³m quáº£n trá»‹ Ä‘Æ°á»£c cÃ´ng ty phÃª duyá»‡t.</li>
+      <li>Chá»n <span class="code">Save</span>.</li>
     </ul>
   </div>
   <div class="step-card">
-    <h3>Bước 4.3 — Tắt trang phụ (trang phụ (subsite)) tạo mới</h3>
+    <h3>BÆ°á»›c 4.3 â€” Táº¯t trang phá»¥ (trang phá»¥ (subsite)) táº¡o má»›i</h3>
     <ul>
-      <li>Tại <span class="code">cài đặt</span>, mở phần kinh điển cài đặt nếu tổ chức thuê (tổ chức thuê (tenant)) còn hiển thị.</li>
-      <li>Đặt <span class="code">trang phụ (trang phụ (subsite)) tạo mới</span> về trạng thái không cho người dùng tự tạo các trang phụ (trang phụ (trang phụ (subsite))).</li>
+      <li>Táº¡i <span class="code">cÃ i Ä‘áº·t</span>, má»Ÿ pháº§n kinh Ä‘iá»ƒn cÃ i Ä‘áº·t náº¿u tá»• chá»©c thuÃª (tá»• chá»©c thuÃª (tenant)) cÃ²n hiá»ƒn thá»‹.</li>
+      <li>Äáº·t <span class="code">trang phá»¥ (trang phá»¥ (subsite)) táº¡o má»›i</span> vá» tráº¡ng thÃ¡i khÃ´ng cho ngÆ°á»i dÃ¹ng tá»± táº¡o cÃ¡c trang phá»¥ (trang phá»¥ (trang phá»¥ (subsite))).</li>
     </ul>
   </div>
 </div>
 
 <div class="section" id="sec-5">
-  <h2>5. Tạo site HESEM-QMS-Cốt lõi</h2>
+  <h2>5. Táº¡o site HESEM-QMS-Cá»‘t lÃµi</h2>
   <div class="step-card">
-    <h3>Bước 5.1 — Tạo site</h3>
+    <h3>BÆ°á»›c 5.1 â€” Táº¡o site</h3>
     <ul>
-      <li>Trong SharePoint admin trung tâm, vào <span class="code">Active địa điểm / site</span>.</li>
-      <li>Chọn <span class="code">Tạo</span>.</li>
-      <li>Chọn kiểu site cộng tác riêng tư phù hợp với tổ chức thuê (tổ chức thuê (tenant)).</li>
-      <li>Nhập tên site: <span class="code">HESEM-QMS-Cốt lõi</span>.</li>
-      <li>Đặt quyền riêng tư là <span class="code">riêng tư</span>.</li>
-      <li>Chỉ định chính / sơ cấp owner là tài khoản quản trị thuộc <span class="code">QMS-Chủ sở hữu</span>.</li>
-      <li>Hoàn tất tạo site.</li>
+      <li>Trong SharePoint admin trung tÃ¢m, vÃ o <span class="code">Active Ä‘á»‹a Ä‘iá»ƒm / site</span>.</li>
+      <li>Chá»n <span class="code">Táº¡o</span>.</li>
+      <li>Chá»n kiá»ƒu site cá»™ng tÃ¡c riÃªng tÆ° phÃ¹ há»£p vá»›i tá»• chá»©c thuÃª (tá»• chá»©c thuÃª (tenant)).</li>
+      <li>Nháº­p tÃªn site: <span class="code">HESEM-QMS-Cá»‘t lÃµi</span>.</li>
+      <li>Äáº·t quyá»n riÃªng tÆ° lÃ  <span class="code">riÃªng tÆ°</span>.</li>
+      <li>Chá»‰ Ä‘á»‹nh chÃ­nh / sÆ¡ cáº¥p owner lÃ  tÃ i khoáº£n quáº£n trá»‹ thuá»™c <span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span>.</li>
+      <li>HoÃ n táº¥t táº¡o site.</li>
     </ul>
   </div>
   <div class="step-card">
-    <h3>Bước 5.2 — Kiểm tra site vừa tạo</h3>
+    <h3>BÆ°á»›c 5.2 â€” Kiá»ƒm tra site vá»«a táº¡o</h3>
     <ul>
-      <li>Mở site vừa tạo từ <span class="code">Active địa điểm / site</span>.</li>
-      <li>Xác nhận site tồn tại đúng tên và đúng owner.</li>
-      <li>Không thêm người dùng thường trực tiếp vào site ở bước này.</li>
+      <li>Má»Ÿ site vá»«a táº¡o tá»« <span class="code">Active Ä‘á»‹a Ä‘iá»ƒm / site</span>.</li>
+      <li>XÃ¡c nháº­n site tá»“n táº¡i Ä‘Ãºng tÃªn vÃ  Ä‘Ãºng owner.</li>
+      <li>KhÃ´ng thÃªm ngÆ°á»i dÃ¹ng thÆ°á»ng trá»±c tiáº¿p vÃ o site á»Ÿ bÆ°á»›c nÃ y.</li>
     </ul>
   </div>
 </div>
 
 <div class="section" id="sec-6">
-  <h2>6. Tạo thư viện trong HESEM-QMS-Cốt lõi</h2>
+  <h2>6. Táº¡o thÆ° viá»‡n trong HESEM-QMS-Cá»‘t lÃµi</h2>
   <div class="step-card">
-    <h3>Bước 6.1 — Tạo từng thư viện</h3>
+    <h3>BÆ°á»›c 6.1 â€” Táº¡o tá»«ng thÆ° viá»‡n</h3>
     <ul>
-      <li>Vào site <span class="code">HESEM-QMS-Cốt lõi</span>.</li>
-      <li>Chọn <span class="code">New</span> → <span class="code">Tài liệu thư viện</span>.</li>
-      <li>Tạo lần lượt: <span class="code">01-QMS-Records</span>, <span class="code">02-Quality-Records</span>, <span class="code">03-Job-Records</span>, <span class="code">04-Training-Records</span>, <span class="code">05-Department-Records</span>, <span class="code">06-Archive</span>, <span class="code">07-Mẫu-Working</span>, <span class="code">Part-REV-Bản gốc</span>.</li>
+      <li>VÃ o site <span class="code">HESEM-QMS-Cá»‘t lÃµi</span>.</li>
+      <li>Chá»n <span class="code">New</span> â†’ <span class="code">TÃ i liá»‡u thÆ° viá»‡n</span>.</li>
+      <li>Táº¡o láº§n lÆ°á»£t: <span class="code">01-QMS-Records</span>, <span class="code">02-Quality-Records</span>, <span class="code">03-Job-Records</span>, <span class="code">04-Training-Records</span>, <span class="code">05-Department-Records</span>, <span class="code">06-Archive</span>, <span class="code">07-Máº«u-Working</span>, <span class="code">Part-REV-Báº£n gá»‘c</span>.</li>
     </ul>
   </div>
 </div>
 
 <div class="section" id="sec-7">
-  <h2>7. Tạo site HESEM-People-Hạn chế và thư viện 08-People-Records</h2>
+  <h2>7. Táº¡o site HESEM-People-Háº¡n cháº¿ vÃ  thÆ° viá»‡n 08-People-Records</h2>
   <div class="step-card">
-    <h3>Bước 7.1 — Tạo site People</h3>
+    <h3>BÆ°á»›c 7.1 â€” Táº¡o site People</h3>
     <ul>
-      <li>Quay lại <span class="code">Active địa điểm / site</span>.</li>
-      <li>Chọn <span class="code">Tạo</span>.</li>
-      <li>Chọn kiểu site cộng tác riêng tư.</li>
-      <li>Đặt tên: <span class="code">HESEM-People-Hạn chế</span>.</li>
-      <li>Chính / Sơ cấp owner là tài khoản thuộc <span class="code">QMS-Chủ sở hữu</span>.</li>
-      <li>Hoàn tất tạo site.</li>
+      <li>Quay láº¡i <span class="code">Active Ä‘á»‹a Ä‘iá»ƒm / site</span>.</li>
+      <li>Chá»n <span class="code">Táº¡o</span>.</li>
+      <li>Chá»n kiá»ƒu site cá»™ng tÃ¡c riÃªng tÆ°.</li>
+      <li>Äáº·t tÃªn: <span class="code">HESEM-People-Háº¡n cháº¿</span>.</li>
+      <li>ChÃ­nh / SÆ¡ cáº¥p owner lÃ  tÃ i khoáº£n thuá»™c <span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span>.</li>
+      <li>HoÃ n táº¥t táº¡o site.</li>
     </ul>
   </div>
   <div class="step-card">
-    <h3>Bước 7.2 — Tạo thư viện People</h3>
+    <h3>BÆ°á»›c 7.2 â€” Táº¡o thÆ° viá»‡n People</h3>
     <ul>
-      <li>Mở site <span class="code">HESEM-People-Hạn chế</span>.</li>
-      <li>Chọn <span class="code">New</span> → <span class="code">Tài liệu thư viện</span>.</li>
-      <li>Nhập tên thư viện: <span class="code">08-People-Records</span>.</li>
+      <li>Má»Ÿ site <span class="code">HESEM-People-Háº¡n cháº¿</span>.</li>
+      <li>Chá»n <span class="code">New</span> â†’ <span class="code">TÃ i liá»‡u thÆ° viá»‡n</span>.</li>
+      <li>Nháº­p tÃªn thÆ° viá»‡n: <span class="code">08-People-Records</span>.</li>
     </ul>
   </div>
 </div>
 
 <div class="section" id="sec-8">
-  <h2>8. Tạo site HESEM-Digital-Control và các thư viện 09-Digital-System-Records, 10-QMS-Source-Control</h2>
+  <h2>8. Táº¡o site HESEM-Digital-Control vÃ  cÃ¡c thÆ° viá»‡n 09-Digital-System-Records, 10-QMS-Source-Control</h2>
   <div class="step-card">
-    <h3>Bước 8.1 — Tạo site Digital</h3>
+    <h3>BÆ°á»›c 8.1 â€” Táº¡o site Digital</h3>
     <ul>
-      <li>Tại <span class="code">Active địa điểm / site</span>, chọn <span class="code">Tạo</span>.</li>
-      <li>Tạo site cộng tác riêng tư.</li>
-      <li>Đặt tên: <span class="code">HESEM-Digital-Control</span>.</li>
-      <li>Chính / Sơ cấp owner là tài khoản thuộc <span class="code">QMS-Chủ sở hữu</span>.</li>
+      <li>Táº¡i <span class="code">Active Ä‘á»‹a Ä‘iá»ƒm / site</span>, chá»n <span class="code">Táº¡o</span>.</li>
+      <li>Táº¡o site cá»™ng tÃ¡c riÃªng tÆ°.</li>
+      <li>Äáº·t tÃªn: <span class="code">HESEM-Digital-Control</span>.</li>
+      <li>ChÃ­nh / SÆ¡ cáº¥p owner lÃ  tÃ i khoáº£n thuá»™c <span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span>.</li>
     </ul>
   </div>
   <div class="step-card">
-    <h3>Bước 8.2 — Tạo thư viện Digital</h3>
+    <h3>BÆ°á»›c 8.2 â€” Táº¡o thÆ° viá»‡n Digital</h3>
     <ul>
-      <li>Mở site <span class="code">HESEM-Digital-Control</span>.</li>
-      <li>Chọn <span class="code">New</span> → <span class="code">Tài liệu thư viện</span>.</li>
-      <li>Tạo thư viện thứ nhất: <span class="code">09-Digital-System-Records</span>.</li>
-      <li>Lặp lại thao tác tạo thư viện và nhập tên: <span class="code">10-QMS-Source-Control</span>.</li>
+      <li>Má»Ÿ site <span class="code">HESEM-Digital-Control</span>.</li>
+      <li>Chá»n <span class="code">New</span> â†’ <span class="code">TÃ i liá»‡u thÆ° viá»‡n</span>.</li>
+      <li>Táº¡o thÆ° viá»‡n thá»© nháº¥t: <span class="code">09-Digital-System-Records</span>.</li>
+      <li>Láº·p láº¡i thao tÃ¡c táº¡o thÆ° viá»‡n vÃ  nháº­p tÃªn: <span class="code">10-QMS-Source-Control</span>.</li>
     </ul>
   </div>
 </div>
 
 <div class="section" id="sec-9">
-  <h2>9. Tạo nhóm cần dùng</h2>
+  <h2>9. Táº¡o nhÃ³m cáº§n dÃ¹ng</h2>
   <div class="step-card">
-    <h3>Bước 9.1 — Tạo nhóm nền</h3>
+    <h3>BÆ°á»›c 9.1 â€” Táº¡o nhÃ³m ná»n</h3>
     <ul>
-      <li>Tạo hoặc xác nhận tồn tại các nhóm: <span class="code">QMS-Chủ sở hữu</span>, <span class="code">QMS-QA-Biên tập viên</span>, <span class="code">QMS-ENG-Biên tập viên</span>, <span class="code">QMS-Kế hoạch-Biên tập viên</span>, <span class="code">QMS-PRO-Biên tập viên</span>, <span class="code">QMS-SCM-Biên tập viên</span>, <span class="code">QMS-SAL-Biên tập viên</span>, <span class="code">QMS-FIN-Biên tập viên</span>, <span class="code">QMS-EHS-Biên tập viên</span>, <span class="code">QMS-IT-Governance viên</span>, <span class="code">QMS-ERP-Governance viên</span>, <span class="code">QMS-Portal-Editors</span>, <span class="code">QMS-ReadOnly</span>.</li>
-      <li>Tạo các nhóm hạn chế: <span class="code">QMS-HR-Hạn chế</span>, <span class="code">HR-Bảng lương-Hạn chế</span>, <span class="code">HR-y tế-Hạn chế</span>, <span class="code">QMS-External-Khách-Hạn chế</span>.</li>
-      <li>Tạo các nhóm phòng ban: <span class="code">DEP-EXEC-Biên tập viên</span>, <span class="code">DEP-QMS-Biên tập viên</span>, <span class="code">DEP-QA-Biên tập viên</span>, <span class="code">DEP-ENG-Biên tập viên</span>, <span class="code">DEP-PRO-Biên tập viên</span>, <span class="code">DEP-SCM-Biên tập viên</span>, <span class="code">DEP-SAL-Biên tập viên</span>, <span class="code">DEP-FIN-Biên tập viên</span>, <span class="code">DEP-HR-Biên tập viên</span>, <span class="code">DEP-EHS-Biên tập viên</span>, <span class="code">DEP-IT-Biên tập viên</span>, <span class="code">DEP-ERP-Biên tập viên</span>.</li>
+      <li>Táº¡o hoáº·c xÃ¡c nháº­n tá»“n táº¡i cÃ¡c nhÃ³m: <span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span>, <span class="code">QMS-QA-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-ENG-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-Káº¿ hoáº¡ch-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-PRO-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-SCM-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-SAL-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-FIN-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-EHS-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-IT-Governance viÃªn</span>, <span class="code">QMS-ERP-Governance viÃªn</span>, <span class="code">QMS-Portal-Editors</span>, <span class="code">QMS-ReadOnly</span>.</li>
+      <li>Táº¡o cÃ¡c nhÃ³m háº¡n cháº¿: <span class="code">QMS-HR-Háº¡n cháº¿</span>, <span class="code">HR-Báº£ng lÆ°Æ¡ng-Háº¡n cháº¿</span>, <span class="code">HR-y táº¿-Háº¡n cháº¿</span>, <span class="code">QMS-External-KhÃ¡ch-Háº¡n cháº¿</span>.</li>
+      <li>Táº¡o cÃ¡c nhÃ³m phÃ²ng ban: <span class="code">DEP-EXEC-BiÃªn táº­p viÃªn</span>, <span class="code">DEP-QMS-BiÃªn táº­p viÃªn</span>, <span class="code">DEP-QA-BiÃªn táº­p viÃªn</span>, <span class="code">DEP-ENG-BiÃªn táº­p viÃªn</span>, <span class="code">DEP-PRO-BiÃªn táº­p viÃªn</span>, <span class="code">DEP-SCM-BiÃªn táº­p viÃªn</span>, <span class="code">DEP-SAL-BiÃªn táº­p viÃªn</span>, <span class="code">DEP-FIN-BiÃªn táº­p viÃªn</span>, <span class="code">DEP-HR-BiÃªn táº­p viÃªn</span>, <span class="code">DEP-EHS-BiÃªn táº­p viÃªn</span>, <span class="code">DEP-IT-BiÃªn táº­p viÃªn</span>, <span class="code">DEP-ERP-BiÃªn táº­p viÃªn</span>.</li>
     </ul>
   </div>
-  <div class="keyline"><strong>Quy tắc cứng:</strong> không thêm người dùng trực tiếp vào quyền truy cập của site/thư viện/thư mục nếu chưa có ngoại lệ được duyệt. Luôn thêm người dùng vào group trước.</div>
+  <div class="keyline"><strong>Quy táº¯c cá»©ng:</strong> khÃ´ng thÃªm ngÆ°á»i dÃ¹ng trá»±c tiáº¿p vÃ o quyá»n truy cáº­p cá»§a site/thÆ° viá»‡n/thÆ° má»¥c náº¿u chÆ°a cÃ³ ngoáº¡i lá»‡ Ä‘Æ°á»£c duyá»‡t. LuÃ´n thÃªm ngÆ°á»i dÃ¹ng vÃ o group trÆ°á»›c.</div>
 </div>
 
 <div class="section" id="sec-10">
-  <h2>10. Áp quyền site level</h2>
+  <h2>10. Ãp quyá»n site level</h2>
   <div class="table-card">
     <table>
       <thead>
-        <tr><th>Site</th><th>Chủ sở hữu</th><th>thành viên</th><th>Khách tham quan</th></tr>
+        <tr><th>Site</th><th>Chá»§ sá»Ÿ há»¯u</th><th>thÃ nh viÃªn</th><th>KhÃ¡ch tham quan</th></tr>
       </thead>
       <tbody>
-        <tr><td><span class="code">HESEM-QMS-Cốt lõi</span></td><td><span class="code">QMS-Chủ sở hữu</span></td><td>Chỉ nhóm quản trị cấu hình hoặc để trống nếu dùng thư viện quyền truy cập là chính</td><td><span class="code">QMS-ReadOnly</span> nếu cần đọc rộng nội bộ</td></tr>
-        <tr><td><span class="code">HESEM-People-Hạn chế</span></td><td><span class="code">QMS-Chủ sở hữu</span></td><td><span class="code">QMS-HR-Hạn chế</span></td><td>Để trống</td></tr>
-        <tr><td><span class="code">HESEM-Digital-Control</span></td><td><span class="code">QMS-Chủ sở hữu</span></td><td><span class="code">QMS-IT-Governance viên</span>, <span class="code">QMS-ERP-Governance viên</span>, <span class="code">QMS-Portal-Editors</span></td><td>Để trống</td></tr>
+        <tr><td><span class="code">HESEM-QMS-Cá»‘t lÃµi</span></td><td><span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span></td><td>Chá»‰ nhÃ³m quáº£n trá»‹ cáº¥u hÃ¬nh hoáº·c Ä‘á»ƒ trá»‘ng náº¿u dÃ¹ng thÆ° viá»‡n quyá»n truy cáº­p lÃ  chÃ­nh</td><td><span class="code">QMS-ReadOnly</span> náº¿u cáº§n Ä‘á»c rá»™ng ná»™i bá»™</td></tr>
+        <tr><td><span class="code">HESEM-People-Háº¡n cháº¿</span></td><td><span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span></td><td><span class="code">QMS-HR-Háº¡n cháº¿</span></td><td>Äá»ƒ trá»‘ng</td></tr>
+        <tr><td><span class="code">HESEM-Digital-Control</span></td><td><span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span></td><td><span class="code">QMS-IT-Governance viÃªn</span>, <span class="code">QMS-ERP-Governance viÃªn</span>, <span class="code">QMS-Portal-Editors</span></td><td>Äá»ƒ trá»‘ng</td></tr>
       </tbody>
     </table>
   </div>
   <div class="step-card">
-    <h3>Bước 10.1 — Cách vào màn hình site quyền truy cập</h3>
+    <h3>BÆ°á»›c 10.1 â€” CÃ¡ch vÃ o mÃ n hÃ¬nh site quyá»n truy cáº­p</h3>
     <ul>
-      <li>Mở site cần cấu hình.</li>
-      <li>Chọn bánh răng → <span class="code">Site quyền truy cập</span>.</li>
-      <li>Dùng <span class="code">Nâng cao quyền truy cập cài đặt</span> nếu cần chỉnh sâu chủ sở hữu, thành viên, khách tham quan.</li>
+      <li>Má»Ÿ site cáº§n cáº¥u hÃ¬nh.</li>
+      <li>Chá»n bÃ¡nh rÄƒng â†’ <span class="code">Site quyá»n truy cáº­p</span>.</li>
+      <li>DÃ¹ng <span class="code">NÃ¢ng cao quyá»n truy cáº­p cÃ i Ä‘áº·t</span> náº¿u cáº§n chá»‰nh sÃ¢u chá»§ sá»Ÿ há»¯u, thÃ nh viÃªn, khÃ¡ch tham quan.</li>
     </ul>
   </div>
 </div>
 
 <div class="section" id="sec-11">
-  <h2>11. Áp quyền thư viện level</h2>
+  <h2>11. Ãp quyá»n thÆ° viá»‡n level</h2>
   <div class="step-card">
-    <h3>Bước 11.1 — Cách vào quyền truy cập của thư viện</h3>
+    <h3>BÆ°á»›c 11.1 â€” CÃ¡ch vÃ o quyá»n truy cáº­p cá»§a thÆ° viá»‡n</h3>
     <ul>
-      <li>Mở thư viện.</li>
-      <li>Chọn bánh răng → <span class="code">Thư viện cài đặt</span>.</li>
-      <li>Chọn <span class="code">quyền truy cập for này tài liệu thư viện</span>.</li>
-      <li>Nếu thư viện đang kế thừa site quyền truy cập, chọn <span class="code">Stop kế thừa quyền truy cập</span>.</li>
-      <li>Xóa các nhóm không cần.</li>
-      <li>Thêm đúng nhóm theo bảng dưới đây.</li>
+      <li>Má»Ÿ thÆ° viá»‡n.</li>
+      <li>Chá»n bÃ¡nh rÄƒng â†’ <span class="code">ThÆ° viá»‡n cÃ i Ä‘áº·t</span>.</li>
+      <li>Chá»n <span class="code">quyá»n truy cáº­p for nÃ y tÃ i liá»‡u thÆ° viá»‡n</span>.</li>
+      <li>Náº¿u thÆ° viá»‡n Ä‘ang káº¿ thá»«a site quyá»n truy cáº­p, chá»n <span class="code">Stop káº¿ thá»«a quyá»n truy cáº­p</span>.</li>
+      <li>XÃ³a cÃ¡c nhÃ³m khÃ´ng cáº§n.</li>
+      <li>ThÃªm Ä‘Ãºng nhÃ³m theo báº£ng dÆ°á»›i Ä‘Ã¢y.</li>
     </ul>
   </div>
   <div class="table-card">
     <table>
       <thead>
-        <tr><th>Thư viện</th><th>nhóm phải có</th><th>Mức quyền</th></tr>
+        <tr><th>ThÆ° viá»‡n</th><th>nhÃ³m pháº£i cÃ³</th><th>Má»©c quyá»n</th></tr>
       </thead>
       <tbody>
-        <tr><td><span class="code">01-QMS-Records</span></td><td><span class="code">QMS-Chủ sở hữu</span>, <span class="code">QMS-QA-Biên tập viên</span>, <span class="code">QMS-ReadOnly</span> khi cần</td><td>Đầy đủ / Edit / đọc</td></tr>
-        <tr><td><span class="code">02-Quality-Records</span></td><td><span class="code">QMS-Chủ sở hữu</span>, <span class="code">QMS-QA-Biên tập viên</span></td><td>Đầy đủ / Edit</td></tr>
-        <tr><td><span class="code">03-Job-Records</span></td><td><span class="code">QMS-Kế hoạch-Biên tập viên</span>, <span class="code">QMS-QA-Biên tập viên</span>, <span class="code">QMS-ENG-Biên tập viên</span>, <span class="code">QMS-PRO-Biên tập viên</span>, <span class="code">QMS-SCM-Biên tập viên</span></td><td>Edit</td></tr>
-        <tr><td><span class="code">04-Training-Records</span></td><td><span class="code">QMS-HR-Hạn chế</span>, <span class="code">QMS-QA-Biên tập viên</span></td><td>Edit</td></tr>
-        <tr><td><span class="code">05-Department-Records</span></td><td><span class="code">QMS-Chủ sở hữu</span> và các nhóm <span class="code">DEP-{DeptCode}-Biên tập viên</span></td><td>Đầy đủ / Edit</td></tr>
-        <tr><td><span class="code">06-Archive</span></td><td><span class="code">QMS-Chủ sở hữu</span>, lưu trữ người quản lý hồ sơ</td><td>Đầy đủ / đọc</td></tr>
-        <tr><td><span class="code">07-Mẫu-Working</span></td><td>Template chủ sở hữu</td><td>Edit</td></tr>
-        <tr><td><span class="code">Part-REV-Bản gốc</span></td><td><span class="code">QMS-ENG-Biên tập viên</span>, <span class="code">QMS-QA-Biên tập viên</span></td><td>Edit / đọc</td></tr>
-        <tr><td><span class="code">08-People-Records</span></td><td><span class="code">QMS-HR-Hạn chế</span>, <span class="code">HR-Bảng lương-Hạn chế</span>, <span class="code">HR-y tế-Hạn chế</span> theo Sub-folder hạn chế</td><td>Edit / Hạn chế Edit</td></tr>
-        <tr><td><span class="code">09-Digital-System-Records</span></td><td><span class="code">QMS-IT-Governance viên</span>, <span class="code">QMS-ERP-Governance viên</span></td><td>Edit</td></tr>
-        <tr><td><span class="code">10-QMS-Source-Control</span></td><td><span class="code">QMS-Chủ sở hữu</span>, <span class="code">QMS-IT-Governance viên</span>, <span class="code">QMS-QA-Biên tập viên</span>, <span class="code">QMS-Portal-Editors</span></td><td>Đầy đủ / Edit / Edit / Edit có kiểm soát</td></tr>
+        <tr><td><span class="code">01-QMS-Records</span></td><td><span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span>, <span class="code">QMS-QA-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-ReadOnly</span> khi cáº§n</td><td>Äáº§y Ä‘á»§ / Edit / Ä‘á»c</td></tr>
+        <tr><td><span class="code">02-Quality-Records</span></td><td><span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span>, <span class="code">QMS-QA-BiÃªn táº­p viÃªn</span></td><td>Äáº§y Ä‘á»§ / Edit</td></tr>
+        <tr><td><span class="code">03-Job-Records</span></td><td><span class="code">QMS-Káº¿ hoáº¡ch-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-QA-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-ENG-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-PRO-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-SCM-BiÃªn táº­p viÃªn</span></td><td>Edit</td></tr>
+        <tr><td><span class="code">04-Training-Records</span></td><td><span class="code">QMS-HR-Háº¡n cháº¿</span>, <span class="code">QMS-QA-BiÃªn táº­p viÃªn</span></td><td>Edit</td></tr>
+        <tr><td><span class="code">05-Department-Records</span></td><td><span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span> vÃ  cÃ¡c nhÃ³m <span class="code">DEP-{DeptCode}-BiÃªn táº­p viÃªn</span></td><td>Äáº§y Ä‘á»§ / Edit</td></tr>
+        <tr><td><span class="code">06-Archive</span></td><td><span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span>, lÆ°u trá»¯ ngÆ°á»i quáº£n lÃ½ há»“ sÆ¡</td><td>Äáº§y Ä‘á»§ / Ä‘á»c</td></tr>
+        <tr><td><span class="code">07-Máº«u-Working</span></td><td>Template chá»§ sá»Ÿ há»¯u</td><td>Edit</td></tr>
+        <tr><td><span class="code">Part-REV-Báº£n gá»‘c</span></td><td><span class="code">QMS-ENG-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-QA-BiÃªn táº­p viÃªn</span></td><td>Edit / Ä‘á»c</td></tr>
+        <tr><td><span class="code">08-People-Records</span></td><td><span class="code">QMS-HR-Háº¡n cháº¿</span>, <span class="code">HR-Báº£ng lÆ°Æ¡ng-Háº¡n cháº¿</span>, <span class="code">HR-y táº¿-Háº¡n cháº¿</span> theo Sub-folder háº¡n cháº¿</td><td>Edit / Háº¡n cháº¿ Edit</td></tr>
+        <tr><td><span class="code">09-Digital-System-Records</span></td><td><span class="code">QMS-IT-Governance viÃªn</span>, <span class="code">QMS-ERP-Governance viÃªn</span></td><td>Edit</td></tr>
+        <tr><td><span class="code">10-QMS-Source-Control</span></td><td><span class="code">QMS-Chá»§ sá»Ÿ há»¯u</span>, <span class="code">QMS-IT-Governance viÃªn</span>, <span class="code">QMS-QA-BiÃªn táº­p viÃªn</span>, <span class="code">QMS-Portal-Editors</span></td><td>Äáº§y Ä‘á»§ / Edit / Edit / Edit cÃ³ kiá»ƒm soÃ¡t</td></tr>
       </tbody>
     </table>
   </div>
 </div>
 
 <div class="section" id="sec-12">
-  <h2>12. Cấu hình chia sẻ</h2>
+  <h2>12. Cáº¥u hÃ¬nh chia sáº»</h2>
   <div class="step-card">
-    <h3>Bước 12.1 — Site chia sẻ cài đặt</h3>
+    <h3>BÆ°á»›c 12.1 â€” Site chia sáº» cÃ i Ä‘áº·t</h3>
     <ul>
-      <li>Trong SharePoint admin trung tâm, vào <span class="code">Active địa điểm / site</span>.</li>
-      <li>Chọn site cần cấu hình.</li>
-      <li>Mở <span class="code">chính sách</span> hoặc <span class="code">cài đặt</span> → <span class="code">chia sẻ</span>.</li>
-      <li><span class="code">HESEM-People-Hạn chế</span>: đặt <span class="code">chỉ / duy nhất con người in của bạn tổ chức</span>.</li>
-      <li><span class="code">HESEM-Digital-Control</span>: đặt <span class="code">chỉ / duy nhất con người in của bạn tổ chức</span>.</li>
-      <li><span class="code">10-QMS-Source-Control</span>: không bật external sharing ở library level; chỉ cho endpoint đã phê duyệt sync theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>.</li>
-      <li><span class="code">HESEM-QMS-Cốt lõi</span>: đặt <span class="code">hiện có khách</span>; không dùng ẩn danh liên kết.</li>
+      <li>Trong SharePoint admin trung tÃ¢m, vÃ o <span class="code">Active Ä‘á»‹a Ä‘iá»ƒm / site</span>.</li>
+      <li>Chá»n site cáº§n cáº¥u hÃ¬nh.</li>
+      <li>Má»Ÿ <span class="code">chÃ­nh sÃ¡ch</span> hoáº·c <span class="code">cÃ i Ä‘áº·t</span> â†’ <span class="code">chia sáº»</span>.</li>
+      <li><span class="code">HESEM-People-Háº¡n cháº¿</span>: Ä‘áº·t <span class="code">chá»‰ / duy nháº¥t con ngÆ°á»i in cá»§a báº¡n tá»• chá»©c</span>.</li>
+      <li><span class="code">HESEM-Digital-Control</span>: Ä‘áº·t <span class="code">chá»‰ / duy nháº¥t con ngÆ°á»i in cá»§a báº¡n tá»• chá»©c</span>.</li>
+      <li><span class="code">10-QMS-Source-Control</span>: khÃ´ng báº­t external sharing á»Ÿ library level; chá»‰ cho endpoint Ä‘Ã£ phÃª duyá»‡t sync theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>.</li>
+      <li><span class="code">HESEM-QMS-Cá»‘t lÃµi</span>: Ä‘áº·t <span class="code">hiá»‡n cÃ³ khÃ¡ch</span>; khÃ´ng dÃ¹ng áº©n danh liÃªn káº¿t.</li>
     </ul>
   </div>
   <div class="step-card">
-    <h3>Bước 12.2 — Mặc định link type</h3>
+    <h3>BÆ°á»›c 12.2 â€” Máº·c Ä‘á»‹nh link type</h3>
     <ul>
-      <li>Trong site cài đặt hoặc thư viện/chia sẻ cài đặt, đặt mặc định link là <span class="code">cụ thể con người</span>.</li>
-      <li>Khách nhận gói hàng từ <span class="code">HESEM-QMS-Cốt lõi</span> phải được IT tạo trước trong tổ chức thuê (tổ chức thuê (tenant)); người dùng vận hành không tự thêm khách ngoài quy trình.</li>
-      <li>Cho gói hàng gửi ra ngoài, mặc định bỏ quyền edit và đặt hết hạn date.</li>
+      <li>Trong site cÃ i Ä‘áº·t hoáº·c thÆ° viá»‡n/chia sáº» cÃ i Ä‘áº·t, Ä‘áº·t máº·c Ä‘á»‹nh link lÃ  <span class="code">cá»¥ thá»ƒ con ngÆ°á»i</span>.</li>
+      <li>KhÃ¡ch nháº­n gÃ³i hÃ ng tá»« <span class="code">HESEM-QMS-Cá»‘t lÃµi</span> pháº£i Ä‘Æ°á»£c IT táº¡o trÆ°á»›c trong tá»• chá»©c thuÃª (tá»• chá»©c thuÃª (tenant)); ngÆ°á»i dÃ¹ng váº­n hÃ nh khÃ´ng tá»± thÃªm khÃ¡ch ngoÃ i quy trÃ¬nh.</li>
+      <li>Cho gÃ³i hÃ ng gá»­i ra ngoÃ i, máº·c Ä‘á»‹nh bá» quyá»n edit vÃ  Ä‘áº·t háº¿t háº¡n date.</li>
     </ul>
   </div>
 </div>
 
 <div class="section" id="sec-13">
-  <h2>13. Quản lý phiên bản, lưu giữ và nhãn</h2>
+  <h2>13. Quáº£n lÃ½ phiÃªn báº£n, lÆ°u giá»¯ vÃ  nhÃ£n</h2>
   <div class="step-card">
-    <h3>Bước 13.1 — Quản lý phiên bản</h3>
+    <h3>BÆ°á»›c 13.1 â€” Quáº£n lÃ½ phiÃªn báº£n</h3>
     <ul>
-      <li>Trong từng thư viện, vào <span class="code">Thư viện cài đặt</span> → <span class="code">Quản lý phiên bản cài đặt</span>.</li>
-      <li>Bật lớn / nghiêm trọng phiên bản cho được kiểm soát thư viện.</li>
+      <li>Trong tá»«ng thÆ° viá»‡n, vÃ o <span class="code">ThÆ° viá»‡n cÃ i Ä‘áº·t</span> â†’ <span class="code">Quáº£n lÃ½ phiÃªn báº£n cÃ i Ä‘áº·t</span>.</li>
+      <li>Báº­t lá»›n / nghiÃªm trá»ng phiÃªn báº£n cho Ä‘Æ°á»£c kiá»ƒm soÃ¡t thÆ° viá»‡n.</li>
     </ul>
   </div>
   <div class="step-card">
-    <h3>Bước 13.2 — Lưu giữ và độ nhạy</h3>
+    <h3>BÆ°á»›c 13.2 â€” LÆ°u giá»¯ vÃ  Ä‘á»™ nháº¡y</h3>
     <ul>
-      <li>Áp lưu giữ nhãn theo sơ đồ ánh xạ của <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span> và <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>.</li>
-      <li>People site và Digital site phải có độ nhạy/quyền / sự cho phép ranh giới nghiêm ngặt hơn cốt lõi site.</li>
+      <li>Ãp lÆ°u giá»¯ nhÃ£n theo sÆ¡ Ä‘á»“ Ã¡nh xáº¡ cá»§a <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span> vÃ  <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>.</li>
+      <li>People site vÃ  Digital site pháº£i cÃ³ Ä‘á»™ nháº¡y/quyá»n / sá»± cho phÃ©p ranh giá»›i nghiÃªm ngáº·t hÆ¡n cá»‘t lÃµi site.</li>
     </ul>
   </div>
 </div>
 
 <div class="section" id="sec-14">
-  <h2>14. Tạo gốc / căn nguyên thư mục và năm cấu trúc</h2>
+  <h2>14. Táº¡o gá»‘c / cÄƒn nguyÃªn thÆ° má»¥c vÃ  nÄƒm cáº¥u trÃºc</h2>
   <div class="step-card">
-    <h3>Bước 14.1 — gốc / căn nguyên thư mục</h3>
+    <h3>BÆ°á»›c 14.1 â€” gá»‘c / cÄƒn nguyÃªn thÆ° má»¥c</h3>
     <ul>
-      <li>Vào từng thư viện.</li>
-      <li>Tạo gốc / căn nguyên thư mục và năm thư mục đúng theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>.</li>
-      <li>Với <span class="code">05-Department-Records</span>, tạo phòng ban khu vực trước, sau đó tạo <span class="code">00-Live-Control-and-Master-Data / Master-Data</span>, các nhánh <span class="code">00-Current</span>/<span class="code">00-Active</span>, các nhánh <span class="code">06-Working-Transitory-and-Draft</span> và <span class="code">07-Reference-and-Received-External</span>, rồi mới tạo các thư mục <span class="code">{YYYY}</span> trong những nhánh có lịch sử theo năm. Trong từng nhánh <span class="code">Operations</span>, <span class="code">Logs</span> và <span class="code">Interfaces</span>, phải tạo tiếp grammar chuẩn theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>; trong nhánh <span class="code">06</span> phải tạo workbench theo từng role/JD.</li>
-      <li>Với <span class="code">08-People-Records</span>, tạo các gốc / căn nguyên khu vực: active, trước đây, nhà thầu-and-thực tập sinh, khách tham quan-and-tạm thời-truy cập.</li>
-      <li>Với <span class="code">09-Digital-System-Records</span>, tạo đủ 8 khu vực hệ thống theo bản thiết kế.</li>
-      <li>Với <span class="code">10-QMS-Source-Control</span>, tạo đủ các nhánh <span class="code">01-Controlled-Source/qms.hesem.com.vn</span>, <span class="code">02-Release-Manifests/{YYYY}</span>, <span class="code">03-Server-Deploy-Receipts/{YYYY}</span>, <span class="code">04-Reverse-Sync-Intake/{YYYY}</span>.</li>
+      <li>VÃ o tá»«ng thÆ° viá»‡n.</li>
+      <li>Táº¡o gá»‘c / cÄƒn nguyÃªn thÆ° má»¥c vÃ  nÄƒm thÆ° má»¥c Ä‘Ãºng theo <span class="code"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span>.</li>
+      <li>Vá»›i <span class="code">05-Department-Records</span>, táº¡o phÃ²ng ban khu vá»±c trÆ°á»›c, sau Ä‘Ã³ táº¡o <span class="code">00-Live-Control-and-Master-Data</span>, cÃ¡c nhÃ¡nh <span class="code">00-Current</span>/<span class="code">00-Active</span>, cÃ¡c nhÃ¡nh <span class="code">06-Working-Transitory-and-Draft</span> vÃ  <span class="code">07-Reference-and-Received-External</span>, rá»“i má»›i táº¡o cÃ¡c thÆ° má»¥c <span class="code">{YYYY}</span> trong nhá»¯ng nhÃ¡nh cÃ³ lá»‹ch sá»­ theo nÄƒm. Trong tá»«ng nhÃ¡nh <span class="code">Operations</span>, <span class="code">Logs</span> vÃ  <span class="code">Interfaces</span>, pháº£i táº¡o tiáº¿p grammar chuáº©n theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>; trong nhÃ¡nh <span class="code">06</span> pháº£i táº¡o Ä‘á»§ team workbench theo role/JD vÃ  nhÃ¡nh <span class="code">90-Employee-WB/{EmployeeID}-{DisplayName}</span>.</li>
+      <li>Khi táº¡o folder names, khÃ´ng tá»± nới dÃ i tÃªn so vá»›i bá»™ chuáº©n. Giá»¯ nguyÃªn cÃ¡c segment sync-safe nhÆ° <span class="code">90-Employee-WB</span>, <span class="code">03-Team-Promote</span>, <span class="code">04-My-Offline-Pack</span>, <span class="code">02-Pending-Starters</span> vÃ  <span class="code">06-Restricted-Shared-Ops</span> Ä‘á»ƒ trÃ¡nh lá»—i Ä‘á»“ng bá»™ local/Windows.</li>
+      <li>Vá»›i <span class="code">08-People-Records</span>, táº¡o Ä‘á»§ cÃ¡c gá»‘c / cÄƒn nguyÃªn khu vá»±c: <span class="code">01-Active-Employees</span>, <span class="code">02-Pending-Starters</span>, <span class="code">03-Former-Employees</span>, <span class="code">04-Contractors-Interns-Temps</span>, <span class="code">05-Visitors-and-Vendors</span>, <span class="code">06-Restricted-Shared-Ops</span>.</li>
+      <li>Vá»›i <span class="code">09-Digital-System-Records</span>, táº¡o Ä‘á»§ 8 khu vá»±c há»‡ thá»‘ng theo báº£n thiáº¿t káº¿ vÃ  trong má»—i khu vá»±c pháº£i cÃ³ cáº£ nhÃ¡nh <span class="code">00-Current</span> láº«n <span class="code">{YYYY}</span>.</li>
+      <li>Vá»›i <span class="code">10-QMS-Source-Control</span>, táº¡o Ä‘á»§ cÃ¡c nhÃ¡nh <span class="code">01-Controlled-Source/qms.hesem.com.vn</span>, <span class="code">02-Release-Manifests/{YYYY}</span>, <span class="code">03-Server-Deploy-Receipts/{YYYY}</span>, <span class="code">04-Reverse-Sync-Intake/{YYYY}</span>; dÆ°á»›i <span class="code">01-Controlled-Source/qms.hesem.com.vn</span> táº¡o Ä‘Ãºng mirror roots <span class="code">01-QMS-Portal</span>, <span class="code">02-Tai-Lieu-He-Thong</span>, <span class="code">03-Tai-Lieu-Van-Hanh</span>, <span class="code">04-Bieu-Mau</span>, <span class="code">10-Training-Academy</span>, <span class="code">11-Glossary</span>, <span class="code">assets</span>, <span class="code">core-standards</span>, <span class="code">tools</span>.</li>
     </ul>
   </div>
 </div>
 
 <div class="section" id="sec-15">
-  <h2>15. Bảng kiểm nghiệm thu trước khi bàn giao</h2>
+  <h2>15. Báº£ng kiá»ƒm nghiá»‡m thu trÆ°á»›c khi bÃ n giao</h2>
   <div class="table-card">
     <table>
       <thead>
-        <tr><th>Điểm kiểm</th><th>Pass điều kiện</th></tr>
+        <tr><th>Äiá»ƒm kiá»ƒm</th><th>Pass Ä‘iá»u kiá»‡n</th></tr>
       </thead>
       <tbody>
-        <tr><td>Số site</td><td>Đúng 3 địa điểm / site: Cốt lõi, People, Digital</td></tr>
-        <tr><td>Tên thư viện</td><td>Đúng theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>, không sai chính tả</td></tr>
-        <tr><td>Site quyền truy cập</td><td>Chủ sở hữu/thành viên/Khách tham quan đúng sơ đồ ánh xạ</td></tr>
-        <tr><td>Thư viện quyền truy cập</td><td>Không còn cấp lẻ người dùng ngoài ngoại lệ đã duyệt</td></tr>
-        <tr><td>chia sẻ</td><td>People và Digital không chia sẻ ngoài; Cốt lõi không có ẩn danh link</td></tr>
-        <tr><td>Quản lý phiên bản/nhãn</td><td>Bật đúng trên từng thư viện được kiểm soát</td></tr>
-        <tr><td>gốc / căn nguyên thư mục</td><td>Đúng bản thiết kế trong <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></td></tr>
+        <tr><td>Sá»‘ site</td><td>ÄÃºng 3 Ä‘á»‹a Ä‘iá»ƒm / site: Cá»‘t lÃµi, People, Digital</td></tr>
+        <tr><td>TÃªn thÆ° viá»‡n</td><td>ÄÃºng theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>, khÃ´ng sai chÃ­nh táº£</td></tr>
+        <tr><td>Site quyá»n truy cáº­p</td><td>Chá»§ sá»Ÿ há»¯u/thÃ nh viÃªn/KhÃ¡ch tham quan Ä‘Ãºng sÆ¡ Ä‘á»“ Ã¡nh xáº¡</td></tr>
+        <tr><td>ThÆ° viá»‡n quyá»n truy cáº­p</td><td>KhÃ´ng cÃ²n cáº¥p láº» ngÆ°á»i dÃ¹ng ngoÃ i ngoáº¡i lá»‡ Ä‘Ã£ duyá»‡t</td></tr>
+        <tr><td>chia sáº»</td><td>People vÃ  Digital khÃ´ng chia sáº» ngoÃ i; Cá»‘t lÃµi khÃ´ng cÃ³ áº©n danh link</td></tr>
+        <tr><td>Quáº£n lÃ½ phiÃªn báº£n/nhÃ£n</td><td>Báº­t Ä‘Ãºng trÃªn tá»«ng thÆ° viá»‡n Ä‘Æ°á»£c kiá»ƒm soÃ¡t</td></tr>
+        <tr><td>gá»‘c / cÄƒn nguyÃªn thÆ° má»¥c</td><td>ÄÃºng báº£n thiáº¿t káº¿ trong <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></td></tr>
+        <tr><td>Employee workbench</td><td>Äá»§ role team workbench vÃ  <span class="code">90-Employee-WB/{EmployeeID}-{DisplayName}</span> vá»›i cÃ¡c thÆ° má»¥c con 00-My Ä‘áº¿n 99 theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td></tr>
+        <tr><td>Path budget</td><td>KhÃ´ng cÃ³ nhÃ¡nh nÃ o tá»± Ã½ Ä‘á»•i sang tÃªn dÃ i hÆ¡n bá»™ chuáº©n; cÃ¡c nhÃ¡nh sÃ¢u dÃ¹ng Ä‘Ãºng segment sync-safe trong <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> vÃ  <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td></tr>
+        <tr><td>People lifecycle roots</td><td>Äá»§ active, pending starter, former, contractor/intern/temp, visitor/vendor access vÃ  restricted shared operations</td></tr>
+        <tr><td>System current and year</td><td>Má»—i khu vá»±c trong <span class="code">09-Digital-System-Records</span> Ä‘á»u cÃ³ cáº£ <span class="code">00-Current</span> vÃ  <span class="code">{YYYY}</span></td></tr>
+        <tr><td>Source mirror</td><td><span class="code">10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn</span> cÃ³ Ä‘á»§ repo roots theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td></tr>
       </tbody>
     </table>
   </div>
-<div class="keyline"><strong>Tài liệu liên kết:</strong> <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>, <a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>, <a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a>, <a href="wi-107-sharefile-git-cpanel-sync.html">WI-107</a>.</div>
-  <div class="keyline"><strong>Reference Microsoft hiện hành:</strong> <a href="https://learn.microsoft.com/en-us/sharepoint/create-site-collection" target="_blank" rel="noreferrer">Tạo a site - SharePoint in Microsoft 365</a>; <a href="https://learn.microsoft.com/en-us/sharepoint/manage-site-creation" target="_blank" rel="noreferrer">quản lý site tạo mới in SharePoint</a>; <a href="https://learn.microsoft.com/en-us/microsoft-365/enterprise/media/teams-sharepoint-online-sites-highly-regulated-data/SharePointSitesHighlyRegulatedData.pdf" target="_blank" rel="noreferrer">SharePoint địa điểm / site for cao được quản lý data</a>; <a href="https://learn.microsoft.com/en-us/sharepoint/library-version-limits" target="_blank" rel="noreferrer">Set version giới hạn for a tài liệu thư viện</a>; <a href="https://support.microsoft.com/en-us/office/what-permissions-do-i-need-for-sharepoint-versioning-95bce34c-db77-4fd4-8449-9ad7ce0363c0" target="_blank" rel="noreferrer">quyền truy cập for SharePoint quản lý phiên bản</a>.</div>
+<div class="keyline"><strong>TÃ i liá»‡u liÃªn káº¿t:</strong> <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>, <a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>, <a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a>, <a href="wi-107-sharefile-git-cpanel-sync.html">WI-107</a>.</div>
+  <div class="keyline"><strong>Reference Microsoft hiá»‡n hÃ nh:</strong> <a href="https://learn.microsoft.com/en-us/sharepoint/create-site-collection" target="_blank" rel="noreferrer">Táº¡o a site - SharePoint in Microsoft 365</a>; <a href="https://learn.microsoft.com/en-us/sharepoint/manage-site-creation" target="_blank" rel="noreferrer">quáº£n lÃ½ site táº¡o má»›i in SharePoint</a>; <a href="https://learn.microsoft.com/en-us/microsoft-365/enterprise/media/teams-sharepoint-online-sites-highly-regulated-data/SharePointSitesHighlyRegulatedData.pdf" target="_blank" rel="noreferrer">SharePoint Ä‘á»‹a Ä‘iá»ƒm / site for cao Ä‘Æ°á»£c quáº£n lÃ½ data</a>; <a href="https://learn.microsoft.com/en-us/sharepoint/library-version-limits" target="_blank" rel="noreferrer">Set version giá»›i háº¡n for a tÃ i liá»‡u thÆ° viá»‡n</a>; <a href="https://support.microsoft.com/en-us/office/restrictions-and-limitations-in-onedrive-and-sharepoint-64883a5d-228e-48f5-b3d2-eb39e07630fa" target="_blank" rel="noreferrer">Restrictions and limitations in OneDrive and SharePoint</a>; <a href="https://support.microsoft.com/en-us/office/what-permissions-do-i-need-for-sharepoint-versioning-95bce34c-db77-4fd4-8449-9ad7ce0363c0" target="_blank" rel="noreferrer">quyá»n truy cáº­p for SharePoint quáº£n lÃ½ phiÃªn báº£n</a>.</div>
 </div>
 
 </div>
@@ -368,3 +374,4 @@
 </div>
 </body>
 </html>
+

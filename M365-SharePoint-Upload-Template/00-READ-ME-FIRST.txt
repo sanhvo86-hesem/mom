@@ -1,9 +1,15 @@
-HESEM M365 SHAREPOINT UPLOAD TEMPLATE
+﻿HESEM M365 SHAREPOINT UPLOAD TEMPLATE
 
 This folder pack is aligned to:
 - ANNEX-131: M365 records metadata, list schema, value sets and register catalog
+- ANNEX-132: M365 records flow, approval, sharing and exception control
 - ANNEX-133: M365 records site topology, libraries and folder blueprint
 - ANNEX-134: M365 records provisioning, permissions and automation architecture
+- ANNEX-135: M365 operational records file plan by department, role and job
+- ANNEX-136: M365 SharePoint, Git, server sync and runtime boundary
+- WI-102: SharePoint sites, libraries and permissions click-by-click
+- WI-103: folder routing training and competence
+- WI-104: quick cards by role
 - WI-203: Job dossier evidence pack and record completeness
 - SOP-303: Engineering release baseline package and job snapshot control
 
@@ -15,22 +21,94 @@ UPLOAD ORDER
 CURRENT BUILD
 - Year-based folders in this pack were created for 2026.
 
+ENTERPRISE SCOPE
+- This pack is not evidence-only.
+- It is the enterprise file-plan template for all departments, all roles, and all employees.
+- Department shared records, team workbenches, named employee workbenches, restricted people dossiers, digital admin records, and controlled source roots are all included.
+
+EMPLOYEE STORAGE MODEL
+- Each employee has up to 3 storage loci:
+  - official records in the correct department/library/job series
+  - a named employee workbench under the employee's role in 05-Department-Records
+  - a restricted people dossier in 08-People-Records when the content is HR-sensitive
+- Do not create personal SSOT folders outside this structure.
+
 PLACEHOLDER FOLDERS
 - Folders wrapped in braces are templates and must be copied or renamed for real use.
 - Examples:
-  - {JobNum}-{PartNo}-REV-{Revision}
   - {CustomerID}
+  - {JobNum}-{PartNo}-REV-{Revision}
   - {EmployeeID}-{FullName}
+  - {CandidateOrPersonID}-{Name}
   - {Population}
+  - {RestrictedProcess}
   - {VisitType}
   - {VisitorName}
   - {PartNo}
   - REV-{Rev}
 
+DEPARTMENT AND EMPLOYEE WORKBENCH RULE
+- Each role workbench must contain team folders and a named employee workbench branch:
+  - ROLE-{RoleCode}/00-Team-Inbox
+  - ROLE-{RoleCode}/01-Team-Draft
+  - ROLE-{RoleCode}/02-Team-Review
+  - ROLE-{RoleCode}/03-Team-Promote
+  - ROLE-{RoleCode}/04-Team-Offline
+  - ROLE-{RoleCode}/05-Team-Ref
+  - ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}
+  - ROLE-{RoleCode}/91-Deputy-Handover
+  - ROLE-{RoleCode}/99-Clear-90d
+- Named employee workbenches must contain:
+  - 00-My-Inbox
+  - 01-My-WIP
+  - 02-My-Review
+  - 03-My-Handoff
+  - 04-My-Offline-Pack
+  - 05-My-Ref
+  - 99-Clear-30d
+
+PEOPLE AND DIGITAL RULE
+- 08-People-Records must include:
+  - 01-Active-Employees
+  - 02-Pending-Starters
+  - 03-Former-Employees
+  - 04-Contractors-Interns-Temps
+  - 05-Visitors-and-Vendors
+  - 06-Restricted-Shared-Ops
+- Every system area in 09-Digital-System-Records must have both:
+  - 00-Current
+  - {YYYY}
+- 10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn must mirror:
+  - 01-QMS-Portal
+  - 02-Tai-Lieu-He-Thong
+  - 03-Tai-Lieu-Van-Hanh
+  - 04-Bieu-Mau
+  - 10-Training-Academy
+  - 11-Glossary
+  - assets
+  - core-standards
+  - tools
+
+SYNC-SAFE PATH RULE
+- This template is designed for SharePoint + OneDrive sync + Windows local worktree use.
+- Keep the short deep-branch segments exactly as issued:
+  - 90-Employee-WB
+  - 03-Team-Promote
+  - 04-Team-Offline
+  - 04-My-Offline-Pack
+  - 02-Pending-Starters
+  - 06-Restricted-Shared-Ops
+- Do not expand these back into longer sentences.
+- In deep folders, file names must stay short and structured because the path already carries department, role, employee, year and record-series context.
+
 PART MASTER RULE
 - Part-REV-Master is customer-scoped.
 - Use Part-REV-Master/{CustomerID}/{PartNo}/REV-{Rev}/.
 - Do not store two different customer baselines under the same PartNo branch.
+
+JOB DOSSIER RULE
+- Job dossier templates are customer-scoped.
+- Use 03-Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/.
 
 IMPORTANT UPLOAD NOTE
 - SharePoint browser upload may skip empty folders.
@@ -39,4 +117,6 @@ IMPORTANT UPLOAD NOTE
 
 REBUILD
 - To recreate this folder pack, run:
-  powershell -ExecutionPolicy Bypass -File tools\\generate_m365_sharepoint_upload_template.ps1
+  powershell -ExecutionPolicy Bypass -File tools\\scripts\\m365\\generate_m365_sharepoint_upload_template.ps1
+
+
