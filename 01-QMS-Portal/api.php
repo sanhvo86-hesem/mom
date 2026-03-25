@@ -1674,6 +1674,18 @@ function git_collect_paths_from_status_lines(array $statusLines): array {
   return array_values(array_unique($paths));
 }
 
+function git_join_paths_for_error(array $paths, int $max = 12): string {
+  $clean = array_values(array_filter(array_map(static function($p){
+    return is_string($p) ? trim(str_replace('\\', '/', $p)) : '';
+  }, $paths), static fn($p) => $p !== ''));
+  if (empty($clean)) return '';
+  $slice = array_slice($clean, 0, $max);
+  $extra = count($clean) - count($slice);
+  $msg = implode(', ', $slice);
+  if ($extra > 0) $msg .= ', ... (+' . $extra . ')';
+  return $msg;
+}
+
 function git_cleanup_runtime_noise(string $repoReal): void {
   $statusCode = 0;
   $statusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $statusCode);
@@ -1881,7 +1893,7 @@ function git_pull_portal(string $repoDir): array {
   $stagedFiles = split_nonempty_lines($stagedOut);
   $stagedMeaningful = git_filter_non_runtime_paths($stagedFiles);
   if (!empty($stagedMeaningful)) {
-    throw new RuntimeException('staged_changes_present');
+    throw new RuntimeException('staged_changes_present: ' . git_join_paths_for_error($stagedMeaningful));
   }
 
   $statusCode = 0;
@@ -1891,7 +1903,8 @@ function git_pull_portal(string $repoDir): array {
   }
   $dirtyLines = git_filter_non_runtime_status_lines(split_nonempty_lines($statusOut));
   if (!empty($dirtyLines)) {
-    throw new RuntimeException('working_tree_dirty');
+    $dirtyPaths = git_collect_paths_from_status_lines($dirtyLines);
+    throw new RuntimeException('working_tree_dirty: ' . git_join_paths_for_error($dirtyPaths));
   }
 
   $branchCode = 0;
