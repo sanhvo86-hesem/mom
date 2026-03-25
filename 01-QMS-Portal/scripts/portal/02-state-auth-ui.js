@@ -3676,7 +3676,7 @@ function gitSyncRenderPresyncSection(presync){
   const pushed = !!presync.pushed;
   const files = Array.isArray(presync.files) ? presync.files : [];
   const statusEntries = Array.isArray(presync.status_entries) ? presync.status_entries : [];
-  const hasAnything = pushed || files.length || statusEntries.length || String(presync.message||'').trim();
+  const hasAnything = pushed || files.length || statusEntries.length || String(presync.commit_output||'').trim() || String(presync.push_output||'').trim();
   if(!hasAnything) return '';
   return `
     <section class="git-sync-section">
