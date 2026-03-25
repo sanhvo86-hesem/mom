@@ -1597,7 +1597,11 @@ function renderDashboard(){
   });
   const myEditing = VDOCS.filter(d=>{
     const state=getDocState(d.code);
-    return state && state.status==='draft' && state.lastEdit && state.lastEdit.by===currentUser.name;
+    return state
+      && state.status==='draft'
+      && state.lastEdit
+      && state.lastEdit.by===currentUser.name
+      && docHasWorkingVersion(d.code);
   });
   const approvedCount = VDOCS.filter(d=>getDocStatus(d)==='approved').length;
   const draftCount = VDOCS.filter(d=>getDocStatus(d)==='draft').length;

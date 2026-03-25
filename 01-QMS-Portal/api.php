@@ -3438,7 +3438,7 @@ case 'doc_save_draft': {
       ];
       $state['approvedDate'] = $dt;
       $state['has_release'] = true;
-      foreach (['submittedBy','submittedDate','submittedUpdateType','rejectedBy','checked_out_by'] as $k) {
+      foreach (['lastEdit','submittedBy','submittedDate','submittedUpdateType','rejectedBy','checked_out_by'] as $k) {
         if (array_key_exists($k, $state)) unset($state[$k]);
       }
       form_save_state($DATA_DIR, (string)$formEntry['code'], $state);
@@ -3971,6 +3971,9 @@ case 'doc_save_draft': {
     $hasApproved = false;
     foreach ($kept as $v) { if (is_array($v) && ((($v['status'] ?? '') === 'approved') || (($v['status'] ?? '') === 'initial_release'))) { $hasApproved = true; break; } }
     $state['status'] = $hasApproved ? 'approved' : 'draft';
+    foreach (['lastEdit','submittedBy','submittedDate','submittedUpdateType','rejectedBy','rejectedDate','checked_out_by'] as $k) {
+      if (array_key_exists($k, $state)) unset($state[$k]);
+    }
     save_doc_state($ROOT_DIR, $baseRel, $state);
 
     api_json(['ok' => true, 'code' => $code, 'deleted' => $deleted, 'state' => $state, 'versions' => $kept, 'server_time' => now_iso()]);

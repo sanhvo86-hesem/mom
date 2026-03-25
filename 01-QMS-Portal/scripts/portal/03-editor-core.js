@@ -33,6 +33,13 @@ function getDocVersions(code){
 function setDocVersions(code, versions){
   try{ SERVER_DOC_VERSIONS[code]=versions; }catch(e){}
 }
+function docHasWorkingVersion(code){
+  const versions=getDocVersions(code);
+  return Array.isArray(versions) && versions.some(function(v){
+    if(!v) return false;
+    return v.status==='draft' || v.status==='in_review' || v.status==='pending_approval';
+  });
+}
 const ED_SESSION_DRAFT_PREFIX = 'doc_html_';
 const ED_RECOVERY_DRAFT_PREFIX = 'doc_recovery_';
 const ED_RECOVERY_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
@@ -6069,4 +6076,3 @@ function edPrint(){
 }
 
 // ═══════════════════════════════════════════════════
-

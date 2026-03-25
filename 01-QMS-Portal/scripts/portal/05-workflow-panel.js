@@ -79,7 +79,11 @@ async function deleteDraft(code){
     :'Xóa bản nháp '+doc.code+'? Tất cả chỉnh sửa, dữ liệu xem xét sẽ bị xóa và tài liệu trở về bản gốc.';
   if(!confirm(msg)) return;
   // Clear local unsaved edits
-  try{ sessionStorage.removeItem('doc_html_'+code); }catch(e){}
+  try{
+    if(typeof setEditedHtml==='function') setEditedHtml(code, '');
+    else sessionStorage.removeItem('doc_html_'+code);
+  }catch(e){}
+  try{ if(typeof edClearRecoveryDraft==='function') edClearRecoveryDraft(code); }catch(e){}
 
   // Delete server-backed draft/review files inside /archive (ISO-style)
   try{
@@ -630,13 +634,14 @@ function renderVersionHistory(doc){
           var hasEdited=!!getEditedHtml(doc.code);
           var docSt=getDocStatus(doc);
           var draftCount=versions.filter(function(v){return v && v.status==='draft';}).length;
+          var hasWorkingVersion=(typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : (draftCount>0);
           // Show footer if there is draft history OR there is an active draft/edited content
-          if(!(draftCount>0 || (docSt==='draft' && (hasEdited||st.lastEdit)))) return '';
+          if(!(draftCount>0 || (docSt==='draft' && (hasEdited || (st.lastEdit && hasWorkingVersion))))) return '';
 
           var btnClear = draftCount>0
             ? '<button style="font-size:10px;padding:4px 10px;border:1px solid #fca5a5;border-radius:6px;background:#fff;color:#dc2626;cursor:pointer" onclick="clearDraftHistory(\''+doc.code+'\')">🧹 '+(lang==='en'?'Clear all drafts':'Xóa tất cả nháp')+'</button>'
             : '';
-          var btnDel = (docSt==='draft' && (hasEdited||st.lastEdit))
+          var btnDel = (docSt==='draft' && (hasEdited || (st.lastEdit && hasWorkingVersion)))
             ? '<button style="font-size:10px;padding:4px 10px;border:1px solid #fecaca;border-radius:6px;background:#fff;color:#dc2626;cursor:pointer" onclick="deleteDraft(\''+doc.code+'\')" title="'+(lang==='en'?'Delete draft & restore original':'Xóa nháp & khôi phục bản gốc')+'">'+T('delete_draft_btn')+'</button>'
             : '';
 
