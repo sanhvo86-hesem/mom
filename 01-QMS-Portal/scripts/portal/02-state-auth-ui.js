@@ -1728,49 +1728,49 @@ function renderDashboard(){
     <div id="dash-pending">${pendingHtml}${draftsHtml}</div>
 
     <div class="card" style="margin-top:18px">
-      <h3>🏭 ${lang==='en'?'Job Order Lifecycle — G0 → IQC → G1 → G5':'Vòng đời đơn hàng — G0 → IQC → G1 → G5'}</h3>
-      <p style="margin:-8px 0 12px;color:var(--text-3);font-size:12px">${lang==='en'?'Quick access to SOPs, WIs and Forms for each quality gate. Material must PASS IQC before production.':'Truy cập nhanh SOP, WI và biểu mẫu theo từng cổng kiểm soát. Vật liệu phải PASS IQC trước khi đưa vào sản xuất.'}</p>
-      <div style="display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px">
-        <div style="flex:0 0 auto;min-width:140px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #4CAF50;background:#f8fdf8">
-          <div style="font-weight:700;font-size:13px;color:#2e7d32;margin-bottom:6px">G0 — Contract</div>
-          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'RFQ review, order entry':'Xem xét RFQ, nhập đơn hàng'}</div>
-          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-SAL-001');return false" style="color:#0369a1">SOP-201</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-201</a></div>
+      <h3>🏭 ${lang==='en'?'Job Order Lifecycle — G0 → G6 (7 Gates)':'Vòng đời đơn hàng — G0 → G6 (7 cổng)'}</h3>
+      <p style="margin:-8px 0 12px;color:var(--text-3);font-size:12px">${lang==='en'?'Quick access to SOPs, WIs and Forms for each quality gate. Material must PASS G1-IQC before production.':'Truy cập nhanh SOP, WI và biểu mẫu theo từng cổng kiểm soát. Vật liệu phải PASS G1-IQC trước khi đưa vào sản xuất.'}</p>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px">
+        <div style="flex:0 0 auto;min-width:130px;border:1px solid #e5e7eb;border-radius:8px;padding:10px;border-top:3px solid #4CAF50;background:#f8fdf8">
+          <div style="font-weight:700;font-size:12px;color:#2e7d32;margin-bottom:4px">G0 — Contract</div>
+          <div style="font-size:10px;color:#666;margin-bottom:6px">${lang==='en'?'RFQ, order entry':'Xem xét RFQ, nhập đơn'}</div>
+          <div style="font-size:10px"><a href="#" onclick="openDoc('SOP-SAL-001');return false" style="color:#0369a1">SOP-201</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-201</a></div>
         </div>
-        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
-        <div style="flex:0 0 auto;min-width:140px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #795548;background:#faf6f3">
-          <div style="font-weight:700;font-size:13px;color:#4e342e;margin-bottom:6px">IQC — Incoming</div>
-          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'Receiving, incoming inspection':'Nhận hàng, kiểm tra đầu vào'}</div>
-          <div style="font-size:11px"><a href="#" onclick="openDoc('WI-OPS-012');return false" style="color:#0369a1">WI-701</a> · <a href="#" onclick="openDoc('SOP-PUR-002');return false" style="color:#0369a1">SOP-402</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-701</a></div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:18px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:130px;border:1px solid #e5e7eb;border-radius:8px;padding:10px;border-top:3px solid #795548;background:#faf6f3">
+          <div style="font-weight:700;font-size:12px;color:#4e342e;margin-bottom:4px">G1 — IQC</div>
+          <div style="font-size:10px;color:#666;margin-bottom:6px">${lang==='en'?'Receiving, incoming QC':'Nhận hàng, kiểm tra đầu vào'}</div>
+          <div style="font-size:10px"><a href="#" onclick="openDoc('WI-OPS-012');return false" style="color:#0369a1">WI-701</a> · <a href="#" onclick="openDoc('SOP-PUR-002');return false" style="color:#0369a1">SOP-402</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-701</a></div>
         </div>
-        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
-        <div style="flex:0 0 auto;min-width:140px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #2196F3;background:#f5f9ff">
-          <div style="font-weight:700;font-size:13px;color:#1565c0;margin-bottom:6px">G1 — Setup</div>
-          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'Program release, machine setup':'Phát hành chương trình, setup máy'}</div>
-          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-ENG-001');return false" style="color:#0369a1">SOP-303</a> · <a href="#" onclick="openDoc('SOP-OPS-004');return false" style="color:#0369a1">SOP-504</a></div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:18px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:130px;border:1px solid #e5e7eb;border-radius:8px;padding:10px;border-top:3px solid #2196F3;background:#f5f9ff">
+          <div style="font-weight:700;font-size:12px;color:#1565c0;margin-bottom:4px">G2 — Setup</div>
+          <div style="font-size:10px;color:#666;margin-bottom:6px">${lang==='en'?'Program, machine setup':'Phát hành CT, setup máy'}</div>
+          <div style="font-size:10px"><a href="#" onclick="openDoc('SOP-ENG-001');return false" style="color:#0369a1">SOP-303</a> · <a href="#" onclick="openDoc('SOP-OPS-004');return false" style="color:#0369a1">SOP-504</a></div>
         </div>
-        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
-        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #FF9800;background:#fffbf0">
-          <div style="font-weight:700;font-size:13px;color:#e65100;margin-bottom:6px">G2 — FAI</div>
-          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'First article inspection':'Kiểm tra bài đầu tiên'}</div>
-          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-ENG-002');return false" style="color:#0369a1">SOP-302</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-302</a></div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:18px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:130px;border:1px solid #e5e7eb;border-radius:8px;padding:10px;border-top:3px solid #FF9800;background:#fffbf0">
+          <div style="font-weight:700;font-size:12px;color:#e65100;margin-bottom:4px">G3 — FAI</div>
+          <div style="font-size:10px;color:#666;margin-bottom:6px">${lang==='en'?'First article inspection':'Kiểm tra bài đầu tiên'}</div>
+          <div style="font-size:10px"><a href="#" onclick="openDoc('SOP-ENG-002');return false" style="color:#0369a1">SOP-302</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-302</a></div>
         </div>
-        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
-        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #9C27B0;background:#fdf5ff">
-          <div style="font-weight:700;font-size:13px;color:#7b1fa2;margin-bottom:6px">G3 — IPQC</div>
-          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'In-process QC, SPC':'Kiểm soát trong quá trình'}</div>
-          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-OPS-002');return false" style="color:#0369a1">SOP-502</a> · <a href="#" onclick="openDoc('SOP-QA-004');return false" style="color:#0369a1">SOP-604</a></div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:18px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:130px;border:1px solid #e5e7eb;border-radius:8px;padding:10px;border-top:3px solid #9C27B0;background:#fdf5ff">
+          <div style="font-weight:700;font-size:12px;color:#7b1fa2;margin-bottom:4px">G4 — IPQC</div>
+          <div style="font-size:10px;color:#666;margin-bottom:6px">${lang==='en'?'In-process QC, SPC':'Kiểm soát trong quá trình'}</div>
+          <div style="font-size:10px"><a href="#" onclick="openDoc('SOP-OPS-002');return false" style="color:#0369a1">SOP-502</a> · <a href="#" onclick="openDoc('SOP-QA-004');return false" style="color:#0369a1">SOP-604</a></div>
         </div>
-        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
-        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #00BCD4;background:#f0fdff">
-          <div style="font-weight:700;font-size:13px;color:#00838f;margin-bottom:6px">G4 — Final QC</div>
-          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'Final inspection, packaging':'Kiểm tra cuối, đóng gói'}</div>
-          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-QA-005');return false" style="color:#0369a1">SOP-605</a> · <a href="#" onclick="openDoc('SOP-WHS-001');return false" style="color:#0369a1">SOP-701</a></div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:18px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:130px;border:1px solid #e5e7eb;border-radius:8px;padding:10px;border-top:3px solid #00BCD4;background:#f0fdff">
+          <div style="font-weight:700;font-size:12px;color:#00838f;margin-bottom:4px">G5 — Final QC</div>
+          <div style="font-size:10px;color:#666;margin-bottom:6px">${lang==='en'?'Final inspection, packing':'Kiểm tra cuối, đóng gói'}</div>
+          <div style="font-size:10px"><a href="#" onclick="openDoc('SOP-QA-005');return false" style="color:#0369a1">SOP-605</a> · <a href="#" onclick="openDoc('SOP-WHS-001');return false" style="color:#0369a1">SOP-701</a></div>
         </div>
-        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
-        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #F44336;background:#fff5f5">
-          <div style="font-weight:700;font-size:13px;color:#c62828;margin-bottom:6px">G5 — Ship</div>
-          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'Shipment release, CoC':'Giao hàng, hoàn tất hồ sơ'}</div>
-          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-QA-005');return false" style="color:#0369a1">SOP-605</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-705</a></div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:18px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:130px;border:1px solid #e5e7eb;border-radius:8px;padding:10px;border-top:3px solid #F44336;background:#fff5f5">
+          <div style="font-weight:700;font-size:12px;color:#c62828;margin-bottom:4px">G6 — Ship</div>
+          <div style="font-size:10px;color:#666;margin-bottom:6px">${lang==='en'?'Shipment release, CoC':'Giao hàng, hoàn tất hồ sơ'}</div>
+          <div style="font-size:10px"><a href="#" onclick="openDoc('SOP-QA-005');return false" style="color:#0369a1">SOP-605</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-705</a></div>
         </div>
       </div>
     </div>
@@ -3563,7 +3563,7 @@ function adminGitPushErrorMessage(res){
   const detail = (res && res.detail) ? String(res.detail) : '';
   if(error === 'staged_changes_present'){
     return lang==='en'
-      ? 'There are staged changes on the server already. Commit or unstage them in Terminal before using Git sync.'
+      ? 'There are staged meaningful changes on the server already. Review them before using Git sync.'
       : 'Server đang có thay đổi đã stage sẵn. Hãy commit hoặc unstage trong Terminal trước khi dùng nút đồng bộ Git.';
   }
   if(error === 'exec_unavailable'){
@@ -3592,7 +3592,7 @@ function adminGitPullErrorMessage(res){
   const detail = (res && res.detail) ? String(res.detail) : '';
   if(error === 'working_tree_dirty' || error === 'staged_changes_present'){
     return lang==='en'
-      ? 'The cPanel repository still has local changes. Commit or discard them in Terminal before pulling from Git.'
+      ? 'The cPanel repository still has meaningful local changes after runtime auto-clean. Review them before pulling from Git.'
       : 'Repo trên cPanel vẫn còn thay đổi local. Hãy commit hoặc bỏ các thay đổi đó trong Terminal trước khi pull từ Git.';
   }
   if(error === 'exec_unavailable'){
@@ -3648,7 +3648,7 @@ async function adminSyncDocsToGit(){
 async function adminPullPortalFromGit(){
   if(!isAdmin() || isGitSyncBusy()) return;
   const msg = lang==='en'
-    ? 'Pull the latest commit from Git into this cPanel portal now? This runs fast-forward only and requires a clean server repository.'
+    ? 'Pull the latest commit from Git into this cPanel portal now? The system will auto-clean runtime noise, try to pre-sync meaningful server-side document changes, then run fast-forward update.'
     : 'Kéo commit mới nhất từ Git xuống portal trên cPanel ngay bây giờ? Thao tác này chỉ chạy fast-forward và yêu cầu repo trên server đang sạch.';
   if(!confirm(msg)) return;
 
@@ -3685,7 +3685,7 @@ function renderAdminSyncPanel(){
         <div class="admin-sync-title-wrap">
           <div class="admin-sync-kicker">${lang==='en'?'Sync Control':'Điều khiển đồng bộ'}</div>
           <h3>${lang==='en'?'Portal Data Synchronization':'Đồng bộ dữ liệu portal'}</h3>
-          <p>${lang==='en'?'Use Pull to update cPanel from Git, and Push to publish approved portal-side document changes back to GitHub.':'Dùng Pull để cập nhật cPanel từ Git, và dùng Push để đẩy các thay đổi tài liệu hợp lệ từ portal trở lại GitHub.'}</p>
+          <p>${lang==='en'?'Use Pull to auto-clean runtime noise, pre-sync meaningful portal-side changes when needed, and update cPanel from Git. Use Push when you want to explicitly publish meaningful server-side changes back to GitHub.':'Dùng Pull để tự dọn runtime, pre-sync các thay đổi meaningful trên portal khi cần, rồi cập nhật cPanel từ Git. Dùng Push khi muốn chủ động xuất bản các thay đổi meaningful trên server lên GitHub.'}</p>
         </div>
         <button class="admin-sync-mini" onclick="rescanDocs().then(n=>{showToast('🔄 Scanned: '+n+' docs');renderAdmin()})">
           <span class="admin-sync-mini-ico">${adminGitSyncIcon('sync')}</span>
@@ -3699,7 +3699,7 @@ function renderAdminSyncPanel(){
           <span class="admin-sync-copy">
             <span class="admin-sync-label">${lang==='en'?'Pull To Portal':'Pull to Portal'}</span>
             <span class="admin-sync-desc">${lang==='en'?'Bring the latest committed version from Git into this live cPanel portal.':'Kéo phiên bản đã commit mới nhất từ Git xuống portal đang chạy trên cPanel.'}</span>
-            <span class="admin-sync-note">${lang==='en'?'Fast-forward only, requires clean working tree.':'Chỉ fast-forward, yêu cầu working tree sạch.'}</span>
+            <span class="admin-sync-note">${lang==='en'?'Auto-cleans runtime noise, pre-syncs meaningful server changes when possible, then fast-forwards from Git.':'Tự dọn runtime, pre-sync thay đổi meaningful trên server khi có thể, sau đó fast-forward từ Git.'}</span>
           </span>
           <span class="admin-sync-arrow">${pullBusy ? (lang==='en'?'Running...':'Đang chạy...') : (lang==='en'?'Update portal':'Cập nhật portal')}</span>
         </button>
@@ -3708,8 +3708,8 @@ function renderAdminSyncPanel(){
           <span class="admin-sync-icon">${adminGitSyncIcon('push')}</span>
           <span class="admin-sync-copy">
             <span class="admin-sync-label">${lang==='en'?'Push To Git':'Push to Git'}</span>
-            <span class="admin-sync-desc">${lang==='en'?'Commit whitelisted document changes from cPanel and publish them back to GitHub.':'Commit các thay đổi tài liệu đã whitelist từ cPanel và đẩy ngược trở lại GitHub.'}</span>
-            <span class="admin-sync-note">${lang==='en'?'Ignores runtime files such as sessions and rate limits.':'Bỏ qua file runtime như sessions và rate limits.'}</span>
+            <span class="admin-sync-desc">${lang==='en'?'Commit meaningful repository changes from cPanel and publish them back to GitHub.':'Commit các thay đổi meaningful trong repo từ cPanel và đẩy ngược trở lại GitHub.'}</span>
+            <span class="admin-sync-note">${lang==='en'?'Ignores runtime files such as sessions, rate limits, scan cache, and local user config noise.':'Bỏ qua file runtime như sessions, rate limits, scan cache và nhiễu do cấu hình user cục bộ.'}</span>
           </span>
           <span class="admin-sync-arrow">${pushBusy ? (lang==='en'?'Running...':'Đang chạy...') : (lang==='en'?'Publish changes':'Xuất bản thay đổi')}</span>
         </button>
