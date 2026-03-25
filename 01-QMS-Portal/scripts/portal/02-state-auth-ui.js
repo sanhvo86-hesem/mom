@@ -2325,6 +2325,9 @@ async function doSaveDocEdit(oldCode){
         showToast(`✅ ${lang==='en'?'Saved':'Đã lưu'}`);
         document.getElementById('doc-edit-modal')?.remove();
         await rescanDocs(); renderDocuments(); renderSidebar();
+        if(currentDoc && (currentDoc===oldCode || currentDoc===newCode)){
+          try{ await openDocPreview(newCode || oldCode); }catch(e){}
+        }
         return;
       } else {
         showToast('\u26A0 ' + (res?.detail || res?.error || 'Error'));

@@ -1585,6 +1585,46 @@ function attachIframeViewerZoom(iframe){
   idoc.__portalViewerZoomAttached = true;
 }
 
+function syncIframeDocumentHeaderMetadata(idoc, doc){
+  if(!idoc || !doc) return;
+  try{
+    const code = String(doc.code || '').trim();
+    const title = String((typeof getDocDisplayTitle === 'function' ? getDocDisplayTitle(doc) : (doc.title || '')) || '').trim();
+    const desc = String((typeof getDocDisplayDescription === 'function' ? getDocDisplayDescription(doc) : '') || '').trim();
+    const combinedTitle = [code, title].filter(Boolean).join(' — ');
+
+    const titleWrap = idoc.querySelector('.form-header .title');
+    if(titleWrap){
+      const strongEl = titleWrap.querySelector('strong');
+      if(strongEl && combinedTitle){
+        strongEl.textContent = combinedTitle;
+      }
+
+      const subEl = titleWrap.querySelector('.sub-vn, .sub');
+      if(subEl){
+        subEl.textContent = desc;
+      }else if(desc){
+        const createdSub = idoc.createElement('span');
+        createdSub.className = 'sub-vn';
+        createdSub.textContent = desc;
+        titleWrap.appendChild(createdSub);
+      }
+    }
+
+    const codeRows = idoc.querySelectorAll('.form-header .meta .row');
+    codeRows.forEach(function(row){
+      try{
+        const labelEl = row.querySelector('b');
+        const valueEl = row.querySelector('span:last-child');
+        const label = String(labelEl ? labelEl.textContent : '').toLowerCase();
+        if(valueEl && /code|mã/.test(label) && code){
+          valueEl.textContent = code;
+        }
+      }catch(_e){}
+    });
+  }catch(e){}
+}
+
 function loadDocContent(code){
   const doc=DOCS.find(d=>d.code===code);
   if(!doc) return;
@@ -1691,6 +1731,7 @@ function loadDocContent(code){
           if(dc) dc.innerHTML = edited;
           else if(idoc.body) idoc.body.innerHTML = edited;
         }
+        try{ syncIframeDocumentHeaderMetadata(idoc, doc); }catch(_e){}
         try{
           if(idoc && typeof edApplyGlobalTablePolicyToDocument==='function'){
             edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load'});
