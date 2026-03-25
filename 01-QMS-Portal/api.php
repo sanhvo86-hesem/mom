@@ -2093,6 +2093,18 @@ function git_sync_documents(array $me, string $repoDir): array {
     $aheadOut = git_command(['rev-list', '--count', 'origin/' . $branch . '..' . $branch], $repoReal, $aheadCode);
     $aheadCount = $aheadCode === 0 ? (int)trim($aheadOut) : 0;
     if ($aheadCount > 0) {
+      // Pull first to integrate remote changes before pushing
+      $pullCode = 0;
+      $pullOut = git_command(['pull', '--rebase', 'origin', $branch], $repoReal, $pullCode);
+      if ($pullCode !== 0) {
+        // If rebase fails, try regular pull
+        git_command(['rebase', '--abort'], $repoReal, $pullCode);
+        $pullCode = 0;
+        $pullOut = git_command(['pull', '--no-rebase', 'origin', $branch], $repoReal, $pullCode);
+        if ($pullCode !== 0) {
+          throw new RuntimeException('git_presync_pull_failed' . ($pullOut !== '' ? ': ' . $pullOut : ''));
+        }
+      }
       $pushCode = 0;
       $pushOut = git_command(['push', 'origin', $branch], $repoReal, $pushCode);
       if ($pushCode !== 0) {
@@ -2170,6 +2182,15 @@ function git_sync_documents(array $me, string $repoDir): array {
   ], $repoReal, $commitCode);
   if ($commitCode !== 0) {
     throw new RuntimeException('git_commit_failed' . ($commitOut !== '' ? ': ' . $commitOut : ''));
+  }
+
+  // Pull remote changes before pushing to avoid non-fast-forward errors
+  $prePullCode = 0;
+  $prePullOut = git_command(['pull', '--rebase', 'origin', $branch], $repoReal, $prePullCode);
+  if ($prePullCode !== 0) {
+    git_command(['rebase', '--abort'], $repoReal, $prePullCode);
+    $prePullCode = 0;
+    $prePullOut = git_command(['pull', '--no-rebase', 'origin', $branch], $repoReal, $prePullCode);
   }
 
   $pushCode = 0;
