@@ -3,26 +3,31 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>WI-105 — Điều hướng tài liệu QMS, lộ trình đọc theo phòng ban và triển khai toàn công ty | HESEM QMS</title>
+<title>WI-105 — Điều hướng tài liệu QMS, lộ trình đọc theo phòng ban và triển khai tiếp cận toàn công ty | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
-.page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
-.page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color:var(--navy);}
-.page-body h3 {font-size:14px; line-height:1.45; margin:0 0 6px; color:var(--ink);}
-.grid-2 {display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:12px 0;}
-.card {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff;}
-.path-card {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fcfcfd;}
-.tag {display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--ln); background:#eef7ff; color:var(--navy); font-size:11px; font-weight:700; margin:0 6px 6px 0;}
-.step {border-left:4px solid var(--brand); padding:8px 12px; background:#fcfcfd; margin:10px 0;}
-.callout-strong {border:1px solid var(--th-bdr); background:#fff7e6; padding:12px; border-radius:var(--r); margin:10px 0;}
-.matrix-table {width:100%; border-collapse:collapse; table-layout:fixed; word-wrap:break-word;}
-.matrix-table th {padding:8px 10px; text-align:left; font-size:11px; font-weight:800; color:var(--navy); background:var(--th-bg); border:1px solid var(--th-bdr); text-transform:uppercase; letter-spacing:.3px; vertical-align:bottom;}
-.matrix-table td {padding:8px 10px; border:1px solid var(--ln2); vertical-align:top; line-height:1.45;}
-ul.tight {margin:8px 0; padding-left:18px;}
-ul.tight li {margin:4px 0;}
-@media (max-width:960px) {
-  .grid-2 {grid-template-columns:1fr;}
-  .page-body {padding:24px 18px 36px;}
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f7fbff 0%,#fffdf6 100%);margin:0 0 18px;}
+.hero h1{margin:0 0 8px;font-size:24px;line-height:1.35;color:var(--navy);}
+.hero p{margin:0;color:var(--ink2);}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+.step{border-left:4px solid var(--blue);padding:10px 12px;background:#fcfdff;border-radius:8px;margin:10px 0;}
+.path-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
+.path-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
+.chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;border:1px solid var(--ln);background:var(--bg2);font-size:10px;font-weight:700;margin:0 6px 6px 0;}
+.matrix-table{width:100%;border-collapse:collapse;table-layout:fixed;word-wrap:break-word;}
+.matrix-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--navy);background:var(--th-bg);border:1px solid var(--th-bdr);text-transform:uppercase;letter-spacing:.3px;vertical-align:bottom;}
+.matrix-table td{padding:8px 10px;border:1px solid var(--ln2);vertical-align:top;line-height:1.5;}
+.tight{margin:8px 0;padding-left:18px;}
+.tight li{margin:4px 0;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:12px 0;}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
+.metric-card .value{font-size:22px;font-weight:800;color:var(--navy);}
+.metric-card .label{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-top:4px;}
+.note-warn{border-left:4px solid #e67700;background:#fff7ed;padding:12px 14px;border-radius:var(--r);margin:12px 0;}
+@media (max-width:960px){
+  .grid-2,.grid-3{grid-template-columns:1fr;}
+  .page-body{padding:24px 18px 36px;}
 }
 </style>
 </head>
@@ -39,191 +44,314 @@ ul.tight li {margin:4px 0;}
       <span>Tài liệu vận hành • Công việc hướng dẫn</span>
     </div>
   </div>
-  <div class="title"><strong>WI-105 — Điều hướng tài liệu QMS, lộ trình đọc theo phòng ban và triển khai toàn công ty</strong></div>
+  <div class="title"><strong>WI-105 — Điều hướng tài liệu QMS, lộ trình đọc theo phòng ban và triển khai tiếp cận toàn công ty</strong></div>
   <div class="meta">
     <div class="row"><span><b>Code:</b></span><span>WI-105</span></div>
-    <div class="row"><span><b>Version:</b></span><span>V1</span></div>
+    <div class="row"><span><b>Version:</b></span><span>V2</span></div>
     <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-    <div class="row"><span><b>Owner:</b></span><span>QMS Manager / HR Manager / Department Quản lý</span></div>
+    <div class="row"><span><b>Owner:</b></span><span>QMS Manager / HR Manager / Department Managers</span></div>
     <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
   </div>
 </div>
 
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng để hướng dẫn toàn bộ phòng ban biết phải mở tài liệu nào trước, đọc theo thứ tự nào, thao tác theo tài liệu nào và lưu bằng chứng ở đâu. WI này là chuẩn điều hướng tài liệu cho hội nhập nhân viên mới, chuyển vai trò, đào tạo định kỳ, go-Live M365 hồ sơ, đánh giá sẵn sàng và khắc phục tình trạng quá nhiều tài liệu nhưng không biết bắt đầu từ đâu.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho hội nhập nhân sự mới, chuyển vai trò, đào tạo định kỳ, triển khai tài liệu vận hành, triển khai dashboard, go-live M365 hồ sơ, hypercare sau go-live và đánh giá sẵn sàng theo phòng ban.</div>
 
-<h1>WI-105 — Điều hướng tài liệu QMS, lộ trình đọc theo phòng ban và triển khai toàn công ty</h1>
+<div class="hero">
+  <h1>WI-105 — Điều hướng tài liệu QMS theo vai trò và theo phòng ban</h1>
+  <p>Người dùng phải biết mở tài liệu đúng lớp, đúng thứ tự, đúng thời điểm và đúng nơi lưu hồ sơ. Supervisor và Champion phải dùng WI này để giao đúng playlist tài liệu cho từng phòng ban thay vì yêu cầu người dùng tự bơi trong toàn thư viện.</p>
+</div>
 
-<div class="callout-strong"><strong>KẾT QUẢ BẮT BUỘC</strong>: mọi nhân sự phải biết đúng tuyến đọc tài liệu của mình theo công việc thật. Khi có một việc cụ thể, người dùng phải xác định được trong vòng 3 phút: phòng ban nào chịu trách nhiệm, SOP nào là luật gốc, WI nào là thao tác, FRM nào là biểu mẫu, ANNEX nào là bảng tra và nơi lưu hồ sơ ở đâu.</div>
+<div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong><br/>Trong vòng 3 phút, người dùng phải xác định được 5 câu trả lời: bắt đầu từ tài liệu nào, SOP gốc là gì, WI thao tác là gì, FRM hoặc hồ sơ số nào phải dùng và nơi lưu bằng chứng ở đâu.</div>
 
 <div class="section">
   <h2>1. Nguyên tắc điều hướng bắt buộc</h2>
   <div class="grid-2">
-    <div class="card">
-      <h3>Quy tắc đọc tài liệu</h3>
+    <div class="path-card">
+      <h3>1.1 Tuyến đọc chuẩn</h3>
       <ul class="tight">
-        <li>Mọi nhân sự bắt đầu từ <b>Department Sổ tay</b> của phòng mình.</li>
-        <li>Mọi quyết định vận hành bắt đầu từ <b>SOP</b>, không bắt đầu từ biểu mẫu hoặc ghi nhớ truyền miệng.</li>
-        <li>Mọi thao tác chi tiết bắt đầu từ <b>WI</b>.</li>
-        <li>Mọi bằng chứng chính thức phải đi vào <b>FRM</b> hoặc hồ sơ số được chỉ định.</li>
-        <li>Mọi bảng tra path, matrix, siêu dữ liệu, thẩm quyền, ngưỡng phải mở <b>ANNEX</b> tương ứng.</li>
+        <li>Bắt đầu từ <b>Department Handbook</b> của phòng ban.</li>
+        <li>Ra quyết định bằng <b>SOP</b>.</li>
+        <li>Thao tác tại điểm dùng bằng <b>WI</b>.</li>
+        <li>Ghi bằng chứng bằng <b>FRM</b> hoặc hồ sơ số được chỉ định.</li>
+        <li>Tra path, quyền, ngưỡng và mapping bằng <b>ANNEX</b>.</li>
       </ul>
     </div>
-    <div class="card">
-      <h3>Quy tắc dùng tài liệu</h3>
+    <div class="path-card">
+      <h3>1.2 Điều cấm</h3>
       <ul class="tight">
-        <li><b>Sổ tay</b> trả lời: tôi thuộc phòng nào, chịu đầu ra nào, KPI nào bị kiểm.</li>
-        <li><b>SOP</b> trả lời: luật gốc là gì, ai duyệt, hồ sơ nào là bắt buộc.</li>
-        <li><b>WI</b> trả lời: làm từng bước thế nào tại điểm dùng.</li>
-        <li><b>FRM</b> trả lời: ghi bằng chứng ở đâu, trường nào bắt buộc.</li>
-        <li><b>ANNEX</b> trả lời: file để ở đâu, dùng mã gì, ai được quyền, bảng tra nào áp dụng.</li>
+        <li>Không bắt đầu từ biểu mẫu khi chưa biết SOP gốc.</li>
+        <li>Không dùng email, chat, màn hình desktop hoặc USB làm nơi lưu hồ sơ chính.</li>
+        <li>Không phát cho người dùng một danh sách link rời rạc không có thứ tự đọc.</li>
+        <li>Không yêu cầu nhân sự đọc toàn bộ thư viện nếu công việc chỉ chạm một luồng cụ thể.</li>
       </ul>
     </div>
   </div>
-  <div class="step"><strong>Tuyến đọc chuẩn duy nhất:</strong> <b>Department Sổ tay → SOP → WI → FRM → ANNEX → nơi lưu hồ sơ</b>.</div>
+  <div class="step"><strong>Tuyến đọc chuẩn duy nhất:</strong> Department Handbook → SOP → WI → FRM → ANNEX → nơi lưu hồ sơ.</div>
 </div>
 
 <div class="section">
-  <h2>2. Cây tài liệu và câu hỏi mỗi lớp phải trả lời</h2>
+  <h2>2. Playlist tài liệu theo nhóm người dùng</h2>
   <div class="table-card">
     <table class="matrix-table">
       <thead>
-        <tr><th>Loại tài liệu</th><th>Mở khi nào</th><th>Câu hỏi phải trả lời</th><th>Ví dụ</th></tr>
+        <tr>
+          <th>Nhóm người dùng</th>
+          <th>Phải đọc trước</th>
+          <th>Phải đọc tiếp</th>
+          <th>Đầu ra bắt buộc</th>
+        </tr>
       </thead>
       <tbody>
-        <tr><td>Department Sổ tay</td><td>Ngày đầu vào vai trò; khi đổi vai trò; khi cần hiểu phạm vi phòng ban</td><td>Tôi thuộc phòng nào, làm gì, phối hợp với ai, tài liệu gốc nào phải biết?</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/index.html">Department Handbooks Index</a></td></tr>
-        <tr><td>SOP</td><td>Khi bắt đầu một luồng công việc hoặc khi cần quyết định hold/phát hành/thẩm quyền</td><td>Luật gốc là gì, ai duyệt, hồ sơ nào là bắt buộc?</td><td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>, <a href="../../01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a></td></tr>
-        <tr><td>WI</td><td>Khi thao tác tại điểm dùng</td><td>Từng bước phải làm thế nào, dùng biểu mẫu nào, khi nào phải dừng?</td><td><a href="../07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a>, <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td></tr>
-        <tr><td>FRM</td><td>Khi ghi bằng chứng và hồ sơ</td><td>Ghi gì, ai ký, trường nào bắt buộc?</td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a>, <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a></td></tr>
-        <tr><td>ANNEX</td><td>Khi cần tra bảng path, siêu dữ liệu, ngưỡng, thẩm quyền, file plan</td><td>File để ở đâu, quyền nào áp dụng, matrix nào phải theo?</td><td><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>, <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td></tr>
-        <tr><td>JD</td><td>Khi xác định quyền hạn và năng lực vai trò</td><td>Vai trò có quyền gì, bị giới hạn gì, phải tái chứng nhận khi nào?</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">JD Thư viện</a></td></tr>
+        <tr>
+          <td>Ban Giám đốc / Steering Committee</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html">QMS-MAN-001</a>, <a href="wi-106-job-order-deployment-master-plan.html">WI-106</a></td>
+          <td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>, <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114</a>, <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td>
+          <td>Phê duyệt wave, nguồn lực, gate Go/No-Go và cơ chế escalation</td>
+        </tr>
+        <tr>
+          <td>Department Manager</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/index.html">Department Handbooks Index</a>, sổ tay phòng mình, WI này</td>
+          <td>SOP cốt lõi của phòng, WI thao tác trọng yếu, <a href="wi-106-job-order-deployment-master-plan.html">WI-106</a>, <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td>
+          <td>Playlist tài liệu theo vai trò, danh sách Champion, lịch đào tạo, kiểm soát no-go</td>
+        </tr>
+        <tr>
+          <td>Champion triển khai</td>
+          <td><a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>, <a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a>, WI này</td>
+          <td><a href="wi-106-job-order-deployment-master-plan.html">WI-106</a>, <a href="../02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a>, <a href="../02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>, <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td>
+          <td>Hỗ trợ tại chỗ, kiểm 3 phút truy xuất, log vấn đề, xác nhận readiness từng ca</td>
+        </tr>
+        <tr>
+          <td>Nhân sự vận hành theo vai trò</td>
+          <td>Sổ tay phòng ban, SOP của luồng công việc đang làm</td>
+          <td>WI tại điểm dùng, Quick Card, FRM cần ghi</td>
+          <td>Thao tác đúng tuyến tài liệu và lưu bằng chứng đúng chỗ</td>
+        </tr>
+        <tr>
+          <td>Nhân sự mới / chuyển vị trí</td>
+          <td>Sổ tay phòng ban, thư viện JD, WI này</td>
+          <td>SOP/WI/FRM của vai trò mới, checklist OJT</td>
+          <td>Hoàn thành OJT, được supervisor xác nhận năng lực, biết route hồ sơ</td>
+        </tr>
+        <tr>
+          <td>Auditor / người rà soát</td>
+          <td>QMS Manual, WI này, sổ tay phòng ban</td>
+          <td>SOP, WI, ANNEX, hồ sơ bằng chứng của luồng được audit</td>
+          <td>Truy được từ yêu cầu tới bằng chứng trong cùng một tuyến tài liệu</td>
+        </tr>
       </tbody>
     </table>
   </div>
 </div>
 
 <div class="section">
-  <h2>3. Cách bộ phận Mua hàng phải đọc tài liệu</h2>
-  <div class="path-card">
-    <span class="tag">Nhân viên mua hàng</span><span class="tag">Mua hàng</span><span class="tag">Chuỗi cung ứng</span>
-    <p><strong>Điểm vào bắt buộc:</strong> <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html">Sổ tay Phòng Chuỗi cung ứng</a>. Người mua hàng không bắt đầu từ email NCC hoặc <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a>. Phải bắt đầu từ sổ tay để hiểu ranh giới với SCM Manager, Kho, QA và Hậu cần.</p>
-    <div class="table-card">
-      <table class="matrix-table">
-        <thead>
-          <tr><th>Tình huống</th><th>Đọc trước</th><th>Dùng khi thao tác</th><th>Biểu mẫu</th><th>Nơi lưu</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Đánh giá và dùng nhà cung cấp/người xử lý</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html">Sổ tay SCM</a> → <a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a></td><td><a href="../../03-Reference/04-ANNEX-400/annex-401-supplier-risk-model-and-scorecard-method.html">ANNEX-401</a>, <a href="../../03-Reference/04-ANNEX-400/annex-402-outsource-special-process-pack.html">ANNEX-402</a>, <a href="../../03-Reference/04-ANNEX-400/annex-403-approved-processor-list.html">ANNEX-403</a></td><td><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-402_Supplier_Evaluation_Form.xlsx">FRM-402</a>, <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-405_Supplier_Scorecard.xlsx">FRM-405</a>, <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-408_Requirements_Flow_Down_Checklist.xlsx">FRM-408</a></td><td>DEP-SCM nhà cung cấp chuỗi / loạt + nhà cung cấp hồ sơ</td></tr>
-          <tr><td>Theo dõi PO, due date, đẩy nhanh tiến độ</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html">Sổ tay SCM</a> → <a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a></td><td>Nhịp điều hành theo sổ tay và dashboard nguồn</td><td><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a></td><td>ERP là SoR giao dịch; Current pack ở DEP-SCM</td></tr>
-          <tr><td>Outsource điều phối xuất hàng và hàng outsource trả về</td><td><a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> → <a href="../../01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a></td><td><a href="../07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a>, <a href="../07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a></td><td><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx">FRM-403</a>, <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-404</a>, <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a></td><td>Nhận hàng/IQC bàn giao pack + hồ sơ công việc nếu gắn job</td></tr>
-          <tr><td>Cert sai, truy xuất nguồn gốc lỗi, nguồn nghi ngờ</td><td><a href="../../01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a></td><td><a href="../07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a>, <a href="../07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a></td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a>, <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a>, <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a></td><td>Epicor giao dịch + M365 SSOT bằng chứng</td></tr>
-          <tr><td>Lưu dữ liệu và tìm thư mục đúng</td><td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td><td><a href="wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a>, <a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>, <a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a></td><td>siêu dữ liệu + đặt tên theo rule</td><td><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="step"><strong>Kết luận cho Nhân viên mua hàng:</strong> tuyến đọc bắt buộc là <b>Sổ tay SCM → <a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>/<a href="../../01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a> → <a href="../07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a>/<a href="../07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a> khi có nhận hàng/giao diện → FRM tương ứng → <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> + <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> để lưu hồ sơ</b>.</div>
-  </div>
-</div>
-
-<div class="section">
-  <h2>4. Mỗi phòng ban tương tác với bộ tài liệu như thế nào</h2>
+  <h2>3. Bản đồ tiếp cận theo phòng ban</h2>
   <div class="table-card">
     <table class="matrix-table">
       <thead>
-        <tr><th>Department</th><th>Điểm vào bắt buộc</th><th>Tài liệu cốt lõi</th><th>Khi nào mở thêm</th><th>Hồ sơ và nơi lưu</th></tr>
+        <tr>
+          <th>Phòng ban</th>
+          <th>Điểm vào bắt buộc</th>
+          <th>SOP cốt lõi</th>
+          <th>WI vận hành chính</th>
+          <th>Nơi lưu bằng chứng</th>
+        </tr>
       </thead>
       <tbody>
-        <tr><td>Kinh doanh / Customer Dịch vụ</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html">Sổ tay Kinh doanh &amp; CS</a></td><td><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>, <a href="../../01-SOPs/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-202</a>, <a href="../../01-SOPs/02-SOP-200/sop-203-customer-property-control.html">SOP-203</a></td><td>Khi ship/cao-rủi ro/khách hàng pack thì mở <a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a>, <a href="../02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a>, <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>DEP-SAL Current gói; chính thức trường hợp ở Job/Quality hồ sơ</td></tr>
-        <tr><td>Kỹ thuật</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html">Sổ tay Kỹ thuật</a></td><td><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a>, <a href="../../01-SOPs/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a>, <a href="../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td><td>Khi mốc chuẩn/job gói hồ sơ/phát hành thì mở <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>, <a href="../05-WI-500/wi-518-work-transfer-validation.html">WI-518</a>, <a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>, <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Part chủ / gốc + Job Hồ sơ + DEP-ENG Current gói</td></tr>
-        <tr><td>Sản xuất</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html">Sổ tay Sản xuất</a></td><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a>, <a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a>, <a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td><td>Khi điều phối xuất hàng/setup/run/chuyển giao thì mở <a href="../05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a>, <a href="../05-WI-500/wi-502-tier-1-2-3-daily-management.html">WI-502</a>, <a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>, <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>DEP-PRO Current gói; final bằng chứng vào Job Hồ sơ</td></tr>
-        <tr><td>Quality</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html">Sổ tay Quality</a></td><td><a href="../../01-SOPs/06-SOP-600/sop-603-aql-sampling-inspection.html">SOP-603</a>, <a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>, <a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td><td>Khi kiểm tra/phát hành/ngăn chặn thì mở <a href="../02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a>, <a href="../06-WI-600/wi-603-aql-sampling-inspection-execution.html">WI-603</a>, <a href="../06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a>, <a href="../06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Quality hồ sơ 02 + DEP-QA Current gói + Job Hồ sơ</td></tr>
-        <tr><td>Chuỗi cung ứng</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html">Sổ tay Chuỗi cung ứng</a></td><td><a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>, <a href="../../01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a>, <a href="../../01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a></td><td>Khi nhận hàng/kho/ship thì mở <a href="../07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a>, <a href="../07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>, <a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a>, <a href="../02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a></td><td>DEP-SCM + Job Hồ sơ G3/G6 + Epicor giao dịch</td></tr>
-        <tr><td>Finance</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html">Sổ tay Finance</a></td><td><a href="../../01-SOPs/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html">SOP-803</a>, <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td><td>Khi lấy hồ sơ job/hóa đơn/tính giá thành thì mở <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>DEP-FIN Current gói; hạn chế bảng lương ở site 08; ERP là SoR</td></tr>
-        <tr><td>HR</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html">Sổ tay HR</a></td><td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> và SOP/FRM HR liên quan</td><td>Khi hội nhập nhân viên mới/đào tạo/năng lực thì mở <a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>, <a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a></td><td>04-Training-Records + site 08 People Hạn chế</td></tr>
-        <tr><td>EHS</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html">Sổ tay EHS</a></td><td><a href="../../01-SOPs/08-SOP-800/sop-802-incident-near-miss-and-ehs.html">SOP-802</a>, <a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td><td>Khi kho/môi trường/sự cố giao diện thì mở <a href="../07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>, <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a></td><td>DEP-EHS + site 08 nếu có dữ liệu cá nhân nhạy cảm</td></tr>
-        <tr><td>IT</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html">Sổ tay IT</a></td><td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>, <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a>, <a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td><td>Khi thiết kế M365 kiểm soát thì mở <a href="wi-101-digital-online-forms-and-approvals.html">WI-101</a>, <a href="wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>/132/133</td><td>Site 09 Digital Control</td></tr>
-        <tr><td>Epicor / ERP</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html">Sổ tay Epicor</a></td><td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>, <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td><td>Khi map giao dịch-hồ sơ/offline thì mở <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a>, <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></td><td>Epicor là SoR; M365 là SSOT bằng chứng</td></tr>
+        <tr>
+          <td>Kinh doanh / CS</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html">Sổ tay Kinh doanh &amp; CS</a></td>
+          <td><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>, <a href="../../01-SOPs/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-202</a>, <a href="../../01-SOPs/02-SOP-200/sop-203-customer-property-control.html">SOP-203</a></td>
+          <td><a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>, <a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a>, <a href="../02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a></td>
+          <td>DEP-SAL current pack, Job Dossier, hồ sơ khách hàng có kiểm soát</td>
+        </tr>
+        <tr>
+          <td>Kỹ thuật</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html">Sổ tay Kỹ thuật</a></td>
+          <td><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a>, <a href="../../01-SOPs/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a>, <a href="../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td>
+          <td><a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>, <a href="../05-WI-500/wi-518-work-transfer-validation.html">WI-518</a>, <a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td>
+          <td>Part master, Job Dossier, DEP-ENG current pack</td>
+        </tr>
+        <tr>
+          <td>Sản xuất</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html">Sổ tay Sản xuất</a></td>
+          <td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a>, <a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a>, <a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
+          <td><a href="../05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a>, <a href="../05-WI-500/wi-502-tier-1-2-3-daily-management.html">WI-502</a>, <a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td>
+          <td>DEP-PRO current pack, Job Dossier, dispatch evidence</td>
+        </tr>
+        <tr>
+          <td>Quality</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html">Sổ tay Quality</a></td>
+          <td><a href="../../01-SOPs/06-SOP-600/sop-603-aql-sampling-inspection.html">SOP-603</a>, <a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>, <a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+          <td><a href="../02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a>, <a href="../06-WI-600/wi-603-aql-sampling-inspection-execution.html">WI-603</a>, <a href="../06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a>, <a href="../06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td>
+          <td>Quality records, Job Dossier, DEP-QA current pack</td>
+        </tr>
+        <tr>
+          <td>Chuỗi cung ứng</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html">Sổ tay Chuỗi cung ứng</a></td>
+          <td><a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>, <a href="../../01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a>, <a href="../../01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a></td>
+          <td><a href="../07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a>, <a href="../07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>, <a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td>
+          <td>DEP-SCM, receiving pack, shipping pack, Epicor giao dịch</td>
+        </tr>
+        <tr>
+          <td>Finance</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html">Sổ tay Finance</a></td>
+          <td><a href="../../01-SOPs/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html">SOP-803</a>, <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td>
+          <td><a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td>
+          <td>DEP-FIN current pack, ERP SoR, hồ sơ chi phí công việc</td>
+        </tr>
+        <tr>
+          <td>HR</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html">Sổ tay HR</a></td>
+          <td><a href="../../01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a>, <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td>
+          <td><a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>, <a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a></td>
+          <td>Training records, OJT evidence, restricted people site</td>
+        </tr>
+        <tr>
+          <td>EHS</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html">Sổ tay EHS</a></td>
+          <td><a href="../../01-SOPs/08-SOP-800/sop-802-incident-near-miss-and-ehs.html">SOP-802</a>, <a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td>
+          <td><a href="../07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>, <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a></td>
+          <td>DEP-EHS, sự cố và môi trường có kiểm soát</td>
+        </tr>
+        <tr>
+          <td>IT</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html">Sổ tay IT</a></td>
+          <td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>, <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a>, <a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td>
+          <td><a href="wi-101-digital-online-forms-and-approvals.html">WI-101</a>, <a href="wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a></td>
+          <td>Site số hóa, access log, provisioning records</td>
+        </tr>
+        <tr>
+          <td>ERP / Epicor</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html">Sổ tay Epicor</a></td>
+          <td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>, <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td>
+          <td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a>, <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></td>
+          <td>ERP SoR, interface map, exception and fallback log</td>
+        </tr>
       </tbody>
     </table>
   </div>
 </div>
 
 <div class="section">
-  <h2>5. Khi có quá nhiều tài liệu, người dùng phải làm gì</h2>
-  <div class="grid-2">
-    <div class="card">
-      <h3>Câu hỏi số 1</h3>
-      <p><b>Tôi thuộc phòng ban nào và đầu ra tôi đang chạm tới là gì?</b></p>
-      <p>Nếu chưa rõ, mở sổ tay phòng ban trước. Không mở ngẫu nhiên một WI do người khác gửi.</p>
+  <h2>4. Playlist triển khai theo pha tiếp cận</h2>
+  <div class="grid-3">
+    <div class="path-card">
+      <h3>4.1 Trước go-live</h3>
+      <span class="chip">Manager</span><span class="chip">Champion</span>
+      <ul class="tight">
+        <li>Chốt sổ tay phòng ban và playlist theo vai trò.</li>
+        <li>Phát hành QR hoặc link vào đúng sổ tay, WI và Quick Card.</li>
+        <li>Huấn luyện người dùng theo công việc thật, không huấn luyện theo danh mục tài liệu.</li>
+        <li>Kiểm thử truy xuất trong 3 phút đối với 3 tình huống thật.</li>
+      </ul>
     </div>
-    <div class="card">
-      <h3>Câu hỏi số 2</h3>
-      <p><b>Việc này là quyết định quy trình, thao tác hiện trường hay chỉ là ghi hồ sơ?</b></p>
-      <p>Quyết định quy trình mở SOP. Thao tác mở WI. Ghi bằng chứng mở FRM. Tra path/quyền mở ANNEX.</p>
+    <div class="path-card">
+      <h3>4.2 Trong go-live</h3>
+      <span class="chip">Supervisor</span><span class="chip">Champion</span>
+      <ul class="tight">
+        <li>Kiểm 100% job mới có đúng điểm vào tài liệu.</li>
+        <li>Kiểm người dùng mở đúng WI tại điểm dùng và ghi đúng FRM/hồ sơ số.</li>
+        <li>Ghi mọi lỗi wrong-document, wrong-location, wrong-revision vào log triển khai.</li>
+        <li>Escalate ngay khi người dùng phải hỏi lại cùng một câu hỏi nhiều hơn 2 lần trong ngày.</li>
+      </ul>
+    </div>
+    <div class="path-card">
+      <h3>4.3 Trong hypercare</h3>
+      <span class="chip">QMS</span><span class="chip">Dept Head</span>
+      <ul class="tight">
+        <li>Rà log lỗi lặp lại theo phòng ban và theo vai trò.</li>
+        <li>Cập nhật playlist, QR, dashboard hoặc WI khi lỗi lặp xuất phát từ cấu trúc điều hướng.</li>
+        <li>Giảm hỗ trợ tại chỗ theo dữ liệu pass, không giảm theo cảm tính.</li>
+        <li>Đưa tuyến tài liệu vào hội nhập nhân sự mới và refresh định kỳ.</li>
+      </ul>
     </div>
   </div>
-  <div class="step"><strong>Rule chống ngợp:</strong> người dùng chỉ phải đọc <b>tập tài liệu của vai trò và tình huống Current</b>, không đọc toàn thư viện. Supervisor và champion phải giao đúng playlist cho từng vai trò.</div>
 </div>
 
 <div class="section">
-  <h2>6. Mô hình triển khai cho toàn bộ phòng ban</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr><th>Pha</th><th>Mục tiêu</th><th>Việc phải làm</th><th>Đầu ra bắt buộc</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Phase 0 - Chuẩn bị</td><td>Khóa cấu trúc và đường dẫn</td><td>Chốt sổ tay, SOP/WI/FRM/ANNEX, portal liên kết, QR liên kết, thư mục mô hình, owner từng tài liệu</td><td>Không còn link chết hoặc tài liệu không có owner</td></tr>
-        <tr><td>Phase 1 - Lãnh đạo phòng ban</td><td>Manager hiểu logic điều hướng</td><td>ngắn gọn / tóm tắt 60-90 phút cho quản lý: sổ tay, SOP, WI, FRM, ANNEX, no-giải pháp tạm quy tắc</td><td>Mỗi manager ký nhận playlist tài liệu của phòng mình</td></tr>
-        <tr><td>Phase 2 - Champion</td><td>Có người dẫn tại chỗ</td><td>Mỗi phòng ban và mỗi ca phải có champion; champion học sâu sổ tay + <a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>/104/105</td><td>Danh sách champion + backup theo ca</td></tr>
-        <tr><td>Phase 3 - Training theo phòng ban</td><td>Người dùng học đúng phần việc</td><td>Tổ chức lớp riêng cho từng phòng ban, không gộp toàn công ty vào một lớp</td><td>Chuyên cần + quiz + role walkthrough</td></tr>
-        <tr><td>Phase 4 - OJT</td><td>Biết dùng trên việc thật</td><td>Cho mỗi người xử lý tình huống thật: mở đúng sổ tay, SOP, WI, FRM, lưu đúng chỗ</td><td><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM-803</a> + <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-804_Competence_Assessment.xlsx">FRM-804</a></td></tr>
-        <tr><td>Phase 5 - Go-Live</td><td>Vận hành thật theo tuyến tài liệu</td><td>Đặt QR ở điểm dùng; sổ tay index mở được; supervisor rà soát hằng ngày</td><td>Người dùng không còn hỏi file này để đâu hoặc mở tài liệu nào ở các việc lặp lại</td></tr>
-        <tr><td>Phase 6 - Đánh giá và duy trì</td><td>Không trôi hệ thống</td><td>Review ca thật; đo truy xuất time; rà soát sai lộ trình gia công/sai đọc tài liệu; CAPA khi lặp lại</td><td>Metrics pass và refresher plan</td></tr>
-      </tbody>
-    </table>
+  <h2>5. Trình tự supervisor phải triển khai</h2>
+  <div class="step"><strong>Bước 1.</strong> Chốt owner cho handbook, SOP, WI, FRM, ANNEX của phòng ban.</div>
+  <div class="step"><strong>Bước 2.</strong> Xác định 5 đến 10 tình huống công việc thật mà phòng ban lặp lại nhiều nhất.</div>
+  <div class="step"><strong>Bước 3.</strong> Gắn cho từng tình huống một tuyến tài liệu chuẩn: handbook → SOP → WI → FRM → nơi lưu.</div>
+  <div class="step"><strong>Bước 4.</strong> Lập playlist riêng cho Manager, Champion, nhân sự văn phòng, nhân sự hiện trường và nhân sự mới.</div>
+  <div class="step"><strong>Bước 5.</strong> Cấp QR hoặc link trực tiếp đến đúng tài liệu tại điểm dùng.</div>
+  <div class="step"><strong>Bước 6.</strong> Kiểm 3 phút truy xuất và ghi kết quả vào OJT hoặc checklist triển khai.</div>
+  <div class="step"><strong>Bước 7.</strong> Không công nhận pass nếu người dùng mở đúng file nhưng lưu hồ sơ sai chỗ.</div>
+  <div class="step"><strong>Bước 8.</strong> Không công nhận pass nếu người dùng biết link nhưng không biết SOP gốc.</div>
+  <div class="step"><strong>Bước 9.</strong> Cập nhật playlist ngay khi tài liệu đổi mã, đổi link hoặc đổi nơi lưu hồ sơ.</div>
+  <div class="step"><strong>Bước 10.</strong> Đưa checklist điều hướng vào đào tạo định kỳ, onboarding và audit nội bộ.</div>
+</div>
+
+<div class="section">
+  <h2>6. Điều kiện không được công nhận sẵn sàng</h2>
+  <div class="note-warn">
+    <strong>NO-GO</strong><br/>
+    Không công nhận go-live hoặc handoff khi còn một trong các điều kiện sau.
   </div>
-</div>
-
-<div class="section">
-  <h2>7. Trình tự triển khai từng bước 1</h2>
-  <div class="step"><strong>Bước 1.</strong> Chốt owner cho từng sổ tay, SOP, WI, FRM, ANNEX.</div>
-  <div class="step"><strong>Bước 2.</strong> Công bố <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/index.html">Department Handbooks Index</a> làm cửa vào chính.</div>
-  <div class="step"><strong>Bước 3.</strong> Ban hành WI này và gắn link của nó vào sổ tay các phòng ban.</div>
-  <div class="step"><strong>Bước 4.</strong> Lập danh sách từng phòng ban, từng vai trò, từng ca và champion phụ trách.</div>
-  <div class="step"><strong>Bước 5.</strong> Dạy quản lý quy tắc đọc: sổ tay trước, SOP sau, WI cho thao tác, FRM cho bằng chứng, ANNEX để tra.</div>
-  <div class="step"><strong>Bước 6.</strong> Dạy champion theo bộ <a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>, <a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a> và WI này.</div>
-  <div class="step"><strong>Bước 7.</strong> Tổ chức lớp phòng ban theo từng playlist tài liệu, không gộp tất cả vai trò vào một buổi.</div>
-  <div class="step"><strong>Bước 8.</strong> Tại điểm dùng, dán QR tới sổ tay phòng ban, WI thao tác và nhanh card vai trò.</div>
-  <div class="step"><strong>Bước 9.</strong> Trong 2 tuần đầu, supervisor kiểm 3 tình huống thật mỗi ca: mở đúng tài liệu, dùng đúng biểu mẫu, lưu đúng hồ sơ.</div>
-  <div class="step"><strong>Bước 10.</strong> Bất kỳ lỗi lặp nào phải sửa bằng cập nhật playlist hoặc WI, không chỉ nhắc miệng.</div>
-  <div class="step"><strong>Bước 11.</strong> Đưa tuyến điều hướng tài liệu vào hội nhập nhân viên mới và đánh giá năng lực định kỳ.</div>
-  <div class="step"><strong>Bước 12.</strong> Không công nhận go-Live hoàn tất nếu sổ tay index, QR liên kết, OJT và truy xuất test chưa đạt.</div>
-</div>
-
-<div class="section">
-  <h2>8. Điều kiện không được go-Live</h2>
   <ul class="tight">
-    <li>Department chưa có sổ tay hoặc sổ tay không phản ánh bộ SOP/WI hiện hành.</li>
-    <li>Người dùng chưa biết điểm vào tài liệu của vai trò mình.</li>
-    <li>Supervisor chưa có champion theo ca.</li>
-    <li>Link nội bộ chết hoặc sổ tay index chưa mở được.</li>
-    <li>Người dùng vẫn dùng email/chat/máy tính bàn làm nơi lưu hồ sơ chính.</li>
-    <li>Không chứng minh được truy xuất dưới 3 phút cho hồ sơ thật.</li>
+    <li>Phòng ban chưa có handbook hoặc handbook không phản ánh bộ SOP/WI hiện hành.</li>
+    <li>Playlist tài liệu chưa phân theo vai trò và theo ca.</li>
+    <li>Champion chưa được chỉ định hoặc không có backup.</li>
+    <li>QR, link portal hoặc đường dẫn hồ sơ có link chết.</li>
+    <li>Người dùng không truy được hồ sơ thật trong 3 phút.</li>
+    <li>Người dùng vẫn dùng email, chat hoặc thư mục cá nhân làm nơi lưu hồ sơ chính.</li>
+    <li>Supervisor chưa chứng minh được bằng chứng đào tạo, OJT và truy xuất.</li>
   </ul>
 </div>
 
 <div class="section">
-  <h2>9. Tài liệu và đường link phải dùng</h2>
+  <h2>7. KPI điều hướng tài liệu phải theo dõi</h2>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="value">≥90%</div>
+      <div class="label">Tự truy xuất đúng tuyến</div>
+      <div class="mini-note">Người dùng tự tìm đúng tài liệu và đúng nơi lưu mà không cần hỏi lại.</div>
+    </div>
+    <div class="metric-card">
+      <div class="value">≤3 phút</div>
+      <div class="label">Thời gian tìm tài liệu</div>
+      <div class="mini-note">Đo trên tình huống thật, không đo trên ví dụ đã báo trước.</div>
+    </div>
+    <div class="metric-card">
+      <div class="value">0</div>
+      <div class="label">Wrong revision do điều hướng</div>
+      <div class="mini-note">Mọi lỗi wrong revision phải truy ra handbook, playlist, QR hoặc WI tại điểm dùng.</div>
+    </div>
+    <div class="metric-card">
+      <div class="value">100%</div>
+      <div class="label">Playlist theo vai trò</div>
+      <div class="mini-note">Mỗi vai trò trong phòng ban phải có playlist được manager xác nhận.</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>8. Tài liệu liên quan</h2>
   <div class="table-card">
     <table class="matrix-table">
       <thead>
-        <tr><th>Nhóm</th><th>Tài liệu</th></tr>
+        <tr>
+          <th>Nhóm</th>
+          <th>Tài liệu</th>
+        </tr>
       </thead>
       <tbody>
-        <tr><td>Điểm vào tổ chức</td><td><a href="../../../02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html">QMS-MAN-001</a><br/><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/index.html">Department Handbooks Index</a><br/><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">JD Thư viện</a></td></tr>
-        <tr><td>M365 hồ sơ / điều hướng</td><td><a href="wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a><br/><a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a><br/><a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a><br/><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td></tr>
-        <tr><td>Governance dữ liệu</td><td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a><br/><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a><br/><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a><br/><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></td></tr>
-        <tr><td>Training và năng lực</td><td><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-801_Training_Plan.xlsx">FRM-801</a><br/><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-802_Attendance_List.xlsx">FRM-802</a><br/><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM-803</a><br/><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-804_Competence_Assessment.xlsx">FRM-804</a><br/><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-807</a></td></tr>
+        <tr>
+          <td>Điểm vào tổ chức</td>
+          <td><a href="../../../02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html">QMS-MAN-001</a><br/><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/index.html">Department Handbooks Index</a><br/><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">Thư viện JD</a></td>
+        </tr>
+        <tr>
+          <td>Triển khai vận hành</td>
+          <td><a href="wi-106-job-order-deployment-master-plan.html">WI-106</a><br/><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a><br/><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114</a><br/><a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td>
+        </tr>
+        <tr>
+          <td>M365 và điểm dùng</td>
+          <td><a href="wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a><br/><a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a><br/><a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a><br/><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td>
+        </tr>
+        <tr>
+          <td>Đào tạo và năng lực</td>
+          <td><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-801_Training_Plan.xlsx">FRM-801</a><br/><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-802_Attendance_List.xlsx">FRM-802</a><br/><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM-803</a><br/><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-804_Competence_Assessment.xlsx">FRM-804</a><br/><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-807</a></td>
+        </tr>
       </tbody>
     </table>
   </div>

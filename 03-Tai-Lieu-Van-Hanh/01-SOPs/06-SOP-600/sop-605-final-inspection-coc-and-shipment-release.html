@@ -106,6 +106,10 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2>
 <div class="field-grid"><div class="field"><b>Đầu vào bắt buộc</b><div class="blank">Closed traveler/job, kiểm tra cuối plan/results, material/quy trình certs, deviation approvals, packaging instructions, label rules, ship request, customer-specific docs.</div></div><div class="field"><b>Đầu ra bắt buộc</b><div class="blank">Released shipment pack, approved CoC, label/SSCC bằng chứng, ship giao dịch, archived gói phát hành link.</div></div><div class="field"><b>Điều kiện tiên quyết</b><div class="blank">No open technical HOLD unless approved exception; revision synchronized; part physically available for final check and pack confirmation; responsible vai trò available.</div></div><div class="field"><b>Điểm không được bỏ qua</b><div class="blank">Partial ship, split lot, outsourced finish certs, customer format CoC, clean/vacuum packaging, customer-specific serial/lot trace fields.</div></div></div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
+<div class="note-blue" style="margin:12px 0">
+<b>&#x1F5FA;&#xFE0F; Vị trí trong hệ thống 8 cổng (G0&#x2192;G7):</b> SOP-605 vận hành bên trong cổng hệ thống <b>G6 &mdash; Final QC</b> và <b>G7 &mdash; Ship</b>.
+<br/>Lưu ý: Các bước 605-G1 đến 605-G5 thuộc cổng hệ thống G6 (Final QC). Bước 605-G6 và 605-G7 thuộc cổng hệ thống G7 (Ship). Không nhầm với mã cổng hệ thống G0-G7.
+</div>
 <div class="gate-grid">
 <div class="gate-card"><h3>605-G1 — Kiểm tra cuối đầy đủ</h3><p>kiểm tra cuối kết quả, phương pháp, gage trạng thái, CTQ disposition và số lượng đã chấp nhận phải rõ; thiếu bất kỳ mắt xích nào → TẠM GIỮ.</p></div>
 <div class="gate-card"><h3>605-G2 — Hồ sơ tính đầy đủ</h3><p>Traveler, mẫu đầu (đầu tiên chi tiết / sản phẩm)/FAI (nếu có), trong quá trình/final hồ sơ, NCR/miễn trừ disposition, nguyên vật liệu/quy trình chứng chỉ phải đủ và đúng lô giao hàng scope.</p></div>

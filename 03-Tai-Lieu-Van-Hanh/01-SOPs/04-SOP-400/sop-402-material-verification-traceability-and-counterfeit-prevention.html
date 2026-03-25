@@ -115,6 +115,10 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="field"><b>Điểm không được bỏ qua</b><div class="blank">Nguyên vật liệu thay thế, vật liệu thừa tái sử dụng, outsource trả lại, khách hàng-được cung cấp nguyên vật liệu, tách / chia lot, hỗn hợp / lẫn lộn mẻ nấu (mẻ nấu (heat))/lot, ship một phần, làm lại làm thay đổi nhận diện lô.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
+<div class="note-blue" style="margin:12px 0">
+<b>&#x1F5FA;&#xFE0F; Vị trí trong hệ thống 8 cổng (G0&#x2192;G7):</b> SOP-402 vận hành chủ yếu bên trong cổng hệ thống <b>G2 &mdash; IQC</b>, với phần truy xuất xuyên suốt vòng đời job.
+<br/>Lưu ý: Các bước 402-G1 đến 402-G3 thuộc cổng hệ thống G2 (IQC). Các bước 402-G4 đến 402-G7 là kiểm soát truy xuất xuyên suốt vòng đời job. Không nhầm với mã cổng hệ thống G0-G7.
+</div>
 <div class="gate-grid">
 <div class="gate-card"><h3>402-G1 — Source &amp; PO flowdown</h3><p>PO phải chỉ rõ material/grade/spec/rev, source rules, cert requirements và no-substitution khi áp dụng. Thiếu flowdown → không nhận hàng.</p></div>
 <div class="gate-card"><h3>402-G2 — Receipt identity</h3><p>Physical marking, label, phiếu kê đóng gói (phiếu kê đóng gói) và cert phải khớp. Bất kỳ mismatch nào về grade, size, qty, heat/lot, processor name → HOLD.</p></div>
