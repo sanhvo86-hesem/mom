@@ -131,7 +131,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td><b>Người vận hành</b></td><td>Tuân thủ Level khi vận hành; tạo MRR OJT; không tự mở quyền vận hành</td><td>L2–L3 yêu cầu OJT đầu ra theo job thật + xác nhận Supervisor</td></tr>
+<tr><td><b>Operator</b></td><td>Tuân thủ Level khi vận hành; tạo MRR OJT; không tự mở quyền vận hành</td><td>L2–L3 yêu cầu OJT đầu ra theo job thật + xác nhận Supervisor</td></tr>
 <tr><td><b>Setup</b></td><td>Quyền setup/chứng minh-out gắn Level; bắt buộc hiệu suất test khi nâng Level</td><td>L3 yêu cầu bằng chứng kiểm soát rủi ro sự cố nghiêm trọng + ký-off Bảo trì/QA khi cần</td></tr>
 <tr><td><b>Lập trình viên (CNC)</b></td><td>Quyền phát hành chương trình gắn Level; kiểm soát phiên bản</td><td>Draft</td></tr>
 <tr><td><b>QC</b></td><td>Quyền đo/duyệt gage gắn Level; chặn OOT gage</td><td>L3 yêu cầu hiệu suất test đo + truy xuất nguồn gốc MRR</td></tr>
@@ -324,7 +324,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Thưởng map lệch phiên bản</b></td>
-<td>CHẶN chi trả → khóa file thưởng map → họp 15 phút đồng bộ người phụ trách</td>
+<td>CHẶN chi trả → khóa file thưởng map → họp 15 phút đồng bộ Responsible Person</td>
 <td>HR</td>
 <td>Thông báo khóa + phiên bản mới</td>
 </tr>
@@ -394,7 +394,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>5) Đánh giá rủi ro cập nhật sai</td>
 <td>Ghi FMEA-rút gọn: lỗi nào xảy ra, hậu quả nào, điểm chặn nào</td>
-<td>Giữ kỷ luật fail-nhanh và trách nhiệm người phụ trách</td>
+<td>Giữ kỷ luật fail-nhanh và trách nhiệm Responsible Person</td>
 </tr>
 <tr>
 <td>6) Soát &amp; nộp</td>
@@ -414,7 +414,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>01 bộ <b>FRM-HR-TRN-007</b> hoàn chỉnh, có phạm vi, job minh chứng, điều kiện đạt, FMEA-rút gọn, chữ ký xác nhận.</li>
 <li>01 gói bằng chứng kèm theo: bảng kiểm OJT ký, ảnh, log ca, biên bản hiệu suất test, kết quả đo/duyệt liên quan.</li>
 <li>01 bản <b>ảnh chụp trạng thái Kỹ năng Matrix</b> trước/sau cập nhật (phiên bản + ngày) để truy xuất nguồn gốc.</li>
-<li>01 hồ sơ thông báo thay đổi quyền vận hành cho các người phụ trách liên quan (Planner/QC/QA/OPS).</li>
+<li>01 hồ sơ thông báo thay đổi quyền vận hành cho các Responsible Person liên quan (Planner/QC/QA/OPS).</li>
 <li>01 tình huống “chặn giao việc sai Level” được ghi lại bằng log hành động (khi xảy ra).</li>
 </ul>
 </div>
@@ -456,7 +456,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol style="line-height:1.9; margin:0 0 0 18px">
 <li>ma trận kỹ năng (kỹ năng matrix) được dùng như “cổng” tại bước nào trong E2E?</li>
 <li>Định nghĩa “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” trong cập nhật Level là gì?</li>
-<li>FRM-HR-TRN-007 dùng để làm gì và người phụ trách là ai?</li>
+<li>FRM-HR-TRN-007 dùng để làm gì và Responsible Person là ai?</li>
 <li>FRM-HR-TRN-011 dùng để làm gì và khi nào bắt buộc cập nhật?</li>
 <li>Khi Planner phân job sai Level, quyết định fail-nhanh là gì?</li>
 <li>Khi QC phát hiện người ký duyệt không đủ Level, quyết định là gì?</li>
@@ -481,11 +481,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>
 <b>Tình huống 1 — Phân ca sai Level:</b><br/>
  Dữ kiện: job chứng minh-out máy mới yêu cầu Setup L3; bảng ca ghi Setup L2; Supervisor vắng 10 phút đầu ca.<br/>
- Yêu cầu: quyết định <b>TẠM GIỮ/GO</b>; liệt kê 60 giây đầu; ghi MRR cần tạo; người phụ trách đóng hành động.
+ Yêu cầu: quyết định <b>TẠM GIỮ/GO</b>; liệt kê 60 giây đầu; ghi MRR cần tạo; Responsible Person đóng hành động.
  </li>
 <li>
 <b>Tình huống 2 — Nâng Level không có bằng chứng:</b><br/>
- Dữ kiện: Supervisor muốn nâng Người vận hành từ L1 lên L2 để kịp giao hàng; chỉ có 01 ngày làm việc; không có hiệu suất test và không có job minh chứng.<br/>
+ Dữ kiện: Supervisor muốn nâng Operator từ L1 lên L2 để kịp giao hàng; chỉ có 01 ngày làm việc; không có hiệu suất test và không có job minh chứng.<br/>
  Yêu cầu: quyết định <b>CHẶN/GO</b>; chỉ rõ điểm chặn; nêu MRR bắt buộc trong <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a>; cách lập kế hoạch OJT 2 ngày/tuần.
  </li>
 <li>

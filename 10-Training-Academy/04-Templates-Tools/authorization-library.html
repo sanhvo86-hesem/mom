@@ -77,7 +77,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
     <a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"/></a>
     <div class="fh-company"><a href="../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Đào tạo Academy • Mẫu & dụng cụ</span></div>
   </div>
-  <div class="title"><strong>TRN-ACA-AUTH-01 — ủy quyền Thư viện</strong><span class="sub-vn">Thư viện phân quyền năng lực: đã đào tạo, đã chứng nhận, được ủy quyền, người phê duyệt và phó mức sẵn sàng.</span></div>
+  <div class="title"><strong>TRN-ACA-AUTH-01 — ủy quyền Thư viện</strong><span class="sub-vn">Thư viện phân quyền năng lực: đã đào tạo, đã chứng nhận, được ủy quyền, Approver và phó mức sẵn sàng.</span></div>
   <div class="meta">
     <div class="row"><span><b>Code:</b></span><span>TRN-ACA-AUTH-01</span></div>
     <div class="row"><span><b>Version:</b></span><span>V0</span></div>
@@ -94,10 +94,10 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <h2 id="a1">1. ủy quyền lớp / phân loại</h2>
 <div class="table-card"><table><thead><tr><th>Class</th><th>Ý nghĩa</th><th>Ví dụ</th></tr></thead><tbody>
 <tr><td>quan sát / đào tạo</td><td>Được học và thực hành có giám sát; không được phát hành / ký độc lập.</td><td>Học viên setup, mới vào nhận hàng, đứng cạnh học việc nhân viên mua hàng.</td></tr>
-<tr><td>vận hành dưới giám sát</td><td>Được làm trên scope hẹp với supervisor ký-off.</td><td>Người vận hành mới đạt cổng kiểm soát trên 1 nhóm máy (machine nhóm sản phẩm).</td></tr>
-<tr><td>độc lập người vận hành</td><td>Được làm độc lập trong scope đã nêu, vẫn chịu các cổng kiểm soát chất lượng / escalation.</td><td>Kho nhận hàng standard nguyên vật liệu; QC theo phương pháp đã chứng nhận.</td></tr>
-<tr><td>Người phê duyệt / người rà soát</td><td>Được rà soát, phát hành, ký hoặc quyết định theo matrix thẩm quyền.</td><td>QA phát hành, kỹ thuật rà soát, nhân viên mua hàng luồng-xuống / ngừng phát hành.</td></tr>
-<tr><td>Phó đủ điều kiện</td><td>Được kích hoạt làm backup cho vai trò quan trọng / nghiêm trọng khi điều kiện phạm vi bao phủ đạt.</td><td>Phó planner, phó Tổ trưởng kho.</td></tr>
+<tr><td>vận hành dưới giám sát</td><td>Được làm trên scope hẹp với supervisor ký-off.</td><td>Operator mới đạt cổng kiểm soát trên 1 nhóm máy (machine nhóm sản phẩm).</td></tr>
+<tr><td>độc lập Operator</td><td>Được làm độc lập trong scope đã nêu, vẫn chịu các cổng kiểm soát chất lượng / escalation.</td><td>Kho nhận hàng standard nguyên vật liệu; QC theo phương pháp đã chứng nhận.</td></tr>
+<tr><td>Approver / Reviewer</td><td>Được rà soát, phát hành, ký hoặc quyết định theo matrix thẩm quyền.</td><td>QA phát hành, kỹ thuật rà soát, nhân viên mua hàng luồng-xuống / ngừng phát hành.</td></tr>
+<tr><td>Phó đủ điều kiện</td><td>Được kích hoạt làm backup cho vai trò quan trọng / nghiêm trọng khi điều kiện phạm vi bao phủ đạt.</td><td>Phó planner, phó Team Leader kho.</td></tr>
 </tbody></table></div>
 <h2 id="a2">2. Scope kích thước phải khóa</h2>
 <div class="check-grid"><div class="check-item"><span class="chk"></span>Vai trò / quy trình nhóm sản phẩm</div><div class="check-item"><span class="chk"></span>Machine / tool / gage / system nhóm sản phẩm</div><div class="check-item"><span class="chk"></span>Shift / cell / vị trí / clean-khu vực ranh giới</div><div class="check-item"><span class="chk"></span>Khách hàng / sản phẩm / đặc biệt yêu cầu scope</div><div class="check-item"><span class="chk"></span>Phê duyệt giới hạn / ký-off ranh giới</div><div class="check-item"><span class="chk"></span>hiệu lực giai đoạn / kỳ / tái đánh giá năng lực kích hoạt</div></div>
@@ -109,7 +109,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <h2 id="a5">5. Đã thực hiện ví dụ by vai trò nhóm sản phẩm</h2>
 <div class="link-grid"><div class="link-card"><h3>Nhận hàng / Kho</h3><p>Đào tạo xong nhận hàng chưa đủ để phát hành lot/batch. ủy quyền phải nêu rõ standard nguyên vật liệu chỉ / duy nhất hay bao gồm đặc biệt-quy trình trả lại, clean-pack hoặc khách hàng-cụ thể cert rà soát.</p></div><div class="link-card"><h3>CNC / Setup</h3><p>Cổng kiểm soát test đạt không đồng nghĩa được set-up mọi machine. Scope phải khóa theo nhóm máy (machine nhóm sản phẩm), phát hành chương trình (program phát hành) rule, mẫu đầu (đầu tiên chi tiết / sản phẩm) ký-off và shift/cell.</p></div><div class="link-card"><h3>QA / Đo lường</h3><p>Chứng nhận đo lường có thể có hiệu lực riêng, nhưng quyền phát hành cuối vẫn phụ thuộc vào phương pháp nhóm sản phẩm, khách hàng yêu cầu và ma trận thẩm quyền.</p></div></div>
 <h2 id="a6">6. Bộ bằng chứng và hồ sơ</h2>
-<div class="check-grid"><div class="check-item"><span class="chk"></span>Lộ trình / OJT / cổng kiểm soát-test tham chiếu</div><div class="check-item"><span class="chk"></span>Chứng nhận hồ sơ / hết hạn / tái đánh giá năng lực kích hoạt</div><div class="check-item"><span class="chk"></span>ủy quyền quyết định / scope báo cáo / tuyên bố / người phê duyệt</div><div class="check-item"><span class="chk"></span>Phó trạng thái / backup mức sẵn sàng bằng chứng</div></div>
+<div class="check-grid"><div class="check-item"><span class="chk"></span>Lộ trình / OJT / cổng kiểm soát-test tham chiếu</div><div class="check-item"><span class="chk"></span>Chứng nhận hồ sơ / hết hạn / tái đánh giá năng lực kích hoạt</div><div class="check-item"><span class="chk"></span>ủy quyền quyết định / scope báo cáo / tuyên bố / Approver</div><div class="check-item"><span class="chk"></span>Phó trạng thái / backup mức sẵn sàng bằng chứng</div></div>
 <div class="footer-note">ủy quyền hồ sơ nên được gọi ra được từ xem xét của lãnh đạo, đánh giá, khách hàng tham quan / kiểm tra và tính liên tục kích hoạt. Khi đã đào tạo, đã chứng nhận và được ủy quyền bị lẫn vào nhau, hệ thống sẽ báo mức sẵn sàng ảo.</div>
 
 </div></div>

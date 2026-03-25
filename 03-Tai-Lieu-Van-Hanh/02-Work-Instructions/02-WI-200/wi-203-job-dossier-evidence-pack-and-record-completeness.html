@@ -56,7 +56,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="row"><span><b>Code:</b></span><span>WI-203</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>QA/QMS Manager / Kế hoạch Tổ trưởng / Kỹ thuật Điều phối viên</span></div>
+<div class="row"><span><b>Owner:</b></span><span>QA/QMS Manager / Kế hoạch Team Leader / Kỹ thuật Điều phối viên</span></div>
 <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
@@ -74,7 +74,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>dự phòng / Offline Sự kiện</td><td>Lưu sự kiện log, scan nhập bù, bảng kiểm bổ sung / thay thế khi hệ thống xuống / ngừng</td><td>Không thay Hồ sơ chính sau khi hệ thống đã phục hồi</td><td>QA/QMS</td></tr>
 <tr><td>Khách hàng Pack đầu ra</td><td>Lưu gói / bó/hồ sơ phát hành ra ngoài theo yêu cầu từng lô giao hàng hoặc source kiểm tra</td><td>Không phải nơi làm việc nội bộ chính trong quá trình sản xuất</td><td>QA / Giao vận theo lộ trình gia công</td></tr>
 </tbody></table></div>
-<div class="keyline"><strong>Lưu ý về Part-Rev Bản gốc:</strong> vùng này cố ý không có tiền tố số phía trước vì đây là kho chủ / gốc kỹ thuật theo <span class="code">CustomerID + PartNo + Rev</span>, dùng làm nguồn mốc chuẩn chuẩn để sinh hồ sơ job/ảnh chụp trạng thái. Khi PartNo trùng giữa nhiều khách hàng, hồ sơ job phải link đúng nhánh khách hàng tương ứng. Nó không phải dải hồ sơ vận hành tuần tự như các thư mục hồ sơ G0-G5.</div>
+<div class="keyline"><strong>Lưu ý về Part-Rev Bản gốc:</strong> vùng này cố ý không có tiền tố số phía trước vì đây là kho chủ / gốc kỹ thuật theo <span class="code">CustomerID + PartNo + Rev</span>, dùng làm nguồn mốc chuẩn chuẩn để sinh hồ sơ job/ảnh chụp trạng thái. Khi PartNo trùng giữa nhiều khách hàng, hồ sơ job phải link đúng nhánh khách hàng tương ứng. Nó không phải dải hồ sơ vận hành tuần tự như các Record Folder G0-G5.</div>
 <p>Mọi link trong hồ sơ phải trỏ về SSOT đang hiệu lực. PHẢI giữ link về nguồn chuẩn; không gửi hoặc lưu đường dẫn tới bản tải về trên máy tính bàn cá nhân, và không tạo hồ sơ phụ song song cho cùng một JobNum.</p></div>
 <div class="section"><h2>3. Cấu trúc Hồ sơ công việc, owner và thời điểm phải nạp hồ sơ</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thư mục</th><th>Nội dung bắt buộc</th><th>Responsible Person chính</th><th>Thời điểm phải có</th></tr></thead><tbody>
@@ -88,7 +88,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>07_NCR-CAPA-Sai lệch</td><td>NCR, concession, miễn trừ, thoát / bỏ qua, CAPA, làm lại chuỗi, khách hàng sai lệch phê duyệt</td><td>QA</td><td>Ngay khi sự kiện phát sinh</td></tr>
 <tr><td>99_Archive-Đã khóa</td><td>Ảnh chụp trạng thái cuối, đã ký bảng kê, export gói / bó, lưu trữ note</td><td>QA/QMS</td><td>Sau ship hoặc job đóng</td></tr>
 </tbody></table></div>
-<div class="keyline"><strong>Quy định file plan chi tiết cấp job:</strong> mỗi gate ở trên phải tiếp tục tách theo thư mục con nghiệp vụ bên trong. File phải đi đúng <b>gate trước, loại nội dung sau</b>. Ví dụ: ảnh setup, <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-519_Job_Packet_Quick_Check_and_Pre_Run_Verification.xlsx">FRM-519</a> và công việc chuyển giao validation không được để chung dưới <span class="code">02_G1-Setup-Phát hành</span> mà phải đi vào đúng nhánh con theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>. Việc tạo thư mục job mới, kiểm tra đầy đủ hồ sơ và nộp bằng chứng phải bám đúng thư mục con mô hình đã khóa trong ANNEX này.</div>
+<div class="keyline"><strong>Quy định file plan chi tiết cấp job:</strong> mỗi gate ở trên phải tiếp tục tách theo Sub-folder nghiệp vụ bên trong. File phải đi đúng <b>gate trước, loại nội dung sau</b>. Ví dụ: ảnh setup, <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-519_Job_Packet_Quick_Check_and_Pre_Run_Verification.xlsx">FRM-519</a> và công việc chuyển giao validation không được để chung dưới <span class="code">02_G1-Setup-Phát hành</span> mà phải đi vào đúng nhánh con theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>. Việc tạo thư mục job mới, kiểm tra đầy đủ hồ sơ và nộp bằng chứng phải bám đúng Sub-folder mô hình đã khóa trong ANNEX này.</div>
 <div class="keyline"><strong>SLA nạp hồ sơ:</strong> hồ sơ vận hành tạo trong ca phải được nạp vào hồ sơ trong chính ca đó hoặc chậm nhất trước khi đóng cổng kiểm soát kế tiếp. PHẢI chuyển ảnh, phiếu giấy và file đo vào hồ sơ đúng hạn; không giữ ở máy cá nhân để “cuối tuần nhập một lần”.</div></div>
 <div class="section"><h2>4. Tiêu chí chấp nhận cho từng loại bằng chứng</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>RecordType</th><th>Được chấp nhận khi</th><th>PHẢI trả lại khi</th></tr></thead><tbody>
@@ -102,7 +102,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>5. Các bước vận hành bắt buộc</h2>
 <div class="step-list">
 <div class="step-item"><strong>Tạo hồ sơ ngay khi lập kế hoạch phát hành.</strong><br/>Kế hoạch mở hồ sơ đúng template, gắn JobNum, CustomerID, PartNo, Rev, cơ sở / nền QPL, lớp phủ code, và link tới bộ hồ sơ chuẩn đúng nhánh khách hàng. Không chờ tới khi có hồ sơ đầu tiên mới tạo thư mục.</div>
-<div class="step-item"><strong>Nạp hồ sơ đúng cổng kiểm soát, đúng ngày.</strong><br/>Người phát sinh hồ sơ chịu trách nhiệm nạp hoặc bàn giao nạp đúng thư mục G0–G5. PHẢI đưa file vào đúng thư mục hồ sơ; không để ở gốc / căn nguyên, không giữ trong tải xuống/máy tính bàn rồi coi đó là “đã có hồ sơ”.</div>
+<div class="step-item"><strong>Nạp hồ sơ đúng cổng kiểm soát, đúng ngày.</strong><br/>Người phát sinh hồ sơ chịu trách nhiệm nạp hoặc bàn giao nạp đúng thư mục G0–G5. PHẢI đưa file vào đúng Record Folder; không để ở gốc / căn nguyên, không giữ trong tải xuống/máy tính bàn rồi coi đó là “đã có hồ sơ”.</div>
 <div class="step-item"><strong>Điền siêu dữ liệu ngay khi nạp.</strong><br/>JobNum, CustomerID, PartNo, Rev, Cổng kiểm soát, DocType, RecordDate, Responsible Person, QPL/lớp phủ, lot/mẻ nấu (mẻ nấu (heat)) khi áp dụng, và lưu giữ kích hoạt phải được điền đầy đủ để truy xuất nguồn gốc được trong 60 giây.</div>
 <div class="step-item"><strong>Kiểm tính đầy đủ trước khi đóng cổng kiểm soát.</strong><br/>Responsible Person của cổng kiểm soát tự kiểm trước, QA kiểm chéo ở các cổng kiểm soát chất lượng và phê duyệt giao hàng. Thiếu một mục bắt buộc thì cổng kiểm soát không được đóng.</div>
 <div class="step-item"><strong>Xuất khách hàng gói hàng đúng biến thể.</strong><br/>Khi khách yêu cầu data pack, source kiểm tra pack, clean/chân không pack hoặc FAI pack, phải xuất từ hồ sơ chính và lưu ngược index của pack đã phát hành vào G5 hoặc thư mục tương ứng.</div>
@@ -130,7 +130,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>8. đánh dấu đỏ (đánh dấu đỏ (redline)), làm lại, sai lệch và truy vết chuỗi</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Sự kiện</th><th>Phải tạo thêm gì trong hồ sơ</th><th>Quy tắc truy vết</th></tr></thead><tbody>
 <tr><td>Phiên bản thay đổi giữa chừng</td><td>Thay đổi sự kiện note, mốc chuẩn mới, danh sách hồ sơ chịu ảnh hưởng, quyết định re-phát hành cổng kiểm soát liên quan</td><td>Không xóa dấu vết phiên bản cũ; phải chỉ ra hồ sơ nào thuộc rev cũ và hồ sơ nào thuộc rev mới</td></tr>
-<tr><td>NCR / làm lại</td><td>Thư mục con hoặc hồ sơ class riêng trong 07_NCR-CAPA-Sai lệch, làm lại traveler, re-kiểm tra bằng chứng</td><td>Phải link từ khuyết tật gốc → quyết định xử lý → bằng chứng làm lại → bằng chứng re-phát hành</td></tr>
+<tr><td>NCR / làm lại</td><td>Sub-folder hoặc hồ sơ class riêng trong 07_NCR-CAPA-Sai lệch, làm lại traveler, re-kiểm tra bằng chứng</td><td>Phải link từ khuyết tật gốc → quyết định xử lý → bằng chứng làm lại → bằng chứng re-phát hành</td></tr>
 <tr><td>Concession / sai lệch đã phê duyệt</td><td>Bản chấp thuận ngoại lệ, phạm vi part/qty/số sê-ri, điều kiện áp dụng</td><td>Chỉ dùng cho đúng phạm vi được phê duyệt; không “mượn” sang job khác</td></tr>
 <tr><td>Một phần ship / tách / chia lot</td><td>Lô giao hàng sub-pack, đã giao hàng qty vs mở cân bằng / số dư sơ đồ ánh xạ, SSCC sơ đồ ánh xạ riêng</td><td>Phải truy được mỗi kiện/lot ship ra từ hồ sơ chung</td></tr>
 <tr><td>Chuyển giao công việc</td><td>Hồ sơ bàn giao, machine/person/khu vực chuyển giao bằng chứng, khởi động lại ủy quyền</td><td>Phải truy được ai giao, ai nhận, khi nào, điều kiện gì còn mở</td></tr>
@@ -160,7 +160,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <li>Mở hold/NCR liên quan lô giao hàng đã đóng hoặc được link đúng ngoại lệ</li>
 <li>Khách hàng gói hàng đã lưu ngược index vào hồ sơ</li>
 <li>Lưu giữ kích hoạt đã khai báo đúng</li>
-<li>Quyền chỉnh sửa sau khóa đã chuyển về đúng người phụ trách</li>
+<li>Quyền chỉnh sửa sau khóa đã chuyển về đúng Responsible Person</li>
 </ul></div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>

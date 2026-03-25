@@ -121,6 +121,38 @@ Các tên cột sau là định danh kỹ thuật trong M365 Lists / Epicor. **K
 
 **Nhận dạng nhanh tên cột nội bộ:** Bất kỳ từ nào viết dạng **CamelCase** (như `RecordType`, `JobNum`, `CustomerID`) đều là tên cột kỹ thuật — **KHÔNG dịch**.
 
+#### B3.2b Nơi lưu trữ (Storage Locations) — giữ nguyên tiếng Anh 100%
+
+| Tên tiếng Anh | Mô tả |
+|---------------|--------|
+| `QMS Library / SSOT` | Thư viện QMS chính |
+| `QMS Change Folder` | Thư mục thay đổi |
+| `QMS Release Folder` | Thư mục phát hành |
+| `Department Folder / SSOT` | Thư mục bộ phận |
+| `QMS Review Folder` | Thư mục rà soát |
+| `Point-of-use` / `Point-of-use Control` | Điểm sử dụng |
+| `Document Library` | Thư viện tài liệu |
+| `Record Library` | Thư viện hồ sơ |
+| `Job Folder` | Thư mục Job |
+
+**Quy tắc:** Tên nơi lưu trữ là danh từ riêng M365/SharePoint — dịch sẽ gây nhầm lẫn khi tham chiếu.
+
+#### B3.2c Chức danh / Vai trò — giữ nguyên tiếng Anh 100%
+
+| Tiếng Anh | Tiếng Việt (mô tả) |
+|-----------|---------------------|
+| `Document Responsible Person` | Người phụ trách tài liệu |
+| `Lead Department` | Bộ phận chủ trì |
+| `IT Administrator` | Quản trị viên IT |
+| `Team Leader` | Tổ trưởng |
+| `Shift Leader` | Trưởng ca |
+| `Foreman` | Quản đốc |
+| `Approver` / `Reviewer` / `Author` | Người phê duyệt / rà soát / soạn |
+| `Performer` / `Inspector` / `Operator` | Người thực hiện / kiểm tra / vận hành |
+| `Specialist` / `Worker` / `End User` | Chuyên viên / Công nhân / Người dùng cuối |
+
+**Quy tắc:** Chức danh dùng tiếng Anh xuyên suốt — RACI, bảng chủ trì, gate, nội dung văn bản.
+
 #### B3.3 Tên SharePoint List — giữ nguyên 100%
 
 | Tên List gốc | Mô tả |

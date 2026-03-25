@@ -79,7 +79,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Thông tin triển khai</strong>
 <ul>
-<li><strong>TargetRoles:</strong> Người vận hành, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor</li>
+<li><strong>TargetRoles:</strong> Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor</li>
 <li><strong>Thời lượng chuẩn:</strong> 90 phút lý thuyết (ca 1/ca 2) • 120 phút phân xưởng theo tình huống phân xưởng • 120 phút OJT tại hiện trường + ký xác nhận</li>
 <li><strong>Nhịp triển khai:</strong> 2 ca/ngày, 6 ngày/tuần. Mỗi vai trò học tối đa 2 ngày/tuần. Ca nào nghỉ học thì ca đó vẫn vận hành theo bảng kiểm.</li>
 <li><strong>Tài liệu nội bộ bắt buộc đã đọc:</strong> ANNEX-QMS-012; SOP-QMS-012; SOP-QMS-012; SOP-QMS-011; SOP-QMS-011; WI-OPS-008; WI-OPS-001</li>
@@ -130,7 +130,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:14%">Level mục tiêu</th>
 </tr>
 <tr>
-<td><b>Người vận hành</b></td>
+<td><b>Operator</b></td>
 <td>Dùng app đúng môi trường; không dùng bản draft; báo lỗi khi gặp không khớp Rev/dữ liệu; không tự chia sẻ dữ liệu khách.</td>
 <td>01 biên bản OJT + 01 thực hành “tìm hồ sơ đúng trong 3 phút” có ký xác nhận.</td>
 <td>L2</td>
@@ -351,7 +351,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Sai Rev</b> giữa app và WO/Lot/drawing</td>
-<td>TẠM GIỮ công việc tại điểm sử dụng • Báo Supervisor + QA • Chụp màn hình không khớp • Xác nhận Rev chuẩn theo nguồn đã phát hành</td>
+<td>TẠM GIỮ công việc tại Point-of-use • Báo Supervisor + QA • Chụp màn hình không khớp • Xác nhận Rev chuẩn theo nguồn đã phát hành</td>
 <td>01 log sự cố + 01 ảnh bằng chứng + link hồ sơ đã phát hành</td>
 </tr>
 <tr>
@@ -361,7 +361,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Thiếu chứng từ</b> khi cần đánh giá pack/phê duyệt giao hàng</td>
-<td>CHẶN ship • Kho báo QA • QA kiểm tra MRR theo cổng kiểm soát • Tạo danh sách thiếu và giao người phụ trách đóng</td>
+<td>CHẶN ship • Kho báo QA • QA kiểm tra MRR theo cổng kiểm soát • Tạo danh sách thiếu và giao Responsible Person đóng</td>
 <td>01 bảng kiểm MRR thiếu + 01 quyết định CHẶN có chữ ký</td>
 </tr>
 <tr>
@@ -403,7 +403,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>3</td>
 <td>Chốt SoD: ai xây dựng, ai xác nhận hiệu lực, ai phê duyệt</td>
 <td>Supervisor + QA</td>
-<td>RACI + danh sách người phê duyệt độc lập</td>
+<td>RACI + danh sách Approver độc lập</td>
 <td>Một người làm cả 3 vai → đánh giá không đạt</td>
 </tr>
 <tr>
@@ -533,7 +533,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>7</td>
 <td>Chạy acceptance kiểm nghiệm bằng người dùng thật</td>
-<td>Test đúng vai trò người dùng (vai trò người dùng (persona)) (Người vận hành/QC/Kho) • Test “bằng chứng trong 3 phút”</td>
+<td>Test đúng vai trò người dùng (vai trò người dùng (persona)) (Operator/QC/Kho) • Test “bằng chứng trong 3 phút”</td>
 <td>Admin đạt không đồng nghĩa người dùng đạt</td>
 </tr>
 <tr>
@@ -569,7 +569,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L2</b></td>
 <td>Thực hành đúng: mở đúng hồ sơ đã phát hành, tìm bằng chứng đúng WO/Lot trong 3 phút, tạo log sự cố khi không khớp Rev.</td>
 <td>OJT pass + 01 tình huống quyết định TẠM GIỮ/GO đúng</td>
-<td>Được phép xác nhận vận hành theo bảng kiểm vai trò (Người vận hành/Setup/Mua hàng/Bảo trì/EHS)</td>
+<td>Được phép xác nhận vận hành theo bảng kiểm vai trò (Operator/Setup/Mua hàng/Bảo trì/EHS)</td>
 </tr>
 <tr>
 <td><b>L3</b></td>
@@ -611,8 +611,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 <h3>10.2 Tình huống (≥ 3 tình huống thật; có dữ kiện; quyết định TẠM GIỮ/GO và ghi MRR)</h3>
 <div class="note">
-<strong>Tình huống 1 — Sai Rev tại điểm sử dụng</strong><br/>
- Dữ kiện: Người vận hành mở app “Job Theo dõi Sheet” hiển thị PartNo PN-7750 Rev B, trong khi drawing đã phát hành tại QMS-Được kiểm soát-Tài liệu là Rev C.
+<strong>Tình huống 1 — Sai Rev tại Point-of-use</strong><br/>
+ Dữ kiện: Operator mở app “Job Theo dõi Sheet” hiển thị PartNo PN-7750 Rev B, trong khi drawing đã phát hành tại QMS-Được kiểm soát-Tài liệu là Rev C.
  Lot đang ở ca 2, máy đã set tool.<br/>
  Yêu cầu: ra quyết định TẠM GIỮ/GO, mô tả phản ứng 60 giây, và liệt kê MRR phải tạo ngay.
  </div>
@@ -652,7 +652,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>đạt khi quyết định có căn cứ + không có “GO khi thiếu bằng chứng”</td>
 </tr>
 <tr>
-<td><b>Người vận hành/Setup/QC/Kho/Mua hàng/Planner/Bảo trì/EHS/Kinh doanh-CS</b></td>
+<td><b>Operator/Setup/QC/Kho/Mua hàng/Planner/Bảo trì/EHS/Kinh doanh-CS</b></td>
 <td>Thực hành đúng theo vai trò người dùng (vai trò người dùng (persona)): truy xuất nguồn gốc hồ sơ đã phát hành, tìm bằng chứng trong 3 phút, tạo log sự cố, không chia sẻ sai kênh</td>
 <td>đạt khi vận hành đúng và tạo MRR đúng yêu cầu</td>
 </tr>
@@ -720,7 +720,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Không được quản lý trong PROD</b> → bắt buộc được quản lý + khóa quyền người tạo / nhà sản xuất trong PROD.</li>
 <li><b>Bằng chứng không có ngữ cảnh</b> → ảnh chụp màn hình phải thấy tên site/thư viện + cài đặt value.</li>
 <li><b>Quyền truy cập không kiểm soát</b> → dùng group mốc chuẩn; không tách quyền per-file; có ảnh chụp trạng thái quyền.</li>
-<li><b>Không có acceptance kiểm nghiệm bằng người dùng thật</b> → chạy test theo vai trò người dùng (vai trò người dùng (persona)) (Người vận hành/QC/Kho).</li>
+<li><b>Không có acceptance kiểm nghiệm bằng người dùng thật</b> → chạy test theo vai trò người dùng (vai trò người dùng (persona)) (Operator/QC/Kho).</li>
 <li><b>DLP không phù hợp mức dữ liệu</b> → map khu vực + phân loại với DLP đầu nối; có test tình huống chặn chia sẻ.</li>
 <li><b>cứng / khó-code env giá trị</b> → dùng env biến số; có bảng kiểm pre-import; có sơ đồ ánh xạ theo môi trường.</li>
 <li><b>Không có backup/hoàn tác / quay lại</b> → export trước phát hành và lưu đúng kho bằng chứng.</li>

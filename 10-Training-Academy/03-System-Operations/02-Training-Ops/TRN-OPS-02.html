@@ -104,7 +104,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><b>Tên mô-đun:</b> Đánh giá năng lực &amp; chứng nhận Level: tiêu chí đánh giá L1–L4, năng lực đánh giá, chứng nhận log</div>
 <div style="margin-top:6px;"><b>TargetRoles (bắt buộc):</b></div>
 <div>
-<span class="role-tag">Người vận hành</span>
+<span class="role-tag">Operator</span>
 <span class="role-tag">Setup</span>
 <span class="role-tag">Lập trình viên (CNC)</span>
 <span class="role-tag">QC</span>
@@ -191,7 +191,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <b>Áp dụng theo vai trò</b>
 <ul class="tight">
-<li><b>Người vận hành/Setup/Lập trình viên (CNC):</b> Level gắn quyền vận hành máy, set-up, phát hành chương trình, chỉnh sửa thông số, xử lý lệch chuẩn.</li>
+<li><b>Operator/Setup/Lập trình viên (CNC):</b> Level gắn quyền vận hành máy, set-up, phát hành chương trình, chỉnh sửa thông số, xử lý lệch chuẩn.</li>
 <li><b>QC/QA:</b> Level gắn quyền chấp nhận/loại, phê duyệt phương pháp đo, phát hành báo cáo FAI/IR, xử lý NCR/MRB theo thẩm quyền.</li>
 <li><b>Kho/Mua hàng/Planner/Người định giá (SAL-03):</b> Level gắn quyền phát hành chứng từ, kiểm soát truy xuất nguồn gốc, chặn ship rủi ro, kiểm soát nhà cung cấp/outsource.</li>
 <li><b>Bảo trì/EHS:</b> Level gắn quyền LOTO, nghiệm thu an toàn, phê duyệt điều kiện vận hành an toàn.</li>
@@ -208,7 +208,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3>Mô-đun TRN-OPS-02 nằm ở đâu?</h3>
 <ul class="tight">
-<li><b>Cổng kiểm soát trước Sản xuất:</b> xác nhận người vận hành / set-up / lập trình nằm trong phạm vi chứng nhận hợp lệ.</li>
+<li><b>Cổng kiểm soát trước Sản xuất:</b> xác nhận Operator / set-up / lập trình nằm trong phạm vi chứng nhận hợp lệ.</li>
 <li><b>Cổng kiểm soát trước QC/QA ký-off:</b> xác nhận người đo/duyệt có thẩm quyền Level đúng scope (gage/phương pháp/CTQ).</li>
 <li><b>Cổng kiểm soát trước Ship:</b> xác nhận người phát hành phiếu kê đóng gói (phiếu kê đóng gói)/CoC/truy xuất nguồn gốc có chứng nhận scope phù hợp; chặn giao hàng khi hồ sơ năng lực thiếu.</li>
 <li><b>Cổng kiểm soát sau NCR/MRB:</b> tái đánh giá năng lực bắt buộc khi NCR liên quan vận hành/đo/duyệt; cập nhật log tái chứng nhận.</li>
@@ -335,7 +335,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
 </div>
 <ul class="tight">
-<li><b>FF1 — STOP:</b> Khi người thực hiện không có chứng nhận Level hợp lệ theo scope máy/công đoạn/đo/duyệt → dừng giao việc ngay, thay người, khóa quyền vận hành.</li>
+<li><b>FF1 — STOP:</b> Khi Performer không có chứng nhận Level hợp lệ theo scope máy/công đoạn/đo/duyệt → dừng giao việc ngay, thay người, khóa quyền vận hành.</li>
 <li><b>FF2 — TẠM GIỮ:</b> Khi hồ sơ đánh giá thiếu minh chứng bắt buộc (WO/Job, bản ghi đo, chữ ký người đánh giá, ngày đánh giá) → giữ trạng thái “chưa đạt”, không phát hành chứng nhận.</li>
 <li><b>FF3 — CHẶN:</b> Khi phát hiện sai Rev hoặc lẫn lộn hồ sơ (mã NV không khớp, file name sai người, WO tham chiếu sai) → khóa bộ hồ sơ, mở NCR hồ sơ, đánh giá lại.</li>
 <li><b>FF4 — STOP:</b> Khi hiệu suất test liên quan đo lường dùng gage OOT/OOC hoặc chưa có chứng chỉ hiệu chuẩn hợp lệ → dừng bài test, tạm đình chỉ quyền đo lường.</li>
@@ -452,7 +452,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Thực hiện hành động khắc phục khi không đạt và lên lịch tái đánh giá</td>
 <td>Supervisor</td>
 <td>Kế hoạch bù (MRR) + lịch tái đánh giá</td>
-<td>Hành động bù không có hạn chót/người phụ trách</td>
+<td>Hành động bù không có hạn chót/Responsible Person</td>
 </tr>
 <tr>
 <td>14</td>
@@ -576,7 +576,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>L4 (tối thiểu để dẫn dắt/duyệt)</th>
 </tr>
 <tr>
-<td>Người vận hành</td>
+<td>Operator</td>
 <td>Chạy máy theo WI; tự kiểm tra CTQ theo bảng kiểm; ghi nhận truy xuất nguồn gốc</td>
 <td>Chặn lỗi tool mài mòn/bù trừ (bù trừ (offset)) trôi / sai lệch; kích hoạt phản ứng 60 giây khi nghi lẫn lộn/sai Rev</td>
 <td>Huấn luyện OJT vận hành an toàn; tham gia chuẩn hóa bảng kiểm và 5S tại cell</td>
@@ -674,7 +674,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi một nhân sự đổi từ máy 3 trục sang 5 trục, mô-đun này kích hoạt theo kích hoạt nào?</li>
 <li>Chọn đáp án đúng: Hiệu suất test áp dụng cho đối tượng nào?
  <ul class="tight">
-<li>A. Chỉ Người vận hành</li>
+<li>A. Chỉ Operator</li>
 <li>B. Tất cả vai trò khi công việc có vận hành/cổng kiểm soát/đo/duyệt thuộc scope chứng nhận</li>
 <li>C. Chỉ bộ phận văn phòng</li>
 </ul>
@@ -715,7 +715,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="no-break">
 <div class="callout"><b>Tình huống 1 — Sai Rev tại cổng kiểm soát Sản xuất</b></div>
 <ul class="tight">
-<li><b>Dữ kiện:</b> WO ghi Drawing Rev C. Tại máy, Người vận hành cầm bản in Rev B. Người vận hành có chứng nhận Level L2 cho máy đúng cell, chứng nhận còn hiệu lực.</li>
+<li><b>Dữ kiện:</b> WO ghi Drawing Rev C. Tại máy, Operator cầm bản in Rev B. Operator có chứng nhận Level L2 cho máy đúng cell, chứng nhận còn hiệu lực.</li>
 <li><b>Quyết định bắt buộc:</b> Chọn TẠM GIỮ/GO/STOP/CHẶN và ghi phản ứng 60 giây.</li>
 <li><b>MRR bắt buộc:</b> Ảnh bản in Rev B; ghi nhận thời điểm; log quyết định cổng kiểm soát; tài liệu đúng Rev được phát hành lại.</li>
 </ul>

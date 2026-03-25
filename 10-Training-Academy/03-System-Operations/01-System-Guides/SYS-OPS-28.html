@@ -95,7 +95,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Thông tin triển khai</strong>
 <ul>
-<li><strong>Đối tượng (bắt buộc):</strong> Người vận hành, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor</li>
+<li><strong>Đối tượng (bắt buộc):</strong> Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor</li>
 <li><strong>Thời lượng:</strong> Lý thuyết 90 phút • Phân xưởng 60 phút • OJT 120 phút (theo ca)</li>
 <li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền tối thiểu theo vai trò; đã học định hướng / đào tạo hội nhập + quy tắc an toàn dữ liệu nội bộ.</li>
 <li><strong>Điểm chặn:</strong> Phát hành Part/Rev • Nhận chứng từ vật liệu/outsource • Đóng kiểm tra • bộ hồ sơ giao hàng (ship gói hồ sơ)</li>
@@ -460,7 +460,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP7 — Hết hiệu lực cách ly / biệt trữ</b></td>
 <td>QA/QMS</td>
-<td>Thu hồi bản hết hiệu lực; kho hết hiệu lực chỉ đọc; PHẢI loại khỏi điểm sử dụng tại phân xưởng.</td>
+<td>Thu hồi bản hết hiệu lực; kho hết hiệu lực chỉ đọc; PHẢI loại khỏi Point-of-use tại phân xưởng.</td>
 <td>Danh mục hết hiệu lực + log thay đổi + thông báo phát hành</td>
 </tr>
 <tr>
@@ -472,7 +472,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody>
 </table>
 <div class="callout">
-<b>Đánh dấu mức “bằng chứng-ready”:</b> hồ sơ đã khai báo (đọc-chỉ / duy nhất) + có index + có key + có người phụ trách. Thiếu 01 yếu tố = FAIL cổng kiểm soát.
+<b>Đánh dấu mức “bằng chứng-ready”:</b> hồ sơ đã khai báo (đọc-chỉ / duy nhất) + có index + có key + có Responsible Person. Thiếu 01 yếu tố = FAIL cổng kiểm soát.
  </div>
 </div>
 <!-- 6) Fail-fast rules -->
@@ -625,7 +625,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>6</td>
-<td>Sản xuất (Người vận hành)</td>
+<td>Sản xuất (Operator)</td>
 <td>Ghi bằng chứng ngoại lệ (thời gian ngừng máy/thiết lập lại) vào Hồ sơ công việc theo đúng mục.</td>
 <td>Ảnh/log + mô tả ngắn</td>
 <td>Ảnh nằm điện thoại; không upload; thiếu JobNum</td>
@@ -780,7 +780,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </td>
 <td>
 <ul>
-<li><b>Người vận hành/Setup:</b> mở đúng SnapshotID, không dùng tệp cục bộ (nội bộ / tại chỗ file).</li>
+<li><b>Operator/Setup:</b> mở đúng SnapshotID, không dùng tệp cục bộ (nội bộ / tại chỗ file).</li>
 <li><b>QC/Kho:</b> upload file vào đúng mục trong Hồ sơ công việc.</li>
 <li><b>Người định giá (SAL-03)/Mua hàng:</b> lưu hợp đồng/cert đúng Zone05 và gắn link Job.</li>
 </ul>
@@ -806,7 +806,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Được quyền <b>công bố / phát hành</b> từ Zone06 sang Chính / Sơ cấp Home theo vai trò</td>
 </tr>
 <tr>
-<td><b>L3</b><div class="muted">Chủ động chặn lỗi (cổng kiểm soát người phụ trách)</div></td>
+<td><b>L3</b><div class="muted">Chủ động chặn lỗi (cổng kiểm soát Responsible Person)</div></td>
 <td>
 <ul>
 <li>Phát hiện và dừng sai Rev/lẫn lộn trong &lt; 60 giây.</li>
@@ -839,7 +839,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Supervisor:</b> duy trì kỷ luật cổng kiểm soát theo ca.</li>
 </ul>
 </td>
-<td>Được quyền <b>người phụ trách</b> template/khu vực và phê duyệt thay đổi cấu trúc</td>
+<td>Được quyền <b>Responsible Person</b> template/khu vực và phê duyệt thay đổi cấu trúc</td>
 </tr>
 </tbody>
 </table>
@@ -886,12 +886,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>1</td>
 <td>
- Khi Người vận hành mở chương trình trên máy thấy tên file có “REV-B” nhưng traveler ghi “REV-C”.
+ Khi Operator mở chương trình trên máy thấy tên file có “REV-B” nhưng traveler ghi “REV-C”.
  File đang nằm trong ổ D: của máy.
  </td>
 <td>STOP + CHẶN tệp cục bộ (nội bộ / tại chỗ file); chỉ chạy từ SnapshotID đúng Rev</td>
 <td>Ảnh màn hình path + log hold + link SnapshotID đúng</td>
-<td>Người vận hành → Supervisor → Lập trình viên (CNC) + QA</td>
+<td>Operator → Supervisor → Lập trình viên (CNC) + QA</td>
 </tr>
 <tr>
 <td>2</td>
@@ -945,7 +945,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Index pack</td>
-<td>Có index liệt kê file + key + người phụ trách + ngày</td>
+<td>Có index liệt kê file + key + Responsible Person + ngày</td>
 <td>Không có index; file rơi</td>
 </tr>
 <tr>
@@ -999,7 +999,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td>Người vận hành</td>
+<td>Operator</td>
 <td>Ảnh/log ngoại lệ theo Job; bằng chứng mở đúng SnapshotID khi được yêu cầu</td>
 <td>Zone03 / Hồ sơ công việc</td>
 </tr>

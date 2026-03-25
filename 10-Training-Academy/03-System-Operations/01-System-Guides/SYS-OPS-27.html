@@ -104,7 +104,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h2" style="margin-top:14px;">TargetRoles &amp; phạm vi áp dụng theo vai trò</h3>
 <table class="form-table">
 <tr><th>Vai trò</th><th>Áp dụng trong công việc</th><th>Tiêu chí đạt khác nhau theo vai trò</th></tr>
-<tr><td><b>Người vận hành</b></td><td>Nộp ảnh/biên bản/ghi chép vận hành vào đúng thư mục và đúng loại nội dung để tự dán nhãn dán nhãn.</td><td>đạt khi tạo 01 hồ sơ “Vận hành ảnh chụp” đúng siêu dữ liệu + tự kiểm tra nhãn đã dán trong 2 phút.</td></tr>
+<tr><td><b>Operator</b></td><td>Nộp ảnh/biên bản/ghi chép vận hành vào đúng thư mục và đúng loại nội dung để tự dán nhãn dán nhãn.</td><td>đạt khi tạo 01 hồ sơ “Vận hành ảnh chụp” đúng siêu dữ liệu + tự kiểm tra nhãn đã dán trong 2 phút.</td></tr>
 <tr><td><b>Setup</b></td><td>Nộp hồ sơ setup, mẫu đầu (đầu tiên chi tiết / sản phẩm) bằng chứng, tool bù trừ (bù trừ (offset)) các log gắn JobNum/PartNum/Phiên bản.</td><td>đạt khi nộp 01 bộ bằng chứng setup có JobNum/PartNum/RevisionNum + không tạo file trùng RecordID.</td></tr>
 <tr><td><b>Lập trình viên (CNC)</b></td><td>Nộp chương trình, bản in set-up sheet, thay đổi liên quan phiên bản; liên kết tới Hồ sơ công việc.</td><td>đạt khi khóa phiên bản: file phát hành mang đúng RevisionNum và không ghi đè bản cũ; tạo hồ sơ T1 khi nằm trong FAI gói hàng.</td></tr>
 <tr><td><b>QC</b></td><td>Nộp FAI/Final/CMM, xác nhận Tier-1 là Hồ sơ, chặn giao hàng khi thiếu.</td><td>đạt khi kiểm tra 01 job: đủ hồ sơ T1 + đúng nhãn + trạng thái Hồ sơ hiển thị; phát hiện sai nhãn và TẠM GIỮ đúng.</td></tr>
@@ -261,7 +261,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h2" style="margin-top:14px;">Tiêu chí đánh giá L1–L4 (hành vi quan sát được)</h3>
 <table class="form-table">
 <tr><th>Level</th><th>Hành vi quan sát</th><th>Điều kiện lên level</th><th>Quyền hạn khi đạt</th></tr>
-<tr><td><b>L1</b></td><td>Nêu đúng Tier-1/Tier-2/Tier-3 và ý nghĩa Hồ sơ.</td><td>Bài kiểm tra nhanh ≥ 80% (Người vận hành/Setup/Kho) hoặc ≥ 85% (các vai trò còn lại).</td><td>Được nộp hồ sơ dưới giám sát.</td></tr>
+<tr><td><b>L1</b></td><td>Nêu đúng Tier-1/Tier-2/Tier-3 và ý nghĩa Hồ sơ.</td><td>Bài kiểm tra nhanh ≥ 80% (Operator/Setup/Kho) hoặc ≥ 85% (các vai trò còn lại).</td><td>Được nộp hồ sơ dưới giám sát.</td></tr>
 <tr><td><b>L2</b></td><td>Nộp 01 hồ sơ đúng loại nội dung + đủ siêu dữ liệu + nhãn tự dán nhãn dán đúng.</td><td>Hoàn thành OJT đầu ra; không sai 5 trường bắt buộc.</td><td>Được nộp hồ sơ độc lập trong phạm vi vai trò.</td></tr>
 <tr><td><b>L3</b></td><td>Phát hiện nhãn sai, khoanh vùng nguyên nhân (loại nội dung, siêu dữ liệu, rule) và kích hoạt TẠM GIỮ.</td><td>Thực hiện 1 tình huống xử lý sai nhãn; ghi MRR đầy đủ.</td><td>Được tham gia phê duyệt giao hàng cổng kiểm soát (QC/QA/Supervisor) hoặc rà soát hồ sơ khu vực (Planner/Lead).</td></tr>
 <tr><td><b>L4</b></td><td>Chạy duyệt hủy theo vòng đời (Disposition) + trích xuất; kiểm soát thay đổi policy và chứng minh đánh giá log.</td><td>PASS hiệu suất test quản trị (QA/QMS) và rà soát thành công 1 batch disposition.</td><td>Được ủy quyền quản trị lưu giữ/disposition/trích xuất theo phân quyền.</td></tr>
@@ -334,7 +334,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="form-table" style="margin-top:10px;">
 <tr><th>Bài test</th><th>Thực hiện</th><th>ĐẠT/KHÔNG ĐẠT tiêu chí đánh giá</th></tr>
 <tr>
-<td><b>PT1 — Vai trò vận hành (Người vận hành/Setup/Kho/Lập trình viên (CNC))</b></td>
+<td><b>PT1 — Vai trò vận hành (Operator/Setup/Kho/Lập trình viên (CNC))</b></td>
 <td>
  Tạo 01 hồ sơ theo vai trò trong đúng thư mục; chọn đúng loại nội dung; điền đủ siêu dữ liệu; xác nhận nhãn đã dán trong 2 phút.
  </td>
@@ -367,7 +367,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" style="margin-top:12px;">Tiêu chí ĐẠT/KHÔNG ĐẠT (rõ ràng, có bằng chứng)</h2>
 <table class="form-table">
 <tr><th>Nhóm vai trò</th><th>Bài kiểm tra nhanh</th><th>OJT</th><th>Hiệu suất test</th><th>Điều kiện FAIL ngay</th></tr>
-<tr><td>Người vận hành, Setup, Kho</td><td>≥ 80%</td><td>Hoàn thành OJT đầu ra</td><td>PASS PT1</td><td>Thiếu 1 siêu dữ liệu bắt buộc hoặc nhãn sai tier</td></tr>
+<tr><td>Operator, Setup, Kho</td><td>≥ 80%</td><td>Hoàn thành OJT đầu ra</td><td>PASS PT1</td><td>Thiếu 1 siêu dữ liệu bắt buộc hoặc nhãn sai tier</td></tr>
 <tr><td>Lập trình viên (CNC), Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03)</td><td>≥ 85%</td><td>Hoàn thành OJT đầu ra theo vai trò</td><td>PASS PT1</td><td>ghi đè file Tier-1 hoặc tạo RecordID trùng</td></tr>
 <tr><td>QC, QA, Supervisor</td><td>≥ 90%</td><td>Hoàn thành OJT đầu ra + 1 tình huống đúng</td><td>PASS PT2 (QC/Supervisor) hoặc PT3 (QA)</td><td>Cho GO tại phê duyệt giao hàng khi thiếu hồ sơ Tier-1</td></tr>
 </table>

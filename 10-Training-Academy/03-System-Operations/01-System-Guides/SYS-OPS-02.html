@@ -91,7 +91,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Đối tượng &amp; điều kiện triển khai</strong>
 <ul>
 <li><b>Áp dụng:</b>
-<span class="role-tag">Người vận hành</span><span class="role-tag">Setup</span><span class="role-tag">Lập trình viên (CNC)</span><span class="role-tag">QC</span><span class="role-tag">QA</span>
+<span class="role-tag">Operator</span><span class="role-tag">Setup</span><span class="role-tag">Lập trình viên (CNC)</span><span class="role-tag">QC</span><span class="role-tag">QA</span>
 <span class="role-tag">Kho</span><span class="role-tag">Mua hàng</span><span class="role-tag">Planner</span><span class="role-tag">Bảo trì</span><span class="role-tag">EHS</span>
 <span class="role-tag">Người định giá (SAL-03)</span><span class="role-tag">Supervisor</span>
 </li>
@@ -146,7 +146,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 </div>
-<h3>Hai thư viện SharePoint bắt buộc (chuẩn hệ thống)</h3>
+<h3>Hai SharePoint Library bắt buộc (chuẩn hệ thống)</h3>
 <div class="table-wrap">
 <table class="tight">
 <thead>
@@ -209,7 +209,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Sản xuất / Setup</td>
-<td>Setup → Người vận hành/QC</td>
+<td>Setup → Operator/QC</td>
 <td>Phát hành Hồ sơ + link CAM chủ / gốc, setup bằng chứng</td>
 <td>Hồ sơ công việc / <b>03_Programs-Setup</b></td>
 <td>Chặn “gia công khi chưa phát hành”</td>
@@ -361,7 +361,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>CP8</b> – Thay đổi Quản lý</td>
 <td>Đổi REV phải có hồ sơ thay đổi; Rev cũ chuyển 00_Archive; không sửa file hồ sơ đã khai báo</td>
 <td>Doc Control + QA/QMS</td>
-<td>Thay đổi hồ sơ + thư mục lưu trữ đúng</td>
+<td>Thay đổi hồ sơ + Archive Folder đúng</td>
 <td>Không truy vết phiên bản</td>
 </tr>Draft</tbody>
 </table>
@@ -382,7 +382,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>FF1 — Sai REV</b></td>
 <td>RevisionNum trên job/traveler ≠ REV của file chủ / gốc (DATA) hoặc ≠ Epicor PartRev</td>
 <td>DỪNG gia công/đo lường; TẠM GIỮ WIP; tạo Hold log; chỉ tiếp tục khi có phát hành đúng</td>
-<td>Người vận hành/Setup/QC</td>
+<td>Operator/Setup/QC</td>
 <td>QCHoldLog + ảnh + link file sai/đúng</td>
 </tr>
 <tr>
@@ -568,7 +568,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L3</b><div class="mini">Nâng cao (xử lý tình huống + hướng dẫn)</div></td>
 <td>Phát hiện sai lệch hệ thống (label không áp, siêu dữ liệu lệch); xử lý theo fail-nhanh; hướng dẫn người mới; thực hiện diễn tập đánh giá 60s.</td>
 <td>01 báo cáo bài học kinh nghiệm hoặc đánh giá nhỏ / thu gọn (≥ 5 mẫu kiểm).</td>
-<td>Được giao vai trò “người kiểm tra” ở cổng kiểm soát nội bộ (tuỳ phòng) và tham gia cải tiến quy tắc.</td>
+<td>Được giao vai trò “Inspector” ở cổng kiểm soát nội bộ (tuỳ phòng) và tham gia cải tiến quy tắc.</td>
 </tr>
 <tr>
 <td><b>L4</b><div class="mini">Chuyên gia/hệ thống (chuẩn hoá &amp; cải tiến)</div></td>
@@ -584,7 +584,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="tight">
 <thead><tr><th>Vai trò</th><th>Phải làm được sau mô-đun</th><th>Điểm kiểm tra trọng yếu</th></tr></thead>
 <tbody>
-<tr><td><b>Người vận hành</b></td><td>Scan QR mở đúng Hồ sơ công việc; nhận biết sai REV; upload ảnh T3 đúng thư mục.</td><td>Thực hành tình huống FF1 trong 60 giây.</td></tr>
+<tr><td><b>Operator</b></td><td>Scan QR mở đúng Hồ sơ công việc; nhận biết sai REV; upload ảnh T3 đúng thư mục.</td><td>Thực hành tình huống FF1 trong 60 giây.</td></tr>
 <tr><td><b>Setup</b></td><td>Đọc Phát hành Hồ sơ; xác nhận link chủ / gốc; lưu setup bằng chứng đúng nơi.</td><td>Không dùng file từ USB/máy tính bàn; chỉ dùng file từ DATA/REV đúng.</td></tr>
 <tr><td><b>Lập trình viên (CNC)</b></td><td>Phát hành CAM chủ / gốc + đặt tên + siêu dữ liệu; tạo Phát hành Hồ sơ (link) cho job.</td><td>Không copy CAM vào Hồ sơ công việc; biết lưu trữ khi đổi Rev.</td></tr>
 <tr><td><b>QC</b></td><td>Upload IR/FAI/CMM đúng thư mục + đặt tên; gắn Kết quả; kích hoạt Hold/NCR khi không đạt.</td><td>siêu dữ liệu bắt buộc Tier-1 và RecordType chuẩn.</td></tr>
@@ -648,7 +648,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Chuẩn bị phê duyệt giao hàng nhưng thiếu CoC</b></td>
 <td>07_Shipping-Đóng gói có ship bảng kiểm &amp; ảnh chụp, thiếu CoC/Cert</td>
 <td>Không phát hành G5; yêu cầu bổ sung; khi trễ cam kết → mở NCR (tuỳ mức)</td>
-<td>ShipRelease log (PacketIncomplete) + hành động người phụ trách</td>
+<td>ShipRelease log (PacketIncomplete) + hành động Responsible Person</td>
 </tr>
 <tr>
 <td>3</td>

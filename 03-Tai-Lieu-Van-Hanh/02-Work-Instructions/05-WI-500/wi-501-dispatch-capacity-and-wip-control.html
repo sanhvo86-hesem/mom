@@ -65,7 +65,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
           <div class="row"><span><b>Code:</b></span><span><a href="">WI-501</a></span></div>
           <div class="row"><span><b>Version:</b></span><span>V0</span></div>
           <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Owner:</b></span><span>Kế hoạch Tổ trưởng / Ops Manager</span></div>
+          <div class="row"><span><b>Owner:</b></span><span>Kế hoạch Team Leader / Ops Manager</span></div>
           <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
         </div>
       </div>
@@ -117,7 +117,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>5-trục / phay-lượt / quay</td><td>Ưu tiên job có mức sẵn sàng đầy đủ, fixture sẵn, chứng minh-out ngắn hơn, và không làm đứt chuỗi QA/mẫu đầu của ca</td><td>Không xếp xen job mới vào giữa hai chứng minh-out đang mở nếu làm tăng rủi ro sự cố nghiêm trọng hoặc trễ nút thắt / điểm nghẽn.</td></tr>
 <tr><td>3-trục / tiện</td><td>Ưu tiên theo due + setup nhóm sản phẩm gần nhau để giảm chuyển đổi (chuyển đổi (changeover)), nhưng không được bỏ qua job P1 đã ready đầy đủ</td><td>Không gom tối ưu setup đến mức để job gần due bị trễ.</td></tr>
 <tr><td>Hoàn thiện / mài bavia / clean</td><td>Ưu tiên theo rủi ro của bề mặt và công đoạn sau cổng kiểm soát; part đã gần ship hoặc chờ QA phải được hút trước</td><td>Không đẩy part chân không/clean chờ lẫn với part thường làm tăng xử lý / vận chuyển rủi ro.</td></tr>
-<tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship phát hành)</td><td>Ưu tiên theo ship cửa sổ / khung thời gian, cổng kiểm soát đã đủ hồ sơ và mức độ ảnh hưởng khách hàng</td><td>Không nhận thêm lot khi gói hồ sơ còn thiếu; phải trả về người phụ trách công đoạn trước để đóng hồ sơ.</td></tr>
+<tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship phát hành)</td><td>Ưu tiên theo ship cửa sổ / khung thời gian, cổng kiểm soát đã đủ hồ sơ và mức độ ảnh hưởng khách hàng</td><td>Không nhận thêm lot khi gói hồ sơ còn thiếu; phải trả về Responsible Person công đoạn trước để đóng hồ sơ.</td></tr>
 </tbody></table></div>
 </div>
 
@@ -134,7 +134,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>6. Kỷ luật hàng đợi và WIP trong ca</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
 <tr><td>hàng đợi trước nút thắt / điểm nghẽn tăng nhanh</td><td>Chỉ giữ lượng đã sắp xếp cần cho ca hiện tại và phần kế tiếp đã được duyệt; phần còn lại giữ ở trạng thái plan hoặc hold có lý do</td><td>Không xả hàng ào ạt để “nhìn như đang bận”</td></tr>
-<tr><td>Job dở do chờ QA hoặc chờ tool</td><td>Gắn trạng thái rõ, người phụ trách rõ, next hành động rõ, ảnh chụp trạng thái vào tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn) log</td><td>Không để lẫn trong hàng đợi thường như job sẵn sàng</td></tr>
+<tr><td>Job dở do chờ QA hoặc chờ tool</td><td>Gắn trạng thái rõ, Responsible Person rõ, next hành động rõ, ảnh chụp trạng thái vào tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn) log</td><td>Không để lẫn trong hàng đợi thường như job sẵn sàng</td></tr>
 <tr><td>Chuyển WIP giữa khu vực</td><td>Phải có tag/nhãn, điểm đến rõ, giao dịch/hồ sơ liên quan và trách nhiệm nhận việc</td><td>Không di chuyển bằng miệng hoặc để bán thành phẩm vô chủ</td></tr>
 <tr><td>Một phần run / tách / chia lot</td><td>Phải xác định lot nào chạy trước, lot nào chờ, điểm kiểm CTQ và điều kiện ghép lại hồ sơ</td><td>Không trộn lot làm mất truy vết hoặc nhầm part-phạm vi / dải</td></tr>
 </tbody></table></div>
@@ -156,14 +156,14 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <ul class="tight">
 <li>Không phát hành thêm công đoạn trước nếu người xử lý đã đầy đủ khe / vị trí hoặc xuất đi lot chưa có lộ trình gia công/ETA rõ.</li>
 <li>Không để kiểm tra cuối / phê duyệt giao hàng trở thành “kho đệm cuối cùng”. Nếu ship-ready hàng đợi vượt 1 ngày năng lực, Planner phải quay ngược công đoạn trước để hãm phát hành.</li>
-<li>Khi ngày đến hạn buộc phải giao hàng một phần, quyết định phải chốt rõ part-phạm vi / dải/qty/tài liệu pack/label logic và người phụ trách xác nhận.</li>
+<li>Khi ngày đến hạn buộc phải giao hàng một phần, quyết định phải chốt rõ part-phạm vi / dải/qty/tài liệu pack/label logic và Responsible Person xác nhận.</li>
 </ul>
 </div>
 
 <div class="section"><h2>9. Họp giữa ca, cuối ca và bàn giao</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thời điểm</th><th>Phải rà soát</th><th>Đầu ra bắt buộc</th></tr></thead><tbody>
 <tr><td>Giữa ca</td><td>P0/P1, machine xuống / ngừng, WIP đỏ, mức sẵn sàng của nửa ca còn lại</td><td>Bảng cập nhật + log hành động + người chịu trách nhiệm</td></tr>
-<tr><td>Cuối ca</td><td>Job đầy đủ, job dở, tuổi tồn phát sinh, bất thường chưa đóng, việc giao ca</td><td>Danh sách bàn giao có người phụ trách, next hành động và thời điểm đến hạn</td></tr>
+<tr><td>Cuối ca</td><td>Job đầy đủ, job dở, tuổi tồn phát sinh, bất thường chưa đóng, việc giao ca</td><td>Danh sách bàn giao có Responsible Person, next hành động và thời điểm đến hạn</td></tr>
 <tr><td>Đầu ca sau</td><td>Nhận lại mở hành động và xác minh trạng thái trên SoR</td><td>Tiếp nhận chính thức; không được bỏ trôi hành động qua ca</td></tr>
 </tbody></table></div>
 </div>
@@ -171,10 +171,10 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>11. Kích hoạt bắt buộc phải mở escalation trong ngày</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Kích hoạt</th><th>Escalation tối thiểu</th><th>Bằng chứng phải có</th></tr></thead><tbody>
-<tr><td>P0 không thể vào máy trong khung đã cam kết</td><td>L1 ngay; lên L2 nếu ảnh hưởng ship trong ngày</td><td>Hot-job note, người phụ trách, job bị lùi và plan khôi phục</td></tr>
+<tr><td>P0 không thể vào máy trong khung đã cam kết</td><td>L1 ngay; lên L2 nếu ảnh hưởng ship trong ngày</td><td>Hot-job note, Responsible Person, job bị lùi và plan khôi phục</td></tr>
 <tr><td>nút thắt / điểm nghẽn cell vượt WIP cap hoặc trong hàng đợi giờ vượt 1 ngày hữu dụng</td><td>L1</td><td>Ảnh chụp trạng thái hàng đợi, nguyên nhân và quyết định clear</td></tr>
 <tr><td>Outsource trả lại trễ nhưng lộ trình gia công sau đó đã khóa khe / vị trí</td><td>L1</td><td>ETA mới, quyết định cân bằng lại/một phần/hold</td></tr>
-<tr><td>Phiên bản thay đổi sau khi đã phát hành điều phối xuất hàng</td><td>L1 hoặc L2 tùy số job bị ảnh hưởng</td><td>Danh sách nghi ngờ WIP, trạng thái hold, người phụ trách Kỹ thuật</td></tr>
+<tr><td>Phiên bản thay đổi sau khi đã phát hành điều phối xuất hàng</td><td>L1 hoặc L2 tùy số job bị ảnh hưởng</td><td>Danh sách nghi ngờ WIP, trạng thái hold, Responsible Person Kỹ thuật</td></tr>
 <tr><td>QA TẠM GIỮ trên P0/P1 hoặc trên nút thắt / điểm nghẽn part-phạm vi / dải</td><td>L1</td><td>Hold code, part-phạm vi / dải, next rà soát time</td></tr>
 </tbody></table></div>
 </div>
@@ -182,7 +182,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>12. Hồ sơ điều độ tối thiểu của một ca</h2>
 <ul class="tight">
 <li>Điều phối list đã phát hành cho từng nhóm máy (machine nhóm sản phẩm) hoặc cell.</li>
-<li>Ảnh chụp trạng thái tuổi tồn WIP (tuổi tồn / tuổi tồn) có người phụ trách và hành động cho mọi item đỏ/đen.</li>
+<li>Ảnh chụp trạng thái tuổi tồn WIP (tuổi tồn / tuổi tồn) có Responsible Person và hành động cho mọi item đỏ/đen.</li>
 <li>log hành động của họp đầu ca/giữa ca nếu có hot-job, machine xuống / ngừng, thiếu hụt hoặc cổng kiểm soát bất thường.</li>
 <li>Quyết định note cho mọi lần phá cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch), sắp xếp lại, tách / chia lot, outsource khẩn hoặc giao hàng một phần.</li>
 <li>Bàn giao list cuối ca với job đang chạy, job đang chờ, bất thường mở và việc giao ca chưa đóng.</li>

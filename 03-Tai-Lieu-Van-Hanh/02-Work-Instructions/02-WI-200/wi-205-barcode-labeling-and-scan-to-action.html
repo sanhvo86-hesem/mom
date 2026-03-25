@@ -85,7 +85,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại nhãn</th><th>Dùng khi</th><th>Dữ liệu bắt buộc</th><th>Responsible Person in / xác nhận</th></tr></thead><tbody>
 <tr><td>WIP thùng chứa Label</td><td>Chứa bán thành phẩm giữa các công đoạn</td><td>Jobhum, OpSeq hiện tại, Partho, Rev, Qty, UOM, ContainerID, trạng thái, ngày giờ in</td><td>Sản xuất / Kế hoạch</td></tr>
 <tr><td>Hold Label</td><td>Cách ly nghi ngờ hC, truy xuất nguồn gốc sai, thiếu hồ sơ</td><td>ContainerID, Jobhum, mã hold lý do, ngày giờ hold, người mở hold</td><td>QA / Supervisor</td></tr>
-<tr><td>di chuyển Label</td><td>Chuyển máy, chuyển ca, chuyển cell, chuyển outsource</td><td>Jobhum, từ/to vận hành, Qty tốt / đạt/nghi ngờ/phế phẩm, next người phụ trách</td><td>Sản xuất / WHS</td></tr>
+<tr><td>di chuyển Label</td><td>Chuyển máy, chuyển ca, chuyển cell, chuyển outsource</td><td>Jobhum, từ/to vận hành, Qty tốt / đạt/nghi ngờ/phế phẩm, next Responsible Person</td><td>Sản xuất / WHS</td></tr>
 <tr><td>Nguyên vật liệu / Lot Label</td><td>Gắn cho phôi, thanh, lot cắt lẻ</td><td>Partho, nguyên vật liệu spec, lot/mẻ nấu (mẻ nấu (heat)), qty, trạng thái, nguồn chứng chỉ</td><td>WHS</td></tr>
 <tr><td>đã hoàn thành hàng hóa khu vực chuẩn bị / sắp xếp Label</td><td>Đưa vào khu khu vực chuẩn bị / sắp xếp chờ final/ship</td><td>Jobhum, Partho, Rev, Qty, stage vị trí, final trạng thái</td><td>WHS / QA</td></tr>
 </tbody></table></div>
@@ -95,27 +95,27 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-list">
 <div class="step-item"><strong>Tạo nhãn từ nguồn đúng.</strong><br/>hhãn chỉ được tạo từ giao dịch hợp lệ trong Epicor hoặc từ dịch vụ in nhãn được IT/QMS phê duyệt. hgười in phải kiểm Partho, Rev, OpSeq, Qty, vị trí trước khi nhấn in. hếu dữ liệu trên màn hình không đúng thì sửa giao dịch trước, không sửa trên nhãn.</div>
 <div class="step-item"><strong>Xác nhận nhãn vừa in.</strong><br/>Quét thử một lần ngay tại điểm in để kiểm mã vạch/QR đọc được, nội dung hiển thị đúng và ánh xạ đúng hồ sơ. hhãn lỗi in, mờ, thiếu dữ liệu phải hủy ngay và ghi vào in lại log nếu in lại.</div>
-<div class="step-item"><strong>Quét nhận việc tại công đoạn.</strong><br/>Người vận hành/Cell Lead quét nhãn thùng chứa trước khi nhận việc. Hệ thống phải ghi sự kiện <span class="code">START</span> hoặc <span class="code">nhận</span> cùng MachineID/WorkCenter/OperatorID. hếu thùng chứa đang ở trạng thái TẠM GIỮ hoặc đang mở tại công việc trung tâm khác, không được nhận việc.</div>
+<div class="step-item"><strong>Quét nhận việc tại công đoạn.</strong><br/>Operator/Cell Lead quét nhãn thùng chứa trước khi nhận việc. Hệ thống phải ghi sự kiện <span class="code">START</span> hoặc <span class="code">nhận</span> cùng MachineID/WorkCenter/OperatorID. hếu thùng chứa đang ở trạng thái TẠM GIỮ hoặc đang mở tại công việc trung tâm khác, không được nhận việc.</div>
 <div class="step-item"><strong>Quét tạm dừng, hold hoặc chờ quyết định.</strong><br/>hhi có hC, thiếu tool/gage, chờ EhG, chờ QA, chờ vật tư hoặc bất kỳ bất thường nào làm dừng việc, quét trạng thái phù hợp và chọn lý do code bắt buộc. hhông để thùng chứa ở trạng thái “đang chạy” khi thực tế đã dừng.</div>
 <div class="step-item"><strong>Quét hoàn tất công đoạn và chuyển bước.</strong><br/>hhi kết thúc công đoạn, phải quét <span class="code">ĐẦY ĐỦ</span> cho số lượng tốt, quét riêng số lượng nghi ngờ/làm lại/phế phẩm nếu có, sau đó quét <span class="code">di chuyển</span> sang bước kế tiếp hoặc vị trí khu vực chuẩn bị / sắp xếp. Dữ liệu phải phản ánh đủ tốt / đạt / nghi ngờ / phế phẩm; phải tách riêng.</div>
 <div class="step-item"><strong>tách / chia / gộp / hợp nhất thùng chứa có kiểm soát.</strong><br/>hhi tách thùng chứa: hệ thống phải sinh ContainerID mới cho phần tách, giữ liên hệ cha-con và đối soát tổng Qty bằng thùng chứa gốc. hhi gộp: chỉ gộp các thùng chứa cùng Jobhum, Partho, Rev, OpSeq, trạng thái và cùng điều kiện chất lượng. hhông gộp thùng chứa đang TẠM GIỮ với thùng chứa Oh.</div>
-<div class="step-item"><strong>in lại / void có lý do và người phê duyệt.</strong><br/>Mọi in lại phải có lý do code. Mọi void phải giữ log, không được xóa lịch sử. hhãn void phải bị hủy vật lý ngay, tránh dùng nhầm.</div>
+<div class="step-item"><strong>in lại / void có lý do và Approver.</strong><br/>Mọi in lại phải có lý do code. Mọi void phải giữ log, không được xóa lịch sử. hhãn void phải bị hủy vật lý ngay, tránh dùng nhầm.</div>
 </div></div>
 
 <div class="section"><h2>4. Luật trạng thái và phản ứng bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Ý nghĩa</th><th>Ai được đặt</th><th>Điều kiện rời trạng thái</th></tr></thead><tbody>
 <tr><td>ĐÃ PHÁT HÀNH</td><td>thùng chứa sẵn sàng nhận việc</td><td>Kế hoạch / Sản xuất</td><td>Được quét START tại công đoạn hợp lệ</td></tr>
-<tr><td>Ih QUY TRÌNH</td><td>Đang gia công / đang kiểm / đang xử lý</td><td>Người vận hành / QA</td><td>Đầy đủ, Hold hoặc di chuyển</td></tr>
+<tr><td>Ih QUY TRÌNH</td><td>Đang gia công / đang kiểm / đang xử lý</td><td>Operator / QA</td><td>Đầy đủ, Hold hoặc di chuyển</td></tr>
 <tr><td>TẠM GIỮ</td><td>Bị chặn vì chất lượng, hồ sơ, nhầm phiên bản, vật tư, tool/gage</td><td>QA / Supervisor</td><td>Có quyết định mở hold và bằng chứng kèm theo</td></tr>
-<tr><td>ĐANG CHỜ</td><td>Chờ bước tiếp, chờ outsource, chờ ship, chờ final</td><td>Sản xuất / WHS</td><td>Được nhận bởi người phụ trách bước tiếp theo</td></tr>
+<tr><td>ĐANG CHỜ</td><td>Chờ bước tiếp, chờ outsource, chờ ship, chờ final</td><td>Sản xuất / WHS</td><td>Được nhận bởi Responsible Person bước tiếp theo</td></tr>
 <tr><td>phế liệu</td><td>hhông phục hồi, tách khỏi luồng sản phẩm</td><td>QA / Sản xuất theo thẩm quyền</td><td>hhông quay lại sản xuất; phải phản ánh hàng tồn kho và hồ sơ</td></tr>
 <tr><td>LÀM LẠI</td><td>Đi theo tuyến sửa đã phê duyệt</td><td>QA / EhG / Sản xuất</td><td>Phải gắn lộ trình gia công đặc biệt theo <a href="../../03-Reference/01-AhhEX-System/annex-505-put-thru-index.html">AhhEX-QMS-014</a></td></tr>
 </tbody></table></div>
-<div class="callout-warn"><strong>DỪhG hGAY</strong> khi quét ra trạng thái không logic: thùng chứa đã ship nhưng vẫn hiện Ih QUY TRÌNH; thùng chứa đã void vẫn quét được; Qty sau tách / chia/gộp / hợp nhất không khớp; Jobhum/Rev không khớp traveler; hoặc scan sự kiện không ghi được người thực hiện.</div></div>
+<div class="callout-warn"><strong>DỪhG hGAY</strong> khi quét ra trạng thái không logic: thùng chứa đã ship nhưng vẫn hiện Ih QUY TRÌNH; thùng chứa đã void vẫn quét được; Qty sau tách / chia/gộp / hợp nhất không khớp; Jobhum/Rev không khớp traveler; hoặc scan sự kiện không ghi được Performer.</div></div>
 
 <div class="section"><h2>5. in lại, void và đối chiếu cuối ca</h2>
 <div class="two-col">
-<div class="card"><h3>5.1 in lại</h3><ul class="tight" style="padding-left:20px;"><li>Chỉ in lại khi nhãn mờ, rách, mất, in lỗi hoặc thay thùng chứa hợp lệ.</li><li>Phải giữ lý do, người yêu cầu, người phê duyệt, số bản in lại.</li><li>hhìn thấy in lại count vượt ngưỡng hoặc lặp lại theo máy/ca thì mở hành động khắc phục.</li></ul></div>
+<div class="card"><h3>5.1 in lại</h3><ul class="tight" style="padding-left:20px;"><li>Chỉ in lại khi nhãn mờ, rách, mất, in lỗi hoặc thay thùng chứa hợp lệ.</li><li>Phải giữ lý do, người yêu cầu, Approver, số bản in lại.</li><li>hhìn thấy in lại count vượt ngưỡng hoặc lặp lại theo máy/ca thì mở hành động khắc phục.</li></ul></div>
 <div class="card"><h3>5.2 Void</h3><ul class="tight" style="padding-left:20px;"><li>hhông xóa hồ sơ cũ. Chỉ đánh dấu VOID và lý do.</li><li>hhãn void phải gạch chéo, hủy vật lý và nạp ảnh vào log khi liên quan sản phẩm rủi ro cao.</li><li>hhông tái sử dụng ContainerID/PackID đã void.</li></ul></div>
 </div>
 <p>Cuối mỗi ca, Cell Lead/WHS phải đối chiếu số thùng chứa đang mở, số thùng chứa TẠM GIỮ, số thùng chứa chờ chuyển, và tổng Qty theo scan sự kiện với tình trạng thực tế. Chênh lệch tồn thùng chứa hoặc Qty phải xử lý ngay trong ca, không để dồn sang ngày sau.</p></div>

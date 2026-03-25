@@ -184,7 +184,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><span class="gate g3">G3</span> Không nhập kho khi thiếu cert/lot; phòng ngừa lẫn lộn</td>
 </tr>
 <tr>
-<td><b>Sản xuất</b> (Người vận hành/Setup/Supervisor)</td>
+<td><b>Sản xuất</b> (Operator/Setup/Supervisor)</td>
 <td>Traveler, phiếu cài đặt, danh sách dao cụ, dụng cụ đo đã hiệu chuẩn</td>
 <td>Kiểm tra hồ sơ trong quá trình + ảnh chụp/label WIP</td>
 <td><span class="gate g2">G2</span> Xác minh Rev + gage trạng thái; <span class="gate g4">G4</span> Đánh giá diễn tập: gọi đúng bằng chứng trong 60s</td>
@@ -263,7 +263,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>CP4 — Hiệu chuẩn cổng kiểm soát</b></td>
-<td>QC + Bảo trì (system), Người vận hành (kiểm tra)</td>
+<td>QC + Bảo trì (system), Operator (kiểm tra)</td>
 <td>Trước đo/FAI/Final</td>
 <td>Danh sách gage OK + “OOT xử lý / vận chuyển” log khi phát hiện</td>
 <td>Gage OOT/không xác định → <b>TẠM GIỮ đo lường</b> + NCR khi ảnh hưởng</td>
@@ -363,8 +363,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3</td><td>Link Part/REV Bản gốc đúng Rev</td><td>Lập trình viên (CNC)</td><td>Link DWG/CAM/SPEC trong DATA (REV đúng)</td><td>Copy file vào job thay vì link → trùng &amp; sai Rev</td></tr>
 <tr><td>4</td><td>Lập &amp; phát hành chương trình</td><td>Lập trình viên (CNC)</td><td>Phát hành hồ sơ trong 03_Programs-Setup</td><td>Chạy NC “đang thử” chưa phát hành</td></tr>
 <tr><td>5</td><td>Setup sheet &amp; đầu tiên-off kiểm tra</td><td>Setup</td><td>Setup sheet ký + đầu tiên-off kết quả</td><td>Setup sheet lưu máy cá nhân; không ký</td></tr>
-<tr><td>6</td><td>Kiểm tra nhãn WIP/lot chống lẫn lộn</td><td>Người vận hành</td><td>Ảnh WIP + nhãn + vị trí lưu 08_Photos</td><td>Để chung khay; nhãn không có JobNum/Rev</td></tr>
-<tr><td>7</td><td>Trong quá trình kiểm tra theo kế hoạch</td><td>QC/Người vận hành</td><td>Hồ sơ đo trong quá trình (khi áp dụng)</td><td>Đo nhưng không ghi; ghi thiếu gage ID</td></tr>
+<tr><td>6</td><td>Kiểm tra nhãn WIP/lot chống lẫn lộn</td><td>Operator</td><td>Ảnh WIP + nhãn + vị trí lưu 08_Photos</td><td>Để chung khay; nhãn không có JobNum/Rev</td></tr>
+<tr><td>7</td><td>Trong quá trình kiểm tra theo kế hoạch</td><td>QC/Operator</td><td>Hồ sơ đo trong quá trình (khi áp dụng)</td><td>Đo nhưng không ghi; ghi thiếu gage ID</td></tr>
 <tr><td>8</td><td>Kiểm tra hiệu chuẩn trước đo quan trọng</td><td>QC</td><td>Gage trạng thái OK / log OOT khi phát hiện</td><td>nhãn dán mờ/hết hạn vẫn dùng</td></tr>
 <tr><td>9</td><td>Final IR/CMM/FAI và khóa hồ sơ</td><td>QC/QA</td><td>PDF đã ký/đã khóa + Tier‑1 label</td><td>File scan thiếu trang; chưa khóa</td></tr>
 <tr><td>10</td><td>NCR/MRB khi có sai lỗi</td><td>QA + Supervisor</td><td>NCR gói hàng + MRB disposition + phê duyệt</td><td>“Sửa xong rồi” nhưng không có quyết định MRB</td></tr>
@@ -480,7 +480,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 <h3>9.3 Áp dụng theo từng vai trò (TargetRoles bắt buộc)</h3>
 <div class="card">
-<div class="pill"><b>Người vận hành</b></div>
+<div class="pill"><b>Operator</b></div>
 <div class="pill"><b>Setup</b></div>
 <div class="pill"><b>Lập trình viên (CNC)</b></div>
 <div class="pill"><b>QC</b></div>
@@ -531,7 +531,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Diễn tập: mở phiếu cài đặt + đầu tiên‑off bằng chứng; 0 lỗi thiếu chữ ký</td>
 </tr>
 <tr>
-<td><b>Người vận hành</b></td>
+<td><b>Operator</b></td>
 <td>Nhãn WIP/lot; ảnh chống lẫn lộn; in‑quy trình kiểm tra theo hướng dẫn</td>
 <td>hold khi WIP không nhãn/lẫn lộn rủi ro</td>
 <td>Thực hiện đúng bước 6–7 bảng kiểm; diễn tập: chứng minh WIP label/ảnh trong ≤60s</td>
@@ -613,7 +613,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>20</td><td>(Vai trò‑cụ thể: Supervisor) Khi diễn tập fail lặp lại, yêu cầu tối thiểu là?</td><td><b>C</b> OJT lại + CAPA hệ thống + cập nhật chuẩn khi cần</td></tr>
 <tr><td>21</td><td>(Tình huống) Đánh giá hỏi “NCR/MRB quyết định gì?” nhưng bạn chỉ có email. Đúng hay sai?</td><td><b>B</b> Sai — cần NCR gói hàng + MRB disposition/phê duyệt trong 05_NCR-Hold-CAPA</td></tr>
 <tr><td>22</td><td>(Tình huống) Bạn không tìm được bằng chứng trong 60 giây. Kết luận diễn tập?</td><td><b>A</b> FAIL (dù thực tế được đã làm)</td></tr>
-<tr><td>23</td><td>(Vai trò‑cụ thể: Người vận hành) Khi WIP không nhãn, hành động đầu tiên?</td><td><b>C</b> TẠM GIỮ khu vực/WIP; dán nhãn; báo Supervisor</td></tr>
+<tr><td>23</td><td>(Vai trò‑cụ thể: Operator) Khi WIP không nhãn, hành động đầu tiên?</td><td><b>C</b> TẠM GIỮ khu vực/WIP; dán nhãn; báo Supervisor</td></tr>
 <tr><td>24</td><td>(Tình huống) File đúng nhưng đặt tên thiếu REV. Rủi ro chính?</td><td><b>D</b> Search fail, nhầm job/rev, lưu giữ sai</td></tr>
 </tbody>
 </table>

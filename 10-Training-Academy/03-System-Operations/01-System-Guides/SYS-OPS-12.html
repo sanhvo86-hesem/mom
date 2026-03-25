@@ -100,7 +100,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><a href="#s4">Chuẩn đầu ra theo vai trò &amp; cấp độ</a></li>
 <li><a href="#s5">Quy trình chi tiết + điểm hỏng + kiểm soát</a></li>
 <li><a href="#s6">Biểu mẫu liên quan &amp; cách dùng</a></li>
-<li><a href="#s7">Bảng kiểm thực hành tại điểm sử dụng (≤ 15 bước)</a></li>
+<li><a href="#s7">Bảng kiểm thực hành tại Point-of-use (≤ 15 bước)</a></li>
 </ol>
 </div>
 <div>
@@ -131,7 +131,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3" style="margin-top:0;">1.1 Mục tiêu</h3>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Chặn sử dụng sai phiên bản tại hiện trường (bản vẽ, phiếu cài đặt, CNC program, kế hoạch kiểm tra (kiểm tra plan), WI/SOP, biểu mẫu).</li>
-<li>Thiết lập đường đi kiểm soát từ “chủ / gốc” đến “điểm sử dụng” và ngược lại (thu hồi/đã lỗi thời).</li>
+<li>Thiết lập đường đi kiểm soát từ “chủ / gốc” đến “Point-of-use” và ngược lại (thu hồi/đã lỗi thời).</li>
 <li>Gắn thay đổi với bằng chứng: phê duyệt, phát hành, đào tạo/OJT, thu hồi, lưu kho.</li>
 <li>Đảm bảo truy xuất nguồn gốc trong ≤ 2 phút khi đánh giá nội bộ/khách hàng.</li>
 </ul>
@@ -156,7 +156,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><span class="k">FRM-QMS-010</span> — Tài liệu phát hành Control (Vấn đề/Thu hồi).</li>
 <li><span class="k">FRM-QMS-022</span> — Tài liệu &amp; Data Thay đổi Thông báo (DCN).</li>
 <li><span class="k">FRM-QMS-012</span> — Tài liệu triển khai Bảng kiểm (triển khai thay đổi).</li>
-<li><span class="k">FRM-QMS-013</span> — Tài liệu Triển khai Bảng kiểm (điểm sử dụng).</li>
+<li><span class="k">FRM-QMS-013</span> — Tài liệu Triển khai Bảng kiểm (Point-of-use).</li>
 <li><span class="k">SOP-QMS-013</span> — Doanh nghiệp File Plan &amp; Phòng ban Lưu hồ sơ Matrix (lưu trữ/lưu giữ).</li>
 <li><span class="k">ANNEX-QMS-011</span> — Epicor Kinetic (Epicor) (Epicor) tích hợp Pack (Nguồn chuẩn giao dịch).</li>
 </ul>
@@ -217,8 +217,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Sản xuất</b></td>
 <td>POU pack: bản vẽ, phiếu cài đặt, program, WI, bảng kiểm.</td>
-<td>Người vận hành + Supervisor</td>
-<td>Điểm sử dụng có Được kiểm soát Copy ID/QR; điểm / tại chỗ-kiểm tra theo bảng kiểm.</td>
+<td>Operator + Supervisor</td>
+<td>Point-of-use có Được kiểm soát Copy ID/QR; điểm / tại chỗ-kiểm tra theo bảng kiểm.</td>
 </tr>
 <tr>
 <td><b>QC/QA</b></td>
@@ -275,12 +275,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Bản kiểm soát</b></td>
-<td>Bản được phát hành có nhận diện (Được kiểm soát Copy ID) và quản lý điểm sử dụng.</td>
+<td>Bản được phát hành có nhận diện (Được kiểm soát Copy ID) và quản lý Point-of-use.</td>
 <td>Bản in gắn CC-#### tại máy; QR trỏ về SSOT.</td>
 </tr>
 <tr>
-<td><b>POU</b> (Điểm sử dụng)</td>
-<td>Điểm sử dụng tại hiện trường; nơi rủi ro dùng nhầm phiên bản cao nhất.</td>
+<td><b>POU</b> (Point-of-use)</td>
+<td>Point-of-use tại hiện trường; nơi rủi ro dùng nhầm phiên bản cao nhất.</td>
 <td>Bảng kẹp tài liệu tại máy, máy tính bảng, màn hình mặt bằng xưởng.</td>
 </tr>
 <tr>
@@ -323,7 +323,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>Người vận hành</b></td>
+<td><b>Operator</b></td>
 <td>POU kiểm soát: nhận gói job, kiểm Rev, dùng QR/Được kiểm soát Copy, báo sai phiên bản trong 60 giây.</td>
 <td>Hoàn thành bảng kiểm POU + vượt bài thực hành nhận diện bản hiện hành tại máy; 0 lỗi dùng nhầm Rev trong test.</td>
 </tr>
@@ -398,7 +398,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3" style="margin-top:0;">L2/L3 — Người phát hành &amp; quản trị thay đổi</h3>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Soạn/duyệt/phát hành; cập nhật Bản gốc List; kiểm soát Vấn đề/Thu hồi.</li>
-<li>Vận hành DCN, triển khai, đào tạo/OJT, đánh giá điểm sử dụng.</li>
+<li>Vận hành DCN, triển khai, đào tạo/OJT, đánh giá Point-of-use.</li>
 </ul>
 </div>
 </div>
@@ -473,7 +473,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="grid-2">
 <div class="card">
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
-<li>Bản in cũ còn treo tại máy; người vận hành lấy nhầm.</li>
+<li>Bản in cũ còn treo tại máy; Operator lấy nhầm.</li>
 <li>QR tại POU trỏ sai đường dẫn; mở ra bản lỗi thời.</li>
 <li>Setup sheet Rev B đi kèm program Rev A.</li>
 <li>kế hoạch kiểm tra (kiểm tra plan) chưa cập nhật theo thay đổi CTQ.</li>
@@ -487,8 +487,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Kho lưu chứng chỉ vật liệu không gắn JobNum/lot; truy xuất nguồn gốc thất bại.</li>
 <li>PO mua hàng dùng tiêu chuẩn vật liệu bản cũ; NCC giao sai spec.</li>
 <li>Hồ sơ đo bị sửa sau khi ký; không có kiểm soát quyền sửa.</li>
-<li>triển khai thay đổi không có bằng chứng đào tạo/OJT; người vận hành chưa nhận biết điểm thay đổi.</li>
-<li>Thu hồi thiếu 1 điểm sử dụng; bản lỗi thời còn tồn tại trong ca đêm.</li>
+<li>triển khai thay đổi không có bằng chứng đào tạo/OJT; Operator chưa nhận biết điểm thay đổi.</li>
+<li>Thu hồi thiếu 1 Point-of-use; bản lỗi thời còn tồn tại trong ca đêm.</li>
 </ul>
 </div>
 </div>
@@ -520,7 +520,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Tài liệu Triển khai Bảng kiểm</b> (<span class="k">FRM-QMS-013</span>)</td>
-<td>Danh mục điểm sử dụng theo khu vực/máy; map tài liệu nào treo ở đâu.</td>
+<td>Danh mục Point-of-use theo khu vực/máy; map tài liệu nào treo ở đâu.</td>
 <td>Sổ đăng ký POU cập nhật</td>
 </tr>
 <tr>
@@ -558,7 +558,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="pill"><span class="stop">CHẶN</span> <span>Khóa phát hành/khóa giao</span></div>
 <ul class="tight" style="margin:10px 0 0 18px; line-height:1.85;">
 <li>Khi hồ sơ tối thiểu (MRR) thiếu: thiếu log Vấn đề/Thu hồi, thiếu bằng chứng đào tạo, thiếu lưu trữ bản cũ.</li>
-<li>Khi QA chưa xác nhận cổng kiểm soát “đúng phiên bản tại điểm sử dụng” trước phê duyệt giao hàng.</li>
+<li>Khi QA chưa xác nhận cổng kiểm soát “đúng phiên bản tại Point-of-use” trước phê duyệt giao hàng.</li>
 </ul>
 </div>
 <h3 class="h3">5.5 Phản ứng trong 60 giây tại hiện trường</h3>
@@ -576,7 +576,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>Người vận hành/Setup</b></td>
+<td><b>Operator/Setup</b></td>
 <td>Dừng máy; giữ nguyên tài liệu đang dùng; chụp ảnh Rev/POU; báo Supervisor và QC.</td>
 <td>Ảnh hiện trường + ghi chú JobNum/OpSeq</td>
 </tr>
@@ -607,7 +607,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3" style="margin-top:0;">6.1 FRM-QMS-001 — Tài liệu Bản gốc List</h3>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
-<li>Vai trò: nguồn sự thật của mã tài liệu, Rev, hiệu lực, người phụ trách, vị trí, trạng thái.</li>
+<li>Vai trò: nguồn sự thật của mã tài liệu, Rev, hiệu lực, Responsible Person, vị trí, trạng thái.</li>
 <li>Khi có tài liệu mới hoặc Rev mới: cập nhật 1 dòng; chuyển bản cũ sang Hết hiệu lực.</li>
 <li>Trường bắt buộc: Mã • Tên • Loại • Rev • Hiệu lực • Responsible Person • Lưu giữ • Vị trí • Trạng thái.</li>
 </ul>
@@ -615,7 +615,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3" style="margin-top:0;">6.2 FRM-QMS-010 — Vấn đề/Thu hồi (phát hành/thu hồi)</h3>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
-<li>Vai trò: ghi sổ Được kiểm soát Copy ID, điểm sử dụng (POU), người nhận, ngày phát hành.</li>
+<li>Vai trò: ghi sổ Được kiểm soát Copy ID, Point-of-use (POU), người nhận, ngày phát hành.</li>
 <li>Khi có Rev thay thế: ghi đủ danh sách thu hồi và trạng thái (hủy/đóng dấu/đã lưu trữ).</li>
 <li>Bằng chứng bắt buộc: ít nhất 1 dòng Vấn đề + 1 dòng Thu hồi cho mỗi POU có bản cứng.</li>
 </ul>
@@ -631,7 +631,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3" style="margin-top:0;">6.4 FRM-QMS-012 — triển khai bảng kiểm</h3>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
-<li>Vai trò: bảng kiểm triển khai thay đổi tại các điểm sử dụng, ca, phòng ban.</li>
+<li>Vai trò: bảng kiểm triển khai thay đổi tại các Point-of-use, ca, phòng ban.</li>
 <li>Bảng kiểm gắn với đào tạo/OJT và thời điểm hiệu lực; xác nhận thu hồi bản cũ.</li>
 <li>triển khai hoàn tất trước khi chạy tiếp khi DCN phân loại S3/S4.</li>
 </ul>
@@ -639,8 +639,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3" style="margin-top:0;">6.5 FRM-QMS-013 — Tài liệu Triển khai Bảng kiểm (POU)</h3>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
-<li>Vai trò: bản đồ điểm sử dụng và danh mục bản kiểm soát theo khu vực/máy/bảng.</li>
-<li>Khi mở điểm sử dụng mới hoặc thay máy: cập nhật sổ đăng ký trước phát hành bản cứng.</li>
+<li>Vai trò: bản đồ Point-of-use và danh mục bản kiểm soát theo khu vực/máy/bảng.</li>
+<li>Khi mở Point-of-use mới hoặc thay máy: cập nhật sổ đăng ký trước phát hành bản cứng.</li>
 </ul>
 </div>
 <div class="card">
@@ -654,8 +654,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 7 -->
 <div class="card" id="s7">
-<h2 class="h2" style="margin-top:0;">7) Bảng kiểm thực hành tại điểm sử dụng (≤ 15 bước)</h2>
-<p class="lead">Bảng kiểm này dùng cho điểm / tại chỗ-kiểm tra tại hiện trường và cho bài thực hành bắt buộc của Người vận hành/Setup/QC.</p>
+<h2 class="h2" style="margin-top:0;">7) Bảng kiểm thực hành tại Point-of-use (≤ 15 bước)</h2>
+<p class="lead">Bảng kiểm này dùng cho điểm / tại chỗ-kiểm tra tại hiện trường và cho bài thực hành bắt buộc của Operator/Setup/QC.</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
@@ -668,9 +668,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Đọc JobNum/OpSeq trên phiếu theo dõi công việc; xác định POU đang kiểm.</td><td>Người vận hành</td><td>Ảnh phiếu theo dõi công việc</td><td>Thiếu OpSeq, nhầm Job.</td></tr>
-<tr><td>2</td><td>Kiểm mã tài liệu và Rev trên bản vẽ/phiếu cài đặt/kế hoạch kiểm tra (kiểm tra plan).</td><td>Người vận hành</td><td>Ảnh Rev trên 3 tài liệu</td><td>Không có Rev/Date.</td></tr>
-<tr><td>3</td><td>Mở QR/đường dẫn SSOT; đối chiếu Rev với bản đang cầm.</td><td>Người vận hành</td><td>Ảnh màn hình SSOT</td><td>QR trỏ sai thư mục.</td></tr>
+<tr><td>1</td><td>Đọc JobNum/OpSeq trên phiếu theo dõi công việc; xác định POU đang kiểm.</td><td>Operator</td><td>Ảnh phiếu theo dõi công việc</td><td>Thiếu OpSeq, nhầm Job.</td></tr>
+<tr><td>2</td><td>Kiểm mã tài liệu và Rev trên bản vẽ/phiếu cài đặt/kế hoạch kiểm tra (kiểm tra plan).</td><td>Operator</td><td>Ảnh Rev trên 3 tài liệu</td><td>Không có Rev/Date.</td></tr>
+<tr><td>3</td><td>Mở QR/đường dẫn SSOT; đối chiếu Rev với bản đang cầm.</td><td>Operator</td><td>Ảnh màn hình SSOT</td><td>QR trỏ sai thư mục.</td></tr>
 <tr><td>4</td><td>Kiểm Được kiểm soát Copy ID trên bản cứng; đối chiếu với sổ Vấn đề.</td><td>Supervisor</td><td>FRM-QMS-010 dòng Vấn đề</td><td>Không có CC-ID.</td></tr>
 <tr><td>5</td><td>Kiểm đồng bộ program Rev ↔ phiếu cài đặt Rev.</td><td>Setup</td><td>Ảnh header program + phiếu cài đặt</td><td>Program chỉnh tại máy.</td></tr>
 <tr><td>6</td><td>Kiểm danh mục thay đổi DCN khi có thông báo thay đổi trong ca.</td><td>Supervisor</td><td>DCN ID + mục C list</td><td>Thiếu DCN khi đổi CTQ.</td></tr>
@@ -706,24 +706,24 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Tạo DCN; mô tả thay đổi và tác động; yêu cầu rà soát ENG + QA.</li>
 <li>Phát hành program Rev mới qua SSOT; thay thế bản cũ tại POU; ghi Vấn đề/Thu hồi.</li>
 </ul>
-<div class="note"><b>Đầu ra bắt buộc:</b> DCN + gói phát hành chương trình (Rev, người phê duyệt, thời điểm hiệu lực).</div>
+<div class="note"><b>Đầu ra bắt buộc:</b> DCN + gói phát hành chương trình (Rev, Approver, thời điểm hiệu lực).</div>
 </div>
 <div class="card">
 <h3 class="h3" style="margin-top:0;">Tình huống 3 — QR trỏ sai tài liệu</h3>
-<p class="mini">Bối cảnh: QR tại máy M12 mở ra thư mục chứa Rev cũ; người vận hành phát hiện trước khi chạy.</p>
+<p class="mini">Bối cảnh: QR tại máy M12 mở ra thư mục chứa Rev cũ; Operator phát hiện trước khi chạy.</p>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Kích hoạt STOP; chụp ảnh QR và màn hình Rev; báo Supervisor &amp; QA/QMS.</li>
-<li>QA/QMS sửa đường dẫn về SSOT; cập nhật FRM-QMS-013 cho điểm sử dụng.</li>
+<li>QA/QMS sửa đường dẫn về SSOT; cập nhật FRM-QMS-013 cho Point-of-use.</li>
 <li>điểm / tại chỗ-kiểm tra 100% QR trong khu vực trong cùng ca; ghi biên bản.</li>
 </ul>
 <div class="note"><b>Đầu ra bắt buộc:</b> biên bản điểm / tại chỗ-kiểm tra + log sửa QR + xác nhận POU đạt.</div>
 </div>
 <div class="card">
-<h3 class="h3" style="margin-top:0;">Tình huống 4 — Thu hồi thiếu 1 điểm sử dụng</h3>
+<h3 class="h3" style="margin-top:0;">Tình huống 4 — Thu hồi thiếu 1 Point-of-use</h3>
 <p class="mini">Bối cảnh: Rev mới đã phát hành; ca đêm vẫn giữ bản in Rev cũ tại bảng WIP.</p>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Supervisor ca đêm kích hoạt TẠM GIỮ; thu hồi ngay; ghi bổ sung vào FRM-QMS-010.</li>
-<li>QA/QMS cập nhật Tài liệu Triển khai Bảng kiểm; bổ sung điểm sử dụng vào danh mục.</li>
+<li>QA/QMS cập nhật Tài liệu Triển khai Bảng kiểm; bổ sung Point-of-use vào danh mục.</li>
 <li>Đóng hành động: đánh giá lại toàn bộ khu vực và ký xác nhận.</li>
 </ul>
 <div class="note"><b>Đầu ra bắt buộc:</b> 1 dòng Thu hồi bổ sung + bản đồ POU cập nhật.</div>
@@ -733,7 +733,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 9 -->
 <div class="card" id="s9">
 <h2 class="h2" style="margin-top:0;">9) OJT theo TWI Job Sự cố hỏng máy (đào tạo tại chỗ)</h2>
-<p class="lead">OJT tập trung 1 kỹ năng: “xác nhận đúng phiên bản tại điểm sử dụng và xử lý sai phiên bản trong 60 giây”.</p>
+<p class="lead">OJT tập trung 1 kỹ năng: “xác nhận đúng phiên bản tại Point-of-use và xử lý sai phiên bản trong 60 giây”.</p>
 <div class="grid-2">
 <div class="card">
 <h3 class="h3" style="margin-top:0;">9.1 Job Sự cố hỏng máy (TWI)</h3>
@@ -816,7 +816,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>12</td><td>Ai chịu trách nhiệm khoanh vùng WIP ngay khi phát hiện sai Rev?</td><td>D. Supervisor</td></tr>
 <tr><td>13</td><td>Kiểm soát nào chặn sửa ngoài ý muốn đối với hồ sơ?</td><td>A. Quyền truy cập + log phiên bản</td></tr>
 <tr><td>14</td><td>Khi bộ hồ sơ công việc đã phát hành, thay đổi giữa ca được triển khai qua chuỗi nào?</td><td>B. DCN → triển khai → Vấn đề/Thu hồi</td></tr>
-<tr><td>15</td><td>Biểu mẫu xác nhận triển khai thay đổi tại nhiều điểm sử dụng là mã nào?</td><td>C. FRM-QMS-012</td></tr>
+<tr><td>15</td><td>Biểu mẫu xác nhận triển khai thay đổi tại nhiều Point-of-use là mã nào?</td><td>C. FRM-QMS-012</td></tr>
 <tr><td>16</td><td>“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” áp dụng cho điều gì?</td><td>D. Mọi cổng kiểm soát tự kiểm</td></tr>
 <tr><td>17</td><td>Khi program chỉnh tại máy không cập nhật chủ / gốc, rủi ro chính là gì?</td><td>A. Mất truy xuất nguồn gốc Rev</td></tr>
 <tr><td>18</td><td>Tài liệu bên ngoài cần kiểm soát gồm nhóm nào?</td><td>B. Bản vẽ/spec/standard khách</td></tr>
@@ -852,7 +852,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th style="width:240px;">Hạng mục</th><th style="width:120px;">Điều kiện</th><th>Ghi chú</th></tr></thead>
 <tbody>
 <tr><td>Bài kiểm tra nhanh 20 câu</td><td>≥ 17/20</td><td>Áp dụng mọi vai trò.</td></tr>
-<tr><td>Hiệu suất Test</td><td>Đạt/không đạt</td><td>Người vận hành/Setup/QC/Supervisor/QA/QMS bắt buộc.</td></tr>
+<tr><td>Hiệu suất Test</td><td>Đạt/không đạt</td><td>Operator/Setup/QC/Supervisor/QA/QMS bắt buộc.</td></tr>
 <tr><td>OJT</td><td>Pass</td><td>Thiếu hồ sơ OJT đồng nghĩa không đạt.</td></tr>
 </tbody>
 </table>
@@ -1045,7 +1045,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td>Bản lỗi thời xuất hiện tại POU</td><td>G5 Thu hồi bắt buộc + điểm / tại chỗ-kiểm tra G6 sau triển khai</td></tr>
 <tr><td>2</td><td>Thiếu bằng chứng thu hồi bản cũ</td><td>FRM-QMS-010 bảng Thu hồi + ảnh hủy/đóng dấu</td></tr>
 <tr><td>3</td><td>Bản gốc List không cập nhật hoặc thiếu vị trí</td><td>G1 buộc có dòng FRM-QMS-001 trước phát hành</td></tr>
-<tr><td>4</td><td>Tài liệu không có mã/Rev/hiệu lực/người phụ trách</td><td>Chặn phát hành tại G2; không gắn vào bộ hồ sơ công việc khi thiếu siêu dữ liệu</td></tr>
+<tr><td>4</td><td>Tài liệu không có mã/Rev/hiệu lực/Responsible Person</td><td>Chặn phát hành tại G2; không gắn vào bộ hồ sơ công việc khi thiếu siêu dữ liệu</td></tr>
 <tr><td>5</td><td>Thay đổi ảnh hưởng CTQ nhưng không có kiểm soát thay đổi</td><td>DCN bắt buộc + triển khai bắt buộc; fail-nhanh CHẶN khi thiếu</td></tr>
 <tr><td>6</td><td>Program/Setup/kế hoạch kiểm tra (kiểm tra plan) không đồng bộ Rev</td><td>Bảng kiểm POU bước 5 + STOP ngay khi không khớp</td></tr>
 <tr><td>7</td><td>Hồ sơ đo bị sửa đổi ngoài kiểm soát</td><td>Quyền truy cập + log phiên bản; lưu SSOT theo lưu giữ tier</td></tr>

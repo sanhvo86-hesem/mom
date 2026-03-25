@@ -65,7 +65,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
           <div class="row"><span><b>Code:</b></span><span>ANNEX-501</span></div>
           <div class="row"><span><b>Version:</b></span><span>V0</span></div>
           <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Owner:</b></span><span>Kế hoạch Tổ trưởng / Ops Manager</span></div>
+          <div class="row"><span><b>Owner:</b></span><span>Kế hoạch Team Leader / Ops Manager</span></div>
           <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
         </div>
       </div>
@@ -80,17 +80,17 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>2. Hot-job bậc thang năng lực và rule ưu tiên</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Class</th><th>Khi được gán</th><th>Ai có quyền gán</th><th>Quy tắc bắt buộc</th></tr></thead><tbody>
-<tr><td>P0</td><td>Đã trễ cam kết hoặc sẽ vỡ giao hàng trong ≤ 24 giờ; hoặc khách hàng / nhà máy sự kiện buộc phải cứu ngay</td><td>Ops Manager hoặc cao hơn theo ma trận thẩm quyền</td><td>Được phép phá cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch); phải chỉ rõ job bị lùi, tác động OTD, người phụ trách và thời điểm khôi phục / thu hồi.</td></tr>
+<tr><td>P0</td><td>Đã trễ cam kết hoặc sẽ vỡ giao hàng trong ≤ 24 giờ; hoặc khách hàng / nhà máy sự kiện buộc phải cứu ngay</td><td>Ops Manager hoặc cao hơn theo ma trận thẩm quyền</td><td>Được phép phá cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch); phải chỉ rõ job bị lùi, tác động OTD, Responsible Person và thời điểm khôi phục / thu hồi.</td></tr>
 <tr><td>P1</td><td>Sẽ đến hạn trong 24–48 giờ; CTQ/final phát hành đang chờ; part cho dòng / chuyền-stop nội bộ hoặc job rủi ro cao</td><td>Planner Lead / Ops Manager</td><td>Được đẩy lên đầu ca hoặc giữa ca nhưng phải ghi lý do và cập nhật điều phối xuất hàng bảng.</td></tr>
 <tr><td>P2</td><td>Job chuẩn theo kế hoạch</td><td>Planner/Nhân viên điều phối theo lịch đã duyệt</td><td>Phải tuân thủ cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch). Không được hạ xuống P3 vì tiện đổi máy.</td></tr>
-<tr><td>P3</td><td>Chờ vật tư, chờ ENG, chờ QA, chờ outsource, chờ máy/fixture/tool</td><td>Planner/Nhân viên điều phối khi có hold code hợp lệ</td><td>Không được phát vào hàng đợi chạy. Phải có hold code, người phụ trách, next hành động, ETA hoặc quyết định rà soát.</td></tr>
+<tr><td>P3</td><td>Chờ vật tư, chờ ENG, chờ QA, chờ outsource, chờ máy/fixture/tool</td><td>Planner/Nhân viên điều phối khi có hold code hợp lệ</td><td>Không được phát vào hàng đợi chạy. Phải có hold code, Responsible Person, next hành động, ETA hoặc quyết định rà soát.</td></tr>
 </tbody></table></div>
 <p>Một trung tâm gia công tại cùng một thời điểm chỉ nên có <b>01 P0 chủ động</b>. Nếu phát sinh P0 thứ hai mà không đóng P0 đang mở, Ops Manager phải ra quyết định bằng văn bản: chia nguồn lực, đổi nhóm máy (machine nhóm sản phẩm), tách / chia lot, outsource hoặc đàm phán lại due. Không được để 3–4 P0 treo đồng thời rồi yêu cầu phân xưởng “tự sắp xếp”.</p>
 </div>
 
 <div class="section"><h2>3. cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và rule đổi lịch</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cửa sổ</th><th>Ý nghĩa</th><th>Khi nào được phá</th><th>Bằng chứng bắt buộc</th></tr></thead><tbody>
-<tr><td>Đóng băng của ca</td><td>Danh sách job đầu ca đã phát hành, dùng để giữ nhịp vận hành trong ca hiện tại</td><td>Chỉ P0 hoặc sự cố L1/L2: machine xuống / ngừng, nguyên vật liệu thiếu / bỏ sót, phiên bản thay đổi, QA TẠM GIỮ, an toàn sự kiện</td><td>Thay đổi note + người phụ trách + job bị lùi + thời điểm cập nhật Epicor/M365</td></tr>
+<tr><td>Đóng băng của ca</td><td>Danh sách job đầu ca đã phát hành, dùng để giữ nhịp vận hành trong ca hiện tại</td><td>Chỉ P0 hoặc sự cố L1/L2: machine xuống / ngừng, nguyên vật liệu thiếu / bỏ sót, phiên bản thay đổi, QA TẠM GIỮ, an toàn sự kiện</td><td>Thay đổi note + Responsible Person + job bị lùi + thời điểm cập nhật Epicor/M365</td></tr>
 <tr><td>Đóng băng ngày</td><td>Kế hoạch ngày cho trung tâm gia công/cell</td><td>P0, nút thắt / điểm nghẽn khôi phục / thu hồi, outsource quá hạn, khách hàng đặc biệt phê duyệt</td><td>Quyết định hồ sơ trong tier cuộc họp / log hành động</td></tr>
 <tr><td>Đóng băng tuần</td><td>Kế hoạch chuẩn để bảo vệ thời gian dẫn (lead time) và vật tư/nguồn lực đã khóa</td><td>Chỉ L2 hoặc quyết định nhà máy-level</td><td>Biên bản công suất rà soát hoặc quyết định điều hành</td></tr>
 </tbody></table></div>
@@ -121,7 +121,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>nhóm / phân loại tuổi tồn</th><th>Định nghĩa</th><th>Responsible Person phản ứng</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td>0–1 shift</td><td>Bình thường</td><td>Cell Lead</td><td>Theo dõi theo điều phối xuất hàng; chưa cần escalation nếu job vẫn trong nhịp cam kết.</td></tr>
 <tr><td>&gt;1 đến 3 shift</td><td>Cảnh báo</td><td>Planner + Supervisor</td><td>Phải chỉ ra lý do: thiếu nguyên vật liệu, thiếu setup, chờ QA, chờ machine, chờ outsource, chờ quyết định.</td></tr>
-<tr><td>&gt;3 shift đến 7 ngày</td><td>Đỏ</td><td>Ops Manager</td><td>Báo cáo vượt cấp L1; phải có plan clear kèm due/time và người phụ trách.</td></tr>
+<tr><td>&gt;3 shift đến 7 ngày</td><td>Đỏ</td><td>Ops Manager</td><td>Báo cáo vượt cấp L1; phải có plan clear kèm due/time và Responsible Person.</td></tr>
 <tr><td>&gt;7 ngày hoặc có nguy cơ vỡ giao</td><td>Đen</td><td>Nhà máy Trưởng / Đầu / GM theo thẩm quyền</td><td>Báo cáo vượt cấp L2; phải quyết định chuyển tải, outsource, tách / chia lot, giao hàng một phần hoặc re-plan cam kết.</td></tr>
 </tbody></table></div>
 <p>Tuổi tồn được tính theo <b>lần giao dịch gần nhất trong SoR</b> hoặc theo mốc phát hành/di chuyển có ý nghĩa sản xuất. Không được xóa tuổi tồn bằng di chuyển giả, time mục nhập giả hoặc thay đổi thủ công ngày ảnh chụp trạng thái.</p>
@@ -144,9 +144,9 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường dữ liệu tối thiểu</th><th>Phải có</th></tr></thead><tbody>
 <tr><td>Thông tin định danh</td><td>JobNum, Part, Rev, OpSeq, trung tâm gia công/Machine nhóm sản phẩm, Qty mở, Ngày đến hạn, Ưu tiên class</td></tr>
 <tr><td>Mức sẵn sàng</td><td>Khởi động/Kế hoạch phát hành trạng thái, hold code, nguyên vật liệu ready, setup ready, QA ready, outsource trạng thái</td></tr>
-<tr><td>Điều độ</td><td>Điều phối trình tự, đã lên kế hoạch start, đã lên kế hoạch hoàn thành, người phụ trách cell, next cổng kiểm soát</td></tr>
+<tr><td>Điều độ</td><td>Điều phối trình tự, đã lên kế hoạch start, đã lên kế hoạch hoàn thành, Responsible Person cell, next cổng kiểm soát</td></tr>
 <tr><td>Rủi ro</td><td>Tuổi tồn nhóm / phân loại, nút thắt / điểm nghẽn đánh dấu / cờ, đặc biệt xử lý / vận chuyển đánh dấu / cờ, khách hàng lớp phủ đánh dấu / cờ, hot-job note</td></tr>
-<tr><td>Hành động</td><td>Next hành động, người phụ trách, due time, escalation level, bằng chứng link khi đóng</td></tr>
+<tr><td>Hành động</td><td>Next hành động, Responsible Person, due time, escalation level, bằng chứng link khi đóng</td></tr>
 </tbody></table></div>
 <p>Điều phối bảng phải được rà soát tối thiểu ở 3 thời điểm: <b>đầu ca</b>, <b>giữa ca</b> và <b>cuối ca/chuẩn bị bàn giao</b>. Nếu ngày đó có P0, machine xuống / ngừng lớn, phiên bản thay đổi hoặc outsource quá hạn, phải mở thêm rà soát bất thường trong ngày thay vì chờ đến cuối ca.</p>
 </div>
@@ -171,9 +171,9 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>12. Hồ sơ điều độ bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Responsible Person</th></tr></thead><tbody>
 <tr><td>Điều phối list theo ca/ngày</td><td>Khóa thứ tự chạy và cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) cho từng trung tâm gia công</td><td>Planner / Nhân viên điều phối</td></tr>
-<tr><td>WIP tuổi tồn ảnh chụp trạng thái</td><td>Nhìn rõ job đỏ/đen, người phụ trách và hành động</td><td>Planner</td></tr>
+<tr><td>WIP tuổi tồn ảnh chụp trạng thái</td><td>Nhìn rõ job đỏ/đen, Responsible Person và hành động</td><td>Planner</td></tr>
 <tr><td>Escalation / hot-job log</td><td>Chứng minh ai duyệt, job nào bị ảnh hưởng và plan khôi phục / thu hồi</td><td>Ops Manager</td></tr>
-<tr><td>Công suất rà soát biên bản họp</td><td>Ghi quyết định về OT, outsource, cân bằng lại, re-plan</td><td>Ops Manager + Kế hoạch Tổ trưởng</td></tr>
+<tr><td>Công suất rà soát biên bản họp</td><td>Ghi quyết định về OT, outsource, cân bằng lại, re-plan</td><td>Ops Manager + Kế hoạch Team Leader</td></tr>
 <tr><td>thiếu hụt / ràng buộc log</td><td>Theo dõi nguyên vật liệu, tool, machine, QA cổng kiểm soát và ETA khôi phục</td><td>Planner + Supervisor</td></tr>
 </tbody></table></div>
 </div>

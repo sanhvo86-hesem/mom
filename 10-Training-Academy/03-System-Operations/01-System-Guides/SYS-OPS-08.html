@@ -98,7 +98,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>TargetRoles (áp dụng bắt buộc)</strong>
 <div style="margin-top:8px">
-<span class="tag">Người vận hành</span><span class="tag">Setup</span><span class="tag">Lập trình viên (CNC)</span><span class="tag">QC</span><span class="tag">QA</span>
+<span class="tag">Operator</span><span class="tag">Setup</span><span class="tag">Lập trình viên (CNC)</span><span class="tag">QC</span><span class="tag">QA</span>
 <span class="tag">Kho</span><span class="tag">Mua hàng</span><span class="tag">Planner</span><span class="tag">Bảo trì</span><span class="tag">EHS</span>
 <span class="tag">Người định giá (SAL-03)</span><span class="tag">Supervisor</span>
 </div>
@@ -175,7 +175,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Kế hoạch</td>
 <td>JobIndex, DispatchPlan M365/SharePoint → HESEM-QMS-SSOT</td>
 <td>Planner/Điều phối Trung tâm điều hành</td>
-<td>WIP quá hạn + thiếu hành động người phụ trách → TẠM GIỮ</td>
+<td>WIP quá hạn + thiếu hành động Responsible Person → TẠM GIỮ</td>
 </tr>
 <tr>
 <td>Kỹ thuật</td>
@@ -312,7 +312,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>CP5 — Làm mới quản trị (tài khoản + lịch ca + cửa sổ)</td>
 <td>IT</td>
-<td>Làm mới lịch trình ảnh chụp màn hình + làm mới người phụ trách tài khoản</td>
+<td>Làm mới lịch trình ảnh chụp màn hình + làm mới Responsible Person tài khoản</td>
 <td>Làm mới fail &gt; 1 lần/ca không có xử lý → TẠM GIỮ quyết định dựa bảng điều khiển</td>
 </tr>
 <tr>
@@ -360,7 +360,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>CHẶN (phải dừng triển khai/không công nhận cổng kiểm soát)</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Khi công bố / phát hành PROD không có BI_ReleaseNotes + chữ ký duyệt.</li>
-<li>Khi dùng tài khoản cá nhân làm làm mới người phụ trách.</li>
+<li>Khi dùng tài khoản cá nhân làm làm mới Responsible Person.</li>
 <li>Khi RLS không đạt kiểm thử 3 vai trò.</li>
 </ul>
 </div>
@@ -436,7 +436,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>11</td><td>Dựng trang theo spec (Điều hành/Planner/Chất lượng/Thiết bị/Kho/Lam mức sẵn sàng)</td><td>IT/BI + Chủ quá trình</td><td>Ảnh từng page + diễn tập-xuyên suốt</td><td>Thiếu bảng chi tiết</td></tr>
 <tr><td>12</td><td>Chạy UAT theo 3 vai trò (QA/WHS/Planner) và ký kết quả</td><td>Supervisor + QA</td><td>Biên bản UAT + lỗi đã đóng</td><td>UAT chỉ xem KPI, không mở bằng chứng</td></tr>
 <tr><td>13</td><td>Công bố DEV → UAT → PROD theo bảng kiểm phát hành</td><td>IT + QA</td><td>BI_ReleaseNotes + chữ ký duyệt</td><td>Công bố thẳng PROD</td></tr>
-<tr><td>14</td><td>Cấu hình làm mới lịch trình theo cửa sổ ca + tài khoản vận hành</td><td>IT</td><td>Ảnh lịch trình + người phụ trách tài khoản</td><td>Dùng tài khoản cá nhân</td></tr>
+<tr><td>14</td><td>Cấu hình làm mới lịch trình theo cửa sổ ca + tài khoản vận hành</td><td>IT</td><td>Ảnh lịch trình + Responsible Person tài khoản</td><td>Dùng tài khoản cá nhân</td></tr>
 <tr><td>15</td><td>Kích hoạt giám sát + alert và test 01 lần trong ca</td><td>IT + Supervisor</td><td>BI_IncidentLog test alert</td><td>Không test alert</td></tr>
 </tbody>
 </table>
@@ -462,7 +462,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Chuẩn hóa nguồn</td>
-<td>Khóa list nguồn và sơ đồ cấu trúc; xác định người phụ trách từng list</td>
+<td>Khóa list nguồn và sơ đồ cấu trúc; xác định Responsible Person từng list</td>
 <td>Tránh sai dữ liệu và tránh đổi sơ đồ cấu trúc làm gãy mô hình</td>
 </tr>
 <tr>
@@ -504,7 +504,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>01 biên bản UAT có diễn tập-xuyên suốt tới EvidenceFolderUrl cho ít nhất 05 job.</li>
 <li>01 BI_ReleaseNotes cho bản phát hành (có hoàn tác / quay lại).</li>
 <li>01 hồ sơ test alert (làm mới fail giả lập hoặc bất thường giả lập) trong BI_IncidentLog.</li>
-<li>Với nhóm người dùng (Người vận hành/Setup/QC/Kho/...): 01 quyết định TẠM GIỮ/GO dựa bảng điều khiển kèm hồ sơ MRR.</li>
+<li>Với nhóm người dùng (Operator/Setup/QC/Kho/...): 01 quyết định TẠM GIỮ/GO dựa bảng điều khiển kèm hồ sơ MRR.</li>
 </ul>
 <h3>9.3 Tiêu chí đánh giá L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn khi đạt)</h3>
 <div class="table-wrap">
@@ -532,7 +532,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L3</b></td>
-<td>Với vai trò người phụ trách: sửa truy vấn/mô hình/DAX trong DEV và chứng minh UAT pass; với vai trò vận hành: ra quyết định TẠM GIỮ/GO kèm MRR đầy đủ.</td>
+<td>Với vai trò Responsible Person: sửa truy vấn/mô hình/DAX trong DEV và chứng minh UAT pass; với vai trò vận hành: ra quyết định TẠM GIỮ/GO kèm MRR đầy đủ.</td>
 <td>Hiệu suất test pass; không vi phạm STOP/CHẶN.</td>
 <td>Được tham gia UAT và ký xác nhận dữ liệu theo vai trò.</td>
 </tr>
@@ -540,7 +540,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L4</b></td>
 <td>Thiết lập quản trị hoàn chỉnh: phát hành ghi chú, hoàn tác / quay lại, giám sát/alert; đào tạo lại người khác và đánh giá diễn tập-xuống / ngừng pass.</td>
 <td>01 lần phát hành PROD không phát sinh sự cố nghiêm trọng trong 30 ngày SSOT/EHS-Sự cố-Log (SharePoint List).</td>
-<td>Được làm người phê duyệt thay đổi KPI/làm mới theo ma trận quyền.</td>
+<td>Được làm Approver thay đổi KPI/làm mới theo ma trận quyền.</td>
 </tr>
 </tbody>
 </table>
@@ -551,7 +551,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>IT/BI:</b> bắt buộc đạt L3 để công bố / phát hành DEV/UAT; bắt buộc đạt L4 để công bố / phát hành PROD.</li>
 <li><b>QA/QMS + Supervisor:</b> bắt buộc đạt L3 để ký UAT và quyết định cổng kiểm soát; đạt L4 để phê duyệt KPI/làm mới.</li>
 <li><b>Planner/Kho/QC/Bảo trì:</b> bắt buộc đạt L2 để tạo hồ sơ sự cố theo ca; đạt L3 để ký dữ liệu trang chuyên môn.</li>
-<li><b>Người vận hành/Setup/Lập trình viên (CNC)/EHS/Người định giá (SAL-03)/Mua hàng:</b> bắt buộc đạt L1 để dùng bảng điều khiển; đạt L2 khi tạo hồ sơ bất thường đúng.</li>
+<li><b>Operator/Setup/Lập trình viên (CNC)/EHS/Người định giá (SAL-03)/Mua hàng:</b> bắt buộc đạt L1 để dùng bảng điều khiển; đạt L2 khi tạo hồ sơ bất thường đúng.</li>
 </ul>
 </div>
 </div>
@@ -663,7 +663,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Không có MRR cho bất kỳ quyết định cổng kiểm soát nào.</li>
 <li>Công bố PROD không có phát hành note/duyệt.</li>
-<li>Dùng tài khoản cá nhân làm làm mới người phụ trách.</li>
+<li>Dùng tài khoản cá nhân làm làm mới Responsible Person.</li>
 <li>RLS fail hoặc rò dữ liệu khách hàng.</li>
 </ul>
 </div>
@@ -673,8 +673,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>12) MRR tối thiểu</h2>
 <h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
-<li><b>BI_ReleaseNotes</b> (SharePoint list): version, người soạn, ngày, mô tả thay đổi, rủi ro, hoàn tác / quay lại, người duyệt.</li>
-<li><b>BI_IncidentLog</b> (SharePoint list) M365/SharePoint → HESEM-QMS-SSOT: làm mới fail, bất thường, hành động, người phụ trách, thời điểm đóng.</li>
+<li><b>BI_ReleaseNotes</b> (SharePoint list): version, Author, ngày, mô tả thay đổi, rủi ro, hoàn tác / quay lại, người duyệt.</li>
+<li><b>BI_IncidentLog</b> (SharePoint list) M365/SharePoint → HESEM-QMS-SSOT: làm mới fail, bất thường, hành động, Responsible Person, thời điểm đóng.</li>
 <li><b>UAT_Minutes</b> (hồ sơ): kết quả test theo vai trò, diễn tập-xuyên suốt bằng chứng, danh sách lỗi và trạng thái đóng.</li>
 <li><b>Refresh_Schedule_Snapshot</b>: ảnh cấu hình làm mới + cửa sổ ca.</li>
 <li><b>RLS_Test_Record</b>: kết quả test 3 vai trò + tài khoản test.</li>
@@ -708,7 +708,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Mô hình không nhất quán với sơ đồ cấu trúc list</b> → CP1 khóa sơ đồ cấu trúc + CP2 kiểm truy vấn.</li>
 <li><b>Bảng điều khiển dẫn dắt quyết định giao hàng khi thiếu chứng từ</b> → khóa không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate); STOP khi thiếu link bằng chứng.</li>
 <li><b>Không có kế hoạch hoàn tác / quay lại</b> → bắt buộc hoàn tác / quay lại trong phát hành ghi chú + test.</li>
-<li><b>Không có owner dữ liệu</b> → RACI ngắn và người phụ trách list trong hồ sơ.</li>
+<li><b>Không có owner dữ liệu</b> → RACI ngắn và Responsible Person list trong hồ sơ.</li>
 </ol>
 </div>
 <!-- 14) DCR record -->

@@ -76,16 +76,16 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng ngay trước Cycle Start, sau setup/chuyển đổi (chuyển đổi (changeover)), sau tool thay đổi ảnh hưởng CTQ, sau bù trừ (bù trừ (offset)) edit/WCS reset, sau power tổn thất/cảnh báo, sau chuyển giao công việc hoặc bất kỳ lần nào phải chạy lại máy sau trạng thái không ổn định.</div>
 <h1>WI-519 — Kiểm nhanh bộ hồ sơ công việc, xác minh trước khi chạy, đầu tiên cut và khởi động lại sau bất thường</h1>
 <div class="section"><h2>1. Quy tắc 60 giây trước Cycle Start</h2>
-<p>WI này là cổng chặn cuối cùng trước khi nhấn <b>Cycle Start</b>. Trong vòng 60 giây, Người vận hành hoặc Setup Lead phải xác nhận đủ 07 điểm bắt buộc tại máy. Nếu có 01 điểm không PASS hoặc không chứng minh được, máy phải vào <b>TẠM GIỮ</b>.</p>
+<p>WI này là cổng chặn cuối cùng trước khi nhấn <b>Cycle Start</b>. Trong vòng 60 giây, Operator hoặc Setup Lead phải xác nhận đủ 07 điểm bắt buộc tại máy. Nếu có 01 điểm không PASS hoặc không chứng minh được, máy phải vào <b>TẠM GIỮ</b>.</p>
 <div class="callout-danger"><strong>STOP-THE-dòng / chuyền</strong><br/>Không được chạy máy để “test tạm” khi chưa qua WI-519. Không được bỏ qua bước kiểm vì job lặp, vì đã từng chạy, vì gần đến giờ giao, hoặc vì người setup nói “ổn rồi”.</div></div>
 <div class="section"><h2>2. Khi nào bắt buộc dùng WI-519</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thời điểm</th><th>Phải thực hiện</th><th>Người xác nhận</th></tr></thead><tbody>
-<tr><td>Part đầu sau setup / chuyển đổi (chuyển đổi (changeover))</td><td>Đủ 07 điểm kiểm + chứng minh-out + xác nhận đầu tiên cut</td><td>Người vận hành + Setup Lead</td></tr>
-<tr><td>Sau thay tool ảnh hưởng CTQ, thay mảnh dao (mảnh dao (insert)) chính, thay cán dao / đầu gá</td><td>Kiểm lại danh sách dao cụ, bù trừ (bù trừ (offset)), đầu tiên cut, đặc tính chịu ảnh hưởng</td><td>Người vận hành; QA cùng ký khi CTQ cao</td></tr>
+<tr><td>Part đầu sau setup / chuyển đổi (chuyển đổi (changeover))</td><td>Đủ 07 điểm kiểm + chứng minh-out + xác nhận đầu tiên cut</td><td>Operator + Setup Lead</td></tr>
+<tr><td>Sau thay tool ảnh hưởng CTQ, thay mảnh dao (mảnh dao (insert)) chính, thay cán dao / đầu gá</td><td>Kiểm lại danh sách dao cụ, bù trừ (bù trừ (offset)), đầu tiên cut, đặc tính chịu ảnh hưởng</td><td>Operator; QA cùng ký khi CTQ cao</td></tr>
 <tr><td>Sau bù trừ (bù trừ (offset)) edit, đầu dò (đầu dò (probe)) re-không / bằng không, đổi WCS, đổi fixture điểm</td><td>Lặp WI-519 đầy đủ</td><td>Setup Lead</td></tr>
 <tr><td>Sau cảnh báo, power tổn thất, khởi động lại, dừng dài, chuyển đổi (chuyển đổi (changeover)) qua ca</td><td>Kiểm lại gói hồ sơ, machine trạng thái và bằng chứng cut</td><td>Supervisor</td></tr>
 <tr><td>Sau chuyển giao công việc sang máy khác hoặc người khác nhận máy</td><td>Kiểm đầy đủ như part đầu của máy mới</td><td>Supervisor + người nhận máy</td></tr>
-<tr><td>Sau thay lot vật liệu, thay batch outsource, thay jaw/kẹp / gá kẹp định hướng / đào tạo hội nhập</td><td>Kiểm thêm truy xuất nguồn gốc, kẹp / gá kẹp sơ đồ / kế hoạch và điều kiện bề mặt</td><td>Người vận hành + Setup Lead</td></tr>
+<tr><td>Sau thay lot vật liệu, thay batch outsource, thay jaw/kẹp / gá kẹp định hướng / đào tạo hội nhập</td><td>Kiểm thêm truy xuất nguồn gốc, kẹp / gá kẹp sơ đồ / kế hoạch và điều kiện bề mặt</td><td>Operator + Setup Lead</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>3. Bảy điểm bắt buộc tại máy</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điểm kiểm</th><th>Phải xác nhận</th><th>Bằng chứng tối thiểu</th><th>Không đạt khi</th></tr></thead><tbody>
@@ -117,14 +117,14 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Sau bù trừ (bù trừ (offset)) edit / re-không / bằng không / đầu dò (đầu dò (probe)) hiệu chuẩn</td><td>Điểm 4, 5, 7; chạy đơn lẻ chặn / khóa ở đoạn rủi ro</td><td>Ghi rõ bù trừ (bù trừ (offset)) đã thay đổi by / time / lý do</td></tr>
 <tr><td>Sau cảnh báo hoặc power tổn thất</td><td>Điểm 1, 3, 4, 6, 7; khoanh vùng WIP từ cuối cùng-đã biết-tốt / đạt</td><td>Hồ sơ thời điểm dừng và trạng thái WIP</td></tr>
 <tr><td>Sau thay lot vật liệu</td><td>Điểm 2, 5, 7; xác nhận lot mới và part đầu của lot mới</td><td>Traveler / lot truy vết</td></tr>
-<tr><td>Sau đổi ca hoặc đổi người vận hành</td><td>Điểm 1 đến 7 + bàn giao note</td><td>Ký bàn giao ca trên hồ sơ job</td></tr>
+<tr><td>Sau đổi ca hoặc đổi Operator</td><td>Điểm 1 đến 7 + bàn giao note</td><td>Ký bàn giao ca trên hồ sơ job</td></tr>
 <tr><td>Sau nới kẹp, re-kẹp / gá kẹp, tháo part kiểm lại rồi gá lại</td><td>Điểm 4, 5, 7; cắt lại part đầu hoặc đo lại đầy đủ đặc điểm / tính năng chịu ảnh hưởng</td><td>Ghi rõ lý do re-kẹp / gá kẹp và part phạm vi / dải liên quan</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>7. ký-off và bằng chứng tối thiểu</h2>
 <p>Machine chỉ được xem là qua WI-519 khi <b>người chạy máy</b> và <b>người setup/giám sát</b> cùng xác nhận. Job có yêu cầu QA phát hành, CTQ cao hoặc mẫu đầu (đầu tiên chi tiết / sản phẩm) nhạy cảm phải có xác nhận của QA theo rule job.</p>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại job</th><th>Bằng chứng tối thiểu</th><th>Người phải ký</th></tr></thead><tbody>
-<tr><td>Job tiêu chuẩn QPL-1/QPL-2</td><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx"  download="">FRM-511</a> hoặc hồ sơ số tương đương, traveler, cuối cùng-đã biết-tốt / đạt khi có khởi động lại</td><td>Người vận hành + Setup Lead/Supervisor</td></tr>
-<tr><td>Job CTQ cao, QPL-3/QPL-4, khách hàng lớp phủ</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> + mẫu đầu/FAI bằng chứng + link hồ sơ đo</td><td>Người vận hành + Setup Lead + QA</td></tr>
+<tr><td>Job tiêu chuẩn QPL-1/QPL-2</td><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx"  download="">FRM-511</a> hoặc hồ sơ số tương đương, traveler, cuối cùng-đã biết-tốt / đạt khi có khởi động lại</td><td>Operator + Setup Lead/Supervisor</td></tr>
+<tr><td>Job CTQ cao, QPL-3/QPL-4, khách hàng lớp phủ</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> + mẫu đầu/FAI bằng chứng + link hồ sơ đo</td><td>Operator + Setup Lead + QA</td></tr>
 <tr><td>Job sau sự cố nghiêm trọng/bất thường khởi động lại</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> + ghi rõ phạm vi nghi ngờ WIP + hành động khởi động lại</td><td>Supervisor + QA; Kỹ thuật/Bảo trì khi có machine tác động</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>8. Phản ứng khi không đạt</h2>

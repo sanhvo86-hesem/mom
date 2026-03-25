@@ -88,7 +88,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Thông tin triển khai (khóa này KHÔNG học kiểu lý thuyết)</strong>
 <ul>
 <li><strong>Đối tượng (BẮT BUỘC):</strong>
-<span class="pill">Người vận hành</span><span class="pill">Setup</span><span class="pill">Lập trình viên (CNC)</span><span class="pill">QC</span><span class="pill">QA</span><span class="pill">Kho</span><span class="pill">Mua hàng</span><span class="pill">Planner</span><span class="pill">Bảo trì</span><span class="pill">EHS</span><span class="pill">Người định giá (SAL-03)</span><span class="pill">Supervisor</span>
+<span class="pill">Operator</span><span class="pill">Setup</span><span class="pill">Lập trình viên (CNC)</span><span class="pill">QC</span><span class="pill">QA</span><span class="pill">Kho</span><span class="pill">Mua hàng</span><span class="pill">Planner</span><span class="pill">Bảo trì</span><span class="pill">EHS</span><span class="pill">Người định giá (SAL-03)</span><span class="pill">Supervisor</span>
 </li>
 <li><strong>Thời lượng chuẩn:</strong> 2.5 giờ lớp chung (mục 2–7) • 1.5 giờ thực hành theo vai trò (mục 8–10) • OJT 1 ca làm việc (mục 9).</li>
 <li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền truy cập danh sách vận hành; đã hoàn tất định hướng / đào tạo hội nhập về “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”.</li>
@@ -153,7 +153,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><strong>Người vận hành</strong></td>
+<td><strong>Operator</strong></td>
 <td>Nhập dữ liệu thực thi theo ca (thời gian ngừng máy, hoàn thành công đoạn, chứng từ kèm JobNum/Rev). Khi bảng điều khiển báo thiếu minh chứng phải dừng và báo.</td>
 <td>Ghi đủ <span class="path">JobNum + RevisionNum</span> trong hồ sơ; gắn link minh chứng; xử lý “data thiếu” theo phản ứng 60 giây.</td>
 </tr>
@@ -175,7 +175,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>QA</strong></td>
 <td>Quản trị Hold/NCR/CAPA; khóa logic cổng kiểm soát; phê duyệt định nghĩa KPI; xác nhận diễn tập‑xuống / ngừng chạy đến hồ sơ và bằng chứng.</td>
-<td>Thiết lập ĐẠT/KHÔNG ĐẠT cổng kiểm soát trong KPI từ điển; mọi hold/NCR/CAPA có trạng thái + người phụ trách + bằng chứng link.</td>
+<td>Thiết lập ĐẠT/KHÔNG ĐẠT cổng kiểm soát trong KPI từ điển; mọi hold/NCR/CAPA có trạng thái + Responsible Person + bằng chứng link.</td>
 </tr>
 <tr>
 <td><strong>Kho</strong></td>
@@ -209,7 +209,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><strong>Supervisor</strong></td>
-<td>Dẫn dắt Trung tâm điều hành; ép dùng KPI từ điển; chặn quyết định khi KPI không đủ bằng chứng; ghi hành động &amp; người phụ trách.</td>
+<td>Dẫn dắt Trung tâm điều hành; ép dùng KPI từ điển; chặn quyết định khi KPI không đủ bằng chứng; ghi hành động &amp; Responsible Person.</td>
 <td>họp đứng / họp nhanh dùng KPI có diễn tập‑xuống / ngừng; mọi bất ổn có hành động hồ sơ; không có hành động bị xem là FAIL.</td>
 </tr>
 </tbody>
@@ -273,8 +273,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h4 style="margin-top:0">Bàn giao A — Tạo/Sửa KPI (định nghĩa)</h4>
 <ul>
 <li><span class="must">Đầu vào:</span> yêu cầu KPI từ Supervisor/Quy trình Owner; mô tả quyết định cần chặn; rủi ro cần giảm.</li>
-<li><span class="must">Đầu ra:</span> 01 bản ghi KPI từ điển (name/người phụ trách/nhịp độ / chu kỳ họp/source/truy vấn chi tiết (truy vấn chi tiết (drillthrough))) + 01 bản ghi kiểm soát thay đổi.</li>
-<li><span class="must">Điểm chặn:</span> KPI không có người phụ trách hoặc không có nguồn dữ liệu bị khóa ở trạng thái <span class="block">CHẶN</span>.</li>
+<li><span class="must">Đầu ra:</span> 01 bản ghi KPI từ điển (name/Responsible Person/nhịp độ / chu kỳ họp/source/truy vấn chi tiết (truy vấn chi tiết (drillthrough))) + 01 bản ghi kiểm soát thay đổi.</li>
+<li><span class="must">Điểm chặn:</span> KPI không có Responsible Person hoặc không có nguồn dữ liệu bị khóa ở trạng thái <span class="block">CHẶN</span>.</li>
 </ul>
 </div>
 <div class="card">
@@ -326,7 +326,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 5) Risk Controls -->
 <div class="card" id="sec5">
 <h2>5) Biện pháp kiểm soát rủi ro (liệt kê điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6 điểm kiểm soát)</h2>
-<p>điểm kiểm soát (điểm kiểm soát) là “cửa chặn có bằng chứng”. Mọi điểm kiểm soát (điểm kiểm soát) có người phụ trách, kích hoạt, và MRR bắt buộc.</p>
+<p>điểm kiểm soát (điểm kiểm soát) là “cửa chặn có bằng chứng”. Mọi điểm kiểm soát (điểm kiểm soát) có Responsible Person, kích hoạt, và MRR bắt buộc.</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
@@ -341,7 +341,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>CP1 — từ điển KPI (từ điển) khóa</strong></td>
 <td>QA/QMS</td>
-<td>Chỉ KPI có ID duy nhất, người phụ trách, nhịp độ / chu kỳ họp, source bảng, diễn tập‑xuyên suốt mới được công bố / phát hành.</td>
+<td>Chỉ KPI có ID duy nhất, Responsible Person, nhịp độ / chu kỳ họp, source bảng, diễn tập‑xuyên suốt mới được công bố / phát hành.</td>
 <td>01 bản ghi KPI từ điển + 01 phê duyệt (ApprovalHistory).</td>
 </tr>
 <tr>
@@ -415,7 +415,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>FF3 — thiếu bằng chứng</strong></td>
 <td>Hồ sơ cổng kiểm soát (ShipRelease/Hold/NCR/CAPA) không có EvidenceFolderUrl/PacketFolderUrl hoặc link hỏng.</td>
 <td><span class="hold">TẠM GIỮ</span></td>
-<td>Hold/giữ quyết định; người phụ trách hồ sơ bổ sung MRR; Supervisor xác nhận đóng.</td>
+<td>Hold/giữ quyết định; Responsible Person hồ sơ bổ sung MRR; Supervisor xác nhận đóng.</td>
 </tr>
 <tr>
 <td><strong>FF4 — không khớp Rev</strong></td>
@@ -453,7 +453,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li><span class="must">KHÓA</span> ShipRelease ở trạng thái TẠM GIỮ; không in nhãn/không xuất hàng.</li>
 <li>Kiểm tra 4 cờ cổng kiểm soát: PacketComplete, PackagingPass, FinalIRPass, ReconciliationStatus.</li>
-<li>Tạo hành động hồ sơ (StandupActions) giao người phụ trách bổ sung MRR và due time.</li>
+<li>Tạo hành động hồ sơ (StandupActions) giao Responsible Person bổ sung MRR và due time.</li>
 <li>QA/Kho xác nhận link PacketFolderUrl và SSCC hợp lệ.</li>
 <li>Chỉ đổi trạng thái Đã phê duyệt khi đủ MRR và có ApprovalHistory.</li>
 </ol>
@@ -473,7 +473,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 8) Checklist operation -->
 <div class="card" id="sec8">
 <h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Responsible Person, Bằng chứng/MRR, “điểm sai điển hình”</h2>
-<p class="muted">Bảng kiểm này dùng cho 2 tình huống: (A) tạo KPI mới, (B) sửa KPI/mô hình đang chạy. Tổng bước ≤15 và dùng chung cho mọi vai trò bằng cách điền đúng người phụ trách.</p>
+<p class="muted">Bảng kiểm này dùng cho 2 tình huống: (A) tạo KPI mới, (B) sửa KPI/mô hình đang chạy. Tổng bước ≤15 và dùng chung cho mọi vai trò bằng cách điền đúng Responsible Person.</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
@@ -488,7 +488,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Supervisor</td><td>Chốt “quyết định cần chặn” + rủi ro cần giảm; gắn KPI vào bước E2E.</td><td>01 yêu cầu KPI (phiếu yêu cầu) IT-bộ phận hỗ trợ</td><td>KPI đo “cho vui”, không gắn cổng kiểm soát/bàn giao</td></tr>
 <tr><td>2</td><td>QA/QMS</td><td>Đặt tên KPI duy nhất + định nghĩa 1 câu + phạm vi (job/pack/khách hàng) + tiêu chí cổng kiểm soát.</td><td>Bản ghi KPI từ điển (draft)</td><td>Tên KPI trùng; định nghĩa dài, mơ hồ</td></tr>
-<tr><td>3</td><td>Quy trình Owner</td><td>Chỉ định nguồn dữ liệu SSOT (bảng + cột khóa) và người phụ trách dữ liệu.</td><td>Map nguồn (table/cột) trong KPI từ điển</td><td>Chọn dữ liệu “ngoài hệ thống”</td></tr>
+<tr><td>3</td><td>Quy trình Owner</td><td>Chỉ định nguồn dữ liệu SSOT (bảng + cột khóa) và Responsible Person dữ liệu.</td><td>Map nguồn (table/cột) trong KPI từ điển</td><td>Chọn dữ liệu “ngoài hệ thống”</td></tr>
 <tr><td>4</td><td>IT/BI</td><td>Khóa hạt / thớ KPI và mô hình: thực tế nào, dim nào, tham gia / nối key nào.</td><td>mối quan hệ map + mô tả hạt / thớ</td><td>tham gia / nối sai hạt / thớ gây phình số</td></tr>
 <tr><td>5</td><td>QA/QMS</td><td>Định nghĩa minh chứng bắt buộc cho diễn tập‑xuống / ngừng (hồ sơ link + bằng chứng link).</td><td>Quy tắc EvidenceFolderUrl/PacketFolderUrl</td><td>Quên link bằng chứng; link hỏng</td></tr>
 <tr><td>6</td><td>IT/BI</td><td>Xây đo lường theo định nghĩa; khóa tên đo lường và mô tả.</td><td>DAX đo lường + cam kết log M365/SharePoint → HESEM-QMS-SSOT</td><td>đo lường đổi tên gây gãy báo cáo</td></tr>
@@ -555,7 +555,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><strong>L1</strong><div class="muted">Nhận biết &amp; làm theo bảng kiểm (có giám sát)</div></td>
-<td>Đọc đúng định nghĩa KPI; xác định đúng người phụ trách; mở được diễn tập‑xuống / ngừng đến bảng hồ sơ theo hướng dẫn.</td>
+<td>Đọc đúng định nghĩa KPI; xác định đúng Responsible Person; mở được diễn tập‑xuống / ngừng đến bảng hồ sơ theo hướng dẫn.</td>
 <td>Bài kiểm tra nhanh đạt; thực hiện được bảng kiểm bước 1–6 có kèm minh chứng.</td>
 <td>Được xem bảng điều khiển và báo lỗi dữ liệu theo phản ứng 60 giây.</td>
 </tr>
@@ -594,7 +594,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Phân biệt <span class="path">ShipRelease</span> và <span class="path">ShipmentMirror</span> theo mục đích và thời điểm.</li>
 <li>Khi diễn tập‑xuống / ngừng không chạy tới danh sách hồ sơ, hành động bắt buộc là gì?</li>
 <li>Nêu 3 chỉ số Data Sức khỏe bắt buộc có trên Trung tâm điều hành.</li>
-<li>Khi phát hiện không khớp Rev giữa JobIndex và bộ hồ sơ giao hàng, ai là người phụ trách xử lý ngăn chặn?</li>
+<li>Khi phát hiện không khớp Rev giữa JobIndex và bộ hồ sơ giao hàng, ai là Responsible Person xử lý ngăn chặn?</li>
 <li>Vì sao “tham gia / nối thực tế‑to‑thực tế” tạo rủi ro KPI sai?</li>
 <li>Trong mô hình ngôi sao / đánh dấu sơ đồ cấu trúc, “thực tế” và “Dim” khác nhau điểm nào?</li>
 <li>Nhịp độ của KPI dùng để làm gì trong điều hành ca?</li>
@@ -616,12 +616,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h4 style="margin-top:0">Tình huống 1 — KPI OTD “xanh” nhưng đánh giá hỏi bằng chứng</h4>
 <p><strong>Dữ kiện:</strong> Bảng điều khiển OTD = 96%. Diễn tập‑xuống / ngừng tới danh sách lô giao hàng mở được, nhưng 4 dòng thiếu Theo dõi và link bằng chứng (PacketFolderUrl trống).</p>
-<p><strong>Yêu cầu:</strong> Quyết định <span class="hold">TẠM GIỮ</span>/<span class="block">CHẶN</span>/<span class="stop">STOP</span> cho việc dùng KPI OTD trong họp và cho việc ship; liệt kê MRR phải bổ sung và người phụ trách.</p>
+<p><strong>Yêu cầu:</strong> Quyết định <span class="hold">TẠM GIỮ</span>/<span class="block">CHẶN</span>/<span class="stop">STOP</span> cho việc dùng KPI OTD trong họp và cho việc ship; liệt kê MRR phải bổ sung và Responsible Person.</p>
 <p><strong>MRR bắt buộc:</strong> cập nhật PacketFolderUrl/Theo dõi; đánh giá mẫu 10 hồ sơ; log Data Sức khỏe.</p>
 </div>
 <div class="card">
 <h4 style="margin-top:0">Tình huống 2 — không khớp Rev trước khi ship</h4>
-<p><strong>Dữ kiện:</strong> JobIndex[RevisionNum]=B. bộ hồ sơ giao hàng trong thư mục hồ sơ ghi Rev=C. ShipRelease đã ở trạng thái “Đã phê duyệt”.</p>
+<p><strong>Dữ kiện:</strong> JobIndex[RevisionNum]=B. bộ hồ sơ giao hàng trong Record Folder ghi Rev=C. ShipRelease đã ở trạng thái “Đã phê duyệt”.</p>
 <p><strong>Yêu cầu:</strong> Ra quyết định ngay (<span class="stop">STOP</span> + <span class="hold">TẠM GIỮ</span>), nêu chuỗi hành động 60 giây, hồ sơ cần tạo (Hold/NCR/ApprovalHistory/StandupActions), và điều kiện mở lại.</p>
 </div>
 <div class="card">
@@ -634,7 +634,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h4 style="margin-top:0">Bài test: “Từ KPI card tới hồ sơ và minh chứng trong 10 phút”</h4>
 <p><strong>Nhiệm vụ:</strong> Chọn 1 KPI bất kỳ trên Trung tâm điều hành (OTD/WIP/Hold/NCR/Ship Mức sẵn sàng). Thực hiện 5 bước:</p>
 <ol>
-<li>Đọc đúng định nghĩa KPI theo KPI từ điển (nêu người phụ trách + nhịp độ / chu kỳ họp).</li>
+<li>Đọc đúng định nghĩa KPI theo KPI từ điển (nêu Responsible Person + nhịp độ / chu kỳ họp).</li>
 <li>Click diễn tập‑xuống / ngừng tới bảng chi tiết hồ sơ (Job/Pack/NCR).</li>
 <li>Mở 1 hồ sơ và xác minh khóa JobNum/Rev.</li>
 <li>Mở link minh chứng (EvidenceFolderUrl/PacketFolderUrl) và xác minh tài liệu tồn tại.</li>
@@ -664,11 +664,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="muted">MRR là “bằng chứng vận hành” để sẵn sàng đánh giá. MRR phải có ID, có người chịu trách nhiệm, có đường dẫn lưu, và truy vết được theo JobNum/PackID/NCRID.</p>
 <h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
 <ul>
-<li><strong>KPI từ điển</strong> (CSV/List): tên KPI, định nghĩa, công thức, người phụ trách, nhịp độ / chu kỳ họp, source, diễn tập‑xuyên suốt.</li>
-<li><strong>BI_ReleaseNotes</strong> (List) SSOT/BI-ReleaseNotes (SharePoint List): version, thay đổi, rủi ro, hoàn tác / quay lại, người thực hiện, ngày.</li>
+<li><strong>KPI từ điển</strong> (CSV/List): tên KPI, định nghĩa, công thức, Responsible Person, nhịp độ / chu kỳ họp, source, diễn tập‑xuyên suốt.</li>
+<li><strong>BI_ReleaseNotes</strong> (List) SSOT/BI-ReleaseNotes (SharePoint List): version, thay đổi, rủi ro, hoàn tác / quay lại, Performer, ngày.</li>
 <li><strong>ApprovalHistory</strong>: phê duyệt KPI/cổng kiểm soát, phê duyệt đổi mô hình, quyết định TẠM GIỮ/GO.</li>
 <li><strong>Data Sức khỏe log</strong> SSOT/Data-Sức khỏe-Log (SharePoint List + ảnh kiểm tra): ảnh/đầu ra kiểm tra null key/trùng lặp/độ trễ/không khớp Rev.</li>
-<li><strong>StandupActions</strong>: hành động xử lý bất ổn KPI (người phụ trách, ngày đến hạn, trạng thái).</li>
+<li><strong>StandupActions</strong>: hành động xử lý bất ổn KPI (Responsible Person, ngày đến hạn, trạng thái).</li>
 </ul>
 <h3>12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
 <div class="table-card">

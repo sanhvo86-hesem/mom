@@ -80,7 +80,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 
 <div class="section"><h2>2. Cấu trúc hồ sơ setup bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Khối dữ liệu</th><th>Nội dung bắt buộc</th><th>Mục đích vận hành</th></tr></thead><tbody>
-<tr><td>Header job</td><td>Khách hàng, Job/WO, Part No., Part Name, Rev, Op No., lộ trình gia công step, QPL, machine nhóm sản phẩm, site/trung tâm gia công</td><td>Chặn nhầm job, nhầm op, nhầm phiên bản ngay từ điểm sử dụng.</td></tr>
+<tr><td>Header job</td><td>Khách hàng, Job/WO, Part No., Part Name, Rev, Op No., lộ trình gia công step, QPL, machine nhóm sản phẩm, site/trung tâm gia công</td><td>Chặn nhầm job, nhầm op, nhầm phiên bản ngay từ Point-of-use.</td></tr>
 <tr><td>Source mốc chuẩn</td><td>Drawing no., mô hình/CAD ref, traveler ref, program ID/version, phiếu cài đặt version, danh sách dao cụ version, AML/người xử lý ràng buộc</td><td>Chứng minh bộ tài liệu phát hành là bộ đúng và đầy đủ.</td></tr>
 <tr><td>Nguyên vật liệu &amp; điều kiện</td><td>Nguyên vật liệu nhóm sản phẩm, hợp kim/cấp / hạng/ram (ram (temper)), mẻ nấu (mẻ nấu (heat))/lot ref khi áp dụng, thô/hoàn thành trạng thái, trước / ưu tiên công đoạn đặc biệt trạng thái, vệ sinh / sạch sẽ/chân không đánh dấu</td><td>Ngăn setup sai với part cần rule xử lý đặc biệt.</td></tr>
 <tr><td>gá kẹp chi tiết</td><td>Fixture ID/rev, jaw type/rev, chốt định vị sơ đồ / kế hoạch, stop pin, kẹp / gá kẹp điểm, mô-men xoắn giá trị, hỗ trợ điểm, ảnh chụp</td><td>Khóa logic gá và điều kiện giữ part ổn định.</td></tr>
@@ -95,12 +95,12 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường</th><th>Quy tắc bắt buộc</th><th>Từ chối khi</th></tr></thead><tbody>
 <tr><td>Tài liệu ID</td><td>Mã file, phiên bản, ngày phát hành, đã chuẩn bị/đã kiểm tra/đã phát hành by phải hiện ngay trên trang đầu.</td><td>Không có dấu vết phát hành hoặc dùng file export không có siêu dữ liệu.</td></tr>
 <tr><td>Machine nhóm sản phẩm</td><td>Chọn đúng một trong các họ: 3-trục VMC, 5-trục phay, CNC tiện, phay-lượt / quay/đa nhiệm.</td><td>Ghi chung “CNC machine” hoặc không định danh họ máy.</td></tr>
-<tr><td>Vận hành mục đích / ý định</td><td>thô / bán-hoàn thành / hoàn thành / diễn tập-tap / mài bavia / chuyển giao / làm lại / kiểm tra cut.</td><td>Không nói rõ ý định công đoạn nên người vận hành tự suy diễn.</td></tr>
+<tr><td>Vận hành mục đích / ý định</td><td>thô / bán-hoàn thành / hoàn thành / diễn tập-tap / mài bavia / chuyển giao / làm lại / kiểm tra cut.</td><td>Không nói rõ ý định công đoạn nên Operator tự suy diễn.</td></tr>
 <tr><td>Phiên bản trạng thái</td><td>Part Rev và Program Version phải đồng nhất với bộ hồ sơ chuẩn (mốc chuẩn gói hàng).</td><td>Part Rev ≠ Program Rev logic; phiếu cài đặt không chỉ ra version đang hiệu lực.</td></tr>
 <tr><td>Khách hàng đánh dấu / cờ</td><td>Nêu rõ job có yêu cầu đặc biệt về truy xuất nguồn gốc, vệ sinh / sạch sẽ, người xử lý, bề mặt, rò rỉ test, đóng gói hay không.</td><td>Job có lớp phủ nhưng phiếu cài đặt không gắn cờ cảnh báo.</td></tr>
 <tr><td>ảnh chụp pack</td><td>Ảnh định hướng part, gá đặt, mặt chuẩn, vị trí kẹp / gá kẹp, vị trí tool đặc biệt phải có chất lượng đủ nhìn.</td><td>Ảnh thiếu góc nhìn quan trọng, mờ, cũ hoặc không đúng phiên bản fixture.</td></tr>
 </tbody></table></div>
-<div class="keyline"><strong>Rule file name và view name:</strong> tên hiển thị tại điểm sử dụng phải chứa tối thiểu <span class="code">PartNo_Op_MachineFamily_Rev_SetupRev</span>. Không được phát hành file có tên không đủ nhận dạng.</div>
+<div class="keyline"><strong>Rule file name và view name:</strong> tên hiển thị tại Point-of-use phải chứa tối thiểu <span class="code">PartNo_Op_MachineFamily_Rev_SetupRev</span>. Không được phát hành file có tên không đủ nhận dạng.</div>
 </div>
 
 <div class="section"><h2>4. Dữ liệu công đoạn bắt buộc theo từng setup</h2>
@@ -155,7 +155,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục</th><th>Yêu cầu dữ liệu</th></tr></thead><tbody>
 <tr><td>Mốc chuẩn (mốc chuẩn (datum)) chiến lược</td><td>Phải chỉ rõ mốc chuẩn (mốc chuẩn (datum)) vật lý, mốc chuẩn (mốc chuẩn (datum)) logic trong chương trình, và mối liên hệ với bản vẽ/kế hoạch kiểm tra (kiểm tra plan).</td></tr>
 <tr><td>đầu dò (đầu dò (probe)) cycle</td><td>Mã cycle, bề mặt chạm, dự kiến kết quả, logic đạt/không đạt, viết / ghi-back cho phép hay không.</td></tr>
-<tr><td>Quan trọng bù trừ (bù trừ (bù trừ (offset)))</td><td>Danh sách bù trừ (bù trừ (offset)) không được sửa bởi người vận hành hoặc chỉ được sửa trong biên độ hẹp; nêu rõ ai được sửa và phải log ở đâu.</td></tr>
+<tr><td>Quan trọng bù trừ (bù trừ (bù trừ (offset)))</td><td>Danh sách bù trừ (bù trừ (offset)) không được sửa bởi Operator hoặc chỉ được sửa trong biên độ hẹp; nêu rõ ai được sửa và phải log ở đâu.</td></tr>
 <tr><td>Chứng minh-out chế độ</td><td>Dry-run / đồ họa / đơn lẻ chặn / khóa / nhanh / chạy nhanh cap / trục chính (trục chính (spindle)) cap / đầu tiên-cut điểm giám sát / đặc điểm / tính năng-by-đặc điểm / tính năng phát hành.</td></tr>
 <tr><td>khởi động lại note</td><td>Rule quay lại chứng minh-out khi machine reset, chuyển giao công việc, tool thay thế, sự cố nghiêm trọng, fixture re-kẹp / gá kẹp hoặc thiết lập lại mốc chuẩn phiên bản.</td></tr>
 </tbody></table></div>

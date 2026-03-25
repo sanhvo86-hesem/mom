@@ -80,7 +80,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Bước 1 — STOP / TẠM GIỮ ngay tại điểm phát hiện.</strong><br/>Dừng công đoạn liên quan; dừng vấn đề; dừng ship nếu có khả năng lô ảnh hưởng đã tới khu xuất; chặn di chuyển giao dịch tiếp theo trên hệ thống.</div>
 <div class="step-item"><strong>Bước 2 — Cô lập vật lý.</strong><br/>Đưa vật tư/WIP/FG vào khu <span class="code">TẠM GIỮ</span> hoặc <span class="code">cách ly / biệt trữ</span> đã định danh; dán tag nhận diện rõ part, lot, qty, lý do, time, người gắn.</div>
 <div class="step-item"><strong>Bước 3 — Giữ nguyên chứng cứ.</strong><br/>Không được tự ý đánh bóng, đổi nhãn, tháo bag, dỡ pallet, sửa bù trừ (bù trừ (offset)), reset bộ đếm / quầy, xóa dữ liệu, hoặc tách kiện trước khi chụp ảnh và ghi nhận tình trạng ban đầu.</div>
-<div class="step-item"><strong>Bước 4 — Gọi đúng người.</strong><br/>Báo Supervisor, QA, WHS và người phụ trách công đoạn. Nếu nghi đã chạm giao vận/khách hàng rủi ro, escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> trong cùng ca, không chờ họp sáng hôm sau.</div>
+<div class="step-item"><strong>Bước 4 — Gọi đúng người.</strong><br/>Báo Supervisor, QA, WHS và Responsible Person công đoạn. Nếu nghi đã chạm giao vận/khách hàng rủi ro, escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> trong cùng ca, không chờ họp sáng hôm sau.</div>
 <div class="step-item"><strong>Bước 5 — Mở hồ sơ.</strong><br/>Mở <a href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx"  download="">FRM-651</a> hoặc log hold tương đương; ghi thời điểm phát hiện, part/rev, lot/số sê-ri, qty ảnh hưởng, vị trí phát hiện, trạng thái hiện tại và nguyên nhân sơ bộ.</div>
 </div>
 </div><div class="section">
@@ -89,7 +89,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm sự cố</th><th>Phạm vi phải quét / dọn dẹp</th><th>Điểm dừng / phát hành lại</th></tr></thead><tbody>
 <tr><td>Đo lường / gage vấn đề</td><td>Tất cả lô/CTQ đo bằng cùng gage từ lần xác minh tốt cuối cùng; mọi hồ sơ dựa trên gage đó.</td><td>Chỉ phát hành khi gage hợp lệ, phạm vi ảnh hưởng đã rà xong và dữ liệu đo lại chứng minh lô đạt.</td></tr>
 <tr><td>Tool mài mòn / sự cố nghiêm trọng / setup trôi / sai lệch</td><td>Từ cuối cùng-đã biết-tốt / đạt đến thời điểm phát hiện; cùng machine, cùng tool nhóm sản phẩm, cùng bù trừ (bù trừ (offset)) nếu có nghi ngờ lan rộng.</td><td>khởi động lại theo <a href="../05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a>/<a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>; lô ảnh hưởng phải sort hoặc đo lại đủ đặc tính chịu tác động.</td></tr>
-<tr><td>Label / truy vết không khớp</td><td>Tất cả khay, pallet, box, bin, vật liệu thừa, phiếu nhận / biên nhận dòng / chuyền và vị trí liên quan cùng thời điểm in nhãn hoặc cùng người vận hành/label batch.</td><td>Phát hành khi vật lý ↔ hệ thống ↔ hồ sơ truy vết khớp hoàn toàn và nhãn mới đã được QA chấp thuận.</td></tr>
+<tr><td>Label / truy vết không khớp</td><td>Tất cả khay, pallet, box, bin, vật liệu thừa, phiếu nhận / biên nhận dòng / chuyền và vị trí liên quan cùng thời điểm in nhãn hoặc cùng Operator/label batch.</td><td>Phát hành khi vật lý ↔ hệ thống ↔ hồ sơ truy vết khớp hoàn toàn và nhãn mới đã được QA chấp thuận.</td></tr>
 <tr><td>Cert / nhà cung cấp / người xử lý vấn đề</td><td>Toàn bộ phiếu nhận / biên nhận, WIP, FG và lô giao hàng có chung nhà cung cấp lô giao hàng, người xử lý batch, cert số hoặc mẻ nấu (mẻ nấu (heat))/lot liên quan.</td><td>Phát hành khi đủ cert/scope/bằng chứng hoặc có disposition được phê duyệt bằng văn bản.</td></tr>
 <tr><td>FOD / nhiễm bẩn / clean vi phạm</td><td>Khu vực, tool, khay, bag, clean khu vực, cùng ca và cùng batch sạch; hàng đang ở ship khu vực chuẩn bị / sắp xếp hoặc clean pack cũng phải rà.</td><td>Phát hành khi dòng / chuyền thông quan / giải phóng, clean khôi phục / thu hồi và kiểm tra lại đạt; phần ảnh hưởng không phục hồi được phải disposition riêng.</td></tr>
 <tr><td>môi trường vượt ngưỡng / lưu kho / lưu trữ vi phạm</td><td>Toàn bộ vật tư và thành phẩm nhạy đang nằm trong khu vực cùng thời điểm lệch ngưỡng.</td><td>Phát hành khi đánh giá ảnh hưởng xong; không dựa cảm tính “chắc không sao”.</td></tr>
@@ -98,10 +98,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div><div class="section">
 <h2>4. Gắn trạng thái, cô lập vật lý và kiểm soát hệ thống</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Dùng khi</th><th>Quy tắc bắt buộc</th></tr></thead><tbody>
-<tr><td>TẠM GIỮ</td><td>Chưa đủ bằng chứng hoặc đang chờ đánh giá</td><td>Không vấn đề, không di chuyển sang công đoạn kế, không ship; phải có người phụ trách và due cho bước tiếp.</td></tr>
+<tr><td>TẠM GIỮ</td><td>Chưa đủ bằng chứng hoặc đang chờ đánh giá</td><td>Không vấn đề, không di chuyển sang công đoạn kế, không ship; phải có Responsible Person và due cho bước tiếp.</td></tr>
 <tr><td>cách ly / biệt trữ</td><td>Cần tách vật lý khỏi hàng tốt</td><td>Đặt tại khu riêng; nhãn phải có lý do code, qty, lot, người gắn, thời điểm.</td></tr>
 <tr><td>rà soát</td><td>Đang chờ xác nhận QA/ENG hoặc chờ on nhà cung cấp/khách hàng</td><td>Không được coi là có thể sử dụng; trạng thái rà soát không thay cho PASS.</td></tr>
-<tr><td>SỬA HÀNG / SORT</td><td>Đã chốt disposition có đường thực hiện rõ</td><td>Phải có WI/lộ trình gia công/tiêu chí chấp nhận và người phê duyệt. Làm lại xong phải quay lại cổng kiểm soát kiểm phù hợp.</td></tr>
+<tr><td>SỬA HÀNG / SORT</td><td>Đã chốt disposition có đường thực hiện rõ</td><td>Phải có WI/lộ trình gia công/tiêu chí chấp nhận và Approver. Làm lại xong phải quay lại cổng kiểm soát kiểm phù hợp.</td></tr>
 <tr><td>phế liệu / trả lại</td><td>Lô không thể hoặc không được phép phát hành</td><td>Phải khóa qty, lot, chi phí, bằng chứng và giao dịch hệ thống tương ứng.</td></tr>
 </tbody></table></div>
 <p>Tag vật lý, trạng thái hệ thống và hồ sơ NCR <strong>PHẢI</strong> cùng một thông tin. PHẢI đồng bộ trạng thái giữa pallet, hệ thống và khu vực lưu; không để pallet dán TẠM GIỮ nhưng hệ thống vẫn có thể sử dụng, hoặc hệ thống TẠM GIỮ nhưng hàng lại ở khu vực tốt không có nhãn.</p>
@@ -117,7 +117,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </ul></div>
 <div class="card"><h3>Điều kiện phát hành lại</h3><ul class="tight" style="padding-left:18px;">
 <li>Đã xác định rõ phạm vi ảnh hưởng và số lượng còn lại.</li>
-<li><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a> và hồ sơ TẠM GIỮ/ngăn chặn đã đủ ảnh, lot, qty, lý do, người phụ trách.</li>
+<li><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a> và hồ sơ TẠM GIỮ/ngăn chặn đã đủ ảnh, lot, qty, lý do, Responsible Person.</li>
 <li>Kết quả sort / đo lại / cert bổ sung / rà soát nhà cung cấp đã đóng đủ.</li>
 <li>Tag vật lý, trạng thái hệ thống, nhãn mới và vị trí đã đồng bộ.</li>
 <li>QA phê duyệt phát hành; các concession bắt buộc đã có văn bản hợp lệ.</li>

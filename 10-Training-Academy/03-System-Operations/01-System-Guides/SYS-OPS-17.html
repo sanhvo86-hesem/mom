@@ -77,7 +77,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Thông tin triển khai</strong>
 <ul style="line-height:1.8">
-<li><strong>Đối tượng bắt buộc:</strong> Người vận hành, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor.</li>
+<li><strong>Đối tượng bắt buộc:</strong> Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor.</li>
 <li><strong>Thời lượng chuẩn (khóa đầu):</strong> 2 giờ lý thuyết tại hiện trường • 2 giờ tình huống • 4 giờ OJT theo TWI.</li>
 <li><strong>Giới hạn khả thi:</strong> triển khai 2 ca/ngày, 6 ngày/tuần; mỗi vai trò học tối đa 2 ngày/tuần; OJT chia ca theo Job thực tế.</li>
 <li><strong>Điều kiện trước:</strong> biết đọc Job pack/Traveler; biết quy tắc kiểm soát phiên bản; biết khu vực TẠM GIỮ và quy tắc kho.</li>
@@ -178,7 +178,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>Người vận hành</b></td>
+<td><b>Operator</b></td>
 <td>Phát hiện NC; dừng công đoạn; tách hàng; gắn nhãn; báo Supervisor/QC; không tự ý “sửa hồ sơ”.</td>
 <td>Thực hiện đúng “60 giây” + tạo TẠM GIỮ vật lý đúng nhãn + không để hàng rời trạng thái.</td>
 </tr>
@@ -190,7 +190,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Lập trình viên (CNC)</b></td>
 <td>Phân tích lỗi PROG; xác định cơ chế sai (ghi sổ / đăng, tool comp, nguồn gốc, phiên bản); cập nhật program theo Thay đổi Quản lý.</td>
-<td>Tạo bằng chứng nguyên nhân gốc + bản sửa program + khóa phiên bản; cập nhật bộ tài liệu điểm sử dụng.</td>
+<td>Tạo bằng chứng nguyên nhân gốc + bản sửa program + khóa phiên bản; cập nhật bộ tài liệu Point-of-use.</td>
 </tr>
 <tr>
 <td><b>QC</b></td>
@@ -234,8 +234,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Supervisor</b></td>
-<td>Kích hoạt ngăn chặn; phân công người phụ trách; duy trì kỷ luật cổng kiểm soát; điều phối nguồn lực MRB/CAPA.</td>
-<td>Không có vượt qua cổng kiểm soát; phân công rõ người phụ trách &amp; hạn chót; báo cáo vượt cấp theo fail-nhanh khi quá hạn.</td>
+<td>Kích hoạt ngăn chặn; phân công Responsible Person; duy trì kỷ luật cổng kiểm soát; điều phối nguồn lực MRB/CAPA.</td>
+<td>Không có vượt qua cổng kiểm soát; phân công rõ Responsible Person &amp; hạn chót; báo cáo vượt cấp theo fail-nhanh khi quá hạn.</td>
 </tr>
 </tbody>
 </table>
@@ -257,7 +257,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Hold log</b></td><td>JobNum + ReasonCode + Ngăn chặn + Mức nghiêm trọng</td><td>Hồ sơ QCHoldLog + link bằng chứng thư mục</td><td>Không hồ sơ = CHẶN</td></tr>
 <tr><td><b>NCR</b></td><td>DetectedAt + DefectType + QtyAffected + bằng chứng đo/ảnh/CMM</td><td>Hồ sơ NCRLog + thư mục NCR_&lt;NCR-ID&gt;</td><td>NCR thiếu dữ kiện = TẠM GIỮ kéo dài</td></tr>
 <tr><td><b>MRB</b></td><td>NCR đã đủ dữ kiện + phương án disposition + đánh giá rủi ro</td><td>Disposition được duyệt + tiêu chí làm lại/xác minh + phê duyệt concession (khi có)</td><td>Disposition chưa duyệt = MRB</td></tr>
-<tr><td><b>Làm lại/Xác minh</b></td><td>WI làm lại + điểm kiểm tra đo + người thực hiện</td><td>Làm lại bằng chứng + IR/CMM PASS</td><td>Thiếu IR PASS = CHẶN phát hành</td></tr>
+<tr><td><b>Làm lại/Xác minh</b></td><td>WI làm lại + điểm kiểm tra đo + Performer</td><td>Làm lại bằng chứng + IR/CMM PASS</td><td>Thiếu IR PASS = CHẶN phát hành</td></tr>
 <tr><td><b>CAPA/8D</b></td><td>Ngưỡng bắt buộc mở CAPA + nguyên nhân gốc + điểm lọt</td><td>Hồ sơ CAPA8D + hành động hệ thống + bằng chứng triển khai</td><td>CAPA thiếu nguyên nhân gốc = FAIL</td></tr>
 <tr><td><b>Effectiveness kiểm tra</b></td><td>Dữ liệu trước/sau + cửa sổ theo dõi + xác nhận không tái diễn</td><td>Bằng chứng hiệu lực + đóng CAPA/NCR</td><td>Không hiệu lực = mở lại CAPA</td></tr>
 </tbody>
@@ -309,7 +309,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>CP-01 TẠM GIỮ vật lý</b></td>
-<td>Người vận hành/Setup/Kho</td>
+<td>Operator/Setup/Kho</td>
 <td>Ảnh hàng + nhãn TẠM GIỮ + vị trí khu TẠM GIỮ</td>
 <td>Hàng nghi ngờ nằm trong khu TẠM GIỮ; nhãn có JobNum + trạng thái + ngày/ca</td>
 </tr>
@@ -339,7 +339,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>CP-06 CAPA8D</b></td>
-<td>QA (người phụ trách) + các bộ phận liên quan</td>
+<td>QA (Responsible Person) + các bộ phận liên quan</td>
 <td>Hồ sơ CAPA8D: SourceType/SourceID, Mức nghiêm trọng, Responsible Person, Trạng thái; 8D có RootCause+EscapePoint</td>
 <td>CAPA có hành động hệ thống + bằng chứng triển khai + hạn chót</td>
 </tr>
@@ -411,7 +411,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>MRB</b> (Pending)</td>
 <td>Thiếu dữ kiện hoặc cần thử nghiệm</td>
-<td>Danh sách dữ kiện cần bổ sung + người phụ trách + hạn chót; TẠM GIỮ duy trì đến khi có quyết định</td>
+<td>Danh sách dữ kiện cần bổ sung + Responsible Person + hạn chót; TẠM GIỮ duy trì đến khi có quyết định</td>
 </tr>
 </tbody>
 </table>
@@ -563,9 +563,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td><b>STOP/TẠM GIỮ vật lý</b>: tách hàng, gắn nhãn, đưa vào khu TẠM GIỮ</td><td>Người vận hành/Setup/WHS</td><td>Ảnh nhãn TẠM GIỮ + vị trí</td><td>Để hàng “tạm” tại dòng / chuyền; nhãn thiếu JobNum/ca</td></tr>
+<tr><td>1</td><td><b>STOP/TẠM GIỮ vật lý</b>: tách hàng, gắn nhãn, đưa vào khu TẠM GIỮ</td><td>Operator/Setup/WHS</td><td>Ảnh nhãn TẠM GIỮ + vị trí</td><td>Để hàng “tạm” tại dòng / chuyền; nhãn thiếu JobNum/ca</td></tr>
 <tr><td>2</td><td><b>Tạo QCHoldLog</b> với ReasonCode/Mức nghiêm trọng/Ngăn chặn/Responsible Person</td><td>QC/QA</td><td>QCHoldLog hồ sơ</td><td>Ghi UNK nhưng không gán Responsible Person; thiếu Ngăn chặn</td></tr>
-<tr><td>3</td><td><b>Khóa truy xuất nguồn gốc</b>: xác nhận Job/Part/Rev; khóa program/print tại điểm sử dụng</td><td>Supervisor/Lập trình viên (CNC)</td><td>Ảnh màn hình/print + ghi Rev nghi ngờ</td><td>Đổi file ngoài kiểm soát; dùng file cũ tại máy</td></tr>
+<tr><td>3</td><td><b>Khóa truy xuất nguồn gốc</b>: xác nhận Job/Part/Rev; khóa program/print tại Point-of-use</td><td>Supervisor/Lập trình viên (CNC)</td><td>Ảnh màn hình/print + ghi Rev nghi ngờ</td><td>Đổi file ngoài kiểm soát; dùng file cũ tại máy</td></tr>
 <tr><td>4</td><td><b>Thu bằng chứng</b>: đo/ảnh/CMM; ghi rõ gage ID &amp; trạng thái hiệu chuẩn</td><td>QC</td><td>IR/CMM báo cáo + ảnh + gage ID</td><td>Ảnh không có thước; không ghi gage ID</td></tr>
 <tr><td>5</td><td><b>Mở NCR</b> khi đủ dữ kiện tối thiểu</td><td>QA</td><td>NCRLog + thư mục NCR</td><td>Thiếu DetectedAt/QtyAffected; không link thư mục</td></tr>
 <tr><td>6</td><td><b>Đánh giá ảnh hưởng</b>: khoanh vùng WIP/FG/thuê ngoài/ship lịch sử</td><td>QA+Supervisor+Planner</td><td>Danh sách phạm vi ảnh hưởng + link Job/lot</td><td>Chỉ khoanh vùng dòng / chuyền hiện tại; bỏ sót hàng chờ ship</td></tr>
@@ -581,7 +581,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="note" style="margin-top:12px">
-<b>Phản ứng khi quá hạn:</b> Khi QCHoldLog hoặc NCR không có người phụ trách hoặc quá hạn xử lý, Supervisor kích hoạt escalation theo Tier nhịp độ / chu kỳ họp <b>M365/SharePoint → HESEM-QMS-SSOT</b> chuẩn escalation nội bộ.
+<b>Phản ứng khi quá hạn:</b> Khi QCHoldLog hoặc NCR không có Responsible Person hoặc quá hạn xử lý, Supervisor kích hoạt escalation theo Tier nhịp độ / chu kỳ họp <b>M365/SharePoint → HESEM-QMS-SSOT</b> chuẩn escalation nội bộ.
  </div>
 </div>
 <!-- 9 -->
@@ -605,7 +605,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>STOP/TẠM GIỮ vật lý</td><td>Tách OK/NG; nhãn có JobNum/ca/ngày; đưa vào khu TẠM GIỮ</td><td>Chặn lan rộng và chặn giao nhầm</td></tr>
 <tr><td>2</td><td>Tạo QCHoldLog</td><td>Chọn đúng ReasonCode/Mức nghiêm trọng; ghi Ngăn chặn hành động ngay; gán Responsible Person</td><td>Quy tắc điều hướng hoạt động; không “TẠM GIỮ vô chủ”</td></tr>
-<tr><td>3</td><td>Khóa Job/Rev tại điểm sử dụng</td><td>So sánh Job pack ↔ program ↔ setup ↔ print; dán tag “Rev nghi ngờ”</td><td>Chặn sai Rev là rủi ro chết người</td></tr>
+<tr><td>3</td><td>Khóa Job/Rev tại Point-of-use</td><td>So sánh Job pack ↔ program ↔ setup ↔ print; dán tag “Rev nghi ngờ”</td><td>Chặn sai Rev là rủi ro chết người</td></tr>
 <tr><td>4</td><td>Thu bằng chứng đo</td><td>Ghi rõ gage ID; ảnh có thước/quy mô / thang đo; CMM báo cáo gắn đúng JobNum</td><td>MRB quyết dựa trên dữ liệu, không dựa cảm giác</td></tr>
 <tr><td>5</td><td>QA mở NCR</td><td>DetectedAt/DefectType/QtyAffected; link EvidenceFolderUrl; Trạng thái=Mở</td><td>dấu vết kiểm toán đầy đủ; khoanh vùng ảnh hưởng</td></tr>
 <tr><td>6</td><td>Đánh giá ảnh hưởng</td><td>Khoanh WIP/FG/thuê ngoài/ship lịch sử; liệt kê lô nghi ngờ</td><td>Chặn lỗi “xảy ra nơi khác” theo ISO 10.2</td></tr>
@@ -646,7 +646,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>Người vận hành/Setup</b></td>
+<td><b>Operator/Setup</b></td>
 <td>Gọi đúng STOP/TẠM GIỮ/CHẶN</td>
 <td>TẠM GIỮ vật lý đúng nhãn; báo đúng tuyến</td>
 <td>Khoanh vùng đúng theo Job/Opr; bàn giao QC/QA đủ dữ kiện</td>
@@ -677,7 +677,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>WHS/PUR/Planner/Kinh doanh</b></td>
 <td>Nhận biết rủi ro giao hàng và chứng từ</td>
 <td>CHẶN giao hàng khi thiếu gói hồ sơ; khóa nhận hàng khi thiếu cert</td>
-<td>Vận hành cổng kiểm soát đúng hồ sơ; bàn giao rõ người phụ trách/hạn chót</td>
+<td>Vận hành cổng kiểm soát đúng hồ sơ; bàn giao rõ Responsible Person/hạn chót</td>
 <td>Chủ trì escalation liên phòng; chặn áp lực ngày đến hạn làm vượt qua cổng kiểm soát</td>
 </tr>
 </tbody>
@@ -685,9 +685,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3 class="h3">10.1 Quyền hạn sau khi đạt (ví dụ)</h3>
 <ul style="line-height:1.9">
-<li><b>Người vận hành/Setup L3:</b> được quyền STOP tại máy và đưa WIP vào TẠM GIỮ không cần xin phép trước.</li>
+<li><b>Operator/Setup L3:</b> được quyền STOP tại máy và đưa WIP vào TẠM GIỮ không cần xin phép trước.</li>
 <li><b>QC L3:</b> được quyền tạo QCHoldLog và yêu cầu kho CHẶN phê duyệt giao hàng khi thiếu bằng chứng.</li>
-<li><b>QA L3:</b> được quyền phát hành khi IR PASS và hồ sơ đầy đủ; được quyền mở CAPA và đặt người phụ trách/hạn chót.</li>
+<li><b>QA L3:</b> được quyền phát hành khi IR PASS và hồ sơ đầy đủ; được quyền mở CAPA và đặt Responsible Person/hạn chót.</li>
 <li><b>Supervisor L4:</b> được quyền điều phối MRB và báo cáo vượt cấp lên GM khi có concession/stop-ship.</li>
 </ul>
 </div>
@@ -703,7 +703,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>DefectType “DIM” đại diện nhóm lỗi nào trong NCRLog?</li>
 <li>Phân biệt “sửa chữa / hiệu chính” và “khắc phục hành động” bằng 01 ví dụ thực tế.</li>
 <li>Disposition “UAI” chỉ được dùng khi nào?</li>
-<li>Ai là người phụ trách bắt buộc để mở NCR theo SOP-QMS-006?</li>
+<li>Ai là Responsible Person bắt buộc để mở NCR theo SOP-QMS-006?</li>
 <li>Khi dụng cụ đo hết hạn hiệu chuẩn, hành động ngay là STOP/TẠM GIỮ/CHẶN mức nào?</li>
 <li>MRB tối thiểu gồm những vai trò nào để quyết disposition không mù rủi ro?</li>
 <li>Nguyên nhân gốc khác điểm lọt ở điểm nào? Nêu 01 ví dụ “điểm lọt” trong CNC.</li>
@@ -725,7 +725,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" style="margin-top:12px">
 <h3 class="h3" style="margin-top:0">Tình huống 1 — Sai Rev do program</h3>
 <p><b>Dữ kiện:</b> Job J-240215, Part P-881, Rev trên traveler = B. Tại máy, file program tên “P-881_REV-A.nc”. QC đo 3 pcs đầu: 2/3 vượt giới hạn CTQ vát mép.</p>
-<p><b>Quyết định bắt buộc:</b> kích hoạt STOP/TẠM GIỮ/CHẶN mức nào; chọn HoldReasonCode; liệt kê 05 bằng chứng tối thiểu phải có trong 30 phút đầu; xác định ai là người phụ trách nguyên nhân gốc và ai là người phụ trách điểm lọt.</p>
+<p><b>Quyết định bắt buộc:</b> kích hoạt STOP/TẠM GIỮ/CHẶN mức nào; chọn HoldReasonCode; liệt kê 05 bằng chứng tối thiểu phải có trong 30 phút đầu; xác định ai là Responsible Person nguyên nhân gốc và ai là Responsible Person điểm lọt.</p>
 <p><b>MRR bắt buộc:</b> ảnh nhãn TẠM GIỮ + QCHoldLog + IR/CMM bằng chứng + ghi chú Rev nghi ngờ + link thư mục NCR.</p>
 </div>
 <div class="card" style="margin-top:12px">
@@ -736,7 +736,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card" style="margin-top:12px">
 <h3 class="h3" style="margin-top:0">Tình huống 3 — Lặp lại vấn đề và CAPA không hiệu lực</h3>
-<p><b>Dữ kiện 6 tuần:</b> NCR “bavia cạnh” lặp 3 lần trên 2 Job khác nhau; lần 1 làm lại; lần 2 thay dao; lần 3 lại tái diễn. CAPA trước đó ghi hành động “nhắc nhở Người vận hành”.</p>
+<p><b>Dữ kiện 6 tuần:</b> NCR “bavia cạnh” lặp 3 lần trên 2 Job khác nhau; lần 1 làm lại; lần 2 thay dao; lần 3 lại tái diễn. CAPA trước đó ghi hành động “nhắc nhở Operator”.</p>
 <p><b>Quyết định bắt buộc:</b> xác định nguyên nhân gốc và điểm lọt mới; định nghĩa hành động hệ thống bắt buộc; định nghĩa “effectiveness” bằng thước đo cụ thể; quyết định khi nào đóng CAPA và khi nào mở lại.</p>
 <p><b>MRR bắt buộc:</b> CAPA8D cập nhật RootCause+EscapePoint+CorrectiveAction; bằng chứng triển khai (WI/Setup cập nhật + đào tạo hồ sơ); dữ liệu trước/sau.</p>
 </div>
@@ -751,7 +751,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th style="width:220px">Hạng mục</th><th>đạt khi</th><th>Không đạt khi</th></tr></thead>
 <tbody>
 <tr><td>TẠM GIỮ 60 giây</td><td>Cô lập vật lý + báo đúng tuyến + hồ sơ TẠM GIỮ</td><td>Chỉ báo miệng; không có hồ sơ; hàng rời khỏi dòng / chuyền</td></tr>
-<tr><td>QCHoldLog</td><td>ReasonCode/Mức nghiêm trọng/Ngăn chặn/Responsible Person/Trạng thái đầy đủ</td><td>Thiếu người phụ trách hoặc ngăn chặn; dùng sai code</td></tr>
+<tr><td>QCHoldLog</td><td>ReasonCode/Mức nghiêm trọng/Ngăn chặn/Responsible Person/Trạng thái đầy đủ</td><td>Thiếu Responsible Person hoặc ngăn chặn; dùng sai code</td></tr>
 <tr><td>NCR gói hàng</td><td>NCRLog đủ trường + thư mục có ≥3 bằng chứng</td><td>Thiếu Job/Rev hoặc thiếu bằng chứng đo</td></tr>
 <tr><td>MRB quyết định</td><td>Disposition rõ + tiêu chí xác minh + concession có phê duyệt (khi có)</td><td>Quyết mơ hồ; không có tiêu chí đo lại</td></tr>
 <tr><td>CAPA &amp; hiệu lực</td><td>Nguyên nhân gốc + điểm lọt + hành động hệ thống + kế hoạch effectiveness</td><td>Nguyên nhân gốc = “do người”; đóng CAPA không có dữ liệu</td></tr>

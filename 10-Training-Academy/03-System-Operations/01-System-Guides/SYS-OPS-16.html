@@ -135,7 +135,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Tổng / Chung Manager (EXE-01) / COO</b></td>
 <td>Chủ trì quyết định: mục tiêu, nguồn lực, ưu tiên, thay đổi hệ thống.</td>
-<td>Quyết định có ghi lý do + người phụ trách + hạn; xác nhận phê duyệt Biên bản họp.</td>
+<td>Quyết định có ghi lý do + Responsible Person + hạn; xác nhận phê duyệt Biên bản họp.</td>
 <td><span class="kpi-pill">L3</span></td>
 </tr>
 <tr>
@@ -147,7 +147,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Planner / Sản xuất Control</b></td>
 <td>Trình bày OTD, tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn), điều phối xuất hàng tuân thủ, công việc tồn đọng/công suất.</td>
-<td>KPI ảnh chụp trạng thái + Pareto vấn đề chặn + danh sách job quá SLA có người phụ trách xử lý.</td>
+<td>KPI ảnh chụp trạng thái + Pareto vấn đề chặn + danh sách job quá SLA có Responsible Person xử lý.</td>
 <td><span class="kpi-pill">L2</span></td>
 </tr>
 <tr>
@@ -191,7 +191,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="req" style="margin-top:12px;">
 <span class="req-tag shall">PHẢI</span>
 <div>
- Mọi Hành động trong MR PHẢI có <b>01 người phụ trách cá nhân</b> (không ghi “phòng ban”), <b>01 hạn hoàn thành</b>, <b>01 tiêu chí đóng</b>, và <b>01 bằng chứng</b> gắn link/hồ sơ.
+ Mọi Hành động trong MR PHẢI có <b>01 Responsible Person cá nhân</b> (không ghi “phòng ban”), <b>01 hạn hoàn thành</b>, <b>01 tiêu chí đóng</b>, và <b>01 bằng chứng</b> gắn link/hồ sơ.
  </div>
 </div>
 </div>
@@ -264,7 +264,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td><b>T-2 ngày</b></td><td>Chốt danh sách KPI &amp; dữ liệu; gửi chương trình họp; yêu cầu các bộ phận gửi đầu vào đúng định dạng.</td><td>QA/QMS</td></tr>
 <tr><td><b>T-1 ngày</b></td><td>Khóa Data Pack (ảnh chụp trạng thái) và phát hành link; đánh dấu điểm đỏ cần quyết định.</td><td>QA/QMS + Responsible Person</td></tr>
-<tr><td><b>T0</b></td><td>Họp MR 45–60 phút; chốt quyết định + hành động; xác nhận người phụ trách + hạn.</td><td>Tổng / Chung Manager (EXE-01)</td></tr>
+<tr><td><b>T0</b></td><td>Họp MR 45–60 phút; chốt quyết định + hành động; xác nhận Responsible Person + hạn.</td><td>Tổng / Chung Manager (EXE-01)</td></tr>
 <tr><td><b>T+1 ngày</b></td><td>Phát hành FRM-QMS-003; hành động nhập bảng theo dõi; gửi thông báo.</td><td>QA/QMS</td></tr>
 <tr><td><b>Hàng tuần</b></td><td>theo dõi tiếp hành động quá hạn tại Tier 2; escalations theo SLA.</td><td>trưởng nhóm + QA</td></tr>
 </tbody>
@@ -284,7 +284,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>MR (Xem xét của lãnh đạo)</b></td>
 <td>Họp của lãnh đạo để đánh giá hiệu lực QMS và ra quyết định về cải tiến, thay đổi hệ thống, nguồn lực.</td>
-<td>FRM-QMS-003 có quyết định/người phụ trách/hạn + lý do tham chiếu KPI/Đánh giá/Rủi ro.</td>
+<td>FRM-QMS-003 có quyết định/Responsible Person/hạn + lý do tham chiếu KPI/Đánh giá/Rủi ro.</td>
 </tr>
 <tr>
 <td><b>MR Data Pack</b></td>
@@ -298,8 +298,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Hành động (hành động)</b></td>
-<td>Công việc có người phụ trách, hạn, tiêu chí đóng, và bằng chứng. Hành động không có người phụ trách bị xem là không tồn tại.</td>
-<td>Hành động: “Cập nhật bảng kiểm phê duyệt giao hàng (ship phát hành)” • Responsible Person: Tổ trưởng kho • Due: 2026-03-05 • Bằng chứng: link file.</td>
+<td>Công việc có Responsible Person, hạn, tiêu chí đóng, và bằng chứng. Hành động không có Responsible Person bị xem là không tồn tại.</td>
+<td>Hành động: “Cập nhật bảng kiểm phê duyệt giao hàng (ship phát hành)” • Responsible Person: Team Leader kho • Due: 2026-03-05 • Bằng chứng: link file.</td>
 </tr>
 <tr>
 <td><b>MRR cho MR</b></td>
@@ -325,7 +325,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><strong>L1</strong><div class="muted">Tham gia &amp; làm theo hướng dẫn</div></td>
-<td>Nắm cấu trúc MR, hiểu đầu vào/đầu ra và trách nhiệm người phụ trách.</td>
+<td>Nắm cấu trúc MR, hiểu đầu vào/đầu ra và trách nhiệm Responsible Person.</td>
 <td>Điền đúng phần dữ liệu của bộ phận vào template Data Pack.</td>
 <td>01 phần Data Pack đúng định dạng + bài kiểm tra nhanh đạt.</td>
 <td><code>MR-K1</code>: Bài kiểm tra nhanh ≥ 80%</td>
@@ -334,7 +334,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>L2</strong><div class="muted">Thực hiện độc lập phần việc</div></td>
 <td>Hiểu KPI của bộ phận (định nghĩa, mục tiêu, ngưỡng đỏ).</td>
 <td>Trình bày xu hướng và đưa phương án xử lý có dữ liệu.</td>
-<td>trình chiếu / trượt/KPI ảnh chụp trạng thái + 01 hành động có người phụ trách/hạn/bằng chứng.</td>
+<td>trình chiếu / trượt/KPI ảnh chụp trạng thái + 01 hành động có Responsible Person/hạn/bằng chứng.</td>
 <td><code>MR-K2</code>: Data Pack đúng hạn ≥ 95%</td>
 </tr>
 <tr>
@@ -381,7 +381,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Điều phối chương trình họp đúng thời gian; khóa hành động đúng chuẩn; phát hành biên bản họp trong 24 giờ; theo dõi tiếp hành động quá hạn tại Tier 2.
  </td>
 <td>
- 01 kỳ MR hoàn chỉnh + 05 hành động hợp lệ + không có hành động thiếu người phụ trách/hạn; biên bản họp phát hành đúng hạn.
+ 01 kỳ MR hoàn chỉnh + 05 hành động hợp lệ + không có hành động thiếu Responsible Person/hạn; biên bản họp phát hành đúng hạn.
  </td>
 <td>
  Được quyền phát hành Data Pack/MR biên bản họp; được quyền TẠM GIỮ kết luận mục KPI khi thiếu bằng chứng hoặc có rủi ro nhầm REV.
@@ -390,7 +390,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Planner (L2)</b></td>
 <td>
- Trình bày OTD/tuổi tồn WIP (tuổi tồn / tuổi tồn) theo xu hướng; nêu top vấn đề chặn theo Pareto; gắn người phụ trách xử lý cho từng vấn đề chặn chính.
+ Trình bày OTD/tuổi tồn WIP (tuổi tồn / tuổi tồn) theo xu hướng; nêu top vấn đề chặn theo Pareto; gắn Responsible Person xử lý cho từng vấn đề chặn chính.
  </td>
 <td>
  KPI ảnh chụp trạng thái đúng kỳ + 01 hành động xử lý vấn đề chặn có bằng chứng (kế hoạch điều phối/đẩy nhanh tiến độ log).
@@ -429,7 +429,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Chốt quyết định nguồn lực; xác nhận ưu tiên cấp hệ thống; yêu cầu kiểm tra hiệu lực hành động.
  </td>
 <td>
- Quyết định ghi rõ người phụ trách + hạn + nguồn lực; hành động quá hạn được xử lý escalations rõ ràng.
+ Quyết định ghi rõ Responsible Person + hạn + nguồn lực; hành động quá hạn được xử lý escalations rõ ràng.
  </td>
 <td>
  Được quyền phê duyệt thay đổi hệ thống (SOP/KPI/luồng công việc) và phân bổ ngân sách/nhân lực.
@@ -460,7 +460,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Quyết định cải tiến QMS và cải tiến quá trình/sản phẩm.</li>
 <li>Quyết định thay đổi hệ thống (SOP, biểu mẫu, KPI, luồng công việc).</li>
 <li>Nhu cầu nguồn lực (thiết bị, nhân sự, đào tạo, ngân sách).</li>
-<li>Kế hoạch hành động có người phụ trách/hạn/tiêu chí đóng/bằng chứng.</li>
+<li>Kế hoạch hành động có Responsible Person/hạn/tiêu chí đóng/bằng chứng.</li>
 </ul>
 </div>
 </div>
@@ -519,14 +519,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>A3</b></td><td>Rà soát KPI xu hướng (OTD/Chất lượng/Luồng/Thiết bị)</td><td>Đỏ → tạo hành động; xanh → xác nhận duy trì</td></tr>
 <tr><td><b>A4</b></td><td>Khách hàng + Nhà cung cấp + Đánh giá + CAPA</td><td>Chốt ngăn chặn/CAPA/SCAR</td></tr>
 <tr><td><b>A5</b></td><td>Rủi ro &amp; thay đổi (REV/layout/máy/nhân sự)</td><td>Cập nhật sổ đăng ký rủi ro (rủi ro sổ đăng ký) + quyết định kiểm soát</td></tr>
-<tr><td><b>A6</b></td><td>Nguồn lực &amp; quyết định cấp hệ thống</td><td>Quyết định nguồn lực có người phụ trách/hạn</td></tr>
+<tr><td><b>A6</b></td><td>Nguồn lực &amp; quyết định cấp hệ thống</td><td>Quyết định nguồn lực có Responsible Person/hạn</td></tr>
 </tbody>
 </table>
 </div>
 <h3>8.3 Sau họp (T+1)</h3>
 <ol style="line-height:1.9; margin:0 0 0 18px;">
 <li>QA/QMS hoàn thiện FRM-QMS-003, đính kèm link Data Pack ảnh chụp trạng thái và phát hành trong 24 giờ.</li>
-<li>QA/QMS nhập Hành động list vào bảng theo dõi; mỗi hành động có người phụ trách, hạn, tiêu chí đóng, và nơi lưu bằng chứng.</li>
+<li>QA/QMS nhập Hành động list vào bảng theo dõi; mỗi hành động có Responsible Person, hạn, tiêu chí đóng, và nơi lưu bằng chứng.</li>
 <li>Responsible Person triển khai hành động và cập nhật trạng thái theo SLA; QA/QMS kiểm tra đóng hành động theo tiêu chí và bằng chứng.</li>
 </ol>
 <div class="req" style="margin-top:12px;">
@@ -554,14 +554,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Dữ liệu KPI không thống nhất định nghĩa</td><td>Quyết định sai, tranh luận kéo dài</td><td>Khóa KPI từ điển và nguồn dữ liệu trước MR</td><td>QA/QMS</td><td>Data Pack có định nghĩa KPI</td></tr>
 <tr><td>2</td><td>Không rà soát hành động kỳ trước</td><td>Hành động trôi, lặp lỗi</td><td>Mục A2 bắt buộc đứng đầu chương trình họp</td><td>Chủ trì</td><td>Biên bản họp có bảng hành động kỳ trước</td></tr>
-<tr><td>3</td><td>Hành động không có người phụ trách cá nhân</td><td>Không ai chịu trách nhiệm</td><td>Biên bản họp chỉ chấp nhận người phụ trách cá nhân</td><td>QA/QMS</td><td>Hành động list có tên người</td></tr>
+<tr><td>3</td><td>Hành động không có Responsible Person cá nhân</td><td>Không ai chịu trách nhiệm</td><td>Biên bản họp chỉ chấp nhận Responsible Person cá nhân</td><td>QA/QMS</td><td>Hành động list có tên người</td></tr>
 <tr><td>4</td><td>Hành động không có hạn</td><td>Quá hạn kéo dài, mất kiểm soát</td><td>Không chốt hành động khi thiếu ngày đến hạn</td><td>Chủ trì</td><td>Hành động list có due</td></tr>
 <tr><td>5</td><td>Đóng hành động không có bằng chứng</td><td>đánh giá không đạt, lỗi lặp</td><td>Đóng hành động kèm link hồ sơ; QA/QMS kiểm tra hiệu lực</td><td>Responsible Person + QA</td><td>Link bằng chứng trong bảng theo dõi</td></tr>
 <tr><td>6</td><td>Biên bản họp phát hành trễ</td><td>Mất nhịp triển khai, lệch thông tin 2 ca</td><td>Phát hành trong 24 giờ; KPI theo dõi</td><td>QA/QMS</td><td>Email/Teams thông báo + file</td></tr>
 <tr><td>7</td><td>Không rà soát đánh giá phát hiện/CAPA</td><td>Lặp lại NC, khách đánh giá không đạt</td><td>chương trình họp có mục đánh giá + CAPA tuổi tồn</td><td>QA/QMS</td><td>CAPA list + trạng thái</td></tr>
 <tr><td>8</td><td>Bỏ qua phản hồi khách hàng/khiếu nại</td><td>Lọt lỗi, mất uy tín</td><td>Khách hàng phản hồi là đầu vào bắt buộc</td><td>Kinh doanh/QA</td><td>Khách hàng log + NCR/8D</td></tr>
 <tr><td>9</td><td>Bỏ qua nhà cung cấp/thuê ngoài hiệu suất</td><td>Chậm giao, lỗi đầu vào</td><td>Thẻ điểm + PO trễ + hành động escalation</td><td>PUR</td><td>Nhà cung cấp thẻ điểm</td></tr>
-<tr><td>10</td><td>Không cập nhật rủi ro khi có thay đổi REV/layout</td><td>Rủi ro CTQ lọt, sai REV</td><td>sổ đăng ký rủi ro cập nhật sau MR, gắn người phụ trách</td><td>ENG + QA</td><td>Sổ đăng ký rủi ro mục nhập</td></tr>
+<tr><td>10</td><td>Không cập nhật rủi ro khi có thay đổi REV/layout</td><td>Rủi ro CTQ lọt, sai REV</td><td>sổ đăng ký rủi ro cập nhật sau MR, gắn Responsible Person</td><td>ENG + QA</td><td>Sổ đăng ký rủi ro mục nhập</td></tr>
 <tr><td>11</td><td>Họp thiếu đại diện 2 ca</td><td>Triển khai lệch ca, lỗi lặp</td><td>Đặt giờ họp có đại diện 2 ca; ghi chuyên cần / điểm danh</td><td>Chủ trì</td><td>Chuyên cần trong biên bản họp</td></tr>
 <tr><td>12</td><td>Quyết định không gắn nguồn lực</td><td>Hành động không thực thi, quá hạn</td><td>Quyết định nguồn lực ghi rõ ai cấp và thời điểm</td><td>Chủ trì</td><td>Quyết định + nguồn lực dòng / chuyền</td></tr>
 </tbody>
@@ -580,7 +580,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Khóa KPI từ điển cho kỳ MR</td><td>QA/QMS</td><td>Danh sách KPI + nguồn dữ liệu (có phiên bản)</td><td>Không đổi định nghĩa KPI trong kỳ</td></tr>
 <tr><td>2</td><td>Data Pack ảnh chụp trạng thái có ngày/kỳ/phiên bản</td><td>Draft</td><td>DataPack.pdf/trình chiếu / trượt có version</td><td>Truy vết được dữ liệu tại thời điểm họp</td></tr>
-<tr><td>3</td><td>Hành động sơ đồ cấu trúc chuẩn (người phụ trách/hạn/tiêu chí/bằng chứng)</td><td>QA/QMS</td><td>Bảng theo dõi hành động trường dữ liệu cố định</td><td>100% hành động hợp lệ</td></tr>
+<tr><td>3</td><td>Hành động sơ đồ cấu trúc chuẩn (Responsible Person/hạn/tiêu chí/bằng chứng)</td><td>QA/QMS</td><td>Bảng theo dõi hành động trường dữ liệu cố định</td><td>100% hành động hợp lệ</td></tr>
 <tr><td>4</td><td>Phát hành biên bản họp trong 24 giờ</td><td>QA/QMS</td><td>FRM-QMS-003 phát hành + thông báo</td><td>100% kỳ MR đúng hạn</td></tr>
 <tr><td>5</td><td>theo dõi tiếp hành động quá hạn tại Tier 2</td><td>trưởng nhóm + QA</td><td>Biên bản Tier 2 + trạng thái bảng theo dõi</td><td>Hành động quá hạn có escalation rõ ràng</td></tr>
 <tr><td>6</td><td>Kiểm tra hiệu lực trước khi đóng hành động</td><td>QA/QMS</td><td>Effectiveness kiểm tra note + bằng chứng link</td><td>Đóng hành động không có bằng chứng = 0</td></tr>
@@ -594,7 +594,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout">
 <ul style="margin:0 0 0 18px; line-height:1.9;">
 <li><b>Rule 1 — Thiếu MRR cho MR:</b> khi thiếu chương trình họp + Data Pack ảnh chụp trạng thái + biên bản họp → MR bị xem là chưa hoàn tất và bị chặn kết luận.</li>
-<li><b>Rule 2 — Hành động không có người phụ trách/hạn:</b> khi hành động thiếu người phụ trách cá nhân hoặc thiếu hạn → hành động không được ghi nhận.</li>
+<li><b>Rule 2 — Hành động không có Responsible Person/hạn:</b> khi hành động thiếu Responsible Person cá nhân hoặc thiếu hạn → hành động không được ghi nhận.</li>
 <li><b>Rule 3 — KPI đỏ không có hành động:</b> khi KPI đỏ không gắn hành động → MR bị xem là không hiệu lực cho mục đó và phải bổ sung hành động trong 24 giờ.</li>
 </ul>
 </div>
@@ -612,7 +612,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Tình huống 2: hành động quá hạn ảnh hưởng ship</strong>
 <ol style="margin:0 0 0 18px; line-height:1.85;">
-<li>Chuyển escalation sang Tier 2 cùng ngày; chủ trì MR gọi người phụ trách cam kết giờ hoàn thành.</li>
+<li>Chuyển escalation sang Tier 2 cùng ngày; chủ trì MR gọi Responsible Person cam kết giờ hoàn thành.</li>
 <li>QA/QMS mở NCR/CAPA khi rủi ro chất lượng/khách hàng.</li>
 <li>Bảng theo dõi cập nhật trạng thái và gắn bằng chứng ngăn chặn.</li>
 </ol>
@@ -633,7 +633,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout">
 <b>Tình huống A — OTD giảm và tuổi tồn WIP (tuổi tồn / tuổi tồn) tăng (ảnh hưởng 2 ca)</b><br/>
  Dữ liệu: OTD tuần = 88% (mục tiêu 95%), WIP quá SLA = 14 job, top vấn đề chặn: chờ đo CMM + chờ outsource xi mạ anốt (xi mạ anốt (anodize)).
- Nhiệm vụ: tạo 03 hành động bắt buộc (người phụ trách/hạn/bằng chứng), trong đó 01 hành động liên quan nguồn lực đo lường và 01 hành động liên quan nhà cung cấp.
+ Nhiệm vụ: tạo 03 hành động bắt buộc (Responsible Person/hạn/bằng chứng), trong đó 01 hành động liên quan nguồn lực đo lường và 01 hành động liên quan nhà cung cấp.
  </div>
 <div class="callout" style="margin-top:10px;">
 <b>Tình huống B — Khiếu nại khách hàng về bavia (CTQ)</b><br/>
@@ -655,7 +655,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>PT2 — Hỗ trợ / Tạo điều kiện MR</b></td>
 <td>Điều phối mô phỏng MR 30 phút và chốt tối thiểu 05 hành động.</td>
-<td>Hành động đủ người phụ trách/hạn/tiêu chí đóng • không bỏ qua đánh giá/CAPA.</td>
+<td>Hành động đủ Responsible Person/hạn/tiêu chí đóng • không bỏ qua đánh giá/CAPA.</td>
 </tr>
 <tr>
 <td><b>PT3 — Biên bản họp</b></td>
@@ -674,11 +674,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Hành động MR hợp lệ phải có đủ thành phần nào?<br/>
  A. Responsible Person phòng ban • B. Responsible Person cá nhân + hạn + tiêu chí đóng + bằng chứng • C. Chỉ cần mô tả • D. Chỉ cần hạn chót</li>
 <li>Khi KPI đỏ xuất hiện trong MR, hành động bắt buộc là gì?<br/>
- A. Ghi nhận để kỳ sau xử lý • B. Tạo hành động có người phụ trách/hạn/bằng chứng • C. Bỏ qua • D. Chờ khách nhắc</li>
+ A. Ghi nhận để kỳ sau xử lý • B. Tạo hành động có Responsible Person/hạn/bằng chứng • C. Bỏ qua • D. Chờ khách nhắc</li>
 <li>MR Data Pack được “khóa ảnh chụp trạng thái” nhằm mục tiêu gì?<br/>
  A. Làm đẹp báo cáo • B. Bảo vệ truy vết và chống sửa số liệu sau họp • C. Giảm dung lượng file • D. Tránh đánh giá</li>
 <li>Ai chịu trách nhiệm phát hành biên bản MR theo chuẩn HESEM?<br/>
- A. Kho • B. QA/QMS • C. Người vận hành • D. IT</li>
+ A. Kho • B. QA/QMS • C. Operator • D. IT</li>
 <li>Thời hạn phát hành FRM-QMS-003 sau MR là bao lâu?<br/>
  A. 07 ngày • B. 24 giờ • C. 30 ngày • D. Không quy định</li>
 <li>Đầu vào nào bắt buộc phải có trong MR?<br/>
@@ -699,7 +699,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  A. bên cuối buổi • B. Rà soát hành động kỳ trước • C. Rà soát logo • D. Rà soát nghỉ phép</li>
 <li>Dữ liệu nhà cung cấp/thuê ngoài được rà soát nhằm mục tiêu gì?<br/>
  A. Tăng số PO • B. Kiểm soát rủi ro chất lượng và chậm giao do bên ngoài • C. Tăng chi phí • D. Giảm hồ sơ</li>
-<li>Vì sao hành động không ghi “phòng ban” làm người phụ trách?<br/>
+<li>Vì sao hành động không ghi “phòng ban” làm Responsible Person?<br/>
  A. Vì dài • B. Vì không gắn trách nhiệm cá nhân và khó đóng đúng hạn • C. Vì sai ISO 4.1 • D. Vì không đẹp</li>
 <li>Khi phát hiện nguy cơ nhầm REV trong MR, vận hành đúng là gì?<br/>
  A. Tiếp tục dùng dữ liệu đó • B. TẠM GIỮ mục liên quan và yêu cầu xác nhận REV + cập nhật biên bản họp • C. Xóa file • D. Không ghi nhận</li>
@@ -739,7 +739,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>3</b></td>
 <td>Điều phối họp MR</td>
-<td>Giữ thời gian; chốt quyết định; mọi KPI đỏ gắn hành động; hành động có người phụ trách cá nhân + hạn.</td>
+<td>Giữ thời gian; chốt quyết định; mọi KPI đỏ gắn hành động; hành động có Responsible Person cá nhân + hạn.</td>
 <td>Họp ra quyết định; không biến thành “kể KPI”.</td>
 </tr>
 <tr>
@@ -765,7 +765,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note" style="margin-top:12px;">
 <strong>Tiêu chí OJT PASS</strong>
 <ul>
-<li>Học viên tự chạy được 01 kỳ MR mô phỏng hoặc thực tế theo bảng kiểm; không phát sinh hành động thiếu người phụ trách/hạn.</li>
+<li>Học viên tự chạy được 01 kỳ MR mô phỏng hoặc thực tế theo bảng kiểm; không phát sinh hành động thiếu Responsible Person/hạn.</li>
 <li>FRM-QMS-003 phát hành đúng hạn và có link Data Pack ảnh chụp trạng thái.</li>
 <li>Ít nhất 01 hành động được đóng có bằng chứng và có kiểm tra hiệu lực.</li>
 </ul>
@@ -773,7 +773,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card" id="checklist">
 <h2>12) Bảng kiểm triển khai MR (≤ 15 bước)</h2>
-<p class="muted">Bảng kiểm dùng để chạy MR đúng chuẩn, giảm phụ thuộc kinh nghiệm cá nhân. Mỗi bước có người phụ trách, hồ sơ, và lỗi hay gặp.</p>
+<p class="muted">Bảng kiểm dùng để chạy MR đúng chuẩn, giảm phụ thuộc kinh nghiệm cá nhân. Mỗi bước có Responsible Person, hồ sơ, và lỗi hay gặp.</p>
 <table class="table">
 <thead>
 <tr>
@@ -791,7 +791,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>4</td><td>Chụp ảnh chụp trạng thái bảng điều khiển (Data Pack)</td><td>QA/QMS</td><td>Data Pack có phiên bản</td><td>Ảnh chụp trạng thái thiếu ngày/phiên bản</td></tr>
 <tr><td>5</td><td>Đánh dấu red mục / hạng mục cần quyết định</td><td>QA/QMS</td><td>Danh sách red mục / hạng mục</td><td>Không chuẩn bị câu hỏi quyết định</td></tr>
 <tr><td>6</td><td>Chạy MR theo chương trình họp (45–60 phút)</td><td>Chủ trì</td><td>Chuyên cần + biên bản họp nháp</td><td>Sa đà tranh luận không chốt</td></tr>
-<tr><td>7</td><td>Chốt hành động: người phụ trách cá nhân + hạn + tiêu chí đóng</td><td>Chủ trì</td><td>Hành động list</td><td>Responsible Person ghi phòng ban</td></tr>
+<tr><td>7</td><td>Chốt hành động: Responsible Person cá nhân + hạn + tiêu chí đóng</td><td>Chủ trì</td><td>Hành động list</td><td>Responsible Person ghi phòng ban</td></tr>
 <tr><td>8</td><td>Ghi quyết định nguồn lực</td><td>Chủ trì</td><td>Quyết định dòng / đường</td><td>Quyết định không gắn nguồn lực</td></tr>
 <tr><td>9</td><td>Hoàn thiện FRM-QMS-003</td><td>QA/QMS</td><td>FRM-QMS-003</td><td>Thiếu tham chiếu KPI/Đánh giá/Rủi ro</td></tr>
 <tr><td>10</td><td>Phát hành biên bản họp trong 24 giờ</td><td>QA/QMS</td><td>Biên bản họp phát hành + thông báo</td><td>Phát hành trễ làm lệch ca</td></tr>
@@ -822,7 +822,7 @@ MR_{YYYY-MM}_{Site/Nhà máy}_{Version}_DataPack.pdf</pre>
 </div>
 <div class="callout">
 <b>Nơi lưu:</b> M365/SharePoint → CNC-IMS-HUB → <b>QMS-Hồ sơ</b> → Quản lý-Rà soát → {YYYY} → {YYYY-MM}<br/>
-<b>Lưu ý Hồ sơ công việc (hồ sơ công việc):</b> Khi MR cần dẫn chứng theo job, sử dụng thư mục Hồ sơ công việc và thư mục con <code>08_Management-Rà soát</code> theo cấu trúc đã chuẩn hóa trong bộ mẫu cấu hình (SSOT).
+<b>Lưu ý Hồ sơ công việc (hồ sơ công việc):</b> Khi MR cần dẫn chứng theo job, sử dụng thư mục Hồ sơ công việc và Sub-folder <code>08_Management-Rà soát</code> theo cấu trúc đã chuẩn hóa trong bộ mẫu cấu hình (SSOT).
  </div>
 <div class="req" style="margin-top:12px;">
 <span class="req-tag shall">PHẢI</span>
@@ -835,7 +835,7 @@ MR_{YYYY-MM}_{Site/Nhà máy}_{Version}_DataPack.pdf</pre>
 <h3>14.1 Chung đánh giá phát hiện về MR (≥ 8)</h3>
 <ul style="margin:0 0 0 18px; line-height:1.9;">
 <li>Biên bản MR chỉ ghi KPI, không ghi quyết định và hành động.</li>
-<li>Hành động không có người phụ trách cá nhân hoặc thiếu hạn hoàn thành.</li>
+<li>Hành động không có Responsible Person cá nhân hoặc thiếu hạn hoàn thành.</li>
 <li>Hành động đóng không có bằng chứng; không có kiểm tra hiệu lực.</li>
 <li>Không rà soát hành động kỳ trước hoặc hành động quá hạn không có escalations.</li>
 <li>Không đưa đánh giá phát hiện/CAPA vào MR, dẫn tới lặp lại NC.</li>

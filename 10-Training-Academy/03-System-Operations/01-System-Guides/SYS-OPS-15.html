@@ -93,7 +93,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Thông tin triển khai</strong>
 <ul>
-<li><strong>Đối tượng:</strong> QA/QMS, QC, Sản xuất (Người vận hành/Setup/Tổ trưởng), Kỹ thuật/Lập trình, Kế hoạch/Mua hàng, Kho/Giao hàng, Bảo trì/Hiệu chuẩn, Kinh doanh/CS, HR/Đào tạo.</li>
+<li><strong>Đối tượng:</strong> QA/QMS, QC, Sản xuất (Operator/Setup/Team Leader), Kỹ thuật/Lập trình, Kế hoạch/Mua hàng, Kho/Giao hàng, Bảo trì/Hiệu chuẩn, Kinh doanh/CS, HR/Đào tạo.</li>
 <li><strong>Giới hạn thời gian học:</strong> mỗi vai trò học tối đa 02 ngày/tuần; ưu tiên chia nhỏ theo ca.</li>
 <li><strong>Thời lượng chuẩn:</strong> Lý thuyết 2 giờ • Thực hành nhóm 2 giờ • OJT 4 giờ • Đánh giá 1 giờ.</li>
 <li><strong>Đầu vào bắt buộc:</strong> hoàn tất Định hướng QMS + hiểu cách truy xuất nguồn gốc hồ sơ Hồ sơ Job.</li>
@@ -149,8 +149,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Không để “quá hạn đóng”; bằng chứng gắn đúng Job/Rev/Ngày; hành động ngăn tái diễn thể hiện trong hồ sơ/KPI.</td>
 </tr>
 <tr>
-<td><b>Người vận hành / Setup / Lập trình viên</b></td>
-<td>Trình bày cách làm theo WI/SOP tại điểm sử dụng, cung cấp hồ sơ Phiếu theo dõi Job (Traveler), phiên bản CAM/chương trình, FAI/IPQC.</td>
+<td><b>Operator / Setup / Lập trình viên</b></td>
+<td>Trình bày cách làm theo WI/SOP tại Point-of-use, cung cấp hồ sơ Phiếu theo dõi Job (Traveler), phiên bản CAM/chương trình, FAI/IPQC.</td>
 <td>Trả lời dựa trên hồ sơ; biết điểm chặn: chạy sai phiên bản, gage quá hạn, thiếu QA phát hành.</td>
 </tr>
 <tr>
@@ -294,7 +294,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Chuẩn bị</strong> (rà soát dữ liệu, bảng kiểm, lấy mẫu Job).</div></div>
 <div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Thực hiện</strong> (mở / lỗ mở, phỏng vấn, quan sát, kiểm hồ sơ, truy vết Job).</div></div>
 <div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Ghi phát hiện</strong> (đủ cấu trúc, phân loại Lớn / Nghiêm trọng/Nhỏ / Không nghiêm trọng/OFI).</div></div>
-<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Họp kết thúc</strong> (chốt người phụ trách + ngày đến hạn + ngăn chặn).</div></div>
+<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Họp kết thúc</strong> (chốt Responsible Person + ngày đến hạn + ngăn chặn).</div></div>
 <div class="vstep"><div class="vnum">7</div><div class="vtext"><strong>Phát hành báo cáo</strong> (≤ 03 ngày làm việc).</div></div>
 <div class="vstep"><div class="vnum">8</div><div class="vtext"><strong>khắc phục tức thời/CAPA</strong> (theo SOP-QMS-006, có minh chứng).</div></div>
 <div class="vstep"><div class="vnum">9</div><div class="vtext"><strong>Xác nhận hiệu lực</strong> + đóng + cập nhật KPI/MR.</div></div>
@@ -316,9 +316,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Đánh giá plan không dựa trên rủi ro &amp; số liệu</td><td>Chọn khu vực “dễ” / bỏ qua quá trình nóng</td><td>Đánh giá mất tác dụng; lỗi tái diễn không bị bắt</td></tr>
 <tr><td>2</td><td>Đánh giá viên xung đột lợi ích</td><td>Đánh giá viên đánh giá chính công việc mình phụ trách</td><td>Kết luận thiên lệch; mất tính khách quan</td></tr>
-<tr><td>3</td><td>Lấy mẫu chỉ kiểm giấy tờ</td><td>Không quan sát tại điểm sử dụng; không phỏng vấn</td><td>Không phát hiện sai vận hành; thoát / bỏ qua sản phẩm</td></tr>
+<tr><td>3</td><td>Lấy mẫu chỉ kiểm giấy tờ</td><td>Không quan sát tại Point-of-use; không phỏng vấn</td><td>Không phát hiện sai vận hành; thoát / bỏ qua sản phẩm</td></tr>
 <tr><td>4</td><td>Không truy vết theo 01 Job thật</td><td>Mỗi phòng đưa 1 bộ hồ sơ rời rạc</td><td>Mất liên kết E2E; thiếu điểm chặn quan trọng</td></tr>
-<tr><td>5</td><td>Dùng tài liệu sai phiên bản tại điểm sử dụng</td><td>WI in/bản mềm không đúng rev</td><td>Gia công sai; lỗi kích thước/CTQ</td></tr>
+<tr><td>5</td><td>Dùng tài liệu sai phiên bản tại Point-of-use</td><td>WI in/bản mềm không đúng rev</td><td>Gia công sai; lỗi kích thước/CTQ</td></tr>
 <tr><td>6</td><td>Thiết bị đo quá hạn hoặc OOT vẫn quyết định OK/NG</td><td>Tem hết hạn; không có hồ sơ xử lý OOT</td><td>Quyết định sai; lô lỗi lọt; khiếu nại / yêu cầu bồi thường khách hàng</td></tr>
 <tr><td>7</td><td>Phát hiện viết mơ hồ, thiếu bằng chứng</td><td>Ghi “không tốt”, “thiếu” nhưng không nêu hồ sơ</td><td>Không triển khai hành động; tranh cãi kéo dài</td></tr>
 <tr><td>8</td><td>Phân loại Lớn / Nghiêm trọng/Nhỏ / Không nghiêm trọng không nhất quán</td><td>Lỗi CTQ bị ghi Nhỏ / Không nghiêm trọng; lỗi hồ sơ nhỏ bị ghi Lớn / Nghiêm trọng</td><td>Ưu tiên sai; nguồn lực đổ sai chỗ</td></tr>
@@ -365,8 +365,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Kiểm soát tài liệu</b></td>
-<td>sổ đăng ký vấn đề (vấn đề sổ đăng ký), bản tại điểm sử dụng đúng rev, dấu “Bản kiểm soát” khi in.</td>
-<td>CHẶN: phát hiện dùng sai rev tại điểm sử dụng.</td>
+<td>sổ đăng ký vấn đề (vấn đề sổ đăng ký), bản tại Point-of-use đúng rev, dấu “Bản kiểm soát” khi in.</td>
+<td>CHẶN: phát hiện dùng sai rev tại Point-of-use.</td>
 </tr>
 <tr>
 <td><b>Đo lường/Hiệu chuẩn</b></td>
@@ -404,7 +404,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <h3 class="h3" style="margin-top:0;">5.1. STOP (dừng ngay tại nguồn)</h3>
 <ul style="margin:10px 0 0 18px; line-height:1.85;">
-<li>STOP khi phát hiện chạy/kiểm theo <b>sai bản vẽ rev</b> hoặc sai WI tại điểm sử dụng.</li>
+<li>STOP khi phát hiện chạy/kiểm theo <b>sai bản vẽ rev</b> hoặc sai WI tại Point-of-use.</li>
 <li>STOP khi phát hiện <b>gage quá hạn</b> đang dùng quyết định OK/NG.</li>
 <li>STOP khi phát hiện <b>CTQ NG</b> nhưng vẫn tiếp tục gia công hàng loạt.</li>
 </ul>
@@ -441,17 +441,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Sai rev tại máy</b></td>
 <td>STOP máy → giữ WIP tại chỗ → dán nhãn TẠM GIỮ → chụp ảnh màn hình rev (bằng chứng) → báo Giám sát + QA.</td>
-<td>Người vận hành/Setup (thực hiện) • Giám sát (xác nhận) • QA (mở NCR)</td>
+<td>Operator/Setup (thực hiện) • Giám sát (xác nhận) • QA (mở NCR)</td>
 </tr>
 <tr>
 <td><b>Dụng cụ đo quá hạn/OOT</b></td>
 <td>STOP đo bằng gage đó → dán tem “TẠM GIỮ/OOT” → tách gage khỏi dòng / chuyền → báo Hiệu chuẩn/QC → khoanh vùng sản phẩm đã đo.</td>
-<td>QC/Người vận hành • Hiệu chuẩn/Bảo trì • QA</td>
+<td>QC/Operator • Hiệu chuẩn/Bảo trì • QA</td>
 </tr>
 <tr>
 <td><b>WIP lẫn trạng thái</b></td>
 <td>TẠM GIỮ toàn bộ khay/kệ liên quan → kiểm nhãn Job/Rev/Trạng thái → báo Kho/QC → ghi nhận vị trí &amp; số lượng.</td>
-<td>Kho/Người vận hành • QC • Giám sát</td>
+<td>Kho/Operator • QC • Giám sát</td>
 </tr>
 <tr>
 <td><b>Giao hàng Bộ chứng từ thiếu</b></td>
@@ -486,10 +486,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3</td><td>Trưởng đoàn đánh giá</td><td>Lập kế hoạch đánh giá: mục tiêu, phạm vi, tiêu chí, khung thời gian, đánh giáee.</td><td>Kế hoạch đánh giá (FRM-QMS-002)</td><td>Thiếu tiêu chí CSR/Tiêu chuẩn</td></tr>
 <tr><td>4</td><td>Trưởng đoàn đánh giá</td><td>Chọn mẫu tối thiểu 03 Job + 01 Job CTQ/outsource; chuẩn bị danh sách hồ sơ cần xem.</td><td>Danh sách Job + liên kết Hồ sơ Job</td><td>Chọn Job quá cũ, không phản ánh hiện trạng</td></tr>
 <tr><td>5</td><td>Đánh giá viên</td><td>Họp mở cuộc họp: chốt phạm vi, phương pháp, quy tắc STOP/TẠM GIỮ.</td><td>Danh sách tham dự + biên bản</td><td>Không nhắc fail-nhanh ngay từ đầu</td></tr>
-<tr><td>6</td><td>Đánh giá viên</td><td>Đánh giá tại hiện trường: quan sát điểm sử dụng WI/Rev, truy vết WIP label, kiểm gage hạn.</td><td>Ảnh/ghi nhận + hồ sơ tại chỗ</td><td>Quan sát nhưng không ghi “bằng chứng cụ thể”</td></tr>
+<tr><td>6</td><td>Đánh giá viên</td><td>Đánh giá tại hiện trường: quan sát Point-of-use WI/Rev, truy vết WIP label, kiểm gage hạn.</td><td>Ảnh/ghi nhận + hồ sơ tại chỗ</td><td>Quan sát nhưng không ghi “bằng chứng cụ thể”</td></tr>
 <tr><td>7</td><td>Đánh giá viên</td><td>Đánh giá hồ sơ: Phiếu theo dõi Job (Traveler), FAI/IPQC/FQC, NCR/CAPA, ship bộ chứng từ.</td><td>Liên kết/ID hồ sơ + trích thông tin</td><td>Ghi phát hiện thiếu số Job/Rev/ID gage</td></tr>
 <tr><td>8</td><td>Đánh giá viên</td><td>Viết phát hiện theo template chuẩn và phân loại.</td><td>Danh sách phát hiện</td><td>Dùng câu cảm tính, thiếu tiêu chí</td></tr>
-<tr><td>9</td><td>Đánh giá viên + Chủ quá trình</td><td>Họp kết thúc cuộc họp: chốt người phụ trách + ngày đến hạn + ngăn chặn cho Lớn / Nghiêm trọng.</td><td>Biên bản kết thúc + chữ ký</td><td>Không chốt rõ ngăn chặn/ảnh hưởng lô</td></tr>
+<tr><td>9</td><td>Đánh giá viên + Chủ quá trình</td><td>Họp kết thúc cuộc họp: chốt Responsible Person + ngày đến hạn + ngăn chặn cho Lớn / Nghiêm trọng.</td><td>Biên bản kết thúc + chữ ký</td><td>Không chốt rõ ngăn chặn/ảnh hưởng lô</td></tr>
 <tr><td>10</td><td>Trưởng đoàn đánh giá</td><td>Phát hành báo cáo trong 03 ngày làm việc.</td><td>Đánh giá báo cáo</td><td>Trễ phát hành làm mất lực triển khai</td></tr>
 <tr><td>11</td><td>Chủ quá trình</td><td>Thực hiện sửa chữa / hiệu chính/CAPA theo SOP-QMS-006.</td><td>8D/CAPA + minh chứng</td><td>Chỉ “đào tạo lại” mà không sửa hệ thống</td></tr>
 <tr><td>12</td><td>QA/QMS</td><td>Xác nhận hiệu lực: kiểm bằng chứng kết quả (KPI/re-đánh giá/quan sát).</td><td>Hồ sơ xác nhận hiệu lực</td><td>Đóng khi thiếu minh chứng kết quả</td></tr>
@@ -514,7 +514,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td>Chọn Job mẫu</td><td>Chọn 03 Job gần nhất; có 01 Job CTQ/outsource</td><td>Đảm bảo đánh giá phản ánh rủi ro thật</td></tr>
 <tr><td>2</td><td>Chốt tiêu chí</td><td>ISO + SOP/WI/FRM hiện hành + CSR/Tiêu chuẩn</td><td>Tránh đánh giá “tự nghĩ”</td></tr>
 <tr><td>3</td><td>Chuẩn bị bảng kiểm</td><td>Liệt kê hồ sơ cần xem theo E2E</td><td>Giữ nhịp khung thời gian; không bỏ sót cổng kiểm soát</td></tr>
-<tr><td>4</td><td>Quan sát tại điểm sử dụng</td><td>Kiểm rev, nhãn trạng thái, gage hạn, khu TẠM GIỮ</td><td>Bắt lỗi vận hành, không chỉ bắt lỗi giấy</td></tr>
+<tr><td>4</td><td>Quan sát tại Point-of-use</td><td>Kiểm rev, nhãn trạng thái, gage hạn, khu TẠM GIỮ</td><td>Bắt lỗi vận hành, không chỉ bắt lỗi giấy</td></tr>
 <tr><td>5</td><td>Phỏng vấn theo hồ sơ</td><td>Câu hỏi bám hồ sơ: “cho xem” thay vì “kể”</td><td>Giữ bằng chứng khách quan</td></tr>
 <tr><td>6</td><td>Ghi phát hiện chuẩn</td><td>Yêu cầu → Bằng chứng → Khoảng cách → Rủi ro</td><td>Giảm tranh cãi; tăng tốc CAPA</td></tr>
 <tr><td>7</td><td>cô lập cho Lớn / Nghiêm trọng</td><td>STOP/TẠM GIỮ/CHẶN ngay</td><td>Chặn thoát / bỏ qua; bảo vệ khách hàng</td></tr>
@@ -527,7 +527,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Nhận diện và kích hoạt đúng STOP/TẠM GIỮ/CHẶN khi gặp sai rev, gage quá hạn, thiếu QA phát hành.</li>
 <li>Viết được ≥ 02 phát hiện có đủ 4 thành phần (yêu cầu/bằng chứng/khoảng cách/rủi ro).</li>
 <li>Phân loại Lớn / Nghiêm trọng/Nhỏ / Không nghiêm trọng/OFI nhất quán theo định nghĩa vận hành.</li>
-<li>Lập được danh sách hành động có người phụ trách + ngày đến hạn + minh chứng dự kiến.</li>
+<li>Lập được danh sách hành động có Responsible Person + ngày đến hạn + minh chứng dự kiến.</li>
 <li>Xác nhận hiệu lực: chỉ đóng khi có minh chứng kết quả (không nhận “đã làm” dạng miệng).</li>
 </ul>
 <h3 class="h3">8.3. Thang mức L1–L4 (hành vi quan sát được) + quyền hạn</h3>
@@ -574,7 +574,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Nhỏ / Không nghiêm trọng NC là khi: (A) CTQ NG vẫn chạy (B) gage quá hạn quyết định OK/NG (C) sai lệch cục bộ rủi ro thấp (D) ship thiếu QA phát hành.</li>
 <li>OFI là khi: (A) bắt buộc mở NCR (B) cơ hội tăng hiệu lực/hiệu quả, không phải NC (C) lỗi tái diễn (D) thiếu truy xuất nguồn gốc.</li>
 <li>Quy tắc “Không có bằng chứng = Không qua cổng kiểm soát” áp dụng mạnh nhất tại: (A) họp mở (B) giao hàng (C) ăn trưa (D) chấm công.</li>
-<li>STOP áp dụng khi: (A) thiếu giấy in (B) sai rev tại điểm sử dụng (C) thiếu bút (D) thiếu ghế.</li>
+<li>STOP áp dụng khi: (A) thiếu giấy in (B) sai rev tại Point-of-use (C) thiếu bút (D) thiếu ghế.</li>
 <li>TẠM GIỮ áp dụng khi: (A) WIP lẫn trạng thái (B) máy bẩn (C) trời mưa (D) internet chậm.</li>
 <li>CHẶN áp dụng khi: (A) thiếu QA phát hành trước xuất hàng (B) thiếu nước uống (C) thiếu khẩu trang dự phòng (D) thiếu giấy A4.</li>
 <li>Đánh giá viên độc lập nghĩa là: (A) người trong cùng phòng (B) người tự đánh giá công việc mình (C) người không đánh giá phần việc mình phụ trách (D) người làm lâu năm.</li>
@@ -589,9 +589,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi thiếu Giao hàng Bộ chứng từ, hành động đúng là: (A) xuất hàng (B) CHẶN + Giao hàng hold (C) nhờ khách tự lo (D) bỏ chứng từ.</li>
 <li>Phát hiện thiếu Job/Rev/ID hồ sơ dẫn tới: (A) dễ truy xuất nguồn gốc (B) tranh cãi + không đóng được (C) nhanh hơn (D) không ảnh hưởng.</li>
 <li>Vai trò Chủ quá trình phải làm: (A) né đánh giá (B) thực hiện CAPA và cung cấp minh chứng hiệu lực (C) đổi chủ đề (D) chỉ ký.</li>
-<li>Chương trình đánh giá người phụ trách phải báo cáo lên: (A) bảo vệ (B) Xem xét của lãnh đạo (C) nhà hàng (D) khách hàng luôn luôn.</li>
+<li>Chương trình đánh giá Responsible Person phải báo cáo lên: (A) bảo vệ (B) Xem xét của lãnh đạo (C) nhà hàng (D) khách hàng luôn luôn.</li>
 <li>Khi phát sinh NCR Lớn / Nghiêm trọng liên quan sản phẩm, đánh giá nội bộ được kích hoạt theo: (A) bỏ qua (B) kích hoạt rủi ro (C) chờ năm sau (D) chờ khách nhắc.</li>
-<li>Tài liệu sai phiên bản tại điểm sử dụng phải xử lý: (A) giữ nguyên (B) thu hồi &amp; thay bản hiện hành + ghi minh chứng (C) xóa file (D) đổi tên.</li>
+<li>Tài liệu sai phiên bản tại Point-of-use phải xử lý: (A) giữ nguyên (B) thu hồi &amp; thay bản hiện hành + ghi minh chứng (C) xóa file (D) đổi tên.</li>
 </ol>
 <h3 class="h3">9.2. Tình huống (03 tình huống — trả lời bằng hành động + bằng chứng)</h3>
 <div class="note">
@@ -602,15 +602,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">9.3. Bài thực hành bắt buộc (Bài thực hành)</h3>
 <p class="muted">Thực hành là điều kiện để qua cổng kiểm soát cấp quyền (L2 trở lên). Thực hiện theo nhóm nhỏ (2–3 người) theo ca.</p>
 <ul style="margin:10px 0 0 18px; line-height:1.9;">
-<li><b>Luồng Người được đánh giá (Người vận hành/Setup/Kế hoạch/Kho…):</b> nhận 01 Job bất kỳ → truy xuất nguồn gốc hồ sơ đúng Job/Rev → trả lời 10 câu hỏi theo hồ sơ → thực hiện 01 tình huống STOP/TẠM GIỮ mô phỏng.</li>
-<li><b>Luồng Đánh giá viên (QA/QMS/QC/Tổ trưởng):</b> lập 01 kế hoạch đánh giá nhỏ / thu gọn → lấy mẫu 01 Job theo E2E → ghi ≥ 02 phát hiện chuẩn + 01 OFI → tổ chức kết thúc → phát hành báo cáo mô phỏng.</li>
+<li><b>Luồng Người được đánh giá (Operator/Setup/Kế hoạch/Kho…):</b> nhận 01 Job bất kỳ → truy xuất nguồn gốc hồ sơ đúng Job/Rev → trả lời 10 câu hỏi theo hồ sơ → thực hiện 01 tình huống STOP/TẠM GIỮ mô phỏng.</li>
+<li><b>Luồng Đánh giá viên (QA/QMS/QC/Team Leader):</b> lập 01 kế hoạch đánh giá nhỏ / thu gọn → lấy mẫu 01 Job theo E2E → ghi ≥ 02 phát hiện chuẩn + 01 OFI → tổ chức kết thúc → phát hành báo cáo mô phỏng.</li>
 </ul>
 <details style="margin-top:10px;">
 <summary><b>Đáp án cho người hướng dẫn (khóa lại khi triển khai)</b></summary>
 <div class="note" style="margin-top:10px;">
 <ul style="margin:6px 0 0 18px; line-height:1.85;">
 <li>Trắc nghiệm đáp án mẫu: 1B,2A,3B,4C,5B,6B,7B,8A,9A,10C,11B,12B,13B,14B,15A,16B,17B,18B,19B,20B,21B,22B,23B,24B.</li>
-<li>Tình huống 1: STOP + TẠM GIỮ + NCR + xác định ảnh hưởng + thay rev tại điểm sử dụng.</li>
+<li>Tình huống 1: STOP + TẠM GIỮ + NCR + xác định ảnh hưởng + thay rev tại Point-of-use.</li>
 <li>Tình huống 2: Lớn / Nghiêm trọng khi gage quá hạn quyết định OK/NG; ngăn chặn + đánh giá ảnh hưởng.</li>
 <li>Tình huống 3: CAPA thiếu minh chứng kết quả; bắt buộc re-đánh giá + cập nhật kiểm soát.</li>
 </ul>

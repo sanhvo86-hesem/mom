@@ -208,7 +208,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td><b>Người vận hành</b></td><td>Chỉ sử dụng bản đã phát hành/WIP đúng nguồn; không sao chép file ra ngoài; nộp IPQC các log đúng nơi.</td><td>Hoàn thành 01 ca làm: IPQC log + ảnh/scan bảng kiểm lưu đúng Hồ sơ công việc; không phát sinh “nội bộ / tại chỗ chủ / gốc”.</td></tr>
+<tr><td><b>Operator</b></td><td>Chỉ sử dụng bản đã phát hành/WIP đúng nguồn; không sao chép file ra ngoài; nộp IPQC các log đúng nơi.</td><td>Hoàn thành 01 ca làm: IPQC log + ảnh/scan bảng kiểm lưu đúng Hồ sơ công việc; không phát sinh “nội bộ / tại chỗ chủ / gốc”.</td></tr>
 <tr><td><b>Setup</b></td><td>Lưu phiếu cài đặt, danh sách dao cụ, bù trừ (bù trừ (offset)) log đúng thư mục; khóa theo kết thúc / đóng hồ sơ.</td><td>01 bộ setup pack đúng chuẩn tên + thư mục; xác nhận dùng đúng Rev từ Hồ sơ công việc.</td></tr>
 <tr><td><b>Lập trình viên (CNC)</b></td><td>Quản trị CNC program/CAM/ghi sổ / đăng trong thư viện Hạn chế; kiểm soát phiên bản, phát hành bản chạy.</td><td>Bài kiểm tra thực hành đạt 100% điểm “Program source &amp; phát hành”; không có file program nằm ngoài thư viện Hạn chế.</td></tr>
 <tr><td><b>QC</b></td><td>Lưu FAI/CMM/FQC đúng Hồ sơ; bảo toàn tính toàn vẹn hồ sơ.</td><td>01 bộ kiểm tra hồ sơ “chỉ đọc/lưu giữ” sau phát hành; truy xuất nguồn gốc ≤ 3 phút.</td></tr>
@@ -539,7 +539,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3" style="margin-top:0">10.2 Tình huống (3 tình huống thật) — yêu cầu quyết định TẠM GIỮ/GO và ghi MRR</h3>
 <details>
 <summary>Tình huống 1 — Sai Rev (Kỹ thuật → Sản xuất)</summary>
-<p><b>Dữ kiện:</b> Người vận hành đang chuẩn bị chạy WO-31245, Part PN-8821. Trong Hồ sơ công việc có 2 file drawing: <code>WO31245_PN8821_RevA_DRAW_20260112.pdf</code> và <code>WO31245_PN8821_RevB_DRAW_20260201.pdf</code>. Setup sheet đang tham chiếu RevA. Lập trình viên (CNC) báo đã phát hành program theo RevB.</p>
+<p><b>Dữ kiện:</b> Operator đang chuẩn bị chạy WO-31245, Part PN-8821. Trong Hồ sơ công việc có 2 file drawing: <code>WO31245_PN8821_RevA_DRAW_20260112.pdf</code> và <code>WO31245_PN8821_RevB_DRAW_20260201.pdf</code>. Setup sheet đang tham chiếu RevA. Lập trình viên (CNC) báo đã phát hành program theo RevB.</p>
 <p><b>Yêu cầu:</b> Ra quyết định <b>STOP/TẠM GIỮ/GO</b>. Ghi tối thiểu 3 MRR phải tạo ngay.</p>
 <ul class="iso-list">
 <li>Quyết định bắt buộc: <b>STOP</b> cho tới khi phiếu cài đặt và drawing thống nhất Rev.</li>

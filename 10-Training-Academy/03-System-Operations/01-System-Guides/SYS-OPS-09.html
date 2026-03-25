@@ -111,7 +111,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Mục tiêu:</b> vận hành đúng “1 nguồn đúng”, chặn sai Rev, chặn ship thiếu gói hồ sơ, giữ truy vết ISO 9001 (thông tin dạng văn bản).</li>
 <li><b>Phạm vi dữ liệu:</b> Job, Vận hành, Nhân công, Lô giao hàng, SSCC/Pack, Bằng chứng liên kết, ApprovalHistory, IntegrationLogs/cài đặt.</li>
-<li><b>Đối tượng:</b> Người vận hành, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor.</li>
+<li><b>Đối tượng:</b> Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor.</li>
 </ul>
 <div class="callout">
 <h3>Vai trò dùng mô-đun vào việc gì</h3>
@@ -119,7 +119,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="tight">
 <thead><tr><th>Vai trò</th><th>Quyết định dựa trên dữ liệu</th><th>Dữ liệu/điểm chạm bắt buộc</th></tr></thead>
 <tbody>
-<tr><td>Người vận hành / Setup</td><td>Chạy đúng Job/Rev/Op, dừng khi sai bằng chứng</td><td>JobIndex, JobOperIndex, Hồ sơ công việc (mở nhanh)</td></tr>
+<tr><td>Operator / Setup</td><td>Chạy đúng Job/Rev/Op, dừng khi sai bằng chứng</td><td>JobIndex, JobOperIndex, Hồ sơ công việc (mở nhanh)</td></tr>
 <tr><td>Lập trình viên (CNC)</td><td>Phát hành chương trình đúng Rev, chống nhầm Rev</td><td>JobIndex.RevisionNum, Part/REV Bản gốc, Phát hành hồ sơ</td></tr>
 <tr><td>QC / QA</td><td>Hold/NCR/CAPA, xác nhận ĐẠT/KHÔNG ĐẠT, đóng hồ sơ</td><td>QCHoldLog, NCRLog, InspectionReports, ApprovalHistory</td></tr>
 <tr><td>Kho</td><td>Đóng gói, in SSCC, cổng kiểm soát phê duyệt giao hàng</td><td>PackSSCCRegister, PackagingChecks, ShipRelease, ShipmentMirror</td></tr>
@@ -192,7 +192,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>6</td><td>Thiếu EvidenceFolderUrl</td><td>JobIndex.EvidenceFolderUrl rỗng</td><td>Đánh giá diễn tập fail, thiếu bằng chứng</td><td>Chạy lại tạo Hồ sơ công việc (tính bất biến (tính bất biến (idempotent))); khóa cổng kiểm soát liên quan</td><td>Link thư mục + cấu trúc thư mục đúng</td></tr>
 <tr><td>7</td><td>Nhầm Rev giữa Job và Part/REV Bản gốc</td><td>JobIndex.RevisionNum khác thư mục REV</td><td>Chạy sai chương trình/drawing</td><td>Hold ngay; mở QCHoldLog ReasonCode=WrongRev; kiểm tra Part/REV</td><td>QCHoldLog + ảnh/đường dẫn file Rev đúng</td></tr>
 <tr><td>8</td><td>Điều tiết SharePoint</td><td>Luồng fail 429/503</td><td>công việc tồn đọng, trễ dữ liệu</td><td>Giảm batch; bật thử lại/chờ lùi (chờ lùi (backoff)); giãn lịch; ghi IntegrationLogs</td><td>IntegrationLogs + thông số thử lại/batch</td></tr>
-<tr><td>9</td><td>Thiếu ApprovalHistory</td><td>Hồ sơ đóng nhưng không có ApprovalHistory</td><td>Không đánh giá được phê duyệt</td><td>Chặn đóng hồ sơ; chạy lại phê duyệt luồng; đào tạo lại người phê duyệt</td><td>ApprovalHistory + hồ sơ URL</td></tr>
+<tr><td>9</td><td>Thiếu ApprovalHistory</td><td>Hồ sơ đóng nhưng không có ApprovalHistory</td><td>Không đánh giá được phê duyệt</td><td>Chặn đóng hồ sơ; chạy lại phê duyệt luồng; đào tạo lại Approver</td><td>ApprovalHistory + hồ sơ URL</td></tr>
 <tr><td>10</td><td>bộ hồ sơ giao hàng thiếu (cổng kiểm soát lỏng)</td><td>ShipRelease người xác nhận FAIL hoặc PacketComplete=No</td><td>Ship sai/thiếu → khiếu nại khách</td><td>ĐÃ CHẶN + StandupAction S1; bổ sung chứng từ; re-xác nhận hiệu lực</td><td>ShipRelease + thư mục bộ hồ sơ giao hàng + Final IR/CoC</td></tr>
 </tbody>
 </table>
@@ -248,7 +248,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Sai Rev nghi ngờ</td>
 <td>So JobNum/Rev trên traveler ↔ JobIndex; mở Part/REV Bản gốc; dừng máy; gắn tag TẠM GIỮ</td>
-<td>Người vận hành/Setup + QC</td>
+<td>Operator/Setup + QC</td>
 <td>QCHoldLog ReasonCode=WrongRev + ảnh file Rev đúng</td>
 </tr>
 <tr>
@@ -296,7 +296,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>8</td><td>Kiểm tra ApprovalHistory đủ cho phê duyệt giao hàng, NCR/CAPA kết thúc / đóng</td><td>QA</td><td>ApprovalHistory lọc theo SourceList</td><td>Phê duyệt qua chat/miệng</td></tr>
 <tr><td>9</td><td>Kiểm tra đặt tên bằng chứng Tier 1 theo ANNEX-QMS-003</td><td>Doc Control</td><td>Danh sách file Tier 1 + tên file</td><td>tên tập tin có dấu/ký tự không hợp lệ</td></tr>
 <tr><td>10</td><td>Kiểm tra bảng điều khiển làm mới trạng thái (JobIndex/ShipRelease nhịp độ / chu kỳ họp)</td><td>IT</td><td>Làm mới log + thời điểm gần nhất</td><td>Bảng điều khiển hiển thị “cũ” mà không báo</td></tr>
-<tr><td>11</td><td>Đóng phân loại ưu tiên: StandupActions Mức nghiêm trọng S1/S2 có người phụ trách + ngày đến hạn</td><td>Supervisor</td><td>StandupActions list</td><td>Không gán người phụ trách rõ</td></tr>
+<tr><td>11</td><td>Đóng phân loại ưu tiên: StandupActions Mức nghiêm trọng S1/S2 có Responsible Person + ngày đến hạn</td><td>Supervisor</td><td>StandupActions list</td><td>Không gán Responsible Person rõ</td></tr>
 <tr><td>12</td><td>Ghi nhận học viên OJT hoàn thành hiệu suất test</td><td>Người đào tạo</td><td>Phiếu chấm + link bằng chứng</td><td>Chấm “đạt” không có dấu vết</td></tr>
 </tbody>
 </table>
@@ -524,7 +524,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>Nhóm</th><th>Bài thực hành</th><th>Tiêu chí PASS</th><th>Tiêu chí FAIL (1 lỗi là FAIL)</th><th>Bằng chứng bắt buộc</th></tr></thead>
 <tbody>
 <tr>
-<td>OPS (Người vận hành/Setup)</td>
+<td>OPS (Operator/Setup)</td>
 <td>Chọn 01 job → xác minh Rev → mở Hồ sơ công việc ≤ 60s</td>
 <td>Đúng Job/Rev; mở đúng thư mục; ghi bảng kiểm ca</td>
 <td>Tiếp tục chạy khi nghi ngờ sai Rev; không để dấu vết</td>
