@@ -1,21 +1,21 @@
 {
     "status": "approved",
-    "revision": "0.1",
-    "updateType": "minor",
-    "updated_at": "2026-03-25T03:55:27+00:00",
+    "revision": "1.0",
+    "updateType": "major",
+    "updated_at": "2026-03-25T07:24:31+00:00",
     "has_release": true,
-    "released_revision": "0.1",
+    "released_revision": "1.0",
     "lastEdit": {
-        "date": "2026-03-25 03:36",
+        "date": "2026-03-25 07:22",
         "user": "Võ Ngọc Sanh",
         "role": "ceo",
         "note": "Bắt đầu phiên bản mới"
     },
-    "submittedDate": "2026-03-25 03:55",
+    "submittedDate": "2026-03-25 07:24",
     "approvedBy": {
         "name": "Võ Ngọc Sanh",
         "role": "ceo",
-        "date": "2026-03-25 03:55"
+        "date": "2026-03-25 07:24"
     },
-    "approvedDate": "2026-03-25 03:55"
+    "approvedDate": "2026-03-25 07:24"
 }
