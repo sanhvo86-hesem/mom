@@ -1610,6 +1610,24 @@ function split_nonempty_lines(string $text): array {
   return array_values(array_filter(array_map('trim', $lines), static fn($line) => $line !== ''));
 }
 
+function git_sync_commit_author(array $me): array {
+  $name = trim((string)($me['name'] ?? $me['username'] ?? 'Portal Sync'));
+  if ($name === '') $name = 'Portal Sync';
+
+  $username = strtolower(trim((string)($me['username'] ?? '')));
+  if ($username === '') {
+    $username = strtolower($name);
+  }
+  $username = preg_replace('/[^a-z0-9._-]+/i', '-', $username) ?? 'portal';
+  $username = trim($username, '.-');
+  if ($username === '') $username = 'portal';
+
+  return [
+    'name' => $name,
+    'email' => 'portal+' . $username . '@local.invalid',
+  ];
+}
+
 function git_sync_allowed_targets(string $repoDir): array {
   $targets = [
     '02-Tai-Lieu-He-Thong',
@@ -1733,9 +1751,14 @@ function git_sync_documents(array $me, string $repoDir): array {
   $actor = strtolower((string)($me['username'] ?? 'portal'));
   $actor = preg_replace('/[^a-z0-9._-]+/i', '-', $actor) ?: 'portal';
   $commitMessage = sprintf('docs: portal sync by %s %s UTC', $actor, gmdate('Y-m-d H:i:s'));
+  $author = git_sync_commit_author($me);
 
   $commitCode = 0;
-  $commitOut = git_command(['commit', '-m', $commitMessage], $repoReal, $commitCode);
+  $commitOut = git_command([
+    '-c', 'user.name=' . (string)$author['name'],
+    '-c', 'user.email=' . (string)$author['email'],
+    'commit', '-m', $commitMessage
+  ], $repoReal, $commitCode);
   if ($commitCode !== 0) {
     throw new RuntimeException('git_commit_failed' . ($commitOut !== '' ? ': ' . $commitOut : ''));
   }
