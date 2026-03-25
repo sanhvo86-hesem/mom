@@ -15,33 +15,9 @@
  .swatch.core{background:#eff6ff; border-color:#3b82f6;}
  .swatch.sup{background:#fdf2f8; border-color:#ec4899;}
  .swatch.imp{background:#fefce8; border-color:#f59e0b;}
- @media print {
- @page { size: A3 portrait; margin: 12mm; }
+ 
  .no-print{display:none !important;}
- .container{max-width:none;}
- }
-
-/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
-@media print {
- .card, .table-card, .callout, .note, .box, .iso-map,
- .preface-block, .jd-mission, .form-sheet, .lane,
- .legend, .req, .auth-grid, .backup-card, .vstep {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- h1, h2, h3, .h1, .h2, .h3 {
- page-break-after: avoid;
- break-after: avoid;
- }
- .form-header {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- .sig-row, .sign-row, .approval-row {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- tr { page-break-inside: avoid; break-inside: avoid; }
+ .container{
  thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }

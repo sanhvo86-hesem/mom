@@ -35,17 +35,11 @@
   .chip.active{ background:#0f172a; color:#fff; border-color:#0f172a; }
   .mini-tag{ display:inline-block; padding:2px 6px; border-radius:999px; font-size:11px; font-weight:700; background:#eef2ff; color:#1e3a8a; margin-bottom:6px; }
   .load-note{ color:var(--muted); font-size:12px; }
-  @media print{
-    @page{ size:A4 landscape; margin:10mm; }
+  
     .searchbox, .chiplist, .dict-pager{ display:none !important; }
     .dict-table{ font-size:10.5px; }
     .page{ border:none; box-shadow:none; }
-    .page-body{ padding:0; }
-  }
-  @media print {
-    .card, .table-card, .callout, .note, .box, .iso-map, .preface-block, .form-sheet { page-break-inside: avoid; break-inside: avoid; }
-    h1, h2, h3, .h1, .h2, .h3 { page-break-after: avoid; break-after: avoid; }
-    tr { page-break-inside: avoid; break-inside: avoid; }
+    .page-body{
     thead { display: table-header-group; }
     tfoot { display: table-footer-group; }
     
