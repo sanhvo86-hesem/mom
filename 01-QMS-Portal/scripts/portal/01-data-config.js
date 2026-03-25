@@ -1652,8 +1652,35 @@ function getBestTreeNodeForCategory(catCode, docs){
   return nodes.slice().sort((a,b) => getTreeNodeScore(b, docs) - getTreeNodeScore(a, docs))[0] || null;
 }
 
+function getCategoryTreeRoot(catCode, docs){
+  const nodes = getTreeNodesForCategory(catCode);
+  if(nodes.length === 0) return null;
+  if(nodes.length === 1) return nodes[0];
+  const orderedNodes = nodes.slice().sort((a,b) => {
+    const numDiff = Number(a?.num || 0) - Number(b?.num || 0);
+    if(numDiff !== 0) return numDiff;
+    return String(a?.name || '').localeCompare(String(b?.name || ''));
+  });
+  const cat = (Array.isArray(CATEGORIES) ? CATEGORIES : []).find(item => String(item?.id || '') === String(catCode));
+  const label = cat ? (typeof catLabel === 'function' ? catLabel(cat).split('(')[0].trim() : String(cat.label || catCode)) : String(catCode || '');
+  const nodeParents = orderedNodes
+    .map(node => String(node?.path || '').split('/').slice(0, -1).join('/'))
+    .filter(Boolean);
+  const rootPath = nodeParents.length > 0 && nodeParents.every(path => path === nodeParents[0])
+    ? nodeParents[0]
+    : '';
+  return {
+    path: rootPath,
+    num: 0,
+    name: label || String(catCode || ''),
+    cat: String(catCode || ''),
+    fileCount: orderedNodes.reduce((sum, node) => sum + Number(node?.fileCount || 0), 0),
+    subs: orderedNodes
+  };
+}
+
 function resolveTreeNodeForCategory(catCode, folderSegments, docs){
-  let currentNode = getBestTreeNodeForCategory(catCode, docs);
+  let currentNode = getCategoryTreeRoot(catCode, docs) || getBestTreeNodeForCategory(catCode, docs);
   if(!currentNode) return null;
   const segs = Array.isArray(folderSegments) ? folderSegments : [];
   for(let i=0; i<segs.length && currentNode; i++){
@@ -1698,7 +1725,7 @@ function groupDocsBySubfolder(docs){
 // Uses FOLDER_TREE from API's scan_folders response
 function buildDocFolderTree(docs, catCode){
   // Find tree node for this category
-  const treeNode = getBestTreeNodeForCategory(catCode, docs);
+  const treeNode = getCategoryTreeRoot(catCode, docs) || getBestTreeNodeForCategory(catCode, docs);
   if(!treeNode || !treeNode.subs || treeNode.subs.length === 0){
     return {name: catCode, path: '', docs: docs, children: [], isLeaf: true};
   }

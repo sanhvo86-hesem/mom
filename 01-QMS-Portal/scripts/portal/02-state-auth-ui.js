@@ -2232,7 +2232,9 @@ function renderDocuments(){
 
   // ═══ CATEGORY/FOLDER BROWSING MODE ═══
   const catDocs = currentFilter !== 'ALL' ? VDOCS.filter(d=>d.cat===currentFilter) : VDOCS;
-  const treeNode = currentFilter !== 'ALL' ? getBestTreeNodeForCategory(currentFilter, catDocs) : null;
+  const treeNode = currentFilter !== 'ALL'
+    ? ((typeof getCategoryTreeRoot === 'function' ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs))
+    : null;
   const currentNode = currentFilter !== 'ALL' ? resolveTreeNodeForCategory(currentFilter, currentFolderPath, catDocs) : null;
 
   // Get child folders and docs at current level
@@ -2405,8 +2407,9 @@ function renderDocFileList(docs){
 // ═══ EDIT MODE: Folder creation dialog ═══
 function openCreateFolderDialog(){
   // Auto-compute next folder number
-  const treeNode = getBestTreeNodeForCategory(currentFilter, DOCS.filter(d=>d.cat===currentFilter));
-  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, DOCS.filter(d=>d.cat===currentFilter));
+  const catDocs = DOCS.filter(d=>d.cat===currentFilter);
+  const treeNode = ((typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs);
+  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, catDocs);
   // Find max existing number in current folder
   let maxNum = 0;
   if(currentNode && currentNode.subs){
@@ -2446,8 +2449,9 @@ async function doCreateFolder(nextNum){
   const name = (document.getElementById('nf-name')?.value||'').trim().replace(/[^A-Za-z0-9_-]/g,'-');
   if(!name){ showToast(lang==='en'?'Enter folder name':'Nhập tên folder'); return; }
   const folderName = String(nextNum).padStart(2,'0') + '-' + name;
-  const treeNode = getBestTreeNodeForCategory(currentFilter, DOCS.filter(d=>d.cat===currentFilter));
-  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, DOCS.filter(d=>d.cat===currentFilter));
+  const catDocs = DOCS.filter(d=>d.cat===currentFilter);
+  const treeNode = ((typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs);
+  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, catDocs);
   const parentPath = currentNode ? currentNode.path : (treeNode ? treeNode.path : '');
   try {
     const res = await apiCall('create_folder', {parent: parentPath, name: folderName});
@@ -2465,8 +2469,9 @@ async function doCreateFolder(nextNum){
 // ═══ QUICK CREATE DOC — defaults to current folder ═══
 function openCreateDocModalQuick(){
   // Compute current folder path
-  const treeNode = getBestTreeNodeForCategory(currentFilter, DOCS.filter(d=>d.cat===currentFilter));
-  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, DOCS.filter(d=>d.cat===currentFilter));
+  const catDocs = DOCS.filter(d=>d.cat===currentFilter);
+  const treeNode = ((typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs);
+  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, catDocs);
   const folderPath = currentNode ? currentNode.path : (treeNode ? treeNode.path : '');
   const folderLabel = currentNode ? getSubfolderLabel((currentNode.path||'').split('/').pop()) : currentFilter;
 
@@ -2906,7 +2911,8 @@ function confirmDeleteFolder(folderPath, folderKey){
   const vi=lang!=='en';
   const label=getSubfolderLabel(folderKey);
   // Count docs in this folder from tree
-  const treeNode=getBestTreeNodeForCategory(currentFilter, DOCS.filter(d=>d.cat===currentFilter));
+  const catDocs = DOCS.filter(d=>d.cat===currentFilter);
+  const treeNode=((typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs);
   let targetNode=null;
   function findNode(node,path){
     if(node.path===path)return node;
@@ -3120,6 +3126,8 @@ const CAT_OPTIONS = [
 
 function getDefaultFolderForCat(cat){
   const catDocs = DOCS.filter(d=>d.cat===cat);
+  const rootNode = (typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(cat, catDocs) : null;
+  if(rootNode && rootNode.path) return rootNode.path;
   const bestNode = getBestTreeNodeForCategory(cat, catDocs);
   if(bestNode && bestNode.path) return bestNode.path;
   if(DEFAULT_FOLDERS[cat]) return DEFAULT_FOLDERS[cat];
@@ -3145,6 +3153,8 @@ function computeFolder(cat, dept){
     return DYNAMIC_FOLDERS[cat][dept];
   }
   if(!getCatHasDept(cat)){
+    const rootNode = (typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(cat, DOCS.filter(d=>d.cat===cat)) : null;
+    if(rootNode && rootNode.path) return rootNode.path;
     const bestNode = getBestTreeNodeForCategory(cat, DOCS.filter(d=>d.cat===cat));
     if(bestNode && bestNode.path) return bestNode.path;
     if(DEFAULT_FOLDERS[cat]) return DEFAULT_FOLDERS[cat];
