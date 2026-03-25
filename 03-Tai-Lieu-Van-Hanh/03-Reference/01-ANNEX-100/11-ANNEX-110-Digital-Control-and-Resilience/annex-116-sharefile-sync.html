@@ -8,24 +8,7 @@
 <style>
 @media print {
   .card, .table-card, .callout, .note, .box, .keyline, .figure-box, .step-box { break-inside: avoid; page-break-inside: avoid; }
-  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
-  tr, td, th { break-inside: avoid; page-break-inside: avoid; }
-}
-.page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
-.page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color:var(--navy);}
-.page-body h3 {font-size:14px; line-height:1.45; margin:12px 0 6px; color:var(--ink);}
-
-.table-card th, 
-
-.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
-.code {font-family:var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
-.path {font-family:var(--mono); font-size:12px; white-space:pre-wrap; background:#0f172a; color:#e2e8f0; padding:12px; border-radius:10px; overflow:auto;}
-.figure-box, .step-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
-.section ul {margin:8px 0; padding-left:20px;}
-@media (max-width:960px) {
-  .two-col {grid-template-columns:1fr;}
-  .page-body {padding:24px 18px 36px;}
-}
+.keyline, .figure-box, .step-box { break-inside: avoid; page-break-inside: avoid; }
 </style>
 </head>
 <body>

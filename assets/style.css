@@ -88,14 +88,14 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 .note    { padding: 14px 18px; margin: 16px 0; background: var(--blue-l); border: none; border-left: 3px solid var(--blue); border-radius: var(--r); font-size: 13px; line-height: 1.65; }
 /* Named note/callout variants — no border, only border-left 3px */
 .note-blue   { padding: 14px 18px; margin: 16px 0; background: var(--blue-l); border: none; border-left: 3px solid var(--blue); border-radius: var(--r); font-size: 13px; line-height: 1.65; }
-.note-soft   { padding: 14px 18px; margin: 16px 0; background: var(--bg2); border: none; border-left: 3px solid var(--ink4); border-radius: var(--r); font-size: 13px; line-height: 1.65; }
+.note-soft   { padding: 14px 18px; margin: 16px 0; background: var(--bg2); border: none; border-left: 3px solid var(--blue); border-radius: var(--r); font-size: 13px; line-height: 1.65; }
 .note-green  { padding: 14px 18px; margin: 16px 0; background: #ebfbee; border: none; border-left: 3px solid var(--green); border-radius: var(--r); font-size: 13px; line-height: 1.65; }
 .callout-danger { padding: 14px 18px; margin: 16px 0; background: #fff5f5; border: none; border-left: 3px solid var(--red); border-radius: var(--r); font-size: 13px; line-height: 1.65; }
 .callout-info  { padding: 14px 18px; margin: 16px 0; background: var(--blue-l); border: none; border-left: 3px solid var(--blue); border-radius: var(--r); font-size: 13px; line-height: 1.65; }
 .callout-warn  { padding: 14px 18px; margin: 16px 0; background: var(--gold-l); border: none; border-left: 3px solid var(--gold); border-radius: var(--r); font-size: 13px; line-height: 1.65; }
 .iso-map { background: var(--bg2); border: 1px solid var(--ln); border-radius: var(--r); padding: 20px 24px; margin: 20px 0; }
 .iso-title { font-size: 11px; font-weight: 700; color: var(--ink3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; }
-.req { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; margin: 6px 0; background: var(--bg); border: none; border-left: 3px solid var(--ln); border-radius: var(--r); font-size: 13px; }
+.req { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; margin: 6px 0; background: var(--bg); border: none; border-left: 3px solid var(--blue); border-radius: var(--r); font-size: 13px; }
 .req-tag { flex-shrink: 0; padding: 3px 10px; border-radius: var(--r-sm); font-size: 10px; font-weight: 800; text-transform: uppercase; }
 .req-tag.shall  { background: #fff5f5; color: var(--red); border: 1px solid #ffc9c9; }
 .req-tag.should { background: #fff9db; color: #e67700; border: 1px solid #ffe066; }
@@ -175,7 +175,7 @@ body.qms-resizing * { cursor: col-resize !important; }
 .vnum { flex-shrink: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--navy); color: #fff; font-weight: 800; font-size: 12px; }
 .vtext { flex: 1; font-size: 13px; }
 .vbranches { margin-left: 42px; border-left: 2px solid var(--ln); padding-left: 14px; }
-.box { padding: 12px 16px; margin: 12px 0; border: 1px solid var(--ln); border-radius: var(--r); font-size: 13px; }
+.box { padding: 12px 16px; margin: 12px 0; border: none; border-left: 3px solid var(--blue); border-radius: var(--r); font-size: 13px; background: var(--bg); }
 .box.core { background: var(--blue-l); border: none; border-left: 3px solid var(--blue); }
 .box.sup  { background: var(--gold-l); border: none; border-left: 3px solid var(--gold); }
 .box.imp  { background: #fff5f5; border: none; border-left: 3px solid var(--red); }

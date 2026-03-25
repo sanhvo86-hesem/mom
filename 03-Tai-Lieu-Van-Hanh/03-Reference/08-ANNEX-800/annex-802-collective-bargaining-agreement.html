@@ -7,33 +7,6 @@
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <script defer="" src="../../../assets/app.js"></script>
 <style>
- /* TƯLĐTT (CBA) — dùng 100% nội dung từ file Word người dùng cung cấp */
- html, body{ overflow-x:hidden; }
-
- /* Mục lục 2 cột để dễ in ấn */
- .toc{ column-count:2; column-gap:28px; }
- .toc li{ break-inside: avoid; }
- .toc a{ overflow-wrap:anywhere; word-break: break-word; }
- @media (max-width:960px; width: 100%; box-sizing: border-box){ .toc{ column-count:1; } }
-
- /* Chống tràn ngang với bảng/chuỗi dài */
- .table{ table-layout: fixed; }
- .table th, .table td{ overflow-wrap:anywhere; word-break: break-word; }
-
- /* Render nội dung DOCX */
- .docx-content{ line-height:1.7; font-size:14px; }
- .docx-content p{ margin:8px 0; white-space: pre-wrap; }
- .docx-content h1.doc-title{ text-align:center; margin:14px 0 8px; font-size:26px; color:#0f172a; }
- .docx-content h2{ margin:18px 0 8px; color:#0f172a; }
- .docx-content h3{ margin:14px 0 6px; color:#0f172a; }
- .docx-content .docx-table th,
- .docx-content .docx-table td{ white-space: pre-wrap; }
-
- @media print{
- .toc a{ color:#000; text-decoration:none; }
- }
- 
-/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
 @media print {
  .card, .table-card, .callout, .note, .box, .iso-map,
  .preface-block, .jd-mission, .form-sheet, .lane,
@@ -41,29 +14,15 @@
  page-break-inside: avoid;
  break-inside: avoid;
  }
- h1, h2, h3, .h1, .h2, .h3 {
- page-break-after: avoid;
- break-after: avoid;
- }
- .form-header {
+.jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
  page-break-inside: avoid;
  break-inside: avoid;
  }
- .sig-row, .sign-row, .approval-row {
+.auth-grid, .backup-card, .vstep {
  page-break-inside: avoid;
  break-inside: avoid;
  }
- tr { page-break-inside: avoid; break-inside: avoid; }
- thead { display: table-header-group; }
- tfoot { display: table-footer-group; }
- p { orphans: 3; widows: 3; }
- 
-}
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-
 </style>
 </head>
 <body>

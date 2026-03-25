@@ -7,21 +7,6 @@
 <title>ANNEX-105 — Bản đồ quá trình chi tiết và điểm giao diện | HESEM QMS</title>
 <link href="../../../../assets/style.css" rel="stylesheet"/>
 <style>
- .process-svg{width:100%; height:auto; border:1px solid var(--border); border-radius:16px; background:#fff;}
- .legend{display:flex; gap:12px; flex-wrap:wrap;}
- .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:#fff;}
- .swatch{width:14px;height:14px;border-radius:4px;border:1px solid #0f172a;}
- .swatch.mgt{background:#ecfeff; border-color:#06b6d4;}
- .swatch.core{background:#eff6ff; border-color:#3b82f6;}
- .swatch.sup{background:#fdf2f8; border-color:#ec4899;}
- .swatch.imp{background:#fefce8; border-color:#f59e0b;}
- @media print {
- @page { size: A3 portrait; margin: 12mm; }
- .no-print{display:none !important;}
- .container{max-width:none;}
- }
-
-/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
 @media print {
  .card, .table-card, .callout, .note, .box, .iso-map,
  .preface-block, .jd-mission, .form-sheet, .lane,
@@ -29,29 +14,15 @@
  page-break-inside: avoid;
  break-inside: avoid;
  }
- h1, h2, h3, .h1, .h2, .h3 {
- page-break-after: avoid;
- break-after: avoid;
- }
- .form-header {
+.jd-mission, .form-sheet, .lane,
+ .legend, .req, .auth-grid, .backup-card, .vstep {
  page-break-inside: avoid;
  break-inside: avoid;
  }
- .sig-row, .sign-row, .approval-row {
+.auth-grid, .backup-card, .vstep {
  page-break-inside: avoid;
  break-inside: avoid;
  }
- tr { page-break-inside: avoid; break-inside: avoid; }
- thead { display: table-header-group; }
- tfoot { display: table-footer-group; }
- p { orphans: 3; widows: 3; }
- 
-}
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-
 </style>
 <style>
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px}
