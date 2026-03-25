@@ -72,7 +72,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><strong>Vai trò mục tiêu</strong><br/>Tất cả vị trí chạm Job Pack: Người định giá (SAL-03), Kế hoạch, Kỹ thuật, Mua hàng, Kho/IQC, Operator/Setup, QC/QA, Hậu cần, Finance</div>
 <div><strong>Đầu ra bắt buộc</strong>
 <ul>
-<li>Mở đúng Hồ sơ công việc (hồ sơ công việc) và xác nhận JobNum/PartNo/REV trước khi làm.</li><li>Nhận diện 6 cổng kiểm soát chính (G0–G5) và biết bằng chứng tối thiểu của mỗi cổng kiểm soát.</li><li>Kích hoạt hold khi thiếu bằng chứng bắt buộc hoặc sai phiên bản; không chạy tiếp để “kịp tiến độ”.</li>
+<li>Mở đúng Hồ sơ công việc (hồ sơ công việc) và xác nhận JobNum/PartNo/REV trước khi làm.</li><li>Nhận diện 7 cổng kiểm soát chính (G0–G6) và biết bằng chứng tối thiểu của mỗi cổng kiểm soát.</li><li>Kích hoạt hold khi thiếu bằng chứng bắt buộc hoặc sai phiên bản; không chạy tiếp để “kịp tiến độ”.</li>
 </ul>
 </div>
 <div><strong>Cổng kiểm soát trọng yếu</strong><br/><span class="badge bad">Sai REV / thiếu Job Pack / vượt qua cổng kiểm soát</span> = TẠM GIỮ/FAIL</div>
@@ -101,14 +101,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
-<p>Chuỗi Lệnh sản xuất vận hành theo cổng kiểm soát G0–G5. Mỗi cổng kiểm soát có điều kiện vào/ra và hồ sơ tối thiểu (MRR). Khi thiếu MRR hoặc sai phiên bản set: kích hoạt TẠM GIỮ.</p>
+<p>Chuỗi Lệnh sản xuất vận hành theo cổng kiểm soát G0–G6. Mỗi cổng kiểm soát có điều kiện vào/ra và hồ sơ tối thiểu (MRR). Khi thiếu MRR hoặc sai phiên bản set: kích hoạt TẠM GIỮ.</p>
 <div class="vflow">
 <div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>RFQ tiếp nhận</strong><p>Tiếp nhận RFQ/PO/drawing/spec và khóa dữ liệu đầu vào.</p></div></div>
 <div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Review hợp đồng</strong><p>Xác nhận CTQ, chứng từ bắt buộc, ngày đến hạn và Requests đặc biệt.</p></div></div>
 <div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>G0 — Job Khởi động</strong><p>Tạo Job Theo dõi Sheet, plan lộ trình gia công, outsource nhu cầu, rủi ro xếp hạng / đánh giá.</p></div></div>
 <div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>ENG Mốc chuẩn</strong><p>Phát hành bộ hồ sơ chuẩn (mốc chuẩn gói hàng) đúng phiên bản (drawing, setup, kế hoạch kiểm tra (kiểm tra plan)).</p></div></div>
 <div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>G1–G3 — Thực thi</strong><p>Phát hành program/setup, FAI/mẫu đầu (đầu tiên chi tiết / sản phẩm), IPQC theo phản ứng plan.</p></div></div>
-<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>G4–G5 — Ship &amp; Tiền mặt</strong><p>Final QC/pack, CoC, bộ hồ sơ giao hàng, hóa đơn và phản hồi khách.</p></div></div>
+<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>G4–G6 — Ship &amp; Tiền mặt</strong><p>Final QC/pack, CoC, bộ hồ sơ giao hàng, hóa đơn và phản hồi khách.</p></div></div>
 </div>
 <h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
 <ol><li>Nhận job nhưng không mở Hồ sơ công việc/không xác nhận JobNum trước khi làm.</li><li>Dùng bản vẽ/spec không thuộc phiên bản set của job (file rời, bản in cũ).</li><li>Bỏ qua rà soát hợp đồng hoặc không đọc Requests chứng từ (MTR/CoC/FAI/pack).</li><li>Tạo Phiếu theo dõi công việc thiếu CTQ hoặc thiếu vận hành trình tự; công đoạn sau không biết kiểm gì.</li><li>Phát hành program/setup khi chưa có bộ hồ sơ chuẩn hoặc chưa kiểm tra phiên bản.</li><li>Chạy hàng loạt khi chưa có FAI/mẫu đầu phát hành cho CTQ.</li><li>Outsource hoàn thiện bề mặt không có spec/PO note; nhận về thiếu CoC hoặc sai spec.</li><li>Không cập nhật WIP trạng thái; Kế hoạch/Điều phối ra quyết định ưu tiên sai.</li><li>Bị chặn &gt;15 phút nhưng không escal theo SLA; trễ mới báo.</li><li>giao hàng khi thiếu CoC/final báo cáo/đóng gói bằng chứng; khách hàng khiếu nại / Requests bồi thường và đánh giá không đạt.</li><li>Thay đổi khách hàng giữa chừng nhưng không log thay đổi và không cập nhật hồ sơ job.</li><li>Evidence không nằm SSOT; truy xuất nguồn gốc quá 60 giây.</li></ol>
@@ -146,7 +146,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody></table></div>
 <h2>10) Đánh giá</h2>
 <h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
-<div class="quiz"><ol><li>RFQ → Tiền mặt trong phân xưởng CNC gồm những bước nào theo thứ tự?</li><li>G0–G5 là gì và cổng kiểm soát nào liên quan trực tiếp tới FAI?</li><li>Phiên bản set là gì và nằm ở đâu trong hệ thống?</li><li>Khi thiếu rà soát hợp đồng, hành động bắt buộc là gì?</li><li>Phiếu theo dõi công việc tối thiểu phải có những trường nào để công đoạn sau làm đúng?</li><li>Bộ hồ sơ chuẩn gồm những thành phần nào?</li><li>Điều kiện để phát hành chạy hàng loạt sau mẫu đầu là gì?</li><li>Outsource hoàn thiện bề mặt cần chứng từ nào khi nhận về?</li><li>Trạng thái WIP cập nhật trễ tạo ra rủi ro gì?</li><li>Escalation SLA kích hoạt khi nào và báo cho ai trước?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) nghĩa là gì trong RFQ→Tiền mặt?</li><li>Khi khách gửi thay đổi giữa job, hồ sơ bắt buộc là gì?</li><li>Phân biệt TẠM GIỮ và STOP trong vận hành job.</li><li>Cổng kiểm soát nào quyết định ‘KHÔNG SHIP’ khi thiếu chứng từ?</li><li>CTQ là gì và CTQ được ghi ở đâu trong hồ sơ job?</li><li>Nêu 03 ví dụ vượt qua cổng kiểm soát trong phân xưởng CNC.</li><li>Khi FAI fail, ba hành động đầu tiên là gì?</li><li>Tại sao bộ hồ sơ giao hàng phải nằm trong SSOT?</li><li>Ai phát hành CoC và điều kiện phát hành là gì?</li><li>Điểm khác nhau giữa job note và bộ hồ sơ chuẩn?</li><li>Nêu 02 lỗi gây khiếu nại / Requests bồi thường khách liên quan hồ sơ.</li><li>Truy xuất nguồn gốc hồ sơ trong 60 giây Requests điều kiện nào?</li></ol></div>
+<div class="quiz"><ol><li>RFQ → Tiền mặt trong phân xưởng CNC gồm những bước nào theo thứ tự?</li><li>G0–G6 là gì và cổng kiểm soát nào liên quan trực tiếp tới FAI?</li><li>Phiên bản set là gì và nằm ở đâu trong hệ thống?</li><li>Khi thiếu rà soát hợp đồng, hành động bắt buộc là gì?</li><li>Phiếu theo dõi công việc tối thiểu phải có những trường nào để công đoạn sau làm đúng?</li><li>Bộ hồ sơ chuẩn gồm những thành phần nào?</li><li>Điều kiện để phát hành chạy hàng loạt sau mẫu đầu là gì?</li><li>Outsource hoàn thiện bề mặt cần chứng từ nào khi nhận về?</li><li>Trạng thái WIP cập nhật trễ tạo ra rủi ro gì?</li><li>Escalation SLA kích hoạt khi nào và báo cho ai trước?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) nghĩa là gì trong RFQ→Tiền mặt?</li><li>Khi khách gửi thay đổi giữa job, hồ sơ bắt buộc là gì?</li><li>Phân biệt TẠM GIỮ và STOP trong vận hành job.</li><li>Cổng kiểm soát nào quyết định ‘KHÔNG SHIP’ khi thiếu chứng từ?</li><li>CTQ là gì và CTQ được ghi ở đâu trong hồ sơ job?</li><li>Nêu 03 ví dụ vượt qua cổng kiểm soát trong phân xưởng CNC.</li><li>Khi FAI fail, ba hành động đầu tiên là gì?</li><li>Tại sao bộ hồ sơ giao hàng phải nằm trong SSOT?</li><li>Ai phát hành CoC và điều kiện phát hành là gì?</li><li>Điểm khác nhau giữa job note và bộ hồ sơ chuẩn?</li><li>Nêu 02 lỗi gây khiếu nại / Requests bồi thường khách liên quan hồ sơ.</li><li>Truy xuất nguồn gốc hồ sơ trong 60 giây Requests điều kiện nào?</li></ol></div>
 <h3>Tình huống (≥ 3 tình huống thật)</h3>
 <details>
 <summary>Customer gửi bản vẽ REV mới khi job đang chạy</summary>
@@ -174,7 +174,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Bài test tay nghề — Đọc 01 Job và xác nhận cổng kiểm soát mức sẵn sàng</h3>
 <h4>Bài làm bắt buộc</h4>
 <ol>
-<li>Mở đúng Hồ sơ công việc và trích ra 01 trang tóm tắt: JobNum/PartNo/REV/CTQ/ngày đến hạn/công đoạn đặc biệt.</li><li>Chỉ ra cổng kiểm soát Current (G0–G5) và 03 bằng chứng bắt buộc để qua cổng kiểm soát.</li><li>Phát hiện tối thiểu 05 thiếu sót/điểm rủi ro trong job pack giả lập và tạo 05 hành động có Responsible Person + due trong ngày.</li>
+<li>Mở đúng Hồ sơ công việc và trích ra 01 trang tóm tắt: JobNum/PartNo/REV/CTQ/ngày đến hạn/công đoạn đặc biệt.</li><li>Chỉ ra cổng kiểm soát Current (G0–G6) và 03 bằng chứng bắt buộc để qua cổng kiểm soát.</li><li>Phát hiện tối thiểu 05 thiếu sót/điểm rủi ro trong job pack giả lập và tạo 05 hành động có Responsible Person + due trong ngày.</li>
 </ol>
 <h4>ĐẠT/KHÔNG ĐẠT</h4>
 <ul>

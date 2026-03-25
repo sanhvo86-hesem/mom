@@ -93,7 +93,7 @@
               </tr>
               <tr>
                 <td><span class="code">03-Job-Hồ sơ</span></td>
-                <td>Hồ sơ thực thi theo JobNum, gate G0–G5, Photos trạng thái đóng job và bằng chứng xuyên suốt đơn hàng-to-ship.</td>
+                <td>Hồ sơ thực thi theo JobNum, gate G0–G6, Photos trạng thái đóng job và bằng chứng xuyên suốt đơn hàng-to-ship.</td>
                 <td>Sản xuất Giám đốc / QA Manager</td>
                 <td>chéo-chức năng</td>
                 <td>Phải tương thích <a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> và <a href="../../02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>.</td>
@@ -219,7 +219,7 @@
         <h2>5. Bản thiết kế Hồ sơ công việc trong 03-Job-Hồ sơ</h2>
         <div class="figure-box">
           <p style="margin:0 0 8px;"><strong>Path chuẩn:</strong> <span class="path">03-Job-Hồ sơ/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/</span></p>
-          <p style="margin:0;">Nếu khách hàng cần tách biệt dữ liệu, bổ sung lớp <span class="code">{CustomerID}</span> trước thư mục job. Không thay đổi logic G0–G5, không rút gọn tên thư mục, không thêm thư mục làm phá gate logic.</p>
+          <p style="margin:0;">Nếu khách hàng cần tách biệt dữ liệu, bổ sung lớp <span class="code">{CustomerID}</span> trước thư mục job. Không thay đổi logic G0–G6, không rút gọn tên thư mục, không thêm thư mục làm phá gate logic.</p>
         </div>
         <div class="table-card">
           <table>
@@ -233,11 +233,11 @@
             <tbody>
               <tr><td>00_Admin-Control</td><td><a download="" href="../../../../04-Bieu-Mau/02-FRM-200/FRM-205_Job_Dossier_Evidence_Index.xlsx">FRM-205</a>, index, hồ sơ status, phê duyệt lịch sử, thay đổi log, khách hàng tóm tắt.</td><td>Kế hoạch / QA</td></tr>
               <tr><td>01_G0-Contract-Kickoff</td><td>RFQ link, hợp đồng rà soát, khởi động bảng kiểm, cao-rủi ro sẵn sàng hồ sơ.</td><td>Kinh doanh-CS / Kế hoạch</td></tr>
-              <tr><td>02_G1-Setup-Release</td><td>Lộ trình gia công, traveler, phiếu cài đặt, danh sách dao cụ, pre-run kiểm tra, công việc chuyển giao validation.</td><td>Kỹ thuật / Sản xuất</td></tr>
-              <tr><td>03_G2-FAI-First-Piece</td><td>FAI, đầu tiên-chi tiết / sản phẩm kết quả, balloon drawings, phê duyệt or làm lại quyết định.</td><td>QA / Kỹ thuật</td></tr>
-              <tr><td>04_G3-IPQC-Production</td><td>In-quy trình hồ sơ, shift bàn giao, SPC phản ứng, bất thường bằng chứng, khởi động lại bằng chứng.</td><td>Sản xuất / QA</td></tr>
-              <tr><td>05_G4-Final-QC-Packaging</td><td>Final kiểm tra, clean-pack, đóng gói checklists, người xử lý trả hàng, cert thu thập.</td><td>QA / Clean-Pack / WHS</td></tr>
-              <tr><td>06_G5-Ship-Release</td><td>Giao vận bảng kiểm, nhãn, đặt lịch / ghi nhận, CoC/CoA, POD, khách hàng ship pack.</td><td>WHS / Hậu cần / QA</td></tr>
+              <tr><td>03_G2-Setup-Release</td><td>Lộ trình gia công, traveler, phiếu cài đặt, danh sách dao cụ, pre-run kiểm tra, công việc chuyển giao validation.</td><td>Kỹ thuật / Sản xuất</td></tr>
+              <tr><td>04_G3-FAI-First-Piece</td><td>FAI, đầu tiên-chi tiết / sản phẩm kết quả, balloon drawings, phê duyệt or làm lại quyết định.</td><td>QA / Kỹ thuật</td></tr>
+              <tr><td>05_G4-IPQC-Production</td><td>In-quy trình hồ sơ, shift bàn giao, SPC phản ứng, bất thường bằng chứng, khởi động lại bằng chứng.</td><td>Sản xuất / QA</td></tr>
+              <tr><td>06_G5-Final-QC-Packaging</td><td>Final kiểm tra, clean-pack, đóng gói checklists, người xử lý trả hàng, cert thu thập.</td><td>QA / Clean-Pack / WHS</td></tr>
+              <tr><td>07_G6-Ship-Release</td><td>Giao vận bảng kiểm, nhãn, đặt lịch / ghi nhận, CoC/CoA, POD, khách hàng ship pack.</td><td>WHS / Hậu cần / QA</td></tr>
               <tr><td>07_NCR-CAPA-Deviation</td><td>NCR, CAPA, concessions, deviations, làm lại chuỗi, khiếu nại liên kết.</td><td>QA</td></tr>
               <tr><td>99_Archive-Locked</td><td>Final đã khóa Photos trạng thái, đã ký export gói / bó, kết thúc / đóng hồ sơ danh mục / bảng kê.</td><td>QA / QMS</td></tr>
             </tbody>

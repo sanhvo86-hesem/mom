@@ -1692,7 +1692,7 @@ function renderDashboard(){
       </div>`;
   }
 
-  // High-impact execution shortcuts (RFQ → Cash, G0–G5)
+  // High-impact execution shortcuts (RFQ → Cash, G0–G6)
   const execShortcutCodes = [
     "PROC-OPS-001",
     "WI-OPS-001",
@@ -1809,7 +1809,7 @@ function renderDashboard(){
         <div style="font-size:12px;color:var(--text-2)">
           <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>Epicor Kinetic</b> — System of Record (transactions)<br><span style="color:var(--text-3)">Job, Dispatch, Time Entry, PO, Inventory</span></div>
           <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>M365 / SharePoint</b> — SSOT (evidence/records)<br><span style="color:var(--text-3)">${T('controlled_docs')}</span></div>
-          <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>Quality Gates</b> — G0 → G5<br><span style="color:var(--text-3)">Hold/Release ${T('at_each_gate')}</span></div>
+          <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>Quality Gates</b> — G0 → G6<br><span style="color:var(--text-3)">Hold/Release ${T('at_each_gate')}</span></div>
           <div style="padding:10px 0"><b>${T('standards')}</b> — ISO 9001:2015 • revision-ready<br><span style="color:var(--text-3)">CNC Semiconductor Grade</span></div>
         </div>
       </div>
