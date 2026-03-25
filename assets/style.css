@@ -5,8 +5,8 @@
   --blue-l:#e3f2fd;
   --gold:  #f9a825;
   --gold-l:#fff8e1;
-  --th-bg: #dce8f5;
-  --th-bdr:#a8c8e0;
+  --th-bg: rgba(21, 101, 192, 0.12);
+  --th-bdr: #1565c0;
   --ink:   #212529;
   --ink2:  #495057;
   --ink3:  #868e96;
@@ -105,46 +105,46 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
 /* TABLES — Clean Minimal v10 */
+/* ── TABLE DESIGN (inspired by pricing-table: border #1565c0, header rgba(21,101,192,0.12)) ── */
 .table-card, .table-block, .table-wrap {
-  border: 1px solid #a8c8e0 !important; border-radius: var(--r); overflow: auto; overflow-x: auto;
+  border: 1px solid var(--th-bdr) !important; border-radius: var(--r); overflow: auto; overflow-x: auto;
   -webkit-overflow-scrolling: touch; margin: 16px 0; background: var(--bg); box-shadow: none !important;
 }
 .table-card table, .table-card table.table, .table-card .table, .table-block table, .table-wrap table { margin: 0; border: none !important; border-radius: 0 !important; overflow: visible !important; }
-.table-card .form-table { border: none; }
-.table, table.table { width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; font-size: 12.5px; table-layout: auto; border: 1px solid #a8c8e0 !important; border-radius: var(--r); overflow: hidden; }
+.table-card .form-table { border: none !important; }
+.table, table.table { width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; font-size: 12.5px; table-layout: auto; border: 1px solid var(--th-bdr) !important; border-radius: var(--r); overflow: hidden; }
 .table thead th, table.table thead th {
   text-align: left; padding: 11px 14px;
   font-size: 10.5px; font-weight: 700; color: var(--navy) !important;
-  background: #dce8f5 !important; letter-spacing: .4px; text-transform: uppercase;
-  border: none !important; border-bottom: 1px solid #a8c8e0 !important;
+  background: var(--th-bg) !important; letter-spacing: .4px; text-transform: uppercase;
+  border: none !important; border-bottom: 1px solid var(--th-bdr) !important;
 }
 .table tbody td, table.table tbody td {
-  padding: 10px 14px; border: none !important; border-bottom: 1px solid #e4eaf2 !important;
+  padding: 10px 14px; border: none !important; border-bottom: 1px solid rgba(73,72,74,0.1) !important;
   vertical-align: top; line-height: 1.6; color: var(--ink); background: transparent !important;
 }
 .table tbody tr:last-child td { border-bottom: none !important; }
-.table tbody tr:hover { background: #f3f7fc !important; transition: background .15s ease; }
+.table tbody tr:hover { background: rgba(21,101,192,0.04) !important; transition: background .15s ease; }
 .table tbody th, table.table tbody th {
   padding: 10px 14px; font-weight: 700; color: var(--navy) !important;
-  background: #edf2f9 !important; border: none !important; border-bottom: 1px solid #e4eaf2 !important; font-size: 11.5px; vertical-align: top;
+  background: rgba(21,101,192,0.06) !important; border: none !important; border-bottom: 1px solid rgba(73,72,74,0.1) !important; font-size: 11.5px; vertical-align: top;
 }
 /* Compact variant */
 .table.compact td, .table.compact th { padding: 6px 10px; font-size: 11.5px; }
 .table.compact thead th { padding: 8px 10px; font-size: 9.5px; }
 /* Form table */
-.form-table { width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; font-size: 12px; border: 1px solid #a8c8e0 !important; border-radius: var(--r); overflow: hidden; }
+.form-table { width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; font-size: 12px; border: 1px solid var(--th-bdr) !important; border-radius: var(--r); overflow: hidden; }
 .form-table th {
   padding: 9px 14px; text-align: left; font-weight: 700; color: var(--navy) !important;
-  background: #dce8f5 !important; border: none !important; border-bottom: 1px solid #a8c8e0 !important; font-size: 11px; vertical-align: top;
+  background: var(--th-bg) !important; border: none !important; border-bottom: 1px solid var(--th-bdr) !important; font-size: 11px; vertical-align: top;
 }
-.form-table td { padding: 9px 14px; border: none !important; border-bottom: 1px solid #e4eaf2 !important; vertical-align: top; background: transparent !important; }
-.form-table tbody tr:hover { background: #f3f7fc; }
+.form-table td { padding: 9px 14px; border: none !important; border-bottom: 1px solid rgba(73,72,74,0.1) !important; vertical-align: top; background: transparent !important; }
+.form-table tbody tr:hover { background: rgba(21,101,192,0.04); }
 /* Docx table */
-.docx-table { border-collapse: collapse; width: 100%; font-size: 12px; margin: 12px 0; table-layout: auto; border: 1px solid #a8c8e0; border-radius: var(--r); overflow: hidden; }
-.docx-table td, .docx-table th { border: none !important; border-bottom: 1px solid #e4eaf2 !important; padding: 9px 14px; vertical-align: top; background: transparent !important; }
-.docx-table th { background: #dce8f5 !important; font-weight: 700; color: var(--navy) !important; border-bottom: 1px solid #a8c8e0 !important; }
-.table-card .table, .table-wrap .table, .table-block .table { margin: 0; border: 1px solid #a8c8e0; }
-.table-card .docx-table, .table-wrap .docx-table { margin: 0; border: none; }
+.docx-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 12px; margin: 12px 0; table-layout: auto; border: 1px solid var(--th-bdr); border-radius: var(--r); overflow: hidden; }
+.docx-table td, .docx-table th { border: none !important; border-bottom: 1px solid rgba(73,72,74,0.1) !important; padding: 9px 14px; vertical-align: top; background: transparent !important; }
+.docx-table th { background: var(--th-bg) !important; font-weight: 700; color: var(--navy) !important; border-bottom: 1px solid var(--th-bdr) !important; }
+.table-card .docx-table, .table-wrap .docx-table { margin: 0; border: none !important; }
 .iso-matrix { font-size: 11px; }
 .iso-matrix td, .iso-matrix th { padding: 5px 8px; }
 .iso-matrix thead th { font-size: 9px; padding: 6px 8px; }
