@@ -358,6 +358,15 @@ function isPortalSidebarCategoryVisible(id){
   return !((PORTAL_DISPLAY_CONFIG?.sidebar?.hidden_categories || []).includes(key));
 }
 
+function portalCategoryHasPhysicalTree(catId){
+  try{
+    if(typeof getTreeNodesForCategory !== 'function') return false;
+    return getTreeNodesForCategory(catId).length > 0;
+  }catch(e){
+    return false;
+  }
+}
+
 function setPortalDisplayConfigDirty(value){
   portalDisplayConfigDirty = !!value;
   const bar = document.getElementById('portal-display-save-bar');
@@ -1341,7 +1350,7 @@ function renderSidebar(){
 
   SIDEBAR_SECTIONS.forEach(sec => {
     if(!isPortalSidebarSectionVisible(sec.id)) return;
-    const catsInSec = CATEGORIES.filter(c => !c.hidden && isPortalSidebarCategoryVisible(c.id) && c.section === sec.id && VDOCS.some(d => d.cat === c.id));
+    const catsInSec = CATEGORIES.filter(c => !c.hidden && isPortalSidebarCategoryVisible(c.id) && c.section === sec.id && (VDOCS.some(d => d.cat === c.id) || portalCategoryHasPhysicalTree(c.id)));
     if(catsInSec.length === 0) return;
     html += `<div class="nav-section"><div class="nav-section-title">${sec.label}</div>`;
     catsInSec.forEach(cat => {
@@ -2352,7 +2361,7 @@ function renderDocSearchBar(VDOCS){
   return `
     <div class="filter-bar">
       <button class="filter-chip ${currentFilter==='ALL'?'active':''}" onclick="currentFilter='ALL';currentFolderPath=[];renderDocuments();renderSidebar()">${T('all')} (${VDOCS.length})</button>
-      ${CATEGORIES.filter(c=>!c.hidden&&VDOCS.some(d=>d.cat===c.id)).map(cat =>
+      ${CATEGORIES.filter(c=>!c.hidden&&(VDOCS.some(d=>d.cat===c.id) || portalCategoryHasPhysicalTree(c.id))).map(cat =>
         `<button class="filter-chip ${currentFilter===cat.id?'active':''}" onclick="currentFilter='${cat.id}';currentFolderPath=[];renderDocuments();renderSidebar()">${cat.icon} ${catLabel(cat).split('(')[0].trim()} (${VDOCS.filter(d=>d.cat===cat.id).length})</button>`
       ).join('')}
     </div>
@@ -2362,7 +2371,7 @@ function renderDocSearchBar(VDOCS){
 // Render ALL docs view as category folder cards
 function renderDocCategoryGrid(VDOCS){
   let html = `<div class="fm-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:16px 0">`;
-  CATEGORIES.filter(c=>!c.hidden&&VDOCS.some(d=>d.cat===c.id)).forEach(cat => {
+  CATEGORIES.filter(c=>!c.hidden&&(VDOCS.some(d=>d.cat===c.id) || portalCategoryHasPhysicalTree(c.id))).forEach(cat => {
     const cnt = VDOCS.filter(d=>d.cat===cat.id).length;
     html += `
       <div class="fm-folder" onclick="currentFilter='${cat.id}';currentFolderPath=[];renderDocuments();renderSidebar()" style="padding:20px 14px">
