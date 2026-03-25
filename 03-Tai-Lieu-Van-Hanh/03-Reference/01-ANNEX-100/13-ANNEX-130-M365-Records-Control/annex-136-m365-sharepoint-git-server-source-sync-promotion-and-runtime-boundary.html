@@ -58,7 +58,11 @@
       <h1>ANNEX-136 - M365 SharePoint, Git và server source sync, promotion và runtime boundary</h1>
 
       <div class="section">
-        <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
+        <div class="note-blue" style="margin:12px 0">
+  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — SharePoint-Git Sync</b>.
+  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+</div>
+<h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
         <p style="margin:8px 0;">ANNEX này xác lập kiến trúc bắt buộc để bộ tài liệu HESEM nằm trên M365 SharePoint theo cách vẫn hỗ trợ local authoring, Git promotion, server deployment, reverse sync và online-form governance mà không làm lẫn source với runtime data. Kết quả bắt buộc là: mọi người biết bộ source docs nằm ở đâu trên SharePoint, local nào được phép sync, Git là gì trong chuỗi kiểm soát, server giữ cái gì, và dữ liệu nào tuyệt đối không được quay vào Git hay SharePoint source library.</p>
         <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: bộ tài liệu nguồn có đúng một đường đi chuẩn <b>SharePoint local sync worktree → Git remote → server deploy</b>; mọi hotfix từ server phải quay lại <b>Git → SharePoint local sync</b>; runtime data, secret-bearing config, draft workflow binaries, session files, rate-limit state và form transaction data không được trộn vào controlled source library.</div>
         <div class="keyline"><strong>Ranh giới tài liệu:</strong> <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> khóa site/library/path; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> khóa provisioning, permissions và automation; <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> khóa field/list catalog; <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> khóa file plan; <a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a> khóa tạo site/library/quyền; <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> khóa thao tác click-by-click cho local sync, Git và server.</div>

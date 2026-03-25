@@ -72,7 +72,11 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
       <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi quyết định điều phối xuất hàng, công suất rà soát, WIP cap, sắp xếp lại, hot-job, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và escalation liên quan tới lập kế hoạch/OPS.</div>
       <h1>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và giới hạn WIP</h1>
 
-<div class="section"><h2>1. Mục đích và nguyên tắc điều hành</h2>
+<div class="section"><div class="note-blue" style="margin:12px 0">
+  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>tại G3 (Setup) và G5 (IPQC) — Dispatch/WIP Rules</b>.
+  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+</div>
+<h2>1. Mục đích và nguyên tắc điều hành</h2>
 <p>ANNEX này khóa bộ rule dùng chung cho <b>điều độ</b>, <b>rà soát năng lực</b>, <b>giới hạn WIP</b>, <b>đóng băng cửa sổ / khung thời gian</b>, <b>sắp xếp lại</b>, <b>hot-job</b> và <b>tuổi tồn (lão hóa / cũ)</b> ở toàn bộ phân xưởng CNC lệnh sản xuất của HESEM. Planner, Nhân viên điều phối, Supervisor và Ops Manager phải dùng cùng một rule set để ra quyết định; không để mỗi ca hoặc mỗi cell dùng một cách hiểu khác nhau.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span><br/>Giữ lịch bằng cơ chế điều phối xuất hàng chính thức, tôn trọng trạng thái TẠM GIỮ, giới hạn số hot-job đồng thời và kiểm soát WIP trước nút thắt / điểm nghẽn trong ngưỡng Released.</div>
 <div class="callout-info"><strong>Nguồn chuẩn</strong><br/>Epicor là SoR cho trạng thái Job/Op, hàng đợi, nhân công/di chuyển/đầy đủ, đặt trước, ship. M365 chỉ là SSOT cho Photos trạng thái, log hành động, cuộc họp biên bản họp, quyết định hồ sơ và bằng chứng đi kèm.</div>

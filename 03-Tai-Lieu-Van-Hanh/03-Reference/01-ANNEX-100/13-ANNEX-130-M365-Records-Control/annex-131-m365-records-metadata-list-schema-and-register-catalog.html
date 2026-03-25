@@ -56,7 +56,11 @@
       <h1>ANNEX-131 - M365 hồ sơ siêu dữ liệu, list sơ đồ cấu trúc, value bộ / tập hợp and sổ đăng ký danh mục</h1>
 
       <div class="section">
-        <h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
+        <div class="note-blue" style="margin:12px 0">
+  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — M365 Records Metadata</b>.
+  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+</div>
+<h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
         <p style="margin:8px 0;">ANNEX này chuẩn hóa field sơ đồ ánh xạ cho M365/List, nội dung type, tra cứu, xác nhận rule và source-of-hồ sơ cho toàn bộ hồ sơ mô hình cấp công ty, cấp phòng ban, cấp nhân sự, cấp job và cấp hệ thống số. Mục tiêu là loại bỏ dữ liệu rời, loại bỏ bộ mã trùng nghĩa, khóa logic cung cấp / cấp phát của <span class="code">ANNEX-134</span> vào cùng một từ điển dữ liệu và đảm bảo mọi list/sổ đăng ký đều có owner, khóa tự nhiên, lưu giữ kích hoạt và liên kết tới SSOT rõ ràng.</p>
         <div class="keyline"><strong>Quy tắc cứng:</strong> Epicor là SoR cho giao dịch Job, Hàng tồn kho, PO/Phiếu nhận, Lô giao hàng, Nhân công và chủ / gốc data giao dịch. M365 không tái tạo giao dịch để thay thế Epicor. M365 lưu hồ sơ điều hành, bằng chứng, phê duyệt, siêu dữ liệu chỉ mục, quyết định pack và logs điều khiển.</div>
       </div>

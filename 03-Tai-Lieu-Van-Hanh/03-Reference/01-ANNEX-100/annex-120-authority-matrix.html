@@ -164,7 +164,11 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
             </div>
           </div>
           <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#a1">1. Mục đích và phạm vi áp dụng</a><a href="#a2">2. Chú giải, vai trò và quy tắc cưỡng chế</a><a href="#a3">3. Decision register / ma trận thẩm quyền thực thi</a><a href="#a4">4. Quy tắc thực thi thẩm quyền tại hiện trường và trên hệ thống</a><a href="#a5">5. Thang thẩm quyền theo cổng kiểm soát và loại release</a><a href="#a6">6. Ủy quyền tạm thời, backup và giới hạn không chuyển giao</a><a href="#a7">7. Digital rights, segregation-of-duties và dấu vết kiểm toán (audit trail)</a><a href="#a8">8. Trigger rà soát và cập nhật ma trận</a></div></div>
-          <h2 class="h2" id="a1">1. Mục đích và phạm vi áp dụng</h2>
+          <div class="note-blue" style="margin:12px 0">
+  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Authority Matrix</b>.
+  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+</div>
+<h2 class="h2" id="a1">1. Mục đích và phạm vi áp dụng</h2>
 <p>ANNEX-120 khóa quyền <b>đề xuất (P) – xác minh (V) – phê duyệt/quyết định cuối (A) – tham vấn (C) – được thông tin (I)</b> cho các quyết định có ảnh hưởng tới chất lượng, tiến độ, an toàn, doanh thu, chi phí, tuân thủ khách hàng và tính toàn vẹn dữ liệu. Mọi quyết định làm thay đổi trạng thái job, thay đổi cổng kiểm soát, release/hold, thay đổi nguồn lực, thay đổi dữ liệu gốc (dữ liệu gốc) nhạy cảm, thay đổi dòng tiền, hoặc kích hoạt chế độ gián đoạn/khôi phục đều phải bám tài liệu này.</p>
 <div class="badge-strip">
   <span class="badge-chip">Bằng chứng before decision</span>

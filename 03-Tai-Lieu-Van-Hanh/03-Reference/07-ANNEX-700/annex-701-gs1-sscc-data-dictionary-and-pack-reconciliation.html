@@ -71,7 +71,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
       <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi cấp PackID/SSCC, in nhãn hậu cần, tách / chia/gộp / hợp nhất kiện, in lại/void nhãn, và đối soát trước xác nhận giao hàng (ship xác nhận).</div>
       <h1>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</h1>
       
-<div class="section"><h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
+<div class="section"><div class="note-blue" style="margin:12px 0">
+  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>tại G2, G7 (SCM) — Supply Chain Reference</b>.
+  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+</div>
+<h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
 <p>ANNEX này giữ toàn bộ quy tắc dữ liệu cho PackID và SSCC. Mọi vận hành in nhãn, quét, in lại, void, tách / chia/gộp / hợp nhất và đối soát kiện hàng phải bám đúng Annex này. Dữ liệu hậu cần không được tự chế ngoài hệ thống.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì SSCC duy nhất cho từng pack, chỉ giao hàng khi ReconciliationStatus không ở trạng thái ĐÃ CHẶN và chỉnh PackID hoặc SSCC bằng dữ liệu hệ thống đã kiểm soát, không sửa tay trên nhãn.</div></div>
 
