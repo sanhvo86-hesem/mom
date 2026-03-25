@@ -1727,7 +1727,49 @@ function renderDashboard(){
     </div>
     <div id="dash-pending">${pendingHtml}${draftsHtml}</div>
 
-    <div class="grid-2">
+    <div class="card" style="margin-top:18px">
+      <h3>🏭 ${lang==='en'?'Job Order Lifecycle — G0 → G5':'Vòng đời đơn hàng — G0 → G5'}</h3>
+      <p style="margin:-8px 0 12px;color:var(--text-3);font-size:12px">${lang==='en'?'Quick access to SOPs, WIs and Forms for each quality gate.':'Truy cập nhanh SOP, WI và biểu mẫu theo từng cổng kiểm soát chất lượng.'}</p>
+      <div style="display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px">
+        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #4CAF50;background:#f8fdf8">
+          <div style="font-weight:700;font-size:13px;color:#2e7d32;margin-bottom:6px">G0 — Contract</div>
+          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'RFQ review, order entry':'Xem xét RFQ, nhập đơn hàng'}</div>
+          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-SAL-001');return false" style="color:#0369a1">SOP-201</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-201</a></div>
+        </div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #2196F3;background:#f5f9ff">
+          <div style="font-weight:700;font-size:13px;color:#1565c0;margin-bottom:6px">G1 — Setup</div>
+          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'Program release, machine setup':'Phát hành chương trình, setup máy'}</div>
+          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-ENG-001');return false" style="color:#0369a1">SOP-303</a> · <a href="#" onclick="openDoc('SOP-OPS-004');return false" style="color:#0369a1">SOP-504</a></div>
+        </div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #FF9800;background:#fffbf0">
+          <div style="font-weight:700;font-size:13px;color:#e65100;margin-bottom:6px">G2 — FAI</div>
+          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'First article inspection':'Kiểm tra bài đầu tiên'}</div>
+          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-ENG-002');return false" style="color:#0369a1">SOP-302</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-302</a></div>
+        </div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #9C27B0;background:#fdf5ff">
+          <div style="font-weight:700;font-size:13px;color:#7b1fa2;margin-bottom:6px">G3 — IPQC</div>
+          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'In-process QC, SPC':'Kiểm soát trong quá trình'}</div>
+          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-OPS-002');return false" style="color:#0369a1">SOP-502</a> · <a href="#" onclick="openDoc('SOP-QA-004');return false" style="color:#0369a1">SOP-604</a></div>
+        </div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #00BCD4;background:#f0fdff">
+          <div style="font-weight:700;font-size:13px;color:#00838f;margin-bottom:6px">G4 — Final QC</div>
+          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'Final inspection, packaging':'Kiểm tra cuối, đóng gói'}</div>
+          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-QA-005');return false" style="color:#0369a1">SOP-605</a> · <a href="#" onclick="openDoc('SOP-WHS-001');return false" style="color:#0369a1">SOP-701</a></div>
+        </div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #F44336;background:#fff5f5">
+          <div style="font-weight:700;font-size:13px;color:#c62828;margin-bottom:6px">G5 — Ship</div>
+          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'Shipment release, CoC':'Giao hàng, hoàn tất hồ sơ'}</div>
+          <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-QA-005');return false" style="color:#0369a1">SOP-605</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-705</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:18px">
       <div class="card">
         <h3>${T('quick_access')}</h3>
         <div class="quick-grid">
@@ -1743,31 +1785,35 @@ function renderDashboard(){
         </div>
       </div>
       <div class="card">
+        <h3>👤 ${lang==='en'?'By Role':'Theo vai trò'}</h3>
+        <div style="display:grid;grid-template-columns:1fr;gap:6px;font-size:12px">
+          <div style="padding:8px 10px;border-left:3px solid #2196F3;border-radius:4px;background:#f5f9ff;cursor:pointer" onclick="navigateTo('documents','SOP')"><b>CNC Operator</b> — SOP-502, SOP-504, WI-519</div>
+          <div style="padding:8px 10px;border-left:3px solid #4CAF50;border-radius:4px;background:#f8fdf8;cursor:pointer" onclick="navigateTo('documents','SOP')"><b>QC Inspector</b> — SOP-302, SOP-603, SOP-604, SOP-601</div>
+          <div style="padding:8px 10px;border-left:3px solid #FF9800;border-radius:4px;background:#fffbf0;cursor:pointer" onclick="navigateTo('documents','SOP')"><b>Team Leader / Foreman</b> — WI-202, SOP-501, Authority Matrix</div>
+          <div style="padding:8px 10px;border-left:3px solid #9C27B0;border-radius:4px;background:#fdf5ff;cursor:pointer" onclick="navigateTo('documents','SOP')"><b>Planner / Engineer</b> — SOP-501, SOP-303, ANNEX-115</div>
+          <div style="padding:8px 10px;border-left:3px solid #0C2D48;border-radius:4px;background:#f0f4f8;cursor:pointer" onclick="navigateTo('documents','SOP')"><b>Manager / Director</b> — SOP-902, WI-901, KPI Dictionary</div>
+          <div style="padding:8px 10px;border-left:3px solid #00BCD4;border-radius:4px;background:#f0fdff;cursor:pointer" onclick="navigateTo('documents','SOP')"><b>IT / QMS Admin</b> — SOP-101, SOP-104, ANNEX-101</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:18px">
+      <div class="card">
         <h3>📊 ${T('system_overview')}</h3>
-        <div style="font-size:12px;color:var(--text-2);space-y:8px">
+        <div style="font-size:12px;color:var(--text-2)">
           <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>Epicor Kinetic</b> — System of Record (transactions)<br><span style="color:var(--text-3)">Job, Dispatch, Time Entry, PO, Inventory</span></div>
           <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>M365 / SharePoint</b> — SSOT (evidence/records)<br><span style="color:var(--text-3)">${T('controlled_docs')}</span></div>
           <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>Quality Gates</b> — G0 → G5<br><span style="color:var(--text-3)">Hold/Release ${T('at_each_gate')}</span></div>
           <div style="padding:10px 0"><b>${T('standards')}</b> — ISO 9001:2015 • revision-ready<br><span style="color:var(--text-3)">CNC Semiconductor Grade</span></div>
         </div>
       </div>
-    </div>
-
-    <div class="card" style="margin-top:18px">
-      <h3>${T('exec_shortcuts_title')}</h3>
-      <p style="margin:-8px 0 12px;color:var(--text-3);font-size:12px">${T('exec_shortcuts_desc')}</p>
-      <div class="quick-grid">
-        ${execShortcuts.map(doc=>{
-          const cat=getCatForDoc(doc);
-          const locked=!canAccessDoc(doc.code);
-          const displayTitle = getDocDisplayTitle(doc);
-          const displayDesc = getDocDisplayDescription(doc);
-          return `<button class="quick-btn" style="border-left-color:#6366f1" onclick="openDoc('${doc.code}')">
-            <span class="q-icon">${cat?cat.icon:'📄'}</span>
-            <div class="q-meta"><div class="q-code">${doc.code}</div><div class="q-label">${displayTitle}</div>${displayDesc?`<div class="q-desc">${displayDesc}</div>`:''}</div>
-            ${locked?'<span class="lock">🔒</span>':''}
-          </button>`;
-        }).join('')}
+      <div class="card">
+        <h3>⚠️ ${lang==='en'?'System & Emergency':'Hệ thống & Khẩn cấp'}</h3>
+        <div style="display:grid;gap:8px;font-size:12px">
+          <div style="padding:10px 12px;border:1px solid #fee2e2;border-left:3px solid #ef4444;border-radius:6px;background:#fff5f5;cursor:pointer" onclick="openDoc('ANNEX-118')"><b>ANNEX-118</b> — Offline Fallback Kit<br><span style="color:#666">${lang==='en'?'Use when portal/ERP is down':'Dùng khi portal/ERP gián đoạn'}</span></div>
+          <div style="padding:10px 12px;border:1px solid #fef3c7;border-left:3px solid #f59e0b;border-radius:6px;background:#fffbeb;cursor:pointer" onclick="openDoc('SOP-QMS-008')"><b>SOP-108</b> — Contingency Plan<br><span style="color:#666">${lang==='en'?'Operational contingency procedures':'Quy trình vận hành dự phòng'}</span></div>
+          <div style="padding:10px 12px;border:1px solid #e5e7eb;border-left:3px solid #6366f1;border-radius:6px;background:#fafbff;cursor:pointer" onclick="openDoc('ANNEX-123')"><b>ANNEX-123</b> — Deputy / Backup Matrix<br><span style="color:#666">${lang==='en'?'Who replaces whom when absent':'Người thay thế khi vắng mặt'}</span></div>
+        </div>
       </div>
     </div>`;
 }
