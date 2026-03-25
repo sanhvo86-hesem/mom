@@ -1410,8 +1410,9 @@ function getDocDisplayTitle(doc){
   const rawTitle = String(doc.title || '').trim();
   const code = String(doc.code || '').trim();
   const derivedTitle = deriveDocTitleFromPath(doc);
+  // Keep header text in sync with Admin "Edit Document" title input.
+  // Only derive from path when title is missing or equals code.
   if(!rawTitle || rawTitle.toUpperCase() === code.toUpperCase()) return derivedTitle || rawTitle || code;
-  if(looksLikeVietnameseText(rawTitle) && derivedTitle) return derivedTitle;
   return rawTitle;
 }
 
