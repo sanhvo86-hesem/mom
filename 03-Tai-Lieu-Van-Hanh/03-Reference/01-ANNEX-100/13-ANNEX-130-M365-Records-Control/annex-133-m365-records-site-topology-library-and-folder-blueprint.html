@@ -141,6 +141,13 @@
                 <td>Không trộn với hồ sơ kinh doanh của phòng ban; chỉ lưu hồ sơ điều hành hệ thống và bằng chứng kỹ thuật.</td>
               </tr>
               <tr>
+                <td><span class="code">10-QMS-Source-Control</span></td>
+                <td>Controlled source cho toàn bộ bộ tài liệu QMS, source portal, released form definitions, release manifests, deploy receipts và reverse-sync intake.</td>
+                <td>QMS Manager / IT System Administrator</td>
+                <td>Hạn chế source-control</td>
+                <td>Không lưu runtime payload, session data, workflow draft binaries, secrets hoặc transaction records tại thư viện này.</td>
+              </tr>
+              <tr>
                 <td><span class="code">Part-REV-Bản gốc</span></td>
                 <td>không gian tên chủ / gốc theo CustomerID/PartNo/Rev cho mốc chuẩn kỹ thuật và nguồn sinh Photos trạng thái/job gói hàng.</td>
                 <td>Kỹ thuật Lead</td>
@@ -150,7 +157,7 @@
             </tbody>
           </table>
         </div>
-        <div class="keyline"><strong>Site cấu trúc liên kết bắt buộc:</strong> <span class="code">01-QMS-Hồ sơ</span>, <span class="code">02-Chất lượng-Hồ sơ</span>, <span class="code">03-Job-Hồ sơ</span>, <span class="code">04-Đào tạo-Hồ sơ</span>, <span class="code">05-Phòng ban-Hồ sơ</span>, <span class="code">06-Lưu trữ</span>, <span class="code">07-Mẫu-Làm việc</span> và <span class="code">Part-REV-Bản gốc</span> đặt trong site <span class="code">HESEM-QMS-Cốt lõi</span>. <span class="code">08-Con người-Hồ sơ</span> đặt trong site <span class="code">HESEM-Con người-Hạn chế</span>. <span class="code">09-Số hóa-System-Hồ sơ</span> đặt trong site <span class="code">HESEM-Số hóa-Control</span>. Cơ chế cung cấp / cấp phát theo site và trình tự triển khai nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>.</div>
+        <div class="keyline"><strong>Site cấu trúc liên kết bắt buộc:</strong> <span class="code">01-QMS-Hồ sơ</span>, <span class="code">02-Chất lượng-Hồ sơ</span>, <span class="code">03-Job-Hồ sơ</span>, <span class="code">04-Đào tạo-Hồ sơ</span>, <span class="code">05-Phòng ban-Hồ sơ</span>, <span class="code">06-Lưu trữ</span>, <span class="code">07-Mẫu-Làm việc</span> và <span class="code">Part-REV-Bản gốc</span> đặt trong site <span class="code">HESEM-QMS-Cốt lõi</span>. <span class="code">08-Con người-Hồ sơ</span> đặt trong site <span class="code">HESEM-Con người-Hạn chế</span>. <span class="code">09-Số hóa-System-Hồ sơ</span> và <span class="code">10-QMS-Source-Control</span> đặt trong site <span class="code">HESEM-Số hóa-Control</span>. Cơ chế cung cấp / cấp phát theo site và trình tự triển khai nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>; ranh giới source, Git và server runtime nằm tại <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>.</div>
       </div>
 
       <div class="section">
@@ -438,7 +445,7 @@
       </div>
 
       <div class="section">
-        <h2>10. Bản thiết kế hồ sơ hệ thống trong 09-Số hóa-System-Hồ sơ</h2>
+        <h2>10. Bản thiết kế hồ sơ hệ thống và source trong 09-Số hóa-System-Hồ sơ, 10-QMS-Source-Control</h2>
         <div class="table-card">
           <table>
             <thead>
@@ -457,9 +464,14 @@
               <tr><td class="path">09-Số hóa-System-Hồ sơ/06-Sự cố-and-Vấn đề-Quản lý/{YYYY}/</td><td>System sự cố logs, ngăn chặn bằng chứng, khắc phục hành động, gốc / căn nguyên nguyên nhân reviews.</td><td>IT / ERP</td></tr>
               <tr><td class="path">09-Số hóa-System-Hồ sơ/07-Tài sản-and-điểm cuối-Control/{YYYY}/</td><td>Tài sản registers, điểm cuối status, tuân thủ ngoại lệ, khôi phục / thu hồi khóa / phím ở đâu / nơi nào đã phê duyệt.</td><td>IT</td></tr>
               <tr><td class="path">09-Số hóa-System-Hồ sơ/08-tự động hóa-Run-Logs/{YYYY}/</td><td>cung cấp / cấp phát logs, run lịch sử, flow hỏng hóc, chia sẻ link hết hạn dọn dẹp logs.</td><td>IT</td></tr>
+              <tr><td class="path">10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</td><td>Source docs, portal source, static assets, released form definitions, approved templates và config baselines được phép đi qua Git.</td><td>QMS / IT</td></tr>
+              <tr><td class="path">10-QMS-Source-Control/02-Release-Manifests/{YYYY}/</td><td>Release manifest, commit map, tag/branch note, approved release notes, deploy scope và change bundle evidence.</td><td>QMS / IT</td></tr>
+              <tr><td class="path">10-QMS-Source-Control/03-Server-Deploy-Receipts/{YYYY}/</td><td>Server pull/deploy receipts, smoke test, rollback evidence, point-of-use verification sau phát hành.</td><td>IT</td></tr>
+              <tr><td class="path">10-QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</td><td>Server hotfix intake, reverse-sync justification, commit quay ngược, local pull confirmation và close-out log.</td><td>IT / QMS</td></tr>
             </tbody>
           </table>
         </div>
+        <div class="keyline"><strong>Rule source:</strong> <span class="code">10-QMS-Source-Control</span> là thư viện source được kiểm soát, không thay cho <span class="code">09-Số hóa-System-Hồ sơ</span>. Ranh giới SharePoint sync, Git, server deployment và runtime exclusions bắt buộc theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>.</div>
       </div>
 
       <div class="section">
@@ -553,6 +565,7 @@
               <tr><td>Phòng ban operations</td><td>Phòng ban group edit, chéo-chức năng đọc/edit theo RACI.</td><td>Không biến thành kho cá nhân; không cấp trực tiếp từng người dùng tràn lan.</td></tr>
               <tr><td>Con người hạn chế</td><td>HR-chỉ / duy nhất hoặc HR+Finance/IT hạn chế theo thư mục con.</td><td>Không duyệt rộng toàn thư viện, không chia sẻ ngoài công ty, không copy ra Teams/email làm SSOT mới.</td></tr>
               <tr><td>Số hóa system hạn chế</td><td>IT/ERP admin nhóm, đọc-chỉ / duy nhất rà soát cho đánh giá khi cần thiết.</td><td>Không cho người dùng kinh doanh sửa admin bằng chứng hoặc run logs.</td></tr>
+              <tr><td>QMS source control</td><td>QMS/IT/Portal editor groups theo library, sync chỉ trên endpoint được phê duyệt.</td><td>Không dùng external sharing; không đưa runtime payload, secrets hoặc session data vào source library.</td></tr>
               <tr><td>Part-REV-Bản gốc</td><td>ENG edit, QA/OPS đọc.</td><td>Không lưu lot-cụ thể bằng chứng hoặc chỉnh phiên bản trực tiếp ngoài phát hành flow.</td></tr>
               <tr><td>Lưu trữ đã khóa</td><td>đọc-chỉ / duy nhất sau khóa.</td><td>Không mở lại edit trừ khi có đã phê duyệt ngoại lệ với truy vết đầy đủ.</td></tr>
             </tbody>
@@ -574,6 +587,7 @@
               <tr><td>Hồ sơ nằm sai thư viện hoặc sai phòng ban khu vực</td><td>Di chuyển về đúng SSOT, cập nhật link/index, log lý do nếu hồ sơ đã được dùng trong quyết định.</td></tr>
               <tr><td>Hồ sơ cá nhân bị lưu trong phòng ban chia sẻ chung</td><td>Chuyển sang <span class="code">08-Con người-Hồ sơ</span>, thu hẹp quyền và rà soát toàn bộ tập hợp / dân số tương tự.</td></tr>
               <tr><td>IT/Epicor bằng chứng bị lưu lẫn trong phòng ban làm việc thư mục</td><td>Chuyển sang <span class="code">09-Số hóa-System-Hồ sơ</span>; phòng ban thư mục chỉ giữ giao diện pack hoặc link.</td></tr>
+              <tr><td>Source docs, form definitions hoặc deploy receipts bị lưu lẫn trong department records hay system records</td><td>Chuyển sang <span class="code">10-QMS-Source-Control</span>; cập nhật manifest, register và link ngược về record/evidence nếu cần.</td></tr>
               <tr><td>Phòng ban tự tạo thư mục con ngoài khung sườn chuẩn</td><td>Đánh giá nếu hồ sơ type mới thật sự phát sinh; nếu không, dọn về cấu trúc chuẩn và khóa quyền tạo không kiểm soát.</td></tr>
               <tr><td>Đào tạo bằng chứng bị copy sang nhân viên thư mục</td><td>Giữ lại index/link trong nhân viên thư mục, xóa bản trùng sau khi xác nhận SSOT ở <span class="code">04-Đào tạo-Hồ sơ</span>.</td></tr>
               <tr><td>Thư mục job thiếu gate thư mục hoặc thiếu lưu trữ khóa</td><td>dự phòng bổ sung ngay theo WI-203 và log gap để rà soát tự động hóa/cung cấp / cấp phát.</td></tr>

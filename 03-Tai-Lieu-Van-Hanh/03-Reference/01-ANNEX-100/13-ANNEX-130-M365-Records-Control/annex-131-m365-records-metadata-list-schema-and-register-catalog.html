@@ -140,6 +140,11 @@
               <tr><td>tập hợp / dân số</td><td>tập hợp / dân số</td><td>Lựa chọn</td><td>Theo con người hồ sơ</td><td>nhà thầu, thực tập sinh, khách tham quan, nhà cung cấp truy cập</td></tr>
               <tr><td>ExpiryDate</td><td>Ngày hết hạn</td><td>Date</td><td>Theo chia sẻ/ngoại lệ</td><td>Bên ngoài chia sẻ, quyền / sự cho phép ngoại lệ</td></tr>
               <tr><td>ExceptionReasonCode</td><td>Mã lý do ngoại lệ</td><td>Lựa chọn</td><td>Theo ngoại lệ</td><td>quyền / sự cho phép, đã niêm phong copy, lưu trữ mở lại</td></tr>
+              <tr><td>GitRef</td><td>Git ref</td><td>Đơn lẻ dòng / chuyền</td><td>Theo source control</td><td>Branch, tag hoặc ref dùng cho promotion, deploy hoặc reverse sync.</td></tr>
+              <tr><td>CommitId</td><td>Commit ID</td><td>Đơn lẻ dòng / chuyền</td><td>Theo source control</td><td>Commit SHA hoặc short SHA dùng cho manifest, deploy receipt và reverse sync log.</td></tr>
+              <tr><td>DeployState</td><td>Trạng thái deploy</td><td>Lựa chọn</td><td>Theo deploy</td><td>Release manifest, server deploy register, point-of-use verification.</td></tr>
+              <tr><td>ReverseSyncState</td><td>Trạng thái reverse sync</td><td>Lựa chọn</td><td>Theo reverse sync</td><td>Server hotfix intake, reverse-sync register, close-out log.</td></tr>
+              <tr><td>SyncBoundaryClass</td><td>Lớp ranh giới sync</td><td>Lựa chọn</td><td>Theo source/runtime</td><td>Phân biệt controlled source, release evidence, runtime record, runtime noise và server-only secret.</td></tr>
             </tbody>
           </table>
         </div>
@@ -154,10 +159,10 @@
             </thead>
             <tbody>
               <tr><td>DeptCodeCodes</td><td>EXEC, QMS, QA, ENG, PRO, SCM, SAL, FIN, HR, EHS, IT, ERP</td><td>Không dùng biến thể tự đặt như Kinh doanh, Sản xuất, Kho nếu chưa map chính thức.</td></tr>
-              <tr><td>LibraryCodes</td><td>01-QMS-Hồ sơ, 02-Chất lượng-Hồ sơ, 03-Job-Hồ sơ, 04-Đào tạo-Hồ sơ, 05-Phòng ban-Hồ sơ, 06-Lưu trữ, 07-Mẫu-Làm việc, 08-Con người-Hồ sơ, 09-Số hóa-System-Hồ sơ, Part-REV-Bản gốc</td><td>Khớp phân loại hệ thống trong <span class="code">ANNEX-133</span>.</td></tr>
+              <tr><td>LibraryCodes</td><td>01-QMS-Hồ sơ, 02-Chất lượng-Hồ sơ, 03-Job-Hồ sơ, 04-Đào tạo-Hồ sơ, 05-Phòng ban-Hồ sơ, 06-Lưu trữ, 07-Mẫu-Làm việc, 08-Con người-Hồ sơ, 09-Số hóa-System-Hồ sơ, 10-QMS-Source-Control, Part-REV-Bản gốc</td><td>Khớp phân loại hệ thống trong <span class="code">ANNEX-133</span>.</td></tr>
               <tr><td>SiteCodeCodes</td><td>HESEM-QMS-Cốt lõi, HESEM-Con người-Hạn chế, HESEM-Số hóa-Control</td><td>Khớp site cấu trúc liên kết trong <span class="code">ANNEX-134</span>.</td></tr>
-              <tr><td>RequestTypeCodes</td><td>CreateCompanyRecordZone, CreateDepartmentZone, CreateDepartmentYearFolder, CreateJobDossier, CreateEmployeeDossier, CreateContractorDossier, CreateVisitorAccessRecord, CreateSystemRecordZone, ExternalSharePackage, ArchiveLock, PermissionException</td><td>Khớp điều phối trong <span class="code">ANNEX-134</span>.</td></tr>
-              <tr><td>RecordZoneCodes</td><td>CompanyGovernance, QualityFormal, JobDossier, TrainingSSOT, DepartmentOperations, PeopleRestricted, SystemAdmin, ArchiveLocked, TemplateWorking, PartMaster</td><td>Dùng cho danh mục, dashboard và cung cấp / cấp phát logic.</td></tr>
+              <tr><td>RequestTypeCodes</td><td>CreateCompanyRecordZone, CreateDepartmentZone, CreateDepartmentYearFolder, CreateJobDossier, CreateEmployeeDossier, CreateContractorDossier, CreateVisitorAccessRecord, CreateSystemRecordZone, CreateSourceWorkspace, PromoteSourceChange, RegisterServerDeploy, RegisterReverseSync, ExternalSharePackage, ArchiveLock, PermissionException</td><td>Khớp điều phối trong <span class="code">ANNEX-134</span>.</td></tr>
+              <tr><td>RecordZoneCodes</td><td>CompanyGovernance, QualityFormal, JobDossier, TrainingSSOT, DepartmentOperations, PeopleRestricted, SystemAdmin, SourceControl, ArchiveLocked, TemplateWorking, PartMaster</td><td>Dùng cho danh mục, dashboard và cung cấp / cấp phát logic.</td></tr>
               <tr><td>FunctionAreaCodes</td><td>Quản trị, Operations, RegistersLogs, ProjectsImprovement, InterfacesReleasedPacks, WorkingTransitory, ReferenceReceived, RestrictedPeople, SystemAdministration</td><td>Không tạo label trùng nghĩa.</td></tr>
               <tr><td>RecordClassCodes</td><td>OfficialRecord, OperationalCurrent, RegisterLog, ReleasedPack, ProjectImprovement, WorkingTransitory, ReferenceReceived, ConvenienceCopy, SoRSnapshot, RestrictedPeopleRecord, SystemAdminRecord</td><td>Khóa rule route, retention, permission và culling.</td></tr>
               <tr><td>FolderSegmentCodes</td><td>LiveControl, Current, YearlyHistory, Active, Working, Reference, Archive</td><td>Dùng cho department live data, current control zones, workbench zones, reference zones và year-based history zones.</td></tr>
@@ -167,6 +172,9 @@
               <tr><td>EmploymentStatusCodes</td><td>Active, Thử việc, rời / nghỉ phép, Tạm ngưng, đã chấm dứt, nhà thầu, thực tập sinh, khách tham quan</td><td>Dùng cho con người hồ sơ và hội nhập nhân viên mới/thôi việc / rời công ty quy trình làm việc.</td></tr>
               <tr><td>PersonRecordClassCodes</td><td>Nhân viên, FormerEmployee, nhà thầu, thực tập sinh, khách tham quan, VendorAccess, TemporaryWorker</td><td>Điều khiển thư mục path và lưu giữ logic.</td></tr>
               <tr><td>SystemAreaCodes</td><td>AccessIdentity, M365Config, EpicorRoleMasterData, DeploymentCutover, BackupRecovery, IncidentProblem, AssetEndpoint, AutomationRunLogs</td><td>Điều khiển path trong <span class="code">09-Số hóa-System-Hồ sơ</span>.</td></tr>
+              <tr><td>SyncBoundaryClassCodes</td><td>ControlledSource, ReleaseManifest, DeployReceipt, ReverseSyncRecord, RuntimeRecord, RuntimeNoise, ServerOnlySecret</td><td>Dùng để khóa ranh giới SharePoint sync, Git, server runtime và record areas theo <span class="code">ANNEX-136</span>.</td></tr>
+              <tr><td>DeployStateCodes</td><td>Prepared, Pulled, Deployed, SmokeVerified, RolledBack, Closed</td><td>Dùng cho release manifest và server deploy receipt.</td></tr>
+              <tr><td>ReverseSyncStateCodes</td><td>Detected, Logged, CommittedBack, PulledLocal, Closed, Rejected</td><td>Dùng cho server hotfix intake và reverse-sync register.</td></tr>
               <tr><td>StatusCodes</td><td>đã Requests, InReview, Đã phê duyệt, InProgress, đã cấp phát, Thất bại, Closed, Đã hết hạn, Đã khóa, ExceptionOpen, ExceptionClosed</td><td>Dùng cho Requests/phê duyệt/sổ đăng ký vận hành.</td></tr>
             </tbody>
           </table>
@@ -194,6 +202,9 @@
               <tr><td>M365-Record-Series-Catalog</td><td>Danh mục record series theo ANNEX-135</td><td>RecordSeriesCode</td><td>QMS / IT</td><td>SupersededDate</td></tr>
               <tr><td>Con người-Hồ sơ-Index</td><td>Con người hồ sơ index</td><td>EmployeeID or PopulationKey</td><td>HR</td><td>EmploymentEndDate or tham quan / kiểm tra end</td></tr>
               <tr><td>System-Hồ sơ-Yêu cầu-Log</td><td>System-khu vực cung cấp / cấp phát and admin Requests</td><td>SystemReqId</td><td>IT / ERP</td><td>ClosedDate</td></tr>
+              <tr><td>QMS-Source-Promotion-Sổ đăng ký</td><td>Source workspace provisioning, release manifests và source promotion log</td><td>SourceChangeId</td><td>QMS / IT</td><td>ClosedDate</td></tr>
+              <tr><td>Server-Deploy-Sổ đăng ký</td><td>Server pull/deploy receipts, smoke verification và rollback close-out</td><td>DeployId</td><td>IT</td><td>DeployDate</td></tr>
+              <tr><td>Reverse-Sync-Sổ đăng ký</td><td>Server hotfix intake, reverse-sync actions, commit back và local pull close-out</td><td>ReverseSyncId</td><td>IT / QMS</td><td>ClosedDate</td></tr>
               <tr><td>Bên ngoài-chia sẻ-Phê duyệt-Log</td><td>All bên ngoài chia sẻ and khách liên kết</td><td>ShareRequestId</td><td>QMS / IT</td><td>ExpiryDate or thu hồi / hủy bỏ date</td></tr>
               <tr><td>Lưu trữ-khóa-Sổ đăng ký</td><td>Lưu trữ khóa and mở lại log</td><td>ArchiveLockId</td><td>QMS</td><td>TriggerEventDate</td></tr>
               <tr><td>tự động hóa-Run-Log</td><td>Flow run and thử lại log</td><td>RunId</td><td>IT</td><td>RunDate</td></tr>

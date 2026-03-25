@@ -100,6 +100,7 @@
               <tr><td><span class="code">SoRSnapshot</span></td><td>Export hoặc snapshot lấy từ Epicor, Power BI, máy CNC, hệ thống khác để làm evidence, review hoặc reconciliation.</td><td>Series chính thức đang dùng snapshot đó, hoặc <span class="code">09-Số hóa-System-Hồ sơ</span> nếu là admin snapshot</td><td>Bắt buộc có <span class="code">SourceSystemCode</span>, thời điểm chụp và link back về hệ nguồn nếu có.</td></tr>
               <tr><td><span class="code">RestrictedPeopleRecord</span></td><td>Hồ sơ pháp lý, payroll, medical, disciplinary, onboarding/offboarding cá nhân.</td><td><span class="code">08-Con người-Hồ sơ</span></td><td>Không lưu ở department shared area.</td></tr>
               <tr><td><span class="code">SystemAdminRecord</span></td><td>Access review, config, deployment, backup, recovery, incident, admin evidence.</td><td><span class="code">09-Số hóa-System-Hồ sơ</span></td><td>Department folders chỉ giữ interface pack hoặc current queue, không giữ admin SSOT.</td></tr>
+              <tr><td><span class="code">ControlledSourceArtifact</span></td><td>Source docs, portal source, released form definitions, release manifest, deploy receipt và reverse-sync close-out được phép đi qua Git.</td><td><span class="code">10-QMS-Source-Control</span></td><td>Không chứa runtime payload, sessions, rate-limit data, secrets hoặc form submissions.</td></tr>
             </tbody>
           </table>
         </div>
@@ -552,10 +553,29 @@
               <tr><td><span class="code">03-Job-Hồ sơ</span></td><td>Kế hoạch, QA, ENG, PRO, SCM theo gate; external share chỉ qua approved package</td><td>Gate evidence phải được nộp đúng ngày/ca theo WI-203. Không dùng <span class="code">06-Working</span> làm nơi giữ evidence cuối.</td></tr>
               <tr><td><span class="code">08-Con người-Hồ sơ</span></td><td>HR core restricted; payroll/medical sub-groups</td><td>Không nhân đôi hồ sơ cá nhân nhạy cảm qua shared department folders.</td></tr>
               <tr><td><span class="code">09-Số hóa-System-Hồ sơ</span></td><td>IT/ERP admin groups</td><td>Access/config/backup/deployment/admin evidence không được đặt ở department shared area.</td></tr>
+              <tr><td><span class="code">10-QMS-Source-Control</span></td><td>QMS/IT/Portal editor groups; sync chỉ trên endpoint được phê duyệt</td><td>Source docs, release manifest, deploy receipt và reverse-sync log ở đây; không external share, không runtime payload, không secrets.</td></tr>
             </tbody>
           </table>
         </div>
         <div class="keyline"><strong>Rule promote:</strong> file từ <span class="code">06-Working</span> trở thành official record ngay khi nó được phê duyệt, phát hành, dùng để ra quyết định, dùng để bàn giao hoặc dùng làm evidence cho gate/inspection/review/audit. Khi promote, file phải được chuyển hoặc copy có kiểm soát vào record series chính thức, gắn metadata chính thức và cập nhật <span class="code">PromotionState = Promoted</span>.</div>
+      </div>
+
+      <div class="section">
+        <h2>9.1 Ranh giới source, forms và runtime</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Nhóm nội dung</th><th>Nơi lưu bắt buộc</th><th>Rule bắt buộc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Source docs, portal source, released form definitions, approved source templates</td><td><span class="code">10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Đây là controlled source đi theo SharePoint local sync và Git. Không thay cho record library nghiệp vụ.</td></tr>
+              <tr><td>Release manifest, server deploy receipt, reverse-sync intake</td><td><span class="code">10-QMS-Source-Control/02-Release-Manifests</span>, <span class="code">03-Server-Deploy-Receipts</span>, <span class="code">04-Reverse-Sync-Intake</span></td><td>Lưu như source-control records, không ném lẫn vào <span class="code">09-Số hóa-System-Hồ sơ</span> hay folder phòng ban.</td></tr>
+              <tr><td>Form submissions, approvals, operational responses, runtime record payload</td><td>Route về library hồ sơ tương ứng trong <span class="code">01</span> đến <span class="code">09</span> theo file plan này hoặc runtime record area được phê duyệt</td><td>Không commit vào Git, không để trong source library, không dùng thư mục phòng ban làm nơi thay thế record library chính thức.</td></tr>
+              <tr><td>Session files, rate-limit state, workflow draft binaries, server-only secrets, runtime noise</td><td>Server runtime area hoặc server-only protected path</td><td>Tuyệt đối không đưa vào <span class="code">10-QMS-Source-Control</span>, không external share, không xem là release evidence.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Rule source boundary:</strong> ranh giới SharePoint source library, Git, server deployment, runtime exclusions và reverse-sync control thực hiện theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> và <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a>.</div>
       </div>
 
       <div class="section">
@@ -566,8 +586,8 @@
               <tr><th>Nhóm</th><th>Tài liệu</th></tr>
             </thead>
             <tbody>
-              <tr><td>M365 records control</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a><br/><a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a><br/><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a><br/><a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a></td></tr>
-              <tr><td>SharePoint / thao tác</td><td><a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a><br/><a href="../../../02-Work-Instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a><br/><a href="../../../02-Work-Instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a><br/><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a></td></tr>
+              <tr><td>M365 records control</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a><br/><a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a><br/><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a><br/><a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a><br/><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td></tr>
+              <tr><td>SharePoint / thao tác</td><td><a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a><br/><a href="../../../02-Work-Instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a><br/><a href="../../../02-Work-Instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a><br/><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a><br/><a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td></tr>
               <tr><td>Job records</td><td><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a><br/><a href="../../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td></tr>
               <tr><td>Data governance</td><td><a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td></tr>
               <tr><td>Organization and roles</td><td><a href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/index.html">Department handbooks</a><br/><a href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">JD library</a></td></tr>
