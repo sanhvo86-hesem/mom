@@ -1674,6 +1674,46 @@ function git_collect_paths_from_status_lines(array $statusLines): array {
   return array_values(array_unique($paths));
 }
 
+function git_cleanup_runtime_noise(string $repoReal): void {
+  $statusCode = 0;
+  $statusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $statusCode);
+  if ($statusCode !== 0) return;
+  $statusLines = split_nonempty_lines($statusOut);
+
+  $trackedRuntimePaths = [];
+  foreach ($statusLines as $line) {
+    if (!is_string($line) || strlen($line) < 3) continue;
+    $xy = substr($line, 0, 2);
+    $path = git_status_entry_path($line);
+    if ($path === '' || !git_is_runtime_noise_path($path)) continue;
+    if ($xy !== '??') {
+      $trackedRuntimePaths[] = $path;
+    }
+  }
+  $trackedRuntimePaths = array_values(array_unique($trackedRuntimePaths));
+  if (!empty($trackedRuntimePaths)) {
+    $restoreCode = 0;
+    git_command(['restore', '--staged', '--worktree', '--', ...$trackedRuntimePaths], $repoReal, $restoreCode);
+  }
+
+  // Clean untracked runtime files/dirs in known noisy locations.
+  $cleanTargets = [
+    '01-QMS-Portal/qms-data/form-workflow',
+    '01-QMS-Portal/qms-data/sessions',
+    '01-QMS-Portal/qms-data/ratelimit',
+    '01-QMS-Portal/qms-data/php_error.log',
+    '01-QMS-Portal/qms-data/scan_cache.json',
+  ];
+  foreach ($cleanTargets as $target) {
+    $cleanCode = 0;
+    git_command(['clean', '-fd', '--', $target], $repoReal, $cleanCode);
+  }
+
+  // Ensure tracked runtime file returns to HEAD state.
+  $usersRestoreCode = 0;
+  git_command(['restore', '--', '01-QMS-Portal/qms-data/config/users.json'], $repoReal, $usersRestoreCode);
+}
+
 function git_sync_commit_author(array $me): array {
   $name = trim((string)($me['name'] ?? $me['username'] ?? 'Portal Sync'));
   if ($name === '') $name = 'Portal Sync';
@@ -1828,6 +1868,10 @@ function git_pull_portal(string $repoDir): array {
   if ($checkCode !== 0 || trim($checkOut) !== 'true') {
     throw new RuntimeException('not_a_git_repo');
   }
+
+  // Auto-clean runtime noise before safety checks so Pull can run without
+  // manual cleanup in cPanel Terminal.
+  git_cleanup_runtime_noise($repoReal);
 
   $stagedCode = 0;
   $stagedOut = git_command(['diff', '--cached', '--name-only'], $repoReal, $stagedCode);
