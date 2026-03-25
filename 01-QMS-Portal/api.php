@@ -1070,6 +1070,34 @@ function portal_normalize_revision_value(string $value): string {
   return ltrim($value, "Vv");
 }
 
+function doc_recompute_release_state(array $versions, array $state): array {
+  $hasApproved = false;
+  $releasedRev = '';
+  foreach ($versions as $v) {
+    if (!is_array($v)) continue;
+    $st = (string)($v['status'] ?? '');
+    if ($st === 'approved' || $st === 'initial_release') {
+      $hasApproved = true;
+      $ver = revision_from_version_string((string)($v['version'] ?? ''));
+      if ($ver !== '') {
+        $releasedRev = $ver;
+        break; // versions are newest-first
+      }
+    }
+  }
+  if ($releasedRev === '') {
+    $releasedRev = portal_normalize_revision_value((string)($state['released_revision'] ?? ($state['revision'] ?? '0')));
+  }
+  $state['status'] = $hasApproved ? 'approved' : 'draft';
+  $state['revision'] = $hasApproved ? $releasedRev : portal_normalize_revision_value((string)($state['revision'] ?? '0'));
+  $state['released_revision'] = $releasedRev;
+  $state['has_release'] = $hasApproved;
+  foreach (['lastEdit','submittedBy','submittedDate','submittedUpdateType','rejectedBy','rejectedDate','checked_out_by'] as $k) {
+    if (array_key_exists($k, $state)) unset($state[$k]);
+  }
+  return $state;
+}
+
 function load_form_control_registry_docs(string $file, string $rootDir, ?array $allowedExtensions = null): array {
   global $DATA_DIR;
   $json = read_json_file($file);
@@ -4534,13 +4562,7 @@ case 'doc_save_draft': {
     save_doc_manifest($ROOT_DIR, $baseRel, $manifest);
 
     $state = load_doc_state($ROOT_DIR, $baseRel, $ARCHIVE_DIR, $code) ?? [];
-    // If we deleted working copies, revert status to approved if there is a released version
-    $hasApproved = false;
-    foreach ($kept as $v) { if (is_array($v) && ((($v['status'] ?? '') === 'approved') || (($v['status'] ?? '') === 'initial_release'))) { $hasApproved = true; break; } }
-    $state['status'] = $hasApproved ? 'approved' : 'draft';
-    foreach (['lastEdit','submittedBy','submittedDate','submittedUpdateType','rejectedBy','rejectedDate','checked_out_by'] as $k) {
-      if (array_key_exists($k, $state)) unset($state[$k]);
-    }
+    $state = doc_recompute_release_state($kept, $state);
     save_doc_state($ROOT_DIR, $baseRel, $state);
 
     api_json(['ok' => true, 'code' => $code, 'deleted' => $deleted, 'state' => $state, 'versions' => $kept, 'server_time' => now_iso()]);
@@ -4584,7 +4606,10 @@ case 'doc_save_draft': {
     }
     $manifest['versions'] = $kept;
     save_doc_manifest($ROOT_DIR, $baseRel, $manifest);
-    api_json(['ok' => true, 'code' => $code, 'deleted' => $deleted, 'versions' => $kept, 'server_time' => now_iso()]);
+    $state = load_doc_state($ROOT_DIR, $baseRel, $ARCHIVE_DIR, $code) ?? [];
+    $state = doc_recompute_release_state($kept, $state);
+    save_doc_state($ROOT_DIR, $baseRel, $state);
+    api_json(['ok' => true, 'code' => $code, 'deleted' => $deleted, 'state' => $state, 'versions' => $kept, 'server_time' => now_iso()]);
   }
 
 
