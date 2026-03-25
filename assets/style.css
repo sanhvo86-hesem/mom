@@ -194,10 +194,46 @@ body.qms-resizing * { cursor: col-resize !important; }
 .loc-code { font-size: 22px; font-weight: 800; font-family: var(--mono); }
 .ship-box { border: 1px solid var(--ln); border-radius: var(--r); padding: 16px; margin: 12px 0; }
 .ship-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.vflow { display: flex; flex-direction: column; gap: 6px; margin: 16px 0; }
-.vstep { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; background: var(--bg); border: 1px solid var(--ln2); border-radius: var(--r); }
-.vnum { flex-shrink: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--navy); color: #fff; font-weight: 800; font-size: 12px; }
-.vtext { flex: 1; font-size: 13px; }
+/* ── VFLOW: Visual Flowchart Steps (ISO-style process flow) ── */
+.vflow { display: flex; flex-direction: column; gap: 0; margin: 16px 0; position: relative; }
+.vflow::before {
+  content: ''; position: absolute; left: 27px; top: 28px; bottom: 28px;
+  width: 2px; background: linear-gradient(180deg, var(--blue), var(--blue) 60%, var(--gold));
+  z-index: 0;
+}
+.vstep {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 14px 18px; margin: 0;
+  background: var(--bg); border: 1px solid var(--ln);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--r);
+  position: relative; z-index: 1;
+  transition: border-color .15s, box-shadow .15s;
+}
+.vstep:hover { border-left-color: var(--gold); box-shadow: 0 2px 8px rgba(21,101,192,0.08); }
+.vstep + .vstep { margin-top: 8px; }
+.vnum {
+  flex-shrink: 0; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: var(--blue); color: #fff;
+  font-weight: 800; font-size: 12px;
+  box-shadow: 0 2px 6px rgba(21,101,192,0.25);
+}
+.vtext { flex: 1; font-size: 13px; line-height: 1.6; }
+.vtext b, .vtext strong { color: var(--navy); }
+/* Arrow between steps */
+.vflow .varrow, .vflow > .vstep + .vstep::after {
+  content: ''; display: block; width: 0; height: 0;
+}
+/* Decision diamond variant */
+.vstep.decision { border-left-color: var(--gold); background: var(--gold-l); }
+.vstep.decision .vnum { background: var(--gold); }
+/* End step variant */
+.vstep.end { border-left-color: var(--green); }
+.vstep.end .vnum { background: var(--green); }
+/* Error/hold step variant */
+.vstep.hold { border-left-color: var(--red); background: #fff5f5; }
+.vstep.hold .vnum { background: var(--red); }
 .vbranches { margin-left: 42px; border-left: 2px solid var(--ln); padding-left: 14px; }
 .box { padding: 12px 16px; margin: 12px 0; border: none !important; border-left: 3px solid var(--blue) !important; border-radius: var(--r); font-size: 13px; background: var(--bg) !important; }
 .box.core { background: var(--blue-l) !important; border: none !important; border-left: 3px solid var(--blue) !important; }
@@ -293,29 +329,91 @@ table[data-ed-autofit="balanced"] th {
 .table, table.table, table { max-width: 100%; }
 pre, code { overflow-wrap: anywhere; word-break: break-word; }
 
+/* ═══ PRINT LAYOUT — ISO compliant, WYSIWYG ═══ */
 @media print {
-  html { font-size: 10.5pt; }
-  body { background: #fff; }
+  /* ── Base: match screen appearance ── */
+  html { font-size: 10pt; }
+  body { background: #fff; margin: 0; padding: 0; }
   .no-print { display: none !important; }
-  .container { max-width: 100%; padding: 0; }
-  .page { border-radius: 0; box-shadow: none; border: none; }
-  .page-body { padding: 0; }
-  .form-header { border-radius: 0; border: 1px solid var(--th-bdr); margin-bottom: 12px; page-break-inside: auto; break-inside: auto; }
-  .brand-logo img { max-width: 120px; }
-  a { color: var(--ink) !important; text-decoration: none !important; }
   .btn { display: none !important; }
+  a { color: var(--ink) !important; text-decoration: none !important; }
+
+  /* ── Page margins with running header/footer ── */
+  @page {
+    margin: 15mm 12mm 18mm 12mm;
+    @bottom-center { content: "Bản in không kiểm soát nếu không có dấu kiểm soát — HESEM QMS"; font-size: 7pt; color: #999; }
+  }
+  @page :first { margin-top: 10mm; }
+
+  /* ── Container: no decorations ── */
+  .container { max-width: 100%; padding: 0; margin: 0; }
+  .page { border-radius: 0; box-shadow: none; border: none; margin: 0; padding: 0; }
+  .page-body { padding: 8px 0 0; }
+
+  /* ── Form Header: SAME layout as screen ── */
+  .form-header {
+    border-radius: 0 !important;
+    border: 1px solid #999 !important;
+    margin-bottom: 10px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .form-header .meta {
+    border-top: 1px solid var(--gold) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .brand-logo img { max-width: 100px; }
+
+  /* ── Print disclaimer footer ── */
   .print-disclaimer { display: block !important; }
-  h2, h3, .h2, .h3 { page-break-after: avoid; }
-  tr { page-break-inside: avoid; }
+
+  /* ── Typography: avoid orphans ── */
+  h2, h3, .h2, .h3 { page-break-after: avoid; break-after: avoid; }
+  p { orphans: 3; widows: 3; }
+
+  /* ── Tables: preserve colors ── */
+  tr { page-break-inside: avoid; break-inside: avoid; }
   thead { display: table-header-group; }
   .table thead th, table.table thead th, .form-table th, .docx-table th {
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
     background: var(--th-bg) !important; color: var(--navy) !important;
   }
   .table, .form-table, .docx-table { border: 1px solid var(--th-bdr) !important; }
-  .table-card, .table-block { border: 1px solid var(--th-bdr) !important; }
+  .table-card, .table-block { border: 1px solid var(--th-bdr) !important; overflow: visible !important; }
   .table-card table, .table-card .table { border: none !important; }
-  @page { margin: 18mm 12mm 20mm 12mm; }
+
+  /* ── Cards/Notes: allow page break if long ── */
+  .card, .table-card, .callout, .note, .box, .iso-map,
+  .preface-block, .form-sheet {
+    page-break-inside: auto; break-inside: auto;
+  }
+  .req, .vstep, .legend, .sig-row, .sign-row, .approval-row, .backup-card {
+    page-break-inside: avoid; break-inside: avoid;
+  }
+
+  /* ── Callout/Note/Box: preserve border-left color ── */
+  .callout, .note, .note-blue, .note-soft, .note-green,
+  .callout-danger, .callout-info, .callout-warn,
+  .box, .box.core, .box.sup, .box.imp, .box.mgt, .req {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* ── Gate cards: compact for print ── */
+  .gate-grid { gap: 8px !important; }
+  .gate-card { padding: 10px !important; font-size: 11px !important; }
+
+  /* ── Metric cards: preserve colors ── */
+  .metric-card, .metric-grid {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* ── Badge/Tag: preserve colors ── */
+  .badge, .req-tag, .chip {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
 }
 @media screen and (max-width: 768px) {
   /* Mobile overflow fixes */
