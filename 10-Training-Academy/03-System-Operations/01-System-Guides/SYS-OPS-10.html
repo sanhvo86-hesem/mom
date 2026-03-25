@@ -17,27 +17,27 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-10 — Power nền tảng ALM &amp; Governance</strong>
-  <span class="sub-vn"></span>
+ <strong>SYS-OPS-10 — Power nền tảng ALM &amp; Governance</strong>
+ <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-10</span></div>
-  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Code:</b></span><span>SYS-OPS-10</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
 <div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
 </div>
 <div class="card">
 <div class="grid-2">
@@ -231,10 +231,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 4) -->
 <h2 id="sec4">4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế)</h2>
 <ol>
-<li><b>Nhập nhầm phiên bản giải pháp</b>: import gói cũ, thiếu bản vá nóng (bản vá nóng (hotfix)), hoặc lệch version so với DCR hồ sơ.</li>
+<li><b>Nhập nhầm phiên bản giải pháp</b>: import gói cũ, thiếu bản vá nóng ((hotfix)), hoặc lệch version so với DCR hồ sơ.</li>
 <li><b>Nhập nhầm môi trường</b>: triển khai thẳng vào PROD, bỏ qua UAT, hoặc chạy thử bằng dữ liệu thật.</li>
 <li><b>Không được quản lý tồn tại trong PROD</b>: người dùng chỉnh trực tiếp trong PROD, tạo “độ lệch” không truy vết.</li>
-<li><b>kết nối Reference trỏ sai</b>: luồng/app gọi nhầm site/thư viện, nhầm list, nhầm tổ chức thuê (tổ chức thuê (tenant)).</li>
+<li><b>kết nối Reference trỏ sai</b>: luồng/app gọi nhầm site/thư viện, nhầm list, nhầm tổ chức thuê ((tenant)).</li>
 <li><b>Môi trường biến số / biến thiên bị cứng / khó-code</b>: copy/paste URL, GUID, hộp thư, khiến dữ liệu chảy sai vùng.</li>
 <li><b>DLP bị bỏ qua</b>: đầu nối ngoài danh sách cho phép kéo dữ liệu khách ra kênh ngoài.</li>
 <li><b>SoD bị phá</b>: cùng một người vừa cấu hình vừa tự phê duyệt go-Live.</li>
@@ -309,7 +309,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Quy tắc dừng ngay</strong>
 <ul>
 <li><b>CHẶN:</b> Không có phiếu Requests/Yêu cầu thay đổi hợp lệ → không được làm bất kỳ thay đổi nào trong UAT/PROD.</li>
-<li><b>CHẶN:</b> Thiếu bằng chứng cho bất kỳ điểm kiểm soát (điểm kiểm soát) C1–C8 → không được GO-Live.</li>
+<li><b>CHẶN:</b> Thiếu bằng chứng cho bất kỳ điểm kiểm soát C1–C8 → không được GO-Live.</li>
 <li><b>TẠM GIỮ:</b> Phát hiện không được quản lý thay đổi trong PROD → khóa triển khai, lập điều tra, khôi phục theo được quản lý gói hàng.</li>
 <li><b>TẠM GIỮ:</b> kết nối Reference/Môi trường biến số / biến thiên không có danh sách kiểm tra và không có xác nhận đúng mục tiêu → dừng import.</li>
 <li><b>STOP:</b> DLP bị mở rộng đầu nối ngoài danh sách cho phép đối với dữ liệu Customer-Bảo mật/Hạn chế → dừng ngay và hoàn tác / quay lại.</li>
@@ -405,7 +405,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>7</td>
 <td>Export được quản lý gói hàng để triển khai UAT</td>
 <td>Lập trình viên (CNC)</td>
-<td>File được quản lý export + mã băm (mã băm (hash))/size + ngày export</td>
+<td>File được quản lý export + mã băm ((hash))/size + ngày export</td>
 <td>Nhầm gói không được quản lý</td>
 </tr>
 <tr>
@@ -495,7 +495,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>5</td>
 <td>Export được quản lý gói hàng</td>
-<td>Export đúng dạng được quản lý cho UAT/PROD • Lưu mã băm (mã băm (hash))/size</td>
+<td>Export đúng dạng được quản lý cho UAT/PROD • Lưu mã băm ((hash))/size</td>
 <td>được quản lý bảo vệ khỏi chỉnh trực tiếp và hỗ trợ gỡ cài đặt/nâng cấp</td>
 </tr>
 <tr>
@@ -507,7 +507,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>7</td>
 <td>Chạy acceptance kiểm nghiệm bằng người dùng thật</td>
-<td>Test đúng vai trò người dùng (vai trò người dùng (persona)) (Operator/QC/Kho) • Test “bằng chứng trong 3 phút”</td>
+<td>Test đúng vai trò người dùng ((persona)) (Operator/QC/Kho) • Test “bằng chứng trong 3 phút”</td>
 <td>Admin đạt không đồng nghĩa người dùng đạt</td>
 </tr>
 <tr>
@@ -627,7 +627,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Operator/Setup/QC/Kho/Mua hàng/Planner/Bảo trì/EHS/Kinh doanh-CS</b></td>
-<td>Thực hành đúng theo vai trò người dùng (vai trò người dùng (persona)): truy xuất nguồn gốc hồ sơ Released, tìm bằng chứng trong 3 phút, tạo log sự cố, không chia sẻ sai kênh</td>
+<td>Thực hành đúng theo vai trò người dùng ((persona)): truy xuất nguồn gốc hồ sơ Released, tìm bằng chứng trong 3 phút, tạo log sự cố, không chia sẻ sai kênh</td>
 <td>đạt khi vận hành đúng và tạo MRR đúng Requests</td>
 </tr>
 </table>
@@ -677,8 +677,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="note">
 <strong>Nhóm Evidence triển khai Power nền tảng</strong><br/>
- Định dạng: <b>SYS-OPS-10_{Env}_{SolutionName}_vX.Y.Z_{YYYYMMDD}_{sản phẩm / hiện vật (sản phẩm / hiện vật)}.ext</b><br/>
- Khi chưa thống nhất tên SolutionName/sản phẩm / hiện vật (sản phẩm / hiện vật), ghi <b>M365/SharePoint → HESEM-QMS-SSOT</b> ngay trong file name và cập nhật khi chuẩn hóa.
+ Định dạng: <b>SYS-OPS-10_{Env}_{SolutionName}_vX.Y.Z_{YYYYMMDD}_{sản phẩm / hiện vật}.ext</b><br/>
+ Khi chưa thống nhất tên SolutionName/sản phẩm / hiện vật, ghi <b>M365/SharePoint → HESEM-QMS-SSOT</b> ngay trong file name và cập nhật khi chuẩn hóa.
  </div>
 <h3>12.3 Nơi lưu (SharePoint thư viện/list/path)</h3>
 <ul>
@@ -694,7 +694,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Không được quản lý trong PROD</b> → bắt buộc được quản lý + khóa quyền người tạo / nhà sản xuất trong PROD.</li>
 <li><b>Evidence không có ngữ cảnh</b> → Photos màn hình phải thấy tên site/thư viện + cài đặt value.</li>
 <li><b>Quyền truy cập không kiểm soát</b> → dùng group mốc chuẩn; không tách quyền per-file; có Photos trạng thái quyền.</li>
-<li><b>Không có acceptance kiểm nghiệm bằng người dùng thật</b> → chạy test theo vai trò người dùng (vai trò người dùng (persona)) (Operator/QC/Kho).</li>
+<li><b>Không có acceptance kiểm nghiệm bằng người dùng thật</b> → chạy test theo vai trò người dùng ((persona)) (Operator/QC/Kho).</li>
 <li><b>DLP không phù hợp mức dữ liệu</b> → map khu vực + phân loại với DLP đầu nối; có test tình huống chặn chia sẻ.</li>
 <li><b>cứng / khó-code env giá trị</b> → dùng env biến số; có bảng kiểm pre-import; có sơ đồ ánh xạ theo môi trường.</li>
 <li><b>Không có backup/hoàn tác / quay lại</b> → export trước phát hành và lưu đúng kho bằng chứng.</li>

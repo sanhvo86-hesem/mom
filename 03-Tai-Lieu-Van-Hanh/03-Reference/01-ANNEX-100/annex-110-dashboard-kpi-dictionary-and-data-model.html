@@ -47,32 +47,32 @@ ul.tight li {margin:4px 0;}
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Annex hệ thống</span>
-          </div>
-        </div>
-        <div class="title"><strong>ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</strong></div>
-        <div class="meta">
-          <div class="row"><span><b>Mã:</b></span><span>ANNEX-110</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / IT chủ dữ liệu</span></div>
-          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-        </div>
-      </div>
-      
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Annex hệ thống</span>
+ </div>
+ </div>
+ <div class="title"><strong>ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</strong></div>
+ <div class="meta">
+ <div class="row"><span><b>Mã:</b></span><span>ANNEX-110</span></div>
+ <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / IT chủ dữ liệu</span></div>
+ <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+ </div>
+ </div>
+ 
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết kế bảng điều khiển, xây board điều hành, họp tầng, xem xét của lãnh đạo, đánh giá hiệu lực cải tiến, hoặc khi cần thống nhất định nghĩa KPI giữa phòng ban, báo cáo khách hàng và dữ liệu số.</div>
 <h1>ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</h1>
 
 <div class="section"><div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Dashboard KPI Dictionary</b>.
-  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Dashboard KPI Dictionary</b>.
+ <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
 </div>
 <h2>1. Vai trò bắt buộc của ANNEX này</h2>
 <p>ANNEX này là tài liệu chuẩn duy nhất cho định nghĩa KPI, công thức tính, diễn tập-down key, cut-off, refresh rule, nguồn dữ liệu và người phụ trách của board điều hành. Tất cả bảng điều khiển số, bảng họp tầng, report tuần/tháng và slide xem xét của lãnh đạo phải bám đúng ANNEX này.</p>
@@ -162,7 +162,7 @@ ul.tight li {margin:4px 0;}
 <li>Tất cả bảng điều khiển phải hiển thị <strong>lần refresh gần nhất</strong>, <strong>người phụ trách dữ liệu</strong> và <strong>số vấn đề dữ liệu đang mở</strong>.</li>
 </ul></div>
 
-<div class="section"><h2>8. Data cổng kiểm soát chất lượng (cổng kiểm soát chất lượng)</h2>
+<div class="section"><h2>8. Data cổng kiểm soát chất lượng</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Kiểm cái gì</th><th>Không đạt khi</th><th>Phản ứng</th></tr></thead><tbody>
 <tr><td>Completeness</td><td>Field bắt buộc có đủ không</td><td>Thiếu JobNum, OprSeq, PackID, due, người phụ trách hoặc severity</td><td>Không publish KPI liên quan; mở Data Vấn đề</td></tr>
 <tr><td>Timeliness</td><td>Dữ liệu có đúng cửa sổ refresh không</td><td>Refresh quá cut-off đã công bố</td><td>Đánh cờ đỏ “stale data”</td></tr>
@@ -196,7 +196,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Pack / ngữ cảnh dùng</th><th>Người phụ trách chuẩn bị</th><th>Freeze-date / cut-off</th><th>Khi nào cần exception note</th><th>Hồ sơ / WI dùng để giữ vết</th></tr></thead><tbody>
 <tr><td>T1/T2 board trong ngày</td><td>Planning / Production / Người phụ trách QA của board</td><td>Trước họp 10–15 phút</td><td>Refresh fail, late posting, thiếu diễn tập-down, dùng export SoR thay bảng điều khiển</td><td><a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> ghi chú điều hành / board note</td></tr>
 <tr><td>T3 tuần / tháng</td><td>Người phụ trách Bảng điều khiển + chủ quá trình</td><td>Theo lịch pack đã công bố</td><td>Dữ liệu chưa đầy đủ, có reclass/backfill sau cut-off, vấn đề mapping còn mở</td><td>WI-901 + data vấn đề / change hồ sơ</td></tr>
-<tr><td>T4 / xem xét của lãnh đạo</td><td>QMS / chủ quá trình / bảng điều khiển người phụ trách</td><td>Freeze snapshot theo kỳ review</td><td>Số đã freeze nhưng cần giải thích ngoại lệ, offline fallback, manual pack hoặc SoR correction sau close</td><td><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> + <a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td></tr>
+<tr><td>T4 / xem xét của lãnh đạo</td><td>QMS / chủ quá trình / bảng điều khiển người phụ trách</td><td>Freeze snapshot theo kỳ review</td><td>Số đã freeze nhưng cần giải thích ngoại lệ, offline fallback, manual pack hoặc SoR correction sau close</td><td><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> + <a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td></tr>
 <tr><td>Customer / external disclosure pack</td><td>chủ quá trình + authorized người phê duyệt</td><td>Freeze theo phiên bản được gửi</td><td>Nội bộ chưa khớp external pack hoặc phải dùng approved exception logic</td><td>Gói phát hành / communication hồ sơ</td></tr>
 </tbody></table></div>
 <div class="callout-info">Khi bảng điều khiển pack bị gắn exception note, người phụ trách phải chỉ rõ <b>phạm vi KPI bị ảnh hưởng</b>, <b>nguồn tạm thời dùng để ra quyết định</b>, <b>ETA khôi phục</b> và <b>thời điểm backfill/re-review</b>. Không để bảng điều khiển đang lỗi nhưng pack vẫn được trình bày như dữ liệu bình thường.</div></div>
@@ -210,10 +210,10 @@ ul.tight li {margin:4px 0;}
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Cách Planning dùng KPI luồng/capacity để ra quyết định trong ngày.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Quy tắc bằng chứng, retention, completeness và linkage của hồ sơ số.</td></tr>
 <tr><td><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> / <a href="../../01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Review xu hướng và đóng vòng lặp cải tiến.</td></tr>
-<tr><td><a href="../01-ANNEX-100/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a></td><td>Khóa publish, access, refresh, failure control và rollback của bảng điều khiển production.</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> / <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></td><td>Rà access định kỳ, request cấp/đổi/thu hồi quyền và privileged/deputy governance.</td></tr><tr><td><a  download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td><td>Khóa pack control, freeze-date, exception note và quyết định ở xem xét của lãnh đạo.</td></tr></tbody></table></div></div>
+<tr><td><a href="../01-ANNEX-100/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a></td><td>Khóa publish, access, refresh, failure control và rollback của bảng điều khiển production.</td></tr><tr><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> / <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></td><td>Rà access định kỳ, request cấp/đổi/thu hồi quyền và privileged/deputy governance.</td></tr><tr><td><a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td><td>Khóa pack control, freeze-date, exception note và quyết định ở xem xét của lãnh đạo.</td></tr></tbody></table></div></div>
 
-    </div>
-  </div>
+ </div>
+ </div>
 </div>
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>

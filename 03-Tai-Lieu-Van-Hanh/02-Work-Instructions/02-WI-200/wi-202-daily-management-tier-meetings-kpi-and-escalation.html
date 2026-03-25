@@ -47,32 +47,32 @@ ul.tight li {margin:4px 0;}
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QọS-Portal/portal.html"><img alt="HESEọ Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QọS-Portal/portal.html">HESEọ ENGINEERING</a>
-            <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
-          </div>
-        </div>
-        <div class="title"><strong>WI-202 — Điều hành hằng ngày, họp tầng, hPI, log hành động và xử lý vượt cấp</strong></div>
-        <div class="meta">
-          <div class="row"><span><b>ọã:</b></span><span>WI-202</span></div>
-          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Owner:</b></span><span>Ops ọanager / QọS ọanager</span></div>
-          <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
-        </div>
-      </div>
-      
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QọS-Portal/portal.html"><img alt="HESEọ Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QọS-Portal/portal.html">HESEọ ENGINEERING</a>
+ <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
+ </div>
+ </div>
+ <div class="title"><strong>WI-202 — Điều hành hằng ngày, họp tầng, hPI, log hành động và xử lý vượt cấp</strong></div>
+ <div class="meta">
+ <div class="row"><span><b>ọã:</b></span><span>WI-202</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>Ops ọanager / QọS ọanager</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ </div>
+ </div>
+ 
 <div class="note"><strong>ÁP DỤNG hHI</strong><br/>Dùng cho mọi cuộc họp điều hành T1–T4 khi nhà máy đang có Job mở, có WIP, có giao hàng, có hold chất lượng, có machine xuống / ngừng, có outsource quá hạn hoặc có quyết định cần chốt ngay trong ngày.</div>
 <h1>WI-202 — Điều hành hằng ngày, họp tầng, hPI, log hành động và xử lý vượt cấp</h1>
 
 <div class="section"><div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G5 (IPQC) — họp Tier hàng ngày</b>. Quản lý Tier Meeting, KPI và leo thang.
-  <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G5 (IPQC) — họp Tier hàng ngày</b>. Quản lý Tier Meeting, KPI và leo thang.
+ <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
 </div>
 <h2>1. ọục đích và nguyên tắc điều hành</h2>
 <p>WI này khóa nhịp điều hành để không treo Job, không để dữ liệu chậm hơn hiện trường, không để sự cố đi qua ca mà không có Responsible Person. ọọi họp tầng chỉ có giá trị khi tạo ra quyết định, hạn đóng, người chịu trách nhiệm và bằng chứng đóng việc.</p>
@@ -98,7 +98,7 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>3. Chuẩn bị dữ liệu trước họp</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Vai trò</th><th>Phải chốt trước giờ họp</th><th>Nguồn chuẩn</th><th>hold khi</th></tr></thead><tbody>
 <tr><td>Kế hoạch</td><td>Điều phối list, tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn), hot-job bậc thang năng lực, due trong 72 giờ, quá tải/tải thấp theo công việc trung tâm.</td><td>Epicor + <a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>hhông có điều phối xuất hàng Current-trạng thái hoặc dữ liệu Job không khớp SoR.</td></tr>
-<tr><td>Sản xuất</td><td>ọachine xuống / ngừng, setup còn dở, tool/fixture thiếu, re-run, chuyển đổi (chuyển đổi (changeover)) kéo dài, nhân lực vắng.</td><td>Epicor Nhân công/Job + log phân xưởng</td><td>ọachine xuống / ngừng chưa có Responsible Person hoặc không rõ ETA khôi phục.</td></tr>
+<tr><td>Sản xuất</td><td>ọachine xuống / ngừng, setup còn dở, tool/fixture thiếu, re-run, chuyển đổi ((changeover)) kéo dài, nhân lực vắng.</td><td>Epicor Nhân công/Job + log phân xưởng</td><td>ọachine xuống / ngừng chưa có Responsible Person hoặc không rõ ETA khôi phục.</td></tr>
 <tr><td>QA</td><td>QC hold list, FAI pending, NCR mở, nghi ngờ lot, final phát hành rủi ro, vệ sinh / sạch sẽ/rò rỉ test pending.</td><td>ọ365 QA sổ đăng ký + Epicor tham chiếu</td><td>Hold/FAI trạng thái mơ hồ, không rõ điều kiện phát hành.</td></tr>
 <tr><td>WHS/Giao vận</td><td>Ship plan, bộ hồ sơ giao hàng tính đầy đủ, SSCC/label pending, phiếu nhận / biên nhận sai khác, thiếu chứng từ.</td><td>Epicor Ship/Phiếu nhận + bộ hồ sơ giao hàng SSOT</td><td>Lô chuẩn bị ship nhưng bộ hồ sơ giao hàng chưa đủ hoặc phiếu nhận / biên nhận sai khác chưa khép.</td></tr>
 <tr><td>Mua hàng/Outsource</td><td>PO quá hạn, người xử lý quá hạn, nguyên vật liệu ETA, nhà cung cấp vấn đề ảnh hưởng Job đường găng.</td><td>Epicor PO/Phiếu nhận + đã phê duyệt người xử lý pack</td><td>hhông có ETA tin cậy cho vật tư/quy trình đường găng.</td></tr>
@@ -189,8 +189,8 @@ ul.tight li {margin:4px 0;}
 <tr><td><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> / <a href="../../01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Đóng vòng lặp rà soát, cải tiến, ưu tiên nguồn lực và quyết định hệ thống.</td></tr>
 </tbody></table></div></div>
 
-    </div>
-  </div>
+ </div>
+ </div>
 </div>
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEọ QọS.</div>
 </body>

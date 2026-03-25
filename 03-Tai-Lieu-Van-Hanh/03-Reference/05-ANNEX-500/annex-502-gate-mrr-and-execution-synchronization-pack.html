@@ -51,31 +51,31 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Annex</span>
-          </div>
-        </div>
-        <div class="title"><strong>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G7</strong></div>
-        <div class="meta">
-          <div class="row"><span><b>Code:</b></span><span>ANNEX-502</span></div>
-          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Owner:</b></span><span>Operations Manager / QA Manager</span></div>
-          <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
-        </div>
-      </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng để tra matrix cổng kiểm soát và MRR cho mọi lệnh sản xuất CNC từ RFQ đến giao hàng. Planner, Kỹ thuật, QA, Sản xuất, Kho và người đánh giá phải dùng cùng một matrix này khi kiểm cổng kiểm soát và khi bàn giao hồ sơ.</div>
-      <h1>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G7</h1>
-      
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Annex</span>
+ </div>
+ </div>
+ <div class="title"><strong>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G7</strong></div>
+ <div class="meta">
+ <div class="row"><span><b>Code:</b></span><span>ANNEX-502</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>Operations Manager / QA Manager</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ </div>
+ </div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng để tra matrix cổng kiểm soát và MRR cho mọi lệnh sản xuất CNC từ RFQ đến giao hàng. Planner, Kỹ thuật, QA, Sản xuất, Kho và người đánh giá phải dùng cùng một matrix này khi kiểm cổng kiểm soát và khi bàn giao hồ sơ.</div>
+ <h1>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G7</h1>
+ 
 <div class="section"><div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Gate MRR & Sync Pack</b>.
-  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Gate MRR & Sync Pack</b>.
+ <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
 </div>
 <h2>1. Mục đích, cách dùng và ranh giới</h2>
 <p>ANNEX này là bộ matrix dùng chung để đồng bộ <strong>cổng kiểm soát, MRR, bàn giao field, vai trò quyền sở hữu và điều kiện đồng bộ dữ liệu</strong> từ G0 đến G7. ANNEX này <strong>không thay</strong> WI vận hành tại Point-of-use. Người sử dụng tra ANNEX này để biết mỗi cổng kiểm soát cần bộ hồ sơ nào, ai được quyền mở/giữ/nhả cổng kiểm soát, phải bàn giao trường dữ liệu nào và khi nào phải dừng vì lệch phiên bản hoặc lệch nguồn dữ liệu.</p>
@@ -90,11 +90,11 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td><span class="badge-blue">G0 — Contract</span></td><td>Khóa Requests khách hàng, rev, CSR, qty, ngày đến hạn, QPL sơ bộ</td><td>RFQ/PO rõ, file kỹ thuật có thể đọc, giả định đã ghi</td><td>Kinh doanh / Kỹ thuật</td><td>RFQ sổ đăng ký, rà soát hợp đồng, khởi động bảng kiểm</td><td>Thiếu file kỹ thuật, rev mơ hồ, Requests xung đột</td></tr>
 <tr><td><span class="badge-blue">G1 — Engineering</span></td><td>Khóa mốc chuẩn, DFM, CAM/NC release, baseline package, lộ trình gia công, tool, program, kiểm tra Requests</td><td>Mốc chuẩn Released, baseline package phát hành PASS</td><td>Kỹ thuật</td><td>DFM review, baseline package, routing, setup sheet gốc, danh sách dao cụ, kiểm tra Requests, Kế hoạch Phát hành Bảng kiểm</td><td>không khớp giữa drawing/setup/program/kế hoạch kiểm soát</td></tr>
 <tr><td><span class="badge-blue">G2 — IQC</span></td><td>Xác nhận material đạt yêu cầu, cert hợp lệ, truy xuất lot/heat</td><td>Material nhận về, cert check hoàn tất, IQC pass</td><td>Supply Chain / QA</td><td>Receiving log, material cert, IQC result, lot/heat traceability</td><td>Thiếu cert, material không đạt, lot/heat không truy xuất được</td></tr>
-<tr><td><span class="badge-blue">G3 — Setup</span></td><td>Xác nhận máy sẵn sàng, program đúng rev, fixture/tool/gage ready</td><td>Bộ hồ sơ công việc (job gói hồ sơ) đủ, machine ready, gage ready, program đúng rev</td><td>Kỹ thuật / Sản xuất</td><td>Setup sheet, program link, fixture/tool readiness, gage readiness, pre-run verification</td><td>Thiếu gage, thiếu ký-off, sai bù trừ (bù trừ (offset)) / sai fixture / sai mốc chuẩn (mốc chuẩn (datum))</td></tr>
+<tr><td><span class="badge-blue">G3 — Setup</span></td><td>Xác nhận máy sẵn sàng, program đúng rev, fixture/tool/gage ready</td><td>Bộ hồ sơ công việc (job gói hồ sơ) đủ, machine ready, gage ready, program đúng rev</td><td>Kỹ thuật / Sản xuất</td><td>Setup sheet, program link, fixture/tool readiness, gage readiness, pre-run verification</td><td>Thiếu gage, thiếu ký-off, sai bù trừ ((offset)) / sai fixture / sai mốc chuẩn ((datum))</td></tr>
 <tr><td><span class="badge-blue">G4 — FAI</span></td><td>Xác nhận chi tiết đầu tiên đạt CTQ đã phê duyệt</td><td>Setup hoàn tất, mẫu đầu plan rõ, gage sẵn sàng</td><td>QA + Sản xuất</td><td>FAI/mẫu đầu báo cáo, balloon drawing, measurement data, phát hành quyết định</td><td>FAI không đạt, thiếu balloon/raw data, sai đặc tính CTQ</td></tr>
 <tr><td><span class="badge-blue">G5 — IPQC</span></td><td>Giữ ổn định trong chạy lô, phản ứng nhanh khi trôi / sai lệch</td><td>G4 đã nhả, điều phối xuất hàng list hợp lệ, WIP rule rõ</td><td>Sản xuất Supervisor / QA</td><td>Điều phối list, traveler, IPQC/SPC/AQL hồ sơ khi áp dụng</td><td>WIP không truy vết được, bỏ lỡ kiểm tra, trôi / sai lệch nhưng không phản ứng</td></tr>
 <tr><td><span class="badge-blue">G6 — Final QC</span></td><td>Khóa kết quả cuối, CoC/cert/pack Requests</td><td>Lot hoàn tất, làm lại đóng, cert thu đủ</td><td>QA + WHS</td><td>Kiểm tra cuối báo cáo, kiểm tra cuối sổ đăng ký, lô giao hàng bảng kiểm draft</td><td>Thiếu cert, truy vết hỏng / gãy, pack level không đúng</td></tr>
-<tr><td><span class="badge-blue">G7 — Ship</span></td><td>Cho phép giao hàng và khóa bằng chứng để kết thúc / đóng hồ sơ / lập hóa đơn</td><td>Lô giao hàng gói hồ sơ PASS, đối chiếu đóng gói PASS, thẩm quyền đúng</td><td>WHS + QA + Finance khi kết thúc / đóng hồ sơ</td><td>Giao vận Bảng kiểm, ship label, đối chiếu đóng gói, CoC, bằng chứng of lấy hàng</td><td>SSCC / label / phiếu kê đóng gói (phiếu kê đóng gói) / CoC không khớp hoặc lô giao hàng chưa ĐÃ PHÁT HÀNH</td></tr>
+<tr><td><span class="badge-blue">G7 — Ship</span></td><td>Cho phép giao hàng và khóa bằng chứng để kết thúc / đóng hồ sơ / lập hóa đơn</td><td>Lô giao hàng gói hồ sơ PASS, đối chiếu đóng gói PASS, thẩm quyền đúng</td><td>WHS + QA + Finance khi kết thúc / đóng hồ sơ</td><td>Giao vận Bảng kiểm, ship label, đối chiếu đóng gói, CoC, bằng chứng of lấy hàng</td><td>SSCC / label / phiếu kê đóng gói / CoC không khớp hoặc lô giao hàng chưa ĐÃ PHÁT HÀNH</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>3. gói / bó MRR bắt buộc theo từng cổng kiểm soát</h2>
@@ -140,7 +140,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>7. Customer lớp phủ và gói hàng đặc biệt</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>lớp phủ</th><th>Khi áp dụng</th><th>Phải cộng thêm vào MRR</th></tr></thead><tbody>
-<tr><td>mẫu thử (mẫu thử (prototype)) / hot-job</td><td>thời gian dẫn (lead time) cực ngắn, mẫu, khẩn cấp khôi phục / thu hồi</td><td>Rủi ro note, sai lệch phê duyệt, đã đẩy nhanh điều phối xuất hàng hồ sơ</td></tr>
+<tr><td>mẫu thử ((prototype)) / hot-job</td><td>thời gian dẫn (lead time) cực ngắn, mẫu, khẩn cấp khôi phục / thu hồi</td><td>Rủi ro note, sai lệch phê duyệt, đã đẩy nhanh điều phối xuất hàng hồ sơ</td></tr>
 <tr><td>bán dẫn / chân không / vệ sinh / sạch sẽ</td><td>Part có clean xây dựng, rò rỉ test, hạt / phần tử / độ ẩm / chân không Requests</td><td>Clean pack bằng chứng, vệ sinh / sạch sẽ xác minh, rò rỉ test hồ sơ, bảo quản class</td></tr>
 <tr><td>Outsource-nặng</td><td>Có nhiều công đoạn thuê ngoài / công đoạn đặc biệt</td><td>Điều phối bảng kiểm, người xử lý cert, xác minh đầu vào, lot truy vết tính liên tục</td></tr>
 <tr><td>Customer-bắt buộc bộ chứng từ chứng nhận</td><td>Khách Requests nguyên vật liệu cert, CoC định dạng riêng, số sê-ri-level truy vết</td><td>Customer-định dạng cert, số sê-ri map, khách hàng label / pack Photos theo spec</td></tr>
@@ -182,47 +182,47 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td><a href="../01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation và SLA.</td></tr>
 <tr><td><a href="../01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td><td>Ma trận thẩm quyền.</td></tr>
 <tr><td><a href="../01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a></td><td>RACI chủ / gốc matrix.</td></tr>
-<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-501_Planning_Release_Checklist.xlsx"  download="">FRM-501</a></td><td>Kế hoạch Phát hành Bảng kiểm.</td></tr>
-<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx"  download="">FRM-511</a></td><td>Setup and mẫu đầu hồ sơ.</td></tr>
-<tr><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-641_Final_Inspection_Report.xlsx"  download="">FRM-641</a></td><td>Kiểm tra cuối báo cáo.</td></tr>
-<tr><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx"  download="">FRM-702</a></td><td>Giao vận Bảng kiểm.</td></tr>
+<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-501_Planning_Release_Checklist.xlsx" download="">FRM-501</a></td><td>Kế hoạch Phát hành Bảng kiểm.</td></tr>
+<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx" download="">FRM-511</a></td><td>Setup and mẫu đầu hồ sơ.</td></tr>
+<tr><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-641_Final_Inspection_Report.xlsx" download="">FRM-641</a></td><td>Kiểm tra cuối báo cáo.</td></tr>
+<tr><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx" download="">FRM-702</a></td><td>Giao vận Bảng kiểm.</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>11. Sơ đồ phụ thuộc cổng kiểm soát G0–G7</h2>
 <div style="background:var(--bg);border:1px solid var(--ln);border-radius:var(--r);padding:20px 24px;overflow-x:auto;margin:12px 0;">
 <div style="display:flex;align-items:stretch;gap:0;font-family:var(--mono);font-size:13px;line-height:1.6;white-space:nowrap;">
-  <!-- G0 -->
-  <div style="display:flex;align-items:center;">
-    <span class="badge-blue" style="padding:6px 12px;font-size:12px;font-weight:700;">G0 Contract</span>
-    <span style="padding:0 4px;color:var(--ink2);">→</span>
-  </div>
-  <!-- Fork: G1 + G2 parallel -->
-  <div style="display:flex;flex-direction:column;justify-content:center;position:relative;">
-    <!-- Top branch: G1 -->
-    <div style="display:flex;align-items:center;">
-      <span style="color:var(--ink2);padding-right:4px;">┬→</span>
-      <span class="badge-blue" style="padding:6px 12px;font-size:12px;font-weight:700;">G1 Engineering</span>
-      <span style="padding:0 4px;color:var(--ink2);">─┬→</span>
-    </div>
-    <!-- Bottom branch: G2 -->
-    <div style="display:flex;align-items:center;">
-      <span style="color:var(--ink2);padding-right:4px;">└→</span>
-      <span class="badge-blue" style="padding:6px 12px;font-size:12px;font-weight:700;">G2 IQC</span>
-      <span style="padding:0 4px;color:var(--ink2);">─────────┘</span>
-    </div>
-  </div>
-  <!-- Sequential: G3 → G4 → G5 → G6 → G7 -->
-  <div style="display:flex;align-items:center;">
-    <span class="badge-green" style="padding:6px 12px;font-size:12px;font-weight:700;">G3 Setup</span>
-    <span style="padding:0 4px;color:var(--ink2);">→</span>
-    <span class="badge-green" style="padding:6px 12px;font-size:12px;font-weight:700;">G4 FAI</span>
-    <span style="padding:0 4px;color:var(--ink2);">→</span>
-    <span class="badge-green" style="padding:6px 12px;font-size:12px;font-weight:700;">G5 IPQC</span>
-    <span style="padding:0 4px;color:var(--ink2);">→</span>
-    <span class="badge-amber" style="padding:6px 12px;font-size:12px;font-weight:700;">G6 Final QC</span>
-    <span style="padding:0 4px;color:var(--ink2);">→</span>
-    <span class="badge-navy" style="padding:6px 12px;font-size:12px;font-weight:700;">G7 Ship</span>
-  </div>
+ <!-- G0 -->
+ <div style="display:flex;align-items:center;">
+ <span class="badge-blue" style="padding:6px 12px;font-size:12px;font-weight:700;">G0 Contract</span>
+ <span style="padding:0 4px;color:var(--ink2);">→</span>
+ </div>
+ <!-- Fork: G1 + G2 parallel -->
+ <div style="display:flex;flex-direction:column;justify-content:center;position:relative;">
+ <!-- Top branch: G1 -->
+ <div style="display:flex;align-items:center;">
+ <span style="color:var(--ink2);padding-right:4px;">┬→</span>
+ <span class="badge-blue" style="padding:6px 12px;font-size:12px;font-weight:700;">G1 Engineering</span>
+ <span style="padding:0 4px;color:var(--ink2);">─┬→</span>
+ </div>
+ <!-- Bottom branch: G2 -->
+ <div style="display:flex;align-items:center;">
+ <span style="color:var(--ink2);padding-right:4px;">└→</span>
+ <span class="badge-blue" style="padding:6px 12px;font-size:12px;font-weight:700;">G2 IQC</span>
+ <span style="padding:0 4px;color:var(--ink2);">─────────┘</span>
+ </div>
+ </div>
+ <!-- Sequential: G3 → G4 → G5 → G6 → G7 -->
+ <div style="display:flex;align-items:center;">
+ <span class="badge-green" style="padding:6px 12px;font-size:12px;font-weight:700;">G3 Setup</span>
+ <span style="padding:0 4px;color:var(--ink2);">→</span>
+ <span class="badge-green" style="padding:6px 12px;font-size:12px;font-weight:700;">G4 FAI</span>
+ <span style="padding:0 4px;color:var(--ink2);">→</span>
+ <span class="badge-green" style="padding:6px 12px;font-size:12px;font-weight:700;">G5 IPQC</span>
+ <span style="padding:0 4px;color:var(--ink2);">→</span>
+ <span class="badge-amber" style="padding:6px 12px;font-size:12px;font-weight:700;">G6 Final QC</span>
+ <span style="padding:0 4px;color:var(--ink2);">→</span>
+ <span class="badge-navy" style="padding:6px 12px;font-size:12px;font-weight:700;">G7 Ship</span>
+ </div>
 </div>
 <p class="tiny" style="margin-top:10px;">G1 Engineering và G2 IQC chạy song song (parallel). G3 chỉ mở khi cả G1 và G2 đều PASS.</p>
 </div>
@@ -244,8 +244,8 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </tbody></table></div>
 </div>
 
-    </div>
-  </div>
+ </div>
+ </div>
 </div>
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>

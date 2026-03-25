@@ -15,26 +15,26 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-18 — SOP-QMS-07 Hiệu chuẩn: gage list, khoảng thời gian, OOT tác động, MSA</strong>
-  <span class="sub-vn"></span>
+ <strong>SYS-OPS-18 — SOP-QMS-07 Hiệu chuẩn: gage list, khoảng thời gian, OOT tác động, MSA</strong>
+ <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-18</span></div>
-  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Code:</b></span><span>SYS-OPS-18</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent"><div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
 </div>
 <div class="card">
 <div class="grid-2">
@@ -85,7 +85,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>Bước E2E</th><th>Đầu vào</th><th>Responsible Person</th><th>Đầu ra</th><th>Điểm chặn (Cổng kiểm soát)</th></tr></thead>
 <tbody>
 <tr><td>Báo giá/Hợp đồng</td><td>Yêu cầu khách về truy xuất nguồn gốc, MSA, tiêu chuẩn hiệu chuẩn</td><td>Người định giá (SAL-03)</td><td>Danh mục Requests đo/hiệu chuẩn theo hợp đồng</td><td>Không có Requests rõ = ghi M365/SharePoint → HESEM-QMS-SSOT vào Kế hoạch &amp; rà soát hợp đồng</td></tr>
-<tr><td>Kế hoạch</td><td>CTQ, tần suất kiểm, plan công đoạn</td><td>Planner</td><td>kế hoạch kiểm tra (kiểm tra plan) + lịch tránh trùng hạn hiệu chuẩn</td><td>Plan dùng thiết bị quá hạn = CHẶN phát hành traveler</td></tr>
+<tr><td>Kế hoạch</td><td>CTQ, tần suất kiểm, plan công đoạn</td><td>Planner</td><td>kế hoạch kiểm tra (plan) + lịch tránh trùng hạn hiệu chuẩn</td><td>Plan dùng thiết bị quá hạn = CHẶN phát hành traveler</td></tr>
 <tr><td>Kỹ thuật</td><td>Bản vẽ Rev, phương pháp đo, đồ gá đo</td><td>Lập trình viên (CNC)/Kỹ thuật</td><td>Quy định gage + Requests MSA cho CTQ</td><td>CTQ dung sai chặt không có Requests MSA = TẠM GIỮ FAI/Final quyết định</td></tr>
 <tr><td>Mua hàng</td><td>Nhu cầu mua gage, dịch vụ hiệu chuẩn</td><td>Mua hàng</td><td>PO + tiêu chí chứng chỉ + nhà cung cấp đủ năng lực</td><td>PO không ràng buộc truy xuất nguồn gốc/độ không đảm bảo đo = TẠM GIỮ đặt dịch vụ</td></tr>
 <tr><td>Nhận hàng/Kho</td><td>Thiết bị mới / thiết bị về từ hiệu chuẩn</td><td>Kho</td><td>Gage được gán ID + nhãn trạng thái + chuyển QA rà soát</td><td>Thiết bị về không cert/không nhãn = cách ly / biệt trữ</td></tr>
@@ -283,7 +283,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>S3 — Khách Requests MSA trước FAI</td>
 <td>Bản vẽ CTQ: khe / vị trí width 8.00 ±0.01. Dụng cụ dự kiến: thước cặp 0.01mm. 2 Operator đo chênh 0.02.</td>
 <td>TẠM GIỮ FAI. Chọn hệ đo phù hợp và kích hoạt MSA/Gage R&amp;R. Cập nhật plan.</td>
-<td>MSA plan + báo cáo Gage R&amp;R + cập nhật traveler/kế hoạch kiểm tra (kiểm tra plan)</td>
+<td>MSA plan + báo cáo Gage R&amp;R + cập nhật traveler/kế hoạch kiểm tra (plan)</td>
 </tr>
 </tbody>
 </table>
@@ -329,9 +329,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 <h3>12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
 <ul>
-<li><b>Chuẩn:</b> [SITE]_[khu vực]_[mã gage (mã gage (GAGEID))]_[loại tài liệu (loại tài liệu (DOCTYPE))]_[YYYYMMDD]_[REV]</li>
+<li><b>Chuẩn:</b> [SITE]_[khu vực]_[mã gage ((GAGEID))]_[loại tài liệu ((DOCTYPE))]_[YYYYMMDD]_[REV]</li>
 <li><b>Ví dụ:</b> HCM_QC_GA-012_CalCert_20260204_V0.pdf • HCM_QC_GA-012_VerifyLog_20260204_V0.xlsx • HCM_QA_OOT_GA-012_20260204_V0.pdf</li>
-<li><b>Ràng buộc:</b> mã gage (mã gage (GAGEID)) trên file name phải khớp nhãn và FRM-QMS-04.</li>
+<li><b>Ràng buộc:</b> mã gage ((GAGEID)) trên file name phải khớp nhãn và FRM-QMS-04.</li>
 </ul>
 <h3>12.3 Nơi lưu (SharePoint)</h3>
 <ul>

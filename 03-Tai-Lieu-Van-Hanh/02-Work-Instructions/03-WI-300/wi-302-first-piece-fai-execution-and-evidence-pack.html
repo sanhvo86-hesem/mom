@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>WI-302 — Thực hiện mẫu đầu (đầu tiên chi tiết / sản phẩm), FAI, balloon/CMM và đóng gói bằng chứng | HESEM QMS</title>
+<title>WI-302 — Thực hiện mẫu đầu (tiên chi tiết / sản phẩm), FAI, balloon/CMM và đóng gói bằng chứng | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
 
@@ -46,28 +46,28 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
-          </div>
-        </div>
-        <div class="title"><strong>WI-302 — Thực hiện mẫu đầu, FAI, balloon/CMM và đóng gói bằng chứng</strong></div>
-        <div class="meta">
-          <div class="row"><span><b>Code:</b></span><span>WI-302</span></div>
-          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Owner:</b></span><span>QA Manager / Kỹ thuật Manager</span></div>
-          <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
-        </div>
-      </div>
-      <div class="note"><strong>ÁP DỤNG hHI</strong><br/>Dùng khi có part mới, phiên bản mới, đổi máy/chương trình/fixture/tool có ảnh hưởng, sau sự cố nghiêm trọng/PM lớn, hoặc khi khách hàng Requests mẫu đầu/FAI.</div>
-      <h1>WI-302 — Thực hiện mẫu đầu, FAI, balloon/CMM và đóng gói bằng chứng</h1>
-      
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
+ </div>
+ </div>
+ <div class="title"><strong>WI-302 — Thực hiện mẫu đầu, FAI, balloon/CMM và đóng gói bằng chứng</strong></div>
+ <div class="meta">
+ <div class="row"><span><b>Code:</b></span><span>WI-302</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QA Manager / Kỹ thuật Manager</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ </div>
+ </div>
+ <div class="note"><strong>ÁP DỤNG hHI</strong><br/>Dùng khi có part mới, phiên bản mới, đổi máy/chương trình/fixture/tool có ảnh hưởng, sau sự cố nghiêm trọng/PM lớn, hoặc khi khách hàng Requests mẫu đầu/FAI.</div>
+ <h1>WI-302 — Thực hiện mẫu đầu, FAI, balloon/CMM và đóng gói bằng chứng</h1>
+ 
 <div class="section"><h2>1. Mục đích và nguyên tắc không thương lượng</h2>
 <p>Mẫu đầu và FAI là cổng chặn để bảo vệ xưởng khỏi scrap hàng loạt, protect schedule khỏi treo Job và protect khách hàng khỏi escape. hhi cổng kiểm soát này chưa pass, sản xuất hàng loạt <strong>không được</strong> chạy.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> hích hoạt mẫu đầu/FAI theo đúng job đang chạy, thực hiện balloon/CMM khi Job yêu cầu, chỉ ký PASS sau khi đã đo đủ đặc tính thuộc phạm vi kiểm, và chỉ mở cổng kiểm soát FAI khi QA đã release.</div>
@@ -80,10 +80,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>2. Ma trận kích hoạt: Mẫu đầu, Chênh lệch FAI, Đầy đủ FAI</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Mức bắt buộc</th><th>Ghi chú vận hành</th></tr></thead><tbody>
 <tr><td>Part mới / lần chạy đầu</td><td><span class="badge-red">Đầy đủ FAI</span> + Mẫu đầu</td><td>Đo đầy đủ đặc tính theo balloon/spec, khóa phát hành trước khi chạy lô.</td></tr>
-<tr><td>phiên bản mới / ECO ảnh hưởng đặc tính</td><td><span class="badge-red">Đầy đủ FAI</span> hoặc <span class="badge-amber">Chênh lệch FAI</span> theo tác động</td><td>Nếu ảnh hưởng CTQ, mốc chuẩn (mốc chuẩn (datum)), dung sai chuỗi hoặc fit/chức năng thì mặc định Đầy đủ FAI.</td></tr>
+<tr><td>phiên bản mới / ECO ảnh hưởng đặc tính</td><td><span class="badge-red">Đầy đủ FAI</span> hoặc <span class="badge-amber">Chênh lệch FAI</span> theo tác động</td><td>Nếu ảnh hưởng CTQ, mốc chuẩn ((datum)), dung sai chuỗi hoặc fit/chức năng thì mặc định Đầy đủ FAI.</td></tr>
 <tr><td>Đổi máy, đổi fixture, đổi lộ trình gia công, đổi WCS logic, đổi chương trình chính</td><td><span class="badge-amber">Chênh lệch FAI</span> + Mẫu đầu</td><td>Phải đo lại toàn bộ đặc tính bị ảnh hưởng và các CTQ liên quan.</td></tr>
-<tr><td>Thay dao/mảnh dao (mảnh dao (insert)) bình thường không đổi logic cắt</td><td><span class="badge-blue">Mẫu đầu tăng cường</span></td><td>Đo CTQ, kích thước không / bằng không và bề mặt/cạnh nhạy cảm trước khi chạy tiếp.</td></tr>
-<tr><td>Sau sự cố nghiêm trọng, PM lớn, thay trục chính (trục chính (spindle)), sửa đồ gá, nghi ngờ năng lực / khả năng</td><td><span class="badge-red">tái xác nhận hiệu lực FAI</span></td><td>QA và ENG quyết định phạm vi; không dùng dữ liệu cũ để suy diễn.</td></tr>
+<tr><td>Thay dao/mảnh dao ((insert)) bình thường không đổi logic cắt</td><td><span class="badge-blue">Mẫu đầu tăng cường</span></td><td>Đo CTQ, kích thước không / bằng không và bề mặt/cạnh nhạy cảm trước khi chạy tiếp.</td></tr>
+<tr><td>Sau sự cố nghiêm trọng, PM lớn, thay trục chính ((spindle)), sửa đồ gá, nghi ngờ năng lực / khả năng</td><td><span class="badge-red">tái xác nhận hiệu lực FAI</span></td><td>QA và ENG quyết định phạm vi; không dùng dữ liệu cũ để suy diễn.</td></tr>
 <tr><td>khởi động lại sau dừng dài / đổi ca với Job rủi ro cao</td><td><span class="badge-blue">Mẫu đầu</span></td><td>Áp dụng mạnh cho QPL-3/QPL-4 hoặc part bề mặt/chức năng nhạy cảm.</td></tr>
 </tbody></table></div>
 <p>Mức cưỡng chế hồ sơ theo QPL xem tại <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a>.</p></div>
@@ -99,7 +99,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-list">
 <div class="step-item"><strong>Tách mẫu đầu và khóa lô nghi ngờ.</strong><br/>Ngay sau setup/chứng minh-out, tách part đầu tiên hoặc tập mẫu đầu theo Requests. Toàn bộ sản phẩm cắt ra trước khi cổng kiểm soát PASS phải được nhận diện là nghi ngờ cho tới khi QA quyết định phát hành.</div>
 <div class="step-item"><strong>Đối chiếu 4 điểm trước khi đo.</strong><br/>áản vẽ/spec, chương trình, phiếu cài đặt, tool/fixture phải cùng phiên bản và cùng part. Sai một điểm thì dừng, mở hold, trả về ENG/Setup.</div>
-<div class="step-item"><strong>Đo theo thứ tự bảo vệ rủi ro.</strong><br/>Đo CTQ, kích thước chuẩn gá/không / bằng không, mốc chuẩn (mốc chuẩn (datum)) chuỗi, hình học, đặc tính ảnh hưởng fit/chức năng trước. Sau đó mới đo phần còn lại trong phạm vi Đầy đủ FAI/Chênh lệch FAI. hhi dùng CMM phải lưu cả raw đầu ra, không chỉ lưu bản tóm tắt.</div>
+<div class="step-item"><strong>Đo theo thứ tự bảo vệ rủi ro.</strong><br/>Đo CTQ, kích thước chuẩn gá/không / bằng không, mốc chuẩn ((datum)) chuỗi, hình học, đặc tính ảnh hưởng fit/chức năng trước. Sau đó mới đo phần còn lại trong phạm vi Đầy đủ FAI/Chênh lệch FAI. hhi dùng CMM phải lưu cả raw đầu ra, không chỉ lưu bản tóm tắt.</div>
 <div class="step-item"><strong>áalloon và truy vết đặc tính.</strong><br/>Mỗi kết quả đo phải truy ngược được về số balloon hoặc mã đặc tính trong kiểm tra program. hhông chấp nhận báo cáo mà người đọc không biết kết quả đó đang nói tới đặc điểm / tính năng nào.</div>
 <div class="step-item"><strong>Đánh giá kết quả và quyết định cổng kiểm soát.</strong><br/>đạt khi toàn bộ đặc tính thuộc phạm vi đều đạt và hồ sơ đầy đủ. Không đạt khi có bất kỳ đặc tính không đạt hoặc bằng chứng không đáng tin cậy. có điều kiện TẠM GIỮ chỉ dùng khi part chưa NG nhưng hồ sơ thiếu/đang chờ quyết định kỹ thuật.</div>
 <div class="step-item"><strong>hhóa bằng chứng và phát hành.</strong><br/>Sau khi pass, nạp báo cáo, balloon drawing, raw data, ảnh khi cần, quyết định phát hành và người ký vào Hồ sơ công việc (hồ sơ công việc). Thông tin phát hành phải nhìn thấy được cho Sản xuất tại Point-of-use.</div>
@@ -107,12 +107,12 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>5. tái xác nhận hiệu lực và xử lý FAIL</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>hhi nào phải tái xác nhận</th><th>Yêu cầu tối thiểu</th><th>Ai quyết định</th></tr></thead><tbody>
-<tr><td>Thay đổi program/bù trừ (bù trừ (offset)) vượt giới hạn đã phê duyệt</td><td>Đo lại đặc tính bị ảnh hưởng + CTQ liên quan</td><td>QA + ENG</td></tr>
+<tr><td>Thay đổi program/bù trừ ((offset)) vượt giới hạn đã phê duyệt</td><td>Đo lại đặc tính bị ảnh hưởng + CTQ liên quan</td><td>QA + ENG</td></tr>
 <tr><td>Thay fixture/jaw/gá kẹp chi tiết, đổi machine hoặc đổi định hướng / đào tạo hội nhập</td><td>Chênh lệch FAI hoặc Đầy đủ FAI theo tác động</td><td>QA + ENG</td></tr>
-<tr><td>sự cố nghiêm trọng, trục chính (trục chính (spindle)) hit, jaw phiếu / trượt, đầu dò (đầu dò (probe)) hit, part shift</td><td>Hold toàn bộ WIP nghi ngờ; đánh giá phạm vi và FAI lại</td><td>QA + Sản xuất + ENG</td></tr>
+<tr><td>sự cố nghiêm trọng, trục chính ((spindle)) hit, jaw phiếu / trượt, đầu dò ((probe)) hit, part shift</td><td>Hold toàn bộ WIP nghi ngờ; đánh giá phạm vi và FAI lại</td><td>QA + Sản xuất + ENG</td></tr>
 <tr><td>khởi động lại sau dừng dài, chuyển ca ở Job QPL cao</td><td>Mẫu đầu xác nhận lại trước khi chạy tiếp</td><td>Supervisor + QA</td></tr>
 </tbody></table></div>
-<div class="callout-danger"><strong>FAIL thì làm ngay</strong><br/>1) Dừng công đoạn. 2) Cách ly part nghi ngờ từ cuối cùng đã biết tốt / đạt. 3) áảo toàn setup hiện trạng nếu cần điều tra. 4) Ghi rõ đặc điểm / tính năng fail, phương pháp đo, dụng cụ đo, người đo, thời điểm. 5) hhông tự sửa chương trình/bù trừ (bù trừ (offset)) rồi chạy lại khi chưa có quyết định phù hợp.</div></div>
+<div class="callout-danger"><strong>FAIL thì làm ngay</strong><br/>1) Dừng công đoạn. 2) Cách ly part nghi ngờ từ cuối cùng đã biết tốt / đạt. 3) áảo toàn setup hiện trạng nếu cần điều tra. 4) Ghi rõ đặc điểm / tính năng fail, phương pháp đo, dụng cụ đo, người đo, thời điểm. 5) hhông tự sửa chương trình/bù trừ ((offset)) rồi chạy lại khi chưa có quyết định phù hợp.</div></div>
 
 <div class="section"><h2>6. áộ bằng chứng bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>áằng chứng</th><th>áắt buộc khi</th><th>Ghi chú</th></tr></thead><tbody>
@@ -122,7 +122,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Setup sheet / danh sách dao cụ / program version</td><td>Mọi lần mở cổng kiểm soát</td><td>Phải truy về cùng phát hành set.</td></tr>
 <tr><td>Ảnh part / fixture / setup quan trọng / nghiêm trọng</td><td>hhi part phức tạp, rủi ro cao hoặc khách Requests</td><td>Ảnh phải phục vụ truy vết, không chụp minh họa chung chung.</td></tr>
 </tbody></table></div>
-<p>Hồ sơ công việc và siêu dữ liệu cấu trúc theo <a href="../../03-Reference/02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>. Nếu Job thuộc tuyến put-xuyên qua (xuyên qua (thru))/pass-xuyên suốt đặc biệt, bộ hồ sơ đi kèm phải mở rộng theo <a href="../../03-Reference/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>.</p></div>
+<p>Hồ sơ công việc và siêu dữ liệu cấu trúc theo <a href="../../03-Reference/02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a>. Nếu Job thuộc tuyến put-xuyên qua ((thru))/pass-xuyên suốt đặc biệt, bộ hồ sơ đi kèm phải mở rộng theo <a href="../../03-Reference/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>.</p></div>
 
 <div class="section"><h2>7. hPI và tài liệu liên kết</h2>
 <div class="kpi-grid">
@@ -134,13 +134,13 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>Xác định QPL và mức hồ sơ/cổng kiểm soát cưỡng chế.</td></tr>
 <tr><td><a href="../../03-Reference/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a></td><td>Chuẩn phiếu cài đặt, danh sách dao cụ, setup Photos.</td></tr>
-<tr><td><a href="../05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a></td><td>Setup/chuyển đổi (chuyển đổi (changeover)) và xác nhận ready-to-run.</td></tr>
+<tr><td><a href="../05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a></td><td>Setup/chuyển đổi ((changeover)) và xác nhận ready-to-run.</td></tr>
 <tr><td><a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Nhanh-kiểm tra card trước khi bấm chạy.</td></tr>
 <tr><td><a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Đóng gói bằng chứng vào Hồ sơ công việc và khóa hồ sơ.</td></tr>
 </tbody></table></div></div>
 
-    </div>
-  </div>
+ </div>
+ </div>
 </div>
 <div class="no-screen print-disclaimer">⚠ áản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>

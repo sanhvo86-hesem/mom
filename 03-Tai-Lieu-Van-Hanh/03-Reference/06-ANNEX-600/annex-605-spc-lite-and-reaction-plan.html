@@ -46,32 +46,32 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Annex</span>
-          </div>
-        </div>
-        <div class="title"><strong>ANNEX-605 — Thông số SPC, chọn biểu đồ, năng lực / khả năng và phản ứng plan</strong></div>
-        <div class="meta">
-          <div class="row"><span><b>Code:</b></span><span>ANNEX-605</span></div>
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Annex</span>
+ </div>
+ </div>
+ <div class="title"><strong>ANNEX-605 — Thông số SPC, chọn biểu đồ, năng lực / khả năng và phản ứng plan</strong></div>
+ <div class="meta">
+ <div class="row"><span><b>Code:</b></span><span>ANNEX-605</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Owner:</b></span><span>QA Manager / Quy trình Engineer</span></div>
 <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
-        </div>
-      </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Áp dụng khi kế hoạch kiểm soát Requests SPC/năng lực / khả năng hoặc khi cần theo dõi trôi / sai lệch của đặc tính quan trọng trong quá trình gia công CNC.</div>
-      <h1>ANNEX-605 — Thông số SPC, chọn biểu đồ, năng lực / khả năng và phản ứng plan</h1>
-      <div class="section"><div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>tại G4-G6 (Quality) — Quality Reference</b>.
-  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+ </div>
+ </div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Áp dụng khi kế hoạch kiểm soát Requests SPC/năng lực / khả năng hoặc khi cần theo dõi trôi / sai lệch của đặc tính quan trọng trong quá trình gia công CNC.</div>
+ <h1>ANNEX-605 — Thông số SPC, chọn biểu đồ, năng lực / khả năng và phản ứng plan</h1>
+ <div class="section"><div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>tại G4-G6 (Quality) — Quality Reference</b>.
+ <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
 </div>
-<h2>1. Mục đích và phạm vi áp dụng SPC</h2><p>ANNEX này quy định logic dùng SPC, chọn loại chart, đặt phản ứng plan và đọc năng lực / khả năng cho môi trường gia công CNC lệnh sản xuất. SPC dùng để phát hiện trôi / sai lệch và mất ổn định đủ sớm để ngăn thoát / bỏ qua. SPC không thay cho việc hiểu quá trình, không thay cho mẫu đầu (đầu tiên chi tiết / sản phẩm) và không thay cho kiểm tra cuối.</p><ul><li>Áp dụng cho đặc tính có thể đo lặp lại, có nhịp dữ liệu đủ và có giá trị kiểm soát trôi / sai lệch trước khi vượt dung sai.</li><li>Không ép áp dụng SPC cho mọi đặc tính chỉ để “đủ bài”; chỉ áp dụng nơi dữ liệu và phản ứng có ý nghĩa vận hành.</li></ul></div><div class="section"><h2>2. Chọn biểu đồ và logic nhóm con</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống dữ liệu</th><th>Chart ưu tiên</th><th>Ghi chú</th></tr></thead><tbody><tr><td>Đo liên tiếp từng chiếc, sản lượng thấp, lệnh sản xuất ngắn</td><td>I-MR</td><td>Phù hợp cho nhiều job CNC vì nhóm con nhỏ và dữ liệu nối thời gian</td></tr>
+<h2>1. Mục đích và phạm vi áp dụng SPC</h2><p>ANNEX này quy định logic dùng SPC, chọn loại chart, đặt phản ứng plan và đọc năng lực / khả năng cho môi trường gia công CNC lệnh sản xuất. SPC dùng để phát hiện trôi / sai lệch và mất ổn định đủ sớm để ngăn thoát / bỏ qua. SPC không thay cho việc hiểu quá trình, không thay cho mẫu đầu (tiên chi tiết / sản phẩm) và không thay cho kiểm tra cuối.</p><ul><li>Áp dụng cho đặc tính có thể đo lặp lại, có nhịp dữ liệu đủ và có giá trị kiểm soát trôi / sai lệch trước khi vượt dung sai.</li><li>Không ép áp dụng SPC cho mọi đặc tính chỉ để “đủ bài”; chỉ áp dụng nơi dữ liệu và phản ứng có ý nghĩa vận hành.</li></ul></div><div class="section"><h2>2. Chọn biểu đồ và logic nhóm con</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống dữ liệu</th><th>Chart ưu tiên</th><th>Ghi chú</th></tr></thead><tbody><tr><td>Đo liên tiếp từng chiếc, sản lượng thấp, lệnh sản xuất ngắn</td><td>I-MR</td><td>Phù hợp cho nhiều job CNC vì nhóm con nhỏ và dữ liệu nối thời gian</td></tr>
 <tr><td>Có thể lấy nhóm con hợp lý trong một điều kiện ổn định ngắn</td><td>Xbar-R hoặc Xbar-S</td><td>Chỉ dùng khi nhóm con thực sự đồng nhất</td></tr>
 <tr><td>Dữ liệu khuyết tật count / phế phẩm</td><td>np / p / c / u chart theo bản chất dữ liệu</td><td>Không dùng chart biến số cho khuyết tật count</td></tr>
 <tr><td>Quá trình trôi / sai lệch chậm cần nhạy sớm</td><td>EWMA/CUSUM khi được phê duyệt</td><td>Chỉ dùng khi người sở hữu hiểu rõ cách phản ứng</td></tr>
@@ -79,12 +79,12 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>CTQ / đặc tính khách hàng nhạy</td><td>Mục tiêu cao hơn mức đặc tính thường nếu khách hàng/QPL Requests</td><td>Kết hợp với đã tăng kiểm tra hoặc chặt hơn phản ứng nếu rủi ro cao</td></tr>
 <tr><td>Quá trình mới / mới khôi phục</td><td>Chưa dùng năng lực / khả năng để giảm nhịp kiểm cho tới khi đủ dữ liệu ổn định</td><td>Ưu tiên học tập phase</td></tr>
 </tbody></table></div></div><div class="section"><h2>4. Tín hiệu bất thường và phản ứng plan</h2><div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tín hiệu</th><th>Phản ứng bắt buộc</th></tr></thead><tbody><tr><td>Điểm vượt UCL/LCL</td><td>Dừng và xác định nguyên nhân; giữ sản phẩm từ lần cuối cùng-đã biết-tốt / đạt phù hợp</td></tr>
-<tr><td>Run/xu hướng/trôi / sai lệch bất thường</td><td>Tăng nhịp kiểm, xác minh tool mài mòn/bù trừ (bù trừ (offset))/fixture/nhiệt; điều chỉnh có kiểm soát</td></tr>
+<tr><td>Run/xu hướng/trôi / sai lệch bất thường</td><td>Tăng nhịp kiểm, xác minh tool mài mòn/bù trừ ((offset))/fixture/nhiệt; điều chỉnh có kiểm soát</td></tr>
 <tr><td>Khả năng giảm hoặc phân tán / biên độ tăng</td><td>Xem lại máy, tool, phương pháp đo, nguyên liệu, Operator; không chỉ sửa số liệu</td></tr>
 <tr><td>Dữ liệu thiếu hoặc nhập sai</td><td>Không tự lấp số để giữ chart đẹp; chỉnh sửa theo rule dữ liệu có dấu vết kiểm toán</td></tr>
 </tbody></table></div><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Tỷ lệ phản ứng đúng hạn với OOC; số thoát / bỏ qua sau tín hiệu SPC; tỷ lệ chart có dữ liệu hợp lệ; số tình huống năng lực / khả năng dùng sai bối cảnh.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="../../01-SOPs/06-SOP-600/sop-604-spc-and-capability-control.html">SOP-604</a>, <a href="../../02-Work-Instructions/06-WI-600/wi-604-spc-chart-use-process-capability-and-reaction.html">WI-604</a>, <a href="../../02-Work-Instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>, <a href="annex-602-msa-acceptance-criteria.html">ANNEX-602</a>, <a href="annex-604-control-plan-guide.html">ANNEX-604</a>, <a href="annex-603-quality-package-levels-qpl.html">ANNEX-603</a>.</div></div></div></div>
-    </div>
-  </div>
+ </div>
+ </div>
 </div>
 </body>
 </html>

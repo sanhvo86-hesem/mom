@@ -34,29 +34,29 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-02 — Hồ sơ công việc Data kiến trúc & Part/Rev Bản gốc (SharePoint + Phạm vi quản lý)</strong>
-  <span class="sub-vn"></span>
+ <strong>SYS-OPS-02 — Hồ sơ công việc Data kiến trúc & Part/Rev Bản gốc (SharePoint + Phạm vi quản lý)</strong>
+ <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-02</span></div>
-  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Code:</b></span><span>SYS-OPS-02</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 
 <!-- 1) FORM-HEADER (VI/EN) -->
 <div class="doc-content" id="docContent">
 <div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
 </div>
 <div class="card">
 <div class="grid-2">
@@ -97,7 +97,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><a href="#s8">8) Bảng kiểm triển khai (≤ 15 bước) – ai làm, minh chứng, lỗi hay gặp</a></li>
 <li><a href="#s9">9) OJT (TWI) + tiêu chí đánh giá đánh giá L1–L4 theo vai trò</a></li>
 <li><a href="#s10">10) Đánh giá pack: bài kiểm tra nhanh (≥ 20) + tình huống (≥ 3) + hiệu suất test</a></li>
-<li><a href="#s11">11) Tiêu chí ĐẠT/KHÔNG ĐẠT (ĐẠT/KHÔNG ĐẠT)</a></li>
+<li><a href="#s11">11) Tiêu chí ĐẠT/KHÔNG ĐẠT</a></li>
 <li><a href="#s12">12) MRR tối thiểu (hồ sơ) – loại hồ sơ, đặt tên, nơi lưu</a></li>
 <li><a href="#s13">13) Đánh giá phát hiện hay gặp gặp (≥ 8) &amp; cách phòng ngừa</a></li>
 <li><a href="#s14">14) DCR hồ sơ</a></li>
@@ -270,7 +270,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>5</td><td>Không gắn nhãn Phạm vi quản lý / không khai báo hồ sơ</td><td>Tier-1 nằm đúng thư mục nhưng label không áp</td><td>Rủi ro xoá/sửa ngoài kiểm soát</td><td>Phạm vi quản lý tự động-áp dụng + QA kiểm tra</td></tr>
 <tr><td>6</td><td>RecordType/DocType dùng “tự chế”</td><td>RecordType không nằm trong danh mục chuẩn</td><td>Báo cáo Pareto sai, lưu giữ sai</td><td>Lựa chọn mã + đào tạo</td></tr>
 <tr><td>7</td><td>bộ hồ sơ giao hàng “đủ giấy” nhưng thiếu <b>phê duyệt lịch sử</b></td><td>Không chứng minh ai phát hành</td><td>đánh giá không đạt, rủi ro tranh chấp khách hàng</td><td>G5 Phê duyệt giao hàng</td></tr>
-<tr><td>8</td><td>Outsource chứng chỉ/lot thiếu</td><td>Cert không có lot/mẻ nấu (mẻ nấu (heat)) hoặc không map job</td><td>Truy xuất nguồn gốc fail, được bị trả hàng</td><td>06_Outsource + IQC</td></tr>
+<tr><td>8</td><td>Outsource chứng chỉ/lot thiếu</td><td>Cert không có lot/mẻ nấu ((heat)) hoặc không map job</td><td>Truy xuất nguồn gốc fail, được bị trả hàng</td><td>06_Outsource + IQC</td></tr>
 <tr><td>9</td><td>Người định giá (SAL-03) không đưa “đặc biệt Requests” vào hồ sơ</td><td>Spec/PO note nằm trong email cá nhân</td><td>Sai Requests, trễ giao, NCR</td><td>01_Rfq-Review hợp đồng</td></tr>
 <tr><td>10</td><td>Planner phát hành traveler không có QR/link hồ sơ</td><td>Không scan được đến thư mục bằng chứng</td><td>Bàn giao chậm, đánh giá mất thời gian</td><td>Print rule + G1</td></tr>
 <tr><td>11</td><td>QC upload báo cáo nhưng “file name” không theo chuẩn</td><td>Không có JobNum/REV/Date</td><td>Export/email mất truy vết, đánh giá hỏi lại</td><td>Đặt tên thực thi / cưỡng chế</td></tr>
@@ -326,7 +326,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>CP6</b> – MRR xác nhận theo cổng kiểm soát</td>
-<td>Cổng chỉ phát hành khi MRR đủ; thiếu → TẠM GIỮ + ghi log (ShipRelease/tạm giữ QC (tạm giữ QC (QCHold))/NCR)</td>
+<td>Cổng chỉ phát hành khi MRR đủ; thiếu → TẠM GIỮ + ghi log (ShipRelease/tạm giữ QC ((QCHold))/NCR)</td>
 <td>QA + Supervisor + WHS</td>
 <td>Bảng kiểm MRR + phê duyệt lịch sử</td>
 <td>Ship thiếu bằng chứng</td>
@@ -382,7 +382,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>FF4 — Outsource truy xuất nguồn gốc fail</b></td>
-<td>Thiếu cert/lot/mẻ nấu (mẻ nấu (heat)) hoặc không map được JobNum/Supplier</td>
+<td>Thiếu cert/lot/mẻ nấu ((heat)) hoặc không map được JobNum/Supplier</td>
 <td>Không nhận hàng vào sản xuất; cách ly; mở NCR khi ảnh hưởng tiến độ</td>
 <td>WHS/QA/PUR</td>
 <td>đầu vào / nhận hàng IR + NCR</td>
@@ -633,7 +633,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>3</td>
-<td><b>Outsource cert thiếu lot/mẻ nấu (mẻ nấu (heat))</b></td>
+<td><b>Outsource cert thiếu lot/mẻ nấu ((heat))</b></td>
 <td>Cert scan có Supplier nhưng không có Lot/Mẻ nấu (mẻ nấu (heat)); PO Requests truy xuất nguồn gốc</td>
 <td>Cách ly, không nhận vào sản xuất (FF4); Requests nhà cung cấp cung cấp bổ sung</td>
 <td>đầu vào / nhận hàng IR = Hold + Requests bổ sung chứng chỉ</td>
@@ -657,7 +657,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 11) ĐẠT/KHÔNG ĐẠT (PASS/FAIL) -->
 <div class="card" id="s11">
-<h2>11) Tiêu chí ĐẠT/KHÔNG ĐẠT (ĐẠT/KHÔNG ĐẠT)</h2>
+<h2>11) Tiêu chí ĐẠT/KHÔNG ĐẠT</h2>
 <div class="table-wrap">
 <table class="tight">
 <thead><tr><th>Hạng mục</th><th>PASS</th><th>FAIL (bất kỳ điều kiện nào)</th></tr></thead>
@@ -787,10 +787,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td>Không chứng minh “đúng REV”</td><td>Khách/đánh giá hỏi file chủ / gốc &amp; job bằng chứng có khớp Rev không</td><td>Phát hành Hồ sơ phải link DATA/REV đúng; diễn tập đánh giá 60 giây</td></tr>
 <tr><td>2</td><td>Thiếu Tier-1 hồ sơ hoặc thiếu siêu dữ liệu bắt buộc</td><td>Không search/lưu giữ được; rủi ro thất lạc</td><td>thực thi nội dung type + bắt buộc cột; QA xác nhận hiệu lực trước cổng kiểm soát</td></tr>
 <tr><td>3</td><td>Tier-1 không có lưu giữ label / không khai báo hồ sơ</td><td>Hồ sơ được bị xoá/sửa</td><td>tự động-áp dụng rule theo path + nội dung type; kiểm tra label sau upload</td></tr>
-<tr><td>4</td><td>dữ liệu gốc (dữ liệu gốc) nằm rải rác (email/USB/nội bộ / tại chỗ)</td><td>Không kiểm soát phiên bản</td><td>Draft</td></tr>
+<tr><td>4</td><td>dữ liệu gốc nằm rải rác (email/USB/nội bộ / tại chỗ)</td><td>Không kiểm soát phiên bản</td><td>Draft</td></tr>
 <tr><td>5</td><td>Hồ sơ công việc chứa file chủ / gốc “bản copy”</td><td>2 nguồn dữ liệu → sai lệch</td><td>Job chỉ lưu Phát hành Hồ sơ + link; khi cần “đóng băng” phải có phê duyệt &amp; lý do</td></tr>
 <tr><td>6</td><td>bộ hồ sơ giao hàng thiếu phê duyệt lịch sử</td><td>Không chứng minh ai phát hành/ai chịu trách nhiệm</td><td>ShipRelease phải có phê duyệt; Supervisor kiểm tra trước ship</td></tr>
-<tr><td>7</td><td>Outsource thiếu chứng chỉ/lot/mẻ nấu (mẻ nấu (heat))</td><td>Truy xuất nguồn gốc là Requests bắt buộc</td><td>WHS/QA kiểm trước nhận; lưu đầy đủ ở 06_Outsource</td></tr>
+<tr><td>7</td><td>Outsource thiếu chứng chỉ/lot/mẻ nấu ((heat))</td><td>Truy xuất nguồn gốc là Requests bắt buộc</td><td>WHS/QA kiểm trước nhận; lưu đầy đủ ở 06_Outsource</td></tr>
 <tr><td>8</td><td>Không kiểm soát Rev cũ (không có 00_Archive hoặc lưu trữ sai)</td><td>Không truy vết thay thế / bãi bỏ</td><td>Đổi Rev phải chuyển Rev cũ vào 00_Archive + thay đổi hồ sơ</td></tr>
 <tr><td>9</td><td>Tên file không theo chuẩn, khó export</td><td>Đánh giá Requests export/offline pack</td><td>Áp đặt tên chuẩn ANNEX-QMS-003; đào tạo + điểm / tại chỗ kiểm tra</td></tr>
 <tr><td>10</td><td>Bỏ qua cổng kiểm soát vì gấp</td><td>Rủi ro stop-ship cao</td><td>Dừng sớm (fail-nhanh) + cứng / khó stop G5; KPI theo “cổng kiểm soát tuân thủ”</td></tr>

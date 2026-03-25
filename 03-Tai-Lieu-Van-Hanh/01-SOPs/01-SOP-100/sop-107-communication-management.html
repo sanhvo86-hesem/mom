@@ -47,7 +47,7 @@
 .role-note{border-left: 3px solid var(--blue);background:#f8fafc;padding:12px 14px;border-radius:8px;margin-top:10px}
 table{max-width:100%;table-layout:auto}
 td,th{
-  thead{display:table-header-group}tfoot{display:table-footer-group}
+ thead{display:table-header-group}tfoot{display:table-footer-group}
 }
 @media (max-width: 960px; width: 100%; box-sizing: border-box){.grid-2,.grid-3,.field-grid{grid-template-columns:1fr;}}
 </style>
@@ -80,7 +80,7 @@ td,th{
 <p>SOP-107 quy định ai nói, nói với ai, nói lúc nào, nói bằng kênh nào và bằng chứng ở đâu. Một vấn đề không được phép có nhiều phiên bản thông tin khác nhau giữa QA, Kế hoạch, Sản xuất, CS, khách hàng và nhà cung cấp. Khi thông tin khác nhau, quyết định vận hành sẽ sai. Vì vậy mọi truyền đạt / giao tiếp ảnh hưởng vận hành phải có người sở hữu và phải đóng được bằng hồ sơ.</p>
 <div class="legend-row">
 <span class="chip">Cổng kiểm soát: 107-G1 → 107-G5</span>
-<span class="chip">Biểu mẫu bắt buộc: <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></span>
+<span class="chip">Biểu mẫu bắt buộc: <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></span>
 <span class="chip">WI liên đới: <a href="../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a> / <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> / <a href="../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a></span>
 <span class="chip">ANNEX liên đới: <a href="../../03-Reference/05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a> / <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> / <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></span>
 </div>
@@ -157,9 +157,9 @@ td,th{
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
 <div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> SOP này vận hành <b>xuyên suốt hệ thống (G0→G7)</b>. Quản lý truyền thông áp dụng tại mọi cổng.
-  Các bước nội bộ (SOP-107-G1→G5) là chi tiết triển khai, KHÔNG nhầm với mã cổng hệ thống G0-G7.
-  <br>→ Xem <a href="../../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference đầy đủ.
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> SOP này vận hành <b>xuyên suốt hệ thống (G0→G7)</b>. Quản lý truyền thông áp dụng tại mọi cổng.
+ Các bước nội bộ (SOP-107-G1→G5) là chi tiết triển khai, KHÔNG nhầm với mã cổng hệ thống G0-G7.
+ <br>→ Xem <a href="../../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference đầy đủ.
 </div>
 <div class="gate-grid">
 <div class="gate-card"><h3>107-G1 — Phân loại sự kiện &amp; chọn kênh</h3><p>Xác định event family, severity, người phụ trách, kênh và người nhận đầu tiên. <b>HOLD</b> nếu sự kiện chưa được phân loại nhưng đã có người phát ngôn ra ngoài.</p></div>
@@ -171,7 +171,7 @@ td,th{
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:32%"/><col style="width:18%"/><col style="width:18%"/><col style="width:32%"/></colgroup><thead><tr><th>KPI</th><th>Mục tiêu</th><th>Tần suất</th><th>Ghi chú</th></tr></thead><tbody>
 <tr><td>Tỷ lệ sự kiện mức nghiêm trọng cao được log trong 15 phút</td><td>â‰¥ 95%</td><td>Tháng</td><td>Áp dụng cho stop-dòng / chuyền, khiếu nại nghi thoát / bỏ qua, rủi ro giao hàng giống / cùng-day, data/IP sự cố.</td></tr>
 <tr><td>Tỷ lệ khách hàng xác nhận / biên nhận đúng SLA</td><td>100%</td><td>Tháng</td><td>Dùng cho khiếu nại, chậm trễ, thay đổi, RMA, cao-rủi ro thông báo.</td></tr>
-<tr><td>Tỷ lệ hành động từ Tier cuộc họp đóng đúng hạn</td><td>â‰¥ 95%</td><td>Tuần</td><td>Đo qua log của <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a>.</td></tr>
+<tr><td>Tỷ lệ hành động từ Tier cuộc họp đóng đúng hạn</td><td>â‰¥ 95%</td><td>Tuần</td><td>Đo qua log của <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a>.</td></tr>
 <tr><td>Số tình huống gửi ra ngoài thiếu thẩm quyền hoặc thiếu bằng chứng</td><td>0</td><td>Tháng</td><td>Vi phạm phải mở hành động hệ thống.</td></tr>
 <tr><td>Số vụ trễ escalation ngoài giờ</td><td>0 quan trọng / nghiêm trọng</td><td>Tháng</td><td>Đo theo bậc thang năng lực của <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</td></tr>
 </tbody></table></div>
@@ -242,14 +242,14 @@ td,th{
 <div class="field"><b>Điều kiện đóng hồ sơ</b><div class="blank">Tình huống có outcome rõ, người phụ trách xác nhận đóng, người nhận chính đã được cập nhật, bằng chứng đầy đủ và nếu cần thì tài liệu liên quan đã mở action.</div></div>
 </div>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:25%"/><col style="width:23%"/><col style="width:14%"/><col style="width:20%"/></colgroup><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Nơi lưu / nguồn</th><th>Chủ trì</th><th>Điều kiện đóng</th></tr></thead><tbody>
-<tr><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></td><td>Log kế hoạch truyền thông, escalation, người nhận, hành động và kết thúc / đóng.</td><td>Truyền đạt / quản lý thư viện</td><td>CS / Planner / QA theo tình huống</td><td>Khi tình huống đã đóng và cập nhật cuối Released.</td></tr>
+<tr><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></td><td>Log kế hoạch truyền thông, escalation, người nhận, hành động và kết thúc / đóng.</td><td>Truyền đạt / quản lý thư viện</td><td>CS / Planner / QA theo tình huống</td><td>Khi tình huống đã đóng và cập nhật cuối Released.</td></tr>
 <tr><td>Tier cuộc họp log</td><td>Ghi nhận vấn đề theo ca, escalation và mở hành động.</td><td>Tier cuộc họp / trung tâm điều hành hồ sơ</td><td>Shift Lead / Planner</td><td>Khi hành động đã đóng hoặc chuyển war phòng.</td></tr>
 <tr><td>Customer truyền đạt / giao tiếp bằng chứng</td><td>Email, portal tin nhắn / thông điệp, đã phê duyệt thông báo, trả lời, đính kèm / tài liệu đính kèm.</td><td>Tình huống thư mục / SSOT</td><td>CS</td><td>Khi khiếu nại/chậm trễ/thay đổi tình huống kết thúc.</td></tr>
 <tr><td>Escalation / war phòng quyết định log</td><td>Ghi ai quyết, quyết gì, khi nào và bước tiếp theo.</td><td>Escalation thư viện</td><td>QA / Sản xuất Giám đốc</td><td>Khi khủng hoảng/sự kiện được ổn định.</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="p10">10. Biểu mẫu, WI, ANNEX, SOP &amp; JD liên kết</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:44%"/><col style="width:40%"/></colgroup><thead><tr><th>Nhóm</th><th>Tài liệu liên quan</th><th>Vai trò trong SOP</th></tr></thead><tbody>
-<tr><td>Biểu mẫu</td><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></td><td>Log truyền đạt / giao tiếp, escalation, người nhận xác nhận / biên nhận và kết thúc / đóng.</td></tr>
+<tr><td>Biểu mẫu</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></td><td>Log truyền đạt / giao tiếp, escalation, người nhận xác nhận / biên nhận và kết thúc / đóng.</td></tr>
 <tr><td>WI</td><td><a href="../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>; <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a>; <a href="../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Point-of-use cho tier cuộc họp, bộ bằng chứng, cao-rủi ro mức sẵn sàng và ngăn chặn escalation.</td></tr>
 <tr><td>ANNEX</td><td><a href="../../03-Reference/05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a>; <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>; <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>; <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>; <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td><td>Khóa nhịp độ / chu kỳ họp, escalation bậc thang năng lực, KPI, thẩm quyền và phó/backup.</td></tr>
 <tr><td>SOP liên đới</td><td><a href="../02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>; <a href="../02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-202</a>; <a href="../05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a>; <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>; <a href="sop-108-operational-contingency-plan.html">SOP-108</a></td><td>Khóa liên kết giữa truyền đạt / giao tiếp với đơn hàng, khiếu nại, điều phối xuất hàng, NCR/CAPA và dự phòng.</td></tr>

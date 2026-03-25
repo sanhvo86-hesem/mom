@@ -36,22 +36,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-01 — Tiêu chuẩn Bộ bằng chứng & Diễn tập đánh giá 60 giây</strong>
-  <span class="sub-vn"></span>
+ <strong>SYS-OPS-01 — Tiêu chuẩn Bộ bằng chứng & Diễn tập đánh giá 60 giây</strong>
+ <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-01</span></div>
-  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Code:</b></span><span>SYS-OPS-01</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 
@@ -102,7 +102,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- ===================================================== -->
 <h2 class="h2">2) Mục đích mô-đun &amp; bối cảnh vận hành (cổng kiểm soát/bàn giao; ai chịu trách nhiệm; khi nào kích hoạt)</h2>
 <div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
 </div>
 <div class="card">
 <p><b>Lý do tồn tại (Cổng kiểm soát Logic):</b> Phân xưởng CNC gia công theo đơn có rủi ro “chết người” ở <b>Rev</b>, <b>lẫn lộn (mix-up)</b>, <b>thiếu chứng từ</b>, <b>hiệu chuẩn</b>, <b>vượt qua cổng kiểm soát</b>, <b>ship sai</b>. Các rủi ro này không thể “dò lại” bằng trí nhớ; phải chặn bằng <b>MRR có cấu trúc</b>.</p>
@@ -156,11 +156,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Mua hàng/Outsource</b> (Mua hàng)</td>
 <td>PO, nhà cung cấp phê duyệt, Requests chứng chỉ</td>
 <td>06_Outsource: bộ hồ sơ gửi nhà cung cấp (điều phối xuất hàng gói hồ sơ) + cert + kế hoạch xác minh đầu vào</td>
-<td><span class="gate g3">G3</span> Công đoạn đặc biệt/outsource có chứng từ; truy vết lot/mẻ nấu (mẻ nấu (heat)) khi Requests</td>
+<td><span class="gate g3">G3</span> Công đoạn đặc biệt/outsource có chứng từ; truy vết lot/mẻ nấu ((heat)) khi Requests</td>
 </tr>
 <tr>
 <td><b>Nhận hàng/Kho</b> (Kho)</td>
-<td>Vật tư, cert, lot/mẻ nấu (mẻ nấu (heat))</td>
+<td>Vật tư, cert, lot/mẻ nấu ((heat))</td>
 <td>Nhận hàng IQC hồ sơ + nhãn lô + link cert</td>
 <td><span class="gate g3">G3</span> Không nhập kho khi thiếu cert/lot; phòng ngừa lẫn lộn</td>
 </tr>
@@ -196,7 +196,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol class="tight">
 <li><b>Sai Rev</b>: Job chạy theo drawing Rev cũ (Kỹ thuật/Sản xuất).</li>
 <li><b>Lẫn lộn/lẫn lô</b>: WIP không nhãn, vật tư/part để chung khay (Kho/Sản xuất).</li>
-<li><b>Thiếu/giả chứng từ</b>: bộ hồ sơ giao hàng thiếu CoC/cert hoặc cert không đúng lot/mẻ nấu (mẻ nấu (heat)) (Mua hàng/Kho/QA).</li>
+<li><b>Thiếu/giả chứng từ</b>: bộ hồ sơ giao hàng thiếu CoC/cert hoặc cert không đúng lot/mẻ nấu ((heat)) (Mua hàng/Kho/QA).</li>
 <li><b>Outsource/Công đoạn đặc biệt</b> không có bộ hồ sơ gửi nhà cung cấp hoặc không có xác minh đầu vào (Mua hàng/QC).</li>
 <li><b>Truy xuất nguồn gốc đứt</b>: không nối được JobNum ↔ PartNum ↔ Rev ↔ lot (toàn chuỗi).</li>
 <li><b>Hiệu chuẩn/đo lường</b>: dùng gage OOT/không có nhãn dán; CMM program không khóa version (QC/QA).</li>
@@ -239,7 +239,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>CP3 — Phát hành chương trình Hồ sơ</b></td>
 <td>Lập trình viên (CNC)</td>
 <td>Trước chạy lô</td>
-<td>Phát hành hồ sơ: tên tập tin, tổng kiểm tra/mã băm (mã băm (hash)) (khi áp dụng), ngày, người phát hành</td>
+<td>Phát hành hồ sơ: tên tập tin, tổng kiểm tra/mã băm ((hash)) (khi áp dụng), ngày, người phát hành</td>
 <td>Chưa phát hành → <b>CHẶN run</b></td>
 </tr>
 <tr>
@@ -349,7 +349,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>8</td><td>Kiểm tra hiệu chuẩn trước đo quan trọng</td><td>QC</td><td>Gage trạng thái OK / log OOT khi phát hiện</td><td>nhãn dán mờ/hết hạn vẫn dùng</td></tr>
 <tr><td>9</td><td>Final IR/CMM/FAI và khóa hồ sơ</td><td>QC/QA</td><td>PDF đã ký/đã khóa + Tier‑1 label</td><td>File scan thiếu trang; chưa khóa</td></tr>
 <tr><td>10</td><td>NCR/MRB khi có sai lỗi</td><td>QA + Supervisor</td><td>NCR gói hàng + MRB disposition + phê duyệt</td><td>“Sửa xong rồi” nhưng không có quyết định MRB</td></tr>
-<tr><td>11</td><td>Bộ hồ sơ giao hàng: CoC/chứng chỉ/đóng gói</td><td>Kho</td><td>07_Shipping-Đóng gói: bộ hồ sơ giao hàng đầy đủ</td><td>Cert đúng nhưng không khớp lot/mẻ nấu (mẻ nấu (heat))</td></tr>
+<tr><td>11</td><td>Bộ hồ sơ giao hàng: CoC/chứng chỉ/đóng gói</td><td>Kho</td><td>07_Shipping-Đóng gói: bộ hồ sơ giao hàng đầy đủ</td><td>Cert đúng nhưng không khớp lot/mẻ nấu ((heat))</td></tr>
 <tr><td>12</td><td>Phê duyệt giao hàng GO/CHẶN</td><td>QA</td><td>Phê duyệt giao hàng hồ sơ + bảng kiểm PASS</td><td>Cho giao hàng khi thiếu bằng chứng (“mai upload”)</td></tr>
 <tr><td>13</td><td>bài diễn tập đánh giá 60 giây (ngẫu nhiên)</td><td>Supervisor</td><td>Diễn tập log ĐẠT/KHÔNG ĐẠT + hành động sửa</td><td>Không ai biết file nằm đâu</td></tr>
 <tr><td>14</td><td>Đóng vòng lặp: bài học kinh nghiệm</td><td>QA + Lập trình viên (CNC)/Planner</td><td>CAPA/bài học kinh nghiệm cập nhật (khi không đạt lặp)</td><td>Sửa vụ việc nhưng không cập nhật hệ thống</td></tr>
@@ -449,7 +449,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L3</b> (Dẫn dắt &amp; chặn lỗi)</td>
 <td>Chủ động kích hoạt hold khi thiếu bằng chứng; hướng dẫn người khác; đóng được “nhỏ / thu gọn cổng kiểm soát” trong phạm vi vai trò.</td>
 <td>Thực hiện 1 tình huống fail-nhanh thật hoặc mô phỏng, ra quyết định đúng + log đầy đủ.</td>
-<td>Được phép làm “người đi kèm (người đi kèm (buddy)) người đào tạo” cho L1–L2; lập Requests CAPA.</td>
+<td>Được phép làm “người đi kèm ((buddy)) người đào tạo” cho L1–L2; lập Requests CAPA.</td>
 </tr>
 <tr>
 <td><b>L4</b> (Sở hữu hệ thống)</td>
@@ -539,7 +539,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Mua hàng</b></td>
 <td>Supplier chứng chỉ; outsource bộ hồ sơ gửi nhà cung cấp; công đoạn đặc biệt bằng chứng</td>
 <td>STOP outsource khi thiếu chứng từ/phê duyệt</td>
-<td>Chứng minh cert đúng lot/mẻ nấu (mẻ nấu (heat)); diễn tập: mở điều phối xuất hàng + cert trong ≤60s</td>
+<td>Chứng minh cert đúng lot/mẻ nấu ((heat)); diễn tập: mở điều phối xuất hàng + cert trong ≤60s</td>
 </tr>
 <tr>
 <td><b>Bảo trì</b></td>
@@ -549,7 +549,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>EHS</b></td>
-<td>Evidence an toàn liên quan khu vực lưu trữ/xử lý / vận chuyển; log sự cố (sự cố log) khi ảnh hưởng</td>
+<td>Evidence an toàn liên quan khu vực lưu trữ/xử lý / vận chuyển; log sự cố (log) khi ảnh hưởng</td>
 <td>STOP khi rủi ro an toàn khi xử lý vật tư/hoá chất/công đoạn đặc biệt</td>
 <td>Biết nơi lưu JSA/sự cố hồ sơ; phối hợp khi đánh giá hỏi về EHS bằng chứng</td>
 </tr>
@@ -583,7 +583,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>9</td><td>Tier‑1 bằng chứng hay gặp gồm nhóm nào?</td><td><b>A</b> FAI/Final IR/CMM/Bộ hồ sơ giao hàng/CoC</td></tr>
 <tr><td>10</td><td>(Tình huống) Bạn mở Hồ sơ công việc nhưng không thấy thư mục 07_Shipping-Đóng gói. Bạn làm gì?</td><td><b>B</b> TẠM GIỮ/STOP ship, tạo đúng thư mục + báo cáo vượt cấp QA, ghi log</td></tr>
 <tr><td>11</td><td>(Tình huống) Có file IR nhưng nằm trong “tải xuống” máy cá nhân. Đúng hay sai?</td><td><b>C</b> Sai — phải upload vào Hồ sơ công việc đúng chỗ + khóa hồ sơ</td></tr>
-<tr><td>12</td><td>(Vai trò‑cụ thể: Kho) Chứng chỉ vật liệu (cert) phải khớp gì để dùng cho bộ hồ sơ giao hàng?</td><td><b>D</b> Lot/mẻ nấu (mẻ nấu (heat)) + part + Requests PO</td></tr>
+<tr><td>12</td><td>(Vai trò‑cụ thể: Kho) Chứng chỉ vật liệu (cert) phải khớp gì để dùng cho bộ hồ sơ giao hàng?</td><td><b>D</b> Lot/mẻ nấu ((heat)) + part + Requests PO</td></tr>
 <tr><td>13</td><td>Trong “bài diễn tập đánh giá 60 giây”, bước đầu tiên là gì?</td><td><b>A</b> Chốt JobNum/PartNum/Rev từ traveler/ERP</td></tr>
 <tr><td>14</td><td>(Tình huống) Kế hoạch nói “Rev chưa cập nhật nhưng cứ chạy”. Quyết định đúng?</td><td><b>A</b> STOP + báo cáo vượt cấp; không khớp Rev là cổng kiểm soát vi phạm</td></tr>
 <tr><td>15</td><td>Quy tắc ngôn ngữ đặt tên file theo chuẩn bằng chứng-đặt tên-bảng tóm tắt nhanh là?</td><td><b>B</b> Tiếng Anh chỉ / duy nhất, không dấu, ngày ISO 8601</td></tr>
@@ -668,11 +668,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Hồ sơ chưa ký/khóa</b> → QC/QA phải “khóa PDF” và gắn Tier‑1 label trước ship.</li>
 <li><b>Evidence lưu sai chỗ</b> (PC cá nhân/email) → quy định “chỉ tính bằng chứng khi ở đúng thư viện”.</li>
 <li><b>Thiếu bộ hồ sơ giao hàng</b> → phê duyệt giao hàng người xác nhận bắt buộc; thiếu 1 mục T1 là CHẶN.</li>
-<li><b>Truy xuất nguồn gốc đứt</b> (lot/mẻ nấu (mẻ nấu (heat)) không khớp cert) → Kho/Mua hàng phải chéo‑kiểm tra lot/mẻ nấu (mẻ nấu (heat)).</li>
+<li><b>Truy xuất nguồn gốc đứt</b> (lot/mẻ nấu ((heat)) không khớp cert) → Kho/Mua hàng phải chéo‑kiểm tra lot/mẻ nấu ((heat)).</li>
 <li><b>Gage OOT</b> → CP4; log OOT + đánh giá ảnh hưởng + đo lại.</li>
 <li><b>NCR/MRB không rõ quyết định</b> → bắt buộc có MRB disposition + phê duyệt trong 05_NCR-Hold-CAPA.</li>
 <li><b>Vượt qua cổng kiểm soát vì tiến độ</b> → Supervisor chịu trách nhiệm; diễn tập fail lặp phải CAPA hệ thống.</li>
-<li><b>Đặt tên file không chuẩn</b> → dùng tóm tắt nhanh (tóm tắt nhanh (cheat sheet) sheet) sheet; đánh giá diễn tập sẽ Không đạt khi search không ra.</li>
+<li><b>Đặt tên file không chuẩn</b> → dùng tóm tắt nhanh ((cheat sheet) sheet) sheet; đánh giá diễn tập sẽ Không đạt khi search không ra.</li>
 <li><b>Outsource thiếu chứng từ</b> → không nhận hàng/không dùng; phải có bộ hồ sơ gửi nhà cung cấp + xác minh đầu vào.</li>
 </ol>
 </div>

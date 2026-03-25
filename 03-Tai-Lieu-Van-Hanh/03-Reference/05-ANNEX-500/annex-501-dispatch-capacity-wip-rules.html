@@ -49,31 +49,31 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Annex</span>
-          </div>
-        </div>
-        <div class="title"><strong>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và giới hạn WIP</strong></div>
-        <div class="meta">
-          <div class="row"><span><b>Code:</b></span><span>ANNEX-501</span></div>
-          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Owner:</b></span><span>Kế hoạch Team Leader / Ops Manager</span></div>
-          <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
-        </div>
-      </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi quyết định điều phối xuất hàng, công suất rà soát, WIP cap, sắp xếp lại, hot-job, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và escalation liên quan tới lập kế hoạch/OPS.</div>
-      <h1>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và giới hạn WIP</h1>
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Annex</span>
+ </div>
+ </div>
+ <div class="title"><strong>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và giới hạn WIP</strong></div>
+ <div class="meta">
+ <div class="row"><span><b>Code:</b></span><span>ANNEX-501</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>Kế hoạch Team Leader / Ops Manager</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ </div>
+ </div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi quyết định điều phối xuất hàng, công suất rà soát, WIP cap, sắp xếp lại, hot-job, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và escalation liên quan tới lập kế hoạch/OPS.</div>
+ <h1>ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và giới hạn WIP</h1>
 
 <div class="section"><div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>tại G3 (Setup) và G5 (IPQC) — Dispatch/WIP Rules</b>.
-  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>tại G3 (Setup) và G5 (IPQC) — Dispatch/WIP Rules</b>.
+ <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
 </div>
 <h2>1. Mục đích và nguyên tắc điều hành</h2>
 <p>ANNEX này khóa bộ rule dùng chung cho <b>điều độ</b>, <b>rà soát năng lực</b>, <b>giới hạn WIP</b>, <b>đóng băng cửa sổ / khung thời gian</b>, <b>sắp xếp lại</b>, <b>hot-job</b> và <b>tuổi tồn (lão hóa / cũ)</b> ở toàn bộ phân xưởng CNC lệnh sản xuất của HESEM. Planner, Nhân viên điều phối, Supervisor và Ops Manager phải dùng cùng một rule set để ra quyết định; không để mỗi ca hoặc mỗi cell dùng một cách hiểu khác nhau.</p>
@@ -97,14 +97,14 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Đóng băng ngày</td><td>Kế hoạch ngày cho trung tâm gia công/cell</td><td>P0, nút thắt / điểm nghẽn khôi phục / thu hồi, outsource quá hạn, khách hàng đặc biệt phê duyệt</td><td>Quyết định hồ sơ trong tier cuộc họp / log hành động</td></tr>
 <tr><td>Đóng băng tuần</td><td>Kế hoạch chuẩn để bảo vệ thời gian dẫn (lead time) và vật tư/nguồn lực đã khóa</td><td>Chỉ L2 hoặc quyết định nhà máy-level</td><td>Biên bản công suất rà soát hoặc quyết định điều hành</td></tr>
 </tbody></table></div>
-<div class="callout-warn"><strong>Rule sắp xếp lại</strong><br/>Được phép sắp xếp lại chỉ khi job phía trước chưa vào setup/cycle hoặc khi việc đổi lịch làm giảm tổng rủi ro trễ giao. Không được sắp xếp lại nếu làm đứt chuỗi của nguyên vật liệu đặt trước, khách hàng kit, thuê ngoài trả lại, clean-pack cửa sổ / khung thời gian hoặc mẫu đầu (đầu tiên chi tiết / sản phẩm) plan mà chưa xử lý hệ quả.</div>
+<div class="callout-warn"><strong>Rule sắp xếp lại</strong><br/>Được phép sắp xếp lại chỉ khi job phía trước chưa vào setup/cycle hoặc khi việc đổi lịch làm giảm tổng rủi ro trễ giao. Không được sắp xếp lại nếu làm đứt chuỗi của nguyên vật liệu đặt trước, khách hàng kit, thuê ngoài trả lại, clean-pack cửa sổ / khung thời gian hoặc mẫu đầu (tiên chi tiết / sản phẩm) plan mà chưa xử lý hệ quả.</div>
 </div>
 
 <div class="section"><h2>4. Mô hình năng lực hữu dụng</h2>
 <p>Năng lực dùng để điều phối xuất hàng không phải là công suất lý thuyết của máy. Planner phải tính <b>năng lực hữu dụng</b> theo công thức sau: <span class="code">Khả dụng giờ – đã lên kế hoạch thời gian ngừng máy – PM / hiệu chuẩn hold – cuộc họp / bàn giao dự trữ / dự phòng – setup dự trữ / dự phòng – bất thường dự trữ / dự phòng = có thể điều phối giờ</span>. Khi nhóm máy (machine nhóm sản phẩm) có OEE lịch sử đủ tin cậy, Planner được dùng hệ số hiệu lực; nếu không có dữ liệu đủ sạch, phải dùng mức thận trọng hơn thay vì vẽ năng lực đẹp.</p>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thành phần</th><th>Cách hiểu bắt buộc</th><th>Ghi chú vận hành</th></tr></thead><tbody>
 <tr><td>Khả dụng giờ</td><td>Giờ máy thực sự mở cho sản xuất theo lịch đã duyệt</td><td>Không tính cả thời gian PM, đào tạo, đánh giá, hoặc dòng / chuyền stop đã biết trước.</td></tr>
-<tr><td>Setup dự trữ / dự phòng</td><td>Phần thời gian dành cho chuyển đổi (chuyển đổi (changeover))/chứng minh-out/mẫu đầu</td><td>Không được coi setup là “chạy sản lượng”. Chủng loại cao (cao-mix) cell phải giữ dự trữ / dự phòng cao hơn cell lặp.</td></tr>
+<tr><td>Setup dự trữ / dự phòng</td><td>Phần thời gian dành cho chuyển đổi ((changeover))/chứng minh-out/mẫu đầu</td><td>Không được coi setup là “chạy sản lượng”. Chủng loại cao (cao-mix) cell phải giữ dự trữ / dự phòng cao hơn cell lặp.</td></tr>
 <tr><td>bất thường dự trữ / dự phòng</td><td>Biên độ để hấp thụ lỗi nhỏ, khôi phục / thu hồi, tool thay đổi, nhỏ / không nghiêm trọng ngừng máy</td><td>nút thắt / điểm nghẽn cell phải có dự trữ / dự phòng rõ; không được load 100% rồi mong phân xưởng tự xoay.</td></tr>
 <tr><td>có thể điều phối giờ</td><td>Giờ thật sự có thể xếp job</td><td>Dùng để so với trong hàng đợi standard giờ khi quyết định mở thêm việc.</td></tr>
 </tbody></table></div>
@@ -188,13 +188,13 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td><a href="../01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation chuỗi và SLA xử lý.</td></tr>
 <tr><td><a href="annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Nhịp độ họp tầng và log hành động.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Khung thủ tục lập kế hoạch/lập lịch/điều phối xuất hàng.</td></tr>
-<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx"  download="">FRM-502</a></td><td>Điều phối list hằng ca/ngày.</td></tr>
-<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx"  download="">FRM-503</a></td><td>Ảnh chụp trạng thái tuổi tồn WIP (tuổi tồn / tuổi tồn) và hành động.</td></tr>
+<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx" download="">FRM-502</a></td><td>Điều phối list hằng ca/ngày.</td></tr>
+<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx" download="">FRM-503</a></td><td>Ảnh chụp trạng thái tuổi tồn WIP (tuổi tồn / tuổi tồn) và hành động.</td></tr>
 </tbody></table></div>
 </div>
 
-    </div>
-  </div>
+ </div>
+ </div>
 </div>
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>

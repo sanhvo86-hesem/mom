@@ -26,28 +26,28 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>TRN-OPS-08 — Cấu hình & Phiên bản Control for CNC (Sai-Rev Phòng ngừa)</strong>
-  <span class="sub-vn"></span>
+ <strong>TRN-OPS-08 — Cấu hình & Phiên bản Control for CNC (Sai-Rev Phòng ngừa)</strong>
+ <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>TRN-OPS-08</span></div>
-  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Code:</b></span><span>TRN-OPS-08</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
 
  <div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Operations</b>.
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Operations</b>.
 </div>
 <div class="card">
  <div class="grid-2">
@@ -57,7 +57,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <p class="muted">
  Mục tiêu: giảm “sai phiên bản / sai program” về <b>0</b> bằng 3 lớp kiểm soát:
  <b>(1) Bộ hồ sơ chuẩn (mốc chuẩn gói hàng)</b> (đúng file, đúng Rev),
- <b>(2) Cổng kiểm soát (gate) kiểm tra</b> (Kế hoạch phát hành → Job khởi động → Mẫu đầu (đầu tiên chi tiết / sản phẩm)),
+ <b>(2) Cổng kiểm soát (gate) kiểm tra</b> (Kế hoạch phát hành → Job khởi động → Mẫu đầu (tiên chi tiết / sản phẩm)),
  <b>(3) Cấu hình đánh giá</b> (đối chiếu as‑đã xây dựng ↔ Requests).
  </p>
  </div>
@@ -97,7 +97,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <tr><td><b>Đăng / Ghi sổ / Machine</b></td><td>Chạy nhầm ghi sổ / đăng, nhầm machine cấu hình</td><td>Phát hành chương trình (program phát hành) control (PROC‑CNC‑002)</td></tr>
  <tr><td><b>Setup sheet</b></td><td>Setup sheet không cập nhật rev</td><td>Setup sheet phát hành &amp; rà soát đồng cấp</td></tr>
  <tr><td><b>On-machine program</b></td><td>Operator dùng program cũ lưu trên máy</td><td>Chỉ chạy program từ vị trí kiểm soát; xác minh ID/Rev</td></tr>
- <tr><td><b>CMM program</b></td><td>Chương trình đo không khớp drawing rev</td><td>Phát hành chương trình kiểm tra (kiểm tra phát hành chương trình) <a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM‑QA‑016</a></td></tr>
+ <tr><td><b>CMM program</b></td><td>Chương trình đo không khớp drawing rev</td><td>Phát hành chương trình kiểm tra (phát hành chương trình) <a download="" href="../../../04-Bieu-Mau/03-FRM-300/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM‑QA‑016</a></td></tr>
  <tr><td><b>As-đã xây dựng hồ sơ</b></td><td>Bộ hồ sơ giao hàng (ship gói hồ sơ) thiếu chứng chỉ outsource đúng scope</td><td>cấu hình đánh giá <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a> + cổng kiểm soát G6</td></tr>
  </tbody>
  </table>
@@ -144,7 +144,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <li>Bộ hồ sơ chuẩn có bảng kê/tổng kiểm tra và đúng Part/Rev?</li>
  <li>Setup sheet hiển thị Program ID/Rev/Tool list/không / bằng không điểm?</li>
  <li>Chương trình trên máy = program phát hành (ID/Rev)?</li>
- <li>kế hoạch kiểm tra (kiểm tra plan) có CTQ phương pháp + gage “xanh lá”?</li>
+ <li>kế hoạch kiểm tra (plan) có CTQ phương pháp + gage “xanh lá”?</li>
  <li>Nếu dùng CMM: FRM‑QA‑016 pass và báo cáo đo có Program ID/Rev?</li>
  <li>Nếu outsource: APL/scope/cert truy vết đầy đủ?</li>
  <li>Traveler/nhãn phản ánh đúng Rev &amp; truy vết lot?</li>
@@ -188,7 +188,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="card" id="records">
  <h2>7) Hồ sơ bắt buộc</h2>
  <ul class="list">
- <li><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-802_Attendance_List.xlsx">FRM‑HR‑TRN‑002 Chuyên cần List</a></li>
+ <li><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-802_Attendance_List.xlsx">FRM‑HR‑TRN‑002 Chuyên cần List</a></li>
  <li>Bài kiểm tra nhanh + kết quả (FRM‑HR‑TRN‑009)</li>
  <li>Phân xưởng đầu ra: 01 bản FRM‑QA‑017 đã điền (job mẫu) + hành động list</li>
  </ul>

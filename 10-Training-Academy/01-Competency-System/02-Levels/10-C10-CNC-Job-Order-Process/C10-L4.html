@@ -16,22 +16,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>C10-L4 — Quy trình Lệnh sản xuất CNC (RFQ → Tiền mặt) — Chuyên gia | HESEM Academy</strong>
-  <span class="sub-vn"></span>
+ <strong>C10-L4 — Quy trình Lệnh sản xuất CNC (RFQ → Tiền mặt) — Chuyên gia | HESEM Academy</strong>
+ <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>C10-L4</span></div>
-  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Code:</b></span><span>C10-L4</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent"><h1>C10 — Hiểu quy trình Lệnh sản xuất CNC (RFQ → Cash) — Level 4</h1>
@@ -50,7 +50,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <p class="small-note">Nguyên tắc vận hành: không nhảy cổng kiểm soát, không dùng file rời làm nguồn, không giao hàng khi thiếu bộ hồ sơ giao hàng (ship gói hồ sơ).</p>
 </div><div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>tại G0→G7 — CNC Job Order Process (trọng tâm vòng đời đơn hàng)</b>.
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>tại G0→G7 — CNC Job Order Process (trọng tâm vòng đời đơn hàng)</b>.
 </div>
 <div class="card">
 <span class="badge">Bộ diễn tập (Job CNC)</span>
@@ -81,7 +81,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>KPI System</strong><p>Thiết kế KPI pack: OTD, thời gian dẫn (lead time), FPY, COPQ, AR ngày.</p></div></div>
 <div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Đánh giá System</strong><p>Thiết kế đánh giá plan: LPA, đánh giá nội bộ, khách hàng đánh giá mức sẵn sàng.</p></div></div>
 <div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Supplier System</strong><p>Thiết kế nhà cung cấp quản lý và outsource control end-to-end.</p></div></div>
-<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>mở rộng quy mô</strong><p>Chuẩn hóa ma trận đào tạo (đào tạo matrix), hội nhập nhân sự mới, kèm cặp phát triển (huấn luyện) và năng lực 19×4.</p></div></div>
+<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>mở rộng quy mô</strong><p>Chuẩn hóa ma trận đào tạo (matrix), hội nhập nhân sự mới, kèm cặp phát triển (huấn luyện) và năng lực 19×4.</p></div></div>
 </div>
 <h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
 <ol><li>Không có Quy trình Owner; trách nhiệm mờ dẫn tới cổng kiểm soát bị bỏ qua.</li><li>Không cưỡng chế SSOT; tài liệu rải rác; dấu vết kiểm toán không tồn tại.</li><li>KPI không có định nghĩa nguồn dữ liệu; tranh cãi số; quyết định sai.</li><li>Cổng kiểm soát không có mục nhập/thoát / ra tiêu chí; mỗi người hiểu một kiểu.</li><li>Không có đánh giá plan; phát hiện lỗi muộn qua khiếu nại / Requests bồi thường khách.</li><li>Supplier thay đổi không qua kiểm soát; chất lượng dao động mạnh.</li><li>Training không bám job thực tế; người học không vận hành được hệ thống.</li><li>Hệ thống không có phản ứng plan khi KPI lệch; chỉ báo cáo mà không hành động.</li><li>ERP giao dịch không chuẩn; dữ liệu lập kế hoạch/finance lệch.</li><li>Không có bài học kinh nghiệm; lỗi lặp trở lại.</li></ol>
@@ -119,7 +119,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody></table></div>
 <h2>10) Đánh giá</h2>
 <h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
-<div class="quiz"><ol><li>Cổng kiểm soát điều lệ / quy chế tối thiểu gồm những phần nào?</li><li>SSOT khác SoR và cách cưỡng chế SSOT trong tổ chức?</li><li>KPI từ điển cần chốt những trường nào để không tranh cãi số?</li><li>OTD đo theo cổng kiểm soát mang lại lợi ích gì?</li><li>COPQ gồm những thành phần nào trong CNC phân xưởng gia công theo đơn?</li><li>AR ngày ảnh hưởng gì đến RFQ→Tiền mặt?</li><li>Đánh giá plan cần phủ những rủi ro nào trước khách hàng đánh giá?</li><li>LPA khác đánh giá nội bộ ở mục tiêu gì?</li><li>Supplier quản trị cho outsource cần chỉ số nào?</li><li>Thay đổi nhà cung cấp cần đi qua hệ thống nào?</li><li>ma trận đào tạo (đào tạo matrix) 19×4 gắn với cổng kiểm soát như thế nào?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) được biến thành cưỡng chế bằng cách nào?</li><li>Khi KPI lệch mục tiêu, phản ứng plan chuẩn gồm gì?</li><li>Vai trò Quy trình Owner trong RFQ→Tiền mặt là gì?</li><li>Cách thiết kế nhịp độ / chu kỳ họp rà soát để không thành họp báo cáo.</li><li>Định nghĩa thời gian dẫn end-to-end trong phân xưởng gia công theo đơn.</li><li>Cách kiểm soát phiên bản set ở cấp hệ thống.</li><li>Cách đảm bảo bộ hồ sơ giao hàng luôn đầy đủ trước ship.</li><li>Cách quản trị bài học kinh nghiệm và cập nhật standard.</li><li>Khi quy mô / thang đo lên 2x sản lượng, rủi ro hệ thống tăng ở đâu?</li><li>Điều kiện để phê duyệt thay đổi quy trình/cổng kiểm soát.</li><li>Bộ bằng chứng tối thiểu cho khách hàng đánh giá về RFQ→Tiền mặt.</li></ol></div>
+<div class="quiz"><ol><li>Cổng kiểm soát điều lệ / quy chế tối thiểu gồm những phần nào?</li><li>SSOT khác SoR và cách cưỡng chế SSOT trong tổ chức?</li><li>KPI từ điển cần chốt những trường nào để không tranh cãi số?</li><li>OTD đo theo cổng kiểm soát mang lại lợi ích gì?</li><li>COPQ gồm những thành phần nào trong CNC phân xưởng gia công theo đơn?</li><li>AR ngày ảnh hưởng gì đến RFQ→Tiền mặt?</li><li>Đánh giá plan cần phủ những rủi ro nào trước khách hàng đánh giá?</li><li>LPA khác đánh giá nội bộ ở mục tiêu gì?</li><li>Supplier quản trị cho outsource cần chỉ số nào?</li><li>Thay đổi nhà cung cấp cần đi qua hệ thống nào?</li><li>ma trận đào tạo (matrix) 19×4 gắn với cổng kiểm soát như thế nào?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) được biến thành cưỡng chế bằng cách nào?</li><li>Khi KPI lệch mục tiêu, phản ứng plan chuẩn gồm gì?</li><li>Vai trò Quy trình Owner trong RFQ→Tiền mặt là gì?</li><li>Cách thiết kế nhịp độ / chu kỳ họp rà soát để không thành họp báo cáo.</li><li>Định nghĩa thời gian dẫn end-to-end trong phân xưởng gia công theo đơn.</li><li>Cách kiểm soát phiên bản set ở cấp hệ thống.</li><li>Cách đảm bảo bộ hồ sơ giao hàng luôn đầy đủ trước ship.</li><li>Cách quản trị bài học kinh nghiệm và cập nhật standard.</li><li>Khi quy mô / thang đo lên 2x sản lượng, rủi ro hệ thống tăng ở đâu?</li><li>Điều kiện để phê duyệt thay đổi quy trình/cổng kiểm soát.</li><li>Bộ bằng chứng tối thiểu cho khách hàng đánh giá về RFQ→Tiền mặt.</li></ol></div>
 <h3>Tình huống (≥ 3 tình huống thật)</h3>
 <details>
 <summary>Customer đánh giá đột xuất Requests bộ bằng chứng của 5 job trong 2 giờ</summary>
@@ -132,7 +132,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <summary>Triển khai ERP luồng công việc mới làm lập kế hoạch dữ liệu lệch 2 tuần</summary>
 <div class="grid">
 <div class="dl"><h4>Dữ kiện</h4><ul><li>ERP trạng thái không phản ánh hiện trường</li><li>Điều phối sai ưu tiên, trễ hàng</li><li>Người dùng phản hồi khác nhau</li></ul></div>
-<div class="dl"><h4>Yêu cầu</h4><p><strong>Cách xử lý theo quản trị RFQ→Tiền mặt.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Kích hoạt sự cố; khóa thay đổi; hoàn tác / quay lại hoặc bản vá nóng (bản vá nóng (hotfix)) theo IT kiểm soát thay đổi.</li><li>Chốt SoR và dữ liệu chuẩn; chạy đối soát và sửa dữ liệu có dấu vết kiểm toán.</li><li>Huấn luyện lại vận hành giao dịch; cập nhật WI và đào tạo hồ sơ.</li><li>Đưa vào xem xét của lãnh đạo và đánh giá lại sau 30 ngày.</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Cách xử lý theo quản trị RFQ→Tiền mặt.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Kích hoạt sự cố; khóa thay đổi; hoàn tác / quay lại hoặc bản vá nóng ((hotfix)) theo IT kiểm soát thay đổi.</li><li>Chốt SoR và dữ liệu chuẩn; chạy đối soát và sửa dữ liệu có dấu vết kiểm toán.</li><li>Huấn luyện lại vận hành giao dịch; cập nhật WI và đào tạo hồ sơ.</li><li>Đưa vào xem xét của lãnh đạo và đánh giá lại sau 30 ngày.</li></ul></div>
 </div>
 </details>
 <details>
@@ -166,14 +166,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>12) MRR tối thiểu (hồ sơ bắt buộc + đặt tên + nơi lưu)</h2>
 <p><strong>Quy tắc đặt tên:</strong> <span class="mono">JobNum_PartNo_REV_DocType_YYYYMMDD_##.ext (chỉ A–Z,0–9, '-', '_'; không dùng dấu cách).</span></p>
 <ul>
-<li>Cổng kiểm soát điều lệ / quy chế G0–G7 + RACI.</li><li>Chỉ số từ điển + data source map.</li><li>Nhịp độ lịch + xem xét của lãnh đạo biên bản họp.</li><li>Đánh giá plan + LPA bảng kiểm + đánh giá nội bộ báo cáo.</li><li>Supplier system pack: thẻ điểm + đánh giá + kiểm soát thay đổi hồ sơ.</li><li>ma trận đào tạo (đào tạo matrix) 19×4 + OJT bằng chứng gói.</li><li>Bộ bằng chứng bảng kiểm cho khách hàng đánh giá.</li>
+<li>Cổng kiểm soát điều lệ / quy chế G0–G7 + RACI.</li><li>Chỉ số từ điển + data source map.</li><li>Nhịp độ lịch + xem xét của lãnh đạo biên bản họp.</li><li>Đánh giá plan + LPA bảng kiểm + đánh giá nội bộ báo cáo.</li><li>Supplier system pack: thẻ điểm + đánh giá + kiểm soát thay đổi hồ sơ.</li><li>ma trận đào tạo (matrix) 19×4 + OJT bằng chứng gói.</li><li>Bộ bằng chứng bảng kiểm cho khách hàng đánh giá.</li>
 </ul>
 <div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → <span class="mono">Job-Hồ sơ</span>.</div>
 <h2>13) Chung đánh giá phát hiện &amp; phòng ngừa</h2>
 <ol>
 <li>Thiếu bằng chứng cổng kiểm soát (rà soát hợp đồng /khởi động/mốc chuẩn/FAI/final/bộ hồ sơ giao hàng bộ hồ sơ giao hàng / rà soát hợp đồng).</li>
 <li>Phiên bản set không được khóa; dùng file rời; tồn tại nhiều bản.</li>
-<li>Traveler/kế hoạch kiểm tra (kiểm tra plan) không đồng bộ CTQ và điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm chặn))))))))))))))))))))).</li>
+<li>Traveler/kế hoạch kiểm tra (plan) không đồng bộ CTQ và điểm giữ ((điểm giữ ((điểm giữ ((điểm giữ ((điểm giữ ((điểm giữ ((điểm giữ ((điểm giữ ((điểm giữ ((điểm giữ ((điểm giữ (điểm chặn))))))))))))))))))))).</li>
 <li>Outsource hoàn thiện bề mặt thiếu cert hoặc spec không khớp nhưng vẫn phát hành.</li>
 <li>WIP trạng thái lệch hiện trường; điều phối xuất hàng sai ưu tiên.</li>
 <li>Escal log không có hoặc không đóng; rủi ro OTD không nhìn thấy.</li>

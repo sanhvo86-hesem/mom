@@ -17,22 +17,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-21 — External nhà cung cấp dịch vụ &amp; thuê ngoài Control: Luồng-xuống / ngừng, QC Cổng kiểm soát, Thẻ điểm</strong>
-  <span class="sub-vn"></span>
+ <strong>SYS-OPS-21 — External nhà cung cấp dịch vụ &amp; thuê ngoài Control: Luồng-xuống / ngừng, QC Cổng kiểm soát, Thẻ điểm</strong>
+ <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-21</span></div>
-  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Code:</b></span><span>SYS-OPS-21</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -57,7 +57,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h2 class="h2">2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
 </div>
 <div class="card">
 <p><b>Mục đích:</b> Chặn rủi ro “ship sai/ship lỗi” phát sinh từ NCC và thuê ngoài; bảo toàn truy xuất nguồn gốc; khóa vượt qua cổng kiểm soát; đảm bảo chứng từ hợp lệ; tạo bằng chứng sẵn sàng đánh giá theo ISO 9001 điều khoản 8.4 &amp; 7.5.</p>
@@ -65,7 +65,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Khi tạo NCC mới, thay đổi NCC, thay đổi sub‑tier hoặc thay đổi công đoạn/tiêu chuẩn.</li>
 <li>Khi phát hành PO/Job Pack cho NCC (mua hàng hoặc thuê ngoài).</li>
-<li>Khi gửi hàng đi thuê ngoài (đặc biệt xi mạ anốt (xi mạ anốt (anodize))/mạ/mẻ nấu (mẻ nấu (heat)) xử lý/EDM/lớp phủ / mạ…).</li>
+<li>Khi gửi hàng đi thuê ngoài (đặc biệt xi mạ anốt ((anodize))/mạ/mẻ nấu ((heat)) xử lý/EDM/lớp phủ / mạ…).</li>
 <li>Khi nhận hàng về từ NCC và trước khi phát hành sang công đoạn tiếp theo / đóng gói / ship.</li>
 <li>Khi KPI NCC vượt ngưỡng cảnh báo hoặc phát sinh NCR/SCAR liên quan NCC.</li>
 </ul>
@@ -75,7 +75,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>QA/QC</b>: xác nhận CTQ/KPC; định nghĩa phương pháp kiểm; vận hành cổng kiểm soát kiểm tra nhận về FRM-QA-005; quyết định TẠM GIỮ/TỪ CHỐI khi chứng từ/đo lường không đạt.</li>
 <li><b>Kho</b>: kiểm đếm – đóng gói – nhãn lot/số sê-ri; vận hành điều phối xuất hàng bảng kiểm FRM-PUR-004; cách ly lô TẠM GIỮ.</li>
 <li><b>Planner/Supervisor</b>: khóa lịch, bộ đệm / vùng đệm thời gian dẫn (lead time); không cho chạy “tắt” khi cổng kiểm soát chưa PASS.</li>
-<li><b>Kỹ thuật/Lập trình viên (CNC)/Setup/Operator</b>: xác định Requests kỹ thuật/hoàn thành/che phủ (che phủ (masking)); bảo vệ bề mặt; cung cấp thông tin kỹ thuật đúng phiên bản cho Mua hàng.</li>
+<li><b>Kỹ thuật/Lập trình viên (CNC)/Setup/Operator</b>: xác định Requests kỹ thuật/hoàn thành/che phủ ((masking)); bảo vệ bề mặt; cung cấp thông tin kỹ thuật đúng phiên bản cho Mua hàng.</li>
 <li><b>Người định giá (SAL-03)</b>: khóa Requests khách hàng/hợp đồng; xác nhận Requests chứng chỉ; phát tín hiệu thay đổi.</li>
 </ul>
 </div>
@@ -126,10 +126,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <ol>
 <li>PO/Job Pack ghi sai Rev hoặc ghi “mới nhất” làm NCC gia công sai phiên bản.</li>
-<li>Luồng‑xuống / ngừng thiếu Requests che phủ (che phủ (masking))/hoàn thành/bề mặt; NCC xử lý thiếu hoặc xử lý nhầm vùng CTQ.</li>
+<li>Luồng‑xuống / ngừng thiếu Requests che phủ ((masking))/hoàn thành/bề mặt; NCC xử lý thiếu hoặc xử lý nhầm vùng CTQ.</li>
 <li>NCC thay đổi sub‑tier hoặc thay đổi quy trình/nguyên vật liệu mà không có phê duyệt trước.</li>
 <li>Part bị lẫn lô (lẫn lộn (mix-up)) khi gửi đi hoặc khi nhận về; nhãn lot/số sê-ri không khớp.</li>
-<li>Thiếu chứng chỉ bắt buộc (CoC/CoA/mẻ nấu (mẻ nấu (heat)) xử lý/mạ cert) hoặc chứng chỉ không khớp PO/Rev.</li>
+<li>Thiếu chứng chỉ bắt buộc (CoC/CoA/mẻ nấu ((heat)) xử lý/mạ cert) hoặc chứng chỉ không khớp PO/Rev.</li>
 <li>Không đo CTQ bị ảnh hưởng bởi hoàn thiện bề mặt (độ dày/độ cứng/kích thước trôi / sai lệch) trước khi phát hành.</li>
 <li>Đóng gói không bảo vệ bề mặt sau hoàn thiện bề mặt; trầy xước làm phát sinh phế phẩm/làm lại.</li>
 <li>Bỏ qua cổng kiểm soát nhận về do áp lực tiến độ; hàng đi thẳng vào sản xuất/giao hàng khi chưa PASS.</li>
@@ -145,7 +145,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Kiểm soát theo rủi ro: công đoạn càng đặc biệt/sai càng khó phát hiện → cổng kiểm soát càng cứng.</li>
 <li>Evidence đi trước quyết định: mọi “GO/PHÁT HÀNH” phải có file/chữ ký/hồ sơ.</li>
-<li>Truy xuất nguồn gốc xuyên suốt: lot/số sê-ri/mẻ nấu (mẻ nấu (heat)) phải nối từ gửi đi → nhận về → ship.</li>
+<li>Truy xuất nguồn gốc xuyên suốt: lot/số sê-ri/mẻ nấu ((heat)) phải nối từ gửi đi → nhận về → ship.</li>
 </ul>
 </div>
 <table class="form-table">
@@ -260,7 +260,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2">8) Bảng kiểm vận hành (≤15 bước) — Responsible Person + Evidence/MRR + lỗi lặp lại</h2>
 <table class="form-table">
 <tr><th>#</th><th>Bước vận hành</th><th>Responsible Person</th><th>Evidence/MRR</th><th>Điểm lỗi lặp</th></tr>
-<tr><td>1</td><td>Xác định công đoạn thuê ngoài &amp; rủi ro (đặc biệt/quan trọng / nghiêm trọng)</td><td>Kỹ thuật + QA</td><td>CTQ list / note trên job pack</td><td>Không ghi rõ vùng CTQ hoặc Requests che phủ (che phủ (masking))</td></tr>
+<tr><td>1</td><td>Xác định công đoạn thuê ngoài &amp; rủi ro (đặc biệt/quan trọng / nghiêm trọng)</td><td>Kỹ thuật + QA</td><td>CTQ list / note trên job pack</td><td>Không ghi rõ vùng CTQ hoặc Requests che phủ ((masking))</td></tr>
 <tr><td>2</td><td>Chọn NCC từ ASL/AVL; khóa sub‑tier</td><td>Mua hàng</td><td>ASL/AVL mục nhập + FRM-PUR-002</td><td>Dùng NCC “quen” nhưng chưa phê duyệt</td></tr>
 <tr><td>3</td><td>Hoàn tất FRM-PUR-003 (Requests kỹ thuật + điều kiện chất lượng)</td><td>Mua hàng + QA</td><td>FRM-PUR-003 ký</td><td>Thiếu spec/độ dày/màu/tiêu chuẩn</td></tr>
 <tr><td>4</td><td>Phát hành PO/Job Pack có luồng‑xuống / ngừng đầy đủ</td><td>Mua hàng</td><td>PO/Job Pack file</td><td>Ghi “mới nhất”; thiếu chứng chỉ</td></tr>
@@ -281,7 +281,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><th>Step</th><th>Điểm then chốt</th><th>Lý do (lý do)</th></tr>
 <tr><td>1</td><td>Khóa đúng Rev + spec + CTQ trước khi điền biểu mẫu</td><td>Chặn sai Rev ngay từ nguồn</td></tr>
 <tr><td>2</td><td>Chọn đúng NCC đã phê duyệt; khóa sub‑tier</td><td>Giảm rủi ro “không kiểm soát được”</td></tr>
-<tr><td>3</td><td>Điền FRM-PUR-003 đủ spec/che phủ (che phủ (masking))/cert/truy xuất nguồn gốc</td><td>NCC nhận 1 Requests rõ, đo được</td></tr>
+<tr><td>3</td><td>Điền FRM-PUR-003 đủ spec/che phủ ((masking))/cert/truy xuất nguồn gốc</td><td>NCC nhận 1 Requests rõ, đo được</td></tr>
 <tr><td>4</td><td>PO/Job Pack phải phản chiếu y hệt FRM-PUR-003</td><td>Tránh mâu thuẫn tài liệu</td></tr>
 <tr><td>5</td><td>Trước khi gửi: chụp ảnh hiện trạng + nhãn lot/số sê-ri</td><td>Chặn tranh chấp và lẫn lộn</td></tr>
 <tr><td>6</td><td>Nhận về: giữ tại Nhận hàng cho tới khi cert + FRM-QA-005 PASS</td><td>Chặn vượt qua cổng kiểm soát</td></tr>
@@ -376,7 +376,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Part No/Drawing No/Rev; spec; phạm vi công việc; CTQ; chứng chỉ; truy xuất nguồn gốc; thay đổi; đóng gói/vận chuyển.</li>
 <li>CHẶN phát hành PO; cập nhật Rev cụ thể; phát hành lại.</li>
 <li>FRM-PUR-004 + ảnh hiện trạng/nhãn lot/số sê-ri.</li>
-<li>Khớp PO; khớp Rev/spec; khớp lot/số sê-ri/mẻ nấu (mẻ nấu (heat)) và Requests chứng chỉ.</li>
+<li>Khớp PO; khớp Rev/spec; khớp lot/số sê-ri/mẻ nấu ((heat)) và Requests chứng chỉ.</li>
 <li>TẠM GIỮ tại Nhận hàng; không phát hành.</li>
 <li>Nhãn lot/số sê-ri không nối được với cert/PO; không đối chiếu được từ gửi đi tới nhận về.</li>
 <li>Thông tin job/part + Requests kỹ thuật tối thiểu + điều kiện chất lượng + phê duyệt.</li>
@@ -401,7 +401,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <ol>
 <li><b>Tình huống 1 — Sai Rev trên cert:</b> Job J-2411, P/N ABC-123, Rev C. NCC gửi cert ghi Rev B. Hàng đã về kho, chưa kiểm. Bạn quyết định <b>TẠM GIỮ/GO</b> và liệt kê 04 MRR phải tạo ngay (tên file chuẩn).</li>
-<li><b>Tình huống 2 — Thiếu che phủ (che phủ (masking)) vùng CTQ:</b> FRM-PUR-003 không ghi che phủ (che phủ (masking)), NCC xi mạ anốt (xi mạ anốt (anodize)) phủ toàn bộ; vùng lắp ghép CTQ bị thay đổi kích thước. Bạn quyết định <b>TẠM GIỮ/TỪ CHỐI</b>, kích hoạt hồ sơ nào, và cập nhật thẻ điểm ra sao.</li>
+<li><b>Tình huống 2 — Thiếu che phủ ((masking)) vùng CTQ:</b> FRM-PUR-003 không ghi che phủ ((masking)), NCC xi mạ anốt ((anodize)) phủ toàn bộ; vùng lắp ghép CTQ bị thay đổi kích thước. Bạn quyết định <b>TẠM GIỮ/TỪ CHỐI</b>, kích hoạt hồ sơ nào, và cập nhật thẻ điểm ra sao.</li>
 <li><b>Tình huống 3 — Lẫn lộn lẫn lô:</b> 02 lô cùng P/N nhưng khác lot; NCC trả về 01 thùng không phân tách. Nhãn lot mờ. Bạn thực hiện phản ứng 60 giây và quyết định cổng kiểm soát. Nêu tiêu chí phát hành khi nào.</li>
 </ol>
 </div>
@@ -442,7 +442,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx">FRM-PUR-003</a> (Outsource Hoàn thiện Yêu cầu) + phê duyệt.</li>
 <li>PO/Job Pack có luồng‑xuống / ngừng (Rev/spec/CTQ/cert/truy xuất nguồn gốc/đóng gói).</li>
 <li><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-PUR-004</a> + ảnh hiện trạng + nhãn lot/số sê-ri + theo dõi.</li>
-<li>File chứng chỉ: CoC/CoA/mẻ nấu (mẻ nấu (heat)) xử lý/mạ cert… theo Requests.</li>
+<li>File chứng chỉ: CoC/CoA/mẻ nấu ((heat)) xử lý/mạ cert… theo Requests.</li>
 <li><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-QA-005</a> + hồ sơ đo/ngoại quan.</li>
 <li>Hồ sơ NCR/SCAR (khi NG hoặc vượt ngưỡng).</li>
 <li><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-405_Supplier_Scorecard.xlsx">FRM-PUR-005</a> + kế hoạch hành động.</li>
@@ -454,7 +454,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <p><b>Nơi lưu (bắt buộc):</b></p>
 <ul>
-<li>Hồ sơ công việc (hồ sơ công việc): <code>M365/SharePoint → HESEM-QMS-SSOT /Job-Hồ sơ/{mã lệnh sản xuất (mã lệnh sản xuất (JOBNO))}/Outsource/</code></li>
+<li>Hồ sơ công việc (hồ sơ công việc): <code>M365/SharePoint → HESEM-QMS-SSOT /Job-Hồ sơ/{mã lệnh sản xuất ((JOBNO))}/Outsource/</code></li>
 <li>Supplier chủ / gốc: <code>M365/SharePoint → HESEM-QMS-SSOT /Suppliers/{nhà cung cấp}/đánh giá năng lực/</code></li>
 <li>Thẻ điểm: <code>M365/SharePoint → HESEM-QMS-SSOT /Suppliers/{nhà cung cấp}/Thẻ điểm/{YYYY}/</code></li>
 </ul>

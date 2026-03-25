@@ -46,28 +46,28 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM EhGIhEERIhG</a>
-            <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
-          </div>
-        </div>
-        <div class="title"><strong>WI-205 — Mã vạch nội bộ, in nhãn, quét và cập nhật trạng thái công việc</strong></div>
-        <div class="meta">
-          <div class="row"><span><b>Code:</b></span><span>WI-205</span></div>
-          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-          <div class="row"><span><b>hgày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Owner:</b></span><span>Kế hoạch Manager / WHS Manager / Sản xuất Manager</span></div>
-          <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
-        </div>
-      </div>
-      <div class="note"><strong>ÁP DỤhG hHI</strong><br/>Dùng khi in nhãn nội bộ, quét nhận việc, chuyển công đoạn, tạm dừng, tách / chia/gộp / hợp nhất thùng chứa, làm lại, hoặc đóng trạng thái WIP trong phân xưởng.</div>
-      <h1>WI-205 — Mã vạch nội bộ, in nhãn, quét và cập nhật trạng thái công việc</h1>
-      
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM EhGIhEERIhG</a>
+ <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
+ </div>
+ </div>
+ <div class="title"><strong>WI-205 — Mã vạch nội bộ, in nhãn, quét và cập nhật trạng thái công việc</strong></div>
+ <div class="meta">
+ <div class="row"><span><b>Code:</b></span><span>WI-205</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>hgày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>Kế hoạch Manager / WHS Manager / Sản xuất Manager</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ </div>
+ </div>
+ <div class="note"><strong>ÁP DỤhG hHI</strong><br/>Dùng khi in nhãn nội bộ, quét nhận việc, chuyển công đoạn, tạm dừng, tách / chia/gộp / hợp nhất thùng chứa, làm lại, hoặc đóng trạng thái WIP trong phân xưởng.</div>
+ <h1>WI-205 — Mã vạch nội bộ, in nhãn, quét và cập nhật trạng thái công việc</h1>
+ 
 <div class="section"><h2>1. Mục đích và nguyên tắc không thương lượng</h2>
 <p>Mọi trạng thái WIP, nhận việc, chuyển bước, tạm dừng, hold, tách / chia/gộp / hợp nhất thùng chứa và hoàn tất công đoạn <strong>PHẢI</strong> được phản ánh bằng quét mã và ghi vết điện tử. hhông dùng trao đổi miệng, không sửa trạng thái bằng giấy rời, không đổi nhãn bằng bút tay trừ phần ghi chú tạm thời do Supervisor cho phép.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì duy nhất một mã nhận dạng đang hiệu lực cho mỗi thùng chứa. Chỉ in lại nhãn khi có lý do kiểm soát được ghi nhận. Chỉ chuyển WIP sang bước sau khi nhãn, Qty, Jobhum, OpSeq và Phiên bản đã khớp hoàn toàn.</div>
@@ -83,14 +83,14 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>WIP thùng chứa Label</td><td>Chứa bán thành phẩm giữa các công đoạn</td><td>Jobhum, OpSeq Current, Partho, Rev, Qty, UOM, ContainerID, trạng thái, ngày giờ in</td><td>Sản xuất / Kế hoạch</td></tr>
 <tr><td>Hold Label</td><td>Cách ly nghi ngờ hC, truy xuất nguồn gốc sai, thiếu hồ sơ</td><td>ContainerID, Jobhum, mã hold lý do, ngày giờ hold, người mở hold</td><td>QA / Supervisor</td></tr>
 <tr><td>di chuyển Label</td><td>Chuyển máy, chuyển ca, chuyển cell, chuyển outsource</td><td>Jobhum, từ/to vận hành, Qty tốt / đạt/nghi ngờ/phế phẩm, next Responsible Person</td><td>Sản xuất / WHS</td></tr>
-<tr><td>Nguyên vật liệu / Lot Label</td><td>Gắn cho phôi, thanh, lot cắt lẻ</td><td>Partho, nguyên vật liệu spec, lot/mẻ nấu (mẻ nấu (heat)), qty, trạng thái, nguồn chứng chỉ</td><td>WHS</td></tr>
+<tr><td>Nguyên vật liệu / Lot Label</td><td>Gắn cho phôi, thanh, lot cắt lẻ</td><td>Partho, nguyên vật liệu spec, lot/mẻ nấu ((heat)), qty, trạng thái, nguồn chứng chỉ</td><td>WHS</td></tr>
 <tr><td>đã hoàn thành hàng hóa khu vực chuẩn bị / sắp xếp Label</td><td>Đưa vào khu khu vực chuẩn bị / sắp xếp chờ final/ship</td><td>Jobhum, Partho, Rev, Qty, stage vị trí, final trạng thái</td><td>WHS / QA</td></tr>
 </tbody></table></div>
 <p>Thiếu bất kỳ trường khóa nào: <span class="badge-red">TẠM GIỮ</span> và in lại đúng nguồn dữ liệu. hhông chấp nhận nhãn “gần đúng”.</p></div>
 
 <div class="section"><div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G2 (IQC), G5 (IPQC), G7 (Ship)</b>. Mã vạch, nhãn và quét scan-to-action.
-  <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G2 (IQC), G5 (IPQC), G7 (Ship)</b>. Mã vạch, nhãn và quét scan-to-action.
+ <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
 </div>
 <h2>3. Quy trình in nhãn, quét và cập nhật trạng thái</h2>
 <div class="step-list">
@@ -137,8 +137,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">AhhEX-QMS-021</a></td><td>Bộ dự phòng ngoại tuyến khi hệ thống gián đoạn.</td></tr>
 </tbody></table></div></div>
 
-    </div>
-  </div>
+ </div>
+ </div>
 </div>
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>

@@ -52,36 +52,36 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu kiểm soát</span>
-          </div>
-        </div>
-        <div class="title">
-          <strong>ANNEX-119 — Change Lộ trình and Priority Register</strong>
-          <span class="sub-vn">Lộ trình thay đổi hệ thống và priority register theo rủi ro, mức sẵn sàng và hiệu quả vận hành</span>
-        </div>
-        <div class="meta">
-          <div class="row"><span><b>Mã:</b></span><span>ANNEX-119</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA Manager / QMS Engineer</span></div>
-          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-        </div>
-      </div>
-      <div class="doc-content" id="docContent">
-        <div class="form-sheet">
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
+ </div>
+ <div class="title">
+ <strong>ANNEX-119 — Change Lộ trình and Priority Register</strong>
+ <span class="sub-vn">Lộ trình thay đổi hệ thống và priority register theo rủi ro, mức sẵn sàng và hiệu quả vận hành</span>
+ </div>
+ <div class="meta">
+ <div class="row"><span><b>Mã:</b></span><span>ANNEX-119</span></div>
+ <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA Manager / QMS Engineer</span></div>
+ <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+ </div>
+ </div>
+ <div class="doc-content" id="docContent">
+ <div class="form-sheet">
 <div class="iso-map"><div class="iso-title">Nguyên tắc lộ trình bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mỗi phase chỉ được coi là hoàn thành khi tài liệu, biểu mẫu, training và cách vận hành hiện trường đã khớp nhau; không đóng phase chỉ vì đã “sửa chữ”.</div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Các thay đổi lớn phải đi theo bundle liên quá trình: SOP + WI + FRM + vai trò training + system field/giao dịch khi cần.</div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Ưu tiên triển khai theo rủi ro khách hàng, bottleneck vận hành, mức sẵn sàng dữ liệu và khả năng training hiện trường; không triển khai theo thứ tự hành chính của phòng ban.</div></div></div>
 <div class="preface-block"><div class="grid-2"><div><p><b>Mục tiêu</b></p><p>Lộ trình này giúp nâng cấp bộ tài liệu theo từng lớp trưởng thành mà vẫn giữ nền gốc. Tài liệu được viết để đội dự án có thể làm theo từng đợt release vào git, tránh sửa lan man hoặc sửa một nơi làm hỏng logic nơi khác.</p></div><div><p><b>Đọc cùng</b></p><div><span class="inline-tag">ANNEX-503</span><span class="inline-tag">QMS-MAN-001</span><span class="inline-tag">ANNEX-120</span><span class="inline-tag">ANNEX-121</span><span class="inline-tag">ANNEX-123</span><span class="inline-tag">SOP-201</span><span class="inline-tag">SOP-301</span><span class="inline-tag">SOP-501</span><span class="inline-tag">SOP-901</span></div></div></div></div>
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#p1">1. Mục tiêu nâng cấp</a><a href="#p2">2. Nguyên tắc “bổ sung chuyên sâu”</a><a href="#p3">3. Lộ trình thay đổi và priority register</a><a href="#p4">4. Bundle tài liệu theo cụm</a><a href="#p5">5. Quy tắc thay đổi tài liệu</a><a href="#p6">6. Cadence review & governance</a><a href="#p7">7. Điều kiện đóng phase</a></div></div>
 <div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Change Roadmap & Priority</b>.
-  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Change Roadmap & Priority</b>.
+ <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
 </div>
 <h2 class="h2" id="p1">1. Mục tiêu nâng cấp</h2><p>Nâng hệ thống từ mức “tài liệu có mặt để đánh giá” sang mức <b>vận hành được, giải thích được, truy xuất được và scale được</b> cho môi trường gia công CNC lệnh sản xuất toàn cầu. Trọng tâm không phải viết lại câu chữ cho đẹp, mà là làm rõ người sở hữu, tạm giữ/phê duyệt point, dữ liệu tối thiểu, phê duyệt và cơ chế phản ứng bất thường.</p>
 <h2 class="h2" id="p2">2. Nguyên tắc “bổ sung chuyên sâu”</h2><ul><li>Không đổi mã tài liệu, không phá cấu trúc thư mục nếu không bắt buộc.</li><li>Ưu tiên bổ sung vào các chương đang có: mục đích, phạm vi, RACI, quy trình, biểu mẫu liên quan, thẩm quyền note.</li><li>Chỉ tạo tài liệu mới khi cần một nguồn chuẩn dùng cho nhiều tài liệu khác (ví dụ ranh giới trách nhiệm, lộ trình, matrix).</li><li>Mỗi nội dung mới phải trả lời được ít nhất một câu hỏi thực tế: ai quyết? ai giữ cổng kiểm soát? cần bằng chứng gì? escalation đi đâu?</li><li>Sau mỗi phase phải thực hiện cleanup ngôn ngữ: xóa tham chiếu lỗi thời kiểu “JD.docx”, “áp dụng theo tài liệu khác” mà không có link/người phụ trách cụ thể.</li></ul>
@@ -98,10 +98,10 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2" id="p6">6. Cadence review & governance</h2><div class="table-card"><table class="table"><colgroup><col style="width:20%"/><col style="width:80%"/></colgroup><thead><tr><th>Chu kỳ</th><th>Nội dung review</th></tr></thead><tbody><tr><td>Hàng tuần</td><td>Review danh sách tài liệu đã sửa, conflict logic, broken link, phản hồi người phụ trách</td></tr><tr><td>2 tuần/lần</td><td>Review theo phase: ký chốt bundle gồm SOP + WI + FRM liên quan</td></tr><tr><td>Hàng tháng</td><td>Management checkpoint: đánh giá tác động lên OTD, customer khiếu nại, NCR backlog, training completion</td></tr><tr><td>Sau mỗi major release</td><td>Đánh giá nhanh tại hiện trường để xác minh tài liệu có sống được hay không</td></tr></tbody></table></div>
 <h2 class="h2" id="p7">7. Điều kiện đóng phase</h2><ul><li>Tài liệu trong bundle đã đồng bộ logic ranh giới trách nhiệm, thẩm quyền, form instruction và link tham chiếu.</li><li>Không còn tham chiếu lỗi thời hoặc placeholder kiểu “áp dụng theo JD/SOP liên quan” mà không chỉ rõ tài liệu.</li><li>Có ít nhất một vòng review với người phụ trách nghiệp vụ, một vòng QA link/path check và một vòng kiểm tại hiện trường hoặc walk-through mô phỏng.</li><li>Các chỉ báo chính của phase có xu hướng cải thiện hoặc ít nhất không làm tăng customer risk.</li><li>Đã cập nhật training / communication cần thiết cho người dùng của tài liệu.</li></ul>
 <div class="footer-note">ANNEX-119 là tài liệu chiến lược triển khai. Khi release từng giai đoạn vào git, nên tag theo phase và bundle để truy được lịch sử trưởng thành của hệ thống.</div>
-        </div>
-      </div>
-    </div>
-  </div>
+ </div>
+ </div>
+ </div>
+ </div>
 </div>
 </body>
 </html>

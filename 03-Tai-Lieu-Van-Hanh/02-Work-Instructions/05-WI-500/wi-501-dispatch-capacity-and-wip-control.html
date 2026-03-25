@@ -49,35 +49,35 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
-          </div>
-        </div>
-        <div class="title"><strong><a href="">WI-501</a> — Điều độ hằng ca, rà soát năng lực và kiểm soát WIP</strong></div>
-        <div class="meta">
-          <div class="row"><span><b>Code:</b></span><span><a href="">WI-501</a></span></div>
-          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Owner:</b></span><span>Kế hoạch Team Leader / Ops Manager</span></div>
-          <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
-        </div>
-      </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho Planner, Nhân viên điều phối, Supervisor và Cell Lead ở mọi ca có job mở/Released/WIP, đặc biệt khi có nút thắt / điểm nghẽn, hot-job, machine xuống / ngừng hoặc outsource khớp nối.</div>
-      <h1><a href="">WI-501</a> — Điều độ hằng ca, rà soát năng lực và kiểm soát WIP</h1>
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
+ </div>
+ </div>
+ <div class="title"><strong><a href="">WI-501</a> — Điều độ hằng ca, rà soát năng lực và kiểm soát WIP</strong></div>
+ <div class="meta">
+ <div class="row"><span><b>Code:</b></span><span><a href="">WI-501</a></span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>Kế hoạch Team Leader / Ops Manager</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ </div>
+ </div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho Planner, Nhân viên điều phối, Supervisor và Cell Lead ở mọi ca có job mở/Released/WIP, đặc biệt khi có nút thắt / điểm nghẽn, hot-job, machine xuống / ngừng hoặc outsource khớp nối.</div>
+ <h1><a href="">WI-501</a> — Điều độ hằng ca, rà soát năng lực và kiểm soát WIP</h1>
 
 <div class="section"><div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G3 (Setup) và G5 (IPQC)</b>. Kiểm soát dispatch, capacity và WIP.
-  <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G3 (Setup) và G5 (IPQC)</b>. Kiểm soát dispatch, capacity và WIP.
+ <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
 </div>
 <h2>1. Mục tiêu và quy tắc không thương lượng</h2>
 <p>WI này dùng để vận hành công tác điều độ hằng ca: lấy dữ liệu từ SoR, xác nhận mức sẵn sàng, phát hành điều phối xuất hàng, kiểm soát WIP, xử lý hot-job, quản lý cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và bàn giao cuối ca. Mục tiêu là làm cho phân xưởng chạy đúng <b>job cần chạy</b>, đúng <b>thời điểm</b>, đúng <b>năng lực</b> và đúng <b>điều kiện phát hành</b>.</p>
-<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span><br/>Chỉ kéo job vào máy khi mức sẵn sàng đã đủ. Giữ điều phối xuất hàng trên bảng và hệ thống điều độ chính thức. Mọi thay đổi thứ tự phải có đánh giá tác động tới nút thắt / điểm nghẽn, mẫu đầu (đầu tiên chi tiết / sản phẩm), outsource, final phát hành và OTD.</div>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span><br/>Chỉ kéo job vào máy khi mức sẵn sàng đã đủ. Giữ điều phối xuất hàng trên bảng và hệ thống điều độ chính thức. Mọi thay đổi thứ tự phải có đánh giá tác động tới nút thắt / điểm nghẽn, mẫu đầu (tiên chi tiết / sản phẩm), outsource, final phát hành và OTD.</div>
 <ul class="tight">
 <li>Epicor là SoR. Điều phối bảng, Photos trạng thái và log hành động chỉ phản ánh lại dữ liệu điều hành và quyết định.</li>
 <li>Mỗi thay đổi thứ tự phải có lý do, người quyết định và job bị ảnh hưởng.</li>
@@ -118,7 +118,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>4A. Quy tắc xếp thứ tự mặc định theo họ công đoạn</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Họ công đoạn</th><th>Ưu tiên xếp thứ tự khi cùng class</th><th>Không được quên</th></tr></thead><tbody>
 <tr><td>5-trục / phay-lượt / quay</td><td>Ưu tiên job có mức sẵn sàng đầy đủ, fixture sẵn, chứng minh-out ngắn hơn, và không làm đứt chuỗi QA/mẫu đầu của ca</td><td>Không xếp xen job mới vào giữa hai chứng minh-out đang mở nếu làm tăng rủi ro sự cố nghiêm trọng hoặc trễ nút thắt / điểm nghẽn.</td></tr>
-<tr><td>3-trục / tiện</td><td>Ưu tiên theo due + setup nhóm sản phẩm gần nhau để giảm chuyển đổi (chuyển đổi (changeover)), nhưng không được bỏ qua job P1 đã ready đầy đủ</td><td>Không gom tối ưu setup đến mức để job gần due bị trễ.</td></tr>
+<tr><td>3-trục / tiện</td><td>Ưu tiên theo due + setup nhóm sản phẩm gần nhau để giảm chuyển đổi ((changeover)), nhưng không được bỏ qua job P1 đã ready đầy đủ</td><td>Không gom tối ưu setup đến mức để job gần due bị trễ.</td></tr>
 <tr><td>Hoàn thiện / mài bavia / clean</td><td>Ưu tiên theo rủi ro của bề mặt và công đoạn sau cổng kiểm soát; part đã gần ship hoặc chờ QA phải được hút trước</td><td>Không đẩy part chân không/clean chờ lẫn với part thường làm tăng xử lý / vận chuyển rủi ro.</td></tr>
 <tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship phát hành)</td><td>Ưu tiên theo ship cửa sổ / khung thời gian, cổng kiểm soát đã đủ hồ sơ và mức độ ảnh hưởng khách hàng</td><td>Không nhận thêm lot khi gói hồ sơ còn thiếu; phải trả về Responsible Person công đoạn trước để đóng hồ sơ.</td></tr>
 </tbody></table></div>
@@ -204,13 +204,13 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>Cổng kiểm soát/MRR và rule bàn giao theo bước.</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation và SLA.</td></tr>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Chuẩn họp tầng và log hành động.</td></tr>
-<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx"  download="">FRM-502</a></td><td>Điều phối list hằng ca/ngày.</td></tr>
-<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx"  download="">FRM-503</a></td><td>tuổi tồn WIP (tuổi tồn / tuổi tồn) và hành động.</td></tr>
+<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx" download="">FRM-502</a></td><td>Điều phối list hằng ca/ngày.</td></tr>
+<tr><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx" download="">FRM-503</a></td><td>tuổi tồn WIP (tuổi tồn / tuổi tồn) và hành động.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Khung thủ tục nền của lập kế hoạch/điều phối xuất hàng.</td></tr>
 </tbody></table></div>
 </div>
 
-    
+ 
 </div>
 </div>
 </div><!-- .page-body -->

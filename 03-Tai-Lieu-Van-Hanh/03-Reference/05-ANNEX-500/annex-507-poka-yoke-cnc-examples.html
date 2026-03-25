@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-507 — Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) CNC, chống-mix, chống-rev, chống-tooling lỗi | HESEM QMS</title>
+<title>ANNEX-507 — Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ ((yoke)) CNC, chống-mix, chống-rev, chống-tooling lỗi | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
 
@@ -42,38 +42,38 @@ ul.tight li {margin:4px 0;}
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Annex</span>
-          </div>
-        </div>
-        <div class="title"><strong>ANNEX-507 — Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) CNC, chống-mix, chống-rev, chống-tooling lỗi</strong></div>
-        <div class="meta">
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Annex</span>
+ </div>
+ </div>
+ <div class="title"><strong>ANNEX-507 — Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ ((yoke)) CNC, chống-mix, chống-rev, chống-tooling lỗi</strong></div>
+ <div class="meta">
 
-          <div class="row"><span><b>M&#227;:</b></span><span>ANNEX-507</span></div>
+ <div class="row"><span><b>M&#227;:</b></span><span>ANNEX-507</span></div>
 
-          <div class="row"><span><b>Phi&#234;n b&#7843;n:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Phi&#234;n b&#7843;n:</b></span><span>V0</span></div>
 
-          <div class="row"><span><b>Ng&#224;y hi&#7879;u l&#7921;c:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Ng&#224;y hi&#7879;u l&#7921;c:</b></span><span>Theo quyết định ban hành</span></div>
 
-          <div class="row"><span><b>Ch&#7911; s&#7903; h&#7919;u:</b></span><span>QMS / QA / Kỹ thuật / Sản xuất</span></div>
+ <div class="row"><span><b>Ch&#7911; s&#7903; h&#7919;u:</b></span><span>QMS / QA / Kỹ thuật / Sản xuất</span></div>
 
-          <div class="row"><span><b>Ph&#234; duy&#7879;t:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Ph&#234; duy&#7879;t:</b></span><span>Tổng Giám đốc</span></div>
 
-        </div>
-      </div>
-      <div class="doc-content" id="docContent"><div class="form-sheet">
+ </div>
+ </div>
+ <div class="doc-content" id="docContent"><div class="form-sheet">
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi lựa chọn ý tưởng chống sai cho máy, setup, kiểm tra, clean-pack, giao vận và FOD control. Đây là thư viện giải pháp, không thay WI tại Point-of-use.</div>
-      <h1>ANNEX-507 — Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) CNC, chống-mix, chống-rev, chống-tooling lỗi</h1>
-      
+ <h1>ANNEX-507 — Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ ((yoke)) CNC, chống-mix, chống-rev, chống-tooling lỗi</h1>
+ 
 <div class="section"><div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>tại G3 (Setup) và G5 (IPQC) — Poka-yoke CNC</b>.
-  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>tại G3 (Setup) và G5 (IPQC) — Poka-yoke CNC</b>.
+ <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
 </div>
 <h2>1. Cách dùng thư viện</h2>
 <p>ANNEX này là thư viện lựa chọn giải pháp. Không dùng ANNEX này để thay WI tại máy. Khi chọn được giải pháp phù hợp, phải triển khai theo <a href="../../02-Work-Instructions/08-WI-800/wi-801-cnc-poka-yoke-examples.html">WI-801</a>, cập nhật đúng Point-of-use và theo dõi hiệu lực sau phát hành.</p>
@@ -83,13 +83,13 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại lỗi</th><th>Ưu tiên 1</th><th>Ưu tiên 2</th><th>Chỉ dùng bổ trợ</th></tr></thead><tbody>
 <tr><td>Nhầm phiên bản / nhầm program / nhầm lộ trình gia công</td><td>khóa / scan / liên động an toàn (khóa liên động) dữ liệu</td><td>Trực quan xác nhận tại máy</td><td>Nhắc miệng / đào tạo lại</td></tr>
 <tr><td>Lắp ngược / lắp sai định hướng / đào tạo hội nhập / sai mặt chuẩn</td><td>nhập liệu cơ khí / one-way fixture</td><td>Go-NoGo template / chứng kiến đánh dấu</td><td>Ảnh treo tường đơn lẻ</td></tr>
-<tr><td>Sai tool / sai bù trừ (bù trừ (offset)) / bỏ sót bước setup</td><td>bắt buộc xác minh / đứng cạnh học việc / bảng kiểm ép buộc</td><td>Dry-run liên động an toàn / setup Photos</td><td>Kiểm tra bằng trí nhớ</td></tr>
+<tr><td>Sai tool / sai bù trừ ((offset)) / bỏ sót bước setup</td><td>bắt buộc xác minh / đứng cạnh học việc / bảng kiểm ép buộc</td><td>Dry-run liên động an toàn / setup Photos</td><td>Kiểm tra bằng trí nhớ</td></tr>
 <tr><td>Nhầm nguyên vật liệu / hỗn hợp / lẫn lộn part / hỗn hợp / lẫn lộn lot</td><td>cách ly + scan + bin control</td><td>Màu / nhãn / layout</td><td>Để chung rồi “nhìn kỹ”</td></tr>
 <tr><td>Sai gage / sai data mục nhập / bỏ sót CTQ</td><td>Gage nhóm sản phẩm control / bắt buộc tính đầy đủ</td><td>Balloon / bảng kiểm / đồng cấp xác minh</td><td>Kiểm ngẫu hứng</td></tr>
 <tr><td>Sai clean-pack / sai giao vận label / thiếu phụ kiện</td><td>Pack lộ trình gia công + count khóa + scan-to-print</td><td>chứng kiến đánh dấu / mù / ẩn count</td><td>Đếm miệng / nhớ tay</td></tr>
 </tbody></table></div></div>
 
-<div class="section"><h2>3. Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) CNC / QA / WHS / clean-pack</h2>
+<div class="section"><h2>3. Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ ((yoke)) CNC / QA / WHS / clean-pack</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>ID</th><th>Lỗi mục tiêu</th><th>Giải pháp mẫu</th><th>Áp dụng tốt nhất tại</th><th>Mức ưu tiên</th><th>Điều kiện để hiệu quả</th></tr></thead><tbody>
 <tr><td>PY-001</td><td>Nhầm program / nhầm revision</td><td>Scan traveler chỉ mở đúng thư mục program theo part-rev hiện hành; khóa chọn tay ngoài danh sách phát hành.</td><td>Machine loading / program call</td><td>M1</td><td>Phát hành chương trình (program release) và part-rev master phải sạch dữ liệu.</td></tr>
 <tr><td>PY-002</td><td>Nhầm fixture orientation</td><td>Asymmetric key / pin / stop block làm cho part chỉ vào một chiều.</td><td>Setup fixture</td><td>M1</td><td>Thiết kế fixture từ đầu hoặc retrofit được mà không làm mất datum.</td></tr>
@@ -129,10 +129,10 @@ ul.tight li {margin:4px 0;}
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a> / <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a> / <a href="../../02-Work-Instructions/07-WI-700/wi-721-fod-prevention-line-clearance-and-tool-accountability.html">WI-721</a></td><td>Các Point-of-use có nhu cầu chống sai cao.</td></tr>
 </tbody></table></div></div>
 
-    </div>
-      </div></div>
-    </div>
-  </div>
+ </div>
+ </div></div>
+ </div>
+ </div>
 </div>
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 <script src="../../../assets/app.js"></script>

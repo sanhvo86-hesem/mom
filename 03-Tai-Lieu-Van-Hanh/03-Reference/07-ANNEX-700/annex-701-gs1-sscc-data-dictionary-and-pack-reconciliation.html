@@ -46,31 +46,31 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Annex</span>
-          </div>
-        </div>
-        <div class="title"><strong>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</strong></div>
-        <div class="meta">
-          <div class="row"><span><b>Code:</b></span><span>ANNEX-701</span></div>
-          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Owner:</b></span><span>WHS Manager / IT Manager / QMS Manager</span></div>
-          <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
-        </div>
-      </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi cấp PackID/SSCC, in nhãn hậu cần, tách / chia/gộp / hợp nhất kiện, in lại/void nhãn, và đối soát trước xác nhận giao hàng (ship xác nhận).</div>
-      <h1>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</h1>
-      
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Annex</span>
+ </div>
+ </div>
+ <div class="title"><strong>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</strong></div>
+ <div class="meta">
+ <div class="row"><span><b>Code:</b></span><span>ANNEX-701</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>WHS Manager / IT Manager / QMS Manager</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ </div>
+ </div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi cấp PackID/SSCC, in nhãn hậu cần, tách / chia/gộp / hợp nhất kiện, in lại/void nhãn, và đối soát trước xác nhận giao hàng (ship xác nhận).</div>
+ <h1>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</h1>
+ 
 <div class="section"><div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>tại G2, G7 (SCM) — Supply Chain Reference</b>.
-  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>tại G2, G7 (SCM) — Supply Chain Reference</b>.
+ <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
 </div>
 <h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
 <p>ANNEX này giữ toàn bộ quy tắc dữ liệu cho PackID và SSCC. Mọi vận hành in nhãn, quét, in lại, void, tách / chia/gộp / hợp nhất và đối soát kiện hàng phải bám đúng Annex này. Dữ liệu hậu cần không được tự chế ngoài hệ thống.</p>
@@ -101,7 +101,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>4. Quy tắc đối soát kiện hàng</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục đối soát</th><th>đạt khi</th><th>CHẶN khi</th></tr></thead><tbody>
-<tr><td>Qty đối soát</td><td>Tổng Qty theo PackID = lô giao hàng dòng / chuyền = phiếu kê đóng gói (phiếu kê đóng gói)</td><td>Chênh số lượng hoặc UOM</td></tr>
+<tr><td>Qty đối soát</td><td>Tổng Qty theo PackID = lô giao hàng dòng / chuyền = phiếu kê đóng gói</td><td>Chênh số lượng hoặc UOM</td></tr>
 <tr><td>Phiên bản đối soát</td><td>Part/Rev trên nhãn khớp phát hành set và bộ hồ sơ giao hàng</td><td>Sai rev hoặc lẫn nhiều rev trong một hậu cần đơn vị không được phép</td></tr>
 <tr><td>con / phụ thuộc-cha / gốc mối quan hệ</td><td>Cấu trúc thùng thùng carton/pallet rõ ràng và quét ra đúng</td><td>cha / gốc không mở được con / phụ thuộc hoặc con / phụ thuộc mất quan hệ</td></tr>
 <tr><td>Evidence đối soát</td><td>CoC/cert/đóng gói bảng kiểm/ảnh kiện đầy đủ khi áp dụng</td><td>Thiếu hồ sơ bắt buộc hoặc link hỏng</td></tr>
@@ -126,8 +126,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td><a href="../06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>Mức hồ sơ bắt buộc theo QPL.</td></tr>
 </tbody></table></div></div>
 
-    </div>
-  </div>
+ </div>
+ </div>
 </div>
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>

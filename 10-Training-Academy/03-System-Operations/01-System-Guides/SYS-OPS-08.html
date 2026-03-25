@@ -37,29 +37,29 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-08 — Power BI Triển khai Pack: PowerQuery, Mô hình, DAX, Làm mới Governance</strong>
-  <span class="sub-vn"></span>
+ <strong>SYS-OPS-08 — Power BI Triển khai Pack: PowerQuery, Mô hình, DAX, Làm mới Governance</strong>
+ <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-08</span></div>
-  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Code:</b></span><span>SYS-OPS-08</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 
 <!-- 1) Header VI/EN + Form-Header -->
 <div class="doc-content" id="docContent">
 <div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
 </div>
 <div class="card">
 <div class="badge"><span class="dot"></span>SYS-OPS-08</div>
@@ -125,7 +125,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Công bố PROD không đi qua bảng kiểm phát hành và không có BI_ReleaseNotes → <b>CHẶN</b>.</li>
 <li>Làm mới fail không có hồ sơ xử lý trong ca → <b>TẠM GIỮ</b> quyết định dựa trên bảng điều khiển.</li>
-<li>Diễn tập-xuyên suốt không mở được bằng chứng thư mục/hồ sơ công việc (hồ sơ công việc) → <b>bảng điều khiển không được dùng làm cổng kiểm soát</b>.</li>
+<li>Diễn tập-xuyên suốt không mở được bằng chứng thư mục/hồ sơ công việc → <b>bảng điều khiển không được dùng làm cổng kiểm soát</b>.</li>
 </ul>
 </div>
 </div>
@@ -160,7 +160,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Kỹ thuật</td>
-<td>RevisionNum, mức CTQ (mức CTQ (CTQLevel)), RequiresFAI</td>
+<td>RevisionNum, mức CTQ ((CTQLevel)), RequiresFAI</td>
 <td>Job diễn tập-xuyên suốt (Rev/CTQ)</td>
 <td>Rev không khớp giữa JobIndex và hồ sơ chương trình → CHẶN chạy</td>
 </tr>
@@ -174,7 +174,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Nhận hàng</td>
 <td>ReceivingLog M365/SharePoint → HESEM-QMS-SSOT</td>
 <td>Truy xuất nguồn gốc &amp; lot tính toàn vẹn</td>
-<td>Thiếu lot/COC/mẻ nấu (mẻ nấu (heat)) số → CHẶN nhập kho</td>
+<td>Thiếu lot/COC/mẻ nấu ((heat)) số → CHẶN nhập kho</td>
 </tr>
 <tr>
 <td>Sản xuất</td>
@@ -254,7 +254,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 5) Risk Controls -->
 <div class="card">
 <h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng)</h2>
-<p>Mỗi điểm kiểm soát (điểm kiểm soát) có Responsible Person rõ ràng và MRR bắt buộc. Thiếu MRR → Cổng kiểm soát không công nhận.</p>
+<p>Mỗi điểm kiểm soát có Responsible Person rõ ràng và MRR bắt buộc. Thiếu MRR → Cổng kiểm soát không công nhận.</p>
 <div class="table-wrap">
 <table>
 <thead>
@@ -326,7 +326,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Khi bảng điều khiển dùng dữ liệu cũ hơn ngưỡng ca (dấu thời gian không cập nhật) và vẫn có quyết định SHIP/GO đang chờ.</li>
 <li>Khi diễn tập-xuyên suốt không mở tới EvidenceFolderUrl hoặc link bằng chứng chính (bộ hồ sơ giao hàng (ship gói hồ sơ)/IR/FAI) trống.</li>
-<li>Khi phát hiện KPI “Lam Ready %” tăng đột biến trong lúc tạm giữ QC (tạm giữ QC (QCHold))/NCR mở tăng.</li>
+<li>Khi phát hiện KPI “Lam Ready %” tăng đột biến trong lúc tạm giữ QC ((QCHold))/NCR mở tăng.</li>
 </ul>
 </div>
 <div class="gate">
@@ -556,7 +556,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Điểm chặn khi diễn tập-xuyên suốt không mở EvidenceFolderUrl.</li>
 <li>Responsible Person Làm mới tài khoản phải thuộc loại nào và vì sao?</li>
 <li>Biên bản UAT tối thiểu phải chứng minh điều gì?</li>
-<li>điểm kiểm soát (điểm kiểm soát) nào khóa sơ đồ cấu trúc list và bằng chứng tương ứng?</li>
+<li>điểm kiểm soát nào khóa sơ đồ cấu trúc list và bằng chứng tương ứng?</li>
 <li>Chỉ ra 1 dấu hiệu dữ liệu “đúng cú pháp, sai thực tế”.</li>
 <li>Quy tắc STOP khi bảng điều khiển dùng dữ liệu cũ hơn ngưỡng ca.</li>
 <li>NCR/CAPA tuổi tồn dùng để chặn rủi ro gì trong phân xưởng?</li>

@@ -30,22 +30,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>DIỄN TẬP-Bài diễn tập lệnh sản xuất (lệnh sản xuất (JOBORDER))-E2E — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng) | HESEM Academy</strong>
-  <span class="sub-vn"></span>
+ <strong>DIỄN TẬP-Bài diễn tập lệnh sản xuất ((JOBORDER))-E2E — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng) | HESEM Academy</strong>
+ <span class="sub-vn"></span>
 </div>
 <div class="meta">
-  <div class="row"><span><b>Code:</b></span><span>DIỄN TẬP-lệnh sản xuất (lệnh sản xuất (JOBORDER))-E2E</span></div>
-  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Code:</b></span><span>DIỄN TẬP-lệnh sản xuất ((JOBORDER))-E2E</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -58,7 +58,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="grid-2">
 <div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Material</b>.
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Material</b>.
 </div>
 <div class="card">
 <span class="badge">Mục tiêu</span>
@@ -98,7 +98,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR (bằng chứng)</th><th style="width:90px;">Cổng kiểm soát</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Mở Hồ sơ công việc (hồ sơ công việc), xác nhận JobNum/PartNo/REV và khóa phiên bản set.</td><td>Tất cả vai trò</td><td>Photos màn hình đường dẫn hồ sơ + REV tại thư mục name</td><td>STOP</td></tr><tr><td>2</td><td>Review hợp đồng/PO: chốt CTQ + chứng từ bắt buộc (FAI/MTR/CoC/pack).</td><td>Người định giá (SAL-03) + QA</td><td>CR biểu mẫu + CTQ list (PDF)</td><td>TẠM GIỮ</td></tr><tr><td>3</td><td>Khởi động: lộ trình gia công + điểm giữ + rủi ro xếp hạng / đánh giá + outsource nhu cầu.</td><td>Kế hoạch/OPS</td><td>Job khởi động bảng kiểm + Traveler</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Kỹ thuật mốc chuẩn: phát hành phiếu cài đặt + kế hoạch kiểm tra (kiểm tra plan) + CAM phát hành link.</td><td>ENG/CAM</td><td>Mốc chuẩn pack + phát hành log</td><td>CHẶN</td></tr><tr><td>5</td><td>Pre-start + an toàn: PPE/5S + xác nhận tool/gage trong hạn.</td><td>Supervisor + Setup</td><td>Pre-start bảng kiểm + ảnh setup</td><td>STOP</td></tr><tr><td>6</td><td>Setup + chạy mẫu đầu (đầu tiên chi tiết / sản phẩm): đo CTQ và lập IR/FAI.</td><td>Setup + QC</td><td>IR/FAI ký + ảnh mẫu đầu</td><td>TẠM GIỮ</td></tr><tr><td>7</td><td>Trong quá trình: ghi IPQC log theo phản ứng plan.</td><td>Operator + QC</td><td>IPQC log (PDF)</td><td>TẠM GIỮ</td></tr><tr><td>8</td><td>Outsource (KHI có): đối soát spec + nhận cert + truy xuất nguồn gốc.</td><td>PUR + WHS + QA</td><td>PO note + Supplier cert + nhận hàng hồ sơ</td><td>TẠM GIỮ</td></tr><tr><td>9</td><td>Final + bộ hồ sơ giao hàng: CoC + final IR + đóng gói/label Photos.</td><td>QA/QC + WHS</td><td>Bộ hồ sơ giao hàng bảng kiểm + CoC + đóng gói Photos</td><td>TẠM GIỮ</td></tr><tr><td>10</td><td>bài diễn tập đánh giá 60 giây: người hướng dẫn gọi 01 hồ sơ bất kỳ và Requests mở đúng file.</td><td>Người đánh giá</td><td>Link SSOT mở đúng ≤ 60s</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Mở Hồ sơ công việc (hồ sơ công việc), xác nhận JobNum/PartNo/REV và khóa phiên bản set.</td><td>Tất cả vai trò</td><td>Photos màn hình đường dẫn hồ sơ + REV tại thư mục name</td><td>STOP</td></tr><tr><td>2</td><td>Review hợp đồng/PO: chốt CTQ + chứng từ bắt buộc (FAI/MTR/CoC/pack).</td><td>Người định giá (SAL-03) + QA</td><td>CR biểu mẫu + CTQ list (PDF)</td><td>TẠM GIỮ</td></tr><tr><td>3</td><td>Khởi động: lộ trình gia công + điểm giữ + rủi ro xếp hạng / đánh giá + outsource nhu cầu.</td><td>Kế hoạch/OPS</td><td>Job khởi động bảng kiểm + Traveler</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Kỹ thuật mốc chuẩn: phát hành phiếu cài đặt + kế hoạch kiểm tra (plan) + CAM phát hành link.</td><td>ENG/CAM</td><td>Mốc chuẩn pack + phát hành log</td><td>CHẶN</td></tr><tr><td>5</td><td>Pre-start + an toàn: PPE/5S + xác nhận tool/gage trong hạn.</td><td>Supervisor + Setup</td><td>Pre-start bảng kiểm + ảnh setup</td><td>STOP</td></tr><tr><td>6</td><td>Setup + chạy mẫu đầu (tiên chi tiết / sản phẩm): đo CTQ và lập IR/FAI.</td><td>Setup + QC</td><td>IR/FAI ký + ảnh mẫu đầu</td><td>TẠM GIỮ</td></tr><tr><td>7</td><td>Trong quá trình: ghi IPQC log theo phản ứng plan.</td><td>Operator + QC</td><td>IPQC log (PDF)</td><td>TẠM GIỮ</td></tr><tr><td>8</td><td>Outsource (KHI có): đối soát spec + nhận cert + truy xuất nguồn gốc.</td><td>PUR + WHS + QA</td><td>PO note + Supplier cert + nhận hàng hồ sơ</td><td>TẠM GIỮ</td></tr><tr><td>9</td><td>Final + bộ hồ sơ giao hàng: CoC + final IR + đóng gói/label Photos.</td><td>QA/QC + WHS</td><td>Bộ hồ sơ giao hàng bảng kiểm + CoC + đóng gói Photos</td><td>TẠM GIỮ</td></tr><tr><td>10</td><td>bài diễn tập đánh giá 60 giây: người hướng dẫn gọi 01 hồ sơ bất kỳ và Requests mở đúng file.</td><td>Người đánh giá</td><td>Link SSOT mở đúng ≤ 60s</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>

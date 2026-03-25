@@ -50,28 +50,28 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
-          </div>
-        </div>
-        <div class="title"><strong>WI-206 — Ship Phát hành Pack, SSCC Label and Pack Đối soát</strong></div>
-        <div class="meta">
-          <div class="row"><span><b>Code:</b></span><span>WI-206</span></div>
-          <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Owner:</b></span><span>QA Manager / Kho Manager / Giao vận Lead / Kinh doanh-Customer Dịch vụ Manager</span></div>
-          <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
-        </div>
-      </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi lô giao hàng có cổng kiểm soát release; bắt buộc áp dụng khi có PackID/Shipment, khi có yêu cầu SSCC hoặc customer label, khi có giao hàng một phầnment, relabel, repack, split shipment hoặc khi phải bàn giao bộ chứng từ giao hàng cho khách/vận chuyển.</div>
-      <h1>WI-206 — bộ hồ sơ phê duyệt giao hàng, nhãn SSCC, đối soát kiện và bàn giao xác nhận giao hàng</h1>
-      
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
+ </div>
+ </div>
+ <div class="title"><strong>WI-206 — Ship Phát hành Pack, SSCC Label and Pack Đối soát</strong></div>
+ <div class="meta">
+ <div class="row"><span><b>Code:</b></span><span>WI-206</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QA Manager / Kho Manager / Giao vận Lead / Kinh doanh-Customer Dịch vụ Manager</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ </div>
+ </div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi lô giao hàng có cổng kiểm soát release; bắt buộc áp dụng khi có PackID/Shipment, khi có yêu cầu SSCC hoặc customer label, khi có giao hàng một phầnment, relabel, repack, split shipment hoặc khi phải bàn giao bộ chứng từ giao hàng cho khách/vận chuyển.</div>
+ <h1>WI-206 — bộ hồ sơ phê duyệt giao hàng, nhãn SSCC, đối soát kiện và bàn giao xác nhận giao hàng</h1>
+ 
 <div class="section"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
 <p>WI này quy định cách lập <b>Bộ hồ sơ phê duyệt giao hàng</b>, gán <b>SSCC</b>, đối soát inner-pack/outer-pack/logistic unit và bàn giao sang bước <b>Xác nhận giao hàng</b>. WI này áp dụng cho mọi lô xuất có kiểm soát chất lượng và áp dụng thêm khi khách hàng yêu cầu GS1/SSCC, customer label overlay, chứng từ vật liệu, chứng từ công đoạn đặc biệt, hoặc giao hàng một phầnment.</p>
 <div class="callout-danger"><strong>QUYỀN DỪNG</strong><br/>QA, Warehouse, Shipping, Sales/Customer Service và người có thẩm quyền release có quyền dừng xuất khi phát hiện sai part, sai rev, sai qty, sai lot/serial, sai SSCC, sai nhãn khách hàng, thiếu chứng từ, bao gói hỏng, hoặc bộ bằng chứng chưa đủ. <b>PHẢI</b> hoàn tất hồ sơ trước khi xác nhận giao hàng.</div></div>
@@ -138,7 +138,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thay đổi phát sinh</th><th>Được phép làm gì</th><th>Ai phê duyệt</th><th>Hồ sơ phải cập nhật</th></tr></thead><tbody>
 <tr><td>Nhãn in lỗi nhưng dữ liệu gốc không đổi</td><td>In lại nhãn cùng dữ liệu, VOID nhãn lỗi, chụp bằng chứng nhãn mới</td><td>Shipping Lead</td><td>Reprint nhật ký + ảnh nhãn</td></tr>
 <tr><td>Đổi cấu trúc kiện / repack</td><td>Đóng lại, cấp lại mapping, scan lại, chụp lại bằng chứng</td><td>Warehouse Manager + QA</td><td>Repack hồ sơ + reconciliation mới</td></tr>
-<tr><td>Đổi qty do giao hàng một phầnment</td><td>Tạo pack structure mới cho qty giao thực tế; cập nhật chứng từ và remaining balance</td><td>Warehouse Manager + QA + Sales/CS khi ảnh hưởng khách</td><td>phiếu kê đóng gói (phiếu kê đóng gói) mới + bằng chứng mới</td></tr>
+<tr><td>Đổi qty do giao hàng một phầnment</td><td>Tạo pack structure mới cho qty giao thực tế; cập nhật chứng từ và remaining balance</td><td>Warehouse Manager + QA + Sales/CS khi ảnh hưởng khách</td><td>phiếu kê đóng gói mới + bằng chứng mới</td></tr>
 <tr><td>Đổi Ship-to, customer label, carrier label overlay</td><td>Chỉ thay sau khi có xác nhận từ nguồn yêu cầu hợp lệ</td><td>Sales/CS + QA + Warehouse</td><td>Approval history + label bằng chứng mới</td></tr>
 <tr><td>Thiếu cert hoặc mismatch release data</td><td>Không được relabel để ship tạm; phải HOLD shipment</td><td>QA thẩm quyền</td><td>Hold nhật ký / NCR / corrective hồ sơ</td></tr>
 </tbody></table></div>
@@ -149,14 +149,14 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Sai mã chi tiết / mức sửa đổi / mã chi tiết khách hàng</td><td>TẠM GIỮ toàn bộ đơn vị hậu cần liên quan; khoanh vùng mọi kiện cùng lô; kiểm 100%; không giao một phần khi chưa rõ phạm vi.</td></tr>
 <tr><td>Sai số lượng / thiếu kiện / sai UOM</td><td>Dừng xuất; đếm lại; khóa hồ sơ đóng gói; cập nhật lại phiếu đóng gói và đối soát từ đầu.</td></tr>
 <tr><td>Sai SSCC hoặc quét không mở đúng hồ sơ đóng gói</td><td>ĐÁNH DẤU HỦY nhãn cũ; cấp lại SSCC nếu cần; quét xác nhận 100%; lưu bằng chứng in lại/dán nhãn lại.</td></tr>
-<tr><td>Nhãn đúng nhưng bao gói hỏng hoặc có dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (FOD))))))))))</td><td>Đóng gói lại toàn bộ đơn vị hậu cần bị ảnh hưởng; chụp lại bằng chứng; rà soát lại bao gói sạch / thời hạn bảo quản.</td></tr>
+<tr><td>Nhãn đúng nhưng bao gói hỏng hoặc có dị vật ((dị vật ((dị vật ((dị vật ((dị vật ((FOD))))))))))</td><td>Đóng gói lại toàn bộ đơn vị hậu cần bị ảnh hưởng; chụp lại bằng chứng; rà soát lại bao gói sạch / thời hạn bảo quản.</td></tr>
 <tr><td>Thiếu CoC/MTR/chứng từ chứng nhận/công đoạn đặc biệt trong hồ sơ</td><td>Không giao; giữ TẠM GIỮ cho đến khi hồ sơ đủ và thẩm quyền phê duyệt lại.</td></tr>
 <tr><td>Không khớp giữa bộ bằng chứng và lô giao hàng thực tế</td><td>Review lại toàn bộ lô giao hàng; không sửa lẻ từng file để “cho khớp”.</td></tr>
 </tbody></table></div>
-<div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Phê duyệt giao hàng đúng hạn; số lô giao hàng TẠM GIỮ do đóng gói/chứng từ không khớp; số dán nhãn lại/đóng gói lại; số lọt lỗi giao hàng do nhãn/chứng từ; thời gian từ phê duyệt cuối cùng đến xác nhận giao hàng.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>; <a href="wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>; <a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>; <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>; <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a>; <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx"  download="">FRM-702</a>; <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-706_Shipping_Label.xlsx"  download="">FRM-706</a>.</div></div></div></div>
+<div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Phê duyệt giao hàng đúng hạn; số lô giao hàng TẠM GIỮ do đóng gói/chứng từ không khớp; số dán nhãn lại/đóng gói lại; số lọt lỗi giao hàng do nhãn/chứng từ; thời gian từ phê duyệt cuối cùng đến xác nhận giao hàng.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>; <a href="wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>; <a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>; <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>; <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a>; <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx" download="">FRM-702</a>; <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-706_Shipping_Label.xlsx" download="">FRM-706</a>.</div></div></div></div>
 
-    </div>
-  </div>
+ </div>
+ </div>
 </div>
 </body>
 </html>

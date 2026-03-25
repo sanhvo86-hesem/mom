@@ -25,8 +25,8 @@
 .chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;border:1px solid var(--ln);background:var(--bg2);font-size:10px;font-weight:700;margin:0 6px 6px 0;}
 }
 @media (max-width:960px){
-  .grid-2,.grid-3{grid-template-columns:1fr;}
-  .page-body{padding:24px 18px 36px;}
+ .grid-2,.grid-3{grid-template-columns:1fr;}
+ .page-body{padding:24px 18px 36px;}
 }
 </style>
 </head>
@@ -34,380 +34,380 @@
 <div class="container"><div class="page"><div class="page-body">
 
 <div class="form-header">
-  <div class="fh-left">
-    <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
-    <div class="fh-company">
-      <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-      <span>Tài liệu vận hành • Annex số hóa</span>
-    </div>
-  </div>
-  <div class="title">
-    <strong>ANNEX-114 — Go-Live runbook, cutover control và hypercare command center</strong>
-  </div>
-  <div class="meta">
-    <div class="row"><span><b>Code:</b></span><span>ANNEX-114</span></div>
-    <div class="row"><span><b>Version:</b></span><span>V1</span></div>
-    <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-    <div class="row"><span><b>Owner:</b></span><span>Cutover Lead / QMS Manager / IT Manager</span></div>
-    <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
-  </div>
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Annex số hóa</span>
+ </div>
+ </div>
+ <div class="title">
+ <strong>ANNEX-114 — Go-Live runbook, cutover control và hypercare command center</strong>
+ </div>
+ <div class="meta">
+ <div class="row"><span><b>Code:</b></span><span>ANNEX-114</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V1</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>Cutover Lead / QMS Manager / IT Manager</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ </div>
 </div>
 
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Áp dụng cho mọi go-live hoặc cutover liên quan đến tài liệu vận hành, M365 hồ sơ, dashboard điều hành, routing metadata, access production, release package, workflow, pilot chuyển sang production và handoff sang hypercare.</div>
 
 <div class="hero">
-  <h1>ANNEX-114 — Runbook điều hành ngày go-live và 14 ngày đầu sau triển khai</h1>
-  <p>Mọi go-live phải có runbook theo mốc thời gian, người chỉ huy, severity rõ, rollback trigger rõ, kênh liên lạc rõ và bằng chứng rõ. Không cho phép triển khai kiểu “ai rảnh thì xử lý” hoặc chỉ dựa vào chat nhóm.</p>
+ <h1>ANNEX-114 — Runbook điều hành ngày go-live và 14 ngày đầu sau triển khai</h1>
+ <p>Mọi go-live phải có runbook theo mốc thời gian, người chỉ huy, severity rõ, rollback trigger rõ, kênh liên lạc rõ và bằng chứng rõ. Không cho phép triển khai kiểu “ai rảnh thì xử lý” hoặc chỉ dựa vào chat nhóm.</p>
 </div>
 
 <div class="callout"><strong>PHẢI</strong><br/>Go-live chỉ được phép diễn ra khi đã chốt đủ 6 lớp: người quyết định, người vận hành, dữ liệu nguồn, dashboard trạng thái, fallback và kênh hỗ trợ người dùng. Thiếu một lớp thì dừng go-live.</div>
 
 <div class="section">
-  <div class="note-blue" style="margin:12px 0">
-  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Foundation & Control</b>.
-  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
+ <div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Foundation & Control</b>.
+ <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
 </div>
 <h2>1. Vai trò trong cutover và hypercare</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr>
-          <th>Vai trò</th>
-          <th>Trách nhiệm chính</th>
-          <th>Điểm dừng / quyền quyết</th>
-          <th>Giao ca / backup</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Executive Sponsor</td>
-          <td>Quyết định Go/No-Go ở cấp công ty, cho phép rollback nếu ảnh hưởng sản xuất</td>
-          <td>Dừng go-live hoặc rollback toàn cục</td>
-          <td>Deputy theo <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td>
-        </tr>
-        <tr>
-          <td>Cutover Lead</td>
-          <td>Điều phối toàn bộ hoạt động theo từng mốc thời gian và cập nhật trạng thái chung</td>
-          <td>Dừng chuyển bước khi chưa đủ điều kiện của mốc trước</td>
-          <td>Cutover Deputy</td>
-        </tr>
-        <tr>
-          <td>Command Center Lead</td>
-          <td>Điều hành issue board, severity, owner, ETA và thông tin tới phòng ban</td>
-          <td>Nâng severity, gọi support, yêu cầu fallback cục bộ</td>
-          <td>Shift Lead còn lại</td>
-        </tr>
-        <tr>
-          <td>Business Owner / Dept Manager</td>
-          <td>Xác nhận người dùng phòng mình sẵn sàng và xử lý issue nghiệp vụ</td>
-          <td>Không cho phòng mình vào go-live nếu chưa pass training hoặc OJT</td>
-          <td>Deputy Manager hoặc Champion Lead</td>
-        </tr>
-        <tr>
-          <td>IT / Data Owner</td>
-          <td>Access, metadata, portal, refresh, backup, rollback kỹ thuật</td>
-          <td>Khóa publish, chặn access production, kích hoạt fallback số</td>
-          <td>System Admin backup</td>
-        </tr>
-        <tr>
-          <td>Champion Lead</td>
-          <td>Phân công Champion theo ca, thu issue hiện trường, hỗ trợ tại điểm dùng</td>
-          <td>Báo no-go ở mức cell/line/shift nếu coverage không đủ</td>
-          <td>Champion backup theo ca</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+ <div class="table-card">
+ <table class="matrix-table">
+ <thead>
+ <tr>
+ <th>Vai trò</th>
+ <th>Trách nhiệm chính</th>
+ <th>Điểm dừng / quyền quyết</th>
+ <th>Giao ca / backup</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td>Executive Sponsor</td>
+ <td>Quyết định Go/No-Go ở cấp công ty, cho phép rollback nếu ảnh hưởng sản xuất</td>
+ <td>Dừng go-live hoặc rollback toàn cục</td>
+ <td>Deputy theo <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td>
+ </tr>
+ <tr>
+ <td>Cutover Lead</td>
+ <td>Điều phối toàn bộ hoạt động theo từng mốc thời gian và cập nhật trạng thái chung</td>
+ <td>Dừng chuyển bước khi chưa đủ điều kiện của mốc trước</td>
+ <td>Cutover Deputy</td>
+ </tr>
+ <tr>
+ <td>Command Center Lead</td>
+ <td>Điều hành issue board, severity, owner, ETA và thông tin tới phòng ban</td>
+ <td>Nâng severity, gọi support, yêu cầu fallback cục bộ</td>
+ <td>Shift Lead còn lại</td>
+ </tr>
+ <tr>
+ <td>Business Owner / Dept Manager</td>
+ <td>Xác nhận người dùng phòng mình sẵn sàng và xử lý issue nghiệp vụ</td>
+ <td>Không cho phòng mình vào go-live nếu chưa pass training hoặc OJT</td>
+ <td>Deputy Manager hoặc Champion Lead</td>
+ </tr>
+ <tr>
+ <td>IT / Data Owner</td>
+ <td>Access, metadata, portal, refresh, backup, rollback kỹ thuật</td>
+ <td>Khóa publish, chặn access production, kích hoạt fallback số</td>
+ <td>System Admin backup</td>
+ </tr>
+ <tr>
+ <td>Champion Lead</td>
+ <td>Phân công Champion theo ca, thu issue hiện trường, hỗ trợ tại điểm dùng</td>
+ <td>Báo no-go ở mức cell/line/shift nếu coverage không đủ</td>
+ <td>Champion backup theo ca</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
 </div>
 
 <div class="section">
-  <h2>2. Trình tự cutover theo thời gian</h2>
-  <div class="timeline-step"><strong>T-30 đến T-14:</strong> Khóa phạm vi, owner, danh sách phòng ban vào wave, backlog thay đổi, kế hoạch giao tiếp, danh sách tài liệu hiệu lực, mô hình access, plan fallback và rollback.</div>
-  <div class="timeline-step"><strong>T-14 đến T-7:</strong> Hoàn thành manager briefing, Champion bootcamp, test metadata, test dashboard, load baseline KPI, kiểm link portal, phát QR, test 3 tình huống truy xuất thật.</div>
-  <div class="timeline-step"><strong>T-7 đến T-2:</strong> Freeze các thay đổi không bắt buộc, ký UAT, chốt danh sách support, diễn tập rollback, kiểm backup, chốt hotline và người trực từng ca.</div>
-  <div class="timeline-step"><strong>T-1:</strong> Họp Go/No-Go cuối, xác nhận checklist, kiểm last refresh dashboard, phát thông báo cuối cho người dùng, chụp snapshot trạng thái trước go-live.</div>
-  <div class="timeline-step"><strong>Day 0:</strong> Thực hiện cutover theo giờ, kích hoạt command center, theo dõi giao dịch đầu tiên, đóng hoặc escalate issue theo severity, ra quyết định tiếp tục hoặc rollback.</div>
-  <div class="timeline-step"><strong>D+1 đến D+14:</strong> Hypercare theo ca và theo ngày, rà issue aging, giảm support dựa trên dữ liệu pass, khóa bài học kinh nghiệm và chuẩn bị hypercare exit.</div>
+ <h2>2. Trình tự cutover theo thời gian</h2>
+ <div class="timeline-step"><strong>T-30 đến T-14:</strong> Khóa phạm vi, owner, danh sách phòng ban vào wave, backlog thay đổi, kế hoạch giao tiếp, danh sách tài liệu hiệu lực, mô hình access, plan fallback và rollback.</div>
+ <div class="timeline-step"><strong>T-14 đến T-7:</strong> Hoàn thành manager briefing, Champion bootcamp, test metadata, test dashboard, load baseline KPI, kiểm link portal, phát QR, test 3 tình huống truy xuất thật.</div>
+ <div class="timeline-step"><strong>T-7 đến T-2:</strong> Freeze các thay đổi không bắt buộc, ký UAT, chốt danh sách support, diễn tập rollback, kiểm backup, chốt hotline và người trực từng ca.</div>
+ <div class="timeline-step"><strong>T-1:</strong> Họp Go/No-Go cuối, xác nhận checklist, kiểm last refresh dashboard, phát thông báo cuối cho người dùng, chụp snapshot trạng thái trước go-live.</div>
+ <div class="timeline-step"><strong>Day 0:</strong> Thực hiện cutover theo giờ, kích hoạt command center, theo dõi giao dịch đầu tiên, đóng hoặc escalate issue theo severity, ra quyết định tiếp tục hoặc rollback.</div>
+ <div class="timeline-step"><strong>D+1 đến D+14:</strong> Hypercare theo ca và theo ngày, rà issue aging, giảm support dựa trên dữ liệu pass, khóa bài học kinh nghiệm và chuẩn bị hypercare exit.</div>
 </div>
 
 <div class="section">
-  <h2>3. Checklist Go/No-Go bắt buộc</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr>
-          <th>Nhóm điều kiện</th>
-          <th>Điểm kiểm bắt buộc</th>
-          <th>Owner xác nhận</th>
-          <th>No-go nếu</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>People</td>
-          <td>Manager pass, Champion coverage đủ theo ca, người dùng trọng yếu pass OJT</td>
-          <td>Dept Manager / HR</td>
-          <td>Không đủ Champion hoặc user trọng yếu chưa pass</td>
-        </tr>
-        <tr>
-          <td>Documents</td>
-          <td>Handbook, SOP, WI, QR, playlist, FRM và ANNEX đã đồng bộ bản hiệu lực</td>
-          <td>QMS Manager</td>
-          <td>Link chết, tài liệu sai phiên bản, QR trỏ sai</td>
-        </tr>
-        <tr>
-          <td>Digital</td>
-          <td>Permission, metadata, folder routing, retention, backup, offline kit đã sẵn sàng</td>
-          <td>IT Manager</td>
-          <td>Không truy cập được hoặc sai quyền production</td>
-        </tr>
-        <tr>
-          <td>Data &amp; dashboard</td>
-          <td>Dashboard có owner, source, last refresh, exception rule, baseline KPI</td>
-          <td>Data Owner</td>
-          <td>Số không đáng tin hoặc không có nguồn thay thế được công bố</td>
-        </tr>
-        <tr>
-          <td>Support</td>
-          <td>Command center rota, contact list, severity matrix, issue log, escalation SLA</td>
-          <td>Command Center Lead</td>
-          <td>Không có người trực hoặc không có kênh xử lý issue</td>
-        </tr>
-        <tr>
-          <td>Rollback</td>
-          <td>Đã diễn tập rollback và đã chốt trigger rõ</td>
-          <td>Cutover Lead / IT</td>
-          <td>Chưa kiểm được fallback hoặc rollback path</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+ <h2>3. Checklist Go/No-Go bắt buộc</h2>
+ <div class="table-card">
+ <table class="matrix-table">
+ <thead>
+ <tr>
+ <th>Nhóm điều kiện</th>
+ <th>Điểm kiểm bắt buộc</th>
+ <th>Owner xác nhận</th>
+ <th>No-go nếu</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td>People</td>
+ <td>Manager pass, Champion coverage đủ theo ca, người dùng trọng yếu pass OJT</td>
+ <td>Dept Manager / HR</td>
+ <td>Không đủ Champion hoặc user trọng yếu chưa pass</td>
+ </tr>
+ <tr>
+ <td>Documents</td>
+ <td>Handbook, SOP, WI, QR, playlist, FRM và ANNEX đã đồng bộ bản hiệu lực</td>
+ <td>QMS Manager</td>
+ <td>Link chết, tài liệu sai phiên bản, QR trỏ sai</td>
+ </tr>
+ <tr>
+ <td>Digital</td>
+ <td>Permission, metadata, folder routing, retention, backup, offline kit đã sẵn sàng</td>
+ <td>IT Manager</td>
+ <td>Không truy cập được hoặc sai quyền production</td>
+ </tr>
+ <tr>
+ <td>Data &amp; dashboard</td>
+ <td>Dashboard có owner, source, last refresh, exception rule, baseline KPI</td>
+ <td>Data Owner</td>
+ <td>Số không đáng tin hoặc không có nguồn thay thế được công bố</td>
+ </tr>
+ <tr>
+ <td>Support</td>
+ <td>Command center rota, contact list, severity matrix, issue log, escalation SLA</td>
+ <td>Command Center Lead</td>
+ <td>Không có người trực hoặc không có kênh xử lý issue</td>
+ </tr>
+ <tr>
+ <td>Rollback</td>
+ <td>Đã diễn tập rollback và đã chốt trigger rõ</td>
+ <td>Cutover Lead / IT</td>
+ <td>Chưa kiểm được fallback hoặc rollback path</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
 </div>
 
 <div class="section">
-  <h2>4. Lịch điều hành Day 0 theo mốc giờ</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr>
-          <th>Thời điểm</th>
-          <th>Hoạt động</th>
-          <th>Owner</th>
-          <th>Đầu ra</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>06:30-07:00</td>
-          <td>Command center mở ca, kiểm contact list, kiểm dashboard status, xác nhận Champion hiện diện</td>
-          <td>Command Center Lead</td>
-          <td>Bảng trạng thái ngày go-live ở trạng thái xanh hoặc có exception được chấp nhận</td>
-        </tr>
-        <tr>
-          <td>07:00-07:30</td>
-          <td>Go-live briefing đầu ca: nhắc scope, rule dừng, kênh hỗ trợ và rollback trigger</td>
-          <td>Cutover Lead</td>
-          <td>Tất cả owner biết mốc giao việc và kênh báo issue</td>
-        </tr>
-        <tr>
-          <td>07:30-09:00</td>
-          <td>Quan sát giao dịch đầu tiên, job đầu tiên, upload đầu tiên, truy xuất đầu tiên</td>
-          <td>Dept Managers / Champions</td>
-          <td>First transaction log và first issue list</td>
-        </tr>
-        <tr>
-          <td>09:00-11:00</td>
-          <td>Xử lý issue ưu tiên cao, khóa ngay lỗi wrong-document, wrong-location, wrong-revision</td>
-          <td>Command Center Lead / QMS / IT</td>
-          <td>Issue board cập nhật severity và owner</td>
-        </tr>
-        <tr>
-          <td>12:00</td>
-          <td>Mid-shift review: quyết tiếp tục, giới hạn phạm vi hoặc rollback cục bộ</td>
-          <td>Cutover Lead / Sponsor</td>
-          <td>Quyết định giữa ca và thông báo chính thức</td>
-        </tr>
-        <tr>
-          <td>14:00-16:00</td>
-          <td>Rà adoption tại điểm dùng, kiểm 3 phút truy xuất, kiểm completeness hồ sơ</td>
-          <td>Champions / Supervisors</td>
-          <td>Readiness by department và issue aging</td>
-        </tr>
-        <tr>
-          <td>17:00</td>
-          <td>End-of-day review, chốt issue mở sang D+1, xác định support tăng cường ban đêm nếu cần</td>
-          <td>Command Center Lead</td>
-          <td>Daily cutover report và kế hoạch D+1</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+ <h2>4. Lịch điều hành Day 0 theo mốc giờ</h2>
+ <div class="table-card">
+ <table class="matrix-table">
+ <thead>
+ <tr>
+ <th>Thời điểm</th>
+ <th>Hoạt động</th>
+ <th>Owner</th>
+ <th>Đầu ra</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td>06:30-07:00</td>
+ <td>Command center mở ca, kiểm contact list, kiểm dashboard status, xác nhận Champion hiện diện</td>
+ <td>Command Center Lead</td>
+ <td>Bảng trạng thái ngày go-live ở trạng thái xanh hoặc có exception được chấp nhận</td>
+ </tr>
+ <tr>
+ <td>07:00-07:30</td>
+ <td>Go-live briefing đầu ca: nhắc scope, rule dừng, kênh hỗ trợ và rollback trigger</td>
+ <td>Cutover Lead</td>
+ <td>Tất cả owner biết mốc giao việc và kênh báo issue</td>
+ </tr>
+ <tr>
+ <td>07:30-09:00</td>
+ <td>Quan sát giao dịch đầu tiên, job đầu tiên, upload đầu tiên, truy xuất đầu tiên</td>
+ <td>Dept Managers / Champions</td>
+ <td>First transaction log và first issue list</td>
+ </tr>
+ <tr>
+ <td>09:00-11:00</td>
+ <td>Xử lý issue ưu tiên cao, khóa ngay lỗi wrong-document, wrong-location, wrong-revision</td>
+ <td>Command Center Lead / QMS / IT</td>
+ <td>Issue board cập nhật severity và owner</td>
+ </tr>
+ <tr>
+ <td>12:00</td>
+ <td>Mid-shift review: quyết tiếp tục, giới hạn phạm vi hoặc rollback cục bộ</td>
+ <td>Cutover Lead / Sponsor</td>
+ <td>Quyết định giữa ca và thông báo chính thức</td>
+ </tr>
+ <tr>
+ <td>14:00-16:00</td>
+ <td>Rà adoption tại điểm dùng, kiểm 3 phút truy xuất, kiểm completeness hồ sơ</td>
+ <td>Champions / Supervisors</td>
+ <td>Readiness by department và issue aging</td>
+ </tr>
+ <tr>
+ <td>17:00</td>
+ <td>End-of-day review, chốt issue mở sang D+1, xác định support tăng cường ban đêm nếu cần</td>
+ <td>Command Center Lead</td>
+ <td>Daily cutover report và kế hoạch D+1</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
 </div>
 
 <div class="section">
-  <h2>5. Severity và phản ứng bắt buộc</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr>
-          <th>Mức độ</th>
-          <th>Tình huống điển hình</th>
-          <th>Phản ứng ngay</th>
-          <th>Quyền nâng cấp</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Sev-1</td>
-          <td>Dừng sản xuất, không phát hành hàng được, sai revision có nguy cơ thoát gate, mất truy cập diện rộng</td>
-          <td>Dừng phạm vi bị ảnh hưởng, kích hoạt fallback hoặc rollback, thông báo Sponsor ngay</td>
-          <td>Cutover Lead, Sponsor, IT Manager, QMS Manager</td>
-        </tr>
-        <tr>
-          <td>Sev-2</td>
-          <td>Phòng ban vẫn chạy được nhưng phải làm vòng tránh tạm thời, dashboard hoặc route hồ sơ có lỗi lớn</td>
-          <td>Kích hoạt owner xử lý ngay, giới hạn phạm vi, ghi exception note, review trong 30 phút</td>
-          <td>Command Center Lead</td>
-        </tr>
-        <tr>
-          <td>Sev-3</td>
-          <td>Lỗi hướng dẫn, lỗi link cục bộ, lỗi UI, lỗi cần hỗ trợ tại chỗ nhưng chưa ảnh hưởng quyết định chính</td>
-          <td>Giao cho Champion hoặc owner liên quan, xử lý trong ngày hoặc đưa vào backlog hypercare</td>
-          <td>Dept Manager / Champion Lead</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="danger"><strong>Rule:</strong> mọi Sev-1 phải có mốc quyết định tiếp tục hay rollback trong vòng 30 phút kể từ lúc xác nhận.</div>
+ <h2>5. Severity và phản ứng bắt buộc</h2>
+ <div class="table-card">
+ <table class="matrix-table">
+ <thead>
+ <tr>
+ <th>Mức độ</th>
+ <th>Tình huống điển hình</th>
+ <th>Phản ứng ngay</th>
+ <th>Quyền nâng cấp</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td>Sev-1</td>
+ <td>Dừng sản xuất, không phát hành hàng được, sai revision có nguy cơ thoát gate, mất truy cập diện rộng</td>
+ <td>Dừng phạm vi bị ảnh hưởng, kích hoạt fallback hoặc rollback, thông báo Sponsor ngay</td>
+ <td>Cutover Lead, Sponsor, IT Manager, QMS Manager</td>
+ </tr>
+ <tr>
+ <td>Sev-2</td>
+ <td>Phòng ban vẫn chạy được nhưng phải làm vòng tránh tạm thời, dashboard hoặc route hồ sơ có lỗi lớn</td>
+ <td>Kích hoạt owner xử lý ngay, giới hạn phạm vi, ghi exception note, review trong 30 phút</td>
+ <td>Command Center Lead</td>
+ </tr>
+ <tr>
+ <td>Sev-3</td>
+ <td>Lỗi hướng dẫn, lỗi link cục bộ, lỗi UI, lỗi cần hỗ trợ tại chỗ nhưng chưa ảnh hưởng quyết định chính</td>
+ <td>Giao cho Champion hoặc owner liên quan, xử lý trong ngày hoặc đưa vào backlog hypercare</td>
+ <td>Dept Manager / Champion Lead</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+ <div class="danger"><strong>Rule:</strong> mọi Sev-1 phải có mốc quyết định tiếp tục hay rollback trong vòng 30 phút kể từ lúc xác nhận.</div>
 </div>
 
 <div class="section">
-  <h2>6. Rollback trigger và fallback</h2>
-  <ul class="tight">
-    <li>Kích hoạt rollback khi hệ thống mới làm mất khả năng truy hồ sơ, phát hành hàng, kiểm soát revision hoặc bảo mật dữ liệu.</li>
-    <li>Kích hoạt fallback khi business vẫn phải tiếp tục nhưng lớp số hóa hoặc dashboard chưa đáng tin.</li>
-    <li>Fallback phải quay về nguồn đã được phê duyệt trong <a href="annex-118-offline-fallback-kit.html">ANNEX-118</a>, không tự chế biểu mẫu ngoài luồng.</li>
-    <li>Rollback hoặc fallback phải ghi rõ phạm vi, thời điểm bắt đầu, người phê duyệt, người thực hiện và tiêu chí quay lại trạng thái chuẩn.</li>
-  </ul>
-  <div class="ok"><strong>Khái niệm đúng:</strong> rollback bảo vệ sản xuất; fallback bảo vệ tính liên tục; exception note bảo vệ tính minh bạch; không mục nào được dùng để che lỗi.</div>
+ <h2>6. Rollback trigger và fallback</h2>
+ <ul class="tight">
+ <li>Kích hoạt rollback khi hệ thống mới làm mất khả năng truy hồ sơ, phát hành hàng, kiểm soát revision hoặc bảo mật dữ liệu.</li>
+ <li>Kích hoạt fallback khi business vẫn phải tiếp tục nhưng lớp số hóa hoặc dashboard chưa đáng tin.</li>
+ <li>Fallback phải quay về nguồn đã được phê duyệt trong <a href="annex-118-offline-fallback-kit.html">ANNEX-118</a>, không tự chế biểu mẫu ngoài luồng.</li>
+ <li>Rollback hoặc fallback phải ghi rõ phạm vi, thời điểm bắt đầu, người phê duyệt, người thực hiện và tiêu chí quay lại trạng thái chuẩn.</li>
+ </ul>
+ <div class="ok"><strong>Khái niệm đúng:</strong> rollback bảo vệ sản xuất; fallback bảo vệ tính liên tục; exception note bảo vệ tính minh bạch; không mục nào được dùng để che lỗi.</div>
 </div>
 
 <div class="section">
-  <h2>7. Kế hoạch hypercare D+1 đến D+14</h2>
-  <div class="grid-3">
-    <div class="card-lite">
-      <h3>D+1 đến D+3</h3>
-      <span class="chip">Support tăng cường</span>
-      <ul class="tight">
-        <li>Champion hiện diện tại điểm dùng trọng yếu.</li>
-        <li>Review issue mỗi ca.</li>
-        <li>Chưa giảm bất kỳ lớp hỗ trợ nào nếu còn issue Sev-1 hoặc Sev-2 mở.</li>
-      </ul>
-    </div>
-    <div class="card-lite">
-      <h3>D+4 đến D+7</h3>
-      <span class="chip">Ổn định có kiểm soát</span>
-      <ul class="tight">
-        <li>Giảm hỗ trợ chỉ ở khu vực đã pass liên tiếp.</li>
-        <li>Rà wrong-document, wrong-location, retrieval time và issue aging.</li>
-        <li>Đóng bài học kinh nghiệm đầu tiên vào tài liệu hoặc dashboard.</li>
-      </ul>
-    </div>
-    <div class="card-lite">
-      <h3>D+8 đến D+14</h3>
-      <span class="chip">Chuẩn bị handoff</span>
-      <ul class="tight">
-        <li>Chốt owner vận hành thường xuyên.</li>
-        <li>Rà metrics hypercare exit.</li>
-        <li>Đóng support tạm thời và chuyển sang cadence thường xuyên.</li>
-      </ul>
-    </div>
-  </div>
+ <h2>7. Kế hoạch hypercare D+1 đến D+14</h2>
+ <div class="grid-3">
+ <div class="card-lite">
+ <h3>D+1 đến D+3</h3>
+ <span class="chip">Support tăng cường</span>
+ <ul class="tight">
+ <li>Champion hiện diện tại điểm dùng trọng yếu.</li>
+ <li>Review issue mỗi ca.</li>
+ <li>Chưa giảm bất kỳ lớp hỗ trợ nào nếu còn issue Sev-1 hoặc Sev-2 mở.</li>
+ </ul>
+ </div>
+ <div class="card-lite">
+ <h3>D+4 đến D+7</h3>
+ <span class="chip">Ổn định có kiểm soát</span>
+ <ul class="tight">
+ <li>Giảm hỗ trợ chỉ ở khu vực đã pass liên tiếp.</li>
+ <li>Rà wrong-document, wrong-location, retrieval time và issue aging.</li>
+ <li>Đóng bài học kinh nghiệm đầu tiên vào tài liệu hoặc dashboard.</li>
+ </ul>
+ </div>
+ <div class="card-lite">
+ <h3>D+8 đến D+14</h3>
+ <span class="chip">Chuẩn bị handoff</span>
+ <ul class="tight">
+ <li>Chốt owner vận hành thường xuyên.</li>
+ <li>Rà metrics hypercare exit.</li>
+ <li>Đóng support tạm thời và chuyển sang cadence thường xuyên.</li>
+ </ul>
+ </div>
+ </div>
 </div>
 
 <div class="section">
-  <h2>8. Điều kiện thoát hypercare</h2>
-  <ul class="tight">
-    <li>Không còn issue Sev-1 mở.</li>
-    <li>Issue Sev-2 còn lại đã có workaround ổn định, owner rõ và thời hạn đóng rõ.</li>
-    <li>Người dùng của wave đang xét tự truy xuất tài liệu và hồ sơ trong ngưỡng mục tiêu.</li>
-    <li>Dashboard có last refresh, owner, source và exception note hoạt động đúng.</li>
-    <li>Dept Manager xác nhận phòng ban đã vận hành độc lập được mà không cần Champion túc trực liên tục.</li>
-  </ul>
+ <h2>8. Điều kiện thoát hypercare</h2>
+ <ul class="tight">
+ <li>Không còn issue Sev-1 mở.</li>
+ <li>Issue Sev-2 còn lại đã có workaround ổn định, owner rõ và thời hạn đóng rõ.</li>
+ <li>Người dùng của wave đang xét tự truy xuất tài liệu và hồ sơ trong ngưỡng mục tiêu.</li>
+ <li>Dashboard có last refresh, owner, source và exception note hoạt động đúng.</li>
+ <li>Dept Manager xác nhận phòng ban đã vận hành độc lập được mà không cần Champion túc trực liên tục.</li>
+ </ul>
 </div>
 
 <div class="section">
-  <h2>9. Bằng chứng phải lưu trong runbook pack</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr>
-          <th>Thành phần</th>
-          <th>Nội dung tối thiểu</th>
-          <th>Owner</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Go/No-Go sign-off</td>
-          <td>Checklist pass/fail, quyết định, điều kiện kèm theo, chữ ký hoặc log phê duyệt</td>
-          <td>Executive Sponsor / Cutover Lead</td>
-        </tr>
-        <tr>
-          <td>Cutover timeline</td>
-          <td>Mốc giờ, bước thực hiện, trạng thái hoàn thành, issue phát sinh</td>
-          <td>Cutover Lead</td>
-        </tr>
-        <tr>
-          <td>Issue board</td>
-          <td>Severity, owner, ETA, root cause tạm thời, trạng thái đóng</td>
-          <td>Command Center Lead</td>
-        </tr>
-        <tr>
-          <td>Rollback / fallback record</td>
-          <td>Trigger, phạm vi, thời điểm, người phê duyệt, thời điểm phục hồi</td>
-          <td>IT Manager / QMS Manager</td>
-        </tr>
-        <tr>
-          <td>Hypercare report</td>
-          <td>KPI, issue aging, adoption, readiness by department, exit decision</td>
-          <td>Command Center Lead / QMS</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+ <h2>9. Bằng chứng phải lưu trong runbook pack</h2>
+ <div class="table-card">
+ <table class="matrix-table">
+ <thead>
+ <tr>
+ <th>Thành phần</th>
+ <th>Nội dung tối thiểu</th>
+ <th>Owner</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td>Go/No-Go sign-off</td>
+ <td>Checklist pass/fail, quyết định, điều kiện kèm theo, chữ ký hoặc log phê duyệt</td>
+ <td>Executive Sponsor / Cutover Lead</td>
+ </tr>
+ <tr>
+ <td>Cutover timeline</td>
+ <td>Mốc giờ, bước thực hiện, trạng thái hoàn thành, issue phát sinh</td>
+ <td>Cutover Lead</td>
+ </tr>
+ <tr>
+ <td>Issue board</td>
+ <td>Severity, owner, ETA, root cause tạm thời, trạng thái đóng</td>
+ <td>Command Center Lead</td>
+ </tr>
+ <tr>
+ <td>Rollback / fallback record</td>
+ <td>Trigger, phạm vi, thời điểm, người phê duyệt, thời điểm phục hồi</td>
+ <td>IT Manager / QMS Manager</td>
+ </tr>
+ <tr>
+ <td>Hypercare report</td>
+ <td>KPI, issue aging, adoption, readiness by department, exit decision</td>
+ <td>Command Center Lead / QMS</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
 </div>
 
 <div class="section">
-  <h2>10. Tài liệu liên quan</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr>
-          <th>Nhóm</th>
-          <th>Tài liệu</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Kế hoạch triển khai</td>
-          <td><a href="../../../02-Work-Instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html">WI-106</a><br/><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td>
-        </tr>
-        <tr>
-          <td>Dashboard và dữ liệu</td>
-          <td><a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a><br/><a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></td>
-        </tr>
-        <tr>
-          <td>Escalation và fallback</td>
-          <td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a><br/><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a><br/><a href="../../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td>
-        </tr>
-        <tr>
-          <td>Điều hướng và evidence</td>
-          <td><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a><br/><a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a><br/><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+ <h2>10. Tài liệu liên quan</h2>
+ <div class="table-card">
+ <table class="matrix-table">
+ <thead>
+ <tr>
+ <th>Nhóm</th>
+ <th>Tài liệu</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td>Kế hoạch triển khai</td>
+ <td><a href="../../../02-Work-Instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html">WI-106</a><br/><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td>
+ </tr>
+ <tr>
+ <td>Dashboard và dữ liệu</td>
+ <td><a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a><br/><a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></td>
+ </tr>
+ <tr>
+ <td>Escalation và fallback</td>
+ <td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a><br/><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a><br/><a href="../../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td>
+ </tr>
+ <tr>
+ <td>Điều hướng và evidence</td>
+ <td><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a><br/><a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a><br/><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
 </div>
 
 </div></div></div>
