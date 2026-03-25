@@ -128,6 +128,28 @@ td,th{
 <div class="field"><b>Điểm dừng tự động</b><div class="blank">Kỹ thuật hold, nguyên vật liệu hold, nhà cung cấp sự kiện, chất lượng hold, machine sự cố hỏng máy vượt khôi phục / thu hồi ngưỡng, no-Operator / no-tool mức sẵn sàng, đóng băng-cửa sổ / khung thời gian ghi đè / bỏ qua chưa được phê duyệt.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
+<div class="gate-grid">
+<div class="gate-card"><h3>501-G1 — Tiếp nhận Job và phân bổ nguồn lực</h3>
+<p class="small"><b>Lead:</b> Production Planner</p>
+<p class="small"><b>Điểm dừng:</b> Engineering hold chưa gỡ; vật tư hoặc outsource ETA chưa khả dụng; customer requirement chưa giải quyết; không có đường chạy thực tế (no realistic path to run).</p>
+<p class="small"><b>KPI chính:</b> % job đủ mức sẵn sàng ngay lần đầu ≥ 90%; readiness pass rate; thời gian từ tiếp nhận đến release ≤ 4h.</p></div>
+<div class="gate-card"><h3>501-G2 — Lập lịch sản xuất và dispatch</h3>
+<p class="small"><b>Lead:</b> Planner + Giám đốc Sản xuất</p>
+<p class="small"><b>Điểm dừng:</b> FRM-501 Planning Release Checklist chưa pass; ngày đến hạn không khả thi; load model chưa cập nhật; bottleneck slot chưa được xem xét; routing mismatch.</p>
+<p class="small"><b>KPI chính:</b> Planning release cycle time ≤ 2h; release rework rate ≤ 5%; dispatch stability index ≥ 85%.</p></div>
+<div class="gate-card"><h3>501-G3 — Kiểm soát WIP, capacity và cân bằng tải</h3>
+<p class="small"><b>Lead:</b> Planner + Trưởng ca</p>
+<p class="small"><b>Điểm dừng:</b> WIP cap bị vượt ngưỡng; queue aging vượt SLA; repeated no-start tại cell; uncontrolled split lot; thay đổi ưu tiên không được phê duyệt.</p>
+<p class="small"><b>KPI chính:</b> WIP cap compliance ≥ 95%; on-time start rate; queue aging SLA adherence; hot-job override count ≤ 2/tuần.</p></div>
+<div class="gate-card"><h3>501-G4 — Bàn giao ca, theo dõi tiến độ và escalation</h3>
+<p class="small"><b>Lead:</b> Trưởng ca + Production Manager</p>
+<p class="small"><b>Điểm dừng:</b> Không có handover log cuối ca; delay không gắn nguyên nhân và người chịu trách nhiệm; missing recovery owner; bottleneck chưa review trong ngày.</p>
+<p class="small"><b>KPI chính:</b> Shift handover completeness = 100%; plan adherence trong freeze window ≥ 90%; recovery closure rate ≥ 85%.</p></div>
+<div class="gate-card"><h3>501-G5 — Đóng Job, đối soát và bàn giao hồ sơ</h3>
+<p class="small"><b>Lead:</b> Production + Planner + QA</p>
+<p class="small"><b>Điểm dừng:</b> Job chưa hoàn tất tất cả operation trên router; hồ sơ chất lượng chưa đủ để đóng; WIP aging report chưa được reconcile; downtime chưa ghi nhận đầy đủ vào FRM-512.</p>
+<p class="small"><b>KPI chính:</b> Job close-out cycle time ≤ 24h sau operation cuối; % job đóng đúng hạn; record completeness ≥ 98%.</p></div>
+</div>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:28%"/><col style="width:20%"/><col style="width:18%"/><col style="width:20%"/></colgroup><thead><tr><th>Cổng</th><th>Tiêu chí mở cổng</th><th>Điểm dừng bắt buộc</th><th>Người phụ trách</th><th>KPI chính</th></tr></thead><tbody>
 <tr><td><b>501-G1</b><br/>Mức sẵn sàng to plan</td><td>Demand rõ; baseline đã khóa; vật tư / outsource ETA khả dụng; risk flags đã nhìn thấy.</td><td>Engineering hold; source hold; unresolved customer requirement; no realistic path to run.</td><td>Planner</td><td>% job đủ mức sẵn sàng ngay lần đầu; mức sẵn sàng pass rate.</td></tr>
 <tr><td><b>501-G2</b><br/>Planning Release</td><td>FRM-501 pass; ngày đến hạn logic khả thi; load model cập nhật; bottleneck slot đã xem xét.</td><td>FRM-501 fail; hidden constraint; missing critical operation / routing mismatch.</td><td>Planner + Production</td><td>Planning release cycle time; release rework rate.</td></tr>

@@ -141,6 +141,28 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 <div class="field"><b>Điểm dừng tự động</b><div class="blank">Tạm ngưng/Chặn trạng thái, cert hết hạn, site/scope không khớp, hàng giả / hàng nhái tín hiệu, lặp lại từ chối, khách hàng-đã đề cử source chưa có miễn trừ rõ.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
+<div class="gate-grid">
+<div class="gate-card"><h3>401-G1 — Đánh giá và phê duyệt nhà cung cấp mới</h3>
+<p class="small"><b>Lead:</b> Chuỗi cung ứng Manager + QA Manager</p>
+<p class="small"><b>Điểm dừng:</b> NCC mới chưa qua đánh giá rủi ro và năng lực; site hoặc scope không khớp family đã đăng ký; nguồn đơn chưa có risk treatment; khách hàng có source restriction chưa được xác minh.</p>
+<p class="small"><b>KPI chính:</b> % supplier hồ sơ đầy đủ ngay lần đầu; cycle time phê duyệt NCC mới ≤ 15 ngày làm việc; % critical buy có ≥ 2 nguồn phê duyệt.</p></div>
+<div class="gate-card"><h3>401-G2 — Kiểm soát đơn hàng và yêu cầu chất lượng</h3>
+<p class="small"><b>Lead:</b> Nhân viên mua hàng (Buyer)</p>
+<p class="small"><b>Điểm dừng:</b> PO thiếu part/rev/spec; thiếu yêu cầu cert, truy xuất, đóng gói hoặc nhãn; luồng-down checklist chưa pass; NCC chưa xác nhận lead time và điều kiện chấp nhận.</p>
+<p class="small"><b>KPI chính:</b> PO right-first-time ≥ 95%; % PO phải phát hành lại do thiếu thông tin; thời gian phản hồi xác nhận đơn ≤ 48h.</p></div>
+<div class="gate-card"><h3>401-G3 — Giám sát hiệu suất nhà cung cấp</h3>
+<p class="small"><b>Lead:</b> Chuỗi cung ứng Manager + QA</p>
+<p class="small"><b>Điểm dừng:</b> OTD hoặc OTQ dưới ngưỡng tối thiểu theo family; reject lặp lại ≥ 2 lần cùng nguyên nhân; NCC không phản hồi SCAR trong SLA; change-notice không thông báo.</p>
+<p class="small"><b>KPI chính:</b> OTD NCC theo family/site; incoming reject rate (ppm); SCAR closure on-time rate ≥ 90%.</p></div>
+<div class="gate-card"><h3>401-G4 — Kiểm soát quy trình đặc biệt — outsource</h3>
+<p class="small"><b>Lead:</b> Buyer + Planner + Warehouse / IQC + QA</p>
+<p class="small"><b>Điểm dừng:</b> Processor chưa phê duyệt đúng scope/site; cert không khớp part/rev/lot; kiểm tra đầu vào không pass; bao gói hư hỏng hoặc thiếu truy xuất; công đoạn đặc biệt scope mismatch.</p>
+<p class="small"><b>KPI chính:</b> Cert completeness ngay lần nhận đầu tiên ≥ 98%; outsource turnaround adherence; % receipt hold xử lý đúng hạn.</p></div>
+<div class="gate-card"><h3>401-G5 — NCR nhà cung cấp, SCAR và cải tiến</h3>
+<p class="small"><b>Lead:</b> Chuỗi cung ứng Manager + QA Manager</p>
+<p class="small"><b>Điểm dừng:</b> SCAR quá hạn chưa đóng; reject lặp lại nhưng chưa chuyển trạng thái Probation/Suspend; corrective action chưa có bằng chứng hiệu lực; thẻ điểm chưa review đúng chu kỳ.</p>
+<p class="small"><b>KPI chính:</b> SCAR overdue = 0; supplier quality reject rate trend giảm; probation close-out rate ≥ 85%; requalification cycle time.</p></div>
+</div>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:28%"/><col style="width:20%"/><col style="width:18%"/><col style="width:20%"/></colgroup><thead><tr><th>Cổng</th><th>Tiêu chí mở cổng</th><th>Điểm dừng bắt buộc</th><th>Người phụ trách</th><th>KPI chính</th></tr></thead><tbody>
 <tr><td><b>401-G1</b><br/>Source approval</td><td>Đã xác định family; risk class; approved/conditional processor trạng thái; customer source restriction; alternate source trạng thái.</td><td>NCC mới chưa đánh giá; site/scope mismatch; Block trạng thái; nguồn đơn (single-source / nguồn đơn) chưa có risk treatment.</td><td>Supply Chain + QA</td><td>% supplier hồ sơ đầy đủ; % critical buy có nguồn thay thế; cycle time hội nhập nhân sự mới.</td></tr>
 <tr><td><b>401-G2</b><br/>PO &amp; luồng-down release</td><td>PO đủ field; pack kỹ thuật đủ; luồng-down bảng kiểm pass; ngày đến hạn và đầu ra condition được NCC commit.</td><td>Thiếu rev/spec; thiếu cert requirement; yêu cầu đóng gói/nhãn chưa rõ; chưa xác nhận thời gian dẫn.</td><td>Buyer</td><td>PO right-first-time; % PO phát hành lại; thời gian phản hồi xác nhận đơn.</td></tr>

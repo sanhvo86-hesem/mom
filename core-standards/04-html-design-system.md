@@ -533,3 +533,66 @@ Style.css có khối CSS ẩn toàn bộ UI Google Translate (banner, menu, tool
 | `callout-` | Callout variant |
 | `step-` | Step/flow |
 | `sig-`, `sign-` | Signature |
+
+---
+
+## 16. Print Layout (In ấn — ISO compliant)
+
+### Nguyên tắc: WYSIWYG — hiển thị sao, in như vậy
+
+| Thuộc tính | Giá trị |
+|-----------|---------|
+| `@page margin` | 15mm top, 12mm sides, 18mm bottom |
+| `form-header` | Giữ nguyên grid layout, border 1px solid #999, `page-break-inside: avoid` |
+| Table header | `print-color-adjust: exact` — in đúng màu |
+| Cards/Notes | `page-break-inside: auto` — cho phép cắt nếu dài |
+| `req`, `vstep` | `page-break-inside: avoid` — không cắt element nhỏ |
+| Badge/Tag | `print-color-adjust: exact` — in đúng màu |
+
+### Lưu ý ISO trên bản in:
+- Footer trang: "Bản in không kiểm soát nếu không có dấu kiểm soát — HESEM QMS"
+- Không thêm header/footer tự động từ browser (tắt trong settings in)
+
+### Quy tắc bắt buộc:
+1. **KHÔNG** thêm inline `@media print` vào HTML files — tất cả print rules nằm trong `style.css`
+2. **KHÔNG** thêm `page-break-inside: avoid` cho elements lớn (card, table-card, note)
+3. **CÓ THỂ** thêm `page-break-before: always` trước heading lớn nếu cần tách trang
+
+---
+
+## 17. Vflow — Visual Flowchart Steps
+
+### Cấu trúc HTML:
+```html
+<div class="vflow">
+  <div class="vstep">
+    <div class="vnum">1</div>
+    <div class="vtext"><b>Tên bước</b><br>Mô tả chi tiết...</div>
+  </div>
+  <div class="vstep decision">
+    <div class="vnum">?</div>
+    <div class="vtext"><b>Quyết định</b><br>Nếu PASS → bước tiếp. Nếu FAIL → hold.</div>
+  </div>
+  <div class="vstep hold">
+    <div class="vnum">!</div>
+    <div class="vtext"><b>HOLD</b><br>Dừng và escalation.</div>
+  </div>
+  <div class="vstep end">
+    <div class="vnum">✓</div>
+    <div class="vtext"><b>Hoàn tất</b><br>Release sang gate tiếp theo.</div>
+  </div>
+</div>
+```
+
+### Variants:
+| Class | Màu border-left | Vnum background | Dùng khi |
+|-------|-----------------|----------------|----------|
+| `.vstep` (default) | `--blue` | `--blue` | Bước thông thường |
+| `.vstep.decision` | `--gold` | `--gold` | Bước quyết định (pass/fail) |
+| `.vstep.hold` | `--red` | `--red` | Bước HOLD/dừng |
+| `.vstep.end` | `--green` | `--green` | Bước hoàn tất/release |
+
+### Visual:
+- Vertical connector line gradient `--blue` → `--gold` nối các bước
+- Hover: border-left chuyển sang `--gold`, subtle box-shadow
+- Vnum: circle 32px, box-shadow, số bước bên trong

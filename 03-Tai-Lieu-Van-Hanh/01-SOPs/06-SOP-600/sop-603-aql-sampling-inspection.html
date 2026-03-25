@@ -127,6 +127,28 @@ td,th{
 <div class="field"><b>Điểm dừng tự động</b><div class="blank">Hỗn hợp lot, không chắc chắn truy xuất nguồn gốc, thiếu trực quan standard, gage trạng thái không hợp lệ, quy trình trôi / sai lệch rõ, CTQ/khách hàng rule Requests 100%.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
+<div class="gate-grid">
+<div class="gate-card"><h3>603-G1 — Xác định AQL plan và mức kiểm tra</h3>
+<p class="small"><b>Lead:</b> Quality Engineer</p>
+<p class="small"><b>Điểm dừng:</b> Lot không đồng nhất (mixed lot); đặc tính CTQ yêu cầu 100% kiểm tra; quy trình không ổn định; thiếu lot definition hoặc truy xuất nguồn gốc; QPL/customer rule chưa xác định.</p>
+<p class="small"><b>KPI chính:</b> % lots chọn đúng eligibility ngay lần đầu ≥ 95%; plan selection accuracy ≥ 98%.</p></div>
+<div class="gate-card"><h3>603-G2 — Lấy mẫu và thực hiện kiểm tra</h3>
+<p class="small"><b>Lead:</b> Tổ trưởng QC + QC Inspector</p>
+<p class="small"><b>Điểm dừng:</b> Mẫu bị thiên vị hoặc hư hỏng; visual standard hoặc gage không hợp lệ; defect classification chưa rõ; raw count không truy xuất được; AQL/Ac/Re tra sai hoặc không theo standard reference.</p>
+<p class="small"><b>KPI chính:</b> Sampling discipline compliance ≥ 98%; inspection cycle time ≤ SLA theo lot size; switching-history completeness = 100%.</p></div>
+<div class="gate-card"><h3>603-G3 — Phán quyết Accept/Reject và escalation</h3>
+<p class="small"><b>Lead:</b> Tổ trưởng QC + QA</p>
+<p class="small"><b>Điểm dừng:</b> Resample không được phép mà vẫn thực hiện; reject nhưng không kích hoạt containment; accept khi defect class chưa xác định rõ; raw counts chưa đối chiếu Ac/Re.</p>
+<p class="small"><b>KPI chính:</b> Decision lead time ≤ 2h sau khi mẫu sẵn sàng; reject reaction timeliness ≤ 4h; false-accept trend = 0.</p></div>
+<div class="gate-card"><h3>603-G4 — Chuyển đổi mức kiểm tra (Normal → Tightened → Reduced)</h3>
+<p class="small"><b>Lead:</b> Quality Engineer + Tổ trưởng QC</p>
+<p class="small"><b>Điểm dừng:</b> Switching state chưa cập nhật sau reject; reject lặp nhưng vẫn giữ Normal; chuyển sang Reduced khi chưa đủ điều kiện liên tiếp; không có history log để chứng minh switching decision.</p>
+<p class="small"><b>KPI chính:</b> Tightened trigger compliance = 100%; switching decision có truy xuất bằng chứng; % lot áp đúng inspection level theo history.</p></div>
+<div class="gate-card"><h3>603-G5 — Ghi nhận hồ sơ và phản hồi cải tiến</h3>
+<p class="small"><b>Lead:</b> Quality Engineer</p>
+<p class="small"><b>Điểm dừng:</b> History lot không cập nhật vào hệ thống; reject lặp nhưng không có feedback loop về supplier/process/final release; hồ sơ FRM-621 thiếu trường dữ liệu bắt buộc.</p>
+<p class="small"><b>KPI chính:</b> % history cập nhật đúng hạn ≤ 24h; feedback loop closure rate ≥ 90%; FRM-621 completeness = 100%.</p></div>
+</div>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:28%"/><col style="width:20%"/><col style="width:18%"/><col style="width:20%"/></colgroup><thead><tr><th>Cổng</th><th>Tiêu chí mở cổng</th><th>Điểm dừng bắt buộc</th><th>Người phụ trách</th><th>KPI chính</th></tr></thead><tbody>
 <tr><td><b>603-G1</b><br/>Lot eligibility</td><td>Lot homogeneous; context cho phép sampling; traceability rõ; QPL/customer rule đã xác định.</td><td>Mixed lot; CTQ 100%; unstable quy trình; missing lot definition.</td><td>Quality Engineer</td><td>% lots chọn đúng eligibility ngay lần đầu.</td></tr>
 <tr><td><b>603-G2</b><br/>Plan selection</td><td>AQL, kiểm tra level, switching state, Ac/Re đã tra đúng theo standard reference và hồ sơ trên FRM-621.</td><td>Tự chọn plan không theo rule; plan không truy được nguồn; switching state chưa cập nhật.</td><td>Tổ trưởng QC</td><td>Plan selection accuracy; switching-history completeness.</td></tr>
