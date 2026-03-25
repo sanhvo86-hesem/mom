@@ -276,7 +276,7 @@ pre, code { overflow-wrap: anywhere; word-break: break-word; }
   .container { max-width: 100%; padding: 0; }
   .page { border-radius: 0; box-shadow: none; border: none; }
   .page-body { padding: 0; }
-  .form-header { border-radius: 0; border: 1px solid var(--th-bdr); page-break-after: avoid; margin-bottom: 12px; }
+  .form-header { border-radius: 0; border: 1px solid var(--th-bdr); margin-bottom: 12px; page-break-inside: auto; break-inside: auto; }
   .brand-logo img { max-width: 120px; }
   a { color: var(--ink) !important; text-decoration: none !important; }
   .btn { display: none !important; }
@@ -359,25 +359,23 @@ html,body{top:0!important;}
 .doc-content table th,.doc-content table td{border:1px solid #d1d5db;padding:8px;vertical-align:top;}
 .doc-content table th{background:rgba(0,0,0,.04);}
 
-/* ═══ PAGE BREAK & OVERFLOW CONTROL (v8.1) ═══ */
+/* ═══ PAGE BREAK & OVERFLOW CONTROL (v8.2) ═══ */
 @media print {
-  .card, .table-card, .callout, .note, .box, .iso-map,
-  .preface-block, .jd-mission, .form-sheet, .lane,
-  .legend, .req, .auth-grid, .backup-card, .vstep {
+  /* CHỈ avoid cho elements NHỎ — cho phép cắt trang nếu nội dung dài */
+  .req, .vstep, .legend, .sig-row, .sign-row, .approval-row, .backup-card {
     page-break-inside: avoid;
     break-inside: avoid;
   }
+  /* Heading không bị tách khỏi nội dung ngay sau */
   h1, h2, h3, .h1, .h2, .h3 {
     page-break-after: avoid;
     break-after: avoid;
   }
-  .form-header {
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
-  .sig-row, .sign-row, .approval-row {
-    page-break-inside: avoid;
-    break-inside: avoid;
+  /* Card, table, note — CHO PHÉP cắt nếu dài hơn 1 trang */
+  .card, .table-card, .callout, .note, .box, .iso-map,
+  .preface-block, .form-header, .form-sheet {
+    page-break-inside: auto;
+    break-inside: auto;
   }
   tr { page-break-inside: avoid; break-inside: avoid; }
   thead { display: table-header-group; }
