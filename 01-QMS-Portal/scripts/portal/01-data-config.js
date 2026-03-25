@@ -1721,9 +1721,7 @@ function buildDocFolderTree(docs, catCode){
     if(apiNode.subs && apiNode.subs.length > 0){
       apiNode.subs.forEach(sub => {
         const child = buildNode(sub, allDocs);
-        if(child.docs.length > 0 || child.children.length > 0){
-          node.children.push(child);
-        }
+        node.children.push(child);
       });
     }
     return node;
@@ -1732,9 +1730,7 @@ function buildDocFolderTree(docs, catCode){
   // Build children from API tree subs
   treeNode.subs.forEach(sub => {
     const child = buildNode(sub, docs);
-    if(child.docs.length > 0 || child.children.length > 0){
-      root.children.push(child);
-    }
+    root.children.push(child);
   });
 
   // Docs directly in the category root (no subfolder)
@@ -1754,20 +1750,28 @@ function renderFolderTreeHtml(node, mode, options, depth){
   if(node.children && node.children.length > 0){
     node.children.forEach(child => {
       const allChildDocs = collectTreeDocs(child);
-      if(allChildDocs.length === 0) return;
+      const hasChildDocs = allChildDocs.length > 0;
 
       if(mode === 'perms'){
         const role = options.role;
         const isFullAccess = options.isFullAccess;
         const dAccess = allChildDocs.filter(d=>docMatchesRole(d.code,role)).length;
-        const dAllChecked = dAccess === allChildDocs.length;
+        const dAllChecked = hasChildDocs && dAccess === allChildDocs.length;
         const subPath = child.path.split('/').pop() || child.name;
+        const folderControl = isFullAccess
+          ? '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">✓</span>'
+          : (hasChildDocs
+              ? '<input type="checkbox" '+(dAllChecked?'checked':'')+' onchange="toggleSubfolderPerms(this,\''+escapeHtml(options.catId)+'\',\''+escapeHtml(subPath)+'\',\''+role+'\')" style="margin:0">'
+              : '<span style="color:#94a3b8;font-weight:700;width:16px;display:inline-block">•</span>');
+        const folderMeta = hasChildDocs
+          ? `${dAccess}/${allChildDocs.length}`
+          : (lang==='en' ? 'Empty folder' : 'Thư mục trống');
 
         html += `<div style="margin:4px 0 2px ${indent}px;padding:4px 8px;background:${depth>0?'var(--bg-1,#fff)':'var(--bg-2,#f8fafc)'};border-radius:8px;border:1px solid var(--border-light,#e2e8f0)">
           <div style="display:flex;align-items:center;gap:6px;padding:2px 0;font-size:${depth>0?'11':'12'}px;font-weight:600;color:#475569">
-            ${!isFullAccess ? '<input type="checkbox" '+(dAllChecked?'checked':'')+' onchange="toggleSubfolderPerms(this,\''+escapeHtml(options.catId)+'\',\''+escapeHtml(subPath)+'\',\''+role+'\')" style="margin:0"> ' : '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">✓</span>'}
+            ${folderControl}
             📁 ${escapeHtml(getSubfolderLabel(child.path.split('/').pop()||child.name))}
-            <span style="font-weight:400;font-size:10px;color:var(--text-3);margin-left:auto">${dAccess}/${allChildDocs.length}</span>
+            <span style="font-weight:400;font-size:10px;color:var(--text-3);margin-left:auto">${folderMeta}</span>
           </div>`;
 
         // If child has sub-children, recurse
@@ -1791,22 +1795,31 @@ function renderFolderTreeHtml(node, mode, options, depth){
 
       } else if(mode === 'effective'){
         const dHiddenCount = allChildDocs.filter(d=>isDocHidden(d.code)).length;
-        const dAllHidden = dHiddenCount === allChildDocs.length;
+        const dAllHidden = hasChildDocs && dHiddenCount === allChildDocs.length;
         const dBtnLabel = dAllHidden ? (lang==='en'?'Show':'Hiện') : (lang==='en'?'Hide':'Ẩn');
         const dBtnIcon = dAllHidden ? '👁️' : '🙈';
         const subPath = child.path.split('/').pop() || child.name;
         const catId = options.catId;
+        const subMeta = hasChildDocs
+          ? `${allChildDocs.length} ${lang==='en'?'docs':'tài liệu'} • ${lang==='en'?'Hidden':'Ẩn'}: ${dHiddenCount}`
+          : (lang==='en' ? 'Empty folder — ready for new controlled files' : 'Thư mục trống — sẵn sàng nhận tài liệu được kiểm soát');
+        const subAction = hasChildDocs
+          ? `<button class="btn-admin" style="font-size:11px;padding:4px 10px" onclick="toggleSubfolderHidden('${escapeHtml(catId)}','${escapeHtml(subPath)}')">${dBtnIcon} ${dBtnLabel}</button>`
+          : `<span style="font-size:11px;color:var(--text-3);font-weight:600">${lang==='en'?'No files yet':'Chưa có file'}</span>`;
+        const emptyNotice = (!hasChildDocs && (!child.children || child.children.length === 0))
+          ? `<div style="padding:8px 2px 2px;font-size:11px;color:var(--text-3)">${lang==='en'?'This folder exists on disk but has no displayable files yet.':'Folder này đã tồn tại trên ổ đĩa nhưng hiện chưa có file hiển thị trên portal.'}</div>`
+          : '';
 
-        html += `<details class="admin-dept-group" ${dAllHidden?'':'open'} style="border:1px solid var(--border-light,#e2e8f0);border-radius:10px;margin:${depth>0?'4':'8'}px 0 ${depth>0?'4':'8'}px ${indent}px;overflow:hidden;background:${depth>0?'var(--bg-1,#fff)':'var(--bg-2,#f8fafc)'}">
+        html += `<details class="admin-dept-group" ${(!hasChildDocs || !dAllHidden)?'open':''} style="border:1px solid var(--border-light,#e2e8f0);border-radius:10px;margin:${depth>0?'4':'8'}px 0 ${depth>0?'4':'8'}px ${indent}px;overflow:hidden;background:${depth>0?'var(--bg-1,#fff)':'var(--bg-2,#f8fafc)'}">
           <summary style="list-style:none;cursor:pointer;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px">
             <div style="display:flex;align-items:center;gap:10px;min-width:0">
               <div style="min-width:0">
                 <div style="font-weight:700;font-size:${depth>0?'12':'13'}px">📁 ${escapeHtml(getSubfolderLabel(subPath))}</div>
-                <div style="font-size:11px;color:var(--muted)">${allChildDocs.length} ${lang==='en'?'docs':'tài liệu'} • ${lang==='en'?'Hidden':'Ẩn'}: ${dHiddenCount}</div>
+                <div style="font-size:11px;color:var(--muted)">${subMeta}</div>
               </div>
             </div>
             <div style="display:flex;gap:6px;align-items:center" onclick="event.stopPropagation();">
-              <button class="btn-admin" style="font-size:11px;padding:4px 10px" onclick="toggleSubfolderHidden('${escapeHtml(catId)}','${escapeHtml(subPath)}')">${dBtnIcon} ${dBtnLabel}</button>
+              ${subAction}
             </div>
           </summary>
           <div style="padding:6px 10px">`;
@@ -1830,6 +1843,7 @@ function renderFolderTreeHtml(node, mode, options, depth){
             }).join('')}
           </table>`;
         }
+        html += emptyNotice;
         html += `</div></details>`;
       }
     });
