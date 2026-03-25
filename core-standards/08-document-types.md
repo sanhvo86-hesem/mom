@@ -1,122 +1,122 @@
-# 08 — Cau truc chuan theo loai tai lieu
+# 08 — Cấu trúc chuẩn theo loại tài liệu
 
-> Phien ban: V0 | Hieu luc: 2025-06-01 | Chu so huu: QMS Engineer
+> Phiên bản: V0 | Hiệu lực: 2025-06-01 | Chủ sở hữu: QMS Engineer
 
 ---
 
 ## 1. SOP — Standard Operating Procedure (10 section)
 
-Moi SOP cua HESEM PHAI co du 10 section theo thu tu sau. KHONG duoc bo section, KHONG duoc doi thu tu.
+Mọi SOP của HESEM PHẢI có đủ 10 section theo thứ tự sau. KHÔNG được bỏ section, KHÔNG được đổi thứ tự.
 
-### Cau truc bat buoc
+### Cấu trúc bắt buộc
 
-| Section | Tieu de | Noi dung chinh |
+| Section | Tiêu đề | Nội dung chính |
 |---------|---------|---------------|
-| 1 | Muc dich | 3-5 bullet, moi bullet bat dau bang dong tu |
-| 2 | Pham vi | "Co bao phu" + "Khong thay the" |
-| 3 | Thuat ngu & nguyen tac | Bang 2 cot: Thuat ngu \| Quy dinh su dung |
-| 4 | Vai tro, quyen han & RACI | Bang 3 cot: Vai tro \| Trach nhiem \| Quyen/Diem chan |
-| 5 | Dau vao, dau ra & dieu kien tien quyet | 4 field boxes: Input, Output, Prerequisites, Trigger |
-| 6 | Cong kiem soat, diem dung bat buoc & KPI | Gate cards + KPI metrics table |
-| 7 | Quy trinh chi tiet | Moi gate: h3 + mo ta + ul + note-soft + role-note |
-| 8 | Ngoai le, thay doi & lam lai | Bulleted list: tinh huong + hanh dong + nguoi quyet dinh |
-| 9 | He thong, ho so & du lieu | Table mapping: He thong -> Du lieu -> Trach nhiem -> Luu tru |
-| 10 | Bieu mau, WI, SOP & JD lien ket | Bang ma tai lieu + ten + link |
+| 1 | Mục đích | 3-5 bullet, mỗi bullet bắt đầu bằng động từ |
+| 2 | Phạm vi | "Có bao phủ" + "Không thay thế" |
+| 3 | Thuật ngữ & nguyên tắc | Bảng 2 cột: Thuật ngữ \| Quy định sử dụng |
+| 4 | Vai trò, quyền hạn & RACI | Bảng 3 cột: Vai trò \| Trách nhiệm \| Quyền/Điểm chặn |
+| 5 | Đầu vào, đầu ra & điều kiện tiên quyết | 4 field boxes: Input, Output, Prerequisites, Trigger |
+| 6 | Cổng kiểm soát, điểm dừng bắt buộc & KPI | Gate cards + KPI metrics table |
+| 7 | Quy trình chi tiết | Mọi gate: h3 + mô tả + ul + note-soft + role-note |
+| 8 | Ngoại lệ, thay đổi & làm lại | Bulleted list: tình huống + hành động + người quyết định |
+| 9 | Hệ thống, hồ sơ & dữ liệu | Table mapping: Hệ thống -> Dữ liệu -> Trách nhiệm -> Lưu trữ |
+| 10 | Biểu mẫu, WI, SOP & JD liên kết | Bảng mã tài liệu + tên + link |
 
 ### HTML skeleton
 
 ```html
 <section id="s1-purpose" class="sop-section">
-  <h2>1. Muc dich</h2>
+  <h2>1. Mục đích</h2>
   <ul>
-    <li>Dong tu + noi dung...</li>
+    <li>Động từ + nội dung...</li>
   </ul>
 </section>
 
 <section id="s2-scope" class="sop-section">
-  <h2>2. Pham vi</h2>
+  <h2>2. Phạm vi</h2>
   <div class="scope-in">
-    <h3>Co bao phu</h3>
+    <h3>Có bao phủ</h3>
     <ul>...</ul>
   </div>
   <div class="scope-out">
-    <h3>Khong thay the</h3>
+    <h3>Không thay thế</h3>
     <ul>...</ul>
   </div>
 </section>
 
 <section id="s3-terms" class="sop-section">
-  <h2>3. Thuat ngu & nguyen tac</h2>
+  <h2>3. Thuật ngữ & nguyên tắc</h2>
   <table class="term-table">
-    <thead><tr><th>Thuat ngu</th><th>Quy dinh su dung</th></tr></thead>
+    <thead><tr><th>Thuật ngữ</th><th>Quy định sử dụng</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
 
 <section id="s4-roles" class="sop-section">
-  <h2>4. Vai tro, quyen han & RACI</h2>
+  <h2>4. Vai trò, quyền hạn & RACI</h2>
   <table class="role-table">
-    <thead><tr><th>Vai tro</th><th>Trach nhiem</th><th>Quyen / Diem chan</th></tr></thead>
+    <thead><tr><th>Vai trò</th><th>Trách nhiệm</th><th>Quyền / Điểm chặn</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
 
 <section id="s5-io" class="sop-section">
-  <h2>5. Dau vao, dau ra & dieu kien tien quyet</h2>
+  <h2>5. Đầu vào, đầu ra & điều kiện tiên quyết</h2>
   <div class="io-grid">
-    <div class="io-box io-input"><h4>Dau vao</h4><ul>...</ul></div>
-    <div class="io-box io-output"><h4>Dau ra</h4><ul>...</ul></div>
-    <div class="io-box io-prereq"><h4>Dieu kien tien quyet</h4><ul>...</ul></div>
+    <div class="io-box io-input"><h4>Đầu vào</h4><ul>...</ul></div>
+    <div class="io-box io-output"><h4>Đầu ra</h4><ul>...</ul></div>
+    <div class="io-box io-prereq"><h4>Điều kiện tiên quyết</h4><ul>...</ul></div>
     <div class="io-box io-trigger"><h4>Trigger</h4><ul>...</ul></div>
   </div>
 </section>
 
 <section id="s6-gates" class="sop-section">
-  <h2>6. Cong kiem soat, diem dung bat buoc & KPI</h2>
+  <h2>6. Cổng kiểm soát, điểm dừng bắt buộc & KPI</h2>
   <div class="gate-card">
-    <h3>G2 — Ten gate</h3>
-    <p><strong>PASS:</strong> dieu kien</p>
-    <p><strong>HOLD/FAIL:</strong> dieu kien</p>
-    <p><strong>Vai tro:</strong> ai quyet dinh</p>
-    <p><strong>Ho so:</strong> FRM-XXX</p>
+    <h3>G2 — Tên gate</h3>
+    <p><strong>PASS:</strong> điều kiện</p>
+    <p><strong>HOLD/FAIL:</strong> điều kiện</p>
+    <p><strong>Vai trò:</strong> ai quyết định</p>
+    <p><strong>Hồ sơ:</strong> FRM-XXX</p>
   </div>
   <table class="kpi-table">
-    <thead><tr><th>KPI</th><th>Muc tieu</th><th>Do luong</th><th>Tan suat</th></tr></thead>
+    <thead><tr><th>KPI</th><th>Mục tiêu</th><th>Đo lường</th><th>Tần suất</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
 
 <section id="s7-procedure" class="sop-section">
-  <h2>7. Quy trinh chi tiet</h2>
-  <h3>G2 — Ten gate</h3>
-  <p>Mo ta ngan.</p>
+  <h2>7. Quy trình chi tiết</h2>
+  <h3>G2 — Tên gate</h3>
+  <p>Mô tả ngắn.</p>
   <ul>
-    <li>Buoc 1...</li>
-    <li>Buoc 2...</li>
+    <li>Bước 1...</li>
+    <li>Bước 2...</li>
   </ul>
-  <div class="note-soft">Ghi chu bo sung.</div>
-  <div class="role-note">Vai tro: ten vai tro</div>
+  <div class="note-soft">Ghi chú bổ sung.</div>
+  <div class="role-note">Vai trò: tên vai trò</div>
 </section>
 
 <section id="s8-exceptions" class="sop-section">
-  <h2>8. Ngoai le, thay doi & lam lai</h2>
+  <h2>8. Ngoại lệ, thay đổi & làm lại</h2>
   <ul>
-    <li>Khi [tinh huong]: [vai tro] [hanh dong]. Ghi ly do vao [ho so].</li>
+    <li>Khi [tình huống]: [vai trò] [hành động]. Ghi lý do vào [hồ sơ].</li>
   </ul>
 </section>
 
 <section id="s9-systems" class="sop-section">
-  <h2>9. He thong, ho so & du lieu</h2>
+  <h2>9. Hệ thống, hồ sơ & dữ liệu</h2>
   <table class="system-table">
-    <thead><tr><th>He thong</th><th>Du lieu</th><th>Trach nhiem</th><th>Luu tru</th></tr></thead>
+    <thead><tr><th>Hệ thống</th><th>Dữ liệu</th><th>Trách nhiệm</th><th>Lưu trữ</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
 
 <section id="s10-links" class="sop-section">
-  <h2>10. Bieu mau, WI, SOP & JD lien ket</h2>
+  <h2>10. Biểu mẫu, WI, SOP & JD liên kết</h2>
   <table class="link-table">
-    <thead><tr><th>Ma</th><th>Ten tai lieu</th><th>Lien ket</th></tr></thead>
+    <thead><tr><th>Ma</th><th>Tên tài liệu</th><th>Liên kết</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
@@ -126,176 +126,176 @@ Moi SOP cua HESEM PHAI co du 10 section theo thu tu sau. KHONG duoc bo section, 
 
 ## 2. WI — Work Instruction (7 section)
 
-WI la huong dan thao tac cu the, chi tiet hon SOP. Viet dang buoc-by-buoc.
+WI là hướng dẫn thao tác cụ thể, chi tiết hơn SOP. Viết dạng bước-by-bước.
 
-### Cau truc bat buoc
+### Cấu trúc bắt buộc
 
-| Section | Tieu de | Noi dung chinh |
+| Section | Tiêu đề | Nội dung chính |
 |---------|---------|---------------|
-| 1 | Muc dich | 2-3 bullet, mo ta WI nay giup gi |
-| 2 | Pham vi & doi tuong ap dung | Ap dung cho ai, o dau, khi nao |
-| 3 | Cong cu, vat tu & tai lieu can thiet | Danh sach cong cu, vat tu, tai lieu tham chieu |
-| 4 | Dieu kien tien quyet | Dieu kien PHAI thoa man truoc khi bat dau |
-| 5 | Cac buoc thuc hien | Step-by-step, moi buoc 1 hanh dong |
-| 6 | Ho so & bang chung | Ho so nao can ghi, luu o dau |
-| 7 | Tai lieu lien quan | Bang ma + ten + link |
+| 1 | Mục đích | 2-3 bullet, mô tả WI này giúp gì |
+| 2 | Phạm vi & đối tượng áp dụng | Áp dụng cho ai, ở đâu, khi nào |
+| 3 | Công cụ, vật tư & tài liệu cần thiết | Danh sách công cụ, vật tư, tài liệu tham chiếu |
+| 4 | Điều kiện tiên quyết | Điều kiện PHẢI thỏa mãn trước khi bắt đầu |
+| 5 | Các bước thực hiện | Step-by-step, mỗi bước 1 hành động |
+| 6 | Hồ sơ & bằng chứng | Hồ sơ nào cần ghi, lưu ở đâu |
+| 7 | Tài liệu liên quan | Bảng mã + tên + link |
 
 ### HTML skeleton
 
 ```html
 <section id="wi-s1" class="wi-section">
-  <h2>1. Muc dich</h2>
+  <h2>1. Mục đích</h2>
   <ul>...</ul>
 </section>
 
 <section id="wi-s2" class="wi-section">
-  <h2>2. Pham vi & doi tuong ap dung</h2>
+  <h2>2. Phạm vi & đối tượng áp dụng</h2>
   <ul>...</ul>
 </section>
 
 <section id="wi-s3" class="wi-section">
-  <h2>3. Cong cu, vat tu & tai lieu can thiet</h2>
+  <h2>3. Công cụ, vật tư & tài liệu cần thiết</h2>
   <table class="tool-table">
-    <thead><tr><th>Hang muc</th><th>Mo ta</th><th>Ghi chu</th></tr></thead>
+    <thead><tr><th>Hạng mục</th><th>Mô tả</th><th>Ghi chú</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
 
 <section id="wi-s4" class="wi-section">
-  <h2>4. Dieu kien tien quyet</h2>
+  <h2>4. Điều kiện tiên quyết</h2>
   <ul>
-    <li>Dieu kien 1...</li>
+    <li>Điều kiện 1...</li>
   </ul>
 </section>
 
 <section id="wi-s5" class="wi-section">
-  <h2>5. Cac buoc thuc hien</h2>
+  <h2>5. Các bước thực hiện</h2>
   <div class="step-block">
-    <h3>Buoc 1: Ten buoc</h3>
-    <p>Mo ta hanh dong cu the.</p>
-    <div class="note-soft">Ghi chu (neu co).</div>
+    <h3>Bước 1: Tên bước</h3>
+    <p>Mô tả hành động cụ thể.</p>
+    <div class="note-soft">Ghi chú (nếu có).</div>
   </div>
-  <!-- Lap lai cho cac buoc tiep theo -->
+  <!-- Lặp lại cho các bước tiếp theo -->
 </section>
 
 <section id="wi-s6" class="wi-section">
-  <h2>6. Ho so & bang chung</h2>
+  <h2>6. Hồ sơ & bằng chứng</h2>
   <table class="record-table">
-    <thead><tr><th>Ho so</th><th>Noi dung</th><th>Luu tru</th><th>Trach nhiem</th></tr></thead>
+    <thead><tr><th>Hồ sơ</th><th>Nội dung</th><th>Lưu trữ</th><th>Trách nhiệm</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
 
 <section id="wi-s7" class="wi-section">
-  <h2>7. Tai lieu lien quan</h2>
+  <h2>7. Tài liệu liên quan</h2>
   <table class="link-table">
-    <thead><tr><th>Ma</th><th>Ten tai lieu</th><th>Lien ket</th></tr></thead>
+    <thead><tr><th>Ma</th><th>Tên tài liệu</th><th>Liên kết</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
 ```
 
-### Nguyen tac viet WI
+### Nguyên tắc viết WI
 
-- Moi buoc BAT DAU bang dong tu menh lenh: "Dat", "Mo", "Kiem tra", "Ghi", "Bao cao".
-- Moi buoc chi 1 hanh dong. KHONG gop nhieu hanh dong.
-- Neu buoc co dieu kien: viet "Neu [dieu kien], thi [hanh dong]."
-- Neu buoc co canh bao: dung `<div class="note-warning">` truoc buoc.
-- Ket thuc bang ho so can ghi + nguoi kiem tra.
+- Mọi bước BẮT ĐẦU bằng động từ mệnh lệnh: "Đặt", "Mở", "Kiểm tra", "Ghi", "Báo cáo".
+- Mọi bước chỉ có 1 hành động. KHÔNG gộp nhiều hành động.
+- Nếu bước có điều kiện: viết "Nếu [điều kiện], thì [hành động]."
+- Nếu bước có cảnh báo: dùng `<div class="note-warning">` trước bước.
+- Kết thúc bằng hồ sơ cần ghi + người kiểm tra.
 
 ---
 
-## 3. ANNEX — Phu luc tham chieu (Rule-pack format)
+## 3. ANNEX — Phụ lục tham chiếu (Rule-pack format)
 
-ANNEX la tai lieu tham chieu chua quy tac, bang, phuong phap, ma tran. Cau truc linh hoat theo noi dung.
+ANNEX la tài liệu tham chiếu chứa quy tắc, bảng, phương pháp, ma trận. Cấu trúc linh hoạt theo nội dung.
 
-### Thanh phan bat buoc
+### Thành phần bắt buộc
 
-| Thanh phan | Mo ta | Bat buoc |
+| Thành phần | Mô tả | Bắt buộc |
 |-----------|-------|---------|
-| iso-map | Bang lien ket clause ISO 9001/AS9100D | PHAI |
-| Sections | Cac phan noi dung, danh so | PHAI |
-| Tables | Bang du lieu, quy tac, ma tran | PHAI (toi thieu 1) |
-| Header (meta) | Ma, rev, hieu luc, owner | PHAI |
+| iso-map | Bảng liên kết clause ISO 9001/AS9100D | PHẢI |
+| Sections | Các phần nội dung, đánh số | PHẢI |
+| Tables | Bảng dữ liệu, quy tắc, ma trận | PHẢI (tối thiểu 1) |
+| Header (meta) | Ma, rev, hiệu lực, owner | PHẢI |
 
 ### Cac dang ANNEX
 
-| Dang | Vi du | Dac diem |
+| Dạng | Ví dụ | Đặc điểm |
 |------|-------|---------|
 | Reference data | ANNEX-302 Approved Materials List | Bang danh sach, co filter |
-| Matrix | ANNEX-120 Authority Matrix | Bang 2 chieu: vai tro x quyen |
+| Matrix | ANNEX-120 Authority Matrix | Bảng 2 chiều: vai trò x quyền |
 | Method | ANNEX-601 AQL Method Reference | Quy trinh tinh toan, bang tra |
 | Rules | ANNEX-501 Dispatch Capacity WIP Rules | Dieu kien + hanh dong |
-| Map | ANNEX-106 ISO 9001 Matrix Full | Clause -> tai lieu -> trach nhiem |
-| Topology | ANNEX-133 M365 Site Topology | Cau truc thu muc, site, library |
+| Map | ANNEX-106 ISO 9001 Matrix Full | Clause -> tài liệu -> trach nhiem |
+| Topology | ANNEX-133 M365 Site Topology | Cấu trúc thư mục, site, library |
 
 ### HTML skeleton
 
 ```html
 <section id="annex-iso-map" class="annex-section">
-  <h2>Lien ket ISO</h2>
+  <h2>Liên kết ISO</h2>
   <table class="iso-map">
-    <thead><tr><th>Clause</th><th>Yeu cau</th><th>Tai lieu lien quan</th></tr></thead>
+    <thead><tr><th>Clause</th><th>Yêu cầu</th><th>Tài liệu liên quan</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
 
 <section id="annex-s1" class="annex-section">
   <h2>1. Ten phan</h2>
-  <!-- Noi dung: bang, danh sach, quy tac -->
+  <!-- Nội dung: bang, danh sach, quy tac -->
 </section>
 ```
 
 ### Nguyen tac viet ANNEX
 
-- KHONG viet dang tuong thuat. Dung bang va danh sach.
-- Moi bang PHAI co header ro rang.
-- Ghi nguon/can cu cho moi quy tac (ISO clause, tieu chuan, yeu cau khach hang).
-- Dat ten section theo noi dung, khong theo so thu tu co dinh.
+- KHÔNG viet dang tuong thuat. Dung bang và danh sach.
+- Mọi bảng PHẢI có header rõ ràng.
+- Ghi nguon/can cu cho moi quy tac (ISO clause, tiêu chuẩn, yêu cầu khách hàng).
+- Dat ten section theo nội dung, không theo so thu tu co dinh.
 
 ---
 
 ## 4. JD — Job Description (6 section)
 
-### Cau truc bat buoc
+### Cấu trúc bắt buộc
 
-| Section | Tieu de | CSS class | Noi dung |
+| Section | Tiêu đề | CSS class | Nội dung |
 |---------|---------|-----------|---------|
-| 1 | Muc dich & su menh | `jd-purpose`, `jd-mission` | 2-3 cau: vi tri nay ton tai de lam gi |
-| 2 | Trach nhiem chinh | `resp-table` | Bang: STT \| Trach nhiem \| Tan suat \| Ho so |
-| 3 | Tham quyen | `auth-grid` | Bang: Quyet dinh \| Pham vi \| Gioi han \| Bao cao cho |
-| 4 | Nang luc yeu cau | `comp-grid` | Bang: Nang luc \| Muc do (Dreyfus) \| Bat buoc/Uu tien |
-| 5 | Nguoi du phong | `backup-card` | Card: Vai tro du phong + dieu kien kich hoat |
-| 6 | Tai lieu lien quan | `link-table` | Bang ma + ten + link |
+| 1 | Mục đích & su menh | `jd-purpose`, `jd-mission` | 2-3 cau: vi tri nay ton tai de lam gi |
+| 2 | Trách nhiệm chính | `resp-table` | Bảng: STT \| Trách nhiệm \| Tần suất \| Hồ sơ |
+| 3 | Thẩm quyền | `auth-grid` | Bảng: Quyết định \| Phạm vi \| Giới hạn \| Báo cáo cho |
+| 4 | Nang luc yeu cau | `comp-grid` | Bang: Nang luc \| Muc do (Dreyfus) \| Bắt buộc/Uu tien |
+| 5 | Người dự phòng | `backup-card` | Card: Vai trò dự phòng + dieu kien kích hoạt |
+| 6 | Tài liệu liên quan | `link-table` | Bảng mã + tên + link |
 
 ### HTML skeleton
 
 ```html
 <section id="jd-s1" class="jd-section">
   <div class="jd-purpose">
-    <h2>1. Muc dich</h2>
+    <h2>1. Mục đích</h2>
     <p>Vi tri nay chiu trach nhiem...</p>
   </div>
   <div class="jd-mission">
-    <p><strong>Su menh:</strong> Mo ta ngan su menh cua vi tri.</p>
+    <p><strong>Su menh:</strong> Mô tả ngắn su menh cua vi tri.</p>
   </div>
 </section>
 
 <section id="jd-s2" class="jd-section">
-  <h2>2. Trach nhiem chinh</h2>
+  <h2>2. Trách nhiệm chinh</h2>
   <table class="resp-table">
-    <thead><tr><th>#</th><th>Trach nhiem</th><th>Tan suat</th><th>Ho so</th></tr></thead>
+    <thead><tr><th>#</th><th>Trách nhiệm</th><th>Tần suất</th><th>Hồ sơ</th></tr></thead>
     <tbody>
-      <tr><td>1</td><td>Noi dung trach nhiem</td><td>Hang ngay</td><td>FRM-XXX</td></tr>
+      <tr><td>1</td><td>Nội dung trach nhiem</td><td>Hang ngay</td><td>FRM-XXX</td></tr>
     </tbody>
   </table>
 </section>
 
 <section id="jd-s3" class="jd-section">
-  <h2>3. Tham quyen</h2>
+  <h2>3. Thẩm quyền</h2>
   <div class="auth-grid">
     <table>
-      <thead><tr><th>Quyet dinh</th><th>Pham vi</th><th>Gioi han</th><th>Bao cao cho</th></tr></thead>
+      <thead><tr><th>Quyết định</th><th>Phạm vi</th><th>Giới hạn</th><th>Báo cáo cho</th></tr></thead>
       <tbody>...</tbody>
     </table>
   </div>
@@ -305,25 +305,25 @@ ANNEX la tai lieu tham chieu chua quy tac, bang, phuong phap, ma tran. Cau truc 
   <h2>4. Nang luc yeu cau</h2>
   <div class="comp-grid">
     <table>
-      <thead><tr><th>Nang luc</th><th>Muc do (Dreyfus)</th><th>Bat buoc / Uu tien</th></tr></thead>
+      <thead><tr><th>Nang luc</th><th>Muc do (Dreyfus)</th><th>Bắt buộc / Uu tien</th></tr></thead>
       <tbody>...</tbody>
     </table>
   </div>
 </section>
 
 <section id="jd-s5" class="jd-section">
-  <h2>5. Nguoi du phong</h2>
+  <h2>5. Người dự phòng</h2>
   <div class="backup-card">
-    <p><strong>Du phong chinh:</strong> Ten vai tro</p>
-    <p><strong>Dieu kien kich hoat:</strong> Khi nguoi giu vi tri vang mat tren 1 ngay lam viec.</p>
-    <p><strong>Pham vi du phong:</strong> Toan bo / Chi cac muc uu tien cao.</p>
+    <p><strong>Dự phòng chinh:</strong> Ten vai trò</p>
+    <p><strong>Dieu kien kích hoạt:</strong> Khi người giu vi tri vắng mặt tren 1 ngay lam viec.</p>
+    <p><strong>Phạm vi dự phòng:</strong> Toan bo / Chi cac muc uu tien cao.</p>
   </div>
 </section>
 
 <section id="jd-s6" class="jd-section">
-  <h2>6. Tai lieu lien quan</h2>
+  <h2>6. Tài liệu liên quan</h2>
   <table class="link-table">
-    <thead><tr><th>Ma</th><th>Ten tai lieu</th><th>Lien ket</th></tr></thead>
+    <thead><tr><th>Ma</th><th>Tên tài liệu</th><th>Liên kết</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
@@ -331,8 +331,8 @@ ANNEX la tai lieu tham chieu chua quy tac, bang, phuong phap, ma tran. Cau truc 
 
 ### Nguyen tac viet JD
 
-- Trach nhiem viet dang bang, KHONG viet doan van.
-- Moi dong trach nhiem co tan suat (Hang ngay / Hang tuan / Hang thang / Khi can).
+- Trách nhiệm viet dang bang, KHÔNG viet đoạn văn.
+- Mọi dòng trách nhiệm có tần suất (Hằng ngày / Hằng tuần / Hằng tháng / Khi cần).
 - Auth-grid ghi ro gioi han: "Duoc duyet PO duoi $5,000" thay vi "Duoc duyet PO".
 - Nang luc dung thang Dreyfus 5 bac: Novice, Advanced Beginner, Competent, Proficient, Expert.
 
@@ -340,22 +340,22 @@ ANNEX la tai lieu tham chieu chua quy tac, bang, phuong phap, ma tran. Cau truc 
 
 ## 5. Department Handbook (6 section)
 
-### Cau truc bat buoc
+### Cấu trúc bắt buộc
 
-| Section | Tieu de | Noi dung |
+| Section | Tiêu đề | Nội dung |
 |---------|---------|---------|
-| 1 | Tong quan phong ban | Su menh, muc tieu, vi tri trong to chuc |
-| 2 | Pham vi chuc nang | Cac chuc nang chinh phong ban dam nhan |
-| 3 | So do to chuc | Cay to chuc (org-tree) cua phong ban |
-| 4 | Quy trinh chinh | Danh sach SOP chinh phong ban so huu hoac tham gia |
-| 5 | KPI phong ban | Bang KPI: chi so, muc tieu, do luong, tan suat |
-| 6 | Lien ket SOP/WI/Form | Bang ma tai lieu lien quan |
+| 1 | Tổng quan phòng ban | Sứ mệnh, mục tiêu, vị trí trong tổ chức |
+| 2 | Phạm vi chức năng | Các chức năng chính phòng ban đảm nhận |
+| 3 | Sơ đồ tổ chức | Cây tổ chức (org-tree) của phòng ban |
+| 4 | Quy trình chính | Danh sách SOP chính phòng ban sở hữu hoặc tham gia |
+| 5 | KPI phòng ban | Bảng KPI: chỉ số, mục tiêu, đo lường, tần suất |
+| 6 | Liên kết SOP/WI/Form | Bang ma tài liệu liên quan |
 
 ### HTML skeleton
 
 ```html
 <section id="dept-s1" class="dept-section">
-  <h2>1. Tong quan phong ban</h2>
+  <h2>1. Tổng quan phòng ban</h2>
   <div class="dept-overview">
     <p><strong>Su menh:</strong> ...</p>
     <p><strong>Bao cao cho:</strong> ...</p>
@@ -364,7 +364,7 @@ ANNEX la tai lieu tham chieu chua quy tac, bang, phuong phap, ma tran. Cau truc 
 </section>
 
 <section id="dept-s2" class="dept-section">
-  <h2>2. Pham vi chuc nang</h2>
+  <h2>2. Phạm vi chuc nang</h2>
   <ul>
     <li>Chuc nang 1</li>
     <li>Chuc nang 2</li>
@@ -374,30 +374,30 @@ ANNEX la tai lieu tham chieu chua quy tac, bang, phuong phap, ma tran. Cau truc 
 <section id="dept-s3" class="dept-section">
   <h2>3. So do to chuc</h2>
   <div class="org-tree">
-    <!-- Cau truc cay to chuc -->
+    <!-- Cấu trúc cay to chuc -->
   </div>
 </section>
 
 <section id="dept-s4" class="dept-section">
   <h2>4. Quy trinh chinh</h2>
   <table>
-    <thead><tr><th>SOP</th><th>Ten</th><th>Vai tro phong ban</th></tr></thead>
+    <thead><tr><th>SOP</th><th>Tên</th><th>Vai trò phòng ban</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
 
 <section id="dept-s5" class="dept-section">
-  <h2>5. KPI phong ban</h2>
+  <h2>5. KPI phòng ban</h2>
   <table class="kpi-table">
-    <thead><tr><th>KPI</th><th>Muc tieu</th><th>Do luong</th><th>Tan suat</th></tr></thead>
+    <thead><tr><th>KPI</th><th>Mục tiêu</th><th>Đo lường</th><th>Tần suất</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
 
 <section id="dept-s6" class="dept-section">
-  <h2>6. Lien ket SOP/WI/Form</h2>
+  <h2>6. Liên kết SOP/WI/Form</h2>
   <table class="link-table">
-    <thead><tr><th>Ma</th><th>Ten tai lieu</th><th>Lien ket</th></tr></thead>
+    <thead><tr><th>Ma</th><th>Tên tài liệu</th><th>Liên kết</th></tr></thead>
     <tbody>...</tbody>
   </table>
 </section>
@@ -405,26 +405,26 @@ ANNEX la tai lieu tham chieu chua quy tac, bang, phuong phap, ma tran. Cau truc 
 
 ---
 
-## 6. Training Module — C01 den C19 (6 section)
+## 6. Training Module — C01 đến C19 (6 section)
 
-### Cau truc bat buoc
+### Cấu trúc bắt buộc
 
-| Section | Tieu de | Noi dung |
+| Section | Tiêu đề | Nội dung |
 |---------|---------|---------|
-| 1 | Thong tin trien khai | Doi tuong, thoi luong, dieu kien tham gia, hinh thuc |
-| 2 | Muc luc nhanh | Danh sach cac phan trong module |
-| 3 | Noi dung ly thuyet | Cac section kien thuc, bang, hinh anh |
+| 1 | Thong tin triển khai | Đối tượng, thoi luong, dieu kien tham gia, hinh thuc |
+| 2 | Muc luc nhanh | Danh sách cac phan trong module |
+| 3 | Nội dung ly thuyet | Cac section kien thuc, bang, hinh anh |
 | 4 | Vi du thuc te | Case study, tinh huong thuc te tai HESEM |
-| 5 | Bai tap thuc hanh | Bai tap, tinh huong, cau hoi kiem tra |
-| 6 | Checklist danh gia | Checklist de danh gia nguoi hoc dat/chua dat |
+| 5 | Bai tap thuc hanh | Bai tap, tinh huong, cau hoi kiểm tra |
+| 6 | Checklist danh gia | Checklist de danh gia người hoc dat/chưa dat |
 
 ### HTML skeleton
 
 ```html
 <section id="train-s1" class="train-section">
-  <h2>1. Thong tin trien khai</h2>
+  <h2>1. Thong tin triển khai</h2>
   <table class="deploy-info">
-    <tr><th>Doi tuong</th><td>...</td></tr>
+    <tr><th>Đối tượng</th><td>...</td></tr>
     <tr><th>Thoi luong</th><td>... gio</td></tr>
     <tr><th>Dieu kien</th><td>...</td></tr>
     <tr><th>Hinh thuc</th><td>Truc tiep / Online / Tu hoc</td></tr>
@@ -441,21 +441,21 @@ ANNEX la tai lieu tham chieu chua quy tac, bang, phuong phap, ma tran. Cau truc 
 </section>
 
 <section id="train-s3" class="train-section">
-  <h2>3. Noi dung ly thuyet</h2>
+  <h2>3. Nội dung ly thuyet</h2>
   <div id="train-s3-1">
     <h3>3.1 Ten phan</h3>
-    <p>Noi dung...</p>
+    <p>Nội dung...</p>
   </div>
 </section>
 
 <section id="train-s4" class="train-section">
   <h2>4. Vi du thuc te</h2>
   <div class="case-study">
-    <h3>Tinh huong 1</h3>
+    <h3>Tình huống 1</h3>
     <p><strong>Boi canh:</strong> ...</p>
     <p><strong>Van de:</strong> ...</p>
     <p><strong>Giai phap:</strong> ...</p>
-    <p><strong>Ket qua:</strong> ...</p>
+    <p><strong>Kết quả:</strong> ...</p>
   </div>
 </section>
 
@@ -463,18 +463,18 @@ ANNEX la tai lieu tham chieu chua quy tac, bang, phuong phap, ma tran. Cau truc 
   <h2>5. Bai tap thuc hanh</h2>
   <div class="exercise">
     <h3>Bai tap 1</h3>
-    <p>Yeu cau: ...</p>
-    <p>Tai lieu can: ...</p>
-    <p>Thoi gian: ... phut</p>
+    <p>Yêu cầu: ...</p>
+    <p>Tài liệu can: ...</p>
+    <p>Thời gian: ... phut</p>
   </div>
 </section>
 
 <section id="train-s6" class="train-section">
   <h2>6. Checklist danh gia</h2>
   <table class="eval-checklist">
-    <thead><tr><th>#</th><th>Tieu chi</th><th>Dat</th><th>Chua dat</th><th>Ghi chu</th></tr></thead>
+    <thead><tr><th>#</th><th>Tiêu chí</th><th>Dat</th><th>Chua dat</th><th>Ghi chú</th></tr></thead>
     <tbody>
-      <tr><td>1</td><td>Tieu chi 1</td><td></td><td></td><td></td></tr>
+      <tr><td>1</td><td>Tiêu chí 1</td><td></td><td></td><td></td></tr>
     </tbody>
   </table>
 </section>
@@ -482,22 +482,22 @@ ANNEX la tai lieu tham chieu chua quy tac, bang, phuong phap, ma tran. Cau truc 
 
 ### Nguyen tac viet Training Module
 
-- Noi dung ly thuyet viet ngan, tap trung vao "can biet de lam" KHONG phai "can biet de biet".
-- Vi du thuc te PHAI lay tu boi canh HESEM (gia cong CNC, semiconductor parts, ISO 9001).
-- Bai tap thuc hanh PHAI lam duoc tai noi lam viec voi tai lieu va cong cu hien co.
-- Checklist danh gia bam sat nang luc can dat, dung thang Dreyfus lam tham chieu.
+- Nội dung ly thuyet viet ngắn, tap trung vao "can biet de lam" KHÔNG phai "can biet de biet".
+- Vi du thuc te PHẢI lay tu boi canh HESEM (gia cong CNC, semiconductor parts, ISO 9001).
+- Bai tap thuc hanh PHẢI lam được tai nơi làm việc voi tài liệu và cong cu hien co.
+- Checklist danh gia bam sat nang luc can dat, dung thang Dreyfus lam tham chiếu.
 
 ---
 
 ## 7. Bang tom tat so sanh
 
-| Dac diem | SOP | WI | ANNEX | JD | Dept HB | Training |
+| Đặc điểm | SOP | WI | ANNEX | JD | Dept HB | Training |
 |----------|-----|----|-------|----|---------| ---------|
 | So section | 10 | 7 | Linh hoat | 6 | 6 | 6 |
-| Gate/checkpoint | Co | Khong | Khong | Khong | Khong | Co (checklist) |
-| RACI | Co (Section 4) | Khong | Khong | Co (Section 3) | Khong | Khong |
-| KPI | Co (Section 6) | Khong | Khong | Khong | Co (Section 5) | Khong |
-| Step-by-step | Co (Section 7) | Co (Section 5) | Khong | Khong | Khong | Co (Section 5) |
-| iso-map | Khong | Khong | Co | Khong | Khong | Khong |
-| Bang du lieu | Co | Co | PHAI co | Co | Co | Co |
-| Lien ket tai lieu | Co (Section 10) | Co (Section 7) | Co | Co (Section 6) | Co (Section 6) | Khong |
+| Gate/checkpoint | Co | Không | Không | Không | Không | Co (checklist) |
+| RACI | Co (Section 4) | Không | Không | Co (Section 3) | Không | Không |
+| KPI | Co (Section 6) | Không | Không | Không | Co (Section 5) | Không |
+| Step-by-step | Co (Section 7) | Co (Section 5) | Không | Không | Không | Co (Section 5) |
+| iso-map | Không | Không | Co | Không | Không | Không |
+| Bang dữ liệu | Co | Co | PHẢI co | Co | Co | Co |
+| Liên kết tài liệu | Co (Section 10) | Co (Section 7) | Co | Co (Section 6) | Co (Section 6) | Không |

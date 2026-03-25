@@ -42,194 +42,194 @@ Mỗi câu lệnh trong SOP/WI tuân theo pattern:
 
 | Loại | Câu |
 |------|-----|
-| ĐUNG | QMS Engineer ra soat cau truc tai lieu truoc khi gui phe duyet. |
-| SAI | Tai lieu nay duoc thiet ke de ho tro viec ra soat cau truc... |
-| DUNG | Khong phat hanh tai lieu khi chua co ra soat cheo. |
-| SAI | Nen dam bao rang tai lieu da duoc ra soat cheo truoc khi phat hanh. |
-| DUNG | QC Inspector do 5 diem theo ban ve truoc khi chap nhan lo. |
-| SAI | Viec do luong can duoc thuc hien mot cach can than de dam bao chat luong. |
-| DUNG | Shift Leader dung may ngay khi phat hien phe pham lien tiep 3 chi tiet. |
-| SAI | Trong truong hop phat hien su co, can xem xet viec dung may de xu ly. |
+| ĐÚNG | QMS Engineer rà soát cấu trúc tài liệu trước khi gửi phê duyệt. |
+| SAI | Tài liệu này được thiết kế để hỗ trợ việc rà soát cấu trúc... |
+| ĐÚNG | Không phát hành tài liệu khi chưa có rà soát chéo. |
+| SAI | Nên đảm bảo rằng tài liệu đã được rà soát chéo trước khi phát hành. |
+| ĐÚNG | QC Inspector đo 5 điểm theo bản vẽ trước khi chấp nhận lô. |
+| SAI | Việc đo lường cần được thực hiện một cách cẩn thận để đảm bảo chất lượng. |
+| ĐÚNG | Shift Leader dừng máy ngay khi phát hiện phế phẩm liên tiếp 3 chi tiết. |
+| SAI | Trong trường hợp phát hiện sự cố, cần xem xét việc dừng máy để xử lý. |
 
-### 2.3 Quy tac viet lenh phu dinh
+### 2.3 Quy tắc viết lệnh phủ định
 
-- Dung "KHONG" + dong tu: "Khong phat hanh khi chua co chu ky."
-- Khong dung "Khong nen", "Can tranh" — qua yeu, khong rang buoc.
+- Dùng "KHÔNG" + động từ: "Không phát hành khi chưa có chữ ký."
+- Không dùng "Không nên", "Cần tránh" — quá yếu, không ràng buộc.
 
-### 2.4 Quy tac viet dieu kien
+### 2.4 Quy tắc viết điều kiện
 
-- Dung "Khi" hoac "Neu" o dau cau cho dieu kien.
-- "Khi NCR mo qua 5 ngay, QA Manager bao cao CEO."
-- Khong dung "Trong truong hop", "Doi voi tinh huong" — dai va mo ho.
+- Dùng "Khi" hoặc "Nếu" ở đầu câu cho điều kiện.
+- "Khi NCR mở quá 5 ngày, QA Manager báo cáo CEO."
+- Không dùng "Trong trường hợp", "Đối với tình huống" — dài và mơ hồ.
 
 ---
 
-## 3. Tu ngu chuan — Muc do bat buoc
+## 3. Từ ngữ chuẩn — Mức độ bắt buộc
 
-### 3.1 Ba cap do
+### 3.1 Ba cấp độ
 
-| Tu khoa | Tieng Anh | Y nghia | Cach dung |
+| Từ khóa | Tiếng Anh | Ý nghĩa | Cách dùng |
 |---------|-----------|---------|-----------|
-| **PHAI** | shall | Bat buoc thuc hien. Vi pham = non-conformance. | Dung cho yeu cau ISO, khach hang, luat. |
-| **NEN** | should | Khuyen nghi manh. Cho phep ngoai le co ly do. | Dung cho best practice, khuyen nghi noi bo. |
-| **CO THE** | may | Tuy chon. Nguoi thuc hien tu quyet dinh. | Dung cho phuong phap thay the, bo sung. |
+| **PHẢI** | shall | Bắt buộc thực hiện. Vi phạm = non-conformance. | Dùng cho yêu cầu ISO, khách hàng, luật. |
+| **NÊN** | should | Khuyến nghị mạnh. Cho phép ngoại lệ có lý do. | Dùng cho best practice, khuyến nghị nội bộ. |
+| **CÓ THỂ** | may | Tùy chọn. Người thực hiện tự quyết định. | Dùng cho phương pháp thay thế, bổ sung. |
 
-### 3.2 Cach danh dau trong HTML
+### 3.2 Cách đánh dấu trong HTML
 
 ```html
-<span class="req-tag shall">PHAI</span>
-<span class="req-tag should">NEN</span>
-<span class="req-tag may">CO THE</span>
+<span class="req-tag shall">PHẢI</span>
+<span class="req-tag should">NÊN</span>
+<span class="req-tag may">CÓ THỂ</span>
 ```
 
-### 3.3 Quy tac su dung
+### 3.3 Quy tắc sử dụng
 
-- Moi SOP PHAI co it nhat 1 yeu cau "PHAI" trong moi gate.
-- KHONG dung "PHAI" cho muc khuyen nghi — se gay non-conformance khi audit.
-- Khi khong chac chan muc do, mac dinh dung "NEN" va de QA Manager xac nhan nang cap.
+- Mọi SOP PHẢI có ít nhất 1 yêu cầu "PHẢI" trong mỗi gate.
+- KHÔNG dùng "PHẢI" cho mức khuyến nghị — sẽ gây non-conformance khi audit.
+- Khi không chắc chắn mức độ, mặc định dùng "NÊN" và để QA Manager xác nhận nâng cấp.
 
 ---
 
-## 4. Quy tac noi dung SOP — 10 section
+## 4. Quy tắc nội dung SOP — 10 section
 
-### Section 1: Muc dich
+### Section 1: Mục đích
 
 - 3-5 bullet points.
-- Moi bullet bat dau bang **dong tu** (Thiet lap, Kiem soat, Dam bao, Quy dinh, Ngan ngua).
-- KHONG bat dau bang danh tu ("Quy trinh nay...", "Tai lieu nay...").
+- Mọi bullet bắt đầu bằng **động từ** (Thiết lập, Kiểm soát, Đảm bảo, Quy định, Ngăn ngừa).
+- KHÔNG bắt đầu bằng danh từ ("Quy trình này...", "Tài liệu này...").
 
-**Vi du:**
+**Ví dụ:**
 ```
-- Thiet lap quy trinh kiem soat tai lieu tu tao moi den phe duyet.
-- Dam bao moi tai lieu phat hanh deu co ra soat cheo.
-- Ngan ngua su dung tai lieu het hieu luc tai noi lam viec.
-```
-
-### Section 2: Pham vi
-
-Chia thanh 2 phan ro rang:
-
-**Co bao phu:**
-- Liet ke cac doi tuong, quy trinh, khu vuc ap dung.
-
-**Khong thay the:**
-- Liet ke cac tai lieu/quy trinh KHONG nam trong pham vi SOP nay.
-
-**Vi du:**
-```
-Co bao phu:
-- Tat ca tai lieu QMS noi bo: SOP, WI, ANNEX, FRM, JD.
-- Tai lieu goc tu khach hang khi duoc noi bo hoa.
-
-Khong thay the:
-- SOP-104 (bao mat du lieu va IP).
-- Quy trinh kiem soat ban ve khach hang do Engineering quan ly.
+- Thiết lập quy trình kiểm soát tài liệu từ tạo mới đến phê duyệt.
+- Đảm bảo mọi tài liệu phát hành đều có rà soát chéo.
+- Ngăn ngừa sử dụng tài liệu hết hiệu lực tại nơi làm việc.
 ```
 
-### Section 3: Thuat ngu & nguyen tac
+### Section 2: Phạm vi
 
-Bang 2 cot:
+Chia thành 2 phần rõ ràng:
 
-| Thuat ngu | Quy dinh su dung |
+**Có bao phủ:**
+- Liệt kê các đối tượng, quy trình, khu vực áp dụng.
+
+**Không thay thế:**
+- Liệt kê các tài liệu/quy trình KHÔNG nằm trong phạm vi SOP này.
+
+**Ví dụ:**
+```
+Có bao phủ:
+- Tất cả tài liệu QMS nội bộ: SOP, WI, ANNEX, FRM, JD.
+- Tài liệu gốc từ khách hàng khi được nội bộ hóa.
+
+Không thay thế:
+- SOP-104 (bảo mật dữ liệu và IP).
+- Quy trình kiểm soát bản vẽ khách hàng do Engineering quản lý.
+```
+
+### Section 3: Thuật ngữ & nguyên tắc
+
+Bảng 2 cột:
+
+| Thuật ngữ | Quy định sử dụng |
 |-----------|-----------------|
-| DCR | Document Change Request — yeu cau thay doi tai lieu chinh thuc |
-| SoR | System of Record — he thong luu tru goc (Epicor hoac M365) |
-| SSOT | Single Source of Truth — nguon du lieu duy nhat duoc cong nhan |
+| DCR | Document Change Request — yêu cầu thay đổi tài liệu chính thức |
+| SoR | System of Record — hệ thống lưu trữ gốc (Epicor hoặc M365) |
+| SSOT | Single Source of Truth — nguồn dữ liệu duy nhất được công nhận |
 
-- Chi liet ke thuat ngu DUNG TRONG SOP NAY.
-- KHONG copy toan bo glossary he thong vao moi SOP.
+- Chỉ liệt kê thuật ngữ dùng trong SOP này.
+- KHÔNG copy toàn bộ glossary hệ thống vào mỗi SOP.
 
-### Section 4: Vai tro, quyen han & RACI
+### Section 4: Vai trò, quyền hạn & RACI
 
-Bang 3 cot:
+Bảng 3 cột:
 
-| Vai tro | Trach nhiem | Quyen / Diem chan |
+| Vai trò | Trách nhiệm | Quyền / Điểm chặn |
 |---------|------------|------------------|
-| QMS Engineer | Ra soat cau truc, kiem tra cross-ref | Quyen tu choi phat hanh neu thieu cross-review |
-| QA Manager | Phe duyet tai lieu cap SOP | Diem chan: Khong phe duyet = khong phat hanh |
-| Document Owner | Soan thao, cap nhat, theo doi hieu luc | Chiu trach nhiem noi dung chinh xac |
+| QMS Engineer | Rà soát cấu trúc, kiểm tra cross-ref | Quyền từ chối phát hành nếu thiếu cross-review |
+| QA Manager | Phê duyệt tài liệu cấp SOP | Điểm chặn: Không phê duyệt = không phát hành |
+| Document Owner | Soạn thảo, cập nhật, theo dõi hiệu lực | Chịu trách nhiệm nội dung chính xác |
 
-- Cot "Quyen / Diem chan" rat quan trong — cho biet ai co quyen DUNG quy trinh.
+- Cột "Quyền / Điểm chặn" rất quan trọng — cho biết ai có quyền dừng quy trình.
 
-### Section 5: Dau vao, dau ra & dieu kien tien quyet
+### Section 5: Đầu vào, đầu ra & điều kiện tiên quyết
 
 4 field boxes:
 
-| Box | Noi dung |
+| Box | Nội dung |
 |-----|---------|
-| **Dau vao** | Tai lieu nao can co truoc khi bat dau quy trinh nay |
-| **Dau ra** | San pham/ho so nao duoc tao ra khi hoan thanh |
-| **Dieu kien tien quyet** | Dieu kien nao PHAI thoa man truoc khi bat dau |
-| **Trigger** | Su kien nao kich hoat quy trinh nay |
+| **Đầu vào** | Tài liệu nào cần có trước khi bắt đầu quy trình này |
+| **Đầu ra** | Sản phẩm/hồ sơ nào được tạo ra khi hoàn thành |
+| **Điều kiện tiên quyết** | Điều kiện nào PHẢI thỏa mãn trước khi bắt đầu |
+| **Trigger** | Sự kiện nào kích hoạt quy trình này |
 
-### Section 6: Cong kiem soat, diem dung bat buoc & KPI
+### Section 6: Cổng kiểm soát, điểm dừng bắt buộc & KPI
 
 **Gate cards:**
 
-Moi gate la 1 card chua:
-- Ten gate (vi du: G2 — Kiem tra cau truc)
-- Dieu kien PASS
-- Dieu kien HOLD/FAIL
-- Vai tro quyet dinh
-- Ho so ghi nhan
+Mọi gate là 1 card chứa:
+- Tên gate (ví dụ: G2 — Kiểm tra cấu trúc)
+- Điều kiện PASS
+- Điều kiện HOLD/FAIL
+- Vai trò quyết định
+- Hồ sơ ghi nhận
 
 **KPI metrics:**
 
-| KPI | Muc tieu | Do luong | Tan suat |
+| KPI | Mục tiêu | Đo lường | Tần suất |
 |-----|---------|---------|---------|
-| Thoi gian phe duyet tai lieu | <= 5 ngay lam viec | Ngay tu submit den approve | Hang thang |
-| Ti le tai lieu het hieu luc con luu hanh | 0% | So tai lieu het hieu luc / tong | Hang quy |
+| Thời gian phê duyệt tài liệu | <= 5 ngày làm việc | Ngày từ submit đến approve | Hằng tháng |
+| Tỷ lệ tài liệu hết hiệu lực còn lưu hành | 0% | Số tài liệu hết hiệu lực / tổng | Hằng quý |
 
-### Section 7: Quy trinh chi tiet
+### Section 7: Quy trình chi tiết
 
-Moi gate co:
-- `<h3>` — Ten gate
-- Mo ta ngan (1-2 cau)
-- `<ul>` — Cac buoc thuc hien
-- `<div class="note-soft">` — Ghi chu bo sung (neu co)
-- `<div class="role-note">` — Vai tro chiu trach nhiem
+Mọi gate có:
+- `<h3>` — Tên gate
+- Mô tả ngắn (1-2 câu)
+- `<ul>` — Các bước thực hiện
+- `<div class="note-soft">` — Ghi chú bổ sung (nếu có)
+- `<div class="role-note">` — Vai trò chịu trách nhiệm
 
-**Vi du:**
+**Ví dụ:**
 ```html
-<h3>G3 — Ra soat cheo</h3>
-<p>Nguoi duoc chi dinh ra soat cheo kiem tra noi dung va cross-reference.</p>
+<h3>G3 — Rà soát chéo</h3>
+<p>Người được chỉ định rà soát chéo kiểm tra nội dung và cross-reference.</p>
 <ul>
-  <li>Doc toan bo tai lieu, doi chieu voi SOP/WI lien quan.</li>
-  <li>Kiem tra moi lien ket noi bo con hoat dong.</li>
-  <li>Ghi nhan ket qua vao FRM-105 Peer Review Log.</li>
+  <li>Đọc toàn bộ tài liệu, đối chiếu với SOP/WI liên quan.</li>
+  <li>Kiểm tra mọi liên kết nội bộ còn hoạt động.</li>
+  <li>Ghi nhận kết quả vào FRM-105 Peer Review Log.</li>
 </ul>
-<div class="note-soft">Thoi gian ra soat cheo: toi da 3 ngay lam viec.</div>
-<div class="role-note">Vai tro: Peer Reviewer (do Document Owner chi dinh)</div>
+<div class="note-soft">Thời gian rà soát chéo: tối đa 3 ngày làm việc.</div>
+<div class="role-note">Vai trò: Peer Reviewer (do Document Owner chỉ định)</div>
 ```
 
-### Section 8: Ngoai le, thay doi & lam lai
+### Section 8: Ngoại lệ, thay đổi & làm lại
 
-- Bulleted list cac tinh huong ngoai le.
-- Moi bullet ghi: tinh huong + hanh dong + nguoi quyet dinh.
+- Bulleted list các tình huống ngoại lệ.
+- Mọi bullet ghi: tình huống + hành động + người quyết định.
 
-**Vi du:**
+**Ví dụ:**
 ```
-- Khi tai lieu khan cap (an toan, phap luat): CEO co the phe duyet
-  ngay, bo qua buoc ra soat cheo. Ghi ly do vao DCR.
-- Khi nguoi ra soat cheo vang mat qua 3 ngay: Document Owner de xuat
-  nguoi thay the, QA Manager chap thuan.
+- Khi tài liệu khẩn cấp (an toàn, pháp luật): CEO có thể phê duyệt
+  ngay, bỏ qua bước rà soát chéo. Ghi lý do vào DCR.
+- Khi người rà soát chéo vắng mặt quá 3 ngày: Document Owner đề xuất
+  người thay thế, QA Manager chấp thuận.
 ```
 
-### Section 9: He thong, ho so & du lieu
+### Section 9: Hệ thống, hồ sơ & dữ liệu
 
-Bang mapping:
+Bảng mapping:
 
-| He thong | Du lieu | Trach nhiem | Luu tru |
+| He thong | Du lieu | Trách nhiệm | Lưu trữ |
 |----------|--------|------------|---------|
-| SharePoint | Tai lieu QMS goc (PDF) | QMS Engineer | QMS Records Site |
+| SharePoint | Tài liệu QMS gốc (PDF) | QMS Engineer | QMS Records Site |
 | Epicor | So lieu san xuat | Production Planner | Job Module |
 | Power BI | Dashboard KPI | QMS Engineer | QMS Dashboard |
 
-### Section 10: Lien ket
+### Section 10: Liên kết
 
-Bang ma tai lieu + ten + link:
+Bảng mã tài liệu + tên + link:
 
-| Ma | Ten tai lieu | Lien ket |
+| Ma | Tên tài liệu | Liên kết |
 |----|-------------|---------|
 | SOP-102 | Quality Policy, Objectives & Context | [Link] |
 | WI-102 | SharePoint Record Sites & Permissions | [Link] |
@@ -239,53 +239,53 @@ Bang ma tai lieu + ten + link:
 
 ---
 
-## 5. Quy tac dac biet theo loai tai lieu
+## 5. Quy tắc đặc biệt theo loại tài liệu
 
 ### 5.1 WI (Work Instruction)
 
-- Viet theo dang **buoc-by-buoc** (step 1, step 2...).
-- Moi buoc bat dau bang dong tu menh lenh.
-- Moi buoc chi 1 hanh dong. KHONG gop nhieu hanh dong vao 1 buoc.
-- Co hinh anh / so do neu buoc phuc tap.
-- Ket thuc bang: ho so can ghi + nguoi kiem tra.
+- Viet theo dang **bước-by-bước** (step 1, step 2...).
+- Mọi buoc bắt đầu bằng động từ menh lenh.
+- Mọi buoc chi 1 hanh dong. KHÔNG gộp nhiều hành động vao 1 buoc.
+- Co hình ảnh / sơ đồ neu buoc phức tạp.
+- Kết thúc bằng: hồ sơ can ghi + người kiểm tra.
 
 ### 5.2 ANNEX
 
-- Viet dang **rule-pack**: bang, dieu kien, quy tac.
-- KHONG viet dang tường thuat.
-- Moi bang PHAI co header ro rang va ghi chu nguon.
-- Dung `iso-map` de lien ket clause ISO.
+- Viết dạng **rule-pack**: bang, dieu kien, quy tac.
+- KHÔNG viet dang tường thuat.
+- Mọi bảng PHẢI có header rõ ràng và ghi chú nguồn.
+- Dung `iso-map` de liên kết clause ISO.
 
 ### 5.3 JD (Job Description)
 
-- Trach nhiem viet dang bang, khong viet doan van.
-- Moi dong trach nhiem co: noi dung + tan suat + ho so lien quan.
-- Phan tham quyen (auth-grid) ghi ro: duoc quyet dinh gi, den muc nao.
+- Trách nhiệm viet dang bang, không viet đoạn văn.
+- Mọi dong trach nhiem co: nội dung + tần suất + hồ sơ liên quan.
+- Phần thẩm quyền (auth-grid) ghi rõ: được quyết định gì, đến mức nào.
 
 ### 5.4 Form (Excel)
 
-- Chi co ten cot, label ngan, dropdown.
-- KHONG viet giai thich dai trong form.
-- Giai thich nam trong SOP/WI tuong ung, KHONG nam trong form.
+- Chi co ten cot, label ngắn, dropdown.
+- KHÔNG viết giải thích dài trong form.
+- Giai thich nam trong SOP/WI tuong ung, KHÔNG nam trong form.
 
 ---
 
-## 6. Kiem tra truoc khi phat hanh
+## 6. Kiem tra trước khi phát hành
 
-Truoc khi gui tai lieu de phe duyet, kiem tra:
+Truoc khi gửi tài liệu để phê duyệt, kiểm tra:
 
-| # | Hang muc | Kiem tra |
+| # | Hạng mục | Kiem tra |
 |---|---------|---------|
-| 1 | Moi cau co chu ngu ro rang | Khong co cau bi dong khong ro ai lam |
-| 2 | Moi gate co dieu kien PASS/FAIL | Khong co gate mo ho |
-| 3 | Moi vai tro trong Section 4 xuat hien trong Section 7 | Khong co vai tro "ma" |
-| 4 | Moi form/WI lien ket ton tai | Khong co lien ket chet |
-| 5 | Khong co meta-text | Xoa het "tai lieu nay nham muc dich..." |
-| 6 | Khong co "AI", "generated" | Kiem tra toan van ban |
-| 7 | Tu khoa PHAI/NEN/CO THE dung dung cap do | QA Manager xac nhan |
-| 8 | Thuat ngu nhat quan voi Glossary | Khong dung 2 tu cho 1 khai niem |
-| 9 | A4 printable | In thu, kiem tra layout |
-| 10 | Cross-reference chinh xac | Moi ma tai lieu dung va link hoat dong |
+| 1 | Mọi câu có chủ ngữ rõ ràng | Không có câu bị động không rõ ai làm |
+| 2 | Mọi gate có điều kiện PASS/FAIL | Không có gate mơ hồ |
+| 3 | Mọi vai trò trong Section 4 xuất hiện trong Section 7 | Không có vai trò "ma" |
+| 4 | Mọi form/WI liên kết tồn tại | Không có liên kết chết |
+| 5 | Không co meta-text | Xoa het "tài liệu nay nham muc dich..." |
+| 6 | Không co "AI", "generated" | Kiem tra toan van ban |
+| 7 | Từ khóa PHẢI/NÊN/CÓ THỂ dùng đúng cấp độ | QA Manager xác nhận |
+| 8 | Thuật ngữ nhất quán voi Glossary | Không dung 2 tu cho 1 khai niem |
+| 9 | A4 printable | In thu, kiểm tra layout |
+| 10 | Cross-reference chính xác | Mọi ma tài liệu dung và link hoat dong |
 
 ---
 
@@ -293,13 +293,13 @@ Truoc khi gui tai lieu de phe duyet, kiem tra:
 
 | Cam | Thay bang |
 |-----|----------|
-| "Tai lieu nay nham muc dich..." | (Xoa, bat dau bang noi dung thuc.) |
-| "Nhu da de cap o tren..." | (Xoa hoac ghi lai noi dung cu the.) |
-| "Can luu y rang..." | (Viet thang noi dung can luu y.) |
-| "Mot cach tong quat..." | (Xoa, viet cu the.) |
-| "Co the noi rang..." | (Xoa, khang dinh truc tiep.) |
-| "Duoc tao boi AI" | (KHONG BAO GIO dung.) |
-| "Generated", "auto-generated" | (KHONG BAO GIO dung.) |
-| "Ban", "chung ta", "minh" | Dung ten vai tro cu the. |
-| "Nen dam bao rang..." | Dung "PHAI" hoac "NEN" + hanh dong cu the. |
-| "Trong truong hop" | Dung "Khi" hoac "Neu". |
+| "Tài liệu nay nham muc dich..." | (Xoa, bat dau bang nội dung thuc.) |
+| "Nhu đã de cap ở tren..." | (Xoa hoặc ghi lai nội dung cụ thể.) |
+| "Can luu y rang..." | (Viet thang nội dung can luu y.) |
+| "Mot cach tong quat..." | (Xoa, viet cụ thể.) |
+| "Có thể nói rằng..." | (Xóa, khẳng định trực tiếp.) |
+| "Duoc tao boi AI" | (KHÔNG BAO GIO dung.) |
+| "Generated", "auto-generated" | (KHÔNG BAO GIO dung.) |
+| "Ban", "chung ta", "minh" | Dung ten vai trò cụ thể. |
+| "Nên đảm bảo rằng..." | Dùng "PHẢI" hoặc "NÊN" + hành động cụ thể. |
+| "Trong trường hợp" | Dung "Khi" hoặc "Nếu". |
