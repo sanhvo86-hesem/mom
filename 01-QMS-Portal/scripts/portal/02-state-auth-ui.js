@@ -1020,6 +1020,9 @@ function renderSidebar(){
     <button class="nav-item ${currentPage==='search'?'active':''}" onclick="navigateTo('search')"><span class="icon">&#128269;</span><span>${T('search')}</span></button>
     <button class="nav-item ${currentPage==='dictionary'?'active':''}" onclick="navigateTo('dictionary')"><span class="icon">&#128214;</span><span>${T('dictionary')}</span><span class="badge" id="dict-badge">${dictData ? dictData.length.toLocaleString() : '...'}</span></button>
   </div>
+  <div class="nav-section"><div class="nav-section-title">${lang==='en'?'DEPLOYMENT':'TRIỂN KHAI VẬN HÀNH'}</div>
+    <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">&#128640;</span><span>${lang==='en'?'Operations Deploy':'Triển khai vận hành'}</span></button>
+  </div>
   ${(isAdmin()) ? '<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item '+(currentPage==='admin'?'active':'')+'" onclick="navigateTo(\'admin\')"><span class="icon">&#9881;</span><span>'+T('admin_panel')+'</span></button></div>' : ''}`;
 
   SIDEBAR_SECTIONS.forEach(sec => {
@@ -1055,7 +1058,7 @@ function navigateTo(page, filter){
   document.getElementById('user-dropdown').classList.remove('show');
   
   // Track page view for activity log
-  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống'};
+  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành'};
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
   const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access')};
@@ -1071,6 +1074,7 @@ function navigateTo(page, filter){
   if(page==='search') renderSearch();
   if(page==='dictionary') renderDictionary();
   if(page==='access') renderAccessMatrix();
+  if(page==='deploy') renderDeployDashboard();
   if(page==='admin'){ if(!isAdmin()){navigateTo('dashboard');return;} renderAdmin(); }
   
   document.getElementById('page-'+page).classList.add('active');
