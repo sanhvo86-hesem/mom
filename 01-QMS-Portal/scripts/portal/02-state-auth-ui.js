@@ -1728,16 +1728,22 @@ function renderDashboard(){
     <div id="dash-pending">${pendingHtml}${draftsHtml}</div>
 
     <div class="card" style="margin-top:18px">
-      <h3>🏭 ${lang==='en'?'Job Order Lifecycle — G0 → G5':'Vòng đời đơn hàng — G0 → G5'}</h3>
-      <p style="margin:-8px 0 12px;color:var(--text-3);font-size:12px">${lang==='en'?'Quick access to SOPs, WIs and Forms for each quality gate.':'Truy cập nhanh SOP, WI và biểu mẫu theo từng cổng kiểm soát chất lượng.'}</p>
+      <h3>🏭 ${lang==='en'?'Job Order Lifecycle — G0 → IQC → G1 → G5':'Vòng đời đơn hàng — G0 → IQC → G1 → G5'}</h3>
+      <p style="margin:-8px 0 12px;color:var(--text-3);font-size:12px">${lang==='en'?'Quick access to SOPs, WIs and Forms for each quality gate. Material must PASS IQC before production.':'Truy cập nhanh SOP, WI và biểu mẫu theo từng cổng kiểm soát. Vật liệu phải PASS IQC trước khi đưa vào sản xuất.'}</p>
       <div style="display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px">
-        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #4CAF50;background:#f8fdf8">
+        <div style="flex:0 0 auto;min-width:140px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #4CAF50;background:#f8fdf8">
           <div style="font-weight:700;font-size:13px;color:#2e7d32;margin-bottom:6px">G0 — Contract</div>
           <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'RFQ review, order entry':'Xem xét RFQ, nhập đơn hàng'}</div>
           <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-SAL-001');return false" style="color:#0369a1">SOP-201</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-201</a></div>
         </div>
         <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
-        <div style="flex:0 0 auto;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #2196F3;background:#f5f9ff">
+        <div style="flex:0 0 auto;min-width:140px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #795548;background:#faf6f3">
+          <div style="font-weight:700;font-size:13px;color:#4e342e;margin-bottom:6px">IQC — Incoming</div>
+          <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'Receiving, incoming inspection':'Nhận hàng, kiểm tra đầu vào'}</div>
+          <div style="font-size:11px"><a href="#" onclick="openDoc('WI-OPS-012');return false" style="color:#0369a1">WI-701</a> · <a href="#" onclick="openDoc('SOP-PUR-002');return false" style="color:#0369a1">SOP-402</a> · <a href="#" onclick="navigateTo('documents','FRM');return false" style="color:#d97706">FRM-701</a></div>
+        </div>
+        <div style="display:flex;align-items:center;color:#cbd5e1;font-size:20px;flex-shrink:0">→</div>
+        <div style="flex:0 0 auto;min-width:140px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;border-top:3px solid #2196F3;background:#f5f9ff">
           <div style="font-weight:700;font-size:13px;color:#1565c0;margin-bottom:6px">G1 — Setup</div>
           <div style="font-size:11px;color:#666;margin-bottom:8px">${lang==='en'?'Program release, machine setup':'Phát hành chương trình, setup máy'}</div>
           <div style="font-size:11px"><a href="#" onclick="openDoc('SOP-ENG-001');return false" style="color:#0369a1">SOP-303</a> · <a href="#" onclick="openDoc('SOP-OPS-004');return false" style="color:#0369a1">SOP-504</a></div>

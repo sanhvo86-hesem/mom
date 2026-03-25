@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ANNEX-116 — Bản thiết kế ShareFile local working copy và vòng lặp đồng bộ khép kín | HESEM QMS</title>
+<link rel="stylesheet" href="../../../../assets/style.css"/>
+<style>
+.page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
+.page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color:var(--navy);}
+.page-body h3 {font-size:14px; line-height:1.45; margin:10px 0 6px; color:var(--ink);}
+.grid-2 {display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:12px 0;}
+.grid-3 {display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:12px 0;}
+.card {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff;}
+.tree {font-family:var(--mono); font-size:12px; white-space:pre-wrap; background:#0f172a; color:#e2e8f0; border-radius:12px; padding:14px; overflow:auto; margin:12px 0;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius:var(--r); background:#fcfcfd;}
+.matrix-table {width:100%; border-collapse:collapse; table-layout:fixed; word-wrap:break-word;}
+.matrix-table th {padding:8px 10px; text-align:left; font-size:11px; font-weight:800; color:var(--navy); background:var(--th-bg); border:1px solid var(--th-bdr); text-transform:uppercase; letter-spacing:.3px; vertical-align:bottom;}
+.matrix-table td {padding:8px 10px; border:1px solid var(--ln2); vertical-align:top; line-height:1.5;}
+ul.tight {margin:8px 0; padding-left:18px;}
+ul.tight li {margin:4px 0;}
+.pill {display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid var(--ln); background:#eef7ff; color:var(--navy); font-size:11px; font-weight:700; margin:0 6px 6px 0;}
+@media (max-width:960px) {
+  .grid-2 {grid-template-columns:1fr;}
+  .page-body {padding:24px 18px 36px;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+<div class="form-header">
+  <div class="fh-left">
+    <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+    <div class="fh-company">
+      <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+      <span>Tài liệu vận hành • Annex số hóa</span>
+    </div>
+  </div>
+  <div class="title"><strong>ANNEX-116 — Bản thiết kế ShareFile local working copy và vòng lặp đồng bộ khép kín</strong></div>
+  <div class="meta">
+    <div class="row"><span><b>Code:</b></span><span>ANNEX-116</span></div>
+    <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+    <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+    <div class="row"><span><b>Owner:</b></span><span>QMS Engineer / IT Administrator</span></div>
+    <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+  </div>
+</div>
+
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết kế cấu trúc ShareFile để chứa local working copy của repo QMS, review pack, release evidence và restore point cho vòng lặp đồng bộ giữa ShareFile, GitHub và cPanel. ANNEX này khóa cây thư mục, quyền, giới hạn và trạng thái của từng vùng.</div>
+
+<h1>ANNEX-116 — Bản thiết kế ShareFile local working copy và vòng lặp đồng bộ khép kín</h1>
+
+<div class="keyline"><strong>Ranh giới tài liệu:</strong> ANNEX này khóa <b>cấu trúc ShareFile local</b>, không thay thế <a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> về phê duyệt/phát hành, không thay thế <a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> về thao tác từng bước, và không thay thế <a href="../13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> về SSOT M365/SharePoint.</div>
+
+<div class="section">
+  <h2>1. Kiến trúc kiểm soát bắt buộc</h2>
+  <div class="grid-3">
+    <div class="card">
+      <h3>Node 1 — ShareFile controlled local</h3>
+      <p>Nơi người tích hợp chính soạn thảo trong working copy có đồng bộ, gom review pack, release evidence và restore point.</p>
+    </div>
+    <div class="card">
+      <h3>Node 2 — GitHub main</h3>
+      <p>Sổ cái commit trung tâm để local và cPanel cùng truy về một lịch sử phiên bản.</p>
+    </div>
+    <div class="card">
+      <h3>Node 3 — cPanel live repo</h3>
+      <p>Bản point-of-use đang chạy portal; pull/push từ portal admin đều vận hành trên node này.</p>
+    </div>
+  </div>
+  <div class="tree">ShareFile controlled local
+        |
+        v
+Git working copy (single active writer)
+        |
+        v
+GitHub origin/main
+        |
+        v
+cPanel live repository
+        |
+        v
+Portal point-of-use
+
+Emergency path:
+cPanel edit -> Push to Git -> GitHub origin/main -> local git pull -> ShareFile evidence update</div>
+</div>
+
+<div class="section">
+  <h2>2. Root folder bắt buộc trong ShareFile</h2>
+  <p>Root đề nghị dùng một tên duy nhất ở vùng Shared Folders, ví dụ <span class="pill">HESEM-QMS-Control</span>. Tất cả thư mục con bên dưới phải dùng English slug/ngữ cảnh ngắn, không đặt tên dài gây vượt giới hạn path.</p>
+  <div class="tree">HESEM-QMS-Control/
+  01-Controlled-Working-Repos/
+    qms.hesem.com.vn/
+  02-DCR-and-Review-Packs/
+    2026/
+      DCR-0001/
+      DCR-0002/
+  03-Released-Snapshots/
+    2026/
+      SOP-101/
+      WI-107/
+  04-Deployment-Evidence/
+    2026/
+      local-to-git-to-cpanel/
+      cpanel-to-git-to-local/
+  05-Restore-Points/
+    2026/
+      2026-03-25-pre-major-update/
+  06-Onboarding-and-How-To/
+  99-Not-Controlled-Do-Not-Use-As-SSOT/</div>
+</div>
+
+<div class="section">
+  <h2>3. Quy tắc từng thư mục</h2>
+  <div class="table-card">
+    <table class="matrix-table">
+      <thead>
+        <tr><th>Thư mục</th><th>Mục đích</th><th>Quyền tối thiểu</th><th>Rule bắt buộc</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="mono">01-Controlled-Working-Repos</span></td><td>Chứa working copy Git chính của repo QMS.</td><td>IT Administrator + QMS Engineer: Admin. Người tích hợp chính: Modify. Người khác: Read hoặc No Access.</td><td>Chỉ một người được ghi trực tiếp vào working copy đang đồng bộ. Không lưu file cá nhân cạnh repo.</td></tr>
+        <tr><td><span class="mono">02-DCR-and-Review-Packs</span></td><td>Lưu DCR, peer review, approval notes, markup, bản PDF so sánh và ảnh chụp minh chứng review.</td><td>Document Owner + Reviewer + QMS: Modify. Người ngoài nhóm: Read theo nhu cầu.</td><td>Mỗi DCR là một thư mục riêng; không ghi đè, chỉ thêm bản review tiếp theo.</td></tr>
+        <tr><td><span class="mono">03-Released-Snapshots</span></td><td>Lưu snapshot đã phát hành: PDF, HTML export, manifest/state, commit hash reference, release summary.</td><td>QMS Engineer + IT Admin: Modify. Các phòng ban liên quan: Read.</td><td>Đây là vùng bằng chứng audit, không phải working folder.</td></tr>
+        <tr><td><span class="mono">04-Deployment-Evidence</span></td><td>Lưu bằng chứng pull cPanel, smoke test, ảnh màn hình point-of-use, checklist triển khai.</td><td>QMS Engineer + Lead Department: Modify.</td><td>Tách riêng evidence cho hướng <span class="mono">local→git→cpanel</span> và <span class="mono">cpanel→git→local</span>.</td></tr>
+        <tr><td><span class="mono">05-Restore-Points</span></td><td>Lưu bản sao khôi phục trước major change, cutover hoặc cleanup lớn.</td><td>IT Admin + QMS Engineer: Modify.</td><td>Không dùng thay cho Git history; chỉ là bản dự phòng vận hành.</td></tr>
+        <tr><td><span class="mono">06-Onboarding-and-How-To</span></td><td>Lưu WI, ANNEX, quick guide, ảnh hướng dẫn và checklist onboarding.</td><td>Read rộng; sửa bởi QMS/IT.</td><td>Không để draft lẫn với hướng dẫn đã ban hành.</td></tr>
+        <tr><td><span class="mono">99-Not-Controlled-Do-Not-Use-As-SSOT</span></td><td>Vùng tạm cho export, file gửi ngoài, ảnh chụp, file chờ phân loại.</td><td>Modify theo người dùng.</td><td>Không được xem là bản phát hành hiệu lực; phải dọn hoặc phân loại sau khi xong việc.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2>4. Ánh xạ ShareFile với repo local và cPanel</h2>
+  <div class="table-card">
+    <table class="matrix-table">
+      <thead>
+        <tr><th>Mục</th><th>Path ví dụ</th><th>Vai trò</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>ShareFile local root</td><td><span class="mono">C:\ShareFile\HESEM-QMS-Control\</span></td><td>Vùng được ShareFile đồng bộ xuống máy local.</td></tr>
+        <tr><td>Local working repo</td><td><span class="mono">C:\ShareFile\HESEM-QMS-Control\01-Controlled-Working-Repos\qms.hesem.com.vn\</span></td><td>Nơi chạy <span class="mono">git pull</span>, <span class="mono">git add</span>, <span class="mono">git commit</span>, <span class="mono">git push</span>.</td></tr>
+        <tr><td>GitHub central</td><td><span class="mono">origin/main</span></td><td>Lịch sử tích hợp tập trung.</td></tr>
+        <tr><td>cPanel live repo</td><td><span class="mono">/home/&lt;cpanel-user&gt;/qms.hesem.com.vn</span></td><td>Repo đang gắn với portal live.</td></tr>
+        <tr><td>Portal runtime noise</td><td><span class="mono">01-QMS-Portal/qms-data/...</span></td><td>Không map vào release evidence; không được commit như tài liệu.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2>5. Quy tắc quyền và kế thừa quyền</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Quyền ở root</h3>
+      <ul class="tight">
+        <li>Chỉ IT Administrator và QMS Engineer được tạo root-level folder mới.</li>
+        <li>Quyền root phải được thiết kế từ trên xuống, vì thư mục con sẽ kế thừa quyền từ thư mục cha.</li>
+        <li>Không cấp Admin rộng cho end user ở vùng release evidence hoặc working repo.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Personal Folder</h3>
+      <ul class="tight">
+        <li>Personal Folder có thể tồn tại cho nhu cầu cá nhân, nhưng không được dùng làm SSOT cho tài liệu QMS.</li>
+        <li>Nếu cần file cá nhân để chuẩn bị trước khi chia sẻ, phải chuyển vào vùng Shared Folders trước khi bước vào review hoặc phát hành.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>6. Giới hạn thiết kế để ShareFile vận hành ổn định</h2>
+  <div class="table-card">
+    <table class="matrix-table">
+      <thead>
+        <tr><th>Rule</th><th>Giới hạn</th><th>Cách áp dụng tại HESEM</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Độ dài path</td><td>Giữ path dưới khoảng 250 ký tự</td><td>Dùng slug ngắn, không thêm nhiều lớp thư mục thừa, không ghép tên file quá dài với mã tài liệu đã đủ dài.</td></tr>
+        <tr><td>Độ sâu cây thư mục</td><td>Ưu tiên rộng hơn sâu</td><td>Tách theo năm, DCR, mã tài liệu ở level đầu hoặc level hai; tránh chuỗi thư mục 6-7 tầng.</td></tr>
+        <tr><td>Số lượng item trong một folder</td><td>Không vượt khoảng 5.000 item/folder</td><td>Tách theo năm hoặc mã tài liệu, không dồn mọi snapshot hoặc mọi evidence vào một thư mục duy nhất.</td></tr>
+        <tr><td>Pagination</td><td>Trên khoảng 250 item bắt đầu phải “Show more”</td><td>Tách folder sớm hơn ngưỡng này để end user không phải cuộn dài khi audit.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2>7. Trạng thái được phép của tài liệu trong ShareFile local</h2>
+  <div class="table-card">
+    <table class="matrix-table">
+      <thead>
+        <tr><th>Trạng thái</th><th>Thư mục chính</th><th>Ý nghĩa</th><th>Được sửa không</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Draft working copy</td><td><span class="mono">01-Controlled-Working-Repos</span></td><td>Đang soạn hoặc đang hoàn tất self-check.</td><td>Có, bởi người tích hợp chính hoặc người được chỉ định.</td></tr>
+        <tr><td>Review pack</td><td><span class="mono">02-DCR-and-Review-Packs</span></td><td>Bản trình review/phê duyệt, dùng để góp ý và chứng minh nội dung đã qua kiểm.</td><td>Không sửa đè; mỗi vòng review tạo bổ sung hoặc ghi chú riêng.</td></tr>
+        <tr><td>Released snapshot</td><td><span class="mono">03-Released-Snapshots</span></td><td>Ảnh chụp lại bản đã phát hành và đã lên Git/cPanel.</td><td>Không. Muốn sửa phải mở thay đổi mới.</td></tr>
+        <tr><td>Restore point</td><td><span class="mono">05-Restore-Points</span></td><td>Điểm phục hồi trước change lớn hoặc cutover.</td><td>Không sửa; chỉ tạo mới.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2>8. Nội dung bắt buộc của release evidence</h2>
+  <ul class="tight">
+    <li>Mã DCR và phạm vi thay đổi.</li>
+    <li>Tài liệu bị ảnh hưởng và quyết định version.</li>
+    <li>Commit hash trên GitHub <span class="mono">origin/main</span>.</li>
+    <li>Bằng chứng cPanel pull hoặc portal sync thành công.</li>
+    <li>Ảnh/smoke test point-of-use hoặc checklist triển khai.</li>
+    <li>Nếu là hotfix cPanel, phải có dấu vết local pull về ShareFile sau đó.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>9. Điều cấm bắt buộc</h2>
+  <ul class="tight">
+    <li>Không dùng ShareFile Personal Folder làm nơi giữ bản chính thức.</li>
+    <li>Không cho nhiều người cùng chỉnh trực tiếp một working copy Git dưới ShareFile.</li>
+    <li>Không để runtime file hoặc log tạm đi vào vùng snapshot/release evidence.</li>
+    <li>Không dùng <span class="mono">99-Not-Controlled-Do-Not-Use-As-SSOT</span> như nơi phát hành.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>10. Tài liệu liên kết</h2>
+  <div class="table-card">
+    <table class="matrix-table">
+      <thead>
+        <tr><th>Nhóm</th><th>Tài liệu</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>WI</td><td><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td></tr>
+        <tr><td>SOP</td><td><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> ; <a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> ; <a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td></tr>
+        <tr><td>M365/Records</td><td><a href="../13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> ; <a href="../13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> ; <a href="../13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>
