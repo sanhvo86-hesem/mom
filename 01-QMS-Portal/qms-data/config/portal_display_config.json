@@ -1,0 +1,32 @@
+{
+    "extensions": {
+        "custom": [],
+        "enabled": [
+            "html",
+            "pdf",
+            "doc",
+            "docx",
+            "docm",
+            "xls",
+            "xlsx",
+            "xlsm",
+            "xlsb",
+            "csv",
+            "ppt",
+            "pptx",
+            "pptm"
+        ]
+    },
+    "sidebar": {
+        "hidden_core_items": [
+            "documents"
+        ],
+        "hidden_sections": [
+            "train"
+        ],
+        "hidden_categories": [
+            "TRN"
+        ]
+    },
+    "updated_at": "2026-03-25T08:05:39+00:00"
+}
