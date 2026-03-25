@@ -1869,7 +1869,7 @@ function git_sync_documents(array $me, string $repoDir): array {
   ];
 }
 
-function git_pull_portal(string $repoDir): array {
+function git_pull_portal(string $repoDir, ?array $me = null): array {
   $repoReal = realpath($repoDir);
   if ($repoReal === false || !is_dir($repoReal)) {
     throw new RuntimeException('repo_not_found');
@@ -1884,6 +1884,20 @@ function git_pull_portal(string $repoDir): array {
   // Auto-clean runtime noise before safety checks so Pull can run without
   // manual cleanup in cPanel Terminal.
   git_cleanup_runtime_noise($repoReal);
+
+  // Auto-sync meaningful local changes before pulling so admin does not need
+  // to switch between Push and Pull manually for routine edits.
+  if (is_array($me)) {
+    try {
+      git_sync_documents($me, $repoReal);
+      git_cleanup_runtime_noise($repoReal);
+    } catch (Throwable $syncError) {
+      $syncMsg = (string)$syncError->getMessage();
+      if (!(str_starts_with($syncMsg, 'git_status_failed') || str_starts_with($syncMsg, 'git_diff_cached_failed'))) {
+        throw new RuntimeException('git_presync_failed: ' . $syncMsg);
+      }
+    }
+  }
 
   $stagedCode = 0;
   $stagedOut = git_command(['diff', '--cached', '--name-only'], $repoReal, $stagedCode);
@@ -2381,7 +2395,7 @@ switch ($action) {
     if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
 
     try {
-      $result = git_pull_portal($ROOT_DIR);
+      $result = git_pull_portal($ROOT_DIR, $me);
       api_json([
         'ok' => true,
         'pulled' => (bool)($result['pulled'] ?? false),
@@ -2399,6 +2413,7 @@ switch ($action) {
         str_starts_with($message, 'not_a_git_repo') => 'not_a_git_repo',
         str_starts_with($message, 'staged_changes_present') => 'staged_changes_present',
         str_starts_with($message, 'working_tree_dirty') => 'working_tree_dirty',
+        str_starts_with($message, 'git_presync_failed') => 'git_presync_failed',
         str_starts_with($message, 'git_fetch_failed') => 'git_fetch_failed',
         str_starts_with($message, 'git_pull_failed') => 'git_pull_failed',
         str_starts_with($message, 'git_status_failed') => 'git_status_failed',
