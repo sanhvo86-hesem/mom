@@ -161,6 +161,11 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="field"><b>Điều kiện không cho phép chuyển bước</b><div class="blank">Thiếu thẩm quyền, thiếu chủ dữ liệu, thiếu hết hạn date cho khách, thiếu lưu giữ label, không test truy cập/ghi nhận được hồ sơ, hoặc chưa chứng minh khôi phục.</div></div>
 </div>
 <h2 class="h2" id="p6">6. Cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
+<div class="note-blue" style="margin:12px 0">
+  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> SOP này vận hành <b>xuyên suốt hệ thống (G0→G7)</b>. Quản trị dữ liệu và bảo mật hồ sơ áp dụng tại mọi cổng.
+  Các bước nội bộ (SOP-104-G1→G5) là chi tiết triển khai, KHÔNG nhầm với mã cổng hệ thống G0-G7.
+  <br>→ Xem <a href="../../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference đầy đủ.
+</div>
 <div class="gate-grid">
 <div class="gate-card"><h3>104-G1 — Phân loại dữ liệu &amp; chốt SoR/SSOT</h3><p>Chốt loại dữ liệu, mức nhạy cảm, chủ dữ liệu, Responsible Person hệ thống và nơi lưu chuẩn. <b>TẠM GIỮ</b> nếu dữ liệu chưa biết lưu ở đâu hoặc có hơn một nguồn chính thức.</p></div>
 <div class="gate-card"><h3>104-G2 — Rà quyền, SoD, IP &amp; phê duyệt</h3><p>Kiểm tra ít nhất quyền hạn, SoD, khách/bên ngoài chia sẻ, có đặc quyền truy cập, pháp lý/hợp đồng Requests và thẩm quyền trước hành động. <b>TẠM GIỮ</b> nếu quyền xin vượt vai trò hoặc thiếu phê duyệt.</p></div>

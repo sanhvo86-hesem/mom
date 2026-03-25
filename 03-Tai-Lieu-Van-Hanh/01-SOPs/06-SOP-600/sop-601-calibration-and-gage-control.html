@@ -107,6 +107,11 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2>
 <div class="field-grid"><div class="field"><b>Đầu vào bắt buộc</b><div class="blank">Inventory gage, intended use, tolerance/uncertainty needs, risk class, user/area, hiệu chuẩn plan, approved lab info, master references, prior history, xác minh method.</div></div><div class="field"><b>Đầu ra bắt buộc</b><div class="blank">Validated equipment trạng thái, hiệu chuẩn hồ sơ, xác minh history, OOT đánh giá, recall scope, disposition of affected product, KPI report.</div></div><div class="field"><b>Điều kiện tiên quyết</b><div class="blank">Mỗi gage có ID duy nhất, người phụ trách, intended use, risk class và link tới FRM-525 trước khi được đưa vào dùng.</div></div><div class="field"><b>Điểm không được bỏ qua</b><div class="blank">Drop/impact, repair, battery change ảnh hưởng accuracy, environmental extremes, overdue label, borrowed gage, external hiệu chuẩn cert thiếu traceability.</div></div></div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
+<div class="note-blue" style="margin:12px 0">
+  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> SOP này vận hành <b>hỗ trợ G4 (FAI), G5 (IPQC) và G6 (Final QC)</b>. Hiệu chuẩn đảm bảo đo lường chính xác tại mọi cổng kiểm tra.
+  Các bước nội bộ (SOP-601-G1→G5) là chi tiết triển khai, KHÔNG nhầm với mã cổng hệ thống G0-G7.
+  <br>→ Xem <a href="../../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference đầy đủ.
+</div>
 <div class="gate-grid">
 <div class="gate-card"><h3>601-G1 — đăng ký &amp; rủi ro class</h3><p>Thiết bị phải có ID, Responsible Person, dự kiến / có chủ đích use, giải quyết / độ phân giải/phạm vi / dải, rủi ro class và đã lên kế hoạch control phương pháp trước khi cấp cho người dùng.</p></div>
 <div class="gate-card"><h3>601-G2 — Bản gốc &amp; phương pháp mức sẵn sàng</h3><p>Phải xác định phương pháp, acceptance tiêu chí, tham chiếu standard/chủ / gốc và nhịp độ / chu kỳ họp xác minh trước khi thiết bị được dùng cho phát hành quyết định.</p></div>

@@ -30,7 +30,8 @@
 | Thuộc tính `title` (tooltip) | **CÓ** — dịch sang tiếng Việt | Tooltip người dùng đọc |
 | Thuộc tính `placeholder` | **CÓ** — dịch sang tiếng Việt | Hướng dẫn nhập liệu |
 | Khối `<style>...</style>` | **KHÔNG** — giữ nguyên toàn bộ | Mã CSS |
-| Khối `<script>...</script>` | **KHÔNG** — giữ nguyên toàn bộ | Mã JavaScript |
+| Logic/định danh trong `<script>...</script>` | **KHÔNG** — giữ nguyên | Hàm, biến, selector, key kỹ thuật |
+| Chuỗi hiển thị trong JavaScript / template literal / JSON UI | **CÓ** — viết tiếng Việt có dấu | Đây là nội dung người dùng nhìn thấy |
 | Tên file trong `href`/`download` | **KHÔNG** — giữ nguyên | Tên file thực trên hệ thống |
 | Comment HTML `<!-- -->` | **KHÔNG** — giữ nguyên | Comment kỹ thuật |
 

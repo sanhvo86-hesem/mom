@@ -161,6 +161,11 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="field"><b>Điều kiện không cho phép chuyển bước</b><div class="blank">Không rõ Responsible Person, không đủ dữ liệu tối thiểu, chưa có phê duyệt để gửi ra ngoài, hoặc chưa xác nhận người nhận Received thông tin khẩn.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
+<div class="note-blue" style="margin:12px 0">
+  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> SOP này vận hành <b>xuyên suốt hệ thống (G0→G7)</b>. Quản lý truyền thông áp dụng tại mọi cổng.
+  Các bước nội bộ (SOP-107-G1→G5) là chi tiết triển khai, KHÔNG nhầm với mã cổng hệ thống G0-G7.
+  <br>→ Xem <a href="../../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference đầy đủ.
+</div>
 <div class="gate-grid">
 <div class="gate-card"><h3>107-G1 — Phân loại sự kiện &amp; chọn kênh</h3><p>Xác định event family, severity, người phụ trách, kênh và người nhận đầu tiên. <b>HOLD</b> nếu sự kiện chưa được phân loại nhưng đã có người phát ngôn ra ngoài.</p></div>
 <div class="gate-card"><h3>107-G2 — Kiểm dữ liệu tối thiểu trước phát hành</h3><p>Message phải đủ ID, job/part/rev, impact, action, người phụ trách, due. <b>HOLD</b> nếu message mơ hồ, thiếu revision hoặc chưa rõ ảnh hưởng.</p></div>
