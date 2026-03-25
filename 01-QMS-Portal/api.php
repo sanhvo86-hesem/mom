@@ -5972,6 +5972,61 @@ if ($username === '') {
       }));
     }
 
+    $reconcileTreeNodeWithFilesystem = function(array $node) use (&$reconcileTreeNodeWithFilesystem, $ROOT_DIR): array {
+      $nodePath = trim((string)($node['path'] ?? ''));
+      if ($nodePath === '') return $node;
+      $nodeAbs = join_in_root($ROOT_DIR, $nodePath);
+      if (!is_dir($nodeAbs)) return $node;
+
+      $existingSubs = [];
+      foreach (($node['subs'] ?? []) as $idx => $sub) {
+        if (!is_array($sub)) continue;
+        $subPath = trim((string)($sub['path'] ?? ''));
+        if ($subPath === '') continue;
+        $existingSubs[$subPath] = $idx;
+      }
+
+      $dirEntries = @scandir($nodeAbs);
+      if ($dirEntries) {
+        sort($dirEntries);
+        foreach ($dirEntries as $entry) {
+          if ($entry === '' || $entry[0] === '.' || $entry === '_Archive' || $entry === 'index.html') continue;
+          $entryAbs = $nodeAbs . '/' . $entry;
+          if (!is_dir($entryAbs)) continue;
+          [$entryNum, $entryLabel] = parse_folder_num($entry);
+          if ($entryNum === null || $entryNum < 1) continue;
+          $entryPath = $nodePath . '/' . $entry;
+          if (isset($existingSubs[$entryPath])) continue;
+          if (!isset($node['subs']) || !is_array($node['subs'])) $node['subs'] = [];
+          $node['subs'][] = [
+            'path' => $entryPath,
+            'num' => $entryNum,
+            'name' => $entryLabel,
+            'fileCount' => 0,
+          ];
+        }
+      }
+
+      if (!empty($node['subs']) && is_array($node['subs'])) {
+        foreach ($node['subs'] as $idx => $sub) {
+          if (!is_array($sub)) continue;
+          $node['subs'][$idx] = $reconcileTreeNodeWithFilesystem($sub);
+        }
+        usort($node['subs'], function($a, $b) {
+          $numDiff = (int)($a['num'] ?? 0) - (int)($b['num'] ?? 0);
+          if ($numDiff !== 0) return $numDiff;
+          return strcmp((string)($a['name'] ?? ''), (string)($b['name'] ?? ''));
+        });
+      }
+
+      return $node;
+    };
+
+    foreach ($tree as $idx => $node) {
+      if (!is_array($node)) continue;
+      $tree[$idx] = $reconcileTreeNodeWithFilesystem($node);
+    }
+
     // Repair custom_docs stale paths
     try {
       $custom = load_custom_docs($CUSTOM_DOCS_FILE);
