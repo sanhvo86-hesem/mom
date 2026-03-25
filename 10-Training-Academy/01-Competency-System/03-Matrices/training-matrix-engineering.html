@@ -7,6 +7,9 @@
 <title>TRN-MTX-02 — Training Matrix – Phòng Kỹ thuật | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
+@media print{ @page{ size:A4 landscape; margin:12mm; } }
+
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
 @media print {
  .card, .table-card, .callout, .note, .box, .iso-map,
  .preface-block, .jd-mission, .form-sheet, .lane,
@@ -14,15 +17,29 @@
  page-break-inside: avoid;
  break-inside: avoid;
  }
-.jd-mission, .form-sheet, .lane,
- .legend, .req, .auth-grid, .backup-card, .vstep {
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
  page-break-inside: avoid;
  break-inside: avoid;
  }
-.auth-grid, .backup-card, .vstep {
+ .sig-row, .sign-row, .approval-row {
  page-break-inside: avoid;
  break-inside: avoid;
  }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
 </style>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
 </head>

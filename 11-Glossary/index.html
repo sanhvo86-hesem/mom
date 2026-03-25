@@ -6,8 +6,50 @@
 <title>ANNEX-QMS-970 — Từ điển | HESEM QMS</title>
 <link href="../assets/style.css" rel="stylesheet"/>
 <style>
-@media print {
+  .dict-toolbar{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin:14px 0 10px; }
+  .dict-wrap{ width:100%; max-width:100%; overflow-x:hidden; }
+  .dict-table{ width:100%; border-collapse:collapse; font-size:13px; table-layout:fixed; }
+  .dict-table th, .dict-table td{ border:1px solid var(--border); padding:8px; vertical-align:top; }
+  .dict-table thead th{ background:#f8fafc; }
+  .dict-table .col-term{ width:20%; font-weight:800; white-space:normal; overflow-wrap:break-word; word-break:break-word; line-height:1.25; }
+  .dict-table .col-meaning{ width:26%; white-space:normal; overflow-wrap:break-word; word-break:break-word; line-height:1.25; }
+  .dict-table .col-def{ width:54%; white-space:normal; overflow-wrap:break-word; word-break:break-word; }
+  .th-en{ font-weight:800; }
+  .th-vn{ font-size:11px; color:var(--muted); margin-top:2px; font-weight:600; }
+  .term-top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .term-text{ font-weight:900; letter-spacing:.2px; }
+  .term-sub{ margin-top:4px; font-weight:600; color:var(--muted); font-size:11px; }
+  .badge-cat{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border); background:#fff; color:#0f172a; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; white-space:nowrap; }
+  .badge-cat .dot{ width:8px; height:8px; border-radius:999px; background:rgba(66,133,246,.9); display:inline-block; }
+  .meaning-en{ font-weight:800; line-height:1.35; }
+  .meaning-empty{ color:var(--muted); font-style:italic; }
+  .detail-body{ white-space:pre-wrap; color:#0f172a; line-height:1.4; }
+  .detail-body + .detail-body{ margin-top:8px; }
+  .detail-label{ font-weight:800; display:block; margin-bottom:3px; }
+  .dict-pager{ display:flex; gap:10px; align-items:center; justify-content:flex-end; margin:12px 0 0; }
+  .dict-btn{ appearance:none; border:1px solid var(--border); background:#fff; color:#0f172a; padding:8px 12px; border-radius:12px; font-weight:800; cursor:pointer; }
+  .dict-btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .dict-shown{ font-size:12px; color:var(--muted); font-weight:600; }
+  .chiplist{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{ appearance:none; border:1px solid var(--border); background:#fff; color:#0f172a; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; cursor:pointer; }
+  .chip.active{ background:#0f172a; color:#fff; border-color:#0f172a; }
+  .mini-tag{ display:inline-block; padding:2px 6px; border-radius:999px; font-size:11px; font-weight:700; background:#eef2ff; color:#1e3a8a; margin-bottom:6px; }
+  .load-note{ color:var(--muted); font-size:12px; }
+  @media print{
+    @page{ size:A4 landscape; margin:10mm; }
+    .searchbox, .chiplist, .dict-pager{ display:none !important; }
+    .dict-table{ font-size:10.5px; }
+    .page{ border:none; box-shadow:none; }
+    .page-body{ padding:0; }
+  }
+  @media print {
     .card, .table-card, .callout, .note, .box, .iso-map, .preface-block, .form-sheet { page-break-inside: avoid; break-inside: avoid; }
+    h1, h2, h3, .h1, .h2, .h3 { page-break-after: avoid; break-after: avoid; }
+    tr { page-break-inside: avoid; break-inside: avoid; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    
+  }
 </style>
 </head>
 <body>

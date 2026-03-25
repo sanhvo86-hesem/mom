@@ -8,10 +8,25 @@
 <style>
 @media print {
   .quick-card, .note, .keyline { break-inside: avoid; page-break-inside: avoid; }
-.keyline { break-inside: avoid; page-break-inside: avoid; }
-.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius:var(--r); background:#fcfcfd;}
-.quick-card, .note, .keyline { break-inside: avoid; page-break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+}
+.page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
+.page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color:var(--navy);}
+.page-body h3 {font-size:14px; line-height:1.5; margin:0 0 6px; color:var(--ink);}
 .quick-card {border:1px solid var(--ln); border-radius:var(--r); padding:14px; background:#fff; margin:14px 0;}
+.quick-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;}
+.mini-box {border:1px solid var(--ln); border-radius:var(--r-sm); padding:10px; background:#fcfcfd;}
+.path {font-family:var(--mono); font-size:11px; color:var(--ink2);}
+.tag {display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--ln); background:#eef7ff; color:var(--navy); font-size:11px; font-weight:700; margin-right:6px;}
+.danger {background:#fff5f5; color:#c92a2a; border-color:#ffc9c9;}
+.good {background:#ebfbee; color:#2b8a3e; border-color:#b2f2bb;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius:var(--r); background:#fcfcfd;}
+ul.tight {margin:8px 0; padding-left:18px;}
+ul.tight li {margin:4px 0;}
+@media (max-width:960px) {
+  .quick-grid {grid-template-columns:1fr;}
+  .page-body {padding:24px 18px 36px;}
+}
 </style>
 </head>
 <body>

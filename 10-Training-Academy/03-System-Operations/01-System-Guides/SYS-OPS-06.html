@@ -7,6 +7,17 @@
 <title>SYS-OPS-06 — từ điển KPI (từ điển) & Data Mô hình (Power BI Trung tâm điều hành (control tháp / cột)) | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
+ .mini{font-size:12px;color:#374151;}
+ .path{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; font-size:12px;}
+ .tight td{padding:8px 10px;}
+ .kpi-box{border:1px solid #e5e7eb;border-radius:12px;padding:12px;background:#fff;}
+ .pill{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #e5e7eb;background:#f9fafb;font-size:12px;margin:2px 6px 2px 0;}
+ .stop{display:inline-block;padding:2px 8px;border-radius:999px;background:#fee2e2;border:1px solid #fecaca;font-weight:700;}
+ .hold{display:inline-block;padding:2px 8px;border-radius:999px;background:#ffedd5;border:1px solid #fed7aa;font-weight:700;}
+ .block{display:inline-block;padding:2px 8px;border-radius:999px;background:#e0f2fe;border:1px solid #bae6fd;font-weight:700;}
+ .must{font-weight:800;}
+
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
 @media print {
  .card, .table-card, .callout, .note, .box, .iso-map,
  .preface-block, .jd-mission, .form-sheet, .lane,
@@ -14,15 +25,29 @@
  page-break-inside: avoid;
  break-inside: avoid;
  }
-.jd-mission, .form-sheet, .lane,
- .legend, .req, .auth-grid, .backup-card, .vstep {
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
  page-break-inside: avoid;
  break-inside: avoid;
  }
-.auth-grid, .backup-card, .vstep {
+ .sig-row, .sign-row, .approval-row {
  page-break-inside: avoid;
  break-inside: avoid;
  }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
 </style>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
 </head>

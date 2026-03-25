@@ -6,11 +6,57 @@
 <title>ANNEX-118 — Offline Fallback Kit| HESEM QMS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
+
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;}
 .metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
+.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;}
+.link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);}
+.link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
+.link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);}
+.link-list{list-style:none;margin:0;padding:0}
+.link-list li{padding:4px 0 4px 0;font-size:12px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}
+.hero h1{font-size:24px;margin:0 0 8px;color:var(--navy);}
+.hero p{margin:0;color:var(--ink2);}
+
+.notice-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0;}
+.notice-item{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);}
+
+.small{font-size:12px;color:var(--ink2);}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0;}
+.kpi-card{border:1px solid var(--ln);padding:14px;border-radius:12px;background:var(--bg);}
+.kpi-card h3{font-size:14px;margin:0 0 8px;color:var(--navy);}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:12px 0;}
+.callout-card{border:1px solid var(--ln);padding:14px;border-radius:12px;background:#fff;}
+.callout-card h3{font-size:14px;margin:0 0 8px;color:var(--navy);}
+.req-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0;}
+
+.req-tag{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:24px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.4px}
+.must{background:#ffe8e8;color:#8f1d1d}
+.should{background:#eef6ff;color:#1f4e79}
+.may{background:#eef8ef;color:#2f6b2f}
 .footer-note{margin-top:18px;padding:12px 14px;border-radius:10px;background:#f6f7f9;color:var(--ink2);font-size:12px}
+.svg-wrap{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;overflow:auto;margin:14px 0}
+.field-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:12px 0}
+.field{border:1px solid var(--ln);border-radius:12px;padding:12px;background:#fff}
+.blank{display:block;min-height:46px;border:1px dashed #cbd5e1;border-radius:8px;background:#fcfdff;padding:8px;margin-top:8px}
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin:12px 0}
+.check-item{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--ln);border-radius:10px;padding:10px;background:#fff;font-size:12px}
+.chk{display:inline-block;width:14px;height:14px;border:1px solid #64748b;border-radius:3px;margin-top:2px}
+.matrix-small th,.matrix-small td{font-size:12px}
+.doc-link-list{margin:0;padding-left:18px}
+.doc-link-list li{margin:4px 0}
+
 </style>
 </head>
 <body>

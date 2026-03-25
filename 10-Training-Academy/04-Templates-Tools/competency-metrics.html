@@ -9,6 +9,12 @@
 <link href="../../assets/style.css" rel="stylesheet"/>
 <link href="../01-Competency-System/01-Framework/competency-metrics.html" rel="canonical"/>
 <style>
+ .redirect-box{ display:flex; gap:12px; align-items:flex-start; }
+ .redirect-icon{ width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+ background: rgba(66,133,246,.10); border:1px solid rgba(66,133,246,.25); font-weight:900; color: var(--primary);
+ }
+ 
+/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
 @media print {
  .card, .table-card, .callout, .note, .box, .iso-map,
  .preface-block, .jd-mission, .form-sheet, .lane,
@@ -16,15 +22,29 @@
  page-break-inside: avoid;
  break-inside: avoid;
  }
-.jd-mission, .form-sheet, .lane,
- .legend, .req, .auth-grid, .backup-card, .vstep {
+ h1, h2, h3, .h1, .h2, .h3 {
+ page-break-after: avoid;
+ break-after: avoid;
+ }
+ .form-header {
  page-break-inside: avoid;
  break-inside: avoid;
  }
-.auth-grid, .backup-card, .vstep {
+ .sig-row, .sign-row, .approval-row {
  page-break-inside: avoid;
  break-inside: avoid;
  }
+ tr { page-break-inside: avoid; break-inside: avoid; }
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
 </style>
 </head>
 <body>

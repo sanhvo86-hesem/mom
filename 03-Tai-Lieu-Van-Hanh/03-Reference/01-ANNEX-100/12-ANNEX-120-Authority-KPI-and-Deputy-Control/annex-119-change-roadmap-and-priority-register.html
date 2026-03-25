@@ -6,16 +6,49 @@
 <title>ANNEX-119 — Thay đổi Roadmap &amp; Ưu tiên Sổ đăng ký — Lo trinh trien khai dong loat Job Đơn hàng | HESEM QMS</title>
 <link href="../../../../assets/style.css" rel="stylesheet"/>
 <style>
-@media print{.card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.metric-card,.gate-card,.field,.callout-card{page-break-inside:avoid;break-inside:avoid}
-.gate-card,.field,.callout-card{page-break-inside:avoid;break-inside:avoid}
-.gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
-.gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
-.metric-card,.gate-card,.field,.callout-card{page-break-inside:avoid;break-inside:avoid}
+@media print{.card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.metric-card,.gate-card,.field,.callout-card{page-break-inside:avoid;break-inside:avoid}h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}}
+.chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
+.tight li{margin:4px 0;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
+.gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
+.mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
+
+.note-red{border-left: 3px solid #dc2626;background:#fef2f2;padding:12px 14px;border-radius:8px;margin:12px 0;}
+
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+.callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
+.callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
+.step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+.step-band span{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ln);background:var(--bg);padding:6px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700;margin:0 6px 6px 0;}
+.pill-red{background:#fef2f2;color:#dc2626;}
+.pill-green{background:#f0fdf4;color:#16a34a;}
+.pill-amber{background:#fffbeb;color:#d97706;}
+.phase-header{background:var(--navy);color:#fff;padding:14px 18px;border-radius:var(--r) var(--r) 0 0;font-size:15px;font-weight:700;}
+.phase-body{border:1px solid var(--ln);border-top:0;border-radius:0 0 var(--r) var(--r);padding:16px;}
+.dep-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;margin:2px;}
+.dep-prod{background:#dbeafe;color:#1e40af;}
+.dep-eng{background:#fce7f3;color:#9d174d;}
+.dep-qa{background:#dcfce7;color:#166534;}
+.dep-sc{background:#fef3c7;color:#92400e;}
+.dep-sales{background:#e0e7ff;color:#3730a3;}
+.dep-fin{background:#f3e8ff;color:#6b21a8;}
+.dep-hr{background:#ffe4e6;color:#9f1239;}
+.dep-it{background:#cffafe;color:#155e75;}
+table{max-width:100%;table-layout:auto}
+td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-align:top}
+@media(max-width:960px){.grid-2,.grid-3{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>

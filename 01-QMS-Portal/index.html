@@ -6,9 +6,64 @@
 <title>ANNEX-50490 — Hệ thống điều hướng QMS | HESEM QMS</title>
 <link href="../assets/style.css" rel="stylesheet"/>
 <style>
+/* Zone 1: Hero + Quick Actions */
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:24px 28px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 24px;}
+.hero h1{font-size:20px;line-height:1.35;color:var(--navy);margin:0 0 8px;font-weight:800}
+.hero p{font-size:13px;color:var(--ink2);margin:0;line-height:1.6}
+
+.action-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 28px}
+.action-card{display:flex;align-items:center;gap:10px;padding:14px 16px;border:1px solid var(--ln);border-radius:var(--r);background:var(--bg);text-decoration:none;color:var(--ink);transition:box-shadow .15s,border-color .15s}
+.action-card:hover{border-color:var(--blue);box-shadow:0 2px 8px rgba(21,101,192,.12);text-decoration:none}
+.action-icon{width:36px;height:36px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0}
+.action-card .action-label{font-size:13px;font-weight:700;color:var(--navy)}
+
+/* Zone 2: Gate Flow */
+.section-title{font-size:14px;font-weight:700;color:var(--navy);margin:0 0 12px;padding-bottom:6px;border-bottom:1px solid var(--ln)}
+.gate-flow{display:flex;gap:0;overflow-x:auto;padding:4px 0 12px;margin:0 0 28px;-webkit-overflow-scrolling:touch}
+.gate-flow::-webkit-scrollbar{height:6px}
+.gate-flow::-webkit-scrollbar-thumb{background:var(--ln);border-radius:3px}
 .gate-card{min-width:220px;max-width:240px;flex-shrink:0;border:1px solid var(--ln);border-radius:var(--r);background:var(--bg);overflow:hidden}
-.gate-card{min-width:200px}
+.gate-header{padding:10px 14px;font-weight:700;font-size:13px;color:#fff}
+.gate-desc{padding:0 14px;font-size:11.5px;color:var(--ink2);margin:8px 0 6px;line-height:1.5}
+.gate-links{padding:0 14px 12px}
+.gate-links .gl-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin:6px 0 3px}
+.gate-links ul{list-style:none;margin:0;padding:0}
+.gate-links li{padding:2px 0;font-size:12px}
+.gate-links a{color:var(--blue)}
+.gate-arrow{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:28px;font-size:18px;color:var(--ink3);font-weight:700}
+
+/* Zone 3: Role Cards */
+.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:0 0 28px}
+.role-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px 18px;background:var(--bg);border-left: 3px solid var(--ln)}
+.role-card h3{font-size:13px;font-weight:700;color:var(--navy);margin:0 0 8px}
+.role-card ul{list-style:none;margin:0;padding:0}
+.role-card li{padding:3px 0;font-size:12px}
+.role-card a{color:var(--blue)}
+
+/* Zone 4: Governance */
+.gov-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:0 0 28px}
+.gov-col{border:1px solid var(--ln);border-radius:var(--r);padding:16px 18px;background:var(--bg)}
+.gov-col h3{font-size:13px;font-weight:700;color:var(--navy);margin:0 0 10px}
+.gov-col ul{list-style:none;margin:0;padding:0}
+.gov-col li{padding:3px 0;font-size:12px}
+.gov-col a{color:var(--blue)}
+
+/* Zone 5: System & Emergency */
+.sys-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 24px}
+.sys-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px 18px;background:var(--bg);border-top:3px solid var(--navy)}
+.sys-card h3{font-size:13px;font-weight:700;color:var(--navy);margin:0 0 4px}
+.sys-card p{font-size:12px;color:var(--ink2);margin:0}
+
+/* Footer */
 .footer-note{margin-top:18px;padding:14px 16px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2);line-height:1.6}
+
+/* Responsive */
+@media (max-width:768px){
+  .action-grid{grid-template-columns:repeat(2,1fr)}
+  .role-grid,.gov-grid{grid-template-columns:1fr}
+  .sys-grid{grid-template-columns:1fr}
+  .gate-card{min-width:200px}
+}
 </style>
 </head>
 <body>
