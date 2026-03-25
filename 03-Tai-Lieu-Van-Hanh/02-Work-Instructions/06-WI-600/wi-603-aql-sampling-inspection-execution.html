@@ -87,12 +87,12 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>3. Trình tự thực hiện AQL</h2>
 <div class="step-list">
-<div class="step-item"><strong>Chốt lot và đơn vị kiểm.</strong><br/>Ghi rõ lot size, kiểm tra đơn vị, QPL/khách hàng level, trạng thái bình thường/siết chặt / thắt chặt/giảm và nguồn plan sử dụng.</div>
-<div class="step-item"><strong>Tra cỡ mẫu và Ac/Re.</strong><br/>Tra theo lot size và kiểm tra level trong bảng đã phê duyệt. Nếu lot nhỏ hoặc khách hàng chỉ định 100% thì không dùng AQL để giảm mẫu.</div>
-<div class="step-item"><strong>Lấy mẫu ngẫu nhiên.</strong><br/>Mẫu phải rải đều qua toàn lô hoặc toàn kiện; không lấy liên tiếp trong một khay duy nhất nếu lot phân bố nhiều vị trí/thời điểm. Với lot có nhiều pallet/box/khay, phải có quy tắc ngẫu nhiên hóa từng tầng chứa.</div>
-<div class="step-item"><strong>Kiểm và ghi khuyết tật.</strong><br/>Kiểm theo plan, phân loại khuyết tật từng chiếc, từng loại. Không được cộng dồn mơ hồ. khuyết tật quan trọng / nghiêm trọng tách riêng khỏi lớn / nghiêm trọng/nhỏ / không nghiêm trọng.</div>
-<div class="step-item"><strong>Quyết định chấp nhận/từ chối.</strong><br/>So khuyết tật count với Ac/Re; từ chối lô khi vượt Re hoặc khi xuất hiện bất kỳ quan trọng / nghiêm trọng khuyết tật thuộc rule không / bằng không acceptance. Nếu plan nhiều bước Requests mẫu tiếp theo, phải tuân đúng logic.</div>
-<div class="step-item"><strong>Xử lý sau quyết định.</strong><br/>chấp nhận thì phát hành lô theo cổng kiểm soát tương ứng. Từ chối thì giữ lô, mở ngăn chặn/NCR nếu cần và xác định hướng 100% sort/làm lại/kiểm tra lại dưới quyền QA.</div>
+<div class="step-item"><strong>Chốt lot và đơn vị kiểm.</strong><br/>Ghi rõ lot size, kiểm tra unit, QPL/customer level, trạng thái normal/tightened/reduced và nguồn plan sử dụng.</div>
+<div class="step-item"><strong>Tra cỡ mẫu và Ac/Re.</strong><br/>Tra theo lot size và kiểm tra level trong bảng đã phê duyệt. Nếu lot nhỏ hoặc customer chỉ định 100% thì không dùng AQL để giảm mẫu.</div>
+<div class="step-item"><strong>Lấy mẫu ngẫu nhiên.</strong><br/>Mẫu phải rải đều qua toàn lô hoặc toàn kiện; không lấy liên tiếp trong một khay duy nhất nếu lot phân bố nhiều vị trí/thời điểm. Với lot có nhiều pallet/box/khay, phải có quy tắc random hóa từng tầng chứa.</div>
+<div class="step-item"><strong>Kiểm và ghi defect.</strong><br/>Kiểm theo plan, phân loại defect từng chiếc, từng loại. Không được cộng dồn mơ hồ. Defect critical tách riêng khỏi major/minor.</div>
+<div class="step-item"><strong>Quyết định accept/reject.</strong><br/>So defect count với Ac/Re; reject lô khi vượt Re hoặc khi xuất hiện bất kỳ critical defect thuộc rule zero acceptance. Nếu plan nhiều bước yêu cầu sample tiếp theo, phải tuân đúng logic.</div>
+<div class="step-item"><strong>Xử lý sau quyết định.</strong><br/>Accept thì release lô theo cổng kiểm soát tương ứng. Reject thì giữ lô, mở containment/NCR nếu cần và xác định hướng 100% sort/rework/reinspect dưới quyền QA.</div>
 </div></div>
 
 <div class="section"><h2>4. chuyển đổi quy tắc, kiểm tra lại và lỗi thường gặp</h2>
@@ -107,8 +107,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>5. Hồ sơ, KPI và liên kết</h2>
 <div class="two-col">
-<div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Lot định nghĩa, lot size, source plan, chuyển đổi trạng thái.</li><li>mẫu size, cách ngẫu nhiên hóa, khuyết tật count theo class.</li><li>Ac/Re quyết định, người kiểm, thời điểm, lệnh hold/phê duyệt nếu có.</li><li>Liên kết NCR/100% sort/kiểm tra lại khi từ chối.</li></ul></div>
-<div class="card"><h3>TẠM GIỮ bắt buộc</h3><ul class="tight" style="padding-left:18px;"><li>Không xác định được lot ranh giới hoặc hỗn hợp / lẫn lộn lot.</li><li>Không xác định được plan hiệu lực.</li><li>Đo lường system nghi ngờ hoặc khuyết tật class còn tranh cãi.</li><li>Phát hiện quan trọng / nghiêm trọng khuyết tật hoặc dấu hiệu mẫu sai lệch hệ thống.</li></ul></div>
+<div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Lot definition, lot size, source plan, switching trạng thái.</li><li>Sample size, cách random hóa, defect count theo class.</li><li>Ac/Re decision, người kiểm, thời điểm, lệnh tạm giữ/phê duyệt nếu có.</li><li>Liên kết NCR/100% sort/reinspection khi reject.</li></ul></div>
+<div class="card"><h3>HOLD bắt buộc</h3><ul class="tight" style="padding-left:18px;"><li>Không xác định được lot boundary hoặc mixed lot.</li><li>Không xác định được plan hiệu lực.</li><li>Measurement system nghi ngờ hoặc defect class còn tranh cãi.</li><li>Phát hiện critical defect hoặc dấu hiệu sample bias.</li></ul></div>
 </div>
 <div class="kpi-grid">
 <div class="kpi-box"><strong>KPI-WI603-01</strong><br/>Tỷ lệ từ chối theo lot và theo khuyết tật class.</div>

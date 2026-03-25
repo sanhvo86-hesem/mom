@@ -98,11 +98,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div><div class="section">
 <h2>4. Gắn trạng thái, cô lập vật lý và kiểm soát hệ thống</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Dùng khi</th><th>Quy tắc bắt buộc</th></tr></thead><tbody>
-<tr><td>TẠM GIỮ</td><td>Chưa đủ bằng chứng hoặc đang chờ đánh giá</td><td>Không vấn đề, không di chuyển sang công đoạn kế, không ship; phải có Responsible Person và due cho bước tiếp.</td></tr>
-<tr><td>cách ly / biệt trữ</td><td>Cần tách vật lý khỏi hàng tốt</td><td>Đặt tại khu riêng; nhãn phải có lý do code, qty, lot, người gắn, thời điểm.</td></tr>
-<tr><td>rà soát</td><td>Đang chờ xác nhận QA/ENG hoặc chờ on nhà cung cấp/khách hàng</td><td>Không được coi là có thể sử dụng; trạng thái rà soát không thay cho PASS.</td></tr>
-<tr><td>SỬA HÀNG / SORT</td><td>Đã chốt disposition có đường thực hiện rõ</td><td>Phải có WI/lộ trình gia công/tiêu chí chấp nhận và Approver. Làm lại xong phải quay lại cổng kiểm soát kiểm phù hợp.</td></tr>
-<tr><td>phế liệu / trả lại</td><td>Lô không thể hoặc không được phép phát hành</td><td>Phải khóa qty, lot, chi phí, bằng chứng và giao dịch hệ thống tương ứng.</td></tr>
+<tr><td>HOLD</td><td>Chưa đủ bằng chứng hoặc đang chờ đánh giá</td><td>Không vấn đề, không move sang công đoạn kế, không ship; phải có người phụ trách và due cho bước tiếp.</td></tr>
+<tr><td>QUARANTINE</td><td>Cần tách vật lý khỏi hàng tốt</td><td>Đặt tại khu riêng; nhãn phải có reason code, qty, lot, người gắn, thời điểm.</td></tr>
+<tr><td>REVIEW</td><td>Đang chờ xác nhận QA/ENG hoặc waiting on supplier/customer</td><td>Không được coi là usable; trạng thái review không thay cho PASS.</td></tr>
+<tr><td>REWORK / SORT</td><td>Đã chốt disposition có đường thực hiện rõ</td><td>Phải có WI/route/tiêu chí chấp nhận và người phê duyệt. Rework xong phải quay lại cổng kiểm soát kiểm phù hợp.</td></tr>
+<tr><td>SCRAP / RETURN</td><td>Lô không thể hoặc không được phép release</td><td>Phải khóa qty, lot, chi phí, bằng chứng và giao dịch hệ thống tương ứng.</td></tr>
 </tbody></table></div>
 <p>Tag vật lý, trạng thái hệ thống và hồ sơ NCR <strong>PHẢI</strong> cùng một thông tin. PHẢI đồng bộ trạng thái giữa pallet, hệ thống và khu vực lưu; không để pallet dán TẠM GIỮ nhưng hệ thống vẫn có thể sử dụng, hoặc hệ thống TẠM GIỮ nhưng hàng lại ở khu vực tốt không có nhãn.</p>
 </div><div class="section">

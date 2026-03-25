@@ -76,15 +76,15 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="doc-content" id="docContent">
 <div class="form-sheet">
 <div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi sự kiện ảnh hưởng chất lượng, giao hàng, phiên bản, stop-dòng / chuyền, khiếu nại, dữ liệu, môi trường sạch, an toàn hoặc uy tín khách hàng phải được phân loại, gắn Responsible Person, gửi đúng kênh và lưu bằng chứng chính thức.</div></div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Thông tin gửi ra khách hàng hoặc nhà cung cấp về chậm trễ, ngăn chặn, khiếu nại, thay đổi, RMA, trả lại, hold hoặc sự cố dữ liệu chỉ được phát hành sau khi có người chịu trách nhiệm nội dung và phê duyệt đúng thẩm quyền.</div></div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Không dùng truyền miệng, chat riêng hoặc trí nhớ cá nhân làm hồ sơ chính thức cho sự kiện vận hành. Kênh nhanh vẫn phải có log và bằng chứng theo SSOT.</div></div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Sự kiện ngoài giờ, ngày nghỉ hoặc mức khẩn cao phải đi theo sau-giờ escalation, có xác nhận người nhận và có quyết định log. Không để vụ việc dừng ở mức “đã nhắn nhưng chưa ai đọc”.</div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi sự kiện ảnh hưởng chất lượng, giao hàng, revision, stop-line, khiếu nại, dữ liệu, môi trường sạch, safety hoặc uy tín khách hàng phải được phân loại, gắn người phụ trách, gửi đúng kênh và lưu bằng chứng chính thức.</div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Thông tin gửi ra khách hàng hoặc nhà cung cấp về delay, containment, khiếu nại, change, RMA, return, hold hoặc sự cố dữ liệu chỉ được phát hành sau khi có người chịu trách nhiệm nội dung và phê duyệt đúng thẩm quyền.</div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Không dùng truyền miệng, chat riêng hoặc trí nhớ cá nhân làm hồ sơ chính thức cho sự kiện vận hành. Kênh nhanh vẫn phải có nhật ký và bằng chứng theo SSOT.</div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Sự kiện ngoài giờ, ngày nghỉ hoặc mức khẩn cao phải đi theo chuyển cấp ngoài giờ, có xác nhận người nhận và có decision nhật ký. Không để vụ việc dừng ở mức “đã nhắn nhưng chưa ai đọc”.</div></div>
 </div>
 <div class="preface-block"><div class="callout"><div class="card-title">Lệnh điều hành</div>
 <p>SOP-107 quy định ai nói, nói với ai, nói lúc nào, nói bằng kênh nào và bằng chứng ở đâu. Một vấn đề không được phép có nhiều phiên bản thông tin khác nhau giữa QA, Kế hoạch, Sản xuất, CS, khách hàng và nhà cung cấp. Khi thông tin khác nhau, quyết định vận hành sẽ sai. Vì vậy mọi truyền đạt / giao tiếp ảnh hưởng vận hành phải có người sở hữu và phải đóng được bằng hồ sơ.</p>
 <div class="legend-row">
-<span class="chip">Control cổng kiểm soát (gate): 107-G1 → 107-G5</span>
+<span class="chip">Cổng kiểm soát: 107-G1 → 107-G5</span>
 <span class="chip">Biểu mẫu bắt buộc: <a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></span>
 <span class="chip">WI liên đới: <a href="../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a> / <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> / <a href="../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a></span>
 <span class="chip">ANNEX liên đới: <a href="../../03-Reference/05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a> / <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> / <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></span>
@@ -96,7 +96,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <a href="#p3">3. Thuật ngữ &amp; nguyên tắc</a>
 <a href="#p4">4. Vai trò, quyền hạn &amp; RACI</a>
 <a href="#p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</a>
-<a href="#p6">6. cổng kiểm soát (control cổng kiểm soát), điểm dừng bắt buộc &amp; KPI</a>
+<a href="#p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</a>
 <a href="#p7">7. Quy trình chi tiết</a>
 <a href="#p8">8. Ngoại lệ, thay đổi &amp; làm lại</a>
 <a href="#p9">9. Hệ thống, hồ sơ &amp; dữ liệu</a>
@@ -107,16 +107,16 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <ul class="tight">
 <li>Chuẩn hóa truyền thông giữa CS, Kỹ thuật, Kế hoạch, Sản xuất, QA, WHS, Mua hàng, IT và lãnh đạo.</li>
 <li>Quy định rõ ai được phép phát ngôn ra khách hàng/nhà cung cấp theo từng loại sự kiện.</li>
-<li>Khóa nhịp Tier cuộc họp, war phòng, sau-giờ escalation, thay đổi truyền đạt / giao tiếp và khiếu nại truyền đạt / giao tiếp.</li>
-<li>Đảm bảo mọi tin nhắn / thông điệp quan trọng đều quay về SSOT, đủ truy xuất nguồn gốc khi đánh giá, khi khách hàng hỏi lại hoặc khi điều tra thoát / bỏ qua.</li>
+<li>Khóa nhịp Tier meeting, war room, chuyển cấp ngoài giờ, change communication và khiếu nại communication.</li>
+<li>Đảm bảo mọi message quan trọng đều quay về SSOT, đủ truy xuất khi đánh giá, khi customer hỏi lại hoặc khi điều tra escape.</li>
 </ul>
 <h2 class="h2" id="p2">2. Phạm vi</h2>
 <div class="callout-grid">
 <div class="callout-card"><h3>Có bao phủ</h3>
 <ul class="tight">
-<li>Tier cuộc họp đầu ca, giữa ca, cuối ngày; cuộc họp mức sẵn sàng cho cao-rủi ro công việc / đơn hàng; war phòng; escalation ngoài giờ.</li>
-<li>Thông tin nội bộ/bên ngoài về khiếu nại, chậm trễ, một phần ship, phiên bản thay đổi, ngăn chặn, stop-dòng / chuyền, chất lượng rủi ro, rủi ro giao hàng, dữ liệu/IP, phòng sạch vấn đề, công đoạn đặc biệt vấn đề.</li>
-<li>Email chính thức, Teams/điện thoại dùng cho phản ứng nhanh nhưng phải log lại, khách hàng portal tin nhắn / thông điệp, nhà cung cấp thông báo, field cập nhật, quản lý tóm tắt.</li>
+<li>Tier meeting đầu ca, giữa ca, cuối ngày; meeting mức sẵn sàng cho high-risk jobs; war room; escalation ngoài giờ.</li>
+<li>Thông tin nội bộ/bên ngoài về khiếu nại, delay, giao hàng một phần, revision change, containment, stop-line, quality risk, rủi ro giao hàng, dữ liệu/IP, cleanroom vấn đề, công đoạn đặc biệt vấn đề.</li>
+<li>Email chính thức, Teams/phone dùng cho phản ứng nhanh nhưng phải nhật ký lại, customer portal message, supplier notice, field update, management summary.</li>
 </ul>
 </div>
 <div class="callout-card"><h3>Không thay thế</h3>
@@ -127,31 +127,31 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ul>
 </div>
 </div>
-<div class="note-blue"><b>Phạm vi bắt buộc:</b> bất kỳ sự kiện nào có thể làm đổi quyết định của phân xưởng, đổi cam kết với khách hàng hoặc làm phát sinh hold/phát hành đều phải đi qua SOP-107.</div>
+<div class="note-blue"><b>Phạm vi bắt buộc:</b> bất kỳ sự kiện nào có thể làm đổi quyết định của xưởng, đổi cam kết với khách hàng hoặc làm phát sinh tạm giữ/phê duyệt đều phải đi qua SOP-107.</div>
 <h2 class="h2" id="p3">3. Thuật ngữ &amp; nguyên tắc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:28%"/><col style="width:72%"/></colgroup><thead><tr><th>Thuật ngữ / nguyên tắc</th><th>Quy định sử dụng</th></tr></thead><tbody>
-<tr><td><b>Sự kiện nhóm sản phẩm</b></td><td>Nhóm sự kiện: chất lượng vấn đề, chậm trễ rủi ro, thay đổi/phiên bản, khách hàng khiếu nại, data/IP sự cố, an toàn/EHS, phòng sạch/môi trường, nhà cung cấp/người xử lý hỏng / lỗi, lệnh sản xuất rủi ro cao mức sẵn sàng.</td></tr>
-<tr><td><b>tin nhắn / thông điệp tối thiểu data set</b></td><td>Mỗi tin nhắn / thông điệp chính thức phải có tối thiểu: ID sự kiện, khách hàng/job/part/rev, mô tả vấn đề, mức ảnh hưởng, hành động đang chạy, người sở hữu, thời hạn phản hồi/đóng, trạng thái hold/phát hành nếu có.</td></tr>
-<tr><td><b>Responsible Person phát ngôn</b></td><td>Người chịu trách nhiệm nội dung và người được quyền gửi ra ngoài có thể khác nhau, nhưng cả hai phải được chỉ rõ. Không được “nhờ gửi hộ” khi chưa kiểm thẩm quyền.</td></tr>
-<tr><td><b>Sau-giờ escalation</b></td><td>Escalation ngoài giờ/ngày nghỉ áp dụng cho stop-dòng / chuyền, rủi ro giao hàng trong ngày, khiếu nại nghi thoát / bỏ qua, sự cố dữ liệu/IP, sự cố phòng sạch hoặc người xử lý hỏng / lỗi ảnh hưởng đơn hàng. Không chờ đến sáng hôm sau nếu hạn chót đã chạm.</td></tr>
-<tr><td><b>One source of sự thật for trạng thái</b></td><td>Trạng thái một sự kiện chỉ có một hồ sơ chính thức. Chat hoặc cuộc gọi chỉ là kênh phản ứng nhanh, không phải hồ sơ đóng vụ việc.</td></tr>
-<tr><td><b>No cam kết không có nội bộ cam kết</b></td><td>Không cam kết ngày giao, ngăn chặn plan, trả lại ủy quyền, đặc biệt concession hoặc data gửi lại với khách hàng nếu chưa có xác nhận nội bộ đúng thẩm quyền.</td></tr>
+<tr><td><b>Event family</b></td><td>Nhóm sự kiện: quality vấn đề, delay risk, change/revision, customer khiếu nại, data/IP incident, safety/EHS, cleanroom/environment, supplier/processor failure, lệnh sản xuất rủi ro cao mức sẵn sàng.</td></tr>
+<tr><td><b>Message minimum data set</b></td><td>Mỗi message chính thức phải có tối thiểu: ID sự kiện, customer/job/part/rev, mô tả vấn đề, mức ảnh hưởng, hành động đang chạy, người sở hữu, thời hạn phản hồi/đóng, trạng thái tạm giữ/phê duyệt nếu có.</td></tr>
+<tr><td><b>Người phụ trách phát ngôn</b></td><td>Người chịu trách nhiệm nội dung và người được quyền gửi ra ngoài có thể khác nhau, nhưng cả hai phải được chỉ rõ. Không được “nhờ gửi hộ” khi chưa kiểm thẩm quyền.</td></tr>
+<tr><td><b>After-hours escalation</b></td><td>Escalation ngoài giờ/holiday áp dụng cho stop-line, rủi ro giao hàng trong ngày, khiếu nại nghi escape, sự cố dữ liệu/IP, sự cố cleanroom hoặc processor failure ảnh hưởng đơn hàng. Không chờ đến sáng hôm sau nếu deadline đã chạm.</td></tr>
+<tr><td><b>One source of truth for trạng thái</b></td><td>Trạng thái một sự kiện chỉ có một hồ sơ chính thức. Chat hoặc call chỉ là kênh phản ứng nhanh, không phải hồ sơ đóng vụ việc.</td></tr>
+<tr><td><b>No promise without internal commitment</b></td><td>Không cam kết ngày giao, containment plan, return authorization, special concession hoặc data resend với khách hàng nếu chưa có xác nhận nội bộ đúng thẩm quyền.</td></tr>
 </tbody></table></div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:22%"/><col style="width:18%"/><col style="width:20%"/><col style="width:18%"/><col style="width:22%"/></colgroup><thead><tr><th>Nhóm sự kiện</th><th>Responsible Person log đầu</th><th>Kênh đầu tiên</th><th>Mốc ACK nội bộ</th><th>Điểm cần có trong tin nhắn / thông điệp</th></tr></thead><tbody>
-<tr><td>Stop-dòng / chuyền / machine xuống / ngừng / vấn đề chặn công đoạn</td><td>Shift Lead / Bảo trì / Planner</td><td>Tier + cuộc gọi/Teams + <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></td><td>Ngay trong ca</td><td>Job/WO, machine, vấn đề chặn, ETA khôi phục, cần-for-escalation</td></tr>
-<tr><td>chậm trễ rủi ro / một phần ship</td><td>Planner</td><td>Tier 2/3 + <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></td><td>â‰¤ 30 phút khi chạm rủi ro giao hàng</td><td>Customer, part, qty, ngày đến hạn, phương án bù, Responsible Person xác nhận</td></tr>
-<tr><td>Khiếu nại / nghi ngờ thoát / bỏ qua</td><td>CS / QA</td><td>Khiếu nại tình huống + escalation</td><td>Ngay khi mở tình huống</td><td>Tình huống ID, triệu chứng / dấu hiệu, bị ảnh hưởng tập hợp / dân số, ngăn chặn trạng thái, next cập nhật time</td></tr>
-<tr><td>Phiên bản / kỹ thuật thay đổi ảnh hưởng sản xuất</td><td>Kỹ thuật / Planner</td><td>Thay đổi thông báo + có mục tiêu người nhận</td><td>Trước khi hàng chạy tiếp</td><td>old rev, new rev, bị ảnh hưởng WO/part, disposition hàng đang chạy</td></tr>
-<tr><td>Data / IP sự cố</td><td>IT / QMS</td><td>Escalation bậc thang năng lực + bằng chứng log</td><td>Ngay khi phát hiện</td><td>loại dữ liệu, mức rò rỉ/nghi rò rỉ, chia sẻ trạng thái, ngăn chặn trạng thái</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:22%"/><col style="width:18%"/><col style="width:20%"/><col style="width:18%"/><col style="width:22%"/></colgroup><thead><tr><th>Nhóm sự kiện</th><th>Người phụ trách nhật ký đầu</th><th>Kênh đầu tiên</th><th>Mốc ACK nội bộ</th><th>Điểm cần có trong message</th></tr></thead><tbody>
+<tr><td>Stop-line / machine down / blocker công đoạn</td><td>Shift Lead / Maintenance / Planner</td><td>Tier + call/Teams + FRM-171</td><td>Ngay trong ca</td><td>Job/WO, machine, blocker, ETA khôi phục, need-for-escalation</td></tr>
+<tr><td>Delay risk / giao hàng một phần</td><td>Planner</td><td>Tier 2/3 + FRM-171</td><td>≤ 30 phút khi chạm rủi ro giao hàng</td><td>Customer, part, qty, ngày đến hạn, phương án bù, người phụ trách xác nhận</td></tr>
+<tr><td>Khiếu nại / suspect escape</td><td>CS / QA</td><td>Khiếu nại tình huống + escalation</td><td>Ngay khi mở tình huống</td><td>Tình huống ID, symptom, affected population, containment trạng thái, next update time</td></tr>
+<tr><td>Revision / engineering change ảnh hưởng sản xuất</td><td>Engineering / Planner</td><td>Change notice + targeted recipients</td><td>Trước khi hàng chạy tiếp</td><td>old rev, new rev, affected WO/part, disposition hàng đang chạy</td></tr>
+<tr><td>Data / IP incident</td><td>IT / QMS</td><td>Escalation ladder + bằng chứng nhật ký</td><td>Ngay khi phát hiện</td><td>loại dữ liệu, mức rò rỉ/nghi rò rỉ, share trạng thái, containment trạng thái</td></tr>
 </tbody></table></div>
 
 <h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:30%"/><col style="width:14%"/><col style="width:14%"/><col style="width:14%"/><col style="width:28%"/></colgroup><thead><tr><th>Hoạt động</th><th>R</th><th>A</th><th>C</th><th>Quyền hạn bắt buộc</th></tr></thead><tbody>
-<tr><td>Phân loại sự kiện và mở log truyền đạt / giao tiếp</td><td>CS / Shift Lead / Planner / QA</td><td>Responsible Person của quá trình liên quan</td><td>QMS Engineer</td><td>Người mở tình huống phải xác định sự kiện nhóm sản phẩm, mức nghiêm trọng, Responsible Person và due time ngay khi log.</td></tr>
-<tr><td>Gửi thông tin nội bộ ảnh hưởng điều độ / chất lượng</td><td>Planner / QA / Sản xuất</td><td>Sản xuất Giám đốc hoặc QA Manager theo tính chất</td><td>Kỹ thuật, WHS, Mua hàng</td><td>Không gửi alert “chung chung”; phải có next hành động và người nhận cụ thể.</td></tr>
-<tr><td>Gửi thông tin ra khách hàng</td><td>CS / Người định giá</td><td>QA Manager hoặc Sản xuất Giám đốc theo nội dung</td><td>Kỹ thuật / Planner / Finance</td><td>Khiếu nại, chậm trễ, một phần ship, phiên bản thay đổi, RMA, thoát / bỏ qua, concession phải theo ma trận thẩm quyền.</td></tr>
-<tr><td>Sau-giờ escalation / war phòng</td><td>Người trực ca / Responsible Person phát hiện sự kiện</td><td>Sản xuất Giám đốc / QA Manager / CEO theo mức nghiêm trọng</td><td>Planner, Kỹ thuật, IT, WHS</td><td>Khi không kích hoạt đúng bậc thang năng lực sẽ xem là lỗi quản trị truyền thông.</td></tr>
-<tr><td>Đóng tình huống và bài học kinh nghiệm</td><td>Responsible Person Tình huống</td><td>Department trưởng / đầu liên quan</td><td>QMS Engineer</td><td>Chỉ đóng khi đủ log, quyết định, bằng chứng và nếu cần thì đã kéo bài học vào SOP/WI/ANNEX.</td></tr>
+<tr><td>Phân loại sự kiện và mở nhật ký communication</td><td>CS / Shift Lead / Planner / QA</td><td>Người phụ trách của quá trình liên quan</td><td>QMS Engineer</td><td>Người mở tình huống phải xác định event family, severity, người phụ trách và due time ngay khi nhật ký.</td></tr>
+<tr><td>Gửi thông tin nội bộ ảnh hưởng điều độ / chất lượng</td><td>Planner / QA / Production</td><td>Production Director hoặc QA Manager theo tính chất</td><td>Engineering, WHS, Purchasing</td><td>Không gửi alert “chung chung”; phải có next action và người nhận cụ thể.</td></tr>
+<tr><td>Gửi thông tin ra khách hàng</td><td>CS / Estimator</td><td>QA Manager hoặc Production Director theo nội dung</td><td>Engineering / Planner / Finance</td><td>Khiếu nại, delay, giao hàng một phần, revision change, RMA, escape, concession phải theo ma trận thẩm quyền.</td></tr>
+<tr><td>After-hours escalation / war room</td><td>Người trực ca / người phụ trách phát hiện sự kiện</td><td>Production Director / QA Manager / CEO theo severity</td><td>Planner, Engineering, IT, WHS</td><td>Khi không kích hoạt đúng ladder sẽ xem là lỗi quản trị truyền thông.</td></tr>
+<tr><td>Đóng tình huống và bài học kinh nghiệm</td><td>Người phụ trách Tình huống</td><td>Department head liên quan</td><td>QMS Engineer</td><td>Chỉ đóng khi đủ nhật ký, quyết định, bằng chứng và nếu cần thì đã kéo bài học vào SOP/WI/ANNEX.</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2>
 <div class="field-grid">
@@ -160,13 +160,13 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="field"><b>Đầu ra bắt buộc</b><div class="blank">Truyền đạt log, hành động list, escalation hồ sơ, khách hàng phản hồi, shift/Tier báo cáo, quyết định log, kết thúc / đóng note và bằng chứng link.</div></div>
 <div class="field"><b>Điều kiện không cho phép chuyển bước</b><div class="blank">Không rõ Responsible Person, không đủ dữ liệu tối thiểu, chưa có phê duyệt để gửi ra ngoài, hoặc chưa xác nhận người nhận Received thông tin khẩn.</div></div>
 </div>
-<h2 class="h2" id="p6">6. cổng kiểm soát (control cổng kiểm soát), điểm dừng bắt buộc &amp; KPI</h2>
+<h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
 <div class="gate-grid">
-<div class="gate-card"><h3>107-G1 — Phân loại sự kiện &amp; chọn kênh</h3><p>Xác định sự kiện nhóm sản phẩm, mức nghiêm trọng, Responsible Person, kênh và người nhận đầu tiên. <b>TẠM GIỮ</b> nếu sự kiện chưa được phân loại nhưng đã có người phát ngôn ra ngoài.</p></div>
-<div class="gate-card"><h3>107-G2 — Kiểm dữ liệu tối thiểu trước phát hành</h3><p>tin nhắn / thông điệp phải đủ ID, job/part/rev, tác động, hành động, Responsible Person, due. <b>TẠM GIỮ</b> nếu tin nhắn / thông điệp mơ hồ, thiếu phiên bản hoặc chưa rõ ảnh hưởng.</p></div>
-<div class="gate-card"><h3>107-G3 — Phê duyệt nội dung phát ra ngoài</h3><p>Thông báo chậm, khiếu nại phản hồi, ngăn chặn plan, RMA, một phần ship, thay đổi thông báo, data sự cố thông báo phải có phê duyệt đúng thẩm quyền.</p></div>
-<div class="gate-card"><h3>107-G4 — xác nhận / biên nhận &amp; sau-giờ escalation</h3><p>Với mức nghiêm trọng cao, phải có xác nhận người nhận và nếu ngoài giờ phải kích hoạt bậc thang năng lực. <b>TẠM GIỮ</b> nếu chưa xác nhận người quyết định Received tình huống.</p></div>
-<div class="gate-card"><h3>107-G5 — Đóng truyền đạt / giao tiếp &amp; bài học kinh nghiệm</h3><p>Tình huống chỉ đóng khi log hành động, quyết định, người nhận chính và bài học cập nhật đã đầy đủ.</p></div>
+<div class="gate-card"><h3>107-G1 — Phân loại sự kiện &amp; chọn kênh</h3><p>Xác định event family, severity, người phụ trách, kênh và người nhận đầu tiên. <b>HOLD</b> nếu sự kiện chưa được phân loại nhưng đã có người phát ngôn ra ngoài.</p></div>
+<div class="gate-card"><h3>107-G2 — Kiểm dữ liệu tối thiểu trước phát hành</h3><p>Message phải đủ ID, job/part/rev, impact, action, người phụ trách, due. <b>HOLD</b> nếu message mơ hồ, thiếu revision hoặc chưa rõ ảnh hưởng.</p></div>
+<div class="gate-card"><h3>107-G3 — Phê duyệt nội dung phát ra ngoài</h3><p>Thông báo chậm, khiếu nại response, containment plan, RMA, giao hàng một phần, change notice, data incident notice phải có phê duyệt đúng thẩm quyền.</p></div>
+<div class="gate-card"><h3>107-G4 — Acknowledgement &amp; chuyển cấp ngoài giờ</h3><p>Với severity cao, phải có xác nhận người nhận và nếu ngoài giờ phải kích hoạt ladder. <b>HOLD</b> nếu chưa xác nhận người quyết định đã nhận tình huống.</p></div>
+<div class="gate-card"><h3>107-G5 — Đóng communication &amp; bài học kinh nghiệm</h3><p>Tình huống chỉ đóng khi nhật ký hành động, quyết định, người nhận chính và bài học cập nhật đã đầy đủ.</p></div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:32%"/><col style="width:18%"/><col style="width:18%"/><col style="width:32%"/></colgroup><thead><tr><th>KPI</th><th>Mục tiêu</th><th>Tần suất</th><th>Ghi chú</th></tr></thead><tbody>
 <tr><td>Tỷ lệ sự kiện mức nghiêm trọng cao được log trong 15 phút</td><td>â‰¥ 95%</td><td>Tháng</td><td>Áp dụng cho stop-dòng / chuyền, khiếu nại nghi thoát / bỏ qua, rủi ro giao hàng giống / cùng-day, data/IP sự cố.</td></tr>
@@ -193,18 +193,18 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Nếu có nhiều group chat, chỉ một log được công nhận là hồ sơ chính thức.</li>
 </ul>
 <h3>7.3 Truyền thông với khách hàng và nhà cung cấp</h3>
-<p>CS/Người định giá là đầu mối phát hành ra ngoài trong đa số tình huống thương mại, nhưng nội dung kỹ thuật/chất lượng phải được QA/Kỹ thuật xác nhận trước. Với chậm trễ, khiếu nại, RMA, một phần ship hoặc thay đổi phiên bản, nội dung gửi ra ngoài phải trả lời được bốn câu hỏi: chuyện gì xảy ra, ảnh hưởng đến đâu, HESEM đang làm gì, khi nào cập nhật lần tiếp theo.</p>
+<p>CS/Estimator là đầu mối phát hành ra ngoài trong đa số tình huống thương mại, nhưng nội dung kỹ thuật/quality phải được QA/Engineering xác nhận trước. Với delay, khiếu nại, RMA, giao hàng một phần hoặc thay đổi revision, nội dung gửi ra ngoài phải trả lời được bốn câu hỏi: chuyện gì xảy ra, ảnh hưởng đến đâu, HESEM đang làm gì, khi nào cập nhật lần tiếp theo.</p>
 <ul class="tight">
 <li>Không hứa ngăn chặn plan, ship date hoặc thay thế trước khi Kế hoạch/QA xác nhận nội bộ.</li>
 <li>Không gửi kết luận nguyên nhân gốc khi điều tra chưa đủ bằng chứng.</li>
 <li>Thông báo cho nhà cung cấp/người xử lý về hold, khuyết tật, trả lại, làm lại hoặc đẩy nhanh phải đi qua đúng Responsible Person.</li>
 <li>Mọi phát hành ra ngoài phải được lưu vào tình huống thư mục hoặc log tương ứng.</li>
 </ul>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:24%"/><col style="width:28%"/><col style="width:20%"/><col style="width:28%"/></colgroup><thead><tr><th>Loại tin nhắn / thông điệp ra ngoài</th><th>Author</th><th>Người duyệt</th><th>Nội dung tối thiểu trước khi gửi</th></tr></thead><tbody>
-<tr><td>chậm trễ / một phần ship thông báo</td><td>CS / Planner</td><td>Sản xuất Giám đốc hoặc Responsible Person Thương mại</td><td>Part/PO, qty ảnh hưởng, lý do cấp 1, tình trạng hàng, ngày cập nhật kế tiếp</td></tr>
-<tr><td>Khiếu nại ACK / ngăn chặn cập nhật</td><td>CS</td><td>QA Manager</td><td>Tình huống ID, triệu chứng / dấu hiệu, ngăn chặn trạng thái, cần thêm dữ liệu gì, next cập nhật time</td></tr>
-<tr><td>Phiên bản / thay đổi thông báo</td><td>Kỹ thuật / CS</td><td>Kỹ thuật Lead + QA nếu ảnh hưởng chất lượng</td><td>old rev/new rev, hiệu lực / hiệu quả điểm, bị ảnh hưởng tồn kho/WIP/ship, hành động khách hàng cần làm</td></tr>
-<tr><td>Data/IP sự cố thông báo</td><td>IT / QMS</td><td>CEO hoặc thẩm quyền được chỉ định</td><td>mô tả sự kiện, phạm vi sơ bộ, ngăn chặn đã làm, kênh cập nhật tiếp theo</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:24%"/><col style="width:28%"/><col style="width:20%"/><col style="width:28%"/></colgroup><thead><tr><th>Loại message ra ngoài</th><th>Người soạn</th><th>Người duyệt</th><th>Nội dung tối thiểu trước khi gửi</th></tr></thead><tbody>
+<tr><td>Delay / giao hàng một phần notice</td><td>CS / Planner</td><td>Production Director hoặc Người phụ trách Commercial</td><td>Part/PO, qty ảnh hưởng, lý do cấp 1, tình trạng hàng, ngày cập nhật kế tiếp</td></tr>
+<tr><td>Khiếu nại ACK / containment update</td><td>CS</td><td>QA Manager</td><td>Tình huống ID, symptom, containment trạng thái, cần thêm dữ liệu gì, next update time</td></tr>
+<tr><td>Revision / change notice</td><td>Engineering / CS</td><td>Engineering Lead + QA nếu ảnh hưởng chất lượng</td><td>old rev/new rev, effective point, affected stock/WIP/ship, action customer cần làm</td></tr>
+<tr><td>Data/IP incident notice</td><td>IT / QMS</td><td>CEO hoặc thẩm quyền được chỉ định</td><td>mô tả sự kiện, phạm vi sơ bộ, containment đã làm, kênh cập nhật tiếp theo</td></tr>
 </tbody></table></div>
 <div class="note-soft"><b>Quy tắc cam kết với khách hàng:</b> người gửi chỉ được hứa những gì nội bộ đã chốt Performer, nguồn lực và thời điểm. Mọi câu chữ như “sẽ ship hôm nay”, “sẽ thay toàn bộ”, “không ảnh hưởng lô khác” hoặc “nguyên nhân gốc đã xác định” đều cần bằng chứng và thẩm quyền.</div>
 
@@ -229,17 +229,17 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ul>
 <h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:42%"/><col style="width:14%"/><col style="width:12%"/><col style="width:14%"/></colgroup><thead><tr><th>Tình huống</th><th>Cách xử lý bắt buộc</th><th>Đầu mối</th><th>Escalation</th><th>Hồ sơ</th></tr></thead><tbody>
-<tr><td>Gửi nhầm thông tin / sai phiên bản</td><td>Dừng dùng thông tin sai, phát hành sửa chữa / hiệu chính thông báo ngay, xác định người nhận đã dùng thông tin sai hay chưa và giữ bằng chứng sửa chữa / hiệu chính.</td><td>Responsible Person Tình huống</td><td>QA Manager / Sản xuất Giám đốc</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a> + tình huống bằng chứng</td></tr>
-<tr><td>Customer không thể liên lạc</td><td>Log đủ nỗ lực liên lạc, báo cáo vượt cấp theo liên hệ bậc thang năng lực, dùng thay thế / phương án khác liên hệ đã phê duyệt; không tự ý đóng tình huống vì “khách không phản hồi”.</td><td>CS</td><td>Responsible Person Thương mại</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></td></tr>
-<tr><td>Ngoài giờ / ngày nghỉ</td><td>Kích hoạt sau-giờ bậc thang năng lực; bổ sung / thay thế vào log chính thức trong ca làm việc tiếp theo.</td><td>Người trực</td><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation log</td></tr>
-<tr><td>Hệ thống log chính thức bị gián đoạn</td><td>Dùng bộ offline đã phê duyệt, ghi tối thiểu ID + Responsible Person + due + trạng thái hold/phát hành, sau đó bù lại lên SSOT.</td><td>Planner / QA / IT</td><td><a href="sop-108-operational-contingency-plan.html">SOP-108</a></td><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></td></tr>
+<tr><td>Gửi nhầm thông tin / sai phiên bản (wrong revision)</td><td>Dừng dùng thông tin sai, phát hành correction notice ngay, xác định người nhận đã dùng thông tin sai hay chưa và giữ bằng chứng correction.</td><td>Người phụ trách Tình huống</td><td>QA Manager / Production Director</td><td>FRM-171 + tình huống bằng chứng</td></tr>
+<tr><td>Customer unreachable</td><td>Nhật ký đủ nỗ lực liên lạc, escalates theo contact ladder, dùng alternate contact đã phê duyệt; không tự ý đóng tình huống vì “khách không phản hồi”.</td><td>CS</td><td>Người phụ trách Commercial</td><td>FRM-171</td></tr>
+<tr><td>Ngoài giờ / ngày nghỉ</td><td>Kích hoạt after-hours ladder; backfill vào nhật ký chính thức trong ca làm việc tiếp theo.</td><td>Người trực</td><td>ANNEX-117</td><td>Escalation nhật ký</td></tr>
+<tr><td>Hệ thống nhật ký chính thức bị gián đoạn</td><td>Dùng bộ offline đã phê duyệt, ghi tối thiểu ID + người phụ trách + due + trạng thái tạm giữ/phê duyệt, sau đó bù lại lên SSOT.</td><td>Planner / QA / IT</td><td>SOP-108</td><td><a href="../../03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118</a></td></tr>
 </tbody></table></div>
 <h2 class="h2" id="p9">9. Hệ thống, hồ sơ &amp; dữ liệu</h2>
 <div class="field-grid">
-<div class="field"><b>Hệ thống / SSOT</b><div class="blank">Truyền đạt log, log hành động và bằng chứng phải về M365 theo cấu trúc đã phê duyệt. Giao dịch kinh doanh vẫn về Epicor khi liên quan job/ship/PO.</div></div>
-<div class="field"><b>Trường bắt buộc trong log</b><div class="blank">Sự kiện ID, nhóm sản phẩm, mức nghiêm trọng, khách hàng/job/part/rev, Responsible Person, hành động, due time, trạng thái, hold/phát hành, Approver, cập nhật time, bằng chứng link.</div></div>
-<div class="field"><b>Nhịp rà soát</b><div class="blank">Tier 1 mỗi ca; Tier 2/3 theo nhịp độ / chu kỳ họp; rà soát mở escalations hằng ngày; rà soát truyền đạt / giao tiếp kỷ luật / chuyên ngành hàng tuần.</div></div>
-<div class="field"><b>Điều kiện đóng hồ sơ</b><div class="blank">Tình huống có kết quả rõ, Responsible Person xác nhận đóng, người nhận chính đã được cập nhật, bằng chứng đầy đủ và nếu cần thì tài liệu liên quan đã mở hành động.</div></div>
+<div class="field"><b>Hệ thống / SSOT</b><div class="blank">Communication nhật ký, nhật ký hành động và bằng chứng phải về M365 theo cấu trúc đã phê duyệt. Giao dịch business vẫn về Epicor khi liên quan job/ship/PO.</div></div>
+<div class="field"><b>Trường bắt buộc trong nhật ký</b><div class="blank">Event ID, family, severity, customer/job/part/rev, người phụ trách, action, due time, trạng thái, tạm giữ/phê duyệt, người phê duyệt, update time, bằng chứng link.</div></div>
+<div class="field"><b>Nhịp review</b><div class="blank">Tier 1 mỗi ca; Tier 2/3 theo cadence; review open escalations hằng ngày; review communication discipline hàng tuần.</div></div>
+<div class="field"><b>Điều kiện đóng hồ sơ</b><div class="blank">Tình huống có outcome rõ, người phụ trách xác nhận đóng, người nhận chính đã được cập nhật, bằng chứng đầy đủ và nếu cần thì tài liệu liên quan đã mở action.</div></div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:25%"/><col style="width:23%"/><col style="width:14%"/><col style="width:20%"/></colgroup><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Nơi lưu / nguồn</th><th>Chủ trì</th><th>Điều kiện đóng</th></tr></thead><tbody>
 <tr><td><a  download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></td><td>Log kế hoạch truyền thông, escalation, người nhận, hành động và kết thúc / đóng.</td><td>Truyền đạt / quản lý thư viện</td><td>CS / Planner / QA theo tình huống</td><td>Khi tình huống đã đóng và cập nhật cuối Released.</td></tr>

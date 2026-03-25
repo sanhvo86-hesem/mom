@@ -117,26 +117,26 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <p>Cap là <b>giới hạn phát hành</b>, không phải KPI để nhồi đầy. Khi vượt cap, ưu tiên đầu tiên là <b>ngừng mở thêm việc</b> và <b>dọn hàng đang kẹt</b>, không phải tạo thêm bảng theo dõi.</p>
 </div>
 
-<div class="section"><h2>6. hàng đợi kỷ luật / chuyên ngành, tuổi tồn và phản ứng</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>nhóm / phân loại tuổi tồn</th><th>Định nghĩa</th><th>Responsible Person phản ứng</th><th>Hành động bắt buộc</th></tr></thead><tbody>
-<tr><td>0–1 shift</td><td>Bình thường</td><td>Cell Lead</td><td>Theo dõi theo điều phối xuất hàng; chưa cần escalation nếu job vẫn trong nhịp cam kết.</td></tr>
-<tr><td>&gt;1 đến 3 shift</td><td>Cảnh báo</td><td>Planner + Supervisor</td><td>Phải chỉ ra lý do: thiếu nguyên vật liệu, thiếu setup, chờ QA, chờ machine, chờ outsource, chờ quyết định.</td></tr>
-<tr><td>&gt;3 shift đến 7 ngày</td><td>Đỏ</td><td>Ops Manager</td><td>Báo cáo vượt cấp L1; phải có plan clear kèm due/time và Responsible Person.</td></tr>
-<tr><td>&gt;7 ngày hoặc có nguy cơ vỡ giao</td><td>Đen</td><td>Nhà máy Trưởng / Đầu / GM theo thẩm quyền</td><td>Báo cáo vượt cấp L2; phải quyết định chuyển tải, outsource, tách / chia lot, giao hàng một phần hoặc re-plan cam kết.</td></tr>
+<div class="section"><h2>6. Queue discipline, tuổi tồn và phản ứng</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bucket tuổi tồn</th><th>Định nghĩa</th><th>Người phụ trách phản ứng</th><th>Hành động bắt buộc</th></tr></thead><tbody>
+<tr><td>0–1 shift</td><td>Bình thường</td><td>Cell Lead</td><td>Theo dõi theo dispatch; chưa cần escalation nếu job vẫn trong nhịp cam kết.</td></tr>
+<tr><td>&gt;1 đến 3 shift</td><td>Cảnh báo</td><td>Planner + Supervisor</td><td>Phải chỉ ra lý do: thiếu material, thiếu setup, chờ QA, chờ machine, chờ outsource, chờ decision.</td></tr>
+<tr><td>&gt;3 shift đến 7 ngày</td><td>Đỏ</td><td>Ops Manager</td><td>Escalate L1; phải có plan clear kèm due/time và người phụ trách.</td></tr>
+<tr><td>&gt;7 ngày hoặc có nguy cơ vỡ giao</td><td>Đen</td><td>Plant Head / GM theo thẩm quyền</td><td>Escalate L2; phải quyết định chuyển tải, outsource, split lot, giao hàng một phần hoặc re-plan cam kết.</td></tr>
 </tbody></table></div>
 <p>Tuổi tồn được tính theo <b>lần giao dịch gần nhất trong SoR</b> hoặc theo mốc phát hành/di chuyển có ý nghĩa sản xuất. Không được xóa tuổi tồn bằng di chuyển giả, time mục nhập giả hoặc thay đổi thủ công ngày Photos trạng thái.</p>
 </div>
 
-<div class="section"><h2>7. Hold lý do code chuẩn</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mã</th><th>Nhóm</th><th>Điều kiện mở</th><th>Điều kiện phát hành</th></tr></thead><tbody>
-<tr><td>HR01-MAT</td><td>Nguyên vật liệu</td><td>Thiếu vật tư, lot/mẻ nấu (mẻ nấu (heat)), cert hoặc đặt trước</td><td>WHS xác nhận tồn/lot/cert và SoR đã cập nhật</td></tr>
-<tr><td>HR02-PRG</td><td>Program</td><td>Program hoặc bản kiểm soát chưa phát hành / sai phiên bản</td><td>ENG phát hành bản kiểm soát và link hồ sơ đúng</td></tr>
-<tr><td>HR03-TOL</td><td>Tooling / Fixture</td><td>Thiếu tool, fixture, jaw, cán dao / đầu gá, chứng minh-out plan</td><td>Setup Lead xác nhận đủ điều kiện chạy</td></tr>
-<tr><td>HR04-QA</td><td>Quality</td><td>QA hold, FAI chưa xong, gage chưa sẵn, NCR chưa đóng</td><td>QA phát hành bằng bằng chứng đúng cổng kiểm soát</td></tr>
-<tr><td>HR05-MCH</td><td>Machine</td><td>Máy xuống / ngừng, PM hold, sự cố nghiêm trọng, lặp lại bất thường</td><td>Bảo trì/OPS xác nhận machine ready</td></tr>
-<tr><td>HR06-OUT</td><td>Outsource</td><td>Chờ người xử lý, chờ phiếu nhận / biên nhận, chờ cert, quá hạn trả lại</td><td>PUR/WHS xác nhận hàng về và đủ hồ sơ</td></tr>
-<tr><td>HR07-ENG</td><td>Kỹ thuật</td><td>Rev thay đổi, ECO, thiếu Photos trạng thái, không rõ ràng Requests</td><td>ENG phát hành set mới và cập nhật bộ hồ sơ công việc (job gói hồ sơ)</td></tr>
-<tr><td>HR08-SHIP</td><td>Giao vận</td><td>Thiếu bộ hồ sơ giao hàng (ship gói hồ sơ), CoC, label, khách hàng phát hành</td><td>WHS/QA hoàn tất gói hồ sơ và phê duyệt giao hàng</td></tr>
+<div class="section"><h2>7. Hold reason code chuẩn</h2>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mã</th><th>Nhóm</th><th>Điều kiện mở</th><th>Điều kiện release</th></tr></thead><tbody>
+<tr><td>HR01-MAT</td><td>Material</td><td>Thiếu vật tư, lot/heat, cert hoặc reservation</td><td>WHS xác nhận tồn/lot/cert và SoR đã cập nhật</td></tr>
+<tr><td>HR02-PRG</td><td>Program</td><td>Program hoặc controlled copy chưa phát hành / sai phiên bản (wrong revision)</td><td>ENG phát hành controlled copy và link hồ sơ đúng</td></tr>
+<tr><td>HR03-TOL</td><td>Tooling / Fixture</td><td>Thiếu tool, fixture, jaw, holder, prove-out plan</td><td>Setup Lead xác nhận đủ điều kiện chạy</td></tr>
+<tr><td>HR04-QA</td><td>Quality</td><td>QA hold, FAI chưa xong, gage chưa sẵn, NCR chưa đóng</td><td>QA release bằng bằng chứng đúng cổng kiểm soát</td></tr>
+<tr><td>HR05-MCH</td><td>Machine</td><td>Máy down, PM hold, crash, repeat abnormality</td><td>Maintenance/OPS xác nhận machine ready</td></tr>
+<tr><td>HR06-OUT</td><td>Outsource</td><td>Chờ processor, chờ receipt, chờ cert, overdue return</td><td>PUR/WHS xác nhận hàng về và đủ hồ sơ</td></tr>
+<tr><td>HR07-ENG</td><td>Engineering</td><td>Rev change, ECO, thiếu snapshot, unclear requirement</td><td>ENG release set mới và cập nhật bộ hồ sơ công việc (job packet)</td></tr>
+<tr><td>HR08-SHIP</td><td>Shipping</td><td>Thiếu bộ hồ sơ giao hàng (ship packet), CoC, label, customer release</td><td>WHS/QA hoàn tất packet và phê duyệt giao hàng</td></tr>
 </tbody></table></div>
 </div>
 

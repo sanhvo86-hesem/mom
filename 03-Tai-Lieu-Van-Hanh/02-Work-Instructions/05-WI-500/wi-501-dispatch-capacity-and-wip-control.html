@@ -93,12 +93,12 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>3. Bảng kiểm phát hành điều phối xuất hàng cho từng trung tâm gia công</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điểm kiểm</th><th>đạt khi</th><th>FAIL thì làm gì</th></tr></thead><tbody>
-<tr><td>Job/Rev/Op đúng SoR</td><td>Không có không khớp giữa traveler, điều phối xuất hàng, Photos trạng thái và phát hành kỹ thuật</td><td>TẠM GIỮ job; trả về ENG/Kế hoạch để sửa gói hồ sơ</td></tr>
-<tr><td>Nguyên vật liệu ready</td><td>Đủ qty, đúng lot/mẻ nấu (mẻ nấu (heat))/điều kiện, đặt trước hoặc khu vực chuẩn bị / sắp xếp đã xác nhận</td><td>Gắn HR01-MAT; không xếp vào vị trí chạy</td></tr>
-<tr><td>Setup / tool / fixture ready</td><td>Có phiếu cài đặt, danh sách dao cụ, chứng minh-out plan, fixture/jaw đúng</td><td>Gắn HR03-TOL; dời lịch hoặc chuyển sang cell khác nếu hợp lệ</td></tr>
-<tr><td>QA / cổng kiểm soát ready</td><td>QPL, CTQ plan, mẫu đầu / FAI / rò rỉ / clean cổng kiểm soát đã rõ người nhận</td><td>Gắn HR04-QA; không phát hành chạy mù</td></tr>
-<tr><td>Machine / công suất ready</td><td>Machine không xuống / ngừng/cứng / khó hold; trong hàng đợi giờ sau khi thêm job vẫn trong cap</td><td>Dừng phát hành thêm; rà soát sắp xếp lại hoặc cân bằng lại</td></tr>
-<tr><td>Outsource / công đoạn sau khớp nối ready</td><td>Job không đẩy nghẽn sang công đoạn sau hoặc outsource chưa có khe / vị trí</td><td>Giữ lại hoặc phát hành có điều kiện kèm quyết định rõ</td></tr>
+<tr><td>Job/Rev/Op đúng SoR</td><td>Không có mismatch giữa traveler, dispatch, snapshot và phát hành kỹ thuật</td><td>HOLD job; trả về ENG/Planning để sửa packet</td></tr>
+<tr><td>Material ready</td><td>Đủ qty, đúng lot/heat/condition, reservation hoặc staging đã xác nhận</td><td>Gắn HR01-MAT; không xếp vào vị trí chạy</td></tr>
+<tr><td>Setup / tool / fixture ready</td><td>Có setup sheet, tool list, prove-out plan, fixture/jaw đúng</td><td>Gắn HR03-TOL; dời lịch hoặc chuyển sang cell khác nếu hợp lệ</td></tr>
+<tr><td>QA / cổng kiểm soát ready</td><td>QPL, CTQ plan, mẫu đầu / FAI / leak / clean cổng kiểm soát đã rõ người nhận</td><td>Gắn HR04-QA; không phát hành chạy mù</td></tr>
+<tr><td>Machine / capacity ready</td><td>Machine không down/hard hold; queued hours sau khi thêm job vẫn trong cap</td><td>Dừng phát hành thêm; review resequence hoặc rebalance</td></tr>
+<tr><td>Outsource / downstream coupling ready</td><td>Job không đẩy nghẽn sang công đoạn sau hoặc outsource chưa có slot</td><td>Giữ lại hoặc phát hành có điều kiện kèm quyết định rõ</td></tr>
 </tbody></table></div>
 </div>
 
@@ -154,9 +154,9 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>8. khớp nối với outsource và giao vận</h2>
 <ul class="tight">
-<li>Không phát hành thêm công đoạn trước nếu người xử lý đã đầy đủ khe / vị trí hoặc xuất đi lot chưa có lộ trình gia công/ETA rõ.</li>
-<li>Không để kiểm tra cuối / phê duyệt giao hàng trở thành “kho đệm cuối cùng”. Nếu ship-ready hàng đợi vượt 1 ngày năng lực, Planner phải quay ngược công đoạn trước để hãm phát hành.</li>
-<li>Khi ngày đến hạn buộc phải giao hàng một phần, quyết định phải chốt rõ part-phạm vi / dải/qty/tài liệu pack/label logic và Responsible Person xác nhận.</li>
+<li>Không phát hành thêm upstream nếu processor đã full slot hoặc outbound lot chưa có route/ETA rõ.</li>
+<li>Không để kiểm tra cuối / phê duyệt giao hàng trở thành “kho đệm cuối cùng”. Nếu ship-ready queue vượt 1 ngày năng lực, Planner phải quay ngược upstream để hãm phát hành.</li>
+<li>Khi ngày đến hạn buộc phải giao hàng một phần, quyết định phải chốt rõ part-range/qty/document pack/label logic và người phụ trách xác nhận.</li>
 </ul>
 </div>
 
@@ -181,11 +181,11 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>12. Hồ sơ điều độ tối thiểu của một ca</h2>
 <ul class="tight">
-<li>Điều phối list Released cho từng nhóm máy (machine nhóm sản phẩm) hoặc cell.</li>
-<li>Ảnh chụp trạng thái tuổi tồn WIP (tuổi tồn / tuổi tồn) có Responsible Person và hành động cho mọi item đỏ/đen.</li>
-<li>log hành động của họp đầu ca/giữa ca nếu có hot-job, machine xuống / ngừng, thiếu hụt hoặc cổng kiểm soát bất thường.</li>
-<li>Quyết định note cho mọi lần phá cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch), sắp xếp lại, tách / chia lot, outsource khẩn hoặc giao hàng một phần.</li>
-<li>Bàn giao list cuối ca với job đang chạy, job đang chờ, bất thường mở và việc giao ca chưa đóng.</li>
+<li>Dispatch list đã phát hành cho từng nhóm máy (machine family) hoặc cell.</li>
+<li>Snapshot tuổi tồn WIP (tuổi tồn / tuổi tồn) có người phụ trách và action cho mọi item đỏ/đen.</li>
+<li>nhật ký hành động của họp đầu ca/giữa ca nếu có hot-job, machine down, shortage hoặc cổng kiểm soát bất thường.</li>
+<li>Decision note cho mọi lần phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), resequence, split lot, outsource khẩn hoặc giao hàng một phần.</li>
+<li>Handover list cuối ca với job đang chạy, job đang chờ, abnormality mở và việc giao ca chưa đóng.</li>
 </ul>
 </div>
 
