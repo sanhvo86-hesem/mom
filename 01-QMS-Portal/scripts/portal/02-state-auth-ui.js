@@ -1332,6 +1332,7 @@ function renderSidebar(){
   if(isPortalSidebarCoreVisible('deploy')){
     html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'DEPLOYMENT':'TRIỂN KHAI VẬN HÀNH'}</div>
       <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">🚀</span><span>${lang==='en'?'Operations Deploy':'Triển khai vận hành'}</span></button>
+      <button class="nav-item ${currentPage==='forms'?'active':''}" onclick="navigateTo('forms')"><span class="icon">📋</span><span>${lang==='en'?'Online Forms':'Form trực tuyến'}</span></button>
     </div>`;
   }
   if(isAdmin() && isPortalSidebarCoreVisible('admin')){
@@ -1372,16 +1373,16 @@ function navigateTo(page, filter){
   document.getElementById('user-dropdown').classList.remove('show');
   
   // Track page view for activity log
-  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành'};
+  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',forms:'Form trực tuyến'};
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
-  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access')};
+  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),forms:lang==='en'?'Online Forms':'Form trực tuyến'};
   // Reset header breadcrumb for non-documents pages
   if(page !== 'documents'){
     const bcEl = document.getElementById('header-breadcrumb');
     if(bcEl) bcEl.innerHTML = `<span>HESEM QMS</span><span style="margin:0 4px">›</span><span class="current">${titles[page]||page}</span>`;
   }
-  
+
   setDocHeaderToolbar('');
   if(page==='dashboard') renderDashboard();
   if(page==='documents') renderDocuments();
@@ -1389,6 +1390,7 @@ function navigateTo(page, filter){
   if(page==='dictionary') renderDictionary();
   if(page==='access') renderAccessMatrix();
   if(page==='deploy') renderDeployDashboard();
+  if(page==='forms' && typeof renderOnlineForms==='function') renderOnlineForms();
   if(page==='admin'){ if(!isAdmin()){navigateTo('dashboard');return;} renderAdmin(); }
   
   document.getElementById('page-'+page).classList.add('active');

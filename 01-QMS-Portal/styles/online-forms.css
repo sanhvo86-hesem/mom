@@ -1,0 +1,127 @@
+/* ═══════════════════════════════════════════════════
+   Online Forms — CSS Styles
+   HESEM QMS Portal
+   ═══════════════════════════════════════════════════ */
+
+/* ── Forms List Page ── */
+.forms-page{max-width:960px;margin:0 auto;padding:24px 16px}
+.forms-header{margin-bottom:24px}
+.forms-title{font-size:22px;font-weight:700;color:#0c2d48;margin:0 0 6px}
+.forms-subtitle{font-size:13px;color:#6b7280;margin:0}
+
+.forms-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:28px}
+.forms-stat-card{background:#fff;border:1px solid #dee2e6;border-radius:10px;padding:16px;text-align:center}
+.forms-stat-card .stat-value{font-size:28px;font-weight:700;color:#0c2d48}
+.forms-stat-card .stat-label{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+.forms-group{margin-bottom:28px}
+.forms-group-title{font-size:14px;font-weight:700;color:#374151;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.forms-group-icon{font-size:18px}
+.forms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+
+/* ── Form Card ── */
+.form-card{background:#fff;border:1px solid #dee2e6;border-radius:10px;padding:18px 20px;cursor:pointer;transition:box-shadow .15s,transform .1s}
+.form-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);transform:translateY(-2px)}
+.form-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.form-card-code{font-family:'SF Mono',Consolas,monospace;font-size:11px;font-weight:700;color:#1565c0;background:#e3f2fd;padding:2px 8px;border-radius:4px}
+.form-card-freq{font-size:10px;color:#6b7280;background:#f3f4f6;padding:2px 8px;border-radius:999px;font-weight:600}
+.form-card-title{font-size:14px;font-weight:700;color:#0c2d48;margin-bottom:6px;line-height:1.4}
+.form-card-desc{font-size:12px;color:#6b7280;line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.form-card-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.form-card-ref{font-size:11px;color:#9ca3af}
+.form-card-entries{font-size:11px;color:#2f9e44;font-weight:600}
+.form-card-btn{font-size:12px;font-weight:600;color:#1565c0;background:none;border:1px solid #1565c0;border-radius:6px;padding:4px 12px;cursor:pointer;transition:all .15s}
+.form-card-btn:hover{background:#1565c0;color:#fff}
+
+/* ── Form Entry Page ── */
+.form-entry-page{max-width:780px;margin:0 auto;padding:20px 16px}
+.form-entry-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.form-back-btn{font-size:13px;color:#6b7280;background:none;border:1px solid #dee2e6;border-radius:6px;padding:6px 14px;cursor:pointer;transition:all .15s}
+.form-back-btn:hover{background:#f3f4f6;color:#0c2d48}
+.form-entry-meta{display:flex;gap:8px;align-items:center}
+.form-code-badge{font-family:monospace;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px}
+.form-version-badge{font-size:10px;color:#6b7280;background:#f3f4f6;padding:2px 8px;border-radius:999px;font-weight:600}
+
+.form-entry-header{background:#fff;border:1px solid #dee2e6;border-radius:10px;padding:20px 24px;margin-bottom:20px}
+.form-entry-header h1{font-size:18px;font-weight:700;color:#0c2d48;margin:0 0 6px}
+.form-entry-header p{font-size:13px;color:#6b7280;margin:0;line-height:1.5}
+
+/* ── Form Body ── */
+.form-entry-body{background:#fff;border:1px solid #dee2e6;border-radius:10px;padding:24px}
+
+.form-field{margin-bottom:18px}
+.form-field label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+.form-req{color:#e03131;font-weight:700}
+.form-field input[type=text],
+.form-field input[type=number],
+.form-field input[type=date],
+.form-field input[type=time],
+.form-field select,
+.form-field textarea{width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:7px;font-size:13px;font-family:inherit;color:#1f2937;background:#fff;transition:border-color .15s;box-sizing:border-box}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{outline:none;border-color:#1565c0;box-shadow:0 0 0 3px rgba(21,101,192,.1)}
+.form-field textarea{resize:vertical;min-height:60px}
+
+.form-field-check{margin-bottom:14px}
+.form-check-label{display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;cursor:pointer}
+.form-check-label input[type=checkbox]{width:18px;height:18px;accent-color:#1565c0}
+
+/* ── Field Group ── */
+.form-field-group{background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:16px 18px;margin-bottom:18px}
+.form-group-title{font-size:12px;font-weight:700;color:#0c2d48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #e5e7eb}
+.form-group-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.form-group-grid .form-field{margin-bottom:0}
+
+/* ── Table Field ── */
+.form-field-table{margin-bottom:18px}
+.form-table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.form-table-header label{font-size:12px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.3px;margin:0}
+.form-table-add{font-size:12px;font-weight:600;color:#1565c0;background:#e3f2fd;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;transition:all .15s}
+.form-table-add:hover{background:#1565c0;color:#fff}
+
+.form-table-wrap{overflow-x:auto;border:1px solid #dee2e6;border-radius:8px}
+.form-data-table{width:100%;border-collapse:collapse;font-size:12px}
+.form-data-table thead th{background:#f1f5f9;color:#475569;font-size:10px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;padding:8px 6px;border-bottom:2px solid #cbd5e1;text-align:left;white-space:nowrap}
+.form-data-table tbody td{padding:4px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.form-data-table tbody input,.form-data-table tbody select{width:100%;padding:6px 8px;border:1px solid #e5e7eb;border-radius:5px;font-size:12px;font-family:inherit;background:#fff;box-sizing:border-box}
+.form-data-table tbody input:focus,.form-data-table tbody select:focus{border-color:#1565c0;outline:none;box-shadow:0 0 0 2px rgba(21,101,192,.1)}
+.form-data-table tbody tr:hover{background:#f8fafc}
+.form-row-del{width:28px;height:28px;border:none;background:none;color:#9ca3af;font-size:14px;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center}
+.form-row-del:hover{background:#fee2e2;color:#e03131}
+
+/* ── Actions ── */
+.form-actions{display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #e5e7eb;flex-wrap:wrap}
+.form-submit-btn{font-size:14px;font-weight:600;color:#fff;background:#1565c0;border:none;border-radius:8px;padding:10px 24px;cursor:pointer;transition:all .15s;flex:1;min-width:180px}
+.form-submit-btn:hover{background:#0d47a1}
+.form-draft-btn{font-size:13px;font-weight:600;color:#374151;background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:10px 18px;cursor:pointer;transition:all .15s}
+.form-draft-btn:hover{background:#e5e7eb}
+.form-clear-btn{font-size:13px;font-weight:600;color:#9ca3af;background:none;border:1px solid #e5e7eb;border-radius:8px;padding:10px 18px;cursor:pointer;transition:all .15s}
+.form-clear-btn:hover{background:#fee2e2;color:#e03131;border-color:#fecaca}
+
+/* ── Recent Entries ── */
+.form-recent{margin-top:24px;background:#fff;border:1px solid #dee2e6;border-radius:10px;padding:20px 24px}
+.form-recent-title{font-size:14px;font-weight:700;color:#0c2d48;margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.form-recent-count{font-size:11px;background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:999px;font-weight:700}
+.form-recent-list{display:flex;flex-direction:column;gap:6px}
+.form-recent-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#f8fafc;border:1px solid #f1f5f9;border-radius:7px;transition:background .15s}
+.form-recent-item:hover{background:#eef4fb}
+.form-recent-id{font-family:monospace;font-size:11px;color:#6b7280;min-width:180px;overflow:hidden;text-overflow:ellipsis}
+.form-recent-info{display:flex;gap:16px;flex:1;font-size:12px;color:#374151}
+.form-draft-badge{font-size:9px;font-weight:700;color:#e67700;background:#fff9db;padding:2px 8px;border-radius:999px;text-transform:uppercase}
+
+/* ── Toast ── */
+.form-toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;z-index:99999;transform:translateY(20px);opacity:0;transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.form-toast.show{transform:translateY(0);opacity:1}
+.form-toast-success{background:#2f9e44}
+.form-toast-error{background:#e03131}
+.form-toast-warn{background:#e67700}
+.form-toast-info{background:#1565c0}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .forms-grid{grid-template-columns:1fr}
+  .form-group-grid{grid-template-columns:1fr}
+  .form-actions{flex-direction:column}
+  .form-submit-btn,.form-draft-btn,.form-clear-btn{width:100%;min-width:0}
+  .form-entry-topbar{flex-direction:column;gap:10px;align-items:flex-start}
+  .form-data-table{font-size:11px}
+}

@@ -6469,6 +6469,91 @@ if ($username === '') {
     }
   }
 
+  // ═══════════════════════════════════════════════════
+  // ONLINE FORMS ENGINE
+  // ═══════════════════════════════════════════════════
+  case 'online_form_list': {
+    $schemasDir = $DATA_DIR . '/online-forms/schemas';
+    $entriesDir = $DATA_DIR . '/online-forms/entries';
+    $forms = [];
+    $entries = [];
+    if (is_dir($schemasDir)) {
+      foreach (glob($schemasDir . '/*.json') as $f) {
+        $raw = @file_get_contents($f);
+        if ($raw) {
+          $schema = json_decode($raw, true);
+          if ($schema && !empty($schema['form_code'])) {
+            $forms[] = $schema;
+            // Load entries count for today
+            $code = $schema['form_code'];
+            $entryFile = $entriesDir . '/' . $code . '.json';
+            if (file_exists($entryFile)) {
+              $eRaw = @file_get_contents($entryFile);
+              $eData = $eRaw ? json_decode($eRaw, true) : [];
+              $entries[$code] = is_array($eData) ? $eData : [];
+            } else {
+              $entries[$code] = [];
+            }
+          }
+        }
+      }
+    }
+    usort($forms, function($a, $b){ return strcmp($a['form_code'], $b['form_code']); });
+    api_json(['ok' => true, 'forms' => $forms, 'entries' => $entries]);
+  }
+
+  case 'online_form_schema': {
+    $code = trim((string)($_GET['code'] ?? ''));
+    if (!$code) { api_json(['ok' => false, 'error' => 'missing_code'], 400); }
+    $schemasDir = $DATA_DIR . '/online-forms/schemas';
+    $file = $schemasDir . '/' . $code . '.json';
+    if (!file_exists($file)) { api_json(['ok' => false, 'error' => 'schema_not_found'], 404); }
+    $schema = json_decode(file_get_contents($file), true);
+    if (!$schema) { api_json(['ok' => false, 'error' => 'invalid_schema'], 500); }
+    api_json(['ok' => true, 'schema' => $schema]);
+  }
+
+  case 'online_form_submit': {
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!$input || empty($input['form_code']) || empty($input['data'])) {
+      api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    }
+    $code = (string)$input['form_code'];
+    $data = $input['data'];
+    $status = (string)($input['status'] ?? 'submitted');
+    $entriesDir = $DATA_DIR . '/online-forms/entries';
+    if (!is_dir($entriesDir)) @mkdir($entriesDir, 0755, true);
+    $entryFile = $entriesDir . '/' . $code . '.json';
+    $existing = [];
+    if (file_exists($entryFile)) {
+      $raw = @file_get_contents($entryFile);
+      $existing = $raw ? json_decode($raw, true) : [];
+      if (!is_array($existing)) $existing = [];
+    }
+    // Add server-side metadata
+    $data['_server_time'] = date('c');
+    $data['_status'] = $status;
+    $data['_ip'] = $_SERVER['REMOTE_ADDR'] ?? '';
+    if (!empty($_SESSION['user'])) $data['_session_user'] = (string)$_SESSION['user'];
+    array_unshift($existing, $data);
+    // Keep max 1000 entries per form
+    if (count($existing) > 1000) $existing = array_slice($existing, 0, 1000);
+    file_put_contents($entryFile, json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    api_json(['ok' => true, 'entry_id' => $data['entry_id'] ?? '', 'count' => count($existing)]);
+  }
+
+  case 'online_form_entries': {
+    $code = trim((string)($_GET['code'] ?? ''));
+    if (!$code) { api_json(['ok' => false, 'error' => 'missing_code'], 400); }
+    $entryFile = $DATA_DIR . '/online-forms/entries/' . $code . '.json';
+    $entries = [];
+    if (file_exists($entryFile)) {
+      $raw = @file_get_contents($entryFile);
+      $entries = $raw ? json_decode($raw, true) : [];
+    }
+    api_json(['ok' => true, 'entries' => is_array($entries) ? $entries : []]);
+  }
+
   default:
     api_json(['ok' => false, 'error' => 'unknown_action'], 400);
 }
