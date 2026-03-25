@@ -3511,6 +3511,244 @@ function showToast(msg, duration=2500){
   setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},duration);
 }
 
+function closeGitSyncModal(){
+  document.getElementById('git-sync-modal')?.remove();
+}
+
+function gitSyncShortHash(hash){
+  const raw = String(hash||'').trim();
+  return raw ? raw.slice(0,7) : '—';
+}
+
+function gitSyncStatusTone(status){
+  const raw = String(status||'').toUpperCase();
+  if(raw.startsWith('A') || raw === '??') return 'is-add';
+  if(raw.startsWith('D')) return 'is-delete';
+  if(raw.startsWith('R')) return 'is-rename';
+  if(raw.startsWith('M')) return 'is-modify';
+  return 'is-neutral';
+}
+
+function gitSyncEscapeLines(text){
+  return escapeHtml(String(text||'').trim());
+}
+
+function gitSyncRenderSimpleFileTable(items, emptyText){
+  const rows = Array.isArray(items) ? items.filter(Boolean) : [];
+  if(!rows.length){
+    return `<div class="git-sync-empty">${escapeHtml(emptyText)}</div>`;
+  }
+  return `
+    <div class="git-sync-table-wrap">
+      <table class="git-sync-table">
+        <thead>
+          <tr>
+            <th>${lang==='en'?'Status':'Trạng thái'}</th>
+            <th>${lang==='en'?'Path':'Đường dẫn'}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(row=>{
+            const xy = String(row.xy || row.status || '').trim() || '--';
+            const path = String(row.path || row || '').trim();
+            return `<tr>
+              <td><span class="git-sync-status ${gitSyncStatusTone(xy)}">${escapeHtml(xy)}</span></td>
+              <td><code>${escapeHtml(path)}</code></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function gitSyncRenderChangedFileTable(items, emptyText){
+  const rows = Array.isArray(items) ? items.filter(Boolean) : [];
+  if(!rows.length){
+    return `<div class="git-sync-empty">${escapeHtml(emptyText)}</div>`;
+  }
+  return `
+    <div class="git-sync-table-wrap">
+      <table class="git-sync-table">
+        <thead>
+          <tr>
+            <th>${lang==='en'?'Change':'Thay đổi'}</th>
+            <th>${lang==='en'?'Current path':'Đường dẫn hiện tại'}</th>
+            <th>${lang==='en'?'Previous path':'Đường dẫn cũ'}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(row=>{
+            const status = String(row.status || '').trim() || '--';
+            const path = String(row.path || '').trim();
+            const oldPath = String(row.old_path || '').trim();
+            return `<tr>
+              <td><span class="git-sync-status ${gitSyncStatusTone(status)}">${escapeHtml(status)}</span></td>
+              <td><code>${escapeHtml(path)}</code></td>
+              <td>${oldPath ? `<code>${escapeHtml(oldPath)}</code>` : '<span class="git-sync-empty-inline">—</span>'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function gitSyncRenderOutputBlock(title, text){
+  const clean = String(text||'').trim();
+  if(!clean) return '';
+  return `
+    <section class="git-sync-section">
+      <div class="git-sync-section-title">${escapeHtml(title)}</div>
+      <pre class="git-sync-pre">${gitSyncEscapeLines(clean)}</pre>
+    </section>`;
+}
+
+function gitSyncRenderSummaryCard(label, value){
+  return `<div class="git-sync-card-mini"><div class="git-sync-card-label">${escapeHtml(label)}</div><div class="git-sync-card-value">${escapeHtml(value)}</div></div>`;
+}
+
+function gitSyncRenderPresyncSection(presync){
+  if(!presync || typeof presync !== 'object') return '';
+  const pushed = !!presync.pushed;
+  const files = Array.isArray(presync.files) ? presync.files : [];
+  const statusEntries = Array.isArray(presync.status_entries) ? presync.status_entries : [];
+  const hasAnything = pushed || files.length || statusEntries.length || String(presync.message||'').trim();
+  if(!hasAnything) return '';
+  return `
+    <section class="git-sync-section">
+      <div class="git-sync-section-title">${lang==='en'?'Auto pre-sync before pull':'Auto pre-sync trước khi pull'}</div>
+      <div class="git-sync-callout">
+        ${pushed
+          ? (lang==='en'
+            ? 'Portal detected meaningful local server changes, committed them, and pushed them to GitHub before pulling.'
+            : 'Portal phát hiện thay đổi meaningful trên server, đã commit và đẩy chúng lên GitHub trước khi pull.')
+          : (lang==='en'
+            ? 'No meaningful local server change needed a pre-sync commit before pull.'
+            : 'Không có thay đổi meaningful trên server cần pre-sync commit trước khi pull.')}
+      </div>
+      <div class="git-sync-summary-grid git-sync-summary-grid--compact">
+        ${gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', String(presync.branch || 'main'))}
+        ${gitSyncRenderSummaryCard(lang==='en'?'Files':'Số file', String(files.length))}
+        ${gitSyncRenderSummaryCard(lang==='en'?'Before':'Trước', gitSyncShortHash(presync.head_before))}
+        ${gitSyncRenderSummaryCard(lang==='en'?'After':'Sau', gitSyncShortHash(presync.head_after))}
+      </div>
+      ${gitSyncRenderSimpleFileTable(files.map(path=>({status:'SYNC', path})), lang==='en'?'No meaningful file was auto-pushed before pull.':'Không có file meaningful nào được auto-push trước khi pull.')}
+      ${gitSyncRenderOutputBlock(lang==='en'?'Pre-sync commit output':'Log commit pre-sync', presync.commit_output)}
+      ${gitSyncRenderOutputBlock(lang==='en'?'Pre-sync push output':'Log push pre-sync', presync.push_output)}
+    </section>`;
+}
+
+function openGitSyncReportModal(kind, res){
+  closeGitSyncModal();
+  const isPull = kind === 'pull';
+  const branch = String((res && res.branch) || 'main');
+  const files = Array.isArray(res && res.files) ? res.files : [];
+  const statusEntries = Array.isArray(res && res.status_entries) ? res.status_entries : [];
+  const changedFiles = Array.isArray(res && res.changed_files) ? res.changed_files : [];
+  const pushed = !!(res && res.pushed);
+  const pulled = !!(res && res.pulled);
+  const beforeHead = String((res && (res.before_head || res.head_before)) || '');
+  const afterHead = String((res && (res.after_head || res.head_after)) || '');
+  const title = isPull
+    ? (lang==='en' ? 'Pull Detail' : 'Chi tiết Pull')
+    : (lang==='en' ? 'Push Detail' : 'Chi tiết Push');
+  const kicker = isPull ? 'GitHub -> Portal' : 'Portal -> GitHub';
+  const summaryCards = isPull
+    ? [
+        gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', branch),
+        gitSyncRenderSummaryCard(lang==='en'?'Changed files':'File thay đổi', String(changedFiles.length)),
+        gitSyncRenderSummaryCard(lang==='en'?'From':'Từ commit', gitSyncShortHash(beforeHead)),
+        gitSyncRenderSummaryCard(lang==='en'?'To':'Đến commit', gitSyncShortHash(afterHead)),
+      ].join('')
+    : [
+        gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', branch),
+        gitSyncRenderSummaryCard(lang==='en'?'Committed files':'File commit', String(files.length)),
+        gitSyncRenderSummaryCard(lang==='en'?'Before':'Trước', gitSyncShortHash(beforeHead)),
+        gitSyncRenderSummaryCard(lang==='en'?'After':'Sau', gitSyncShortHash(afterHead)),
+      ].join('');
+
+  const bodySections = isPull
+    ? `
+      <section class="git-sync-section">
+        <div class="git-sync-section-title">${lang==='en'?'Pull summary':'Tóm tắt pull'}</div>
+        <div class="git-sync-callout">${escapeHtml(String(res && res.message || (pulled ? 'Portal updated.' : 'Already up to date.')))}</div>
+      </section>
+      ${gitSyncRenderPresyncSection(res && res.presync)}
+      <section class="git-sync-section">
+        <div class="git-sync-section-title">${lang==='en'?'Files applied to portal':'Danh sách file áp dụng xuống portal'}</div>
+        ${gitSyncRenderChangedFileTable(changedFiles, lang==='en'?'No remote file change was applied in this pull.':'Không có file remote nào được áp xuống trong lần pull này.')}
+      </section>
+      ${gitSyncRenderOutputBlock(lang==='en'?'Fetch output':'Log fetch', res && res.fetch_output)}
+      ${gitSyncRenderOutputBlock(lang==='en'?'Pull output':'Log pull', res && res.pull_output)}
+    `
+    : `
+      <section class="git-sync-section">
+        <div class="git-sync-section-title">${lang==='en'?'Push summary':'Tóm tắt push'}</div>
+        <div class="git-sync-callout">${escapeHtml(String(res && res.message || (pushed ? 'Changes pushed.' : 'Nothing to sync.')))}</div>
+      </section>
+      <section class="git-sync-section">
+        <div class="git-sync-section-title">${lang==='en'?'Detected meaningful changes before commit':'Các thay đổi meaningful được phát hiện trước khi commit'}</div>
+        ${gitSyncRenderSimpleFileTable(statusEntries, lang==='en'?'No meaningful file was detected for a new commit.':'Không phát hiện file meaningful nào để tạo commit mới.')}
+      </section>
+      <section class="git-sync-section">
+        <div class="git-sync-section-title">${lang==='en'?'Files included in push':'Danh sách file đi cùng lần push'}</div>
+        ${gitSyncRenderSimpleFileTable(files.map(path=>({status:'SYNC', path})), lang==='en'?'No new file was included in this push.':'Không có file mới nào nằm trong lần push này.')}
+      </section>
+      ${gitSyncRenderOutputBlock(lang==='en'?'Commit output':'Log commit', res && res.commit_output)}
+      ${gitSyncRenderOutputBlock(lang==='en'?'Push output':'Log push', res && res.push_output)}
+    `;
+
+  const primaryButton = isPull && pulled
+    ? `<button class="btn-admin primary" onclick="adminReloadLatestPortal()">${lang==='en'?'OK - reload latest portal':'OK - tải lại portal mới nhất'}</button>`
+    : '';
+
+  const modal = document.createElement('div');
+  modal.id = 'git-sync-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal git-sync-modal">
+      <div class="git-sync-modal-head">
+        <div>
+          <div class="git-sync-modal-kicker">${escapeHtml(kicker)}</div>
+          <h3>${escapeHtml(title)}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="git-sync-modal-body">
+        <div class="git-sync-summary-grid">${summaryCards}</div>
+        ${bodySections}
+      </div>
+      <div class="modal-actions git-sync-modal-actions">
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en'?'Close':'Đóng'}</button>
+        ${primaryButton}
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeGitSyncModal(); });
+}
+
+async function adminReloadLatestPortal(){
+  closeGitSyncModal();
+  showToast(lang==='en' ? 'Refreshing portal with cache-busting…' : 'Đang nạp lại portal với cache-busting…', 2200);
+  try{
+    await apiCall('admin_clear_site_cache', {}, 'POST', 15000);
+  }catch(e){}
+  try{
+    if(typeof caches !== 'undefined' && caches && typeof caches.keys === 'function'){
+      const keys = await caches.keys();
+      await Promise.all(keys.map(key => caches.delete(key).catch(()=>false)));
+    }
+  }catch(e){}
+  try{
+    if(navigator.serviceWorker && typeof navigator.serviceWorker.getRegistrations === 'function'){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all((regs || []).map(reg => reg.update().catch(()=>null)));
+    }
+  }catch(e){}
+  const url = new URL(window.location.href, window.location.origin);
+  url.searchParams.set('_portal_sync_reload', String(Date.now()));
+  window.location.replace(url.toString());
+}
+
 async function adminSaveAll(){
   // Local saves (client-side)
   saveRoleDocsToStorage();
@@ -3613,6 +3851,117 @@ function adminGitPullErrorMessage(res){
   return detail || (lang==='en' ? 'Git pull failed' : 'Git pull thất bại');
 }
 
+function adminGitExtractDetailPaths(detail){
+  const text = String(detail||'').trim();
+  if(!text) return [];
+  const found = [];
+  const pushUnique = value => {
+    const clean = String(value||'').trim().replace(/^['"]|['"]$/g,'');
+    if(!clean) return;
+    if(!found.includes(clean)) found.push(clean);
+  };
+  const listPatterns = [
+    /(?:^|:\s)(?:working_tree_dirty|staged_changes_present):\s*(.+)$/i,
+    /(?:^|:\s)(?:git_presync_failed):\s*(?:working_tree_dirty|staged_changes_present):\s*(.+)$/i,
+  ];
+  listPatterns.forEach(pattern => {
+    const match = text.match(pattern);
+    if(match && match[1]){
+      match[1].split(',').forEach(part => pushUnique(part));
+    }
+  });
+  Array.from(text.matchAll(/pathspec '([^']+)'/g)).forEach(match => pushUnique(match[1]));
+  return found.filter(path => /[\/\\]/.test(path) || /\.[A-Za-z0-9_-]+$/.test(path));
+}
+
+function adminGitErrorGuidance(kind, res){
+  const error = (res && res.error) ? String(res.error) : '';
+  if(error === 'working_tree_dirty' || error === 'staged_changes_present'){
+    return lang==='en'
+      ? 'Review the listed files first. If those edits are valid, use Push to Git or commit them in Terminal. If they are wrong or temporary, discard them before pulling.'
+      : 'Hãy rà soát các file đang được liệt kê. Nếu đó là thay đổi hợp lệ, dùng Push to Git hoặc commit trong Terminal. Nếu là thay đổi tạm/sai, hãy bỏ chúng trước khi pull.';
+  }
+  if(error === 'git_push_failed'){
+    return lang==='en'
+      ? 'The server could not push to GitHub. Check SSH access, remote URL, and whether origin/main has newer commits that require fetch/rebase first.'
+      : 'Server không thể đẩy lên GitHub. Hãy kiểm tra SSH, remote URL và xem origin/main có commit mới hơn cần fetch/rebase trước hay không.';
+  }
+  if(error === 'git_fetch_failed' || error === 'git_pull_failed'){
+    return lang==='en'
+      ? 'The server could not fetch or pull from the remote. Verify network access, SSH key, and remote branch state.'
+      : 'Server không thể fetch hoặc pull từ remote. Hãy kiểm tra kết nối mạng, SSH key và trạng thái nhánh remote.';
+  }
+  if(error === 'git_add_failed'){
+    return lang==='en'
+      ? 'Git could not stage one or more paths. This usually means the path no longer exists or was renamed. Rescan the document index, then try again.'
+      : 'Git không thể stage một hoặc nhiều đường dẫn. Trường hợp này thường do file đã đổi tên hoặc không còn tồn tại. Hãy quét lại danh mục tài liệu rồi thử lại.';
+  }
+  if(error === 'exec_unavailable'){
+    return lang==='en'
+      ? 'Hosting is blocking PHP exec, so portal buttons cannot run git commands. Terminal or hosting configuration is required.'
+      : 'Hosting đang chặn PHP exec nên các nút trên portal không thể chạy lệnh git. Cần dùng Terminal hoặc mở cấu hình hosting.';
+  }
+  return kind === 'pull'
+    ? (lang==='en'
+      ? 'Review the raw server detail below to decide whether this is a repository state issue, a remote access issue, or a path mismatch.'
+      : 'Hãy xem log chi tiết bên dưới để xác định đây là lỗi trạng thái repo, lỗi truy cập remote hay lỗi không khớp đường dẫn.')
+    : (lang==='en'
+      ? 'Review the raw server detail below to decide whether this is a staging issue, a commit issue, or a GitHub push issue.'
+      : 'Hãy xem log chi tiết bên dưới để xác định đây là lỗi stage, lỗi commit hay lỗi đẩy lên GitHub.');
+}
+
+function openGitSyncErrorModal(kind, res){
+  closeGitSyncModal();
+  const isPull = kind === 'pull';
+  const branch = String((res && res.branch) || 'main');
+  const detail = String((res && res.detail) || '').trim();
+  const errorCode = String((res && res.error) || (isPull ? 'git_pull_failed' : 'git_sync_failed')).trim();
+  const paths = adminGitExtractDetailPaths(detail);
+  const title = isPull
+    ? (lang==='en' ? 'Pull Failed' : 'Pull thất bại')
+    : (lang==='en' ? 'Push Failed' : 'Push thất bại');
+  const summary = isPull ? adminGitPullErrorMessage(res) : adminGitPushErrorMessage(res);
+  const modal = document.createElement('div');
+  modal.id = 'git-sync-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal git-sync-modal is-error">
+      <div class="git-sync-modal-head">
+        <div>
+          <div class="git-sync-modal-kicker">${escapeHtml(isPull ? 'GitHub -> Portal' : 'Portal -> GitHub')}</div>
+          <h3>${escapeHtml(title)}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="git-sync-modal-body">
+        <div class="git-sync-summary-grid git-sync-summary-grid--compact">
+          ${gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', branch)}
+          ${gitSyncRenderSummaryCard(lang==='en'?'Error code':'Mã lỗi', errorCode || '—')}
+          ${gitSyncRenderSummaryCard(lang==='en'?'Paths found':'Path nhận diện', String(paths.length))}
+          ${gitSyncRenderSummaryCard(lang==='en'?'Time':'Thời gian', String((res && res.server_time) || '—'))}
+        </div>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en'?'Readable summary':'Tóm tắt dễ hiểu'}</div>
+          <div class="git-sync-callout is-error">${escapeHtml(summary)}</div>
+        </section>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en'?'Recommended handling':'Hướng xử lý đề nghị'}</div>
+          <div class="git-sync-callout">${escapeHtml(adminGitErrorGuidance(kind, res))}</div>
+        </section>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en'?'Detected paths from server detail':'Các path nhận diện từ log server'}</div>
+          ${gitSyncRenderSimpleFileTable(paths.map(path=>({status:'PATH', path})), lang==='en'?'No specific path could be extracted from the server detail.':'Không trích xuất được path cụ thể nào từ log server.')}
+        </section>
+        ${gitSyncRenderOutputBlock(lang==='en'?'Raw server detail':'Chi tiết lỗi gốc từ server', detail || errorCode)}
+      </div>
+      <div class="modal-actions git-sync-modal-actions">
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en'?'Close':'Đóng'}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeGitSyncModal(); });
+}
+
 async function adminSyncDocsToGit(){
   if(!isAdmin() || isGitSyncBusy()) return;
   const msg = lang==='en'
@@ -3625,20 +3974,16 @@ async function adminSyncDocsToGit(){
   try{
     const res = await apiCall('admin_git_sync', {});
     if(!(res && res.ok)){
-      showToast('⚠ ' + adminGitPushErrorMessage(res));
+      openGitSyncErrorModal('push', res || {error:'git_sync_failed', detail:''});
       return;
     }
-    const fileCount = Array.isArray(res.files) ? res.files.length : 0;
-    if(res.pushed){
-      showToast(fileCount > 0
-        ? ((lang==='en' ? '✅ Pushed to origin/' : '✅ Đã đẩy lên origin/') + (res.branch || 'main') + ' · ' + fileCount + ' ' + (lang==='en' ? 'file(s)' : 'tệp'))
-        : (res.message || (lang==='en' ? '✅ Existing local commits pushed to Git' : '✅ Đã đẩy các commit local còn tồn lên Git'))
-      );
-    }else{
-      showToast(res.message || (lang==='en' ? 'No allowed document changes to sync' : 'Không có thay đổi tài liệu hợp lệ để đồng bộ'));
-    }
+    openGitSyncReportModal('push', res);
   }catch(e){
-    showToast('⚠ ' + (lang==='en' ? 'Git sync failed' : 'Đồng bộ Git thất bại'));
+    openGitSyncErrorModal('push', {
+      error:'git_sync_failed',
+      detail:(e && e.message) ? String(e.message) : '',
+      server_time:new Date().toISOString()
+    });
   }finally{
     gitSyncBusyMode = '';
     if(currentPage === 'admin') renderAdmin();
@@ -3649,7 +3994,7 @@ async function adminPullPortalFromGit(){
   if(!isAdmin() || isGitSyncBusy()) return;
   const msg = lang==='en'
     ? 'Pull the latest commit from Git into this cPanel portal now? The system will auto-clean runtime noise, try to pre-sync meaningful server-side document changes, then run fast-forward update.'
-    : 'Kéo commit mới nhất từ Git xuống portal trên cPanel ngay bây giờ? Thao tác này chỉ chạy fast-forward và yêu cầu repo trên server đang sạch.';
+    : 'Kéo commit mới nhất từ Git xuống portal trên cPanel ngay bây giờ? Hệ thống sẽ tự dọn runtime noise, thử pre-sync thay đổi meaningful trên server, rồi mới fast-forward cập nhật.';
   if(!confirm(msg)) return;
 
   gitSyncBusyMode = 'pull';
@@ -3657,16 +4002,16 @@ async function adminPullPortalFromGit(){
   try{
     const res = await apiCall('admin_git_pull', {});
     if(!(res && res.ok)){
-      showToast('⚠ ' + adminGitPullErrorMessage(res));
+      openGitSyncErrorModal('pull', res || {error:'git_pull_failed', detail:''});
       return;
     }
-    if(res.pulled){
-      showToast((lang==='en' ? '✅ Portal updated from origin/' : '✅ Portal đã cập nhật từ origin/') + (res.branch || 'main'));
-    }else{
-      showToast(res.message || (lang==='en' ? 'Portal is already up to date' : 'Portal đã ở bản mới nhất'));
-    }
+    openGitSyncReportModal('pull', res);
   }catch(e){
-    showToast('⚠ ' + (lang==='en' ? 'Git pull failed' : 'Git pull thất bại'));
+    openGitSyncErrorModal('pull', {
+      error:'git_pull_failed',
+      detail:(e && e.message) ? String(e.message) : '',
+      server_time:new Date().toISOString()
+    });
   }finally{
     gitSyncBusyMode = '';
     if(currentPage === 'admin') renderAdmin();
@@ -4428,7 +4773,7 @@ function downloadLoginInfoFromModal(){
 
 
 function closeModal(){
-  ['user-modal','perm-modal','create-doc-modal','dict-modal','delete-user-modal'].forEach(id=>{
+  ['user-modal','perm-modal','create-doc-modal','dict-modal','delete-user-modal','git-sync-modal'].forEach(id=>{
     const m=document.getElementById(id);
     if(m) m.remove();
   });

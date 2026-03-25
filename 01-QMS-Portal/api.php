@@ -1686,6 +1686,50 @@ function git_join_paths_for_error(array $paths, int $max = 12): string {
   return $msg;
 }
 
+function git_head_commit(string $repoReal, string $ref = 'HEAD'): string {
+  $code = 0;
+  $out = trim((string)git_command(['rev-parse', $ref], $repoReal, $code));
+  return $code === 0 ? $out : '';
+}
+
+function git_parse_status_entries(array $statusLines): array {
+  $entries = [];
+  foreach ($statusLines as $line) {
+    if (!is_string($line) || strlen($line) < 3) continue;
+    $path = git_status_entry_path($line);
+    if ($path === '') continue;
+    $entries[] = [
+      'xy' => substr($line, 0, 2),
+      'path' => $path,
+    ];
+  }
+  return $entries;
+}
+
+function git_parse_name_status_output(string $text): array {
+  $entries = [];
+  foreach (split_nonempty_lines($text) as $line) {
+    $parts = preg_split("/\t+/", trim((string)$line));
+    if (!is_array($parts) || count($parts) < 2) continue;
+    $status = strtoupper(trim((string)$parts[0]));
+    if ($status === '') continue;
+    if (count($parts) >= 3) {
+      $oldPath = str_replace('\\', '/', trim((string)$parts[1]));
+      $path = str_replace('\\', '/', trim((string)$parts[2]));
+    } else {
+      $oldPath = '';
+      $path = str_replace('\\', '/', trim((string)$parts[1]));
+    }
+    if ($path === '') continue;
+    $entries[] = [
+      'status' => $status,
+      'path' => $path,
+      'old_path' => $oldPath,
+    ];
+  }
+  return $entries;
+}
+
 function git_cleanup_runtime_noise(string $repoReal): void {
   $statusCode = 0;
   $statusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $statusCode);
@@ -1759,6 +1803,7 @@ function git_sync_documents(array $me, string $repoDir): array {
   $branchCode = 0;
   $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
   if ($branchCode !== 0 || $branch === '') $branch = 'main';
+  $headBefore = git_head_commit($repoReal);
 
   $statusArgs = ['status', '--porcelain', '--untracked-files=all'];
   $statusCode = 0;
@@ -1767,6 +1812,7 @@ function git_sync_documents(array $me, string $repoDir): array {
     throw new RuntimeException('git_status_failed');
   }
   $statusLines = git_filter_non_runtime_status_lines(split_nonempty_lines($statusOut));
+  $statusEntries = git_parse_status_entries($statusLines);
   if (empty($statusLines)) {
     $aheadCode = 0;
     $aheadOut = git_command(['rev-list', '--count', 'origin/' . $branch . '..' . $branch], $repoReal, $aheadCode);
@@ -1783,8 +1829,11 @@ function git_sync_documents(array $me, string $repoDir): array {
         'files' => [],
         'message' => 'Existing local commits pushed to origin/' . $branch,
         'status' => [],
+        'status_entries' => [],
         'commit_output' => '',
         'push_output' => $pushOut,
+        'head_before' => $headBefore,
+        'head_after' => git_head_commit($repoReal),
       ];
     }
     return [
@@ -1793,8 +1842,11 @@ function git_sync_documents(array $me, string $repoDir): array {
       'files' => [],
       'message' => 'No non-runtime changes to sync.',
       'status' => [],
+      'status_entries' => [],
       'commit_output' => '',
       'push_output' => '',
+      'head_before' => $headBefore,
+      'head_after' => $headBefore,
     ];
   }
 
@@ -1822,8 +1874,11 @@ function git_sync_documents(array $me, string $repoDir): array {
       'files' => [],
       'message' => 'No staged non-runtime changes to sync.',
       'status' => $statusLines,
+      'status_entries' => $statusEntries,
       'commit_output' => '',
       'push_output' => '',
+      'head_before' => $headBefore,
+      'head_after' => $headBefore,
     ];
   }
 
@@ -1854,8 +1909,11 @@ function git_sync_documents(array $me, string $repoDir): array {
     'files' => $files,
     'message' => 'Document changes pushed to origin/' . $branch,
     'status' => $statusLines,
+    'status_entries' => $statusEntries,
     'commit_output' => $commitOut,
     'push_output' => $pushOut,
+    'head_before' => $headBefore,
+    'head_after' => git_head_commit($repoReal),
   ];
 }
 
@@ -1877,9 +1935,10 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
 
   // Auto-sync meaningful local changes before pulling so admin does not need
   // to switch between Push and Pull manually for routine edits.
+  $presyncResult = null;
   if (is_array($me)) {
     try {
-      git_sync_documents($me, $repoReal);
+      $presyncResult = git_sync_documents($me, $repoReal);
       git_cleanup_runtime_noise($repoReal);
     } catch (Throwable $syncError) {
       $syncMsg = (string)$syncError->getMessage();
@@ -1914,6 +1973,7 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
   $branchCode = 0;
   $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
   if ($branchCode !== 0 || $branch === '') $branch = 'main';
+  $headBefore = git_head_commit($repoReal);
 
   $fetchCode = 0;
   $fetchOut = git_command(['fetch', 'origin', $branch], $repoReal, $fetchCode);
@@ -1929,6 +1989,11 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
       'pulled' => false,
       'branch' => $branch,
       'message' => 'Portal is already up to date with origin/' . $branch,
+      'before_head' => $headBefore,
+      'after_head' => $headBefore,
+      'changed_files' => [],
+      'presync' => $presyncResult,
+      'fetch_output' => $fetchOut,
       'pull_output' => $fetchOut,
     ];
   }
@@ -1939,10 +2004,25 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
     throw new RuntimeException('git_pull_failed' . ($pullOut !== '' ? ': ' . $pullOut : ''));
   }
 
+  $headAfter = git_head_commit($repoReal);
+  $changedFiles = [];
+  if ($headBefore !== '' && $headAfter !== '' && $headBefore !== $headAfter) {
+    $changedCode = 0;
+    $changedOut = git_command(['diff', '--name-status', $headBefore . '..' . $headAfter], $repoReal, $changedCode);
+    if ($changedCode === 0) {
+      $changedFiles = git_parse_name_status_output($changedOut);
+    }
+  }
+
   return [
     'pulled' => true,
     'branch' => $branch,
     'message' => 'Portal updated from origin/' . $branch,
+    'before_head' => $headBefore,
+    'after_head' => $headAfter,
+    'changed_files' => $changedFiles,
+    'presync' => $presyncResult,
+    'fetch_output' => $fetchOut,
     'pull_output' => trim($fetchOut . ($fetchOut !== '' && $pullOut !== '' ? "\n" : '') . $pullOut),
   ];
 }
@@ -2348,9 +2428,17 @@ switch ($action) {
         'branch' => (string)($result['branch'] ?? 'main'),
         'files' => array_values(array_map('strval', $result['files'] ?? [])),
         'status' => array_values(array_map('strval', $result['status'] ?? [])),
+        'status_entries' => array_values(array_map(static function($row){
+          return [
+            'xy' => (string)($row['xy'] ?? ''),
+            'path' => (string)($row['path'] ?? ''),
+          ];
+        }, $result['status_entries'] ?? [])),
         'message' => (string)($result['message'] ?? ''),
         'commit_output' => (string)($result['commit_output'] ?? ''),
         'push_output' => (string)($result['push_output'] ?? ''),
+        'head_before' => (string)($result['head_before'] ?? ''),
+        'head_after' => (string)($result['head_after'] ?? ''),
         'server_time' => now_iso(),
       ]);
     } catch (Throwable $e) {
@@ -2391,6 +2479,33 @@ switch ($action) {
         'pulled' => (bool)($result['pulled'] ?? false),
         'branch' => (string)($result['branch'] ?? 'main'),
         'message' => (string)($result['message'] ?? ''),
+        'before_head' => (string)($result['before_head'] ?? ''),
+        'after_head' => (string)($result['after_head'] ?? ''),
+        'changed_files' => array_values(array_map(static function($row){
+          return [
+            'status' => (string)($row['status'] ?? ''),
+            'path' => (string)($row['path'] ?? ''),
+            'old_path' => (string)($row['old_path'] ?? ''),
+          ];
+        }, $result['changed_files'] ?? [])),
+        'presync' => is_array($result['presync'] ?? null) ? [
+          'pushed' => (bool)($result['presync']['pushed'] ?? false),
+          'branch' => (string)($result['presync']['branch'] ?? ''),
+          'files' => array_values(array_map('strval', $result['presync']['files'] ?? [])),
+          'status' => array_values(array_map('strval', $result['presync']['status'] ?? [])),
+          'status_entries' => array_values(array_map(static function($row){
+            return [
+              'xy' => (string)($row['xy'] ?? ''),
+              'path' => (string)($row['path'] ?? ''),
+            ];
+          }, $result['presync']['status_entries'] ?? [])),
+          'message' => (string)($result['presync']['message'] ?? ''),
+          'commit_output' => (string)($result['presync']['commit_output'] ?? ''),
+          'push_output' => (string)($result['presync']['push_output'] ?? ''),
+          'head_before' => (string)($result['presync']['head_before'] ?? ''),
+          'head_after' => (string)($result['presync']['head_after'] ?? ''),
+        ] : null,
+        'fetch_output' => (string)($result['fetch_output'] ?? ''),
         'pull_output' => (string)($result['pull_output'] ?? ''),
         'server_time' => now_iso(),
       ]);
@@ -2417,6 +2532,21 @@ switch ($action) {
         'server_time' => now_iso(),
       ], 500);
     }
+  }
+
+  case 'admin_clear_site_cache': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    header('Clear-Site-Data: "cache"');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+    api_json([
+      'ok' => true,
+      'message' => 'Origin cache reset requested.',
+      'server_time' => now_iso(),
+    ]);
   }
 
   // ==========================================================
