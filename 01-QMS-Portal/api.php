@@ -3444,6 +3444,7 @@ case 'doc_save_draft': {
 
     if (trim($code) === '') api_json(['ok' => false, 'error' => 'missing_code'], 400);
     if (trim($basePath) === '') api_json(['ok' => false, 'error' => 'missing_base_path'], 400);
+    $newRevision = form_normalize_revision($newRevision, '0');
 
     $baseRel = safe_rel_path($basePath);
     if (is_reserved_root_segment($baseRel)) api_json(['ok' => false, 'error' => 'invalid_base_path'], 400);
@@ -3456,6 +3457,26 @@ case 'doc_save_draft': {
       $manifest = form_load_manifest($DATA_DIR, $ROOT_DIR, $formEntry);
       $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
       $newRevision = form_normalize_revision($newRevision, form_normalize_revision((string)($state['revision'] ?? '0'), '0'));
+      // Guard: only allow approving the currently in-review revision
+      $workingRevision = '';
+      foreach ($versions as $vv) {
+        if (!is_array($vv)) continue;
+        $stt = strtolower((string)($vv['status'] ?? ''));
+        if (!in_array($stt, ['in_review', 'pending_approval'], true)) continue;
+        $candidate = form_normalize_revision(revision_from_version_string((string)($vv['version'] ?? '')), '');
+        if ($candidate !== '') { $workingRevision = $candidate; break; }
+      }
+      if ($workingRevision === '' && isset($state['revision'])) {
+        $workingRevision = form_normalize_revision((string)$state['revision'], '');
+      }
+      if ($workingRevision !== '' && $newRevision !== $workingRevision) {
+        api_json([
+          'ok' => false,
+          'error' => 'approve_revision_mismatch',
+          'expected_revision' => $workingRevision,
+          'received_revision' => $newRevision
+        ], 409);
+      }
       $ext = form_extension_from_path((string)$formEntry['path']);
       $reviewMeta = form_private_file_meta($DATA_DIR, (string)$formEntry['code'], $newRevision, 'in_review', $ext);
       $draftMeta = form_private_file_meta($DATA_DIR, (string)$formEntry['code'], $newRevision, 'draft', $ext);
@@ -3593,6 +3614,26 @@ case 'doc_save_draft': {
     $manifest = load_doc_manifest($ROOT_DIR, $baseRel, $ARCHIVE_DIR, $code);
     $versions = $manifest['versions'] ?? [];
     $state = load_doc_state($ROOT_DIR, $baseRel, $ARCHIVE_DIR, $code) ?? [];
+    // Guard: only allow approving the currently in-review revision
+    $workingRevision = '';
+    foreach ($versions as $vv) {
+      if (!is_array($vv)) continue;
+      $stt = strtolower((string)($vv['status'] ?? ''));
+      if (!in_array($stt, ['in_review', 'pending_approval'], true)) continue;
+      $candidate = form_normalize_revision(revision_from_version_string((string)($vv['version'] ?? '')), '');
+      if ($candidate !== '') { $workingRevision = $candidate; break; }
+    }
+    if ($workingRevision === '' && isset($state['revision'])) {
+      $workingRevision = form_normalize_revision((string)$state['revision'], '');
+    }
+    if ($workingRevision !== '' && $newRevision !== $workingRevision) {
+      api_json([
+        'ok' => false,
+        'error' => 'approve_revision_mismatch',
+        'expected_revision' => $workingRevision,
+        'received_revision' => $newRevision
+      ], 409);
+    }
 
     // If client didn't send HTML, read the server-stored INREVIEW file for this revision
     if (strlen(trim($html)) < 30) {
@@ -3726,6 +3767,7 @@ case 'doc_save_draft': {
 
     $state['status'] = 'approved';
     $state['revision'] = $newRevision;
+    $state['released_revision'] = $newRevision;
     $state['updateType'] = ($updateType === 'minor') ? 'minor' : 'major';
     $state['approvedBy'] = [
       'name' => (string)($me['name'] ?? $me['username'] ?? ''),

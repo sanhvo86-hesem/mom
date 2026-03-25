@@ -1054,6 +1054,15 @@ const innerHtml = _getCurrentEditorInnerHtml();
       try{ renderWorkflowPanel(doc); }catch(e){}
       try{ renderVersionHistory(doc); }catch(e){}
     }else{
+      if(res && res.error==='approve_revision_mismatch'){
+        const exp = String(res.expected_revision||'').trim();
+        const got = String(res.received_revision||'').trim();
+        showToast('⚠ ' + (lang==='en'
+          ? `Revision mismatch. Server expects v${exp} but received v${got}. Please reload and approve again.`
+          : `Lệch phiên bản. Server yêu cầu v${exp} nhưng nhận v${got}. Vui lòng tải lại và duyệt lại.`));
+        try{ await openDocPreview(doc.code); }catch(e){}
+        return;
+      }
       showToast('\u26A0 '+((res&&res.error)?res.error:'server_error'));
     }
   }catch(err){
@@ -1382,7 +1391,12 @@ async function approveDoc(code){
 
     const state = getDocState(code) || {status:'draft', revision: doc.rev||'0'};
     const updateType = state.updateType || (state.submittedUpdateType||'minor');
-    const currentRev = String(state.revision || doc.rev || '0');
+    const versions = (typeof getDocVersions==='function') ? (getDocVersions(code)||[]) : [];
+    const reviewEntry = versions.find(v=>v && v.status==='in_review')
+      || versions.find(v=>v && v.status==='pending_approval')
+      || versions.find(v=>v && v.status==='draft');
+    const reviewRev = reviewEntry ? String(reviewEntry.version||'').replace(/^v/i,'').trim() : '';
+    const currentRev = String(reviewRev || state.revision || doc.rev || '0');
     const prevRev = String(state.released_revision || doc.rev || '0');
 
     // IMPORTANT: do NOT bump revision here.
