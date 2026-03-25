@@ -1,8 +1,8 @@
 {
     "status": "approved",
-    "revision": "3.0",
+    "revision": "2.0",
     "updateType": "major",
-    "updated_at": "2026-03-25T08:59:49+00:00",
+    "updated_at": "2026-03-25T10:16:24+00:00",
     "has_release": true,
     "released_revision": "2.0"
 }
