@@ -50,13 +50,16 @@ php security_reset_all_users.php --apply --out="/secure/path/reset_credentials.c
   - `mfa.enabled=false` (users re-enroll MFA at next login).
   - `must_change_password=true`.
 - Remove credential CSV after secure handover.
-- If `QMS_DATA_DIR` is set, scripts use it. Otherwise they auto-prefer private data dir outside web root.
+- If `QMS_DATA_DIR` is set, scripts use it.
+- If `QMS_DATA_DIR` is not set, some helper scripts may still auto-prefer a private runtime data dir outside web root on the server.
+- This runtime data directory is not controlled source and must never be synced into the SharePoint source library or committed as source content.
 
 ## 4) Runtime Data Directory Behavior
 
-- Default runtime storage is a sibling directory outside web root, typically `/home/<cpanel-user>/qms-data-private`.
-- This directory is created automatically by `api.php` and `postdeploy_healthcheck.php` when `QMS_DATA_DIR` is not set.
-- Recreating `.git` inside the site repo does not create this folder by itself. The folder usually appears after the first portal/API request or a health check run.
+- Runtime data is separate from the controlled source tree defined by `ANNEX-136` and `WI-107`.
+- Depending on deployment configuration, runtime data may live in `01-QMS-Portal/qms-data` or in a private server path set by `QMS_DATA_DIR`.
+- Some helper scripts still support an external private runtime path when `QMS_DATA_DIR` is not set.
+- Recreating `.git` inside the site repo does not create runtime data by itself. Runtime data is created by the app or helper scripts when needed.
 - Keep these items because they are part of the live runtime state:
   - `config/`
   - `.htaccess`
@@ -65,4 +68,4 @@ php security_reset_all_users.php --apply --out="/secure/path/reset_credentials.c
   - `ratelimit/`
   - `scan_cache.json`
   - `php_error.log`
-- If the whole directory is removed, the app will try to recreate it automatically and then copy legacy data from `01-QMS-Portal/qms-data` when available.
+- If the whole runtime directory is removed, the app or helper scripts may try to recreate it automatically. Review deployment settings before doing this on a live server.

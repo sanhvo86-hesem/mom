@@ -1,27 +1,29 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>WI-107 — Quy trình ShareFile, Git và cPanel cho vòng lặp kiểm soát tài liệu khép kín | HESEM QMS</title>
+<title>WI-107 - M365 SharePoint local sync, Git và server deployment control | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 <style>
+@media print {
+  .card, .table-card, .callout, .note, .box, .keyline, .figure-box, .step-box { break-inside: avoid; page-break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
 .page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
 .page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color:var(--navy);}
-.page-body h3 {font-size:14px; line-height:1.45; margin:10px 0 6px; color:var(--ink);}
-.grid-3 {display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:12px 0;}
-.card {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff;}
-.step {border-left:4px solid var(--brand); padding:10px 12px; background:#fcfcfd; margin:10px 0;}
-.callout-strong {border:1px solid var(--th-bdr); background:#fff7e6; padding:12px; border-radius:var(--r); margin:10px 0;}
-.mono {font-family:var(--mono); font-size:12px;}
-.matrix-table {width:100%; border-collapse:collapse; table-layout:fixed; word-wrap:break-word;}
-.matrix-table th {padding:8px 10px; text-align:left; font-size:11px; font-weight:800; color:var(--navy); background:var(--th-bg); border:1px solid var(--th-bdr); text-transform:uppercase; letter-spacing:.3px; vertical-align:bottom;}
-.matrix-table td {padding:8px 10px; border:1px solid var(--ln2); vertical-align:top; line-height:1.5;}
-ul.tight {margin:8px 0; padding-left:18px;}
-ul.tight li {margin:4px 0;}
-pre.cmd {margin:10px 0; padding:12px; border-radius:10px; background:#0b1220; color:#dbeafe; overflow:auto; font:12px/1.5 var(--mono);}
-.pill {display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid var(--ln); background:#eef7ff; color:var(--navy); font-size:11px; font-weight:700; margin:0 6px 6px 0;}
+.page-body h3 {font-size:14px; line-height:1.45; margin:12px 0 6px; color:var(--ink);}
+.table-card table {width:100%; border-collapse:collapse; font-size:12px;}
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align:top;}
+.table-card th {background:var(--th-bg); border-color:var(--th-bdr); text-align:left;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.code {font-family:var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.path, .cmd {font-family:var(--mono); font-size:12px; background:#0f172a; color:#e2e8f0; border-radius:10px; padding:12px; white-space:pre-wrap; overflow:auto;}
+.figure-box, .step-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.section ul, .section ol {margin:8px 0; padding-left:20px;}
 @media (max-width:960px) {
+  .two-col {grid-template-columns:1fr;}
   .page-body {padding:24px 18px 36px;}
 }
 </style>
@@ -30,227 +32,204 @@ pre.cmd {margin:10px 0; padding:12px; border-radius:10px; background:#0b1220; co
 <div class="container">
   <div class="page">
     <div class="page-body">
+
 <div class="form-header">
   <div class="fh-left">
     <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
     <div class="fh-company">
       <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-      <span>Tài liệu vận hành • Công việc hướng dẫn</span>
+      <span>Tài liệu vận hành • Work Instruction</span>
     </div>
   </div>
-  <div class="title"><strong>WI-107 — Quy trình ShareFile, Git và cPanel cho vòng lặp kiểm soát tài liệu khép kín</strong></div>
+  <div class="title"><strong>WI-107 - M365 SharePoint local sync, Git và server deployment control</strong></div>
   <div class="meta">
     <div class="row"><span><b>Code:</b></span><span>WI-107</span></div>
-    <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+    <div class="row"><span><b>Version:</b></span><span>V1</span></div>
     <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-    <div class="row"><span><b>Owner:</b></span><span>QMS Engineer / IT Administrator / Document Owner</span></div>
-    <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+    <div class="row"><span><b>Owner:</b></span><span>IT System Administrator / QMS Manager</span></div>
+    <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám Đốc</span></div>
   </div>
 </div>
 
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết lập và vận hành vòng lặp tài liệu số giữa máy local đang đồng bộ qua ShareFile, kho Git trung tâm và portal đang chạy trên cPanel. WI này là hướng dẫn thực thi bắt buộc cho người mới bắt đầu, Document Owner, QMS Engineer, IT Administrator và người được giao quyền đồng bộ trên portal.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết lập hoặc vận hành đường đi bắt buộc cho source của bộ tài liệu HESEM: SharePoint local synced working copy, Git version history, server deployment, reverse sync và boundary với runtime data. Cách gọi cũ “ShareFile” trong bộ tài liệu legacy được hiểu là <b>SharePoint-synced local working copy</b>.</div>
+      <h1>WI-107 - M365 SharePoint local sync, Git và server deployment control</h1>
 
-<h1>WI-107 — Quy trình ShareFile, Git và cPanel cho vòng lặp kiểm soát tài liệu khép kín</h1>
+      <div class="section">
+        <h2>1. Kết quả phải đạt</h2>
+        <ul>
+          <li>Controlled source nằm trong <span class="code">10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span> trên SharePoint.</li>
+          <li>Local working copy được sync bởi OneDrive/SharePoint, nhưng thư mục <span class="code">.git</span> nằm ngoài vùng sync.</li>
+          <li>Mọi thay đổi source đi theo đường <span class="code">SharePoint local sync → Git → server deployment</span>.</li>
+          <li>Mọi hotfix từ server quay về theo đường <span class="code">server → Git → local sync</span>.</li>
+          <li>Runtime data, session files, secrets và submission payload không đi vào source library.</li>
+        </ul>
+      </div>
 
-<div class="callout-strong"><strong>KẾT QUẢ BẮT BUỘC</strong>: một thay đổi tài liệu phải đi theo một vòng lặp khép kín có dấu vết rõ ràng từ nơi soạn thảo local trên ShareFile, qua Git, xuống cPanel để trở thành bản point-of-use, rồi khi có chỉnh sửa khẩn trên cPanel phải quay ngược về Git và trở lại local. Không được để tồn tại bản cPanel-only, local-only hoặc bản nhớ cá nhân làm nguồn phát hành hiệu lực.</div>
+      <div class="section">
+        <h2>2. Điều kiện tiên quyết</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Điều kiện</th><th>Yêu cầu</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>SharePoint site/library</td><td><span class="code">HESEM-Digital-Control / 10-QMS-Source-Control</span> đã tồn tại theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a>.</td></tr>
+              <tr><td>Endpoint</td><td>Máy local đã được IT phê duyệt để sync source library.</td></tr>
+              <tr><td>Git remote</td><td>Remote repository đã được tạo và cấp quyền push/pull đúng người dùng.</td></tr>
+              <tr><td>Server operator</td><td>Tài khoản deploy có quyền pull repo và chạy smoke test.</td></tr>
+              <tr><td>Runtime boundary</td><td>.gitignore và runtime path exclusions đã được xác nhận theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-<div class="section">
-  <h2>1. Nguyên tắc điều hành bắt buộc</h2>
-  <div class="grid-3">
-    <div class="card">
-      <h3>Hướng chuẩn để phát hành</h3>
-      <p><span class="pill">Chuẩn</span> <b>ShareFile local → GitHub → cPanel</b>. Đây là hướng mặc định cho mọi thay đổi đã chuẩn bị đầy đủ, có DCR và review.</p>
-    </div>
-    <div class="card">
-      <h3>Hướng ngoại lệ để cứu live system</h3>
-      <p><span class="pill">Ngoại lệ</span> <b>cPanel → GitHub → ShareFile local</b>. Chỉ dùng khi cần sửa trực tiếp trên portal/cPanel để bảo vệ vận hành, sửa liên kết, sửa lỗi hiển thị hoặc xử lý sự cố point-of-use.</p>
-    </div>
-    <div class="card">
-      <h3>Không đồng bộ file tạm</h3>
-      <p><span class="pill">Loại trừ</span> Các file runtime như <span class="mono">sessions</span>, <span class="mono">ratelimit</span>, <span class="mono">scan_cache.json</span>, <span class="mono">php_error.log</span>, <span class="mono">form-workflow</span> và <span class="mono">users.json</span> không được xem là thay đổi tài liệu để phát hành.</p>
-    </div>
-  </div>
-  <div class="step"><strong>Quy tắc một người tích hợp:</strong> thư mục Git working copy nằm trong ShareFile chỉ có <b>một người tích hợp chính</b> được quyền chỉnh sửa trực tiếp cùng một thời điểm. Người khác gửi yêu cầu thay đổi qua DCR/review pack hoặc làm việc trên bản clone riêng của mình, không cùng ghi vào một thư mục <span class="mono">.git</span> được ShareFile đồng bộ.</div>
-</div>
+      <div class="section">
+        <h2>3. Chuẩn bị local synced worktree</h2>
+        <div class="two-col">
+          <div class="figure-box">
+            <h3>Worktree được phép</h3>
+            <p>Ví dụ path sync được phép:</p>
+            <div class="path">%UserProfile%\HESEM Engineering\HESEM-Digital-Control - 10-QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn\</div>
+          </div>
+          <div class="figure-box">
+            <h3>Git-dir được phép</h3>
+            <p>Ví dụ git metadata path:</p>
+            <div class="path">C:\HESEM-Git\qms.hesem.com.vn.git\</div>
+          </div>
+        </div>
+        <div class="keyline"><strong>Rule cứng:</strong> không để <span class="code">.git</span> trong thư mục SharePoint sync. Không sync source library trên máy không được đăng ký. Không cho nhiều người cùng dùng chung một local worktree.</div>
+      </div>
 
-<div class="section">
-  <h2>2. Vai trò của từng nút trong vòng lặp</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr><th>Nút</th><th>Vai trò</th><th>Cái gì được xem là nguồn chuẩn</th><th>Không được làm</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>ShareFile local working copy</td><td>Nơi soạn thảo, self-check, gom review pack và lưu bằng chứng phát hành nội bộ.</td><td>Đây là <b>bản làm việc có kiểm soát</b> cho người tích hợp chính, không phải nơi point-of-use cho end user.</td><td>Không dùng Personal Folder, Desktop, Downloads hoặc USB làm bản làm việc chính.</td></tr>
-        <tr><td>GitHub <span class="mono">origin/main</span></td><td>Sổ cái commit trung tâm, nơi hợp nhất thay đổi và lưu lịch sử version có thể truy ngược.</td><td>Đây là <b>nguồn lịch sử phiên bản tích hợp</b> cho local và cPanel.</td><td>Không bỏ qua bước pull/rebase khi remote đã có commit mới hơn.</td></tr>
-        <tr><td>cPanel repo</td><td>Bản repo đang gắn với portal live và là nơi các nút <b>Push to Git</b> / <b>Pull to Portal</b> chạy lệnh đồng bộ.</td><td>Đây là <b>bản triển khai live</b> trước mặt end user sau khi pull thành công.</td><td>Không sửa ở thư mục ngoài repo, không giữ thay đổi meaningful chưa đẩy qua Git quá một ca làm việc.</td></tr>
-        <tr><td>Portal runtime data</td><td>Dữ liệu phiên, rate limit, log tạm và file phát sinh khi portal vận hành.</td><td>Không phải hồ sơ kiểm soát tài liệu, không là bằng chứng phát hành.</td><td>Không commit lên Git, không dùng để chứng minh thay đổi tài liệu.</td></tr>
-        <tr><td>ShareFile release evidence</td><td>Nơi lưu DCR, peer review, snapshot phát hành, ảnh xác nhận pull/deploy và check sau phát hành.</td><td>Đây là <b>bằng chứng audit</b> đi kèm vòng lặp phát hành.</td><td>Không ghi đè snapshot cũ; chỉ thêm phiên bản mới và giữ lịch sử.</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+      <div class="section">
+        <h2>4. Tạo local working copy đúng chuẩn</h2>
+        <div class="step-box">
+          <h3>Bước 4.1 - Đồng bộ library source xuống máy</h3>
+          <ol>
+            <li>Đăng nhập OneDrive bằng tài khoản công ty được cấp quyền.</li>
+            <li>Mở <span class="code">10-QMS-Source-Control</span> và chọn <span class="code">Sync</span>.</li>
+            <li>Xác nhận thư mục local xuất hiện đúng dưới profile người dùng.</li>
+          </ol>
+        </div>
+        <div class="step-box">
+          <h3>Bước 4.2 - Clone với separate git-dir</h3>
+          <p>Chỉ thực hiện khi thư mục worktree đang trống:</p>
+          <div class="cmd">git clone --separate-git-dir C:\HESEM-Git\qms.hesem.com.vn.git &lt;git-remote-url&gt; "%UserProfile%\HESEM Engineering\HESEM-Digital-Control - 10-QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn"</div>
+          <p>Nếu worktree đã có dữ liệu sync sẵn, IT phải tạo lại worktree sạch trước khi clone.</p>
+        </div>
+        <div class="step-box">
+          <h3>Bước 4.3 - Kiểm tra ranh giới</h3>
+          <ol>
+            <li>Chạy <span class="code">git status</span> trong worktree.</li>
+            <li>Xác nhận thư mục worktree không có <span class="code">.git</span>.</li>
+            <li>Xác nhận <span class="code">git rev-parse --git-dir</span> trỏ về <span class="code">C:\HESEM-Git\...</span>.</li>
+          </ol>
+        </div>
+      </div>
 
-<div class="section">
-  <h2>3. Thiết lập lần đầu cho người mới</h2>
-  <h3>3.1 Chuẩn bị ShareFile root</h3>
-  <ul class="tight">
-    <li>Tạo một root duy nhất trong vùng <b>Shared Folders</b> của ShareFile theo bản thiết kế tại <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-116-sharefile-sync.html">ANNEX-116</a>.</li>
-    <li>QMS Engineer và IT Administrator giữ quyền Admin ở root; Document Owner chỉ được quyền theo vai trò ở từng thư mục con.</li>
-    <li>Không dùng <b>Personal Folders</b> cho bản phát hành hiệu lực, không đặt thư mục Git working copy trong vùng cá nhân.</li>
-  </ul>
+      <div class="section">
+        <h2>5. Chu trình chuẩn local → Git → server</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Evidence</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>Soạn/chỉnh source trong worktree local đang sync.</td><td>Changed files</td></tr>
+              <tr><td>2</td><td>Kiểm tra diff, loại runtime noise khỏi commit.</td><td>Clean git status</td></tr>
+              <tr><td>3</td><td><span class="code">git add</span> → <span class="code">git commit</span> → <span class="code">git push</span>.</td><td>CommitId</td></tr>
+              <tr><td>4</td><td>Đăng ký release manifest theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a>.</td><td>Manifest URL</td></tr>
+              <tr><td>5</td><td>Server operator pull đúng commit/tag, chạy smoke test, lưu deploy receipt.</td><td>Deploy receipt</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-  <h3>3.2 Chuẩn bị local working copy trong ShareFile</h3>
-  <p>Dùng thư mục local đã được ShareFile đồng bộ, ví dụ <span class="mono">C:\ShareFile\HESEM-QMS-Control\01-Controlled-Working-Repos\qms.hesem.com.vn</span>.</p>
-  <pre class="cmd">cd C:\ShareFile\HESEM-QMS-Control\01-Controlled-Working-Repos
-git clone https://github.com/&lt;account&gt;/&lt;repo&gt;.git qms.hesem.com.vn
-cd qms.hesem.com.vn
-git branch --show-current
-git remote -v</pre>
-  <ul class="tight">
-    <li>Nhánh chuẩn để vận hành live là <span class="mono">main</span>. Không đổi nhánh trên cPanel nếu chưa có chấp thuận của IT Administrator và QMS Engineer.</li>
-    <li>Kiểm tra <span class="mono">git remote -v</span> để chắc local đang trỏ đúng repo đang được cPanel dùng làm <span class="mono">origin</span>.</li>
-  </ul>
+      <div class="section">
+        <h2>6. Chu trình hotfix server → Git → local</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Evidence</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>Khi sửa trực tiếp trên server, mở reverse-sync intake ngay.</td><td>ReverseSyncId</td></tr>
+              <tr><td>2</td><td>Commit và push thay đổi từ server về Git remote.</td><td>CommitId</td></tr>
+              <tr><td>3</td><td>Local admin endpoint pull về worktree đang sync.</td><td>Local pull log</td></tr>
+              <tr><td>4</td><td>Kiểm tra SharePoint sync hoàn tất.</td><td>Sync complete evidence</td></tr>
+              <tr><td>5</td><td>Đóng reverse-sync register.</td><td>Close-out record</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Rule khẩn:</strong> không giữ thay đổi meaningful trên server mà chưa commit back quá một ca làm việc. Không dùng server như nơi soạn thảo chính.</div>
+      </div>
 
-  <h3>3.3 Chuẩn bị cPanel</h3>
-  <pre class="cmd">cd /home/&lt;cpanel-user&gt;/qms.hesem.com.vn
-git rev-parse --is-inside-work-tree
-git config user.name "&lt;cpanel sync user&gt;"
-git config user.email "&lt;cpanel-sync&gt;@local.invalid"
-ssh-keygen -t ed25519 -C "&lt;cpanel-user&gt;@cpanel" -f ~/.ssh/id_ed25519 -N ""
-cat ~/.ssh/id_ed25519.pub
-ssh -T git@github.com
-git remote set-url origin git@github.com:&lt;account&gt;/&lt;repo&gt;.git
-git pull --ff-only origin main</pre>
-  <ul class="tight">
-    <li>Public key ở bước trên phải được thêm vào tài khoản GitHub đang sở hữu repo.</li>
-    <li>Portal Admin chỉ được dùng nút đồng bộ khi cPanel repo đã qua bước SSH key test thành công.</li>
-    <li>Nếu cPanel không nhìn thấy repo, phải sửa ở repo path thật đang chạy portal, không sửa ở bản sao ngoài repo.</li>
-  </ul>
-</div>
+      <div class="section">
+        <h2>7. Runtime exclusions bắt buộc</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path / nhóm dữ liệu</th><th>Quy tắc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="code">01-QMS-Portal/qms-data/form-workflow/</span></td><td>Runtime workflow binaries, archives và working state. Không commit vào source library.</td></tr>
+              <tr><td><span class="code">01-QMS-Portal/qms-data/sessions/</span></td><td>Session runtime. Không sync, không commit.</td></tr>
+              <tr><td><span class="code">01-QMS-Portal/qms-data/ratelimit/</span></td><td>Rate-limit state. Không sync, không commit.</td></tr>
+              <tr><td><span class="code">01-QMS-Portal/qms-data/php_error.log</span></td><td>Runtime log. Không commit.</td></tr>
+              <tr><td><span class="code">01-QMS-Portal/qms-data/scan_cache.json</span></td><td>Runtime cache. Không commit.</td></tr>
+              <tr><td><span class="code">01-QMS-Portal/qms-data/config/users.json</span> và secret-bearing config</td><td>Xem như runtime/server-only control data; không dùng như controlled source artifact nếu chưa có kiến trúc secret control riêng được duyệt.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-<div class="section">
-  <h2>4. Chu kỳ chuẩn: ShareFile local → GitHub → cPanel</h2>
-  <div class="step"><strong>Bước 1.</strong> Mở DCR theo <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-102_Document_Change_Request.xlsx">FRM-102</a>, quyết định đây là thay đổi minor hay major, và chốt tài liệu liên đới cần rà soát.</div>
-  <div class="step"><strong>Bước 2.</strong> Trước khi sửa, kéo local về mới nhất để tránh divergence.
-    <pre class="cmd">cd C:\ShareFile\HESEM-QMS-Control\01-Controlled-Working-Repos\qms.hesem.com.vn
-git stash push -m "temp-before-pull"
-git pull origin main
-git stash pop</pre>
-  </div>
-  <div class="step"><strong>Bước 3.</strong> Chỉnh sửa nội dung ngay trong working copy nằm dưới ShareFile. Không sửa trong thư mục export cá nhân. Không đổi tên file tùy ý ngoài rule đặt tên chuẩn.</div>
-  <div class="step"><strong>Bước 4.</strong> Tự kiểm tra: liên kết nội bộ còn mở được, mã tài liệu đúng, version label đúng, revision note rõ, link FRM/WI/ANNEX/SOP không chết.</div>
-  <div class="step"><strong>Bước 5.</strong> Đưa bản dự thảo và peer review log vào thư mục review pack trong ShareFile theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-116-sharefile-sync.html">ANNEX-116</a>.</div>
-  <div class="step"><strong>Bước 6.</strong> Commit và push local lên GitHub.
-    <pre class="cmd">git status --short
-git add &lt;file-1&gt; &lt;file-2&gt;
-git commit -m "docs: &lt;noi-dung-thay-doi&gt;"
-git push origin main</pre>
-  </div>
-  <div class="step"><strong>Bước 7.</strong> Trên cPanel dùng một trong hai cách:
-    <ul class="tight">
-      <li><b>Cách có giao diện:</b> đăng nhập portal Admin và bấm <b>Pull to Portal</b>.</li>
-      <li><b>Cách terminal:</b> chạy <span class="mono">git pull --ff-only origin main</span> trong repo path trên cPanel.</li>
-    </ul>
-  </div>
-  <div class="step"><strong>Bước 8.</strong> Xác nhận point-of-use sau pull: mở đúng tài liệu live trên portal, kiểm tra version, link và nội dung ở đúng nơi dùng.</div>
-  <div class="step"><strong>Bước 9.</strong> Lưu bằng chứng phát hành vào ShareFile: DCR, peer review, commit hash, ngày pull trên cPanel, ảnh/smoke test hoặc check list triển khai.</div>
-  <div class="step"><strong>Bước 10.</strong> Cập nhật sổ đăng ký và thông báo triển khai theo <a href="../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a>.</div>
-</div>
+      <div class="section">
+        <h2>8. Online forms boundary</h2>
+        <ul>
+          <li>Form definition, released schema, source template và supporting source code đi theo source cycle của WI-107.</li>
+          <li>Form submissions, approvals, operational responses và record payload đi về records libraries hoặc runtime record areas theo <a href="wi-101-digital-online-forms-and-approvals.html">WI-101</a>.</li>
+          <li>Workflow runtime files trong <span class="code">qms-data/form-workflow</span> không được coi là source artifact.</li>
+        </ul>
+      </div>
 
-<div class="section">
-  <h2>5. Chu kỳ ngoại lệ: cPanel → GitHub → ShareFile local</h2>
-  <div class="callout-strong"><strong>Chỉ dùng khi có lý do rõ:</strong> sửa lỗi live point-of-use, sửa liên kết hỏng, sửa chính tả/hiển thị gây hiểu sai, hoặc xử lý gián đoạn mà không thể chờ vòng local chuẩn.</div>
-  <div class="step"><strong>Bước 1.</strong> Chỉ sửa trong repo thật đang chạy portal. Không sửa ở thư mục <span class="mono">public_html</span> hay bản sao ngoài repo.</div>
-  <div class="step"><strong>Bước 2.</strong> Sau khi sửa trên portal/cPanel, bấm <b>Push to Git</b>. Nút này sẽ commit các thay đổi meaningful và tự bỏ qua file runtime.</div>
-  <div class="step"><strong>Bước 3.</strong> Về local working copy trong ShareFile và kéo thay đổi mới nhất về.
-    <pre class="cmd">cd C:\ShareFile\HESEM-QMS-Control\01-Controlled-Working-Repos\qms.hesem.com.vn
-git pull origin main</pre>
-  </div>
-  <div class="step"><strong>Bước 4.</strong> Đối chiếu local với nội dung đang live trên cPanel, bổ sung release evidence vào ShareFile và cập nhật DCR nếu đây là thay đổi có kiểm soát.</div>
-  <div class="step"><strong>Bước 5.</strong> Nếu thay đổi cPanel là thay đổi logic/quy trình chứ không chỉ là hotfix hiển thị, Document Owner phải chuẩn hóa lại revision note và hoàn tất review/approval ngay trong ngày làm việc kế tiếp.</div>
-  <div class="step"><strong>Lưu ý quan trọng về nút Pull:</strong> khi bấm <b>Pull to Portal</b>, hệ thống hiện tại sẽ tự dọn runtime noise, thử pre-sync các thay đổi meaningful trên cPanel trước, rồi mới chạy <span class="mono">pull --ff-only</span>. Tuy nhiên về vận hành chuẩn, sau khi vừa sửa trên cPanel bạn vẫn nên bấm <b>Push to Git</b> rõ ràng trước để dấu vết phát hành minh bạch hơn.</div>
-</div>
+      <div class="section">
+        <h2>9. Evidence bắt buộc cho mỗi release</h2>
+        <ul>
+          <li>CommitId và GitRef</li>
+          <li>Release manifest</li>
+          <li>Deploy receipt</li>
+          <li>Smoke test hoặc point-of-use verification</li>
+          <li>Rollback readiness</li>
+          <li>Reverse-sync close-out nếu có hotfix</li>
+        </ul>
+      </div>
 
-<div class="section">
-  <h2>6. Quy tắc phiên bản và bằng chứng ISO</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr><th>Tình huống</th><th>Nhãn làm việc</th><th>Nhãn phát hành có hiệu lực</th><th>Bằng chứng tối thiểu</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Soạn thảo chưa phát hành</td><td>Draft nội bộ theo DCR/review pack</td><td>Chưa có hiệu lực point-of-use</td><td>DCR, review notes, file đang soạn trong ShareFile working copy</td></tr>
-        <tr><td>Phát hành lần đầu</td><td>Bản đã chốt sau review và approval</td><td>Tuân theo rule phát hành lần đầu tại hệ thống kiểm soát tài liệu</td><td>DCR đã duyệt, peer review, commit hash, pull cPanel, xác nhận point-of-use</td></tr>
-        <tr><td>Cập nhật nhỏ</td><td>Sửa link, chính tả, định dạng, làm rõ nội dung</td><td>Tăng minor theo rule phát hành của hệ thống</td><td>DCR, revision note cụ thể, commit hash, bằng chứng triển khai nếu ảnh hưởng point-of-use</td></tr>
-        <tr><td>Cập nhật lớn</td><td>Đổi logic, vai trò, gate, phạm vi, hệ thống lưu</td><td>Tăng major theo rule phát hành của hệ thống</td><td>DCR đầy đủ, cross-review, approval, deployment evidence, đào tạo/re-brief nếu cần</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="step"><strong>Rule kiểm soát:</strong> Git commit là dấu vết kỹ thuật; DCR và release evidence trong ShareFile mới là gói chứng cứ audit. Một thay đổi chỉ được xem là khép kín khi có đủ <b>commit hash + bằng chứng pull live + hồ sơ review/phê duyệt</b>.</div>
-</div>
+      <div class="section">
+        <h2>10. Không được go-live khi</h2>
+        <ul>
+          <li>Worktree local chưa tách khỏi git-dir</li>
+          <li>Source library vẫn mở external sharing</li>
+          <li>Runtime noise còn bị stage vào commit</li>
+          <li>Deploy không truy được manifest và smoke evidence</li>
+          <li>Server hotfix chưa có reverse-sync close-out</li>
+        </ul>
+      </div>
 
-<div class="section">
-  <h2>7. File nào được đồng bộ và file nào bị loại trừ</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr><th>Nhóm</th><th>Ví dụ</th><th>Xử lý</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Tài liệu có kiểm soát</td><td>HTML SOP/WI/ANNEX/Manual, file biểu mẫu phát hành, file hướng dẫn, manifest/state của tài liệu cần theo version</td><td>Được commit, push, pull và phải đi trong vòng lặp kiểm soát.</td></tr>
-        <tr><td>Runtime noise</td><td><span class="mono">01-QMS-Portal/qms-data/sessions/</span>, <span class="mono">ratelimit/</span>, <span class="mono">php_error.log</span>, <span class="mono">scan_cache.json</span>, <span class="mono">form-workflow/</span>, <span class="mono">config/users.json</span></td><td>Bị bỏ qua khi dùng nút sync trên portal; không được xem là thay đổi tài liệu.</td></tr>
-        <tr><td>Export cá nhân</td><td>file tải về máy, file gửi chat, bản in scan tạm, ảnh chụp màn hình cá nhân</td><td>Không được xem là master copy; chỉ dùng làm bằng chứng phụ khi đưa vào release pack đúng chỗ.</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<div class="section">
-  <h2>8. Thông điệp thường gặp và cách xử lý</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr><th>Thông điệp</th><th>Ý nghĩa</th><th>Cách xử lý</th></tr>
-      </thead>
-      <tbody>
-        <tr><td><span class="mono">No non-runtime changes to sync</span></td><td>Hiện không có thay đổi meaningful để push; chỉ có file tạm hoặc không có gì mới.</td><td>Kiểm tra <span class="mono">git status --short</span>. Nếu không có file tài liệu thì không cần làm gì thêm.</td></tr>
-        <tr><td><span class="mono">fetch first</span> hoặc remote has new commits</td><td>GitHub đã có commit mới hơn local.</td><td>Trên local chạy <span class="mono">git fetch origin</span>, <span class="mono">git pull --rebase origin main</span>, xử lý conflict nếu có rồi mới push.</td></tr>
-        <tr><td><span class="mono">Permission denied (publickey)</span></td><td>cPanel chưa xác thực được với GitHub qua SSH.</td><td>Kiểm tra <span class="mono">ssh -T git@github.com</span>, remote URL và SSH key trên GitHub.</td></tr>
-        <tr><td><span class="mono">working_tree_dirty</span></td><td>Trên cPanel còn thay đổi meaningful chưa tích hợp.</td><td>Bấm <b>Push to Git</b> nếu muốn giữ thay đổi, hoặc rà soát và bỏ thay đổi sai trong Terminal.</td></tr>
-        <tr><td><span class="mono">Author identity unknown</span></td><td>Manual commit trên cPanel chưa có <span class="mono">user.name</span>/<span class="mono">user.email</span>.</td><td>Thiết lập Git config trên cPanel. Khi dùng nút portal, hệ thống đã tự gắn commit author cho thao tác đồng bộ.</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<div class="section">
-  <h2>9. Điều cấm bắt buộc</h2>
-  <ul class="tight">
-    <li>Không sửa tài liệu live ở thư mục ngoài repo rồi mong <span class="mono">git pull</span> tự đồng bộ ngược.</li>
-    <li>Không dùng cùng một working copy Git trong ShareFile cho nhiều người cùng ghi đồng thời.</li>
-    <li>Không để thay đổi cPanel không được đẩy về Git và local quá một ca làm việc.</li>
-    <li>Không bỏ qua DCR/release evidence chỉ vì đã có commit hash.</li>
-    <li>Không xem file runtime là chứng cứ thay đổi tài liệu.</li>
-  </ul>
-</div>
-
-<div class="section">
-  <h2>10. Tài liệu và hồ sơ phải dùng cùng</h2>
-  <div class="table-card">
-    <table class="matrix-table">
-      <thead>
-        <tr><th>Nhóm</th><th>Tài liệu</th><th>Vai trò trong WI này</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>SOP</td><td><a href="../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> ; <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> ; <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td><td>Khóa rule kiểm soát tài liệu, dữ liệu, quyền và thay đổi hệ thống.</td></tr>
-        <tr><td>WI</td><td><a href="wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a></td><td>Điều hướng end user đến đúng tài liệu point-of-use sau khi đã phát hành.</td></tr>
-        <tr><td>ANNEX</td><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-116-sharefile-sync.html">ANNEX-116</a> ; <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> ; <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> ; <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td><td>Khóa cấu trúc ShareFile local, vùng M365/SharePoint và quy tắc phân quyền/lưu giữ.</td></tr>
-        <tr><td>Hồ sơ</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-101_Master_Document_Register.xlsx">FRM-101</a> ; <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-102_Document_Change_Request.xlsx">FRM-102</a> ; <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-104_Document_Deployment_Checklist.xlsx">FRM-104</a> ; <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-105_Peer_Review_Log.xlsx">FRM-105</a></td><td>Dùng để ghi version, change request, triển khai và review.</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+      <div class="section">
+        <h2>11. Tài liệu liên kết</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Nhóm</th><th>Tài liệu</th><th>Vai trò</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>SOP</td><td><a href="../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> ; <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> ; <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td><td>Khóa document control, governance và change control.</td></tr>
+              <tr><td>ANNEX</td><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-116-sharefile-sync.html">ANNEX-116</a> ; <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a> ; <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td><td>Khóa workspace model, flow control và boundary.</td></tr>
+              <tr><td>WI</td><td><a href="wi-101-digital-online-forms-and-approvals.html">WI-101</a> ; <a href="wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a></td><td>Khóa forms boundary và site/library setup.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Nguồn chính thức tham khảo:</strong> <a href="https://support.microsoft.com/en-us/office/work-with-synced-files-in-file-explorer-8d9b1c45-4a3f-4fa8-a55b-fd0635e77d4d" target="_blank" rel="noopener">Microsoft Support - Work with synced files in File Explorer</a>; <a href="https://support.microsoft.com/en-us/office/restrictions-and-limitations-in-onedrive-and-sharepoint-64883a5d-228e-48f5-b3d2-eb39e07630fa" target="_blank" rel="noopener">Microsoft Support - Restrictions and limitations in OneDrive and SharePoint</a>.</div>
+      </div>
 
     </div>
   </div>

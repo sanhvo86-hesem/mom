@@ -1,46 +1,59 @@
-# Excel Form Version Control Architecture
+﻿# Excel Form Version Control Architecture
 
-Date: 2026-03-22
+Date: 2026-03-25
 
-## Why this model
+## Purpose
 
-The portal now manages Excel forms with a document-control model aligned to common enterprise practice:
+This note defines the boundary between controlled source, runtime workflow data, released form files, and evidence for Excel-form control in the HESEM portal.
 
-1. Keep one canonical live workbook at the controlled public path.
-2. Use check-out / draft upload before review.
-3. Require submit-for-review before release.
-4. Keep released history immutable outside web root.
-5. Allow authenticated download of both the current release and approved obsolete versions.
+## Source and runtime boundary
 
-This follows the direction used by Microsoft document libraries (check-out, check-in, approval, version history, restore) and spreadsheet-governance guidance such as ICAEW's recommendation to maintain regular backup and version control, and to manage access levels.
+### Controlled source
 
-## Reference direction
+These artifacts belong to the SharePoint-synced source tree and Git-controlled source path defined in [ANNEX-136](../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html) and [WI-107](../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html):
 
-- Microsoft Support: check out, check in, or discard changes in a library
-- Microsoft Support: require approval and draft-item security in a library
-- Microsoft Support: view version history and restore a previous version
-- ICAEW: maintain regular backup and version control, and manage access levels for spreadsheets
+- PHP/JS/HTML source that implements the form workflow
+- released form definitions and source templates
+- source-controlled configuration that is approved to move through Git and deployment
+
+### Runtime workflow data
+
+These artifacts are runtime data and must stay under server/runtime control, not in the SharePoint source library and not in Git source history:
+
+- `01-QMS-Portal/qms-data/form-workflow/<CODE>/files/...`
+- `01-QMS-Portal/qms-data/form-workflow/<CODE>/state.json`
+- `01-QMS-Portal/qms-data/form-workflow/<CODE>/manifest.json`
+- archived binaries created by runtime workflow actions
+- review-state payload created by the live system
 
 ## Adopted workflow
 
 For `.xlsx`, `.xlsm`, `.xls`, and `.csv` forms registered in `form_control_registry.json`:
 
-1. Baseline `V0` stays at the canonical live path under `04-Bieu-Mau/...`.
-2. Starting a new revision creates a workflow state entry only. No live file is overwritten.
-3. Uploading a draft stores the binary in private runtime data under `qms-data-private/form-workflow/<CODE>/files/...`.
+1. Baseline `V0` stays at the canonical controlled live path under `04-Bieu-Mau/...`.
+2. Starting a new revision creates workflow state only; it does not overwrite the released live file.
+3. Uploading a draft stores the binary in runtime data under `01-QMS-Portal/qms-data/form-workflow/<CODE>/files/...`.
 4. Submitting for review promotes the working binary from `DRAFT` to `INREVIEW`.
-5. Approval copies the reviewed binary to the canonical live path and archives the previous live release as an immutable obsolete version in private runtime storage.
+5. Approval copies the reviewed binary to the canonical live path and archives the previous live release in runtime storage.
 6. Reject moves the in-review binary back to draft.
 7. Delete draft removes only working copies and restores the released state.
 
 ## Storage rules
 
-- Live current release: web root, canonical form path.
-- Working draft / in-review files: private runtime data, outside web root.
-- Obsolete approved history: private runtime data, outside web root.
-- Metadata and history: `state.json` and `manifest.json` per form in private runtime data.
+- Live current release: canonical controlled form path under `04-Bieu-Mau/...`
+- Working draft / in-review files: `01-QMS-Portal/qms-data/form-workflow/...`
+- Obsolete approved history: `01-QMS-Portal/qms-data/form-workflow/...`
+- Source code and released schema definitions: SharePoint-synced source tree + Git
+- Deployment evidence: `10-QMS-Source-Control/03-Server-Deploy-Receipts/{YYYY}/`
+- Source promotion evidence: `10-QMS-Source-Control/02-Release-Manifests/{YYYY}/`
 
-The workbook binary is not rewritten to inject release metadata. Version control is handled by sidecar metadata plus immutable archived binaries.
+## Operational rule
+
+The workbook binary is not rewritten to inject release metadata. Version control is handled by:
+
+- source control for code and approved source definitions
+- runtime state for draft/in-review/archive workflow payload
+- controlled live release at the form path
 
 ## API and UI touchpoints
 
@@ -50,24 +63,17 @@ The workbook binary is not rewritten to inject release metadata. Version control
 - Workflow actions: `01-QMS-Portal/scripts/portal/04-workflow-actions.js`
 - Version history panel: `01-QMS-Portal/scripts/portal/05-workflow-panel.js`
 
-## Operational notes
+## Evidence expectations
 
-- Current release downloads use `api.php?action=doc_stream`.
-- Historical workbook downloads use `api.php?action=form_version_stream`.
-- After first released revision beyond `V0`, the registry entry is upgraded from `v0_registry_checksum_control` to `private_archive_release_control`.
-- This model assumes runtime private data is preserved across deploys. Do not delete `qms-data-private` if you need form history.
+Every production release that changes Excel-form workflow behavior must have:
 
-## Smoke test outcome
+- approved source change / manifest in `10-QMS-Source-Control/02-Release-Manifests/{YYYY}/`
+- deploy receipt in `10-QMS-Source-Control/03-Server-Deploy-Receipts/{YYYY}/`
+- reverse-sync close-out if any hotfix originated on the server
 
-Validated in isolated local runtime on `FRM-101`:
+## References
 
-- `V0 -> V0.1`: start revision, upload draft, submit review, approve, current download, obsolete download.
-- `V0.1 -> V0.2 draft`: upload draft, submit review, reject, discard draft, restore released state.
-
-Observed result:
-
-- current live release advanced correctly,
-- obsolete release remained downloadable,
-- draft cleanup did not damage the released workbook,
-- registry revision advanced to `V0.1`,
-- registry control model changed to `private_archive_release_control`.
+- [ANNEX-136](../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html)
+- [WI-107](../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html)
+- [WI-101](../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html)
+- [SOP-104](../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html)

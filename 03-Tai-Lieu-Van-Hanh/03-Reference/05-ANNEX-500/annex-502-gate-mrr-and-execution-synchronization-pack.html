@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G5 | HESEM QMS</title>
+<title>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G7 | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 
 <style>
@@ -75,7 +75,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
       <h1>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G7</h1>
       
 <div class="section"><h2>1. Mục đích, cách dùng và ranh giới</h2>
-<p>ANNEX này là bộ matrix dùng chung để đồng bộ <strong>cổng kiểm soát, MRR, bàn giao field, vai trò quyền sở hữu và điều kiện đồng bộ dữ liệu</strong> từ G0 đến G6. ANNEX này <strong>không thay</strong> WI vận hành tại Point-of-use. Người sử dụng tra ANNEX này để biết mỗi cổng kiểm soát cần bộ hồ sơ nào, ai được quyền mở/giữ/nhả cổng kiểm soát, phải bàn giao trường dữ liệu nào và khi nào phải dừng vì lệch phiên bản hoặc lệch nguồn dữ liệu.</p>
+<p>ANNEX này là bộ matrix dùng chung để đồng bộ <strong>cổng kiểm soát, MRR, bàn giao field, vai trò quyền sở hữu và điều kiện đồng bộ dữ liệu</strong> từ G0 đến G7. ANNEX này <strong>không thay</strong> WI vận hành tại Point-of-use. Người sử dụng tra ANNEX này để biết mỗi cổng kiểm soát cần bộ hồ sơ nào, ai được quyền mở/giữ/nhả cổng kiểm soát, phải bàn giao trường dữ liệu nào và khi nào phải dừng vì lệch phiên bản hoặc lệch nguồn dữ liệu.</p>
 <div class="callout-warning"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ đóng cổng kiểm soát khi đủ mục nhập tiêu chí, đủ MRR tối thiểu và trạng thái giữa SoR, SSOT, traveler và mã vạch đã đồng nhất.</div>
 <div class="two-col">
 <div class="card"><h3>SoR</h3><p>Nguồn chuẩn cho giao dịch gốc: ERP / lô giao hàng / lộ trình gia công / pack / hàng tồn kho.</p></div>
@@ -84,22 +84,26 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>2. Cổng kiểm soát map G0–G7</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Mục tiêu</th><th>Mục nhập tiêu chí</th><th>Responsible Person Quyết định</th><th>MRR tối thiểu</th><th>Hold tín hiệu mạnh nhất</th></tr></thead><tbody>
-<tr><td><span class="badge-blue">G0 — RFQ / Hợp đồng khởi động</span></td><td>Khóa Requests khách hàng, rev, CSR, qty, ngày đến hạn, QPL sơ bộ</td><td>RFQ/PO rõ, file kỹ thuật có thể đọc, giả định đã ghi</td><td>Kinh doanh / Kỹ thuật</td><td>RFQ sổ đăng ký, rà soát hợp đồng, khởi động bảng kiểm</td><td>Thiếu file kỹ thuật, rev mơ hồ, Requests xung đột</td></tr>
-<tr><td><span class="badge-blue">G1 — Kế hoạch / Phát hành kỹ thuật</span></td><td>Khóa mốc chuẩn, lộ trình gia công, setup, tool, program, kiểm tra Requests</td><td>Mốc chuẩn Released, lập kế hoạch phát hành PASS</td><td>Kỹ thuật / Kế hoạch</td><td>Setup sheet, lộ trình gia công, danh sách dao cụ, kiểm tra Requests, Kế hoạch Phát hành Bảng kiểm</td><td>không khớp giữa drawing/setup/program/kế hoạch kiểm soát</td></tr>
-<tr><td><span class="badge-blue">G3 — Setup / mẫu đầu (đầu tiên chi tiết / sản phẩm) / FAI phát hành</span></td><td>Xác nhận máy có thể chạy lô theo CTQ đã phê duyệt</td><td>Bộ hồ sơ công việc (job gói hồ sơ) đủ, machine ready, gage ready, mẫu đầu plan rõ</td><td>Sản xuất + QA</td><td>Setup & mẫu đầu hồ sơ, FAI/mẫu đầu bằng chứng</td><td>Thiếu gage, thiếu ký-off, sai bù trừ (bù trừ (offset)) / sai fixture / sai mốc chuẩn (mốc chuẩn (datum))</td></tr>
-<tr><td><span class="badge-blue">G4 — Sản xuất thực thi / IPQC control</span></td><td>Giữ ổn định trong chạy lô, phản ứng nhanh khi trôi / sai lệch</td><td>G2 đã nhả, điều phối xuất hàng list hợp lệ, WIP rule rõ</td><td>Sản xuất Supervisor / QA</td><td>Điều phối list, traveler, IPQC/SPC/AQL hồ sơ khi áp dụng</td><td>WIP không truy vết được, bỏ lỡ kiểm tra, trôi / sai lệch nhưng không phản ứng</td></tr>
-<tr><td><span class="badge-blue">G4 — Kiểm tra cuối / lô giao hàng gói hồ sơ ready</span></td><td>Khóa kết quả cuối, CoC/cert/pack Requests</td><td>Lot hoàn tất, làm lại đóng, cert thu đủ</td><td>QA + WHS</td><td>Kiểm tra cuối báo cáo, kiểm tra cuối sổ đăng ký, lô giao hàng bảng kiểm draft</td><td>Thiếu cert, truy vết hỏng / gãy, pack level không đúng</td></tr>
-<tr><td><span class="badge-blue">G7 — Phê duyệt giao hàng (ship phát hành) / kết thúc / đóng hồ sơ</span></td><td>Cho phép giao hàng và khóa bằng chứng để kết thúc / đóng hồ sơ / lập hóa đơn</td><td>Lô giao hàng gói hồ sơ PASS, đối chiếu đóng gói PASS, thẩm quyền đúng</td><td>WHS + QA + Finance khi kết thúc / đóng hồ sơ</td><td>Giao vận Bảng kiểm, ship label, đối chiếu đóng gói, CoC, bằng chứng of lấy hàng</td><td>SSCC / label / phiếu kê đóng gói (phiếu kê đóng gói) / CoC không khớp hoặc lô giao hàng chưa ĐÃ PHÁT HÀNH</td></tr>
+<tr><td><span class="badge-blue">G0 — Contract</span></td><td>Khóa Requests khách hàng, rev, CSR, qty, ngày đến hạn, QPL sơ bộ</td><td>RFQ/PO rõ, file kỹ thuật có thể đọc, giả định đã ghi</td><td>Kinh doanh / Kỹ thuật</td><td>RFQ sổ đăng ký, rà soát hợp đồng, khởi động bảng kiểm</td><td>Thiếu file kỹ thuật, rev mơ hồ, Requests xung đột</td></tr>
+<tr><td><span class="badge-blue">G1 — Engineering</span></td><td>Khóa mốc chuẩn, DFM, CAM/NC release, baseline package, lộ trình gia công, tool, program, kiểm tra Requests</td><td>Mốc chuẩn Released, baseline package phát hành PASS</td><td>Kỹ thuật</td><td>DFM review, baseline package, routing, setup sheet gốc, danh sách dao cụ, kiểm tra Requests, Kế hoạch Phát hành Bảng kiểm</td><td>không khớp giữa drawing/setup/program/kế hoạch kiểm soát</td></tr>
+<tr><td><span class="badge-blue">G2 — IQC</span></td><td>Xác nhận material đạt yêu cầu, cert hợp lệ, truy xuất lot/heat</td><td>Material nhận về, cert check hoàn tất, IQC pass</td><td>Supply Chain / QA</td><td>Receiving log, material cert, IQC result, lot/heat traceability</td><td>Thiếu cert, material không đạt, lot/heat không truy xuất được</td></tr>
+<tr><td><span class="badge-blue">G3 — Setup</span></td><td>Xác nhận máy sẵn sàng, program đúng rev, fixture/tool/gage ready</td><td>Bộ hồ sơ công việc (job gói hồ sơ) đủ, machine ready, gage ready, program đúng rev</td><td>Kỹ thuật / Sản xuất</td><td>Setup sheet, program link, fixture/tool readiness, gage readiness, pre-run verification</td><td>Thiếu gage, thiếu ký-off, sai bù trừ (bù trừ (offset)) / sai fixture / sai mốc chuẩn (mốc chuẩn (datum))</td></tr>
+<tr><td><span class="badge-blue">G4 — FAI</span></td><td>Xác nhận chi tiết đầu tiên đạt CTQ đã phê duyệt</td><td>Setup hoàn tất, mẫu đầu plan rõ, gage sẵn sàng</td><td>QA + Sản xuất</td><td>FAI/mẫu đầu báo cáo, balloon drawing, measurement data, phát hành quyết định</td><td>FAI không đạt, thiếu balloon/raw data, sai đặc tính CTQ</td></tr>
+<tr><td><span class="badge-blue">G5 — IPQC</span></td><td>Giữ ổn định trong chạy lô, phản ứng nhanh khi trôi / sai lệch</td><td>G4 đã nhả, điều phối xuất hàng list hợp lệ, WIP rule rõ</td><td>Sản xuất Supervisor / QA</td><td>Điều phối list, traveler, IPQC/SPC/AQL hồ sơ khi áp dụng</td><td>WIP không truy vết được, bỏ lỡ kiểm tra, trôi / sai lệch nhưng không phản ứng</td></tr>
+<tr><td><span class="badge-blue">G6 — Final QC</span></td><td>Khóa kết quả cuối, CoC/cert/pack Requests</td><td>Lot hoàn tất, làm lại đóng, cert thu đủ</td><td>QA + WHS</td><td>Kiểm tra cuối báo cáo, kiểm tra cuối sổ đăng ký, lô giao hàng bảng kiểm draft</td><td>Thiếu cert, truy vết hỏng / gãy, pack level không đúng</td></tr>
+<tr><td><span class="badge-blue">G7 — Ship</span></td><td>Cho phép giao hàng và khóa bằng chứng để kết thúc / đóng hồ sơ / lập hóa đơn</td><td>Lô giao hàng gói hồ sơ PASS, đối chiếu đóng gói PASS, thẩm quyền đúng</td><td>WHS + QA + Finance khi kết thúc / đóng hồ sơ</td><td>Giao vận Bảng kiểm, ship label, đối chiếu đóng gói, CoC, bằng chứng of lấy hàng</td><td>SSCC / label / phiếu kê đóng gói (phiếu kê đóng gói) / CoC không khớp hoặc lô giao hàng chưa ĐÃ PHÁT HÀNH</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>3. gói / bó MRR bắt buộc theo từng cổng kiểm soát</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Bộ hồ sơ tối thiểu phải truy xuất nguồn gốc được trong 60 giây</th><th>Nơi phải tìm thấy</th><th>Ai chịu trách nhiệm tính đầy đủ</th></tr></thead><tbody>
 <tr><td>G0</td><td>RFQ sổ đăng ký, rà soát hợp đồng, khách hàng Requests / CSR, bản vẽ đang báo giá, log giả định</td><td>ERP + Hồ sơ công việc (hồ sơ công việc)</td><td>Kinh doanh / Người định giá</td></tr>
-<tr><td>G1</td><td>Mốc chuẩn drawing/rev, lộ trình gia công, phiếu cài đặt, program ID, danh sách dao cụ, kế hoạch kiểm soát / kiểm tra Requests, lập kế hoạch phát hành</td><td>ERP + Kỹ thuật thư mục + Hồ sơ công việc</td><td>Kỹ thuật + Kế hoạch</td></tr>
-<tr><td>G2</td><td>Setup and mẫu đầu hồ sơ, balloon/FAI pack khi áp dụng, gage khả dụng / sẵn sàng, machine ready ký-off, bất thường rủi ro ghi chú</td><td>Traveler + Hồ sơ công việc + machine-cạnh / mặt bên gói hồ sơ</td><td>Sản xuất Supervisor + QA</td></tr>
-<tr><td>G3</td><td>Điều phối list, traveler, WIP card, IPQC/SPC/AQL hồ sơ, thời gian ngừng máy / bất thường khởi động lại log, outsource chuyển giao log khi áp dụng</td><td>Machine gói hồ sơ + ERP + SSOT</td><td>Sản xuất / Kế hoạch / QA</td></tr>
-<tr><td>G4</td><td>kiểm tra cuối báo cáo, cert gói / bó, nguyên vật liệu / outsource cert, sai lệch / NCR disposition nếu có, đóng gói level</td><td>QA gói hồ sơ + Giao vận Gói hồ sơ draft</td><td>QA</td></tr>
-<tr><td>G5</td><td>Giao vận Bảng kiểm, giao vận label / SSCC, đối chiếu đóng gói, CoC, bằng chứng of lấy hàng, hóa đơn Requests kích hoạt</td><td>Giao vận Gói hồ sơ + ERP lô giao hàng</td><td>WHS + QA</td></tr>
+<tr><td>G1</td><td>DFM review, CAM/NC phát hành, baseline package, routing, setup sheet gốc, tool list, kiểm tra requirement</td><td>ERP + Kỹ thuật thư mục + Hồ sơ công việc</td><td>Kỹ thuật</td></tr>
+<tr><td>G2</td><td>Receiving inspection, material verification, cert check, lot/heat traceability, IQC handoff</td><td>ERP + Kho + QA gói hồ sơ</td><td>Supply Chain / QA / WHS</td></tr>
+<tr><td>G3</td><td>Setup sheet, danh sách dao cụ, program link, gage mức sẵn sàng, machine ready ký-off, bất thường rủi ro ghi chú</td><td>Traveler + Hồ sơ công việc + machine-cạnh / mặt bên gói hồ sơ</td><td>Kỹ thuật / Sản xuất</td></tr>
+<tr><td>G4</td><td>FAI/mẫu đầu hồ sơ, balloon/FAI pack, gage khả dụng / sẵn sàng, phát hành quyết định</td><td>QA gói hồ sơ + Hồ sơ công việc</td><td>QA / Sản xuất / Kỹ thuật</td></tr>
+<tr><td>G5</td><td>Điều phối list, traveler, WIP card, IPQC/SPC/AQL hồ sơ, thời gian ngừng máy / bất thường khởi động lại log, outsource chuyển giao log khi áp dụng</td><td>Machine gói hồ sơ + ERP + SSOT</td><td>Sản xuất / Kế hoạch / QA</td></tr>
+<tr><td>G6</td><td>kiểm tra cuối báo cáo, cert gói / bó, nguyên vật liệu / outsource cert, sai lệch / NCR disposition nếu có, đóng gói level</td><td>QA gói hồ sơ + Giao vận Gói hồ sơ draft</td><td>QA</td></tr>
+<tr><td>G7</td><td>Giao vận Bảng kiểm, giao vận label / SSCC, đối chiếu đóng gói, CoC, bằng chứng of lấy hàng, hóa đơn Requests kích hoạt</td><td>Giao vận Gói hồ sơ + ERP lô giao hàng</td><td>WHS + QA</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>4. Trường dữ liệu bàn giao bắt buộc giữa các vai</h2>
@@ -114,7 +118,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>5. Dấu hiệu lệch phiên bản-set và hành động bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Dấu hiệu lệch</th><th>Ví dụ thực tế</th><th>Hành động bắt buộc</th><th>Ai phải biết ngay</th></tr></thead><tbody>
 <tr><td>Drawing Rev â‰  Setup sheet Rev</td><td>Bản vẽ Rev C nhưng phiếu cài đặt còn Rev B</td><td>TẠM GIỮ G1/G3. Dừng setup. Thu hồi gói hồ sơ tại máy. thiết lập lại mốc chuẩn lại trước khi chạy.</td><td>Kỹ thuật, Kế hoạch, Sản xuất, QA</td></tr>
-<tr><td>Program ID â‰  Phát hành chương trình (program phát hành) list</td><td>Máy đang gọi chương trình cũ hoặc chương trình không nằm trong mốc chuẩn</td><td>TẠM GIỮ G2/G4. Không chạy đầu tiên cut. Ghi bất thường khởi động lại / sai program sự kiện.</td><td>Sản xuất Supervisor, Kỹ thuật, QA</td></tr>
+<tr><td>Program ID â‰  Phát hành chương trình (program phát hành) list</td><td>Máy đang gọi chương trình cũ hoặc chương trình không nằm trong mốc chuẩn</td><td>TẠM GIỮ G3/G4. Không chạy đầu tiên cut. Ghi bất thường khởi động lại / sai program sự kiện.</td><td>Sản xuất Supervisor, Kỹ thuật, QA</td></tr>
 <tr><td>Traveler / mã vạch / WIP card không khớp lot</td><td>Lot trên khay khác với lot trong traveler</td><td>TẠM GIỮ G3/G5. Cách ly lô, kiểm 100% truy vết, không trộn lại bằng tay.</td><td>Sản xuất, QA, WHS</td></tr>
 <tr><td>Lô giao hàng label / SSCC â‰  pack hồ sơ</td><td>bên ngoài thùng thùng carton dán nhầm SSCC hoặc Pack ID</td><td>TẠM GIỮ G6. Không xác nhận giao hàng (ship xác nhận). đóng gói lại / dán nhãn lại theo quyền hạn cho phép.</td><td>WHS, QA</td></tr>
 </tbody></table></div></div>
@@ -122,11 +126,13 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>6. truy xuất diễn tập 60 giây</h2>
 <div class="callout-info"><strong>Mục tiêu:</strong> tại mỗi cổng kiểm soát, Responsible Person phải mở đúng bằng chứng trong 60 giây. Không tìm thấy trong 60 giây xem như chưa kiểm soát đủ.</div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Phải truy xuất nguồn gốc trong 60 giây</th><th>Đạt khi</th></tr></thead><tbody>
-<tr><td>G1</td><td>Setup sheet đúng Rev, Program ID, Kế hoạch Phát hành Bảng kiểm</td><td>Mở đúng file / đúng bản đang hiệu lực / đúng Job</td></tr>
-<tr><td>G2</td><td>Setup and mẫu đầu hồ sơ, kiểm tra điểm, gage trạng thái</td><td>Thấy rõ người ký, giờ ký và kết quả PASS/TẠM GIỮ</td></tr>
-<tr><td>G3</td><td>Điều phối list, Current WIP trạng thái, bất thường log mở gần nhất</td><td>Xác nhận được lô đang ở đâu, ai giữ và đang chờ gì</td></tr>
-<tr><td>G4</td><td>Kiểm tra cuối báo cáo, cert gói / bó, mở NCR ảnh hưởng lô giao hàng</td><td>Không còn tài liệu thiếu hoặc liên kết lỗi</td></tr>
-<tr><td>G5</td><td>Giao vận Bảng kiểm, label/SSCC, đối chiếu đóng gói, CoC</td><td>Đủ 4 mục và cùng một Pack ID / Lô giao hàng</td></tr>
+<tr><td>G1</td><td>Baseline package, DFM review, CAM/NC program release, routing</td><td>Mở đúng file / đúng bản đang hiệu lực / đúng Job</td></tr>
+<tr><td>G2</td><td>Receiving log, material cert, IQC result, lot/heat traceability</td><td>Thấy rõ cert status, lot match và IQC pass/hold</td></tr>
+<tr><td>G3</td><td>Setup sheet đúng Rev, Program ID, Kế hoạch Phát hành Bảng kiểm</td><td>Mở đúng file / đúng bản đang hiệu lực / đúng Job</td></tr>
+<tr><td>G4</td><td>FAI/mẫu đầu hồ sơ, kiểm tra điểm, gage trạng thái</td><td>Thấy rõ người ký, giờ ký và kết quả PASS/TẠM GIỮ</td></tr>
+<tr><td>G5</td><td>Điều phối list, Current WIP trạng thái, bất thường log mở gần nhất</td><td>Xác nhận được lô đang ở đâu, ai giữ và đang chờ gì</td></tr>
+<tr><td>G6</td><td>Kiểm tra cuối báo cáo, cert gói / bó, mở NCR ảnh hưởng lô giao hàng</td><td>Không còn tài liệu thiếu hoặc liên kết lỗi</td></tr>
+<tr><td>G7</td><td>Giao vận Bảng kiểm, label/SSCC, đối chiếu đóng gói, CoC</td><td>Đủ 4 mục và cùng một Pack ID / Lô giao hàng</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>7. Customer lớp phủ và gói hàng đặc biệt</h2>
@@ -151,7 +157,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="card"><h3>KPI</h3><ul class="tight">
 <li>% cổng kiểm soát đóng đúng hạn theo plan.</li>
 <li>% truy xuất diễn tập PASS trong 60 giây.</li>
-<li>% gói hồ sơ thiếu MRR tại G4/G6.</li>
+<li>% gói hồ sơ thiếu MRR tại G6/G7.</li>
 <li>Số sự cố không khớp phiên bản / gói hồ sơ / lô giao hàng theo tháng.</li>
 </ul></div>
 <div class="card"><h3>Đánh giá nhanh</h3><ul class="tight">

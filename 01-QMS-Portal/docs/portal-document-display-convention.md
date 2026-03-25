@@ -1,6 +1,6 @@
-# Portal Document Display Convention
+﻿# Portal Document Display Convention
 
-Updated: 2026-03-21
+Updated: 2026-03-25
 
 ## Required portal structure
 
@@ -19,10 +19,10 @@ This applies to:
 
 ## Runtime source priority
 
-The portal now uses these helpers:
+The portal uses these helpers:
 
-- `getDocDisplayTitle(doc)` in [01-data-config.js](/C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/scripts/portal/01-data-config.js)
-- `getDocDisplayDescription(doc)` in [01-data-config.js](/C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/scripts/portal/01-data-config.js)
+- `getDocDisplayTitle(doc)` in `01-QMS-Portal/scripts/portal/01-data-config.js`
+- `getDocDisplayDescription(doc)` in `01-QMS-Portal/scripts/portal/01-data-config.js`
 
 Display title priority:
 
@@ -31,16 +31,22 @@ Display title priority:
 
 Display description priority:
 
-1. `qms-data-private/config/doc_descriptions.json`
+1. `01-QMS-Portal/qms-data/config/doc_descriptions.json`
 2. Legacy localized HTML title when it differs from the English display title
-3. `qms-data-private/config/folder_descriptions.json`
+3. `01-QMS-Portal/qms-data/config/folder_descriptions.json`
 
-## Maintenance rules for future imports
+## Boundary rule
+
+- `doc_descriptions.json` and `folder_descriptions.json` are runtime configuration files for the live portal.
+- Controlled source for the portal page code and static documentation lives in the SharePoint-synced source tree and Git path defined by [ANNEX-136](../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html).
+- Runtime config files are not the same thing as controlled source artifacts unless they are explicitly promoted through the approved source path.
+
+## Maintenance rules
 
 - HTML documents: keep the `<title>` as the English standard title, not the Vietnamese summary.
 - Excel forms: keep `form_control_registry.json -> title` in English.
-- Put the Vietnamese explanation in `qms-data-private/config/doc_descriptions.json`.
-- If the document only needs a generic description by folder, keep `folder_descriptions.json` updated.
+- Put the Vietnamese explanation in `01-QMS-Portal/qms-data/config/doc_descriptions.json`.
+- If the document only needs a generic description by folder, keep `01-QMS-Portal/qms-data/config/folder_descriptions.json` updated.
 - Do not mix the English title and Vietnamese description into the same field.
 
 ## Post-import checklist
@@ -59,11 +65,7 @@ For each sample, confirm:
 3. line 3 shows the Vietnamese description
 4. search finds the document by code, English title, and Vietnamese description
 
-## Legacy compatibility note
+## References
 
-The portal can temporarily recover English titles from file names for legacy HTML docs that still carry Vietnamese `<title>` values. Treat this as a compatibility layer only, not the long-term source of truth.
-
-The preferred target state is still:
-
-- English title in document metadata
-- Vietnamese description in `doc_descriptions.json`
+- [ANNEX-136](../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html)
+- [WI-107](../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html)

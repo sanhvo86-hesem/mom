@@ -1,0 +1,36 @@
+﻿HESEM QMS - SharePoint source architecture update report
+Date: 2026-03-25
+
+Updated documents
+- 03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html
+- 03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-132-m365-records-flow-approval-sharing-and-exception-control.html
+- 03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html
+- 03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html
+- 03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html
+- 03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html
+- 03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-116-sharefile-sync.html
+- 03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html
+- 03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html
+- 03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html
+- 03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-101-document-and-data-control.html
+- 03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html
+- 02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html
+- 01-QMS-Portal/docs/excel-form-version-control-architecture.md
+- 01-QMS-Portal/docs/portal-document-display-convention.md
+- 01-QMS-Portal/docs/form-server-delivery-rollout-baseline.md
+
+Architecture now locked
+- Controlled source location: HESEM-Digital-Control / 10-QMS-Source-Control
+- Source path: 10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/
+- Release evidence paths: 02-Release-Manifests/{YYYY}, 03-Server-Deploy-Receipts/{YYYY}, 04-Reverse-Sync-Intake/{YYYY}
+- Sync chain: SharePoint local sync -> Git -> server deployment -> Git -> local sync
+- Runtime boundary: form submissions, sessions, rate-limit data, workflow binaries and runtime payload do not belong in source library
+
+Residual technical items found outside the updated document set
+- .cpanel.yml still references qms-data-private as one-time migration note
+- 01-QMS-Portal/scripts/postdeploy_healthcheck.php still auto-prefers qms-data-private when QMS_DATA_DIR is unset
+- 01-QMS-Portal/scripts/security_reset_all_users.php still auto-prefers qms-data-private when QMS_DATA_DIR is unset
+
+Interpretation
+- The QMS source/governance document layer is now aligned to the SharePoint source-control model.
+- The deployment/runtime helper layer still contains legacy private-runtime fallback logic and should be reviewed separately before declaring full technical convergence.
