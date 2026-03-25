@@ -3480,6 +3480,181 @@ async function adminSaveAll(){
   renderAdmin();
 }
 
+let gitSyncBusyMode = '';
+
+function isGitSyncBusy(){
+  return gitSyncBusyMode === 'pull' || gitSyncBusyMode === 'push';
+}
+
+function adminGitSyncIcon(kind){
+  if(kind === 'pull'){
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 19h14"></path></svg>';
+  }
+  if(kind === 'push'){
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V8"></path><path d="m7 13 5-5 5 5"></path><path d="M5 5h14"></path></svg>';
+  }
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.66-5.66L20 8"></path><path d="M20 4v4h-4"></path><path d="M20 12a8 8 0 0 1-13.66 5.66L4 16"></path><path d="M4 20v-4h4"></path></svg>';
+}
+
+function adminGitPushErrorMessage(res){
+  const error = (res && res.error) ? String(res.error) : 'git_sync_failed';
+  const detail = (res && res.detail) ? String(res.detail) : '';
+  if(error === 'staged_changes_present'){
+    return lang==='en'
+      ? 'There are staged changes on the server already. Commit or unstage them in Terminal before using Git sync.'
+      : 'Server đang có thay đổi đã stage sẵn. Hãy commit hoặc unstage trong Terminal trước khi dùng nút đồng bộ Git.';
+  }
+  if(error === 'exec_unavailable'){
+    return lang==='en'
+      ? 'PHP exec is disabled on hosting, so the portal cannot run git commands.'
+      : 'Hosting đang chặn PHP exec nên portal không thể chạy lệnh git.';
+  }
+  if(error === 'git_push_failed'){
+    return lang==='en'
+      ? 'Git push failed. Please verify the server can push to GitHub with SSH key or token.'
+      : 'Git push thất bại. Hãy kiểm tra server đã cấu hình SSH key hoặc token để đẩy lên GitHub chưa.';
+  }
+  if(error === 'not_a_git_repo' || error === 'repo_not_found'){
+    return lang==='en'
+      ? 'The portal root on this server is not available as a git repository.'
+      : 'Thư mục portal trên server này không sẵn sàng như một repo git.';
+  }
+  if(error === 'git_sync_failed' && detail){
+    return detail;
+  }
+  return detail || (lang==='en' ? 'Git sync failed' : 'Đồng bộ Git thất bại');
+}
+
+function adminGitPullErrorMessage(res){
+  const error = (res && res.error) ? String(res.error) : 'git_pull_failed';
+  const detail = (res && res.detail) ? String(res.detail) : '';
+  if(error === 'working_tree_dirty' || error === 'staged_changes_present'){
+    return lang==='en'
+      ? 'The cPanel repository still has local changes. Commit or discard them in Terminal before pulling from Git.'
+      : 'Repo trên cPanel vẫn còn thay đổi local. Hãy commit hoặc bỏ các thay đổi đó trong Terminal trước khi pull từ Git.';
+  }
+  if(error === 'exec_unavailable'){
+    return lang==='en'
+      ? 'PHP exec is disabled on hosting, so the portal cannot run git commands.'
+      : 'Hosting đang chặn PHP exec nên portal không thể chạy lệnh git.';
+  }
+  if(error === 'git_fetch_failed' || error === 'git_pull_failed'){
+    return lang==='en'
+      ? 'Git pull failed. Please verify the cPanel server can access the remote repository.'
+      : 'Git pull thất bại. Hãy kiểm tra server cPanel có quyền truy cập remote repository.';
+  }
+  if(error === 'not_a_git_repo' || error === 'repo_not_found'){
+    return lang==='en'
+      ? 'The portal root on this server is not available as a git repository.'
+      : 'Thư mục portal trên server này không sẵn sàng như một repo git.';
+  }
+  return detail || (lang==='en' ? 'Git pull failed' : 'Git pull thất bại');
+}
+
+async function adminSyncDocsToGit(){
+  if(!isAdmin() || isGitSyncBusy()) return;
+  const msg = lang==='en'
+    ? 'Push allowed document changes from this cPanel server to Git now? Runtime files such as sessions and rate limits will be ignored.'
+    : 'Đẩy ngay các thay đổi tài liệu được cho phép từ server cPanel này lên Git? Các file runtime như sessions và rate limit sẽ bị bỏ qua.';
+  if(!confirm(msg)) return;
+
+  gitSyncBusyMode = 'push';
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_git_sync', {});
+    if(!(res && res.ok)){
+      showToast('⚠ ' + adminGitPushErrorMessage(res));
+      return;
+    }
+    const fileCount = Array.isArray(res.files) ? res.files.length : 0;
+    if(res.pushed){
+      showToast(fileCount > 0
+        ? ((lang==='en' ? '✅ Pushed to origin/' : '✅ Đã đẩy lên origin/') + (res.branch || 'main') + ' · ' + fileCount + ' ' + (lang==='en' ? 'file(s)' : 'tệp'))
+        : (res.message || (lang==='en' ? '✅ Existing local commits pushed to Git' : '✅ Đã đẩy các commit local còn tồn lên Git'))
+      );
+    }else{
+      showToast(res.message || (lang==='en' ? 'No allowed document changes to sync' : 'Không có thay đổi tài liệu hợp lệ để đồng bộ'));
+    }
+  }catch(e){
+    showToast('⚠ ' + (lang==='en' ? 'Git sync failed' : 'Đồng bộ Git thất bại'));
+  }finally{
+    gitSyncBusyMode = '';
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function adminPullPortalFromGit(){
+  if(!isAdmin() || isGitSyncBusy()) return;
+  const msg = lang==='en'
+    ? 'Pull the latest commit from Git into this cPanel portal now? This runs fast-forward only and requires a clean server repository.'
+    : 'Kéo commit mới nhất từ Git xuống portal trên cPanel ngay bây giờ? Thao tác này chỉ chạy fast-forward và yêu cầu repo trên server đang sạch.';
+  if(!confirm(msg)) return;
+
+  gitSyncBusyMode = 'pull';
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_git_pull', {});
+    if(!(res && res.ok)){
+      showToast('⚠ ' + adminGitPullErrorMessage(res));
+      return;
+    }
+    if(res.pulled){
+      showToast((lang==='en' ? '✅ Portal updated from origin/' : '✅ Portal đã cập nhật từ origin/') + (res.branch || 'main'));
+    }else{
+      showToast(res.message || (lang==='en' ? 'Portal is already up to date' : 'Portal đã ở bản mới nhất'));
+    }
+  }catch(e){
+    showToast('⚠ ' + (lang==='en' ? 'Git pull failed' : 'Git pull thất bại'));
+  }finally{
+    gitSyncBusyMode = '';
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+function renderAdminSyncPanel(){
+  const pullBusy = gitSyncBusyMode === 'pull';
+  const pushBusy = gitSyncBusyMode === 'push';
+  const disablePull = isGitSyncBusy() && !pullBusy;
+  const disablePush = isGitSyncBusy() && !pushBusy;
+
+  return `
+    <section class="admin-sync-strip">
+      <div class="admin-sync-head">
+        <div class="admin-sync-title-wrap">
+          <div class="admin-sync-kicker">${lang==='en'?'Sync Control':'Điều khiển đồng bộ'}</div>
+          <h3>${lang==='en'?'Portal Data Synchronization':'Đồng bộ dữ liệu portal'}</h3>
+          <p>${lang==='en'?'Use Pull to update cPanel from Git, and Push to publish approved portal-side document changes back to GitHub.':'Dùng Pull để cập nhật cPanel từ Git, và dùng Push để đẩy các thay đổi tài liệu hợp lệ từ portal trở lại GitHub.'}</p>
+        </div>
+        <button class="admin-sync-mini" onclick="rescanDocs().then(n=>{showToast('🔄 Scanned: '+n+' docs');renderAdmin()})">
+          <span class="admin-sync-mini-ico">${adminGitSyncIcon('sync')}</span>
+          <span>${lang==='en'?'Rescan folders':'Quét lại thư mục'}</span>
+        </button>
+      </div>
+      <div class="admin-sync-grid">
+        <button class="admin-sync-card is-pull ${pullBusy?'is-busy':''}" onclick="adminPullPortalFromGit()" ${(pullBusy || disablePull)?'disabled':''}>
+          <span class="admin-sync-badge">GitHub -> Portal</span>
+          <span class="admin-sync-icon">${adminGitSyncIcon('pull')}</span>
+          <span class="admin-sync-copy">
+            <span class="admin-sync-label">${lang==='en'?'Pull To Portal':'Pull to Portal'}</span>
+            <span class="admin-sync-desc">${lang==='en'?'Bring the latest committed version from Git into this live cPanel portal.':'Kéo phiên bản đã commit mới nhất từ Git xuống portal đang chạy trên cPanel.'}</span>
+            <span class="admin-sync-note">${lang==='en'?'Fast-forward only, requires clean working tree.':'Chỉ fast-forward, yêu cầu working tree sạch.'}</span>
+          </span>
+          <span class="admin-sync-arrow">${pullBusy ? (lang==='en'?'Running...':'Đang chạy...') : (lang==='en'?'Update portal':'Cập nhật portal')}</span>
+        </button>
+        <button class="admin-sync-card is-push ${pushBusy?'is-busy':''}" onclick="adminSyncDocsToGit()" ${(pushBusy || disablePush)?'disabled':''}>
+          <span class="admin-sync-badge">Portal -> GitHub</span>
+          <span class="admin-sync-icon">${adminGitSyncIcon('push')}</span>
+          <span class="admin-sync-copy">
+            <span class="admin-sync-label">${lang==='en'?'Push To Git':'Push to Git'}</span>
+            <span class="admin-sync-desc">${lang==='en'?'Commit whitelisted document changes from cPanel and publish them back to GitHub.':'Commit các thay đổi tài liệu đã whitelist từ cPanel và đẩy ngược trở lại GitHub.'}</span>
+            <span class="admin-sync-note">${lang==='en'?'Ignores runtime files such as sessions and rate limits.':'Bỏ qua file runtime như sessions và rate limits.'}</span>
+          </span>
+          <span class="admin-sync-arrow">${pushBusy ? (lang==='en'?'Running...':'Đang chạy...') : (lang==='en'?'Publish changes':'Xuất bản thay đổi')}</span>
+        </button>
+      </div>
+    </section>`;
+}
+
 function markUnsaved(){
   adminUnsaved = true;
   const bar = document.getElementById('admin-save-bar');
@@ -3502,10 +3677,7 @@ function renderAdmin(){
       <div class="admin-stat"><div class="val">${DOCS.length}</div><div class="lbl">${T('admin_total_docs')} <span style="font-size:9px;color:#10b981">● LIVE</span></div></div>
       <div class="admin-stat"><div class="val">${activeUsers}</div><div class="lbl">Active</div></div>
     </div>
-    <div style="margin:-8px 0 12px;display:flex;gap:8px">
-      <button onclick="rescanDocs().then(n=>{showToast('🔄 Scanned: '+n+' docs');renderAdmin()})" style="padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg-2);cursor:pointer;font-size:12px;color:var(--text-2)">🔄 ${lang==='en'?'Rescan Folders':'Quét lại thư mục'}</button>
-      <span style="font-size:11px;color:var(--text-3);align-self:center">${lang==='en'?'Auto-detects new files on server':'Tự động phát hiện file mới trên hosting'}</span>
-    </div>
+    ${renderAdminSyncPanel()}
     <div class="admin-tabs-v2">
       <button class="admin-tab-v2 ${adminTab==='users'?'active':''}" onclick="adminTab='users';renderAdmin()">👥 ${T('admin_users')} <span class="tab-badge">${USERS.length}</span></button>
       <button class="admin-tab-v2 ${adminTab==='dept_title'?'active':''}" onclick="adminTab='dept_title';renderAdmin()">🏢 ${lang==='en'?'Dept & Titles':'Phòng ban & Chức danh'}</button>

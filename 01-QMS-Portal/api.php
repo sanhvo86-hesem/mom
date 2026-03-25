@@ -1569,6 +1569,261 @@ function require_csrf(): void {
   }
 }
 
+function shell_exec_available(): bool {
+  if (!function_exists('exec')) return false;
+  $disabled = array_map('trim', explode(',', (string)ini_get('disable_functions')));
+  return !in_array('exec', $disabled, true);
+}
+
+function shell_run(string $command, ?int &$exitCode = null): string {
+  if (!shell_exec_available()) {
+    throw new RuntimeException('exec_unavailable');
+  }
+  $output = [];
+  $code = 0;
+  exec($command . ' 2>&1', $output, $code);
+  $exitCode = $code;
+  return trim(implode("\n", $output));
+}
+
+function git_shell_command(string $repoDir, array $args): string {
+  $parts = [
+    'GIT_TERMINAL_PROMPT=0',
+    'GIT_SSH_COMMAND=' . escapeshellarg('ssh -oBatchMode=yes'),
+    'git',
+    '-C',
+    escapeshellarg($repoDir),
+  ];
+  foreach ($args as $arg) {
+    $parts[] = escapeshellarg((string)$arg);
+  }
+  return implode(' ', $parts);
+}
+
+function git_command(array $args, string $repoDir, ?int &$exitCode = null): string {
+  return shell_run(git_shell_command($repoDir, $args), $exitCode);
+}
+
+function split_nonempty_lines(string $text): array {
+  $lines = preg_split("/\r\n|\n|\r/", trim($text));
+  if (!is_array($lines)) return [];
+  return array_values(array_filter(array_map('trim', $lines), static fn($line) => $line !== ''));
+}
+
+function git_sync_allowed_targets(string $repoDir): array {
+  $targets = [
+    '02-Tai-Lieu-He-Thong',
+    '03-Tai-Lieu-Van-Hanh',
+    '04-Bieu-Mau',
+    '10-Training-Academy',
+    '11-Glossary',
+    '01-QMS-Portal/docs',
+  ];
+
+  $repoNorm = rtrim(str_replace('\\', '/', $repoDir), '/');
+  $configDir = $repoNorm . '/01-QMS-Portal/qms-data/config';
+  if (is_dir($configDir)) {
+    $configFiles = glob($configDir . '/*.json');
+    if (is_array($configFiles)) {
+      sort($configFiles, SORT_STRING);
+      foreach ($configFiles as $file) {
+        $fileNorm = str_replace('\\', '/', (string)$file);
+        $rel = ltrim(substr($fileNorm, strlen($repoNorm)), '/');
+        if ($rel === '' || basename($rel) === 'users.json') continue;
+        $targets[] = $rel;
+      }
+    }
+  }
+
+  return array_values(array_unique($targets));
+}
+
+function git_sync_documents(array $me, string $repoDir): array {
+  $repoReal = realpath($repoDir);
+  if ($repoReal === false || !is_dir($repoReal)) {
+    throw new RuntimeException('repo_not_found');
+  }
+
+  $checkCode = 0;
+  $checkOut = git_command(['rev-parse', '--is-inside-work-tree'], $repoReal, $checkCode);
+  if ($checkCode !== 0 || trim($checkOut) !== 'true') {
+    throw new RuntimeException('not_a_git_repo');
+  }
+
+  $stagedCode = 0;
+  $stagedOut = git_command(['diff', '--cached', '--name-only'], $repoReal, $stagedCode);
+  if ($stagedCode !== 0) {
+    throw new RuntimeException('git_index_check_failed');
+  }
+  $stagedFiles = split_nonempty_lines($stagedOut);
+  if (!empty($stagedFiles)) {
+    throw new RuntimeException('staged_changes_present');
+  }
+
+  $branchCode = 0;
+  $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
+  if ($branchCode !== 0 || $branch === '') $branch = 'main';
+
+  $targets = git_sync_allowed_targets($repoReal);
+  $statusArgs = ['status', '--porcelain', '--untracked-files=all', '--'];
+  array_push($statusArgs, ...$targets);
+  $statusCode = 0;
+  $statusOut = git_command($statusArgs, $repoReal, $statusCode);
+  if ($statusCode !== 0) {
+    throw new RuntimeException('git_status_failed');
+  }
+  $statusLines = split_nonempty_lines($statusOut);
+  if (empty($statusLines)) {
+    $aheadCode = 0;
+    $aheadOut = git_command(['rev-list', '--count', 'origin/' . $branch . '..' . $branch], $repoReal, $aheadCode);
+    $aheadCount = $aheadCode === 0 ? (int)trim($aheadOut) : 0;
+    if ($aheadCount > 0) {
+      $pushCode = 0;
+      $pushOut = git_command(['push', 'origin', $branch], $repoReal, $pushCode);
+      if ($pushCode !== 0) {
+        throw new RuntimeException('git_push_failed' . ($pushOut !== '' ? ': ' . $pushOut : ''));
+      }
+      return [
+        'pushed' => true,
+        'branch' => $branch,
+        'files' => [],
+        'message' => 'Existing local commits pushed to origin/' . $branch,
+        'status' => [],
+        'commit_output' => '',
+        'push_output' => $pushOut,
+      ];
+    }
+    return [
+      'pushed' => false,
+      'branch' => $branch,
+      'files' => [],
+      'message' => 'No allowed document changes to sync.',
+      'status' => [],
+      'commit_output' => '',
+      'push_output' => '',
+    ];
+  }
+
+  $addArgs = ['add', '--'];
+  array_push($addArgs, ...$targets);
+  $addCode = 0;
+  $addOut = git_command($addArgs, $repoReal, $addCode);
+  if ($addCode !== 0) {
+    throw new RuntimeException('git_add_failed' . ($addOut !== '' ? ': ' . $addOut : ''));
+  }
+
+  $filesCode = 0;
+  $filesOut = git_command(['diff', '--cached', '--name-only', '--'], $repoReal, $filesCode);
+  if ($filesCode !== 0) {
+    throw new RuntimeException('git_diff_cached_failed');
+  }
+  $files = split_nonempty_lines($filesOut);
+  if (empty($files)) {
+    return [
+      'pushed' => false,
+      'branch' => $branch,
+      'files' => [],
+      'message' => 'No staged document changes to sync.',
+      'status' => $statusLines,
+      'commit_output' => '',
+      'push_output' => '',
+    ];
+  }
+
+  $actor = strtolower((string)($me['username'] ?? 'portal'));
+  $actor = preg_replace('/[^a-z0-9._-]+/i', '-', $actor) ?: 'portal';
+  $commitMessage = sprintf('docs: portal sync by %s %s UTC', $actor, gmdate('Y-m-d H:i:s'));
+
+  $commitCode = 0;
+  $commitOut = git_command(['commit', '-m', $commitMessage], $repoReal, $commitCode);
+  if ($commitCode !== 0) {
+    throw new RuntimeException('git_commit_failed' . ($commitOut !== '' ? ': ' . $commitOut : ''));
+  }
+
+  $pushCode = 0;
+  $pushOut = git_command(['push', 'origin', $branch], $repoReal, $pushCode);
+  if ($pushCode !== 0) {
+    throw new RuntimeException('git_push_failed' . ($pushOut !== '' ? ': ' . $pushOut : ''));
+  }
+
+  return [
+    'pushed' => true,
+    'branch' => $branch,
+    'files' => $files,
+    'message' => 'Document changes pushed to origin/' . $branch,
+    'status' => $statusLines,
+    'commit_output' => $commitOut,
+    'push_output' => $pushOut,
+  ];
+}
+
+function git_pull_portal(string $repoDir): array {
+  $repoReal = realpath($repoDir);
+  if ($repoReal === false || !is_dir($repoReal)) {
+    throw new RuntimeException('repo_not_found');
+  }
+
+  $checkCode = 0;
+  $checkOut = git_command(['rev-parse', '--is-inside-work-tree'], $repoReal, $checkCode);
+  if ($checkCode !== 0 || trim($checkOut) !== 'true') {
+    throw new RuntimeException('not_a_git_repo');
+  }
+
+  $stagedCode = 0;
+  $stagedOut = git_command(['diff', '--cached', '--name-only'], $repoReal, $stagedCode);
+  if ($stagedCode !== 0) {
+    throw new RuntimeException('git_index_check_failed');
+  }
+  if (!empty(split_nonempty_lines($stagedOut))) {
+    throw new RuntimeException('staged_changes_present');
+  }
+
+  $statusCode = 0;
+  $statusOut = git_command(['status', '--porcelain'], $repoReal, $statusCode);
+  if ($statusCode !== 0) {
+    throw new RuntimeException('git_status_failed');
+  }
+  $dirtyLines = split_nonempty_lines($statusOut);
+  if (!empty($dirtyLines)) {
+    throw new RuntimeException('working_tree_dirty');
+  }
+
+  $branchCode = 0;
+  $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
+  if ($branchCode !== 0 || $branch === '') $branch = 'main';
+
+  $fetchCode = 0;
+  $fetchOut = git_command(['fetch', 'origin', $branch], $repoReal, $fetchCode);
+  if ($fetchCode !== 0) {
+    throw new RuntimeException('git_fetch_failed' . ($fetchOut !== '' ? ': ' . $fetchOut : ''));
+  }
+
+  $behindCode = 0;
+  $behindOut = git_command(['rev-list', '--count', $branch . '..origin/' . $branch], $repoReal, $behindCode);
+  $behindCount = $behindCode === 0 ? (int)trim($behindOut) : 0;
+  if ($behindCount <= 0) {
+    return [
+      'pulled' => false,
+      'branch' => $branch,
+      'message' => 'Portal is already up to date with origin/' . $branch,
+      'pull_output' => $fetchOut,
+    ];
+  }
+
+  $pullCode = 0;
+  $pullOut = git_command(['pull', '--ff-only', 'origin', $branch], $repoReal, $pullCode);
+  if ($pullCode !== 0) {
+    throw new RuntimeException('git_pull_failed' . ($pullOut !== '' ? ': ' . $pullOut : ''));
+  }
+
+  return [
+    'pulled' => true,
+    'branch' => $branch,
+    'message' => 'Portal updated from origin/' . $branch,
+    'pull_output' => trim($fetchOut . ($fetchOut !== '' && $pullOut !== '' ? "\n" : '') . $pullOut),
+  ];
+}
+
 // ---------- Rate limit (simple) ----------
 function rate_limit_check(string $key, int $maxHits, int $windowSec, string $rlDir): void {
   ensure_dir($rlDir);
@@ -1954,6 +2209,90 @@ switch ($action) {
 
     save_role_permissions($ROLE_PERMS_FILE, $clean);
     api_json(['ok' => true, 'perms' => $clean, 'server_time' => now_iso()]);
+  }
+
+  case 'admin_git_sync': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+
+    try {
+      $result = git_sync_documents($me, $ROOT_DIR);
+      api_json([
+        'ok' => true,
+        'pushed' => (bool)($result['pushed'] ?? false),
+        'branch' => (string)($result['branch'] ?? 'main'),
+        'files' => array_values(array_map('strval', $result['files'] ?? [])),
+        'status' => array_values(array_map('strval', $result['status'] ?? [])),
+        'message' => (string)($result['message'] ?? ''),
+        'commit_output' => (string)($result['commit_output'] ?? ''),
+        'push_output' => (string)($result['push_output'] ?? ''),
+        'server_time' => now_iso(),
+      ]);
+    } catch (Throwable $e) {
+      @error_log('[API] admin_git_sync failed: ' . $e->getMessage());
+      $message = $e->getMessage();
+      $error = match (true) {
+        str_starts_with($message, 'exec_unavailable') => 'exec_unavailable',
+        str_starts_with($message, 'repo_not_found') => 'repo_not_found',
+        str_starts_with($message, 'not_a_git_repo') => 'not_a_git_repo',
+        str_starts_with($message, 'staged_changes_present') => 'staged_changes_present',
+        str_starts_with($message, 'git_add_failed') => 'git_add_failed',
+        str_starts_with($message, 'git_commit_failed') => 'git_commit_failed',
+        str_starts_with($message, 'git_push_failed') => 'git_push_failed',
+        str_starts_with($message, 'git_status_failed') => 'git_status_failed',
+        str_starts_with($message, 'git_index_check_failed') => 'git_index_check_failed',
+        str_starts_with($message, 'git_diff_cached_failed') => 'git_diff_cached_failed',
+        default => 'git_sync_failed',
+      };
+      api_json([
+        'ok' => false,
+        'error' => $error,
+        'detail' => $message,
+        'server_time' => now_iso(),
+      ], 500);
+    }
+  }
+
+  case 'admin_git_pull': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+
+    try {
+      $result = git_pull_portal($ROOT_DIR);
+      api_json([
+        'ok' => true,
+        'pulled' => (bool)($result['pulled'] ?? false),
+        'branch' => (string)($result['branch'] ?? 'main'),
+        'message' => (string)($result['message'] ?? ''),
+        'pull_output' => (string)($result['pull_output'] ?? ''),
+        'server_time' => now_iso(),
+      ]);
+    } catch (Throwable $e) {
+      @error_log('[API] admin_git_pull failed: ' . $e->getMessage());
+      $message = $e->getMessage();
+      $error = match (true) {
+        str_starts_with($message, 'exec_unavailable') => 'exec_unavailable',
+        str_starts_with($message, 'repo_not_found') => 'repo_not_found',
+        str_starts_with($message, 'not_a_git_repo') => 'not_a_git_repo',
+        str_starts_with($message, 'staged_changes_present') => 'staged_changes_present',
+        str_starts_with($message, 'working_tree_dirty') => 'working_tree_dirty',
+        str_starts_with($message, 'git_fetch_failed') => 'git_fetch_failed',
+        str_starts_with($message, 'git_pull_failed') => 'git_pull_failed',
+        str_starts_with($message, 'git_status_failed') => 'git_status_failed',
+        str_starts_with($message, 'git_index_check_failed') => 'git_index_check_failed',
+        default => 'git_pull_failed',
+      };
+      api_json([
+        'ok' => false,
+        'error' => $error,
+        'detail' => $message,
+        'server_time' => now_iso(),
+      ], 500);
+    }
   }
 
   // ==========================================================
