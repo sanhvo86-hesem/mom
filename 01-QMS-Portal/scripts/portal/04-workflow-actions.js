@@ -1528,13 +1528,8 @@ function getLatestWorkingFile(code){
 
 function getDocViewFile(doc){
   if(!doc) return null;
-  const code=doc.code;
-  const st=getDocState(code)||{};
-  const working=getLatestWorkingFile(code);
-  if(working && (st.status==='draft' || st.status==='in_review' || st.status==='pending_approval')){
-    // ISO-style: only editors/reviewers/approvers/admin see the working copy
-    if(isAdmin() || canEdit(doc) || canReview(doc) || canApprove(doc)) return working;
-  }
+  // Master view must always point to the current released file (version history "Hiện tại")
+  // to keep sidebar/header/document metadata consistent.
   return doc.path;
 }
 

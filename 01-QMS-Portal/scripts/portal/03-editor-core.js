@@ -218,24 +218,28 @@ function canCreateNewDoc(){
   return !!(r && r.canCreateDocs);
 }
 
-function getDocRevision(doc){
-  const state=getDocState(doc.code)||{};
-  const stateRev=String(state.revision||doc.rev||'0').replace(/^v/i,'').trim() || '0';
+function getDocCurrentReleasedEntry(doc){
+  if(!doc) return null;
   const versions=(typeof getDocVersions==='function') ? (getDocVersions(doc.code)||[]) : [];
-  const released=versions.find(function(v){
-    const st=String((v&&v.status)||'');
-    return st==='approved' || st==='initial_release';
-  });
+  if(!Array.isArray(versions) || versions.length===0) return null;
+  return versions.find(v=>v && v.is_current)
+    || versions.find(v=>v && (v.status==='approved' || v.status==='initial_release'))
+    || null;
+}
+
+function getDocWorkingRevision(doc){
+  const state=getDocState(doc.code)||{};
+  return String(state.revision||doc.rev||'0').replace(/^v/i,'').trim() || '0';
+}
+
+function getDocRevision(doc){
+  const released=getDocCurrentReleasedEntry(doc);
   const releasedRev=String((released&&released.version)||'').replace(/^v/i,'').trim();
-  if(!releasedRev) return stateRev;
-  const toPair=function(rev){
-    const p=String(rev||'0').split('.');
-    return [parseInt(p[0]||'0',10)||0, parseInt(p[1]||'0',10)||0];
-  };
-  const s=toPair(stateRev);
-  const r=toPair(releasedRev);
-  if(r[0]>s[0] || (r[0]===s[0] && r[1]>s[1])) return releasedRev;
-  return stateRev;
+  if(releasedRev) return releasedRev;
+  const state=getDocState(doc.code)||{};
+  const fallbackReleased=String(state.released_revision||'').replace(/^v/i,'').trim();
+  if(fallbackReleased) return fallbackReleased;
+  return String(doc.rev||'0').replace(/^v/i,'').trim() || '0';
 }
 
 function getDocStatus(doc){

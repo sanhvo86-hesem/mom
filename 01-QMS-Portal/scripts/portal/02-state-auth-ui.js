@@ -367,6 +367,20 @@ function portalCategoryHasPhysicalTree(catId){
   }
 }
 
+function getPortalCategoryPhysicalNodeCount(catId){
+  try{
+    if(typeof getTreeNodesForCategory !== 'function') return 0;
+    const nodes = getTreeNodesForCategory(catId);
+    if(!Array.isArray(nodes) || nodes.length === 0) return 0;
+    const catDocs = Array.isArray(DOCS) ? DOCS.filter(d => d && d.cat === catId) : [];
+    const root = (typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(catId, catDocs) : null;
+    if(root && Array.isArray(root.subs) && root.subs.length > 0) return root.subs.length;
+    return nodes.length;
+  }catch(e){
+    return 0;
+  }
+}
+
 function setPortalDisplayConfigDirty(value){
   portalDisplayConfigDirty = !!value;
   const bar = document.getElementById('portal-display-save-bar');
@@ -1314,6 +1328,7 @@ async function showApp(){
   syncSidebarToggleState();
   navigateTo('dashboard');
   loadUsersFromServerIfAdmin();
+  try{ if(typeof startLiveDocsSync==='function') startLiveDocsSync(); }catch(e){}
 }
 
 function renderSidebar(){
@@ -1354,9 +1369,11 @@ function renderSidebar(){
     if(catsInSec.length === 0) return;
     html += `<div class="nav-section"><div class="nav-section-title">${sec.label}</div>`;
     catsInSec.forEach(cat => {
-      const cnt = VDOCS.filter(d=>d.cat===cat.id).length;
-      if(cnt === 0) return;
-      const locked = !VDOCS.filter(d=>d.cat===cat.id).some(d=>canAccessDoc(d.code));
+      let cnt = VDOCS.filter(d=>d.cat===cat.id).length;
+      const physicalCount = getPortalCategoryPhysicalNodeCount(cat.id);
+      if(cnt === 0 && physicalCount > 0) cnt = physicalCount;
+      const visibleDocsInCat = VDOCS.filter(d=>d.cat===cat.id);
+      const locked = visibleDocsInCat.length > 0 && !visibleDocsInCat.some(d=>canAccessDoc(d.code));
       html += `<button class="nav-item ${currentFilter===cat.id&&currentPage==='documents'?'active':''}" onclick="navigateTo('documents','${cat.id}')">
         <span class="icon">${cat.icon}</span><span>${catLabel(cat)}</span><span class="badge">${locked?'🔒':cnt}</span>
       </button>`;
@@ -1724,7 +1741,8 @@ function buildDocHeaderActions(doc){
     const status=getDocStatus(doc);
     const isWorkbook=isDownloadOnlyDoc(doc);
     const versions=getDocVersions(doc.code)||[];
-    const activeDraft=versions.find(v=>v && v.status==='draft' && (v.download_url || v.file) && String(v.version||'').replace(/^v/i,'')===String(getDocRevision(doc)||''));
+    const workflowRev = (typeof getDocWorkingRevision==='function') ? getDocWorkingRevision(doc) : String(getDocRevision(doc)||'0');
+    const activeDraft=versions.find(v=>v && v.status==='draft' && (v.download_url || v.file) && String(v.version||'').replace(/^v/i,'')===String(workflowRev||''));
     const hasDiscardableWorkbookDraft=!!activeDraft || ((typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : false);
 
     // While editing: show edit workflow buttons
