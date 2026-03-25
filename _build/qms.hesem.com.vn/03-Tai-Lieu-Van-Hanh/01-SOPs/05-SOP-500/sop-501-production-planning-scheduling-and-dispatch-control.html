@@ -122,7 +122,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td>Shift Leader</td><td>Thực thi điều độ đầu ca, xác nhận machine/operator readiness, phản hồi progress/downtime/end-of-shift handover.</td><td>Được trả job về HOLD nếu thực tế không đạt readiness hoặc thiếu chứng cứ release bắt buộc.</td></tr>
 <tr><td>Engineering Lead</td><td>Xác nhận baseline khóa, route đúng, NC/program/tooling readiness theo phạm vi liên quan.</td><td>Được chặn Planning Release khi dữ liệu kỹ thuật chưa sạch.</td></tr>
 <tr><td>Supply Chain / Buyer</td><td>Xác nhận vật tư, outsource ETA, receipt status, source issue và tác động supplier lên lịch.</td><td>Được yêu cầu giữ/đổi lịch khi material / outsource gate chưa đạt.</td></tr>
-<tr><td>QA Manager / Quality Engineer</td><td>Xác nhận gate chất lượng ảnh hưởng release, hold/disposition, bottleneck metrology/final release, escalation khi risk to ship.</td><td>Được dừng hoặc không cho dispatch/continue khi quality gate hoặc containment chưa đóng.</td></tr>
+<tr><td>QA Manager / Quality Engineer</td><td>Xác nhận gate chất lượng ảnh hưởng release, hold/disposition, bottleneck metrology/final release, escalation khi risk to ship.</td><td>Được dừng hoặc không cho dispatch/continue khi cổng kiểm soát chất lượng hoặc containment chưa đóng.</td></tr>
 </tbody></table></div>
 <div class="role-note"><b>Authority ladder về đổi ưu tiên:</b> đổi thứ tự trong cùng bucket do Planner + Shift Leader xử lý; phá freeze window do Planner + Production Director; hot-job kéo liên department hoặc ảnh hưởng ship release phải qua Supply Chain/QA/Production authority theo <a href="../../03-Reference/01-ANNEX-System/annex-qms-020-escalation-matrix-and-sla.html">ANNEX-QMS-020</a>.</div>
 <h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2>
@@ -161,7 +161,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ol>
 <h3 class="h3">7.3 Planning Release bằng FRM-501</h3>
 <div class="callout-grid">
-<div class="callout-card"><h3>FRM-501 phải khóa tối thiểu</h3><ul class="tight"><li>Part/rev/job/route/workcenter.</li><li>Material / outsource readiness.</li><li>Critical gate: FAI, special process, final inspection, ship logic.</li><li>Target due date, lot strategy, split lot/partial ship nếu có.</li><li>Owner và reaction plan nếu assumption fail.</li></ul></div>
+<div class="callout-card"><h3>FRM-501 phải khóa tối thiểu</h3><ul class="tight"><li>Part/rev/job/route/workcenter.</li><li>Material / outsource readiness.</li><li>Critical gate: FAI, special process, final inspection, ship logic.</li><li>Target due date, lot strategy, split lot/giao hàng một phần nếu có.</li><li>Owner và reaction plan nếu assumption fail.</li></ul></div>
 <div class="callout-card"><h3>Không được release khi</h3><ul class="tight"><li>Due date chỉ dựa trên kỳ vọng, chưa có chứng cứ vật tư hoặc processor.</li><li>Engineering còn issue mở ảnh hưởng route / tolerance / process note.</li><li>Có quality hold hoặc open NCR chưa xác định được đường đi tiếp.</li></ul></div>
 </div>
 <h3 class="h3">7.4 Phát hành dispatch, freeze window và hot-job override</h3>
@@ -246,12 +246,12 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Không được để dispatch sheet tiếp tục mang job không thể chạy chỉ để “giữ kế hoạch đẹp”.</li>
 <li>Mọi resequence trong ngày phải ghi nguyên nhân, owner, ảnh hưởng dây chuyền sau và hành động bù; tối thiểu cập nhật vào <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> và <a  download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a>.</li>
 </ul>
-<h3>7.17 Giao thức hot-job, split lot, partial ship và outsource assist</h3>
+<h3>7.17 Giao thức hot-job, split lot, giao hàng một phần và outsource assist</h3>
 <div class="callout"><div class="card-title">Hot-job không phải là quyền phá hệ thống</div>
 <ul class="tight">
 <li>Người yêu cầu hot-job <b>PHẢI</b> nêu rõ customer commit, quantity, due hour, route bị ảnh hưởng và nguồn bù năng lực.</li>
 <li>Planner chỉ được override freeze window khi có phê duyệt theo authority ladder và đã thông báo đầy đủ cho các cell bị đẩy lùi.</li>
-<li>Split lot/partial ship/outsource assist chỉ được mở khi traceability, inspection release và chứng từ giao hàng vẫn giữ sạch theo từng sub-lot.</li>
+<li>Split lot/giao hàng một phần/outsource assist chỉ được mở khi traceability, inspection release và chứng từ giao hàng vẫn giữ sạch theo từng sub-lot.</li>
 </ul></div>
 <h3>7.18 Review học lại từ missed date và queue aging</h3>
 <ul class="tight">
