@@ -92,7 +92,11 @@ ul.tight li {margin:4px 0;}
 <tr><td><span class="badge-red">M4 — Giảm hậu quả</span></td><td>Khi chưa thể chặn từ đầu, phải cô lập phạm vi và truy được ngay.</td><td>duy nhất lot phân tách, scan log, đã cách ly bin, bất thường sự kiện đánh dấu / cờ.</td><td>Không khóa được phạm vi ảnh hưởng hoặc không giúp ngăn chặn nhanh hơn.</td></tr>
 </tbody></table></div></div>
 
-<div class="section"><h2>4. Quy trình triển khai poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) tại công đoạn</h2>
+<div class="section"><div class="note-blue" style="margin:12px 0">
+  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G3 (Setup) và G5 (IPQC)</b>. Ví dụ poka-yoke CNC thực tế.
+  <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
+</div>
+<h2>4. Quy trình triển khai poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) tại công đoạn</h2>
 <div class="step-list">
 <div class="step-item"><strong>Bước 1 — Chốt lỗi mục tiêu.</strong> Mô tả lỗi bằng hành vi cụ thể: nhầm phiên bản, nhầm program, lắp ngược, sai bù trừ (bù trừ (offset)), bỏ sót cap, sai count, dùng sai gage, sai tool, hỗn hợp / lẫn lộn part… Không dùng mô tả mơ hồ kiểu “Operator bất cẩn”.</div>
 <div class="step-item"><strong>Bước 2 — Chốt Point-of-use và điểm chặn.</strong> Xác định đúng trạm / vị trí làm việc, đúng bước, đúng người, đúng điểm mà lỗi có thể bị chặn sớm nhất. poka (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)) đặt càng xa nguồn sai thì càng yếu.</div>

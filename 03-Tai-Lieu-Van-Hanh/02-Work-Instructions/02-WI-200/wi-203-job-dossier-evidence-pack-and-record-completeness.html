@@ -62,7 +62,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng từ G0 đến khi ship/job đóng cho mọi JobNum cần kiểm soát hồ sơ, bằng chứng, truy xuất nguồn gốc, khách hàng gói hàng, offline bổ sung / thay thế và khóa hồ sơ sau giao hàng.</div>
 <h1>WI-203 — Lập Hồ sơ công việc, nạp bằng chứng, kiểm tính đầy đủ hồ sơ và khóa hồ sơ</h1>
-<div class="section"><h2>1. Mục đích và 5 quy tắc không thỏa hiệp</h2>
+<div class="section"><div class="note-blue" style="margin:12px 0">
+  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>xuyên suốt (G0→G7)</b>. Hồ sơ công việc và bộ bằng chứng tại mỗi cổng.
+  <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
+</div>
+<h2>1. Mục đích và 5 quy tắc không thỏa hiệp</h2>
 <div style="background:#EFF6FF;border-left:4px solid #0078D4;padding:0.8em 1em;margin:1em 0;font-size:0.9em"><strong>Lưu ý:</strong> Tài liệu này đã tích hợp nội dung tham chiếu từ ANNEX-201 (từ điển metadata, hồ sơ class, quy tắc đặt tên) tại phần Phụ lục cuối trang. ANNEX-201 sẽ được chuyển thành redirect trỏ về WI-203.</div>
 <p>WI này quy định cách tạo, duy trì, kiểm tính đầy đủ, khóa và truy xuất <strong>Hồ sơ công việc</strong>. Hồ sơ công việc là hồ sơ vận hành theo từng JobNum dùng để chứng minh job đã được release, thực hiện, kiểm tra, đóng gói và giao hàng đúng yêu cầu; đồng thời dùng để trả lời câu hỏi của QA, khách hàng, đánh giá, source kiểm tra và điều tra sự cố mà không phải đi nhặt hồ sơ rời rạc.</p>
 <div class="keyline"><strong>5 quy tắc không thỏa hiệp:</strong><br/>1) Một JobNum = một dossier điều hành chính thức. 2) Part/Rev Master là nguồn kỹ thuật chuẩn; dossier job chỉ liên kết và lưu bằng chứng theo job. 3) Mọi hồ sơ bắt buộc phải về đúng SSOT; không lưu bản điều hành ở máy cá nhân, chat, USB cá nhân hoặc folder “tạm”. 4) Thiếu bằng chứng bắt buộc theo cổng kiểm soát = không đóng cổng kiểm soát. 5) Sau ship hoặc job close, dossier phải có snapshot/bảng kê cuối và trạng thái khóa rõ ràng.</div>
