@@ -1798,26 +1798,16 @@ function git_sync_documents(array $me, string $repoDir): array {
     ];
   }
 
-  $candidatePaths = git_collect_paths_from_status_lines($statusLines);
-  if (empty($candidatePaths)) {
-    return [
-      'pushed' => false,
-      'branch' => $branch,
-      'files' => [],
-      'message' => 'No non-runtime changes to sync.',
-      'status' => $statusLines,
-      'commit_output' => '',
-      'push_output' => '',
-    ];
-  }
-
-  $addArgs = ['add', '--'];
-  array_push($addArgs, ...$candidatePaths);
+  // Stage all changes first, then runtime noise will be removed from index/worktree.
+  $addArgs = ['add', '-A', '--', '.'];
   $addCode = 0;
   $addOut = git_command($addArgs, $repoReal, $addCode);
   if ($addCode !== 0) {
     throw new RuntimeException('git_add_failed' . ($addOut !== '' ? ': ' . $addOut : ''));
   }
+
+  // Ensure runtime files never get committed even after add -A.
+  git_cleanup_runtime_noise($repoReal);
 
   $filesCode = 0;
   $filesOut = git_command(['diff', '--cached', '--name-only', '--'], $repoReal, $filesCode);
@@ -1846,7 +1836,7 @@ function git_sync_documents(array $me, string $repoDir): array {
   $commitOut = git_command([
     '-c', 'user.name=' . (string)$author['name'],
     '-c', 'user.email=' . (string)$author['email'],
-    'commit', '-m', $commitMessage, '--', ...$candidatePaths
+    'commit', '-m', $commitMessage
   ], $repoReal, $commitCode);
   if ($commitCode !== 0) {
     throw new RuntimeException('git_commit_failed' . ($commitOut !== '' ? ': ' . $commitOut : ''));
