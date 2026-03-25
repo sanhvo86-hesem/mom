@@ -78,9 +78,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li><a href="../../01-Competency-System/01-Framework/assessment-matrix.html">TRN-FRM-03 — Năng lực Đánh giá Matrix (L1–L4) | HESEM OS</a> (chuẩn Level &amp; hành vi quan sát)</li>
 <li><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-808_Performance_Review_Form.xlsx">FRM-HR-TRN-008 — Test Bản thiết kế</a></li>
-<li><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-808_Performance_Review_Form.xlsx">FRM-HR-TRN-009 — Hiệu suất Rà soát Biểu mẫu</a></li>
+<li><a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-808_Performance_Review_Form.xlsx">FRM-HR-TRN-009 — Hiệu suất Review Biểu mẫu</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-101-document-and-data-control.html">SOP-QMS-001 — SOP-101 — Kiểm soát tài liệu và dữ liệu điều hành</a></li>
-<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP-QMS-008 — SOP-106 — Quản trị thay đổi và cấu hình</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP-QMS-008 — SOP-106 — Governance thay đổi và cấu hình</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//09-SOP-900//sop-901-internal-audit-and-lpa.html">SOP-QMS-004 — SOP-901 — Đánh giá nội bộ và LPA</a></li>
 </ul>
 </div>
@@ -141,7 +141,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Kỹ thuật</b></td>
 <td>Khi phát hành program/phiếu cài đặt/FAI yêu cầu mới.</td>
 <td>Tình huống kiểm soát thay đổi; ngân hàng câu hỏi theo phiên bản.</td>
-<td>Chặn “đã phát hành” khi đề/đáp án chưa được kiểm soát phiên bản.</td>
+<td>Chặn “Released” khi đề/đáp án chưa được kiểm soát phiên bản.</td>
 </tr>
 <tr>
 <td><b>Mua hàng/Nhận hàng</b></td>
@@ -257,7 +257,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Danh sách câu “Fail-Cổng kiểm soát” kèm lý do + phê duyệt.</td>
 </tr>
 <tr>
-<td><b>Rà soát đồng cấp câu hỏi</b></td>
+<td><b>Review đồng cấp câu hỏi</b></td>
 <td>SME phòng ban</td>
 <td>Khi thêm câu mới vào ngân hàng.</td>
 <td>Biên bản rà soát (ai-rà soát-ai, kết luận) + version ngân hàng.</td>
@@ -356,7 +356,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3</td><td>Lập bản thiết kế bằng FRM-HR-TRN-008: mục tiêu, tỷ trọng, Fail-Cổng kiểm soát, dạng câu.</td><td>QA + SME</td><td>FRM-HR-TRN-008 đã ký.</td><td>Bản thiết kế thiếu Fail-Cổng kiểm soát.</td></tr>
 <tr><td>4</td><td>Thiết lập Câu hỏi ngân hàng: ID, tag (vai trò/level/chủ đề/cổng kiểm soát), Responsible Person, nơi lưu.</td><td>QA/QMS</td><td>Sổ đăng ký ngân hàng + phân quyền.</td><td>ngân hàng “trôi nổi” không ai chịu trách nhiệm.</td></tr>
 <tr><td>5</td><td>Viết câu hỏi theo bản thiết kế; mỗi câu có đáp án + giải thích + tag Fail-Cổng kiểm soát.</td><td>SME</td><td>Bản nháp câu hỏi + log rà soát.</td><td>Câu hỏi mơ hồ, không kiểm chứng được.</td></tr>
-<tr><td>6</td><td>Rà soát đồng cấp: kiểm tính đúng, rõ, bám rủi ro; loại câu “mẹo nhớ”.</td><td>SME + Supervisor</td><td>Biên bản rà soát.</td><td>Đề thiên về lý thuyết, không đo hành vi.</td></tr>
+<tr><td>6</td><td>Review đồng cấp: kiểm tính đúng, rõ, bám rủi ro; loại câu “mẹo nhớ”.</td><td>SME + Supervisor</td><td>Biên bản rà soát.</td><td>Đề thiên về lý thuyết, không đo hành vi.</td></tr>
 <tr><td>7</td><td>Tạo đề theo FRM-HR-TRN-009 từ ngân hàng; tạo tối thiểu 2 version A/B.</td><td>QA/QMS</td><td>FRM-HR-TRN-009 (A/B) + version.</td><td>Dùng 1 version kéo dài → lộ đề.</td></tr>
 <tr><td>8</td><td>Tách lưu “đề” và “key chấm”; key chỉ cấp cho người chấm/QA.</td><td>QA/QMS</td><td>Thư mục quyền hạn + log phát hành.</td><td>Key nằm chung với đề → rò rỉ.</td></tr>
 <tr><td>9</td><td>Thiết lập chống-tóm tắt nhanh (tóm tắt nhanh (cheat sheet) sheet): xác thực người thi, giám sát, kiểm soát tài liệu/điện thoại.</td><td>Người đào tạo</td><td>người giám sát thi bảng kiểm + quy tắc thi ký nhận.</td><td>Thi “tự do” → bằng chứng bị bác.</td></tr>
@@ -406,8 +406,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>4</td>
-<td>Rà soát &amp; phát hành</td>
-<td>Rà soát đồng cấp; kiểm soát truy cập; phát hành version A/B; thu hồi bản cũ.</td>
+<td>Review &amp; phát hành</td>
+<td>Review đồng cấp; kiểm soát truy cập; phát hành version A/B; thu hồi bản cũ.</td>
 <td>Ngăn rò rỉ đề; bảo toàn tính toàn vẹn bài thi.</td>
 </tr>
 <tr>
@@ -503,7 +503,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>
 <ul style="margin:0; padding-left:18px; line-height:1.75;">
 <li>Hoàn thành OJT đầu ra: tối thiểu 10 câu hỏi + 01 tình huống.</li>
-<li>Rà soát đồng cấp đạt “không lỗi kỹ thuật/không mơ hồ”.</li>
+<li>Review đồng cấp đạt “không lỗi kỹ thuật/không mơ hồ”.</li>
 </ul>
 </td>
 <td>
@@ -518,7 +518,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>
 <ul style="margin:0; padding-left:18px; line-height:1.75;">
 <li>Thiết lập bản thiết kế hoàn chỉnh theo FRM-HR-TRN-008, có Fail-Cổng kiểm soát.</li>
-<li>Quản trị ngân hàng: ID, version, phân quyền, thu hồi/đưa vào lỗi thời.</li>
+<li>Governance ngân hàng: ID, version, phân quyền, thu hồi/đưa vào lỗi thời.</li>
 <li>Tạo tối thiểu 2 version đề A/B từ ngân hàng; đảm bảo độ phủ bản thiết kế.</li>
 <li>Phân tích kết quả sau thi và cập nhật ngân hàng theo lỗi thực tế.</li>
 </ul>
@@ -531,7 +531,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </td>
 <td>
 <ul style="margin:0; padding-left:18px; line-height:1.75;">
-<li>FRM-HR-TRN-008 + FRM-HR-TRN-009 A/B (đã phát hành).</li>
+<li>FRM-HR-TRN-008 + FRM-HR-TRN-009 A/B (Released).</li>
 <li>ngân hàng sổ đăng ký + log thu hồi/đưa vào lỗi thời.</li>
 </ul>
 </td>
@@ -739,7 +739,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <ul style="margin:0; padding-left:18px; line-height:1.85;">
 <li>Kho tài liệu kiểm soát: <b>M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → đào tạo</b> → academy → system-ops <b>RBAC: QA/QMS phê duyệt • OPS thực thi • IT admin • sửa hồ sơ cổng kiểm soát = QA/QMS.</b>.</li>
-<li>Kho bằng chứng thi/OJT: <b>M365/SharePoint → CNC-IMS-HUB → Đào tạo-Hồ sơ</b> <b>M365/SharePoint → HESEM-QMS-SSOT</b>.</li>
+<li>Kho bằng chứng thi/OJT: <b>M365/SharePoint → CNC-IMS-HUB → Training-Hồ sơ</b> <b>M365/SharePoint → HESEM-QMS-SSOT</b>.</li>
 <li>Câu hỏi ngân hàng &amp; Key chấm: lưu trong thư mục phân quyền; không lưu trên máy cá nhân/USB.</li>
 </ul>
 </div>

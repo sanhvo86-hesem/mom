@@ -93,7 +93,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Thông tin Job / Hồ sơ</strong>
 <div class="mini">
  JobCode: <span class="formline"> </span><br/>
- Khách hàng: <span class="formline"> </span><br/>
+ Customer: <span class="formline"> </span><br/>
  Part No: <span class="formline"> </span>   Rev: <span class="formline"> </span><br/>
  Số lượng: <span class="formline"> </span>   Due: <span class="formline"> </span><br/>
 </div>
@@ -117,18 +117,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><span class="chk">☐</span> log hành động (Responsible Person + due trong ngày)</td><td>ACT</td><td>D0</td><td>OPS</td><td class="mini">SSOT/Ops/Tier/<span class="pill">&lt;YYYYMMDD&gt;</span>/</td><td class="mini">ACT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn) báo cáo (job list) + ưu tiên</td><td>WIP</td><td>D0</td><td>Kế hoạch</td><td class="mini">SSOT/Ops/WIP/</td><td class="mini">WIP_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Thời gian ngừng máy Log (machine/ca/nguyên nhân/min)</td><td>DT</td><td>D0</td><td>OPS</td><td class="mini">SSOT/Ops/Thời gian ngừng máy/</td><td class="mini">DT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> Chất lượng alert (khi NG/thoát / bỏ qua) + ngăn chặn</td><td>cảnh báo chất lượng (cảnh báo chất lượng (QALERT))</td><td>D1</td><td>QA</td><td class="mini">SSOT/Ops/Chất lượng-Alert/</td><td class="mini">QALERT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Quality alert (khi NG/thoát / bỏ qua) + ngăn chặn</td><td>cảnh báo chất lượng (cảnh báo chất lượng (QALERT))</td><td>D1</td><td>QA</td><td class="mini">SSOT/Ops/Quality-Alert/</td><td class="mini">QALERT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Escalation log (vấn đề chặn &gt;15 phút)</td><td>ESC</td><td>D1</td><td>OPS</td><td class="mini">SSOT/Ops/Escalation/</td><td class="mini">ESC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> KPI bảng điều khiển ảnh chụp trạng thái (OTD/FPY/Phế phẩm/Làm lại)</td><td>KPI</td><td>D2</td><td>OPS+QA</td><td class="mini">SSOT/Ops/KPI/</td><td class="mini">KPI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> OJT plan trong ngày (ai kèm ai, mô-đun nào)</td><td>OJT</td><td>D2</td><td>Người đào tạo</td><td class="mini">SSOT/Đào tạo/OJT/<span class="pill">&lt;YYYYMMDD&gt;</span>/</td><td class="mini">OJT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> OJT plan trong ngày (ai kèm ai, mô-đun nào)</td><td>OJT</td><td>D2</td><td>Người đào tạo</td><td class="mini">SSOT/Training/OJT/<span class="pill">&lt;YYYYMMDD&gt;</span>/</td><td class="mini">OJT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 </table>
 </div>
-<div class="note mini"><strong>Gắn với mô-đun</strong>: C09 (OTD), C08 (Data), C03 (Chất lượng at source), C07 (CAPA).</div>
+<div class="note mini"><strong>Gắn với mô-đun</strong>: C09 (OTD), C08 (Data), C03 (Quality at source), C07 (CAPA).</div>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-nhanh (STOP/TẠM GIỮ/CHẶN)</h2>
 <ul class="tight">
-<li>Không chốt log hành động hoặc không có Responsible Person/due → TẠM GIỮ kết luận họp.</li><li>vấn đề chặn &gt;15 phút không escalation log → FAIL cổng kiểm soát cá nhân và đánh giá lại C09.</li><li>Chất lượng alert thiếu ngăn chặn → STOP chuyền liên quan.</li><li>Thời gian ngừng máy Log thiếu nguyên nhân → TẠM GIỮ phân tích ngày.</li>
+<li>Không chốt log hành động hoặc không có Responsible Person/due → TẠM GIỮ kết luận họp.</li><li>vấn đề chặn &gt;15 phút không escalation log → FAIL cổng kiểm soát cá nhân và đánh giá lại C09.</li><li>Quality alert thiếu ngăn chặn → STOP chuyền liên quan.</li><li>Thời gian ngừng máy Log thiếu nguyên nhân → TẠM GIỮ phân tích ngày.</li>
 </ul>
 </div>
 <div class="card">

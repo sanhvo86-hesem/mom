@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SYS-OPS-08 — Power BI Triển khai Pack: PowerQuery, Mô hình, DAX, Làm mới Quản trị | HESEM OS</title>
+<title>SYS-OPS-08 — Power BI Triển khai Pack: PowerQuery, Mô hình, DAX, Làm mới Governance | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
  .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:14px 0;}
@@ -66,7 +66,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-08 — Power BI Triển khai Pack: PowerQuery, Mô hình, DAX, Làm mới Quản trị</strong>
+  <strong>SYS-OPS-08 — Power BI Triển khai Pack: PowerQuery, Mô hình, DAX, Làm mới Governance</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -92,7 +92,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Mã mô-đun / Tên mô-đun</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li><b>Mã mô-đun:</b> SYS-OPS-08</li>
-<li><b>Tên mô-đun:</b> Power BI Triển khai Pack: PowerQuery, Mô hình, DAX, Làm mới Quản trị</li>
+<li><b>Tên mô-đun:</b> Power BI Triển khai Pack: PowerQuery, Mô hình, DAX, Làm mới Governance</li>
 </ul>
 </div>
 <div class="note">
@@ -168,7 +168,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Báo giá/Hợp đồng</td>
 <td>Thông tin khách hàng, yêu cầu chứng từ</td>
-<td>Khách hàng view (Người định giá (SAL-03))</td>
+<td>Customer view (Người định giá (SAL-03))</td>
 <td>Thiếu yêu cầu bằng chứng → CHẶN nhận cam kết giao</td>
 </tr>
 <tr>
@@ -204,7 +204,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>QC/QA</td>
 <td>NCRLog, QCHoldLog, CAPA8D</td>
-<td>Chất lượng bảng điều khiển tổng quan</td>
+<td>Quality bảng điều khiển tổng quan</td>
 <td>TẠM GIỮ CTQ chưa đóng + vẫn “Lam Ready” → chặn giao hàng (CHẶN SHIP / chặn giao hàng)</td>
 </tr>
 <tr>
@@ -304,7 +304,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Link không mở → bảng điều khiển không được dùng làm cổng kiểm soát</td>
 </tr>
 <tr>
-<td>CP4 — Rà soát đồng cấp DAX/KPI (2 người)</td>
+<td>CP4 — Review đồng cấp DAX/KPI (2 người)</td>
 <td>QA/QMS + Supervisor</td>
 <td>BI_ReleaseNotes có mục “KPI đã thay đổi” + người duyệt</td>
 <td>KPI đổi không duyệt → CHẶN PROD</td>
@@ -319,7 +319,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>CP6 — giám sát &amp; Alert (làm mới + bất thường)</td>
 <td>IT + Supervisor</td>
 <td>01 lần test alert gửi Teams/Email Teams: QMS-ALERT + phiếu yêu cầu: IT-bộ phận hỗ trợ</td>
-<td>Không có alert → TẠM GIỮ go-vận hành thực</td>
+<td>Không có alert → TẠM GIỮ go-Live</td>
 </tr>
 <tr>
 <td>CP7 — RLS &amp; quyền truy cập</td>
@@ -433,7 +433,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>8</td><td>Tạo DimDate và đánh dấu as Date table</td><td>IT/BI</td><td>Ảnh mô hình view</td><td>Không đánh dấu date table</td></tr>
 <tr><td>9</td><td>Thiết lập quan hệ theo template (dữ kiện → JobIndex/DimDate)</td><td>IT/BI</td><td>Ảnh mối quan hệ</td><td>chéo filter sai</td></tr>
 <tr><td>10</td><td>Dán phép đo / biện pháp template và thay bảng giữ chỗ bằng bảng thật</td><td>IT/BI</td><td>Danh sách đo lường pass</td><td>Giữ DispatchPlan/WIPTracker giữ chỗ</td></tr>
-<tr><td>11</td><td>Dựng trang theo spec (Điều hành/Planner/Chất lượng/Thiết bị/Kho/Lam mức sẵn sàng)</td><td>IT/BI + Chủ quá trình</td><td>Ảnh từng page + diễn tập-xuyên suốt</td><td>Thiếu bảng chi tiết</td></tr>
+<tr><td>11</td><td>Dựng trang theo spec (Điều hành/Planner/Quality/Thiết bị/Kho/Lam mức sẵn sàng)</td><td>IT/BI + Chủ quá trình</td><td>Ảnh từng page + diễn tập-xuyên suốt</td><td>Thiếu bảng chi tiết</td></tr>
 <tr><td>12</td><td>Chạy UAT theo 3 vai trò (QA/WHS/Planner) và ký kết quả</td><td>Supervisor + QA</td><td>Biên bản UAT + lỗi đã đóng</td><td>UAT chỉ xem KPI, không mở bằng chứng</td></tr>
 <tr><td>13</td><td>Công bố DEV → UAT → PROD theo bảng kiểm phát hành</td><td>IT + QA</td><td>BI_ReleaseNotes + chữ ký duyệt</td><td>Công bố thẳng PROD</td></tr>
 <tr><td>14</td><td>Cấu hình làm mới lịch trình theo cửa sổ ca + tài khoản vận hành</td><td>IT</td><td>Ảnh lịch trình + Responsible Person tài khoản</td><td>Dùng tài khoản cá nhân</td></tr>
@@ -491,7 +491,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Đánh giá yêu cầu truy xuất nguồn gốc; KPI không đủ</td>
 </tr>
 <tr>
-<td>Quản trị</td>
+<td>Governance</td>
 <td>Phát hành note; UAT; công bố / phát hành theo stage; làm mới lịch trình; giám sát</td>
 <td>Không quản trị = không kiểm soát thay đổi</td>
 </tr>
@@ -607,7 +607,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" style="margin-top:10px">
 <b>Tình huống 3 — KPI “Ready” tăng nhưng Hold tăng</b>
 <p class="muted" style="margin:6px 0 0 0">
- Trang Điều hành báo Lam Ready % tăng 15% trong 1 giờ. Trang Chất lượng báo Hold CTQ Mở tăng 3 mục và NCR Mở tăng 2 mục.
+ Trang Điều hành báo Lam Ready % tăng 15% trong 1 giờ. Trang Quality báo Hold CTQ Mở tăng 3 mục và NCR Mở tăng 2 mục.
  </p>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Quyết định: STOP/TẠM GIỮ/CHẶN áp dụng mức nào?</li>

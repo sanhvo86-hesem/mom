@@ -162,7 +162,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">2.1 Chuẩn thuật ngữ nội bộ để tránh lệch hệ thống</h3>
 <ul style="line-height:1.9">
 <li><b>Nhỏ / Không nghiêm trọng/Lớn / Nghiêm trọng/Quan trọng</b> (SOP-QMS-006) ⇔ <b>MIN/MAJ/CTQ</b> (SharePoint list). Sơ đồ ánh xạ vận hành: <b>Nhỏ / Không nghiêm trọng → MIN</b>, <b>Lớn / Nghiêm trọng → MAJ</b>, <b>Quan trọng/CTQ → CTQ</b>. Khi ghi list, dùng đúng mã.</li>
-<li><b>sửa chữa / hiệu chính</b> là “sửa lô hiện tại” (sort/làm lại/sửa chữa). <b>khắc phục hành động</b> là “loại nguyên nhân gốc” để ngăn tái diễn. Hai khái niệm tách bạch trong NCR/CAPA.</li>
+<li><b>sửa chữa / hiệu chính</b> là “sửa lô Current” (sort/làm lại/sửa chữa). <b>khắc phục hành động</b> là “loại nguyên nhân gốc” để ngăn tái diễn. Hai khái niệm tách bạch trong NCR/CAPA.</li>
 <li><b>Disposition mã</b> (NCRLog): UAI (use-as-is có chấp thuận), RWK (làm lại), REP (sửa chữa), SCR (phế phẩm), RTS (trả lại nhà cung cấp), MRB (chờ hội đồng). Khi chưa có quyết định, trạng thái là <b>InReview</b> và disposition là <b>MRB</b>.</li>
 <li><b>HoldReasonCode</b> (QCHoldLog): MAT (vật liệu), PROC (quy trình), PROG (chương trình), GAGE (dụng cụ đo), OUT (thuê ngoài), tay / thủ công (vận hành/xử lý / vận chuyển), UNK (chưa rõ). Khi chưa rõ nguyên nhân, vẫn ghi TẠM GIỮ bằng UNK và khóa trách nhiệm truy tìm.</li>
 </ul>
@@ -266,7 +266,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">3.3 Điểm chặn tối quan trọng (cổng kiểm soát)</h3>
 <ul style="line-height:1.9">
 <li><b>Cổng kiểm soát-TẠM GIỮ:</b> hàng nghi ngờ rời khỏi dòng / chuyền hoặc đi qua kho khi chưa được cô lập là <b>CHẶN</b>.</li>
-<li><b>Cổng kiểm soát-Phát hành:</b> phát hành chỉ xảy ra khi có hồ sơ (Hold đã phát hành/NCR Closed/ShipRelease đã phát hành) và bằng chứng nằm trong SSOT.</li>
+<li><b>Cổng kiểm soát-Phát hành:</b> phát hành chỉ xảy ra khi có hồ sơ (Hold Released/NCR Closed/ShipRelease Released) và bằng chứng nằm trong SSOT.</li>
 <li><b>Cổng kiểm soát-Concession:</b> use-as-is chỉ xảy ra khi có chấp thuận bằng văn bản trước khi giao; thiếu chấp thuận là <b>CHẶN</b>.</li>
 </ul>
 </div>
@@ -359,7 +359,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>CP-09 Phê duyệt giao hàng cổng kiểm soát</b></td>
 <td>Kho + QA</td>
 <td>ShipRelease: PacketComplete=Yes, FinalIRPass=Yes, PackagingPass=Yes</td>
-<td>Trạng thái=đã phát hành mới xuất hàng; thiếu 1 điều kiện là Đã chặn</td>
+<td>Trạng thái=Released mới xuất hàng; thiếu 1 điều kiện là Đã chặn</td>
 </tr>
 </tbody>
 </table>
@@ -423,7 +423,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td><b>Lớn / Nghiêm trọng/Quan trọng</b></td><td>Bất kỳ</td><td>Bắt buộc mở CAPA/8D và có kiểm tra hiệu lực.</td></tr>
 <tr><td><b>Lặp lại vấn đề</b></td><td>≥ 2 lần / 90 ngày hoặc theo cảnh báo KPI</td><td>Bắt buộc mở CAPA; xác định điểm lọt; bổ sung điểm kiểm tra.</td></tr>
-<tr><td><b>Khách hàng / giao hàng tác động</b></td><td>Stop-ship, khiếu nại / yêu cầu bồi thường, trả lại</td><td>Phối hợp SOP-QMS-012 và mở CAPA.</td></tr>
+<tr><td><b>Customer / giao hàng tác động</b></td><td>Stop-ship, khiếu nại / yêu cầu bồi thường, trả lại</td><td>Phối hợp SOP-QMS-012 và mở CAPA.</td></tr>
 <tr><td><b>NC hệ thống</b></td><td>kiểm soát tài liệu / hiệu chuẩn / đào tạo / truy xuất nguồn gốc</td><td>Bắt buộc CAPA và kiểm soát thay đổi (SOP-QMS-001, SOP-QMS-008).</td></tr>
 </tbody>
 </table>
@@ -568,7 +568,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3</td><td><b>Khóa truy xuất nguồn gốc</b>: xác nhận Job/Part/Rev; khóa program/print tại Point-of-use</td><td>Supervisor/Lập trình viên (CNC)</td><td>Ảnh màn hình/print + ghi Rev nghi ngờ</td><td>Đổi file ngoài kiểm soát; dùng file cũ tại máy</td></tr>
 <tr><td>4</td><td><b>Thu bằng chứng</b>: đo/ảnh/CMM; ghi rõ gage ID &amp; trạng thái hiệu chuẩn</td><td>QC</td><td>IR/CMM báo cáo + ảnh + gage ID</td><td>Ảnh không có thước; không ghi gage ID</td></tr>
 <tr><td>5</td><td><b>Mở NCR</b> khi đủ dữ kiện tối thiểu</td><td>QA</td><td>NCRLog + thư mục NCR</td><td>Thiếu DetectedAt/QtyAffected; không link thư mục</td></tr>
-<tr><td>6</td><td><b>Đánh giá ảnh hưởng</b>: khoanh vùng WIP/FG/thuê ngoài/ship lịch sử</td><td>QA+Supervisor+Planner</td><td>Danh sách phạm vi ảnh hưởng + link Job/lot</td><td>Chỉ khoanh vùng dòng / chuyền hiện tại; bỏ sót hàng chờ ship</td></tr>
+<tr><td>6</td><td><b>Đánh giá ảnh hưởng</b>: khoanh vùng WIP/FG/thuê ngoài/ship lịch sử</td><td>QA+Supervisor+Planner</td><td>Danh sách phạm vi ảnh hưởng + link Job/lot</td><td>Chỉ khoanh vùng dòng / chuyền Current; bỏ sót hàng chờ ship</td></tr>
 <tr><td>7</td><td><b>Triệu tập MRB</b>: chuẩn bị dữ kiện + phương án disposition</td><td>QA</td><td>MRB biên bản họp + phương án</td><td>MRB họp không có dữ liệu đo; quyết theo cảm tính</td></tr>
 <tr><td>8</td><td><b>Ra disposition</b> + tiêu chí phát hành rõ</td><td>MRB</td><td>Disposition code + điều kiện phát hành</td><td>Không ghi tiêu chí đo lại; concession thiếu chấp thuận</td></tr>
 <tr><td>9</td><td><b>Thực hiện làm lại/sort/phế phẩm/trả lại</b> theo quyết định</td><td>Setup/WHS/PUR</td><td>WI làm lại + Epicor giao dịch <b>M365/SharePoint → HESEM-QMS-SSOT</b> mã giao dịch nội bộ</td><td>Làm lại không có WI; phế phẩm không ghi nhận trên SoR</td></tr>
@@ -576,7 +576,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>11</td><td><b>Quyết định mở CAPA/8D</b> theo ngưỡng</td><td>QA</td><td>CAPA8D hồ sơ + 8D file</td><td>Lớn / Nghiêm trọng/Quan trọng nhưng không mở CAPA</td></tr>
 <tr><td>12</td><td><b>Nguyên nhân gốc + điểm lọt</b> + hành động hệ thống</td><td>Responsible Person CAPA</td><td>5-Why/Ishikawa + hành động + bằng chứng triển khai</td><td>Nguyên nhân gốc = “do người”; không có cơ chế ngăn</td></tr>
 <tr><td>13</td><td><b>Effectiveness kiểm tra</b> và đóng hồ sơ</td><td>QA+Supervisor</td><td>Bằng chứng trước/sau + CAPA trạng thái Closed</td><td>Đóng vì “đã làm xong” nhưng không có dữ liệu hiệu lực</td></tr>
-<tr><td>14</td><td><b>Phát hành/Ship</b> chỉ khi cổng kiểm soát PASS</td><td>QA+WHS</td><td>ShipRelease đã phát hành + gói hồ sơ đầy đủ</td><td>Xuất hàng khi thiếu gói hồ sơ; thiếu link NCR</td></tr>
+<tr><td>14</td><td><b>Phát hành/Ship</b> chỉ khi cổng kiểm soát PASS</td><td>QA+WHS</td><td>ShipRelease Released + gói hồ sơ đầy đủ</td><td>Xuất hàng khi thiếu gói hồ sơ; thiếu link NCR</td></tr>
 </tbody>
 </table>
 </div>
@@ -713,7 +713,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Trường hợp nào bắt buộc mở CAPA/8D theo SOP-QMS-006?</li>
 <li>Tại sao chụp ảnh lỗi phải có thước/quy mô / thang đo hoặc chỉ dấu đo?</li>
 <li>Planner phải làm gì để chống vượt qua cổng kiểm soát khi có TẠM GIỮ?</li>
-<li>Kho phải kiểm tra những điều kiện nào trước khi chuyển ShipRelease sang đã phát hành?</li>
+<li>Kho phải kiểm tra những điều kiện nào trước khi chuyển ShipRelease sang Released?</li>
 <li>Ghi sai mã Mức nghiêm trọng trong list gây hậu quả vận hành gì?</li>
 <li>Khi nguyên nhân gốc ghi “do người”, yêu cầu bắt buộc phải bổ sung là gì?</li>
 <li>Điều kiện PASS của xác minh khi tình huống là CTQ là gì?</li>

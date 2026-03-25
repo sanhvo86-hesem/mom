@@ -58,7 +58,7 @@
       <div class="section">
         <h2>1. Mục đích và phạm vi</h2>
         <p>ANNEX này là ma trận escalation chính thức của HESEM để quyết định <b>khi nào phải nâng cấp thông tin</b>, <b>ai phải được gọi</b>, <b>trong bao lâu phải phản ứng</b>, <b>ai được quyền cho chạy lại / mở TẠM GIỮ / thông báo khách hàng</b> và <b>gói bằng chứng tối thiểu</b> phải có trước khi đóng sự kiện.</p>
-        <p>ANNEX này áp dụng cho mọi lệnh sản xuất, lot, lô giao hàng, thiết bị, hệ thống dữ liệu và sự kiện phát sinh ở phân xưởng, kho, QA, Kỹ thuật, Kế hoạch, Mua hàng, Kinh doanh/Khách hàng Dịch vụ, HSE và IT khi sự kiện có khả năng ảnh hưởng một trong các yếu tố sau: an toàn con người, an toàn sản phẩm, phù hợp kỹ thuật, giao hàng, truy xuất nguồn gốc, clean-trạng thái, dữ liệu điều hành, uy tín khách hàng hoặc nghĩa vụ tuân thủ.</p>
+        <p>ANNEX này áp dụng cho mọi lệnh sản xuất, lot, lô giao hàng, thiết bị, hệ thống dữ liệu và sự kiện phát sinh ở phân xưởng, kho, QA, Kỹ thuật, Kế hoạch, Mua hàng, Kinh doanh/Customer Dịch vụ, HSE và IT khi sự kiện có khả năng ảnh hưởng một trong các yếu tố sau: an toàn con người, an toàn sản phẩm, phù hợp kỹ thuật, giao hàng, truy xuất nguồn gốc, clean-trạng thái, dữ liệu điều hành, uy tín khách hàng hoặc nghĩa vụ tuân thủ.</p>
         <div class="callout"><strong>QUY TẮC CỨNG</strong>: sự kiện đạt ngưỡng escalation <b>PHẢI</b> được báo đúng cấp và đúng SLA. Không được tự ý “xử lý nội bộ cho êm”, không được hạ mức sự kiện để né escalation, không được mở lại sản xuất / đóng kiện / giao hàng khi chưa đủ thẩm quyền phát hành.</div>
       </div>
 
@@ -90,13 +90,13 @@
         <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
           <thead><tr><th>nhóm sản phẩm</th><th>Kích hoạt L2</th><th>Kích hoạt L3</th><th>Kích hoạt L4</th><th>Responsible Person điều phối mặc định</th></tr></thead>
           <tbody>
-            <tr><td>Chất lượng / sự phù hợp</td><td>NCR lặp lại; fail mẫu đầu; sai khác ảnh hưởng lot hiện hành.</td><td>CTQ/OOS; hỗn hợp / lẫn lộn trạng thái; nghi ngờ thoát / bỏ qua; thiếu bắt buộc bằng chứng trước phát hành.</td><td>Thoát đã ship, nghi ngờ hàng giả / hàng nhái, mất truy xuất nguồn gốc vật liệu cho hàng đã giao.</td><td>QA</td></tr>
-            <tr><td>Giao hàng / Kế hoạch</td><td>tuổi tồn WIP (tuổi tồn / tuổi tồn) vượt ngưỡng đỏ; hot job không có Responsible Person; cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) bị phá.</td><td>Nguy cơ thiếu / bỏ sót ship date đã cam kết; machine nút thắt / điểm nghẽn không có lộ trình gia công thay thế; giao hàng một phần chưa được phê duyệt.</td><td>Khách hàng stop dòng / chuyền / phạt mức độ tiếp xúc / phơi nhiễm / lô giao hàng bị chặn ở cửa giao.</td><td>Kế hoạch / Ops</td></tr>
+            <tr><td>Quality / sự phù hợp</td><td>NCR lặp lại; fail mẫu đầu; sai khác ảnh hưởng lot hiện hành.</td><td>CTQ/OOS; hỗn hợp / lẫn lộn trạng thái; nghi ngờ thoát / bỏ qua; thiếu bắt buộc bằng chứng trước phát hành.</td><td>Thoát đã ship, nghi ngờ hàng giả / hàng nhái, mất truy xuất nguồn gốc vật liệu cho hàng đã giao.</td><td>QA</td></tr>
+            <tr><td>Giao hàng / Kế hoạch</td><td>tuổi tồn WIP (tuổi tồn / tuổi tồn) vượt ngưỡng đỏ; hot job không có Responsible Person; cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) bị phá.</td><td>Nguy cơ thiếu / bỏ sót ship date đã cam kết; machine nút thắt / điểm nghẽn không có lộ trình gia công thay thế; giao hàng một phần chưa được phê duyệt.</td><td>Customer stop dòng / chuyền / phạt mức độ tiếp xúc / phơi nhiễm / lô giao hàng bị chặn ở cửa giao.</td><td>Kế hoạch / Ops</td></tr>
             <tr><td>Machine / Tooling / tiện ích</td><td>Sự cố hỏng máy > 30 phút ở công đoạn nút cổ chai; tuổi dao (tool tuổi thọ / vòng đời) vượt ngưỡng.</td><td>sự cố nghiêm trọng làm ảnh hưởng đường chạy dao/setup/part phả hệ truy xuất; tiện ích sự kiện làm dừng nhiều cell.</td><td>Sự kiện gây mất an toàn, cháy / hỏa hoạn rủi ro, điện mối nguy hoặc ảnh hưởng nhiều job trọng yếu.</td><td>Ops / Bảo trì</td></tr>
             <tr><td>Vệ sinh / FOD / Đóng gói</td><td>Giám sát vượt alert; phát hiện mở-pack không đúng quy tắc; dòng / chuyền thông quan / giải phóng fail.</td><td>hạt / phần tử xu hướng vượt hành động giới hạn; FOD phát hiện trong khu/pack; bảo quản cửa sổ / khung thời gian quá hạn.</td><td>Nhiễm bẩn có khả năng ảnh hưởng khách hàng ứng dụng; clean-trạng thái bị phá sau phát hành.</td><td>QA / Ops</td></tr>
-            <tr><td>Nhà cung cấp / Bên ngoài nhà cung cấp dịch vụ</td><td>Chậm cert, chậm người xử lý khe / vị trí, thiếu bằng chứng khi phiếu nhận / biên nhận.</td><td>Người xử lý scope không phù hợp; công đoạn đặc biệt fail; đã phê duyệt trạng thái xuống thử việc.</td><td>NCC gây thoát / bỏ qua lớn, vi phạm pháp lý, mất cert/phê duyệt bắt buộc cho job đang chạy.</td><td>Mua hàng / QA</td></tr>
+            <tr><td>Supplier / External nhà cung cấp dịch vụ</td><td>Chậm cert, chậm người xử lý khe / vị trí, thiếu bằng chứng khi phiếu nhận / biên nhận.</td><td>Người xử lý scope không phù hợp; công đoạn đặc biệt fail; đã phê duyệt trạng thái xuống thử việc.</td><td>NCC gây thoát / bỏ qua lớn, vi phạm pháp lý, mất cert/phê duyệt bắt buộc cho job đang chạy.</td><td>Mua hàng / QA</td></tr>
             <tr><td>Data / System / Truy cập</td><td>Luồng công việc lỗi làm chậm phê duyệt; thư mục sai path; người dùng truy cập không khớp cục bộ.</td><td>Data tính toàn vẹn rủi ro giữa Epicor và M365; hồ sơ không khôi phục được; quyền cao cấp cấp sai cho người dùng đang active.</td><td>Mất dữ liệu phát hành/lô giao hàng; nghi ngờ an ninh mạng sự kiện; thay đổi trái phép ảnh hưởng quyết định chất lượng/giao hàng.</td><td>IT / QMS</td></tr>
-            <tr><td>Khách hàng / Khiếu nại / Thương mại</td><td>Khiếu nại cần phản hồi trong ngày; sai điều kiện giao hàng cần xác nhận lại.</td><td>RMA/bảo hành sự kiện; khiếu nại có nguy cơ lan sang nhiều lô giao hàng.</td><td>Thu hồi, stop-ship, khách hàng điều hành escalation, pháp lý mức độ tiếp xúc / phơi nhiễm.</td><td>Kinh doanh-CS / QA</td></tr>
+            <tr><td>Customer / Khiếu nại / Thương mại</td><td>Khiếu nại cần phản hồi trong ngày; sai điều kiện giao hàng cần xác nhận lại.</td><td>RMA/bảo hành sự kiện; khiếu nại có nguy cơ lan sang nhiều lô giao hàng.</td><td>Thu hồi, stop-ship, khách hàng điều hành escalation, pháp lý mức độ tiếp xúc / phơi nhiễm.</td><td>Kinh doanh-CS / QA</td></tr>
             <tr><td>An toàn / EHS</td><td>Sự cố suýt xảy ra (gần / suýt-thiếu / bỏ sót) nghiêm trọng; PPE fail ở công việc nguy cơ cao.</td><td>có thể ghi nhận chấn thương, hóa chất tràn / đổ, nén-air lạm dụng, nâng sự kiện có nguy cơ tái diễn.</td><td>nghiêm trọng chấn thương, cháy / hỏa hoạn, sơ tán, cơ quan quản lý-tiện mặt đầu (tiện mặt đầu (facing)) sự kiện.</td><td>HSE / Ops</td></tr>
           </tbody>
         </table></div>
@@ -112,7 +112,7 @@
             <tr><td>Escalation tới quản lý chức năng</td><td>≤ 2 giờ</td><td>≤ 30 phút</td><td>≤ 15 phút</td></tr>
             <tr><td>Escalation tới cấp điều hành</td><td>Khi thiếu / bỏ sót SLA hoặc rủi ro tăng cấp</td><td>≤ 2 giờ</td><td>≤ 30 phút</td></tr>
             <tr><td>Quyết định war phòng</td><td>Khi vấn đề chặn kéo dài > 1 ca</td><td>≤ 4 giờ</td><td>Ngay khi xác nhận L4</td></tr>
-            <tr><td>Khách hàng thông báo</td><td>Khi hợp đồng/CSR yêu cầu</td><td>≤ 24 giờ hoặc sớm hơn theo hợp đồng</td><td>bằng lời ngay khi đủ dữ kiện tối thiểu, email chính thức ≤ 24 giờ</td></tr>
+            <tr><td>Customer thông báo</td><td>Khi hợp đồng/CSR yêu cầu</td><td>≤ 24 giờ hoặc sớm hơn theo hợp đồng</td><td>bằng lời ngay khi đủ dữ kiện tối thiểu, email chính thức ≤ 24 giờ</td></tr>
             <tr><td>Mở NCR / sự kiện hồ sơ</td><td>≤ 8 giờ làm việc</td><td>≤ 4 giờ</td><td>≤ 2 giờ</td></tr>
             <tr><td>Nguyên nhân gốc sơ bộ</td><td>≤ 2 ngày làm việc</td><td>≤ 1 ngày làm việc</td><td>≤ 24 giờ</td></tr>
           </tbody>
@@ -128,7 +128,7 @@
             <tr><td>Hold lot / hold job / stop machine</td><td>Lead / QA / Ops / Bảo trì</td><td>Lead hoặc chức năng sở hữu công đoạn; escalation lên Ops Manager nếu > 1 cell/job</td><td>Mã job/lot bị ảnh hưởng, phạm vi ảnh hưởng, lý do hold, thời điểm hold, Performer</td></tr>
             <tr><td>Mở lại sản xuất sau sự kiện chất lượng/machine</td><td>Responsible Person điều phối</td><td>QA + Ops; thêm Kỹ thuật khi thay đổi program/setup/tool</td><td>Ngăn chặn hoàn tất, nguyên nhân sơ bộ, mẫu đầu/tái xác nhận hiệu lực nếu áp dụng, cập nhật Hồ sơ công việc (hồ sơ công việc)</td></tr>
             <tr><td>Mở lô giao hàng / phát hành giao hàng</td><td>QA / WHS / Kinh doanh-CS</td><td>QA Manager hoặc người được ủy quyền theo <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td><td>Gói phát hành đủ, CoC đúng, label/SSCC đúng, số lượng đối soát, sai lệch/khách hàng phê duyệt nếu có</td></tr>
-            <tr><td>Khách hàng thông báo chính thức</td><td>Kinh doanh-CS / QA / QMS</td><td>Thương mại Responsible Person + QA/QMS + GM khi L4 hoặc hợp đồng yêu cầu</td><td>thực tế pack tối thiểu: part/job/lot, vấn đề báo cáo / tuyên bố, ngăn chặn, tác động đã biết/không xác định, next cập nhật time</td></tr>
+            <tr><td>Customer thông báo chính thức</td><td>Kinh doanh-CS / QA / QMS</td><td>Thương mại Responsible Person + QA/QMS + GM khi L4 hoặc hợp đồng yêu cầu</td><td>thực tế pack tối thiểu: part/job/lot, vấn đề báo cáo / tuyên bố, ngăn chặn, tác động đã biết/không xác định, next cập nhật time</td></tr>
             <tr><td>War phòng</td><td>Ops Manager / QMS Manager / GM</td><td>GM hoặc người được chỉ định</td><td>Lý do kích hoạt, Responsible Person, phòng nhịp độ / chu kỳ họp, hành động bảng, end điều kiện</td></tr>
           </tbody>
         </table></div>
@@ -143,7 +143,7 @@
         <div class="step-list">
           <div class="step-item"><b>Kích hoạt war phòng</b> khi xảy ra L4, khi L3 kéo dài quá 1 ngày mà chưa chặn được rủi ro giao hàng, hoặc khi một sự kiện tác động đồng thời tới chất lượng + giao hàng + khách hàng cam kết.</div>
           <div class="step-item"><b>Thiết lập Responsible Person và nhịp độ / chu kỳ họp</b>: chỉ định Sự cố Responsible Person, Log người giữ, khách hàng trọng tâm điểm, kỹ thuật trọng tâm điểm, next rà soát time và thoát / ra tiêu chí.</div>
-          <div class="step-item"><b>Khách hàng thông báo</b> phải nhất quán một tiếng nói. Không để Kinh doanh, QA, Kỹ thuật trả lời tách rời và mâu thuẫn nhau. Bản khách hàng thông báo phải nêu rõ thực tế hiện có, phần chưa biết, ngăn chặn đã áp dụng và thời gian cập nhật tiếp theo.</div>
+          <div class="step-item"><b>Customer thông báo</b> phải nhất quán một tiếng nói. Không để Kinh doanh, QA, Kỹ thuật trả lời tách rời và mâu thuẫn nhau. Bản khách hàng thông báo phải nêu rõ thực tế hiện có, phần chưa biết, ngăn chặn đã áp dụng và thời gian cập nhật tiếp theo.</div>
           <div class="step-item"><b>Đóng war phòng</b> chỉ khi ngăn chặn ổn định, công việc tồn đọng phát hành đã rõ, Responsible Person hành động tồn và ngày theo dõi tiếp sau war phòng đã được chốt.</div>
         </div>
       </div>
@@ -155,7 +155,7 @@
           <tbody>
             <tr><td>Nhận dạng sự kiện</td><td>Sự kiện ID, ngày giờ, job/WO/lot/part/rev, nhóm sản phẩm sự kiện, mức độ L1-L4, Responsible Person điều phối.</td></tr>
             <tr><td>Phạm vi ảnh hưởng</td><td>Cell/trung tâm gia công, số lượng bị ảnh hưởng, đã ship/chưa ship, khách hàng/program bị ảnh hưởng, lô giao hàng liên quan.</td></tr>
-            <tr><td>Ngăn chặn</td><td>TẠM GIỮ/cách ly/stop-machine/stop-ship/data-khóa đã áp dụng, lúc bắt đầu, người xác nhận, trạng thái hiện tại.</td></tr>
+            <tr><td>Ngăn chặn</td><td>TẠM GIỮ/cách ly/stop-machine/stop-ship/data-khóa đã áp dụng, lúc bắt đầu, người xác nhận, trạng thái Current.</td></tr>
             <tr><td>Escalation vết / nhật ký thay đổi</td><td>Ai đã được gọi, lúc nào, bằng kênh nào, phản hồi gì, escalation tiếp theo khi không bắt máy.</td></tr>
             <tr><td>Quyết định</td><td>Quyết định khởi động lại/phát hành/khách hàng thông báo/war phòng, người duyệt, căn cứ duyệt, điều kiện còn treo.</td></tr>
             <tr><td>Kết thúc</td><td>Nguyên nhân gốc sơ bộ/cuối cùng, hành động khắc phục, hành động phòng ngừa, xác nhận hiệu lực, bài học kinh nghiệm.</td></tr>

@@ -81,7 +81,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Bước 2 — Cô lập vật lý.</strong><br/>Đưa vật tư/WIP/FG vào khu <span class="code">TẠM GIỮ</span> hoặc <span class="code">cách ly / biệt trữ</span> đã định danh; dán tag nhận diện rõ part, lot, qty, lý do, time, người gắn.</div>
 <div class="step-item"><strong>Bước 3 — Giữ nguyên chứng cứ.</strong><br/>Không được tự ý đánh bóng, đổi nhãn, tháo bag, dỡ pallet, sửa bù trừ (bù trừ (offset)), reset bộ đếm / quầy, xóa dữ liệu, hoặc tách kiện trước khi chụp ảnh và ghi nhận tình trạng ban đầu.</div>
 <div class="step-item"><strong>Bước 4 — Gọi đúng người.</strong><br/>Báo Supervisor, QA, WHS và Responsible Person công đoạn. Nếu nghi đã chạm giao vận/khách hàng rủi ro, escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> trong cùng ca, không chờ họp sáng hôm sau.</div>
-<div class="step-item"><strong>Bước 5 — Mở hồ sơ.</strong><br/>Mở <a href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx"  download="">FRM-651</a> hoặc log hold tương đương; ghi thời điểm phát hiện, part/rev, lot/số sê-ri, qty ảnh hưởng, vị trí phát hiện, trạng thái hiện tại và nguyên nhân sơ bộ.</div>
+<div class="step-item"><strong>Bước 5 — Mở hồ sơ.</strong><br/>Mở <a href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx"  download="">FRM-651</a> hoặc log hold tương đương; ghi thời điểm phát hiện, part/rev, lot/số sê-ri, qty ảnh hưởng, vị trí phát hiện, trạng thái Current và nguyên nhân sơ bộ.</div>
 </div>
 </div><div class="section">
 <h2>3. Ranh giới lot logic và hỗn hợp / lẫn lộn-vị trí quét / dọn dẹp</h2>
@@ -128,7 +128,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <h2>6. đặc biệt trường hợp phải xử lý theo rule chặt hơn</h2>
 <h3>6.1 Cert / truy vết ngắt / nghỉ</h3>
 <p>Nếu part/lot không nối được với cert, MTC, người xử lý cert hoặc chuỗi-of-giám hộ / quản lý thì mặc định là nghi ngờ. Chỉ có hai hướng: khôi phục được truy vết bằng bằng chứng độc lập và được QA chấp nhận, hoặc disposition về trả lại/phế liệu/USE-AS-IS theo thẩm quyền. PHẢI dựa trên bằng chứng độc lập; không “suy luận hợp lý” để ghép cert cho lô khác.</p>
-<h3>6.2 Khách hàng thoát / bỏ qua / rủi ro giao hàng</h3>
+<h3>6.2 Customer thoát / bỏ qua / rủi ro giao hàng</h3>
 <p>Nếu lô nghi ngờ đã tới khu đóng gói, đã tạo CoC, đã xác nhận giao hàng (ship xác nhận) hoặc có khả năng đã giao khách, phải kích hoạt stop-ship / chặn / giao điểm / khách hàng truyền đạt / giao tiếp theo thang escalation đã phê duyệt. Không chờ họp CAPA mới gọi khách hoặc hãng vận chuyển.</p>
 <h3>6.3 FOD / clean vi phạm</h3>
 <p>Khi phát hiện phoi, dị vật, bao sạch thủng, bag mở sai quy định, chạm tay trần vào vùng clean hoặc có môi trường vượt ngưỡng, quét / dọn dẹp toàn bộ batch sạch liên quan và dùng thêm <a href="../07-WI-700/wi-721-fod-prevention-line-clearance-and-tool-accountability.html">WI-721</a> để dòng / chuyền thông quan / giải phóng, tool accountability và khôi phục / thu hồi. Chỉ phát hành lại sau khi khôi phục trạng thái sạch và kiểm chứng phù hợp.</p>

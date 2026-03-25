@@ -105,7 +105,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="box"><b>Mục tiêu lỗi</b><span>0 lô giao hàng sai</span><div class="mini">Sai part / sai rev / sai qty / sai job</div></div>
 <div class="box"><b>Điểm khoá</b><span>Cổng kiểm soát G5</span><div class="mini">Phê duyệt giao hàng (ship phát hành) người xác nhận</div></div>
 <div class="box"><b>Đối tượng</b><span>PackID + SSCC</span><div class="mini">Mỗi kiện 1 ID duy nhất</div></div>
-<div class="box"><b>Lưu trữ</b><span>Tier 1 ≥ 10 năm</span><div class="mini">bộ hồ sơ giao hàng + chứng cứ khoá cổng kiểm soát</div></div>
+<div class="box"><b>Archive</b><span>Tier 1 ≥ 10 năm</span><div class="mini">bộ hồ sơ giao hàng + chứng cứ khoá cổng kiểm soát</div></div>
 </div>
 <div class="warn" style="margin-top:12px">
 <b>Quy tắc vận hành:</b> Khi ReconciliationStatus ≠ <span class="qa-badge">Pass</span> hoặc PacketComplete ≠ <span class="qa-badge">Yes</span> → trạng thái ShipRelease = <span class="qa-badge">Đã chặn</span> và kiện hàng không rời khỏi nhà máy.
@@ -127,7 +127,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/">WI-OPS-010 — GS1 SSCC Giao vận Label &amp; Đối chiếu đóng gói</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//02-WI-200//">WI-OPS-005 — Bộ hồ sơ phê duyệt giao hàng (ship gói phát hành)</a></li>
-<li><a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//">WI-OPS-008 — Hồ sơ công việc Quản trị &amp; Bộ bằng chứng</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//">WI-OPS-008 — Hồ sơ công việc Governance &amp; Bộ bằng chứng</a></li>
 <li><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx">FRM-WHS-002 — Giao vận Bảng kiểm</a></li>
 <li><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-706_Shipping_Label.xlsx">FRM-WHS-006 — Giao vận Label</a></li>
 <li><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-707_Packaging_Checklist.xlsx">FRM-WHS-007 — Đóng gói Bảng kiểm</a></li>
@@ -179,7 +179,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>PackID</b>: định danh nội bộ cho kiện/pack; PackID = Epicor PackNum khi áp dụng.</li>
 <li><b>SSCC</b>: mã hậu cần đơn vị theo GS1 AI (00); phát sinh và đăng ký trong <span class="path">PackSSCCRegister</span>.</li>
 <li><b>ShipmentMirror</b>: dữ liệu lô giao hàng từ Epicor (nguồn chuẩn) được phản chiếu / sao chép vào M365 để đối soát.</li>
-<li><b>ShipRelease</b>: hồ sơ phát hành xuất hàng (Power ứng dụng + SharePoint list); trạng thái Draft/RequestRelease/đã phát hành/Đã chặn.</li>
+<li><b>ShipRelease</b>: hồ sơ phát hành xuất hàng (Power ứng dụng + SharePoint list); trạng thái Draft/RequestRelease/Released/Đã chặn.</li>
 <li><b>Bộ hồ sơ giao hàng</b>: thư mục chứng cứ trong Hồ sơ công việc (07_Shipping-Đóng gói).</li>
 </ul>
 </div>
@@ -204,11 +204,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>PackID</td><td>Epicor/WHS</td><td>Yes</td><td>duy nhất; bất biến sau khi Đã giao hàng</td><td>PackSSCCRegister / ShipRelease / PackagingChecks</td></tr>
 <tr><td>EpicorPackNum</td><td>Epicor phản chiếu / sao chép</td><td>Yes</td><td>Khớp ShipmentMirror</td><td>PackSSCCRegister / ShipRelease</td></tr>
 <tr><td>SSCC</td><td>Label dịch vụ</td><td>Yes</td><td>18 chữ số; kiểm tra chữ số hợp lệ; không tái sử dụng</td><td>PackSSCCRegister / ShipRelease</td></tr>
-<tr><td>JobNum</td><td>JobIndex</td><td>Yes</td><td>Job tồn tại; khớp Part/Rev/Khách hàng</td><td>ShipRelease / PackagingChecks</td></tr>
+<tr><td>JobNum</td><td>JobIndex</td><td>Yes</td><td>Job tồn tại; khớp Part/Rev/Customer</td><td>ShipRelease / PackagingChecks</td></tr>
 <tr><td>Qty</td><td>ShipmentMirror</td><td>Yes</td><td>Khớp count + phiếu kê đóng gói (phiếu kê đóng gói)</td><td>ShipmentMirror / ShipRelease</td></tr>
 <tr><td>PacketComplete</td><td>M365</td><td>Yes</td><td>Yes khi đủ link chứng cứ Tier‑1</td><td>ShipRelease</td></tr>
 <tr><td>ReconciliationStatus</td><td>LUỒNG-WHS-13</td><td>Yes</td><td>Pass / Fail / Đã chặn</td><td>ShipRelease</td></tr>
-<tr><td>Trạng thái</td><td>WHS</td><td>Yes</td><td>Draft/Đã in/Đã xác minh/đã phát hành/Đã giao hàng/Đã hủy</td><td>PackSSCCRegister</td></tr>
+<tr><td>Trạng thái</td><td>WHS</td><td>Yes</td><td>Draft/Đã in/Đã xác minh/Released/Đã giao hàng/Đã hủy</td><td>PackSSCCRegister</td></tr>
 <tr><td>PrintVersion</td><td>LUỒNG-WHS-12</td><td>Yes</td><td>1 = in lần đầu; tăng 1 cho mỗi lần in lại</td><td>PackSSCCRegister</td></tr>
 <tr><td>ReprintReasonCode</td><td>Team Leader kho/QA</td><td>điều kiện (điều kiện (Cond)).</td><td>Bắt buộc khi PrintVersion &gt; 1</td><td>PackSSCCRegister</td></tr>
 <tr><td>PacketFolderUrl</td><td>Hồ sơ công việc</td><td>Yes</td><td>Trỏ đúng 07_Shipping-Đóng gói</td><td>ShipRelease / PackSSCCRegister</td></tr>
@@ -227,7 +227,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>PackID tồn tại trong ShipmentMirror và Job/Qty khớp / phù hợp.</li>
 <li>SSCC đã đăng ký trong PackSSCCRegister và trạng thái = Đã xác minh.</li>
 <li>bộ hồ sơ giao hàng có tối thiểu: Final IR/CMM + CoC/Cert theo PO + PackagingChecks PASS + ảnh nhãn.</li>
-<li>ShipRelease có ApprovalHistory (WHS + QA) và Trạng thái = đã phát hành.</li>
+<li>ShipRelease có ApprovalHistory (WHS + QA) và Trạng thái = Released.</li>
 </ol>
 </div>
 <div>
@@ -286,9 +286,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td class="role">Người định giá (SAL-03)</td>
-<td>Khách hàng‑cụ thể</td>
+<td>Customer‑cụ thể</td>
 <td>Ghi nhận yêu cầu nhãn/đóng gói; xác nhận địa chỉ; gửi ASN/thông báo theo yêu cầu khách</td>
-<td>PO ghi chú; ShipRelease trường dữ liệu Khách hàng/PO</td>
+<td>PO ghi chú; ShipRelease trường dữ liệu Customer/PO</td>
 <td>Tình huống diễn tập + hồ sơ cập nhật</td>
 </tr>
 <tr>
@@ -357,7 +357,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>10</td><td>Tạo/hoàn thiện ShipRelease hồ sơ; gắn PacketFolderUrl; đặt PacketComplete</td><td>WHS</td><td>ShipRelease row: PacketFolderUrl + PacketComplete</td><td>Link thư mục sai; PacketComplete đặt sai</td></tr>
 <tr><td>11</td><td>Submit ShipRelease để chạy LUỒNG-WHS-13; nhận ReconciliationStatus</td><td>WHS</td><td>ReconciliationStatus Đạt/không đạt/Đã chặn; log time</td><td>Submit thiếu trường; trạng thái không cập nhật</td></tr>
 <tr><td>12</td><td>khi không đạt/Đã chặn: mở StandupAction S1; khoanh vùng; sửa nguyên nhân và re‑xác nhận hiệu lực</td><td>Supervisor + QA + WHS</td><td>log hành động + bằng chứng sửa lỗi; re‑run người xác nhận</td><td>Vượt qua; ship “tạm”; sửa không có log</td></tr>
-<tr><td>13</td><td>Khi Pass: WHS + QA phê duyệt; ShipRelease.Trạng thái = đã phát hành</td><td>Team Leader kho + QA</td><td>ApprovalHistory; dấu vết kiểm toán</td><td>Thiếu chữ ký; phê duyệt sai người</td></tr>
+<tr><td>13</td><td>Khi Pass: WHS + QA phê duyệt; ShipRelease.Trạng thái = Released</td><td>Team Leader kho + QA</td><td>ApprovalHistory; dấu vết kiểm toán</td><td>Thiếu chữ ký; phê duyệt sai người</td></tr>
 <tr><td>14</td><td>Bàn giao đơn vị vận chuyển; cập nhật đơn vị vận chuyển/Theo dõi/ShipDate; PackSSCCRegister.Trạng thái = Đã giao hàng</td><td>WHS</td><td>đơn vị vận chuyển/Theo dõi; ảnh bàn giao; dấu thời gian</td><td>Theo dõi sai; thiếu ảnh bàn giao</td></tr>
 <tr><td>15</td><td>Lưu POD/bằng chứng; khóa hồ sơ Tier 1; đóng lô giao hàng</td><td>QA + Người định giá (SAL-03)</td><td>POD file; lưu giữ label Tier 1 ≥ 10 năm</td><td>POD thất lạc; lưu giữ không áp</td></tr>
 </tbody>
@@ -433,7 +433,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Lưu giữ label không áp cho hồ sơ Tier 1; không chứng minh thời hạn lưu ≥ 10 năm.</li>
 </ol>
 <div class="callout">
-<b>Quy tắc kiểm soát:</b> QA thực hiện đánh giá nội bộ theo mẫu “bộ hồ sơ giao hàng điểm / tại chỗ‑Kiểm tra” M365/SharePoint → HESEM-QMS-SSOT với tần suất tối thiểu 01 lần/tuần cho các lô giao hàng đã đã phát hành.
+<b>Quy tắc kiểm soát:</b> QA thực hiện đánh giá nội bộ theo mẫu “bộ hồ sơ giao hàng điểm / tại chỗ‑Kiểm tra” M365/SharePoint → HESEM-QMS-SSOT với tần suất tối thiểu 01 lần/tuần cho các lô giao hàng đã Released.
  </div>
 </div>
 <div class="card">
@@ -442,7 +442,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <h3 class="h3">MRR bắt buộc cho phê duyệt giao hàng (Tier 1)</h3>
 <ul>
-<li>ShipRelease hồ sơ (đã phát hành) + ReconciliationStatus = Pass.</li>
+<li>ShipRelease hồ sơ (Released) + ReconciliationStatus = Pass.</li>
 <li>Final IR/CMM PASS (PDF khoá).</li>
 <li>FRM-WHS-007 PackagingChecks = PASS + ảnh đóng gói + ảnh nhãn.</li>
 <li>Phiếu kê đóng gói + CoC + cert theo PO (nguyên vật liệu/công đoạn đặc biệt).</li>
@@ -550,17 +550,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Kiểm tra chữ số SSCC được tính theo thuật toán nào? (A) CRC32 (B) Mod‑10 (C) SHA‑1 (D) Mod‑11</li>
 <li>Khi ReconciliationStatus = Đã chặn, hành động bắt buộc là gì? (A) Ship ngay (B) Tạo StandupAction S1 + khoanh vùng (C) Bỏ qua (D) In nhãn mới</li>
 <li>PackSSCCRegister.PrintVersion = 1 có nghĩa gì? (A) In lần đầu (B) In lần 2 (C) Đã void (D) Đã ship</li>
-<li>Trường nào bắt buộc ghi khi PrintVersion &gt; 1? (A) Khách hàng (B) ReprintReasonCode (C) đơn vị vận chuyển (D) ShipDate</li>
+<li>Trường nào bắt buộc ghi khi PrintVersion &gt; 1? (A) Customer (B) ReprintReasonCode (C) đơn vị vận chuyển (D) ShipDate</li>
 <li>PacketComplete = Yes khi nào? (A) Khi có nhãn (B) Khi đủ link chứng cứ Tier‑1 (C) Khi có theo dõi (D) Khi có pallet</li>
 <li>Đối soát Qty lấy dữ liệu chuẩn từ đâu? (A) Excel cá nhân (B) ShipmentMirror từ Epicor (C) Email (D) Ảnh chụp</li>
-<li>Trạng thái nào của PackSSCCRegister được dùng khi huỷ nhãn? (A) đã phát hành (B) Đã hủy (C) Đã giao hàng (D) Đã in</li>
+<li>Trạng thái nào của PackSSCCRegister được dùng khi huỷ nhãn? (A) Released (B) Đã hủy (C) Đã giao hàng (D) Đã in</li>
 <li>Scan test thực hiện trước thời điểm nào? (A) Sau khi bàn giao đơn vị vận chuyển (B) Trước khi niêm phong kiện (C) Sau khi ship (D) Sau khi đánh giá</li>
 <li>bộ hồ sơ giao hàng phải nằm trong thư mục nào của Hồ sơ công việc? (A) 03_Programs-Setup (B) 04_Inspection-FAI (C) 07_Shipping-Đóng gói (D) 08_Photos</li>
-<li>Ai được phép in lại nhãn theo rule? (A) Bất kỳ ai (B) Team Leader kho hoặc QA (C) Kinh doanh (D) Khách hàng</li>
+<li>Ai được phép in lại nhãn theo rule? (A) Bất kỳ ai (B) Team Leader kho hoặc QA (C) Kinh doanh (D) Customer</li>
 <li>Khi SSCC đã Đã hủy, xử lý đúng là gì? (A) Tái sử dụng SSCC (B) Xoá hồ sơ (C) Giữ hồ sơ + không tái sử dụng (D) Đổi khách hàng</li>
 <li>Mục tiêu chính của đối soát là gì? (A) Tăng giấy tờ (B) Ngăn ship sai/thiếu + tạo bằng chứng đánh giá (C) Tăng thời gian (D) Giảm ảnh chụp</li>
 <li>Đối soát cổng kiểm soát chạy khi nào? (A) Khi ShipRelease submit (B) Khi in nhãn (C) Khi tạo PO (D) Khi nhận vật tư</li>
-<li>Thiếu Final IR/CMM PASS dẫn tới trạng thái nào? (A) đã phát hành (B) Pass (C) Đã chặn (D) Đã giao hàng</li>
+<li>Thiếu Final IR/CMM PASS dẫn tới trạng thái nào? (A) Released (B) Pass (C) Đã chặn (D) Đã giao hàng</li>
 <li>Thông tin cốt lõi trên hậu cần label phải có dạng gì? (A) Chỉ chữ in (B) Chỉ mã vạch (C) mã vạch + chữ in (D) Chỉ QR</li>
 <li>Trường nào lưu link mở màn hình ShipRelease qua QR? (A) liên kết QR phát hành giao hàng (B) EvidenceFolderUrl (C) PhotosUrl (D) GS1Payload</li>
 <li>Ai chịu trách nhiệm duy trì máy in/máy quét? (A) Bảo trì (B) QC (C) Kinh doanh (D) Mua hàng</li>

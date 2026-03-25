@@ -223,7 +223,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Tier 1</b> (Hàng ngày/Shift)</td>
 <td>Đầu mỗi ca (2 ca/ngày)</td>
 <td>10–15 phút</td>
-<td>Điều phối/WIP, job Due ≤ 48h, danh sách Đã chặn, Chất lượng holds/NCR, Giao vận mức sẵn sàng, Thời gian ngừng máy top 3, EHS cảnh báo</td>
+<td>Điều phối/WIP, job Due ≤ 48h, danh sách Đã chặn, Quality holds/NCR, Giao vận mức sẵn sàng, Thời gian ngừng máy top 3, EHS cảnh báo</td>
 <td>
 <b>FRM-OPS-005 họp đứng / họp nhanh Log hành động</b> (cập nhật đầy đủ) + ảnh Tier bảng + danh sách escal (S1/S2) trong ca
  </td>
@@ -316,7 +316,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Lẫn lộn/lẫn lô</b> vì Kho không khóa truy xuất nguồn gốc tại bàn giao giữa ca → ship sai lô.</li>
 <li><b>thiếu / đã giả mạo outsource tài liệu/công đoạn đặc biệt</b> vì Tier 2 không rà gói hồ sơ → mất bằng chứng đánh giá.</li>
 <li><b>Job “đứng im” qua đêm</b> vì không gán Responsible Person + hạn chót giờ/phút → trễ giao hàng.</li>
-<li><b>Chất lượng hold bị bỏ quên</b> vì không có rule escal khi hold vượt SLA → rủi ro giao hàng.</li>
+<li><b>Quality hold bị bỏ quên</b> vì không có rule escal khi hold vượt SLA → rủi ro giao hàng.</li>
 <li><b>Vượt qua cổng kiểm soát QC</b> vì áp lực tiến độ + không có STOP/TẠM GIỮ rõ → không phù hợp sản phẩm.</li>
 <li><b>Gage OOT/quá hạn hiệu chuẩn</b> nhưng vẫn đo vì Tier 1 không xem trạng thái gage → dữ liệu đo không hợp lệ.</li>
 <li><b>Thời gian ngừng máy lặp lại</b> vì Bảo trì xử lý “chữa cháy” không có hành động chống lặp + không ghi bằng chứng.</li>
@@ -359,7 +359,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Level 2 khi vấn đề chặn &gt; 2h hoặc Due ≤ 48h bị ảnh hưởng</td>
 </tr>
 <tr>
-<td><b>Chất lượng hold quản trị</b>: ngăn chặn + tiêu chí giải hold</td>
+<td><b>Quality hold quản trị</b>: ngăn chặn + tiêu chí giải hold</td>
 <td>QC/QA</td>
 <td>Mỗi Tier 1</td>
 <td>NCR/Hold hồ sơ + bằng chứng đo/kiểm</td>
@@ -486,13 +486,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td>Chuẩn bị bảng Tier 1: WIP/Điều phối, Due ≤ 48h, Đã chặn, Holds, Ship cắt / ngưỡng cắt, Thời gian ngừng máy</td><td>Supervisor + Planner + QC</td><td>Ảnh Tier bảng + dữ liệu WIP Nguồn: SSOT + Epicor + IntegrationLogs.</td><td>Thiếu danh sách Due ≤ 48h; thiếu vấn đề chặn</td></tr>
 <tr><td>2</td><td>Mở họp đúng giờ, nhắc “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”, chốt khung thời gian giới hạn 15 phút</td><td>Supervisor</td><td>FRM-OPS-005 có giờ họp + điều phối</td><td>Họp kéo dài, lan man, không chốt đầu ra</td></tr>
 <tr><td>3</td><td>Rà Điều phối/WIP: job Due ≤ 48h và job Đã chặn</td><td>Planner + Supervisor</td><td>FRM-OPS-005 (Kích hoạt/Tuổi tồn/Ảnh hưởng)</td><td>Không ghi tuổi tồn; không gán Responsible Person</td></tr>
-<tr><td>4</td><td>Rà Chất lượng holds/NCR/MRB: quyết định GO/TẠM GIỮ/CHẶN</td><td>QC/QA</td><td>Hold/NCR hồ sơ + quyết định + ngăn chặn</td><td>Ghi “đang chờ” không tiêu chí giải hold</td></tr>
+<tr><td>4</td><td>Rà Quality holds/NCR/MRB: quyết định GO/TẠM GIỮ/CHẶN</td><td>QC/QA</td><td>Hold/NCR hồ sơ + quyết định + ngăn chặn</td><td>Ghi “đang chờ” không tiêu chí giải hold</td></tr>
 <tr><td>5</td><td>Rà Giao vận mức sẵn sàng: gói hồ sơ, nhãn, truy xuất nguồn gốc, cắt / ngưỡng cắt</td><td>Kho + QA</td><td>Bảng kiểm gói hồ sơ + ảnh nhãn + COC</td><td>Cho đóng gói khi thiếu COC/nhãn</td></tr>
 <tr><td>6</td><td>Rà Thời gian ngừng máy top 3 + gán hành động chống lặp</td><td>Bảo trì + Supervisor</td><td>Thời gian ngừng máy Log + hành động + ảnh/phiếu</td><td>Chỉ ghi “sửa xong”, không chống lặp</td></tr>
 <tr><td>7</td><td>Ghi Hành động list theo chuẩn: Hành động–Chủ trách nhiệm–Due time–Trạng thái–Minh chứng link</td><td>Người ghi biên bản (Supervisor chỉ định)</td><td>FRM-OPS-005</td><td>Không ghi due time giờ/phút; thiếu link</td></tr>
 <tr><td>8</td><td>Áp “Escalation bậc thang năng lực”: Level 1 xử lý trong 2 giờ</td><td>Chủ trách nhiệm hành động</td><td>Cập nhật trạng thái trong FRM-OPS-005</td><td>Để quá 2 giờ không escal</td></tr>
 <tr><td>9</td><td>Escal Level 2 khi: không giải trong 2 giờ hoặc ảnh hưởng Due ≤ 48h</td><td>Supervisor + QA Lead + Sản xuất Lead</td><td>Hồ sơ escal (tag S1/S2/S3)</td><td>Escal miệng không hồ sơ</td></tr>
-<tr><td>10</td><td>Escal Level 3 khi: rủi ro thiếu / bỏ sót ship date hoặc khách khiếu nại</td><td>Ops Trưởng / Đầu/GM + Người định giá (SAL-03)</td><td>Biên bản/quyết định log Biểu mẫu: biểu mẫu/index.html#dao-tao (FRM-Đào tạo/OJT/Đánh giá/Chứng chỉ).</td><td>Đổi ưu tiên không thông báo khách có dấu vết</td></tr>
+<tr><td>10</td><td>Escal Level 3 khi: rủi ro thiếu / bỏ sót ship date hoặc khách khiếu nại</td><td>Ops Trưởng / Đầu/GM + Người định giá (SAL-03)</td><td>Biên bản/quyết định log Biểu mẫu: biểu mẫu/index.html#dao-tao (FRM-Training/OJT/Đánh giá/Chứng chỉ).</td><td>Đổi ưu tiên không thông báo khách có dấu vết</td></tr>
 <tr><td>11</td><td>Đóng họp: đọc lại 5 hành động quan trọng nhất + xác nhận Responsible Person</td><td>Supervisor</td><td>FRM-OPS-005 cập nhật</td><td>Kết thúc mà không đọc lại hành động</td></tr>
 <tr><td>12</td><td>Bàn giao giữa ca: rà soát hành động còn mở + bàn giao Responsible Person</td><td>Supervisor ca + Operator/Setup</td><td>Ảnh Tier bảng cuối ca + FRM-OPS-005</td><td>Chuyển ca mà không bàn giao hành động</td></tr>
 <tr><td>13</td><td>Đóng hành động bằng minh chứng: ảnh/phiếu/link hồ sơ</td><td>Chủ trách nhiệm hành động</td><td>Minh chứng link trong FRM-OPS-005</td><td>Đóng hành động không có bằng chứng</td></tr>

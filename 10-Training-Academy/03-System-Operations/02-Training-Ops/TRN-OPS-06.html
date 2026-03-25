@@ -126,8 +126,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>HR/Đào tạo</b></td>
-<td>Quản trị kế hoạch đào tạo, sổ theo dõi tái chứng nhận, kho hồ sơ đào tạo; đảm bảo truy xuất nguồn gốc 60 giây theo yêu cầu đánh giá.</td>
+<td><b>HR/Training</b></td>
+<td>Governance kế hoạch đào tạo, sổ theo dõi tái chứng nhận, kho hồ sơ đào tạo; đảm bảo truy xuất nguồn gốc 60 giây theo yêu cầu đánh giá.</td>
 <td>Kho hồ sơ có cấu trúc chuẩn; log tái chứng nhận cập nhật; diễn tập truy xuất nguồn gốc PASS.</td>
 </tr>
 <tr>
@@ -173,7 +173,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Báo giá/Hợp đồng</b></td>
 <td>Yêu cầu khách hàng/điều khoản chất lượng</td>
-<td>Đào tạo hồ sơ “Khách hàng yêu cầu nhận thức” cho Người định giá (SAL-03)</td>
+<td>Training hồ sơ “Customer yêu cầu nhận thức” cho Người định giá (SAL-03)</td>
 <td>Thiếu hồ sơ nhận thức điều khoản = <b>CHẶN</b> chốt cam kết/thời gian dẫn (lead time)</td>
 </tr>
 <tr>
@@ -238,7 +238,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Phản hồi/CI</b></td>
-<td>Khách hàng phản hồi + đánh giá nội bộ</td>
+<td>Customer phản hồi + đánh giá nội bộ</td>
 <td>Hồ sơ đào tạo cải tiến/cập nhật SOP sau phát hiện</td>
 <td>Phát hiện mở quá hạn = <b>TẠM GIỮ</b> tăng level / <b>CHẶN</b> mở scope mới</td>
 </tr>
@@ -247,7 +247,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3>Luồng bàn giao tối thiểu (đầu vào/đầu ra)</h3>
 <ol>
-<li><b>HR/Đào tạo</b> cấp “Bộ bằng chứng đào tạo” cho từng nhân sự theo mô-đun → gửi link kho hồ sơ + quy tắc đặt tên.</li>
+<li><b>HR/Training</b> cấp “Bộ bằng chứng đào tạo” cho từng nhân sự theo mô-đun → gửi link kho hồ sơ + quy tắc đặt tên.</li>
 <li><b>Supervisor</b> xác nhận OJT + kiểm tra hạn chứng nhận trước khi giao việc.</li>
 <li><b>QA/QMS</b> đánh giá nội bộ theo diễn tập 60 giây và trả về hành động list; đóng hành động mới mở scope.</li>
 </ol>
@@ -286,14 +286,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>CP1 — Nguồn dữ liệu duy nhất</b></td>
-<td>HR/Đào tạo</td>
+<td>HR/Training</td>
 <td>Kho hồ sơ đào tạo (SharePoint Thư viện) + cấu trúc theo nhân sự/vai trò/mô-đun</td>
 <td>Liên tục</td>
 </tr>
 <tr>
 <td><b>CP2 — Khoá phiên bản</b></td>
 <td>QA/QMS (Doc Control)</td>
-<td>Danh mục mô-đun + phiên bản; hồ sơ “đã nhận thức phiên bản mới” khi phát hành</td>
+<td>Danh mục mô-đun + phiên bản; hồ sơ “Received thức phiên bản mới” khi phát hành</td>
 <td>Khi phát hành</td>
 </tr>
 <tr>
@@ -359,7 +359,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <h3>Diễn tập chuẩn (mục tiêu ≤60 giây)</h3>
 <ol>
-<li>Mở <b>SharePoint Đào tạo Hồ sơ</b> → tìm theo <b>Mã NV</b> hoặc <b>Họ tên</b>.</li>
+<li>Mở <b>SharePoint Training Hồ sơ</b> → tìm theo <b>Mã NV</b> hoặc <b>Họ tên</b>.</li>
 <li>Mở thư mục <span class="path">TRN-OPS-06</span> → chọn phiên bản mới nhất.</li>
 <li>Mở 04 file bắt buộc: <b>Chuyên cần</b> + <b>kết quả bài kiểm tra nhanh</b> + <b>Tình huống</b> + <b>bài kiểm tra thực hành tiêu chí đánh giá</b>.</li>
 <li>Chụp màn hình “đường dẫn + ngày + trạng thái Hợp lệ” làm bằng chứng diễn tập (lưu vào log diễn tập).</li>
@@ -394,7 +394,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td>Xác định vai trò + scope công việc (máy/công đoạn/CTQ) cho từng người</td><td>Supervisor + HR</td><td>Kỹ năng Matrix + scope note</td><td>Không ghi rõ phạm vi → đánh giá hỏi “được làm gì” không trả lời được</td></tr>
 <tr><td>2</td><td>Định danh hồ sơ: mã NV, họ tên chuẩn, bộ phận, ca</td><td>HR</td><td>Danh mục nhân sự chuẩn</td><td>Viết tắt/đổi tên → tìm không ra</td></tr>
 <tr><td>3</td><td>Thiết lập thư mục chuẩn theo nhân sự/vai trò/mô-đun</td><td>HR</td><td>Thư mục cấu trúc + quyền truy cập</td><td>Thư mục trùng tên/khác cấu trúc giữa phòng ban</td></tr>
-<tr><td>4</td><td>Kiểm tra phiên bản mô-đun đang áp dụng (Draft,...)</td><td>QA/QMS</td><td>Danh mục mô-đun + DCR hồ sơ</td><td>Đào tạo bằng file cũ lưu trên máy cá nhân</td></tr>
+<tr><td>4</td><td>Kiểm tra phiên bản mô-đun đang áp dụng (Draft,...)</td><td>QA/QMS</td><td>Danh mục mô-đun + DCR hồ sơ</td><td>Training bằng file cũ lưu trên máy cá nhân</td></tr>
 <tr><td>5</td><td>Tổ chức đào tạo và ghi chuyên cần / điểm danh</td><td>Người đào tạo</td><td>FRM-HR-TRN-002</td><td>Chỉ có danh sách, không có nội dung/giờ học</td></tr>
 <tr><td>6</td><td>Thi bài kiểm tra nhanh và lưu kết quả</td><td>Người đào tạo</td><td>FRM-HR-TRN-009 + kết quả</td><td>Không lưu đáp án/ký xác nhận</td></tr>
 <tr><td>7</td><td>Chạy tình huống và lưu quyết định + bằng chứng</td><td>Người đào tạo + QA</td><td>phiếu tình huống + quyết định TẠM GIỮ/GO</td><td>Trả lời miệng, không có hồ sơ</td></tr>
@@ -570,7 +570,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>2</td>
-<td>Khách hàng yêu cầu chứng minh Người định giá (SAL-03) đã được đào tạo điều khoản “bộ hồ sơ giao hàng bắt buộc gồm CoC + cert công đoạn đặc biệt”. Hồ sơ lưu trong email cá nhân, không có trong kho.</td>
+<td>Customer yêu cầu chứng minh Người định giá (SAL-03) đã được đào tạo điều khoản “bộ hồ sơ giao hàng bắt buộc gồm CoC + cert công đoạn đặc biệt”. Hồ sơ lưu trong email cá nhân, không có trong kho.</td>
 <td><b>CHẶN</b> chốt cam kết bộ hồ sơ giao hàng đến khi hồ sơ đưa vào kho và diễn tập PASS</td>
 <td>Pack của Người định giá (SAL-03) + log diễn tập 60 giây + hồ sơ nhận thức điều khoản</td>
 </tr>
@@ -634,9 +634,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>12.3 Nơi lưu (SharePoint thư viện/list/path)</h3>
 <div class="callout">
 <ul>
-<li><b>Kho hồ sơ đào tạo (bằng chứng):</b> <span class="path">M365/SharePoint → CNC-IMS-HUB → CNC-IMS-HUB → QMS-Hồ sơ → Đào tạo-Hồ sơ. → {{Phòng ban}} → {{EmpID}} → TRN-OPS-06</span></li>
+<li><b>Kho hồ sơ đào tạo (bằng chứng):</b> <span class="path">M365/SharePoint → CNC-IMS-HUB → CNC-IMS-HUB → QMS-Hồ sơ → Training-Hồ sơ. → {{Department}} → {{EmpID}} → TRN-OPS-06</span></li>
 <li><b>Biểu mẫu &amp; mô-đun (tài liệu kiểm soát):</b> <span class="path">M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → đào tạo → academy</span></li>
-<li><b>Log tái chứng nhận (list):</b> <span class="path">M365/SharePoint → CNC-IMS-HUB → CNC-IMS-HUB → QMS-Hồ sơ → Đào tạo-Hồ sơ. → Re-Cert Theo dõi</span></li>
+<li><b>Log tái chứng nhận (list):</b> <span class="path">M365/SharePoint → CNC-IMS-HUB → CNC-IMS-HUB → QMS-Hồ sơ → Training-Hồ sơ. → Re-Cert Theo dõi</span></li>
 </ul>
 </div>
 <h3>12.4 Chỉ số bắt buộc (đo sẵn sàng đánh giá)</h3>

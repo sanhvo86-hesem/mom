@@ -93,7 +93,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Thông tin triển khai</strong>
 <ul>
-<li><strong>Đối tượng:</strong> QA/QMS, QC, Sản xuất (Operator/Setup/Team Leader), Kỹ thuật/Lập trình, Kế hoạch/Mua hàng, Kho/Giao hàng, Bảo trì/Hiệu chuẩn, Kinh doanh/CS, HR/Đào tạo.</li>
+<li><strong>Đối tượng:</strong> QA/QMS, QC, Sản xuất (Operator/Setup/Team Leader), Kỹ thuật/Lập trình, Kế hoạch/Mua hàng, Kho/Giao hàng, Bảo trì/Hiệu chuẩn, Kinh doanh/CS, HR/Training.</li>
 <li><strong>Giới hạn thời gian học:</strong> mỗi vai trò học tối đa 02 ngày/tuần; ưu tiên chia nhỏ theo ca.</li>
 <li><strong>Thời lượng chuẩn:</strong> Lý thuyết 2 giờ • Thực hành nhóm 2 giờ • OJT 4 giờ • Đánh giá 1 giờ.</li>
 <li><strong>Đầu vào bắt buộc:</strong> hoàn tất Định hướng QMS + hiểu cách truy xuất nguồn gốc hồ sơ Hồ sơ Job.</li>
@@ -164,7 +164,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Không xuất hàng khi thiếu QA phát hành; truy vết được lô → Job → chứng từ; khu TẠM GIỮ/NG rõ ràng.</td>
 </tr>
 <tr>
-<td><b>Kinh doanh/CS + HR/Đào tạo</b></td>
+<td><b>Kinh doanh/CS + HR/Training</b></td>
 <td>Trình bày rà soát hợp đồng/CSR, xử lý khiếu nại; đào tạo năng lực và hồ sơ năng lực.</td>
 <td>CSR/PO/Tiêu chuẩn được kiểm soát phiên bản; hồ sơ đào tạo truy xuất nguồn gốc theo người/vai trò/ngày.</td>
 </tr>
@@ -240,7 +240,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Kinh doanh/CS</b><div class="muted">PO/CSR</div></td>
 <td>PO, bản vẽ, CSR/Tiêu chuẩn</td>
-<td>Rà soát hợp đồng OK</td>
+<td>Review hợp đồng OK</td>
 <td>Biên bản rà soát hợp đồng; kiểm soát phiên bản bản vẽ/CSR; điều kiện giao hàng.</td>
 </tr>
 <tr>
@@ -262,7 +262,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Phiếu theo dõi Job (Traveler) có chữ ký/giờ; phiếu cài đặt; sổ theo dõi bù trừ (bù trừ (offset)); phản ứng khi sai lệch.</td>
 </tr>
 <tr>
-<td><b>Chất lượng (QC/QA)</b></td>
+<td><b>Quality (QC/QA)</b></td>
 <td>FAI/IPQC/FQC</td>
 <td>QA Phê duyệt phát hành</td>
 <td>báo cáo kiểm, dụng cụ đo &amp; hạn hiệu chuẩn, NCR/CAPA, khu TẠM GIỮ/NG.</td>
@@ -384,7 +384,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>CHẶN: xuất hàng khi thiếu QA phát hành.</td>
 </tr>
 <tr>
-<td><b>Đào tạo năng lực</b></td>
+<td><b>Training năng lực</b></td>
 <td>Ma trận đào tạo, hồ sơ đào tạo theo vai trò, đánh giá OJT, ủy quyền ký duyệt.</td>
 <td>CHẶN: nhân sự chưa đạt năng lực ký duyệt cổng kiểm soát.</td>
 </tr>
@@ -651,7 +651,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td><b>Đánh giá plan / bảng kiểm (FRM-QMS-002)</b></td><td>Chốt phạm vi/tiêu chí/lịch/đội đánh giá</td><td><span class="path">QMS-Hồ sơ / Z_Audit_Evidence_Pack</span> <span class="muted">Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint).</span></td></tr>
 <tr><td><b>Đánh giá báo cáo</b></td><td>Kết luận + phát hiện + ngày đến hạn</td><td><span class="path">QMS-Hồ sơ / Z_Audit_Evidence_Pack</span></td></tr>
-<tr><td><b>phát hiện log</b></td><td>Theo dõi trạng thái đóng</td><td><span class="path">QMS-Cải tiến / NCR-CAPA-Thay đổi</span></td></tr>
+<tr><td><b>phát hiện log</b></td><td>Theo dõi trạng thái đóng</td><td><span class="path">QMS-Improvement / NCR-CAPA-Thay đổi</span></td></tr>
 <tr><td><b>NCR/CAPA góiage</b></td><td>cô lập + RCA + hành động ngăn tái diễn</td><td><span class="path">Job-Hồ sơ / &lt;Job&gt; / 05_NCR-Hold-CAPA</span></td></tr>
 <tr><td><b>Effectiveness bằng chứng</b></td><td>Kết quả chứng minh không tái diễn</td><td><span class="path">QMS-Hồ sơ / Z_Audit_Evidence_Pack</span> hoặc <span class="path">bảng KPI</span></td></tr>
 <tr><td><b>Chuyên cần list / cuộc họp biên bản họp</b></td><td>Họp mở/Họp kết thúc &amp; cam kết</td><td>Đính kèm Đánh giá báo cáo</td></tr>

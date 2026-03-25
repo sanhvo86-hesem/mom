@@ -157,7 +157,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><span class="k">FRM-QMS-022</span> — Tài liệu &amp; Data Thay đổi Thông báo (DCN).</li>
 <li><span class="k">FRM-QMS-012</span> — Tài liệu triển khai Bảng kiểm (triển khai thay đổi).</li>
 <li><span class="k">FRM-QMS-013</span> — Tài liệu Triển khai Bảng kiểm (Point-of-use).</li>
-<li><span class="k">SOP-QMS-013</span> — Doanh nghiệp File Plan &amp; Phòng ban Lưu hồ sơ Matrix (lưu trữ/lưu giữ).</li>
+<li><span class="k">SOP-QMS-013</span> — Doanh nghiệp File Plan &amp; Department Lưu hồ sơ Matrix (lưu trữ/lưu giữ).</li>
 <li><span class="k">ANNEX-QMS-011</span> — Epicor Kinetic (Epicor) (Epicor) tích hợp Pack (Nguồn chuẩn giao dịch).</li>
 </ul>
 </div>
@@ -242,7 +242,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="note" style="margin-top:10px;">
-<b>Điểm giao “cứng”:</b> khi Bộ hồ sơ công việc đã phát hành tới phân xưởng, mọi thay đổi ảnh hưởng CTQ/lộ trình gia công/program/kế hoạch kiểm tra (kiểm tra plan) kích hoạt DCN và cổng kiểm soát triển khai trước khi chạy tiếp.
+<b>Điểm giao “cứng”:</b> khi Bộ hồ sơ công việc Released tới phân xưởng, mọi thay đổi ảnh hưởng CTQ/lộ trình gia công/program/kế hoạch kiểm tra (kiểm tra plan) kích hoạt DCN và cổng kiểm soát triển khai trước khi chạy tiếp.
  </div>
 </div>
 <!-- 3 -->
@@ -432,7 +432,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>3</td>
-<td>Rà soát kỹ thuật &amp; chất lượng: kiểm CTQ, truy xuất nguồn gốc, tác động tooling/program/kiểm tra.</td>
+<td>Review kỹ thuật &amp; chất lượng: kiểm CTQ, truy xuất nguồn gốc, tác động tooling/program/kiểm tra.</td>
 <td>Đồng nghiệp / Ngang cấp bộ hồ sơ rà soát (bộ hồ sơ rà soát) (theo DCN)</td>
 <td>ENG + QA</td>
 </tr>
@@ -463,7 +463,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>8</td>
 <td>Lưu kho &amp; lưu giữ: lưu bản cũ vào lưu trữ; gắn lưu giữ tier; kiểm soát truy cập.</td>
-<td>Lưu trữ sổ đăng ký (theo <span class="k">SOP-QMS-013</span>)</td>
+<td>Archive sổ đăng ký (theo <span class="k">SOP-QMS-013</span>)</td>
 <td>QA/QMS + IT/Data</td>
 </tr>
 </tbody>
@@ -625,7 +625,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Vai trò: mô tả thay đổi; phân loại mức độ; xác định kiểm soát cổng (rà soát/thí điểm/đào tạo/tăng kiểm).</li>
 <li>Khi thay đổi ảnh hưởng CTQ/program/tooling/kiểm tra/luồng-xuống / ngừng: DCN là bắt buộc.</li>
-<li>DCN gắn Job/WO/Khách hàng/PO và liệt kê danh mục tài liệu/dữ liệu cần cập nhật.</li>
+<li>DCN gắn Job/WO/Customer/PO và liệt kê danh mục tài liệu/dữ liệu cần cập nhật.</li>
 </ul>
 </div>
 <div class="card">
@@ -646,7 +646,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3" style="margin-top:0;">6.6 Quy tắc ghi mã &amp; siêu dữ liệu</h3>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
-<li>Khóa truy xuất nguồn gốc tối thiểu: <span class="k">JobNum</span> • <span class="k">PartNum-Rev</span> • <span class="k">Khách hàng</span> • <span class="k">Responsible Person</span> • <span class="k">RetentionTier</span>.</li>
+<li>Khóa truy xuất nguồn gốc tối thiểu: <span class="k">JobNum</span> • <span class="k">PartNum-Rev</span> • <span class="k">Customer</span> • <span class="k">Responsible Person</span> • <span class="k">RetentionTier</span>.</li>
 <li>Hồ sơ không có siêu dữ liệu bị xem là không truy xuất nguồn gốc; cổng kiểm soát không mở.</li>
 </ul>
 </div>
@@ -720,7 +720,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card">
 <h3 class="h3" style="margin-top:0;">Tình huống 4 — Thu hồi thiếu 1 Point-of-use</h3>
-<p class="mini">Bối cảnh: Rev mới đã phát hành; ca đêm vẫn giữ bản in Rev cũ tại bảng WIP.</p>
+<p class="mini">Bối cảnh: Rev mới Released; ca đêm vẫn giữ bản in Rev cũ tại bảng WIP.</p>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Supervisor ca đêm kích hoạt TẠM GIỮ; thu hồi ngay; ghi bổ sung vào FRM-QMS-010.</li>
 <li>QA/QMS cập nhật Tài liệu Triển khai Bảng kiểm; bổ sung Point-of-use vào danh mục.</li>
@@ -815,7 +815,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>11</td><td>Khi Rev mới phát hành, bản cũ được xử lý trạng thái nào?</td><td>C. Hết hiệu lực</td></tr>
 <tr><td>12</td><td>Ai chịu trách nhiệm khoanh vùng WIP ngay khi phát hiện sai Rev?</td><td>D. Supervisor</td></tr>
 <tr><td>13</td><td>Kiểm soát nào chặn sửa ngoài ý muốn đối với hồ sơ?</td><td>A. Quyền truy cập + log phiên bản</td></tr>
-<tr><td>14</td><td>Khi bộ hồ sơ công việc đã phát hành, thay đổi giữa ca được triển khai qua chuỗi nào?</td><td>B. DCN → triển khai → Vấn đề/Thu hồi</td></tr>
+<tr><td>14</td><td>Khi bộ hồ sơ công việc Released, thay đổi giữa ca được triển khai qua chuỗi nào?</td><td>B. DCN → triển khai → Vấn đề/Thu hồi</td></tr>
 <tr><td>15</td><td>Biểu mẫu xác nhận triển khai thay đổi tại nhiều Point-of-use là mã nào?</td><td>C. FRM-QMS-012</td></tr>
 <tr><td>16</td><td>“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” áp dụng cho điều gì?</td><td>D. Mọi cổng kiểm soát tự kiểm</td></tr>
 <tr><td>17</td><td>Khi program chỉnh tại máy không cập nhật chủ / gốc, rủi ro chính là gì?</td><td>A. Mất truy xuất nguồn gốc Rev</td></tr>
@@ -918,7 +918,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>G7</td>
-<td><b>Lưu trữ &amp; Lưu giữ tier</b></td>
+<td><b>Archive &amp; Lưu giữ tier</b></td>
 <td>Khi chuyển bản cũ sang kho lưu</td>
 <td>QA/QMS + IT/Data</td>
 <td>Đường dẫn lưu trữ + lưu giữ tier theo SOP-QMS-013</td>
@@ -1000,7 +1000,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → hồ sơ → triển khai <span class="k">M365/SharePoint → HESEM-QMS-SSOT</span></td>
 </tr>
 <tr>
-<td>OJT/Đào tạo bằng chứng</td>
+<td>OJT/Training bằng chứng</td>
 <td>Biên bản đào tạo/OJT + danh sách người ảnh hưởng</td>
 <td>HR + Supervisor</td>
 <td>T2</td>
@@ -1014,7 +1014,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → hồ sơ → đợt đánh giá/điểm / tại chỗ-kiểm tra <span class="k">M365/SharePoint → HESEM-QMS-SSOT</span></td>
 </tr>
 <tr>
-<td>Lưu trữ hết hiệu lực</td>
+<td>Archive hết hiệu lực</td>
 <td>Đường dẫn lưu bản cũ + lưu giữ kích hoạt theo SOP-QMS-013</td>
 <td>QA/QMS + IT/Data</td>
 <td>T2/T3</td>
@@ -1042,7 +1042,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Bản lỗi thời xuất hiện tại POU</td><td>G5 Thu hồi bắt buộc + điểm / tại chỗ-kiểm tra G6 sau triển khai</td></tr>
+<tr><td>1</td><td>Bản lỗi thời xuất Current POU</td><td>G5 Thu hồi bắt buộc + điểm / tại chỗ-kiểm tra G6 sau triển khai</td></tr>
 <tr><td>2</td><td>Thiếu bằng chứng thu hồi bản cũ</td><td>FRM-QMS-010 bảng Thu hồi + ảnh hủy/đóng dấu</td></tr>
 <tr><td>3</td><td>Bản gốc List không cập nhật hoặc thiếu vị trí</td><td>G1 buộc có dòng FRM-QMS-001 trước phát hành</td></tr>
 <tr><td>4</td><td>Tài liệu không có mã/Rev/hiệu lực/Responsible Person</td><td>Chặn phát hành tại G2; không gắn vào bộ hồ sơ công việc khi thiếu siêu dữ liệu</td></tr>

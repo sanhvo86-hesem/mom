@@ -79,7 +79,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại chuyển giao</th><th>Khi xảy ra</th><th>Điều kiện vào</th><th>Người nhận xác nhận</th></tr></thead><tbody>
 <tr><td>Shift bàn giao</td><td>Hết ca hoặc đổi người chạy cùng máy/cùng job</td><td>Máy an toàn, trạng thái job rõ, Qty cập nhật</td><td>Operator/Trưởng nhóm ca nhận</td></tr>
 <tr><td>Machine chuyển giao</td><td>Chuyển cùng Op sang máy khác</td><td>Đã phê duyệt đổi machine, phát hành set cập nhật</td><td>Setup/Sản xuất tại máy nhận</td></tr>
-<tr><td>Vận hành chuyển giao</td><td>Chuyển sang OpSeq kế tiếp</td><td>Op hiện tại đầy đủ, hồ sơ đủ, label đúng</td><td>Responsible Person công đoạn kế tiếp</td></tr>
+<tr><td>Vận hành chuyển giao</td><td>Chuyển sang OpSeq kế tiếp</td><td>Op Current đầy đủ, hồ sơ đủ, label đúng</td><td>Responsible Person công đoạn kế tiếp</td></tr>
 <tr><td>Outsource chuyển giao</td><td>Gửi ra nhà cung cấp/nhận từ nhà cung cấp</td><td>PO truyền đạt yêu cầu, cert yêu cầu, đóng gói đúng</td><td>WHS / PUR / QA</td></tr>
 <tr><td>Làm lại vòng lặp</td><td>Quay lại bước trước hoặc chuyển tuyến sửa</td><td>Có disposition rõ và lộ trình gia công đặc biệt</td><td>QA + Sản xuất</td></tr>
 </tbody></table></div>
@@ -89,7 +89,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm thông tin</th><th>Bắt buộc phải có</th></tr></thead><tbody>
 <tr><td>Nhận dạng Job</td><td>JobNum, PartNo, Rev, OpSeq, lộ trình gia công code, QPL</td></tr>
 <tr><td>Số lượng</td><td>Qty tốt / đạt, qty nghi ngờ, qty phế phẩm, qty còn lại, số thùng chứa</td></tr>
-<tr><td>Điều kiện kỹ thuật</td><td>Program ID/Rev, phiếu cài đặt rev, tool/fixture đang dùng, bù trừ (bù trừ (offset)) khóa/hiện tại trạng thái</td></tr>
+<tr><td>Điều kiện kỹ thuật</td><td>Program ID/Rev, phiếu cài đặt rev, tool/fixture đang dùng, bù trừ (bù trừ (offset)) khóa/Current trạng thái</td></tr>
 <tr><td>Điểm kiểm soát</td><td>Mẫu đầu (đầu tiên chi tiết / sản phẩm)/FAI trạng thái, CTQ đang theo dõi, IPQC tần suất, mở hold/mở vấn đề</td></tr>
 <tr><td>Hồ sơ đi kèm</td><td>Traveler, label, bộ bằng chứng bắt buộc, cert/coc khi áp dụng</td></tr>
 <tr><td>Rủi ro / do-not-do</td><td>Điểm nhạy cảm, lỗi vừa xảy ra, cảnh báo kẹp / gá kẹp/tool/path, cuối cùng đã biết tốt / đạt</td></tr>

@@ -85,7 +85,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>2. Cổng kiểm soát map G0–G5</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Mục tiêu</th><th>Mục nhập tiêu chí</th><th>Responsible Person Quyết định</th><th>MRR tối thiểu</th><th>Hold tín hiệu mạnh nhất</th></tr></thead><tbody>
 <tr><td><span class="badge-blue">G0 — RFQ / Hợp đồng khởi động</span></td><td>Khóa yêu cầu khách hàng, rev, CSR, qty, ngày đến hạn, QPL sơ bộ</td><td>RFQ/PO rõ, file kỹ thuật có thể đọc, giả định đã ghi</td><td>Kinh doanh / Kỹ thuật</td><td>RFQ sổ đăng ký, rà soát hợp đồng, khởi động bảng kiểm</td><td>Thiếu file kỹ thuật, rev mơ hồ, yêu cầu xung đột</td></tr>
-<tr><td><span class="badge-blue">G1 — Kế hoạch / Phát hành kỹ thuật</span></td><td>Khóa mốc chuẩn, lộ trình gia công, setup, tool, program, kiểm tra yêu cầu</td><td>Mốc chuẩn đã phát hành, lập kế hoạch phát hành PASS</td><td>Kỹ thuật / Kế hoạch</td><td>Setup sheet, lộ trình gia công, danh sách dao cụ, kiểm tra yêu cầu, Kế hoạch Phát hành Bảng kiểm</td><td>không khớp giữa drawing/setup/program/kế hoạch kiểm soát</td></tr>
+<tr><td><span class="badge-blue">G1 — Kế hoạch / Phát hành kỹ thuật</span></td><td>Khóa mốc chuẩn, lộ trình gia công, setup, tool, program, kiểm tra yêu cầu</td><td>Mốc chuẩn Released, lập kế hoạch phát hành PASS</td><td>Kỹ thuật / Kế hoạch</td><td>Setup sheet, lộ trình gia công, danh sách dao cụ, kiểm tra yêu cầu, Kế hoạch Phát hành Bảng kiểm</td><td>không khớp giữa drawing/setup/program/kế hoạch kiểm soát</td></tr>
 <tr><td><span class="badge-blue">G2 — Setup / mẫu đầu (đầu tiên chi tiết / sản phẩm) / FAI phát hành</span></td><td>Xác nhận máy có thể chạy lô theo CTQ đã phê duyệt</td><td>Bộ hồ sơ công việc (job gói hồ sơ) đủ, machine ready, gage ready, mẫu đầu plan rõ</td><td>Sản xuất + QA</td><td>Setup & mẫu đầu hồ sơ, FAI/mẫu đầu bằng chứng</td><td>Thiếu gage, thiếu ký-off, sai bù trừ (bù trừ (offset)) / sai fixture / sai mốc chuẩn (mốc chuẩn (datum))</td></tr>
 <tr><td><span class="badge-blue">G3 — Sản xuất thực thi / IPQC control</span></td><td>Giữ ổn định trong chạy lô, phản ứng nhanh khi trôi / sai lệch</td><td>G2 đã nhả, điều phối xuất hàng list hợp lệ, WIP rule rõ</td><td>Sản xuất Supervisor / QA</td><td>Điều phối list, traveler, IPQC/SPC/AQL hồ sơ khi áp dụng</td><td>WIP không truy vết được, bỏ lỡ kiểm tra, trôi / sai lệch nhưng không phản ứng</td></tr>
 <tr><td><span class="badge-blue">G4 — Kiểm tra cuối / lô giao hàng gói hồ sơ ready</span></td><td>Khóa kết quả cuối, CoC/cert/pack yêu cầu</td><td>Lot hoàn tất, làm lại đóng, cert thu đủ</td><td>QA + WHS</td><td>Kiểm tra cuối báo cáo, kiểm tra cuối sổ đăng ký, lô giao hàng bảng kiểm draft</td><td>Thiếu cert, truy vết hỏng / gãy, pack level không đúng</td></tr>
@@ -104,7 +104,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>4. Trường dữ liệu bàn giao bắt buộc giữa các vai</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm trường</th><th>Giao từ</th><th>Nhận bởi</th><th>Phải có</th><th>Không được để trống</th></tr></thead><tbody>
-<tr><td>Job chủ / gốc</td><td>Kinh doanh / Kế hoạch</td><td>Kỹ thuật / Sản xuất / QA / WHS</td><td>Khách hàng, Job, Part, Rev, Qty, ngày đến hạn, ship-to, ưu tiên class</td><td>Job, Part, Rev, Qty, ngày đến hạn</td></tr>
+<tr><td>Job chủ / gốc</td><td>Kinh doanh / Kế hoạch</td><td>Kỹ thuật / Sản xuất / QA / WHS</td><td>Customer, Job, Part, Rev, Qty, ngày đến hạn, ship-to, ưu tiên class</td><td>Job, Part, Rev, Qty, ngày đến hạn</td></tr>
 <tr><td>Phát hành kỹ thuật</td><td>Kỹ thuật</td><td>Kế hoạch / Sản xuất / QA</td><td>Program ID, phiếu cài đặt ID, fixture/tool yêu cầu, CTQ list, mốc chuẩn (mốc chuẩn (datum)) logic, đặc biệt ghi chú</td><td>Program ID, phiếu cài đặt ID, CTQ / control tham chiếu</td></tr>
 <tr><td>Cổng kiểm soát chất lượng (cổng kiểm soát chất lượng)</td><td>QA</td><td>Sản xuất / WHS</td><td>Mẫu đầu kết quả, FAI yêu cầu, kiểm tra tần suất, hold/phê duyệt kết quả, cert yêu cầu</td><td>Trạng thái cổng kiểm soát, hold lý do, phát hành Responsible Person</td></tr>
 <tr><td>Điều phối / WIP</td><td>Kế hoạch</td><td>Sản xuất</td><td>Machine phân công, trình tự, lot tách / chia rule, hot-job đánh dấu / cờ, đóng băng cửa sổ / khung thời gian, outsource chặng</td><td>Machine / công việc trung tâm, trình tự, lot tách / chia rule</td></tr>
@@ -124,22 +124,22 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Phải truy xuất nguồn gốc trong 60 giây</th><th>Đạt khi</th></tr></thead><tbody>
 <tr><td>G1</td><td>Setup sheet đúng Rev, Program ID, Kế hoạch Phát hành Bảng kiểm</td><td>Mở đúng file / đúng bản đang hiệu lực / đúng Job</td></tr>
 <tr><td>G2</td><td>Setup and mẫu đầu hồ sơ, kiểm tra điểm, gage trạng thái</td><td>Thấy rõ người ký, giờ ký và kết quả PASS/TẠM GIỮ</td></tr>
-<tr><td>G3</td><td>Điều phối list, hiện tại WIP trạng thái, bất thường log mở gần nhất</td><td>Xác nhận được lô đang ở đâu, ai giữ và đang chờ gì</td></tr>
+<tr><td>G3</td><td>Điều phối list, Current WIP trạng thái, bất thường log mở gần nhất</td><td>Xác nhận được lô đang ở đâu, ai giữ và đang chờ gì</td></tr>
 <tr><td>G4</td><td>Kiểm tra cuối báo cáo, cert gói / bó, mở NCR ảnh hưởng lô giao hàng</td><td>Không còn tài liệu thiếu hoặc liên kết lỗi</td></tr>
 <tr><td>G5</td><td>Giao vận Bảng kiểm, label/SSCC, đối chiếu đóng gói, CoC</td><td>Đủ 4 mục và cùng một Pack ID / Lô giao hàng</td></tr>
 </tbody></table></div></div>
 
-<div class="section"><h2>7. Khách hàng lớp phủ và gói hàng đặc biệt</h2>
+<div class="section"><h2>7. Customer lớp phủ và gói hàng đặc biệt</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>lớp phủ</th><th>Khi áp dụng</th><th>Phải cộng thêm vào MRR</th></tr></thead><tbody>
 <tr><td>mẫu thử (mẫu thử (prototype)) / hot-job</td><td>thời gian dẫn (lead time) cực ngắn, mẫu, khẩn cấp khôi phục / thu hồi</td><td>Rủi ro note, sai lệch phê duyệt, đã đẩy nhanh điều phối xuất hàng hồ sơ</td></tr>
 <tr><td>bán dẫn / chân không / vệ sinh / sạch sẽ</td><td>Part có clean xây dựng, rò rỉ test, hạt / phần tử / độ ẩm / chân không yêu cầu</td><td>Clean pack bằng chứng, vệ sinh / sạch sẽ xác minh, rò rỉ test hồ sơ, bảo quản class</td></tr>
 <tr><td>Outsource-nặng</td><td>Có nhiều công đoạn thuê ngoài / công đoạn đặc biệt</td><td>Điều phối bảng kiểm, người xử lý cert, xác minh đầu vào, lot truy vết tính liên tục</td></tr>
-<tr><td>Khách hàng-bắt buộc bộ chứng từ chứng nhận</td><td>Khách yêu cầu nguyên vật liệu cert, CoC định dạng riêng, số sê-ri-level truy vết</td><td>Khách hàng-định dạng cert, số sê-ri map, khách hàng label / pack ảnh chụp theo spec</td></tr>
+<tr><td>Customer-bắt buộc bộ chứng từ chứng nhận</td><td>Khách yêu cầu nguyên vật liệu cert, CoC định dạng riêng, số sê-ri-level truy vết</td><td>Customer-định dạng cert, số sê-ri map, khách hàng label / pack ảnh chụp theo spec</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>8. Ngoại lệ path: chuyển giao công việc, thiết lập lại mốc chuẩn, tách / chia lot, giao hàng một phần</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Có được đi tiếp không</th><th>Điều kiện bắt buộc trước khi mở lại</th></tr></thead><tbody>
-<tr><td>Chuyển giao công việc sang máy / ca / người khác</td><td>Chỉ được đi tiếp sau G2 nhỏ / thu gọn-kiểm tra hoặc theo <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Bàn giao log, hiện tại bù trừ (bù trừ (offset))/tool trạng thái, part mẫu đã lưu giữ, đầu tiên 1–3 pcs xác minh lại</td></tr>
+<tr><td>Chuyển giao công việc sang máy / ca / người khác</td><td>Chỉ được đi tiếp sau G2 nhỏ / thu gọn-kiểm tra hoặc theo <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Bàn giao log, Current bù trừ (bù trừ (offset))/tool trạng thái, part mẫu đã lưu giữ, đầu tiên 1–3 pcs xác minh lại</td></tr>
 <tr><td>thiết lập lại mốc chuẩn do đổi rev / ECO</td><td>Không được dùng dữ liệu G2/G3 cũ nguyên xi</td><td>Thu hồi phiên bản set cũ, mốc chuẩn mới, đánh dấu cut-trên / vượt quá time, re-ký kỹ thuật + QA</td></tr>
 <tr><td>tách / chia lot / giao hàng một phần</td><td>Được nếu truy vết và label tách hoàn toàn</td><td>Mỗi lot con có đối chiếu đóng gói riêng, label riêng, qty cân bằng / số dư rõ</td></tr>
 <tr><td>đóng gói lại / dán nhãn lại sau G5</td><td>Được trong giới hạn thẩm quyền</td><td>Giữ chuỗi of giám hộ / quản lý, ảnh trước/sau, in lại / dán nhãn lại log, QA/WHS phê duyệt</td></tr>
@@ -155,7 +155,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <li>Số sự cố không khớp phiên bản / gói hồ sơ / lô giao hàng theo tháng.</li>
 </ul></div>
 <div class="card"><h3>Đánh giá nhanh</h3><ul class="tight">
-<li>Cổng kiểm soát hiện tại là gì? Ai có quyền nhả cổng kiểm soát?</li>
+<li>Cổng kiểm soát Current là gì? Ai có quyền nhả cổng kiểm soát?</li>
 <li>MRR tối thiểu của cổng kiểm soát này nằm ở đâu?</li>
 <li>Nếu drawing rev và setup rev khác nhau thì ai phải biết trước tiên?</li>
 <li>Trong 60 giây có mở ra được đúng bằng chứng không?</li>

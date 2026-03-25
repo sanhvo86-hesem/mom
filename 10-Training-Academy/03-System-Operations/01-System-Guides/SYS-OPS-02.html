@@ -96,7 +96,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="role-tag">Người định giá (SAL-03)</span><span class="role-tag">Supervisor</span>
 </li>
 <li><b>Thời lượng YÊU CẦU:</b> Lý thuyết 90 phút • Thực hành 90 phút • OJT 120 phút (chia 2 ca/ngày, tối đa 2 ngày/tuần/nhân sự).</li>
-<li><b>Điều kiện trước:</b> Đã học WI-OPS-008 (Hồ sơ công việc Quản trị) và nắm quy tắc đặt tên file (ANNEX-QMS-003).</li>
+<li><b>Điều kiện trước:</b> Đã học WI-OPS-008 (Hồ sơ công việc Governance) và nắm quy tắc đặt tên file (ANNEX-QMS-003).</li>
 <li><b>Kích hoạt học:</b> (1) có job mới, (2) có Part/REV mới hoặc đổi REV, (3) chuẩn bị outsource/phê duyệt giao hàng (ship phát hành).</li>
 </ul>
 <div class="warn" style="margin-top:10px">
@@ -187,7 +187,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td>RFQ → Rà soát hợp đồng</td>
+<td>RFQ → Review hợp đồng</td>
 <td>Người định giá (SAL-03) → Planner/QA</td>
 <td>Yêu cầu khách hàng, PO/hợp đồng, spec</td>
 <td>Hồ sơ công việc / <b>01_Rfq-Hợp đồng</b></td>
@@ -290,7 +290,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>6</td><td>RecordType/DocType dùng “tự chế”</td><td>RecordType không nằm trong danh mục chuẩn</td><td>Báo cáo Pareto sai, lưu giữ sai</td><td>Lựa chọn mã + đào tạo</td></tr>
 <tr><td>7</td><td>bộ hồ sơ giao hàng “đủ giấy” nhưng thiếu <b>phê duyệt lịch sử</b></td><td>Không chứng minh ai phát hành</td><td>đánh giá không đạt, rủi ro tranh chấp khách hàng</td><td>G5 Phê duyệt giao hàng</td></tr>
 <tr><td>8</td><td>Outsource chứng chỉ/lot thiếu</td><td>Cert không có lot/mẻ nấu (mẻ nấu (heat)) hoặc không map job</td><td>Truy xuất nguồn gốc fail, được bị trả hàng</td><td>06_Outsource + IQC</td></tr>
-<tr><td>9</td><td>Người định giá (SAL-03) không đưa “đặc biệt yêu cầu” vào hồ sơ</td><td>Spec/PO note nằm trong email cá nhân</td><td>Sai yêu cầu, trễ giao, NCR</td><td>01_Rfq-Rà soát hợp đồng</td></tr>
+<tr><td>9</td><td>Người định giá (SAL-03) không đưa “đặc biệt yêu cầu” vào hồ sơ</td><td>Spec/PO note nằm trong email cá nhân</td><td>Sai yêu cầu, trễ giao, NCR</td><td>01_Rfq-Review hợp đồng</td></tr>
 <tr><td>10</td><td>Planner phát hành traveler không có QR/link hồ sơ</td><td>Không scan được đến thư mục bằng chứng</td><td>Bàn giao chậm, đánh giá mất thời gian</td><td>Print rule + G1</td></tr>
 <tr><td>11</td><td>QC upload báo cáo nhưng “file name” không theo chuẩn</td><td>Không có JobNum/REV/Date</td><td>Export/email mất truy vết, đánh giá hỏi lại</td><td>Đặt tên thực thi / cưỡng chế</td></tr>
 <tr><td>12</td><td>Supervisor “bỏ qua cổng kiểm soát” vì gấp</td><td>Ship đi khi thiếu MRR</td><td>Stop-ship, hoàn phí / bồi hoàn, mất khách</td><td>Dừng sớm (fail-nhanh) rule + escalation</td></tr>
@@ -352,7 +352,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>CP7</b> – Outsource truy xuất nguồn gốc</td>
-<td>06_Outsource phải có bộ hồ sơ gửi nhà cung cấp + chứng chỉ + đầu vào / nhận hàng IR; map đúng JobNum/Nhà cung cấp/Lot</td>
+<td>06_Outsource phải có bộ hồ sơ gửi nhà cung cấp + chứng chỉ + đầu vào / nhận hàng IR; map đúng JobNum/Supplier/Lot</td>
 <td>Mua hàng/WHS/QA</td>
 <td>OS bằng chứng + IQC kết quả</td>
 <td>Thiếu truy xuất nguồn gốc / sai lô</td>
@@ -401,7 +401,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>FF4 — Outsource truy xuất nguồn gốc fail</b></td>
-<td>Thiếu cert/lot/mẻ nấu (mẻ nấu (heat)) hoặc không map được JobNum/Nhà cung cấp</td>
+<td>Thiếu cert/lot/mẻ nấu (mẻ nấu (heat)) hoặc không map được JobNum/Supplier</td>
 <td>Không nhận hàng vào sản xuất; cách ly; mở NCR khi ảnh hưởng tiến độ</td>
 <td>WHS/QA/PUR</td>
 <td>đầu vào / nhận hàng IR + NCR</td>
@@ -439,7 +439,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Tình huống C: outsource chứng chỉ thiếu</strong>
 <ol>
 <li>Mở <b>06_Outsource</b> → tìm cert/bộ hồ sơ gửi nhà cung cấp theo đặt tên.</li>
-<li>Kiểm tra Nhà cung cấp + Lot/Mẻ nấu (mẻ nấu (heat)) có khớp PO/đóng gói.</li>
+<li>Kiểm tra Supplier + Lot/Mẻ nấu (mẻ nấu (heat)) có khớp PO/đóng gói.</li>
 <li>Không khớp/thiếu → kích hoạt <b>FF4</b>.</li>
 </ol>
 </div>
@@ -471,7 +471,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Xác nhận JobNum/PartNum/RevisionNum từ Epicor phản chiếu (JobIndex)</td><td>Planner</td><td>JobIndex có hồ sơ + Rev đúng</td><td>Copy nhầm Rev từ email</td></tr>
 <tr><td>2</td><td>Tạo Hồ sơ công việc thư mục theo template + đặt tên chuẩn</td><td>IT/Planner</td><td>Thư mục tồn tại + cấu trúc 01→08</td><td>Thiếu thư mục 05/06/07</td></tr>
-<tr><td>3</td><td>Gắn siêu dữ liệu cơ bản cho hồ sơ (JobNum, PartNum, RevisionNum, Khách hàng)</td><td>Planner/QA</td><td>Cột siêu dữ liệu có giá trị</td><td>Để trống Khách hàng → lưu giữ sai</td></tr>
+<tr><td>3</td><td>Gắn siêu dữ liệu cơ bản cho hồ sơ (JobNum, PartNum, RevisionNum, Customer)</td><td>Planner/QA</td><td>Cột siêu dữ liệu có giá trị</td><td>Để trống Customer → lưu giữ sai</td></tr>
 <tr><td>4</td><td>Kiểm tra/khởi tạo Part/REV thư mục trong DATA đúng Rev</td><td>ENG/Lập trình viên (CNC)</td><td><span class="path">.../REV {Rev}/</span> có template đầy đủ</td><td>Đặt Rev không thống nhất (RevE/REV-E)</td></tr>
 <tr><td>5</td><td>Upload DWG/SOL/SPEC theo đặt tên chuẩn Part/REV</td><td>ENG</td><td>File có <span class="path">_{DocType}_{DocID}_{YYYY-MM-DD}_REV-{Rev}_</span></td><td>Thiếu DocID/Date</td></tr>
 <tr><td>6</td><td>Upload CAM chủ / gốc theo đặt tên chuẩn + ghi EffectiveDate</td><td>Lập trình viên (CNC)</td><td>File CAM nằm trong <b>04_CAM</b></td><td>Để CAM ở máy tính bàn/USB</td></tr>
@@ -653,7 +653,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>3</td>
 <td><b>Outsource cert thiếu lot/mẻ nấu (mẻ nấu (heat))</b></td>
-<td>Cert scan có Nhà cung cấp nhưng không có Lot/Mẻ nấu (mẻ nấu (heat)); PO yêu cầu truy xuất nguồn gốc</td>
+<td>Cert scan có Supplier nhưng không có Lot/Mẻ nấu (mẻ nấu (heat)); PO yêu cầu truy xuất nguồn gốc</td>
 <td>Cách ly, không nhận vào sản xuất (FF4); yêu cầu nhà cung cấp cung cấp bổ sung</td>
 <td>đầu vào / nhận hàng IR = Hold + yêu cầu bổ sung chứng chỉ</td>
 </tr>
@@ -699,7 +699,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Kỷ luật cổng kiểm soát</td>
 <td>Thực hiện đúng tuyến báo cáo vượt cấp; ghi nhận đúng log/bằng chứng</td>
-<td>Bỏ qua cổng kiểm soát hoặc “sửa hồ sơ cho đủ” sau khi đã phát hành</td>
+<td>Bỏ qua cổng kiểm soát hoặc “sửa hồ sơ cho đủ” sau khi Released</td>
 </tr>
 </tbody>
 </table>
@@ -774,7 +774,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <h3>12.3 nội dung loại &amp; lưu giữ nhãn (Phạm vi quản lý)</h3>
-<p class="mini">Các nội dung type dưới đây dùng để tự động-áp dụng lưu giữ label. Khi hệ thống chưa triển khai đủ, đánh dấu <b>M365/SharePoint → HESEM-QMS-SSOT</b> trong bảng kiểm go-vận hành thực.</p>
+<p class="mini">Các nội dung type dưới đây dùng để tự động-áp dụng lưu giữ label. Khi hệ thống chưa triển khai đủ, đánh dấu <b>M365/SharePoint → HESEM-QMS-SSOT</b> trong bảng kiểm go-Live.</p>
 <div class="table-wrap">
 <table class="tight">
 <thead><tr><th>nội dung Type</th><th>Tier</th><th>Mặc định lưu giữ label</th><th>khai báo hồ sơ</th><th>Cột bắt buộc</th><th>Thư mục YÊU CẦU</th></tr></thead>
@@ -783,10 +783,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Kiểm tra cuối</b></td><td>T1</td><td>LAM-T1-10Y-HỒ SƠ</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID; Kết quả</td><td>04_Inspection-FAI</td></tr>
 <tr><td><b>CMM Báo cáo</b></td><td>T1</td><td>LAM-T1-10Y-HỒ SƠ</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID; Kết quả</td><td>04_Inspection-FAI</td></tr>
 <tr><td><b>Bộ hồ sơ giao hàng</b></td><td>T1</td><td>LAM-T1-10Y-HỒ SƠ</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID</td><td>07_Shipping-Đóng gói</td></tr>
-<tr><td><b>CoC / Chứng chỉ</b></td><td>T1</td><td>LAM-T1-10Y-HỒ SƠ</td><td>Yes</td><td>JobNum; Khách hàng; RecordType; RecordID</td><td>07_Shipping-Đóng gói</td></tr>
+<tr><td><b>CoC / Chứng chỉ</b></td><td>T1</td><td>LAM-T1-10Y-HỒ SƠ</td><td>Yes</td><td>JobNum; Customer; RecordType; RecordID</td><td>07_Shipping-Đóng gói</td></tr>
 <tr><td><b>NCR / CAPA Kết thúc</b></td><td>T1</td><td>LAM-T1-10Y-HỒ SƠ</td><td>Yes</td><td>JobNum; PartNum; RevisionNum; RecordType; RecordID; Trạng thái</td><td>05_NCR-Hold-CAPA</td></tr>
-<tr><td><b>Nhận hàng IQC</b></td><td>T2</td><td>HESEM-T2-5Y</td><td>No</td><td>RecordType; RecordID; Nhà cung cấp; LotNumber; Kết quả</td><td>06_Outsource</td></tr>
-<tr><td><b>Outsource Bằng chứng</b></td><td>T2</td><td>HESEM-T2-5Y</td><td>No</td><td>JobNum; Nhà cung cấp; RecordType; RecordID</td><td>06_Outsource</td></tr>
+<tr><td><b>Nhận hàng IQC</b></td><td>T2</td><td>HESEM-T2-5Y</td><td>No</td><td>RecordType; RecordID; Supplier; LotNumber; Kết quả</td><td>06_Outsource</td></tr>
+<tr><td><b>Outsource Bằng chứng</b></td><td>T2</td><td>HESEM-T2-5Y</td><td>No</td><td>JobNum; Supplier; RecordType; RecordID</td><td>06_Outsource</td></tr>
 <tr><td><b>Vận hành ảnh chụp</b></td><td>T3</td><td>HESEM-T3-3Y</td><td>No</td><td>JobNum; RecordType; Cổng</td><td>08_Photos</td></tr>
 </tbody>
 </table>

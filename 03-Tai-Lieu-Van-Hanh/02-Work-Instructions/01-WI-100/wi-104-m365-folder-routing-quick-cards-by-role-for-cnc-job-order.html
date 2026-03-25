@@ -47,7 +47,7 @@ ul.tight li {margin:4px 0;}
     <div class="row"><span><b>Code:</b></span><span>WI-104</span></div>
     <div class="row"><span><b>Version:</b></span><span>V1</span></div>
     <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-    <div class="row"><span><b>Owner:</b></span><span>QMS Manager / HR Manager / Phòng ban Champions</span></div>
+    <div class="row"><span><b>Owner:</b></span><span>QMS Manager / HR Manager / Department Champions</span></div>
     <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
   </div>
 </div>
@@ -59,15 +59,15 @@ ul.tight li {margin:4px 0;}
 <div class="keyline"><strong>Cách dùng:</strong> mỗi nhanh card tương ứng một vai trò hoặc nhóm vai trò. In riêng từng card, dán tại điểm dùng hoặc gắn QR tới đúng neo / điểm tham chiếu của card đó. Người dùng không cần nhớ toàn bộ hệ thống; chỉ cần dùng đúng card của mình và escalation khi file vượt khỏi phạm vi card.</div>
 
 <div class="quick-card" id="role-sales-cs-est">
-  <h2>Card 1 - Kinh doanh / Khách hàng Dịch vụ / Người định giá</h2>
+  <h2>Card 1 - Kinh doanh / Customer Dịch vụ / Người định giá</h2>
   <span class="tag">RFQ</span><span class="tag">báo giá</span><span class="tag">hợp đồng rà soát</span>
   <div class="quick-grid">
     <div class="mini-box">
       <h3>Lưu ở đâu</h3>
-      <p class="path">DEP-SAL/02-Operations/00-hiện tại/01-RFQ-and-báo giá-Pack</p>
-      <p class="path">DEP-SAL/02-Operations/00-hiện tại/02-hợp đồng-Rà soát-and-Đơn hàng-Ack</p>
-      <p class="path">03-Job-Hồ sơ/.../01_G0-hợp đồng-Khởi động</p>
-      <p class="path">07-Tham chiếu-and-đã nhận-Bên ngoài/01-Khách hàng-đã nhận</p>
+      <p class="path">DEP-SAL/02-Operations/00-Current/01-RFQ-and-báo giá-Pack</p>
+      <p class="path">DEP-SAL/02-Operations/00-Current/02-hợp đồng-Review-and-Đơn hàng-Ack</p>
+      <p class="path">03-Job-Records/.../01_G0-hợp đồng-Khởi động</p>
+      <p class="path">07-Reference-and-Received-External/01-Customer-Received</p>
     </div>
     <div class="mini-box">
       <h3>Dùng tài liệu nào</h3>
@@ -91,7 +91,7 @@ ul.tight li {margin:4px 0;}
       <h3>Khi nào escalation</h3>
       <ul class="tight">
         <li>Khách đổi rev hoặc yêu cầu kỹ thuật.</li>
-        <li>báo giá pack đã phát hành nhưng phải sửa.</li>
+        <li>báo giá pack Released nhưng phải sửa.</li>
         <li>Không rõ file là khách hàng tham chiếu hay chính thức hồ sơ.</li>
       </ul>
     </div>
@@ -104,10 +104,10 @@ ul.tight li {margin:4px 0;}
   <div class="quick-grid">
     <div class="mini-box">
       <h3>Lưu ở đâu</h3>
-      <p class="path">03-Job-Hồ sơ/{YYYY}/{JobNum}-{PartNo}-REV-{Phiên bản}/00_Admin-Control</p>
-      <p class="path">03-Job-Hồ sơ/.../01_G0-hợp đồng-Khởi động</p>
-      <p class="path">DEP-PRO/00-vận hành thực-Control-and-Gốc / Chủ-Data</p>
-      <p class="path">DEP-PRO/03-Registers-and-Logs/00-hiện tại</p>
+      <p class="path">03-Job-Records/{YYYY}/{JobNum}-{PartNo}-REV-{Phiên bản}/00_Admin-Control</p>
+      <p class="path">03-Job-Records/.../01_G0-hợp đồng-Khởi động</p>
+      <p class="path">DEP-PRO/00-Live-Control-and-Master-Data / Master-Data</p>
+      <p class="path">DEP-PRO/03-Registers-and-Logs/00-Current</p>
     </div>
     <div class="mini-box">
       <h3>Dùng tài liệu nào</h3>
@@ -132,7 +132,7 @@ ul.tight li {margin:4px 0;}
       <ul class="tight">
         <li>Hồ sơ công việc đã có chưa?</li>
         <li><a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-205_Job_Dossier_Evidence_Index.xlsx">FRM-205</a> đã mở chưa?</li>
-        <li>File control tháp / cột là hiện tại log hay đã phát hành pack?</li>
+        <li>File control tháp / cột là Current log hay Released pack?</li>
       </ul>
     </div>
   </div>
@@ -145,9 +145,9 @@ ul.tight li {margin:4px 0;}
     <div class="mini-box">
       <h3>Lưu ở đâu</h3>
       <p class="path">Part-REV-Gốc / Chủ/{CustomerID}/{PartNo}/REV-{Rev}</p>
-      <p class="path">DEP-ENG/02-Operations/00-hiện tại</p>
-      <p class="path">03-Job-Hồ sơ/.../02_G1-Setup-Phát hành</p>
-      <p class="path">DEP-ENG/06-Làm việc-Transitory-and-Draft/ROLE-ELM|DFM|PE|CAM</p>
+      <p class="path">DEP-ENG/02-Operations/00-Current</p>
+      <p class="path">03-Job-Records/.../02_G1-Setup-Phát hành</p>
+      <p class="path">DEP-ENG/06-Working-Transitory-and-Draft/ROLE-ELM|DFM|PE|CAM</p>
     </div>
     <div class="mini-box">
       <h3>Dùng tài liệu nào</h3>
@@ -184,10 +184,10 @@ ul.tight li {margin:4px 0;}
   <div class="quick-grid">
     <div class="mini-box">
       <h3>Lưu ở đâu</h3>
-      <p class="path">03-Job-Hồ sơ/.../02_G1-Setup-Phát hành</p>
-      <p class="path">03-Job-Hồ sơ/.../04_G3-IPQC-Sản xuất</p>
-      <p class="path">DEP-PRO/03-Registers-and-Logs/00-hiện tại</p>
-      <p class="path">DEP-PRO/06-Làm việc-Transitory-and-Draft/ROLE-SET|CNC|SHFL|PIE</p>
+      <p class="path">03-Job-Records/.../02_G1-Setup-Phát hành</p>
+      <p class="path">03-Job-Records/.../04_G3-IPQC-Sản xuất</p>
+      <p class="path">DEP-PRO/03-Registers-and-Logs/00-Current</p>
+      <p class="path">DEP-PRO/06-Working-Transitory-and-Draft/ROLE-SET|CNC|SHFL|PIE</p>
     </div>
     <div class="mini-box">
       <h3>Dùng tài liệu nào</h3>
@@ -224,10 +224,10 @@ ul.tight li {margin:4px 0;}
   <div class="quick-grid">
     <div class="mini-box">
       <h3>Lưu ở đâu</h3>
-      <p class="path">03-Job-Hồ sơ/.../03_G2-FAI-Đầu tiên-chi tiết / sản phẩm</p>
-      <p class="path">03-Job-Hồ sơ/.../05_G4-Final-QC-Đóng gói</p>
-      <p class="path">03-Job-Hồ sơ/.../07_NCR-CAPA-Sai lệch</p>
-      <p class="path">02-Chất lượng-Hồ sơ</p>
+      <p class="path">03-Job-Records/.../03_G2-FAI-Đầu tiên-chi tiết / sản phẩm</p>
+      <p class="path">03-Job-Records/.../05_G4-Final-QC-Đóng gói</p>
+      <p class="path">03-Job-Records/.../07_NCR-CAPA-Sai lệch</p>
+      <p class="path">02-Quality-Records</p>
     </div>
     <div class="mini-box">
       <h3>Dùng tài liệu nào</h3>
@@ -263,10 +263,10 @@ ul.tight li {margin:4px 0;}
   <div class="quick-grid">
     <div class="mini-box">
       <h3>Lưu ở đâu</h3>
-      <p class="path">DEP-SCM/02-Operations/00-hiện tại/03-Nhận hàng-and-IQC-bàn giao</p>
-      <p class="path">03-Job-Hồ sơ/.../05_G4-Final-QC-Đóng gói</p>
-      <p class="path">03-Job-Hồ sơ/.../06_G5-Ship-Phát hành</p>
-      <p class="path">DEP-SCM/05-Giao diện-and-đã phát hành-Gói</p>
+      <p class="path">DEP-SCM/02-Operations/00-Current/03-Nhận hàng-and-IQC-bàn giao</p>
+      <p class="path">03-Job-Records/.../05_G4-Final-QC-Đóng gói</p>
+      <p class="path">03-Job-Records/.../06_G5-Ship-Phát hành</p>
+      <p class="path">DEP-SCM/05-Interfaces-and-Released-Packs</p>
     </div>
     <div class="mini-box">
       <h3>Dùng tài liệu nào</h3>
@@ -305,7 +305,7 @@ ul.tight li {margin:4px 0;}
       <ul class="tight">
         <li>Ít nhất 3 file mới của ca đã lộ trình gia công đúng chưa.</li>
         <li>Workbench <span class="code">06</span> có file lẽ ra đã thăng chức / nâng cấp chưa.</li>
-        <li>Tham chiếu khu vực <span class="code">07</span> có thuận tiện copy đang bị dùng như SSOT không.</li>
+        <li>Reference khu vực <span class="code">07</span> có thuận tiện copy đang bị dùng như SSOT không.</li>
       </ul>
     </div>
     <div class="mini-box">

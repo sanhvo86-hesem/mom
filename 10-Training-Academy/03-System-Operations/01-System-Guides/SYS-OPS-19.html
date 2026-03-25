@@ -67,7 +67,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 
 <div class="title">
 <strong>SYS-OPS-19 — Quản lý thay đổi: phân loại, phê duyệt, ma trận tác động</strong><br/>
-<span class="sub-vn"><b>VI:</b> Đào tạo vận hành SOP-QMS-08 cho phân xưởng CNC gia công theo đơn (job xưởng)</span><br/>
+<span class="sub-vn"><b>VI:</b> Training vận hành SOP-QMS-08 cho phân xưởng CNC gia công theo đơn (job xưởng)</span><br/>
 <span class="sub-vn"><b>EN:</b> SOP-QMS-08 Thay đổi Quản lý: phân loại, phê duyệt, thay đổi tác động matrix</span>
 <div class="muted" style="margin-top:8px">
  Quy ước từ khóa vận hành: <b>PHẢI</b> (bắt buộc) • <b>DỪNG/TẠM GIỮ/CHẶN</b> (điểm chặn) • <b>Không có bằng chứng = không qua cổng</b>
@@ -87,7 +87,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <div class="badge"><span class="dot"></span>Mã mô-đun: <b>SYS-OPS-19</b></div>
 <h1 style="margin-top:10px">SOP-QMS-08 Quản lý thay đổi: phân loại, phê duyệt, ma trận tác động thay đổi</h1>
-<p class="muted">Đào tạo thực chiến để triển khai thay đổi trong phân xưởng CNC gia công theo đơn, chặn sai Rev, chặn vượt qua cổng kiểm soát, bảo đảm truy xuất nguồn gốc và bằng chứng đánh giá.</p>
+<p class="muted">Training thực chiến để triển khai thay đổi trong phân xưởng CNC gia công theo đơn, chặn sai Rev, chặn vượt qua cổng kiểm soát, bảo đảm truy xuất nguồn gốc và bằng chứng đánh giá.</p>
 <div class="tag blue">Vai trò áp dụng: Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor</div>
 </div>
 <div class="note">
@@ -152,7 +152,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Lập trình viên (CNC)</b></td>
-<td>Quản trị version program; phát hành program có tổng kiểm tra (mã kiểm); khóa version cũ; ghi cut-in theo lot/job.</td>
+<td>Governance version program; phát hành program có tổng kiểm tra (mã kiểm); khóa version cũ; ghi cut-in theo lot/job.</td>
 <td>Log phát hành chương trình; tổng kiểm tra (mã kiểm); phiếu cài đặt rev; ảnh màn hình version.</td>
 </tr>
 <tr>
@@ -162,7 +162,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Operator</b></td>
-<td>Chạy theo traveler/phiếu cài đặt đã phát hành; kiểm tra nhãn Rev tại máy; dừng khi phát hiện không khớp; giữ WIP.</td>
+<td>Chạy theo traveler/phiếu cài đặt Released; kiểm tra nhãn Rev tại máy; dừng khi phát hiện không khớp; giữ WIP.</td>
 <td>Traveler ký; nhãn TẠM GIỮ; log dừng máy theo 60 giây.</td>
 </tr>
 <tr>
@@ -411,7 +411,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>10</td><td>Lập xác nhận plan: Mẫu đầu/Chênh lệch FAI/Đầy đủ FAI; gage trạng thái hiệu chuẩn.</td><td>QC + QA</td><td>Plan ký + list gage</td><td>Đo CTQ bằng gage hết hạn.</td></tr>
 <tr><td>11</td><td>Thực thi thay đổi tại máy: setup/chạy thử; xác nhận program tổng kiểm tra (mã kiểm).</td><td>Setup + Lập trình viên (CNC)</td><td>Setup bảng kiểm; tổng kiểm tra (mã kiểm) log</td><td>Chạy nhầm file do tên giống.</td></tr>
 <tr><td>12</td><td>QC đo Mẫu đầu/FAI; ghi rõ ĐẠT/KHÔNG ĐẠT; QA quyết định PHÁT HÀNH/TẠM GIỮ.</td><td>QC + QA</td><td>IR/CMM/FAI + quyết định</td><td>Thiếu chữ ký QC/QA.</td></tr>
-<tr><td>13</td><td>Đào tạo bắt buộc trước cut-in cho người chạm việc; ký xác nhận.</td><td>Supervisor + QA</td><td>Danh sách đào tạo + ký</td><td>Đào tạo xong nhưng không có ký.</td></tr>
+<tr><td>13</td><td>Training bắt buộc trước cut-in cho người chạm việc; ký xác nhận.</td><td>Supervisor + QA</td><td>Danh sách đào tạo + ký</td><td>Training xong nhưng không có ký.</td></tr>
 <tr><td>14</td><td>Hiệu lực sau triển khai: theo dõi 1–2 job; kiểm tra khuyết tật/độ ổn định.</td><td>QA + Supervisor</td><td>Biên bản xác minh hiệu lực</td><td>Đóng CR khi chưa có job thực tế.</td></tr>
 <tr><td>15</td><td>Đóng CR: gom MRR, lưu đúng nơi; cập nhật DCR hồ sơ.</td><td>QA/QMS</td><td>Thư mục MRR hoàn chỉnh</td><td>MRR rải rác, thiếu đặt tên.</td></tr>
 </tbody>
@@ -519,7 +519,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>[Trắc nghiệm] Ai có quyền chốt TẠM GIỮ/PHÁT HÀNH cho thay đổi liên quan CTQ? A) Operator B) QA (và QC theo phần đo) C) Kho D) Người định giá (SAL-03)</li>
 <li>[Trắc nghiệm] Thay đổi “áp dụng ngay tại hiện trường” phải hoàn tất hợp thức hóa hồ sơ trong bao lâu theo chuẩn nội bộ? A) 1 tuần B) 24h C) 1 tháng D) Không cần hợp thức hóa hồ sơ</li>
 <li>[Tình huống ngắn] Khi phát hiện gage đo CTQ hết hạn hiệu chuẩn trong lúc đang đo Mẫu đầu, trạng thái cổng kiểm soát là gì và ai phải được gọi?</li>
-<li>[Tình huống ngắn] Khi program mới đã phát hành nhưng máy đang chạy file tên gần giống, vận hành khóa nguồn lỗi là gì?</li>
+<li>[Tình huống ngắn] Khi program mới Released nhưng máy đang chạy file tên gần giống, vận hành khóa nguồn lỗi là gì?</li>
 <li>[Tình huống ngắn] Khi kho phát hiện tồn cùng part nhưng khác Rev đặt chung kệ, hành động bắt buộc trong 60 giây là gì?</li>
 <li>[Trắc nghiệm] Khi thay đổi lộ trình gia công/thứ tự nguyên công, bắt buộc cập nhật gì? A) Chỉ traveler B) Traveler + phiếu cài đặt + kế hoạch kiểm tra (kiểm tra plan) C) Chỉ program D) Chỉ PO</li>
 <li>[Trắc nghiệm] Khi thay đổi phát sinh từ NCR/MRB, tài liệu điều phối bắt buộc là gì? A) MRB quyết định + CR/Thông báo B) Chỉ email C) Chỉ họp miệng D) Không cần vì đã NCR</li>
@@ -614,7 +614,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>FRM-QMS-022</b> — Tài liệu/Data Thay đổi Thông báo (mã CR).</li>
 <li><b>FRM-QMS-006</b> — Thay đổi Tác động Matrix (đủ chữ ký liên phòng).</li>
-<li><b>FRM-SAL-003</b> — Khách hàng Thay đổi Đơn hàng Rà soát (khi thay đổi từ khách).</li>
+<li><b>FRM-SAL-003</b> — Customer Thay đổi Đơn hàng Review (khi thay đổi từ khách).</li>
 <li>Danh mục tài liệu cập nhật: traveler, phiếu cài đặt, kế hoạch kiểm tra (kiểm tra plan), label, lộ trình gia công.</li>
 <li>Bằng chứng program: file name + version + tổng kiểm tra (mã kiểm) + log phát hành.</li>
 <li>Bằng chứng xác nhận: Mẫu đầu/IR/CMM/FAI (theo mức) + kết luận ĐẠT/KHÔNG ĐẠT.</li>

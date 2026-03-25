@@ -68,7 +68,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
           <div class="row"><span><b>Code:</b></span><span>WI-206</span></div>
           <div class="row"><span><b>Version:</b></span><span>V0</span></div>
           <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Owner:</b></span><span>QA Manager / Kho Manager / Giao vận Lead / Kinh doanh-Khách hàng Dịch vụ Manager</span></div>
+          <div class="row"><span><b>Owner:</b></span><span>QA Manager / Kho Manager / Giao vận Lead / Kinh doanh-Customer Dịch vụ Manager</span></div>
           <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
         </div>
       </div>
@@ -77,7 +77,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
       
 <div class="section"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
 <p>WI này quy định cách lập <b>Bộ hồ sơ phê duyệt giao hàng</b>, gán <b>SSCC</b>, đối soát kiện trong/kiện ngoài/đơn vị hậu cần và bàn giao sang bước <b>Xác nhận giao hàng</b>. WI này áp dụng cho mọi lô xuất có kiểm soát chất lượng và áp dụng thêm khi khách hàng yêu cầu GS1/SSCC, nhãn bổ sung theo yêu cầu khách hàng, chứng từ vật liệu, chứng từ công đoạn đặc biệt, hoặc giao hàng từng phần.</p>
-<div class="callout-danger"><strong>QUYỀN DỪNG</strong><br/>QA, Kho, Giao vận, Kinh doanh/Khách hàng Dịch vụ và người có thẩm quyền phê duyệt có quyền dừng xuất khi phát hiện sai mã chi tiết, sai mức sửa đổi, sai số lượng, sai lô/số sê-ri, sai SSCC, sai nhãn khách hàng, thiếu chứng từ, bao gói hỏng, hoặc bộ bằng chứng chưa đủ. <b>PHẢI</b> hoàn tất hồ sơ trước khi xác nhận giao hàng.</div></div>
+<div class="callout-danger"><strong>QUYỀN DỪNG</strong><br/>QA, Kho, Giao vận, Kinh doanh/Customer Dịch vụ và người có thẩm quyền phê duyệt có quyền dừng xuất khi phát hiện sai mã chi tiết, sai mức sửa đổi, sai số lượng, sai lô/số sê-ri, sai SSCC, sai nhãn khách hàng, thiếu chứng từ, bao gói hỏng, hoặc bộ bằng chứng chưa đủ. <b>PHẢI</b> hoàn tất hồ sơ trước khi xác nhận giao hàng.</div></div>
 
 <div class="section"><h2>2. Thuật ngữ vận hành bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thuật ngữ</th><th>Ý nghĩa dùng trong HESEM</th></tr></thead><tbody>
@@ -112,7 +112,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Một dòng giao hàng — nhiều đơn vị hậu cần</td><td>Mỗi kiện/pallet có SSCC riêng; kiện ngoài tóm tắt phải cộng đúng kiện trong</td><td>Kho/Giao vận</td></tr>
 <tr><td>Giao hàng từng phần</td><td>Tách riêng số lượng giao kỳ này, số lượng còn lại, mã lý do và chứng từ áp dụng; không dùng nhãn của lô giao hàng đầy đủ</td><td>Kho Manager + QA</td></tr>
 <tr><td>Đóng gói lại sau khi đã dán nhãn</td><td>ĐÁNH DẤU HỦY nhãn cũ, tạo lại ánh xạ kiện trong ↔ kiện ngoài ↔ pallet, chụp lại bằng chứng, rà soát lại độ đầy đủ của bộ hồ sơ</td><td>Kho Manager + QA</td></tr>
-<tr><td>Nhãn bổ sung theo yêu cầu khách hàng hoặc thay Địa điểm giao hàng</td><td>Phải có xác nhận từ Kinh doanh/Khách hàng Dịch vụ và QA; không tự sửa tay trên nhãn</td><td>Kinh doanh/CS + QA + Kho</td></tr>
+<tr><td>Nhãn bổ sung theo yêu cầu khách hàng hoặc thay Địa điểm giao hàng</td><td>Phải có xác nhận từ Kinh doanh/Customer Dịch vụ và QA; không tự sửa tay trên nhãn</td><td>Kinh doanh/CS + QA + Kho</td></tr>
 </tbody></table></div></div>
 
 <div class="section"><h2>5. Xây bộ hồ sơ phê duyệt giao hàng</h2>
@@ -124,7 +124,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Vật liệu / thuê ngoài</td><td>Khi khách hàng hoặc yêu cầu kỹ thuật yêu cầu</td><td>MTR/CoC vật liệu, chứng từ chứng nhận công đoạn đặc biệt, bộ hồ sơ thuê ngoài, chuỗi mẻ nhiệt/lô</td></tr>
 <tr><td>Vận chuyển / xuất khẩu / chứng từ khách hàng</td><td>Khi áp dụng</td><td>AWB/BOL/theo dõi, nhãn theo yêu cầu khách hàng, chứng từ thương mại, xuất xứ hàng hóa</td></tr>
 </tbody></table></div>
-<div class="callout-warn"><strong>Quy tắc chứng từ</strong><br/>Nếu lô giao hàng chia nhiều đợt, mỗi đợt phải có bộ hồ sơ phê duyệt giao hàng riêng. Chứng từ chung chỉ được dùng lại khi quy định khách hàng cho phép và phải trỏ đúng lô giao hàng hiện tại.</div></div>
+<div class="callout-warn"><strong>Quy tắc chứng từ</strong><br/>Nếu lô giao hàng chia nhiều đợt, mỗi đợt phải có bộ hồ sơ phê duyệt giao hàng riêng. Chứng từ chung chỉ được dùng lại khi quy định khách hàng cho phép và phải trỏ đúng lô giao hàng Current.</div></div>
 
 <div class="section"><h2>6. Đối soát kiện trong ↔ kiện ngoài ↔ lô giao hàng</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bước đối soát</th><th>Yêu cầu ĐẠT</th><th>Performer</th></tr></thead><tbody>
@@ -154,7 +154,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Sai SSCC hoặc quét không mở đúng hồ sơ đóng gói</td><td>ĐÁNH DẤU HỦY nhãn cũ; cấp lại SSCC nếu cần; quét xác nhận 100%; lưu bằng chứng in lại/dán nhãn lại.</td></tr>
 <tr><td>Nhãn đúng nhưng bao gói hỏng hoặc có dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (dị vật (FOD))))))))))</td><td>Đóng gói lại toàn bộ đơn vị hậu cần bị ảnh hưởng; chụp lại bằng chứng; rà soát lại bao gói sạch / thời hạn bảo quản.</td></tr>
 <tr><td>Thiếu CoC/MTR/chứng từ chứng nhận/công đoạn đặc biệt trong hồ sơ</td><td>Không giao; giữ TẠM GIỮ cho đến khi hồ sơ đủ và thẩm quyền phê duyệt lại.</td></tr>
-<tr><td>Không khớp giữa bộ bằng chứng và lô giao hàng thực tế</td><td>Rà soát lại toàn bộ lô giao hàng; không sửa lẻ từng file để “cho khớp”.</td></tr>
+<tr><td>Không khớp giữa bộ bằng chứng và lô giao hàng thực tế</td><td>Review lại toàn bộ lô giao hàng; không sửa lẻ từng file để “cho khớp”.</td></tr>
 </tbody></table></div>
 <div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Phê duyệt giao hàng đúng hạn; số lô giao hàng TẠM GIỮ do đóng gói/chứng từ không khớp; số dán nhãn lại/đóng gói lại; số lọt lỗi giao hàng do nhãn/chứng từ; thời gian từ phê duyệt cuối cùng đến xác nhận giao hàng.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>; <a href="wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>; <a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>; <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>; <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a>; <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx"  download="">FRM-702</a>; <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-706_Shipping_Label.xlsx"  download="">FRM-706</a>.</div></div></div></div>
 

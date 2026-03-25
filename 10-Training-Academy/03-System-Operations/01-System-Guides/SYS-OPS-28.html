@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SYS-OPS-28 — Doanh nghiệp File Plan & Phòng ban Lưu hồ sơ Matrix | HESEM OS</title>
+<title>SYS-OPS-28 — Doanh nghiệp File Plan & Department Lưu hồ sơ Matrix | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
  /* SYS-OPS-28: ưu tiên bảng gọn, đọc nhanh trên workshop */
@@ -63,7 +63,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-28 — Doanh nghiệp File Plan & Phòng ban Lưu hồ sơ Matrix</strong>
+  <strong>SYS-OPS-28 — Doanh nghiệp File Plan & Department Lưu hồ sơ Matrix</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -81,7 +81,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="grid-2">
 <div>
 <div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-28</div>
-<h1 style="margin-top:10px">SOP-QMS-17 — Doanh nghiệp File Plan &amp; Phòng ban Lưu hồ sơ Matrix</h1>
+<h1 style="margin-top:10px">SOP-QMS-17 — Doanh nghiệp File Plan &amp; Department Lưu hồ sơ Matrix</h1>
 <p class="muted">
  Trọng tâm: <b>Chính / Sơ cấp Home</b> (nơi gốc duy nhất) • <b>Lộ trình gia công</b> (luồng công bố / phát hành &amp; bàn giao) • <b>Đánh giá truy xuất</b> (truy xuất nguồn gốc theo key).
  Mọi hành động trong mô-đun này tạo bằng chứng vận hành (MRR) và tạo điểm chặn chống sai Rev/lẫn lộn (mix-up).
@@ -202,12 +202,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Báo giá/Hợp đồng</td>
 <td>RFQ + yêu cầu kỹ thuật + điều khoản</td>
 <td>Hợp đồng/PO điều khoản + nghĩa vụ tóm tắt</td>
-<td>Zone05_Commercial (Khách hàng)</td>
+<td>Zone05_Commercial (Customer)</td>
 <td>Người định giá (SAL-03) xác nhận “điều khoản hồ sơ” trước khi nhận đơn</td>
 </tr>
 <tr>
 <td>Kế hoạch</td>
-<td>PO đã nhận + BOM/lộ trình gia công trong ERP</td>
+<td>PO Received + BOM/lộ trình gia công trong ERP</td>
 <td>Job mở + Hồ sơ công việc khung sườn + link PartRev</td>
 <td>Zone03_Operations_Evidence_Job</td>
 <td>Planner tạo Hồ sơ công việc trước khi phát hành xuống phân xưởng</td>
@@ -215,7 +215,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Kỹ thuật</td>
 <td>Part yêu cầu + Rev</td>
-<td>Part/Rev đã phát hành gói hàng + SnapshotID</td>
+<td>Part/Rev Released gói hàng + SnapshotID</td>
 <td>Zone02_Product_Config_PartRev</td>
 <td>QA ký ack phát hành; bản hết hiệu lực bị khóa</td>
 </tr>
@@ -223,7 +223,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Mua hàng</td>
 <td>nhà thầu phụ (nhà thầu phụ (Subcon)) yêu cầu / nguyên vật liệu spec</td>
 <td>PO + cert yêu cầu + nhà cung cấp bằng chứng</td>
-<td>Zone05 (Nhà cung cấp) + link sang Job pack</td>
+<td>Zone05 (Supplier) + link sang Job pack</td>
 <td>Mua hàng khóa yêu cầu cert theo PO; thiếu cert = TẠM GIỮ</td>
 </tr>
 <tr>
@@ -281,13 +281,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Zone01</b><div class="muted">Được kiểm soát</div></td>
 <td>QA/QMS (Responsible Person), Supervisor (phê duyệt)</td>
-<td>SOP/WI/Biểu mẫu chủ / gốc; phiên bản đã phát hành duy nhất; kho hết hiệu lực (đọc-chỉ / duy nhất)</td>
+<td>SOP/WI/Biểu mẫu chủ / gốc; phiên bản Released duy nhất; kho hết hiệu lực (đọc-chỉ / duy nhất)</td>
 <td>Không lưu bằng chứng theo Job; không lưu draft dài ngày</td>
 </tr>
 <tr>
 <td><b>Zone02</b><div class="muted">Part/Rev</div></td>
 <td>Lập trình viên (CNC)/Kỹ thuật (Responsible Person), QA (ack)</td>
-<td>Drawing/CAD/CAM/Setup đã phát hành theo PartNum-Rev; gói hàng phát hành</td>
+<td>Drawing/CAD/CAM/Setup Released theo PartNum-Rev; gói hàng phát hành</td>
 <td>Không nhét bằng chứng theo Job; không chạy mặt bằng xưởng từ tệp cục bộ (nội bộ / tại chỗ file)/USB</td>
 </tr>
 <tr>
@@ -305,13 +305,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Zone05</b><div class="muted">Thương mại</div></td>
 <td>Người định giá (SAL-03) + Mua hàng</td>
-<td>Khách hàng/nhà cung cấp hợp đồng, thỏa thuận bảo mật (NDA), điều khoản; sơ đồ ánh xạ nghĩa vụ</td>
-<td>Không chứa bằng chứng theo Job; không chứa bản đã phát hành Part/Rev</td>
+<td>Customer/nhà cung cấp hợp đồng, thỏa thuận bảo mật (NDA), điều khoản; sơ đồ ánh xạ nghĩa vụ</td>
+<td>Không chứa bằng chứng theo Job; không chứa bản Released Part/Rev</td>
 </tr>
 <tr>
-<td><b>Zone06</b><div class="muted">Làm việc</div></td>
+<td><b>Zone06</b><div class="muted">Working</div></td>
 <td>Tất cả vai trò</td>
-<td>hộp thư đến/Draft/khu vực chuẩn bị / sắp xếp/ToPublish; dọn tự động theo lưu giữ T3</td>
+<td>Inbox/Draft/khu vực chuẩn bị / sắp xếp/ToPublish; dọn tự động theo lưu giữ T3</td>
 <td>Không giữ “bản chính”; không coi là hồ sơ</td>
 </tr>
 </tbody>
@@ -466,7 +466,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP8 — Truy cập rà soát</b></td>
 <td>IT/Data + Supervisor</td>
-<td>Rà soát quyền theo vai trò; tách quyền đọc/ghi theo Khu vực; khóa chia sẻ ngoài.</td>
+<td>Review quyền theo vai trò; tách quyền đọc/ghi theo Khu vực; khóa chia sẻ ngoài.</td>
 <td>Biên bản rà soát quyền truy cập + danh sách nhóm truy cập</td>
 </tr>
 </tbody>
@@ -829,7 +829,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Thiết kế/chuẩn hóa template cho bộ phận; khóa “đường tắt”.</li>
 <li>Đánh giá nội bộ: truy xuất nguồn gốc ngẫu nhiên 5 job và ghi kết quả.</li>
-<li>Đào tạo lại người mới bằng OJT theo TWI.</li>
+<li>Training lại người mới bằng OJT theo TWI.</li>
 </ul>
 </td>
 <td>
@@ -1030,7 +1030,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Mua hàng</td>
-<td>Nhà cung cấp hợp đồng/đánh giá năng lực; cert outsource theo Job/PO</td>
+<td>Supplier hợp đồng/đánh giá năng lực; cert outsource theo Job/PO</td>
 <td>Zone05 (thương mại) + Zone03 (job bằng chứng)</td>
 </tr>
 <tr>
@@ -1051,7 +1051,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Người định giá (SAL-03)</td>
 <td>Hợp đồng/PO điều khoản + nghĩa vụ tóm tắt; sơ đồ ánh xạ yêu cầu hồ sơ</td>
-<td>Zone05 / Khách hàng</td>
+<td>Zone05 / Customer</td>
 </tr>
 <tr>
 <td>Supervisor</td>
@@ -1085,7 +1085,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Zone03 Job Bằng chứng:</b> M365/SharePoint → CNC-IMS-HUB → 03_Operations-Bằng chứng-Job</li>
 <li><b>Zone04 Doanh nghiệp Hồ sơ:</b> M365/SharePoint → CNC-IMS-HUB → 04_Enterprise-Hồ sơ</li>
 <li><b>Zone05 Thương mại:</b> M365/SharePoint → CNC-IMS-HUB → 05_Commercial</li>
-<li><b>Zone06 Làm việc:</b> M365/SharePoint → CNC-IMS-HUB → 06_Working-phân loại ưu tiên</li>
+<li><b>Zone06 Working:</b> M365/SharePoint → CNC-IMS-HUB → 06_Working-phân loại ưu tiên</li>
 </ul>
 <div class="muted" style="margin-top:8px">Khi tên site/thư viện khác thực tế, cập nhật ngay: <b>Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint).</b>.</div>
 </div>
@@ -1150,7 +1150,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Bằng chứng chung không thuộc T1</td>
 </tr>
 <tr>
-<td><b>T3</b><div class="muted">Làm việc</div></td>
+<td><b>T3</b><div class="muted">Working</div></td>
 <td>HESEM-T3-3Y</td>
 <td>3 năm</td>
 <td>Zone06 làm việc; ảnh/log vận hành phục vụ phân tích</td>
@@ -1187,7 +1187,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>3</td>
 <td>Bằng chứng nằm sai Chính / Sơ cấp Home</td>
-<td>Rà soát định kỳ; di chuyển về đúng Khu vực và thay bằng link</td>
+<td>Review định kỳ; di chuyển về đúng Khu vực và thay bằng link</td>
 <td>Biên bản dọn dẹp + log di chuyển</td>
 </tr>
 <tr>

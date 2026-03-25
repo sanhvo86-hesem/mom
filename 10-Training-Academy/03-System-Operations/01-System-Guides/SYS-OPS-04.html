@@ -68,7 +68,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <div class="badge"><span class="dot"></span>Vận hành hệ thống • SYS-OPS-04</div>
 <h1 style="margin-top:10px">SYS-OPS-04 — Power Automate Luồng &amp; Approvals: hàng tồn kho, ApprovalHistory, lỗi cẩm nang triển khai</h1>
-<p class="muted">Đào tạo THỰC CHIẾN để chạy phân xưởng CNC gia công theo đơn (job xưởng) và sẵn sàng đánh giá. Mọi bước đều gắn cổng kiểm soát/bàn giao/rủi ro/MRR.</p>
+<p class="muted">Training THỰC CHIẾN để chạy phân xưởng CNC gia công theo đơn (job xưởng) và sẵn sàng đánh giá. Mọi bước đều gắn cổng kiểm soát/bàn giao/rủi ro/MRR.</p>
 <div class="tag blue">Phiên bản</div>
 </div>
 <div class="note">
@@ -114,13 +114,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>Vai trò</th><th>Trách nhiệm bắt buộc trong mô-đun này</th><th>Điều kiện đạt (khác nhau theo vai trò)</th></tr></thead>
 <tbody>
 <tr><td><b>Operator</b></td><td>Ghi nhận bằng chứng thực tế vào đúng Hồ sơ công việc (hồ sơ công việc); không vượt qua cổng kiểm soát; phản hồi vấn đề chặn trong 60 giây.</td><td>Thực hiện đúng 3 lần OJT “đính kèm bằng chứng + cập nhật hồ sơ” không lỗi; hiểu 5 lý do ĐÃ CHẶN phổ biến.</td></tr>
-<tr><td><b>Setup</b></td><td>Đảm bảo phiếu cài đặt/fixture ảnh chụp nằm đúng thư mục; xác nhận Hồ sơ công việc đã tạo khi job đã phát hành.</td><td>Tạo đúng cấu trúc bằng chứng cho 2 job; không phát sinh sai Rev trong hồ sơ.</td></tr>
+<tr><td><b>Setup</b></td><td>Đảm bảo phiếu cài đặt/fixture ảnh chụp nằm đúng thư mục; xác nhận Hồ sơ công việc đã tạo khi job Released.</td><td>Tạo đúng cấu trúc bằng chứng cho 2 job; không phát sinh sai Rev trong hồ sơ.</td></tr>
 <tr><td><b>Lập trình viên (CNC)</b></td><td>Đặt chương trình/NC/Phiên bản đúng thư mục; cập nhật thông tin Rev theo lộ trình gia công; không phát hành file “mồ côi”.</td><td>1 ca chạy mẫu: chương trình + setup + rev truy vết truy xuất nguồn gốc được trong 60 giây.</td></tr>
 <tr><td><b>QC</b></td><td>Đảm bảo Kiểm tra/FAI hồ sơ đủ trường bắt buộc; gắn Báo cáo URL vào hồ sơ.</td><td>2 tình huống: 01 tình huống yêu cầu FAI và 01 tình huống không yêu cầu FAI — ghi nhận đúng và PASS.</td></tr>
-<tr><td><b>QA</b></td><td>Quản trị tạm giữ QC (tạm giữ QC (QCHold))/NCR/CAPA; duyệt theo SoD; kiểm tra ApprovalHistory và dấu vết.</td><td>Không có phê duyệt thiếu nhận xét/DecisionTime; đóng 01 NCR và 01 CAPA có vết / nhật ký thay đổi đầy đủ.</td></tr>
+<tr><td><b>QA</b></td><td>Governance tạm giữ QC (tạm giữ QC (QCHold))/NCR/CAPA; duyệt theo SoD; kiểm tra ApprovalHistory và dấu vết.</td><td>Không có phê duyệt thiếu nhận xét/DecisionTime; đóng 01 NCR và 01 CAPA có vết / nhật ký thay đổi đầy đủ.</td></tr>
 <tr><td><b>Kho</b></td><td>Thực hiện PackagingChecks/SSCC; chạy ShipRelease cổng kiểm soát; xử lý ĐÃ CHẶN không né.</td><td>Phát hành 01 pack chỉ khi PacketComplete=PASS; chứng minh được vết / nhật ký thay đổi “từ hồ sơ đến file”.</td></tr>
 <tr><td><b>Mua hàng</b></td><td>Thu thập chứng từ nhà cung cấp/công đoạn đặc biệt; gắn vào hồ sơ đúng mục; phản hồi DocMissing.</td><td>2 lô nhận hàng: chứng từ truy xuất nguồn gốc trong 60 giây, không thiếu rev/lot.</td></tr>
-<tr><td><b>Planner</b></td><td>Giám sát JobIndex/JobOper; đảm bảo job đã phát hành có hồ sơ; điều phối bàn giao theo cổng kiểm soát.</td><td>Không có job đã phát hành thiếu EvidenceFolderUrl; phản hồi vấn đề chặn trong 1 ca.</td></tr>
+<tr><td><b>Planner</b></td><td>Giám sát JobIndex/JobOper; đảm bảo job Released có hồ sơ; điều phối bàn giao theo cổng kiểm soát.</td><td>Không có job Released thiếu EvidenceFolderUrl; phản hồi vấn đề chặn trong 1 ca.</td></tr>
 <tr><td><b>Bảo trì</b></td><td>Ghi nhận ToolLife/Thời gian ngừng máy theo hồ sơ; giữ bằng chứng hiệu chuẩn CNC-IMS-HUB → QMS-Hồ sơ → Đo lường-Hồ sơ..</td><td>Đóng 01 sự cố thời gian ngừng máy có hồ sơ + ảnh + nguyên nhân; không mất dấu vết.</td></tr>
 <tr><td><b>EHS</b></td><td>Gắn kiểm soát EHS vào hồ sơ khi có yêu cầu; khóa phát hành khi thiếu kiểm soát an toàn EHS cổng kiểm soát: PPE • LOTO • Hot Công việc • nâng • hóa chất/Dung dịch làm mát (dung dịch làm nguội) • Machine bảo vệ / tấm chắn..</td><td>Nhận biết các điểm chặn EHS và phát hành đúng 100%.</td></tr>
 <tr><td><b>Người định giá (SAL-03)</b></td><td>Không cam kết giao hàng khi ShipRelease chưa ĐÃ PHÁT HÀNH; truyền thông đúng trạng thái cổng kiểm soát.</td><td>Không có email/báo giá xác nhận giao hàng khi Trạng thái=ĐÃ CHẶN/TẠM GIỮ.</td></tr>
@@ -164,7 +164,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>Kế hoạch</b> (job đã phát hành)</td>
+<td><b>Kế hoạch</b> (job Released)</td>
 <td>JobIndex/JobOperIndex phản chiếu / sao chép; Rev; ngày đến hạn</td>
 <td>Hồ sơ công việc được tạo và gắn link</td>
 <td><b>CHẶN</b> khi EvidenceFolderUrl trống</td>
@@ -217,7 +217,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>FLOW_02_Sync_JobOperations</td><td>tái phát 30m</td><td>BAQ_JobOperations</td><td>Cập nhật/Thêm mới JobOperIndex</td><td>JobNum+OprSeq duy nhất</td></tr>
 <tr><td>FLOW_03_Sync_LaborMirror</td><td>tái phát 15m</td><td>BAQ_LaborTime</td><td>Cập nhật/Thêm mới LaborMirror</td><td>Không thiếu JobNum/ClockIn</td></tr>
 <tr><td>FLOW_04_Sync_ShipmentMirror</td><td>tái phát 15m</td><td>BAQ_ShipmentsOpen</td><td>Cập nhật/Thêm mới ShipmentMirror</td><td>Không trễ so với ca vận hành</td></tr>
-<tr><td>FLOW_06_Create_JobDossier_OnNewJob</td><td>On JobIndex new/đã phát hành</td><td>JobIndex</td><td>Tạo Record Folder</td><td>Không tạo sai đường dẫn/Rev</td></tr>
+<tr><td>FLOW_06_Create_JobDossier_OnNewJob</td><td>On JobIndex new/Released</td><td>JobIndex</td><td>Tạo Record Folder</td><td>Không tạo sai đường dẫn/Rev</td></tr>
 <tr><td>FLOW_06_QA_Approvals</td><td>On submit (Hold/NCR/CAPA/Ship)</td><td>Hồ sơ</td><td>ApprovalHistory</td><td>SoD + nhận xét + dấu thời gian</td></tr>
 <tr><td>FLOW_07_ShipRelease_Validator</td><td>On ShipRelease tạo/sửa đổi</td><td>ShipRelease + hồ sơ</td><td>PASS/CHẶN + thông báo</td><td>Cổng kiểm soát stop‑ship, không có “pass im lặng”</td></tr>
 </tbody>
@@ -233,7 +233,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td>Luồng sync bị tắt/không chạy theo lịch</td><td>Kế hoạch/Sản xuất</td><td>IntegrationLogs trống &gt; 60 phút trong giờ ca</td><td>Supervisor kích hoạt STOP dữ liệu; khóa quyết định theo phản chiếu / sao chép</td></tr>
 <tr><td>2</td><td>con trỏ LastSyncUtc bị tạm ứng / nâng cao dù run fail</td><td>Kế hoạch</td><td>Khoảng trống dữ liệu; JobIndex thiếu job mới</td><td>IT hoàn tác / quay lại con trỏ; ghi Sự cố + MRR</td></tr>
 <tr><td>3</td><td>Cập nhật/Thêm mới không tính bất biến (tính bất biến (idempotent)) → trùng hồ sơ</td><td>Kế hoạch</td><td>2 EpicorKey giống nhau</td><td>IT sửa khóa; QA khóa sử dụng dữ liệu trùng</td></tr>
-<tr><td>4</td><td>Job đã phát hành nhưng EvidenceFolderUrl trống</td><td>Kế hoạch</td><td>JobIndex filter EvidenceFolderUrl=phôi</td><td>Planner TẠM GIỮ phát hành; chạy lại FLOW_06 hoặc tạo hồ sơ thủ công và log</td></tr>
+<tr><td>4</td><td>Job Released nhưng EvidenceFolderUrl trống</td><td>Kế hoạch</td><td>JobIndex filter EvidenceFolderUrl=phôi</td><td>Planner TẠM GIỮ phát hành; chạy lại FLOW_06 hoặc tạo hồ sơ thủ công và log</td></tr>
 <tr><td>5</td><td>Phê duyệt thực hiện qua chat/email, không log</td><td>QA/Ship</td><td>Không có ApprovalHistory cho RecordID</td><td>CHẶN cổng kiểm soát; yêu cầu duyệt lại trong hệ thống</td></tr>
 <tr><td>6</td><td>ApprovalHistory thiếu nhận xét/time/Approver</td><td>QA</td><td>Trường bắt buộc rỗng</td><td>QA trả về (Từ chối) và yêu cầu ghi rõ; không cho “phê duyệt trắng”</td></tr>
 <tr><td>7</td><td>ShipRelease bị sửa trạng thái bằng tay để vượt cổng kiểm soát</td><td>Ship</td><td>Trạng thái=ĐÃ PHÁT HÀNH nhưng người xác nhận log FAIL</td><td>dừng giao hàng (STOP-SHIP / dừng giao hàng); mở NCR nội bộ; khóa quyền sửa tay RBAC: QA/QMS phê duyệt • OPS thực thi • IT admin • sửa hồ sơ cổng kiểm soát = QA/QMS.</td></tr>
@@ -257,7 +257,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>CP3 — Bằng chứng lưu bằng URL, không nhét file vào list</td><td>All vai trò tạo hồ sơ</td><td>EvidenceFolderUrl/RecordUrl</td><td>Link mở được; file nằm đúng Record Folder</td><td>Từ chối hồ sơ; yêu cầu sửa link và tổ chức lại hồ sơ</td></tr>
 <tr><td>CP4 — SoD cho approvals</td><td>QA + Supervisor</td><td>ApprovalHistory + quyền truy cập M365/SharePoint → HESEM-QMS-SSOT</td><td>Approver khác người tạo; nhận xét bắt buộc khi Từ chối</td><td>Chặn và mở NCR nội bộ khi tự duyệt</td></tr>
 <tr><td>CP5 — cứng / khó cổng kiểm soát ShipRelease</td><td>Kho + QA</td><td>ShipRelease + IntegrationLogs + PackagingChecks + PackSSCCRegister</td><td>người xác nhận PASS mới được ĐÃ PHÁT HÀNH</td><td>ĐÃ CHẶN + thông báo Teams + StandupAction</td></tr>
-<tr><td>CP6 — Giám sát &amp; bất thường quy tắc</td><td>Supervisor</td><td>Báo cáo/ảnh chụp màn hình bảng điều khiển mỗi ca CNC-IMS-HUB → QMS-Hồ sơ → bảng điều khiển (bảng điều khiển (Dash))-ảnh chụp trạng thái.</td><td>0 đã phát hành khi đối soát FAIL; 0 NCR Closed thiếu disposition</td><td>dừng giao hàng (STOP-SHIP / dừng giao hàng) hoặc TẠM GIỮ chất lượng; mở hành động khắc phục</td></tr>
+<tr><td>CP6 — Giám sát &amp; bất thường quy tắc</td><td>Supervisor</td><td>Báo cáo/ảnh chụp màn hình bảng điều khiển mỗi ca CNC-IMS-HUB → QMS-Hồ sơ → bảng điều khiển (bảng điều khiển (Dash))-ảnh chụp trạng thái.</td><td>0 Released khi đối soát FAIL; 0 NCR Closed thiếu disposition</td><td>dừng giao hàng (STOP-SHIP / dừng giao hàng) hoặc TẠM GIỮ chất lượng; mở hành động khắc phục</td></tr>
 <tr><td>CP7 — Version control cho Luồng</td><td>IT</td><td>Export gói hàng + DCR hồ sơ</td><td>Mọi thay đổi luồng có phiếu yêu cầu + phê duyệt + hoàn tác / quay lại plan</td><td>hoàn tác / quay lại ngay khi phát hiện ảnh hưởng cổng kiểm soát</td></tr>
 </tbody>
 </table>
@@ -270,7 +270,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Định nghĩa trạng thái cưỡng chế</h3>
 <ul>
 <li><b>STOP:</b> Dừng vận hành ngay tại hiện trường. Áp dụng khi có rủi ro an toàn/lẫn lộn/ship sai.</li>
-<li><b>TẠM GIỮ:</b> Giữ trạng thái tại bước hiện tại, không bàn giao sang bước sau.</li>
+<li><b>TẠM GIỮ:</b> Giữ trạng thái tại bước Current, không bàn giao sang bước sau.</li>
 <li><b>CHẶN:</b> Khóa hệ thống cổng kiểm soát (ShipRelease/Phê duyệt) cho tới khi đủ MRR.</li>
 </ul>
 </div>
@@ -334,7 +334,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Mở IntegrationLogs (24h) và lọc Thất bại/cảnh báo</td><td>Supervisor</td><td>Ảnh chụp màn hình + link log</td><td>Bỏ sót lỗi do không lọc theo FlowName</td></tr>
 <tr><td>2</td><td>Kiểm tra IntegrationSettings.LastSyncUtc cho JobIndex/Nhân công/lô giao hàng</td><td>Planner</td><td>Giá trị dấu thời gian + ảnh chụp</td><td>Nhầm múi giờ; đọc nhầm ngày</td></tr>
-<tr><td>3</td><td>Rà JobIndex: đã phát hành nhưng EvidenceFolderUrl trống</td><td>Planner</td><td>Danh sách job + hành động xử lý</td><td>Cho chạy sản xuất khi hồ sơ chưa tạo</td></tr>
+<tr><td>3</td><td>Rà JobIndex: Released nhưng EvidenceFolderUrl trống</td><td>Planner</td><td>Danh sách job + hành động xử lý</td><td>Cho chạy sản xuất khi hồ sơ chưa tạo</td></tr>
 <tr><td>4</td><td>Kiểm tra thư mục Hồ sơ công việc của job mới (cấu trúc 01→08)</td><td>Setup</td><td>Link thư mục + ảnh cấu trúc</td><td>Tạo nhầm tên thư mục; thiếu Rev</td></tr>
 <tr><td>5</td><td>Kiểm tra công việc tồn đọng Approvals (Ship/NCR/CAPA/Hold)</td><td>QA</td><td>Danh sách phê duyệt quá hạn</td><td>Để trôi SLA; không escalation</td></tr>
 <tr><td>6</td><td>Kiểm tra SoD: người tạo hồ sơ không tự duyệt</td><td>QA + Supervisor</td><td>ApprovalHistory đối chiếu CreatedBy</td><td>Chấp nhận tự duyệt “cho nhanh”</td></tr>
@@ -343,7 +343,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>9</td><td>Chạy lại xác nhận (FLOW_07) bằng cách cập nhật ShipRelease</td><td>Kho</td><td>IntegrationLogs run mới + PASS/CHẶN</td><td>Không ghi lại runId; không chứng minh tái xác nhận</td></tr>
 <tr><td>10</td><td>Khi PASS: xác nhận có ApprovalHistory (khi luồng yêu cầu duyệt)</td><td>QA</td><td>ApprovalHistory.ApprovalID + DecisionTime</td><td>Phát hành khi phê duyệt chưa log</td></tr>
 <tr><td>11</td><td>Đóng vòng lặp: tạo/đóng StandupAction cho mọi vấn đề chặn</td><td>Supervisor</td><td>StandupActions (Responsible Person/Due/Đóng)</td><td>Không có Responsible Person; không có due time</td></tr>
-<tr><td>12</td><td>Bàn giao ca: ghi “tình trạng cổng kiểm soát” (Đã chặn/Hold/Stop)</td><td>Supervisor</td><td>Biên bản bàn giao Biểu mẫu: biểu mẫu/index.html#dao-tao (FRM-Đào tạo/OJT/Đánh giá/Chứng chỉ).</td><td>Truyền miệng; mất dấu vết</td></tr>
+<tr><td>12</td><td>Bàn giao ca: ghi “tình trạng cổng kiểm soát” (Đã chặn/Hold/Stop)</td><td>Supervisor</td><td>Biên bản bàn giao Biểu mẫu: biểu mẫu/index.html#dao-tao (FRM-Training/OJT/Đánh giá/Chứng chỉ).</td><td>Truyền miệng; mất dấu vết</td></tr>
 </tbody>
 </table>
 </div>
@@ -449,7 +449,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>tích hợp hỏng / lỗi 3 lần; ShipRelease bị chặn đột biến / tăng đột ngột; SSCC đối soát fail; CAPA quá hạn.</li>
 <li>B.</li>
 <li>CHẶN và sửa dữ liệu đầu nguồn.</li>
-<li>Tham chiếu mục 13.</li>
+<li>Reference mục 13.</li>
 <li>CHẶN.</li>
 <li>Supervisor.</li>
 <li>Ví dụ: SP_{{JobNum}}_{{PackID}}_{{YYYYMMDD}}_CoC.pdf</li>
@@ -542,7 +542,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Danh sách:</b> M365/SharePoint → Site SharePoint Site: CNC-IMS-HUB. → Danh sách theo sơ đồ cấu trúc.</li>
 <li><b>Hồ sơ công việc:</b> M365/SharePoint → Thư viện “Job-Hồ sơ” Theo chuẩn QMS: SSOT = CNC-IMS-HUB (SharePoint). → {{JobNum}}_{{PartNum}}_Rev{{RevisionNum}} → 01..08.</li>
 <li><b>Mô-đun này:</b> M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → đào tạo → academy → system-ops.</li>
-<li><b>Ảnh chụp trạng thái bằng chứng theo ca:</b> lưu vào 08_Management-Rà soát trong hồ sơ của ngày/tuần Quy ước: 01 JobCode = 01 Hồ sơ; không tạo hồ sơ theo ca..</li>
+<li><b>Ảnh chụp trạng thái bằng chứng theo ca:</b> lưu vào 08_Management-Review trong hồ sơ của ngày/tuần Quy ước: 01 JobCode = 01 Hồ sơ; không tạo hồ sơ theo ca..</li>
 </ul>
 <h3>12.4 Tập trường tối thiểu cho ApprovalHistory (chuẩn đánh giá)</h3>
 <p class="muted">Mục tiêu: truy xuất nguồn gốc được “ai duyệt gì, lúc nào, dựa trên hồ sơ nào, dựa trên bằng chứng nào”.</p>
@@ -573,7 +573,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td>Duyệt ngoài hệ thống (email/chat), không có ApprovalHistory</td><td>Không chứng minh được quyết định</td><td>CHẶN cổng kiểm soát; duyệt lại trong luồng; lưu vết / nhật ký thay đổi</td></tr>
 <tr><td>2</td><td>Thiếu bằng chứng file/URL, hồ sơ chỉ có chữ</td><td>Không truy xuất nguồn gốc được “bằng chứng”</td><td>Chỉ cho đạt khi EvidenceFolderUrl/ReportUrl mở được</td></tr>
 <tr><td>3</td><td>SoD bị vi phạm (tự duyệt)</td><td>Rủi ro gian lận, sai sót</td><td>Đối chiếu CreatedBy vs Approver theo bảng kiểm bước 6</td></tr>
-<tr><td>4</td><td>ShipRelease ĐÃ PHÁT HÀNH khi còn thiếu lý do</td><td>Vượt qua cổng kiểm soát</td><td>Flow_07 cưỡng chế ĐÃ CHẶN; giám sát bất thường “đã phát hành khi đối soát FAIL = 0”</td></tr>
+<tr><td>4</td><td>ShipRelease ĐÃ PHÁT HÀNH khi còn thiếu lý do</td><td>Vượt qua cổng kiểm soát</td><td>Flow_07 cưỡng chế ĐÃ CHẶN; giám sát bất thường “Released khi đối soát FAIL = 0”</td></tr>
 <tr><td>5</td><td>FAI/Kiểm tra thiếu ReportUrl</td><td>Không có chứng cứ chất lượng</td><td>TẠM GIỮ/CHẶN cho đến khi gắn báo cáo</td></tr>
 <tr><td>6</td><td>IntegrationLogs thiếu thông tin runId/thời lượng/count</td><td>Không chứng minh kiểm soát hệ thống</td><td>Chuẩn hóa log trường dữ liệu; ảnh chụp trạng thái theo ca</td></tr>
 <tr><td>7</td><td>Hồ sơ thiếu khóa (JobNum/PackID), dữ liệu không sạch</td><td>Không truy vết; có nguy cơ lẫn lộn</td><td>Rule FF4; hàng ngày data chất lượng kiểm tra</td></tr>

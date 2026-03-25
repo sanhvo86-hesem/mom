@@ -93,7 +93,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Thông tin Job / Hồ sơ</strong>
 <div class="mini">
  JobCode: <span class="formline"> </span><br/>
- Khách hàng: <span class="formline"> </span><br/>
+ Customer: <span class="formline"> </span><br/>
  Part No: <span class="formline"> </span>   Rev: <span class="formline"> </span><br/>
  Số lượng: <span class="formline"> </span>   Due: <span class="formline"> </span><br/>
 </div>
@@ -120,7 +120,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><span class="chk">☐</span> Nguyên nhân gốc (5Why / Xương cá (Xương cá (Fishbone))) + xác nhận bằng dữ liệu</td><td>RCA</td><td>N2</td><td>QA+ENG</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RCA_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> CAPA plan (hành động + Responsible Person + due + control cập nhật)</td><td>CAPA</td><td>N2</td><td>QA/QMS</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CAPA_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
 <tr><td><span class="chk">☐</span> Xác minh bằng chứng (đo lại/FAI lại/SPC/3 lô liên tiếp)</td><td>xác minh (xác minh (VERI))</td><td>N3</td><td>QA</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_VERI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Kết thúc ký-off + bài học kinh nghiệm (cập nhật WI/Đào tạo)</td><td>đóng</td><td>N3</td><td>QA/QMS</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CLOSE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Kết thúc ký-off + bài học kinh nghiệm (cập nhật WI/Training)</td><td>đóng</td><td>N3</td><td>QA/QMS</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CLOSE_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 </table>
 </div>
 <div class="note mini"><strong>Gắn với mô-đun</strong>: C07 (CAPA), C06 (NCR), C13 (Kiểm soát thay đổi), C10 (Cổng kiểm soát), C08 (SSOT).</div>
@@ -128,13 +128,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-nhanh (STOP/TẠM GIỮ/CHẶN)</h2>
 <ul class="tight">
-<li>Không cô lập sản phẩm NG hoặc không dán TẠM GIỮ → STOP.</li><li>Không mở NCR mà xử lý miệng → CHẶN.</li><li>Disposition thiếu phê duyệt QA/Khách hàng (khi yêu cầu) → TẠM GIỮ.</li><li>Đóng CAPA khi chưa có xác minh bằng chứng → TẠM GIỮ.</li>
+<li>Không cô lập sản phẩm NG hoặc không dán TẠM GIỮ → STOP.</li><li>Không mở NCR mà xử lý miệng → CHẶN.</li><li>Disposition thiếu phê duyệt QA/Customer (khi yêu cầu) → TẠM GIỮ.</li><li>Đóng CAPA khi chưa có xác minh bằng chứng → TẠM GIỮ.</li>
 </ul>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Đánh giá 60 giây</h2>
 <ol class="tight">
-<li>Mở thư mục NCR và xác nhận có ảnh + số lượng + lot/số sê-ri.</li><li>Mở CAPA plan và đối chiếu Responsible Person/due.</li><li>Mở xác minh bằng chứng và đối chiếu tiêu chí đạt.</li><li>Mở kết thúc / đóng và kiểm tra WI/Đào tạo đã cập nhật.</li>
+<li>Mở thư mục NCR và xác nhận có ảnh + số lượng + lot/số sê-ri.</li><li>Mở CAPA plan và đối chiếu Responsible Person/due.</li><li>Mở xác minh bằng chứng và đối chiếu tiêu chí đạt.</li><li>Mở kết thúc / đóng và kiểm tra WI/Training đã cập nhật.</li>
 </ol>
 </div>
 <div class="card">

@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SYS-OPS-10 — Power nền tảng ALM &amp; Quản trị | HESEM OS</title>
+<title>SYS-OPS-10 — Power nền tảng ALM &amp; Governance | HESEM OS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
 /* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
@@ -53,7 +53,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-10 — Power nền tảng ALM &amp; Quản trị</strong>
+  <strong>SYS-OPS-10 — Power nền tảng ALM &amp; Governance</strong>
   <span class="sub-vn"></span>
 </div>
 <div class="meta">
@@ -69,9 +69,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="grid-2">
 <div>
 <div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-10</div>
-<h1 style="margin-top:10px">Power nền tảng ALM &amp; Quản trị</h1>
+<h1 style="margin-top:10px">Power nền tảng ALM &amp; Governance</h1>
 <p class="muted">
- Mã mô-đun: <b>SYS-OPS-10</b> • Tên mô-đun: <b>Power nền tảng ALM &amp; Quản trị (giải pháp import-ready, bảo mật mô hình)</b><br/>
+ Mã mô-đun: <b>SYS-OPS-10</b> • Tên mô-đun: <b>Power nền tảng ALM &amp; Governance (giải pháp import-ready, bảo mật mô hình)</b><br/>
  Mục tiêu: triển khai Power nền tảng theo chuẩn import-ready, quản trị quyền/ dữ liệu theo khu vực, và tạo MRR đủ để qua đánh giá mà không “đốt” thời gian truy vết.
  </p>
 <div class="tag blue">Phiên bản</div>
@@ -115,7 +115,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Khi nào kích hoạt mô-đun</strong>
 <ul>
-<li>Khi tạo mới hoặc thay đổi giải pháp/app/luồng/báo cáo liên quan vận hành phân xưởng (Hồ sơ công việc (hồ sơ công việc), QC, phê duyệt giao hàng (ship phát hành), Nhà cung cấp control, NCR/MRB, EHS).</li>
+<li>Khi tạo mới hoặc thay đổi giải pháp/app/luồng/báo cáo liên quan vận hành phân xưởng (Hồ sơ công việc (hồ sơ công việc), QC, phê duyệt giao hàng (ship phát hành), Supplier control, NCR/MRB, EHS).</li>
 <li>Khi có nhu cầu đưa thay đổi vào UAT hoặc PROD.</li>
 <li>Khi thay đổi mô hình quyền, nhóm truy cập, DLP, nhãn phân loại dữ liệu, hoặc lưu giữ/hồ sơ.</li>
 <li>Khi bàn giao hệ thống (admin bàn giao) từ IT sang QA/QMS/IMS hoặc khi nhận yêu cầu đánh giá bộ bằng chứng từ khách hàng.</li>
@@ -155,7 +155,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>QA</b></td>
-<td>Đặt cổng kiểm soát kiểm soát; rà soát bằng chứng; chạy acceptance kiểm nghiệm; phê duyệt go-vận hành thực; sẵn sàng đánh giá trong 3 phút.</td>
+<td>Đặt cổng kiểm soát kiểm soát; rà soát bằng chứng; chạy acceptance kiểm nghiệm; phê duyệt go-Live; sẵn sàng đánh giá trong 3 phút.</td>
 <td>01 ký-off UAT/PROD + 01 bộ bằng chứng hoàn chỉnh theo SOP-QMS-012.</td>
 <td>L4</td>
 </tr>
@@ -191,7 +191,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Người định giá (SAL-03)</b></td>
-<td>Phân loại dữ liệu khách hàng (Khách hàng-Bảo mật); dùng đánh giá pack đúng kênh; không gửi link “Bất kỳ ai”.</td>
+<td>Phân loại dữ liệu khách hàng (Customer-Bảo mật); dùng đánh giá pack đúng kênh; không gửi link “Bất kỳ ai”.</td>
 <td>01 tình huống tạo đánh giá pack đúng chính sách + log phê duyệt.</td>
 <td>L3</td>
 </tr>
@@ -260,10 +260,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Nhập nhầm phiên bản giải pháp</b>: import gói cũ, thiếu bản vá nóng (bản vá nóng (hotfix)), hoặc lệch version so với DCR hồ sơ.</li>
 <li><b>Nhập nhầm môi trường</b>: triển khai thẳng vào PROD, bỏ qua UAT, hoặc chạy thử bằng dữ liệu thật.</li>
 <li><b>Không được quản lý tồn tại trong PROD</b>: người dùng chỉnh trực tiếp trong PROD, tạo “độ lệch” không truy vết.</li>
-<li><b>kết nối Tham chiếu trỏ sai</b>: luồng/app gọi nhầm site/thư viện, nhầm list, nhầm tổ chức thuê (tổ chức thuê (tenant)).</li>
+<li><b>kết nối Reference trỏ sai</b>: luồng/app gọi nhầm site/thư viện, nhầm list, nhầm tổ chức thuê (tổ chức thuê (tenant)).</li>
 <li><b>Môi trường biến số / biến thiên bị cứng / khó-code</b>: copy/paste URL, GUID, hộp thư, khiến dữ liệu chảy sai vùng.</li>
 <li><b>DLP bị bỏ qua</b>: đầu nối ngoài danh sách cho phép kéo dữ liệu khách ra kênh ngoài.</li>
-<li><b>SoD bị phá</b>: cùng một người vừa cấu hình vừa tự phê duyệt go-vận hành thực.</li>
+<li><b>SoD bị phá</b>: cùng một người vừa cấu hình vừa tự phê duyệt go-Live.</li>
 <li><b>ngắt / nghỉ quyền / sự cho phép theo từng file</b>: quyền rải rác, không kiểm tra được khi đánh giá, tạo lỗ hổng truy cập.</li>
 <li><b>Không có ảnh chụp trạng thái quyền</b>: không chứng minh ai có quyền gì tại thời điểm ship/đánh giá.</li>
 <li><b>Không có backup/export trước triển khai</b>: lỗi xảy ra không hoàn tác / quay lại được trong ca sản xuất.</li>
@@ -301,7 +301,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>C4 — DLP policy theo khu vực dữ liệu</b></td>
 <td>IT + QA</td>
-<td>DLP policy export/ảnh chụp màn hình + test tình huống “Khách hàng-Bảo mật không chia sẻ bên ngoài”</td>
+<td>DLP policy export/ảnh chụp màn hình + test tình huống “Customer-Bảo mật không chia sẻ bên ngoài”</td>
 <td>Rò rỉ dữ liệu khách hàng</td>
 </tr>
 <tr>
@@ -335,10 +335,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Quy tắc dừng ngay</strong>
 <ul>
 <li><b>CHẶN:</b> Không có phiếu yêu cầu/Yêu cầu thay đổi hợp lệ → không được làm bất kỳ thay đổi nào trong UAT/PROD.</li>
-<li><b>CHẶN:</b> Thiếu bằng chứng cho bất kỳ điểm kiểm soát (điểm kiểm soát) C1–C8 → không được GO-vận hành thực.</li>
+<li><b>CHẶN:</b> Thiếu bằng chứng cho bất kỳ điểm kiểm soát (điểm kiểm soát) C1–C8 → không được GO-Live.</li>
 <li><b>TẠM GIỮ:</b> Phát hiện không được quản lý thay đổi trong PROD → khóa triển khai, lập điều tra, khôi phục theo được quản lý gói hàng.</li>
-<li><b>TẠM GIỮ:</b> kết nối Tham chiếu/Môi trường biến số / biến thiên không có danh sách kiểm tra và không có xác nhận đúng mục tiêu → dừng import.</li>
-<li><b>STOP:</b> DLP bị mở rộng đầu nối ngoài danh sách cho phép đối với dữ liệu Khách hàng-Bảo mật/Hạn chế → dừng ngay và hoàn tác / quay lại.</li>
+<li><b>TẠM GIỮ:</b> kết nối Reference/Môi trường biến số / biến thiên không có danh sách kiểm tra và không có xác nhận đúng mục tiêu → dừng import.</li>
+<li><b>STOP:</b> DLP bị mở rộng đầu nối ngoài danh sách cho phép đối với dữ liệu Customer-Bảo mật/Hạn chế → dừng ngay và hoàn tác / quay lại.</li>
 </ul>
 </div>
 <!-- 7) -->
@@ -351,8 +351,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Sai Rev</b> giữa app và WO/Lot/drawing</td>
-<td>TẠM GIỮ công việc tại Point-of-use • Báo Supervisor + QA • Chụp màn hình không khớp • Xác nhận Rev chuẩn theo nguồn đã phát hành</td>
-<td>01 log sự cố + 01 ảnh bằng chứng + link hồ sơ đã phát hành</td>
+<td>TẠM GIỮ công việc tại Point-of-use • Báo Supervisor + QA • Chụp màn hình không khớp • Xác nhận Rev chuẩn theo nguồn Released</td>
+<td>01 log sự cố + 01 ảnh bằng chứng + link hồ sơ Released</td>
 </tr>
 <tr>
 <td><b>Lẫn lộn lẫn lô</b> do app hiển thị sai lot</td>
@@ -389,7 +389,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>1</td>
 <td>Tạo phiếu yêu cầu/Yêu cầu thay đổi và phân loại dữ liệu</td>
 <td>Supervisor/Quy trình Owner</td>
-<td>phiếu yêu cầu ID + phạm vi thay đổi + mức dữ liệu (Nội bộ/Khách hàng-Bảo mật/Hạn chế)</td>
+<td>phiếu yêu cầu ID + phạm vi thay đổi + mức dữ liệu (Nội bộ/Customer-Bảo mật/Hạn chế)</td>
 <td>Thiếu phạm vi dữ liệu → DLP không đúng</td>
 </tr>
 <tr>
@@ -478,7 +478,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>14</td>
-<td>Giám sát sau go-vận hành thực (24–72 giờ)</td>
+<td>Giám sát sau go-Live (24–72 giờ)</td>
 <td>Supervisor + QA</td>
 <td>Log lỗi/sự cố + quyết định TẠM GIỮ/GO cho ca vận hành</td>
 <td>Lỗi phát sinh không ghi log</td>
@@ -548,7 +548,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>01 Xây dựng Sheet có Cài đặt IDs (Trạng thái: Đã xác nhận hiệu lực) + link tới bằng chứng.</li>
 <li>01 gói triển khai UAT (được quản lý) + log quy trình / luồng công việc + bảng kiểm pre-import ký.</li>
 <li>01 bộ acceptance kiểm nghiệm kết quả ĐẠT/KHÔNG ĐẠT có chữ ký QA + Supervisor.</li>
-<li>01 ảnh chụp trạng thái quyền (nhóm/tư cách thành viên/quyền truy cập) tại thời điểm go-vận hành thực.</li>
+<li>01 ảnh chụp trạng thái quyền (nhóm/tư cách thành viên/quyền truy cập) tại thời điểm go-Live.</li>
 <li>01 bộ bằng chứng lưu đúng kho, đúng quy tắc đặt tên.</li>
 </ul>
 <h3>Tiêu chí đánh giá L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn được cấp)</h3>
@@ -567,7 +567,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L2</b></td>
-<td>Thực hành đúng: mở đúng hồ sơ đã phát hành, tìm bằng chứng đúng WO/Lot trong 3 phút, tạo log sự cố khi không khớp Rev.</td>
+<td>Thực hành đúng: mở đúng hồ sơ Released, tìm bằng chứng đúng WO/Lot trong 3 phút, tạo log sự cố khi không khớp Rev.</td>
 <td>OJT pass + 01 tình huống quyết định TẠM GIỮ/GO đúng</td>
 <td>Được phép xác nhận vận hành theo bảng kiểm vai trò (Operator/Setup/Mua hàng/Bảo trì/EHS)</td>
 </tr>
@@ -581,7 +581,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L4</b></td>
 <td>Triển khai và kiểm soát end-to-end: lập Xây dựng Sheet; chạy quy trình / luồng công việc; rà soát bằng chứng; ký ký-off; chứng minh sẵn sàng đánh giá trong 3 phút.</td>
 <td>Hiệu suất test end-to-end PASS + SoD đạt</td>
-<td>Được phép tham gia phê duyệt go-vận hành thực và khóa quyền triển khai (Lập trình viên (CNC)/QA/Supervisor)</td>
+<td>Được phép tham gia phê duyệt go-Live và khóa quyền triển khai (Lập trình viên (CNC)/QA/Supervisor)</td>
 </tr>
 </table>
 <!-- 10) -->
@@ -592,15 +592,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>được quản lý giải pháp dùng ở môi trường nào và mục đích gì?</li>
 <li>Không được quản lý giải pháp được phép tồn tại ở môi trường nào?</li>
 <li>Vì sao phải dùng Môi trường biến số thay vì cứng / khó-code?</li>
-<li>kết nối Tham chiếu có vai trò gì trong luồng/app?</li>
+<li>kết nối Reference có vai trò gì trong luồng/app?</li>
 <li>DLP policy chặn cái gì và chặn theo cơ chế nào?</li>
 <li>Quy tắc “không ngắt / nghỉ quyền / sự cho phép theo từng file” chặn rủi ro gì?</li>
 <li>SoD là gì và vì sao đánh giá quan tâm?</li>
-<li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) nghĩa là gì trong go-vận hành thực?</li>
+<li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) nghĩa là gì trong go-Live?</li>
 <li>Khi phát hiện app hiển thị sai Rev, hành động đầu tiên là gì?</li>
-<li>Khi có yêu cầu chia sẻ dữ liệu Khách hàng-Bảo mật ra ngoài, kênh đúng là gì?</li>
+<li>Khi có yêu cầu chia sẻ dữ liệu Customer-Bảo mật ra ngoài, kênh đúng là gì?</li>
 <li>Vì sao acceptance test phải chạy bằng người dùng thật?</li>
-<li>Tình huống: luồng gửi email ra ngoài kèm file “Khách hàng-Bảo mật”. Quyết định TẠM GIỮ/GO? Ghi MRR nào?</li>
+<li>Tình huống: luồng gửi email ra ngoài kèm file “Customer-Bảo mật”. Quyết định TẠM GIỮ/GO? Ghi MRR nào?</li>
 <li>Tình huống: triển khai UAT xong nhưng chưa có ký-off. Có được triển khai PROD không? Trả lời theo cổng kiểm soát.</li>
 <li>Tình huống: Kho chuẩn bị ship nhưng thiếu 01 IR. Quyết định? MRR phải tạo?</li>
 <li>Tình huống: phát hiện không được quản lý edit trong PROD. STOP/TẠM GIỮ/CHẶN? Vì sao?</li>
@@ -612,7 +612,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>10.2 Tình huống (≥ 3 tình huống thật; có dữ kiện; quyết định TẠM GIỮ/GO và ghi MRR)</h3>
 <div class="note">
 <strong>Tình huống 1 — Sai Rev tại Point-of-use</strong><br/>
- Dữ kiện: Operator mở app “Job Theo dõi Sheet” hiển thị PartNo PN-7750 Rev B, trong khi drawing đã phát hành tại QMS-Được kiểm soát-Tài liệu là Rev C.
+ Dữ kiện: Operator mở app “Job Theo dõi Sheet” hiển thị PartNo PN-7750 Rev B, trong khi drawing Released tại QMS-Được kiểm soát-Tài liệu là Rev C.
  Lot đang ở ca 2, máy đã set tool.<br/>
  Yêu cầu: ra quyết định TẠM GIỮ/GO, mô tả phản ứng 60 giây, và liệt kê MRR phải tạo ngay.
  </div>
@@ -643,7 +643,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>QA</b></td>
-<td>Chạy acceptance kiểm nghiệm bằng người dùng thật • Kiểm tra DLP/khu vực • Rà soát bằng chứng theo Cài đặt ID • Ký ký-off</td>
+<td>Chạy acceptance kiểm nghiệm bằng người dùng thật • Kiểm tra DLP/khu vực • Review bằng chứng theo Cài đặt ID • Ký ký-off</td>
 <td>đạt khi test đầy đủ + ký-off hợp lệ + “bằng chứng trong 3 phút” đạt</td>
 </tr>
 <tr>
@@ -653,7 +653,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Operator/Setup/QC/Kho/Mua hàng/Planner/Bảo trì/EHS/Kinh doanh-CS</b></td>
-<td>Thực hành đúng theo vai trò người dùng (vai trò người dùng (persona)): truy xuất nguồn gốc hồ sơ đã phát hành, tìm bằng chứng trong 3 phút, tạo log sự cố, không chia sẻ sai kênh</td>
+<td>Thực hành đúng theo vai trò người dùng (vai trò người dùng (persona)): truy xuất nguồn gốc hồ sơ Released, tìm bằng chứng trong 3 phút, tạo log sự cố, không chia sẻ sai kênh</td>
 <td>đạt khi vận hành đúng và tạo MRR đúng yêu cầu</td>
 </tr>
 </table>
@@ -671,9 +671,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Điều kiện FAIL</strong>
 <ul>
-<li>Thiếu bất kỳ MRR nào thuộc nhóm “Tier 1” cho go-vận hành thực hoặc phê duyệt giao hàng.</li>
+<li>Thiếu bất kỳ MRR nào thuộc nhóm “Tier 1” cho go-Live hoặc phê duyệt giao hàng.</li>
 <li>triển khai vượt qua UAT hoặc thiếu ký-off QA.</li>
-<li>cứng / khó-code kết nối/value hoặc mở rộng đầu nối trái DLP đối với dữ liệu Khách hàng-Bảo mật/Hạn chế.</li>
+<li>cứng / khó-code kết nối/value hoặc mở rộng đầu nối trái DLP đối với dữ liệu Customer-Bảo mật/Hạn chế.</li>
 <li>Bằng chứng không chứng minh được ngữ cảnh (không thấy tên site/thư viện/cài đặt value).</li>
 </ul>
 </div>
@@ -686,7 +686,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>quy trình / luồng công việc log</b>: lịch sử triển khai DEV→UAT→PROD (ảnh + log xuất).</li>
 <li><b>Acceptance kiểm nghiệm hồ sơ</b>: ĐẠT/KHÔNG ĐẠT + vấn đề list + chữ ký QA + Supervisor.</li>
 <li><b>Backup/export trước phát hành</b>: gói export và ảnh chụp trạng thái cấu hình.</li>
-<li><b>Ảnh chụp trạng thái quyền</b>: nhóm/tư cách thành viên/quyền truy cập tại thời điểm go-vận hành thực.</li>
+<li><b>Ảnh chụp trạng thái quyền</b>: nhóm/tư cách thành viên/quyền truy cập tại thời điểm go-Live.</li>
 <li><b>DCR hồ sơ phát hành</b>: version, nội dung thay đổi, rủi ro, quyết định GO/TẠM GIỮ.</li>
 <li><b>Log sự cố</b> (khi phát sinh): mô tả, phản ứng 60 giây, hoàn tác / quay lại, quyết định.</li>
 </ul>
@@ -711,7 +711,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Tài liệu kiểm soát (mô-đun này):</b> M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → đào tạo → academy → system-ops</li>
 <li><b>Bằng chứng IT/Truy cập/Backup:</b> QMS-Hồ sơ/J_IT_Backup_and_Access_Evidence/YYYY/Q#</li>
 <li><b>Bằng chứng Power nền tảng ALM:</b> M365/SharePoint → HESEM-QMS-SSOT (tạo thư viện/thư mục chuẩn dưới QMS-Hồ sơ để lưu export, quy trình / luồng công việc các log, acceptance hồ sơ)</li>
-<li><b>Biểu mẫu FRM-QMS-14/15/16/17:</b> M365/SharePoint → HESEM-QMS-SSOT (gói hiện tại chưa có biểu mẫu; khi phát hành biểu mẫu phải cập nhật đường dẫn và mã biểu mẫu)</li>
+<li><b>Biểu mẫu FRM-QMS-14/15/16/17:</b> M365/SharePoint → HESEM-QMS-SSOT (gói Current chưa có biểu mẫu; khi phát hành biểu mẫu phải cập nhật đường dẫn và mã biểu mẫu)</li>
 </ul>
 <!-- 13) -->
 <h2 id="sec13">13) Chung đánh giá phát hiện &amp; phòng ngừa (≥ 8 lỗi)</h2>

@@ -68,7 +68,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 1) Header VI/EN + Form-Header (tách rời) -->
 <div class="doc-content" id="docContent">
 <div class="cover">
-<div class="kicker">HESEM CNC Academy • System Ops • Cổng kiểm soát (gate) Chất lượng</div>
+<div class="kicker">HESEM CNC Academy • System Ops • Cổng kiểm soát (gate) Quality</div>
 <h1 class="h1">SYS-OPS-20</h1>
 <p class="lead">
  Mô-đun này khóa chặt rủi ro “lọt lỗi ngay từ sản phẩm đầu”: sai REV, sai setup, sai dụng cụ đo, thiếu chứng chỉ vật liệu/công đoạn đặc biệt,
@@ -79,7 +79,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Tài liệu nội bộ áp dụng trực tiếp</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
 <li>SOP-QMS-009 — Kiểm tra sản phẩm đầu tiên Kiểm tra / Mẫu đầu (đầu tiên chi tiết / sản phẩm) Control</li>
-<li>ANNEX-QMS-003 — Bộ bằng chứng (Hồ sơ công việc (hồ sơ công việc) + Data Quản trị)</li>
+<li>ANNEX-QMS-003 — Bộ bằng chứng (Hồ sơ công việc (hồ sơ công việc) + Data Governance)</li>
 </ul>
 <div class="small muted" style="margin-top:8px">
  Mục tiêu vận hành: <b>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</b> tại điểm chặn FAI và trước phê duyệt giao hàng (ship phát hành).
@@ -365,7 +365,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Định nghĩa trạng thái</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
 <li><b>STOP</b>: dừng vận hành/máy ngay lập tức để ngăn tạo thêm phế phẩm.</li>
-<li><b>TẠM GIỮ</b>: phong tỏa sản phẩm/tài liệu; phải giữ tại công đoạn hiện tại; dán nhãn TẠM GIỮ.</li>
+<li><b>TẠM GIỮ</b>: phong tỏa sản phẩm/tài liệu; phải giữ tại công đoạn Current; dán nhãn TẠM GIỮ.</li>
 <li><b>CHẶN</b>: không cho phép qua cổng kiểm soát hệ thống; không ký phát hành; không ship.</li>
 </ul>
 <div class="small muted" style="margin-top:8px">
@@ -568,7 +568,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Setup</td><td>Setup/bù trừ (bù trừ (offset)) mốc chuẩn, re-kiểm tra khi chỉnh CTQ</td><td>L2; L3 khi tự xác định đặc tính bị ảnh hưởng</td></tr>
 <tr><td>Lập trình viên (CNC)</td><td>REV khóa, program version control, thay đổi tác động</td><td>L3</td></tr>
 <tr><td>QC</td><td>Balloon/plan, đo CTQ, Biểu mẫu 3, lưu bằng chứng</td><td>L3</td></tr>
-<tr><td>QA</td><td>Rà soát/phê duyệt, NCR/MRB cổng kiểm soát, phê duyệt giao hàng bằng chứng</td><td>L4</td></tr>
+<tr><td>QA</td><td>Review/phê duyệt, NCR/MRB cổng kiểm soát, phê duyệt giao hàng bằng chứng</td><td>L4</td></tr>
 <tr><td>Kho</td><td>Truy xuất nguồn gốc mẻ nấu (mẻ nấu (heat))/lot, nguyên vật liệu cert</td><td>L2</td></tr>
 <tr><td>Mua hàng</td><td>Công đoạn đặc biệt cert, đã phê duyệt nhà cung cấp kỷ luật / chuyên ngành</td><td>L2; L3 khi xử lý cert thiếu trường</td></tr>
 <tr><td>Planner</td><td>Chèn cổng kiểm soát vào lộ trình gia công, lịch QC, không “đẩy job” qua cổng kiểm soát</td><td>L2</td></tr>
@@ -613,7 +613,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3>10.2 Tình huống (≥ 3 tình huống thật, yêu cầu TẠM GIỮ/GO và ghi MRR)</h3>
 <div class="note">
-<strong>Tình huống 1 — Sai REV phát hiện tại máy</strong>
+<strong>Tình huống 1 — Sai REV phát Current máy</strong>
 <p style="margin:6px 0 0 0; line-height:1.7">
  Job J-28419: drawing ghi REV F, phiếu cài đặt ghi REV E, program file name có “REV-E”.
  Operator đã gia công xong 01 mẫu đầu và chuẩn bị chạy loạt.
@@ -623,7 +623,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note" style="margin-top:10px">
 <strong>Tình huống 2 — Công đoạn đặc biệt cert thiếu trường</strong>
 <p style="margin:6px 0 0 0; line-height:1.7">
- Job J-29107 có xi mạ anốt (xi mạ anốt (anodize)). Nhà cung cấp gửi CoC ghi spec đúng nhưng thiếu “lot/số sê-ri” và thiếu ngày quy trình.
+ Job J-29107 có xi mạ anốt (xi mạ anốt (anodize)). Supplier gửi CoC ghi spec đúng nhưng thiếu “lot/số sê-ri” và thiếu ngày quy trình.
  Đóng gói hỏi “có ship được không”.
  <br/><b>Yêu cầu:</b> quyết định TẠM GIỮ/GO, phân công Mua hàng/QA làm gì trong 30 phút, và nêu bằng chứng tối thiểu để mở phê duyệt giao hàng.
  </p>
@@ -755,7 +755,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Mô-đun này yêu cầu có nguồn truy xuất nguồn gốc tập trung</td>
 </tr>
 <tr>
-<td>Đào tạo hồ sơ</td>
+<td>Training hồ sơ</td>
 <td>M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → đào tạo → academy → system-ops</td>
 <td>Lưu tiêu chí đánh giá, bảng kiểm ký và kết quả đánh giá</td>
 </tr>

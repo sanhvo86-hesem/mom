@@ -133,7 +133,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Nhãn trạng thái bị bong/mờ/ghi tay không kiểm soát → dùng thiết bị quá hạn.</li>
 <li>Thiết bị rơi/va đập nhưng không đưa vào TẠM GIỮ → đo sai kéo dài nhiều lot.</li>
 <li>Chứng chỉ hiệu chuẩn thiếu truy xuất nguồn gốc/thiếu kết quả “as phát hiện/as trái / còn lại” → không chứng minh độ tin cậy của phép đo.</li>
-<li>Nhà cung cấp hiệu chuẩn không được phê duyệt → chứng chỉ không được chấp nhận khi khách đánh giá.</li>
+<li>Supplier hiệu chuẩn không được phê duyệt → chứng chỉ không được chấp nhận khi khách đánh giá.</li>
 <li>Thiết bị go/no-go (pin/ren) không kiểm soát mòn → false-chấp nhận, lọt NG.</li>
 <li>Không có xác minh trước khi dùng cho thiết bị xưởng-sàn / tầng → trôi / sai lệch/không / bằng không sai kéo theo sai số hệ thống.</li>
 <li>Phát hiện OOT nhưng không khoanh vùng ảnh hưởng theo thời gian → ngăn chặn thiếu, ship rủi ro.</li>
@@ -151,7 +151,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>CP2</td><td>Thiết lập chu kỳ theo rủi ro: tần suất dùng, môi trường, lịch sử ổn định, mức CTQ, yêu cầu khách</td><td>QA + Supervisor</td><td>Dòng “cơ sở/lý do” trong FRM-QMS-04 + biên bản rà soát hằng năm</td><td>Không có cơ sở = TẠM GIỮ phê duyệt chu kỳ</td></tr>
 <tr><td>CP3</td><td>điểm-of-Use trạng thái: nhãn trạng thái bắt buộc (Cal Date, Ngày đến hạn, ID, trạng thái OK/TẠM GIỮ)</td><td>Operator/Setup + QC</td><td>Ảnh nhãn + bảng kiểm đầu ca ký</td><td>Thiếu nhãn/nhãn hết hạn = STOP đo</td></tr>
 <tr><td>CP4</td><td>Xác minh trước khi dùng cho xưởng-sàn / tầng (không / bằng không, chủ / gốc kiểm tra, dưỡng đo / đồng hồ đo chặn / khóa/pin chủ / gốc)</td><td>QC (chủ trì) + Operator (thực hiện)</td><td>Xác minh Log theo job/ca</td><td>Không có log = TẠM GIỮ IR/FAI/Final</td></tr>
-<tr><td>CP5</td><td>Rà soát chứng chỉ hiệu chuẩn: truy xuất nguồn gốc, ngày, ID khớp, kết quả as-phát hiện/as-trái / còn lại, sai số/độ không đảm bảo đo phù hợp</td><td>QA</td><td>Bảng kiểm rà soát cert + PDF chứng chỉ</td><td>Cert không đạt = cách ly / biệt trữ thiết bị</td></tr>
+<tr><td>CP5</td><td>Review chứng chỉ hiệu chuẩn: truy xuất nguồn gốc, ngày, ID khớp, kết quả as-phát hiện/as-trái / còn lại, sai số/độ không đảm bảo đo phù hợp</td><td>QA</td><td>Bảng kiểm rà soát cert + PDF chứng chỉ</td><td>Cert không đạt = cách ly / biệt trữ thiết bị</td></tr>
 <tr><td>CP6</td><td>OOT xử lý / vận chuyển: khoanh vùng ảnh hưởng, quyết định ngăn chặn, re-đo lường/sort, NCR/MRB</td><td>QA + Supervisor</td><td>FRM-QA-03 NCR + báo cáo OOT tác động đánh giá</td><td>Chưa đóng OOT = CHẶN ship vùng ảnh hưởng</td></tr>
 <tr><td>CP7</td><td>MSA/Gage R&amp;R cho CTQ dung sai chặt hoặc đặc tính quyết định phát hành</td><td>QA + Kỹ thuật</td><td>Báo cáo MSA + phê duyệt phương pháp đo</td><td>Không đạt MSA = TẠM GIỮ quyết định ĐẠT/KHÔNG ĐẠT cho CTQ</td></tr>
 </tbody>
@@ -196,13 +196,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>6</td><td>Thực hiện xác minh (không / bằng không/chủ / gốc kiểm tra) và ghi kết quả</td><td>Operator (thực hiện) + QC (giám sát)</td><td>Xác minh Log</td><td>Ghi “OK” nhưng không có giá trị đo</td></tr>
 <tr><td>7</td><td>Gửi thiết bị đi hiệu chuẩn trước hạn tối thiểu 10 ngày làm việc (kèm PO)</td><td>Planner + Mua hàng</td><td>Lệnh gửi hiệu chuẩn + PO</td><td>Gửi sát hạn làm gián đoạn sản xuất</td></tr>
 <tr><td>8</td><td>Nhận thiết bị về: kiểm tra đủ chứng chỉ, ID khớp, trạng thái niêm phong</td><td>Kho</td><td>Phiếu nhận + bảng kiểm nhận cert</td><td>Nhận thiết bị nhưng cert bị tách rời</td></tr>
-<tr><td>9</td><td>Rà soát chứng chỉ theo bảng kiểm (truy xuất nguồn gốc, as-phát hiện/as-trái / còn lại, độ không đảm bảo đo)</td><td>QA</td><td>Bảng kiểm rà soát cert + PDF cert</td><td>Chỉ lưu PDF mà không rà soát nội dung</td></tr>
+<tr><td>9</td><td>Review chứng chỉ theo bảng kiểm (truy xuất nguồn gốc, as-phát hiện/as-trái / còn lại, độ không đảm bảo đo)</td><td>QA</td><td>Bảng kiểm rà soát cert + PDF cert</td><td>Chỉ lưu PDF mà không rà soát nội dung</td></tr>
 <tr><td>10</td><td>Cập nhật FRM-QMS-04: cal date, ngày đến hạn, kết quả, trạng thái OK/TẠM GIỮ</td><td>QA</td><td>FRM-QMS-04 cập nhật</td><td>Cập nhật log chậm → xưởng-sàn / tầng dùng nhầm</td></tr>
 <tr><td>11</td><td>Khi cert báo OOT: kích hoạt OOT tác động đánh giá và TẠM GIỮ vùng ảnh hưởng</td><td>QA + Supervisor</td><td>OOT báo cáo + NCR/MRB</td><td>Không khoanh vùng theo “lần đạt cuối”</td></tr>
 <tr><td>12</td><td>Re-đo lường/100% sort theo quyết định MRB và cập nhật IR/FAI/Final</td><td>QC + Sản xuất</td><td>IR/FAI cập nhật + biên bản sort</td><td>Re-đo lường nhưng không ghi liên kết đến OOT tình huống</td></tr>
 <tr><td>13</td><td>Kích hoạt MSA cho CTQ: chọn phương pháp, mẫu, người đo, tiêu chí PASS</td><td>QA + Kỹ thuật</td><td>Báo cáo MSA/Gage R&amp;R</td><td>Làm MSA nhưng không gắn CTQ cụ thể</td></tr>
-<tr><td>14</td><td>Rà soát chương trình hằng năm: quá hạn tỷ lệ, OOT tỷ lệ, hiệu lực khoảng thời gian</td><td>QA + Supervisor</td><td>Biên bản rà soát + KPI</td><td>Không điều chỉnh khoảng thời gian theo dữ liệu</td></tr>
-<tr><td>15</td><td>Đào tạo lại khi có OOT/vi phạm dùng thiết bị quá hạn</td><td>Supervisor</td><td>danh mục OJT (bảng kiểm / danh mục) + hồ sơ đào tạo lại</td><td>Nhắc miệng nhưng không có bằng chứng</td></tr>
+<tr><td>14</td><td>Review chương trình hằng năm: quá hạn tỷ lệ, OOT tỷ lệ, hiệu lực khoảng thời gian</td><td>QA + Supervisor</td><td>Biên bản rà soát + KPI</td><td>Không điều chỉnh khoảng thời gian theo dữ liệu</td></tr>
+<tr><td>15</td><td>Training lại khi có OOT/vi phạm dùng thiết bị quá hạn</td><td>Supervisor</td><td>danh mục OJT (bảng kiểm / danh mục) + hồ sơ đào tạo lại</td><td>Nhắc miệng nhưng không có bằng chứng</td></tr>
 </tbody>
 </table>
 </div>
@@ -328,7 +328,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>Nhận diện trạng thái tại Point-of-use</td><td>Đọc đúng ID/ngày đến hạn, dừng đúng khi thiếu nhãn</td><td>Dùng thiết bị quá hạn/không nhãn</td></tr>
 <tr><td>Xác minh log</td><td>Ghi đủ giá trị/nhận định + chữ ký + thời điểm</td><td>Ghi “OK” không có giá trị hoặc thiếu ID</td></tr>
-<tr><td>Rà soát cert</td><td>Phát hiện thiếu truy xuất nguồn gốc/as-phát hiện/as-trái / còn lại và TẠM GIỮ đúng</td><td>Chấp nhận cert lỗi và phát hành thiết bị</td></tr>
+<tr><td>Review cert</td><td>Phát hiện thiếu truy xuất nguồn gốc/as-phát hiện/as-trái / còn lại và TẠM GIỮ đúng</td><td>Chấp nhận cert lỗi và phát hành thiết bị</td></tr>
 <tr><td>OOT tác động</td><td>Khoanh vùng theo thời gian và liệt kê job/lot/số sê-ri đầy đủ</td><td>Không khoanh vùng hoặc không tạo NCR/MRB</td></tr>
 </tbody>
 </table>

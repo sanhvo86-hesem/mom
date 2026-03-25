@@ -104,7 +104,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 id="purpose">2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="req"><span class="req-tag shall">PHẢI</span>
 <div>
- Mọi rủi ro/cơ hội ảnh hưởng QCDSM (Chất lượng–Chi phí–Giao hàng–An toàn–Tinh thần) <b>PHẢI</b> được quản trị bằng chấm <b>S‑O‑D</b>, áp <b>ngưỡng hành động</b>, và lưu <b>MRR</b> tại đúng cổng kiểm soát. Vi phạm “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” bị xem là <b>vượt qua cổng kiểm soát</b>.
+ Mọi rủi ro/cơ hội ảnh hưởng QCDSM (Quality–Chi phí–Giao hàng–An toàn–Tinh thần) <b>PHẢI</b> được quản trị bằng chấm <b>S‑O‑D</b>, áp <b>ngưỡng hành động</b>, và lưu <b>MRR</b> tại đúng cổng kiểm soát. Vi phạm “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” bị xem là <b>vượt qua cổng kiểm soát</b>.
  </div>
 </div>
 <div class="grid-2">
@@ -138,7 +138,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td><b>Operator</b></td><td>Thực thi phản ứng 60 giây; báo rủi ro tại mặt bằng xưởng; không vượt qua cổng kiểm soát; ghi minh chứng trên traveler/bảng kiểm tra.</td><td><b>L2</b> (độc lập theo bảng kiểm) + hiệu suất test PASS</td></tr>
 <tr><td><b>Setup</b></td><td>Chấm S‑O‑D cho rủi ro gá đặt/dao/bù trừ (bù trừ (offset)); kích hoạt TẠM GIỮ tại setup/đầu tiên‑chi tiết / sản phẩm; bảo vệ mốc chuẩn (mốc chuẩn (datum)) &amp; CTQ.</td><td><b>L3</b> + hiệu suất test PASS</td></tr>
-<tr><td><b>Lập trình viên (CNC)</b></td><td>Quản trị rủi ro phát hành chương trình (program phát hành); chuẩn hóa tên file/rev; khóa bản lỗi thời; cập nhật rủi ro khi đổi ghi sổ / đăng/đường chạy dao.</td><td><b>L3</b> + tình huống PASS</td></tr>
+<tr><td><b>Lập trình viên (CNC)</b></td><td>Governance rủi ro phát hành chương trình (program phát hành); chuẩn hóa tên file/rev; khóa bản lỗi thời; cập nhật rủi ro khi đổi ghi sổ / đăng/đường chạy dao.</td><td><b>L3</b> + tình huống PASS</td></tr>
 <tr><td><b>QC</b></td><td>Quy định D (phát hiện) theo phương pháp đo; chặn gage OOT; xác nhận plan đo cho CTQ; giữ IR/FAI.</td><td><b>L3</b> + hiệu suất test PASS</td></tr>
 <tr><td><b>QA</b></td><td>Rủi ro người quản lý: chuẩn hóa tiêu chí S‑O‑D, ngưỡng; rà soát dữ liệu sổ đăng ký rủi ro (rủi ro sổ đăng ký); đánh giá cổng kiểm soát; kích hoạt NCR/CAPA/MRB.</td><td><b>L3</b> (L4 cho người đào tạo) + bài kiểm tra nhanh ≥ 90%</td></tr>
 <tr><td><b>Kho</b></td><td>Chặn lẫn lộn (mix-up); kiểm soát truy xuất nguồn gốc; kiểm tra chứng từ đi kèm; phê duyệt giao hàng chỉ khi đủ MRR.</td><td><b>L2</b> + hiệu suất test PASS</td></tr>
@@ -197,7 +197,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>G4 Mua hàng</b><br/><span class="muted">Responsible Person: Mua hàng</span></td>
 <td>Yêu cầu vật liệu/chứng chỉ; yêu cầu outsource/công đoạn đặc biệt</td>
-<td>Nhà cung cấp rủi ro chấm S‑O‑D; PO có luồng‑xuống / ngừng; yêu cầu CoC/CoA/quy trình cert</td>
+<td>Supplier rủi ro chấm S‑O‑D; PO có luồng‑xuống / ngừng; yêu cầu CoC/CoA/quy trình cert</td>
 <td>MRR: PO + nhà cung cấp bằng chứng<br/>hold khi thiếu chứng chỉ bắt buộc</td>
 </tr>
 <tr>
@@ -296,7 +296,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Gage OOT → STOP ngay</td>
 </tr>
 <tr>
-<td><b>CP6 — Nhà cung cấp/công đoạn đặc biệt control</b></td>
+<td><b>CP6 — Supplier/công đoạn đặc biệt control</b></td>
 <td>Mua hàng luồng‑xuống / ngừng yêu cầu; Nhận hàng kiểm chứng chứng chỉ; QA đánh giá nhà cung cấp khi rủi ro cao.</td>
 <td>PO/Nhận hàng gói hồ sơ + quy trình cert/CoC/CoA scan</td>
 <td>Thiếu chứng chỉ bắt buộc → CHẶN ship</td>
@@ -554,10 +554,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>9</td><td>Setup/đầu tiên‑chi tiết / sản phẩm: xác nhận mốc chuẩn (mốc chuẩn (datum))/bù trừ (bù trừ (offset))/danh sách dao cụ</td><td>Setup</td><td>Setup ký‑off + ảnh setup</td><td>Mốc chuẩn (mốc chuẩn (datum)) sai; nhầm dao/bù trừ (bù trừ (offset))</td></tr>
 <tr><td>10</td><td>FAI/IPQC/FQC: xác nhận phương pháp đo + D xếp hạng / đánh giá</td><td>QC</td><td>IR/FAI/FQC báo cáo</td><td>Đo sai; thiếu ghi số seri gage</td></tr>
 <tr><td>11</td><td>Chặn gage OOT và đánh giá tác động</td><td>QC/QA</td><td>Hồ sơ cách ly + NCR (khi áp dụng)</td><td>Tiếp tục dùng gage; không truy hồi lô</td></tr>
-<tr><td>12</td><td>Quản trị thay đổi: cập nhật sổ đăng ký rủi ro + đào tạo trước hiệu lực / hiệu quả date</td><td>QA + Responsible Person thay đổi</td><td>FRM‑QMS‑006 + log đào tạo</td><td>Thay đổi làm xong mới cập nhật</td></tr>
+<tr><td>12</td><td>Governance thay đổi: cập nhật sổ đăng ký rủi ro + đào tạo trước hiệu lực / hiệu quả date</td><td>QA + Responsible Person thay đổi</td><td>FRM‑QMS‑006 + log đào tạo</td><td>Thay đổi làm xong mới cập nhật</td></tr>
 <tr><td>13</td><td>NCR/MRB: ngăn chặn + quyết định MRB bằng văn bản</td><td>QA + Supervisor</td><td>SOP‑QMS‑006 + MRB hồ sơ</td><td>Tự làm lại; thiếu quyết định MRB</td></tr>
 <tr><td>14</td><td>phê duyệt giao hàng: kiểm “đủ MRR” trước xuất</td><td>Kho + QA</td><td>Bộ hồ sơ giao hàng bảng kiểm</td><td>Thiếu chứng chỉ; thiếu FQC pass</td></tr>
-<tr><td>15</td><td>Rà soát hiệu lực: RPN giảm + KPI ổn định + cập nhật thư viện rủi ro</td><td>QA + Supervisor</td><td>Effectiveness note + xu hướng KPI</td><td>Đóng rủi ro khi chưa có dữ liệu</td></tr>
+<tr><td>15</td><td>Review hiệu lực: RPN giảm + KPI ổn định + cập nhật thư viện rủi ro</td><td>QA + Supervisor</td><td>Effectiveness note + xu hướng KPI</td><td>Đóng rủi ro khi chưa có dữ liệu</td></tr>
 </tbody>
 </table>
 <h2 id="ojt">9) OJT thực chiến theo TWI</h2>
@@ -574,7 +574,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>Nguyên tắc TWI</b>
 <ul>
 <li>Hướng dẫn theo “bước → điểm then chốt → lý do”.</li>
-<li>Quan sát tại hiện trường; lỗi xuất hiện tại hiện trường được sửa ngay.</li>
+<li>Quan sát tại hiện trường; lỗi xuất Current hiện trường được sửa ngay.</li>
 <li>Không công nhận đạt khi thiếu minh chứng.</li>
 </ul>
 </div>
@@ -749,7 +749,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3 class="h3">10.3 Bài thực hành bắt buộc</h3>
 <div class="note">
-<b>Bài test:</b> Thực hiện 01 “Rà soát rủi ro tại cổng kiểm soát” cho một job thực tế hoặc tình huống mô phỏng, bao gồm: (1) trích CTQ; (2) chấm S‑O‑D cho 3 rủi ro; (3) áp ngưỡng và ra quyết định GO/TẠM GIỮ/CHẶN; (4) tạo MRR đầy đủ theo vai trò.
+<b>Bài test:</b> Thực hiện 01 “Review rủi ro tại cổng kiểm soát” cho một job thực tế hoặc tình huống mô phỏng, bao gồm: (1) trích CTQ; (2) chấm S‑O‑D cho 3 rủi ro; (3) áp ngưỡng và ra quyết định GO/TẠM GIỮ/CHẶN; (4) tạo MRR đầy đủ theo vai trò.
  </div>
 <table class="table">
 <thead>
@@ -827,7 +827,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Thí điểm/Dry‑run log</td>
 <td><code>thí điểm-[WO]-[Op]-[YYYYMMDD]</code></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT QMS/Chất lượng các log</td>
+<td>M365/SharePoint → HESEM-QMS-SSOT QMS/Quality các log</td>
 <td>Lập trình viên (CNC) + Setup</td>
 </tr>
 <tr>
@@ -844,7 +844,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Bộ hồ sơ giao hàng bảng kiểm</td>
-<td><code>SHIP-[WO]-[Khách hàng]-[YYYYMMDD]</code></td>
+<td><code>SHIP-[WO]-[Customer]-[YYYYMMDD]</code></td>
 <td>M365/SharePoint → HESEM-QMS-SSOT Giao vận hồ sơ</td>
 <td>Kho + QA</td>
 </tr>
@@ -863,7 +863,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Hồ sơ đào tạo (chuyên cần / điểm danh + OJT + test)</td>
 <td><code>TRN-SYS-OPS-14-[Name]-[YYYYMMDD]</code></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT Đào tạo hồ sơ</td>
+<td>M365/SharePoint → HESEM-QMS-SSOT Training hồ sơ</td>
 <td>QA/QMS</td>
 </tr>
 </tbody>
@@ -891,7 +891,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-103-risk-opportunity-fmea-and-control-plan.html">SOP‑QMS‑003 — Rủi ro &amp; Cơ hội</a></li>
 <li><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-162_Change_Impact_Matrix.xlsx">FRM‑QMS‑006 — Thay đổi Tác động Matrix</a></li>
-<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP-106 — Quản trị thay đổi và cấu hình</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP-106 — Governance thay đổi và cấu hình</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//06-SOP-600//sop-606-ncr-capa-and-ipqc-reaction.html">SOP‑QMS‑006 — NC/CAPA</a></li>
 <li><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx">rủi ro and Cơ hội Sổ đăng ký</a></li>
 <li><a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">OJT Bảng kiểm</a></li>

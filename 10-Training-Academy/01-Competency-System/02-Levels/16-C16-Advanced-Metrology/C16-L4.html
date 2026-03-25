@@ -74,7 +74,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><strong>Đối tượng áp dụng:</strong><br/>QA/QC + Đo lường + Kỹ thuật (chủ trì: QA Manager (QA-01))</div>
 <div><strong>Đầu ra bắt buộc:</strong><br/>Bằng chứng + chỉ số theo K–S–E–M; đạt Cơ chế chặn theo KPI (KPI kiểm soát cổng) để được công nhận Level.</div>
 <div><strong>Nguyên tắc ISO tích hợp:</strong><br/>Mọi bước quan trọng <em>PHẢI</em> có hồ sơ; thay đổi <em>PHẢI</em> được kiểm soát; dữ liệu tuân ALCOA+; tư duy rủi ro (rủi ro‑dựa trên).</div>
-<div><strong>Thời lượng chuẩn:</strong><br/>L1: 4–6h • L2: 8–12h • L3: 12–20h • L4: 20–40h (theo dự án/OJT).</div>
+<div><strong>Thời lượng chuẩn:</strong><br/>L1: 4–6h • L2: 8–12h • L3: 12–20h • L4: 20–40h (theo Projects/OJT).</div>
 </div>
 </div><div class="card">
 <span class="badge">Bộ diễn tập (Job CNC)</span>
@@ -93,7 +93,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><ul><li>Thiết kế hệ thống đo lường: chủ / gốc plan, hiệu chuẩn rủi ro-dựa trên, OOT.</li><li>Hiểu đánh giá logic ISO 7.1.5/8.6/7.5/8.7.</li><li>Hiểu quản trị dữ liệu số (truy xuất nguồn gốc, dấu vết kiểm toán).</li></ul></td>
-<td><ul><li>Xây SOP/WI/FRM đo lường, MSA sổ đăng ký, bảng điều khiển KPI.</li><li>Thiết lập OOT quy trình + tác động đánh giá + CAPA.</li><li>Đào tạo &amp; chứng nhận đội ngũ; đánh giá nội bộ.</li></ul></td>
+<td><ul><li>Xây SOP/WI/FRM đo lường, MSA sổ đăng ký, bảng điều khiển KPI.</li><li>Thiết lập OOT quy trình + tác động đánh giá + CAPA.</li><li>Training &amp; chứng nhận đội ngũ; đánh giá nội bộ.</li></ul></td>
 <td><ul><li>Đo lường Bản gốc Plan + RACI.</li><li>Procedure OOT + hồ sơ diễn tập.</li><li>ma trận đào tạo (đào tạo matrix) + đánh giá báo cáo.</li></ul></td>
 <td><ul><li>0 lớn / nghiêm trọng NC về đo lường.</li><li>On-time hiệu chuẩn ≥99%.</li><li>Chứng nhận pass ≥95%.</li></ul></td>
 </tr>
@@ -184,11 +184,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>độ tuyến tính</strong>: sai lệch hệ thống thay đổi theo dải đo.</li>
 <li><strong>độ ổn định</strong>: kết quả trôi / sai lệch theo thời gian (nhiệt/hao mòn).</li>
 <li><strong>lồng nhau GRR</strong>: khi không thể đo cùng part lặp lại (ví dụ đo phá hủy, hoặc part khác nhau theo lot).</li>
-</ul><h3>3.10 Liên kết đo lường với năng lực / khả năng và kế hoạch kiểm soát</h3><p>Khả năng (Cp/Cpk) “đẹp” mà hệ đo kém → chỉ là ảo giác. Level 3 phải biết kiểm tra điều kiện: σ quan sát = √(σ<sub>quy trình</sub><sup>2</sup> + σ<sub>gage</sub><sup>2</sup>). Muốn cải thiện thật: giảm biến thiên quá trình và/hoặc nâng cấp hệ đo.</p><h3>3.11 Xây hệ thống Đo lường theo ISO: Bản gốc Plan – Quản trị – Đánh giá pack</h3><p>Level 4 chuyển từ “làm” sang “thiết kế hệ thống”:</p><ul>
+</ul><h3>3.10 Liên kết đo lường với năng lực / khả năng và kế hoạch kiểm soát</h3><p>Khả năng (Cp/Cpk) “đẹp” mà hệ đo kém → chỉ là ảo giác. Level 3 phải biết kiểm tra điều kiện: σ quan sát = √(σ<sub>quy trình</sub><sup>2</sup> + σ<sub>gage</sub><sup>2</sup>). Muốn cải thiện thật: giảm biến thiên quá trình và/hoặc nâng cấp hệ đo.</p><h3>3.11 Xây hệ thống Đo lường theo ISO: Bản gốc Plan – Governance – Đánh giá pack</h3><p>Level 4 chuyển từ “làm” sang “thiết kế hệ thống”:</p><ul>
 <li><strong>Đo lường Bản gốc Plan</strong>: danh mục CTQ, phương pháp đo, thiết bị, năng lực nhân sự, MSA plan, hiệu chuẩn plan.</li>
 <li><strong>Hiệu chuẩn khoảng thời gian rủi ro‑dựa trên</strong>: điều chỉnh chu kỳ theo tần suất dùng, độ ổn định, lịch sử OOT, mức rủi ro CTQ.</li>
 <li><strong>Out‑of‑Dung sai (OOT) quy trình</strong>: khi thiết bị đo phát hiện lệch – phải đánh giá ảnh hưởng sản phẩm đã đo trước đó (ngăn chặn + re‑kiểm tra) và đóng CAPA.</li>
-<li><strong>Số hóa truy xuất nguồn gốc</strong>: chuẩn hóa đặt tên, version control, dấu vết kiểm toán để truy xuất nguồn gốc job trong ≤ 10 phút.</li>
+<li><strong>Digital truy xuất nguồn gốc</strong>: chuẩn hóa đặt tên, version control, dấu vết kiểm toán để truy xuất nguồn gốc job trong ≤ 10 phút.</li>
 </ul><div class="figure">
 <div class="cols-2">
 <div class="dl">
@@ -359,7 +359,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="small">Trong đánh giá nội bộ phát hiện một đồng hồ so đã quá hạn hiệu chuẩn 2 tuần, nhưng đã được dùng đo CTQ. Cần xử lý ngay để giảm rủi ro khách hàng.</p>
 <div class="grid">
 <div class="dl"><h4>Dữ liệu/đầu vào</h4><ul><li>Thiết bị: đồng hồ so tem hết hạn 14 ngày.</li><li>CTQ: độ đảo (độ đảo (runout)) ≤ 0.03.</li><li>công việc / đơn hàng đo trong 2 tuần: 6 job (batch nhỏ).</li></ul></div>
-<div class="dl"><h4>Nhiệm vụ</h4><ul><li>Thiết kế SOP OOT chuẩn hóa toàn công ty: kích hoạt, escalation, tác động đánh giá, khách hàng truyền đạt / giao tiếp (khi cần).</li><li>Thiết lập bảng điều khiển KPI OOT và đưa vào xem xét của lãnh đạo.</li><li>Đào tạo &amp; đánh giá lại năng lực cho nhóm đo lường.</li></ul></div>
+<div class="dl"><h4>Nhiệm vụ</h4><ul><li>Thiết kế SOP OOT chuẩn hóa toàn công ty: kích hoạt, escalation, tác động đánh giá, khách hàng truyền đạt / giao tiếp (khi cần).</li><li>Thiết lập bảng điều khiển KPI OOT và đưa vào xem xét của lãnh đạo.</li><li>Training &amp; đánh giá lại năng lực cho nhóm đo lường.</li></ul></div>
 <div class="dl"><h4>Đầu ra/Bằng chứng</h4><ul><li>SOP OOT + biểu mẫu + hướng dẫn.</li><li>Bảng điều khiển OOT + log hành động.</li><li>Kế hoạch đào tạo/đánh giá lại sau OOT.</li></ul></div>
 <div class="dl"><h4>Tiêu chí chấm</h4><ul><li>SOP rõ, sẵn sàng cho đánh giá.</li><li>KPI giúp quản trị, không gây che giấu.</li><li>Đảm bảo năng lực (7.2) và nhận thức (7.3).</li></ul></div>
 </div>
@@ -373,7 +373,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody><tr><td>1</td><td>Kiểm tra tem hiệu chuẩn/ID thiết bị đo trước khi sử dụng (đúng dải đo, không hư hỏng).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>2</td><td>Chuẩn bị điều kiện đo: làm sạch chi tiết, loại bỏ bavia, ổn định nhiệt độ khi cần.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>3</td><td>Thực hiện đo theo WI (đúng điểm đo, đúng lực đo, đúng số lần lặp).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>4</td><td>Ghi hồ sơ ngay tại thời điểm đo (ALCOA+), đầy đủ job/rev/lot/thiết bị/ký tên.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>5</td><td>Gắn trạng thái OK/TẠM GIỮ/NG đúng quy định và cô lập sản phẩm TẠM GIỮ/NG.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>6</td><td>Giải thích được vì sao chọn phương pháp đo này (dung sai/CTQ).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>7</td><td>Thực hiện truy xuất nguồn gốc 1 bộ hồ sơ FAI/đo cho 1 job trong thời gian mục tiêu.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>8</td><td>Xử lý tình huống sai lệch: tem hết hạn/đo dao động/thiết bị rơi → TẠM GIỮ + báo cáo vượt cấp.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>9</td><td>Tạo đặc tính list/kế hoạch kiểm tra (kiểm tra plan) đơn giản và thực hiện đo theo plan.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>10</td><td>Thực hiện/đọc kết quả MSA/GRR và đưa ra hành động.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>11</td><td>Thực hiện đánh giá nội bộ đo lường và viết NC/OFI đúng ngôn ngữ.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr></tbody>
 </table><h2>8. Kiểm tra đánh giá (bản thiết kế kiểm thử (test bản thiết kế) + bài kiểm tra nhanh mẫu)</h2><h3>8.1 Test bản thiết kế</h3><table class="table">
 <thead><tr><th>Nhóm nội dung</th><th>Số câu</th><th>Tỷ trọng</th></tr></thead>
-<tbody><tr><td>Quản trị đo lường + ISO đánh giá</td><td>8</td><td>25%</td></tr><tr><td>OOT/tác động đánh giá + CAPA</td><td>8</td><td>25%</td></tr><tr><td>Thiết kế hệ thống (plan/policy)</td><td>8</td><td>25%</td></tr><tr><td>Tình huống chiến lược</td><td>8</td><td>25%</td></tr></tbody>
+<tbody><tr><td>Governance đo lường + ISO đánh giá</td><td>8</td><td>25%</td></tr><tr><td>OOT/tác động đánh giá + CAPA</td><td>8</td><td>25%</td></tr><tr><td>Thiết kế hệ thống (plan/policy)</td><td>8</td><td>25%</td></tr><tr><td>Tình huống chiến lược</td><td>8</td><td>25%</td></tr></tbody>
 </table><h3>8.2 Bài kiểm tra nhanh mẫu</h3><div class="quiz">
 <div class="card">
 <strong>Câu 1 (MCQ):</strong> Khi phát hiện thiết bị đo OOT, bước nào là bắt buộc theo tư duy ISO?
@@ -403,7 +403,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 4:Chấm theo đủ bước + bằng chứng.
 5:Chấm theo hệ thống hóa và gắn KPI/ISO.</div></details><h2>9. Tiêu chí đánh giá chấm điểm &amp; tiêu chuẩn công nhận Level</h2><table class="table rubric">
 <thead><tr><th>Tiêu chí</th><th>Tỷ trọng</th><th>Mô tả đạt</th></tr></thead>
-<tbody><tr><td><strong>Bài kiểm tra (system/chiến lược)</strong></td><td>20%</td><td>Trả lời theo tư duy hệ thống; đúng ISO; có quản trị.</td></tr><tr><td><strong>Dự án/Tình huống chiến lược</strong></td><td>50%</td><td>Thiết kế hệ thống (SOP/plan/policy/bảng điều khiển) + có cơ chế duy trì/đánh giá.</td></tr><tr><td><strong>OJT + chứng minh huấn luyện</strong></td><td>30%</td><td>Huấn luyện/đánh giá người khác; có hồ sơ đào tạo; 0 lớn / nghiêm trọng NC.</td></tr></tbody>
+<tbody><tr><td><strong>Bài kiểm tra (system/chiến lược)</strong></td><td>20%</td><td>Trả lời theo tư duy hệ thống; đúng ISO; có quản trị.</td></tr><tr><td><strong>Project/Tình huống chiến lược</strong></td><td>50%</td><td>Thiết kế hệ thống (SOP/plan/policy/bảng điều khiển) + có cơ chế duy trì/đánh giá.</td></tr><tr><td><strong>OJT + chứng minh huấn luyện</strong></td><td>30%</td><td>Huấn luyện/đánh giá người khác; có hồ sơ đào tạo; 0 lớn / nghiêm trọng NC.</td></tr></tbody>
 </table><div class="callout"><strong>Ngưỡng đạt:</strong> Tổng điểm ≥ 80/100 và không vi phạm kiểm soát cổng bắt buộc (an toàn/chất lượng/tuân thủ hồ sơ).</div><h2>10. Bảng kiểm tự đánh giá trước khi đề nghị xét Level</h2><div class="card">
 <ul><li>Tôi có đủ bằng chứng (biểu mẫu/hồ sơ/log) chứng minh năng lực – không chỉ ‘nói được’.</li><li>Tôi hiểu các kiểm soát cổng bắt buộc và không có vi phạm trong kỳ đánh giá.</li><li>Tôi truy xuất nguồn gốc hồ sơ liên quan trong thời gian mục tiêu (đánh giá diễn tập).</li><li>Tôi chọn đúng phương pháp đo theo dung sai/CTQ và giải thích được lý do.</li><li>Tôi hiểu rủi ro false chấp nhận/false từ chối và biết khi nào phải TẠM GIỮ/báo cáo vượt cấp.</li><li>Tôi có tham gia/đọc được MSA/GRR và biết hành động khi không đạt.</li><li>Tôi thiết kế/đánh giá hệ thống đo lường (hiệu chuẩn, OOT, đánh giá pack).</li></ul>
 </div><hr/><p class="small"><strong>Ghi chú triển khai:</strong> Tài liệu này được thiết kế để tích hợp trực tiếp vào sổ tay vận hành/đào tạo của HESEM. Khi đưa vào áp dụng, cần gắn mã SOP/WI/FRM thực tế, Approver và ngày hiệu lực, đồng thời liên kết ma trận kỹ năng (kỹ năng matrix) + chính sách thưởng/level.</p></div></div></div>

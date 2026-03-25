@@ -116,7 +116,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>OJT đầu ra bắt buộc</h3>
 <ul><li>01 báo cáo Pareto top 5 lỗi + log hành động (≥ 5 hành động).</li><li>01 template báo cáo chuẩn có version và hướng dẫn dùng.</li><li>01 biên bản OJT cho 01 người học đạt theo tiêu chí đánh giá.</li></ul>
 <h3>Tiêu chí đánh giá L1–L4 (hành vi quan sát được)</h3>
-<div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Kỷ luật hồ sơ</td><td>Ghi đúng/lưu đúng/đúng REV</td></tr><tr><td><strong>L2</strong></td><td>Báo cáo &amp; đối soát</td><td>Báo cáo có dấu thời gian + xác nhận</td></tr><tr><td><strong>L3</strong></td><td>Phân tích &amp; chuẩn hóa</td><td>Pareto/xu hướng + log hành động + template được kiểm soát + huấn luyện</td></tr><tr><td><strong>L4</strong></td><td>Quản trị &amp; tích hợp</td><td>Bảng điều khiển liên phòng + data mô hình + truy cập/lưu giữ + sự cố cẩm nang triển khai (sách hướng dẫn)</td></tr></tbody></table></div>
+<div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Kỷ luật hồ sơ</td><td>Ghi đúng/lưu đúng/đúng REV</td></tr><tr><td><strong>L2</strong></td><td>Báo cáo &amp; đối soát</td><td>Báo cáo có dấu thời gian + xác nhận</td></tr><tr><td><strong>L3</strong></td><td>Phân tích &amp; chuẩn hóa</td><td>Pareto/xu hướng + log hành động + template được kiểm soát + huấn luyện</td></tr><tr><td><strong>L4</strong></td><td>Governance &amp; tích hợp</td><td>Bảng điều khiển liên phòng + data mô hình + truy cập/lưu giữ + sự cố cẩm nang triển khai (sách hướng dẫn)</td></tr></tbody></table></div>
 <h2>10) Đánh giá</h2>
 <h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
 <div class="quiz"><ol><li>Data từ điển của KPI phải có các trường nào?</li><li>Pareto dùng để trả lời câu hỏi gì trong phân xưởng CNC?</li><li>Xu hướng chart dùng để phát hiện điều gì?</li><li>Vì sao log hành động bắt buộc đi kèm phân tích?</li><li>Khi template báo cáo đổi, hồ sơ nào phải tạo?</li><li>KPI trọng yếu phải kiểm tra chéo theo nguyên tắc nào?</li><li>Nêu 02 rủi ro khi quyền truy cập bộ dữ liệu quá rộng.</li><li>nhóm / phân loại tuổi tồn WIP (tuổi tồn / tuổi tồn) BLACK kích hoạt escalation nào?</li><li>Sai định nghĩa KPI gây hậu quả gì cho OTD?</li><li>Nêu 03 trường hợp phải gắn nhãn dưới rà soát.</li><li>dấu vết kiểm toán của báo cáo thể hiện ở đâu?</li><li>Vì sao báo cáo phải ghi nguồn SoR?</li><li>Nêu 03 ví dụ KPI phù hợp cho phân xưởng CNC gia công theo đơn (job xưởng).</li><li>Phế phẩm chi phí cần liên kết với dữ liệu nào?</li><li>Thời gian ngừng máy phân tích cần dữ liệu đầu vào nào?</li><li>Nêu 02 cách khóa template để tránh sửa lẻ tẻ.</li><li>Một hành động tốt phải có những thuộc tính nào?</li><li>Huấn luyện báo cáo theo OJT khác gì hướng dẫn miệng?</li><li>Khi KPI tranh cãi, quyết định đúng là gì?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) áp dụng cho phân tích ra sao?</li><li>Vì sao giữ version báo cáo là yêu cầu sẵn sàng đánh giá?</li><li>Khi phát hiện KPI sai 3 tuần liên tiếp, bước xử lý là gì?</li></ol></div>
@@ -155,7 +155,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</strong>
 <ul>
 <li>đạt khi hoàn thành OJT đầu ra và hiệu suất test đạt, toàn bộ bằng chứng nằm trong SSOT, đúng REV, đúng tên file.</li>
-<li>FAIL ngay khi sai REV, lẫn lộn (mix-up) Job/Part, vượt qua TẠM GIỮ, chỉnh sửa hồ sơ đã phát hành không có log, hoặc không truy xuất nguồn gốc được bằng chứng.</li>
+<li>FAIL ngay khi sai REV, lẫn lộn (mix-up) Job/Part, vượt qua TẠM GIỮ, chỉnh sửa hồ sơ Released không có log, hoặc không truy xuất nguồn gốc được bằng chứng.</li>
 </ul>
 </div>
 <h2>12) MRR tối thiểu (hồ sơ bắt buộc + đặt tên + nơi lưu)</h2>
@@ -166,10 +166,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol><li>KPI không có định nghĩa; số liệu tranh cãi.</li><li>Không có nguồn SoR/dấu thời gian trong bộ dữ liệu.</li><li>Phân tích không có log hành động.</li><li>Template báo cáo không được kiểm soát, không version.</li><li>Không có kiểm tra chéo cho KPI trọng yếu.</li><li>Quyền truy cập bộ dữ liệu rộng; không có truy cập rà soát.</li><li>Không có lưu giữ; bộ dữ liệu mất.</li><li>Huấn luyện không có bằng chứng OJT.</li></ol>
 <h2>Tài liệu liên quan</h2>
 <ul>
-<li><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/">ANNEX-QMS-003 — Bộ bằng chứng (Hồ sơ công việc (hồ sơ công việc) + Data Quản trị)</a></li>
-<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Quản trị dữ liệu &amp; phân quyền truy cập</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/">ANNEX-QMS-003 — Bộ bằng chứng (Hồ sơ công việc (hồ sơ công việc) + Data Governance)</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Governance dữ liệu &amp; phân quyền truy cập</a></li>
 <li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Data Phân loại &amp; Lưu kho</a></li>
-<li><a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//">WI-OPS-008 — Quản trị Hồ sơ công việc &amp; gói chứng cứ</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//">WI-OPS-008 — Governance Hồ sơ công việc &amp; gói chứng cứ</a></li>
 </ul>
 </div></div></div>
 </div>
