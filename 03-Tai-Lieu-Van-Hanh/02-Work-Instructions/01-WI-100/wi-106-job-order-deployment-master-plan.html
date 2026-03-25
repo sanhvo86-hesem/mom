@@ -2,861 +2,269 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>WI-106 — Job Order Deployment Master Plan — Lo trinh trien khai chi tiet tung buoc | HESEM QMS</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WI-106 — Triển khai đồng loạt hệ thống Job Order | HESEM QMS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
-@media print{.card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.metric-card,.gate-card,.field,.callout-card,.phase-box{page-break-inside:avoid;break-inside:avoid}h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}}
-.chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
-.tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
-.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
-.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;}
-.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
-.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
-.metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
-.metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
-.gate-card{border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
-.gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.note-soft{border-left:4px solid #eab308;background:#fffbeb;padding:12px 14px;border-radius:8px;margin:12px 0;}
-.note-blue{border-left:4px solid var(--blue);background:var(--blue-l);padding:12px 14px;border-radius:8px;margin:12px 0;}
-.note-red{border-left:4px solid #dc2626;background:#fef2f2;padding:12px 14px;border-radius:8px;margin:12px 0;}
-.note-green{border-left:4px solid #16a34a;background:#f0fdf4;padding:12px 14px;border-radius:8px;margin:12px 0;}
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
-.callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
-.callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
-.step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
-.step-band span{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ln);background:var(--bg);padding:6px 10px;border-radius:999px;font-size:11px;font-weight:700}
-.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700;margin:0 6px 6px 0;}
-.pill-red{background:#fef2f2;color:#dc2626;}
-.pill-green{background:#f0fdf4;color:#16a34a;}
-.pill-amber{background:#fffbeb;color:#d97706;}
-.phase-box{border:2px solid var(--navy);border-radius:var(--r);margin:24px 0;overflow:hidden;}
-.phase-header{background:var(--navy);color:#fff;padding:14px 18px;font-size:15px;font-weight:700;}
-.phase-body{padding:18px;}
-.dep-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;margin:2px;}
-.dep-prod{background:#dbeafe;color:#1e40af;}
-.dep-eng{background:#fce7f3;color:#9d174d;}
-.dep-qa{background:#dcfce7;color:#166534;}
-.dep-sc{background:#fef3c7;color:#92400e;}
-.dep-sales{background:#e0e7ff;color:#3730a3;}
-.dep-fin{background:#f3e8ff;color:#6b21a8;}
-.dep-hr{background:#ffe4e6;color:#9f1239;}
-.dep-it{background:#cffafe;color:#155e75;}
-.week-tag{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--navy);color:#fff;font-size:11px;font-weight:700;margin-right:6px;}
-.day-row{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--ln);}
-.day-label{min-width:80px;font-weight:700;font-size:12px;color:var(--navy);}
+.small{font-size:12px}
+.tight li{margin:4px 0}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+.kpi-box{border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r);padding:12px;background:#fff}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.code{font-family:var(--mono);font-size:12px;background:#f1f3f5;padding:1px 6px;border-radius:4px}
+.callout-danger{border-left:4px solid #c92a2a;background:#fff5f5;padding:10px 12px;border-radius:var(--r);margin:10px 0}
+.callout-info{border-left:4px solid #1971c2;background:#eef7ff;padding:10px 12px;border-radius:var(--r);margin:10px 0}
+.callout-warn{border-left:4px solid #e67700;background:#fff9db;padding:10px 12px;border-radius:var(--r);margin:10px 0}
 table{max-width:100%;table-layout:auto}
 td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-align:top}
-@media(max-width:960px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+@media print{.card,.table-card,.callout,.note,.box,.lane,.legend,.req,.vstep{break-inside:avoid;page-break-inside:avoid}h1,h2,h3{break-after:avoid;page-break-after:avoid}tr{break-inside:avoid;page-break-inside:avoid}}
+@media(max-width:960px){.two-col,.kpi-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="container"><div class="page"><div class="page-body">
 
-<!-- ══════ FORM HEADER ══════ -->
+<!-- FORM HEADER -->
 <div class="form-header">
 <div class="fh-left">
 <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-<span>Tai lieu van hanh &bull; Cong viec Huong dan</span>
+<span>Tài liệu vận hành &bull; Công việc Hướng dẫn</span>
 </div>
 </div>
-<div class="title">
-<strong>WI-106 &mdash; Job Order Deployment Master Plan</strong>
-<span class="sub-vn">Lo trinh trien khai dong loat he thong Job Order &mdash; Huong dan chi tiet tung buoc</span>
-</div>
+<div class="title"><strong>WI-106 — Triển khai đồng loạt hệ thống Job Order</strong></div>
 <div class="meta">
 <div class="row"><span><b>Code:</b></span><span>WI-106</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Theo quyet dinh ban hanh</span></div>
+<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Owner:</b></span><span>QMS Manager / Production Director</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tong Giam doc</span></div>
+<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
 </div>
 </div>
 
-<!-- ══════ ISO MAP ══════ -->
-<div class="iso-map">
-<b>ISO 9001:2015</b> &mdash; 4.4 QMS va cac quy trinh | 5.3 Vai tro &amp; trach nhiem | 6.1 Rui ro &amp; co hoi | 6.3 Hoach dinh thay doi | 7.1 Nguon luc | 7.2 Nang luc | 7.3 Nhan thuc | 8.1 Hoach dinh van hanh<br/>
-<b>AS9100D</b> &mdash; 8.1.1 Quan ly rui ro van hanh | 8.1.2 Quan ly cau hinh | 8.5.1.3 Xac nhan quy trinh san xuat
-</div>
+<!-- ÁP DỤNG KHI -->
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Ban Giám đốc quyết định triển khai hệ thống quản lý Job Order (G0–G6) cho toàn bộ nhà máy. Áp dụng cho 10 phòng ban, ~50–80 nhân viên, lộ trình 20 tuần / 5 giai đoạn.</div>
 
-<!-- ══════ PREFACE ══════ -->
-<div class="preface-block">
-<p><strong>Muc dich:</strong> Huong dan chi tiet <em>tung buoc, tung ngay, tung vai tro</em> de trien khai dong loat he thong quan ly Job Order (Lenh san xuat) cho toan bo nha may HESEM Engineering. Tai lieu nay la ban mo rong cua ANNEX-119 (Change Roadmap), di sau vao chi tiet thuc hien tai hien truong.</p>
-<p><strong>Pham vi:</strong> 10 phong ban, ~50-80 nhan vien, 20 tuan, 5 giai doan.</p>
-<p><strong>Nguyen tac:</strong> Moi buoc phai co (1) nguoi chiu trach nhiem, (2) thoi han, (3) dau ra cu the, (4) tieu chi PASS/FAIL, (5) tai lieu tham chieu.</p>
-</div>
+<h1>WI-106 — Triển khai đồng loạt hệ thống Job Order</h1>
 
-<!-- ══════ TOC ══════ -->
-<div class="toc">
-<div class="toc-title">Muc luc</div>
-<div class="toc-grid">
-<a href="#s1">1. Tong quan 5 Phase / 20 Tuan</a>
-<a href="#s2">2. Phase 0: Chuan bi &amp; dong GAP (Tuan 1-4)</a>
-<a href="#s3">3. Phase 1: Dao tao &amp; ha tang (Tuan 5-6)</a>
-<a href="#s4">4. Phase 2: Pilot 3 nhom Job (Tuan 7-10)</a>
-<a href="#s5">5. Phase 3: Go-Live dong loat (Tuan 11-14)</a>
-<a href="#s6">6. Phase 4: On dinh &amp; chung nhan (Tuan 15-20)</a>
-<a href="#s7">7. Chi tiet theo phong ban (10 phong ban)</a>
-<a href="#s8">8. Chi tiet OJT &amp; Competency theo vai tro</a>
-<a href="#s9">9. He thong do luong &amp; KPI</a>
-<a href="#s10">10. Tai lieu tham chieu</a>
-</div>
-</div>
-
-<!-- ════════════════════════════════════════════════════════ -->
-<!-- SECTION 1: TONG QUAN -->
-<!-- ════════════════════════════════════════════════════════ -->
-<h2 id="s1">1. Tong quan 5 Phase / 20 Tuan</h2>
-
-<div class="table-card">
-<table>
-<thead>
-<tr><th>Phase</th><th>Tuan</th><th>Muc tieu</th><th>Dau ra bat buoc</th><th>Go/No-Go</th></tr>
-</thead>
-<tbody>
-<tr><td><strong>0 &mdash; Chuan bi</strong></td><td>1&ndash;4</td><td>Dong 12 GAP, cross-review 87 SOP/WI, ban hanh V1, cau hinh M365, chi dinh Champion</td><td>FRM-101 day du, 39 FRM-102 co chu ky, M365 template chay duoc, 20+ Champion</td><td>6 dieu kien P0-CHECK</td></tr>
-<tr><td><strong>1 &mdash; Dao tao</strong></td><td>5&ndash;6</td><td>Dao tao lanh dao 90 phut, bootcamp Champion 2 ngay, KPI dashboard, M365 production-ready</td><td>10 truong phong dat quiz, 20+ Champion dat 3 tieu chi, dashboard co du lieu thu nghiem</td><td>4 dieu kien P1-CHECK</td></tr>
-<tr><td><strong>2 &mdash; Pilot</strong></td><td>7&ndash;10</td><td>Chay 7-10 job that qua 3 nhom (repeat/CTQ/outsource), dual-run 2 tuan, single-run 2 tuan</td><td>6 KPI duoc do, 0 wrong-revision, retrieval &le;90s, 3 drill hoan thanh</td><td>6 dieu kien P2-CHECK</td></tr>
-<tr><td><strong>3 &mdash; Go-Live</strong></td><td>11&ndash;14</td><td>3 dot go-live (SX+KT+QA &rarr; SCM+Sales &rarr; Support), hypercare 2 tuan/dot</td><td>10/10 phong ban go-live, KPI-FLD-01 &ge;85%, 0 wrong-version thoat gate, 100% dao tao</td><td>4 dieu kien P3-CHECK</td></tr>
-<tr><td><strong>4 &mdash; On dinh</strong></td><td>15&ndash;20</td><td>Nang V0&rarr;V1, audit noi bo, management review, san sang chung nhan ISO 9001/AS9100D</td><td>87 SOP/WI V1, audit hoan thanh, MR co bao cao, KPI dat nguong</td><td>6 dieu kien CERT</td></tr>
-</tbody>
-</table>
-</div>
-
-<!-- ════════════════════════════════════════════════════════ -->
-<!-- SECTION 2: PHASE 0 CHI TIET -->
-<!-- ════════════════════════════════════════════════════════ -->
-<h2 id="s2">2. Phase 0: Chuan bi &amp; dong GAP (Tuan 1&ndash;4)</h2>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 1</span> Khoi dong, phan cong, cau truc</div>
-<div class="phase-body">
-
-<div class="table-card">
-<table>
-<thead><tr><th>Ngay</th><th>Hoat dong</th><th>Nguoi thuc hien</th><th>Dau ra</th><th>Tai lieu</th></tr></thead>
-<tbody>
-<tr><td><strong>T1.1</strong></td><td>Hop khoi dong du an voi Ban Giam doc: trinh bay lo trinh 20 tuan, cam ket nguon luc, chi dinh Project Sponsor</td><td>QMS Manager</td><td>Bien ban hop co chu ky CEO, xac nhan nguon luc</td><td>WI-106, ANNEX-119</td></tr>
-<tr><td><strong>T1.1</strong></td><td>Thanh lap doi trien khai: 1 QMS Lead + 1 IT + 1 Production rep + 1 QA rep</td><td>CEO / COO</td><td>Quyet dinh thanh lap doi</td><td>&mdash;</td></tr>
-<tr><td><strong>T1.2</strong></td><td>Phan cong 87 SOP/WI cho reviewer. Moi nguoi nhan toi da 8 tai lieu. Moi tai lieu co 2 reviewer tu 2 phong ban khac nhau</td><td>QMS Manager</td><td>Bang phan cong review (Excel), deadline T2.5</td><td>FRM-105</td></tr>
-<tr><td><strong>T1.2</strong></td><td>Bat dau dien FRM-101 Master Document Register: 596 tai lieu voi ma, phien ban, chu so huu</td><td>QMS Engineer</td><td>FRM-101 draft (hoan thanh 50% cuoi T1)</td><td>FRM-101, SOP-101</td></tr>
-<tr><td><strong>T1.3</strong></td><td>Chi dinh Champion: 1 nguoi/phong ban/ca. Uu tien nguoi co kinh nghiem, uy tin, biet su dung M365</td><td>10 truong phong ban</td><td>Danh sach 20+ Champion co ten, phong ban, ca lam viec</td><td>&mdash;</td></tr>
-<tr><td><strong>T1.3-5</strong></td><td>IT bat dau cau hinh M365 SharePoint:<br/>
-&bull; Tao Site Collection cho Job Dossier<br/>
-&bull; Tao folder template G0-G6 theo ANNEX-133<br/>
-&bull; Cau hinh metadata columns: JobNum, PartNo, Rev, Gate, DocType, RecordDate<br/>
-&bull; Thiet lap permissions theo ANNEX-134</td><td>IT Admin + QMS</td><td>M365 site san sang (chua production)</td><td>ANNEX-131, ANNEX-133, ANNEX-134</td></tr>
-<tr><td><strong>T1.4-5</strong></td><td>In Quick Card WI-104 (7 loai, moi loai 10-20 ban) va chuyen den phong ban tuong ung</td><td>QMS + Admin</td><td>Quick Cards vat ly tai phong ban</td><td>WI-104</td></tr>
-<tr><td><strong>T1.5</strong></td><td>Chuan bi Offline Fallback Kit theo ANNEX-118: in form giay, luu PDF offline, lam danh sach lien lac</td><td>IT + QMS</td><td>1 bo Fallback Kit san sang</td><td>ANNEX-118</td></tr>
-</tbody>
-</table>
-</div>
-</div></div>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 2</span> Cross-review, sua GAP, FRM-101</div>
-<div class="phase-body">
-
-<div class="table-card">
-<table>
-<thead><tr><th>Ngay</th><th>Hoat dong</th><th>Nguoi thuc hien</th><th>Dau ra</th><th>Tieu chi PASS</th></tr></thead>
-<tbody>
-<tr><td><strong>T2.1-5</strong></td><td>Reviewer doc va review 87 SOP/WI theo FRM-105. Kiem tra:<br/>
-&bull; Noi dung chinh xac voi thuc te nha may<br/>
-&bull; Cross-ref hop le (link khong bi hong)<br/>
-&bull; Form code dung (FRM-xxx, khong phai FRM-QA-xxx cu)<br/>
-&bull; Gate so luong khop header va body<br/>
-&bull; Section numbering lien tuc</td><td>Reviewer duoc phan cong</td><td>FRM-105 cho moi tai lieu, danh sach comment</td><td>Moi tai lieu co 2 FRM-105 hoan thanh, 0 comment chua giai quyet</td></tr>
-<tr><td><strong>T2.3</strong></td><td>Hoan thanh FRM-101 Master Document Register (596 tai lieu)</td><td>QMS Engineer</td><td>FRM-101 day du</td><td>596 dong co ma/version/owner/ngay</td></tr>
-<tr><td><strong>T2.4-5</strong></td><td>Giai quyet comment tu cross-review. Cap nhat tai lieu HTML</td><td>Document Owner + QMS</td><td>File HTML da sua</td><td>0 comment mo</td></tr>
-<tr><td><strong>T2.5</strong></td><td>Test M365 Job Dossier: tao 1 job mau, upload 10 file, test metadata, test permissions, test retrieval time</td><td>IT + QMS + 1 Champion</td><td>Test report</td><td>Upload thanh cong, metadata dung, retrieval &le;60s</td></tr>
-</tbody>
-</table>
-</div>
-</div></div>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 3</span> Ban hanh chinh thuc, DCR, KPI dashboard</div>
-<div class="phase-body">
-
-<div class="table-card">
-<table>
-<thead><tr><th>Ngay</th><th>Hoat dong</th><th>Nguoi thuc hien</th><th>Dau ra</th><th>Tieu chi PASS</th></tr></thead>
-<tbody>
-<tr><td><strong>T3.1-3</strong></td><td>Tao FRM-102 DCR cho 39 SOP. Moi DCR co:<br/>
-&bull; Ma SOP, phien ban cu (V0) va moi (V1)<br/>
-&bull; Ly do thay doi: "Ban hanh chinh thuc sau cross-review"<br/>
-&bull; Chu ky Owner + QA Manager</td><td>SOP Owners + QMS</td><td>39 FRM-102 co chu ky</td><td>Moi FRM-102 co 2 chu ky</td></tr>
-<tr><td><strong>T3.3</strong></td><td>QA Manager + CEO ky phe duyet ban hanh V1 cho toan bo SOP/WI</td><td>QA Manager, CEO</td><td>Van ban phe duyet</td><td>Chu ky CEO va QA Manager</td></tr>
-<tr><td><strong>T3.3-5</strong></td><td>Xay dung KPI dashboard (Excel truoc, Power BI sau):<br/>
-&bull; 11 KPI van hanh (KPI-FLD-01 den KPI-CERT-01)<br/>
-&bull; 5 KPI trien khai (KPI-DEPLOY-01 den 05)<br/>
-&bull; Cong thuc, nguon du lieu, nguong xanh/do</td><td>IT + QA + Production</td><td>KPI dashboard template</td><td>16 KPI co dinh nghia, cong thuc, nguon du lieu</td></tr>
-<tr><td><strong>T3.4-5</strong></td><td>Dan QR code tai workstation:<br/>
-&bull; QR link den Quick Card WI-104 tuong ung<br/>
-&bull; QR link den SOP cot loi cua khu vuc<br/>
-&bull; QR link den portal QMS</td><td>QMS + Production</td><td>QR code dan tai moi workstation</td><td>Moi workstation co it nhat 1 QR code</td></tr>
-</tbody>
-</table>
-</div>
-</div></div>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 4</span> Kiem tra tong the, Go/No-Go Phase 0</div>
-<div class="phase-body">
-
-<div class="table-card">
-<table>
-<thead><tr><th>Ngay</th><th>Hoat dong</th><th>Nguoi thuc hien</th><th>Dau ra</th></tr></thead>
-<tbody>
-<tr><td><strong>T4.1-2</strong></td><td>Tao 3 Job Dossier mau tren M365 (1 repeat, 1 CTQ, 1 outsource). Upload day du ho so tu G0 den G5 voi du lieu gia dinh</td><td>QMS + Planning + QA</td><td>3 Job Dossier mau hoan chinh</td></tr>
-<tr><td><strong>T4.2</strong></td><td>Chay Drill 60-second retrieval voi doi trien khai: goi ten 5 tai lieu bat ky, tim trong 60 giay</td><td>QMS Manager</td><td>Ket qua drill</td></tr>
-<tr><td><strong>T4.3</strong></td><td>Kiem tra Offline Fallback Kit: mo kit, tim form, kich hoat deputy, dien mau</td><td>IT + QMS + 1 Champion</td><td>Kit test report</td></tr>
-<tr><td><strong>T4.4</strong></td><td>Hop Go/No-Go Phase 0 voi Ban Giam doc</td><td>QMS Manager + CEO</td><td>Quyet dinh Go/No-Go</td></tr>
-</tbody>
-</table>
-</div>
-
-<h3>Phase 0 &mdash; 6 dieu kien Go/No-Go</h3>
-<div class="gate-grid">
-<div class="gate-card"><h3>P0-01</h3><p>87 SOP/WI da cross-review, 0 comment mo</p></div>
-<div class="gate-card"><h3>P0-02</h3><p>FRM-101 day du 596 tai lieu</p></div>
-<div class="gate-card"><h3>P0-03</h3><p>39 FRM-102 DCR co chu ky QA + Owner</p></div>
-<div class="gate-card"><h3>P0-04</h3><p>M365 Job Dossier template tao thanh cong 3 job mau</p></div>
-<div class="gate-card"><h3>P0-05</h3><p>20+ Champion duoc chi dinh bang van ban</p></div>
-<div class="gate-card"><h3>P0-06</h3><p>KPI dashboard template san sang voi 16 KPI</p></div>
-</div>
-
-</div></div>
-
-<!-- ════════════════════════════════════════════════════════ -->
-<!-- SECTION 3: PHASE 1 -->
-<!-- ════════════════════════════════════════════════════════ -->
-<h2 id="s3">3. Phase 1: Dao tao &amp; ha tang (Tuan 5&ndash;6)</h2>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 5</span> Dao tao lanh dao + Bootcamp Champion Ngay 1</div>
-<div class="phase-body">
-
-<div class="table-card">
-<table>
-<thead><tr><th>Ngay</th><th>Nhom</th><th>Noi dung chi tiet</th><th>Thoi luong</th><th>Tai lieu</th><th>Bai tap / Quiz</th></tr></thead>
-<tbody>
-<tr><td><strong>T5.1</strong></td><td>CEO + 10 Truong phong</td><td>
-&bull; Tong quan QMS va Job Order flow (G0-G6)<br/>
-&bull; Gate model: STOP/HOLD/BLOCK<br/>
-&bull; KPI he thong va trach nhiem truong phong<br/>
-&bull; Reading path theo WI-105: moi phong chi can doc 15-25 tai lieu<br/>
-&bull; Demo M365 Job Dossier
-</td><td>90 phut</td><td>WI-105, WI-106, ANNEX-119, Dept Handbooks</td><td>Quiz 10 cau (nguong: &ge;70%)</td></tr>
-<tr><td><strong>T5.2</strong></td><td>Production Director + Shop Managers</td><td>
-&bull; SOP-501: dispatch logic, WIP cap, freeze window, recovery plan<br/>
-&bull; WI-501: per-shift dispatch board, readiness filter<br/>
-&bull; ANNEX-501: priority classes P0-P3, WIP aging thresholds<br/>
-&bull; ANNEX-504: Tier meeting T1/T2/T3 cadence<br/>
-&bull; Demo FRM-502 dispatch list
-</td><td>120 phut</td><td>SOP-501, WI-501, ANNEX-501, ANNEX-504</td><td>Bai tap: tao 1 dispatch list mau cho 1 ca</td></tr>
-<tr><td><strong>T5.3</strong></td><td>QA Manager + Quality Engineers + QC Leads</td><td>
-&bull; Gate model G0-G6 chi tiet: dieu kien mo/dong moi gate<br/>
-&bull; WI-203: Job Dossier completeness, 60-second retrieval<br/>
-&bull; SOP-605: 7 cong kiem soat final release (G1-G7)<br/>
-&bull; SOP-606: NCR/CAPA flow, containment SLA<br/>
-&bull; SOP-302: FAI trigger, scope, disposition<br/>
-&bull; Demo M365 evidence upload + retrieval
-</td><td>120 phut</td><td>WI-203, SOP-605, SOP-606, SOP-302</td><td>Bai tap: kiem tra completeness 1 Job Dossier mau</td></tr>
-<tr><td><strong>T5.4</strong></td><td>Bootcamp Champion &mdash; NGAY 1 (20+ nguoi)</td><td>
-<strong>Buoi sang (4h):</strong><br/>
-&bull; Cau truc M365: Site &gt; Library &gt; Job Dossier &gt; G0-G6<br/>
-&bull; Naming convention: JobNum_PartNo_REV_DocType_YYYYMMDD<br/>
-&bull; Folder routing theo WI-103/WI-104<br/>
-&bull; Thuc hanh: Tao 1 Job Dossier tu dau<br/>
-<strong>Buoi chieu (4h):</strong><br/>
-&bull; Upload 10 file dung vi tri theo Quick Card<br/>
-&bull; Metadata: dien day du JobNum, DocType, RecordDate<br/>
-&bull; Xu ly loi: file sai thu muc, metadata thieu, file trung<br/>
-&bull; Thuc hanh: Sua 5 loi routing co chu dich
-</td><td>8h</td><td>WI-103, WI-104, ANNEX-133, ANNEX-135</td><td>Bai tap thuc hanh tren M365 that</td></tr>
-<tr><td><strong>T5.5</strong></td><td>Bootcamp Champion &mdash; NGAY 2 (20+ nguoi)</td><td>
-<strong>Buoi sang (4h):</strong><br/>
-&bull; Gate logic: WI-201, dieu kien PASS/HOLD/FAIL tai moi gate<br/>
-&bull; Evidence check: WI-203, completeness checklist<br/>
-&bull; Escalation: ANNEX-117, SLA L1-L4<br/>
-<strong>Buoi chieu (4h):</strong><br/>
-&bull; Drill 60 giay: giang vien goi 10 tai lieu, Champion tim tren M365<br/>
-&bull; Quiz 15 cau<br/>
-&bull; Bai tap tinh huong: job dang chay thieu MTR, Champion phai lam gi?
-</td><td>8h</td><td>WI-201, WI-203, ANNEX-117, ANNEX-502</td><td>Quiz 15 cau (&ge;80%); Drill 60s (&le;60s cho 8/10 tai lieu)</td></tr>
-</tbody>
-</table>
-</div>
-
-<h3>Tieu chi dat Champion</h3>
-<div class="callout-grid">
-<div class="callout-card"><h3>Quiz</h3><p>&ge; 80% (12/15 cau dung)</p></div>
-<div class="callout-card"><h3>Live Routing</h3><p>100% dung nhanh chinh (toi da 1 loi naming nho)</p></div>
-<div class="callout-card"><h3>Retrieval</h3><p>&le; 60 giay cho job dang chay; &le; 5 phut cho job da dong</p></div>
-</div>
-
-</div></div>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 6</span> M365 production-ready + KPI baseline + Go/No-Go</div>
-<div class="phase-body">
-
-<div class="table-card">
-<table>
-<thead><tr><th>Ngay</th><th>Hoat dong</th><th>Nguoi thuc hien</th><th>Dau ra</th></tr></thead>
-<tbody>
-<tr><td><strong>T6.1-2</strong></td><td>Final config M365: production permissions, retention policy, auto-numbering (neu co), backup schedule</td><td>IT Admin</td><td>M365 production-ready sign-off</td></tr>
-<tr><td><strong>T6.2-3</strong></td><td>Nhap du lieu KPI baseline tu 3 thang truoc (OTD, FPY, WIP aging, NCR) de co diem so sanh</td><td>QA + Production + Finance</td><td>KPI baseline data</td></tr>
-<tr><td><strong>T6.3</strong></td><td>Chon 3 nhom Job pilot (chi tiet tai Phase 2)</td><td>Production Director + QA Manager + Planning</td><td>Danh sach job pilot</td></tr>
-<tr><td><strong>T6.4</strong></td><td>Hop Go/No-Go Phase 1</td><td>QMS + CEO</td><td>Quyet dinh Go/No-Go</td></tr>
-</tbody>
-</table>
-</div>
-
-<h3>Phase 1 &mdash; 4 dieu kien Go/No-Go</h3>
-<div class="gate-grid">
-<div class="gate-card"><h3>P1-01</h3><p>10 Truong phong ban hoan thanh briefing (&ge;70% quiz)</p></div>
-<div class="gate-card"><h3>P1-02</h3><p>20+ Champion dat 3 tieu chi (quiz + routing + retrieval)</p></div>
-<div class="gate-card"><h3>P1-03</h3><p>M365 production-ready (permissions, metadata, retention)</p></div>
-<div class="gate-card"><h3>P1-04</h3><p>KPI dashboard hoat dong voi du lieu baseline</p></div>
-</div>
-
-</div></div>
-
-<!-- ════════════════════════════════════════════════════════ -->
-<!-- SECTION 4: PHASE 2 -->
-<!-- ════════════════════════════════════════════════════════ -->
-<h2 id="s4">4. Phase 2: Pilot 3 nhom Job (Tuan 7&ndash;10)</h2>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 7-8</span> Dual-Run &mdash; Chay song song quy trinh cu va moi</div>
-<div class="phase-body">
-
-<h3>4.1 Ba nhom Job pilot</h3>
-<div class="callout-grid">
-<div class="callout-card" style="border-left:4px solid #10b981;">
-<h3>Nhom A: Repeat / Low-Risk (3-5 jobs)</h3>
-<p><strong>Tieu chi chon:</strong> Job lap lai, routing on dinh, khong co yeu cau dac biet<br/>
-<strong>Muc dich:</strong> Kiem tra quy trinh co chay muot khi khong co ap luc ky thuat<br/>
-<strong>Phong ban chinh:</strong> <span class="dep-tag dep-prod">Production</span> <span class="dep-tag dep-qa">QC</span> <span class="dep-tag dep-sc">Warehouse</span><br/>
-<strong>Gate tap trung:</strong> G1 (setup), G3 (IPQC), G5 (ship)</p>
-</div>
-<div class="callout-card" style="border-left:4px solid #f59e0b;">
-<h3>Nhom B: CTQ / High-Risk (2-3 jobs)</h3>
-<p><strong>Tieu chi chon:</strong> Tolerance chat, clean/vacuum, QPL cao, job moi<br/>
-<strong>Muc dich:</strong> Kiem tra gate model chiu duoc ap luc, evidence pack day du<br/>
-<strong>Phong ban chinh:</strong> <span class="dep-tag dep-eng">Engineering</span> <span class="dep-tag dep-qa">QA</span> <span class="dep-tag dep-prod">Production</span><br/>
-<strong>Gate tap trung:</strong> G0 (contract review), G2 (FAI), G4 (final release)</p>
-</div>
-<div class="callout-card" style="border-left:4px solid #ef4444;">
-<h3>Nhom C: Outsource / Special Process (2-3 jobs)</h3>
-<p><strong>Tieu chi chon:</strong> Co gia cong ngoai (xi ma, nhiet luyen, anodize)<br/>
-<strong>Muc dich:</strong> Kiem tra supplier control, cert flow, material traceability<br/>
-<strong>Phong ban chinh:</strong> <span class="dep-tag dep-sc">Supply Chain</span> <span class="dep-tag dep-qa">QA</span> <span class="dep-tag dep-prod">Production</span><br/>
-<strong>Gate tap trung:</strong> G0 (PO flow-down), G1 (outsource dispatch), G4 (cert verification)</p>
-</div>
-</div>
-
-<h3>4.2 Quy trinh Dual-Run (Tuan 7-8)</h3>
-<div class="table-card">
-<table>
-<thead><tr><th>Buoc</th><th>Quy trinh cu</th><th>Quy trinh moi (dong thoi)</th><th>Champion theo doi</th></tr></thead>
-<tbody>
-<tr><td>1. Nhan job</td><td>Lam theo cach cu</td><td>Mo Job Dossier tren M365, tao folder G0</td><td>Xac nhan folder duoc tao dung</td></tr>
-<tr><td>2. Contract review</td><td>Lam theo cach cu</td><td>Upload FRM-202 vao G0/02-Contract-Review</td><td>Kiem tra metadata</td></tr>
-<tr><td>3. Kickoff</td><td>Lam theo cach cu</td><td>Upload FRM-204 vao G0/03-Kickoff</td><td>Kiem tra completeness</td></tr>
-<tr><td>4. Engineering</td><td>Lam theo cach cu</td><td>Upload baseline package vao G1</td><td>Kiem tra version set</td></tr>
-<tr><td>5. Setup/FAI</td><td>Lam theo cach cu</td><td>Upload FRM-511 + FRM-311 vao G2</td><td>Kiem tra gate logic</td></tr>
-<tr><td>6. Production</td><td>Lam theo cach cu</td><td>Upload IPQC log vao G3</td><td>Kiem tra in-process evidence</td></tr>
-<tr><td>7. Final/Ship</td><td>Lam theo cach cu</td><td>Upload FRM-642 + CoC vao G4/G5</td><td>Drill 60-second retrieval</td></tr>
-</tbody>
-</table>
-</div>
-
-<h3>4.3 Champion theo doi hang ngay</h3>
+<!-- ══════════════════════════════════════════════ -->
+<!-- MỤC 1 — MỤC ĐÍCH VÀ CÁCH DÙNG              -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+<h2>1. Mục đích và cách dùng</h2>
 <ul class="tight">
-<li>Moi ca: Champion kiem tra Job Dossier cua cac job pilot &mdash; file co dung vi tri khong, metadata day du khong</li>
-<li>Moi ngay: Ghi nhan van de vao FRM-208 (Daily Tier Meeting Log)</li>
-<li>Cuoi tuan: Bao cao pilot cho QMS Manager</li>
+<li>Quy định trình tự, thời hạn, trách nhiệm và tiêu chí Go/No-Go cho từng giai đoạn triển khai hệ thống Job Order.</li>
+<li>Đảm bảo 10 phòng ban chuyển đổi đồng bộ từ quy trình cũ sang quy trình mới trong 20 tuần.</li>
+<li>Cung cấp checklist, KPI và drill cụ thể để đo lường mức sẵn sàng tại mỗi cổng Go/No-Go.</li>
 </ul>
-
-</div></div>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 9-10</span> Single-Run + Drill + Do KPI</div>
-<div class="phase-body">
-
-<h3>4.4 Chuyen sang Single-Run (chi dung quy trinh moi)</h3>
-<div class="note-soft">
-<strong>Dieu kien chuyen:</strong> Tuan 7-8 khong co van de nghiem trong (0 wrong-revision, 0 mat ho so, retrieval &le;120s). Neu chua dat, keo dai dual-run them 1 tuan.
 </div>
 
-<h3>4.5 Ba drill bat buoc</h3>
-<div class="table-card">
-<table>
-<thead><tr><th>Drill</th><th>Tuan</th><th>Thoi gian</th><th>Nguoi tham gia</th><th>Tai lieu</th><th>Tieu chi PASS</th></tr></thead>
-<tbody>
-<tr><td><strong>60-second retrieval drill</strong></td><td>T9 + T10</td><td>15 phut/lan</td><td>Champion + 3-5 operator</td><td>WI-203, drill-joborder-e2e</td><td>&ge;8/10 tai lieu tim duoc trong 60 giay</td></tr>
-<tr><td><strong>Wrong-revision response drill</strong></td><td>T9</td><td>30 phut</td><td>Setup + QC + Planning</td><td>SOP-303, WI-519</td><td>Phat hien va HOLD trong &le;5 phut</td></tr>
-<tr><td><strong>Shipment-to-source traceback</strong></td><td>T10</td><td>45 phut</td><td>QA + Warehouse + Production</td><td>SOP-605, SOP-402</td><td>Trace tu shipment den material source trong &le;30 phut</td></tr>
-</tbody>
-</table>
-</div>
-
-<h3>4.6 Do 6 KPI bat buoc</h3>
-<div class="metric-grid">
-<div class="metric-card"><div class="value">&ge;85%</div><div class="label">First-pass setup success</div></div>
-<div class="metric-card"><div class="value">&ge;90%</div><div class="label">Plan adherence in freeze window</div></div>
-<div class="metric-card"><div class="value">&le;5%</div><div class="label">Red queue WIP aging</div></div>
-<div class="metric-card"><div class="value">&le;90s</div><div class="label">Retrieval time trung binh</div></div>
-<div class="metric-card"><div class="value">100%</div><div class="label">Cert completeness tai ship</div></div>
-<div class="metric-card"><div class="value">0</div><div class="label">Wrong-revision incidents</div></div>
-</div>
-
-<h3>Phase 2 &mdash; 6 dieu kien Go/No-Go</h3>
-<div class="gate-grid">
-<div class="gate-card"><h3>P2-01</h3><p>7-10 jobs pilot hoan thanh</p></div>
-<div class="gate-card"><h3>P2-02</h3><p>6 KPI duoc do, khong co KPI do</p></div>
-<div class="gate-card"><h3>P2-03</h3><p>Retrieval time &le;90s</p></div>
-<div class="gate-card"><h3>P2-04</h3><p>0 wrong-revision thoat gate</p></div>
-<div class="gate-card"><h3>P2-05</h3><p>Champion tu van hanh duoc</p></div>
-<div class="gate-card"><h3>P2-06</h3><p>Tat ca van de pilot da dong hoac co ke hoach</p></div>
-</div>
-
-</div></div>
-
-<!-- ════════════════════════════════════════════════════════ -->
-<!-- SECTION 5: PHASE 3 -->
-<!-- ════════════════════════════════════════════════════════ -->
-<h2 id="s5">5. Phase 3: Go-Live dong loat (Tuan 11&ndash;14)</h2>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 11</span> DOT 1: San xuat + Ky thuat + Chat luong</div>
-<div class="phase-body">
-
-<h3>5.1 Lich dao tao Dot 1 (T-3 ngay truoc go-live)</h3>
-<div class="table-card">
-<table>
-<thead><tr><th>Nhom</th><th>So nguoi</th><th>Noi dung</th><th>Thoi luong</th><th>Tai lieu</th><th>Quiz</th></tr></thead>
-<tbody>
-<tr><td>Setup / CNC Operator / Shift Lead</td><td>15-30</td><td>
-&bull; WI-519: 7 diem kiem tra truoc Cycle Start<br/>
-&bull; WI-517: SMED changeover<br/>
-&bull; WI-516: 5 moc bat buoc (start shift, pre-cut, running, handover, anomaly)<br/>
-&bull; SOP-502: in-process control, tool life, drift response<br/>
-&bull; M365 folder: upload FRM-511, FRM-504 vao dung vi tri<br/>
-&bull; Quick Card 4 (Setup/CNC/Shift Lead)
-</td><td>90 phut</td><td>SOP-502, WI-519, WI-517, WI-516, WI-104 Card 4, OJT-operator, OJT-setup-teamlead</td><td>10 cau (&ge;70%)</td></tr>
-<tr><td>Engineering / DFM / CAM</td><td>4-8</td><td>
-&bull; SOP-303: baseline package, snapshot, supersession<br/>
-&bull; SOP-301: DFM checklist, CTQ flow-down<br/>
-&bull; M365 Part Master folder routing<br/>
-&bull; Quick Card 3 (Engineering)
-</td><td>90 phut</td><td>SOP-303, SOP-301, WI-104 Card 3, OJT-cam-nc</td><td>10 cau (&ge;70%)</td></tr>
-<tr><td>QA / QC / Metrology</td><td>4-8</td><td>
-&bull; SOP-605: 7 gate final release<br/>
-&bull; SOP-302: FAI trigger/scope/disposition<br/>
-&bull; SOP-606: NCR/CAPA flow, containment SLA<br/>
-&bull; WI-203: Job Dossier completeness, lock<br/>
-&bull; WI-201: gate logic PASS/HOLD/FAIL<br/>
-&bull; Quick Card 5 (QA/QC)
-</td><td>120 phut</td><td>SOP-605, SOP-302, SOP-606, WI-203, WI-201, WI-104 Card 5, OJT-qc-inspector, OJT-qa-qms</td><td>15 cau (&ge;70%)</td></tr>
-<tr><td>Planning / Dispatcher</td><td>2-4</td><td>
-&bull; SOP-501: dispatch logic, WIP cap, freeze window<br/>
-&bull; WI-501: per-shift dispatch, readiness filter<br/>
-&bull; ANNEX-501: P0-P3, WIP aging<br/>
-&bull; FRM-501/502/503 thuc hanh<br/>
-&bull; Quick Card 2 (Planning)
-</td><td>120 phut</td><td>SOP-501, WI-501, ANNEX-501, WI-104 Card 2, OJT-planner-dispatcher</td><td>10 cau (&ge;70%)</td></tr>
-</tbody>
-</table>
-</div>
-
-<h3>5.2 Ngay Go-Live Dot 1</h3>
+<!-- ══════════════════════════════════════════════ -->
+<!-- MỤC 2 — PHẠM VI & ĐỐI TƯỢNG ÁP DỤNG       -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+<h2>2. Phạm vi &amp; đối tượng áp dụng</h2>
+<div class="two-col">
+<div class="card"><h3>Đối tượng</h3>
 <ul class="tight">
-<li><strong>7:00:</strong> Champion tuc truc tai moi khu vuc (SX, KT, QA)</li>
-<li><strong>7:00-7:30:</strong> Tier-1 meeting dau ngay (Planning + Production + QA). Xac nhan: tat ca job moi tu ngay nay tao Job Dossier tren M365</li>
-<li><strong>7:30-12:00:</strong> Champion ho tro truc tiep tai workstation. QMS hotline mo (7:00-18:00)</li>
-<li><strong>12:00:</strong> Mid-shift review: kiem tra Job Dossier cua job buoi sang</li>
-<li><strong>17:00:</strong> End-of-day review: tong ket van de, ghi FRM-208</li>
+<li>Tất cả nhân viên tham gia chuỗi Job Order: Sản xuất, Kỹ thuật, Chất lượng, Chuỗi cung ứng, Kinh doanh, Tài chính, Nhân sự, IT, EHS, ERP.</li>
+<li>Champion triển khai (≥20 người, 1/phòng ban/ca).</li>
+<li>Ban Giám đốc (CEO, COO, Production Director, QA Manager).</li>
 </ul>
-
-<h3>5.3 Hypercare Dot 1 (D+1 den D+14)</h3>
+</div>
+<div class="card"><h3>Không thay thế</h3>
 <ul class="tight">
-<li><strong>D+1 den D+7:</strong> Champion review moi ca. Tier-1 hang ngay co muc "QMS go-live". QMS Manager tham gia Tier-2 hang tuan</li>
-<li><strong>D+7 den D+14:</strong> Giam ho tro. Champion chi can ho tro khi co yeu cau. Bat dau do KPI-FLD-01</li>
+<li>SOP-201 (quy trình RFQ-to-Cash) — WI-106 hướng dẫn cách triển khai, không thay đổi nội dung quy trình.</li>
+<li>SOP-101 (kiểm soát tài liệu) — WI-106 tuân theo SOP-101 cho việc ban hành V0→V1.</li>
+<li>SOP-801 (đào tạo &amp; năng lực) — WI-106 sử dụng khung đào tạo của SOP-801.</li>
 </ul>
+</div>
+</div>
+</div>
 
-</div></div>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 12</span> DOT 2: Chuoi cung ung + Kinh doanh</div>
-<div class="phase-body">
-
-<div class="table-card">
-<table>
-<thead><tr><th>Nhom</th><th>So nguoi</th><th>Noi dung</th><th>Thoi luong</th><th>Tai lieu</th></tr></thead>
+<!-- ══════════════════════════════════════════════ -->
+<!-- MỤC 3 — CÔNG CỤ, VẬT TƯ & TÀI LIỆU       -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+<h2>3. Công cụ, vật tư &amp; tài liệu cần thiết</h2>
+<div class="table-card"><table class="table">
+<thead><tr><th>Hạng mục</th><th>Mô tả</th><th>Trách nhiệm</th></tr></thead>
 <tbody>
-<tr><td>Supply Chain (SCM/Buyer/Warehouse)</td><td>3-6</td><td>
-&bull; SOP-401: supplier control, PO flow-down, outsource dispatch (G1-G5)<br/>
-&bull; SOP-402: material traceability, 7 gate (G1-G7), counterfeit prevention<br/>
-&bull; SOP-701: receiving, put-away, issue, carrier handover (G1-G5)<br/>
-&bull; M365: upload certs, receipts vao Job Dossier<br/>
-&bull; Quick Card 6 (Warehouse/Shipping)
-</td><td>90 phut</td><td>SOP-401, SOP-402, SOP-701, WI-104 Card 6, OJT-purchasing, OJT-warehouse</td></tr>
-<tr><td>Sales / CS / Estimator</td><td>3-5</td><td>
-&bull; SOP-201: RFQ-to-Cash flow, 7 gate (G0-G6)<br/>
-&bull; FRM-201/202/204/205 thuc hanh<br/>
-&bull; M365: upload RFQ/PO/contract review vao G0<br/>
-&bull; Quick Card 1 (Sales/CS)
-</td><td>60 phut</td><td>SOP-201, WI-104 Card 1, Dept Handbook Sales</td></tr>
+<tr><td>M365 SharePoint</td><td>Site Collection cho Job Dossier, folder template G0–G6 theo ANNEX-133, metadata columns theo ANNEX-134</td><td>IT Admin</td></tr>
+<tr><td>Quick Card WI-104</td><td>7 loại thẻ nhanh (in vật lý + QR code), dán tại workstation</td><td>QMS + Production</td></tr>
+<tr><td>FRM-101</td><td>Master Document Register — 596 tài liệu</td><td>QMS Engineer</td></tr>
+<tr><td>FRM-102</td><td>Document Change Request — 39 bản cho 39 SOP</td><td>SOP Owner + QMS</td></tr>
+<tr><td>FRM-105</td><td>Peer Review Log — 87 bản (1/SOP + 1/WI)</td><td>Reviewer</td></tr>
+<tr><td>FRM-208</td><td>Daily Tier Meeting &amp; Escalation Log — ghi nhận vấn đề hàng ngày</td><td>Champion</td></tr>
+<tr><td>KPI Dashboard</td><td>Excel template 16 KPI (11 vận hành + 5 triển khai)</td><td>IT + QA</td></tr>
+<tr><td>Offline Fallback Kit</td><td>Bộ form giấy + PDF offline + danh sách liên lạc theo ANNEX-118</td><td>IT + QMS</td></tr>
 </tbody>
-</table>
-</div>
-<p class="mini-note">Quy trinh go-live va hypercare giong Dot 1.</p>
-
-</div></div>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 13</span> DOT 3: Tai chinh + Nhan su + IT + EHS + ERP</div>
-<div class="phase-body">
-
-<div class="table-card">
-<table>
-<thead><tr><th>Nhom</th><th>So nguoi</th><th>Noi dung</th><th>Thoi luong</th><th>Tai lieu</th></tr></thead>
-<tbody>
-<tr><td>Finance</td><td>2-4</td><td>SOP-803: job costing, invoice gate (FIN-01/02/03), margin review</td><td>60 phut</td><td>SOP-803, Dept Handbook Finance</td></tr>
-<tr><td>HR / Training</td><td>1-2</td><td>SOP-801: competence levels L0-L3, certification, skills matrix</td><td>60 phut</td><td>SOP-801, Role Roadmaps</td></tr>
-<tr><td>IT / ERP</td><td>2-3</td><td>ANNEX-115: Epicor transaction map, M365 admin, ANNEX-118: offline fallback</td><td>60 phut</td><td>ANNEX-115, ANNEX-118, Dept Handbook IT/ERP</td></tr>
-<tr><td>EHS</td><td>1-2</td><td>SOP-802: incident reporting, ANNEX-506: FOD prevention</td><td>60 phut</td><td>SOP-802, ANNEX-506</td></tr>
-</tbody>
-</table>
+</table></div>
 </div>
 
-</div></div>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 14</span> Kiem tra tong the + Go/No-Go Phase 3</div>
-<div class="phase-body">
-
-<h3>Phase 3 &mdash; 4 dieu kien Go/No-Go</h3>
-<div class="gate-grid">
-<div class="gate-card"><h3>P3-01</h3><p>10/10 phong ban da go-live, khong con chay quy trinh cu</p></div>
-<div class="gate-card"><h3>P3-02</h3><p>KPI-FLD-01 (file routing dung) &ge;85% sau 2 tuan</p></div>
-<div class="gate-card"><h3>P3-03</h3><p>0 wrong-version thoat gate trong 2 tuan lien tiep</p></div>
-<div class="gate-card"><h3>P3-04</h3><p>100% nhan vien lien quan da dao tao (diem danh + quiz)</p></div>
-</div>
-
-</div></div>
-
-<!-- ════════════════════════════════════════════════════════ -->
-<!-- SECTION 6: PHASE 4 -->
-<!-- ════════════════════════════════════════════════════════ -->
-<h2 id="s6">6. Phase 4: On dinh &amp; chung nhan (Tuan 15&ndash;20)</h2>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 15-16</span> Nang V0 &rarr; V1 + Tong hop thay doi</div>
-<div class="phase-body">
-<div class="table-card">
-<table>
-<thead><tr><th>Hoat dong</th><th>Nguoi</th><th>Dau ra</th></tr></thead>
-<tbody>
-<tr><td>Tong hop thay doi tu pilot + go-live vao SOP/WI</td><td>QMS + Document Owners</td><td>SOP/WI cap nhat</td></tr>
-<tr><td>Nang phien ban V0 &rarr; V1 cho 87 SOP/WI</td><td>QMS Manager</td><td>87 tai lieu V1</td></tr>
-<tr><td>Cap nhat FRM-101, dong FRM-102</td><td>QMS Engineer</td><td>FRM-101 V1, 39 FRM-102 dong</td></tr>
-<tr><td>Dao tao QMS awareness cho toan nha may (theo SOP-801)</td><td>HR + QMS</td><td>FRM-802 diem danh, FRM-804 danh gia</td></tr>
-</tbody>
-</table>
-</div>
-</div></div>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 17-18</span> Audit noi bo lan dau</div>
-<div class="phase-body">
-<div class="table-card">
-<table>
-<thead><tr><th>Hoat dong</th><th>Tuan</th><th>Nguoi</th><th>Tai lieu</th></tr></thead>
-<tbody>
-<tr><td>Lap ke hoach audit: pham vi 10 phong ban, 7 chieu AS9100D</td><td>T17</td><td>QA Manager</td><td>SOP-901</td></tr>
-<tr><td>Thuc hien audit (2 auditor x 5 ngay)</td><td>T17-18</td><td>Internal Auditors</td><td>FRM-901, ANNEX-107</td></tr>
-<tr><td>Bao cao findings, phan loai Critical/Major/Minor/Observation</td><td>T18</td><td>Lead Auditor</td><td>FRM-901</td></tr>
-<tr><td>Mo NCR/CAPA cho findings Major/Critical</td><td>T18</td><td>QA + Process Owners</td><td>FRM-651, FRM-652</td></tr>
-</tbody>
-</table>
-</div>
-
-<div class="note-blue">
-<strong>7 chieu AS9100D phai audit:</strong> (1) An toan san pham, (2) Phong ngua hang gia, (3) Cau hinh/truy xuat nguon goc, (4) Nha cung cap/quy trinh dac biet, (5) Yeu to con nguoi, (6) FOD/sach, (7) Tinh toan ven du lieu so hoa.
-</div>
-</div></div>
-
-<div class="phase-box">
-<div class="phase-header"><span class="week-tag">TUAN 19-20</span> Management Review + San sang chung nhan</div>
-<div class="phase-body">
-<div class="table-card">
-<table>
-<thead><tr><th>Hoat dong</th><th>Tuan</th><th>Nguoi</th><th>Tai lieu</th></tr></thead>
-<tbody>
-<tr><td>Chuan bi 10 input categories cho Management Review</td><td>T19</td><td>10 Truong phong</td><td>SOP-902</td></tr>
-<tr><td>Hop Management Review (CEO chu tri)</td><td>T19-20</td><td>CEO + All Dept Heads</td><td>FRM-911</td></tr>
-<tr><td>Dong CAPA tu audit, cap nhat tai lieu</td><td>T20</td><td>Process Owners + QA</td><td>FRM-652</td></tr>
-<tr><td>Danh gia san sang chung nhan (CERT-01 den CERT-06)</td><td>T20</td><td>QMS Manager</td><td>Certification readiness report</td></tr>
-</tbody>
-</table>
-</div>
-
-<h3>6 dieu kien san sang chung nhan</h3>
-<div class="gate-grid">
-<div class="gate-card"><h3>CERT-01</h3><p>87 SOP/WI da V1, FRM-101 day du</p></div>
-<div class="gate-card"><h3>CERT-02</h3><p>Audit noi bo hoan thanh, CAPA dong hoac co ke hoach</p></div>
-<div class="gate-card"><h3>CERT-03</h3><p>Management Review co bao cao + chu ky CEO</p></div>
-<div class="gate-card"><h3>CERT-04</h3><p>He thong van hanh &ge;3 thang co bang chung</p></div>
-<div class="gate-card"><h3>CERT-05</h3><p>100% nhan vien co dao tao va bang chung</p></div>
-<div class="gate-card"><h3>CERT-06</h3><p>KPI dat nguong (OTD &ge;90%, FPY &ge;95%, retrieval &le;60s)</p></div>
-</div>
-</div></div>
-
-<!-- ════════════════════════════════════════════════════════ -->
-<!-- SECTION 7: PHONG BAN -->
-<!-- ════════════════════════════════════════════════════════ -->
-<h2 id="s7">7. Chi tiet theo phong ban (10 phong ban)</h2>
-
-<div class="table-card">
-<table>
-<thead>
-<tr><th>Phong ban</th><th>Tai lieu PHAI doc (reading path)</th><th>Bieu mau PHAI biet su dung</th><th>Gate phu trach</th><th>OJT Guide</th><th>Dot go-live</th><th>Champion</th></tr>
-</thead>
-<tbody>
-<tr>
-<td><span class="dep-tag dep-prod">San xuat</span></td>
-<td>SOP-501, SOP-502, SOP-504, SOP-503, SOP-505, WI-501, WI-516, WI-517, WI-518, WI-519, WI-512/513/514/515 (theo may)</td>
-<td>FRM-501, FRM-502, FRM-503, FRM-504, FRM-511, FRM-512, FRM-513, FRM-514, FRM-518, FRM-519</td>
-<td>G1 (setup), G3 (IPQC), 504-G1 den G6, 502-G1 den G5</td>
-<td>OJT-operator, OJT-setup-teamlead, OJT-planner-dispatcher</td>
-<td>Dot 1</td>
-<td>4-6</td>
-</tr>
-<tr>
-<td><span class="dep-tag dep-eng">Ky thuat</span></td>
-<td>SOP-301, SOP-303, SOP-302 (phan ENG), WI-302</td>
-<td>FRM-301, FRM-302, FRM-303, FRM-304, FRM-305, FRM-306, FRM-307, FRM-311</td>
-<td>301-G1 den G4, 303-G1 den G5</td>
-<td>OJT-cam-nc</td>
-<td>Dot 1</td>
-<td>2</td>
-</tr>
-<tr>
-<td><span class="dep-tag dep-qa">Chat luong</span></td>
-<td>SOP-302, SOP-605, SOP-606, SOP-601, SOP-603, SOP-604, WI-201, WI-203, WI-302</td>
-<td>FRM-311, FRM-641, FRM-642, FRM-651, FRM-652, FRM-621, FRM-631</td>
-<td>G2 (FAI), G4 (final), 605-G1 den G7, 606-G1 den G5</td>
-<td>OJT-qc-inspector, OJT-qa-qms</td>
-<td>Dot 1</td>
-<td>2-3</td>
-</tr>
-<tr>
-<td><span class="dep-tag dep-sc">Chuoi cung ung</span></td>
-<td>SOP-401, SOP-402, SOP-701, WI-206</td>
-<td>FRM-401 den 411, FRM-701, FRM-702, FRM-706</td>
-<td>401-G1 den G5, 402-G1 den G7, 701-G1 den G5</td>
-<td>OJT-purchasing, OJT-warehouse</td>
-<td>Dot 2</td>
-<td>2</td>
-</tr>
-<tr>
-<td><span class="dep-tag dep-sales">Kinh doanh</span></td>
-<td>SOP-201, SOP-202</td>
-<td>FRM-201, FRM-202, FRM-204, FRM-205, FRM-206, FRM-207, FRM-212</td>
-<td>201-G0 den G5</td>
-<td>&mdash;</td>
-<td>Dot 2</td>
-<td>1</td>
-</tr>
-<tr>
-<td><span class="dep-tag dep-fin">Tai chinh</span></td>
-<td>SOP-803</td>
-<td>FRM-821, FRM-206, FRM-301</td>
-<td>803-G1 den G5, FIN-01 den 03</td>
-<td>&mdash;</td>
-<td>Dot 3</td>
-<td>1</td>
-</tr>
-<tr>
-<td><span class="dep-tag dep-hr">Nhan su</span></td>
-<td>SOP-801</td>
-<td>FRM-801 den 809</td>
-<td>801-G1 den G5</td>
-<td>&mdash;</td>
-<td>Dot 3</td>
-<td>1</td>
-</tr>
-<tr>
-<td><span class="dep-tag dep-it">IT</span></td>
-<td>ANNEX-115, ANNEX-118, ANNEX-131-135</td>
-<td>FRM-110, FRM-111, FRM-181</td>
-<td>&mdash;</td>
-<td>&mdash;</td>
-<td>Dot 3</td>
-<td>1</td>
-</tr>
-<tr>
-<td><span class="dep-tag">EHS</span></td>
-<td>SOP-802, SOP-703, ANNEX-506</td>
-<td>FRM-851</td>
-<td>&mdash;</td>
-<td>&mdash;</td>
-<td>Dot 3</td>
-<td>1</td>
-</tr>
-<tr>
-<td><span class="dep-tag">ERP</span></td>
-<td>ANNEX-115, Dept Handbook ERP</td>
-<td>&mdash;</td>
-<td>&mdash;</td>
-<td>&mdash;</td>
-<td>Dot 3</td>
-<td>1</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<!-- ════════════════════════════════════════════════════════ -->
-<!-- SECTION 8: OJT & COMPETENCY -->
-<!-- ════════════════════════════════════════════════════════ -->
-<h2 id="s8">8. Chi tiet OJT &amp; Competency theo vai tro</h2>
-
-<div class="note-blue">
-<strong>Mo hinh OJT:</strong> 70-20-10 (70% tai hien truong, 20% coaching, 10% lop hoc). Moi vai tro co lo trinh 90 ngay / 3 gate (Gate A / 60 ngay / 90 ngay). Tat ca dung khung K-S-E-M (Knowledge, Skills, Evidence, Metrics).
-</div>
-
-<div class="table-card">
-<table>
-<thead>
-<tr><th>Vai tro</th><th>OJT Code</th><th>Gate A (30 ngay)</th><th>60 ngay</th><th>90 ngay</th><th>Performance Test</th><th>Certification</th></tr>
-</thead>
-<tbody>
-<tr><td><strong>CNC Operator</strong></td><td>TRN-ACA-OJT-OP-01</td><td>C01-L1, C02-L1, C03-L1, C08-L1, C10-L1</td><td>C09-L2, C16-L2, C17-L1</td><td>C03-L2, C10-L2</td><td>(1) Rev drill 10 phut, (2) FAI gate, (3) Line stop + NCR</td><td>TRN-ACA-CERT-01</td></tr>
-<tr><td><strong>Setup / Team Lead</strong></td><td>TRN-ACA-OJT-SET-01</td><td>C01-L1, C02-L1, C03-L1, C08-L1, C10-L1, C17-L2</td><td>C09-L3, C16-L3, C13-L2</td><td>C10-L2, LPA at area</td><td>(1) Prove-out 1 job, (2) Release package, (3) Handle repeat defect</td><td>TRN-ACA-CERT-01</td></tr>
-<tr><td><strong>Planner / Dispatcher</strong></td><td>TRN-ACA-OJT-PLA-01</td><td>C01-L1, C02-L1, C03-L1, C08-L1, C10-L1, C09-L3</td><td>C09-L4, C10-L2, C08-L2</td><td>OTD cadence, constraint log</td><td>(1) Create dispatch, (2) WIP aging action, (3) Hot job escalation</td><td>TRN-ACA-CERT-01</td></tr>
-<tr><td><strong>QC Inspector</strong></td><td>TRN-ACA-OJT-QC-01</td><td>C01-L1, C02-L1, C03-L1, C08-L1, C10-L1, C16-L2</td><td>C16-L3, C03-L2, C13-L2</td><td>C10-L2, zero-escape</td><td>(1) Measure CTQ, (2) Containment, (3) Ship packet verify</td><td>TRN-ACA-CERT-01</td></tr>
-<tr><td><strong>QA / QMS</strong></td><td>TRN-ACA-OJT-QMS-01</td><td>C01-L1, C02-L1, C03-L1, C08-L1, C10-L1, C13-L3</td><td>C10-L3, C16-L3, C15-L3</td><td>C13-L4, MR packet, Audit</td><td>(1) CAPA effectiveness, (2) Change control, (3) Audit drill</td><td>TRN-ACA-CERT-01</td></tr>
-<tr><td><strong>Purchasing</strong></td><td>TRN-ACA-OJT-PUR-01</td><td>C01-L1, C02-L1, C03-L1, C08-L1, C10-L1, C18-L3</td><td>C15-L3, C13-L2</td><td>AVL admin, SCAR closure</td><td>(1) Subcon pack, (2) Cert verify, (3) SCAR</td><td>TRN-ACA-CERT-01</td></tr>
-<tr><td><strong>Warehouse</strong></td><td>TRN-ACA-OJT-WHS-01</td><td>C01-L1, C02-L1, C03-L1, C08-L1, C10-L1, C18-L2</td><td>C15-L2, C10-L1</td><td>Cycle count, shortage prevention</td><td>(1) 3-point match, (2) Segregation, (3) Cycle count</td><td>TRN-ACA-CERT-01</td></tr>
-<tr><td><strong>CAM / NC</strong></td><td>TRN-ACA-OJT-CAM-01</td><td>C01-L1, C02-L1, C03-L1, C08-L1, C10-L1, C17-L3</td><td>C13-L3, C08-L2, C10-L2</td><td>C17-L4, cycle time improvement</td><td>(1) Toolpath + simulation, (2) Peer review, (3) Change control</td><td>TRN-ACA-CERT-01</td></tr>
-</tbody>
-</table>
-</div>
-
-<!-- ════════════════════════════════════════════════════════ -->
-<!-- SECTION 9: KPI -->
-<!-- ════════════════════════════════════════════════════════ -->
-<h2 id="s9">9. He thong do luong &amp; KPI</h2>
-
-<h3>9.1 KPI van hanh (do lien tuc tu Phase 2)</h3>
-<div class="table-card">
-<table>
-<thead><tr><th>Ma</th><th>Ten</th><th>Nguong xanh</th><th>Nguong do</th><th>Nguon</th><th>Tan suat</th><th>Owner</th></tr></thead>
-<tbody>
-<tr><td>KPI-FLD-01</td><td>File routing dung lan dau</td><td>&ge;95%</td><td>&lt;80%</td><td>M365 audit</td><td>Hang tuan</td><td>QMS</td></tr>
-<tr><td>KPI-FLD-02</td><td>Retrieval time (job dang chay)</td><td>&le;60s</td><td>&gt;120s</td><td>Drill test</td><td>Hang tuan</td><td>QMS</td></tr>
-<tr><td>KPI-FLD-03</td><td>File nop cung ca/truoc gate</td><td>&ge;98%</td><td>&lt;90%</td><td>M365 timestamp</td><td>Hang tuan</td><td>QMS</td></tr>
-<tr><td>KPI-PLAN-01</td><td>OTD theo ship date</td><td>&ge;92%</td><td>&lt;85%</td><td>Epicor</td><td>Hang tuan</td><td>Planning</td></tr>
-<tr><td>KPI-PLAN-02</td><td>WIP aging red/black</td><td>&le;5%</td><td>&gt;15%</td><td>FRM-503</td><td>Hang ngay</td><td>Planning</td></tr>
-<tr><td>KPI-PLAN-03</td><td>% job chay dung dispatch</td><td>&ge;90%</td><td>&lt;75%</td><td>FRM-502</td><td>Hang ngay</td><td>Planning</td></tr>
-<tr><td>KPI-FAI-01</td><td>First-pass setup success</td><td>&ge;85%</td><td>&lt;70%</td><td>FRM-511</td><td>Hang tuan</td><td>Production</td></tr>
-<tr><td>KPI-CERT-01</td><td>Cert completeness tai ship</td><td>100%</td><td>&lt;95%</td><td>FRM-642</td><td>Moi shipment</td><td>QA</td></tr>
-<tr><td>KPI-NCR-01</td><td>Containment reaction time</td><td>&le;2h</td><td>&gt;4h</td><td>FRM-651</td><td>Moi su kien</td><td>QA</td></tr>
-<tr><td>KPI-NCR-02</td><td>CAPA on-time closure</td><td>&ge;90%</td><td>&lt;70%</td><td>FRM-652</td><td>Hang thang</td><td>QA</td></tr>
-<tr><td>KPI-SUP-01</td><td>Supplier OTD</td><td>&ge;95%</td><td>&lt;85%</td><td>Epicor/FRM-409</td><td>Hang thang</td><td>SCM</td></tr>
-</tbody>
-</table>
-</div>
-
-<h3>9.2 KPI trien khai (do trong Phase 0-4)</h3>
-<div class="table-card">
-<table>
-<thead><tr><th>Ma</th><th>Ten</th><th>Nguong</th><th>Phase ap dung</th></tr></thead>
-<tbody>
-<tr><td>KPI-DEPLOY-01</td><td>% phong ban da go-live</td><td>100% tai Phase 3</td><td>Phase 3</td></tr>
-<tr><td>KPI-DEPLOY-02</td><td>% nhan vien hoan thanh dao tao</td><td>100% tai Phase 3</td><td>Phase 1-3</td></tr>
-<tr><td>KPI-DEPLOY-03</td><td>% Champion dat tieu chi</td><td>100% tai Phase 1</td><td>Phase 1</td></tr>
-<tr><td>KPI-DEPLOY-04</td><td>So GAP con mo</td><td>0 tai Phase 0</td><td>Phase 0</td></tr>
-<tr><td>KPI-DEPLOY-05</td><td>Wrong-revision incidents</td><td>0 trong 2 tuan lien tiep</td><td>Phase 2-3</td></tr>
-</tbody>
-</table>
-</div>
-
-<!-- ════════════════════════════════════════════════════════ -->
-<!-- SECTION 10: TAI LIEU THAM CHIEU -->
-<!-- ════════════════════════════════════════════════════════ -->
-<h2 id="s10">10. Tai lieu tham chieu</h2>
-
-<h3>10.1 Tai lieu trien khai</h3>
+<!-- ══════════════════════════════════════════════ -->
+<!-- MỤC 4 — ĐIỀU KIỆN TIÊN QUYẾT               -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+<h2>4. Điều kiện tiên quyết</h2>
 <ul class="tight">
-<li><a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a> &mdash; Change Roadmap &amp; Priority Register</li>
-<li><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114</a> &mdash; Go-Live Runbook</li>
-<li><a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a> &mdash; M365 Folder Routing Training</li>
-<li><a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a> &mdash; Quick Cards by Role</li>
-<li><a href="wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a> &mdash; QMS Navigation &amp; Deployment</li>
+<li><span class="req-tag shall">PHẢI</span> Ban Giám đốc ký cam kết nguồn lực và chỉ định Project Sponsor.</li>
+<li><span class="req-tag shall">PHẢI</span> 596 tài liệu QMS (39 SOP + 48 WI + 60 ANNEX + 111 FRM + 38 JD + 10 Handbook + 19 Competency) đã có nội dung hoàn chỉnh.</li>
+<li><span class="req-tag shall">PHẢI</span> M365 SharePoint có license đủ cho toàn bộ nhân viên liên quan.</li>
+<li><span class="req-tag should">NÊN</span> Epicor Kinetic đã vận hành ổn định cho job/WO/transaction cơ bản.</li>
 </ul>
+</div>
 
-<h3>10.2 SOP cot loi cua Job Order</h3>
-<ul class="tight">
-<li><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a> &mdash; RFQ to Cash (G0-G6)</li>
-<li><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a> &mdash; Engineering &amp; DFM (G1-G4)</li>
-<li><a href="../../01-SOPs/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a> &mdash; FAI (G1-G5)</li>
-<li><a href="../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a> &mdash; Engineering Release (G1-G5)</li>
-<li><a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> &mdash; Supplier Control (G1-G5)</li>
-<li><a href="../../01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a> &mdash; Material Traceability (G1-G7)</li>
-<li><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a> &mdash; Planning &amp; Dispatch (G1-G5)</li>
-<li><a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a> &mdash; CNC Operations (G1-G5)</li>
-<li><a href="../../01-SOPs/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html">SOP-503</a> &mdash; Tooling &amp; Maintenance (G1-G5 + MNT)</li>
-<li><a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a> &mdash; Setup &amp; First Piece (G1-G6)</li>
-<li><a href="../../01-SOPs/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html">SOP-505</a> &mdash; Finishing &amp; Deburr (G1-G5)</li>
-<li><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a> &mdash; Final Release (G1-G7)</li>
-<li><a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> &mdash; NCR &amp; CAPA (G1-G5)</li>
-<li><a href="../../01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a> &mdash; Receiving &amp; Storage (G1-G5)</li>
-</ul>
+<!-- ══════════════════════════════════════════════ -->
+<!-- MỤC 5 — CÁC BƯỚC THỰC HIỆN                  -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+<h2>5. Các bước thực hiện</h2>
 
-<h3>10.3 Kiem soat &amp; quan tri</h3>
-<ul class="tight">
-<li><a href="../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> &mdash; Document Control (G1-G5)</li>
-<li><a href="../../01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a> &mdash; Training &amp; Certification (G1-G5)</li>
-<li><a href="../../01-SOPs/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html">SOP-803</a> &mdash; Job Costing (G1-G5)</li>
-<li><a href="../../01-SOPs/09-SOP-900/sop-901-internal-audit-and-lpa.html">SOP-901</a> &mdash; Internal Audit &amp; LPA (G1-G5)</li>
-<li><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> &mdash; Management Review</li>
-</ul>
+<!-- ── PHASE 0 ── -->
+<h3>Phase 0 — Chuẩn bị &amp; đồng bộ tài liệu (Tuần 1–4)</h3>
 
-<h3>10.4 Reference &amp; ANNEX</h3>
-<ul class="tight">
-<li><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> &mdash; Escalation Matrix &amp; SLA (L1-L4)</li>
-<li><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a> &mdash; Offline Fallback Kit</li>
-<li><a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a> &mdash; Dispatch &amp; WIP Rules (P0-P3)</li>
-<li><a href="../../03-Reference/05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a> &mdash; Tier Meeting Cadence (T1-T4)</li>
-<li><a href="../../03-Reference/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a> &mdash; Special Route Index (PT-01 den PT-08)</li>
-<li><a href="../../03-Reference/05-ANNEX-500/annex-506-fod-prevention-program.html">ANNEX-506</a> &mdash; FOD Prevention (Zone A-D)</li>
-<li><a href="../../03-Reference/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html">ANNEX-507</a> &mdash; Poka-Yoke (PY-001 den PY-020)</li>
-</ul>
+<div class="vflow">
+<div class="vstep"><div class="vnum">1</div><div class="vtext"><b>Họp khởi động dự án</b><p>QMS Manager trình bày lộ trình 20 tuần cho Ban Giám đốc. CEO ký cam kết nguồn lực. Chỉ định đội triển khai: 1 QMS Lead + 1 IT + 1 Production rep + 1 QA rep.</p></div></div>
+<div class="vstep"><div class="vnum">2</div><div class="vtext"><b>Phân công cross-review 87 SOP/WI</b><p>QMS Manager phân công mỗi reviewer tối đa 8 tài liệu. Mỗi tài liệu có 2 reviewer từ 2 phòng ban khác nhau. Deadline: cuối Tuần 2. Ghi nhận vào FRM-105.</p></div></div>
+<div class="vstep"><div class="vnum">3</div><div class="vtext"><b>Điền FRM-101 Master Document Register</b><p>QMS Engineer nhập 596 tài liệu với mã, phiên bản, chủ sở hữu, ngày hiệu lực. Hoàn thành cuối Tuần 2.</p></div></div>
+<div class="vstep"><div class="vnum">4</div><div class="vtext"><b>Chỉ định Champion</b><p>10 Trưởng phòng ban chỉ định ≥20 Champion (1 người/phòng ban/ca). Ưu tiên người có kinh nghiệm, uy tín, biết sử dụng M365.</p></div></div>
+<div class="vstep"><div class="vnum">5</div><div class="vtext"><b>Cấu hình M365 SharePoint</b><p>IT Admin tạo Site Collection cho Job Dossier, folder template G0–G6 theo ANNEX-133, metadata columns (JobNum, PartNo, Rev, Gate, DocType, RecordDate), permissions theo ANNEX-134.</p></div></div>
+<div class="vstep"><div class="vnum">6</div><div class="vtext"><b>Giải quyết comment từ cross-review</b><p>Document Owner sửa tài liệu HTML theo comment reviewer. QMS Manager xác nhận 0 comment mở. Hoàn thành cuối Tuần 2.</p></div></div>
+<div class="vstep"><div class="vnum">7</div><div class="vtext"><b>Tạo FRM-102 DCR cho 39 SOP</b><p>Mỗi SOP Owner tạo 1 FRM-102 ghi lý do "Ban hành chính thức sau cross-review". QA Manager + Owner ký. Hoàn thành Tuần 3.</p></div></div>
+<div class="vstep"><div class="vnum">8</div><div class="vtext"><b>CEO + QA Manager phê duyệt ban hành V1</b><p>Ký văn bản ban hành V1 cho toàn bộ 87 SOP/WI. Cập nhật FRM-101.</p></div></div>
+<div class="vstep"><div class="vnum">9</div><div class="vtext"><b>In Quick Card WI-104 + dán QR code</b><p>In 7 loại Quick Card (mỗi loại 10–20 bản). Dán QR code tại workstation liên kết đến Quick Card, SOP cốt lõi, và portal QMS.</p></div></div>
+<div class="vstep"><div class="vnum">10</div><div class="vtext"><b>Xây dựng KPI dashboard</b><p>IT + QA tạo Excel dashboard chứa 16 KPI (11 vận hành + 5 triển khai) với công thức, nguồn dữ liệu, ngưỡng xanh/đỏ. Hoàn thành Tuần 3.</p></div></div>
+<div class="vstep"><div class="vnum">11</div><div class="vtext"><b>Chuẩn bị Offline Fallback Kit</b><p>IT + QMS in form giấy (FRM-181, FRM-203, FRM-311, FRM-413, FRM-512, FRM-641, FRM-702), lưu PDF offline, lập danh sách liên lạc khẩn theo ANNEX-118.</p></div></div>
+<div class="vstep"><div class="vnum">12</div><div class="vtext"><b>Test M365 Job Dossier</b><p>Tạo 3 Job Dossier mẫu (1 repeat, 1 CTQ, 1 outsource). Upload đầy đủ hồ sơ G0–G6 với dữ liệu giả định. Kiểm tra metadata, permissions, retrieval time ≤60s.</p></div></div>
+<div class="vstep"><div class="vnum">13</div><div class="vtext"><b>Họp Go/No-Go Phase 0</b><p>QMS Manager trình bày 6 điều kiện P0-CHECK cho Ban Giám đốc. CEO quyết định Go hoặc No-Go.</p></div></div>
+</div>
 
-<h3>10.5 Training</h3>
-<ul class="tight">
-<li><a href="../../../10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L1.html">C10-L1</a> den <a href="../../../10-Training-Academy/01-Competency-System/02-Levels/10-C10-CNC-Job-Order-Process/C10-L4.html">C10-L4</a> &mdash; CNC Job Order Process (4 cap do)</li>
-<li><a href="../../../10-Training-Academy/02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-JOBORDER-E2E</a> &mdash; End-to-End Drill</li>
-<li><a href="../../../10-Training-Academy/04-Templates-Tools/role-roadmaps.html">Role Roadmaps</a> &mdash; 30/60/90 Day</li>
-<li>8 OJT Guides: OJT-operator, OJT-setup-teamlead, OJT-planner-dispatcher, OJT-qc-inspector, OJT-qa-qms, OJT-purchasing, OJT-warehouse, OJT-cam-nc</li>
-</ul>
+<div class="callout-info"><b>6 điều kiện Go/No-Go Phase 0:</b><br/>P0-01: 87 SOP/WI đã cross-review, 0 comment mở. P0-02: FRM-101 đầy đủ 596 tài liệu. P0-03: 39 FRM-102 DCR có chữ ký. P0-04: M365 Job Dossier template tạo thành công 3 job mẫu. P0-05: ≥20 Champion được chỉ định. P0-06: KPI dashboard template sẵn sàng.</div>
 
-</div></div></div><!-- container/page/page-body -->
+<!-- ── PHASE 1 ── -->
+<h3>Phase 1 — Đào tạo &amp; hạ tầng (Tuần 5–6)</h3>
+
+<div class="vflow">
+<div class="vstep"><div class="vnum">14</div><div class="vtext"><b>Đào tạo lãnh đạo — CEO + 10 Trưởng phòng</b><p>90 phút. Nội dung: tổng quan QMS, Job Order flow G0–G6, gate model STOP/HOLD/BLOCK, KPI hệ thống, reading path theo WI-105. Demo M365 Job Dossier. Quiz 10 câu (ngưỡng ≥70%).</p></div></div>
+<div class="vstep"><div class="vnum">15</div><div class="vtext"><b>Đào tạo chuyên sâu — Production Director + Shop Managers</b><p>120 phút. Nội dung: SOP-501 dispatch logic, WIP cap, freeze window, recovery plan. ANNEX-501 priority P0–P3. ANNEX-504 Tier meeting T1–T4. Thực hành tạo dispatch list mẫu trên FRM-502.</p></div></div>
+<div class="vstep"><div class="vnum">16</div><div class="vtext"><b>Đào tạo chuyên sâu — QA Manager + Quality Engineers + QC Leads</b><p>120 phút. Nội dung: gate G0–G6 chi tiết, WI-203 Job Dossier completeness, SOP-605 7 cổng final release, SOP-606 NCR/CAPA flow, SOP-302 FAI. Thực hành kiểm tra completeness 1 Job Dossier mẫu.</p></div></div>
+<div class="vstep"><div class="vnum">17</div><div class="vtext"><b>Bootcamp Champion — Ngày 1 (8 giờ)</b><p>Buổi sáng (4h): cấu trúc M365, naming convention, folder routing theo WI-103/WI-104. Thực hành tạo 1 Job Dossier từ đầu. Buổi chiều (4h): upload 10 file đúng vị trí, điền metadata, xử lý lỗi routing.</p></div></div>
+<div class="vstep"><div class="vnum">18</div><div class="vtext"><b>Bootcamp Champion — Ngày 2 (8 giờ)</b><p>Buổi sáng (4h): gate logic WI-201, evidence check WI-203, escalation ANNEX-117. Buổi chiều (4h): Drill 60 giây (10 tài liệu), quiz 15 câu (ngưỡng ≥80%), bài tập tình huống thực tế.</p></div></div>
+<div class="vstep"><div class="vnum">19</div><div class="vtext"><b>Cấu hình M365 production-ready</b><p>IT Admin hoàn tất: production permissions, retention policy, backup schedule. Ký sign-off M365 production-ready.</p></div></div>
+<div class="vstep"><div class="vnum">20</div><div class="vtext"><b>Nhập dữ liệu KPI baseline</b><p>QA + Production + Finance nhập dữ liệu KPI 3 tháng gần nhất (OTD, FPY, WIP aging, NCR) làm điểm so sánh.</p></div></div>
+<div class="vstep"><div class="vnum">21</div><div class="vtext"><b>Chọn 3 nhóm Job pilot</b><p>Production Director + QA Manager chọn: Nhóm A (3–5 job repeat/low-risk), Nhóm B (2–3 job CTQ/high-risk), Nhóm C (2–3 job outsource/special process).</p></div></div>
+<div class="vstep"><div class="vnum">22</div><div class="vtext"><b>Họp Go/No-Go Phase 1</b><p>4 điều kiện: P1-01 (10 Trưởng phòng ≥70% quiz), P1-02 (≥20 Champion đạt 3 tiêu chí), P1-03 (M365 production-ready), P1-04 (KPI dashboard có dữ liệu baseline).</p></div></div>
+</div>
+
+<div class="callout-info"><b>3 tiêu chí đạt Champion:</b> Quiz ≥80% (12/15 câu). Live routing 100% đúng nhánh chính. Retrieval ≤60 giây cho job đang chạy, ≤5 phút cho job đã đóng.</div>
+
+<!-- ── PHASE 2 ── -->
+<h3>Phase 2 — Pilot 3 nhóm Job (Tuần 7–10)</h3>
+
+<div class="vflow">
+<div class="vstep"><div class="vnum">23</div><div class="vtext"><b>Dual-run Tuần 7–8</b><p>Chạy song song quy trình cũ và mới. Mỗi job pilot: mở Job Dossier trên M365, upload hồ sơ G0–G6 song song với cách làm cũ. Champion kiểm tra hàng ca: file đúng vị trí, metadata đầy đủ. Ghi vấn đề vào FRM-208.</p></div></div>
+<div class="vstep"><div class="vnum">24</div><div class="vtext"><b>Single-run Tuần 9–10</b><p>Chuyển sang chỉ dùng quy trình mới. Điều kiện chuyển: Tuần 7–8 không có wrong-revision, không mất hồ sơ, retrieval ≤120s. Nếu chưa đạt, kéo dài dual-run thêm 1 tuần.</p></div></div>
+<div class="vstep"><div class="vnum">25</div><div class="vtext"><b>Drill 60-second retrieval</b><p>Tuần 9 + Tuần 10, 15 phút/lần. Champion + 3–5 operator. Giảng viên gọi tên 10 tài liệu bất kỳ, người tham gia tìm trên M365 trong 60 giây. Ngưỡng PASS: ≥8/10.</p></div></div>
+<div class="vstep"><div class="vnum">26</div><div class="vtext"><b>Drill wrong-revision response</b><p>Tuần 9, 30 phút. Setup + QC + Planning. Giả lập phát hiện bản vẽ sai REV tại máy CNC. Ngưỡng PASS: phát hiện và HOLD trong ≤5 phút.</p></div></div>
+<div class="vstep"><div class="vnum">27</div><div class="vtext"><b>Drill shipment-to-source traceback</b><p>Tuần 10, 45 phút. QA + Warehouse + Production. Truy từ shipment đến material source/cert. Ngưỡng PASS: trace hoàn thành trong ≤30 phút.</p></div></div>
+<div class="vstep"><div class="vnum">28</div><div class="vtext"><b>Đo 6 KPI bắt buộc</b><p>First-pass setup ≥85%. Plan adherence ≥90%. WIP aging đỏ ≤5%. Retrieval ≤90s. Cert completeness 100%. Wrong-revision 0.</p></div></div>
+<div class="vstep"><div class="vnum">29</div><div class="vtext"><b>Họp Go/No-Go Phase 2</b><p>6 điều kiện: 7–10 job pilot hoàn thành; 6 KPI không đỏ; retrieval ≤90s; 0 wrong-revision; Champion tự vận hành được; tất cả vấn đề đã đóng hoặc có kế hoạch.</p></div></div>
+</div>
+
+<!-- ── PHASE 3 ── -->
+<h3>Phase 3 — Go-Live đồng loạt (Tuần 11–14)</h3>
+
+<div class="callout-warn"><b>Nguyên tắc:</b> Không triển khai tất cả phòng ban cùng lúc. Chia 3 đợt, mỗi đợt cách nhau 1 tuần.</div>
+
+<div class="table-card"><table class="table">
+<thead><tr><th>Đợt</th><th>Tuần</th><th>Phòng ban</th><th>Nội dung đào tạo</th><th>Thời lượng</th></tr></thead>
+<tbody>
+<tr><td><b>Đợt 1</b></td><td>Tuần 11</td><td>Sản xuất + Kỹ thuật + Chất lượng</td><td>SOP-501/502/504 (dispatch, CNC ops, setup); SOP-301/303 (DFM, baseline); SOP-302/605/606 (FAI, final release, NCR); WI-519/517/516 (pre-run, changeover, quick card). Thực hành M365 upload.</td><td>90–120 phút/nhóm</td></tr>
+<tr><td><b>Đợt 2</b></td><td>Tuần 12</td><td>Chuỗi cung ứng + Kinh doanh</td><td>SOP-401/402/701 (supplier, traceability, receiving); SOP-201 (RFQ-to-Cash). Thực hành upload cert, PO, contract review.</td><td>60–90 phút/nhóm</td></tr>
+<tr><td><b>Đợt 3</b></td><td>Tuần 13</td><td>Tài chính + Nhân sự + IT + EHS + ERP</td><td>SOP-803 (job costing); SOP-801 (đào tạo); ANNEX-115/118 (Epicor, offline). Tổng quan QMS cho phòng ban hỗ trợ.</td><td>60 phút/nhóm</td></tr>
+</tbody>
+</table></div>
+
+<div class="vflow">
+<div class="vstep"><div class="vnum">30</div><div class="vtext"><b>Đào tạo theo vai trò (T-3 ngày trước go-live mỗi đợt)</b><p>Mỗi nhóm vai trò nhận Quick Card tương ứng, thực hành trên M365 thật. Quiz ≥70%.</p></div></div>
+<div class="vstep"><div class="vnum">31</div><div class="vtext"><b>Ngày Go-Live</b><p>7:00 Champion túc trực. 7:00–7:30 Tier-1 meeting: xác nhận tất cả job mới tạo Job Dossier trên M365. 7:30–12:00 Champion hỗ trợ. 12:00 mid-shift review. 17:00 tổng kết, ghi FRM-208.</p></div></div>
+<div class="vstep"><div class="vnum">32</div><div class="vtext"><b>Hypercare D+1 đến D+14</b><p>D+1–D+7: Champion review mỗi ca. Tier-1 hàng ngày có mục "QMS go-live". D+7–D+14: giảm hỗ trợ, bắt đầu đo KPI-FLD-01.</p></div></div>
+<div class="vstep"><div class="vnum">33</div><div class="vtext"><b>Họp Go/No-Go Phase 3</b><p>4 điều kiện: 10/10 phòng ban đã go-live; KPI-FLD-01 ≥85%; 0 wrong-version thoát gate trong 2 tuần; 100% nhân viên đã đào tạo.</p></div></div>
+</div>
+
+<!-- ── PHASE 4 ── -->
+<h3>Phase 4 — Ổn định &amp; chứng nhận (Tuần 15–20)</h3>
+
+<div class="vflow">
+<div class="vstep"><div class="vnum">34</div><div class="vtext"><b>Tổng hợp thay đổi từ pilot + go-live</b><p>QMS Manager + Document Owner cập nhật SOP/WI dựa trên feedback thực tế. Hoàn thành Tuần 15–16.</p></div></div>
+<div class="vstep"><div class="vnum">35</div><div class="vtext"><b>Nâng phiên bản V0 → V1</b><p>QA Manager + CEO ký ban hành V1 cho 87 SOP/WI. Cập nhật FRM-101, đóng FRM-102.</p></div></div>
+<div class="vstep"><div class="vnum">36</div><div class="vtext"><b>Đào tạo QMS awareness toàn nhà máy</b><p>HR + QMS tổ chức theo SOP-801. Ghi FRM-802 (điểm danh) + FRM-804 (đánh giá năng lực).</p></div></div>
+<div class="vstep"><div class="vnum">37</div><div class="vtext"><b>Lập kế hoạch audit nội bộ</b><p>QA Manager xác định phạm vi 10 phòng ban, 7 chiều AS9100D: an toàn sản phẩm, phòng ngừa hàng giả, cấu hình/truy xuất, nhà cung cấp/quy trình đặc biệt, yếu tố con người, FOD/sạch, tính toàn vẹn dữ liệu. Tuần 17.</p></div></div>
+<div class="vstep"><div class="vnum">38</div><div class="vtext"><b>Thực hiện audit nội bộ</b><p>2 auditor × 5 ngày. Phân loại findings: Critical/Major/Minor/Observation. Mở NCR/CAPA cho Major/Critical. Tuần 17–18.</p></div></div>
+<div class="vstep"><div class="vnum">39</div><div class="vtext"><b>Đóng CAPA từ audit</b><p>Process Owner + QA đóng corrective action, cập nhật tài liệu, đào tạo lại nếu cần. Tuần 18–19.</p></div></div>
+<div class="vstep"><div class="vnum">40</div><div class="vtext"><b>Management Review lần đầu</b><p>CEO chủ trì. 10 input categories theo SOP-902: KPI, khách hàng, NCR/CAPA/audit, nhà cung cấp, nguồn lực/đào tạo, rủi ro/cơ hội, liên tục kinh doanh, EHS, thay đổi, tài chính. Ghi FRM-911. Tuần 19–20.</p></div></div>
+<div class="vstep"><div class="vnum">41</div><div class="vtext"><b>Đánh giá sẵn sàng chứng nhận</b><p>QMS Manager kiểm tra 6 điều kiện CERT. Trình Ban Giám đốc quyết định thời điểm mời tổ chức chứng nhận.</p></div></div>
+</div>
+
+<div class="callout-info"><b>6 điều kiện sẵn sàng chứng nhận:</b><br/>CERT-01: 87 SOP/WI đã V1, FRM-101 đầy đủ. CERT-02: Audit nội bộ hoàn thành, CAPA đóng hoặc có kế hoạch. CERT-03: Management Review có báo cáo + chữ ký CEO. CERT-04: Hệ thống vận hành ≥3 tháng có bằng chứng. CERT-05: 100% nhân viên có đào tạo và bằng chứng. CERT-06: KPI đạt ngưỡng (OTD ≥90%, FPY ≥95%, retrieval ≤60s).</div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- MỤC 6 — HỒ SƠ & BẰNG CHỨNG                 -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+<h2>6. Hồ sơ &amp; bằng chứng</h2>
+<div class="table-card"><table class="table">
+<thead><tr><th>Hồ sơ</th><th>Nội dung</th><th>Lưu trữ</th><th>Trách nhiệm</th></tr></thead>
+<tbody>
+<tr><td>FRM-101</td><td>Master Document Register — 596 tài liệu</td><td>M365 / QMS Records</td><td>QMS Engineer</td></tr>
+<tr><td>FRM-102</td><td>Document Change Request — 39 bản (1/SOP)</td><td>M365 / QMS Records</td><td>SOP Owner + QMS</td></tr>
+<tr><td>FRM-105</td><td>Peer Review Log — 87 bản (1/SOP, 1/WI)</td><td>M365 / QMS Records</td><td>Reviewer</td></tr>
+<tr><td>FRM-208</td><td>Daily Tier Meeting Log — ghi vấn đề triển khai</td><td>M365 / Production Records</td><td>Champion</td></tr>
+<tr><td>FRM-802</td><td>Training Attendance — điểm danh đào tạo</td><td>M365 / HR Records</td><td>HR + QMS</td></tr>
+<tr><td>FRM-804</td><td>Competence Assessment — đánh giá năng lực</td><td>M365 / HR Records</td><td>Dept Head</td></tr>
+<tr><td>FRM-901</td><td>Internal Audit Report — báo cáo audit nội bộ</td><td>M365 / QMS Records</td><td>Lead Auditor</td></tr>
+<tr><td>FRM-911</td><td>Management Review Minutes — biên bản MR</td><td>M365 / QMS Records</td><td>QMS Manager</td></tr>
+<tr><td>KPI Dashboard</td><td>16 KPI triển khai + vận hành</td><td>M365 / QMS Dashboard</td><td>IT + QA</td></tr>
+<tr><td>Go/No-Go Checklist</td><td>Checklist per phase (P0–P4, CERT)</td><td>M365 / QMS Records</td><td>QMS Manager</td></tr>
+</tbody>
+</table></div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- MỤC 7 — TÀI LIỆU LIÊN QUAN                 -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+<h2>7. Tài liệu liên quan</h2>
+<div class="table-card"><table class="table">
+<thead><tr><th>Mã</th><th>Tên tài liệu</th></tr></thead>
+<tbody>
+<tr><td><a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td><td>Change Roadmap &amp; Priority Register</td></tr>
+<tr><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114</a></td><td>Go-Live Runbook &amp; Cutover Control</td></tr>
+<tr><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation Matrix &amp; SLA</td></tr>
+<tr><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></td><td>Offline Fallback Kit</td></tr>
+<tr><td><a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a></td><td>M365 Folder Routing Training</td></tr>
+<tr><td><a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a></td><td>Quick Cards by Role</td></tr>
+<tr><td><a href="wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a></td><td>QMS Navigation &amp; Deployment</td></tr>
+<tr><td><a href="../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a></td><td>Document &amp; Data Control</td></tr>
+<tr><td><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>Order Fulfillment: RFQ to Cash</td></tr>
+<tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Production Planning, Scheduling &amp; Dispatch</td></tr>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>Final Inspection, CoC &amp; Shipment Release</td></tr>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td><td>NCR, CAPA &amp; IPQC Reaction</td></tr>
+<tr><td><a href="../../01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a></td><td>Competence, Training &amp; Certification</td></tr>
+<tr><td><a href="../../01-SOPs/09-SOP-900/sop-901-internal-audit-and-lpa.html">SOP-901</a></td><td>Internal Audit &amp; LPA</td></tr>
+<tr><td><a href="../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a></td><td>Management Review</td></tr>
+<tr><td><a href="../../../10-Training-Academy/02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-E2E</a></td><td>Job Order End-to-End Drill</td></tr>
+<tr><td><a href="../../../10-Training-Academy/04-Templates-Tools/role-roadmaps.html">Role Roadmaps</a></td><td>30/60/90 Day Onboarding Roadmaps</td></tr>
+</tbody>
+</table></div>
+</div>
+
+</div></div></div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

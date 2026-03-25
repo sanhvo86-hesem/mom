@@ -1672,6 +1672,21 @@ function loadDocContent(code){
     const title=(typeof escapeHtml==='function') ? escapeHtml(getDocDisplayTitle(doc)||doc.title||doc.code) : (getDocDisplayTitle(doc)||doc.title||doc.code);
     const desc=(typeof escapeHtml==='function') ? escapeHtml(getDocDisplayDescription(doc)||'') : (getDocDisplayDescription(doc)||'');
     const owner=(typeof escapeHtml==='function') ? escapeHtml(String((state&&state.owner)||doc.owner||'QA/QMS')) : String((state&&state.owner)||doc.owner||'QA/QMS');
+    const docExt=String(doc.ext || '').toLowerCase();
+    const docTypeLabel=docExt==='pdf'
+      ? (lang==='en' ? 'Controlled PDF file' : 'Tai lieu PDF duoc kiem soat')
+      : (/^(doc|docx|docm)$/i.test(docExt)
+        ? (lang==='en' ? 'Controlled Word file' : 'Tep Word duoc kiem soat')
+        : (/^(ppt|pptx|pptm)$/i.test(docExt)
+          ? (lang==='en' ? 'Controlled PowerPoint file' : 'Tep PowerPoint duoc kiem soat')
+          : (/^(xls|xlsx|xlsm|xlsb|csv)$/i.test(docExt)
+            ? (lang==='en' ? 'Controlled Excel file' : 'Tep Excel duoc kiem soat')
+            : (docExt ? (lang==='en' ? `Controlled file (.${docExt})` : `Tep duoc kiem soat (.${docExt})`) : (lang==='en' ? 'Controlled file' : 'Tep duoc kiem soat')))));
+    const currentFileLabel=lang==='en' ? 'Download current file' : 'Tai file hien hanh';
+    const workingFileLabel=lang==='en' ? 'Download working copy' : 'Tai ban lam viec';
+    const fileNote=lang==='en'
+      ? 'Non-HTML controlled files are version-managed through private staging, review, approval, and immutable archive. Use the buttons below to retrieve the current released file or the latest working copy.'
+      : 'Cac tep khong phai HTML duoc kiem soat phien ban qua private staging, review, approval va immutable archive. Dung cac nut ben duoi de tai file phat hanh hien hanh hoac ban lam viec moi nhat.';
     iframe.onload=function(){
       try{ attachIframeViewerZoom(iframe); }catch(e){}
       if(loading) loading.style.display='none';
@@ -1701,7 +1716,7 @@ function loadDocContent(code){
       <body>
         <div class="wrap">
           <div class="card">
-            <div class="eyebrow">Controlled Excel Form</div>
+            <div class="eyebrow">${docTypeLabel}</div>
             <h1>${doc.code} — ${title}</h1>
             ${desc?`<div class="sub">${desc}</div>`:''}
             <div class="grid">
@@ -1711,13 +1726,11 @@ function loadDocContent(code){
               <div class="meta"><b>${lang==='en'?'Delivery mode':'Cách phát hành'}</b><span>${lang==='en'?'Download only':'Chỉ tải về'}</span></div>
             </div>
             <div class="cta">
-              <button class="btn primary" type="button" onclick='parent.triggerDownloadUrl(${JSON.stringify(currentUrl)})'>${lang==='en'?'Download current workbook':'Tải workbook hiện hành'}</button>
-              ${workingUrl?`<button class="btn" type="button" onclick='parent.triggerDownloadUrl(${JSON.stringify(workingUrl)})'>${lang==='en'?'Download working copy':'Tải bản làm việc'}</button>`:''}
+              <button class="btn primary" type="button" onclick='parent.triggerDownloadUrl(${JSON.stringify(currentUrl)})'>${currentFileLabel}</button>
+              ${workingUrl?`<button class="btn" type="button" onclick='parent.triggerDownloadUrl(${JSON.stringify(workingUrl)})'>${workingFileLabel}</button>`:''}
             </div>
             <div class="note">
-              ${lang==='en'
-                ?'Excel forms are version-controlled through private staging, review, approval, and immutable archive. The active file remains at the canonical form path, while draft and historical copies are stored outside the web root.'
-                :'Biểu mẫu Excel hiện được kiểm soát phiên bản qua private staging, review, approval và immutable archive. File active vẫn nằm ở đường dẫn biểu mẫu chuẩn, còn draft và các bản lịch sử được lưu ngoài web root.'}
+              ${fileNote}
             </div>
           </div>
         </div>

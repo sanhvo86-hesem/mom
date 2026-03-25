@@ -42,6 +42,7 @@ $USERS_FILE = $CONF_DIR . '/users.json';
 $ROLE_PERMS_FILE   = $CONF_DIR . '/role_permissions.json';
 $CUSTOM_DOCS_FILE  = $CONF_DIR . '/docs_custom.json';
 $DOC_VIS_FILE     = $CONF_DIR . '/docs_visibility.json';
+$PORTAL_DISPLAY_CONFIG_FILE = $CONF_DIR . '/portal_display_config.json';
 $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
 $PORTAL_CONFIG_JS_FILE = $BASE_DIR . '/scripts/portal/01-data-config.js';
 $LOG_FILE   = $DATA_DIR . '/php_error.log';
@@ -536,6 +537,185 @@ function save_doc_visibility(string $file, array $hidden): void {
   write_json_file($file, ['hidden' => $hidden, 'updated_at' => now_iso()]);
 }
 
+function portal_default_doc_extensions(): array {
+  static $extensions = ['html', 'pdf', 'doc', 'docx', 'docm', 'xls', 'xlsx', 'xlsm', 'xlsb', 'csv', 'ppt', 'pptx', 'pptm'];
+  return $extensions;
+}
+
+function portal_normalize_extension_list(array $values): array {
+  $out = [];
+  $seen = [];
+  foreach ($values as $value) {
+    $ext = strtolower(trim((string)$value));
+    $ext = ltrim($ext, '.');
+    $ext = preg_replace('/[^a-z0-9]+/', '', $ext);
+    if ($ext === '' || strlen($ext) > 16 || isset($seen[$ext])) continue;
+    $seen[$ext] = true;
+    $out[] = $ext;
+  }
+  return $out;
+}
+
+function portal_normalize_lower_id_list(array $values): array {
+  $out = [];
+  $seen = [];
+  foreach ($values as $value) {
+    $id = strtolower(trim((string)$value));
+    $id = preg_replace('/[^a-z0-9_-]+/', '', $id);
+    if ($id === '' || isset($seen[$id])) continue;
+    $seen[$id] = true;
+    $out[] = $id;
+  }
+  return $out;
+}
+
+function portal_normalize_upper_id_list(array $values): array {
+  $out = [];
+  $seen = [];
+  foreach ($values as $value) {
+    $id = strtoupper(trim((string)$value));
+    $id = preg_replace('/[^A-Z0-9_-]+/', '', $id);
+    if ($id === '' || isset($seen[$id])) continue;
+    $seen[$id] = true;
+    $out[] = $id;
+  }
+  return $out;
+}
+
+function portal_display_config_defaults(): array {
+  return [
+    'extensions' => [
+      'enabled' => portal_default_doc_extensions(),
+      'custom' => [],
+    ],
+    'sidebar' => [
+      'hidden_core_items' => [],
+      'hidden_sections' => [],
+      'hidden_categories' => [],
+    ],
+  ];
+}
+
+function portal_display_config_known_extensions(array $config): array {
+  $out = [];
+  $seen = [];
+  foreach (array_merge(portal_default_doc_extensions(), portal_normalize_extension_list($config['extensions']['custom'] ?? [])) as $ext) {
+    if ($ext === '' || isset($seen[$ext])) continue;
+    $seen[$ext] = true;
+    $out[] = $ext;
+  }
+  return $out;
+}
+
+function portal_display_config_enabled_extensions(array $config): array {
+  $known = portal_display_config_known_extensions($config);
+  $enabledRaw = portal_normalize_extension_list($config['extensions']['enabled'] ?? []);
+  $enabledLookup = array_fill_keys($enabledRaw, true);
+  $out = [];
+  foreach ($known as $ext) {
+    if (isset($enabledLookup[$ext])) $out[] = $ext;
+  }
+  return $out;
+}
+
+function portal_load_display_config(string $file): array {
+  $defaults = portal_display_config_defaults();
+  $raw = read_json_file($file);
+  if (!is_array($raw)) {
+    $raw = [];
+  }
+
+  $config = [
+    'extensions' => [
+      'custom' => portal_normalize_extension_list($raw['extensions']['custom'] ?? []),
+      'enabled' => portal_normalize_extension_list($raw['extensions']['enabled'] ?? $defaults['extensions']['enabled']),
+    ],
+    'sidebar' => [
+      'hidden_core_items' => portal_normalize_lower_id_list($raw['sidebar']['hidden_core_items'] ?? []),
+      'hidden_sections' => portal_normalize_lower_id_list($raw['sidebar']['hidden_sections'] ?? []),
+      'hidden_categories' => portal_normalize_upper_id_list($raw['sidebar']['hidden_categories'] ?? []),
+    ],
+  ];
+
+  $known = portal_display_config_known_extensions($config);
+  $enabled = portal_display_config_enabled_extensions($config);
+  $builtinLookup = array_fill_keys(portal_default_doc_extensions(), true);
+  $custom = array_values(array_filter($known, function ($ext) use ($builtinLookup) {
+    return !isset($builtinLookup[$ext]);
+  }));
+
+  $config['extensions']['custom'] = $custom;
+  $config['extensions']['enabled'] = $enabled;
+
+  return $config;
+}
+
+function portal_save_display_config(string $file, array $config): array {
+  $normalized = portal_load_display_config($file);
+
+  if (isset($config['extensions']) && is_array($config['extensions'])) {
+    $normalized['extensions']['custom'] = portal_normalize_extension_list($config['extensions']['custom'] ?? []);
+    $normalized['extensions']['enabled'] = portal_normalize_extension_list($config['extensions']['enabled'] ?? []);
+  }
+
+  if (isset($config['sidebar']) && is_array($config['sidebar'])) {
+    $normalized['sidebar']['hidden_core_items'] = portal_normalize_lower_id_list($config['sidebar']['hidden_core_items'] ?? []);
+    $normalized['sidebar']['hidden_sections'] = portal_normalize_lower_id_list($config['sidebar']['hidden_sections'] ?? []);
+    $normalized['sidebar']['hidden_categories'] = portal_normalize_upper_id_list($config['sidebar']['hidden_categories'] ?? []);
+  }
+
+  $known = portal_display_config_known_extensions($normalized);
+  $enabledLookup = array_fill_keys(portal_normalize_extension_list($normalized['extensions']['enabled'] ?? []), true);
+  $enabled = [];
+  foreach ($known as $ext) {
+    if (isset($enabledLookup[$ext])) $enabled[] = $ext;
+  }
+  $builtinLookup = array_fill_keys(portal_default_doc_extensions(), true);
+  $custom = array_values(array_filter($known, function ($ext) use ($builtinLookup) {
+    return !isset($builtinLookup[$ext]);
+  }));
+
+  $normalized['extensions']['custom'] = $custom;
+  $normalized['extensions']['enabled'] = $enabled;
+
+  write_json_file($file, [
+    'extensions' => [
+      'custom' => $normalized['extensions']['custom'],
+      'enabled' => $normalized['extensions']['enabled'],
+    ],
+    'sidebar' => [
+      'hidden_core_items' => $normalized['sidebar']['hidden_core_items'],
+      'hidden_sections' => $normalized['sidebar']['hidden_sections'],
+      'hidden_categories' => $normalized['sidebar']['hidden_categories'],
+    ],
+    'updated_at' => now_iso(),
+  ]);
+
+  return $normalized;
+}
+
+function portal_display_config_public_payload(array $config): array {
+  return [
+    'extensions' => [
+      'builtin' => portal_default_doc_extensions(),
+      'custom' => $config['extensions']['custom'] ?? [],
+      'known' => portal_display_config_known_extensions($config),
+      'enabled' => portal_display_config_enabled_extensions($config),
+    ],
+    'sidebar' => [
+      'hidden_core_items' => $config['sidebar']['hidden_core_items'] ?? [],
+      'hidden_sections' => $config['sidebar']['hidden_sections'] ?? [],
+      'hidden_categories' => $config['sidebar']['hidden_categories'] ?? [],
+    ],
+  ];
+}
+
+function portal_doc_extension_is_enabled(string $ext, array $displayConfig): bool {
+  $ext = strtolower(trim($ext));
+  if ($ext === '') return false;
+  return in_array($ext, portal_display_config_enabled_extensions($displayConfig), true);
+}
+
 function portal_extract_doc_code(string $filename): string {
   $stem = pathinfo($filename, PATHINFO_FILENAME);
   if (preg_match('/^(sop-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
@@ -740,10 +920,13 @@ function portal_can_access_jd_doc(array $user, array $doc, array $roleDocs): boo
   return false;
 }
 
-function portal_can_access_doc(array $user, array $doc, array $roleDocs, array $hiddenCodes = []): bool {
+function portal_can_access_doc(array $user, array $doc, array $roleDocs, array $hiddenCodes = [], array $displayConfig = []): bool {
   $code = strtoupper(trim((string)($doc['code'] ?? '')));
   if ($code === '') return false;
   if (in_array($code, $hiddenCodes, true)) return false;
+
+  $ext = strtolower(trim((string)($doc['ext'] ?? portal_get_doc_extension((string)($doc['path'] ?? '')))));
+  if ($displayConfig && !portal_doc_extension_is_enabled($ext, $displayConfig)) return false;
 
   $role = migrate_role((string)($user['role'] ?? ''));
   $patterns = $roleDocs[$role] ?? null;
@@ -762,7 +945,7 @@ function portal_can_access_doc(array $user, array $doc, array $roleDocs, array $
   return false;
 }
 
-function portal_filter_docs_for_user(array $docs, array $user, string $portalConfigJsFile, array $hiddenCodes = []): array {
+function portal_filter_docs_for_user(array $docs, array $user, string $portalConfigJsFile, array $hiddenCodes = [], array $displayConfig = []): array {
   $roleDocs = portal_load_role_docs($portalConfigJsFile);
   if (!$roleDocs) return [];
   $hiddenUpper = array_values(array_unique(array_map(function($value) {
@@ -772,15 +955,77 @@ function portal_filter_docs_for_user(array $docs, array $user, string $portalCon
   $out = [];
   foreach ($docs as $doc) {
     if (!is_array($doc)) continue;
-    if (portal_can_access_doc($user, $doc, $roleDocs, $hiddenUpper)) $out[] = $doc;
+    if (portal_can_access_doc($user, $doc, $roleDocs, $hiddenUpper, $displayConfig)) $out[] = $doc;
   }
   return $out;
+}
+
+function portal_supported_doc_extensions(): array {
+  return portal_default_doc_extensions();
+}
+
+function portal_supported_download_only_extensions(): array {
+  return array_values(array_filter(portal_supported_doc_extensions(), function ($ext) {
+    return $ext !== 'html';
+  }));
+}
+
+function portal_get_doc_extension(string $path): string {
+  return strtolower(trim((string)pathinfo($path, PATHINFO_EXTENSION)));
+}
+
+function portal_is_supported_doc_file_name(string $fileName): bool {
+  return in_array(portal_get_doc_extension($fileName), portal_supported_doc_extensions(), true);
+}
+
+function portal_stream_mime_map(): array {
+  static $map = [
+    'html' => 'text/html; charset=utf-8',
+    'pdf' => 'application/pdf',
+    'doc' => 'application/msword',
+    'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'docm' => 'application/vnd.ms-word.document.macroEnabled.12',
+    'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'xlsm' => 'application/vnd.ms-excel.sheet.macroEnabled.12',
+    'xlsb' => 'application/vnd.ms-excel.sheet.binary.macroEnabled.12',
+    'xls' => 'application/vnd.ms-excel',
+    'csv' => 'text/csv; charset=utf-8',
+    'ppt' => 'application/vnd.ms-powerpoint',
+    'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'pptm' => 'application/vnd.ms-powerpoint.presentation.macroEnabled.12',
+    'svg' => 'image/svg+xml',
+    'png' => 'image/png',
+    'jpg' => 'image/jpeg',
+    'jpeg' => 'image/jpeg',
+    'gif' => 'image/gif',
+    'webp' => 'image/webp',
+    'css' => 'text/css; charset=utf-8',
+  ];
+  return $map;
+}
+
+function portal_stream_mime_type(string $ext): string {
+  $map = portal_stream_mime_map();
+  return $map[strtolower(trim($ext))] ?? 'application/octet-stream';
+}
+
+function portal_stream_can_inline(string $ext): bool {
+  return in_array(strtolower(trim($ext)), ['html', 'pdf', 'svg', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'css'], true);
+}
+
+function portal_fallback_doc_title(string $fileName): string {
+  $title = pathinfo($fileName, PATHINFO_FILENAME);
+  $title = preg_replace('/[_-]+/', ' ', (string)$title);
+  $title = preg_replace('/\s+/', ' ', (string)$title);
+  $title = trim((string)$title);
+  return $title !== '' ? $title : $fileName;
 }
 
 function portal_doc_title_is_fallback(array $doc): bool {
   $title = strtolower(trim((string)($doc['title'] ?? '')));
   if ($title === '') return true;
-  foreach (['.html', '.xlsx', '.xlsm', '.xls', '.csv'] as $suffix) {
+  foreach (portal_supported_doc_extensions() as $ext) {
+    $suffix = '.' . $ext;
     if (str_ends_with($title, $suffix)) return true;
   }
   return false;
@@ -788,11 +1033,12 @@ function portal_doc_title_is_fallback(array $doc): bool {
 
 function portal_doc_quality_score(array $doc): int {
   $path = strtolower((string)($doc['path'] ?? ''));
-  $ext = strtolower((string)($doc['ext'] ?? pathinfo($path, PATHINFO_EXTENSION)));
+  $ext = strtolower((string)($doc['ext'] ?? portal_get_doc_extension($path)));
   $score = portal_doc_title_is_fallback($doc) ? 0 : 1000;
   if (($doc['status'] ?? '') === 'approved') $score += 250;
-  if (($doc['delivery_mode'] ?? '') === 'download') $score += 150;
-  if ($ext === 'xlsx' || $ext === 'xlsm' || $ext === 'xls' || $ext === 'csv') $score += 120;
+  if ($ext === 'html') $score += 300;
+  if (($doc['delivery_mode'] ?? '') === 'download' && $ext !== 'html') $score += 50;
+  if (in_array($ext, portal_supported_download_only_extensions(), true)) $score += 120;
   $score += min(strlen(pathinfo($path, PATHINFO_FILENAME)), 200);
   return $score;
 }
@@ -824,10 +1070,11 @@ function portal_normalize_revision_value(string $value): string {
   return ltrim($value, "Vv");
 }
 
-function load_form_control_registry_docs(string $file, string $rootDir): array {
+function load_form_control_registry_docs(string $file, string $rootDir, ?array $allowedExtensions = null): array {
   global $DATA_DIR;
   $json = read_json_file($file);
   if (!is_array($json)) return [];
+  $allowedExtensions = is_array($allowedExtensions) ? array_values(array_unique(array_map('strval', $allowedExtensions))) : portal_supported_doc_extensions();
 
   $docs = [];
   foreach ($json as $entry) {
@@ -845,7 +1092,7 @@ function load_form_control_registry_docs(string $file, string $rootDir): array {
     if (!is_file($absPath) || !is_inside_root($absPath, $rootDir)) continue;
 
     $ext = strtolower(trim((string)($entry['ext'] ?? pathinfo($relPath, PATHINFO_EXTENSION))));
-    if (!in_array($ext, ['xlsx','xlsm','xls','csv'], true)) continue;
+    if (!in_array($ext, $allowedExtensions, true)) continue;
 
     $folder = trim((string)($entry['folder'] ?? dirname($relPath)));
     $state = form_load_state_existing($DATA_DIR, $code);
@@ -879,8 +1126,8 @@ function load_form_control_registry_docs(string $file, string $rootDir): array {
 }
 
 function portal_allowed_stream_extension(string $relPath): bool {
-  $ext = strtolower(pathinfo($relPath, PATHINFO_EXTENSION));
-  return in_array($ext, ['html','xlsx','xlsm','xls','csv','svg','png','jpg','jpeg','gif','webp','css'], true);
+  $ext = portal_get_doc_extension($relPath);
+  return $ext !== '';
 }
 
 // ---------- Dictionary (Glossary) ----------
@@ -2583,6 +2830,29 @@ switch ($action) {
     api_json(['ok' => true, 'hidden' => array_values(array_unique($clean)), 'server_time' => now_iso()]);
   }
 
+  case 'admin_portal_display_config_get': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    $config = portal_load_display_config($PORTAL_DISPLAY_CONFIG_FILE);
+    api_json(['ok' => true, 'config' => portal_display_config_public_payload($config), 'server_time' => now_iso()]);
+  }
+
+  case 'admin_portal_display_config_save': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+
+    $data = read_json_body();
+    $configIn = $data['config'] ?? null;
+    if (!is_array($configIn)) api_json(['ok' => false, 'error' => 'invalid_config'], 400);
+
+    $saved = portal_save_display_config($PORTAL_DISPLAY_CONFIG_FILE, $configIn);
+    invalidate_scan_cache($DATA_DIR);
+    api_json(['ok' => true, 'config' => portal_display_config_public_payload($saved), 'server_time' => now_iso()]);
+  }
+
 
   // ==========================================================
   // CUSTOM DOCUMENTS LIST (server-backed)
@@ -2592,7 +2862,8 @@ switch ($action) {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
     $me = require_logged_in($store);
     $docs = load_custom_docs($CUSTOM_DOCS_FILE);
-    $docs = portal_filter_docs_for_user($docs, $me, $PORTAL_CONFIG_JS_FILE, load_doc_visibility($DOC_VIS_FILE));
+    $displayConfig = portal_load_display_config($PORTAL_DISPLAY_CONFIG_FILE);
+    $docs = portal_filter_docs_for_user($docs, $me, $PORTAL_CONFIG_JS_FILE, load_doc_visibility($DOC_VIS_FILE), $displayConfig);
     api_json(['ok' => true, 'docs' => $docs, 'server_time' => now_iso()]);
   }
 
@@ -5180,6 +5451,8 @@ if ($username === '') {
   case 'scan_folders': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
     $me = require_logged_in($store);
+    $displayConfig = portal_load_display_config($PORTAL_DISPLAY_CONFIG_FILE);
+    $allowedExtensions = portal_display_config_enabled_extensions($displayConfig);
 
     // Cache
     $cacheFile = $DATA_DIR . '/scan_cache.json';
@@ -5189,11 +5462,19 @@ if ($username === '') {
       $cacheAge = time() - filemtime($cacheFile);
       if ($cacheAge < $cacheMaxAge) {
         $cached = json_decode(file_get_contents($cacheFile), true);
-        if ($cached) {
+        $cachedExtensions = portal_normalize_extension_list($cached['extension_filter'] ?? []);
+        if ($cached && $cachedExtensions === $allowedExtensions) {
           $rawDocs = is_array($cached['docs'] ?? null) ? $cached['docs'] : [];
           $hidden = load_doc_visibility($DOC_VIS_FILE);
-          $visibleDocs = portal_filter_docs_for_user($rawDocs, $me, $PORTAL_CONFIG_JS_FILE, $hidden);
-          api_json(['ok' => true, 'docs' => $visibleDocs, 'tree' => $cached['tree'] ?? [], 'count' => count($visibleDocs), 'cached' => true]);
+          $visibleDocs = portal_filter_docs_for_user($rawDocs, $me, $PORTAL_CONFIG_JS_FILE, $hidden, $displayConfig);
+          api_json([
+            'ok' => true,
+            'docs' => $visibleDocs,
+            'tree' => $cached['tree'] ?? [],
+            'count' => count($visibleDocs),
+            'cached' => true,
+            'display_config' => portal_display_config_public_payload($displayConfig),
+          ]);
         }
       }
     }
@@ -5403,16 +5684,48 @@ if ($username === '') {
 
     // Helper: extract title from HTML <title> tag
     function extract_title(string $absFile, string $fallback): string {
+      $fallbackTitle = portal_fallback_doc_title($fallback);
+      if (portal_get_doc_extension($absFile) !== 'html') return $fallbackTitle;
       $head = @file_get_contents($absFile, false, null, 0, 2048);
-      if (!$head) return $fallback;
+      if (!$head) return $fallbackTitle;
       if (preg_match('/<title[^>]*>([^<]+)<\/title>/i', $head, $tm)) {
         $raw = html_entity_decode(trim($tm[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $raw = preg_replace('/\s*\|\s*HESEM\s*(OS|QMS)\s*$/i', '', $raw);
         if (preg_match('/^[A-Z0-9-]+\s*[—–-]\s*(.+)$/u', $raw, $tm2)) return $tm2[1];
         return $raw;
       }
-      return $fallback;
+      return $fallbackTitle;
     }
+
+    $append_scanned_doc = function(string $absFile, string $relPath, string $topCat, ?string $subName, string $folderPath) use (&$docs, &$seen, $docOwnerOverrides, $allowedExtensions): bool {
+      $fileName = basename($absFile);
+      $ext = portal_get_doc_extension($fileName);
+      if ($ext === '' || !in_array($ext, $allowedExtensions, true)) return false;
+      if (isset($seen[$relPath])) return false;
+      $seen[$relPath] = true;
+
+      $code = scan_extract_code($fileName);
+      $title = extract_title($absFile, $fileName);
+      $owner = apply_doc_owner_override(derive_owner($fileName), $code, $relPath, $docOwnerOverrides);
+      $smartCat = scan_classify_doc_cat($topCat, $subName, $fileName);
+      $downloadOnly = $ext !== 'html';
+
+      $docs[] = [
+        'code' => $code,
+        'title' => $title,
+        'cat' => $smartCat,
+        'path' => $relPath,
+        'rev' => '0',
+        'status' => 'draft',
+        'owner' => $owner,
+        'folder' => $folderPath,
+        'ext' => $ext,
+        'delivery_mode' => $downloadOnly ? 'download' : 'stream',
+        'portal_behavior' => $downloadOnly ? 'download_on_open' : 'inline',
+        'browser_open_enabled' => !$downloadOnly,
+      ];
+      return true;
+    };
 
     // ═══ SCAN TOP-LEVEL FOLDERS ═══
     $topDirs = @scandir($ROOT_DIR);
@@ -5464,20 +5777,15 @@ if ($username === '') {
                 // Scan files in deep dir
                 $deepFiles = @scandir($deepAbs);
                 if ($deepFiles) foreach ($deepFiles as $fn) {
-                  if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_'||!str_ends_with($fn,'.html')) continue;
+                  if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
                   if (scan_should_skip_filename($fn, $scanExclusions)) continue;
                   if (is_dir($deepAbs.'/'.$fn)) continue;
                   $relPath = $topName.'/'.$subName.'/'.$deepName.'/'.$fn;
-                  if (isset($seen[$fn])) continue;
-                  $seen[$fn] = true;
-                  $code = scan_extract_code($fn);
-                  $title = extract_title($deepAbs.'/'.$fn, $fn);
-                  $owner = apply_doc_owner_override(derive_owner($fn), $code, $relPath, $docOwnerOverrides);
-                  $smartCat = scan_classify_doc_cat($catCode, $subName, $fn);
-                  $docs[] = ['code'=>$code,'title'=>$title,'cat'=>$smartCat,'path'=>$relPath,'rev'=>'0','status'=>'draft','owner'=>$owner,'folder'=>$topName.'/'.$subName.'/'.$deepName];
-                  $deepNode['fileCount']++;
-                  $subNode['fileCount']++;
-                  $topNode['fileCount']++;
+                  if ($append_scanned_doc($deepAbs.'/'.$fn, $relPath, $catCode, $subName, $topName.'/'.$subName.'/'.$deepName)) {
+                    $deepNode['fileCount']++;
+                    $subNode['fileCount']++;
+                    $topNode['fileCount']++;
+                  }
                 }
                 // ═══ LEVEL 4: Scan subdirs of deep dir (e.g. Job-Descriptions/01-JD-Executive/) ═══
                 if ($deepFiles) foreach ($deepFiles as $l4Name) {
@@ -5489,21 +5797,16 @@ if ($username === '') {
                   $l4Node = ['path' => $topName.'/'.$subName.'/'.$deepName.'/'.$l4Name, 'num' => $l4Num, 'name' => $l4Label, 'fileCount' => 0];
                   $l4Files = @scandir($l4Abs);
                   if ($l4Files) foreach ($l4Files as $fn) {
-                    if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_'||!str_ends_with($fn,'.html')) continue;
-                  if (scan_should_skip_filename($fn, $scanExclusions)) continue;
+                    if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
+                    if (scan_should_skip_filename($fn, $scanExclusions)) continue;
                     if (is_dir($l4Abs.'/'.$fn)) continue;
                     $relPath = $topName.'/'.$subName.'/'.$deepName.'/'.$l4Name.'/'.$fn;
-                    if (isset($seen[$fn])) continue;
-                    $seen[$fn] = true;
-                    $code = scan_extract_code($fn);
-                    $title = extract_title($l4Abs.'/'.$fn, $fn);
-                    $owner = apply_doc_owner_override(derive_owner($fn), $code, $relPath, $docOwnerOverrides);
-                    $smartCat = scan_classify_doc_cat($catCode, $subName, $fn);
-                    $docs[] = ['code'=>$code,'title'=>$title,'cat'=>$smartCat,'path'=>$relPath,'rev'=>'0','status'=>'draft','owner'=>$owner,'folder'=>$topName.'/'.$subName.'/'.$deepName.'/'.$l4Name];
-                    $l4Node['fileCount']++;
-                    $deepNode['fileCount']++;
-                    $subNode['fileCount']++;
-                    $topNode['fileCount']++;
+                    if ($append_scanned_doc($l4Abs.'/'.$fn, $relPath, $catCode, $subName, $topName.'/'.$subName.'/'.$deepName.'/'.$l4Name)) {
+                      $l4Node['fileCount']++;
+                      $deepNode['fileCount']++;
+                      $subNode['fileCount']++;
+                      $topNode['fileCount']++;
+                    }
                   }
                   // Always include L4 folders (even empty ones — user may have just created them)
                   if (!isset($deepNode['subs'])) $deepNode['subs'] = [];
@@ -5520,19 +5823,14 @@ if ($username === '') {
           // Scan files directly in this subfolder
           $subFiles = @scandir($subAbs);
           if ($subFiles) foreach ($subFiles as $fn) {
-            if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_'||!str_ends_with($fn,'.html')) continue;
-                  if (scan_should_skip_filename($fn, $scanExclusions)) continue;
+            if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
+            if (scan_should_skip_filename($fn, $scanExclusions)) continue;
             if (is_dir($subAbs.'/'.$fn)) continue;
             $relPath = $topName.'/'.$subName.'/'.$fn;
-            if (isset($seen[$fn])) continue;
-            $seen[$fn] = true;
-            $code = scan_extract_code($fn);
-            $title = extract_title($subAbs.'/'.$fn, $fn);
-            $owner = apply_doc_owner_override(derive_owner($fn), $code, $relPath, $docOwnerOverrides);
-            $smartCat = scan_classify_doc_cat($catCode, $subName, $fn);
-            $docs[] = ['code'=>$code,'title'=>$title,'cat'=>$smartCat,'path'=>$relPath,'rev'=>'0','status'=>'draft','owner'=>$owner,'folder'=>$topName.'/'.$subName];
-            $subNode['fileCount']++;
-            $topNode['fileCount']++;
+            if ($append_scanned_doc($subAbs.'/'.$fn, $relPath, $catCode, $subName, $topName.'/'.$subName)) {
+              $subNode['fileCount']++;
+              $topNode['fileCount']++;
+            }
           }
 
           $topNode['subs'][] = $subNode;
@@ -5543,18 +5841,13 @@ if ($username === '') {
       if (!$hasNumberedSubs) {
         $files = @scandir($topAbs);
         if ($files) foreach ($files as $fn) {
-          if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_'||!str_ends_with($fn,'.html')) continue;
-                  if (scan_should_skip_filename($fn, $scanExclusions)) continue;
+          if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
+          if (scan_should_skip_filename($fn, $scanExclusions)) continue;
           if (is_dir($topAbs.'/'.$fn)) continue;
           $relPath = $topName.'/'.$fn;
-          if (isset($seen[$fn])) continue;
-          $seen[$fn] = true;
-          $code = scan_extract_code($fn);
-          $title = extract_title($topAbs.'/'.$fn, $fn);
-          $owner = apply_doc_owner_override(derive_owner($fn), $code, $relPath, $docOwnerOverrides);
-          $smartCat = scan_classify_doc_cat($catCode, null, $fn);
-          $docs[] = ['code'=>$code,'title'=>$title,'cat'=>$smartCat,'path'=>$relPath,'rev'=>'0','status'=>'draft','owner'=>$owner,'folder'=>$topName];
-          $topNode['fileCount']++;
+          if ($append_scanned_doc($topAbs.'/'.$fn, $relPath, $catCode, null, $topName)) {
+            $topNode['fileCount']++;
+          }
         }
       }
 
@@ -5589,7 +5882,7 @@ if ($username === '') {
     }
     unset($d);
 
-    $docs = array_merge($docs, load_form_control_registry_docs($FORM_CONTROL_REGISTRY_FILE, $ROOT_DIR));
+    $docs = array_merge($docs, load_form_control_registry_docs($FORM_CONTROL_REGISTRY_FILE, $ROOT_DIR, $allowedExtensions));
     $docs = portal_dedupe_docs($docs);
 
     // Sort docs by cat then code
@@ -5667,12 +5960,19 @@ if ($username === '') {
 
     // Cache result
     ensure_dir($DATA_DIR);
-    $cacheData = ['docs' => $docs, 'tree' => $tree];
+    $cacheData = ['docs' => $docs, 'tree' => $tree, 'extension_filter' => $allowedExtensions];
     @file_put_contents($cacheFile, json_encode($cacheData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
 
     $hidden = load_doc_visibility($DOC_VIS_FILE);
-    $visibleDocs = portal_filter_docs_for_user($docs, $me, $PORTAL_CONFIG_JS_FILE, $hidden);
-    api_json(['ok' => true, 'docs' => $visibleDocs, 'tree' => $tree, 'count' => count($visibleDocs), 'cached' => false]);
+    $visibleDocs = portal_filter_docs_for_user($docs, $me, $PORTAL_CONFIG_JS_FILE, $hidden, $displayConfig);
+    api_json([
+      'ok' => true,
+      'docs' => $visibleDocs,
+      'tree' => $tree,
+      'count' => count($visibleDocs),
+      'cached' => false,
+      'display_config' => portal_display_config_public_payload($displayConfig),
+    ]);
   }
 
   case 'form_version_stream': {
@@ -5698,21 +5998,16 @@ if ($username === '') {
       'cat' => 'FRM',
     ];
     $hidden = load_doc_visibility($DOC_VIS_FILE);
+    $displayConfig = portal_load_display_config($PORTAL_DISPLAY_CONFIG_FILE);
     if (!portal_can_access_doc($me, $doc, portal_load_role_docs($PORTAL_CONFIG_JS_FILE), array_values(array_map(function($value) {
       return strtoupper((string)$value);
-    }, $hidden)))) {
+    }, $hidden)), $displayConfig)) {
       api_json(['ok' => false, 'error' => 'forbidden'], 403);
     }
     $resolved = form_resolve_version_for_stream($DATA_DIR, $ROOT_DIR, $formEntry, $id);
     if (!is_array($resolved) || !is_file((string)($resolved['abs'] ?? ''))) api_json(['ok' => false, 'error' => 'not_found'], 404);
     $ext = strtolower((string)($resolved['ext'] ?? ''));
-    $mimeMap = [
-      'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'xlsm' => 'application/vnd.ms-excel.sheet.macroEnabled.12',
-      'xls' => 'application/vnd.ms-excel',
-      'csv' => 'text/csv; charset=utf-8',
-    ];
-    $contentType = $mimeMap[$ext] ?? 'application/octet-stream';
+    $contentType = portal_stream_mime_type($ext);
     if (session_status() === PHP_SESSION_ACTIVE) @session_write_close();
     http_response_code(200);
     header('Content-Type: ' . $contentType);
@@ -5748,7 +6043,10 @@ if ($username === '') {
       api_json(['ok' => false, 'error' => 'invalid_path'], 400);
     }
 
-    if (!portal_allowed_stream_extension($relPath)) api_json(['ok' => false, 'error' => 'unsupported_type'], 403);
+    $displayConfig = portal_load_display_config($PORTAL_DISPLAY_CONFIG_FILE);
+    if (!portal_allowed_stream_extension($relPath) || !portal_doc_extension_is_enabled(portal_get_doc_extension($relPath), $displayConfig)) {
+      api_json(['ok' => false, 'error' => 'unsupported_type'], 403);
+    }
     if (!is_file($absPath) || !is_inside_root($absPath, $ROOT_DIR)) api_json(['ok' => false, 'error' => 'not_found'], 404);
 
     $allDocs = [];
@@ -5757,7 +6055,11 @@ if ($username === '') {
       $cached = json_decode((string)@file_get_contents($cacheFile), true);
       if (is_array($cached['docs'] ?? null)) $allDocs = $cached['docs'];
     }
-    $allDocs = array_merge($allDocs, load_custom_docs($CUSTOM_DOCS_FILE), load_form_control_registry_docs($FORM_CONTROL_REGISTRY_FILE, $ROOT_DIR));
+    $allDocs = array_merge(
+      $allDocs,
+      load_custom_docs($CUSTOM_DOCS_FILE),
+      load_form_control_registry_docs($FORM_CONTROL_REGISTRY_FILE, $ROOT_DIR, portal_display_config_enabled_extensions($displayConfig))
+    );
     $allDocs = portal_dedupe_docs($allDocs);
 
     $requestedCode = strtoupper(trim((string)($_GET['code'] ?? '')));
@@ -5788,27 +6090,13 @@ if ($username === '') {
     $hidden = load_doc_visibility($DOC_VIS_FILE);
     if (!portal_can_access_doc($me, $doc, portal_load_role_docs($PORTAL_CONFIG_JS_FILE), array_values(array_map(function($value) {
       return strtoupper((string)$value);
-    }, $hidden)))) {
+    }, $hidden)), $displayConfig)) {
       api_json(['ok' => false, 'error' => 'forbidden'], 403);
     }
 
     $ext = strtolower(pathinfo($relPath, PATHINFO_EXTENSION));
-    $mimeMap = [
-      'html' => 'text/html; charset=utf-8',
-      'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'xlsm' => 'application/vnd.ms-excel.sheet.macroEnabled.12',
-      'xls' => 'application/vnd.ms-excel',
-      'csv' => 'text/csv; charset=utf-8',
-      'svg' => 'image/svg+xml',
-      'png' => 'image/png',
-      'jpg' => 'image/jpeg',
-      'jpeg' => 'image/jpeg',
-      'gif' => 'image/gif',
-      'webp' => 'image/webp',
-      'css' => 'text/css; charset=utf-8',
-    ];
-    $contentType = $mimeMap[$ext] ?? 'application/octet-stream';
-    $asAttachment = isset($_GET['download']) || in_array($ext, ['xlsx','xlsm','xls','csv'], true);
+    $contentType = portal_stream_mime_type($ext);
+    $asAttachment = isset($_GET['download']) || !portal_stream_can_inline($ext);
 
     if (session_status() === PHP_SESSION_ACTIVE) @session_write_close();
     http_response_code(200);

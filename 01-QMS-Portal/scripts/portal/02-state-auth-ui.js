@@ -48,6 +48,7 @@ function resetPortalToLogin(options={}){
   const preserveUsername = opts.preserveUsername !== false;
 
   clearPendingAuthTimer();
+  try{ if(typeof stopLiveDocsSync==='function') stopLiveDocsSync(); }catch(e){}
   currentUser = null;
   csrfToken = null;
   enrollInfo = null;
@@ -168,6 +169,306 @@ async function loadDocVisibilityFromServer(){
 async function saveDocVisibilityToServer(){
   const hidden = Array.from(HIDDEN_DOCS || []);
   return await apiCall('admin_docs_visibility_save', {hidden});
+}
+
+const PORTAL_DISPLAY_BUILTIN_EXTENSIONS = Object.freeze(['html','pdf','doc','docx','docm','xls','xlsx','xlsm','xlsb','csv','ppt','pptx','pptm']);
+let PORTAL_DISPLAY_CONFIG = createDefaultPortalDisplayConfig();
+let PORTAL_DISPLAY_CONFIG_DRAFT = null;
+let portalDisplayConfigDirty = false;
+let portalDisplayConfigHydrated = false;
+let portalDisplayConfigLoadPromise = null;
+
+function createDefaultPortalDisplayConfig(){
+  return {
+    extensions: {
+      builtin: [...PORTAL_DISPLAY_BUILTIN_EXTENSIONS],
+      custom: [],
+      known: [...PORTAL_DISPLAY_BUILTIN_EXTENSIONS],
+      enabled: [...PORTAL_DISPLAY_BUILTIN_EXTENSIONS]
+    },
+    sidebar: {
+      hidden_core_items: [],
+      hidden_sections: [],
+      hidden_categories: []
+    }
+  };
+}
+
+function normalizePortalDisplayExt(value){
+  return String(value||'').trim().toLowerCase().replace(/^\./,'').replace(/[^a-z0-9]+/g,'').slice(0,16);
+}
+
+function normalizePortalDisplayLowerList(values){
+  const out = [];
+  const seen = new Set();
+  (Array.isArray(values) ? values : []).forEach(value => {
+    const token = String(value||'').trim().toLowerCase().replace(/[^a-z0-9_-]+/g,'');
+    if(!token || seen.has(token)) return;
+    seen.add(token);
+    out.push(token);
+  });
+  return out;
+}
+
+function normalizePortalDisplayUpperList(values){
+  const out = [];
+  const seen = new Set();
+  (Array.isArray(values) ? values : []).forEach(value => {
+    const token = String(value||'').trim().toUpperCase().replace(/[^A-Z0-9_-]+/g,'');
+    if(!token || seen.has(token)) return;
+    seen.add(token);
+    out.push(token);
+  });
+  return out;
+}
+
+function sanitizePortalDisplayConfig(config){
+  const base = createDefaultPortalDisplayConfig();
+  const builtin = [...PORTAL_DISPLAY_BUILTIN_EXTENSIONS];
+  const custom = [];
+  const customSeen = new Set();
+  (Array.isArray(config?.extensions?.custom) ? config.extensions.custom : []).forEach(value => {
+    const ext = normalizePortalDisplayExt(value);
+    if(!ext || customSeen.has(ext) || builtin.includes(ext)) return;
+    customSeen.add(ext);
+    custom.push(ext);
+  });
+  const known = [...builtin, ...custom];
+  const enabledTokens = new Set((Array.isArray(config?.extensions?.enabled) ? config.extensions.enabled : builtin).map(normalizePortalDisplayExt).filter(Boolean));
+  const enabled = known.filter(ext => enabledTokens.has(ext));
+  const hiddenCoreItems = normalizePortalDisplayLowerList(config?.sidebar?.hidden_core_items).filter(id => id !== 'admin');
+  return {
+    extensions: {
+      builtin,
+      custom,
+      known,
+      enabled
+    },
+    sidebar: {
+      hidden_core_items: hiddenCoreItems,
+      hidden_sections: normalizePortalDisplayLowerList(config?.sidebar?.hidden_sections),
+      hidden_categories: normalizePortalDisplayUpperList(config?.sidebar?.hidden_categories)
+    }
+  };
+}
+
+function portalDisplayConfigFingerprint(config){
+  try{ return JSON.stringify(sanitizePortalDisplayConfig(config)); }catch(e){ return String(Date.now()); }
+}
+
+function applyPortalDisplayConfig(config, options={}){
+  const next = sanitizePortalDisplayConfig(config);
+  const changed = portalDisplayConfigFingerprint(next) !== portalDisplayConfigFingerprint(PORTAL_DISPLAY_CONFIG);
+  PORTAL_DISPLAY_CONFIG = next;
+  portalDisplayConfigHydrated = true;
+  if(!portalDisplayConfigDirty || options.forceDraftSync){
+    PORTAL_DISPLAY_CONFIG_DRAFT = sanitizePortalDisplayConfig(next);
+    portalDisplayConfigDirty = false;
+  }
+  try{
+    if(currentPage === 'documents' && currentFilter && !isPortalSidebarCategoryVisible(currentFilter)){
+      currentFilter = '';
+    }
+  }catch(e){}
+  return changed;
+}
+
+function ensurePortalDisplayConfigDraft(){
+  if(!PORTAL_DISPLAY_CONFIG_DRAFT){
+    PORTAL_DISPLAY_CONFIG_DRAFT = sanitizePortalDisplayConfig(PORTAL_DISPLAY_CONFIG);
+  }
+  return PORTAL_DISPLAY_CONFIG_DRAFT;
+}
+
+async function loadPortalDisplayConfigFromServer(options={}){
+  if(!isAdmin()) return PORTAL_DISPLAY_CONFIG;
+  if(portalDisplayConfigLoadPromise && !options.force){
+    return portalDisplayConfigLoadPromise;
+  }
+  if(portalDisplayConfigHydrated && !options.force){
+    return PORTAL_DISPLAY_CONFIG;
+  }
+  const shouldSyncDraft = !!options.forceDraftSync || !portalDisplayConfigDirty;
+  portalDisplayConfigLoadPromise = (async () => {
+    try{
+      const res = await apiCall('admin_portal_display_config_get', null, 'GET');
+      if(res && res.ok && res.config){
+        applyPortalDisplayConfig(res.config, {forceDraftSync: shouldSyncDraft});
+        if(currentPage === 'admin' && adminTab === 'portal_display'){
+          renderAdminPortalDisplay();
+        }else{
+          try{ renderSidebar(); }catch(e){}
+        }
+      }else if(!options.silent){
+        showToast('⚠ ' + ((res && res.error) ? res.error : (lang==='en'?'display_config_load_failed':'Khong tai duoc cau hinh hien thi portal')));
+      }
+    }catch(e){
+      if(!options.silent){
+        showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en'?'display_config_load_failed':'Khong tai duoc cau hinh hien thi portal')));
+      }
+    }finally{
+      portalDisplayConfigLoadPromise = null;
+    }
+    return PORTAL_DISPLAY_CONFIG;
+  })();
+  return portalDisplayConfigLoadPromise;
+}
+
+function portalSidebarCoreItems(){
+  return [
+    {id:'dashboard', icon:'🏠', label:lang==='en'?'Dashboard':'Dashboard'},
+    {id:'documents', icon:'📁', label:lang==='en'?'All documents':'Tất cả tài liệu'},
+    {id:'search', icon:'🔍', label:lang==='en'?'Search':'Tìm kiếm'},
+    {id:'dictionary', icon:'📖', label:lang==='en'?'Dictionary':'Từ điển thuật ngữ'},
+    {id:'deploy', icon:'🚀', label:lang==='en'?'Operations deploy':'Triển khai vận hành'},
+    {id:'admin', icon:'⚙', label:'Admin', locked:true},
+  ];
+}
+
+function portalSidebarSections(){
+  return [
+    {id:'system', label:lang==='en'?'System documents':'Tài liệu hệ thống'},
+    {id:'ops', label:lang==='en'?'Operational documents':'Tài liệu vận hành'},
+    {id:'train', label:lang==='en'?'Training & competency':'Đào tạo & năng lực'}
+  ];
+}
+
+function portalSidebarCategoryItems(){
+  return (Array.isArray(CATEGORIES) ? CATEGORIES : []).filter(cat => cat && !cat.hidden).map(cat => ({
+    id: String(cat.id||'').toUpperCase(),
+    icon: cat.icon || '•',
+    label: (typeof catLabel === 'function') ? catLabel(cat) : String(cat.label || cat.id || ''),
+    section: String(cat.section || '').toLowerCase()
+  }));
+}
+
+function isPortalSidebarCoreVisible(id){
+  const key = String(id||'').toLowerCase();
+  if(key === 'admin') return true;
+  return !((PORTAL_DISPLAY_CONFIG?.sidebar?.hidden_core_items || []).includes(key));
+}
+
+function isPortalSidebarSectionVisible(id){
+  const key = String(id||'').toLowerCase();
+  return !((PORTAL_DISPLAY_CONFIG?.sidebar?.hidden_sections || []).includes(key));
+}
+
+function isPortalSidebarCategoryVisible(id){
+  const key = String(id||'').toUpperCase();
+  return !((PORTAL_DISPLAY_CONFIG?.sidebar?.hidden_categories || []).includes(key));
+}
+
+function setPortalDisplayConfigDirty(value){
+  portalDisplayConfigDirty = !!value;
+  const bar = document.getElementById('portal-display-save-bar');
+  if(bar) bar.style.display = portalDisplayConfigDirty ? 'flex' : 'none';
+}
+
+function setPortalDisplayCoreItemVisible(id, visible){
+  const draft = ensurePortalDisplayConfigDraft();
+  const key = String(id||'').toLowerCase();
+  if(key === 'admin') return;
+  const hidden = new Set(draft.sidebar.hidden_core_items || []);
+  if(visible) hidden.delete(key); else hidden.add(key);
+  draft.sidebar.hidden_core_items = Array.from(hidden);
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function setPortalDisplaySectionVisible(id, visible){
+  const draft = ensurePortalDisplayConfigDraft();
+  const key = String(id||'').toLowerCase();
+  const hidden = new Set(draft.sidebar.hidden_sections || []);
+  if(visible) hidden.delete(key); else hidden.add(key);
+  draft.sidebar.hidden_sections = Array.from(hidden);
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function setPortalDisplayCategoryVisible(id, visible){
+  const draft = ensurePortalDisplayConfigDraft();
+  const key = String(id||'').toUpperCase();
+  const hidden = new Set(draft.sidebar.hidden_categories || []);
+  if(visible) hidden.delete(key); else hidden.add(key);
+  draft.sidebar.hidden_categories = Array.from(hidden);
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function setPortalDisplayExtensionVisible(ext, visible){
+  const draft = ensurePortalDisplayConfigDraft();
+  const key = normalizePortalDisplayExt(ext);
+  if(!key) return;
+  const enabled = new Set(draft.extensions.enabled || []);
+  if(visible) enabled.add(key); else enabled.delete(key);
+  draft.extensions.enabled = draft.extensions.known.filter(item => enabled.has(item));
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function removePortalDisplayCustomExtension(ext){
+  const draft = ensurePortalDisplayConfigDraft();
+  const key = normalizePortalDisplayExt(ext);
+  if(!key) return;
+  draft.extensions.custom = (draft.extensions.custom || []).filter(item => item !== key);
+  draft.extensions.known = draft.extensions.builtin.concat(draft.extensions.custom);
+  draft.extensions.enabled = (draft.extensions.enabled || []).filter(item => item !== key);
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function addPortalDisplayCustomExtension(){
+  const input = document.getElementById('portal-display-new-ext');
+  const ext = normalizePortalDisplayExt(input ? input.value : '');
+  if(!ext){
+    showToast(lang==='en'?'⚠ Enter a valid extension':'⚠ Nhập đuôi file hợp lệ');
+    return;
+  }
+  const draft = ensurePortalDisplayConfigDraft();
+  if((draft.extensions.known || []).includes(ext)){
+    showToast(lang==='en'?'ℹ Extension already exists':'ℹ Đuôi file đã tồn tại');
+    return;
+  }
+  draft.extensions.custom = [...(draft.extensions.custom || []), ext];
+  draft.extensions.known = draft.extensions.builtin.concat(draft.extensions.custom);
+  draft.extensions.enabled = [...(draft.extensions.enabled || []), ext];
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function resetPortalDisplayConfigDraft(){
+  PORTAL_DISPLAY_CONFIG_DRAFT = sanitizePortalDisplayConfig(PORTAL_DISPLAY_CONFIG);
+  setPortalDisplayConfigDirty(false);
+  renderAdminPortalDisplay();
+}
+
+async function savePortalDisplayConfig(){
+  if(!isAdmin()) return;
+  const draft = sanitizePortalDisplayConfig(ensurePortalDisplayConfigDraft());
+  const current = sanitizePortalDisplayConfig(PORTAL_DISPLAY_CONFIG);
+  const extensionsChanged = JSON.stringify(draft.extensions) !== JSON.stringify(current.extensions);
+  try{
+    const res = await apiCall('admin_portal_display_config_save', {config: draft});
+    if(!(res && res.ok && res.config)){
+      showToast('⚠ ' + ((res && res.error) ? res.error : 'save_failed'));
+      return;
+    }
+    applyPortalDisplayConfig(res.config, {forceDraftSync:true});
+    if(extensionsChanged && typeof rescanDocs === 'function'){
+      await rescanDocs();
+    }else{
+      try{ renderSidebar(); }catch(e){}
+      try{
+        if(currentPage==='documents' && typeof renderDocuments==='function') renderDocuments();
+        if(currentPage==='search' && typeof renderSearch==='function') renderSearch();
+        if(currentPage==='dashboard' && typeof renderDashboard==='function') renderDashboard();
+      }catch(e){}
+    }
+    showToast(lang==='en'?'✅ Portal display settings saved':'✅ Đã lưu cấu hình hiển thị portal');
+    if(currentPage === 'admin') renderAdmin();
+  }catch(e){
+    showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en'?'Server error':'Lỗi server')));
+  }
 }
 
 
@@ -550,6 +851,7 @@ async function doLogout(){
 
   csrfToken = null;
   currentUser = null;
+  try{ if(typeof stopLiveDocsSync==='function') stopLiveDocsSync(); }catch(e){}
 
   document.getElementById('app').classList.remove('active');
   document.getElementById('login-screen').style.display = 'flex';
@@ -789,6 +1091,7 @@ async function showApp(){
   syncSidebarToggleState();
   navigateTo('dashboard');
   loadUsersFromServerIfAdmin();
+  try{ if(typeof startLiveDocsSync==='function') startLiveDocsSync(); }catch(e){}
 }
 
 // Auth flow hardening override:
@@ -1008,25 +1311,36 @@ function renderSidebar(){
   const nav = document.getElementById('sidebar-nav');
   const VDOCS = getVisibleDocs();
 
-  const SIDEBAR_SECTIONS = [
-    {id:'system', label:lang==='en'?'System Documents':'Tài liệu hệ thống'},
-    {id:'ops',    label:lang==='en'?'Operational Documents':'Tài liệu vận hành'},
-    {id:'train',  label:lang==='en'?'Training & Competency':'Đào tạo & Năng lực'}
-  ];
+  const SIDEBAR_SECTIONS = portalSidebarSections();
+  const coreButtons = [];
 
-  let html = `<div class="nav-section">
-    <button class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="navigateTo('dashboard')"><span class="icon">&#127968;</span><span>${T('dashboard')}</span></button>
-    <button class="nav-item ${currentPage==='documents'?'active':''}" onclick="navigateTo('documents')"><span class="icon">&#128193;</span><span>${T('all_docs')}</span><span class="badge">${VDOCS.length}</span></button>
-    <button class="nav-item ${currentPage==='search'?'active':''}" onclick="navigateTo('search')"><span class="icon">&#128269;</span><span>${T('search')}</span></button>
-    <button class="nav-item ${currentPage==='dictionary'?'active':''}" onclick="navigateTo('dictionary')"><span class="icon">&#128214;</span><span>${T('dictionary')}</span><span class="badge" id="dict-badge">${dictData ? dictData.length.toLocaleString() : '...'}</span></button>
-  </div>
-  <div class="nav-section"><div class="nav-section-title">${lang==='en'?'DEPLOYMENT':'TRIỂN KHAI VẬN HÀNH'}</div>
-    <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">&#128640;</span><span>${lang==='en'?'Operations Deploy':'Triển khai vận hành'}</span></button>
-  </div>
-  ${(isAdmin()) ? '<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item '+(currentPage==='admin'?'active':'')+'" onclick="navigateTo(\'admin\')"><span class="icon">&#9881;</span><span>'+T('admin_panel')+'</span></button></div>' : ''}`;
+  if(isPortalSidebarCoreVisible('dashboard')){
+    coreButtons.push(`<button class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="navigateTo('dashboard')"><span class="icon">🏠</span><span>${T('dashboard')}</span></button>`);
+  }
+  if(isPortalSidebarCoreVisible('documents')){
+    coreButtons.push(`<button class="nav-item ${currentPage==='documents'?'active':''}" onclick="navigateTo('documents')"><span class="icon">📁</span><span>${T('all_docs')}</span><span class="badge">${VDOCS.length}</span></button>`);
+  }
+  if(isPortalSidebarCoreVisible('search')){
+    coreButtons.push(`<button class="nav-item ${currentPage==='search'?'active':''}" onclick="navigateTo('search')"><span class="icon">🔍</span><span>${T('search')}</span></button>`);
+  }
+  if(isPortalSidebarCoreVisible('dictionary')){
+    coreButtons.push(`<button class="nav-item ${currentPage==='dictionary'?'active':''}" onclick="navigateTo('dictionary')"><span class="icon">📖</span><span>${T('dictionary')}</span><span class="badge" id="dict-badge">${dictData ? dictData.length.toLocaleString() : '...'}</span></button>`);
+  }
+
+  let html = coreButtons.length ? `<div class="nav-section">${coreButtons.join('')}</div>` : '';
+
+  if(isPortalSidebarCoreVisible('deploy')){
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'DEPLOYMENT':'TRIỂN KHAI VẬN HÀNH'}</div>
+      <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">🚀</span><span>${lang==='en'?'Operations Deploy':'Triển khai vận hành'}</span></button>
+    </div>`;
+  }
+  if(isAdmin() && isPortalSidebarCoreVisible('admin')){
+    html += `<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item ${currentPage==='admin'?'active':''}" onclick="navigateTo('admin')"><span class="icon">⚙</span><span>${T('admin_panel')}</span></button></div>`;
+  }
 
   SIDEBAR_SECTIONS.forEach(sec => {
-    const catsInSec = CATEGORIES.filter(c => !c.hidden && c.section === sec.id && VDOCS.some(d => d.cat === c.id));
+    if(!isPortalSidebarSectionVisible(sec.id)) return;
+    const catsInSec = CATEGORIES.filter(c => !c.hidden && isPortalSidebarCategoryVisible(c.id) && c.section === sec.id && VDOCS.some(d => d.cat === c.id));
     if(catsInSec.length === 0) return;
     html += `<div class="nav-section"><div class="nav-section-title">${sec.label}</div>`;
     catsInSec.forEach(cat => {
@@ -1085,8 +1399,10 @@ function isDownloadOnlyDoc(doc){
   try{
     if(!doc) return false;
     if(doc.delivery_mode === 'download' || doc.portal_behavior === 'download_on_open') return true;
-    if(/^(xlsx|xlsm|xls|csv)$/i.test(String(doc.ext||''))) return true;
-    return /\.(xlsx|xlsm|xls|csv)$/i.test(String(doc.path||''));
+    const ext = String(doc.ext||'').trim().toLowerCase();
+    if(ext) return ext !== 'html';
+    const match = String(doc.path||'').match(/\.([a-z0-9]+)$/i);
+    return !!(match && String(match[1]||'').toLowerCase() !== 'html');
   }catch(e){ return false; }
 }
 
@@ -4162,6 +4478,7 @@ function renderAdmin(){
       <button class="admin-tab-v2 ${adminTab==='perms'?'active':''}" onclick="adminTab='perms';renderAdmin()">🔐 ${T('admin_perms')}</button>
       <button class="admin-tab-v2 ${adminTab==='activity'?'active':''}" onclick="adminTab='activity';renderAdmin()" ${canViewActivityLog()?'':'style="display:none"'}>📊 ${lang==='en'?'Activity Log':'Kiểm soát hành vi'} <span class="tab-badge">${ACTIVITY_LOG.length}</span></button>
       <button class="admin-tab-v2 ${adminTab==='docs'?'active':''}" onclick="adminTab='docs';renderAdmin()">📄 ${T('admin_effective_docs')}</button>
+      <button class="admin-tab-v2 ${adminTab==='portal_display'?'active':''}" onclick="adminTab='portal_display';renderAdmin()">🧭 ${lang==='en'?'Portal display':'Hiển thị portal'}</button>
       <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()">📋 ${lang==='en'?'Retention':'Lưu giữ'}</button>
     </div>
     <div class="admin-panel" id="admin-content"></div>`;
@@ -4172,7 +4489,143 @@ function renderAdmin(){
   if(adminTab==='orgchart') renderAdminOrgChart();
   if(adminTab==='activity') renderAdminActivity();
   if(adminTab==='docs') renderAdminEffectiveDocs();
+  if(adminTab==='portal_display'){
+    renderAdminPortalDisplay();
+    loadPortalDisplayConfigFromServer({silent:true});
+  }
   if(adminTab==='retention') renderAdminRetention();
+}
+
+function renderAdminPortalDisplay(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+
+  const draft = ensurePortalDisplayConfigDraft();
+  const isLoadingConfig = !portalDisplayConfigHydrated && !!portalDisplayConfigLoadPromise;
+  const enabledExt = new Set(draft.extensions.enabled || []);
+  const customExt = new Set(draft.extensions.custom || []);
+  const coreHidden = new Set(draft.sidebar.hidden_core_items || []);
+  const sectionHidden = new Set(draft.sidebar.hidden_sections || []);
+  const catHidden = new Set(draft.sidebar.hidden_categories || []);
+
+  const extRows = (draft.extensions.known || []).map(ext => {
+    const checked = enabledExt.has(ext) ? 'checked' : '';
+    const typeLabel = ext === 'html'
+      ? (lang==='en' ? 'Inline page' : 'Trang HTML hiển thị trực tiếp')
+      : (lang==='en' ? 'Controlled download / file stream' : 'Tệp được quản lý và tải qua portal');
+    const sourceLabel = customExt.has(ext)
+      ? (lang==='en' ? 'Custom' : 'Tự thêm')
+      : (lang==='en' ? 'Built-in' : 'Mặc định');
+    const removeBtn = customExt.has(ext)
+      ? `<button class="btn-admin secondary portal-display-mini-btn" onclick="removePortalDisplayCustomExtension('${ext}')">${lang==='en'?'Remove':'Xóa'}</button>`
+      : `<span class="portal-display-chip is-static">${sourceLabel}</span>`;
+    return `<div class="portal-display-row">
+      <label class="portal-display-check">
+        <input type="checkbox" ${checked} onchange="setPortalDisplayExtensionVisible('${ext}', this.checked)">
+        <span class="portal-display-check-copy">
+          <b>.${ext}</b>
+          <small>${typeLabel}</small>
+        </span>
+      </label>
+      <div class="portal-display-row-actions">
+        <span class="portal-display-chip">${sourceLabel}</span>
+        ${removeBtn}
+      </div>
+    </div>`;
+  }).join('');
+
+  const coreRows = portalSidebarCoreItems().map(item => {
+    const visible = item.locked ? true : !coreHidden.has(item.id);
+    const checked = visible ? 'checked' : '';
+    const disabled = item.locked ? 'disabled' : '';
+    const note = item.locked
+      ? (lang==='en' ? 'Always visible for admin access' : 'Luôn hiện để bảo toàn đường vào trang quản trị')
+      : '';
+    return `<label class="portal-display-option">
+      <input type="checkbox" ${checked} ${disabled} onchange="setPortalDisplayCoreItemVisible('${item.id}', this.checked)">
+      <span class="portal-display-option-copy">
+        <b>${item.icon} ${item.label}</b>
+        ${note ? `<small>${note}</small>` : ''}
+      </span>
+    </label>`;
+  }).join('');
+
+  const sectionRows = portalSidebarSections().map(section => {
+    const visible = !sectionHidden.has(section.id);
+    const checked = visible ? 'checked' : '';
+    const categories = portalSidebarCategoryItems().filter(cat => cat.section === section.id).map(cat => {
+      const catChecked = !catHidden.has(cat.id) ? 'checked' : '';
+      return `<label class="portal-display-option is-compact">
+        <input type="checkbox" ${catChecked} onchange="setPortalDisplayCategoryVisible('${cat.id}', this.checked)">
+        <span class="portal-display-option-copy"><b>${cat.icon} ${cat.label}</b><small>${cat.id}</small></span>
+      </label>`;
+    }).join('');
+    return `<div class="portal-display-section-card">
+      <label class="portal-display-option portal-display-section-head">
+        <input type="checkbox" ${checked} onchange="setPortalDisplaySectionVisible('${section.id}', this.checked)">
+        <span class="portal-display-option-copy">
+          <b>${section.label}</b>
+          <small>${lang==='en'?'Show or hide this whole group in the left sidebar.':'Bật hoặc ẩn cả nhóm này trên thanh bên trái.'}</small>
+        </span>
+      </label>
+      <div class="portal-display-option-grid">${categories}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="portal-display-admin">
+      <div class="portal-display-hero">
+        <div>
+          <div class="portal-display-kicker">${lang==='en'?'Portal display control':'Điều khiển hiển thị portal'}</div>
+          <h3>${lang==='en'?'Choose what the portal shows':'Chọn những gì portal được hiển thị'}</h3>
+          <p>${lang==='en'
+            ? 'Control which file extensions are indexed on the portal, add extra extensions when needed, and decide which left-sidebar items remain visible to users.'
+            : 'Quản lý các đuôi file được index trên portal, thêm đuôi mới khi cần, và chọn các mục nào ở thanh bên trái sẽ xuất hiện với người dùng.'}</p>
+          ${isLoadingConfig ? `<div class="portal-display-loading-note">${lang==='en'?'Loading saved configuration from server...':'Đang tải cấu hình hiển thị đã lưu từ server...'}</div>` : ''}
+        </div>
+      </div>
+
+      <div class="portal-display-grid">
+        <section class="portal-display-card">
+          <div class="portal-display-card-head">
+            <div>
+              <h4>${lang==='en'?'Displayed file extensions':'Đuôi file hiển thị'}</h4>
+              <p>${lang==='en'
+                ? 'Only enabled extensions are scanned from server folders and shown on the portal. Non-HTML extensions open through controlled download mode.'
+                : 'Chỉ các đuôi file đang bật mới được scan từ thư mục server và hiển thị lên portal. Các đuôi không phải HTML sẽ mở qua chế độ tải tệp được kiểm soát.'}</p>
+            </div>
+          </div>
+          <div class="portal-display-add-row">
+            <input id="portal-display-new-ext" class="portal-display-input" placeholder="${lang==='en'?'Add extension, e.g. dwg or msg':'Thêm đuôi file, ví dụ dwg hoặc msg'}">
+            <button class="btn-admin primary" onclick="addPortalDisplayCustomExtension()">${lang==='en'?'Add extension':'Thêm đuôi file'}</button>
+          </div>
+          <div class="portal-display-list">${extRows || `<div class="portal-display-empty">${lang==='en'?'No extensions configured.':'Chưa có đuôi file nào được cấu hình.'}</div>`}</div>
+        </section>
+
+        <section class="portal-display-card">
+          <div class="portal-display-card-head">
+            <div>
+              <h4>${lang==='en'?'Left sidebar visibility':'Hiển thị thanh bên trái'}</h4>
+              <p>${lang==='en'
+                ? 'Choose which fixed portal entries and category groups should appear in the left navigation.'
+                : 'Chọn các mục cố định và các nhóm tài liệu nào sẽ xuất hiện ở thanh điều hướng bên trái.'}</p>
+            </div>
+          </div>
+          <div class="portal-display-subtitle">${lang==='en'?'Core portal items':'Mục lõi của portal'}</div>
+          <div class="portal-display-option-grid">${coreRows}</div>
+          <div class="portal-display-subtitle" style="margin-top:16px">${lang==='en'?'Document groups and categories':'Nhóm tài liệu và chuyên mục'}</div>
+          <div class="portal-display-section-stack">${sectionRows}</div>
+        </section>
+      </div>
+
+      <div class="admin-save-bar" id="portal-display-save-bar" style="${portalDisplayConfigDirty?'display:flex':'display:none'}">
+        <span class="save-hint">${portalDisplayConfigDirty
+          ? `<b>⚠ ${lang==='en'?'Unsaved portal display changes':'Có thay đổi hiển thị portal chưa lưu'}</b>`
+          : (lang==='en'?'Adjust the display configuration, then click Save':'Điều chỉnh cấu hình hiển thị rồi nhấn Lưu')}</span>
+        <button class="btn-admin secondary" onclick="resetPortalDisplayConfigDraft()">↩ ${lang==='en'?'Reset draft':'Khôi phục bản nháp'}</button>
+        <button class="btn-admin primary" onclick="savePortalDisplayConfig()" style="padding:8px 24px;font-size:13px">💾 ${lang==='en'?'SAVE':'LƯU'}</button>
+      </div>
+    </div>`;
 }
 
 function renderAdminUsers(){

@@ -1227,6 +1227,123 @@ function resetCustomIcon(type,id){
 // ═══════════════════════════════════════════════════
 let DOCS = []; // Populated dynamically from api.php?action=scan_folders
 let DOCS_LOADED = false;
+const LIVE_DOCS_SYNC_INTERVAL_MS = 10000;
+let liveDocsSyncTimer = null;
+let liveDocsSyncInFlight = false;
+let lastDocsSyncFingerprint = '';
+
+function flattenTreeForSyncFingerprint(nodes, bucket=[]){
+  (Array.isArray(nodes) ? nodes : []).forEach(node => {
+    if(!node) return;
+    bucket.push([
+      String(node.path || ''),
+      String(node.num ?? ''),
+      String(node.fileCount ?? ''),
+      String(node.cat || ''),
+      String(node.name || '')
+    ].join('|'));
+    if(Array.isArray(node.subs) && node.subs.length){
+      flattenTreeForSyncFingerprint(node.subs, bucket);
+    }
+  });
+  return bucket;
+}
+
+function buildDocsSyncFingerprint(docs, tree){
+  try{
+    const docFingerprint = (Array.isArray(docs) ? docs : []).map(doc => ([
+      String(doc?.code || ''),
+      String(doc?.path || ''),
+      String(doc?.folder || ''),
+      String(doc?.ext || ''),
+      String(doc?.rev || ''),
+      String(doc?.status || ''),
+      String(doc?.delivery_mode || ''),
+      String(doc?.portal_behavior || ''),
+      doc?.browser_open_enabled ? '1' : '0'
+    ]).join('|')).join('||');
+    const treeFingerprint = flattenTreeForSyncFingerprint(tree, []).join('||');
+    return docFingerprint + '###' + treeFingerprint;
+  }catch(e){
+    return String(Date.now());
+  }
+}
+
+function refreshPortalDocsUiAfterSync(){
+  try{ renderSidebar(); }catch(e){}
+  try{ if(typeof syncSidebarToggleState==='function') syncSidebarToggleState(); }catch(e){}
+  try{
+    if(currentPage==='dashboard' && typeof renderDashboard==='function') renderDashboard();
+    if(currentPage==='documents' && typeof renderDocuments==='function') renderDocuments();
+    if(currentPage==='search' && typeof renderSearch==='function') renderSearch();
+    if(currentPage==='dictionary' && typeof renderDictionary==='function') renderDictionary();
+    if(currentPage==='access' && typeof renderAccessMatrix==='function') renderAccessMatrix();
+    if(currentPage==='admin' && typeof renderAdmin==='function') renderAdmin();
+    if(currentPage==='deploy' && typeof renderDeployDashboard==='function') renderDeployDashboard();
+  }catch(e){}
+  try{
+    const dv = document.getElementById('doc-viewer');
+    if(dv && dv.classList.contains('active') && currentDoc){
+      const doc = DOCS.find(d => String(d?.code || '') === String(currentDoc));
+      if(doc){
+        if(typeof updateDocViewerHeader==='function') updateDocViewerHeader(doc);
+        if(typeof renderWorkflowPanel==='function') renderWorkflowPanel(doc);
+        if(typeof renderVersionHistory==='function') renderVersionHistory(doc);
+        if(!editMode && typeof loadDocContent==='function') loadDocContent(currentDoc);
+      }
+    }
+  }catch(e){}
+}
+
+function applyDocsTreeResponse(res, options={}){
+  if(!(res && res.ok && Array.isArray(res.docs))) return null;
+  const nextDocs = Array.isArray(res.docs) ? res.docs : [];
+  const nextTree = Array.isArray(res.tree) ? res.tree : [];
+  const nextFingerprint = buildDocsSyncFingerprint(nextDocs, nextTree);
+  let configChanged = false;
+  try{
+    if(res.display_config && typeof applyPortalDisplayConfig === 'function'){
+      configChanged = !!applyPortalDisplayConfig(res.display_config);
+    }
+  }catch(e){}
+  const changed = nextFingerprint !== lastDocsSyncFingerprint || configChanged;
+
+  DOCS = nextDocs;
+  DOCS_LOADED = true;
+  FOLDER_TREE = nextTree;
+  buildDynamicFolderStructure();
+  lastDocsSyncFingerprint = nextFingerprint;
+
+  if(options.refreshUi && (changed || options.forceUiRefresh)){
+    refreshPortalDocsUiAfterSync();
+  }
+
+  console.log('[QMS] Loaded ' + DOCS.length + ' documents from server' + (res.cached ? ' (cached)' : '') + ', tree: ' + FOLDER_TREE.length + ' nodes');
+  return {changed, count: DOCS.length, cached: !!res.cached};
+}
+
+function shouldPauseLiveDocsSync(){
+  try{
+    const app = document.getElementById('app');
+    if(app && !app.classList.contains('active')) return true;
+  }catch(e){}
+  try{ if(document.hidden) return true; }catch(e){}
+  try{ if(typeof editMode !== 'undefined' && editMode) return true; }catch(e){}
+  try{ if(typeof folderEditMode !== 'undefined' && folderEditMode) return true; }catch(e){}
+  try{
+    const blockingSelector = [
+      '#sync-report-modal',
+      '#recovery-modal',
+      '#preview-modal',
+      '.sync-report-overlay',
+      '.vp-overlay',
+      '.modal-overlay',
+      '.confirm-overlay'
+    ].join(',');
+    if(document.querySelector(blockingSelector)) return true;
+  }catch(e){}
+  return false;
+}
 
 async function fetchDocsTree(forceFresh=true) {
   const url = forceFresh
@@ -1239,20 +1356,60 @@ async function fetchDocsTree(forceFresh=true) {
 async function loadDocsFromServer() {
   try {
     const res = await fetchDocsTree(true);
-    if (res && res.ok && Array.isArray(res.docs)) {
-      DOCS = res.docs;
-      DOCS_LOADED = true;
-      if (Array.isArray(res.tree)) {
-        FOLDER_TREE = res.tree;
-        buildDynamicFolderStructure();
-      }
-      console.log('[QMS] Loaded ' + DOCS.length + ' documents from server' + (res.cached ? ' (cached)' : '') + ', tree: ' + FOLDER_TREE.length + ' nodes');
-      return true;
-    }
+    return !!applyDocsTreeResponse(res);
   } catch (e) {
     console.warn('[QMS] scan_folders failed, using fallback', e);
   }
   return false;
+}
+
+async function runLiveDocsSync(reason='interval'){
+  if(liveDocsSyncInFlight || shouldPauseLiveDocsSync()) return false;
+  liveDocsSyncInFlight = true;
+  try{
+    const res = await fetchDocsTree(true);
+    const applied = applyDocsTreeResponse(res, {refreshUi:true});
+    if(applied && applied.changed){
+      console.log('[QMS] Live document sync applied via ' + reason);
+      return true;
+    }
+  }catch(e){
+    console.warn('[QMS] live sync failed', e);
+  }finally{
+    liveDocsSyncInFlight = false;
+  }
+  return false;
+}
+
+function handleLiveDocsSyncVisibility(){
+  if(document.hidden) return;
+  void runLiveDocsSync('visibility');
+}
+
+function handleLiveDocsSyncFocus(){
+  void runLiveDocsSync('focus');
+}
+
+function startLiveDocsSync(){
+  stopLiveDocsSync();
+  liveDocsSyncTimer = window.setInterval(() => {
+    void runLiveDocsSync('interval');
+  }, LIVE_DOCS_SYNC_INTERVAL_MS);
+  document.addEventListener('visibilitychange', handleLiveDocsSyncVisibility);
+  window.addEventListener('focus', handleLiveDocsSyncFocus);
+  window.setTimeout(() => {
+    void runLiveDocsSync('startup');
+  }, 1500);
+}
+
+function stopLiveDocsSync(){
+  if(liveDocsSyncTimer){
+    clearInterval(liveDocsSyncTimer);
+    liveDocsSyncTimer = null;
+  }
+  liveDocsSyncInFlight = false;
+  document.removeEventListener('visibilitychange', handleLiveDocsSyncVisibility);
+  window.removeEventListener('focus', handleLiveDocsSyncFocus);
 }
 
 // ═══ DYNAMIC FOLDER TREE ═══
@@ -1756,16 +1913,8 @@ function _toggleSubPerms(cb, catId, subPath, role){
 async function rescanDocs() {
   try {
     const data = await fetchDocsTree(true);
-    if (data && data.ok && Array.isArray(data.docs)) {
-      DOCS = data.docs;
-      DOCS_LOADED = true;
-      if (Array.isArray(data.tree)) {
-        FOLDER_TREE = data.tree;
-        buildDynamicFolderStructure();
-      }
-      renderSidebar();
-      return data.count;
-    }
+    const applied = applyDocsTreeResponse(data, {refreshUi:true, forceUiRefresh:true});
+    if (applied) return data.count;
   } catch (e) { console.warn('[QMS] rescan failed', e); }
   return 0;
 }
