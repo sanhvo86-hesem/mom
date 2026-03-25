@@ -22,7 +22,7 @@
 .small {font-size:12px;}
 .tiny {font-size:11px; color: var(--ink2);} 
 .kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
-.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
 .badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
 .badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
 .badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
@@ -30,7 +30,7 @@
 .badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
 .badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
 .step-list {display:grid; gap:10px;}
-.step-item {border:1px solid var(--ln); border-left:4px solid var(--blue); padding:10px 12px; border-radius: var(--r); background:#fff;}
+.step-item {border:1px solid var(--ln); border-left: 3px solid var(--blue); padding:10px 12px; border-radius: var(--r); background:#fff;}
 .two-col {display:grid; grid-template-columns:1fr 1fr; gap:12px;}
 .section {margin-top:16px;}
 ul.tight li {margin:4px 0;}
@@ -72,7 +72,7 @@ ul.tight li {margin:4px 0;}
 <p>WI này khóa cách lưu kho, khu vực chuẩn bị / sắp xếp, giữ môi trường, bố trí vị trí, cấp phát FIFO/FEFO, hoàn trả hàng và phản ứng khi phát hiện bất thường đối với raw nguyên vật liệu, bán thành phẩm, thành phẩm, hàng clean-pack và vật tư đóng gói có kiểm soát. Mục tiêu là giữ đúng <strong>truy vết</strong>, đúng <strong>tình trạng bảo quản</strong>, đúng <strong>vị trí</strong> và đúng <strong>thứ tự cấp phát</strong> từ lúc hàng được nhập vị trí cho đến khi vấn đề cho công đoạn hoặc giao cho khách.</p>
 <p><strong>QUYỀN DỪNG:</strong> Kho, IQC, QA, Kế hoạch, Sản xuất Supervisor và người có thẩm quyền phát hành được quyền dừng cấp phát hoặc dừng chuyển vị trí khi phát hiện sai nhãn trạng thái, thiếu lot/mẻ nấu (mẻ nấu (heat)), lệch môi trường, lô clean-pack mất niêm phong, dấu hiệu ăn mòn, lẫn phiên bản, lẫn vị trí hoặc tồn già vượt rule.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Lưu hàng cách nền, cách tường, trong giới hạn chịu tải, ghi nhận mọi vị trí tạm, cấp phát theo FIFO hoặc FEFO đã xác nhận và dùng đúng vật liệu ngăn cách cho part đã hoàn thiện bề mặt.</div></div><div class="section"><h2>2. Rule phân vùng, trạng thái và quyền vận hành theo khu vực</h2>
-<div style="background:#FEF9C3;border-left:4px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Reference:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Quy tắc vị trí kho, phân vùng, FIFO/FEFO, khu vực chuẩn bị / sắp xếp và cycle count</a>. WI này tóm tắt các quy tắc chính để vận hành nhanh tại hiện trường.</div>
+<div style="background:#FEF9C3;border-left: 3px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Reference:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Quy tắc vị trí kho, phân vùng, FIFO/FEFO, khu vực chuẩn bị / sắp xếp và cycle count</a>. WI này tóm tắt các quy tắc chính để vận hành nhanh tại hiện trường.</div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Khu vực</th><th>Dùng cho</th><th>Ai được đặt / lấy</th><th>Nhãn bắt buộc</th><th>Điều kiện được rời khu vực</th></tr></thead><tbody>
 <tr><td>RM</td><td>Raw nguyên vật liệu đã PASS và đủ truy vết</td><td>Kho; IQC chỉ xác nhận trạng thái</td><td>Part/Nguyên vật liệu nhóm sản phẩm, size, mẻ nấu (mẻ nấu (heat))/lot, qty, vị trí</td><td>Chỉ vấn đề theo WO/Job đã được điều phối xuất hàng và theo FIFO/mẻ nấu (mẻ nấu (heat)) plan</td></tr>
 <tr><td>IQC</td><td>Hàng mới nhận chờ xác nhận chứng từ hoặc kiểm đầu vào</td><td>Nhận hàng/IQC</td><td>PO/ASN, nhà cung cấp, part, qty, trạng thái IQC</td><td>Phải có PASS hoặc quyết định xử lý hợp lệ</td></tr>
@@ -162,7 +162,7 @@ ul.tight li {margin:4px 0;}
 <!-- .page-body -->
 
 <div class="section" data-phase2i="true"><h2>9. Quy tắc điều hành — Hạn chế lưu kho / lưu trữ lớp / phân loại và thẩm quyền-to-phát hành</h2>
-<div style="background:#FEF9C3;border-left:4px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Reference:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Hạn chế lưu kho / lưu trữ lớp / phân loại S0-S4</a>. WI này tóm tắt các quy tắc chính để vận hành nhanh tại hiện trường.</div>
+<div style="background:#FEF9C3;border-left: 3px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Reference:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Hạn chế lưu kho / lưu trữ lớp / phân loại S0-S4</a>. WI này tóm tắt các quy tắc chính để vận hành nhanh tại hiện trường.</div>
 <p>Kho không được đối xử mọi vị trí như nhau. Ngay tại thời điểm phiếu nhận / biên nhận / put-cách xa / rời phải gán <b>lưu kho / lưu trữ class</b> cho lô hoặc khu: <b>S0</b> standard được kiểm soát tồn kho, <b>S1</b> kệ-tuổi thọ / vòng đời/FEFO, <b>S2</b> nhiệt ẩm nhạy, <b>S3</b> clean-pack/chân không-nhạy cảm, <b>S4</b> cách ly / biệt trữ/hạn chế truy cập. Mỗi class kéo theo rule riêng về vị trí được phép, người được chạm, điều kiện di dời và người có quyền nhả TẠM GIỮ.</p>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Hồ sơ chính</th><th>Hành động bắt buộc</th><th>Ai được mở lại</th></tr></thead><tbody>
 <tr><td>vượt ngưỡng ngắn dưới hành động giới hạn ở S0 và chưa thấy ảnh hưởng vật lý</td><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-708_Environment_Log.xlsx"  download="">FRM-708</a></td><td>Ghi log, tăng theo dõi, xác nhận không có tồn kho đặc biệt lẫn trong khu vực.</td><td>Responsible Person Kho theo quyền hạn được giao.</td></tr>

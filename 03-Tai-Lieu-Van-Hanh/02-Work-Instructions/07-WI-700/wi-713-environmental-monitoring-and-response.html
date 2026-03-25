@@ -22,7 +22,7 @@
 .small {font-size:12px;}
 .tiny {font-size:11px; color: var(--ink2);} 
 .kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
-.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
 .badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
 .badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
 .badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
@@ -30,7 +30,7 @@
 .badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
 .badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
 .step-list {display:grid; gap:10px;}
-.step-item {border:1px solid var(--ln); border-left:4px solid var(--blue); padding:10px 12px; border-radius: var(--r); background:#fff;}
+.step-item {border:1px solid var(--ln); border-left: 3px solid var(--blue); padding:10px 12px; border-radius: var(--r); background:#fff;}
 .two-col {display:grid; grid-template-columns:1fr 1fr; gap:12px;}
 .section {margin-top:16px;}
 ul.tight li {margin:4px 0;}
@@ -120,7 +120,7 @@ ul.tight li {margin:4px 0;}
 <!-- .page-body -->
 
 <div class="section" data-phase2i="true"><h2>6. Quy tắc điều hành — Alert / Action / Monitoring-gap trigger classes</h2>
-<div style="background:#FEF9C3;border-left:4px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Quy tắc vị trí kho, zoning, FIFO/FEFO, staging và cycle count</a>. WI này tóm tắt các quy tắc chính để thao tác nhanh tại hiện trường.</div>
+<div style="background:#FEF9C3;border-left: 3px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em"><strong>Tham chiếu:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Quy tắc vị trí kho, zoning, FIFO/FEFO, staging và cycle count</a>. WI này tóm tắt các quy tắc chính để thao tác nhanh tại hiện trường.</div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trigger class</th><th>Khi nào dùng</th><th>Phản ứng tối thiểu</th><th>Default stock trạng thái</th></tr></thead><tbody>
 <tr><td>T1 — Alert drift</td><td>Reading chạm vùng cảnh báo nhưng chưa vượt action limit, chưa có affected stock đặc biệt.</td><td>Ghi nhật ký, xác nhận sensor/door/load, tăng tần suất đọc trong ca và review nguyên nhân gần.</td><td>Watch; chưa HOLD nếu risk thấp và không có class nhạy.</td></tr>
 <tr><td>T2 — Action excursion</td><td>Vượt giới hạn tác động hoặc vượt thời gian cho phép trong zone đang chứa S1/S2 stock.</td><td>Giữ stock bị ảnh hưởng, khoanh phạm vi thời gian và location, mở đánh giá condition.</td><td>HOLD cho affected stock cho đến khi có disposition.</td></tr>
