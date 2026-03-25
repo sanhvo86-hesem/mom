@@ -6,30 +6,73 @@
 <title>ANNEX-113 — Governance dashboard triển khai vận hành, truy cập, refresh và publish control | HESEM QMS</title>
 <link href="../../../../assets/style.css" rel="stylesheet"/>
 <style>
-.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f7fbff 0%,#fff9ef 100%);margin:0 0 18px;}
-.hero h1{font-size:24px;margin:0 0 8px;color:var(--navy);}
-.hero p{margin:0;color:var(--ink2);}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
-.card-lite{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
-.card-lite h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
-.matrix-table{width:100%;border-collapse:collapse;table-layout:fixed;word-wrap:break-word;}
-.matrix-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--navy);background:var(--th-bg);border:1px solid var(--th-bdr);text-transform:uppercase;letter-spacing:.3px;vertical-align:bottom;}
-.matrix-table td{padding:8px 10px;border:1px solid var(--ln2);vertical-align:top;line-height:1.5;}
-.tight{margin:8px 0;padding-left:18px;}
-.tight li{margin:4px 0;}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0;}
-.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
-.metric-card .value{font-size:22px;font-weight:800;color:var(--navy);}
-.metric-card .label{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-top:4px;}
-.warn{border-left: 3px solid #e67700;background:#fff7ed;padding:12px 14px;border-radius:var(--r);margin:12px 0;}
-.danger{border-left: 3px solid #c92a2a;background:#fff5f5;padding:12px 14px;border-radius:var(--r);margin:12px 0;}
-.ok{border-left: 3px solid #2f9e44;background:#f1f8f1;padding:12px 14px;border-radius:var(--r);margin:12px 0;}
-.chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;border:1px solid var(--ln);background:var(--bg2);font-size:10px;font-weight:700;margin:0 6px 6px 0;}
+/* ── Compact dashboard design — synced with portal (index.html) ── */
+
+/* Hero — compact gradient banner like portal */
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:16px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 20px}
+.hero h1{font-size:17px;font-weight:800;color:var(--navy);margin:0 0 4px;line-height:1.35}
+.hero p{font-size:12.5px;color:var(--ink2);margin:0;line-height:1.6}
+
+/* Section title — matching portal pattern */
+.sec-title{font-size:14px;font-weight:700;color:var(--navy);margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--ln)}
+.sec-title:first-of-type{margin-top:0}
+
+/* Principle cards — compact 3-col */
+.principle-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 6px}
+.p-card{border:1px solid var(--ln);border-radius:var(--r);padding:12px 14px;background:var(--bg);border-top:2px solid var(--blue)}
+.p-card h4{font-size:12px;font-weight:700;color:var(--navy);margin:0 0 6px}
+.p-card ul{list-style:none;margin:0;padding:0}
+.p-card li{font-size:11.5px;line-height:1.55;padding:2px 0 2px 14px;position:relative;color:var(--ink2)}
+.p-card li::before{content:"\203A";position:absolute;left:0;color:var(--blue);font-weight:700}
+
+/* KPI strip — single row of compact metric pills */
+.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:8px 0 4px}
+.kpi-item{border:1px solid var(--ln);border-radius:var(--r);padding:10px 12px;background:var(--bg);text-align:center}
+.kpi-item .val{font-size:16px;font-weight:800;color:var(--navy);line-height:1.2}
+.kpi-item .lbl{font-size:9.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-top:3px;line-height:1.3}
+.kpi-item .hint{font-size:10px;color:var(--ink4);margin-top:2px;line-height:1.35}
+
+/* Change class cards — 3-col compact */
+.change-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 6px}
+.chg-card{border:1px solid var(--ln);border-radius:var(--r);padding:12px 14px;background:var(--bg)}
+.chg-card h4{font-size:12px;font-weight:700;color:var(--navy);margin:0 0 4px;display:flex;align-items:center;gap:6px}
+.chg-card .risk{font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-sm);text-transform:uppercase;letter-spacing:.4px}
+.chg-card .risk.low{background:#ebfbee;color:var(--green)}
+.chg-card .risk.mid{background:var(--gold-l);color:#e67700}
+.chg-card .risk.high{background:#fff5f5;color:var(--red)}
+.chg-card ul{list-style:none;margin:4px 0 0;padding:0}
+.chg-card li{font-size:11.5px;line-height:1.55;padding:1px 0 1px 14px;position:relative;color:var(--ink2)}
+.chg-card li::before{content:"\203A";position:absolute;left:0;color:var(--ink3);font-weight:700}
+
+/* Metadata 2-col cards */
+.meta-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 6px}
+.meta-card{border:1px solid var(--ln);border-radius:var(--r);padding:12px 14px;background:var(--bg)}
+.meta-card h4{font-size:12px;font-weight:700;color:var(--navy);margin:0 0 6px}
+.meta-card ul{list-style:none;margin:0;padding:0}
+.meta-card li{font-size:11.5px;line-height:1.55;padding:2px 0 2px 14px;position:relative;color:var(--ink2)}
+.meta-card li::before{content:"\203A";position:absolute;left:0;color:var(--blue);font-weight:700}
+
+/* Inline rule banners — compact */
+.rule{font-size:12px;line-height:1.6;padding:10px 14px;border-radius:var(--r);margin:8px 0}
+.rule.r-warn{background:var(--gold-l);border-left:3px solid var(--gold)}
+.rule.r-danger{background:#fff5f5;border-left:3px solid var(--red)}
+.rule.r-ok{background:#ebfbee;border-left:3px solid var(--green)}
+.rule b{color:var(--navy)}
+
+/* Ref links — compact grid */
+.ref-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:0 0 6px}
+.ref-cell{border:1px solid var(--ln);border-radius:var(--r);padding:10px 14px;background:var(--bg)}
+.ref-cell h4{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin:0 0 4px}
+.ref-cell a{display:block;font-size:12px;padding:2px 0}
+
+/* Responsive */
+@media(max-width:960px){
+  .principle-row,.change-row{grid-template-columns:1fr}
+  .kpi-strip{grid-template-columns:repeat(3,1fr)}
+  .meta-row,.ref-grid{grid-template-columns:1fr}
 }
-@media (max-width:960px){
- .grid-2,.grid-3{grid-template-columns:1fr;}
- .page-body{padding:24px 18px 36px;}
+@media(max-width:600px){
+  .kpi-strip{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
@@ -37,367 +80,242 @@
 <div class="container"><div class="page"><div class="page-body">
 
 <div class="form-header">
- <div class="fh-left">
- <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
- <div class="fh-company">
- <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
- <span>Tài liệu vận hành • Annex số hóa</span>
- </div>
- </div>
- <div class="title">
- <strong>ANNEX-113 — Governance dashboard triển khai vận hành, truy cập, refresh và publish control</strong>
- </div>
- <div class="meta">
- <div class="row"><span><b>Code:</b></span><span>ANNEX-113</span></div>
- <div class="row"><span><b>Version:</b></span><span>V1</span></div>
- <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>IT Manager / QMS Manager / Data Owners</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
- </div>
+  <div class="fh-left">
+    <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+    <div class="fh-company">
+      <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+      <span>Tài liệu vận hành &bull; Annex số hóa</span>
+    </div>
+  </div>
+  <div class="title">
+    <strong>ANNEX-113 &mdash; Governance dashboard triển khai vận hành, truy cập, refresh và publish control</strong>
+    <span class="sub-vn">Xuyên suốt G0&rarr;G7 &mdash; Dashboard Deployment</span>
+  </div>
+  <div class="meta">
+    <div class="row"><span><b>Code:</b></span><span>ANNEX-113</span></div>
+    <div class="row"><span><b>Version:</b></span><span>V1</span></div>
+    <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+    <div class="row"><span><b>Owner:</b></span><span>IT Manager / QMS Manager / Data Owners</span></div>
+    <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+  </div>
 </div>
 
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Áp dụng cho mọi dashboard dùng để điều hành triển khai, quản trị tài liệu, theo dõi readiness, vận hành hypercare, theo dõi KPI, publish bộ số điều hành và làm cửa truy cập tài liệu cho nhiều phòng ban.</div>
-
+<!-- Hero -->
 <div class="hero">
- <h1>ANNEX-113 — Dashboard phải vừa là command center vừa là cửa vào tài liệu</h1>
- <p>Dashboard triển khai không chỉ hiển thị số. Dashboard phải giúp từng nhóm người dùng biết đang ở pha nào, phải làm gì tiếp theo, phải mở tài liệu nào, số hiện tại có đáng tin hay không và khi nào phải dừng tin vào dashboard để quay về nguồn chuẩn.</p>
+  <h1>Dashboard phải vừa là command center vừa là cửa vào tài liệu</h1>
+  <p>Áp dụng cho mọi dashboard dùng để điều hành triển khai, quản trị tài liệu, theo dõi readiness, vận hành hypercare, theo dõi KPI, publish bộ số điều hành và làm cửa truy cập tài liệu cho nhiều phòng ban.</p>
 </div>
 
-<div class="callout"><strong>PHẢI</strong><br/>Mọi dashboard dùng để ra quyết định điều hành phải chỉ rõ: owner, source-of-record, last refresh, phạm vi người xem, trạng thái ngoại lệ và đường dẫn tới tài liệu hành động tương ứng. Thiếu một mục thì dashboard không được dùng như nguồn quyết định chính.</div>
+<div class="rule r-warn"><b>Nguyên tắc:</b> Mọi dashboard dùng để ra quyết định điều hành phải chỉ rõ: owner, source-of-record, last refresh, phạm vi người xem, trạng thái ngoại lệ và đường dẫn tới tài liệu hành động. Thiếu một mục &rarr; không dùng làm nguồn quyết định chính.</div>
 
-<div class="section">
- <div class="note-blue" style="margin:12px 0">
- <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Dashboard Deployment</b>.
- <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
-</div>
-<h2>1. Nguyên tắc governance bắt buộc</h2>
- <div class="grid-3">
- <div class="card-lite">
- <h3>1.1 Một nguồn chuẩn</h3>
- <ul class="tight">
- <li>Số trên dashboard phải truy ngược được về SoR hoặc SSOT đã được công nhận.</li>
- <li>Khi dashboard lệch với SoR, quyết định phải quay về SoR.</li>
- <li>Không “chọn số đẹp hơn” giữa các nguồn khác nhau.</li>
- </ul>
- </div>
- <div class="card-lite">
- <h3>1.2 Managed self-service</h3>
- <ul class="tight">
- <li>Người dùng được tự xem và tự phục vụ ở phạm vi đã công bố.</li>
- <li>Logic KPI, refresh, source mapping và publish vẫn do owner được chỉ định kiểm soát.</li>
- <li>Không để dashboard thành nơi ai cũng sửa trực tiếp trong production.</li>
- </ul>
- </div>
- <div class="card-lite">
- <h3>1.3 Dashboard phải có hành động</h3>
- <ul class="tight">
- <li>Mỗi khối số phải dẫn tới tài liệu, checklist hoặc owner tương ứng.</li>
- <li>Dashboard triển khai phải phục vụ manager, Champion và người dùng cuối theo ngữ cảnh riêng.</li>
- <li>Không giữ dashboard chỉ như một màn hình “đẹp để xem”.</li>
- </ul>
- </div>
- </div>
+<!-- 1. Nguyên tắc governance -->
+<div class="sec-title">1 &mdash; Nguyên tắc governance bắt buộc</div>
+<div class="principle-row">
+  <div class="p-card">
+    <h4>1.1 Một nguồn chuẩn</h4>
+    <ul>
+      <li>Số trên dashboard phải truy ngược được về SoR hoặc SSOT đã được công nhận</li>
+      <li>Khi dashboard lệch với SoR, quyết định phải quay về SoR</li>
+      <li>Không &ldquo;chọn số đẹp hơn&rdquo; giữa các nguồn khác nhau</li>
+    </ul>
+  </div>
+  <div class="p-card">
+    <h4>1.2 Managed self-service</h4>
+    <ul>
+      <li>Người dùng được tự xem và tự phục vụ ở phạm vi đã công bố</li>
+      <li>Logic KPI, refresh, source mapping và publish do owner kiểm soát</li>
+      <li>Không để dashboard thành nơi ai cũng sửa trực tiếp production</li>
+    </ul>
+  </div>
+  <div class="p-card">
+    <h4>1.3 Dashboard phải có hành động</h4>
+    <ul>
+      <li>Mỗi khối số phải dẫn tới tài liệu, checklist hoặc owner tương ứng</li>
+      <li>Phục vụ manager, Champion và người dùng cuối theo ngữ cảnh riêng</li>
+      <li>Không giữ dashboard chỉ như một màn hình &ldquo;đẹp để xem&rdquo;</li>
+    </ul>
+  </div>
 </div>
 
-<div class="section">
- <h2>2. Các module bắt buộc của dashboard triển khai vận hành</h2>
- <div class="table-card">
- <table class="matrix-table">
- <thead>
- <tr>
- <th>Module</th>
- <th>Người dùng chính</th>
- <th>Phải hiển thị</th>
- <th>Hành động phải có</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>Executive view</td>
- <td>Ban Giám đốc</td>
- <td>Pha hiện tại, wave hiện tại, KPI đỏ, issue nghiêm trọng, quyết định cần chốt</td>
- <td>Mở gate pack, mở runbook, mở escalation matrix</td>
- </tr>
- <tr>
- <td>Department navigator</td>
- <td>Manager, Champion, người dùng cuối</td>
- <td>Phòng ban, điểm vào tài liệu, SOP/WI chính, nơi lưu hồ sơ, readiness</td>
- <td>Mở handbook, playlist, quick cards, QR hoặc portal links</td>
- </tr>
- <tr>
- <td>Readiness heatmap</td>
- <td>Steering, Command Center</td>
- <td>Doc review, training, M365, Champion, pilot, go-live theo phòng ban</td>
- <td>Cập nhật trạng thái, lọc theo wave, xem phòng ban bị chặn</td>
- </tr>
- <tr>
- <td>Go/No-Go &amp; gate board</td>
- <td>Cutover Lead, Sponsor</td>
- <td>Checklist của pha hiện tại, blocker, owner, due date, rollback trigger</td>
- <td>Xem runbook, phê duyệt, chặn qua gate</td>
- </tr>
- <tr>
- <td>Hypercare issue board</td>
- <td>Command Center, Champion</td>
- <td>Issue aging, severity, owner, ETA, workaround, status</td>
- <td>Escalate, assign owner, review closure</td>
- </tr>
- <tr>
- <td>Document hub</td>
- <td>Tất cả phòng ban</td>
- <td>Nhóm tài liệu theo vai trò và theo pha triển khai</td>
- <td>Mở WI-105, WI-106, ANNEX-113, ANNEX-114, handbook, quick card</td>
- </tr>
- </tbody>
- </table>
- </div>
+<!-- 2. Các module bắt buộc -->
+<div class="sec-title">2 &mdash; Các module bắt buộc của dashboard triển khai</div>
+<div class="table-card">
+  <table class="table">
+    <thead>
+      <tr><th style="width:17%">Module</th><th style="width:20%">Người dùng chính</th><th style="width:35%">Phải hiển thị</th><th style="width:28%">Hành động phải có</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>Executive view</b></td><td>Ban Giám đốc</td><td>Pha hiện tại, wave, KPI đỏ, issue nghiêm trọng, quyết định cần chốt</td><td>Mở gate pack, runbook, escalation matrix</td></tr>
+      <tr><td><b>Dept navigator</b></td><td>Manager, Champion, end-user</td><td>Phòng ban, điểm vào tài liệu, SOP/WI chính, readiness</td><td>Mở handbook, playlist, quick cards, portal</td></tr>
+      <tr><td><b>Readiness heatmap</b></td><td>Steering, Command Center</td><td>Doc review, training, M365, Champion, pilot, go-live theo phòng ban</td><td>Cập nhật trạng thái, lọc wave, xem phòng bị chặn</td></tr>
+      <tr><td><b>Go/No-Go gate</b></td><td>Cutover Lead, Sponsor</td><td>Checklist pha hiện tại, blocker, owner, due date, rollback trigger</td><td>Xem runbook, phê duyệt, chặn qua gate</td></tr>
+      <tr><td><b>Hypercare board</b></td><td>Command Center, Champion</td><td>Issue aging, severity, owner, ETA, workaround, status</td><td>Escalate, assign owner, review closure</td></tr>
+      <tr><td><b>Document hub</b></td><td>Tất cả phòng ban</td><td>Nhóm tài liệu theo vai trò và pha triển khai</td><td>Mở WI-105, WI-106, ANNEX-113, handbook, quick card</td></tr>
+    </tbody>
+  </table>
 </div>
 
-<div class="section">
- <h2>3. Trường thông tin tối thiểu phải có trên dashboard</h2>
- <div class="grid-2">
- <div class="card-lite">
- <h3>3.1 Metadata bắt buộc</h3>
- <ul class="tight">
- <li>Tên dashboard và mục đích sử dụng.</li>
- <li>Business owner và data owner.</li>
- <li>Last refresh timestamp và trạng thái refresh.</li>
- <li>Source-of-record hoặc data source chính.</li>
- <li>Phiên bản hoặc class phát hành gần nhất.</li>
- </ul>
- </div>
- <div class="card-lite">
- <h3>3.2 Trạng thái vận hành bắt buộc</h3>
- <ul class="tight">
- <li>Badge Current, Exception, Offline fallback hoặc Outdated.</li>
- <li>Thông điệp ngoại lệ nếu số đang dùng workaround.</li>
- <li>Contact hoặc owner khi người dùng cần hỗ trợ.</li>
- <li>Link đến tài liệu hành động tương ứng.</li>
- </ul>
- </div>
- </div>
- <div class="warn"><strong>Rule:</strong> nếu không hiển thị last refresh và owner, người dùng không được dùng dashboard đó để chốt quyết định điều hành.</div>
+<!-- 3. Trường thông tin tối thiểu -->
+<div class="sec-title">3 &mdash; Trường thông tin tối thiểu trên dashboard</div>
+<div class="meta-row">
+  <div class="meta-card">
+    <h4>3.1 Metadata bắt buộc</h4>
+    <ul>
+      <li>Tên dashboard và mục đích sử dụng</li>
+      <li>Business owner và data owner</li>
+      <li>Last refresh timestamp và trạng thái refresh</li>
+      <li>Source-of-record hoặc data source chính</li>
+      <li>Phiên bản hoặc class phát hành gần nhất</li>
+    </ul>
+  </div>
+  <div class="meta-card">
+    <h4>3.2 Trạng thái vận hành bắt buộc</h4>
+    <ul>
+      <li>Badge Current, Exception, Offline fallback hoặc Outdated</li>
+      <li>Thông điệp ngoại lệ nếu số đang dùng workaround</li>
+      <li>Contact hoặc owner khi người dùng cần hỗ trợ</li>
+      <li>Link đến tài liệu hành động tương ứng</li>
+    </ul>
+  </div>
+</div>
+<div class="rule r-warn"><b>Rule:</b> Nếu không hiển thị last refresh và owner, người dùng không được dùng dashboard đó để chốt quyết định điều hành.</div>
+
+<!-- 4. Quyền truy cập -->
+<div class="sec-title">4 &mdash; Quyền truy cập và publish</div>
+<div class="table-card">
+  <table class="table">
+    <thead>
+      <tr><th style="width:14%">Quyền</th><th style="width:30%">Dùng cho</th><th style="width:30%">Không bao gồm</th><th style="width:26%">Phê duyệt tối thiểu</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>View</b></td><td>Xem dashboard, filter, mở tài liệu</td><td>Không sửa logic KPI hoặc publish</td><td>Role-based &mdash; <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></td></tr>
+      <tr><td><b>Contributor</b></td><td>Tạo nháp, thử layout, chuẩn bị nội dung DEV/UAT</td><td>Không tự publish vào production</td><td>Data Owner + IT Manager</td></tr>
+      <tr><td><b>Publisher</b></td><td>Đưa bản được duyệt lên production</td><td>Không đổi source/quyền production khi chưa approval</td><td>Business Owner + System Owner</td></tr>
+      <tr><td><b>Admin</b></td><td>Quản trị access, refresh, environment, credential</td><td>Không thay Business Owner hoặc đổi logic KPI</td><td>IT authority &mdash; <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="rule r-danger"><b>Cấm:</b> Cấp quyền publish/admin chỉ vì &ldquo;để tiện&rdquo; trong giai đoạn triển khai. Quyền tạm thời phải có ngày hết hạn và người thu hồi rõ.</div>
+
+<!-- 5. Refresh, freeze -->
+<div class="sec-title">5 &mdash; Refresh, freeze và exception note</div>
+<div class="table-card">
+  <table class="table">
+    <thead>
+      <tr><th style="width:20%">Ngữ cảnh</th><th style="width:28%">Quy tắc refresh</th><th style="width:26%">Quy tắc freeze</th><th style="width:26%">Khi nào gắn exception</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>Daily command center</b></td><td>Refresh trước cuộc họp đủ sớm để kịp xác minh</td><td>Giữ snapshot nếu quyết định quan trọng đã chốt</td><td>Refresh thất bại, nguồn chậm, workaround bằng file xuất tay</td></tr>
+      <tr><td><b>Gate review</b></td><td>Chỉ dùng bộ số đã xác minh và khóa thời điểm</td><td>Freeze theo thời điểm bắt đầu gate review</td><td>Dữ liệu bổ sung sau gate hoặc sai lệch dashboard vs SoR</td></tr>
+      <tr><td><b>Hypercare daily</b></td><td>Refresh &ge;1 lần trước review cuối ngày</td><td>Giữ bản báo cáo đã gửi</td><td>Issue log update thủ công hoặc dashboard chỉ phản ánh một phần</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="rule r-ok"><b>Exception note tối thiểu:</b> phạm vi bị ảnh hưởng &middot; nguồn thay thế &middot; owner khắc phục &middot; ETA khôi phục &middot; thời điểm review lại.</div>
+
+<!-- 6. Quản trị thay đổi -->
+<div class="sec-title">6 &mdash; Quản trị thay đổi dashboard</div>
+<div class="change-row">
+  <div class="chg-card">
+    <h4>Class A &mdash; Giao diện <span class="risk low">Thấp</span></h4>
+    <ul>
+      <li>Đổi bố cục, nhãn, grouping, style, icon</li>
+      <li>Vẫn phải ghi release note và người phê duyệt</li>
+    </ul>
+  </div>
+  <div class="chg-card">
+    <h4>Class B &mdash; Logic &amp; ngưỡng <span class="risk mid">T.bình</span></h4>
+    <ul>
+      <li>Đổi công thức, ngưỡng RAG, mapping field, nguồn filter</li>
+      <li>Phải có test, sign-off nghiệp vụ và kế hoạch hoàn nguyên</li>
+    </ul>
+  </div>
+  <div class="chg-card">
+    <h4>Class C &mdash; Source &amp; access <span class="risk high">Cao</span></h4>
+    <ul>
+      <li>Đổi source-of-record, credential, workspace, access, refresh engine</li>
+      <li>Phải có cutover plan, rollback path và review sau triển khai</li>
+    </ul>
+  </div>
+</div>
+<div class="rule r-warn"><b>Quy tắc phát hành:</b> DEV &rarr; UAT &rarr; PROD. Không sửa thẳng production trong giờ họp điều hành trừ khi đang xử lý sự cố được phê duyệt.</div>
+
+<!-- 7. KPI -->
+<div class="sec-title">7 &mdash; KPI của hệ dashboard triển khai</div>
+<div class="kpi-strip">
+  <div class="kpi-item">
+    <div class="val">&ge;95%</div>
+    <div class="lbl">Refresh đúng hạn</div>
+    <div class="hint">Trong cửa sổ cam kết</div>
+  </div>
+  <div class="kpi-item">
+    <div class="val">&le;10%</div>
+    <div class="lbl">Change failure</div>
+    <div class="hint">Rollback hoặc exception</div>
+  </div>
+  <div class="kpi-item">
+    <div class="val">&le;10d</div>
+    <div class="lbl">Change lead time</div>
+    <div class="hint">Duyệt &rarr; production ổn định</div>
+  </div>
+  <div class="kpi-item">
+    <div class="val">100%</div>
+    <div class="lbl">Owner coverage</div>
+    <div class="hint">Biz owner + data owner</div>
+  </div>
+  <div class="kpi-item">
+    <div class="val">100%</div>
+    <div class="lbl">Access review</div>
+    <div class="hint">Rà đúng kỳ</div>
+  </div>
+  <div class="kpi-item">
+    <div class="val">&ge;90%</div>
+    <div class="lbl">Self-service</div>
+    <div class="hint">Tự tìm đúng dashboard</div>
+  </div>
 </div>
 
-<div class="section">
- <h2>4. Quyền truy cập và publish</h2>
- <div class="table-card">
- <table class="matrix-table">
- <thead>
- <tr>
- <th>Quyền</th>
- <th>Dùng cho</th>
- <th>Không bao gồm</th>
- <th>Phê duyệt tối thiểu</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>View</td>
- <td>Xem dashboard, filter, mở tài liệu được công bố</td>
- <td>Không bao gồm quyền sửa logic KPI hoặc publish</td>
- <td>Role-based access theo <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></td>
- </tr>
- <tr>
- <td>Contributor / Builder</td>
- <td>Tạo bản nháp, thử layout, chuẩn bị nội dung trong DEV hoặc UAT</td>
- <td>Không tự publish vào production</td>
- <td>Data Owner + IT Manager</td>
- </tr>
- <tr>
- <td>Publisher</td>
- <td>Đưa bản được phê duyệt lên production</td>
- <td>Không tự đổi source hoặc quyền production khi chưa có approval</td>
- <td>Business Owner + System Owner</td>
- </tr>
- <tr>
- <td>Admin</td>
- <td>Quản trị access, refresh, environment, workspace, credential</td>
- <td>Không thay Business Owner hoặc tự ý đổi logic KPI</td>
- <td>IT authority theo <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td>
- </tr>
- </tbody>
- </table>
- </div>
- <div class="danger"><strong>Không cho phép</strong><br/>Cấp quyền publish hoặc admin chỉ vì “để tiện” trong giai đoạn triển khai. Quyền tạm thời phải có ngày hết hạn và người thu hồi rõ.</div>
+<!-- 8. Evidence pack -->
+<div class="sec-title">8 &mdash; Evidence pack cho mỗi dashboard production</div>
+<div class="table-card">
+  <table class="table">
+    <thead>
+      <tr><th style="width:22%">Thành phần</th><th>Nội dung tối thiểu</th><th style="width:16%">Owner</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>Dashboard register</b></td><td>Tên, mục đích, owner, source, audience, environment</td><td>Data Owner</td></tr>
+      <tr><td><b>Release log</b></td><td>Class thay đổi, ngày phát hành, người phê duyệt, ghi chú</td><td>Publisher / IT</td></tr>
+      <tr><td><b>Refresh evidence</b></td><td>Timestamp, tình trạng refresh, issue nếu có, exception note</td><td>System Owner</td></tr>
+      <tr><td><b>Access review</b></td><td>Danh sách quyền, người xem, publish/admin access, ngày rà</td><td>IT Manager</td></tr>
+      <tr><td><b>Fallback note</b></td><td>Nguồn thay thế, trigger rollback, thời điểm phục hồi, người duyệt</td><td>IT / QMS</td></tr>
+    </tbody>
+  </table>
 </div>
 
-<div class="section">
- <h2>5. Refresh, freeze và exception note</h2>
- <div class="table-card">
- <table class="matrix-table">
- <thead>
- <tr>
- <th>Ngữ cảnh</th>
- <th>Quy tắc refresh</th>
- <th>Quy tắc freeze</th>
- <th>Khi nào phải gắn exception note</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>Daily command center</td>
- <td>Refresh trước cuộc họp đủ sớm để kịp xác minh</td>
- <td>Giữ snapshot cuộc họp nếu quyết định quan trọng đã được chốt</td>
- <td>Làm mới thất bại, nguồn dữ liệu chậm, workaround bằng file xuất tay</td>
- </tr>
- <tr>
- <td>Gate review</td>
- <td>Chỉ dùng bộ số đã xác minh và đã khóa thời điểm</td>
- <td>Freeze theo thời điểm bắt đầu gate review</td>
- <td>Có dữ liệu bổ sung sau khi gate đã mở hoặc có sai lệch giữa dashboard và SoR</td>
- </tr>
- <tr>
- <td>Hypercare daily report</td>
- <td>Refresh ít nhất một lần trước review cuối ngày</td>
- <td>Giữ bản báo cáo đã gửi</td>
- <td>Issue log đang update thủ công hoặc dashboard mới chỉ phản ánh một phần thực tế</td>
- </tr>
- </tbody>
- </table>
- </div>
- <div class="ok"><strong>Exception note tối thiểu phải ghi:</strong> phạm vi bị ảnh hưởng, nguồn thay thế đang dùng, owner khắc phục, ETA khôi phục và thời điểm cần review lại.</div>
-</div>
-
-<div class="section">
- <h2>6. Quản trị thay đổi dashboard</h2>
- <div class="grid-3">
- <div class="card-lite">
- <h3>Class A — Giao diện</h3>
- <span class="chip">Rủi ro thấp</span>
- <ul class="tight">
- <li>Đổi bố cục, nhãn, grouping, style, icon.</li>
- <li>Vẫn phải ghi release note và người phê duyệt.</li>
- </ul>
- </div>
- <div class="card-lite">
- <h3>Class B — Logic và ngưỡng</h3>
- <span class="chip">Rủi ro trung bình</span>
- <ul class="tight">
- <li>Đổi công thức, ngưỡng RAG, mapping field, nguồn filter.</li>
- <li>Phải có test, sign-off nghiệp vụ và kế hoạch hoàn nguyên.</li>
- </ul>
- </div>
- <div class="card-lite">
- <h3>Class C — Source và access</h3>
- <span class="chip">Rủi ro cao</span>
- <ul class="tight">
- <li>Đổi source-of-record, credential, workspace, access, refresh engine.</li>
- <li>Phải có cutover plan, rollback path và review sau triển khai.</li>
- </ul>
- </div>
- </div>
- <div class="step"><strong>Quy tắc phát hành:</strong> DEV → UAT → PROD. Không sửa thẳng production trong giờ họp điều hành trừ khi đang xử lý sự cố được phê duyệt.</div>
-</div>
-
-<div class="section">
- <h2>7. KPI của chính hệ dashboard triển khai</h2>
- <div class="metric-grid">
- <div class="metric-card">
- <div class="value">≥95%</div>
- <div class="label">Refresh đúng hạn</div>
- <div class="mini-note">Tỷ lệ dashboard quan trọng refresh trong cửa sổ cam kết.</div>
- </div>
- <div class="metric-card">
- <div class="value">≤10%</div>
- <div class="label">Change failure rate</div>
- <div class="mini-note">Tỷ lệ thay đổi dashboard phải rollback hoặc gây exception nghiêm trọng.</div>
- </div>
- <div class="metric-card">
- <div class="value">≤10 ngày làm việc</div>
- <div class="label">Change lead time</div>
- <div class="mini-note">Tính từ lúc change được duyệt đến lúc production ổn định.</div>
- </div>
- <div class="metric-card">
- <div class="value">100%</div>
- <div class="label">Owner coverage</div>
- <div class="mini-note">Mọi dashboard production phải có business owner và data owner.</div>
- </div>
- <div class="metric-card">
- <div class="value">100%</div>
- <div class="label">Access review đúng hạn</div>
- <div class="mini-note">Quyền publish, admin và view nhạy cảm phải được rà đúng kỳ.</div>
- </div>
- <div class="metric-card">
- <div class="value">≥90%</div>
- <div class="label">Self-service access</div>
- <div class="mini-note">Người dùng liên quan tự tìm được đúng dashboard và tài liệu hành động mà không cần hỏi lại.</div>
- </div>
- </div>
-</div>
-
-<div class="section">
- <h2>8. Evidence pack bắt buộc cho mỗi dashboard production</h2>
- <div class="table-card">
- <table class="matrix-table">
- <thead>
- <tr>
- <th>Thành phần</th>
- <th>Nội dung tối thiểu</th>
- <th>Owner</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>Dashboard register</td>
- <td>Tên dashboard, mục đích, owner, source, audience, environment</td>
- <td>Data Owner</td>
- </tr>
- <tr>
- <td>Release log</td>
- <td>Class thay đổi, ngày phát hành, người phê duyệt, ghi chú thay đổi</td>
- <td>Publisher / IT</td>
- </tr>
- <tr>
- <td>Refresh evidence</td>
- <td>Timestamp, tình trạng refresh, issue nếu có, exception note</td>
- <td>System Owner</td>
- </tr>
- <tr>
- <td>Access review</td>
- <td>Danh sách quyền, người xem, publish/admin access, ngày rà gần nhất</td>
- <td>IT Manager</td>
- </tr>
- <tr>
- <td>Fallback and rollback note</td>
- <td>Nguồn thay thế, trigger rollback, thời điểm phục hồi, người phê duyệt</td>
- <td>IT / QMS</td>
- </tr>
- </tbody>
- </table>
- </div>
-</div>
-
-<div class="section">
- <h2>9. Tài liệu liên quan</h2>
- <div class="table-card">
- <table class="matrix-table">
- <thead>
- <tr>
- <th>Nhóm</th>
- <th>Tài liệu</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>KPI và dashboard operation</td>
- <td><a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a><br/><a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></td>
- </tr>
- <tr>
- <td>Triển khai và cutover</td>
- <td><a href="../../../02-Work-Instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html">WI-106</a><br/><a href="annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114</a></td>
- </tr>
- <tr>
- <td>Điều hướng và tiếp cận</td>
- <td><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a><br/><a href="../13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td>
- </tr>
- <tr>
- <td>Access và authority</td>
- <td><a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a><br/><a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-102-access-request-field-dictionary.html">ANNEX-102</a><br/><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a><br/><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td>
- </tr>
- </tbody>
- </table>
- </div>
+<!-- 9. Tài liệu liên quan -->
+<div class="sec-title">9 &mdash; Tài liệu liên quan</div>
+<div class="ref-grid">
+  <div class="ref-cell">
+    <h4>KPI &amp; Dashboard operation</h4>
+    <a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110 &mdash; KPI Dictionary &amp; Data Model</a>
+    <a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901 &mdash; Performance Dashboard</a>
+  </div>
+  <div class="ref-cell">
+    <h4>Triển khai &amp; Cutover</h4>
+    <a href="../../../02-Work-Instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html">WI-106 &mdash; Deployment Master Plan</a>
+    <a href="annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114 &mdash; Go-Live Runbook</a>
+  </div>
+  <div class="ref-cell">
+    <h4>Điều hướng &amp; Tiếp cận</h4>
+    <a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105 &mdash; Document Navigation</a>
+    <a href="../13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135 &mdash; M365 File Plan</a>
+  </div>
+  <div class="ref-cell">
+    <h4>Access &amp; Authority</h4>
+    <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101 &mdash; Role-Based Access Map</a>
+    <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-102-access-request-field-dictionary.html">ANNEX-102 &mdash; Access Request Dictionary</a>
+    <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120 &mdash; Authority Matrix</a>
+  </div>
 </div>
 
 </div></div></div>

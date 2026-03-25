@@ -79,7 +79,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="badge"><span class="dot"></span>MÔ-ĐUN tổng quan</div>
 <h1 style="margin-top:10px">SYS-OPS-05 — GS1 SSCC Giao vận Label &amp; Đối chiếu đóng gói (Lam-ready)</h1>
 <p class="lead">
- Mô-đun này chuẩn hoá nhãn vận chuyển theo GS1 SSCC và cơ chế đối soát PackID/SSCC ↔ Epicor ShipmentMirror ↔ M365 ShipRelease ↔ bộ hồ sơ giao hàng (ship gói hồ sơ) (Hồ sơ công việc (hồ sơ công việc)).
+ Mô-đun này chuẩn hoá nhãn vận chuyển theo GS1 SSCC và cơ chế đối soát PackID/SSCC ↔ Epicor ShipmentMirror ↔ M365 ShipRelease ↔ bộ hồ sơ giao hàng (ship gói hồ sơ) (Hồ sơ công việc (hồ sơ công việc).
  Mô-đun này khoá cứng điểm xuất hàng (Cổng kiểm soát (gate) G5) để ngăn ship sai part/rev/qty, ngăn thiếu chứng cứ, và tạo dấu vết đánh giá.
  </p>
 <div class="kpi">
@@ -147,7 +147,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Loại bỏ kiểm tra chữ số; lấy 17 chữ số đầu.</li>
 <li>Từ phải sang trái: nhân lần lượt các chữ số với hệ số 3 và 1 xen kẽ.</li>
 <li>Cộng tổng; lấy <span class="path">T = tổng</span>.</li>
-<li>Tính <span class="path">C = (10 − (T mod 10)) mod 10</span>; <span class="path">C</span> là kiểm tra chữ số.</li>
+<li>Tính <span class="path">C = (10 − (T mod 10) mod 10</span>; <span class="path">C</span> là kiểm tra chữ số.</li>
 <li>Khi quét mã vạch, hệ thống <b>PHẢI</b> xác nhận kiểm tra chữ số hợp lệ trước khi cho phép trạng thái <span class="qa-badge">Đã xác minh</span>.</li>
 </ol>
 </div>
@@ -173,7 +173,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 </div>
-<h3 class="h3">Bảng dữ liệu cốt lõi (trích từ bộ mẫu cấu hình (SSOT))</h3>
+<h3 class="h3">Bảng dữ liệu cốt lõi (trích từ bộ mẫu cấu hình (SSOT)</h3>
 <div class="table-wrap">
 <table class="table tight">
 <thead>
@@ -191,7 +191,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>ReconciliationStatus</td><td>LUỒNG-WHS-13</td><td>Yes</td><td>Pass / Fail / Đã chặn</td><td>ShipRelease</td></tr>
 <tr><td>Trạng thái</td><td>WHS</td><td>Yes</td><td>Draft/Đã in/Đã xác minh/Released/Đã giao hàng/Đã hủy</td><td>PackSSCCRegister</td></tr>
 <tr><td>PrintVersion</td><td>LUỒNG-WHS-12</td><td>Yes</td><td>1 = in lần đầu; tăng 1 cho mỗi lần in lại</td><td>PackSSCCRegister</td></tr>
-<tr><td>ReprintReasonCode</td><td>Team Leader kho/QA</td><td>điều kiện ((Cond)).</td><td>Bắt buộc khi PrintVersion &gt; 1</td><td>PackSSCCRegister</td></tr>
+<tr><td>ReprintReasonCode</td><td>Team Leader kho/QA</td><td>điều kiện (Cond).</td><td>Bắt buộc khi PrintVersion &gt; 1</td><td>PackSSCCRegister</td></tr>
 <tr><td>PacketFolderUrl</td><td>Hồ sơ công việc</td><td>Yes</td><td>Trỏ đúng 07_Shipping-Đóng gói</td><td>ShipRelease / PackSSCCRegister</td></tr>
 <tr><td>liên kết QR phát hành giao hàng</td><td>LUỒNG-WHS-11</td><td>Yes</td><td>Quét mở đúng màn hình ShipRelease</td><td>PackSSCCRegister</td></tr>
 <tr><td>liên kết QR gói giao hàng</td><td>LUỒNG-WHS-11</td><td>Yes</td><td>Quét mở đúng thư mục bộ hồ sơ giao hàng</td><td>PackSSCCRegister</td></tr>
@@ -298,7 +298,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>An toàn đóng gói</td>
 <td>Kiểm soát dao cắt/băng dính / băng keo gun/xe nâng; nhãn cảnh báo; xử lý vật liệu nguy hại khi áp dụng</td>
 <td>EHS bảng kiểm; đào tạo hồ sơ</td>
-<td>An toàn đi kiểm tra (gemba (thực địa) đi kiểm tra (gemba walk)) + ký‑off</td>
+<td>An toàn đi kiểm tra (gemba (thực địa) đi kiểm tra (gemba walk) + ký‑off</td>
 </tr>
 <tr>
 <td class="role">Operator / Setup / Lập trình viên (CNC)</td>
@@ -326,7 +326,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Nhận Requests ship + xác nhận PO ghi chú (label/đóng gói/ASN/điều khoản thương mại (Incoterms))</td><td>Planner + Người định giá (SAL-03)</td><td>PO ghi chú trong Hồ sơ công việc 01_Rfq-Hợp đồng</td><td>Thiếu Requests khách; dùng Requests cũ</td></tr>
+<tr><td>1</td><td>Nhận Requests ship + xác nhận PO ghi chú (label/đóng gói/ASN/điều khoản thương mại (Incoterms)</td><td>Planner + Người định giá (SAL-03)</td><td>PO ghi chú trong Hồ sơ công việc 01_Rfq-Hợp đồng</td><td>Thiếu Requests khách; dùng Requests cũ</td></tr>
 <tr><td>2</td><td>Xác nhận Hồ sơ công việc tồn tại; thư mục 07_Shipping-Đóng gói sẵn sàng</td><td>Planner</td><td>JobIndex.EvidenceFolderUrl; thư mục 07_Shipping-Đóng gói</td><td>Upload nhầm thư mục; thư mục không có quyền</td></tr>
 <tr><td>3</td><td>Xác nhận Final IR/CMM = PASS; không có TẠM GIỮ/NCR mở</td><td>QA + QC</td><td>Final IR/CMM file + log TẠM GIỮ/NCR disposition</td><td>Thiếu file PASS; còn TẠM GIỮ</td></tr>
 <tr><td>4</td><td>Tạo/nhận PackID (= Epicor PackNum) theo ShipmentMirror</td><td>WHS</td><td>ShipmentMirror row; PackID/EpicorPackNum khớp / phù hợp</td><td>PackID không tồn tại trong phản chiếu / sao chép</td></tr>

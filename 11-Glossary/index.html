@@ -161,7 +161,7 @@
  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
  }
  function normalize(s){
- return stripAccent(String(s || '')).replace(/\s+/g, ' ').trim();
+ return stripAccent(String(s || '').replace(/\s+/g, ' ').trim();
  }
  function esc(s){
  return String(s || '').replace(/[&<>"]/g, function(ch){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[ch]; });
@@ -170,10 +170,10 @@
  return normalize(a.term).localeCompare(normalize(b.term), 'vi');
  }
  function buildText(item){
- return normalize([item.term, item.meaning, item.vi, item.def, item.ctx, item.rec, item.cat].join(' | '));
+ return normalize([item.term, item.meaning, item.vi, item.def, item.ctx, item.rec, item.cat].join(' | ');
  }
  function categories(data){
- return Array.from(new Set(data.map(x => (x.cat || 'General').trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'vi'));
+ return Array.from(new Set(data.map(x => (x.cat || 'General').trim().filter(Boolean)).sort(a,b)=>a.localeCompare(b,'vi');
  }
  function filterData(){
  const q = normalize(state.q);
@@ -187,7 +187,7 @@
  renderStatus();
  }
  function renderChips(){
- const cats = ['ALL'].concat(categories(state.all));
+ const cats = ['ALL'].concat(categories(state.all);
  chipsEl.innerHTML = cats.map(cat => {
  const label = cat === 'ALL' ? 'Tất cả' : cat;
  const cls = 'chip' + (cat === state.cat ? ' active' : '');
@@ -210,7 +210,7 @@
  '<div style="margin-top:6px"><span class="badge-cat"><span class="dot"></span>'+esc(item.cat || 'General')+'</span></div>' +
  '</td>' +
  '<td class="col-meaning">' +
- ((meaning || (item.term && /^[A-Za-z0-9][A-Za-z0-9/&+,.()' \\-]*$/.test(item.term) ? item.term : '')) ? '<div class="meaning-en">'+esc(meaning || item.term)+'</div>' : '<div class="meaning-empty">Chưa có full English</div>') +
+ (meaning || (item.term && /^[A-Za-z0-9][A-Za-z0-9/&+,.()' \\-]*$/.test(item.term) ? item.term : '') ? '<div class="meaning-en">'+esc(meaning || item.term)+'</div>' : '<div class="meaning-empty">Chưa có full English</div>') +
  '</td>' +
  '<td class="col-def">' +
  (vi ? '<div class="detail-body"><span class="detail-label">Tiếng Việt</span>'+esc(vi)+'</div>' : '') +
@@ -245,7 +245,7 @@
 
  loadData().then(list => {
  state.all = (list || []).slice().sort(byTerm);
- const missingMeaning = state.all.filter(x => !String(x.meaning || '').trim()).length;
+ const missingMeaning = state.all.filter(x => !String(x.meaning || '').trim().length;
  loadNoteEl.textContent = 'Tổng mục từ: ' + state.all.length + '. Mục từ còn thiếu full English: ' + missingMeaning + '.';
  renderChips();
  filterData();

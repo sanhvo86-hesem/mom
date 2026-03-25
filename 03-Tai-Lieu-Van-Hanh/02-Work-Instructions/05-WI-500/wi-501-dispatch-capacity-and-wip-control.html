@@ -118,7 +118,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>4A. Quy tắc xếp thứ tự mặc định theo họ công đoạn</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Họ công đoạn</th><th>Ưu tiên xếp thứ tự khi cùng class</th><th>Không được quên</th></tr></thead><tbody>
 <tr><td>5-trục / phay-lượt / quay</td><td>Ưu tiên job có mức sẵn sàng đầy đủ, fixture sẵn, chứng minh-out ngắn hơn, và không làm đứt chuỗi QA/mẫu đầu của ca</td><td>Không xếp xen job mới vào giữa hai chứng minh-out đang mở nếu làm tăng rủi ro sự cố nghiêm trọng hoặc trễ nút thắt / điểm nghẽn.</td></tr>
-<tr><td>3-trục / tiện</td><td>Ưu tiên theo due + setup nhóm sản phẩm gần nhau để giảm chuyển đổi ((changeover)), nhưng không được bỏ qua job P1 đã ready đầy đủ</td><td>Không gom tối ưu setup đến mức để job gần due bị trễ.</td></tr>
+<tr><td>3-trục / tiện</td><td>Ưu tiên theo due + setup nhóm sản phẩm gần nhau để giảm chuyển đổi (changeover), nhưng không được bỏ qua job P1 đã ready đầy đủ</td><td>Không gom tối ưu setup đến mức để job gần due bị trễ.</td></tr>
 <tr><td>Hoàn thiện / mài bavia / clean</td><td>Ưu tiên theo rủi ro của bề mặt và công đoạn sau cổng kiểm soát; part đã gần ship hoặc chờ QA phải được hút trước</td><td>Không đẩy part chân không/clean chờ lẫn với part thường làm tăng xử lý / vận chuyển rủi ro.</td></tr>
 <tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship phát hành)</td><td>Ưu tiên theo ship cửa sổ / khung thời gian, cổng kiểm soát đã đủ hồ sơ và mức độ ảnh hưởng khách hàng</td><td>Không nhận thêm lot khi gói hồ sơ còn thiếu; phải trả về Responsible Person công đoạn trước để đóng hồ sơ.</td></tr>
 </tbody></table></div>

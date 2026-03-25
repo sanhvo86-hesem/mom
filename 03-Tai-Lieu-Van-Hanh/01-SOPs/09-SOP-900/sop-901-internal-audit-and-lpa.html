@@ -10,18 +10,18 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
 .legend-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0;}
@@ -29,7 +29,7 @@
 .boxed-list{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .lane-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.35px;color:var(--navy);margin-bottom:6px;}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .role-note{border-left: 3px solid var(--blue);background:#f8fafc;padding:12px 14px;border-radius:8px;margin-top:10px}
@@ -174,7 +174,7 @@ td,th{thead{display:table-header-group}tfoot{display:table-footer-group}}
 </div>
 <h3 class="h3">7.4 Thiết kế và thực hiện LPA</h3>
 <ol class="tight">
-<li>LPA phải dùng câu hỏi ngắn, quan sát trực tiếp, áp cho control lặp và dễ trôi: xác minh trước khi chạy, setup kỷ luật / chuyên ngành, gage trạng thái, NC cách ly, label scan, clean mặc đồ bảo hộ ((gowning)), pack bàn giao, shift bàn giao.</li>
+<li>LPA phải dùng câu hỏi ngắn, quan sát trực tiếp, áp cho control lặp và dễ trôi: xác minh trước khi chạy, setup kỷ luật / chuyên ngành, gage trạng thái, NC cách ly, label scan, clean mặc đồ bảo hộ (gowning), pack bàn giao, shift bàn giao.</li>
 <li>LPA phải có nhiều lớp: lãnh đạo, supervisor, khối hỗ trợ. Không để LPA trở thành hoạt động của riêng QA.</li>
 <li>Thang phản ứng LPA phải rõ: sai nhẹ sửa tại chỗ; sai có rủi ro chất lượng mở phát hiện; sai có rủi ro ship/an toàn/khiếu nại kích hoạt ngăn chặn và escalation ngay.</li>
 <li>LPA tuân thủ phải được theo dõi theo người, theo khu vực và theo lớp quản lý trên bảng điều khiển.</li>
@@ -210,15 +210,15 @@ td,th{thead{display:table-header-group}tfoot{display:table-footer-group}}
 
 <h3>7.9 Đánh giá phạm vi tổng thể, điều khoản-quy trình matrix và mức sẵn sàng lớp phủ</h3>
 <p>Chương trình đánh giá phải bám quy trình map chứ không bám tên Department đơn thuần. QMS Engineer phải duy trì ma trận điều khoản – quá trình – tài liệu – bằng chứng, trong đó ít nhất mỗi quá trình trọng yếu có thể được đánh giá theo ba lát cắt: tuân thủ hệ thống, hiệu lực vận hành và mức sẵn sàng theo Requests khách hàng đặc thù. Với HESEM, mức sẵn sàng lớp phủ bắt buộc phải soi các chiều dễ bị bỏ quên nhưng gây hậu quả lớn: sản phẩm an toàn, nghi ngờ hàng giả / hàng nhái, phiên bản/cấu hình tính toàn vẹn, công đoạn đặc biệt bằng chứng, clean/chân không kiểm soát, label/SSCC kỷ luật / chuyên ngành, con người yếu tố và FOD. Đây là cách xây sẵn nền cho AS9100D mà không biến đánh giá thành tài liệu chỉ để thi chứng nhận.</p>
-<h3>7.10 Năng lực, độc lập và theo dõi học việc ((shadowing)) của đánh giá viên</h3>
-<p>Đánh giá viên không chỉ cần biết điều khoản, mà còn phải đọc được quá trình sản xuất/lệnh sản xuất thực tế. QMS Engineer phải duy trì hồ sơ năng lực đánh giá viên theo ba lớp: hiểu chuẩn, hiểu quá trình, và kỹ năng lấy bằng chứng. Đánh giá viên outsource hoặc đánh giá viên nội bộ mới không được đi một mình vào khu vực rủi ro cao nếu chưa qua theo dõi học việc ((shadowing)) và đánh giá năng lực quan sát tại gemba (thực địa) (thực địa). Người trực tiếp sở hữu quá trình không được đánh giá phần mình vừa quyết định / vừa phát hành nếu việc đó làm mất tính khách quan.</p>
+<h3>7.10 Năng lực, độc lập và theo dõi học việc (shadowing) của đánh giá viên</h3>
+<p>Đánh giá viên không chỉ cần biết điều khoản, mà còn phải đọc được quá trình sản xuất/lệnh sản xuất thực tế. QMS Engineer phải duy trì hồ sơ năng lực đánh giá viên theo ba lớp: hiểu chuẩn, hiểu quá trình, và kỹ năng lấy bằng chứng. Đánh giá viên outsource hoặc đánh giá viên nội bộ mới không được đi một mình vào khu vực rủi ro cao nếu chưa qua theo dõi học việc (shadowing) và đánh giá năng lực quan sát tại gemba (thực địa) (thực địa). Người trực tiếp sở hữu quá trình không được đánh giá phần mình vừa quyết định / vừa phát hành nếu việc đó làm mất tính khách quan.</p>
 <ul class="tight"><li>LPA trưởng nhóm phải biết cell đang nhìn có cổng kiểm soát nào, WI nào, phản ứng chuẩn ra sao nếu thấy lệch.</li><li>Đánh giá viên đánh vào clean/chân không, công đoạn đặc biệt hoặc phê duyệt giao hàng phải đọc trước bộ bằng chứng mẫu, không được đi hiện trường trong trạng thái “chưa biết mình đang tìm gì”.</li></ul>
 <h3>7.11 Theo dõi-the-vết / nhật ký thay đổi: đi từ Requests đến bằng chứng và quay lại gemba (thực địa) (thực địa)</h3>
 <p>Đánh giá tốt phải đi theo vết / nhật ký thay đổi, không đi theo bảng kiểm cứng. Quy tắc là: lấy một job/part/tình huống thực tế, đi từ Requests khách hàng hoặc Requests hệ thống → mốc chuẩn kỹ thuật → lập kế hoạch / điều phối xuất hàng → thực thi cell → kiểm tra / phát hành → pack / ship → hồ sơ / bảng điều khiển, rồi quay ngược lại xem ở đâu đang có đứng cạnh học việc hồ sơ, phiên bản trôi / sai lệch hoặc cổng kiểm soát chỉ tồn tại trên giấy. Khi đánh giá dữ liệu số, đánh giá viên phải so với sự kiện vật lý; khi đánh giá hiện trường, đánh giá viên phải quay về log số. Chỉ kiểm một phía là chưa đủ.</p>
 <h3>7.12 Rule viết phát hiện để ép sửa đúng gốc</h3>
 <p>Phát hiện phải giúp người đọc hiểu ngay đây là lỗi gì, đang đe dọa điều gì và phải sửa từ đâu. Mỗi phát hiện tối thiểu phải có: tiêu chí; bằng chứng có định danh; phân loại mức nghiêm trọng; rủi ro đối với chất lượng/khách hàng/ship/data; ngăn chặn Requests; người sở hữu; hạn sửa chữa / hiệu chính; tiêu chí xác minh hiệu lực. Không được viết phát hiện kiểu mơ hồ “chưa tuân thủ SOP” hoặc “cần cải thiện”. Nếu phát hiện chạm sản phẩm an toàn, phát hành thẩm quyền, truy xuất nguồn gốc, clean tính toàn vẹn, nghi ngờ hàng giả / hàng nhái hoặc khách hàng đặc biệt Requests, mức nghiêm trọng không được hạ thấp chỉ vì chưa thấy khách hàng phàn nàn.</p>
 <h3>7.13 Thiết kế LPA theo tầng quản lý và chủ đề lặp</h3>
-<p>LPA phải đánh trúng những control có tính lặp, dễ trôi và gây thoát / bỏ qua nếu lơi tay. HESEM phải duy trì bộ chủ đề LPA xoay vòng tối thiểu: xác minh trước khi chạy, setup/chuyển đổi ((changeover)), gage trạng thái, cách ly/NC, truy vết label/scan, phòng sạch mục nhập/mặc đồ bảo hộ ((gowning)), đóng gói/bảo quản, shift bàn giao, tool accountability, phê duyệt giao hàng bàn giao. Cùng một chủ đề nhưng câu hỏi của Tier-1, Tier-2 và Tier-3 không giống nhau: Tier-1 nhìn standard công việc, Tier-2 nhìn trôi / sai lệch và phản ứng, Tier-3 nhìn kỷ luật hệ thống và xu hướng. Điều này giúp LPA thực sự là cơ chế lãnh đạo đi gemba (thực địa) (thực địa) chứ không phải bảng kiểm của riêng QA.</p>
+<p>LPA phải đánh trúng những control có tính lặp, dễ trôi và gây thoát / bỏ qua nếu lơi tay. HESEM phải duy trì bộ chủ đề LPA xoay vòng tối thiểu: xác minh trước khi chạy, setup/chuyển đổi (changeover), gage trạng thái, cách ly/NC, truy vết label/scan, phòng sạch mục nhập/mặc đồ bảo hộ (gowning), đóng gói/bảo quản, shift bàn giao, tool accountability, phê duyệt giao hàng bàn giao. Cùng một chủ đề nhưng câu hỏi của Tier-1, Tier-2 và Tier-3 không giống nhau: Tier-1 nhìn standard công việc, Tier-2 nhìn trôi / sai lệch và phản ứng, Tier-3 nhìn kỷ luật hệ thống và xu hướng. Điều này giúp LPA thực sự là cơ chế lãnh đạo đi gemba (thực địa) (thực địa) chứ không phải bảng kiểm của riêng QA.</p>
 <h3>7.14 Xác minh hiệu lực và phạt với lặp lại phát hiện</h3>
 <p>Không có khái niệm kết thúc / đóng thật nếu chưa qua một chu kỳ vận hành có thể tái tạo lỗi. Đánh giá viên hoặc Responsible Person xác minh phải chứng minh được control mới đã chạy thật, bằng chứng được tạo đúng, KPI hoặc xu hướng không còn xấu như cũ và Performer hiểu rule mới. Lặp lại phát hiện phải chịu phạt điều hành: tăng tần suất đánh giá, tăng tầng duyệt, tăng lấy mẫu hoặc Requests trưởng nhóm đi gemba (thực địa) (thực địa) trực tiếp. Nếu lặp lại chạm cùng một rủi ro nhóm sản phẩm qua nhiều SOP/WI, phải mở mang tính hệ thống hành động chứ không xử lý từng phát hiện riêng lẻ.</p>
 <h3>7.15 Đánh giá đầu ra phải chảy vào xem xét của lãnh đạo và thay đổi lộ trình</h3>
@@ -247,7 +247,7 @@ td,th{thead{display:table-header-group}tfoot{display:table-footer-group}}
 <tr><td>JD</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html">JD-QMS Engineer</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-internal-auditor-outsource.html">JD-Nội bộ Đánh giá viên</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">JD-QA Manager</a>; <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html">JD-Sản xuất Giám đốc</a></td><td>Khóa Responsible Person của chương trình đánh giá, người đánh giá, người nhận phát hiện và người chịu trách nhiệm nguồn lực kết thúc / đóng.</td></tr>
 </tbody></table></div>
 <div class="note-blue"><b>Yêu cầu nối tài liệu:</b> phát hiện của SOP-901 không được chết tại bảng kiểm. Mọi phát hiện có tác động hệ thống phải đi qua ngăn chặn/CAPA theo <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>, được đẩy lên rà soát lãnh đạo theo <a href="sop-902-management-review.html">SOP-902</a>, và được chuyển thành hành động cải tiến hoặc chuẩn hóa theo <a href="sop-903-continual-improvement-and-kaizen.html">SOP-903</a>.</div>
-<div class="footer-note">V0 — Bản đánh dấu đỏ ((redline)) R3. Đã thay cũ / lỗi thời REF bằng WI / ANNEX / SOP / FORM / JD hiện hành và tăng chiều sâu phần chương trình đánh giá, LPA, escalation, kết thúc / đóng tới hiệu lực.</div>
+<div class="footer-note">V0 — Bản đánh dấu đỏ (redline) R3. Đã thay cũ / lỗi thời REF bằng WI / ANNEX / SOP / FORM / JD hiện hành và tăng chiều sâu phần chương trình đánh giá, LPA, escalation, kết thúc / đóng tới hiệu lực.</div>
 </div></div></div></div></div>
 <script src="../../../assets/app.js"></script>
 </body>

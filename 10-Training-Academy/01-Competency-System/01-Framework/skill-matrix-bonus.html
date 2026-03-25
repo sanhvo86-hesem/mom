@@ -63,7 +63,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div>
-<h3>Chuẩn đầu ra (Kiến thức – Kỹ năng – Evidence – Chỉ số (K-S-E-M))</h3>
+<h3>Chuẩn đầu ra (Kiến thức – Kỹ năng – Evidence – Chỉ số (K-S-E-M)</h3>
 <ul>
 <li><b>Kiến thức</b>: hiểu đúng khái niệm/tiêu chuẩn/quy định liên quan.</li>
 <li><b>Kỹ năng</b>: vận hành/ra quyết định đúng trong bối cảnh thực tế.</li>
@@ -131,12 +131,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Với một vị trí, chỉ chọn các năng lực liên quan + gán trọng số.
  Công thức (PHẢI):
  </p>
-<pre class="codeblock">K_skill = SUM( Weight_i * MIN(Level_current_i / Level_required_i, 1)) / SUM(Weight_i)</pre>
+<pre class="codeblock">K_skill = SUM( Weight_i * MIN(Level_current_i / Level_required_i, 1) / SUM(Weight_i)</pre>
 <h3>3.3 Hệ số cổng kiểm soát (K<sub>cổng kiểm soát</sub>)</h3>
 <p>
  Công thức (PHẢI):
  </p>
-<pre class="codeblock">K_gate = IF(Any Quan trọng Cổng kiểm soát FAIL, 0, IF(Any Lớn / Nghiêm trọng Cổng kiểm soát FAIL, 0.5, 1))</pre>
+<pre class="codeblock">K_gate = IF(Any Quan trọng Cổng kiểm soát FAIL, 0, IF(Any Lớn / Nghiêm trọng Cổng kiểm soát FAIL, 0.5, 1)</pre>
 <h3>3.4 thưởng kỹ năng (thưởng) (phần thưởng kỹ năng)</h3>
 <p>
  thưởng kỹ năng (thưởng) được tách như một phần của “thưởng hiệu suất” (để tối ưu đóng BHXH theo mô hình HESEM).
@@ -171,7 +171,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div>
-<h3>Mẫu đánh giá từng nhân sự (Nhân viên ma trận kỹ năng (matrix))</h3>
+<h3>Mẫu đánh giá từng nhân sự (Nhân viên ma trận kỹ năng (matrix)</h3>
 <p>
  Dùng biểu mẫu chuẩn để:
  <b>(i)</b> lấy Level Requests theo vị trí, <b>(ii)</b> ghi Level Current + bằng chứng, <b>(iii)</b> đối chiếu cổng kiểm soát chỉ số,
@@ -189,7 +189,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>BaseSalary = 9,500,000 VND</li>
 <li>Rate_skill_pool = 6%</li>
-<li>K_skill (từ ma trận kỹ năng (matrix)) = 0.87</li>
+<li>K_skill (từ ma trận kỹ năng (matrix) = 0.87</li>
 <li>Cổng kiểm soát: không có Quan trọng FAIL, có 1 Lớn / Nghiêm trọng FAIL (trễ hiệu chuẩn kiểm tra) ⇒ K_gate = 0.5</li>
 </ul>
 <pre class="codeblock">Bonus_skill = 9,500,000 * 0.06 * 0.87 * 0.5

@@ -8,21 +8,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -36,7 +36,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -92,7 +92,7 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 <h3>Có bao phủ</h3>
 <ul class="tight">
 <li>Nguyên vật liệu chính, vật tư phụ có ảnh hưởng CTQ, hàng mua theo nguồn chỉ định, tooling, đồ gá thuê ngoài, hiệu chuẩn ngoài.</li>
-<li>Gia công ngoài và công đoạn đặc biệt: mẻ nấu ((heat)) xử lý, xi mạ anốt ((anodize)), mạ, thụ động hóa ((passivation)), làm sạch đặc thù, NDT, lớp phủ / mạ, laser đánh dấu, lần bắn / Photos búa bi ((shot peen)) hoặc dịch vụ tương đương.</li>
+<li>Gia công ngoài và công đoạn đặc biệt: mẻ nấu (heat) xử lý, xi mạ anốt (anodize), mạ, thụ động hóa (passivation), làm sạch đặc thù, NDT, lớp phủ / mạ, laser đánh dấu, lần bắn / Photos búa bi (shot peen) hoặc dịch vụ tương đương.</li>
 <li>Thẩm định nguồn mới, thay đổi nguồn, thay đổi site, thay đổi cert/scope, luồng-xuống / ngừng trên PO, gửi hàng đi, nhận hàng về, rà soát cert, thẻ điểm, SCAR và tái đánh giá năng lực.</li>
 </ul>
 </div>
@@ -128,7 +128,7 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 <tr><td>Nhân viên mua hàng / Mua hàng</td><td>Thu thập hồ sơ nhà cung cấp, phát hành PO, gửi luồng-xuống / ngừng, theo dõi cam kết, cập nhật ETA, tổ chức pack outsource và hồ sơ nhà cung cấp thư mục.</td><td>Được TẠM GIỮ 401-G2 khi PO thiếu field, pack chưa đủ, cert/scope chưa rõ, hoặc nhà cung cấp không cam kết được thời gian dẫn (lead time) / đầu ra điều kiện.</td></tr>
 <tr><td>QA Manager</td><td>Phê duyệt mức kiểm soát chất lượng của nhà cung cấp / người xử lý, chặn nguồn khi phát sinh lỗi, phê duyệt phát hành hoặc từ chối hàng trả về theo bằng chứng.</td><td>Có quyền TẠM GIỮ/TỪ CHỐI mọi lot/batch hoặc nhà cung cấp khi cert/scope không phù hợp, có nghi ngờ giả mạo hoặc lỗi ảnh hưởng CTQ.</td></tr>
 <tr><td>Quality Engineer</td><td>Xem spec, cert Requests, test Requests, đầu vào / nhận hàng plan, thẻ điểm, SCAR và effectiveness sau hành động khắc phục.</td><td>Được Requests siết chặt / thắt chặt phiếu nhận / biên nhận kiểm tra hoặc 100% kiểm tra theo xu hướng rủi ro.</td></tr>
-<tr><td>Kỹ thuật Lead / Quy trình Engineer</td><td>Xác nhận bản vẽ, đặc biệt ghi chú, quy trình lộ trình gia công, che phủ ((masking))/fixture Requests, phiếu / mẫu thử ((coupon))/test mẫu Requests, đã phê duyệt nguyên vật liệu/quy trình Requests.</td><td>Được chặn gửi việc ra ngoài khi mốc chuẩn kỹ thuật chưa khóa hoặc chưa đủ dữ liệu để NCC làm đúng.</td></tr>
+<tr><td>Kỹ thuật Lead / Quy trình Engineer</td><td>Xác nhận bản vẽ, đặc biệt ghi chú, quy trình lộ trình gia công, che phủ (masking)/fixture Requests, phiếu / mẫu thử (coupon)/test mẫu Requests, đã phê duyệt nguyên vật liệu/quy trình Requests.</td><td>Được chặn gửi việc ra ngoài khi mốc chuẩn kỹ thuật chưa khóa hoặc chưa đủ dữ liệu để NCC làm đúng.</td></tr>
 <tr><td>Planner</td><td>Đánh giá tác động công suất và ngày đến hạn, kích hoạt outsource theo plan, phản hồi ưu tiên/hot-job, phối hợp khôi phục / thu hồi khi NCC trễ.</td><td>Được báo cáo vượt cấp lên 401-G3/401-G5 khi outsource ảnh hưởng điều phối xuất hàng độ ổn định hoặc cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch).</td></tr>
 <tr><td>Kho / IQC</td><td>Xuất/nhận kiện, kiểm đếm, kiểm nhận dạng, giữ cách ly / biệt trữ, thực hiện đầu vào / nhận hàng log và chuyển QA đánh giá khi cần.</td><td>Được từ chối xuất/gửi hoặc không nhập kho khi nhãn, số lượng, tình trạng bao gói hoặc chứng từ không khớp.</td></tr>
 </tbody></table></div>
@@ -153,7 +153,7 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 <div class="metric-card"><div class="value">Cert Tính đầy đủ</div><div class="label">% lot/batch có chứng cứ đủ ngay lần đầu</div><div class="mini-note">Theo dõi riêng thiếu cert, sai cert, scope không khớp, site không khớp, label không khớp và cert sắp đến sau.</div></div>
 <div class="metric-card"><div class="value">OTQ / Từ chối Tỷ lệ</div><div class="label">Lỗi đầu vào / nhận hàng / outsource trả lại</div><div class="mini-note">Tách lỗi về kích thước / hoàn thành / công đoạn đặc biệt / giấy tờ / hồ sơ / truy xuất nguồn gốc để ra quyết định đúng nhóm sản phẩm và đúng Responsible Person.</div></div>
 <div class="metric-card"><div class="value">SCAR Kỷ luật</div><div class="label">Quá hạn / tái diễn / hiệu lực sau đóng</div><div class="mini-note">SCAR không đóng bằng trả lời email. Chỉ đóng khi có bằng chứng nguyên nhân, hành động và kết quả sau hành động đủ thuyết phục.</div></div>
-</div><div class="callout"><div class="card-title">KPI bổ sung phải theo dõi hằng tháng</div><ul class="tight"><li>% PO phát hành sạch luồng-xuống / ngừng ngay lần đầu</li><li>% phiếu nhận / biên nhận công đoạn đặc biệt pass ngay lần đầu</li><li>% nhà cung cấp/quy trình ((proc)) site-scope đã xác minh trước use</li><li>Số job bị ảnh hưởng bởi nhà cung cấp thoát / bỏ qua hoặc cert/scope trôi / sai lệch</li></ul></div>
+</div><div class="callout"><div class="card-title">KPI bổ sung phải theo dõi hằng tháng</div><ul class="tight"><li>% PO phát hành sạch luồng-xuống / ngừng ngay lần đầu</li><li>% phiếu nhận / biên nhận công đoạn đặc biệt pass ngay lần đầu</li><li>% nhà cung cấp/quy trình (proc) site-scope đã xác minh trước use</li><li>Số job bị ảnh hưởng bởi nhà cung cấp thoát / bỏ qua hoặc cert/scope trôi / sai lệch</li></ul></div>
 <div class="note-blue" style="margin:12px 0">
  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> SOP này vận hành <b>cung cấp đầu vào cho G2 (IQC)</b>. Kiểm soát nhà cung cấp đảm bảo chất lượng đầu vào cho IQC.
  Các bước nội bộ (SOP-401-G1→G5) là chi tiết triển khai, KHÔNG nhầm với mã cổng hệ thống G0-G7.
@@ -175,7 +175,7 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 </ol>
 <h3 class="h3">7.3 Đã phê duyệt nguyên vật liệu / đã phê duyệt người xử lý / khách hàng source hạn chế</h3>
 <ol class="tight">
-<li>Vật tư nằm trong <a href="../../03-Reference/03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a> mới được mua nếu job Requests AML. Thay cấp / hạng, ram ((temper)), hoàn thành, source category hoặc bằng chứng chuỗi phải quay lại rà soát.</li>
+<li>Vật tư nằm trong <a href="../../03-Reference/03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a> mới được mua nếu job Requests AML. Thay cấp / hạng, ram (temper), hoàn thành, source category hoặc bằng chứng chuỗi phải quay lại rà soát.</li>
 <li>Công đoạn đặc biệt chỉ được giao cho người xử lý có trong <a href="../../03-Reference/04-ANNEX-400/annex-403-approved-processor-list.html">ANNEX-403</a> cho đúng nhóm sản phẩm/scope/site.</li>
 <li>Nếu khách hàng chỉ định nguồn, phải gắn cờ <b>khách hàng-được chỉ định source</b>, giữ nguyên luồng-xuống / ngừng của khách hàng và ghi rõ trách nhiệm nếu source đó vi phạm OTD/OTQ.</li>
 </ol>
@@ -184,8 +184,8 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 <div class="callout-grid">
 <div class="callout-card"><h3>Luồng-xuống / ngừng tối thiểu phải có</h3><ul class="tight">
 <li>Part số, phiên bản, drawing/spec level, số lượng, đơn vị tính, ngày đến hạn.</li>
-<li>Yêu cầu chứng chỉ: MTC/CoC/quy trình cert/test báo cáo/phiếu / mẫu thử ((coupon))/rò rỉ/vệ sinh / sạch sẽ/trực quan Requests.</li>
-<li>Truy xuất nguồn gốc Requests: mẻ nấu ((heat))/lot/batch, cách ly, vật liệu thừa control, tách / chia lot rule.</li>
+<li>Yêu cầu chứng chỉ: MTC/CoC/quy trình cert/test báo cáo/phiếu / mẫu thử (coupon)/rò rỉ/vệ sinh / sạch sẽ/trực quan Requests.</li>
+<li>Truy xuất nguồn gốc Requests: mẻ nấu (heat)/lot/batch, cách ly, vật liệu thừa control, tách / chia lot rule.</li>
 <li>Đóng gói/label/bảo quản Requests; FOD / clean / chân không tương thích nếu áp dụng.</li>
 <li>Điều khoản <b>thay đổi thông báo</b>: nhà cung cấp không được đổi source, quy trình, site, sub-tier, vật tư tiêu hao quan trọng / nghiêm trọng hoặc lộ trình gia công mà không báo và được chấp thuận.</li>
 </ul></div>
@@ -198,7 +198,7 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 <h3 class="h3">7.5 Chuẩn bị pack gia công ngoài và gửi hàng đi</h3>
 <ol class="tight">
 <li>Trước khi gửi, Nhân viên mua hàng + Planner + Kho phải xác nhận part/rev, số lượng, lộ trình gia công, người xử lý, ngày đến hạn, traveler/bộ hồ sơ công việc (job gói hồ sơ), tình trạng bề mặt Current, Photos bằng chứng nếu job Requests.</li>
-<li><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx">FRM-403</a> phải mô tả rõ quy trình đã Requests, spec, che phủ ((masking)) / giá đỡ / khung / định hướng / đào tạo hội nhập / chứng kiến mẫu / phiếu / mẫu thử ((coupon)) nếu áp dụng. <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-404</a> phải pass trước khi giao kiện cho Hậu cần.</li>
+<li><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx">FRM-403</a> phải mô tả rõ quy trình đã Requests, spec, che phủ (masking) / giá đỡ / khung / định hướng / đào tạo hội nhập / chứng kiến mẫu / phiếu / mẫu thử (coupon) nếu áp dụng. <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-404</a> phải pass trước khi giao kiện cho Hậu cần.</li>
 <li>Nếu job đi nhiều người xử lý liên tiếp, mỗi chặng phải có phát hành riêng; không gom nhiều công đoạn đặc biệt vào một “giao miệng”.</li>
 <li>Hot-job gửi ngoài trong cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) của Kế hoạch phải theo thẩm quyền bậc thang năng lực và ghi rõ ai chịu trách nhiệm tác động tới lịch phân xưởng.</li>
 </ol>
@@ -211,7 +211,7 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 <h3 class="h3">7.7 Nhận hàng về, rà soát chứng chỉ và quyết định nhập</h3>
 <ol class="tight">
 <li>Kho/IQC phải kiểm nhận dạng kiện, số lượng, tình trạng bao gói, niêm phong, label và đối chiếu với PO / outsource Requests.</li>
-<li>Cert rà soát phải xác minh tối thiểu: đúng nhà cung cấp/site, đúng quy trình/spec, đúng lot/batch/mẻ nấu ((heat)) khi áp dụng, đúng part/rev, ngày/chữ ký hoặc hệ thống chứng thực, và không có dấu hiệu sửa tay/đè file.</li>
+<li>Cert rà soát phải xác minh tối thiểu: đúng nhà cung cấp/site, đúng quy trình/spec, đúng lot/batch/mẻ nấu (heat) khi áp dụng, đúng part/rev, ngày/chữ ký hoặc hệ thống chứng thực, và không có dấu hiệu sửa tay/đè file.</li>
 <li>Khi quy trình là công đoạn đặc biệt, nếu cert scope không rõ, hết hạn, hoặc cách diễn đạt không khớp / phù hợp luồng-xuống / ngừng, trạng thái phải là <b>TẠM GIỮ</b>. Không nhận “cam kết gửi cert sau” như bằng chứng cho phép dùng.</li>
 <li>Khi cần kiểm tra đầu vào, thực hiện theo WI/FRM tương ứng trước khi phát hành về kho/WIP.</li>
 </ol>
@@ -225,7 +225,7 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 <h3 class="h3">7.9 Kiểm soát thay đổi, nguồn khẩn cấp và tín hiệu giả mạo</h3>
 <ol class="tight">
 <li>Khi buộc phải dùng nguồn khẩn cấp, phải có rủi ro rà soát, kiểm tra escalation, phạm vi lô, ngày đến hạn lý do và thẩm quyền phê duyệt. Nguồn khẩn cấp không tự động trở thành nguồn Đã phê duyệt cho các job sau.</li>
-<li>Tín hiệu nghi giả mạo gồm: cert định dạng lạ, thiếu chuỗi truy vết, mẻ nấu ((heat))/lot không nhất quán, chữ ký không đối chứng, không khớp site/scope, template cert đã tái sử dụng. Gặp tín hiệu này phải TẠM GIỮ và kích hoạt QA rà soát.</li>
+<li>Tín hiệu nghi giả mạo gồm: cert định dạng lạ, thiếu chuỗi truy vết, mẻ nấu (heat)/lot không nhất quán, chữ ký không đối chứng, không khớp site/scope, template cert đã tái sử dụng. Gặp tín hiệu này phải TẠM GIỮ và kích hoạt QA rà soát.</li>
 <li>Mọi nhà cung cấp / người xử lý thay đổi thông báo liên quan site, sub-tier, quy trình thành phần hóa học, kiểm tra lộ trình gia công, Operator đánh giá năng lực, phần mềm/công thức / chương trình gia công quan trọng / nghiêm trọng hoặc công suất chuyển giao phải rà soát trước khi nhận lô tiếp theo.</li>
 </ol>
 <h3 class="h3">7.10 Kiểm soát sub-tier, nhà cung cấp thư mục và phản ứng 60 phút đầu khi chuỗi cung ứng gián đoạn</h3>
@@ -262,7 +262,7 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 </ul></div>
 <h3>7.15 Bộ bằng chứng tối thiểu theo từng nhóm sản phẩm nhà cung cấp / công đoạn đặc biệt</h3>
 <ul class="tight">
-<li><b>Nguyên vật liệu nhà cung cấp:</b> cert hóa học/cơ lý, mẻ nấu ((heat))/lot truy vết, source hạn chế, AML/AML ngoại lệ và bằng chứng chống hàng giả / hàng nhái.</li>
+<li><b>Nguyên vật liệu nhà cung cấp:</b> cert hóa học/cơ lý, mẻ nấu (heat)/lot truy vết, source hạn chế, AML/AML ngoại lệ và bằng chứng chống hàng giả / hàng nhái.</li>
 <li><b>Công đoạn đặc biệt nhà / nội bộ:</b> cert quy trình, site/scope phạm vi bao phủ, thông số/kết quả hồ sơ, đóng gói/vệ sinh / sạch sẽ rule, sub-tier công bố nếu có.</li>
 <li><b>gia công cơ khí/outsource hỗ trợ:</b> traveler/lộ trình gia công/part-rev, mẫu đầu (tiên chi tiết / sản phẩm) hoặc nhận hàng kiểm tra Requests, pack list, label, số lượng đối soát, hư hỏng kiểm tra và hoàn thành bằng chứng.</li>
 <li><b>Customer-chỉ đạo nhà cung cấp:</b> phê duyệt email/PO note/CSR trích xuất, sai lệch rule, phạm vi miễn trừ (nếu có) và liên hệ chuỗi khi xảy ra vấn đề.</li>

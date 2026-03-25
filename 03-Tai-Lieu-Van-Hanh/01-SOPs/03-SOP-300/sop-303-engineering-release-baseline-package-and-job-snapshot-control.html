@@ -11,21 +11,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -39,7 +39,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -122,7 +122,7 @@ td,th{
 <tr><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html">Setup Technician – Ca 1 / Ca 2</a></td><td>I</td><td>I</td><td>I</td><td>I</td><td>R</td><td>Xác nhận tại máy/CMM/khu vực sử dụng đúng snapshot hiệu lực</td></tr>
 <tr><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">Job Description — Chief Executive Officer</a></td><td>I</td><td>I</td><td>I</td><td>I</td><td>A</td><td>Phê duyệt ngoại lệ cấp cao khi rủi ro vượt ngưỡng</td></tr></tbody></table></div>
 <div class="role-note"><b>Lưu ý ranh giới trách nhiệm:</b> Kỹ sư Quy trình chịu trách nhiệm nguyên tắc gói chuẩn; CAM/NC chịu trách nhiệm job-level technical snapshot; Kế hoạch chịu trách nhiệm gắn snapshot đúng job và đúng thời điểm release; QA chịu trách nhiệm package đủ điều kiện kiểm soát/đo/FAI; QMS/Document Control chịu trách nhiệm controlled copy, obsolete sweep và nhật ký withdrawal trên FRM-307. Không ai được tự ý "sửa ngay tại file phát hành" ở điểm sử dụng.</div></div>
-<h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2><div class="field-grid"><div class="field"><b>Gói chuẩn tối thiểu</b><div class="blank">Drawing PDF rev hiệu lực; model 3D nếu có; spec/customer notes; route sơ bộ hoặc route kỹ thuật; CTQ list; kiểm tra concept/control plan khi áp dụng; phiếu setup template; công đoạn đặc biệt requirements; packaging/label requirements; gói chất lượng level; danh mục phát hành.</div></div><div class="field"><b>Snapshot package tối thiểu</b><div class="blank">Job number; part/rev; traveler link; mã chương trình/Rev; phiếu setup rev; danh sách dao cụ; fixture note; kiểm tra requirement / FRM-305 link khi áp dụng; cert/truy xuất requirements; điểm sử dụng release nhật ký; snapshot danh mục phát hành.</div></div><div class="field"><b>Điều kiện tạm giữ khi package chưa được phát hành</b><div class="blank">Thiếu file lõi; rev không thống nhất; link chết; chưa có QA approval cho job class bắt buộc; chưa có phát hành chương trình kiểm tra (phát hành chương trình (program release)) khi cần CMM; thiếu controlled copy/obsolete sweep plan; chưa rõ điểm sử dụng.</div></div><div class="field"><b>Đầu ra bắt buộc của SOP-303</b><div class="blank">Baseline danh mục phát hành; snapshot danh mục phát hành; approval nhật ký; thay thế có kiểm soát register; điểm sử dụng vấn đề/withdrawal hồ sơ; update link vào FRM-204/205/501; revalidation trigger tới SOP-302/504 nếu change ảnh hưởng sản xuất.</div></div></div><ul class="tight"><li>Không phát hành snapshot bằng cách copy ngẫu hứng các file từ nhiều nơi rồi gửi link chat/email. Mọi snapshot <b>PHẢI</b> có danh mục phát hành và chủ trì.</li><li>Controlled copy giấy chỉ là bản trình bày tại điểm sử dụng; nguồn hiệu lực vẫn là bộ hồ sơ phát hành và nhật ký phát hành. Bản in cũ chưa thu hồi = package mới chưa hoàn tất release.</li><li>Khi job class yêu cầu, gói chất lượng như control plan, PFMEA-lite, FAI trigger, phát hành chương trình kiểm tra <b>PHẢI</b> là một phần của package completeness chứ không được để công đoạn sau tự đi tìm.</li></ul><h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
+<h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2><div class="field-grid"><div class="field"><b>Gói chuẩn tối thiểu</b><div class="blank">Drawing PDF rev hiệu lực; model 3D nếu có; spec/customer notes; route sơ bộ hoặc route kỹ thuật; CTQ list; kiểm tra concept/control plan khi áp dụng; phiếu setup template; công đoạn đặc biệt requirements; packaging/label requirements; gói chất lượng level; danh mục phát hành.</div></div><div class="field"><b>Snapshot package tối thiểu</b><div class="blank">Job number; part/rev; traveler link; mã chương trình/Rev; phiếu setup rev; danh sách dao cụ; fixture note; kiểm tra requirement / FRM-305 link khi áp dụng; cert/truy xuất requirements; điểm sử dụng release nhật ký; snapshot danh mục phát hành.</div></div><div class="field"><b>Điều kiện tạm giữ khi package chưa được phát hành</b><div class="blank">Thiếu file lõi; rev không thống nhất; link chết; chưa có QA approval cho job class bắt buộc; chưa có phát hành chương trình kiểm tra (phát hành chương trình (program release) khi cần CMM; thiếu controlled copy/obsolete sweep plan; chưa rõ điểm sử dụng.</div></div><div class="field"><b>Đầu ra bắt buộc của SOP-303</b><div class="blank">Baseline danh mục phát hành; snapshot danh mục phát hành; approval nhật ký; thay thế có kiểm soát register; điểm sử dụng vấn đề/withdrawal hồ sơ; update link vào FRM-204/205/501; revalidation trigger tới SOP-302/504 nếu change ảnh hưởng sản xuất.</div></div></div><ul class="tight"><li>Không phát hành snapshot bằng cách copy ngẫu hứng các file từ nhiều nơi rồi gửi link chat/email. Mọi snapshot <b>PHẢI</b> có danh mục phát hành và chủ trì.</li><li>Controlled copy giấy chỉ là bản trình bày tại điểm sử dụng; nguồn hiệu lực vẫn là bộ hồ sơ phát hành và nhật ký phát hành. Bản in cũ chưa thu hồi = package mới chưa hoàn tất release.</li><li>Khi job class yêu cầu, gói chất lượng như control plan, PFMEA-lite, FAI trigger, phát hành chương trình kiểm tra <b>PHẢI</b> là một phần của package completeness chứ không được để công đoạn sau tự đi tìm.</li></ul><h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
 <div class="note-blue" style="margin:12px 0">
 <b>&#x1F5FA;&#xFE0F; Vị trí trong hệ thống 8 cổng (G0&#x2192;G7):</b> SOP-303 vận hành bên trong cổng hệ thống <b>G1 &mdash; Engineering</b>. Các bước nội bộ (303-G1&#x2192;303-G5) là chi tiết triển khai, KH&Ocirc;NG nhầm với mã cổng hệ thống G0&ndash;G7.
 <br/>Lưu ý: Các bước nội bộ 303-G1 đến 303-G5 là các bước chi tiết BÊN TRONG cổng hệ thống G1 (Engineering). Không nhầm với mã cổng hệ thống G0-G7.

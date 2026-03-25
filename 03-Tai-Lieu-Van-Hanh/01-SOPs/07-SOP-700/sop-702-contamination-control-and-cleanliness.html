@@ -10,21 +10,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -38,7 +38,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -112,7 +112,7 @@ td,th{
 <div data-phase2i="true">
 <h2>Quy tắc điều hành — Clean-lưu kho / lưu trữ lớp / phân loại, vượt ngưỡng disposition và mở lại quy tắc</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:24%"/><col style="width:24%"/><col style="width:24%"/><col style="width:28%"/></colgroup><thead><tr><th>Tình huống trong tuyến sạch</th><th>Mặc định trạng thái</th><th>Điều phải làm ngay</th><th>Điều kiện mới được mở lại</th></tr></thead><tbody>
-<tr><td>Khu vực sạch vượt ngưỡng bụi / hành vi mặc đồ bảo hộ ((gowning)) / cửa kỷ luật / chuyên ngành nhưng part chưa pack</td><td>TẠM GIỮ lot đang vận hành</td><td>Dừng vận hành, dòng / chuyền thông quan / giải phóng, xác định part đã mức độ tiếp xúc / phơi nhiễm, làm sạch khu và đánh giá re-clean.</td><td>Khu vực trở lại đạt + bị ảnh hưởng tồn kho đã có disposition rõ.</td></tr>
+<tr><td>Khu vực sạch vượt ngưỡng bụi / hành vi mặc đồ bảo hộ (gowning) / cửa kỷ luật / chuyên ngành nhưng part chưa pack</td><td>TẠM GIỮ lot đang vận hành</td><td>Dừng vận hành, dòng / chuyền thông quan / giải phóng, xác định part đã mức độ tiếp xúc / phơi nhiễm, làm sạch khu và đánh giá re-clean.</td><td>Khu vực trở lại đạt + bị ảnh hưởng tồn kho đã có disposition rõ.</td></tr>
 <tr><td>Clean-pack đã niêm phong nhưng HIC out-of-phạm vi / dải, niêm phong hở hoặc bao bì rách</td><td>Clean-hold</td><td>Đánh giá pack tính toàn vẹn, mức độ tiếp xúc / phơi nhiễm time, chất hút ẩm / thanh lọc / loại bỏ / bag trạng thái; không ship trực tiếp.</td><td>Re-pack hoặc re-clean/re-xác minh theo rủi ro; QA xác nhận trước phát hành.</td></tr>
 <tr><td>Giám sát gap trên clean khu vực hoặc tủ chứa tồn kho sạch</td><td>Clean-hold cho bị ảnh hưởng tồn kho</td><td>Khoanh thời gian gap, lượng tồn kho bị ảnh hưởng, sổ tay / thủ công backup và bảo quản điều kiện.</td><td>Có đánh giá được lập thành tài liệu rằng điều kiện vẫn chấp nhận được hoặc đã re-quy trình phù hợp.</td></tr>
 <tr><td>bìa thùng thùng carton / vật bẩn / tool không kiểm soát đi vào clean khu vực</td><td>TẠM GIỮ khu vực và lot mở</td><td>Loại bỏ vật lạ, vệ sinh lại, rà FOD/nhiễm bẩn path, ghi hồ sơ và xem lại hành vi control.</td><td>Supervisor + QA xác nhận khu sạch và part bị ảnh hưởng đã được xử lý xong.</td></tr>
@@ -127,7 +127,7 @@ td,th{
 <tr><td>tương thích, đóng túi, niêm phong / bịt kín, thanh lọc / loại bỏ, hold-time</td><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-709_Clean_Packaging_Checklist.xlsx" download="">FRM-709</a></td><td>Phát hành quyết định dựa trên bằng chứng, không dựa vào cảm tính.</td></tr>
 <tr><td>hạt / phần tử / lau / nhiễm bẩn xác minh khi Requests</td><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-712_Helium_Leak_Test_Record.xlsx" download="">FRM-712</a></td><td>Không bỏ qua khi sản phẩm / khách hàng Requests dữ liệu này.</td></tr>
 </tbody></table></div>
-</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-sop702-clean-workbooks">12. Biểu mẫu Excel đang hiệu lực — Clean / phòng sạch / chân không hồ sơ đã chuyển sang sổ tay thực hành</h2><div class="note phase3a-workbook-alignment"><b>Điểm thay đổi</b><br/>SOP-702 phải dùng bộ sổ tay thực hành hiện hành để ghi bằng chứng sạch thay vì nhồi hết vào log tổng quát: <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-713_Cleanroom_Entry_and_Gowning_Log.xlsx" download="">FRM-713</a> cho mục nhập/mặc đồ bảo hộ ((gowning)), <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-714_Ultrasonic_Cleaning_Batch_Record.xlsx" download="">FRM-714</a> cho siêu âm làm sạch batch, và <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-715_Vacuum_Compatible_Clean_Build_and_Bagging_Record.xlsx" download="">FRM-715</a> cho chân không-tương thích clean xây dựng &amp; đóng túi. Trong danh mục hiện hành không duy trì HTML biểu mẫu active hay lưu trữ kèm theo cho các FRM này; người dùng phải vào thẳng sổ tay thực hành hiện hành.</div></div></div></div></div>
+</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-sop702-clean-workbooks">12. Biểu mẫu Excel đang hiệu lực — Clean / phòng sạch / chân không hồ sơ đã chuyển sang sổ tay thực hành</h2><div class="note phase3a-workbook-alignment"><b>Điểm thay đổi</b><br/>SOP-702 phải dùng bộ sổ tay thực hành hiện hành để ghi bằng chứng sạch thay vì nhồi hết vào log tổng quát: <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-713_Cleanroom_Entry_and_Gowning_Log.xlsx" download="">FRM-713</a> cho mục nhập/mặc đồ bảo hộ (gowning), <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-714_Ultrasonic_Cleaning_Batch_Record.xlsx" download="">FRM-714</a> cho siêu âm làm sạch batch, và <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-715_Vacuum_Compatible_Clean_Build_and_Bagging_Record.xlsx" download="">FRM-715</a> cho chân không-tương thích clean xây dựng &amp; đóng túi. Trong danh mục hiện hành không duy trì HTML biểu mẫu active hay lưu trữ kèm theo cho các FRM này; người dùng phải vào thẳng sổ tay thực hành hiện hành.</div></div></div></div></div>
 <script src="../../../assets/app.js"></script>
 </body>
 </html>

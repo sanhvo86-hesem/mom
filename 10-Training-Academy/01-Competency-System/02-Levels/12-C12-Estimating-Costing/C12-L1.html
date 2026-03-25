@@ -53,7 +53,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cost-waste-tool-scrap.html">DRL-10 — TRN-Bài diễn tập ACA-DRL-10 — Chi phí &amp;amp; Lãng phí (Tool tuổi thọ / vòng đời • Phế phẩm • Làm lại) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship gói hồ sơ)) | HESEM Academy</a></li>
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cost-waste-tool-scrap.html">DRL-10 — TRN-Bài diễn tập ACA-DRL-10 — Chi phí &amp;amp; Lãng phí (Tool tuổi thọ / vòng đời • Phế phẩm • Làm lại) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship gói hồ sơ) | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
  Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
@@ -120,7 +120,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>đơn vị giá:</strong> vật liệu + gia công (setup + run) + QC/kiểm tra + hoàn thiện bề mặt/thuê ngoài + đóng gói + chi phí gián tiếp + biên lợi nhuận.</li>
 <li><strong>Điều kiện:</strong> thời gian dẫn định nghĩa, MOQ, hiệu lực, Incoterms, thanh toán, thay đổi policy.</li>
 </ul>
-<div class="cap">Tách NRE giúp minh bạch: mẫu thử ((prototype)) tốn setup cao nhưng run thấp; sản xuất thì ngược lại.</div>
+<div class="cap">Tách NRE giúp minh bạch: mẫu thử (prototype) tốn setup cao nhưng run thấp; sản xuất thì ngược lại.</div>
 </div><h3>3.3. Machine Giờ Tỷ lệ: công thức và bẫy hay gặp</h3><p><strong>Machine Giờ Tỷ lệ (MHR)</strong> là chi phí 1 giờ máy “ bán” (tính phí giờ), không phải 1 giờ đồng hồ. Một cách tính thực dụng:</p><div class="codeblock">
  MHR = (Chi phí sở hữu máy/năm + bảo trì + điện + khấu hao + phần lao động trực tiếp gắn với máy + chi phí gián tiếp phân bổ)
  / (Giờ máy khả dụng/năm x tỷ lệ sử dụng x Hiệu suất)
@@ -129,8 +129,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Hiệu suất</strong> phản ánh thực tế: đổi job nhiều, setup dài, tool thay đổi, chờ QC…</li>
 <li><strong>Quy tắc HESEM:</strong> MHR do Finance/OPS ban hành; Người định giá không tự đổi MHR.</li>
 </ul><h3>3.4. Ước tính thời gian gia công: 3 lớp phương pháp</h3><ol>
-<li><strong>Rule-of-ngón cái / quy tắc nhanh (L1):</strong> dựa trên lộ trình gia công chuẩn và kinh nghiệm (vd: khoan/tarô ((taro ren) ren) theo số lỗ, phay mặt theo diện tích).</li>
-<li><strong>CAM Mô phỏng (L2):</strong> dùng thời gian mô phỏng đường chạy dao; hiệu chỉnh bởi hệ số thực tế (bước tiến ((feed)) ghi đè / bỏ qua, tool thay đổi, đo bằng đầu dò).</li>
+<li><strong>Rule-of-ngón cái / quy tắc nhanh (L1):</strong> dựa trên lộ trình gia công chuẩn và kinh nghiệm (vd: khoan/tarô (taro ren) ren) theo số lỗ, phay mặt theo diện tích).</li>
+<li><strong>CAM Mô phỏng (L2):</strong> dùng thời gian mô phỏng đường chạy dao; hiệu chỉnh bởi hệ số thực tế (bước tiến (feed) ghi đè / bỏ qua, tool thay đổi, đo bằng đầu dò).</li>
 <li><strong>lịch sử/tham số (L3):</strong> dùng dữ liệu job tương tự (nhóm sản phẩm) + mô hình tham số (diện tích cắt, khối lượng loại bỏ, số lần setup) để dự báo.</li>
 </ol><p>Người định giá giỏi không chọn 1 phương pháp duy nhất. Họ dùng <strong>tam giác kiểm chứng</strong>: rule-of-ngón cái / quy tắc nhanh ↔ mô phỏng ↔ lịch sử. Khi 3 cái lệch nhau quá lớn, đó là tín hiệu rủi ro.</p><h2>4. Quy trình vận hành chuẩn (luồng dọc, dễ đọc)</h2><p class="small">Lưu đồ được thiết kế theo hướng dọc để đọc rõ khi in A4. chỉnh trực tiếp bằng HTML/CSS.</p><div class="vflow">
 <div class="vstep">
@@ -165,7 +165,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="vnum">5</div>
 <div class="vtext">
 <strong>Tính vật liệu &amp; tỷ lệ đạt</strong>
-<p>Tính phôi, dung sai cho phép, phế phẩm dung sai cho phép theo dữ liệu; cộng chi phí cắt phôi/mẻ nấu ((heat)) số truy vết khi cần.</p>
+<p>Tính phôi, dung sai cho phép, phế phẩm dung sai cho phép theo dữ liệu; cộng chi phí cắt phôi/mẻ nấu (heat) số truy vết khi cần.</p>
 </div>
 </div>
 <div class="vstep">
@@ -308,11 +308,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="small">Kiểm soát cổng ưu tiên: an toàn → chất lượng → tuân thủ hồ sơ → đạo đức dữ liệu. Vi phạm kiểm soát cổng có nguy cơ dẫn tới không công nhận Level/thưởng.</p>
 </div><h2>6. Bài tập theo Level (Nghiên cứu tình huống HESEM)</h2><p class="small">Mỗi tình huống được thiết kế theo “học thuật ứng dụng”: có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (bằng chứng) để chấm. chuẩn làm theo nhóm và rà soát chéo để tăng chất lượng tư duy.</p><div class="card">
 <h3>Tình huống 1: Ước tính job đơn giản – bích nhôm 2 mặt phẳng</h3>
-<p class="small">Part dạng bích nhôm 6061, phay 2 mặt, khoan 8 lỗ, tarô ((taro ren) ren) 4 lỗ. Qty 20 pcs.</p>
+<p class="small">Part dạng bích nhôm 6061, phay 2 mặt, khoan 8 lỗ, tarô (taro ren) ren) 4 lỗ. Qty 20 pcs.</p>
 <div class="cols-2">
 <div>
 <strong>Dữ liệu (Đầu vào):</strong>
-<ul><li>Nguyên vật liệu: 6061-T6, phôi tấm</li><li>Ops: mặt / bề mặt phay, khoan/tarô ((taro ren) ren), vát mép, mài bavia</li><li>hoàn thành: không có</li></ul>
+<ul><li>Nguyên vật liệu: 6061-T6, phôi tấm</li><li>Ops: mặt / bề mặt phay, khoan/tarô (taro ren) ren), vát mép, mài bavia</li><li>hoàn thành: không có</li></ul>
 </div>
 <div>
 <strong>Nhiệm vụ theo Level 1:</strong>
@@ -325,22 +325,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout"><strong>Tiêu chí chấm điểm:</strong> Ưu tiên đúng cấu trúc và giả định rõ ràng hơn là con số tuyệt đối.
  </div>
 </div><div class="card">
-<h3>Tình huống 2: Bẫy bỏ sót công đoạn – xi mạ anốt ((anodize)) + che phủ ((masking))</h3>
-<p class="small">RFQ ghi 'xi mạ anốt ((anodize)) đen'. Bản vẽ có note 'che / mặt nạ ren' nhưng người định giá bỏ qua.</p>
+<h3>Tình huống 2: Bẫy bỏ sót công đoạn – xi mạ anốt (anodize) + che phủ (masking)</h3>
+<p class="small">RFQ ghi 'xi mạ anốt (anodize) đen'. Bản vẽ có note 'che / mặt nạ ren' nhưng người định giá bỏ qua.</p>
 <div class="cols-2">
 <div>
 <strong>Dữ liệu (Đầu vào):</strong>
-<ul><li>hoàn thành: xi mạ anốt ((anodize)) đen</li><li>Note: che / mặt nạ nội bộ ren M6</li></ul>
+<ul><li>hoàn thành: xi mạ anốt (anodize) đen</li><li>Note: che / mặt nạ nội bộ ren M6</li></ul>
 </div>
 <div>
 <strong>Nhiệm vụ theo Level 1:</strong>
-<ol><li>Xác định công đoạn phụ (che phủ ((masking))) và thêm chi phí xử lý / vận chuyển.</li><li>Đưa ra hỏi Kinh doanh/QA về Requests chứng từ/hoàn thành spec.</li></ol>
+<ol><li>Xác định công đoạn phụ (che phủ (masking) và thêm chi phí xử lý / vận chuyển.</li><li>Đưa ra hỏi Kinh doanh/QA về Requests chứng từ/hoàn thành spec.</li></ol>
 </div>
 </div>
 <hr class="sep"/>
 <strong>Sản phẩm đầu ra (Evidence):</strong>
 <ul><li>Ước tính cập nhật</li><li>Danh sách câu hỏi làm rõ</li></ul>
-<div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi nhận diện 'che phủ ((masking))' là nguyên nhân / động lực tăng chi phí/thời gian dẫn.
+<div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi nhận diện 'che phủ (masking)' là nguyên nhân / động lực tăng chi phí/thời gian dẫn.
  </div>
 </div><div class="card">
 <h3>Tình huống 3: Ước tính sai do nhầm đơn vị</h3>
@@ -352,13 +352,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div>
 <strong>Nhiệm vụ theo Level 1:</strong>
-<ol><li>Chỉ ra dấu hiệu nhận biết đơn vị trên bản vẽ.</li><li>Sửa ước tính: vật liệu, cycle time, giá.</li><li>Đưa ra poka (chống sai) (chống sai)-giá đỡ ((yoke)) để tránh tái diễn.</li></ol>
+<ol><li>Chỉ ra dấu hiệu nhận biết đơn vị trên bản vẽ.</li><li>Sửa ước tính: vật liệu, cycle time, giá.</li><li>Đưa ra poka (chống sai) (chống sai)-giá đỡ (yoke) để tránh tái diễn.</li></ol>
 </div>
 </div>
 <hr class="sep"/>
 <strong>Sản phẩm đầu ra (Evidence):</strong>
-<ul><li>Ước tính đã sửa</li><li>Đưa ra poka (chống sai) (chống sai)-giá đỡ ((yoke)) (bảng kiểm)</li></ul>
-<div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi poka (chống sai) (chống sai)-giá đỡ ((yoke)) cụ thể: field bắt buộc 'đơn vị' trong ước tính.
+<ul><li>Ước tính đã sửa</li><li>Đưa ra poka (chống sai) (chống sai)-giá đỡ (yoke) (bảng kiểm)</li></ul>
+<div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi poka (chống sai) (chống sai)-giá đỡ (yoke) cụ thể: field bắt buộc 'đơn vị' trong ước tính.
  </div>
 </div><h2>7. OJT theo TWI (Job Sự cố hỏng máy + bảng kiểm)</h2><p class="small">TWI (Training Within Ngành công nghiệp) nhấn mạnh: <strong>chia nhỏ công việc</strong> → <strong>điểm then chốt</strong> → <strong>lý do</strong>. OJT của HESEM phải tạo được “thói quen đúng” và bằng chứng (hồ sơ) để sẵn sàng đánh giá.</p><h3>7.1. Job Sự cố hỏng máy Sheet (mẫu)</h3><table class="table">
 <thead><tr><th>Bước</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead>
@@ -465,7 +465,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Tình huống: bản vẽ dùng inch. Bạn kiểm tra ở đâu và làm sao tránh nhầm?</li>
 <li>Khi nào cần thêm chi phí QC/kiểm tra trong ước tính? Nêu 3 ví dụ.</li>
 <li>Bài toán: cycle time 6 phút/pcs, qty 20, setup 90 phút. Tổng giờ máy là bao nhiêu?</li>
-<li>Khi RFQ Requests xi mạ anốt ((anodize)), người định giá cần hỏi/ghi gì về hoàn thành spec?</li>
+<li>Khi RFQ Requests xi mạ anốt (anodize), người định giá cần hỏi/ghi gì về hoàn thành spec?</li>
 <li>Nêu 2 ví dụ công đoạn phụ dễ bị bỏ sót nhưng tạo biên lợi nhuận rò rỉ.</li>
 <li>ALCOA+ áp dụng thế nào trong lưu ước tính version?</li>
 <li>KPI 'ước tính tính đầy đủ' dùng để làm gì?</li>
@@ -478,7 +478,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Thiếu nhiều dòng; không theo mẫu.</td>
 <td>Đủ dòng chính; theo mẫu.</td>
 <td>Đầy đủ, rõ giả định; dễ rà soát.</td>
-<td>Thiết kế poka (chống sai) (chống sai)-giá đỡ ((yoke)); giảm thiếu sót hệ thống.</td>
+<td>Thiết kế poka (chống sai) (chống sai)-giá đỡ (yoke); giảm thiếu sót hệ thống.</td>
 </tr>
 <tr>
 <td><strong>Ước tính time (setup/run)</strong></td>

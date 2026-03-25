@@ -8,21 +8,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -36,7 +36,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -196,7 +196,7 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 <li>Quyền đặc quyền phải có lý giải / biện minh, thời hạn, người chịu trách nhiệm giám sát và bằng chứng đóng quyền sau khi hết việc.</li>
 <li>Khách truy cập chỉ mở theo thư viện hoặc nhóm hồ sơ được chỉ định; PHẢI chặn khách duyệt toàn site.</li>
 <li>Vai trò thay đổi phải rà toàn bộ quyền cũ; không chỉ cộng quyền mới lên quyền cũ.</li>
-<li>thôi việc / rời công ty phải thu hồi tài khoản, group, dùng chung hộp thư truy cập, khách chia sẻ, di động phiên / buổi và mã thông báo ((token)) liên quan.</li>
+<li>thôi việc / rời công ty phải thu hồi tài khoản, group, dùng chung hộp thư truy cập, khách chia sẻ, di động phiên / buổi và mã thông báo (token) liên quan.</li>
 </ul>
 <div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không được cấp quyền nếu người duyệt không đúng thẩm quyền, nếu Requests thiếu hết hạn date cho quyền tạm thời, hoặc nếu người dùng được xin quyền không có trong vai trò map.</div>
 <h3>7.3 Xây và đổi cấu hình thư viện/list/luồng</h3>
@@ -259,9 +259,9 @@ td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
 <h3>7.10 Kiểm soát export / báo cáo / tích hợp / tự động hóa để tránh tạo “đứng cạnh học việc system”</h3>
 <p>Nhiều rủi ro dữ liệu không đến từ tin tặc mà đến từ các file export, báo cáo tự viết, bot, Power truy vấn, macro, API hoặc tích hợp phụ làm trôi SoR/SSOT. Mọi export định kỳ, bảng điều khiển, bot hoặc luồng dùng cho quyết định vận hành phải có Responsible Person, mục đích, nguồn dữ liệu, tần suất làm mới, logic chuyển đổi, rule kiểm chéo và Approver. Không cho phép một bảng điều khiển, file Excel hoặc báo cáo tự phát trở thành nguồn quyết định điều phối xuất hàng, phê duyệt giao hàng hoặc hóa đơn nếu chưa qua <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>/<a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a> / kiểm soát thay đổi phù hợp.</p>
 <h3>7.11 Thiết bị, USB, hình ảnh điện thoại và dữ liệu trên máy cục bộ</h3>
-<p>Ảnh, video, file scan, program backup và data export tạo ở hiện trường chỉ được xem là bằng chứng chính thức khi được chuyển vào SSOT có siêu dữ liệu và link tới tình huống/job tương ứng. Không cho phép để hình ảnh chứng cứ, scan cert, scan traveler, ảnh NCR hoặc file pack nằm lâu dài trên điện thoại cá nhân, USB không kiểm soát, chat app hoặc ổ cứng cục bộ. Nếu tình huống gián đoạn buộc dùng phương tiện tạm, phải ghi log nhận diện phương tiện, người giữ, thời gian dùng và thời điểm nhập dữ liệu ((ingest)) về SSOT; sau đó xóa hoặc niêm phong theo quy định.</p>
+<p>Ảnh, video, file scan, program backup và data export tạo ở hiện trường chỉ được xem là bằng chứng chính thức khi được chuyển vào SSOT có siêu dữ liệu và link tới tình huống/job tương ứng. Không cho phép để hình ảnh chứng cứ, scan cert, scan traveler, ảnh NCR hoặc file pack nằm lâu dài trên điện thoại cá nhân, USB không kiểm soát, chat app hoặc ổ cứng cục bộ. Nếu tình huống gián đoạn buộc dùng phương tiện tạm, phải ghi log nhận diện phương tiện, người giữ, thời gian dùng và thời điểm nhập dữ liệu (ingest) về SSOT; sau đó xóa hoặc niêm phong theo quy định.</p>
 <h3>7.12 Quy tắc an ninh mạng sự cố, giữ pháp lý số và khôi phục sau sự cố</h3>
-<p>Khi có dấu hiệu mã độc tống tiền ((ransomware)), tài khoản thỏa hiệp, file mã hóa bất thường, chia sẻ sai đối tượng hoặc nghi bị lộ dữ liệu khách hàng, HESEM phải coi đó là sự cố vận hành chứ không phải việc riêng của IT. IT Admin phải cô lập tài khoản / thiết bị / site liên quan, QMS Engineer đánh giá tác động tới bằng chứng và phát hành cổng, còn Quy trình Owner xác định job nào đang chịu rủi ro dùng dữ liệu không tin cậy. Nếu sự cố chạm phê duyệt giao hàng, khiếu nại, pháp lý vấn đề hoặc dữ liệu khách hàng, giữ pháp lý số phải được bật ngay cho các vùng dữ liệu liên quan cho tới khi sự cố đóng.</p>
+<p>Khi có dấu hiệu mã độc tống tiền (ransomware), tài khoản thỏa hiệp, file mã hóa bất thường, chia sẻ sai đối tượng hoặc nghi bị lộ dữ liệu khách hàng, HESEM phải coi đó là sự cố vận hành chứ không phải việc riêng của IT. IT Admin phải cô lập tài khoản / thiết bị / site liên quan, QMS Engineer đánh giá tác động tới bằng chứng và phát hành cổng, còn Quy trình Owner xác định job nào đang chịu rủi ro dùng dữ liệu không tin cậy. Nếu sự cố chạm phê duyệt giao hàng, khiếu nại, pháp lý vấn đề hoặc dữ liệu khách hàng, giữ pháp lý số phải được bật ngay cho các vùng dữ liệu liên quan cho tới khi sự cố đóng.</p>
 <h3>7.13 Truy cập tái chứng nhận, có đặc quyền truy cập và ngắt / nghỉ-kính / thủy tinh kỷ luật / chuyên ngành</h3>
 <p>rà soát quyền truy cập hàng quý không phải thủ tục ký cho đủ. Approver phải rà 5 câu: người này còn cần quyền không, quyền có vượt nhu cầu không, có xung đột nhiệm vụ không, có quyền chia sẻ/export quá rộng không, và nếu nghỉ việc/đổi vai trò hôm nay thì thôi việc / rời công ty có hở lỗ nào không. Quyền đặc quyền, dịch vụ tài khoản, admin tài khoản, dùng chung hộp thư và ngắt / nghỉ-kính / thủy tinh tài khoản phải có Responsible Person, mật khẩu xoay vòng / bí mật control, log sử dụng và rà soát riêng. Không được dùng dùng chung tài khoản làm cách lách phê duyệt cá nhân.</p>
 <h3>7.14 Evidence số phải đọc được, truy được và chứng minh được tính nguyên vẹn</h3>
