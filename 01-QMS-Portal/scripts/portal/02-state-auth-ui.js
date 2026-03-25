@@ -3762,8 +3762,8 @@ function openGitSyncReportModal(kind, res){
       ${gitSyncRenderOutputBlock(lang==='en'?'Push output':'Log push', res && res.push_output)}
     `;
 
-  const primaryButton = isPull && pulled
-    ? `<button class="btn-admin primary" onclick="adminReloadLatestPortal()">${lang==='en'?'OK - reload latest portal':'OK - tải lại portal mới nhất'}</button>`
+  const primaryButton = isPull
+    ? `<button class="btn-admin primary" onclick="adminReloadLatestPortal()">${lang==='en'?(pulled?'OK - reload latest portal':'OK - refresh portal'):(pulled?'OK - tải lại portal mới nhất':'OK - làm mới portal')}</button>`
     : '';
 
   const modal = document.createElement('div');
