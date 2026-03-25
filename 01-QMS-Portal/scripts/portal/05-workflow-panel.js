@@ -89,8 +89,23 @@ async function deleteDraft(code){
   try{
     const res = await apiCall('doc_delete_drafts', {code, base_path: doc.path});
     if(res && res.ok){
-      if(res.state) setDocState(code, res.state);
       if(res.versions) setDocVersions(code, res.versions);
+      if(res.state){
+        const nextState = Object.assign({}, res.state);
+        const hasWorkingVersion = Array.isArray(res.versions) && res.versions.some(function(v){
+          return v && (v.status==='draft' || v.status==='in_review' || v.status==='pending_approval');
+        });
+        if(!hasWorkingVersion){
+          delete nextState.lastEdit;
+          delete nextState.submittedBy;
+          delete nextState.submittedDate;
+          delete nextState.submittedUpdateType;
+          delete nextState.rejectedBy;
+          delete nextState.rejectedDate;
+          delete nextState.checked_out_by;
+        }
+        setDocState(code, nextState);
+      }
     }
   }catch(e){}
 
@@ -117,8 +132,23 @@ async function clearDraftHistory(code){
   try{
     const res = await apiCall('doc_delete_drafts', {code, base_path: doc.path});
     if(res && res.ok){
-      if(res.state) setDocState(code, res.state);
       if(res.versions) setDocVersions(code, res.versions);
+      if(res.state){
+        const nextState = Object.assign({}, res.state);
+        const hasWorkingVersion = Array.isArray(res.versions) && res.versions.some(function(v){
+          return v && (v.status==='draft' || v.status==='in_review' || v.status==='pending_approval');
+        });
+        if(!hasWorkingVersion){
+          delete nextState.lastEdit;
+          delete nextState.submittedBy;
+          delete nextState.submittedDate;
+          delete nextState.submittedUpdateType;
+          delete nextState.rejectedBy;
+          delete nextState.rejectedDate;
+          delete nextState.checked_out_by;
+        }
+        setDocState(code, nextState);
+      }
     }
   }catch(e){}
 
@@ -596,8 +626,11 @@ function renderVersionHistory(doc){
         ${(function(){
           var st=getDocState(doc.code)||{};
           var summaryHtml='';
+          var hasEdited=!!getEditedHtml(doc.code);
+          var hasWorkingVersion=(typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : false;
+          var hasDraftArtifacts=hasEdited || hasWorkingVersion;
           // Show last editor info
-          if(st.lastEdit && st.lastEdit.by){
+          if(st.lastEdit && st.lastEdit.by && hasDraftArtifacts){
             summaryHtml+='<div style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #e2e8f0;background:#f8fafc">✏️ '+(lang==='en'?'Last editor':'Người chỉnh sửa cuối')+': <b>'+st.lastEdit.by+'</b>'+(st.lastEdit.role?' — '+st.lastEdit.role:'')+(st.lastEdit.date?' · '+st.lastEdit.date:'')+'</div>';
           }
           // Show last review submission
@@ -633,12 +666,14 @@ function renderVersionHistory(doc){
           var st=getDocState(doc.code)||{};
           var hasEdited=!!getEditedHtml(doc.code);
           var docSt=getDocStatus(doc);
-          var draftCount=versions.filter(function(v){return v && v.status==='draft';}).length;
-          var hasWorkingVersion=(typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : (draftCount>0);
+          var workingVersionCount=versions.filter(function(v){
+            return v && (v.status==='draft' || v.status==='in_review' || v.status==='pending_approval');
+          }).length;
+          var hasWorkingVersion=(typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : (workingVersionCount>0);
           // Show footer if there is draft history OR there is an active draft/edited content
-          if(!(draftCount>0 || (docSt==='draft' && (hasEdited || (st.lastEdit && hasWorkingVersion))))) return '';
+          if(!(workingVersionCount>0 || (docSt==='draft' && (hasEdited || (st.lastEdit && hasWorkingVersion))))) return '';
 
-          var btnClear = draftCount>0
+          var btnClear = workingVersionCount>0
             ? '<button style="font-size:10px;padding:4px 10px;border:1px solid #fca5a5;border-radius:6px;background:#fff;color:#dc2626;cursor:pointer" onclick="clearDraftHistory(\''+doc.code+'\')">🧹 '+(lang==='en'?'Clear all drafts':'Xóa tất cả nháp')+'</button>'
             : '';
           var btnDel = (docSt==='draft' && (hasEdited || (st.lastEdit && hasWorkingVersion)))

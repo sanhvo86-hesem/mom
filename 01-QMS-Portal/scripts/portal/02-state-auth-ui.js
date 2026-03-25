@@ -1394,6 +1394,7 @@ function buildDocHeaderActions(doc){
     const isWorkbook=isDownloadOnlyDoc(doc);
     const versions=getDocVersions(doc.code)||[];
     const activeDraft=versions.find(v=>v && v.status==='draft' && (v.download_url || v.file) && String(v.version||'').replace(/^v/i,'')===String(getDocRevision(doc)||''));
+    const hasDiscardableWorkbookDraft=!!activeDraft || ((typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : false);
 
     // While editing: show edit workflow buttons
     if(editMode && editingDoc===doc.code){
@@ -1413,7 +1414,7 @@ function buildDocHeaderActions(doc){
       return `
         ${renderDocHeaderButton(lang==='en'?'Upload draft':'Upload bản nháp', 'upload', 'primary', `uploadFormDraft('${doc.code}')`)}
         ${activeDraft?renderDocHeaderButton(T('wf_submit_review'), 'submit', 'accent', `submitWorkbookForReview('${doc.code}')`):''}
-        ${renderDocHeaderButton(lang==='en'?'Discard draft':'Hủy nháp', 'cancel', 'danger', `deleteDraft('${doc.code}')`)}
+        ${hasDiscardableWorkbookDraft?renderDocHeaderButton(lang==='en'?'Discard draft':'Hủy nháp', 'cancel', 'danger', `deleteDraft('${doc.code}')`):''}
       `;
     }
 
@@ -1443,6 +1444,8 @@ function updateDocViewerHeader(doc){
   const rev = getDocRevision(doc);
   const state = getDocState(doc.code);
   const viewFile = getDocViewFile(doc) || doc.path;
+  const hasWorkingDraft = (((typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : false)
+    || ((typeof getEditedHtml==='function') && !!getEditedHtml(doc.code)));
 
   // Build submitted-by meta
   let submittedMeta='';
@@ -1454,7 +1457,7 @@ function updateDocViewerHeader(doc){
 
   // Build last-editor meta (who last edited/saved draft)
   let lastEditMeta='';
-  if(state && state.lastEdit && state.lastEdit.by){
+  if(state && state.lastEdit && state.lastEdit.by && hasWorkingDraft){
     const le=state.lastEdit;
     lastEditMeta=`<div class="dv-meta-note edit"><span class="dv-meta-note-label">${lang==='en'?'Last edited by':'Người chỉnh sửa cuối'}</span><b>${le.by}</b><span>${le.role?le.role+' · ':''}${le.date||''}</span></div>`;
   }

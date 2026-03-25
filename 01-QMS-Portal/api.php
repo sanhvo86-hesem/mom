@@ -3928,7 +3928,7 @@ case 'doc_save_draft': {
       $state['status'] = $hasApproved ? 'approved' : 'draft';
       $state['revision'] = $hasApproved ? $releasedRev : form_normalize_revision((string)($state['revision'] ?? '0'), '0');
       $state['released_revision'] = $releasedRev;
-      foreach (['submittedBy','submittedDate','submittedUpdateType','rejectedBy','checked_out_by'] as $k) {
+      foreach (['lastEdit','submittedBy','submittedDate','submittedUpdateType','rejectedBy','rejectedDate','checked_out_by'] as $k) {
         if (array_key_exists($k, $state)) unset($state[$k]);
       }
       form_save_state($DATA_DIR, (string)$formEntry['code'], $state);
