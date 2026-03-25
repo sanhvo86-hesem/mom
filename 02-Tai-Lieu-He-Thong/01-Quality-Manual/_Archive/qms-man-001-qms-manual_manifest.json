@@ -1,0 +1,35 @@
+{
+    "code": "QMS-MAN-001",
+    "updated_at": "2026-03-25T03:36:03+00:00",
+    "versions": [
+        {
+            "id": "20260325_033603_draft",
+            "version": "v0.1",
+            "status": "draft",
+            "date": "2026-03-25 03:36",
+            "user": "Võ Ngọc Sanh",
+            "role": "ceo",
+            "note": "Bắt đầu phiên bản mới",
+            "updateType": "minor",
+            "file": "02-Tai-Lieu-He-Thong/01-Quality-Manual/_Archive/qms-man-001-qms-manual_V00.01_DRAFT.html"
+        },
+        {
+            "id": "20260325_032701_approved",
+            "version": "v0",
+            "status": "initial_release",
+            "date": "2026-03-25 03:27",
+            "user": "Võ Ngọc Sanh",
+            "role": "ceo",
+            "submittedBy": "Võ Ngọc Sanh",
+            "submittedDate": "2026-03-25 03:26",
+            "lastEditBy": "",
+            "lastEditRole": "",
+            "lastEditDate": "",
+            "approvedBy": "Võ Ngọc Sanh",
+            "approvedDate": "2026-03-25 03:27",
+            "note": "",
+            "updateType": "minor",
+            "file": "02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html"
+        }
+    ]
+}
