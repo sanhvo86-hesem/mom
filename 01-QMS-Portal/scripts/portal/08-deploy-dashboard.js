@@ -124,6 +124,13 @@ function renderKpiCard(state,kpi){
   return `<div class="kpi-mini-card kpi-rag-${rag}"><div class="kpi-mini-icon">${kpi.icon}</div><div class="kpi-mini-body"><div class="kpi-mini-label">${kpi.label}</div><div class="kpi-mini-target">Target: ${kpi.target}</div></div><input type="text" class="kpi-mini-input" value="${value}" placeholder="-" onchange="updateMetric('${kpi.id}', this.value)"></div>`;
 }
 
+let _deployActiveTab='overview';
+function switchDeployTab(tabId){
+  _deployActiveTab=tabId;
+  document.querySelectorAll('.deploy-tab').forEach(t=>{t.classList.toggle('active',t.dataset.tab===tabId);});
+  document.querySelectorAll('.deploy-tab-panel').forEach(p=>{p.classList.toggle('active',p.id==='dtab-'+tabId);});
+}
+
 function renderDeployDashboard(){
   const container=document.getElementById('page-deploy');
   if(!container)return;
@@ -137,14 +144,17 @@ function renderDeployDashboard(){
   const redSignals=blockedDepartments+redKpis+getNumberValue(state.kpiValues.sev1Open);
   const checklist=getPhaseChecklist(state.currentPhase);
   const checklistDone=checklist.filter((item,index)=>state.checklistItems[state.currentPhase+'-'+index]).length;
+  const at=_deployActiveTab;
 
   container.innerHTML=`
     <div class="deploy-dash">
+
+      <!-- ═══ Hero — compact strip ═══ -->
       <section class="deploy-hero">
         <div class="deploy-hero-main">
           <span class="deploy-kicker">${isVi?'Triển khai vận hành':'Operations deployment'}</span>
-          <h1>${isVi?'Command Center triển khai vận hành và tiếp cận tài liệu':'Operations deployment command center'}</h1>
-          <p>${isVi?'Dashboard này đồng thời là bảng điều phối cho lãnh đạo, bảng readiness cho command center và document hub cho từng phòng ban.':'This dashboard combines steering control, readiness tracking, and a document hub for every department.'}</p>
+          <h1>${isVi?'Command Center triển khai vận hành':'Operations deployment command center'}</h1>
+          <p>${isVi?'Bảng điều phối, readiness, command center và document hub cho từng phòng ban.':'Steering control, readiness tracking, and document hub for every department.'}</p>
           <div class="deploy-hero-actions">
             <a class="deploy-action-link" href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html" target="_blank">WI-106</a>
             <a class="deploy-action-link" href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html" target="_blank">WI-105</a>
@@ -162,89 +172,113 @@ function renderDeployDashboard(){
             <span class="hero-side-label">${isVi?'Checklist pha':'Phase checklist'}</span>
             <strong>${checklistDone}/${checklist.length}</strong>
             <div>${isVi?'Mục đã xác nhận':'Items confirmed'}</div>
-            <div class="hero-side-meta">${getNextChecklistItem(state)|| (isVi?'Không còn mục mở':'No open items')}</div>
+            <div class="hero-side-meta">${getNextChecklistItem(state)||(isVi?'Không còn mục mở':'No open items')}</div>
           </div>
         </div>
       </section>
 
+      <!-- ═══ Summary strip ═══ -->
       <section class="deploy-summary-grid">
-        <div class="deploy-summary-card"><span class="summary-label">${isVi?'Phòng ban sẵn sàng':'Departments ready'}</span><strong>${readyDepartments}/${DEPLOY_CONFIG.departments.length}</strong><div>${isVi?'Đạt 100% trên 6 tiêu chí readiness':'Reached 100% across 6 readiness criteria'}</div></div>
-        <div class="deploy-summary-card"><span class="summary-label">${isVi?'Đang triển khai':'In progress'}</span><strong>${departmentsInProgress}</strong><div>${isVi?'Phòng ban đang đi qua wave hiện tại':'Departments moving through the active wave'}</div></div>
-        <div class="deploy-summary-card"><span class="summary-label">Champion coverage</span><strong>${getChampionPercent(state)}%</strong><div>${getNumberValue(state.kpiValues.championPass)}/${DEPLOY_CONFIG.championTarget} ${isVi?'Champion đã pass':'champions passed'}</div></div>
-        <div class="deploy-summary-card summary-alert"><span class="summary-label">${isVi?'Tín hiệu đỏ':'Red signals'}</span><strong>${redSignals}</strong><div>${blockedDepartments} ${isVi?'phòng ban bị chặn':'blocked departments'} • ${redKpis} KPI ${isVi?'đỏ':'red'}</div></div>
+        <div class="deploy-summary-card"><span class="summary-label">${isVi?'Phòng ban sẵn sàng':'Departments ready'}</span><strong>${readyDepartments}/${DEPLOY_CONFIG.departments.length}</strong><div>${isVi?'Đạt 100% trên 6 tiêu chí':'100% across 6 criteria'}</div></div>
+        <div class="deploy-summary-card"><span class="summary-label">${isVi?'Đang triển khai':'In progress'}</span><strong>${departmentsInProgress}</strong><div>${isVi?'Phòng ban đang đi qua wave':'Moving through active wave'}</div></div>
+        <div class="deploy-summary-card"><span class="summary-label">Champion</span><strong>${getChampionPercent(state)}%</strong><div>${getNumberValue(state.kpiValues.championPass)}/${DEPLOY_CONFIG.championTarget} ${isVi?'đã pass':'passed'}</div></div>
+        <div class="deploy-summary-card summary-alert"><span class="summary-label">${isVi?'Tín hiệu đỏ':'Red signals'}</span><strong>${redSignals}</strong><div>${blockedDepartments} ${isVi?'chặn':'blocked'} · ${redKpis} KPI ${isVi?'đỏ':'red'}</div></div>
       </section>
 
-      <section class="deploy-section">
-        <div class="deploy-section-head"><h2>${isVi?'Lộ trình 5 pha':'Five-phase roadmap'}</h2><span>${isVi?'Nhấn để chuyển pha đang theo dõi':'Click to set active phase'}</span></div>
-        <div class="deploy-phase-timeline">${DEPLOY_CONFIG.phases.map((phase)=>renderPhaseNode(state,phase)).join('<div class="phase-connector"></div>')}</div>
-      </section>
+      <!-- ═══ Tab bar ═══ -->
+      <nav class="deploy-tabs">
+        <button class="deploy-tab ${at==='overview'?'active':''}" data-tab="overview" onclick="switchDeployTab('overview')">${isVi?'Tổng quan':'Overview'}</button>
+        <button class="deploy-tab ${at==='departments'?'active':''}" data-tab="departments" onclick="switchDeployTab('departments')">${isVi?'Phòng ban':'Departments'}</button>
+        <button class="deploy-tab ${at==='readiness'?'active':''}" data-tab="readiness" onclick="switchDeployTab('readiness')">${isVi?'Readiness & Gate':'Readiness & Gate'}</button>
+        <button class="deploy-tab ${at==='command'?'active':''}" data-tab="command" onclick="switchDeployTab('command')">Command Center</button>
+        <button class="deploy-tab ${at==='docs'?'active':''}" data-tab="docs" onclick="switchDeployTab('docs')">${isVi?'Tài liệu':'Documents'}</button>
+      </nav>
 
-      <section class="deploy-section">
-        <div class="deploy-section-head"><h2>${isVi?'7 trụ phải triển khai':'Seven mandatory deployment pillars'}</h2><span>${isVi?'Không được coi go-live thành công nếu thiếu bất kỳ trụ nào':'Go-live is not complete if any pillar is missing'}</span></div>
-        <div class="deploy-pillar-grid">${DEPLOY_CONFIG.pillars.map((pillar)=>`<div class="deploy-pillar-card"><h3>${pillar.title}</h3><div class="pillar-owner">${pillar.owner}</div><p>${pillar.deliverable}</p><div class="pillar-pass">${pillar.pass}</div></div>`).join('')}</div>
-      </section>
+      <!-- ═══ TAB 1: Tổng quan ═══ -->
+      <div class="deploy-tab-panel ${at==='overview'?'active':''}" id="dtab-overview">
+        <section class="deploy-section">
+          <div class="deploy-section-head"><h2>${isVi?'Lộ trình 5 pha':'Five-phase roadmap'}</h2><span>${isVi?'Nhấn để chuyển pha đang theo dõi':'Click to set active phase'}</span></div>
+          <div class="deploy-phase-timeline">${DEPLOY_CONFIG.phases.map((phase)=>renderPhaseNode(state,phase)).join('<div class="phase-connector"></div>')}</div>
+        </section>
+        <section class="deploy-section">
+          <div class="deploy-section-head"><h2>${isVi?'7 trụ triển khai':'Seven deployment pillars'}</h2><span>${isVi?'Thiếu bất kỳ trụ nào = chưa go-live':'Missing any pillar = no go-live'}</span></div>
+          <div class="deploy-pillar-grid">${DEPLOY_CONFIG.pillars.map((pillar)=>`<div class="deploy-pillar-card"><h3>${pillar.title}</h3><div class="pillar-owner">${pillar.owner}</div><p>${pillar.deliverable}</p><div class="pillar-pass">${pillar.pass}</div></div>`).join('')}</div>
+        </section>
+        <section class="deploy-section">
+          <div class="deploy-section-head"><h2>${isVi?'KPI triển khai':'Deployment KPIs'}</h2><span>${isVi?'Nhập giá trị thực tế':'Enter current values'}</span></div>
+          <div class="kpi-mini-grid">${DEPLOY_CONFIG.kpis.map((kpi)=>renderKpiCard(state,kpi)).join('')}</div>
+        </section>
+      </div>
 
-      <section class="deploy-section">
-        <div class="deploy-section-head"><h2>${isVi?'Wave rollout theo phòng ban':'Wave rollout by department'}</h2><span>${isVi?'Mỗi wave phải có readiness và support riêng':'Each wave needs its own readiness and support model'}</span></div>
-        <div class="deploy-wave-grid">${[1,2,3].map((wave)=>renderWaveColumn(state,wave)).join('')}</div>
-      </section>
+      <!-- ═══ TAB 2: Phòng ban ═══ -->
+      <div class="deploy-tab-panel ${at==='departments'?'active':''}" id="dtab-departments">
+        <section class="deploy-section">
+          <div class="deploy-section-head"><h2>${isVi?'Wave rollout':'Wave rollout'}</h2><span>${isVi?'Mỗi wave có readiness và support riêng':'Each wave has its own readiness and support'}</span></div>
+          <div class="deploy-wave-grid">${[1,2,3].map((wave)=>renderWaveColumn(state,wave)).join('')}</div>
+        </section>
+        <section class="deploy-section">
+          <div class="deploy-section-head"><h2>${isVi?'Navigator theo phòng ban':'Department navigator'}</h2><span>${isVi?'Cửa vào tài liệu và readiness cho từng phòng':'Document entry point per department'}</span></div>
+          <div class="deploy-dept-grid">${DEPLOY_CONFIG.departments.map((dept)=>renderDepartmentCard(state,dept)).join('')}</div>
+        </section>
+      </div>
 
-      <section class="deploy-section">
-        <div class="deploy-section-head"><h2>${isVi?'Navigator theo phòng ban':'Department navigator'}</h2><span>${isVi?'Đây là cửa vào tài liệu và ô readiness cho từng phòng ban':'This is the document entry point and readiness card for each department'}</span></div>
-        <div class="deploy-dept-grid">${DEPLOY_CONFIG.departments.map((dept)=>renderDepartmentCard(state,dept)).join('')}</div>
-      </section>
-
-      <section class="deploy-section">
-        <div class="deploy-section-head"><h2>${isVi?'Bảng readiness và Go/No-Go':'Readiness and Go/No-Go board'}</h2><span>${isVi?'Cập nhật theo phòng ban và theo 6 tiêu chí readiness':'Update each department across the 6 readiness dimensions'}</span></div>
-        <div class="deploy-table-wrap">
-          <table class="deploy-heatmap">
-            <thead>
-              <tr>
-                <th>${isVi?'Phòng ban':'Department'}</th>
-                <th>Wave</th>
-                ${DEPLOY_CONFIG.readinessDimensions.map((dim)=>`<th title="${dim.help}">${dim.label}</th>`).join('')}
-                <th>${isVi?'Tiến độ':'Progress'}</th>
-              </tr>
-            </thead>
-            <tbody>${DEPLOY_CONFIG.departments.map((dept)=>renderReadinessRow(state,dept)).join('')}</tbody>
-          </table>
-        </div>
-        <div class="heatmap-legend">
-          <span class="hm-legend-item"><span class="hm-dot hm-pending"></span>${isVi?'Chưa bắt đầu':'Not started'}</span>
-          <span class="hm-legend-item"><span class="hm-dot hm-in_progress"></span>${isVi?'Đang thực hiện':'In progress'}</span>
-          <span class="hm-legend-item"><span class="hm-dot hm-completed"></span>${isVi?'Hoàn thành':'Completed'}</span>
-          <span class="hm-legend-item"><span class="hm-dot hm-blocked"></span>${isVi?'Bị chặn':'Blocked'}</span>
-        </div>
-      </section>
-
-      <section class="deploy-row-2col">
-        <div class="deploy-section">
-          <div class="deploy-section-head"><h2>${isVi?'Checklist pha hiện tại':'Current phase checklist'}</h2><span>${activePhase.label} • ${activePhase.title}</span></div>
+      <!-- ═══ TAB 3: Readiness & Gate ═══ -->
+      <div class="deploy-tab-panel ${at==='readiness'?'active':''}" id="dtab-readiness">
+        <section class="deploy-section">
+          <div class="deploy-section-head"><h2>${isVi?'Bảng readiness':'Readiness board'}</h2><span>${isVi?'Nhấn ô để chuyển trạng thái':'Click a cell to cycle status'}</span></div>
+          <div class="deploy-table-wrap">
+            <table class="deploy-heatmap">
+              <thead>
+                <tr>
+                  <th>${isVi?'Phòng ban':'Department'}</th>
+                  <th>Wave</th>
+                  ${DEPLOY_CONFIG.readinessDimensions.map((dim)=>`<th title="${dim.help}">${dim.label}</th>`).join('')}
+                  <th>${isVi?'Tiến độ':'Progress'}</th>
+                </tr>
+              </thead>
+              <tbody>${DEPLOY_CONFIG.departments.map((dept)=>renderReadinessRow(state,dept)).join('')}</tbody>
+            </table>
+          </div>
+          <div class="heatmap-legend">
+            <span class="hm-legend-item"><span class="hm-dot hm-pending"></span>${isVi?'Chưa bắt đầu':'Not started'}</span>
+            <span class="hm-legend-item"><span class="hm-dot hm-in_progress"></span>${isVi?'Đang thực hiện':'In progress'}</span>
+            <span class="hm-legend-item"><span class="hm-dot hm-completed"></span>${isVi?'Hoàn thành':'Completed'}</span>
+            <span class="hm-legend-item"><span class="hm-dot hm-blocked"></span>${isVi?'Bị chặn':'Blocked'}</span>
+          </div>
+        </section>
+        <section class="deploy-section">
+          <div class="deploy-section-head"><h2>${isVi?'Checklist pha hiện tại':'Current phase checklist'}</h2><span>${activePhase.label} · ${activePhase.title}</span></div>
           <div class="checklist-grid">${checklist.map((item,index)=>{const key=state.currentPhase+'-'+index;const checked=!!state.checklistItems[key];return `<label class="checklist-item ${checked?'checked':''}"><input type="checkbox" ${checked?'checked':''} onchange="toggleChecklist('${key}', this.checked)"><span class="checklist-code">${item.code}</span><span class="checklist-text">${item.text}</span></label>`;}).join('')}</div>
           <div class="deploy-links-compact"><a href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html" target="_blank">WI-106</a><a href="../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html" target="_blank">ANNEX-114</a><a href="../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html" target="_blank">ANNEX-117</a></div>
-        </div>
+        </section>
+      </div>
 
-        <div class="deploy-section">
-          <div class="deploy-section-head"><h2>${isVi?'Command center và hypercare':'Command center and hypercare'}</h2><span>${isVi?'Cập nhật issue severity và support signal':'Update issue severity and support signals'}</span></div>
-          <div class="command-card-grid">
-            <div class="command-card"><span class="command-label">Sev-1</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.sev1Open)}" onchange="updateMetric('sev1Open', this.value)"><small>${isVi?'Dừng sản xuất / rollback signal':'Stop / rollback signal'}</small></div>
-            <div class="command-card"><span class="command-label">Sev-2</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.sev2Open)}" onchange="updateMetric('sev2Open', this.value)"><small>${isVi?'Cần workaround và review nhanh':'Needs workaround and fast review'}</small></div>
-            <div class="command-card"><span class="command-label">Sev-3</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.sev3Open)}" onchange="updateMetric('sev3Open', this.value)"><small>${isVi?'Cần đóng trong ngày / backlog':'Same-day close or backlog'}</small></div>
-            <div class="command-card"><span class="command-label">${isVi?'Champion pass':'Champion passed'}</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.championPass)}" onchange="updateMetric('championPass', this.value)"><small>${DEPLOY_CONFIG.championTarget} ${isVi?'là mục tiêu toàn công ty':'is the company target'}</small></div>
+      <!-- ═══ TAB 4: Command Center ═══ -->
+      <div class="deploy-tab-panel ${at==='command'?'active':''}" id="dtab-command">
+        <section class="deploy-row-2col">
+          <div class="deploy-section">
+            <div class="deploy-section-head"><h2>${isVi?'Issue severity':'Issue severity'}</h2><span>${isVi?'Cập nhật signal':'Update signals'}</span></div>
+            <div class="command-card-grid">
+              <div class="command-card"><span class="command-label">Sev-1</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.sev1Open)}" onchange="updateMetric('sev1Open', this.value)"><small>${isVi?'Dừng sản xuất / rollback signal':'Stop / rollback signal'}</small></div>
+              <div class="command-card"><span class="command-label">Sev-2</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.sev2Open)}" onchange="updateMetric('sev2Open', this.value)"><small>${isVi?'Cần workaround và review nhanh':'Needs workaround and fast review'}</small></div>
+              <div class="command-card"><span class="command-label">Sev-3</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.sev3Open)}" onchange="updateMetric('sev3Open', this.value)"><small>${isVi?'Đóng trong ngày / backlog':'Same-day close or backlog'}</small></div>
+              <div class="command-card"><span class="command-label">${isVi?'Champion pass':'Champion passed'}</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.championPass)}" onchange="updateMetric('championPass', this.value)"><small>${DEPLOY_CONFIG.championTarget} ${isVi?'mục tiêu':'target'}</small></div>
+            </div>
           </div>
-          <div class="cadence-list">${DEPLOY_CONFIG.commandCadence.map((item)=>`<div class="cadence-item"><strong>${item.title}</strong><span>${item.cadence}</span><p>${item.owner} • ${item.purpose}</p></div>`).join('')}</div>
-        </div>
-      </section>
+          <div class="deploy-section">
+            <div class="deploy-section-head"><h2>${isVi?'Lịch điều hành':'Meeting cadence'}</h2></div>
+            <div class="cadence-list">${DEPLOY_CONFIG.commandCadence.map((item)=>`<div class="cadence-item"><strong>${item.title}</strong><span>${item.cadence}</span><p>${item.owner} · ${item.purpose}</p></div>`).join('')}</div>
+          </div>
+        </section>
+      </div>
 
-      <section class="deploy-section">
-        <div class="deploy-section-head"><h2>${isVi?'KPI triển khai và dashboard governance':'Deployment and governance KPIs'}</h2><span>${isVi?'Nhập giá trị thực tế để theo dõi tín hiệu xanh / vàng / đỏ':'Enter current values to track green / amber / red signals'}</span></div>
-        <div class="kpi-mini-grid">${DEPLOY_CONFIG.kpis.map((kpi)=>renderKpiCard(state,kpi)).join('')}</div>
-      </section>
-
-      <section class="deploy-section">
-        <div class="deploy-section-head"><h2>${isVi?'Document hub cho mọi phòng ban':'Document hub for every department'}</h2><span>${isVi?'Những bộ tài liệu cần mở nhiều nhất trong triển khai và hypercare':'Most-used document packs during rollout and hypercare'}</span></div>
-        <div class="doc-group-grid">${DEPLOY_CONFIG.docsByGroup.map((group)=>`<div class="doc-group-card"><h3>${group.title}</h3><p>${group.subtitle}</p><div class="doc-group-links">${group.items.map((item)=>`<a class="deploy-doc-card" href="${item.path}" target="_blank"><span class="deploy-doc-code">${item.code}</span><span class="deploy-doc-title">${item.title}</span></a>`).join('')}</div></div>`).join('')}</div>
-      </section>
+      <!-- ═══ TAB 5: Tài liệu ═══ -->
+      <div class="deploy-tab-panel ${at==='docs'?'active':''}" id="dtab-docs">
+        <section class="deploy-section">
+          <div class="deploy-section-head"><h2>${isVi?'Document hub':'Document hub'}</h2><span>${isVi?'Tài liệu dùng nhiều nhất trong triển khai':'Most-used during rollout'}</span></div>
+          <div class="doc-group-grid">${DEPLOY_CONFIG.docsByGroup.map((group)=>`<div class="doc-group-card"><h3>${group.title}</h3><p>${group.subtitle}</p><div class="doc-group-links">${group.items.map((item)=>`<a class="deploy-doc-card" href="${item.path}" target="_blank"><span class="deploy-doc-code">${item.code}</span><span class="deploy-doc-title">${item.title}</span></a>`).join('')}</div></div>`).join('')}</div>
+        </section>
+      </div>
 
       <div class="deploy-footer"><span>${isVi?'Cập nhật lần cuối':'Last updated'}: ${state.lastUpdated?new Date(state.lastUpdated).toLocaleString('vi-VN'):'-'}</span><button class="deploy-btn-reset" onclick="resetDeployState()">${isVi?'Reset dữ liệu':'Reset data'}</button></div>
     </div>

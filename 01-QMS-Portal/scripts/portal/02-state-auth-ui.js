@@ -1402,7 +1402,7 @@ function navigateTo(page, filter){
   const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',forms:'Form trực tuyến'};
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
-  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),forms:lang==='en'?'Online Forms':'Form trực tuyến'};
+  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',forms:lang==='en'?'Online Forms':'Form trực tuyến'};
   // Reset header breadcrumb for non-documents pages
   if(page !== 'documents'){
     const bcEl = document.getElementById('header-breadcrumb');
