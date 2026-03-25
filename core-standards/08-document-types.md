@@ -74,7 +74,7 @@ Moi SOP cua HESEM PHAI co du 10 section theo thu tu sau. KHONG duoc bo section, 
 <section id="s6-gates" class="sop-section">
   <h2>6. Cong kiem soat, diem dung bat buoc & KPI</h2>
   <div class="gate-card">
-    <h3>G1 — Ten gate</h3>
+    <h3>G2 — Ten gate</h3>
     <p><strong>PASS:</strong> dieu kien</p>
     <p><strong>HOLD/FAIL:</strong> dieu kien</p>
     <p><strong>Vai tro:</strong> ai quyet dinh</p>
@@ -88,7 +88,7 @@ Moi SOP cua HESEM PHAI co du 10 section theo thu tu sau. KHONG duoc bo section, 
 
 <section id="s7-procedure" class="sop-section">
   <h2>7. Quy trinh chi tiet</h2>
-  <h3>G1 — Ten gate</h3>
+  <h3>G2 — Ten gate</h3>
   <p>Mo ta ngan.</p>
   <ul>
     <li>Buoc 1...</li>

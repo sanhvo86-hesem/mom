@@ -181,7 +181,7 @@ Moi tai lieu HTML co bang revision history o cuoi trang, trong `<footer>` hoac s
 |-----------|------|---------------|---------------|-------|
 | V0 | 2025-06-01 | Nguyen Van A | Phat hanh lan dau | DCR-001 |
 | V1.1 | 2025-08-15 | Tran Van B | Sua loi chinh ta Section 3, cap nhat link Section 10 | DCR-015 |
-| V2.0 | 2025-11-01 | Nguyen Van A | Them gate G4, thay doi vai tro QC Lead | DCR-042 |
+| V2.0 | 2025-11-01 | Nguyen Van A | Them gate G5, thay doi vai tro QC Lead | DCR-042 |
 
 ### 5.3 Quy tac ghi
 

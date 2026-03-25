@@ -167,7 +167,7 @@ Bang 3 cot:
 **Gate cards:**
 
 Moi gate la 1 card chua:
-- Ten gate (vi du: G1 — Kiem tra cau truc)
+- Ten gate (vi du: G2 — Kiem tra cau truc)
 - Dieu kien PASS
 - Dieu kien HOLD/FAIL
 - Vai tro quyet dinh
@@ -191,7 +191,7 @@ Moi gate co:
 
 **Vi du:**
 ```html
-<h3>G2 — Ra soat cheo</h3>
+<h3>G3 — Ra soat cheo</h3>
 <p>Nguoi duoc chi dinh ra soat cheo kiem tra noi dung va cross-reference.</p>
 <ul>
   <li>Doc toan bo tai lieu, doi chieu voi SOP/WI lien quan.</li>

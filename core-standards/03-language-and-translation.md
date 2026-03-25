@@ -505,7 +505,7 @@ Một số từ tiếng Anh có nhiều nghĩa tiếng Việt tùy ngữ cảnh.
 
 ## G. Công cụ dịch tự động
 
-### G1. Engine chính: `context_translate_engine.py`
+### G2. Engine chính: `context_translate_engine.py`
 
 **Vị trí:** `tools/context_translate_engine.py`
 
@@ -530,7 +530,7 @@ python tools/context_translate_engine.py "03-Tai-Lieu-Van-Hanh/01-SOPs/**/*.html
 2. `tools/qms-terminology-dictionary.xlsx` — từ điển thuật ngữ QMS
 3. `tools/remaining-english-words.xlsx` — danh sách từ bổ sung (5008 entries)
 
-### G2. File từ điển
+### G3. File từ điển
 
 | File | Vị trí | Mô tả | Số lượng |
 |------|--------|-------|---------|
@@ -538,7 +538,7 @@ python tools/context_translate_engine.py "03-Tai-Lieu-Van-Hanh/01-SOPs/**/*.html
 | `remaining-english-words.xlsx` | `tools/` | Danh sách từ tiếng Anh cần dịch | 5008 entries |
 | `remaining-english-words-v2.xlsx` | `tools/` | Phiên bản cập nhật | Cập nhật |
 
-### G3. Danh sách viết tắt giữ nguyên (trong engine)
+### G4. Danh sách viết tắt giữ nguyên (trong engine)
 
 Engine tự động nhận diện và bỏ qua các viết tắt sau (trích từ `KEEP_ENGLISH` set):
 

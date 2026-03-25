@@ -103,7 +103,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </p>
 <div class="kpi">
 <div class="box"><b>Mục tiêu lỗi</b><span>0 lô giao hàng sai</span><div class="mini">Sai part / sai rev / sai qty / sai job</div></div>
-<div class="box"><b>Điểm khoá</b><span>Cổng kiểm soát G5</span><div class="mini">Phê duyệt giao hàng (ship phát hành) người xác nhận</div></div>
+<div class="box"><b>Điểm khoá</b><span>Cổng kiểm soát G6</span><div class="mini">Phê duyệt giao hàng (ship phát hành) người xác nhận</div></div>
 <div class="box"><b>Đối tượng</b><span>PackID + SSCC</span><div class="mini">Mỗi kiện 1 ID duy nhất</div></div>
 <div class="box"><b>Archive</b><span>Tier 1 ≥ 10 năm</span><div class="mini">bộ hồ sơ giao hàng + chứng cứ khoá cổng kiểm soát</div></div>
 </div>
@@ -265,7 +265,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td class="role">QA/QMS</td>
-<td>CTQ + Cổng kiểm soát G5</td>
+<td>CTQ + Cổng kiểm soát G6</td>
 <td>Kiểm tra hồ sơ bộ hồ sơ giao hàng; phê duyệt ShipRelease; điều tra không khớp; phê duyệt void/in lại</td>
 <td>ApprovalHistory; PacketComplete; ReconciliationStatus</td>
 <td>Đánh giá mô phỏng + CAPA logic</td>
@@ -502,7 +502,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>4. Scan test</td><td>Quét mở đúng ShipRelease + đúng Job/Part/Rev/Qty</td><td>Khoá lỗi sai nhãn trước khi niêm phong</td></tr>
 <tr><td>5. Chụp ảnh đóng gói</td><td>Tối thiểu 4 ảnh: (a) sản phẩm bảo vệ (b) thùng mở (c) thùng đóng (d) nhãn</td><td>Chứng minh khi khiếu nại / Requests bồi thường vận chuyển</td></tr>
 <tr><td>6. Hoàn thiện bộ hồ sơ giao hàng</td><td>CoC/cert đúng Rev; file đặt tên chuẩn; lưu đúng 07_Shipping-Đóng gói</td><td>Đánh giá truy xuất nguồn gốc nhanh; ngăn thiếu cert</td></tr>
-<tr><td>7. Submit + PASS</td><td>ReconciliationStatus=Pass trước khi phê duyệt</td><td>Cổng kiểm soát G5 khoá cứng</td></tr>
+<tr><td>7. Submit + PASS</td><td>ReconciliationStatus=Pass trước khi phê duyệt</td><td>Cổng kiểm soát G6 khoá cứng</td></tr>
 <tr><td>8. Bàn giao đơn vị vận chuyển</td><td>Theo dõi đúng; ảnh bàn giao; cập nhật ShipDate</td><td>Truy vết giao hàng</td></tr>
 </tbody>
 </table>
@@ -516,7 +516,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>L1</b></td>
-<td>Hiểu thuật ngữ PackID/SSCC; hiểu cổng kiểm soát G5; hiểu trạng thái Đạt/không đạt/Đã chặn</td>
+<td>Hiểu thuật ngữ PackID/SSCC; hiểu cổng kiểm soát G6; hiểu trạng thái Đạt/không đạt/Đã chặn</td>
 <td>Bài kiểm tra nhanh ≥ 80%; mô tả đúng 4 điều kiện PASS</td>
 <td>Nhầm PackID/SSCC; mô tả sai logic ĐÃ CHẶN</td>
 </tr>
@@ -632,7 +632,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table tight">
 <thead><tr><th>Mức</th><th>Kích hoạt</th><th>Hành động</th><th>Thời hạn</th><th>Chủ trì</th></tr></thead>
 <tbody>
-<tr><td><b>S1</b></td><td>Đã chặn tại cổng kiểm soát G5; nghi ngờ lẫn lộn; thiếu cert CTQ</td><td>Dừng ship; khoanh vùng; mở hành động; thông báo Planner + QA + Supervisor</td><td>15 phút</td><td>Supervisor</td></tr>
+<tr><td><b>S1</b></td><td>Đã chặn tại cổng kiểm soát G6; nghi ngờ lẫn lộn; thiếu cert CTQ</td><td>Dừng ship; khoanh vùng; mở hành động; thông báo Planner + QA + Supervisor</td><td>15 phút</td><td>Supervisor</td></tr>
 <tr><td><b>S2</b></td><td>in lại lặp lại; lỗi máy in/máy quét</td><td>Chuyển Bảo trì; kiểm tra chất lượng in; ghi thời gian ngừng máy</td><td>60 phút</td><td>Bảo trì</td></tr>
 <tr><td><b>S3</b></td><td>Thiếu ảnh chứng cứ; file đặt tên sai</td><td>Yêu cầu bổ sung ngay; QA điểm / tại chỗ kiểm tra</td><td>Trong ca</td><td>QA</td></tr>
 </tbody>

@@ -44,7 +44,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </div>
 
 <!-- ÁP DỤNG KHI -->
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Ban Giám đốc quyết định triển khai hệ thống quản lý Job Order (G0–G6) cho toàn bộ nhà máy. Áp dụng cho 10 phòng ban, ~50–80 nhân viên, lộ trình 20 tuần / 5 giai đoạn.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Ban Giám đốc quyết định triển khai hệ thống quản lý Job Order (G0–G7) cho toàn bộ nhà máy. Áp dụng cho 10 phòng ban, ~50–80 nhân viên, lộ trình 20 tuần / 5 giai đoạn.</div>
 
 <h1>WI-106 — Triển khai đồng loạt hệ thống Job Order</h1>
 
@@ -91,7 +91,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="table-card"><table class="table">
 <thead><tr><th>Hạng mục</th><th>Mô tả</th><th>Trách nhiệm</th></tr></thead>
 <tbody>
-<tr><td>M365 SharePoint</td><td>Site Collection cho Job Dossier, folder template G0–G6 theo ANNEX-133, metadata columns theo ANNEX-134</td><td>IT Admin</td></tr>
+<tr><td>M365 SharePoint</td><td>Site Collection cho Job Dossier, folder template G0–G7 theo ANNEX-133, metadata columns theo ANNEX-134</td><td>IT Admin</td></tr>
 <tr><td>Quick Card WI-104</td><td>7 loại thẻ nhanh (in vật lý + QR code), dán tại workstation</td><td>QMS + Production</td></tr>
 <tr><td>FRM-101</td><td>Master Document Register — 596 tài liệu</td><td>QMS Engineer</td></tr>
 <tr><td>FRM-102</td><td>Document Change Request — 39 bản cho 39 SOP</td><td>SOP Owner + QMS</td></tr>
@@ -130,14 +130,14 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="vstep"><div class="vnum">2</div><div class="vtext"><b>Phân công cross-review 87 SOP/WI</b><p>QMS Manager phân công mỗi reviewer tối đa 8 tài liệu. Mỗi tài liệu có 2 reviewer từ 2 phòng ban khác nhau. Deadline: cuối Tuần 2. Ghi nhận vào FRM-105.</p></div></div>
 <div class="vstep"><div class="vnum">3</div><div class="vtext"><b>Điền FRM-101 Master Document Register</b><p>QMS Engineer nhập 596 tài liệu với mã, phiên bản, chủ sở hữu, ngày hiệu lực. Hoàn thành cuối Tuần 2.</p></div></div>
 <div class="vstep"><div class="vnum">4</div><div class="vtext"><b>Chỉ định Champion</b><p>10 Trưởng phòng ban chỉ định ≥20 Champion (1 người/phòng ban/ca). Ưu tiên người có kinh nghiệm, uy tín, biết sử dụng M365.</p></div></div>
-<div class="vstep"><div class="vnum">5</div><div class="vtext"><b>Cấu hình M365 SharePoint</b><p>IT Admin tạo Site Collection cho Job Dossier, folder template G0–G6 theo ANNEX-133, metadata columns (JobNum, PartNo, Rev, Gate, DocType, RecordDate), permissions theo ANNEX-134.</p></div></div>
+<div class="vstep"><div class="vnum">5</div><div class="vtext"><b>Cấu hình M365 SharePoint</b><p>IT Admin tạo Site Collection cho Job Dossier, folder template G0–G7 theo ANNEX-133, metadata columns (JobNum, PartNo, Rev, Gate, DocType, RecordDate), permissions theo ANNEX-134.</p></div></div>
 <div class="vstep"><div class="vnum">6</div><div class="vtext"><b>Giải quyết comment từ cross-review</b><p>Document Owner sửa tài liệu HTML theo comment reviewer. QMS Manager xác nhận 0 comment mở. Hoàn thành cuối Tuần 2.</p></div></div>
 <div class="vstep"><div class="vnum">7</div><div class="vtext"><b>Tạo FRM-102 DCR cho 39 SOP</b><p>Mỗi SOP Owner tạo 1 FRM-102 ghi lý do "Ban hành chính thức sau cross-review". QA Manager + Owner ký. Hoàn thành Tuần 3.</p></div></div>
 <div class="vstep"><div class="vnum">8</div><div class="vtext"><b>CEO + QA Manager phê duyệt ban hành V1</b><p>Ký văn bản ban hành V1 cho toàn bộ 87 SOP/WI. Cập nhật FRM-101.</p></div></div>
 <div class="vstep"><div class="vnum">9</div><div class="vtext"><b>In Quick Card WI-104 + dán QR code</b><p>In 7 loại Quick Card (mỗi loại 10–20 bản). Dán QR code tại workstation liên kết đến Quick Card, SOP cốt lõi, và portal QMS.</p></div></div>
 <div class="vstep"><div class="vnum">10</div><div class="vtext"><b>Xây dựng KPI dashboard</b><p>IT + QA tạo Excel dashboard chứa 16 KPI (11 vận hành + 5 triển khai) với công thức, nguồn dữ liệu, ngưỡng xanh/đỏ. Hoàn thành Tuần 3.</p></div></div>
 <div class="vstep"><div class="vnum">11</div><div class="vtext"><b>Chuẩn bị Offline Fallback Kit</b><p>IT + QMS in form giấy (FRM-181, FRM-203, FRM-311, FRM-413, FRM-512, FRM-641, FRM-702), lưu PDF offline, lập danh sách liên lạc khẩn theo ANNEX-118.</p></div></div>
-<div class="vstep"><div class="vnum">12</div><div class="vtext"><b>Test M365 Job Dossier</b><p>Tạo 3 Job Dossier mẫu (1 repeat, 1 CTQ, 1 outsource). Upload đầy đủ hồ sơ G0–G6 với dữ liệu giả định. Kiểm tra metadata, permissions, retrieval time ≤60s.</p></div></div>
+<div class="vstep"><div class="vnum">12</div><div class="vtext"><b>Test M365 Job Dossier</b><p>Tạo 3 Job Dossier mẫu (1 repeat, 1 CTQ, 1 outsource). Upload đầy đủ hồ sơ G0–G7 với dữ liệu giả định. Kiểm tra metadata, permissions, retrieval time ≤60s.</p></div></div>
 <div class="vstep"><div class="vnum">13</div><div class="vtext"><b>Họp Go/No-Go Phase 0</b><p>QMS Manager trình bày 6 điều kiện P0-CHECK cho Ban Giám đốc. CEO quyết định Go hoặc No-Go.</p></div></div>
 </div>
 
@@ -147,9 +147,9 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <h3>Phase 1 — Đào tạo &amp; hạ tầng (Tuần 5–6)</h3>
 
 <div class="vflow">
-<div class="vstep"><div class="vnum">14</div><div class="vtext"><b>Đào tạo lãnh đạo — CEO + 10 Trưởng phòng</b><p>90 phút. Nội dung: tổng quan QMS, Job Order flow G0–G6, gate model STOP/HOLD/BLOCK, KPI hệ thống, reading path theo WI-105. Demo M365 Job Dossier. Quiz 10 câu (ngưỡng ≥70%).</p></div></div>
+<div class="vstep"><div class="vnum">14</div><div class="vtext"><b>Đào tạo lãnh đạo — CEO + 10 Trưởng phòng</b><p>90 phút. Nội dung: tổng quan QMS, Job Order flow G0–G7, gate model STOP/HOLD/BLOCK, KPI hệ thống, reading path theo WI-105. Demo M365 Job Dossier. Quiz 10 câu (ngưỡng ≥70%).</p></div></div>
 <div class="vstep"><div class="vnum">15</div><div class="vtext"><b>Đào tạo chuyên sâu — Production Director + Shop Managers</b><p>120 phút. Nội dung: SOP-501 dispatch logic, WIP cap, freeze window, recovery plan. ANNEX-501 priority P0–P3. ANNEX-504 Tier meeting T1–T4. Thực hành tạo dispatch list mẫu trên FRM-502.</p></div></div>
-<div class="vstep"><div class="vnum">16</div><div class="vtext"><b>Đào tạo chuyên sâu — QA Manager + Quality Engineers + QC Leads</b><p>120 phút. Nội dung: gate G0–G6 chi tiết, WI-203 Job Dossier completeness, SOP-605 7 cổng final release, SOP-606 NCR/CAPA flow, SOP-302 FAI. Thực hành kiểm tra completeness 1 Job Dossier mẫu.</p></div></div>
+<div class="vstep"><div class="vnum">16</div><div class="vtext"><b>Đào tạo chuyên sâu — QA Manager + Quality Engineers + QC Leads</b><p>120 phút. Nội dung: gate G0–G7 chi tiết, WI-203 Job Dossier completeness, SOP-605 8 cổng final release, SOP-606 NCR/CAPA flow, SOP-302 FAI. Thực hành kiểm tra completeness 1 Job Dossier mẫu.</p></div></div>
 <div class="vstep"><div class="vnum">17</div><div class="vtext"><b>Bootcamp Champion — Ngày 1 (8 giờ)</b><p>Buổi sáng (4h): cấu trúc M365, naming convention, folder routing theo WI-103/WI-104. Thực hành tạo 1 Job Dossier từ đầu. Buổi chiều (4h): upload 10 file đúng vị trí, điền metadata, xử lý lỗi routing.</p></div></div>
 <div class="vstep"><div class="vnum">18</div><div class="vtext"><b>Bootcamp Champion — Ngày 2 (8 giờ)</b><p>Buổi sáng (4h): gate logic WI-201, evidence check WI-203, escalation ANNEX-117. Buổi chiều (4h): Drill 60 giây (10 tài liệu), quiz 15 câu (ngưỡng ≥80%), bài tập tình huống thực tế.</p></div></div>
 <div class="vstep"><div class="vnum">19</div><div class="vtext"><b>Cấu hình M365 production-ready</b><p>IT Admin hoàn tất: production permissions, retention policy, backup schedule. Ký sign-off M365 production-ready.</p></div></div>
@@ -164,7 +164,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <h3>Phase 2 — Pilot 3 nhóm Job (Tuần 7–10)</h3>
 
 <div class="vflow">
-<div class="vstep"><div class="vnum">23</div><div class="vtext"><b>Dual-run Tuần 7–8</b><p>Chạy song song quy trình cũ và mới. Mỗi job pilot: mở Job Dossier trên M365, upload hồ sơ G0–G6 song song với cách làm cũ. Champion kiểm tra hàng ca: file đúng vị trí, metadata đầy đủ. Ghi vấn đề vào FRM-208.</p></div></div>
+<div class="vstep"><div class="vnum">23</div><div class="vtext"><b>Dual-run Tuần 7–8</b><p>Chạy song song quy trình cũ và mới. Mỗi job pilot: mở Job Dossier trên M365, upload hồ sơ G0–G7 song song với cách làm cũ. Champion kiểm tra hàng ca: file đúng vị trí, metadata đầy đủ. Ghi vấn đề vào FRM-208.</p></div></div>
 <div class="vstep"><div class="vnum">24</div><div class="vtext"><b>Single-run Tuần 9–10</b><p>Chuyển sang chỉ dùng quy trình mới. Điều kiện chuyển: Tuần 7–8 không có wrong-revision, không mất hồ sơ, retrieval ≤120s. Nếu chưa đạt, kéo dài dual-run thêm 1 tuần.</p></div></div>
 <div class="vstep"><div class="vnum">25</div><div class="vtext"><b>Drill 60-second retrieval</b><p>Tuần 9 + Tuần 10, 15 phút/lần. Champion + 3–5 operator. Giảng viên gọi tên 10 tài liệu bất kỳ, người tham gia tìm trên M365 trong 60 giây. Ngưỡng PASS: ≥8/10.</p></div></div>
 <div class="vstep"><div class="vnum">26</div><div class="vtext"><b>Drill wrong-revision response</b><p>Tuần 9, 30 phút. Setup + QC + Planning. Giả lập phát hiện bản vẽ sai REV tại máy CNC. Ngưỡng PASS: phát hiện và HOLD trong ≤5 phút.</p></div></div>

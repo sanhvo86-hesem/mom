@@ -2083,7 +2083,7 @@ const I = {
   accessible:{vi:'Được phép truy cập',en:'Accessible'},
   by_role:{vi:'theo vai trò',en:'by role'},
   quick_access:{vi:'Truy cập nhanh theo loại tài liệu',en:'Quick Access by Document Type'},
-  exec_shortcuts_title:{vi:'🚀 Chuẩn thực thi RFQ → Cash (G0–G6)',en:'🚀 RFQ → Cash Execution (G0–G6)'},
+  exec_shortcuts_title:{vi:'🚀 Chuẩn thực thi RFQ → Cash (G0–G7)',en:'🚀 RFQ → Cash Execution (G0–G7)'},
   exec_shortcuts_desc:{vi:'Điểm truy cập nhanh các tài liệu "bắt buộc để chạy" theo Gate và Job Dossier.',en:'Quick access to "must-have" documents per gate and Job Dossier.'},
   system_overview:{vi:'Tổng quan hệ thống',en:'System Overview'},
   // Documents
