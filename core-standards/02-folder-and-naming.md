@@ -131,11 +131,35 @@ qms.hesem.com.vn/
 │   ├── reference/
 │   └── templates/
 │
-├── tools/                                  → Công cụ hỗ trợ
-│   ├── context_translate_engine.py        → Engine dịch Anh→Việt
-│   ├── qms-terminology-dictionary.xlsx    → Từ điển thuật ngữ
-│   ├── remaining-english-words.xlsx       → Danh sách từ cần dịch
-│   └── remaining-english-words-v2.xlsx    → Phiên bản cập nhật
+├── tools/                                  → Công cụ hỗ trợ (chi tiết: 11-ai-tooling-and-reports.md)
+│   ├── engines/                           → Engine tái sử dụng (giữ vĩnh viễn)
+│   │   ├── context_translate_engine.py   → Engine dịch Anh→Việt
+│   │   └── ...
+│   ├── scripts/                           → Scripts chạy một lần theo đợt
+│   │   ├── form-repair/                  → Sửa lỗi Excel forms
+│   │   ├── translation/                  → Dịch theo batch
+│   │   ├── encoding/                     → Sửa mojibake/encoding
+│   │   ├── link-repair/                  → Sửa broken links
+│   │   ├── language-polish/              → Polish ngôn ngữ Việt
+│   │   └── m365/                         → SharePoint/M365 scripts
+│   ├── data/                              → Dữ liệu tham chiếu
+│   │   ├── qms-terminology-dictionary.xlsx
+│   │   ├── remaining-english-words.xlsx
+│   │   └── remaining-english-words-v2.xlsx
+│   └── legacy/                            → Scripts cũ chưa phân loại
+│
+├── _reports/                               → Output & báo cáo AI-generated (chi tiết: 11-ai-tooling-and-reports.md)
+│   ├── analysis/                          → Phân tích chiến lược & expert reviews
+│   ├── translation/                       → Tiến độ dịch thuật
+│   ├── link-repair/                       → Tracking sửa broken links
+│   ├── encoding/                          → Encoding/mojibake fix tracking
+│   ├── language/                          → Language audit & mixed-term
+│   ├── m365/                              → SharePoint/M365 templates
+│   ├── form-audit/                        → Form analysis & compliance
+│   └── screenshots/                       → Screenshots minh họa
+│
+├── _build/                                 → Build artifacts (generated)
+├── _Deleted/                               → Files đã xóa/archive
 │
 ├── M365-SharePoint-Upload-Template/        → Template upload lên SharePoint (hệ thống)
 ├── M365-SharePoint-Upload-Template-Operational/ → Template upload (vận hành)
