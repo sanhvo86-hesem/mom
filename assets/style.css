@@ -106,10 +106,10 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 
 /* TABLES — Clean Minimal v10 */
 .table-card, .table-block, .table-wrap {
-  border: none !important; border-radius: var(--r); overflow: auto; overflow-x: auto;
+  border: 1px solid #7bafd4 !important; border-radius: var(--r); overflow: auto; overflow-x: auto;
   -webkit-overflow-scrolling: touch; margin: 16px 0; background: var(--bg); box-shadow: none !important;
 }
-.table-card table { margin: 0; }
+.table-card table { margin: 0; border: none !important; border-radius: 0 !important; }
 .table-card .form-table { border: none; }
 .table, table.table { width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; font-size: 12.5px; table-layout: auto; border: 1px solid #7bafd4 !important; border-radius: var(--r); overflow: hidden; }
 .table thead th, table.table thead th {
