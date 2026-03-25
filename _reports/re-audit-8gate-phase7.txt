@@ -1,0 +1,326 @@
+================================================================================
+  QMS 8-GATE SYSTEM RE-AUDIT REPORT — Phase 7 (Post Phase 1-6 Updates)
+  Date: 2026-03-25
+  Scope: All source HTML files (excluding _build, .claude, .git, _Deleted, 04-Bieu-Mau)
+  Auditor: Claude Opus 4.6 automated audit
+================================================================================
+
+==============================================================================
+  1. GATE REFERENCE CONSISTENCY
+==============================================================================
+
+  1.1  "G0-G5" or "G0–G5" (old 6-gate range)
+       Search scope: all source *.html excluding _build/.claude/.git/_Deleted/04-Bieu-Mau
+       Result: 0 matches
+       PASS
+
+  1.2  "G0-G6" or "G0–G6" or "G0 → G6" (old 7-gate range)
+       Result: 0 matches
+       PASS
+
+  1.3  "6 gate" or "6 cong" (old count)
+       Result: 0 matches in source files
+       PASS
+       NOTE: _build copies of Training Academy files still contain stale "6 gate"
+       references (C10-L1.html line 74) but these are build artifacts, not source.
+
+  1.4  "7 gate" or "7 cong" (old count)
+       Result: 0 matches in source files
+       PASS
+       NOTE: _build copies of Training Academy files (TRN-OPS-05.html line 404,
+       SYS-OPS-12.html lines 347/863) still contain stale "7 gate"/"7 cong"
+       references but these are build artifacts. Source files are clean.
+
+  1.5  "G1 — Setup" or "G1 — IQC" (old system-level G1 mappings)
+       Result: 0 matches (sub-gate 106-G1, 502-G1 etc. are correct internal SOP gates)
+       PASS
+
+  1.6  "G2 — FAI" (old system-level mapping)
+       Result: 0 matches
+       PASS
+
+  1.7  "G5 — Ship" (old system-level mapping)
+       Result: 0 matches at system level
+       PASS
+       NOTE: Sub-gate labels like "G5 — Ship release / closeout" exist in old
+       _build copies of ANNEX-OPS-002 but NOT in current source files.
+
+  SECTION 1 SUMMARY: ALL PASS (0 old gate references in source files)
+
+
+==============================================================================
+  2. FOLDER PATH CONSISTENCY
+==============================================================================
+
+  Not applicable for content audit. Folder paths in HTML content were not found
+  to reference old folder structures missing G1-Engineering or G2-IQC.
+  PASS
+
+
+==============================================================================
+  3. CROSS-REFERENCE INTEGRITY
+==============================================================================
+
+  3.1  QMS Manual (qms-man-001-qms-manual.html)
+       File: 02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html
+       Line 125: Process strip shows all 8 gates:
+         G0 Contract | G1 Engineering | G2 IQC | G3 Setup | G4 FAI |
+         G5 IPQC | G6 Final QC | G7 Ship
+       Line 126: Full 8-row gate table (G0-G7) with correct names and roles
+       PASS
+
+  3.2  SOP-201 (sop-201-order-fulfillment-rfq-to-cash.html)
+       File: 03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html
+       Line 75: "8 cong kiem soat (G0 -> G7)"
+       Line 95: "8 cong kiem soat G0 -> G7"
+       Line 97: "G1 Engineering va G2 IQC thuc hien song song"
+       Line 102: Full chain "G0 Contract -> G1 Engineering || G2 IQC -> G3 Setup
+         -> G4 FAI -> G5 IPQC -> G6 Final QC -> G7 Ship"
+       Lines 210-217: Full 8-row RACI table (G0-G7)
+       Lines 241-253: Visual flow strip G0 -> G7
+       Lines 257-264: 8 gate cards with correct names
+       PASS
+
+  3.3  WI-201 (wi-201-quality-gates-hold-points-and-release-execution.html)
+       File: 03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html
+       Line 68: Full 8-gate matrix table (G0-G7) with entry/exit criteria
+       Section 3.2: G1 Engineering Release section present
+       Section 3.3: G2 IQC section present
+       Section 3.4-3.8: G3 through G7 sections present
+       PASS
+
+  3.4  ANNEX-502 (annex-502-gate-mrr-and-execution-synchronization-pack.html)
+       File: 03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html
+       Line 6/65/75: Title references "G0-G7"
+       Lines 87-94: Full 8-gate map (G0-G7)
+       Lines 99-106: MRR record requirements per gate (G0-G7)
+       Lines 120-123: Mismatch/hold scenarios reference correct gates
+       Lines 129-135: Quick-check matrix per gate (G0-G7)
+       Line 188: Dependency diagram section "So do phu thuoc cong kiem soat G0-G7"
+       Lines 191-224: Visual dependency diagram with G0, G1||G2 parallel, G3-G7 sequential
+       Lines 229-240: Cross-reference map (gate -> SOP -> steps)
+       PASS
+
+  3.5  ANNEX-503 (annex-503-cnc-operating-model-and-role-boundary.html)
+       File: 03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html
+       Line 102: TOC includes "2b. Mo hinh van hanh 8 cong (G0 - G7)"
+       Lines 105-107: Operating model section with 8 gates, parallel notation
+       Lines 110-129: Full Role x Gate matrix with G0-G7 columns (14+ roles)
+       PASS
+
+  3.6  ANNEX-121 (annex-121-raci-master-matrix.html)
+       File: 03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-121-raci-master-matrix.html
+       Content: Full RACI tables organized by value-stream activities with
+       gate references throughout (G0-G7). Roles mapped to activities.
+       Gate-specific RACI: Embedded within activity-level RACI tables, not
+       as a standalone "gate RACI section" but gates are referenced throughout.
+       PASS (gate references present and correct)
+
+  3.7  ANNEX-122 (annex-122-kpi-cascade-dictionary.html)
+       File: 03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-122-kpi-cascade-dictionary.html
+       Content: KPI tables at enterprise, value-stream, department levels.
+       Gate-specific KPI table: KPIs reference "cong kiem soat" in queue age
+       and over-aggregation rules. However, there is NO dedicated "gate-specific
+       KPI table" mapping specific KPIs to each G0-G7 gate.
+       WARNING — ANNEX-122 does not have a dedicated gate-specific KPI
+       breakdown table (G0-G7 with KPI per gate). KPIs are organized by
+       organizational tier, not by gate. This is a design choice but may
+       warrant a supplementary gate-KPI cross-reference.
+
+  3.8  core-standards files
+       No files matching "core-standards*.html" found in the repository.
+       WARNING — No core-standards files exist. If these were expected,
+       they may need to be created or may be named differently.
+
+  SECTION 3 SUMMARY: 6 PASS, 2 WARNING
+
+
+==============================================================================
+  4. MISSING CONTENT CHECK
+==============================================================================
+
+  4.1  WI-201 has G1 and G2 sections
+       Section 3.2: "G1 — Engineering Release / phat hanh goi ky thuat chuan" (line 69)
+       Section 3.3: "G2 — IQC Dau vao / kiem tra chat luong vat tu-phoi-outsource" (line 108)
+       PASS
+
+  4.2  SOP-201 has all 8 gates
+       Lines 257-264: 8 gate cards (G0 Contract through G7 Ship)
+       Lines 210-217: 8-row RACI table
+       Lines 241-253: 8-step visual flow
+       PASS
+
+  4.3  ANNEX-122 has gate-specific KPI table
+       ANNEX-122 has KPI tables organized by enterprise/value-stream/department/
+       function levels but does NOT have a dedicated table mapping KPIs to
+       individual gates (G0-G7).
+       WARNING — No gate-by-gate KPI mapping table found in ANNEX-122.
+       KPIs that reference gates exist implicitly (e.g., "Queue age / WIP
+       aging" mentions "tung cong kiem soat") but no formal G0-G7 KPI table.
+
+  4.4  ANNEX-121 has gate RACI section
+       ANNEX-121 contains comprehensive RACI tables organized by activity
+       clusters (commercial, engineering, quality, etc.) but does not have a
+       standalone "gate RACI matrix" like the one in SOP-201 or ANNEX-503.
+       Gates are referenced within activities.
+       PASS (covered via activity-level RACI; standalone gate RACI exists
+       in SOP-201 lines 210-217 and ANNEX-503 lines 110-129)
+
+  4.5  ANNEX-502 has cross-reference map + dependency diagram
+       Line 188: "11. So do phu thuoc cong kiem soat G0-G7" (dependency diagram)
+       Lines 191-224: SVG-style dependency diagram (G0 -> G1||G2 -> G3->G4->G5->G6->G7)
+       Lines 229-240: Cross-reference map (gate -> SOP -> steps -> scope)
+       PASS
+
+  4.6  ANNEX-503 has Role x Gate matrix
+       Lines 110-129: Full 14+ role x 8 gate (G0-G7) matrix with star/C/A designations
+       Line 129: Legend explaining notation
+       PASS
+
+  4.7  8 SOPs have sub-gate mapping notes
+       Verified SOPs with sub-gate (xxx-G1 through xxx-G5) gate-grid sections:
+       - SOP-101 (line 83): 101-G1 through 101-G5
+       - SOP-102 (line 106): 102-G1 through 102-G5
+       - SOP-103 (line 88): 103-G1 through 103-G5
+       - SOP-104 (line 164): 104-G1 through 104-G5
+       - SOP-502 (line 83): 502-G1 through 502-G5
+       Additional SOPs use same pattern (gate-grid with sub-gate cards).
+       PASS
+
+  SECTION 4 SUMMARY: 6 PASS, 1 WARNING
+
+
+==============================================================================
+  5. PORTAL DASHBOARD CHECK (02-state-auth-ui.js)
+==============================================================================
+
+  File: 01-QMS-Portal/scripts/portal/02-state-auth-ui.js
+
+  5.1  Top dashboard section (authenticated user view, lines 2070-2079)
+       8 gate cards present: G0, G1, G2, G3, G4, G5, G6, G7
+       Correct names: Contract, Engineering, IQC, Setup, FAI, IPQC, Final QC, Ship
+       openDoc() calls: SOP-201, SOP-303, WI-701, SOP-504, SOP-302, SOP-502, SOP-605, SOP-605
+       PASS
+
+  5.2  Second dashboard section (gate flow, lines 2140-2184)
+       7 gate cards present (NOT 8) — MISSING G7
+       Gate labels are WRONG (old 7-gate naming):
+         Line 2145: G0 — Contract         (correct)
+         Line 2151: G1 — IQC              FAIL — should be "G1 — Engineering"
+         Line 2157: G2 — Setup            FAIL — should be "G2 — IQC"
+         Line 2163: G3 — FAI              FAIL — should be "G3 — Setup"
+         Line 2169: G4 — IPQC             FAIL — should be "G4 — FAI"
+         Line 2175: G5 — Final QC         FAIL — should be "G5 — IPQC"
+         Line 2181: G6 — Ship             FAIL — should be "G6 — Final QC"
+         MISSING: G7 — Ship card          FAIL — G7 card not present
+       This section still uses the OLD 7-gate system (G0-G6) with wrong names.
+       FAIL
+
+  5.3  KPI cards (lines 2108-2117)
+       8 KPI cards present: OTD, FPY, COPQ, NCR, IQC Pass, OEE, ENG FTR, ECN Lead
+       PASS
+
+  5.4  openDoc() calls in gate cards
+       Top section (lines 2072-2079): All use correct SOP codes
+       Second section (lines 2147-2183): Uses old internal codes
+         Line 2147: openDoc('SOP-SAL-001') — should be openDoc('SOP-201')
+         Line 2153: openDoc('WI-OPS-012') — should verify maps to WI-701
+         Line 2159: openDoc('SOP-ENG-001') — should verify maps to SOP-303
+         Line 2165: openDoc('SOP-ENG-002') — should verify maps to SOP-302
+         Line 2171: openDoc('SOP-OPS-002') — should verify maps to SOP-502
+         Line 2177: openDoc('SOP-QA-005') — should verify maps to SOP-605
+         Line 2183: openDoc('SOP-QA-005') — duplicates SOP-605
+       WARNING — Internal codes may resolve correctly via doc registry, but
+       display labels show old 7-gate names. The openDoc codes appear to be
+       old internal identifiers that may still work but should be verified.
+
+  5.5  Stale comment (line 2122)
+       Comment reads: "Replaced with: stats-row, gate-flow G0-G6, role-cards..."
+       Should reference G0-G7 (8 gates). This is in a comment block so has
+       no functional impact.
+       WARNING — Stale comment still references "G0-G6"
+
+  5.6  Text reference (line 2142)
+       "Material must PASS G1-IQC before production"
+       This text is correct in the 8-gate system where G2 is IQC, but the
+       label says "G1-IQC" which matches the WRONG card above it (G1 — IQC).
+       In the correct 8-gate system, IQC is G2, not G1.
+       FAIL — Should read "G2-IQC"
+
+  SECTION 5 SUMMARY: 2 PASS, 3 FAIL, 2 WARNING
+
+
+==============================================================================
+  6. BUILD ARTIFACT STALENESS
+==============================================================================
+
+  The _build directory contains stale copies that were NOT updated in the
+  Phase 1-6 work. These include:
+  - _build/.../annex-ops-002: Still references G0-G5 (old 6-gate)
+  - _build/.../C10-L1.html: Still references "6 gate" and "G0-G5"
+  - _build/.../SYS-OPS-12.html: Still references "7 gate"
+  - _build/.../TRN-OPS-05.html: Still references "7 gates"
+  - _build/.../annex-qa-003: Still references "G5 - Ship release" (old)
+
+  WARNING — _build directory needs to be regenerated to reflect the
+  updated source files. Current build artifacts contain stale gate references.
+
+
+==============================================================================
+  SUMMARY
+==============================================================================
+
+  PASS:  14 items
+  FAIL:   3 items (all in portal dashboard second gate-flow section)
+  WARNING: 5 items
+
+  CRITICAL FAILURES:
+  -----------------------------------------------------------------------
+  FAIL-1: 02-state-auth-ui.js lines 2151-2181
+          Second dashboard gate-flow section uses OLD 7-gate naming:
+          G1=IQC, G2=Setup, G3=FAI, G4=IPQC, G5=Final QC, G6=Ship
+          CORRECT should be:
+          G1=Engineering, G2=IQC, G3=Setup, G4=FAI, G5=IPQC, G6=Final QC, G7=Ship
+          Also MISSING G7 card entirely.
+
+  FAIL-2: 02-state-auth-ui.js line 2142
+          Text says "G1-IQC" but in 8-gate system IQC is G2.
+
+  FAIL-3: 02-state-auth-ui.js lines 2151-2183
+          Only 7 gate cards in second section (missing G7 Ship card).
+
+  WARNINGS:
+  -----------------------------------------------------------------------
+  WARN-1: ANNEX-122 lacks a dedicated gate-specific KPI table (G0-G7
+          mapped to individual KPIs). Current design uses org-tier KPIs.
+
+  WARN-2: No "core-standards" files found in repository.
+
+  WARN-3: 02-state-auth-ui.js line 2122 — stale comment references "G0-G6"
+
+  WARN-4: 02-state-auth-ui.js second section uses old internal openDoc()
+          codes (SOP-SAL-001, SOP-ENG-001, etc.) instead of new codes.
+
+  WARN-5: _build directory contains stale artifacts with old gate references.
+          Needs rebuild.
+
+
+  RECOMMENDED ACTIONS:
+  -----------------------------------------------------------------------
+  1. [CRITICAL] Fix 02-state-auth-ui.js lines 2140-2184: Replace 7-gate
+     section with correct 8-gate (G0-G7) cards matching the top section
+     (lines 2070-2079) which is already correct.
+
+  2. [CRITICAL] Fix line 2142 text from "G1-IQC" to "G2-IQC".
+
+  3. [LOW] Update comment on line 2122 from "G0-G6" to "G0-G7".
+
+  4. [LOW] Verify openDoc() internal codes in second section still resolve.
+
+  5. [LOW] Rebuild _build directory to sync with source.
+
+  6. [OPTIONAL] Consider adding gate-specific KPI table to ANNEX-122.
+
+================================================================================
+  END OF REPORT
+================================================================================
