@@ -85,7 +85,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>con / phụ thuộc-cha / gốc sơ đồ ánh xạ</td><td>Có khi pallet/thùng thùng carton nhiều tầng</td><td>WHS scan logic</td><td>Phải nhìn được quan hệ pallet ↔ thùng thùng carton ↔ bên trong pack.</td></tr>
 <tr><td>LabelPrintVersion</td><td>Có</td><td>Label dịch vụ</td><td>Giúp truy vết layout/template đang dùng.</td></tr>
 <tr><td>ReprintCount / VoidFlag</td><td>Có</td><td>in lại/Void log</td><td>Mỗi in lại/void phải có lý do code và Approver.</td></tr>
-<tr><td>PacketComplete</td><td>Có</td><td>SSOT bộ hồ sơ giao hàng (ship gói hồ sơ)</td><td>Chỉ đạt khi đủ hồ sơ bắt buộc theo QPL và yêu cầu khách hàng.</td></tr>
+<tr><td>PacketComplete</td><td>Có</td><td>SSOT bộ hồ sơ giao hàng (ship gói hồ sơ)</td><td>Chỉ đạt khi đủ hồ sơ bắt buộc theo QPL và Requests khách hàng.</td></tr>
 <tr><td>ReconciliationStatus</td><td>Có</td><td>người xác nhận logic</td><td>PASS / FAIL / ĐÃ CHẶN. ĐÃ CHẶN chặn xác nhận giao hàng.</td></tr>
 </tbody></table></div></div>
 
@@ -103,7 +103,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Qty đối soát</td><td>Tổng Qty theo PackID = lô giao hàng dòng / chuyền = phiếu kê đóng gói (phiếu kê đóng gói)</td><td>Chênh số lượng hoặc UOM</td></tr>
 <tr><td>Phiên bản đối soát</td><td>Part/Rev trên nhãn khớp phát hành set và bộ hồ sơ giao hàng</td><td>Sai rev hoặc lẫn nhiều rev trong một hậu cần đơn vị không được phép</td></tr>
 <tr><td>con / phụ thuộc-cha / gốc mối quan hệ</td><td>Cấu trúc thùng thùng carton/pallet rõ ràng và quét ra đúng</td><td>cha / gốc không mở được con / phụ thuộc hoặc con / phụ thuộc mất quan hệ</td></tr>
-<tr><td>Bằng chứng đối soát</td><td>CoC/cert/đóng gói bảng kiểm/ảnh kiện đầy đủ khi áp dụng</td><td>Thiếu hồ sơ bắt buộc hoặc link hỏng</td></tr>
+<tr><td>Evidence đối soát</td><td>CoC/cert/đóng gói bảng kiểm/ảnh kiện đầy đủ khi áp dụng</td><td>Thiếu hồ sơ bắt buộc hoặc link hỏng</td></tr>
 <tr><td>Trạng thái đối soát</td><td>Không còn hold, không còn nghi ngờ chưa xử lý</td><td>Có hold mở hoặc vấn đề chưa disposition</td></tr>
 </tbody></table></div>
 <p>Chi tiết đóng gói vật lý và label layout xem <a href="annex-702-packaging-labeling-spec.html">ANNEX-702</a>. Hướng dẫn vận hành tại Point-of-use sẽ theo WI phê duyệt giao hàng (ship phát hành) tương ứng.</p></div>

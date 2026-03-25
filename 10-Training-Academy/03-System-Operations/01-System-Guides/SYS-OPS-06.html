@@ -272,7 +272,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h4 style="margin-top:0">Bàn giao A — Tạo/Sửa KPI (định nghĩa)</h4>
 <ul>
-<li><span class="must">Đầu vào:</span> yêu cầu KPI từ Supervisor/Quy trình Owner; mô tả quyết định cần chặn; rủi ro cần giảm.</li>
+<li><span class="must">Đầu vào:</span> Requests KPI từ Supervisor/Quy trình Owner; mô tả quyết định cần chặn; rủi ro cần giảm.</li>
 <li><span class="must">Đầu ra:</span> 01 bản ghi KPI từ điển (name/Responsible Person/nhịp độ / chu kỳ họp/source/truy vấn chi tiết (truy vấn chi tiết (drillthrough))) + 01 bản ghi kiểm soát thay đổi.</li>
 <li><span class="must">Điểm chặn:</span> KPI không có Responsible Person hoặc không có nguồn dữ liệu bị khóa ở trạng thái <span class="block">CHẶN</span>.</li>
 </ul>
@@ -334,7 +334,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:210px">Điểm kiểm soát</th>
 <th style="width:160px">Responsible Person</th>
 <th>Quy tắc bắt buộc</th>
-<th style="width:240px">MRR/Bằng chứng tối thiểu</th>
+<th style="width:240px">MRR/Evidence tối thiểu</th>
 </tr>
 </thead>
 <tbody>
@@ -357,7 +357,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Ảnh chụp Data Sức khỏe + log kiểm tra ngày/ca.</td>
 </tr>
 <tr>
-<td><strong>CP4 — Bằng chứng Tính đầy đủ người xác nhận</strong></td>
+<td><strong>CP4 — Evidence Tính đầy đủ người xác nhận</strong></td>
 <td>QA + Kho</td>
 <td>ShipRelease chỉ “Đã phê duyệt” khi PacketComplete + PackagingPass + FinalIRPass + ReconciliationStatus đều PASS.</td>
 <td>ShipRelease hồ sơ + link PacketFolderUrl + PackagingChecks + IR/FAI link.</td>
@@ -366,7 +366,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>CP5 — Làm mới &amp; cảnh báo</strong></td>
 <td>IT/BI</td>
 <td>Làm mới thất bại hoặc vượt SLA phải phát cảnh báo và khóa quyết định bằng bảng điều khiển.</td>
-<td>Log làm mới (Power BI dịch vụ) + thông báo Teams: QMS-ALERT + tạo phiếu yêu cầu: IT-bộ phận hỗ trợ.</td>
+<td>Log làm mới (Power BI dịch vụ) + thông báo Teams: QMS-ALERT + tạo phiếu Requests: IT-bộ phận hỗ trợ.</td>
 </tr>
 <tr>
 <td><strong>CP6 — RLS &amp; Kiểm soát truy cập</strong></td>
@@ -463,7 +463,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 style="margin-top:0">Khi bảng điều khiển báo “data thiếu / làm mới lỗi”</h3>
 <ol>
 <li><span class="must">DỪNG</span> dùng KPI để quyết định; đánh dấu cuộc họp là “sổ tay / thủ công chế độ”.</li>
-<li>Chụp màn hình lỗi và ghi thời điểm; gửi IT/BI theo kênh cảnh báo Teams: QMS-ALERT + phiếu yêu cầu: IT-bộ phận hỗ trợ.</li>
+<li>Chụp màn hình lỗi và ghi thời điểm; gửi IT/BI theo kênh cảnh báo Teams: QMS-ALERT + phiếu Requests: IT-bộ phận hỗ trợ.</li>
 <li>Supervisor dùng bảng họp đứng / họp nhanh sổ tay / thủ công có danh sách job/hold/ship và ký xác nhận.</li>
 <li>IT/BI xử lý lỗi; chạy Data Sức khỏe; ghi BI phát hành note khi có thay đổi.</li>
 <li>Chỉ quay lại “bảng điều khiển chế độ” khi diễn tập‑xuống / ngừng chạy và làm mới time trong SLA.</li>
@@ -472,7 +472,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 8) Checklist operation -->
 <div class="card" id="sec8">
-<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Responsible Person, Bằng chứng/MRR, “điểm sai điển hình”</h2>
+<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Responsible Person, Evidence/MRR, “điểm sai điển hình”</h2>
 <p class="muted">Bảng kiểm này dùng cho 2 tình huống: (A) tạo KPI mới, (B) sửa KPI/mô hình đang chạy. Tổng bước ≤15 và dùng chung cho mọi vai trò bằng cách điền đúng Responsible Person.</p>
 <div class="table-card">
 <table class="table tight">
@@ -481,12 +481,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:50px">#</th>
 <th style="width:160px">Responsible Person</th>
 <th>Hành động bắt buộc</th>
-<th style="width:260px">Bằng chứng/MRR</th>
+<th style="width:260px">Evidence/MRR</th>
 <th style="width:230px">Điểm sai điển hình</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Supervisor</td><td>Chốt “quyết định cần chặn” + rủi ro cần giảm; gắn KPI vào bước E2E.</td><td>01 yêu cầu KPI (phiếu yêu cầu) IT-bộ phận hỗ trợ</td><td>KPI đo “cho vui”, không gắn cổng kiểm soát/bàn giao</td></tr>
+<tr><td>1</td><td>Supervisor</td><td>Chốt “quyết định cần chặn” + rủi ro cần giảm; gắn KPI vào bước E2E.</td><td>01 Requests KPI (phiếu Requests) IT-bộ phận hỗ trợ</td><td>KPI đo “cho vui”, không gắn cổng kiểm soát/bàn giao</td></tr>
 <tr><td>2</td><td>QA/QMS</td><td>Đặt tên KPI duy nhất + định nghĩa 1 câu + phạm vi (job/pack/khách hàng) + tiêu chí cổng kiểm soát.</td><td>Bản ghi KPI từ điển (draft)</td><td>Tên KPI trùng; định nghĩa dài, mơ hồ</td></tr>
 <tr><td>3</td><td>Quy trình Owner</td><td>Chỉ định nguồn dữ liệu SSOT (bảng + cột khóa) và Responsible Person dữ liệu.</td><td>Map nguồn (table/cột) trong KPI từ điển</td><td>Chọn dữ liệu “ngoài hệ thống”</td></tr>
 <tr><td>4</td><td>IT/BI</td><td>Khóa hạt / thớ KPI và mô hình: thực tế nào, dim nào, tham gia / nối key nào.</td><td>mối quan hệ map + mô tả hạt / thớ</td><td>tham gia / nối sai hạt / thớ gây phình số</td></tr>
@@ -496,7 +496,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>8</td><td>IT/BI</td><td>Chạy Data Sức khỏe: null khóa / phím, trùng lặp, độ trễ, không khớp Rev.</td><td>Ảnh Data Sức khỏe + log ca</td><td>Chỉ nhìn KPI, bỏ qua sức khỏe</td></tr>
 <tr><td>9</td><td>QA/QMS</td><td>Phê duyệt KPI từ điển và cổng kiểm soát rule; ghi ApprovalHistory.</td><td>ApprovalHistory hồ sơ</td><td>Công bố trước khi phê duyệt</td></tr>
 <tr><td>10</td><td>IT/BI</td><td>Ghi BI phát hành note: version, thay đổi, rủi ro, hoàn tác / quay lại.</td><td>BI_ReleaseNotes: SSOT/BI-ReleaseNotes (SharePoint List)</td><td>Không có hoàn tác / quay lại; không log</td></tr>
-<tr><td>11</td><td>IT/BI</td><td>Cấu hình làm mới lịch trình và cảnh báo.</td><td>Ảnh cấu hình làm mới + log alert Teams: QMS-ALERT + phiếu yêu cầu: IT-bộ phận hỗ trợ</td><td>Làm mới ngoài giờ gây nhiễu</td></tr>
+<tr><td>11</td><td>IT/BI</td><td>Cấu hình làm mới lịch trình và cảnh báo.</td><td>Ảnh cấu hình làm mới + log alert Teams: QMS-ALERT + phiếu Requests: IT-bộ phận hỗ trợ</td><td>Làm mới ngoài giờ gây nhiễu</td></tr>
 <tr><td>12</td><td>Supervisor</td><td>Chạy 01 cuộc họp họp đứng / họp nhanh dùng KPI mới; tạo hành động cho bất ổn.</td><td>StandupActions hồ sơ + ảnh bảng job at‑rủi ro</td><td>Không tạo hành động; chỉ “bàn”</td></tr>
 <tr><td>13</td><td>Quy trình Owner</td><td>Đánh giá nhanh 10 hồ sơ: đúng khóa + có bằng chứng link.</td><td>Bảng kiểm đánh giá mẫu có ký</td><td>Chọn mẫu “đẹp”; bỏ mẫu fail</td></tr>
 <tr><td>14</td><td>QA/QMS</td><td>Đóng vòng: cập nhật mô-đun đào tạo/OJT theo sai lỗi phát hiện.</td><td>Log cập nhật đào tạo + DCR hồ sơ</td><td>Không cập nhật đào tạo</td></tr>
@@ -612,7 +612,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi xuất hiện trùng lặp ShipRelease theo PackID/SSCC, hành động fail-nhanh nào được kích hoạt?</li>
 <li>Ai chịu trách nhiệm tạo StandupActions khi KPI báo bất ổn trong ca?</li>
 </ol>
-<h3>10.2 Tình huống (≥3 tình huống thật — có dữ kiện; yêu cầu quyết định TẠM GIỮ/GO và ghi MRR)</h3>
+<h3>10.2 Tình huống (≥3 tình huống thật — có dữ kiện; Requests quyết định TẠM GIỮ/GO và ghi MRR)</h3>
 <div class="card">
 <h4 style="margin-top:0">Tình huống 1 — KPI OTD “xanh” nhưng đánh giá hỏi bằng chứng</h4>
 <p><strong>Dữ kiện:</strong> Bảng điều khiển OTD = 96%. Diễn tập‑xuống / ngừng tới danh sách lô giao hàng mở được, nhưng 4 dòng thiếu Theo dõi và link bằng chứng (PacketFolderUrl trống).</p>

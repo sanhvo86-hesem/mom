@@ -77,7 +77,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mục tiêu: giảm “sai phiên bản / sai program” về <b>0</b> bằng 3 lớp kiểm soát:
  <b>(1) Bộ hồ sơ chuẩn (mốc chuẩn gói hàng)</b> (đúng file, đúng Rev),
  <b>(2) Cổng kiểm soát (gate) kiểm tra</b> (Kế hoạch phát hành → Job khởi động → Mẫu đầu (đầu tiên chi tiết / sản phẩm)),
- <b>(3) Cấu hình đánh giá</b> (đối chiếu as‑đã xây dựng ↔ yêu cầu).
+ <b>(3) Cấu hình đánh giá</b> (đối chiếu as‑đã xây dựng ↔ Requests).
  </p>
  </div>
  <div class="note">
@@ -137,9 +137,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="note">
  <h3>(2) Cấu hình Đánh giá</h3>
  <ul class="list">
- <li>Đối chiếu yêu cầu ↔ program/setup/kiểm tra ↔ chứng chỉ ↔ as‑đã xây dựng.</li>
+ <li>Đối chiếu Requests ↔ program/setup/kiểm tra ↔ chứng chỉ ↔ as‑đã xây dựng.</li>
  <li>Thực hiện nhanh bằng <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a>.</li>
- <li>Áp dụng tối thiểu cho job có: Rev mới, CTQ, outsource công đoạn đặc biệt, hoặc khách yêu cầu.</li>
+ <li>Áp dụng tối thiểu cho job có: Rev mới, CTQ, outsource công đoạn đặc biệt, hoặc khách Requests.</li>
  </ul>
  </div>
  </div>
@@ -176,7 +176,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <h2>5) Phân xưởng: làm cấu hình đánh giá trong 15 phút</h2>
  <p class="mini">Chọn 1 job thật (hoặc job mẫu), thực hiện FRM‑QA‑017 theo nhóm. Mục tiêu: tìm ít nhất 2 điểm không khớp tiềm ẩn và đề xuất control.</p>
  <ul class="list">
- <li>Nhóm 1: yêu cầu (drawing/spec/CTQ)</li>
+ <li>Nhóm 1: Requests (drawing/spec/CTQ)</li>
  <li>Nhóm 2: program/setup (CAM/NC/phiếu cài đặt)</li>
  <li>Nhóm 3: kiểm tra/hồ sơ (IR/FAI/CMM program)</li>
  <li>Nhóm 4: bộ hồ sơ giao hàng (nhãn/CoC/chứng chỉ)</li>

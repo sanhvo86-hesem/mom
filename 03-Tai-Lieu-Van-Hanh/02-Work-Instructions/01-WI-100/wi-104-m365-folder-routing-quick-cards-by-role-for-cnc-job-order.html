@@ -65,8 +65,8 @@ ul.tight li {margin:4px 0;}
     <div class="mini-box">
       <h3>Lưu ở đâu</h3>
       <p class="path">DEP-SAL/02-Operations/00-Current/01-RFQ-and-báo giá-Pack</p>
-      <p class="path">DEP-SAL/02-Operations/00-Current/02-hợp đồng-Review-and-Đơn hàng-Ack</p>
-      <p class="path">03-Job-Records/.../01_G0-hợp đồng-Khởi động</p>
+      <p class="path">DEP-SAL/02-Operations/00-Current/02-Contract-Review-and-Order-Ack</p>
+      <p class="path">03-Job-Records/.../01_G0-Contract-Kickoff</p>
       <p class="path">07-Reference-and-Received-External/01-Customer-Received</p>
     </div>
     <div class="mini-box">
@@ -80,7 +80,7 @@ ul.tight li {margin:4px 0;}
   </div>
   <div class="quick-grid">
     <div class="mini-box">
-      <h3>Không được làm</h3>
+      <h3>Must not do</h3>
       <ul class="tight">
         <li>Không giữ cam kết khách hàng chỉ trong hộp thư.</li>
         <li>Không để file khách gửi thành bản vận hành chính nếu chưa lộ trình gia công đúng.</li>
@@ -90,7 +90,7 @@ ul.tight li {margin:4px 0;}
     <div class="mini-box">
       <h3>Khi nào escalation</h3>
       <ul class="tight">
-        <li>Khách đổi rev hoặc yêu cầu kỹ thuật.</li>
+        <li>Khách đổi rev hoặc Requests kỹ thuật.</li>
         <li>báo giá pack Released nhưng phải sửa.</li>
         <li>Không rõ file là khách hàng tham chiếu hay chính thức hồ sơ.</li>
       </ul>
@@ -99,13 +99,13 @@ ul.tight li {margin:4px 0;}
 </div>
 
 <div class="quick-card" id="role-planning">
-  <h2>Card 2 - Kế hoạch / Sản xuất Planner / Control tháp / cột</h2>
+  <h2>Card 2 - Kế hoạch / Production Planner / Control tháp / cột</h2>
   <span class="tag">Hồ sơ công việc</span><span class="tag">Khởi động</span><span class="tag">Control tháp / cột</span>
   <div class="quick-grid">
     <div class="mini-box">
       <h3>Lưu ở đâu</h3>
-      <p class="path">03-Job-Records/{YYYY}/{JobNum}-{PartNo}-REV-{Phiên bản}/00_Admin-Control</p>
-      <p class="path">03-Job-Records/.../01_G0-hợp đồng-Khởi động</p>
+      <p class="path">03-Job-Records/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/00_Admin-Control</p>
+      <p class="path">03-Job-Records/.../01_G0-Contract-Kickoff</p>
       <p class="path">DEP-PRO/00-Live-Control-and-Master-Data / Master-Data</p>
       <p class="path">DEP-PRO/03-Registers-and-Logs/00-Current</p>
     </div>
@@ -120,7 +120,7 @@ ul.tight li {margin:4px 0;}
   </div>
   <div class="quick-grid">
     <div class="mini-box">
-      <h3>Không được làm</h3>
+      <h3>Must not do</h3>
       <ul class="tight">
         <li>Không mở job mà chưa có hồ sơ.</li>
         <li>Không để bảng điều hành sống ở file cá nhân.</li>
@@ -146,7 +146,7 @@ ul.tight li {margin:4px 0;}
       <h3>Lưu ở đâu</h3>
       <p class="path">Part-REV-Gốc / Chủ/{CustomerID}/{PartNo}/REV-{Rev}</p>
       <p class="path">DEP-ENG/02-Operations/00-Current</p>
-      <p class="path">03-Job-Records/.../02_G1-Setup-Phát hành</p>
+      <p class="path">03-Job-Records/.../02_G1-Setup-Release</p>
       <p class="path">DEP-ENG/06-Working-Transitory-and-Draft/ROLE-ELM|DFM|PE|CAM</p>
     </div>
     <div class="mini-box">
@@ -160,7 +160,7 @@ ul.tight li {margin:4px 0;}
   </div>
   <div class="quick-grid">
     <div class="mini-box">
-      <h3>Không được làm</h3>
+      <h3>Must not do</h3>
       <ul class="tight">
         <li>Không trộn mốc chuẩn chủ / gốc với job-cụ thể phát hành.</li>
         <li>Không giữ marked-up drawing chỉ trong tải xuống.</li>
@@ -184,8 +184,8 @@ ul.tight li {margin:4px 0;}
   <div class="quick-grid">
     <div class="mini-box">
       <h3>Lưu ở đâu</h3>
-      <p class="path">03-Job-Records/.../02_G1-Setup-Phát hành</p>
-      <p class="path">03-Job-Records/.../04_G3-IPQC-Sản xuất</p>
+      <p class="path">03-Job-Records/.../02_G1-Setup-Release</p>
+      <p class="path">03-Job-Records/.../04_G3-IPQC-Production</p>
       <p class="path">DEP-PRO/03-Registers-and-Logs/00-Current</p>
       <p class="path">DEP-PRO/06-Working-Transitory-and-Draft/ROLE-SET|CNC|SHFL|PIE</p>
     </div>
@@ -200,11 +200,11 @@ ul.tight li {margin:4px 0;}
   </div>
   <div class="quick-grid">
     <div class="mini-box">
-      <h3>Không được làm</h3>
+      <h3>Must not do</h3>
       <ul class="tight">
         <li>Không giữ ảnh setup hoặc lỗi trên điện thoại cá nhân.</li>
         <li>Không giao ca khi bằng chứng trong ca chưa nộp.</li>
-        <li>Không bỏ file vào gốc / căn nguyên gate hoặc thư mục chung “ảnh chụp”.</li>
+        <li>Không bỏ file vào gốc / căn nguyên gate hoặc thư mục chung “Photos”.</li>
       </ul>
     </div>
     <div class="mini-box">
@@ -224,9 +224,9 @@ ul.tight li {margin:4px 0;}
   <div class="quick-grid">
     <div class="mini-box">
       <h3>Lưu ở đâu</h3>
-      <p class="path">03-Job-Records/.../03_G2-FAI-Đầu tiên-chi tiết / sản phẩm</p>
-      <p class="path">03-Job-Records/.../05_G4-Final-QC-Đóng gói</p>
-      <p class="path">03-Job-Records/.../07_NCR-CAPA-Sai lệch</p>
+      <p class="path">03-Job-Records/.../03_G2-FAI-First-Piece</p>
+      <p class="path">03-Job-Records/.../05_G4-Final-QC-Packaging</p>
+      <p class="path">03-Job-Records/.../07_NCR-CAPA-Deviation</p>
       <p class="path">02-Quality-Records</p>
     </div>
     <div class="mini-box">
@@ -239,7 +239,7 @@ ul.tight li {margin:4px 0;}
   </div>
   <div class="quick-grid">
     <div class="mini-box">
-      <h3>Không được làm</h3>
+      <h3>Must not do</h3>
       <ul class="tight">
         <li>Không để raw data chỉ ở máy đo.</li>
         <li>Không lưu final báo cáo trong workbench draft.</li>
@@ -250,7 +250,7 @@ ul.tight li {margin:4px 0;}
       <h3>Khi nào escalation</h3>
       <ul class="tight">
         <li>Không truy được part/rev/program/raw data.</li>
-        <li>Bằng chứng không đủ nhưng gate cần mở.</li>
+        <li>Evidence không đủ nhưng gate cần mở.</li>
         <li>NCR/CAPA có dấu hiệu liên job hoặc liên khách hàng.</li>
       </ul>
     </div>
@@ -263,9 +263,9 @@ ul.tight li {margin:4px 0;}
   <div class="quick-grid">
     <div class="mini-box">
       <h3>Lưu ở đâu</h3>
-      <p class="path">DEP-SCM/02-Operations/00-Current/03-Nhận hàng-and-IQC-bàn giao</p>
-      <p class="path">03-Job-Records/.../05_G4-Final-QC-Đóng gói</p>
-      <p class="path">03-Job-Records/.../06_G5-Ship-Phát hành</p>
+      <p class="path">DEP-SCM/02-Operations/00-Current/03-Receiving-and-IQC-Handoff</p>
+      <p class="path">03-Job-Records/.../05_G4-Final-QC-Packaging</p>
+      <p class="path">03-Job-Records/.../06_G5-Ship-Release</p>
       <p class="path">DEP-SCM/05-Interfaces-and-Released-Packs</p>
     </div>
     <div class="mini-box">
@@ -278,9 +278,9 @@ ul.tight li {margin:4px 0;}
   </div>
   <div class="quick-grid">
     <div class="mini-box">
-      <h3>Không được làm</h3>
+      <h3>Must not do</h3>
       <ul class="tight">
-        <li>Không để POD, label bằng chứng, nhận hàng ảnh chụp ngoài hồ sơ/giao diện pack.</li>
+        <li>Không để POD, label bằng chứng, nhận hàng Photos ngoài hồ sơ/giao diện pack.</li>
         <li>Không đứt chuỗi lot/mẻ nấu (heat)/SSCC.</li>
         <li>Không lưu chứng từ ship trên máy tính bàn quầy giao vận.</li>
       </ul>
@@ -318,7 +318,7 @@ ul.tight li {margin:4px 0;}
   </div>
   <div class="quick-grid">
     <div class="mini-box">
-      <h3>Không được làm</h3>
+      <h3>Must not do</h3>
       <ul class="tight">
         <li>Không xác nhận pass chỉ vì người dùng “đã được học”.</li>
         <li>Không sửa hộ rồi bỏ qua đào tạo lại.</li>

@@ -112,7 +112,7 @@
             <tr><td>Escalation tới quản lý chức năng</td><td>≤ 2 giờ</td><td>≤ 30 phút</td><td>≤ 15 phút</td></tr>
             <tr><td>Escalation tới cấp điều hành</td><td>Khi thiếu / bỏ sót SLA hoặc rủi ro tăng cấp</td><td>≤ 2 giờ</td><td>≤ 30 phút</td></tr>
             <tr><td>Quyết định war phòng</td><td>Khi vấn đề chặn kéo dài > 1 ca</td><td>≤ 4 giờ</td><td>Ngay khi xác nhận L4</td></tr>
-            <tr><td>Customer thông báo</td><td>Khi hợp đồng/CSR yêu cầu</td><td>≤ 24 giờ hoặc sớm hơn theo hợp đồng</td><td>bằng lời ngay khi đủ dữ kiện tối thiểu, email chính thức ≤ 24 giờ</td></tr>
+            <tr><td>Customer thông báo</td><td>Khi hợp đồng/CSR Requests</td><td>≤ 24 giờ hoặc sớm hơn theo hợp đồng</td><td>bằng lời ngay khi đủ dữ kiện tối thiểu, email chính thức ≤ 24 giờ</td></tr>
             <tr><td>Mở NCR / sự kiện hồ sơ</td><td>≤ 8 giờ làm việc</td><td>≤ 4 giờ</td><td>≤ 2 giờ</td></tr>
             <tr><td>Nguyên nhân gốc sơ bộ</td><td>≤ 2 ngày làm việc</td><td>≤ 1 ngày làm việc</td><td>≤ 24 giờ</td></tr>
           </tbody>
@@ -123,12 +123,12 @@
       <div class="section">
         <h2>6. liên hệ chuỗi và quyền quyết định</h2>
         <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
-          <thead><tr><th>Quyết định</th><th>Người đề xuất</th><th>Người được quyền duyệt</th><th>Bằng chứng tối thiểu trước khi duyệt</th></tr></thead>
+          <thead><tr><th>Quyết định</th><th>Người đề xuất</th><th>Người được quyền duyệt</th><th>Evidence tối thiểu trước khi duyệt</th></tr></thead>
           <tbody>
             <tr><td>Hold lot / hold job / stop machine</td><td>Lead / QA / Ops / Bảo trì</td><td>Lead hoặc chức năng sở hữu công đoạn; escalation lên Ops Manager nếu > 1 cell/job</td><td>Mã job/lot bị ảnh hưởng, phạm vi ảnh hưởng, lý do hold, thời điểm hold, Performer</td></tr>
             <tr><td>Mở lại sản xuất sau sự kiện chất lượng/machine</td><td>Responsible Person điều phối</td><td>QA + Ops; thêm Kỹ thuật khi thay đổi program/setup/tool</td><td>Ngăn chặn hoàn tất, nguyên nhân sơ bộ, mẫu đầu/tái xác nhận hiệu lực nếu áp dụng, cập nhật Hồ sơ công việc (hồ sơ công việc)</td></tr>
             <tr><td>Mở lô giao hàng / phát hành giao hàng</td><td>QA / WHS / Kinh doanh-CS</td><td>QA Manager hoặc người được ủy quyền theo <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td><td>Gói phát hành đủ, CoC đúng, label/SSCC đúng, số lượng đối soát, sai lệch/khách hàng phê duyệt nếu có</td></tr>
-            <tr><td>Customer thông báo chính thức</td><td>Kinh doanh-CS / QA / QMS</td><td>Thương mại Responsible Person + QA/QMS + GM khi L4 hoặc hợp đồng yêu cầu</td><td>thực tế pack tối thiểu: part/job/lot, vấn đề báo cáo / tuyên bố, ngăn chặn, tác động đã biết/không xác định, next cập nhật time</td></tr>
+            <tr><td>Customer thông báo chính thức</td><td>Kinh doanh-CS / QA / QMS</td><td>Thương mại Responsible Person + QA/QMS + GM khi L4 hoặc hợp đồng Requests</td><td>thực tế pack tối thiểu: part/job/lot, vấn đề báo cáo / tuyên bố, ngăn chặn, tác động đã biết/không xác định, next cập nhật time</td></tr>
             <tr><td>War phòng</td><td>Ops Manager / QMS Manager / GM</td><td>GM hoặc người được chỉ định</td><td>Lý do kích hoạt, Responsible Person, phòng nhịp độ / chu kỳ họp, hành động bảng, end điều kiện</td></tr>
           </tbody>
         </table></div>
@@ -161,7 +161,7 @@
             <tr><td>Kết thúc</td><td>Nguyên nhân gốc sơ bộ/cuối cùng, hành động khắc phục, hành động phòng ngừa, xác nhận hiệu lực, bài học kinh nghiệm.</td></tr>
           </tbody>
         </table></div>
-        <p class="small">Bằng chứng sự kiện phải được liên kết vào Hồ sơ công việc / sự kiện pack tương ứng. Nếu có lô giao hàng liên quan, bộ bằng chứng phải liên kết tới <a href="../../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a> và phát hành hồ sơ; nếu có chất lượng sự kiện, phải liên kết tới <a href="../../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a> và hồ sơ NCR/CAPA; nếu là mức sẵn sàng/lệnh sản xuất rủi ro cao, phải liên kết <a href="../../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a>.</p>
+        <p class="small">Evidence sự kiện phải được liên kết vào Hồ sơ công việc / sự kiện pack tương ứng. Nếu có lô giao hàng liên quan, bộ bằng chứng phải liên kết tới <a href="../../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a> và phát hành hồ sơ; nếu có chất lượng sự kiện, phải liên kết tới <a href="../../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a> và hồ sơ NCR/CAPA; nếu là mức sẵn sàng/lệnh sản xuất rủi ro cao, phải liên kết <a href="../../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a>.</p>
       </div>
 
       <div class="section">

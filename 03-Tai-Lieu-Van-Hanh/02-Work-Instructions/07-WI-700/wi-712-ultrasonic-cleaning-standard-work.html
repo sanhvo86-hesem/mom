@@ -68,7 +68,7 @@ ul.tight li {margin:4px 0;}
         </div>
       </div>
       
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi Job yêu cầu siêu âm làm sạch theo clean level, theo khách hàng spec, theo lộ trình gia công chân không-tương thích/gas-path hoặc khi chi tiết phải qua xác minh sạch trước khi clean-pack, rò rỉ test hoặc final phát hành.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi Job Requests siêu âm làm sạch theo clean level, theo khách hàng spec, theo lộ trình gia công chân không-tương thích/gas-path hoặc khi chi tiết phải qua xác minh sạch trước khi clean-pack, rò rỉ test hoặc final phát hành.</div>
 <h1>WI-712 — Làm sạch siêu âm: chọn công thức / chương trình gia công, chuẩn bị bể, chạy mẻ, rửa cuối, sấy khô và xác nhận</h1>
 
 <div class="section"><h2>1. Mục đích và điều kiện mở mẻ</h2>
@@ -82,8 +82,8 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>2. Ma trận chọn công thức / chương trình gia công chuẩn</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm</th><th>Áp dụng điển hình</th><th>Tần số</th><th>Nhiệt độ</th><th>Dung dịch</th><th>Thời gian mỗi stage</th><th>rửa</th><th>Sấy</th><th>Ghi chú bắt buộc</th></tr></thead><tbody>
-<tr><td>CL-A</td><td>Part chân không-tương thích, gas-path, clean-pack, rò rỉ-test, part có yêu cầu xác minh sạch cao</td><td>40–80 kHz</td><td>40–55°C</td><td>kiềm (alkaline) chất tẩy rửa pH 9–11 hoặc thành phần hóa học theo yêu cầu khách hàng</td><td>5–15 phút</td><td>3 stage: giải pháp → DI → DI mới/tràn</td><td>N₂ sạch + lò sấy sạch 60°C trong 15–30 phút khi cần</td><td>DI nước phải đạt ≥ 10 MΩ·cm; không vượt 70°C; ưu tiên công thức / chương trình gia công dịu hơn với mềm kim loại/đã đánh bóng part</td></tr>
-<tr><td>CL-B</td><td>Part tiêu chuẩn sau hoàn thiện bề mặt, part không yêu cầu clean-pack mức cao</td><td>25–40 kHz</td><td>40–60°C</td><td>kiềm (alkaline) hoặc trung tính chất tẩy rửa</td><td>5–10 phút</td><td>2 stage: giải pháp → DI</td><td>N₂ sạch hoặc clean air theo lộ trình gia công</td><td>Dùng khi không có yêu cầu chân không/khí sạch đặc biệt</td></tr>
+<tr><td>CL-A</td><td>Part chân không-tương thích, gas-path, clean-pack, rò rỉ-test, part có Requests xác minh sạch cao</td><td>40–80 kHz</td><td>40–55°C</td><td>kiềm (alkaline) chất tẩy rửa pH 9–11 hoặc thành phần hóa học theo Requests khách hàng</td><td>5–15 phút</td><td>3 stage: giải pháp → DI → DI mới/tràn</td><td>N₂ sạch + lò sấy sạch 60°C trong 15–30 phút khi cần</td><td>DI nước phải đạt ≥ 10 MΩ·cm; không vượt 70°C; ưu tiên công thức / chương trình gia công dịu hơn với mềm kim loại/đã đánh bóng part</td></tr>
+<tr><td>CL-B</td><td>Part tiêu chuẩn sau hoàn thiện bề mặt, part không Requests clean-pack mức cao</td><td>25–40 kHz</td><td>40–60°C</td><td>kiềm (alkaline) hoặc trung tính chất tẩy rửa</td><td>5–10 phút</td><td>2 stage: giải pháp → DI</td><td>N₂ sạch hoặc clean air theo lộ trình gia công</td><td>Dùng khi không có Requests chân không/khí sạch đặc biệt</td></tr>
 <tr><td>công thức / chương trình gia công đặc biệt</td><td>đã xi mạ anốt (xi mạ anốt (anodize)), đã thụ động hóa, đã phủ, mỏng-tường, phản chiếu / sao chép hoàn thành, đã mài rà/đã đánh bóng, part có mù / ẩn hốc / lòng khuôn sâu</td><td>Theo phê duyệt ENG/QA</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Không được tự ý suy diễn từ CL-A/CL-B chuẩn</td></tr>
 </tbody></table></div>
 <div class="callout-warning"><strong>Rule vật liệu:</strong> nhôm mềm, bề mặt xi mạ anốt (xi mạ anốt (anodize)), bề mặt đánh bóng điện hóa, bề mặt niêm phong / bịt kín, chi tiết có đánh dấu nhạy hoặc polymer gắn kèm phải coi là công thức / chương trình gia công đặc biệt nếu chưa có phê duyệt dùng công thức / chương trình gia công chuẩn.</div></div>
@@ -123,12 +123,12 @@ ul.tight li {margin:4px 0;}
 <div class="step-item"><strong>Bước 2 — Chạy stage rửa siêu âm.</strong><br/>Thiết lập tần số, nhiệt độ và thời gian đúng công thức / chương trình gia công. Theo dõi bề mặt bể, tiếng xâm thực, nhiệt độ thực và tình trạng part. Nếu part có dấu hiệu va đập, nổi, kẹt hoặc tạo bọt khí lớn trong hốc / lòng khuôn phải dừng và xếp lại.</div>
 <div class="step-item"><strong>Bước 3 — rửa 1.</strong><br/>Chuyển part sang rửa đầu tiên trong thời gian ngắn nhất, tránh để hóa chất khô lại trên bề mặt. Với CL-A, không được bỏ qua bước này.</div>
 <div class="step-item"><strong>Bước 4 — rửa cuối.</strong><br/>CL-A phải có rửa cuối bằng DI mới hoặc tràn rửa; part phải được lắc/đảo/định hướng để xả hết dung dịch kẹt trong lỗ, hốc / túi và khe ren. Nếu part giữ nước, phải dùng thời gian chảy/rút phù hợp trước khi qua bước dry.</div>
-<div class="step-item"><strong>Bước 5 — Dry-xuống / ngừng.</strong><br/>Thổi N₂ sạch theo hướng đẩy nước ra khỏi hốc / lòng khuôn, không thổi ngược bụi lên part. Khi lộ trình gia công yêu cầu, đưa vào lò sấy sạch 60°C trong 15–30 phút hoặc theo công thức / chương trình gia công. Không để part khô tự do trong môi trường bẩn.</div>
-<div class="step-item"><strong>Bước 6 — Kiểm sau làm sạch.</strong><br/>Kiểm nước đánh dấu, vết bẩn / ố, cặn / dư lượng, đã lưu giữ nước, phoi (phoi (chip)) sót, dấu cọ xát và bề mặt bất thường. Nếu Job yêu cầu xác minh sạch, chuyển ngay sang biểu mẫu/hồ sơ xác minh tương ứng; nếu không, chuyển ngay sang clean-pack hoặc bước kế tiếp được chỉ định.</div>
+<div class="step-item"><strong>Bước 5 — Dry-xuống / ngừng.</strong><br/>Thổi N₂ sạch theo hướng đẩy nước ra khỏi hốc / lòng khuôn, không thổi ngược bụi lên part. Khi lộ trình gia công Requests, đưa vào lò sấy sạch 60°C trong 15–30 phút hoặc theo công thức / chương trình gia công. Không để part khô tự do trong môi trường bẩn.</div>
+<div class="step-item"><strong>Bước 6 — Kiểm sau làm sạch.</strong><br/>Kiểm nước đánh dấu, vết bẩn / ố, cặn / dư lượng, đã lưu giữ nước, phoi (phoi (chip)) sót, dấu cọ xát và bề mặt bất thường. Nếu Job Requests xác minh sạch, chuyển ngay sang biểu mẫu/hồ sơ xác minh tương ứng; nếu không, chuyển ngay sang clean-pack hoặc bước kế tiếp được chỉ định.</div>
 </div></div>
 
 <div class="section"><h2>7. Kiểm soát thay bể và chống nhiễm chéo</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Không được làm</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Must not do</th></tr></thead><tbody>
 <tr><td>Dung dịch đổi màu, có dầu nổi, mùi lạ, nhiều bọt, có cặn nhìn thấy</td><td>Dừng dùng cho mẻ tiếp theo; thay bể/lọc bể theo rule; ghi log thay bể</td><td>Không được “chạy thêm mẻ nữa cho hết ca”</td></tr>
 <tr><td>Part sau làm sạch có cặn / dư lượng / vết bẩn / ố / nước đánh dấu</td><td>Cô lập lô, điều tra thành phần hóa học, DI rửa, định hướng / đào tạo hội nhập, dry-xuống / ngừng; chỉ re-clean khi đã rõ nguyên nhân</td><td>Không được chuyển qua clean-pack với lý do “vết nhỏ không sao”</td></tr>
 <tr><td>Mix bẩn lot với clean lot hoặc mix nguyên vật liệu nhạy với nguyên vật liệu thường</td><td>Xem toàn bộ mẻ là nghi ngờ; đánh giá lại theo clean level cao hơn</td><td>Không được chỉ tách vài part ra rồi phát hành phần còn lại</td></tr>
@@ -141,7 +141,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>vết bẩn / ố, đổi màu, khắc axit (khắc axit (etch)) nhẹ, nước điểm / tại chỗ lặp lại</td><td>Nghi ngờ thành phần hóa học quá mạnh, nhiệt quá cao, DI không đạt hoặc sấy khô không đúng</td><td>TẠM GIỮ; không re-clean lặp lại khi chưa chỉnh công thức / chương trình gia công</td></tr>
 <tr><td>Bề mặt xước/cọ xát</td><td>Lỗi xếp mẻ, rổ / giỏ hoặc xử lý / vận chuyển</td><td>Cô lập lô; đánh giá ngoại quan / bề ngoài/chức năng tác động; sửa phương pháp xếp trước mẻ kế tiếp</td></tr>
 <tr><td>đã lưu giữ nước trong lỗ/hốc / lòng khuôn</td><td>Rủi ro nhiễm bẩn, ăn mòn hoặc ảnh hưởng rò rỉ test/clean pack</td><td>Tăng bước xả / thoát nước/dry; xác minh lại trước phát hành</td></tr>
-<tr><td>bộ chuyển đổi (bộ chuyển đổi (transducer)) yếu / vùng chết / xâm thực không đều</td><td>Bể không còn hiệu lực ổn định</td><td>Ngừng dùng bể; mở yêu cầu bảo trì</td></tr>
+<tr><td>bộ chuyển đổi (bộ chuyển đổi (transducer)) yếu / vùng chết / xâm thực không đều</td><td>Bể không còn hiệu lực ổn định</td><td>Ngừng dùng bể; mở Requests bảo trì</td></tr>
 </tbody></table></div>
 <div class="callout-warning"><strong>Rule từ chối:</strong> mọi part sau làm sạch mà vẫn còn phoi (phoi (chip)), cặn / dư lượng, vết bẩn / ố khó lau, đã lưu giữ nước hoặc bằng chứng cho thấy công thức / chương trình gia công sai phải xem là chưa đạt. Không đẩy trách nhiệm sang bước xác minh/đóng gói kế tiếp.</div></div>
 
@@ -167,7 +167,7 @@ ul.tight li {margin:4px 0;}
 <tr><td><a href="wi-711-cleanroom-entry-and-gowning.html">WI-711</a></td><td>Chuẩn vào khu sạch / mặc đồ bảo hộ (mặc đồ bảo hộ (gowning)) trước và sau làm sạch sạch.</td></tr>
 <tr><td><a href="wi-713-environmental-monitoring-and-response.html">WI-713</a></td><td>Điều kiện môi trường và phản ứng khi môi trường lệch chuẩn.</td></tr>
 <tr><td><a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td><td>Đóng gói sạch và bảo quản sau làm sạch.</td></tr>
-<tr><td><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-711_Cleanliness_Verification_Form.xlsx">FRM-711</a></td><td>Ghi kết quả xác minh sạch khi lộ trình gia công yêu cầu.</td></tr>
+<tr><td><a  download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-711_Cleanliness_Verification_Form.xlsx">FRM-711</a></td><td>Ghi kết quả xác minh sạch khi lộ trình gia công Requests.</td></tr>
 </tbody></table></div></div>
 
     </div>

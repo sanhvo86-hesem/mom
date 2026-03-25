@@ -118,14 +118,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi đổi REV bản vẽ/spec/ECO thay đổi fit–biểu mẫu–chức năng hoặc thay đổi CTQ.</li>
 <li>Khi thay đổi program/CAM/ghi sổ / đăng, fixture, lộ trình gia công, tooling chiến lược, phương pháp đo CTQ.</li>
 <li>Khi có sự cố: sự cố nghiêm trọng, sửa chữa lớn, thay trục chính (trục chính (spindle))/tuyến tính quy mô / thang đo, đo OOT, NCR liên quan kích thước CTQ.</li>
-<li>Khi có outsource/công đoạn đặc biệt hoặc yêu cầu FAI từ PO/hợp đồng của khách hàng.</li>
+<li>Khi có outsource/công đoạn đặc biệt hoặc Requests FAI từ PO/hợp đồng của khách hàng.</li>
 </ul>
 </div>
 <div class="note">
 <strong>Cổng kiểm soát mục tiêu</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
 <li>Cổng kiểm soát G1: Mẫu đầu PASS trước khi chạy loạt.</li>
-<li>Cổng kiểm soát G2: FAI PASS (Đầy đủ/Chênh lệch) trước khi phát hành sản xuất hoặc giao hàng khi hợp đồng yêu cầu.</li>
+<li>Cổng kiểm soát G2: FAI PASS (Đầy đủ/Chênh lệch) trước khi phát hành sản xuất hoặc giao hàng khi hợp đồng Requests.</li>
 <li>Cổng kiểm soát G5: phê duyệt giao hàng chỉ mở khi Bộ bằng chứng đầy đủ.</li>
 </ul>
 <div class="small muted" style="margin-top:8px">
@@ -164,7 +164,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note" style="margin-top:10px">
 <strong>Biểu mẫu 3 — đặc tính Accountability (cốt lõi)</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
-<li><b>tài khoản 100%</b> đặc tính: kích thước, GD&amp;T, ghi chú, bề mặt, đánh dấu, làm sạch, yêu cầu đóng gói (khi PO/spec yêu cầu).</li>
+<li><b>tài khoản 100%</b> đặc tính: kích thước, GD&amp;T, ghi chú, bề mặt, đánh dấu, làm sạch, Requests đóng gói (khi PO/spec Requests).</li>
 <li>Mỗi dòng đo gắn với <b>01 balloon ID</b>; balloon ID không trùng; không bỏ số.</li>
 <li>Ghi rõ dụng cụ đo, độ phân giải, điều kiện đo, người đo, ngày giờ.</li>
 </ul>
@@ -203,13 +203,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Bước</th>
 <th>Đầu vào tối thiểu</th>
 <th>Bàn giao / điểm chặn</th>
-<th>Đầu ra / Bằng chứng (MRR)</th>
+<th>Đầu ra / Evidence (MRR)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><b>Kế hoạch</b></td>
-<td>PO/hợp đồng, yêu cầu FAI, lộ trình gia công sơ bộ</td>
+<td>PO/hợp đồng, Requests FAI, lộ trình gia công sơ bộ</td>
 <td><b>Chèn Cổng kiểm soát FAI</b> vào lộ trình gia công + lịch QC</td>
 <td>Job Pack có cột “FAI bắt buộc” + kích hoạt ghi rõ</td>
 </tr>
@@ -245,7 +245,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Đóng gói/Ship</b></td>
-<td>bộ hồ sơ giao hàng (ship gói hồ sơ), CoC, FAI/IR khi yêu cầu</td>
+<td>bộ hồ sơ giao hàng (ship gói hồ sơ), CoC, FAI/IR khi Requests</td>
 <td><b>Phê duyệt giao hàng Cổng kiểm soát</b></td>
 <td>bộ hồ sơ giao hàng đầy đủ + log phê duyệt giao hàng</td>
 </tr>
@@ -289,7 +289,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Điểm kiểm soát</th>
 <th>Responsible Person chính</th>
 <th>Điều kiện đạt</th>
-<th>Bằng chứng/MRR tối thiểu</th>
+<th>Evidence/MRR tối thiểu</th>
 </tr>
 </thead>
 <tbody>
@@ -302,7 +302,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP2 — Balloon &amp; Plan</b></td>
 <td>QC + QA</td>
-<td>Mọi đặc tính yêu cầu được đánh số và có dòng đo tương ứng</td>
+<td>Mọi đặc tính Requests được đánh số và có dòng đo tương ứng</td>
 <td>Đã đánh số balloon drawing + kiểm tra plan + biểu mẫu đặc tính list</td>
 </tr>
 <tr>
@@ -333,7 +333,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>CP7 — Bộ bằng chứng tính toàn vẹn</b></td>
 <td>QA + Doc Control</td>
 <td>Tên file đúng quy tắc; lưu đúng thư mục; truy xuất nguồn gốc trong 60 giây</td>
-<td>Đường dẫn thư mục + bảng kiểm “Bằng chứng tính đầy đủ”</td>
+<td>Đường dẫn thư mục + bảng kiểm “Evidence tính đầy đủ”</td>
 </tr>
 </tbody>
 </table>
@@ -384,7 +384,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Sự cố</th>
 <th>Phản ứng 60 giây</th>
 <th>Ai gọi ai</th>
-<th>Bằng chứng</th>
+<th>Evidence</th>
 </tr>
 </thead>
 <tbody>
@@ -423,7 +423,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <!-- 8) Checklist -->
-<h2 class="h2">8) Bảng kiểm vận hành (≤ 15 bước) — Responsible Person + Bằng chứng/MRR + điểm sai hay gặp</h2>
+<h2 class="h2">8) Bảng kiểm vận hành (≤ 15 bước) — Responsible Person + Evidence/MRR + điểm sai hay gặp</h2>
 <div class="card">
 <div class="table-card">
 <table class="table">
@@ -432,12 +432,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>#</th>
 <th>Bước vận hành</th>
 <th>Responsible Person</th>
-<th>Bằng chứng/MRR</th>
+<th>Evidence/MRR</th>
 <th>Điểm sai hay gặp</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Xác nhận yêu cầu FAI theo PO/hợp đồng và đánh dấu trong Job Pack</td><td>Người định giá (SAL-03) + Planner</td><td>Trang PO nổi bật / đánh dấu yêu cầu FAI + lộ trình gia công có Cổng kiểm soát</td><td>Bỏ sót yêu cầu FAI trong PO</td></tr>
+<tr><td>1</td><td>Xác nhận Requests FAI theo PO/hợp đồng và đánh dấu trong Job Pack</td><td>Người định giá (SAL-03) + Planner</td><td>Trang PO nổi bật / đánh dấu Requests FAI + lộ trình gia công có Cổng kiểm soát</td><td>Bỏ sót Requests FAI trong PO</td></tr>
 <tr><td>2</td><td>Khóa REV: drawing/spec/mô hình/lộ trình gia công/program/phiếu cài đặt thống nhất</td><td>Lập trình viên (CNC) + Planner</td><td>Phát hành hồ sơ + ảnh trang REV</td><td>Program chạy “bản cũ”</td></tr>
 <tr><td>3</td><td>Chuẩn bị đã đánh số balloon drawing/kế hoạch kiểm tra (kiểm tra plan) (đánh số duy nhất)</td><td>QC + QA</td><td>Đã đánh số balloon drawing + plan</td><td>Số balloon không khớp hồ sơ</td></tr>
 <tr><td>4</td><td>Kiểm tra vật liệu: spec + mẻ nấu (mẻ nấu (heat))/lot + cert đủ trường</td><td>Kho</td><td>Nguyên vật liệu cert + nhãn mẻ nấu (mẻ nấu (heat))/lot</td><td>Nhầm mẻ nấu (mẻ nấu (heat))/lot do nhãn mờ</td></tr>
@@ -473,7 +473,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Khóa REV</td>
-<td>So 3 nguồn: drawing + lộ trình gia công + program; ghi lại “REV khóa ảnh chụp trạng thái”</td>
+<td>So 3 nguồn: drawing + lộ trình gia công + program; ghi lại “REV khóa Photos trạng thái”</td>
 <td>Chặn rủi ro ship sai REV; đánh giá hỏi mở ra phải trùng</td>
 </tr>
 <tr>
@@ -573,8 +573,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Mua hàng</td><td>Công đoạn đặc biệt cert, đã phê duyệt nhà cung cấp kỷ luật / chuyên ngành</td><td>L2; L3 khi xử lý cert thiếu trường</td></tr>
 <tr><td>Planner</td><td>Chèn cổng kiểm soát vào lộ trình gia công, lịch QC, không “đẩy job” qua cổng kiểm soát</td><td>L2</td></tr>
 <tr><td>Bảo trì</td><td>Gage/CMM trạng thái, cách ly OOT</td><td>L2</td></tr>
-<tr><td>EHS</td><td>An toàn khu vực đo, hóa chất vệ sinh, công thái học khi đo</td><td>L1 (nhận biết) + ký xác nhận bảng kiểm khu vực khi yêu cầu</td></tr>
-<tr><td>Người định giá (SAL-03)</td><td>Nhận diện yêu cầu FAI trong PO, giao tiếp thay đổi tiến độ do cổng kiểm soát</td><td>L1</td></tr>
+<tr><td>EHS</td><td>An toàn khu vực đo, hóa chất vệ sinh, công thái học khi đo</td><td>L1 (nhận biết) + ký xác nhận bảng kiểm khu vực khi Requests</td></tr>
+<tr><td>Người định giá (SAL-03)</td><td>Nhận diện Requests FAI trong PO, giao tiếp thay đổi tiến độ do cổng kiểm soát</td><td>L1</td></tr>
 <tr><td>Supervisor</td><td>Thực thi STOP/TẠM GIỮ/CHẶN, ký cổng kiểm soát phát hành</td><td>L4</td></tr>
 </tbody>
 </table>
@@ -588,7 +588,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol style="margin:0; padding-left:18px; line-height:1.75">
 <li>FAI khác Mẫu đầu Control ở điểm nào về phạm vi đặc tính và hồ sơ?</li>
 <li>3 điều kiện bắt buộc để mở Cổng kiểm soát chạy loạt sau mẫu đầu.</li>
-<li>Khi PO yêu cầu AS9102 FAIR, học viên phải tạo những thành phần hồ sơ nào?</li>
+<li>Khi PO Requests AS9102 FAIR, học viên phải tạo những thành phần hồ sơ nào?</li>
 <li>Đã đánh số balloon drawing dùng để làm gì trong truy xuất nguồn gốc đánh giá?</li>
 <li>Khi đổi REV nhưng không đổi kích thước CTQ, chênh lệch FAI phải khóa những yếu tố nào?</li>
 <li>Điều gì xảy ra khi gage hết hạn hiệu chuẩn nhưng vẫn dùng để đo CTQ?</li>
@@ -611,7 +611,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 </div>
 <div class="card">
-<h3>10.2 Tình huống (≥ 3 tình huống thật, yêu cầu TẠM GIỮ/GO và ghi MRR)</h3>
+<h3>10.2 Tình huống (≥ 3 tình huống thật, Requests TẠM GIỮ/GO và ghi MRR)</h3>
 <div class="note">
 <strong>Tình huống 1 — Sai REV phát Current máy</strong>
 <p style="margin:6px 0 0 0; line-height:1.7">
@@ -652,12 +652,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>REV khóa</td>
-<td>Chỉ ra 01 REV duy nhất, lưu ảnh chụp trạng thái</td>
+<td>Chỉ ra 01 REV duy nhất, lưu Photos trạng thái</td>
 <td>Không phát hiện không khớp</td>
 </tr>
 <tr>
 <td>Balloon &amp; Biểu mẫu 3</td>
-<td>tài khoản 100% đặc tính yêu cầu; số balloon khớp hồ sơ</td>
+<td>tài khoản 100% đặc tính Requests; số balloon khớp hồ sơ</td>
 <td>Bỏ sót note/spec/CTQ</td>
 </tr>
 <tr>
@@ -715,7 +715,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:0; padding-left:18px; line-height:1.75">
 <li>FAI pack: Biểu mẫu 1–2–3 hoặc hồ sơ tương đương (PDF).</li>
 <li>Đã đánh số balloon drawing / kiểm tra plan.</li>
-<li>Mẫu đầu label (TẠM GIỮ/PASS) — ảnh chụp.</li>
+<li>Mẫu đầu label (TẠM GIỮ/PASS) — Photos.</li>
 <li>CMM báo cáo / dữ liệu đo (khi áp dụng).</li>
 <li>Nguyên vật liệu cert + truy xuất nguồn gốc (mẻ nấu (mẻ nấu (heat))/lot).</li>
 <li>Công đoạn đặc biệt cert (khi áp dụng).</li>
@@ -752,7 +752,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Danh mục hiệu chuẩn/đã phê duyệt nhà cung cấp</td>
 <td>M365/SharePoint → HESEM-QMS-SSOT (thư viện/list chuẩn để truy xuất nguồn gốc trạng thái)</td>
-<td>Mô-đun này yêu cầu có nguồn truy xuất nguồn gốc tập trung</td>
+<td>Mô-đun này Requests có nguồn truy xuất nguồn gốc tập trung</td>
 </tr>
 <tr>
 <td>Training hồ sơ</td>
@@ -799,7 +799,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Lập trình viên (CNC)</td>
 </tr>
 <tr>
-<td>Bằng chứng lưu rải rác (máy tính bàn, Zalo, USB)</td>
+<td>Evidence lưu rải rác (máy tính bàn, Zalo, USB)</td>
 <td>Thất lạc; rủi ro bảo mật; không sẵn sàng đánh giá</td>
 <td>Chỉ lưu vào SharePoint theo template Bộ bằng chứng; phát hiện lưu ngoài = NCR data quản trị</td>
 <td>QA + Supervisor</td>
@@ -817,7 +817,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Thiếu chữ ký/ngày</b> → cổng kiểm soát ký-off chỉ mở khi field đầy đủ; thiếu field = CHẶN.</li>
 <li><b>Gage trạng thái không chứng minh</b> → lưu ảnh tem + link danh mục hiệu chuẩn; OOT = cách ly.</li>
 <li><b>Nguyên vật liệu cert không khớp mẻ nấu (mẻ nấu (heat))/lot</b> → kho dán nhãn mẻ nấu (mẻ nấu (heat))/lot, log cấp phát và đối chiếu cert.</li>
-<li><b>Công đoạn đặc biệt cert thiếu trường</b> → Mua hàng yêu cầu re-vấn đề; không giao hàng khi chưa đủ.</li>
+<li><b>Công đoạn đặc biệt cert thiếu trường</b> → Mua hàng Requests re-vấn đề; không giao hàng khi chưa đủ.</li>
 <li><b>FAI không đại diện cho quá trình</b> (đo mẫu đã làm lại) → kỷ luật mẫu đầu “giữ nguyên trạng”.</li>
 <li><b>Lưu hồ sơ sai chỗ/sai tên</b> → áp dụng đặt tên rule ANNEX-QMS-003; kiểm tra truy xuất nguồn gốc 60 giây.</li>
 <li><b>Chênh lệch FAI làm sai phạm vi</b> → bắt buộc thay đổi tác động rà soát có chữ ký Lập trình viên (CNC) + QA.</li>

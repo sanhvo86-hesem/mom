@@ -75,7 +75,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="kicker">Bộ diễn tập</div>
 <h1 class="h1">DRL-Bài diễn tập 11 — Customer Yêu cầu → CTQ Dịch thuật</h1>
 <p class="lead">
- Diễn tập này khóa lỗi gốc của nhiều khiếu nại / yêu cầu bồi thường: <b>đọc yêu cầu không hết</b> và <b>dịch yêu cầu sai</b>.
+ Diễn tập này khóa lỗi gốc của nhiều khiếu nại / Requests bồi thường: <b>đọc Requests không hết</b> và <b>dịch Requests sai</b>.
  Đầu ra của diễn tập là 01 CTQ list + kế hoạch kiểm tra (kiểm tra plan) + rà soát hợp đồng tóm tắt nằm đúng SSOT.
  </p>
 </div>
@@ -109,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Nhận RFQ/PO/drawing/spec và xác nhận REV set của khách hàng.</td><td>Người định giá (SAL-03)</td><td>Đầu vào gói hàng link + REV note</td><td>STOP</td></tr><tr><td>2</td><td>Trích xuất yêu cầu: CTQ dim/tol, hoàn thành/spec, đóng gói/label, cert/FAI, công đoạn đặc biệt.</td><td>Kinh doanh/QA/ENG</td><td>Yêu cầu list (1 trang)</td><td>TẠM GIỮ</td></tr><tr><td>3</td><td>Dịch yêu cầu thành CTQ list: đặc tính – phương pháp đo – tần suất – tiêu chí ĐẠT/KHÔNG ĐẠT.</td><td>QA/QC/ENG</td><td>CTQ list + kiểm tra phương pháp</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Tạo kế hoạch kiểm tra (kiểm tra plan) + phản ứng plan (STOP/hold khi lệch CTQ).</td><td>QA/QC</td><td>Kiểm tra plan (PDF)</td><td>TẠM GIỮ</td></tr><tr><td>5</td><td>rà soát hợp đồng tóm tắt: xác nhận năng lực đáp ứng và điểm cần outsource.</td><td>Kinh doanh/QA/OPS</td><td>CR tóm tắt + ký-off</td><td>TẠM GIỮ</td></tr><tr><td>6</td><td>Bàn giao cho lập kế hoạch/sản xuất: điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm chặn))))))))))))))))))))) + link mốc chuẩn + bảng kiểm.</td><td>QA/Kế hoạch</td><td>Bàn giao note + liên kết</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Nhận RFQ/PO/drawing/spec và xác nhận REV set của khách hàng.</td><td>Người định giá (SAL-03)</td><td>Đầu vào gói hàng link + REV note</td><td>STOP</td></tr><tr><td>2</td><td>Trích xuất Requests: CTQ dim/tol, hoàn thành/spec, đóng gói/label, cert/FAI, công đoạn đặc biệt.</td><td>Kinh doanh/QA/ENG</td><td>Yêu cầu list (1 trang)</td><td>TẠM GIỮ</td></tr><tr><td>3</td><td>Dịch Requests thành CTQ list: đặc tính – phương pháp đo – tần suất – tiêu chí ĐẠT/KHÔNG ĐẠT.</td><td>QA/QC/ENG</td><td>CTQ list + kiểm tra phương pháp</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Tạo kế hoạch kiểm tra (kiểm tra plan) + phản ứng plan (STOP/hold khi lệch CTQ).</td><td>QA/QC</td><td>Kiểm tra plan (PDF)</td><td>TẠM GIỮ</td></tr><tr><td>5</td><td>rà soát hợp đồng tóm tắt: xác nhận năng lực đáp ứng và điểm cần outsource.</td><td>Kinh doanh/QA/OPS</td><td>CR tóm tắt + ký-off</td><td>TẠM GIỮ</td></tr><tr><td>6</td><td>Bàn giao cho lập kế hoạch/sản xuất: điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm chặn))))))))))))))))))))) + link mốc chuẩn + bảng kiểm.</td><td>QA/Kế hoạch</td><td>Bàn giao note + liên kết</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
@@ -130,7 +130,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Yêu cầu hút / chiết xuất</b></td><td>Không bỏ sót yêu cầu đặc biệt (hoàn thành/pack/cert/FAI).</td><td>0/1/2</td></tr><tr><td><b>CTQ sự rõ ràng</b></td><td>CTQ có phương pháp đo, tần suất, tiêu chí rõ.</td><td>0/1/2</td></tr><tr><td><b>Phản ứng plan</b></td><td>STOP/TẠM GIỮ rule rõ và gắn vào quy trình step.</td><td>0/1/2</td></tr><tr><td><b>căn chỉnh / liên kết</b></td><td>Kinh doanh/ENG/QA/OPS cùng dùng 1 bản CTQ list trong SSOT.</td><td>0/1/2</td></tr><tr><td><b>Hồ sơ chất lượng</b></td><td>CR tóm tắt có chữ ký; link SSOT đầy đủ.</td><td>0/1/2</td></tr>
+<tr><td><b>Yêu cầu hút / chiết xuất</b></td><td>Không bỏ sót Requests đặc biệt (hoàn thành/pack/cert/FAI).</td><td>0/1/2</td></tr><tr><td><b>CTQ sự rõ ràng</b></td><td>CTQ có phương pháp đo, tần suất, tiêu chí rõ.</td><td>0/1/2</td></tr><tr><td><b>Phản ứng plan</b></td><td>STOP/TẠM GIỮ rule rõ và gắn vào quy trình step.</td><td>0/1/2</td></tr><tr><td><b>căn chỉnh / liên kết</b></td><td>Kinh doanh/ENG/QA/OPS cùng dùng 1 bản CTQ list trong SSOT.</td><td>0/1/2</td></tr><tr><td><b>Hồ sơ chất lượng</b></td><td>CR tóm tắt có chữ ký; link SSOT đầy đủ.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>

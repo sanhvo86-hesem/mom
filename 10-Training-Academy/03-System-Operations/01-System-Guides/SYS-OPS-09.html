@@ -110,7 +110,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>1) Mục tiêu, phạm vi, đối tượng học</h2>
 <ul>
 <li><b>Mục tiêu:</b> vận hành đúng “1 nguồn đúng”, chặn sai Rev, chặn ship thiếu gói hồ sơ, giữ truy vết ISO 9001 (thông tin dạng văn bản).</li>
-<li><b>Phạm vi dữ liệu:</b> Job, Vận hành, Nhân công, Lô giao hàng, SSCC/Pack, Bằng chứng liên kết, ApprovalHistory, IntegrationLogs/cài đặt.</li>
+<li><b>Phạm vi dữ liệu:</b> Job, Vận hành, Nhân công, Lô giao hàng, SSCC/Pack, Evidence liên kết, ApprovalHistory, IntegrationLogs/cài đặt.</li>
 <li><b>Đối tượng:</b> Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor.</li>
 </ul>
 <div class="callout">
@@ -153,7 +153,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>Job / Rev / Lộ trình gia công / Lô giao hàng / MES time mục nhập</td><td>Epicor Kinetic (Epicor) (Epicor)</td><td>M365 chỉ hiển thị (phản chiếu / sao chép) + bằng chứng link</td><td>Chỉnh tay list phản chiếu / sao chép</td></tr>
 <tr><td>Hold / NCR / CAPA / Đóng gói / ShipRelease / Approvals</td><td>M365 danh sách</td><td>Hồ sơ công việc (file), ApprovalHistory (log)</td><td>Phê duyệt bằng chat/miệng</td></tr>
-<tr><td>Bằng chứng tập tin (IR/FAI/CMM/CoC/Cert/ảnh chụp/Bộ hồ sơ giao hàng (ship gói hồ sơ))</td><td>SharePoint thư viện</td><td>URL trong list + lưu giữ tier</td><td>Nhét file vào list</td></tr>
+<tr><td>Evidence tập tin (IR/FAI/CMM/CoC/Cert/Photos/Bộ hồ sơ giao hàng (ship gói hồ sơ))</td><td>SharePoint thư viện</td><td>URL trong list + lưu giữ tier</td><td>Nhét file vào list</td></tr>
 </tbody>
 </table>
 </div>
@@ -165,13 +165,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="tight">
 <thead><tr><th>Thuật ngữ</th><th>Định nghĩa vận hành</th><th>Điểm lỗi hay gặp</th></tr></thead>
 <tbody>
-<tr><td><b>BAQ</b></td><td>Kinh doanh hoạt động truy vấn trong Epicor; xuất dữ liệu theo tập chuẩn (OpenJobs, Operations, Nhân công, lô giao hàng…)</td><td>Thiếu trường khoá/LastUpdated</td></tr>
+<tr><td><b>BAQ</b></td><td>Kinh doanh hoạt động truy vấn trong Epicor; Exports theo tập chuẩn (OpenJobs, Operations, Nhân công, lô giao hàng…)</td><td>Thiếu trường khoá/LastUpdated</td></tr>
 <tr><td><b>OData / nextLink</b></td><td>REST/OData phân trang; khi có <span class="mono">@OData.nextLink</span> thì tải tiếp trang kế</td><td>Bỏ phân trang → thiếu dữ liệu</td></tr>
 <tr><td><b>Chênh lệch + chồng chéo</b></td><td>Đọc <span class="mono">LastUpdated ≥ con trỏ − 5 phút</span> để chống thiếu / bỏ sót do đồng hồ trôi / sai lệch</td><td>Không chồng chéo → rơi hồ sơ</td></tr>
 <tr><td><b>dấu chìm / hình chìm (con trỏ)</b></td><td>Thời điểm đồng bộ cuối; lưu trong IntegrationSettings</td><td>Đẩy con trỏ khi lỗi → mất dữ liệu</td></tr>
 <tr><td><b>tính bất biến (tính bất biến (idempotent)) cập nhật/thêm mới (cập nhật/thêm mới (upsert))</b></td><td>Cập nhật/Thêm mới theo khoá tự nhiên (EpicorKey/JobNum+OprSeq…); chạy lại cho ra cùng kết quả</td><td>Khoá sai → trùng/ghi đè nhầm</td></tr>
 <tr><td><b>Điều tiết 429/503</b></td><td>SharePoint giới hạn; cần thử lại + chờ lùi (chờ lùi (backoff)) + batch</td><td>thử lại dồn dập → fail dây chuyền sản xuất</td></tr>
-<tr><td><b>Dấu vết kiểm toán (dấu vết kiểm toán)</b></td><td>ApprovalHistory + Bằng chứng link + IntegrationLogs</td><td>Thiếu log → không đánh giá được</td></tr>
+<tr><td><b>Dấu vết kiểm toán (dấu vết kiểm toán)</b></td><td>ApprovalHistory + Evidence link + IntegrationLogs</td><td>Thiếu log → không đánh giá được</td></tr>
 <tr><td><b>MRR</b></td><td>Tối thiểu Bắt buộc Hồ sơ: bằng chứng tối thiểu để qua cổng kiểm soát</td><td>Đính thiếu/đính sai thư mục</td></tr>
 </tbody>
 </table>
@@ -182,13 +182,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="mini">Mỗi điểm thất bại có “tín hiệu”, “hậu quả”, “hành động chặn” và “bằng chứng”.</p>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>#</th><th>Điểm thất bại</th><th>Tín hiệu nhận biết</th><th>Hậu quả</th><th>Hành động chặn</th><th>Bằng chứng (MRR)</th></tr></thead>
+<thead><tr><th>#</th><th>Điểm thất bại</th><th>Tín hiệu nhận biết</th><th>Hậu quả</th><th>Hành động chặn</th><th>Evidence (MRR)</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>phản chiếu / sao chép trễ (cũ / lỗi thời)</td><td>JobIndex.EpicorLastSync quá hạn [SLA]</td><td>Quyết định dựa dữ liệu cũ</td><td>DỪNG dùng phản chiếu / sao chép cho cổng kiểm soát; mở Epicor kiểm tra; tạo StandupAction S1</td><td>Ảnh màn hình Epicor + log StandupAction</td></tr>
 <tr><td>2</td><td>Bỏ phân trang nextLink</td><td>số đếm lệch giữa Epicor và JobIndex</td><td>Thiếu job/vận hành</td><td>Chặn chuyển giao hệ thống; chạy lại luồng; ghi IntegrationLogs cảnh báo/Thất bại</td><td>IntegrationLogs + số liệu đối soát</td></tr>
 <tr><td>3</td><td>Khoá tự nhiên sai</td><td>Trùng EpicorKey hoặc JobNum nhiều dòng</td><td>Bảng điều khiển sai, cổng kiểm soát sai</td><td>Khoá lại theo sơ đồ cấu trúc; dọn trùng có đánh giá</td><td>Báo cáo Data Sức khỏe (trùng lặp)</td></tr>
 <tr><td>4</td><td>Đẩy dấu chìm / hình chìm khi lỗi</td><td>IntegrationLogs Thất bại nhưng IntegrationSettings cập nhật</td><td>Mất hồ sơ vĩnh viễn</td><td>Khoá quyền cập nhật IntegrationSettings; điều tra luồng</td><td>IntegrationSettings lịch sử + IntegrationLogs</td></tr>
-<tr><td>5</td><td>Sai múi giờ/định dạng ngày</td><td>DueDate lệch 1 ngày</td><td>Planner sai ưu tiên</td><td>Chuẩn hoá UTC → nội bộ / tại chỗ; đã nhập cột trong Power truy vấn</td><td>ảnh chụp màn hình sơ đồ ánh xạ + bộ dữ liệu làm mới log</td></tr>
+<tr><td>5</td><td>Sai múi giờ/định dạng ngày</td><td>DueDate lệch 1 ngày</td><td>Planner sai ưu tiên</td><td>Chuẩn hoá UTC → nội bộ / tại chỗ; đã nhập cột trong Power truy vấn</td><td>Photos màn hình sơ đồ ánh xạ + bộ dữ liệu làm mới log</td></tr>
 <tr><td>6</td><td>Thiếu EvidenceFolderUrl</td><td>JobIndex.EvidenceFolderUrl rỗng</td><td>Đánh giá diễn tập fail, thiếu bằng chứng</td><td>Chạy lại tạo Hồ sơ công việc (tính bất biến (tính bất biến (idempotent))); khóa cổng kiểm soát liên quan</td><td>Link thư mục + cấu trúc thư mục đúng</td></tr>
 <tr><td>7</td><td>Nhầm Rev giữa Job và Part/REV Bản gốc</td><td>JobIndex.RevisionNum khác thư mục REV</td><td>Chạy sai chương trình/drawing</td><td>Hold ngay; mở QCHoldLog ReasonCode=WrongRev; kiểm tra Part/REV</td><td>QCHoldLog + ảnh/đường dẫn file Rev đúng</td></tr>
 <tr><td>8</td><td>Điều tiết SharePoint</td><td>Luồng fail 429/503</td><td>công việc tồn đọng, trễ dữ liệu</td><td>Giảm batch; bật thử lại/chờ lùi (chờ lùi (backoff)); giãn lịch; ghi IntegrationLogs</td><td>IntegrationLogs + thông số thử lại/batch</td></tr>
@@ -284,11 +284,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="mini">Bảng kiểm áp dụng cho ca trưởng/supervisor và người trực IT/QMS.</p>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Bằng chứng (MRR)</th><th>Lỗi hay gặp</th></tr></thead>
+<thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Evidence (MRR)</th><th>Lỗi hay gặp</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Kiểm tra IntegrationLogs 3 luồng phản chiếu / sao chép (công việc / đơn hàng/ops/ship) trạng thái thành công/cảnh báo</td><td>Supervisor</td><td>Ảnh màn hình IntegrationLogs</td><td>Chỉ nhìn “luồng run thành công” mà bỏ ErrorSummary</td></tr>
 <tr><td>2</td><td>Kiểm tra IntegrationSettings dấu chìm / hình chìm cập nhật đúng sau thành công</td><td>IT</td><td>Hồ sơ IntegrationSettings + dấu thời gian</td><td>con trỏ nhảy khi run FAIL</td></tr>
-<tr><td>3</td><td>Kiểm tra Data Sức khỏe: null khóa / phím/trùng lặp/độ trễ</td><td>Supervisor</td><td>Báo cáo Data Sức khỏe CNC-IMS-HUB → QMS-Hồ sơ → bảng điều khiển (bảng điều khiển (Dash))-ảnh chụp trạng thái.</td><td>Không phân loại ưu tiên lỗi lặp</td></tr>
+<tr><td>3</td><td>Kiểm tra Data Sức khỏe: null khóa / phím/trùng lặp/độ trễ</td><td>Supervisor</td><td>Báo cáo Data Sức khỏe CNC-IMS-HUB → QMS-Hồ sơ → bảng điều khiển (bảng điều khiển (Dash))-Photos trạng thái.</td><td>Không phân loại ưu tiên lỗi lặp</td></tr>
 <tr><td>4</td><td>điểm / tại chỗ kiểm tra 5 Job: JobIndex ↔ Epicor (JobNum, Rev, DueDate, Trạng thái)</td><td>Planner</td><td>Danh sách điểm / tại chỗ kiểm tra + ảnh</td><td>So sai công ty/nhà máy</td></tr>
 <tr><td>5</td><td>Kiểm tra Hồ sơ công việc tạo đủ thư mục template theo ANNEX-QMS-003</td><td>QA/QMS</td><td>Link thư mục + danh sách thư mục</td><td>Template lệch do luồng cấu hình khác</td></tr>
 <tr><td>6</td><td>Kiểm tra ShipRelease pending/ĐÃ CHẶN; chốt vấn đề chặn trong ngày</td><td>WHS + QA</td><td>Danh sách ĐÃ CHẶN + lý do</td><td>Đổi Trạng thái bằng tay</td></tr>
@@ -457,7 +457,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>(MC)</b> Hồ sơ phê duyệt phải được lưu ở đâu để đánh giá?
  <div class="mini">A. ApprovalHistory • B. Chat nhóm • C. Email cá nhân • D. Ghi nhớ</div>
 </li>
-<li><b>(MC)</b> Bằng chứng file Tier 1 lưu ở đâu?
+<li><b>(MC)</b> Evidence file Tier 1 lưu ở đâu?
  <div class="mini">A. Trong list • B. SharePoint thư viện (Hồ sơ công việc/Part‑REV) và list chỉ lưu URL • C. USB • D. Máy cá nhân</div>
 </li>
 <li><b>(MC)</b> Điều kiện PASS phê duyệt giao hàng bắt buộc có gì?
@@ -488,7 +488,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>3 kịch bản tình huống (tình huống)</h3>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Kịch bản</th><th>Đầu vào</th><th>Hành động bắt buộc</th><th>dự kiến kết quả</th><th>Bằng chứng</th></tr></thead>
+<thead><tr><th>Kịch bản</th><th>Đầu vào</th><th>Hành động bắt buộc</th><th>dự kiến kết quả</th><th>Evidence</th></tr></thead>
 <tbody>
 <tr>
 <td>SC-01: Sai Rev do dữ liệu cũ</td>
@@ -521,7 +521,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="mini">Hiệu suất test chấm ĐẠT/KHÔNG ĐẠT theo hành vi và dấu vết, không chấm cảm tính.</p>
 <div class="table-wrap">
 <table class="tight">
-<thead><tr><th>Nhóm</th><th>Bài thực hành</th><th>Tiêu chí PASS</th><th>Tiêu chí FAIL (1 lỗi là FAIL)</th><th>Bằng chứng bắt buộc</th></tr></thead>
+<thead><tr><th>Nhóm</th><th>Bài thực hành</th><th>Tiêu chí PASS</th><th>Tiêu chí FAIL (1 lỗi là FAIL)</th><th>Evidence bắt buộc</th></tr></thead>
 <tbody>
 <tr>
 <td>OPS (Operator/Setup)</td>
@@ -606,7 +606,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Đóng gói &amp; ship</td>
-<td>PackagingChecks PASS + ảnh chụp; PackSSCCRegister Đã xác minh; ShipRelease ĐÃ PHÁT HÀNH; bộ hồ sơ giao hàng thư mục</td>
+<td>PackagingChecks PASS + Photos; PackSSCCRegister Đã xác minh; ShipRelease ĐÃ PHÁT HÀNH; bộ hồ sơ giao hàng thư mục</td>
 <td>M365 danh sách + Hồ sơ công việc 07_Shipping-Đóng gói</td>
 <td>PackID/SSCC/ShipReleaseID</td>
 <td>Tier 1 ≥ 10 năm</td>

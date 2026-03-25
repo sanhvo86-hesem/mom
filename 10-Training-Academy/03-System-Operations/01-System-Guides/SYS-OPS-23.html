@@ -115,7 +115,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Ai chịu trách nhiệm</strong>
 <ul>
 <li><b>IT/M365 Admin:</b> cấu hình mốc chuẩn tổ chức thuê (tổ chức thuê (tenant)), nhãn/DLP/lưu giữ, đánh giá ghi nhật ký; cấp/thu hồi quyền; xuất bằng chứng cấu hình.</li>
-<li><b>QA/QMS:</b> định nghĩa yêu cầu bằng chứng‑ready, kiểm tra kiểm tra đột xuất “đúng Rev”, dựng bộ bằng chứng cho đánh giá; chặn cổng kiểm soát khi thiếu MRR.</li>
+<li><b>QA/QMS:</b> định nghĩa Requests bằng chứng‑ready, kiểm tra kiểm tra đột xuất “đúng Rev”, dựng bộ bằng chứng cho đánh giá; chặn cổng kiểm soát khi thiếu MRR.</li>
 <li><b>Quy trình Owner/Supervisor:</b> chịu trách nhiệm vùng dữ liệu (Released/Hồ sơ/WIP) và kỷ luật lưu hồ sơ theo job.</li>
 <li><b>Toàn bộ vai trò vận hành:</b> tạo hồ sơ đúng thư viện, đúng tên, đúng nhãn; không tự ý chia sẻ bên ngoài; không dùng file từ chat/email làm “bản đúng”.</li>
 </ul>
@@ -123,7 +123,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Khi nào kích hoạt (Kích hoạt)</strong>
 <ul>
-<li>Khi có <b>khách hàng/đánh giá viên</b> yêu cầu truy cập hồ sơ → dựng Bộ bằng chứng và cấp quyền bên ngoài theo kiểm soát.</li>
+<li>Khi có <b>khách hàng/đánh giá viên</b> Requests truy cập hồ sơ → dựng Bộ bằng chứng và cấp quyền bên ngoài theo kiểm soát.</li>
 <li>Khi có <b>part/REV mới</b> hoặc thay đổi Rev → kiểm tra vùng Part/REV chủ / gốc, chặn dùng bản cũ.</li>
 <li>Khi có <b>thay đổi cấu hình</b> (chia sẻ, DLP, lưu giữ, quyền / sự cho phép) ảnh hưởng QMS → chạy bảng kiểm kiểm soát và lưu bằng chứng.</li>
 <li>Khi phát hiện <b>lỗi dấu hiệu</b>: file nằm sai thư viện, link bên ngoài không hết hạn, khối lượng download, delete hồ sơ.</li>
@@ -145,13 +145,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Báo giá/Hợp đồng</b> (Người định giá (SAL-03))</td>
-<td>NDA/PO/spec khách hàng; yêu cầu chia sẻ</td>
+<td>NDA/PO/spec khách hàng; Requests chia sẻ</td>
 <td>Thư mục/Tài liệu Set khách hàng + nhãn bảo mật + log cấp quyền</td>
 <td>Không có log cấp quyền &amp; hết hạn bên ngoài → <b>CHẶN</b> chia sẻ</td>
 </tr>
 <tr>
 <td><b>Kế hoạch</b> (Planner/Supervisor)</td>
-<td>JobNum/WO, Part/Rev, lộ trình gia công, yêu cầu bằng chứng</td>
+<td>JobNum/WO, Part/Rev, lộ trình gia công, Requests bằng chứng</td>
 <td>Hồ sơ công việc tạo đúng mẫu + link Part/REV chủ / gốc</td>
 <td>Hồ sơ công việc thiếu key Rev/Customer → <b>TẠM GIỮ</b> phát hành job pack</td>
 </tr>
@@ -210,9 +210,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:200px">Điểm kiểm soát</th>
 <th>Responsible Person</th>
-<th>Bằng chứng/MRR</th>
+<th>Evidence/MRR</th>
 <th>Điều kiện đạt (Test/Acceptance)</th>
-<th style="width:120px">Bằng chứng ID</th>
+<th style="width:120px">Evidence ID</th>
 </tr>
 </thead>
 <tbody>
@@ -263,14 +263,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>IT</td>
 <td>Kết quả truy vấn đánh giá log + biên bản xử lý sự kiện</td>
 <td>Truy xuất nguồn gốc được sự kiện chia sẻ/download/delete; có hành động khi bất ổn</td>
-<td><b>M365-50</b> <span class="muted">CNC-IMS-HUB → QMS-SSOT → Bằng chứng-Pack.</span></td>
+<td><b>M365-50</b> <span class="muted">CNC-IMS-HUB → QMS-SSOT → Evidence-Pack.</span></td>
 </tr>
 <tr>
 <td><b>Bộ bằng chứng chỉ đọc + hết hạn</b></td>
 <td>QA/QMS + Người định giá (SAL-03)</td>
 <td>Bộ bằng chứng tại Z_Audit_Evidence_Pack + log chia sẻ + hết hạn</td>
 <td>Khách/đánh giá viên chỉ đọc; link có hết hạn; có FRM log cấp quyền</td>
-<td><b>M365-60</b> <span class="muted">CNC-IMS-HUB → QMS-SSOT → Bằng chứng-Pack.</span></td>
+<td><b>M365-60</b> <span class="muted">CNC-IMS-HUB → QMS-SSOT → Evidence-Pack.</span></td>
 </tr>
 </tbody>
 </table>
@@ -307,7 +307,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 </div>
 </div>
-<h2 class="h2" id="m8">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Responsible Person, Bằng chứng/MRR, điểm sai hay gặp</h2>
+<h2 class="h2" id="m8">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Responsible Person, Evidence/MRR, điểm sai hay gặp</h2>
 <div class="table-card">
 <table class="table">
 <thead>
@@ -315,7 +315,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:44px">#</th>
 <th>Bước</th>
 <th style="width:170px">Responsible Person</th>
-<th style="width:260px">Bằng chứng/MRR bắt buộc</th>
+<th style="width:260px">Evidence/MRR bắt buộc</th>
 <th>Điểm sai hay gặp</th>
 </tr>
 </thead>
@@ -396,7 +396,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3">9.2 OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
 <ul>
-<li><b>01 bộ hồ sơ cấu hình</b> cho mô-đun này: FRM‑QMS‑016 được điền đầy đủ + bộ ảnh/ảnh chụp trạng thái bằng chứng theo Bằng chứng ID M365‑01…M365‑42.</li>
+<li><b>01 bộ hồ sơ cấu hình</b> cho mô-đun này: FRM‑QMS‑016 được điền đầy đủ + bộ ảnh/Photos trạng thái bằng chứng theo Evidence ID M365‑01…M365‑42.</li>
 <li><b>01 Hồ sơ công việc mẫu</b> (JobNum giả lập) có cấu trúc đúng, siêu dữ liệu Rev/Customer đầy đủ, có hồ sơ kiểm tra mẫu.</li>
 <li><b>01 Bộ bằng chứng mẫu</b> đặt tại <b>Z_Audit_Evidence_Pack</b> (chỉ đọc + hết hạn) và có log chia sẻ.</li>
 <li><b>01 kết quả truy vấn đánh giá log</b> cho sự kiện bên ngoài chia sẻ và delete trong 30 ngày gần nhất, kèm biên bản xử lý.</li>
@@ -500,10 +500,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 </div>
 <div class="card">
-<h3 class="h3">10.2 Tình huống (≥3 tình huống thật) — yêu cầu quyết định TẠM GIỮ/GO và ghi MRR</h3>
+<h3 class="h3">10.2 Tình huống (≥3 tình huống thật) — Requests quyết định TẠM GIỮ/GO và ghi MRR</h3>
 <div class="note">
-<strong>Tình huống 1 — Đánh giá khách hàng yêu cầu truy cập “hồ sơ công việc mẫu”</strong>
-<p><b>Dữ kiện:</b> Người định giá (SAL-03) nhận yêu cầu từ đánh giá viên truy cập 01 hồ sơ công việc và 01 bản SOP. Người định giá (SAL-03) đã tạo link SharePoint dạng “Bất kỳ ai” không hết hạn cho thư mục job.</p>
+<strong>Tình huống 1 — Đánh giá khách hàng Requests truy cập “hồ sơ công việc mẫu”</strong>
+<p><b>Dữ kiện:</b> Người định giá (SAL-03) nhận Requests từ đánh giá viên truy cập 01 hồ sơ công việc và 01 bản SOP. Người định giá (SAL-03) đã tạo link SharePoint dạng “Bất kỳ ai” không hết hạn cho thư mục job.</p>
 <p><b>Yêu cầu:</b> Quyết định <b>CHẶN/TẠM GIỮ/GO</b>, liệt kê 5 hành động bắt buộc trong 30 phút đầu, và ghi MRR phải tạo.</p>
 </div>
 <div class="note">
@@ -575,7 +575,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
 <ul>
 <li>FRM‑QMS‑016 (M365 Cấu hình Bảng kiểm) — bản điền đầy đủ và ký xác nhận.</li>
-<li>Bộ ảnh/ảnh chụp trạng thái bằng chứng cho các kiểm soát: M365‑01,02,03,10,11,20,21,22,30–33,40–42.</li>
+<li>Bộ ảnh/Photos trạng thái bằng chứng cho các kiểm soát: M365‑01,02,03,10,11,20,21,22,30–33,40–42.</li>
 <li>Log cấp/thu hồi quyền (FRM‑QMS‑15) cho mọi bên ngoài chia sẻ/khách.</li>
 <li>Biên bản truy cập rà soát quý (FRM‑QMS‑17) kèm quyết định thu hồi/cập nhật.</li>
 <li>Bộ bằng chứng chỉ đọc (Z_Audit_Evidence_Pack) + hết hạn + danh mục nội dung.</li>

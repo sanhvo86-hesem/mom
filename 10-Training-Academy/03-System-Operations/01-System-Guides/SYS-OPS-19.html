@@ -120,9 +120,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3" style="margin-top:0">Khi kích hoạt (Kích hoạt)</h3>
 <ul>
-<li>Khi khách hàng đổi bản vẽ/Rev/spec/PO, đổi yêu cầu đóng gói/nhãn, đổi điều kiện giao hàng.</li>
+<li>Khi khách hàng đổi bản vẽ/Rev/spec/PO, đổi Requests đóng gói/nhãn, đổi điều kiện giao hàng.</li>
 <li>Khi Kỹ thuật đổi program/CAM/ghi sổ / đăng/chiến lược; đổi gá/không / bằng không; đổi lộ trình gia công/thứ tự nguyên công.</li>
-<li>Khi thay NCC/thuê ngoài/xi mạ anốt (xi mạ anốt (anodize))/mạ/mẻ nấu (mẻ nấu (heat)) xử lý; khi PO cần luồng-xuống / ngừng yêu cầu mới.</li>
+<li>Khi thay NCC/thuê ngoài/xi mạ anốt (xi mạ anốt (anodize))/mạ/mẻ nấu (mẻ nấu (heat)) xử lý; khi PO cần luồng-xuống / ngừng Requests mới.</li>
 <li>Khi thay dụng cụ đo/phương pháp đo; khi gage OOT/đến hạn hiệu chuẩn; khi đổi chủ / gốc/fixture đo.</li>
 <li>Khi bảo trì thay linh kiện máy, đổi máy khác mô hình, đổi layout ảnh hưởng an toàn/chất lượng.</li>
 <li>Khi phát sinh NCR/MRB/CAPA buộc thay đổi để chặn tái diễn.</li>
@@ -136,7 +136,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:160px;">Vai trò</th>
 <th>Trách nhiệm bắt buộc trong mô-đun này</th>
-<th style="width:260px;">Bằng chứng/MRR gắn vai trò</th>
+<th style="width:260px;">Evidence/MRR gắn vai trò</th>
 </tr>
 </thead>
 <tbody>
@@ -173,7 +173,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Mua hàng</b></td>
 <td>Luồng-xuống / ngừng thay đổi vào PO; chặn NCC khi thiếu cert/phê duyệt; theo dõi hiệu lực và lô áp dụng.</td>
-<td>PO phiên bản; yêu cầu chứng từ; xác nhận NCC.</td>
+<td>PO phiên bản; Requests chứng từ; xác nhận NCC.</td>
 </tr>
 <tr>
 <td><b>Planner</b></td>
@@ -192,7 +192,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Người định giá (SAL-03)</b></td>
-<td>Tiếp nhận thay đổi khách hàng; lập FRM-SAL-003; chốt yêu cầu phê duyệt khách; thông báo tác động lịch trình/giá.</td>
+<td>Tiếp nhận thay đổi khách hàng; lập FRM-SAL-003; chốt Requests phê duyệt khách; thông báo tác động lịch trình/giá.</td>
 <td>FRM-SAL-003 ký; email/biên bản xác nhận khách (lưu nội bộ).</td>
 </tr>
 <tr>
@@ -219,8 +219,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Báo giá/Hợp đồng</b></td>
-<td>Khách thay đổi yêu cầu thương mại/kỹ thuật</td>
-<td>FRM-SAL-003 + xác nhận yêu cầu</td>
+<td>Khách thay đổi Requests thương mại/kỹ thuật</td>
+<td>FRM-SAL-003 + xác nhận Requests</td>
 <td>Không có FRM-SAL-003 ký → <b>CHẶN</b> cập nhật kế hoạch/giá</td>
 </tr>
 <tr>
@@ -238,7 +238,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Mua hàng</b></td>
 <td>Đổi NCC/thuê ngoài/công đoạn đặc biệt</td>
-<td>PO cập nhật + luồng-xuống / ngừng + cert yêu cầu</td>
+<td>PO cập nhật + luồng-xuống / ngừng + cert Requests</td>
 <td>Thiếu luồng-xuống / ngừng/cert → <b>TẠM GIỮ</b> nhận hàng</td>
 </tr>
 <tr>
@@ -293,7 +293,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:70px;">#</th>
 <th>điểm kiểm soát (điểm kiểm soát) bắt buộc</th>
 <th style="width:190px;">Responsible Person</th>
-<th style="width:260px;">Bằng chứng/MRR</th>
+<th style="width:260px;">Evidence/MRR</th>
 <th style="width:170px;">Tần suất</th>
 </tr>
 </thead>
@@ -394,7 +394,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:60px;">Bước</th>
 <th>Nội dung bắt buộc</th>
 <th style="width:180px;">Responsible Person</th>
-<th style="width:240px;">Bằng chứng/MRR</th>
+<th style="width:240px;">Evidence/MRR</th>
 <th style="width:220px;">Điểm sai hay gặp</th>
 </tr>
 </thead>
@@ -406,7 +406,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>5</td><td>Chốt cut-in theo lot/số sê-ri/date; lập danh sách job bị ảnh hưởng.</td><td>Planner + QA</td><td>Cut-in hồ sơ</td><td>Cut-in ghi “từ nay” không có mốc.</td></tr>
 <tr><td>6</td><td>Cập nhật tài liệu/dữ liệu: traveler, phiếu cài đặt, kế hoạch kiểm tra (kiểm tra plan), label, program.</td><td>Kiểm soát tài liệu (Doc Control)/QA + Kỹ thuật</td><td>Danh mục cập nhật trong FRM-QMS-022</td><td>Cập nhật một phần, bỏ sót label/pack.</td></tr>
 <tr><td>7</td><td>Khóa &amp; thu hồi bản cũ tại phân xưởng/kho; dán Rev mới tại máy.</td><td>Supervisor + Kho</td><td>Log thu hồi + ảnh hiện trường</td><td>Bản cũ còn treo tại máy.</td></tr>
-<tr><td>8</td><td>Luồng-xuống / ngừng thay đổi cho NCC/thuê ngoài qua PO; chốt yêu cầu cert.</td><td>Mua hàng</td><td>PO phiên bản + yêu cầu cert</td><td>PO không ghi Rev/spec mới.</td></tr>
+<tr><td>8</td><td>Luồng-xuống / ngừng thay đổi cho NCC/thuê ngoài qua PO; chốt Requests cert.</td><td>Mua hàng</td><td>PO phiên bản + Requests cert</td><td>PO không ghi Rev/spec mới.</td></tr>
 <tr><td>9</td><td>cách ly tồn/WIP theo Rev; nhãn TẠM GIỮ/SỬA HÀNG; quyết định xử lý WIP.</td><td>Kho + QA</td><td>Biên bản cách ly + list lot</td><td>Lẫn lô trong cùng kệ.</td></tr>
 <tr><td>10</td><td>Lập xác nhận plan: Mẫu đầu/Chênh lệch FAI/Đầy đủ FAI; gage trạng thái hiệu chuẩn.</td><td>QC + QA</td><td>Plan ký + list gage</td><td>Đo CTQ bằng gage hết hạn.</td></tr>
 <tr><td>11</td><td>Thực thi thay đổi tại máy: setup/chạy thử; xác nhận program tổng kiểm tra (mã kiểm).</td><td>Setup + Lập trình viên (CNC)</td><td>Setup bảng kiểm; tổng kiểm tra (mã kiểm) log</td><td>Chạy nhầm file do tên giống.</td></tr>
@@ -512,10 +512,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>[Trắc nghiệm] Khi traveler tại máy ghi Rev B nhưng drawing phát hành ghi Rev C, hành động đúng là gì? A) Chạy theo traveler B) DỪNG và kích hoạt 60 giây C) Sửa tay traveler D) Bỏ qua vì chỉ khác chữ</li>
 <li>[Trắc nghiệm] Thay đổi Tác động Matrix bắt buộc tối thiểu gồm hạng mục nào? A) CTQ B) Program C) WIP/truy xuất nguồn gốc D) Tất cả các đáp án</li>
 <li>[Trắc nghiệm] Thay đổi đổi lớp phủ / mạ/công đoạn đặc biệt rơi vào mức nào theo logic nội bộ? A) C3 B) C2 C) C1 D) Không cần phân loại</li>
-<li>[Trắc nghiệm] Bằng chứng “Không có bằng chứng = không qua cổng” áp dụng mạnh nhất tại cổng kiểm soát nào? A) Ship cổng kiểm soát B) Cổng kiểm soát phát hành program/tài liệu C) Cổng kiểm soát Mẫu đầu/FAI D) Tất cả các cổng kiểm soát</li>
+<li>[Trắc nghiệm] Evidence “Không có bằng chứng = không qua cổng” áp dụng mạnh nhất tại cổng kiểm soát nào? A) Ship cổng kiểm soát B) Cổng kiểm soát phát hành program/tài liệu C) Cổng kiểm soát Mẫu đầu/FAI D) Tất cả các cổng kiểm soát</li>
 <li>[Trắc nghiệm] Cut-in đúng chuẩn phải gắn với gì? A) Cảm giác “từ giờ” B) Lot/số sê-ri/date C) Ca làm việc D) Operator</li>
-<li>[Trắc nghiệm] Khi thay đổi dụng cụ đo cho CTQ, yêu cầu tối thiểu là gì? A) Đo nhanh cho xong B) Xác nhận hiệu chuẩn hợp lệ + cập nhật hướng dẫn đo C) Không cần ghi D) Chỉ QC biết</li>
-<li>[Trắc nghiệm] Khi đổi NCC outsource hoàn thiện bề mặt, hành động bắt buộc là gì? A) Chỉ đổi tên NCC B) Luồng-xuống / ngừng PO + yêu cầu cert + tăng xác minh đầu vào C) Không cần vì NCC chịu D) Đợi lỗi rồi sửa</li>
+<li>[Trắc nghiệm] Khi thay đổi dụng cụ đo cho CTQ, Requests tối thiểu là gì? A) Đo nhanh cho xong B) Xác nhận hiệu chuẩn hợp lệ + cập nhật hướng dẫn đo C) Không cần ghi D) Chỉ QC biết</li>
+<li>[Trắc nghiệm] Khi đổi NCC outsource hoàn thiện bề mặt, hành động bắt buộc là gì? A) Chỉ đổi tên NCC B) Luồng-xuống / ngừng PO + Requests cert + tăng xác minh đầu vào C) Không cần vì NCC chịu D) Đợi lỗi rồi sửa</li>
 <li>[Trắc nghiệm] Ai có quyền chốt TẠM GIỮ/PHÁT HÀNH cho thay đổi liên quan CTQ? A) Operator B) QA (và QC theo phần đo) C) Kho D) Người định giá (SAL-03)</li>
 <li>[Trắc nghiệm] Thay đổi “áp dụng ngay tại hiện trường” phải hoàn tất hợp thức hóa hồ sơ trong bao lâu theo chuẩn nội bộ? A) 1 tuần B) 24h C) 1 tháng D) Không cần hợp thức hóa hồ sơ</li>
 <li>[Tình huống ngắn] Khi phát hiện gage đo CTQ hết hạn hiệu chuẩn trong lúc đang đo Mẫu đầu, trạng thái cổng kiểm soát là gì và ai phải được gọi?</li>
@@ -527,7 +527,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>[Trắc nghiệm] Khi thiếu chữ ký phê duyệt bắt buộc trên CR, trạng thái đúng là gì? A) GO B) TẠM GIỮ/CHẶN C) Ship trước D) Đợi cuối tuần ký</li>
 <li>[Trắc nghiệm] Vai trò nào bắt buộc quản trị version program và tổng kiểm tra (mã kiểm)? A) Lập trình viên (CNC) B) Operator C) EHS D) Người định giá (SAL-03)</li>
 <li>[Trắc nghiệm] Vai trò nào bắt buộc luồng-xuống / ngừng thay đổi vào PO? A) Mua hàng B) QC C) Setup D) Bảo trì</li>
-<li>[Tình huống ngắn] Khi khách yêu cầu đổi Rev gấp để kịp ship, điều kiện tối thiểu để ship hợp lệ là gì?</li>
+<li>[Tình huống ngắn] Khi khách Requests đổi Rev gấp để kịp ship, điều kiện tối thiểu để ship hợp lệ là gì?</li>
 </ol>
 <h3 class="h3">10.2 Tình huống (≥3) — dữ kiện thật, quyết định TẠM GIỮ/GO và ghi MRR</h3>
 <div class="grid-3">
@@ -543,7 +543,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card">
 <h4 class="h4" style="margin-top:0">Tình huống 3 — Đổi NCC xi mạ anốt (xi mạ anốt (anodize))</h4>
-<p><b>Dữ kiện:</b> Mua hàng đổi NCC xi mạ anốt (xi mạ anốt (anodize)) do NCC cũ quá tải. Khách yêu cầu chứng chỉ xi mạ anốt (xi mạ anốt (anodize)) theo spec, lô đầu cần ship trong 2 ngày.</p>
+<p><b>Dữ kiện:</b> Mua hàng đổi NCC xi mạ anốt (xi mạ anốt (anodize)) do NCC cũ quá tải. Khách Requests chứng chỉ xi mạ anốt (xi mạ anốt (anodize)) theo spec, lô đầu cần ship trong 2 ngày.</p>
 <p><b>Yêu cầu:</b> Liệt kê luồng-xuống / ngừng PO bắt buộc, xác minh đầu vào tăng mức ra sao, điều kiện ship cổng kiểm soát.</p>
 </div>
 </div>
@@ -574,7 +574,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Không khoanh vùng; lẫn Rev trên kệ hoặc tại máy.</td>
 </tr>
 <tr>
-<td>Bằng chứng chất lượng</td>
+<td>Evidence chất lượng</td>
 <td>Gói MRR có: tổng kiểm tra (mã kiểm) program, ảnh thu hồi bản cũ, Mẫu đầu/IR/FAI, log quyết định.</td>
 <td>Thiếu bất kỳ bằng chứng trọng yếu.</td>
 </tr>
@@ -598,7 +598,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>QC</td><td>≥90%</td><td>Đúng cả 3 tình huống</td><td>Lập xác nhận plan; Mẫu đầu/FAI; xác nhận gage hợp lệ; ký ĐẠT/KHÔNG ĐẠT.</td></tr>
 <tr><td>QA</td><td>≥90%</td><td>Đúng cả 3 tình huống</td><td>Chủ trì phân loại ưu tiên; chốt cổng kiểm soát; quyết định PHÁT HÀNH/TẠM GIỮ; đóng CR với MRR đầy đủ.</td></tr>
 <tr><td>Kho</td><td>≥80%</td><td>Đúng Tình huống 1</td><td>Cách ly tồn/WIP theo Rev; nhãn TẠM GIỮ/SỬA HÀNG; log xuất/nhập theo lot.</td></tr>
-<tr><td>Mua hàng</td><td>≥85%</td><td>Đúng Tình huống 3</td><td>PO luồng-xuống / ngừng; yêu cầu cert; chặn nhận hàng khi thiếu chứng từ.</td></tr>
+<tr><td>Mua hàng</td><td>≥85%</td><td>Đúng Tình huống 3</td><td>PO luồng-xuống / ngừng; Requests cert; chặn nhận hàng khi thiếu chứng từ.</td></tr>
 <tr><td>Planner</td><td>≥85%</td><td>Đúng Tình huống 1</td><td>Cut-in theo lot/số sê-ri/date; tách job theo Rev; thông báo triển khai.</td></tr>
 <tr><td>Bảo trì</td><td>≥80%</td><td>Đúng Tình huống 2</td><td>Bảng kiểm an toàn máy; hồ sơ chạy thử; bàn giao máy đủ điều kiện.</td></tr>
 <tr><td>EHS</td><td>≥80%</td><td>Đúng Tình huống 2 (phần rủi ro an toàn)</td><td>Rủi ro log; điều kiện an toàn trước triển khai.</td></tr>
@@ -616,11 +616,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>FRM-QMS-006</b> — Thay đổi Tác động Matrix (đủ chữ ký liên phòng).</li>
 <li><b>FRM-SAL-003</b> — Customer Thay đổi Đơn hàng Review (khi thay đổi từ khách).</li>
 <li>Danh mục tài liệu cập nhật: traveler, phiếu cài đặt, kế hoạch kiểm tra (kiểm tra plan), label, lộ trình gia công.</li>
-<li>Bằng chứng program: file name + version + tổng kiểm tra (mã kiểm) + log phát hành.</li>
-<li>Bằng chứng xác nhận: Mẫu đầu/IR/CMM/FAI (theo mức) + kết luận ĐẠT/KHÔNG ĐẠT.</li>
-<li>Bằng chứng WIP cách ly: ảnh nhãn TẠM GIỮ/SỬA HÀNG + list lot/số sê-ri + quyết định xử lý.</li>
-<li>Bằng chứng nhà cung cấp: PO phiên bản + cert vật liệu/công đoạn đặc biệt + xác minh đầu vào hồ sơ.</li>
-<li>Bằng chứng đào tạo: danh sách người chạm việc + ngày + chữ ký.</li>
+<li>Evidence program: file name + version + tổng kiểm tra (mã kiểm) + log phát hành.</li>
+<li>Evidence xác nhận: Mẫu đầu/IR/CMM/FAI (theo mức) + kết luận ĐẠT/KHÔNG ĐẠT.</li>
+<li>Evidence WIP cách ly: ảnh nhãn TẠM GIỮ/SỬA HÀNG + list lot/số sê-ri + quyết định xử lý.</li>
+<li>Evidence nhà cung cấp: PO phiên bản + cert vật liệu/công đoạn đặc biệt + xác minh đầu vào hồ sơ.</li>
+<li>Evidence đào tạo: danh sách người chạm việc + ngày + chữ ký.</li>
 <li>Biên bản xác minh hiệu lực sau triển khai + quyết định đóng CR.</li>
 </ul>
 <h3 class="h3">12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
@@ -644,12 +644,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Không có CR/Thông báo cho thay đổi đã triển khai → chặn bằng cổng kiểm soát FF2, bắt buộc FRM-QMS-022 trước cut-in.</li>
 <li>Thay đổi Tác động Matrix thiếu chữ ký liên phòng → chặn bằng bảng kiểm bước 3–4.</li>
 <li>Cut-in mơ hồ, không gắn lot/số sê-ri/date → chặn bằng bảng kiểm bước 5; kho không xuất khi thiếu cut-in.</li>
-<li>Không thu hồi bản cũ tại máy → chặn bằng bước 7; yêu cầu ảnh hiện trường trong MRR.</li>
+<li>Không thu hồi bản cũ tại máy → chặn bằng bước 7; Requests ảnh hiện trường trong MRR.</li>
 <li>Program không có version/tổng kiểm tra (mã kiểm) → chặn bằng bước 11; bắt buộc log phát hành.</li>
 <li>Thiết bị đo hết hạn hiệu chuẩn nhưng vẫn dùng → chặn bằng xác nhận plan + FF2.</li>
 <li>Outsource/công đoạn đặc biệt thiếu cert/luồng-xuống / ngừng → chặn bằng bước 8–9 và xác minh đầu vào tăng mức.</li>
 <li>giao hàng khi thiếu bằng chứng Mẫu đầu/FAI hoặc COC sai Rev → chặn bằng ship cổng kiểm soát điểm kiểm soát (điểm kiểm soát) #6.</li>
-<li>Đóng CR khi chưa xác minh hiệu lực → chặn bằng điểm kiểm soát (điểm kiểm soát) #7; yêu cầu biên bản hiệu lực.</li>
+<li>Đóng CR khi chưa xác minh hiệu lực → chặn bằng điểm kiểm soát (điểm kiểm soát) #7; Requests biên bản hiệu lực.</li>
 </ol>
 </div>
 </div>

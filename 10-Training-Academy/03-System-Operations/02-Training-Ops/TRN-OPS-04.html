@@ -92,7 +92,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </p>
 <ul style="line-height:1.85;">
 <li>Khi phát hành mới hoặc thay đổi <b>SOP/WI/FRM</b> ảnh hưởng vận hành, tiêu chí chấp nhận, hồ sơ.</li>
-<li>Khi có <b>sản phẩm mới / khách hàng mới / yêu cầu chứng từ mới</b> tạo rủi ro “thiếu/giả bằng chứng”.</li>
+<li>Khi có <b>sản phẩm mới / khách hàng mới / Requests chứng từ mới</b> tạo rủi ro “thiếu/giả bằng chứng”.</li>
 <li>Khi có <b>NCR/MRB/khiếu nại</b> liên quan “không đủ năng lực” hoặc “bỏ qua cổng kiểm soát”.</li>
 <li>Khi bổ nhiệm/luân chuyển nhân sự vào vai trò có quyền ký/duyệt/cổng kiểm soát.</li>
 </ul>
@@ -127,9 +127,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Báo giá/Hợp đồng</b></td>
-<td>Khi yêu cầu khách có “chứng từ bắt buộc / truy xuất nguồn gốc / công đoạn đặc biệt”.</td>
+<td>Khi Requests khách có “chứng từ bắt buộc / truy xuất nguồn gốc / công đoạn đặc biệt”.</td>
 <td>Bản thiết kế &amp; bài kiểm tra nhanh cho Người định giá (SAL-03) + Planner.</td>
-<td>Chặn báo giá khi Responsible Person chưa đạt Level yêu cầu về chứng từ.</td>
+<td>Chặn báo giá khi Responsible Person chưa đạt Level Requests về chứng từ.</td>
 </tr>
 <tr>
 <td><b>Kế hoạch</b></td>
@@ -139,7 +139,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Kỹ thuật</b></td>
-<td>Khi phát hành program/phiếu cài đặt/FAI yêu cầu mới.</td>
+<td>Khi phát hành program/phiếu cài đặt/FAI Requests mới.</td>
 <td>Tình huống kiểm soát thay đổi; ngân hàng câu hỏi theo phiên bản.</td>
 <td>Chặn “Released” khi đề/đáp án chưa được kiểm soát phiên bản.</td>
 </tr>
@@ -169,7 +169,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Đóng gói/Ship/Phản hồi</b></td>
-<td>Khi khách yêu cầu nhãn, đóng gói, chứng từ ship đặc thù.</td>
+<td>Khi khách Requests nhãn, đóng gói, chứng từ ship đặc thù.</td>
 <td>Bài kiểm tra nhanh &amp; tình huống rủi ro giao hàng; log version đề thi theo lô.</td>
 <td>Chặn giao hàng khi bảng kiểm/bài kiểm tra nhanh kiểm soát cổng sai hoặc thiếu hồ sơ.</td>
 </tr>
@@ -240,7 +240,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:210px;">Điểm kiểm soát</th>
 <th style="width:160px;">Responsible Person</th>
 <th>Khi kích hoạt</th>
-<th style="width:230px;">Bằng chứng (MRR)</th>
+<th style="width:230px;">Evidence (MRR)</th>
 </tr>
 </thead>
 <tbody>
@@ -338,7 +338,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <hr/>
-<h2>7) Bảng kiểm vận hành (≤ 15 bước) — Responsible Person + Bằng chứng/MRR + điểm sai lặp lại</h2>
+<h2>7) Bảng kiểm vận hành (≤ 15 bước) — Responsible Person + Evidence/MRR + điểm sai lặp lại</h2>
 <div class="table-card">
 <table class="table">
 <thead>
@@ -346,7 +346,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:55px;">#</th>
 <th>Hành động bắt buộc</th>
 <th style="width:170px;">Responsible Person</th>
-<th style="width:240px;">Bằng chứng/MRR</th>
+<th style="width:240px;">Evidence/MRR</th>
 <th style="width:220px;">Điểm sai lặp lại cần chặn</th>
 </tr>
 </thead>
@@ -435,7 +435,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 <h3>8.3 Tiêu chí đánh giá L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn sau khi đạt)</h3>
 <div class="note">
-<strong>Bản đồ yêu cầu theo vai trò (mức tối thiểu)</strong>
+<strong>Bản đồ Requests theo vai trò (mức tối thiểu)</strong>
 <div class="table-card" style="margin-top:10px;">
 <table class="table">
 <thead>
@@ -462,7 +462,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:90px;">Level</th>
 <th>Hành vi quan sát được</th>
 <th style="width:260px;">Điều kiện lên level</th>
-<th style="width:260px;">Bằng chứng tối thiểu</th>
+<th style="width:260px;">Evidence tối thiểu</th>
 </tr>
 </thead>
 <tbody>
@@ -497,7 +497,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Viết được câu hỏi theo bản thiết kế, câu rõ, có đáp án + giải thích.</li>
 <li>Gắn tag vai trò/level/chủ đề/cổng kiểm soát đúng quy ước.</li>
 <li>Thực hiện rà soát đồng cấp chéo và ghi nhận sửa đổi.</li>
-<li>Viết được 01 tình huống có dữ kiện thật, yêu cầu quyết định GO/TẠM GIỮ.</li>
+<li>Viết được 01 tình huống có dữ kiện thật, Requests quyết định GO/TẠM GIỮ.</li>
 </ul>
 </td>
 <td>
@@ -641,7 +641,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>2</td>
 <td>
-<b>Nghi vấn rò rỉ đáp án:</b> Trong nhóm chat ca đêm xuất hiện ảnh chụp 3 câu Fail-Cổng kiểm soát trùng với đề version A.
+<b>Nghi vấn rò rỉ đáp án:</b> Trong nhóm chat ca đêm xuất hiện Photos 3 câu Fail-Cổng kiểm soát trùng với đề version A.
  Ca ngày đang chuẩn bị thi.
  </td>
 <td><b>TẠM GIỮ</b></td>
@@ -698,7 +698,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>10) ĐẠT/KHÔNG ĐẠT tiêu chí (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”)</h2>
 <div class="callout">
 <ul style="margin:0; padding-left:18px; line-height:1.9;">
-<li><b>PASS</b> khi: (1) đạt điểm theo ngưỡng; (2) 0 lỗi Fail-Cổng kiểm soát; (3) có đủ MRR; (4) hoàn tất OJT/hiệu suất theo yêu cầu vai trò.</li>
+<li><b>PASS</b> khi: (1) đạt điểm theo ngưỡng; (2) 0 lỗi Fail-Cổng kiểm soát; (3) có đủ MRR; (4) hoàn tất OJT/hiệu suất theo Requests vai trò.</li>
 <li><b>FAIL</b> khi: (1) sai 1 câu Fail-Cổng kiểm soát; hoặc (2) thiếu bằng chứng; hoặc (3) vi phạm chống-tóm tắt nhanh (tóm tắt nhanh (cheat sheet) sheet); hoặc (4) không truy ra phiên bản nguồn.</li>
 <li><b>Thiếu MRR</b> được xử lý như <b>FAIL</b> ngay lập tức. Không có ngoại lệ.</li>
 </ul>

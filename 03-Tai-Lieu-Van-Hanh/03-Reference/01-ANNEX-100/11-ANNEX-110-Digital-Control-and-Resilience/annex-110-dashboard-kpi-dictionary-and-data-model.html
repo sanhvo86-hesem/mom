@@ -128,7 +128,7 @@ ul.tight li {margin:4px 0;}
 <h3>6.1 thực tế table bắt buộc</h3>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>thực tế</th><th>Hạt dữ liệu</th><th>Key chính</th><th>Ghi chú</th></tr></thead><tbody>
 <tr><td>FactShipment</td><td>01 phát hành / 01 ship sự kiện</td><td>ShipHeadNum, PackID, OrderNum, Phát hành</td><td>Không gộp nhiều pack thành 1 dòng nếu cần diễn tập-xuống / ngừng bộ hồ sơ giao hàng</td></tr>
-<tr><td>FactJobOperation</td><td>01 JobNum + 01 OprSeq + 01 trạng thái ảnh chụp trạng thái</td><td>JobNum, OprSeq, WorkCenter, SnapshotDate</td><td>Dùng cho tuổi tồn WIP (tuổi tồn / tuổi tồn), điều phối xuất hàng tuân thủ, cam kết rủi ro</td></tr>
+<tr><td>FactJobOperation</td><td>01 JobNum + 01 OprSeq + 01 trạng thái Photos trạng thái</td><td>JobNum, OprSeq, WorkCenter, SnapshotDate</td><td>Dùng cho tuổi tồn WIP (tuổi tồn / tuổi tồn), điều phối xuất hàng tuân thủ, cam kết rủi ro</td></tr>
 <tr><td>FactHoldEvent</td><td>01 hold sự kiện</td><td>HoldID, JobNum, PackID, HoldCode</td><td>Phải có mở time, Responsible Person, phát hành time, mức nghiêm trọng</td></tr>
 <tr><td>FactNCR</td><td>01 NCR / sai khác</td><td>NCR ID</td><td>Phải liên được tới JobNum, part, khuyết tật nhóm sản phẩm</td></tr>
 <tr><td>FactReceipt</td><td>01 phiếu nhận / biên nhận dòng / chuyền / lot</td><td>PONum, dòng đơn mua hàng (dòng đơn mua hàng (POLine)), ReceiptNum, Lot</td><td>Phải giữ cert/mẻ nấu (mẻ nấu (heat))/truy vết path khi áp dụng</td></tr>
@@ -137,7 +137,7 @@ ul.tight li {margin:4px 0;}
 </tbody></table></div>
 <h3>6.2 kích thước bắt buộc</h3>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>kích thước</th><th>Field tối thiểu</th><th>Mục đích</th></tr></thead><tbody>
-<tr><td>DimDate</td><td>DateKey, tuần, tháng, quý, năm, shift-cut nhóm / phân loại</td><td>Cắt kỳ, rà soát xu hướng, đóng băng ảnh chụp trạng thái</td></tr>
+<tr><td>DimDate</td><td>DateKey, tuần, tháng, quý, năm, shift-cut nhóm / phân loại</td><td>Cắt kỳ, rà soát xu hướng, đóng băng Photos trạng thái</td></tr>
 <tr><td>DimPartRev</td><td>PartNum, Rev, khách hàng code, nguyên vật liệu nhóm sản phẩm, clean level</td><td>Nhìn KPI theo part/rev/nhóm sản phẩm</td></tr>
 <tr><td>DimCustomer</td><td>CustID, khách hàng group, CSR/QPL hồ sơ / biên dạng</td><td>Tách KPI theo khách hàng / cam kết</td></tr>
 <tr><td>DimWorkCenter</td><td>WC, machine nhóm sản phẩm, nút thắt / điểm nghẽn đánh dấu / cờ</td><td>Nhìn công suất, thời gian ngừng máy, hàng đợi</td></tr>
@@ -151,7 +151,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>T1 đầu ca</td><td>Chốt trước họp tối thiểu 15 phút</td><td>Epicor báo cáo / bảng điều khiển đã làm mới</td><td>Dùng Epicor để quyết định, mở Data Vấn đề, không chờ bảng điều khiển sửa xong</td></tr>
 <tr><td>T2/T3</td><td>Chốt theo lịch họp trong <a href="../../05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Bảng điều khiển + export SoR</td><td>Nếu số xu hướng lệch SoR, vấn đề Responsible Person phải giải trình ngay trong cuộc họp</td></tr>
 <tr><td>T4 / Xem xét của lãnh đạo</td><td>Ảnh chụp trạng thái đã đóng băng theo tháng/quý</td><td>Gói phát hành đã phê duyệt</td><td>Mọi sửa số của kỳ đã đóng băng phải đi qua thay đổi hồ sơ</td></tr>
-<tr><td>Customer báo cáo</td><td>Theo kỳ khách hàng yêu cầu</td><td>bộ dữ liệu phát hành đã phê duyệt</td><td>Không gửi báo cáo ngoài gói phát hành</td></tr>
+<tr><td>Customer báo cáo</td><td>Theo kỳ khách hàng Requests</td><td>bộ dữ liệu phát hành đã phê duyệt</td><td>Không gửi báo cáo ngoài gói phát hành</td></tr>
 </tbody></table></div>
 <ul class="tight" style="padding-left:18px;">
 <li>Không ghi đè dữ liệu lịch sử khi chỉ muốn sửa sơ đồ ánh xạ trình bày; phải version hóa gói phát hành.</li>
@@ -178,7 +178,7 @@ ul.tight li {margin:4px 0;}
 <li>Ảnh chụp trạng thái trước–sau nếu đổi công thức</li>
 <li>Responsible Person nghiệp vụ và Responsible Person dữ liệu ký chấp thuận</li>
 </ul></div>
-<div class="card"><h3>Khi bắt buộc mở yêu cầu thay đổi</h3><ul class="tight" style="padding-left:18px;">
+<div class="card"><h3>Khi bắt buộc mở Requests thay đổi</h3><ul class="tight" style="padding-left:18px;">
 <li>Đổi tử số/mẫu số hoặc loại trừ</li>
 <li>Đổi source ưu tiên / thứ tự</li>
 <li>Đổi RAG ngưỡng hoặc hành động kích hoạt</li>
@@ -193,7 +193,7 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Pack / ngữ cảnh dùng</th><th>Responsible Person chuẩn bị</th><th>Đóng băng-date / cut-off</th><th>Khi nào cần ngoại lệ note</th><th>Hồ sơ / WI dùng để giữ vết</th></tr></thead><tbody>
 <tr><td>T1/T2 bảng trong ngày</td><td>Kế hoạch / Sản xuất / Responsible Person QA của bảng</td><td>Trước họp 10–15 phút</td><td>Làm mới fail, muộn / trễ ghi sổ / đăng, thiếu diễn tập-xuống / ngừng, dùng export SoR thay bảng điều khiển</td><td><a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> ghi chú điều hành / bảng note</td></tr>
 <tr><td>T3 tuần / tháng</td><td>Responsible Person Bảng điều khiển + Quy trình Owner</td><td>Theo lịch pack đã công bố</td><td>Dữ liệu chưa đầy đủ, có phân loại lại (phân loại lại (reclass))/bổ sung / thay thế sau cut-off, vấn đề sơ đồ ánh xạ còn mở</td><td><a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> + data vấn đề / thay đổi hồ sơ</td></tr>
-<tr><td>T4 / xem xét của lãnh đạo</td><td>QMS / Quy trình Owner / bảng điều khiển Responsible Person</td><td>Đóng băng ảnh chụp trạng thái theo kỳ rà soát</td><td>Số đã đóng băng nhưng cần giải thích ngoại lệ, offline phương án dự phòng, sổ tay / thủ công pack hoặc SoR sửa chữa / hiệu chính sau đóng</td><td><a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> + <a  download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td></tr>
+<tr><td>T4 / xem xét của lãnh đạo</td><td>QMS / Quy trình Owner / bảng điều khiển Responsible Person</td><td>Đóng băng Photos trạng thái theo kỳ rà soát</td><td>Số đã đóng băng nhưng cần giải thích ngoại lệ, offline phương án dự phòng, sổ tay / thủ công pack hoặc SoR sửa chữa / hiệu chính sau đóng</td><td><a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> + <a  download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td></tr>
 <tr><td>Customer / bên ngoài công bố pack</td><td>Quy trình Owner + được ủy quyền Approver</td><td>Đóng băng theo phiên bản được gửi</td><td>Nội bộ chưa khớp bên ngoài pack hoặc phải dùng đã phê duyệt ngoại lệ logic</td><td>Gói phát hành / truyền đạt / giao tiếp hồ sơ</td></tr>
 </tbody></table></div>
 <div class="callout-info">Khi bảng điều khiển pack bị gắn ngoại lệ note, Responsible Person phải chỉ rõ <b>phạm vi KPI bị ảnh hưởng</b>, <b>nguồn tạm thời dùng để ra quyết định</b>, <b>ETA khôi phục</b> và <b>thời điểm bổ sung / thay thế/re-rà soát</b>. Không để bảng điều khiển đang lỗi nhưng pack vẫn được trình bày như dữ liệu bình thường.</div></div>
@@ -207,7 +207,7 @@ ul.tight li {margin:4px 0;}
 <tr><td><a href="../../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Cách Kế hoạch dùng KPI luồng/công suất để ra quyết định trong ngày.</td></tr>
 <tr><td><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Quy tắc bằng chứng, lưu giữ, tính đầy đủ và liên kết của hồ sơ số.</td></tr>
 <tr><td><a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> / <a href="../../../01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Review xu hướng và đóng vòng lặp cải tiến.</td></tr>
-<tr><td><a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a></td><td>Khóa công bố / phát hành, truy cập, làm mới, hỏng / lỗi control và hoàn tác / quay lại của bảng điều khiển sản xuất.</td></tr><tr><td><a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> / <a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></td><td>Rà truy cập định kỳ, yêu cầu cấp/đổi/thu hồi quyền và có đặc quyền/phó quản trị.</td></tr><tr><td><a  download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td><td>Khóa pack control, đóng băng-date, ngoại lệ note và quyết định ở xem xét của lãnh đạo.</td></tr></tbody></table></div></div>
+<tr><td><a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a></td><td>Khóa công bố / phát hành, truy cập, làm mới, hỏng / lỗi control và hoàn tác / quay lại của bảng điều khiển sản xuất.</td></tr><tr><td><a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a> / <a  download="" href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></td><td>Rà truy cập định kỳ, Requests cấp/đổi/thu hồi quyền và có đặc quyền/phó quản trị.</td></tr><tr><td><a  download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td><td>Khóa pack control, đóng băng-date, ngoại lệ note và quyết định ở xem xét của lãnh đạo.</td></tr></tbody></table></div></div>
 
     </div>
   </div>

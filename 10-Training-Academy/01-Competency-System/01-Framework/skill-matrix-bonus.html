@@ -78,7 +78,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>1) Khái niệm &amp; cấu trúc dữ liệu ma trận kỹ năng (kỹ năng matrix)</h2>
 <p><b>Kỹ năng Matrix</b> là bảng sơ đồ ánh xạ giữa:</p>
 <ul>
-<li><b>Vị trí</b> (Job/Vai trò) → <b>mức Level yêu cầu</b> theo từng năng lực (C01…C19), kèm <b>trọng số</b> (trọng lượng) theo mức độ quan trọng.</li>
+<li><b>Vị trí</b> (Job/Vai trò) → <b>mức Level Requests</b> theo từng năng lực (C01…C19), kèm <b>trọng số</b> (trọng lượng) theo mức độ quan trọng.</li>
 <li><b>Nhân sự</b> → <b>Level Current</b> (đã chứng nhận) + <b>bằng chứng</b> + <b>chỉ số định lượng</b> + <b>kiểm soát cổng</b>.</li>
 <li><b>Quy đổi thưởng</b> → hệ số/tiền thưởng theo mô hình thưởng hiệu suất HESEM (không đưa OT vào đóng BHXH; OT hoạch toán qua thưởng hiệu suất).</li>
 </ul>
@@ -93,11 +93,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div>
-<h3>Chuẩn đầu ra (Kiến thức – Kỹ năng – Bằng chứng – Chỉ số (K-S-E-M))</h3>
+<h3>Chuẩn đầu ra (Kiến thức – Kỹ năng – Evidence – Chỉ số (K-S-E-M))</h3>
 <ul>
 <li><b>Kiến thức</b>: hiểu đúng khái niệm/tiêu chuẩn/quy định liên quan.</li>
 <li><b>Kỹ năng</b>: vận hành/ra quyết định đúng trong bối cảnh thực tế.</li>
-<li><b>Bằng chứng</b>: hồ sơ chứng minh (FRM, log, ảnh, test, đánh giá hồ sơ…).</li>
+<li><b>Evidence</b>: hồ sơ chứng minh (FRM, log, ảnh, test, đánh giá hồ sơ…).</li>
 <li><b>Chỉ số</b>: định lượng bằng công thức + nguồn dữ liệu (MES/ERP, QC log, OEE, NCR, OT, chuyên cần / điểm danh…).</li>
 </ul>
 </div>
@@ -185,8 +185,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </section><section class="card">
 <h2>4) ma trận kỹ năng (kỹ năng matrix) theo phòng ban + vị trí (mẫu) &amp; liên kết level/thưởng</h2>
 <p>
- HESEM đã có các bảng <b>ma trận đào tạo (đào tạo matrix) theo phòng ban</b> (mức yêu cầu Level theo vị trí).
- ma trận kỹ năng (kỹ năng matrix) “đủ chuẩn” sẽ lấy Level yêu cầu từ các bảng này và gán thêm: <b>trọng lượng + Cổng kiểm soát + Thưởng sơ đồ ánh xạ</b>.
+ HESEM đã có các bảng <b>ma trận đào tạo (đào tạo matrix) theo phòng ban</b> (mức Requests Level theo vị trí).
+ ma trận kỹ năng (kỹ năng matrix) “đủ chuẩn” sẽ lấy Level Requests từ các bảng này và gán thêm: <b>trọng lượng + Cổng kiểm soát + Thưởng sơ đồ ánh xạ</b>.
  </p>
 <div class="grid-2">
 <div>
@@ -204,7 +204,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Mẫu đánh giá từng nhân sự (Nhân viên ma trận kỹ năng (kỹ năng matrix))</h3>
 <p>
  Dùng biểu mẫu chuẩn để:
- <b>(i)</b> lấy Level yêu cầu theo vị trí, <b>(ii)</b> ghi Level Current + bằng chứng, <b>(iii)</b> đối chiếu cổng kiểm soát chỉ số,
+ <b>(i)</b> lấy Level Requests theo vị trí, <b>(ii)</b> ghi Level Current + bằng chứng, <b>(iii)</b> đối chiếu cổng kiểm soát chỉ số,
  <b>(iv)</b> tự động ra K_skill, K_gate và mức thưởng.
  </p>
 <ul>
@@ -237,7 +237,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Tài liệu ma trận kỹ năng (kỹ năng matrix) &amp; Thưởng Map <b>PHẢI</b> có mã, phiên bản, ngày hiệu lực, Responsible Person, và lịch rà soát.</li>
 <li>Dữ liệu KPI/chỉ số <b>PHẢI</b> có nguồn, định nghĩa, công thức, và lưu vết.</li>
-<li>Cấp Level <b>PHẢI</b> dựa trên: Test + danh mục OJT (bảng kiểm / danh mục) + Tiêu chí đánh giá + Bằng chứng + Cổng kiểm soát PASS.</li>
+<li>Cấp Level <b>PHẢI</b> dựa trên: Test + danh mục OJT (bảng kiểm / danh mục) + Tiêu chí đánh giá + Evidence + Cổng kiểm soát PASS.</li>
 <li>Thay đổi định nghĩa Level/Chỉ số <b>PHẢI</b> đi qua quy trình ECO/Kiểm soát tài liệu (SOP-QMS-01).</li>
 </ul>
 </section></div></div></div>

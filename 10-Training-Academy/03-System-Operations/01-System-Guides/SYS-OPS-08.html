@@ -134,7 +134,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li><b>QA/QMS:</b> owner Cổng kiểm soát bằng chứng, phê duyệt thay đổi KPI &amp; diễn tập-xuyên suốt đánh giá.</li>
 <li><b>IT/BI:</b> dựng Power truy vấn, mô hình, DAX, làm mới, giám sát, quyền truy cập.</li>
-<li><b>Chủ quá trình (Planner/QC/Kho/Bảo trì...):</b> sở hữu dữ liệu đầu vào list, đóng phiếu yêu cầu sai dữ liệu trong ca.</li>
+<li><b>Chủ quá trình (Planner/QC/Kho/Bảo trì...):</b> sở hữu dữ liệu đầu vào list, đóng phiếu Requests sai dữ liệu trong ca.</li>
 <li><b>Supervisor:</b> quyết định TẠM GIỮ/CHẶN khi bảng điều khiển báo rủi ro và MRR thiếu.</li>
 </ul>
 </div>
@@ -167,9 +167,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Báo giá/Hợp đồng</td>
-<td>Thông tin khách hàng, yêu cầu chứng từ</td>
+<td>Thông tin khách hàng, Requests chứng từ</td>
 <td>Customer view (Người định giá (SAL-03))</td>
-<td>Thiếu yêu cầu bằng chứng → CHẶN nhận cam kết giao</td>
+<td>Thiếu Requests bằng chứng → CHẶN nhận cam kết giao</td>
 </tr>
 <tr>
 <td>Kế hoạch</td>
@@ -280,7 +280,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th>Điểm kiểm soát</th>
 <th>Responsible Person</th>
-<th>Bằng chứng/MRR</th>
+<th>Evidence/MRR</th>
 <th>Điểm chặn</th>
 </tr>
 </thead>
@@ -288,7 +288,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>CP1 — Khóa sơ đồ cấu trúc list (cột/kiểu dữ liệu)</td>
 <td>QA/QMS + Quy trình Owner</td>
-<td>sơ đồ cấu trúc ảnh chụp trạng thái + log thay đổi (BI_ReleaseNotes)</td>
+<td>sơ đồ cấu trúc Photos trạng thái + log thay đổi (BI_ReleaseNotes)</td>
 <td>Đổi sơ đồ cấu trúc không có phát hành note → CHẶN làm mới PROD</td>
 </tr>
 <tr>
@@ -312,13 +312,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>CP5 — Làm mới quản trị (tài khoản + lịch ca + cửa sổ)</td>
 <td>IT</td>
-<td>Làm mới lịch trình ảnh chụp màn hình + làm mới Responsible Person tài khoản</td>
+<td>Làm mới lịch trình Photos màn hình + làm mới Responsible Person tài khoản</td>
 <td>Làm mới fail &gt; 1 lần/ca không có xử lý → TẠM GIỮ quyết định dựa bảng điều khiển</td>
 </tr>
 <tr>
 <td>CP6 — giám sát &amp; Alert (làm mới + bất thường)</td>
 <td>IT + Supervisor</td>
-<td>01 lần test alert gửi Teams/Email Teams: QMS-ALERT + phiếu yêu cầu: IT-bộ phận hỗ trợ</td>
+<td>01 lần test alert gửi Teams/Email Teams: QMS-ALERT + phiếu Requests: IT-bộ phận hỗ trợ</td>
 <td>Không có alert → TẠM GIỮ go-Live</td>
 </tr>
 <tr>
@@ -381,7 +381,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Làm mới fail / bộ dữ liệu không cập nhật</td>
-<td>Supervisor chuyển quyết định sang kiểm tra bằng chứng trực tiếp (SharePoint hồ sơ). IT tạo phiếu yêu cầu và chạy làm mới lại theo bảng kiểm.</td>
+<td>Supervisor chuyển quyết định sang kiểm tra bằng chứng trực tiếp (SharePoint hồ sơ). IT tạo phiếu Requests và chạy làm mới lại theo bảng kiểm.</td>
 <td>BI_IncidentLog item + ảnh giám sát hub</td>
 </tr>
 <tr>
@@ -410,7 +410,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 8) Checklist -->
 <div class="card">
-<h2>8) Bảng kiểm vận hành (≤ 15 bước) — mỗi bước có Responsible Person, Bằng chứng/MRR, điểm sai hay gặp</h2>
+<h2>8) Bảng kiểm vận hành (≤ 15 bước) — mỗi bước có Responsible Person, Evidence/MRR, điểm sai hay gặp</h2>
 <div class="table-wrap">
 <table>
 <thead>
@@ -418,7 +418,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>#</th>
 <th>Bước</th>
 <th>Responsible Person</th>
-<th>Bằng chứng/MRR</th>
+<th>Evidence/MRR</th>
 <th>Điểm sai hay gặp</th>
 </tr>
 </thead>
@@ -488,7 +488,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Thiết kế page</td>
 <td>Mỗi KPI có chi tiết table + diễn tập-xuyên suốt tới bằng chứng</td>
-<td>Đánh giá yêu cầu truy xuất nguồn gốc; KPI không đủ</td>
+<td>Đánh giá Requests truy xuất nguồn gốc; KPI không đủ</td>
 </tr>
 <tr>
 <td>Governance</td>
@@ -528,7 +528,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L2</b></td>
 <td>Thực hiện đúng quy trình 60 giây: phát hiện dữ liệu đột biến và tạo hồ sơ sự cố/bất thường.</td>
 <td>02 ca liên tiếp tạo hồ sơ đúng, đủ link bằng chứng.</td>
-<td>Được ghi nhận vấn đề chặn và yêu cầu cập nhật list trong ca.</td>
+<td>Được ghi nhận vấn đề chặn và Requests cập nhật list trong ca.</td>
 </tr>
 <tr>
 <td><b>L3</b></td>
@@ -581,7 +581,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>NCR/CAPA tuổi tồn dùng để chặn rủi ro gì trong phân xưởng?</li>
 <li>Khi ShipRelease bị chặn tăng, 4 cột cổng kiểm soát phải kiểm tra là gì?</li>
 </ol>
-<h3>10.2 Tình huống (≥ 3 tình huống thật; yêu cầu quyết định TẠM GIỮ/GO và ghi MRR)</h3>
+<h3>10.2 Tình huống (≥ 3 tình huống thật; Requests quyết định TẠM GIỮ/GO và ghi MRR)</h3>
 <div class="card" style="margin-top:10px">
 <b>Tình huống 1 — Rev không khớp</b>
 <p class="muted" style="margin:6px 0 0 0">

@@ -80,7 +80,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>2. Điều kiện trước khi lấy mẫu</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điều kiện</th><th>Phải có</th><th>hold khi</th></tr></thead><tbody>
 <tr><td>Định nghĩa lot</td><td>Cùng part/rev, cùng điều kiện, cùng nguồn/ca/quy trình trạng thái, cùng phạm vi submit cho quyết định.</td><td>Lot trộn part/rev, trộn làm lại/nghi ngờ với sản phẩm thường.</td></tr>
-<tr><td>khuyết tật phân loại</td><td>Áp dụng từ <a href="wi-601-visual-inspection-and-defect-classification.html">WI-601</a>, QPL và khách hàng yêu cầu.</td><td>Chưa chốt quan trọng / nghiêm trọng/lớn / nghiêm trọng/nhỏ / không nghiêm trọng hoặc còn tranh cãi tiêu chí.</td></tr>
+<tr><td>khuyết tật phân loại</td><td>Áp dụng từ <a href="wi-601-visual-inspection-and-defect-classification.html">WI-601</a>, QPL và khách hàng Requests.</td><td>Chưa chốt quan trọng / nghiêm trọng/lớn / nghiêm trọng/nhỏ / không nghiêm trọng hoặc còn tranh cãi tiêu chí.</td></tr>
 <tr><td>Kế hoạch AQL</td><td>Mức kiểm, kiểm tra level, chuyển đổi trạng thái và Ac/Re từ <a href="../../03-Reference/06-ANNEX-600/annex-601-aql-method-reference.html">ANNEX-601</a>.</td><td>Không xác định được plan hiệu lực.</td></tr>
 <tr><td>Đo lường system</td><td>Gage hợp lệ và đã nhanh xác minh theo <a href="wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a>.</td><td>Gage nghi ngờ/hết hạn/chưa xác minh.</td></tr>
 </tbody></table></div></div>
@@ -91,13 +91,13 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Tra cỡ mẫu và Ac/Re.</strong><br/>Tra theo lot size và kiểm tra level trong bảng đã phê duyệt. Nếu lot nhỏ hoặc khách hàng chỉ định 100% thì không dùng AQL để giảm mẫu.</div>
 <div class="step-item"><strong>Lấy mẫu ngẫu nhiên.</strong><br/>Mẫu phải rải đều qua toàn lô hoặc toàn kiện; không lấy liên tiếp trong một khay duy nhất nếu lot phân bố nhiều vị trí/thời điểm. Với lot có nhiều pallet/box/khay, phải có quy tắc ngẫu nhiên hóa từng tầng chứa.</div>
 <div class="step-item"><strong>Kiểm và ghi khuyết tật.</strong><br/>Kiểm theo plan, phân loại khuyết tật từng chiếc, từng loại. Không được cộng dồn mơ hồ. khuyết tật quan trọng / nghiêm trọng tách riêng khỏi lớn / nghiêm trọng/nhỏ / không nghiêm trọng.</div>
-<div class="step-item"><strong>Quyết định chấp nhận/từ chối.</strong><br/>So khuyết tật count với Ac/Re; từ chối lô khi vượt Re hoặc khi xuất hiện bất kỳ quan trọng / nghiêm trọng khuyết tật thuộc rule không / bằng không acceptance. Nếu plan nhiều bước yêu cầu mẫu tiếp theo, phải tuân đúng logic.</div>
+<div class="step-item"><strong>Quyết định chấp nhận/từ chối.</strong><br/>So khuyết tật count với Ac/Re; từ chối lô khi vượt Re hoặc khi xuất hiện bất kỳ quan trọng / nghiêm trọng khuyết tật thuộc rule không / bằng không acceptance. Nếu plan nhiều bước Requests mẫu tiếp theo, phải tuân đúng logic.</div>
 <div class="step-item"><strong>Xử lý sau quyết định.</strong><br/>chấp nhận thì phát hành lô theo cổng kiểm soát tương ứng. Từ chối thì giữ lô, mở ngăn chặn/NCR nếu cần và xác định hướng 100% sort/làm lại/kiểm tra lại dưới quyền QA.</div>
 </div></div>
 
 <div class="section"><h2>4. chuyển đổi quy tắc, kiểm tra lại và lỗi thường gặp</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Quy định HESEM</th></tr></thead><tbody>
-<tr><td>bình thường → siết chặt / thắt chặt</td><td>Chuyển khi có từ chối liên tiếp, khiếu nại, khuyết tật xu hướng xấu hoặc QPL/khách hàng yêu cầu tăng cường.</td></tr>
+<tr><td>bình thường → siết chặt / thắt chặt</td><td>Chuyển khi có từ chối liên tiếp, khiếu nại, khuyết tật xu hướng xấu hoặc QPL/khách hàng Requests tăng cường.</td></tr>
 <tr><td>siết chặt / thắt chặt → giảm</td><td>Chỉ giảm khi có lịch sử ổn định đủ dài và không có mở vấn đề; không áp dụng cho Job mới, Job cao-rủi ro, clean/chân không hoặc sau ngăn chặn gần đây.</td></tr>
 <tr><td>kiểm tra lại sau làm lại/sort</td><td>QA phải xác định lại lot ranh giới và plan mới; không mặc định dùng lại y nguyên mẫu cũ.</td></tr>
 <tr><td>Hỗn hợp khuyết tật loại</td><td>Quan trọng/lớn / nghiêm trọng/nhỏ / không nghiêm trọng phải đếm riêng theo plan áp dụng; không bù trừ giữa các mức.</td></tr>

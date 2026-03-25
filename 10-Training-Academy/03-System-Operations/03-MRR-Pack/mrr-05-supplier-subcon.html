@@ -106,14 +106,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div style="overflow:auto;">
 <table class="form-table">
 <tr>
-<th style="min-width:320px;">MRR / Bằng chứng</th>
+<th style="min-width:320px;">MRR / Evidence</th>
 <th style="min-width:140px;">RecordType</th>
 <th style="min-width:110px;">Cổng kiểm soát</th>
 <th style="min-width:120px;">Responsible Person</th>
 <th style="min-width:220px;">SSOT path</th>
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
-<tr><td><span class="chk">☐</span> PO/PR có CTQ + yêu cầu chứng từ (MTR/CoC/CoA)</td><td>PO</td><td>S0</td><td>PUR</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/PO/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PO_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> PO/PR có CTQ + Requests chứng từ (MTR/CoC/CoA)</td><td>PO</td><td>S0</td><td>PUR</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/PO/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PO_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Gia công ngoài pack (drawing/spec/lộ trình gia công/đóng gói) phát hành</td><td>gói nhà thầu phụ (gói nhà thầu phụ (SUBPACK))</td><td>S0</td><td>PUR+QA</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/07_SUPPLIER/gói nhà thầu phụ (gói nhà thầu phụ (SUBPACK))/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SUBPACK_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.zip</td></tr>
 <tr><td><span class="chk">☐</span> Supplier chứng chỉ / giấy chứng nhận (MTR/CoC/CoA) nhận về</td><td>MTR/COC</td><td>S1</td><td>WHS</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/07_SUPPLIER/CERT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CERT_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 <tr><td><span class="chk">☐</span> Nhận hàng/IQC hồ sơ cho vật tư/hoàn thiện bề mặt</td><td>IQC</td><td>S1</td><td>QC</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/07_SUPPLIER/IQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
@@ -128,13 +128,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Fail-nhanh (STOP/TẠM GIỮ/CHẶN)</h2>
 <ul class="tight">
-<li>Nhận hàng không có chứng chỉ / giấy chứng nhận khi PO yêu cầu → TẠM GIỮ tại nhận hàng.</li><li>Không IQC mà đưa thẳng vào sản xuất → STOP.</li><li>Đổi nhà cung cấp/hoàn thiện bề mặt không kiểm soát thay đổi → CHẶN.</li><li>Truy xuất nguồn gốc lot/batch mất liên kết → TẠM GIỮ.</li>
+<li>Nhận hàng không có chứng chỉ / giấy chứng nhận khi PO Requests → TẠM GIỮ tại nhận hàng.</li><li>Không IQC mà đưa thẳng vào sản xuất → STOP.</li><li>Đổi nhà cung cấp/hoàn thiện bề mặt không kiểm soát thay đổi → CHẶN.</li><li>Truy xuất nguồn gốc lot/batch mất liên kết → TẠM GIỮ.</li>
 </ul>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Đánh giá 60 giây</h2>
 <ol class="tight">
-<li>Mở PO và xác nhận CTQ/chứng chỉ / giấy chứng nhận yêu cầu.</li><li>Mở CERT và đối chiếu lot/batch trên nhãn vật tư.</li><li>Mở IQC hồ sơ và đối chiếu kết quả.</li><li>Mở truy vết link và kiểm tra liên kết tới Hồ sơ công việc.</li>
+<li>Mở PO và xác nhận CTQ/chứng chỉ / giấy chứng nhận Requests.</li><li>Mở CERT và đối chiếu lot/batch trên nhãn vật tư.</li><li>Mở IQC hồ sơ và đối chiếu kết quả.</li><li>Mở truy vết link và kiểm tra liên kết tới Hồ sơ công việc.</li>
 </ol>
 </div>
 <div class="card">

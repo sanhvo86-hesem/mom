@@ -81,7 +81,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h1 class="h1" style="margin-top:12px;">SYS-OPS-12 — Tài liệu Control vận hành tại phân xưởng CNC</h1>
 <p class="lead">
  Mục tiêu: mọi người tại hiện trường chỉ sử dụng <b>bản hiện hành</b> của tài liệu, chương trình, dữ liệu và hồ sơ; bản lỗi thời bị chặn tại nguồn;
- đường đi của thay đổi có dấu vết từ <b>yêu cầu</b> → <b>phê duyệt</b> → <b>phát hành</b> → <b>triển khai</b> → <b>thu hồi</b> → <b>lưu kho</b>.
+ đường đi của thay đổi có dấu vết từ <b>Requests</b> → <b>phê duyệt</b> → <b>phát hành</b> → <b>triển khai</b> → <b>thu hồi</b> → <b>lưu kho</b>.
  </p>
 <div class="qa-box">
 <div class="mini"><b>Nguyên tắc nền:</b> không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</div>
@@ -117,7 +117,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="iso-map" style="margin-top:14px;">
-<div class="iso-title">ISO điều khoản sơ đồ ánh xạ &amp; yêu cầu bắt buộc của mô-đun</div>
+<div class="iso-title">ISO điều khoản sơ đồ ánh xạ &amp; Requests bắt buộc của mô-đun</div>
 <div class="small muted"><b>Nhóm điều khoản:</b> 7.5 • 8.5.6 • 7.2 • 10.2</div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Kiểm soát nhận diện, truy cập, phân phối, sử dụng, lưu trữ, bảo quản, thời hạn lưu và hủy bỏ cho mọi thông tin dạng văn bản và hồ sơ. <span class="iso-ref">ISO 7.5.3</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Khi có thay đổi ảnh hưởng sản phẩm hoặc vận hành, chỉ áp dụng bản đã phê duyệt; triển khai đi kèm bằng chứng thông tin/đào tạo và thu hồi bản lỗi thời. <span class="iso-ref">ISO 8.5.6, 7.2</span></div></div>
@@ -141,11 +141,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li><b>Tài liệu QMS:</b> SOP/WI/FRM/Bảng kiểm/Policy.</li>
 <li><b>Tài liệu gia công:</b> phiếu theo dõi công việc (job traveler), lộ trình gia công, phiếu cài đặt, danh sách dao cụ, fixture plan, CNC program, FAI pack, kiểm tra plan.</li>
-<li><b>Tài liệu bên ngoài:</b> bản vẽ/PO/spec khách hàng, tiêu chuẩn vật liệu, chứng chỉ vật liệu, yêu cầu thuê ngoài.</li>
+<li><b>Tài liệu bên ngoài:</b> bản vẽ/PO/spec khách hàng, tiêu chuẩn vật liệu, chứng chỉ vật liệu, Requests thuê ngoài.</li>
 <li><b>Hồ sơ:</b> kết quả đo, IR, NCR, MRB, COA, biên bản đào tạo, log phát hành/thu hồi.</li>
 </ul>
 <div class="note" style="margin-top:10px;">
-<b>Quy tắc:</b> mọi bản in, ảnh chụp màn hình, file tải về, bản gửi email được xem là <b>bản tham chiếu không kiểm soát</b> khi không có cơ chế kiểm soát (Được kiểm soát Copy ID/QR/đường dẫn SSOT).
+<b>Quy tắc:</b> mọi bản in, Photos màn hình, file tải về, bản gửi email được xem là <b>bản tham chiếu không kiểm soát</b> khi không có cơ chế kiểm soát (Được kiểm soát Copy ID/QR/đường dẫn SSOT).
  </div>
 </div>
 </div>
@@ -180,13 +180,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>RFQ → Báo giá</b></td>
-<td>Bản vẽ/spec hiện hành của khách, yêu cầu chất lượng, điều kiện giao hàng.</td>
+<td>Bản vẽ/spec hiện hành của khách, Requests chất lượng, điều kiện giao hàng.</td>
 <td>Người định giá (SAL-03) + Kỹ thuật</td>
 <td>Gói rà soát hợp đồng + lưu bản vẽ theo Rev; khóa phiên bản khi tạo báo giá.</td>
 </tr>
 <tr>
 <td><b>Báo giá → PO/Hợp đồng</b></td>
-<td>PO, phiên bản, yêu cầu luồng-xuống / ngừng, CTQ.</td>
+<td>PO, phiên bản, Requests luồng-xuống / ngừng, CTQ.</td>
 <td>Người định giá (SAL-03) + QA</td>
 <td>rà soát hợp đồng có dấu vết: Rev/Date/Responsible Person; lưu SSOT.</td>
 </tr>
@@ -204,7 +204,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Mua hàng</b></td>
-<td>Yêu cầu vật tư, spec NCC, yêu cầu chứng chỉ.</td>
+<td>Yêu cầu vật tư, spec NCC, Requests chứng chỉ.</td>
 <td>Mua hàng</td>
 <td>PO luồng-xuống / ngừng; phiên bản/standard được chốt; thay đổi có log.</td>
 </tr>
@@ -265,7 +265,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Hồ sơ</b> (Hồ sơ)</td>
-<td>Bằng chứng đã thực hiện: khóa sửa ngoài ý muốn; có siêu dữ liệu để truy xuất nguồn gốc.</td>
+<td>Evidence đã thực hiện: khóa sửa ngoài ý muốn; có siêu dữ liệu để truy xuất nguồn gốc.</td>
 <td>Kiểm tra báo cáo, NCR, biên bản đào tạo.</td>
 </tr>
 <tr>
@@ -300,7 +300,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Lưu giữ</b></td>
-<td>Thời hạn lưu và điều kiện hủy bỏ theo loại hồ sơ và yêu cầu khách hàng.</td>
+<td>Thời hạn lưu và điều kiện hủy bỏ theo loại hồ sơ và Requests khách hàng.</td>
 <td>FAI/COC lưu tier cao; hồ sơ vận hành lưu theo SOP-QMS-013.</td>
 </tr>
 </tbody>
@@ -330,7 +330,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Setup</b></td>
 <td>Đối chiếu phiếu cài đặt ↔ program ↔ bản vẽ; xử lý thay đổi hiện trường bằng DCN và thu hồi bản cũ.</td>
-<td>Thực hành cập nhật “pack kỹ thuật” và ghi dấu vết; chạy dry-run theo yêu cầu cổng kiểm soát.</td>
+<td>Thực hành cập nhật “pack kỹ thuật” và ghi dấu vết; chạy dry-run theo Requests cổng kiểm soát.</td>
 </tr>
 <tr>
 <td><b>Lập trình viên (CNC)</b></td>
@@ -499,7 +499,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:260px;">Kiểm soát</th>
 <th>Thiết kế vận hành</th>
-<th style="width:220px;">Bằng chứng</th>
+<th style="width:220px;">Evidence</th>
 </tr>
 </thead>
 <tbody>
@@ -571,7 +571,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:160px;">Ai</th>
 <th>Hành động 60 giây</th>
-<th style="width:220px;">Bằng chứng tối thiểu</th>
+<th style="width:220px;">Evidence tối thiểu</th>
 </tr>
 </thead>
 <tbody>
@@ -617,7 +617,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Vai trò: ghi sổ Được kiểm soát Copy ID, Point-of-use (POU), người nhận, ngày phát hành.</li>
 <li>Khi có Rev thay thế: ghi đủ danh sách thu hồi và trạng thái (hủy/đóng dấu/đã lưu trữ).</li>
-<li>Bằng chứng bắt buộc: ít nhất 1 dòng Vấn đề + 1 dòng Thu hồi cho mỗi POU có bản cứng.</li>
+<li>Evidence bắt buộc: ít nhất 1 dòng Vấn đề + 1 dòng Thu hồi cho mỗi POU có bản cứng.</li>
 </ul>
 </div>
 <div class="card">
@@ -663,7 +663,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:60px;">#</th>
 <th>Bước thực hiện</th>
 <th style="width:160px;">Responsible Person</th>
-<th style="width:220px;">Bằng chứng</th>
+<th style="width:220px;">Evidence</th>
 <th style="width:220px;">Lỗi hay gặp</th>
 </tr>
 </thead>
@@ -703,7 +703,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="mini">Bối cảnh: Setup chỉnh bước tiến (bước tiến (feed))/tốc độ trực tiếp trên máy để “đẹp bề mặt”, không cập nhật chủ / gốc.</p>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Dừng chạy; khóa file program tại máy; sao lưu bản đang chạy để so sánh.</li>
-<li>Tạo DCN; mô tả thay đổi và tác động; yêu cầu rà soát ENG + QA.</li>
+<li>Tạo DCN; mô tả thay đổi và tác động; Requests rà soát ENG + QA.</li>
 <li>Phát hành program Rev mới qua SSOT; thay thế bản cũ tại POU; ghi Vấn đề/Thu hồi.</li>
 </ul>
 <div class="note"><b>Đầu ra bắt buộc:</b> DCN + gói phát hành chương trình (Rev, Approver, thời điểm hiệu lực).</div>
@@ -781,7 +781,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Học viên thực hiện bảng kiểm POU 12 bước tại 1 máy thực tế.</li>
 <li>Học viên kích hoạt phản ứng 60 giây theo tình huống giả lập “QR sai Rev”.</li>
-<li>Giảng viên xác nhận: 0 lỗi bỏ sót; ghi chú sai sót và yêu cầu làm lại ngay.</li>
+<li>Giảng viên xác nhận: 0 lỗi bỏ sót; ghi chú sai sót và Requests làm lại ngay.</li>
 <li>Hồ sơ OJT lưu: <span class="k">FRM-HR-TRN-03</span> hoặc biểu mẫu nội bộ tương ứng <span class="k">M365/SharePoint → HESEM-QMS-SSOT</span>.</li>
 </ul>
 <div class="note"><b>Tiêu chí đạt OJT:</b> hoàn thành 100% bước; phản ứng 60 giây đúng; ghi đúng bằng chứng MRR.</div>
@@ -811,7 +811,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>7</td><td>Trường siêu dữ liệu tối thiểu để truy xuất nguồn gốc hồ sơ theo SOP-QMS-013 gồm JobNum và gì nữa?</td><td>C. PartNum-Rev</td></tr>
 <tr><td>8</td><td>Khi QR trỏ sai thư mục, cơ chế khắc phục bắt buộc gồm gì?</td><td>D. Sửa về SSOT + điểm / tại chỗ-kiểm tra khu vực</td></tr>
 <tr><td>9</td><td>Tài liệu Triển khai Bảng kiểm (POU map) mang mã nào?</td><td>A. FRM-QMS-013</td></tr>
-<tr><td>10</td><td>Bằng chứng tối thiểu của cổng kiểm soát Vấn đề/Thu hồi là gì?</td><td>B. Dòng Vấn đề và dòng Thu hồi theo POU</td></tr>
+<tr><td>10</td><td>Evidence tối thiểu của cổng kiểm soát Vấn đề/Thu hồi là gì?</td><td>B. Dòng Vấn đề và dòng Thu hồi theo POU</td></tr>
 <tr><td>11</td><td>Khi Rev mới phát hành, bản cũ được xử lý trạng thái nào?</td><td>C. Hết hiệu lực</td></tr>
 <tr><td>12</td><td>Ai chịu trách nhiệm khoanh vùng WIP ngay khi phát hiện sai Rev?</td><td>D. Supervisor</td></tr>
 <tr><td>13</td><td>Kiểm soát nào chặn sửa ngoài ý muốn đối với hồ sơ?</td><td>A. Quyền truy cập + log phiên bản</td></tr>
@@ -1049,7 +1049,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>5</td><td>Thay đổi ảnh hưởng CTQ nhưng không có kiểm soát thay đổi</td><td>DCN bắt buộc + triển khai bắt buộc; fail-nhanh CHẶN khi thiếu</td></tr>
 <tr><td>6</td><td>Program/Setup/kế hoạch kiểm tra (kiểm tra plan) không đồng bộ Rev</td><td>Bảng kiểm POU bước 5 + STOP ngay khi không khớp</td></tr>
 <tr><td>7</td><td>Hồ sơ đo bị sửa đổi ngoài kiểm soát</td><td>Quyền truy cập + log phiên bản; lưu SSOT theo lưu giữ tier</td></tr>
-<tr><td>8</td><td>Hồ sơ lưu rải rác, truy xuất nguồn gốc thất bại</td><td>MRR yêu cầu siêu dữ liệu; kiểm SLA truy xuất nguồn gốc ≤ 2 phút</td></tr>
+<tr><td>8</td><td>Hồ sơ lưu rải rác, truy xuất nguồn gốc thất bại</td><td>MRR Requests siêu dữ liệu; kiểm SLA truy xuất nguồn gốc ≤ 2 phút</td></tr>
 <tr><td>9</td><td>Thiếu bằng chứng đào tạo khi thay đổi</td><td>Cổng kiểm soát G4 buộc có hồ sơ đào tạo/OJT</td></tr>
 <tr><td>10</td><td>Kiểm soát tài liệu bên ngoài không rõ nguồn/Rev</td><td>Người định giá (SAL-03) chốt Rev trong rà soát hợp đồng; lưu SSOT và luồng-xuống / ngừng</td></tr>
 </tbody>

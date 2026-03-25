@@ -87,7 +87,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mọi hành động trong mô-đun này tạo bằng chứng vận hành (MRR) và tạo điểm chặn chống sai Rev/lẫn lộn (mix-up).
  </p>
 <div class="kpi">
-<div class="tag blue">KPI: truy xuất nguồn gốc Job/PartRev/Bằng chứng ≤ 3 phút</div>
+<div class="tag blue">KPI: truy xuất nguồn gốc Job/PartRev/Evidence ≤ 3 phút</div>
 <div class="tag">Nguyên tắc: 01 đối tượng = 01 Chính / Sơ cấp Home</div>
 <div class="tag">Luật: không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</div>
 </div>
@@ -156,7 +156,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Phát hành Part/Rev (drawing/CAM/setup)</td>
 <td>Lập trình viên (CNC) + Setup + QA</td>
-<td>Phát hành theo Gói hàng; ảnh chụp trạng thái xuống phân xưởng; khóa bản cũ (hết hiệu lực) và chặn copy tay.</td>
+<td>Phát hành theo Gói hàng; Photos trạng thái xuống phân xưởng; khóa bản cũ (hết hiệu lực) và chặn copy tay.</td>
 <td>CFG gói hàng + bằng chứng phát hành + SnapshotID</td>
 </tr>
 <tr>
@@ -200,7 +200,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Báo giá/Hợp đồng</td>
-<td>RFQ + yêu cầu kỹ thuật + điều khoản</td>
+<td>RFQ + Requests kỹ thuật + điều khoản</td>
 <td>Hợp đồng/PO điều khoản + nghĩa vụ tóm tắt</td>
 <td>Zone05_Commercial (Customer)</td>
 <td>Người định giá (SAL-03) xác nhận “điều khoản hồ sơ” trước khi nhận đơn</td>
@@ -214,17 +214,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Kỹ thuật</td>
-<td>Part yêu cầu + Rev</td>
+<td>Part Requests + Rev</td>
 <td>Part/Rev Released gói hàng + SnapshotID</td>
 <td>Zone02_Product_Config_PartRev</td>
 <td>QA ký ack phát hành; bản hết hiệu lực bị khóa</td>
 </tr>
 <tr>
 <td>Mua hàng</td>
-<td>nhà thầu phụ (nhà thầu phụ (Subcon)) yêu cầu / nguyên vật liệu spec</td>
-<td>PO + cert yêu cầu + nhà cung cấp bằng chứng</td>
+<td>nhà thầu phụ (nhà thầu phụ (Subcon)) Requests / nguyên vật liệu spec</td>
+<td>PO + cert Requests + nhà cung cấp bằng chứng</td>
 <td>Zone05 (Supplier) + link sang Job pack</td>
-<td>Mua hàng khóa yêu cầu cert theo PO; thiếu cert = TẠM GIỮ</td>
+<td>Mua hàng khóa Requests cert theo PO; thiếu cert = TẠM GIỮ</td>
 </tr>
 <tr>
 <td>Nhận hàng</td>
@@ -236,9 +236,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Sản xuất</td>
 <td>SnapshotID + traveler + vật tư pass</td>
-<td>Bằng chứng ngoại lệ + setup bằng chứng + ảnh theo yêu cầu</td>
+<td>Evidence ngoại lệ + setup bằng chứng + ảnh theo Requests</td>
 <td>Zone03 (Job bằng chứng)</td>
-<td>Supervisor chặn chạy khi mở sai Rev/sai ảnh chụp trạng thái</td>
+<td>Supervisor chặn chạy khi mở sai Rev/sai Photos trạng thái</td>
 </tr>
 <tr>
 <td>QC/QA</td>
@@ -291,7 +291,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Không nhét bằng chứng theo Job; không chạy mặt bằng xưởng từ tệp cục bộ (nội bộ / tại chỗ file)/USB</td>
 </tr>
 <tr>
-<td><b>Zone03</b><div class="muted">Job Bằng chứng</div></td>
+<td><b>Zone03</b><div class="muted">Job Evidence</div></td>
 <td>Planner/Sản xuất/QC/Kho (người đóng góp), QA (Responsible Person)</td>
 <td>Hồ sơ công việc + pack bằng chứng (kiểm tra, ship, cert, outsource)</td>
 <td>Không lưu chủ / gốc Part/Rev; không chỉnh sửa file sau khi khai báo hồ sơ</td>
@@ -339,7 +339,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Kế hoạch</td>
 <td>Không tạo Hồ sơ công việc hoặc đặt tên sai key</td>
-<td>Bằng chứng rơi, không truy xuất nguồn gốc theo JobNum</td>
+<td>Evidence rơi, không truy xuất nguồn gốc theo JobNum</td>
 <td>Planner tạo khung sườn theo template trước khi phát hành traveler</td>
 </tr>
 <tr>
@@ -350,9 +350,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Mua hàng</td>
-<td>PO thiếu yêu cầu cert/lot sơ đồ ánh xạ</td>
+<td>PO thiếu Requests cert/lot sơ đồ ánh xạ</td>
 <td>Vật tư về không có chứng từ; TẠM GIỮ toàn job</td>
-<td>Mua hàng khóa cert yêu cầu trong PO + bảng kiểm nhận hàng</td>
+<td>Mua hàng khóa cert Requests trong PO + bảng kiểm nhận hàng</td>
 </tr>
 <tr>
 <td>Nhận hàng</td>
@@ -364,7 +364,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Sản xuất</td>
 <td>Chạy từ USB/ổ cứng máy, không theo SnapshotID</td>
 <td>Vượt qua cổng kiểm soát; không chứng minh bản chạy</td>
-<td>Supervisor chặn chạy; chỉ mở từ ảnh chụp trạng thái đọc-chỉ / duy nhất</td>
+<td>Supervisor chặn chạy; chỉ mở từ Photos trạng thái đọc-chỉ / duy nhất</td>
 </tr>
 <tr>
 <td>Setup</td>
@@ -417,7 +417,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:210px">Điểm kiểm soát</th>
 <th style="width:200px">Responsible Person</th>
 <th>Vận hành chặn rủi ro</th>
-<th style="width:240px">Bằng chứng (MRR)</th>
+<th style="width:240px">Evidence (MRR)</th>
 </tr>
 </thead>
 <tbody>
@@ -430,7 +430,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP2 — Part/Rev bộ hồ sơ phát hành</b></td>
 <td>Lập trình viên (CNC) + Setup + QA</td>
-<td>Phát hành theo PackageID; ảnh chụp trạng thái đọc-chỉ / duy nhất xuống phân xưởng; bản cũ chuyển hết hiệu lực.</td>
+<td>Phát hành theo PackageID; Photos trạng thái đọc-chỉ / duy nhất xuống phân xưởng; bản cũ chuyển hết hiệu lực.</td>
 <td>CFG gói hàng + chữ ký điện tử/ack + SnapshotID</td>
 </tr>
 <tr>
@@ -482,7 +482,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <b>STOP</b> (dừng vận hành ngay)
  <ul style="margin:10px 0 0 18px">
-<li>Khi phát hiện Rev trên máy/phân xưởng khác Rev trên ảnh chụp trạng thái hoặc traveler.</li>
+<li>Khi phát hiện Rev trên máy/phân xưởng khác Rev trên Photos trạng thái hoặc traveler.</li>
 <li>Khi mở file không nằm trong Chính / Sơ cấp Home (tệp cục bộ (nội bộ / tại chỗ file), USB, email đính kèm / tài liệu đính kèm).</li>
 <li>Khi báo cáo/bộ hồ sơ giao hàng thiếu key (JobNum/PartRev/Date/PackID).</li>
 </ul>
@@ -535,7 +535,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Sai Rev (drawing/CAM/setup)</td>
 <td>STOP + TẠM GIỮ lô; chỉ mở từ SnapshotID đúng</td>
-<td>Ảnh/path + link ảnh chụp trạng thái đúng + log hold</td>
+<td>Ảnh/path + link Photos trạng thái đúng + log hold</td>
 <td>Supervisor + QA</td>
 </tr>
 <tr>
@@ -547,7 +547,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Thiếu cert vật liệu/outsource</td>
 <td>TẠM GIỮ nhận hàng/ship; không cấp cho sản xuất</td>
-<td>Cert yêu cầu log + link PO + nhận hàng hold</td>
+<td>Cert Requests log + link PO + nhận hàng hold</td>
 <td>Mua hàng + QA</td>
 </tr>
 <tr>
@@ -573,7 +573,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 8) Checklist -->
 <div class="card" id="checklist">
-<h2 class="h2" style="margin-top:0">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Bằng chứng/MRR, điểm sai hay gặp</h2>
+<h2 class="h2" style="margin-top:0">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Evidence/MRR, điểm sai hay gặp</h2>
 <div class="note">
 <b>Luật bảng kiểm:</b> hoàn tất từng bước mới được chuyển bước kế tiếp trong E2E. Thiếu MRR = FAIL cổng kiểm soát.
  </div>
@@ -583,7 +583,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:44px">#</th>
 <th style="width:160px">Responsible Person</th>
 <th>Hành động bắt buộc</th>
-<th style="width:220px">Bằng chứng/MRR</th>
+<th style="width:220px">Evidence/MRR</th>
 <th style="width:220px">Điểm sai hay gặp</th>
 </tr>
 </thead>
@@ -633,7 +633,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>7</td>
 <td>Mua hàng</td>
-<td>Khóa yêu cầu cert/outsource theo PO; gắn JobNum/PO vào yêu cầu.</td>
+<td>Khóa Requests cert/outsource theo PO; gắn JobNum/PO vào Requests.</td>
 <td>PO note + bảng kiểm cert</td>
 <td>Yêu cầu cert nói miệng; không có dòng PO</td>
 </tr>
@@ -713,7 +713,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>2</td>
 <td>Chọn Chính / Sơ cấp Home đúng Khu vực</td>
-<td>Được kiểm soát → Zone01; Part/Rev → Zone02; Bằng chứng Job → Zone03; Doanh nghiệp hồ sơ → Zone04; Thương mại → Zone05.</td>
+<td>Được kiểm soát → Zone01; Part/Rev → Zone02; Evidence Job → Zone03; Doanh nghiệp hồ sơ → Zone04; Thương mại → Zone05.</td>
 <td>SSOT: 01 đối tượng chỉ có 01 nơi gốc.</td>
 </tr>
 <tr>
@@ -738,7 +738,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>6</td>
 <td>Khóa &amp; khai báo hồ sơ khi đủ</td>
 <td>Pack có index + xác nhận phê duyệt + hồ sơ trạng thái; PHẢI khóa nội dung sau khai báo.</td>
-<td>Hồ sơ bảo vệ bằng chứng; đánh giá yêu cầu tính toàn vẹn.</td>
+<td>Hồ sơ bảo vệ bằng chứng; đánh giá Requests tính toàn vẹn.</td>
 </tr>
 <tr>
 <td>7</td>
@@ -799,7 +799,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>
 <ul>
 <li><b>Lập trình viên (CNC):</b> tạo CFG gói hàng có bảng kê và PackageID.</li>
-<li><b>QA:</b> kiểm “đủ key” và yêu cầu sửa ngay khi thiếu.</li>
+<li><b>QA:</b> kiểm “đủ key” và Requests sửa ngay khi thiếu.</li>
 <li><b>Bảo trì:</b> gắn AssetID và hiệu lực cali (đo) (đo) vào hồ sơ.</li>
 </ul>
 </td>
@@ -853,7 +853,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Luật “01 đối tượng = 01 Chính / Sơ cấp Home” chặn rủi ro nào?</li>
 <li>Zone02 chứa nhóm hồ sơ nào? Nêu 02 ví dụ.</li>
 <li>Hành vi nào bị CHẶN: (A) upload vào Zone03 đúng mục; (B) sửa file đã khai báo hồ sơ; (C) tạo index pack; (D) truy xuất nguồn gốc theo key.</li>
-<li>Khi phát hiện Rev trên máy khác Rev trên ảnh chụp trạng thái, hành động đầu tiên là gì?</li>
+<li>Khi phát hiện Rev trên máy khác Rev trên Photos trạng thái, hành động đầu tiên là gì?</li>
 <li>Chọn cấu trúc tên file đúng (chọn 1): (A) final.pdf; (B) JOB-123_IR-01_2026-02-04_REV-A_Final.pdf; (C) báo cáo new.pdf; (D) IR_Job123.pdf.</li>
 <li>Tại sao Zone06 không được coi là kho chính?</li>
 <li>Chứng chỉ vật liệu thuộc Chính / Sơ cấp Home nào khi cần chứng minh cho job?</li>
@@ -870,7 +870,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Điểm khác nhau giữa Part/Rev chủ / gốc và Job bằng chứng là gì?</li>
 <li>Trong 60 giây, học viên phải ghi MRR gì khi phát hiện vượt qua cổng kiểm soát?</li>
 </ol>
-<h3 class="h3" style="margin-top:14px">10.2 Tình huống (≥3) — tình huống thật, yêu cầu quyết định TẠM GIỮ/GO và ghi MRR</h3>
+<h3 class="h3" style="margin-top:14px">10.2 Tình huống (≥3) — tình huống thật, Requests quyết định TẠM GIỮ/GO và ghi MRR</h3>
 <div class="table-card">
 <table class="table">
 <thead>
@@ -898,8 +898,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>
  Hàng outsource mẻ nấu (mẻ nấu (heat)) xử lý về đủ số lượng. Cert đính kèm không có lot/mẻ nấu (mẻ nấu (heat)) sơ đồ ánh xạ và không có PO tham chiếu.
  </td>
-<td>TẠM GIỮ nhận hàng; không cấp cho sản xuất; yêu cầu cert đúng</td>
-<td>Cert yêu cầu log + nhận hàng hold hồ sơ + link PO</td>
+<td>TẠM GIỮ nhận hàng; không cấp cho sản xuất; Requests cert đúng</td>
+<td>Cert Requests log + nhận hàng hold hồ sơ + link PO</td>
 <td>Kho + Mua hàng + QA</td>
 </tr>
 <tr>
@@ -1000,13 +1000,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Operator</td>
-<td>Ảnh/log ngoại lệ theo Job; bằng chứng mở đúng SnapshotID khi được yêu cầu</td>
+<td>Ảnh/log ngoại lệ theo Job; bằng chứng mở đúng SnapshotID khi được Requests</td>
 <td>Zone03 / Hồ sơ công việc</td>
 </tr>
 <tr>
 <td>Setup</td>
 <td>Setup bằng chứng + SnapshotID; log thay đổi kẹp/dao gắn PackageID</td>
-<td>Zone02 (gói hàng) + Zone03 (ảnh chụp trạng thái)</td>
+<td>Zone02 (gói hàng) + Zone03 (Photos trạng thái)</td>
 </tr>
 <tr>
 <td>Lập trình viên (CNC)</td>
@@ -1050,7 +1050,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Người định giá (SAL-03)</td>
-<td>Hợp đồng/PO điều khoản + nghĩa vụ tóm tắt; sơ đồ ánh xạ yêu cầu hồ sơ</td>
+<td>Hợp đồng/PO điều khoản + nghĩa vụ tóm tắt; sơ đồ ánh xạ Requests hồ sơ</td>
 <td>Zone05 / Customer</td>
 </tr>
 <tr>
@@ -1082,7 +1082,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:10px 0 0 18px">
 <li><b>Zone01 Được kiểm soát:</b> M365/SharePoint → CNC-IMS-HUB → 01_QMS-Được kiểm soát-Tài liệu</li>
 <li><b>Zone02 Part/Rev:</b> M365/SharePoint → CNC-IMS-HUB → 02_Product-cấu hình-PartRev</li>
-<li><b>Zone03 Job Bằng chứng:</b> M365/SharePoint → CNC-IMS-HUB → 03_Operations-Bằng chứng-Job</li>
+<li><b>Zone03 Job Evidence:</b> M365/SharePoint → CNC-IMS-HUB → 03_Operations-Evidence-Job</li>
 <li><b>Zone04 Doanh nghiệp Hồ sơ:</b> M365/SharePoint → CNC-IMS-HUB → 04_Enterprise-Hồ sơ</li>
 <li><b>Zone05 Thương mại:</b> M365/SharePoint → CNC-IMS-HUB → 05_Commercial</li>
 <li><b>Zone06 Working:</b> M365/SharePoint → CNC-IMS-HUB → 06_Working-phân loại ưu tiên</li>
@@ -1141,13 +1141,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>T1</b><div class="muted">Hồ sơ</div></td>
 <td>LAM-T1-10Y-HỒ SƠ</td>
 <td>10 năm</td>
-<td>Kiểm tra/Giao vận gói; hồ sơ khách yêu cầu; NCR/CAPA kết thúc / đóng</td>
+<td>Kiểm tra/Giao vận gói; hồ sơ khách Requests; NCR/CAPA kết thúc / đóng</td>
 </tr>
 <tr>
 <td><b>T2</b><div class="muted">Tổng / Chung</div></td>
 <td>HESEM-T2-5Y</td>
 <td>5 năm</td>
-<td>Bằng chứng chung không thuộc T1</td>
+<td>Evidence chung không thuộc T1</td>
 </tr>
 <tr>
 <td><b>T3</b><div class="muted">Working</div></td>
@@ -1157,7 +1157,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </tbody>
 </table>
-<div class="muted">Khi hợp đồng khách yêu cầu lớn hơn 10 năm, áp dụng nhãn T1 theo hợp đồng: <b>Chu kỳ tái đánh giá: 12 tháng (L1–L2) • 24 tháng (L3–L4).</b>.</div>
+<div class="muted">Khi hợp đồng khách Requests lớn hơn 10 năm, áp dụng nhãn T1 theo hợp đồng: <b>Chu kỳ tái đánh giá: 12 tháng (L1–L2) • 24 tháng (L3–L4).</b>.</div>
 </div>
 <!-- 13) Audit findings -->
 <div class="card" id="audit">
@@ -1175,7 +1175,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>1</td>
 <td>Dùng bản vẽ/Rev hết hiệu lực tại phân xưởng</td>
-<td>Hết hiệu lực cách ly / biệt trữ + chỉ mở từ ảnh chụp trạng thái; kiểm cổng kiểm soát đầu ca</td>
+<td>Hết hiệu lực cách ly / biệt trữ + chỉ mở từ Photos trạng thái; kiểm cổng kiểm soát đầu ca</td>
 <td>Log cổng kiểm soát + danh mục hết hiệu lực + SnapshotID</td>
 </tr>
 <tr>
@@ -1186,7 +1186,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>3</td>
-<td>Bằng chứng nằm sai Chính / Sơ cấp Home</td>
+<td>Evidence nằm sai Chính / Sơ cấp Home</td>
 <td>Review định kỳ; di chuyển về đúng Khu vực và thay bằng link</td>
 <td>Biên bản dọn dẹp + log di chuyển</td>
 </tr>

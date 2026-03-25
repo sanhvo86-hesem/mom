@@ -180,7 +180,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Báo giá/Hợp đồng</b></td>
-<td>Người định giá (SAL-03) bàn giao yêu cầu, rev, điều khoản chất lượng</td>
+<td>Người định giá (SAL-03) bàn giao Requests, rev, điều khoản chất lượng</td>
 <td>Người định giá (SAL-03) đạt TRN-OPS-05 (L2) trước khi xác nhận dữ kiện rev/CTQ cho báo giá</td>
 </tr>
 <tr>
@@ -196,7 +196,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Mua hàng</b></td>
 <td>Mua hàng đặt hàng, kiểm soát công đoạn đặc biệt/nhà cung cấp</td>
-<td>Mua hàng đạt TRN-OPS-05 (L2) trước khi phát hành PO có yêu cầu CoC/truy xuất nguồn gốc</td>
+<td>Mua hàng đạt TRN-OPS-05 (L2) trước khi phát hành PO có Requests CoC/truy xuất nguồn gốc</td>
 </tr>
 <tr>
 <td><b>Nhận hàng</b></td>
@@ -226,7 +226,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Đóng gói</b></td>
 <td>Đóng gói, nhãn, chống lẫn lộn (mix-up)</td>
-<td>Kho/QC đạt TRN-OPS-05 trước khi đóng gói hàng có yêu cầu truy xuất nguồn gốc</td>
+<td>Kho/QC đạt TRN-OPS-05 trước khi đóng gói hàng có Requests truy xuất nguồn gốc</td>
 </tr>
 <tr>
 <td><b>Ship</b></td>
@@ -302,25 +302,25 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="iso-title">Điểm kiểm soát bắt buộc (gắn bằng chứng – sẵn sàng đánh giá)</div>
 <div class="small muted"><b>Nhóm rủi ro:</b> sai Rev/phiên bản • vượt qua cổng kiểm soát • thiếu/giả hồ sơ • lẫn lộn/truy xuất nguồn gốc • đo lường/hiệu chuẩn • rủi ro giao hàng</div>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div><b>CP1 — Chốt tài liệu tham chiếu đúng phiên bản</b>: Supervisor/QA/QMS <b>PHẢI</b> xác nhận danh mục SOP/WI/Phiếu theo dõi công việc/Drawing dùng cho OJT trước khi bắt đầu. Bằng chứng: bảng kiểm “Phiên bản Đã xác minh” kèm ảnh/đường dẫn tài liệu. </div>
+<div><b>CP1 — Chốt tài liệu tham chiếu đúng phiên bản</b>: Supervisor/QA/QMS <b>PHẢI</b> xác nhận danh mục SOP/WI/Phiếu theo dõi công việc/Drawing dùng cho OJT trước khi bắt đầu. Evidence: bảng kiểm “Phiên bản Đã xác minh” kèm ảnh/đường dẫn tài liệu. </div>
 </div>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div><b>CP2 — Chọn người hướng dẫn theo năng lực</b>: Supervisor <b>PHẢI</b> chỉ định người hướng dẫn đã đạt level phù hợp hoặc có ủy quyền bằng văn bản. Bằng chứng: trích xuất ma trận kỹ năng (kỹ năng matrix)/hồ sơ chứng nhận. </div>
+<div><b>CP2 — Chọn người hướng dẫn theo năng lực</b>: Supervisor <b>PHẢI</b> chỉ định người hướng dẫn đã đạt level phù hợp hoặc có ủy quyền bằng văn bản. Evidence: trích xuất ma trận kỹ năng (kỹ năng matrix)/hồ sơ chứng nhận. </div>
 </div>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div><b>CP3 — TWI Job Sự cố hỏng máy Sheet</b>: Người hướng dẫn <b>PHẢI</b> lập Job Sự cố hỏng máy (Step/Điểm then chốt/Lý do) cho nhiệm vụ trước khi dạy. Bằng chứng: file Job Sự cố hỏng máy ký tên và ngày. </div>
+<div><b>CP3 — TWI Job Sự cố hỏng máy Sheet</b>: Người hướng dẫn <b>PHẢI</b> lập Job Sự cố hỏng máy (Step/Điểm then chốt/Lý do) cho nhiệm vụ trước khi dạy. Evidence: file Job Sự cố hỏng máy ký tên và ngày. </div>
 </div>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div><b>CP4 — Hiệu suất test cho nhiệm vụ có vận hành/cổng kiểm soát/đo/duyệt</b>: Người hướng dẫn + QA/QC <b>PHẢI</b> thực hiện bài test theo tiêu chí đánh giá và kết luận ĐẠT/KHÔNG ĐẠT. Bằng chứng: phiếu test + kết quả đo/hồ sơ. </div>
+<div><b>CP4 — Hiệu suất test cho nhiệm vụ có vận hành/cổng kiểm soát/đo/duyệt</b>: Người hướng dẫn + QA/QC <b>PHẢI</b> thực hiện bài test theo tiêu chí đánh giá và kết luận ĐẠT/KHÔNG ĐẠT. Evidence: phiếu test + kết quả đo/hồ sơ. </div>
 </div>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div><b>CP5 — không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</b>: Supervisor <b>PHẢI</b> khóa quyền vận hành khi thiếu MRR, kể cả học viên đã làm tốt tại hiện trường. Bằng chứng: danh sách quyền được cấp theo phạm vi và trạng thái (GO/TẠM GIỮ/CHẶN). </div>
+<div><b>CP5 — không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</b>: Supervisor <b>PHẢI</b> khóa quyền vận hành khi thiếu MRR, kể cả học viên đã làm tốt tại hiện trường. Evidence: danh sách quyền được cấp theo phạm vi và trạng thái (GO/TẠM GIỮ/CHẶN). </div>
 </div>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div><b>CP6 — theo dõi tiếp quan sát trong ca</b>: Người hướng dẫn <b>PHẢI</b> quan sát tối thiểu 02 lần trong 01 tuần sau OJT và ghi nhận hành vi theo tiêu chí đánh giá. Bằng chứng: log quan sát + hành động chỉnh sửa. </div>
+<div><b>CP6 — theo dõi tiếp quan sát trong ca</b>: Người hướng dẫn <b>PHẢI</b> quan sát tối thiểu 02 lần trong 01 tuần sau OJT và ghi nhận hành vi theo tiêu chí đánh giá. Evidence: log quan sát + hành động chỉnh sửa. </div>
 </div>
 <div class="req"><span class="req-tag shall">PHẢI</span>
-<div><b>CP7 — Kiểm tra định kỳ kiểu LPA</b>: Supervisor/QA <b>PHẢI</b> kiểm tra tuân thủ OJT (đúng nhiệm vụ, đúng người, đúng hồ sơ, đúng vị trí lưu) theo tần suất đã công bố. Bằng chứng: bảng kiểm kiểm tra tầng + hành động kết thúc / đóng.</div>
+<div><b>CP7 — Kiểm tra định kỳ kiểu LPA</b>: Supervisor/QA <b>PHẢI</b> kiểm tra tuân thủ OJT (đúng nhiệm vụ, đúng người, đúng hồ sơ, đúng vị trí lưu) theo tần suất đã công bố. Evidence: bảng kiểm kiểm tra tầng + hành động kết thúc / đóng.</div>
 </div>
 </div>
 </div>
@@ -372,21 +372,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <!-- 8) Checklist operation <=15 bước -->
-<h2 id="checklist">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Bằng chứng/MRR, “điểm sai hay gặp gặp”</h2>
+<h2 id="checklist">8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Evidence/MRR, “điểm sai hay gặp gặp”</h2>
 <table class="table">
 <thead>
 <tr>
 <th style="width:48px">#</th>
 <th>Bước chuẩn (bắt buộc)</th>
 <th style="width:160px">Responsible Person</th>
-<th style="width:220px">Bằng chứng/MRR</th>
+<th style="width:220px">Evidence/MRR</th>
 <th style="width:220px">Điểm sai hay gặp gặp</th>
 </tr>
 </thead>
 <tbody>
 <tr><td>1</td><td><b>Khai báo nhiệm vụ &amp; phạm vi cấp quyền</b> (vai trò × nhiệm vụ × máy/công đoạn)</td><td>Supervisor</td><td>Danh mục nhiệm vụ + phạm vi</td><td>Gộp chung “biết làm” nhưng không ghi phạm vi</td></tr>
 <tr><td>2</td><td><b>Chốt tài liệu đúng phiên bản</b> (SOP/WI/Traveler/Drawing)</td><td>QA/QMS + Supervisor</td><td>Bảng kiểm Rev Đã xác minh + link nội bộ</td><td>Dùng bản in cũ; mở file không kiểm rev</td></tr>
-<tr><td>3</td><td><b>Chọn người hướng dẫn đủ năng lực/ủy quyền</b></td><td>Supervisor</td><td>Bằng chứng level/ủy quyền</td><td>Chọn người rảnh ca; không có chứng nhận</td></tr>
+<tr><td>3</td><td><b>Chọn người hướng dẫn đủ năng lực/ủy quyền</b></td><td>Supervisor</td><td>Evidence level/ủy quyền</td><td>Chọn người rảnh ca; không có chứng nhận</td></tr>
 <tr><td>4</td><td><b>Lập Job Sự cố hỏng máy Sheet</b> (Step/Điểm then chốt/Lý do)</td><td>Người hướng dẫn</td><td>Job Sự cố hỏng máy ký tên/ngày</td><td>Viết chung chung; thiếu “điểm then chốt”</td></tr>
 <tr><td>5</td><td><b>Chuẩn bị hiện trường OJT</b> (an toàn, dụng cụ, mẫu, gage đạt chuẩn)</td><td>Người hướng dẫn + EHS/QC</td><td>Ảnh hiện trường + ID gage</td><td>Thiếu dụng cụ; gage quá hạn; khu vực bừa</td></tr>
 <tr><td>6</td><td><b>TWI Step 1 — Chuẩn bị người học</b> (mục tiêu, rủi ro, tiêu chí ĐẠT/KHÔNG ĐẠT)</td><td>Người hướng dẫn</td><td>Biên bản họp ngắn / phổ biến</td><td>Không nói rõ rủi ro; không nêu cổng kiểm soát</td></tr>
@@ -460,7 +460,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>7) Hiệu suất test &amp; kết luận ĐẠT/KHÔNG ĐẠT</b></td>
 <td>Bài test có tiêu chí; có hồ sơ; có người chứng kiến (khi CTQ)</td>
-<td>Bằng chứng “làm được”; bảo vệ chất lượng</td>
+<td>Evidence “làm được”; bảo vệ chất lượng</td>
 </tr>
 <tr>
 <td><b>8) Lưu MRR &amp; cấp quyền theo phạm vi</b></td>
@@ -520,7 +520,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiết kế Job Sự cố hỏng máy cho nhiệm vụ mới; tổ chức hiệu suất test có chứng cứ.</li>
 </ul>
 </td>
-<td>Được làm người hướng dẫn cho nhiệm vụ trong phạm vi; được quyền yêu cầu khóa cổng kiểm soát khi phát hiện sai rev/thiếu chứng cứ.</td>
+<td>Được làm người hướng dẫn cho nhiệm vụ trong phạm vi; được quyền Requests khóa cổng kiểm soát khi phát hiện sai rev/thiếu chứng cứ.</td>
 </tr>
 <tr>
 <td><b>L4</b><div class="muted">Thiết kế hệ thống &amp; kiểm soát trôi chuẩn</div></td>
@@ -531,7 +531,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Chuyển bài học NCR/MRB thành cập nhật WI/OJT và tái chứng nhận.</li>
 </ul>
 </td>
-<td>Được phê duyệt cấp quyền theo phạm vi, thiết lập cổng kiểm soát, yêu cầu tái đào tạo và mở NCR hệ thống khi vi phạm.</td>
+<td>Được phê duyệt cấp quyền theo phạm vi, thiết lập cổng kiểm soát, Requests tái đào tạo và mở NCR hệ thống khi vi phạm.</td>
 </tr>
 </tbody>
 </table>
@@ -577,8 +577,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Mua hàng</b></td>
-<td>OJT cho kiểm soát nhà cung cấp; PO có yêu cầu CoC/công đoạn đặc biệt</td>
-<td>L2; phát hành 01 PO đúng yêu cầu chứng từ; khóa phát hành khi thiếu dữ kiện</td>
+<td>OJT cho kiểm soát nhà cung cấp; PO có Requests CoC/công đoạn đặc biệt</td>
+<td>L2; phát hành 01 PO đúng Requests chứng từ; khóa phát hành khi thiếu dữ kiện</td>
 </tr>
 <tr>
 <td><b>Planner</b></td>
@@ -597,7 +597,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Người định giá (SAL-03)</b></td>
-<td>OJT cho bàn giao yêu cầu khách; kiểm soát rev/CTQ; rủi ro giao hàng</td>
+<td>OJT cho bàn giao Requests khách; kiểm soát rev/CTQ; rủi ro giao hàng</td>
 <td>L2; hoàn tất 01 tình huống báo giá/bàn giao không sai rev; kích hoạt hold khi dữ kiện thiếu</td>
 </tr>
 <tr>
@@ -668,7 +668,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </details>
 </div>
-<h3 class="h3">10.2 Tình huống (≥3 tình huống thật; yêu cầu quyết định TẠM GIỮ/GO và ghi MRR)</h3>
+<h3 class="h3">10.2 Tình huống (≥3 tình huống thật; Requests quyết định TẠM GIỮ/GO và ghi MRR)</h3>
 <div class="card">
 <div style="font-weight:800;">Tình huống 1 — sai phiên bản tại điểm bàn giao</div>
 <div class="small" style="margin-top:6px;"><b>Dữ kiện:</b> Người định giá (SAL-03) gửi email bàn giao ghi “Rev B”, Planner mở bản vẽ trên thư mục kiểm soát thấy “Rev C”, traveler đang soạn chưa khóa rev.</div>
@@ -822,7 +822,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li><b>Kho tài liệu kiểm soát:</b> M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → đào tạo → academy → system-ops</li>
 <li><b>Kho hồ sơ đào tạo (MRR):</b> M365/SharePoint → CNC-IMS-HUB → IncidentLog (SharePoint List) + Teams: QMS-ALERT. → đào tạo-hồ sơ → TRN-OPS-05</li>
-<li><b>Kho bằng chứng kèm (ảnh/video):</b> M365/SharePoint → CNC-IMS-HUB → CNC-IMS-HUB → QMS-SSOT → Bằng chứng-Pack. → TRN-OPS-05</li>
+<li><b>Kho bằng chứng kèm (ảnh/video):</b> M365/SharePoint → CNC-IMS-HUB → CNC-IMS-HUB → QMS-SSOT → Evidence-Pack. → TRN-OPS-05</li>
 </ul>
 <div class="small muted">Yêu cầu truy xuất nguồn gốc: mở được trong 03 phút theo mã job/vai trò/mã nhân viên.</div>
 </div>

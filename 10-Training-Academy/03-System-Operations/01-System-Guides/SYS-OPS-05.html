@@ -252,7 +252,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table tight">
 <thead>
 <tr>
-<th>Vai trò</th><th>Áp dụng</th><th>Trách nhiệm bắt buộc</th><th>Điểm kiểm soát</th><th>Bằng chứng năng lực</th>
+<th>Vai trò</th><th>Áp dụng</th><th>Trách nhiệm bắt buộc</th><th>Điểm kiểm soát</th><th>Evidence năng lực</th>
 </tr>
 </thead>
 <tbody>
@@ -280,21 +280,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td class="role">Planner</td>
 <td>100%</td>
-<td>Khoá đúng Rev/PO ghi chú; tạo Job phản chiếu / sao chép; đảm bảo Hồ sơ công việc tồn tại; xác nhận yêu cầu khách (label/ASN)</td>
+<td>Khoá đúng Rev/PO ghi chú; tạo Job phản chiếu / sao chép; đảm bảo Hồ sơ công việc tồn tại; xác nhận Requests khách (label/ASN)</td>
 <td>JobIndex; lộ trình gia công/Rev; Ship date cửa sổ / khung thời gian</td>
 <td>Bảng kiểm lập kế hoạch + tình huống diễn tập</td>
 </tr>
 <tr>
 <td class="role">Người định giá (SAL-03)</td>
 <td>Customer‑cụ thể</td>
-<td>Ghi nhận yêu cầu nhãn/đóng gói; xác nhận địa chỉ; gửi ASN/thông báo theo yêu cầu khách</td>
+<td>Ghi nhận Requests nhãn/đóng gói; xác nhận địa chỉ; gửi ASN/thông báo theo Requests khách</td>
 <td>PO ghi chú; ShipRelease trường dữ liệu Customer/PO</td>
 <td>Tình huống diễn tập + hồ sơ cập nhật</td>
 </tr>
 <tr>
 <td class="role">Mua hàng</td>
 <td>Vật tư đóng gói</td>
-<td>Đảm bảo vật tư nhãn/giấy/in ruy-băng; vật tư ESD/VCI/chất hút ẩm đạt spec; COA vật tư khi yêu cầu</td>
+<td>Đảm bảo vật tư nhãn/giấy/in ruy-băng; vật tư ESD/VCI/chất hút ẩm đạt spec; COA vật tư khi Requests</td>
 <td>Lot truy vết vật tư đóng gói; tồn kho</td>
 <td>Lot truy vết diễn tập</td>
 </tr>
@@ -331,7 +331,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<h2>6) Bảng kiểm vận hành (≤ 15 bước) — Responsible Person + Bằng chứng + Lỗi hay gặp</h2>
+<h2>6) Bảng kiểm vận hành (≤ 15 bước) — Responsible Person + Evidence + Lỗi hay gặp</h2>
 <p class="mini">Bảng kiểm này là chuẩn vận hành tại hiện trường. Mỗi bước có bằng chứng tối thiểu. Khi thiếu bằng chứng → trạng thái ĐÃ CHẶN.</p>
 <div class="table-wrap">
 <table class="table tight">
@@ -340,12 +340,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:52px;">#</th>
 <th>Bước</th>
 <th style="width:160px;">Responsible Person</th>
-<th>Bằng chứng/MRR</th>
+<th>Evidence/MRR</th>
 <th>Lỗi hay gặp (chặn ngay)</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Nhận yêu cầu ship + xác nhận PO ghi chú (label/đóng gói/ASN/điều khoản thương mại (Incoterms))</td><td>Planner + Người định giá (SAL-03)</td><td>PO ghi chú trong Hồ sơ công việc 01_Rfq-Hợp đồng</td><td>Thiếu yêu cầu khách; dùng yêu cầu cũ</td></tr>
+<tr><td>1</td><td>Nhận Requests ship + xác nhận PO ghi chú (label/đóng gói/ASN/điều khoản thương mại (Incoterms))</td><td>Planner + Người định giá (SAL-03)</td><td>PO ghi chú trong Hồ sơ công việc 01_Rfq-Hợp đồng</td><td>Thiếu Requests khách; dùng Requests cũ</td></tr>
 <tr><td>2</td><td>Xác nhận Hồ sơ công việc tồn tại; thư mục 07_Shipping-Đóng gói sẵn sàng</td><td>Planner</td><td>JobIndex.EvidenceFolderUrl; thư mục 07_Shipping-Đóng gói</td><td>Upload nhầm thư mục; thư mục không có quyền</td></tr>
 <tr><td>3</td><td>Xác nhận Final IR/CMM = PASS; không có TẠM GIỮ/NCR mở</td><td>QA + QC</td><td>Final IR/CMM file + log TẠM GIỮ/NCR disposition</td><td>Thiếu file PASS; còn TẠM GIỮ</td></tr>
 <tr><td>4</td><td>Tạo/nhận PackID (= Epicor PackNum) theo ShipmentMirror</td><td>WHS</td><td>ShipmentMirror row; PackID/EpicorPackNum khớp / phù hợp</td><td>PackID không tồn tại trong phản chiếu / sao chép</td></tr>
@@ -368,7 +368,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>7) Xử lý ngoại lệ (ngoại lệ) — quy tắc + bằng chứng bắt buộc</h2>
 <div class="table-wrap">
 <table class="table tight">
-<thead><tr><th>Tình huống</th><th>Quy tắc</th><th>Bằng chứng bắt buộc</th><th>Trạng thái hệ thống</th></tr></thead>
+<thead><tr><th>Tình huống</th><th>Quy tắc</th><th>Evidence bắt buộc</th><th>Trạng thái hệ thống</th></tr></thead>
 <tbody>
 <tr>
 <td><b>tách / chia pack</b></td>
@@ -411,7 +411,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>5</td><td>in lại không có lý do</td><td>Mất dấu vết kiểm toán</td><td>LUỒNG-WHS-12 bắt buộc ReprintReasonCode</td><td>Team Leader kho</td></tr>
 <tr><td>6</td><td>SSCC trùng hoặc tái sử dụng</td><td>Mất truy xuất nguồn gốc</td><td>SSCC tính duy nhất kiểm tra + Trạng thái Đã hủy</td><td>IT + WHS</td></tr>
 <tr><td>7</td><td>Quét mã vạch không mở đúng màn hình</td><td>Lẫn lộn khi ship</td><td>LabelScanVerified=True trước khi niêm phong</td><td>WHS</td></tr>
-<tr><td>8</td><td>Ảnh đóng gói thiếu hoặc mờ</td><td>Không chứng minh khi khiếu nại / yêu cầu bồi thường</td><td>FRM-WHS-007 yêu cầu ảnh tối thiểu; đánh giá điểm / tại chỗ kiểm tra</td><td>WHS + QA</td></tr>
+<tr><td>8</td><td>Ảnh đóng gói thiếu hoặc mờ</td><td>Không chứng minh khi khiếu nại / Requests bồi thường</td><td>FRM-WHS-007 Requests ảnh tối thiểu; đánh giá điểm / tại chỗ kiểm tra</td><td>WHS + QA</td></tr>
 <tr><td>9</td><td>Upload sai thư mục Hồ sơ công việc</td><td>Đánh giá không truy xuất nguồn gốc</td><td>PacketFolderUrl trỏ đúng 07_Shipping-Đóng gói; kiểm tra link</td><td>Planner + QA</td></tr>
 <tr><td>10</td><td>Phê duyệt sai người/thiếu chữ ký</td><td>Không hợp lệ</td><td>Power ứng dụng vai trò kiểm tra + ApprovalHistory</td><td>QA</td></tr>
 <tr><td>11</td><td>đơn vị vận chuyển/Theo dõi nhập sai</td><td>Truy vết giao hàng sai</td><td>kép / gấp đôi‑mục nhập kiểm tra + ảnh vận đơn</td><td>WHS + Người định giá (SAL-03)</td></tr>
@@ -426,7 +426,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiếu bằng chứng Đối chiếu đóng gói (không có ReconciliationStatus hoặc không có log run).</li>
 <li>in lại nhãn không có lý do và không có phê duyệt.</li>
 <li>SSCC/PackID không duy nhất hoặc bị tái sử dụng sau khi Đã hủy.</li>
-<li>bộ hồ sơ giao hàng thiếu CoC/cert theo yêu cầu PO.</li>
+<li>bộ hồ sơ giao hàng thiếu CoC/cert theo Requests PO.</li>
 <li>Final IR/CMM không khoá hoặc không truy xuất nguồn gốc được trong Hồ sơ công việc.</li>
 <li>PacketFolderUrl trỏ sai; chứng cứ rải rác, không theo cấu trúc Hồ sơ công việc.</li>
 <li>ApprovalHistory không rõ Approver; vai trò không phù hợp.</li>
@@ -500,7 +500,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>2. phân công SSCC</td><td>SSCC 18 số; kiểm tra chữ số hợp lệ; hồ sơ tạo thành công</td><td>Truy xuất nguồn gốc end‑to‑end</td></tr>
 <tr><td>3. In &amp; dán nhãn</td><td>mã vạch đậm, không nhòe; dán phẳng; không che thông tin</td><td>Scan độ tin cậy; giảm in lại</td></tr>
 <tr><td>4. Scan test</td><td>Quét mở đúng ShipRelease + đúng Job/Part/Rev/Qty</td><td>Khoá lỗi sai nhãn trước khi niêm phong</td></tr>
-<tr><td>5. Chụp ảnh đóng gói</td><td>Tối thiểu 4 ảnh: (a) sản phẩm bảo vệ (b) thùng mở (c) thùng đóng (d) nhãn</td><td>Chứng minh khi khiếu nại / yêu cầu bồi thường vận chuyển</td></tr>
+<tr><td>5. Chụp ảnh đóng gói</td><td>Tối thiểu 4 ảnh: (a) sản phẩm bảo vệ (b) thùng mở (c) thùng đóng (d) nhãn</td><td>Chứng minh khi khiếu nại / Requests bồi thường vận chuyển</td></tr>
 <tr><td>6. Hoàn thiện bộ hồ sơ giao hàng</td><td>CoC/cert đúng Rev; file đặt tên chuẩn; lưu đúng 07_Shipping-Đóng gói</td><td>Đánh giá truy xuất nguồn gốc nhanh; ngăn thiếu cert</td></tr>
 <tr><td>7. Submit + PASS</td><td>ReconciliationStatus=Pass trước khi phê duyệt</td><td>Cổng kiểm soát G5 khoá cứng</td></tr>
 <tr><td>8. Bàn giao đơn vị vận chuyển</td><td>Theo dõi đúng; ảnh bàn giao; cập nhật ShipDate</td><td>Truy vết giao hàng</td></tr>
@@ -558,7 +558,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>bộ hồ sơ giao hàng phải nằm trong thư mục nào của Hồ sơ công việc? (A) 03_Programs-Setup (B) 04_Inspection-FAI (C) 07_Shipping-Đóng gói (D) 08_Photos</li>
 <li>Ai được phép in lại nhãn theo rule? (A) Bất kỳ ai (B) Team Leader kho hoặc QA (C) Kinh doanh (D) Customer</li>
 <li>Khi SSCC đã Đã hủy, xử lý đúng là gì? (A) Tái sử dụng SSCC (B) Xoá hồ sơ (C) Giữ hồ sơ + không tái sử dụng (D) Đổi khách hàng</li>
-<li>Mục tiêu chính của đối soát là gì? (A) Tăng giấy tờ (B) Ngăn ship sai/thiếu + tạo bằng chứng đánh giá (C) Tăng thời gian (D) Giảm ảnh chụp</li>
+<li>Mục tiêu chính của đối soát là gì? (A) Tăng giấy tờ (B) Ngăn ship sai/thiếu + tạo bằng chứng đánh giá (C) Tăng thời gian (D) Giảm Photos</li>
 <li>Đối soát cổng kiểm soát chạy khi nào? (A) Khi ShipRelease submit (B) Khi in nhãn (C) Khi tạo PO (D) Khi nhận vật tư</li>
 <li>Thiếu Final IR/CMM PASS dẫn tới trạng thái nào? (A) Released (B) Pass (C) Đã chặn (D) Đã giao hàng</li>
 <li>Thông tin cốt lõi trên hậu cần label phải có dạng gì? (A) Chỉ chữ in (B) Chỉ mã vạch (C) mã vạch + chữ in (D) Chỉ QR</li>
@@ -581,28 +581,28 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<h2>15) Tình huống diễn tập (03 tình huống) — yêu cầu hành động + bằng chứng</h2>
+<h2>15) Tình huống diễn tập (03 tình huống) — Requests hành động + bằng chứng</h2>
 <div class="grid-3">
 <div class="card" style="margin:0">
 <div class="badge"><span class="dot"></span>tình huống 1</div>
 <h3 class="h3">Qty không khớp</h3>
 <p class="mini"><b>Tình huống:</b> ShipmentMirror Qty = 10, ShipRelease Qty = 9.</p>
 <p class="mini"><b>Hành động bắt buộc:</b> đặt Đã chặn; khoanh vùng; kiểm đếm lại; cập nhật phiếu kê đóng gói (phiếu kê đóng gói); re‑submit người xác nhận.</p>
-<p class="mini"><b>Bằng chứng:</b> ảnh count sheet + log chỉnh sửa + ReconciliationStatus=Pass.</p>
+<p class="mini"><b>Evidence:</b> ảnh count sheet + log chỉnh sửa + ReconciliationStatus=Pass.</p>
 </div>
 <div class="card" style="margin:0">
 <div class="badge"><span class="dot"></span>tình huống 2</div>
 <h3 class="h3">Thiếu cert theo PO</h3>
-<p class="mini"><b>Tình huống:</b> PO yêu cầu cert mạ; bộ hồ sơ giao hàng chưa có file cert.</p>
+<p class="mini"><b>Tình huống:</b> PO Requests cert mạ; bộ hồ sơ giao hàng chưa có file cert.</p>
 <p class="mini"><b>Hành động bắt buộc:</b> PacketComplete=No; Đã chặn; Mua hàng/Planner truy file cert; QA xác nhận đúng Rev; upload vào 07_Shipping-Đóng gói.</p>
-<p class="mini"><b>Bằng chứng:</b> cert file + đặt tên chuẩn + ApprovalHistory sau khi Pass.</p>
+<p class="mini"><b>Evidence:</b> cert file + đặt tên chuẩn + ApprovalHistory sau khi Pass.</p>
 </div>
 <div class="card" style="margin:0">
 <div class="badge"><span class="dot"></span>tình huống 3</div>
 <h3 class="h3">Nhãn bị rách sau khi dán</h3>
 <p class="mini"><b>Tình huống:</b> Nhãn PackID/SSCC bị rách; mã vạch không quét được.</p>
 <p class="mini"><b>Hành động bắt buộc:</b> Team Leader kho in lại; ghi ReprintReasonCode=LabelDamaged; dán nhãn mới; chụp ảnh; scan test lại.</p>
-<p class="mini"><b>Bằng chứng:</b> PrintVersion tăng; lý do + ảnh nhãn mới + LabelScanVerified=True.</p>
+<p class="mini"><b>Evidence:</b> PrintVersion tăng; lý do + ảnh nhãn mới + LabelScanVerified=True.</p>
 </div>
 </div>
 </div>
@@ -611,7 +611,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="mini">Bài test áp dụng cho WHS (L2/L3) và QA (L2/L3). Thời gian tối đa 35 phút/nhóm 2 người.</p>
 <div class="table-wrap">
 <table class="table tight">
-<thead><tr><th>Hạng mục</th><th>Yêu cầu Pass</th><th>Bằng chứng</th><th>Điểm</th></tr></thead>
+<thead><tr><th>Hạng mục</th><th>Yêu cầu Pass</th><th>Evidence</th><th>Điểm</th></tr></thead>
 <tbody>
 <tr><td>1) phân công SSCC</td><td>PackSSCCRegister tạo đúng; SSCC hợp lệ; Trạng thái = Đã in/Đã xác minh đúng thứ tự</td><td>Row + dấu thời gian</td><td>20</td></tr>
 <tr><td>2) In &amp; dán nhãn</td><td>Nhãn rõ; đúng kiện; không che thông tin</td><td>Ảnh nhãn</td><td>15</td></tr>

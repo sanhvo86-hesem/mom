@@ -115,7 +115,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Lý do tồn tại (Cổng kiểm soát Logic)</h3>
 <ul>
 <li><b>Cổng kiểm soát năng lực:</b> phân xưởng CNC gia công theo đơn (job xưởng) chạy tốc độ cao; bố trí sai người/sai phạm vi gây sai Rev, sai đo, ship sai, NCR/MRB, khách hàng thoát / bỏ qua.</li>
-<li><b>Cổng kiểm soát đánh giá:</b> đánh giá viên/khách hàng yêu cầu chứng minh “ai làm gì” và “đã được đào tạo/đánh giá hiệu lực”. Không có hồ sơ = không có chứng minh.</li>
+<li><b>Cổng kiểm soát đánh giá:</b> đánh giá viên/khách hàng Requests chứng minh “ai làm gì” và “đã được đào tạo/đánh giá hiệu lực”. Không có hồ sơ = không có chứng minh.</li>
 <li><b>Cổng kiểm soát vận hành:</b> hồ sơ nằm rải rác, đặt tên sai, trộn phiên bản, thiếu ký/thiếu tiêu chí đánh giá làm phân xưởng mất thời gian, treo job, phát sinh tranh chấp.</li>
 </ul>
 </div>
@@ -127,7 +127,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>HR/Training</b></td>
-<td>Governance kế hoạch đào tạo, sổ theo dõi tái chứng nhận, kho hồ sơ đào tạo; đảm bảo truy xuất nguồn gốc 60 giây theo yêu cầu đánh giá.</td>
+<td>Governance kế hoạch đào tạo, sổ theo dõi tái chứng nhận, kho hồ sơ đào tạo; đảm bảo truy xuất nguồn gốc 60 giây theo Requests đánh giá.</td>
 <td>Kho hồ sơ có cấu trúc chuẩn; log tái chứng nhận cập nhật; diễn tập truy xuất nguồn gốc PASS.</td>
 </tr>
 <tr>
@@ -173,7 +173,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Báo giá/Hợp đồng</b></td>
 <td>Yêu cầu khách hàng/điều khoản chất lượng</td>
-<td>Training hồ sơ “Customer yêu cầu nhận thức” cho Người định giá (SAL-03)</td>
+<td>Training hồ sơ “Customer Requests nhận thức” cho Người định giá (SAL-03)</td>
 <td>Thiếu hồ sơ nhận thức điều khoản = <b>CHẶN</b> chốt cam kết/thời gian dẫn (lead time)</td>
 </tr>
 <tr>
@@ -279,7 +279,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:170px">Điểm kiểm soát</th>
 <th style="width:160px">Responsible Person</th>
-<th>Bằng chứng/MRR bắt buộc</th>
+<th>Evidence/MRR bắt buộc</th>
 <th style="width:160px">Tần suất</th>
 </tr>
 </thead>
@@ -378,7 +378,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 8) Checklist operation -->
 <div class="card" id="checklist">
-<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Responsible Person, Bằng chứng/MRR, “điểm sai hay gặp”</h2>
+<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: Responsible Person, Evidence/MRR, “điểm sai hay gặp”</h2>
 <div class="table-wrap">
 <table class="table tight">
 <thead>
@@ -386,7 +386,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:46px">#</th>
 <th>Bước bắt buộc</th>
 <th style="width:160px">Responsible Person</th>
-<th style="width:260px">Bằng chứng/MRR</th>
+<th style="width:260px">Evidence/MRR</th>
 <th>Điểm sai hay gặp</th>
 </tr>
 </thead>
@@ -492,7 +492,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>L3</b><div class="muted">Chuẩn hóa cho nhóm</div></td>
 <td>Đánh giá mẫu 05 hồ sơ trong nhóm; phát hiện sai tên/sai phiên bản và mở hành động list; diễn tập PASS cho 03 người khác.</td>
-<td>Được làm người đào tạo/huấn luyện viên nội bộ cho mô-đun; được quyền yêu cầu hold khi thiếu hồ sơ.</td>
+<td>Được làm người đào tạo/huấn luyện viên nội bộ cho mô-đun; được quyền Requests hold khi thiếu hồ sơ.</td>
 <td>Đánh giá bảng kiểm + hành động kết thúc / đóng</td>
 </tr>
 <tr>
@@ -519,11 +519,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>QC</b></td><td>Diễn tập mở được hồ sơ năng lực đo lường + trạng thái hiệu lực; hiểu liên kết với hiệu chuẩn/truy xuất nguồn gốc</td><td>Thiếu hồ sơ = TẠM GIỮ lot</td></tr>
 <tr><td><b>QA</b></td><td>Thiết lập chỉ số + đánh giá mẫu + hành động kết thúc / đóng; diễn tập 10 hồ sơ ngẫu nhiên ≤60 giây</td><td>No bằng chứng = CHẶN phê duyệt giao hàng</td></tr>
 <tr><td><b>Kho</b></td><td>Diễn tập mở được hồ sơ đóng gói/truy xuất nguồn gốc; biết gắn chứng từ vào bộ hồ sơ giao hàng đúng job</td><td>Thiếu hồ sơ = TẠM GIỮ đóng gói</td></tr>
-<tr><td><b>Mua hàng</b></td><td>Diễn tập mở được hồ sơ kiểm soát nhà cung cấp/công đoạn đặc biệt; biết yêu cầu cert</td><td>Thiếu hồ sơ = CHẶN PO công đoạn đặc biệt</td></tr>
+<tr><td><b>Mua hàng</b></td><td>Diễn tập mở được hồ sơ kiểm soát nhà cung cấp/công đoạn đặc biệt; biết Requests cert</td><td>Thiếu hồ sơ = CHẶN PO công đoạn đặc biệt</td></tr>
 <tr><td><b>Planner</b></td><td>Diễn tập mở được hồ sơ lập kế hoạch cổng kiểm soát; biết chặn bố trí nhân sự theo scope</td><td>Thiếu hồ sơ = CHẶN phát hành traveler CTQ</td></tr>
 <tr><td><b>Bảo trì</b></td><td>Diễn tập mở được hồ sơ an toàn/LOTO + phạm vi; biết treo máy khi thiếu chứng nhận</td><td>Hết hạn = CHẶN can thiệp máy trong phạm vi</td></tr>
 <tr><td><b>EHS</b></td><td>Diễn tập mở được hồ sơ an toàn; biết đánh giá PPE/sự cố suýt xảy ra (gần / suýt-thiếu / bỏ sót) và liên kết đào tạo lại</td><td>Thiếu hồ sơ = STOP công việc nguy hiểm</td></tr>
-<tr><td><b>Người định giá (SAL-03)</b></td><td>Diễn tập mở được hồ sơ nhận thức yêu cầu khách hàng; biết chặn cam kết vượt năng lực</td><td>Thiếu hồ sơ = CHẶN chốt cam kết chất lượng</td></tr>
+<tr><td><b>Người định giá (SAL-03)</b></td><td>Diễn tập mở được hồ sơ nhận thức Requests khách hàng; biết chặn cam kết vượt năng lực</td><td>Thiếu hồ sơ = CHẶN chốt cam kết chất lượng</td></tr>
 <tr><td><b>Supervisor</b></td><td>Diễn tập 03 hồ sơ bất kỳ trong ≤60 giây; biết kích hoạt TẠM GIỮ/CHẶN; biết cập nhật tái chứng nhận log cùng HR</td><td>Không chặn khi thiếu bằng chứng = mở NCR “vượt qua cổng kiểm soát”</td></tr>
 </tbody>
 </table>
@@ -555,7 +555,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Chỉ ra 03 chỉ số dùng đo mức sẵn sàng đánh giá cho hồ sơ đào tạo.</li>
 <li>Trình tự đóng vòng cải tiến khi diễn tập FAIL.</li>
 </ol>
-<h3>10.2 Tình huống (≥3) — có dữ kiện; yêu cầu quyết định TẠM GIỮ/GO và ghi MRR</h3>
+<h3>10.2 Tình huống (≥3) — có dữ kiện; Requests quyết định TẠM GIỮ/GO và ghi MRR</h3>
 <div class="table-wrap">
 <table class="table tight">
 <thead>
@@ -570,7 +570,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>2</td>
-<td>Customer yêu cầu chứng minh Người định giá (SAL-03) đã được đào tạo điều khoản “bộ hồ sơ giao hàng bắt buộc gồm CoC + cert công đoạn đặc biệt”. Hồ sơ lưu trong email cá nhân, không có trong kho.</td>
+<td>Customer Requests chứng minh Người định giá (SAL-03) đã được đào tạo điều khoản “bộ hồ sơ giao hàng bắt buộc gồm CoC + cert công đoạn đặc biệt”. Hồ sơ lưu trong email cá nhân, không có trong kho.</td>
 <td><b>CHẶN</b> chốt cam kết bộ hồ sơ giao hàng đến khi hồ sơ đưa vào kho và diễn tập PASS</td>
 <td>Pack của Người định giá (SAL-03) + log diễn tập 60 giây + hồ sơ nhận thức điều khoản</td>
 </tr>
@@ -588,7 +588,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h4>Bài test: “Tạo pack &amp; truy xuất nguồn gốc 60 giây”</h4>
 <ul>
 <li><b>Nhiệm vụ:</b> tạo mới 01 Record Folder cho 01 nhân sự giả lập, lưu đủ 04 file mẫu (theo template), đặt tên đúng, và truy xuất nguồn gốc lại trong ≤60 giây.</li>
-<li><b>Điều kiện bấm giờ:</b> bắt đầu khi người đánh giá đưa yêu cầu “mở hồ sơ Tên/Mã NV – TRN-OPS-06” và dừng khi mở xong file thứ 4.</li>
+<li><b>Điều kiện bấm giờ:</b> bắt đầu khi người đánh giá đưa Requests “mở hồ sơ Tên/Mã NV – TRN-OPS-06” và dừng khi mở xong file thứ 4.</li>
 <li><b>ĐẠT/KHÔNG ĐẠT:</b> đạt khi ≤60 giây và đủ 04 file đúng đặt tên; Không đạt khi &gt;60 giây hoặc thiếu/đặt tên sai/không xác định phiên bản.</li>
 </ul>
 </div>
@@ -695,7 +695,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Quy tắc bắt buộc</strong>
 <ul>
-<li><b>Nhịp độ phải được định nghĩa theo rủi ro &amp; yêu cầu khách hàng.</b> Khi chưa có quy định, đánh dấu M365/SharePoint → HESEM-QMS-SSOT và không được tự gán “vĩnh viễn”.</li>
+<li><b>Nhịp độ phải được định nghĩa theo rủi ro &amp; Requests khách hàng.</b> Khi chưa có quy định, đánh dấu M365/SharePoint → HESEM-QMS-SSOT và không được tự gán “vĩnh viễn”.</li>
 <li><b>Cổng kiểm soát CTQ/Ship/Kiểm tra</b> phải có ngày hết hạn rõ; quá hạn = CHẶN.</li>
 </ul>
 </div>

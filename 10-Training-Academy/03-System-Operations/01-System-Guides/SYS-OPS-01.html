@@ -131,7 +131,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><span class="gate g2">G2</span> Trước khi chạy lô đầu tiên / setup mới / đổi Rev → xác nhận Rev + phát hành chương trình + phiếu cài đặt.</li>
 <li><span class="gate g3">G3</span> Trước khi đóng NCR/MRB / làm lại → đảm bảo hồ sơ &amp; phê duyệt đủ.</li>
 <li><span class="gate g5">G5</span> phê duyệt giao hàng → bộ hồ sơ giao hàng (ship gói hồ sơ) &amp; Tier‑1 bằng chứng đầy đủ (CHẶN khi thiếu).</li>
-<li><span class="gate g4">G4</span> Khi đánh giá/khách hàng yêu cầu hoặc diễn tập nội bộ → kích hoạt “bài diễn tập đánh giá 60 giây”.</li>
+<li><span class="gate g4">G4</span> Khi đánh giá/khách hàng Requests hoặc diễn tập nội bộ → kích hoạt “bài diễn tập đánh giá 60 giây”.</li>
 </ul>
 <p><b>Owner vận hành:</b> QA/QMS điều phối chuẩn; Supervisor là người “đóng cổng kiểm soát” trên sàn; mỗi vai trò chịu trách nhiệm bằng chứng phần mình tạo ra.</p>
 </div>
@@ -155,9 +155,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Báo giá/Hợp đồng</b> (Người định giá (SAL-03))</td>
-<td>RFQ/PO, yêu cầu đặc biệt (spec, cert, công đoạn đặc biệt), yêu cầu lưu giữ</td>
-<td>01_Rfq-Hợp đồng đầy đủ + “yêu cầu đặc biệt” được bóc tách</td>
-<td><span class="gate g1">G1</span> Hợp đồng/PO &amp; yêu cầu kỹ thuật lưu đúng job; <b>không thiếu tham chiếu phiên bản</b></td>
+<td>RFQ/PO, Requests đặc biệt (spec, cert, công đoạn đặc biệt), Requests lưu giữ</td>
+<td>01_Rfq-Hợp đồng đầy đủ + “Requests đặc biệt” được bóc tách</td>
+<td><span class="gate g1">G1</span> Hợp đồng/PO &amp; Requests kỹ thuật lưu đúng job; <b>không thiếu tham chiếu phiên bản</b></td>
 </tr>
 <tr>
 <td><b>Kế hoạch</b> (Planner)</td>
@@ -167,15 +167,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Kỹ thuật/lập trình</b> (Lập trình viên (CNC)/Setup)</td>
-<td>Part/REV chủ / gốc (DWG/CAM/SPEC), yêu cầu thay đổi khi có</td>
+<td>Part/REV chủ / gốc (DWG/CAM/SPEC), Requests thay đổi khi có</td>
 <td>03_Programs-Setup: phát hành hồ sơ + phiếu cài đặt + link CAM chủ / gốc</td>
 <td><span class="gate g2">G2</span> “Phát hành chương trình” có bằng chứng; <b>không chạy chương trình chưa phát hành</b></td>
 </tr>
 <tr>
 <td><b>Mua hàng/Outsource</b> (Mua hàng)</td>
-<td>PO, nhà cung cấp phê duyệt, yêu cầu chứng chỉ</td>
+<td>PO, nhà cung cấp phê duyệt, Requests chứng chỉ</td>
 <td>06_Outsource: bộ hồ sơ gửi nhà cung cấp (điều phối xuất hàng gói hồ sơ) + cert + kế hoạch xác minh đầu vào</td>
-<td><span class="gate g3">G3</span> Công đoạn đặc biệt/outsource có chứng từ; truy vết lot/mẻ nấu (mẻ nấu (heat)) khi yêu cầu</td>
+<td><span class="gate g3">G3</span> Công đoạn đặc biệt/outsource có chứng từ; truy vết lot/mẻ nấu (mẻ nấu (heat)) khi Requests</td>
 </tr>
 <tr>
 <td><b>Nhận hàng/Kho</b> (Kho)</td>
@@ -186,12 +186,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Sản xuất</b> (Operator/Setup/Supervisor)</td>
 <td>Traveler, phiếu cài đặt, danh sách dao cụ, dụng cụ đo đã hiệu chuẩn</td>
-<td>Kiểm tra hồ sơ trong quá trình + ảnh chụp/label WIP</td>
+<td>Kiểm tra hồ sơ trong quá trình + Photos/label WIP</td>
 <td><span class="gate g2">G2</span> Xác minh Rev + gage trạng thái; <span class="gate g4">G4</span> Đánh giá diễn tập: gọi đúng bằng chứng trong 60s</td>
 </tr>
 <tr>
 <td><b>QC/QA</b> (QC/QA)</td>
-<td>Spec/FAI/IR yêu cầu, hiệu chuẩn list</td>
+<td>Spec/FAI/IR Requests, hiệu chuẩn list</td>
 <td>04_Inspection-FAI: IR/CMM/FAI + phê duyệt; NCR khi không đạt</td>
 <td><span class="gate g3">G3</span> “Hồ sơ đã khóa/đã ký”; hiệu chuẩn OK; NCR/MRB bằng chứng đủ</td>
 </tr>
@@ -235,7 +235,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Điểm kiểm soát</th>
 <th>Ai làm (Responsible Person)</th>
 <th>Khi nào</th>
-<th>Bằng chứng/MRR bắt buộc</th>
+<th>Evidence/MRR bắt buộc</th>
 <th>Fail → hành động</th>
 </tr>
 </thead>
@@ -251,7 +251,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>CP2 — Rev khớp / phù hợp kiểm tra</b></td>
 <td>Lập trình viên (CNC) + Supervisor</td>
 <td>Trước phát hành chương trình</td>
-<td>ảnh chụp màn hình/hồ sơ “PartRev khớp / phù hợp” + link DWG/CAM đúng Rev</td>
+<td>Photos màn hình/hồ sơ “PartRev khớp / phù hợp” + link DWG/CAM đúng Rev</td>
 <td>không khớp → <b>STOP</b> + báo cáo vượt cấp QA</td>
 </tr>
 <tr>
@@ -346,20 +346,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <!-- ===================================================== -->
-<h2 class="h2">8) Bảng kiểm vận hành (≤15 bước) — Responsible Person, Bằng chứng/MRR, “điểm sai hay gặp gặp”</h2>
+<h2 class="h2">8) Bảng kiểm vận hành (≤15 bước) — Responsible Person, Evidence/MRR, “điểm sai hay gặp gặp”</h2>
 <table class="table">
 <thead>
 <tr>
 <th>#</th>
 <th>Bước</th>
 <th>Responsible Person</th>
-<th>Bằng chứng/MRR bắt buộc</th>
+<th>Evidence/MRR bắt buộc</th>
 <th>Điểm sai hay gặp gặp</th>
 </tr>
 </thead>
 <tbody>
 <tr><td>1</td><td>Tạo Hồ sơ công việc theo template</td><td>Planner</td><td>Thư mục cấu trúc + siêu dữ liệu tối thiểu</td><td>Tạo sai Rev thư mục / đặt tên không có Rev</td></tr>
-<tr><td>2</td><td>Đính PO/RFQ + yêu cầu đặc biệt</td><td>Người định giá (SAL-03)</td><td>01_Rfq-Hợp đồng: PO/hợp đồng + đặc biệt yêu cầu</td><td>Yêu cầu cert/công đoạn đặc biệt bị “mất” trong email</td></tr>
+<tr><td>2</td><td>Đính PO/RFQ + Requests đặc biệt</td><td>Người định giá (SAL-03)</td><td>01_Rfq-Hợp đồng: PO/hợp đồng + đặc biệt Requests</td><td>Yêu cầu cert/công đoạn đặc biệt bị “mất” trong email</td></tr>
 <tr><td>3</td><td>Link Part/REV Bản gốc đúng Rev</td><td>Lập trình viên (CNC)</td><td>Link DWG/CAM/SPEC trong DATA (REV đúng)</td><td>Copy file vào job thay vì link → trùng &amp; sai Rev</td></tr>
 <tr><td>4</td><td>Lập &amp; phát hành chương trình</td><td>Lập trình viên (CNC)</td><td>Phát hành hồ sơ trong 03_Programs-Setup</td><td>Chạy NC “đang thử” chưa phát hành</td></tr>
 <tr><td>5</td><td>Setup sheet &amp; đầu tiên-off kiểm tra</td><td>Setup</td><td>Setup sheet ký + đầu tiên-off kết quả</td><td>Setup sheet lưu máy cá nhân; không ký</td></tr>
@@ -468,7 +468,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L3</b> (Dẫn dắt &amp; chặn lỗi)</td>
 <td>Chủ động kích hoạt hold khi thiếu bằng chứng; hướng dẫn người khác; đóng được “nhỏ / thu gọn cổng kiểm soát” trong phạm vi vai trò.</td>
 <td>Thực hiện 1 tình huống fail-nhanh thật hoặc mô phỏng, ra quyết định đúng + log đầy đủ.</td>
-<td>Được phép làm “người đi kèm (người đi kèm (buddy)) người đào tạo” cho L1–L2; lập yêu cầu CAPA.</td>
+<td>Được phép làm “người đi kèm (người đi kèm (buddy)) người đào tạo” cho L1–L2; lập Requests CAPA.</td>
 </tr>
 <tr>
 <td><b>L4</b> (Sở hữu hệ thống)</td>
@@ -508,9 +508,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Người định giá (SAL-03)</b></td>
-<td>01_Rfq-Hợp đồng: PO/hợp đồng; yêu cầu cert/công đoạn đặc biệt; yêu cầu lưu giữ; truyền đạt / giao tiếp log quan trọng</td>
-<td>Không khởi động khi thiếu yêu cầu đặc biệt &amp; tham chiếu phiên bản</td>
-<td>Diễn tập: gọi được PO + đặc biệt req trong ≤60s; không bỏ sót yêu cầu cert/bộ hồ sơ giao hàng</td>
+<td>01_Rfq-Hợp đồng: PO/hợp đồng; Requests cert/công đoạn đặc biệt; Requests lưu giữ; truyền đạt / giao tiếp log quan trọng</td>
+<td>Không khởi động khi thiếu Requests đặc biệt &amp; tham chiếu phiên bản</td>
+<td>Diễn tập: gọi được PO + đặc biệt req trong ≤60s; không bỏ sót Requests cert/bộ hồ sơ giao hàng</td>
 </tr>
 <tr>
 <td><b>Planner</b></td>
@@ -568,7 +568,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>EHS</b></td>
-<td>Bằng chứng an toàn liên quan khu vực lưu trữ/xử lý / vận chuyển; log sự cố (sự cố log) khi ảnh hưởng</td>
+<td>Evidence an toàn liên quan khu vực lưu trữ/xử lý / vận chuyển; log sự cố (sự cố log) khi ảnh hưởng</td>
 <td>STOP khi rủi ro an toàn khi xử lý vật tư/hoá chất/công đoạn đặc biệt</td>
 <td>Biết nơi lưu JSA/sự cố hồ sơ; phối hợp khi đánh giá hỏi về EHS bằng chứng</td>
 </tr>
@@ -595,14 +595,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>2</td><td>Đâu là “Nguồn chuẩn” cho time mục nhập (MES) theo chuẩn HESEM?</td><td><b>C</b> Epicor/MES</td></tr>
 <tr><td>3</td><td>Khi đánh giá hỏi “đúng Rev”, bằng chứng ưu tiên phải nằm ở đâu?</td><td><b>A</b> Link Part/REV Bản gốc (DATA) + phát hành hồ sơ</td></tr>
 <tr><td>4</td><td>File bằng chứng đặt tên đúng chuẩn phải có tối thiểu những thành phần nào?</td><td><b>D</b> JobNum/RecordType/Ngày/REV + mô tả ngắn</td></tr>
-<tr><td>5</td><td>Vì sao không PHẢI lưu ảnh chụp time mục nhập vào Hồ sơ công việc?</td><td><b>B</b> Trùng dữ liệu, dễ sai lệch; Epicor là nguồn đúng</td></tr>
+<tr><td>5</td><td>Vì sao không PHẢI lưu Photos time mục nhập vào Hồ sơ công việc?</td><td><b>B</b> Trùng dữ liệu, dễ sai lệch; Epicor là nguồn đúng</td></tr>
 <tr><td>6</td><td>(Vai trò‑cụ thể: Lập trình viên (CNC)) “Phát hành chương trình Hồ sơ” tối thiểu cần gì?</td><td><b>C</b> Người phát hành + ngày + tên file + phiên bản/REV</td></tr>
 <tr><td>7</td><td>(Vai trò‑cụ thể: QC) Khi phát hiện gage hết hạn hiệu chuẩn, hành động đúng là?</td><td><b>A</b> TẠM GIỮ đo lường, báo QC/Bảo trì, đánh giá ảnh hưởng</td></tr>
 <tr><td>8</td><td>Điều nào là dấu hiệu lẫn lộn rủi ro?</td><td><b>D</b> WIP không nhãn/nhãn thiếu JobNum/Rev</td></tr>
 <tr><td>9</td><td>Tier‑1 bằng chứng hay gặp gồm nhóm nào?</td><td><b>A</b> FAI/Final IR/CMM/Bộ hồ sơ giao hàng/CoC</td></tr>
 <tr><td>10</td><td>(Tình huống) Bạn mở Hồ sơ công việc nhưng không thấy thư mục 07_Shipping-Đóng gói. Bạn làm gì?</td><td><b>B</b> TẠM GIỮ/STOP ship, tạo đúng thư mục + báo cáo vượt cấp QA, ghi log</td></tr>
 <tr><td>11</td><td>(Tình huống) Có file IR nhưng nằm trong “tải xuống” máy cá nhân. Đúng hay sai?</td><td><b>C</b> Sai — phải upload vào Hồ sơ công việc đúng chỗ + khóa hồ sơ</td></tr>
-<tr><td>12</td><td>(Vai trò‑cụ thể: Kho) Chứng chỉ vật liệu (cert) phải khớp gì để dùng cho bộ hồ sơ giao hàng?</td><td><b>D</b> Lot/mẻ nấu (mẻ nấu (heat)) + part + yêu cầu PO</td></tr>
+<tr><td>12</td><td>(Vai trò‑cụ thể: Kho) Chứng chỉ vật liệu (cert) phải khớp gì để dùng cho bộ hồ sơ giao hàng?</td><td><b>D</b> Lot/mẻ nấu (mẻ nấu (heat)) + part + Requests PO</td></tr>
 <tr><td>13</td><td>Trong “bài diễn tập đánh giá 60 giây”, bước đầu tiên là gì?</td><td><b>A</b> Chốt JobNum/PartNum/Rev từ traveler/ERP</td></tr>
 <tr><td>14</td><td>(Tình huống) Kế hoạch nói “Rev chưa cập nhật nhưng cứ chạy”. Quyết định đúng?</td><td><b>A</b> STOP + báo cáo vượt cấp; không khớp Rev là cổng kiểm soát vi phạm</td></tr>
 <tr><td>15</td><td>Quy tắc ngôn ngữ đặt tên file theo chuẩn bằng chứng-đặt tên-bảng tóm tắt nhanh là?</td><td><b>B</b> Tiếng Anh chỉ / duy nhất, không dấu, ngày ISO 8601</td></tr>
@@ -610,7 +610,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>17</td><td>(Tình huống) CMM báo cáo có nhưng chưa ký/khóa. Có được ship không?</td><td><b>B</b> Không — hồ sơ chưa khóa = thiếu bằng chứng</td></tr>
 <tr><td>18</td><td>(Tình huống) Outsource công đoạn đặc biệt về nhưng thiếu cert. Làm gì?</td><td><b>A</b> TẠM GIỮ nhận hàng + gọi Mua hàng/QA; không nhập/không dùng</td></tr>
 <tr><td>19</td><td>Vì sao cần siêu dữ liệu (JobNum/Rev/RecordType) ngoài tên file?</td><td><b>D</b> Search, lưu giữ, và người xác nhận/cổng kiểm soát tự động hóa</td></tr>
-<tr><td>20</td><td>(Vai trò‑cụ thể: Supervisor) Khi diễn tập fail lặp lại, yêu cầu tối thiểu là?</td><td><b>C</b> OJT lại + CAPA hệ thống + cập nhật chuẩn khi cần</td></tr>
+<tr><td>20</td><td>(Vai trò‑cụ thể: Supervisor) Khi diễn tập fail lặp lại, Requests tối thiểu là?</td><td><b>C</b> OJT lại + CAPA hệ thống + cập nhật chuẩn khi cần</td></tr>
 <tr><td>21</td><td>(Tình huống) Đánh giá hỏi “NCR/MRB quyết định gì?” nhưng bạn chỉ có email. Đúng hay sai?</td><td><b>B</b> Sai — cần NCR gói hàng + MRB disposition/phê duyệt trong 05_NCR-Hold-CAPA</td></tr>
 <tr><td>22</td><td>(Tình huống) Bạn không tìm được bằng chứng trong 60 giây. Kết luận diễn tập?</td><td><b>A</b> FAIL (dù thực tế được đã làm)</td></tr>
 <tr><td>23</td><td>(Vai trò‑cụ thể: Operator) Khi WIP không nhãn, hành động đầu tiên?</td><td><b>C</b> TẠM GIỮ khu vực/WIP; dán nhãn; báo Supervisor</td></tr>
@@ -661,7 +661,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li><b>Tier‑1 (T1, lưu giữ 10Y, khai báo hồ sơ):</b> FAI gói hàng, Final IR, CMM báo cáo, Bộ hồ sơ giao hàng, CoC/Chứng chỉ, NCR/CAPA kết thúc / đóng (khi closed).</li>
 <li><b>Tier‑2 (T2, lưu giữ 5Y):</b> Nhận hàng IQC, Outsource bằng chứng/bộ hồ sơ gửi nhà cung cấp, xác minh đầu vào.</li>
-<li><b>Tier‑3 (T3, lưu giữ 3Y):</b> Vận hành ảnh chụp, nhanh các log hỗ trợ điều hành (không thay thế Tier‑1).</li>
+<li><b>Tier‑3 (T3, lưu giữ 3Y):</b> Vận hành Photos, nhanh các log hỗ trợ điều hành (không thay thế Tier‑1).</li>
 </ul>
 <h3>12.2 Tên chuẩn &amp; quy tắc đặt tên (theo bộ mẫu cấu hình (SSOT))</h3>
 <div class="mono-block">
@@ -685,7 +685,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol class="tight">
 <li><b>Không chứng minh được đúng Rev</b> (file Rev cũ/không có link Part/REV) → bắt buộc CP2, phát hành hồ sơ.</li>
 <li><b>Hồ sơ chưa ký/khóa</b> → QC/QA phải “khóa PDF” và gắn Tier‑1 label trước ship.</li>
-<li><b>Bằng chứng lưu sai chỗ</b> (PC cá nhân/email) → quy định “chỉ tính bằng chứng khi ở đúng thư viện”.</li>
+<li><b>Evidence lưu sai chỗ</b> (PC cá nhân/email) → quy định “chỉ tính bằng chứng khi ở đúng thư viện”.</li>
 <li><b>Thiếu bộ hồ sơ giao hàng</b> → phê duyệt giao hàng người xác nhận bắt buộc; thiếu 1 mục T1 là CHẶN.</li>
 <li><b>Truy xuất nguồn gốc đứt</b> (lot/mẻ nấu (mẻ nấu (heat)) không khớp cert) → Kho/Mua hàng phải chéo‑kiểm tra lot/mẻ nấu (mẻ nấu (heat)).</li>
 <li><b>Gage OOT</b> → CP4; log OOT + đánh giá ảnh hưởng + đo lại.</li>

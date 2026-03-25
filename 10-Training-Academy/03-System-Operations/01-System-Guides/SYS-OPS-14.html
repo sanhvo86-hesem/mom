@@ -119,10 +119,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <b>Khi mô-đun kích hoạt:</b>
 <ul>
-<li>Khi báo giá/rà soát hợp đồng cho part mới, CTQ mới, yêu cầu chứng chỉ đặc biệt, hoặc thời gian dẫn (lead time) căng.</li>
+<li>Khi báo giá/rà soát hợp đồng cho part mới, CTQ mới, Requests chứng chỉ đặc biệt, hoặc thời gian dẫn (lead time) căng.</li>
 <li>Khi phát hành program lần đầu hoặc thay đổi program/dao/đồ gá/phương pháp đo.</li>
 <li>Khi phát sinh NCR/sự cố suýt xảy ra (gần / suýt-thiếu / bỏ sót)/thoát / bỏ qua hoặc xu hướng KPI xấu đi.</li>
-<li>Khi thay đổi nhà cung cấp/thuê ngoài/công đoạn đặc biệt hoặc thay đổi yêu cầu khách hàng.</li>
+<li>Khi thay đổi nhà cung cấp/thuê ngoài/công đoạn đặc biệt hoặc thay đổi Requests khách hàng.</li>
 </ul>
 </div>
 </div>
@@ -145,8 +145,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Mua hàng</b></td><td>Chấm rủi ro nhà cung cấp/công đoạn đặc biệt; kiểm soát chứng chỉ; escalations khi thiếu CoC/CoA/quy trình cert.</td><td><b>L2</b> + tình huống PASS</td></tr>
 <tr><td><b>Planner</b></td><td>Nhìn rủi ro giao hàng/công suất; kích hoạt ưu tiên cổng kiểm soát cho rủi ro Cao/Nghiêm trọng; khóa lịch khi TẠM GIỮ.</td><td><b>L2</b> + bài kiểm tra nhanh ≥ 80%</td></tr>
 <tr><td><b>Bảo trì</b></td><td>Chặn rủi ro máy không đủ năng lực; phản ứng khi máy OOT; bảo vệ kế hoạch PM liên quan CTQ.</td><td><b>L2</b> + hiệu suất test PASS</td></tr>
-<tr><td><b>EHS</b></td><td>Chấm S cho rủi ro an toàn/hóa chất/điện/khí nén; yêu cầu STOP khi vi phạm an toàn.</td><td><b>L2</b> + tình huống PASS</td></tr>
-<tr><td><b>Người định giá (SAL-03)</b></td><td>Chặn rủi ro hợp đồng: rev/spec, chứng chỉ, yêu cầu đóng gói/ship; thông báo khách hàng khi TẠM GIỮ.</td><td><b>L2</b> + bài kiểm tra nhanh ≥ 80%</td></tr>
+<tr><td><b>EHS</b></td><td>Chấm S cho rủi ro an toàn/hóa chất/điện/khí nén; Requests STOP khi vi phạm an toàn.</td><td><b>L2</b> + tình huống PASS</td></tr>
+<tr><td><b>Người định giá (SAL-03)</b></td><td>Chặn rủi ro hợp đồng: rev/spec, chứng chỉ, Requests đóng gói/ship; thông báo khách hàng khi TẠM GIỮ.</td><td><b>L2</b> + bài kiểm tra nhanh ≥ 80%</td></tr>
 <tr><td><b>Supervisor</b></td><td>Thực thi ngưỡng hành động; quyết định TẠM GIỮ/CHẶN theo thẩm quyền; bảo đảm vòng kín MRR.</td><td><b>L3</b> + hiệu suất test PASS</td></tr>
 </tbody>
 </table>
@@ -178,8 +178,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>G1 Báo giá/Hợp đồng</b><br/><span class="muted">Responsible Person: Người định giá (SAL-03)</span></td>
-<td>Bản vẽ/Rev; yêu cầu spec; số lượng; yêu cầu chứng chỉ; yêu cầu đóng gói/ship</td>
-<td>Danh sách CTQ + yêu cầu chứng chỉ; rủi ro hợp đồng chấm S‑O‑D; quyết định chấp nhận/làm rõ</td>
+<td>Bản vẽ/Rev; Requests spec; số lượng; Requests chứng chỉ; Requests đóng gói/ship</td>
+<td>Danh sách CTQ + Requests chứng chỉ; rủi ro hợp đồng chấm S‑O‑D; quyết định chấp nhận/làm rõ</td>
 <td>MRR: mục nhập sổ đăng ký rủi ro + lưu file “rev‑đã xác nhận”<br/>STOP khi thiếu bản vẽ/Rev</td>
 </tr>
 <tr>
@@ -190,14 +190,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>G3 Kỹ thuật</b><br/><span class="muted">Responsible Person: Lập trình viên (CNC)</span></td>
-<td>CTQ list; mốc chuẩn (mốc chuẩn (datum)); yêu cầu hoàn thành; quy định đo</td>
+<td>CTQ list; mốc chuẩn (mốc chuẩn (datum)); Requests hoàn thành; quy định đo</td>
 <td>Phát hành chương trình bảng kiểm; mô phỏng/thí điểm log; cập nhật rủi ro program</td>
 <td>MRR: Phát hành chương trình hồ sơ<br/>CHẶN khi sai rev/program</td>
 </tr>
 <tr>
 <td><b>G4 Mua hàng</b><br/><span class="muted">Responsible Person: Mua hàng</span></td>
-<td>Yêu cầu vật liệu/chứng chỉ; yêu cầu outsource/công đoạn đặc biệt</td>
-<td>Supplier rủi ro chấm S‑O‑D; PO có luồng‑xuống / ngừng; yêu cầu CoC/CoA/quy trình cert</td>
+<td>Yêu cầu vật liệu/chứng chỉ; Requests outsource/công đoạn đặc biệt</td>
+<td>Supplier rủi ro chấm S‑O‑D; PO có luồng‑xuống / ngừng; Requests CoC/CoA/quy trình cert</td>
 <td>MRR: PO + nhà cung cấp bằng chứng<br/>hold khi thiếu chứng chỉ bắt buộc</td>
 </tr>
 <tr>
@@ -220,7 +220,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>G8 Đóng gói/Ship</b><br/><span class="muted">Responsible Person: Kho</span></td>
-<td>FQC pass; chứng chỉ; yêu cầu đóng gói; ship hướng dẫn</td>
+<td>FQC pass; chứng chỉ; Requests đóng gói; ship hướng dẫn</td>
 <td>phê duyệt giao hàng hồ sơ; bộ chứng từ giao hàng</td>
 <td>MRR: bộ hồ sơ giao hàng (ship gói hồ sơ) đủ<br/>CHẶN khi thiếu chứng chỉ</td>
 </tr>
@@ -236,7 +236,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 id="failpoints">4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế)</h2>
 <ol class="iso-list">
 <li><b>Sai Rev</b> tại RFQ/hợp đồng dẫn tới báo giá/plan sai.</li>
-<li><b>Không luồng‑xuống / ngừng</b> yêu cầu chứng chỉ/công đoạn đặc biệt vào PO.</li>
+<li><b>Không luồng‑xuống / ngừng</b> Requests chứng chỉ/công đoạn đặc biệt vào PO.</li>
 <li><b>Thiếu/nhầm mẻ nấu (mẻ nấu (heat))/lot</b> khi nhận vật liệu gây mất truy xuất nguồn gốc.</li>
 <li><b>Nhầm program</b> do tên file không chuẩn hoặc không khóa bản lỗi thời.</li>
 <li><b>Thiếu mô phỏng/thí điểm</b> cho đường chạy dao mới làm sự cố nghiêm trọng/dao gãy.</li>
@@ -297,7 +297,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>CP6 — Supplier/công đoạn đặc biệt control</b></td>
-<td>Mua hàng luồng‑xuống / ngừng yêu cầu; Nhận hàng kiểm chứng chứng chỉ; QA đánh giá nhà cung cấp khi rủi ro cao.</td>
+<td>Mua hàng luồng‑xuống / ngừng Requests; Nhận hàng kiểm chứng chứng chỉ; QA đánh giá nhà cung cấp khi rủi ro cao.</td>
 <td>PO/Nhận hàng gói hồ sơ + quy trình cert/CoC/CoA scan</td>
 <td>Thiếu chứng chỉ bắt buộc → CHẶN ship</td>
 </tr>
@@ -538,17 +538,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="width:50px">#</th>
 <th>Bước</th>
 <th style="width:160px">Responsible Person</th>
-<th style="width:240px">Bằng chứng/MRR</th>
+<th style="width:240px">Evidence/MRR</th>
 <th style="width:220px">Điểm sai hay gặp</th>
 </tr>
 </thead>
 <tbody>
 <tr><td>1</td><td>Xác nhận đúng Rev/spec (bản vẽ–traveler–program–PO)</td><td>Người định giá (SAL-03) + Lập trình viên (CNC)</td><td>“Rev‑đã xác nhận” log + bản vẽ rev</td><td>Dùng bản in cũ; program không đồng bộ</td></tr>
-<tr><td>2</td><td>Trích CTQ + yêu cầu chứng chỉ/công đoạn đặc biệt</td><td>Người định giá (SAL-03) + QA</td><td>CTQ list + Sổ đăng ký rủi ro mục nhập</td><td>Bỏ sót yêu cầu ghi chú/hoàn thành</td></tr>
+<tr><td>2</td><td>Trích CTQ + Requests chứng chỉ/công đoạn đặc biệt</td><td>Người định giá (SAL-03) + QA</td><td>CTQ list + Sổ đăng ký rủi ro mục nhập</td><td>Bỏ sót Requests ghi chú/hoàn thành</td></tr>
 <tr><td>3</td><td>Chấm S‑O‑D theo nguyên nhân–sự kiện–tác động</td><td>Responsible Person Rủi ro</td><td>FRM‑QMS‑005</td><td>Chấm theo cảm giác; không viết nguyên nhân</td></tr>
 <tr><td>4</td><td>Áp ngưỡng hành động và quyết định GO/TẠM GIỮ/CHẶN</td><td>Supervisor + QA</td><td>Log quyết định + chữ ký</td><td>Không ghi lý do; không ghi Responsible Person</td></tr>
 <tr><td>5</td><td>Thiết kế control tại đúng cổng kiểm soát (phát hành chương trình, setup/FAI, nhận hàng, ship)</td><td>Quy trình Owner</td><td>Bảng kiểm/cổng kiểm soát plan cập nhật</td><td>Đặt control sai chỗ; thiếu MRR</td></tr>
-<tr><td>6</td><td>Luồng‑xuống / ngừng yêu cầu vào PO &amp; nhà cung cấp (khi outsource/công đoạn đặc biệt)</td><td>Mua hàng</td><td>PO + yêu cầu chứng chỉ</td><td>PO thiếu luồng‑xuống / ngừng; thiếu spec</td></tr>
+<tr><td>6</td><td>Luồng‑xuống / ngừng Requests vào PO &amp; nhà cung cấp (khi outsource/công đoạn đặc biệt)</td><td>Mua hàng</td><td>PO + Requests chứng chỉ</td><td>PO thiếu luồng‑xuống / ngừng; thiếu spec</td></tr>
 <tr><td>7</td><td>Nhận hàng: xác nhận truy xuất nguồn gốc &amp; chứng từ</td><td>Kho</td><td>Nhận hàng hồ sơ + scan chứng từ</td><td>Lẫn lô; thiếu mẻ nấu (mẻ nấu (heat))/lot</td></tr>
 <tr><td>8</td><td>Phát hành chương trình: đặt tên chuẩn + khóa bản lỗi thời + thí điểm/chạy thử khô (dry run)</td><td>Lập trình viên (CNC)</td><td>Phát hành hồ sơ + FRM‑QMS‑008</td><td>File trùng tên; không khóa bản cũ</td></tr>
 <tr><td>9</td><td>Setup/đầu tiên‑chi tiết / sản phẩm: xác nhận mốc chuẩn (mốc chuẩn (datum))/bù trừ (bù trừ (offset))/danh sách dao cụ</td><td>Setup</td><td>Setup ký‑off + ảnh setup</td><td>Mốc chuẩn (mốc chuẩn (datum)) sai; nhầm dao/bù trừ (bù trừ (offset))</td></tr>
@@ -682,7 +682,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>5) Phối hợp liên phòng ban</b></td>
-<td>Báo cáo khi được yêu cầu</td>
+<td>Báo cáo khi được Requests</td>
 <td>Báo đúng kênh; đủ thông tin; vòng kín</td>
 <td>Điều phối xử lý rủi ro Cao/Nghiêm trọng</td>
 <td>Dẫn dắt rà soát rủi ro cấp hệ thống; đưa vào MR</td>
@@ -722,7 +722,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Nêu 3 ví dụ cơ hội (cơ hội) được chấp nhận khi vẫn bảo vệ CTQ.</li>
 <li>Điền 3 trường bắt buộc trong sổ đăng ký rủi ro để đánh giá không fail.</li>
 </ol>
-<h3 class="h3">10.2 Tình huống (&gt;=3 tình huống thật; yêu cầu TẠM GIỮ/GO + ghi MRR)</h3>
+<h3 class="h3">10.2 Tình huống (&gt;=3 tình huống thật; Requests TẠM GIỮ/GO + ghi MRR)</h3>
 <div class="card">
 <h4 style="margin-top:0">Tình huống 1 — Sai Rev giữa bản vẽ và traveler</h4>
 <ul>
@@ -734,7 +734,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h4 style="margin-top:0">Tình huống 2 — Out source xi mạ anốt (xi mạ anốt (anodize)) thiếu quy trình cert</h4>
 <ul>
-<li><b>Dữ kiện:</b> PO có yêu cầu xi mạ anốt (xi mạ anốt (anodize)); Nhận hàng nhận hàng về có CoC chung, không có quy trình cert; khách yêu cầu cert kèm ship.</li>
+<li><b>Dữ kiện:</b> PO có Requests xi mạ anốt (xi mạ anốt (anodize)); Nhận hàng nhận hàng về có CoC chung, không có quy trình cert; khách Requests cert kèm ship.</li>
 <li><b>Yêu cầu:</b> Quyết định TẠM GIỮ/CHẶN ship; xác định bước truy hồi chứng chỉ; cập nhật rủi ro nhà cung cấp theo S‑O‑D.</li>
 <li><b>Kết quả PASS:</b> CHẶN ship; truy hồi quy trình cert; cập nhật sổ đăng ký rủi ro + hành động Responsible Person/ngày đến hạn; phê duyệt giao hàng chỉ khi đủ gói hồ sơ.</li>
 </ul>
@@ -761,7 +761,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td>Trích CTQ &amp; yêu cầu chứng chỉ</td>
+<td>Trích CTQ &amp; Requests chứng chỉ</td>
 <td>CTQ list đầy đủ; không bỏ sót ghi chú/hoàn thành/truy vết</td>
 <td>CTQ list + link bản vẽ rev</td>
 </tr>
