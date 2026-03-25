@@ -346,9 +346,10 @@ pre, code { overflow-wrap: anywhere; word-break: break-word; }
   @page :first { margin-top: 10mm; }
 
   /* ── Container: no decorations ── */
-  .container { max-width: 100%; padding: 0; margin: 0; }
-  .page { border-radius: 0; box-shadow: none; border: none; margin: 0; padding: 0; }
-  .page-body { padding: 8px 0 0; }
+  .container { max-width: 100%; padding: 0; margin: 0; overflow: visible !important; height: auto !important; }
+  .page { border-radius: 0; box-shadow: none; border: none; margin: 0; padding: 0; overflow: visible !important; height: auto !important; }
+  .page-body { padding: 8px 0 0; overflow: visible !important; height: auto !important; }
+  .doc-content, .form-sheet { overflow: visible !important; height: auto !important; }
 
   /* ── Form Header: SAME layout as screen ── */
   .form-header {
