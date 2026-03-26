@@ -67,7 +67,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  
 <div class="section"><h2>1. Mục đích, phạm vi và logic lô kiểm</h2>
 <p>WI này hướng dẫn lấy mẫu AQL và quyết định chấp nhận/từ chối lô theo kiểm tra by thuộc tính. AQL dùng để ra quyết định với <strong>lô</strong>, không dùng thay cho kiểm soát quá trình và không được dùng để hợp thức hóa lô có khuyết tật quan trọng / nghiêm trọng. Kế hoạch lấy mẫu chỉ được chọn từ bảng tra đã được HESEM kiểm soát; không chụp, chép hoặc tự dựng bảng rời ngoài hệ thống.</p>
-<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Giữ nguyên lấy mẫu plan Released, lấy mẫu ngẫu nhiên đại diện và tách biệt từng lot theo part, phiên bản, mẻ nấu (heat) và quy trình trạng thái.</div></div>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Giữ nguyên lấy mẫu plan Released, lấy mẫu nMẫu nhiên đại diện và tách biệt từng lot theo part, phiên bản, mẻ nấu (heat) và quy trình trạng thái.</div></div>
 
 <div class="section"><h2>2. Điều kiện trước khi lấy mẫu</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điều kiện</th><th>Phải có</th><th>hold khi</th></tr></thead><tbody>
@@ -81,7 +81,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-list">
 <div class="step-item"><strong>Chốt lot và đơn vị kiểm.</strong><br/>Ghi rõ lot size, kiểm tra unit, QPL/customer level, trạng thái normal/tightened/reduced và nguồn plan sử dụng.</div>
 <div class="step-item"><strong>Tra cỡ mẫu và Ac/Re.</strong><br/>Tra theo lot size và kiểm tra level trong bảng đã phê duyệt. Nếu lot nhỏ hoặc customer chỉ định 100% thì không dùng AQL để giảm mẫu.</div>
-<div class="step-item"><strong>Lấy mẫu ngẫu nhiên.</strong><br/>Mẫu phải rải đều qua toàn lô hoặc toàn kiện; không lấy liên tiếp trong một khay duy nhất nếu lot phân bố nhiều vị trí/thời điểm. Với lot có nhiều pallet/box/khay, phải có quy tắc random hóa từng tầng chứa.</div>
+<div class="step-item"><strong>Lấy mẫu nMẫu nhiên.</strong><br/>Mẫu phải rải đều qua toàn lô hoặc toàn kiện; không lấy liên tiếp trong một khay duy nhất nếu lot phân bố nhiều vị trí/thời điểm. Với lot có nhiều pallet/box/khay, phải có quy tắc random hóa từng tầng chứa.</div>
 <div class="step-item"><strong>Kiểm và ghi defect.</strong><br/>Kiểm theo plan, phân loại defect từng chiếc, từng loại. Không được cộng dồn mơ hồ. Defect critical tách riêng khỏi major/minor.</div>
 <div class="step-item"><strong>Quyết định accept/reject.</strong><br/>So defect count với Ac/Re; reject lô khi vượt Re hoặc khi xuất hiện bất kỳ critical defect thuộc rule zero acceptance. Nếu plan nhiều bước yêu cầu sample tiếp theo, phải tuân đúng logic.</div>
 <div class="step-item"><strong>Xử lý sau quyết định.</strong><br/>Accept thì release lô theo cổng kiểm soát tương ứng. Reject thì giữ lô, mở containment/NCR nếu cần và xác định hướng 100% sort/rework/reinspect dưới quyền QA.</div>
@@ -90,7 +90,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="section"><h2>4. chuyển đổi quy tắc, kiểm tra lại và lỗi thường gặp</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Quy định HESEM</th></tr></thead><tbody>
 <tr><td>bình thường → siết chặt / thắt chặt</td><td>Chuyển khi có từ chối liên tiếp, khiếu nại, khuyết tật xu hướng xấu hoặc QPL/khách hàng Requests tăng cường.</td></tr>
-<tr><td>siết chặt / thắt chặt → giảm</td><td>Chỉ giảm khi có lịch sử ổn định đủ dài và không có mở vấn đề; không áp dụng cho Job mới, Job cao-rủi ro, clean/chân không hoặc sau ngăn chặn gần đây.</td></tr>
+<tr><td>siết chặt / thắt chặt → giảm</td><td>Chỉ giảm khi có lịch sử ổn định đủ dài và không có mở vấn đề; không áp dụng cho Job mới, Job cao-rủi ro, clean/chân không hoặc sau ngăn chặn Cần đây.</td></tr>
 <tr><td>kiểm tra lại sau làm lại/sort</td><td>QA phải xác định lại lot ranh giới và plan mới; không mặc định dùng lại y nguyên mẫu cũ.</td></tr>
 <tr><td>Hỗn hợp khuyết tật loại</td><td>Quan trọng/lớn / nghiêm trọng/nhỏ / không nghiêm trọng phải đếm riêng theo plan áp dụng; không bù trừ giữa các mức.</td></tr>
 <tr><td>Lấy mẫu sai lệch hệ thống</td><td>Nếu phát hiện sai lệch hệ thống mẫu, kết quả kiểm vô hiệu; phải TẠM GIỮ và lấy mẫu lại.</td></tr>
@@ -99,7 +99,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>5. Hồ sơ, KPI và liên kết</h2>
 <div class="two-col">
-<div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Lot definition, lot size, source plan, switching trạng thái.</li><li>Sample size, cách random hóa, defect count theo class.</li><li>Ac/Re decision, người kiểm, thời điểm, lệnh tạm giữ/phê duyệt nếu có.</li><li>Liên kết NCR/100% sort/reinspection khi reject.</li></ul></div>
+<div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Lot definition, lot size, source plan, switching trạng thái.</li><li>Sample size, cách random hóa, defect count theo class.</li><li>Ac/Re decision, nNgười kiểm, thời điểm, lệnh tạm giữ/phê duyệt nếu có.</li><li>Liên kết NCR/100% sort/reinspection khi reject.</li></ul></div>
 <div class="card"><h3>HOLD bắt buộc</h3><ul class="tight" style="padding-left:18px;"><li>Không xác định được lot boundary hoặc mixed lot.</li><li>Không xác định được plan hiệu lực.</li><li>Measurement system nghi ngờ hoặc defect class còn tranh cãi.</li><li>Phát hiện critical defect hoặc dấu hiệu sample bias.</li></ul></div>
 </div>
 <div class="kpi-grid">

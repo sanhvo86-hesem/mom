@@ -45,7 +45,7 @@
  </div>
 </div>
 
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết lập hoặc vận hành đường đi bắt buộc cho source của bộ tài liệu HESEM: SharePoint local synced working copy, Git version history, server deployment, reverse sync và boundary với runtime data. Cách gọi cũ “ShareFile” trong bộ tài liệu legacy được hiểu là <b>SharePoint-synced local working copy</b>.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết lập hoặc vận hành đường đi bắt buộc cho source của bộ tài liệu HESEM: SharePoint local synced working copy, Git version history, server deployment, reverse sync và boundary với runtime data. Cách Mọi cũ “ShareFile” trong bộ tài liệu legacy được hiểu là <b>SharePoint-synced local working copy</b>.</div>
  <h1>WI-107 - M365 SharePoint local sync, Git và server deployment control</h1>
 
  <div class="section">
@@ -73,7 +73,7 @@
  <tbody>
  <tr><td>SharePoint site/library</td><td><span class="code">HESEM-Digital-Control / 10-QMS-Source-Control</span> đã tồn tại theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a>.</td></tr>
  <tr><td>Endpoint</td><td>Máy local đã được IT phê duyệt để sync source library.</td></tr>
- <tr><td>Git remote</td><td>Remote repository đã được tạo và cấp quyền push/pull đúng người dùng.</td></tr>
+ <tr><td>Git remote</td><td>Remote repository đã được tạo và cấp quyền push/pull đúng nNgười dùng.</td></tr>
  <tr><td>Server operator</td><td>Tài khoản deploy có quyền pull repo và chạy smoke test.</td></tr>
  <tr><td>Runtime boundary</td><td>.gitignore và runtime path exclusions đã được xác nhận theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>.</td></tr>
  </tbody>
@@ -95,7 +95,7 @@
  <div class="path">C:\HESEM-Git\qms.hesem.com.vn.git\</div>
  </div>
  </div>
- <div class="keyline"><strong>Rule cứng:</strong> không để <span class="code">.git</span> trong thư mục SharePoint sync. Không sync source library trên máy không được đăng ký. Không cho nhiều người cùng dùng chung một local worktree.</div>
+ <div class="keyline"><strong>Rule cứng:</strong> không để <span class="code">.git</span> trong thư mục SharePoint sync. Không sync source library trên máy không được đăng ký. Không cho nhiều nNgười cùng dùng chung một local worktree.</div>
  </div>
 
  <div class="section">
@@ -105,7 +105,7 @@
  <ol>
  <li>Đăng nhập OneDrive bằng tài khoản công ty được cấp quyền.</li>
  <li>Mở <span class="code">10-QMS-Source-Control</span> và chọn <span class="code">Sync</span>.</li>
- <li>Xác nhận thư mục local xuất hiện đúng dưới profile người dùng.</li>
+ <li>Xác nhận thư mục local xuất hiện đúng dưới profile nNgười dùng.</li>
  </ol>
  </div>
  <div class="step-box">

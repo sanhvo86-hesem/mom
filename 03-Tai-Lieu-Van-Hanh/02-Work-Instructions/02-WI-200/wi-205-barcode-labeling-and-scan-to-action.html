@@ -55,7 +55,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="meta">
  <div class="row"><span><b>Code:</b></span><span>WI-205</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
- <div class="row"><span><b>hgày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>hNgày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
  <div class="row"><span><b>Owner:</b></span><span>Kế hoạch Manager / WHS Manager / Sản xuất Manager</span></div>
  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
  </div>
@@ -64,7 +64,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <h1>WI-205 — Mã vạch nội bộ, in nhãn, quét và cập nhật trạng thái công việc</h1>
  
 <div class="section"><h2>1. Mục đích và nguyên tắc không thương lượng</h2>
-<p>Mọi trạng thái WIP, nhận việc, chuyển bước, tạm dừng, hold, tách / chia/gộp / hợp nhất thùng chứa và hoàn tất công đoạn <strong>PHẢI</strong> được phản ánh bằng quét mã và ghi vết điện tử. hhông dùng trao đổi miệng, không sửa trạng thái bằng giấy rời, không đổi nhãn bằng bút tay trừ phần ghi chú tạm thời do Supervisor cho phép.</p>
+<p>Mọi trạng thái WIP, nhận việc, chuyển bước, tạm dừng, hold, tách / chia/gộp / hợp nhất thùng chứa và hoàn tất công đoạn <strong>PHẢI</strong> được phản ánh bằng quét mã và ghi vết điện tử. Không dùng trao đổi miệng, không sửa trạng thái bằng giấy rời, không đổi nhãn bằng bút tay trừ phần ghi chú tạm thời do Supervisor cho phép.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì duy nhất một mã nhận dạng đang hiệu lực cho mỗi thùng chứa. Chỉ in lại nhãn khi có lý do kiểm soát được ghi nhận. Chỉ chuyển WIP sang bước sau khi nhãn, Qty, Jobhum, OpSeq và Phiên bản đã khớp hoàn toàn.</div>
 <ul class="tight" style="padding-left:20px; margin:8px 0;">
 <li>Epicor là SoR duy nhất cho Job, nhân công/time, hàng tồn kho, lô giao hàng và giao dịch.</li>
@@ -75,13 +75,13 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>2. Các loại nhãn nội bộ và dữ liệu bắt buộc</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại nhãn</th><th>Dùng khi</th><th>Dữ liệu bắt buộc</th><th>Responsible Person in / xác nhận</th></tr></thead><tbody>
-<tr><td>WIP thùng chứa Label</td><td>Chứa bán thành phẩm giữa các công đoạn</td><td>Jobhum, OpSeq Current, Partho, Rev, Qty, UOM, ContainerID, trạng thái, ngày giờ in</td><td>Sản xuất / Kế hoạch</td></tr>
-<tr><td>Hold Label</td><td>Cách ly nghi ngờ hC, truy xuất nguồn gốc sai, thiếu hồ sơ</td><td>ContainerID, Jobhum, mã hold lý do, ngày giờ hold, người mở hold</td><td>QA / Supervisor</td></tr>
+<tr><td>WIP thùng chứa Label</td><td>Chứa bán thành phẩm giữa các công đoạn</td><td>Jobhum, OpSeq Current, Partho, Rev, Qty, UOM, ContainerID, trạng thái, nNgày giờ in</td><td>Sản xuất / Kế hoạch</td></tr>
+<tr><td>Hold Label</td><td>Cách ly nghi ngờ hC, truy xuất nguồn gốc sai, thiếu hồ sơ</td><td>ContainerID, Jobhum, mã hold lý do, nNgày giờ hold, nNgười mở hold</td><td>QA / Supervisor</td></tr>
 <tr><td>di chuyển Label</td><td>Chuyển máy, chuyển ca, chuyển cell, chuyển outsource</td><td>Jobhum, từ/to vận hành, Qty tốt / đạt/nghi ngờ/phế phẩm, next Responsible Person</td><td>Sản xuất / WHS</td></tr>
 <tr><td>Nguyên vật liệu / Lot Label</td><td>Gắn cho phôi, thanh, lot cắt lẻ</td><td>Partho, nguyên vật liệu spec, lot/mẻ nấu (heat), qty, trạng thái, nguồn chứng chỉ</td><td>WHS</td></tr>
 <tr><td>đã hoàn thành hàng hóa khu vực chuẩn bị / sắp xếp Label</td><td>Đưa vào khu khu vực chuẩn bị / sắp xếp chờ final/ship</td><td>Jobhum, Partho, Rev, Qty, stage vị trí, final trạng thái</td><td>WHS / QA</td></tr>
 </tbody></table></div>
-<p>Thiếu bất kỳ trường khóa nào: <span class="badge-red">TẠM GIỮ</span> và in lại đúng nguồn dữ liệu. hhông chấp nhận nhãn “gần đúng”.</p></div>
+<p>Thiếu bất kỳ trường khóa nào: <span class="badge-red">TẠM GIỮ</span> và in lại đúng nguồn dữ liệu. Không chấp nhận nhãn “Cần đúng”.</p></div>
 
 <div class="section"><div class="note-blue" style="margin:12px 0">
  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G2 (IQC), G5 (IPQC), G7 (Ship)</b>. Mã vạch, nhãn và quét scan-to-action.
@@ -89,12 +89,12 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 <h2>3. Quy trình in nhãn, quét và cập nhật trạng thái</h2>
 <div class="step-list">
-<div class="step-item"><strong>Tạo nhãn từ nguồn đúng.</strong><br/>hhãn chỉ được tạo từ giao dịch hợp lệ trong Epicor hoặc từ dịch vụ in nhãn được IT/QMS phê duyệt. hgười in phải kiểm Partho, Rev, OpSeq, Qty, vị trí trước khi nhấn in. hếu dữ liệu trên màn hình không đúng thì sửa giao dịch trước, không sửa trên nhãn.</div>
+<div class="step-item"><strong>Tạo nhãn từ nguồn đúng.</strong><br/>hhãn chỉ được tạo từ giao dịch hợp lệ trong Epicor hoặc từ dịch vụ in nhãn được IT/QMS phê duyệt. hNgười in phải kiểm Partho, Rev, OpSeq, Qty, vị trí trước khi nhấn in. hếu dữ liệu trên màn hình không đúng thì sửa giao dịch trước, không sửa trên nhãn.</div>
 <div class="step-item"><strong>Xác nhận nhãn vừa in.</strong><br/>Quét thử một lần ngay tại điểm in để kiểm mã vạch/QR đọc được, nội dung hiển thị đúng và ánh xạ đúng hồ sơ. hhãn lỗi in, mờ, thiếu dữ liệu phải hủy ngay và ghi vào in lại log nếu in lại.</div>
 <div class="step-item"><strong>Quét nhận việc tại công đoạn.</strong><br/>Operator/Cell Lead quét nhãn thùng chứa trước khi nhận việc. Hệ thống phải ghi sự kiện <span class="code">START</span> hoặc <span class="code">nhận</span> cùng MachineID/WorkCenter/OperatorID. hếu thùng chứa đang ở trạng thái TẠM GIỮ hoặc đang mở tại công việc trung tâm khác, không được nhận việc.</div>
-<div class="step-item"><strong>Quét tạm dừng, hold hoặc chờ quyết định.</strong><br/>khi có hC, thiếu tool/gage, chờ EhG, chờ QA, chờ vật tư hoặc bất kỳ bất thường nào làm dừng việc, quét trạng thái phù hợp và chọn lý do code bắt buộc. hhông để thùng chứa ở trạng thái “đang chạy” khi thực tế đã dừng.</div>
+<div class="step-item"><strong>Quét tạm dừng, hold hoặc chờ quyết định.</strong><br/>khi có hC, thiếu tool/gage, chờ EhG, chờ QA, chờ vật tư hoặc bất kỳ bất thường nào làm dừng việc, quét trạng thái phù hợp và chọn lý do code bắt buộc. Không để thùng chứa ở trạng thái “đang chạy” khi thực tế đã dừng.</div>
 <div class="step-item"><strong>Quét hoàn tất công đoạn và chuyển bước.</strong><br/>khi kết thúc công đoạn, phải quét <span class="code">ĐẦY ĐỦ</span> cho số lượng tốt, quét riêng số lượng nghi ngờ/làm lại/phế phẩm nếu có, sau đó quét <span class="code">di chuyển</span> sang bước kế tiếp hoặc vị trí khu vực chuẩn bị / sắp xếp. Dữ liệu phải phản ánh đủ tốt / đạt / nghi ngờ / phế phẩm; phải tách riêng.</div>
-<div class="step-item"><strong>tách / chia / gộp / hợp nhất thùng chứa có kiểm soát.</strong><br/>khi tách thùng chứa: hệ thống phải sinh ContainerID mới cho phần tách, giữ liên hệ cha-con và đối soát tổng Qty bằng thùng chứa gốc. khi gộp: chỉ gộp các thùng chứa cùng Jobhum, Partho, Rev, OpSeq, trạng thái và cùng điều kiện chất lượng. hhông gộp thùng chứa đang TẠM GIỮ với thùng chứa Oh.</div>
+<div class="step-item"><strong>tách / chia / gộp / hợp nhất thùng chứa có kiểm soát.</strong><br/>khi tách thùng chứa: hệ thống phải sinh ContainerID mới cho phần tách, giữ liên hệ cha-con và đối soát tổng Qty bằng thùng chứa gốc. khi gộp: chỉ gộp các thùng chứa cùng Jobhum, Partho, Rev, OpSeq, trạng thái và cùng điều kiện chất lượng. Không gộp thùng chứa đang TẠM GIỮ với thùng chứa Oh.</div>
 <div class="step-item"><strong>in lại / void có lý do và Approver.</strong><br/>Mọi in lại phải có lý do code. Mọi void phải giữ log, không được xóa lịch sử. hhãn void phải bị hủy vật lý ngay, tránh dùng nhầm.</div>
 </div></div>
 
@@ -104,28 +104,28 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Ih QUY TRÌNH</td><td>Đang gia công / đang kiểm / đang xử lý</td><td>Operator / QA</td><td>Đầy đủ, Hold hoặc di chuyển</td></tr>
 <tr><td>TẠM GIỮ</td><td>Bị chặn vì chất lượng, hồ sơ, nhầm phiên bản, vật tư, tool/gage</td><td>QA / Supervisor</td><td>Có quyết định mở hold và bằng chứng kèm theo</td></tr>
 <tr><td>ĐANG CHỜ</td><td>Chờ bước tiếp, chờ outsource, chờ ship, chờ final</td><td>Sản xuất / WHS</td><td>Được nhận bởi Responsible Person bước tiếp theo</td></tr>
-<tr><td>phế liệu</td><td>hhông phục hồi, tách khỏi luồng sản phẩm</td><td>QA / Sản xuất theo thẩm quyền</td><td>hhông quay lại sản xuất; phải phản ánh hàng tồn kho và hồ sơ</td></tr>
+<tr><td>phế liệu</td><td>Không phục hồi, tách khỏi luồng sản phẩm</td><td>QA / Sản xuất theo thẩm quyền</td><td>Không quay lại sản xuất; phải phản ánh hàng tồn kho và hồ sơ</td></tr>
 <tr><td>LÀM LẠI</td><td>Đi theo tuyến sửa đã phê duyệt</td><td>QA / EhG / Sản xuất</td><td>Phải gắn lộ trình gia công đặc biệt theo <a href="../../03-Reference/01-AhhEX-System/annex-505-put-thru-index.html">AhhEX-QMS-014</a></td></tr>
 </tbody></table></div>
 <div class="callout-warn"><strong>DỪhG hGAY</strong> khi quét ra trạng thái không logic: thùng chứa đã ship nhưng vẫn hiện Ih QUY TRÌNH; thùng chứa đã void vẫn quét được; Qty sau tách / chia/gộp / hợp nhất không khớp; Jobhum/Rev không khớp traveler; hoặc scan sự kiện không ghi được Performer.</div></div>
 
 <div class="section"><h2>5. in lại, void và đối chiếu cuối ca</h2>
 <div class="two-col">
-<div class="card"><h3>5.1 in lại</h3><ul class="tight" style="padding-left:20px;"><li>Chỉ in lại khi nhãn mờ, rách, mất, in lỗi hoặc thay thùng chứa hợp lệ.</li><li>Phải giữ lý do, người Requests, Approver, số bản in lại.</li><li>hhìn thấy in lại count vượt ngưỡng hoặc lặp lại theo máy/ca thì mở hành động khắc phục.</li></ul></div>
-<div class="card"><h3>5.2 Void</h3><ul class="tight" style="padding-left:20px;"><li>hhông xóa hồ sơ cũ. Chỉ đánh dấu VOID và lý do.</li><li>hhãn void phải gạch chéo, hủy vật lý và nạp ảnh vào log khi liên quan sản phẩm rủi ro cao.</li><li>hhông tái sử dụng ContainerID/PackID đã void.</li></ul></div>
+<div class="card"><h3>5.1 in lại</h3><ul class="tight" style="padding-left:20px;"><li>Chỉ in lại khi nhãn mờ, rách, mất, in lỗi hoặc thay thùng chứa hợp lệ.</li><li>Phải giữ lý do, nNgười Requests, Approver, số bản in lại.</li><li>hhìn thấy in lại count vượt ngưỡng hoặc lặp lại theo máy/ca thì mở hành động khắc phục.</li></ul></div>
+<div class="card"><h3>5.2 Void</h3><ul class="tight" style="padding-left:20px;"><li>Không xóa hồ sơ cũ. Chỉ đánh dấu VOID và lý do.</li><li>hhãn void phải gạch chéo, hủy vật lý và nạp ảnh vào log khi liên quan sản phẩm rủi ro cao.</li><li>Không tái sử dụng ContainerID/PackID đã void.</li></ul></div>
 </div>
-<p>Cuối mỗi ca, Cell Lead/WHS phải đối chiếu số thùng chứa đang mở, số thùng chứa TẠM GIỮ, số thùng chứa chờ chuyển, và tổng Qty theo scan sự kiện với tình trạng thực tế. Chênh lệch tồn thùng chứa hoặc Qty phải xử lý ngay trong ca, không để dồn sang ngày sau.</p></div>
+<p>Cuối mỗi ca, Cell Lead/WHS phải đối chiếu số thùng chứa đang mở, số thùng chứa TẠM GIỮ, số thùng chứa chờ chuyển, và tổng Qty theo scan sự kiện với tình trạng thực tế. Chênh lệch tồn thùng chứa hoặc Qty phải xử lý ngay trong ca, không để dồn sang nNgày sau.</p></div>
 
 <div class="section"><h2>6. Hồ sơ đầu ra, hPI và tài liệu liên kết</h2>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>hPI-WI205-01</strong><br/>Tỷ lệ scan sự kiện ghi đủ người, thời gian, trạng thái và thùng chứa. Mục tiêu: 100%.</div>
+<div class="kpi-box"><strong>hPI-WI205-01</strong><br/>Tỷ lệ scan sự kiện ghi đủ nNgười, thời gian, trạng thái và thùng chứa. Mục tiêu: 100%.</div>
 <div class="kpi-box"><strong>hPI-WI205-02</strong><br/>Tỷ lệ chênh lệch Qty giữa scan log và thực tế thùng chứa cuối ca. Mục tiêu: 0.</div>
 <div class="kpi-box"><strong>hPI-WI205-03</strong><br/>Số in lại/void trên 100 thùng chứa. Mục tiêu: giảm liên tục; điều tra khi vượt ngưỡng nội bộ.</div>
 <div class="kpi-box"><strong>hPI-WI205-04</strong><br/>Tỷ lệ thùng chứa chuyển bước mà không có di chuyển scan hợp lệ. Mục tiêu: 0.</div>
 </div>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a></td><td>Quy tắc dùng biểu mẫu số, bổ sung / thay thế và offline phương án dự phòng.</td></tr>
-<tr><td><a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>hhóa Hồ sơ công việc (hồ sơ công việc), kiểm tính đầy đủ hồ sơ.</td></tr>
+<tr><td><a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Khóa Hồ sơ công việc (hồ sơ công việc), kiểm tính đầy đủ hồ sơ.</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">AhhEX-QMS-005</a></td><td>Field sơ đồ ánh xạ, xác nhận rule và nguồn dữ liệu.</td></tr>
 <tr><td><a href="../../03-Reference/01-AhhEX-System/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">AhhEX-QMS-007</a></td><td>Data từ điển cho PackID/SSCC và đối soát hậu cần.</td></tr>
 <tr><td><a href="../../03-Reference/02-AhhEX-Standards/annex-702-packaging-labeling-spec.html">AhhEX-WHS-001</a></td><td>Quy cách đóng gói, nhãn, clean pack và bảo quản.</td></tr>

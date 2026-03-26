@@ -68,7 +68,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Sign-out mọi gage dùng liên công đoạn, chỉ đo CTQ bằng gage đã zero và xác minh, và khai báo ngay mọi sự cố rơi, va đập, pin yếu, màn hình lỗi hoặc reading bất thường.</div></div>
 <div class="section"><h2>2. Cổng kiểm soát kiểm trước khi dùng</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Phải kiểm</th><th>đạt khi</th><th>hold khi</th></tr></thead><tbody>
-<tr><td>G2 — Nhận diện</td><td>Gage ID, số sê-ri, trạng thái CAL, ngày hết hạn, Responsible Person/vị trí cấp phát.</td><td>Nhãn rõ, đúng gage, còn hiệu lực.</td><td>Không nhãn, sai ID, quá hạn, không truy ra hồ sơ.</td></tr>
+<tr><td>G2 — Nhận diện</td><td>Gage ID, số sê-ri, trạng thái CAL, nNgày hết hạn, Responsible Person/vị trí cấp phát.</td><td>Nhãn rõ, đúng gage, còn hiệu lực.</td><td>Không nhãn, sai ID, quá hạn, không truy ra hồ sơ.</td></tr>
 <tr><td>G2 — Tình trạng vật lý</td><td>Mặt đo, mỏ đo, đầu dò, dây cáp, màn hình, pin, niêm phong, hộp bảo quản.</td><td>Không sứt mẻ, không rỉ, không bavia, không niêm phong hỏng / gãy.</td><td>Rơi/va đập, niêm phong hỏng, mặt đo trầy, ren dưỡng đo / đồng hồ đo mẻ, pin yếu gây mất ổn định.</td></tr>
 <tr><td>G3 — không / bằng không / tham chiếu</td><td>không / bằng không tại điều kiện dùng; kiểm bằng chuẩn tham chiếu hoặc chủ / gốc phù hợp.</td><td>không / bằng không ổn định, lặp lại tốt, chủ / gốc kiểm tra đạt.</td><td>không / bằng không trôi, lặp lại kém, sai trên chủ / gốc.</td></tr>
 <tr><td>G4 — Điều kiện đo</td><td>Nhiệt độ, sạch bề mặt, lực đo, đơn vị mm/inch, chế độ tuyệt đối/gia tăng.</td><td>Điều kiện đo phù hợp phương pháp và dụng cụ.</td><td>Chi tiết/gage còn nóng, bẩn, đơn vị sai, Operator không hiểu phương pháp.</td></tr>
@@ -87,10 +87,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Dừng dùng ngay.</strong><br/>Đặt trạng thái TẠM GIỮ vật lý; không tiếp tục đo để “kiểm thử thêm”.</div>
 <div class="step-item"><strong>Khóa ảnh hưởng.</strong><br/>Xác định phép đo nào đã dùng gage này từ lần xác minh cuối cùng; nếu đã dùng cho CTQ/phát hành thì kích hoạt <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
 <div class="step-item"><strong>Đổi phương pháp đo.</strong><br/>Chuyển sang gage khác đã xác minh hoặc sang CMM/fixture/tham chiếu phương pháp được QA phê duyệt.</div>
-<div class="step-item"><strong>Ghi nhận sự cố.</strong><br/>Log sự cố phải có gage ID, hiện tượng, thời điểm, người phát hiện, job liên quan và hành động tạm thời.</div>
+<div class="step-item"><strong>Ghi nhận sự cố.</strong><br/>Log sự cố phải có gage ID, hiện tượng, thời điểm, nNgười phát hiện, job liên quan và hành động tạm thời.</div>
 </div>
 <div class="callout-warn"><strong>Rule:</strong> Nếu gage fail trên chủ / gốc hoặc có niêm phong hỏng / gãy, mọi kết quả đang chờ phát hành dựa trên gage đó phải dừng lại đến khi có quyết định của QA/Đo lường.</div></div>
-<div class="section"><h2>5. Khi nào phải gọi QA / Đo lường</h2>
+<div class="section"><h2>5. Khi nào phải Mọi QA / Đo lường</h2>
 <div class="two-col">
 <div class="card"><h3>Phải escalation ngay</h3><ul class="tight" style="padding-left:18px;"><li>Gage đo CTQ/phát hành final bị fail nhanh xác minh.</li><li>Gage rơi, va đập, ngâm dầu/dung dịch hoặc nghi nhiễm bẩn.</li><li>Đọc số không lặp lại, sai chủ / gốc, hoặc khác nhau giữa hai gage vượt ngưỡng nội bộ.</li><li>Không tìm thấy standard/chủ / gốc hợp lệ để xác minh.</li></ul></div>
 <div class="card"><h3>Cho phép xử lý tại chỗ</h3><ul class="tight" style="padding-left:18px;"><li>Lau sạch bề mặt đo theo chuẩn.</li><li>Thay pin hoặc reset chế độ khi không ảnh hưởng tính toàn vẹn của thiết bị.</li><li>Thực hiện không / bằng không lại sau khi đã xác minh nguyên nhân là do vận hành.</li></ul></div>
@@ -113,7 +113,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <h2 class="h2" id="phase2f-study-selection">Kiểm soát bổ sung — nghiên cứu lựa chọn hướng dẫn</h2>
 <div class="table-card"><table class="table"><thead><tr><th>Khi nào</th><th>Dùng hồ sơ nào</th><th>Ranh giới</th></tr></thead><tbody>
 <tr><td>Pre-use kiểm tra / shift kiểm tra / sau sự kiện</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-602_Gage_Verification_Log.xlsx" download="">FRM-602</a></td><td>Không thay cho hiệu chuẩn hay MSA đầy đủ.</td></tr>
-<tr><td>Nghi ngờ người đo + thiết bị biến thiên</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-611_GRR_Study_Form.xlsx" download="">FRM-611</a></td><td>Dùng khi quyết định cần nhìn độ lặp lại / độ tái lập.</td></tr>
+<tr><td>Nghi ngờ nNgười đo + thiết bị biến thiên</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-611_GRR_Study_Form.xlsx" download="">FRM-611</a></td><td>Dùng khi quyết định cần nhìn độ lặp lại / độ tái lập.</td></tr>
 <tr><td>Nghi ngờ sai lệch hệ thống / độ tuyến tính / trôi / sai lệch</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-612_Bias_Linearity_Stability_Study_Form.xlsx" download="">FRM-612</a></td><td>Dùng khi GR&amp;R không trả lời đủ rủi ro.</td></tr>
 <tr><td>Trực quan đạt/không đạt hoặc CMM đánh giá năng lực</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-613_Attribute_MSA_and_CMM_Qualification_Record.xlsx" download="">FRM-613</a></td><td>Khóa tính nhất quán của thuộc tính quyết định hoặc phát hành chương trình (program phát hành).</td></tr>
 </tbody></table></div>

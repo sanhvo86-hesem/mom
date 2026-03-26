@@ -107,8 +107,8 @@ Git metadata
  </thead>
  <tbody>
  <tr><td>Named endpoint</td><td>Mỗi máy được sync source library phải có EndpointID, owner, OS, location và approver trong register nội bộ.</td></tr>
- <tr><td>One endpoint, one primary writer</td><td>Mỗi worktree chỉ có một người chịu trách nhiệm chính. Không dùng shared desktop hoặc generic account làm máy authoring chính.</td></tr>
- <tr><td>No unregistered sync</td><td>Không cho người dùng tự bấm sync source library trên máy chưa được duyệt.</td></tr>
+ <tr><td>One endpoint, one primary writer</td><td>Mỗi worktree chỉ có một nNgười chịu trách nhiệm chính. Không dùng shared desktop hoặc generic account làm máy authoring chính.</td></tr>
+ <tr><td>No unregistered sync</td><td>Không cho nNgười dùng tự bấm sync source library trên máy chưa được duyệt.</td></tr>
  <tr><td>Periodic review</td><td>Hàng quý rà endpoint được sync, loại bỏ máy cũ, máy nghỉ việc, máy đổi owner.</td></tr>
  </tbody>
  </table>
@@ -134,7 +134,7 @@ Git metadata
  <tr><th>Tình huống</th><th>Quy định</th></tr>
  </thead>
  <tbody>
- <tr><td>Nhiều người cùng sửa trong một local synced worktree</td><td>Bị cấm. Mỗi người dùng phải có endpoint riêng hoặc làm việc qua Git branch/merge đúng chuẩn.</td></tr>
+ <tr><td>Nhiều nNgười cùng sửa trong một local synced worktree</td><td>Bị cấm. Mỗi nNgười dùng phải có endpoint riêng hoặc làm việc qua Git branch/merge đúng chuẩn.</td></tr>
  <tr><td>Dùng USB/external drive chứa worktree</td><td>Bị cấm.</td></tr>
  <tr><td>Để team sửa trực tiếp trên server thay cho local synced worktree</td><td>Bị cấm, trừ hotfix khẩn có reverse-sync close-out.</td></tr>
  </tbody>

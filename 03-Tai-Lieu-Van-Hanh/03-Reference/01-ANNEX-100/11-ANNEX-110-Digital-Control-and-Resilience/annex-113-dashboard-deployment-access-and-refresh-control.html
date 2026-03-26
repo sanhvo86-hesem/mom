@@ -106,7 +106,7 @@
   <p>Áp dụng cho mọi dashboard dùng để điều hành triển khai, quản trị tài liệu, theo dõi readiness, vận hành hypercare, theo dõi KPI, publish bộ số điều hành và làm cửa truy cập tài liệu cho nhiều phòng ban.</p>
 </div>
 
-<div class="rule r-warn"><b>Nguyên tắc:</b> Mọi dashboard dùng để ra quyết định điều hành phải chỉ rõ: owner, source-of-record, last refresh, phạm vi người xem, trạng thái ngoại lệ và đường dẫn tới tài liệu hành động. Thiếu một mục &rarr; không dùng làm nguồn quyết định chính.</div>
+<div class="rule r-warn"><b>Nguyên tắc:</b> Mọi dashboard dùng để ra quyết định điều hành phải chỉ rõ: owner, source-of-record, last refresh, phạm vi nNgười xem, trạng thái ngoại lệ và đường dẫn tới tài liệu hành động. Thiếu một mục &rarr; không dùng làm nguồn quyết định chính.</div>
 
 <!-- 1. Nguyên tắc governance -->
 <div class="sec-title">1 &mdash; Nguyên tắc governance bắt buộc</div>
@@ -122,7 +122,7 @@
   <div class="p-card">
     <h4>1.2 Managed self-service</h4>
     <ul>
-      <li>Người dùng được tự xem và tự phục vụ ở phạm vi đã công bố</li>
+      <li>NNgười dùng được tự xem và tự phục vụ ở phạm vi đã công bố</li>
       <li>Logic KPI, refresh, source mapping và publish do owner kiểm soát</li>
       <li>Không để dashboard thành nơi ai cũng sửa trực tiếp production</li>
     </ul>
@@ -131,7 +131,7 @@
     <h4>1.3 Dashboard phải có hành động</h4>
     <ul>
       <li>Mỗi khối số phải dẫn tới tài liệu, checklist hoặc owner tương ứng</li>
-      <li>Phục vụ manager, Champion và người dùng cuối theo ngữ cảnh riêng</li>
+      <li>Phục vụ manager, Champion và nNgười dùng cuối theo ngữ cảnh riêng</li>
       <li>Không giữ dashboard chỉ như một màn hình &ldquo;đẹp để xem&rdquo;</li>
     </ul>
   </div>
@@ -142,7 +142,7 @@
 <div class="table-card">
   <table class="table">
     <thead>
-      <tr><th style="width:17%">Module</th><th style="width:20%">Người dùng chính</th><th style="width:35%">Phải hiển thị</th><th style="width:28%">Hành động phải có</th></tr>
+      <tr><th style="width:17%">Module</th><th style="width:20%">NNgười dùng chính</th><th style="width:35%">Phải hiển thị</th><th style="width:28%">Hành động phải có</th></tr>
     </thead>
     <tbody>
       <tr><td><b>Executive view</b></td><td>Ban Giám đốc</td><td>Pha hiện tại, wave, KPI đỏ, issue nghiêm trọng, quyết định cần chốt</td><td>Mở gate pack, runbook, escalation matrix</td></tr>
@@ -165,7 +165,7 @@
       <li>Business owner và data owner</li>
       <li>Last refresh timestamp và trạng thái refresh</li>
       <li>Source-of-record hoặc data source chính</li>
-      <li>Phiên bản hoặc class phát hành gần nhất</li>
+      <li>Phiên bản hoặc class phát hành Cần nhất</li>
     </ul>
   </div>
   <div class="meta-card">
@@ -173,12 +173,12 @@
     <ul>
       <li>Badge Current, Exception, Offline fallback hoặc Outdated</li>
       <li>Thông điệp ngoại lệ nếu số đang dùng workaround</li>
-      <li>Contact hoặc owner khi người dùng cần hỗ trợ</li>
+      <li>Contact hoặc owner khi nNgười dùng cần hỗ trợ</li>
       <li>Link đến tài liệu hành động tương ứng</li>
     </ul>
   </div>
 </div>
-<div class="rule r-warn"><b>Rule:</b> Nếu không hiển thị last refresh và owner, người dùng không được dùng dashboard đó để chốt quyết định điều hành.</div>
+<div class="rule r-warn"><b>Rule:</b> Nếu không hiển thị last refresh và owner, nNgười dùng không được dùng dashboard đó để chốt quyết định điều hành.</div>
 
 <!-- 4. Quyền truy cập -->
 <div class="sec-title">4 &mdash; Quyền truy cập và publish</div>
@@ -195,7 +195,7 @@
     </tbody>
   </table>
 </div>
-<div class="rule r-danger"><b>Cấm:</b> Cấp quyền publish/admin chỉ vì &ldquo;để tiện&rdquo; trong giai đoạn triển khai. Quyền tạm thời phải có ngày hết hạn và người thu hồi rõ.</div>
+<div class="rule r-danger"><b>Cấm:</b> Cấp quyền publish/admin chỉ vì &ldquo;để tiện&rdquo; trong giai đoạn triển khai. Quyền tạm thời phải có nNgày hết hạn và nNgười thu hồi rõ.</div>
 
 <!-- 5. Refresh, freeze -->
 <div class="sec-title">5 &mdash; Refresh, freeze và exception note</div>
@@ -220,7 +220,7 @@
     <h4>Class A &mdash; Giao diện <span class="risk low">Thấp</span></h4>
     <ul>
       <li>Đổi bố cục, nhãn, grouping, style, icon</li>
-      <li>Vẫn phải ghi release note và người phê duyệt</li>
+      <li>Vẫn phải ghi release note và nNgười phê duyệt</li>
     </ul>
   </div>
   <div class="chg-card">
@@ -284,10 +284,10 @@
     </thead>
     <tbody>
       <tr><td><b>Dashboard register</b></td><td>Tên, mục đích, owner, source, audience, environment</td><td>Data Owner</td></tr>
-      <tr><td><b>Release log</b></td><td>Class thay đổi, ngày phát hành, người phê duyệt, ghi chú</td><td>Publisher / IT</td></tr>
+      <tr><td><b>Release log</b></td><td>Class thay đổi, nNgày phát hành, nNgười phê duyệt, ghi chú</td><td>Publisher / IT</td></tr>
       <tr><td><b>Refresh evidence</b></td><td>Timestamp, tình trạng refresh, issue nếu có, exception note</td><td>System Owner</td></tr>
-      <tr><td><b>Access review</b></td><td>Danh sách quyền, người xem, publish/admin access, ngày rà</td><td>IT Manager</td></tr>
-      <tr><td><b>Fallback note</b></td><td>Nguồn thay thế, trigger rollback, thời điểm phục hồi, người duyệt</td><td>IT / QMS</td></tr>
+      <tr><td><b>Access review</b></td><td>Danh sách quyền, nNgười xem, publish/admin access, nNgày rà</td><td>IT Manager</td></tr>
+      <tr><td><b>Fallback note</b></td><td>Nguồn thay thế, trigger rollback, thời điểm phục hồi, nNgười duyệt</td><td>IT / QMS</td></tr>
     </tbody>
   </table>
 </div>

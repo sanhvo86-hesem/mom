@@ -57,7 +57,7 @@
  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
 </div>
 <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
- <p style="margin:8px 0;">ANNEX này xác lập kiến trúc bắt buộc để bộ tài liệu HESEM nằm trên M365 SharePoint theo cách vẫn hỗ trợ local authoring, Git promotion, server deployment, reverse sync và online-form governance mà không làm lẫn source với runtime data. Kết quả bắt buộc là: mọi người biết bộ source docs nằm ở đâu trên SharePoint, local nào được phép sync, Git là gì trong chuỗi kiểm soát, server giữ cái gì, và dữ liệu nào tuyệt đối không được quay vào Git hay SharePoint source library.</p>
+ <p style="margin:8px 0;">ANNEX này xác lập kiến trúc bắt buộc để bộ tài liệu HESEM nằm trên M365 SharePoint theo cách vẫn hỗ trợ local authoring, Git promotion, server deployment, reverse sync và online-form governance mà không làm lẫn source với runtime data. Kết quả bắt buộc là: mọi nNgười biết bộ source docs nằm ở đâu trên SharePoint, local nào được phép sync, Git là gì trong chuỗi kiểm soát, server giữ cái gì, và dữ liệu nào tuyệt đối không được quay vào Git hay SharePoint source library.</p>
  <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: bộ tài liệu nguồn có đúng một đường đi chuẩn <b>SharePoint local sync worktree → Git remote → server deploy</b>; mọi hotfix từ server phải quay lại <b>Git → SharePoint local sync</b>; runtime data, secret-bearing config, draft workflow binaries, session files, rate-limit state và form transaction data không được trộn vào controlled source library.</div>
  <div class="keyline"><strong>Ranh giới tài liệu:</strong> <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> khóa site/library/path; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> khóa provisioning, permissions và automation; <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> khóa field/list catalog; <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> khóa file plan; <a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a> khóa tạo site/library/quyền; <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> khóa thao tác click-by-click cho local sync, Git và server.</div>
  </div>
@@ -118,7 +118,7 @@
  <div class="two-col">
  <div class="figure-box">
  <h3>Local path được phép</h3>
- <p style="margin:8px 0;">Chỉ các máy được chỉ định của IT/QMS mới được sync library <span class="code">10-QMS-Source-Control</span>. Worktree local phải nằm dưới thư mục sync do OneDrive quản lý trong hồ sơ người dùng, ví dụ:</p>
+ <p style="margin:8px 0;">Chỉ các máy được chỉ định của IT/QMS mới được sync library <span class="code">10-QMS-Source-Control</span>. Worktree local phải nằm dưới thư mục sync do OneDrive quản lý trong hồ sơ nNgười dùng, ví dụ:</p>
  <p class="path">%UserProfile%\HESEM Engineering\HESEM-Digital-Control - 10-QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn\</p>
  </div>
  <div class="figure-box">
@@ -214,7 +214,7 @@
  <li>Chưa tạo library <span class="code">10-QMS-Source-Control</span> và chưa khóa quyền đúng group model.</li>
  <li>Worktree local vẫn chứa thư mục <span class="code">.git</span> trong vùng SharePoint sync.</li>
  <li>Chưa chứng minh được một vòng đầy đủ <span class="code">local sync → Git push → server pull → deploy receipt → local pull</span>.</li>
- <li>Runtime noise vẫn bị stage/commit trong quá trình sync thử nghiệm.</li>
+ <li>Runtime noise vẫn bị stage/commit trong quá trình sync thử nNhiệm.</li>
  <li>Chưa có rule route riêng cho online form source và online form transaction data.</li>
  <li>Chưa có WI thao tác cho admin endpoint và server operator.</li>
  </ul>

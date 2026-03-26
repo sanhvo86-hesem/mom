@@ -73,7 +73,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Áp dụng:</b>
 <span class="role-tag">Operator</span><span class="role-tag">Setup</span><span class="role-tag">Lập trình viên (CNC)</span><span class="role-tag">QC</span><span class="role-tag">QA</span>
 <span class="role-tag">Kho</span><span class="role-tag">Mua hàng</span><span class="role-tag">Planner</span><span class="role-tag">Bảo trì</span><span class="role-tag">EHS</span>
-<span class="role-tag">Người định giá (SAL-03)</span><span class="role-tag">Supervisor</span>
+<span class="role-tag">NNgười định giá (SAL-03)</span><span class="role-tag">Supervisor</span>
 </li>
 <li><b>Thời lượng YÊU CẦU:</b> Lý thuyết 90 phút • Thực hành 90 phút • OJT 120 phút (chia 2 ca/ngày, tối đa 2 ngày/tuần/nhân sự).</li>
 <li><b>Điều kiện trước:</b> Đã học WI-OPS-008 (Hồ sơ công việc Governance) và nắm quy tắc đặt tên file (ANNEX-QMS-003).</li>
@@ -168,7 +168,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>RFQ → Review hợp đồng</td>
-<td>Người định giá (SAL-03) → Planner/QA</td>
+<td>NNgười định giá (SAL-03) → Planner/QA</td>
 <td>Yêu cầu khách hàng, PO/hợp đồng, spec</td>
 <td>Hồ sơ công việc / <b>01_Rfq-Hợp đồng</b></td>
 <td>Chặn “thiếu Requests đặc biệt” trước khi plan</td>
@@ -270,10 +270,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>6</td><td>RecordType/DocType dùng “tự chế”</td><td>RecordType không nằm trong danh mục chuẩn</td><td>Báo cáo Pareto sai, lưu giữ sai</td><td>Lựa chọn mã + đào tạo</td></tr>
 <tr><td>7</td><td>bộ hồ sơ giao hàng “đủ giấy” nhưng thiếu <b>phê duyệt lịch sử</b></td><td>Không chứng minh ai phát hành</td><td>đánh giá không đạt, rủi ro tranh chấp khách hàng</td><td>G5 Phê duyệt giao hàng</td></tr>
 <tr><td>8</td><td>Outsource chứng chỉ/lot thiếu</td><td>Cert không có lot/mẻ nấu (heat) hoặc không map job</td><td>Truy xuất nguồn gốc fail, được bị trả hàng</td><td>06_Outsource + IQC</td></tr>
-<tr><td>9</td><td>Người định giá (SAL-03) không đưa “đặc biệt Requests” vào hồ sơ</td><td>Spec/PO note nằm trong email cá nhân</td><td>Sai Requests, trễ giao, NCR</td><td>01_Rfq-Review hợp đồng</td></tr>
+<tr><td>9</td><td>NNgười định giá (SAL-03) không đưa “đặc biệt Requests” vào hồ sơ</td><td>Spec/PO note nằm trong email cá nhân</td><td>Sai Requests, trễ giao, NCR</td><td>01_Rfq-Review hợp đồng</td></tr>
 <tr><td>10</td><td>Planner phát hành traveler không có QR/link hồ sơ</td><td>Không scan được đến thư mục bằng chứng</td><td>Bàn giao chậm, đánh giá mất thời gian</td><td>Print rule + G1</td></tr>
 <tr><td>11</td><td>QC upload báo cáo nhưng “file name” không theo chuẩn</td><td>Không có JobNum/REV/Date</td><td>Export/email mất truy vết, đánh giá hỏi lại</td><td>Đặt tên thực thi / cưỡng chế</td></tr>
-<tr><td>12</td><td>Supervisor “bỏ qua cổng kiểm soát” vì gấp</td><td>Ship đi khi thiếu MRR</td><td>Stop-ship, hoàn phí / bồi hoàn, mất khách</td><td>Dừng sớm (fail-nhanh) rule + escalation</td></tr>
+<tr><td>12</td><td>Supervisor “bỏ qua cổng kiểm soát” vì Cấp</td><td>Ship đi khi thiếu MRR</td><td>Stop-ship, hoàn phí / bồi hoàn, mất khách</td><td>Dừng sớm (fail-nhanh) rule + escalation</td></tr>
 </tbody>
 </table>
 </div>
@@ -306,7 +306,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>CP3</b> – Phát hành Hồ sơ (job)</td>
 <td>Trong 03_Programs-Setup, chỉ lưu “Phát hành Hồ sơ” + link đến file chủ / gốc (không copy)</td>
 <td>Lập trình viên (CNC)/Setup</td>
-<td>Phát hành Hồ sơ có người phát hành/ngày/tên tập tin/REV/link</td>
+<td>Phát hành Hồ sơ có nNgười phát hành/ngày/tên tập tin/REV/link</td>
 <td>Lệch phiên bản giữa job và chủ / gốc</td>
 </tr>
 <tr>
@@ -397,7 +397,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Tình huống A: nghi sai REV (phổ biến nhất)</strong>
 <ol>
-<li>Ngừng vận hành (Stop) và giữ nguyên WIP.</li>
+<li>NTừng vận hành (Stop) và giữ nguyên WIP.</li>
 <li>Scan QR mở Hồ sơ công việc → xem <b>RevisionNum</b> của job.</li>
 <li>Mở Phát hành Hồ sơ ở <b>03_Programs-Setup</b> → click link tới DATA.</li>
 <li>Đối chiếu REV thư mục + tên file chủ / gốc (<span class="path">REV-X</span>).</li>
@@ -455,8 +455,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>4</td><td>Kiểm tra/khởi tạo Part/REV thư mục trong DATA đúng Rev</td><td>ENG/Lập trình viên (CNC)</td><td><span class="path">.../REV {Rev}/</span> có template đầy đủ</td><td>Đặt Rev không thống nhất (RevE/REV-E)</td></tr>
 <tr><td>5</td><td>Upload DWG/SOL/SPEC theo đặt tên chuẩn Part/REV</td><td>ENG</td><td>File có <span class="path">_{DocType}_{DocID}_{YYYY-MM-DD}_REV-{Rev}_</span></td><td>Thiếu DocID/Date</td></tr>
 <tr><td>6</td><td>Upload CAM chủ / gốc theo đặt tên chuẩn + ghi EffectiveDate</td><td>Lập trình viên (CNC)</td><td>File CAM nằm trong <b>04_CAM</b></td><td>Để CAM ở máy tính bàn/USB</td></tr>
-<tr><td>7</td><td>Tạo Phát hành Hồ sơ trong Hồ sơ công việc (03_Programs-Setup) + link tới chủ / gốc</td><td>Lập trình viên (CNC)/Setup</td><td>Phát hành Hồ sơ + link + người phát hành</td><td>Copy file chủ / gốc vào Hồ sơ công việc</td></tr>
-<tr><td>8</td><td>Người định giá (SAL-03) lưu PO/hợp đồng/đặc biệt Requests vào 01_Rfq-Hợp đồng</td><td>Người định giá (SAL-03)</td><td>File/spec nằm đúng thư mục</td><td>Giữ trong email cá nhân</td></tr>
+<tr><td>7</td><td>Tạo Phát hành Hồ sơ trong Hồ sơ công việc (03_Programs-Setup) + link tới chủ / gốc</td><td>Lập trình viên (CNC)/Setup</td><td>Phát hành Hồ sơ + link + nNgười phát hành</td><td>Copy file chủ / gốc vào Hồ sơ công việc</td></tr>
+<tr><td>8</td><td>NNgười định giá (SAL-03) lưu PO/hợp đồng/đặc biệt Requests vào 01_Rfq-Hợp đồng</td><td>NNgười định giá (SAL-03)</td><td>File/spec nằm đúng thư mục</td><td>Giữ trong email cá nhân</td></tr>
 <tr><td>9</td><td>Planner phát hành traveler có QR mở Hồ sơ công việc</td><td>Planner</td><td>Traveler/label có QR</td><td>QR sai link hoặc thiếu QR</td></tr>
 <tr><td>10</td><td>QC/QA upload FAI/IR/CMM đúng thư mục 04_Inspection-FAI</td><td>QC/QA</td><td>File theo đặt tên chuẩn Job + đủ siêu dữ liệu</td><td>Đặt sai RecordType</td></tr>
 <tr><td>11</td><td>Gắn nội dung Type cho Tier-1 (FAI/Final/CMM/ShipPacket…)</td><td>QA/WHS</td><td>nội dung Type đúng</td><td>Để mặc định “Tài liệu”</td></tr>
@@ -468,7 +468,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="callout" style="margin-top:12px">
-<b>Mẹo thực chiến:</b> Sau khi upload Tier-1, khi không thấy label Tier-1 trong 1–2 phút, kiểm tra lại <b>siêu dữ liệu bắt buộc</b> trước khi gọi IT (đa số lỗi do thiếu JobNum/RecordID/RevisionNum).
+<b>Mẹo thực chiến:</b> Sau khi upload Tier-1, khi không thấy label Tier-1 trong 1–2 phút, kiểm tra lại <b>siêu dữ liệu bắt buộc</b> trước khi Mọi IT (đa số lỗi do thiếu JobNum/RecordID/RevisionNum).
  </div>
 </div>
 <!-- 9) OJT TWI + RUBRIC -->
@@ -501,7 +501,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>4</td>
 <td>Tạo Phát hành Hồ sơ ở Hồ sơ công việc</td>
-<td>Phát hành Hồ sơ chứa: người phát hành, ngày, tên tập tin, REV, link</td>
+<td>Phát hành Hồ sơ chứa: nNgười phát hành, ngày, tên tập tin, REV, link</td>
 <td>Job không chứa file chủ / gốc; chỉ chứa quyết định phát hành</td>
 </tr>
 <tr>
@@ -541,13 +541,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>L2</b><div class="mini">Thực hiện độc lập (ổn định theo bảng kiểm)</div></td>
 <td>Tự thực hiện bảng kiểm 15 bước liên quan vai trò; upload đúng thư mục; đặt tên đúng; gắn đủ siêu dữ liệu bắt buộc theo nội dung type.</td>
-<td>danh mục OJT (bảng kiểm / danh mục) đạt (ký người hướng dẫn) + 01 tình huống xử lý đúng (Hold/Go).</td>
+<td>danh mục OJT (bảng kiểm / danh mục) đạt (ký nNgười hướng dẫn) + 01 tình huống xử lý đúng (Hold/Go).</td>
 <td>Được phép tạo/hoàn thiện hồ sơ theo vai trò (QC/QA/WHS) nhưng vẫn phải qua phê duyệt ở cổng kiểm soát.</td>
 </tr>
 <tr>
 <td><b>L3</b><div class="mini">Nâng cao (xử lý tình huống + hướng dẫn)</div></td>
-<td>Phát hiện sai lệch hệ thống (label không áp, siêu dữ liệu lệch); xử lý theo fail-nhanh; hướng dẫn người mới; thực hiện diễn tập đánh giá 60s.</td>
-<td>01 báo cáo bài học kinh nghiệm hoặc đánh giá nhỏ / thu gọn (≥ 5 mẫu kiểm).</td>
+<td>Phát hiện sai lệch hệ thống (label không áp, siêu dữ liệu lệch); xử lý theo fail-nhanh; hướng dẫn nNgười mới; thực hiện diễn tập đánh giá 60s.</td>
+<td>01 báo cáo bài học kinh nNhiệm hoặc đánh giá nhỏ / thu gọn (≥ 5 mẫu kiểm).</td>
 <td>Được giao vai trò “Inspector” ở cổng kiểm soát nội bộ (tuỳ phòng) và tham gia cải tiến quy tắc.</td>
 </tr>
 <tr>
@@ -574,7 +574,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Planner</b></td><td>Tạo/đảm bảo hồ sơ tồn tại; traveler có QR; lộ trình gia công/Rev đúng.</td><td>Rev đồng nhất giữa Epicor phản chiếu, traveler, Phát hành Hồ sơ.</td></tr>
 <tr><td><b>Bảo trì</b></td><td>Khi có sự cố thiết bị ảnh hưởng job: lưu bằng chứng sự cố đúng nơi (khi được Requests).</td><td>Không lưu time mục nhập; chỉ lưu hồ sơ sự cố có phê duyệt.</td></tr>
 <tr><td><b>EHS</b></td><td>Khi có Requests khách hàng về EHS hoặc sự cố: lưu hồ sơ liên quan đúng thư mục (01 hoặc 05).</td><td>Phân loại đúng Tier/label theo tính chất.</td></tr>
-<tr><td><b>Người định giá (SAL-03)</b></td><td>Lưu Requests khách hàng &amp; rà soát hợp đồng vào 01_Rfq-Hợp đồng.</td><td>Không để Requests trong email cá nhân.</td></tr>
+<tr><td><b>NNgười định giá (SAL-03)</b></td><td>Lưu Requests khách hàng &amp; rà soát hợp đồng vào 01_Rfq-Hợp đồng.</td><td>Không để Requests trong email cá nhân.</td></tr>
 <tr><td><b>Supervisor</b></td><td>Thực thi fail-nhanh; không vượt qua cổng kiểm soát; điều phối escalation.</td><td>G5 là cứng / khó stop; phải có MRR + phê duyệt.</td></tr>
 </tbody>
 </table>
@@ -607,9 +607,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Hệ quả đánh giá khi thiếu phê duyệt lịch sử ở phê duyệt giao hàng là gì?</li>
 <li>Kể tên ít nhất 2 điểm chặn trong chuỗi E2E giúp chống nhầm REV.</li>
 <li>Trong bảng kiểm, bước nào đảm bảo traveler có QR? Chủ trì là ai?</li>
-<li>Khi label Tier-1 không tự áp, kiểm tra gì trước khi gọi IT?</li>
+<li>Khi label Tier-1 không tự áp, kiểm tra gì trước khi Mọi IT?</li>
 <li>Truy xuất nguồn gốc hồ sơ job trong 60 giây cần mở 2 thư mục nào trước?</li>
-<li>Vai trò Người định giá (SAL-03) phải lưu tài liệu ở thư mục nào?</li>
+<li>Vai trò NNgười định giá (SAL-03) phải lưu tài liệu ở thư mục nào?</li>
 </ol>
 <h3>10.2 Tình huống (tối thiểu 3 tình huống)</h3>
 <div class="table-wrap">
@@ -792,7 +792,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>7</td><td>Outsource thiếu chứng chỉ/lot/mẻ nấu (heat)</td><td>Truy xuất nguồn gốc là Requests bắt buộc</td><td>WHS/QA kiểm trước nhận; lưu đầy đủ ở 06_Outsource</td></tr>
 <tr><td>8</td><td>Không kiểm soát Rev cũ (không có 00_Archive hoặc lưu trữ sai)</td><td>Không truy vết thay thế / bãi bỏ</td><td>Đổi Rev phải chuyển Rev cũ vào 00_Archive + thay đổi hồ sơ</td></tr>
 <tr><td>9</td><td>Tên file không theo chuẩn, khó export</td><td>Đánh giá Requests export/offline pack</td><td>Áp đặt tên chuẩn ANNEX-QMS-003; đào tạo + điểm / tại chỗ kiểm tra</td></tr>
-<tr><td>10</td><td>Bỏ qua cổng kiểm soát vì gấp</td><td>Rủi ro stop-ship cao</td><td>Dừng sớm (fail-nhanh) + cứng / khó stop G5; KPI theo “cổng kiểm soát tuân thủ”</td></tr>
+<tr><td>10</td><td>Bỏ qua cổng kiểm soát vì Cấp</td><td>Rủi ro stop-ship cao</td><td>Dừng sớm (fail-nhanh) + cứng / khó stop G5; KPI theo “cổng kiểm soát tuân thủ”</td></tr>
 </tbody>
 </table>
 </div>

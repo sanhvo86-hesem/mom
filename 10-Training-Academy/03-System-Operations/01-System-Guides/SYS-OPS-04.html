@@ -48,7 +48,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Thông tin triển khai</strong>
 <ul>
-<li><strong>Target vai trò (bắt buộc):</strong> Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor</li>
+<li><strong>Target vai trò (bắt buộc):</strong> Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, NNgười định giá (SAL-03), Supervisor</li>
 <li><strong>Kích hoạt mô-đun:</strong> Khi phân xưởng vận hành “không giấy bằng chứng” qua M365 Danh sách/SharePoint + Power Automate, và khi có Requests duyệt (phê duyệt giao hàng (ship phát hành) / NCR / CAPA / Hold).</li>
 <li><strong>Không có bằng chứng = Không qua cổng kiểm soát:</strong> Không có MRR hợp lệ thì trạng thái phải TẠM GIỮ/CHẶN.</li>
 </ul>
@@ -80,7 +80,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Thiết lập “đường ray” để mọi quyết định vận hành có <b>dấu vết duyệt</b> (ApprovalHistory) và <b>dấu vết hệ thống</b> (IntegrationLogs) theo chuẩn đánh giá.</li>
 <li>Chặn các rủi ro Top rủi ro: sai phiên bản (Sai Rev), lẫn lộn (mix-up)/lẫn lô, thiếu/giả chứng từ, vượt qua cổng kiểm soát, ship sai, NCR/MRB không có bằng chứng.</li>
-<li>Ổn định vận hành 2 ca/ngày, 6 ngày/tuần: kiểm tra theo nhịp ca, không đẻ thêm người, không đẻ thêm file.</li>
+<li>Ổn định vận hành 2 ca/ngày, 6 ngày/tuần: kiểm tra theo nhịp ca, không đẻ thêm nNgười, không đẻ thêm file.</li>
 </ul>
 <h3>Ai chịu trách nhiệm (RACI theo vai trò)</h3>
 <div class="table-card">
@@ -95,9 +95,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Kho</b></td><td>Thực hiện PackagingChecks/SSCC; chạy ShipRelease cổng kiểm soát; xử lý ĐÃ CHẶN không né.</td><td>Phát hành 01 pack chỉ khi PacketComplete=PASS; chứng minh được vết / nhật ký thay đổi “từ hồ sơ đến file”.</td></tr>
 <tr><td><b>Mua hàng</b></td><td>Thu thập chứng từ nhà cung cấp/công đoạn đặc biệt; gắn vào hồ sơ đúng mục; phản hồi DocMissing.</td><td>2 lô nhận hàng: chứng từ truy xuất nguồn gốc trong 60 giây, không thiếu rev/lot.</td></tr>
 <tr><td><b>Planner</b></td><td>Giám sát JobIndex/JobOper; đảm bảo job Released có hồ sơ; điều phối bàn giao theo cổng kiểm soát.</td><td>Không có job Released thiếu EvidenceFolderUrl; phản hồi vấn đề chặn trong 1 ca.</td></tr>
-<tr><td><b>Bảo trì</b></td><td>Ghi nhận ToolLife/Thời gian ngừng máy theo hồ sơ; giữ bằng chứng hiệu chuẩn CNC-IMS-HUB → QMS-Hồ sơ → Đo lường-Hồ sơ..</td><td>Đóng 01 sự cố thời gian ngừng máy có hồ sơ + ảnh + nguyên nhân; không mất dấu vết.</td></tr>
+<tr><td><b>Bảo trì</b></td><td>Ghi nhận ToolLife/Thời gian nTừng máy theo hồ sơ; giữ bằng chứng hiệu chuẩn CNC-IMS-HUB → QMS-Hồ sơ → Đo lường-Hồ sơ..</td><td>Đóng 01 sự cố thời gian nTừng máy có hồ sơ + ảnh + nguyên nhân; không mất dấu vết.</td></tr>
 <tr><td><b>EHS</b></td><td>Gắn kiểm soát EHS vào hồ sơ khi có Requests; khóa phát hành khi thiếu kiểm soát an toàn EHS cổng kiểm soát: PPE • LOTO • Hot Công việc • nâng • hóa chất/Dung dịch làm mát (dung dịch làm nguội) • Machine bảo vệ / tấm chắn..</td><td>Nhận biết các điểm chặn EHS và phát hành đúng 100%.</td></tr>
-<tr><td><b>Người định giá (SAL-03)</b></td><td>Không cam kết giao hàng khi ShipRelease chưa ĐÃ PHÁT HÀNH; truyền thông đúng trạng thái cổng kiểm soát.</td><td>Không có email/báo giá xác nhận giao hàng khi Trạng thái=ĐÃ CHẶN/TẠM GIỮ.</td></tr>
+<tr><td><b>NNgười định giá (SAL-03)</b></td><td>Không cam kết giao hàng khi ShipRelease chưa ĐÃ PHÁT HÀNH; truyền thông đúng trạng thái cổng kiểm soát.</td><td>Không có email/báo giá xác nhận giao hàng khi Trạng thái=ĐÃ CHẶN/TẠM GIỮ.</td></tr>
 <tr><td><b>Supervisor</b></td><td>Chủ trì bàn giao ca; cưỡng chế “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”; mở sự cố khi có vượt qua.</td><td>0 lần vượt qua cổng kiểm soát trong ca trực; 100% vấn đề chặn có Responsible Person và due time.</td></tr>
 </tbody>
 </table>
@@ -119,8 +119,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Nguyên tắc toàn cầu (Lớp / Tầng 2) được áp dụng vào phân xưởng</strong>
 <ul>
-<li>Phê duyệt phải có SLA, nhắc việc, escalation, và vết / nhật ký thay đổi theo người/giờ/ý kiến.</li>
-<li>cách ly of nhiệm vụ: người tạo hồ sơ không tự phê duyệt cho chính mình ở cổng kiểm soát chất lượng/ship.</li>
+<li>Phê duyệt phải có SLA, nhắc việc, escalation, và vết / nhật ký thay đổi theo nNgười/giờ/ý kiến.</li>
+<li>cách ly of nhiệm vụ: nNgười tạo hồ sơ không tự phê duyệt cho chính mình ở cổng kiểm soát chất lượng/ship.</li>
 <li>dấu vết kiểm toán phải truy ra “ai làm gì, lúc nào, dựa trên bằng chứng nào”.</li>
 </ul>
 </div>
@@ -139,7 +139,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Kế hoạch</b> (job Released)</td>
-<td>JobIndex/JobOperIndex phản chiếu / sao chép; Rev; ngày đến hạn</td>
+<td>JobIndex/JobOperIndex phản chiếu / sao chép; Rev; nNgày đến hạn</td>
 <td>Hồ sơ công việc được tạo và gắn link</td>
 <td><b>CHẶN</b> khi EvidenceFolderUrl trống</td>
 <td>JobIndex.EvidenceFolderUrl + cấu trúc thư mục</td>
@@ -210,11 +210,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>4</td><td>Job Released nhưng EvidenceFolderUrl trống</td><td>Kế hoạch</td><td>JobIndex filter EvidenceFolderUrl=phôi</td><td>Planner TẠM GIỮ phát hành; chạy lại FLOW_06 hoặc tạo hồ sơ thủ công và log</td></tr>
 <tr><td>5</td><td>Phê duyệt thực hiện qua chat/email, không log</td><td>QA/Ship</td><td>Không có ApprovalHistory cho RecordID</td><td>CHẶN cổng kiểm soát; Requests duyệt lại trong hệ thống</td></tr>
 <tr><td>6</td><td>ApprovalHistory thiếu nhận xét/time/Approver</td><td>QA</td><td>Trường bắt buộc rỗng</td><td>QA trả về (Từ chối) và Requests ghi rõ; không cho “phê duyệt trắng”</td></tr>
-<tr><td>7</td><td>ShipRelease bị sửa trạng thái bằng tay để vượt cổng kiểm soát</td><td>Ship</td><td>Trạng thái=ĐÃ PHÁT HÀNH nhưng người xác nhận log FAIL</td><td>dừng giao hàng (STOP-SHIP / dừng giao hàng); mở NCR nội bộ; khóa quyền sửa tay RBAC: QA/QMS phê duyệt • OPS thực thi • IT admin • sửa hồ sơ cổng kiểm soát = QA/QMS.</td></tr>
+<tr><td>7</td><td>ShipRelease bị sửa trạng thái bằng tay để vượt cổng kiểm soát</td><td>Ship</td><td>Trạng thái=ĐÃ PHÁT HÀNH nhưng nNgười xác nhận log FAIL</td><td>dừng giao hàng (STOP-SHIP / dừng giao hàng); mở NCR nội bộ; khóa quyền sửa tay RBAC: QA/QMS phê duyệt • OPS thực thi • IT admin • sửa hồ sơ cổng kiểm soát = QA/QMS.</td></tr>
 <tr><td>8</td><td>SSCC chưa Đã xác minh nhưng vẫn đóng gói</td><td>Đóng gói</td><td>PackSSCCRegister.VerifiedAt trống</td><td>CHẶN; Kho tái in/đối chiếu; ghi StandupAction</td></tr>
 <tr><td>9</td><td>FAI bắt buộc nhưng thiếu báo cáo URL</td><td>QC/QA</td><td>RequiresFAI=TRUE và ReportUrl trống</td><td>TẠM GIỮ; QC lập báo cáo và gắn link trước khi ship</td></tr>
 <tr><td>10</td><td>DocMissing/công đoạn đặc biệt cert thiếu</td><td>Mua hàng/Nhận hàng</td><td>ReceivingIQC DocMissing</td><td>TẠM GIỮ vật tư; Mua hàng truy chứng từ; không phát hành vào sản xuất</td></tr>
-<tr><td>11</td><td>Data chất lượng: hồ sơ thiếu JobNum/PackID</td><td>All</td><td>Hàng ngày kiểm tra phát hiện null key</td><td>STOP quyết định dựa trên hồ sơ lỗi; sửa nguyên nhân đầu nguồn</td></tr>
+<tr><td>11</td><td>Data chất lượng: hồ sơ thiếu JobNum/PackID</td><td>All</td><td>Hàng nNgày kiểm tra phát hiện null key</td><td>STOP quyết định dựa trên hồ sơ lỗi; sửa nguyên nhân đầu nguồn</td></tr>
 <tr><td>12</td><td>bất thường: đột biến / tăng đột ngột ĐÃ CHẶN nhưng không có Responsible Person</td><td>Ship/họp đứng / họp nhanh</td><td>Đã chặn count tăng; StandupActions rỗng</td><td>Supervisor mở họp đứng / họp nhanh ngay; gán Responsible Person + due time</td></tr>
 </tbody>
 </table>
@@ -229,8 +229,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>CP1 — Chênh lệch+chồng chéo + tính bất biến (idempotent) cập nhật/thêm mới (upsert)</td><td>IT</td><td>IntegrationSettings + IntegrationLogs</td><td>Không trùng EpicorKey; LastSyncUtc chỉ cập nhật khi thành công</td><td>Khóa sử dụng dữ liệu phản chiếu / sao chép; IT sửa và ghi sự cố</td></tr>
 <tr><td>CP2 — Đánh giá trường dữ liệu bắt buộc</td><td>QA/QMS</td><td>List sơ đồ cấu trúc đánh giá: đã tạo/đã sửa đổi + FlowRunId FlowRunId = cột bắt buộc trên mọi hồ sơ cổng kiểm soát (Power Automate Run ID).</td><td>Truy ra ai/giờ cho mọi hồ sơ cổng kiểm soát</td><td>Không qua cổng kiểm soát cho hồ sơ thiếu đánh giá trường dữ liệu</td></tr>
 <tr><td>CP3 — Evidence lưu bằng URL, không nhét file vào list</td><td>All vai trò tạo hồ sơ</td><td>EvidenceFolderUrl/RecordUrl</td><td>Link mở được; file nằm đúng Record Folder</td><td>Từ chối hồ sơ; Requests sửa link và tổ chức lại hồ sơ</td></tr>
-<tr><td>CP4 — SoD cho approvals</td><td>QA + Supervisor</td><td>ApprovalHistory + quyền truy cập M365/SharePoint → HESEM-QMS-SSOT</td><td>Approver khác người tạo; nhận xét bắt buộc khi Từ chối</td><td>Chặn và mở NCR nội bộ khi tự duyệt</td></tr>
-<tr><td>CP5 — cứng / khó cổng kiểm soát ShipRelease</td><td>Kho + QA</td><td>ShipRelease + IntegrationLogs + PackagingChecks + PackSSCCRegister</td><td>người xác nhận PASS mới được ĐÃ PHÁT HÀNH</td><td>ĐÃ CHẶN + thông báo Teams + StandupAction</td></tr>
+<tr><td>CP4 — SoD cho approvals</td><td>QA + Supervisor</td><td>ApprovalHistory + quyền truy cập M365/SharePoint → HESEM-QMS-SSOT</td><td>Approver khác nNgười tạo; nhận xét bắt buộc khi Từ chối</td><td>Chặn và mở NCR nội bộ khi tự duyệt</td></tr>
+<tr><td>CP5 — cứng / khó cổng kiểm soát ShipRelease</td><td>Kho + QA</td><td>ShipRelease + IntegrationLogs + PackagingChecks + PackSSCCRegister</td><td>nNgười xác nhận PASS mới được ĐÃ PHÁT HÀNH</td><td>ĐÃ CHẶN + thông báo Teams + StandupAction</td></tr>
 <tr><td>CP6 — Giám sát &amp; bất thường quy tắc</td><td>Supervisor</td><td>Báo cáo/Photos màn hình bảng điều khiển mỗi ca CNC-IMS-HUB → QMS-Hồ sơ → bảng điều khiển (Dash)-Photos trạng thái.</td><td>0 Released khi đối soát FAIL; 0 NCR Closed thiếu disposition</td><td>dừng giao hàng (STOP-SHIP / dừng giao hàng) hoặc TẠM GIỮ chất lượng; mở hành động khắc phục</td></tr>
 <tr><td>CP7 — Version control cho Luồng</td><td>IT</td><td>Export gói hàng + DCR hồ sơ</td><td>Mọi thay đổi luồng có phiếu Requests + phê duyệt + hoàn tác / quay lại plan</td><td>hoàn tác / quay lại ngay khi phát hiện ảnh hưởng cổng kiểm soát</td></tr>
 </tbody>
@@ -253,7 +253,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li><b>Rule FF1 — phản chiếu / sao chép không tin cậy:</b> Khi IntegrationLogs(Thất bại) xảy ra 3 lần liên tiếp cho luồng sync trong giờ ca → <b>STOP dữ liệu</b>; Planner/Supervisor chuyển sang kiểm bằng Epicor trực tiếp phương án dự phòng: Epicor trực tiếp + export CSV vào SSOT..</li>
 <li><b>Rule FF2 — No bằng chứng:</b> Khi bất kỳ cổng kiểm soát hồ sơ (ShipRelease/NCR/CAPA/QC Hold) thiếu EvidenceFolderUrl hoặc thiếu file bắt buộc → <b>TẠM GIỮ/CHẶN</b> ngay tại hồ sơ; không mở ngoại lệ.</li>
-<li><b>Rule FF3 — Vượt qua cổng kiểm soát:</b> Khi phát hiện Trạng thái=ĐÃ PHÁT HÀNH nhưng người xác nhận FAIL hoặc thiếu ApprovalHistory → <b>dừng giao hàng (STOP-SHIP / dừng giao hàng)</b>, mở NCR nội bộ, khóa quyền sửa tay và báo cáo ban điều hành trong ca.</li>
+<li><b>Rule FF3 — Vượt qua cổng kiểm soát:</b> Khi phát hiện Trạng thái=ĐÃ PHÁT HÀNH nhưng nNgười xác nhận FAIL hoặc thiếu ApprovalHistory → <b>dừng giao hàng (STOP-SHIP / dừng giao hàng)</b>, mở NCR nội bộ, khóa quyền sửa tay và báo cáo ban điều hành trong ca.</li>
 <li><b>Rule FF4 — Null key:</b> Khi hồ sơ cổng kiểm soát thiếu JobNum/PackID/ID khóa → <b>CHẶN</b> hồ sơ; sửa dữ liệu đầu nguồn rồi mới chạy lại.</li>
 </ol>
 </div>
@@ -274,7 +274,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Lẫn lộn / lẫn lô</td>
 <td>Nhân công/WIP không truy JobNum; nhầm khay/nhãn</td>
-<td>Operator dừng máy; dán nhãn “TẠM GIỮ”; gọi QC/QA tới hiện trường</td>
+<td>Operator dừng máy; dán nhãn “TẠM GIỮ”; Mọi QC/QA tới hiện trường</td>
 <td>QCHoldLog + ảnh hiện trường + ghi chú ngăn chặn</td>
 </tr>
 <tr>
@@ -311,7 +311,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3</td><td>Rà JobIndex: Released nhưng EvidenceFolderUrl trống</td><td>Planner</td><td>Danh sách job + hành động xử lý</td><td>Cho chạy sản xuất khi hồ sơ chưa tạo</td></tr>
 <tr><td>4</td><td>Kiểm tra thư mục Hồ sơ công việc của job mới (cấu trúc 01→08)</td><td>Setup</td><td>Link thư mục + ảnh cấu trúc</td><td>Tạo nhầm tên thư mục; thiếu Rev</td></tr>
 <tr><td>5</td><td>Kiểm tra công việc tồn đọng Approvals (Ship/NCR/CAPA/Hold)</td><td>QA</td><td>Danh sách phê duyệt quá hạn</td><td>Để trôi SLA; không escalation</td></tr>
-<tr><td>6</td><td>Kiểm tra SoD: người tạo hồ sơ không tự duyệt</td><td>QA + Supervisor</td><td>ApprovalHistory đối chiếu CreatedBy</td><td>Chấp nhận tự duyệt “cho nhanh”</td></tr>
+<tr><td>6</td><td>Kiểm tra SoD: nNgười tạo hồ sơ không tự duyệt</td><td>QA + Supervisor</td><td>ApprovalHistory đối chiếu CreatedBy</td><td>Chấp nhận tự duyệt “cho nhanh”</td></tr>
 <tr><td>7</td><td>Rà ShipRelease trạng thái=ĐÃ CHẶN và lý do thiếu</td><td>Kho</td><td>ShipRelease hồ sơ + thiếu lý do</td><td>Chỉ xem trạng thái, không đọc lý do</td></tr>
 <tr><td>8</td><td>Bổ sung bằng chứng thiếu (gói hồ sơ/kiểm tra/đóng gói/SSCC)</td><td>Responsible Person theo lý do</td><td>File trong hồ sơ + URL gắn vào hồ sơ</td><td>Gắn link sai thư mục; file “mồ côi”</td></tr>
 <tr><td>9</td><td>Chạy lại xác nhận (FLOW_07) bằng cách cập nhật ShipRelease</td><td>Kho</td><td>IntegrationLogs run mới + PASS/CHẶN</td><td>Không ghi lại runId; không chứng minh tái xác nhận</td></tr>
@@ -382,7 +382,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="section" id="assessment">
 <h2>10) Đánh giá</h2>
-<h3>10.1 Bài kiểm tra nhanh (≥20 câu) — trắc nghiệm + tình huống ngắn</h3>
+<h3>10.1 Bài kiểm tra nhanh (≥20 câu) — trắc nNhiệm + tình huống ngắn</h3>
 <ol>
 <li>(MCQ) “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” nghĩa là gì trong ShipRelease?</li>
 <li>(MCQ) Khi IntegrationLogs báo Thất bại, hành động nào phải chặn ngay? A) tạm ứng / nâng cao LastSyncUtc B) Tạo StandupAction C) Gửi thông báo D) Giữ con trỏ</li>
@@ -390,7 +390,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>(MCQ) tính bất biến (idempotent) cập nhật/thêm mới (upsert) bắt buộc dùng khóa nào cho JobIndex? A) JobNum B) EpicorKey C) PartNum D) DueDate</li>
 <li>(MCQ) Ai phải tách khỏi quyền tự phê duyệt hồ sơ do chính mình tạo ở cổng kiểm soát Ship/NCR?</li>
 <li>(ngắn / thiếu) Nêu 3 trường tối thiểu trong ApprovalHistory để đánh giá được.</li>
-<li>(MCQ) ShipRelease người xác nhận kiểm tra tối thiểu những nhóm gì? A) Đóng gói B) Kiểm tra/FAI C) SSCC D) Tất cả</li>
+<li>(MCQ) ShipRelease nNgười xác nhận kiểm tra tối thiểu những nhóm gì? A) Đóng gói B) Kiểm tra/FAI C) SSCC D) Tất cả</li>
 <li>(MCQ) Khi RequiresFAI=TRUE và thiếu ReportUrl, trạng thái đúng là gì?</li>
 <li>(ngắn / thiếu) Viết 1 câu “phản ứng 60 giây” khi phát hiện vượt qua cổng kiểm soát.</li>
 <li>(MCQ) Evidence phải lưu theo nguyên tắc nào? A) Nhét file vào list B) Lưu URL tới hồ sơ C) Gửi email D) Chụp hình để máy</li>
@@ -406,13 +406,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>(MCQ) Khi phát hiện lẫn lộn, hành động đầu tiên tại hiện trường là gì?</li>
 </ol>
 <details class="note">
-<summary><strong>Đáp án chuẩn (chỉ dùng cho Người đào tạo/QA/Supervisor)</strong></summary>
+<summary><strong>Đáp án chuẩn (chỉ dùng cho NNgười đào tạo/QA/Supervisor)</strong></summary>
 <ol>
 <li>Không có MRR hợp lệ thì không ĐÃ PHÁT HÀNH, bắt buộc TẠM GIỮ/CHẶN.</li>
 <li>A (PHẢI chặn tạm ứng / nâng cao LastSyncUtc khi không đạt).</li>
 <li>Chặn mất dữ liệu do trễ đồng bộ và chặn bỏ sót hồ sơ quanh điểm chuyển ca.</li>
 <li>B.</li>
-<li>Operator/Setup/Lập trình viên (CNC)/QC/QA/Kho/Mua hàng/Planner/Bảo trì/EHS/Người định giá (SAL-03)/Supervisor đều phải tách khỏi quyền tự duyệt hồ sơ do chính mình tạo ở cổng kiểm soát chất lượng/ship.</li>
+<li>Operator/Setup/Lập trình viên (CNC)/QC/QA/Kho/Mua hàng/Planner/Bảo trì/EHS/NNgười định giá (SAL-03)/Supervisor đều phải tách khỏi quyền tự duyệt hồ sơ do chính mình tạo ở cổng kiểm soát chất lượng/ship.</li>
 <li>ApprovalID; SourceList/SourceRecordID; Approver; kết quả; DecisionTime (tối thiểu 3 trong số đó phải có: ApprovalID + Approver + DecisionTime).</li>
 <li>D.</li>
 <li>TẠM GIỮ/ĐÃ CHẶN.</li>
@@ -427,7 +427,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>CHẶN.</li>
 <li>Supervisor.</li>
 <li>Ví dụ: SP_{{JobNum}}_{{PackID}}_{{YYYYMMDD}}_CoC.pdf</li>
-<li>Dừng máy, cô lập sản phẩm, gọi QC/QA.</li>
+<li>Dừng máy, cô lập sản phẩm, Mọi QC/QA.</li>
 </ol>
 </details>
 <h3>10.2 Tình huống (≥3 tình huống thật — có dữ kiện; Requests quyết định TẠM GIỮ/GO và ghi MRR)</h3>
@@ -445,11 +445,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>S2 — FAI bắt buộc nhưng thiếu báo cáo</b></td>
 <td>RequiresFAI=TRUE; Báo cáo FAI trống; ShipRelease chuẩn bị tạo.</td>
 <td><b>CHẶN</b> ShipRelease; QC lập FAI và gắn ReportUrl.</td>
-<td>FAI báo cáo file + link ReportUrl + IntegrationLogs run người xác nhận</td>
+<td>FAI báo cáo file + link ReportUrl + IntegrationLogs run nNgười xác nhận</td>
 </tr>
 <tr>
 <td><b>S3 — Vượt qua cổng kiểm soát bị phát hiện</b></td>
-<td>ShipRelease.Trạng thái=ĐÃ PHÁT HÀNH nhưng người xác nhận log ghi PackagingChecks thiếu PhotoEvidenceUrl; SSCC chưa Đã xác minh.</td>
+<td>ShipRelease.Trạng thái=ĐÃ PHÁT HÀNH nhưng nNgười xác nhận log ghi PackagingChecks thiếu PhotoEvidenceUrl; SSCC chưa Đã xác minh.</td>
 <td><b>dừng giao hàng (STOP-SHIP / dừng giao hàng)</b>; set lại ĐÃ CHẶN; mở NCR nội bộ.</td>
 <td>ShipRelease cập nhật + IntegrationLogs(Thất bại/cảnh báo) + NCRLog nội bộ + StandupAction</td>
 </tr>
@@ -459,17 +459,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>10.3 Hiệu suất test (bắt buộc)</h3>
 <div class="note">
 <strong>Bài test:</strong> “Từ ĐÃ CHẶN đến ĐÃ PHÁT HÀNH có vết / nhật ký thay đổi đầy đủ” (thời gian tối đa 45 phút/tình huống)<br/>
-<strong>Mô tả:</strong> Người đào tạo tạo 01 ShipRelease giả lập bị ĐÃ CHẶN do thiếu 2 bằng chứng (PhotoEvidenceUrl và thiếu ReportUrl). Học viên phải:
+<strong>Mô tả:</strong> NNgười đào tạo tạo 01 ShipRelease giả lập bị ĐÃ CHẶN do thiếu 2 bằng chứng (PhotoEvidenceUrl và thiếu ReportUrl). Học viên phải:
  <ol>
 <li>Xác định đúng thiếu lý do trong 3 phút.</li>
 <li>Tạo/đính kèm đủ bằng chứng vào đúng Hồ sơ công việc.</li>
-<li>Cập nhật hồ sơ để chạy lại người xác nhận và đạt PASS.</li>
+<li>Cập nhật hồ sơ để chạy lại nNgười xác nhận và đạt PASS.</li>
 <li>Thực hiện phê duyệt đúng tuyến (khi được Requests) và tạo ApprovalHistory đầy đủ.</li>
 <li>Ghi IntegrationLogs/StandupAction và đóng vòng lặp.</li>
 </ol>
 <strong>Tiêu chí đánh giá ĐẠT/KHÔNG ĐẠT:</strong>
 <ul>
-<li><b>PASS</b> khi: 100% bằng chứng truy xuất nguồn gốc được; người xác nhận PASS; ApprovalHistory đầy đủ; không có vận hành vượt qua; hoàn tất trong 45 phút.</li>
+<li><b>PASS</b> khi: 100% bằng chứng truy xuất nguồn gốc được; nNgười xác nhận PASS; ApprovalHistory đầy đủ; không có vận hành vượt qua; hoàn tất trong 45 phút.</li>
 <li><b>FAIL</b> khi: thiếu bất kỳ MRR; dùng đường vòng (email/chat) để duyệt; sửa trạng thái cổng kiểm soát thủ công; không chứng minh tái xác nhận bằng log.</li>
 </ul>
 </div>
@@ -483,7 +483,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Operator / Setup / Lập trình viên (CNC)</td><td>≥ 80%</td><td>OJT đầu ra đạt 2 lần liên tiếp</td><td>PASS (tham gia theo phần vai trò)</td><td>đạt khi đủ 3 cột</td></tr>
 <tr><td>QC / Kho</td><td>≥ 85%</td><td>OJT đầu ra đạt 3 lần liên tiếp</td><td>PASS đầy đủ</td><td>PASS mới được vận hành cổng kiểm soát quan trọng</td></tr>
 <tr><td>QA / Supervisor</td><td>≥ 90%</td><td>OJT đầu ra đạt 3 lần liên tiếp + 0 vượt qua cổng kiểm soát</td><td>PASS + đánh giá dẫn dắt</td><td>PASS mới được duyệt/ra lệnh dừng giao hàng (STOP-SHIP / dừng giao hàng)</td></tr>
-<tr><td>Mua hàng / Planner / Bảo trì / EHS / Người định giá (SAL-03)</td><td>≥ 80%</td><td>Hoàn tất phần OJT liên quan chứng từ/bàn giao</td><td>PASS (phần vai trò)</td><td>đạt khi không vi phạm cổng kiểm soát</td></tr>
+<tr><td>Mua hàng / Planner / Bảo trì / EHS / NNgười định giá (SAL-03)</td><td>≥ 80%</td><td>Hoàn tất phần OJT liên quan chứng từ/bàn giao</td><td>PASS (phần vai trò)</td><td>đạt khi không vi phạm cổng kiểm soát</td></tr>
 </tbody>
 </table>
 </div>
@@ -550,7 +550,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>4</td><td>ShipRelease ĐÃ PHÁT HÀNH khi còn thiếu lý do</td><td>Vượt qua cổng kiểm soát</td><td>Flow_07 cưỡng chế ĐÃ CHẶN; giám sát bất thường “Released khi đối soát FAIL = 0”</td></tr>
 <tr><td>5</td><td>FAI/Kiểm tra thiếu ReportUrl</td><td>Không có chứng cứ chất lượng</td><td>TẠM GIỮ/CHẶN cho đến khi gắn báo cáo</td></tr>
 <tr><td>6</td><td>IntegrationLogs thiếu thông tin runId/thời lượng/count</td><td>Không chứng minh kiểm soát hệ thống</td><td>Chuẩn hóa log trường dữ liệu; Photos trạng thái theo ca</td></tr>
-<tr><td>7</td><td>Hồ sơ thiếu khóa (JobNum/PackID), dữ liệu không sạch</td><td>Không truy vết; có nguy cơ lẫn lộn</td><td>Rule FF4; hàng ngày data chất lượng kiểm tra</td></tr>
+<tr><td>7</td><td>Hồ sơ thiếu khóa (JobNum/PackID), dữ liệu không sạch</td><td>Không truy vết; có nguy cơ lẫn lộn</td><td>Rule FF4; hàng nNgày data chất lượng kiểm tra</td></tr>
 <tr><td>8</td><td>Không có DCR hồ sơ cho thay đổi luồng</td><td>Không kiểm soát thay đổi</td><td>CP7: mọi thay đổi luồng có phiếu Requests + hoàn tác / quay lại + phê duyệt</td></tr>
 <tr><td>9</td><td>Bàn giao ca không có biên bản</td><td>Mất dấu vết trách nhiệm</td><td>Bảng kiểm bước 12; lưu biên bản vào kho M365/SharePoint → HESEM-QMS-SSOT</td></tr>
 </tbody>

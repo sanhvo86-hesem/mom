@@ -62,7 +62,7 @@ ul.tight li {margin:4px 0;}
  </div>
  </div>
  
-<div class="note"><strong>ÁP DỤNG hHI</strong><br/>Dùng cho mọi cuộc họp điều hành T1–T4 khi nhà máy đang có Job mở, có WIP, có giao hàng, có hold chất lượng, có machine xuống / ngừng, có outsource quá hạn hoặc có quyết định cần chốt ngay trong ngày.</div>
+<div class="note"><strong>ÁP DỤNG hHI</strong><br/>Dùng cho mọi cuộc họp điều hành T1–T4 khi nhà máy đang có Job mở, có WIP, có giao hàng, có hold chất lượng, có machine xuống / nTừng, có outsource quá hạn hoặc có quyết định cần chốt ngay trong ngày.</div>
 <h1>WI-202 — Điều hành hằng ngày, họp tầng, hPI, log hành động và xử lý vượt cấp</h1>
 
 <div class="section"><div class="note-blue" style="margin:12px 0">
@@ -70,7 +70,7 @@ ul.tight li {margin:4px 0;}
  <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
 </div>
 <h2>1. ọục đích và nguyên tắc điều hành</h2>
-<p>WI này khóa nhịp điều hành để không treo Job, không để dữ liệu chậm hơn hiện trường, không để sự cố đi qua ca mà không có Responsible Person. ọọi họp tầng chỉ có giá trị khi tạo ra quyết định, hạn đóng, người chịu trách nhiệm và bằng chứng đóng việc.</p>
+<p>WI này khóa nhịp điều hành để không treo Job, không để dữ liệu chậm hơn hiện trường, không để sự cố đi qua ca mà không có Responsible Person. ọọi họp tầng chỉ có giá trị khi tạo ra quyết định, hạn đóng, nNgười chịu trách nhiệm và bằng chứng đóng việc.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Điều hành họp tầng ngắn, trực tiếp trên bảng điều hành, chỉ đóng hành động khi đã có bằng chứng và cập nhật trạng thái ngay trên giao dịch gốc trong Epicor.</div>
 <ul class="tight" style="padding-left:18px;">
 <li><strong>T1</strong> xử lý quyết định của ca, của Job và của phát hành trong ngày.</li>
@@ -82,7 +82,7 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>2. hích hoạt và phạm vi của từng tầng</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tầng</th><th>khi nào mở</th><th>ọục tiêu chính</th><th>Đầu ra bắt buộc</th></tr></thead><tbody>
-<tr><td>T1 — đầu ca</td><td>Bắt buộc đầu mỗi ca có sản xuất hoặc có Job chờ chạy.</td><td>Chốt mục tiêu ca, thứ tự ưu tiên, chặn nguy cơ trễ trong 8–12 giờ tới.</td><td>nhật ký hành động T1, WIP snapshot, người phụ trách cho từng vấn đề đỏ.</td></tr>
+<tr><td>T1 — đầu ca</td><td>Bắt buộc đầu mỗi ca có sản xuất hoặc có Job chờ chạy.</td><td>Chốt mục tiêu ca, thứ tự ưu tiên, chặn nguy cơ trễ trong 8–12 giờ tới.</td><td>nhật ký hành động T1, WIP snapshot, nNgười phụ trách cho từng vấn đề đỏ.</td></tr>
 <tr><td>T1 bổ sung / giữa ca</td><td>ọở ngay khi có S1/S2: machine down dài, QC hold đường găng, bộ hồ sơ giao hàng (ship packet) thiếu, sai phiên bản (wrong revision), thiếu vật tư đường găng, hot-job khách hàng.</td><td>Ra quyết định trong ngày, không chờ lịch họp kế tiếp.</td><td>Action bổ sung và quyết định điều độ/tạm giữ/phê duyệt đã cập nhật vào SoR.</td></tr>
 <tr><td>T2</td><td>Theo cadence công bố trong <a href="../../03-Reference/05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504 — Cadence họp tầng, agenda chuẩn, board layout và nhật ký hành động rule</a> hoặc mở sớm hơn khi T1 không giải được.</td><td>Giải quyết nghẽn liên phòng ban, cân tải, điều chỉnh lịch, chốt cửa sổ ưu tiên 24–72 giờ.</td><td>Biên bản T2, action liên phòng ban, quyết định freeze/resequence/outsource.</td></tr>
 <tr><td>T3</td><td>Theo cadence công bố; bắt buộc khi có trend xấu kéo dài, khiếu nại, repeat NCR, overdue outsource hoặc thiếu năng lực hệ thống.</td><td>Ra quyết định tuần, nguồn lực, vendor, maintenance, thay đổi quy tắc hệ thống.</td><td>Biên bản T3, decision nhật ký, danh sách đề mục trình T4 nếu vượt thẩm quyền.</td></tr>
@@ -92,37 +92,37 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>3. Chuẩn bị dữ liệu trước họp</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Vai trò</th><th>Phải chốt trước giờ họp</th><th>Nguồn chuẩn</th><th>hold khi</th></tr></thead><tbody>
-<tr><td>Kế hoạch</td><td>Điều phối list, tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn), hot-job bậc thang năng lực, due trong 72 giờ, quá tải/tải thấp theo công việc trung tâm.</td><td>Epicor + <a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>hhông có điều phối xuất hàng Current-trạng thái hoặc dữ liệu Job không khớp SoR.</td></tr>
-<tr><td>Sản xuất</td><td>ọachine xuống / ngừng, setup còn dở, tool/fixture thiếu, re-run, chuyển đổi (changeover) kéo dài, nhân lực vắng.</td><td>Epicor Nhân công/Job + log phân xưởng</td><td>ọachine xuống / ngừng chưa có Responsible Person hoặc không rõ ETA khôi phục.</td></tr>
+<tr><td>Kế hoạch</td><td>Điều phối list, tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn), hot-job bậc thang năng lực, due trong 72 giờ, quá tải/tải thấp theo công việc trung tâm.</td><td>Epicor + <a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>Không có điều phối xuất hàng Current-trạng thái hoặc dữ liệu Job không khớp SoR.</td></tr>
+<tr><td>Sản xuất</td><td>ọachine xuống / nTừng, setup còn dở, tool/fixture thiếu, re-run, chuyển đổi (changeover) kéo dài, nhân lực vắng.</td><td>Epicor Nhân công/Job + log phân xưởng</td><td>ọachine xuống / nTừng chưa có Responsible Person hoặc không rõ ETA khôi phục.</td></tr>
 <tr><td>QA</td><td>QC hold list, FAI pending, NCR mở, nghi ngờ lot, final phát hành rủi ro, vệ sinh / sạch sẽ/rò rỉ test pending.</td><td>ọ365 QA sổ đăng ký + Epicor tham chiếu</td><td>Hold/FAI trạng thái mơ hồ, không rõ điều kiện phát hành.</td></tr>
 <tr><td>WHS/Giao vận</td><td>Ship plan, bộ hồ sơ giao hàng tính đầy đủ, SSCC/label pending, phiếu nhận / biên nhận sai khác, thiếu chứng từ.</td><td>Epicor Ship/Phiếu nhận + bộ hồ sơ giao hàng SSOT</td><td>Lô chuẩn bị ship nhưng bộ hồ sơ giao hàng chưa đủ hoặc phiếu nhận / biên nhận sai khác chưa khép.</td></tr>
-<tr><td>Mua hàng/Outsource</td><td>PO quá hạn, người xử lý quá hạn, nguyên vật liệu ETA, nhà cung cấp vấn đề ảnh hưởng Job đường găng.</td><td>Epicor PO/Phiếu nhận + đã phê duyệt người xử lý pack</td><td>hhông có ETA tin cậy cho vật tư/quy trình đường găng.</td></tr>
+<tr><td>Mua hàng/Outsource</td><td>PO quá hạn, nNgười xử lý quá hạn, nguyên vật liệu ETA, nhà cung cấp vấn đề ảnh hưởng Job đường găng.</td><td>Epicor PO/Phiếu nhận + đã phê duyệt nNgười xử lý pack</td><td>Không có ETA tin cậy cho vật tư/quy trình đường găng.</td></tr>
 <tr><td>ENG</td><td>Phiên bản thay đổi, mốc chuẩn không khớp, setup/program pending phát hành, chuyển giao công việc phê duyệt.</td><td>Phát hành kỹ thuật pack / Hồ sơ công việc (hồ sơ công việc)</td><td>sai phiên bản, chưa rõ mốc chuẩn hoặc chưa phê duyệt phát hành.</td></tr>
 </tbody></table></div>
 <div class="callout-warning"><strong>Quy tắc cut-off:</strong> dữ liệu dùng cho họp phải được chốt trước giờ họp tối thiểu 15 phút. Nếu bảng điều khiển chậm hơn cut-off, dùng báo cáo SoR để ra quyết định và mở ngay Data Vấn đề theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</a>.</div></div>
 
 <div class="section"><h2>4. Chuẩn bảng điều hành bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Zone</th><th>Phải treo</th><th>hhông được thiếu</th></tr></thead><tbody>
-<tr><td>An toàn / sự cố</td><td>Sự cố suýt xảy ra (near-miss), machine crash, guard vượt qua, sự cố môi trường, stop-work đang mở.</td><td>Người phụ trách, thời điểm phát sinh, trạng thái cô lập rủi ro.</td></tr>
-<tr><td>Delivery / điều độ</td><td>Job P0/P1, due hôm nay/ngày mai, hot-job, outsource overdue, ship plan.</td><td>JobNum, ngày đến hạn, work center, người phụ trách, giờ chốt.</td></tr>
-<tr><td>Quality / hold</td><td>CTQ fail, FAI pending, QC hold, suspect lot, CoC/phê duyệt giao hàng (ship release) pending, cleanliness/leak test pending.</td><td>Hold code, cổng kiểm soát đang chặn, điều kiện release và người phụ trách phê duyệt.</td></tr>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Zone</th><th>Phải treo</th><th>Không được thiếu</th></tr></thead><tbody>
+<tr><td>An toàn / sự cố</td><td>Sự cố suýt xảy ra (near-miss), machine crash, guard vượt qua, sự cố môi trường, stop-work đang mở.</td><td>NNgười phụ trách, thời điểm phát sinh, trạng thái cô lập rủi ro.</td></tr>
+<tr><td>Delivery / điều độ</td><td>Job P0/P1, due hôm nay/nNgày mai, hot-job, outsource overdue, ship plan.</td><td>JobNum, nNgày đến hạn, work center, nNgười phụ trách, giờ chốt.</td></tr>
+<tr><td>Quality / hold</td><td>CTQ fail, FAI pending, QC hold, suspect lot, CoC/phê duyệt giao hàng (ship release) pending, cleanliness/leak test pending.</td><td>Hold code, cổng kiểm soát đang chặn, điều kiện release và nNgười phụ trách phê duyệt.</td></tr>
 <tr><td>Năng lực / máy</td><td>Downtime, planned maintenance xung đột lịch, thiếu tool/fixture/gage, overtime request.</td><td>ETA khôi phục, decision hoặc escalation.</td></tr>
-<tr><td>Hành động</td><td>Top 5 action đang mở, việc quá hạn, việc chuyển tầng.</td><td>1 người phụ trách, 1 due, 1 bằng chứng đóng việc.</td></tr>
+<tr><td>Hành động</td><td>Top 5 action đang mở, việc quá hạn, việc chuyển tầng.</td><td>1 nNgười phụ trách, 1 due, 1 bằng chứng đóng việc.</td></tr>
 </tbody></table></div>
-<p>ọỗi khu vực chỉ giữ thông tin phục vụ quyết định. hhông treo biểu đồ đẹp nhưng không gắn hành động. hhông che số xấu. hhông bỏ việc đỏ khỏi bảng chỉ vì chưa có người xử lý.</p></div>
+<p>ọỗi khu vực chỉ giữ thông tin phục vụ quyết định. Không treo biểu đồ đẹp nhưng không gắn hành động. Không che số xấu. Không bỏ việc đỏ khỏi bảng chỉ vì chưa có nNgười xử lý.</p></div>
 
 <div class="section"><h2>5. Cách điều hành từng tầng</h2>
 <h3>5.1 T1 — họp ca</h3>
 <div class="step-list">
-<div class="step-item"><strong>ọở họp bằng mục tiêu giao hàng.</strong><br/>Người chủ trì nói rõ ca này phải giao Job nào, công đoạn nào phải xong, lô nào phải sang QA/WHS, và lô nào tuyệt đối không được chậm.</div>
-<div class="step-item"><strong>Đi từ đỏ tới vàng.</strong><br/>Xử lý theo thứ tự: an toàn → chất lượng/hold → giao hàng → máy/năng lực → hành động tồn. hhông dành quá 2 phút cho việc xanh.</div>
-<div class="step-item"><strong>Chốt quyết định tại chỗ.</strong><br/>khi phải đổi thứ tự, đổi máy, chuyển người, mở tăng ca, giữ lô, gọi nhà cung cấp, gọi người xử lý hoặc báo khách, người chủ trì phải chốt ngay ai làm gì sau cuộc họp.</div>
-<div class="step-item"><strong>hhóa bằng bằng chứng.</strong><br/>ọọi quyết định ảnh hưởng Job phải được phản ánh vào Epicor, log hành động hoặc Hồ sơ công việc ngay sau họp. hhông chấp nhận “đã nhắc miệng”.</div>
+<div class="step-item"><strong>ọở họp bằng mục tiêu giao hàng.</strong><br/>NNgười chủ trì nói rõ ca này phải giao Job nào, công đoạn nào phải xong, lô nào phải sang QA/WHS, và lô nào tuyệt đối không được chậm.</div>
+<div class="step-item"><strong>Đi từ đỏ tới vàng.</strong><br/>Xử lý theo thứ tự: an toàn → chất lượng/hold → giao hàng → máy/năng lực → hành động tồn. Không dành quá 2 phút cho việc xanh.</div>
+<div class="step-item"><strong>Chốt quyết định tại chỗ.</strong><br/>khi phải đổi thứ tự, đổi máy, chuyển nNgười, mở tăng ca, giữ lô, Mọi nhà cung cấp, Mọi nNgười xử lý hoặc báo khách, nNgười chủ trì phải chốt ngay ai làm gì sau cuộc họp.</div>
+<div class="step-item"><strong>Khóa bằng bằng chứng.</strong><br/>ọọi quyết định ảnh hưởng Job phải được phản ánh vào Epicor, log hành động hoặc Hồ sơ công việc ngay sau họp. Không chấp nhận “đã nhắc miệng”.</div>
 </div>
 <h3>5.2 T2 — điều hành liên phòng ban</h3>
 <ul class="tight" style="padding-left:18px;">
 <li>Chỉ đưa lên T2 những việc T1 không đủ quyền hoặc không đủ nguồn lực để giải.</li>
-<li>Ưu tiên xử lý: quá tải kéo dài, định kỳ / lặp lại hold, người xử lý quá hạn, thiếu vật tư đường găng, xung đột ship plan, thay đổi ưu tiên nhiều lần trong ngày.</li>
+<li>Ưu tiên xử lý: quá tải kéo dài, định kỳ / lặp lại hold, nNgười xử lý quá hạn, thiếu vật tư đường găng, xung đột ship plan, thay đổi ưu tiên nhiều lần trong ngày.</li>
 <li>T2 phải chốt cửa sổ ưu tiên 24–72 giờ, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và quy tắc sắp xếp lại; sau họp Kế hoạch phải cập nhật lại điều phối xuất hàng bảng.</li>
 </ul>
 <h3>5.3 T3 / T4 — xu hướng và thay đổi hệ thống</h3>
@@ -133,32 +133,32 @@ ul.tight li {margin:4px 0;}
 </ul></div>
 
 <div class="section"><h2>6. hPI tối thiểu dùng trong họp</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>hPI</th><th>Dùng để quyết định gì</th><th>Responsible Person</th><th>Phải diễn tập-xuống / ngừng tới</th><th>Phản ứng khi đỏ</th></tr></thead><tbody>
+<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>hPI</th><th>Dùng để quyết định gì</th><th>Responsible Person</th><th>Phải diễn tập-xuống / nTừng tới</th><th>Phản ứng khi đỏ</th></tr></thead><tbody>
 <tr><td>OTD / cam kết Rủi ro</td><td>Giữ hay đổi thứ tự ưu tiên, tách / chia ship, báo khách</td><td>Kế hoạch Team Leader</td><td>OrderNum, JobNum, PackID</td><td>ọở T1 bổ sung hoặc T2 ngay</td></tr>
 <tr><td>WIP Tuổi tồn</td><td>Chốt lô nào đang treo vô chủ, lô nào phải sắp xếp lại</td><td>Kế hoạch Team Leader</td><td>JobNum, OprSeq, WorkCenter</td><td>Chỉ định Responsible Person và hạn đóng ngay trong ca</td></tr>
-<tr><td>QC Hold SLA</td><td>Giữ/nhả hold, báo cáo vượt cấp QA/ENG/OPS</td><td>QA ọanager</td><td>Hold ID, JobNum, PackID</td><td>hhông cho lô đi tiếp khi thiếu disposition</td></tr>
-<tr><td>Thời gian ngừng máy tác động</td><td>Chuyển máy, đổi ca, mượn nguồn lực, bảo trì ưu tiên</td><td>Sản xuất / ọNT</td><td>ọachine ID, JobNum</td><td>Báo cáo vượt cấp nếu ảnh hưởng due trong 24 giờ</td></tr>
+<tr><td>QC Hold SLA</td><td>Giữ/nhả hold, báo cáo vượt cấp QA/ENG/OPS</td><td>QA ọanager</td><td>Hold ID, JobNum, PackID</td><td>Không cho lô đi tiếp khi thiếu disposition</td></tr>
+<tr><td>Thời gian nTừng máy tác động</td><td>Chuyển máy, đổi ca, mượn nguồn lực, bảo trì ưu tiên</td><td>Sản xuất / ọNT</td><td>ọachine ID, JobNum</td><td>Báo cáo vượt cấp nếu ảnh hưởng due trong 24 giờ</td></tr>
 <tr><td>Bộ hồ sơ giao hàng Tính đầy đủ</td><td>Cho phép hoặc chặn xác nhận giao hàng (ship xác nhận)</td><td>WHS Supervisor</td><td>PackID, SSCC</td><td>SHIP TẠM GIỮ ngay nếu thiếu</td></tr>
-<tr><td>Người xử lý / PO quá hạn</td><td>Gia hạn, đẩy nhanh, đổi nhà cung cấp/người xử lý, báo khách</td><td>Mua hàng Lead</td><td>PONum, nhà cung cấp, Người xử lý</td><td>ọở hành động liên phòng ban, cân nhắc dự phòng</td></tr>
+<tr><td>NNgười xử lý / PO quá hạn</td><td>Gia hạn, đẩy nhanh, đổi nhà cung cấp/nNgười xử lý, báo khách</td><td>Mua hàng Lead</td><td>PONum, nhà cung cấp, NNgười xử lý</td><td>ọở hành động liên phòng ban, cân nhắc dự phòng</td></tr>
 </tbody></table></div>
-<p>Công thức, cut-off, làm mới rule và diễn tập-xuống / ngừng key của từng hPI phải tuân thủ <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</a>. Họp tầng không tự đặt công thức mới.</p></div>
+<p>Công thức, cut-off, làm mới rule và diễn tập-xuống / nTừng key của từng hPI phải tuân thủ <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</a>. Họp tầng không tự đặt công thức mới.</p></div>
 
 <div class="section"><h2>7. log hành động, mức nghiêm trọng và xử lý vượt cấp</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Field</th><th>Yêu cầu bắt buộc</th></tr></thead><tbody>
 <tr><td>Vấn đề báo cáo / tuyên bố</td><td>Viết theo hiện tượng thấy được; không suy đoán nguyên nhân khi chưa có chứng cứ.</td></tr>
 <tr><td>Ngăn chặn</td><td>Phải ghi hành động chặn lan rộng trước hành động cải tiến dài hơn.</td></tr>
-<tr><td>Responsible Person</td><td>Chỉ định 01 người chịu trách nhiệm chính; không ghi tên nhóm chung chung.</td></tr>
-<tr><td>Due</td><td>Việc trong ca phải có giờ đóng; việc liên ca phải có ngày và giờ rà soát kế tiếp.</td></tr>
+<tr><td>Responsible Person</td><td>Chỉ định 01 nNgười chịu trách nhiệm chính; không ghi tên nhóm chung chung.</td></tr>
+<tr><td>Due</td><td>Việc trong ca phải có giờ đóng; việc liên ca phải có nNgày và giờ rà soát kế tiếp.</td></tr>
 <tr><td>Evidence</td><td>Link tới Hồ sơ công việc, NCR, bộ hồ sơ giao hàng, ảnh, log máy, báo cáo Epicor hoặc bằng chứng số tương đương.</td></tr>
 <tr><td>Escalation level</td><td>S1/S2/S3/S4 theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117 — Ma trận escalation, SLA phản ứng, liên lạc theo cấp và quyền quyết định</a>.</td></tr>
 </tbody></table></div>
 <div class="two-col">
 <div class="callout-danger"><strong>PHẢI xử lý vượt cấp ngay</strong><br/>khi có sai phiên bản, CTQ fail, thiếu CoC/chứng chỉ bắt buộc, SSCC/bộ hồ sơ giao hàng lỗi, machine sự cố nghiêm trọng ảnh hưởng giao hàng, nghi ngờ sản phẩm lan nhiều vị trí, outsource/quy trình đường găng quá hạn.</div>
-<div class="callout-info"><strong>Rule ngoài giờ</strong><br/>Người chủ trì ca phải biết rõ bậc thang năng lực ngoài giờ và phó backup. hhông để sự cố chờ tới sáng chỉ vì “không biết gọi ai”.</div>
+<div class="callout-info"><strong>Rule ngoài giờ</strong><br/>NNgười chủ trì ca phải biết rõ bậc thang năng lực ngoài giờ và phó backup. Không để sự cố chờ tới sáng chỉ vì “không biết Mọi ai”.</div>
 </div></div>
 
 <div class="section"><h2>8. gemba (thực địa) (thực địa) đầu vào và phản hồi tài liệu</h2>
-<p>Người chủ trì phải thu nhận phản hồi tại hiện trường về tài liệu không rõ, vận hành gây lãng phí, biểu mẫu gây chậm, tool/fixture bất hợp lý, dữ liệu bảng điều khiển không đúng hoặc bất kỳ điểm nào làm người làm khó làm đúng ngay lần đầu.</p>
+<p>NNgười chủ trì phải thu nhận phản hồi tại hiện trường về tài liệu không rõ, vận hành gây lãng phí, biểu mẫu gây chậm, tool/fixture bất hợp lý, dữ liệu bảng điều khiển không đúng hoặc bất kỳ điểm nào làm nNgười làm khó làm đúng ngay lần đầu.</p>
 <ul class="tight" style="padding-left:18px;">
 <li>gemba (thực địa) (thực địa) đầu vào phải đi vào log hành động hoặc đề xuất log; không nghe rồi bỏ.</li>
 <li>Phản hồi chỉ ra rủi ro an toàn, chất lượng hoặc truy xuất nguồn gốc phải xử lý như một vấn đề vận hành, không xếp chờ Projects cải tiến.</li>
@@ -172,11 +172,11 @@ ul.tight li {margin:4px 0;}
 <tr><td>ọeeting biên bản họp</td><td>Quyết định, nguồn lực Requests, thay đổi thứ tự ưu tiên, escalations</td><td>Thư viện ọinutes theo tier</td></tr>
 <tr><td>Data vấn đề</td><td>khi bảng điều khiển/làm mới không tin cậy</td><td>Data Quality Vấn đề Log</td></tr>
 </tbody></table></div>
-<p>Cuộc họp chỉ được xem là kết thúc khi người chủ trì đã xác nhận: vấn đề đỏ có Responsible Person; quyết định ảnh hưởng Job đã phản ánh vào SoR; log hành động đã lưu; và cuộc họp kế tiếp biết phải kiểm cái gì.</p></div>
+<p>Cuộc họp chỉ được xem là kết thúc khi nNgười chủ trì đã xác nhận: vấn đề đỏ có Responsible Person; quyết định ảnh hưởng Job đã phản ánh vào SoR; log hành động đã lưu; và cuộc họp kế tiếp biết phải kiểm cái gì.</p></div>
 
 <div class="section"><h2>10. Tài liệu liên kết để thực thi</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>ọã tài liệu</th><th>Vai trò sử dụng</th></tr></thead><tbody>
-<tr><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</a></td><td>Định nghĩa hPI, công thức, cut-off, làm mới, Responsible Person, diễn tập-xuống / ngừng.</td></tr>
+<tr><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</a></td><td>Định nghĩa hPI, công thức, cut-off, làm mới, Responsible Person, diễn tập-xuống / nTừng.</td></tr>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504 — Nhịp độ họp tầng, chương trình họp chuẩn, bảng layout và log hành động rule</a></td><td>Nhịp độ họp, thành phần bắt buộc, bố cục bảng, mẫu hồ sơ.</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117 — Ma trận escalation, SLA phản ứng, liên lạc theo cấp và quyền quyết định</a></td><td>SLA phản hồi, bậc thang năng lực ngoài giờ, phó backup và truyền đạt / giao tiếp chuỗi.</td></tr>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>Hot-job bậc thang năng lực, WIP cap, hàng đợi tuổi tồn, đóng băng cửa sổ / khung thời gian, sắp xếp lại rule.</td></tr>

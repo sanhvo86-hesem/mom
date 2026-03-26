@@ -80,7 +80,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div style="margin-top:8px">
 <span class="tag">Operator</span><span class="tag">Setup</span><span class="tag">Lập trình viên (CNC)</span><span class="tag">QC</span><span class="tag">QA</span>
 <span class="tag">Kho</span><span class="tag">Mua hàng</span><span class="tag">Planner</span><span class="tag">Bảo trì</span><span class="tag">EHS</span>
-<span class="tag">Người định giá (SAL-03)</span><span class="tag">Supervisor</span>
+<span class="tag">NNgười định giá (SAL-03)</span><span class="tag">Supervisor</span>
 </div>
 </div>
 </div>
@@ -106,7 +106,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi tạo mới hoặc thay đổi sơ đồ cấu trúc SharePoint danh sách phục vụ vận hành (JobIndex, ShipRelease, NCRLog...).</li>
 <li>Khi công bố / phát hành lần đầu bộ dữ liệu/báo cáo lên không gian làm việc vận hành.</li>
 <li>Khi thay đổi KPI/DAX, quan hệ mô hình, làm mới lịch trình, quyền truy cập.</li>
-<li>Khi chuẩn bị đánh giá nội bộ/khách hàng và cần diễn tập-xuống / ngừng tới MRR.</li>
+<li>Khi chuẩn bị đánh giá nội bộ/khách hàng và cần diễn tập-xuống / nTừng tới MRR.</li>
 </ul>
 </div>
 <div class="note">
@@ -148,7 +148,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Báo giá/Hợp đồng</td>
 <td>Thông tin khách hàng, Requests chứng từ</td>
-<td>Customer view (Người định giá (SAL-03)</td>
+<td>Customer view (NNgười định giá (SAL-03)</td>
 <td>Thiếu Requests bằng chứng → CHẶN nhận cam kết giao</td>
 </tr>
 <tr>
@@ -179,7 +179,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Sản xuất</td>
 <td>LaborMirror M365/SharePoint → HESEM-QMS-SSOT, DowntimeEvents</td>
 <td>Thiết bị &amp; MES</td>
-<td>Thời gian ngừng máy đột biến / tăng đột ngột + thiếu biên bản xử lý → TẠM GIỮ kế hoạch</td>
+<td>Thời gian nTừng máy đột biến / tăng đột ngột + thiếu biên bản xử lý → TẠM GIỮ kế hoạch</td>
 </tr>
 <tr>
 <td>QC/QA</td>
@@ -238,7 +238,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Tên list không khớp</b> (JobIndex vs Job Index) → fnGetSharePointList báo không tìm thấy, làm mới fail.</li>
 <li><b>List bị trùng tên hiển thị</b> → fnGetSharePointList báo trùng lặp, làm mới fail.</li>
 <li><b>Cột SharePoint có khoảng trắng</b> nhưng mô hình dùng tên đã bỏ khoảng trắng → đo lường lỗi, trực quan trống.</li>
-<li><b>Kiểu dữ liệu sai</b> (DueDate dạng text) → lọc ngày hỏng, KPI OTD sai.</li>
+<li><b>Kiểu dữ liệu sai</b> (DueDate dạng text) → lọc nNgày hỏng, KPI OTD sai.</li>
 <li><b>Power truy vấn lỗi cú pháp</b> trong file mốc chuẩn: <span class="mono">JobIndex.pq</span> thiếu dấu phẩy sau bước <span class="mono">đã nhập</span> → làm mới fail toàn bộ.</li>
 <li><b>mở rộng siêu liên kết/person không đồng nhất</b> → diễn tập-xuyên suốt link trống, đánh giá không truy xuất nguồn gốc.</li>
 <li><b>DAX dùng bảng giữ chỗ</b> (DispatchPlan/WIPTracker) chưa tồn tại → mô hình công bố / phát hành được nhưng KPI lỗi.</li>
@@ -284,9 +284,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Link không mở → bảng điều khiển không được dùng làm cổng kiểm soát</td>
 </tr>
 <tr>
-<td>CP4 — Review đồng cấp DAX/KPI (2 người)</td>
+<td>CP4 — Review đồng cấp DAX/KPI (2 nNgười)</td>
 <td>QA/QMS + Supervisor</td>
-<td>BI_ReleaseNotes có mục “KPI đã thay đổi” + người duyệt</td>
+<td>BI_ReleaseNotes có mục “KPI đã thay đổi” + nNgười duyệt</td>
 <td>KPI đổi không duyệt → CHẶN PROD</td>
 </tr>
 <tr>
@@ -403,12 +403,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Khóa danh sách list nguồn và quyền truy cập đọc</td><td>QA + Chủ quá trình</td><td>Danh mục list + người sở hữu + quyền</td><td>List trùng tên hiển thị</td></tr>
+<tr><td>1</td><td>Khóa danh sách list nguồn và quyền truy cập đọc</td><td>QA + Chủ quá trình</td><td>Danh mục list + nNgười sở hữu + quyền</td><td>List trùng tên hiển thị</td></tr>
 <tr><td>2</td><td>Tạo thông số <span class="mono">pSiteUrl</span> đúng site PROD</td><td>IT/BI</td><td>Ảnh cấu hình thông số</td><td>Trỏ nhầm DEV/UAT</td></tr>
 <tr><td>3</td><td>Dán 4 chức năng M vào Power truy vấn</td><td>IT/BI</td><td>Ảnh Nâng cao biên tập viên / trình soạn thảo (fnGetSharePointList, fnClean..., fnExpandPerson..., fnExpandHyperlink...)</td><td>Đặt sai tên chức năng</td></tr>
 <tr><td>4</td><td>Import truy vấn list theo pack (JobIndex, ShipRelease, PackagingChecks, NCRLog, QCHoldLog, CAPA8D, DowntimeEvents, StandupActions)</td><td>IT/BI</td><td>Danh sách truy vấn đã load</td><td>Thiếu truy vấn làm KPI trống</td></tr>
 <tr><td>5</td><td>Sửa lỗi cú pháp mốc chuẩn tại <span class="mono">JobIndex.pq</span> (thêm dấu phẩy sau <span class="mono">đã nhập</span>)</td><td>IT/BI</td><td>so sánh khác biệt (diff) nội dung + làm mới pass</td><td>Sửa nhưng quên Áp dụng</td></tr>
-<tr><td>6</td><td>Ép kiểu dữ liệu theo chuẩn (date/ngày giờ/text)</td><td>IT/BI</td><td>Danh sách cột đã đã nhập</td><td>DueDate ở dạng text</td></tr>
+<tr><td>6</td><td>Ép kiểu dữ liệu theo chuẩn (date/nNgày giờ/text)</td><td>IT/BI</td><td>Danh sách cột đã đã nhập</td><td>DueDate ở dạng text</td></tr>
 <tr><td>7</td><td>Mở diễn tập-xuyên suốt link EvidenceFolderUrl từ JobIndex</td><td>QA + IT/BI</td><td>Ảnh diễn tập-xuyên suốt mở link</td><td>Siêu liên kết chưa mở rộng</td></tr>
 <tr><td>8</td><td>Tạo DimDate và đánh dấu as Date table</td><td>IT/BI</td><td>Ảnh mô hình view</td><td>Không đánh dấu date table</td></tr>
 <tr><td>9</td><td>Thiết lập quan hệ theo template (dữ kiện → JobIndex/DimDate)</td><td>IT/BI</td><td>Ảnh mối quan hệ</td><td>chéo filter sai</td></tr>
@@ -484,7 +484,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>01 biên bản UAT có diễn tập-xuyên suốt tới EvidenceFolderUrl cho ít nhất 05 job.</li>
 <li>01 BI_ReleaseNotes cho bản phát hành (có hoàn tác / quay lại).</li>
 <li>01 hồ sơ test alert (làm mới fail giả lập hoặc bất thường giả lập) trong BI_IncidentLog.</li>
-<li>Với nhóm người dùng (Operator/Setup/QC/Kho/...): 01 quyết định TẠM GIỮ/GO dựa bảng điều khiển kèm hồ sơ MRR.</li>
+<li>Với nhóm nNgười dùng (Operator/Setup/QC/Kho/...): 01 quyết định TẠM GIỮ/GO dựa bảng điều khiển kèm hồ sơ MRR.</li>
 </ul>
 <h3>9.3 Tiêu chí đánh giá L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn khi đạt)</h3>
 <div class="table-wrap">
@@ -518,8 +518,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L4</b></td>
-<td>Thiết lập quản trị hoàn chỉnh: phát hành ghi chú, hoàn tác / quay lại, giám sát/alert; đào tạo lại người khác và đánh giá diễn tập-xuống / ngừng pass.</td>
-<td>01 lần phát hành PROD không phát sinh sự cố nghiêm trọng trong 30 ngày SSOT/EHS-Sự cố-Log (SharePoint List).</td>
+<td>Thiết lập quản trị hoàn chỉnh: phát hành ghi chú, hoàn tác / quay lại, giám sát/alert; đào tạo lại nNgười khác và đánh giá diễn tập-xuống / nTừng pass.</td>
+<td>01 lần phát hành PROD không phát sinh sự cố nghiêm trọng trong 30 nNgày SSOT/EHS-Sự cố-Log (SharePoint List).</td>
 <td>Được làm Approver thay đổi KPI/làm mới theo ma trận quyền.</td>
 </tr>
 </tbody>
@@ -531,14 +531,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>IT/BI:</b> bắt buộc đạt L3 để công bố / phát hành DEV/UAT; bắt buộc đạt L4 để công bố / phát hành PROD.</li>
 <li><b>QA/QMS + Supervisor:</b> bắt buộc đạt L3 để ký UAT và quyết định cổng kiểm soát; đạt L4 để phê duyệt KPI/làm mới.</li>
 <li><b>Planner/Kho/QC/Bảo trì:</b> bắt buộc đạt L2 để tạo hồ sơ sự cố theo ca; đạt L3 để ký dữ liệu trang chuyên môn.</li>
-<li><b>Operator/Setup/Lập trình viên (CNC)/EHS/Người định giá (SAL-03)/Mua hàng:</b> bắt buộc đạt L1 để dùng bảng điều khiển; đạt L2 khi tạo hồ sơ bất thường đúng.</li>
+<li><b>Operator/Setup/Lập trình viên (CNC)/EHS/NNgười định giá (SAL-03)/Mua hàng:</b> bắt buộc đạt L1 để dùng bảng điều khiển; đạt L2 khi tạo hồ sơ bất thường đúng.</li>
 </ul>
 </div>
 </div>
 <!-- 10) Đánh giá -->
 <div class="card">
 <h2>10) Đánh giá</h2>
-<h3>10.1 Bài kiểm tra nhanh (≥ 20 câu; trắc nghiệm + tình huống ngắn)</h3>
+<h3>10.1 Bài kiểm tra nhanh (≥ 20 câu; trắc nNhiệm + tình huống ngắn)</h3>
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
 <li>pSiteUrl dùng để làm gì và đặt ở đâu trong Power BI?</li>
 <li>Khi fnGetSharePointList báo “not phát hiện or trùng lặp”, hành động chặn là gì?</li>
@@ -597,7 +597,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3>10.3 Hiệu suất test (bắt buộc)</h3>
 <p>
- Hiệu suất test chia 2 đường: <b>Responsible Person theo dõi</b> (IT/BI/QA/Supervisor) và <b>Người dùng theo dõi</b> (các vai trò còn lại).
+ Hiệu suất test chia 2 đường: <b>Responsible Person theo dõi</b> (IT/BI/QA/Supervisor) và <b>NNgười dùng theo dõi</b> (các vai trò còn lại).
  </p>
 <div class="table-wrap">
 <table>
@@ -617,7 +617,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Công bố khi làm mới fail; thiếu BI_ReleaseNotes; diễn tập-xuyên suốt trống.</td>
 </tr>
 <tr>
-<td><b>Người dùng theo dõi</b></td>
+<td><b>NNgười dùng theo dõi</b></td>
 <td>Thực hiện phản ứng 60 giây cho 01 bất thường và tạo hồ sơ MRR đầy đủ (sự cố/bất thường + link bằng chứng).</td>
 <td>Chọn đúng TẠM GIỮ/GO; hồ sơ đủ trường bắt buộc; link bằng chứng mở được.</td>
 <td>Ra quyết định GO/giao hàng khi thiếu bằng chứng; không tạo hồ sơ.</td>
@@ -653,7 +653,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>12) MRR tối thiểu</h2>
 <h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
-<li><b>BI_ReleaseNotes</b> (SharePoint list): version, Author, ngày, mô tả thay đổi, rủi ro, hoàn tác / quay lại, người duyệt.</li>
+<li><b>BI_ReleaseNotes</b> (SharePoint list): version, Author, ngày, mô tả thay đổi, rủi ro, hoàn tác / quay lại, nNgười duyệt.</li>
 <li><b>BI_IncidentLog</b> (SharePoint list) M365/SharePoint → HESEM-QMS-SSOT: làm mới fail, bất thường, hành động, Responsible Person, thời điểm đóng.</li>
 <li><b>UAT_Minutes</b> (hồ sơ): kết quả test theo vai trò, diễn tập-xuyên suốt bằng chứng, danh sách lỗi và trạng thái đóng.</li>
 <li><b>Refresh_Schedule_Snapshot</b>: ảnh cấu hình làm mới + cửa sổ ca.</li>
@@ -683,7 +683,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Không truy xuất nguồn gốc được bằng chứng từ KPI</b> → bắt buộc diễn tập-xuyên suốt link; UAT kiểm bằng chứng.</li>
 <li><b>Thay đổi KPI không có kiểm soát</b> → BI_ReleaseNotes + chữ ký duyệt.</li>
 <li><b>Làm mới fail nhưng không có xử lý</b> → BI_IncidentLog theo ca, Supervisor ký đóng.</li>
-<li><b>Dùng tài khoản cá nhân chạy làm mới</b> → chuyển sang tài khoản vận hành/dịch vụ chính / người ủy quyền M365/SharePoint → HESEM-QMS-SSOT.</li>
+<li><b>Dùng tài khoản cá nhân chạy làm mới</b> → chuyển sang tài khoản vận hành/dịch vụ chính / nNgười ủy quyền M365/SharePoint → HESEM-QMS-SSOT.</li>
 <li><b>RLS không chứng minh được</b> → RLS_Test_Record 3 vai trò.</li>
 <li><b>Mô hình không nhất quán với sơ đồ cấu trúc list</b> → CP1 khóa sơ đồ cấu trúc + CP2 kiểm truy vấn.</li>
 <li><b>Bảng điều khiển dẫn dắt quyết định giao hàng khi thiếu chứng từ</b> → khóa không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate); STOP khi thiếu link bằng chứng.</li>

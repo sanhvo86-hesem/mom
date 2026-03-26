@@ -76,11 +76,11 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <tr><td>2</td><td>bảo vệ / tấm chắn / liên động an toàn</td><td>Kiểm cửa, kính chắn, chắn phoi, liên động an toàn, đèn cảnh báo, E-stop, rào cản và biển nhận diện.</td><td>bảo vệ / tấm chắn hỏng, cửa không khóa, liên động an toàn vô hiệu, kính nứt, E-stop không ổn định.</td></tr>
 <tr><td>3</td><td>Tiện ích máy</td><td>Điện, khí nén, dung dịch làm mát (dung dịch làm nguội), bôi trơn, thủy lực/mâm cặp (chuck) áp suất, trục chính (spindle) máy làm lạnh, chân không/air phun bi / thổi nếu có phải ở trạng thái đúng.</td><td>Áp suất thấp, dung dịch làm mát sai nồng độ, bôi trơn cảnh báo, rò rỉ dầu/nước, máy làm lạnh lỗi.</td></tr>
 <tr><td>4</td><td>cảnh báo / PM / trạng thái máy</td><td>Đọc cảnh báo tồn, ghi ca trước, PM due, bảo trì tag, sự cố nghiêm trọng lịch sử chưa đóng.</td><td>Còn cảnh báo chưa hiểu nguyên nhân; PM quá hạn nhưng chưa có quyết định tiếp tục; có tag TẠM GIỮ máy.</td></tr>
-<tr><td>5</td><td>ổ dao (magazine) / đầu dao (turret) / đầu dò (probe)</td><td>Kiểm hốc / túi, chị em / liên kết tool, đầu dao (turret) trạm / vị trí làm việc, đầu dò (probe) tip, tool người cài đặt máy, arm bộ thay đổi và tình trạng cán dao / đầu gá.</td><td>Tool/hốc / túi không khớp list, đầu dò (probe) tip nứt, cán dao / đầu gá mẻ, tool người cài đặt máy bẩn hoặc lệch.</td></tr>
+<tr><td>5</td><td>ổ dao (magazine) / đầu dao (turret) / đầu dò (probe)</td><td>Kiểm hốc / túi, chị em / liên kết tool, đầu dao (turret) trạm / vị trí làm việc, đầu dò (probe) tip, tool nNgười cài đặt máy, arm bộ thay đổi và tình trạng cán dao / đầu gá.</td><td>Tool/hốc / túi không khớp list, đầu dò (probe) tip nứt, cán dao / đầu gá mẻ, tool nNgười cài đặt máy bẩn hoặc lệch.</td></tr>
 <tr><td>6</td><td>Đồ gá / chấu / fixture</td><td>Kiểm đúng fixture phiên bản, trạng thái chấu mềm/chấu cứng, chặn / dừng, chốt định vị, pin, mô-men xoắn kẹp / gá kẹp và bề mặt tỳ.</td><td>Thiếu chi tiết gá, dùng sai phiên bản, thiếu mô-men xoắn đánh dấu, bề mặt tỳ bẩn hoặc có bavia.</td></tr>
 <tr><td>7</td><td>không / bằng không / home / ấm / làm nóng trước-up</td><td>Thực hiện về gốc (homing)/ấm / làm nóng trước-up theo nhóm máy (machine nhóm sản phẩm) khi máy nguội, sau mất điện, sau bảo trì hoặc sau bộ điều khiển / kiểm soát viên reset.</td><td>Máy chưa ấm / làm nóng trước-up mà chạy tinh; home/tham chiếu tổn thất; không chắc machine trạng thái.</td></tr>
 <tr><td>8</td><td>Tài liệu Job đang hiệu lực</td><td>Trên máy chỉ giữ bộ tài liệu đúng Job/Op/Part/Rev/QPL đang chạy.</td><td>Còn bộ giấy/file của Job khác, phiên bản cũ, traveler không khớp hoặc thiếu phiếu phát hành.</td></tr>
-<tr><td>9</td><td>WIP / vật tư đầu vào</td><td>Kiểm số lượng, trạng thái, tem truy xuất nguồn gốc, lot vật liệu, người xử lý cert nếu có và tình trạng bảo quản.</td><td>Thiếu tem, lẫn lot, thiếu cert bắt buộc, part đã mở bao nhưng không có rule niêm phong lại.</td></tr>
+<tr><td>9</td><td>WIP / vật tư đầu vào</td><td>Kiểm số lượng, trạng thái, tem truy xuất nguồn gốc, lot vật liệu, nNgười xử lý cert nếu có và tình trạng bảo quản.</td><td>Thiếu tem, lẫn lot, thiếu cert bắt buộc, part đã mở bao nhưng không có rule niêm phong lại.</td></tr>
 <tr><td>10</td><td>Dụng cụ đo và phản ứng</td><td>Gage dùng cho CTQ đầu tiên phải sẵn sàng, còn hiệu chuẩn, còn tem trạng thái, và Operator biết ngưỡng phản ứng.</td><td>Thiếu gage, tem hết hạn, chưa rõ CTQ đầu tiên phải kiểm hoặc chưa rõ ai phê duyệt khởi động lại.</td></tr>
 </tbody></table></div>
 </div>
@@ -92,7 +92,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="card"><strong>B. Setup đủ điều kiện.</strong><br/>Tool preset, holder, fixture, torque, clamp logic, dung dịch làm mát mode, sister tool và wear start value đã khóa theo <a href="wi-517-setup-changeover-smed-standard-work.html">WI-517</a>.</div>
 <div class="card"><strong>C. Machine state an toàn.</strong><br/>Home/reference đúng, warm-up hoàn thành, offset nền xác minh, probe/tool setter không lỗi, guard hoạt động.</div>
 <div class="card"><strong>D. Run strategy rõ.</strong><br/>Biết rõ đoạn prove-out, single block/override, điểm quan sát đầu tiên, nơi có nguy cơ va chạm và điểm dừng an toàn.</div>
-<div class="card"><strong>E. CTQ đầu tiên đã nhận diện.</strong><br/>Người vận hành biết rõ đặc tính đầu tiên phải kiểm, dụng cụ đo, ngưỡng phản ứng và người ký mở cổng kiểm soát.</div>
+<div class="card"><strong>E. CTQ đầu tiên đã nhận diện.</strong><br/>NNgười vận hành biết rõ đặc tính đầu tiên phải kiểm, dụng cụ đo, ngưỡng phản ứng và nNgười ký mở cổng kiểm soát.</div>
 <div class="card"><strong>F. Bất thường đã đóng.</strong><br/>Mọi alarm, maintenance tag, HOLD part hoặc HOLD machine của ca trước đã được đóng hoặc có lệnh mở rõ ràng.</div>
 </div>
 <div class="callout-warn"><strong>Quy tắc chứng minh-out:</strong> setup mới, chương trình mới, machine chuyển giao, tool thay thế, fixture thay thế, bù trừ (offset) reset sau sự cố nghiêm trọng hoặc khởi động lại sau mất điện đều phải quay về chứng minh-out có kiểm soát. Không được nhảy cóc sang chạy sản lượng.</div>
@@ -105,7 +105,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <tr><td>bù trừ (offset) / mài mòn</td><td>Chỉnh mài mòn theo rule cho phép; mọi chỉnh hình học/không / bằng không phải có thẩm quyền đúng.</td><td>Ghi bù trừ (offset) ra giấy rời, sửa hình học không log, hoặc sửa bù để che lỗi quy trình.</td></tr>
 <tr><td>Tool tuổi thọ / vòng đời</td><td>Ghi nhận tool cảnh báo, thay đúng trước ngưỡng end-of-tuổi thọ / vòng đời, kiểm part đầu tiên sau thay dao.</td><td>Ép chạy quá tuổi thọ / vòng đời, bỏ qua cảnh báo, hoặc thay dao nhưng không reset/xác nhận hốc / túi dữ liệu.</td></tr>
 <tr><td>cửa / bảo vệ / tấm chắn</td><td>Chỉ mở khi trục chính (spindle)/trục ở trạng thái an toàn cho phép.</td><td>Mở cửa khi còn chuyển động nguy hiểm hoặc vô hiệu liên động an toàn để can thiệp tay.</td></tr>
-<tr><td>phoi (chip) / dung dịch làm mát</td><td>Duy trì dòng phoi (chip) thoát, nồng độ dung dịch làm mát, vòi phun hướng và vệ sinh định kỳ an toàn.</td><td>Dùng khí nén bừa bãi vào vùng có phoi (chip) bay vào mắt/người khác hoặc thổi trực tiếp vào ổ trục/cảm biến không đúng quy cách.</td></tr>
+<tr><td>phoi (chip) / dung dịch làm mát</td><td>Duy trì dòng phoi (chip) thoát, nồng độ dung dịch làm mát, vòi phun hướng và vệ sinh định kỳ an toàn.</td><td>Dùng khí nén bừa bãi vào vùng có phoi (chip) bay vào mắt/nNgười khác hoặc thổi trực tiếp vào ổ trục/cảm biến không đúng quy cách.</td></tr>
 <tr><td>Ghi nhận</td><td>Ghi điểm bất thường, tool thay thế, đo lường kích hoạt, ngắn / thiếu stop, phế phẩm/làm lại đúng hồ sơ.</td><td>Chạy tiếp nhưng không cập nhật sự kiện làm sai phạm vi part nghi ngờ.</td></tr>
 </tbody></table></div>
 </div>
@@ -121,11 +121,11 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục bàn giao</th><th>Nội dung bắt buộc</th></tr></thead><tbody>
 <tr><td>Trạng thái máy</td><td>Đang chạy / đang chứng minh-out / đang hold / chờ bảo trì / chờ QA.</td></tr>
 <tr><td>Trạng thái WIP</td><td>cuối cùng-đã biết-tốt / đạt, đầu tiên-bị ảnh hưởng nếu có, số lượng đạt/chờ/chịu nghi ngờ.</td></tr>
-<tr><td>Trạng thái tool</td><td>Dao nào gần hết tuổi thọ / vòng đời, dao nào vừa thay, chị em / liên kết tool đã sẵn hay chưa.</td></tr>
+<tr><td>Trạng thái tool</td><td>Dao nào Cần hết tuổi thọ / vòng đời, dao nào vừa thay, chị em / liên kết tool đã sẵn hay chưa.</td></tr>
 <tr><td>bù trừ (offset) &amp; lưu ý</td><td>Chỉnh mài mòn đã thực hiện, lưu ý tiếng cắt/rung/phoi (chip)/dung dịch làm mát, điểm phải quan sát ở chu kỳ tới.</td></tr>
-<tr><td>Cổng kiểm soát / phát hành</td><td>Cổng kiểm soát nào đã mở, cổng kiểm soát nào đang chờ, ai là người ký bước tiếp theo.</td></tr>
+<tr><td>Cổng kiểm soát / phát hành</td><td>Cổng kiểm soát nào đã mở, cổng kiểm soát nào đang chờ, ai là nNgười ký bước tiếp theo.</td></tr>
 </tbody></table></div>
-<h3>5.3 Cuối ca / ngừng hoạt động có kiểm soát</h3>
+<h3>5.3 Cuối ca / nTừng hoạt động có kiểm soát</h3>
 <ul>
 <li>Trả máy về trạng thái sạch, an toàn, dễ tiếp quản; không để phoi (chip), đồ gá rời, dụng cụ đo hoặc vật lạ trong vỏ bọc / hộp.</li>
 <li>Hoàn tất việc backup hồ sơ cần thiết, ảnh bất thường, lý do code và log sản lượng.</li>
@@ -136,8 +136,8 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="section"><h2>6. Phản ứng khi máy bất thường và khởi động lại có kiểm soát</h2>
 <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mức</th><th>Dấu hiệu</th><th>Hành động tức thời</th><th>Điều kiện mở lại</th></tr></thead><tbody>
 <tr><td>Mức 1 — bất thường nhẹ</td><td>phoi (chip) kẹt, dung dịch làm mát lệch, tiếng cắt lạ nhưng chưa va chạm, bước tiến (feed) hold do quan sát thấy dao cắt nặng</td><td>bước tiến (feed) hold/cycle stop, kiểm nguyên nhân, làm sạch/điều chỉnh, xác định part bị ảnh hưởng</td><td>Operator/Shift Lead xác nhận nguyên nhân đã loại bỏ và part đầu tiên sau khởi động lại được kiểm</td></tr>
-<tr><td>Mức 2 — nguy cơ chất lượng</td><td>tool gãy, mài mòn chạy nhanh bất thường, đầu dò (probe) fail, bù trừ (offset) nghi trôi, kẹp / gá kẹp nghi trượt</td><td>TẠM GIỮ machine và TẠM GIỮ WIP liên quan; cô lập cuối cùng-đã biết-tốt / đạt/đầu tiên-bị ảnh hưởng; gọi Sản xuất/QA/Kỹ thuật</td><td>Người có thẩm quyền cho phép sau khi xác định machine trạng thái, phạm vi nghi ngờ và kế hoạch kiểm chứng</td></tr>
-<tr><td>Mức 3 — nguy cơ an toàn hoặc sự cố nghiêm trọng</td><td>va chạm, trục chính (spindle)/đầu dao (turret) sự cố nghiêm trọng, bảo vệ / tấm chắn/liên động an toàn fail, mất điện giữa chu kỳ nguy hiểm, rò rỉ nghiêm trọng</td><td>E-stop khi cần, phong tỏa khu vực, gắn thẻ TẠM GIỮ, gọi Bảo trì và quản lý chức năng</td><td>Chỉ mở lại sau đánh giá kỹ thuật, xác nhận an toàn, chứng minh-out lại và phát hành đúng thẩm quyền bậc thang năng lực</td></tr>
+<tr><td>Mức 2 — nguy cơ chất lượng</td><td>tool gãy, mài mòn chạy nhanh bất thường, đầu dò (probe) fail, bù trừ (offset) nghi trôi, kẹp / gá kẹp nghi trượt</td><td>TẠM GIỮ machine và TẠM GIỮ WIP liên quan; cô lập cuối cùng-đã biết-tốt / đạt/đầu tiên-bị ảnh hưởng; Mọi Sản xuất/QA/Kỹ thuật</td><td>NNgười có thẩm quyền cho phép sau khi xác định machine trạng thái, phạm vi nghi ngờ và kế hoạch kiểm chứng</td></tr>
+<tr><td>Mức 3 — nguy cơ an toàn hoặc sự cố nghiêm trọng</td><td>va chạm, trục chính (spindle)/đầu dao (turret) sự cố nghiêm trọng, bảo vệ / tấm chắn/liên động an toàn fail, mất điện giữa chu kỳ nguy hiểm, rò rỉ nghiêm trọng</td><td>E-stop khi cần, phong tỏa khu vực, gắn thẻ TẠM GIỮ, Mọi Bảo trì và quản lý chức năng</td><td>Chỉ mở lại sau đánh giá kỹ thuật, xác nhận an toàn, chứng minh-out lại và phát hành đúng thẩm quyền bậc thang năng lực</td></tr>
 </tbody></table></div>
 <h3>6.1 khởi động lại sau bước tiến (feed) hold/cycle stop thông thường</h3>
 <ul>
@@ -147,7 +147,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </ul>
 <h3>6.2 khởi động lại sau reset bộ điều khiển / kiểm soát viên hoặc mất điện</h3>
 <ul>
-<li>Xác minh home/tham chiếu, đầu dao (turret)/ổ dao (magazine) trạng thái, pallet/quay định hướng / đào tạo hội nhập, đầu dò (probe)/tool người cài đặt máy trạng thái, mâm cặp (chuck)/kẹp / gá kẹp áp suất và chương trình/bù trừ (offset) đang dùng.</li>
+<li>Xác minh home/tham chiếu, đầu dao (turret)/ổ dao (magazine) trạng thái, pallet/quay định hướng / đào tạo hội nhập, đầu dò (probe)/tool nNgười cài đặt máy trạng thái, mâm cặp (chuck)/kẹp / gá kẹp áp suất và chương trình/bù trừ (offset) đang dùng.</li>
 <li>Không giả định máy “nhớ đúng” trạng thái trước đó. Nếu không chứng minh được vị trí hoặc logic trình tự, phải quay lại chứng minh-out.</li>
 <li>Khi part dở đang nằm trong máy, phải quyết định rõ: tiếp tục, tháo ra kiểm, hoặc loại khỏi dòng chính.</li>
 </ul>
@@ -164,7 +164,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="card"><h3>7.1 Hồ sơ bắt buộc</h3><ul class="tight">
 <li>cảnh báo log / ảnh màn hình / ảnh hiện trường khi có bất thường.</li>
 <li>Shift bàn giao note cho mọi machine đang chạy dở, chứng minh-out hoặc TẠM GIỮ.</li>
-<li>lý do code cho thời gian ngừng máy, ngắn / thiếu stop, tool thay đổi bất thường, sự cố nghiêm trọng/sự cố suýt xảy ra (gần / suýt-thiếu / bỏ sót).</li>
+<li>lý do code cho thời gian nTừng máy, ngắn / thiếu stop, tool thay đổi bất thường, sự cố nghiêm trọng/sự cố suýt xảy ra (Cần / suýt-thiếu / bỏ sót).</li>
 <li>Liên kết tới Hồ sơ công việc (hồ sơ công việc) nếu bất thường có thể ảnh hưởng chất lượng.</li>
 </ul></div>
 <div class="card"><h3>7.2 KPI kỷ luật vận hành</h3><ul class="tight">
