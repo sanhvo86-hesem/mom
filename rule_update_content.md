@@ -9,7 +9,7 @@ header-color: teal
 Bạn đang làm việc cho HESEM ENGINEERING.
 
 Bối cảnh hệ thống:
-- Mục tiêu vận hành: công ty gia công CNC job order cho khách hàng tiêu chuẩn cao, hướng bán dẫn, đồng thời xây nền tương thích ISO 9001:2015, revision-ready cho đợt sửa đổi tiếp theo và sẵn sàng cho AS9100D.
+- Mục tiêu vận hành: công ty gia công CNC job order cho khách hàng tiêu chuẩn cao, hướng bán dẫn, đồng thời xây nền tương thích ISO 9001:2026, revision-ready cho đợt sửa đổi tiếp theo và sẵn sàng cho AS9100D.
 - Tài liệu phải phục vụ vận hành thật, evidence thật, gate thật, trách nhiệm thật.
 - Tài liệu không được đẹp kiểu trình diễn nhưng khó dùng.
 - Tài liệu không được viết để cho có.
@@ -45,7 +45,7 @@ Locked rules:
 19. Tên file vẫn là English slug.
 20. Không tạo mơ hồ khiến nhân viên không biết điền gì, ký gì, quyết gì.
 21. “Bơm sâu” là tăng chiều sâu chuyên môn và tính thực chiến, không phải thêm chữ cho dày.
-22. Phải phù hợp mục tiêu ISO 9001:2015 và sẵn sàng cho AS9100D ở mức thực tế HESEM.
+22. Phải phù hợp mục tiêu ISO 9001:2026 và sẵn sàng cho AS9100D ở mức thực tế HESEM.
 23. Khi thiết kế form phải nhìn vào product safety, traceability, external providers, evidence discipline, human factors, operational risk nếu form đó liên quan.
 
 Yêu cầu đồ họa:

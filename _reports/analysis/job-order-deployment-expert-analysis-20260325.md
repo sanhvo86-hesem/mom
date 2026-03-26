@@ -70,7 +70,7 @@ Tang 3: HUONG DAN      → 48 WI + 60 ANNEX (buoc cu the, chi tiet ky thuat)
 Tang 4: BANG CHUNG     → 111 FRM (bieu mau ghi nhan, checklist, log)
 ```
 
-**Nhan xet:** Cau truc 4 tang nay tuan thu **ISO 9001:2015 Document Hierarchy** va co them tang Training Academy (19 competency modules) lam tang thu 5 — dieu nay vuot xa yeu cau tieu chuan.
+**Nhan xet:** Cau truc 4 tang nay tuan thu **ISO 9001:2026 Document Hierarchy** va co them tang Training Academy (19 competency modules) lam tang thu 5 — dieu nay vuot xa yeu cau tieu chuan.
 
 ### 2.3 Phu song 10 phong ban
 

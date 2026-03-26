@@ -97,7 +97,7 @@ Các tài liệu sau tạo ra một bộ khung rất mạnh:
 
 ## Mức độ bám ISO 9001
 
-Mô hình hiện tại bám rất đúng tinh thần ISO 9001:2015:
+Mô hình hiện tại bám rất đúng tinh thần ISO 9001:2026:
 
 - process approach
 - risk-based thinking
@@ -245,8 +245,8 @@ Nếu đóng 5 khoảng trống ở trên, mô hình này có thể đứng đư
 ## Nguồn chuẩn quốc tế dùng để đối chiếu
 
 - ISO 9001 overview: [ISO 9000 family — Quality management](https://www.iso.org/cms/%20render/live/en/sites/isoorg/home/standards/popular-standards/iso-9001.html)
-- ISO official guidance: [ISO 9001:2015 - How to use it](https://committee.iso.org/files/live/sites/tc176sc2/files/documents/iso_9001-2015_-_how_to_use_it.pdf.pdf)
-- ISO official guidance: [Implementation Guidance for ISO 9001:2015](https://www.iso.org/files/live/sites/isoorg/files/archive/pdf/en/iso9001implementation_guidance.pdf)
+- ISO official guidance: [ISO 9001:2026 - How to use it](https://committee.iso.org/files/live/sites/tc176sc2/files/documents/iso_9001-2015_-_how_to_use_it.pdf.pdf)
+- ISO official guidance: [Implementation Guidance for ISO 9001:2026](https://www.iso.org/files/live/sites/isoorg/files/archive/pdf/en/iso9001implementation_guidance.pdf)
 - IAQG official overview: [9100 revision 2016 - Executive Overview](https://iaqg.org/wp-content/uploads/2019/11/9100-2016_Executive-Overview_-10-16-2019.pdf)
 - IAQG official SCMH overview: [SCMH Communication Pack 2024](https://scmh.iaqg.org/wp-content/uploads/2024/08/SCMH-Communication-Pack-21AUG2024-2.pdf)
 - NIST official manufacturing planning/control reference: [NIST AMS 100-2](https://nvlpubs.nist.gov/nistpubs/ams/NIST.AMS.100-2.pdf)

@@ -134,7 +134,7 @@
 **Đồ họa ISO Map:**
 - Nền: gradient xanh nhạt (`linear-gradient(135deg, #f0f7ff, #e8f4fd)`)
 - Viền: 1px solid xanh (`var(--blue)`)
-- Badge "ISO 9001:2015" tự động hiển thị phía trên (CSS `::before`)
+- Badge "ISO 9001:2026" tự động hiển thị phía trên (CSS `::before`)
 - Các `.req` box bên trong có nền trắng mờ (phân biệt với nền gradient)
 
 **Badges yêu cầu ISO:**
@@ -150,7 +150,7 @@
 ```html
 <span class="iso-clause">§7.5</span>
 ```
-Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2015.
+Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 
 ### 2.4 PREFACE BLOCK — Lệnh điều hành
 

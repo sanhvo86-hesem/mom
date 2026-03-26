@@ -242,7 +242,7 @@
 | Class | Chuc nang | Vi du HTML |
 |---|---|---|
 | `ul.list`, `.list` | Danh sach khong bullet, margin 0, padding 0 | `<ul class="list"><li>Item</li></ul>` |
-| `.iso-list` | Danh sach ISO, khong bullet, border-bottom ln2 | `<ul class="iso-list"><li>ISO 9001:2015 — 7.5</li></ul>` |
+| `.iso-list` | Danh sach ISO, khong bullet, border-bottom ln2 | `<ul class="iso-list"><li>ISO 9001:2026 — 7.5</li></ul>` |
 | `.iso-legend` | Chu thich ISO, 11px ink3, border-top | `<div class="iso-legend">Chu thich: ...</div>` |
 | `.doc-link-list` | Danh sach link tai lieu, bullet xanh | `<ul class="doc-link-list"><li><a href="...">SOP-101</a></li></ul>` |
 | `.link-list` | Danh sach link don gian, 12px | `<ul class="link-list"><li><a href="...">Link</a></li></ul>` |

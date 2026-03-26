@@ -476,7 +476,7 @@ function showConsentDialog(){
           </p>
           <h4>ĐIỀU 2 — Thu thập dữ liệu phiên làm việc</h4>
           <p style="font-size:12px;color:var(--text-2);line-height:1.7;margin-bottom:10px">
-            Nhằm đảm bảo tính toàn vẹn, truy xuất nguồn gốc và tuân thủ các yêu cầu kiểm soát tài liệu theo ISO 9001:2015, Hệ thống sẽ tự động ghi nhận các thông tin sau trong suốt phiên làm việc:
+            Nhằm đảm bảo tính toàn vẹn, truy xuất nguồn gốc và tuân thủ các yêu cầu kiểm soát tài liệu theo ISO 9001:2026, Hệ thống sẽ tự động ghi nhận các thông tin sau trong suốt phiên làm việc:
           </p>
           <ul>
             <li><div class="li-icon">§1</div><div><b>Thời gian truy cập</b> — Ngày, giờ đăng nhập, thời lượng phiên làm việc và thời điểm kết thúc</div></li>
@@ -488,7 +488,7 @@ function showConsentDialog(){
           <h4 style="margin-top:14px">ĐIỀU 3 — Mục đích sử dụng dữ liệu</h4>
           <p style="font-size:12px;color:var(--text-2);line-height:1.7;margin-bottom:10px">
             Dữ liệu thu thập được sử dụng cho các mục đích hợp pháp sau đây:
-            <b>(a)</b> Đảm bảo tuân thủ các yêu cầu kiểm soát tài liệu và truy xuất nguồn gốc theo ISO 9001:2015 và SEMI Standards;
+            <b>(a)</b> Đảm bảo tuân thủ các yêu cầu kiểm soát tài liệu và truy xuất nguồn gốc theo ISO 9001:2026 và SEMI Standards;
             <b>(b)</b> Quản lý an ninh thông tin và bảo vệ tài sản trí tuệ của Công ty;
             <b>(c)</b> Kiểm toán nội bộ và đánh giá tuân thủ;
             <b>(d)</b> Phục vụ điều tra khi có dấu hiệu vi phạm quy chế bảo mật.
@@ -514,7 +514,7 @@ function showConsentDialog(){
 
 // ═══════════════════════════════════════════════════
 // DOCUMENT-LEVEL PERMISSIONS (role → [doc codes])
-// ISO 9001:2015 / AS9100D / SEMI — Need-to-know principle
+// ISO 9001:2026 / AS9100D / SEMI — Need-to-know principle
 // "ALL" = full access. Wildcards: "SOP-1*" matches SOP-101, SOP-102, etc.
 // ═══════════════════════════════════════════════════════════════════════
 // Universal access base: policies, manual, training, org chart
@@ -2065,7 +2065,7 @@ const I = {
   login_btn:{vi:'Đăng nhập',en:'Log in'},
   login_error:{vi:'Sai tài khoản hoặc mã PIN',en:'Invalid username or PIN'},
   login_demo:{vi:'CHỌN NHANH TÀI KHOẢN DEMO',en:'QUICK SELECT DEMO ACCOUNT'},
-  login_hero:{vi:'Hệ thống<br>Quản lý Chất lượng<br><em>ISO 9001:2015 • Revision-ready</em>',en:'Quality<br>Management System<br><em>ISO 9001:2015 • Revision-ready</em>'},
+  login_hero:{vi:'Hệ thống<br>Quản lý Chất lượng<br><em>ISO 9001:2026 • Revision-ready</em>',en:'Quality<br>Management System<br><em>ISO 9001:2026 • Revision-ready</em>'},
   login_desc:{vi:'Nền tảng quản lý tài liệu QMS tập trung cho toàn công ty. Truy cập SOP, quy trình vận hành, biểu mẫu và hướng dẫn công việc theo phân quyền chức năng.',en:'Centralized QMS document management platform. Access SOPs, operating procedures, forms and work instructions based on role-based permissions.'},
   // Dashboard
   hello:{vi:'Xin chào',en:'Hello'},

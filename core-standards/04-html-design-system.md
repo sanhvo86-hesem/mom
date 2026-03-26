@@ -524,7 +524,7 @@ Bảng có attribute `data-qms-autofit="balanced"` hoặc `data-ed-autofit="bala
 | Background | `linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%)` — gradient xanh nhạt |
 | Border | `1px solid var(--blue)` = #1565c0 |
 | Border-radius | `var(--r)` = 8px |
-| `::before` pseudo | Label **"ISO 9001:2015"** — bg blue, text trắng, font 9px bold, absolute top -9px |
+| `::before` pseudo | Label **"ISO 9001:2026"** — bg blue, text trắng, font 9px bold, absolute top -9px |
 | `.iso-clause` | Badge xanh `--blue` bg, text trắng, font 9px bold — dùng cho mã điều khoản (vd: §7.5) |
 | `.iso-map .req` | bg `rgba(255,255,255,0.85)`, border `1px solid rgba(21,101,192,0.15)`, border-left `3px solid --blue` |
 | `.iso-title` | 11px bold uppercase, `--ink3`, letter-spacing .8px |

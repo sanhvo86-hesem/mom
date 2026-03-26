@@ -10,7 +10,7 @@
 - Thống nhất bố cục, phong cách và cấu trúc cho toàn bộ 111 biểu mẫu Excel của HESEM.
 - Đảm bảo mọi form in được trên A4/A3, điền được bằng tay hoặc trên máy, ai cầm vào cũng biết phải làm gì.
 - Đồng bộ header, màu sắc, font chữ với hệ thống SOP/WI/ANNEX hiện hành.
-- Sẵn sàng cho ISO 9001:2015 và AS9100D ở mức thực tế HESEM.
+- Sẵn sàng cho ISO 9001:2026 và AS9100D ở mức thực tế HESEM.
 
 ---
 
@@ -438,7 +438,7 @@ Form dùng ngoài xưởng (TYPE A liên quan production) PHẢI có các field 
 - Giọng văn ngắn, rõ, dùng để thi hành. Không meta text.
 - Form PHẢI bám SOP/WI/ANNEX active, không tự bịa logic.
 - Form PHẢI có gate, owner, evidence, decision và approval khi cần.
-- Thiết kế PHẢI phù hợp ISO 9001:2015 và sẵn sàng cho AS9100D.
+- Thiết kế PHẢI phù hợp ISO 9001:2026 và sẵn sàng cho AS9100D.
 
 ---
 
