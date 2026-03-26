@@ -101,29 +101,20 @@ td,th{}
 <h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2>
 <div class="field-grid"><div class="field"><b>Đầu vào bắt buộc</b><div class="blank">Inventory gage, intended use, tolerance/uncertainty needs, risk class, user/area, hiệu chuẩn plan, approved lab info, master references, prior history, xác minh method.</div></div><div class="field"><b>Đầu ra bắt buộc</b><div class="blank">Validated equipment trạng thái, hiệu chuẩn hồ sơ, xác minh history, OOT đánh giá, recall scope, disposition of affected product, KPI report.</div></div><div class="field"><b>Điều kiện tiên quyết</b><div class="blank">Mỗi gage có ID duy nhất, Người phụ trách, intended use, risk class và link tới FRM-525 trước khi được đưa vào dùng.</div></div><div class="field"><b>Điểm không được bỏ qua</b><div class="blank">Drop/impact, repair, battery change ảnh hưởng accuracy, environmental extremes, overdue label, borrowed gage, external hiệu chuẩn cert thiếu traceability.</div></div></div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
-<div class="gate-grid">
-<div class="gate-card"><h3>601-S1 — đăng ký &amp; rủi ro class</h3><p>Thiết bị phải có ID, Responsible Person, dự kiến / có chủ đích use, giải quyết / độ phân giải/phạm vi / dải, rủi ro class và đã lên kế hoạch control phương pháp trước khi cấp cho Người dùng.</p></div>
-<div class="gate-card"><h3>601-S2 — Bản gốc &amp; phương pháp mức sẵn sàng</h3><p>Phải xác định phương pháp, acceptance tiêu chí, tham chiếu standard/chủ / gốc và nhịp độ / chu kỳ họp xác minh trước khi thiết bị được dùng cho phát hành quyết định.</p></div>
-<div class="gate-card"><h3>601-S3 — Hiệu chuẩn sự kiện acceptance</h3><p>Hiệu chuẩn cert phải đủ scope, truy xuất nguồn gốc, as-phát hiện/as-trái / còn lại khi cần, date, Ngày đến hạn, lab nhận dạng và quyết định; thiếu một trong các trường trọng yếu → không chấp nhận.</p></div>
-<div class="gate-card"><h3>601-S4 — Point-of-use xác minh</h3><p>Thiết bị fail xác minh hoặc nghi trôi / sai lệch/tác động phải TẠM GIỮ ngay, không chờ đến kỳ hiệu chuẩn kế tiếp.</p></div>
-<div class="gate-card"><h3>601-S5 — OOT phản ứng</h3><p>OOT bắt buộc kéo theo đánh giá thu hồi scope và sản phẩm rủi ro từ cuối cùng-đã biết-tốt / đạt, không chỉ đổi nhãn và gửi hiệu chuẩn lại.</p></div>
-<div class="gate-card"><h3>601-S6 — Phát hành to vận hành</h3><p>Thiết bị chỉ trở lại sản xuất/QA sau khi trạng thái được cập nhật, label hợp lệ, hồ sơ đóng và Người dùng được thông báo.</p></div>
-<div class="gate-card"><h3>601-S7 — Xu hướng rà soát</h3><p>lặp lại trôi / sai lệch, quá hạn, thường xuyên hư hỏng hoặc xác minh fail là kích hoạt xem lại phương pháp, khoảng thời gian, lưu kho / lưu trữ, đào tạo và độ bền vững của đo lường quy trình.</p></div>
-</div>
-<div class="metric-grid"><div class="metric-card"><div class="value">100%</div><div class="label">Phát hành quyết định dùng gage hợp lệ</div></div><div class="metric-card"><div class="value">≥ 98%</div><div class="label">Hiệu chuẩn on-time</div></div><div class="metric-card"><div class="value">0</div><div class="label">Lô giao hàng đã phê duyệt bằng gage quá hạn/OOT</div></div><div class="metric-card"><div class="value">≤ 1 Ngày làm việc</div><div class="label">Khóa thu hồi scope khi OOT quan trọng / nghiêm trọng</div></div></div>
+
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
 <div class="flowchart">
-  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Đăng ký gage</div><div class="flow-desc">Đăng ký thiết bị đo mới vào hệ thống</div></div>
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><div class="flow-title">Đăng ký gage</div><div class="flow-desc">Đăng ký thiết bị đo mới vào hệ thống</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">2</div><div class="flow-title">Lập lịch hiệu chuẩn</div><div class="flow-desc">Xác định chu kỳ và phương thức hiệu chuẩn</div></div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><div class="flow-title">Lập lịch hiệu chuẩn</div><div class="flow-desc">Xác định chu kỳ và phương thức hiệu chuẩn</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step critical"><div class="flow-num">3</div><div class="flow-title">Thực hiện CAL</div><div class="flow-desc">Hiệu chuẩn theo chuẩn tham chiếu</div></div>
+  <div class="flow-step critical"><div class="flow-num">3</div><div class="flow-text"><div class="flow-title">Thực hiện CAL</div><div class="flow-desc">Hiệu chuẩn theo chuẩn tham chiếu</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step active"><div class="flow-num">4</div><div class="flow-title">Pass/Fail</div><div class="flow-desc">Quyết định đạt/không đạt hiệu chuẩn</div></div>
+  <div class="flow-step active"><div class="flow-num">4</div><div class="flow-text"><div class="flow-title">Pass/Fail</div><div class="flow-desc">Quyết định đạt/không đạt hiệu chuẩn</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">Dán nhãn</div><div class="flow-desc">Gắn nhãn trạng thái hiệu chuẩn lên gage</div></div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><div class="flow-title">Dán nhãn</div><div class="flow-desc">Gắn nhãn trạng thái hiệu chuẩn lên gage</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step critical"><div class="flow-num">6</div><div class="flow-title">Rà soát recall</div><div class="flow-desc">Đánh giá ảnh hưởng khi OOT/fail</div></div>
+  <div class="flow-step critical"><div class="flow-num">6</div><div class="flow-text"><div class="flow-title">Rà soát recall</div><div class="flow-desc">Đánh giá ảnh hưởng khi OOT/fail</div></div></div>
 </div>
 <h3>7.1 hội nhập nhân sự mới thiết bị đo và phân loại rủi ro</h3>
 <ul class="tight"><li>Mỗi thiết bị mới hoặc mượn từ ngoài phải được đăng ký trong <a href="../../../04-Bieu-Mau/05-FRM-500/FRM-525_Gage_and_Measuring_Equipment_Register.xlsx" download="">FRM-525</a> trước khi dùng. Trường tối thiểu: ID, loại, phạm vi / dải, giải quyết / độ phân giải, vị trí, Responsible Person, dự kiến / có chủ đích use, rủi ro class, chủ / gốc/tham chiếu cần dùng, chu kỳ hiệu chuẩn/xác minh.</li><li>Rủi ro class được xác định theo mức ảnh hưởng tới phát hành quyết định: class cao cho gage dùng FAI/kiểm tra cuối/SPC quan trọng / nghiêm trọng, class thấp hơn cho dụng cụ hỗ trợ không trực tiếp chấp nhận/từ chối.</li><li>Thiết bị không đủ thông tin về dự kiến / có chủ đích use hoặc độ không đảm bảo đo Requests không được đưa vào hiệu chuẩn plan và không được dùng cho phát hành.</li></ul>

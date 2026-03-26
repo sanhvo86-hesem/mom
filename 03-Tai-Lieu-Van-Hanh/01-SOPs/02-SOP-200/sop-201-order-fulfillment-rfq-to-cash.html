@@ -232,53 +232,32 @@ td,th{}
 <div class="parallel-note">G1 Engineering và G2 IQC thực hiện <b>SONG SONG</b>. Cả hai PHẢI hoàn tất trước khi chuyển sang G3 Setup.</div>
 
 <div class="flowchart">
-  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">G0 Contract</div></div>
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><div class="flow-title">G0 Contract</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">2</div><div class="flow-title">&rarr;</div></div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><div class="flow-title">&rarr;</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">3</div><div class="flow-title">&rarr;</div></div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><div class="flow-title">&rarr;</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">4</div><div class="flow-title">G3 Setup</div></div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><div class="flow-title">G3 Setup</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">&rarr;</div></div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><div class="flow-title">&rarr;</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step critical"><div class="flow-num">6</div><div class="flow-title">G4 FAI</div></div>
+  <div class="flow-step critical"><div class="flow-num">6</div><div class="flow-text"><div class="flow-title">G4 FAI</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">7</div><div class="flow-title">&rarr;</div></div>
+  <div class="flow-step"><div class="flow-num">7</div><div class="flow-text"><div class="flow-title">&rarr;</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step critical"><div class="flow-num">8</div><div class="flow-title">G5 IPQC</div></div>
+  <div class="flow-step critical"><div class="flow-num">8</div><div class="flow-text"><div class="flow-title">G5 IPQC</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">9</div><div class="flow-title">&rarr;</div></div>
+  <div class="flow-step"><div class="flow-num">9</div><div class="flow-text"><div class="flow-title">&rarr;</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">10</div><div class="flow-title">G6 Final QC</div></div>
+  <div class="flow-step"><div class="flow-num">10</div><div class="flow-text"><div class="flow-title">G6 Final QC</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">11</div><div class="flow-title">&rarr;</div></div>
+  <div class="flow-step"><div class="flow-num">11</div><div class="flow-text"><div class="flow-title">&rarr;</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">12</div><div class="flow-title">G7 Ship</div></div>
+  <div class="flow-step"><div class="flow-num">12</div><div class="flow-text"><div class="flow-title">G7 Ship</div></div></div>
 </div>
 
-<div class="gate-grid">
-<div class="gate-card"><h3>G0 &mdash; Contract</h3><p>Rà soát và khóa cam kết đơn hàng trước khi nhận PO.</p><p class="small"><b>Chủ trì:</b> CS + Sales | <b>Release:</b> Sales Lead</p></div>
-<div class="gate-card"><h3>G1 &mdash; Engineering</h3><p>Phát hành Baseline Package (drawing, BOM, routing, spec) và đóng băng revision.</p><p class="small"><b>Chủ trì:</b> Engineering Lead | <b>Release:</b> Engineering Lead</p></div>
-<div class="gate-card"><h3>G2 &mdash; IQC</h3><p>Nhận, kiểm tra và release nguyên vật liệu/tooling đầu vào.</p><p class="small"><b>Chủ trì:</b> QC Inspector + Purchasing | <b>Release:</b> QA/QC Lead</p></div>
-<div class="gate-card"><h3>G3 &mdash; Setup</h3><p>Gá đặt máy, nạp chương trình, xác nhận điều kiện gia công.</p><p class="small"><b>Chủ trì:</b> Operator + Shift Leader | <b>Release:</b> Production Planner</p></div>
-<div class="gate-card"><h3>G4 &mdash; FAI</h3><p>Kiểm tra chi tiết đầu tiên theo drawing/spec trước khi chạy lot.</p><p class="small"><b>Chủ trì:</b> QC Inspector | <b>Release:</b> QA/QC Lead</p></div>
-<div class="gate-card"><h3>G5 &mdash; IPQC</h3><p>Kiểm soát chất lượng trong quá trình sản xuất theo tần suất quy định.</p><p class="small"><b>Chủ trì:</b> QC Inspector + Operator | <b>Release:</b> QA/QC Lead</p></div>
-<div class="gate-card"><h3>G6 &mdash; Final QC</h3><p>Kiểm tra toàn bộ lot, phát hành CoC, xác nhận sẵn sàng giao.</p><p class="small"><b>Chủ trì:</b> QC Inspector | <b>Release:</b> QA/QC Lead</p></div>
-<div class="gate-card"><h3>G7 &mdash; Ship</h3><p>Đóng gói, giao hàng, phát hành chứng từ vận chuyển, kích hoạt hóa đơn và đóng job.</p><p class="small"><b>Chủ trì:</b> Logistics + CS | <b>Release:</b> Logistics Lead + Finance</p></div>
-</div>
 
-<h3>KPI xuyên chuỗi</h3>
-<div class="metric-grid">
-<div class="metric-card"><div class="value">&le; 24h</div><div class="label">RFQ response time (log + xác nhận nhận)</div></div>
-<div class="metric-card"><div class="value">&le; 3 ngày</div><div class="label">Contract Review cycle (G0)</div></div>
-<div class="metric-card"><div class="value">&ge; 95%</div><div class="label">OTD &mdash; On-Time Delivery</div></div>
-<div class="metric-card"><div class="value">&ge; 90%</div><div class="label">FPY &mdash; First Pass Yield (G4 FAI)</div></div>
-<div class="metric-card"><div class="value">&le; 2%</div><div class="label">COPQ &mdash; Cost of Poor Quality</div></div>
-<div class="metric-card"><div class="value">&le; 24h</div><div class="label">Invoice request sau ship release</div></div>
-<div class="metric-card"><div class="value">0</div><div class="label">Số lần bypass gate không có concession</div></div>
-<div class="metric-card"><div class="value">&le; 5 ngày</div><div class="label">Job close cycle sau giao hàng cuối</div></div>
-</div>
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 7 — QUY TRÌNH CHI TIẾT -->

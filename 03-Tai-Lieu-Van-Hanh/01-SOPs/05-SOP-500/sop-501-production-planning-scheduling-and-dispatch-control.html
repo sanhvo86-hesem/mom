@@ -127,54 +127,20 @@ td,th{}
 <div class="field"><b>Điểm dừng tự động</b><div class="blank">Kỹ thuật hold, nguyên vật liệu hold, nhà cung cấp sự kiện, chất lượng hold, machine sự cố hỏng máy vượt khôi phục / thu hồi ngưỡng, no-Operator / no-tool mức sẵn sàng, đóng băng-cửa sổ / khung thời gian ghi đè / bỏ qua chưa được phê duyệt.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
-<div class="gate-grid">
-<div class="gate-card"><h3>501-S1 — Tiếp nhận Job và phân bổ nguồn lực</h3>
-<p class="small"><b>Lead:</b> Production Planner</p>
-<p class="small"><b>Điểm dừng:</b> Engineering hold chưa gỡ; vật tư hoặc outsource ETA chưa khả dụng; customer requirement chưa giải quyết; không có đường chạy thực tế (no realistic path to run).</p>
-<p class="small"><b>KPI chính:</b> % job đủ mức sẵn sàng ngay lần đầu ≥ 90%; readiness pass rate; thời gian từ tiếp nhận đến release ≤ 4h.</p></div>
-<div class="gate-card"><h3>501-S2 — Lập lịch sản xuất và dispatch</h3>
-<p class="small"><b>Lead:</b> Planner + Giám đốc Sản xuất</p>
-<p class="small"><b>Điểm dừng:</b> FRM-501 Planning Release Checklist chưa pass; Ngày đến hạn không khả thi; load model chưa cập nhật; bottleneck slot chưa được xem xét; routing mismatch.</p>
-<p class="small"><b>KPI chính:</b> Planning release cycle time ≤ 2h; release rework rate ≤ 5%; dispatch stability index ≥ 85%.</p></div>
-<div class="gate-card"><h3>501-S3 — Kiểm soát WIP, capacity và cân bằng tải</h3>
-<p class="small"><b>Lead:</b> Planner + Trưởng ca</p>
-<p class="small"><b>Điểm dừng:</b> WIP cap bị vượt ngưỡng; queue aging vượt SLA; repeated no-start tại cell; uncontrolled split lot; thay đổi ưu tiên không được phê duyệt.</p>
-<p class="small"><b>KPI chính:</b> WIP cap compliance ≥ 95%; on-time start rate; queue aging SLA adherence; hot-job override count ≤ 2/tuần.</p></div>
-<div class="gate-card"><h3>501-S4 — Bàn giao ca, theo dõi tiến độ và escalation</h3>
-<p class="small"><b>Lead:</b> Trưởng ca + Production Manager</p>
-<p class="small"><b>Điểm dừng:</b> Không có handover log cuối ca; delay không gắn nguyên nhân và Người chịu trách nhiệm; missing recovery owner; bottleneck chưa review trong ngày.</p>
-<p class="small"><b>KPI chính:</b> Shift handover completeness = 100%; plan adherence trong freeze window ≥ 90%; recovery closure rate ≥ 85%.</p></div>
-<div class="gate-card"><h3>501-S5 — Đóng Job, đối soát và bàn giao hồ sơ</h3>
-<p class="small"><b>Lead:</b> Production + Planner + QA</p>
-<p class="small"><b>Điểm dừng:</b> Job chưa hoàn tất tất cả operation trên router; hồ sơ chất lượng chưa đủ để đóng; WIP aging report chưa được reconcile; downtime chưa ghi nhận đầy đủ vào FRM-512.</p>
-<p class="small"><b>KPI chính:</b> Job close-out cycle time ≤ 24h sau operation cuối; % job đóng đúng hạn; record completeness ≥ 98%.</p></div>
-</div>
-<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:28%"/><col style="width:20%"/><col style="width:18%"/><col style="width:20%"/></colgroup><thead><tr><th>Cổng</th><th>Tiêu chí mở cổng</th><th>Điểm dừng bắt buộc</th><th>Người phụ trách</th><th>KPI chính</th></tr></thead><tbody>
-<tr><td><b>501-S1</b><br/>Mức sẵn sàng to plan</td><td>Demand rõ; baseline đã khóa; vật tư / outsource ETA khả dụng; risk flags đã nhìn thấy.</td><td>Engineering hold; source hold; unresolved customer requirement; no realistic path to run.</td><td>Planner</td><td>% job đủ mức sẵn sàng ngay lần đầu; mức sẵn sàng pass rate.</td></tr>
-<tr><td><b>501-S2</b><br/>Planning Release</td><td>FRM-501 pass; Ngày đến hạn logic khả thi; load model cập nhật; bottleneck slot đã xem xét.</td><td>FRM-501 fail; hidden constraint; missing critical operation / routing mismatch.</td><td>Planner + Production</td><td>Planning release cycle time; release rework rate.</td></tr>
-<tr><td><b>501-S3</b><br/>Dispatch &amp; freeze window</td><td>Dispatch list phát hành đúng giờ; hot jobs theo ladder; cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) respected.</td><td>Unapproved priority change; over-capacity dispatch; job chưa đủ run mức sẵn sàng.</td><td>Planner</td><td>Dispatch stability; on-time vấn đề of dispatch; hot-job override count.</td></tr>
-<tr><td><b>501-S4</b><br/>Execution &amp; WIP control</td><td>Cell xác nhận mức sẵn sàng; progress/downtime cập nhật; WIP cap trong ngưỡng; bottleneck review chạy trong ngày.</td><td>Queue tuổi tồn vượt ngưỡng; WIP cap breach; repeated no-start; uncontrolled split lot.</td><td>Trưởng ca + Production</td><td>On-time start; queue tuổi tồn SLA; WIP cap compliance.</td></tr>
-<tr><td><b>501-S5</b><br/>Recovery &amp; handover</td><td>End-of-shift trạng thái, delay reason, next-shift mức sẵn sàng và recovery action đã chốt.</td><td>No handover; delay không gắn nguyên nhân; missing recovery Người phụ trách.</td><td>Production + Planner</td><td>Plan adherence; recovery closure rate; shift handover completeness.</td></tr>
-</tbody></table></div>
-<div class="note-blue"><b>KPI điều hành:</b> KPI dùng cho SOP-501 phải lấy theo từ điển tại <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>. Không tự tạo KPI tên giống nhưng công thức khác giữa Kế hoạch, Sản xuất và QA.</div><div class="metric-grid">
-<div class="metric-card"><div class="value">Plan tuân thủ</div><div class="label">Tuân thủ kế hoạch trong cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch)</div><div class="mini-note">Đo tỷ lệ job/vận hành chạy đúng cửa sổ Released sau khi loại trừ các thay đổi được thẩm quyền phê duyệt.</div></div>
-<div class="metric-card"><div class="value">Mức sẵn sàng Hit Tỷ lệ</div><div class="label">% công việc / đơn hàng pass <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-501_Planning_Release_Checklist.xlsx">FRM-501</a> ngay lần đầu</div><div class="mini-note">Đây là chỉ báo sớm cho chất lượng bàn giao giữa Kinh doanh, Kỹ thuật, Kế hoạch, Mua hàng và Sản xuất.</div></div>
-<div class="metric-card"><div class="value">WIP Tuổi tồn</div><div class="label">nhóm / phân loại 0-1 / 2 / 3 / 4</div><div class="mini-note">Theo dõi riêng theo nút thắt / điểm nghẽn nhóm sản phẩm để tránh WIP đẹp tổng thể nhưng nghẽn nặng cục bộ.</div></div>
-<div class="metric-card"><div class="value">Hot Job hư hỏng</div><div class="label">Tác hại của ghi đè / bỏ qua</div><div class="mini-note">Mọi hot-job phải để lại vết về số job bị dời, số giờ mất ổn định và khôi phục / thu hồi giờ dùng để kéo lại kế hoạch.</div></div>
-</div><div class="callout"><div class="card-title">Chỉ số điều hành bổ sung bắt buộc</div><ul class="tight"><li>Plan đạt được theo trung tâm gia công và theo nút thắt / điểm nghẽn nhóm sản phẩm</li><li>hàng đợi tuổi tồn đỏ vượt ngưỡng / ca</li><li>Số lần sắp xếp lại gây ảnh hưởng chuỗi sau</li><li>% hot-job có phê duyệt đúng bậc thang năng lực và có nguồn bù năng lực</li></ul></div>
+<div class="callout"><div class="card-title">Chỉ số điều hành bổ sung bắt buộc</div><ul class="tight"><li>Plan đạt được theo trung tâm gia công và theo nút thắt / điểm nghẽn nhóm sản phẩm</li><li>hàng đợi tuổi tồn đỏ vượt ngưỡng / ca</li><li>Số lần sắp xếp lại gây ảnh hưởng chuỗi sau</li><li>% hot-job có phê duyệt đúng bậc thang năng lực và có nguồn bù năng lực</li></ul></div>
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
 <div class="flowchart">
-  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Nhận Job</div><div class="flow-desc">Tiếp nhận job/WO từ sales hoặc khách hàng</div></div>
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><div class="flow-title">Nhận Job</div><div class="flow-desc">Tiếp nhận job/WO từ sales hoặc khách hàng</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">2</div><div class="flow-title">Phân bổ nguồn lực</div><div class="flow-desc">Xác định máy, người, vật tư cần thiết</div></div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><div class="flow-title">Phân bổ nguồn lực</div><div class="flow-desc">Xác định máy, người, vật tư cần thiết</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step active"><div class="flow-num">3</div><div class="flow-title">Lập lịch sản xuất</div><div class="flow-desc">Sắp xếp thứ tự và thời gian theo nút thắt</div></div>
+  <div class="flow-step active"><div class="flow-num">3</div><div class="flow-text"><div class="flow-title">Lập lịch sản xuất</div><div class="flow-desc">Sắp xếp thứ tự và thời gian theo nút thắt</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">4</div><div class="flow-title">Dispatch</div><div class="flow-desc">Phát lệnh sản xuất tới từng trạm</div></div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><div class="flow-title">Dispatch</div><div class="flow-desc">Phát lệnh sản xuất tới từng trạm</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step critical"><div class="flow-num">5</div><div class="flow-title">Theo dõi WIP</div><div class="flow-desc">Giám sát tiến độ, phát hiện trễ/nghẽn</div></div>
+  <div class="flow-step critical"><div class="flow-num">5</div><div class="flow-text"><div class="flow-title">Theo dõi WIP</div><div class="flow-desc">Giám sát tiến độ, phát hiện trễ/nghẽn</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step active"><div class="flow-num">6</div><div class="flow-title">Đóng Job</div><div class="flow-desc">Xác nhận hoàn tất, đóng job trong hệ thống</div></div>
+  <div class="flow-step active"><div class="flow-num">6</div><div class="flow-text"><div class="flow-title">Đóng Job</div><div class="flow-desc">Xác nhận hoàn tất, đóng job trong hệ thống</div></div></div>
 </div>
 <h3 class="h3">7.1 Hoạch định năng lực tuần/tháng và bản đồ ràng buộc</h3>
 <ol class="tight">

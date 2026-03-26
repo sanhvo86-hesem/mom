@@ -126,54 +126,20 @@ td,th{}
 <div class="field"><b>Điểm dừng tự động</b><div class="blank">Hỗn hợp lot, không chắc chắn truy xuất nguồn gốc, thiếu trực quan standard, gage trạng thái không hợp lệ, quy trình trôi / sai lệch rõ, CTQ/khách hàng rule Requests 100%.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
-<div class="gate-grid">
-<div class="gate-card"><h3>603-S1 — Xác định AQL plan và mức kiểm tra</h3>
-<p class="small"><b>Lead:</b> Quality Engineer</p>
-<p class="small"><b>Điểm dừng:</b> Lot không đồng nhất (mixed lot); đặc tính CTQ yêu cầu 100% kiểm tra; quy trình không ổn định; thiếu lot definition hoặc truy xuất nguồn gốc; QPL/customer rule chưa xác định.</p>
-<p class="small"><b>KPI chính:</b> % lots chọn đúng eligibility ngay lần đầu ≥ 95%; plan selection accuracy ≥ 98%.</p></div>
-<div class="gate-card"><h3>603-S2 — Lấy mẫu và thực hiện kiểm tra</h3>
-<p class="small"><b>Lead:</b> Tổ trưởng QC + QC Inspector</p>
-<p class="small"><b>Điểm dừng:</b> Mẫu bị thiên vị hoặc hư hỏng; visual standard hoặc gage không hợp lệ; defect classification chưa rõ; raw count không truy xuất được; AQL/Ac/Re tra sai hoặc không theo standard reference.</p>
-<p class="small"><b>KPI chính:</b> Sampling discipline compliance ≥ 98%; inspection cycle time ≤ SLA theo lot size; switching-history completeness = 100%.</p></div>
-<div class="gate-card"><h3>603-S3 — Phán quyết Accept/Reject và escalation</h3>
-<p class="small"><b>Lead:</b> Tổ trưởng QC + QA</p>
-<p class="small"><b>Điểm dừng:</b> Resample không được phép mà vẫn thực hiện; reject nhưng không kích hoạt containment; accept khi defect class chưa xác định rõ; raw counts chưa đối chiếu Ac/Re.</p>
-<p class="small"><b>KPI chính:</b> Decision lead time ≤ 2h sau khi mẫu sẵn sàng; reject reaction timeliness ≤ 4h; false-accept trend = 0.</p></div>
-<div class="gate-card"><h3>603-S4 — Chuyển đổi mức kiểm tra (Normal → Tightened → Reduced)</h3>
-<p class="small"><b>Lead:</b> Quality Engineer + Tổ trưởng QC</p>
-<p class="small"><b>Điểm dừng:</b> Switching state chưa cập nhật sau reject; reject lặp nhưng vẫn giữ Normal; chuyển sang Reduced khi chưa đủ điều kiện liên tiếp; không có history log để chứng minh switching decision.</p>
-<p class="small"><b>KPI chính:</b> Tightened trigger compliance = 100%; switching decision có truy xuất bằng chứng; % lot áp đúng inspection level theo history.</p></div>
-<div class="gate-card"><h3>603-S5 — Ghi nhận hồ sơ và phản hồi cải tiến</h3>
-<p class="small"><b>Lead:</b> Quality Engineer</p>
-<p class="small"><b>Điểm dừng:</b> History lot không cập nhật vào hệ thống; reject lặp nhưng không có feedback loop về supplier/process/final release; hồ sơ FRM-621 thiếu trường dữ liệu bắt buộc.</p>
-<p class="small"><b>KPI chính:</b> % history cập nhật đúng hạn ≤ 24h; feedback loop closure rate ≥ 90%; FRM-621 completeness = 100%.</p></div>
-</div>
-<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:28%"/><col style="width:20%"/><col style="width:18%"/><col style="width:20%"/></colgroup><thead><tr><th>Cổng</th><th>Tiêu chí mở cổng</th><th>Điểm dừng bắt buộc</th><th>Người phụ trách</th><th>KPI chính</th></tr></thead><tbody>
-<tr><td><b>603-S1</b><br/>Lot eligibility</td><td>Lot homogeneous; context cho phép sampling; traceability rõ; QPL/customer rule đã xác định.</td><td>Mixed lot; CTQ 100%; unstable quy trình; missing lot definition.</td><td>Quality Engineer</td><td>% lots chọn đúng eligibility ngay lần đầu.</td></tr>
-<tr><td><b>603-S2</b><br/>Plan selection</td><td>AQL, kiểm tra level, switching state, Ac/Re đã tra đúng theo standard reference và hồ sơ trên FRM-621.</td><td>Tự chọn plan không theo rule; plan không truy được nguồn; switching state chưa cập nhật.</td><td>Tổ trưởng QC</td><td>Plan selection accuracy; switching-history completeness.</td></tr>
-<tr><td><b>603-S3</b><br/>Sample &amp; inspect</td><td>Sample random, traceable, trực quan/gage ready, defect classification rõ.</td><td>Mẫu bị thiên vị; sample damage; trực quan standard/gage invalid; raw count không rõ.</td><td>QC Inspector</td><td>Sampling discipline compliance; kiểm tra cycle time.</td></tr>
-<tr><td><b>603-S4</b><br/>Decision</td><td>Raw counts đối chiếu Ac/Re xong; decision documented; reject/hold nối sang reaction.</td><td>Resample không phép; reject nhưng không containment; accept khi defect class chưa xác định rõ.</td><td>Tổ trưởng QC + QA</td><td>Decision thời gian dẫn (lead time); reject reaction timeliness; false-accept trend.</td></tr>
-<tr><td><b>603-S5</b><br/>History &amp; escalation</td><td>Switching state cập nhật; history lot phản ánh vào supplier/quy trình/final release control.</td><td>History không cập nhật; reject lặp nhưng vẫn giữ normal; no phản hồi loop.</td><td>Quality Engineer</td><td>% history cập nhật đúng hạn; tightened trigger compliance.</td></tr>
-</tbody></table></div>
-<div class="note-blue"><b>Rule quan trọng:</b> Chọn plan ở 603-S2 phải dựa trên <a href="../../03-Reference/06-ANNEX-600/annex-601-aql-method-reference.html">ANNEX-601</a> và chuẩn gốc, không sao chép bảng plan rời rạc sang SOP để tránh lỗi version control.</div><div class="metric-grid">
-<div class="metric-card"><div class="value">Plan Tuân thủ</div><div class="label">Đúng plan / đúng Ac-Re / đúng chuyển đổi</div><div class="mini-note">Mục tiêu không chỉ là ra quyết định, mà là ra quyết định bằng đúng plan đã được phép dùng.</div></div>
-<div class="metric-card"><div class="value">Quyết định Thời gian dẫn</div><div class="label">Từ khi lot sẵn sàng tới khi chấp nhận/từ chối/hold</div><div class="mini-note">thời gian dẫn dài làm tăng nguy cơ lot trôi, hỗn hợp / lẫn lộn disposition hoặc dùng lẫn vào WIP/giao hàng.</div></div>
-<div class="metric-card"><div class="value">False chấp nhận theo dõi / cảnh giác</div><div class="label">Thoát sau lấy mẫu chấp nhận</div><div class="mini-note">Đây là KPI học lại plan, đủ điều kiện và khuyết tật phân loại; không phải chỉ để quy trách nhiệm Người kiểm.</div></div>
-<div class="metric-card"><div class="value">lịch sử Cập nhật</div><div class="label">% lots cập nhật chuyển đổi đúng hạn</div><div class="mini-note">Nếu lịch sử không sạch, chuyển đổi rule trên các lot sau sẽ sai và toàn bộ kỷ luật / chuyên ngành thống kê bị hỏng.</div></div>
-</div>
+
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
 <div class="flowchart">
-  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Xác định AQL plan</div><div class="flow-desc">Chọn mức AQL, bảng lấy mẫu phù hợp</div></div>
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><div class="flow-title">Xác định AQL plan</div><div class="flow-desc">Chọn mức AQL, bảng lấy mẫu phù hợp</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">2</div><div class="flow-title">Lấy mẫu</div><div class="flow-desc">Lấy mẫu ngẫu nhiên từ lot theo cỡ mẫu</div></div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><div class="flow-title">Lấy mẫu</div><div class="flow-desc">Lấy mẫu ngẫu nhiên từ lot theo cỡ mẫu</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step critical"><div class="flow-num">3</div><div class="flow-title">Kiểm tra</div><div class="flow-desc">Đo lường và kiểm tra mẫu theo tiêu chí</div></div>
+  <div class="flow-step critical"><div class="flow-num">3</div><div class="flow-text"><div class="flow-title">Kiểm tra</div><div class="flow-desc">Đo lường và kiểm tra mẫu theo tiêu chí</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step active"><div class="flow-num">4</div><div class="flow-title">Accept/Reject</div><div class="flow-desc">Quyết định chấp nhận hoặc từ chối lot</div></div>
+  <div class="flow-step active"><div class="flow-num">4</div><div class="flow-text"><div class="flow-title">Accept/Reject</div><div class="flow-desc">Quyết định chấp nhận hoặc từ chối lot</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">Chuyển đổi mức kiểm tra</div><div class="flow-desc">Tightened/Normal/Reduced theo lịch sử</div></div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><div class="flow-title">Chuyển đổi mức kiểm tra</div><div class="flow-desc">Tightened/Normal/Reduced theo lịch sử</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">6</div><div class="flow-title">Ghi hồ sơ</div><div class="flow-desc">Lưu kết quả kiểm tra và quyết định</div></div>
+  <div class="flow-step"><div class="flow-num">6</div><div class="flow-text"><div class="flow-title">Ghi hồ sơ</div><div class="flow-desc">Lưu kết quả kiểm tra và quyết định</div></div></div>
 </div>
 <h3 class="h3">7.1 Xác định lot và điều kiện có được lấy mẫu hay không</h3>
 <ol class="tight">
