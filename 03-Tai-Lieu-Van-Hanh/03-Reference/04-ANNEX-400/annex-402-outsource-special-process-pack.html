@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ANNEX-402 — Gói kiểm soát outsource / công đoạn đặc biệt / cert luồng-xuống / nTừng | HESEM QMS</title>
+<title>ANNEX-402 — Gói kiểm soát outsource / công đoạn đặc biệt / cert luồng-xuống / Từng | HESEM QMS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
 
@@ -52,7 +52,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <span>Tài liệu vận hành • Annex</span>
 </div>
 </div>
-<div class="title"><strong>ANNEX-402 — Gói kiểm soát outsource / công đoạn đặc biệt / cert luồng-xuống / nTừng</strong></div>
+<div class="title"><strong>ANNEX-402 — Gói kiểm soát outsource / công đoạn đặc biệt / cert luồng-xuống / Từng</strong></div>
 <div class="meta">
 <div class="row"><span><b>Code:</b></span><span>ANNEX-402</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
@@ -62,7 +62,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 </div>
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng mỗi lần gửi công đoạn outsource hoặc công đoạn đặc biệt ra ngoài và khi nhận hàng về cần kiểm cert/scope/pack.</div>
-<h1>ANNEX-402 — Gói kiểm soát outsource / công đoạn đặc biệt / cert luồng-xuống / nTừng</h1><div class="section">
+<h1>ANNEX-402 — Gói kiểm soát outsource / công đoạn đặc biệt / cert luồng-xuống / Từng</h1><div class="section">
 <div class="note-blue" style="margin:12px 0">
  <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Reference</b>.
  <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
@@ -93,8 +93,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Khóa receipt-back</td><td>Bảng kiểm nhận về, cổng kiểm soát kiểm cert/scope/trực quan/trace, decision path PASS/HOLD/NG.</td><td>WHS và QA dùng cùng logic; không quyết theo cảm tính.</td></tr>
 </tbody></table></div>
 </div><div class="section">
-<h2>4. Luồng-xuống / nTừng bắt buộc trên PO / pack</h2>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điều khoản luồng-xuống / nTừng</th><th>Khi nào bắt buộc</th><th>Ý nghĩa vận hành</th></tr></thead><tbody>
+<h2>4. Luồng-xuống / Từng bắt buộc trên PO / pack</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điều khoản luồng-xuống / Từng</th><th>Khi nào bắt buộc</th><th>Ý nghĩa vận hành</th></tr></thead><tbody>
 <tr><td>Part no / Rev / Quy trình spec / Phiên bản khóa</td><td>Mọi outsource job</td><td>Khoá Người xử lý theo đúng bản vẽ và spec; ngăn xử lý theo rev cũ.</td></tr>
 <tr><td>Lot / mẻ nấu (heat) / batch truy vết được duy trì end-to-end</td><td>Mọi raw / công đoạn đặc biệt / khách hàng-truy vết job</td><td>Giữ chuỗi of giám hộ / quản lý khi nhận về và khi điều tra NCR.</td></tr>
 <tr><td>No thay thế / no lộ trình gia công thay đổi / no làm lại không có bằng văn bản phê duyệt</td><td>Mọi outsource job</td><td>Ngăn Người xử lý tự đổi hoá chất, đổi lộ trình gia công, đánh bóng sửa lỗi hoặc làm lại miệng.</td></tr>
@@ -118,7 +118,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div><div class="section">
 <h2>6. Cổng kiểm soát gửi đi và cổng kiểm soát nhận về</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>đạt khi</th><th>hold khi</th></tr></thead><tbody>
-<tr><td>S0 — Pack phát hành</td><td>Đủ bao phủ / che data, kỹ thuật khóa, truy vết gói / bó, đã phê duyệt Người xử lý, đóng gói note, PO luồng-xuống / nTừng.</td><td>Thiếu rev khóa, thiếu cert Requests, Người xử lý chưa đã phê duyệt hoặc hàng chưa pass công đoạn trước.</td></tr>
+<tr><td>S0 — Pack phát hành</td><td>Đủ bao phủ / che data, kỹ thuật khóa, truy vết gói / bó, đã phê duyệt Người xử lý, đóng gói note, PO luồng-xuống / Từng.</td><td>Thiếu rev khóa, thiếu cert Requests, Người xử lý chưa đã phê duyệt hoặc hàng chưa pass công đoạn trước.</td></tr>
 <tr><td>S1 — Điều phối to Người xử lý</td><td>Qty/lot/box count đúng; pack phát hành đúng phiên bản; giao vận label và niêm phong đúng rule.</td><td>Nhầm qty, hỗn hợp / lẫn lộn lot chưa tách, label không map với pack, không có ảnh giao nhận khi job nhạy.</td></tr>
 <tr><td>S2 — Trong quá trình / quá hạn</td><td>ETA, đã cam kết date và chậm trễ hành động được theo dõi; có backup plan nếu chạm rủi ro Ngày đến hạn.</td><td>Quá hạn không escalation, Người xử lý thay đổi thông tin nhưng chưa chấp thuận lại.</td></tr>
 <tr><td>S3 — Phiếu nhận-back xác minh</td><td>Qty đúng; cert/báo cáo đúng; pack tính toàn vẹn đạt; trực quan sơ bộ đạt; truy vết chuỗi còn nguyên.</td><td>Cert thiếu/sai, site/scope không hợp lệ, bao gói hỏng, sạch/chân không bag vi phạm, hỗn hợp / lẫn lộn lot.</td></tr>

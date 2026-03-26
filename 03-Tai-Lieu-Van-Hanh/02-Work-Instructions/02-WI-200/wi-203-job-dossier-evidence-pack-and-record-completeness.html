@@ -69,7 +69,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thư viện / vùng lưu</th><th>Dùng để làm gì</th><th>Không được dùng để làm gì</th><th>Responsible Person</th></tr></thead><tbody>
 <tr><td>OPS-Hồ sơ / công việc / đơn hàng</td><td>Lưu mọi bằng chứng phát sinh theo JobNum và theo cổng kiểm soát G0–G7</td><td>Không thay Part/Rev Bản gốc làm nguồn kỹ thuật chuẩn</td><td>QA/QMS + Quy trình Owner của cổng kiểm soát</td></tr>
 <tr><td>Part-Rev Bản gốc</td><td>Lưu drawing, mô hình, bộ hồ sơ chuẩn (mốc chuẩn gói hàng), setup standard, đã phê duyệt tài liệu theo CustomerID + PartNo + Rev</td><td>Không chứa bằng chứng ship-cụ thể hoặc lot/job-cụ thể</td><td>Kỹ thuật + QA</td></tr>
-<tr><td>dự phòng / Offline Sự kiện</td><td>Lưu sự kiện log, scan nhập bù, bảng kiểm bổ sung / thay thế khi hệ thống xuống / nTừng</td><td>Không thay Hồ sơ chính sau khi hệ thống đã phục hồi</td><td>QA/QMS</td></tr>
+<tr><td>dự phòng / Offline Sự kiện</td><td>Lưu sự kiện log, scan nhập bù, bảng kiểm bổ sung / thay thế khi hệ thống xuống / Từng</td><td>Không thay Hồ sơ chính sau khi hệ thống đã phục hồi</td><td>QA/QMS</td></tr>
 <tr><td>Customer Pack đầu ra</td><td>Lưu gói / bó/hồ sơ phát hành ra ngoài theo Requests từng lô giao hàng hoặc source kiểm tra</td><td>Không phải nơi làm việc nội bộ chính trong quá trình sản xuất</td><td>QA / Giao vận theo lộ trình gia công</td></tr>
 </tbody></table></div>
 <div class="keyline"><strong>Lưu ý về Part-Rev Bản gốc:</strong> vùng này cố ý không có tiền tố số phía trước vì đây là kho chủ / gốc kỹ thuật theo <span class="code">CustomerID + PartNo + Rev</span>, dùng làm nguồn mốc chuẩn chuẩn để sinh hồ sơ job/Photos trạng thái. Khi PartNo trùng giữa nhiều khách hàng, hồ sơ job phải link đúng nhánh khách hàng tương ứng. Nó không phải dải hồ sơ vận hành tuần tự như các Record Folder G0-G7.</div>
@@ -142,7 +142,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Job lưu trữ / giữ pháp lý / khách hàng khiếu nại hồi cứu</td><td>≤ 1 Ngày làm việc hoặc theo Requests điều tra khẩn</td><td>Lấy được bảng kê, Photos trạng thái, truy vết chuỗi và gói hàng Released</td></tr>
 </tbody></table></div>
 <ul style="padding-left:20px; margin:8px 0;">
-<li>Khi hệ thống xuống / nTừng, áp dụng ngay <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a> và mở sự kiện log. Không tạo thư mục tạm trên máy tính bàn cá nhân để xử lý lâu dài.</li>
+<li>Khi hệ thống xuống / Từng, áp dụng ngay <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a> và mở sự kiện log. Không tạo thư mục tạm trên máy tính bàn cá nhân để xử lý lâu dài.</li>
 <li>Hồ sơ tạo offline phải nhập bù, scan/đối chiếu và chốt bổ sung / thay thế trong thời hạn quy định của sự kiện log. Chưa bổ sung / thay thế đủ = hồ sơ vẫn chưa hoàn chỉnh.</li>
 <li>phê duyệt giao hàng khi offline mặc định TẠM GIỮ, trừ ngoại lệ đã được thẩm quyền cao nhất phê duyệt đúng hồ sơ.</li>
 </ul></div>

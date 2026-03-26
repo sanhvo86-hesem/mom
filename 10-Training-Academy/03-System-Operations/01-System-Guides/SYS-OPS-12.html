@@ -163,7 +163,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Báo giá → PO/Hợp đồng</b></td>
-<td>PO, phiên bản, Requests luồng-xuống / nTừng, CTQ.</td>
+<td>PO, phiên bản, Requests luồng-xuống / Từng, CTQ.</td>
 <td>Người định giá (SAL-03) + QA</td>
 <td>rà soát hợp đồng có dấu vết: Rev/Date/Responsible Person; lưu SSOT.</td>
 </tr>
@@ -183,7 +183,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>Mua hàng</b></td>
 <td>Yêu cầu vật tư, spec NCC, Requests chứng chỉ.</td>
 <td>Mua hàng</td>
-<td>PO luồng-xuống / nTừng; phiên bản/standard được chốt; thay đổi có log.</td>
+<td>PO luồng-xuống / Từng; phiên bản/standard được chốt; thay đổi có log.</td>
 </tr>
 <tr>
 <td><b>Nhận hàng</b></td>
@@ -331,7 +331,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Mua hàng</b></td>
-<td>Luồng-xuống / nTừng spec NCC; chốt phiên bản tiêu chuẩn; kiểm soát thay đổi PO/spec.</td>
+<td>Luồng-xuống / Từng spec NCC; chốt phiên bản tiêu chuẩn; kiểm soát thay đổi PO/spec.</td>
 <td>PO có bản vẽ/spec Rev hiện hành; thay đổi NCC đi qua DCN/triển khai khi ảnh hưởng sản phẩm.</td>
 </tr>
 <tr>
@@ -352,7 +352,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Người định giá (SAL-03)</b></td>
 <td>Kiểm soát phiên bản bản vẽ/spec từ khách; rà soát hợp đồng; thông tin thay đổi tới phòng ban.</td>
-<td>Hồ sơ rà soát hợp đồng ghi rõ Rev/Date; thay đổi khách hàng được luồng-xuống / nTừng và có bằng chứng tiếp nhận.</td>
+<td>Hồ sơ rà soát hợp đồng ghi rõ Rev/Date; thay đổi khách hàng được luồng-xuống / Từng và có bằng chứng tiếp nhận.</td>
 </tr>
 <tr>
 <td><b>Supervisor/Trưởng nhóm</b></td>
@@ -455,7 +455,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Setup sheet Rev B đi kèm program Rev A.</li>
 <li>kế hoạch kiểm tra (plan) chưa cập nhật theo thay đổi CTQ.</li>
 <li>Planner phát hành bộ hồ sơ công việc trước khi chốt Rev bản vẽ.</li>
-<li>Kinh doanh nhận bản vẽ mới từ khách nhưng chưa luồng-xuống / nTừng.</li>
+<li>Kinh doanh nhận bản vẽ mới từ khách nhưng chưa luồng-xuống / Từng.</li>
 </ul>
 </div>
 <div class="card">
@@ -601,7 +601,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3" style="margin-top:0;">6.3 FRM-QMS-022 — DCN (Tài liệu &amp; Data Thay đổi Thông báo)</h3>
 <ul class="tight" style="margin:8px 0 0 18px; line-height:1.85;">
 <li>Vai trò: mô tả thay đổi; phân loại mức độ; xác định kiểm soát cổng (rà soát/thí điểm/đào tạo/tăng kiểm).</li>
-<li>Khi thay đổi ảnh hưởng CTQ/program/tooling/kiểm tra/luồng-xuống / nTừng: DCN là bắt buộc.</li>
+<li>Khi thay đổi ảnh hưởng CTQ/program/tooling/kiểm tra/luồng-xuống / Từng: DCN là bắt buộc.</li>
 <li>DCN gắn Job/WO/Customer/PO và liệt kê danh mục tài liệu/dữ liệu cần cập nhật.</li>
 </ul>
 </div>
@@ -1028,7 +1028,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>7</td><td>Hồ sơ đo bị sửa đổi ngoài kiểm soát</td><td>Quyền truy cập + log phiên bản; lưu SSOT theo lưu giữ tier</td></tr>
 <tr><td>8</td><td>Hồ sơ lưu rải rác, truy xuất nguồn gốc thất bại</td><td>MRR Requests siêu dữ liệu; kiểm SLA truy xuất nguồn gốc ≤ 2 phút</td></tr>
 <tr><td>9</td><td>Thiếu bằng chứng đào tạo khi thay đổi</td><td>Cổng kiểm soát G5 buộc có hồ sơ đào tạo/OJT</td></tr>
-<tr><td>10</td><td>Kiểm soát tài liệu bên ngoài không rõ nguồn/Rev</td><td>Người định giá (SAL-03) chốt Rev trong rà soát hợp đồng; lưu SSOT và luồng-xuống / nTừng</td></tr>
+<tr><td>10</td><td>Kiểm soát tài liệu bên ngoài không rõ nguồn/Rev</td><td>Người định giá (SAL-03) chốt Rev trong rà soát hợp đồng; lưu SSOT và luồng-xuống / Từng</td></tr>
 </tbody>
 </table>
 </div>

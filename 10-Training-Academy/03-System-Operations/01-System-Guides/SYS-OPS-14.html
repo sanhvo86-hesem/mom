@@ -171,7 +171,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>G4 Mua hàng</b><br/><span class="muted">Responsible Person: Mua hàng</span></td>
 <td>Yêu cầu vật liệu/chứng chỉ; Requests outsource/công đoạn đặc biệt</td>
-<td>Supplier rủi ro chấm S‑O‑D; PO có luồng‑xuống / nTừng; Requests CoC/CoA/quy trình cert</td>
+<td>Supplier rủi ro chấm S‑O‑D; PO có luồng‑xuống / Từng; Requests CoC/CoA/quy trình cert</td>
 <td>MRR: PO + nhà cung cấp bằng chứng<br/>hold khi thiếu chứng chỉ bắt buộc</td>
 </tr>
 <tr>
@@ -210,7 +210,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 id="failpoints">4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế)</h2>
 <ol class="iso-list">
 <li><b>Sai Rev</b> tại RFQ/hợp đồng dẫn tới báo giá/plan sai.</li>
-<li><b>Không luồng‑xuống / nTừng</b> Requests chứng chỉ/công đoạn đặc biệt vào PO.</li>
+<li><b>Không luồng‑xuống / Từng</b> Requests chứng chỉ/công đoạn đặc biệt vào PO.</li>
 <li><b>Thiếu/nhầm mẻ nấu (heat)/lot</b> khi nhận vật liệu gây mất truy xuất nguồn gốc.</li>
 <li><b>Nhầm program</b> do tên file không chuẩn hoặc không khóa bản lỗi thời.</li>
 <li><b>Thiếu mô phỏng/thí điểm</b> cho đường chạy dao mới làm sự cố nghiêm trọng/dao gãy.</li>
@@ -271,7 +271,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>CP6 — Supplier/công đoạn đặc biệt control</b></td>
-<td>Mua hàng luồng‑xuống / nTừng Requests; Nhận hàng kiểm chứng chứng chỉ; QA đánh giá nhà cung cấp khi rủi ro cao.</td>
+<td>Mua hàng luồng‑xuống / Từng Requests; Nhận hàng kiểm chứng chứng chỉ; QA đánh giá nhà cung cấp khi rủi ro cao.</td>
 <td>PO/Nhận hàng gói hồ sơ + quy trình cert/CoC/CoA scan</td>
 <td>Thiếu chứng chỉ bắt buộc → CHẶN ship</td>
 </tr>
@@ -522,7 +522,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3</td><td>Chấm S‑O‑D theo nguyên nhân–sự kiện–tác động</td><td>Responsible Person Rủi ro</td><td>FRM‑QMS‑005</td><td>Chấm theo cảm giác; không viết nguyên nhân</td></tr>
 <tr><td>4</td><td>Áp ngưỡng hành động và quyết định GO/TẠM GIỮ/CHẶN</td><td>Supervisor + QA</td><td>Log quyết định + chữ ký</td><td>Không ghi lý do; không ghi Responsible Person</td></tr>
 <tr><td>5</td><td>Thiết kế control tại đúng cổng kiểm soát (phát hành chương trình, setup/FAI, nhận hàng, ship)</td><td>Quy trình Owner</td><td>Bảng kiểm/cổng kiểm soát plan cập nhật</td><td>Đặt control sai chỗ; thiếu MRR</td></tr>
-<tr><td>6</td><td>Luồng‑xuống / nTừng Requests vào PO &amp; nhà cung cấp (khi outsource/công đoạn đặc biệt)</td><td>Mua hàng</td><td>PO + Requests chứng chỉ</td><td>PO thiếu luồng‑xuống / nTừng; thiếu spec</td></tr>
+<tr><td>6</td><td>Luồng‑xuống / Từng Requests vào PO &amp; nhà cung cấp (khi outsource/công đoạn đặc biệt)</td><td>Mua hàng</td><td>PO + Requests chứng chỉ</td><td>PO thiếu luồng‑xuống / Từng; thiếu spec</td></tr>
 <tr><td>7</td><td>Nhận hàng: xác nhận truy xuất nguồn gốc &amp; chứng từ</td><td>Kho</td><td>Nhận hàng hồ sơ + scan chứng từ</td><td>Lẫn lô; thiếu mẻ nấu (heat)/lot</td></tr>
 <tr><td>8</td><td>Phát hành chương trình: đặt tên chuẩn + khóa bản lỗi thời + thí điểm/chạy thử khô (dry run)</td><td>Lập trình viên (CNC)</td><td>Phát hành hồ sơ + FRM‑QMS‑008</td><td>File trùng tên; không khóa bản cũ</td></tr>
 <tr><td>9</td><td>Setup/đầu tiên‑chi tiết / sản phẩm: xác nhận mốc chuẩn (datum)/bù trừ (offset)/danh sách dao cụ</td><td>Setup</td><td>Setup ký‑off + ảnh setup</td><td>Mốc chuẩn (mốc chuẩn (datum) sai; nhầm dao/bù trừ (offset)</td></tr>

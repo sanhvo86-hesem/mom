@@ -88,7 +88,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3" style="margin-top:0">Mục đích</h3>
 <ul>
 <li>Thiết lập 01 cách làm thống nhất để phân loại, phê duyệt, đánh giá tác động, triển khai, xác nhận hiệu lực và đóng thay đổi.</li>
-<li>Chặn 6 rủi ro sống còn: sai Rev/phiên bản; lẫn lộn (mix-up)/lẫn lô; thiếu/giả chứng từ; thuê ngoài/công đoạn đặc biệt không luồng-xuống / nTừng; mất truy xuất nguồn gốc; vượt qua cổng kiểm soát dẫn tới ship sai.</li>
+<li>Chặn 6 rủi ro sống còn: sai Rev/phiên bản; lẫn lộn (mix-up)/lẫn lô; thiếu/giả chứng từ; thuê ngoài/công đoạn đặc biệt không luồng-xuống / Từng; mất truy xuất nguồn gốc; vượt qua cổng kiểm soát dẫn tới ship sai.</li>
 <li>Tạo MRR (bằng chứng vận hành) đủ để đánh giá: thấy được <b>ai quyết định</b>, <b>ai kiểm chứng</b>, <b>áp dụng từ lúc nào</b>, <b>bằng chứng ở đâu</b>.</li>
 </ul>
 </div>
@@ -97,7 +97,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Khi khách hàng đổi bản vẽ/Rev/spec/PO, đổi Requests đóng gói/nhãn, đổi điều kiện giao hàng.</li>
 <li>Khi Kỹ thuật đổi program/CAM/ghi sổ / đăng/chiến lược; đổi gá/không / bằng không; đổi lộ trình gia công/thứ tự nguyên công.</li>
-<li>Khi thay NCC/thuê ngoài/xi mạ anốt (anodize)/mạ/mẻ nấu (heat) xử lý; khi PO cần luồng-xuống / nTừng Requests mới.</li>
+<li>Khi thay NCC/thuê ngoài/xi mạ anốt (anodize)/mạ/mẻ nấu (heat) xử lý; khi PO cần luồng-xuống / Từng Requests mới.</li>
 <li>Khi thay dụng cụ đo/phương pháp đo; khi gage OOT/đến hạn hiệu chuẩn; khi đổi chủ / gốc/fixture đo.</li>
 <li>Khi bảo trì thay linh kiện máy, đổi máy khác mô hình, đổi layout ảnh hưởng an toàn/chất lượng.</li>
 <li>Khi phát sinh NCR/MRB/CAPA buộc thay đổi để chặn tái diễn.</li>
@@ -147,7 +147,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Mua hàng</b></td>
-<td>Luồng-xuống / nTừng thay đổi vào PO; chặn NCC khi thiếu cert/phê duyệt; theo dõi hiệu lực và lô áp dụng.</td>
+<td>Luồng-xuống / Từng thay đổi vào PO; chặn NCC khi thiếu cert/phê duyệt; theo dõi hiệu lực và lô áp dụng.</td>
 <td>PO phiên bản; Requests chứng từ; xác nhận NCC.</td>
 </tr>
 <tr>
@@ -213,8 +213,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Mua hàng</b></td>
 <td>Đổi NCC/thuê ngoài/công đoạn đặc biệt</td>
-<td>PO cập nhật + luồng-xuống / nTừng + cert Requests</td>
-<td>Thiếu luồng-xuống / nTừng/cert → <b>TẠM GIỮ</b> nhận hàng</td>
+<td>PO cập nhật + luồng-xuống / Từng + cert Requests</td>
+<td>Thiếu luồng-xuống / Từng/cert → <b>TẠM GIỮ</b> nhận hàng</td>
 </tr>
 <tr>
 <td><b>Nhận hàng</b></td>
@@ -253,7 +253,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Program phát hành không có tổng kiểm tra (mã kiểm)/version → chạy nhầm file cũ tại máy.</li>
 <li>Setup sheet/traveler không cập nhật đồng bộ → Operator chạy theo giấy cũ.</li>
 <li>Kho không cách ly tồn/WIP theo Rev → xuất nhầm vật tư/lô cũ.</li>
-<li>PO không luồng-xuống / nTừng thay đổi cho NCC → NCC giao lô không đúng spec/lớp phủ / mạ.</li>
+<li>PO không luồng-xuống / Từng thay đổi cho NCC → NCC giao lô không đúng spec/lớp phủ / mạ.</li>
 <li>Thiết bị đo hết hạn hiệu chuẩn/OOT → kết quả Mẫu đầu không tin cậy.</li>
 <li>Xác nhận làm nhưng không lưu bằng chứng → đánh giá “Không có bằng chứng = không qua cổng”.</li>
 <li>Triển khai “áp dụng ngay” tại hiện trường nhưng không hợp thức hóa hồ sơ trong 24h → mất kiểm soát thay đổi.</li>
@@ -381,7 +381,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>5</td><td>Chốt cut-in theo lot/số sê-ri/date; lập danh sách job bị ảnh hưởng.</td><td>Planner + QA</td><td>Cut-in hồ sơ</td><td>Cut-in ghi “từ nay” không có mốc.</td></tr>
 <tr><td>6</td><td>Cập nhật tài liệu/dữ liệu: traveler, phiếu cài đặt, kế hoạch kiểm tra (plan), label, program.</td><td>Kiểm soát tài liệu (Doc Control)/QA + Kỹ thuật</td><td>Danh mục cập nhật trong FRM-QMS-022</td><td>Cập nhật một phần, bỏ sót label/pack.</td></tr>
 <tr><td>7</td><td>Khóa &amp; thu hồi bản cũ tại phân xưởng/kho; dán Rev mới tại máy.</td><td>Supervisor + Kho</td><td>Log thu hồi + ảnh hiện trường</td><td>Bản cũ còn treo tại máy.</td></tr>
-<tr><td>8</td><td>Luồng-xuống / nTừng thay đổi cho NCC/thuê ngoài qua PO; chốt Requests cert.</td><td>Mua hàng</td><td>PO phiên bản + Requests cert</td><td>PO không ghi Rev/spec mới.</td></tr>
+<tr><td>8</td><td>Luồng-xuống / Từng thay đổi cho NCC/thuê ngoài qua PO; chốt Requests cert.</td><td>Mua hàng</td><td>PO phiên bản + Requests cert</td><td>PO không ghi Rev/spec mới.</td></tr>
 <tr><td>9</td><td>cách ly tồn/WIP theo Rev; nhãn TẠM GIỮ/SỬA HÀNG; quyết định xử lý WIP.</td><td>Kho + QA</td><td>Biên bản cách ly + list lot</td><td>Lẫn lô trong cùng kệ.</td></tr>
 <tr><td>10</td><td>Lập xác nhận plan: Mẫu đầu/Chênh lệch FAI/Đầy đủ FAI; gage trạng thái hiệu chuẩn.</td><td>QC + QA</td><td>Plan ký + list gage</td><td>Đo CTQ bằng gage hết hạn.</td></tr>
 <tr><td>11</td><td>Thực thi thay đổi tại máy: setup/chạy thử; xác nhận program tổng kiểm tra (mã kiểm).</td><td>Setup + Lập trình viên (CNC)</td><td>Setup bảng kiểm; tổng kiểm tra (mã kiểm) log</td><td>Chạy nhầm file do tên giống.</td></tr>
@@ -490,7 +490,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>[Trắc Nhiệm] Evidence “Không có bằng chứng = không qua cổng” áp dụng mạnh nhất tại cổng kiểm soát nào? A) Ship cổng kiểm soát B) Cổng kiểm soát phát hành program/tài liệu C) Cổng kiểm soát Mẫu đầu/FAI D) Tất cả các cổng kiểm soát</li>
 <li>[Trắc Nhiệm] Cut-in đúng chuẩn phải gắn với gì? A) Cảm giác “từ giờ” B) Lot/số sê-ri/date C) Ca làm việc D) Operator</li>
 <li>[Trắc Nhiệm] Khi thay đổi dụng cụ đo cho CTQ, Requests tối thiểu là gì? A) Đo nhanh cho xong B) Xác nhận hiệu chuẩn hợp lệ + cập nhật hướng dẫn đo C) Không cần ghi D) Chỉ QC biết</li>
-<li>[Trắc Nhiệm] Khi đổi NCC outsource hoàn thiện bề mặt, hành động bắt buộc là gì? A) Chỉ đổi tên NCC B) Luồng-xuống / nTừng PO + Requests cert + tăng xác minh đầu vào C) Không cần vì NCC chịu D) Đợi lỗi rồi sửa</li>
+<li>[Trắc Nhiệm] Khi đổi NCC outsource hoàn thiện bề mặt, hành động bắt buộc là gì? A) Chỉ đổi tên NCC B) Luồng-xuống / Từng PO + Requests cert + tăng xác minh đầu vào C) Không cần vì NCC chịu D) Đợi lỗi rồi sửa</li>
 <li>[Trắc Nhiệm] Ai có quyền chốt TẠM GIỮ/PHÁT HÀNH cho thay đổi liên quan CTQ? A) Operator B) QA (và QC theo phần đo) C) Kho D) Người định giá (SAL-03)</li>
 <li>[Trắc Nhiệm] Thay đổi “áp dụng ngay tại hiện trường” phải hoàn tất hợp thức hóa hồ sơ trong bao lâu theo chuẩn nội bộ? A) 1 tuần B) 24h C) 1 tháng D) Không cần hợp thức hóa hồ sơ</li>
 <li>[Tình huống ngắn] Khi phát hiện gage đo CTQ hết hạn hiệu chuẩn trong lúc đang đo Mẫu đầu, trạng thái cổng kiểm soát là gì và ai phải được gọi?</li>
@@ -501,7 +501,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>[Trắc Nhiệm] “Mẫu đầu” trong bối cảnh thay đổi quản lý dùng để làm gì? A) Trang trí hồ sơ B) Chứng minh sản phẩm phù hợp sau thay đổi C) Tăng số lượng mẫu D) Thay thế FAI luôn</li>
 <li>[Trắc Nhiệm] Khi thiếu chữ ký phê duyệt bắt buộc trên CR, trạng thái đúng là gì? A) GO B) TẠM GIỮ/CHẶN C) Ship trước D) Đợi cuối tuần ký</li>
 <li>[Trắc Nhiệm] Vai trò nào bắt buộc quản trị version program và tổng kiểm tra (mã kiểm)? A) Lập trình viên (CNC) B) Operator C) EHS D) Người định giá (SAL-03)</li>
-<li>[Trắc Nhiệm] Vai trò nào bắt buộc luồng-xuống / nTừng thay đổi vào PO? A) Mua hàng B) QC C) Setup D) Bảo trì</li>
+<li>[Trắc Nhiệm] Vai trò nào bắt buộc luồng-xuống / Từng thay đổi vào PO? A) Mua hàng B) QC C) Setup D) Bảo trì</li>
 <li>[Tình huống ngắn] Khi khách Requests đổi Rev Cấp để kịp ship, điều kiện tối thiểu để ship hợp lệ là gì?</li>
 </ol>
 <h3 class="h3">10.2 Tình huống (≥3) — dữ kiện thật, quyết định TẠM GIỮ/GO và ghi MRR</h3>
@@ -519,7 +519,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h4 class="h4" style="margin-top:0">Tình huống 3 — Đổi NCC xi mạ anốt (anodize)</h4>
 <p><b>Dữ kiện:</b> Mua hàng đổi NCC xi mạ anốt (anodize) do NCC cũ quá tải. Khách Requests chứng chỉ xi mạ anốt (anodize) theo spec, lô đầu cần ship trong 2 ngày.</p>
-<p><b>Yêu cầu:</b> Liệt kê luồng-xuống / nTừng PO bắt buộc, xác minh đầu vào tăng mức ra sao, điều kiện ship cổng kiểm soát.</p>
+<p><b>Yêu cầu:</b> Liệt kê luồng-xuống / Từng PO bắt buộc, xác minh đầu vào tăng mức ra sao, điều kiện ship cổng kiểm soát.</p>
 </div>
 </div>
 <h3 class="h3">10.3 Bài kiểm tra thực hành (bắt buộc)</h3>
@@ -573,7 +573,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>QC</td><td>≥90%</td><td>Đúng cả 3 tình huống</td><td>Lập xác nhận plan; Mẫu đầu/FAI; xác nhận gage hợp lệ; ký ĐẠT/KHÔNG ĐẠT.</td></tr>
 <tr><td>QA</td><td>≥90%</td><td>Đúng cả 3 tình huống</td><td>Chủ trì phân loại ưu tiên; chốt cổng kiểm soát; quyết định PHÁT HÀNH/TẠM GIỮ; đóng CR với MRR đầy đủ.</td></tr>
 <tr><td>Kho</td><td>≥80%</td><td>Đúng Tình huống 1</td><td>Cách ly tồn/WIP theo Rev; nhãn TẠM GIỮ/SỬA HÀNG; log xuất/nhập theo lot.</td></tr>
-<tr><td>Mua hàng</td><td>≥85%</td><td>Đúng Tình huống 3</td><td>PO luồng-xuống / nTừng; Requests cert; chặn nhận hàng khi thiếu chứng từ.</td></tr>
+<tr><td>Mua hàng</td><td>≥85%</td><td>Đúng Tình huống 3</td><td>PO luồng-xuống / Từng; Requests cert; chặn nhận hàng khi thiếu chứng từ.</td></tr>
 <tr><td>Planner</td><td>≥85%</td><td>Đúng Tình huống 1</td><td>Cut-in theo lot/số sê-ri/date; tách job theo Rev; thông báo triển khai.</td></tr>
 <tr><td>Bảo trì</td><td>≥80%</td><td>Đúng Tình huống 2</td><td>Bảng kiểm an toàn máy; hồ sơ chạy thử; bàn giao máy đủ điều kiện.</td></tr>
 <tr><td>EHS</td><td>≥80%</td><td>Đúng Tình huống 2 (phần rủi ro an toàn)</td><td>Rủi ro log; điều kiện an toàn trước triển khai.</td></tr>
@@ -622,7 +622,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Không thu hồi bản cũ tại máy → chặn bằng bước 7; Requests ảnh hiện trường trong MRR.</li>
 <li>Program không có version/tổng kiểm tra (mã kiểm) → chặn bằng bước 11; bắt buộc log phát hành.</li>
 <li>Thiết bị đo hết hạn hiệu chuẩn nhưng vẫn dùng → chặn bằng xác nhận plan + FF2.</li>
-<li>Outsource/công đoạn đặc biệt thiếu cert/luồng-xuống / nTừng → chặn bằng bước 8–9 và xác minh đầu vào tăng mức.</li>
+<li>Outsource/công đoạn đặc biệt thiếu cert/luồng-xuống / Từng → chặn bằng bước 8–9 và xác minh đầu vào tăng mức.</li>
 <li>giao hàng khi thiếu bằng chứng Mẫu đầu/FAI hoặc COC sai Rev → chặn bằng ship cổng kiểm soát điểm kiểm soát #6.</li>
 <li>Đóng CR khi chưa xác minh hiệu lực → chặn bằng điểm kiểm soát #7; Requests biên bản hiệu lực.</li>
 </ol>

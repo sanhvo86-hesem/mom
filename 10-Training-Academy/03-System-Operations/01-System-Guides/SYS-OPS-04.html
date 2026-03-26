@@ -95,7 +95,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Kho</b></td><td>Thực hiện PackagingChecks/SSCC; chạy ShipRelease cổng kiểm soát; xử lý ĐÃ CHẶN không né.</td><td>Phát hành 01 pack chỉ khi PacketComplete=PASS; chứng minh được vết / nhật ký thay đổi “từ hồ sơ đến file”.</td></tr>
 <tr><td><b>Mua hàng</b></td><td>Thu thập chứng từ nhà cung cấp/công đoạn đặc biệt; gắn vào hồ sơ đúng mục; phản hồi DocMissing.</td><td>2 lô nhận hàng: chứng từ truy xuất nguồn gốc trong 60 giây, không thiếu rev/lot.</td></tr>
 <tr><td><b>Planner</b></td><td>Giám sát JobIndex/JobOper; đảm bảo job Released có hồ sơ; điều phối bàn giao theo cổng kiểm soát.</td><td>Không có job Released thiếu EvidenceFolderUrl; phản hồi vấn đề chặn trong 1 ca.</td></tr>
-<tr><td><b>Bảo trì</b></td><td>Ghi nhận ToolLife/Thời gian nTừng máy theo hồ sơ; giữ bằng chứng hiệu chuẩn CNC-IMS-HUB → QMS-Hồ sơ → Đo lường-Hồ sơ..</td><td>Đóng 01 sự cố thời gian nTừng máy có hồ sơ + ảnh + nguyên nhân; không mất dấu vết.</td></tr>
+<tr><td><b>Bảo trì</b></td><td>Ghi nhận ToolLife/Thời gian Từng máy theo hồ sơ; giữ bằng chứng hiệu chuẩn CNC-IMS-HUB → QMS-Hồ sơ → Đo lường-Hồ sơ..</td><td>Đóng 01 sự cố thời gian Từng máy có hồ sơ + ảnh + nguyên nhân; không mất dấu vết.</td></tr>
 <tr><td><b>EHS</b></td><td>Gắn kiểm soát EHS vào hồ sơ khi có Requests; khóa phát hành khi thiếu kiểm soát an toàn EHS cổng kiểm soát: PPE • LOTO • Hot Công việc • nâng • hóa chất/Dung dịch làm mát (dung dịch làm nguội) • Machine bảo vệ / tấm chắn..</td><td>Nhận biết các điểm chặn EHS và phát hành đúng 100%.</td></tr>
 <tr><td><b>Người định giá (SAL-03)</b></td><td>Không cam kết giao hàng khi ShipRelease chưa ĐÃ PHÁT HÀNH; truyền thông đúng trạng thái cổng kiểm soát.</td><td>Không có email/báo giá xác nhận giao hàng khi Trạng thái=ĐÃ CHẶN/TẠM GIỮ.</td></tr>
 <tr><td><b>Supervisor</b></td><td>Chủ trì bàn giao ca; cưỡng chế “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”; mở sự cố khi có vượt qua.</td><td>0 lần vượt qua cổng kiểm soát trong ca trực; 100% vấn đề chặn có Responsible Person và due time.</td></tr>
@@ -187,10 +187,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th>Luồng</th><th>Kích hoạt</th><th>Đầu vào</th><th>Đầu ra</th><th>Điểm vận hành phải kiểm</th></tr></thead>
 <tbody>
-<tr><td>FLOW_01_Sync_OpenJobs</td><td>tái phát 15–30m</td><td>BAQ_OpenJobs</td><td>Cập nhật/Thêm mới JobIndex</td><td>Chênh lệch+chồng chéo; không tạm ứng / nâng cao con trỏ khi không đạt</td></tr>
-<tr><td>FLOW_02_Sync_JobOperations</td><td>tái phát 30m</td><td>BAQ_JobOperations</td><td>Cập nhật/Thêm mới JobOperIndex</td><td>JobNum+OprSeq duy nhất</td></tr>
-<tr><td>FLOW_03_Sync_LaborMirror</td><td>tái phát 15m</td><td>BAQ_LaborTime</td><td>Cập nhật/Thêm mới LaborMirror</td><td>Không thiếu JobNum/ClockIn</td></tr>
-<tr><td>FLOW_04_Sync_ShipmentMirror</td><td>tái phát 15m</td><td>BAQ_ShipmentsOpen</td><td>Cập nhật/Thêm mới ShipmentMirror</td><td>Không trễ so với ca vận hành</td></tr>
+<tr><td>FLOW_01_Sync_OpenJobs</td><td>Tái phát 15–30m</td><td>BAQ_OpenJobs</td><td>Cập nhật/Thêm mới JobIndex</td><td>Chênh lệch+chồng chéo; không tạm ứng / nâng cao con trỏ khi không đạt</td></tr>
+<tr><td>FLOW_02_Sync_JobOperations</td><td>Tái phát 30m</td><td>BAQ_JobOperations</td><td>Cập nhật/Thêm mới JobOperIndex</td><td>JobNum+OprSeq duy nhất</td></tr>
+<tr><td>FLOW_03_Sync_LaborMirror</td><td>Tái phát 15m</td><td>BAQ_LaborTime</td><td>Cập nhật/Thêm mới LaborMirror</td><td>Không thiếu JobNum/ClockIn</td></tr>
+<tr><td>FLOW_04_Sync_ShipmentMirror</td><td>Tái phát 15m</td><td>BAQ_ShipmentsOpen</td><td>Cập nhật/Thêm mới ShipmentMirror</td><td>Không trễ so với ca vận hành</td></tr>
 <tr><td>FLOW_06_Create_JobDossier_OnNewJob</td><td>On JobIndex new/Released</td><td>JobIndex</td><td>Tạo Record Folder</td><td>Không tạo sai đường dẫn/Rev</td></tr>
 <tr><td>FLOW_06_QA_Approvals</td><td>On submit (Hold/NCR/CAPA/Ship)</td><td>Hồ sơ</td><td>ApprovalHistory</td><td>SoD + nhận xét + dấu thời gian</td></tr>
 <tr><td>FLOW_07_ShipRelease_Validator</td><td>On ShipRelease tạo/sửa đổi</td><td>ShipRelease + hồ sơ</td><td>PASS/CHẶN + thông báo</td><td>Cổng kiểm soát stop‑ship, không có “pass im lặng”</td></tr>

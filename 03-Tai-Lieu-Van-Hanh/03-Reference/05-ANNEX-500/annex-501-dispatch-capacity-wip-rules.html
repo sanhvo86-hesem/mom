@@ -88,7 +88,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>3. cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và rule đổi lịch</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cửa sổ</th><th>Ý nghĩa</th><th>Khi nào được phá</th><th>Evidence bắt buộc</th></tr></thead><tbody>
-<tr><td>Đóng băng của ca</td><td>Danh sách job đầu ca Released, dùng để giữ nhịp vận hành trong ca Current</td><td>Chỉ P0 hoặc sự cố L1/L2: machine xuống / nTừng, nguyên vật liệu thiếu / bỏ sót, phiên bản thay đổi, QA TẠM GIỮ, an toàn sự kiện</td><td>Thay đổi note + Responsible Person + job bị lùi + thời điểm cập nhật Epicor/M365</td></tr>
+<tr><td>Đóng băng của ca</td><td>Danh sách job đầu ca Released, dùng để giữ nhịp vận hành trong ca Current</td><td>Chỉ P0 hoặc sự cố L1/L2: machine xuống / Từng, nguyên vật liệu thiếu / bỏ sót, phiên bản thay đổi, QA TẠM GIỮ, an toàn sự kiện</td><td>Thay đổi note + Responsible Person + job bị lùi + thời điểm cập nhật Epicor/M365</td></tr>
 <tr><td>Đóng băng ngày</td><td>Kế hoạch Ngày cho trung tâm gia công/cell</td><td>P0, nút thắt / điểm nghẽn khôi phục / thu hồi, outsource quá hạn, khách hàng đặc biệt phê duyệt</td><td>Quyết định hồ sơ trong tier cuộc họp / log hành động</td></tr>
 <tr><td>Đóng băng tuần</td><td>Kế hoạch chuẩn để bảo vệ thời gian dẫn (lead time) và vật tư/nguồn lực đã khóa</td><td>Chỉ L2 hoặc quyết định nhà máy-level</td><td>Biên bản công suất rà soát hoặc quyết định điều hành</td></tr>
 </tbody></table></div>
@@ -96,11 +96,11 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>4. Mô hình năng lực hữu dụng</h2>
-<p>Năng lực dùng để điều phối xuất hàng không phải là công suất lý thuyết của máy. Planner phải tính <b>năng lực hữu dụng</b> theo công thức sau: <span class="code">Khả dụng giờ – đã lên kế hoạch thời gian nTừng máy – PM / hiệu chuẩn hold – cuộc họp / bàn giao dự trữ / dự phòng – setup dự trữ / dự phòng – bất thường dự trữ / dự phòng = có thể điều phối giờ</span>. Khi nhóm máy (machine nhóm sản phẩm) có OEE lịch sử đủ tin cậy, Planner được dùng hệ số hiệu lực; nếu không có dữ liệu đủ sạch, phải dùng mức thận trọng hơn thay vì vẽ năng lực đẹp.</p>
+<p>Năng lực dùng để điều phối xuất hàng không phải là công suất lý thuyết của máy. Planner phải tính <b>năng lực hữu dụng</b> theo công thức sau: <span class="code">Khả dụng giờ – đã lên kế hoạch thời gian Từng máy – PM / hiệu chuẩn hold – cuộc họp / bàn giao dự trữ / dự phòng – setup dự trữ / dự phòng – bất thường dự trữ / dự phòng = có thể điều phối giờ</span>. Khi nhóm máy (machine nhóm sản phẩm) có OEE lịch sử đủ tin cậy, Planner được dùng hệ số hiệu lực; nếu không có dữ liệu đủ sạch, phải dùng mức thận trọng hơn thay vì vẽ năng lực đẹp.</p>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thành phần</th><th>Cách hiểu bắt buộc</th><th>Ghi chú vận hành</th></tr></thead><tbody>
 <tr><td>Khả dụng giờ</td><td>Giờ máy thực sự mở cho sản xuất theo lịch đã duyệt</td><td>Không tính cả thời gian PM, đào tạo, đánh giá, hoặc dòng / chuyền stop đã biết trước.</td></tr>
 <tr><td>Setup dự trữ / dự phòng</td><td>Phần thời gian dành cho chuyển đổi (changeover)/chứng minh-out/mẫu đầu</td><td>Không được coi setup là “chạy sản lượng”. Chủng loại cao (cao-mix) cell phải giữ dự trữ / dự phòng cao hơn cell lặp.</td></tr>
-<tr><td>bất thường dự trữ / dự phòng</td><td>Biên độ để hấp thụ lỗi nhỏ, khôi phục / thu hồi, tool thay đổi, nhỏ / không nghiêm trọng nTừng máy</td><td>nút thắt / điểm nghẽn cell phải có dự trữ / dự phòng rõ; không được load 100% rồi mong phân xưởng tự xoay.</td></tr>
+<tr><td>bất thường dự trữ / dự phòng</td><td>Biên độ để hấp thụ lỗi nhỏ, khôi phục / thu hồi, tool thay đổi, nhỏ / không nghiêm trọng Từng máy</td><td>nút thắt / điểm nghẽn cell phải có dự trữ / dự phòng rõ; không được load 100% rồi mong phân xưởng tự xoay.</td></tr>
 <tr><td>có thể điều phối giờ</td><td>Giờ thật sự có thể xếp job</td><td>Dùng để so với trong hàng đợi standard giờ khi quyết định mở thêm việc.</td></tr>
 </tbody></table></div>
 </div>
@@ -112,7 +112,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship phát hành) / clean pack</td><td>Ship-ready / final-kiểm tra-ready ≤ 1 Ngày đầu ra chuẩn</td><td>Không để QA/WHS thành bãi chờ cuối chuỗi</td><td>Review nguyên nhân gốc ở công đoạn trước; không đẩy thêm job nếu đầu ra cuối không hút kịp.</td></tr>
 <tr><td>Outsource hàng đợi</td><td>Chỉ phát lot khi Người xử lý khe / vị trí, lộ trình gia công, cert kỳ vọng và trả lại date đã xác nhận</td><td>Ngăn chất hàng chờ ngoài mà không biết Ngày về</td><td>Planner + PUR quyết định theo PO/ETA/Người xử lý trạng thái; thiếu khe / vị trí thì TẠM GIỮ.</td></tr>
 </tbody></table></div>
-<p>Cap là <b>giới hạn phát hành</b>, không phải KPI để nhồi đầy. Khi vượt cap, ưu tiên đầu tiên là <b>nTừng mở thêm việc</b> và <b>dọn hàng đang kẹt</b>, không phải tạo thêm bảng theo dõi.</p>
+<p>Cap là <b>giới hạn phát hành</b>, không phải KPI để nhồi đầy. Khi vượt cap, ưu tiên đầu tiên là <b>Từng mở thêm việc</b> và <b>dọn hàng đang kẹt</b>, không phải tạo thêm bảng theo dõi.</p>
 </div>
 
 <div class="section"><h2>6. Queue discipline, tuổi tồn và phản ứng</h2>
@@ -146,7 +146,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <tr><td>Rủi ro</td><td>Tuổi tồn nhóm / phân loại, nút thắt / điểm nghẽn đánh dấu / cờ, đặc biệt xử lý / vận chuyển đánh dấu / cờ, khách hàng lớp phủ đánh dấu / cờ, hot-job note</td></tr>
 <tr><td>Hành động</td><td>Next hành động, Responsible Person, due time, escalation level, bằng chứng link khi đóng</td></tr>
 </tbody></table></div>
-<p>Điều phối bảng phải được rà soát tối thiểu ở 3 thời điểm: <b>đầu ca</b>, <b>giữa ca</b> và <b>cuối ca/chuẩn bị bàn giao</b>. Nếu Ngày đó có P0, machine xuống / nTừng lớn, phiên bản thay đổi hoặc outsource quá hạn, phải mở thêm rà soát bất thường trong Ngày thay vì chờ đến cuối ca.</p>
+<p>Điều phối bảng phải được rà soát tối thiểu ở 3 thời điểm: <b>đầu ca</b>, <b>giữa ca</b> và <b>cuối ca/chuẩn bị bàn giao</b>. Nếu Ngày đó có P0, machine xuống / Từng lớn, phiên bản thay đổi hoặc outsource quá hạn, phải mở thêm rà soát bất thường trong Ngày thay vì chờ đến cuối ca.</p>
 </div>
 
 <div class="section"><h2>9. Rule khớp nối với outsource, clean-pack và final phát hành</h2>
