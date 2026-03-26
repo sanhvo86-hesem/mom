@@ -137,8 +137,15 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 /* TYPE 2: Internal Gate — navy rounded pill (IG1, IG2...) */
 .step-tag { display: inline-flex; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #1565c0, #1976d2); border: none; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
 /* Center IG badge in table cell */
-.ig-center { text-align: center !important; vertical-align: middle !important; width: 70px !important; min-width: 70px !important; padding: 10px 8px !important; }
-.ig-center .step-tag { display: inline-flex; margin: 0; }
+.ig-center { text-align: center !important; vertical-align: middle !important; white-space: nowrap !important; padding: 10px 6px !important; }
+.ig-center .step-tag { display: inline-flex; margin: 0 auto; }
+/* IG table — fixed layout for 5 columns: IG | Mô tả | Chủ trì | Điểm dừng | KPI */
+.table:has(colgroup) { table-layout: fixed !important; width: 100% !important; }
+.col-ig { width: 50px; }
+.col-desc { width: 34%; }
+.col-owner { width: 14%; min-width: 80px; }
+.col-hold { width: 22%; }
+.col-kpi { width: 18%; }
 /* TYPE 3: System Gate — teal pill (G0, G1...) */
 .gate-tag { display: inline-flex; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #fff; background: #00838f; text-transform: uppercase; letter-spacing: .3px; }
 /* TYPE 5: Procedure step balloon — green circle before h3 headings in section 7 */
@@ -204,21 +211,21 @@ h3:has(.proc-num) { margin-top: 28px; margin-bottom: 10px; display: flex; align-
 .table-card .form-table { border: none !important; }
 .table, table.table { width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; font-size: 12.5px; table-layout: auto; border: 1px solid var(--th-bdr) !important; border-radius: var(--r); overflow: hidden; }
 .table thead th, table.table thead th {
-  text-align: left; padding: 11px 14px;
+  text-align: left; padding: 11px 7px;
   font-size: 10.5px; font-weight: 700; color: var(--navy) !important;
   background: var(--th-bg) !important; letter-spacing: .4px; text-transform: uppercase;
   border: none !important; border-bottom: 1px solid var(--th-bdr) !important; border-right: 1px solid var(--th-bdr) !important;
 }
 .table thead th:last-child, table.table thead th:last-child { border-right: none !important; }
 .table tbody td, table.table tbody td {
-  padding: 10px 14px; border: none !important; border-bottom: 1px solid var(--th-bdr) !important; border-right: 1px solid var(--th-bdr) !important;
+  padding: 10px 7px; border: none !important; border-bottom: 1px solid var(--th-bdr) !important; border-right: 1px solid var(--th-bdr) !important;
   vertical-align: top; line-height: 1.6; color: var(--ink); background: transparent !important;
 }
 .table tbody td:last-child, table.table tbody td:last-child { border-right: none !important; }
 .table tbody tr:last-child td { border-bottom: none !important; }
 .table tbody tr:hover { background: rgba(21,101,192,0.04) !important; transition: background .15s ease; }
 .table tbody th, table.table tbody th {
-  padding: 10px 14px; font-weight: 700; color: var(--navy) !important;
+  padding: 10px 7px; font-weight: 700; color: var(--navy) !important;
   background: rgba(21,101,192,0.06) !important; border: none !important; border-bottom: 1px solid var(--th-bdr) !important; border-right: 1px solid var(--th-bdr) !important; font-size: 11.5px; vertical-align: top;
 }
 .table tbody th:last-child, table.table tbody th:last-child { border-right: none !important; }
@@ -228,16 +235,16 @@ h3:has(.proc-num) { margin-top: 28px; margin-bottom: 10px; display: flex; align-
 /* Form table */
 .form-table { width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; font-size: 12px; border: 1px solid var(--th-bdr) !important; border-radius: var(--r); overflow: hidden; }
 .form-table th {
-  padding: 9px 14px; text-align: left; font-weight: 700; color: var(--navy) !important;
+  padding: 9px 7px; text-align: left; font-weight: 700; color: var(--navy) !important;
   background: var(--th-bg) !important; border: none !important; border-bottom: 1px solid var(--th-bdr) !important; border-right: 1px solid var(--th-bdr) !important; font-size: 11px; vertical-align: top;
 }
 .form-table th:last-child { border-right: none !important; }
-.form-table td { padding: 9px 14px; border: none !important; border-bottom: 1px solid var(--th-bdr) !important; border-right: 1px solid var(--th-bdr) !important; vertical-align: top; background: transparent !important; }
+.form-table td { padding: 9px 7px; border: none !important; border-bottom: 1px solid var(--th-bdr) !important; border-right: 1px solid var(--th-bdr) !important; vertical-align: top; background: transparent !important; }
 .form-table td:last-child { border-right: none !important; }
 .form-table tbody tr:hover { background: rgba(21,101,192,0.04); }
 /* Docx table */
 .docx-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 12px; margin: 12px 0; table-layout: auto; border: 1px solid var(--th-bdr); border-radius: var(--r); overflow: hidden; }
-.docx-table td, .docx-table th { border: none !important; border-bottom: 1px solid var(--th-bdr) !important; border-right: 1px solid var(--th-bdr) !important; padding: 9px 14px; vertical-align: top; background: transparent !important; }
+.docx-table td, .docx-table th { border: none !important; border-bottom: 1px solid var(--th-bdr) !important; border-right: 1px solid var(--th-bdr) !important; padding: 9px 7px; vertical-align: top; background: transparent !important; }
 .docx-table td:last-child, .docx-table th:last-child { border-right: none !important; }
 .docx-table th { background: var(--th-bg) !important; font-weight: 700; color: var(--navy) !important; border-bottom: 1px solid var(--th-bdr) !important; }
 .table-card .docx-table, .table-wrap .docx-table { margin: 0; border: none !important; }
@@ -324,9 +331,9 @@ body.qms-resizing * { cursor: col-resize !important; }
 .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .toc a { display: block; padding: 5px 10px; font-size: 12px; border-radius: var(--r-sm); }
 .toc a:hover { background: var(--bg3); text-decoration: none; }
-.lane { background: var(--bg2); border: 1px solid var(--ln); border-radius: var(--r-sm); padding: 10px 14px; margin: 8px 0; }
-.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; padding: 10px 14px; background: var(--bg2); border: 1px solid var(--ln); border-radius: var(--r-sm); margin: 12px 0; }
-.item { padding: 10px 14px; border: 1px solid var(--ln2); border-radius: var(--r-sm); margin: 5px 0; background: var(--bg); font-size: 13px; }
+.lane { background: var(--bg2); border: 1px solid var(--ln); border-radius: var(--r-sm); padding: 10px 7px; margin: 8px 0; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; padding: 10px 7px; background: var(--bg2); border: 1px solid var(--ln); border-radius: var(--r-sm); margin: 12px 0; }
+.item { padding: 10px 7px; border: 1px solid var(--ln2); border-radius: var(--r-sm); margin: 5px 0; background: var(--bg); font-size: 13px; }
 .docx-content { padding: 0; line-height: 1.7; }
 .table.assessment-matrix td, .table.assessment-matrix th, .table.rubric td, .table.rubric th { padding: 5px 8px; font-size: 11px; }
 .tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
