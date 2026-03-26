@@ -75,7 +75,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Thông tin triển khai</strong>
 <ul>
-<li><strong>Đối tượng (bắt buộc):</strong> Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, NNgười định giá (SAL-03), Supervisor</li>
+<li><strong>Đối tượng (bắt buộc):</strong> Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor</li>
 <li><strong>Thời lượng:</strong> Lý thuyết 90 phút • Phân xưởng 60 phút • OJT 120 phút (theo ca)</li>
 <li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền tối thiểu theo vai trò; đã học định hướng / đào tạo hội nhập + quy tắc an toàn dữ liệu nội bộ.</li>
 <li><strong>Điểm chặn:</strong> Phát hành Part/Rev • Nhận chứng từ vật liệu/outsource • Đóng kiểm tra • bộ hồ sơ giao hàng (ship gói hồ sơ)</li>
@@ -183,7 +183,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>RFQ + Requests kỹ thuật + điều khoản</td>
 <td>Hợp đồng/PO điều khoản + nghĩa vụ tóm tắt</td>
 <td>Zone05_Commercial (Customer)</td>
-<td>NNgười định giá (SAL-03) xác nhận “điều khoản hồ sơ” trước khi nhận đơn</td>
+<td>Người định giá (SAL-03) xác nhận “điều khoản hồ sơ” trước khi nhận đơn</td>
 </tr>
 <tr>
 <td>Kế hoạch</td>
@@ -237,7 +237,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>Phản hồi/CI</td>
 <td>Khiếu nại / đánh giá phát hiện</td>
-<td>CAPA pack + bài học kinh nNhiệm</td>
+<td>CAPA pack + bài học kinh Nhiệm</td>
 <td>Zone04 (Tình huống) + Zone01 (được kiểm soát cập nhật)</td>
 <td>QA đóng CAPA khi đủ bằng chứng hiệu lực</td>
 </tr>
@@ -272,7 +272,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Zone03</b><div class="muted">Job Evidence</div></td>
-<td>Planner/Sản xuất/QC/Kho (nNgười đóng góp), QA (Responsible Person)</td>
+<td>Planner/Sản xuất/QC/Kho (Người đóng góp), QA (Responsible Person)</td>
 <td>Hồ sơ công việc + pack bằng chứng (kiểm tra, ship, cert, outsource)</td>
 <td>Không lưu chủ / gốc Part/Rev; không chỉnh sửa file sau khi khai báo hồ sơ</td>
 </tr>
@@ -284,7 +284,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Zone05</b><div class="muted">Thương mại</div></td>
-<td>NNgười định giá (SAL-03) + Mua hàng</td>
+<td>Người định giá (SAL-03) + Mua hàng</td>
 <td>Customer/nhà cung cấp hợp đồng, thỏa thuận bảo mật (NDA), điều khoản; sơ đồ ánh xạ nghĩa vụ</td>
 <td>Không chứa bằng chứng theo Job; không chứa bản Released Part/Rev</td>
 </tr>
@@ -314,7 +314,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Báo giá/Hợp đồng</td>
 <td>Điều khoản hồ sơ nằm trong email rải rác, không có “nghĩa vụ tóm tắt”</td>
 <td>Thiếu pack khi ship, đánh giá hỏi không trả lời</td>
-<td>NNgười định giá (SAL-03) bắt buộc công bố / phát hành điều khoản vào Zone05 và gắn tag “EvidenceRequired”</td>
+<td>Người định giá (SAL-03) bắt buộc công bố / phát hành điều khoản vào Zone05 và gắn tag “EvidenceRequired”</td>
 </tr>
 <tr>
 <td>Kế hoạch</td>
@@ -372,7 +372,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Hiệu chuẩn</td>
-<td>Giấy cali (đo) (đo) lưu theo “tên nNgười” hoặc “tên máy”, không theo AssetID</td>
+<td>Giấy cali (đo) (đo) lưu theo “tên Người” hoặc “tên máy”, không theo AssetID</td>
 <td>Không chứng minh thiết bị đo hợp lệ tại thời điểm đo</td>
 <td>Bảo trì/QA lưu theo AssetID ở Zone04; gắn hiệu lực và OOT xử lý / vận chuyển</td>
 </tr>
@@ -479,9 +479,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note" style="margin-top:10px">
 <b>CHẶN</b> (khóa hành vi, chặn hệ thống)
  <ul style="margin:10px 0 0 18px">
-<li>Khi nNgười dùng tạo bản copy “Revised_final_vX” ở ngoài Chính / Sơ cấp Home.</li>
-<li>Khi nNgười dùng sửa nội dung file đã khai báo hồ sơ.</li>
-<li>Khi nNgười dùng chia sẻ link ra ngoài phạm vi nội bộ hoặc cấp quyền trái vai trò.</li>
+<li>Khi Người dùng tạo bản copy “Revised_final_vX” ở ngoài Chính / Sơ cấp Home.</li>
+<li>Khi Người dùng sửa nội dung file đã khai báo hồ sơ.</li>
+<li>Khi Người dùng chia sẻ link ra ngoài phạm vi nội bộ hoặc cấp quyền trái vai trò.</li>
 </ul>
 <div class="muted" style="margin-top:6px">
  CHẶN thực thi bằng quyền hệ thống + escalation Supervisor/QA/IT.
@@ -577,7 +577,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>2</td>
-<td>NNgười định giá (SAL-03)</td>
+<td>Người định giá (SAL-03)</td>
 <td>Công bố điều khoản hồ sơ khách hàng vào Zone05 và gắn link vào Job index.</td>
 <td>nghĩa vụ tóm tắt + link</td>
 <td>Điều khoản nằm trong email; không có bản tóm tắt</td>
@@ -643,7 +643,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Bảo trì</td>
 <td>Bảo đảm gage/tài sản có hồ sơ cali (đo) (đo) theo AssetID; xử lý OOT theo tình huống.</td>
 <td>Hiệu chuẩn hồ sơ + OOT log</td>
-<td>Lưu theo tên nNgười; không map job ảnh hưởng</td>
+<td>Lưu theo tên Người; không map job ảnh hưởng</td>
 </tr>
 <tr>
 <td>12</td>
@@ -705,7 +705,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>4</td>
 <td>Đặt tên file theo quy tắc</td>
-<td>Dùng ASCII không dấu; có nNgày ISO; có REV; có RecordType.</td>
+<td>Dùng ASCII không dấu; có Ngày ISO; có REV; có RecordType.</td>
 <td>Tên file là “siêu dữ liệu tối thiểu” khi tìm kiếm.</td>
 </tr>
 <tr>
@@ -762,7 +762,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Operator/Setup:</b> mở đúng SnapshotID, không dùng tệp cục bộ (nội bộ / tại chỗ file).</li>
 <li><b>QC/Kho:</b> upload file vào đúng mục trong Hồ sơ công việc.</li>
-<li><b>NNgười định giá (SAL-03)/Mua hàng:</b> lưu hợp đồng/cert đúng Zone05 và gắn link Job.</li>
+<li><b>Người định giá (SAL-03)/Mua hàng:</b> lưu hợp đồng/cert đúng Zone05 và gắn link Job.</li>
 </ul>
 </td>
 <td>Được quyền <b>upload</b> vào Zone06 và Zone03 theo thư mục được giao</td>
@@ -809,7 +809,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Thiết kế/chuẩn hóa template cho bộ phận; khóa “đường tắt”.</li>
 <li>Đánh giá nội bộ: truy xuất nguồn gốc nMẫu nhiên 5 job và ghi kết quả.</li>
-<li>Training lại nNgười mới bằng OJT theo TWI.</li>
+<li>Training lại Người mới bằng OJT theo TWI.</li>
 </ul>
 </td>
 <td>
@@ -827,7 +827,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 10) Assessment -->
 <div class="card" id="assessment">
 <h2 class="h2" style="margin-top:0">10) Đánh giá</h2>
-<h3 class="h3">10.1 Bài kiểm tra nhanh (≥20 câu) — trắc nNhiệm + tình huống ngắn</h3>
+<h3 class="h3">10.1 Bài kiểm tra nhanh (≥20 câu) — trắc Nhiệm + tình huống ngắn</h3>
 <ol style="margin:10px 0 0 18px">
 <li>Chính / Sơ cấp Home nghĩa là gì?</li>
 <li>Luật “01 đối tượng = 01 Chính / Sơ cấp Home” chặn rủi ro nào?</li>
@@ -896,7 +896,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h3 class="h3" style="margin-top:14px">10.3 Hiệu suất test (bắt buộc) — mô tả bài test + tiêu chí đánh giá + ĐẠT/KHÔNG ĐẠT</h3>
 <div class="note">
-<b>Bài test:</b> học viên nhận 01 “Job giả lập” (JobNum/PartNum/Rev/PO/PackID được nNgười đào tạo cung cấp) và phải:
+<b>Bài test:</b> học viên nhận 01 “Job giả lập” (JobNum/PartNum/Rev/PO/PackID được Người đào tạo cung cấp) và phải:
  <ol style="margin:10px 0 0 18px">
 <li>Tạo Hồ sơ công việc đúng template và đặt tên đúng key.</li>
 <li>Tạo Part/Rev thùng chứa và công bố / phát hành 01 CFG gói hàng (bảng kê + file) với PackageID.</li>
@@ -1029,7 +1029,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Zone04 / EHS</td>
 </tr>
 <tr>
-<td>NNgười định giá (SAL-03)</td>
+<td>Người định giá (SAL-03)</td>
 <td>Hợp đồng/PO điều khoản + nghĩa vụ tóm tắt; sơ đồ ánh xạ Requests hồ sơ</td>
 <td>Zone05 / Customer</td>
 </tr>
@@ -1042,7 +1042,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 <h3 class="h3">12.2 Tên chuẩn &amp; quy tắc đặt tên (bắt buộc)</h3>
 <div class="note">
-<b>Quy tắc cứng:</b> tên file dùng ASCII không dấu; dùng nNgày ISO <span class="mono">YYYY-MM-DD</span>; có <span class="mono">REV-</span>; không dùng <span class="mono">final</span>, <span class="mono">new</span>, <span class="mono">copy</span>.
+<b>Quy tắc cứng:</b> tên file dùng ASCII không dấu; dùng Ngày ISO <span class="mono">YYYY-MM-DD</span>; có <span class="mono">REV-</span>; không dùng <span class="mono">final</span>, <span class="mono">new</span>, <span class="mono">copy</span>.
  </div>
 <div class="grid-2">
 <div>

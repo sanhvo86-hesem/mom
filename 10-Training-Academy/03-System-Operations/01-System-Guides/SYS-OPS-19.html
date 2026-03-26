@@ -166,13 +166,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>EHS rủi ro log; phê duyệt điều kiện an toàn; đào tạo an toàn bổ sung.</td>
 </tr>
 <tr>
-<td><b>NNgười định giá (SAL-03)</b></td>
+<td><b>Người định giá (SAL-03)</b></td>
 <td>Tiếp nhận thay đổi khách hàng; lập FRM-SAL-003; chốt Requests phê duyệt khách; thông báo tác động lịch trình/giá.</td>
 <td>FRM-SAL-003 ký; email/biên bản xác nhận khách (lưu nội bộ).</td>
 </tr>
 <tr>
 <td><b>Supervisor</b></td>
-<td>Thực thi điểm chặn tại hiện trường; phân công nNgười làm Tác động/Xác nhận; kiểm tra đào tạo đã hoàn tất trước cut-in.</td>
+<td>Thực thi điểm chặn tại hiện trường; phân công Người làm Tác động/Xác nhận; kiểm tra đào tạo đã hoàn tất trước cut-in.</td>
 <td>Bảng kiểm cổng kiểm soát tại dòng / chuyền; danh sách đào tạo; biên bản họp CCB.</td>
 </tr>
 </tbody>
@@ -357,7 +357,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>KHOANH VÙNG</b> WIP: dán nhãn TẠM GIỮ; tách khỏi vật tư/lô khác.</li>
 <li><b>CHỤP ẢNH</b> điểm không khớp: Rev trên giấy, Rev trên màn hình program, nhãn vật tư, cert.</li>
 <li><b>GỌI</b> Supervisor + QA + QC (khi liên quan đo/CTQ) theo kênh nội bộ.</li>
-<li><b>GHI NHẬT KÝ</b> “Sự cố cổng kiểm soát” vào CR/Thông báo hoặc log sự cố: thời điểm, job/part/lot, nNgười phát hiện.</li>
+<li><b>GHI NHẬT KÝ</b> “Sự cố cổng kiểm soát” vào CR/Thông báo hoặc log sự cố: thời điểm, job/part/lot, Người phát hiện.</li>
 <li><b>KHÓA</b> nguồn lỗi: thu hồi bản giấy cũ; khóa file program cũ; chặn xuất kho theo lot.</li>
 </ol>
 </div>
@@ -374,7 +374,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Khởi tạo CR/Thông báo, ghi rõ đối tượng (part/job/quy trình/NCC), lý do, phạm vi.</td><td>NNgười khởi tạo (mọi vai trò)</td><td>FRM-QMS-022 + mã CR</td><td>Ghi chung chung, thiếu part/job/lot.</td></tr>
+<tr><td>1</td><td>Khởi tạo CR/Thông báo, ghi rõ đối tượng (part/job/quy trình/NCC), lý do, phạm vi.</td><td>Người khởi tạo (mọi vai trò)</td><td>FRM-QMS-022 + mã CR</td><td>Ghi chung chung, thiếu part/job/lot.</td></tr>
 <tr><td>2</td><td>QA phân loại ưu tiên, phân loại C1/C2/C3/Khẩn cấp; chỉ định Responsible Person Tác động/Xác nhận.</td><td>QA</td><td>Log phân loại ưu tiên + mức</td><td>Đánh mức theo cảm tính, không nêu cơ sở lý luận.</td></tr>
 <tr><td>3</td><td>Hoàn thành Thay đổi Tác động Matrix đủ hạng mục: CTQ, program, fixture, gage, NCC, WIP.</td><td>Kỹ thuật + QC + Sản xuất + Mua hàng + Kho</td><td>FRM-QMS-006 ký đủ</td><td>Bỏ sót WIP/truy xuất nguồn gốc hoặc thiết bị đo.</td></tr>
 <tr><td>4</td><td>Chốt phê duyệt theo mức: C1/C2/C3/Khẩn cấp; khi cần có xác nhận khách.</td><td>QA + cấp phê duyệt</td><td>Chữ ký/biên bản CCB</td><td>Thiếu chữ ký bắt buộc.</td></tr>
@@ -386,7 +386,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>10</td><td>Lập xác nhận plan: Mẫu đầu/Chênh lệch FAI/Đầy đủ FAI; gage trạng thái hiệu chuẩn.</td><td>QC + QA</td><td>Plan ký + list gage</td><td>Đo CTQ bằng gage hết hạn.</td></tr>
 <tr><td>11</td><td>Thực thi thay đổi tại máy: setup/chạy thử; xác nhận program tổng kiểm tra (mã kiểm).</td><td>Setup + Lập trình viên (CNC)</td><td>Setup bảng kiểm; tổng kiểm tra (mã kiểm) log</td><td>Chạy nhầm file do tên giống.</td></tr>
 <tr><td>12</td><td>QC đo Mẫu đầu/FAI; ghi rõ ĐẠT/KHÔNG ĐẠT; QA quyết định PHÁT HÀNH/TẠM GIỮ.</td><td>QC + QA</td><td>IR/CMM/FAI + quyết định</td><td>Thiếu chữ ký QC/QA.</td></tr>
-<tr><td>13</td><td>Training bắt buộc trước cut-in cho nNgười chạm việc; ký xác nhận.</td><td>Supervisor + QA</td><td>Danh sách đào tạo + ký</td><td>Training xong nhưng không có ký.</td></tr>
+<tr><td>13</td><td>Training bắt buộc trước cut-in cho Người chạm việc; ký xác nhận.</td><td>Supervisor + QA</td><td>Danh sách đào tạo + ký</td><td>Training xong nhưng không có ký.</td></tr>
 <tr><td>14</td><td>Hiệu lực sau triển khai: theo dõi 1–2 job; kiểm tra khuyết tật/độ ổn định.</td><td>QA + Supervisor</td><td>Biên bản xác minh hiệu lực</td><td>Đóng CR khi chưa có job thực tế.</td></tr>
 <tr><td>15</td><td>Đóng CR: gom MRR, lưu đúng nơi; cập nhật DCR hồ sơ.</td><td>QA/QMS</td><td>Thư mục MRR hoàn chỉnh</td><td>MRR rải rác, thiếu đặt tên.</td></tr>
 </tbody>
@@ -481,34 +481,34 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <h2 class="h2">10) Đánh giá</h2>
 <div class="card">
-<h3 class="h3" style="margin-top:0">10.1 Bài kiểm tra nhanh (≥20 câu) — trắc nNhiệm + tình huống ngắn</h3>
+<h3 class="h3" style="margin-top:0">10.1 Bài kiểm tra nhanh (≥20 câu) — trắc Nhiệm + tình huống ngắn</h3>
 <ol>
-<li>[Trắc nNhiệm] Mục tiêu cốt lõi của quản lý thay đổi trong phân xưởng CNC là gì? A) Tăng tốc độ chạy máy B) Tạo bằng chứng và chặn sai Rev/lẫn lộn C) Giảm số biểu mẫu D) Tối đa hóa outsource</li>
-<li>[Trắc nNhiệm] Khi traveler tại máy ghi Rev B nhưng drawing phát hành ghi Rev C, hành động đúng là gì? A) Chạy theo traveler B) DỪNG và kích hoạt 60 giây C) Sửa tay traveler D) Bỏ qua vì chỉ khác chữ</li>
-<li>[Trắc nNhiệm] Thay đổi Tác động Matrix bắt buộc tối thiểu gồm hạng mục nào? A) CTQ B) Program C) WIP/truy xuất nguồn gốc D) Tất cả các đáp án</li>
-<li>[Trắc nNhiệm] Thay đổi đổi lớp phủ / mạ/công đoạn đặc biệt rơi vào mức nào theo logic nội bộ? A) C3 B) C2 C) C1 D) Không cần phân loại</li>
-<li>[Trắc nNhiệm] Evidence “Không có bằng chứng = không qua cổng” áp dụng mạnh nhất tại cổng kiểm soát nào? A) Ship cổng kiểm soát B) Cổng kiểm soát phát hành program/tài liệu C) Cổng kiểm soát Mẫu đầu/FAI D) Tất cả các cổng kiểm soát</li>
-<li>[Trắc nNhiệm] Cut-in đúng chuẩn phải gắn với gì? A) Cảm giác “từ giờ” B) Lot/số sê-ri/date C) Ca làm việc D) Operator</li>
-<li>[Trắc nNhiệm] Khi thay đổi dụng cụ đo cho CTQ, Requests tối thiểu là gì? A) Đo nhanh cho xong B) Xác nhận hiệu chuẩn hợp lệ + cập nhật hướng dẫn đo C) Không cần ghi D) Chỉ QC biết</li>
-<li>[Trắc nNhiệm] Khi đổi NCC outsource hoàn thiện bề mặt, hành động bắt buộc là gì? A) Chỉ đổi tên NCC B) Luồng-xuống / nTừng PO + Requests cert + tăng xác minh đầu vào C) Không cần vì NCC chịu D) Đợi lỗi rồi sửa</li>
-<li>[Trắc nNhiệm] Ai có quyền chốt TẠM GIỮ/PHÁT HÀNH cho thay đổi liên quan CTQ? A) Operator B) QA (và QC theo phần đo) C) Kho D) NNgười định giá (SAL-03)</li>
-<li>[Trắc nNhiệm] Thay đổi “áp dụng ngay tại hiện trường” phải hoàn tất hợp thức hóa hồ sơ trong bao lâu theo chuẩn nội bộ? A) 1 tuần B) 24h C) 1 tháng D) Không cần hợp thức hóa hồ sơ</li>
+<li>[Trắc Nhiệm] Mục tiêu cốt lõi của quản lý thay đổi trong phân xưởng CNC là gì? A) Tăng tốc độ chạy máy B) Tạo bằng chứng và chặn sai Rev/lẫn lộn C) Giảm số biểu mẫu D) Tối đa hóa outsource</li>
+<li>[Trắc Nhiệm] Khi traveler tại máy ghi Rev B nhưng drawing phát hành ghi Rev C, hành động đúng là gì? A) Chạy theo traveler B) DỪNG và kích hoạt 60 giây C) Sửa tay traveler D) Bỏ qua vì chỉ khác chữ</li>
+<li>[Trắc Nhiệm] Thay đổi Tác động Matrix bắt buộc tối thiểu gồm hạng mục nào? A) CTQ B) Program C) WIP/truy xuất nguồn gốc D) Tất cả các đáp án</li>
+<li>[Trắc Nhiệm] Thay đổi đổi lớp phủ / mạ/công đoạn đặc biệt rơi vào mức nào theo logic nội bộ? A) C3 B) C2 C) C1 D) Không cần phân loại</li>
+<li>[Trắc Nhiệm] Evidence “Không có bằng chứng = không qua cổng” áp dụng mạnh nhất tại cổng kiểm soát nào? A) Ship cổng kiểm soát B) Cổng kiểm soát phát hành program/tài liệu C) Cổng kiểm soát Mẫu đầu/FAI D) Tất cả các cổng kiểm soát</li>
+<li>[Trắc Nhiệm] Cut-in đúng chuẩn phải gắn với gì? A) Cảm giác “từ giờ” B) Lot/số sê-ri/date C) Ca làm việc D) Operator</li>
+<li>[Trắc Nhiệm] Khi thay đổi dụng cụ đo cho CTQ, Requests tối thiểu là gì? A) Đo nhanh cho xong B) Xác nhận hiệu chuẩn hợp lệ + cập nhật hướng dẫn đo C) Không cần ghi D) Chỉ QC biết</li>
+<li>[Trắc Nhiệm] Khi đổi NCC outsource hoàn thiện bề mặt, hành động bắt buộc là gì? A) Chỉ đổi tên NCC B) Luồng-xuống / nTừng PO + Requests cert + tăng xác minh đầu vào C) Không cần vì NCC chịu D) Đợi lỗi rồi sửa</li>
+<li>[Trắc Nhiệm] Ai có quyền chốt TẠM GIỮ/PHÁT HÀNH cho thay đổi liên quan CTQ? A) Operator B) QA (và QC theo phần đo) C) Kho D) Người định giá (SAL-03)</li>
+<li>[Trắc Nhiệm] Thay đổi “áp dụng ngay tại hiện trường” phải hoàn tất hợp thức hóa hồ sơ trong bao lâu theo chuẩn nội bộ? A) 1 tuần B) 24h C) 1 tháng D) Không cần hợp thức hóa hồ sơ</li>
 <li>[Tình huống ngắn] Khi phát hiện gage đo CTQ hết hạn hiệu chuẩn trong lúc đang đo Mẫu đầu, trạng thái cổng kiểm soát là gì và ai phải được gọi?</li>
 <li>[Tình huống ngắn] Khi program mới Released nhưng máy đang chạy file tên Cần giống, vận hành khóa nguồn lỗi là gì?</li>
 <li>[Tình huống ngắn] Khi kho phát hiện tồn cùng part nhưng khác Rev đặt chung kệ, hành động bắt buộc trong 60 giây là gì?</li>
-<li>[Trắc nNhiệm] Khi thay đổi lộ trình gia công/thứ tự nguyên công, bắt buộc cập nhật gì? A) Chỉ traveler B) Traveler + phiếu cài đặt + kế hoạch kiểm tra (plan) C) Chỉ program D) Chỉ PO</li>
-<li>[Trắc nNhiệm] Khi thay đổi phát sinh từ NCR/MRB, tài liệu điều phối bắt buộc là gì? A) MRB quyết định + CR/Thông báo B) Chỉ email C) Chỉ họp miệng D) Không cần vì đã NCR</li>
-<li>[Trắc nNhiệm] “Mẫu đầu” trong bối cảnh thay đổi quản lý dùng để làm gì? A) Trang trí hồ sơ B) Chứng minh sản phẩm phù hợp sau thay đổi C) Tăng số lượng mẫu D) Thay thế FAI luôn</li>
-<li>[Trắc nNhiệm] Khi thiếu chữ ký phê duyệt bắt buộc trên CR, trạng thái đúng là gì? A) GO B) TẠM GIỮ/CHẶN C) Ship trước D) Đợi cuối tuần ký</li>
-<li>[Trắc nNhiệm] Vai trò nào bắt buộc quản trị version program và tổng kiểm tra (mã kiểm)? A) Lập trình viên (CNC) B) Operator C) EHS D) NNgười định giá (SAL-03)</li>
-<li>[Trắc nNhiệm] Vai trò nào bắt buộc luồng-xuống / nTừng thay đổi vào PO? A) Mua hàng B) QC C) Setup D) Bảo trì</li>
+<li>[Trắc Nhiệm] Khi thay đổi lộ trình gia công/thứ tự nguyên công, bắt buộc cập nhật gì? A) Chỉ traveler B) Traveler + phiếu cài đặt + kế hoạch kiểm tra (plan) C) Chỉ program D) Chỉ PO</li>
+<li>[Trắc Nhiệm] Khi thay đổi phát sinh từ NCR/MRB, tài liệu điều phối bắt buộc là gì? A) MRB quyết định + CR/Thông báo B) Chỉ email C) Chỉ họp miệng D) Không cần vì đã NCR</li>
+<li>[Trắc Nhiệm] “Mẫu đầu” trong bối cảnh thay đổi quản lý dùng để làm gì? A) Trang trí hồ sơ B) Chứng minh sản phẩm phù hợp sau thay đổi C) Tăng số lượng mẫu D) Thay thế FAI luôn</li>
+<li>[Trắc Nhiệm] Khi thiếu chữ ký phê duyệt bắt buộc trên CR, trạng thái đúng là gì? A) GO B) TẠM GIỮ/CHẶN C) Ship trước D) Đợi cuối tuần ký</li>
+<li>[Trắc Nhiệm] Vai trò nào bắt buộc quản trị version program và tổng kiểm tra (mã kiểm)? A) Lập trình viên (CNC) B) Operator C) EHS D) Người định giá (SAL-03)</li>
+<li>[Trắc Nhiệm] Vai trò nào bắt buộc luồng-xuống / nTừng thay đổi vào PO? A) Mua hàng B) QC C) Setup D) Bảo trì</li>
 <li>[Tình huống ngắn] Khi khách Requests đổi Rev Cấp để kịp ship, điều kiện tối thiểu để ship hợp lệ là gì?</li>
 </ol>
 <h3 class="h3">10.2 Tình huống (≥3) — dữ kiện thật, quyết định TẠM GIỮ/GO và ghi MRR</h3>
 <div class="grid-3">
 <div class="card">
 <h4 class="h4" style="margin-top:0">Tình huống 1 — Đổi Rev bản vẽ giữa chừng</h4>
-<p><b>Dữ kiện:</b> NNgười định giá (SAL-03) nhận bản vẽ Rev D thay Rev C, có 30 pcs WIP đang chạy, 20 pcs tồn kho raw nguyên vật liệu đã cắt theo Rev C.</p>
+<p><b>Dữ kiện:</b> Người định giá (SAL-03) nhận bản vẽ Rev D thay Rev C, có 30 pcs WIP đang chạy, 20 pcs tồn kho raw nguyên vật liệu đã cắt theo Rev C.</p>
 <p><b>Yêu cầu:</b> Chọn TẠM GIỮ/GO cho từng nhóm (WIP, tồn raw, ship) và ghi danh sách MRR tối thiểu phải tạo.</p>
 </div>
 <div class="card">
@@ -555,7 +555,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Giao tiếp &amp; bàn giao</td>
-<td>Thông báo đúng đối tượng: Planner, Kho, QC/QA, NNgười định giá (SAL-03) theo tình huống.</td>
+<td>Thông báo đúng đối tượng: Planner, Kho, QC/QA, Người định giá (SAL-03) theo tình huống.</td>
 <td>Không thông báo khiến kho/phân xưởng chạy bản cũ.</td>
 </tr>
 </tbody>
@@ -577,7 +577,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Planner</td><td>≥85%</td><td>Đúng Tình huống 1</td><td>Cut-in theo lot/số sê-ri/date; tách job theo Rev; thông báo triển khai.</td></tr>
 <tr><td>Bảo trì</td><td>≥80%</td><td>Đúng Tình huống 2</td><td>Bảng kiểm an toàn máy; hồ sơ chạy thử; bàn giao máy đủ điều kiện.</td></tr>
 <tr><td>EHS</td><td>≥80%</td><td>Đúng Tình huống 2 (phần rủi ro an toàn)</td><td>Rủi ro log; điều kiện an toàn trước triển khai.</td></tr>
-<tr><td>NNgười định giá (SAL-03)</td><td>≥85%</td><td>Đúng Tình huống 1 &amp; 3</td><td>FRM-SAL-003 hoàn chỉnh; xác nhận khách; lưu MRR nội bộ.</td></tr>
+<tr><td>Người định giá (SAL-03)</td><td>≥85%</td><td>Đúng Tình huống 1 &amp; 3</td><td>FRM-SAL-003 hoàn chỉnh; xác nhận khách; lưu MRR nội bộ.</td></tr>
 <tr><td>Supervisor</td><td>≥90%</td><td>Đúng cả 3 tình huống</td><td>Thực thi cổng kiểm soát tại dòng / chuyền; kiểm tra đào tạo; ký thu hồi bản cũ; phối hợp đóng CR.</td></tr>
 </tbody>
 </table>
@@ -595,7 +595,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Evidence xác nhận: Mẫu đầu/IR/CMM/FAI (theo mức) + kết luận ĐẠT/KHÔNG ĐẠT.</li>
 <li>Evidence WIP cách ly: ảnh nhãn TẠM GIỮ/SỬA HÀNG + list lot/số sê-ri + quyết định xử lý.</li>
 <li>Evidence nhà cung cấp: PO phiên bản + cert vật liệu/công đoạn đặc biệt + xác minh đầu vào hồ sơ.</li>
-<li>Evidence đào tạo: danh sách nNgười chạm việc + nNgày + chữ ký.</li>
+<li>Evidence đào tạo: danh sách Người chạm việc + Ngày + chữ ký.</li>
 <li>Biên bản xác minh hiệu lực sau triển khai + quyết định đóng CR.</li>
 </ul>
 <h3 class="h3">12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>

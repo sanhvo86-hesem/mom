@@ -39,7 +39,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>Mục tiêu đào tạo &amp; phạm vi Level 3</h2>
 <div class="small-note"><span class="badge">ISO 8.2.2</span> <span class="badge">ISO 8.1</span> <span class="badge">ISO 7.1.2</span> <span class="badge">ISO 7.1.3</span> <span class="badge">ISO 9.1</span> <span class="badge">ISO 6.1</span> <span class="badge">ISO 7.5</span></div>
 <div class="meta">
-<div><strong>Đối tượng áp dụng:</strong><br/>NNgười định giá/Tính giá thành + Finance + OPS/Kỹ thuật (chủ trì: Tính giá thành Lead) (và các vị trí liên quan theo phân công).</div>
+<div><strong>Đối tượng áp dụng:</strong><br/>Người định giá/Tính giá thành + Finance + OPS/Kỹ thuật (chủ trì: Tính giá thành Lead) (và các vị trí liên quan theo phân công).</div>
 <div><strong>Đầu ra bắt buộc:</strong><br/>Evidence + chỉ số theo K–S–E–M; đạt Cơ chế chặn theo KPI (kiểm soát cổng) để được công nhận Level.</div>
 <div><strong>Nguyên tắc ISO tích hợp:</strong><br/>Mọi bước quan trọng <em>PHẢI</em> có hồ sơ; thay đổi <em>PHẢI</em> được kiểm soát; dữ liệu tuân ALCOA+.</div>
 <div><strong>Thời lượng chuẩn:</strong><br/>L1: 4–6h • L2: 8–12h • L3: 12–20h • L4: 20–40h (theo Projects/OJT).</div>
@@ -128,14 +128,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div><ul>
 <li><strong>tỷ lệ sử dụng</strong> là tỷ lệ giờ máy thực sự chạy có thu tiền. Khi ước tỷ lệ sử dụng quá cao, tỷ lệ sẽ thấp giả tạo → dưới-báo giá.</li>
 <li><strong>Hiệu suất</strong> phản ánh thực tế: đổi job nhiều, setup dài, tool thay đổi, chờ QC…</li>
-<li><strong>Quy tắc HESEM:</strong> MHR do Finance/OPS ban hành; NNgười định giá không tự đổi MHR.</li>
+<li><strong>Quy tắc HESEM:</strong> MHR do Finance/OPS ban hành; Người định giá không tự đổi MHR.</li>
 </ul><h3>3.4. Ước tính thời gian gia công: 3 lớp phương pháp</h3><ol>
-<li><strong>Rule-of-ngón cái / quy tắc nhanh (L1):</strong> dựa trên lộ trình gia công chuẩn và kinh nNhiệm (vd: khoan/tarô (taro ren) ren) theo số lỗ, phay mặt theo diện tích).</li>
+<li><strong>Rule-of-ngón cái / quy tắc nhanh (L1):</strong> dựa trên lộ trình gia công chuẩn và kinh Nhiệm (vd: khoan/tarô (taro ren) ren) theo số lỗ, phay mặt theo diện tích).</li>
 <li><strong>CAM Mô phỏng (L2):</strong> dùng thời gian mô phỏng đường chạy dao; hiệu chỉnh bởi hệ số thực tế (bước tiến (feed) ghi đè / bỏ qua, tool thay đổi, đo bằng đầu dò).</li>
 <li><strong>lịch sử/tham số (L3):</strong> dùng dữ liệu job tương tự (nhóm sản phẩm) + mô hình tham số (diện tích cắt, khối lượng loại bỏ, số lần setup) để dự báo.</li>
-</ol><p>NNgười định giá giỏi không chọn 1 phương pháp duy nhất. Họ dùng <strong>tam giác kiểm chứng</strong>: rule-of-ngón cái / quy tắc nhanh ↔ mô phỏng ↔ lịch sử. Khi 3 cái lệch nhau quá lớn, đó là tín hiệu rủi ro.</p><h3>3.5. Tính vật liệu theo tỷ lệ đạt: đừng quên “phần bị mất”</h3><p>Trong CNC, vật liệu không chỉ là “khối phôi”. tỷ lệ đạt bị ảnh hưởng bởi: dung sai cho phép cắt phôi, kẹp giữ, phay mặt, phế phẩm đầu, và lỗi do vật liệu. Công thức Áp dụng: </p><div class="codeblock">Nguyên vật liệu Chi phí = (Giá/kg x Khối lượng phôi) x (1 + Phế phẩm dung sai cho phép)</div><ul>
+</ol><p>Người định giá giỏi không chọn 1 phương pháp duy nhất. Họ dùng <strong>tam giác kiểm chứng</strong>: rule-of-ngón cái / quy tắc nhanh ↔ mô phỏng ↔ lịch sử. Khi 3 cái lệch nhau quá lớn, đó là tín hiệu rủi ro.</p><h3>3.5. Tính vật liệu theo tỷ lệ đạt: đừng quên “phần bị mất”</h3><p>Trong CNC, vật liệu không chỉ là “khối phôi”. tỷ lệ đạt bị ảnh hưởng bởi: dung sai cho phép cắt phôi, kẹp giữ, phay mặt, phế phẩm đầu, và lỗi do vật liệu. Công thức Áp dụng: </p><div class="codeblock">Nguyên vật liệu Chi phí = (Giá/kg x Khối lượng phôi) x (1 + Phế phẩm dung sai cho phép)</div><ul>
 <li><strong>Phế phẩm dung sai cho phép</strong> không được dùng theo tiện. Phải dựa trên dữ liệu phế phẩm theo vật liệu/khách/công nghệ.</li>
-<li>Khi khách cung cấp vật liệu, nNgười định giá vẫn phải tính <em>rủi ro xử lý vật liệu khách</em> (truy xuất nguồn gốc, kích thước phôi, chứng từ).</li>
+<li>Khi khách cung cấp vật liệu, Người định giá vẫn phải tính <em>rủi ro xử lý vật liệu khách</em> (truy xuất nguồn gốc, kích thước phôi, chứng từ).</li>
 </ul><h3>3.6. Dự phòng rủi ro (dự phòng) – dùng có kỷ luật</h3><p>Dự phòng là cần thiết cho job mới, nhưng phải có kỷ luật để chống “độn giá”. HESEM Dùng 3 mức:</p><ul>
 <li><strong>0–3%:</strong> job lặp/đã có dữ liệu.</li>
 <li><strong>3–8%:</strong> job mới nhưng công nghệ quen.</li>
@@ -291,7 +291,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><strong>Chênh lệch Kết thúc Thời gian dẫn</strong></td>
-<td class="mono">NNgày đóng chênh lệch / phương sai báo cáo − nNgày ship</td>
+<td class="mono">Ngày đóng chênh lệch / phương sai báo cáo − Ngày ship</td>
 <td>Chênh lệch bảng theo dõi</td>
 <td>Tháng</td>
 <td>&lt;=14d</td>
@@ -408,7 +408,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Kiểm tra tính đầy đủ; xin phê duyệt; lưu version và bằng chứng.</td>
 <td>Đáp ứng ISO và chống tranh chấp nội bộ.</td>
 </tr>
-</tbody></table><h3>7.2. OJT Bảng kiểm (Level 3)</h3><p class="small">Dấu tích ✓ khi hoàn thành; lưu bảng kiểm như được lập thành tài liệu thông tin. NNgười hướng dẫn ký xác nhận.</p><table class="table">
+</tbody></table><h3>7.2. OJT Bảng kiểm (Level 3)</h3><p class="small">Dấu tích ✓ khi hoàn thành; lưu bảng kiểm như được lập thành tài liệu thông tin. Người hướng dẫn ký xác nhận.</p><table class="table">
 <thead><tr><th>#</th><th>Hạng mục</th><th>Tiêu chí đạt</th><th>Kết quả</th><th>Ghi chú</th></tr></thead>
 <tbody>
 <tr>
@@ -428,7 +428,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>3</td>
 <td>Xây chi phí mô hình ABC mức áp dụng</td>
-<td>nguyên nhân / động lực rõ; dữ liệu nguồn rõ; thử nNhiệm 3 job</td>
+<td>nguyên nhân / động lực rõ; dữ liệu nguồn rõ; thử Nhiệm 3 job</td>
 <td>□ Đạt □ Chưa</td>
 <td>…</td>
 </tr>
@@ -486,11 +486,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiết kế chênh lệch / phương sai báo cáo: những cột nào bắt buộc, ai chịu trách nhiệm hành động?</li>
 <li>Nêu 5 nguyên nhân hệ thống làm cycle time thực tế cao hơn ước tính và cách xác minh.</li>
 <li>Project Kaizen giảm tool chi phí: làm sao xác nhận tiết kiệm để Finance công nhận?</li>
-<li>Khi thấy nNgười định giá định kỳ bỏ sót chi phí QC/FAI, bạn sẽ sửa hệ thống thế nào (bảng kiểm/poka (chống sai) (chống sai)-giá đỡ (yoke)?</li>
+<li>Khi thấy Người định giá định kỳ bỏ sót chi phí QC/FAI, bạn sẽ sửa hệ thống thế nào (bảng kiểm/poka (chống sai) (chống sai)-giá đỡ (yoke)?</li>
 <li>Giải thích sự khác nhau giữa chi phí-cộng thêm và value-dựa trên trong CNC phân xưởng gia công theo đơn.</li>
 <li>Đưa ra 3 KPI để phát hiện sớm biên lợi nhuận rò rỉ trước khi kết thúc tháng.</li>
 </ol>
-</div><h2>9. Tiêu chí đánh giá chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Tiêu chí đánh giá giúp chấm công bằng và chống “cảm tính”. chuẩn chấm bởi 2 nNgười (Dòng / Chuyền Manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
+</div><h2>9. Tiêu chí đánh giá chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Tiêu chí đánh giá giúp chấm công bằng và chống “cảm tính”. chuẩn chấm bởi 2 Người (Dòng / Chuyền Manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
 <thead><tr><th>Tiêu chí</th><th>0 – Không đạt</th><th>1 – Đạt tối thiểu</th><th>2 – Tốt</th><th>3 – Xuất sắc</th></tr></thead>
 <tbody>
 <tr>

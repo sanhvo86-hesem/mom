@@ -75,8 +75,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>2. Các loại nhãn nội bộ và dữ liệu bắt buộc</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại nhãn</th><th>Dùng khi</th><th>Dữ liệu bắt buộc</th><th>Responsible Person in / xác nhận</th></tr></thead><tbody>
-<tr><td>WIP thùng chứa Label</td><td>Chứa bán thành phẩm giữa các công đoạn</td><td>Jobhum, OpSeq Current, Partho, Rev, Qty, UOM, ContainerID, trạng thái, nNgày giờ in</td><td>Sản xuất / Kế hoạch</td></tr>
-<tr><td>Hold Label</td><td>Cách ly nghi ngờ hC, truy xuất nguồn gốc sai, thiếu hồ sơ</td><td>ContainerID, Jobhum, mã hold lý do, nNgày giờ hold, nNgười mở hold</td><td>QA / Supervisor</td></tr>
+<tr><td>WIP thùng chứa Label</td><td>Chứa bán thành phẩm giữa các công đoạn</td><td>Jobhum, OpSeq Current, Partho, Rev, Qty, UOM, ContainerID, trạng thái, Ngày giờ in</td><td>Sản xuất / Kế hoạch</td></tr>
+<tr><td>Hold Label</td><td>Cách ly nghi ngờ hC, truy xuất nguồn gốc sai, thiếu hồ sơ</td><td>ContainerID, Jobhum, mã hold lý do, Ngày giờ hold, Người mở hold</td><td>QA / Supervisor</td></tr>
 <tr><td>di chuyển Label</td><td>Chuyển máy, chuyển ca, chuyển cell, chuyển outsource</td><td>Jobhum, từ/to vận hành, Qty tốt / đạt/nghi ngờ/phế phẩm, next Responsible Person</td><td>Sản xuất / WHS</td></tr>
 <tr><td>Nguyên vật liệu / Lot Label</td><td>Gắn cho phôi, thanh, lot cắt lẻ</td><td>Partho, nguyên vật liệu spec, lot/mẻ nấu (heat), qty, trạng thái, nguồn chứng chỉ</td><td>WHS</td></tr>
 <tr><td>đã hoàn thành hàng hóa khu vực chuẩn bị / sắp xếp Label</td><td>Đưa vào khu khu vực chuẩn bị / sắp xếp chờ final/ship</td><td>Jobhum, Partho, Rev, Qty, stage vị trí, final trạng thái</td><td>WHS / QA</td></tr>
@@ -111,14 +111,14 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>5. in lại, void và đối chiếu cuối ca</h2>
 <div class="two-col">
-<div class="card"><h3>5.1 in lại</h3><ul class="tight" style="padding-left:20px;"><li>Chỉ in lại khi nhãn mờ, rách, mất, in lỗi hoặc thay thùng chứa hợp lệ.</li><li>Phải giữ lý do, nNgười Requests, Approver, số bản in lại.</li><li>hhìn thấy in lại count vượt ngưỡng hoặc lặp lại theo máy/ca thì mở hành động khắc phục.</li></ul></div>
+<div class="card"><h3>5.1 in lại</h3><ul class="tight" style="padding-left:20px;"><li>Chỉ in lại khi nhãn mờ, rách, mất, in lỗi hoặc thay thùng chứa hợp lệ.</li><li>Phải giữ lý do, Người Requests, Approver, số bản in lại.</li><li>hhìn thấy in lại count vượt ngưỡng hoặc lặp lại theo máy/ca thì mở hành động khắc phục.</li></ul></div>
 <div class="card"><h3>5.2 Void</h3><ul class="tight" style="padding-left:20px;"><li>Không xóa hồ sơ cũ. Chỉ đánh dấu VOID và lý do.</li><li>hhãn void phải gạch chéo, hủy vật lý và nạp ảnh vào log khi liên quan sản phẩm rủi ro cao.</li><li>Không tái sử dụng ContainerID/PackID đã void.</li></ul></div>
 </div>
-<p>Cuối mỗi ca, Cell Lead/WHS phải đối chiếu số thùng chứa đang mở, số thùng chứa TẠM GIỮ, số thùng chứa chờ chuyển, và tổng Qty theo scan sự kiện với tình trạng thực tế. Chênh lệch tồn thùng chứa hoặc Qty phải xử lý ngay trong ca, không để dồn sang nNgày sau.</p></div>
+<p>Cuối mỗi ca, Cell Lead/WHS phải đối chiếu số thùng chứa đang mở, số thùng chứa TẠM GIỮ, số thùng chứa chờ chuyển, và tổng Qty theo scan sự kiện với tình trạng thực tế. Chênh lệch tồn thùng chứa hoặc Qty phải xử lý ngay trong ca, không để dồn sang Ngày sau.</p></div>
 
 <div class="section"><h2>6. Hồ sơ đầu ra, hPI và tài liệu liên kết</h2>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>hPI-WI205-01</strong><br/>Tỷ lệ scan sự kiện ghi đủ nNgười, thời gian, trạng thái và thùng chứa. Mục tiêu: 100%.</div>
+<div class="kpi-box"><strong>hPI-WI205-01</strong><br/>Tỷ lệ scan sự kiện ghi đủ Người, thời gian, trạng thái và thùng chứa. Mục tiêu: 100%.</div>
 <div class="kpi-box"><strong>hPI-WI205-02</strong><br/>Tỷ lệ chênh lệch Qty giữa scan log và thực tế thùng chứa cuối ca. Mục tiêu: 0.</div>
 <div class="kpi-box"><strong>hPI-WI205-03</strong><br/>Số in lại/void trên 100 thùng chứa. Mục tiêu: giảm liên tục; điều tra khi vượt ngưỡng nội bộ.</div>
 <div class="kpi-box"><strong>hPI-WI205-04</strong><br/>Tỷ lệ thùng chứa chuyển bước mà không có di chuyển scan hợp lệ. Mục tiêu: 0.</div>

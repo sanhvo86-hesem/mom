@@ -68,7 +68,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Thông tin triển khai (khóa này KHÔNG học kiểu lý thuyết)</strong>
 <ul>
 <li><strong>Đối tượng (BẮT BUỘC):</strong>
-<span class="pill">Operator</span><span class="pill">Setup</span><span class="pill">Lập trình viên (CNC)</span><span class="pill">QC</span><span class="pill">QA</span><span class="pill">Kho</span><span class="pill">Mua hàng</span><span class="pill">Planner</span><span class="pill">Bảo trì</span><span class="pill">EHS</span><span class="pill">NNgười định giá (SAL-03)</span><span class="pill">Supervisor</span>
+<span class="pill">Operator</span><span class="pill">Setup</span><span class="pill">Lập trình viên (CNC)</span><span class="pill">QC</span><span class="pill">QA</span><span class="pill">Kho</span><span class="pill">Mua hàng</span><span class="pill">Planner</span><span class="pill">Bảo trì</span><span class="pill">EHS</span><span class="pill">Người định giá (SAL-03)</span><span class="pill">Supervisor</span>
 </li>
 <li><strong>Thời lượng chuẩn:</strong> 2.5 giờ lớp chung (mục 2–7) • 1.5 giờ thực hành theo vai trò (mục 8–10) • OJT 1 ca làm việc (mục 9).</li>
 <li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền truy cập danh sách vận hành; đã hoàn tất định hướng / đào tạo hội nhập về “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”.</li>
@@ -183,7 +183,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Không đưa KPI EHS vào thẻ điểm (bảng điểm) khi chưa có SSOT và đặt tên rule; mục thiếu phải gắn M365/SharePoint → HESEM-QMS-SSOT.</td>
 </tr>
 <tr>
-<td><strong>NNgười định giá (SAL-03)</strong></td>
+<td><strong>Người định giá (SAL-03)</strong></td>
 <td>Chỉ sử dụng KPI khi có dữ liệu khiếu nại/phản hồi có hồ sơ và bằng chứng. Khi khách hỏi KPI phải trả bằng định nghĩa chuẩn.</td>
 <td>Không báo KPI CS khi thiếu hồ sơ; mọi khiếu nại có ID + bằng chứng link theo MRR.</td>
 </tr>
@@ -296,7 +296,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><strong>7) Làm mới lỗi/độ trễ</strong></td><td>Bảng điều khiển đứng số; cuối cùng làm mới vượt SLA</td><td>Họp dựa trên dữ liệu cũ; quyết định sai</td></tr>
 <tr><td><strong>8) Sai hạt / thớ mô hình</strong></td><td>đo lường tham gia / nối thực tế‑to‑thực tế tạo số phình bất ổn</td><td>KPI sai hệ thống; đánh giá bác bỏ</td></tr>
 <tr><td><strong>9) Không có DimDate chuẩn</strong></td><td>Time trí tuệ lệch; tuần/tháng sai</td><td>Xu hướng sai; KPI mục tiêu sai</td></tr>
-<tr><td><strong>10) Quyền truy cập sai (RLS)</strong></td><td>NNgười dùng thấy dữ liệu không thuộc phạm vi</td><td>Rủi ro bảo mật; mất kiểm soát khách hàng</td></tr>
+<tr><td><strong>10) Quyền truy cập sai (RLS)</strong></td><td>Người dùng thấy dữ liệu không thuộc phạm vi</td><td>Rủi ro bảo mật; mất kiểm soát khách hàng</td></tr>
 <tr><td><strong>11) KPI không có “phạm vi bao phủ/sức khỏe”</strong></td><td>KPI xanh nhưng nhiều hồ sơ thiếu khóa</td><td>Ảo giác số liệu; đánh giá đánh FAIL</td></tr>
 <tr><td><strong>12) Dữ liệu ngoài hệ thống</strong></td><td>Department dùng Excel riêng, không đẩy vào SSOT</td><td>Không đồng nhất; không truy vết; quyết định sai</td></tr>
 </tbody>
@@ -337,7 +337,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Ảnh chụp Data Sức khỏe + log kiểm tra ngày/ca.</td>
 </tr>
 <tr>
-<td><strong>CP4 — Evidence Tính đầy đủ nNgười xác nhận</strong></td>
+<td><strong>CP4 — Evidence Tính đầy đủ Người xác nhận</strong></td>
 <td>QA + Kho</td>
 <td>ShipRelease chỉ “Đã phê duyệt” khi PacketComplete + PackagingPass + FinalIRPass + ReconciliationStatus đều PASS.</td>
 <td>ShipRelease hồ sơ + link PacketFolderUrl + PackagingChecks + IR/FAI link.</td>
@@ -351,8 +351,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><strong>CP6 — RLS &amp; Kiểm soát truy cập</strong></td>
 <td>IT + QA/QMS</td>
-<td>Quyền xem theo vai trò; không gian làm việc vai trò “trình xem” áp dụng RLS; Admin/thành viên không được dùng cho nNgười xem dữ liệu giới hạn.</td>
-<td>Danh sách phân quyền + ảnh cấu hình vai trò + kiểm thử 2 nNgười dùng.</td>
+<td>Quyền xem theo vai trò; không gian làm việc vai trò “trình xem” áp dụng RLS; Admin/thành viên không được dùng cho Người xem dữ liệu giới hạn.</td>
+<td>Danh sách phân quyền + ảnh cấu hình vai trò + kiểm thử 2 Người dùng.</td>
 </tr>
 <tr>
 <td><strong>CP7 — Key Governance</strong></td>
@@ -501,7 +501,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Chọn KPI gắn quyết định cổng kiểm soát</td><td>Gắn KPI vào bước E2E và quyết định GO/TẠM GIỮ/CHẶN</td><td>Tránh KPI “đo cho đẹp” và bỏ rủi ro chết nNgười</td></tr>
+<tr><td>1</td><td>Chọn KPI gắn quyết định cổng kiểm soát</td><td>Gắn KPI vào bước E2E và quyết định GO/TẠM GIỮ/CHẶN</td><td>Tránh KPI “đo cho đẹp” và bỏ rủi ro chết Người</td></tr>
 <tr><td>2</td><td>Điền KPI từ điển</td><td>Name duy nhất • Responsible Person • Nhịp độ • Source bảng • Diễn tập‑xuyên suốt</td><td>Tránh đa định nghĩa, tranh cãi số liệu</td></tr>
 <tr><td>3</td><td>Xác định hạt / thớ &amp; tham gia / nối key</td><td>thực tế đúng • Dim đúng • JobNum là khóa tối thiểu</td><td>Tránh tham gia / nối sai gây phình số</td></tr>
 <tr><td>4</td><td>Thiết lập bằng chứng</td><td>Hồ sơ link + EvidenceFolderUrl/PacketFolderUrl phải tồn tại</td><td>Tránh đánh giá không đạt và vượt qua cổng kiểm soát</td></tr>
@@ -543,11 +543,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>L2</strong><div class="muted">Thực hiện độc lập (ổn định)</div></td>
 <td>Tạo/sửa KPI từ điển đúng trường; kiểm tra Data Sức khỏe; tạo hành động hồ sơ khi thấy bất ổn.</td>
 <td>Hoàn tất OJT đầu ra đầy đủ; không có lỗi thiếu bằng chứng link.</td>
-<td>Được làm “data nNgười quản lý” cho bảng dữ liệu của vai trò và chịu đánh giá mẫu.</td>
+<td>Được làm “data Người quản lý” cho bảng dữ liệu của vai trò và chịu đánh giá mẫu.</td>
 </tr>
 <tr>
 <td><strong>L3</strong><div class="muted">Dẫn dắt và chặn rủi ro</div></td>
-<td>Chỉ ra không khớp rev, trùng lặp, độ trễ; kích hoạt STOP/TẠM GIỮ/CHẶN đúng; hướng dẫn nNgười khác sửa hồ sơ.</td>
+<td>Chỉ ra không khớp rev, trùng lặp, độ trễ; kích hoạt STOP/TẠM GIỮ/CHẶN đúng; hướng dẫn Người khác sửa hồ sơ.</td>
 <td>Ít nhất 2 ca vận hành không lỗi; đóng 1 vòng CAPA hoặc fix data chất lượng có log.</td>
 <td>Được tham gia phê duyệt thay đổi KPI/mô hình với QA/QMS.</td>
 </tr>
@@ -555,7 +555,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><strong>L4</strong><div class="muted">Chuẩn hoá hệ thống</div></td>
 <td>Chuẩn hoá đặt tên, quy tắc bằng chứng, và data sức khỏe; giảm lỗi tái diễn bằng điểm kiểm soát.</td>
 <td>Chứng minh giảm lỗi dữ liệu trong 4 tuần 4 tuần liên tục và cập nhật mô-đun đào tạo.</td>
-<td>Được ủy quyền làm nNgười đào tạo nội bộ cho SYS-OPS-06.</td>
+<td>Được ủy quyền làm Người đào tạo nội bộ cho SYS-OPS-06.</td>
 </tr>
 </tbody>
 </table>
@@ -564,7 +564,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 10) Đánh giá -->
 <div class="card" id="sec10">
 <h2>10) Đánh giá</h2>
-<h3>10.1 Bài kiểm tra nhanh (≥20 câu — trắc nNhiệm + tình huống ngắn)</h3>
+<h3>10.1 Bài kiểm tra nhanh (≥20 câu — trắc Nhiệm + tình huống ngắn)</h3>
 <p class="muted">Câu trả lời phải dựa trên “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” và cấu trúc KPI từ điển/data mô hình. Câu trả lời phải bám bằng chứng và cấu trúc dữ liệu, không suy diễn cảm tính.</p>
 <ol>
 <li>KPI được phép xuất hiện trên bảng điều khiển khi nào?</li>
@@ -641,14 +641,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 12) MRR tối thiểu -->
 <div class="card" id="sec12">
 <h2>12) MRR tối thiểu</h2>
-<p class="muted">MRR là “bằng chứng vận hành” để sẵn sàng đánh giá. MRR phải có ID, có nNgười chịu trách nhiệm, có đường dẫn lưu, và truy vết được theo JobNum/PackID/NCRID.</p>
+<p class="muted">MRR là “bằng chứng vận hành” để sẵn sàng đánh giá. MRR phải có ID, có Người chịu trách nhiệm, có đường dẫn lưu, và truy vết được theo JobNum/PackID/NCRID.</p>
 <h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
 <ul>
 <li><strong>KPI từ điển</strong> (CSV/List): tên KPI, định nghĩa, công thức, Responsible Person, nhịp độ / chu kỳ họp, source, diễn tập‑xuyên suốt.</li>
 <li><strong>BI_ReleaseNotes</strong> (List) SSOT/BI-ReleaseNotes (SharePoint List): version, thay đổi, rủi ro, hoàn tác / quay lại, Performer, ngày.</li>
 <li><strong>ApprovalHistory</strong>: phê duyệt KPI/cổng kiểm soát, phê duyệt đổi mô hình, quyết định TẠM GIỮ/GO.</li>
 <li><strong>Data Sức khỏe log</strong> SSOT/Data-Sức khỏe-Log (SharePoint List + ảnh kiểm tra): ảnh/đầu ra kiểm tra null key/trùng lặp/độ trễ/không khớp Rev.</li>
-<li><strong>StandupActions</strong>: hành động xử lý bất ổn KPI (Responsible Person, nNgày đến hạn, trạng thái).</li>
+<li><strong>StandupActions</strong>: hành động xử lý bất ổn KPI (Responsible Person, Ngày đến hạn, trạng thái).</li>
 </ul>
 <h3>12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
 <div class="table-card">
@@ -692,12 +692,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td><strong>1) KPI không có định nghĩa kiểm soát</strong></td><td>Mỗi phòng nói 1 kiểu</td><td>KPI từ điển khóa + ApprovalHistory (CP1)</td></tr>
 <tr><td><strong>2) KPI không truy vết hồ sơ</strong></td><td>Không diễn tập‑xuống / nTừng</td><td>Fail‑nhanh FF2 + diễn tập thử‑xuyên suốt bắt buộc</td></tr>
-<tr><td><strong>3) Thiếu minh chứng</strong></td><td>Link bằng chứng trống/hỏng</td><td>nNgười xác nhận bằng chứng + đánh giá mẫu (CP4, CP7)</td></tr>
+<tr><td><strong>3) Thiếu minh chứng</strong></td><td>Link bằng chứng trống/hỏng</td><td>Người xác nhận bằng chứng + đánh giá mẫu (CP4, CP7)</td></tr>
 <tr><td><strong>4) Thay đổi không kiểm soát</strong></td><td>đo lường đổi, không phát hành note</td><td>BI_ReleaseNotes + hoàn tác / quay lại plan (CP2)</td></tr>
 <tr><td><strong>5) Dữ liệu bẩn</strong></td><td>Null key/trùng lặp cao</td><td>Data Sức khỏe page + log ca (CP3)</td></tr>
 <tr><td><strong>6) Vượt qua cổng kiểm soát chất lượng</strong></td><td>giao hàng khi hold mở</td><td>Fail‑nhanh FF3 + CP4 cổng kiểm soát đánh dấu</td></tr>
 <tr><td><strong>7) Làm mới/độ trễ không kiểm soát</strong></td><td>Bảng điều khiển số cũ</td><td>Làm mới SLA + cảnh báo + sổ tay / thủ công chế độ (CP5)</td></tr>
-<tr><td><strong>8) Quyền truy cập sai</strong></td><td>Xem dữ liệu vượt phạm vi</td><td>RLS + vai trò trình xem + kiểm thử nNgười dùng (CP6)</td></tr>
+<tr><td><strong>8) Quyền truy cập sai</strong></td><td>Xem dữ liệu vượt phạm vi</td><td>RLS + vai trò trình xem + kiểm thử Người dùng (CP6)</td></tr>
 </tbody>
 </table>
 </div>

@@ -83,7 +83,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </p>
 <div class="kpi">
 <div class="box"><b>Mục tiêu lỗi</b><span>0 lô giao hàng sai</span><div class="mini">Sai part / sai rev / sai qty / sai job</div></div>
-<div class="box"><b>Điểm khoá</b><span>Cổng kiểm soát G6</span><div class="mini">Phê duyệt giao hàng (ship phát hành) nNgười xác nhận</div></div>
+<div class="box"><b>Điểm khoá</b><span>Cổng kiểm soát G6</span><div class="mini">Phê duyệt giao hàng (ship phát hành) Người xác nhận</div></div>
 <div class="box"><b>Đối tượng</b><span>PackID + SSCC</span><div class="mini">Mỗi kiện 1 ID duy nhất</div></div>
 <div class="box"><b>Archive</b><span>Tier 1 ≥ 10 năm</span><div class="mini">bộ hồ sơ giao hàng + chứng cứ khoá cổng kiểm soát</div></div>
 </div>
@@ -135,7 +135,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div>
 <h3 class="h3">hậu cần Label</h3>
 <ul>
-<li>Nhãn hậu cần <b>PHẢI</b> có thông tin cốt lõi ở dạng <b>machine‑có thể đọc</b> (mã vạch) và <b>con nNgười‑có thể đọc</b> (chữ in).</li>
+<li>Nhãn hậu cần <b>PHẢI</b> có thông tin cốt lõi ở dạng <b>machine‑có thể đọc</b> (mã vạch) và <b>con Người‑có thể đọc</b> (chữ in).</li>
 <li>Thông tin in trên nhãn <b>PHẢI</b> đồng nhất với dữ liệu trong hệ thống phát hành (PackSSCCRegister + ShipRelease).</li>
 <li>Template nhãn là tài liệu kiểm soát; thay đổi template <b>PHẢI</b> theo kiểm soát thay đổi và lưu version.</li>
 </ul>
@@ -265,7 +265,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Bảng kiểm lập kế hoạch + tình huống diễn tập</td>
 </tr>
 <tr>
-<td class="role">NNgười định giá (SAL-03)</td>
+<td class="role">Người định giá (SAL-03)</td>
 <td>Customer‑cụ thể</td>
 <td>Ghi nhận Requests nhãn/đóng gói; xác nhận địa chỉ; gửi ASN/thông báo theo Requests khách</td>
 <td>PO ghi chú; ShipRelease trường dữ liệu Customer/PO</td>
@@ -325,7 +325,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Nhận Requests ship + xác nhận PO ghi chú (label/đóng gói/ASN/điều khoản thương mại (Incoterms)</td><td>Planner + NNgười định giá (SAL-03)</td><td>PO ghi chú trong Hồ sơ công việc 01_Rfq-Hợp đồng</td><td>Thiếu Requests khách; dùng Requests cũ</td></tr>
+<tr><td>1</td><td>Nhận Requests ship + xác nhận PO ghi chú (label/đóng gói/ASN/điều khoản thương mại (Incoterms)</td><td>Planner + Người định giá (SAL-03)</td><td>PO ghi chú trong Hồ sơ công việc 01_Rfq-Hợp đồng</td><td>Thiếu Requests khách; dùng Requests cũ</td></tr>
 <tr><td>2</td><td>Xác nhận Hồ sơ công việc tồn tại; thư mục 07_Shipping-Đóng gói sẵn sàng</td><td>Planner</td><td>JobIndex.EvidenceFolderUrl; thư mục 07_Shipping-Đóng gói</td><td>Upload nhầm thư mục; thư mục không có quyền</td></tr>
 <tr><td>3</td><td>Xác nhận Final IR/CMM = PASS; không có TẠM GIỮ/NCR mở</td><td>QA + QC</td><td>Final IR/CMM file + log TẠM GIỮ/NCR disposition</td><td>Thiếu file PASS; còn TẠM GIỮ</td></tr>
 <tr><td>4</td><td>Tạo/nhận PackID (= Epicor PackNum) theo ShipmentMirror</td><td>WHS</td><td>ShipmentMirror row; PackID/EpicorPackNum khớp / phù hợp</td><td>PackID không tồn tại trong phản chiếu / sao chép</td></tr>
@@ -336,10 +336,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>9</td><td>Chuẩn bị bộ hồ sơ giao hàng: phiếu kê đóng gói + CoC + cert theo PO + bản sao điện tử</td><td>QA + WHS</td><td>File trong 07_Shipping-Đóng gói; đặt tên chuẩn</td><td>Thiếu CoC/cert; file sai Rev</td></tr>
 <tr><td>10</td><td>Tạo/hoàn thiện ShipRelease hồ sơ; gắn PacketFolderUrl; đặt PacketComplete</td><td>WHS</td><td>ShipRelease row: PacketFolderUrl + PacketComplete</td><td>Link thư mục sai; PacketComplete đặt sai</td></tr>
 <tr><td>11</td><td>Submit ShipRelease để chạy LUỒNG-WHS-13; nhận ReconciliationStatus</td><td>WHS</td><td>ReconciliationStatus Đạt/không đạt/Đã chặn; log time</td><td>Submit thiếu trường; trạng thái không cập nhật</td></tr>
-<tr><td>12</td><td>khi không đạt/Đã chặn: mở StandupAction S1; khoanh vùng; sửa nguyên nhân và re‑xác nhận hiệu lực</td><td>Supervisor + QA + WHS</td><td>log hành động + bằng chứng sửa lỗi; re‑run nNgười xác nhận</td><td>Vượt qua; ship “tạm”; sửa không có log</td></tr>
-<tr><td>13</td><td>Khi Pass: WHS + QA phê duyệt; ShipRelease.Trạng thái = Released</td><td>Team Leader kho + QA</td><td>ApprovalHistory; dấu vết kiểm toán</td><td>Thiếu chữ ký; phê duyệt sai nNgười</td></tr>
+<tr><td>12</td><td>khi không đạt/Đã chặn: mở StandupAction S1; khoanh vùng; sửa nguyên nhân và re‑xác nhận hiệu lực</td><td>Supervisor + QA + WHS</td><td>log hành động + bằng chứng sửa lỗi; re‑run Người xác nhận</td><td>Vượt qua; ship “tạm”; sửa không có log</td></tr>
+<tr><td>13</td><td>Khi Pass: WHS + QA phê duyệt; ShipRelease.Trạng thái = Released</td><td>Team Leader kho + QA</td><td>ApprovalHistory; dấu vết kiểm toán</td><td>Thiếu chữ ký; phê duyệt sai Người</td></tr>
 <tr><td>14</td><td>Bàn giao đơn vị vận chuyển; cập nhật đơn vị vận chuyển/Theo dõi/ShipDate; PackSSCCRegister.Trạng thái = Đã giao hàng</td><td>WHS</td><td>đơn vị vận chuyển/Theo dõi; ảnh bàn giao; dấu thời gian</td><td>Theo dõi sai; thiếu ảnh bàn giao</td></tr>
-<tr><td>15</td><td>Lưu POD/bằng chứng; khóa hồ sơ Tier 1; đóng lô giao hàng</td><td>QA + NNgười định giá (SAL-03)</td><td>POD file; lưu giữ label Tier 1 ≥ 10 năm</td><td>POD thất lạc; lưu giữ không áp</td></tr>
+<tr><td>15</td><td>Lưu POD/bằng chứng; khóa hồ sơ Tier 1; đóng lô giao hàng</td><td>QA + Người định giá (SAL-03)</td><td>POD file; lưu giữ label Tier 1 ≥ 10 năm</td><td>POD thất lạc; lưu giữ không áp</td></tr>
 </tbody>
 </table>
 </div>
@@ -385,7 +385,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th>#</th><th>Điểm lỗi</th><th>Hậu quả</th><th>Cơ chế chặn bắt buộc</th><th>Responsible Person</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Sai Part/Rev trên nhãn</td><td>Ship sai; thu hồi; hoàn phí / bồi hoàn</td><td>Scan test mở đúng ShipRelease + đối chiếu Rev</td><td>WHS + QA</td></tr>
-<tr><td>2</td><td>Qty nhãn khác ShipmentMirror</td><td>Thiếu/thừa</td><td>nNgười xác nhận so Qty; trạng thái Đã chặn</td><td>WHS</td></tr>
+<tr><td>2</td><td>Qty nhãn khác ShipmentMirror</td><td>Thiếu/thừa</td><td>Người xác nhận so Qty; trạng thái Đã chặn</td><td>WHS</td></tr>
 <tr><td>3</td><td>Thiếu Final IR/CMM PASS</td><td>giao hàng khi chưa đạt</td><td>PacketComplete = No; Đã chặn</td><td>QC + QA</td></tr>
 <tr><td>4</td><td>Thiếu CoC/cert theo PO</td><td>Từ chối tại khách</td><td>MRR kiểm tra + PacketComplete cổng kiểm soát</td><td>QA</td></tr>
 <tr><td>5</td><td>in lại không có lý do</td><td>Mất dấu vết kiểm toán</td><td>LUỒNG-WHS-12 bắt buộc ReprintReasonCode</td><td>Team Leader kho</td></tr>
@@ -393,8 +393,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>7</td><td>Quét mã vạch không mở đúng màn hình</td><td>Lẫn lộn khi ship</td><td>LabelScanVerified=True trước khi niêm phong</td><td>WHS</td></tr>
 <tr><td>8</td><td>Ảnh đóng gói thiếu hoặc mờ</td><td>Không chứng minh khi khiếu nại / Requests bồi thường</td><td>FRM-WHS-007 Requests ảnh tối thiểu; đánh giá điểm / tại chỗ kiểm tra</td><td>WHS + QA</td></tr>
 <tr><td>9</td><td>Upload sai thư mục Hồ sơ công việc</td><td>Đánh giá không truy xuất nguồn gốc</td><td>PacketFolderUrl trỏ đúng 07_Shipping-Đóng gói; kiểm tra link</td><td>Planner + QA</td></tr>
-<tr><td>10</td><td>Phê duyệt sai nNgười/thiếu chữ ký</td><td>Không hợp lệ</td><td>Power ứng dụng vai trò kiểm tra + ApprovalHistory</td><td>QA</td></tr>
-<tr><td>11</td><td>đơn vị vận chuyển/Theo dõi nhập sai</td><td>Truy vết giao hàng sai</td><td>kép / Cấp đôi‑mục nhập kiểm tra + ảnh vận đơn</td><td>WHS + NNgười định giá (SAL-03)</td></tr>
+<tr><td>10</td><td>Phê duyệt sai Người/thiếu chữ ký</td><td>Không hợp lệ</td><td>Power ứng dụng vai trò kiểm tra + ApprovalHistory</td><td>QA</td></tr>
+<tr><td>11</td><td>đơn vị vận chuyển/Theo dõi nhập sai</td><td>Truy vết giao hàng sai</td><td>kép / Cấp đôi‑mục nhập kiểm tra + ảnh vận đơn</td><td>WHS + Người định giá (SAL-03)</td></tr>
 <tr><td>12</td><td>Không áp lưu giữ Tier 1</td><td>Mất hồ sơ dài hạn</td><td>Lưu giữ label tự động‑áp dụng + đánh giá hàng tuần</td><td>QA/QMS + IT</td></tr>
 </tbody>
 </table>
@@ -445,28 +445,28 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <ul class="mini">
 <li>Tên file dùng tiếng Anh không dấu; dùng dấu gạch dưới; chỉ dùng bộ ký tự hợp lệ; loại bỏ: / \\ : * ? " &lt; &gt; |</li>
-<li>NNgày theo ISO 8601: YYYY-MM-DD.</li>
+<li>Ngày theo ISO 8601: YYYY-MM-DD.</li>
 <li>Khi file liên quan bản vẽ/spec: bắt buộc có REV-{Rev}.</li>
 </ul>
 </div>
 <div class="card">
-<h2>11) Kế hoạch đào tạo &amp; triển khai trong 06 nNgày (2 ca, 6 ngày)</h2>
-<p class="mini">Kế hoạch gồm 06 nNgày triển khai theo 03 tuần (mỗi tuần 02 ngày). Mỗi vai trò tham gia tối đa 02 ngày/tuần. Mỗi nNgày chạy 02 ca: Ca A và Ca B học cùng nội dung để bảo đảm phủ đủ nhân sự.</p>
+<h2>11) Kế hoạch đào tạo &amp; triển khai trong 06 Ngày (2 ca, 6 ngày)</h2>
+<p class="mini">Kế hoạch gồm 06 Ngày triển khai theo 03 tuần (mỗi tuần 02 ngày). Mỗi vai trò tham gia tối đa 02 ngày/tuần. Mỗi Ngày chạy 02 ca: Ca A và Ca B học cùng nội dung để bảo đảm phủ đủ nhân sự.</p>
 <div class="table-wrap">
 <table class="table tight">
 <thead><tr><th>Tuần/Ngày</th><th>Chủ đề</th><th>Đối tượng</th><th>Thời lượng/ca</th><th>Đầu ra bắt buộc</th></tr></thead>
 <tbody>
-<tr><td>Tuần 1 – NNgày 1</td><td>Tổng quan Step 3A + Data từ điển + cổng kiểm soát logic</td><td>All vai trò</td><td>2.0h</td><td>Bài kiểm tra nhanh mốc chuẩn + ký cam kết cổng kiểm soát kỷ luật / chuyên ngành</td></tr>
-<tr><td>Tuần 1 – NNgày 2</td><td>Vận hành WHS: phân công SSCC, Print, Scan test, FRM-WHS-007</td><td>WHS + Bảo trì + QA</td><td>3.0h</td><td>OJT demo + 01 lô giao hàng giả lập/nhóm</td></tr>
-<tr><td>Tuần 2 – NNgày 3</td><td>Bộ hồ sơ giao hàng: MRR Tier 1 + đặt tên + lưu giữ + CoC/cert</td><td>QA + QC + NNgười định giá (SAL-03)</td><td>2.5h</td><td>MRR bảng kiểm hoàn chỉnh + 01 bộ hồ sơ mẫu</td></tr>
-<tr><td>Tuần 2 – NNgày 4</td><td>Đối soát cổng kiểm soát: xử lý Fail/Đã chặn + ngoại lệ tách / chia/gộp / hợp nhất/void/in lại</td><td>Team Leader kho + Supervisor + QA</td><td>3.0h</td><td>03 tình huống diễn tập đạt PASS</td></tr>
-<tr><td>Tuần 3 – NNgày 5</td><td>OJT tại hiện trường: chạy thật 2 job (mỗi ca 1 job)</td><td>WHS + QA + Planner</td><td>4.0h</td><td>02 ShipRelease Pass + dấu vết kiểm toán đầy đủ</td></tr>
-<tr><td>Tuần 3 – NNgày 6</td><td>Thi đánh giá: bài kiểm tra nhanh + hiệu suất test + đánh giá mô phỏng</td><td>Vai trò‑dựa trên</td><td>2.5h</td><td>Chứng nhận L2/L3 theo tiêu chí đánh giá</td></tr>
+<tr><td>Tuần 1 – Ngày 1</td><td>Tổng quan Step 3A + Data từ điển + cổng kiểm soát logic</td><td>All vai trò</td><td>2.0h</td><td>Bài kiểm tra nhanh mốc chuẩn + ký cam kết cổng kiểm soát kỷ luật / chuyên ngành</td></tr>
+<tr><td>Tuần 1 – Ngày 2</td><td>Vận hành WHS: phân công SSCC, Print, Scan test, FRM-WHS-007</td><td>WHS + Bảo trì + QA</td><td>3.0h</td><td>OJT demo + 01 lô giao hàng giả lập/nhóm</td></tr>
+<tr><td>Tuần 2 – Ngày 3</td><td>Bộ hồ sơ giao hàng: MRR Tier 1 + đặt tên + lưu giữ + CoC/cert</td><td>QA + QC + Người định giá (SAL-03)</td><td>2.5h</td><td>MRR bảng kiểm hoàn chỉnh + 01 bộ hồ sơ mẫu</td></tr>
+<tr><td>Tuần 2 – Ngày 4</td><td>Đối soát cổng kiểm soát: xử lý Fail/Đã chặn + ngoại lệ tách / chia/gộp / hợp nhất/void/in lại</td><td>Team Leader kho + Supervisor + QA</td><td>3.0h</td><td>03 tình huống diễn tập đạt PASS</td></tr>
+<tr><td>Tuần 3 – Ngày 5</td><td>OJT tại hiện trường: chạy thật 2 job (mỗi ca 1 job)</td><td>WHS + QA + Planner</td><td>4.0h</td><td>02 ShipRelease Pass + dấu vết kiểm toán đầy đủ</td></tr>
+<tr><td>Tuần 3 – Ngày 6</td><td>Thi đánh giá: bài kiểm tra nhanh + hiệu suất test + đánh giá mô phỏng</td><td>Vai trò‑dựa trên</td><td>2.5h</td><td>Chứng nhận L2/L3 theo tiêu chí đánh giá</td></tr>
 </tbody>
 </table>
 </div>
 <div class="callout">
-<b>Ràng buộc vận hành:</b> Trong nNgày triển khai, ca sản xuất giữ năng suất bằng cách tổ chức đào tạo theo nhóm nhỏ; WHS chạy song song 01 dòng / chuyền thực tế và 01 dòng / chuyền huấn luyện.
+<b>Ràng buộc vận hành:</b> Trong Ngày triển khai, ca sản xuất giữ năng suất bằng cách tổ chức đào tạo theo nhóm nhỏ; WHS chạy song song 01 dòng / chuyền thực tế và 01 dòng / chuyền huấn luyện.
  </div>
 </div>
 <div class="card">
@@ -514,7 +514,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L4</b></td>
-<td>Huấn luyện nNgười khác; cải tiến và duy trì đánh giá mức sẵn sàng</td>
+<td>Huấn luyện Người khác; cải tiến và duy trì đánh giá mức sẵn sàng</td>
 <td>Dẫn dắt Tier rà soát bị chặn hàng đợi; đóng CAPA cho không khớp; tạo SOP cập nhật khi cần</td>
 <td>Không duy trì kỷ luật cổng kiểm soát; thiếu kiểm tra định kỳ</td>
 </tr>
@@ -523,7 +523,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card">
-<h2>14) Bài kiểm tra lý thuyết (≥ 20 câu) — trắc nNhiệm</h2>
+<h2>14) Bài kiểm tra lý thuyết (≥ 20 câu) — trắc Nhiệm</h2>
 <ol>
 <li>SSCC thuộc GS1 ứng dụng mã định danh nào? (A) 01 (B) 10 (C) 00 (D) 21</li>
 <li>SSCC có bao nhiêu chữ số? (A) 16 (B) 17 (C) 18 (D) 20</li>
@@ -567,7 +567,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="badge"><span class="dot"></span>tình huống 1</div>
 <h3 class="h3">Qty không khớp</h3>
 <p class="mini"><b>Tình huống:</b> ShipmentMirror Qty = 10, ShipRelease Qty = 9.</p>
-<p class="mini"><b>Hành động bắt buộc:</b> đặt Đã chặn; khoanh vùng; kiểm đếm lại; cập nhật phiếu kê đóng gói; re‑submit nNgười xác nhận.</p>
+<p class="mini"><b>Hành động bắt buộc:</b> đặt Đã chặn; khoanh vùng; kiểm đếm lại; cập nhật phiếu kê đóng gói; re‑submit Người xác nhận.</p>
 <p class="mini"><b>Evidence:</b> ảnh count sheet + log chỉnh sửa + ReconciliationStatus=Pass.</p>
 </div>
 <div class="card" style="margin:0">
@@ -588,7 +588,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card">
 <h2>16) Hiệu suất Test (thực hành đánh giá) — Đạt/không đạt</h2>
-<p class="mini">Bài test áp dụng cho WHS (L2/L3) và QA (L2/L3). Thời gian tối đa 35 phút/nhóm 2 nNgười.</p>
+<p class="mini">Bài test áp dụng cho WHS (L2/L3) và QA (L2/L3). Thời gian tối đa 35 phút/nhóm 2 Người.</p>
 <div class="table-wrap">
 <table class="table tight">
 <thead><tr><th>Hạng mục</th><th>Yêu cầu Pass</th><th>Evidence</th><th>Điểm</th></tr></thead>

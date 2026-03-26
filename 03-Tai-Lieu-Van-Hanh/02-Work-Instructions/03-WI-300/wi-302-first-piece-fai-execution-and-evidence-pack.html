@@ -68,7 +68,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> hích hoạt mẫu đầu/FAI theo đúng job đang chạy, thực hiện balloon/CMM khi Job yêu cầu, chỉ ký PASS sau khi đã đo đủ đặc tính thuộc phạm vi kiểm, và chỉ mở cổng kiểm soát FAI khi QA đã release.</div>
 <ul class="tight" style="padding-left:20px; margin:8px 0;">
 <li>Mọi kích hoạt FAI/mẫu đầu phải được nhìn thấy trên Bộ hồ sơ công việc (job gói hồ sơ), traveler và hồ sơ Job.</li>
-<li>Mẫu mẫu đầu phải truy ra được máy, chương trình, tool/fixture, nNgười setup, ca và thời điểm.</li>
+<li>Mẫu mẫu đầu phải truy ra được máy, chương trình, tool/fixture, Người setup, ca và thời điểm.</li>
 <li>Phần đã cắt ra trước khi cổng kiểm soát PASS phải được giữ ở trạng thái nghi ngờ nếu chưa có quyết định rõ.</li>
 </ul></div>
 
@@ -95,9 +95,9 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Tách mẫu đầu và khóa lô nghi ngờ.</strong><br/>Ngay sau setup/chứng minh-out, tách part đầu tiên hoặc tập mẫu đầu theo Requests. Toàn bộ sản phẩm cắt ra trước khi cổng kiểm soát PASS phải được nhận diện là nghi ngờ cho tới khi QA quyết định phát hành.</div>
 <div class="step-item"><strong>Đối chiếu 4 điểm trước khi đo.</strong><br/>áản vẽ/spec, chương trình, phiếu cài đặt, tool/fixture phải cùng phiên bản và cùng part. Sai một điểm thì dừng, mở hold, trả về ENG/Setup.</div>
 <div class="step-item"><strong>Đo theo thứ tự bảo vệ rủi ro.</strong><br/>Đo CTQ, kích thước chuẩn gá/không / bằng không, mốc chuẩn (datum) chuỗi, hình học, đặc tính ảnh hưởng fit/chức năng trước. Sau đó mới đo phần còn lại trong phạm vi Đầy đủ FAI/Chênh lệch FAI. khi dùng CMM phải lưu cả raw đầu ra, không chỉ lưu bản tóm tắt.</div>
-<div class="step-item"><strong>áalloon và truy vết đặc tính.</strong><br/>Mỗi kết quả đo phải truy ngược được về số balloon hoặc mã đặc tính trong kiểm tra program. Không chấp nhận báo cáo mà nNgười đọc không biết kết quả đó đang nói tới đặc điểm / tính năng nào.</div>
+<div class="step-item"><strong>áalloon và truy vết đặc tính.</strong><br/>Mỗi kết quả đo phải truy ngược được về số balloon hoặc mã đặc tính trong kiểm tra program. Không chấp nhận báo cáo mà Người đọc không biết kết quả đó đang nói tới đặc điểm / tính năng nào.</div>
 <div class="step-item"><strong>Đánh giá kết quả và quyết định cổng kiểm soát.</strong><br/>đạt khi toàn bộ đặc tính thuộc phạm vi đều đạt và hồ sơ đầy đủ. Không đạt khi có bất kỳ đặc tính không đạt hoặc bằng chứng không đáng tin cậy. có điều kiện TẠM GIỮ chỉ dùng khi part chưa NG nhưng hồ sơ thiếu/đang chờ quyết định kỹ thuật.</div>
-<div class="step-item"><strong>Khóa bằng chứng và phát hành.</strong><br/>Sau khi pass, nạp báo cáo, balloon drawing, raw data, ảnh khi cần, quyết định phát hành và nNgười ký vào Hồ sơ công việc (hồ sơ công việc). Thông tin phát hành phải nhìn thấy được cho Sản xuất tại Point-of-use.</div>
+<div class="step-item"><strong>Khóa bằng chứng và phát hành.</strong><br/>Sau khi pass, nạp báo cáo, balloon drawing, raw data, ảnh khi cần, quyết định phát hành và Người ký vào Hồ sơ công việc (hồ sơ công việc). Thông tin phát hành phải nhìn thấy được cho Sản xuất tại Point-of-use.</div>
 </div></div>
 
 <div class="section"><h2>5. tái xác nhận hiệu lực và xử lý FAIL</h2>
@@ -107,7 +107,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>sự cố nghiêm trọng, trục chính (spindle) hit, jaw phiếu / trượt, đầu dò (probe) hit, part shift</td><td>Hold toàn bộ WIP nghi ngờ; đánh giá phạm vi và FAI lại</td><td>QA + Sản xuất + ENG</td></tr>
 <tr><td>khởi động lại sau dừng dài, chuyển ca ở Job QPL cao</td><td>Mẫu đầu xác nhận lại trước khi chạy tiếp</td><td>Supervisor + QA</td></tr>
 </tbody></table></div>
-<div class="callout-danger"><strong>FAIL thì làm ngay</strong><br/>1) Dừng công đoạn. 2) Cách ly part nghi ngờ từ cuối cùng đã biết tốt / đạt. 3) áảo toàn setup hiện trạng nếu cần điều tra. 4) Ghi rõ đặc điểm / tính năng fail, phương pháp đo, dụng cụ đo, nNgười đo, thời điểm. 5) Không tự sửa chương trình/bù trừ (offset) rồi chạy lại khi chưa có quyết định phù hợp.</div></div>
+<div class="callout-danger"><strong>FAIL thì làm ngay</strong><br/>1) Dừng công đoạn. 2) Cách ly part nghi ngờ từ cuối cùng đã biết tốt / đạt. 3) áảo toàn setup hiện trạng nếu cần điều tra. 4) Ghi rõ đặc điểm / tính năng fail, phương pháp đo, dụng cụ đo, Người đo, thời điểm. 5) Không tự sửa chương trình/bù trừ (offset) rồi chạy lại khi chưa có quyết định phù hợp.</div></div>
 
 <div class="section"><h2>6. áộ bằng chứng bắt buộc</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>áằng chứng</th><th>áắt buộc khi</th><th>Ghi chú</th></tr></thead><tbody>

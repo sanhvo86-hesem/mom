@@ -98,7 +98,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><a href="#s7">7) Phản ứng 60 giây</a></li>
 <li><a href="#s8">8) Bảng kiểm vận hành (≤15 bước)</a></li>
 <li><a href="#s9">9) OJT theo TWI (Job Sự cố hỏng máy + Tiêu chí đánh giá L1–L4)</a></li>
-<li><a href="#s10">10) Đánh giá (Trắc nNhiệm + Tình huống + Bài kiểm tra thực hành)</a></li>
+<li><a href="#s10">10) Đánh giá (Trắc Nhiệm + Tình huống + Bài kiểm tra thực hành)</a></li>
 <li><a href="#s11">11) ĐẠT/KHÔNG ĐẠT tiêu chí</a></li>
 <li><a href="#s12">12) MRR tối thiểu + nơi lưu</a></li>
 <li><a href="#s13">13) Đánh giá phát hiện &amp; phòng ngừa</a></li>
@@ -109,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 2) Mục đích module & bối cảnh operation -->
 <h2 class="h2" id="s2">2) Mục đích mô-đun &amp; bối cảnh vận hành (cổng chặn/bàn giao; kích hoạt; trách nhiệm)</h2>
 <div class="callout">
-<b>Lý do tồn tại (Cổng chặn logic):</b> sai vị trí lưu / sai quyền / sai phiên bản tạo lỗi chạy máy, lỗi kiểm tra, lỗi giao hàng và lỗi đánh giá. Mô-đun này là “cổng chặn hệ thống” để chặn 6 rủi ro chết nNgười: <b>sai Rev</b>, <b>lẫn lộn (mix-up)/lẫn lô</b>, <b>thiếu/giả chứng từ</b>, <b>chỉnh sửa âm thầm hồ sơ</b>, <b>rò rỉ dữ liệu khách hàng</b>, <b>vượt qua cổng chặn giao hàng</b>.
+<b>Lý do tồn tại (Cổng chặn logic):</b> sai vị trí lưu / sai quyền / sai phiên bản tạo lỗi chạy máy, lỗi kiểm tra, lỗi giao hàng và lỗi đánh giá. Mô-đun này là “cổng chặn hệ thống” để chặn 6 rủi ro chết Người: <b>sai Rev</b>, <b>lẫn lộn (mix-up)/lẫn lô</b>, <b>thiếu/giả chứng từ</b>, <b>chỉnh sửa âm thầm hồ sơ</b>, <b>rò rỉ dữ liệu khách hàng</b>, <b>vượt qua cổng chặn giao hàng</b>.
  </div>
 <div class="grid-2">
 <div class="card">
@@ -129,7 +129,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>QA/QMS</b></td><td>Thiết lập chuẩn kiểm soát (Released/Hồ sơ/WIP), điểm / tại chỗ-kiểm tra tuân thủ, lập gói minh chứng đánh giá.</td></tr>
 <tr><td><b>IT/M365 Admin</b></td><td>Thiết lập cấu trúc địa điểm / site/thư viện, quản lý phiên bản/phê duyệt, lưu giữ/DLP, nhóm quyền, xuất đánh giá các log.</td></tr>
 <tr><td><b>Quy trình Owner/Dept Trưởng / Đầu</b></td><td>Phê duyệt quyền truy cập, thu hồi quyền, chấp thuận ngoại lệ có thời hạn.</td></tr>
-<tr><td><b>All nNgười dùng</b></td><td>Lưu đúng nơi, đúng tên, đúng phân loại; không tự ý chia sẻ ngoài; báo cáo sự cố ngay.</td></tr>
+<tr><td><b>All Người dùng</b></td><td>Lưu đúng nơi, đúng tên, đúng phân loại; không tự ý chia sẻ ngoài; báo cáo sự cố ngay.</td></tr>
 </tbody>
 </table>
 </div>
@@ -193,7 +193,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Planner</b></td><td>Lưu lập kế hoạch Photos trạng thái và thay đổi lịch có dấu vết; tránh dùng file cá nhân làm chủ / gốc.</td><td>01 lập kế hoạch hồ sơ có quản lý phiên bản và log thay đổi liên quan WO/Lot.</td></tr>
 <tr><td><b>Bảo trì</b></td><td>Lưu PM các log, machine các log đúng QMS-Hồ sơ/Bảo trì; giữ lịch sử.</td><td>01 bộ PM hồ sơ: tên đúng chuẩn + không bị ghi đè.</td></tr>
 <tr><td><b>EHS</b></td><td>Lưu sự cố/sự cố suýt xảy ra (Cần / suýt-thiếu / bỏ sót)/đào tạo EHS đúng khu vực Hồ sơ; quyền truy cập theo phân loại.</td><td>01 hồ sơ EHS được phân loại đúng và giới hạn quyền truy cập.</td></tr>
-<tr><td><b>NNgười định giá (SAL-03)</b></td><td>Lưu RFQ/PO/rà soát hợp đồng đúng khu vực; chia sẻ khách hàng theo cơ chế kiểm soát.</td><td>01 rà soát hợp đồng hồ sơ gắn WO/Lot; chia sẻ khách hàng qua gói minh chứng có log.</td></tr>
+<tr><td><b>Người định giá (SAL-03)</b></td><td>Lưu RFQ/PO/rà soát hợp đồng đúng khu vực; chia sẻ khách hàng theo cơ chế kiểm soát.</td><td>01 rà soát hợp đồng hồ sơ gắn WO/Lot; chia sẻ khách hàng qua gói minh chứng có log.</td></tr>
 <tr><td><b>Supervisor</b></td><td>Thực thi cổng chặn: không cho chạy/giao hàng khi hồ sơ sai vị trí/sai quyền/sai Rev.</td><td>Đạt L3: thực hiện 02 lần đánh giá nhanh + xử lý 01 tình huống vi phạm theo chặn lỗi tức thì.</td></tr>
 </tbody>
 </table>
@@ -255,7 +255,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:260px">Bàn giao</th><th>Đầu vào tối thiểu</th><th>Đầu ra/MRR bắt buộc</th></tr></thead>
 <tbody>
-<tr><td><b>NNgười định giá (SAL-03) → Kế hoạch</b></td><td>RFQ/PO/NDA + drawing/spec + Rev</td><td>rà soát hợp đồng Hồ sơ + Customer Đầu vào lưu trong Hồ sơ công việc (đúng thư mục + tên)</td></tr>
+<tr><td><b>Người định giá (SAL-03) → Kế hoạch</b></td><td>RFQ/PO/NDA + drawing/spec + Rev</td><td>rà soát hợp đồng Hồ sơ + Customer Đầu vào lưu trong Hồ sơ công việc (đúng thư mục + tên)</td></tr>
 <tr><td><b>Kỹ thuật → Sản xuất</b></td><td>bộ định tuyến / lộ trình/phiếu cài đặt + program Released</td><td>Link “source of sự thật” program từ thư viện Hạn chế + dấu phát hành (note)</td></tr>
 <tr><td><b>Nhận hàng → Sản xuất</b></td><td>CoC/chứng chỉ vật liệu</td><td>Nguyên vật liệu pack: CoC + truy xuất nguồn gốc link đúng WO/Lot</td></tr>
 <tr><td><b>Sản xuất → QC/QA</b></td><td>IPQC các log + setup bằng chứng</td><td>IPQC hồ sơ + ảnh/bảng kiểm, lưu đúng khu vực, khóa khi kết thúc / đóng hồ sơ</td></tr>
@@ -296,7 +296,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>4</td><td><b>ít nhất quyền hạn &amp; group-dựa trên</b>: cấp quyền qua nhóm; mọi thay đổi có log và thời hạn.</td><td>IT + chủ dữ liệu</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#DCR record">FRM-QMS-15</a> + cập nhật Truy cập Matrix (<a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html">FRM-QMS-14</a>/<a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#edam">FRM-QMS-18</a>)</td><td>Mỗi thay đổi</td></tr>
 <tr><td>5</td><td><b>rà soát quyền truy cập hàng quý</b>: rà soát quyền + khách hết hạn + gói minh chứng.</td><td>IT + QA/QMS</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-QMS-17</a> (gói minh chứng) + danh sách thu hồi</td><td>Hàng quý</td></tr>
 <tr><td>6</td><td><b>Hồ sơ tính toàn vẹn</b>: hồ sơ không chỉnh sửa; đính chính bằng file mới có lý do; lưu giữ label áp dụng.</td><td>QA/QMS</td><td>Phiên bản/lưu giữ + log đính chính</td><td>Mỗi hồ sơ</td></tr>
-<tr><td>7</td><td><b>External chia sẻ cổng chặn</b>: chỉ chia sẻ qua gói minh chứng; link chỉ đọc có hết hạn; PHẢI chặn chia sẻ Hạn chế.</td><td>QA/QMS + NNgười định giá (SAL-03)</td><td>Bộ bằng chứng link + FRM-QMS-15 + Photos màn hình hết hạn</td><td>Mỗi lần chia sẻ</td></tr>
+<tr><td>7</td><td><b>External chia sẻ cổng chặn</b>: chỉ chia sẻ qua gói minh chứng; link chỉ đọc có hết hạn; PHẢI chặn chia sẻ Hạn chế.</td><td>QA/QMS + Người định giá (SAL-03)</td><td>Bộ bằng chứng link + FRM-QMS-15 + Photos màn hình hết hạn</td><td>Mỗi lần chia sẻ</td></tr>
 <tr><td>8</td><td><b>điểm / tại chỗ-kiểm tra tuân thủ</b>: chọn mẫu WO/Lot kiểm tra vị trí lưu, tên file, quyền truy cập, khóa kết thúc / đóng hồ sơ.</td><td>QA/QMS</td><td>Biên bản điểm / tại chỗ-kiểm tra + NCR/CAPA khi phát hiện</td><td>Hàng tháng</td></tr>
 </tbody>
 </table>
@@ -308,7 +308,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><b>Dừng gia công ngay</b> khi CNC program/phiếu cài đặt không truy xuất nguồn gốc được nguồn từ thư viện <b>Chương trình (Hạn chế)</b> hoặc không khớp REV/WO/Lot. MRR: Photos màn hình đường dẫn + báo Supervisor + Kỹ thuật trong ≤ 5 phút.</div>
 </div>
 <div class="req"><span class="req-tag shall">TẠM GIỮ</span>
-<div><b>Giữ lô/giữ giao hàng</b> khi thiếu bất kỳ hồ sơ bắt buộc trong giao vận pack (CoC/chứng chỉ/kiểm tra/kết thúc / đóng hồ sơ khóa) hoặc hồ sơ nằm sai khu vực. MRR: log TẠM GIỮ + danh sách thiếu + nNgười chịu trách nhiệm.</div>
+<div><b>Giữ lô/giữ giao hàng</b> khi thiếu bất kỳ hồ sơ bắt buộc trong giao vận pack (CoC/chứng chỉ/kiểm tra/kết thúc / đóng hồ sơ khóa) hoặc hồ sơ nằm sai khu vực. MRR: log TẠM GIỮ + danh sách thiếu + Người chịu trách nhiệm.</div>
 </div>
 <div class="req"><span class="req-tag shall">CHẶN</span>
 <div><b>Chặn chia sẻ bên ngoài</b> khi file chưa được phân loại (Công khai/Nội bộ/Customer-Bảo mật/Hạn chế) hoặc file thuộc <b>Hạn chế</b>. MRR: phiếu Requests/FRM-QMS-15 + quyết định phê duyệt/không phê duyệt.</div>
@@ -346,21 +346,21 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Xác định file thuộc khu vực nào: Released / WIP / Hồ sơ.</td><td>NNgười tạo file</td><td>Tag/nhãn khu vực trong siêu dữ liệu hoặc thư mục chuẩn</td><td>Trộn WIP và Hồ sơ trong 1 thư mục</td></tr>
-<tr><td>2</td><td>Gán mức phân loại: Công khai / Nội bộ / Customer-Bảo mật / Hạn chế.</td><td>NNgười tạo file</td><td>Nhãn phân loại trên file/thư viện</td><td>Để trống phân loại; gán sai “Nội bộ” cho dữ liệu khách</td></tr>
-<tr><td>3</td><td>Lưu file vào đúng nơi theo SOP: QMS-Được kiểm soát-Tài liệu / QMS-Hồ sơ / OPS-Job-Hồ sơ.</td><td>NNgười tạo file</td><td>Đường dẫn đúng site/thư viện/thư mục</td><td>Lưu OneDrive cá nhân/máy nội bộ / tại chỗ làm bản chính</td></tr>
-<tr><td>4</td><td>Đặt tên file có đủ: Customer, Part No, Phiên bản, WO/Lot, DocType, ngày.</td><td>NNgười tạo file</td><td>Tên file theo chuẩn</td><td>Dùng “final_v3”; thiếu REV/WO</td></tr>
+<tr><td>1</td><td>Xác định file thuộc khu vực nào: Released / WIP / Hồ sơ.</td><td>Người tạo file</td><td>Tag/nhãn khu vực trong siêu dữ liệu hoặc thư mục chuẩn</td><td>Trộn WIP và Hồ sơ trong 1 thư mục</td></tr>
+<tr><td>2</td><td>Gán mức phân loại: Công khai / Nội bộ / Customer-Bảo mật / Hạn chế.</td><td>Người tạo file</td><td>Nhãn phân loại trên file/thư viện</td><td>Để trống phân loại; gán sai “Nội bộ” cho dữ liệu khách</td></tr>
+<tr><td>3</td><td>Lưu file vào đúng nơi theo SOP: QMS-Được kiểm soát-Tài liệu / QMS-Hồ sơ / OPS-Job-Hồ sơ.</td><td>Người tạo file</td><td>Đường dẫn đúng site/thư viện/thư mục</td><td>Lưu OneDrive cá nhân/máy nội bộ / tại chỗ làm bản chính</td></tr>
+<tr><td>4</td><td>Đặt tên file có đủ: Customer, Part No, Phiên bản, WO/Lot, DocType, ngày.</td><td>Người tạo file</td><td>Tên file theo chuẩn</td><td>Dùng “final_v3”; thiếu REV/WO</td></tr>
 <tr><td>5</td><td>Đối với drawing/spec: chỉ lưu “Customer Đầu vào” trong Hồ sơ công việc; mọi bản phát hành nội bộ chỉ link.</td><td>Kỹ thuật</td><td>Link “source of sự thật” + hồ sơ nhận file</td><td>Sao chép bản vẽ sang thư mục riêng để tiện</td></tr>
 <tr><td>6</td><td>Đối với CNC program/CAM/ghi sổ / đăng: lưu trong Chương trình (Hạn chế) và phát hành bản chạy.</td><td>Lập trình viên (CNC)</td><td>Phát hành note + đường dẫn program</td><td>Copy program qua USB giữa máy; chỉnh tại máy</td></tr>
 <tr><td>7</td><td>Đối với kiểm tra hồ sơ: phát hành vào Hồ sơ; khóa không sửa; đính chính bằng file mới có lý do.</td><td>QC/QA</td><td>DCR hồ sơ/lưu giữ + log đính chính</td><td>ghi đè file để “đẹp số”</td></tr>
 <tr><td>8</td><td>Đối với nhà cung cấp cert/CoC: lưu QMS-Hồ sơ/Suppliers và gắn link vào Hồ sơ công việc/Nguyên vật liệu.</td><td>Mua hàng/Kho</td><td>Link cert + dấu nhận hàng</td><td>Để cert trong email/scan rời không truy xuất nguồn gốc</td></tr>
 <tr><td>9</td><td>Không bẻ quyền theo file; mọi thay đổi quyền qua FRM-QMS-15 và nhóm quyền.</td><td>IT + chủ dữ liệu</td><td>FRM-QMS-15 + nhóm quyền</td><td>Chia sẻ trực tiếp cho cá nhân, không thời hạn</td></tr>
-<tr><td>10</td><td>Chia sẻ bên ngoài chỉ qua gói minh chứng chỉ đọc có hết hạn; PHẢI chặn chia sẻ Hạn chế.</td><td>QA + NNgười định giá (SAL-03)</td><td>Link hết hạn + log chia sẻ</td><td>chia sẻ cả thư viện hoặc thư mục WO</td></tr>
+<tr><td>10</td><td>Chia sẻ bên ngoài chỉ qua gói minh chứng chỉ đọc có hết hạn; PHẢI chặn chia sẻ Hạn chế.</td><td>QA + Người định giá (SAL-03)</td><td>Link hết hạn + log chia sẻ</td><td>chia sẻ cả thư viện hoặc thư mục WO</td></tr>
 <tr><td>11</td><td>Khi kết thúc / đóng hồ sơ WO/Lot: đóng băng WIP thành Hồ sơ và khóa chỉ đọc/lưu giữ.</td><td>QA + Supervisor</td><td>kết thúc / đóng hồ sơ bảng kiểm ký + trạng thái đã khóa</td><td>Tiếp tục sửa hồ sơ sau giao hàng</td></tr>
 <tr><td>12</td><td>Thực hiện điểm / tại chỗ-kiểm tra định kỳ: 01 WO/Lot/tuần theo lịch QMS.</td><td>QA/QMS</td><td>Biên bản điểm / tại chỗ-kiểm tra + hành động</td><td>Kiểm tra “cho có” không có bằng chứng</td></tr>
 <tr><td>13</td><td>Thực hiện rà soát quyền truy cập hàng quý + thu hồi quyền trong ≤ 24h khi kết thúc đánh giá/Projects.</td><td>IT + QA/QMS</td><td>FRM-QMS-17 + danh sách thu hồi</td><td>Khách truy cập tồn tại vô hạn</td></tr>
 <tr><td>14</td><td>Kích hoạt phản ứng 60 giây khi phát hiện sai Rev/rò rỉ/chỉnh sửa hồ sơ.</td><td>Tất cả</td><td>Ảnh chứng cứ + log NCR/rủi ro</td><td>Sửa trước rồi mới báo</td></tr>
-<tr><td>15</td><td>Đóng bài học: cập nhật đào tạo hồ sơ và gắn MRR vào hồ sơ đào tạo.</td><td>QA/QMS</td><td>Training hồ sơ + tiêu chí đánh giá ký</td><td>Chỉ có điểm trắc nNhiệm, không có hiệu suất bằng chứng</td></tr>
+<tr><td>15</td><td>Đóng bài học: cập nhật đào tạo hồ sơ và gắn MRR vào hồ sơ đào tạo.</td><td>QA/QMS</td><td>Training hồ sơ + tiêu chí đánh giá ký</td><td>Chỉ có điểm trắc Nhiệm, không có hiệu suất bằng chứng</td></tr>
 </tbody>
 </table>
 </div>
@@ -371,7 +371,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="iso-list">
 <li><b>01 WO/Lot Tài liệu Set hoàn chỉnh</b> (cấu trúc thư mục chuẩn) gồm tối thiểu: Customer Đầu vào, bộ định tuyến / lộ trình/Setup, Chương trình (Hạn chế link), IPQC, Kiểm tra, Nguyên vật liệu/CoC, Giao vận, kết thúc / đóng hồ sơ khóa.</li>
 <li><b>01 Truy cập DCR hồ sơ</b> hoàn chỉnh (khi có cấp quyền/chia sẻ) theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#DCR record">FRM-QMS-15</a>.</li>
-<li><b>01 Gói minh chứng</b> chỉ đọc có hết hạn (mô phỏng đánh giá/khách hàng) + Photos cấu hình hết hạn + danh sách nNgười được cấp quyền.</li>
+<li><b>01 Gói minh chứng</b> chỉ đọc có hết hạn (mô phỏng đánh giá/khách hàng) + Photos cấu hình hết hạn + danh sách Người được cấp quyền.</li>
 </ul>
 <div class="req"><span class="req-tag shall">PHẢI</span>
 <div>OJT kết thúc khi đủ 3 đầu ra trên và QA/QMS ký xác nhận. Không đủ đầu ra thì KHÔNG ĐẠT.</div>
@@ -450,7 +450,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>L1</b></td>
 <td>Lưu đúng thư mục theo hướng dẫn; đặt tên đúng; không tạo bản chính ở nội bộ / tại chỗ. Thực hiện phản ứng 60 giây khi phát hiện sai.</td>
-<td>Trắc nNhiệm ≥ 80% + hoàn thành 01 OJT đầu ra có giám sát.</td>
+<td>Trắc Nhiệm ≥ 80% + hoàn thành 01 OJT đầu ra có giám sát.</td>
 <td>Được Đóng góp trong Hồ sơ công việc theo vai trò; không được chia sẻ bên ngoài.</td>
 </tr>
 <tr>
@@ -461,24 +461,24 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L3</b></td>
-<td>Phát hiện và chặn lỗi của nNgười khác tại hiện trường; thực hiện điểm / tại chỗ-kiểm tra; mở NCR/CAPA khi phát hiện chỉnh sửa hồ sơ.</td>
+<td>Phát hiện và chặn lỗi của Người khác tại hiện trường; thực hiện điểm / tại chỗ-kiểm tra; mở NCR/CAPA khi phát hiện chỉnh sửa hồ sơ.</td>
 <td>Thực hiện 02 điểm / tại chỗ-kiểm tra có biên bản + xử lý 01 tình huống TẠM GIỮ/STOP đúng chuẩn.</td>
-<td>Được làm “nNgười đi kèm (buddy) nNgười đào tạo”; được phê duyệt nội bộ cấp quyền trong phạm vi chủ dữ liệu uỷ quyền.</td>
+<td>Được làm “Người đi kèm (buddy) Người đào tạo”; được phê duyệt nội bộ cấp quyền trong phạm vi chủ dữ liệu uỷ quyền.</td>
 </tr>
 <tr>
 <td><b>L4</b></td>
 <td>Thiết kế/chuẩn hóa cấu trúc dữ liệu; xử lý sự cố rò rỉ; điều phối truy cập rà soát; cung cấp gói minh chứng đánh giá theo scope.</td>
 <td>Chủ trì 01 rà soát quyền truy cập hàng quý + 01 sự cố diễn tập + đánh giá pass không phát hiện trọng yếu.</td>
-<td>Được làm Data nNgười quản lý/Quy trình Owner; được Requests IT thay đổi cấu hình mốc chuẩn (có phê duyệt).</td>
+<td>Được làm Data Người quản lý/Quy trình Owner; được Requests IT thay đổi cấu hình mốc chuẩn (có phê duyệt).</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <!-- 10) Đánh giá -->
-<h2 class="h2" id="s10">10) Đánh giá: Trắc nNhiệm (≥20) + Tình huống (≥3) + Bài kiểm tra thực hành (bắt buộc)</h2>
-<div class="card" id="trắc nNhiệm">
-<h3 class="h3" style="margin-top:0">10.1 Trắc nNhiệm (25 câu) — trắc nNhiệm + tình huống ngắn</h3>
+<h2 class="h2" id="s10">10) Đánh giá: Trắc Nhiệm (≥20) + Tình huống (≥3) + Bài kiểm tra thực hành (bắt buộc)</h2>
+<div class="card" id="trắc Nhiệm">
+<h3 class="h3" style="margin-top:0">10.1 Trắc Nhiệm (25 câu) — trắc Nhiệm + tình huống ngắn</h3>
 <ol class="iso-list">
 <li>Ba khu vực thông tin trong HESEM gồm những khu vực nào?</li>
 <li>Kho “nguồn sự thật duy nhất” cho Released/Được kiểm soát Tài liệu là kho nào?</li>
@@ -495,7 +495,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>DocType chuẩn dùng trong tên file job gồm những loại nào? Nêu tối thiểu 5 loại.</li>
 <li>Khi nhận CoC vật liệu, file phải lưu ở đâu và gắn vào đâu?</li>
 <li>Khi cần chia sẻ cho đánh giá viên, đối tượng chia sẻ là thư viện WO/Lot hay gói minh chứng? Vì sao?</li>
-<li>Khi thấy nNgười khác bẻ quyền theo file “cho tiện”, hành động bắt buộc là gì?</li>
+<li>Khi thấy Người khác bẻ quyền theo file “cho tiện”, hành động bắt buộc là gì?</li>
 <li>Rủi ro “đúng nội dung nhưng sai trạng thái kiểm soát” xuất hiện khi nào?</li>
 <li>Lưu giữ policy không được “né” bằng cách tạo thư mục nào?</li>
 <li>Khi WO/Lot đã giao hàng, sửa file kiểm tra hồ sơ có được phép không? Mô tả cách xử lý đúng.</li>
@@ -507,7 +507,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>“No bằng chứng = No cổng chặn” áp dụng vào quyết định nào trong chuỗi E2E?</li>
 </ol>
 <div class="note">
-<b>Chấm điểm:</b> đúng ≥ 80% mới qua phần trắc nNhiệm. Dưới ngưỡng là KHÔNG ĐẠT và học lại ngay trong ca tiếp theo.
+<b>Chấm điểm:</b> đúng ≥ 80% mới qua phần trắc Nhiệm. Dưới ngưỡng là KHÔNG ĐẠT và học lại ngay trong ca tiếp theo.
  </div>
 </div>
 <div class="card">
@@ -527,7 +527,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p><b>Yêu cầu:</b> Ra quyết định <b>CHẶN/GO</b>. Nêu cấu hình chia sẻ bắt buộc (chỉ đọc/hết hạn/log). Ghi MRR.</p>
 <ul class="iso-list">
 <li>Quyết định bắt buộc: <b>CHẶN</b> chia sẻ thư mục WO/Lot; chỉ chia sẻ <b>Gói minh chứng</b> chỉ đọc có hết hạn.</li>
-<li>MRR: link gói minh chứng + ảnh hết hạn + FRM-QMS-15 + danh sách nNgười được cấp quyền + thời điểm thu hồi.</li>
+<li>MRR: link gói minh chứng + ảnh hết hạn + FRM-QMS-15 + danh sách Người được cấp quyền + thời điểm thu hồi.</li>
 </ul>
 </details>
 <details>
@@ -543,7 +543,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3" style="margin-top:0">10.3 Bài kiểm tra thực hành (bắt buộc) — bài test + tiêu chí đánh giá + ĐẠT/KHÔNG ĐẠT</h3>
 <div class="callout">
-<b>Mô tả bài test:</b> NNgười học thực hiện trên 01 WO/Lot mô phỏng: nhận 6 file (drawing/spec, bộ định tuyến / lộ trình, phiếu cài đặt, CAM file, CNC program, FQC báo cáo) và 1 Requests chia sẻ cho “khách hàng” phạm vi 2 file. NNgười học phải lưu đúng khu vực, gán phân loại, đặt tên đúng, tạo gói minh chứng chia sẻ chỉ đọc có hết hạn, ghi log FRM-QMS-15, và thực hiện kết thúc / đóng hồ sơ khóa.
+<b>Mô tả bài test:</b> Người học thực hiện trên 01 WO/Lot mô phỏng: nhận 6 file (drawing/spec, bộ định tuyến / lộ trình, phiếu cài đặt, CAM file, CNC program, FQC báo cáo) và 1 Requests chia sẻ cho “khách hàng” phạm vi 2 file. Người học phải lưu đúng khu vực, gán phân loại, đặt tên đúng, tạo gói minh chứng chia sẻ chỉ đọc có hết hạn, ghi log FRM-QMS-15, và thực hiện kết thúc / đóng hồ sơ khóa.
  </div>
 <table class="table">
 <thead><tr><th style="width:280px">Hạng mục chấm</th><th>Tiêu chí ĐẠT</th><th style="width:220px">Lỗi KHÔNG ĐẠT ngay</th></tr></thead>
@@ -582,7 +582,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="iso-list">
 <li><b>ĐẠT</b> khi đồng thời đạt:
  <ul class="iso-list">
-<li>Trắc nNhiệm ≥ <b>80%</b>.</li>
+<li>Trắc Nhiệm ≥ <b>80%</b>.</li>
 <li>Tình huống: 3/3 quyết định đúng (STOP/TẠM GIỮ/CHẶN/GO) và ghi đủ MRR.</li>
 <li>Bài kiểm tra thực hành: đạt ĐẠT cho tất cả hạng mục; không có lỗi KHÔNG ĐẠT ngay.</li>
 <li>OJT đầu ra đủ 3 đầu ra Requests (WO/Lot Tài liệu Set + FRM-QMS-15 + Gói minh chứng) có chữ ký QA/QMS.</li>
@@ -608,7 +608,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>MRR-25-01</b></td><td>Ảnh chụp đường dẫn “source of sự thật” cho drawing/spec và program (Hạn chế).</td><td>Hồ sơ công việc/Closeout_Lock</td></tr>
 <tr><td><b>MRR-25-02</b></td><td>Bảng kiểm vận hành mục 8 ký xác nhận (theo vai trò).</td><td>QMS-Hồ sơ/Training</td></tr>
 <tr><td><b>MRR-25-03</b></td><td>FRM-QMS-15 Truy cập DCR hồ sơ (cấp quyền/chia sẻ).</td><td>QMS-Hồ sơ/IT_Evidence</td></tr>
-<tr><td><b>MRR-25-04</b></td><td>Gói minh chứng chia sẻ chỉ đọc có hết hạn + danh sách nNgười được cấp.</td><td>Z_Audit_Evidence_Pack</td></tr>
+<tr><td><b>MRR-25-04</b></td><td>Gói minh chứng chia sẻ chỉ đọc có hết hạn + danh sách Người được cấp.</td><td>Z_Audit_Evidence_Pack</td></tr>
 <tr><td><b>MRR-25-05</b></td><td>Biên bản điểm / tại chỗ-kiểm tra tuân thủ (mẫu WO/Lot).</td><td>QMS-Hồ sơ/đợt đánh giá</td></tr>
 <tr><td><b>MRR-25-06</b></td><td>kết thúc / đóng hồ sơ bảng kiểm + trạng thái khóa/lưu giữ của WO/Lot.</td><td>Hồ sơ công việc/Closeout_Lock</td></tr>
 </tbody>

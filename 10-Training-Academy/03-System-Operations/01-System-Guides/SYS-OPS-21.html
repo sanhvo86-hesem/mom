@@ -77,7 +77,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Kho</b>: kiểm đếm – đóng gói – nhãn lot/số sê-ri; vận hành điều phối xuất hàng bảng kiểm FRM-PUR-004; cách ly lô TẠM GIỮ.</li>
 <li><b>Planner/Supervisor</b>: khóa lịch, bộ đệm / vùng đệm thời gian dẫn (lead time); không cho chạy “tắt” khi cổng kiểm soát chưa PASS.</li>
 <li><b>Kỹ thuật/Lập trình viên (CNC)/Setup/Operator</b>: xác định Requests kỹ thuật/hoàn thành/che phủ (masking); bảo vệ bề mặt; cung cấp thông tin kỹ thuật đúng phiên bản cho Mua hàng.</li>
-<li><b>NNgười định giá (SAL-03)</b>: khóa Requests khách hàng/hợp đồng; xác nhận Requests chứng chỉ; phát tín hiệu thay đổi.</li>
+<li><b>Người định giá (SAL-03)</b>: khóa Requests khách hàng/hợp đồng; xác nhận Requests chứng chỉ; phát tín hiệu thay đổi.</li>
 </ul>
 </div>
 <h2 class="h2">3) Vị trí trong chuỗi E2E + luồng bàn giao + “điểm chặn”</h2>
@@ -226,7 +226,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>STOP &amp; báo cáo vượt cấp:</b> Phát hiện NCC thay đổi sub‑tier/quy trình/nguyên vật liệu khi chưa có phê duyệt; kích hoạt điều tra + ngăn chặn ngay.</li>
 </ol>
 </div>
-<h2 class="h2">7) Phản ứng 60 giây (khi gặp rủi ro “chết nNgười”)</h2>
+<h2 class="h2">7) Phản ứng 60 giây (khi gặp rủi ro “chết Người”)</h2>
 <div class="danger">
 <b>Mục tiêu:</b> 60 giây đầu phải khóa vật lý + khóa hồ sơ + khóa quyết định. Không tranh luận tại hiện trường. Không cho lô chạy tiếp.
  </div>
@@ -327,7 +327,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>L4</td>
-<td>Dẫn dắt đánh giá NCC theo rủi ro; thiết kế kế hoạch kiểm soát cho công đoạn đặc biệt; huấn luyện lại nNgười khác; giảm lặp NCR liên quan NCC bằng hành động có hiệu lực.</td>
+<td>Dẫn dắt đánh giá NCC theo rủi ro; thiết kế kế hoạch kiểm soát cho công đoạn đặc biệt; huấn luyện lại Người khác; giảm lặp NCR liên quan NCC bằng hành động có hiệu lực.</td>
 <td>Minh chứng cải tiến + phê duyệt Supervisor/QA/QMS</td>
 <td>Được chủ trì thay đổi tiêu chí/ngưỡng thẻ điểm &amp; phê duyệt NCC rủi ro cao theo quy trình</td>
 </tr>
@@ -340,7 +340,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Kho:</b> đạt khi vận hành FRM-PUR-004, nhãn lot/số sê-ri chuẩn, ảnh hiện trạng đầy đủ, không để vượt qua cổng kiểm soát.</li>
 <li><b>Kỹ thuật/Lập trình viên (CNC)/Setup/Operator:</b> đạt khi cung cấp Requests hoàn thiện bề mặt/CTQ rõ và bảo vệ bề mặt đúng hướng dẫn khi bàn giao kho.</li>
 <li><b>Planner/Supervisor:</b> đạt khi khóa lịch không cho “chạy tắt” và xử lý escalation theo fail-nhanh quy tắc.</li>
-<li><b>NNgười định giá (SAL-03):</b> đạt khi xác nhận Requests chứng chỉ và chuyển thông tin thay đổi tới Mua hàng/QA trong nNgày phát sinh.</li>
+<li><b>Người định giá (SAL-03):</b> đạt khi xác nhận Requests chứng chỉ và chuyển thông tin thay đổi tới Mua hàng/QA trong Ngày phát sinh.</li>
 </ul>
 </div>
 <h2 class="h2">10) Đánh giá</h2>
@@ -371,7 +371,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Tiêu chí PASS cho vai trò Kho trong mô-đun này là gì?</li>
 </ol>
 <details class="note">
-<summary><b>Đáp án chuẩn cho NNgười đào tạo (mở khi chấm)</b></summary>
+<summary><b>Đáp án chuẩn cho Người đào tạo (mở khi chấm)</b></summary>
 <ol>
 <li>NCC phải nằm trong ASL/AVL và có FRM-PUR-002 đầy đủ minh chứng.</li>
 <li>Part No/Drawing No/Rev; spec; phạm vi công việc; CTQ; chứng chỉ; truy xuất nguồn gốc; thay đổi; đóng gói/vận chuyển.</li>
@@ -387,7 +387,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Hàng đi/nhận/chạy khi chưa PASS cổng kiểm soát và chưa có hồ sơ.</li>
 <li>Sai Rev; thiếu cert; lẫn lộn/lẫn lô; vượt qua cổng kiểm soát; đóng gói trầy xước; sub-tier không phê duyệt…</li>
 <li>STOP &amp; báo cáo vượt cấp; CHẶN lô/PO; đánh giá lại và phê duyệt thay đổi trước khi tiếp tục.</li>
-<li>&gt; 5 nNgày làm việc.</li>
+<li>&gt; 5 Ngày làm việc.</li>
 <li>&lt; 90%.</li>
 <li>Mở SCAR + tăng kiểm tra đầu vào + escalation Mua hàng → QA → GD.</li>
 <li>Tại mọi quyết định GO/PHÁT HÀNH (cổng kiểm soát gửi/nhận/phát hành).</li>

@@ -91,7 +91,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li><b>Mục tiêu:</b> vận hành đúng “1 nguồn đúng”, chặn sai Rev, chặn ship thiếu gói hồ sơ, giữ truy vết ISO 9001 (thông tin dạng văn bản).</li>
 <li><b>Phạm vi dữ liệu:</b> Job, Vận hành, Nhân công, Lô giao hàng, SSCC/Pack, Evidence liên kết, ApprovalHistory, IntegrationLogs/cài đặt.</li>
-<li><b>Đối tượng:</b> Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, NNgười định giá (SAL-03), Supervisor.</li>
+<li><b>Đối tượng:</b> Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor.</li>
 </ul>
 <div class="callout">
 <h3>Vai trò dùng mô-đun vào việc gì</h3>
@@ -107,7 +107,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Mua hàng</td><td>Outsource/chứng chỉ, tránh thiếu chứng từ</td><td>OutsourceMirror, Hồ sơ công việc (chứng chỉ)</td></tr>
 <tr><td>Bảo trì</td><td>Thời gian nTừng máy Log chuẩn để phản ánh OEE</td><td>Thời gian nTừng máy Log (list liên quan) IncidentLog (SharePoint List) + Teams: QMS-ALERT.</td></tr>
 <tr><td>EHS</td><td>Hành động an toàn vào Tier bảng</td><td>StandupActions (Mức nghiêm trọng/SLA)</td></tr>
-<tr><td>NNgười định giá (SAL-03)</td><td>Cam kết giao hàng dựa trên cổng kiểm soát</td><td>ShipRelease.Trạng thái, Gate_ShipReady, OTD</td></tr>
+<tr><td>Người định giá (SAL-03)</td><td>Cam kết giao hàng dựa trên cổng kiểm soát</td><td>ShipRelease.Trạng thái, Gate_ShipReady, OTD</td></tr>
 <tr><td>Supervisor</td><td>Trung tâm điều hành (control tháp / cột): lỗi sync, vấn đề chặn, escalations</td><td>IntegrationLogs, StandupActions, Data Sức khỏe</td></tr>
 </tbody>
 </table>
@@ -118,11 +118,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>2) Vị trí trong chuỗi end‑to‑end và điểm bàn giao</h2>
 <p><b>Chuỗi E2E (điểm bàn giao):</b></p>
 <ol>
-<li>NNgười định giá (SAL-03) nhận PO → tạo Đơn hàng/Job trong Epicor.</li>
-<li>Planner tạo/điều chỉnh lộ trình gia công, nNgày đến hạn, phát hành job.</li>
+<li>Người định giá (SAL-03) nhận PO → tạo Đơn hàng/Job trong Epicor.</li>
+<li>Planner tạo/điều chỉnh lộ trình gia công, Ngày đến hạn, phát hành job.</li>
 <li>tích hợp Pack chạy BAQ → REST/OData → cập nhật/thêm mới (upsert) vào M365 danh sách (phản chiếu / sao chép) + tạo Hồ sơ công việc.</li>
 <li>OPS thực thi (log Hold/NCR/Đóng gói/ShipRelease) trong M365, bằng chứng lưu vào Hồ sơ công việc.</li>
-<li>Cổng kiểm soát phê duyệt giao hàng chạy nNgười xác nhận: PASS → ĐÃ PHÁT HÀNH, lỗi → ĐÃ CHẶN + tạo StandupAction.</li>
+<li>Cổng kiểm soát phê duyệt giao hàng chạy Người xác nhận: PASS → ĐÃ PHÁT HÀNH, lỗi → ĐÃ CHẶN + tạo StandupAction.</li>
 <li>Power BI đọc danh sách để bảng điều khiển KPI + Data Sức khỏe.</li>
 </ol>
 <div class="callout ok">
@@ -173,7 +173,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>7</td><td>Nhầm Rev giữa Job và Part/REV Bản gốc</td><td>JobIndex.RevisionNum khác thư mục REV</td><td>Chạy sai chương trình/drawing</td><td>Hold ngay; mở QCHoldLog ReasonCode=WrongRev; kiểm tra Part/REV</td><td>QCHoldLog + ảnh/đường dẫn file Rev đúng</td></tr>
 <tr><td>8</td><td>Điều tiết SharePoint</td><td>Luồng fail 429/503</td><td>công việc tồn đọng, trễ dữ liệu</td><td>Giảm batch; bật thử lại/chờ lùi (backoff); giãn lịch; ghi IntegrationLogs</td><td>IntegrationLogs + thông số thử lại/batch</td></tr>
 <tr><td>9</td><td>Thiếu ApprovalHistory</td><td>Hồ sơ đóng nhưng không có ApprovalHistory</td><td>Không đánh giá được phê duyệt</td><td>Chặn đóng hồ sơ; chạy lại phê duyệt luồng; đào tạo lại Approver</td><td>ApprovalHistory + hồ sơ URL</td></tr>
-<tr><td>10</td><td>bộ hồ sơ giao hàng thiếu (cổng kiểm soát lỏng)</td><td>ShipRelease nNgười xác nhận FAIL hoặc PacketComplete=No</td><td>Ship sai/thiếu → khiếu nại khách</td><td>ĐÃ CHẶN + StandupAction S1; bổ sung chứng từ; re-xác nhận hiệu lực</td><td>ShipRelease + thư mục bộ hồ sơ giao hàng + Final IR/CoC</td></tr>
+<tr><td>10</td><td>bộ hồ sơ giao hàng thiếu (cổng kiểm soát lỏng)</td><td>ShipRelease Người xác nhận FAIL hoặc PacketComplete=No</td><td>Ship sai/thiếu → khiếu nại khách</td><td>ĐÃ CHẶN + StandupAction S1; bổ sung chứng từ; re-xác nhận hiệu lực</td><td>ShipRelease + thư mục bộ hồ sơ giao hàng + Final IR/CoC</td></tr>
 </tbody>
 </table>
 </div>
@@ -200,7 +200,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card">
 <h3>R5. Cổng kiểm soát Phê duyệt giao hàng</h3>
-<p class="mini">Luồng nNgười xác nhận chặn ship; mọi ngoại lệ bắt buộc có ApprovalHistory.</p>
+<p class="mini">Luồng Người xác nhận chặn ship; mọi ngoại lệ bắt buộc có ApprovalHistory.</p>
 </div>
 <div class="card">
 <h3>R6. Bộ bằng chứng chuẩn</h3>
@@ -214,7 +214,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li><b>Khi EpicorLastSync quá hạn</b> → DỪNG dùng phản chiếu / sao chép cho quyết định cổng kiểm soát/ship; mở Epicor để xác nhận; tạo StandupAction S1.</li>
 <li><b>Khi JobIndex.RevisionNum khác Rev đang vận hành</b> → DỪNG sản xuất/pack; tạo QCHoldLog; khóa phát hành chương trình.</li>
-<li><b>Khi ShipRelease nNgười xác nhận báo FAIL/ĐÃ CHẶN</b> → DỪNG ship; không xuất kho; bổ sung MRR đúng thư mục; chạy lại xác nhận hiệu lực.</li>
+<li><b>Khi ShipRelease Người xác nhận báo FAIL/ĐÃ CHẶN</b> → DỪNG ship; không xuất kho; bổ sung MRR đúng thư mục; chạy lại xác nhận hiệu lực.</li>
 </ol>
 </div>
 <p class="mini"><b>Luật chung:</b> mọi “dừng” phải để lại dấu vết: Hold/NCR/StandupAction/IntegrationLogs.</p>
@@ -261,7 +261,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card">
 <h2>8) Bảng kiểm vận hành chuẩn (≤ 15 bước)</h2>
-<p class="mini">Bảng kiểm áp dụng cho ca trưởng/supervisor và nNgười trực IT/QMS.</p>
+<p class="mini">Bảng kiểm áp dụng cho ca trưởng/supervisor và Người trực IT/QMS.</p>
 <div class="table-wrap">
 <table class="table tight">
 <thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Evidence (MRR)</th><th>Lỗi hay gặp</th></tr></thead>
@@ -276,8 +276,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>8</td><td>Kiểm tra ApprovalHistory đủ cho phê duyệt giao hàng, NCR/CAPA kết thúc / đóng</td><td>QA</td><td>ApprovalHistory lọc theo SourceList</td><td>Phê duyệt qua chat/miệng</td></tr>
 <tr><td>9</td><td>Kiểm tra đặt tên bằng chứng Tier 1 theo ANNEX-QMS-003</td><td>Doc Control</td><td>Danh sách file Tier 1 + tên file</td><td>tên tập tin có dấu/ký tự không hợp lệ</td></tr>
 <tr><td>10</td><td>Kiểm tra bảng điều khiển làm mới trạng thái (JobIndex/ShipRelease nhịp độ / chu kỳ họp)</td><td>IT</td><td>Làm mới log + thời điểm Cần nhất</td><td>Bảng điều khiển hiển thị “cũ” mà không báo</td></tr>
-<tr><td>11</td><td>Đóng phân loại ưu tiên: StandupActions Mức nghiêm trọng S1/S2 có Responsible Person + nNgày đến hạn</td><td>Supervisor</td><td>StandupActions list</td><td>Không gán Responsible Person rõ</td></tr>
-<tr><td>12</td><td>Ghi nhận học viên OJT hoàn thành hiệu suất test</td><td>NNgười đào tạo</td><td>Phiếu chấm + link bằng chứng</td><td>Chấm “đạt” không có dấu vết</td></tr>
+<tr><td>11</td><td>Đóng phân loại ưu tiên: StandupActions Mức nghiêm trọng S1/S2 có Responsible Person + Ngày đến hạn</td><td>Supervisor</td><td>StandupActions list</td><td>Không gán Responsible Person rõ</td></tr>
+<tr><td>12</td><td>Ghi nhận học viên OJT hoàn thành hiệu suất test</td><td>Người đào tạo</td><td>Phiếu chấm + link bằng chứng</td><td>Chấm “đạt” không có dấu vết</td></tr>
 </tbody>
 </table>
 </div>
@@ -322,7 +322,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>1</td><td>Xác nhận PackID/SSCC trong PackSSCCRegister trạng thái Đã xác minh</td><td>Chặn nhầm nhãn/nhầm pack</td></tr>
 <tr><td>2</td><td>Xác nhận PackagingChecks PASS + có PhotosUrl</td><td>Chứng minh đóng gói đúng</td></tr>
 <tr><td>3</td><td>Xác nhận Final IR/FAI PASS có ReportUrl trong InspectionReports</td><td>Chặn ship thiếu kiểm tra</td></tr>
-<tr><td>4</td><td>Tạo/ cập nhật ShipRelease: PacketComplete=Yes; chạy nNgười xác nhận</td><td>Cổng kiểm soát tự động; giảm sai sót thủ công</td></tr>
+<tr><td>4</td><td>Tạo/ cập nhật ShipRelease: PacketComplete=Yes; chạy Người xác nhận</td><td>Cổng kiểm soát tự động; giảm sai sót thủ công</td></tr>
 <tr><td>5</td><td>Đảm bảo ApprovalHistory có quyết định phê duyệt</td><td>Đánh giá bắt buộc</td></tr>
 </tbody>
 </table>
@@ -423,13 +423,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="mini">A. IntegrationSettings • B. ApprovalHistory • C. Hồ sơ công việc • D. ShipRelease</div>
 </li>
 <li><b>(MC)</b> Cập nhật/Thêm mới tính bất biến (idempotent) dựa trên gì?
- <div class="mini">A. Tiêu đề file • B. Khoá tự nhiên (EpicorKey/JobNum+OprSeq…) • C. Màu bảng điều khiển • D. NNgười nhập</div>
+ <div class="mini">A. Tiêu đề file • B. Khoá tự nhiên (EpicorKey/JobNum+OprSeq…) • C. Màu bảng điều khiển • D. Người nhập</div>
 </li>
 <li><b>(MC)</b> Điều tiết SharePoint hay trả mã nào?
  <div class="mini">A. 200 • B. 201 • C. 429/503 • D. 302</div>
 </li>
 <li><b>(MC)</b> Khi run FAIL, con trỏ xử lý ra sao?
- <div class="mini">A. Cập nhật lên utcNow • B. Giữ nguyên • C. Trừ 7 nNgày • D. Xoá</div>
+ <div class="mini">A. Cập nhật lên utcNow • B. Giữ nguyên • C. Trừ 7 Ngày • D. Xoá</div>
 </li>
 <li><b>(MC)</b> “Không có bằng chứng = không có cổng kiểm soát” áp dụng mạnh nhất ở cổng kiểm soát nào?
  <div class="mini">A. Giao ca • B. phê duyệt giao hàng • C. Họp tuần • D. Chấm công</div>
@@ -459,7 +459,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>(Tình huống ngắn)</b> Bảng điều khiển OTD lệch; nghi ngờ DueDate bị sai múi giờ. Chuỗi kiểm tra 5 bước.</li>
 </ol>
 <div class="callout" style="margin-top:10px">
-<h3>Đáp án (dùng cho nNgười đào tạo)</h3>
+<h3>Đáp án (dùng cho Người đào tạo)</h3>
 <p class="mini">1B, 2B, 3B, 4B, 5A, 6B, 7C, 8B, 9B, 10A, 11B, 12A, 13B, 14A, 15B</p>
 <p class="mini">Câu 16–20 chấm theo tiêu chí đánh giá: đúng “nguồn đúng”, đúng cổng kiểm soát, có dấu vết, đúng trình tự.</p>
 </div>
@@ -487,7 +487,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>SC-03: Stop‑ship bị kích hoạt</td>
 <td>ShipRelease ĐÃ CHẶN, PacketComplete=No</td>
-<td>Bổ sung bộ hồ sơ giao hàng Tier 1; đảm bảo Final IR/CoC/Cert; chạy nNgười xác nhận; ApprovalHistory</td>
+<td>Bổ sung bộ hồ sơ giao hàng Tier 1; đảm bảo Final IR/CoC/Cert; chạy Người xác nhận; ApprovalHistory</td>
 <td>ShipRelease ĐÃ PHÁT HÀNH hợp lệ</td>
 <td>ShipRelease + thư mục bộ hồ sơ giao hàng + ApprovalHistory</td>
 </tr>
@@ -520,7 +520,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>WHS</td>
 <td>Đăng ký SSCC + PackagingChecks + ShipRelease; xử lý từ ĐÃ CHẶN → ĐÃ PHÁT HÀNH</td>
-<td>PASS đủ điều kiện; nNgười xác nhận chuyển ĐÃ PHÁT HÀNH; phê duyệt có log</td>
+<td>PASS đủ điều kiện; Người xác nhận chuyển ĐÃ PHÁT HÀNH; phê duyệt có log</td>
 <td>Xuất kho khi ĐÃ CHẶN; sửa Trạng thái bằng tay</td>
 <td>PackSSCCRegister + PackagingChecks + ShipRelease + ApprovalHistory</td>
 </tr>

@@ -142,7 +142,7 @@ td,th{}
 <li>Rà soát cam kết đơn hàng (Contract Review), họp triển khai (Kickoff).</li>
 <li>Engineering release &amp; IQC song song, Setup, FAI, IPQC, Final QC.</li>
 <li>Ship release, hóa đơn request và job close.</li>
-<li>Mọi thay đổi cam kết sau PO (revision, nNgày giao, scope).</li>
+<li>Mọi thay đổi cam kết sau PO (revision, Ngày giao, scope).</li>
 </ul>
 </div>
 <div class="callout-card"><h3>Không thay thế</h3>
@@ -185,7 +185,7 @@ td,th{}
 <div class="table-card"><table class="table">
 <thead><tr><th>Vai trò</th><th>Trách nhiệm chính</th><th>Quyền / điểm chặn</th></tr></thead>
 <tbody>
-<tr><td><b>CS (Customer Service)</b></td><td>Tiếp nhận RFQ, làm rõ yêu cầu, điều phối Contract Review, duy trì kênh liên lạc khách hàng, theo dõi cam kết nNgày giao.</td><td>HOLD RFQ khi thiếu thông tin. Không cho phát hành báo giá khi chưa đủ dữ liệu đầu vào.</td></tr>
+<tr><td><b>CS (Customer Service)</b></td><td>Tiếp nhận RFQ, làm rõ yêu cầu, điều phối Contract Review, duy trì kênh liên lạc khách hàng, theo dõi cam kết Ngày giao.</td><td>HOLD RFQ khi thiếu thông tin. Không cho phát hành báo giá khi chưa đủ dữ liệu đầu vào.</td></tr>
 <tr><td><b>Sales / Báo giá</b></td><td>Tính giá, xác nhận giả định thương mại, phát hành báo giá, đàm phán PO.</td><td>Từ chối báo giá khi margin dưới ngưỡng cho phép.</td></tr>
 <tr><td><b>Engineering Lead</b></td><td>DFM review, phát hành Baseline Package (drawing, BOM, routing), xử lý ECR/ECO.</td><td>HOLD G1 khi thiếu thông tin kỹ thuật hoặc drawing chưa rõ ràng. Không release Baseline Package khi còn open question.</td></tr>
 <tr><td><b>Production Planner</b></td><td>Lập kế hoạch sản xuất, cấp việc, theo dõi WIP, điều phối outsource.</td><td>HOLD G3 Setup khi G1 hoặc G2 chưa hoàn tất. Điều chỉnh ưu tiên theo năng lực hữu hạn.</td></tr>
@@ -218,7 +218,7 @@ td,th{}
 <!-- ══════════════════════════════════════════════ -->
 <h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2>
 <div class="field-grid">
-<div class="field"><b>Đầu vào bắt buộc</b><div class="blank">RFQ từ khách hàng (email/portal) kèm drawing, model, spec, số lượng, nNgày giao yêu cầu, yêu cầu chất lượng đặc biệt (nếu có).</div></div>
+<div class="field"><b>Đầu vào bắt buộc</b><div class="blank">RFQ từ khách hàng (email/portal) kèm drawing, model, spec, số lượng, Ngày giao yêu cầu, yêu cầu chất lượng đặc biệt (nếu có).</div></div>
 <div class="field"><b>Đầu ra bắt buộc</b><div class="blank">Hàng giao đúng spec + CoC + Invoice + Job Dossier hoàn chỉnh đã đóng trên hệ thống.</div></div>
 <div class="field"><b>Điều kiện kích hoạt</b><div class="blank">Khách hàng gửi RFQ hoặc PO mới / PO thay đổi. CS log vào <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-201_RFQ_Register.xlsx">FRM-201</a> trong vòng 4 giờ làm việc.</div></div>
 <div class="field"><b>Điều kiện không được chuyển bước</b><div class="blank">Thiếu bất kỳ bằng chứng bắt buộc tại gate hiện tại. Chưa có chữ ký release của chủ trì gate. NCR mở chưa xử lý ảnh hưởng đến gate tiếp theo.</div></div>
@@ -285,15 +285,15 @@ td,th{}
 <li>RFQ từ khách hàng (email, portal, fax) đã log trên <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-201_RFQ_Register.xlsx">FRM-201</a>.</li>
 <li>Drawing/model/spec kèm revision rõ ràng.</li>
 <li>Yêu cầu chất lượng: CoC, FAI, truy xuất, clean, cert vật liệu.</li>
-<li>Điều kiện thương mại: số lượng, Incoterm, payment term, nNgày giao.</li>
+<li>Điều kiện thương mại: số lượng, Incoterm, payment term, Ngày giao.</li>
 </ul>
 </div>
 <div class="callout-card"><h3>Hoạt động</h3>
 <ul class="tight">
 <li>CS log RFQ vào <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-201_RFQ_Register.xlsx">FRM-201</a> trong vòng 4 giờ làm việc. Gán mã RFQ, phân loại new/repeat/change.</li>
 <li>CS kiểm tra đủ dữ liệu đầu vào. Thiếu thông tin &rarr; gửi clarification cho khách hàng, trạng thái RFQ = HOLD&ndash;Clarification.</li>
-<li>Engineering xác nhận khả thi gia công (DFM feasibility) trong 1 nNgày làm việc.</li>
-<li>Planning xác nhận năng lực máy/nhân sự trong 1 nNgày làm việc.</li>
+<li>Engineering xác nhận khả thi gia công (DFM feasibility) trong 1 Ngày làm việc.</li>
+<li>Planning xác nhận năng lực máy/nhân sự trong 1 Ngày làm việc.</li>
 <li>QA xác nhận khả năng đáp ứng yêu cầu kiểm tra/cert.</li>
 <li>Sales tính giá trên cơ sở giả định đã khóa, phát hành báo giá.</li>
 <li>Khi nhận PO, CS + QA hoàn tất <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> Contract Review Checklist &mdash; khóa part/rev/qty/spec/date.</li>
@@ -319,7 +319,7 @@ td,th{}
 <li><b>HOLD&ndash;C:</b> Incoterm, packing, payment term chưa xác nhận.</li>
 <li><b>HOLD&ndash;Q:</b> Yêu cầu FAI/CoC/cert/truy xuất chưa rõ.</li>
 <li><b>HOLD&ndash;CAP:</b> Chưa xác nhận năng lực máy hoặc outsource slot.</li>
-<li>HOLD &gt; 2 nNgày &rarr; escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</li>
+<li>HOLD &gt; 2 Ngày &rarr; escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</li>
 </ul>
 </div>
 </div>
@@ -336,7 +336,7 @@ td,th{}
 <div class="boxed-list"><div class="lane-title">KPI G0</div>
 <ul class="tight">
 <li>RFQ response &le; 24 giờ.</li>
-<li>Contract Review cycle &le; 3 nNgày làm việc.</li>
+<li>Contract Review cycle &le; 3 Ngày làm việc.</li>
 </ul>
 </div>
 </div>
@@ -380,7 +380,7 @@ td,th{}
 <ul class="tight">
 <li><b>HOLD:</b> Drawing mâu thuẫn hoặc thiếu dimension critical &rarr; gửi clarification cho khách qua CS.</li>
 <li><b>HOLD:</b> Không khả thi gia công &rarr; đề xuất thay thế qua CS, chờ khách chấp thuận.</li>
-<li>HOLD &gt; 2 nNgày &rarr; escalation Engineering Lead &rarr; Ops Manager.</li>
+<li>HOLD &gt; 2 Ngày &rarr; escalation Engineering Lead &rarr; Ops Manager.</li>
 </ul>
 </div>
 </div>
@@ -395,7 +395,7 @@ td,th{}
 </div>
 <div class="boxed-list"><div class="lane-title">KPI G1</div>
 <ul class="tight">
-<li>Engineering release cycle &le; 2 nNgày làm việc (standard part), &le; 5 nNgày (complex part).</li>
+<li>Engineering release cycle &le; 2 Ngày làm việc (standard part), &le; 5 Ngày (complex part).</li>
 <li>DFM issue rate &le; 5% tổng job.</li>
 </ul>
 </div>
@@ -441,7 +441,7 @@ td,th{}
 <ul class="tight">
 <li><b>HOLD:</b> Vật tư không đạt IQC &rarr; cách ly + NCR + thông báo nhà cung cấp.</li>
 <li><b>HOLD:</b> Mill Cert thiếu hoặc không khớp &rarr; yêu cầu nhà cung cấp bổ sung.</li>
-<li><b>HOLD:</b> Vật tư trễ hẹn &gt; 2 nNgày &rarr; escalation Purchasing Manager theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</li>
+<li><b>HOLD:</b> Vật tư trễ hẹn &gt; 2 Ngày &rarr; escalation Purchasing Manager theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</li>
 </ul>
 </div>
 </div>
@@ -717,7 +717,7 @@ td,th{}
 <ul class="tight">
 <li>G6 Release: Final QC PASS, CoC phát hành, lot tại Shipping area.</li>
 <li>Yêu cầu đóng gói/labeling từ Contract Review (<a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a>).</li>
-<li>Shipping instruction (Incoterm, carrier, address, nNgày giao cam kết).</li>
+<li>Shipping instruction (Incoterm, carrier, address, Ngày giao cam kết).</li>
 </ul>
 </div>
 <div class="callout-card"><h3>Hoạt động</h3>
@@ -726,7 +726,7 @@ td,th{}
 <li>Logistics kiểm tra: qty khớp CoC, labeling đúng part/rev/lot, packing list đầy đủ.</li>
 <li>Logistics lập bộ chứng từ giao hàng: Packing List, CoC, Delivery Note, Material Cert (nếu yêu cầu).</li>
 <li>QA/QC Lead ký Ship Release trên <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx">FRM-702</a>.</li>
-<li>CS thông báo khách hàng nNgày giao, tracking number.</li>
+<li>CS thông báo khách hàng Ngày giao, tracking number.</li>
 <li>Logistics giao hàng hoặc bàn giao carrier.</li>
 <li>Logistics ghi nhận Shipment trên Epicor (Customer Shipment Entry).</li>
 <li>Logistics mở <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-821_Invoice_Request.xlsx">FRM-821</a> Invoice Request trong vòng 24 giờ sau giao hàng.</li>
@@ -740,7 +740,7 @@ td,th{}
 <div class="grid-2">
 <div class="boxed-list"><div class="lane-title">Tiêu chí Release G7</div>
 <ul class="tight">
-<li>Hàng giao đúng qty, đúng part/rev, đúng nNgày cam kết (hoặc đã thông báo thay đổi).</li>
+<li>Hàng giao đúng qty, đúng part/rev, đúng Ngày cam kết (hoặc đã thông báo thay đổi).</li>
 <li>Bộ chứng từ giao hàng đầy đủ: Packing List + CoC + Delivery Note.</li>
 <li><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx">FRM-702</a> ký đủ.</li>
 <li>Invoice Request (<a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-821_Invoice_Request.xlsx">FRM-821</a>) mở trong 24 giờ.</li>
@@ -754,7 +754,7 @@ td,th{}
 <li><b>HOLD:</b> Qty không khớp CoC &rarr; kiểm tra lại trước khi ship.</li>
 <li><b>HOLD:</b> CoC chưa ký / thiếu cert &rarr; không ship.</li>
 <li><b>HOLD:</b> Invoice hold do chứng từ không khớp &rarr; AR trả về nguồn (Logistics/QA/CS) xử lý.</li>
-<li>Job chưa close &gt; 5 nNgày sau giao hàng cuối &rarr; escalation Planner &rarr; Ops Manager.</li>
+<li>Job chưa close &gt; 5 Ngày sau giao hàng cuối &rarr; escalation Planner &rarr; Ops Manager.</li>
 </ul>
 </div>
 </div>
@@ -773,7 +773,7 @@ td,th{}
 <ul class="tight">
 <li>OTD &ge; 95%.</li>
 <li>Invoice request &le; 24 giờ sau ship.</li>
-<li>Job close &le; 5 nNgày sau giao hàng cuối.</li>
+<li>Job close &le; 5 Ngày sau giao hàng cuối.</li>
 </ul>
 </div>
 </div>
@@ -791,7 +791,7 @@ td,th{}
 <h3>7.10 Quy tắc phản ứng khi đơn hàng lệch cam kết</h3>
 <ul class="tight">
 <li>Khi dự báo trễ giao &gt; 24 giờ so với cam kết, Planner và CS PHẢI kích hoạt escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> trong cùng ngày.</li>
-<li>Khi lệch do nhà cung cấp, vật tư, công đoạn đặc biệt hoặc khách hàng clarification chậm, nguyên nhân gốc và nNgười phản hồi khách hàng PHẢI được ghi trong Job Dossier.</li>
+<li>Khi lệch do nhà cung cấp, vật tư, công đoạn đặc biệt hoặc khách hàng clarification chậm, nguyên nhân gốc và Người phản hồi khách hàng PHẢI được ghi trong Job Dossier.</li>
 <li>Đơn hàng có miss date, premium freight, khiếu nại, debit note hoặc margin sai lệch vượt ngưỡng PHẢI vào rà soát tại tier meeting và management review.</li>
 </ul>
 
@@ -803,7 +803,7 @@ td,th{}
 <colgroup><col style="width:15%"/><col style="width:33%"/><col style="width:14%"/><col style="width:16%"/><col style="width:22%"/></colgroup>
 <thead><tr><th>Tình huống</th><th>Quy tắc xử lý bắt buộc</th><th>Chủ trì</th><th>Approver / gỡ HOLD</th><th>Hồ sơ bắt buộc</th></tr></thead>
 <tbody>
-<tr><td>Khách thay revision sau PO</td><td>Đóng băng job. Đánh giá lại giá, nNgày giao, vật tư, WIP, FAI và baseline. Chỉ tiếp tục khi thay đổi được chấp nhận chính thức.</td><td>CS + Engineering</td><td>Engineering Lead + QA + Sales Lead</td><td><a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> + <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-161_ECR_ECO.xlsx">FRM-161</a> ECR/ECO + cập nhật <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a></td></tr>
+<tr><td>Khách thay revision sau PO</td><td>Đóng băng job. Đánh giá lại giá, Ngày giao, vật tư, WIP, FAI và baseline. Chỉ tiếp tục khi thay đổi được chấp nhận chính thức.</td><td>CS + Engineering</td><td>Engineering Lead + QA + Sales Lead</td><td><a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> + <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-161_ECR_ECO.xlsx">FRM-161</a> ECR/ECO + cập nhật <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a></td></tr>
 <tr><td>Đơn Cấp / expedite</td><td>Được đổi thứ tự ưu tiên; KHÔNG được bỏ Contract Review, FAI hoặc Final QC. Đi qua đầy đủ 8 gate.</td><td>Planner</td><td>Ops Manager + QA/QC Lead</td><td>Escalation log + replan note + <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-209_High_Risk_Job_Readiness_Review.xlsx">FRM-209</a></td></tr>
 <tr><td>Partial ship</td><td>Chỉ giao phần đã Final QC PASS, chứng từ tách bạch, khách chấp thuận.</td><td>Logistics + CS</td><td>QA/QC Lead + Sales Lead</td><td>Partial ship record + khách chấp thuận bằng văn bản</td></tr>
 <tr><td>Khách yêu cầu waiver chứng từ hoặc bỏ kiểm</td><td>Chỉ áp dụng khi có văn bản chấp thuận khách hàng và QA xác nhận rủi ro chấp nhận được.</td><td>CS</td><td>QA/QC Lead + Sales Lead</td><td>Concession record</td></tr>

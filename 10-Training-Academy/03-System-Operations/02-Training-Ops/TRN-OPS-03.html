@@ -116,7 +116,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Planner</b></td><td>Dùng ma trận kỹ năng (matrix) để lập ca; chặn giao việc vượt Level</td><td>L3 Requests kế hoạch ca có phân bổ theo Level và bằng chứng kiểm tra</td></tr>
 <tr><td><b>Bảo trì</b></td><td>Xác nhận năng lực LOTO/PM; ghi nhận diễn tập</td><td>L3 Requests hiệu suất test LOTO + bàn giao an toàn</td></tr>
 <tr><td><b>EHS</b></td><td>Xác nhận năng lực an toàn; đánh giá tuân thủ</td><td>L3 Requests tình huống đánh giá phát hiện &amp; đóng hành động</td></tr>
-<tr><td><b>NNgười định giá (SAL-03)</b></td><td>Bàn giao Requests khách liên quan chứng chỉ/phê duyệt giao hàng</td><td>L3 Requests hồ sơ bàn giao đầy đủ, tránh thiếu Requests tại báo giá/hợp đồng</td></tr>
+<tr><td><b>Người định giá (SAL-03)</b></td><td>Bàn giao Requests khách liên quan chứng chỉ/phê duyệt giao hàng</td><td>L3 Requests hồ sơ bàn giao đầy đủ, tránh thiếu Requests tại báo giá/hợp đồng</td></tr>
 <tr><td><b>Supervisor</b></td><td>Responsible Person cập nhật Level; vận hành luồng công việc; escalations</td><td>L3 Requests vận hành đầy đủ <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> + đóng hành động + kiểm soát thay đổi</td></tr>
 </tbody>
 </table>
@@ -124,7 +124,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <div class="card">
 <p style="margin:0 0 8px 0"><b>Chuỗi E2E:</b> Báo giá/Hợp đồng → Kế hoạch → Kỹ thuật → Mua hàng → Nhận hàng → Sản xuất → QC/QA → NCR/MRB → Final → Đóng gói → Ship → Phản hồi/CI.</p>
-<p style="margin:0 0 10px 0"><b>Vị trí mô-đun:</b> ma trận kỹ năng (matrix) nằm “bên dưới” toàn chuỗi và tác động trực tiếp tại các bước có quyền quyết định: Kế hoạch (phân nNgười), Sản xuất (vận hành/setup/chứng minh-out), QC/QA (đo/duyệt), Ship (phát hành), Phản hồi/CI (đóng năng lực sau NCR/sự cố).</p>
+<p style="margin:0 0 10px 0"><b>Vị trí mô-đun:</b> ma trận kỹ năng (matrix) nằm “bên dưới” toàn chuỗi và tác động trực tiếp tại các bước có quyền quyết định: Kế hoạch (phân Người), Sản xuất (vận hành/setup/chứng minh-out), QC/QA (đo/duyệt), Ship (phát hành), Phản hồi/CI (đóng năng lực sau NCR/sự cố).</p>
 <table class="docx-table">
 <thead>
 <tr>
@@ -143,9 +143,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Kế hoạch</td>
-<td>Danh sách nNgười + Level theo vai trò</td>
-<td>Phân ca theo Level; job quan trọng / nghiêm trọng gắn nNgười đủ Level</td>
-<td><b>CHẶN</b> khi phân nNgười dưới Level Requests</td>
+<td>Danh sách Người + Level theo vai trò</td>
+<td>Phân ca theo Level; job quan trọng / nghiêm trọng gắn Người đủ Level</td>
+<td><b>CHẶN</b> khi phân Người dưới Level Requests</td>
 </tr>
 <tr>
 <td>Sản xuất</td>
@@ -157,7 +157,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>QC/QA</td>
 <td>Quyền đo/duyệt theo Level + trạng thái gage</td>
 <td>Kết quả đo/duyệt có chữ ký đúng Level</td>
-<td><b>TẠM GIỮ</b> khi nNgười ký không đủ Level hoặc gage OOT</td>
+<td><b>TẠM GIỮ</b> khi Người ký không đủ Level hoặc gage OOT</td>
 </tr>
 <tr>
 <td>Ship</td>
@@ -183,9 +183,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Kế hoạch</td><td>Phân job quan trọng / nghiêm trọng cho nNgười dưới Level</td><td>sự cố nghiêm trọng, NCR, trễ tiến độ</td><td>Bảng ca ghi tên không đạt L_req</td></tr>
-<tr><td>2</td><td>Sản xuất</td><td>Thực hiện vận hành vượt quyền (setup/chứng minh-out/đo)</td><td>Rủi ro an toàn, sai kích thước</td><td>Log máy/log ca không khớp nNgười</td></tr>
-<tr><td>3</td><td>QC/QA</td><td>NNgười ký duyệt không đúng Level</td><td>Ship sai, tranh chấp</td><td>Chữ ký không khớp danh sách quyền</td></tr>
+<tr><td>1</td><td>Kế hoạch</td><td>Phân job quan trọng / nghiêm trọng cho Người dưới Level</td><td>sự cố nghiêm trọng, NCR, trễ tiến độ</td><td>Bảng ca ghi tên không đạt L_req</td></tr>
+<tr><td>2</td><td>Sản xuất</td><td>Thực hiện vận hành vượt quyền (setup/chứng minh-out/đo)</td><td>Rủi ro an toàn, sai kích thước</td><td>Log máy/log ca không khớp Người</td></tr>
+<tr><td>3</td><td>QC/QA</td><td>Người ký duyệt không đúng Level</td><td>Ship sai, tranh chấp</td><td>Chữ ký không khớp danh sách quyền</td></tr>
 <tr><td>4</td><td>HR/OPS</td><td>Cập nhật Level không có FRM-HR-TRN-007</td><td>Không đánh giá được</td><td>Không có Requests ID</td></tr>
 <tr><td>5</td><td>HR</td><td>ma trận kỹ năng (matrix) một phiên bản, thưởng map một phiên bản khác</td><td>Thưởng sai, mâu thuẫn nội bộ</td><td>Ngày/phiên bản không khớp</td></tr>
 <tr><td>6</td><td>QA/QMS</td><td>Không khóa thay đổi; file bị sửa không log</td><td>Mất kiểm soát ISO 7.5</td><td>Không có DCR hồ sơ</td></tr>
@@ -237,7 +237,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>CP5 — Phân ca theo Level (chặn giao việc sai)</b></td>
 <td>Planner + Supervisor</td>
-<td>Trước ca, đối chiếu L_req của job/vận hành với L_cur từng nNgười; ghi trên bảng ca</td>
+<td>Trước ca, đối chiếu L_req của job/vận hành với L_cur từng Người; ghi trên bảng ca</td>
 <td>Ảnh bảng ca + danh sách phân ca</td>
 <td>Mỗi ca</td>
 </tr>
@@ -264,9 +264,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol style="margin:0 0 0 18px; line-height:1.9">
 <li><b>CHẶN-01 (No bằng chứng):</b> Cập nhật Level khi thiếu FRM-HR-TRN-007 hoặc thiếu OJT đầu ra/hiệu suất test → HR không cập nhật; QA giữ trạng thái “Chưa đủ bằng chứng”.</li>
 <li><b>CHẶN-02 (Version không khớp):</b> Thưởng map và ma trận kỹ năng (matrix) khác phiên bản ban hành → HR khóa chi trả thưởng cho kỳ đó; mở lại sau khi đồng bộ.</li>
-<li><b>TẠM GIỮ-01 (Sai nNgười ký):</b> QC/QA phát hiện chữ ký duyệt/đo không đúng Level → TẠM GIỮ lô; mở điều tra; cập nhật quyền theo Level.</li>
-<li><b>TẠM GIỮ-02 (phân công không khớp):</b> Planner/Supervisor phát hiện phân ca sai Level → TẠM GIỮ job/vận hành; đổi nNgười đủ Level; ghi log.</li>
-<li><b>STOP-01 (không an toàn năng lực):</b> Vận hành nguy hiểm (LOTO, chứng minh-out, nâng hạ) thực hiện bởi nNgười không đủ Level → STOP, bàn giao cho nNgười đủ quyền; EHS ghi nhận.</li>
+<li><b>TẠM GIỮ-01 (Sai Người ký):</b> QC/QA phát hiện chữ ký duyệt/đo không đúng Level → TẠM GIỮ lô; mở điều tra; cập nhật quyền theo Level.</li>
+<li><b>TẠM GIỮ-02 (phân công không khớp):</b> Planner/Supervisor phát hiện phân ca sai Level → TẠM GIỮ job/vận hành; đổi Người đủ Level; ghi log.</li>
+<li><b>STOP-01 (không an toàn năng lực):</b> Vận hành nguy hiểm (LOTO, chứng minh-out, nâng hạ) thực hiện bởi Người không đủ Level → STOP, bàn giao cho Người đủ quyền; EHS ghi nhận.</li>
 </ol>
 </div>
 <!-- ====== 7) 60-second reaction ====== -->
@@ -281,12 +281,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>Phân job sai Level</b></td>
-<td>TẠM GIỮ vận hành → đổi nNgười đủ Level → cập nhật bảng ca → tạo log hành động</td>
+<td>TẠM GIỮ vận hành → đổi Người đủ Level → cập nhật bảng ca → tạo log hành động</td>
 <td>Planner/Supervisor</td>
 <td>Ảnh bảng trước/sau + log hành động</td>
 </tr>
 <tr>
-<td><b>NNgười ký duyệt sai Level</b></td>
+<td><b>Người ký duyệt sai Level</b></td>
 <td>TẠM GIỮ lô → khoanh vùng vật lý → báo QA → dừng bộ hồ sơ giao hàng</td>
 <td>QC → QA</td>
 <td>Ảnh lô TẠM GIỮ + hồ sơ ký duyệt</td>
@@ -322,9 +322,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>1</td><td>Chốt danh sách job/vận hành quan trọng / nghiêm trọng và L_req theo vai trò</td><td>Planner + Supervisor</td><td>Bảng ca + job list</td><td>L_req không được ghi rõ theo công đoạn</td></tr>
-<tr><td>2</td><td>Đối chiếu L_cur từng nNgười trước phân ca</td><td>Planner</td><td>Ảnh chụp trạng thái matrix (ngày/phiên bản)</td><td>Dùng bản cũ, không có ngày</td></tr>
+<tr><td>2</td><td>Đối chiếu L_cur từng Người trước phân ca</td><td>Planner</td><td>Ảnh chụp trạng thái matrix (ngày/phiên bản)</td><td>Dùng bản cũ, không có ngày</td></tr>
 <tr><td>3</td><td>Gắn quyền vận hành: ai vận hành, ai setup, ai chứng minh-out, ai đo, ai ký</td><td>Supervisor + QA/QC</td><td>Danh sách quyền theo Level</td><td>Quyền ghi chung chung, không có ranh giới</td></tr>
-<tr><td>4</td><td>Kích hoạt OJT cho nNgười cần nâng Level, chốt OJT đầu ra</td><td>Supervisor</td><td>Kế hoạch OJT + đầu ra list</td><td>OJT không gắn job thật</td></tr>
+<tr><td>4</td><td>Kích hoạt OJT cho Người cần nâng Level, chốt OJT đầu ra</td><td>Supervisor</td><td>Kế hoạch OJT + đầu ra list</td><td>OJT không gắn job thật</td></tr>
 <tr><td>5</td><td>Thu bằng chứng OJT: bảng kiểm, ảnh, log ca, sản phẩm minh chứng</td><td>Học viên + Supervisor</td><td>Gói bằng chứng theo ID</td><td>Ảnh rời rạc, không truy xuất nguồn gốc</td></tr>
 <tr><td>6</td><td>Thực hiện hiệu suất test theo mô-đun liên quan (khi có cổng kiểm soát/vận hành/đo/duyệt)</td><td>Supervisor + QA/QC/EHS</td><td>Biên bản test + ĐẠT/KHÔNG ĐẠT</td><td>Không có tiêu chí đánh giá, chỉ xác nhận miệng</td></tr>
 <tr><td>7</td><td>Tạo FRM-HR-TRN-007: phạm vi, job minh chứng, điều kiện đạt, rủi ro cập nhật sai</td><td>Supervisor</td><td><a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> có ID</td><td>Thiếu phạm vi kỹ năng, thiếu job chứng minh</td></tr>
@@ -409,7 +409,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L2</b></td>
 <td>Thực hiện OJT đầu ra đầy đủ; hiểu cổng kiểm soát/bàn giao; không vượt quyền vận hành</td>
 <td>01 job minh chứng đạt; Supervisor xác nhận; MRR truy xuất nguồn gốc được</td>
-<td>Được giao vận hành theo L2; được ghi nhận làm nNgười hướng dẫn phụ trong OJT</td>
+<td>Được giao vận hành theo L2; được ghi nhận làm Người hướng dẫn phụ trong OJT</td>
 </tr>
 <tr>
 <td><b>L3</b></td>
@@ -427,14 +427,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 <!-- ====== 10) Đánh giá ====== -->
 <h2>10) Đánh giá</h2>
-<h3>10.1 Bài kiểm tra nhanh (≥20 câu) — trắc nNhiệm + tình huống ngắn</h3>
+<h3>10.1 Bài kiểm tra nhanh (≥20 câu) — trắc Nhiệm + tình huống ngắn</h3>
 <ol style="line-height:1.9; margin:0 0 0 18px">
 <li>ma trận kỹ năng (matrix) được dùng như “cổng” tại bước nào trong E2E?</li>
 <li>Định nghĩa “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” trong cập nhật Level là gì?</li>
 <li>FRM-HR-TRN-007 dùng để làm gì và Responsible Person là ai?</li>
 <li>FRM-HR-TRN-011 dùng để làm gì và khi nào bắt buộc cập nhật?</li>
 <li>Khi Planner phân job sai Level, quyết định fail-nhanh là gì?</li>
-<li>Khi QC phát hiện nNgười ký duyệt không đủ Level, quyết định là gì?</li>
+<li>Khi QC phát hiện Người ký duyệt không đủ Level, quyết định là gì?</li>
 <li>5 thành phần tối thiểu của gói bằng chứng kèm <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> là gì?</li>
 <li>Vì sao cần Photos trạng thái ma trận kỹ năng (matrix) trước/sau cập nhật?</li>
 <li>Điểm gãy nào tạo rủi ro ship sai do thiếu bằng chứng năng lực?</li>
@@ -460,12 +460,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </li>
 <li>
 <b>Tình huống 2 — Nâng Level không có bằng chứng:</b><br/>
- Dữ kiện: Supervisor muốn nâng Operator từ L1 lên L2 để kịp giao hàng; chỉ có 01 nNgày làm việc; không có hiệu suất test và không có job minh chứng.<br/>
+ Dữ kiện: Supervisor muốn nâng Operator từ L1 lên L2 để kịp giao hàng; chỉ có 01 Ngày làm việc; không có hiệu suất test và không có job minh chứng.<br/>
  Yêu cầu: quyết định <b>CHẶN/GO</b>; chỉ rõ điểm chặn; nêu MRR bắt buộc trong <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a>; cách lập kế hoạch OJT 2 ngày/tuần.
  </li>
 <li>
 <b>Tình huống 3 — Thưởng map lệch phiên bản:</b><br/>
- Dữ kiện: kỳ thưởng tháng này dùng thưởng map phiên bản 2026-01; ma trận kỹ năng (matrix) cập nhật phiên bản 2026-02; có 3 nNgười vừa nâng Level tuần này.<br/>
+ Dữ kiện: kỳ thưởng tháng này dùng thưởng map phiên bản 2026-01; ma trận kỹ năng (matrix) cập nhật phiên bản 2026-02; có 3 Người vừa nâng Level tuần này.<br/>
  Yêu cầu: quyết định <b>TẠM GIỮ/CHẶN</b> chi trả; ghi MRR cần tạo; cách đồng bộ phiên bản và lưu Photos trạng thái.
  </li>
 </ol>
@@ -537,7 +537,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>3</td><td>Thưởng map không có cổng kiểm soát chỉ số ID / nguồn dữ liệu</td><td>CP4 bắt buộc; thiếu là CHẶN chi trả kỳ đó</td></tr>
 <tr><td>4</td><td>Matrix/thưởng map lệch phiên bản, không có Photos trạng thái theo kỳ</td><td>CP1/CP4/CP12; khóa phiên bản và lưu Photos trạng thái</td></tr>
 <tr><td>5</td><td>Phân ca không đối chiếu Level</td><td>CP5; ảnh bảng ca bắt buộc; sai là TẠM GIỮ vận hành</td></tr>
-<tr><td>6</td><td>NNgười ký duyệt không đủ Level</td><td>Danh sách quyền theo Level; TẠM GIỮ lô; cập nhật quyền</td></tr>
+<tr><td>6</td><td>Người ký duyệt không đủ Level</td><td>Danh sách quyền theo Level; TẠM GIỮ lô; cập nhật quyền</td></tr>
 <tr><td>7</td><td>NCR/MRB đóng mà không có hành động đào tạo/Level</td><td>CP7; CHẶN đóng NCR khi thiếu hành động năng lực</td></tr>
 <tr><td>8</td><td>File ma trận kỹ năng (matrix) bị sửa không log (thiếu kiểm soát thay đổi)</td><td>Khóa chỉnh sửa; DCR hồ sơ; QA kiểm tra dấu vết</td></tr>
 <tr><td>9</td><td>Yêu cầu <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> thiếu phạm vi kỹ năng/job minh chứng</td><td>Job sự cố hỏng máy mục 9.1; QA trả Requests ngay</td></tr>

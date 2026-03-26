@@ -89,7 +89,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>3. cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và rule đổi lịch</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cửa sổ</th><th>Ý nghĩa</th><th>Khi nào được phá</th><th>Evidence bắt buộc</th></tr></thead><tbody>
 <tr><td>Đóng băng của ca</td><td>Danh sách job đầu ca Released, dùng để giữ nhịp vận hành trong ca Current</td><td>Chỉ P0 hoặc sự cố L1/L2: machine xuống / nTừng, nguyên vật liệu thiếu / bỏ sót, phiên bản thay đổi, QA TẠM GIỮ, an toàn sự kiện</td><td>Thay đổi note + Responsible Person + job bị lùi + thời điểm cập nhật Epicor/M365</td></tr>
-<tr><td>Đóng băng ngày</td><td>Kế hoạch nNgày cho trung tâm gia công/cell</td><td>P0, nút thắt / điểm nghẽn khôi phục / thu hồi, outsource quá hạn, khách hàng đặc biệt phê duyệt</td><td>Quyết định hồ sơ trong tier cuộc họp / log hành động</td></tr>
+<tr><td>Đóng băng ngày</td><td>Kế hoạch Ngày cho trung tâm gia công/cell</td><td>P0, nút thắt / điểm nghẽn khôi phục / thu hồi, outsource quá hạn, khách hàng đặc biệt phê duyệt</td><td>Quyết định hồ sơ trong tier cuộc họp / log hành động</td></tr>
 <tr><td>Đóng băng tuần</td><td>Kế hoạch chuẩn để bảo vệ thời gian dẫn (lead time) và vật tư/nguồn lực đã khóa</td><td>Chỉ L2 hoặc quyết định nhà máy-level</td><td>Biên bản công suất rà soát hoặc quyết định điều hành</td></tr>
 </tbody></table></div>
 <div class="callout-warn"><strong>Rule sắp xếp lại</strong><br/>Được phép sắp xếp lại chỉ khi job phía trước chưa vào setup/cycle hoặc khi việc đổi lịch làm giảm tổng rủi ro trễ giao. Không được sắp xếp lại nếu làm đứt chuỗi của nguyên vật liệu đặt trước, khách hàng kit, thuê ngoài trả lại, clean-pack cửa sổ / khung thời gian hoặc mẫu đầu (tiên chi tiết / sản phẩm) plan mà chưa xử lý hệ quả.</div>
@@ -107,22 +107,22 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>5. WIP cap theo họ trung tâm gia công</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm trung tâm gia công</th><th>Cap mặc định</th><th>Mục đích của cap</th><th>Khi vượt cap phải làm gì</th></tr></thead><tbody>
-<tr><td>5-trục / phay-lượt / quay / rò rỉ / clean nút thắt / điểm nghẽn</td><td>trong hàng đợi standard giờ ≤ 1.0 nNgày năng lực hữu dụng; setup đã sắp xếp ≤ 1 job kế tiếp / machine</td><td>Bảo vệ nút thắt / điểm nghẽn, giảm đổi lịch và tránh tắc mẫu đầu</td><td>Báo cáo vượt cấp L1 ngay; rà soát tách / chia lot, chuyển tải, outsource, hoặc dời job chưa đủ mức sẵn sàng.</td></tr>
-<tr><td>3-trục / CNC tiện / hoàn thiện bề mặt cell</td><td>trong hàng đợi standard giờ ≤ 1.5 nNgày năng lực hữu dụng; đã sắp xếp công việc / đơn hàng ≤ 2 job / nhóm máy (machine nhóm sản phẩm)</td><td>Giữ dòng chảy nhưng vẫn đủ việc cho ca tiếp theo</td><td>Review tuổi tồn WIP (tuổi tồn / tuổi tồn), dừng phát hành thêm nếu chưa có plan clear.</td></tr>
-<tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship phát hành) / clean pack</td><td>Ship-ready / final-kiểm tra-ready ≤ 1 nNgày đầu ra chuẩn</td><td>Không để QA/WHS thành bãi chờ cuối chuỗi</td><td>Review nguyên nhân gốc ở công đoạn trước; không đẩy thêm job nếu đầu ra cuối không hút kịp.</td></tr>
-<tr><td>Outsource hàng đợi</td><td>Chỉ phát lot khi nNgười xử lý khe / vị trí, lộ trình gia công, cert kỳ vọng và trả lại date đã xác nhận</td><td>Ngăn chất hàng chờ ngoài mà không biết nNgày về</td><td>Planner + PUR quyết định theo PO/ETA/nNgười xử lý trạng thái; thiếu khe / vị trí thì TẠM GIỮ.</td></tr>
+<tr><td>5-trục / phay-lượt / quay / rò rỉ / clean nút thắt / điểm nghẽn</td><td>trong hàng đợi standard giờ ≤ 1.0 Ngày năng lực hữu dụng; setup đã sắp xếp ≤ 1 job kế tiếp / machine</td><td>Bảo vệ nút thắt / điểm nghẽn, giảm đổi lịch và tránh tắc mẫu đầu</td><td>Báo cáo vượt cấp L1 ngay; rà soát tách / chia lot, chuyển tải, outsource, hoặc dời job chưa đủ mức sẵn sàng.</td></tr>
+<tr><td>3-trục / CNC tiện / hoàn thiện bề mặt cell</td><td>trong hàng đợi standard giờ ≤ 1.5 Ngày năng lực hữu dụng; đã sắp xếp công việc / đơn hàng ≤ 2 job / nhóm máy (machine nhóm sản phẩm)</td><td>Giữ dòng chảy nhưng vẫn đủ việc cho ca tiếp theo</td><td>Review tuổi tồn WIP (tuổi tồn / tuổi tồn), dừng phát hành thêm nếu chưa có plan clear.</td></tr>
+<tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship phát hành) / clean pack</td><td>Ship-ready / final-kiểm tra-ready ≤ 1 Ngày đầu ra chuẩn</td><td>Không để QA/WHS thành bãi chờ cuối chuỗi</td><td>Review nguyên nhân gốc ở công đoạn trước; không đẩy thêm job nếu đầu ra cuối không hút kịp.</td></tr>
+<tr><td>Outsource hàng đợi</td><td>Chỉ phát lot khi Người xử lý khe / vị trí, lộ trình gia công, cert kỳ vọng và trả lại date đã xác nhận</td><td>Ngăn chất hàng chờ ngoài mà không biết Ngày về</td><td>Planner + PUR quyết định theo PO/ETA/Người xử lý trạng thái; thiếu khe / vị trí thì TẠM GIỮ.</td></tr>
 </tbody></table></div>
 <p>Cap là <b>giới hạn phát hành</b>, không phải KPI để nhồi đầy. Khi vượt cap, ưu tiên đầu tiên là <b>nTừng mở thêm việc</b> và <b>dọn hàng đang kẹt</b>, không phải tạo thêm bảng theo dõi.</p>
 </div>
 
 <div class="section"><h2>6. Queue discipline, tuổi tồn và phản ứng</h2>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bucket tuổi tồn</th><th>Định nghĩa</th><th>NNgười phụ trách phản ứng</th><th>Hành động bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bucket tuổi tồn</th><th>Định nghĩa</th><th>Người phụ trách phản ứng</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td>0–1 shift</td><td>Bình thường</td><td>Cell Lead</td><td>Theo dõi theo dispatch; chưa cần escalation nếu job vẫn trong nhịp cam kết.</td></tr>
 <tr><td>&gt;1 đến 3 shift</td><td>Cảnh báo</td><td>Planner + Supervisor</td><td>Phải chỉ ra lý do: thiếu material, thiếu setup, chờ QA, chờ machine, chờ outsource, chờ decision.</td></tr>
-<tr><td>&gt;3 shift đến 7 ngày</td><td>Đỏ</td><td>Ops Manager</td><td>Escalate L1; phải có plan clear kèm due/time và nNgười phụ trách.</td></tr>
-<tr><td>&gt;7 nNgày hoặc có nguy cơ vỡ giao</td><td>Đen</td><td>Plant Head / GM theo thẩm quyền</td><td>Escalate L2; phải quyết định chuyển tải, outsource, split lot, giao hàng một phần hoặc re-plan cam kết.</td></tr>
+<tr><td>&gt;3 shift đến 7 ngày</td><td>Đỏ</td><td>Ops Manager</td><td>Escalate L1; phải có plan clear kèm due/time và Người phụ trách.</td></tr>
+<tr><td>&gt;7 Ngày hoặc có nguy cơ vỡ giao</td><td>Đen</td><td>Plant Head / GM theo thẩm quyền</td><td>Escalate L2; phải quyết định chuyển tải, outsource, split lot, giao hàng một phần hoặc re-plan cam kết.</td></tr>
 </tbody></table></div>
-<p>Tuổi tồn được tính theo <b>lần giao dịch Cần nhất trong SoR</b> hoặc theo mốc phát hành/di chuyển có ý nghĩa sản xuất. Không được xóa tuổi tồn bằng di chuyển giả, time mục nhập giả hoặc thay đổi thủ công nNgày Photos trạng thái.</p>
+<p>Tuổi tồn được tính theo <b>lần giao dịch Cần nhất trong SoR</b> hoặc theo mốc phát hành/di chuyển có ý nghĩa sản xuất. Không được xóa tuổi tồn bằng di chuyển giả, time mục nhập giả hoặc thay đổi thủ công Ngày Photos trạng thái.</p>
 </div>
 
 <div class="section"><h2>7. Hold reason code chuẩn</h2>
@@ -140,18 +140,18 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>8. Điều phối bảng và rà soát bắt buộc</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường dữ liệu tối thiểu</th><th>Phải có</th></tr></thead><tbody>
-<tr><td>Thông tin định danh</td><td>JobNum, Part, Rev, OpSeq, trung tâm gia công/Machine nhóm sản phẩm, Qty mở, NNgày đến hạn, Ưu tiên class</td></tr>
+<tr><td>Thông tin định danh</td><td>JobNum, Part, Rev, OpSeq, trung tâm gia công/Machine nhóm sản phẩm, Qty mở, Ngày đến hạn, Ưu tiên class</td></tr>
 <tr><td>Mức sẵn sàng</td><td>Khởi động/Kế hoạch phát hành trạng thái, hold code, nguyên vật liệu ready, setup ready, QA ready, outsource trạng thái</td></tr>
 <tr><td>Điều độ</td><td>Điều phối trình tự, đã lên kế hoạch start, đã lên kế hoạch hoàn thành, Responsible Person cell, next cổng kiểm soát</td></tr>
 <tr><td>Rủi ro</td><td>Tuổi tồn nhóm / phân loại, nút thắt / điểm nghẽn đánh dấu / cờ, đặc biệt xử lý / vận chuyển đánh dấu / cờ, khách hàng lớp phủ đánh dấu / cờ, hot-job note</td></tr>
 <tr><td>Hành động</td><td>Next hành động, Responsible Person, due time, escalation level, bằng chứng link khi đóng</td></tr>
 </tbody></table></div>
-<p>Điều phối bảng phải được rà soát tối thiểu ở 3 thời điểm: <b>đầu ca</b>, <b>giữa ca</b> và <b>cuối ca/chuẩn bị bàn giao</b>. Nếu nNgày đó có P0, machine xuống / nTừng lớn, phiên bản thay đổi hoặc outsource quá hạn, phải mở thêm rà soát bất thường trong nNgày thay vì chờ đến cuối ca.</p>
+<p>Điều phối bảng phải được rà soát tối thiểu ở 3 thời điểm: <b>đầu ca</b>, <b>giữa ca</b> và <b>cuối ca/chuẩn bị bàn giao</b>. Nếu Ngày đó có P0, machine xuống / nTừng lớn, phiên bản thay đổi hoặc outsource quá hạn, phải mở thêm rà soát bất thường trong Ngày thay vì chờ đến cuối ca.</p>
 </div>
 
 <div class="section"><h2>9. Rule khớp nối với outsource, clean-pack và final phát hành</h2>
 <ul class="tight">
-<li>Không phát job ra outsource nếu nNgười xử lý chưa được duyệt đúng nhóm sản phẩm quy trình, lộ trình gia công chưa rõ trả lại cổng kiểm soát hoặc đóng gói để gửi đi chưa đúng.</li>
+<li>Không phát job ra outsource nếu Người xử lý chưa được duyệt đúng nhóm sản phẩm quy trình, lộ trình gia công chưa rõ trả lại cổng kiểm soát hoặc đóng gói để gửi đi chưa đúng.</li>
 <li>Không đẩy job tới clean-pack / final phát hành nếu công đoạn trước chưa khóa xong bằng chứng mẫu đầu, CTQ, NCR, rò rỉ/clean Requests hoặc bộ hồ sơ giao hàng.</li>
 <li>Khi một quyết định ở Kế hoạch làm thay đổi clean-pack, rò rỉ-test, FAI hoặc ship-phát hành cửa sổ / khung thời gian, Planner phải đồng bộ ngay với QA/WHS/ENG; không được coi đây là việc của “khâu sau”.</li>
 </ul>

@@ -59,7 +59,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="note">
 <strong>Đối tượng bắt buộc</strong>
-<div class="small muted" style="margin-top:6px">TargetRoles: Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, NNgười định giá (SAL-03), Supervisor</div>
+<div class="small muted" style="margin-top:6px">TargetRoles: Operator, Setup, Lập trình viên (CNC), QC, QA, Kho, Mua hàng, Planner, Bảo trì, EHS, Người định giá (SAL-03), Supervisor</div>
 <div style="margin-top:10px"><strong>Điều kiện tham gia</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
 <li>Đã học mô-đun “Phiên bản control &amp; Job Pack kỷ luật / chuyên ngành” (hoặc đã qua kiểm tra tương đương).</li>
@@ -104,7 +104,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Cổng kiểm soát G6: phê duyệt giao hàng chỉ mở khi Bộ bằng chứng đầy đủ.</li>
 </ul>
 <div class="small muted" style="margin-top:8px">
- NNgười chịu trách nhiệm chặn cổng kiểm soát: <b>Supervisor + QA</b>. NNgười tạo hồ sơ: theo bảng kiểm từng bước.
+ Người chịu trách nhiệm chặn cổng kiểm soát: <b>Supervisor + QA</b>. Người tạo hồ sơ: theo bảng kiểm từng bước.
  </div>
 </div>
 </div>
@@ -132,7 +132,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
 <li>Vật liệu: spec, mẻ nấu (heat)/lot, chứng chỉ đi kèm.</li>
 <li>Công đoạn đặc biệt: nhà cung ứng, spec/hoàn thành code, cert khớp lot/số sê-ri.</li>
-<li>Chức năng kiểm tra / thử nNhiệm/NDI: phương pháp, tiêu chí ĐẠT/KHÔNG ĐẠT, báo cáo đính kèm.</li>
+<li>Chức năng kiểm tra / thử Nhiệm/NDI: phương pháp, tiêu chí ĐẠT/KHÔNG ĐẠT, báo cáo đính kèm.</li>
 </ul>
 </div>
 </div>
@@ -141,7 +141,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.7">
 <li><b>tài khoản 100%</b> đặc tính: kích thước, GD&amp;T, ghi chú, bề mặt, đánh dấu, làm sạch, Requests đóng gói (khi PO/spec Requests).</li>
 <li>Mỗi dòng đo gắn với <b>01 balloon ID</b>; balloon ID không trùng; không bỏ số.</li>
-<li>Ghi rõ dụng cụ đo, độ phân giải, điều kiện đo, nNgười đo, nNgày giờ.</li>
+<li>Ghi rõ dụng cụ đo, độ phân giải, điều kiện đo, Người đo, Ngày giờ.</li>
 </ul>
 <div class="small muted" style="margin-top:8px">
  Trong HESEM, Biểu mẫu 1–2–3 được phép thể hiện bằng “FAI hồ sơ” nội bộ khi vẫn đảm bảo đầy đủ trường tương ứng và truy xuất nguồn gốc đánh giá.
@@ -412,7 +412,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Xác nhận Requests FAI theo PO/hợp đồng và đánh dấu trong Job Pack</td><td>NNgười định giá (SAL-03) + Planner</td><td>Trang PO nổi bật / đánh dấu Requests FAI + lộ trình gia công có Cổng kiểm soát</td><td>Bỏ sót Requests FAI trong PO</td></tr>
+<tr><td>1</td><td>Xác nhận Requests FAI theo PO/hợp đồng và đánh dấu trong Job Pack</td><td>Người định giá (SAL-03) + Planner</td><td>Trang PO nổi bật / đánh dấu Requests FAI + lộ trình gia công có Cổng kiểm soát</td><td>Bỏ sót Requests FAI trong PO</td></tr>
 <tr><td>2</td><td>Khóa REV: drawing/spec/mô hình/lộ trình gia công/program/phiếu cài đặt thống nhất</td><td>Lập trình viên (CNC) + Planner</td><td>Phát hành hồ sơ + ảnh trang REV</td><td>Program chạy “bản cũ”</td></tr>
 <tr><td>3</td><td>Chuẩn bị đã đánh số balloon drawing/kế hoạch kiểm tra (plan) (đánh số duy nhất)</td><td>QC + QA</td><td>Đã đánh số balloon drawing + plan</td><td>Số balloon không khớp hồ sơ</td></tr>
 <tr><td>4</td><td>Kiểm tra vật liệu: spec + mẻ nấu (heat)/lot + cert đủ trường</td><td>Kho</td><td>Nguyên vật liệu cert + nhãn mẻ nấu (heat)/lot</td><td>Nhầm mẻ nấu (heat)/lot do nhãn mờ</td></tr>
@@ -420,13 +420,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>6</td><td>Kiểm tra tình trạng gage/CMM và phương pháp đo CTQ</td><td>QC + Bảo trì</td><td>Ảnh tem + gage list M365/SharePoint → HESEM-QMS-SSOT</td><td>Dùng gage độ phân giải thiếu</td></tr>
 <tr><td>7</td><td>Setup theo phiếu cài đặt: fixture, không / bằng không, danh sách dao cụ, bù trừ (offset) mốc chuẩn</td><td>Setup</td><td>Ảnh setup quan trọng + bù trừ (offset) mốc chuẩn</td><td>Nhầm tool chiều dài/mài mòn</td></tr>
 <tr><td>8</td><td>Gia công 01 mẫu đầu, giữ nguyên trạng (không làm lại ngoài quy định)</td><td>Operator</td><td>Nhãn TẠM GIỮ/PASS trên mẫu đầu</td><td>Đánh bóng làm lệch kích thước</td></tr>
-<tr><td>9</td><td>Đo CTQ trước, ghi rõ dụng cụ/điều kiện đo, nNgười đo</td><td>QC</td><td>Hồ sơ đo CTQ + ảnh đo khi cần</td><td>Ghi thiếu dụng cụ đo</td></tr>
+<tr><td>9</td><td>Đo CTQ trước, ghi rõ dụng cụ/điều kiện đo, Người đo</td><td>QC</td><td>Hồ sơ đo CTQ + ảnh đo khi cần</td><td>Ghi thiếu dụng cụ đo</td></tr>
 <tr><td>10</td><td>Hoàn tất Biểu mẫu 1–2–3 (hoặc hồ sơ tương đương) + đính kèm CMM/ảnh</td><td>QC + QA</td><td>FAI pack PDF + CMM báo cáo</td><td>Thiếu đặc tính note/drawing note</td></tr>
 <tr><td>11</td><td>Quyết định Cổng kiểm soát: PASS → ký phát hành; FAIL → TẠM GIỮ + NCR</td><td>QA + Supervisor</td><td>Cổng kiểm soát ký-off + NCR khi không đạt</td><td>PASS miệng, không ký</td></tr>
 <tr><td>12</td><td>Khi có chỉnh bù trừ (offset)/tool ảnh hưởng CTQ → re-kiểm tra đặc tính liên quan</td><td>Setup + QC</td><td>Hồ sơ re-kiểm tra (trước/sau)</td><td>Chỉnh xong quên đo lại</td></tr>
 <tr><td>13</td><td>Lưu hồ sơ đúng thư mục Bộ bằng chứng + đặt tên chuẩn</td><td>QC + QA</td><td>Đường dẫn thư mục + tên file chuẩn</td><td>Lưu vào máy tính bàn/USB</td></tr>
 <tr><td>14</td><td>phê duyệt giao hàng kiểm tra: FAI/IR/CoC/cert đầy đủ</td><td>Supervisor + QA</td><td>Phê duyệt giao hàng bảng kiểm + bộ hồ sơ giao hàng</td><td>Thiếu cert outsource</td></tr>
-<tr><td>15</td><td>Đăng / Ghi sổ-job rà soát: cập nhật bài học kinh nNhiệm, cập nhật plan khi phát hiện lỗ hổng</td><td>Supervisor + QA + Lập trình viên (CNC)</td><td>Biên bản rà soát + cập nhật WI/plan</td><td>Lặp lỗi do không cập nhật</td></tr>
+<tr><td>15</td><td>Đăng / Ghi sổ-job rà soát: cập nhật bài học kinh Nhiệm, cập nhật plan khi phát hiện lỗ hổng</td><td>Supervisor + QA + Lập trình viên (CNC)</td><td>Biên bản rà soát + cập nhật WI/plan</td><td>Lặp lỗi do không cập nhật</td></tr>
 </tbody>
 </table>
 </div>
@@ -434,7 +434,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 9) OJT TWI -->
 <h2 class="h2">9) OJT thực chiến theo TWI</h2>
 <div class="card">
-<p><strong>Chuẩn OJT:</strong> NNgười đào tạo làm mẫu 01 lần → học viên làm 02 lần dưới quan sát → 01 lần độc lập. Mọi bước đều tạo MRR.</p>
+<p><strong>Chuẩn OJT:</strong> Người đào tạo làm mẫu 01 lần → học viên làm 02 lần dưới quan sát → 01 lần độc lập. Mọi bước đều tạo MRR.</p>
 <h3 style="margin-top:10px">9.1 Job Sự cố hỏng máy (Step / Điểm then chốt / Lý do)</h3>
 <div class="table-card">
 <table class="table">
@@ -502,7 +502,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>L1</b></td>
-<td>Nhận biết đúng kích hoạt FAI; đọc đúng REV; Mọi đúng nNgười khi có không khớp</td>
+<td>Nhận biết đúng kích hoạt FAI; đọc đúng REV; Mọi đúng Người khi có không khớp</td>
 <td>Bài kiểm tra nhanh đạt ≥ 80% và làm đúng “phản ứng 60 giây” trong mô phỏng</td>
 <td>Được tham gia ca chạy FAI dưới giám sát</td>
 </tr>
@@ -549,7 +549,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>Planner</td><td>Chèn cổng kiểm soát vào lộ trình gia công, lịch QC, không “đẩy job” qua cổng kiểm soát</td><td>L2</td></tr>
 <tr><td>Bảo trì</td><td>Gage/CMM trạng thái, cách ly OOT</td><td>L2</td></tr>
 <tr><td>EHS</td><td>An toàn khu vực đo, hóa chất vệ sinh, công thái học khi đo</td><td>L1 (nhận biết) + ký xác nhận bảng kiểm khu vực khi Requests</td></tr>
-<tr><td>NNgười định giá (SAL-03)</td><td>Nhận diện Requests FAI trong PO, giao tiếp thay đổi tiến độ do cổng kiểm soát</td><td>L1</td></tr>
+<tr><td>Người định giá (SAL-03)</td><td>Nhận diện Requests FAI trong PO, giao tiếp thay đổi tiến độ do cổng kiểm soát</td><td>L1</td></tr>
 <tr><td>Supervisor</td><td>Thực thi STOP/TẠM GIỮ/CHẶN, ký cổng kiểm soát phát hành</td><td>L4</td></tr>
 </tbody>
 </table>
@@ -582,7 +582,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi CMM báo cáo tồn tại nhưng không có link/đính kèm trong FAI pack, cổng kiểm soát có được mở không?</li>
 <li>Nêu 4 tình huống bắt buộc tái thực hiện FAI (re-thành tựu).</li>
 <li>Vai trò Planner phải làm gì để ngăn job bị treo tại cổng QC?</li>
-<li>Khi nNgười đo chưa đạt năng lực, điều kiện cho phép đo là gì?</li>
+<li>Khi Người đo chưa đạt năng lực, điều kiện cho phép đo là gì?</li>
 </ol>
 </div>
 <div class="card">
@@ -598,7 +598,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note" style="margin-top:10px">
 <strong>Tình huống 2 — Công đoạn đặc biệt cert thiếu trường</strong>
 <p style="margin:6px 0 0 0; line-height:1.7">
- Job J-29107 có xi mạ anốt (anodize). Supplier gửi CoC ghi spec đúng nhưng thiếu “lot/số sê-ri” và thiếu nNgày quy trình.
+ Job J-29107 có xi mạ anốt (anodize). Supplier gửi CoC ghi spec đúng nhưng thiếu “lot/số sê-ri” và thiếu Ngày quy trình.
  Đóng gói hỏi “có ship được không”.
  <br/><b>Yêu cầu:</b> quyết định TẠM GIỮ/GO, phân công Mua hàng/QA làm gì trong 30 phút, và nêu bằng chứng tối thiểu để mở phê duyệt giao hàng.
  </p>

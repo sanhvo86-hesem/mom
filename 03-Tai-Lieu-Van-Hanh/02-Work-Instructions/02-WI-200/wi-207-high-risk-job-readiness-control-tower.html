@@ -70,9 +70,9 @@ ul.tight li {margin:4px 0;}
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ kích hoạt trung tâm điều hành khi có kích hoạt thật và luôn kết thúc bằng quyết định rõ: chạy, chạy có điều kiện hoặc dừng.</div></div>
 <div class="section"><h2>2. Gói dữ liệu phải có trước cuộc họp</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm dữ liệu</th><th>Phải có</th><th>CHẶN khi</th></tr></thead><tbody>
-<tr><td>Thương mại / khách hàng</td><td>PO/dự báo, cam kết ship date, theo Requests riêng của khách hàng Requests, QPL, cert, đóng gói Requests.</td><td>Chưa chốt nNgày giao, thiếu triển khai đầy đủ Requests (flow-xuống / nTừng) hoặc mâu thuẫn Requests khách hàng.</td></tr>
+<tr><td>Thương mại / khách hàng</td><td>PO/dự báo, cam kết ship date, theo Requests riêng của khách hàng Requests, QPL, cert, đóng gói Requests.</td><td>Chưa chốt Ngày giao, thiếu triển khai đầy đủ Requests (flow-xuống / nTừng) hoặc mâu thuẫn Requests khách hàng.</td></tr>
 <tr><td>Mốc chuẩn kỹ thuật</td><td>Drawing/3D/rev, bộ định tuyến / lộ trình, NC/program mức sẵn sàng, phiếu cài đặt, danh sách dao cụ, kế hoạch kiểm soát/FMEA mức cần thiết.</td><td>Phiên bản chưa khóa, lộ trình gia công chưa rõ, chưa chốt program/setup chiến lược.</td></tr>
-<tr><td>Nguyên vật liệu &amp; source</td><td>Tình trạng raw nguyên vật liệu, mẻ nấu (heat)/lot, đã phê duyệt source, outsource nNgười xử lý, cert path.</td><td>Thiếu vật tư, thiếu cert, source chưa đã phê duyệt, công đoạn đặc biệt chưa chốt.</td></tr>
+<tr><td>Nguyên vật liệu &amp; source</td><td>Tình trạng raw nguyên vật liệu, mẻ nấu (heat)/lot, đã phê duyệt source, outsource Người xử lý, cert path.</td><td>Thiếu vật tư, thiếu cert, source chưa đã phê duyệt, công đoạn đặc biệt chưa chốt.</td></tr>
 <tr><td>Công suất &amp; thực thi</td><td>Máy dự kiến, ca chạy, fixture/tool/gage mức sẵn sàng, nút thắt / điểm nghẽn, thay thế / phương án khác lộ trình gia công, dự phòng.</td><td>Không có năng lực khả thi, fixture/gage chưa sẵn, thay thế / phương án khác plan rỗng.</td></tr>
 <tr><td>Quality và phê duyệt</td><td>Mẫu đầu (mẫu đầu (tiên chi tiết / sản phẩm)/FAI kích hoạt, kiểm tra phương pháp, vệ sinh / sạch sẽ/rò rỉ/bộ hồ sơ phê duyệt giao hàng, hồ sơ path.</td><td>Chưa chốt cổng kiểm soát Responsible Person hoặc chưa có bằng chứng bắt buộc để phê duyệt.</td></tr>
 </tbody></table></div>
@@ -89,15 +89,15 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>4. Logic quyết định Ready / Đã chặn / RỦI RO GIAO HÀNG</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Điều kiện</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td><span class="badge-green">READY</span></td><td>Material, route, program, setup, gage, plan kiểm và hồ sơ release đều đã sẵn hoặc đã có bằng chứng xác nhận.</td><td>Cho vào dispatch board; kiểm theo cổng kiểm soát chuẩn.</td></tr>
-<tr><td><span class="badge-amber">READY WITH CONTROLS</span></td><td>Có rủi ro đã biết nhưng đã có containment hợp lệ như alternate machine, split lot, staged material, tăng sampling, daily trung tâm điều hành.</td><td>Ghi rõ control bổ sung, nNgười phụ trách, điều kiện dừng và thời điểm review tiếp.</td></tr>
+<tr><td><span class="badge-amber">READY WITH CONTROLS</span></td><td>Có rủi ro đã biết nhưng đã có containment hợp lệ như alternate machine, split lot, staged material, tăng sampling, daily trung tâm điều hành.</td><td>Ghi rõ control bổ sung, Người phụ trách, điều kiện dừng và thời điểm review tiếp.</td></tr>
 <tr><td><span class="badge-red">BLOCKED</span></td><td>Thiếu baseline, thiếu vật tư/chứng chỉ quan trọng, chưa chốt processor, chưa sẵn gage/fixture, open NCR ảnh hưởng CTQ, hoặc điều kiện mẫu đầu chưa sẵn.</td><td>Không dispatch; mở escalation theo <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</td></tr>
-<tr><td><span class="badge-red">RỦI RO GIAO HÀNG</span></td><td>Job đang chạy nhưng nguy cơ không đạt nNgày giao hoặc không kịp gói phát hành.</td><td>Chuyển sang họp tăng tần suất; ưu tiên nguồn lực; đánh giá OT/vendor/giao hàng một phầnment theo quyền hạn.</td></tr>
+<tr><td><span class="badge-red">RỦI RO GIAO HÀNG</span></td><td>Job đang chạy nhưng nguy cơ không đạt Ngày giao hoặc không kịp gói phát hành.</td><td>Chuyển sang họp tăng tần suất; ưu tiên nguồn lực; đánh giá OT/vendor/giao hàng một phầnment theo quyền hạn.</td></tr>
 </tbody></table></div>
-<div class="callout-warning"><strong>TẠM GIỮ bắt buộc:</strong> PHẢI giữ trạng thái BỊ CHẶN/TẠM GIỮ nếu mẫu đầu/FAI bắt buộc mà chưa rõ thời điểm thực hiện, hoặc nếu công đoạn đặc biệt/cert path chưa có Responsible Person nhận và nNgày trả cert.</div></div>
+<div class="callout-warning"><strong>TẠM GIỮ bắt buộc:</strong> PHẢI giữ trạng thái BỊ CHẶN/TẠM GIỮ nếu mẫu đầu/FAI bắt buộc mà chưa rõ thời điểm thực hiện, hoặc nếu công đoạn đặc biệt/cert path chưa có Responsible Person nhận và Ngày trả cert.</div></div>
 <div class="section"><h2>5. Hồ sơ, KPI và liên kết tài liệu</h2>
 <div class="two-col">
 <div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;">
-<li>Biên bản trung tâm điều hành, trạng thái từng trục mức sẵn sàng, action list có nNgười phụ trách và SLA.</li>
+<li>Biên bản trung tâm điều hành, trạng thái từng trục mức sẵn sàng, action list có Người phụ trách và SLA.</li>
 <li>Link tới Hồ sơ công việc (job dossier), bằng chứng còn thiếu, open hold, open shortage, open NCR liên quan.</li>
 <li>Quyết định split lot/giao hàng một phần/alternate route/temporary containment nếu có.</li>
 </ul></div>
@@ -105,18 +105,18 @@ ul.tight li {margin:4px 0;}
 <li><strong>KPI-WI207-01</strong> Tỷ lệ Lệnh sản xuất cao-rủi ro được đánh giá trước điều phối xuất hàng.</li>
 <li><strong>KPI-WI207-02</strong> Tỷ lệ hành động trung tâm điều hành quá SLA.</li>
 <li><strong>KPI-WI207-03</strong> Tỷ lệ Lệnh sản xuất đã SẴN SÀNG nhưng vẫn phát sinh stop do thiếu chuẩn bị.</li>
-<li><strong>KPI-WI207-04</strong> Số nNgày hold mở kéo dài trên Lệnh sản xuất cao-rủi ro.</li>
+<li><strong>KPI-WI207-04</strong> Số Ngày hold mở kéo dài trên Lệnh sản xuất cao-rủi ro.</li>
 </ul></div>
 </div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>Governance đơn hàng và cam kết nNgày giao.</td></tr>
+<tr><td><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>Governance đơn hàng và cam kết Ngày giao.</td></tr>
 <tr><td><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a></td><td>Mức sẵn sàng về mốc chuẩn kỹ thuật.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Điều độ và điều phối xuất hàng.</td></tr>
 <tr><td><a href="wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a></td><td>Nhịp điều hành hằng ngày; trung tâm điều hành là tầng tăng cường cho Lệnh sản xuất đặc biệt.</td></tr>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>Cổng kiểm soát/MRR và đồng bộ thực thi.</td></tr>
 </tbody></table></div></div>
-<h2 class="h2 phase3a-workbook-alignment" id="phase3a-wi207-workbooks">10. Biểu mẫu Excel đang hiệu lực — Hàng nNgày trung tâm điều hành chạy trên sổ tay thực hành hiện hành</h2><div class="note phase3a-workbook-alignment"><b>Quy tắc điều hành</b><br/>Trong danh mục hiện hành, WI-207 phải dùng hai sổ tay thực hành mới làm xương sống cho trung tâm điều hành: <a href="../../../04-Bieu-Mau/02-FRM-200/FRM-208_Daily_Tier_Meeting_and_Escalation_Log.xlsx" download="">FRM-208</a> cho nhịp hàng nNgày tier/chuyển cấp xử lý và <a href="../../../04-Bieu-Mau/02-FRM-200/FRM-209_High_Risk_Job_Readiness_Review.xlsx" download="">FRM-209</a> cho mức sẵn sàng bộ hồ sơ của cao-rủi ro công việc / đơn hàng. Không dùng note rời, chat ren hay bảng trắng Photos làm bằng chứng chính khi cổng kiểm soát quyết định đang mở.</div><ul class="tight phase3a-workbook-alignment">
-<li><a href="../../../04-Bieu-Mau/02-FRM-200/FRM-208_Daily_Tier_Meeting_and_Escalation_Log.xlsx" download="">FRM-208</a>: vấn đề chặn log, Responsible Person leo thang, ETA, next-rà soát khe / vị trí, chuyển sang nNgày hôm sau trạng thái.</li>
+<h2 class="h2 phase3a-workbook-alignment" id="phase3a-wi207-workbooks">10. Biểu mẫu Excel đang hiệu lực — Hàng Ngày trung tâm điều hành chạy trên sổ tay thực hành hiện hành</h2><div class="note phase3a-workbook-alignment"><b>Quy tắc điều hành</b><br/>Trong danh mục hiện hành, WI-207 phải dùng hai sổ tay thực hành mới làm xương sống cho trung tâm điều hành: <a href="../../../04-Bieu-Mau/02-FRM-200/FRM-208_Daily_Tier_Meeting_and_Escalation_Log.xlsx" download="">FRM-208</a> cho nhịp hàng Ngày tier/chuyển cấp xử lý và <a href="../../../04-Bieu-Mau/02-FRM-200/FRM-209_High_Risk_Job_Readiness_Review.xlsx" download="">FRM-209</a> cho mức sẵn sàng bộ hồ sơ của cao-rủi ro công việc / đơn hàng. Không dùng note rời, chat ren hay bảng trắng Photos làm bằng chứng chính khi cổng kiểm soát quyết định đang mở.</div><ul class="tight phase3a-workbook-alignment">
+<li><a href="../../../04-Bieu-Mau/02-FRM-200/FRM-208_Daily_Tier_Meeting_and_Escalation_Log.xlsx" download="">FRM-208</a>: vấn đề chặn log, Responsible Person leo thang, ETA, next-rà soát khe / vị trí, chuyển sang Ngày hôm sau trạng thái.</li>
 <li><a href="../../../04-Bieu-Mau/02-FRM-200/FRM-209_High_Risk_Job_Readiness_Review.xlsx" download="">FRM-209</a>: bộ hồ sơ mức sẵn sàng theo rủi ro class, thiếu bằng chứng, cổng kiểm soát quyết định và hành động-đóng quy tắc.</li>
 <li>Dữ liệu tác nghiệp và xác nhận phê duyệt phải nằm trong sổ tay thực hành ĐÃ PHÊ DUYỆT; nếu cần tra lịch sử hoặc phạm vi mã / phạm vi quy trình thì dùng Biểu mẫu Control Sổ theo dõi và , không dùng HTML biểu mẫu cũ ngoài danh mục hiện hành làm điểm vào vận hành.</li>
 </ul></div>
