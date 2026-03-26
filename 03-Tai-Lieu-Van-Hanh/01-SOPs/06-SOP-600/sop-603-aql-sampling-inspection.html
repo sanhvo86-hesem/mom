@@ -66,7 +66,7 @@ td,th{}
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Chỉ sampling khi lot <b>đồng nhất, truy xuất rõ và nằm trong nhóm được phép sampling</b>. Mixed lot, critical requirement 100%, mẫu đầu, unstable quy trình hoặc lot có điều kiện mơ hồ phải HOLD hoặc chuyển phương án kiểm khác. <span class="iso-clause">§8.6</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Plan, AQL, kiểm tra level, Ac/Re, switching state, raw counts và defect class phải được ghi trên cùng hồ sơ. Không cho phép resample hoặc đổi class defect để “cứu” decision nếu quy định không cho phép. <span class="iso-clause">§8.6</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Reject hoặc hold phải kích hoạt reaction phù hợp: containment, supplier phản hồi, tightened kiểm tra, NCR hoặc escalation; không được dừng ở mức đánh dấu màu trên form. <span class="iso-clause">§8.6</span></div></div></div>
-<div class="preface-block"><div class="callout"><div class="card-title">Lệnh điều hành</div><p>SOP-603 khóa việc dùng AQL đúng chỗ, đúng plan và đúng mục đích. Sampling chỉ có giá trị khi lot đủ điều kiện, plan được chọn đúng chuẩn tham chiếu, mẫu được lấy đúng cách và decision kéo theo reaction phù hợp. Mọi shortcut ở các bước này đều làm hỏng chất lượng quyết định.</p><div class="legend-row"><span class="chip">cổng kiểm soát (control cổng kiểm soát): 603-S1 → 603-S5</span><span class="chip">Biểu mẫu bắt buộc: <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-621_AQL_Inspection_Record.xlsx">FRM-621</a> / <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> / <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a> / <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a></span><span class="chip">WI liên đới: <a href="../../02-Work-Instructions/06-WI-600/wi-603-aql-sampling-inspection-execution.html">WI-603</a> / <a href="../../02-Work-Instructions/06-WI-600/wi-601-visual-inspection-and-defect-classification.html">WI-601</a> / <a href="../../02-Work-Instructions/06-WI-600/wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a> / <a href="../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></span><span class="chip">ANNEX liên đới: <a href="../../03-Reference/06-ANNEX-600/annex-601-aql-method-reference.html">ANNEX-601</a> / <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a> / <a href="../../03-Reference/06-ANNEX-600/annex-605-spc-lite-and-reaction-plan.html">ANNEX-605</a></span></div></div></div>
+<div class="preface-block"><div class="callout"><div class="card-title">Lệnh điều hành</div><p>SOP-603 khóa việc dùng AQL đúng chỗ, đúng plan và đúng mục đích. Sampling chỉ có giá trị khi lot đủ điều kiện, plan được chọn đúng chuẩn tham chiếu, mẫu được lấy đúng cách và decision kéo theo reaction phù hợp. Mọi shortcut ở các bước này đều làm hỏng chất lượng quyết định.</p><div class="legend-row"><span class="chip">cổng kiểm soát (control cổng kiểm soát): 603-IG1 → 603-IG5</span><span class="chip">Biểu mẫu bắt buộc: <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-621_AQL_Inspection_Record.xlsx">FRM-621</a> / <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> / <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a> / <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a></span><span class="chip">WI liên đới: <a href="../../02-Work-Instructions/06-WI-600/wi-603-aql-sampling-inspection-execution.html">WI-603</a> / <a href="../../02-Work-Instructions/06-WI-600/wi-601-visual-inspection-and-defect-classification.html">WI-601</a> / <a href="../../02-Work-Instructions/06-WI-600/wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a> / <a href="../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></span><span class="chip">ANNEX liên đới: <a href="../../03-Reference/06-ANNEX-600/annex-601-aql-method-reference.html">ANNEX-601</a> / <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a> / <a href="../../03-Reference/06-ANNEX-600/annex-605-spc-lite-and-reaction-plan.html">ANNEX-605</a></span></div></div></div>
 <div class="toc"><div class="toc-title">Mục lục</div><div class="toc-grid">
 <a href="#p1">1. Mục đích</a>
 <a href="#p2">2. Phạm vi</a>
@@ -126,124 +126,98 @@ td,th{}
 <div class="field"><b>Điểm dừng tự động</b><div class="blank">Hỗn hợp lot, không chắc chắn truy xuất nguồn gốc, thiếu trực quan standard, gage trạng thái không hợp lệ, quy trình trôi / sai lệch rõ, CTQ/khách hàng rule Requests 100%.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
-<div class="gate-grid">
-<div class="gate-card"><h3><span class="step-tag">S1</span> Xác định AQL plan và mức kiểm tra</h3>
-<p class="small"><b>Lead:</b> Quality Engineer</p>
-<p class="small"><b>Điểm dừng:</b> Lot không đồng nhất (mixed lot); đặc tính CTQ yêu cầu 100% kiểm tra; quy trình không ổn định; thiếu lot definition hoặc truy xuất nguồn gốc; QPL/customer rule chưa xác định.</p>
-<p class="small"><b>KPI chính:</b> % lots chọn đúng eligibility ngay lần đầu ≥ 95%; plan selection accuracy ≥ 98%.</p></div>
-<div class="gate-card"><h3><span class="step-tag">S2</span> Lấy mẫu và thực hiện kiểm tra</h3>
-<p class="small"><b>Lead:</b> Tổ trưởng QC + QC Inspector</p>
-<p class="small"><b>Điểm dừng:</b> Mẫu bị thiên vị hoặc hư hỏng; visual standard hoặc gage không hợp lệ; defect classification chưa rõ; raw count không truy xuất được; AQL/Ac/Re tra sai hoặc không theo standard reference.</p>
-<p class="small"><b>KPI chính:</b> Sampling discipline compliance ≥ 98%; inspection cycle time ≤ SLA theo lot size; switching-history completeness = 100%.</p></div>
-<div class="gate-card"><h3><span class="step-tag">S3</span> Phán quyết Accept/Reject và escalation</h3>
-<p class="small"><b>Lead:</b> Tổ trưởng QC + QA</p>
-<p class="small"><b>Điểm dừng:</b> Resample không được phép mà vẫn thực hiện; reject nhưng không kích hoạt containment; accept khi defect class chưa xác định rõ; raw counts chưa đối chiếu Ac/Re.</p>
-<p class="small"><b>KPI chính:</b> Decision lead time ≤ 2h sau khi mẫu sẵn sàng; reject reaction timeliness ≤ 4h; false-accept trend = 0.</p></div>
-<div class="gate-card"><h3><span class="step-tag">S4</span> Chuyển đổi mức kiểm tra (Normal → Tightened → Reduced)</h3>
-<p class="small"><b>Lead:</b> Quality Engineer + Tổ trưởng QC</p>
-<p class="small"><b>Điểm dừng:</b> Switching state chưa cập nhật sau reject; reject lặp nhưng vẫn giữ Normal; chuyển sang Reduced khi chưa đủ điều kiện liên tiếp; không có history log để chứng minh switching decision.</p>
-<p class="small"><b>KPI chính:</b> Tightened trigger compliance = 100%; switching decision có truy xuất bằng chứng; % lot áp đúng inspection level theo history.</p></div>
-<div class="gate-card"><h3><span class="step-tag">S5</span> Ghi nhận hồ sơ và phản hồi cải tiến</h3>
-<p class="small"><b>Lead:</b> Quality Engineer</p>
-<p class="small"><b>Điểm dừng:</b> History lot không cập nhật vào hệ thống; reject lặp nhưng không có feedback loop về supplier/process/final release; hồ sơ FRM-621 thiếu trường dữ liệu bắt buộc.</p>
-<p class="small"><b>KPI chính:</b> % history cập nhật đúng hạn ≤ 24h; feedback loop closure rate ≥ 90%; FRM-621 completeness = 100%.</p></div>
-</div>
-<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:28%"/><col style="width:20%"/><col style="width:18%"/><col style="width:20%"/></colgroup><thead><tr><th>Cổng</th><th>Tiêu chí mở cổng</th><th>Điểm dừng bắt buộc</th><th>Người phụ trách</th><th>KPI chính</th></tr></thead><tbody>
-<tr><td><b>603-S1</b><br/>Lot eligibility</td><td>Lot homogeneous; context cho phép sampling; traceability rõ; QPL/customer rule đã xác định.</td><td>Mixed lot; CTQ 100%; unstable quy trình; missing lot definition.</td><td>Quality Engineer</td><td>% lots chọn đúng eligibility ngay lần đầu.</td></tr>
-<tr><td><b>603-S2</b><br/>Plan selection</td><td>AQL, kiểm tra level, switching state, Ac/Re đã tra đúng theo standard reference và hồ sơ trên FRM-621.</td><td>Tự chọn plan không theo rule; plan không truy được nguồn; switching state chưa cập nhật.</td><td>Tổ trưởng QC</td><td>Plan selection accuracy; switching-history completeness.</td></tr>
-<tr><td><b>603-S3</b><br/>Sample &amp; inspect</td><td>Sample random, traceable, trực quan/gage ready, defect classification rõ.</td><td>Mẫu bị thiên vị; sample damage; trực quan standard/gage invalid; raw count không rõ.</td><td>QC Inspector</td><td>Sampling discipline compliance; kiểm tra cycle time.</td></tr>
-<tr><td><b>603-S4</b><br/>Decision</td><td>Raw counts đối chiếu Ac/Re xong; decision documented; reject/hold nối sang reaction.</td><td>Resample không phép; reject nhưng không containment; accept khi defect class chưa xác định rõ.</td><td>Tổ trưởng QC + QA</td><td>Decision thời gian dẫn (lead time); reject reaction timeliness; false-accept trend.</td></tr>
-<tr><td><b>603-S5</b><br/>History &amp; escalation</td><td>Switching state cập nhật; history lot phản ánh vào supplier/quy trình/final release control.</td><td>History không cập nhật; reject lặp nhưng vẫn giữ normal; no phản hồi loop.</td><td>Quality Engineer</td><td>% history cập nhật đúng hạn; tightened trigger compliance.</td></tr>
+<div class="table-card"><table class="table">
+<thead><tr><th>IG</th><th>Tên cổng</th><th>Mô tả</th><th>Chủ trì</th><th>Điểm dừng</th><th>KPI chính</th></tr></thead>
+<tbody>
+<tr><td><span class="step-tag">IG1</span></td><td><b>Xác định AQL plan và mức kiểm tra</b></td><td></td><td></td><td></td><td></td></tr>
+<tr><td><span class="step-tag">IG2</span></td><td><b>Lấy mẫu và thực hiện kiểm tra</b></td><td></td><td></td><td></td><td></td></tr>
+<tr><td><span class="step-tag">IG3</span></td><td><b>Phán quyết Accept/Reject và escalation</b></td><td></td><td></td><td></td><td></td></tr>
+<tr><td><span class="step-tag">IG4</span></td><td><b>Chuyển đổi mức kiểm tra (Normal → Tightened → Reduced)</b></td><td></td><td></td><td></td><td></td></tr>
+<tr><td><span class="step-tag">IG5</span></td><td><b>Ghi nhận hồ sơ và phản hồi cải tiến</b></td><td></td><td></td><td></td><td></td></tr>
 </tbody></table></div>
-<div class="note-blue"><b>Rule quan trọng:</b> Chọn plan ở 603-S2 phải dựa trên <a href="../../03-Reference/06-ANNEX-600/annex-601-aql-method-reference.html">ANNEX-601</a> và chuẩn gốc, không sao chép bảng plan rời rạc sang SOP để tránh lỗi version control.</div><div class="metric-grid">
-<div class="metric-card"><div class="value">Plan Tuân thủ</div><div class="label">Đúng plan / đúng Ac-Re / đúng chuyển đổi</div><div class="mini-note">Mục tiêu không chỉ là ra quyết định, mà là ra quyết định bằng đúng plan đã được phép dùng.</div></div>
-<div class="metric-card"><div class="value">Quyết định Thời gian dẫn</div><div class="label">Từ khi lot sẵn sàng tới khi chấp nhận/từ chối/hold</div><div class="mini-note">thời gian dẫn dài làm tăng nguy cơ lot trôi, hỗn hợp / lẫn lộn disposition hoặc dùng lẫn vào WIP/giao hàng.</div></div>
-<div class="metric-card"><div class="value">False chấp nhận theo dõi / cảnh giác</div><div class="label">Thoát sau lấy mẫu chấp nhận</div><div class="mini-note">Đây là KPI học lại plan, đủ điều kiện và khuyết tật phân loại; không phải chỉ để quy trách nhiệm Người kiểm.</div></div>
-<div class="metric-card"><div class="value">lịch sử Cập nhật</div><div class="label">% lots cập nhật chuyển đổi đúng hạn</div><div class="mini-note">Nếu lịch sử không sạch, chuyển đổi rule trên các lot sau sẽ sai và toàn bộ kỷ luật / chuyên ngành thống kê bị hỏng.</div></div>
-</div>
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
 <div class="flowchart">
-  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Xác định AQL plan</div><div class="flow-desc">Chọn mức AQL, bảng lấy mẫu phù hợp</div></div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</div><div class="flow-title">Xác định AQL plan</div><div class="flow-desc">Chọn mức AQL, bảng lấy mẫu phù hợp</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">2</div><div class="flow-title">Lấy mẫu</div><div class="flow-desc">Lấy mẫu ngẫu nhiên từ lot theo cỡ mẫu</div></div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</div><div class="flow-title">Lấy mẫu</div><div class="flow-desc">Lấy mẫu ngẫu nhiên từ lot theo cỡ mẫu</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step critical"><div class="flow-num">3</div><div class="flow-title">Kiểm tra</div><div class="flow-desc">Đo lường và kiểm tra mẫu theo tiêu chí</div></div>
+  <div class="flow-step critical"><div class="flow-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</div><div class="flow-title">Kiểm tra</div><div class="flow-desc">Đo lường và kiểm tra mẫu theo tiêu chí</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step active"><div class="flow-num">4</div><div class="flow-title">Accept/Reject</div><div class="flow-desc">Quyết định chấp nhận hoặc từ chối lot</div></div>
+  <div class="flow-step active"><div class="flow-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</div><div class="flow-title">Accept/Reject</div><div class="flow-desc">Quyết định chấp nhận hoặc từ chối lot</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">Chuyển đổi mức kiểm tra</div><div class="flow-desc">Tightened/Normal/Reduced theo lịch sử</div></div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</div><div class="flow-title">Chuyển đổi mức kiểm tra</div><div class="flow-desc">Tightened/Normal/Reduced theo lịch sử</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">6</div><div class="flow-title">Ghi hồ sơ</div><div class="flow-desc">Lưu kết quả kiểm tra và quyết định</div></div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">6</div><div class="flow-title">Ghi hồ sơ</div><div class="flow-desc">Lưu kết quả kiểm tra và quyết định</div></div>
 </div>
-<h3 class="h3"><span class="proc-num">1</span> Xác định lot và điều kiện có được lấy mẫu hay không</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span> Xác định lot và điều kiện có được lấy mẫu hay không</h3>
 <ol class="tight">
 <li>Trước khi lấy mẫu, QA phải xác nhận lot đồng nhất theo ít nhất các trường: part nhóm sản phẩm, phiên bản, source/site, lộ trình gia công / quy trình nhóm sản phẩm, điều kiện of sản xuất và truy xuất nguồn gốc logic.</li>
 <li>Không lấy mẫu các trường hợp sau nếu không có quy định riêng rõ ràng: mẫu đầu / FAI, quan trọng / nghiêm trọng/an toàn đặc tính Requests 100%, lot có quy trình trôi / sai lệch rõ, hỗn hợp / lẫn lộn lot, làm lại lot chưa chốt scope, phá hủy test lot quá nhỏ.</li>
 <li>đầu vào / nhận hàng lot từ nhà cung cấp mới, Người xử lý đang thử việc hoặc lot đang bị hàng giả / hàng nhái / cert nghi ngờ phải ưu tiên hold hoặc tăng kiểm tra theo rule thay vì mặc định bình thường lấy mẫu.</li>
 </ol>
-<h3 class="h3"><span class="proc-num">2</span> Chọn AQL, kiểm tra level, Ac/Re và chuyển đổi trạng thái</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</span> Chọn AQL, kiểm tra level, Ac/Re và chuyển đổi trạng thái</h3>
 <ol class="tight">
 <li>QA/QC Team Leader chọn plan theo <a href="../../03-Reference/06-ANNEX-600/annex-601-aql-method-reference.html">ANNEX-601</a> và chuẩn tham chiếu đang hiệu lực. Mọi plan phải ghi rõ bối cảnh: đầu vào / nhận hàng / outsource trả lại / final, level, AQL, code thư / chữ cái, mẫu size, Ac/Re.</li>
 <li>QPL/khách hàng Requests có thể ép AQL thấp hơn, chuyển siết chặt / thắt chặt, khóa giảm, hoặc Requests bỏ lấy mẫu để chuyển sang kiểm 100%. Khi đó QPL/khách hàng rule có ưu tiên cao hơn mức mặc định.</li>
 <li>chuyển đổi trạng thái phải lấy từ lịch sử thực tế của nhà cung cấp/quy trình/part nhóm sản phẩm tương ứng. Không reset về bình thường chỉ vì thay Người kiểm hoặc đổi ca.</li>
 </ol>
-<h3 class="h3"><span class="proc-num">3</span> Lấy mẫu nMẫu nhiên và thực hiện kiểm tra</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</span> Lấy mẫu nMẫu nhiên và thực hiện kiểm tra</h3>
 <ol class="tight">
 <li>Mẫu phải rút nMẫu nhiên trên toàn lot hoặc theo sơ đồ nMẫu nhiên đã định trước. Không chọn mẫu “đẹp” hoặc dễ lấy.</li>
 <li>Khi kiểm tra có dùng đặc tính đo/ngoại quan, trực quan standard và gage trạng thái phải hợp lệ trước khi bắt đầu. Nếu gage hết hạn hoặc trực quan class chưa thống nhất, chuyển TẠM GIỮ.</li>
 <li>khuyết tật phải ghi theo đúng class đã định: quan trọng / nghiêm trọng / lớn / nghiêm trọng / nhỏ / không nghiêm trọng hoặc rule tương đương do khách hàng/QPL định nghĩa. Không đổi class sau khi đã thấy kết quả tổng.</li>
 </ol>
-<h3 class="h3"><span class="proc-num">4</span> Ra quyết định chấp nhận / từ chối / hold</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</span> Ra quyết định chấp nhận / từ chối / hold</h3>
 <ol class="tight">
 <li>So raw khuyết tật số đếm với Ac/Re theo từng class. Quan trọng khuyết tật hoặc rule đặc biệt phải xử theo điều kiện nghiêm hơn nếu QPL/khách hàng Requests.</li>
 <li>Lot từ chối phải nối ngay sang ngăn chặn, cách ly, NCR hoặc nhà cung cấp phản hồi theo bối cảnh. đầu vào / nhận hàng từ chối phải phản hồi về source; final từ chối phải phản hồi về job/lộ trình gia công/Quy trình Owner.</li>
 <li>Lot hold dùng khi lấy mẫu kỷ luật / chuyên ngành hỏng, hỗn hợp / lẫn lộn lot chưa làm rõ, trực quan/gage vấn đề, bằng chứng mâu thuẫn hoặc khi cần quyết định vượt cấp. Hold không được dùng như trạng thái “để đó chờ may mắn”.</li>
 </ol>
-<h3 class="h3"><span class="proc-num">5</span> Cập nhật chuyển đổi quy tắc và phản hồi vòng lặp</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</span> Cập nhật chuyển đổi quy tắc và phản hồi vòng lặp</h3>
 <ol class="tight">
 <li>Mọi chấp nhận/từ chối/hold phải cập nhật lịch sử theo nhà cung cấp/quy trình/nhóm sản phẩm để điều khiển chuyển đổi trạng thái ở lô sau.</li>
 <li>Từ chối lặp hoặc xu hướng xấu phải kích hoạt siết chặt / thắt chặt kiểm tra, nhà cung cấp hành động, quy trình rà soát hoặc 100% kiểm tra theo rule. Không để lấy mẫu trở thành lớp lọc cố định che dấu quy trình xuống cấp.</li>
 <li>Kết quả lấy mẫu phải bước tiến (feed) sang <a href="../04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> với đầu vào / nhận hàng/outsource vấn đề và sang <a href="sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> khi cần ngăn chặn/NCR.</li>
 </ol>
-<h3 class="h3"><span class="proc-num">6</span> Ranh giới với SPC, năng lực / khả năng và final phát hành</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">6</span> Ranh giới với SPC, năng lực / khả năng và final phát hành</h3>
 <ol class="tight">
 <li>SPC/năng lực / khả năng dùng để theo dõi hành vi quá trình qua thời gian; AQL dùng để ra quyết định cho lô cụ thể. Hai cơ chế này bổ trợ nhau nhưng không thay nhau.</li>
 <li>Nếu control chart hoặc năng lực / khả năng cho thấy quá trình không ổn định, quyết định lấy mẫu phải xem lại đủ điều kiện của lot tiếp theo thay vì tiếp tục chọn plan như không có gì xảy ra.</li>
 <li>Lot final chấp nhận theo AQL không đồng nghĩa phê duyệt giao hàng (ship phát hành) tự động. Final phát hành vẫn phải đi qua <a href="sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a> để chốt CoC, gói hồ sơ tính đầy đủ và ship ủy quyền.</li>
 </ol>
-<h3 class="h3"><span class="proc-num">7</span> kiểm tra lại, lấy mẫu lại và lot sau làm lại</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#c2410c,#ea580c)">7</span> kiểm tra lại, lấy mẫu lại và lot sau làm lại</h3>
 <ol class="tight">
 <li>lấy mẫu lại không phải quyền mặc định. Chỉ lấy mẫu lại khi standard/khách hàng rule hoặc procedure nội bộ cho phép rõ, và phải chỉ rõ điều kiện nào đã thay đổi để lần lấy mẫu sau có ý nghĩa thống kê.</li>
 <li>Lot sau làm lại hoặc sau-sort phải được xem như một quyết định mới về lot đủ điều kiện. Không được tái dùng y nguyên lịch sử/plan cũ nếu bản chất lot đã đổi.</li>
 <li>Khi chỉ một phần lot bị sửa hoặc bị sort, phải xác định lại ranh giới của sub-lot trước khi quyết định dùng lấy mẫu tiếp hay chuyển 100% xác minh.</li>
 </ol>
-<h3 class="h3"><span class="proc-num">8</span> False chấp nhận học tập, dấu vết kiểm toán và rà soát định kỳ của plan</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#4338ca,#6366f1)">8</span> False chấp nhận học tập, dấu vết kiểm toán và rà soát định kỳ của plan</h3>
 <ol class="tight">
 <li>Mỗi thoát / bỏ qua sau một lot chấp nhận phải được xem như tín hiệu xem lại <b>đủ điều kiện, khuyết tật phân loại, mẫu lựa chọn, plan mức nghiêm trọng và phản hồi vòng lặp</b>. Không chỉ kết luận chung chung là “Người kiểm bỏ sót”.</li>
 <li>Quality Engineer phải rà soát định kỳ các họ lot từ chối/thoát / bỏ qua để quyết định có cần kéo dài siết chặt / thắt chặt, khóa giảm, đổi nhóm sản phẩm rule hoặc chuyển sang 100% xác minh trong một thời gian hay không.</li>
 <li>dấu vết kiểm toán của lấy mẫu phải đủ để Người khác tái dựng được quyết định: lot đã tạo hình how, plan đã chọn why, mẫu đã kéo how, khuyết tật đã đếm ở đâu / nơi nào, quyết định đã phê duyệt by ai / Người nào, phản ứng đã mở khi.</li>
 </ol>
-<div class="note-blue"><b>Rule học lại:</b> Nếu một nhà cung cấp hoặc quy trình nhóm sản phẩm có false-chấp nhận xu hướng tăng, phản ứng đúng không phải là “kiểm kỹ hơn bằng mắt” mà phải xem lại đủ điều kiện, QPL, kiểm tra level, khuyết tật standard, gage/trực quan sự đầy đủ và phản ứng vòng lặp hệ thống.</div><h3 class="h3"><span class="proc-num">9</span> Bảng kiểm bắt buộc để dùng lấy mẫu đúng chỗ</h3>
+<div class="note-blue"><b>Rule học lại:</b> Nếu một nhà cung cấp hoặc quy trình nhóm sản phẩm có false-chấp nhận xu hướng tăng, phản ứng đúng không phải là “kiểm kỹ hơn bằng mắt” mà phải xem lại đủ điều kiện, QPL, kiểm tra level, khuyết tật standard, gage/trực quan sự đầy đủ và phản ứng vòng lặp hệ thống.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#15803d,#22c55e)">9</span> Bảng kiểm bắt buộc để dùng lấy mẫu đúng chỗ</h3>
 <ul class="tight">
 <li>Không dùng lấy mẫu để thay 100% xác minh cho đặc tính mà khách hàng/spec đã khóa kiểm 100%.</li>
 <li>Không dùng lấy mẫu như một cách che việc thiếu trực quan standard, thiếu gage hợp lệ hoặc thiếu năng lực của Người kiểm.</li>
 <li>Không dùng lấy mẫu trên lot mà bản thân phạm vi lot còn đang tranh cãi hoặc truy xuất nguồn gốc chưa rõ.</li>
 <li>Không dùng quyết định chấp nhận của một lot để suy diễn toàn bộ quy trình đã ổn định nếu SPC/năng lực / khả năng đang cho tín hiệu xấu.</li>
-</ul><h3 class="h3"><span class="proc-num">10</span> Chuẩn hóa định nghĩa lot, mẫu đơn vị và phạm vi áp dụng plan</h3>
+</ul><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#be185d,#ec4899)">10</span> Chuẩn hóa định nghĩa lot, mẫu đơn vị và phạm vi áp dụng plan</h3>
 <div class="table-card"><table class="table rule-table"><colgroup><col style="width:20%"/><col style="width:36%"/><col style="width:18%"/><col style="width:26%"/></colgroup><thead><tr><th>Bối cảnh</th><th>Lot được hiểu là gì</th><th>mẫu đơn vị</th><th>Điều kiện bắt buộc phải giữ</th></tr></thead><tbody>
 <tr><td>đầu vào / nhận hàng / IQC</td><td>Cùng part-rev, cùng nhà cung cấp site, cùng PO/phiếu nhận / biên nhận dòng / chuyền và cùng mẻ nấu (heat)/batch nếu có Requests truy vết.</td><td>1 đơn vị nhận hoặc 1 gói đóng gói theo kiểm soát IQC</td><td>PHẢI tách riêng phiếu nhận / biên nhận của từng nhà cung cấp, từng mẻ nấu (heat) và từng Ngày nhận; không gom chung vào một plan AQL.</td></tr>
 <tr><td>IPQC / trong quá trình</td><td>Cùng job-vận hành, cùng trạng thái setup, cùng nhóm máy (machine nhóm sản phẩm) và không có thay đổi sự kiện chưa tái xác nhận.</td><td>1 chi tiết / 1 hốc / lòng khuôn / 1 vị trí / chức vụ theo kế hoạch kiểm tra (plan)</td><td>PHẢI tách lot và mở lot mới khi quy trình thay đổi bản chất; lot AQL không được dùng để che lấp quy trình đang trôi / sai lệch.</td></tr>
 <tr><td>Final / lô giao hàng</td><td>Cùng part-rev, cùng phát hành trạng thái, cùng pack plan và cùng chất lượng gói hàng level.</td><td>1 chi tiết hoặc 1 pack đơn vị tùy kiểm tra hướng dẫn</td><td>PHẢI tách riêng lot đã làm lại với lot chưa làm lại trừ khi đã có đã phê duyệt nộp lại rule cho phép dùng một plan chung.</td></tr>
 <tr><td>Lot sau làm lại / 100% sort</td><td>Chỉ mở lot mới sau khi sort/làm lại hoàn tất và lộ trình gia công/disposition đã khóa.</td><td>1 đơn vị sau làm lại</td><td>PHẢI đánh giá lại plan nếu đặc tính lỗi, khuyết tật nhóm sản phẩm hoặc rủi ro hồ sơ / biên dạng đã đổi; không tái sử dụng nguyên trạng plan cũ.</td></tr>
 </tbody></table></div>
-<h3 class="h3"><span class="proc-num">11</span> Quy tắc chọn mức nghiêm trọng, kiểm tra level và chuyển đổi trạng thái</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">11</span> Quy tắc chọn mức nghiêm trọng, kiểm tra level và chuyển đổi trạng thái</h3>
 <ul class="tight">
 <li>Quan trọng khuyết tật luôn theo logic <b>không / bằng không acceptance</b> và không được dùng AQL như công cụ giảm kiểm. Nếu khuyết tật có khả năng gây sai vật liệu, sai truy xuất nguồn gốc, sai an toàn/fit/chức năng trọng yếu hoặc vi phạm Requests khách hàng, phải xử lý như quan trọng / nghiêm trọng dù số lượng ít.</li>
 <li>Kiểm tra level mặc định, doanh nghiệp mặc định AQL và plan type phải lấy từ <a href="../../03-Reference/06-ANNEX-600/annex-601-aql-method-reference.html">ANNEX-601</a>. SOP này quy định quyết định rule; không sao chép bảng ISO vào SOP.</li>
 <li>chuyển đổi trạng thái phải được theo dõi theo đúng nhóm sản phẩm logic: cùng part-rev / giống / cùng source / giống / cùng quy trình nhóm sản phẩm / giống / cùng khuyết tật chế độ. PHẢI dùng lịch sử đúng đối tượng; không lấy lịch sử của nhà cung cấp tốt để “che” cho nhà cung cấp mới hoặc site mới.</li>
 <li>giảm kiểm tra chỉ được duy trì khi chất lượng lịch sử tốt, điều kiện quy trình ổn định và không có thay đổi nhà cung cấp, nguyên vật liệu, gage, Operator đánh giá năng lực hoặc đóng gói logic làm thay đổi rủi ro hồ sơ / biên dạng.</li>
 </ul>
-<h3 class="h3"><span class="proc-num">12</span> tính toàn vẹn của nMẫu nhiên lấy mẫu, mẫu giám hộ / quản lý và truy vết khi tranh chấp</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">12</span> tính toàn vẹn của nMẫu nhiên lấy mẫu, mẫu giám hộ / quản lý và truy vết khi tranh chấp</h3>
 <div class="callout"><div class="card-title">nMẫu nhiên lấy mẫu phải truy lại được</div>
 <ul class="tight">
 <li>Người lấy mẫu PHẢI chứng minh được nguồn gốc mẫu: lấy từ vị trí nào, thời điểm nào, thùng/pack nào, dòng / chuyền nào hoặc khay nào.</li>
@@ -251,14 +225,14 @@ td,th{}
 <li>Khi có từ chối hoặc tranh chấp khách hàng, HESEM phải truy lại được mẫu logic, khuyết tật mã hóa / lập trình, Inspector, gage dùng và bằng chứng hình ảnh nếu kế hoạch kiểm soát Requests.</li>
 <li>Nếu lô đang ở trạng thái TẠM GIỮ, mọi mẫu giữ lại để kiểm tra lại hoặc khách hàng rà soát phải được nhận dạng, niêm phong hoặc lưu bằng phương pháp ngăn tráo mẫu.</li>
 </ul></div>
-<h3 class="h3"><span class="proc-num">13</span> Quy tắc cho lot sau sort, làm lại, nộp lại và một phần lot</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">13</span> Quy tắc cho lot sau sort, làm lại, nộp lại và một phần lot</h3>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:24%"/><col style="width:40%"/><col style="width:16%"/><col style="width:20%"/></colgroup><thead><tr><th>Tình huống</th><th>Quy tắc bắt buộc</th><th>Người gỡ hold</th><th>Hồ sơ bắt buộc</th></tr></thead><tbody>
 <tr><td>Từ chối lot nhưng chọn 100% sort</td><td>Sort phải có tiêu chí đạt/không đạt rõ, Người sort được chỉ định, lộ trình gia công nhận dạng riêng và bằng chứng cho từng sub-lot được phát hành.</td><td>QA Lead</td><td><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-621_AQL_Inspection_Record.xlsx">FRM-621</a> + <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a> + sort log</td></tr>
 <tr><td>Lot làm lại rồi nộp lại</td><td>Phải xem là lot mới về quyết định trạng thái. Plan kiểm tra lại do QA quyết định theo rủi ro, không tự động quay về giảm/bình thường như chưa có sự cố.</td><td>QA Manager</td><td>Làm lại disposition + <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-621_AQL_Inspection_Record.xlsx">FRM-621</a></td></tr>
 <tr><td>Một phần lot ship</td><td>Chỉ cho phép khi sub-lot ship có truy vết độc lập và không tạo nhầm lẫn cho phần còn lại. Mỗi sub-lot phải có disposition rõ.</td><td>QA Lead / Kho Supervisor</td><td>Pack log + phê duyệt giao hàng hồ sơ</td></tr>
 <tr><td>Customer-chỉ đạo sai lệch</td><td>Chỉ áp dụng khi có khách hàng miễn trừ bằng chứng; sai lệch không được dùng để thay đổi doanh nghiệp rule vĩnh viễn.</td><td>Tổng Giám đốc / QA Manager theo thẩm quyền</td><td>Sai lệch / khách hàng phê duyệt</td></tr>
 </tbody></table></div>
-<h3 class="h3"><span class="proc-num">14</span> Phản hồi bắt buộc từ kết quả AQL về nhà cung cấp, quy trình và lập kế hoạch</h3>
+<h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">14</span> Phản hồi bắt buộc từ kết quả AQL về nhà cung cấp, quy trình và lập kế hoạch</h3>
 <ul class="tight">
 <li>Từ chối lịch sử và chuyển đổi xu hướng phải bước tiến (feed) về <a href="../04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> khi liên quan nhà cung cấp hoặc thuê ngoài công đoạn đặc biệt.</li>
 <li>False-chấp nhận, hỗn hợp / lẫn lộn-lot nhầm lẫn hoặc khuyết tật thoát / bỏ qua sau AQL acceptance phải bước tiến (feed) về <a href="sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a> và <a href="sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> để siết lại phát hành rule.</li>

@@ -134,8 +134,8 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 /* ══════ 4 BADGE TYPES — visually distinct ══════ */
 /* TYPE 1: ISO Clause — blue pill (§8.2) */
 .iso-clause { display: inline-flex; padding: 2px 8px; border-radius: 12px; font-size: 9px; font-weight: 700; color: #fff; background: #1565c0; margin-left: 6px; vertical-align: middle; letter-spacing: .3px; }
-/* TYPE 2: Internal Step — navy rounded square (S1, S2...) */
-.step-tag { display: inline-flex; padding: 4px 12px; border-radius: var(--r-sm); font-size: 11px; font-weight: 800; color: #fff; background: #37474f; border: none; text-transform: uppercase; letter-spacing: .5px; }
+/* TYPE 2: Internal Gate — navy rounded pill (IG1, IG2...) */
+.step-tag { display: inline-flex; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #1565c0, #1976d2); border: none; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
 /* TYPE 3: System Gate — teal pill (G0, G1...) */
 .gate-tag { display: inline-flex; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #fff; background: #00838f; text-transform: uppercase; letter-spacing: .3px; }
 /* TYPE 5: Procedure step balloon — green circle before h3 headings in section 7 */
