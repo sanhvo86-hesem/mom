@@ -76,7 +76,7 @@
 
  <div class="section">
  <h2>3. Mã mức độ sự kiện và định nghĩa</h2>
- <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+ <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
  <thead><tr><th>Mức</th><th>Định nghĩa</th><th>Quyết định mặc định</th><th>Ví dụ điển hình</th></tr></thead>
  <tbody>
  <tr><td><span class="badge-green">L1</span></td><td>Sự kiện cục bộ, không lan rộng, không ảnh hưởng khách hàng, không ảnh hưởng an toàn/sự phù hợp nếu chặn ngay.</td><td>Responsible Person tại công đoạn xử lý; escalation tối thiểu tới cấp lead nếu cần hỗ trợ.</td><td>Thiếu ảnh setup, nhãn nội bộ in sai nhưng chưa sử dụng, 1 gage hết tem trạng thái trước khi đo.</td></tr>
@@ -89,7 +89,7 @@
 
  <div class="section">
  <h2>4. điều kiện kích hoạt escalation theo nhóm sản phẩm sự kiện</h2>
- <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+ <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
  <thead><tr><th>nhóm sản phẩm</th><th>Kích hoạt L2</th><th>Kích hoạt L3</th><th>Kích hoạt L4</th><th>Responsible Person điều phối mặc định</th></tr></thead>
  <tbody>
  <tr><td>Quality / sự phù hợp</td><td>NCR lặp lại; fail mẫu đầu; sai khác ảnh hưởng lot hiện hành.</td><td>CTQ/OOS; hỗn hợp / lẫn lộn trạng thái; nghi ngờ thoát / bỏ qua; thiếu bắt buộc bằng chứng trước phát hành.</td><td>Thoát đã ship, nghi ngờ hàng giả / hàng nhái, mất truy xuất nguồn gốc vật liệu cho hàng đã giao.</td><td>QA</td></tr>
@@ -106,7 +106,7 @@
 
  <div class="section">
  <h2>5. SLA phản ứng bắt buộc</h2>
- <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+ <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
  <thead><tr><th>Mốc</th><th>L2</th><th>L3</th><th>L4</th></tr></thead>
  <tbody>
  <tr><td>Ghi nhận ban đầu</td><td>≤ 30 phút</td><td>≤ 15 phút</td><td>Ngay lập tức</td></tr>
@@ -124,7 +124,7 @@
 
  <div class="section">
  <h2>6. liên hệ chuỗi và quyền quyết định</h2>
- <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+ <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
  <thead><tr><th>Quyết định</th><th>NNgười đề xuất</th><th>NNgười được quyền duyệt</th><th>Evidence tối thiểu trước khi duyệt</th></tr></thead>
  <tbody>
  <tr><td>Hold lot / hold job / stop machine</td><td>Lead / QA / Ops / Bảo trì</td><td>Lead hoặc chức năng sở hữu công đoạn; escalation lên Ops Manager nếu > 1 cell/job</td><td>Mã job/lot bị ảnh hưởng, phạm vi ảnh hưởng, lý do hold, thời điểm hold, Performer</td></tr>
@@ -152,7 +152,7 @@
 
  <div class="section">
  <h2>8. Gói bằng chứng escalation bắt buộc</h2>
- <div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+ <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
  <thead><tr><th>Nhóm trường</th><th>Nội dung bắt buộc</th></tr></thead>
  <tbody>
  <tr><td>Nhận dạng sự kiện</td><td>Sự kiện ID, nNgày giờ, job/WO/lot/part/rev, nhóm sản phẩm sự kiện, mức độ L1-L4, Responsible Person điều phối.</td></tr>

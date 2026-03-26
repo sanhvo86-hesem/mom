@@ -75,7 +75,7 @@ ul.tight li {margin:4px 0;}
 </ul></div>
 
 <div class="section"><h2>2. Ma trận chọn công thức / chương trình gia công chuẩn</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm</th><th>Áp dụng điển hình</th><th>Tần số</th><th>Nhiệt độ</th><th>Dung dịch</th><th>Thời gian mỗi stage</th><th>rửa</th><th>Sấy</th><th>Ghi chú bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm</th><th>Áp dụng điển hình</th><th>Tần số</th><th>Nhiệt độ</th><th>Dung dịch</th><th>Thời gian mỗi stage</th><th>rửa</th><th>Sấy</th><th>Ghi chú bắt buộc</th></tr></thead><tbody>
 <tr><td>CL-A</td><td>Part chân không-tương thích, gas-path, clean-pack, rò rỉ-test, part có Requests xác minh sạch cao</td><td>40–80 kHz</td><td>40–55°C</td><td>kiềm (alkaline) chất tẩy rửa pH 9–11 hoặc thành phần hóa học theo Requests khách hàng</td><td>5–15 phút</td><td>3 stage: giải pháp → DI → DI mới/tràn</td><td>N₂ sạch + lò sấy sạch 60°C trong 15–30 phút khi cần</td><td>DI nước phải đạt ≥ 10 MΩ·cm; không vượt 70°C; ưu tiên công thức / chương trình gia công dịu hơn với mềm kim loại/đã đánh bóng part</td></tr>
 <tr><td>CL-B</td><td>Part tiêu chuẩn sau hoàn thiện bề mặt, part không Requests clean-pack mức cao</td><td>25–40 kHz</td><td>40–60°C</td><td>kiềm (alkaline) hoặc trung tính chất tẩy rửa</td><td>5–10 phút</td><td>2 stage: giải pháp → DI</td><td>N₂ sạch hoặc clean air theo lộ trình gia công</td><td>Dùng khi không có Requests chân không/khí sạch đặc biệt</td></tr>
 <tr><td>công thức / chương trình gia công đặc biệt</td><td>đã xi mạ anốt (anodize), đã thụ động hóa, đã phủ, mỏng-tường, phản chiếu / sao chép hoàn thành, đã mài rà/đã đánh bóng, part có mù / ẩn hốc / lòng khuôn sâu</td><td>Theo phê duyệt ENG/QA</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Theo phê duyệt</td><td>Không được tự ý suy diễn từ CL-A/CL-B chuẩn</td></tr>
@@ -83,7 +83,7 @@ ul.tight li {margin:4px 0;}
 <div class="callout-warning"><strong>Rule vật liệu:</strong> nhôm mềm, bề mặt xi mạ anốt (anodize), bề mặt đánh bóng điện hóa, bề mặt niêm phong / bịt kín, chi tiết có đánh dấu nhạy hoặc polymer gắn kèm phải coi là công thức / chương trình gia công đặc biệt nếu chưa có phê duyệt dùng công thức / chương trình gia công chuẩn.</div></div>
 
 <div class="section"><h2>3. Kiểm mức sẵn sàng trước khi nạp mẻ</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục</th><th>Phải đạt</th><th>hold khi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục</th><th>Phải đạt</th><th>hold khi</th></tr></thead><tbody>
 <tr><td>Bộ hồ sơ công việc (job gói hồ sơ) / lộ trình gia công</td><td>Xác định rõ clean level, nguyên vật liệu nhóm sản phẩm, hoàn thành trạng thái, bước sau làm sạch và hồ sơ cần ghi</td><td>Thiếu clean level, thiếu lộ trình gia công sau làm sạch, không rõ có cần xác minh hay clean-pack hay không</td></tr>
 <tr><td>bồn / thùng chứa ID và thành phần hóa học</td><td>Đúng bồn / thùng chứa theo công thức / chương trình gia công; dung dịch đúng loại, đúng nồng độ, đúng tuổi bể; không có dầu nổi, bọt bất thường hoặc cặn lớn</td><td>Không chứng minh được nNgày thay bể, pH ngoài dải, dung dịch đổi màu/đục/bẩn</td></tr>
 <tr><td>Nhiệt độ / tần số / bộ hẹn giờ</td><td>Thiết bị đạt giá trị công thức / chương trình gia công; bộ chuyển đổi (transducer) hoạt động ổn; đồng hồ nhiệt và pH đồng hồ đo còn hiệu lực sử dụng</td><td>Thông số ngoài cửa sổ công thức / chương trình gia công hoặc thiết bị đo không đáng tin</td></tr>
@@ -101,7 +101,7 @@ ul.tight li {margin:4px 0;}
 </div></div>
 
 <div class="section"><h2>5. Chuẩn bị part và quy tắc xếp mẻ</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Rule</th><th>Yêu cầu bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Rule</th><th>Yêu cầu bắt buộc</th></tr></thead><tbody>
 <tr><td>Tiền làm sạch</td><td>Loại bỏ phoi (chip) lớn, bavia rời, dầu mỡ nặng, nhãn/băng dính / băng keo thừa trước khi vào bể. Không dùng bể siêu âm để xử lý phoi (chip) thô.</td></tr>
 <tr><td>Phân nhóm part</td><td>Không trộn part khác nguyên vật liệu nhóm sản phẩm, khác clean level, khác hoàn thành trạng thái hoặc khác khách hàng-cụ thể hạn chế khi chưa có phê duyệt.</td></tr>
 <tr><td>Hướng part</td><td>mù / ẩn lỗ, hốc / túi sâu, ống, ống góp / đa tạp hoặc hốc / lòng khuôn phải được đặt sao cho thoát bọt và thoát dung dịch; nếu không, part có thể ra bể nhưng vẫn bẩn bên trong.</td></tr>
@@ -122,7 +122,7 @@ ul.tight li {margin:4px 0;}
 </div></div>
 
 <div class="section"><h2>7. Kiểm soát thay bể và chống nhiễm chéo</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Must not do</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Must not do</th></tr></thead><tbody>
 <tr><td>Dung dịch đổi màu, có dầu nổi, mùi lạ, nhiều bọt, có cặn nhìn thấy</td><td>Dừng dùng cho mẻ tiếp theo; thay bể/lọc bể theo rule; ghi log thay bể</td><td>Không được “chạy thêm mẻ nữa cho hết ca”</td></tr>
 <tr><td>Part sau làm sạch có cặn / dư lượng / vết bẩn / ố / nước đánh dấu</td><td>Cô lập lô, điều tra thành phần hóa học, DI rửa, định hướng / đào tạo hội nhập, dry-xuống / nTừng; chỉ re-clean khi đã rõ nguyên nhân</td><td>Không được chuyển qua clean-pack với lý do “vết nhỏ không sao”</td></tr>
 <tr><td>Mix bẩn lot với clean lot hoặc mix nguyên vật liệu nhạy với nguyên vật liệu thường</td><td>Xem toàn bộ mẻ là nghi ngờ; đánh giá lại theo clean level cao hơn</td><td>Không được chỉ tách vài part ra rồi phát hành phần còn lại</td></tr>
@@ -130,7 +130,7 @@ ul.tight li {margin:4px 0;}
 </tbody></table></div></div>
 
 <div class="section"><h2>8. TẠM GIỮ, từ chối và xử lý bất thường</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Dấu hiệu</th><th>Đánh giá</th><th>Hành động</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Dấu hiệu</th><th>Đánh giá</th><th>Hành động</th></tr></thead><tbody>
 <tr><td>hạt / phần tử count/vệ sinh / sạch sẽ xác minh FAIL</td><td>Có thể do thành phần hóa học bẩn, rổ / giỏ bẩn, rửa không đủ, nhiễm bẩn mang sang / tồn dư hoặc xử lý / vận chuyển sau bể</td><td>TẠM GIỮ lô; điều tra và quyết định re-clean / phế phẩm / concession theo QA</td></tr>
 <tr><td>vết bẩn / ố, đổi màu, khắc axit (etch) nhẹ, nước điểm / tại chỗ lặp lại</td><td>Nghi ngờ thành phần hóa học quá mạnh, nhiệt quá cao, DI không đạt hoặc sấy khô không đúng</td><td>TẠM GIỮ; không re-clean lặp lại khi chưa chỉnh công thức / chương trình gia công</td></tr>
 <tr><td>Bề mặt xước/cọ xát</td><td>Lỗi xếp mẻ, rổ / giỏ hoặc xử lý / vận chuyển</td><td>Cô lập lô; đánh giá ngoại quan / bề ngoài/chức năng tác động; sửa phương pháp xếp trước mẻ kế tiếp</td></tr>
@@ -154,7 +154,7 @@ ul.tight li {margin:4px 0;}
 <li>Số sự cố bề mặt hư hỏng sau siêu âm làm sạch</li>
 </ul></div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html">SOP-505</a></td><td>Khung hoàn thiện bề mặt, thứ cấp vận hành và trách nhiệm công đoạn.</td></tr>
 <tr><td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td><td>Yêu cầu sạch, nhiễm bẩn control, môi trường sạch.</td></tr>
 <tr><td><a href="../../03-Reference/06-ANNEX-600/annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a></td><td>Rule vật liệu, bề mặt, chân không tương thích, xử lý / vận chuyển đặc biệt.</td></tr>

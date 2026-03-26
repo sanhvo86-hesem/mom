@@ -73,7 +73,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </ul></div>
 
 <div class="section"><h2>2. Ma trận kích hoạt: Mẫu đầu, Chênh lệch FAI, Đầy đủ FAI</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Mức bắt buộc</th><th>Ghi chú vận hành</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Mức bắt buộc</th><th>Ghi chú vận hành</th></tr></thead><tbody>
 <tr><td>Part mới / lần chạy đầu</td><td><span class="badge-red">Đầy đủ FAI</span> + Mẫu đầu</td><td>Đo đầy đủ đặc tính theo balloon/spec, khóa phát hành trước khi chạy lô.</td></tr>
 <tr><td>phiên bản mới / ECO ảnh hưởng đặc tính</td><td><span class="badge-red">Đầy đủ FAI</span> hoặc <span class="badge-amber">Chênh lệch FAI</span> theo tác động</td><td>Nếu ảnh hưởng CTQ, mốc chuẩn (datum), dung sai chuỗi hoặc fit/chức năng thì mặc định Đầy đủ FAI.</td></tr>
 <tr><td>Đổi máy, đổi fixture, đổi lộ trình gia công, đổi WCS logic, đổi chương trình chính</td><td><span class="badge-amber">Chênh lệch FAI</span> + Mẫu đầu</td><td>Phải đo lại toàn bộ đặc tính bị ảnh hưởng và các CTQ liên quan.</td></tr>
@@ -101,7 +101,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div></div>
 
 <div class="section"><h2>5. tái xác nhận hiệu lực và xử lý FAIL</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>khi nào phải tái xác nhận</th><th>Yêu cầu tối thiểu</th><th>Ai quyết định</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>khi nào phải tái xác nhận</th><th>Yêu cầu tối thiểu</th><th>Ai quyết định</th></tr></thead><tbody>
 <tr><td>Thay đổi program/bù trừ (offset) vượt giới hạn đã phê duyệt</td><td>Đo lại đặc tính bị ảnh hưởng + CTQ liên quan</td><td>QA + ENG</td></tr>
 <tr><td>Thay fixture/jaw/gá kẹp chi tiết, đổi machine hoặc đổi định hướng / đào tạo hội nhập</td><td>Chênh lệch FAI hoặc Đầy đủ FAI theo tác động</td><td>QA + ENG</td></tr>
 <tr><td>sự cố nghiêm trọng, trục chính (spindle) hit, jaw phiếu / trượt, đầu dò (probe) hit, part shift</td><td>Hold toàn bộ WIP nghi ngờ; đánh giá phạm vi và FAI lại</td><td>QA + Sản xuất + ENG</td></tr>
@@ -110,7 +110,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-danger"><strong>FAIL thì làm ngay</strong><br/>1) Dừng công đoạn. 2) Cách ly part nghi ngờ từ cuối cùng đã biết tốt / đạt. 3) áảo toàn setup hiện trạng nếu cần điều tra. 4) Ghi rõ đặc điểm / tính năng fail, phương pháp đo, dụng cụ đo, nNgười đo, thời điểm. 5) Không tự sửa chương trình/bù trừ (offset) rồi chạy lại khi chưa có quyết định phù hợp.</div></div>
 
 <div class="section"><h2>6. áộ bằng chứng bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>áằng chứng</th><th>áắt buộc khi</th><th>Ghi chú</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>áằng chứng</th><th>áắt buộc khi</th><th>Ghi chú</th></tr></thead><tbody>
 <tr><td>áalloon drawing</td><td>Đầy đủ FAI / Chênh lệch FAI</td><td>Phải là phiên bản hiện hành và lưu trong SSOT.</td></tr>
 <tr><td>FAI / Mẫu đầu báo cáo</td><td>Mọi lần mở cổng kiểm soát</td><td>Phải có kết luận rõ PASS/TẠM GIỮ/FAIL.</td></tr>
 <tr><td>CMM / raw đo lường data</td><td>khi dùng CMM hoặc program đo</td><td>Không thay bằng Photos màn hình rời rạc.</td></tr>
@@ -126,7 +126,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="kpi-box"><strong>hPI-WI302-03</strong><br/>Thời gian từ part đầu đến quyết định phát hành. Mục tiêu: ngắn nhưng không bỏ bước.</div>
 <div class="kpi-box"><strong>hPI-WI302-04</strong><br/>Số lần khởi động lại/chạy lô trước khi cổng kiểm soát PASS. Mục tiêu: 0.</div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>Xác định QPL và mức hồ sơ/cổng kiểm soát cưỡng chế.</td></tr>
 <tr><td><a href="../../03-Reference/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a></td><td>Chuẩn phiếu cài đặt, danh sách dao cụ, setup Photos.</td></tr>
 <tr><td><a href="../05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a></td><td>Setup/chuyển đổi (changeover) và xác nhận ready-to-run.</td></tr>

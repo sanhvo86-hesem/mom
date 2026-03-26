@@ -78,7 +78,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="card"><h3>Nguyên tắc 2 — đúng rủi ro hư hỏng</h3><p>Quy cách đóng gói phải được chọn theo bề mặt, độ sạch, nguy cơ ẩm/gỉ, ESD, khối lượng, hình dạng, lộ trình gia công vận chuyển và thời gian lưu kho.</p></div>
 </div></div>
 <div class="section"><h2>2. Chọn cấp đóng gói theo rủi ro sản phẩm</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cấp đóng gói</th><th>Khi áp dụng</th><th>Lớp bảo vệ tối thiểu</th><th>Bổ sung bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cấp đóng gói</th><th>Khi áp dụng</th><th>Lớp bảo vệ tối thiểu</th><th>Bổ sung bắt buộc</th></tr></thead><tbody>
 <tr><td><span class="badge-green">P1 — thường</span></td><td>Part gia công thông thường, không ngoại quan / bề ngoài-quan trọng / nghiêm trọng, không ESD, không độ ẩm-nhạy cảm</td><td>Túi PE sạch hoặc giấy chống trầy + khay / thùng thùng carton đúng cỡ</td><td>Ngăn va đập, phân lô, nhãn Part/Rev/Qty, ảnh kiện hoàn tất</td></tr>
 <tr><td><span class="badge-blue">P2 — bề mặt / hình học nhạy</span></td><td>xi mạ anốt (anodize), đã đánh bóng, mối hàn / hạt phun bi / thổi, mép sắc, chi tiết mỏng dễ cong, chi tiết dễ cấn</td><td>Bọc riêng từng chiếc hoặc từng lớp bằng vật liệu không phát bụi; miếng đệm / phân vùng / góc bộ bảo vệ</td><td>PHẢI ngăn tuyệt đối kim loại chạm kim loại; ảnh lớp phân cách; dán cảnh báo “Do not chồng / xếp” khi áp dụng</td></tr>
 <tr><td><span class="badge-navy">P3 — chống ẩm / chống gỉ / chân không-tương thích</span></td><td>Part cần VCI, chất hút ẩm, HIC, thanh lọc / loại bỏ hoặc niêm phong kín; linh kiện Requests độ ẩm control / chân không tương thích</td><td>bên trong bag + chất hút ẩm/HIC + bên ngoài bag hoặc thùng kín; vật tư không phát bụi, không silicone nếu khách không cho phép</td><td>Ghi loại chất hút ẩm, số lượng, HIC, thời gian đóng gói, thời hạn bảo quản; ảnh HIC và niêm phong</td></tr>
@@ -87,7 +87,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </tbody></table></div>
 <p class="tiny">Khi một part thỏa nhiều điều kiện, <strong>PHẢI</strong> chọn cấp cao hơn. Ví dụ: part xi mạ anốt (anodize) đồng thời cần độ ẩm control thì áp dụng tối thiểu P3, không được chỉ dùng P2.</p></div>
 <div class="section"><h2>3. Vật tư được phép và vật tư phải loại trừ</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm vật tư</th><th>Được phép</th><th>Phải loại trừ</th><th>Ghi chú thực thi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm vật tư</th><th>Được phép</th><th>Phải loại trừ</th><th>Ghi chú thực thi</th></tr></thead><tbody>
 <tr><td>Vật tư tiếp xúc trực tiếp part</td><td>PE sạch, xốp / bọt sạch, xơ / bụi vải-miễn phí / tự do bọc / quấn, khay nhựa sạch, giấy VCI khi được phép</td><td>Giấy thùng thùng carton trần chạm trực tiếp part, vải phát xơ, băng keo dán trực tiếp lên part</td><td>Part ngoại quan / bề ngoài-quan trọng / nghiêm trọng và clean part phải có lớp ngăn trực tiếp riêng</td></tr>
 <tr><td>Vật tư chống ẩm</td><td>chất hút ẩm còn hạn, HIC còn hạn, túi rào cản / túi kín đúng lộ trình gia công</td><td>chất hút ẩm không nhãn, đã no ẩm, HIC đổi màu trước khi dùng, túi thủng / niêm phong lỗi</td><td>Phải ghi số lượng và vị trí đặt trên bảng kiểm</td></tr>
 <tr><td>Vật tư ESD</td><td>Túi che chắn, xốp / bọt ESD, nhãn ESD, niêm phong sạch</td><td>Túi PE thường thay cho che chắn bag, bọt khí bọc / quấn không kiểm soát ESD</td><td>Chỉ mở gói ESD tại khu được kiểm soát theo WI liên quan</td></tr>
@@ -120,13 +120,13 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>5. Rule chống ẩm, thanh lọc / loại bỏ, chất hút ẩm và ESD</h2>
 <h3>5.1 N<sub>2</sub> thanh lọc / loại bỏ</h3>
 <div class="callout-info"><strong>Chỉ áp dụng thanh lọc / loại bỏ</strong> khi lộ trình gia công khách hàng, QPL, <a href="../../02-Work-Instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a> hoặc QA/Kỹ thuật Requests. Tuyệt đối không dùng khí nén nhà máy thay cho N<sub>2</sub> thanh lọc / loại bỏ.</div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Yêu cầu tối thiểu</th><th>Điểm xác nhận</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Yêu cầu tối thiểu</th><th>Điểm xác nhận</th></tr></thead><tbody>
 <tr><td>bên trong bag độ ẩm-nhạy cảm / chân không-tương thích</td><td>Dùng N<sub>2</sub> khô, sạch, không dầu; thanh lọc / loại bỏ tối thiểu 3 lần thể tích túi hoặc theo thời gian chuẩn của <a href="../../02-Work-Instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td><td>Ghi thời gian thanh lọc / loại bỏ, Performer, loại khí; chụp ảnh HIC trước niêm phong khi áp dụng</td></tr>
 <tr><td>Part đã rò rỉ test / clean xây dựng</td><td>niêm phong ngay sau thanh lọc / loại bỏ; không để túi hở chờ vật tư</td><td>Nếu niêm phong lại sau 15 phút phải thanh lọc / loại bỏ lại từ đầu</td></tr>
 <tr><td>Không Requests thanh lọc / loại bỏ</td><td>Không tự ý thanh lọc / loại bỏ cho đủ hình thức</td><td>Dùng đúng vật tư sạch và chất hút ẩm theo lộ trình gia công</td></tr>
 </tbody></table></div>
 <h3>5.2 Chọn chất hút ẩm và HIC</h3>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thể tích xấp xỉ của bên trong vỏ bọc / hộp</th><th>Số đơn vị chất hút ẩm tối thiểu</th><th>HIC</th><th>Khi phải nâng cấp</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thể tích xấp xỉ của bên trong vỏ bọc / hộp</th><th>Số đơn vị chất hút ẩm tối thiểu</th><th>HIC</th><th>Khi phải nâng cấp</th></tr></thead><tbody>
 <tr><td>≤ 10 lít</td><td>1 đơn vị</td><td>1 thẻ / kiện</td><td>Nâng lên 2 đơn vị nếu lộ trình gia công &gt; 7 nNgày hoặc độ ẩm cao</td></tr>
 <tr><td>&gt; 10 đến 30 lít</td><td>2 đơn vị</td><td>1 thẻ / kiện</td><td>Nâng thêm 1 đơn vị khi mở/đóng lại một lần</td></tr>
 <tr><td>&gt; 30 đến 75 lít</td><td>4 đơn vị</td><td>1 thẻ / kiện</td><td>Nâng thêm 2 đơn vị nếu kiện đi biển / vận chuyển dài</td></tr>
@@ -140,7 +140,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <li>Nếu bên ngoài thùng thùng carton là vật tư thường, bên trong bag vẫn phải bảo đảm che chắn còn nguyên và không bị thủng.</li>
 </ul></div>
 <div class="section"><h2>6. Vùng dán nhãn và trường dữ liệu bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Lớp / đơn vị</th><th>Phải dán ở đâu</th><th>Trường bắt buộc</th><th>Phải tránh</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Lớp / đơn vị</th><th>Phải dán ở đâu</th><th>Trường bắt buộc</th><th>Phải tránh</th></tr></thead><tbody>
 <tr><td>bên trong bag / bên trong khay</td><td>Mặt phẳng dễ nhìn, không che niêm phong chính</td><td>Job, Part No., Rev, Qty, Lot/số sê-ri khi áp dụng, nNgày đóng gói, nNgười đóng gói</td><td>Dán lên vùng dễ Cấp, vùng phải cắt mở, hoặc dán trực tiếp lên bề mặt part</td></tr>
 <tr><td>bên ngoài bag / thùng thùng carton</td><td>Một mặt chính, quét được khi đặt kiện trên kệ</td><td>bên trong pack trường dữ liệu + ship-to / khách hàng ref khi xuất đi</td><td>Dán chồng nhiều nhãn cũ mới không xóa bỏ nhãn lỗi</td></tr>
 <tr><td>pallet / thùng gỗ</td><td>Ít nhất 2 mặt liền kề ở cao độ quét thuận tiện</td><td>Pack ID, SSCC khi áp dụng, số kiện, tổng / gộp trọng lượng, xử lý / vận chuyển dấu vết</td><td>Dán dưới dây đai / màng co dày làm không quét được</td></tr>
@@ -158,7 +158,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 <p>Mọi ảnh bằng chứng phải được nạp vào Hồ sơ công việc / Giao vận Gói hồ sơ trước khi xác nhận giao hàng (ship xác nhận). Ảnh mờ, thiếu góc chụp hoặc không đọc được nhãn xem như <strong>chưa có bằng chứng</strong>.</p></div>
 <div class="section"><h2>8. bảo quản cửa sổ / khung thời gian và điều kiện phải đóng gói lại</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại pack</th><th>Thời hạn còn hiệu lực khi niêm kín</th><th>TẠM GIỮ / re-pack khi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại pack</th><th>Thời hạn còn hiệu lực khi niêm kín</th><th>TẠM GIỮ / re-pack khi</th></tr></thead><tbody>
 <tr><td>P1 / P2 thông thường</td><td>30 nNgày nếu lưu trong kho khô, sạch, FIFO</td><td>thùng thùng carton rách, nhãn mất, vật tư đệm xô lệch, dấu ẩm hoặc part dịch chuyển</td></tr>
 <tr><td>P3 chống ẩm / chống gỉ</td><td>90 nNgày hoặc theo Requests khách hàng, tùy điều kiện nào nghiêm hơn</td><td>HIC ngoài ngưỡng, chất hút ẩm hết hạn, túi mất kín, mở lại quá thời gian cho phép</td></tr>
 <tr><td>P4 ESD</td><td>180 nNgày nếu che chắn bag nguyên vẹn và kho đúng điều kiện</td><td>che chắn bag thủng / rách / mất nhãn ESD / bị mở ngoài khu kiểm soát</td></tr>
@@ -181,7 +181,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </ul></div>
 </div></div>
 <div class="section"><h2>10. Tài liệu liên kết</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò sử dụng</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò sử dụng</th></tr></thead><tbody>
 <tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a></td><td>Quy tắc in nhãn, scan-to-hành động và log in lại.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td><td>bộ hồ sơ phê duyệt giao hàng (ship gói phát hành), SSCC và đối soát kiện trước xác nhận giao hàng.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td><td>Step-by-step clean pack, kép / Cấp đôi-bag, thanh lọc / loại bỏ, niêm phong lại và bảo quản.</td></tr>

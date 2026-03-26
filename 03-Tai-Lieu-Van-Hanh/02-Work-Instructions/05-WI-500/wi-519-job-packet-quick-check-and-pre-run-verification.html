@@ -75,7 +75,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <p>WI này là cổng chặn cuối cùng trước khi nhấn <b>Cycle Start</b>. Trong vòng 60 giây, Operator hoặc Setup Lead phải xác nhận đủ 07 điểm bắt buộc tại máy. Nếu có 01 điểm không PASS hoặc không chứng minh được, máy phải vào <b>TẠM GIỮ</b>.</p>
 <div class="callout-danger"><strong>STOP-THE-dòng / chuyền</strong><br/>Không được chạy máy để “test tạm” khi chưa qua WI-519. Không được bỏ qua bước kiểm vì job lặp, vì đã từng chạy, vì Cần đến giờ giao, hoặc vì nNgười setup nói “ổn rồi”.</div></div>
 <div class="section"><h2>2. Khi nào bắt buộc dùng WI-519</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thời điểm</th><th>Phải thực hiện</th><th>NNgười xác nhận</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thời điểm</th><th>Phải thực hiện</th><th>NNgười xác nhận</th></tr></thead><tbody>
 <tr><td>Part đầu sau setup / chuyển đổi (changeover)</td><td>Đủ 07 điểm kiểm + chứng minh-out + xác nhận đầu tiên cut</td><td>Operator + Setup Lead</td></tr>
 <tr><td>Sau thay tool ảnh hưởng CTQ, thay mảnh dao (insert) chính, thay cán dao / đầu gá</td><td>Kiểm lại danh sách dao cụ, bù trừ (offset), đầu tiên cut, đặc tính chịu ảnh hưởng</td><td>Operator; QA cùng ký khi CTQ cao</td></tr>
 <tr><td>Sau bù trừ (offset) edit, đầu dò (probe) re-không / bằng không, đổi WCS, đổi fixture điểm</td><td>Lặp WI-519 đầy đủ</td><td>Setup Lead</td></tr>
@@ -84,7 +84,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Sau thay lot vật liệu, thay batch outsource, thay jaw/kẹp / gá kẹp định hướng / đào tạo hội nhập</td><td>Kiểm thêm truy xuất nguồn gốc, kẹp / gá kẹp sơ đồ / kế hoạch và điều kiện bề mặt</td><td>Operator + Setup Lead</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>3. Bảy điểm bắt buộc tại máy</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điểm kiểm</th><th>Phải xác nhận</th><th>Evidence tối thiểu</th><th>Không đạt khi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điểm kiểm</th><th>Phải xác nhận</th><th>Evidence tối thiểu</th><th>Không đạt khi</th></tr></thead><tbody>
 <tr><td>1. Phiên bản set</td><td>Drawing/spec, traveler, phiếu cài đặt, danh sách dao cụ, kiểm tra phương pháp, khách hàng lớp phủ cùng Part/Rev</td><td>Traveler + phiếu cài đặt + link hồ sơ</td><td>sai phiên bản, thiếu tài liệu hiệu lực, hoặc không biết bản nào đang chạy</td></tr>
 <tr><td>2. Nguyên vật liệu lot / truy xuất nguồn gốc</td><td>Nguyên vật liệu tag, mẻ nấu (heat)/lot, qty, điều kiện khớp traveler và Requests job</td><td>Tag vật liệu + traveler</td><td>Lot không khớp, không truy vết được hoặc lẫn vật liệu</td></tr>
 <tr><td>3. Tool list / tool tuổi thọ / vòng đời</td><td>ToolID đúng, tool CTQ còn tuổi thọ / vòng đời, mảnh dao (insert)/cán dao / đầu gá/dính / que-out đúng, không có tool hỏng</td><td>Tool list + log tuổi dao</td><td>Tool thiếu, sai vị trí, hết tuổi thọ / vòng đời, hoặc cán dao / đầu gá/độ đảo (runout) nghi ngờ</td></tr>
@@ -95,20 +95,20 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div>
 <div class="callout-info"><strong>Kiểm bổ sung bắt buộc</strong><br/>Job QPL-3/QPL-4, part có CTQ cao, part lần đầu, part có Requests chân không/clean/rò rỉ hoặc khách hàng lớp phủ đặc biệt phải kiểm thêm: gage mức sẵn sàng, kiểm tra phương pháp, bằng chứng path và nNgười nhận đo part đầu.</div></div>
 <div class="section"><h2>4. Ba mức kiểm trước khi chạy</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mức kiểm</th><th>Mục tiêu</th><th>Nội dung</th><th>Không đạt thì làm gì</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mức kiểm</th><th>Mục tiêu</th><th>Nội dung</th><th>Không đạt thì làm gì</th></tr></thead><tbody>
 <tr><td>Mức A — Gói hồ sơ</td><td>Chặn sai phiên bản, sai job, sai vật liệu, sai lộ trình gia công</td><td>Kiểm tài liệu, traveler, nguyên vật liệu lot, QPL, khách hàng lớp phủ, trước đó hold/NCR</td><td>TẠM GIỮ bộ hồ sơ công việc; báo Supervisor / QA / Kỹ thuật</td></tr>
 <tr><td>Mức B — Machine tĩnh</td><td>Chặn sai setup phần cứng</td><td>Kiểm WCS, tool map, fixture định hướng / đào tạo hội nhập, dung dịch làm mát, phoi (chip)/FOD, an toàn khu vực</td><td>TẠM GIỮ machine; xử lý setup trước khi chứng minh-out</td></tr>
 <tr><td>Mức C — động / đầu tiên cut</td><td>Chặn sự cố nghiêm trọng, sai đường dao, trôi / sai lệch sớm</td><td>Dry-run, đơn lẻ chặn / khóa, chứng minh-out, part đầu, đặc tính chịu ảnh hưởng sau thay đổi</td><td>Dừng cycle; khoanh vùng cuối cùng-đã biết-tốt / đạt; chuyển <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> hoặc NCR nếu cần</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>5. Add-on bắt buộc theo họ máy</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Họ máy</th><th>Phải kiểm thêm trước Cycle Start</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Họ máy</th><th>Phải kiểm thêm trước Cycle Start</th></tr></thead><tbody>
 <tr><td>3-trục đứng phay</td><td>Chiều cao đồ gá, vùng chạm hàm kẹp, chu trình đầu dò (probe), thông quan / giải phóng của dao dài và thoát phoi trong hốc / túi sâu.</td></tr>
 <tr><td>5-trục phay</td><td>Trạng thái quay kẹp / gá kẹp/tháo kẹp, gốc xoay, an toàn home, góc trục quay đầu tiên và đoạn đường dao Cần fixture tháp / cột.</td></tr>
 <tr><td>CNC tiện</td><td>Jaw step / ống kẹp (collet) đúng, chiều nhô phôi, ụ sau (tailstock)/Live trung tâm, vòi phun dung dịch làm mát, phoi (chip) quấn quanh phôi hoặc mảnh dao (insert).</td></tr>
 <tr><td>phay-lượt / quay</td><td>Main/sub trục chính (spindle) trạng thái, định hướng / đào tạo hội nhập của Live tool, chuyển giao điểm, sync giữa kênh, thông quan / giải phóng vùng bàn giao.</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>6. khởi động lại sau bất thường</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Kiểm lại tối thiểu</th><th>Phải giữ lại bằng chứng gì</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Kiểm lại tối thiểu</th><th>Phải giữ lại bằng chứng gì</th></tr></thead><tbody>
 <tr><td>Sau thay tool hoặc mảnh dao (insert)</td><td>Điểm 3, 4, 7; đo đặc tính bị ảnh hưởng; cập nhật log tuổi dao</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> / log tool thay đổi</td></tr>
 <tr><td>Sau bù trừ (offset) edit / re-không / bằng không / đầu dò (probe) hiệu chuẩn</td><td>Điểm 4, 5, 7; chạy đơn lẻ chặn / khóa ở đoạn rủi ro</td><td>Ghi rõ bù trừ (offset) đã thay đổi by / time / lý do</td></tr>
 <tr><td>Sau cảnh báo hoặc power tổn thất</td><td>Điểm 1, 3, 4, 6, 7; khoanh vùng WIP từ cuối cùng-đã biết-tốt / đạt</td><td>Hồ sơ thời điểm dừng và trạng thái WIP</td></tr>
@@ -118,7 +118,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div></div>
 <div class="section"><h2>7. ký-off và bằng chứng tối thiểu</h2>
 <p>Machine chỉ được xem là qua WI-519 khi <b>nNgười chạy máy</b> và <b>nNgười setup/giám sát</b> cùng xác nhận. Job có Requests QA phát hành, CTQ cao hoặc mẫu đầu (tiên chi tiết / sản phẩm) nhạy cảm phải có xác nhận của QA theo rule job.</p>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại job</th><th>Evidence tối thiểu</th><th>NNgười phải ký</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại job</th><th>Evidence tối thiểu</th><th>NNgười phải ký</th></tr></thead><tbody>
 <tr><td>Job tiêu chuẩn QPL-1/QPL-2</td><td><a href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx" download="">FRM-511</a> hoặc hồ sơ số tương đương, traveler, cuối cùng-đã biết-tốt / đạt khi có khởi động lại</td><td>Operator + Setup Lead/Supervisor</td></tr>
 <tr><td>Job CTQ cao, QPL-3/QPL-4, khách hàng lớp phủ</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> + mẫu đầu/FAI bằng chứng + link hồ sơ đo</td><td>Operator + Setup Lead + QA</td></tr>
 <tr><td>Job sau sự cố nghiêm trọng/bất thường khởi động lại</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> + ghi rõ phạm vi nghi ngờ WIP + hành động khởi động lại</td><td>Supervisor + QA; Kỹ thuật/Bảo trì khi có machine tác động</td></tr>

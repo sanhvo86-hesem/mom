@@ -70,7 +70,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-danger"><strong>Phân biệt bắt buộc:</strong> <strong>Out of control</strong> là mất ổn định thống kê; <strong>In control but không đủ năng lực</strong> là ổn định nhưng vẫn không đạt Requests khách. Hai tình huống này có hành động khác nhau và đều không được bỏ qua.</div></div>
 
 <div class="section"><h2>2. Điều kiện mở chart và chọn loại chart</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống dữ liệu</th><th>Chart áp dụng</th><th>Điều kiện mở</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống dữ liệu</th><th>Chart áp dụng</th><th>Điều kiện mở</th></tr></thead><tbody>
 <tr><td>Dữ liệu biến liên tục, nhóm con 2–5 chiếc liên tiếp</td><td>Xbar-R hoặc Xbar-S</td><td>Đo lường system đạt; định nghĩa nhóm con rõ; CTQ lặp đủ tần suất.</td></tr>
 <tr><td>Dữ liệu theo từng chiếc, tần suất thấp</td><td>I-MR</td><td>Không có nhóm con hợp lý; vẫn phải bảo đảm điều kiện lấy mẫu nhất quán.</td></tr>
 <tr><td>Dữ liệu thuộc tính theo số lỗi/đơn vị</td><td>p, np, c hoặc u chart theo <a href="../../03-Reference/06-ANNEX-600/annex-605-spc-lite-and-reaction-plan.html">ANNEX-605</a></td><td>Đơn vị kiểm, mẫu size và khuyết tật mã hóa / lập trình phải rõ.</td></tr>
@@ -88,7 +88,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div></div>
 
 <div class="section"><h2>4. Phản ứng plan chuẩn</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Dấu hiệu</th><th>Phản ứng ngay</th><th>Must not do</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Dấu hiệu</th><th>Phản ứng ngay</th><th>Must not do</th></tr></thead><tbody>
 <tr><td>Điểm vượt UCL/LCL</td><td>Dừng, xác minh gage, cô lập từ lần tốt / đạt Cần nhất, điều tra tool/bù trừ (offset)/fixture/nguyên vật liệu.</td><td>Không xóa điểm, không tiếp tục chạy để “xem thêm vài chiếc”.</td></tr>
 <tr><td>Xu hướng tiến dần tới spec hoặc control giới hạn</td><td>Tăng tần suất đo, kiểm tuổi dao (tool tuổi thọ / vòng đời), kiểm nhiệt, chuẩn bị tool thay đổi có kiểm soát.</td><td>Không chờ đến khi vượt spec mới phản ứng.</td></tr>
 <tr><td>biên độ / phân tán tăng rộng bất thường</td><td>Kiểm kẹp, độ đảo (runout), mảnh dao (insert) mài mòn, machine điều kiện, dung dịch làm mát điều kiện.</td><td>Không chỉ chỉnh trung bình mà bỏ qua biến thiên.</td></tr>
@@ -102,7 +102,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;"><li>Chart data có time tem / dấu và sự kiện bút đánh dấu.</li><li>Spec giới hạn, control giới hạn, nhóm con rule.</li><li>Phản ứng log: ai dừng, ai mở lại, hành động gì.</li><li>Khả năng tóm tắt kèm giả định và cửa sổ dữ liệu đã dùng.</li></ul></div>
 <div class="card"><h3>KPI bắt buộc</h3><ul class="tight" style="padding-left:18px;"><li>Tỷ lệ chart phản ứng trễ so với tín hiệu.</li><li>Số lần out-of-control lặp theo machine/tool nhóm sản phẩm.</li><li>Cpk/Ppk theo CTQ trọng yếu.</li><li>Tỷ lệ trôi / sai lệch được chặn trước khi tạo NCR/lô giao hàng vấn đề.</li></ul></div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/06-SOP-600/sop-604-spc-and-capability-control.html">SOP-604</a></td><td>Chính sách SPC/năng lực / khả năng ở cấp hệ thống.</td></tr>
 <tr><td><a href="../../03-Reference/06-ANNEX-600/annex-605-spc-lite-and-reaction-plan.html">ANNEX-605</a></td><td>Tham số chart, rule tín hiệu và phản ứng matrix.</td></tr>
 <tr><td><a href="../../03-Reference/06-ANNEX-600/annex-602-msa-acceptance-criteria.html">ANNEX-602</a></td><td>Đo lường system acceptance tiêu chí.</td></tr>

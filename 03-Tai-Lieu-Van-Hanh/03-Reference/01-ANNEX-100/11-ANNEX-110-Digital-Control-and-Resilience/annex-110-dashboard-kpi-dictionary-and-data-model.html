@@ -79,7 +79,7 @@ ul.tight li {margin:4px 0;}
 </ul></div>
 
 <div class="section"><h2>2. Nguyên tắc thiết kế KPI</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nguyên tắc</th><th>Yêu cầu thực thi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nguyên tắc</th><th>Yêu cầu thực thi</th></tr></thead><tbody>
 <tr><td>1 KPI – 1 quyết định</td><td>Mỗi KPI phải gắn với một loại quyết định vận hành: giữ/đổi lịch, mở hold, tăng ca, Mọi nhà cung cấp, tách / chia ship, mở CAPA, nâng cấp xử lý.</td></tr>
 <tr><td>Định nghĩa không mơ hồ</td><td>Phải chỉ rõ tử số, mẫu số/cơ sở, giai đoạn / kỳ, loại trừ và đối tượng đã đo.</td></tr>
 <tr><td>Diễn tập-xuống / nTừng được</td><td>Phải truy tới JobNum, OprSeq, PackID, PONum, NCR ID, CAPA ID, nhà cung cấp hoặc key tương đương.</td></tr>
@@ -89,7 +89,7 @@ ul.tight li {margin:4px 0;}
 </tbody></table></div></div>
 
 <div class="section"><h2>3. KPI lõi dùng cho điều hành nhà máy</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>KPI ID</th><th>KPI</th><th>Mục đích quyết định</th><th>tử số / cơ sở</th><th>loại trừ / lưu ý tính</th><th>SoR / SSOT</th><th>Responsible Person</th><th>Nhịp độ</th><th>Diễn tập-xuống / nTừng key</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>KPI ID</th><th>KPI</th><th>Mục đích quyết định</th><th>tử số / cơ sở</th><th>loại trừ / lưu ý tính</th><th>SoR / SSOT</th><th>Responsible Person</th><th>Nhịp độ</th><th>Diễn tập-xuống / nTừng key</th></tr></thead><tbody>
 <tr><td>KPI-01</td><td>OTD Phát hành</td><td>Quyết định giữ lịch, tách / chia ship, đổi ưu tiên, báo khách</td><td>Số phát hành giao đúng hạn / tổng phát hành đến hạn</td><td>Không tính các due đã được khách chấp thuận đổi chính thức; một phần ship phải tính theo phát hành đã cam kết</td><td>Epicor ShipHead/ShipDtl / SSOT bộ hồ sơ giao hàng (ship gói hồ sơ)</td><td>Kế hoạch Team Leader</td><td>Ngày/tuần</td><td>OrderNum, JobNum, PackID</td></tr>
 <tr><td>KPI-02</td><td>cam kết-Date Rủi ro</td><td>Nhìn sớm lô có nguy cơ trễ trước khi trễ thật</td><td>Số phát hành có còn lại công việc vượt khả năng thời gian còn lại</td><td>Đánh giá trên due hiện hành, load thực tế và các cổng kiểm soát (gate) còn mở</td><td>Epicor Job/Điều phối + <a href="../../05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>Kế hoạch Team Leader</td><td>Mỗi ca</td><td>JobNum, OprSeq, WorkCenter</td></tr>
 <tr><td>KPI-03</td><td>WIP Tuổi tồn (lão hóa / cũ)</td><td>Nhận diện Job treo vô chủ, hàng đợi tắc, hold kéo dài</td><td>Số job/vận hành theo nhóm / phân loại 0–2, 3–7, 8–14, &gt;14 ngày</td><td>Tuổi tồn bắt đầu từ cuối cùng di chuyển hoặc phát hành theo rule trong <a href="../../05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>Epicor JobHead/JobOper</td><td>Kế hoạch Team Leader</td><td>Mỗi ca / ngày</td><td>JobNum, OprSeq, WorkCenter, HoldCode</td></tr>
@@ -105,7 +105,7 @@ ul.tight li {margin:4px 0;}
 </tbody></table></div></div>
 
 <div class="section"><h2>4. KPI chẩn đoán và KPI hỗ trợ</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>KPI</th><th>Dùng khi nào</th><th>Responsible Person</th><th>Ghi chú</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>KPI</th><th>Dùng khi nào</th><th>Responsible Person</th><th>Ghi chú</th></tr></thead><tbody>
 <tr><td>hàng đợi Tuổi tồn by Công việc trung tâm</td><td>Khi WIP già nhưng chưa rõ nút cổ chai nằm ở đâu</td><td>Kế hoạch</td><td>Phải nhìn theo nhóm máy (machine nhóm sản phẩm), không chỉ nhìn tổng nhà máy</td></tr>
 <tr><td>Outsource thời gian quay vòng Chênh lệch</td><td>Khi nNgười xử lý hẹn đúng nhưng trả về dao động lớn</td><td>Mua hàng</td><td>So đã cam kết vs thực tế by nNgười xử lý/quy trình nhóm sản phẩm</td></tr>
 <tr><td>Nhận hàng sai khác Tỷ lệ</td><td>Khi kho/IQC phát hiện sai nhiều ở đầu vào</td><td>WHS + QA</td><td>Link tới <a href="../../../02-Work-Instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a> và đã phê duyệt nguyên vật liệu/nNgười xử lý list</td></tr>
@@ -114,7 +114,7 @@ ul.tight li {margin:4px 0;}
 </tbody></table></div></div>
 
 <div class="section"><h2>5. Quy tắc màu cảnh báo và hành động kích hoạt</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm KPI</th><th>Hiển thị xanh</th><th>Hiển thị vàng</th><th>Hiển thị đỏ</th><th>Hành động bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm KPI</th><th>Hiển thị xanh</th><th>Hiển thị vàng</th><th>Hiển thị đỏ</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td>Giao hàng</td><td>Đạt mục tiêu và không có phát hành P0/P1 rủi ro</td><td>Có rủi ro nhưng còn khôi phục / thu hồi plan trong cửa sổ 24 giờ</td><td>Có phát hành trễ, có stop-ship, hoặc due trong 24 giờ mà chưa rõ đường đi</td><td>Mở T1 bổ sung hoặc T2, cập nhật điều phối xuất hàng và Responsible Person ngay</td></tr>
 <tr><td>Luồng / WIP</td><td>nhóm / phân loại già ổn định trong ngưỡng</td><td>nhóm / phân loại &gt;7 nNgày tăng nhẹ hoặc hàng đợi dài cục bộ</td><td>nhóm / phân loại &gt;14 nNgày tăng, Job vô chủ hoặc hàng đợi tạo nguy cơ trễ</td><td>Rà nút cổ chai, sắp xếp lại/đóng băng/shift, báo cáo vượt cấp theo mức nghiêm trọng</td></tr>
 <tr><td>Quality</td><td>Hold/NCR trong giới hạn, không có lặp lại nghiêm trọng</td><td>Hold cũ dần hoặc FPY xấu cục bộ</td><td>CTQ fail, hold quá SLA, khiếu nại, lặp lại vấn đề, thiếu CoC/FAI/bằng chứng</td><td>TẠM GIỮ/SHIP TẠM GIỮ nếu cần và Mọi đúng bậc thang năng lực phê duyệt</td></tr>
@@ -124,7 +124,7 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>6. Mô hình dữ liệu tối thiểu</h2>
 <h3>6.1 thực tế table bắt buộc</h3>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>thực tế</th><th>Hạt dữ liệu</th><th>Key chính</th><th>Ghi chú</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>thực tế</th><th>Hạt dữ liệu</th><th>Key chính</th><th>Ghi chú</th></tr></thead><tbody>
 <tr><td>FactShipment</td><td>01 phát hành / 01 ship sự kiện</td><td>ShipHeadNum, PackID, OrderNum, Phát hành</td><td>Không gộp nhiều pack thành 1 dòng nếu cần diễn tập-xuống / nTừng bộ hồ sơ giao hàng</td></tr>
 <tr><td>FactJobOperation</td><td>01 JobNum + 01 OprSeq + 01 trạng thái Photos trạng thái</td><td>JobNum, OprSeq, WorkCenter, SnapshotDate</td><td>Dùng cho tuổi tồn WIP (tuổi tồn / tuổi tồn), điều phối xuất hàng tuân thủ, cam kết rủi ro</td></tr>
 <tr><td>FactHoldEvent</td><td>01 hold sự kiện</td><td>HoldID, JobNum, PackID, HoldCode</td><td>Phải có mở time, Responsible Person, phát hành time, mức nghiêm trọng</td></tr>
@@ -134,7 +134,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>FactInventoryCount</td><td>01 count sự kiện / vị trí</td><td>Bin, PartNum, Lot, CountDate</td><td>Dùng cho hàng tồn kho độ chính xác và sai khác xu hướng</td></tr>
 </tbody></table></div>
 <h3>6.2 kích thước bắt buộc</h3>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>kích thước</th><th>Field tối thiểu</th><th>Mục đích</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>kích thước</th><th>Field tối thiểu</th><th>Mục đích</th></tr></thead><tbody>
 <tr><td>DimDate</td><td>DateKey, tuần, tháng, quý, năm, shift-cut nhóm / phân loại</td><td>Cắt kỳ, rà soát xu hướng, đóng băng Photos trạng thái</td></tr>
 <tr><td>DimPartRev</td><td>PartNum, Rev, khách hàng code, nguyên vật liệu nhóm sản phẩm, clean level</td><td>Nhìn KPI theo part/rev/nhóm sản phẩm</td></tr>
 <tr><td>DimCustomer</td><td>CustID, khách hàng group, CSR/QPL hồ sơ / biên dạng</td><td>Tách KPI theo khách hàng / cam kết</td></tr>
@@ -145,7 +145,7 @@ ul.tight li {margin:4px 0;}
 <p class="small">Khi thiếu kích thước hoặc key, bảng điều khiển phải hiển thị cảnh báo “không đủ diễn tập-xuống / nTừng” thay vì bơm số giả.</p></div>
 
 <div class="section"><h2>7. Quy tắc làm mới, cut-off và ưu tiên / thứ tự</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Ngữ cảnh dùng</th><th>Cut-off / làm mới</th><th>Nguồn ưu tiên</th><th>Rule khi không khớp</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Ngữ cảnh dùng</th><th>Cut-off / làm mới</th><th>Nguồn ưu tiên</th><th>Rule khi không khớp</th></tr></thead><tbody>
 <tr><td>T1 đầu ca</td><td>Chốt trước họp tối thiểu 15 phút</td><td>Epicor báo cáo / bảng điều khiển đã làm mới</td><td>Dùng Epicor để quyết định, mở Data Vấn đề, không chờ bảng điều khiển sửa xong</td></tr>
 <tr><td>T2/T3</td><td>Chốt theo lịch họp trong <a href="../../05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Bảng điều khiển + export SoR</td><td>Nếu số xu hướng lệch SoR, vấn đề Responsible Person phải giải trình ngay trong cuộc họp</td></tr>
 <tr><td>T4 / Xem xét của lãnh đạo</td><td>Ảnh chụp trạng thái đã đóng băng theo tháng/quý</td><td>Gói phát hành đã phê duyệt</td><td>Mọi sửa số của kỳ đã đóng băng phải đi qua thay đổi hồ sơ</td></tr>
@@ -158,7 +158,7 @@ ul.tight li {margin:4px 0;}
 </ul></div>
 
 <div class="section"><h2>8. Data cổng kiểm soát chất lượng (gate)</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Kiểm cái gì</th><th>Không đạt khi</th><th>Phản ứng</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Kiểm cái gì</th><th>Không đạt khi</th><th>Phản ứng</th></tr></thead><tbody>
 <tr><td>Tính đầy đủ</td><td>Field bắt buộc có đủ không</td><td>Thiếu JobNum, OprSeq, PackID, due, Responsible Person hoặc mức nghiêm trọng</td><td>Không công bố / phát hành KPI liên quan; mở Data Vấn đề</td></tr>
 <tr><td>đúng hạn</td><td>Dữ liệu có đúng cửa sổ làm mới không</td><td>Làm mới quá cut-off đã công bố</td><td>Đánh cờ đỏ “cũ / lỗi thời data”</td></tr>
 <tr><td>tính duy nhất</td><td>Bản ghi có bị trùng lặp không</td><td>Trùng giao dịch/key gây kép / Cấp đôi count</td><td>Chặn gói phát hành</td></tr>
@@ -188,7 +188,7 @@ ul.tight li {margin:4px 0;}
 
 
 <div class="section" id="a10"><h2>10. Bảng điều khiển pack, đóng băng-date và ngoại lệ-note sơ đồ ánh xạ</h2><div class="table-card"><table class="table"><colgroup><col style="width:22%"/><col style="width:30%"/><col style="width:24%"/><col style="width:24%"/></colgroup><thead><tr><th>Field / note mở rộng</th><th>Khi nào bắt buộc ghi</th><th>Ý nghĩa quản trị</th><th>chéo-link</th></tr></thead><tbody><tr><td>People phụ thuộc note</td><td>KPI chịu ảnh hưởng bởi kỹ năng, chứng nhận, ủy quyền hoặc phó gap.</td><td>Ngăn việc giải thích KPI sai theo hướng “thiếu nNgười” chung chung.</td><td><a href="../../08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html">ANNEX-801</a>, <a download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-807</a>, <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td></tr><tr><td>mang / chuyển-trên / vượt quá hành động tham chiếu</td><td>KPI đỏ kéo dài qua kỳ hoặc chưa đóng ngăn chặn.</td><td>Buộc pack nói rõ lịch sử quyết định và trạng thái hiệu lực.</td><td><a download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a>, CAPA / kaizen / log hành động</td></tr><tr><td>khả năng so sánh ngắt / nghỉ đánh dấu / cờ</td><td>Đổi source, đổi logic, bổ sung / thay thế, sổ tay / thủ công điều chỉnh hoặc đóng băng-date reset.</td><td>Bảo vệ quyết định khỏi việc so sánh sai giữa các kỳ.</td><td><a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>, <a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></td></tr></tbody></table></div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Pack / ngữ cảnh dùng</th><th>Responsible Person chuẩn bị</th><th>Đóng băng-date / cut-off</th><th>Khi nào cần ngoại lệ note</th><th>Hồ sơ / WI dùng để giữ vết</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Pack / ngữ cảnh dùng</th><th>Responsible Person chuẩn bị</th><th>Đóng băng-date / cut-off</th><th>Khi nào cần ngoại lệ note</th><th>Hồ sơ / WI dùng để giữ vết</th></tr></thead><tbody>
 <tr><td>T1/T2 bảng trong ngày</td><td>Kế hoạch / Sản xuất / Responsible Person QA của bảng</td><td>Trước họp 10–15 phút</td><td>Làm mới fail, muộn / trễ ghi sổ / đăng, thiếu diễn tập-xuống / nTừng, dùng export SoR thay bảng điều khiển</td><td><a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> ghi chú điều hành / bảng note</td></tr>
 <tr><td>T3 tuần / tháng</td><td>Responsible Person Bảng điều khiển + Quy trình Owner</td><td>Theo lịch pack đã công bố</td><td>Dữ liệu chưa đầy đủ, có phân loại lại (reclass)/bổ sung / thay thế sau cut-off, vấn đề sơ đồ ánh xạ còn mở</td><td><a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> + data vấn đề / thay đổi hồ sơ</td></tr>
 <tr><td>T4 / xem xét của lãnh đạo</td><td>QMS / Quy trình Owner / bảng điều khiển Responsible Person</td><td>Đóng băng Photos trạng thái theo kỳ rà soát</td><td>Số đã đóng băng nhưng cần giải thích ngoại lệ, offline phương án dự phòng, sổ tay / thủ công pack hoặc SoR sửa chữa / hiệu chính sau đóng</td><td><a href="../../../01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a> + <a download="" href="../../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td></tr>
@@ -197,7 +197,7 @@ ul.tight li {margin:4px 0;}
 <div class="callout-info">Khi bảng điều khiển pack bị gắn ngoại lệ note, Responsible Person phải chỉ rõ <b>phạm vi KPI bị ảnh hưởng</b>, <b>nguồn tạm thời dùng để ra quyết định</b>, <b>ETA khôi phục</b> và <b>thời điểm bổ sung / thay thế/re-rà soát</b>. Không để bảng điều khiển đang lỗi nhưng pack vẫn được trình bày như dữ liệu bình thường.</div></div>
 
 <div class="section" id="a11"><h2>11. Liên kết dùng trong vận hành</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mã tài liệu</th><th>Vai trò sử dụng</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mã tài liệu</th><th>Vai trò sử dụng</th></tr></thead><tbody>
 <tr><td><a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a></td><td>Dùng KPI để điều hành họp tầng và đóng hành động.</td></tr>
 <tr><td><a href="../../05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Nhịp độ họp, thành phần, bảng layout, mức nghiêm trọng bậc thang năng lực.</td></tr>
 <tr><td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Phản hồi SLA, sau giờ, phó backup.</td></tr>

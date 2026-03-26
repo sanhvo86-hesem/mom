@@ -64,7 +64,7 @@
  <div class="section">
  <h2>2. Nguyên tắc kiến trúc không được vi phạm</h2>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>Nguyên tắc</th><th>Yêu cầu bắt buộc</th></tr>
  </thead>
@@ -105,7 +105,7 @@
  <div class="section">
  <h2>4. Danh mục Requests type bắt buộc</h2>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>RequestType</th><th>Mục đích</th><th>Đầu vào tối thiểu</th><th>Đầu ra bắt buộc</th></tr>
  </thead>
@@ -134,7 +134,7 @@
  <div class="section">
  <h2>5. Mô hình thư viện cung cấp / cấp phát toàn công ty</h2>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>Thư viện</th><th>Chức năng</th><th>Điểm tạo tự động</th><th>Owner/biên tập viên / trình soạn thảo mặc định</th><th>Rule bắt buộc</th></tr>
  </thead>
@@ -158,7 +158,7 @@
  <div class="section">
  <h2>6. Matrix hồ sơ nhóm sản phẩm và nơi lưu bắt buộc</h2>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>Hồ sơ nhóm sản phẩm</th><th>Home thư viện / khu vực</th><th>Ví dụ hồ sơ</th><th>Không được lưu ở</th></tr>
  </thead>
@@ -183,7 +183,7 @@
  <div class="keyline"><strong>Provisioning scope:</strong> CreateDepartmentZone phải tạo đủ khung sườn department, role team workbench, named employee workbench placeholder cho từng role/JD và thư mục reference/transitory chuẩn. CreateEmployeeWorkbench phải tạo named folder dưới đúng <span class="code">ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}</span>. CreateJobDossier phải tạo đủ subfolder theo gate chi tiết trong <span class="code">ANNEX-135</span>, không chỉ tạo gate root.</div>
  <div class="keyline"><strong>Sync-safe naming control:</strong> flow provisioning không được phát sinh các segment dài hơn bộ chuẩn trong annex này. Nếu cần thêm nhánh mới, ưu tiên route bằng metadata, list index hoặc register thay vì kéo dài tên folder. Thiết kế phải giữ biên độ cho local sync, Git worktree và file name thật của nNgười dùng ở các nhánh sâu.</div>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>DeptCode</th><th>thư mục con bắt buộc trong 02-Operations</th><th>thư mục con bắt buộc trong 03-Registers-and-Logs</th><th>Biên giới hồ sơ</th></tr>
  </thead>
@@ -222,7 +222,7 @@
  </div>
  </div>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>Thư mục con</th><th>Nội dung bắt buộc</th><th>Quyền tối thiểu</th></tr>
  </thead>
@@ -250,7 +250,7 @@
  <div class="section">
  <h2>9. Bản thiết kế chi tiết hồ sơ hệ thống trong 09-Số hóa-System-Hồ sơ</h2>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>Path</th><th>Nội dung bắt buộc</th><th>Owner group</th><th>Lưu ý</th></tr>
  </thead>
@@ -272,7 +272,7 @@
  <div class="section">
  <h2>9.1 Source control, promotion và runtime boundary trong 10-QMS-Source-Control</h2>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>Path</th><th>Nội dung bắt buộc</th><th>Owner group</th><th>Lưu ý</th></tr>
  </thead>
@@ -290,7 +290,7 @@
  <div class="section">
  <h2>10. Nhóm quyền và matrix phân quyền bắt buộc</h2>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>Group</th><th>Chức năng</th><th>Vùng áp dụng</th><th>Rule</th></tr>
  </thead>
@@ -335,7 +335,7 @@
  <div class="section">
  <h2>12. Thuật toán cung cấp / cấp phát theo từng nhóm Requests</h2>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>Nhóm Requests</th><th>Thuật toán bắt buộc</th></tr>
  </thead>
@@ -358,7 +358,7 @@
  <div class="section">
  <h2>13. Bên ngoài chia sẻ, đã niêm phong gói hàng và ngoại lệ xử lý / vận chuyển</h2>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>Trường hợp</th><th>Control bắt buộc</th><th>Không chấp nhận</th></tr>
  </thead>
@@ -375,7 +375,7 @@
  <div class="section">
  <h2>14. Điều kiện UAT, go-vận hành thực và không chấp nhận phát hành</h2>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>Điểm kiểm</th><th>Pass điều kiện</th><th>Điều kiện fail</th></tr>
  </thead>
@@ -395,7 +395,7 @@
  <div class="section">
  <h2>15. Kiểm soát vận hành định kỳ sau go-vận hành thực</h2>
  <div class="table-card">
- <table>
+ <table class="table">
  <thead>
  <tr><th>Chu kỳ</th><th>Hoạt động</th><th>Đầu ra</th></tr>
  </thead>

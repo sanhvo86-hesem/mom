@@ -77,7 +77,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>2. Hot-job bậc thang năng lực và rule ưu tiên</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Class</th><th>Khi được gán</th><th>Ai có quyền gán</th><th>Quy tắc bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Class</th><th>Khi được gán</th><th>Ai có quyền gán</th><th>Quy tắc bắt buộc</th></tr></thead><tbody>
 <tr><td>P0</td><td>Đã trễ cam kết hoặc sẽ vỡ giao hàng trong ≤ 24 giờ; hoặc khách hàng / nhà máy sự kiện buộc phải cứu ngay</td><td>Ops Manager hoặc cao hơn theo ma trận thẩm quyền</td><td>Được phép phá cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch); phải chỉ rõ job bị lùi, tác động OTD, Responsible Person và thời điểm khôi phục / thu hồi.</td></tr>
 <tr><td>P1</td><td>Sẽ đến hạn trong 24–48 giờ; CTQ/final phát hành đang chờ; part cho dòng / chuyền-stop nội bộ hoặc job rủi ro cao</td><td>Planner Lead / Ops Manager</td><td>Được đẩy lên đầu ca hoặc giữa ca nhưng phải ghi lý do và cập nhật điều phối xuất hàng bảng.</td></tr>
 <tr><td>P2</td><td>Job chuẩn theo kế hoạch</td><td>Planner/Nhân viên điều phối theo lịch đã duyệt</td><td>Phải tuân thủ cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch). Không được hạ xuống P3 vì tiện đổi máy.</td></tr>
@@ -87,7 +87,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>3. cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và rule đổi lịch</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cửa sổ</th><th>Ý nghĩa</th><th>Khi nào được phá</th><th>Evidence bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cửa sổ</th><th>Ý nghĩa</th><th>Khi nào được phá</th><th>Evidence bắt buộc</th></tr></thead><tbody>
 <tr><td>Đóng băng của ca</td><td>Danh sách job đầu ca Released, dùng để giữ nhịp vận hành trong ca Current</td><td>Chỉ P0 hoặc sự cố L1/L2: machine xuống / nTừng, nguyên vật liệu thiếu / bỏ sót, phiên bản thay đổi, QA TẠM GIỮ, an toàn sự kiện</td><td>Thay đổi note + Responsible Person + job bị lùi + thời điểm cập nhật Epicor/M365</td></tr>
 <tr><td>Đóng băng ngày</td><td>Kế hoạch nNgày cho trung tâm gia công/cell</td><td>P0, nút thắt / điểm nghẽn khôi phục / thu hồi, outsource quá hạn, khách hàng đặc biệt phê duyệt</td><td>Quyết định hồ sơ trong tier cuộc họp / log hành động</td></tr>
 <tr><td>Đóng băng tuần</td><td>Kế hoạch chuẩn để bảo vệ thời gian dẫn (lead time) và vật tư/nguồn lực đã khóa</td><td>Chỉ L2 hoặc quyết định nhà máy-level</td><td>Biên bản công suất rà soát hoặc quyết định điều hành</td></tr>
@@ -97,7 +97,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>4. Mô hình năng lực hữu dụng</h2>
 <p>Năng lực dùng để điều phối xuất hàng không phải là công suất lý thuyết của máy. Planner phải tính <b>năng lực hữu dụng</b> theo công thức sau: <span class="code">Khả dụng giờ – đã lên kế hoạch thời gian nTừng máy – PM / hiệu chuẩn hold – cuộc họp / bàn giao dự trữ / dự phòng – setup dự trữ / dự phòng – bất thường dự trữ / dự phòng = có thể điều phối giờ</span>. Khi nhóm máy (machine nhóm sản phẩm) có OEE lịch sử đủ tin cậy, Planner được dùng hệ số hiệu lực; nếu không có dữ liệu đủ sạch, phải dùng mức thận trọng hơn thay vì vẽ năng lực đẹp.</p>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thành phần</th><th>Cách hiểu bắt buộc</th><th>Ghi chú vận hành</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thành phần</th><th>Cách hiểu bắt buộc</th><th>Ghi chú vận hành</th></tr></thead><tbody>
 <tr><td>Khả dụng giờ</td><td>Giờ máy thực sự mở cho sản xuất theo lịch đã duyệt</td><td>Không tính cả thời gian PM, đào tạo, đánh giá, hoặc dòng / chuyền stop đã biết trước.</td></tr>
 <tr><td>Setup dự trữ / dự phòng</td><td>Phần thời gian dành cho chuyển đổi (changeover)/chứng minh-out/mẫu đầu</td><td>Không được coi setup là “chạy sản lượng”. Chủng loại cao (cao-mix) cell phải giữ dự trữ / dự phòng cao hơn cell lặp.</td></tr>
 <tr><td>bất thường dự trữ / dự phòng</td><td>Biên độ để hấp thụ lỗi nhỏ, khôi phục / thu hồi, tool thay đổi, nhỏ / không nghiêm trọng nTừng máy</td><td>nút thắt / điểm nghẽn cell phải có dự trữ / dự phòng rõ; không được load 100% rồi mong phân xưởng tự xoay.</td></tr>
@@ -106,7 +106,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>5. WIP cap theo họ trung tâm gia công</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm trung tâm gia công</th><th>Cap mặc định</th><th>Mục đích của cap</th><th>Khi vượt cap phải làm gì</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm trung tâm gia công</th><th>Cap mặc định</th><th>Mục đích của cap</th><th>Khi vượt cap phải làm gì</th></tr></thead><tbody>
 <tr><td>5-trục / phay-lượt / quay / rò rỉ / clean nút thắt / điểm nghẽn</td><td>trong hàng đợi standard giờ ≤ 1.0 nNgày năng lực hữu dụng; setup đã sắp xếp ≤ 1 job kế tiếp / machine</td><td>Bảo vệ nút thắt / điểm nghẽn, giảm đổi lịch và tránh tắc mẫu đầu</td><td>Báo cáo vượt cấp L1 ngay; rà soát tách / chia lot, chuyển tải, outsource, hoặc dời job chưa đủ mức sẵn sàng.</td></tr>
 <tr><td>3-trục / CNC tiện / hoàn thiện bề mặt cell</td><td>trong hàng đợi standard giờ ≤ 1.5 nNgày năng lực hữu dụng; đã sắp xếp công việc / đơn hàng ≤ 2 job / nhóm máy (machine nhóm sản phẩm)</td><td>Giữ dòng chảy nhưng vẫn đủ việc cho ca tiếp theo</td><td>Review tuổi tồn WIP (tuổi tồn / tuổi tồn), dừng phát hành thêm nếu chưa có plan clear.</td></tr>
 <tr><td>Kiểm tra cuối / phê duyệt giao hàng (ship phát hành) / clean pack</td><td>Ship-ready / final-kiểm tra-ready ≤ 1 nNgày đầu ra chuẩn</td><td>Không để QA/WHS thành bãi chờ cuối chuỗi</td><td>Review nguyên nhân gốc ở công đoạn trước; không đẩy thêm job nếu đầu ra cuối không hút kịp.</td></tr>
@@ -116,7 +116,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>6. Queue discipline, tuổi tồn và phản ứng</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bucket tuổi tồn</th><th>Định nghĩa</th><th>NNgười phụ trách phản ứng</th><th>Hành động bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bucket tuổi tồn</th><th>Định nghĩa</th><th>NNgười phụ trách phản ứng</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td>0–1 shift</td><td>Bình thường</td><td>Cell Lead</td><td>Theo dõi theo dispatch; chưa cần escalation nếu job vẫn trong nhịp cam kết.</td></tr>
 <tr><td>&gt;1 đến 3 shift</td><td>Cảnh báo</td><td>Planner + Supervisor</td><td>Phải chỉ ra lý do: thiếu material, thiếu setup, chờ QA, chờ machine, chờ outsource, chờ decision.</td></tr>
 <tr><td>&gt;3 shift đến 7 ngày</td><td>Đỏ</td><td>Ops Manager</td><td>Escalate L1; phải có plan clear kèm due/time và nNgười phụ trách.</td></tr>
@@ -126,7 +126,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>7. Hold reason code chuẩn</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mã</th><th>Nhóm</th><th>Điều kiện mở</th><th>Điều kiện release</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mã</th><th>Nhóm</th><th>Điều kiện mở</th><th>Điều kiện release</th></tr></thead><tbody>
 <tr><td>HR01-MAT</td><td>Material</td><td>Thiếu vật tư, lot/heat, cert hoặc reservation</td><td>WHS xác nhận tồn/lot/cert và SoR đã cập nhật</td></tr>
 <tr><td>HR02-PRG</td><td>Program</td><td>Program hoặc controlled copy chưa phát hành / sai phiên bản (wrong revision)</td><td>ENG phát hành controlled copy và link hồ sơ đúng</td></tr>
 <tr><td>HR03-TOL</td><td>Tooling / Fixture</td><td>Thiếu tool, fixture, jaw, holder, prove-out plan</td><td>Setup Lead xác nhận đủ điều kiện chạy</td></tr>
@@ -139,7 +139,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>8. Điều phối bảng và rà soát bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường dữ liệu tối thiểu</th><th>Phải có</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường dữ liệu tối thiểu</th><th>Phải có</th></tr></thead><tbody>
 <tr><td>Thông tin định danh</td><td>JobNum, Part, Rev, OpSeq, trung tâm gia công/Machine nhóm sản phẩm, Qty mở, NNgày đến hạn, Ưu tiên class</td></tr>
 <tr><td>Mức sẵn sàng</td><td>Khởi động/Kế hoạch phát hành trạng thái, hold code, nguyên vật liệu ready, setup ready, QA ready, outsource trạng thái</td></tr>
 <tr><td>Điều độ</td><td>Điều phối trình tự, đã lên kế hoạch start, đã lên kế hoạch hoàn thành, Responsible Person cell, next cổng kiểm soát</td></tr>
@@ -159,7 +159,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 
 <div class="section"><h2>11. Quyết định cây / sơ đồ cây khi thiếu năng lực</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Thứ tự ưu tiên quyết định</th><th>Điểm chặn không được vượt</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Thứ tự ưu tiên quyết định</th><th>Điểm chặn không được vượt</th></tr></thead><tbody>
 <tr><td>Thiếu năng lực ngắn hạn trong 1 ca</td><td>1) clear bất thường; 2) đổi trình tự trong cùng nhóm sản phẩm; 3) dời job chưa ready; 4) mở OT ngắn nếu được duyệt</td><td>Không được đẩy job chưa qua mẫu đầu/QA cổng kiểm soát lên chạy chỉ để giữ đầu ra.</td></tr>
 <tr><td>Thiếu năng lực do nút thắt / điểm nghẽn 2–5 ngày</td><td>1) cân bằng lại giữa nhóm máy (machine nhóm sản phẩm); 2) tách / chia lot có kiểm soát; 3) đổi lộ trình gia công được ENG/QA chấp thuận; 4) outsource phần phù hợp</td><td>Không làm tách / chia lot nếu làm mất truy vết hoặc làm đứt Requests clean/rò rỉ/FAI.</td></tr>
 <tr><td>Thiếu năng lực kéo dài / quá tải tuần</td><td>1) công suất rà soát cấp L2; 2) reset cam kết; 3) quyết định outsource, OT có kế hoạch, hoặc giới hạn nhận việc mới</td><td>Không để Planner tự hứa lại due với Kinh doanh hoặc khách hàng nếu chưa có quyết định điều hành.</td></tr>
@@ -167,7 +167,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>12. Hồ sơ điều độ bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Responsible Person</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Responsible Person</th></tr></thead><tbody>
 <tr><td>Điều phối list theo ca/ngày</td><td>Khóa thứ tự chạy và cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) cho từng trung tâm gia công</td><td>Planner / Nhân viên điều phối</td></tr>
 <tr><td>WIP tuổi tồn Photos trạng thái</td><td>Nhìn rõ job đỏ/đen, Responsible Person và hành động</td><td>Planner</td></tr>
 <tr><td>Escalation / hot-job log</td><td>Chứng minh ai duyệt, job nào bị ảnh hưởng và plan khôi phục / thu hồi</td><td>Ops Manager</td></tr>
@@ -177,7 +177,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>13. Tài liệu liên kết</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Hướng dẫn vận hành điều độ hằng ca.</td></tr>
 <tr><td><a href="annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>MRR, cổng kiểm soát và đồng bộ bàn giao.</td></tr>
 <tr><td><a href="../01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation chuỗi và SLA xử lý.</td></tr>

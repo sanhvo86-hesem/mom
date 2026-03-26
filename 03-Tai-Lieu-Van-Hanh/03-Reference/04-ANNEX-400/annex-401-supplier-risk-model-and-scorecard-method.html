@@ -67,7 +67,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <p>ANNEX này quy định hai lớp kiểm soát song song: <b>(1) rủi ro nền của nhà cung cấp</b> và <b>(2) hiệu năng thực tế theo thẻ điểm</b>. Hai lớp này cùng quyết định nhà cung cấp trạng thái, tần suất rà soát, mức độ xác minh đầu vào, Requests kép-source, kích hoạt thử việc/chặn / khóa và điều kiện mở khóa lại.</p>
 <p>Tài liệu áp dụng cho raw nguyên vật liệu suppliers, khách hàng-được chỉ định suppliers, đặc biệt nhà gia công, gia công ngoài gia công cơ khí nhà / chứa, dịch vụ kiểm định/hiệu chuẩn ảnh hưởng sản phẩm, và các nguồn cung ảnh hưởng trực tiếp tới tiến độ/tuân thủ chất lượng của Lệnh sản xuất CNC.</p>
 <h2>2. Phân loại nhóm sản phẩm và rủi ro nền R1–R4</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>nhóm sản phẩm</th><th>Ví dụ</th><th>Rủi ro nền mặc định</th><th>Kiểm soát tối thiểu bắt buộc</th></tr></thead>
 <tbody>
 <tr><td>Quan trọng raw nguyên vật liệu</td><td>Bar/tấm / bản/ống/rèn/đúc, vật liệu đặc chủng, khách hàng-đã quy định cấp / hạng</td><td><span class="badge-red">R1</span></td><td>Đã phê duyệt source, cert/MTR 100%, mẻ nấu (heat)/lot truy vết, xác minh đầu vào, thay thế control, định kỳ thẻ điểm.</td></tr>
@@ -88,7 +88,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 <h2>4. Phương pháp thẻ điểm và trọng số</h2>
 <p>Thẻ Point-of-use thang điểm 0–100. Từng kích thước chấm theo dữ liệu thực tế, không chấm cảm tính. Nếu không có đủ lịch sử, dùng trạng thái <b>New/không đủ lịch sử</b> và áp mức kiểm soát chặt hơn thay vì tự động cho điểm cao.</p>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>kích thước</th><th>Mô tả bắt buộc</th><th>Raw nguyên vật liệu</th><th>đặc biệt nNgười xử lý</th><th>Gia công ngoài gia công cơ khí</th><th>Tổng / Chung cung ứng</th></tr></thead>
 <tbody>
 <tr><td>Quality hiệu suất</td><td>Từ chối tỷ lệ, lặp lại khuyết tật, SCAR, thoát / bỏ qua, khiếu nại, lot hold</td><td>25%</td><td>25%</td><td>25%</td><td>20%</td></tr>
@@ -105,7 +105,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="card"><h3>5.2 cửa sổ / khung thời gian đánh giá</h3><p>Dùng luân phiên 12 tháng cho nhà cung cấp ổn định. Supplier mới dùng luân phiên 3 tháng hoặc 3 lô đầu tiên, tùy cái nào đến sau. Không kết luận nhà cung cấp tốt/xấu chỉ bằng 1 lô nếu chưa đủ dữ liệu, trừ khi có kiểm soát cổng sự kiện nghiêm trọng.</p></div>
 </div>
 <h2>6. Kiểm soát cổng sự kiện có quyền ghi đè score</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Sự kiện</th><th>Hành động bắt buộc</th><th>Thẩm quyền tối thiểu</th></tr></thead>
 <tbody>
 <tr><td>đã giả mạo/đã thay đổi cert, cert không truy được nguồn, sửa tay không kiểm soát</td><td>Chặn ngay; dừng PO mới; giữ toàn bộ lô liên quan; đánh giá ranh giới tác động</td><td>QA Mgr + Pur Mgr, đã báo cáo vượt cấp tới GM</td></tr>
@@ -115,7 +115,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>OTD thu gọn kéo dài hoặc không đáp ứng đẩy nhanh tiến độ trên item nguồn đơn (lẻ-source / nguồn đơn)</td><td>Kích hoạt dự phòng/kép-source; rà soát công suất rủi ro; tăng rà soát tần suất</td><td>Pla Mgr + Pur Mgr</td></tr>
 </tbody></table></div>
 <h2>7. Trạng thái, ngưỡng hành động và tần suất rà soát</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Điểm / trạng thái</th><th>Ý nghĩa</th><th>Hành động bắt buộc</th><th>Tần suất rà soát tối thiểu</th></tr></thead>
 <tbody>
 <tr><td><span class="badge-green">90–100 ưu tiên</span></td><td>Hiệu năng ổn định, dữ liệu sạch, không có kiểm soát cổng sự kiện mở</td><td>Dùng theo lộ trình gia công chuẩn; vẫn giữ kiểm soát nền theo R-class</td><td>R1 hàng tháng; R2 hàng quý; R3/R4 nửa năm</td></tr>
@@ -132,7 +132,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <li>Raw nguyên vật liệu nhà cung cấp phải phù hợp với <a href="../03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a>; score tốt không cho phép tự ý thay thế nguyên vật liệu/cấp / hạng/điều kiện.</li>
 </ul>
 <h2>8A. Quy tắc chấm 1–5 cho từng kích thước</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>kích thước</th><th>Điểm 5</th><th>Điểm 3</th><th>Điểm 1</th></tr></thead>
 <tbody>
 <tr><td>Quality hiệu suất</td><td>Không có từ chối/thoát / bỏ qua lặp, khắc phục hành động đóng đúng hạn, bằng chứng sạch.</td><td>Có vấn đề cục bộ nhưng đã ngăn chặn và không tái diễn kéo dài.</td><td>Lặp lại khuyết tật, CTQ vấn đề, thoát / bỏ qua hoặc lot từ chối kéo dài.</td></tr>
@@ -144,7 +144,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div>
 <h2>8B. tái đánh giá năng lực sau thử việc hoặc chặn / khóa</h2>
 <p>Supplier đang ở trạng thái <b>Thử việc</b> hoặc <b>Chặn</b> chỉ được mở lại khi hoàn tất đầy đủ bộ tái đánh giá năng lực tương ứng với nguyên nhân đã bị hạ cấp. Bộ tái đánh giá năng lực tối thiểu gồm: nguyên nhân gốc đã xác minh, ngăn chặn đã hiệu lực, bằng chứng khắc phục hành động, bằng chứng lô thử hoặc lô đầu tiên sau phục hồi, cert/scope/truy vết sạch, và xác nhận thẩm quyền theo đúng nhóm sản phẩm ảnh hưởng.</p>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Trạng thái trước đó</th><th>Evidence mở lại tối thiểu</th><th>Ai xác minh</th><th>Ai phê duyệt mở lại</th></tr></thead>
 <tbody>
 <tr><td>Có điều kiện → Đã phê duyệt</td><td>Score hồi phục, không còn mở vấn đề quá hạn, đầu vào / nhận hàng kiểm tra tăng cường đã ổn</td><td>Mua hàng + QA</td><td>Pur Mgr</td></tr>
@@ -168,7 +168,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 <div data-phase2i="true">
 <h2>Quy tắc điều hành — Score-to-hành động ghi đè / bỏ qua quy tắc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Kích hoạt</th><th>Mặc định hành động</th><th>Điểm score có còn quyết định chính?</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Kích hoạt</th><th>Mặc định hành động</th><th>Điểm score có còn quyết định chính?</th></tr></thead><tbody>
 <tr><td>Customer thoát / bỏ qua / hàng giả / hàng nhái nghi ngờ / trái phép site-quy trình thay đổi</td><td>SCAR + sự kiện đánh giá + source-trạng thái hạ cấp ngay cho scope bị ảnh hưởng.</td><td>Không. Cổng kiểm soát sự kiện ghi đè / bỏ qua thắng điểm tổng.</td></tr>
 <tr><td>định kỳ / lặp lại cert / truy vết không khớp hoặc lặp lại phiếu nhận / biên nhận TẠM GIỮ</td><td>Giữ Có điều kiện / Thử việc và mở khôi phục / thu hồi path cụ thể.</td><td>Không, cho tới khi hiệu lực được chứng minh qua xác minh cửa sổ / khung thời gian.</td></tr>
 <tr><td>mãn tính / kéo dài công suất / tính liên tục rủi ro ở source quan trọng / nghiêm trọng</td><td>Mở thay thế / phương án khác source / dự phòng plan và báo cáo vượt cấp nếu cần.</td><td>Không hoàn toàn; rủi ro tính liên tục có thể giới hạn scope dù score khác còn ổn.</td></tr>

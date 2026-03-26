@@ -68,7 +68,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Bàn giao bằng hồ sơ và xác nhận trực tiếp. Chốt Qty tốt / đạt, nghi ngờ và phế phẩm trước khi chuyển thùng chứa. NNgười nhận phải được bàn giao đầy đủ bù trừ (offset), tool trạng thái và mở vấn đề.</div></div>
 
 <div class="section"><h2>2. Các loại chuyển giao công việc phải xác nhận</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại chuyển giao</th><th>Khi xảy ra</th><th>Điều kiện vào</th><th>NNgười nhận xác nhận</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại chuyển giao</th><th>Khi xảy ra</th><th>Điều kiện vào</th><th>NNgười nhận xác nhận</th></tr></thead><tbody>
 <tr><td>Shift bàn giao</td><td>Hết ca hoặc đổi nNgười chạy cùng máy/cùng job</td><td>Máy an toàn, trạng thái job rõ, Qty cập nhật</td><td>Operator/Trưởng nhóm ca nhận</td></tr>
 <tr><td>Machine chuyển giao</td><td>Chuyển cùng Op sang máy khác</td><td>Đã phê duyệt đổi machine, phát hành set cập nhật</td><td>Setup/Sản xuất tại máy nhận</td></tr>
 <tr><td>Vận hành chuyển giao</td><td>Chuyển sang OpSeq kế tiếp</td><td>Op Current đầy đủ, hồ sơ đủ, label đúng</td><td>Responsible Person công đoạn kế tiếp</td></tr>
@@ -78,7 +78,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <p>Tuyến đặc biệt áp theo <a href="../../03-Reference/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>.</p></div>
 
 <div class="section"><h2>3. Gói thông tin bắt buộc khi bàn giao</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm thông tin</th><th>Bắt buộc phải có</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm thông tin</th><th>Bắt buộc phải có</th></tr></thead><tbody>
 <tr><td>Nhận dạng Job</td><td>JobNum, PartNo, Rev, OpSeq, lộ trình gia công code, QPL</td></tr>
 <tr><td>Số lượng</td><td>Qty tốt / đạt, qty nghi ngờ, qty phế phẩm, qty còn lại, số thùng chứa</td></tr>
 <tr><td>Điều kiện kỹ thuật</td><td>Program ID/Rev, phiếu cài đặt rev, tool/fixture đang dùng, bù trừ (offset) khóa/Current trạng thái</td></tr>
@@ -111,7 +111,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="kpi-box"><strong>KPI-WI518-03</strong><br/>Tỷ lệ machine chuyển giao phải làm lại mẫu đầu do phát hành set sai hoặc thiếu.</div>
 <div class="kpi-box"><strong>KPI-WI518-04</strong><br/>Thời gian phản ứng khi chuyển giao bị từ chối vì thiếu điều kiện.</div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="wi-517-setup-changeover-smed-standard-work.html">WI-517</a></td><td>Setup/chuyển đổi (changeover) trước khi bàn giao máy/job.</td></tr>
 <tr><td><a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Nhanh-kiểm tra card cho nNgười nhận trước khi chạy.</td></tr>
 <tr><td><a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>Cổng kiểm soát (gate), MRR và đồng bộ bàn giao liên phòng ban.</td></tr>

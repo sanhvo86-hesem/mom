@@ -66,7 +66,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="keyline"><strong>5 quy tắc không thỏa hiệp:</strong><br/>1) Một JobNum = một dossier điều hành chính thức. 2) Part/Rev Master là nguồn kỹ thuật chuẩn; dossier job chỉ liên kết và lưu bằng chứng theo job. 3) Mọi hồ sơ bắt buộc phải về đúng SSOT; không lưu bản điều hành ở máy cá nhân, chat, USB cá nhân hoặc folder “tạm”. 4) Thiếu bằng chứng bắt buộc theo cổng kiểm soát = không đóng cổng kiểm soát. 5) Sau ship hoặc job close, dossier phải có snapshot/bảng kê cuối và trạng thái khóa rõ ràng.</div>
 </div>
 <div class="section"><h2>2. Cấu trúc SSOT và vai trò của từng thư viện</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thư viện / vùng lưu</th><th>Dùng để làm gì</th><th>Không được dùng để làm gì</th><th>Responsible Person</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thư viện / vùng lưu</th><th>Dùng để làm gì</th><th>Không được dùng để làm gì</th><th>Responsible Person</th></tr></thead><tbody>
 <tr><td>OPS-Hồ sơ / công việc / đơn hàng</td><td>Lưu mọi bằng chứng phát sinh theo JobNum và theo cổng kiểm soát G0–G7</td><td>Không thay Part/Rev Bản gốc làm nguồn kỹ thuật chuẩn</td><td>QA/QMS + Quy trình Owner của cổng kiểm soát</td></tr>
 <tr><td>Part-Rev Bản gốc</td><td>Lưu drawing, mô hình, bộ hồ sơ chuẩn (mốc chuẩn gói hàng), setup standard, đã phê duyệt tài liệu theo CustomerID + PartNo + Rev</td><td>Không chứa bằng chứng ship-cụ thể hoặc lot/job-cụ thể</td><td>Kỹ thuật + QA</td></tr>
 <tr><td>dự phòng / Offline Sự kiện</td><td>Lưu sự kiện log, scan nhập bù, bảng kiểm bổ sung / thay thế khi hệ thống xuống / nTừng</td><td>Không thay Hồ sơ chính sau khi hệ thống đã phục hồi</td><td>QA/QMS</td></tr>
@@ -75,7 +75,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="keyline"><strong>Lưu ý về Part-Rev Bản gốc:</strong> vùng này cố ý không có tiền tố số phía trước vì đây là kho chủ / gốc kỹ thuật theo <span class="code">CustomerID + PartNo + Rev</span>, dùng làm nguồn mốc chuẩn chuẩn để sinh hồ sơ job/Photos trạng thái. Khi PartNo trùng giữa nhiều khách hàng, hồ sơ job phải link đúng nhánh khách hàng tương ứng. Nó không phải dải hồ sơ vận hành tuần tự như các Record Folder G0-G7.</div>
 <p>Mọi link trong hồ sơ phải trỏ về SSOT đang hiệu lực. PHẢI giữ link về nguồn chuẩn; không gửi hoặc lưu đường dẫn tới bản tải về trên máy tính bàn cá nhân, và không tạo hồ sơ phụ song song cho cùng một JobNum.</p></div>
 <div class="section"><h2>3. Cấu trúc Hồ sơ công việc, owner và thời điểm phải nạp hồ sơ</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thư mục</th><th>Nội dung bắt buộc</th><th>Responsible Person chính</th><th>Thời điểm phải có</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thư mục</th><th>Nội dung bắt buộc</th><th>Responsible Person chính</th><th>Thời điểm phải có</th></tr></thead><tbody>
 <tr><td>00_Admin-Control</td><td>Index, bảng kê, phê duyệt lịch sử, log thay đổi, khách hàng Requests tóm tắt, hồ sơ trạng thái</td><td>Kế hoạch / QA</td><td>Ngay khi mở job</td></tr>
 <tr><td>01_G0-Hợp đồng-Khởi động</td><td>PO/rà soát hợp đồng, QPL/lớp phủ, khởi động, lập kế hoạch phát hành, lộ trình gia công tóm tắt, mốc chuẩn bảng kê link</td><td>Kinh doanh / Kế hoạch / Kỹ thuật</td><td>Trước G0 phát hành</td></tr>
 <tr><td>02_G1-Engineering-Release</td><td>DFM review, CAM/NC phát hành, baseline package, routing, setup sheet gốc, tool list, kiểm tra requirement, engineering change inputs</td><td>Kỹ thuật</td><td>Trước G1 phát hành</td></tr>
@@ -91,7 +91,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="keyline"><strong>Quy định file plan chi tiết cấp job:</strong> mỗi gate ở trên phải tiếp tục tách theo Sub-folder nghiệp vụ bên trong. File phải đi đúng <b>gate trước, loại nội dung sau</b>. Ví dụ: ảnh setup, <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-519_Job_Packet_Quick_Check_and_Pre_Run_Verification.xlsx">FRM-519</a> và công việc chuyển giao validation không được để chung dưới <span class="code">04_G3-Setup-Release</span> mà phải đi vào đúng nhánh con theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>. Việc tạo thư mục job mới, kiểm tra đầy đủ hồ sơ và nộp bằng chứng phải bám đúng Sub-folder mô hình đã khóa trong ANNEX này.</div>
 <div class="keyline"><strong>SLA nạp hồ sơ:</strong> hồ sơ vận hành tạo trong ca phải được nạp vào hồ sơ trong chính ca đó hoặc chậm nhất trước khi đóng cổng kiểm soát kế tiếp. PHẢI chuyển ảnh, phiếu giấy và file đo vào hồ sơ đúng hạn; không giữ ở máy cá nhân để “cuối tuần nhập một lần”.</div></div>
 <div class="section"><h2>4. Tiêu chí chấp nhận cho từng loại bằng chứng</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>RecordType</th><th>Được chấp nhận khi</th><th>PHẢI trả lại khi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>RecordType</th><th>Được chấp nhận khi</th><th>PHẢI trả lại khi</th></tr></thead><tbody>
 <tr><td>Biểu mẫu scan / giấy ký tay</td><td>Đọc rõ, đủ trang, có tên/ban đầu/ngày, nhận diện được job/part/rev/cổng kiểm soát</td><td>Mờ, thiếu trang, thiếu thông tin nhận diện, cắt mất vùng ký hoặc giá trị đo</td></tr>
 <tr><td>Ảnh / video hiện trường</td><td>Thể hiện đúng đối tượng, đúng thời điểm và đủ bối cảnh để hiểu ảnh đang chứng minh điều gì</td><td>Ảnh rời rạc không nhận diện được part/job, ảnh bị chỉnh sửa làm mất dấu vết, Photos lại màn hình thay cho bằng chứng gốc khi không có lý do</td></tr>
 <tr><td>PDF báo cáo / bản địa / gốc file đo</td><td>Có program ID/rev khi áp dụng, đúng part/rev, đúng lô/job, liên kết được tới raw data gốc khi bắt buộc</td><td>Chỉ có bản in/Photos màn hình mà không giữ file gốc trong khi lộ trình gia công Requests raw data/bản địa / gốc bằng chứng</td></tr>
@@ -109,7 +109,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Khóa hồ sơ sau ship/job đóng.</strong><br/>Tạo bảng kê cuối, Photos trạng thái cuối, xác định lưu giữ kích hoạt, khóa chỉnh sửa theo quyền đã quy định và chuyển bản cần lưu dài hạn vào vùng lưu trữ.</div>
 </div></div>
 <div class="section"><h2>6. Ma trận tính đầy đủ theo cổng kiểm soát</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Hồ sơ tối thiểu phải có</th><th>Responsible Person xác nhận</th><th>Điểm dừng nếu thiếu</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Hồ sơ tối thiểu phải có</th><th>Responsible Person xác nhận</th><th>Điểm dừng nếu thiếu</th></tr></thead><tbody>
 <tr><td>G0</td><td>Review hợp đồng, Requests tóm tắt, cơ sở / nền QPL + lớp phủ, lập kế hoạch phát hành, mốc chuẩn bảng kê link</td><td>Kế hoạch / Kinh doanh / Kỹ thuật</td><td>Không phát hành xuống phân xưởng</td></tr>
 <tr><td>G1</td><td>Setup sheet, danh sách dao cụ, nguyên vật liệu phân bổ, program link/phát hành, gage mức sẵn sàng, pre-run mức sẵn sàng</td><td>Kỹ thuật / Sản xuất</td><td>Không cho chạy mẫu đầu</td></tr>
 <tr><td>G2</td><td>FAI/mẫu đầu bằng chứng khi kích hoạt, quyết định phát hành/hold/fail, balloon/raw/CMM data khi bắt buộc</td><td>QA / Sản xuất / Kỹ thuật</td><td>Không cho chạy lô hoặc chạy lại sau thay đổi</td></tr>
@@ -119,7 +119,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div>
 <p>QPL và lớp phủ làm dày thêm ma trận trên. Ví dụ: O-FAI bổ sung đầy đủ FAI pack tại G2; O-SP bổ sung nNgười xử lý/bộ chứng từ chứng nhận tại G4/G6; O-CLEAN bổ sung clean-pack/bảo quản bằng chứng tại G4/G6; O-SHIP bổ sung pack xây dựng và một phần-ship sơ đồ ánh xạ tại G6.</p></div>
 <div class="section"><h2>7. Biến thể khách hàng gói hàng phải xuất đúng</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Biến thể</th><th>Khi nào dùng</th><th>Thành phần bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Biến thể</th><th>Khi nào dùng</th><th>Thành phần bắt buộc</th></tr></thead><tbody>
 <tr><td>Standard bộ hồ sơ giao hàng (ship gói hồ sơ)</td><td>Mọi lô giao hàng</td><td>CoC/CoA khi áp dụng, phiếu kê đóng gói, label/SSCC bằng chứng, phê duyệt giao hàng ký-off</td></tr>
 <tr><td>FAI pack</td><td>Khách Requests FAI hoặc G2 kích hoạt Requests phát hành ra ngoài</td><td>FAI báo cáo, balloon/đặc tính list, báo cáo đo, quyết định log, part/rev truy vết</td></tr>
 <tr><td>Công đoạn đặc biệt pack</td><td>Có outsource/công đoạn đặc biệt</td><td>NNgười xử lý cert, lộ trình gia công link, phiếu nhận / biên nhận xác minh, lot sơ đồ ánh xạ, ngoại lệ phê duyệt nếu có</td></tr>
@@ -128,7 +128,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div>
 <p>Không xuất gói hàng bằng cách gom file lẻ ngoài SSOT. Gói hàng phát hành ra ngoài phải có index riêng và link ngược về hồ sơ chính.</p></div>
 <div class="section"><h2>8. đánh dấu đỏ (redline), làm lại, sai lệch và truy vết chuỗi</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Sự kiện</th><th>Phải tạo thêm gì trong hồ sơ</th><th>Quy tắc truy vết</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Sự kiện</th><th>Phải tạo thêm gì trong hồ sơ</th><th>Quy tắc truy vết</th></tr></thead><tbody>
 <tr><td>Phiên bản thay đổi giữa chừng</td><td>Thay đổi sự kiện note, mốc chuẩn mới, danh sách hồ sơ chịu ảnh hưởng, quyết định re-phát hành cổng kiểm soát liên quan</td><td>Không xóa dấu vết phiên bản cũ; phải chỉ ra hồ sơ nào thuộc rev cũ và hồ sơ nào thuộc rev mới</td></tr>
 <tr><td>NCR / làm lại</td><td>Sub-folder hoặc hồ sơ class riêng trong 07_NCR-CAPA-Deviation, làm lại traveler, re-kiểm tra bằng chứng</td><td>Phải link từ khuyết tật gốc → quyết định xử lý → bằng chứng làm lại → bằng chứng re-phát hành</td></tr>
 <tr><td>Concession / sai lệch đã phê duyệt</td><td>Bản chấp thuận ngoại lệ, phạm vi part/qty/số sê-ri, điều kiện áp dụng</td><td>Chỉ dùng cho đúng phạm vi được phê duyệt; không “mượn” sang job khác</td></tr>
@@ -136,7 +136,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Chuyển giao công việc</td><td>Hồ sơ bàn giao, machine/person/khu vực chuyển giao bằng chứng, khởi động lại ủy quyền</td><td>Phải truy được ai giao, ai nhận, khi nào, điều kiện gì còn mở</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>9. truy xuất SLA, offline phương án dự phòng và nhập bù</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại Requests truy xuất nguồn gốc</th><th>SLA tối đa</th><th>Điều kiện đạt</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại Requests truy xuất nguồn gốc</th><th>SLA tối đa</th><th>Điều kiện đạt</th></tr></thead><tbody>
 <tr><td>Job đang chạy hoặc vừa đóng cổng kiểm soát</td><td>≤ 60 giây cho bằng chứng chính của cổng kiểm soát hiện hành</td><td>Tìm được bằng JobNum/Part/Rev/Cổng kiểm soát mà không đi mò nhiều thư mục</td></tr>
 <tr><td>Lô giao hàng đã giao trong năm Current</td><td>≤ 5 phút</td><td>Lấy được bộ hồ sơ giao hàng, cert, CoC, label/SSCC, final phát hành hồ sơ</td></tr>
 <tr><td>Job lưu trữ / giữ pháp lý / khách hàng khiếu nại hồi cứu</td><td>≤ 1 nNgày làm việc hoặc theo Requests điều tra khẩn</td><td>Lấy được bảng kê, Photos trạng thái, truy vết chuỗi và gói hàng Released</td></tr>
@@ -163,7 +163,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <li>Quyền chỉnh sửa sau khóa đã chuyển về đúng Responsible Person</li>
 </ul></div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../03-Reference/02-ANNEX-200/annex-201-job-dossier-template-and-metadata-dictionary.html">ANNEX-201</a></td><td>Template dossier, metadata dictionary, hồ sơ class</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-100/annex-116-m365-folder-structure-blueprint.html">ANNEX-116</a></td><td>Blueprint folder M365 và mapping hồ sơ</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118</a></td><td>Bộ dự phòng ngoại tuyến và nhập bù</td></tr>

@@ -74,7 +74,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </ul></div>
 
 <div class="section"><h2>2. Các loại nhãn nội bộ và dữ liệu bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại nhãn</th><th>Dùng khi</th><th>Dữ liệu bắt buộc</th><th>Responsible Person in / xác nhận</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại nhãn</th><th>Dùng khi</th><th>Dữ liệu bắt buộc</th><th>Responsible Person in / xác nhận</th></tr></thead><tbody>
 <tr><td>WIP thùng chứa Label</td><td>Chứa bán thành phẩm giữa các công đoạn</td><td>Jobhum, OpSeq Current, Partho, Rev, Qty, UOM, ContainerID, trạng thái, nNgày giờ in</td><td>Sản xuất / Kế hoạch</td></tr>
 <tr><td>Hold Label</td><td>Cách ly nghi ngờ hC, truy xuất nguồn gốc sai, thiếu hồ sơ</td><td>ContainerID, Jobhum, mã hold lý do, nNgày giờ hold, nNgười mở hold</td><td>QA / Supervisor</td></tr>
 <tr><td>di chuyển Label</td><td>Chuyển máy, chuyển ca, chuyển cell, chuyển outsource</td><td>Jobhum, từ/to vận hành, Qty tốt / đạt/nghi ngờ/phế phẩm, next Responsible Person</td><td>Sản xuất / WHS</td></tr>
@@ -99,7 +99,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div></div>
 
 <div class="section"><h2>4. Luật trạng thái và phản ứng bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Ý nghĩa</th><th>Ai được đặt</th><th>Điều kiện rời trạng thái</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Ý nghĩa</th><th>Ai được đặt</th><th>Điều kiện rời trạng thái</th></tr></thead><tbody>
 <tr><td>ĐÃ PHÁT HÀNH</td><td>thùng chứa sẵn sàng nhận việc</td><td>Kế hoạch / Sản xuất</td><td>Được quét START tại công đoạn hợp lệ</td></tr>
 <tr><td>Ih QUY TRÌNH</td><td>Đang gia công / đang kiểm / đang xử lý</td><td>Operator / QA</td><td>Đầy đủ, Hold hoặc di chuyển</td></tr>
 <tr><td>TẠM GIỮ</td><td>Bị chặn vì chất lượng, hồ sơ, nhầm phiên bản, vật tư, tool/gage</td><td>QA / Supervisor</td><td>Có quyết định mở hold và bằng chứng kèm theo</td></tr>
@@ -123,7 +123,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="kpi-box"><strong>hPI-WI205-03</strong><br/>Số in lại/void trên 100 thùng chứa. Mục tiêu: giảm liên tục; điều tra khi vượt ngưỡng nội bộ.</div>
 <div class="kpi-box"><strong>hPI-WI205-04</strong><br/>Tỷ lệ thùng chứa chuyển bước mà không có di chuyển scan hợp lệ. Mục tiêu: 0.</div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a></td><td>Quy tắc dùng biểu mẫu số, bổ sung / thay thế và offline phương án dự phòng.</td></tr>
 <tr><td><a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Khóa Hồ sơ công việc (hồ sơ công việc), kiểm tính đầy đủ hồ sơ.</td></tr>
 <tr><td><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">AhhEX-QMS-005</a></td><td>Field sơ đồ ánh xạ, xác nhận rule và nguồn dữ liệu.</td></tr>

@@ -75,7 +75,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>2. Cấu trúc hồ sơ setup bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Khối dữ liệu</th><th>Nội dung bắt buộc</th><th>Mục đích vận hành</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Khối dữ liệu</th><th>Nội dung bắt buộc</th><th>Mục đích vận hành</th></tr></thead><tbody>
 <tr><td>Header job</td><td>Customer, Job/WO, Part No., Part Name, Rev, Op No., lộ trình gia công step, QPL, machine nhóm sản phẩm, site/trung tâm gia công</td><td>Chặn nhầm job, nhầm op, nhầm phiên bản ngay từ Point-of-use.</td></tr>
 <tr><td>Source mốc chuẩn</td><td>Drawing no., mô hình/CAD ref, traveler ref, program ID/version, phiếu cài đặt version, danh sách dao cụ version, AML/nNgười xử lý ràng buộc</td><td>Chứng minh bộ tài liệu phát hành là bộ đúng và đầy đủ.</td></tr>
 <tr><td>Nguyên vật liệu &amp; điều kiện</td><td>Nguyên vật liệu nhóm sản phẩm, hợp kim/cấp / hạng/ram (temper), mẻ nấu (heat)/lot ref khi áp dụng, thô/hoàn thành trạng thái, trước / ưu tiên công đoạn đặc biệt trạng thái, vệ sinh / sạch sẽ/chân không đánh dấu</td><td>Ngăn setup sai với part cần rule xử lý đặc biệt.</td></tr>
@@ -88,7 +88,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>3. Trường header bắt buộc và rule đặt tên</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường</th><th>Quy tắc bắt buộc</th><th>Từ chối khi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường</th><th>Quy tắc bắt buộc</th><th>Từ chối khi</th></tr></thead><tbody>
 <tr><td>Tài liệu ID</td><td>Mã file, phiên bản, nNgày phát hành, đã chuẩn bị/đã kiểm tra/Released by phải hiện ngay trên trang đầu.</td><td>Không có dấu vết phát hành hoặc dùng file export không có siêu dữ liệu.</td></tr>
 <tr><td>Machine nhóm sản phẩm</td><td>Chọn đúng một trong các họ: 3-trục VMC, 5-trục phay, CNC tiện, phay-lượt / quay/đa nhiệm.</td><td>Ghi chung “CNC machine” hoặc không định danh họ máy.</td></tr>
 <tr><td>Vận hành mục đích / ý định</td><td>thô / bán-hoàn thành / hoàn thành / diễn tập-tap / mài bavia / chuyển giao / làm lại / kiểm tra cut.</td><td>Không nói rõ ý định công đoạn nên Operator tự suy diễn.</td></tr>
@@ -101,7 +101,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 
 <div class="section"><h2>4. Dữ liệu công đoạn bắt buộc theo từng setup</h2>
 <p>Mỗi setup phải có một <strong>vận hành chặn / khóa</strong> riêng. Không dùng một sheet chung mô tả mơ hồ cho nhiều setup có logic WCS hoặc gá kẹp chi tiết khác nhau.</p>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm dữ liệu</th><th>Nội dung bắt buộc</th><th>Ghi chú</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm dữ liệu</th><th>Nội dung bắt buộc</th><th>Ghi chú</th></tr></thead><tbody>
 <tr><td>Vận hành chặn / khóa ID</td><td>Setup no., nhóm máy (machine nhóm sản phẩm), machine size bao bì / phong bì nếu quan trọng, fixture ID/rev, program main/sub program list</td><td>Dùng để khóa đúng cấu hình thực tế của từng công đoạn.</td></tr>
 <tr><td>định hướng / đào tạo hội nhập</td><td>Mặt A/B/C hoặc top/tuyến đầu/quyền / đúng; ảnh minh họa và mũi tên định hướng phải thống nhất với bản vẽ</td><td>Phải dùng ảnh minh họa và mũi tên định hướng; không mô tả chỉ bằng chữ khi có nguy cơ đảo mặt.</td></tr>
 <tr><td>kẹp / gá kẹp chiến lược</td><td>Điểm tỳ, điểm kẹp, thứ tự kẹp, lực/mô-men xoắn, mềm jaw hồ sơ / biên dạng, hỗ trợ/còn lại / nghỉ pad, chống-phiếu / trượt note</td><td>Phải chỉ rõ vùng phải tránh kẹp và vùng dễ biến dạng.</td></tr>
@@ -111,7 +111,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>5. Ma trận dữ liệu theo nhóm máy (machine nhóm sản phẩm)</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Machine nhóm sản phẩm</th><th>Trường bắt buộc thêm</th><th>Điểm dừng phát hành</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Machine nhóm sản phẩm</th><th>Trường bắt buộc thêm</th><th>Điểm dừng phát hành</th></tr></thead><tbody>
 <tr><td>3-trục VMC</td><td>ê-tô/fixture type, jaw phép chiếu, mềm-jaw ID, stop vị trí, top-of-tồn kho, cạnh / mặt bên stop, đầu dò (probe) cycle, tool chiều dài source</td><td>Không chỉ ra top-of-tồn kho và đầu dò (probe)/WCS phương pháp.</td></tr>
 <tr><td>5-trục phay</td><td>quay định hướng / đào tạo hội nhập trạng thái, không / bằng không trả lại điều kiện, trục quay (trunnion)/table góc quy ước, machine giới hạn/va chạm note, TCP/RTCP điều kiện, điểm kỳ dị (singularity) điểm giám sát</td><td>Không có an toàn góc / va chạm note / rút về chiến lược.</td></tr>
 <tr><td>CNC tiện</td><td>mâm cặp (chuck)/jaw ID, kẹp / gá kẹp áp suất phạm vi / dải, part dính / que-out, ụ sau (tailstock)/sub-trục chính (spindle) use, tool mũi dao comp rule, cut-off bộ hứng / part đẩy phôi rule</td><td>Thiếu kẹp / gá kẹp áp suất, dính / que-out hoặc bộ hứng/đẩy phôi note.</td></tr>
@@ -120,7 +120,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>6. Chuẩn gá kẹp chi tiết và Fixture Xác nhận</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Field</th><th>Bắt buộc ghi</th><th>Mục đích</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Field</th><th>Bắt buộc ghi</th><th>Mục đích</th></tr></thead><tbody>
 <tr><td>Fixture nhận dạng</td><td>Fixture ID, rev, số sê-ri/no. hoặc vị trí nếu fixture dùng nhiều bản giống nhau</td><td>Ngăn lấy nhầm fixture cũ hoặc nhầm fixture của job khác.</td></tr>
 <tr><td>Xác nhận trạng thái</td><td>NNgày đánh giá năng lực Cần nhất, tình trạng mài mòn/hư hỏng, nNgười xác nhận, Photos chuẩn</td><td>Chứng minh fixture còn dùng được.</td></tr>
 <tr><td>mô-men xoắn / kẹp / gá kẹp data</td><td>mô-men xoắn cài đặt, thủy lực/khí nén áp suất, liên hệ xác nhận, chống-hoàn tác / rút lại đặc điểm / tính năng</td><td>Ngăn trượt phôi và biến dạng do kẹp sai.</td></tr>
@@ -131,7 +131,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>7. Chuẩn Tool List chi tiết</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm trường</th><th>Nội dung bắt buộc</th><th>Từ chối khi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm trường</th><th>Nội dung bắt buộc</th><th>Từ chối khi</th></tr></thead><tbody>
 <tr><td>Nhận diện tool lắp ráp</td><td>Tool no., hốc / túi/trạm / vị trí làm việc, cán dao / đầu gá/trục gá (arbor)/ống kẹp (collet), dao cắt ID, mảnh dao (insert) cấp / hạng, dưỡng đo / đồng hồ đo chiều dài, dính / que-out, cân bằng / số dư/mô-men xoắn note nếu có</td><td>Chỉ ghi “EM10” hoặc “diễn tập 5mm” mà không có lắp ráp bối cảnh.</td></tr>
 <tr><td>Chức năng tool</td><td>thô/hoàn thành/khoan/tarô (taro ren) ren)/ren/vát mép/đầu dò (probe)/cắt / ngưỡng cắt, kênh nếu máy nhiều kênh</td><td>Không phân biệt tool thô và hoàn thành dẫn đến dùng nhầm tại chứng minh-out.</td></tr>
 <tr><td>cài đặt trước data</td><td>cài đặt trước source, danh nghĩa chiều dài/bán kính, cho phép mài mòn dải / băng, không / bằng không tham chiếu, chị em / liên kết tool mối quan hệ</td><td>cài đặt trước bằng tay nhưng không có rule xác minh.</td></tr>
@@ -148,7 +148,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>8. đo bằng đầu dò, WCS, quan trọng / nghiêm trọng bù trừ (bù trừ (offset) và chứng minh-out</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục</th><th>Yêu cầu dữ liệu</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục</th><th>Yêu cầu dữ liệu</th></tr></thead><tbody>
 <tr><td>Mốc chuẩn (mốc chuẩn (datum) chiến lược</td><td>Phải chỉ rõ mốc chuẩn (datum) vật lý, mốc chuẩn (datum) logic trong chương trình, và mối liên hệ với bản vẽ/kế hoạch kiểm tra (plan).</td></tr>
 <tr><td>đầu dò (probe) cycle</td><td>Mã cycle, bề mặt chạm, dự kiến kết quả, logic đạt/không đạt, viết / ghi-back cho phép hay không.</td></tr>
 <tr><td>Quan trọng bù trừ (bù trừ (offset)</td><td>Danh sách bù trừ (offset) không được sửa bởi Operator hoặc chỉ được sửa trong biên độ hẹp; nêu rõ ai được sửa và phải log ở đâu.</td></tr>
@@ -170,7 +170,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </div>
 
 <div class="section"><h2>10. Quy tắc thay đổi, thay thế / bãi bỏ và từ chối điều kiện</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
 <tr><td>Đổi bù trừ (offset) logic / WCS / mốc chuẩn (datum) / định hướng / đào tạo hội nhập</td><td>Phát hành phiên bản mới, cập nhật chứng minh-out note và kích hoạt cổng kiểm soát liên quan.</td><td>Sửa miệng hoặc ghi bút tay tại máy rồi tiếp tục chạy hàng loạt.</td></tr>
 <tr><td>Đổi fixture / jaw / stop / kẹp / gá kẹp chiến lược</td><td>Cập nhật ảnh, mô-men xoắn, chốt định vị, rủi ro note và phê duyệt lại.</td><td>Dùng fixture “Cần giống” mà không cập nhật sheet.</td></tr>
 <tr><td>Đổi tool lắp ráp / thay thế</td><td>Cập nhật Tool List phiên bản, chị em / liên kết tool logic, tuổi thọ / vòng đời dải / băng và bắt buộc xác minh.</td><td>Đổi tool rồi chỉ báo miệng cho ca sau.</td></tr>

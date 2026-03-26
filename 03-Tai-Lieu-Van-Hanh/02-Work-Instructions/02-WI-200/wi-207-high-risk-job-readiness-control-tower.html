@@ -61,7 +61,7 @@ ul.tight li {margin:4px 0;}
 </div>
 <h2>1. Mục đích, kích hoạt và nguyên tắc kích hoạt</h2>
 <p>WI này bắt buộc dùng để kiểm tra mức sẵn sàng của những Lệnh sản xuất có RỦI RO GIAO HÀNG hoặc rủi ro chất lượng cao trước khi thả vào nhịp chạy bình thường. Trung tâm điều hành không thay cho họp hằng ngày; trung tâm điều hành là cơ chế <strong>khóa điều kiện vào cuộc</strong> cho Lệnh sản xuất đặc biệt để tránh “đã phát lệnh rồi mới đi nhặt thiếu sót”.</p>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Kích hoạt</th><th>Kích hoạt khi</th><th>Chủ trì</th><th>Kết quả bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Kích hoạt</th><th>Kích hoạt khi</th><th>Chủ trì</th><th>Kết quả bắt buộc</th></tr></thead><tbody>
 <tr><td>Lệnh sản xuất mới / part mới</td><td>Lần đầu gia công tại HESEM, phiên bản mới, dung sai chặt, quy trình chuỗi chưa có lịch sử ổn định.</td><td>Kỹ thuật + Kế hoạch</td><td>Ready / Đã chặn / Ready với kiểm soát.</td></tr>
 <tr><td>Lệnh sản xuất RỦI RO GIAO HÀNG</td><td>thời gian dẫn (lead time) ngắn, cam kết date sát, nhiều công đoạn outsource, thiếu vật tư/tool/gage hoặc mở vấn đề ảnh hưởng ship.</td><td>Program / Kế hoạch</td><td>Hành động list có Responsible Person và SLA.</td></tr>
 <tr><td>Lệnh sản xuất đặc biệt</td><td>QPL cao, vệ sinh / sạch sẽ/chân không, rò rỉ test, công đoạn đặc biệt, khách hàng thuộc tính / tài sản, kiểm tra sản phẩm đầu tiên (sản phẩm / bài viết)/tái xác nhận hiệu lực.</td><td>QA + Kỹ thuật</td><td>Cổng kiểm soát (gate) matrix, bộ bằng chứng và escalation path rõ.</td></tr>
@@ -69,7 +69,7 @@ ul.tight li {margin:4px 0;}
 </tbody></table></div>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ kích hoạt trung tâm điều hành khi có kích hoạt thật và luôn kết thúc bằng quyết định rõ: chạy, chạy có điều kiện hoặc dừng.</div></div>
 <div class="section"><h2>2. Gói dữ liệu phải có trước cuộc họp</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm dữ liệu</th><th>Phải có</th><th>CHẶN khi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm dữ liệu</th><th>Phải có</th><th>CHẶN khi</th></tr></thead><tbody>
 <tr><td>Thương mại / khách hàng</td><td>PO/dự báo, cam kết ship date, theo Requests riêng của khách hàng Requests, QPL, cert, đóng gói Requests.</td><td>Chưa chốt nNgày giao, thiếu triển khai đầy đủ Requests (flow-xuống / nTừng) hoặc mâu thuẫn Requests khách hàng.</td></tr>
 <tr><td>Mốc chuẩn kỹ thuật</td><td>Drawing/3D/rev, bộ định tuyến / lộ trình, NC/program mức sẵn sàng, phiếu cài đặt, danh sách dao cụ, kế hoạch kiểm soát/FMEA mức cần thiết.</td><td>Phiên bản chưa khóa, lộ trình gia công chưa rõ, chưa chốt program/setup chiến lược.</td></tr>
 <tr><td>Nguyên vật liệu &amp; source</td><td>Tình trạng raw nguyên vật liệu, mẻ nấu (heat)/lot, đã phê duyệt source, outsource nNgười xử lý, cert path.</td><td>Thiếu vật tư, thiếu cert, source chưa đã phê duyệt, công đoạn đặc biệt chưa chốt.</td></tr>
@@ -87,7 +87,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-item"><strong>Bước 6 — Theo dõi sau họp.</strong><br/>Trung tâm điều hành rà soát lại theo nhịp đã chốt cho đến khi Lệnh sản xuất về trạng thái xanh. Nếu phát sinh rủi ro mới làm thay đổi giả định, phải họp lại; không được ngầm đổi plan trên mặt bằng xưởng.</div>
 </div></div>
 <div class="section"><h2>4. Logic quyết định Ready / Đã chặn / RỦI RO GIAO HÀNG</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Điều kiện</th><th>Hành động bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Điều kiện</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td><span class="badge-green">READY</span></td><td>Material, route, program, setup, gage, plan kiểm và hồ sơ release đều đã sẵn hoặc đã có bằng chứng xác nhận.</td><td>Cho vào dispatch board; kiểm theo cổng kiểm soát chuẩn.</td></tr>
 <tr><td><span class="badge-amber">READY WITH CONTROLS</span></td><td>Có rủi ro đã biết nhưng đã có containment hợp lệ như alternate machine, split lot, staged material, tăng sampling, daily trung tâm điều hành.</td><td>Ghi rõ control bổ sung, nNgười phụ trách, điều kiện dừng và thời điểm review tiếp.</td></tr>
 <tr><td><span class="badge-red">BLOCKED</span></td><td>Thiếu baseline, thiếu vật tư/chứng chỉ quan trọng, chưa chốt processor, chưa sẵn gage/fixture, open NCR ảnh hưởng CTQ, hoặc điều kiện mẫu đầu chưa sẵn.</td><td>Không dispatch; mở escalation theo <a href="../../03-Reference/01-ANNEX-100/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</td></tr>
@@ -108,7 +108,7 @@ ul.tight li {margin:4px 0;}
 <li><strong>KPI-WI207-04</strong> Số nNgày hold mở kéo dài trên Lệnh sản xuất cao-rủi ro.</li>
 </ul></div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>Governance đơn hàng và cam kết nNgày giao.</td></tr>
 <tr><td><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a></td><td>Mức sẵn sàng về mốc chuẩn kỹ thuật.</td></tr>
 <tr><td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></td><td>Điều độ và điều phối xuất hàng.</td></tr>

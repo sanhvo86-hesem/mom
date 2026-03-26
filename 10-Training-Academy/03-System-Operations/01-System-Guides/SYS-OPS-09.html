@@ -71,7 +71,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div class="table-wrap" style="margin-top:12px">
-<table class="tight">
+<table class="table tight">
 <thead>
 <tr><th>Đọc trước (nội bộ)</th><th>Mục đích</th></tr>
 </thead>
@@ -96,7 +96,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout">
 <h3>Vai trò dùng mô-đun vào việc gì</h3>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Vai trò</th><th>Quyết định dựa trên dữ liệu</th><th>Dữ liệu/điểm chạm bắt buộc</th></tr></thead>
 <tbody>
 <tr><td>Operator / Setup</td><td>Chạy đúng Job/Rev/Op, dừng khi sai bằng chứng</td><td>JobIndex, JobOperIndex, Hồ sơ công việc (mở nhanh)</td></tr>
@@ -128,7 +128,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="callout ok">
 <h3>Phân định “nguồn đúng” theo đối tượng</h3>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Đối tượng</th><th>Nguồn đúng</th><th>Nguồn thực thi/bằng chứng</th><th>Phải tránh</th></tr></thead>
 <tbody>
 <tr><td>Job / Rev / Lộ trình gia công / Lô giao hàng / MES time mục nhập</td><td>Epicor Kinetic (Epicor) (Epicor)</td><td>M365 chỉ hiển thị (phản chiếu / sao chép) + bằng chứng link</td><td>Chỉnh tay list phản chiếu / sao chép</td></tr>
@@ -142,7 +142,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2>3) Từ khoá vận hành (cần thuộc)</h2>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Thuật ngữ</th><th>Định nghĩa vận hành</th><th>Điểm lỗi hay gặp</th></tr></thead>
 <tbody>
 <tr><td><b>BAQ</b></td><td>Kinh doanh hoạt động truy vấn trong Epicor; Exports theo tập chuẩn (OpenJobs, Operations, Nhân công, lô giao hàng…)</td><td>Thiếu trường khoá/LastUpdated</td></tr>
@@ -161,7 +161,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>4) 10 điểm thất bại và cách chặn</h2>
 <p class="mini">Mỗi điểm thất bại có “tín hiệu”, “hậu quả”, “hành động chặn” và “bằng chứng”.</p>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>#</th><th>Điểm thất bại</th><th>Tín hiệu nhận biết</th><th>Hậu quả</th><th>Hành động chặn</th><th>Evidence (MRR)</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>phản chiếu / sao chép trễ (cũ / lỗi thời)</td><td>JobIndex.EpicorLastSync quá hạn [SLA]</td><td>Quyết định dựa dữ liệu cũ</td><td>DỪNG dùng phản chiếu / sao chép cho cổng kiểm soát; mở Epicor kiểm tra; tạo StandupAction S1</td><td>Ảnh màn hình Epicor + log StandupAction</td></tr>
@@ -222,7 +222,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2>7) Phản ứng 60 giây (cẩm nang triển khai (sách hướng dẫn) tại hiện trường)</h2>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Tình huống</th><th>0–60 giây phải làm</th><th>Ai làm</th><th>Dấu vết bắt buộc</th></tr></thead>
 <tbody>
 <tr>
@@ -263,7 +263,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>8) Bảng kiểm vận hành chuẩn (≤ 15 bước)</h2>
 <p class="mini">Bảng kiểm áp dụng cho ca trưởng/supervisor và nNgười trực IT/QMS.</p>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Evidence (MRR)</th><th>Lỗi hay gặp</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Kiểm tra IntegrationLogs 3 luồng phản chiếu / sao chép (công việc / đơn hàng/ops/ship) trạng thái thành công/cảnh báo</td><td>Supervisor</td><td>Ảnh màn hình IntegrationLogs</td><td>Chỉ nhìn “luồng run thành công” mà bỏ ErrorSummary</td></tr>
@@ -288,7 +288,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3>Job 1: Xác minh Job/Rev + mở Hồ sơ công việc trong 60 giây</h3>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Bước</th><th>Điểm chính (Điểm then chốt)</th><th>Lý do</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Mở JobIndex bằng JobNum; đọc PartNum + RevisionNum + DueDate</td><td>Chặn nhầm job/nhầm rev ngay từ đầu</td></tr>
@@ -302,7 +302,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3>Job 2: Xử lý “sai Rev nghi ngờ” trong 60 giây</h3>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Bước</th><th>Điểm chính (Điểm then chốt)</th><th>Lý do</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Dừng vận hành; gắn tag TẠM GIỮ vào lô/chi tiết</td><td>Chặn sai hỏng lan rộng</td></tr>
@@ -316,7 +316,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3>Job 3: Cổng kiểm soát Phê duyệt giao hàng (WHS/QA)</h3>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Bước</th><th>Điểm chính (Điểm then chốt)</th><th>Lý do</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Xác nhận PackID/SSCC trong PackSSCCRegister trạng thái Đã xác minh</td><td>Chặn nhầm nhãn/nhầm pack</td></tr>
@@ -332,7 +332,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2>10) Đầu ra chuẩn theo level (L1–L4)</h2>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Level</th><th>Năng lực quan sát được</th><th>Đầu ra bắt buộc</th><th>Chỉ số</th></tr></thead>
 <tbody>
 <tr>
@@ -367,7 +367,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2>11) Tiêu chí đánh giá đánh giá (L1–L4) theo hành vi</h2>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Tiêu chí</th><th>L1</th><th>L2</th><th>L3</th><th>L4</th></tr></thead>
 <tbody>
 <tr>
@@ -467,7 +467,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3>3 kịch bản tình huống</h3>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Kịch bản</th><th>Đầu vào</th><th>Hành động bắt buộc</th><th>dự kiến kết quả</th><th>Evidence</th></tr></thead>
 <tbody>
 <tr>
@@ -500,7 +500,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>13) Hiệu suất test (bắt buộc vì có vận hành cổng kiểm soát/phê duyệt)</h2>
 <p class="mini">Hiệu suất test chấm ĐẠT/KHÔNG ĐẠT theo hành vi và dấu vết, không chấm cảm tính.</p>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Nhóm</th><th>Bài thực hành</th><th>Tiêu chí PASS</th><th>Tiêu chí FAIL (1 lỗi là FAIL)</th><th>Evidence bắt buộc</th></tr></thead>
 <tbody>
 <tr>
@@ -546,7 +546,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>14) MRR tối thiểu (Tối thiểu Bắt buộc Hồ sơ) và nơi lưu</h2>
 <p class="mini">MRR là tiêu chí cổng kiểm soát. Thiếu MRR → CHẶN.</p>
 <div class="table-wrap">
-<table class="tight">
+<table class="table tight">
 <thead><tr><th>Nhóm MRR</th><th>MRR bắt buộc</th><th>Nơi lưu</th><th>Khoá/đường dẫn</th><th>Lưu giữ</th></tr></thead>
 <tbody>
 <tr>

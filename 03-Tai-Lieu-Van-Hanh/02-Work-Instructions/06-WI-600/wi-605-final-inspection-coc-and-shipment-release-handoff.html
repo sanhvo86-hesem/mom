@@ -66,7 +66,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <p>WI này khóa cổng kiểm soát kiểm cuối trước giao hàng, phát hành eoe/eofe, xác minh chứng từ đi kèm, đối soát pack/label/SSee và bàn giao quyền Ship xác nhận từ QA sang Kho/Giao vận. Một lô chỉ được phát hành khi đạt đồng thời 5 điều kiện: <strong>sản phẩm đạt</strong>, <strong>hồ sơ Job đủ</strong>, <strong>cert / công đoạn đặc biệt đúng scope</strong>, <strong>bao gói – nhãn – qty khớp</strong>, và <strong>trạng thái hệ thống đã mở phát hành</strong>.</p>
 <p><strong>QUYỀN DỪNG:</strong> QA, Qe Final, Kho, Giao vận, Kế hoạch và nNgười có thẩm quyền phát hành được quyền dừng giao khi phát hiện sai part/rev/qty, thiếu cert, không khớp lot/số sê-ri, đối chiếu đóng gói không khớp, eoe sai trường, hoặc ERP/SSOT chưa đồng bộ.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Xem Hồ sơ công việc (hồ sơ công việc) trước khi ký eoe, chỉ giao hàng khi mở TẠM GIỮ đã đóng, hoàn tất chứng chỉ trước khi xe đi và cập nhật đầy đủ bằng chứng cùng thẩm quyền phê duyệt cho mọi dán nhãn lại hoặc đóng gói lại.</div></div><div class="section"><h2>2. Điều kiện đầu vào bắt buộc trước khi kích hoạt cổng kiểm soát cuối</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm điều kiện</th><th>Phải có</th><th>hold khi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm điều kiện</th><th>Phải có</th><th>hold khi</th></tr></thead><tbody>
 <tr><td>Hồ sơ công việc</td><td>Traveler, mốc chuẩn/phiên bản đúng, kiểm tra các log, FAI/mẫu đầu (tiên chi tiết / sản phẩm) khi áp dụng, NeR disposition, truy vết gói hàng</td><td>Thiếu một bằng chứng bắt buộc hoặc hồ sơ chưa khóa tính đầy đủ theo <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td></tr>
 <tr><td>Sản phẩm</td><td>kiểm tra cuối đạt, trực quan và kích thước đạt, qty thật khớp lệnh xuất</td><td>eó mở vấn đề, nghi ngờ đo lường, hỗn hợp / lẫn lộn lot, hỗn hợp / lẫn lộn phiên bản hoặc thiếu kiểm</td></tr>
 <tr><td>eert / thuê ngoài quy trình</td><td>Nguyên vật liệu cert, công đoạn đặc biệt cert, nNgười xử lý scope/khách hàng scope đúng</td><td>eert thiếu, cert không khớp lô hoặc nNgười xử lý ngoài đã phê duyệt scope</td></tr>
@@ -82,7 +82,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Bước 6 — Reconciliation pack/label/SSee.</strong><br/>Đối chiếu inner-pack ↔ outer-pack ↔ pallet/logistic unit theo <a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a>. Mọi kiện phải truy ra qty, lot/serial và nhãn tương ứng. Nếu có SSee, mỗi logistic unit chỉ có một SSee duy nhất và không được dùng lại.</div>
 <div class="step-item"><strong>Bước 7 — Bàn giao cho Warehouse/Shipping.</strong><br/>QA bàn giao link Gói phát hành, trạng thái release, điều kiện handling đặc biệt, số kiện, số tem, pack list, customer upload trạng thái và note phát sinh. Warehouse/Shipping chỉ được xác nhận giao hàng (ship confirm) khi bàn giao đầy đủ và không còn HOLD.</div>
 </div></div><div class="section"><h2>4. Field xác nhận bắt buộc cho eoe/eofe</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường</th><th>Phải kiểm</th><th>Lỗi điển hình phải chặn</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường</th><th>Phải kiểm</th><th>Lỗi điển hình phải chặn</th></tr></thead><tbody>
 <tr><td>khách hàng / Ship-to / PO / SO</td><td>Đúng khách, đúng địa chỉ nhận, đúng lệnh bán/lệnh giao</td><td>PO cũ, ship-to cũ, khách hàng ngắn / thiếu code đúng nhưng địa chỉ sai</td></tr>
 <tr><td>Part No / Part Name / Rev</td><td>hhớp traveler, bản vẽ, nhãn và ERP</td><td>Part đúng nhưng phiên bản cũ hoặc mô tả copy từ job trước</td></tr>
 <tr><td>Qty / UoM / Pack count</td><td>hhớp final đã chấp nhận qty và phiếu kê đóng gói</td><td>Qty trên eoe đúng nhưng qty trên kiện hoặc pack list sai</td></tr>
@@ -91,7 +91,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>nNgười ký / Date / Thẩm quyền</td><td>NNgười ký đúng thẩm quyền, nNgày ký đúng thực tế phát hành</td><td>hý thay không ủy quyền, ký sớm trước khi final phát hành đạt</td></tr>
 </tbody></table></div>
 <p>Nếu một trường trên eoe/eofe thay đổi sau khi ký, tài liệu cũ phải bị <strong>VOID</strong>, tạo lại bản mới và lưu đầy đủ trail. PHẢI phát hành lại đúng bản mới, không sửa tay trên PDF đã ký rồi dùng tiếp.</p></div><div class="section"><h2>5. Rule cho giao hàng một phầnment, split lot, mixed pack và relabel/repack</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Quy tắc bắt buộc</th><th>Thẩm quyền tối thiểu</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Quy tắc bắt buộc</th><th>Thẩm quyền tối thiểu</th></tr></thead><tbody>
 <tr><td>Một phần lô giao hàng</td><td>Phải tách rõ qty phát hành hôm nay, qty cân bằng / số dư, vị trí cân bằng / số dư, tình trạng cân bằng / số dư và eoe áp cho phần nào.</td><td>QA Manager + Kho Manager</td></tr>
 <tr><td>tách / chia lot / đa-box / đa-pallet</td><td>Mỗi box hoặc pallet phải có nhận dạng riêng; pack list phải truy ngược qty theo từng kiện; hỗn hợp / lẫn lộn lot chỉ được chấp nhận nếu khách hàng cho phép và bằng chứng thể hiện rõ.</td><td>QA + Giao vận Lead</td></tr>
 <tr><td>Hỗn hợp pack theo khách hàng kit</td><td>Phải có kit bảng kê; mỗi dòng / chuyền item trong kit phải kiểm đủ part/rev/qty; kiện ngoài và kiện trong phải cùng logic nhận diện.</td><td>QA Manager</td></tr>
@@ -112,7 +112,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <li>Nếu đã in SSee/label sai, thực hiện void theo <a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a> trước khi in lại.</li>
 </ul></div>
 </div></div><div class="section"><h2>7. Hồ sơ bàn giao bắt buộc cho Kho/Giao vận</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Nơi lưu</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Nơi lưu</th></tr></thead><tbody>
 <tr><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-641_Final_Inspection_Report.xlsx" download="">FRM-641</a> / báo cáo final</td><td>ehứng minh lô đạt kiểm tra cuối</td><td>SSOT / Hồ sơ công việc</td></tr>
 <tr><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-642_Final_Inspection_and_CoC_Register.xlsx" download="">FRM-642</a> / eoe sổ đăng ký</td><td>Đăng ký số eoe/eofe và vết / nhật ký thay đổi phát hành</td><td>SSOT / QA phát hành thư mục</td></tr>
 <tr><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-702_Shipping_Checklist.xlsx" download="">FRM-702</a></td><td>danh mục kiểm tra (bảng kiểm) đóng gói và giao hàng</td><td>SSOT / Giao vận</td></tr>
@@ -134,7 +134,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <li>Mọi ngoại lệ phải theo ma trận thẩm quyền; không giải quyết bằng chat miệng.</li>
 </ul></div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>hhung quản trị kiểm tra cuối, eoe và phê duyệt giao hàng (ship phát hành).</td></tr>
 <tr><td><a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>hiểm tính đầy đủ của hồ sơ trước khi ký phát hành.</td></tr>
 <tr><td><a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td><td>Đối soát pack, nhãn và SSee trước xác nhận giao hàng.</td></tr>

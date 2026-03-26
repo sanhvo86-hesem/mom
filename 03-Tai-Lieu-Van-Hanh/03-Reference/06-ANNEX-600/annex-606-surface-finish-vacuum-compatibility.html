@@ -77,7 +77,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>2. Cách xác định lớp kiểm soát cho từng Job</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điều kiện của Job</th><th>Lớp kiểm soát phải áp dụng</th><th>Hệ quả bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điều kiện của Job</th><th>Lớp kiểm soát phải áp dụng</th><th>Hệ quả bắt buộc</th></tr></thead><tbody>
 <tr><td>Bề mặt tiếp xúc tấm bán dẫn (wafer), cao-độ tinh khiết liên hệ, niêm phong / bịt kín mặt / bề mặt, chân không-cạnh / mặt bên, nội bộ đoạn / lối đi hoặc khách hàng Mọi rõ “quan trọng / nghiêm trọng bề mặt”</td><td>Bề mặt Quan trọng</td><td>Phải có vùng đo xác định rõ; phải có chuẩn nhám mục tiêu; phải có bằng chứng đo/kiểm theo cấp QPL.</td></tr>
 <tr><td>Part có đường khí, ống góp / đa tạp, phụ kiện nối ống, buồng / khoang, bao phủ / che, hộp đệm kín (gland), lỗ khoan, hốc / lòng khuôn hoặc chức năng kín khí/chân không</td><td>rò rỉ / chân không Quan trọng</td><td>Phải xác định rò rỉ class, phương pháp, acceptance và bằng chứng phát hành; phải kiểm soát xử lý / vận chuyển/đóng gói nghiêm hơn job thường.</td></tr>
 <tr><td>Part sau EP, thụ động hóa (passivation), xi mạ anốt (anodize), lớp phủ / mạ, outsource công đoạn đặc biệt hoặc clean xây dựng</td><td>hoàn thành / Clean Quan trọng</td><td>Phải kiểm cả cert từ nNgười xử lý lẫn tình trạng bề mặt sau nhận hàng; không phát hành chỉ dựa vào cert.</td></tr>
@@ -87,7 +87,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>3. Chuẩn nhám bề mặt theo chức năng</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Vùng chức năng</th><th>Ra mục tiêu</th><th>Rz mục tiêu</th><th>Điều kiện chấp nhận</th><th>Điểm dễ lỗi phải kiểm</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Vùng chức năng</th><th>Ra mục tiêu</th><th>Rz mục tiêu</th><th>Điều kiện chấp nhận</th><th>Điểm dễ lỗi phải kiểm</th></tr></thead><tbody>
 <tr><td>tấm bán dẫn (wafer)-liên hệ / cao-độ tinh khiết liên hệ</td><td>≤ 0.10 µm khi spec Requests đánh bóng/mài rà (lapping)</td><td>≤ 0.50 µm</td><td>Không bavia, không vết bẩn / bôi, không nhúng hạt / phần tử, không vết kéo do tool.</td><td>Vết cấn khi chạm tay/găng, vết xước chéo, vết bẩn / ố sau clean.</td></tr>
 <tr><td>tiếp xúc chất lỏng gas / hóa chất path</td><td>≤ 0.20 µm hoặc chặt hơn theo spec</td><td>≤ 1.0 µm</td><td>Bề mặt liên tục, không xước sâu, không pit mở, không cặn trong đoạn / lối đi.</td><td>vết bẩn do dao, bavia mép lỗ, cặn chất tẩy rửa, dấu tay sau thụ động hóa (passivation).</td></tr>
 <tr><td>chân không niêm phong mặt / bề mặt / O-vòng / khuyên rãnh / lắp ghép mặt / bề mặt</td><td>Thông thường ≤ 0.40 µm; vùng dao-cạnh / mép theo spec chặt hơn</td><td>≤ 1.6 µm</td><td>Không vết lõm, lõm / móp, vết sứt, trầy xước cắt niêm phong; không bo tròn mép dao ở dao-cạnh / mép.</td><td>Va đập sau gia công, xước khi vệ sinh, làm lại làm sai hồ sơ / biên dạng niêm phong.</td></tr>
@@ -98,7 +98,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>4. Leak class, outgassing và bằng chứng tối thiểu</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Lớp ứng dụng</th><th>Chuẩn leak điển hình</th><th>Outgassing / cleanliness expectation</th><th>Bằng chứng tối thiểu</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Lớp ứng dụng</th><th>Chuẩn leak điển hình</th><th>Outgassing / cleanliness expectation</th><th>Bằng chứng tối thiểu</th></tr></thead><tbody>
 <tr><td>High vacuum chamber / seal critical</td><td>Đến mức 1×10⁻⁹ mbar·L/s khi customer spec yêu cầu</td><td>Ưu tiên bề mặt đã EP hoặc finish tương đương; clean handling chặt; packaging sạch.</td><td>Kết quả He leak test đúng method, hồ sơ thiết bị, trạng thái after-clean/after-bake khi áp dụng, bằng chứng bao gói.</td></tr>
 <tr><td>Gas delivery / manifold / high-purity line</td><td>Thường 1×10⁻⁸ mbar·L/s hoặc theo spec</td><td>Đường khí phải sạch, không có cặn; processor cert và cleanliness bằng chứng phải nối chuỗi.</td><td>Leak hồ sơ + cert xử lý bề mặt + photo bằng chứng vùng đóng gói.</td></tr>
 <tr><td>General vacuum fitting / controlled enclosure</td><td>Thường 1×10⁻⁷ mbar·L/s hoặc theo spec</td><td>Không cho handling breach sau khi leak pass; mở túi phải theo reseal rule.</td><td>Leak hồ sơ, traveler, ship-release reconciliation.</td></tr>
@@ -108,7 +108,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>5. Ma trận vật liệu – ứng dụng – xử lý bề mặt</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Vật liệu</th><th>Ứng dụng nên dùng</th><th>Ứng dụng phải tránh / cần điều kiện</th><th>Xử lý bề mặt ưu tiên</th><th>Ghi chú bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Vật liệu</th><th>Ứng dụng nên dùng</th><th>Ứng dụng phải tránh / cần điều kiện</th><th>Xử lý bề mặt ưu tiên</th><th>Ghi chú bắt buộc</th></tr></thead><tbody>
 <tr><td>SS316L / 316L VAR</td><td>tiếp xúc chất lỏng, chân không, ăn mòn nhẹ đến trung bình, clean dịch vụ, ống góp / đa tạp, phụ kiện nối ống, buồng / khoang phụ kiện đường ống</td><td>Không tự thay bằng 304/303 cho đường khí hoặc vùng ăn mòn nếu khách hàng chưa chấp thuận</td><td>thụ động hóa (passivation); EP khi Requests cao-độ tinh khiết / low thoát khí (outgassing)</td><td>Phải truy vết mẻ nấu (heat)/lot; phải loại trừ nhiễm sắt tự do; sau xử lý phải bảo vệ bề mặt khỏi cấn/xước.</td></tr>
 <tr><td>304/304L</td><td>cấu trúc, chung / tổng quát clean lắp ráp, một số part cơ khí không ăn mòn cao</td><td>Không ưu tiên cho tiếp xúc chất lỏng ăn mòn hoặc cao-độ tinh khiết gas path nếu chưa rà soát</td><td>thụ động hóa (passivation) khi spec Requests</td><td>Không tự thay thế cho 316L ở vùng có rủi ro ăn mòn hoặc ion phát hành.</td></tr>
 <tr><td>Al6061-T6 / 6082 / 7075 theo AML</td><td>vỏ hộp, tấm / bản, fixture, non-ăn mòn mạnh gas/chân không part khi spec cho phép</td><td>Không dùng cho môi trường axit/cơ sở / nền mạnh; với chân không-nhạy cảm job phải rà soát lớp phủ / mạ, nung / sấy giới hạn và vệ sinh / sạch sẽ</td><td>xi mạ anốt (anodize) Type II/III hoặc hoàn thành theo spec</td><td>Dễ xước và dễ giữ hạt / phần tử ở vết xước; cần tấm ngăn phù hợp ngay sau hoàn thiện bề mặt.</td></tr>
@@ -120,7 +120,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>6. Xử lý bề mặt, lớp phủ / mạ và điều kiện chấp nhận</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Quá trình</th><th>Khi dùng</th><th>Điều kiện chấp nhận nội bộ</th><th>Dấu hiệu phải TẠM GIỮ</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Quá trình</th><th>Khi dùng</th><th>Điều kiện chấp nhận nội bộ</th><th>Dấu hiệu phải TẠM GIỮ</th></tr></thead><tbody>
 <tr><td>đánh bóng điện hóa (EP)</td><td>cao-độ tinh khiết, tiếp xúc chất lỏng, chân không, cần giảm độ nhám và cải thiện khả năng làm sạch</td><td>Bề mặt đồng đều; không pit, không cam vỏ cam / bong tróc, không cháy, không vết bẩn / bôi; cert/lot truy vết đầy đủ; vùng chức năng đạt target Ra theo spec.</td><td>Color bất thường, không đều hoàn thành, pit mở, cert không đủ scope hoặc nNgười xử lý ngoài đã phê duyệt scope.</td></tr>
 <tr><td>thụ động hóa (passivation)</td><td>SS cần khử sắt tự do và nâng chống ăn mòn</td><td>Không vết bẩn / ố, không đổi màu bất thường, không nước-ngắt / nghỉ Không đạt khi Requests, chứng cứ xử lý rõ lot/batch.</td><td>gỉ sét ba-via (flash), vết bẩn / ố, truy vết batch đứt hoặc không khớp giữa cert và lot part.</td></tr>
 <tr><td>xi mạ anốt (anodize) / cứng / khó xi mạ anốt (anodize)</td><td>nhôm cần mài mòn/ăn mòn bảo vệ hoặc cách ly theo spec</td><td>Độ phủ đều, không nứt, không bong, không biến dạng làm ảnh hưởng dung sai chức năng.</td><td>bong tróc, cháy đánh dấu, trầy xước lộ nền, che phủ (masking) sai vùng hoặc độ dày out-of-spec.</td></tr>
@@ -155,7 +155,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>8. Rule làm lại, clean-trạng thái và đóng gói cho job nhạy cảm</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Must not do</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Must not do</th></tr></thead><tbody>
 <tr><td>Làm lại vùng niêm phong / bề mặt quan trọng / nghiêm trọng</td><td>Đánh giá lại nhám, hồ sơ / biên dạng, rò rỉ rủi ro và vệ sinh / sạch sẽ; cập nhật bằng chứng theo cổng kiểm soát liên quan.</td><td>Không được đánh bóng chữa cháy rồi ship nếu chưa rà soát lại ảnh hưởng chức năng.</td></tr>
 <tr><td>Part đã rò rỉ-pass nhưng bị mở túi / chạm tay / rơi / va chạm</td><td>Đánh giá lại clean-trạng thái, đóng gói trạng thái và khi cần phải kiểm tra lại rò rỉ hoặc re-clean/re-pack theo WI liên quan.</td><td>Không dùng lập luận “chỉ mở xem một chút” để bỏ qua re-đánh giá.</td></tr>
 <tr><td>Part sau outsource bề mặt xử lý</td><td>Kiểm cert, lot truy vết, trực quan acceptance, vùng phải bảo vệ khỏi lớp phủ và quy cách bao gói khi nhận về.</td><td>Không nhập kho/không chuyển bước chỉ dựa vào phiếu giao hàng.</td></tr>
@@ -164,7 +164,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>9. Evidence tối thiểu theo nhóm Job</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm Job</th><th>Evidence tối thiểu</th><th>Cổng kiểm soát giữ</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm Job</th><th>Evidence tối thiểu</th><th>Cổng kiểm soát giữ</th></tr></thead><tbody>
 <tr><td>Bề mặt hoàn thành quan trọng / nghiêm trọng</td><td>máy đo biên dạng (profilometer) hồ sơ hoặc bằng chứng vùng đo, trực quan hồ sơ vùng chức năng, rule acceptance rõ trên traveler/kế hoạch kiểm tra (plan).</td><td>Thiếu hồ sơ, vị trí đo sai, hoặc bằng chứng không chỉ rõ đặc điểm / tính năng chức năng.</td></tr>
 <tr><td>chân không / rò rỉ-nhạy cảm</td><td>rò rỉ test hồ sơ đúng phương pháp, trạng thái sau-clean/sau-pack, truy vết thiết bị, đóng gói bằng chứng.</td><td>rò rỉ hồ sơ thiếu, phương pháp sai, thiết bị hết hiệu lực hoặc chuỗi bằng chứng bị đứt.</td></tr>
 <tr><td>Outsource bề mặt xử lý</td><td>NNgười xử lý cert, scope đúng nhóm sản phẩm quy trình, lot/batch truy vết, đầu vào / nhận hàng trực quan acceptance, quyết định hồ sơ khi có bất thường.</td><td>NNgười xử lý ngoài danh sách được duyệt, cert thiếu, không khớp lot hoặc hoàn thành lỗi.</td></tr>
@@ -173,7 +173,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 </div>
 
 <div class="section"><h2>10. Tài liệu liên kết</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td><td>Khung kiểm soát sạch và nhiễm bẩn.</td></tr>
 <tr><td><a href="../../01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a></td><td>Rule vật liệu, truy vết và kiểm soát giả mạo.</td></tr>
 <tr><td><a href="../03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a></td><td>Danh mục vật liệu được phê duyệt.</td></tr>

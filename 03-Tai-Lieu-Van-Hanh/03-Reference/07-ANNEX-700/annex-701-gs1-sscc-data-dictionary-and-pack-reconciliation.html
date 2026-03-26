@@ -72,7 +72,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì SSCC duy nhất cho từng pack, chỉ giao hàng khi ReconciliationStatus không ở trạng thái ĐÃ CHẶN và chỉnh PackID hoặc SSCC bằng dữ liệu hệ thống đã kiểm soát, không sửa tay trên nhãn.</div></div>
 
 <div class="section"><h2>2. Từ điển dữ liệu bắt buộc</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Field</th><th>Bắt buộc</th><th>Nguồn dữ liệu chuẩn</th><th>Quy tắc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Field</th><th>Bắt buộc</th><th>Nguồn dữ liệu chuẩn</th><th>Quy tắc</th></tr></thead><tbody>
 <tr><td>PackID</td><td>Có</td><td>Epicor/WHS giao dịch</td><td>Duy nhất trong lô giao hàng scope; không đổi sau xác nhận giao hàng.</td></tr>
 <tr><td>SSCC (AI 00)</td><td>Có khi dùng hậu cần label</td><td>Dịch vụ cấp mã được kiểm soát</td><td>18 số, kiểm tra chữ số hợp lệ, duy nhất toàn cục trong vòng đời quản lý của công ty.</td></tr>
 <tr><td>Lô giao hàng / Đơn hàng / Phát hành</td><td>Có</td><td>Epicor</td><td>Phải khớp ship-to, hóa đơn / bảng kê-to, điều kiện giao hàng.</td></tr>
@@ -95,7 +95,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div></div>
 
 <div class="section"><h2>4. Quy tắc đối soát kiện hàng</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục đối soát</th><th>đạt khi</th><th>CHẶN khi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục đối soát</th><th>đạt khi</th><th>CHẶN khi</th></tr></thead><tbody>
 <tr><td>Qty đối soát</td><td>Tổng Qty theo PackID = lô giao hàng dòng / chuyền = phiếu kê đóng gói</td><td>Chênh số lượng hoặc UOM</td></tr>
 <tr><td>Phiên bản đối soát</td><td>Part/Rev trên nhãn khớp phát hành set và bộ hồ sơ giao hàng</td><td>Sai rev hoặc lẫn nhiều rev trong một hậu cần đơn vị không được phép</td></tr>
 <tr><td>con / phụ thuộc-cha / gốc mối quan hệ</td><td>Cấu trúc thùng thùng carton/pallet rõ ràng và quét ra đúng</td><td>cha / gốc không mở được con / phụ thuộc hoặc con / phụ thuộc mất quan hệ</td></tr>
@@ -113,7 +113,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </ul></div>
 
 <div class="section"><h2>6. Tài liệu liên kết</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="annex-702-packaging-labeling-spec.html">ANNEX-702</a></td><td>Đóng gói spec, label layout, clean pack và bảo quản.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a></td><td>mã vạch nội bộ, scan-to-hành động và quản lý label trong phân xưởng.</td></tr>
 <tr><td><a href="../01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></td><td>Field sơ đồ ánh xạ của hệ thống số.</td></tr>

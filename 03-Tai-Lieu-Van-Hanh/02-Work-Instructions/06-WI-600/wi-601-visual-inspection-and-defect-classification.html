@@ -67,7 +67,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  
 <div class="section"><h2>1. Mục đích, ranh giới và điều kiện quan sát</h2>
 <p>WI này chuẩn hóa kiểm tra ngoại quan tại đầu vào / nhận hàng, IPQC, Final và khi đánh giá NCR/khiếu nại. NNgười kiểm phải dùng tiêu chí chấp nhận đúng Job, đúng Part/Rev, đúng QPL và đúng khách hàng Requests. Không được phân loại lỗi bằng cảm tính, không đổi mức độ lỗi để “cho qua lô”, và không dùng một tiêu chí chung cho mọi nhóm sản phẩm.</p>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Yếu tố</th><th>Yêu cầu bắt buộc</th><th>hold khi</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Yếu tố</th><th>Yêu cầu bắt buộc</th><th>hold khi</th></tr></thead><tbody>
 <tr><td>Ánh sáng</td><td>Khu vực kiểm phải đủ sáng, không có bóng che mạnh, không để nguồn sáng phản xạ làm mất dấu xước/vết cháy.</td><td>Không đủ sáng, bóng đổ lớn, không xác định rõ trạng thái bề mặt.</td></tr>
 <tr><td>Độ sạch</td><td>Chi tiết phải được thổi sạch/phủi sạch theo quy định trước khi soi; không kiểm trên bề mặt còn dầu bẩn/phoi (chip) rời che lỗi.</td><td>Còn phoi, bụi, dung dịch hoặc keo bám che lỗi.</td></tr>
 <tr><td>Phương tiện quan sát</td><td>Dùng mắt thường, kính lúp, ống nội soi (borescope) hoặc nguồn sáng phụ theo mức Requests từng bề mặt/khoang.</td><td>Thiếu phương tiện cần thiết để kết luận.</td></tr>
@@ -77,7 +77,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>2. Phân loại lỗi và nguyên tắc quyết định</h2>
 <p>Phân loại lỗi phải bám ảnh hưởng thực tới chức năng, an toàn, lắp ráp, sạch, truy vết và Requests khách hàng. Khi một lỗi chạm đồng thời nhiều tiêu chí, phải lấy mức nghiêm trọng cao hơn.</p>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mức lỗi</th><th>Định nghĩa vận hành</th><th>Ví dụ CNC/clean/chân không</th><th>Quyết định mặc định</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mức lỗi</th><th>Định nghĩa vận hành</th><th>Ví dụ CNC/clean/chân không</th><th>Quyết định mặc định</th></tr></thead><tbody>
 <tr><td><span class="badge-red">Quan trọng</span></td><td>Lỗi ảnh hưởng an toàn, chức năng chính, kín khít, truy vết vật liệu, nhầm Part/Rev, nhầm hướng lắp hoặc vi phạm khách hàng quan trọng / nghiêm trọng Requests.</td><td>Nhầm vật liệu/nhầm cert; nứt; thiếu đặc điểm / tính năng chức năng; niêm phong bề mặt hỏng; lẫn dị vật bên trong khoang chân không; sai nhãn làm lẫn part.</td><td>TẠM GIỮ ngay, cô lập lô, mở phản ứng theo <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</td></tr>
 <tr><td><span class="badge-amber">Lớn / Nghiêm trọng</span></td><td>Lỗi không được phép vì ảnh hưởng lắp ráp, hiệu năng, độ bền, độ sạch, lớp phủ, ngoại quan khách hàng hoặc gây làm lại đáng kể.</td><td>bavia còn sắc tại mép lắp; ren hỏng; xước sâu trên mặt lộ; vết tool đánh dấu vượt chuẩn; lớp phủ bong; vết bẩn / ố/ôxit ở bề mặt phải bảo vệ.</td><td>TẠM GIỮ lô hoặc khu vực ảnh hưởng; đánh giá làm lại/sort; không phát hành khi chưa có xác nhận QA.</td></tr>
 <tr><td><span class="badge-blue">Nhỏ / Không nghiêm trọng</span></td><td>Lỗi nhỏ không ảnh hưởng chức năng nhưng vượt chuẩn thẩm mỹ hoặc chuẩn hoàn thiện nội bộ.</td><td>Vết xước nhẹ ngoài vùng khách nhìn thấy; đánh dấu nhẹ ở bề mặt không chức năng; sai sót bao gói nhỏ nhưng chưa gây hại sản phẩm.</td><td>Quyết định theo QPL/khách hàng rule; vẫn phải ghi nhận nếu vượt ngưỡng lặp.</td></tr>
@@ -95,7 +95,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div></div>
 
 <div class="section"><h2>4. Thư viện lỗi thường gặp theo nhóm công đoạn</h2>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm lỗi</th><th>Dấu hiệu nhận biết</th><th>Điểm cần làm rõ</th><th>Tài liệu liên kết</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm lỗi</th><th>Dấu hiệu nhận biết</th><th>Điểm cần làm rõ</th><th>Tài liệu liên kết</th></tr></thead><tbody>
 <tr><td>bavia / cạnh / mép ngắt / nghỉ</td><td>Cạnh sắc, ba via, bavia kéo sợi, vát mép thiếu hoặc quá tay.</td><td>Có ở vùng niêm phong/fit/ren không? Có nguy cơ FOD hoặc cắt tay khách không?</td><td><a href="../../01-SOPs/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html">SOP-505</a>, <a href="../05-WI-500/wi-516-machine-operation-quick-card.html">WI-516</a></td></tr>
 <tr><td>trầy xước / lõm / móp / vết lõm</td><td>Vết cào, móp, dập, va chạm khi xếp khay hoặc kẹp.</td><td>Nằm ở bề mặt chức năng hay ngoại quan / bề ngoài? Có phá lớp phủ không?</td><td><a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a></td></tr>
 <tr><td>rung (chatter) / tool đánh dấu / không khớp hoàn thành</td><td>Sóng bề mặt, vân dao bất thường, bề mặt không đồng nhất.</td><td>Ảnh hưởng Ra/Rz, niêm phong / bịt kín, chân không, lớp phủ / mạ độ bám dính hay không?</td><td><a href="../../03-Reference/06-ANNEX-600/annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a></td></tr>
@@ -115,7 +115,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="kpi-box"><strong>KPI-WI601-03</strong><br/>Tỷ lệ lô phải tái kiểm do bằng chứng ảnh/mô tả không đủ.</div>
 <div class="kpi-box"><strong>KPI-WI601-04</strong><br/>Top 5 khuyết tật type theo part nhóm sản phẩm / quy trình nhóm sản phẩm.</div>
 </div>
-<div class="table-card"><table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/06-SOP-600/sop-603-aql-sampling-inspection.html">SOP-603</a></td><td>Khung AQL cho lot kiểm tra.</td></tr>
 <tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>Cổng kiểm soát kiểm cuối và phát hành giao hàng.</td></tr>
 <tr><td><a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td><td>Ngăn chặn, NCR và phản ứng khi lỗi phát hiện.</td></tr>
