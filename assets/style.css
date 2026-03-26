@@ -138,19 +138,24 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 .step-tag { display: inline-flex; padding: 4px 12px; border-radius: var(--r-sm); font-size: 11px; font-weight: 800; color: #fff; background: #37474f; border: none; text-transform: uppercase; letter-spacing: .5px; }
 /* TYPE 3: System Gate — teal pill (G0, G1...) */
 .gate-tag { display: inline-flex; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #fff; background: #00838f; text-transform: uppercase; letter-spacing: .3px; }
+/* TYPE 5: Procedure step balloon — green circle before h3 headings in section 7 */
+.proc-num { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg, #059669, #10b981); color: #fff; font-size: 13px; font-weight: 800; margin-right: 8px; vertical-align: middle; flex-shrink: 0; }
 /* TYPE 4: Procedure Step — amber rounded (Bước 1, Bước 2...) */
 .proc-tag { display: inline-flex; padding: 4px 12px; border-radius: var(--r-sm); font-size: 11px; font-weight: 800; color: #7b4f00; background: #fff3cd; border: 1px solid #ffc107; text-transform: uppercase; letter-spacing: .3px; }
 
-/* ══════ FLOWCHART — process flow visualization ══════ */
-.flowchart { display: flex; flex-wrap: wrap; gap: 0; align-items: stretch; margin: 20px 0; padding: 16px; background: #f8fafe; border: 1px solid rgba(21,101,192,0.15); border-radius: var(--r); }
-.flow-step { flex: 1 1 140px; min-width: 120px; max-width: 200px; padding: 12px 14px; background: #fff; border: 1px solid #1565c0; border-radius: var(--r); text-align: center; position: relative; }
-.flow-step .flow-num { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 50%; background: #1565c0; color: #fff; font-size: 13px; font-weight: 800; margin-bottom: 6px; }
-.flow-step .flow-title { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
-.flow-step .flow-desc { font-size: 10px; color: #666; line-height: 1.4; }
-.flow-step.active { border-color: #f59e0b; background: #fffbeb; }
-.flow-step.critical { border-color: #ef4444; background: #fef2f2; }
-.flow-arrow { display: flex; align-items: center; justify-content: center; flex: 0 0 30px; color: #1565c0; font-size: 20px; font-weight: 700; }
-.flow-fork { display: flex; flex-direction: column; gap: 6px; flex: 1 1 140px; }
+/* ══════ FLOWCHART — process flow visualization v3 ══════ */
+.flowchart { display: flex; flex-wrap: wrap; gap: 10px 6px; align-items: stretch; margin: 20px 0; padding: 16px; background: linear-gradient(135deg, #f0f7ff 0%, #e8f0fe 100%); border: 1px solid rgba(21,101,192,0.18); border-radius: var(--r); }
+.flow-step { flex: 1 1 120px; min-width: 100px; max-width: 170px; padding: 10px 12px; background: #fff; border: 1.5px solid rgba(21,101,192,0.3); border-radius: 10px; text-align: center; position: relative; box-shadow: 0 1px 3px rgba(21,101,192,0.06); }
+.flow-step .flow-num { display: inline-flex; width: 26px; height: 26px; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg, #1565c0, #1976d2); color: #fff; font-size: 12px; font-weight: 800; margin-bottom: 5px; }
+.flow-step .flow-title { font-size: 11px; font-weight: 700; color: var(--navy); line-height: 1.35; }
+.flow-step .flow-desc { font-size: 9.5px; color: #555; line-height: 1.35; margin-top: 2px; }
+.flow-step .flow-text { text-align: left; }
+.flow-step.active { border-color: #f59e0b; background: linear-gradient(135deg, #fffbeb, #fef3c7); }
+.flow-step.active .flow-num { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.flow-step.critical { border-color: #ef4444; background: linear-gradient(135deg, #fef2f2, #fee2e2); }
+.flow-step.critical .flow-num { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.flow-arrow { display: flex; align-items: center; justify-content: center; flex: 0 0 22px; color: #93b3d6; font-size: 16px; font-weight: 700; }
+.flow-fork { display: flex; flex-direction: column; gap: 6px; flex: 1 1 120px; }
 .flow-fork .flow-step { flex: none; }
 @media (max-width: 768px) {
   .flowchart { flex-direction: column; align-items: center; }

@@ -183,7 +183,7 @@ td,th{}
   <div class="flow-arrow">→</div>
   <div class="flow-step"><div class="flow-num">7</div><div class="flow-title">Learn-back</div><div class="flow-desc">Rút bài học, cập nhật hệ thống</div></div>
 </div>
-<h3>7.1 Tiếp nhận khiếu nại và gửi xác nhận / biên nhận</h3>
+<h3><span class="proc-num">1</span> Tiếp nhận khiếu nại và gửi xác nhận / biên nhận</h3>
 <p>Ngay khi nhận email, cuộc gọi, portal tin nhắn / thông điệp hoặc thông tin từ Người giao hàng/field dịch vụ/khách hàng nhân viên mua hàng, CS phải mở tình huống trong <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a>. Tình huống phải ghi khách hàng, liên hệ, part/job/PO/rev, loại sự kiện, mô tả ngắn, bằng chứng ban đầu, mức độ khẩn và Responsible Person chịu trách nhiệm xử lý.</p>
 <ul class="tight">
 <li>ACK trong 24 giờ phải xác nhận Received, nói rõ HESEM đang làm gì và mốc cập nhật tiếp theo.</li>
@@ -191,7 +191,7 @@ td,th{}
 <li>Nếu thông tin ban đầu thiếu, vẫn phải ACK và Requests bổ sung đúng dữ liệu cần thiết.</li>
 <li>Customer gửi nhầm kênh hoặc gửi cho cá nhân vẫn phải được chuyển vào tình huống chính thức, không xử lý ngoài luồng.</li>
 </ul>
-<h3>7.2 Ngăn chặn và phả hệ truy xuất quét / dọn dẹp</h3>
+<h3><span class="proc-num">2</span> Ngăn chặn và phả hệ truy xuất quét / dọn dẹp</h3>
 <p>Ngay sau tiếp nhận, QA cùng Planner, Sản xuất và WHS phải đánh giá có cần hold hay stop-ship hay không. Khi nghi có field thoát / bỏ qua, scope ngăn chặn không dừng ở lô bị khách hàng phát hiện mà phải rà đủ hàng đã ship, hàng tồn, WIP, hàng đang outsource, và các lô sinh ra từ cùng điều kiện máy/ca/vật tư/Người xử lý/phiên bản hoặc phương pháp đo liên quan.</p>
 <ul class="tight">
 <li>Hàng nghi ngờ phải được nhận diện, cách ly và khóa trạng thái rõ ràng.</li>
@@ -207,7 +207,7 @@ td,th{}
 <tr><td>Time cửa sổ / khung thời gian</td><td>Khoảng thời gian mà điều kiện có thể tạo lỗi tồn tại; phải dùng để mở rộng hoặc thu hẹp phạm vi nghi ngờ tập hợp / dân số.</td></tr>
 </tbody></table></div>
 <div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không được phát hành kết luận “đã cách ly tình huống” khi chưa làm phả hệ truy xuất quét / dọn dẹp hoặc chưa chứng minh tập hợp / dân số còn lại an toàn.</div>
-<h3>7.3 Mở NCR/CAPA, điều tra và xác định đường xử lý kỹ thuật</h3>
+<h3><span class="proc-num">3</span> Mở NCR/CAPA, điều tra và xác định đường xử lý kỹ thuật</h3>
 <p>Khi khiếu nại có bản chất chất lượng, QA phải nối ngay sang <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> và dùng <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a> / <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a> nếu cần. Điều tra phải tách rõ: khuyết tật chế độ, thoát / bỏ qua điểm, phát hiện điểm, bị ảnh hưởng tập hợp / dân số, cần for khách hàng hành động và cần for quy trình thay đổi.</p>
 <ul class="tight">
 <li>Không nhầm khiếu nại hậu cần/doc/label với khiếu nại chất lượng thành phẩm, nhưng vẫn phải đánh giá nguy cơ system hỏng / lỗi.</li>
@@ -215,7 +215,7 @@ td,th{}
 <li>Nếu không thể lấy hàng trả về, phải Requests hình ảnh, mẫu data, đo lường sheet hoặc khách hàng sort kết quả đủ dùng cho quyết định.</li>
 <li>Nếu nguyên nhân gốc chưa chắc, phản hồi khách hàng phải dùng ngôn ngữ trạng thái, không khẳng định sớm.</li>
 </ul>
-<h3>7.4 RMA, bảo hành, trả lại, thay thế và khiếu nại / Requests bồi thường chi phí</h3>
+<h3><span class="proc-num">4</span> RMA, bảo hành, trả lại, thay thế và khiếu nại / Requests bồi thường chi phí</h3>
 <p>Mọi Requests trả hàng hoặc khiếu nại / Requests bồi thường sau giao hàng phải đi qua <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a>. Responsible Person Tình huống phải xác định: có cần RMA số không, hàng có quay về HESEM hay xử tại khách hàng, có cần thay thế/làm lại/tín dụng / ghi có/ghi nợ hay không, chi phí nào phải thu thập và ai phê duyệt.</p>
 <ul class="tight">
 <li>Không nhận hàng trả về “không số RMA / không tình huống ID”.</li>
@@ -229,7 +229,7 @@ td,th{}
 <tr><td>Sort tại khách hàng / tại kho</td><td>Khi cần ngăn chặn nhanh trước khi có thay thế</td><td>QA Manager / Sản xuất Giám đốc</td><td>Sort tiêu chí, Responsible Person chi phí, acceptance of kết quả, bị ảnh hưởng tập hợp / dân số</td></tr>
 <tr><td>tín dụng / ghi có / ghi nợ / khiếu nại / Requests bồi thường chi phí</td><td>bảo hành, cước vận chuyển, sort chi phí, trả lại chi phí, phạt hoặc chi phí khác</td><td>Responsible Person Thương mại + Finance + GM theo giá trị</td><td>khiếu nại / Requests bồi thường cơ sở, bằng chứng, phê duyệt, kế toán xử lý</td></tr>
 </tbody></table></div>
-<h3>7.5 Customer cập nhật nhịp độ / chu kỳ họp và kết thúc / đóng</h3>
+<h3><span class="proc-num">5</span> Customer cập nhật nhịp độ / chu kỳ họp và kết thúc / đóng</h3>
 <p>Mỗi tình huống phải có nhịp độ / chu kỳ họp phản hồi: ACK, ngăn chặn cập nhật, kỹ thuật cập nhật, final disposition/kết thúc / đóng. Nếu điều tra dài hơn kế hoạch, tình huống Responsible Person vẫn phải cập nhật khách hàng theo mốc đã hứa. Đóng tình huống chỉ khi: tập hợp / dân số đã rõ, ngăn chặn đã kết thúc, kỹ thuật quyết định đã chốt, cập nhật cuối đã gửi, và bài học đã được kéo về hệ thống nếu cần.</p>
 <ul class="tight">
 <li>Tình huống không được “treo im lặng” sau ACK.</li>
@@ -237,10 +237,10 @@ td,th{}
 <li>Kết thúc note phải nói rõ: phạm vi, nguyên nhân, hành động, tình trạng thay thế/RMA/tín dụng / ghi có và trạng thái học tập.</li>
 <li>Nếu khách hàng chưa phản hồi nhưng HESEM đã hoàn tất, tình huống chỉ chuyển sang pending-khách hàng, không được tự đóng nếu hợp đồng đòi xác nhận hai bên.</li>
 </ul>
-<h3>7.6 Kéo bài học vào hệ thống</h3>
+<h3><span class="proc-num">6</span> Kéo bài học vào hệ thống</h3>
 <p>SOP-202 không kết thúc ở email cuối cho khách hàng. Khi khiếu nại lộ ra lỗ hổng phát hành, truy xuất nguồn gốc, setup, kiểm tra, đóng gói, nhà cung cấp control, truyền đạt / giao tiếp hoặc đào tạo, tình huống Responsible Person và QMS Engineer phải mở hành động cập nhật SOP/WI/ANNEX/KPI/FORM liên quan. Khiếu nại mà không kéo được bài học về hệ thống sẽ tái diễn dưới dạng khác.</p>
 
-<h3>7.7 Ma trận mức độ và ngưỡng escalation của khiếu nại / thoát / bỏ qua</h3>
+<h3><span class="proc-num">7</span> Ma trận mức độ và ngưỡng escalation của khiếu nại / thoát / bỏ qua</h3>
 <p>Không được coi mọi khiếu nại là như nhau. Tình huống phải được phân cấp ít nhất theo 4 mức: C1 thông tin/phản hồi nhẹ; C2 khiếu nại thương mại hoặc chứng từ không chạm chất lượng thành phẩm; C3 khiếu nại chất lượng có ngăn chặn nội bộ và chưa xác nhận lan rộng; C4 field thoát / bỏ qua nghiêm trọng, dòng / chuyền stop, sản phẩm an toàn, clean/chân không vi phạm, nghi ngờ hàng giả / hàng nhái, phiên bản/cấu hình không khớp hoặc khách hàng trọng yếu. Mức tình huống quyết định thời gian ACK, Approver phản hồi, phạm vi phả hệ truy xuất quét / dọn dẹp và việc có cần thông báo lãnh đạo ngay hay không.</p>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:34%"/><col style="width:20%"/><col style="width:32%"/></colgroup><thead><tr><th>Mức</th><th>Đặc trưng</th><th>ACK / cập nhật</th><th>Escalation bắt buộc</th></tr></thead><tbody>
 <tr><td>C1</td><td>Phản hồi, nhận xét, Requests giải thích không có khuyết tật bằng chứng</td><td>1 Ngày làm việc</td><td>Responsible Person Tình huống + CS</td></tr>
@@ -248,16 +248,16 @@ td,th{}
 <tr><td>C3</td><td>Khiếu nại chất lượng, RMA tiềm năng, lỗi tái diễn, cần ngăn chặn nội bộ</td><td>Trong Ngày làm việc; cập nhật plan trong 24 giờ</td><td>CS + QA Manager + Quy trình Owner</td></tr>
 <tr><td>C4</td><td>Field thoát / bỏ qua nghiêm trọng, dòng / chuyền stop, sản phẩm an toàn, nghi ngờ hàng giả / hàng nhái, clean/chân không vi phạm, ASD luồng-xuống / Từng</td><td>ACK ngay; cập nhật ngăn chặn cùng ngày</td><td>QA Manager + Tổng Giám đốc / Người được ủy quyền + <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td></tr>
 </tbody></table></div>
-<h3>7.8 tạm thời phản hồi gói hàng và nội dung phản hồi khách hàng</h3>
+<h3><span class="proc-num">8</span> tạm thời phản hồi gói hàng và nội dung phản hồi khách hàng</h3>
 <p>Phản hồi khách hàng phải có cấu trúc chuẩn. tạm thời phản hồi tối thiểu phải nêu: khiếu nại ID, phạm vi thông tin hiện có, ngăn chặn đã thực Current HESEM, phạm vi nghi ngờ tập hợp / dân số đang được rà, Requests dữ liệu cần bổ sung từ khách hàng nếu có, mốc cập nhật tiếp theo và Responsible Person. Không được gửi phản hồi kiểu chung chung như “đang kiểm tra” mà không có hành động cụ thể. Khi nguyên nhân gốc chưa xác nhận, phải nói rõ đây là nhận định tạm thời và chưa phải kết luận cuối.</p>
 <ul class="tight"><li>Nếu khách hàng Requests 8D hoặc template riêng, vẫn phải duy trì tình huống nền tảng cốt lõi nội bộ trên <a download="" href="../../../04-Bieu-Mau/02-FRM-200/<a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a>_Complaint_Log.xlsx"><a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a></a>/<a download="" href="../../../04-Bieu-Mau/06-FRM-600/<a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>_NCR_Report.xlsx"><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a></a>/<a download="" href="../../../04-Bieu-Mau/06-FRM-600/<a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a>_CAPA_8D_Report.xlsx"><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a></a> và gắn sơ đồ ánh xạ giữa tình huống ID nội bộ với mã khách hàng.</li><li>Phản hồi do Kinh doanh/CS gửi nhưng nội dung kỹ thuật phải được QA/Quy trình Owner rà soát trước khi phát hành.</li><li>Đối với khiếu nại ASD hoặc job có đặc biệt Requests, phản hồi phải chỉ rõ rủi ro đối với các lô giao hàng khác và tình trạng stop-ship / stop-use / thu hồi nếu có.</li></ul>
-<h3>7.9 Xác định nghi ngờ tập hợp / dân số, đã trả lại nguyên vật liệu chuỗi và no-truy vết rule</h3>
+<h3><span class="proc-num">9</span> Xác định nghi ngờ tập hợp / dân số, đã trả lại nguyên vật liệu chuỗi và no-truy vết rule</h3>
 <p>tập hợp / dân số ảnh hưởng không được chốt theo trực giác. Phải dùng bằng chứng để mở rộng hoặc thu hẹp: machine/time cửa sổ / khung thời gian, Operator/shift, nguyên vật liệu lot, Người xử lý lot, setup nhóm sản phẩm, gage/CMM đã sử dụng, phiên bản mốc chuẩn, clean-pack batch, bộ hồ sơ giao hàng (ship gói hồ sơ)/SSCC. Với hàng trả về, chuỗi of nhận dạng phải giữ từ lúc khách thông báo đến lúc HESEM nhận: tình huống ID, khách hàng name, part/rev, lot/số sê-ri nếu có, số lượng, tình trạng niêm phong/bao gói, Người nhận, ảnh hiện trạng và vị trí cách ly. Hàng đã trả lại không rõ nhận dạng, không rõ lot hoặc bị mở trộn không kiểm soát phải được xem là no-truy vết nghi ngờ và không được tự trả lại tồn kho/WIP.</p>
-<h3>7.10 Quy tắc thay thế, tín dụng / ghi có / ghi nợ và chi phí liên quan khiếu nại</h3>
+<h3><span class="proc-num">10</span> Quy tắc thay thế, tín dụng / ghi có / ghi nợ và chi phí liên quan khiếu nại</h3>
 <p>thay thế, làm lại, khách hàng sort hoàn trả, cước vận chuyển khiếu nại / Requests bồi thường, field sort chi phí, tín dụng / ghi có note hoặc hoàn phí / bồi hoàn đều là quyết định thương mại gắn với rủi ro và bằng chứng, không chỉ là hành động chiều khách. Mọi quyết định tài chính phải có: phạm vi xác nhận, who trả tiền gì / cái gì, dòng thời gian, thẩm quyền theo giá trị và rule hạch toán. Không được cam kết tín dụng / ghi có hoặc miễn phí / tự do thay thế khi chưa chốt trách nhiệm hoặc chưa nhìn thấy đầy đủ chi phí tác động. Nếu khiếu nại có phần lỗi khách hàng / xử lý / vận chuyển ngoài HESEM / không đủ bằng chứng, tình huống phải tách rõ phần nào HESEM chấp nhận và phần nào chưa chấp nhận.</p>
-<h3>7.11 Kéo khiếu nại vào sổ đăng ký rủi ro (sổ đăng ký), kế hoạch kiểm soát, WI/SOP và đào tạo</h3>
+<h3><span class="proc-num">11</span> Kéo khiếu nại vào sổ đăng ký rủi ro (sổ đăng ký), kế hoạch kiểm soát, WI/SOP và đào tạo</h3>
 <p>Một khiếu nại chỉ được coi là đóng tốt khi nó thay đổi được control nơi tạo lỗi hoặc nơi để lỗi lọt qua. Responsible Person Tình huống và QMS Engineer phải rà xem khiếu nại này chạm điều gì: rà soát hợp đồng yếu, lập kế hoạch phát hành yếu, mẫu đầu/FAI yếu, kế hoạch kiểm soát/lấy mẫu chưa đủ, bộ hồ sơ phê duyệt giao hàng thiếu, đóng gói/bảo quản chưa kín, nhà cung cấp Người xử lý trôi / sai lệch, data quản trị lỏng, con Người yếu tố hoặc đào tạo chưa đủ. Nếu có, phải mở hành động cập nhật tương ứng tại SOP/WI/ANNEX/FORM/JD thay vì chỉ đóng CAPA trên giấy.</p>
-<h3>7.12 Trường hợp đặc biệt cho khách hàng ASD / SEMI / chân không-clean</h3>
+<h3><span class="proc-num">12</span> Trường hợp đặc biệt cho khách hàng ASD / SEMI / chân không-clean</h3>
 <p>Đối với khách hàng hàng không vũ trụ/không gian/phòng thủ / bảo vệ hoặc job có Requests chân không/clean/cao-độ tin cậy, khiếu nại phải xét thêm 6 chiều: sản phẩm an toàn, truy xuất nguồn gốc tính đầy đủ, cấu hình/phiên bản tính toàn vẹn, nghi ngờ hàng giả / hàng nhái/nguyên vật liệu tính xác thực, vệ sinh / sạch sẽ/đóng gói tính toàn vẹn và Người xử lý/đặc biệt Requests sự phù hợp. Chỉ cần một chiều chưa xác nhận an toàn, tình huống phải giữ mức C4 cho tới khi có bằng chứng đóng. Đây là Requests mức sẵn sàng của HESEM cho AS9100D luồng-xuống / Từng, nhưng được thi hành bằng ngôn ngữ vận hành chung cho mọi job rủi ro cao.</p>
 <h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:42%"/><col style="width:14%"/><col style="width:12%"/><col style="width:14%"/></colgroup><thead><tr><th>Tình huống</th><th>Cách xử lý bắt buộc</th><th>Đầu mối</th><th>Escalation</th><th>Hồ sơ</th></tr></thead><tbody>
