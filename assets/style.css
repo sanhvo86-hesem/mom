@@ -131,6 +131,8 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 .req-tag.should { background: #fff9db; color: #e67700; border: 1px solid #ffe066; }
 .req-tag.may    { background: #ebfbee; color: var(--green); border: 1px solid #b2f2bb; }
 .iso-ref { display: inline-flex; padding: 1px 7px; border-radius: var(--r-sm); font-size: 10px; font-weight: 600; color: var(--blue); background: var(--blue-l); }
+/* Step badges — internal process steps (S1, S2...) */
+.step-tag { display: inline-flex; padding: 3px 10px; border-radius: var(--r-sm); font-size: 10px; font-weight: 800; color: var(--navy); background: #e8edf3; border: 1px solid #c5cdd8; text-transform: uppercase; letter-spacing: .3px; }
 .preface-block { background: var(--bg2); border: 1px solid var(--ln); border-radius: var(--r); padding: 20px 24px; margin: 20px 0; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 

@@ -68,11 +68,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
  <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng để tra matrix cổng kiểm soát và MRR cho mọi lệnh sản xuất CNC từ RFQ đến giao hàng. Planner, Kỹ thuật, QA, Sản xuất, Kho và Người đánh giá phải dùng cùng một matrix này khi kiểm cổng kiểm soát và khi bàn giao hồ sơ.</div>
  <h1>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G7</h1>
  
-<div class="section"><div class="note-blue" style="margin:12px 0">
- <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (G0→G7) — Gate MRR & Sync Pack</b>.
- <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
-</div>
-<h2>1. Mục đích, cách dùng và ranh giới</h2>
+<div class="section"><h2>1. Mục đích, cách dùng và ranh giới</h2>
 <p>ANNEX này là bộ matrix dùng chung để đồng bộ <strong>cổng kiểm soát, MRR, bàn giao field, vai trò quyền sở hữu và điều kiện đồng bộ dữ liệu</strong> từ G0 đến G7. ANNEX này <strong>không thay</strong> WI vận hành tại Point-of-use. Người sử dụng tra ANNEX này để biết mỗi cổng kiểm soát cần bộ hồ sơ nào, ai được quyền mở/giữ/nhả cổng kiểm soát, phải bàn giao trường dữ liệu nào và khi nào phải dừng vì lệch phiên bản hoặc lệch nguồn dữ liệu.</p>
 <div class="callout-warning"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ đóng cổng kiểm soát khi đủ mục nhập tiêu chí, đủ MRR tối thiểu và trạng thái giữa SoR, SSOT, traveler và mã vạch đã đồng nhất.</div>
 <div class="two-col">

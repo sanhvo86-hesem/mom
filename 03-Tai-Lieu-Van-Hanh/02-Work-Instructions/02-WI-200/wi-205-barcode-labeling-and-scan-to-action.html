@@ -83,11 +83,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div>
 <p>Thiếu bất kỳ trường khóa nào: <span class="badge-red">TẠM GIỮ</span> và in lại đúng nguồn dữ liệu. Không chấp nhận nhãn “Cần đúng”.</p></div>
 
-<div class="section"><div class="note-blue" style="margin:12px 0">
- <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G2 (IQC), G5 (IPQC), G7 (Ship)</b>. Mã vạch, nhãn và quét scan-to-action.
- <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
-</div>
-<h2>3. Quy trình in nhãn, quét và cập nhật trạng thái</h2>
+<div class="section"><h2>3. Quy trình in nhãn, quét và cập nhật trạng thái</h2>
 <div class="step-list">
 <div class="step-item"><strong>Tạo nhãn từ nguồn đúng.</strong><br/>hhãn chỉ được tạo từ giao dịch hợp lệ trong Epicor hoặc từ dịch vụ in nhãn được IT/QMS phê duyệt. hNgười in phải kiểm Partho, Rev, OpSeq, Qty, vị trí trước khi nhấn in. hếu dữ liệu trên màn hình không đúng thì sửa giao dịch trước, không sửa trên nhãn.</div>
 <div class="step-item"><strong>Xác nhận nhãn vừa in.</strong><br/>Quét thử một lần ngay tại điểm in để kiểm mã vạch/QR đọc được, nội dung hiển thị đúng và ánh xạ đúng hồ sơ. hhãn lỗi in, mờ, thiếu dữ liệu phải hủy ngay và ghi vào in lại log nếu in lại.</div>

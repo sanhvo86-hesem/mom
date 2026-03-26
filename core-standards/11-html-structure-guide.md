@@ -253,12 +253,14 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 </div>
 ```
 
-### 3.4 Gate Cards — Các bước quy trình
+### 3.4 Gate Cards — Các bước quy trình nội bộ
+
+**Quy ước đặt tên bước:** Dùng **S** (Step), KHÔNG dùng **G** (Gate) để tránh nhầm với 8 system gates (G0→G7).
 
 ```html
 <div class="gate-grid">
   <div class="gate-card">
-    <h3>{{CODE}}-G1 — Tên bước</h3>
+    <h3>{{CODE}}-S1 — Tên bước</h3>
     <p>Mô tả hoạt động.</p>
     <p><b>Lead:</b> Vai trò<br>
     <b>Điểm dừng:</b> Điều kiện hold<br>
@@ -266,6 +268,19 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
   </div>
 </div>
 ```
+
+**Phân biệt:**
+| Ký hiệu | Nghĩa | Ví dụ |
+|----------|--------|-------|
+| **G0→G7** | System Gates (8 cổng kiểm soát hệ thống) | G0 Contract, G4 FAI |
+| **S1→S5** | Internal Steps (bước nội bộ trong 1 SOP/WI) | 302-S1, 504-S3 |
+
+### 3.5 Step Badge — Nhãn bước nội bộ
+
+```html
+<span class="step-tag">S1</span>
+```
+Hiển thị badge xám với mã bước nội bộ — giống style ISO badge nhưng màu trung tính.
 
 ---
 

@@ -103,10 +103,6 @@
 
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#o1">1. Mục đích, phạm vi và điều kiện kích hoạt</a><a href="#o2">2. Phân loại sự cố và thẩm quyền kích hoạt</a><a href="#o3">3. Quyết định nhanh theo cổng kiểm soát G0–G7</a><a href="#o4">4. Thành phần offline fallback kit</a><a href="#o5">5. Vai trò, command chain và deputy activation</a><a href="#o6">6. Quy tắc vận hành khi offline</a><a href="#o7">7. Ghi nhật ký, truyền thông và customer communication</a><a href="#o8">8. Phục hồi hệ thống và backfill sequence</a><a href="#o9">9. Diễn tập, đánh giá và KPI hiệu lực</a><a href="#o10">10. Tài liệu liên kết</a></div></div>
 
-<div class="note-blue" style="margin:12px 0">
- <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> ANNEX này vận hành <b>xuyên suốt (Khẩn cấp) — Offline Fallback Kit</b>.
- <br>→ Xem <a href="../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> cross-reference.
-</div>
 <h2 class="h2" id="o1">1. Mục đích, phạm vi và điều kiện kích hoạt</h2>
 <ul class="tight"><li>Kích hoạt khi hệ thống số làm mất khả năng xác định đúng version tài liệu, trạng thái job, dữ liệu giao dịch, traceability, quyền release hoặc bằng chứng bắt buộc.</li><li>Áp dụng cho các tình huống: Epicor down, M365/SharePoint down, network nội bộ gián đoạn, máy trạm/thiết bị barcode hỏng diện rộng, hoặc kết nối chập chờn làm dữ liệu không đáng tin cậy.</li><li>Khi gián đoạn chỉ ảnh hưởng một phần nhỏ và có workaround được IT xác nhận, vẫn phải mở <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-181_Business_Disruption_Event_Log.xlsx">FRM-181 — Business Disruption Event Log</a> nếu công việc chạm vào cổng kiểm soát chất lượng, phê duyệt giao hàng (ship release), invoice release hoặc quyền truy cập khẩn cấp.</li><li>Không được dùng annex này để hợp thức hóa việc bỏ qua cổng kiểm soát, bỏ qua tài liệu phát hành, hoặc tạo “đường vòng” không kiểm soát cho ERP.</li></ul>
 

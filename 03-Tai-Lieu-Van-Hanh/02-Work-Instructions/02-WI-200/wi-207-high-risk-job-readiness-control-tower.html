@@ -55,11 +55,7 @@ ul.tight li {margin:4px 0;}
 </div>
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Kích hoạt cho Lệnh sản xuất mới, Lệnh sản xuất QPL cao, Lệnh sản xuất clean/chân không, Lệnh sản xuất nhiều công đoạn, Lệnh sản xuất ship Cấp, Lệnh sản xuất có hold đang mở kéo dài hoặc Lệnh sản xuất có RỦI RO GIAO HÀNG cần điều hành liên phòng ban.</div>
 <h1>WI-207 — cao-Rủi ro Job sẵn sàng Control tháp / cột</h1>
-<div class="section"><div class="note-blue" style="margin:12px 0">
- <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G0 (Contract) → G3 (Setup)</b>. Kiểm soát sẵn sàng cho job rủi ro cao.
- <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
-</div>
-<h2>1. Mục đích, kích hoạt và nguyên tắc kích hoạt</h2>
+<div class="section"><h2>1. Mục đích, kích hoạt và nguyên tắc kích hoạt</h2>
 <p>WI này bắt buộc dùng để kiểm tra mức sẵn sàng của những Lệnh sản xuất có RỦI RO GIAO HÀNG hoặc rủi ro chất lượng cao trước khi thả vào nhịp chạy bình thường. Trung tâm điều hành không thay cho họp hằng ngày; trung tâm điều hành là cơ chế <strong>khóa điều kiện vào cuộc</strong> cho Lệnh sản xuất đặc biệt để tránh “đã phát lệnh rồi mới đi nhặt thiếu sót”.</p>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Kích hoạt</th><th>Kích hoạt khi</th><th>Chủ trì</th><th>Kết quả bắt buộc</th></tr></thead><tbody>
 <tr><td>Lệnh sản xuất mới / part mới</td><td>Lần đầu gia công tại HESEM, phiên bản mới, dung sai chặt, quy trình chuỗi chưa có lịch sử ổn định.</td><td>Kỹ thuật + Kế hoạch</td><td>Ready / Đã chặn / Ready với kiểm soát.</td></tr>

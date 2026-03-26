@@ -58,11 +58,7 @@ ul.tight li {margin:4px 0;}
 </div>
 </div>
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi khu vực lưu kho, khu vực chuẩn bị / sắp xếp, WIP, khu clean hold và thành phẩm chờ giao để duy trì đúng điều kiện, vị trí và thứ tự cấp phát.</div>
-<h1>WI-702 — Bảo quản, môi trường kho/phân xưởng, vị trí, FIFO/FEFO và kiểm soát chạm hỏng</h1><div class="section"><div class="note-blue" style="margin:12px 0">
- <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G2 (IQC) và G7 (Ship)</b>. Kiểm soát lưu kho, FIFO và môi trường.
- <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
-</div>
-<h2>1. Mục đích, phạm vi và quyền dừng</h2>
+<h1>WI-702 — Bảo quản, môi trường kho/phân xưởng, vị trí, FIFO/FEFO và kiểm soát chạm hỏng</h1><div class="section"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
 <p>WI này khóa cách lưu kho, khu vực chuẩn bị / sắp xếp, giữ môi trường, bố trí vị trí, cấp phát FIFO/FEFO, hoàn trả hàng và phản ứng khi phát hiện bất thường đối với raw nguyên vật liệu, bán thành phẩm, thành phẩm, hàng clean-pack và vật tư đóng gói có kiểm soát. Mục tiêu là giữ đúng <strong>truy vết</strong>, đúng <strong>tình trạng bảo quản</strong>, đúng <strong>vị trí</strong> và đúng <strong>thứ tự cấp phát</strong> từ lúc hàng được nhập vị trí cho đến khi vấn đề cho công đoạn hoặc giao cho khách.</p>
 <p><strong>QUYỀN DỪNG:</strong> Kho, IQC, QA, Kế hoạch, Sản xuất Supervisor và Người có thẩm quyền phát hành được quyền dừng cấp phát hoặc dừng chuyển vị trí khi phát hiện sai nhãn trạng thái, thiếu lot/mẻ nấu (heat), lệch môi trường, lô clean-pack mất niêm phong, dấu hiệu ăn mòn, lẫn phiên bản, lẫn vị trí hoặc tồn già vượt rule.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Lưu hàng cách nền, cách tường, trong giới hạn chịu tải, ghi nhận mọi vị trí tạm, cấp phát theo FIFO hoặc FEFO đã xác nhận và dùng đúng vật liệu ngăn cách cho part đã hoàn thiện bề mặt.</div></div><div class="section"><h2>2. Rule phân vùng, trạng thái và quyền vận hành theo khu vực</h2>

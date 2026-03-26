@@ -66,11 +66,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
  <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho Planner, Nhân viên điều phối, Supervisor và Cell Lead ở mọi ca có job mở/Released/WIP, đặc biệt khi có nút thắt / điểm nghẽn, hot-job, machine xuống / Từng hoặc outsource khớp nối.</div>
  <h1><a href="">WI-501</a> — Điều độ hằng ca, rà soát năng lực và kiểm soát WIP</h1>
 
-<div class="section"><div class="note-blue" style="margin:12px 0">
- <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G3 (Setup) và G5 (IPQC)</b>. Kiểm soát dispatch, capacity và WIP.
- <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
-</div>
-<h2>1. Mục tiêu và quy tắc không thương lượng</h2>
+<div class="section"><h2>1. Mục tiêu và quy tắc không thương lượng</h2>
 <p>WI này dùng để vận hành công tác điều độ hằng ca: lấy dữ liệu từ SoR, xác nhận mức sẵn sàng, phát hành điều phối xuất hàng, kiểm soát WIP, xử lý hot-job, quản lý cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và bàn giao cuối ca. Mục tiêu là làm cho phân xưởng chạy đúng <b>job cần chạy</b>, đúng <b>thời điểm</b>, đúng <b>năng lực</b> và đúng <b>điều kiện phát hành</b>.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span><br/>Chỉ kéo job vào máy khi mức sẵn sàng đã đủ. Giữ điều phối xuất hàng trên bảng và hệ thống điều độ chính thức. Mọi thay đổi thứ tự phải có đánh giá tác động tới nút thắt / điểm nghẽn, mẫu đầu (tiên chi tiết / sản phẩm), outsource, final phát hành và OTD.</div>
 <ul class="tight">

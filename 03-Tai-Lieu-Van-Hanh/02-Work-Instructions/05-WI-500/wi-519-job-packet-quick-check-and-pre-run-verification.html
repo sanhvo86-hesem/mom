@@ -67,11 +67,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng ngay trước Cycle Start, sau setup/chuyển đổi (changeover), sau tool thay đổi ảnh hưởng CTQ, sau bù trừ (offset) edit/WCS reset, sau power tổn thất/cảnh báo, sau chuyển giao công việc hoặc bất kỳ lần nào phải chạy lại máy sau trạng thái không ổn định.</div>
 <h1>WI-519 — Kiểm nhanh bộ hồ sơ công việc, xác minh trước khi chạy, đầu tiên cut và khởi động lại sau bất thường</h1>
-<div class="section"><div class="note-blue" style="margin:12px 0">
- <b>🗺️ Vị trí trong hệ thống 8 cổng (G0→G7):</b> WI này vận hành <b>tại G3 (Setup)</b>. Kiểm tra nhanh job packet trước khi chạy máy.
- <br>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để tra bảng cross-reference.
-</div>
-<h2>1. Quy tắc 60 giây trước Cycle Start</h2>
+<div class="section"><h2>1. Quy tắc 60 giây trước Cycle Start</h2>
 <p>WI này là cổng chặn cuối cùng trước khi nhấn <b>Cycle Start</b>. Trong vòng 60 giây, Operator hoặc Setup Lead phải xác nhận đủ 07 điểm bắt buộc tại máy. Nếu có 01 điểm không PASS hoặc không chứng minh được, máy phải vào <b>TẠM GIỮ</b>.</p>
 <div class="callout-danger"><strong>STOP-THE-dòng / chuyền</strong><br/>Không được chạy máy để “test tạm” khi chưa qua WI-519. Không được bỏ qua bước kiểm vì job lặp, vì đã từng chạy, vì Cần đến giờ giao, hoặc vì Người setup nói “ổn rồi”.</div></div>
 <div class="section"><h2>2. Khi nào bắt buộc dùng WI-519</h2>
