@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -27,10 +27,10 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .org-tree{display:flex;flex-direction:column;gap:16px;margin:8px 0;}
 .org-level{display:grid;gap:14px;}
 .org-level.cols-1{grid-template-columns:1fr;}
-.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr);}
-.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr);}
-.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr);}
-.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr);}
+.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr));}
 .org-card{border:1px solid var(--ln);border-top:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .org-card h3{font-size:14px;color:var(--navy);margin:0 0 4px;}
 .org-card p{margin:4px 0;font-size:12px;}
@@ -39,7 +39,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .badge-soft{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:10px;font-weight:700;margin-right:6px;margin-bottom:6px;}
 .kpi-box{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);margin:8px 0;}
 .kpi-box b{display:block;font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .ranh giới trách nhiệm{border:1px solid #cfe0ff;border-left: 3px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
@@ -77,7 +77,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
  </div>
  <div class="doc-content" id="docContent">
  <div class="form-sheet">
-<div class="iso-map"><div class="iso-title">Chuẩn mực ranh giới trách nhiệm bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi tài liệu JD, handbook, SOP, WI, ANNEX và biểu mẫu PHẢI dùng cùng một logic ranh giới trách nhiệm cho chuỗi RFQ → ship; Mỗi hoạt động phải có đúng một Người phụ trách cuối; không để hai Người phụ trách cuối hoặc không có Người phụ trách. <span class="iso-clause">§8.5.1</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Quyền dừng / hold không phụ thuộc cấp bậc quản lý khi xuất hiện rủi ro an toàn, sai phiên bản (wrong revision), sai vật tư, mất kiểm soát quá trình hoặc mất tin cậy measurement system. <span class="iso-clause">§8.5.1</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Vai trò hỗ trợ số hóa, costing, metrology và IE phải được tích hợp như năng lực chính thức của mô hình lệnh sản xuất CNC, không coi là “việc phát sinh”. <span class="iso-clause">§8.5.1</span></div></div></div>
+<div class="iso-map"><div class="iso-title">Chuẩn mực ranh giới trách nhiệm bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi tài liệu JD, handbook, SOP, WI, ANNEX và biểu mẫu PHẢI dùng cùng một logic ranh giới trách nhiệm cho chuỗi RFQ → ship; Mỗi hoạt động phải có đúng một Người phụ trách cuối; không để hai Người phụ trách cuối hoặc không có Người phụ trách. <span class="iso-clause">§8.5.1</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Quyền dừng / hold không phụ thuộc cấp bậc quản lý khi xuất hiện rủi ro an toàn, sai phiên bản (wrong revision), sai vật tư, mất kiểm soát quá trình hoặc mất tin cậy measurement system. <span class="iso-clause">§8.5.1</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Vai trò hỗ trợ số hóa, costing, metrology và IE phải được tích hợp như năng lực chính thức của mô hình lệnh sản xuất CNC, không coi là "việc phát sinh". <span class="iso-clause">§8.5.1</span></div></div></div>
 <div class="preface-block"><div class="grid-2"><div><p><b>Mục đích sử dụng</b></p><p>Tài liệu này là chuẩn nguồn để đồng bộ JD mới nhất, department handbook, ma trận thẩm quyền, RACI của SOP/WI và hướng dẫn biểu mẫu. Khi có xung đột diễn giải giữa các tài liệu, logic ranh giới trách nhiệm tại đây được dùng để hiệu chỉnh ở vòng cập nhật tiếp theo.</p></div><div><p><b>Đọc cùng</b></p><div><span class="inline-tag">QMS-MAN-001</span><span class="inline-tag">ANNEX-120</span><span class="inline-tag">ANNEX-121</span><span class="inline-tag">ANNEX-123</span><span class="inline-tag">SOP-201</span><span class="inline-tag">SOP-301</span><span class="inline-tag">SOP-501</span><span class="inline-tag">SOP-605</span><span class="inline-tag">ANNEX-119</span></div></div></div></div>
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#r1">1. Bối cảnh mô hình vận hành</a><a href="#r2">2. Nguyên tắc ranh giới trách nhiệm</a><a href="#r2b">2b. Mô hình vận hành 8 cổng (G0 – G7)</a><a href="#r3">3. Theo từng cổng kiểm soát RFQ → Ship</a><a href="#r4">4. Phân vai sâu tại các giao điểm khó</a><a href="#r5">5. Hold / release / escalation</a><a href="#r6">6. Dữ liệu & truy xuất tối thiểu</a><a href="#r7">7. Vai trò hỗ trợ hệ thống</a><a href="#r8">8. Tài liệu liên quan & baseline tham chiếu</a></div></div>
 <h2 class="h2" id="r1">1. Bối cảnh mô hình vận hành</h2><p>HESEM vận hành theo mô hình <b>lệnh sản xuất / chủng loại cao (high-mix)</b>: nhiều mã hàng, revision thay đổi thường xuyên, tuyến công nghệ không hoàn toàn lặp lại, thời gian dẫn (lead time) ngắn, mức độ phụ thuộc vào công đoạn ngoài và yêu cầu truy xuất cao. Trong bối cảnh này, sai hỏng lớn thường không bắt nguồn từ một thao tác đơn lẻ mà từ <b>điểm giao tiếp bị mờ vai</b>: nhận thiếu dữ liệu RFQ, chốt assumption không ai sở hữu, release kỹ thuật chưa đủ điều kiện, dispatch không phản ánh mức sẵn sàng, hoặc release chất lượng khi measurement chain chưa đủ tin cậy.</p><p>Vì vậy, ranh giới trách nhiệm phải được mô tả theo <b>giai đoạn giá trị</b>, <b>điểm dừng</b>, <b>thẩm quyền</b> và <b>bằng chứng bắt buộc</b>, thay vì chỉ mô tả chức danh ở mức chung chung.</p>
@@ -125,7 +125,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <div class="portal-card"><h3>Tài liệu nội bộ cần đọc cùng</h3><ul class="doc-link-list"><li><a href="../../../02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html">QMS-MAN-001</a></li><li><a href="../01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-104-org-chart-fullpage.html">ANNEX-104</a></li><li><a href="../01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></li><li><a href="../01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a></li><li><a href="../01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></li><li><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></li><li><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a></li><li><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a></li><li><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></li><li><a href="../01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></li></ul></div>
 <div class="portal-card"><h3>Mốc chuẩn chuẩn / thực hành công khai đã dùng để định hướng</h3><ul class="doc-link-list"><li>ISO 9001:2026 và sửa đổi 1:2024 (bối cảnh biến đổi khí hậu)</li><li>ISO 10012:2026 về đo lường quản lý hệ thống</li><li>ISO 19011:2018 cho quản trị chương trình đánh giá</li><li>ISO/IAF APG hướng dẫn về scope, phạm vi áp dụng, năng lực, nguồn lực và đánh giá lập kế hoạch</li><li>NIST hướng dẫn về đo lường truy xuất nguồn gốc, QIF và độ tin cậy của dữ liệu chất lượng / đo lường</li><li>Thực hành chủng loại cao low-khối lượng/phân xưởng gia công theo đơn (job xưởng) về tuyến đầu-end kỹ thuật rà soát, động lập lịch và data-định hướng bởi cải tiến</li></ul></div>
 </div>
-<div class="footer-note">ANNEX-503 là nguồn chuẩn để giải thích “ai làm – ai quyết – ai giữ cổng kiểm soát – ai được dừng” trên toàn bộ hệ thống tài liệu sau khi cập nhật JD mới nhất.</div>
+<div class="footer-note">ANNEX-503 là nguồn chuẩn để giải thích "ai làm – ai quyết – ai giữ cổng kiểm soát – ai được dừng" trên toàn bộ hệ thống tài liệu sau khi cập nhật JD mới nhất.</div>
  </div>
  </div>
  </div>

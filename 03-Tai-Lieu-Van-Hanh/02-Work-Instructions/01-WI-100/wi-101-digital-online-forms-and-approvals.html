@@ -12,12 +12,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <style>
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
 .toc-grid a,.toc-grid span{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink)}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
 .tight li{margin:4px 0}
 .callout-strong{border-left: 3px solid var(--blue);padding:12px 14px;background:var(--blue-l);border-radius:0 var(--r-sm) var(--r-sm) 0;margin:12px 0}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr);gap:12px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .kpi-card,.rule-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg)}
 .kpi-card h3,.rule-card h3{margin:0 0 6px;font-size:14px;color:var(--navy)}
 .doc-link-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
@@ -48,7 +48,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div><div class="doc-content" id="docContent"><div class="form-sheet"><div class="preface-block"><h2 class="h2">Điều kiện áp dụng và kiểm soát</h2><div class="grid-2"><div><p><b>ÁP DỤNG KHI</b></p><ul class="list"><li>Khi tài liệu được viện dẫn trong Job/Quy trình/Forms liên quan.</li><li>Khi phát sinh thay đổi ảnh hưởng chất lượng hoặc yêu cầu khách hàng.</li><li>Khi cần xác định tạm giữ/phê duyệt hoặc yêu cầu bằng chứng bắt buộc.</li></ul></div><div><p><b>Đầu vào / Đầu ra</b></p><ul class="list"><li><b>Đầu vào:</b> Epicor Kinetic (giao dịch)</li><li><b>Đầu vào:</b> M365/SharePoint (SSOT hồ sơ)</li><li><b>Đầu vào:</b> 10-QMS-Source-Control + Git (source definitions / released schemas / source templates)</li><li><b>Đầu ra:</b> Hồ sơ/Nhật ký đầy đủ tại SSOT</li><li><b>Đầu ra:</b> Trạng thái cổng kiểm soát được mở hoặc giữ theo tiêu chí</li></ul></div></div><p class="callout"><b>Hold/Release:</b> Thiếu bằng chứng bắt buộc: áp dụng HOLD theo tiêu chí của tài liệu; không chuyển bước cho đến khi đủ bằng chứng.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết hồ sơ SSOT.</p></div><div class="card"><span class="badge"><span class="dot"></span>WI-101</span><h1 class="h1" style="margin-top:12px;">WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</h1><p class="lead">Tài liệu này quy định cách triển khai và sử dụng biểu mẫu số hoá trên M365 (SharePoint Lists/Power Apps/Power Automate) và cách lưu bằng chứng theo SSOT. Mọi giao dịch vận hành (time entry, trạng thái job, PO, xuất/nhập kho, xác nhận giao hàng (ship confirm) <b>chỉ</b> được ghi nhận trong <b>Epicor Kinetic</b>.</p><p class="callout"><b>Ranh giới source bắt buộc:</b> form definition, released schema, source template và source code hỗ trợ phải nằm trong <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> tại <span class="code">10-QMS-Source-Control</span> và đi theo Git. Submission, approval payload, runtime archive và dữ liệu vận hành phát sinh không được đưa vào Git/source library.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">1. Khi áp dụng</h2><ul>
 <li><b>Phải</b> áp dụng khi thay thế biểu mẫu giấy bằng biểu mẫu số hoá để ghi nhận vận hành tại xưởng CNC: kiểm tra công đoạn, nhật ký hold, bảng kiểm đóng gói, nhật ký giao ca, yêu cầu hỗ trợ máy/tooling.</li>
 <li><b>Phải</b> áp dụng khi cần <b>phê duyệt điện tử</b> (Power Automate Approvals) cho các điểm dừng chất lượng/ship-release.</li>
-<li><b>Không được</b> dùng M365 để tạo “sổ” thay thế Epicor cho các giao dịch: time entry, xác nhận hoàn thành công đoạn, xuất kho, xác nhận giao hàng, cập nhật PO.</li>
+<li><b>Không được</b> dùng M365 để tạo "sổ" thay thế Epicor cho các giao dịch: time entry, xác nhận hoàn thành công đoạn, xuất kho, xác nhận giao hàng, cập nhật PO.</li>
 <li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Ghi nhận trực tiếp trên hệ thống đã chỉ định; không dùng file Excel làm nguồn ghi nhận vận hành.</li>
 </ul></div><div class="card"><h2 class="h2" style="margin-top:0;">2. Công cụ / vật tư</h2><ul>
 <li>M365: SharePoint Site <b>CNC-IMS-HUB</b>; SharePoint Danh sách; Tài liệu thư viện; Teams; Power ứng dụng; Power Automate Approvals; Microsoft Phạm vi quản lý (Lưu giữ/Giữ pháp lý).</li>
@@ -60,27 +60,27 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <ul>
 <li>Trường bắt buộc, kiểu dữ liệu, danh mục mã (lựa chọn mã) và quy tắc kiểm tra.</li>
 <li>Trường tham chiếu Epicor: JobNum/PartNum/PackNum/ShipmentNum… <b>chỉ</b> là tham chiếu, <b>không</b> là nơi chốt giao dịch.</li>
-<li>Trường “EvidenceUrl” bắt buộc cho các trạng thái Hold/Phát hành/Ship.</li>
+<li>Trường "EvidenceUrl" bắt buộc cho các trạng thái Hold/Phát hành/Ship.</li>
 </ul>
 </li>
 <li><b>Phải</b> tạo Power App giao diện ki-ốt theo vai trò (OPS/QA/WHS/QMS):
  <ul>
 <li>Scan mã → tự điền JobNum/PackNum (nếu có) → chọn biểu mẫu → nhập dữ liệu → gửi.</li>
-<li><b>Không được</b> cho phép Người dùng sửa bản ghi sau khi đã “Đã phê duyệt/Released”, trừ vai trò QA/QMS được phân quyền.</li>
+<li><b>Không được</b> cho phép Người dùng sửa bản ghi sau khi đã "Đã phê duyệt/Released", trừ vai trò QA/QMS được phân quyền.</li>
 </ul>
 </li>
 <li><b>Phải</b> cấu hình Power Automate:
  <ul>
 <li>Luồng phê duyệt cho từng Cổng kiểm soát (Hold Phát hành, phê duyệt giao hàng (ship phát hành)…).</li>
-<li>Ghi kết quả phê duyệt vào “ApprovalHistory” (List) và khoá trạng thái bản ghi theo kết quả.</li>
+<li>Ghi kết quả phê duyệt vào "ApprovalHistory" (List) và khoá trạng thái bản ghi theo kết quả.</li>
 <li>Gắn nhãn lưu giữ/hồ sơ theo <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> cho các thư mục bằng chứng Tier-1.</li>
 </ul>
 </li>
 </ol><h3 class="h3">3.2 Ghi nhận tại hiện trường (ki-ốt/PC)</h3><ol>
-<li><b>Phải</b> scan mã Job Theo dõi Sheet/WIP Tag để mở đúng màn hình theo “scan-to-hành động”.</li>
-<li><b>Phải</b> điền đủ trường bắt buộc; <b>không được</b> dùng ký hiệu “—/N/A” cho trường bắt buộc nếu chưa có dữ liệu.</li>
+<li><b>Phải</b> scan mã Job Theo dõi Sheet/WIP Tag để mở đúng màn hình theo "scan-to-hành động".</li>
+<li><b>Phải</b> điền đủ trường bắt buộc; <b>không được</b> dùng ký hiệu "—/N/A" cho trường bắt buộc nếu chưa có dữ liệu.</li>
 <li><b>Phải</b> gắn liên kết bằng chứng (EvidenceUrl) trỏ tới thư mục/tệp trên M365 theo SSOT; <b>không được</b> đính kèm bản sao phân tán ngoài SSOT.</li>
-<li><b>Phải</b> bấm “Gửi/Submit” để tạo bản ghi; hệ thống tự cấp mã RecordID.</li>
+<li><b>Phải</b> bấm "Gửi/Submit" để tạo bản ghi; hệ thống tự cấp mã RecordID.</li>
 </ol><h3 class="h3">3.3 Phê duyệt điện tử và điểm dừng</h3><ol>
 <li><b>Phải</b> thiết lập Cổng kiểm soát theo loại nghiệp vụ:
  <ul>
@@ -88,7 +88,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Cổng kiểm soát giao hàng: WHS + QA phê duyệt phê duyệt giao hàng theo WI-OPS-010.</li>
 </ul>
 </li>
-<li><b>Điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm chặn))):</b> Khi thiếu EvidenceUrl hoặc bằng chứng không truy cập được → <b>phải</b> giữ trạng thái “TẠM GIỮ” và <b>không được</b> chuyển sang “PHÁT HÀNH/SHIP”.</li>
+<li><b>Điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm chặn))):</b> Khi thiếu EvidenceUrl hoặc bằng chứng không truy cập được → <b>phải</b> giữ trạng thái "TẠM GIỮ" và <b>không được</b> chuyển sang "PHÁT HÀNH/SHIP".</li>
 <li><b>Phải</b> lưu dấu vết phê duyệt (Approver, thời gian, nội dung, quyết định) trong ApprovalHistory.</li>
 </ol><h3 class="h3">3.4 Kiểm soát thay đổi biểu mẫu số hoá</h3><ul>
 <li><b>Không được</b> tự ý thêm/xoá/sửa cột SharePoint List khi chưa có phê duyệt kiểm soát tài liệu.</li>

@@ -64,7 +64,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Hiểu cấu trúc một gói báo giá chuyên nghiệp cho khách hàng quốc tế: giả định/loại trừ, định nghĩa thời gian dẫn, Incoterms, Requests chứng từ, điều kiện thanh toán. Biết khái niệm DFM và các rủi ro phổ biến trong CNC (tool truy cập, gá kẹp, bavia, biến dạng, đo lường).</td>
-<td>Thực hiện độc lập rà soát hợp đồng mức trung bình: tạo RFQ tóm tắt, đặt câu hỏi làm rõ theo CTQ, phối hợp Eng/QA để đưa DFM phản hồi, và tạo “bàn giao pack” đầy đủ cho Ước tính / Định giá/Kế hoạch.</td>
+<td>Thực hiện độc lập rà soát hợp đồng mức trung bình: tạo RFQ tóm tắt, đặt câu hỏi làm rõ theo CTQ, phối hợp Eng/QA để đưa DFM phản hồi, và tạo "bàn giao pack" đầy đủ cho Ước tính / Định giá/Kế hoạch.</td>
 <td>(1) 05 RFQ xử lý độc lập có RFQ tóm tắt + log làm rõ; (2) 01 tình huống có DFM phản hồi có số liệu/ảnh minh chứng; (3) 01 báo giá hoàn chỉnh theo mẫu HESEM; (4) danh mục OJT (bảng kiểm / danh mục) + rà soát của Ước tính / Định giá chức năng Manager/QA.</td>
 <td>Báo giá thời gian quay vòng Time (trung vị) ≤ 24h với RFQ chuẩn; tỷ lệ báo giá phải sửa do thiếu Requests ≤ 5%; tỷ lệ 'no-bất ngờ' (không phát sinh điều kiện mới sau PO) ≥ 90%.</td>
 </tr>
@@ -111,13 +111,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><strong>Tổ chức ĐƯỢC PHÉP áp dụng chuẩn hóa biểu mẫu/CRM/ERP để tự động hóa RFQ log, kiểm soát phiên bản và phê duyệt điện tử.</strong> <span class="iso">ISO 7.1.3</span></div>
 <p>Khi số hóa, phải đảm bảo phân quyền, backup, dấu vết kiểm toán; tránh tạo 'hệ thống rác' nhiều phiên bản.</p>
 </div>
-</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L2: làm chủ bảng kiểm + biết đặt câu hỏi CTQ + tạo bàn giao pack sạch cho nội bộ.</strong></div><h3>3.1. Vì sao C11 là “cổng chất lượng” của phân xưởng CNC lệnh sản xuất?</h3><p>Trong mô hình <em>chủng loại cao (cao-mix) / sản lượng thấp đến trung bình (low-to-mid khối lượng)</em>, sai lệch xuất phát từ khâu đầu (RFQ/PO) khó sửa ở cuối vì đã “đóng băng” trên: đường chạy dao, đồ gá, vật tư, lịch máy và thậm chí cả chứng từ xuất khẩu. Thực tế đánh giá ISO cho thấy nhiều <em>nonconformity</em> không nằm ở máy móc mà nằm ở “hệ thống thông tin”: dùng sai phiên bản, hiểu sai note, không kiểm soát thay đổi, không lưu hồ sơ rà soát hợp đồng.</p><p><strong>Nguyên lý:</strong> lỗi “nhận sai Requests” có chi phí cao nhất (COPQ cao) vì tạo ra lãng phí kép: <em>sai ngay lần đầu</em> + <em>điều chỉnh muộn</em>. Do đó, C11 phải được vận hành như một quy trình có dữ liệu, có kiểm soát cổng, có phản ứng.</p><h3>3.2. Thuật ngữ cốt lõi (dùng thống nhất trong HESEM)</h3><ul>
-<li><strong>RFQ (Yêu cầu for báo giá):</strong> Requests báo giá – chưa tạo cam kết. RFQ thiếu dữ liệu; nhiệm vụ của HESEM là “đóng gói Requests” bằng làm rõ.</li>
-<li><strong>RFI/Làm rõ:</strong> câu hỏi làm rõ; phải có <em>được lập thành tài liệu bằng chứng</em> (email/biên bản) và phải “đóng” trước khi báo giá khi là CTQ.</li>
+</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L2: làm chủ bảng kiểm + biết đặt câu hỏi CTQ + tạo bàn giao pack sạch cho nội bộ.</strong></div><h3>3.1. Vì sao C11 là "cổng chất lượng" của phân xưởng CNC lệnh sản xuất?</h3><p>Trong mô hình <em>chủng loại cao (cao-mix) / sản lượng thấp đến trung bình (low-to-mid khối lượng)</em>, sai lệch xuất phát từ khâu đầu (RFQ/PO) khó sửa ở cuối vì đã "đóng băng" trên: đường chạy dao, đồ gá, vật tư, lịch máy và thậm chí cả chứng từ xuất khẩu. Thực tế đánh giá ISO cho thấy nhiều <em>nonconformity</em> không nằm ở máy móc mà nằm ở "hệ thống thông tin": dùng sai phiên bản, hiểu sai note, không kiểm soát thay đổi, không lưu hồ sơ rà soát hợp đồng.</p><p><strong>Nguyên lý:</strong> lỗi "nhận sai Requests" có chi phí cao nhất (COPQ cao) vì tạo ra lãng phí kép: <em>sai ngay lần đầu</em> + <em>điều chỉnh muộn</em>. Do đó, C11 phải được vận hành như một quy trình có dữ liệu, có kiểm soát cổng, có phản ứng.</p><h3>3.2. Thuật ngữ cốt lõi (dùng thống nhất trong HESEM)</h3><ul>
+<li><strong>RFQ (Yêu cầu for báo giá):</strong> Requests báo giá – chưa tạo cam kết. RFQ thiếu dữ liệu; nhiệm vụ của HESEM là "đóng gói Requests" bằng làm rõ.</li>
+<li><strong>RFI/Làm rõ:</strong> câu hỏi làm rõ; phải có <em>được lập thành tài liệu bằng chứng</em> (email/biên bản) và phải "đóng" trước khi báo giá khi là CTQ.</li>
 <li><strong>Báo giá:</strong> báo giá – chứa giả định/loại trừ. Báo giá phải có version và Người duyệt (phê duyệt).</li>
 <li><strong>PO/Hợp đồng:</strong> đơn hàng/ hợp đồng. Khi PO Released, thay đổi phải theo ECO/Kiểm soát thay đổi.</li>
-<li><strong>CTQ (Quan trọng-to-Quality):</strong> đặc tính ảnh hưởng chức năng/lắp ráp/an toàn/độ kín/hiệu suất. CTQ không chỉ là “dung sai chặt” mà còn là: nhám, sạch, không bavia, chứng từ, đóng gói.</li>
-</ul><h3>3.3. Mô hình “3 lớp Requests” trong rà soát hợp đồng</h3><div class="cols-2">
+<li><strong>CTQ (Quan trọng-to-Quality):</strong> đặc tính ảnh hưởng chức năng/lắp ráp/an toàn/độ kín/hiệu suất. CTQ không chỉ là "dung sai chặt" mà còn là: nhám, sạch, không bavia, chứng từ, đóng gói.</li>
+</ul><h3>3.3. Mô hình "3 lớp Requests" trong rà soát hợp đồng</h3><div class="cols-2">
 <div class="figure">
 <strong>Lớp 1 – Kỹ thuật</strong>
 <ul>
@@ -134,7 +134,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Yêu cầu truy xuất nguồn gốc: số sê-ri/lot, traveler, tem trạng thái.</li>
 <li>Yêu cầu đóng gói: sạch, chống va đập, hút ẩm, chuẩn bị bộ linh kiện.</li>
 </ul>
-<div class="cap">Sai lớp 2 tạo “đánh giá phát hiện” và khiếu nại / Requests bồi thường do thiếu chứng từ/truy xuất nguồn gốc.</div>
+<div class="cap">Sai lớp 2 tạo "đánh giá phát hiện" và khiếu nại / Requests bồi thường do thiếu chứng từ/truy xuất nguồn gốc.</div>
 </div>
 </div><div class="figure">
 <strong>Lớp 3 – Thương mại</strong>
@@ -143,8 +143,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>thời gian dẫn: định nghĩa rõ (từ Ngày nào? nhận vật liệu? nhận PO? chốt làm rõ?)</li>
 <li>Điều kiện thay đổi: khi khách đổi phiên bản/qty/hoàn thành → quy tắc cập nhật giá &amp; lịch.</li>
 </ul>
-<div class="cap">Sai lớp 3 dẫn đến tranh chấp, trễ tiến độ, hoặc “biên lợi nhuận rò rỉ”.</div>
-</div><h3>3.4. Bảng kiểm tính đầy đủ: “Không đủ dữ liệu – không cam kết”</h3><p>HESEM sử dụng bảng kiểm như một <strong>cơ chế chống sai</strong> (poka (chống sai) (chống sai)-giá đỡ (yoke) quản trị). Bảng kiểm không để “ký cho xong”; bảng kiểm phải dẫn tới hành động: thiếu dữ liệu nào → hỏi ai → hạn trả lời → lưu ở đâu.</p><details>
+<div class="cap">Sai lớp 3 dẫn đến tranh chấp, trễ tiến độ, hoặc "biên lợi nhuận rò rỉ".</div>
+</div><h3>3.4. Bảng kiểm tính đầy đủ: "Không đủ dữ liệu – không cam kết"</h3><p>HESEM sử dụng bảng kiểm như một <strong>cơ chế chống sai</strong> (poka (chống sai) (chống sai)-giá đỡ (yoke) quản trị). Bảng kiểm không để "ký cho xong"; bảng kiểm phải dẫn tới hành động: thiếu dữ liệu nào → hỏi ai → hạn trả lời → lưu ở đâu.</p><details>
 <summary>RFQ Tính đầy đủ Bảng kiểm (rút gọn)</summary>
 <ol>
 <li>Drawing/3D: file, phiên bản, date, standard, đơn vị.</li>
@@ -156,24 +156,24 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>số lượng &amp; lịch trình: mẫu thử/sản xuất, Ngày đến hạn, dự báo.</li>
 <li>Thương mại: Incoterms, thanh toán, tiền tệ, đặc biệt điều khoản.</li>
 </ol>
-</details><h3>3.5. DFM cho CNC – đặt câu hỏi đúng, tránh “tự làm liều”</h3><p>DFM không phải “cãi bản vẽ”. DFM là cung cấp thông tin kỹ thuật giúp khách <em>đạt cùng chức năng</em> với rủi ro thấp hơn. Một DFM tốt luôn có 3 phần: <strong>(1) vấn đề</strong> → <strong>(2) hậu quả</strong> → <strong>(3) đưa ra thay thế</strong> (kèm dữ liệu).</p><ul>
+</details><h3>3.5. DFM cho CNC – đặt câu hỏi đúng, tránh "tự làm liều"</h3><p>DFM không phải "cãi bản vẽ". DFM là cung cấp thông tin kỹ thuật giúp khách <em>đạt cùng chức năng</em> với rủi ro thấp hơn. Một DFM tốt luôn có 3 phần: <strong>(1) vấn đề</strong> → <strong>(2) hậu quả</strong> → <strong>(3) đưa ra thay thế</strong> (kèm dữ liệu).</p><ul>
 <li><strong>Tool truy cập &amp; gá kẹp:</strong> có bề mặt kẹp không? cần mềm-jaw? có bị biến dạng khi kẹp không?</li>
 <li><strong>Dung sai vs năng lực / khả năng:</strong> dung sai ±0.005mm cho mặt dài 300mm cần kế hoạch nhiệt/đo; khi khách không cần, đưa ra nới dung sai.</li>
-<li><strong>bavia/cạnh / mép:</strong> note “ngắt / nghỉ all cạnh / mép” phải chuyển thành tiêu chuẩn (0.2–0.5) và plan kiểm soát.</li>
+<li><strong>bavia/cạnh / mép:</strong> note "ngắt / nghỉ all cạnh / mép" phải chuyển thành tiêu chuẩn (0.2–0.5) và plan kiểm soát.</li>
 <li><strong>Công đoạn đặc biệt rủi ro:</strong> xi mạ anốt (anodize) có đổi kích thước? mẻ nấu (heat) xử lý có cong vênh? cần dung sai cho phép?</li>
 </ul><div class="codeblock"><span class="c">Ví dụ câu hỏi DFM chuẩn (email):</span><br/>
- 1) “đặc điểm / tính năng A: khe / vị trí width 3.00 ±0.01, chiều sâu 25.0. Với tool L/D lớn, nguy cơ rung (chatter) và sai kích thước. HESEM đưa ra: tăng bán kính đáy lên R1.0 hoặc nới tol ±0.02 khi chức năng cho phép.”<br/>
- 2) “lỗ mẫu / quy luật true vị trí / chức vụ 0.05 @ MMC. Đề nghị xác nhận mốc chuẩn (datum) sơ đồ / kế hoạch A|B|C và phương pháp kiểm (CMM/chức năng gage). Khi cần gage, HESEM báo thêm NRE.”</div><h3>3.6. Rủi ro-dựa trên tư duy: biến “cảm giác” thành dữ liệu quyết định</h3><p>Ở HESEM, mỗi RFQ/PO được gán mức rủi ro để quyết định mức rà soát và Người duyệt. Khung gán rủi ro tối thiểu:</p><ul>
+ 1) "đặc điểm / tính năng A: khe / vị trí width 3.00 ±0.01, chiều sâu 25.0. Với tool L/D lớn, nguy cơ rung (chatter) và sai kích thước. HESEM đưa ra: tăng bán kính đáy lên R1.0 hoặc nới tol ±0.02 khi chức năng cho phép."<br/>
+ 2) "lỗ mẫu / quy luật true vị trí / chức vụ 0.05 @ MMC. Đề nghị xác nhận mốc chuẩn (datum) sơ đồ / kế hoạch A|B|C và phương pháp kiểm (CMM/chức năng gage). Khi cần gage, HESEM báo thêm NRE."</div><h3>3.6. Rủi ro-dựa trên tư duy: biến "cảm giác" thành dữ liệu quyết định</h3><p>Ở HESEM, mỗi RFQ/PO được gán mức rủi ro để quyết định mức rà soát và Người duyệt. Khung gán rủi ro tối thiểu:</p><ul>
 <li><strong>Tác động:</strong> CTQ? khách hàng đánh giá? hậu quả khi sai (phế phẩm/khiếu nại / Requests bồi thường/an toàn)?</li>
 <li><strong>Khả năng xảy ra:</strong> công nghệ mới? vật liệu khó? dung sai chặt? nhà cung cấp chưa quen?</li>
 <li><strong>Khả năng phát hiện:</strong> có đo được không? có kiểm 100% không? có dấu hiệu sớm không?</li>
-</ul><p>Điểm rủi ro cao → bắt buộc họp liên phòng + QA ký-off + kế hoạch kiểm soát tăng.</p><h3>3.7. Bàn giao pack: bàn giao “sạch” để phân xưởng chạy không cần đoán</h3><p>Bàn giao pack là “bộ hồ sơ nội bộ” đi cùng job. Thiếu bàn giao pack, phân xưởng sẽ tự phỏng đoán và rủi ro tăng. Bàn giao pack tối thiểu gồm:</p><ol>
+</ul><p>Điểm rủi ro cao → bắt buộc họp liên phòng + QA ký-off + kế hoạch kiểm soát tăng.</p><h3>3.7. Bàn giao pack: bàn giao "sạch" để phân xưởng chạy không cần đoán</h3><p>Bàn giao pack là "bộ hồ sơ nội bộ" đi cùng job. Thiếu bàn giao pack, phân xưởng sẽ tự phỏng đoán và rủi ro tăng. Bàn giao pack tối thiểu gồm:</p><ol>
 <li>Drawing/3D được kiểm soát (Rev), spec, ghi chú; danh sách CTQ nổi bật / đánh dấu.</li>
 <li>Log làm rõ đã đóng (ai hỏi – ai trả lời – Ngày – file/email).</li>
 <li>Yêu cầu chứng từ: MTR, CoC, CMM báo cáo, FAI; mẫu khách hàng khi có.</li>
 <li>Đóng gói/Label hướng dẫn: WIP label, giao vận label, chuẩn bị bộ linh kiện list.</li>
 <li>giả định/loại trừ của báo giá: cái gì đã/ chưa bao gồm.</li>
-</ol><div class="callout"><strong>chống-thoát / bỏ qua rule:</strong> bất kỳ Requests nào chưa rõ mà có nguy cơ tạo NG/khiếu nại / Requests bồi thường thì phải “đóng làm rõ” trước khi phát hành job.</div><h2>4. Quy trình vận hành chuẩn (luồng dọc, dễ đọc)</h2><p class="small">Lưu đồ được thiết kế theo hướng dọc để đọc rõ khi in A4. chỉnh trực tiếp bằng HTML/CSS.</p><div class="vflow">
+</ol><div class="callout"><strong>chống-thoát / bỏ qua rule:</strong> bất kỳ Requests nào chưa rõ mà có nguy cơ tạo NG/khiếu nại / Requests bồi thường thì phải "đóng làm rõ" trước khi phát hành job.</div><h2>4. Quy trình vận hành chuẩn (luồng dọc, dễ đọc)</h2><p class="small">Lưu đồ được thiết kế theo hướng dọc để đọc rõ khi in A4. chỉnh trực tiếp bằng HTML/CSS.</p><div class="vflow">
 <div class="vstep">
 <div class="vnum">1</div>
 <div class="vtext">
@@ -251,7 +251,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p>Mọi thay đổi sau PO đi qua Thay đổi Thông báo; đánh giá tác động; cập nhật tài liệu; truyền đạt đến phân xưởng.</p>
 </div>
 </div>
-</div><h2>5. KPI/Chỉ số áp dụng theo Level (có công thức + nguồn dữ liệu)</h2><p class="small">Bảng dưới dùng để “định lượng” năng lực. Target là quy định: khi áp dụng thực tế, HESEM hiệu chỉnh theo mốc chuẩn và chiến lược năm. <strong>Kiểm soát cổng</strong> là điều kiện bắt buộc (vi phạm → không công nhận Level/thưởng dù điểm bài kiểm tra cao).</p><table class="table">
+</div><h2>5. KPI/Chỉ số áp dụng theo Level (có công thức + nguồn dữ liệu)</h2><p class="small">Bảng dưới dùng để "định lượng" năng lực. Target là quy định: khi áp dụng thực tế, HESEM hiệu chỉnh theo mốc chuẩn và chiến lược năm. <strong>Kiểm soát cổng</strong> là điều kiện bắt buộc (vi phạm → không công nhận Level/thưởng dù điểm bài kiểm tra cao).</p><table class="table">
 <thead>
 <tr>
 <th>Chỉ số/KPI</th>
@@ -358,7 +358,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Kiểm soát cổng bắt buộc để công nhận Level 2:</strong>
 <ul><li>sai phiên bản (vẽ/mô hình/báo giá/PO) dẫn tới sản xuất sai hoặc khiếu nại / Requests bồi thường.</li><li>Báo giá/nhận PO khi thiếu CTQ hoặc thiếu Requests chứng từ/đóng gói mà không có làm rõ hồ sơ.</li><li>Không có Đơn hàng Acceptance hồ sơ (PO rà soát) hoặc phê duyệt vượt thẩm quyền.</li></ul>
 <p class="small">Kiểm soát cổng ưu tiên: an toàn → chất lượng → tuân thủ hồ sơ → đạo đức dữ liệu. Vi phạm kiểm soát cổng có nguy cơ dẫn tới không công nhận Level/thưởng.</p>
-</div><h2>6. Bài tập theo Level (Nghiên cứu tình huống HESEM)</h2><p class="small">Mỗi tình huống được thiết kế theo “học thuật ứng dụng”: có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (bằng chứng) để chấm. chuẩn làm theo nhóm và rà soát chéo để tăng chất lượng tư duy.</p><div class="card">
+</div><h2>6. Bài tập theo Level (Nghiên cứu tình huống HESEM)</h2><p class="small">Mỗi tình huống được thiết kế theo "học thuật ứng dụng": có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (bằng chứng) để chấm. chuẩn làm theo nhóm và rà soát chéo để tăng chất lượng tư duy.</p><div class="card">
 <h3>Tình huống 1: DFM cho dung sai chặt – đưa ra nới tol có cơ sở</h3>
 <p class="small">Part nhôm 6061-T6, chiều dài 280mm, Requests phẳng 0.01mm trên mặt A. Khách không nói rõ đây có phải niêm phong / bịt kín bề mặt hay không.</p>
 <div class="cols-2">
@@ -412,7 +412,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul><li>PO rà soát bảng kiểm</li><li>Email phản hồi</li><li>Đơn hàng Acceptance hồ sơ</li></ul>
 <div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi email rõ ràng, đưa 2 lựa chọn cho khách, và giữ sắc thái chuyên nghiệp.
  </div>
-</div><h2>7. OJT theo TWI (Job Sự cố hỏng máy + bảng kiểm)</h2><p class="small">TWI (Training Within Ngành công nghiệp) nhấn mạnh: <strong>chia nhỏ công việc</strong> → <strong>điểm then chốt</strong> → <strong>lý do</strong>. OJT của HESEM phải tạo được “thói quen đúng” và bằng chứng (hồ sơ) để sẵn sàng đánh giá.</p><h3>7.1. Job Sự cố hỏng máy Sheet (mẫu)</h3><table class="table">
+</div><h2>7. OJT theo TWI (Job Sự cố hỏng máy + bảng kiểm)</h2><p class="small">TWI (Training Within Ngành công nghiệp) nhấn mạnh: <strong>chia nhỏ công việc</strong> → <strong>điểm then chốt</strong> → <strong>lý do</strong>. OJT của HESEM phải tạo được "thói quen đúng" và bằng chứng (hồ sơ) để sẵn sàng đánh giá.</p><h3>7.1. Job Sự cố hỏng máy Sheet (mẫu)</h3><table class="table">
 <thead><tr><th>Bước</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead>
 <tbody>
 <tr>
@@ -478,7 +478,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>□ Đạt □ Chưa</td>
 <td>…</td>
 </tr>
-</tbody></table><h2>8. Kiểm tra đánh giá (bản thiết kế kiểm thử (test bản thiết kế) + bài kiểm tra nhanh mẫu)</h2><h3>8.1. Test bản thiết kế</h3><p class="small">Bản thiết kế đảm bảo đề thi đo đúng năng lực: không chỉ hỏi “biết gì” mà hỏi “làm được gì” và “ra quyết định thế nào” trong bối cảnh HESEM.</p><table class="table">
+</tbody></table><h2>8. Kiểm tra đánh giá (bản thiết kế kiểm thử (test bản thiết kế) + bài kiểm tra nhanh mẫu)</h2><h3>8.1. Test bản thiết kế</h3><p class="small">Bản thiết kế đảm bảo đề thi đo đúng năng lực: không chỉ hỏi "biết gì" mà hỏi "làm được gì" và "ra quyết định thế nào" trong bối cảnh HESEM.</p><table class="table">
 <thead><tr><th>Miền năng lực</th><th>Tỷ trọng</th><th>Mức nhận thức</th><th>Dạng câu hỏi</th><th>Số câu áp dụng</th></tr></thead>
 <tbody>
 <tr>
@@ -522,7 +522,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>KPI 'Yêu cầu thoát / bỏ qua tỷ lệ' đo để làm gì? Vì sao không phải dùng để phạt Người báo lỗi sớm?</li>
 <li>Viết 1 đoạn email ngắn (≤120 từ) để Requests khách xác nhận phiên bản một cách chuyên nghiệp.</li>
 </ol>
-</div><h2>9. Tiêu chí đánh giá chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Tiêu chí đánh giá giúp chấm công bằng và chống “cảm tính”. chuẩn chấm bởi 2 Người (Dòng / Chuyền Manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
+</div><h2>9. Tiêu chí đánh giá chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Tiêu chí đánh giá giúp chấm công bằng và chống "cảm tính". chuẩn chấm bởi 2 Người (Dòng / Chuyền Manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
 <thead><tr><th>Tiêu chí</th><th>0 – Không đạt</th><th>1 – Đạt tối thiểu</th><th>2 – Tốt</th><th>3 – Xuất sắc</th></tr></thead>
 <tbody>
 <tr>

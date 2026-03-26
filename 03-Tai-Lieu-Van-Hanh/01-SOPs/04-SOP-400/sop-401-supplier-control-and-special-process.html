@@ -8,21 +8,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -36,7 +36,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -46,25 +46,6 @@
 table{max-width:100%;table-layout:auto}
 td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 @media (max-width: 960px){.grid-2,.grid-3,.field-grid{grid-template-columns:1fr;}}
-/* Critical inline CSS for file:// compatibility */
-
-/* Flowchart */
-.flowchart{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:stretch;margin:20px 0;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:1px solid rgba(21,101,192,.18);border-radius:10px}
-.flow-step{flex:1 1 120px;min-width:100px;max-width:170px;padding:10px 12px;background:#fff;border:1.5px solid rgba(21,101,192,.3);border-radius:10px;text-align:center;box-shadow:0 1px 3px rgba(21,101,192,.06)}
-.flow-step .flow-num{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#1565c0,#1976d2);color:#fff;font-size:12px;font-weight:800;margin-bottom:5px}
-.flow-step .flow-title{font-size:11px;font-weight:700;color:#0C2D48;line-height:1.35}
-.flow-step .flow-text{text-align:left}
-.flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 22px;color:#93b3d6;font-size:16px;font-weight:700}
-/* Proc-num */
-.proc-num{display:inline-flex;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;flex-shrink:0;margin-right:8px}
-/* Step-tag */
-.step-tag{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0C2D48,#1565c0);text-transform:uppercase;letter-spacing:.3px}
-/* Metric cards */
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:16px 0}
-.metric-card{padding:16px;border:1px solid rgba(21,101,192,.15);border-radius:10px;text-align:center;background:#fff}
-.metric-card .value{font-size:28px;font-weight:800;color:#1565c0;line-height:1.2}
-.metric-card .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-top:4px}
-.metric-card .sub{font-size:11px;color:#666;margin-top:4px;line-height:1.4}
 
 </style>
 </head>
@@ -82,7 +63,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Chỉ dùng NCC hoặc processor đã được phê duyệt đúng <b>family / risk class / site / scope</b>. Dùng nguồn ngoài phạm vi phê duyệt hoặc nguồn khẩn cấp mà không có thẩm quyền là vi phạm hệ thống. <span class="iso-clause">§8.4</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>PO và gói hồ sơ gửi NCC <b>phải đủ</b> part/rev/spec, chứng chỉ, truy xuất, nhãn, đóng gói, change notification và điều kiện chấp nhận. Thiếu luồng-down thì HOLD, không phát hành. <span class="iso-clause">§8.4</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Hàng mua về và hàng outsource return chỉ được nhập hệ thống hoặc cấp vào WIP khi đã qua cổng kiểm soát nhận dạng, cert review, kiểm tra đầu vào theo rule và disposition rõ ràng. <span class="iso-clause">§8.4</span></div></div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Công đoạn đặc biệt phải được kiểm theo đúng <b>site + scope + hiệu lực chứng chỉ + family</b>; không dùng lập luận “supplier này từng đạt” để vượt qua review cụ thể theo job. <span class="iso-clause">§8.4</span></div></div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Công đoạn đặc biệt phải được kiểm theo đúng <b>site + scope + hiệu lực chứng chỉ + family</b>; không dùng lập luận "supplier này từng đạt" để vượt qua review cụ thể theo job. <span class="iso-clause">§8.4</span></div></div></div>
 <div class="preface-block"><div class="callout"><div class="card-title">Lệnh điều hành</div><p>SOP-401 khóa rủi ro đầu vào của nhà máy. Nếu chọn sai nguồn, truyền đạt sai yêu cầu hoặc nhận hàng về khi bằng chứng chưa đủ, mọi cổng kiểm soát phía sau chỉ đang xử lý hậu quả. Thực hiện chuỗi 401-IG1 → 401-IG5 như một cổng chất lượng bắt buộc, không xem đây là thủ tục hành chính của Purchasing.</p><div class="legend-row"><span class="chip">Control cổng kiểm soát: 401-IG1 → 401-IG5</span><span class="chip">Biểu mẫu bắt buộc: <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-402_Supplier_Evaluation_Form.xlsx">FRM-402</a> / <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx">FRM-403</a> / <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-404</a> / <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-405_Supplier_Scorecard.xlsx">FRM-405</a> / <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-406_SCAR.xlsx">FRM-406</a> / / <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-409_Supplier_Audit_Checklist.xlsx">FRM-409</a> / <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a></span><span class="chip">WI liên đới: <a href="../../02-Work-Instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a> / <a href="../../02-Work-Instructions/06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a> / <a href="../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></span><span class="chip">ANNEX liên đới: <a href="../../03-Reference/04-ANNEX-400/annex-401-supplier-risk-model-and-scorecard-method.html">ANNEX-401</a> / <a href="../../03-Reference/04-ANNEX-400/annex-402-outsource-special-process-pack.html">ANNEX-402</a> / <a href="../../03-Reference/04-ANNEX-400/annex-403-approved-processor-list.html">ANNEX-403</a> / <a href="../../03-Reference/03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a></span></div></div></div>
 <div class="toc"><div class="toc-title">Mục lục</div><div class="toc-grid">
 <a href="#p1">1. Mục đích</a>
@@ -125,7 +106,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 </div>
 </div>
 <div class="note-soft"><b>Ranh giới chủ trì:</b> SOP-401 sở hữu quyết định nguồn cung, luồng-xuống / Từng, outsource điều phối xuất hàng, cổng kiểm soát nhận hàng về và quản trị hiệu suất NCC. Khi hàng đã nhập hệ thống HESEM, quyền kiểm soát truy xuất nguồn gốc, vấn đề vật tư, lot tách / chia và phả hệ truy xuất chuyển sang <a href="sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a>/<a href="../07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a> theo phạm vi tương ứng.</div>
-<div class="note-blue"><b>Quy tắc bộ bằng chứng nhà cung cấp / Người xử lý:</b> là chỉ mục truy xuất cho bộ chứng từ chứng nhận, sản phẩm-nhóm sản phẩm thư mục và lịch sử thay đổi; <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-409_Supplier_Audit_Checklist.xlsx">FRM-409</a> là hồ sơ đánh giá / khôi phục / thu hồi bảng theo dõi cho nguồn rủi ro; <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> là cổng xác minh khi hàng outsource / công đoạn đặc biệt quay về bến xuất nhập hàng. Thẻ điểm hoặc source-trạng thái rà soát không được coi là “đóng” nếu truy xuất, khôi phục / thu hồi hoặc trả lại-xác minh còn mở.</div>
+<div class="note-blue"><b>Quy tắc bộ bằng chứng nhà cung cấp / Người xử lý:</b> là chỉ mục truy xuất cho bộ chứng từ chứng nhận, sản phẩm-nhóm sản phẩm thư mục và lịch sử thay đổi; <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-409_Supplier_Audit_Checklist.xlsx">FRM-409</a> là hồ sơ đánh giá / khôi phục / thu hồi bảng theo dõi cho nguồn rủi ro; <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> là cổng xác minh khi hàng outsource / công đoạn đặc biệt quay về bến xuất nhập hàng. Thẻ điểm hoặc source-trạng thái rà soát không được coi là "đóng" nếu truy xuất, khôi phục / thu hồi hoặc trả lại-xác minh còn mở.</div>
 <h2 class="h2" id="p3">3. Thuật ngữ &amp; nguyên tắc</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:22%"/><col style="width:78%"/></colgroup><thead><tr><th>Thuật ngữ</th><th>Định nghĩa dùng trong SOP-401</th></tr></thead><tbody>
 <tr><td>NCC được phê duyệt</td><td>NCC đã hoàn tất đánh giá theo cấp rủi ro đang áp dụng, hồ sơ còn hiệu lực và không ở trạng thái Thử việc / Tạm ngưng / Chặn cho nhóm sản phẩm liên quan.</td></tr>
@@ -136,8 +117,8 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <tr><td>SCAR</td><td>Supplier hành động khắc phục (hành động) Yêu cầu (SCAR) (SCAR) (SCAR) (SCAR) (SCAR) (SCAR) (SCAR). Kích hoạt khi có lỗi lặp, lỗi nghiêm trọng, thiếu chứng chỉ, sai spec, sai phiên bản, giao trễ kéo dài hoặc vi phạm thay đổi thông báo.</td></tr>
 </tbody></table></div>
 <div class="callout-grid">
-<div class="callout-card"><h3>Nguyên tắc 1 — Kiểm soát theo rủi ro và nhóm sản phẩm</h3><ul class="tight"><li>Không đánh giá “một lần dùng cho mọi thứ”. Mỗi nhà cung cấp / Người xử lý phải được nhìn theo <b>nhóm sản phẩm</b>: raw nguyên vật liệu, standard phần cứng, tool, gia công ngoài gia công cơ khí, công đoạn đặc biệt, hiệu chuẩn, hậu cần.</li><li>Supplier có thể Đã phê duyệt cho một nhóm sản phẩm nhưng chỉ Có điều kiện hoặc Chặn cho nhóm sản phẩm khác.</li></ul></div>
-<div class="callout-card"><h3>Nguyên tắc 2 — Chỉ phát hành PO khi luồng-xuống / Từng đã sạch</h3><ul class="tight"><li>Mọi field quan trọng phải được khóa trước khi phát hành: part no., rev, spec, số lượng, Ngày đến hạn, cert bắt buộc, truy xuất nguồn gốc, khách hàng luồng-xuống / Từng, đóng gói, label, thay đổi-thông báo.</li><li>PO không được dùng như “vỏ bọc” để gửi việc đi khi pack kỹ thuật chưa sạch.</li></ul></div>
+<div class="callout-card"><h3>Nguyên tắc 1 — Kiểm soát theo rủi ro và nhóm sản phẩm</h3><ul class="tight"><li>Không đánh giá "một lần dùng cho mọi thứ". Mỗi nhà cung cấp / Người xử lý phải được nhìn theo <b>nhóm sản phẩm</b>: raw nguyên vật liệu, standard phần cứng, tool, gia công ngoài gia công cơ khí, công đoạn đặc biệt, hiệu chuẩn, hậu cần.</li><li>Supplier có thể Đã phê duyệt cho một nhóm sản phẩm nhưng chỉ Có điều kiện hoặc Chặn cho nhóm sản phẩm khác.</li></ul></div>
+<div class="callout-card"><h3>Nguyên tắc 2 — Chỉ phát hành PO khi luồng-xuống / Từng đã sạch</h3><ul class="tight"><li>Mọi field quan trọng phải được khóa trước khi phát hành: part no., rev, spec, số lượng, Ngày đến hạn, cert bắt buộc, truy xuất nguồn gốc, khách hàng luồng-xuống / Từng, đóng gói, label, thay đổi-thông báo.</li><li>PO không được dùng như "vỏ bọc" để gửi việc đi khi pack kỹ thuật chưa sạch.</li></ul></div>
 <div class="callout-card"><h3>Nguyên tắc 3 — Công đoạn đặc biệt phải theo site + scope + bằng chứng</h3><ul class="tight"><li>Mọi phê duyệt phải theo đúng site đã được chứng minh; không suy rộng từ thành tích của site khác. Mọi phê duyệt phải xem đúng site, đúng quy trình nhóm sản phẩm, đúng spec/khách hàng scope và hiệu lực chứng chỉ.</li><li>Người xử lý không gửi đủ cert, không khớp / phù hợp scope hoặc đổi quy trình lộ trình gia công không báo phải TẠM GIỮ ngay.</li></ul></div>
 <div class="callout-card"><h3>Nguyên tắc 4 — Phiếu nhận là cổng chất lượng, không phải thủ tục kho</h3><ul class="tight"><li>Hàng về phải đi qua nhận dạng, kiểm số lượng, tình trạng bao gói, cert rà soát và kiểm tra đầu vào theo rule. Không nhận thẳng vào WIP.</li><li>Thiếu bằng chứng = TẠM GIỮ. Áp lực tiến độ không được dùng để vượt qua cổng kiểm soát.</li></ul></div>
 </div>
@@ -187,11 +168,11 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <ol class="tight">
 <li>Nhân viên mua hàng hoặc Chuỗi cung ứng Manager phải xác định nhóm sản phẩm ngay từ đầu: raw nguyên vật liệu, standard buy, tool, gia công ngoài gia công cơ khí, công đoạn đặc biệt, hiệu chuẩn/dịch vụ.</li>
 <li>Rủi ro class phải tính theo <b>ảnh hưởng CTQ, khả năng thay thế, lịch sử lỗi, thời gian dẫn, mức phụ thuộc vào chứng chỉ/scope</b> và ràng buộc khách hàng.</li>
-<li>nguồn đơn (lẻ-source / nguồn đơn) phải ghi rõ tình trạng thay thế / phương án khác source, an toàn tồn kho / mua hàng cửa sổ / khung thời gian / outsource dự phòng. Không được coi nguồn đơn (lẻ-source / nguồn đơn) là tình trạng “bình thường” nếu chưa có biện pháp bảo vệ tiến độ.</li>
+<li>nguồn đơn (lẻ-source / nguồn đơn) phải ghi rõ tình trạng thay thế / phương án khác source, an toàn tồn kho / mua hàng cửa sổ / khung thời gian / outsource dự phòng. Không được coi nguồn đơn (lẻ-source / nguồn đơn) là tình trạng "bình thường" nếu chưa có biện pháp bảo vệ tiến độ.</li>
 </ol>
 <h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</span> Đánh giá nguồn mới, thay đổi nguồn hoặc thay đổi site/quy trình</h3>
 <ol class="tight">
-<li>NCC mới, đổi NCC, đổi site, đổi công đoạn đặc biệt lộ trình gia công hoặc đổi source của vật tư được phê duyệt phải quay lại <b>401-IG1</b>. Không dùng logic “từng làm rồi” để bỏ qua rà soát mới.</li>
+<li>NCC mới, đổi NCC, đổi site, đổi công đoạn đặc biệt lộ trình gia công hoặc đổi source của vật tư được phê duyệt phải quay lại <b>401-IG1</b>. Không dùng logic "từng làm rồi" để bỏ qua rà soát mới.</li>
 <li>Hồ sơ đánh giá tối thiểu phải gồm: hồ sơ pháp lý, năng lực nhóm sản phẩm liên quan, cert/scope, kết quả đánh giá nếu áp dụng, OTD/OTQ lịch sử nếu có, khách hàng phê duyệt nếu bắt buộc.</li>
 <li>Đối với công đoạn đặc biệt, phải kiểm đúng <b>site + quy trình + spec/khách hàng scope + hiệu lực chứng chỉ</b>. Nadcap/QML hoặc danh sách tương đương chỉ là điểm đầu tra cứu; HESEM vẫn phải kiểm cert copy, scope chi tiết, site, hết hạn và điều kiện of use cho từng job.</li>
 <li>Khi phê duyệt chỉ là <b>Có điều kiện</b>, phải ghi rõ phạm vi dùng: part nhóm sản phẩm, thời hạn, lot giới hạn, kiểm tra level tăng cường, và Approver.</li>
@@ -213,7 +194,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <li>Điều khoản <b>thay đổi thông báo</b>: nhà cung cấp không được đổi source, quy trình, site, sub-tier, vật tư tiêu hao quan trọng / nghiêm trọng hoặc lộ trình gia công mà không báo và được chấp thuận.</li>
 </ul></div>
 <div class="callout-card"><h3>Không được phép</h3><ul class="tight">
-<li>Gửi PO chỉ ghi “theo bản vẽ” trong khi job có Requests đặc biệt chưa thể hiện rõ.</li>
+<li>Gửi PO chỉ ghi "theo bản vẽ" trong khi job có Requests đặc biệt chưa thể hiện rõ.</li>
 <li>Phát hành khi chưa rõ cert type hoặc chưa rõ ai chịu trách nhiệm rà soát cert.</li>
 <li>Cho phép nhà cung cấp tự hiểu ngầm Requests quan trọng nhưng không có luồng-xuống / Từng bằng chứng.</li>
 </ul></div>
@@ -222,7 +203,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <ol class="tight">
 <li>Trước khi gửi, Nhân viên mua hàng + Planner + Kho phải xác nhận part/rev, số lượng, lộ trình gia công, Người xử lý, Ngày đến hạn, traveler/bộ hồ sơ công việc (job gói hồ sơ), tình trạng bề mặt Current, Photos bằng chứng nếu job Requests.</li>
 <li><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx">FRM-403</a> phải mô tả rõ quy trình đã Requests, spec, che phủ (masking) / giá đỡ / khung / định hướng / đào tạo hội nhập / chứng kiến mẫu / phiếu / mẫu thử (coupon) nếu áp dụng. <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-404</a> phải pass trước khi giao kiện cho Hậu cần.</li>
-<li>Nếu job đi nhiều Người xử lý liên tiếp, mỗi chặng phải có phát hành riêng; không gom nhiều công đoạn đặc biệt vào một “giao miệng”.</li>
+<li>Nếu job đi nhiều Người xử lý liên tiếp, mỗi chặng phải có phát hành riêng; không gom nhiều công đoạn đặc biệt vào một "giao miệng".</li>
 <li>Hot-job gửi ngoài trong cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) của Kế hoạch phải theo thẩm quyền bậc thang năng lực và ghi rõ ai chịu trách nhiệm tác động tới lịch phân xưởng.</li>
 </ol>
 <h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">6</span> Theo dõi cam kết, chậm giao và sự kiện nhà cung cấp</h3>
@@ -235,7 +216,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <ol class="tight">
 <li>Kho/IQC phải kiểm nhận dạng kiện, số lượng, tình trạng bao gói, niêm phong, label và đối chiếu với PO / outsource Requests.</li>
 <li>Cert rà soát phải xác minh tối thiểu: đúng nhà cung cấp/site, đúng quy trình/spec, đúng lot/batch/mẻ nấu (heat) khi áp dụng, đúng part/rev, ngày/chữ ký hoặc hệ thống chứng thực, và không có dấu hiệu sửa tay/đè file.</li>
-<li>Khi quy trình là công đoạn đặc biệt, nếu cert scope không rõ, hết hạn, hoặc cách diễn đạt không khớp / phù hợp luồng-xuống / Từng, trạng thái phải là <b>TẠM GIỮ</b>. Không nhận “cam kết gửi cert sau” như bằng chứng cho phép dùng.</li>
+<li>Khi quy trình là công đoạn đặc biệt, nếu cert scope không rõ, hết hạn, hoặc cách diễn đạt không khớp / phù hợp luồng-xuống / Từng, trạng thái phải là <b>TẠM GIỮ</b>. Không nhận "cam kết gửi cert sau" như bằng chứng cho phép dùng.</li>
 <li>Khi cần kiểm tra đầu vào, thực hiện theo WI/FRM tương ứng trước khi phát hành về kho/WIP.</li>
 </ol>
 <h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#4338ca,#6366f1)">8</span> Thẻ điểm, SCAR, thử việc và tái đánh giá năng lực</h3>
@@ -262,15 +243,15 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <ol class="tight">
 <li>Nếu khiếu nại hoặc thoát / bỏ qua gốc từ nhà cung cấp / outsource source, file khiếu nại không được đóng khi mới chỉ có giải trình từ nhà cung cấp. HESEM phải đánh giá lại hiệu lực ngăn chặn, lot quét / dọn dẹp, chứng nhận chuỗi và xác suất lỗi còn sót ở mở công việc / đơn hàng / in-tồn kho / đã giao hàng công việc / đơn hàng.</li>
 <li>Khi vấn đề đến từ công đoạn đặc biệt, phải nhìn cả ba lớp bằng chứng: Người xử lý cert/scope, batch-cụ thể cert/hồ sơ và lịch sử ổn định của Người xử lý đối với nhóm sản phẩm/spec đó. Thiếu một trong ba lớp này thì kết luận nguyên nhân chưa đủ.</li>
-<li>Khiếu nại liên quan nhà cung cấp phải phản ánh ngược vào thẻ điểm, rủi ro class và quyết định dùng nguồn cho những job kế tiếp. Không có ngoại lệ “job này giải quyết riêng, job sau vẫn mua như cũ”.</li>
+<li>Khiếu nại liên quan nhà cung cấp phải phản ánh ngược vào thẻ điểm, rủi ro class và quyết định dùng nguồn cho những job kế tiếp. Không có ngoại lệ "job này giải quyết riêng, job sau vẫn mua như cũ".</li>
 </ol>
 <h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">12</span> Đánh giá chu kỳ, tái đánh giá năng lực định kỳ và kiểm chứng tính sẵn sàng của nguồn dự phòng</h3>
 <ol class="tight">
 <li>Supplier / Người xử lý thuộc nhóm rủi ro cao, nguồn đơn (lẻ-source / nguồn đơn) hoặc công đoạn đặc biệt phải có nhịp rà soát định kỳ rõ: hồ sơ còn hiệu lực, scope còn đúng, hiệu suất xu hướng và nhu cầu tái đánh giá năng lực.</li>
 <li>thay thế / phương án khác source nếu có trong danh sách nhưng nhiều tháng không dùng phải được xem xét lại khả năng kích hoạt thật: thời gian dẫn Current, MOQ, điều kiện of use, cert khả dụng / sẵn sàng, khách hàng acceptance và đường hậu cần. Nguồn dự phòng chỉ có giá trị khi có thể dùng được, không phải chỉ vì tên còn nằm trên danh sách.</li>
-<li>Khi nhà cung cấp pass đánh giá nhưng hiệu suất ngoài hiện trường xấu đi, hiệu suất data có ưu tiên cao hơn “điểm đánh giá đẹp”. Đánh giá là bằng chứng hỗ trợ, không thay cho dữ liệu OTD/OTQ thật.</li>
+<li>Khi nhà cung cấp pass đánh giá nhưng hiệu suất ngoài hiện trường xấu đi, hiệu suất data có ưu tiên cao hơn "điểm đánh giá đẹp". Đánh giá là bằng chứng hỗ trợ, không thay cho dữ liệu OTD/OTQ thật.</li>
 </ol>
-<div class="note-soft"><b>Rule cuối cùng của SOP-401:</b> Mua đúng không phải là “mua được hàng”, mà là <b>đưa đúng đầu vào đã kiểm soát</b> vào hệ thống HESEM với đủ bằng chứng để các cổng kiểm soát sau có thể tin cậy.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">13</span> Bộ bằng chứng tối thiểu của một lần nhận hàng hợp lệ</h3>
+<div class="note-soft"><b>Rule cuối cùng của SOP-401:</b> Mua đúng không phải là "mua được hàng", mà là <b>đưa đúng đầu vào đã kiểm soát</b> vào hệ thống HESEM với đủ bằng chứng để các cổng kiểm soát sau có thể tin cậy.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">13</span> Bộ bằng chứng tối thiểu của một lần nhận hàng hợp lệ</h3>
 <ol class="tight">
 <li>Một lần nhận hàng được xem là hợp lệ khi tối thiểu ghép được ba lớp bằng chứng: <b>(1) PO/luồng-xuống / Từng đúng</b>, <b>(2) kiện hàng / nhãn / số lượng đúng</b>, và <b>(3) cert / test / quy trình bằng chứng đúng</b>. Thiếu một lớp thì phiếu nhận / biên nhận không được xem là sạch.</li>
 <li>Đối với công đoạn đặc biệt, phiếu nhận / biên nhận pack tối thiểu phải cho phép Reviewer trả lời ngay ba câu hỏi: Người xử lý này có đúng site/scope không; cert batch này có khớp / phù hợp part/spec/lot không; và lô này có điều kiện đặc biệt nào về clean, pack, kệ-tuổi thọ / vòng đời hay ghi sổ / đăng-quy trình xử lý / vận chuyển không.</li>

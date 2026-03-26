@@ -95,9 +95,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <p>
- SYS-OPS-08 tồn tại để chặn 4 nhóm hỏng hóc gây “thoát lỗi” khỏi phân xưởng:
+ SYS-OPS-08 tồn tại để chặn 4 nhóm hỏng hóc gây "thoát lỗi" khỏi phân xưởng:
  <b>sai phiên bản (Rev)</b>, <b>lẫn lô/lẫn lộn (mix-up)</b>, <b>thiếu/giả chứng từ</b>, <b>vượt qua cổng kiểm soát</b>.
- Power BI được dùng như <b>bảng điều khiển điều hành</b>, không phải “báo cáo đẹp”.
+ Power BI được dùng như <b>bảng điều khiển điều hành</b>, không phải "báo cáo đẹp".
  </p>
 <div class="grid-2">
 <div class="note">
@@ -132,7 +132,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2>3) Vị trí trong chuỗi E2E + luồng bàn giao + điểm chặn</h2>
 <p>
- SYS-OPS-08 chạy xuyên suốt chuỗi E2E để bảo đảm dữ liệu điều hành không bị “đứt” tại các điểm bàn giao.
+ SYS-OPS-08 chạy xuyên suốt chuỗi E2E để bảo đảm dữ liệu điều hành không bị "đứt" tại các điểm bàn giao.
  </p>
 <div class="table-wrap">
 <table class="table">
@@ -185,7 +185,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>QC/QA</td>
 <td>NCRLog, QCHoldLog, CAPA8D</td>
 <td>Quality bảng điều khiển tổng quan</td>
-<td>TẠM GIỮ CTQ chưa đóng + vẫn “Lam Ready” → chặn giao hàng (CHẶN SHIP / chặn giao hàng)</td>
+<td>TẠM GIỮ CTQ chưa đóng + vẫn "Lam Ready" → chặn giao hàng (CHẶN SHIP / chặn giao hàng)</td>
 </tr>
 <tr>
 <td>NCR/MRB</td>
@@ -234,7 +234,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế)</h2>
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
-<li><b>Sai pSiteUrl</b> → truy vấn lấy nhầm site, dữ liệu “đúng cú pháp, sai thực tế”.</li>
+<li><b>Sai pSiteUrl</b> → truy vấn lấy nhầm site, dữ liệu "đúng cú pháp, sai thực tế".</li>
 <li><b>Tên list không khớp</b> (JobIndex vs Job Index) → fnGetSharePointList báo không tìm thấy, làm mới fail.</li>
 <li><b>List bị trùng tên hiển thị</b> → fnGetSharePointList báo trùng lặp, làm mới fail.</li>
 <li><b>Cột SharePoint có khoảng trắng</b> nhưng mô hình dùng tên đã bỏ khoảng trắng → đo lường lỗi, trực quan trống.</li>
@@ -242,12 +242,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Power truy vấn lỗi cú pháp</b> trong file mốc chuẩn: <span class="mono">JobIndex.pq</span> thiếu dấu phẩy sau bước <span class="mono">đã nhập</span> → làm mới fail toàn bộ.</li>
 <li><b>mở rộng siêu liên kết/person không đồng nhất</b> → diễn tập-xuyên suốt link trống, đánh giá không truy xuất nguồn gốc.</li>
 <li><b>DAX dùng bảng giữ chỗ</b> (DispatchPlan/WIPTracker) chưa tồn tại → mô hình công bố / phát hành được nhưng KPI lỗi.</li>
-<li><b>Quan hệ mô hình sai hướng lọc</b> → KPI đếm chồng, báo “Lam Ready” sai.</li>
+<li><b>Quan hệ mô hình sai hướng lọc</b> → KPI đếm chồng, báo "Lam Ready" sai.</li>
 <li><b>Làm mới chạy bằng tài khoản cá nhân</b> → khi đổi mật khẩu/nhân sự nghỉ → làm mới fail.</li>
 <li><b>Làm mới lịch trình lệch ca</b> → bảng điều khiển dùng dữ liệu cũ trong thời điểm quyết định.</li>
 <li><b>Công bố thẳng PROD</b> → vượt qua UAT, không có BI_ReleaseNotes, không hoàn tác / quay lại.</li>
 <li><b>RLS cấu hình sai</b> → rò dữ liệu khách hàng, vi phạm bảo mật.</li>
-<li><b>Không khóa “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”</b> → dùng KPI thay bằng chứng, tạo khách hàng thoát / bỏ qua.</li>
+<li><b>Không khóa "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)"</b> → dùng KPI thay bằng chứng, tạo khách hàng thoát / bỏ qua.</li>
 </ol>
 </div>
 <!-- 5) Risk Controls -->
@@ -286,7 +286,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>CP4 — Review đồng cấp DAX/KPI (2 Người)</td>
 <td>QA/QMS + Supervisor</td>
-<td>BI_ReleaseNotes có mục “KPI đã thay đổi” + Người duyệt</td>
+<td>BI_ReleaseNotes có mục "KPI đã thay đổi" + Người duyệt</td>
 <td>KPI đổi không duyệt → CHẶN PROD</td>
 </tr>
 <tr>
@@ -325,7 +325,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li>Khi bảng điều khiển dùng dữ liệu cũ hơn ngưỡng ca (dấu thời gian không cập nhật) và vẫn có quyết định SHIP/GO đang chờ.</li>
 <li>Khi diễn tập-xuyên suốt không mở tới EvidenceFolderUrl hoặc link bằng chứng chính (bộ hồ sơ giao hàng (ship gói hồ sơ)/IR/FAI) trống.</li>
-<li>Khi phát hiện KPI “Lam Ready %” tăng đột biến trong lúc tạm giữ QC (QCHold)/NCR mở tăng.</li>
+<li>Khi phát hiện KPI "Lam Ready %" tăng đột biến trong lúc tạm giữ QC (QCHold)/NCR mở tăng.</li>
 </ul>
 </div>
 <div class="gate">
@@ -371,11 +371,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>ShipRelease bị CHẶN tăng đột biến</td>
-<td>Kho kiểm tra các cột cổng kiểm soát (PacketComplete/PackagingPass/FinalInspectionPass/ReconciliationStatus) và xác định “thiếu bằng chứng” hay “lỗi dữ liệu”.</td>
+<td>Kho kiểm tra các cột cổng kiểm soát (PacketComplete/PackagingPass/FinalInspectionPass/ReconciliationStatus) và xác định "thiếu bằng chứng" hay "lỗi dữ liệu".</td>
 <td>ShipRelease chặn / khóa lý do + link bằng chứng bổ sung</td>
 </tr>
 <tr>
-<td>Hold/NCR mở tăng trong khi KPI “Ready” tăng</td>
+<td>Hold/NCR mở tăng trong khi KPI "Ready" tăng</td>
 <td>QA chạy kiểm tra chéo: QCHoldLog/NCRLog/CAPA8D đối chiếu ShipRelease list; xác định vượt qua cổng kiểm soát.</td>
 <td>BI_IncidentLog + biên bản quyết định TẠM GIỮ</td>
 </tr>
@@ -462,7 +462,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>DAX/KPI</td>
-<td>Dán template; thay giữ chỗ; khóa logic “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”</td>
+<td>Dán template; thay giữ chỗ; khóa logic "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)"</td>
 <td>KPI sai hoặc thiếu cổng kiểm soát tạo khách hàng thoát / bỏ qua</td>
 </tr>
 <tr>
@@ -541,14 +541,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>10.1 Bài kiểm tra nhanh (≥ 20 câu; trắc Nhiệm + tình huống ngắn)</h3>
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
 <li>pSiteUrl dùng để làm gì và đặt ở đâu trong Power BI?</li>
-<li>Khi fnGetSharePointList báo “not phát hiện or trùng lặp”, hành động chặn là gì?</li>
+<li>Khi fnGetSharePointList báo "not phát hiện or trùng lặp", hành động chặn là gì?</li>
 <li>Trường hợp DueDate là text, KPI nào hỏng trước và dấu hiệu nhận biết?</li>
 <li>Vì sao cần mở rộng siêu liên kết cột trước khi dùng diễn tập-xuyên suốt?</li>
-<li>Định nghĩa “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” trong Trung tâm điều hành.</li>
+<li>Định nghĩa "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)" trong Trung tâm điều hành.</li>
 <li>Điều kiện CHẶN công bố / phát hành PROD.</li>
 <li>Khi làm mới fail trong ca, ai ra quyết định và MRR nào bắt buộc?</li>
 <li>Giải thích vì sao ngôi sao / đánh dấu sơ đồ cấu trúc làm KPI ổn định hơn (một ý).</li>
-<li>Chỉ ra 2 lỗi tạo KPI “Lam Ready” sai.</li>
+<li>Chỉ ra 2 lỗi tạo KPI "Lam Ready" sai.</li>
 <li>Khi RLS sai, hành động 60 giây là gì?</li>
 <li>Trong measures_template, tên 2 bảng giữ chỗ là gì và xử lý ra sao?</li>
 <li>Kiểu dữ liệu cho EpicorLastUpdated là gì và vì sao?</li>
@@ -556,7 +556,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Responsible Person Làm mới tài khoản phải thuộc loại nào và vì sao?</li>
 <li>Biên bản UAT tối thiểu phải chứng minh điều gì?</li>
 <li>điểm kiểm soát nào khóa sơ đồ cấu trúc list và bằng chứng tương ứng?</li>
-<li>Chỉ ra 1 dấu hiệu dữ liệu “đúng cú pháp, sai thực tế”.</li>
+<li>Chỉ ra 1 dấu hiệu dữ liệu "đúng cú pháp, sai thực tế".</li>
 <li>Quy tắc STOP khi bảng điều khiển dùng dữ liệu cũ hơn ngưỡng ca.</li>
 <li>NCR/CAPA tuổi tồn dùng để chặn rủi ro gì trong phân xưởng?</li>
 <li>Khi ShipRelease bị chặn tăng, 4 cột cổng kiểm soát phải kiểm tra là gì?</li>
@@ -585,7 +585,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div class="card" style="margin-top:10px">
-<b>Tình huống 3 — KPI “Ready” tăng nhưng Hold tăng</b>
+<b>Tình huống 3 — KPI "Ready" tăng nhưng Hold tăng</b>
 <p class="muted" style="margin:6px 0 0 0">
  Trang Điều hành báo Lam Ready % tăng 15% trong 1 giờ. Trang Quality báo Hold CTQ Mở tăng 3 mục và NCR Mở tăng 2 mục.
  </p>

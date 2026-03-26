@@ -36,7 +36,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="doc-content" id="docContent"><h1>C10 — Hiểu quy trình Lệnh sản xuất CNC (RFQ → Cash) — Level 4</h1>
-<p class="lead"><strong>Level 4 — Thiết kế hệ thống RFQ→Cash (Operating System) &amp; governance.</strong> Mô-đun này giúp nhân sự hiểu và vận hành chuỗi RFQ → Cash bằng “cổng kiểm soát + hồ sơ”, giữ đúng revision set và bàn giao không mất thông tin.</p>
+<p class="lead"><strong>Level 4 — Thiết kế hệ thống RFQ→Cash (Operating System) &amp; governance.</strong> Mô-đun này giúp nhân sự hiểu và vận hành chuỗi RFQ → Cash bằng "cổng kiểm soát + hồ sơ", giữ đúng revision set và bàn giao không mất thông tin.</p>
 <div class="hero">
 <h2>Chuẩn thực chiến – Level 4</h2>
 <div class="meta">
@@ -69,7 +69,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card">
 <ul>
-<li>Đưa mọi Người về cùng một “bản đồ công việc”: RFQ → Báo giá → Khởi động → ENG phát hành → Thực thi → QC → Ship → Hóa đơn.</li>
+<li>Đưa mọi Người về cùng một "bản đồ công việc": RFQ → Báo giá → Khởi động → ENG phát hành → Thực thi → QC → Ship → Hóa đơn.</li>
 <li>Chặn 3 rủi ro lớn của phân xưởng gia công theo đơn (job xưởng) CNC: <strong>sai phiên bản</strong>, <strong>thiếu chứng từ</strong>, <strong>bàn giao mất thông tin</strong>.</li>
 <li>Biến hiểu biết thành hành động: bảng kiểm + OJT + hiệu suất test + MRR để vận hành QMS hàng ngày.</li>
 </ul>
@@ -105,7 +105,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Vận hành</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Đọc job pack</td><td>Xác nhận JobNum/PartNo/REV và Requests đặc biệt</td><td>Ngăn sai phiên bản và bỏ sót CTQ</td></tr><tr><td>2</td><td>Nhận diện cổng kiểm soát</td><td>Xác định cổng kiểm soát Current và điều kiện ra cổng kiểm soát</td><td>Không nhảy cổng kiểm soát</td></tr><tr><td>3</td><td>Chuẩn bị hồ sơ</td><td>Mở đúng biểu mẫu, điền đúng trường bắt buộc</td><td>sẵn sàng cho đánh giá</td></tr><tr><td>4</td><td>Thực thi &amp; ghi nhận</td><td>Ghi theo thời điểm phát sinh; lưu SSOT</td><td>Dữ liệu có giá trị</td></tr><tr><td>5</td><td>TẠM GIỮ &amp; escal</td><td>Kích hoạt TẠM GIỮ/STOP/CHẶN đúng rule</td><td>Chặn lỗi lan rộng</td></tr><tr><td>6</td><td>Bàn giao</td><td>Bàn giao bằng link SSOT + bảng kiểm + Người nhận xác nhận</td><td>Không mất thông tin</td></tr></tbody></table></div>
 <h3>OJT đầu ra bắt buộc</h3>
 <ul>
-<li>01 trang “Job 5 dòng” (JobNum/PartNo/REV/CTQ/Ngày đến hạn/công đoạn đặc biệt) lưu vào SSOT.</li>
+<li>01 trang "Job 5 dòng" (JobNum/PartNo/REV/CTQ/Ngày đến hạn/công đoạn đặc biệt) lưu vào SSOT.</li>
 <li>01 bảng kiểm xác nhận cổng kiểm soát mức sẵn sàng (G0/G2/G3 theo phạm vi) và link SSOT.</li>
 <li>01 hồ sơ TẠM GIỮ + 01 hành động đóng trong Ngày cho tình huống giả lập thiếu MRR.</li>
 </ul>

@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>PM định kỳ → sự cố hỏng máy phản hồi → cơ bản tiện ích hỗ trợ → khôi phục tính sẵn sàng máy theo chuẩn an toàn.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>Maintenance Technician là đầu mối duy trì tình trạng sẵn sàng của thiết bị sản xuất thông qua phòng ngừa bảo trì, sự cố hỏng máy phản hồi, quản lý phụ tùng trọng yếu và phối hợp kỹ thuật với các nhà cung cấp bên ngoài.</p><p>Vị trí này giúp nhà máy tránh thời gian Từng máy lặp, khôi phục máy an toàn sau sự cố và bảo đảm thiết bị chỉ được đưa lại sản xuất khi đã được xác nhận đủ điều kiện.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>PM được thực hiện đúng kế hoạch, đúng hồ sơ và tạo ra giảm hỏng hóc thực sự chứ không chỉ “ký xong”.</li><li>Sự cố máy được phản ứng nhanh, có ngăn chặn an toàn, có nguyên nhân gốc và có theo dõi tái phát.</li><li>Quan trọng phụ tùng / nhà cung cấp / hồ sơ bảo trì được quản rõ ràng để không kéo dài thời gian Từng máy vì thiếu chuẩn bị.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Maintenance Technician chịu trách nhiệm tính sẵn sàng và an toàn vận hành của thiết bị; không tự quyết định thay đổi phương pháp gia công, tiêu chuẩn chất lượng hay cho máy chạy khi chưa đạt điều kiện kỹ thuật/an toàn.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Bảo đảm máy, đồ gá và hạ tầng phụ trợ sẵn sàng theo cửa sổ PM/sự cố hỏng máy phản ứng nhanh, không để “máy chạy được” thay cho “máy đủ điều kiện phát hành”.</li><li>Mọi sự cố hỏng máy/sự cố nghiêm trọng phải được xử lý như một sự kiện có RCA, trạng thái cách ly, điều kiện phát hành lại và bài học phòng ngừa lặp lại.</li><li>Kết nối chặt với Phân xưởng/Planner/Setup để dữ liệu thời gian Từng máy và machine trạng thái phản ánh ngay vào quyết định điều độ.</li></ul></div>
+<div class="jd-mission"><p>Maintenance Technician là đầu mối duy trì tình trạng sẵn sàng của thiết bị sản xuất thông qua phòng ngừa bảo trì, sự cố hỏng máy phản hồi, quản lý phụ tùng trọng yếu và phối hợp kỹ thuật với các nhà cung cấp bên ngoài.</p><p>Vị trí này giúp nhà máy tránh thời gian Từng máy lặp, khôi phục máy an toàn sau sự cố và bảo đảm thiết bị chỉ được đưa lại sản xuất khi đã được xác nhận đủ điều kiện.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>PM được thực hiện đúng kế hoạch, đúng hồ sơ và tạo ra giảm hỏng hóc thực sự chứ không chỉ "ký xong".</li><li>Sự cố máy được phản ứng nhanh, có ngăn chặn an toàn, có nguyên nhân gốc và có theo dõi tái phát.</li><li>Quan trọng phụ tùng / nhà cung cấp / hồ sơ bảo trì được quản rõ ràng để không kéo dài thời gian Từng máy vì thiếu chuẩn bị.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Maintenance Technician chịu trách nhiệm tính sẵn sàng và an toàn vận hành của thiết bị; không tự quyết định thay đổi phương pháp gia công, tiêu chuẩn chất lượng hay cho máy chạy khi chưa đạt điều kiện kỹ thuật/an toàn.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Bảo đảm máy, đồ gá và hạ tầng phụ trợ sẵn sàng theo cửa sổ PM/sự cố hỏng máy phản ứng nhanh, không để "máy chạy được" thay cho "máy đủ điều kiện phát hành".</li><li>Mọi sự cố hỏng máy/sự cố nghiêm trọng phải được xử lý như một sự kiện có RCA, trạng thái cách ly, điều kiện phát hành lại và bài học phòng ngừa lặp lại.</li><li>Kết nối chặt với Phân xưởng/Planner/Setup để dữ liệu thời gian Từng máy và machine trạng thái phản ánh ngay vào quyết định điều độ.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

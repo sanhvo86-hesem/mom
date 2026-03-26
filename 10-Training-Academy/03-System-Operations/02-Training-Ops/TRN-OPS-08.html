@@ -54,7 +54,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="badge"><span class="dot"></span>Mô-đun TRN-OPS-08</div>
  <h1 style="margin-top:10px">Cấu hình &amp; Phiên bản Control for CNC (Sai‑Rev Phòng ngừa)</h1>
  <p class="muted">
- Mục tiêu: giảm “sai phiên bản / sai program” về <b>0</b> bằng 3 lớp kiểm soát:
+ Mục tiêu: giảm "sai phiên bản / sai program" về <b>0</b> bằng 3 lớp kiểm soát:
  <b>(1) Bộ hồ sơ chuẩn (mốc chuẩn gói hàng)</b> (đúng file, đúng Rev),
  <b>(2) Cổng kiểm soát (gate) kiểm tra</b> (Kế hoạch phát hành → Job khởi động → Mẫu đầu (tiên chi tiết / sản phẩm),
  <b>(3) Cấu hình đánh giá</b> (đối chiếu as‑đã xây dựng ↔ Requests).
@@ -64,7 +64,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <strong>Thông tin triển khai</strong>
  <ul>
  <li><strong>Đối tượng (bắt buộc):</strong> Lập trình viên (CNC)/CAM, Setup/Trưởng nhóm, QC/QA (CMM), Planner/Nhân viên điều phối, Supervisor.</li>
- <li><strong>Thời lượng:</strong> 60’ lý thuyết + 60’ phân xưởng trên 1 job thật + 15’ bài kiểm tra nhanh.</li>
+ <li><strong>Thời lượng:</strong> 60' lý thuyết + 60' phân xưởng trên 1 job thật + 15' bài kiểm tra nhanh.</li>
  <li><strong>Tài liệu nền:</strong> <a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP‑QMS‑020</a>, <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">PROC‑CNC‑002</a>, <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a>, <a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//02-WI-200//">WI‑OPS‑001</a>.</li>
  </ul>
  <div class="mini"><b>Thông điệp:</b> Nếu không chứng minh được đúng Rev → <b>STOP/TẠM GIỮ</b>.</div>
@@ -109,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="callout">
  <h3>(1) Bộ hồ sơ chuẩn</h3>
  <ul class="list">
- <li>Tập file “đúng Rev” được phát hành 1 lần, có bảng kê/tổng kiểm tra.</li>
+ <li>Tập file "đúng Rev" được phát hành 1 lần, có bảng kê/tổng kiểm tra.</li>
  <li>Không dùng file rời (email/Zalo/USB) để chạy sản xuất.</li>
  <li>Được đối chiếu tại: Kế hoạch phát hành → Job khởi động → Mẫu đầu.</li>
  </ul>
@@ -143,7 +143,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <li>Bộ hồ sơ chuẩn có bảng kê/tổng kiểm tra và đúng Part/Rev?</li>
  <li>Setup sheet hiển thị Program ID/Rev/Tool list/không / bằng không điểm?</li>
  <li>Chương trình trên máy = program phát hành (ID/Rev)?</li>
- <li>kế hoạch kiểm tra (plan) có CTQ phương pháp + gage “xanh lá”?</li>
+ <li>kế hoạch kiểm tra (plan) có CTQ phương pháp + gage "xanh lá"?</li>
  <li>Nếu dùng CMM: FRM‑QA‑016 pass và báo cáo đo có Program ID/Rev?</li>
  <li>Nếu outsource: APL/scope/cert truy vết đầy đủ?</li>
  <li>Traveler/nhãn phản ánh đúng Rev &amp; truy vết lot?</li>
@@ -169,7 +169,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="callout">
  <h3>Bài kiểm tra nhanh (10 câu — bắt buộc)</h3>
  <ol class="list">
- <li>“One source of sự thật” nghĩa là gì trong cấu hình?</li>
+ <li>"One source of sự thật" nghĩa là gì trong cấu hình?</li>
  <li>Nêu 3 điểm dễ sai Rev nhất trong CNC.</li>
  <li>FRM‑QA‑017 dùng khi nào?</li>
  <li>Tại sao cần hiển thị Program ID/Rev trên báo cáo đo?</li>
@@ -178,8 +178,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
  <div class="note">
  <h3>Tình huống</h3>
- <p class="mini">Giảng viên đưa 1 bộ job pack có 1 lỗi “không khớp” (ví dụ: drawing Rev B, phiếu cài đặt Rev A). Học viên phải phát hiện và nêu đúng cổng kiểm soát/hồ sơ để TẠM GIỮ.</p>
- <p class="mini"><b>Pass:</b> phát hiện không khớp + nêu đúng cổng kiểm soát + tạo đúng bằng chứng (QC hold/log). <b>Fail:</b> đề xuất “chạy tạm rồi sửa sau”.</p>
+ <p class="mini">Giảng viên đưa 1 bộ job pack có 1 lỗi "không khớp" (ví dụ: drawing Rev B, phiếu cài đặt Rev A). Học viên phải phát hiện và nêu đúng cổng kiểm soát/hồ sơ để TẠM GIỮ.</p>
+ <p class="mini"><b>Pass:</b> phát hiện không khớp + nêu đúng cổng kiểm soát + tạo đúng bằng chứng (QC hold/log). <b>Fail:</b> đề xuất "chạy tạm rồi sửa sau".</p>
  </div>
  </div>
  </div>

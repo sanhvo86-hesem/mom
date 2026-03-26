@@ -83,8 +83,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><th>Vai trò</th><th>Phần áp dụng riêng trong mô-đun</th><th>Tiêu chí đạt tối thiểu</th></tr>
 <tr><td><b>Operator</b></td><td>Dùng đúng bản Released; tạo bằng chứng tại Point-of-use (ki-ốt/dòng / chuyền); phản ứng 60 giây khi phát hiện sai Rev/lẫn lộn (mix-up)</td><td>Thực hiện đúng 5 bước kiểm tra Rev trước vận hành + ghi MRR 01 tình huống TẠM GIỮ</td></tr>
 <tr><td><b>Setup</b></td><td>Đối chiếu Rev giữa bản vẽ–phiếu cài đặt–program; khóa thay đổi sau kết thúc / đóng hồ sơ; nộp bằng chứng setup</td><td>Hoàn tất bảng kiểm step liên quan setup + tạo đủ bằng chứng theo đặt tên rule</td></tr>
-<tr><td><b>Lập trình viên (CNC)</b></td><td>Quy tắc quản lý chương trình CNC theo Released/Draft; có thể truy xuất program đầu ra; chặn chạy program chưa Released</td><td>Thiết lập 01 tình huống “Released vs Draft” đạt acceptance test TC-01</td></tr>
-<tr><td><b>QC</b></td><td>Kiểm tra tính toàn vẹn hồ sơ; truy xuất nguồn gốc hồ sơ ≤3 phút; phát hiện thiếu gói hồ sơ thì CHẶN Ship</td><td>Chạy 01 tình huống “bộ hồ sơ giao hàng (ship gói hồ sơ) thiếu IR” và ra quyết định CHẶN + ghi MRR</td></tr>
+<tr><td><b>Lập trình viên (CNC)</b></td><td>Quy tắc quản lý chương trình CNC theo Released/Draft; có thể truy xuất program đầu ra; chặn chạy program chưa Released</td><td>Thiết lập 01 tình huống "Released vs Draft" đạt acceptance test TC-01</td></tr>
+<tr><td><b>QC</b></td><td>Kiểm tra tính toàn vẹn hồ sơ; truy xuất nguồn gốc hồ sơ ≤3 phút; phát hiện thiếu gói hồ sơ thì CHẶN Ship</td><td>Chạy 01 tình huống "bộ hồ sơ giao hàng (ship gói hồ sơ) thiếu IR" và ra quyết định CHẶN + ghi MRR</td></tr>
 <tr><td><b>QA</b></td><td>Định nghĩa đạt/không đạt; chạy acceptance kiểm Nhiệm; ký ký-off go-Live; quản trị bộ bằng chứng</td><td>Ký đúng 01 bộ kết quả UAT/Acceptance + phát hành đánh giá pack</td></tr>
 <tr><td><b>Kho</b></td><td>phê duyệt giao hàng (ship phát hành) Người xác nhận; kiểm tra gói hồ sơ; kiểm soát nhãn/truy xuất nguồn gốc; chặn / khóa rủi ro giao hàng</td><td>Chứng minh 0 lần ship thiếu gói hồ sơ trong bài test + lưu bằng chứng</td></tr>
 <tr><td><b>Mua hàng</b></td><td>Kiểm soát tài liệu nhà cung cấp; điều kiện đặc biệt (công đoạn đặc biệt); lưu chứng từ đúng nơi</td><td>Gắn đúng Requests chứng từ vào lập kế hoạch gói hồ sơ + lưu đúng path</td></tr>
@@ -92,7 +92,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Bảo trì</b></td><td>Lưu/hiệu chuẩn hồ sơ; chặn sử dụng gage OOT; liên kết OOT với hold</td><td>Chạy phản ứng 60 giây cho tình huống gage OOT + ghi MRR</td></tr>
 <tr><td><b>EHS</b></td><td>Lưu hồ sơ an toàn liên quan thay đổi layout/ki-ốt/thiết bị; chặn vượt qua PPE/LOTO</td><td>Kiểm tra bằng chứng EHS trong thay đổi gói hàng + ký xác nhận</td></tr>
 <tr><td><b>Người định giá (SAL-03)</b></td><td>Đưa điều khoản hợp đồng về lưu giữ/bảo mật; xác nhận bên ngoài chia sẻ scope</td><td>Xác nhận đúng 01 lưu giữ tier + rào chắn / quy định bảo vệ bên ngoài theo hợp đồng</td></tr>
-<tr><td><b>Supervisor</b></td><td>Quyết định TẠM GIỮ/GO; cưỡng chế “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”; phân công OJT</td><td>Thực hiện rà soát 01 thay đổi gói hàng và ra quyết định dựa trên bằng chứng</td></tr>
+<tr><td><b>Supervisor</b></td><td>Quyết định TẠM GIỮ/GO; cưỡng chế "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)"; phân công OJT</td><td>Thực hiện rà soát 01 thay đổi gói hàng và ra quyết định dựa trên bằng chứng</td></tr>
 </table>
 <div class="note">
 <strong>Liên kết HESEM nội bộ</strong>
@@ -104,9 +104,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div>
 <div class="card" id="sec3">
-<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + “điểm chặn”</h2>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + "điểm chặn"</h2>
 <h3>3.1 Vị trí trong chuỗi E2E</h3>
-<p>Mô-đun kích hoạt mạnh nhất tại các đoạn: <b>Báo giá/Hợp đồng → Kế hoạch → Kỹ thuật</b> (định nghĩa Requests, IA, lưu giữ, truy cập) và kéo xuyên suốt đến <b>Ship</b> (phê duyệt giao hàng gói hồ sơ). Mô-đun này tạo “hạ tầng bằng chứng” cho toàn chuỗi.</p>
+<p>Mô-đun kích hoạt mạnh nhất tại các đoạn: <b>Báo giá/Hợp đồng → Kế hoạch → Kỹ thuật</b> (định nghĩa Requests, IA, lưu giữ, truy cập) và kéo xuyên suốt đến <b>Ship</b> (phê duyệt giao hàng gói hồ sơ). Mô-đun này tạo "hạ tầng bằng chứng" cho toàn chuỗi.</p>
 <p><b>Điểm chặn chính:</b> Không GO-Live cấu hình; không phát hành Released template; không ship; không mở bên ngoài chia sẻ khi thiếu Xây dựng Sheet đã xác nhận hiệu lực + bộ bằng chứng.</p>
 <h3>3.2 Luồng bàn giao bắt buộc (Đầu vào → Đầu ra)</h3>
 <table class="form-table">
@@ -160,12 +160,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li>Cài đặt ID không duy nhất → bằng chứng không truy vết được → đánh giá không đạt.</li>
 <li>Xây dựng Sheet thiếu Acceptance Test → QA không có chuẩn đạt/không đạt → go-Live cảm tính.</li>
-<li>IT vừa cấu hình vừa tự ký “đạt” → vi phạm SoD → đánh giá không đạt.</li>
+<li>IT vừa cấu hình vừa tự ký "đạt" → vi phạm SoD → đánh giá không đạt.</li>
 <li>Evidence chụp thiếu ngữ cảnh (không thấy site/thư viện/giá trị cài đặt) → bằng chứng vô hiệu.</li>
 <li>Evidence bị cắt/ghi chú đè lên bản gốc → mất tính toàn vẹn hồ sơ.</li>
 <li>Lưu giữ label gắn sai scope → hồ sơ hết hạn sớm hoặc không khoá xoá → mất hồ sơ.</li>
 <li>External chia sẻ mở vượt mốc chuẩn → rò dữ liệu khách hàng → NCR/MRB + vi phạm hợp đồng.</li>
-<li>quyền / sự cho phép “ngắt / nghỉ” theo từng file → quyền rơi rớt, không rà soát được → lộ/thiếu quyền.</li>
+<li>quyền / sự cho phép "ngắt / nghỉ" theo từng file → quyền rơi rớt, không rà soát được → lộ/thiếu quyền.</li>
 <li>Người dùng thấy Draft và sử dụng Draft thay Released → sai Rev → phế phẩm/làm lại.</li>
 <li>Job kết thúc / đóng hồ sơ không khoá đọc-chỉ / duy nhất → chỉnh sửa sau khi ship → mất truy xuất nguồn gốc.</li>
 <li>phê duyệt giao hàng không chặn gói hồ sơ thiếu IR/COC/cal cert → ship sai → khiếu nại / Requests bồi thường khách hàng.</li>
@@ -238,7 +238,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Sai phiên bản (vẽ/program/phiếu cài đặt)</td>
 <td>DỪNG vận hành; treo thẻ TẠM GIỮ; chụp ảnh màn hình vị trí file + Rev; thông báo Supervisor + QA.</td>
 <td>Operator/Setup/Lập trình viên (CNC)</td>
-<td>01 log TẠM GIỮ + ảnh bằng chứng “Released vs Draft” + link Hồ sơ công việc</td>
+<td>01 log TẠM GIỮ + ảnh bằng chứng "Released vs Draft" + link Hồ sơ công việc</td>
 </tr>
 <tr>
 <td>Lẫn lộn/lẫn lô hoặc nhãn truy xuất nguồn gốc sai</td>
@@ -248,7 +248,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Thiếu bằng chứng/bằng chứng không truy xuất nguồn gốc</td>
-<td>CHẶN cổng kiểm soát; ghi “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”; mở phiếu Requests truy xuất nguồn gốc; không tiếp tục bước kế tiếp.</td>
+<td>CHẶN cổng kiểm soát; ghi "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)"; mở phiếu Requests truy xuất nguồn gốc; không tiếp tục bước kế tiếp.</td>
 <td>Bất kỳ vai trò tại cổng kiểm soát</td>
 <td>01 phiếu Requests + ghi chú cổng kiểm soát + ảnh màn hình lỗi truy xuất nguồn gốc</td>
 </tr>
@@ -273,7 +273,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="card" id="sec8">
-<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Evidence/MRR, “lỗi điển hình”</h2>
+<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Evidence/MRR, "lỗi điển hình"</h2>
 <table class="form-table">
 <tr><th>#</th><th>Bước vận hành</th><th>Responsible Person</th><th>Evidence/MRR</th><th>Lỗi điển hình cần chặn</th></tr>
 <tr><td>1</td><td>Xác nhận scope thay đổi + điểm chặn (GO-Live/SHIP)</td><td>Supervisor</td><td>CR/Scope note + quyết định cổng kiểm soát</td><td>Scope mơ hồ, thiếu bước ảnh hưởng</td></tr>
@@ -295,7 +295,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card" id="sec9">
 <h2>9) OJT thực chiến theo TWI</h2>
 <h3>9.1 Job Sự cố hỏng máy (Step / Điểm then chốt / Lý do)</h3>
-<p><b>Nhiệm vụ OJT:</b> triển khai 01 thay đổi thật (hoặc tình huống mô phỏng có dữ kiện) và tạo đủ gói hàng “Đã xác nhận hiệu lực Xây dựng Sheet + Evidence + Acceptance Kiểm Nhiệm + Bàn giao”.</p>
+<p><b>Nhiệm vụ OJT:</b> triển khai 01 thay đổi thật (hoặc tình huống mô phỏng có dữ kiện) và tạo đủ gói hàng "Đã xác nhận hiệu lực Xây dựng Sheet + Evidence + Acceptance Kiểm Nhiệm + Bàn giao".</p>
 <table class="form-table">
 <tr><th>Step</th><th>Điểm then chốt</th><th>Lý do (lý do vận hành)</th></tr>
 <tr>
@@ -340,7 +340,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>01 bộ bằng chứng gốc cho 15 Cài đặt ID, đúng đặt tên rule, đúng kho lưu.</li>
 <li>01 bảng kết quả acceptance kiểm Nhiệm (TC-01…TC-05 + 02 test theo ANNEX-QMS-013).</li>
 <li>01 bàn giao gói hàng IT → QA/IMS: Photos trạng thái nhóm/tư cách thành viên, site quyền truy cập, lưu giữ nhãn/chính sách, DLP chính sách, bên ngoài khách.</li>
-<li>01 quyết định cổng kiểm soát (TẠM GIỮ hoặc GO) dựa trên bằng chứng; ghi rõ “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”.</li>
+<li>01 quyết định cổng kiểm soát (TẠM GIỮ hoặc GO) dựa trên bằng chứng; ghi rõ "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)".</li>
 </ul>
 <h3>9.3 Tiêu chí đánh giá L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn khi đạt)</h3>
 <table class="form-table">
@@ -384,16 +384,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>10.1 Bài kiểm tra nhanh (≥20 câu; trắc Nhiệm + tình huống ngắn)</h3>
 <ol>
 <li>(MC) Mục tiêu cứng của Xây dựng Sheet là gì? A) Tăng tốc triển khai B) Đơn lẻ source cho cấu hình QMS + acceptance kiểm Nhiệm + bằng chứng truy vết C) Ghi chú cá nhân D) Lưu cấu hình ngoài kiểm soát</li>
-<li>(MC) Khi 1 Người vừa cấu hình vừa ký “đạt”, vi phạm nguyên tắc nào? A) 5S B) SoD C) FIFO D) TPM</li>
+<li>(MC) Khi 1 Người vừa cấu hình vừa ký "đạt", vi phạm nguyên tắc nào? A) 5S B) SoD C) FIFO D) TPM</li>
 <li>(MC) Evidence đánh giá-cấp / hạng phải thể hiện tối thiểu điều gì? A) Ảnh đẹp B) Bối cảnh tổ chức thuê (tenant)/site/thư viện + giá trị cài đặt + Cài đặt ID C) logo D) Chat tin nhắn / thông điệp</li>
 <li>(MC) Đặt tên rule bằng chứng chuẩn là gì? A) SettingID.ext B) YYYYQ#_SETTINGID_ShortName.ext C) Screenshot1.png D) AnyName.png</li>
 <li>(MC) Kho lưu bằng chứng IT theo SOP-QMS-012 là gì? A) máy tính bàn B) Email C) QMS-Hồ sơ/J_IT_Backup_and_Access_Evidence/YYYY/Q# D) USB</li>
-<li>(MC) Ai định nghĩa “đạt/không đạt” cho cấu hình ảnh hưởng QMS? A) IT B) QA/QMS C) Operator D) Kinh doanh</li>
-<li>(MC) Acceptance test TC-01 “Released vs Draft” kiểm tra điều gì? A) Màu file B) Người dùng tiêu chuẩn chỉ thấy Released, không công bố / phát hành lớn / nghiêm trọng C) Tốc độ mạng D) In ấn</li>
+<li>(MC) Ai định nghĩa "đạt/không đạt" cho cấu hình ảnh hưởng QMS? A) IT B) QA/QMS C) Operator D) Kinh doanh</li>
+<li>(MC) Acceptance test TC-01 "Released vs Draft" kiểm tra điều gì? A) Màu file B) Người dùng tiêu chuẩn chỉ thấy Released, không công bố / phát hành lớn / nghiêm trọng C) Tốc độ mạng D) In ấn</li>
 <li>(MC) Acceptance test TC-03 kiểm tra gì? A) DLP chặn chia sẻ bên ngoài cho tài liệu nhạy cảm B) 5S C) tuổi dao (tool tuổi thọ / vòng đời) D) Cycle time</li>
-<li>(MC) “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” áp dụng trực tiếp tại đâu? A) Khu ăn B) Cổng kiểm soát GO-Live/SHIP/QC phát hành C) Chấm công D) Bảo trì</li>
+<li>(MC) "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)" áp dụng trực tiếp tại đâu? A) Khu ăn B) Cổng kiểm soát GO-Live/SHIP/QC phát hành C) Chấm công D) Bảo trì</li>
 <li>(MC) khi không đạt acceptance test, hành động bắt buộc là gì? A) GO luôn B) TẠM GIỮ/hoàn tác / quay lại C) Bỏ qua D) Chờ Người khác</li>
-<li>(MC) “ngắt / nghỉ quyền / sự cho phép theo từng file” phải chặn vì lý do nào? A) Tốn màu B) Không rà soát được quyền, tạo quyền rơi rớt C) File nặng D) In chậm</li>
+<li>(MC) "ngắt / nghỉ quyền / sự cho phép theo từng file" phải chặn vì lý do nào? A) Tốn màu B) Không rà soát được quyền, tạo quyền rơi rớt C) File nặng D) In chậm</li>
 <li>(MC) Ảnh chụp trạng thái nhóm/tư cách thành viên dùng để làm gì? A) Trang trí B) Chứng minh kiểm soát truy cập tại thời điểm đánh giá C) Tăng dung lượng D) Tạo biểu tượng cảm xúc</li>
 <li>(MC) phê duyệt giao hàng Người xác nhận fail Requests quyết định gì? A) GO ship B) chặn giao hàng (CHẶN SHIP / chặn giao hàng) C) Chuyển ca D) Chờ email</li>
 <li>(MC) Khi phát hiện gage OOT, bước 60 giây gồm gì? A) Dán thẻ OOT + khóa sử dụng + TẠM GIỮ lot liên quan B) Tiếp tục đo C) Vứt gage D) Chờ tuần sau</li>
@@ -401,14 +401,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>(Tình huống) Khi Operator mở Hồ sơ công việc và thấy 2 file bản vẽ cùng tên khác Rev, hành động cổng kiểm soát là gì?</li>
 <li>(Tình huống) Khi Kho chuẩn bị ship và gói hồ sơ thiếu IR, quyết định là gì và MRR nào phải tạo?</li>
 <li>(Tình huống) Khi QA truy xuất nguồn gốc bằng chứng cho 1 Cài đặt ID mà không tìm thấy file đúng đặt tên rule, hành động là gì?</li>
-<li>(Tình huống) Khi Người định giá (SAL-03) nhận hợp đồng Requests “No bên ngoài chia sẻ”, Xây dựng Sheet phải phản ánh ở cột nào?</li>
-<li>(Tình huống) Khi IT cần ngoại lệ “bên ngoài khách truy cập”, ai phê duyệt và bằng chứng nào bắt buộc?</li>
+<li>(Tình huống) Khi Người định giá (SAL-03) nhận hợp đồng Requests "No bên ngoài chia sẻ", Xây dựng Sheet phải phản ánh ở cột nào?</li>
+<li>(Tình huống) Khi IT cần ngoại lệ "bên ngoài khách truy cập", ai phê duyệt và bằng chứng nào bắt buộc?</li>
 </ol>
 <h3>10.2 Tình huống (≥3 tình huống thật; có dữ kiện; quyết định TẠM GIỮ/GO và ghi MRR)</h3>
 <div class="note">
 <strong>Tình huống 1 — Sai Rev dẫn tới nguy cơ phế phẩm</strong>
 <ul>
-<li><b>Dữ kiện:</b> Job J-2602-001; thư viện “Được kiểm soát Tài liệu”; file “DWG-1234” có Rev C (Released) và Rev D (Draft). Operator mở được cả 2.</li>
+<li><b>Dữ kiện:</b> Job J-2602-001; thư viện "Được kiểm soát Tài liệu"; file "DWG-1234" có Rev C (Released) và Rev D (Draft). Operator mở được cả 2.</li>
 <li><b>Yêu cầu:</b> Ra quyết định TẠM GIỮ/GO; ghi MRR gồm ảnh bằng chứng + vị trí file + Người thông báo + thời điểm.</li>
 <li><b>Đáp án đạt:</b> TẠM GIỮ JOB; kích hoạt phản ứng 60 giây; mở phiếu Requests chặn Draft; lưu bằng chứng theo Cài đặt ID liên quan.</li>
 </ul>
@@ -424,13 +424,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Tình huống 3 — External chia sẻ vượt mốc chuẩn</strong>
 <ul>
-<li><b>Dữ kiện:</b> IT bật “Bất kỳ ai link” cho site Projects; file gắn nhãn “Customer-Bảo mật”; DLP test TC-03 fail.</li>
+<li><b>Dữ kiện:</b> IT bật "Bất kỳ ai link" cho site Projects; file gắn nhãn "Customer-Bảo mật"; DLP test TC-03 fail.</li>
 <li><b>Yêu cầu:</b> Ra quyết định STOP/TẠM GIỮ/hoàn tác / quay lại; ghi MRR; cập nhật FRM-QMS-015.</li>
 <li><b>Đáp án đạt:</b> STOP thay đổi + hoàn tác / quay lại về mốc chuẩn; ghi rõ Cài đặt ID; lưu ảnh bằng chứng; khóa bên ngoài chia sẻ.</li>
 </ul>
 </div>
 <h3>10.3 Hiệu suất test (bắt buộc vì có vận hành/cổng kiểm soát/duyệt)</h3>
-<p><b>Bài test:</b> Học viên nhận 01 Requests thay đổi và phải tạo đầy đủ “Đã xác nhận hiệu lực Xây dựng Sheet + Evidence + Acceptance Kiểm Nhiệm + Bàn giao”. Thời gian tối đa 45 phút cho phần chuẩn bị hồ sơ + 30 phút cho phần trình bày và truy xuất nguồn gốc bằng chứng.</p>
+<p><b>Bài test:</b> Học viên nhận 01 Requests thay đổi và phải tạo đầy đủ "Đã xác nhận hiệu lực Xây dựng Sheet + Evidence + Acceptance Kiểm Nhiệm + Bàn giao". Thời gian tối đa 45 phút cho phần chuẩn bị hồ sơ + 30 phút cho phần trình bày và truy xuất nguồn gốc bằng chứng.</p>
 <table class="form-table">
 <tr><th>Tiêu chí</th><th>PASS</th><th>FAIL</th></tr>
 <tr><td>SoD</td><td>Người cấu hình khác Approver; có bằng chứng ký</td><td>1 Người làm cả 2 vai hoặc thiếu chữ ký</td></tr>
@@ -442,7 +442,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <div class="card" id="sec11">
-<h2>11) ĐẠT/KHÔNG ĐẠT tiêu chí (nhấn mạnh “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”)</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT tiêu chí (nhấn mạnh "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)")</h2>
 <ul>
 <li><b>PASS</b> khi đạt đồng thời: Bài kiểm tra nhanh ≥ 80%; OJT đầu ra đầy đủ; Hiệu suất test PASS; không vi phạm SoD; không có bước nào thiếu bằng chứng.</li>
 <li><b>FAIL</b> khi xảy ra 1 trong các điều kiện: thiếu bằng chứng cho bất kỳ Cài đặt ID; dùng sai Rev mà không TẠM GIỮ; fail TC-03 hoặc TC-01; bộ hồ sơ giao hàng thiếu mà vẫn GO; vi phạm SoD.</li>
@@ -480,7 +480,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>13) Chung đánh giá phát hiện &amp; phòng ngừa (≥8 lỗi)</h2>
 <ol>
 <li><b>Không chứng minh kiểm soát phiên bản</b> → Cưỡng chế TC-01 Released vs Draft + khoá công bố / phát hành quyền.</li>
-<li><b>Evidence thiếu ngữ cảnh</b> → Dùng bảng kiểm “ảnh phải thấy tổ chức thuê (tenant)/site/thư viện + giá trị” và lưu bản gốc.</li>
+<li><b>Evidence thiếu ngữ cảnh</b> → Dùng bảng kiểm "ảnh phải thấy tổ chức thuê (tenant)/site/thư viện + giá trị" và lưu bản gốc.</li>
 <li><b>Thiếu SoD</b> → RACI bắt buộc trong gói hàng; đánh giá kiểm tra chữ ký khác Người.</li>
 <li><b>Hết hiệu lực tài liệu dùng tại điểm vận hành</b> → Point-of-use chỉ hiển thị Released; băng rôn cảnh báo Draft.</li>
 <li><b>Hồ sơ bị xoá/sửa sau kết thúc / đóng hồ sơ</b> → TC-02 tính toàn vẹn hồ sơ + cơ chế khôi phục + log.</li>

@@ -10,21 +10,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -38,7 +38,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -76,7 +76,7 @@ td,th{}
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Không phát hành kết luận nguyên nhân gốc, concession, thay thế, tín dụng / ghi có hoặc Ngày giao lại khi chưa có bằng chứng và thẩm quyền đúng. Mọi phản hồi khách hàng phải có hồ sơ và nhịp độ / chu kỳ họp cập nhật rõ ràng. <span class="iso-clause">§8.7</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Khi khiếu nại hoặc thoát / bỏ qua chạm tới <b>sản phẩm an toàn</b>, <b>nghi ngờ hàng giả / hàng nhái</b>, <b>cấu hình / phiên bản không khớp</b>, <b>đặc biệt Requests</b> hoặc <b>khách hàng hàng không vũ trụ/không gian/phòng thủ / bảo vệ</b>, tình huống PHẢI chuyển sang mức nghiêm trọng cao, ngăn chặn phải thực hiện trong Ngày và tuyến truyền đạt / giao tiếp phải do Responsible Person được ủy quyền kiểm soát. <span class="iso-clause">§8.7</span></div></div></div>
 <div class="preface-block"><div class="callout"><div class="card-title">Lệnh điều hành</div>
-<p>Khiếu nại và field thoát / bỏ qua không chỉ là việc “trả lời email khách hàng”. Đây là quá trình hold, chặn lan rộng, thu hồi hoặc khoanh phạm vi, điều tra, phản hồi đúng dữ liệu, xử lý RMA/bảo hành và học lại cho hệ thống. Tình huống phải đi từ xác nhận / biên nhận đến kết thúc / đóng bằng một đường duy nhất, có Responsible Person, có bằng chứng và có quyết định rõ.</p>
+<p>Khiếu nại và field thoát / bỏ qua không chỉ là việc "trả lời email khách hàng". Đây là quá trình hold, chặn lan rộng, thu hồi hoặc khoanh phạm vi, điều tra, phản hồi đúng dữ liệu, xử lý RMA/bảo hành và học lại cho hệ thống. Tình huống phải đi từ xác nhận / biên nhận đến kết thúc / đóng bằng một đường duy nhất, có Responsible Person, có bằng chứng và có quyết định rõ.</p>
 <div class="legend-row">
 <span class="chip">cổng kiểm soát (control cổng kiểm soát): 202-IG1 → 202-IG5</span>
 <span class="chip">Biểu mẫu bắt buộc: <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a> / <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a> / <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a> / <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a></span>
@@ -128,7 +128,7 @@ td,th{}
 <tr><td><b>Thoát / field thoát / bỏ qua</b></td><td>Sản phẩm hoặc điều kiện không phù hợp đã lọt ra khách hàng hoặc đã qua cổng phát hành mà chưa bị chặn.</td></tr>
 <tr><td><b>Ngăn chặn</b></td><td>Hành động khẩn cấp để dừng lan rộng: hold hàng tồn kho, stop-ship, đóng băng WIP, chặn / khóa outsource, thông báo khách hàng, truy xuất data, nhận diện nghi ngờ tập hợp / dân số.</td></tr>
 <tr><td><b>phả hệ truy xuất quét / dọn dẹp</b></td><td>Rà phạm vi ảnh hưởng theo khách hàng, part, rev, WO, machine, Operator, kiểm tra thiết bị, raw nguyên vật liệu mẻ nấu (heat)/lot, Người xử lý, shift và khoảng thời gian.</td></tr>
-<tr><td><b>RMA</b></td><td>Quyền cho phép trả hàng về HESEM hoặc xử lý khiếu nại / Requests bồi thường bằng đường được kiểm soát trả lại. Không nhận hàng trả về “miệng” mà không có hồ sơ.</td></tr>
+<tr><td><b>RMA</b></td><td>Quyền cho phép trả hàng về HESEM hoặc xử lý khiếu nại / Requests bồi thường bằng đường được kiểm soát trả lại. Không nhận hàng trả về "miệng" mà không có hồ sơ.</td></tr>
 <tr><td><b>bảo hành vấn đề</b></td><td>Khiếu nại sau giao hàng có thể kéo theo thay thế, sửa chữa, tín dụng / ghi có, sort chi phí hoặc khiếu nại / Requests bồi thường chi phí khác. bảo hành vẫn phải đi qua ngăn chặn và bằng chứng như khiếu nại bình thường.</td></tr>
 <tr><td><b>No đóng không có bằng chứng</b></td><td>Tình huống không được đóng nếu chưa có xác nhận / biên nhận, ngăn chặn, điều tra/disposition, phản hồi cuối và hồ sơ đủ bằng chứng.</td></tr>
 </tbody></table></div>
@@ -152,105 +152,105 @@ td,th{}
 <div class="field"><b>Đầu ra bắt buộc</b><div class="blank">Khiếu nại Log, ACK, ngăn chặn plan, phả hệ truy xuất quét / dọn dẹp kết quả, NCR/CAPA link, RMA hồ sơ nếu có, khách hàng cập nhật, disposition, kết thúc / đóng note và bài học kinh Nhiệm.</div></div>
 <div class="field"><b>Điều kiện không cho phép chuyển bước</b><div class="blank">Không được đóng tình huống nếu chưa rõ tập hợp / dân số ảnh hưởng, chưa quyết định disposition, chưa phát hành cập nhật cuối cho khách hàng hoặc chưa đóng đường nối với <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> khi có bản chất chất lượng.</div></div>
 </div>
-<h2 class=”h2” id=”p6”>6. Cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
+<h2 class="h2" id="p6">6. Cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
 
 <!-- ── IG TABLE ── -->
-<div class=”table-card”><table class=”table”>
-<colgroup><col style=”width:7%”/><col style=”width:14%”/><col style=”width:29%”/><col style=”width:11%”/><col style=”width:21%”/><col style=”width:18%”/></colgroup>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:7%"/><col style="width:14%"/><col style="width:29%"/><col style="width:11%"/><col style="width:21%"/><col style="width:18%"/></colgroup>
 <thead><tr><th>IG</th><th>Tên cổng</th><th>Mô tả</th><th>Chủ trì</th><th>Điểm dừng</th><th>KPI chính</th></tr></thead>
 <tbody>
-<tr><td><span class=”step-tag”>IG1</span></td><td><b>Tiếp nhận &amp; ACK</b></td><td>CS log khiếu nại vào <a download=”” href=”../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx”>FRM-211</a>, phân loại mức độ (C1-C4), chỉ định Responsible Person và gửi ACK cho khách hàng trong vòng 24 giờ làm việc hoặc sớm hơn theo cam kết hợp đồng. ACK phải nêu rõ hành động HESEM đang thực hiện và mốc cập nhật tiếp theo.</td><td>CS / SAL</td><td>Không gửi ACK nếu chưa có Responsible Person được chỉ định</td><td>100% ACK trong 24h</td></tr>
-<tr><td><span class=”step-tag”>IG2</span></td><td><b>Containment &amp; truy xuất</b></td><td>Stop-ship, hold WIP, đóng băng hàng tồn kho, kiểm tra hàng outsource, xác định phạm vi suspect population theo phả hệ truy xuất (machine / operator / shift / material lot / time window). Kích hoạt <a href=”../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html”>WI-606</a> nếu cần containment tại hiện trường.</td><td>QA + PRO</td><td>Không được resume sản xuất cho đến khi scope đã được xác nhận</td><td>100% containment trong 4h cho Critical</td></tr>
-<tr><td><span class=”step-tag”>IG3</span></td><td><b>Điều tra &amp; NCR/CAPA</b></td><td>Thực hiện Root Cause Analysis (5-Why, Ishikawa), mở NCR trên <a download=”” href=”../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx”>FRM-651</a>, kích hoạt 8D trên <a download=”” href=”../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx”>FRM-652</a> nếu mức C3+ hoặc khách hàng yêu cầu. Nối sang <a href=”../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html”>SOP-606</a> cho mọi khiếu nại chất lượng. Xác định corrective action plan với timeline rõ ràng.</td><td>QA Engineer</td><td>Không đóng nếu chưa có verified root cause</td><td>&ge; 95% RCA hoàn tất trong 48h</td></tr>
-<tr><td><span class=”step-tag”>IG4</span></td><td><b>RMA &amp; disposition</b></td><td>Quyết định return / replace / credit / rework / sort tại khách hàng. Phát hành RMA number trên <a download=”” href=”../../../04-Bieu-Mau/02-FRM-200/FRM-213_RMA_Tracking_Log.xlsx”>FRM-213</a>. Đảm bảo chain-of-custody cho returned parts. Mọi quyết định tài chính phải có phê duyệt đúng thẩm quyền theo <a href=”../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html”>ANNEX-120</a>.</td><td>CS + QA</td><td>Không phát hành credit nếu chưa có QA sign-off</td><td>100% RMA xử lý đúng SLA</td></tr>
-<tr><td><span class=”step-tag”>IG5</span></td><td><b>Đóng &amp; learn-back</b></td><td>Đóng khiếu nại khi: containment kết thúc, corrective action verified effective, customer update cuối đã gửi, risk register đã cập nhật, bài học đã kéo vào SOP/WI/Control Plan nếu cần. Hồ sơ đủ bằng chứng theo <a href=”../../03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-107-audit-evidence-pack-master.html”>ANNEX-107</a>.</td><td>QMS Engineer</td><td>Không đóng nếu chưa hoàn tất effectiveness check</td><td>0 repeat complaints (cùng failure mode)</td></tr>
+<tr><td><span class="step-tag">IG1</span></td><td><b>Tiếp nhận &amp; ACK</b></td><td>CS log khiếu nại vào <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a>, phân loại mức độ (C1-C4), chỉ định Responsible Person và gửi ACK cho khách hàng trong vòng 24 giờ làm việc hoặc sớm hơn theo cam kết hợp đồng. ACK phải nêu rõ hành động HESEM đang thực hiện và mốc cập nhật tiếp theo.</td><td>CS / SAL</td><td>Không gửi ACK nếu chưa có Responsible Person được chỉ định</td><td>100% ACK trong 24h</td></tr>
+<tr><td><span class="step-tag">IG2</span></td><td><b>Containment &amp; truy xuất</b></td><td>Stop-ship, hold WIP, đóng băng hàng tồn kho, kiểm tra hàng outsource, xác định phạm vi suspect population theo phả hệ truy xuất (machine / operator / shift / material lot / time window). Kích hoạt <a href="../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a> nếu cần containment tại hiện trường.</td><td>QA + PRO</td><td>Không được resume sản xuất cho đến khi scope đã được xác nhận</td><td>100% containment trong 4h cho Critical</td></tr>
+<tr><td><span class="step-tag">IG3</span></td><td><b>Điều tra &amp; NCR/CAPA</b></td><td>Thực hiện Root Cause Analysis (5-Why, Ishikawa), mở NCR trên <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>, kích hoạt 8D trên <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a> nếu mức C3+ hoặc khách hàng yêu cầu. Nối sang <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> cho mọi khiếu nại chất lượng. Xác định corrective action plan với timeline rõ ràng.</td><td>QA Engineer</td><td>Không đóng nếu chưa có verified root cause</td><td>&ge; 95% RCA hoàn tất trong 48h</td></tr>
+<tr><td><span class="step-tag">IG4</span></td><td><b>RMA &amp; disposition</b></td><td>Quyết định return / replace / credit / rework / sort tại khách hàng. Phát hành RMA number trên <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a>. Đảm bảo chain-of-custody cho returned parts. Mọi quyết định tài chính phải có phê duyệt đúng thẩm quyền theo <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>.</td><td>CS + QA</td><td>Không phát hành credit nếu chưa có QA sign-off</td><td>100% RMA xử lý đúng SLA</td></tr>
+<tr><td><span class="step-tag">IG5</span></td><td><b>Đóng &amp; learn-back</b></td><td>Đóng khiếu nại khi: containment kết thúc, corrective action verified effective, customer update cuối đã gửi, risk register đã cập nhật, bài học đã kéo vào SOP/WI/Control Plan nếu cần. Hồ sơ đủ bằng chứng theo <a href="../../03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-107-audit-evidence-pack-master.html">ANNEX-107</a>.</td><td>QMS Engineer</td><td>Không đóng nếu chưa hoàn tất effectiveness check</td><td>0 repeat complaints (cùng failure mode)</td></tr>
 </tbody></table></div>
 
 <!-- ── KPI METRIC CARDS ── -->
-<div class=”metric-grid”>
-<div class=”metric-card”><div class=”value”>100%</div><div class=”label”>ACK trong 24h (IG1)</div></div>
-<div class=”metric-card”><div class=”value”>&le; 4h</div><div class=”label”>Containment cho Critical (IG2)</div></div>
-<div class=”metric-card”><div class=”value”>&ge; 95%</div><div class=”label”>RCA hoàn tất trong 48h (IG3)</div></div>
-<div class=”metric-card”><div class=”value”>100%</div><div class=”label”>RMA xử lý đúng SLA (IG4)</div></div>
-<div class=”metric-card”><div class=”value”>0</div><div class=”label”>Repeat complaints cùng mode (IG5)</div></div>
+<div class="metric-grid">
+<div class="metric-card"><div class="value">100%</div><div class="label">ACK trong 24h (IG1)</div></div>
+<div class="metric-card"><div class="value">&le; 4h</div><div class="label">Containment cho Critical (IG2)</div></div>
+<div class="metric-card"><div class="value">&ge; 95%</div><div class="label">RCA hoàn tất trong 48h (IG3)</div></div>
+<div class="metric-card"><div class="value">100%</div><div class="label">RMA xử lý đúng SLA (IG4)</div></div>
+<div class="metric-card"><div class="value">0</div><div class="label">Repeat complaints cùng mode (IG5)</div></div>
 </div>
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 7 — QUY TRÌNH CHI TIẾT                   -->
 <!-- ══════════════════════════════════════════════ -->
-<h2 class=”h2” id=”p7”>7. Quy trình chi tiết</h2>
+<h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
 
 <!-- ── FLOWCHART ── -->
-<div class=”flowchart”>
-  <div class=”flow-step”><div class=”flow-num” style=”background:linear-gradient(135deg,#1565c0,#1976d2)”>1</div><div class=”flow-text”><div class=”flow-title”>Tiếp nhận &amp; ACK</div></div></div>
-  <div class=”flow-arrow”>&rarr;</div>
-  <div class=”flow-step”><div class=”flow-num” style=”background:linear-gradient(135deg,#059669,#10b981)”>2</div><div class=”flow-text”><div class=”flow-title”>Containment &amp; truy xuất</div></div></div>
-  <div class=”flow-arrow”>&rarr;</div>
-  <div class=”flow-step”><div class=”flow-num” style=”background:linear-gradient(135deg,#d97706,#f59e0b)”>3</div><div class=”flow-text”><div class=”flow-title”>RCA &amp; điều tra</div></div></div>
-  <div class=”flow-arrow”>&rarr;</div>
-  <div class=”flow-step”><div class=”flow-num” style=”background:linear-gradient(135deg,#7c3aed,#8b5cf6)”>4</div><div class=”flow-text”><div class=”flow-title”>NCR/CAPA</div></div></div>
-  <div class=”flow-arrow”>&rarr;</div>
-  <div class=”flow-step”><div class=”flow-num” style=”background:linear-gradient(135deg,#dc2626,#ef4444)”>5</div><div class=”flow-text”><div class=”flow-title”>RMA &amp; disposition</div></div></div>
-  <div class=”flow-arrow”>&rarr;</div>
-  <div class=”flow-step”><div class=”flow-num” style=”background:linear-gradient(135deg,#0891b2,#06b6d4)”>6</div><div class=”flow-text”><div class=”flow-title”>Customer comm</div></div></div>
-  <div class=”flow-arrow”>&rarr;</div>
-  <div class=”flow-step”><div class=”flow-num” style=”background:linear-gradient(135deg,#c2410c,#ea580c)”>7</div><div class=”flow-text”><div class=”flow-title”>Đóng &amp; verify</div></div></div>
-  <div class=”flow-arrow”>&rarr;</div>
-  <div class=”flow-step”><div class=”flow-num” style=”background:linear-gradient(135deg,#4338ca,#6366f1)”>8</div><div class=”flow-text”><div class=”flow-title”>Learn-back</div></div></div>
+<div class="flowchart">
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</div><div class="flow-text"><div class="flow-title">Tiếp nhận &amp; ACK</div></div></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</div><div class="flow-text"><div class="flow-title">Containment &amp; truy xuất</div></div></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</div><div class="flow-text"><div class="flow-title">RCA &amp; điều tra</div></div></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</div><div class="flow-text"><div class="flow-title">NCR/CAPA</div></div></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</div><div class="flow-text"><div class="flow-title">RMA &amp; disposition</div></div></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">6</div><div class="flow-text"><div class="flow-title">Customer comm</div></div></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#c2410c,#ea580c)">7</div><div class="flow-text"><div class="flow-title">Đóng &amp; verify</div></div></div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#4338ca,#6366f1)">8</div><div class="flow-text"><div class="flow-title">Learn-back</div></div></div>
 </div>
 
 <!-- ── STEP 1 ── -->
-<h3><span class=”proc-num” style=”background:linear-gradient(135deg,#1565c0,#1976d2)”>1</span> Tiếp nhận khiếu nại &amp; gửi ACK</h3>
-<p>Ngay khi nhận email, cuộc gọi, portal message, CAR/SCAR, scorecard tiêu cực hoặc thông tin từ field service / driver / khách hàng, CS phải mở case trong <a download=”” href=”../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx”>FRM-211</a> với đầy đủ: khách hàng, liên hệ, part/job/PO/rev, loại sự kiện, mô tả ngắn, bằng chứng ban đầu (ảnh, đo lường, reject tag), mức độ (C1&ndash;C4) và Responsible Person.</p>
-<ul class=”tight”>
-<li><b>Phân loại mức độ</b> &mdash; C1: phản hồi/nhận xét nhẹ; C2: label/doc/qty/thương mại (chưa chạm conformance); C3: khiếu nại chất lượng, cần containment nội bộ; C4: field escape nghiêm trọng, safety, stop-ship, nghi ngờ counterfeit, ASD flow-down. Mức C4 phải escalate ngay theo <a href=”../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html”>ANNEX-117</a>.</li>
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span> Tiếp nhận khiếu nại &amp; gửi ACK</h3>
+<p>Ngay khi nhận email, cuộc gọi, portal message, CAR/SCAR, scorecard tiêu cực hoặc thông tin từ field service / driver / khách hàng, CS phải mở case trong <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a> với đầy đủ: khách hàng, liên hệ, part/job/PO/rev, loại sự kiện, mô tả ngắn, bằng chứng ban đầu (ảnh, đo lường, reject tag), mức độ (C1&ndash;C4) và Responsible Person.</p>
+<ul class="tight">
+<li><b>Phân loại mức độ</b> &mdash; C1: phản hồi/nhận xét nhẹ; C2: label/doc/qty/thương mại (chưa chạm conformance); C3: khiếu nại chất lượng, cần containment nội bộ; C4: field escape nghiêm trọng, safety, stop-ship, nghi ngờ counterfeit, ASD flow-down. Mức C4 phải escalate ngay theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</li>
 <li><b>ACK trong 24h</b> phải xác nhận Received, nêu rõ HESEM đang làm gì (containment, investigation plan) và mốc cập nhật tiếp theo. Không cần chờ điều tra xong mới ACK.</li>
 <li>Nếu thông tin ban đầu thiếu, vẫn phải ACK và yêu cầu bổ sung dữ liệu cụ thể (ảnh, lot, qty, measurement data).</li>
 <li>Khách hàng gửi nhầm kênh hoặc gửi cho cá nhân vẫn phải chuyển vào case chính thức &mdash; không xử lý ngoài luồng.</li>
 <li>Đối với khách hàng ASD / aerospace / defense hoặc job có Customer-Specific Requirements (CSR), ACK phải tuân thủ format và timeline do khách hàng quy định (AS9100D &sect;8.7.1).</li>
 </ul>
-<div class=”table-card”><table class=”table matrix-small”><colgroup><col style=”width:14%”/><col style=”width:30%”/><col style=”width:18%”/><col style=”width:38%”/></colgroup><thead><tr><th>Mức</th><th>Đặc trưng</th><th>ACK / cập nhật</th><th>Escalation bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:30%"/><col style="width:18%"/><col style="width:38%"/></colgroup><thead><tr><th>Mức</th><th>Đặc trưng</th><th>ACK / cập nhật</th><th>Escalation bắt buộc</th></tr></thead><tbody>
 <tr><td><b>C1</b></td><td>Phản hồi, nhận xét, yêu cầu giải thích &mdash; không có defect evidence</td><td>1 ngày làm việc</td><td>Responsible Person + CS</td></tr>
 <tr><td><b>C2</b></td><td>Label/doc/qty/thương mại issue; chưa chạm product conformance</td><td>Trong ngày làm việc</td><td>CS + Finance/Logistics tùy bản chất</td></tr>
 <tr><td><b>C3</b></td><td>Khiếu nại chất lượng, RMA tiềm năng, lỗi tái diễn, cần containment nội bộ</td><td>Trong ngày; update plan trong 24h</td><td>CS + QA Manager + Process Owner</td></tr>
-<tr><td><b>C4</b></td><td>Field escape nghiêm trọng, line stop, safety, counterfeit suspect, clean/vacuum violation, ASD flow-down</td><td>ACK ngay; containment update cùng ngày</td><td>QA Manager + CEO / Authorized Person + <a href=”../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html”>ANNEX-117</a></td></tr>
+<tr><td><b>C4</b></td><td>Field escape nghiêm trọng, line stop, safety, counterfeit suspect, clean/vacuum violation, ASD flow-down</td><td>ACK ngay; containment update cùng ngày</td><td>QA Manager + CEO / Authorized Person + <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td></tr>
 </tbody></table></div>
-<div class=”role-note”><b>ISO 9001:2026 &sect;10.2.1(a):</b> Tổ chức phải react to nonconformity bằng cách thực hiện hành động kiểm soát và correction ngay lập tức. ACK là bước đầu tiên của reaction chain &mdash; không phải chỉ là phép lịch sự.</div>
+<div class="role-note"><b>ISO 9001:2026 &sect;10.2.1(a):</b> Tổ chức phải react to nonconformity bằng cách thực hiện hành động kiểm soát và correction ngay lập tức. ACK là bước đầu tiên của reaction chain &mdash; không phải chỉ là phép lịch sự.</div>
 
 <!-- ── STEP 2 ── -->
-<h3><span class=”proc-num” style=”background:linear-gradient(135deg,#059669,#10b981)”>2</span> Containment &amp; phả hệ truy xuất</h3>
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</span> Containment &amp; phả hệ truy xuất</h3>
 <p>Ngay sau tiếp nhận, QA cùng Planner, Production và WHS phải đánh giá phạm vi containment. Scope không dừng ở lô bị khách hàng phát hiện mà phải rà đủ: <b>hàng đã ship</b>, <b>hàng tồn kho</b>, <b>WIP</b>, <b>hàng đang outsource</b>, và <b>các lô sinh ra từ cùng điều kiện</b> (máy/ca/vật tư/operator/revision/phương pháp đo). Đây là yêu cầu bắt buộc theo ISO 9001:2026 &sect;8.7.1 &mdash; kiểm soát nonconforming outputs phải bao phủ toàn bộ affected population.</p>
-<ul class=”tight”>
+<ul class="tight">
 <li><b>Stop-ship:</b> Đóng băng mọi lô giao hàng liên quan trong ERP (Epicor). Hàng đang vận chuyển phải có quyết định recall hoặc hold-at-customer.</li>
-<li><b>Hold WIP:</b> Đánh dấu hold trên traveler, cách ly vật lý, khóa trạng thái trên hệ thống. Kích hoạt <a href=”../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html”>WI-606</a> cho segregation tại shop floor.</li>
+<li><b>Hold WIP:</b> Đánh dấu hold trên traveler, cách ly vật lý, khóa trạng thái trên hệ thống. Kích hoạt <a href="../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a> cho segregation tại shop floor.</li>
 <li><b>Genealogy sweep:</b> Phải dựa trên dữ liệu thật &mdash; ship records, WO, inspection records, raw material lots, outsource records, machine/operator/time window. Nếu có SSCC/box trace, dùng để thu hẹp hoặc mở rộng scope.</li>
 <li><b>Containment tại khách hàng:</b> Nếu cần sort hoặc hold tại site khách hàng, phải có quyết định log, responsible person và cost allocation rõ ràng.</li>
 </ul>
-<div class=”table-card”><table class=”table matrix-small”><colgroup><col style=”width:22%”/><col style=”width:78%”/></colgroup><thead><tr><th>Genealogy sweep phải rà</th><th>Nội dung bắt buộc</th></tr></thead><tbody>
+<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:22%"/><col style="width:78%"/></colgroup><thead><tr><th>Genealogy sweep phải rà</th><th>Nội dung bắt buộc</th></tr></thead><tbody>
 <tr><td>Customer / shipment lot</td><td>Ship date, box/SSCC, qty, packing list, CoC/CoA, releaser, carrier status.</td></tr>
 <tr><td>Job / WO / routing</td><td>WO, operations, machine/work center, operator, shift, traveler, move history, rework history.</td></tr>
 <tr><td>Inspection / release</td><td>FAI, in-process, final inspection, gage/CMM used, sampling mode, release point, waiver history.</td></tr>
 <tr><td>Material / outsource</td><td>Heat/lot, mill cert, processor, outsource PO/dispatch, receiving results, special process cert scope.</td></tr>
 <tr><td>Time window</td><td>Khoảng thời gian mà điều kiện tạo lỗi tồn tại; dùng để mở rộng hoặc thu hẹp suspect population.</td></tr>
 </tbody></table></div>
-<div class=”note-soft”><b>Điểm dừng bắt buộc (IG2):</b> Không được phát hành kết luận &ldquo;đã cách ly xong&rdquo; khi chưa hoàn tất genealogy sweep hoặc chưa chứng minh remaining population an toàn. Không được resume production cho đến khi scope confirmed.</div>
+<div class="note-soft"><b>Điểm dừng bắt buộc (IG2):</b> Không được phát hành kết luận &ldquo;đã cách ly xong&rdquo; khi chưa hoàn tất genealogy sweep hoặc chưa chứng minh remaining population an toàn. Không được resume production cho đến khi scope confirmed.</div>
 
 <!-- ── STEP 3 ── -->
-<h3><span class=”proc-num” style=”background:linear-gradient(135deg,#d97706,#f59e0b)”>3</span> Điều tra nguyên nhân gốc (RCA)</h3>
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</span> Điều tra nguyên nhân gốc (RCA)</h3>
 <p>QA Engineer thực hiện Root Cause Analysis theo phương pháp phù hợp với complexity: <b>5-Why</b> cho defect đơn giản, <b>Ishikawa (6M)</b> cho multi-factor, <b>8D full</b> cho mức C3+ hoặc khi khách hàng yêu cầu (AS9100D &sect;8.7.2). Điều tra phải tách rõ: <b>failure mode</b>, <b>escape point</b> (nơi lỗi lọt qua), <b>detection point</b> (nơi phát hiện), <b>affected population</b>, <b>customer action cần thiết</b> và <b>process change cần thiết</b>.</p>
-<ul class=”tight”>
+<ul class="tight">
 <li>Không nhầm khiếu nại logistics/doc/label với khiếu nại chất lượng thành phẩm, nhưng vẫn phải đánh giá nguy cơ systemic failure.</li>
 <li>Nếu returned parts chưa về, vẫn phải chạy containment và điều tra bằng evidence có sẵn (ảnh, measurement data, customer sort results).</li>
 <li>Nếu root cause chưa chắc chắn, phản hồi khách hàng phải dùng ngôn ngữ &ldquo;preliminary finding&rdquo; &mdash; không khẳng định sớm.</li>
 <li>ISO 9001:2026 &sect;10.2.1(b): phải đánh giá nhu cầu hành động để loại bỏ nguyên nhân, đảm bảo nonconformity không tái diễn hoặc xảy ra ở nơi khác.</li>
 <li>Đối với job ASD / SEMI / vacuum-clean: RCA phải xét thêm 6 chiều &mdash; product safety, traceability completeness, configuration integrity, counterfeit/material authenticity, cleanliness/packaging integrity, special process conformance. Bất kỳ chiều nào chưa xác nhận an toàn, case phải giữ mức C4.</li>
 </ul>
-<div class=”role-note”><b>AS9100D &sect;8.7.1 lưu ý:</b> Đối với sản phẩm giao cho khách hàng aerospace/defense mà sau đó phát hiện nonconforming, tổ chức phải thông báo khách hàng ngay lập tức và có hành động thích hợp cho sản phẩm đã giao.</div>
+<div class="role-note"><b>AS9100D &sect;8.7.1 lưu ý:</b> Đối với sản phẩm giao cho khách hàng aerospace/defense mà sau đó phát hiện nonconforming, tổ chức phải thông báo khách hàng ngay lập tức và có hành động thích hợp cho sản phẩm đã giao.</div>
 
 <!-- ── STEP 4 ── -->
-<h3><span class=”proc-num” style=”background:linear-gradient(135deg,#7c3aed,#8b5cf6)”>4</span> NCR/CAPA &amp; kế hoạch khắc phục</h3>
-<p>Khi khiếu nại có bản chất chất lượng, QA phải nối ngay sang <a href=”../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html”>SOP-606</a>. Mở NCR trên <a download=”” href=”../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx”>FRM-651</a>; kích hoạt CAPA/8D trên <a download=”” href=”../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx”>FRM-652</a> nếu mức C3+ hoặc lỗi tái diễn hoặc khách hàng yêu cầu. Corrective action plan phải có: hành động cụ thể, responsible person, target date, verification method và effectiveness criteria.</p>
-<ul class=”tight”>
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</span> NCR/CAPA &amp; kế hoạch khắc phục</h3>
+<p>Khi khiếu nại có bản chất chất lượng, QA phải nối ngay sang <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>. Mở NCR trên <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>; kích hoạt CAPA/8D trên <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a> nếu mức C3+ hoặc lỗi tái diễn hoặc khách hàng yêu cầu. Corrective action plan phải có: hành động cụ thể, responsible person, target date, verification method và effectiveness criteria.</p>
+<ul class="tight">
 <li><b>Correction</b> (hành động tức thì): sort, rework, replace &mdash; xử lý hàng hiện tại.</li>
 <li><b>Corrective action</b> (hành động hệ thống): thay đổi process, WI, control plan, training, tooling, fixture, gage &mdash; ngăn tái diễn.</li>
 <li>ISO 9001:2026 &sect;10.2.1(e): hành động khắc phục phải tương xứng với tác động của nonconformity. Không over-engineer cho C1, không under-react cho C4.</li>
@@ -259,57 +259,57 @@ td,th{}
 </ul>
 
 <!-- ── STEP 5 ── -->
-<h3><span class=”proc-num” style=”background:linear-gradient(135deg,#dc2626,#ef4444)”>5</span> RMA, trả hàng &amp; disposition</h3>
-<p>Mọi yêu cầu trả hàng hoặc bồi thường sau giao hàng phải đi qua <a download=”” href=”../../../04-Bieu-Mau/02-FRM-200/FRM-213_RMA_Tracking_Log.xlsx”>FRM-213</a>. Responsible Person phải xác định: có cần RMA number không, hàng quay về HESEM hay xử lý tại khách hàng, có cần replace/rework/credit/debit hay không, chi phí nào phải thu thập và ai phê duyệt theo <a href=”../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html”>ANNEX-120</a>.</p>
-<ul class=”tight”>
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</span> RMA, trả hàng &amp; disposition</h3>
+<p>Mọi yêu cầu trả hàng hoặc bồi thường sau giao hàng phải đi qua <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a>. Responsible Person phải xác định: có cần RMA number không, hàng quay về HESEM hay xử lý tại khách hàng, có cần replace/rework/credit/debit hay không, chi phí nào phải thu thập và ai phê duyệt theo <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>.</p>
+<ul class="tight">
 <li>Không nhận hàng trả về &ldquo;không số RMA / không case ID&rdquo;.</li>
 <li>Returned parts phải giữ chain-of-custody: customer, part, qty, lot/serial nếu có, tình trạng packaging, ngày nhận, người nhận, ảnh hiện trạng, vị trí cách ly.</li>
 <li>Hàng trả lại không rõ identity, không rõ lot hoặc bị mở trộn không kiểm soát &rarr; xem là no-trace suspect, không được tự trả lại inventory/WIP.</li>
 <li>Chi phí warranty/sort/freight chỉ được chấp nhận hoặc từ chối sau khi có rà soát nội bộ theo thẩm quyền.</li>
 <li>Replacement hoặc re-ship phải bám release rules &mdash; không dùng tính cấp bách để bypass quality gates.</li>
 </ul>
-<div class=”table-card”><table class=”table matrix-small”><colgroup><col style=”width:20%”/><col style=”width:26%”/><col style=”width:18%”/><col style=”width:36%”/></colgroup><thead><tr><th>Disposition</th><th>Khi áp dụng</th><th>Thẩm quyền</th><th>Evidence tối thiểu</th></tr></thead><tbody>
+<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:20%"/><col style="width:26%"/><col style="width:18%"/><col style="width:36%"/></colgroup><thead><tr><th>Disposition</th><th>Khi áp dụng</th><th>Thẩm quyền</th><th>Evidence tối thiểu</th></tr></thead><tbody>
 <tr><td><b>Replace / rework</b></td><td>Lỗi xác nhận thuộc HESEM, khách cần hàng thay thế</td><td>Commercial RP + QA</td><td>Case ID, qty, due date, new routing release, cost note</td></tr>
 <tr><td><b>Repair tại HESEM</b></td><td>Part trả về hoặc có thể thu hồi xử lý</td><td>QA + Engineering + Production</td><td>Disposition instruction, re-inspection plan, shipment decision</td></tr>
 <tr><td><b>Sort tại customer / kho</b></td><td>Cần containment nhanh trước khi có replacement</td><td>QA Manager / Production Director</td><td>Sort criteria, cost owner, acceptance of results, affected population</td></tr>
 <tr><td><b>Credit / debit / claim</b></td><td>Warranty, freight, sort cost, return cost, penalties</td><td>Commercial RP + Finance + GM theo value</td><td>Claim basis, evidence, approval, accounting treatment</td></tr>
 </tbody></table></div>
-<div class=”note-soft”><b>Điểm dừng bắt buộc (IG4):</b> Không phát hành credit note, concession hoặc free replacement khi chưa có QA sign-off xác nhận root cause và liability.</div>
+<div class="note-soft"><b>Điểm dừng bắt buộc (IG4):</b> Không phát hành credit note, concession hoặc free replacement khi chưa có QA sign-off xác nhận root cause và liability.</div>
 
 <!-- ── STEP 6 ── -->
-<h3><span class=”proc-num” style=”background:linear-gradient(135deg,#0891b2,#06b6d4)”>6</span> Customer communication &amp; cập nhật</h3>
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">6</span> Customer communication &amp; cập nhật</h3>
 <p>Mỗi case phải có cadence phản hồi rõ ràng: ACK &rarr; containment update &rarr; investigation update &rarr; final disposition/close. Nếu điều tra dài hơn kế hoạch, Responsible Person vẫn phải cập nhật khách hàng theo mốc đã cam kết. Case không được &ldquo;treo im lặng&rdquo; sau ACK.</p>
-<ul class=”tight”>
+<ul class="tight">
 <li><b>Interim response</b> tối thiểu phải nêu: case ID, phạm vi thông tin hiện có, containment đã thực hiện, suspect population đang được rà, yêu cầu data bổ sung từ khách hàng nếu có, mốc update tiếp và Responsible Person.</li>
 <li>Không gửi phản hồi chung chung &ldquo;đang kiểm tra&rdquo; mà không có hành động cụ thể. Khi root cause chưa confirmed, phải nói rõ đây là preliminary finding.</li>
-<li>Nếu khách hàng yêu cầu 8D hoặc template riêng, vẫn phải duy trì case nội bộ trên <a download=”” href=”../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx”>FRM-211</a>/<a download=”” href=”../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx”>FRM-651</a>/<a download=”” href=”../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx”>FRM-652</a> và gắn mapping giữa internal case ID với customer reference.</li>
+<li>Nếu khách hàng yêu cầu 8D hoặc template riêng, vẫn phải duy trì case nội bộ trên <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a>/<a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>/<a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a> và gắn mapping giữa internal case ID với customer reference.</li>
 <li>Phản hồi do CS gửi nhưng nội dung kỹ thuật phải được QA/Process Owner rà soát trước khi phát hành.</li>
 <li>Đối với khiếu nại ASD hoặc job có CSR, phản hồi phải chỉ rõ rủi ro đối với các shipment khác và tình trạng stop-ship / stop-use / recall nếu có.</li>
 <li>Customer không hài lòng về cách HESEM phản hồi vẫn là một phần của case &mdash; không tách rời khỏi khiếu nại chính.</li>
 </ul>
 
 <!-- ── STEP 7 ── -->
-<h3><span class=”proc-num” style=”background:linear-gradient(135deg,#c2410c,#ea580c)”>7</span> Đóng khiếu nại &amp; effectiveness verification</h3>
-<p>Case chỉ đóng khi đủ 5 điều kiện: (1) containment đã kết thúc và population rõ ràng; (2) root cause đã verified; (3) corrective action đã implement và verified effective; (4) customer final update đã gửi với đầy đủ: phạm vi, nguyên nhân, hành động, tình trạng RMA/credit và trạng thái lessons learned; (5) evidence pack đầy đủ theo <a href=”../../03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-107-audit-evidence-pack-master.html”>ANNEX-107</a>.</p>
-<ul class=”tight”>
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#c2410c,#ea580c)">7</span> Đóng khiếu nại &amp; effectiveness verification</h3>
+<p>Case chỉ đóng khi đủ 5 điều kiện: (1) containment đã kết thúc và population rõ ràng; (2) root cause đã verified; (3) corrective action đã implement và verified effective; (4) customer final update đã gửi với đầy đủ: phạm vi, nguyên nhân, hành động, tình trạng RMA/credit và trạng thái lessons learned; (5) evidence pack đầy đủ theo <a href="../../03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-107-audit-evidence-pack-master.html">ANNEX-107</a>.</p>
+<ul class="tight">
 <li><b>Effectiveness check</b>: Kiểm tra &ge; 3 lô sản xuất sau khi áp dụng corrective action. Nếu defect tái diễn, re-open CAPA và escalate.</li>
 <li>Nếu khách hàng chưa phản hồi nhưng HESEM đã hoàn tất, case chỉ chuyển sang pending-customer &mdash; không được tự đóng nếu hợp đồng đòi xác nhận hai bên.</li>
 <li>ISO 9001:2026 &sect;10.2.1(f): tổ chức phải lưu giữ documented information về bản chất nonconformity, hành động đã thực hiện và kết quả corrective action.</li>
-<li>Đóng case trên <a download=”” href=”../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx”>FRM-211</a> với closing note nêu rõ: scope, root cause, actions taken, RMA/credit status, lessons learned status.</li>
+<li>Đóng case trên <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a> với closing note nêu rõ: scope, root cause, actions taken, RMA/credit status, lessons learned status.</li>
 </ul>
 
 <!-- ── STEP 8 ── -->
-<h3><span class=”proc-num” style=”background:linear-gradient(135deg,#4338ca,#6366f1)”>8</span> Learn-back &amp; cải tiến hệ thống</h3>
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#4338ca,#6366f1)">8</span> Learn-back &amp; cải tiến hệ thống</h3>
 <p>SOP-202 không kết thúc ở email cuối cho khách hàng. Khi khiếu nại lộ ra lỗ hổng trong release, traceability, setup, inspection, packaging, supplier control, communication hoặc training, Responsible Person và QMS Engineer phải mở hành động cập nhật tương ứng. Khiếu nại mà không kéo được bài học về hệ thống sẽ tái diễn dưới dạng khác.</p>
-<ul class=”tight”>
-<li><b>Risk register:</b> Cập nhật risk register với failure mode mới, likelihood sau corrective action và residual risk. Liên kết với <a href=”../09-SOP-900/sop-903-continual-improvement-and-kaizen.html”>SOP-903</a>.</li>
+<ul class="tight">
+<li><b>Risk register:</b> Cập nhật risk register với failure mode mới, likelihood sau corrective action và residual risk. Liên kết với <a href="../09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a>.</li>
 <li><b>Control plan / WI:</b> Nếu escape point là inspection gap hoặc process gap, phải cập nhật control plan, sampling plan hoặc WI tương ứng.</li>
 <li><b>Training:</b> Nếu root cause liên quan đến human factor hoặc skill gap, phải mở training action và cập nhật competency matrix.</li>
-<li><b>SOP/ANNEX/FORM:</b> Nếu quy trình hiện tại không đủ để ngăn chặn failure mode, phải đề xuất revision qua <a href=”../01-SOP-100/sop-101-document-and-data-control.html”>SOP-101</a>.</li>
+<li><b>SOP/ANNEX/FORM:</b> Nếu quy trình hiện tại không đủ để ngăn chặn failure mode, phải đề xuất revision qua <a href="../01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a>.</li>
 <li><b>Supplier feedback:</b> Nếu root cause liên quan đến incoming material hoặc special process, phải thông báo supplier và cập nhật supplier scorecard.</li>
 <li>Một khiếu nại chỉ được coi là đóng tốt khi nó thay đổi được control tại nơi tạo lỗi hoặc nơi để lỗi lọt qua &mdash; không chỉ đóng CAPA trên giấy.</li>
 </ul>
-<div class=”role-note”><b>ISO 9001:2026 &sect;10.2.1(d):</b> Tổ chức phải xác định xem có nonconformity tương tự tồn tại hay không, hoặc có khả năng xảy ra hay không. Learn-back là bước thực hiện yêu cầu này &mdash; mở rộng bài học ra toàn bộ hệ thống, không chỉ case đơn lẻ.</div>
+<div class="role-note"><b>ISO 9001:2026 &sect;10.2.1(d):</b> Tổ chức phải xác định xem có nonconformity tương tự tồn tại hay không, hoặc có khả năng xảy ra hay không. Learn-back là bước thực hiện yêu cầu này &mdash; mở rộng bài học ra toàn bộ hệ thống, không chỉ case đơn lẻ.</div>
 <h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:42%"/><col style="width:14%"/><col style="width:12%"/><col style="width:14%"/></colgroup><thead><tr><th>Tình huống</th><th>Cách xử lý bắt buộc</th><th>Đầu mối</th><th>Escalation</th><th>Hồ sơ</th></tr></thead><tbody>
 <tr><td>Customer chưa cung cấp đủ bằng chứng</td><td>Vẫn ACK tình huống, Requests dữ liệu cụ thể còn thiếu, đồng thời chạy ngăn chặn theo mức rủi ro có thể đánh giá được.</td><td>CS / QA</td><td>QA Manager</td><td><a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a></td></tr>

@@ -80,7 +80,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>Định nghĩa không mơ hồ</td><td>Phải chỉ rõ numerator, denominator/basis, period, exclusions và object measured.</td></tr>
 <tr><td>Diễn tập-down được</td><td>Phải truy tới JobNum, OprSeq, PackID, PONum, NCR ID, CAPA ID, Vendor hoặc key tương đương.</td></tr>
 <tr><td>Có Người phụ trách kép</td><td>Mỗi KPI có 01 Người phụ trách nghiệp vụ chịu trách nhiệm hành động và 01 Người phụ trách dữ liệu chịu trách nhiệm pipeline/refresh.</td></tr>
-<tr><td>Có cut-off rõ</td><td>T1/T2/T3/T4 phải biết số được chốt tại thời điểm nào; không dùng số “đang refresh dở”.</td></tr>
+<tr><td>Có cut-off rõ</td><td>T1/T2/T3/T4 phải biết số được chốt tại thời điểm nào; không dùng số "đang refresh dở".</td></tr>
 <tr><td>Có logic phản ứng</td><td>RAG phải đi kèm action trigger, không tô màu để trang trí.</td></tr>
 </tbody></table></div></div>
 
@@ -138,7 +138,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>DimVendorProcessor</td><td>Vendor/Processor ID, family, approval trạng thái</td><td>Nhìn ETA, overdue, quality by source</td></tr>
 <tr><td>DimSeverity</td><td>S1/S2/S3/S4, response SLA</td><td>Điều hành hold/escalation/data vấn đề</td></tr>
 </tbody></table></div>
-<p class="small">Khi thiếu dimension hoặc key, bảng điều khiển phải hiển thị cảnh báo “không đủ diễn tập-down” thay vì bơm số giả.</p></div>
+<p class="small">Khi thiếu dimension hoặc key, bảng điều khiển phải hiển thị cảnh báo "không đủ diễn tập-down" thay vì bơm số giả.</p></div>
 
 <div class="section"><h2>7. Quy tắc refresh, cut-off và precedence</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Ngữ cảnh dùng</th><th>Cut-off / refresh</th><th>Nguồn ưu tiên</th><th>Rule khi mismatch</th></tr></thead><tbody>
@@ -156,7 +156,7 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>8. Data cổng kiểm soát chất lượng</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Kiểm cái gì</th><th>Không đạt khi</th><th>Phản ứng</th></tr></thead><tbody>
 <tr><td>Completeness</td><td>Field bắt buộc có đủ không</td><td>Thiếu JobNum, OprSeq, PackID, due, Người phụ trách hoặc severity</td><td>Không publish KPI liên quan; mở Data Vấn đề</td></tr>
-<tr><td>Timeliness</td><td>Dữ liệu có đúng cửa sổ refresh không</td><td>Refresh quá cut-off đã công bố</td><td>Đánh cờ đỏ “stale data”</td></tr>
+<tr><td>Timeliness</td><td>Dữ liệu có đúng cửa sổ refresh không</td><td>Refresh quá cut-off đã công bố</td><td>Đánh cờ đỏ "stale data"</td></tr>
 <tr><td>Uniqueness</td><td>Bản ghi có bị duplicate không</td><td>Trùng giao dịch/key gây double count</td><td>Chặn gói phát hành</td></tr>
 <tr><td>Referential integrity</td><td>Fact có link được tới dimension và bằng chứng không</td><td>NCR không link Job; bộ hồ sơ giao hàng không link SSCC; receipt không link cert</td><td>Điều tra mapping hoặc quy trình capture</td></tr>
 <tr><td>Reasonableness</td><td>Số có nằm trong logic vận hành không</td><td>OTD >100%, WIP âm, hold SLA âm, uptime bất khả thi</td><td>Fail release và giữ bảng điều khiển ở trạng thái cảnh báo</td></tr>
@@ -183,7 +183,7 @@ ul.tight li {margin:4px 0;}
 <p>Mọi chỉnh sửa bảng điều khiển trong giờ họp phải có dấu vết rõ ràng. Thay đổi có thể được làm rất nhanh, nhưng phải có hồ sơ, Người duyệt và bản so sánh trước–sau.</p></div>
 
 
-<div class="section" id="a10"><h2>10. Bảng điều khiển pack, freeze-date và exception-note mapping</h2><div class="table-card"><table class="table"><colgroup><col style="width:22%"/><col style="width:30%"/><col style="width:24%"/><col style="width:24%"/></colgroup><thead><tr><th>Field / note mở rộng</th><th>Khi nào bắt buộc ghi</th><th>Ý nghĩa quản trị</th><th>Cross-link</th></tr></thead><tbody><tr><td>People dependency note</td><td>KPI chịu ảnh hưởng bởi skill, certification, authorization hoặc deputy gap.</td><td>Ngăn việc giải thích KPI sai theo hướng “thiếu Người” chung chung.</td><td>ANNEX-801, FRM-807, ANNEX-123</td></tr><tr><td>Carry-over action reference</td><td>KPI đỏ kéo dài qua kỳ hoặc chưa đóng containment.</td><td>Buộc pack nói rõ lịch sử quyết định và trạng thái hiệu lực.</td><td>FRM-911, CAPA / kaizen / nhật ký hành động</td></tr><tr><td>Comparability break flag</td><td>Đổi source, đổi logic, backfill, manual adjustment hoặc freeze-date reset.</td><td>Bảo vệ quyết định khỏi việc so sánh sai giữa các kỳ.</td><td>ANNEX-113, WI-901</td></tr></tbody></table></div>
+<div class="section" id="a10"><h2>10. Bảng điều khiển pack, freeze-date và exception-note mapping</h2><div class="table-card"><table class="table"><colgroup><col style="width:22%"/><col style="width:30%"/><col style="width:24%"/><col style="width:24%"/></colgroup><thead><tr><th>Field / note mở rộng</th><th>Khi nào bắt buộc ghi</th><th>Ý nghĩa quản trị</th><th>Cross-link</th></tr></thead><tbody><tr><td>People dependency note</td><td>KPI chịu ảnh hưởng bởi skill, certification, authorization hoặc deputy gap.</td><td>Ngăn việc giải thích KPI sai theo hướng "thiếu Người" chung chung.</td><td>ANNEX-801, FRM-807, ANNEX-123</td></tr><tr><td>Carry-over action reference</td><td>KPI đỏ kéo dài qua kỳ hoặc chưa đóng containment.</td><td>Buộc pack nói rõ lịch sử quyết định và trạng thái hiệu lực.</td><td>FRM-911, CAPA / kaizen / nhật ký hành động</td></tr><tr><td>Comparability break flag</td><td>Đổi source, đổi logic, backfill, manual adjustment hoặc freeze-date reset.</td><td>Bảo vệ quyết định khỏi việc so sánh sai giữa các kỳ.</td><td>ANNEX-113, WI-901</td></tr></tbody></table></div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Pack / ngữ cảnh dùng</th><th>Người phụ trách chuẩn bị</th><th>Freeze-date / cut-off</th><th>Khi nào cần exception note</th><th>Hồ sơ / WI dùng để giữ vết</th></tr></thead><tbody>
 <tr><td>T1/T2 board trong ngày</td><td>Planning / Production / Người phụ trách QA của board</td><td>Trước họp 10–15 phút</td><td>Refresh fail, late posting, thiếu diễn tập-down, dùng export SoR thay bảng điều khiển</td><td><a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> ghi chú điều hành / board note</td></tr>
 <tr><td>T3 tuần / tháng</td><td>Người phụ trách Bảng điều khiển + chủ quá trình</td><td>Theo lịch pack đã công bố</td><td>Dữ liệu chưa đầy đủ, có reclass/backfill sau cut-off, vấn đề mapping còn mở</td><td>WI-901 + data vấn đề / change hồ sơ</td></tr>

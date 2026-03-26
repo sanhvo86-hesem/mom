@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>PO/dự báo/khách hàng Requests → rà soát hợp đồng phối hợp → đơn hàng xác nhận / biên nhận/kiểm soát thay đổi → giao hàng truyền đạt / giao tiếp → khiếu nại/RMA thương mại giao diện.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>Customer Dịch vụ là “mặt tiền dữ liệu đơn hàng” của doanh nghiệp: tiếp nhận PO, khóa đúng phiên bản / CSR / giao vận hướng dẫn, điều phối thông tin xuyên suốt từ khách hàng vào hệ thống và ngược lại. Vị trí này bảo đảm nhà máy chỉ cam kết những gì đã được rà soát hợp đồng đầy đủ và có thể thực hiện.</p><p>Trong môi trường gia công bán dẫn / cơ khí chính xác, sai một phiên bản, sai một PO dòng / chuyền hoặc sai một Requests chứng từ có thể dẫn đến từ chối, hoàn phí / bồi hoàn hoặc mất uy tín. Vì vậy Customer Dịch vụ phải làm chủ tính chính xác thương mại – dữ liệu – chứng từ, chứ không chỉ trả lời email khách hàng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mọi đơn hàng được tiếp nhận, xác nhận và thay đổi theo đúng phiên bản, đúng điều kiện thương mại và đúng Requests hồ sơ / nhãn / đóng gói.</li><li>Cam kết giao hàng ra khách hàng được hình thành trên dữ liệu plan thực và được cập nhật chủ động khi có rủi ro thay đổi.</li><li>Khiếu nại, RMA, khách hàng thuộc tính / tài sản và chứng từ lô giao hàng có đầu mối rõ, có log đầy đủ và không bị đứt mạch giữa khách hàng với nội bộ.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Customer Dịch vụ là Responsible Person của giao tiếp đơn hàng và dữ liệu thương mại với khách hàng; không tự quyết định tính khả thi kỹ thuật, không báo giá thay Người định giá và không hứa lịch giao khi Planner/Sản xuất chưa xác nhận.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Khóa đúng dữ liệu thương mại và cam kết-date giả định ngay từ đầu: phiên bản, CSR, ship điều kiện, chứng từ, tách / chia lô giao hàng, khiếu nại path.</li><li>Customer Dịch vụ phải là đơn lẻ source of sự thật cho giao tiếp đối ngoại, nhưng không tự sở hữu dữ liệu kỹ thuật/chất lượng/nguồn cung ngoài phạm vi của mình.</li><li>Mọi cam kết lại với khách phải bám năng lực thực tế đã được xác nhận nội bộ; không cam kết bằng kỳ vọng.</li></ul></div>
+<div class="jd-mission"><p>Customer Dịch vụ là "mặt tiền dữ liệu đơn hàng" của doanh nghiệp: tiếp nhận PO, khóa đúng phiên bản / CSR / giao vận hướng dẫn, điều phối thông tin xuyên suốt từ khách hàng vào hệ thống và ngược lại. Vị trí này bảo đảm nhà máy chỉ cam kết những gì đã được rà soát hợp đồng đầy đủ và có thể thực hiện.</p><p>Trong môi trường gia công bán dẫn / cơ khí chính xác, sai một phiên bản, sai một PO dòng / chuyền hoặc sai một Requests chứng từ có thể dẫn đến từ chối, hoàn phí / bồi hoàn hoặc mất uy tín. Vì vậy Customer Dịch vụ phải làm chủ tính chính xác thương mại – dữ liệu – chứng từ, chứ không chỉ trả lời email khách hàng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mọi đơn hàng được tiếp nhận, xác nhận và thay đổi theo đúng phiên bản, đúng điều kiện thương mại và đúng Requests hồ sơ / nhãn / đóng gói.</li><li>Cam kết giao hàng ra khách hàng được hình thành trên dữ liệu plan thực và được cập nhật chủ động khi có rủi ro thay đổi.</li><li>Khiếu nại, RMA, khách hàng thuộc tính / tài sản và chứng từ lô giao hàng có đầu mối rõ, có log đầy đủ và không bị đứt mạch giữa khách hàng với nội bộ.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Customer Dịch vụ là Responsible Person của giao tiếp đơn hàng và dữ liệu thương mại với khách hàng; không tự quyết định tính khả thi kỹ thuật, không báo giá thay Người định giá và không hứa lịch giao khi Planner/Sản xuất chưa xác nhận.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Khóa đúng dữ liệu thương mại và cam kết-date giả định ngay từ đầu: phiên bản, CSR, ship điều kiện, chứng từ, tách / chia lô giao hàng, khiếu nại path.</li><li>Customer Dịch vụ phải là đơn lẻ source of sự thật cho giao tiếp đối ngoại, nhưng không tự sở hữu dữ liệu kỹ thuật/chất lượng/nguồn cung ngoài phạm vi của mình.</li><li>Mọi cam kết lại với khách phải bám năng lực thực tế đã được xác nhận nội bộ; không cam kết bằng kỳ vọng.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

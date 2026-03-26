@@ -10,21 +10,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -38,7 +38,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -49,25 +49,6 @@ table{max-width:100%;table-layout:auto}
 td,th{}
  thead{display:table-header-group}tfoot{display:table-footer-group}
 @media (max-width: 960px){.grid-2,.grid-3,.field-grid{grid-template-columns:1fr;}}
-/* Critical inline CSS for file:// compatibility */
-
-/* Flowchart */
-.flowchart{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:stretch;margin:20px 0;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:1px solid rgba(21,101,192,.18);border-radius:10px}
-.flow-step{flex:1 1 120px;min-width:100px;max-width:170px;padding:10px 12px;background:#fff;border:1.5px solid rgba(21,101,192,.3);border-radius:10px;text-align:center;box-shadow:0 1px 3px rgba(21,101,192,.06)}
-.flow-step .flow-num{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#1565c0,#1976d2);color:#fff;font-size:12px;font-weight:800;margin-bottom:5px}
-.flow-step .flow-title{font-size:11px;font-weight:700;color:#0C2D48;line-height:1.35}
-.flow-step .flow-text{text-align:left}
-.flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 22px;color:#93b3d6;font-size:16px;font-weight:700}
-/* Proc-num */
-.proc-num{display:inline-flex;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;flex-shrink:0;margin-right:8px}
-/* Step-tag */
-.step-tag{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0C2D48,#1565c0);text-transform:uppercase;letter-spacing:.3px}
-/* Metric cards */
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:16px 0}
-.metric-card{padding:16px;border:1px solid rgba(21,101,192,.15);border-radius:10px;text-align:center;background:#fff}
-.metric-card .value{font-size:28px;font-weight:800;color:#1565c0;line-height:1.2}
-.metric-card .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-top:4px}
-.metric-card .sub{font-size:11px;color:#666;margin-top:4px;line-height:1.4}
 
 </style>
 </head>
@@ -110,7 +91,7 @@ td,th{}
 <tr><td>Point-of-use xác minh</td><td>Kiểm nhanh trước khi dùng hoặc theo nhịp độ / chu kỳ họp quy định nhằm xác nhận gage chưa trôi / sai lệch/hỏng; không thay hiệu chuẩn định kỳ nhưng có giá trị dừng sử dụng ngay khi không đạt.</td></tr>
 <tr><td>Thu hồi scope</td><td>Danh sách lot/job/part/quá trình có khả năng bị ảnh hưởng bởi thiết bị OOT hoặc nghi ngờ trôi / sai lệch, tính từ cuối cùng-đã biết-tốt / đạt đến thời điểm phát hiện.</td></tr>
 </tbody></table></div>
-<div class="note-blue"><b>Nguyên tắc điều hành:</b> Không có thiết bị đo “mặc định đáng tin”. Trạng thái hợp lệ phải được chứng minh bằng hồ sơ, nhãn và bối cảnh sử dụng Current.</div>
+<div class="note-blue"><b>Nguyên tắc điều hành:</b> Không có thiết bị đo "mặc định đáng tin". Trạng thái hợp lệ phải được chứng minh bằng hồ sơ, nhãn và bối cảnh sử dụng Current.</div>
 <h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:35%"/><col style="width:17%"/><col style="width:15%"/><col style="width:15%"/></colgroup><thead><tr><th>Vai trò</th><th>Trách nhiệm bắt buộc</th><th>Quyền quyết định</th><th>Khi nào phải báo cáo vượt cấp</th><th>KPI cốt lõi</th></tr></thead><tbody>
 <tr><td>Đo lường / Hiệu chuẩn Specialist</td><td>Duy trì chủ / gốc hàng tồn kho, chu kỳ, hiệu chuẩn sự kiện, lab đánh giá, OOT đánh giá và thu hồi scope.</td><td>Quyền TẠM GIỮ thiết bị, stop use, Requests re-cal, mở đánh giá ảnh hưởng sản phẩm.</td><td>OOT trên thiết bị dùng phát hành, bằng chứng lab không đạt, lặp lại trôi / sai lệch.</td><td>On-time hiệu chuẩn, OOT tỷ lệ, thu hồi kết thúc / đóng time.</td></tr>
@@ -186,12 +167,12 @@ td,th{}
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#be185d,#ec4899)">10</span> Tối ưu đo lường system sau mỗi quý</h3>
 <ul class="tight"><li>Review hàng quý phải tổng hợp quá hạn %, OOT %, lặp lại hư hỏng, trung bình thu hồi scope size, and re-kiểm tra giờ để xem đo lường system đang hỗ trợ hay đang kéo lùi sản xuất.</li><li>Thiết bị ít dùng nhưng rủi ro thấp có thể giãn khoảng thời gian có kiểm soát; ngược lại, thiết bị nhiều use/trôi / sai lệch phải rút ngắn khoảng thời gian hoặc đổi phương pháp đo.</li><li>Khi data cho thấy cùng một đặc tính liên tục phải đo lại bằng nhiều gage khác nhau mới tin được kết quả, Kỹ thuật + QA phải xem lại thiết kế đo lường chiến lược, fixture/phương pháp, không đẩy toàn bộ gánh nặng cho Đo lường.</li></ul>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">11</span> Điều kiện môi trường đo và quy tắc chuẩn tham chiếu</h3>
-<ul class="tight"><li>Thiết bị và chủ / gốc dùng cho phát hành quyết định phải được bảo quản và sử dụng trong điều kiện môi trường phù hợp: sạch, khô, nhiệt độ ổn định tương đối, tránh sốc nhiệt giữa kho điều hòa và phân xưởng nóng, tránh đặt cạnh nguồn rung hoặc từ trường khi không phù hợp.</li><li>bản gốc/tham chiếu sản phẩm / tạo tác phải có level kiểm soát chặt hơn thiết bị được xác minh; không được dùng một làm việc gage khác chưa rõ trạng thái để xác minh chéo rồi coi là hợp lệ.</li><li>Nếu việc đo phụ thuộc đáng kể vào nhiệt độ part/fixture hoặc thời gian ổn nhiệt, hướng dẫn này phải được nêu rõ tại WI hoặc phương pháp hồ sơ; không được để Operator tự “ước lượng bằng kinh Nhiệm”.</li><li>Khi part ướt dầu/dung dịch làm mát (dung dịch làm nguội), bẩn hoặc có bavia ảnh hưởng điểm đo, phải xử lý tình trạng part trước khi kết luận thiết bị trôi / sai lệch. Không dùng gage đang nghi sai để chứng minh gage khác sai.</li></ul>
+<ul class="tight"><li>Thiết bị và chủ / gốc dùng cho phát hành quyết định phải được bảo quản và sử dụng trong điều kiện môi trường phù hợp: sạch, khô, nhiệt độ ổn định tương đối, tránh sốc nhiệt giữa kho điều hòa và phân xưởng nóng, tránh đặt cạnh nguồn rung hoặc từ trường khi không phù hợp.</li><li>bản gốc/tham chiếu sản phẩm / tạo tác phải có level kiểm soát chặt hơn thiết bị được xác minh; không được dùng một làm việc gage khác chưa rõ trạng thái để xác minh chéo rồi coi là hợp lệ.</li><li>Nếu việc đo phụ thuộc đáng kể vào nhiệt độ part/fixture hoặc thời gian ổn nhiệt, hướng dẫn này phải được nêu rõ tại WI hoặc phương pháp hồ sơ; không được để Operator tự "ước lượng bằng kinh Nhiệm".</li><li>Khi part ướt dầu/dung dịch làm mát (dung dịch làm nguội), bẩn hoặc có bavia ảnh hưởng điểm đo, phải xử lý tình trạng part trước khi kết luận thiết bị trôi / sai lệch. Không dùng gage đang nghi sai để chứng minh gage khác sai.</li></ul>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">12</span> Ma trận quyết định thiết bị dùng cho phát hành / chỉ dùng tham khảo / không được dùng</h3>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:22%"/><col style="width:18%"/><col style="width:18%"/><col style="width:42%"/></colgroup><thead><tr><th>Trạng thái thiết bị</th><th>Dùng cho phát hành?</th><th>Dùng tham khảo?</th><th>Ghi chú bắt buộc</th></tr></thead><tbody>
 <tr><td>Hợp lệ + xác minh pass</td><td>Có</td><td>Có</td><td>Dùng theo dự kiến / có chủ đích use và phương pháp đã phê duyệt</td></tr>
 <tr><td>Hợp lệ nhưng xác minh fail / nghi ngờ trôi / sai lệch</td><td>Không</td><td>Không</td><td>TẠM GIỮ ngay, mở đánh giá</td></tr>
-<tr><td>quá hạn</td><td>Không</td><td>Chỉ khi ghi rõ “tham chiếu chỉ / duy nhất”, không dùng chấp nhận/từ chối</td><td>Không được lẫn với gage hợp lệ</td></tr>
+<tr><td>quá hạn</td><td>Không</td><td>Chỉ khi ghi rõ "tham chiếu chỉ / duy nhất", không dùng chấp nhận/từ chối</td><td>Không được lẫn với gage hợp lệ</td></tr>
 <tr><td>Mất nhãn / ID không đọc được</td><td>Không</td><td>Không</td><td>Xử lý như TẠM GIỮ</td></tr>
 <tr><td>Mượn/khách hàng gage chưa đánh giá</td><td>Không</td><td>Không</td><td>Phải qua acceptance quy trình trước</td></tr>
 <tr><td>đã sửa chữa, đã sửa đổi, đầu dò (probe) đã thay đổi nhưng chưa xác nhận lại</td><td>Không</td><td>Không</td><td>xác nhận lại bắt buộc</td></tr>
@@ -205,7 +186,7 @@ td,th{}
 <tr><td>cuối cùng-đã biết-tốt / đạt / OOT lịch sử</td><td>Thu hồi scope và xu hướng rà soát</td><td>QA</td><td>Giữ lại qua toàn bộ vòng đời thiết bị</td></tr>
 </tbody></table></div>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">13</span> Interfaces với MSA, SPC và final phát hành</h3>
-<p>Khi đo lường system đổi phương pháp, đổi gage, đổi fixture hoặc có OOT/xác minh hỏng / lỗi lặp lại trên đặc tính quan trọng, QA phải xem lại ảnh hưởng tới <a href="sop-602-measurement-system-analysis-msagr-r.html">MSA</a>, <a href="sop-604-spc-and-capability-control.html">SPC/năng lực / khả năng</a> và kiểm tra cuối quyết định. Không được để MSA vẫn “đạt trên giấy” trong khi gage đang trôi / sai lệch ngoài hiện trường. Nếu gage được dùng cho mẫu đầu hoặc final phát hành, mức phản ứng phải nhanh hơn gage chỉ dùng tham khảo.</p>
+<p>Khi đo lường system đổi phương pháp, đổi gage, đổi fixture hoặc có OOT/xác minh hỏng / lỗi lặp lại trên đặc tính quan trọng, QA phải xem lại ảnh hưởng tới <a href="sop-602-measurement-system-analysis-msagr-r.html">MSA</a>, <a href="sop-604-spc-and-capability-control.html">SPC/năng lực / khả năng</a> và kiểm tra cuối quyết định. Không được để MSA vẫn "đạt trên giấy" trong khi gage đang trôi / sai lệch ngoài hiện trường. Nếu gage được dùng cho mẫu đầu hoặc final phát hành, mức phản ứng phải nhanh hơn gage chỉ dùng tham khảo.</p>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">14</span> Năng lực Người dùng và quyền dùng gage</h3><p>Người dùng chỉ được sử dụng gage cho phát hành quyết định khi đã được đào tạo đúng phương pháp, biết đọc nhãn trạng thái, biết thực hiện xác minh tương ứng và biết khi nào phải TẠM GIỮ. Nếu một khu vực có lặp lại lạm dụng, quản lý khu vực phải khóa quyền dùng thiết bị class cao cho tới khi đào tạo lại và xác nhận năng lực hoàn tất.</p><h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:20%"/><col style="width:46%"/><col style="width:16%"/><col style="width:18%"/></colgroup><thead><tr><th>Tình huống</th><th>Quy tắc bắt buộc</th><th>Phê duyệt</th><th>Hồ sơ</th></tr></thead><tbody>
 <tr><td>Mượn / khách hàng gage</td><td>Phải được đánh giá sự phù hợp-for-use, gán trạng thái, ID tạm và xác minh tối thiểu trước khi dùng cho phát hành.</td><td>QA Lead</td><td>Mượn gage log</td></tr>

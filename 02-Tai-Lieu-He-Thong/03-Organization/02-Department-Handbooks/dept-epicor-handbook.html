@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -27,10 +27,10 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .org-tree{display:flex;flex-direction:column;gap:16px;margin:8px 0;}
 .org-level{display:grid;gap:14px;}
 .org-level.cols-1{grid-template-columns:1fr;}
-.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr);}
-.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr);}
-.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr);}
-.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr);}
+.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr));}
 .org-card{border:1px solid var(--ln);border-top:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .org-card h3{font-size:14px;color:var(--navy);margin:0 0 4px;}
 .org-card p{margin:4px 0;font-size:12px;}
@@ -39,7 +39,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .badge-soft{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:10px;font-weight:700;margin-right:6px;margin-bottom:6px;}
 .kpi-box{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);margin:8px 0;}
 .kpi-box b{display:block;font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .ranh giới trách nhiệm{border:1px solid #cfe0ff;border-left: 3px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
@@ -50,19 +50,19 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
 .toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .toc-grid a{display:block;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2)}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr);gap:14px;margin:14px 0}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg)}
 .metric-card .value{font-weight:800;font-size:16px;color:var(--navy);margin:6px 0}
 .metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
-.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr);gap:14px;margin:14px 0}
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
 .check-item{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
 .process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
 .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700}
 .card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .tight{margin:0;padding-left:18px}
 .tight li{margin:4px 0}
 .mini-note{font-size:12px;color:var(--ink2)}
@@ -72,25 +72,6 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 
 </style>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }
-/* Critical inline CSS for file:// compatibility */
-
-/* Flowchart */
-.flowchart{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:stretch;margin:20px 0;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:1px solid rgba(21,101,192,.18);border-radius:10px}
-.flow-step{flex:1 1 120px;min-width:100px;max-width:170px;padding:10px 12px;background:#fff;border:1.5px solid rgba(21,101,192,.3);border-radius:10px;text-align:center;box-shadow:0 1px 3px rgba(21,101,192,.06)}
-.flow-step .flow-num{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#1565c0,#1976d2);color:#fff;font-size:12px;font-weight:800;margin-bottom:5px}
-.flow-step .flow-title{font-size:11px;font-weight:700;color:#0C2D48;line-height:1.35}
-.flow-step .flow-text{text-align:left}
-.flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 22px;color:#93b3d6;font-size:16px;font-weight:700}
-/* Proc-num */
-.proc-num{display:inline-flex;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;flex-shrink:0;margin-right:8px}
-/* Step-tag */
-.step-tag{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0C2D48,#1565c0);text-transform:uppercase;letter-spacing:.3px}
-/* Metric cards */
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:16px 0}
-.metric-card{padding:16px;border:1px solid rgba(21,101,192,.15);border-radius:10px;text-align:center;background:#fff}
-.metric-card .value{font-size:28px;font-weight:800;color:#1565c0;line-height:1.2}
-.metric-card .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-top:4px}
-.metric-card .sub{font-size:11px;color:#666;margin-top:4px;line-height:1.4}
 
 </style>
 <link rel="stylesheet" href="../../../assets/style.css"/>
@@ -135,7 +116,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <p>Bao phủ quản trị dữ liệu gốc và sơ đồ ánh xạ, vai trò/truy cập trong Epicor, giao dịch quản trị, giao diện với M365/QMS luồng công việc và báo cáo, thay đổi triển khai/chuyển giao hệ thống, lỗi log phân loại ưu tiên, đối soát sau phương án dự phòng, Người dùng hỗ trợ cho nghiệp vụ chuẩn, và phối hợp với IT/nhà cung cấp cho hạ tầng/cơ chế sao lưu khôi phục.</p>
 <div class="table-card"><table class="table"><colgroup><col style="width:20%"/><col style="width:40%"/><col style="width:40%"/></colgroup><thead><tr><th>Nhóm hoạt động</th><th>Bao gồm</th><th>Không thay thế / không vượt quyền</th></tr></thead><tbody><tr><td>Giao dịch quản trị</td><td>Xác định giao dịch nào bắt buộc ghi trong Epicor, thời điểm ghi, Người dùng vai trò và điểm khóa dữ liệu.</td><td>Không để luồng công việc ngoài ERP thay giao dịch chính thức mà không có thiết kế SSOT rõ.</td></tr><tr><td>Dữ liệu gốc & sơ đồ ánh xạ</td><td>Part/khách hàng/nhà cung cấp/item/vị trí/UOM/trạng thái/giao dịch sơ đồ ánh xạ và quy tắc chuẩn hóa dữ liệu.</td><td>Không tự mở mã hoặc sửa logic dùng chung mà không có Responsible Person nghiệp vụ phê duyệt.</td></tr><tr><td>Truy cập / SoD / dấu vết kiểm toán</td><td>Vai trò-dựa trên truy cập, nhạy cảm giao dịch, phê duyệt path, ghi nhật ký, Người dùng vòng đời.</td><td>Không cấp siêu Người dùng để giải quyết vấn đề tạm thời nếu không có kiểm soát.</td></tr><tr><td>Thay đổi / tích hợp / chuyển giao hệ thống</td><td>Biểu mẫu, BAQ/báo cáo, bảng điều khiển trích xuất, giao diện sơ đồ ánh xạ, test, triển khai, hoàn tác / quay lại, re-mục nhập sau chế độ ngoại tuyến.</td><td>Không triển khai thay đổi trực tiếp sản xuất mà không test và xác nhận phê duyệt.</td></tr></tbody></table></div>
 <h2 class="h2" id="g3">3. Trách nhiệm bắt buộc</h2>
-<ul class="tight"><li>Khóa ranh giới giữa Epicor và M365/QMS ứng dụng: Epicor là SoR cho giao dịch ERP đã chốt; M365 là SoR cho luồng công việc, phê duyệt, hồ sơ/bằng chứng ở nơi đã được định nghĩa trong <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a>.</li><li>Duy trì dữ liệu gốc sạch và có Responsible Person: mã part, khách hàng, nhà cung cấp, UOM, vị trí, trạng thái, lộ trình gia công tham chiếu, GL/tính giá thành đánh dấu, giao vận thuộc tính và bản ánh xạ không được phát sinh tùy tiện.</li><li>Governance phân quyền theo vai trò và tách nhiệm vụ; các quyền nhạy cảm như data sửa chữa / hiệu chính, back-date, dữ liệu gốc tạo mới, lô giao hàng hoàn thành, phiếu nhận / biên nhận ghi đè / bỏ qua hoặc sổ tay / thủ công điều chỉnh phải có rule rõ và rà soát định kỳ.</li><li>Mọi thay đổi BAQ/báo cáo, BPM/tùy chỉnh, giao diện, Người dùng vai trò, field rule hoặc chuyển giao hệ thống logic phải qua kiểm soát thay đổi với test bằng chứng, phương án dự phòng/hoàn tác / quay lại plan và truyền đạt / giao tiếp plan theo <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> / <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114</a>.</li><li>Khi vận hành phương án dự phòng/offline, Epicor admin phải giữ danh sách giao dịch tạm, logic nhập bù, đối soát số lượng/trạng thái/date/time và bảo đảm không tạo trùng lặp/bỏ lỡ giao dịch sau khôi phục theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a>.</li><li>Duy trì năng lực hỗ trợ Người dùng ở mức quy trình kỷ luật / chuyên ngành: hỗ trợ cách dùng giao dịch chuẩn, giải thích logic dữ liệu và phát hiện lệch hệ thống; không sửa số liệu “cho khớp đẹp” mà không có nguyên nhân gốc và phê duyệt.</li></ul>
+<ul class="tight"><li>Khóa ranh giới giữa Epicor và M365/QMS ứng dụng: Epicor là SoR cho giao dịch ERP đã chốt; M365 là SoR cho luồng công việc, phê duyệt, hồ sơ/bằng chứng ở nơi đã được định nghĩa trong <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a>.</li><li>Duy trì dữ liệu gốc sạch và có Responsible Person: mã part, khách hàng, nhà cung cấp, UOM, vị trí, trạng thái, lộ trình gia công tham chiếu, GL/tính giá thành đánh dấu, giao vận thuộc tính và bản ánh xạ không được phát sinh tùy tiện.</li><li>Governance phân quyền theo vai trò và tách nhiệm vụ; các quyền nhạy cảm như data sửa chữa / hiệu chính, back-date, dữ liệu gốc tạo mới, lô giao hàng hoàn thành, phiếu nhận / biên nhận ghi đè / bỏ qua hoặc sổ tay / thủ công điều chỉnh phải có rule rõ và rà soát định kỳ.</li><li>Mọi thay đổi BAQ/báo cáo, BPM/tùy chỉnh, giao diện, Người dùng vai trò, field rule hoặc chuyển giao hệ thống logic phải qua kiểm soát thay đổi với test bằng chứng, phương án dự phòng/hoàn tác / quay lại plan và truyền đạt / giao tiếp plan theo <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> / <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114</a>.</li><li>Khi vận hành phương án dự phòng/offline, Epicor admin phải giữ danh sách giao dịch tạm, logic nhập bù, đối soát số lượng/trạng thái/date/time và bảo đảm không tạo trùng lặp/bỏ lỡ giao dịch sau khôi phục theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a>.</li><li>Duy trì năng lực hỗ trợ Người dùng ở mức quy trình kỷ luật / chuyên ngành: hỗ trợ cách dùng giao dịch chuẩn, giải thích logic dữ liệu và phát hiện lệch hệ thống; không sửa số liệu "cho khớp đẹp" mà không có nguyên nhân gốc và phê duyệt.</li></ul>
 <h2 class="h2" id="g4">4. Quyền hạn</h2>
 <div class="auth-grid"><div class="auth-item"><b>từ chối không an toàn giao dịch / truy cập</b><p>Epicor admin có quyền từ chối Requests quyền hoặc giao dịch giải pháp tạm vi phạm SoD, không có dấu vết kiểm toán hoặc tạo rủi ro data tính toàn vẹn.</p></div><div class="auth-item"><b>Hold triển khai / chuyển giao hệ thống</b><p>Epicor admin có quyền hoãn triển khai báo cáo/giao diện/tùy chỉnh khi chưa test, chưa có hoàn tác / quay lại hoặc chưa có Responsible Person xác nhận phê duyệt.</p></div><div class="auth-item"><b>Đóng băng dữ liệu gốc thay đổi</b><p>Epicor admin có quyền giữ Requests tạo/sửa dữ liệu gốc khi đặt tên rule, sơ đồ ánh xạ hoặc phê duyệt của Responsible Person chưa đầy đủ.</p></div><div class="auth-item"><b>Kích hoạt đối soát trước mở lại</b><p>Sau mất dịch vụ / ngưng hoạt động/phương án dự phòng, Epicor admin có quyền Requests đối soát giao dịch trước khi tuyên bố hệ thống sẵn sàng cho hoạt động bình thường.</p></div></div>
 <div class="table-card"><table class="table decision-table"><colgroup><col style="width:28%"/><col style="width:18%"/><col style="width:24%"/><col style="width:30%"/></colgroup><thead><tr><th>Quyết định / ranh giới</th><th>Responsible Person quyết định</th><th>Phải tham vấn</th><th>Không được vượt</th></tr></thead><tbody><tr><td>Tạo/sửa dữ liệu gốc</td><td>Epicor admin theo đã phê duyệt Requests</td><td>Quy trình Owner, Finance/SCM/Kỹ thuật tùy data lĩnh vực / miền</td><td>Không tạo mã tạm không truy vết Responsible Person/use-tình huống</td></tr><tr><td>Cấp quyền giao dịch nhạy cảm</td><td>Epicor admin + quản lý phê duyệt theo matrix</td><td>Responsible Person IT/system/Quy trình Owner</td><td>Không cấp quyền rộng chỉ để giải quyết công việc tồn đọng ngắn hạn</td></tr><tr><td>triển khai BPM/BAQ/báo cáo/giao diện</td><td>Epicor admin + chủ nghiệp vụ</td><td>IT/nhà cung cấp nếu hạ tầng liên quan</td><td>Không triển khai trực tiếp sản xuất thiếu UAT / hoàn tác / quay lại</td></tr><tr><td>Re-mục nhập / đối soát sau offline</td><td>Epicor admin</td><td>Chủ quá trình bị ảnh hưởng</td><td>Không nhập bù mà không đối chiếu bằng chứng nguồn và tránh trùng lặp</td></tr></tbody></table></div>

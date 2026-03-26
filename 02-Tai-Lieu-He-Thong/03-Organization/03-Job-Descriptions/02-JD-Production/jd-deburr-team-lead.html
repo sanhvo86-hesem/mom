@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Sau gia công cơ khí → mài bavia / hoàn thiện thủ công → phát hiện bất thường → bảo vệ bề mặt → chuyển làm sạch/kiểm tra.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>Deburr Team Lead chịu trách nhiệm tổ chức và kiểm soát công đoạn mài bavia / hoàn thiện bề mặt bằng tay hoặc bán thủ công để sản phẩm đạt Requests về cạnh, ngoại quan, sạch và an toàn trước khi chuyển công đoạn kế tiếp.</p><p>Vị trí này đặc biệt quan trọng với khách hàng bán dẫn / công nghệ cao vì lỗi cạnh, xước, bavia hoặc FOD sau gia công thường khó phát hiện ở cuối chuỗi nhưng ảnh hưởng rất lớn đến sự tin cậy của sản phẩm.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>WIP mài bavia được xử lý đúng ưu tiên giao hàng và đúng tiêu chí tay nghề.</li><li>Không để lỗi xước, lõm / móp, vát mép sai, bavia tồn hoặc lẫn WIP lan sang làm sạch / đóng gói / kiểm tra.</li><li>Đội mài bavia có chuẩn vận hành và bằng chứng kiểm soát thống nhất, giảm phụ thuộc tay nghề cá nhân.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Deburr Team Lead chịu trách nhiệm đầu ra hoàn thiện bề mặt theo WI và phát hiện sớm lỗi công đoạn trước; không được tự quyết định chuẩn chấp nhận, bỏ lỗi ngoại quan hoặc phê duyệt làm lại vượt hướng dẫn.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Giữ ổn định luồng sau gia công cơ khí bằng kiểm soát mài bavia/thứ cấp vận hành theo CTQ, bảo vệ bề mặt, bảo toàn truy xuất nguồn gốc và mức sẵn sàng cho làm sạch/kiểm tra/ship.</li><li>Không xem mài bavia là công đoạn “nhẹ”; đây là điểm dễ phát sinh ngoại quan / bề ngoài hư hỏng, mất định hướng / đào tạo hội nhập, mix lot, FOD và thoát / bỏ qua nếu thiếu kỷ luật.</li><li>Điều hành hàng chờ và nhân lực tại công đoạn hoàn thiện để không biến công đoạn sau thành nút thắt ẩn.</li></ul></div>
+<div class="jd-mission"><p>Deburr Team Lead chịu trách nhiệm tổ chức và kiểm soát công đoạn mài bavia / hoàn thiện bề mặt bằng tay hoặc bán thủ công để sản phẩm đạt Requests về cạnh, ngoại quan, sạch và an toàn trước khi chuyển công đoạn kế tiếp.</p><p>Vị trí này đặc biệt quan trọng với khách hàng bán dẫn / công nghệ cao vì lỗi cạnh, xước, bavia hoặc FOD sau gia công thường khó phát hiện ở cuối chuỗi nhưng ảnh hưởng rất lớn đến sự tin cậy của sản phẩm.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>WIP mài bavia được xử lý đúng ưu tiên giao hàng và đúng tiêu chí tay nghề.</li><li>Không để lỗi xước, lõm / móp, vát mép sai, bavia tồn hoặc lẫn WIP lan sang làm sạch / đóng gói / kiểm tra.</li><li>Đội mài bavia có chuẩn vận hành và bằng chứng kiểm soát thống nhất, giảm phụ thuộc tay nghề cá nhân.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Deburr Team Lead chịu trách nhiệm đầu ra hoàn thiện bề mặt theo WI và phát hiện sớm lỗi công đoạn trước; không được tự quyết định chuẩn chấp nhận, bỏ lỗi ngoại quan hoặc phê duyệt làm lại vượt hướng dẫn.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Giữ ổn định luồng sau gia công cơ khí bằng kiểm soát mài bavia/thứ cấp vận hành theo CTQ, bảo vệ bề mặt, bảo toàn truy xuất nguồn gốc và mức sẵn sàng cho làm sạch/kiểm tra/ship.</li><li>Không xem mài bavia là công đoạn "nhẹ"; đây là điểm dễ phát sinh ngoại quan / bề ngoài hư hỏng, mất định hướng / đào tạo hội nhập, mix lot, FOD và thoát / bỏ qua nếu thiếu kỷ luật.</li><li>Điều hành hàng chờ và nhân lực tại công đoạn hoàn thiện để không biến công đoạn sau thành nút thắt ẩn.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
@@ -190,7 +190,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2">9. Yêu cầu năng lực (Năng lực Yêu cầu)</h2>
 <div class="comp-grid">
 <div class="comp-card"><p><b>Kiến thức chuyên môn &amp; hệ thống</b></p><ul><li>Hiểu khuyết tật phân loại, bảo vệ bề mặt, FOD, truy xuất nguồn gốc, cách cách ly OK / TẠM GIỮ / NG và bàn giao sang công đoạn sau.</li><li>Biết xây trực quan mẫu, hướng dẫn vận hành và kiểm soát biến thiên tay nghề.</li></ul></div>
-<div class="comp-card"><p><b>Năng lực lãnh đạo / hành vi</b></p><ul><li>Tỉ mỉ, kiên nhẫn, giữ chuẩn cao, có khả năng kèm cặp phát triển trực tiếp tại bàn vận hành.</li><li>PHẢI giữ chuẩn bề mặt / cạnh của sản phẩm; không “đánh nhanh cho xong”.</li></ul></div>
+<div class="comp-card"><p><b>Năng lực lãnh đạo / hành vi</b></p><ul><li>Tỉ mỉ, kiên nhẫn, giữ chuẩn cao, có khả năng kèm cặp phát triển trực tiếp tại bàn vận hành.</li><li>PHẢI giữ chuẩn bề mặt / cạnh của sản phẩm; không "đánh nhanh cho xong".</li></ul></div>
 </div>
 <div class="callout"><p><b>Mô-đun năng lực / đào tạo cốt lõi</b></p><ul><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C01.html">C01 — Mô-đun C01 — Nơi làm việc An toàn &amp; 5S | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C02.html">C02 — Mô-đun C02 — Quy trình Kỷ luật &amp; Standard Công việc Tuân thủ | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C03.html">C03 — Mô-đun C03 — Quality Tư duy (Đúng ngay từ lần đầu (Quyền / Đúng Đầu tiên Time) | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C04.html">C04 — Mô-đun C04 — chéo-Department Truyền đạt &amp; Phối hợp | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C10.html">C10 — Mô-đun C10 — Quy trình Lệnh sản xuất CNC (RFQ → Tiền mặt) | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C17.html">C17 — Mô-đun C17 — Kỹ thuật Năng lực by Vai trò (CNC/Setup/CAM) | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C19.html">C19 — Mô-đun C19 — Tuyến đầu Lãnh đạo &amp; Kèm cặp phát triển (huấn luyện) | HESEM OS</a></li></ul></div>
 <p class="inline-note">Mức đánh giá chi tiết, kiểm soát cổng OJT và lộ trình phát triển áp dụng theo ma trận đào tạo (matrix) / năng lực đánh giá hướng dẫn hiện hành của bộ phận.</p>

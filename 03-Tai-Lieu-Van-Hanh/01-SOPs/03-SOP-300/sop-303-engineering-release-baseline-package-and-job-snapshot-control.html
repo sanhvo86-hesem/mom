@@ -11,21 +11,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -39,7 +39,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -50,25 +50,6 @@ table{max-width:100%;table-layout:auto}
 td,th{}
  thead{display:table-header-group}tfoot{display:table-footer-group}
 @media (max-width: 960px){.grid-2,.grid-3,.field-grid{grid-template-columns:1fr;}}
-/* Critical inline CSS for file:// compatibility */
-
-/* Flowchart */
-.flowchart{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:stretch;margin:20px 0;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:1px solid rgba(21,101,192,.18);border-radius:10px}
-.flow-step{flex:1 1 120px;min-width:100px;max-width:170px;padding:10px 12px;background:#fff;border:1.5px solid rgba(21,101,192,.3);border-radius:10px;text-align:center;box-shadow:0 1px 3px rgba(21,101,192,.06)}
-.flow-step .flow-num{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#1565c0,#1976d2);color:#fff;font-size:12px;font-weight:800;margin-bottom:5px}
-.flow-step .flow-title{font-size:11px;font-weight:700;color:#0C2D48;line-height:1.35}
-.flow-step .flow-text{text-align:left}
-.flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 22px;color:#93b3d6;font-size:16px;font-weight:700}
-/* Proc-num */
-.proc-num{display:inline-flex;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;flex-shrink:0;margin-right:8px}
-/* Step-tag */
-.step-tag{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0C2D48,#1565c0);text-transform:uppercase;letter-spacing:.3px}
-/* Metric cards */
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:16px 0}
-.metric-card{padding:16px;border:1px solid rgba(21,101,192,.15);border-radius:10px;text-align:center;background:#fff}
-.metric-card .value{font-size:28px;font-weight:800;color:#1565c0;line-height:1.2}
-.metric-card .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-top:4px}
-.metric-card .sub{font-size:11px;color:#666;margin-top:4px;line-height:1.4}
 
 </style>
 </head>
@@ -117,7 +98,7 @@ td,th{}
 <a href="#p10">10. Biểu mẫu, WI, SOP &amp; JD liên kết</a>
 </div>
 </div>
-<h2 class="h2" id="p1">1. Mục đích</h2><p>Thiết lập phương pháp tạo, phê duyệt, phát hành, khóa, thay thế và thu hồi <b>Part/Rev standard gói hàng</b> và <b>Job-đã đóng băng gói hàng</b> để tất cả Point-of-use trong nhà máy luôn làm việc trên đúng dữ liệu hiệu lực.</p><ul class="tight"><li>Bảo đảm mỗi Part/Rev có một gói mốc chuẩn chuẩn để Kỹ thuật, QA, Kế hoạch, Mua hàng và Sản xuất dùng chung một nguyên tắc kỹ thuật.</li><li>Bảo đảm mỗi Job/WO có một Photos trạng thái đóng băng những thứ cần dùng tại hiện trường: traveler link, phiếu setup, mã chương trình/Rev, danh sách tooling, fixture note, kiểm tra Requests, đóng gói/label note, cert Requests và các điểm dừng chất lượng.</li><li>Bảo đảm mọi thay đổi sau khi Released đều có thay thế có kiểm soát logic, quét / dọn dẹp thu hồi, tái xác nhận hiệu lực kích hoạt và bằng chứng đầy đủ; không cho phép “thay file tại chỗ” mà không giữ dấu vết.</li></ul><h2 class="h2" id="p2">2. Phạm vi</h2><p>Áp dụng cho mọi part/rev và mọi job/wo cần phát hành dữ liệu kỹ thuật xuống Kế hoạch, QA, Mua hàng, Sản xuất, Kho hoặc Giao vận. Bao gồm cả new part, rev thay đổi, thí điểm lot, lặp lại job, job chuyển giao giữa máy/cell, job có CMM program, job có thuê ngoài/công đoạn đặc biệt, và job có Requests clean/truy xuất nguồn gốc đặc biệt.</p><ul class="tight"><li><b>Có bao phủ:</b> part chủ / gốc/rev chủ / gốc mức sẵn sàng, gói chuẩn tính đầy đủ, danh mục phát hành/tổng kiểm tra, phê duyệt cổng kiểm soát, job Photos trạng thái vấn đề, Point-of-use phân phối, thay thế có kiểm soát/rút / thu hồi, khẩn cấp/một phần phát hành, Photos trạng thái không khớp xử lý / vận chuyển.</li><li><b>Không thay thế:</b> chính thức thay đổi quản trị/ECR-ECO tại <a href="../01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a>; chi tiết chi tiết đầu tiên phát hành tại <a href="sop-302-first-article-inspection-fai.html">SOP-302</a>; machine-level chạy xác nhận/setup phát hành tại <a href="../05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>; final lô giao hàng phát hành tại <a href="../06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>.</li><li><b>Điểm biên:</b> SOP-303 không bàn chuyện “thiết kế quy trình gia công ban đầu có tốt hay không” — việc đó do <a href="sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a>; SOP-303 bàn chuyện “gói nào là gói đang có hiệu lực và ai được dùng gói đó”.</li></ul><h2 class="h2" id="p3">3. Thuật ngữ &amp; nguyên tắc</h2><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:24%"/><col style="width:76%"/></colgroup><thead><tr><th>Thuật ngữ</th><th>Diễn giải vận hành</th></tr></thead><tbody><tr><td><b>Part/Rev standard gói hàng</b></td><td>Gói chuẩn hóa theo part số và phiên bản, chứa toàn bộ dữ liệu kỹ thuật cần được xem là nguồn đúng để tạo Photos trạng thái và công đoạn sau kiểm soát.</td></tr>
+<h2 class="h2" id="p1">1. Mục đích</h2><p>Thiết lập phương pháp tạo, phê duyệt, phát hành, khóa, thay thế và thu hồi <b>Part/Rev standard gói hàng</b> và <b>Job-đã đóng băng gói hàng</b> để tất cả Point-of-use trong nhà máy luôn làm việc trên đúng dữ liệu hiệu lực.</p><ul class="tight"><li>Bảo đảm mỗi Part/Rev có một gói mốc chuẩn chuẩn để Kỹ thuật, QA, Kế hoạch, Mua hàng và Sản xuất dùng chung một nguyên tắc kỹ thuật.</li><li>Bảo đảm mỗi Job/WO có một Photos trạng thái đóng băng những thứ cần dùng tại hiện trường: traveler link, phiếu setup, mã chương trình/Rev, danh sách tooling, fixture note, kiểm tra Requests, đóng gói/label note, cert Requests và các điểm dừng chất lượng.</li><li>Bảo đảm mọi thay đổi sau khi Released đều có thay thế có kiểm soát logic, quét / dọn dẹp thu hồi, tái xác nhận hiệu lực kích hoạt và bằng chứng đầy đủ; không cho phép "thay file tại chỗ" mà không giữ dấu vết.</li></ul><h2 class="h2" id="p2">2. Phạm vi</h2><p>Áp dụng cho mọi part/rev và mọi job/wo cần phát hành dữ liệu kỹ thuật xuống Kế hoạch, QA, Mua hàng, Sản xuất, Kho hoặc Giao vận. Bao gồm cả new part, rev thay đổi, thí điểm lot, lặp lại job, job chuyển giao giữa máy/cell, job có CMM program, job có thuê ngoài/công đoạn đặc biệt, và job có Requests clean/truy xuất nguồn gốc đặc biệt.</p><ul class="tight"><li><b>Có bao phủ:</b> part chủ / gốc/rev chủ / gốc mức sẵn sàng, gói chuẩn tính đầy đủ, danh mục phát hành/tổng kiểm tra, phê duyệt cổng kiểm soát, job Photos trạng thái vấn đề, Point-of-use phân phối, thay thế có kiểm soát/rút / thu hồi, khẩn cấp/một phần phát hành, Photos trạng thái không khớp xử lý / vận chuyển.</li><li><b>Không thay thế:</b> chính thức thay đổi quản trị/ECR-ECO tại <a href="../01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a>; chi tiết chi tiết đầu tiên phát hành tại <a href="sop-302-first-article-inspection-fai.html">SOP-302</a>; machine-level chạy xác nhận/setup phát hành tại <a href="../05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>; final lô giao hàng phát hành tại <a href="../06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>.</li><li><b>Điểm biên:</b> SOP-303 không bàn chuyện "thiết kế quy trình gia công ban đầu có tốt hay không" — việc đó do <a href="sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a>; SOP-303 bàn chuyện "gói nào là gói đang có hiệu lực và ai được dùng gói đó".</li></ul><h2 class="h2" id="p3">3. Thuật ngữ &amp; nguyên tắc</h2><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:24%"/><col style="width:76%"/></colgroup><thead><tr><th>Thuật ngữ</th><th>Diễn giải vận hành</th></tr></thead><tbody><tr><td><b>Part/Rev standard gói hàng</b></td><td>Gói chuẩn hóa theo part số và phiên bản, chứa toàn bộ dữ liệu kỹ thuật cần được xem là nguồn đúng để tạo Photos trạng thái và công đoạn sau kiểm soát.</td></tr>
 <tr><td><b>Job-đã đóng băng gói hàng</b></td><td>Job-đã đóng băng gói hàng số, phản ánh phiên bản dữ liệu cụ thể được phép dùng cho một job/lot/vận hành tại thời điểm phát hành.</td></tr>
 <tr><td><b>Vấn đề sổ đăng ký</b></td><td>Danh mục file/hồ sơ trong gói hàng, kèm trạng thái, version/rev, chủ trì và tổng kiểm tra hoặc cách nhận diện tương đương để tránh dùng sai file.</td></tr>
 <tr><td><b>Được kiểm soát Point-of-use copy</b></td><td>Vị trí dùng dữ liệu được kiểm soát: máy, tủ hồ sơ phân xưởng, CMM lab, kho đóng gói bàn làm việc, giao vận bàn làm việc, cell bảng, ki-ốt.</td></tr>

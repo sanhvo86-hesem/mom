@@ -8,23 +8,23 @@
 <link href="../../assets/style.css" rel="stylesheet"/>
 <style>
 
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr);gap:14px;margin:14px 0;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;}
 .metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
-.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr);gap:14px;margin:14px 0;}
+.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;}
 .link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);}
 .link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
 .link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);}
 .link-list{list-style:none;margin:0;padding:0}
 .link-list li{padding:4px 0 4px 0;font-size:12px}
-.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:14px}
-.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
 .tight{margin:0;padding-left:18px}
 .tight li{margin:4px 0}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
 .hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}
 .hero h1{font-size:22px;line-height:1.35;color:var(--navy);margin:0 0 8px}
@@ -34,7 +34,7 @@
 .legend-box{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 .legend-box .chip{margin:0}
 .svg-wrap{overflow:auto;border:1px solid var(--ln);border-radius:var(--r);background:#fff;padding:12px}
-.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:10px;margin:12px 0}
+.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
 .notice-item{padding:10px 12px;border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r-sm);background:var(--bg);font-size:12px}
 .small{font-size:12px}
 .footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
@@ -72,7 +72,7 @@
 <div class="form-sheet">
 <div class="hero">
 <h1>Chứng nhận Sổ đăng ký — sổ đăng ký chứng nhận level và trạng thái năng lực</h1>
-<p>Sổ đăng ký này là nơi khóa trạng thái <b>Active / Có điều kiện / Hold / rút / thu hồi / Đã hết hạn</b> của từng chứng nhận nội bộ. Mục tiêu không chỉ là “lưu ai đã học”, mà là xác định ai đang thực sự được phép làm độc lập, làm Người đào tạo hoặc được tính vào phạm vi bao phủ phó.</p>
+<p>Sổ đăng ký này là nơi khóa trạng thái <b>Active / Có điều kiện / Hold / rút / thu hồi / Đã hết hạn</b> của từng chứng nhận nội bộ. Mục tiêu không chỉ là "lưu ai đã học", mà là xác định ai đang thực sự được phép làm độc lập, làm Người đào tạo hoặc được tính vào phạm vi bao phủ phó.</p>
 </div>
 <div class="note"><b>Phạm vi sử dụng</b><br/>Dùng khi cấp level, gia hạn, treo, thu hồi, mở rộng nhóm sản phẩm năng lực hoặc chứng minh phạm vi bao phủ cho <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">Phó Backup Matrix</a>. Sổ đăng ký này phải đồng bộ với <a download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-806_Certification_Tracking_Log.xlsx">FRM-806</a> và các bộ bằng chứng theo SSOT.</div>
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#r1">1. Trạng thái chứng nhận</a><a href="#r2">2. Quy trình cập nhật sổ đăng ký</a><a href="#r3">3. Bộ bằng chứng tối thiểu</a><a href="#r4">4. Kích hoạt treo / thu hồi / đánh giá lại</a><a href="#r5">5. Liên hệ với phó và KPI</a><a href="#r6">6. Mẫu sổ đăng ký tối thiểu</a></div></div>
@@ -93,14 +93,14 @@
 <h2 class="h2" id="r4">4. Kích hoạt treo / thu hồi / đánh giá lại</h2>
 <div class="table-card"><table class="table"><colgroup><col style="width:32%"/><col style="width:34%"/><col style="width:34%"/></colgroup><thead><tr><th>Kích hoạt</th><th>Phản ứng trong sổ đăng ký</th><th>Ghi chú</th></tr></thead><tbody><tr><td>Cổng kiểm soát vi phạm / khách hàng thoát / bỏ qua / NCR nghiêm trọng liên quan trực tiếp năng lực</td><td>Chuyển Hold hoặc giới hạn scope; mở hành động đào tạo lại / CA / đánh giá lại</td><td>Không chờ tới kỳ rà soát định kỳ.</td></tr><tr><td>Thay đổi quy trình, nhóm máy (machine nhóm sản phẩm), phiên bản logic hoặc quy định chất lượng làm thay đổi cách làm</td><td>Đánh dấu cần tái xác nhận hiệu lực hoặc tái chứng nhận</td><td>Không tự coi chứng nhận cũ đương nhiên còn phù hợp.</td></tr><tr><td>Nghỉ dài ngày, điều chuyển vai trò, thiếu bằng chứng duy trì</td><td>Chuyển Hold hoặc Đã hết hạn tùy bối cảnh</td><td>Phải có điều kiện quay lại rõ ràng.</td></tr><tr><td>Không đạt đánh giá / cổng kiểm soát test hoặc bằng chứng không đầy đủ</td><td>Có điều kiện, Hold hoặc rút / thu hồi</td><td>Quyết định theo mức độ và tác động.</td></tr></tbody></table></div>
 <h2 class="h2" id="r5">5. Liên hệ với phó và KPI</h2>
-<p>Chứng nhận chỉ được dùng làm bằng chứng phó khi <b>đúng vai trò nhóm sản phẩm, đúng scope và còn hiệu lực</b>. Việc một Người “đã từng được đào tạo” không đủ để đưa vào phạm vi bao phủ. Khi cập nhật sổ đăng ký, HR/QA phải rà chéo với <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028 Phó Backup Matrix</a> và nếu cần thì với <a download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-809 Kỹ năng Matrix &amp; KPI</a> để tránh khai quá năng lực hệ thống.</p>
+<p>Chứng nhận chỉ được dùng làm bằng chứng phó khi <b>đúng vai trò nhóm sản phẩm, đúng scope và còn hiệu lực</b>. Việc một Người "đã từng được đào tạo" không đủ để đưa vào phạm vi bao phủ. Khi cập nhật sổ đăng ký, HR/QA phải rà chéo với <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028 Phó Backup Matrix</a> và nếu cần thì với <a download="" href="../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-809 Kỹ năng Matrix &amp; KPI</a> để tránh khai quá năng lực hệ thống.</p>
 <h2 class="h2" id="r6">6. Mẫu sổ đăng ký tối thiểu</h2>
 <div class="table-card"><table class="table"><colgroup><col style="width:12%"/><col style="width:18%"/><col style="width:16%"/><col style="width:10%"/><col style="width:10%"/><col style="width:10%"/><col style="width:14%"/><col style="width:10%"/></colgroup><thead><tr><th>Person / ID</th><th>Vai trò / năng lực</th><th>Level / scope</th><th>Trạng thái</th><th>Vấn đề date</th><th>Next rà soát</th><th>Evidence link / Cert ID</th><th>ghi chú</th></tr></thead><tbody><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div>
 <div class="footer-note">Sổ đăng ký này là điểm khóa trạng thái công nhận. Không cập nhật sổ đăng ký nghĩa là hệ thống không có bằng chứng hiện hành để khẳng định phạm vi bao phủ hoặc quyền làm độc lập.</div>
 </div>
 
 <h2>7. ủy quyền và phó ranh giới</h2>
-<div class="note-warning"><b>Không dùng sổ đăng ký này để suy ra quyền làm việc một cách tự động</b><br/>Chứng nhận sổ đăng ký trả lời câu hỏi “ai đang giữ trạng thái chứng nhận nào”; còn quyền được phép làm và phó mức sẵn sàng phải được khóa thêm qua <a href="authorization-library.html">ủy quyền Thư viện</a> và <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a>.</div>
+<div class="note-warning"><b>Không dùng sổ đăng ký này để suy ra quyền làm việc một cách tự động</b><br/>Chứng nhận sổ đăng ký trả lời câu hỏi "ai đang giữ trạng thái chứng nhận nào"; còn quyền được phép làm và phó mức sẵn sàng phải được khóa thêm qua <a href="authorization-library.html">ủy quyền Thư viện</a> và <a href="../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a>.</div>
 <div class="table-card"><table class="table"><thead><tr><th>Sổ đăng ký field</th><th>Dùng cho</th><th>Không dùng để kết luận</th></tr></thead><tbody>
 <tr><td>Trạng thái chứng nhận / hết hạn</td><td>Theo dõi hiệu lực, tái chứng nhận, đình chỉ</td><td>Quyền ký-off ngoài ranh giới đã cấp</td></tr>
 <tr><td>Scope kỹ năng / phương pháp</td><td>Xác định phạm vi năng lực được đánh giá</td><td>Phó mức sẵn sàng nếu không có Cần đây bằng chứng</td></tr>

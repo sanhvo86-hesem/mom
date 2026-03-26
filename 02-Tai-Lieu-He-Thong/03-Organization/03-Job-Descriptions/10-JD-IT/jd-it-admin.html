@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Hạ tầng CNTT → điểm cuối/mạng/bảo mật mốc chuẩn → bộ phận hỗ trợ → thời gian hoạt động/backup/hỗ trợ cho toàn công ty.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>IT Admin duy trì nền hạ tầng số nền tảng để nhà máy vận hành thông suốt qua 2 ca: mạng, thiết bị đầu cuối, tài khoản, lưu trữ, sao lưu, công cụ cộng tác và hỗ trợ Người dùng hiện trường / văn phòng.</p><p>Vị trí này là lớp “đảm bảo vận hành số hằng ngày”: nếu IT Admin làm tốt, Người dùng ít bị gián đoạn, dữ liệu có nơi lưu an toàn, tài khoản được quản lý vòng đời chuẩn và sự cố công nghệ không chặn dòng vận hành của công ty.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Thiết bị, mạng, tài khoản và công cụ làm việc ổn định, sẵn sàng cho Người dùng đúng vai trò và đúng phân quyền.</li><li>Tài sản sổ đăng ký, backup / bản vá / sửa chữa / chống vi-rút / M365 cấu hình và hồ sơ sự cố được duy trì nhất quán, có khả năng kiểm tra.</li><li>Người dùng được hỗ trợ đúng SLA, sự cố lặp lại được giảm dần nhờ chuẩn hóa xây dựng, bàn giao và phòng ngừa bảo trì.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> IT Admin sở hữu hạ tầng và an toàn công nghệ thông tin ở lớp nền; không thiết kế nghiệp vụ ERP thay Epicor Admin và không là chủ dữ liệu của các giao dịch kinh doanh/sản xuất.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Duy trì hạ tầng, M365, điểm cuối, mạng, backup và bảo mật đủ ổn định để QMS số vận hành liên tục tại văn phòng và hiện trường.</li><li>IT Admin không tự đổi logic nghiệp vụ; vai trò là bảo đảm khả dụng / sẵn sàng, bảo mật, thiết bị mức sẵn sàng, máy in/mã vạch hạ tầng và khả năng phục hồi.</li><li>Mọi thay đổi hạ tầng ảnh hưởng vận hành phải có kiểm soát, hoàn tác / quay lại và truyền thông rõ.</li></ul></div>
+<div class="jd-mission"><p>IT Admin duy trì nền hạ tầng số nền tảng để nhà máy vận hành thông suốt qua 2 ca: mạng, thiết bị đầu cuối, tài khoản, lưu trữ, sao lưu, công cụ cộng tác và hỗ trợ Người dùng hiện trường / văn phòng.</p><p>Vị trí này là lớp "đảm bảo vận hành số hằng ngày": nếu IT Admin làm tốt, Người dùng ít bị gián đoạn, dữ liệu có nơi lưu an toàn, tài khoản được quản lý vòng đời chuẩn và sự cố công nghệ không chặn dòng vận hành của công ty.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Thiết bị, mạng, tài khoản và công cụ làm việc ổn định, sẵn sàng cho Người dùng đúng vai trò và đúng phân quyền.</li><li>Tài sản sổ đăng ký, backup / bản vá / sửa chữa / chống vi-rút / M365 cấu hình và hồ sơ sự cố được duy trì nhất quán, có khả năng kiểm tra.</li><li>Người dùng được hỗ trợ đúng SLA, sự cố lặp lại được giảm dần nhờ chuẩn hóa xây dựng, bàn giao và phòng ngừa bảo trì.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> IT Admin sở hữu hạ tầng và an toàn công nghệ thông tin ở lớp nền; không thiết kế nghiệp vụ ERP thay Epicor Admin và không là chủ dữ liệu của các giao dịch kinh doanh/sản xuất.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Duy trì hạ tầng, M365, điểm cuối, mạng, backup và bảo mật đủ ổn định để QMS số vận hành liên tục tại văn phòng và hiện trường.</li><li>IT Admin không tự đổi logic nghiệp vụ; vai trò là bảo đảm khả dụng / sẵn sàng, bảo mật, thiết bị mức sẵn sàng, máy in/mã vạch hạ tầng và khả năng phục hồi.</li><li>Mọi thay đổi hạ tầng ảnh hưởng vận hành phải có kiểm soát, hoàn tác / quay lại và truyền thông rõ.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

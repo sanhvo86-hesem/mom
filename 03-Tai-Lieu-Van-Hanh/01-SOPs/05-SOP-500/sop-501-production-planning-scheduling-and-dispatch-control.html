@@ -10,21 +10,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -38,7 +38,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -49,25 +49,6 @@ table{max-width:100%;table-layout:auto}
 td,th{}
  thead{display:table-header-group}tfoot{display:table-footer-group}
 @media (max-width: 960px){.grid-2,.grid-3,.field-grid{grid-template-columns:1fr;}}
-/* Critical inline CSS for file:// compatibility */
-
-/* Flowchart */
-.flowchart{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:stretch;margin:20px 0;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:1px solid rgba(21,101,192,.18);border-radius:10px}
-.flow-step{flex:1 1 120px;min-width:100px;max-width:170px;padding:10px 12px;background:#fff;border:1.5px solid rgba(21,101,192,.3);border-radius:10px;text-align:center;box-shadow:0 1px 3px rgba(21,101,192,.06)}
-.flow-step .flow-num{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#1565c0,#1976d2);color:#fff;font-size:12px;font-weight:800;margin-bottom:5px}
-.flow-step .flow-title{font-size:11px;font-weight:700;color:#0C2D48;line-height:1.35}
-.flow-step .flow-text{text-align:left}
-.flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 22px;color:#93b3d6;font-size:16px;font-weight:700}
-/* Proc-num */
-.proc-num{display:inline-flex;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;flex-shrink:0;margin-right:8px}
-/* Step-tag */
-.step-tag{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0C2D48,#1565c0);text-transform:uppercase;letter-spacing:.3px}
-/* Metric cards */
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:16px 0}
-.metric-card{padding:16px;border:1px solid rgba(21,101,192,.15);border-radius:10px;text-align:center;background:#fff}
-.metric-card .value{font-size:28px;font-weight:800;color:#1565c0;line-height:1.2}
-.metric-card .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-top:4px}
-.metric-card .sub{font-size:11px;color:#666;margin-top:4px;line-height:1.4}
 
 </style>
 </head>
@@ -126,8 +107,8 @@ td,th{}
 <div class="callout-grid">
 <div class="callout-card"><h3>Nguyên tắc 1 — Một lịch chính thức</h3><ul class="tight"><li>Thứ tự ưu tiên, Ngày chạy, trạng thái job/op chỉ có một nguồn điều hành chính thức. Không điều hành bằng nhiều file hoặc nhiều danh sách song song.</li><li>Mọi thay đổi ưu tiên phải phản ánh về điều phối xuất hàng chính thức và có bằng chứng thẩm quyền.</li></ul></div>
 <div class="callout-card"><h3>Nguyên tắc 2 — Chỉ phát hành khi đủ mức sẵn sàng</h3><ul class="tight"><li>Job chưa đủ mốc chuẩn, chưa đủ vật tư, chưa qua cổng kiểm soát cần thiết, chưa có Người xử lý ETA hoặc chưa có machine/Operator mức sẵn sàng thì không được Kế hoạch Phát hành.</li><li>Kế hoạch không dùng phát hành để đẩy rủi ro từ phòng này sang phân xưởng.</li></ul></div>
-<div class="callout-card"><h3>Nguyên tắc 3 — Năng lực là hữu hạn</h3><ul class="tight"><li>Điều độ phải nhìn theo năng lực hữu hạn: machine giờ, setup/chuyển đổi (changeover), nhân công, QA nút thắt / điểm nghẽn, outsource cycle, phòng sạch khe thời gian, giao vận cửa sổ.</li><li>Không cam kết lại dựa trên “hy vọng chạy kịp”; phải có logic tải, cổng kiểm soát và khôi phục / thu hồi rõ.</li></ul></div>
-<div class="callout-card"><h3>Nguyên tắc 4 — WIP phải có giới hạn và phản ứng nhanh</h3><ul class="tight"><li>WIP cap, hàng đợi tuổi tồn và hot-job bậc thang năng lực là Quy tắc bắt buộc. Khi vượt ngưỡng, Kế hoạch phải mở hành động thay vì chỉ “cập nhật chậm”.</li><li>Điều phối tốt không chỉ là ra danh sách, mà là ra danh sách có thể thực thi và có phản ứng nhanh khi thực tế lệch kế hoạch.</li></ul></div>
+<div class="callout-card"><h3>Nguyên tắc 3 — Năng lực là hữu hạn</h3><ul class="tight"><li>Điều độ phải nhìn theo năng lực hữu hạn: machine giờ, setup/chuyển đổi (changeover), nhân công, QA nút thắt / điểm nghẽn, outsource cycle, phòng sạch khe thời gian, giao vận cửa sổ.</li><li>Không cam kết lại dựa trên "hy vọng chạy kịp"; phải có logic tải, cổng kiểm soát và khôi phục / thu hồi rõ.</li></ul></div>
+<div class="callout-card"><h3>Nguyên tắc 4 — WIP phải có giới hạn và phản ứng nhanh</h3><ul class="tight"><li>WIP cap, hàng đợi tuổi tồn và hot-job bậc thang năng lực là Quy tắc bắt buộc. Khi vượt ngưỡng, Kế hoạch phải mở hành động thay vì chỉ "cập nhật chậm".</li><li>Điều phối tốt không chỉ là ra danh sách, mà là ra danh sách có thể thực thi và có phản ứng nhanh khi thực tế lệch kế hoạch.</li></ul></div>
 </div>
 <h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:48%"/><col style="width:36%"/></colgroup><thead><tr><th>Vai trò</th><th>Trách nhiệm bắt buộc</th><th>Quyền hạn mở / dừng</th></tr></thead><tbody>
@@ -174,7 +155,7 @@ td,th{}
 <ol class="tight">
 <li>Planner phải nhìn tải theo <b>nút thắt / điểm nghẽn thực tế</b>: machine nhóm sản phẩm, setup/chuyển đổi (changeover) time, QA/đo lường khe / vị trí, phòng sạch khe / vị trí, outsource cycle, giao vận cửa sổ / khung thời gian, nhân công/năng lực.</li>
 <li>Công suất rà soát không được dừng ở tổng giờ máy. Phải xét cả thời gian setup, mẫu đầu/FAI, chờ for nguyên vật liệu, bên ngoài quy trình lượt / quay-time và rủi ro lịch bảo trì / thời gian Từng máy.</li>
-<li>Khi load vượt ngưỡng chấp nhận, Planner phải đề xuất rõ biện pháp: lên lịch lại, outsource, OT, tách / chia lot, pre-xây dựng, hoặc hot-job bậc thang năng lực. Không đẩy quá tải xuống điều phối xuất hàng rồi để phân xưởng “tự xoay”.</li>
+<li>Khi load vượt ngưỡng chấp nhận, Planner phải đề xuất rõ biện pháp: lên lịch lại, outsource, OT, tách / chia lot, pre-xây dựng, hoặc hot-job bậc thang năng lực. Không đẩy quá tải xuống điều phối xuất hàng rồi để phân xưởng "tự xoay".</li>
 </ol>
 <h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</span> Định nghĩa mức sẵn sàng trước Kế hoạch Phát hành</h3>
 <ol class="tight">
@@ -191,7 +172,7 @@ td,th{}
 <ol class="tight">
 <li>Điều phối list là lệnh điều hành chính thức cho ca / ngày. Sau khi phát hành, mọi thay đổi phải theo đóng băng bậc thang năng lực tại <a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a>.</li>
 <li>Hot-job không được chen vào chỉ vì có tiếng nói lớn hơn. Mỗi hot-job phải có lý do, Responsible Person, tác động dự kiến tới các job bị ảnh hưởng và hành động phục hồi.</li>
-<li>Khi phá cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch), Planner phải cập nhật lại điều phối xuất hàng chính thức, không cho phép tồn tại “điều phối xuất hàng miệng” song song với điều phối xuất hàng file.</li>
+<li>Khi phá cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch), Planner phải cập nhật lại điều phối xuất hàng chính thức, không cho phép tồn tại "điều phối xuất hàng miệng" song song với điều phối xuất hàng file.</li>
 </ol>
 <h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</span> Hàng Ngày khởi động-off, mức sẵn sàng tại cell và trung tâm điều hành (control tháp / cột)</h3>
 <ol class="tight">
@@ -203,18 +184,18 @@ td,th{}
 <ol class="tight">
 <li>Sản xuất thực thi theo điều phối xuất hàng Released và cập nhật trạng thái đủ để Kế hoạch nhìn được tiến độ thực tế trong ngày.</li>
 <li>WIP cap theo cell / trung tâm gia công là giới hạn cứng. Vượt cap phải mở hành động: đẩy nút thắt / điểm nghẽn hỗ trợ, tách / chia lot có kiểm soát, outsource hỗ trợ, OT hoặc re-trình tự theo thẩm quyền.</li>
-<li>hàng đợi tuổi tồn phải xem theo nhóm / phân loại. Job nằm lâu ở một hàng đợi mà không có Responsible Person / lý do / hành động được xem là lỗi điều hành, không phải “do khách Cấp”.</li>
+<li>hàng đợi tuổi tồn phải xem theo nhóm / phân loại. Job nằm lâu ở một hàng đợi mà không có Responsible Person / lý do / hành động được xem là lỗi điều hành, không phải "do khách Cấp".</li>
 </ol>
 <h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#c2410c,#ea580c)">7</span> Khôi phục plan, lên lịch lại và bàn giao ca</h3>
 <ol class="tight">
 <li>Khi sự cố hỏng máy, no-start, nguyên vật liệu chậm trễ, outsource thiếu / bỏ sót, QA hold hoặc rủi ro giao hàng phát sinh, Planner phải ra khôi phục / thu hồi plan trong Ngày với Responsible Person và ETA cập nhật.</li>
 <li>Bàn giao ca phải ghi rõ: việc đang chạy, việc fail-start, nút thắt / điểm nghẽn, thời gian Từng máy, chất lượng hold, kit thiếu, job ưu tiên ca sau và giả định cần theo dõi.</li>
-<li>Không được dùng “ca sau sẽ xử lý” làm cách kết thúc sự kiện nếu chưa giao Responsible Person và hành động cụ thể.</li>
+<li>Không được dùng "ca sau sẽ xử lý" làm cách kết thúc sự kiện nếu chưa giao Responsible Person và hành động cụ thể.</li>
 </ol>
 <h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#4338ca,#6366f1)">8</span> Quy tắc đổi ưu tiên, tách / chia lot, một phần phát hành và outsource hỗ trợ</h3>
 <ol class="tight">
 <li>tách / chia lot hoặc một phần phát hành chỉ được dùng khi lợi ích giao hàng hoặc giảm rủi ro rõ hơn chi phí tăng lên về setup, QA và truy xuất nguồn gốc; phải có lộ trình gia công/bằng chứng hỗ trợ.</li>
-<li>Outsource hỗ trợ để giải tải nút thắt / điểm nghẽn phải quay lại giao diện với <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>. Kế hoạch không được coi outsource là “cửa xả rủi ro” nếu source/Người xử lý chưa đủ điều kiện.</li>
+<li>Outsource hỗ trợ để giải tải nút thắt / điểm nghẽn phải quay lại giao diện với <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>. Kế hoạch không được coi outsource là "cửa xả rủi ro" nếu source/Người xử lý chưa đủ điều kiện.</li>
 <li>Mọi đổi ưu tiên ảnh hưởng phê duyệt giao hàng, phòng sạch khe / vị trí, QA khe / vị trí hoặc nhà cung cấp cam kết phải đi theo escalation bậc thang năng lực, không do một cell tự quyết.</li>
 </ol>
 <h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#15803d,#22c55e)">9</span> Nhịp điều hành chuẩn: tháng, tuần, Ngày và trong ca</h3>
@@ -227,14 +208,14 @@ td,th{}
 <h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#be185d,#ec4899)">10</span> gemba (thực địa) (thực địa) phản hồi, học lại mức sẵn sàng và sửa lỗi điều hành lặp</h3>
 <ol class="tight">
 <li>Planner phải coi phản hồi từ cell là một nguồn dữ liệu điều hành chính thức. Các lý do fail-start, thiếu kit, setup chậm trễ, kiểm tra chờ, nguyên vật liệu không khớp và giấy tờ / hồ sơ gap phải được gom và xem như đầu vào cải tiến cho <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-501_Planning_Release_Checklist.xlsx">FRM-501</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a> và các cổng kiểm soát liên quan.</li>
-<li>Khi một lỗi mức sẵn sàng lặp từ 3 lần trở lên trong cửa sổ rà soát, SOP này Requests phải sửa rule hoặc bảng kiểm nguồn, không dừng ở mức chỉ nhắc Operator “chú ý hơn”; rule hoặc bảng kiểm nguồn phải được sửa.</li>
+<li>Khi một lỗi mức sẵn sàng lặp từ 3 lần trở lên trong cửa sổ rà soát, SOP này Requests phải sửa rule hoặc bảng kiểm nguồn, không dừng ở mức chỉ nhắc Operator "chú ý hơn"; rule hoặc bảng kiểm nguồn phải được sửa.</li>
 <li>Những quyết định ghi đè / bỏ qua tạo ra hệ quả lớn về lịch trình bất ổn định phải được xem lại sau sự kiện: ghi đè / bỏ qua đó có thật sự đáng không, có job nào bị thiệt không, có cần đổi bậc thang năng lực hoặc đóng băng rule không.</li>
 </ol>
 <h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">11</span> Quy tắc hứa lại Ngày giao và thay đổi cam kết với khách hàng</h3>
 <ol class="tight">
 <li>Kế hoạch không được hứa lại do Ngày giao trực tiếp ra ngoài nếu chưa khóa logic phục hồi với Chuỗi cung ứng, Sản xuất, QA và các cổng kiểm soát còn lại. Mọi cam kết mới phải bám năng lực thật, không bám mong muốn.</li>
 <li>Khi Ngày đến hạn mới phụ thuộc vào nhà cung cấp khôi phục / thu hồi, công đoạn đặc biệt khôi phục / thu hồi hoặc ship cửa sổ / khung thời gian đặc thù, quyết định cam kết lại phải chỉ rõ giả định nào còn đang mở và thời điểm giả định đó sẽ được xác nhận.</li>
-<li>Nếu giả định không được xác nhận đúng hạn, job phải tự động quay lại escalation chứ không để trạng thái “đang cố gắng” kéo dài qua nhiều ngày.</li>
+<li>Nếu giả định không được xác nhận đúng hạn, job phải tự động quay lại escalation chứ không để trạng thái "đang cố gắng" kéo dài qua nhiều ngày.</li>
 </ol>
 <div class="note-soft"><b>Rule chống đứng cạnh học việc lịch trình:</b> Mọi bảng trắng, tệp cục bộ (nội bộ / tại chỗ file), Photos màn hình chat hay danh sách cá nhân chỉ được dùng như công cụ hiển thị tại chỗ. Nếu nội dung đó làm thay đổi quyết định điều hành mà không phản ánh lại về nguồn điều hành chính thức, dữ liệu đó bị xem là đứng cạnh học việc lịch trình và không được phép dùng.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">12</span> Ma trận đòn bẩy phục hồi khi tải vượt ngưỡng</h3>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:18%"/><col style="width:34%"/><col style="width:30%"/></colgroup><thead><tr><th>Đòn bẩy</th><th>Khi dùng</th><th>Lợi ích</th><th>Ràng buộc bắt buộc phải nhìn</th></tr></thead><tbody>
@@ -250,10 +231,10 @@ td,th{}
 <li>Review 72 giờ phải chốt rõ các câu hỏi: job nào tưởng đang an toàn nhưng thực ra đang thiếu một giả định; job nào cần khôi phục / thu hồi ngay sáng hôm sau; job nào cần khách hàng truyền đạt / giao tiếp; job nào nên chuyển ưu tiên trước khi vào cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) mới.</li>
 <li>Nếu Ngày hôm sau dự báo nhiều hot-job cùng lúc, Planner phải chốt trước bậc thang năng lực ưu tiên và nguồn lực hỗ trợ để tránh mở đầu Ngày bằng một cuộc thương lượng lại từ đầu.</li>
 </ol>
-<div class="note-blue"><b>Rule cuối ngày:</b> Không kết thúc Ngày làm việc bằng một điều phối xuất hàng “đẹp trên giấy” nhưng chưa nhìn nút thắt / điểm nghẽn của 72 giờ kế tiếp. Kế hoạch chỉ được xem là hoàn thành khi next-shift và next-tầm nhìn đã được nhìn, không chỉ khi file điều phối xuất hàng đã gửi.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">14</span> Trường dữ liệu tối thiểu bắt buộc trên điều phối xuất hàng và bàn giao</h3>
+<div class="note-blue"><b>Rule cuối ngày:</b> Không kết thúc Ngày làm việc bằng một điều phối xuất hàng "đẹp trên giấy" nhưng chưa nhìn nút thắt / điểm nghẽn của 72 giờ kế tiếp. Kế hoạch chỉ được xem là hoàn thành khi next-shift và next-tầm nhìn đã được nhìn, không chỉ khi file điều phối xuất hàng đã gửi.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">14</span> Trường dữ liệu tối thiểu bắt buộc trên điều phối xuất hàng và bàn giao</h3>
 <ol class="tight">
 <li>Điều phối chính thức phải đủ để Người nhận lệnh không phải đoán: job/vận hành, trung tâm gia công/cell, ưu tiên nhóm / phân loại, due/cần-by, mức sẵn sàng note, cổng kiểm soát note, số lượng/lot chiến lược, và liên hệ escalation khi có fail-start.</li>
-<li>Bàn giao cuối ca phải thể hiện rõ công việc nào đang chạy, công việc nào fail-start, nút thắt / điểm nghẽn nào còn mở, giả định nào cần xác nhận sáng hôm sau và ai là Responsible Person của từng hành động. Bàn giao không được chỉ ghi “đã bàn giao”.</li>
+<li>Bàn giao cuối ca phải thể hiện rõ công việc nào đang chạy, công việc nào fail-start, nút thắt / điểm nghẽn nào còn mở, giả định nào cần xác nhận sáng hôm sau và ai là Responsible Person của từng hành động. Bàn giao không được chỉ ghi "đã bàn giao".</li>
 <li>Nếu một quyết định trong ca đã làm thay đổi đáng kể lịch trình của Ngày hôm sau, quyết định đó phải hiện trên bàn giao và trên điều phối xuất hàng kế tiếp. Không để ca sau tự phát hiện bằng việc ra phân xưởng rồi mới thấy lịch đã bị đảo.</li>
 </ol>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">15</span> Khóa năng lực hữu hạn và quy tắc phân xử nút thắt</h3>
@@ -266,7 +247,7 @@ td,th{}
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">16</span> Kỷ luật lên lịch lại trong Ngày và phản ứng khi mức sẵn sàng bị gãy</h3>
 <ul class="tight">
 <li>Nếu job mất mức sẵn sàng sau khi Released (thiếu nguyên vật liệu, thiếu phiên bản, fail mẫu đầu, fail đầu vào / nhận hàng outsource, machine sự cố hỏng máy), Planner/Trưởng nhóm phải đưa job ra khỏi lịch khả thi trong cùng ca và cập nhật bảng/điều phối xuất hàng chính thức.</li>
-<li>Không được để điều phối xuất hàng sheet tiếp tục mang job không thể chạy chỉ để “giữ kế hoạch đẹp”.</li>
+<li>Không được để điều phối xuất hàng sheet tiếp tục mang job không thể chạy chỉ để "giữ kế hoạch đẹp".</li>
 <li>Mọi sắp xếp lại trong Ngày phải ghi nguyên nhân, Responsible Person, ảnh hưởng dây chuyền sản xuất sau và hành động bù; tối thiểu cập nhật vào <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> và <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a>.</li>
 </ul>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">17</span> Giao thức hot-job, split lot, giao hàng một phần và outsource assist</h3>
@@ -280,7 +261,7 @@ td,th{}
 <ul class="tight">
 <li>Mọi job trễ cam kết, vượt hàng đợi tuổi tồn ngưỡng đỏ hoặc phải sắp xếp lại &gt; 2 lần <b>PHẢI</b> được rà soát trong tier cuộc họp Ngày hôm sau.</li>
 <li>Planner, Sản xuất và QA phải chốt một trong ba kết luận: lỗi mức sẵn sàng, lỗi công suất mô hình, hoặc lỗi kỷ luật thực thi. Kết luận này phải bước tiến (feed) về <a href="../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a> và <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>.</li>
-<li>Không đóng bỏ lỡ date bằng lý do chung chung như “Cấp”, “nhiều việc”, “máy bận”.</li>
+<li>Không đóng bỏ lỡ date bằng lý do chung chung như "Cấp", "nhiều việc", "máy bận".</li>
 </ul>
 <h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:18%"/><col style="width:38%"/><col style="width:16%"/><col style="width:14%"/><col style="width:14%"/></colgroup><thead><tr><th>Tình huống</th><th>Quy tắc xử lý</th><th>Chủ trì</th><th>Người gỡ hold</th><th>Hồ sơ</th></tr></thead><tbody>

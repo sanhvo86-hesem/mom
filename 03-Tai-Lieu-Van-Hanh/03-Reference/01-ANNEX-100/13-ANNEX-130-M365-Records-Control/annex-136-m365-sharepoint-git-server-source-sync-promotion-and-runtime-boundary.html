@@ -69,7 +69,7 @@
  <tr><td>Controlled source</td><td>Nơi chứa nội dung nguồn đã được công ty kiểm soát để soạn thảo, review, commit và phát hành.</td><td><span class="code">HESEM-Digital-Control/10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Không chứa session, workflow draft binary, rate-limit log, user secrets hoặc form transaction entries.</td></tr>
  <tr><td>Git version history</td><td>Sổ cái kỹ thuật trung tâm cho commit, branch, merge, pull, push, rollback theo commit.</td><td>Repo remote của <span class="code">qms.hesem.com.vn</span> và local <span class="code">git-dir</span> tách riêng khỏi thư mục đang sync.</td><td>Không xem Git là kho lưu hồ sơ giao dịch, approval log hay runtime export.</td></tr>
  <tr><td>Server deployment</td><td>Bản đang chạy cho portal và point-of-use sau khi pull hoặc deploy thành công.</td><td>Repo worktree đang chạy trên server/cPanel.</td><td>Không để thay đổi meaningful ở server tồn tại lâu mà không quay về Git.</td></tr>
- <tr><td>Runtime and records</td><td>Dữ liệu chạy hệ thống, evidence, log, approval history, record entries, archive binaries, records libraries.</td><td><span class="code">01-QMS-Portal/qms-data/...</span>, <span class="code">09-Digital-System-Records</span>, các library records tại <span class="code">HESEM-QMS-Core</span>.</td><td>Không sync ngược runtime vào controlled source library chỉ vì “cũng là file”.</td></tr>
+ <tr><td>Runtime and records</td><td>Dữ liệu chạy hệ thống, evidence, log, approval history, record entries, archive binaries, records libraries.</td><td><span class="code">01-QMS-Portal/qms-data/...</span>, <span class="code">09-Digital-System-Records</span>, các library records tại <span class="code">HESEM-QMS-Core</span>.</td><td>Không sync ngược runtime vào controlled source library chỉ vì "cũng là file".</td></tr>
  </tbody>
  </table>
  </div>
@@ -128,7 +128,7 @@
  <ul>
  <li>Microsoft hỗ trợ sync thư viện SharePoint xuống máy qua OneDrive/File Explorer, nhưng OneDrive không hỗ trợ sync vào network drive hoặc mapped drive và không hỗ trợ sync bằng symbolic link/junction. Đây là ranh giới phải tôn trọng khi thiết kế local workspace.</li>
  <li>Git metadata biến động rất nhiều; để <span class="code">.git</span> trong vùng đang sync sẽ làm tăng nguy cơ xung đột sync, file lock và nhiễu history không liên quan đến nội dung tài liệu.</li>
- <li>Mô hình <span class="code">git work-tree</span> tách khỏi <span class="code">git-dir</span> cho phép local “nằm trong SharePoint” mà không kéo toàn bộ internals Git vào library sync.</li>
+ <li>Mô hình <span class="code">git work-tree</span> tách khỏi <span class="code">git-dir</span> cho phép local "nằm trong SharePoint" mà không kéo toàn bộ internals Git vào library sync.</li>
  </ul>
  </div>
  </div>

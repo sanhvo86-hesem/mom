@@ -80,14 +80,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Operations</b>.
 </div>
 <div class="card">
-<p style="margin:0 0 10px 0"><b>Cổng kiểm soát Logic:</b> ma trận kỹ năng (matrix) là “cổng năng lực” của phân xưởng CNC. Mọi quyết định giao việc, duyệt vận hành, duyệt đo, duyệt phê duyệt giao hàng (ship phát hành), map thưởng đều phụ thuộc vào Level và bằng chứng (MRR). Khi ma trận kỹ năng (matrix) sai, phân xưởng rơi vào 3 loại lỗi chết: (1) giao việc vượt năng lực; (2) pass cổng kiểm soát không có bằng chứng; (3) thưởng sai tạo động lực sai.</p>
+<p style="margin:0 0 10px 0"><b>Cổng kiểm soát Logic:</b> ma trận kỹ năng (matrix) là "cổng năng lực" của phân xưởng CNC. Mọi quyết định giao việc, duyệt vận hành, duyệt đo, duyệt phê duyệt giao hàng (ship phát hành), map thưởng đều phụ thuộc vào Level và bằng chứng (MRR). Khi ma trận kỹ năng (matrix) sai, phân xưởng rơi vào 3 loại lỗi chết: (1) giao việc vượt năng lực; (2) pass cổng kiểm soát không có bằng chứng; (3) thưởng sai tạo động lực sai.</p>
 <ul style="margin:0 0 0 18px; line-height:1.9">
 <li><b>Mục tiêu vận hành:</b> 01 luồng công việc thống nhất để cập nhật ma trận kỹ năng (matrix) có kiểm soát; 01 thưởng map có Cơ chế chặn theo KPI (kiểm soát cổng); 01 cơ chế kiểm soát thay đổi (ISO 7.5) bảo toàn bằng chứng.</li>
 <li><b>Trách nhiệm:</b>
 <ul style="margin:6px 0 0 18px; line-height:1.9">
 <li><b>Supervisor:</b> khởi tạo Requests cập nhật Level bằng FRM-HR-TRN-007, xác nhận OJT đầu ra và hiệu suất test; kích hoạt hold khi thiếu bằng chứng.</li>
 <li><b>HR:</b> quản lý dữ liệu ma trận kỹ năng (matrix), cập nhật hệ thống, khóa phiên bản; quản lý thưởng map theo FRM-HR-TRN-011.</li>
-<li><b>QA/QMS:</b> kiểm soát thay đổi, đánh giá bằng chứng, chặn “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”, quản lý phiên bản tài liệu liên quan.</li>
+<li><b>QA/QMS:</b> kiểm soát thay đổi, đánh giá bằng chứng, chặn "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)", quản lý phiên bản tài liệu liên quan.</li>
 <li><b>EHS:</b> xác nhận điều kiện an toàn khi năng lực liên quan vận hành nguy hiểm/LOTO/thiết bị nâng.</li>
 <li><b>Planner:</b> dùng ma trận kỹ năng (matrix) để lập kế hoạch nguồn lực theo ca; chặn giao việc sai Level.</li>
 <li><b>Các vai trò còn lại:</b> tạo đúng OJT đầu ra, lưu đúng MRR, tuân thủ quyền hạn theo Level.</li>
@@ -110,7 +110,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>Setup</b></td><td>Quyền setup/chứng minh-out gắn Level; bắt buộc hiệu suất test khi nâng Level</td><td>L3 Requests bằng chứng kiểm soát rủi ro sự cố nghiêm trọng + ký-off Bảo trì/QA khi cần</td></tr>
 <tr><td><b>Lập trình viên (CNC)</b></td><td>Quyền phát hành chương trình gắn Level; kiểm soát phiên bản</td><td>Draft</td></tr>
 <tr><td><b>QC</b></td><td>Quyền đo/duyệt gage gắn Level; chặn OOT gage</td><td>L3 Requests hiệu suất test đo + truy xuất nguồn gốc MRR</td></tr>
-<tr><td><b>QA</b></td><td>Cổng kiểm soát “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”; đánh giá ma trận kỹ năng (matrix)/thưởng map</td><td>L3–L4 Requests năng lực đánh giá + kiểm soát thay đổi ISO 7.5</td></tr>
+<tr><td><b>QA</b></td><td>Cổng kiểm soát "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)"; đánh giá ma trận kỹ năng (matrix)/thưởng map</td><td>L3–L4 Requests năng lực đánh giá + kiểm soát thay đổi ISO 7.5</td></tr>
 <tr><td><b>Kho</b></td><td>Quyền nhận hàng/nhãn/truy xuất nguồn gốc gắn Level</td><td>L3 Requests tình huống chặn lẫn lộn (mix-up) bằng bằng chứng ảnh + log</td></tr>
 <tr><td><b>Mua hàng</b></td><td>Quyền duyệt NCC/giấy tờ gắn Level</td><td>L3 Requests tình huống đóng thiếu chứng từ + hồ sơ nhà cung cấp file</td></tr>
 <tr><td><b>Planner</b></td><td>Dùng ma trận kỹ năng (matrix) để lập ca; chặn giao việc vượt Level</td><td>L3 Requests kế hoạch ca có phân bổ theo Level và bằng chứng kiểm tra</td></tr>
@@ -124,7 +124,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <div class="card">
 <p style="margin:0 0 8px 0"><b>Chuỗi E2E:</b> Báo giá/Hợp đồng → Kế hoạch → Kỹ thuật → Mua hàng → Nhận hàng → Sản xuất → QC/QA → NCR/MRB → Final → Đóng gói → Ship → Phản hồi/CI.</p>
-<p style="margin:0 0 10px 0"><b>Vị trí mô-đun:</b> ma trận kỹ năng (matrix) nằm “bên dưới” toàn chuỗi và tác động trực tiếp tại các bước có quyền quyết định: Kế hoạch (phân Người), Sản xuất (vận hành/setup/chứng minh-out), QC/QA (đo/duyệt), Ship (phát hành), Phản hồi/CI (đóng năng lực sau NCR/sự cố).</p>
+<p style="margin:0 0 10px 0"><b>Vị trí mô-đun:</b> ma trận kỹ năng (matrix) nằm "bên dưới" toàn chuỗi và tác động trực tiếp tại các bước có quyền quyết định: Kế hoạch (phân Người), Sản xuất (vận hành/setup/chứng minh-out), QC/QA (đo/duyệt), Ship (phát hành), Phản hồi/CI (đóng năng lực sau NCR/sự cố).</p>
 <table class="docx-table">
 <thead>
 <tr>
@@ -221,7 +221,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Mỗi lần nâng/giảm Level</td>
 </tr>
 <tr>
-<td><b>CP3 — Kiểm tra bằng chứng trước cập nhật (“không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”)</b></td>
+<td><b>CP3 — Kiểm tra bằng chứng trước cập nhật ("không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)")</b></td>
 <td>QA/QMS</td>
 <td>Soát đủ OJT đầu ra + hiệu suất test + chữ ký xác nhận; đối chiếu vai trò/level quyền hạn</td>
 <td>Bảng kiểm soát bằng chứng (đính kèm <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a>)</td>
@@ -262,7 +262,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <p style="margin:0 0 8px 0"><b>Định nghĩa:</b> STOP = dừng ngay vì rủi ro an toàn/thiệt hại máy; TẠM GIỮ = giữ lại vì rủi ro chất lượng/truy xuất nguồn gốc/đo; CHẶN = chặn qua cổng kiểm soát/hệ thống vì thiếu bằng chứng hoặc sai phiên bản.</p>
 <ol style="margin:0 0 0 18px; line-height:1.9">
-<li><b>CHẶN-01 (No bằng chứng):</b> Cập nhật Level khi thiếu FRM-HR-TRN-007 hoặc thiếu OJT đầu ra/hiệu suất test → HR không cập nhật; QA giữ trạng thái “Chưa đủ bằng chứng”.</li>
+<li><b>CHẶN-01 (No bằng chứng):</b> Cập nhật Level khi thiếu FRM-HR-TRN-007 hoặc thiếu OJT đầu ra/hiệu suất test → HR không cập nhật; QA giữ trạng thái "Chưa đủ bằng chứng".</li>
 <li><b>CHẶN-02 (Version không khớp):</b> Thưởng map và ma trận kỹ năng (matrix) khác phiên bản ban hành → HR khóa chi trả thưởng cho kỳ đó; mở lại sau khi đồng bộ.</li>
 <li><b>TẠM GIỮ-01 (Sai Người ký):</b> QC/QA phát hiện chữ ký duyệt/đo không đúng Level → TẠM GIỮ lô; mở điều tra; cập nhật quyền theo Level.</li>
 <li><b>TẠM GIỮ-02 (phân công không khớp):</b> Planner/Supervisor phát hiện phân ca sai Level → TẠM GIỮ job/vận hành; đổi Người đủ Level; ghi log.</li>
@@ -328,7 +328,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>5</td><td>Thu bằng chứng OJT: bảng kiểm, ảnh, log ca, sản phẩm minh chứng</td><td>Học viên + Supervisor</td><td>Gói bằng chứng theo ID</td><td>Ảnh rời rạc, không truy xuất nguồn gốc</td></tr>
 <tr><td>6</td><td>Thực hiện hiệu suất test theo mô-đun liên quan (khi có cổng kiểm soát/vận hành/đo/duyệt)</td><td>Supervisor + QA/QC/EHS</td><td>Biên bản test + ĐẠT/KHÔNG ĐẠT</td><td>Không có tiêu chí đánh giá, chỉ xác nhận miệng</td></tr>
 <tr><td>7</td><td>Tạo FRM-HR-TRN-007: phạm vi, job minh chứng, điều kiện đạt, rủi ro cập nhật sai</td><td>Supervisor</td><td><a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> có ID</td><td>Thiếu phạm vi kỹ năng, thiếu job chứng minh</td></tr>
-<tr><td>8</td><td>Soát “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” trước khi nộp HR</td><td>QA/QMS</td><td>Bảng kiểm soát bằng chứng</td><td>Thiếu nơi lưu, thiếu liên kết hồ sơ</td></tr>
+<tr><td>8</td><td>Soát "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)" trước khi nộp HR</td><td>QA/QMS</td><td>Bảng kiểm soát bằng chứng</td><td>Thiếu nơi lưu, thiếu liên kết hồ sơ</td></tr>
 <tr><td>9</td><td>HR cập nhật chủ / gốc ma trận kỹ năng (matrix) theo Requests đã duyệt</td><td>HR</td><td>Matrix version + DCR hồ sơ</td><td>Cập nhật trực tiếp không log thay đổi</td></tr>
 <tr><td>10</td><td>Thông báo thay đổi Level và ràng buộc quyền vận hành cho OPS/QC/QA/Planner</td><td>HR + Supervisor</td><td>Thông báo nội bộ + danh sách thay đổi</td><td>Thông báo không có phạm vi ảnh hưởng</td></tr>
 <tr><td>11</td><td>Cập nhật thưởng map khi thay đổi Level req/KPI cổng kiểm soát</td><td>HR + OPS + QA</td><td>FRM-HR-TRN-011 phiên bản mới</td><td>Cổng kiểm soát chỉ số ID không xác định</td></tr>
@@ -340,7 +340,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 <!-- ====== 9) OJT theo TWI ====== -->
 <h2>9) OJT thực chiến theo TWI</h2>
-<h3>9.1 Job sự cố hỏng máy (TWI) — “Tạo và duyệt 01 Requests cập nhật Level (FRM-HR-TRN-007) kèm bằng chứng”</h3>
+<h3>9.1 Job sự cố hỏng máy (TWI) — "Tạo và duyệt 01 Requests cập nhật Level (FRM-HR-TRN-007) kèm bằng chứng"</h3>
 <table class="docx-table">
 <thead>
 <tr><th>Step</th><th>Điểm then chốt</th><th>Lý do (vì sao bắt buộc)</th></tr>
@@ -359,7 +359,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>3) Chốt điều kiện đạt</td>
 <td>Gắn điều kiện với cổng kiểm soát: vận hành, đo, duyệt, ship; ghi ngưỡng/tiêu chí</td>
-<td>Điều kiện không gắn cổng kiểm soát làm “đạt” vô nghĩa</td>
+<td>Điều kiện không gắn cổng kiểm soát làm "đạt" vô nghĩa</td>
 </tr>
 <tr>
 <td>4) Thu bằng chứng</td>
@@ -390,7 +390,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>01 gói bằng chứng kèm theo: bảng kiểm OJT ký, ảnh, log ca, biên bản hiệu suất test, kết quả đo/duyệt liên quan.</li>
 <li>01 bản <b>Photos trạng thái Kỹ năng Matrix</b> trước/sau cập nhật (phiên bản + ngày) để truy xuất nguồn gốc.</li>
 <li>01 hồ sơ thông báo thay đổi quyền vận hành cho các Responsible Person liên quan (Planner/QC/QA/OPS).</li>
-<li>01 tình huống “chặn giao việc sai Level” được ghi lại bằng log hành động (khi xảy ra).</li>
+<li>01 tình huống "chặn giao việc sai Level" được ghi lại bằng log hành động (khi xảy ra).</li>
 </ul>
 </div>
 <h3>9.3 Tiêu chí đánh giá L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn)</h3>
@@ -414,7 +414,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>L3</b></td>
 <td>Tạo và dẫn dắt 01 <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> hoàn chỉnh; chặn 01 lỗi phân ca/ ký duyệt sai Level; đóng hành động</td>
-<td>Hiệu suất test PASS; QA/QMS soát “No bằng chứng”; HR cập nhật phiên bản khóa</td>
+<td>Hiệu suất test PASS; QA/QMS soát "No bằng chứng"; HR cập nhật phiên bản khóa</td>
 <td>Được giao quyền xác nhận OJT đầu ra; kích hoạt TẠM GIỮ/CHẶN theo mục 6</td>
 </tr>
 <tr>
@@ -429,8 +429,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>10) Đánh giá</h2>
 <h3>10.1 Bài kiểm tra nhanh (≥20 câu) — trắc Nhiệm + tình huống ngắn</h3>
 <ol style="line-height:1.9; margin:0 0 0 18px">
-<li>ma trận kỹ năng (matrix) được dùng như “cổng” tại bước nào trong E2E?</li>
-<li>Định nghĩa “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)” trong cập nhật Level là gì?</li>
+<li>ma trận kỹ năng (matrix) được dùng như "cổng" tại bước nào trong E2E?</li>
+<li>Định nghĩa "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)" trong cập nhật Level là gì?</li>
 <li>FRM-HR-TRN-007 dùng để làm gì và Responsible Person là ai?</li>
 <li>FRM-HR-TRN-011 dùng để làm gì và khi nào bắt buộc cập nhật?</li>
 <li>Khi Planner phân job sai Level, quyết định fail-nhanh là gì?</li>
@@ -445,7 +445,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khác biệt giữa TẠM GIỮ và CHẶN trong bối cảnh ma trận kỹ năng (matrix) là gì?</li>
 <li>Khi thưởng map và ma trận kỹ năng (matrix) lệch phiên bản, hành động xử lý là gì?</li>
 <li>Điểm kiểm soát nào ngăn việc cập nhật trực tiếp không log?</li>
-<li>Trong <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a>, phần “rủi ro khi cập nhật sai” dùng để chặn điều gì?</li>
+<li>Trong <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a>, phần "rủi ro khi cập nhật sai" dùng để chặn điều gì?</li>
 <li>Khi vai trò liên quan vận hành nguy hiểm, EHS xác nhận nội dung nào?</li>
 <li>Điều kiện tối thiểu để công nhận L3 trong mô-đun này là gì?</li>
 <li>Khi hồ sơ OJT tồn tại nhưng không truy xuất nguồn gốc được, trạng thái cổng kiểm soát là gì?</li>
@@ -490,7 +490,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <ul style="margin:0 0 0 18px; line-height:1.9">
 <li><b>PASS:</b> Bài kiểm tra nhanh ≥ 80% • Tình huống quyết định đúng và ghi đủ MRR • Hiệu suất test PASS toàn bộ tiêu chí.</li>
-<li><b>FAIL:</b> Bất kỳ cập nhật Level không có <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> • Bất kỳ trường hợp “cho qua” khi thiếu bằng chứng • Bất kỳ không khớp phiên bản matrix/thưởng map không xử lý.</li>
+<li><b>FAIL:</b> Bất kỳ cập nhật Level không có <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> • Bất kỳ trường hợp "cho qua" khi thiếu bằng chứng • Bất kỳ không khớp phiên bản matrix/thưởng map không xử lý.</li>
 <li><b>Cổng kiểm soát báo cáo / tuyên bố:</b> không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate). Không có bằng chứng thì không có quyền vận hành, không có cập nhật Level, không có phê duyệt giao hàng, không có chi trả thưởng theo Level.</li>
 </ul>
 </div>

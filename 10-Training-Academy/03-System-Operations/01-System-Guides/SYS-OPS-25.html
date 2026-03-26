@@ -109,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 2) Mục đích module & bối cảnh operation -->
 <h2 class="h2" id="s2">2) Mục đích mô-đun &amp; bối cảnh vận hành (cổng chặn/bàn giao; kích hoạt; trách nhiệm)</h2>
 <div class="callout">
-<b>Lý do tồn tại (Cổng chặn logic):</b> sai vị trí lưu / sai quyền / sai phiên bản tạo lỗi chạy máy, lỗi kiểm tra, lỗi giao hàng và lỗi đánh giá. Mô-đun này là “cổng chặn hệ thống” để chặn 6 rủi ro chết Người: <b>sai Rev</b>, <b>lẫn lộn (mix-up)/lẫn lô</b>, <b>thiếu/giả chứng từ</b>, <b>chỉnh sửa âm thầm hồ sơ</b>, <b>rò rỉ dữ liệu khách hàng</b>, <b>vượt qua cổng chặn giao hàng</b>.
+<b>Lý do tồn tại (Cổng chặn logic):</b> sai vị trí lưu / sai quyền / sai phiên bản tạo lỗi chạy máy, lỗi kiểm tra, lỗi giao hàng và lỗi đánh giá. Mô-đun này là "cổng chặn hệ thống" để chặn 6 rủi ro chết Người: <b>sai Rev</b>, <b>lẫn lộn (mix-up)/lẫn lô</b>, <b>thiếu/giả chứng từ</b>, <b>chỉnh sửa âm thầm hồ sơ</b>, <b>rò rỉ dữ liệu khách hàng</b>, <b>vượt qua cổng chặn giao hàng</b>.
  </div>
 <div class="grid-2">
 <div class="card">
@@ -183,10 +183,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td><b>Operator</b></td><td>Chỉ sử dụng bản Released/WIP đúng nguồn; không sao chép file ra ngoài; nộp IPQC các log đúng nơi.</td><td>Hoàn thành 01 ca làm: IPQC log + ảnh/scan bảng kiểm lưu đúng Hồ sơ công việc; không phát sinh “nội bộ / tại chỗ chủ / gốc”.</td></tr>
+<tr><td><b>Operator</b></td><td>Chỉ sử dụng bản Released/WIP đúng nguồn; không sao chép file ra ngoài; nộp IPQC các log đúng nơi.</td><td>Hoàn thành 01 ca làm: IPQC log + ảnh/scan bảng kiểm lưu đúng Hồ sơ công việc; không phát sinh "nội bộ / tại chỗ chủ / gốc".</td></tr>
 <tr><td><b>Setup</b></td><td>Lưu phiếu cài đặt, danh sách dao cụ, bù trừ (offset) log đúng thư mục; khóa theo kết thúc / đóng hồ sơ.</td><td>01 bộ setup pack đúng chuẩn tên + thư mục; xác nhận dùng đúng Rev từ Hồ sơ công việc.</td></tr>
-<tr><td><b>Lập trình viên (CNC)</b></td><td>Governance CNC program/CAM/ghi sổ / đăng trong thư viện Hạn chế; kiểm soát phiên bản, phát hành bản chạy.</td><td>Bài kiểm tra thực hành đạt 100% điểm “Program source &amp; phát hành”; không có file program nằm ngoài thư viện Hạn chế.</td></tr>
-<tr><td><b>QC</b></td><td>Lưu FAI/CMM/FQC đúng Hồ sơ; bảo toàn tính toàn vẹn hồ sơ.</td><td>01 bộ kiểm tra hồ sơ “chỉ đọc/lưu giữ” sau phát hành; truy xuất nguồn gốc ≤ 3 phút.</td></tr>
+<tr><td><b>Lập trình viên (CNC)</b></td><td>Governance CNC program/CAM/ghi sổ / đăng trong thư viện Hạn chế; kiểm soát phiên bản, phát hành bản chạy.</td><td>Bài kiểm tra thực hành đạt 100% điểm "Program source &amp; phát hành"; không có file program nằm ngoài thư viện Hạn chế.</td></tr>
+<tr><td><b>QC</b></td><td>Lưu FAI/CMM/FQC đúng Hồ sơ; bảo toàn tính toàn vẹn hồ sơ.</td><td>01 bộ kiểm tra hồ sơ "chỉ đọc/lưu giữ" sau phát hành; truy xuất nguồn gốc ≤ 3 phút.</td></tr>
 <tr><td><b>QA</b></td><td>Thiết lập gói minh chứng, NCR/CAPA, đánh giá các log; kiểm tra tuân thủ.</td><td>Thực hiện 01 điểm / tại chỗ-kiểm tra hồ sơ công việc + lập biên bản; tạo 01 gói minh chứng chia sẻ chỉ đọc có hết hạn.</td></tr>
 <tr><td><b>Kho</b></td><td>Lưu truy xuất nguồn gốc, CoC vật liệu, đóng gói/giao vận pack đúng thư mục; không sửa âm thầm.</td><td>01 giao vận pack đủ: CoC/truy xuất nguồn gốc/phiếu kê đóng gói lưu đúng nơi; không thiếu MRR.</td></tr>
 <tr><td><b>Mua hàng</b></td><td>Lưu nhà cung cấp approvals/chứng chỉ đúng QMS-Hồ sơ; link vào Hồ sơ công việc/Nguyên vật liệu.</td><td>01 bộ chứng từ nhà cung cấp: lưu đúng QMS-Hồ sơ và gắn link vào WO/Lot.</td></tr>
@@ -199,7 +199,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <!-- 3) Vị trí trong chuỗi E2E + handoff -->
-<h2 class="h2" id="s3">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + “điểm chặn”</h2>
+<h2 class="h2" id="s3">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + "điểm chặn"</h2>
 <div class="vflow">
 <div class="vstep">
 <div class="vnum">1</div>
@@ -256,7 +256,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th style="width:260px">Bàn giao</th><th>Đầu vào tối thiểu</th><th>Đầu ra/MRR bắt buộc</th></tr></thead>
 <tbody>
 <tr><td><b>Người định giá (SAL-03) → Kế hoạch</b></td><td>RFQ/PO/NDA + drawing/spec + Rev</td><td>rà soát hợp đồng Hồ sơ + Customer Đầu vào lưu trong Hồ sơ công việc (đúng thư mục + tên)</td></tr>
-<tr><td><b>Kỹ thuật → Sản xuất</b></td><td>bộ định tuyến / lộ trình/phiếu cài đặt + program Released</td><td>Link “source of sự thật” program từ thư viện Hạn chế + dấu phát hành (note)</td></tr>
+<tr><td><b>Kỹ thuật → Sản xuất</b></td><td>bộ định tuyến / lộ trình/phiếu cài đặt + program Released</td><td>Link "source of sự thật" program từ thư viện Hạn chế + dấu phát hành (note)</td></tr>
 <tr><td><b>Nhận hàng → Sản xuất</b></td><td>CoC/chứng chỉ vật liệu</td><td>Nguyên vật liệu pack: CoC + truy xuất nguồn gốc link đúng WO/Lot</td></tr>
 <tr><td><b>Sản xuất → QC/QA</b></td><td>IPQC các log + setup bằng chứng</td><td>IPQC hồ sơ + ảnh/bảng kiểm, lưu đúng khu vực, khóa khi kết thúc / đóng hồ sơ</td></tr>
 <tr><td><b>QA → External (đánh giá/khách hàng)</b></td><td>Scope đánh giá + danh mục bằng chứng</td><td>Bộ bằng chứng chỉ đọc có hết hạn + log quyền truy cập (FRM-QMS-15/17)</td></tr>
@@ -269,12 +269,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:46px">#</th><th>Điểm gãy</th><th>Hậu quả trực tiếp</th><th>Cổng chặn bị phá</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Lưu bản vẽ/spec trên OneDrive cá nhân hoặc máy nội bộ / tại chỗ làm “bản chính”.</td><td>Chạy sai Rev; không truy xuất nguồn gốc đánh giá.</td><td>Báo giá/Hợp đồng → Kỹ thuật</td></tr>
+<tr><td>1</td><td>Lưu bản vẽ/spec trên OneDrive cá nhân hoặc máy nội bộ / tại chỗ làm "bản chính".</td><td>Chạy sai Rev; không truy xuất nguồn gốc đánh giá.</td><td>Báo giá/Hợp đồng → Kỹ thuật</td></tr>
 <tr><td>2</td><td>Gửi file khách hàng qua email/chat ngoài kiểm soát, không log.</td><td>Rò rỉ dữ liệu; vi phạm NDA.</td><td>External chia sẻ</td></tr>
 <tr><td>3</td><td>Trộn Released/WIP/Hồ sơ trong cùng thư mục, không phân khu vực.</td><td>Đúng nội dung nhưng sai trạng thái kiểm soát; chỉnh sửa hồ sơ.</td><td>Hồ sơ tính toàn vẹn</td></tr>
 <tr><td>4</td><td>CNC program nằm ngoài thư viện Hạn chế; copy USB giữa máy.</td><td>Chạy nhầm chương trình; không truy vết.</td><td>Kỹ thuật → Sản xuất</td></tr>
-<tr><td>5</td><td>Không gắn REV/WO/Lot trong tên file; dùng “final_v3”.</td><td>Lẫn lộn/lẫn lô; truy xuất nguồn gốc chậm.</td><td>Truy xuất nguồn gốc</td></tr>
-<tr><td>6</td><td>Bẻ quyền theo file để “tiện”, không có phê duyệt và thời hạn.</td><td>Không kiểm soát ai truy cập; đánh giá không đạt.</td><td>Kiểm soát truy cập</td></tr>
+<tr><td>5</td><td>Không gắn REV/WO/Lot trong tên file; dùng "final_v3".</td><td>Lẫn lộn/lẫn lô; truy xuất nguồn gốc chậm.</td><td>Truy xuất nguồn gốc</td></tr>
+<tr><td>6</td><td>Bẻ quyền theo file để "tiện", không có phê duyệt và thời hạn.</td><td>Không kiểm soát ai truy cập; đánh giá không đạt.</td><td>Kiểm soát truy cập</td></tr>
 <tr><td>7</td><td>Không đóng băng Hồ sơ công việc khi kết thúc / đóng hồ sơ; tiếp tục sửa file sau giao hàng.</td><td>Hồ sơ không toàn vẹn; tranh chấp khách hàng.</td><td>kết thúc / đóng hồ sơ khóa</td></tr>
 <tr><td>8</td><td>chia sẻ link không hết hạn hoặc chia sẻ cả thư viện thay vì gói minh chứng.</td><td>Rò rỉ dữ liệu kéo dài; không thu hồi.</td><td>External chia sẻ</td></tr>
 <tr><td>9</td><td>Hồ sơ bị ghi đè thay vì tạo bản đính chính có lý do.</td><td>Mất lịch sử; mất non-từ chối / phủ nhận.</td><td>Hồ sơ tính toàn vẹn</td></tr>
@@ -324,16 +324,16 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol class="iso-list">
 <li><b>Khoanh vùng ngay</b>: dừng vận hành đang tạo rủi ro (STOP/TẠM GIỮ/CHẶN theo mục 6).</li>
 <li><b>Chụp bằng chứng tức thì</b>: ảnh màn hình đường dẫn file, REV/WO/Lot, quyền chia sẻ, DCR hồ sơ.</li>
-<li><b>Đóng băng trạng thái</b>: không sửa file; tạo bản sao “Evidence_YYYYMMDD_HHMM” trong khu vực gói minh chứng nội bộ (chỉ đọc) để điều tra. <span class="muted">CNC-IMS-HUB → QMS-SSOT → Evidence-Pack.</span></li>
+<li><b>Đóng băng trạng thái</b>: không sửa file; tạo bản sao "Evidence_YYYYMMDD_HHMM" trong khu vực gói minh chứng nội bộ (chỉ đọc) để điều tra. <span class="muted">CNC-IMS-HUB → QMS-SSOT → Evidence-Pack.</span></li>
 <li><b>Báo đúng tuyến</b> trong ≤ 60 giây: Supervisor + QA/QMS + IT (khi liên quan quyền/chia sẻ) + Kỹ thuật (khi liên quan program/rev).</li>
 <li><b>Ghi log sự cố</b>: mở NCR hoặc rủi ro log theo quy định QMS, gắn WO/Lot và đính kèm ảnh chứng cứ.</li>
 </ol>
 <div class="callout warn">
-<b>Nguyên tắc:</b> xử lý trước – phân tích sau. Không tranh luận tại hiện trường. Không “sửa cho xong” trước khi lưu bằng chứng.
+<b>Nguyên tắc:</b> xử lý trước – phân tích sau. Không tranh luận tại hiện trường. Không "sửa cho xong" trước khi lưu bằng chứng.
  </div>
 </div>
 <!-- 8) Checklist operation -->
-<h2 class="h2" id="s8">8) Bảng kiểm vận hành (≤15 bước) — Responsible Person, Evidence/MRR, “điểm sai phổ biến”</h2>
+<h2 class="h2" id="s8">8) Bảng kiểm vận hành (≤15 bước) — Responsible Person, Evidence/MRR, "điểm sai phổ biến"</h2>
 <div class="table-card">
 <table class="table">
 <thead>
@@ -347,17 +347,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>1</td><td>Xác định file thuộc khu vực nào: Released / WIP / Hồ sơ.</td><td>Người tạo file</td><td>Tag/nhãn khu vực trong siêu dữ liệu hoặc thư mục chuẩn</td><td>Trộn WIP và Hồ sơ trong 1 thư mục</td></tr>
-<tr><td>2</td><td>Gán mức phân loại: Công khai / Nội bộ / Customer-Bảo mật / Hạn chế.</td><td>Người tạo file</td><td>Nhãn phân loại trên file/thư viện</td><td>Để trống phân loại; gán sai “Nội bộ” cho dữ liệu khách</td></tr>
+<tr><td>2</td><td>Gán mức phân loại: Công khai / Nội bộ / Customer-Bảo mật / Hạn chế.</td><td>Người tạo file</td><td>Nhãn phân loại trên file/thư viện</td><td>Để trống phân loại; gán sai "Nội bộ" cho dữ liệu khách</td></tr>
 <tr><td>3</td><td>Lưu file vào đúng nơi theo SOP: QMS-Được kiểm soát-Tài liệu / QMS-Hồ sơ / OPS-Job-Hồ sơ.</td><td>Người tạo file</td><td>Đường dẫn đúng site/thư viện/thư mục</td><td>Lưu OneDrive cá nhân/máy nội bộ / tại chỗ làm bản chính</td></tr>
-<tr><td>4</td><td>Đặt tên file có đủ: Customer, Part No, Phiên bản, WO/Lot, DocType, ngày.</td><td>Người tạo file</td><td>Tên file theo chuẩn</td><td>Dùng “final_v3”; thiếu REV/WO</td></tr>
-<tr><td>5</td><td>Đối với drawing/spec: chỉ lưu “Customer Đầu vào” trong Hồ sơ công việc; mọi bản phát hành nội bộ chỉ link.</td><td>Kỹ thuật</td><td>Link “source of sự thật” + hồ sơ nhận file</td><td>Sao chép bản vẽ sang thư mục riêng để tiện</td></tr>
+<tr><td>4</td><td>Đặt tên file có đủ: Customer, Part No, Phiên bản, WO/Lot, DocType, ngày.</td><td>Người tạo file</td><td>Tên file theo chuẩn</td><td>Dùng "final_v3"; thiếu REV/WO</td></tr>
+<tr><td>5</td><td>Đối với drawing/spec: chỉ lưu "Customer Đầu vào" trong Hồ sơ công việc; mọi bản phát hành nội bộ chỉ link.</td><td>Kỹ thuật</td><td>Link "source of sự thật" + hồ sơ nhận file</td><td>Sao chép bản vẽ sang thư mục riêng để tiện</td></tr>
 <tr><td>6</td><td>Đối với CNC program/CAM/ghi sổ / đăng: lưu trong Chương trình (Hạn chế) và phát hành bản chạy.</td><td>Lập trình viên (CNC)</td><td>Phát hành note + đường dẫn program</td><td>Copy program qua USB giữa máy; chỉnh tại máy</td></tr>
-<tr><td>7</td><td>Đối với kiểm tra hồ sơ: phát hành vào Hồ sơ; khóa không sửa; đính chính bằng file mới có lý do.</td><td>QC/QA</td><td>DCR hồ sơ/lưu giữ + log đính chính</td><td>ghi đè file để “đẹp số”</td></tr>
+<tr><td>7</td><td>Đối với kiểm tra hồ sơ: phát hành vào Hồ sơ; khóa không sửa; đính chính bằng file mới có lý do.</td><td>QC/QA</td><td>DCR hồ sơ/lưu giữ + log đính chính</td><td>ghi đè file để "đẹp số"</td></tr>
 <tr><td>8</td><td>Đối với nhà cung cấp cert/CoC: lưu QMS-Hồ sơ/Suppliers và gắn link vào Hồ sơ công việc/Nguyên vật liệu.</td><td>Mua hàng/Kho</td><td>Link cert + dấu nhận hàng</td><td>Để cert trong email/scan rời không truy xuất nguồn gốc</td></tr>
 <tr><td>9</td><td>Không bẻ quyền theo file; mọi thay đổi quyền qua FRM-QMS-15 và nhóm quyền.</td><td>IT + chủ dữ liệu</td><td>FRM-QMS-15 + nhóm quyền</td><td>Chia sẻ trực tiếp cho cá nhân, không thời hạn</td></tr>
 <tr><td>10</td><td>Chia sẻ bên ngoài chỉ qua gói minh chứng chỉ đọc có hết hạn; PHẢI chặn chia sẻ Hạn chế.</td><td>QA + Người định giá (SAL-03)</td><td>Link hết hạn + log chia sẻ</td><td>chia sẻ cả thư viện hoặc thư mục WO</td></tr>
 <tr><td>11</td><td>Khi kết thúc / đóng hồ sơ WO/Lot: đóng băng WIP thành Hồ sơ và khóa chỉ đọc/lưu giữ.</td><td>QA + Supervisor</td><td>kết thúc / đóng hồ sơ bảng kiểm ký + trạng thái đã khóa</td><td>Tiếp tục sửa hồ sơ sau giao hàng</td></tr>
-<tr><td>12</td><td>Thực hiện điểm / tại chỗ-kiểm tra định kỳ: 01 WO/Lot/tuần theo lịch QMS.</td><td>QA/QMS</td><td>Biên bản điểm / tại chỗ-kiểm tra + hành động</td><td>Kiểm tra “cho có” không có bằng chứng</td></tr>
+<tr><td>12</td><td>Thực hiện điểm / tại chỗ-kiểm tra định kỳ: 01 WO/Lot/tuần theo lịch QMS.</td><td>QA/QMS</td><td>Biên bản điểm / tại chỗ-kiểm tra + hành động</td><td>Kiểm tra "cho có" không có bằng chứng</td></tr>
 <tr><td>13</td><td>Thực hiện rà soát quyền truy cập hàng quý + thu hồi quyền trong ≤ 24h khi kết thúc đánh giá/Projects.</td><td>IT + QA/QMS</td><td>FRM-QMS-17 + danh sách thu hồi</td><td>Khách truy cập tồn tại vô hạn</td></tr>
 <tr><td>14</td><td>Kích hoạt phản ứng 60 giây khi phát hiện sai Rev/rò rỉ/chỉnh sửa hồ sơ.</td><td>Tất cả</td><td>Ảnh chứng cứ + log NCR/rủi ro</td><td>Sửa trước rồi mới báo</td></tr>
 <tr><td>15</td><td>Đóng bài học: cập nhật đào tạo hồ sơ và gắn MRR vào hồ sơ đào tạo.</td><td>QA/QMS</td><td>Training hồ sơ + tiêu chí đánh giá ký</td><td>Chỉ có điểm trắc Nhiệm, không có hiệu suất bằng chứng</td></tr>
@@ -393,7 +393,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>1. Nhận diện khu vực</b></td>
 <td>Gắn đúng Released/WIP/Hồ sơ trước khi lưu.</td>
-<td>Chặn “đúng nội dung nhưng sai trạng thái kiểm soát”.</td>
+<td>Chặn "đúng nội dung nhưng sai trạng thái kiểm soát".</td>
 </tr>
 <tr>
 <td><b>2. Gán phân loại</b></td>
@@ -463,7 +463,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><b>L3</b></td>
 <td>Phát hiện và chặn lỗi của Người khác tại hiện trường; thực hiện điểm / tại chỗ-kiểm tra; mở NCR/CAPA khi phát hiện chỉnh sửa hồ sơ.</td>
 <td>Thực hiện 02 điểm / tại chỗ-kiểm tra có biên bản + xử lý 01 tình huống TẠM GIỮ/STOP đúng chuẩn.</td>
-<td>Được làm “Người đi kèm (buddy) Người đào tạo”; được phê duyệt nội bộ cấp quyền trong phạm vi chủ dữ liệu uỷ quyền.</td>
+<td>Được làm "Người đi kèm (buddy) Người đào tạo"; được phê duyệt nội bộ cấp quyền trong phạm vi chủ dữ liệu uỷ quyền.</td>
 </tr>
 <tr>
 <td><b>L4</b></td>
@@ -481,30 +481,30 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3" style="margin-top:0">10.1 Trắc Nhiệm (25 câu) — trắc Nhiệm + tình huống ngắn</h3>
 <ol class="iso-list">
 <li>Ba khu vực thông tin trong HESEM gồm những khu vực nào?</li>
-<li>Kho “nguồn sự thật duy nhất” cho Released/Được kiểm soát Tài liệu là kho nào?</li>
+<li>Kho "nguồn sự thật duy nhất" cho Released/Được kiểm soát Tài liệu là kho nào?</li>
 <li>Mức phân loại nào áp dụng cho CNC chương trình/ghi sổ / đăng/định giá/biên lợi nhuận theo SOP-QMS-011?</li>
 <li>Khi file thuộc Customer-Bảo mật, hành vi chia sẻ bên ngoài bắt buộc đi qua cơ chế nào?</li>
 <li>Quy tắc bắt buộc số 1 liên quan lưu trữ hồ sơ là gì?</li>
-<li>Ý nghĩa vận hành của “đóng băng WIP thành Hồ sơ khi kết thúc / đóng hồ sơ” là gì?</li>
+<li>Ý nghĩa vận hành của "đóng băng WIP thành Hồ sơ khi kết thúc / đóng hồ sơ" là gì?</li>
 <li>Khi phát hiện program không truy xuất nguồn gốc được đường dẫn thư viện Hạn chế, hành động chặn lỗi tức thì là gì?</li>
 <li>ít nhất quyền hạn được thực thi bằng cách cấp quyền qua gì?</li>
 <li>FRM nào dùng để ghi log cấp quyền/chia sẻ ngoài?</li>
 <li>FRM nào là bằng chứng truy cập rà soát hàng quý?</li>
-<li>Vì sao “đính chính hồ sơ bằng file mới có lý do” bắt buộc?</li>
+<li>Vì sao "đính chính hồ sơ bằng file mới có lý do" bắt buộc?</li>
 <li>4 key tối thiểu gắn với hồ sơ theo SOP-QMS-011 là gì?</li>
 <li>DocType chuẩn dùng trong tên file job gồm những loại nào? Nêu tối thiểu 5 loại.</li>
 <li>Khi nhận CoC vật liệu, file phải lưu ở đâu và gắn vào đâu?</li>
 <li>Khi cần chia sẻ cho đánh giá viên, đối tượng chia sẻ là thư viện WO/Lot hay gói minh chứng? Vì sao?</li>
-<li>Khi thấy Người khác bẻ quyền theo file “cho tiện”, hành động bắt buộc là gì?</li>
-<li>Rủi ro “đúng nội dung nhưng sai trạng thái kiểm soát” xuất hiện khi nào?</li>
-<li>Lưu giữ policy không được “né” bằng cách tạo thư mục nào?</li>
+<li>Khi thấy Người khác bẻ quyền theo file "cho tiện", hành động bắt buộc là gì?</li>
+<li>Rủi ro "đúng nội dung nhưng sai trạng thái kiểm soát" xuất hiện khi nào?</li>
+<li>Lưu giữ policy không được "né" bằng cách tạo thư mục nào?</li>
 <li>Khi WO/Lot đã giao hàng, sửa file kiểm tra hồ sơ có được phép không? Mô tả cách xử lý đúng.</li>
 <li>Trong Hồ sơ công việc, Chương trình thư mục được kiểm soát theo nguyên tắc quyền nào giữa ENG và PROD?</li>
 <li>Khi phát hiện nghi ngờ rò rỉ dữ liệu, 2 hành động đầu tiên trong 60 giây là gì?</li>
-<li>Chỉ số vận hành “truy xuất nguồn gốc hồ sơ ≤ 3 phút” đo bằng cách nào trong thực tế?</li>
+<li>Chỉ số vận hành "truy xuất nguồn gốc hồ sơ ≤ 3 phút" đo bằng cách nào trong thực tế?</li>
 <li>Khi file chưa được gán phân loại, hành động chia sẻ link là GO hay CHẶN?</li>
 <li>Những nhóm quyền mốc chuẩn trong SOP-QMS-011 gồm nhóm nào? Nêu tối thiểu 3 nhóm.</li>
-<li>“No bằng chứng = No cổng chặn” áp dụng vào quyết định nào trong chuỗi E2E?</li>
+<li>"No bằng chứng = No cổng chặn" áp dụng vào quyết định nào trong chuỗi E2E?</li>
 </ol>
 <div class="note">
 <b>Chấm điểm:</b> đúng ≥ 80% mới qua phần trắc Nhiệm. Dưới ngưỡng là KHÔNG ĐẠT và học lại ngay trong ca tiếp theo.
@@ -543,7 +543,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h3 class="h3" style="margin-top:0">10.3 Bài kiểm tra thực hành (bắt buộc) — bài test + tiêu chí đánh giá + ĐẠT/KHÔNG ĐẠT</h3>
 <div class="callout">
-<b>Mô tả bài test:</b> Người học thực hiện trên 01 WO/Lot mô phỏng: nhận 6 file (drawing/spec, bộ định tuyến / lộ trình, phiếu cài đặt, CAM file, CNC program, FQC báo cáo) và 1 Requests chia sẻ cho “khách hàng” phạm vi 2 file. Người học phải lưu đúng khu vực, gán phân loại, đặt tên đúng, tạo gói minh chứng chia sẻ chỉ đọc có hết hạn, ghi log FRM-QMS-15, và thực hiện kết thúc / đóng hồ sơ khóa.
+<b>Mô tả bài test:</b> Người học thực hiện trên 01 WO/Lot mô phỏng: nhận 6 file (drawing/spec, bộ định tuyến / lộ trình, phiếu cài đặt, CAM file, CNC program, FQC báo cáo) và 1 Requests chia sẻ cho "khách hàng" phạm vi 2 file. Người học phải lưu đúng khu vực, gán phân loại, đặt tên đúng, tạo gói minh chứng chia sẻ chỉ đọc có hết hạn, ghi log FRM-QMS-15, và thực hiện kết thúc / đóng hồ sơ khóa.
  </div>
 <table class="table">
 <thead><tr><th style="width:280px">Hạng mục chấm</th><th>Tiêu chí ĐẠT</th><th style="width:220px">Lỗi KHÔNG ĐẠT ngay</th></tr></thead>
@@ -556,11 +556,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Phân loại</b></td>
 <td>Gán đúng 4 mức; CNC program là <b>Hạn chế</b>; drawing là <b>Customer-Bảo mật</b>.</td>
-<td>Gán “Nội bộ” cho CNC program hoặc chia sẻ file Hạn chế.</td>
+<td>Gán "Nội bộ" cho CNC program hoặc chia sẻ file Hạn chế.</td>
 </tr>
 <tr>
 <td><b>Đặt tên &amp; siêu dữ liệu</b></td>
-<td>Tên file có WO/Lot + PartNo + Rev + DocType + ngày; không dùng “final_v3”.</td>
+<td>Tên file có WO/Lot + PartNo + Rev + DocType + ngày; không dùng "final_v3".</td>
 <td>Thiếu REV/WO/Lot; dùng tên mơ hồ gây lẫn lộn.</td>
 </tr>
 <tr>
@@ -577,7 +577,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </table>
 </div>
 <!-- 11) ĐẠT/KHÔNG ĐẠT -->
-<h2 class="h2" id="s11">11) ĐẠT/KHÔNG ĐẠT tiêu chí (rõ ràng; “No bằng chứng = No cổng chặn”)</h2>
+<h2 class="h2" id="s11">11) ĐẠT/KHÔNG ĐẠT tiêu chí (rõ ràng; "No bằng chứng = No cổng chặn")</h2>
 <div class="card">
 <ul class="iso-list">
 <li><b>ĐẠT</b> khi đồng thời đạt:
@@ -591,7 +591,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>KHÔNG ĐẠT</b> khi xảy ra 1 trong các lỗi:
  <ul class="iso-list">
 <li>chia sẻ bên ngoài dữ liệu <b>Hạn chế</b> hoặc chia sẻ không hết hạn.</li>
-<li>Không truy xuất nguồn gốc được “source of sự thật” program từ thư viện Hạn chế.</li>
+<li>Không truy xuất nguồn gốc được "source of sự thật" program từ thư viện Hạn chế.</li>
 <li>Chỉnh sửa/ghi đè hồ sơ thay vì đính chính có lý do.</li>
 <li>Thiếu MRR cho quyết định cổng chặn (No bằng chứng = No cổng chặn).</li>
 </ul>
@@ -605,7 +605,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:280px">MRR</th><th>Nội dung</th><th style="width:220px">Nơi lưu</th></tr></thead>
 <tbody>
-<tr><td><b>MRR-25-01</b></td><td>Ảnh chụp đường dẫn “source of sự thật” cho drawing/spec và program (Hạn chế).</td><td>Hồ sơ công việc/Closeout_Lock</td></tr>
+<tr><td><b>MRR-25-01</b></td><td>Ảnh chụp đường dẫn "source of sự thật" cho drawing/spec và program (Hạn chế).</td><td>Hồ sơ công việc/Closeout_Lock</td></tr>
 <tr><td><b>MRR-25-02</b></td><td>Bảng kiểm vận hành mục 8 ký xác nhận (theo vai trò).</td><td>QMS-Hồ sơ/Training</td></tr>
 <tr><td><b>MRR-25-03</b></td><td>FRM-QMS-15 Truy cập DCR hồ sơ (cấp quyền/chia sẻ).</td><td>QMS-Hồ sơ/IT_Evidence</td></tr>
 <tr><td><b>MRR-25-04</b></td><td>Gói minh chứng chia sẻ chỉ đọc có hết hạn + danh sách Người được cấp.</td><td>Z_Audit_Evidence_Pack</td></tr>
@@ -636,7 +636,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:46px">#</th><th>Phát hiện phổ biến</th><th>Vì sao bị fail</th><th>Phòng ngừa bắt buộc</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Không chứng minh được “nguồn sự thật duy nhất” cho Released tài liệu.</td><td>Đánh giá viên thấy nhiều bản SOP/WI rải rác.</td><td>Chỉ lưu Released trong QMS-Được kiểm soát-Tài liệu; nơi khác chỉ link; điểm / tại chỗ-kiểm tra hàng tháng.</td></tr>
+<tr><td>1</td><td>Không chứng minh được "nguồn sự thật duy nhất" cho Released tài liệu.</td><td>Đánh giá viên thấy nhiều bản SOP/WI rải rác.</td><td>Chỉ lưu Released trong QMS-Được kiểm soát-Tài liệu; nơi khác chỉ link; điểm / tại chỗ-kiểm tra hàng tháng.</td></tr>
 <tr><td>2</td><td>Hồ sơ công việc thiếu cấu trúc chuẩn hoặc thiếu thư mục bắt buộc.</td><td>Không truy xuất nguồn gốc đủ bằng chứng theo WO/Lot.</td><td>Template Tài liệu Set chuẩn + bảng kiểm kết thúc / đóng hồ sơ bắt buộc.</td></tr>
 <tr><td>3</td><td>Hồ sơ chỉnh sửa/ghi đè, không có lịch sử đính chính.</td><td>Mất non-từ chối / phủ nhận.</td><td>Đính chính bằng file mới có lý do; giữ bản cũ; lưu giữ.</td></tr>
 <tr><td>4</td><td>Cấp quyền theo cá nhân; không có log thay đổi quyền.</td><td>Không kiểm soát ít nhất quyền hạn.</td><td>Chỉ cấp qua group; mọi thay đổi ghi FRM-QMS-15.</td></tr>

@@ -69,7 +69,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <h1>WI-519 — Kiểm nhanh bộ hồ sơ công việc, xác minh trước khi chạy, đầu tiên cut và khởi động lại sau bất thường</h1>
 <div class="section"><h2>1. Quy tắc 60 giây trước Cycle Start</h2>
 <p>WI này là cổng chặn cuối cùng trước khi nhấn <b>Cycle Start</b>. Trong vòng 60 giây, Operator hoặc Setup Lead phải xác nhận đủ 07 điểm bắt buộc tại máy. Nếu có 01 điểm không PASS hoặc không chứng minh được, máy phải vào <b>TẠM GIỮ</b>.</p>
-<div class="callout-danger"><strong>STOP-THE-dòng / chuyền</strong><br/>Không được chạy máy để “test tạm” khi chưa qua WI-519. Không được bỏ qua bước kiểm vì job lặp, vì đã từng chạy, vì Cần đến giờ giao, hoặc vì Người setup nói “ổn rồi”.</div></div>
+<div class="callout-danger"><strong>STOP-THE-dòng / chuyền</strong><br/>Không được chạy máy để "test tạm" khi chưa qua WI-519. Không được bỏ qua bước kiểm vì job lặp, vì đã từng chạy, vì Cần đến giờ giao, hoặc vì Người setup nói "ổn rồi".</div></div>
 <div class="section"><h2>2. Khi nào bắt buộc dùng WI-519</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thời điểm</th><th>Phải thực hiện</th><th>Người xác nhận</th></tr></thead><tbody>
 <tr><td>Part đầu sau setup / chuyển đổi (changeover)</td><td>Đủ 07 điểm kiểm + chứng minh-out + xác nhận đầu tiên cut</td><td>Operator + Setup Lead</td></tr>
@@ -121,7 +121,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div></div>
 <div class="section"><h2>8. Phản ứng khi không đạt</h2>
 <div class="step-list">
-<div class="step-item"><strong>Dừng Cycle Start.</strong><br/>Không cho phép chạy “một cái xem sao”.</div>
+<div class="step-item"><strong>Dừng Cycle Start.</strong><br/>Không cho phép chạy "một cái xem sao".</div>
 <div class="step-item"><strong>Giữ trạng thái TẠM GIỮ.</strong><br/>Tag máy, tag WIP hoặc tag lot liên quan nếu đã có cắt phoi sau lần kiểm cuối đạt.</div>
 <div class="step-item"><strong>Báo đúng Người.</strong><br/>Sai gói hồ sơ/phiên bản báo Kỹ thuật + QA; sai setup báo Setup Lead/Supervisor; nghi ngờ machine điều kiện báo Bảo trì; sai lot/nguyên vật liệu báo Kho + QA.</div>
 <div class="step-item"><strong>Khoanh vùng cuối cùng-đã biết-tốt / đạt.</strong><br/>Nếu đã có sản phẩm sau lần kiểm cuối đạt, phải xác định part phạm vi / dải nghi ngờ trước khi mở lại máy.</div>

@@ -8,21 +8,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -36,7 +36,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -46,25 +46,6 @@
 table{max-width:100%;table-layout:auto}
 td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 @media (max-width: 960px){.grid-2,.grid-3,.field-grid{grid-template-columns:1fr;}}
-/* Critical inline CSS for file:// compatibility */
-
-/* Flowchart */
-.flowchart{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:stretch;margin:20px 0;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:1px solid rgba(21,101,192,.18);border-radius:10px}
-.flow-step{flex:1 1 120px;min-width:100px;max-width:170px;padding:10px 12px;background:#fff;border:1.5px solid rgba(21,101,192,.3);border-radius:10px;text-align:center;box-shadow:0 1px 3px rgba(21,101,192,.06)}
-.flow-step .flow-num{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#1565c0,#1976d2);color:#fff;font-size:12px;font-weight:800;margin-bottom:5px}
-.flow-step .flow-title{font-size:11px;font-weight:700;color:#0C2D48;line-height:1.35}
-.flow-step .flow-text{text-align:left}
-.flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 22px;color:#93b3d6;font-size:16px;font-weight:700}
-/* Proc-num */
-.proc-num{display:inline-flex;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;flex-shrink:0;margin-right:8px}
-/* Step-tag */
-.step-tag{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0C2D48,#1565c0);text-transform:uppercase;letter-spacing:.3px}
-/* Metric cards */
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:16px 0}
-.metric-card{padding:16px;border:1px solid rgba(21,101,192,.15);border-radius:10px;text-align:center;background:#fff}
-.metric-card .value{font-size:28px;font-weight:800;color:#1565c0;line-height:1.2}
-.metric-card .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-top:4px}
-.metric-card .sub{font-size:11px;color:#666;margin-top:4px;line-height:1.4}
 
 </style>
 </head>
@@ -87,7 +68,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <div class="doc-content" id="docContent">
 <div class="form-sheet">
 <div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi dữ liệu vận hành, dữ liệu kỹ thuật, hồ sơ chất lượng, hồ sơ giao hàng, hồ sơ tài chính và dữ liệu khách hàng phải được gắn rõ <b>SoR</b>, <b>SSOT</b>, mức nhạy cảm và Người chịu trách nhiệm. Không cho phép file “trôi” ngoài hệ thống đã được phê duyệt. <span class="iso-clause">§7.5.3</span></div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi dữ liệu vận hành, dữ liệu kỹ thuật, hồ sơ chất lượng, hồ sơ giao hàng, hồ sơ tài chính và dữ liệu khách hàng phải được gắn rõ <b>SoR</b>, <b>SSOT</b>, mức nhạy cảm và Người chịu trách nhiệm. Không cho phép file "trôi" ngoài hệ thống đã được phê duyệt. <span class="iso-clause">§7.5.3</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi Requests cấp quyền, đổi quyền, quyền đặc quyền, khách truy cập, bên ngoài chia sẻ, thôi việc / rời công ty, hồ sơ khai báo, backup, khôi phục và disposition rà soát phải có Requests, phê duyệt, bằng chứng thực hiện và log truy vết. <span class="iso-clause">§7.5.3</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Dữ liệu khách hàng, bản vẽ, NC program, báo cáo đo, dữ liệu chi phí, dữ liệu mua hàng và hồ sơ khiếu nại/RMA là dữ liệu kiểm soát. Mọi chia sẻ ra ngoài phải theo đúng ma trận thẩm quyền và tuyến phê duyệt IP. <span class="iso-clause">§7.5.3</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Backup không được xem là đạt Requests nếu chưa có <b>thử khôi phục</b>. Hồ sơ không được xem là kiểm soát nếu chưa chứng minh được truy xuất nguồn gốc, tính toàn vẹn và lưu giữ đúng quy định. <span class="iso-clause">§7.5.3</span></div></div>
@@ -145,14 +126,14 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <div class="note-blue"><b>Phạm vi bắt buộc của lệnh sản xuất CNC:</b> bản vẽ, spec, CAM/NC, phiếu cài đặt, traveler, trong quá trình hồ sơ, kiểm tra cuối hồ sơ, nguyên vật liệu cert, đóng gói label, CoC/CoA, khiếu nại bằng chứng và toàn bộ hồ sơ điều độ phải luôn có SoR/SSOT rõ ràng.</div>
 <h2 class="h2" id="p3">3. Thuật ngữ &amp; nguyên tắc</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:26%"/><col style="width:74%"/></colgroup><thead><tr><th>Thuật ngữ / nguyên tắc</th><th>Quy định sử dụng</th></tr></thead><tbody>
-<tr><td><b>SoR</b> – Nguồn chuẩn</td><td>Hệ thống ghi nhận giao dịch chính thức. Với job, PO, phiếu nhận / biên nhận, hàng tồn kho, ship, hóa đơn: Epicor là SoR. Không tạo “sổ riêng” ngoài Epicor để thay thế giao dịch.</td></tr>
+<tr><td><b>SoR</b> – Nguồn chuẩn</td><td>Hệ thống ghi nhận giao dịch chính thức. Với job, PO, phiếu nhận / biên nhận, hàng tồn kho, ship, hóa đơn: Epicor là SoR. Không tạo "sổ riêng" ngoài Epicor để thay thế giao dịch.</td></tr>
 <tr><td><b>SSOT</b> – Đơn lẻ Source of sự thật</td><td>Nơi lưu hồ sơ/bằng chứng chuẩn để mọi Người truy cập cùng một bản. Với bằng chứng số, SSOT là M365/SharePoint theo cấu trúc đã phê duyệt. Không lưu hồ sơ chính thức trên máy cá nhân.</td></tr>
 <tr><td><b>ít nhất quyền hạn</b></td><td>Chỉ cấp đúng quyền tối thiểu cần cho vai trò, đúng thời hạn và đúng phạm vi dữ liệu. Hết nhu cầu phải thu hồi ngay.</td></tr>
 <tr><td><b>SoD</b> – phân tách trách nhiệm</td><td>Người Requests/duyệt/thực thi không được nhập nhằng. Quyền đặc quyền, quyền xóa, quyền phát hành hoặc quyền sửa rule hệ thống phải có phân tách và bằng chứng duyệt.</td></tr>
 <tr><td><b>Được kiểm soát data</b></td><td>Gồm dữ liệu kỹ thuật, dữ liệu khách hàng, chi phí sheet, NC, CMM/program, báo cáo, bằng chứng chất lượng, khiếu nại/RMA, nhà cung cấp thẻ điểm (bảng điểm), bảng lương/đào tạo. Các loại này không được chia sẻ tự do.</td></tr>
 <tr><td><b>Hồ sơ khai báo / giữ pháp lý</b></td><td>Hồ sơ khi đủ điều kiện phải bị khóa hồ sơ hoặc gắn giữ pháp lý để PHẢI chặn sửa/hủy trái phép. Thiếu hai lớp này thì hồ sơ chưa được xem là kiểm soát hoàn chỉnh.</td></tr>
 <tr><td><b>3-phút / biên bản truy xuất test</b></td><td>Bất kỳ hồ sơ thuộc đánh giá, khiếu nại, phê duyệt giao hàng (ship phát hành) hoặc khách hàng Requests thông tin phải truy ra trong tối đa 3 phút bằng đường dẫn, siêu dữ liệu và tình huống ID chuẩn.</td></tr>
-<tr><td><b>No dùng chung tài khoản</b></td><td>PHẢI dùng đúng tài khoản cá nhân, không “mượn Người dùng” và phải khóa ngay tài khoản của Người đã nghỉ việc.</td></tr>
+<tr><td><b>No dùng chung tài khoản</b></td><td>PHẢI dùng đúng tài khoản cá nhân, không "mượn Người dùng" và phải khóa ngay tài khoản của Người đã nghỉ việc.</td></tr>
 </tbody></table></div>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:20%"/><col style="width:20%"/><col style="width:30%"/><col style="width:30%"/></colgroup><thead><tr><th>Mức dữ liệu</th><th>Ví dụ</th><th>Kiểm soát bắt buộc</th><th>Không được phép</th></tr></thead><tbody>
 <tr><td>Nội bộ phổ thông</td><td>Thông báo nội bộ, biểu mẫu trống, lịch họp</td><td>đọc theo nhóm; edit theo Responsible Person; version control</td><td>Không phát tán như tài liệu đã phê duyệt nếu chưa qua <a href="sop-101-document-and-data-control.html">SOP-101</a></td></tr>
@@ -258,12 +239,12 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <li>Khóa chia sẻ, chặn quyền, giữ log và chụp hiện trạng trước khi sửa.</li>
 <li>Xác định phạm vi ảnh hưởng theo khách hàng/job/part/rev/tình huống ID.</li>
 <li>Nếu ảnh hưởng phát hành, ship, chất lượng hồ sơ hoặc khách hàng IP, phải chuyển cấp ngay theo SLA.</li>
-<li>Bài học sau sự cố phải kéo vào thẩm quyền, vai trò map, luồng spec hoặc WI liên quan; không khép chỉ bằng việc “đã sửa xong”.</li>
+<li>Bài học sau sự cố phải kéo vào thẩm quyền, vai trò map, luồng spec hoặc WI liên quan; không khép chỉ bằng việc "đã sửa xong".</li>
 </ul>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#15803d,#22c55e)">9</span> Bảo toàn mốc chuẩn cấu hình và phiên bản tính toàn vẹn cho dữ liệu kỹ thuật</h3>
 <p>Dữ liệu kỹ thuật không chỉ là file để xem. Với HESEM, drawing, CAD/CAM đầu ra, NC program, phiếu cài đặt, kế hoạch kiểm tra (plan), kế hoạch kiểm soát, FAI bằng chứng và bộ hồ sơ phê duyệt giao hàng là chuỗi cấu hình có thể làm hỏng cả lô nếu bị lẫn phiên bản. Vì vậy, khi Kỹ thuật phát hành mốc chuẩn hoặc Job Ảnh chụp trạng thái, SOP-104 phải bảo đảm 4 điều: nguồn chủ / gốc rõ; nơi dùng công đoạn sau chỉ đọc / chỉ link, không tự sửa; mọi thay đổi có DCR/thay đổi hồ sơ; và mọi bản hết hiệu lực bị khóa khỏi vùng dùng. Nếu chưa bảo đảm 4 điều này, system chưa được xem là đủ mức sẵn sàng.</p>
 <ul class="tight"><li>Không cho phép copy file NC/program sang Personal Folder rồi dùng bản copy làm nguồn chạy máy lâu dài.</li><li>Không cho phép traveler, phiếu cài đặt hoặc kiểm tra biểu mẫu in sẵn hàng loạt trước khi phiên bản mốc chuẩn được khóa.</li><li>Job có ASD luồng-xuống / Từng, sản phẩm an toàn hoặc khách hàng đặc biệt Requests phải có cách chứng minh bản dùng tại gemba (thực địa) (thực địa) đúng phiên bản Released.</li></ul>
-<h3><span class="proc-num" style="background:linear-gradient(135deg,#be185d,#ec4899)">10</span> Kiểm soát export / báo cáo / tích hợp / tự động hóa để tránh tạo “đứng cạnh học việc system”</h3>
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#be185d,#ec4899)">10</span> Kiểm soát export / báo cáo / tích hợp / tự động hóa để tránh tạo "đứng cạnh học việc system"</h3>
 <p>Nhiều rủi ro dữ liệu không đến từ tin tặc mà đến từ các file export, báo cáo tự viết, bot, Power truy vấn, macro, API hoặc tích hợp phụ làm trôi SoR/SSOT. Mọi export định kỳ, bảng điều khiển, bot hoặc luồng dùng cho quyết định vận hành phải có Responsible Person, mục đích, nguồn dữ liệu, tần suất làm mới, logic chuyển đổi, rule kiểm chéo và Approver. Không cho phép một bảng điều khiển, file Excel hoặc báo cáo tự phát trở thành nguồn quyết định điều phối xuất hàng, phê duyệt giao hàng hoặc hóa đơn nếu chưa qua <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>/<a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a> / kiểm soát thay đổi phù hợp.</p>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">11</span> Thiết bị, USB, hình ảnh điện thoại và dữ liệu trên máy cục bộ</h3>
 <p>Ảnh, video, file scan, program backup và data export tạo ở hiện trường chỉ được xem là bằng chứng chính thức khi được chuyển vào SSOT có siêu dữ liệu và link tới tình huống/job tương ứng. Không cho phép để hình ảnh chứng cứ, scan cert, scan traveler, ảnh NCR hoặc file pack nằm lâu dài trên điện thoại cá nhân, USB không kiểm soát, chat app hoặc ổ cứng cục bộ. Nếu tình huống gián đoạn buộc dùng phương tiện tạm, phải ghi log nhận diện phương tiện, Người giữ, thời gian dùng và thời điểm nhập dữ liệu (ingest) về SSOT; sau đó xóa hoặc niêm phong theo quy định.</p>
@@ -319,7 +300,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 </tbody></table></div>
 <div class="note-blue"><b>Yêu cầu lan truyền / phân tầng về JD:</b> JD của IT, Epicor Admin, QA Manager, QMS Engineer và HR Manager phải mô tả quyền hạn phê duyệt/cấp quyền/thu hồi quyền, rà soát định kỳ, giữ pháp lý, thử khôi phục và trách nhiệm kích hoạt escalation khi có sự cố dữ liệu hoặc IP.</div>
 </div>
-<h2 class="h2 phase3a-workbook-alignment" id="phase3a-workbook-security">13. Biểu mẫu Excel đang hiệu lực — SSOT, security và tính toàn vẹn hồ sơ cho thư viện workbook hiện hành</h2><div class="note phase3a-workbook-alignment"><b>Ý nghĩa kiểm soát</b><br/>Workbook hiện hành không phải “file Excel tiện dùng” mà là một lớp hồ sơ-control chính thức. Điều này buộc SOP-104 phải xem workbook như một đối tượng quản trị dữ liệu có Người phụ trách, đường dẫn phát hành, quyền truy cập, quy tắc copy/export và kịch bản backup/restore rõ ràng.<div class="note-soft"><b>Tài liệu kiểm soát bắt buộc đọc:</b> lớp bảo mật endpoint và trusted-location policy cho FRM workbook được khóa tại ; baseline delivery chỉ download được khóa tại ; stack delivery profiles tại ; pilot endpoint / save-path control tại ; và kết luận đánh giá/sửa chữa được chốt tại / .</div></div><ul class="tight phase3a-workbook-alignment"><li>Workbook hiện hành phải được lưu trên thư viện / đường dẫn đã chỉ định; không dùng email attachment, USB hoặc desktop local làm SoR/SSOT cuối cùng.</li><li>Hidden sheets, reference tabs, xác nhận lists và action sheets không được mở khóa/sửa trực tiếp ngoài quy trình thay đổi được duyệt.</li><li>Khi dùng workbook cho daily escalation hoặc cổng kiểm soát decision như <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-208_Daily_Tier_Meeting_and_Escalation_Log.xlsx">FRM-208</a>, <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-209_High_Risk_Job_Readiness_Review.xlsx">FRM-209</a>, <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> hoặc <a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a>, phải khóa Người phụ trách, source, freeze-date, access scope và bằng chứng kiểm soát tương ứng.</li><li> là đầu mối để phân biệt workbook RELEASED và các mã không phát hành trong danh mục hiện hành cùng phạm vi mã / phạm vi quy trình trong portal/search/access review.</li></ul></div></div></div></div>
+<h2 class="h2 phase3a-workbook-alignment" id="phase3a-workbook-security">13. Biểu mẫu Excel đang hiệu lực — SSOT, security và tính toàn vẹn hồ sơ cho thư viện workbook hiện hành</h2><div class="note phase3a-workbook-alignment"><b>Ý nghĩa kiểm soát</b><br/>Workbook hiện hành không phải "file Excel tiện dùng" mà là một lớp hồ sơ-control chính thức. Điều này buộc SOP-104 phải xem workbook như một đối tượng quản trị dữ liệu có Người phụ trách, đường dẫn phát hành, quyền truy cập, quy tắc copy/export và kịch bản backup/restore rõ ràng.<div class="note-soft"><b>Tài liệu kiểm soát bắt buộc đọc:</b> lớp bảo mật endpoint và trusted-location policy cho FRM workbook được khóa tại ; baseline delivery chỉ download được khóa tại ; stack delivery profiles tại ; pilot endpoint / save-path control tại ; và kết luận đánh giá/sửa chữa được chốt tại / .</div></div><ul class="tight phase3a-workbook-alignment"><li>Workbook hiện hành phải được lưu trên thư viện / đường dẫn đã chỉ định; không dùng email attachment, USB hoặc desktop local làm SoR/SSOT cuối cùng.</li><li>Hidden sheets, reference tabs, xác nhận lists và action sheets không được mở khóa/sửa trực tiếp ngoài quy trình thay đổi được duyệt.</li><li>Khi dùng workbook cho daily escalation hoặc cổng kiểm soát decision như <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-208_Daily_Tier_Meeting_and_Escalation_Log.xlsx">FRM-208</a>, <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-209_High_Risk_Job_Readiness_Review.xlsx">FRM-209</a>, <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> hoặc <a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a>, phải khóa Người phụ trách, source, freeze-date, access scope và bằng chứng kiểm soát tương ứng.</li><li> là đầu mối để phân biệt workbook RELEASED và các mã không phát hành trong danh mục hiện hành cùng phạm vi mã / phạm vi quy trình trong portal/search/access review.</li></ul></div></div></div></div>
 <script src="../../../assets/app.js"></script>
 </body>
 </html>

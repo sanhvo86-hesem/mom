@@ -336,7 +336,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>9</td><td>Chuẩn bị bộ hồ sơ giao hàng: phiếu kê đóng gói + CoC + cert theo PO + bản sao điện tử</td><td>QA + WHS</td><td>File trong 07_Shipping-Đóng gói; đặt tên chuẩn</td><td>Thiếu CoC/cert; file sai Rev</td></tr>
 <tr><td>10</td><td>Tạo/hoàn thiện ShipRelease hồ sơ; gắn PacketFolderUrl; đặt PacketComplete</td><td>WHS</td><td>ShipRelease row: PacketFolderUrl + PacketComplete</td><td>Link thư mục sai; PacketComplete đặt sai</td></tr>
 <tr><td>11</td><td>Submit ShipRelease để chạy LUỒNG-WHS-13; nhận ReconciliationStatus</td><td>WHS</td><td>ReconciliationStatus Đạt/không đạt/Đã chặn; log time</td><td>Submit thiếu trường; trạng thái không cập nhật</td></tr>
-<tr><td>12</td><td>khi không đạt/Đã chặn: mở StandupAction S1; khoanh vùng; sửa nguyên nhân và re‑xác nhận hiệu lực</td><td>Supervisor + QA + WHS</td><td>log hành động + bằng chứng sửa lỗi; re‑run Người xác nhận</td><td>Vượt qua; ship “tạm”; sửa không có log</td></tr>
+<tr><td>12</td><td>khi không đạt/Đã chặn: mở StandupAction S1; khoanh vùng; sửa nguyên nhân và re‑xác nhận hiệu lực</td><td>Supervisor + QA + WHS</td><td>log hành động + bằng chứng sửa lỗi; re‑run Người xác nhận</td><td>Vượt qua; ship "tạm"; sửa không có log</td></tr>
 <tr><td>13</td><td>Khi Pass: WHS + QA phê duyệt; ShipRelease.Trạng thái = Released</td><td>Team Leader kho + QA</td><td>ApprovalHistory; dấu vết kiểm toán</td><td>Thiếu chữ ký; phê duyệt sai Người</td></tr>
 <tr><td>14</td><td>Bàn giao đơn vị vận chuyển; cập nhật đơn vị vận chuyển/Theo dõi/ShipDate; PackSSCCRegister.Trạng thái = Đã giao hàng</td><td>WHS</td><td>đơn vị vận chuyển/Theo dõi; ảnh bàn giao; dấu thời gian</td><td>Theo dõi sai; thiếu ảnh bàn giao</td></tr>
 <tr><td>15</td><td>Lưu POD/bằng chứng; khóa hồ sơ Tier 1; đóng lô giao hàng</td><td>QA + Người định giá (SAL-03)</td><td>POD file; lưu giữ label Tier 1 ≥ 10 năm</td><td>POD thất lạc; lưu giữ không áp</td></tr>
@@ -413,7 +413,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Lưu giữ label không áp cho hồ sơ Tier 1; không chứng minh thời hạn lưu ≥ 10 năm.</li>
 </ol>
 <div class="callout">
-<b>Quy tắc kiểm soát:</b> QA thực hiện đánh giá nội bộ theo mẫu “bộ hồ sơ giao hàng điểm / tại chỗ‑Kiểm tra” M365/SharePoint → HESEM-QMS-SSOT với tần suất tối thiểu 01 lần/tuần cho các lô giao hàng đã Released.
+<b>Quy tắc kiểm soát:</b> QA thực hiện đánh giá nội bộ theo mẫu "bộ hồ sơ giao hàng điểm / tại chỗ‑Kiểm tra" M365/SharePoint → HESEM-QMS-SSOT với tần suất tối thiểu 01 lần/tuần cho các lô giao hàng đã Released.
  </div>
 </div>
 <div class="card">
@@ -471,7 +471,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="card">
 <h2>12) OJT theo TWI Job Sự cố hỏng máy (bắt buộc cho WHS/QA)</h2>
-<p class="mini">TWI tập trung “Bước chính — Điểm then chốt — Lý do”. Khi học viên không đạt điểm then chốt → đánh giá Fail.</p>
+<p class="mini">TWI tập trung "Bước chính — Điểm then chốt — Lý do". Khi học viên không đạt điểm then chốt → đánh giá Fail.</p>
 <div class="table-wrap">
 <table class="table tight">
 <thead><tr><th>Bước chính</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead>

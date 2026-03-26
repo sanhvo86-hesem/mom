@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -96,7 +96,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Governance đầu ra Kỹ thuật từ DFM → quy trình → CAM → kiểm soát thay đổi → mức sẵn sàng phục vụ sản xuất ổn định.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Mission)</h2>
-<div class="jd-mission"><p>Engineering Lead/Manager là chủ sở hữu kỹ thuật gia công của nhà máy, bảo đảm mọi chi tiết được chuyển hóa thành quy trình package khả thi, kiểm soát được rủi ro và có thể sản xuất ổn định trên năng lực hiện hữu của công ty.</p><p>Vị trí này giữ cửa kỹ thuật trước sản xuất: từ feasibility, routing, WI / setup concept, NC release, kiểm tra feasibility đến kiểm soát thay đổi và phản hồi kỹ thuật khi phát sinh lỗi hoặc yêu cầu thay đổi.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mọi release kỹ thuật đều rõ ràng, đúng revision, đủ để xưởng chạy được ngay mà không phải “đoán ý” kỹ sư.</li><li>Rủi ro kỹ thuật của part mới / part thay đổi được nhìn thấy và xử lý trước khi ảnh hưởng sản xuất hàng loạt.</li><li>Các vấn đề lặp do quy trình / fixture / tool / NC được giảm dần thông qua chuẩn hóa và quản trị change chặt chẽ.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Engineering Lead/Manager là Người phụ trách của hệ kỹ thuật nội bộ; không trực tiếp điều độ nhà máy, không tự phê duyệt giao hàng (ship release) và không làm thay từng vai trò chuyên môn nếu không cần thiết.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Giữ thẩm quyền kỹ thuật cuối cho feasibility, release bộ hồ sơ chuẩn (baseline package), configuration/kiểm soát thay đổi và interface giữa DFM - Quy trình - CAM - Quality.</li><li>Không để kỹ thuật phát hành nửa vời; mọi routing, setup, NC package, CTQ, kiểm tra method, special note và change impact phải khóa trước khi xuống xưởng.</li><li>Dẫn dắt kỹ thuật bằng logic cổng kiểm soát và nhật ký giả định, không bằng kinh Nhiệm nhớ miệng hoặc sửa nóng tại máy.</li></ul></div>
+<div class="jd-mission"><p>Engineering Lead/Manager là chủ sở hữu kỹ thuật gia công của nhà máy, bảo đảm mọi chi tiết được chuyển hóa thành quy trình package khả thi, kiểm soát được rủi ro và có thể sản xuất ổn định trên năng lực hiện hữu của công ty.</p><p>Vị trí này giữ cửa kỹ thuật trước sản xuất: từ feasibility, routing, WI / setup concept, NC release, kiểm tra feasibility đến kiểm soát thay đổi và phản hồi kỹ thuật khi phát sinh lỗi hoặc yêu cầu thay đổi.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mọi release kỹ thuật đều rõ ràng, đúng revision, đủ để xưởng chạy được ngay mà không phải "đoán ý" kỹ sư.</li><li>Rủi ro kỹ thuật của part mới / part thay đổi được nhìn thấy và xử lý trước khi ảnh hưởng sản xuất hàng loạt.</li><li>Các vấn đề lặp do quy trình / fixture / tool / NC được giảm dần thông qua chuẩn hóa và quản trị change chặt chẽ.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Engineering Lead/Manager là Người phụ trách của hệ kỹ thuật nội bộ; không trực tiếp điều độ nhà máy, không tự phê duyệt giao hàng (ship release) và không làm thay từng vai trò chuyên môn nếu không cần thiết.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Giữ thẩm quyền kỹ thuật cuối cho feasibility, release bộ hồ sơ chuẩn (baseline package), configuration/kiểm soát thay đổi và interface giữa DFM - Quy trình - CAM - Quality.</li><li>Không để kỹ thuật phát hành nửa vời; mọi routing, setup, NC package, CTQ, kiểm tra method, special note và change impact phải khóa trước khi xuống xưởng.</li><li>Dẫn dắt kỹ thuật bằng logic cổng kiểm soát và nhật ký giả định, không bằng kinh Nhiệm nhớ miệng hoặc sửa nóng tại máy.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

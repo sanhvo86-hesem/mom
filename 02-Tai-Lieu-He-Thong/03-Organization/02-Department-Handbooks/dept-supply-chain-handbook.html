@@ -10,7 +10,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -23,10 +23,10 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .org-tree{display:flex;flex-direction:column;gap:16px;margin:8px 0;}
 .org-level{display:grid;gap:14px;}
 .org-level.cols-1{grid-template-columns:1fr;}
-.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr);}
-.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr);}
-.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr);}
-.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr);}
+.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr));}
 .org-card{border:1px solid var(--ln);border-top:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .org-card h3{font-size:14px;color:var(--navy);margin:0 0 4px;}
 .org-card p{margin:4px 0;font-size:12px;}
@@ -35,7 +35,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .badge-soft{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:10px;font-weight:700;margin-right:6px;margin-bottom:6px;}
 .kpi-box{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);margin:8px 0;}
 .kpi-box b{display:block;font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .ranh giới trách nhiệm{border:1px solid #cfe0ff;border-left: 3px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
@@ -44,19 +44,19 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .phase-card p:last-child,.ranh giới trách nhiệm p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
 .small-note{font-size:12px;color:var(--ink2);} .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
 .toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .toc-grid a{display:block;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2)}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr);gap:14px;margin:14px 0}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg)}
 .metric-card .value{font-weight:800;font-size:16px;color:var(--navy);margin:6px 0}
 .metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
-.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr);gap:14px;margin:14px 0}
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
 .check-item{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
 .process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
 .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700}
 .card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .tight{margin:0;padding-left:18px}
 .tight li{margin:4px 0}
 .mini-note{font-size:12px;color:var(--ink2)}
@@ -64,25 +64,6 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .decision-table th,.decision-table td{vertical-align:top}
 @media (max-width: 960px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}} </style>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }
-/* Critical inline CSS for file:// compatibility */
-
-/* Flowchart */
-.flowchart{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:stretch;margin:20px 0;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:1px solid rgba(21,101,192,.18);border-radius:10px}
-.flow-step{flex:1 1 120px;min-width:100px;max-width:170px;padding:10px 12px;background:#fff;border:1.5px solid rgba(21,101,192,.3);border-radius:10px;text-align:center;box-shadow:0 1px 3px rgba(21,101,192,.06)}
-.flow-step .flow-num{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#1565c0,#1976d2);color:#fff;font-size:12px;font-weight:800;margin-bottom:5px}
-.flow-step .flow-title{font-size:11px;font-weight:700;color:#0C2D48;line-height:1.35}
-.flow-step .flow-text{text-align:left}
-.flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 22px;color:#93b3d6;font-size:16px;font-weight:700}
-/* Proc-num */
-.proc-num{display:inline-flex;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;flex-shrink:0;margin-right:8px}
-/* Step-tag */
-.step-tag{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0C2D48,#1565c0);text-transform:uppercase;letter-spacing:.3px}
-/* Metric cards */
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:16px 0}
-.metric-card{padding:16px;border:1px solid rgba(21,101,192,.15);border-radius:10px;text-align:center;background:#fff}
-.metric-card .value{font-size:28px;font-weight:800;color:#1565c0;line-height:1.2}
-.metric-card .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-top:4px}
-.metric-card .sub{font-size:11px;color:#666;margin-top:4px;line-height:1.4}
 
 </style>
 <link rel="stylesheet" href="../../../assets/style.css"/>
@@ -127,7 +108,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <p>Bao phủ tìm nguồn cung, mua hàng, quản trị PO và xác nhận năng lực nhà cung cấp/Người xử lý, nhận hàng &amp; IQC giao diện, truy xuất nguồn gốc vật tư, kho thành phẩm/bán thành phẩm/tool kho dụng cụ (tool kho dụng cụ (tool crib), FIFO/vị trí control, đóng gói &amp; label data, ship đối soát, hậu cần đặt lịch / ghi nhận, export/giao vận giấy tờ / hồ sơ và nhà cung cấp hiệu suất / SCAR.</p>
 <div class="table-card"><table class="table"><colgroup><col style="width:20%"/><col style="width:40%"/><col style="width:40%"/></colgroup><thead><tr><th>Nhóm hoạt động</th><th>Bao gồm</th><th>Không thay thế / không vượt quyền</th></tr></thead><tbody><tr><td>Supplier &amp; Người xử lý quản lý</td><td>Đã phê duyệt source, rủi ro mô hình, thẻ điểm (bảng điểm), outsource pack, PO luồng-xuống / Từng, cert theo dõi / đốc thúc.</td><td>Không tự phê duyệt source mới ngoài rule hoặc bỏ qua source đánh giá năng lực.</td></tr><tr><td>Nhận hàng / kho bãi</td><td>Nhận hàng, trạng thái control, lot/mẻ nấu (mẻ nấu (heat) truy xuất nguồn gốc, put-cách xa / rời, FIFO, vị trí kỷ luật / chuyên ngành, cách ly / biệt trữ/hold.</td><td>Không tự đổi kết quả IQC / phát hành trạng thái vật tư khi Quality chưa xác nhận.</td></tr><tr><td>Tool kho dụng cụ (tool kho dụng cụ (tool crib) &amp; vật tư tiêu hao control</td><td>Tool vấn đề-trả lại, tồn kho min/max, quan trọng / nghiêm trọng tool khả năng nhìn thấy / minh bạch, truy xuất nguồn gốc vật tư tool liên quan job.</td><td>Không phát vật tư/tool thay thế cho job quan trọng / nghiêm trọng nếu chưa đánh giá ảnh hưởng.</td></tr><tr><td>Giao vận &amp; hậu cần</td><td>Đối chiếu đóng gói, dán nhãn, đặt lịch / ghi nhận, export tài liệu, chuyển phát/cước vận chuyển bàn giao, thiếu-hư hỏng phản hồi.</td><td>Không tự giao hàng khi thiếu final gói phát hành hoặc số lượng không khớp.</td></tr></tbody></table></div>
 <h2 class="h2" id="s3">3. Trách nhiệm bắt buộc</h2>
-<ul class="tight"><li>Duy trì đã phê duyệt source và rủi ro view cho nhà cung cấp/Người xử lý; mọi trường hợp source mới, source tạm, quá tải Người xử lý hoặc hiệu suất xuống cấp phải được đánh giá theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-401-supplier-risk-model-and-scorecard-method.html">ANNEX-401</a> và đã báo cáo vượt cấp đúng cấp.</li><li>Bảo đảm vật tư/part/lot đi xuyên suốt chuỗi đều có nhận diện trạng thái rõ: Received, cách ly / biệt trữ, Released, hold, WIP, FG, đã giao hàng; PHẢI gắn nhận diện rõ cho mọi vật tư; không để tồn tại vật tư “không nhãn nhưng ai cũng biết là gì”.</li><li>Luồng-xuống / Từng đầy đủ Requests cho Người xử lý: drawing phiên bản, quy trình spec, cert Requests, vệ sinh / sạch sẽ/đóng gói, Ngày đến hạn, đặc biệt xử lý / vận chuyển, trả lại điều kiện, hồ sơ set bắt buộc theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-402-outsource-special-process-pack.html">ANNEX-402</a>.</li><li>Giữ kho như system-of-hồ sơ vật lý: vị trí, FIFO/FEFO khi áp dụng, số lượng đối soát, niêm phong/gói hàng điều kiện, bảo quản trạng thái và hold cách ly theo <a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a> / <a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>.</li><li>Tổ chức phê duyệt giao hàng (ship phát hành) như một hoạt động đối soát: part, phiên bản, số lượng, label, bộ chứng từ chứng nhận, đóng gói spec, ship phương pháp và khách hàng note phải khớp trước khi hàng rời nhà máy theo <a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a> và <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>.</li><li>Đóng vòng nhà cung cấp chất lượng và giao hàng: khiếu nại tới nhà cung cấp, SCAR, muộn / trễ giao hàng nguyên nhân gốc, sai cert, đóng gói hư hỏng, lặp lại thiếu hụt hay thiếu giấy tờ / hồ sơ phải đi vào thẻ điểm và hành động theo dõi tiếp.</li></ul>
+<ul class="tight"><li>Duy trì đã phê duyệt source và rủi ro view cho nhà cung cấp/Người xử lý; mọi trường hợp source mới, source tạm, quá tải Người xử lý hoặc hiệu suất xuống cấp phải được đánh giá theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-401-supplier-risk-model-and-scorecard-method.html">ANNEX-401</a> và đã báo cáo vượt cấp đúng cấp.</li><li>Bảo đảm vật tư/part/lot đi xuyên suốt chuỗi đều có nhận diện trạng thái rõ: Received, cách ly / biệt trữ, Released, hold, WIP, FG, đã giao hàng; PHẢI gắn nhận diện rõ cho mọi vật tư; không để tồn tại vật tư "không nhãn nhưng ai cũng biết là gì".</li><li>Luồng-xuống / Từng đầy đủ Requests cho Người xử lý: drawing phiên bản, quy trình spec, cert Requests, vệ sinh / sạch sẽ/đóng gói, Ngày đến hạn, đặc biệt xử lý / vận chuyển, trả lại điều kiện, hồ sơ set bắt buộc theo <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-402-outsource-special-process-pack.html">ANNEX-402</a>.</li><li>Giữ kho như system-of-hồ sơ vật lý: vị trí, FIFO/FEFO khi áp dụng, số lượng đối soát, niêm phong/gói hàng điều kiện, bảo quản trạng thái và hold cách ly theo <a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a> / <a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>.</li><li>Tổ chức phê duyệt giao hàng (ship phát hành) như một hoạt động đối soát: part, phiên bản, số lượng, label, bộ chứng từ chứng nhận, đóng gói spec, ship phương pháp và khách hàng note phải khớp trước khi hàng rời nhà máy theo <a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a> và <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>.</li><li>Đóng vòng nhà cung cấp chất lượng và giao hàng: khiếu nại tới nhà cung cấp, SCAR, muộn / trễ giao hàng nguyên nhân gốc, sai cert, đóng gói hư hỏng, lặp lại thiếu hụt hay thiếu giấy tờ / hồ sơ phải đi vào thẻ điểm và hành động theo dõi tiếp.</li></ul>
 <h2 class="h2" id="s4">4. Quyền hạn</h2>
 <div class="auth-grid"><div class="auth-item"><b>Chặn phiếu nhận / biên nhận / put-cách xa / rời</b><p>Kho / IQC giao diện có quyền hold ở cách ly / biệt trữ khi cert, nhãn, lot, gói hàng điều kiện hoặc số lượng chưa rõ.</p></div><div class="auth-item"><b>Chặn chưa phê duyệt source</b><p>Chuỗi cung ứng Manager / Nhân viên mua hàng có quyền từ chối mua hoặc xuất dùng từ nguồn chưa được phê duyệt, trừ khi có nhượng bộ phê duyệt theo rule.</p></div><div class="auth-item"><b>Stop lô giao hàng for không khớp</b><p>Hậu cần / Kho có quyền dừng giao hàng khi pack list, số lượng, label, bộ chứng từ chứng nhận hoặc khách hàng hướng dẫn chưa khớp.</p></div><div class="auth-item"><b>Báo cáo vượt cấp nhà cung cấp hỏng / lỗi</b><p>SCM có quyền nâng mức phản ứng với nhà cung cấp: đẩy nhanh tiến độ, re-source, SCAR, on-site đánh giá hoặc đóng băng source khi rủi ro vượt ngưỡng.</p></div></div>
 <div class="table-card"><table class="table decision-table"><colgroup><col style="width:28%"/><col style="width:18%"/><col style="width:24%"/><col style="width:30%"/></colgroup><thead><tr><th>Quyết định / ranh giới</th><th>Responsible Person quyết định</th><th>Phải tham vấn</th><th>Không được vượt</th></tr></thead><tbody><tr><td>Phát hành PO / outsource Requests</td><td>Nhân viên mua hàng / SCM</td><td>Kỹ thuật/Quality khi luồng-xuống / Từng đặc biệt</td><td>Không phát hành PO với Requests kỹ thuật mơ hồ</td></tr><tr><td>Phát hành vật tư từ cách ly / biệt trữ</td><td>Quality / IQC theo rule</td><td>Kho, Nhân viên mua hàng nếu có sai khác</td><td>Kho không tự chuyển trạng thái sang có thể sử dụng</td></tr><tr><td>Ship đặt lịch / ghi nhận / phát hành kiện</td><td>Hậu cần / Kho sau final phát hành</td><td>Kinh doanh-CS khi đổi lịch ship, QA khi bộ chứng từ chứng nhận đặc biệt</td><td>Không giao hàng khi gói phát hành chưa đủ hoặc label chưa đúng</td></tr><tr><td>Khẩn cấp re-source / đẩy nhanh tiến độ</td><td>Chuỗi cung ứng Manager</td><td>Top Quản lý, Quality, Kỹ thuật theo rủi ro</td><td>Không dùng source tạm mà không có rủi ro quyết định được ghi nhận</td></tr></tbody></table></div>

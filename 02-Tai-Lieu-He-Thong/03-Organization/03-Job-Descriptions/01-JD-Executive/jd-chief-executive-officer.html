@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Chiến lược công ty → ưu tiên khách hàng/ngành → đầu tư năng lực → quyết định cuối cùng tại các escalation xuyên phòng ban.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Mission)</h2>
-<div class="jd-mission"><p>Chief Executive Officer là Người chịu trách nhiệm cao nhất về tăng trưởng bền vững, an toàn, lợi nhuận và năng lực thực thi của toàn doanh nghiệp. Vị trí này bảo đảm mọi nguồn lực, hệ thống QMS, vận hành gia công chính xác và nền tảng số như Epicor được vận hành đồng bộ để đáp ứng khách hàng bán dẫn theo chuẩn quốc tế.</p><p>Chức danh này không trực tiếp “làm thay” các phòng ban mà thiết lập định hướng, quyết định ưu tiên cấp công ty, phân bổ nguồn lực và chấp thuận các ngưỡng rủi ro / đầu tư / cam kết giao hàng có ảnh hưởng trọng yếu đến công ty.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Chiến lược tăng trưởng, năng lực vận hành và cấu trúc tổ chức được triển khai nhất quán với định hướng khách hàng mục tiêu và năng lực cốt lõi của nhà máy.</li><li>Các mục tiêu QCDS (Quality–Cost–Delivery–Safety) cấp công ty được kiểm soát bằng dữ liệu, có cơ chế escalation rõ ràng và được xem xét định kỳ ở cấp lãnh đạo.</li><li>Công ty duy trì năng lực giao hàng, chất lượng, an toàn, compliance và an ninh dữ liệu đủ mạnh để mở rộng khách hàng bán dẫn / công nghệ cao.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> CEO chịu trách nhiệm hướng chiến lược, phân bổ nguồn lực và quyết định trade-off cuối cùng; không thay thế vai trò chuyên môn trong phê duyệt kỹ thuật, chất lượng, lịch hoặc giao dịch thường lệ khi SOP đã chỉ rõ Người phụ trách.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Khóa rõ mức chấp nhận rủi ro, thứ tự ưu tiên chiến lược và nguyên tắc “không vì áp lực thương mại mà bỏ cổng kiểm soát”.</li><li>Ra quyết định cuối cho concession lớn, freeze override liên phòng ban, đầu tư năng lực then chốt và giải quyết xung đột giữa Ngày đến hạn - chất lượng - an toàn.</li><li>Dẫn dắt quality culture, đạo đức nghề nghiệp, product safety, human factors và năng lực kế nhiệm như một phần của hệ điều hành doanh nghiệp.</li></ul></div>
+<div class="jd-mission"><p>Chief Executive Officer là Người chịu trách nhiệm cao nhất về tăng trưởng bền vững, an toàn, lợi nhuận và năng lực thực thi của toàn doanh nghiệp. Vị trí này bảo đảm mọi nguồn lực, hệ thống QMS, vận hành gia công chính xác và nền tảng số như Epicor được vận hành đồng bộ để đáp ứng khách hàng bán dẫn theo chuẩn quốc tế.</p><p>Chức danh này không trực tiếp "làm thay" các phòng ban mà thiết lập định hướng, quyết định ưu tiên cấp công ty, phân bổ nguồn lực và chấp thuận các ngưỡng rủi ro / đầu tư / cam kết giao hàng có ảnh hưởng trọng yếu đến công ty.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Chiến lược tăng trưởng, năng lực vận hành và cấu trúc tổ chức được triển khai nhất quán với định hướng khách hàng mục tiêu và năng lực cốt lõi của nhà máy.</li><li>Các mục tiêu QCDS (Quality–Cost–Delivery–Safety) cấp công ty được kiểm soát bằng dữ liệu, có cơ chế escalation rõ ràng và được xem xét định kỳ ở cấp lãnh đạo.</li><li>Công ty duy trì năng lực giao hàng, chất lượng, an toàn, compliance và an ninh dữ liệu đủ mạnh để mở rộng khách hàng bán dẫn / công nghệ cao.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> CEO chịu trách nhiệm hướng chiến lược, phân bổ nguồn lực và quyết định trade-off cuối cùng; không thay thế vai trò chuyên môn trong phê duyệt kỹ thuật, chất lượng, lịch hoặc giao dịch thường lệ khi SOP đã chỉ rõ Người phụ trách.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Khóa rõ mức chấp nhận rủi ro, thứ tự ưu tiên chiến lược và nguyên tắc "không vì áp lực thương mại mà bỏ cổng kiểm soát".</li><li>Ra quyết định cuối cho concession lớn, freeze override liên phòng ban, đầu tư năng lực then chốt và giải quyết xung đột giữa Ngày đến hạn - chất lượng - an toàn.</li><li>Dẫn dắt quality culture, đạo đức nghề nghiệp, product safety, human factors và năng lực kế nhiệm như một phần của hệ điều hành doanh nghiệp.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

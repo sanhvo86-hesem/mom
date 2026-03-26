@@ -83,7 +83,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>3. Quy tắc vòng đời PackID / SSCC</h2>
 <div class="step-list">
-<div class="step-item"><strong>Cấp mã.</strong><br/>PackID được tạo trong giao dịch đã phê duyệt. SSCC chỉ được cấp cho hậu cần đơn vị thực sự tồn tại. Không cấp mã “dự trữ” để dán sau.</div>
+<div class="step-item"><strong>Cấp mã.</strong><br/>PackID được tạo trong giao dịch đã phê duyệt. SSCC chỉ được cấp cho hậu cần đơn vị thực sự tồn tại. Không cấp mã "dự trữ" để dán sau.</div>
 <div class="step-item"><strong>In và quét xác nhận.</strong><br/>Sau in, phải quét xác nhận đúng bộ phân tích cú pháp, đúng PackID và đúng lô giao hàng bối cảnh. Nhãn không đọc được hoặc đọc sai AI phải hủy ngay.</div>
 <div class="step-item"><strong>tách / chia / gộp / hợp nhất.</strong><br/>tách / chia tạo PackID/SSCC con mới, giữ liên hệ cha-con và điều chỉnh Qty. gộp / hợp nhất phải giữ một cha / gốc đơn vị rõ ràng; không mất dấu thùng chứa thành phần.</div>
 <div class="step-item"><strong>in lại / void.</strong><br/>in lại chỉ cho phép khi nhãn hỏng, mất hoặc đổi vật lý thùng chứa hợp lệ. Void dùng khi thùng chứa bị hủy, gộp lại, dán sai, hoặc lô giao hàng đổi cấu trúc. Mọi hành động phải lưu log.</div>

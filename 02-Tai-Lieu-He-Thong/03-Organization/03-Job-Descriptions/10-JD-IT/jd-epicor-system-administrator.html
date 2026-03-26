@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>ERP quản trị → truy cập/luồng công việc/chủ / gốc-data rule → BAQ/báo cáo/hỗ trợ → cải tiến số hóa quy trình trên Epicor.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>Governance viên hệ thống Epicor là Người bảo vệ và vận hành Epicor như một kinh doanh-quan trọng / nghiêm trọng nguồn chuẩn cho toàn chuỗi RFQ → Tiền mặt. Vị trí này bảo đảm hệ thống luôn ổn định, an toàn, có kiểm soát thay đổi, có khả năng phục hồi và phản ánh đúng logic nghiệp vụ của công ty.</p><p>Không chỉ là “admin cấp quyền”, chức danh này phải hiểu sâu sản xuất ERP: item / phiên bản / job / lộ trình gia công / nhân công / nguyên vật liệu / hàng tồn kho / lô giao hàng / tính giá thành / AR/AP, đồng thời biết cách chuyển các Requests nghiệp vụ thành cấu hình, báo cáo, tích hợp và rào chắn / quy định bảo vệ phù hợp.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Epicor có thời gian hoạt động ổn định, giao dịch trọng yếu thông suốt và sự cố được phản ứng / khôi phục trong SLA.</li><li>Phân quyền, cách ly of nhiệm vụ, log thay đổi, backup / khôi phục, UAT và go-Live được vận hành như một hệ thống kiểm soát chứ không theo cảm tính.</li><li>Dữ liệu Epicor khớp với logic SSOT / bảng điều khiển / tích hợp và hỗ trợ truy vết, tính giá thành, lập kế hoạch, chất lượng hồ sơ một cách tin cậy.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Governance viên hệ thống Epicor sở hữu cơ chế vận hành của ERP, không sở hữu nội dung nghiệp vụ của mọi dữ liệu. Các bộ phận vẫn là chủ dữ liệu; Epicor Admin bảo vệ đúng logic hệ thống, quyền và truy vết.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Bảo vệ Epicor như nguồn chuẩn cho toàn chuỗi RFQ → tiền mặt: đúng dữ liệu gốc, đúng quyền, đúng luồng công việc, đúng dấu vết kiểm toán và đúng logic giao dịch.</li><li>System admin không thay chủ nghiệp vụ; vai trò là chuyển Requests nghiệp vụ thành rào chắn / quy định bảo vệ, cấu hình và dữ liệu vận hành tin cậy.</li><li>Mọi thay đổi hệ thống phải có chuyển giao hệ thống/sổ tay vận hành, phương án dự phòng và đánh giá tác động tới truy xuất nguồn gốc/báo cáo.</li></ul></div>
+<div class="jd-mission"><p>Governance viên hệ thống Epicor là Người bảo vệ và vận hành Epicor như một kinh doanh-quan trọng / nghiêm trọng nguồn chuẩn cho toàn chuỗi RFQ → Tiền mặt. Vị trí này bảo đảm hệ thống luôn ổn định, an toàn, có kiểm soát thay đổi, có khả năng phục hồi và phản ánh đúng logic nghiệp vụ của công ty.</p><p>Không chỉ là "admin cấp quyền", chức danh này phải hiểu sâu sản xuất ERP: item / phiên bản / job / lộ trình gia công / nhân công / nguyên vật liệu / hàng tồn kho / lô giao hàng / tính giá thành / AR/AP, đồng thời biết cách chuyển các Requests nghiệp vụ thành cấu hình, báo cáo, tích hợp và rào chắn / quy định bảo vệ phù hợp.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Epicor có thời gian hoạt động ổn định, giao dịch trọng yếu thông suốt và sự cố được phản ứng / khôi phục trong SLA.</li><li>Phân quyền, cách ly of nhiệm vụ, log thay đổi, backup / khôi phục, UAT và go-Live được vận hành như một hệ thống kiểm soát chứ không theo cảm tính.</li><li>Dữ liệu Epicor khớp với logic SSOT / bảng điều khiển / tích hợp và hỗ trợ truy vết, tính giá thành, lập kế hoạch, chất lượng hồ sơ một cách tin cậy.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Governance viên hệ thống Epicor sở hữu cơ chế vận hành của ERP, không sở hữu nội dung nghiệp vụ của mọi dữ liệu. Các bộ phận vẫn là chủ dữ liệu; Epicor Admin bảo vệ đúng logic hệ thống, quyền và truy vết.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Bảo vệ Epicor như nguồn chuẩn cho toàn chuỗi RFQ → tiền mặt: đúng dữ liệu gốc, đúng quyền, đúng luồng công việc, đúng dấu vết kiểm toán và đúng logic giao dịch.</li><li>System admin không thay chủ nghiệp vụ; vai trò là chuyển Requests nghiệp vụ thành rào chắn / quy định bảo vệ, cấu hình và dữ liệu vận hành tin cậy.</li><li>Mọi thay đổi hệ thống phải có chuyển giao hệ thống/sổ tay vận hành, phương án dự phòng và đánh giá tác động tới truy xuất nguồn gốc/báo cáo.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

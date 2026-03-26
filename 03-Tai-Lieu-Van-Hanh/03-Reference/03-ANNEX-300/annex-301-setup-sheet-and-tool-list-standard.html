@@ -86,7 +86,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="section"><h2>3. Trường header bắt buộc và rule đặt tên</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường</th><th>Quy tắc bắt buộc</th><th>Từ chối khi</th></tr></thead><tbody>
 <tr><td>Tài liệu ID</td><td>Mã file, phiên bản, Ngày phát hành, đã chuẩn bị/đã kiểm tra/Released by phải hiện ngay trên trang đầu.</td><td>Không có dấu vết phát hành hoặc dùng file export không có siêu dữ liệu.</td></tr>
-<tr><td>Machine nhóm sản phẩm</td><td>Chọn đúng một trong các họ: 3-trục VMC, 5-trục phay, CNC tiện, phay-lượt / quay/đa nhiệm.</td><td>Ghi chung “CNC machine” hoặc không định danh họ máy.</td></tr>
+<tr><td>Machine nhóm sản phẩm</td><td>Chọn đúng một trong các họ: 3-trục VMC, 5-trục phay, CNC tiện, phay-lượt / quay/đa nhiệm.</td><td>Ghi chung "CNC machine" hoặc không định danh họ máy.</td></tr>
 <tr><td>Vận hành mục đích / ý định</td><td>thô / bán-hoàn thành / hoàn thành / diễn tập-tap / mài bavia / chuyển giao / làm lại / kiểm tra cut.</td><td>Không nói rõ ý định công đoạn nên Operator tự suy diễn.</td></tr>
 <tr><td>Phiên bản trạng thái</td><td>Part Rev và Program Version phải đồng nhất với bộ hồ sơ chuẩn (mốc chuẩn gói hàng).</td><td>Part Rev ≠ Program Rev logic; phiếu cài đặt không chỉ ra version đang hiệu lực.</td></tr>
 <tr><td>Customer đánh dấu / cờ</td><td>Nêu rõ job có Requests đặc biệt về truy xuất nguồn gốc, vệ sinh / sạch sẽ, Người xử lý, bề mặt, rò rỉ test, đóng gói hay không.</td><td>Job có lớp phủ nhưng phiếu cài đặt không gắn cờ cảnh báo.</td></tr>
@@ -128,7 +128,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 
 <div class="section"><h2>7. Chuẩn Tool List chi tiết</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm trường</th><th>Nội dung bắt buộc</th><th>Từ chối khi</th></tr></thead><tbody>
-<tr><td>Nhận diện tool lắp ráp</td><td>Tool no., hốc / túi/trạm / vị trí làm việc, cán dao / đầu gá/trục gá (arbor)/ống kẹp (collet), dao cắt ID, mảnh dao (insert) cấp / hạng, dưỡng đo / đồng hồ đo chiều dài, dính / que-out, cân bằng / số dư/mô-men xoắn note nếu có</td><td>Chỉ ghi “EM10” hoặc “diễn tập 5mm” mà không có lắp ráp bối cảnh.</td></tr>
+<tr><td>Nhận diện tool lắp ráp</td><td>Tool no., hốc / túi/trạm / vị trí làm việc, cán dao / đầu gá/trục gá (arbor)/ống kẹp (collet), dao cắt ID, mảnh dao (insert) cấp / hạng, dưỡng đo / đồng hồ đo chiều dài, dính / que-out, cân bằng / số dư/mô-men xoắn note nếu có</td><td>Chỉ ghi "EM10" hoặc "diễn tập 5mm" mà không có lắp ráp bối cảnh.</td></tr>
 <tr><td>Chức năng tool</td><td>thô/hoàn thành/khoan/tarô (taro ren) ren)/ren/vát mép/đầu dò (probe)/cắt / ngưỡng cắt, kênh nếu máy nhiều kênh</td><td>Không phân biệt tool thô và hoàn thành dẫn đến dùng nhầm tại chứng minh-out.</td></tr>
 <tr><td>cài đặt trước data</td><td>cài đặt trước source, danh nghĩa chiều dài/bán kính, cho phép mài mòn dải / băng, không / bằng không tham chiếu, chị em / liên kết tool mối quan hệ</td><td>cài đặt trước bằng tay nhưng không có rule xác minh.</td></tr>
 <tr><td>Tool tuổi thọ / vòng đời</td><td>ban đầu tuổi thọ / vòng đời, cảnh báo ngưỡng, end-of-tuổi thọ / vòng đời ngưỡng, thay thế hành động, bắt buộc xác minh sau thay đổi</td><td>Không có ngưỡng hoặc không có hành động sau khi chạm ngưỡng.</td></tr>
@@ -151,7 +151,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <tr><td>Chứng minh-out chế độ</td><td>Dry-run / đồ họa / đơn lẻ chặn / khóa / nhanh / chạy nhanh cap / trục chính (spindle) cap / đầu tiên-cut điểm giám sát / đặc điểm / tính năng-by-đặc điểm / tính năng phát hành.</td></tr>
 <tr><td>khởi động lại note</td><td>Rule quay lại chứng minh-out khi machine reset, chuyển giao công việc, tool thay thế, sự cố nghiêm trọng, fixture re-kẹp / gá kẹp hoặc thiết lập lại mốc chuẩn phiên bản.</td></tr>
 </tbody></table></div>
-<div class="keyline"><strong>Điểm bắt buộc:</strong> phiếu cài đặt phải chỉ ra chính xác <em>điểm bắt đầu chứng minh-out</em>, <em>điểm kết thúc chứng minh-out</em> và <em>điều kiện chuyển sang chạy sản lượng</em>. Không được ghi chung chung “run cẩn thận”.</div>
+<div class="keyline"><strong>Điểm bắt buộc:</strong> phiếu cài đặt phải chỉ ra chính xác <em>điểm bắt đầu chứng minh-out</em>, <em>điểm kết thúc chứng minh-out</em> và <em>điều kiện chuyển sang chạy sản lượng</em>. Không được ghi chung chung "run cẩn thận".</div>
 </div>
 
 <div class="section"><h2>9. Sơ đồ ánh xạ với đo lường và hồ sơ bằng chứng</h2>
@@ -168,10 +168,10 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="section"><h2>10. Quy tắc thay đổi, thay thế / bãi bỏ và từ chối điều kiện</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
 <tr><td>Đổi bù trừ (offset) logic / WCS / mốc chuẩn (datum) / định hướng / đào tạo hội nhập</td><td>Phát hành phiên bản mới, cập nhật chứng minh-out note và kích hoạt cổng kiểm soát liên quan.</td><td>Sửa miệng hoặc ghi bút tay tại máy rồi tiếp tục chạy hàng loạt.</td></tr>
-<tr><td>Đổi fixture / jaw / stop / kẹp / gá kẹp chiến lược</td><td>Cập nhật ảnh, mô-men xoắn, chốt định vị, rủi ro note và phê duyệt lại.</td><td>Dùng fixture “Cần giống” mà không cập nhật sheet.</td></tr>
+<tr><td>Đổi fixture / jaw / stop / kẹp / gá kẹp chiến lược</td><td>Cập nhật ảnh, mô-men xoắn, chốt định vị, rủi ro note và phê duyệt lại.</td><td>Dùng fixture "Cần giống" mà không cập nhật sheet.</td></tr>
 <tr><td>Đổi tool lắp ráp / thay thế</td><td>Cập nhật Tool List phiên bản, chị em / liên kết tool logic, tuổi thọ / vòng đời dải / băng và bắt buộc xác minh.</td><td>Đổi tool rồi chỉ báo miệng cho ca sau.</td></tr>
 <tr><td>Machine chuyển giao</td><td>Tạo phụ lục bổ sung hoặc setup chặn / khóa mới cho nhóm máy (machine nhóm sản phẩm) đích.</td><td>Dùng nguyên phiếu cài đặt của nhóm máy (machine nhóm sản phẩm) khác.</td></tr>
-<tr><td>Hot fix tại phân xưởng</td><td>Quay về được kiểm soát thay đổi; mọi bản in cũ phải được thu hồi hoặc đánh dấu được thay thế.</td><td>Chạy theo bản cũ và hứa “sẽ sửa sau”.</td></tr>
+<tr><td>Hot fix tại phân xưởng</td><td>Quay về được kiểm soát thay đổi; mọi bản in cũ phải được thu hồi hoặc đánh dấu được thay thế.</td><td>Chạy theo bản cũ và hứa "sẽ sửa sau".</td></tr>
 </tbody></table></div>
 <div class="callout-danger"><strong>Từ chối điều kiện tổng hợp:</strong> thiếu trường bắt buộc; ảnh không đúng fixture; Tool List không khớp hốc / túi; không có chứng minh-out note; không chỉ ra CTQ đầu tiên; không xác định nhóm máy (machine nhóm sản phẩm); không có Người phát hành. Gặp một trong các điều kiện này, Tài liệu Control/ENG phải từ chối phát hành.</div>
 </div>

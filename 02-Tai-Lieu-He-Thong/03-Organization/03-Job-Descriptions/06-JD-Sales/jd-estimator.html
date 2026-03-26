@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>RFQ → kỹ thuật/thương mại làm rõ → chi phí xây dựng → báo giá phát hành → báo giá-to-đơn hàng bàn giao.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>Người định giá là Người biến Requests RFQ thành một báo giá có thể bán được, có thể sản xuất được và có thể sinh lợi. Vị trí này là điểm kiểm soát đầu tiên để công ty không nhận những công việc mơ hồ, vượt năng lực hoặc chứa rủi ro chưa được định giá.</p><p>Trong doanh nghiệp gia công bán dẫn / cơ khí chính xác, Người định giá phải đọc được bức tranh tổng thể của part: drawing, dung sai, nguyên vật liệu, công đoạn đặc biệt, CMM, clean đóng gói, lot truy xuất nguồn gốc và thời gian dẫn. Một báo giá tốt không chỉ “ra số” mà còn khóa rõ giả định, rủi ro và thương mại ranh giới.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>RFQ được sàng lọc, làm rõ và phân loại đúng mức độ phức tạp / rủi ro trước khi báo giá.</li><li>Báo giá phản ánh đúng lộ trình gia công, cycle time, kiểm tra load, vật tư, tool, đóng gói, outsource, phế phẩm dung sai cho phép và điều kiện thương mại.</li><li>Khi đơn hàng trúng, hồ sơ bàn giao từ báo giá sang rà soát hợp đồng / lập kế hoạch đủ rõ để không làm sai lệch biên lợi nhuận hoặc gây tranh cãi với khách hàng.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Người định giá sở hữu chất lượng của báo giá và log giả định; không trực tiếp quản PO sau khi trúng, không điều độ giao hàng và không phát hành tài liệu sản xuất cho phân xưởng.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Chuyển nhu cầu khách thành chi phí/thời gian dẫn logic có căn cứ, với giả định đủ rõ về kỹ thuật, chất lượng, nguồn cung, clean/chân không và công đoạn sau Requests.</li><li>Không để báo giá tốt trên giấy nhưng không làm được hoặc chỉ làm được bằng tăng ca và ngoại lệ không bền vững.</li><li>Người định giá phải gắn kết DFM - Chuỗi cung ứng - Finance - Customer Dịch vụ để hình thành báo giá và cam kết logic thực tế.</li></ul></div>
+<div class="jd-mission"><p>Người định giá là Người biến Requests RFQ thành một báo giá có thể bán được, có thể sản xuất được và có thể sinh lợi. Vị trí này là điểm kiểm soát đầu tiên để công ty không nhận những công việc mơ hồ, vượt năng lực hoặc chứa rủi ro chưa được định giá.</p><p>Trong doanh nghiệp gia công bán dẫn / cơ khí chính xác, Người định giá phải đọc được bức tranh tổng thể của part: drawing, dung sai, nguyên vật liệu, công đoạn đặc biệt, CMM, clean đóng gói, lot truy xuất nguồn gốc và thời gian dẫn. Một báo giá tốt không chỉ "ra số" mà còn khóa rõ giả định, rủi ro và thương mại ranh giới.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>RFQ được sàng lọc, làm rõ và phân loại đúng mức độ phức tạp / rủi ro trước khi báo giá.</li><li>Báo giá phản ánh đúng lộ trình gia công, cycle time, kiểm tra load, vật tư, tool, đóng gói, outsource, phế phẩm dung sai cho phép và điều kiện thương mại.</li><li>Khi đơn hàng trúng, hồ sơ bàn giao từ báo giá sang rà soát hợp đồng / lập kế hoạch đủ rõ để không làm sai lệch biên lợi nhuận hoặc gây tranh cãi với khách hàng.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Người định giá sở hữu chất lượng của báo giá và log giả định; không trực tiếp quản PO sau khi trúng, không điều độ giao hàng và không phát hành tài liệu sản xuất cho phân xưởng.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Chuyển nhu cầu khách thành chi phí/thời gian dẫn logic có căn cứ, với giả định đủ rõ về kỹ thuật, chất lượng, nguồn cung, clean/chân không và công đoạn sau Requests.</li><li>Không để báo giá tốt trên giấy nhưng không làm được hoặc chỉ làm được bằng tăng ca và ngoại lệ không bền vững.</li><li>Người định giá phải gắn kết DFM - Chuỗi cung ứng - Finance - Customer Dịch vụ để hình thành báo giá và cam kết logic thực tế.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

@@ -57,7 +57,7 @@
  <h2>1. Mục đích và phạm vi</h2>
  <p>ANNEX này là ma trận escalation chính thức của HESEM để quyết định <b>khi nào phải nâng cấp thông tin</b>, <b>ai phải được gọi</b>, <b>trong bao lâu phải phản ứng</b>, <b>ai được quyền cho chạy lại / mở HOLD / thông báo khách hàng</b> và <b>gói bằng chứng tối thiểu</b> phải có trước khi đóng sự kiện.</p>
  <p>ANNEX này áp dụng cho mọi lệnh sản xuất, lot, shipment, thiết bị, hệ thống dữ liệu và sự kiện phát sinh ở xưởng, kho, QA, Engineering, Planning, Purchasing, Sales/Customer Service, HSE và IT khi sự kiện có khả năng ảnh hưởng một trong các yếu tố sau: an toàn con Người, an toàn sản phẩm, phù hợp kỹ thuật, giao hàng, truy xuất, clean-state, dữ liệu điều hành, uy tín khách hàng hoặc nghĩa vụ tuân thủ.</p>
- <div class="callout"><strong>QUY TẮC CỨNG</strong>: sự kiện đạt ngưỡng escalation <b>PHẢI</b> được báo đúng cấp và đúng SLA. Không được tự ý “xử lý nội bộ cho êm”, không được hạ mức sự kiện để né escalation, không được mở lại sản xuất / đóng kiện / giao hàng khi chưa đủ thẩm quyền release.</div>
+ <div class="callout"><strong>QUY TẮC CỨNG</strong>: sự kiện đạt ngưỡng escalation <b>PHẢI</b> được báo đúng cấp và đúng SLA. Không được tự ý "xử lý nội bộ cho êm", không được hạ mức sự kiện để né escalation, không được mở lại sản xuất / đóng kiện / giao hàng khi chưa đủ thẩm quyền release.</div>
  </div>
 
  <div class="section">
@@ -65,7 +65,7 @@
  <div class="two-col">
  <div class="keyline"><b>2.1 Một sự kiện – một Người phụ trách điều phối</b><br/>Mỗi sự kiện chỉ có một Người điều phối chính để giữ nhật ký hành động, nhịp thông báo, quyết định họp war room và đóng sự kiện. Người điều phối không được đẩy trách nhiệm sang nhiều đầu mối song song.</div>
  <div class="keyline"><b>2.2 Containment đi trước phân tích</b><br/>Khi sự kiện có nguy cơ lan rộng, ưu tiên đầu tiên là chặn lan rộng: HOLD lot, cách ly part, dừng công đoạn, khóa shipment, đóng quyền truy cập, khóa revision hoặc chặn use-to-stock.</div>
- <div class="keyline"><b>2.3 Escalation theo ngưỡng, không theo cảm tính</b><br/>Nếu chạm ngưỡng của bảng trigger thì escalation tự động có hiệu lực, kể cả khi Người phụ trách cho rằng “có thể tự xử lý”.</div>
+ <div class="keyline"><b>2.3 Escalation theo ngưỡng, không theo cảm tính</b><br/>Nếu chạm ngưỡng của bảng trigger thì escalation tự động có hiệu lực, kể cả khi Người phụ trách cho rằng "có thể tự xử lý".</div>
  <div class="keyline"><b>2.4 Sau giờ vẫn phải xử lý</b><br/>Sự kiện phát sinh ngoài giờ, Ngày nghỉ, Ngày lễ vẫn áp dụng SLA. Không được đợi đến sáng hôm sau nếu sự kiện chạm ngưỡng Critical, ảnh hưởng shipment, safety, data integrity hoặc customer-facing commitment.</div>
  </div>
  </div>
@@ -131,7 +131,7 @@
  </tbody>
  </table></div>
  <div class="two-col">
- <div class="keyline"><b>Liên kết thẩm quyền</b><br/>Mọi quyền duyệt cuối cùng phải phù hợp với <b>ANNEX-120</b> và quy tắc deputy/backup của <b>ANNEX-123</b>. Không viện cớ “vắng Người ký” để mở line hoặc giao hàng sai thẩm quyền.</div>
+ <div class="keyline"><b>Liên kết thẩm quyền</b><br/>Mọi quyền duyệt cuối cùng phải phù hợp với <b>ANNEX-120</b> và quy tắc deputy/backup của <b>ANNEX-123</b>. Không viện cớ "vắng Người ký" để mở line hoặc giao hàng sai thẩm quyền.</div>
  <div class="keyline"><b>Liên kết daily management</b><br/>Sự kiện L2/L3 kéo dài qua ca phải được đưa vào <b>WI-202</b> và board hành động của ca/ngày. Event không được biến mất khỏi radar chỉ vì đã chat xong trên Teams.</div>
  </div>
  </div>

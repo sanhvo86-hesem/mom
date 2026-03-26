@@ -72,7 +72,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <ul class="tight">
 <li>Epicor là SoR. Điều phối bảng, Photos trạng thái và log hành động chỉ phản ánh lại dữ liệu điều hành và quyết định.</li>
 <li>Mỗi thay đổi thứ tự phải có lý do, Người quyết định và job bị ảnh hưởng.</li>
-<li>Job P3/TẠM GIỮ không được chen vào hàng đợi chạy chỉ vì vật tư “sắp tới” hoặc khách hàng “giục”.</li>
+<li>Job P3/TẠM GIỮ không được chen vào hàng đợi chạy chỉ vì vật tư "sắp tới" hoặc khách hàng "giục".</li>
 </ul>
 </div>
 
@@ -127,7 +127,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>6. Kỷ luật hàng đợi và WIP trong ca</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
-<tr><td>hàng đợi trước nút thắt / điểm nghẽn tăng nhanh</td><td>Chỉ giữ lượng đã sắp xếp cần cho ca Current và phần kế tiếp đã được duyệt; phần còn lại giữ ở trạng thái plan hoặc hold có lý do</td><td>Không xả hàng ào ạt để “nhìn như đang bận”</td></tr>
+<tr><td>hàng đợi trước nút thắt / điểm nghẽn tăng nhanh</td><td>Chỉ giữ lượng đã sắp xếp cần cho ca Current và phần kế tiếp đã được duyệt; phần còn lại giữ ở trạng thái plan hoặc hold có lý do</td><td>Không xả hàng ào ạt để "nhìn như đang bận"</td></tr>
 <tr><td>Job dở do chờ QA hoặc chờ tool</td><td>Gắn trạng thái rõ, Responsible Person rõ, next hành động rõ, Photos trạng thái vào tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn) log</td><td>Không để lẫn trong hàng đợi thường như job sẵn sàng</td></tr>
 <tr><td>Chuyển WIP giữa khu vực</td><td>Phải có tag/nhãn, destination rõ, giao dịch/hồ sơ liên quan và trách nhiệm nhận việc</td><td>Không di chuyển bằng miệng hoặc để bán thành phẩm vô chủ</td></tr>
 <tr><td>Một phần run / tách / chia lot</td><td>Phải xác định lot nào chạy trước, lot nào chờ, điểm kiểm CTQ và điều kiện ghép lại hồ sơ</td><td>Không trộn lot làm mất truy vết hoặc nhầm part-phạm vi / dải</td></tr>
@@ -149,7 +149,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>8. khớp nối với outsource và giao vận</h2>
 <ul class="tight">
 <li>Không phát hành thêm upstream nếu processor đã full slot hoặc outbound lot chưa có route/ETA rõ.</li>
-<li>Không để kiểm tra cuối / phê duyệt giao hàng trở thành “kho đệm cuối cùng”. Nếu ship-ready queue vượt 1 Ngày năng lực, Planner phải quay ngược upstream để hãm phát hành.</li>
+<li>Không để kiểm tra cuối / phê duyệt giao hàng trở thành "kho đệm cuối cùng". Nếu ship-ready queue vượt 1 Ngày năng lực, Planner phải quay ngược upstream để hãm phát hành.</li>
 <li>Khi Ngày đến hạn buộc phải giao hàng một phần, quyết định phải chốt rõ part-range/qty/document pack/label logic và Người phụ trách xác nhận.</li>
 </ul>
 </div>

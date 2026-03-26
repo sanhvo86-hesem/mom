@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -96,7 +96,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Từ chất lượng quản trị của công ty → chất lượng lập kế hoạch/phát hành → MRB/CAPA → khách hàng/đánh giá → cải tiến hệ thống chất lượng.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Mission)</h2>
-<div class="jd-mission"><p>QA Manager là Người bảo vệ tính độc lập của quyết định chất lượng trong công ty. Vị trí này chịu trách nhiệm thiết lập và duy trì cơ chế hold / release, Phê duyệt giao hàng cuối cùng (phê duyệt giao hàng (ship release), MRB disposition, CAPA effectiveness, đánh giá mức sẵn sàng và kỷ luật hồ sơ cho toàn hệ thống.</p><p>Ngoài việc xử lý sự cố, QA Manager còn phải xây được tổ chức chất lượng có chiều sâu: tuyến đầu được dẫn dắt qua QC Inspector Lead, kỹ thuật chất lượng được dẫn dắt qua Quality Engineer, và hệ thống tài liệu/hồ sơ được giữ nhịp bởi QMS Engineer.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mọi quyết định release / stop-ship / hold có căn cứ, truy được bằng chứng và không bị chi phối bởi áp lực giao hàng ngắn hạn.</li><li>Customer escape, repeat vấn đề, overdue CAPA, đánh giá finding quá hạn và sự mơ hồ trong hồ sơ chất lượng được kiểm soát chủ động.</li><li>QC Inspector Lead và đội ngũ QC vận hành chất lượng cổng kiểm soát ổn định, phản ứng nhanh, cùng một tiêu chuẩn quyết định và cùng một kỷ luật truy vết.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> QA Manager là Người phụ trách cuối của hệ thống chất lượng và các quyết định release/disposition trong phạm vi SOP; không làm thay toàn bộ kiểm tra hay document control, nhưng phải bảo đảm các tuyến đó hoạt động đúng và độc lập.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Giữ integrity của toàn bộ cổng kiểm soát chất lượng từ tạm giữ/phê duyệt, measurement confidence, final release, khiếu nại, CAPA đến product safety/FOD.</li><li>Không để chất lượng trở thành “bộ phận ký cuối”; QA Manager là Người phụ trách của logic release, reaction plan, quality culture và khả năng học từ sự cố.</li><li>Đưa human factors, product safety, ethical behavior và phòng ngừa mindset vào hệ vận hành, không chỉ vào slide đào tạo.</li></ul></div>
+<div class="jd-mission"><p>QA Manager là Người bảo vệ tính độc lập của quyết định chất lượng trong công ty. Vị trí này chịu trách nhiệm thiết lập và duy trì cơ chế hold / release, Phê duyệt giao hàng cuối cùng (phê duyệt giao hàng (ship release), MRB disposition, CAPA effectiveness, đánh giá mức sẵn sàng và kỷ luật hồ sơ cho toàn hệ thống.</p><p>Ngoài việc xử lý sự cố, QA Manager còn phải xây được tổ chức chất lượng có chiều sâu: tuyến đầu được dẫn dắt qua QC Inspector Lead, kỹ thuật chất lượng được dẫn dắt qua Quality Engineer, và hệ thống tài liệu/hồ sơ được giữ nhịp bởi QMS Engineer.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mọi quyết định release / stop-ship / hold có căn cứ, truy được bằng chứng và không bị chi phối bởi áp lực giao hàng ngắn hạn.</li><li>Customer escape, repeat vấn đề, overdue CAPA, đánh giá finding quá hạn và sự mơ hồ trong hồ sơ chất lượng được kiểm soát chủ động.</li><li>QC Inspector Lead và đội ngũ QC vận hành chất lượng cổng kiểm soát ổn định, phản ứng nhanh, cùng một tiêu chuẩn quyết định và cùng một kỷ luật truy vết.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> QA Manager là Người phụ trách cuối của hệ thống chất lượng và các quyết định release/disposition trong phạm vi SOP; không làm thay toàn bộ kiểm tra hay document control, nhưng phải bảo đảm các tuyến đó hoạt động đúng và độc lập.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Giữ integrity của toàn bộ cổng kiểm soát chất lượng từ tạm giữ/phê duyệt, measurement confidence, final release, khiếu nại, CAPA đến product safety/FOD.</li><li>Không để chất lượng trở thành "bộ phận ký cuối"; QA Manager là Người phụ trách của logic release, reaction plan, quality culture và khả năng học từ sự cố.</li><li>Đưa human factors, product safety, ethical behavior và phòng ngừa mindset vào hệ vận hành, không chỉ vào slide đào tạo.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

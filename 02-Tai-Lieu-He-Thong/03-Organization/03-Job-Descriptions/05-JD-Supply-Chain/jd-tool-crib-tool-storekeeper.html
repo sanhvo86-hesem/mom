@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Nhận – lưu – cấp – thu hồi – kiểm soát tồn và tình trạng dụng cụ/mảnh dao (mảnh dao (insert)/phoi (phoi (chip)/fixture trong phạm vi Tool kho dụng cụ (tool kho dụng cụ (tool kho dụng cụ (tool crib)).</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>Tool kho dụng cụ (tool kho dụng cụ (tool kho dụng cụ (tool crib)) / Tool Thủ kho bảo đảm tooling, mảnh dao (mảnh dao (insert) / phoi (phoi (chip) và vật tư tooling được cấp phát đúng loại, đúng trạng thái, đúng thời điểm và có dữ liệu tiêu hao đủ sạch để phục vụ sản xuất lẫn job tính giá thành.</p><p>Đây là vai trò then chốt để ngăn thời gian Từng máy vì thiếu tool, ngăn dùng tool không phê duyệt và ngăn thất thoát / mù dữ liệu vật tư tiêu hao.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Không để phân xưởng dừng vì thiếu tool / mảnh dao (mảnh dao (insert) quan trọng / nghiêm trọng do quản kho yếu.</li><li>Tool / mảnh dao (mảnh dao (insert) được cấp phát, hoàn trả, thay thế và theo dõi tiêu hao có logic, có thể phân tích theo nhóm sản phẩm / job / machine.</li><li>Mọi thay thế / tương đương đều có phê duyệt phù hợp, không để hiện trường tự đổi dao không kiểm soát.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Tool kho dụng cụ (tool kho dụng cụ (tool kho dụng cụ (tool crib)) / Tool Thủ kho chịu trách nhiệm tính sẵn sàng và truy vết của dụng cụ; không quyết định chiến lược công nghệ, không phê duyệt tool tương đương và không thay Setup/Kỹ thuật xác định phương án gia công.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Làm chủ trạng thái tool/cán dao / đầu gá/vật tư tiêu hao để Setup/Operator nhận đúng dụng cụ, đúng điều kiện, đúng nhận dạng và đúng rule tương đương.</li><li>Không để thiếu tool hoặc tool sai trạng thái trở thành “lý do quen thuộc” làm fail-start hay tạo trôi / sai lệch ngoài ý muốn.</li><li>Biến dữ liệu vấn đề/trả lại/điều kiện thành cảnh báo thiếu hụt và đầu vào cho cải tiến tool-tuổi thọ / vòng đời.</li></ul></div>
+<div class="jd-mission"><p>Tool kho dụng cụ (tool kho dụng cụ (tool kho dụng cụ (tool crib)) / Tool Thủ kho bảo đảm tooling, mảnh dao (mảnh dao (insert) / phoi (phoi (chip) và vật tư tooling được cấp phát đúng loại, đúng trạng thái, đúng thời điểm và có dữ liệu tiêu hao đủ sạch để phục vụ sản xuất lẫn job tính giá thành.</p><p>Đây là vai trò then chốt để ngăn thời gian Từng máy vì thiếu tool, ngăn dùng tool không phê duyệt và ngăn thất thoát / mù dữ liệu vật tư tiêu hao.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Không để phân xưởng dừng vì thiếu tool / mảnh dao (mảnh dao (insert) quan trọng / nghiêm trọng do quản kho yếu.</li><li>Tool / mảnh dao (mảnh dao (insert) được cấp phát, hoàn trả, thay thế và theo dõi tiêu hao có logic, có thể phân tích theo nhóm sản phẩm / job / machine.</li><li>Mọi thay thế / tương đương đều có phê duyệt phù hợp, không để hiện trường tự đổi dao không kiểm soát.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Tool kho dụng cụ (tool kho dụng cụ (tool kho dụng cụ (tool crib)) / Tool Thủ kho chịu trách nhiệm tính sẵn sàng và truy vết của dụng cụ; không quyết định chiến lược công nghệ, không phê duyệt tool tương đương và không thay Setup/Kỹ thuật xác định phương án gia công.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Làm chủ trạng thái tool/cán dao / đầu gá/vật tư tiêu hao để Setup/Operator nhận đúng dụng cụ, đúng điều kiện, đúng nhận dạng và đúng rule tương đương.</li><li>Không để thiếu tool hoặc tool sai trạng thái trở thành "lý do quen thuộc" làm fail-start hay tạo trôi / sai lệch ngoài ý muốn.</li><li>Biến dữ liệu vấn đề/trả lại/điều kiện thành cảnh báo thiếu hụt và đầu vào cho cải tiến tool-tuổi thọ / vòng đời.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

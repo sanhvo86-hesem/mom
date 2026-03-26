@@ -10,21 +10,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -38,7 +38,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -49,25 +49,6 @@ table{max-width:100%;table-layout:auto}
 td,th{}
  thead{display:table-header-group}tfoot{display:table-footer-group}
 @media (max-width: 960px){.grid-2,.grid-3,.field-grid{grid-template-columns:1fr;}}
-/* Critical inline CSS for file:// compatibility */
-
-/* Flowchart */
-.flowchart{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:stretch;margin:20px 0;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:1px solid rgba(21,101,192,.18);border-radius:10px}
-.flow-step{flex:1 1 120px;min-width:100px;max-width:170px;padding:10px 12px;background:#fff;border:1.5px solid rgba(21,101,192,.3);border-radius:10px;text-align:center;box-shadow:0 1px 3px rgba(21,101,192,.06)}
-.flow-step .flow-num{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#1565c0,#1976d2);color:#fff;font-size:12px;font-weight:800;margin-bottom:5px}
-.flow-step .flow-title{font-size:11px;font-weight:700;color:#0C2D48;line-height:1.35}
-.flow-step .flow-text{text-align:left}
-.flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 22px;color:#93b3d6;font-size:16px;font-weight:700}
-/* Proc-num */
-.proc-num{display:inline-flex;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;flex-shrink:0;margin-right:8px}
-/* Step-tag */
-.step-tag{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0C2D48,#1565c0);text-transform:uppercase;letter-spacing:.3px}
-/* Metric cards */
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:16px 0}
-.metric-card{padding:16px;border:1px solid rgba(21,101,192,.15);border-radius:10px;text-align:center;background:#fff}
-.metric-card .value{font-size:28px;font-weight:800;color:#1565c0;line-height:1.2}
-.metric-card .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-top:4px}
-.metric-card .sub{font-size:11px;color:#666;margin-top:4px;line-height:1.4}
 
 </style>
 </head>
@@ -115,7 +96,7 @@ td,th{}
 </div><h3 class="h3">604-IG1 — Chọn characteristic / quy trình nào phải theo dõi bằng SPC</h3><div class="note-blue"><b>Yêu cầu tại cổng này:</b> Chỉ đưa vào SPC những gì đáng để điều khiển: CTQ, history drift, tolerance stack khó, customer requirement hoặc quy trình có biến động khó nhìn thấy qua kiểm đơn lẻ.</div><div class="legend-row"><span class="pill">CTQ</span><span class="pill">Repeat jobs</span><span class="pill">High-risk tolerance</span><span class="pill">After change</span></div><ol class="tight"><li>Xác định characteristic nào buộc phải SPC hoặc short-run capability dựa trên risk, history và yêu cầu khách hàng.</li><li>Chỉ rõ mục đích dùng của chart: kiểm soát drift tại máy, xác nhận quá trình ổn định, supporting capability review hay cảnh báo sau thay đổi lớn.</li><li>Gắn đầu mối phụ trách phản ứng cho từng chart: operator, QC, setup, workshop manager hay quality engineer. Chart không có đầu mối phản ứng thì không phát hành.</li></ol><h3 class="h3">604-IG2 — Khóa chart type, nguyên tắc chia subgroup, sampling frequency và reaction plan</h3><div class="note-blue"><b>Yêu cầu tại cổng này:</b> Nếu cách gom dữ liệu và rule phản ứng không rõ, SPC sẽ sinh tranh cãi thay vì kiểm soát.</div><div class="legend-row"><span class="pill">Variable / attribute</span><span class="pill">Subgroup by time/tool/lot</span><span class="pill">Manual or digital</span><span class="pill">Allowed adjustment</span></div><ol class="tight"><li>Chọn chart phù hợp với kiểu dữ liệu và mô hình sản xuất: dữ liệu biến liên tục, dữ liệu attribute, short-run, long-run hoặc digital trend.</li><li>Khóa nguyên tắc chia subgroup theo thời gian, theo tuổi dao (tool life), theo lot hoặc theo condition machine. Subgroup phải phản ánh nguồn biến động thực muốn theo dõi.</li><li>Xác định sampling frequency tối thiểu, nơi ghi dữ liệu, format dữ liệu, cách đánh dấu part suspect và rule khi bỏ lỡ điểm đo.</li><li>Định nghĩa rõ adjustment nào operator được quyền làm, adjustment nào phải Mọi Setup hoặc Engineering, và khi nào bắt buộc dừng để đo lại / mẫu đầu-like check.</li></ol><h3 class="h3">604-IG3 — Thu thập dữ liệu có chất lượng và review chart theo cadence</h3><div class="note-blue"><b>Yêu cầu tại cổng này:</b> SPC tốt bắt đầu từ dữ liệu đúng, đúng lúc và truy được về tool / lot / machine state. Ghi sau ca hoặc đo sai phương pháp sẽ làm chart không còn ý nghĩa.</div><div class="legend-row"><span class="pill">Real-time data</span><span class="pill">Traceable to job</span><span class="pill">Reviewed on cadence</span></div><ol class="tight"><li>Thu dữ liệu theo đúng điểm đo và frequency đã khóa; ghi giá trị thực hoặc defect count thật, không ghi chung là OK.</li><li>Liên kết dữ liệu với job, operation, lot, tool state, Người đo và thời điểm. Khi chart số hóa, phải bảo đảm mapping field không làm mất ngữ cảnh vận hành.</li><li>Tổ trưởng QC hoặc đầu mối phụ trách tương ứng review chart theo cadence đã chốt; nếu dùng daily meeting hoặc bảng theo dõi, chart phải được đọc và chuyển thành hành động rõ ràng tại hiện trường.</li></ol><h3 class="h3">604-IG4 — Phản ứng với out-of-control signal, drift và low capability</h3><div class="note-blue"><b>Yêu cầu tại cổng này:</b> Tín hiệu bất thường mà không có action thì SPC trở thành hồ sơ trang trí. Reaction plan phải diễn ra ngay trên xưởng với trách nhiệm rõ.</div><div class="legend-row"><span class="pill">Stop / contain</span><span class="pill">Adjust with confirmation</span><span class="pill">Escalate</span><span class="pill">NCR when needed</span></div><ol class="tight"><li>Khi có tín hiệu out-of-control hoặc trend drift, đầu mối phụ trách phải xác định ngay: tiếp tục theo dõi, điều chỉnh có kiểm, tăng tần suất đo, hold lot hoặc dừng máy.</li><li>Mọi adjustment ảnh hưởng CTQ phải đi kèm đo xác nhận lại và ghi hồ sơ. Không chỉnh offset liên tục để che mòn dao hoặc nhiệt máy mà không điều tra nguyên nhân.</li><li>Nếu tín hiệu cho thấy nguy cơ đã phát sinh NG, kích hoạt containment từ last-known-good và nối sang SOP-606. Với after-change signal, có thể yêu cầu quay về SOP-504 hoặc SOP-302 tùy mức độ.</li><li>Capability thấp kéo dài phải dẫn tới action như đổi tool strategy, đổi fixture, đổi sequence, đổi condition cắt, đào tạo hoặc điều chỉnh control plan.</li></ol><h3 class="h3">604-IG5 — Review capability và phản hồi vào control plan / setup / tuổi dao (tool life) / planning</h3><div class="note-blue"><b>Yêu cầu tại cổng này:</b> Capability không phải con số để báo cáo; nó phải kéo theo quyết định về cách chạy, cách setup, cách đổi dao và cả cách hứa giao hàng nếu quá trình chưa đủ ổn định.</div><div class="legend-row"><span class="pill">Feed PFMEA / control plan</span><span class="pill">Tool life review</span><span class="pill">Planning implication</span><span class="pill">Kaizen target</span></div><ol class="tight"><li>Review Cp/Cpk hoặc chỉ số short-run phù hợp theo part family / characteristic / machine. Kết luận phải nêu rõ quá trình hiện đủ, chưa đủ hay chỉ đủ trong điều kiện kiểm soát tăng cường.</li><li>Feed kết quả review trở lại control plan, baseline mẫu đầu, tần suất kiểm, tuổi dao (tool life), fixture design hoặc phương án routing khi cần.</li><li>Khi low capability ảnh hưởng giao hàng hoặc cost rework, Planning và Production phải nhận thông tin để điều chỉnh promise date, batch size hoặc strategy chạy máy.</li><li>Lưu bài học và mục tiêu cải tiến theo part family / nhóm máy (machine family) để dùng cho các job lặp tương tự.</li></ol><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">6</span> Ma trận chọn chart, subgroup và cadence trong môi trường HMLV</h3>
 <div class="table-card"><table class="table rule-table"><colgroup><col style="width:22%"/><col style="width:19%"/><col style="width:21%"/><col style="width:38%"/></colgroup><thead><tr><th>Tình huống thực tế</th><th>Chart / logic ưu tiên</th><th>Cadence mặc định</th><th>Quy tắc bắt buộc khi triển khai</th></tr></thead><tbody>
 <tr><td>CTQ variable có lặp liên tục trong cùng setup, đủ subgroup hợp lý</td><td>X̄-R hoặc X̄-S</td><td>30–60 phút hoặc theo control plan</td><td>Subgroup PHẢI gom các điểm được tạo ra trong cùng trạng thái máy/dao/đồ gá. PHẢI tách riêng dữ liệu trước và sau đổi dao, đổi offset, đổi chương trình hoặc đổi operator; không gộp vào cùng một subgroup.</td></tr>
-<tr><td>Đặc tính đo chậm, sản lượng thấp, một lần chỉ đo được 1 chi tiết</td><td>I-MR / trend chart</td><td>Mỗi chi tiết hoặc mỗi lot</td><td>PHẢI gắn event code cho mọi thay đổi ảnh hưởng: đổi dao, crash, bảo trì, thay nhiệt độ môi trường, chuyển ca. Không dùng I-MR để “làm đẹp” dữ liệu của quá trình không lặp.</td></tr>
+<tr><td>Đặc tính đo chậm, sản lượng thấp, một lần chỉ đo được 1 chi tiết</td><td>I-MR / trend chart</td><td>Mỗi chi tiết hoặc mỗi lot</td><td>PHẢI gắn event code cho mọi thay đổi ảnh hưởng: đổi dao, crash, bảo trì, thay nhiệt độ môi trường, chuyển ca. Không dùng I-MR để "làm đẹp" dữ liệu của quá trình không lặp.</td></tr>
 <tr><td>Thuộc tính theo tỷ lệ lỗi hoặc số lỗi</td><td>p/np/c/u theo <a href="../../03-Reference/06-ANNEX-600/annex-605-spc-lite-and-reaction-plan.html">ANNEX-605</a></td><td>Theo lot / ca / batch</td><td>Chỉ dùng khi defect coding và sample unit đã chuẩn hóa. Nếu đã đo được bằng số, phải ưu tiên variable chart thay cho attribute chart.</td></tr>
 <tr><td>Lệnh sản xuất lặp ít, dữ liệu ngắn, HMLV</td><td>Short-run trend + family capability</td><td>Theo family / machine / operation</td><td>Không được cố dựng long-run capability giả tạo từ dữ liệu quá ngắn. Phải nêu rõ use-tình huống: baseline machine, repeat family, hoặc xác nhận drift sau thay đổi.</td></tr>
 </tbody></table></div>

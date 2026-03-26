@@ -47,7 +47,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h1 style="margin-top:10px">Power nền tảng ALM &amp; Governance</h1>
 <p class="muted">
  Mã mô-đun: <b>SYS-OPS-10</b> • Tên mô-đun: <b>Power nền tảng ALM &amp; Governance (giải pháp import-ready, bảo mật mô hình)</b><br/>
- Mục tiêu: triển khai Power nền tảng theo chuẩn import-ready, quản trị quyền/ dữ liệu theo khu vực, và tạo MRR đủ để qua đánh giá mà không “đốt” thời gian truy vết.
+ Mục tiêu: triển khai Power nền tảng theo chuẩn import-ready, quản trị quyền/ dữ liệu theo khu vực, và tạo MRR đủ để qua đánh giá mà không "đốt" thời gian truy vết.
  </p>
 <div class="tag blue">Phiên bản</div>
 </div>
@@ -83,7 +83,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 2) -->
 <h2 id="sec2">2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <p>
- Mô-đun này tồn tại để khóa các rủi ro “chết Người” khi phân xưởng dùng Power nền tảng (app/luồng/báo cáo) làm hệ thống vận hành:
+ Mô-đun này tồn tại để khóa các rủi ro "chết Người" khi phân xưởng dùng Power nền tảng (app/luồng/báo cáo) làm hệ thống vận hành:
  sai phiên bản (Rev), sai môi trường (DEV/UAT/PROD), lẫn dữ liệu khách hàng, vượt qua cổng kiểm soát, và thiếu bằng chứng khi đánh giá.
  Khi hệ thống số sai, phân xưởng chạy sai: mua sai vật tư, gia công sai Rev, đo sai tiêu chí, ship sai, hoặc không kéo được hồ sơ đúng trong 3 phút.
  </p>
@@ -107,7 +107,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Operator</b></td>
 <td>Dùng app đúng môi trường; không dùng bản draft; báo lỗi khi gặp không khớp Rev/dữ liệu; không tự chia sẻ dữ liệu khách.</td>
-<td>01 biên bản OJT + 01 thực hành “tìm hồ sơ đúng trong 3 phút” có ký xác nhận.</td>
+<td>01 biên bản OJT + 01 thực hành "tìm hồ sơ đúng trong 3 phút" có ký xác nhận.</td>
 <td>L2</td>
 </tr>
 <tr>
@@ -166,7 +166,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>Người định giá (SAL-03)</b></td>
-<td>Phân loại dữ liệu khách hàng (Customer-Bảo mật); dùng đánh giá pack đúng kênh; không gửi link “Bất kỳ ai”.</td>
+<td>Phân loại dữ liệu khách hàng (Customer-Bảo mật); dùng đánh giá pack đúng kênh; không gửi link "Bất kỳ ai".</td>
 <td>01 tình huống tạo đánh giá pack đúng chính sách + log phê duyệt.</td>
 <td>L3</td>
 </tr>
@@ -180,7 +180,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 3) -->
 <h2 id="sec3">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <p>
- SYS-OPS-10 không đứng riêng lẻ. Mô-đun này là “hệ thống chặn rủi ro” xuyên suốt chuỗi:
+ SYS-OPS-10 không đứng riêng lẻ. Mô-đun này là "hệ thống chặn rủi ro" xuyên suốt chuỗi:
  <b>Báo giá/Hợp đồng → Kế hoạch → Kỹ thuật → Mua hàng → Nhận hàng → Sản xuất → QC/QA → NCR/MRB → Final → Đóng gói → Ship → Phản hồi/CI</b>.
  Mọi thay đổi hệ thống số tác động trực tiếp tới đúng/sai của dữ liệu trong từng bước trên.
  </p>
@@ -234,7 +234,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ol>
 <li><b>Nhập nhầm phiên bản giải pháp</b>: import gói cũ, thiếu bản vá nóng (hotfix), hoặc lệch version so với DCR hồ sơ.</li>
 <li><b>Nhập nhầm môi trường</b>: triển khai thẳng vào PROD, bỏ qua UAT, hoặc chạy thử bằng dữ liệu thật.</li>
-<li><b>Không được quản lý tồn tại trong PROD</b>: Người dùng chỉnh trực tiếp trong PROD, tạo “độ lệch” không truy vết.</li>
+<li><b>Không được quản lý tồn tại trong PROD</b>: Người dùng chỉnh trực tiếp trong PROD, tạo "độ lệch" không truy vết.</li>
 <li><b>kết nối Reference trỏ sai</b>: luồng/app Mọi nhầm site/thư viện, nhầm list, nhầm tổ chức thuê (tenant).</li>
 <li><b>Môi trường biến số / biến thiên bị cứng / khó-code</b>: copy/paste URL, GUID, hộp thư, khiến dữ liệu chảy sai vùng.</li>
 <li><b>DLP bị bỏ qua</b>: đầu nối ngoài danh sách cho phép kéo dữ liệu khách ra kênh ngoài.</li>
@@ -242,7 +242,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>ngắt / nghỉ quyền / sự cho phép theo từng file</b>: quyền rải rác, không kiểm tra được khi đánh giá, tạo lỗ hổng truy cập.</li>
 <li><b>Không có Photos trạng thái quyền</b>: không chứng minh ai có quyền gì tại thời điểm ship/đánh giá.</li>
 <li><b>Không có backup/export trước triển khai</b>: lỗi xảy ra không hoàn tác / quay lại được trong ca sản xuất.</li>
-<li><b>Không có acceptance test bằng Người dùng thật</b>: test bằng admin làm “ảo giác đạt”, Người dùng thật vào là fail.</li>
+<li><b>Không có acceptance test bằng Người dùng thật</b>: test bằng admin làm "ảo giác đạt", Người dùng thật vào là fail.</li>
 <li><b>Không đóng Hồ sơ công việc</b>: sau kết thúc / đóng hồ sơ vẫn sửa được hồ sơ, phá tính bất biến của bằng chứng.</li>
 </ol>
 <!-- 5) -->
@@ -276,7 +276,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>C4 — DLP policy theo khu vực dữ liệu</b></td>
 <td>IT + QA</td>
-<td>DLP policy export/Photos màn hình + test tình huống “Customer-Bảo mật không chia sẻ bên ngoài”</td>
+<td>DLP policy export/Photos màn hình + test tình huống "Customer-Bảo mật không chia sẻ bên ngoài"</td>
 <td>Rò rỉ dữ liệu khách hàng</td>
 </tr>
 <tr>
@@ -485,7 +485,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>3</td>
 <td>Chuẩn hóa giải pháp</td>
 <td>nhà xuất bản / Người đăng + version • Thành phần nằm trong giải pháp</td>
-<td>Giảm “thành phần lẻ” ngoài kiểm soát</td>
+<td>Giảm "thành phần lẻ" ngoài kiểm soát</td>
 </tr>
 <tr>
 <td>4</td>
@@ -508,7 +508,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>7</td>
 <td>Chạy acceptance kiểm Nhiệm bằng Người dùng thật</td>
-<td>Test đúng vai trò Người dùng (persona) (Operator/QC/Kho) • Test “bằng chứng trong 3 phút”</td>
+<td>Test đúng vai trò Người dùng (persona) (Operator/QC/Kho) • Test "bằng chứng trong 3 phút"</td>
 <td>Admin đạt không đồng nghĩa Người dùng đạt</td>
 </tr>
 <tr>
@@ -536,7 +536,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>L1</b></td>
-<td>Nêu đúng khái niệm DEV/UAT/PROD, được quản lý/không được quản lý, DLP, khu vực dữ liệu; nhận biết “không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)”.</td>
+<td>Nêu đúng khái niệm DEV/UAT/PROD, được quản lý/không được quản lý, DLP, khu vực dữ liệu; nhận biết "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)".</td>
 <td>Bài kiểm tra nhanh ≥ 80% (phần kiến thức)</td>
 <td>Được phép dùng app theo quyền Người dùng</td>
 </tr>
@@ -569,13 +569,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Vì sao phải dùng Môi trường biến số thay vì cứng / khó-code?</li>
 <li>kết nối Reference có vai trò gì trong luồng/app?</li>
 <li>DLP policy chặn cái gì và chặn theo cơ chế nào?</li>
-<li>Quy tắc “không ngắt / nghỉ quyền / sự cho phép theo từng file” chặn rủi ro gì?</li>
+<li>Quy tắc "không ngắt / nghỉ quyền / sự cho phép theo từng file" chặn rủi ro gì?</li>
 <li>SoD là gì và vì sao đánh giá quan tâm?</li>
 <li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) nghĩa là gì trong go-Live?</li>
 <li>Khi phát hiện app hiển thị sai Rev, hành động đầu tiên là gì?</li>
 <li>Khi có Requests chia sẻ dữ liệu Customer-Bảo mật ra ngoài, kênh đúng là gì?</li>
 <li>Vì sao acceptance test phải chạy bằng Người dùng thật?</li>
-<li>Tình huống: luồng gửi email ra ngoài kèm file “Customer-Bảo mật”. Quyết định TẠM GIỮ/GO? Ghi MRR nào?</li>
+<li>Tình huống: luồng gửi email ra ngoài kèm file "Customer-Bảo mật". Quyết định TẠM GIỮ/GO? Ghi MRR nào?</li>
 <li>Tình huống: triển khai UAT xong nhưng chưa có ký-off. Có được triển khai PROD không? Trả lời theo cổng kiểm soát.</li>
 <li>Tình huống: Kho chuẩn bị ship nhưng thiếu 01 IR. Quyết định? MRR phải tạo?</li>
 <li>Tình huống: phát hiện không được quản lý edit trong PROD. STOP/TẠM GIỮ/CHẶN? Vì sao?</li>
@@ -587,24 +587,24 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>10.2 Tình huống (≥ 3 tình huống thật; có dữ kiện; quyết định TẠM GIỮ/GO và ghi MRR)</h3>
 <div class="note">
 <strong>Tình huống 1 — Sai Rev tại Point-of-use</strong><br/>
- Dữ kiện: Operator mở app “Job Theo dõi Sheet” hiển thị PartNo PN-7750 Rev B, trong khi drawing Released tại QMS-Được kiểm soát-Tài liệu là Rev C.
+ Dữ kiện: Operator mở app "Job Theo dõi Sheet" hiển thị PartNo PN-7750 Rev B, trong khi drawing Released tại QMS-Được kiểm soát-Tài liệu là Rev C.
  Lot đang ở ca 2, máy đã set tool.<br/>
  Yêu cầu: ra quyết định TẠM GIỮ/GO, mô tả phản ứng 60 giây, và liệt kê MRR phải tạo ngay.
  </div>
 <div class="note">
 <strong>Tình huống 2 — DLP chặn kết nối ngoài</strong><br/>
- Dữ kiện: Người định giá (SAL-03) cần gửi đánh giá pack cho khách. Người dùng tạo link chia sẻ kiểu “Bất kỳ ai” và nhận cảnh báo DLP.
+ Dữ kiện: Người định giá (SAL-03) cần gửi đánh giá pack cho khách. Người dùng tạo link chia sẻ kiểu "Bất kỳ ai" và nhận cảnh báo DLP.
  Supervisor Requests gửi Cấp trong ngày.<br/>
  Yêu cầu: ra quyết định TẠM GIỮ/GO, chỉ định kênh đúng, và liệt kê bằng chứng cần lưu để chứng minh tuân thủ.
  </div>
 <div class="note">
 <strong>Tình huống 3 — Vượt qua UAT và thiếu ký-off</strong><br/>
- Dữ kiện: Lập trình viên (CNC) triển khai thẳng lên PROD để “kịp ca”, chưa chạy acceptance kiểm Nhiệm. Sau triển khai, Kho báo app phê duyệt giao hàng lỗi lọc lot.
+ Dữ kiện: Lập trình viên (CNC) triển khai thẳng lên PROD để "kịp ca", chưa chạy acceptance kiểm Nhiệm. Sau triển khai, Kho báo app phê duyệt giao hàng lỗi lọc lot.
  Có lệnh ship trong 2 giờ tới.<br/>
  Yêu cầu: ra quyết định STOP/TẠM GIỮ/CHẶN, mô tả hoàn tác / quay lại, và liệt kê MRR + trách nhiệm từng vai trò.
  </div>
 <h3>10.3 Hiệu suất test (bắt buộc)</h3>
-<p><b>Mô tả bài test:</b> triển khai 01 thay đổi nhỏ (ví dụ: thêm 01 trường “Rev” bắt buộc trong app Hồ sơ công việc) theo đúng bảng kiểm 1→14, qua UAT, có ký-off, và tạo bộ bằng chứng hoàn chỉnh.</p>
+<p><b>Mô tả bài test:</b> triển khai 01 thay đổi nhỏ (ví dụ: thêm 01 trường "Rev" bắt buộc trong app Hồ sơ công việc) theo đúng bảng kiểm 1→14, qua UAT, có ký-off, và tạo bộ bằng chứng hoàn chỉnh.</p>
 <table class="form-table">
 <tr>
 <th style="width:22%">Nhóm vai trò</th>
@@ -619,12 +619,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>QA</b></td>
 <td>Chạy acceptance kiểm Nhiệm bằng Người dùng thật • Kiểm tra DLP/khu vực • Review bằng chứng theo Cài đặt ID • Ký ký-off</td>
-<td>đạt khi test đầy đủ + ký-off hợp lệ + “bằng chứng trong 3 phút” đạt</td>
+<td>đạt khi test đầy đủ + ký-off hợp lệ + "bằng chứng trong 3 phút" đạt</td>
 </tr>
 <tr>
 <td><b>Supervisor</b></td>
 <td>Kiểm tra SoD • Quyết định GO/TẠM GIỮ dựa trên MRR • Chặn giao hàng khi thiếu hồ sơ</td>
-<td>đạt khi quyết định có căn cứ + không có “GO khi thiếu bằng chứng”</td>
+<td>đạt khi quyết định có căn cứ + không có "GO khi thiếu bằng chứng"</td>
 </tr>
 <tr>
 <td><b>Operator/Setup/QC/Kho/Mua hàng/Planner/Bảo trì/EHS/Kinh doanh-CS</b></td>
@@ -646,7 +646,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Điều kiện FAIL</strong>
 <ul>
-<li>Thiếu bất kỳ MRR nào thuộc nhóm “Tier 1” cho go-Live hoặc phê duyệt giao hàng.</li>
+<li>Thiếu bất kỳ MRR nào thuộc nhóm "Tier 1" cho go-Live hoặc phê duyệt giao hàng.</li>
 <li>triển khai vượt qua UAT hoặc thiếu ký-off QA.</li>
 <li>cứng / khó-code kết nối/value hoặc mở rộng đầu nối trái DLP đối với dữ liệu Customer-Bảo mật/Hạn chế.</li>
 <li>Evidence không chứng minh được ngữ cảnh (không thấy tên site/thư viện/cài đặt value).</li>

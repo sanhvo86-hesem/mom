@@ -10,21 +10,21 @@
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr);gap:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr);gap:12px;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6;}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:12px;}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
 .gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr);gap:10px 16px;}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
 .field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .field .blank{width:100%;min-height:22px;}
@@ -38,7 +38,7 @@
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
 .small{font-size:12px}
 
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
 .callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
 .callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
 .step-band{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
@@ -49,25 +49,6 @@ table{max-width:100%;table-layout:auto}
 td,th{}
  thead{display:table-header-group}tfoot{display:table-footer-group}
 @media (max-width: 960px){.grid-2,.grid-3,.field-grid{grid-template-columns:1fr;}}
-/* Critical inline CSS for file:// compatibility */
-
-/* Flowchart */
-.flowchart{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:stretch;margin:20px 0;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:1px solid rgba(21,101,192,.18);border-radius:10px}
-.flow-step{flex:1 1 120px;min-width:100px;max-width:170px;padding:10px 12px;background:#fff;border:1.5px solid rgba(21,101,192,.3);border-radius:10px;text-align:center;box-shadow:0 1px 3px rgba(21,101,192,.06)}
-.flow-step .flow-num{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#1565c0,#1976d2);color:#fff;font-size:12px;font-weight:800;margin-bottom:5px}
-.flow-step .flow-title{font-size:11px;font-weight:700;color:#0C2D48;line-height:1.35}
-.flow-step .flow-text{text-align:left}
-.flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 22px;color:#93b3d6;font-size:16px;font-weight:700}
-/* Proc-num */
-.proc-num{display:inline-flex;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;flex-shrink:0;margin-right:8px}
-/* Step-tag */
-.step-tag{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0C2D48,#1565c0);text-transform:uppercase;letter-spacing:.3px}
-/* Metric cards */
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:16px 0}
-.metric-card{padding:16px;border:1px solid rgba(21,101,192,.15);border-radius:10px;text-align:center;background:#fff}
-.metric-card .value{font-size:28px;font-weight:800;color:#1565c0;line-height:1.2}
-.metric-card .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-top:4px}
-.metric-card .sub{font-size:11px;color:#666;margin-top:4px;line-height:1.4}
 
 </style>
 </head>
@@ -161,11 +142,11 @@ td,th{}
 </tbody></table></div>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#c2410c,#ea580c)">7</span> Thu đủ chi phí của job và chi phí of kém chất lượng</h3>
 <p>Giá thành job chỉ hữu ích khi phản ánh cả phần làm ra giá trị và phần tiêu hao vì lỗi. Trước khi đóng job, Finance phải rà riêng các lớp chi phí sau: nhân công chuẩn, tăng ca bất thường, nguyên vật liệu vấn đề/trả lại, vật liệu thừa viết / ghi-off, gia công ngoài, cước vận chuyển, Cấp / khẩn chi phí, làm lại/phế phẩm, khiếu nại/RMA/khiếu nại / Requests bồi thường chi phí, bảo hành dự trữ / dự phòng nếu áp dụng. COPQ không được chôn vào một tài khoản chung rồi mất khả năng học lại. Nếu job dính NCR, thoát / bỏ qua hoặc thay thế, phải chỉ ra chi phí nằm ở job nào, kỳ nào và ai sở hữu hành động sửa nguyên nhân.</p>
-<h3><span class="proc-num" style="background:linear-gradient(135deg,#4338ca,#6366f1)">8</span> Review biên lợi nhuận phải trả lời “rò ở đâu” chứ không chỉ “âm bao nhiêu”</h3>
-<p>Biên lợi nhuận rà soát phải đi theo cầu nối doanh thu → giá thành chuẩn → biến động. Tối thiểu phải hỏi: báo giá giả định có sai không, lộ trình gia công/môi trường chạy có sai không, nhân công vượt vì setup/chuyển đổi (changeover) hay do chờ vật tư, outsource/công đoạn đặc biệt tăng vì làm lại hay vì source chiến lược, cước vận chuyển tăng vì hot-job hay vì lỗi nội bộ, khiếu nại / Requests bồi thường/tín dụng / ghi có do khiếu nại hay do thương mại, hóa đơn chậm trễ có làm lệch dòng tiền hay không. Review mà chỉ báo “biên lợi nhuận thấp” nhưng không chỉ ra cơ chế rò là rà soát không đạt.</p>
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#4338ca,#6366f1)">8</span> Review biên lợi nhuận phải trả lời "rò ở đâu" chứ không chỉ "âm bao nhiêu"</h3>
+<p>Biên lợi nhuận rà soát phải đi theo cầu nối doanh thu → giá thành chuẩn → biến động. Tối thiểu phải hỏi: báo giá giả định có sai không, lộ trình gia công/môi trường chạy có sai không, nhân công vượt vì setup/chuyển đổi (changeover) hay do chờ vật tư, outsource/công đoạn đặc biệt tăng vì làm lại hay vì source chiến lược, cước vận chuyển tăng vì hot-job hay vì lỗi nội bộ, khiếu nại / Requests bồi thường/tín dụng / ghi có do khiếu nại hay do thương mại, hóa đơn chậm trễ có làm lệch dòng tiền hay không. Review mà chỉ báo "biên lợi nhuận thấp" nhưng không chỉ ra cơ chế rò là rà soát không đạt.</p>
 <ul class="tight"><li>Biến động lặp theo khách hàng nhóm sản phẩm phải quay về <a href="../02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a> / <a href="../03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a> để sửa cách rà soát RFQ và định giá.</li><li>Biến động lặp theo nhóm máy (machine nhóm sản phẩm) hoặc hàng đợi phải quay về <a href="../05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a> / <a href="../../02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a> / <a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>.</li><li>Biến động do thoát / bỏ qua / khiếu nại / Requests bồi thường phải nối sang <a href="../02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-202</a> / <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>.</li></ul>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#15803d,#22c55e)">9</span> Governance tranh chấp, ghi nợ / tín dụng / ghi có và AR escalation</h3>
-<p>Mỗi hóa đơn có tranh chấp phải có tình huống Responsible Person và nguyên nhân gốc nhóm sản phẩm: chứng từ, giá/thuế, chất lượng, hậu cần, mua hàng tính phí ngược (backcharge), khách hàng portal vấn đề hoặc tiền mặt-ứng dụng vấn đề. Không cho phép trạng thái “khách chưa trả” kéo dài mà không biết lý do. AP/AR Kế toán phải duy trì log theo tuổi nợ và tuổi tranh chấp, còn Finance Manager quyết định ngưỡng escalation theo giá trị, độ tuổi và khách hàng tính chiến lược. Khi tranh chấp chạm chất lượng/thoát / bỏ qua, thương mại theo dõi tiếp phải nối lại với khiếu nại tình huống thay vì mở hai đường riêng.</p>
+<p>Mỗi hóa đơn có tranh chấp phải có tình huống Responsible Person và nguyên nhân gốc nhóm sản phẩm: chứng từ, giá/thuế, chất lượng, hậu cần, mua hàng tính phí ngược (backcharge), khách hàng portal vấn đề hoặc tiền mặt-ứng dụng vấn đề. Không cho phép trạng thái "khách chưa trả" kéo dài mà không biết lý do. AP/AR Kế toán phải duy trì log theo tuổi nợ và tuổi tranh chấp, còn Finance Manager quyết định ngưỡng escalation theo giá trị, độ tuổi và khách hàng tính chiến lược. Khi tranh chấp chạm chất lượng/thoát / bỏ qua, thương mại theo dõi tiếp phải nối lại với khiếu nại tình huống thay vì mở hai đường riêng.</p>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#be185d,#ec4899)">10</span> AP bàn giao, gia công ngoài chi phí và giai đoạn / kỳ đóng kỷ luật / chuyên ngành</h3>
 <p>AP không chỉ là nhận hóa đơn rồi ghi nhận. Với lệnh sản xuất CNC, chi phí nhà cung cấp thường đến trễ hơn dòng sản xuất. Vì vậy mọi PO gia công ngoài, công đoạn đặc biệt, cước vận chuyển phụ phí hoặc nhà cung cấp sửa chữa / hiệu chính liên quan job phải có bàn giao rõ giữa Mua hàng, Kho, QA và Finance. giai đoạn / kỳ đóng không được coi là sạch nếu còn hóa đơn nhà cung cấp chưa map được về job hoặc nếu hàng hóa/dịch vụ Received nhưng chi phí còn treo ngoài kỳ mà không có dồn tích / tích lũy rule.</p>
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">11</span> Chu trình học lại cho báo giá, lộ trình gia công và chiến lược khách hàng</h3>
@@ -191,7 +172,7 @@ td,th{}
 <li>Một phần ship, tách / chia lot hoặc khách hàng concession phải được phản ánh riêng trong tính giá thành/biên lợi nhuận rà soát; không trộn để che lỗ.</li>
 <li>hoàn phí / bồi hoàn do chất lượng/muộn / trễ giao hàng/nhà cung cấp vấn đề phải được gắn Responsible Person chịu trách nhiệm và đường phản hồi về SOP liên quan.</li>
 <li>Khi khách hàng tranh chấp kéo dài, Finance không được tự đóng bằng sổ tay / thủ công điều chỉnh nếu chưa có phê duyệt đúng tuyến và nguyên nhân được xác định.</li>
-<li>Nếu job dùng Người xử lý/nhà cung cấp ngoài có hóa đơn chậm hoặc dồn tích / tích lũy chưa chắc chắn, biên lợi nhuận rà soát phải gắn trạng thái “tạm thời”, không dùng để thưởng/phạt cá nhân.</li>
+<li>Nếu job dùng Người xử lý/nhà cung cấp ngoài có hóa đơn chậm hoặc dồn tích / tích lũy chưa chắc chắn, biên lợi nhuận rà soát phải gắn trạng thái "tạm thời", không dùng để thưởng/phạt cá nhân.</li>
 </ul>
 <h2 class="h2" id="p9">9. Hệ thống, hồ sơ &amp; dữ liệu</h2><div class="field-grid"><div class="field"><b>Hệ thống ghi nhận chuẩn (SoR)</b><div class="blank">ERP/Epicor là SoR cho SO/giao hàng/hóa đơn/AR phiếu nhận / biên nhận/job chi phí/WIP/đóng job. Không phát hành số liệu chính thức từ file tự tổng hợp thay cho ERP.</div></div><div class="field"><b>Nguồn hồ sơ chuẩn (SSOT)</b><div class="blank">M365/SharePoint hoặc thư mục Finance được chỉ định dùng để lưu hóa đơn Requests, giao hàng gói hồ sơ liên kết, đã gửi bằng chứng, tranh chấp log, biên lợi nhuận pack và AP bàn giao bằng chứng.</div></div><div class="field"><b>Trường dữ liệu tối thiểu</b><div class="blank">SO/PO dòng / chuyền; giao hàng số; khách hàng; số lượng; giá/điều khoản; phát hành tham chiếu; hóa đơn số/date; Ngày đến hạn; job số; nhân công/nguyên vật liệu/gia công ngoài/cước vận chuyển chi phí; chênh lệch / phương sai Responsible Person; AR trạng thái.</div></div><div class="field"><b>Quy tắc đóng hồ sơ</b><div class="blank">Dòng / Chuyền xuất hóa đơn chỉ đóng khi hóa đơn/phiếu nhận / biên nhận/tranh chấp đã kết luận; job đóng chỉ đóng khi doanh thu, chi phí, AR/AP giao diện và chênh lệch / phương sai rà soát đã chốt theo chu kỳ quy định.</div></div></div><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:28%"/><col style="width:24%"/><col style="width:14%"/><col style="width:18%"/></colgroup><thead><tr><th>Hồ sơ</th><th>Mục đích</th><th>Nơi lưu / nguồn</th><th>Chủ trì</th><th>Điều kiện đóng</th></tr></thead><tbody><tr><td><a href="../../../04-Bieu-Mau/08-FRM-800/FRM-821_Invoice_Request.xlsx" download="">FRM-821</a></td><td>Hóa đơn Requests và link giao hàng bằng chứng</td><td>Finance / xuất hóa đơn SSOT</td><td>CS / AP-AR</td><td>Khi dòng / chuyền xuất hóa đơn kết thúc</td></tr><tr><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-642_Final_Inspection_and_CoC_Register.xlsx" download="">FRM-642</a></td><td>Nguồn đối chiếu phát hành/CoC trước xuất hóa đơn</td><td>Quality SSOT / giao hàng gói hồ sơ</td><td>QA / AP-AR dùng để đọc</td><td>Khi giao hàng đóng</td></tr><tr><td><a href="../../../04-Bieu-Mau/02-FRM-200/FRM-206_Job_Completion_Checklist.xlsx" download="">FRM-206</a></td><td>Bảng kiểm hoàn tất job trước đóng</td><td>Hồ sơ công việc (hồ sơ công việc) / finance gói hồ sơ</td><td>Sản xuất / Kế hoạch / Finance</td><td>Khi job đóng</td></tr><tr><td><a href="../../../04-Bieu-Mau/03-FRM-300/FRM-301_Costing_Sheet.xlsx" download="">FRM-301</a></td><td>Tính giá thành / chênh lệch / phương sai hỗ trợ</td><td>Finance phân tích thư mục</td><td>Finance Lead</td><td>Khi chênh lệch / phương sai được chốt</td></tr><tr><td>AR tuổi tồn / đã gửi bằng chứng / tranh chấp log</td><td>Theo dõi công nợ và tranh chấp</td><td>Finance SSOT / ERP báo cáo</td><td>AP-AR</td><td>Duy trì sống</td></tr><tr><td>AP bàn giao pack</td><td>Bàn giao chi phí nhà cung cấp liên quan job cho AP</td><td>Finance/AP thư mục</td><td>AP-AR / Finance</td><td>Khi chi phí Received và ghi đúng kỳ</td></tr></tbody></table></div>
 

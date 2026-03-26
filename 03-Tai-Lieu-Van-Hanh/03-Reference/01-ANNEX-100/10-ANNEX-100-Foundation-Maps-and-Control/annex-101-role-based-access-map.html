@@ -7,23 +7,23 @@
 <link href="../../../../assets/style.css" rel="stylesheet"/>
 <style>
 
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr);gap:14px;margin:14px 0;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
 .metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
 .metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;}
 .metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
-.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr);gap:14px;margin:14px 0;}
+.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;}
 .link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);}
 .link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
 .link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);}
 .link-list{list-style:none;margin:0;padding:0}
 .link-list li{padding:4px 0 4px 0;font-size:12px}
-.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:14px}
-.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr);gap:14px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
 .tight{margin:0;padding-left:18px}
 .tight li{margin:4px 0}
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:8px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
 .toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
 .hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}
 .hero h1{font-size:22px;line-height:1.35;color:var(--navy);margin:0 0 8px}
@@ -33,7 +33,7 @@
 .legend-box{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 .legend-box .chip{margin:0}
 .svg-wrap{overflow:auto;border:1px solid var(--ln);border-radius:var(--r);background:#fff;padding:12px}
-.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr);gap:10px;margin:12px 0}
+.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
 .notice-item{padding:10px 12px;border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r-sm);background:var(--bg);font-size:12px}
 .small{font-size:12px}
 .footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
@@ -71,9 +71,9 @@
 
 <div class="iso-map">
  <div class="iso-title">Nguyên tắc bắt buộc</div>
- <div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi quyền truy cập được cấp theo <b>vai trò công việc</b>, có Responsible Person nghiệp vụ, có hạn dùng khi cần và có dấu vết rà soát; không cấp theo thói quen cá nhân hoặc “cấp giống Người trước”. <span class="iso-clause">§7.5</span></div></div>
+ <div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi quyền truy cập được cấp theo <b>vai trò công việc</b>, có Responsible Person nghiệp vụ, có hạn dùng khi cần và có dấu vết rà soát; không cấp theo thói quen cá nhân hoặc "cấp giống Người trước". <span class="iso-clause">§7.5</span></div></div>
  <div class="req"><span class="req-tag shall">PHẢI</span><div>Quyền nhạy cảm, quyền đặc quyền và quyền liên quan phân tách-of-nhiệm vụ phải gắn với <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>, <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a> và Requests có đủ dữ liệu tại <a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a>. <span class="iso-clause">§7.5</span></div></div>
- <div class="req"><span class="req-tag shall">PHẢI</span><div>Thiết kế quyền theo nguyên tắc “nhỏ nhất khả thi truy cập”: đủ để làm việc và chứng minh được, nhưng không thừa quyền để né kiểm soát hoặc vượt ranh giới của vai trò. <span class="iso-clause">§7.5</span></div></div>
+ <div class="req"><span class="req-tag shall">PHẢI</span><div>Thiết kế quyền theo nguyên tắc "nhỏ nhất khả thi truy cập": đủ để làm việc và chứng minh được, nhưng không thừa quyền để né kiểm soát hoặc vượt ranh giới của vai trò. <span class="iso-clause">§7.5</span></div></div>
 </div>
 
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#a1">1. Mục đích và phạm vi</a><a href="#a2">2. Miền hệ thống và mức quyền chuẩn</a><a href="#a3">3. Bản đồ quyền theo vai trò nhóm sản phẩm</a><a href="#a4">4. Tách nhiệm vụ và quyền đỏ</a><a href="#a5">5. Phê duyệt bậc thang năng lực và quyết định nhóm sản phẩm</a><a href="#a6">6. Phó / backup truy cập</a><a href="#a7">7. Quyền tạm thời, ngắt / nghỉ-kính / thủy tinh, dịch vụ tài khoản</a><a href="#a8">8. Review quyền truy cập và phản ứng theo sự kiện</a><a href="#a9">9. Evidence, KPI và từ chối tín hiệu</a><a href="#a10">10. Tài liệu liên kết</a></div></div>
@@ -81,7 +81,7 @@
 
 <p>ANNEX này khóa logic cấp quyền theo vai trò cho M365 / SharePoint / Portal, Power nền tảng, Power BI, Epicor và các hệ hỗ trợ tại HESEM. Mục tiêu là giữ <b>ít nhất quyền hạn</b>, <b>phân tách of nhiệm vụ</b>, <b>source-of-tính toàn vẹn hồ sơ</b> và khả năng đánh giá/truy vết khi Người dùng đổi vị trí, kích hoạt phó, nghỉ việc, xử lý sự cố hoặc chạy rà soát quyền truy cập định kỳ.</p>
 <p>Tài liệu này dùng để quyết định <b>quyền trần</b> mà một vai trò nhóm sản phẩm được phép có. Chi tiết dữ liệu Requests, phê duyệt lộ trình gia công, từ chối code và bằng chứng Requests nằm tại <a href="annex-102-access-request-field-dictionary.html">ANNEX-102</a> và <a href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx" download="">FRM-141 IT Truy cập Yêu cầu / Thay đổi / thu hồi / hủy bỏ</a>.</p>
-<div class="callout"><b>Quy tắc cứng</b><br/>Không dùng chung tài khoản. Không cấp quyền “đầy đủ truy cập cho tiện”. Không giữ quyền cũ sau khi đổi vị trí. Không để Người Requests tự duyệt quyền nhạy cảm của chính mình. Không để phó hoặc Người hỗ trợ mang quyền cao hơn vai trò gốc nếu chưa có phê duyệt và thời hạn rõ.</div>
+<div class="callout"><b>Quy tắc cứng</b><br/>Không dùng chung tài khoản. Không cấp quyền "đầy đủ truy cập cho tiện". Không giữ quyền cũ sau khi đổi vị trí. Không để Người Requests tự duyệt quyền nhạy cảm của chính mình. Không để phó hoặc Người hỗ trợ mang quyền cao hơn vai trò gốc nếu chưa có phê duyệt và thời hạn rõ.</div>
 
 <h2 class="h2" id="a2">2. Miền hệ thống và mức quyền chuẩn</h2>
 <div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:30%"/><col style="width:26%"/><col style="width:26%"/></colgroup><thead><tr><th>Miền hệ thống</th><th>Ví dụ tài nguyên</th><th>Mức quyền chuẩn</th><th>Ghi chú</th></tr></thead><tbody><tr><td>M365 / SharePoint / Portal</td><td>thư viện SOP/WI/ANNEX/FRM, danh sách, hồ sơ thư mục, portal nội dung</td><td>đọc • Đóng góp • phê duyệt/Công bố • Site Admin</td><td>phê duyệt/Công bố và Site Admin là quyền nhạy cảm; không cấp mặc định theo cấp bậc chức danh.</td></tr><tr><td>Power nền tảng</td><td>Biểu mẫu, luồng, ứng dụng, môi trường, đầu nối</td><td>Người nộp • Approver • Người tạo / nhà sản xuất DEV/UAT • Admin PROD</td><td>Người tạo / nhà sản xuất DEV/UAT không đồng nghĩa Admin PROD; tách riêng theo môi trường.</td></tr><tr><td>Power BI / bảng điều khiển</td><td>Vận hành bảng điểm, MR gói, diễn tập bảng điều khiển</td><td>View • Xây dựng • Công bố</td><td>Quyền Công bố phải đi với Responsible Person bảng điều khiển và kiểm soát nguồn rõ.</td></tr><tr><td>Epicor / ERP</td><td>Yêu cầu thông tin, giao dịch, phát hành hành động, dữ liệu gốc, bảo mật</td><td>Yêu cầu thông tin • Giao dịch • Phát hành • Dữ liệu gốc • bảo mật Admin</td><td>dữ liệu gốc / bảo mật Admin là quyền đỏ; không đi cùng một số vai trò kinh doanh nhất định.</td></tr><tr><td>DNC / program / machine file control</td><td>Program download, Released NC lưu trữ, hàng đợi</td><td>đọc • Download • Phát hành • Admin</td><td>Phát hành program phải bám ranh giới kỹ thuật/sản xuất đã được khóa.</td></tr><tr><td>có đặc quyền / ngắt / nghỉ-kính / thủy tinh</td><td>Khẩn cấp tổ chức thuê (tenant) admin, khẩn cấp Epicor admin</td><td>Time-giới hạn nâng cao truy cập chỉ / duy nhất</td><td>Kích hoạt khẩn cấp phải có Responsible Person, sự kiện log và rà soát hậu sự cố.</td></tr></tbody></table></div>
@@ -94,7 +94,7 @@
 <h2 class="h2" id="a6">6. Phó / backup truy cập</h2>
 
 <p>Phó truy cập không phải bản sao cố định của vai trò gốc. Chỉ kích hoạt khi tên phó đã có trong <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>, năng lực/chứng nhận phù hợp đã được xác nhận và Requests ghi rõ: vai trò thay thế, lý do, phạm vi, Ngày bắt đầu, Ngày kết thúc, Responsible Person chịu trách nhiệm và cách thu hồi sau khi kết thúc.</p>
-<p>Nguyên tắc: phó nhận <b>đúng phần quyền cần để duy trì hoạt động</b>, không nhận “đầy đủ admin” để xử lý cho nhanh. Nếu phó cần quyền vượt vai trò gốc của mình, phải coi như tạm thời nâng cao truy cập và dùng phê duyệt bậc thang năng lực tương ứng.</p>
+<p>Nguyên tắc: phó nhận <b>đúng phần quyền cần để duy trì hoạt động</b>, không nhận "đầy đủ admin" để xử lý cho nhanh. Nếu phó cần quyền vượt vai trò gốc của mình, phải coi như tạm thời nâng cao truy cập và dùng phê duyệt bậc thang năng lực tương ứng.</p>
 
 <h2 class="h2" id="a7">7. Quyền tạm thời, ngắt / nghỉ-kính / thủy tinh, dịch vụ tài khoản</h2>
 <ul class="tight"><li>Quyền tạm thời phải có Ngày hết hạn, phiếu Requests / Requests ID, chủ nghiệp vụ, kỹ thuật Responsible Person và bằng chứng thu hồi sau khi hoàn tất.</li><li>ngắt / nghỉ-kính / thủy tinh chỉ dùng cho sự cố khẩn cấp ảnh hưởng sản xuất, chất lượng, giao hàng hoặc an toàn hệ thống; mọi lần dùng phải ghi vào dự phòng / log sự cố (log) và rà soát hậu sự cố.</li><li>Dịch vụ / machine tài khoản phải có Responsible Person rõ, scope rõ, không dùng để vận hành End User và phải được rà định kỳ như có đặc quyền tài khoản.</li><li>Khách / nhà thầu tài khoản chỉ được cấp đúng thư viện/app cần thiết, mặc định time-giới hạn và phải thu hồi / hủy bỏ ngay khi kết thúc hợp đồng hoặc nhiệm vụ.</li></ul>
@@ -103,7 +103,7 @@
 <h2 class="h2" id="a9">9. Evidence, KPI và từ chối tín hiệu</h2>
 <div class="grid-2">
 <div class="card"><div class="card-title">Evidence tối thiểu</div><p><a href="../../../../04-Bieu-Mau/01-FRM-100/FRM-141_IT_Access_Request_Change_Removal.xlsx" download="">FRM-141</a> / phiếu Requests ID; mô tả vai trò và hệ; phê duyệt hợp lệ; thời hạn nếu tạm thời; xác nhận triển khai; xác nhận Người dùng; log rà soát nếu có đặc quyền/phó.</p></div>
-<div class="card"><div class="card-title">Từ chối tín hiệu</div><p>Yêu cầu ghi “cấp đầy đủ truy cập”, “cấp giống Người A”, thiếu vai trò/JD/Responsible Person, thiếu Ngày hết hạn cho quyền tạm thời, hoặc Requests xung đột SoD mà không có đã báo cáo vượt cấp phê duyệt đều phải trả lại.</p></div>
+<div class="card"><div class="card-title">Từ chối tín hiệu</div><p>Yêu cầu ghi "cấp đầy đủ truy cập", "cấp giống Người A", thiếu vai trò/JD/Responsible Person, thiếu Ngày hết hạn cho quyền tạm thời, hoặc Requests xung đột SoD mà không có đã báo cáo vượt cấp phê duyệt đều phải trả lại.</p></div>
 </div>
 <div class="table-card"><table class="table"><colgroup><col style="width:40%"/><col style="width:60%"/></colgroup><thead><tr><th>KPI / chỉ số giám sát</th><th>Ý nghĩa</th></tr></thead><tbody><tr><td>% Requests đầy đủ ngay lần đầu</td><td>Đo chất lượng dữ liệu Requests và mức độ chuẩn hóa của chủ nghiệp vụ.</td></tr><tr><td>% có đặc quyền truy cập có hết hạn date và đóng-out đúng hạn</td><td>Đo tính kỷ luật của quyền nâng cao / tạm thời.</td></tr><tr><td>Số phát hiện SoD / quý</td><td>Đo mức độ lộ rủi ro từ thiết kế quyền.</td></tr><tr><td>% thu hồi / hủy bỏ hoàn tất đúng SLA khi thôi việc / rời công ty / vai trò thay đổi</td><td>Đo nguy cơ giữ quyền dư.</td></tr></tbody></table></div>
 <h2 class="h2" id="a10">10. Tài liệu liên kết</h2>

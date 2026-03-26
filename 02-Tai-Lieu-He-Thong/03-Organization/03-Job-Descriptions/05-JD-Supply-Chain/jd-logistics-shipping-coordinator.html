@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Sau khi hàng ship-ready → đặt lịch / ghi nhận/đơn vị vận chuyển/export tài liệu → pack list/điều phối xuất hàng → POD/theo dõi → bàn giao dữ liệu giao hàng cho CS/Finance.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>Hậu cần / Giao vận Điều phối viên chịu trách nhiệm đưa hàng Released rời nhà máy đúng thời điểm, đúng Người nhận, đúng dữ liệu giao vận và có đủ bằng chứng giao nhận. Vị trí này bảo vệ “chặng cuối” của cam kết giao hàng.</p><p>Thành công của vị trí nằm ở sự chính xác và chủ động: chỉ giao khi đủ điều kiện, nhưng khi đủ điều kiện thì phải sổ / đặt, theo dõi và xử lý ngoại lệ rất nhanh.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Lô giao hàng đi đúng lịch, đúng label / phiếu kê đóng gói / theo dõi, không phát sinh sai Người nhận / sai tài liệu / sai số lượng.</li><li>POD và theo dõi được thu hồi / cập nhật đầy đủ, giúp Customer Dịch vụ và Finance đóng vòng đơn hàng-to-tiền mặt.</li><li>Các ngoại lệ vận chuyển được phát hiện sớm và xử lý trước khi biến thành trễ giao hàng nghiêm trọng.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Hậu cần / Giao vận Điều phối viên sở hữu thực thi giao hàng và chứng từ hậu cần; không có quyền phê duyệt giao hàng (ship phát hành) khi thiếu QA/CS phê duyệt và không thay đổi Requests nhãn/pack/khách hàng khi chưa được xác nhận.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Biến pack-ready thành ship-ready đúng chứng từ, đúng label/SSCC, đúng tuyến vận chuyển và đúng điều kiện nhả giữ cuối.</li><li>Không để lô giao hàng rời nhà máy khi part/lot/count/label/pack list/COC không đối soát hoàn chỉnh.</li><li>Là mắt xích cuối cùng kết nối Kho - Quality - Customer Dịch vụ - Finance trong chuỗi giao hàng và thu tiền.</li></ul></div>
+<div class="jd-mission"><p>Hậu cần / Giao vận Điều phối viên chịu trách nhiệm đưa hàng Released rời nhà máy đúng thời điểm, đúng Người nhận, đúng dữ liệu giao vận và có đủ bằng chứng giao nhận. Vị trí này bảo vệ "chặng cuối" của cam kết giao hàng.</p><p>Thành công của vị trí nằm ở sự chính xác và chủ động: chỉ giao khi đủ điều kiện, nhưng khi đủ điều kiện thì phải sổ / đặt, theo dõi và xử lý ngoại lệ rất nhanh.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Lô giao hàng đi đúng lịch, đúng label / phiếu kê đóng gói / theo dõi, không phát sinh sai Người nhận / sai tài liệu / sai số lượng.</li><li>POD và theo dõi được thu hồi / cập nhật đầy đủ, giúp Customer Dịch vụ và Finance đóng vòng đơn hàng-to-tiền mặt.</li><li>Các ngoại lệ vận chuyển được phát hiện sớm và xử lý trước khi biến thành trễ giao hàng nghiêm trọng.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Hậu cần / Giao vận Điều phối viên sở hữu thực thi giao hàng và chứng từ hậu cần; không có quyền phê duyệt giao hàng (ship phát hành) khi thiếu QA/CS phê duyệt và không thay đổi Requests nhãn/pack/khách hàng khi chưa được xác nhận.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Biến pack-ready thành ship-ready đúng chứng từ, đúng label/SSCC, đúng tuyến vận chuyển và đúng điều kiện nhả giữ cuối.</li><li>Không để lô giao hàng rời nhà máy khi part/lot/count/label/pack list/COC không đối soát hoàn chỉnh.</li><li>Là mắt xích cuối cùng kết nối Kho - Quality - Customer Dịch vụ - Finance trong chuỗi giao hàng và thu tiền.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

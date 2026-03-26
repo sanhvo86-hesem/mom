@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>đóng / kết thúc sổ cái → bảng lương xử lý/control → sổ nhật ký kế toán/đối soát → hồ sơ tuân thủ liên quan GL &amp; lương.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>Tổng / Chung sổ cái &amp; Bảng lương Kế toán giữ vai trò “khóa sổ và khóa lương” của doanh nghiệp: bảo đảm số liệu tổng hợp chính xác, bút toán đầy đủ, bảng lương minh bạch và mọi chi phí lao động được phản ánh đúng vào báo cáo quản trị cũng như giá thành.</p><p>Đây là vị trí cần vừa chắc nghiệp vụ kế toán tổng hợp, vừa hiểu nhịp vận hành sản xuất 2 ca để xử lý đúng cut-off, tăng ca, nhân công phân bổ, dồn tích / tích lũy và ảnh hưởng của dữ liệu hiện trường tới tài chính đóng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>tháng-end đóng diễn ra đúng lịch, với các tài khoản trọng yếu được đối chiếu sạch và có hồ sơ hỗ trợ đầy đủ.</li><li>Bảng lương gói hàng chính xác, đủ phê duyệt, phản ánh đúng chuyên cần / điểm danh / OT / dung sai cho phép / khấu trừ và được bảo mật chặt chẽ.</li><li>Chi phí lao động, tăng ca và các điều chỉnh liên quan được phản ánh kịp thời vào job tính giá thành / báo cáo quản trị.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Tổng / Chung sổ cái &amp; Bảng lương Kế toán chịu trách nhiệm độ đúng của sổ cái và xử lý lương theo chính sách đã duyệt; không tự duyệt OT/chính sách C&amp;B và không thay HR quản lý nhân sự.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Khóa số GL và bảng lương trên nền dữ liệu nhân công/OT/dung sai cho phép/trạng thái có thẩm quyền, không “vá” số sau khi kỳ đã qua.</li><li>Mọi giờ công, OT và điều chỉnh lương phải bám log ca, phê duyệt chuỗi và trạng thái thực tế, đặc biệt khi dùng OT như đòn bẩy khôi phục / thu hồi.</li><li>Hỗ trợ lãnh đạo nhìn ra xu hướng nhân công chi phí, OT gánh nặng / chi phí và ảnh hưởng tài chính của bất thường vận hành.</li></ul></div>
+<div class="jd-mission"><p>Tổng / Chung sổ cái &amp; Bảng lương Kế toán giữ vai trò "khóa sổ và khóa lương" của doanh nghiệp: bảo đảm số liệu tổng hợp chính xác, bút toán đầy đủ, bảng lương minh bạch và mọi chi phí lao động được phản ánh đúng vào báo cáo quản trị cũng như giá thành.</p><p>Đây là vị trí cần vừa chắc nghiệp vụ kế toán tổng hợp, vừa hiểu nhịp vận hành sản xuất 2 ca để xử lý đúng cut-off, tăng ca, nhân công phân bổ, dồn tích / tích lũy và ảnh hưởng của dữ liệu hiện trường tới tài chính đóng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>tháng-end đóng diễn ra đúng lịch, với các tài khoản trọng yếu được đối chiếu sạch và có hồ sơ hỗ trợ đầy đủ.</li><li>Bảng lương gói hàng chính xác, đủ phê duyệt, phản ánh đúng chuyên cần / điểm danh / OT / dung sai cho phép / khấu trừ và được bảo mật chặt chẽ.</li><li>Chi phí lao động, tăng ca và các điều chỉnh liên quan được phản ánh kịp thời vào job tính giá thành / báo cáo quản trị.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Tổng / Chung sổ cái &amp; Bảng lương Kế toán chịu trách nhiệm độ đúng của sổ cái và xử lý lương theo chính sách đã duyệt; không tự duyệt OT/chính sách C&amp;B và không thay HR quản lý nhân sự.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Khóa số GL và bảng lương trên nền dữ liệu nhân công/OT/dung sai cho phép/trạng thái có thẩm quyền, không "vá" số sau khi kỳ đã qua.</li><li>Mọi giờ công, OT và điều chỉnh lương phải bám log ca, phê duyệt chuỗi và trạng thái thực tế, đặc biệt khi dùng OT như đòn bẩy khôi phục / thu hồi.</li><li>Hỗ trợ lãnh đạo nhìn ra xu hướng nhân công chi phí, OT gánh nặng / chi phí và ảnh hưởng tài chính của bất thường vận hành.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

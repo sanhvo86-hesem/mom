@@ -65,9 +65,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </p>
 </div>
 <h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
-<div class="card"><ul><li>Trong phân xưởng CNC, lỗi tốn kém nhất xuất phát từ: chạy sai phiên bản, sai chương trình, sai bù trừ (offset)/không / bằng không, vượt qua mẫu đầu.</li><li>Operator không bị đánh giá theo “chạy nhanh”, mà theo “chạy đúng và có bằng chứng”.</li><li>Bám quy trình: <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">PROC-CNC-001 CNC gia công cơ khí thực thi</a> • <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">PROC-CNC-002 Program/Setup Phát hành Control</a>.</li></ul></div>
+<div class="card"><ul><li>Trong phân xưởng CNC, lỗi tốn kém nhất xuất phát từ: chạy sai phiên bản, sai chương trình, sai bù trừ (offset)/không / bằng không, vượt qua mẫu đầu.</li><li>Operator không bị đánh giá theo "chạy nhanh", mà theo "chạy đúng và có bằng chứng".</li><li>Bám quy trình: <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">PROC-CNC-001 CNC gia công cơ khí thực thi</a> • <a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">PROC-CNC-002 Program/Setup Phát hành Control</a>.</li></ul></div>
 <h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
-<p>Mô-đun này bám theo các quy trình nội bộ liên quan và Requests “không có bằng chứng = không qua cổng kiểm soát”. Link tham chiếu: 
+<p>Mô-đun này bám theo các quy trình nội bộ liên quan và Requests "không có bằng chứng = không qua cổng kiểm soát". Link tham chiếu: 
 <a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//02-WI-200//">WI-OPS-001 Quality cổng</a> •
 <a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//">WI-OPS-008 Hồ sơ công việc (hồ sơ công việc) &amp; Bộ bằng chứng</a>.
 </p>
@@ -90,7 +90,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2>6) Fail-nhanh quy tắc (STOP/TẠM GIỮ/CHẶN)</h2>
 <ul><li><span class="badge warn">STOP</span> Khi chương trình không phải bản phát hành trong SSOT hoặc không khớp phiên bản.</li><li><span class="badge warn">TẠM GIỮ</span> Khi mẫu đầu chưa được QC/Trưởng nhóm ký phát hành.</li><li><span class="badge warn">STOP</span> Khi có dấu hiệu sự cố nghiêm trọng rủi ro (dao chạm, kẹp sai, bù trừ (offset) bất hợp lý).</li><li><span class="badge warn">TẠM GIỮ</span> Khi đo ra kích thước chạm giới hạn hoặc lệch chuẩn theo phản ứng plan.</li></ul>
 <h2>7) Phản ứng 60 giây</h2>
-<ol><li>DỪNG máy và giữ nguyên trạng thái (không reset chương trình khi chưa ghi nhận).</li><li>GẮN TẠM GIỮ cho part/WIP; tách khỏi part đạt; chụp màn hình cảnh báo và lưu SSOT.</li><li>BÁO ngay Setup/Trưởng nhóm + QC; ghi log vào Phiếu theo dõi công việc và Thời gian Từng máy Log.</li><li>ĐO lại bằng dụng cụ/đồ gá đo phù hợp theo plan; không đo “ước lượng”.</li><li>KHI xác định sai lệch: mở QC Hold/NCR và thực hiện theo quyết định QA/QC.</li></ol>
+<ol><li>DỪNG máy và giữ nguyên trạng thái (không reset chương trình khi chưa ghi nhận).</li><li>GẮN TẠM GIỮ cho part/WIP; tách khỏi part đạt; chụp màn hình cảnh báo và lưu SSOT.</li><li>BÁO ngay Setup/Trưởng nhóm + QC; ghi log vào Phiếu theo dõi công việc và Thời gian Từng máy Log.</li><li>ĐO lại bằng dụng cụ/đồ gá đo phù hợp theo plan; không đo "ước lượng".</li><li>KHI xác định sai lệch: mở QC Hold/NCR và thực hiện theo quyết định QA/QC.</li></ol>
 <h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
 <div class="table-card">
 <table class="table">

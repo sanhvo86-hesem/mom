@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Sau mài bavia/kiểm tra → làm sạch → clean đóng gói → nhãn/gói hồ sơ → bàn giao Hậu cần/QA ship-ready.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Mission)</h2>
-<div class="jd-mission"><p>Cleaning &amp; Packaging Supervisor sở hữu công đoạn làm sạch, đóng gói và nhận diện cuối cùng trước shipment. Vị trí này bảo đảm part được làm sạch phù hợp, đóng gói đúng quy cách, dán nhãn đúng dữ liệu và bàn giao đúng bảng kiểm, không tạo customer khiếu nại do nhầm lẫn hoặc nhiễm bẩn.</p><p>Đây là công đoạn cuối cùng chạm vào sản phẩm trước khi xuất, vì vậy supervisor phải duy trì kỷ luật line clearance, chống lẫn lộn (mix-up), đối chiếu đóng gói và cleanliness xác minh ở mức rất cao.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Không có sai nhãn, sai PO line, sai qty, sai phiên bản (wrong revision), sai pack method hoặc lẫn part ở công đoạn đóng gói.</li><li>Yêu cầu về clean handling / gowning / ultrasonic cleaning / cleanliness xác minh được thực hiện đúng và có bằng chứng.</li><li>Shipment mức sẵn sàng được xác nhận chủ động theo lịch ship, tránh chậm giờ xuất do pack bảng kiểm hoặc chứng từ chưa đủ.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Vị trí này quản đầu ra làm sạch và đóng gói đúng chuẩn, đúng packet và đúng nhãn; không có quyền bỏ qua cổng kiểm soát chất lượng, thay đổi instruction khách hàng hay tự phê duyệt giao hàng (ship release).</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Làm chủ công đoạn sạch - đóng gói - bảo quản - ship-ready để mỗi kiện hàng rời nhà máy với trạng thái sạch, đúng label, đúng preservation và đúng hồ sơ nhả giữ.</li><li>Đây là cổng kiểm soát cuối của rủi ro nhiễm bẩn, mix lot, label lỗi, thiếu SSCC hoặc thiếu bảo vệ vận chuyển; không được coi là bước “chốt đơn thuần”.</li><li>Điều phối clean slot, environment control, pack material mức sẵn sàng và bàn giao với Warehouse/Logistics/Quality để không tạo rủi ro giao hàng cuối chuỗi.</li></ul></div>
+<div class="jd-mission"><p>Cleaning &amp; Packaging Supervisor sở hữu công đoạn làm sạch, đóng gói và nhận diện cuối cùng trước shipment. Vị trí này bảo đảm part được làm sạch phù hợp, đóng gói đúng quy cách, dán nhãn đúng dữ liệu và bàn giao đúng bảng kiểm, không tạo customer khiếu nại do nhầm lẫn hoặc nhiễm bẩn.</p><p>Đây là công đoạn cuối cùng chạm vào sản phẩm trước khi xuất, vì vậy supervisor phải duy trì kỷ luật line clearance, chống lẫn lộn (mix-up), đối chiếu đóng gói và cleanliness xác minh ở mức rất cao.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Không có sai nhãn, sai PO line, sai qty, sai phiên bản (wrong revision), sai pack method hoặc lẫn part ở công đoạn đóng gói.</li><li>Yêu cầu về clean handling / gowning / ultrasonic cleaning / cleanliness xác minh được thực hiện đúng và có bằng chứng.</li><li>Shipment mức sẵn sàng được xác nhận chủ động theo lịch ship, tránh chậm giờ xuất do pack bảng kiểm hoặc chứng từ chưa đủ.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Vị trí này quản đầu ra làm sạch và đóng gói đúng chuẩn, đúng packet và đúng nhãn; không có quyền bỏ qua cổng kiểm soát chất lượng, thay đổi instruction khách hàng hay tự phê duyệt giao hàng (ship release).</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Làm chủ công đoạn sạch - đóng gói - bảo quản - ship-ready để mỗi kiện hàng rời nhà máy với trạng thái sạch, đúng label, đúng preservation và đúng hồ sơ nhả giữ.</li><li>Đây là cổng kiểm soát cuối của rủi ro nhiễm bẩn, mix lot, label lỗi, thiếu SSCC hoặc thiếu bảo vệ vận chuyển; không được coi là bước "chốt đơn thuần".</li><li>Điều phối clean slot, environment control, pack material mức sẵn sàng và bàn giao với Warehouse/Logistics/Quality để không tạo rủi ro giao hàng cuối chuỗi.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>

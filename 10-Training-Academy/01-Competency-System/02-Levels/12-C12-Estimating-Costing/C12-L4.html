@@ -111,10 +111,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div><strong>Tổ chức ĐƯỢC PHÉP triển khai ABC/năng suất thông qua kế toán và mô hình tối ưu giá theo nút thắt / điểm nghẽn để nâng lợi nhuận.</strong> <span class="iso">ISO 10.3</span></div>
 <p>Áp dụng khi dữ liệu đủ tin cậy; bắt đầu từ thí điểm cell.</p>
 </div>
-</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L4: thiết kế hệ thống tính giá thành cấp công ty – dữ liệu, quản trị, chiến lược định giá.</strong></div><h3>3.1. Ước tính / Định giá trong CNC phân xưởng gia công theo đơn: “báo giá là dự báo có kiểm soát”</h3><p>Ước tính / Định giá không phải đoán. Ước tính / Định giá là <strong>mô hình hóa</strong> công việc để ra quyết định thương mại: có phải nhận job không, nhận với giá nào, cam kết thời gian dẫn nào, rủi ro ở đâu. Trong lệnh sản xuất CNC, sai ước tính xuất phát từ 3 nguồn:</p><ul>
+</div><h2>3. Giáo trình lý thuyết ứng dụng (chuyên sâu)</h2><div class="callout"><strong>Trọng tâm L4: thiết kế hệ thống tính giá thành cấp công ty – dữ liệu, quản trị, chiến lược định giá.</strong></div><h3>3.1. Ước tính / Định giá trong CNC phân xưởng gia công theo đơn: "báo giá là dự báo có kiểm soát"</h3><p>Ước tính / Định giá không phải đoán. Ước tính / Định giá là <strong>mô hình hóa</strong> công việc để ra quyết định thương mại: có phải nhận job không, nhận với giá nào, cam kết thời gian dẫn nào, rủi ro ở đâu. Trong lệnh sản xuất CNC, sai ước tính xuất phát từ 3 nguồn:</p><ul>
 <li><strong>Thiếu dữ liệu đầu vào:</strong> chưa chốt CTQ, chưa chốt hoàn thành/đóng gói/tài liệu.</li>
 <li><strong>Định mức sai:</strong> setup đánh giá thấp, đường chạy dao thực tế khác giả định, đo lường bị bỏ sót.</li>
-<li><strong>Hệ thống tỷ lệ sai:</strong> dùng tỷ lệ “cảm tính” không phản ánh chi phí gián tiếp và tỷ lệ sử dụng.</li>
+<li><strong>Hệ thống tỷ lệ sai:</strong> dùng tỷ lệ "cảm tính" không phản ánh chi phí gián tiếp và tỷ lệ sử dụng.</li>
 </ul><h3>3.2. Cấu trúc giá chuẩn của HESEM</h3><div class="figure">
 <ul>
 <li><strong>NRE/Tooling (one-time):</strong> lập trình, thiết kế/ gia công đồ gá, gage đặc biệt, FAI đánh số balloon.</li>
@@ -122,7 +122,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Điều kiện:</strong> thời gian dẫn định nghĩa, MOQ, hiệu lực, Incoterms, thanh toán, thay đổi policy.</li>
 </ul>
 <div class="cap">Tách NRE giúp minh bạch: mẫu thử (prototype) tốn setup cao nhưng run thấp; sản xuất thì ngược lại.</div>
-</div><h3>3.3. Machine Giờ Tỷ lệ: công thức và bẫy hay gặp</h3><p><strong>Machine Giờ Tỷ lệ (MHR)</strong> là chi phí 1 giờ máy “ bán” (tính phí giờ), không phải 1 giờ đồng hồ. Một cách tính thực dụng:</p><div class="codeblock">
+</div><h3>3.3. Machine Giờ Tỷ lệ: công thức và bẫy hay gặp</h3><p><strong>Machine Giờ Tỷ lệ (MHR)</strong> là chi phí 1 giờ máy " bán" (tính phí giờ), không phải 1 giờ đồng hồ. Một cách tính thực dụng:</p><div class="codeblock">
  MHR = (Chi phí sở hữu máy/năm + bảo trì + điện + khấu hao + phần lao động trực tiếp gắn với máy + chi phí gián tiếp phân bổ)
  / (Giờ máy khả dụng/năm x tỷ lệ sử dụng x Hiệu suất)
  </div><ul>
@@ -133,14 +133,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Rule-of-ngón cái / quy tắc nhanh (L1):</strong> dựa trên lộ trình gia công chuẩn và kinh Nhiệm (vd: khoan/tarô (taro ren) ren) theo số lỗ, phay mặt theo diện tích).</li>
 <li><strong>CAM Mô phỏng (L2):</strong> dùng thời gian mô phỏng đường chạy dao; hiệu chỉnh bởi hệ số thực tế (bước tiến (feed) ghi đè / bỏ qua, tool thay đổi, đo bằng đầu dò).</li>
 <li><strong>lịch sử/tham số (L3):</strong> dùng dữ liệu job tương tự (nhóm sản phẩm) + mô hình tham số (diện tích cắt, khối lượng loại bỏ, số lần setup) để dự báo.</li>
-</ol><p>Người định giá giỏi không chọn 1 phương pháp duy nhất. Họ dùng <strong>tam giác kiểm chứng</strong>: rule-of-ngón cái / quy tắc nhanh ↔ mô phỏng ↔ lịch sử. Khi 3 cái lệch nhau quá lớn, đó là tín hiệu rủi ro.</p><h3>3.5. Tính vật liệu theo tỷ lệ đạt: đừng quên “phần bị mất”</h3><p>Trong CNC, vật liệu không chỉ là “khối phôi”. tỷ lệ đạt bị ảnh hưởng bởi: dung sai cho phép cắt phôi, kẹp giữ, phay mặt, phế phẩm đầu, và lỗi do vật liệu. Công thức Áp dụng: </p><div class="codeblock">Nguyên vật liệu Chi phí = (Giá/kg x Khối lượng phôi) x (1 + Phế phẩm dung sai cho phép)</div><ul>
+</ol><p>Người định giá giỏi không chọn 1 phương pháp duy nhất. Họ dùng <strong>tam giác kiểm chứng</strong>: rule-of-ngón cái / quy tắc nhanh ↔ mô phỏng ↔ lịch sử. Khi 3 cái lệch nhau quá lớn, đó là tín hiệu rủi ro.</p><h3>3.5. Tính vật liệu theo tỷ lệ đạt: đừng quên "phần bị mất"</h3><p>Trong CNC, vật liệu không chỉ là "khối phôi". tỷ lệ đạt bị ảnh hưởng bởi: dung sai cho phép cắt phôi, kẹp giữ, phay mặt, phế phẩm đầu, và lỗi do vật liệu. Công thức Áp dụng: </p><div class="codeblock">Nguyên vật liệu Chi phí = (Giá/kg x Khối lượng phôi) x (1 + Phế phẩm dung sai cho phép)</div><ul>
 <li><strong>Phế phẩm dung sai cho phép</strong> không được dùng theo tiện. Phải dựa trên dữ liệu phế phẩm theo vật liệu/khách/công nghệ.</li>
 <li>Khi khách cung cấp vật liệu, Người định giá vẫn phải tính <em>rủi ro xử lý vật liệu khách</em> (truy xuất nguồn gốc, kích thước phôi, chứng từ).</li>
-</ul><h3>3.6. Dự phòng rủi ro (dự phòng) – dùng có kỷ luật</h3><p>Dự phòng là cần thiết cho job mới, nhưng phải có kỷ luật để chống “độn giá”. HESEM Dùng 3 mức:</p><ul>
+</ul><h3>3.6. Dự phòng rủi ro (dự phòng) – dùng có kỷ luật</h3><p>Dự phòng là cần thiết cho job mới, nhưng phải có kỷ luật để chống "độn giá". HESEM Dùng 3 mức:</p><ul>
 <li><strong>0–3%:</strong> job lặp/đã có dữ liệu.</li>
 <li><strong>3–8%:</strong> job mới nhưng công nghệ quen.</li>
 <li><strong>8–15%:</strong> công nghệ mới/công đoạn đặc biệt/chặt / sát dung sai/khách đánh giá.</li>
-</ul><p>Dự phòng phải được ghi rõ lý do trong ước tính và được duyệt theo thẩm quyền.</p><h3>3.7. Job Tính giá thành &amp; Chênh lệch: biến “đau” thành “dữ liệu học”</h3><p>Một hệ thống job tính giá thành tốt không nhằm “truy lỗi cá nhân” mà nhằm trả lời 3 câu hỏi:</p><ol>
+</ul><p>Dự phòng phải được ghi rõ lý do trong ước tính và được duyệt theo thẩm quyền.</p><h3>3.7. Job Tính giá thành &amp; Chênh lệch: biến "đau" thành "dữ liệu học"</h3><p>Một hệ thống job tính giá thành tốt không nhằm "truy lỗi cá nhân" mà nhằm trả lời 3 câu hỏi:</p><ol>
 <li>Chúng ta dự báo sai ở đâu (setup/run/nguyên vật liệu/QC/thuê ngoài)?</li>
 <li>Nguyên nhân hệ thống là gì (dữ liệu gốc, lộ trình gia công, đào tạo, máy móc, phương pháp)?</li>
 <li>Hành động nào làm giảm sai lệch trong tương lai (cập nhật định mức, cải tiến quy trình, thay đổi báo giá policy)?</li>
@@ -148,11 +148,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><strong>Time chênh lệch / phương sai:</strong> (thực tế giờ − Standard giờ) x Tỷ lệ.</li>
 <li><strong>Nguyên vật liệu chênh lệch / phương sai:</strong> (thực tế nguyên vật liệu chi phí − Standard) + Phế phẩm chi phí.</li>
 <li><strong>Quy trình chênh lệch / phương sai:</strong> thuê ngoài chi phí, tool chi phí, làm lại/phế phẩm, thời gian Từng máy.</li>
-</ul><div class="callout"><strong>Rule:</strong> 80% sai lệch đến từ 20% nguyên nhân lặp. Hãy phân loại job theo “nhóm sản phẩm” để tìm mẫu / quy luật.</div><h3>3.8. hoạt động‑dựa trên Tính giá thành (ABC) ở mức áp dụng cho HESEM</h3><p>ABC không cần phức tạp. Ý tưởng: chi phí gián tiếp phân bổ theo “nguyên nhân / động lực” thực tế. Ví dụ:</p><ul>
+</ul><div class="callout"><strong>Rule:</strong> 80% sai lệch đến từ 20% nguyên nhân lặp. Hãy phân loại job theo "nhóm sản phẩm" để tìm mẫu / quy luật.</div><h3>3.8. hoạt động‑dựa trên Tính giá thành (ABC) ở mức áp dụng cho HESEM</h3><p>ABC không cần phức tạp. Ý tưởng: chi phí gián tiếp phân bổ theo "nguyên nhân / động lực" thực tế. Ví dụ:</p><ul>
 <li>chi phí gián tiếp QA phân bổ theo <strong>số lần kiểm</strong> hoặc <strong>giờ CMM</strong>.</li>
 <li>chi phí gián tiếp setup phân bổ theo <strong>số lần setup</strong>.</li>
 <li>chi phí gián tiếp kỹ thuật phân bổ theo <strong>số giờ lập trình/DFM</strong>.</li>
-</ul><p>ABC giúp tránh tình trạng: job đơn giản bị đội giá, job phức tạp bị dưới-báo giá.</p><h3>3.9. định giá theo năng lực &amp; nút thắt / điểm nghẽn: tư duy chiến lược</h3><p>Khi phân xưởng có “nút thắt” (máy 5-trục/CMM), giá không thể chỉ dựa trên chi phí-cộng thêm. Cần thêm yếu tố:</p><ul>
+</ul><p>ABC giúp tránh tình trạng: job đơn giản bị đội giá, job phức tạp bị dưới-báo giá.</p><h3>3.9. định giá theo năng lực &amp; nút thắt / điểm nghẽn: tư duy chiến lược</h3><p>Khi phân xưởng có "nút thắt" (máy 5-trục/CMM), giá không thể chỉ dựa trên chi phí-cộng thêm. Cần thêm yếu tố:</p><ul>
 <li><strong>Công suất-dựa trên định giá:</strong> job chiếm nút thắt / điểm nghẽn giờ cao phải có phí bảo hiểm / cao cấp hoặc phải chọn lọc.</li>
 <li><strong>Value-dựa trên:</strong> khi HESEM giúp khách rút thời gian dẫn hoặc giảm rủi ro, giá trị đó phản ánh vào giá.</li>
 <li><strong>danh mục:</strong> cân bằng job biên lợi nhuận cao vs job ổn định để tối ưu dòng tiền.</li>
@@ -234,7 +234,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p>Sau sản xuất: lấy thực tế, phân tích chênh lệch / phương sai, cập nhật định mức/lộ trình gia công thư viện.</p>
 </div>
 </div>
-</div><h2>5. KPI/Chỉ số áp dụng theo Level (có công thức + nguồn dữ liệu)</h2><p class="small">Bảng dưới dùng để “định lượng” năng lực. Target là quy định: khi áp dụng thực tế, HESEM hiệu chỉnh theo mốc chuẩn và chiến lược năm. <strong>Kiểm soát cổng</strong> là điều kiện bắt buộc (vi phạm → không công nhận Level/thưởng dù điểm bài kiểm tra cao).</p><table class="table">
+</div><h2>5. KPI/Chỉ số áp dụng theo Level (có công thức + nguồn dữ liệu)</h2><p class="small">Bảng dưới dùng để "định lượng" năng lực. Target là quy định: khi áp dụng thực tế, HESEM hiệu chỉnh theo mốc chuẩn và chiến lược năm. <strong>Kiểm soát cổng</strong> là điều kiện bắt buộc (vi phạm → không công nhận Level/thưởng dù điểm bài kiểm tra cao).</p><table class="table">
 <thead>
 <tr>
 <th>Chỉ số/KPI</th>
@@ -330,7 +330,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong>Kiểm soát cổng bắt buộc để công nhận Level 4:</strong>
 <ul><li>Thiếu dòng chi phí bắt buộc hoặc dùng tỷ lệ không đúng policy.</li><li>Sửa số liệu ước tính sau khi đã có thực tế để 'đẹp' (vi phạm đạo đức dữ liệu).</li><li>dưới-báo giá gây lỗ do không kiểm soát rủi ro/giả định.</li></ul>
 <p class="small">Kiểm soát cổng ưu tiên: an toàn → chất lượng → tuân thủ hồ sơ → đạo đức dữ liệu. Vi phạm kiểm soát cổng có nguy cơ dẫn tới không công nhận Level/thưởng.</p>
-</div><h2>6. Bài tập theo Level (Nghiên cứu tình huống HESEM)</h2><p class="small">Mỗi tình huống được thiết kế theo “học thuật ứng dụng”: có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (bằng chứng) để chấm. chuẩn làm theo nhóm và rà soát chéo để tăng chất lượng tư duy.</p><div class="card">
+</div><h2>6. Bài tập theo Level (Nghiên cứu tình huống HESEM)</h2><p class="small">Mỗi tình huống được thiết kế theo "học thuật ứng dụng": có dữ liệu, có nhiệm vụ, có sản phẩm đầu ra (bằng chứng) để chấm. chuẩn làm theo nhóm và rà soát chéo để tăng chất lượng tư duy.</p><div class="card">
 <h3>Tình huống 1: Thiết kế policy định giá &amp; phê duyệt cho toàn công ty</h3>
 <p class="small">HESEM muốn thống nhất: ai được quyền giảm giá, khi nào cần Quản lý Bảng duyệt, và cách ghi nhận chiết khấu để phân tích.</p>
 <div class="cols-2">
@@ -384,7 +384,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul><li>Báo cáo phân tích</li><li>Acceptance tiêu chí</li><li>KPI plan</li></ul>
 <div class="callout"><strong>Tiêu chí chấm điểm:</strong> Điểm cao khi đưa ra vừa chiến lược vừa vận hành được (không lý thuyết suông).
  </div>
-</div><h2>7. OJT theo TWI (Job Sự cố hỏng máy + bảng kiểm)</h2><p class="small">TWI (Training Within Ngành công nghiệp) nhấn mạnh: <strong>chia nhỏ công việc</strong> → <strong>điểm then chốt</strong> → <strong>lý do</strong>. OJT của HESEM phải tạo được “thói quen đúng” và bằng chứng (hồ sơ) để sẵn sàng đánh giá.</p><h3>7.1. Job Sự cố hỏng máy Sheet (mẫu)</h3><table class="table">
+</div><h2>7. OJT theo TWI (Job Sự cố hỏng máy + bảng kiểm)</h2><p class="small">TWI (Training Within Ngành công nghiệp) nhấn mạnh: <strong>chia nhỏ công việc</strong> → <strong>điểm then chốt</strong> → <strong>lý do</strong>. OJT của HESEM phải tạo được "thói quen đúng" và bằng chứng (hồ sơ) để sẵn sàng đánh giá.</p><h3>7.1. Job Sự cố hỏng máy Sheet (mẫu)</h3><table class="table">
 <thead><tr><th>Bước</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead>
 <tbody>
 <tr>
@@ -450,7 +450,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>□ Đạt □ Chưa</td>
 <td>…</td>
 </tr>
-</tbody></table><h2>8. Kiểm tra đánh giá (bản thiết kế kiểm thử (test bản thiết kế) + bài kiểm tra nhanh mẫu)</h2><h3>8.1. Test bản thiết kế</h3><p class="small">Bản thiết kế đảm bảo đề thi đo đúng năng lực: không chỉ hỏi “biết gì” mà hỏi “làm được gì” và “ra quyết định thế nào” trong bối cảnh HESEM.</p><table class="table">
+</tbody></table><h2>8. Kiểm tra đánh giá (bản thiết kế kiểm thử (test bản thiết kế) + bài kiểm tra nhanh mẫu)</h2><h3>8.1. Test bản thiết kế</h3><p class="small">Bản thiết kế đảm bảo đề thi đo đúng năng lực: không chỉ hỏi "biết gì" mà hỏi "làm được gì" và "ra quyết định thế nào" trong bối cảnh HESEM.</p><table class="table">
 <thead><tr><th>Miền năng lực</th><th>Tỷ trọng</th><th>Mức nhận thức</th><th>Dạng câu hỏi</th><th>Số câu áp dụng</th></tr></thead>
 <tbody>
 <tr>
@@ -494,7 +494,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Đưa ra cơ chế rà soát định kỳ MHR và tỷ lệ sử dụng. Ai tham gia? Data nào dùng?</li>
 <li>Viết 1 đoạn policy (ISO ngôn ngữ) về kiểm soát thay đổi chi phí mô hình.</li>
 </ol>
-</div><h2>9. Tiêu chí đánh giá chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Tiêu chí đánh giá giúp chấm công bằng và chống “cảm tính”. chuẩn chấm bởi 2 Người (Dòng / Chuyền Manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
+</div><h2>9. Tiêu chí đánh giá chấm điểm &amp; tiêu chuẩn công nhận Level</h2><p class="small">Tiêu chí đánh giá giúp chấm công bằng và chống "cảm tính". chuẩn chấm bởi 2 Người (Dòng / Chuyền Manager + QA/HRD) với bằng chứng kèm theo.</p><table class="table rubric">
 <thead><tr><th>Tiêu chí</th><th>0 – Không đạt</th><th>1 – Đạt tối thiểu</th><th>2 – Tốt</th><th>3 – Xuất sắc</th></tr></thead>
 <tbody>
 <tr>

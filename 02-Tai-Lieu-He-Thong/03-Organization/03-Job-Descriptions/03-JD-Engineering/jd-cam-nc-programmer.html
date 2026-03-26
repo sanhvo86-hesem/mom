@@ -14,7 +14,7 @@ td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
 .raci-R {background:#e7f5ff; color:#1864ab;}
 .raci-C {background:#fff9db; color:#e67700;}
 .raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr); gap:16px;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
 .portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
 .portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
 .doc-link-list {list-style:none; margin:0; padding:0;}
@@ -29,7 +29,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
 .jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
 .jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin:10px 0 16px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
 .backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
 .muted-note{font-size:12px; color:var(--ink2,#475569);}
@@ -38,7 +38,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .raci-r{background:#e0f2fe; color:#0369a1;}
 .raci-c{background:#f3e8ff; color:#7e22ce;}
 .raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr); gap:12px; margin-top:10px;}
+.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
 .comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
 .comp-card ul{margin-bottom:0;}
 .require-table th{width:24%;}
@@ -100,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Sau DFM/quy trình phát hành → lập trình CAM/NC → mô phỏng/xác minh → phát hành chương trình có phiên bản → hỗ trợ chứng minh-out.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>CAM/NC Lập trình viên (CNC) chịu trách nhiệm phát hành chương trình gia công đúng phiên bản, an toàn và có khả năng lặp lại trên các hệ máy được phân công. Đây là vị trí bảo vệ “ngôn ngữ máy” của công ty.</p><p>Vị trí này phải khóa chắc phiên bản, mô phỏng, ghi sổ / đăng-Người xử lý, phát hành chương trình (program phát hành) pack và logic backup; tuyệt đối không để chương trình chưa xác minh hoặc chương trình lỗi thời lọt xuống phân xưởng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>NC program phát hành sạch lỗi logic cơ bản, có mô phỏng / rà soát đồng cấp phù hợp và đủ thông tin để setup dùng an toàn.</li><li>Phiên bản control của chương trình được bảo vệ chặt; khi có sửa đổi đều truy được ai sửa, sửa gì, vì sao.</li><li>Phản ứng với lỗi hiện trường nhanh và có kỷ luật kiểm soát thay đổi, không “vá file” thiếu kiểm soát.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> CAM/NC Lập trình viên (CNC) sở hữu độ đúng và tính kiểm soát của NC program; không thay Quy trình Engineer trong định nghĩa phương pháp, không thay mặt bằng xưởng trong điều độ và không cho phép sửa code vô kiểm soát tại máy.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Phát hành NC gói hàng an toàn, đúng phiên bản, đúng nhóm máy (machine nhóm sản phẩm)/ghi sổ / đăng-Người xử lý và đủ bằng chứng chứng minh-out để Setup/Operator chạy ổn định.</li><li>Mọi thay đổi program phải là được kiểm soát thay đổi; PHẢI giữ mọi thay đổi program trong được kiểm soát thay đổi, không “sửa tay ở máy” không dấu vết hoặc dùng file cũ vì tiện.</li><li>Hỗ trợ giải quyết bất thường bằng logic chương trình, chiến lược cắt và khởi động lại an toàn, không đẩy hết trách nhiệm cho vận hành.</li></ul></div>
+<div class="jd-mission"><p>CAM/NC Lập trình viên (CNC) chịu trách nhiệm phát hành chương trình gia công đúng phiên bản, an toàn và có khả năng lặp lại trên các hệ máy được phân công. Đây là vị trí bảo vệ "ngôn ngữ máy" của công ty.</p><p>Vị trí này phải khóa chắc phiên bản, mô phỏng, ghi sổ / đăng-Người xử lý, phát hành chương trình (program phát hành) pack và logic backup; tuyệt đối không để chương trình chưa xác minh hoặc chương trình lỗi thời lọt xuống phân xưởng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>NC program phát hành sạch lỗi logic cơ bản, có mô phỏng / rà soát đồng cấp phù hợp và đủ thông tin để setup dùng an toàn.</li><li>Phiên bản control của chương trình được bảo vệ chặt; khi có sửa đổi đều truy được ai sửa, sửa gì, vì sao.</li><li>Phản ứng với lỗi hiện trường nhanh và có kỷ luật kiểm soát thay đổi, không "vá file" thiếu kiểm soát.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> CAM/NC Lập trình viên (CNC) sở hữu độ đúng và tính kiểm soát của NC program; không thay Quy trình Engineer trong định nghĩa phương pháp, không thay mặt bằng xưởng trong điều độ và không cho phép sửa code vô kiểm soát tại máy.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Phát hành NC gói hàng an toàn, đúng phiên bản, đúng nhóm máy (machine nhóm sản phẩm)/ghi sổ / đăng-Người xử lý và đủ bằng chứng chứng minh-out để Setup/Operator chạy ổn định.</li><li>Mọi thay đổi program phải là được kiểm soát thay đổi; PHẢI giữ mọi thay đổi program trong được kiểm soát thay đổi, không "sửa tay ở máy" không dấu vết hoặc dùng file cũ vì tiện.</li><li>Hỗ trợ giải quyết bất thường bằng logic chương trình, chiến lược cắt và khởi động lại an toàn, không đẩy hết trách nhiệm cho vận hành.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
@@ -136,7 +136,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <p class="inline-note">Mọi thay đổi ảnh hưởng chất lượng, giao hàng, chi phí, phiên bản, phát hành hoặc truy vết phải tuân theo quy trình/hồ sơ liên kết tại Mục 12.</p>
 <h2 class="h2">5. Quyền hạn (Thẩm quyền &amp; quyền ra quyết định (quyền)</h2>
 <div class="auth-grid">
-<div class="auth-item">Không phát hành chương trình khi mô hình / drawing / phiên bản / setup giả định chưa rõ hoặc mô phỏng chưa đạt.</div><div class="auth-item">Từ chối Requests “sửa nhanh” tại máy nếu không có log thay đổi và kỷ luật phiên bản phù hợp.</div><div class="auth-item">Yêu cầu rà soát đồng cấp hoặc thử Nhiệm bổ sung đối với job có rủi ro va chạm / sai hình học cao.</div><div class="auth-item">Thu hồi hoặc khóa file không còn hiệu lực ngay khi có thay đổi đã phê duyệt.</div>
+<div class="auth-item">Không phát hành chương trình khi mô hình / drawing / phiên bản / setup giả định chưa rõ hoặc mô phỏng chưa đạt.</div><div class="auth-item">Từ chối Requests "sửa nhanh" tại máy nếu không có log thay đổi và kỷ luật phiên bản phù hợp.</div><div class="auth-item">Yêu cầu rà soát đồng cấp hoặc thử Nhiệm bổ sung đối với job có rủi ro va chạm / sai hình học cao.</div><div class="auth-item">Thu hồi hoặc khóa file không còn hiệu lực ngay khi có thay đổi đã phê duyệt.</div>
 <div class="auth-item">Có quyền chặn sử dụng NC gói hàng không đúng phiên bản/ghi sổ / đăng-Người xử lý hoặc Requests chứng minh-out/re-phê duyệt khi program thay đổi ảnh hưởng đường chạy, khởi động lại hoặc bề mặt/CTQ.</div></div>
 <h2 class="h2">6. Interfaces liên phòng ban — RACI / Bàn giao</h2>
 <div class="table-card">
