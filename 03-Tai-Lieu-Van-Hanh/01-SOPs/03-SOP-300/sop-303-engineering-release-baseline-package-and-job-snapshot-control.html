@@ -130,7 +130,23 @@ td,th{}
 <tr><td>Wrong-revision / snapshot mismatch</td><td>Số sự cố điểm sử dụng dùng sai package</td><td>LPA / đánh giá / incident nhật ký</td><td>Tháng</td><td>QMS / Engineering</td><td>0</td></tr>
 <tr><td>Snapshot release thời gian giao</td><td>Từ lúc Kế hoạch yêu cầu đến lúc snapshot G4 pass</td><td>FRM-501 + snapshot vấn đề nhật ký</td><td>Tuần</td><td>Kế hoạch + CAM</td><td>Theo segment job</td></tr>
 <tr><td>Obsolete sweep đóng sự kiện</td><td>Tỷ lệ thay thế có kiểm soát có đủ withdrawal confirmation trong 1 ca</td><td>FRM-307</td><td>Tháng</td><td>QMS/DC</td><td>100%</td></tr>
-<tr><td>Missing-quality-package hold</td><td>Số lần snapshot bị hold do thiếu control plan/FAI/IPR/CMM release</td><td>Snapshot nhật ký</td><td>Tháng</td><td>Engineering + QA</td><td>Giảm dần về 0</td></tr></tbody></table></div><h2 class="h2" id="p7">7. Quy trình chi tiết</h2><div class="step-band"><span>Part/Rev master</span><span>Build baseline</span><span>QA rà soát</span><span>Approve baseline</span><span>Build snapshot</span><span>Vấn đề to điểm sử dụng</span><span>Supersede / withdraw</span><span>Revalidate if changed</span></div><h3 class="h3">7.1 Khung package completeness</h3><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:34%"/><col style="width:20%"/><col style="width:30%"/></colgroup><thead><tr><th>Nhóm nội dung</th><th>Gói chuẩn phải có gì</th><th>Khi nào bắt buộc</th><th>Bên sử dụng công đoạn sau</th></tr></thead><tbody><tr><td>Core technical set</td><td>Drawing PDF; model 3D nếu có; spec/customer notes; part/rev metadata</td><td>100% part/rev</td><td>Engineering / QA / Production / Planning</td></tr>
+<tr><td>Missing-quality-package hold</td><td>Số lần snapshot bị hold do thiếu control plan/FAI/IPR/CMM release</td><td>Snapshot nhật ký</td><td>Tháng</td><td>Engineering + QA</td><td>Giảm dần về 0</td></tr></tbody></table></div><h2 class="h2" id="p7">7. Quy trình chi tiết</h2><div class="flowchart">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Part/Rev master</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-title">Build baseline</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-title">QA rà soát</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-title">Approve baseline</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">Build snapshot</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">6</div><div class="flow-title">Vấn đề to điểm sử dụng</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">7</div><div class="flow-title">Supersede / withdraw</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">8</div><div class="flow-title">Revalidate if changed</div></div>
+</div><h3 class="h3">7.1 Khung package completeness</h3><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:34%"/><col style="width:20%"/><col style="width:30%"/></colgroup><thead><tr><th>Nhóm nội dung</th><th>Gói chuẩn phải có gì</th><th>Khi nào bắt buộc</th><th>Bên sử dụng công đoạn sau</th></tr></thead><tbody><tr><td>Core technical set</td><td>Drawing PDF; model 3D nếu có; spec/customer notes; part/rev metadata</td><td>100% part/rev</td><td>Engineering / QA / Production / Planning</td></tr>
 <tr><td>Quy trình definition</td><td>Route kỹ thuật, nhóm máy, setup logic, fixture/tooling concept</td><td>100% lệnh sản xuất</td><td>Planning / CAM / Setup</td></tr>
 <tr><td>Gói chất lượng</td><td>CTQ list; control plan; PFMEA-lite; FAI trigger; kiểm tra concept</td><td>Theo QPL/risk class</td><td>Quality / Kế hoạch / Setup</td></tr>
 <tr><td>Measurement package</td><td>FRM-305 / phát hành chương trình kiểm tra; CMM mã chương trình/Rev; gage notes</td><td>Khi dùng CMM/auto kiểm tra hoặc CTQ đặc biệt</td><td>QC / CMM</td></tr>
