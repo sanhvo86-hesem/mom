@@ -102,52 +102,133 @@ td,th{}
 <colgroup><col class="col-ig"/><col class="col-desc"/><col class="col-owner"/><col class="col-hold"/><col class="col-kpi"/></colgroup>
 <thead><tr><th>IG</th><th>Mô tả</th><th>Chủ trì</th><th>Điểm dừng</th><th>KPI chính</th></tr></thead>
 <tbody>
-<tr><td class="ig-center"><span class="step-tag">IG1</span></td><td><b>Nhận diện tri thức trọng yếu</b><br>Xác định tri thức nào ảnh hưởng trực tiếp CTQ, thời gian dẫn (lead time), độ lặp lại, an toàn dữ liệu hoặc năng lực khách hàng.</td><td></td><td></td><td></td></tr>
-<tr><td class="ig-center"><span class="step-tag">IG2</span></td><td><b>Thu thập và chuẩn hóa</b><br>Ghi nhận bài học kinh Nhiệm, tốt nhất thực hành, vàng / chuẩn setup, xử lý sự cố và điều kiện áp dụng bằng biểu mẫu/log chuẩn.</td><td></td><td></td><td></td></tr>
-<tr><td class="ig-center"><span class="step-tag">IG3</span></td><td><b>Xác thực và quyết định hình thức sử dụng</b><br>Đánh giá tri thức sẽ ở dạng kiến thức note, đào tạo nội dung, WI, SOP cập nhật hay kế hoạch kiểm soát cập nhật.</td><td></td><td></td><td></td></tr>
-<tr><td class="ig-center"><span class="step-tag">IG4</span></td><td><b>Triển khai, đào tạo và chuyển giao</b><br>Chia sẻ tri thức tới Người cần dùng, đưa vào đào tạo/chứng nhận và hoàn tất bàn giao khi đổi Người.</td><td></td><td></td><td></td></tr>
-<tr><td class="ig-center"><span class="step-tag">IG5</span></td><td><b>Rà hiệu lực và làm sạch kho tri thức</b><br>Loại bỏ tri thức lỗi thời, hợp nhất trùng lặp và kiểm tra tri thức đang được dùng có còn đúng thực tế hay không.</td><td></td><td></td><td></td></tr>
-</tbody></table></div><div class="metric-grid"><div class="metric-card"><div class="value">100%</div><div class="label">Vai trò quan trọng / nghiêm trọng có bàn giao pack</div><div class="mini-note">Không để tri thức đơn điểm đi theo Người rời vị trí.</div></div><div class="metric-card"><div class="value">≤5 ngày</div><div class="label">Đăng bài học trọng yếu</div><div class="mini-note">Bài học từ sự kiện quan trọng phải được ghi nhận sớm.</div></div><div class="metric-card"><div class="value">100%</div><div class="label">Kiến thức item có Responsible Person</div><div class="mini-note">Mọi tri thức phải có Người chịu trách nhiệm nội dung.</div></div><div class="metric-card"><div class="value">0</div><div class="label">Kiến thức tổn thất</div><div class="mini-note">Không để mất tri thức khi nghỉ việc hoặc chuyển vị trí.</div></div></div>
-
+<tr>
+<td class="ig-center"><span class="step-tag">IG1</span></td>
+<td><b>Thu thập tri thức</b><br>Thu thập lessons learned, best practices, golden setup, xử lý sự cố và kinh nghiệm vận hành từ NCR/CAPA, project close-out, khách hàng phản hồi, bàn giao ca và PM/breakdown. Ghi nhận vào <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-151_Lessons_Learned_Register.xlsx">FRM-151</a> với đầy đủ bối cảnh, điều kiện áp dụng và cảnh báo.</td>
+<td>QMS Engineer + Dept Leads</td>
+<td>KHÔNG đóng sự kiện (NCR/CAPA/project) nếu chưa xác nhận có/không có bài học cần ghi nhận. Mọi tri thức phải có chủ sở hữu nội dung và phạm vi áp dụng rõ ràng.</td>
+<td>100% sự kiện trọng yếu có đánh giá tri thức trong ≤ 5 ngày. ≥ 2 lessons learned/tháng từ hiện trường CNC.</td>
+</tr>
+<tr>
+<td class="ig-center"><span class="step-tag">IG2</span></td>
+<td><b>Phân loại &amp; lưu trữ</b><br>Chuẩn hóa tri thức đã thu thập vào knowledge base (M365/SharePoint) theo danh mục: máy, quy trình, vật liệu, khách hàng, loại sự cố. Đảm bảo SSOT — mỗi tri thức chỉ có một nơi lưu chính thức duy nhất, có metadata đầy đủ (owner, scope, review date, liên kết SOP/WI).</td>
+<td>QMS Engineer + IT</td>
+<td>KHÔNG lưu tri thức ở chat cá nhân, email rời hoặc file cục bộ. KHÔNG tạo bản sao tri thức ngoài knowledge base đã chỉ định. Mọi item phải có Responsible Person và ngày rà soát tiếp theo.</td>
+<td>100% knowledge item có owner và nơi lưu chuẩn. 0 tri thức trọng yếu nằm ngoài SSOT.</td>
+</tr>
+<tr>
+<td class="ig-center"><span class="step-tag">IG3</span></td>
+<td><b>Chia sẻ &amp; đào tạo</b><br>Chuyển tri thức tới người cần dùng qua đào tạo chính thức (<a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-801_Training_Plan.xlsx">FRM-801</a>), OJT tại máy CNC, huddle đầu ca, training academy và bàn giao pack khi đổi người. Kiểm chứng người nhận hiểu đúng điều kiện áp dụng và điểm chặn.</td>
+<td>HR + Training Lead</td>
+<td>KHÔNG ký hoàn tất đào tạo nếu người học chưa demo được cách áp dụng tri thức tại hiện trường. KHÔNG phổ biến tri thức chưa qua xác thực kỹ thuật (IG2).</td>
+<td>100% tri thức trọng yếu mới có kế hoạch đào tạo trong ≤ 10 ngày. ≥ 90% nhân sự liên quan hoàn tất đào tạo đúng hạn.</td>
+</tr>
+<tr>
+<td class="ig-center"><span class="step-tag">IG4</span></td>
+<td><b>Áp dụng vào vận hành</b><br>Cập nhật SOP/WI/Control Plan/Setup Sheet/Traveler khi tri thức mới thay đổi cách làm chuẩn. Thực hiện theo <a href="sop-101-document-and-data-control.html">SOP-101</a> để phát hành tài liệu chính thức. Triển khai tại point-of-use và xác nhận end-user tiếp nhận.</td>
+<td>Department Leads</td>
+<td>KHÔNG giữ bài học ở dạng note/tham khảo nếu nội dung đó thay đổi cách vận hành — PHẢI cập nhật tài liệu kiểm soát. KHÔNG chạy job theo tri thức mới nếu SOP/WI chưa được cập nhật chính thức.</td>
+<td>100% bài học thay đổi vận hành được cập nhật vào SOP/WI trong ≤ 15 ngày. 0 trường hợp dùng tri thức mới mà SOP/WI chưa phản ánh.</td>
+</tr>
+<tr>
+<td class="ig-center"><span class="step-tag">IG5</span></td>
+<td><b>Rà soát hiệu quả &amp; bảo tồn</b><br>Rà định kỳ (≤ 12 tháng) tính hiệu lực của tri thức: còn đúng thực tế không, có trùng lặp không, owner còn tại vị không. Ngăn mất tri thức khi nhân sự nghỉ/chuyển — kích hoạt bàn giao pack bắt buộc. Archive hoặc hủy item lỗi thời theo <a href="sop-101-document-and-data-control.html">SOP-101</a>.</td>
+<td>Management + QMS</td>
+<td>KHÔNG để item quá 12 tháng chưa rà soát vẫn ở trạng thái active. KHÔNG ký hoàn tất thôi việc/chuyển vị trí nếu bàn giao tri thức chưa xong. KHÔNG hủy item đang có legal hold hoặc NCR/CAPA mở.</td>
+<td>100% vai trò trọng yếu nghỉ/chuyển có bàn giao pack hoàn tất. 0 tri thức đơn điểm (chỉ 1 người biết). 100% item được rà soát đúng chu kỳ.</td>
+</tr>
+</tbody></table></div>
 <div class="metric-grid">
-<div class="metric-card"><div class="value">&lt; 5 ngày</div><div class="label">Tạo bài học kinh Nhiệm sau NCR/sự cố hỏng máy trọng yếu</div></div>
-<div class="metric-card"><div class="value">100%</div><div class="label">Vàng / Chuẩn (Golden) job có Responsible Person và phạm vi áp dụng</div></div>
-<div class="metric-card"><div class="value">0</div><div class="label">Tri thức quan trọng chỉ nằm ở một cá nhân</div></div>
-<div class="metric-card"><div class="value">100%</div><div class="label">Bài học đã cập nhật lại SOP/WI/ANNEX khi cần</div></div>
-</div>
-<div class="gate-grid">
-<div class="gate-card"><h3>Cổng kiểm soát (gate) KM-01 — Đủ bằng chứng để chuẩn hóa</h3><p>Không được đẩy kinh Nhiệm cá nhân thành chuẩn nếu chưa có bằng chứng lặp lại, Người xác nhận và điều kiện áp dụng.</p></div>
-<div class="gate-card"><h3>Cổng kiểm soát KM-02 — Chống quá hạn</h3><p>Tri thức quá 12 tháng chưa rà lại phải được rà soát; tri thức gắn với machine/phần mềm/khách hàng thay đổi phải rà soát ngay khi có thay đổi.</p></div>
-<div class="gate-card"><h3>Cổng kiểm soát KM-03 — Chuyển giao bắt buộc</h3><p>Vị trí trọng yếu nghỉ việc/chuyển vai trò phải có bàn giao tri thức tối thiểu trước khi giải phóng vai trò.</p></div>
+<div class="metric-card"><div class="value">≤ 5 ngày</div><div class="label">Ghi nhận bài học sau NCR/sự cố trọng yếu</div><div class="mini-note">Bài học từ sự kiện quan trọng phải được log vào FRM-151 sớm nhất có thể.</div></div>
+<div class="metric-card"><div class="value">100%</div><div class="label">Knowledge item có owner &amp; SSOT</div><div class="mini-note">Mọi tri thức phải có người chịu trách nhiệm nội dung và nơi lưu chính thức duy nhất.</div></div>
+<div class="metric-card"><div class="value">0</div><div class="label">Tri thức đơn điểm (single-point knowledge)</div><div class="mini-note">Không để tri thức trọng yếu chỉ nằm ở một cá nhân duy nhất.</div></div>
+<div class="metric-card"><div class="value">100%</div><div class="label">Bàn giao pack khi nghỉ/chuyển vị trí</div><div class="mini-note">Vai trò trọng yếu phải hoàn tất bàn giao tri thức trước khi giải phóng.</div></div>
+<div class="metric-card"><div class="value">100%</div><div class="label">Bài học → cập nhật SOP/WI khi cần</div><div class="mini-note">Bài học thay đổi cách vận hành phải được phản ánh vào tài liệu kiểm soát.</div></div>
+<div class="metric-card"><div class="value">≤ 12 tháng</div><div class="label">Chu kỳ rà soát knowledge base</div><div class="mini-note">Mọi item phải được rà tính hiệu lực ít nhất mỗi 12 tháng.</div></div>
 </div>
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2><div class="flowchart">
   <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</div><div class="flow-text"><div class="flow-title">Thu thập tri thức</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</div><div class="flow-text"><div class="flow-title">Phân loại / lưu trữ</div></div></div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</div><div class="flow-text"><div class="flow-title">Phân loại &amp; chuẩn hóa</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</div><div class="flow-text"><div class="flow-title">Chia sẻ / đào tạo</div></div></div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</div><div class="flow-text"><div class="flow-title">Tích hợp SOP/WI/Training</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</div><div class="flow-text"><div class="flow-title">Áp dụng vào vận hành</div></div></div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</div><div class="flow-text"><div class="flow-title">Chia sẻ &amp; đào tạo</div></div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</div><div class="flow-text"><div class="flow-title">Rà soát hiệu quả</div></div></div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</div><div class="flow-text"><div class="flow-title">Đo lường hiệu quả</div></div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">6</div><div class="flow-text"><div class="flow-title">Bảo tồn tri thức</div></div></div>
 </div>
-<h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">2</span> Nhận diện tri thức trọng yếu và lỗ hổng tri thức</h3><p>Department phải biết tri thức nào nếu mất đi sẽ làm tăng lỗi, tăng thời gian dẫn, tăng phụ thuộc cá nhân hoặc ảnh hưởng khả năng phản ứng với khách hàng.</p><ul class="tight"><li>Lập danh mục tri thức trọng yếu theo quy trình, nhóm máy (machine nhóm sản phẩm), khách hàng, loại vật liệu, phương pháp đo và hệ thống dữ liệu.</li><li>Đánh dấu tri thức nằm ở một Người, một ca hoặc một máy như điểm rủi ro cần ưu tiên thu thập.</li><li>Rà từ NCR/CAPA, khiếu nại, setup chậm trễ, lập trình làm lại, machine sự cố dừng máy, clean đóng gói vấn đề và công đoạn đặc biệt thiếu / bỏ sót.</li><li>Gắn Responsible Person cho từng nhóm tri thức và chốt nơi lưu chuẩn.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không kết thúc rà soát nếu chưa xác định được tri thức của các vai trò đơn điểm hoặc công nghệ mới.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> Lead Department bàn giao danh mục tri thức ưu tiên cho SME và QMS Engineer.</div><h3><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</span> Thu thập bài học, tốt nhất thực hành và xử lý sự cố</h3><p>Thu thập phải biến kinh Nhiệm cá nhân thành nội dung Người khác có thể hiểu và làm theo.</p><ul class="tight"><li>Dùng <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-151_Lessons_Learned_Register.xlsx">FRM-151</a> để ghi sự kiện, bối cảnh, nguyên nhân, cách xử lý, điều kiện áp dụng và cảnh báo không dùng sai.</li><li>Tạo kiến thức item theo mẫu: hiện tượng, điều kiện xảy ra, dữ liệu nhận biết, hành động đúng, điểm chặn, Người cần biết.</li><li>Đối với vàng / chuẩn setup và xử lý sự cố, phải ghi máy, tool, vật liệu, part nhóm sản phẩm, phiên bản, CTQ và các điều kiện đặc biệt.</li><li>Nếu dùng AI để hỗ trợ soạn nháp, Responsible Person phải rà toàn bộ nội dung trước khi lưu vào hệ thống.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Kiến thức item phải nêu rõ bối cảnh và điều kiện áp dụng; không lưu mô tả chung chung.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> SME gửi kiến thức item cho Lead Department và QMS Engineer xác thực.</div><h3><span class="proc-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</span> Xác thực và chọn hình thức phát hành phù hợp</h3><p>Không phải tri thức nào cũng ở dạng SOP; nhưng tri thức quan trọng phải có nơi sống chính thức.</p><ul class="tight"><li>Phân loại tri thức thành note tham khảo, đào tạo nội dung, bảng kiểm, WI, SOP cập nhật hoặc kế hoạch kiểm soát cập nhật.</li><li>Kiểm tra tri thức có mâu thuẫn với SOP/WI/FORM hiện hành hay không; nếu có phải xử lý theo <a href="sop-101-document-and-data-control.html">SOP-101</a>.</li><li>Đánh giá giá trị phổ quát: chỉ dùng trong một job, một khách hàng hay có thể áp dụng cho cả nhóm sản phẩm/quy trình.</li><li>Gắn chỉ số xem lại, Responsible Person và kích hoạt cập nhật.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không phát hành đào tạo nội dung hoặc WI mới nếu Responsible Person chưa xác nhận kỹ thuật và phạm vi sử dụng.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> QMS Engineer phối hợp HR/Department để lập kế hoạch đào tạo hoặc cập nhật tài liệu.</div><h3><span class="proc-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</span> Training, chuyển giao và kiểm chứng áp dụng</h3><p>Tri thức chỉ trở thành tài sản khi Người cần dùng đã tiếp nhận và áp dụng đúng.</p><ul class="tight"><li>Đưa tri thức vào <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-801_Training_Plan.xlsx">FRM-801</a>, <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-805_Skill_Level_Certificate.xlsx">FRM-805</a>, <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-806_Certification_Tracking_Log.xlsx">FRM-806</a> hoặc chương trình kèm cặp phát triển (huấn luyện) tại máy khi phù hợp.</li><li>Thực hiện bàn giao pack cho nhân sự nghỉ việc/đổi vị trí: danh mục file, job lịch sử, liên hệ điểm, hỏng / lỗi mẫu / quy luật, pending vấn đề.</li><li>Kiểm tra lại Người nhận có hiểu điều kiện áp dụng và điểm chặn hay không.</li><li>Lưu bằng chứng chuyển giao và Ngày hoàn tất.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không ký hoàn tất thôi việc / rời công ty hoặc vai trò thay đổi nếu kiến thức chuyển giao chưa xong.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> HR Lead và Supervisor cập nhật hồ sơ năng lực/chứng nhận liên quan.</div><h3><span class="proc-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</span> Rà hiệu lực, làm sạch và duy trì kiến thức cơ sở / nền</h3><p>Kho tri thức phải sống, không phải kho lưu file cũ.</p><ul class="tight"><li>Rà định kỳ các kiến thức item không còn áp dụng, trùng lặp, thiếu Responsible Person hoặc đã bị SOP/WI mới thay thế.</li><li>Theo dõi kiến thức item nào được dùng hiệu quả, item nào ít dùng hoặc gây nhầm lẫn.</li><li>Liên kết bài học kinh Nhiệm quan trọng sang <a href="../09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a> cho cải tiến hệ thống.</li><li>Archive hoặc hủy item lỗi thời theo quy định kiểm soát tài liệu.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không để item lỗi thời vẫn được đánh dấu active hoặc vẫn nằm trong đào tạo path.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> QMS Engineer cập nhật kiến thức sổ đăng ký và thông báo item bị thay thế/hủy.</div>
 
-<div class="callout-grid">
-<div class="callout-card"><h3>Kích hoạt bắt buộc thu thập tri thức</h3><ul class="tight"><li>Đầu tiên-time job hoặc đầu tiên use nguyên vật liệu/quy trình mới</li><li>NCR/thoát / bỏ qua/khiếu nại/sự cố hỏng máy có tác động giao hàng hoặc CTQ</li><li>Kaizen có cải thiện thực sự</li><li>Supplier/Người xử lý trôi / sai lệch hoặc khách hàng đặc biệt phản hồi</li><li>Bàn giao nhân sự chủ chốt</li></ul></div>
-<div class="callout-card"><h3>Cách ghi nhận</h3><p>Chỉ ghi những gì giúp Người khác làm đúng hơn: điều kiện trước khi làm, tín hiệu bất thường, sai lầm thường gặp, giới hạn không được vượt, bằng chứng bắt buộc, và khi nào phải báo cáo vượt cấp. Không ghi dạng kể chuyện dài dòng.</p></div>
-<div class="callout-card"><h3>Cách chuẩn hóa</h3><p>Nếu bài học kinh Nhiệm làm thay đổi cách làm chuẩn, Responsible Person quá trình PHẢI cập nhật SOP/WI/ANNEX/FORM liên quan. Bài học không được treo mãi ở mục note mà không biến thành chuẩn.</p></div>
-</div>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
-<thead><tr><th>Bước</th><th>Người làm</th><th>Đầu ra</th><th>Điểm kiểm soát</th></tr></thead>
-<tbody>
-<tr><td>1. Nhận kích hoạt</td><td>Responsible Person quá trình / Lead</td><td>Phiếu mở tri thức mới</td><td>Không bỏ qua kích hoạt trọng yếu</td></tr>
-<tr><td>2. Thu thập nội dung</td><td>SME + Người làm trực tiếp</td><td>Bản nháp tri thức</td><td>Phải có điều kiện áp dụng và cảnh báo</td></tr>
-<tr><td>3. Xác thực</td><td>QA/QMS hoặc Department Trưởng / Đầu</td><td>Tri thức được chấp nhận / Requests sửa</td><td>Không phát hành nếu chưa xác thực</td></tr>
-<tr><td>4. Phát hành &amp; đào tạo</td><td>Document Responsible Person</td><td>Bản có kiểm soát + thông báo đào tạo</td><td>Người dùng phải biết nơi tra cứu duy nhất</td></tr>
-<tr><td>5. Kiểm tra hiệu lực</td><td>Quy trình Owner</td><td>Kết luận giữ / sửa / hủy</td><td>So bằng dữ liệu lỗi, thời gian dẫn, phản hồi hiện trường</td></tr>
-</tbody></table></div>
-<div class="role-note">Quy tắc đặc biệt cho tri thức số hóa: đầu ra do AI/ML hỗ trợ chỉ được xem là bản nháp làm việc; không được phát hành như tri thức chuẩn khi chưa có Người chịu trách nhiệm xác minh nội dung.</div>
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span> Thu thập tri thức từ nhiều nguồn</h3>
+<p>Mọi tri thức có giá trị vận hành phải được nhận diện và ghi nhận kịp thời từ các nguồn phát sinh thực tế tại HESEM: NCR/CAPA, project close-out, khách hàng phản hồi/khiếu nại, bàn giao ca, PM/breakdown, setup lần đầu, thử nghiệm vật liệu mới và nguồn bên ngoài (tiêu chuẩn, hội thảo, nhà cung cấp).</p>
+<ul class="tight">
+<li>Khi đóng NCR/CAPA/khiếu nại, Responsible Person phải đánh giá: có bài học cần ghi nhận không? Nếu có, log vào <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-151_Lessons_Learned_Register.xlsx">FRM-151</a> trong vòng 5 ngày làm việc.</li>
+<li>Thu thập lessons learned từ project close-out: điều gì làm tốt, điều gì cần cải thiện, golden setup parameters, defect patterns, customer-specific notes.</li>
+<li>Ghi nhận best practices từ hiện trường CNC: setup tips, tool life patterns, fixture sensitivity, coolant issues, backlash symptoms, clean/deburr techniques.</li>
+<li>Thu thập tri thức từ nguồn bên ngoài: cập nhật tiêu chuẩn ISO/ASTM/ASME, hướng dẫn nhà cung cấp tooling/vật liệu, yêu cầu mới của khách hàng, công nghệ gia công mới.</li>
+<li>Mỗi knowledge item phải ghi rõ: hiện tượng, bối cảnh xảy ra, dữ liệu nhận biết, hành động đúng, điều kiện áp dụng, cảnh báo không dùng sai và người cần biết.</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không đóng sự kiện trọng yếu (NCR/CAPA/project) nếu chưa xác nhận có/không có bài học cần ghi nhận. Không lưu tri thức dạng mô tả chung chung thiếu bối cảnh.</div>
+<div class="role-note"><b>Bàn giao bắt buộc:</b> QMS Engineer nhận knowledge item từ Dept Leads/SME, xác nhận đầy đủ metadata trước khi chuyển sang phân loại (bước 2).</div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</span> Phân loại &amp; chuẩn hóa vào knowledge base</h3>
+<p>Tri thức đã thu thập phải được phân loại, gắn metadata và lưu vào knowledge base (M365/SharePoint) theo cấu trúc chuẩn để đảm bảo SSOT — mỗi tri thức chỉ có một nơi lưu chính thức duy nhất.</p>
+<ul class="tight">
+<li>Phân loại theo danh mục: máy/quy trình, nhóm sản phẩm/job family, vật liệu, khách hàng, loại sự cố, phương pháp đo, hệ thống dữ liệu (Epicor/M365).</li>
+<li>Gắn metadata bắt buộc: tiêu đề, category, owner, source event, machine/process/customer scope, điều kiện sử dụng, liên kết SOP/WI/FRM, ngày rà soát tiếp theo, training impact.</li>
+<li>Kiểm tra trùng lặp: so sánh với knowledge item hiện có, hợp nhất nếu trùng, ghi chú xung đột nếu mâu thuẫn.</li>
+<li>Đánh giá giá trị phổ quát: chỉ dùng cho một job/khách hàng hay áp dụng được cho cả nhóm sản phẩm/quy trình? Gắn scope tương ứng.</li>
+<li>Nếu dùng AI để hỗ trợ soạn nháp, Responsible Person phải rà toàn bộ nội dung trước khi lưu vào knowledge base chính thức.</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không lưu item vào knowledge base nếu thiếu owner, thiếu scope hoặc thiếu ngày rà soát. Không lưu ở chat cá nhân, email rời hoặc file cục bộ.</div>
+<div class="role-note"><b>Bàn giao bắt buộc:</b> QMS Engineer + IT xác nhận item đã lưu đúng vị trí trong SSOT, metadata đầy đủ, quyền truy cập phù hợp.</div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</span> Tích hợp vào SOP/WI/Training</h3>
+<p>Tri thức không được treo mãi ở dạng note tham khảo. Nếu bài học thay đổi cách làm chuẩn, Responsible Person quá trình PHẢI cập nhật tài liệu kiểm soát tương ứng.</p>
+<ul class="tight">
+<li>Xác định hình thức phát hành phù hợp: cập nhật SOP/WI hiện hành, tạo WI mới, cập nhật Control Plan/Setup Sheet/Traveler, tạo training material, hoặc giữ ở dạng knowledge note có kiểm soát.</li>
+<li>Kiểm tra mâu thuẫn với SOP/WI/FORM hiện hành — nếu có phải mở DCR (<a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-102_Document_Change_Request.xlsx">FRM-102</a>) và xử lý theo <a href="sop-101-document-and-data-control.html">SOP-101</a>.</li>
+<li>Thực hiện quy trình phát hành tài liệu đầy đủ: soạn thảo, cross-review, phê duyệt, cập nhật register, triển khai tại point-of-use theo <a href="sop-101-document-and-data-control.html">SOP-101</a>.</li>
+<li>Lập kế hoạch đào tạo (<a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-801_Training_Plan.xlsx">FRM-801</a>) cho tri thức mới cần phổ biến, xác định đối tượng và phương pháp (classroom, OJT, huddle, e-learning).</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không chạy job theo tri thức mới nếu SOP/WI chưa được cập nhật chính thức. Không phát hành training material nếu Responsible Person chưa xác nhận kỹ thuật.</div>
+<div class="role-note"><b>Bàn giao bắt buộc:</b> QMS Engineer phối hợp Dept Leads cập nhật tài liệu; HR lập kế hoạch đào tạo tương ứng.</div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</span> Chia sẻ qua OJT/huddle/training academy</h3>
+<p>Tri thức chỉ trở thành tài sản khi người cần dùng đã tiếp nhận, hiểu đúng và áp dụng được tại hiện trường.</p>
+<ul class="tight">
+<li>Tổ chức OJT tại máy CNC cho tri thức liên quan setup, tool, fixture, đo lường, clean/deburr — người học phải demo được cách áp dụng.</li>
+<li>Chia sẻ qua huddle đầu ca: bài học kinh nghiệm mới, cảnh báo chất lượng, thay đổi quy trình, customer-specific notes.</li>
+<li>Đưa vào training academy cho tri thức cần đào tạo lặp lại và chứng nhận năng lực (<a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-805_Skill_Level_Certificate.xlsx">FRM-805</a>, <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-806_Certification_Tracking_Log.xlsx">FRM-806</a>).</li>
+<li>Thực hiện bàn giao pack cho nhân sự đổi vị trí: danh mục file, job history, contact points, defect patterns, pending issues.</li>
+<li>Kiểm chứng người nhận hiểu điều kiện áp dụng và điểm chặn — ghi bằng chứng đào tạo/chuyển giao và ngày hoàn tất.</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không ký hoàn tất đào tạo nếu người học chưa demo được cách áp dụng. Không phổ biến tri thức chưa qua xác thực kỹ thuật.</div>
+<div class="role-note"><b>Bàn giao bắt buộc:</b> HR + Training Lead cập nhật hồ sơ năng lực/chứng nhận; Supervisor xác nhận người nhận đã áp dụng đúng tại hiện trường.</div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</span> Đo lường hiệu quả áp dụng</h3>
+<p>Tri thức đã chia sẻ phải được đo lường tác động thực tế — không phải chỉ đếm số bài học đã ghi mà phải xem tri thức đó có giúp giảm lỗi, rút ngắn thời gian hay tăng năng lực vận hành hay không.</p>
+<ul class="tight">
+<li>So sánh dữ liệu trước và sau khi áp dụng tri thức: tỷ lệ lỗi lặp, setup time, scrap rate, customer complaint, first-pass yield theo nhóm máy/sản phẩm liên quan.</li>
+<li>Thu thập phản hồi từ hiện trường: Operator/Setup có dùng tri thức đó không? Dễ hiểu không? Có gây nhầm lẫn với tài liệu khác không?</li>
+<li>Đánh giá knowledge item nào được dùng hiệu quả, item nào ít dùng hoặc gây confusion — đề xuất cải thiện hoặc loại bỏ.</li>
+<li>Liên kết kết quả đo lường với <a href="../09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a> (cải tiến liên tục) khi bài học có tác động hệ thống.</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không báo cáo tri thức "đã áp dụng" nếu chưa có dữ liệu đo lường tác động thực tế. Không giữ item không ai dùng ở trạng thái active.</div>
+<div class="role-note"><b>Bàn giao bắt buộc:</b> QMS Engineer tổng hợp KPI tri thức hàng tháng; Dept Leads xác nhận tác động tại bộ phận.</div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">6</span> Bảo tồn khi nhân sự nghỉ/chuyển</h3>
+<p>Khi nhân sự chủ chốt nghỉ việc, chuyển vị trí hoặc nghỉ dài hạn, tri thức phải rời theo vào hệ thống chứ không mất theo người. Đây là cổng kiểm soát bắt buộc trước khi giải phóng vai trò.</p>
+<ul class="tight">
+<li>HR kích hoạt quy trình bàn giao tri thức ngay khi nhận thông báo nghỉ/chuyển — không chờ đến ngày cuối.</li>
+<li>Người nghỉ/chuyển phải hoàn tất bàn giao pack: danh mục knowledge item đang sở hữu, job history, golden setup parameters, customer-specific notes, defect patterns, contact points, pending issues, file/folder quan trọng.</li>
+<li>Dept Lead + QMS Engineer rà soát bàn giao pack: đủ chưa? Người nhận đã tiếp nhận và hiểu chưa? Có tri thức nào chưa được ghi vào knowledge base không?</li>
+<li>Chuyển ownership của các knowledge item sang người kế nhiệm hoặc backup. Cập nhật metadata trong SSOT.</li>
+<li>Đối với nghỉ khẩn cấp: kích hoạt phỏng vấn nhanh SME/manager, khóa danh mục tri thức còn treo và lập kế hoạch bù sau.</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng bắt buộc:</b> KHÔNG ký hoàn tất thôi việc/chuyển vị trí nếu bàn giao tri thức chưa xong. KHÔNG để tri thức đơn điểm mất theo người rời vị trí.</div>
+<div class="role-note"><b>Bàn giao bắt buộc:</b> HR Lead xác nhận bàn giao pack hoàn tất; QMS Engineer cập nhật ownership trong knowledge base; Dept Lead xác nhận người kế nhiệm đã tiếp nhận.</div>
 <h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2><div class="table-card"><table class="table matrix-small"><colgroup><col style="width:20%"/><col style="width:40%"/><col style="width:14%"/><col style="width:12%"/><col style="width:14%"/></colgroup><thead><tr><th>Tình huống</th><th>Cách xử lý bắt buộc</th><th>Responsible Person</th><th>Phê duyệt / chuyển cấp xử lý</th><th>Hồ sơ</th></tr></thead><tbody><tr><td>Nhân sự nghỉ Cấp</td><td>Kích hoạt bàn giao khẩn, phỏng vấn nhanh SME/manager, khóa danh mục tri thức còn treo và lập kế hoạch bù sau.</td><td>HR Lead</td><td>Lead Department</td><td>Bàn giao hồ sơ</td></tr><tr><td>thử Nhiệm thất bại nhưng có bài học giá trị</td><td>Vẫn ghi bài học kinh Nhiệm nhưng phải đánh dấu rõ phạm vi không áp dụng và điều kiện lặp lại.</td><td>SME</td><td>Lead Department</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-151_Lessons_Learned_Register.xlsx">FRM-151</a></td></tr><tr><td>AI-đã tạo draft</td><td>Chỉ lưu ở trạng thái nháp tham khảo; muốn dùng vận hành phải qua kiểm duyệt và <a href="sop-101-document-and-data-control.html">SOP-101</a>.</td><td>Document Responsible Person</td><td>QMS Engineer</td><td>Draft note / <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-151_Lessons_Learned_Register.xlsx">FRM-151</a> khi cần</td></tr><tr><td>Tri thức mâu thuẫn SOP hiện hành</td><td>Dừng phổ biến, mở DCR hoặc rà soát kỹ thuật để thống nhất một nguồn đúng.</td><td>QMS Engineer</td><td>QA Lead</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-102_Document_Change_Request.xlsx">FRM-102</a></td></tr><tr><td>Kiến thức item chứa IP khách hàng</td><td>Áp dụng rule bảo mật của <a href="sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> và chỉ cấp quyền cho Người cần biết.</td><td>IT Administrator / Data Responsible Person</td><td>QA Lead</td><td>Truy cập log</td></tr></tbody></table></div>
 
 <div class="boxed-list"><div class="lane-title">Ngoại lệ bắt buộc khóa quyền truy cập hoặc hạn chế dùng</div><ul class="tight">
