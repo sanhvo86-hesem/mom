@@ -153,7 +153,36 @@ td,th{}
 <div class="field"><b>Điều kiện không cho phép chuyển bước</b><div class="blank">Không được đóng tình huống nếu chưa rõ tập hợp / dân số ảnh hưởng, chưa quyết định disposition, chưa phát hành cập nhật cuối cho khách hàng hoặc chưa đóng đường nối với <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> khi có bản chất chất lượng.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
-
+<div class="gate-grid">
+<div class="gate-card"><h3><span class="step-tag">S1</span> tiếp nhận &amp; xác nhận / biên nhận</h3><p>Log khiếu nại, mở tình huống và ACK trong 24 giờ làm việc hoặc nhanh hơn theo hợp đồng. <b>TẠM GIỮ</b> nếu tình huống chưa có Responsible Person hoặc chưa có mốc phản hồi đầu tiên.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S2</span> Ngăn chặn &amp; phả hệ truy xuất quét / dọn dẹp</h3><p>Khóa hàng, stop-ship, đóng băng WIP, kiểm tra outsource, xác định tập hợp / dân số nghi ngờ. <b>TẠM GIỮ</b> nếu chưa biết phạm vi ảnh hưởng.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S3</span> Kỹ thuật đánh giá / NCR-CAPA / RMA quyết định</h3><p>Xác định loại lỗi, mức nghiêm trọng, cần-for-RMA, cần-for-8D, cần-for-khách hàng thông báo bổ sung.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S4</span> Customer báo cáo nhịp độ / chu kỳ họp &amp; disposition</h3><p>Phản hồi tiến độ đúng nhịp đã cam kết; chốt thay thế/làm lại/tín dụng / ghi có/trả lại/sort. <b>TẠM GIỮ</b> nếu có Người hứa với khách nhưng nội bộ chưa phê duyệt.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S5</span> Kết thúc &amp; học tập</h3><p>Tình huống chỉ đóng khi ngăn chặn kết thúc, hành động nội bộ rõ, khách hàng cập nhật cuối Released và hồ sơ đủ bằng chứng.</p></div>
+</div>
+<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:32%"/><col style="width:18%"/><col style="width:18%"/><col style="width:32%"/></colgroup><thead><tr><th>KPI</th><th>Mục tiêu</th><th>Tần suất</th><th>Ghi chú</th></tr></thead><tbody>
+<tr><td>Tỷ lệ xác nhận / biên nhận đúng 24 giờ</td><td>100%</td><td>Tháng</td><td>Đo trên mọi khiếu nại/phản hồi tiêu cực/RMA Requests.</td></tr>
+<tr><td>Tỷ lệ ngăn chặn plan phát hành đúng 48 giờ cho tình huống chất lượng</td><td>≥ 95%</td><td>Tháng</td><td>Áp dụng với khiếu nại/thoát / bỏ qua có nguy cơ lan rộng.</td></tr>
+<tr><td>Thời gian xác định tập hợp / dân số nghi ngờ</td><td>Theo mức nghiêm trọng; lớn / nghiêm trọng ≤ 4 giờ làm việc</td><td>Tình huống-by-tình huống</td><td>Dùng phả hệ truy xuất quét / dọn dẹp bằng dữ liệu ship, WIP, outsource, lot.</td></tr>
+<tr><td>Thời gian đóng RMA / khiếu nại</td><td>≤ 30 Ngày trừ khi khách hàng quy định khác</td><td>Tháng</td><td>Tình huống mở lâu phải có nhịp độ / chu kỳ họp cập nhật và escalation.</td></tr>
+<tr><td>Tỷ lệ khiếu nại tái diễn cùng chế độ lỗi</td><td>Xu hướng giảm / 0 lớn / nghiêm trọng lặp lại</td><td>Quý</td><td>Phải kéo học tập về kế hoạch kiểm soát, WI, đào tạo, điều phối xuất hàng rule nếu cần.</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
+<div class="flowchart">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Tiếp nhận khiếu nại</div><div class="flow-desc">Nhận và ghi nhận khiếu nại từ khách hàng</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">2</div><div class="flow-title">Phân loại mức độ</div><div class="flow-desc">Xác định mức nghiêm trọng và ưu tiên</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical"><div class="flow-num">3</div><div class="flow-title">Điều tra nguyên nhân</div><div class="flow-desc">Phân tích gốc rễ, thu thập bằng chứng</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-title">Containment</div><div class="flow-desc">Ngăn chặn tạm thời, cách ly sản phẩm nghi ngờ</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">Khắc phục/CAPA</div><div class="flow-desc">Hành động khắc phục và phòng ngừa</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">6</div><div class="flow-title">Đóng khiếu nại</div><div class="flow-desc">Xác nhận hiệu lực, đóng hồ sơ</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">7</div><div class="flow-title">Learn-back</div><div class="flow-desc">Rút bài học, cập nhật hệ thống</div></div>
+</div>
 <h3>7.1 Tiếp nhận khiếu nại và gửi xác nhận / biên nhận</h3>
 <p>Ngay khi nhận email, cuộc gọi, portal tin nhắn / thông điệp hoặc thông tin từ Người giao hàng/field dịch vụ/khách hàng nhân viên mua hàng, CS phải mở tình huống trong <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-211_Complaint_Log.xlsx">FRM-211</a>. Tình huống phải ghi khách hàng, liên hệ, part/job/PO/rev, loại sự kiện, mô tả ngắn, bằng chứng ban đầu, mức độ khẩn và Responsible Person chịu trách nhiệm xử lý.</p>
 <ul class="tight">

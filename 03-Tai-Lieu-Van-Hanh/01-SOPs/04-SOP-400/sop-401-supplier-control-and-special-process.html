@@ -140,20 +140,54 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <div class="field"><b>Điểm dừng tự động</b><div class="blank">Tạm ngưng/Chặn trạng thái, cert hết hạn, site/scope không khớp, hàng giả / hàng nhái tín hiệu, lặp lại từ chối, khách hàng-đã đề cử source chưa có miễn trừ rõ.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
-<div class="callout"><div class="card-title">KPI bổ sung phải theo dõi hằng tháng</div><ul class="tight"><li>% PO phát hành sạch luồng-xuống / Từng ngay lần đầu</li><li>% phiếu nhận / biên nhận công đoạn đặc biệt pass ngay lần đầu</li><li>% nhà cung cấp/quy trình (proc) site-scope đã xác minh trước use</li><li>Số job bị ảnh hưởng bởi nhà cung cấp thoát / bỏ qua hoặc cert/scope trôi / sai lệch</li></ul></div>
+<div class="gate-grid">
+<div class="gate-card"><h3><span class="step-tag">S1</span> Đánh giá và phê duyệt nhà cung cấp mới</h3>
+<p class="small"><b>Lead:</b> Chuỗi cung ứng Manager + QA Manager</p>
+<p class="small"><b>Điểm dừng:</b> NCC mới chưa qua đánh giá rủi ro và năng lực; site hoặc scope không khớp family đã đăng ký; nguồn đơn chưa có risk treatment; khách hàng có source restriction chưa được xác minh.</p>
+<p class="small"><b>KPI chính:</b> % supplier hồ sơ đầy đủ ngay lần đầu; cycle time phê duyệt NCC mới ≤ 15 Ngày làm việc; % critical buy có ≥ 2 nguồn phê duyệt.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S2</span> Kiểm soát đơn hàng và yêu cầu chất lượng</h3>
+<p class="small"><b>Lead:</b> Nhân viên mua hàng (Buyer)</p>
+<p class="small"><b>Điểm dừng:</b> PO thiếu part/rev/spec; thiếu yêu cầu cert, truy xuất, đóng gói hoặc nhãn; luồng-down checklist chưa pass; NCC chưa xác nhận lead time và điều kiện chấp nhận.</p>
+<p class="small"><b>KPI chính:</b> PO right-first-time ≥ 95%; % PO phải phát hành lại do thiếu thông tin; thời gian phản hồi xác nhận đơn ≤ 48h.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S3</span> Giám sát hiệu suất nhà cung cấp</h3>
+<p class="small"><b>Lead:</b> Chuỗi cung ứng Manager + QA</p>
+<p class="small"><b>Điểm dừng:</b> OTD hoặc OTQ dưới ngưỡng tối thiểu theo family; reject lặp lại ≥ 2 lần cùng nguyên nhân; NCC không phản hồi SCAR trong SLA; change-notice không thông báo.</p>
+<p class="small"><b>KPI chính:</b> OTD NCC theo family/site; incoming reject rate (ppm); SCAR closure on-time rate ≥ 90%.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S4</span> Kiểm soát quy trình đặc biệt — outsource</h3>
+<p class="small"><b>Lead:</b> Buyer + Planner + Warehouse / IQC + QA</p>
+<p class="small"><b>Điểm dừng:</b> Processor chưa phê duyệt đúng scope/site; cert không khớp part/rev/lot; kiểm tra đầu vào không pass; bao gói hư hỏng hoặc thiếu truy xuất; công đoạn đặc biệt scope mismatch.</p>
+<p class="small"><b>KPI chính:</b> Cert completeness ngay lần nhận đầu tiên ≥ 98%; outsource turnaround adherence; % receipt hold xử lý đúng hạn.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S5</span> NCR nhà cung cấp, SCAR và cải tiến</h3>
+<p class="small"><b>Lead:</b> Chuỗi cung ứng Manager + QA Manager</p>
+<p class="small"><b>Điểm dừng:</b> SCAR quá hạn chưa đóng; reject lặp lại nhưng chưa chuyển trạng thái Probation/Suspend; corrective action chưa có bằng chứng hiệu lực; thẻ điểm chưa review đúng chu kỳ.</p>
+<p class="small"><b>KPI chính:</b> SCAR overdue = 0; supplier quality reject rate trend giảm; probation close-out rate ≥ 85%; requalification cycle time.</p></div>
+</div>
+<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:14%"/><col style="width:28%"/><col style="width:20%"/><col style="width:18%"/><col style="width:20%"/></colgroup><thead><tr><th>Cổng</th><th>Tiêu chí mở cổng</th><th>Điểm dừng bắt buộc</th><th>Người phụ trách</th><th>KPI chính</th></tr></thead><tbody>
+<tr><td><b>401-S1</b><br/>Source approval</td><td>Đã xác định family; risk class; approved/conditional processor trạng thái; customer source restriction; alternate source trạng thái.</td><td>NCC mới chưa đánh giá; site/scope mismatch; Block trạng thái; nguồn đơn (single-source / nguồn đơn) chưa có risk treatment.</td><td>Supply Chain + QA</td><td>% supplier hồ sơ đầy đủ; % critical buy có nguồn thay thế; cycle time hội nhập nhân sự mới.</td></tr>
+<tr><td><b>401-S2</b><br/>PO &amp; luồng-down release</td><td>PO đủ field; pack kỹ thuật đủ; luồng-down bảng kiểm pass; Ngày đến hạn và đầu ra condition được NCC commit.</td><td>Thiếu rev/spec; thiếu cert requirement; yêu cầu đóng gói/nhãn chưa rõ; chưa xác nhận thời gian dẫn.</td><td>Buyer</td><td>PO right-first-time; % PO phát hành lại; thời gian phản hồi xác nhận đơn.</td></tr>
+<tr><td><b>401-S3</b><br/>Outsource dispatch</td><td>Hàng gửi đi đã nhận dạng; kit đầy đủ; form yêu cầu outsource sạch; logistics path và ETA rõ; risk of delay reviewed.</td><td>Thiếu traveler/pack; quantity mismatch; job đang hold; processor commit không phù hợp cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch).</td><td>Buyer + Planner + Warehouse</td><td>On-time send-out; outsource turnaround adherence; hot-job containment response.</td></tr>
+<tr><td><b>401-S4</b><br/>Receipt certification &amp; release</td><td>Kiện về nguyên vẹn; cert match part/rev/spec/lot/site; quantity match; kiểm tra đầu vào pass theo rule.</td><td>Thiếu cert; cert giả nghi ngờ; lot/heat mismatch; bao gói hư; công đoạn đặc biệt scope mismatch.</td><td>Warehouse / IQC + QA</td><td>Cert completeness; incoming reject ppm; % receipt hold đúng hạn xử lý.</td></tr>
+<tr><td><b>401-S5</b><br/>Thẻ điểm / SCAR / requalification</td><td>Data OTD/OTQ cập nhật; thẻ điểm review; corrective action đóng; trạng thái Approved/Probation/Suspend cập nhật.</td><td>SCAR quá hạn; reject lặp; OTD/OTQ dưới ngưỡng; change-notice violation.</td><td>Supply Chain + QA</td><td>OTD; quality reject rate; SCAR overdue; probation close rate.</td></tr>
+</tbody></table></div>
+<div class="note-blue"><b>Quy tắc hold:</b> Một nhà cung cấp có thể được <b>Đã phê duyệt</b> ở nhóm sản phẩm này nhưng <b>Tạm ngưng</b> ở nhóm sản phẩm khác. Không dùng trạng thái tổng quát che khuất scope thực tế.</div><div class="metric-grid">
+<div class="metric-card"><div class="value">OTD NCC</div><div class="label">Theo nhóm sản phẩm / site / Người xử lý scope</div><div class="mini-note">Theo dõi riêng raw nguyên vật liệu, gia công ngoài gia công cơ khí và công đoạn đặc biệt. Một nhà cung cấp giao đúng vật liệu không có nghĩa công đoạn đặc biệt của họ cũng đang đúng.</div></div>
+<div class="metric-card"><div class="value">Cert Tính đầy đủ</div><div class="label">% lot/batch có chứng cứ đủ ngay lần đầu</div><div class="mini-note">Theo dõi riêng thiếu cert, sai cert, scope không khớp, site không khớp, label không khớp và cert sắp đến sau.</div></div>
+<div class="metric-card"><div class="value">OTQ / Từ chối Tỷ lệ</div><div class="label">Lỗi đầu vào / nhận hàng / outsource trả lại</div><div class="mini-note">Tách lỗi về kích thước / hoàn thành / công đoạn đặc biệt / giấy tờ / hồ sơ / truy xuất nguồn gốc để ra quyết định đúng nhóm sản phẩm và đúng Responsible Person.</div></div>
+<div class="metric-card"><div class="value">SCAR Kỷ luật</div><div class="label">Quá hạn / tái diễn / hiệu lực sau đóng</div><div class="mini-note">SCAR không đóng bằng trả lời email. Chỉ đóng khi có bằng chứng nguyên nhân, hành động và kết quả sau hành động đủ thuyết phục.</div></div>
+</div><div class="callout"><div class="card-title">KPI bổ sung phải theo dõi hằng tháng</div><ul class="tight"><li>% PO phát hành sạch luồng-xuống / Từng ngay lần đầu</li><li>% phiếu nhận / biên nhận công đoạn đặc biệt pass ngay lần đầu</li><li>% nhà cung cấp/quy trình (proc) site-scope đã xác minh trước use</li><li>Số job bị ảnh hưởng bởi nhà cung cấp thoát / bỏ qua hoặc cert/scope trôi / sai lệch</li></ul></div>
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
 <div class="flowchart">
-  <div class="flow-step critical"><div class="flow-num">1</div><div class="flow-text"><div class="flow-title">Đánh giá NCC mới</div><div class="flow-desc">Khảo sát năng lực, scope, rủi ro nhà cung cấp</div></div></div>
+  <div class="flow-step critical"><div class="flow-num">1</div><div class="flow-title">Đánh giá NCC mới</div><div class="flow-desc">Khảo sát năng lực, scope, rủi ro nhà cung cấp</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step active"><div class="flow-num">2</div><div class="flow-text"><div class="flow-title">Phê duyệt/Reject</div><div class="flow-desc">Quyết định chấp nhận hoặc từ chối NCC</div></div></div>
+  <div class="flow-step active"><div class="flow-num">2</div><div class="flow-title">Phê duyệt/Reject</div><div class="flow-desc">Quyết định chấp nhận hoặc từ chối NCC</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><div class="flow-title">Phát hành PO</div><div class="flow-desc">Tạo đơn hàng với yêu cầu chất lượng</div></div></div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-title">Phát hành PO</div><div class="flow-desc">Tạo đơn hàng với yêu cầu chất lượng</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step critical"><div class="flow-num">4</div><div class="flow-text"><div class="flow-title">Giám sát hiệu suất</div><div class="flow-desc">Theo dõi KPI giao hàng, chất lượng, phản hồi</div></div></div>
+  <div class="flow-step critical"><div class="flow-num">4</div><div class="flow-title">Giám sát hiệu suất</div><div class="flow-desc">Theo dõi KPI giao hàng, chất lượng, phản hồi</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><div class="flow-title">NCR/SCAR</div><div class="flow-desc">Xử lý không phù hợp và yêu cầu khắc phục</div></div></div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">NCR/SCAR</div><div class="flow-desc">Xử lý không phù hợp và yêu cầu khắc phục</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step active"><div class="flow-num">6</div><div class="flow-text"><div class="flow-title">Tái đánh giá</div><div class="flow-desc">Đánh giá lại định kỳ hoặc khi có sự cố</div></div></div>
+  <div class="flow-step active"><div class="flow-num">6</div><div class="flow-title">Tái đánh giá</div><div class="flow-desc">Đánh giá lại định kỳ hoặc khi có sự cố</div></div>
 </div>
 <h3 class="h3">7.1 Phân loại nguồn cung và gán mức kiểm soát</h3>
 <ol class="tight">

@@ -141,19 +141,16 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 /* TYPE 4: Procedure Step — amber rounded (Bước 1, Bước 2...) */
 .proc-tag { display: inline-flex; padding: 4px 12px; border-radius: var(--r-sm); font-size: 11px; font-weight: 800; color: #7b4f00; background: #fff3cd; border: 1px solid #ffc107; text-transform: uppercase; letter-spacing: .3px; }
 
-/* ══════ FLOWCHART — process flow visualization v2 ══════ */
-.flowchart { display: flex; flex-wrap: wrap; gap: 8px 4px; align-items: stretch; margin: 20px 0; padding: 18px 14px; background: linear-gradient(135deg, #f0f7ff 0%, #e8f0fe 100%); border: 1px solid rgba(21,101,192,0.18); border-radius: var(--r); }
-.flow-step { flex: 1 1 130px; min-width: 110px; max-width: 180px; padding: 10px 12px; background: #fff; border: 1.5px solid #1565c0; border-radius: 10px; display: flex; align-items: flex-start; gap: 8px; position: relative; box-shadow: 0 1px 3px rgba(21,101,192,0.08); }
-.flow-step .flow-num { flex-shrink: 0; display: inline-flex; width: 26px; height: 26px; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg, #1565c0, #1976d2); color: #fff; font-size: 12px; font-weight: 800; margin-top: 1px; }
-.flow-step .flow-text { flex: 1; }
-.flow-step .flow-title { font-size: 11px; font-weight: 700; color: var(--navy); line-height: 1.35; }
-.flow-step .flow-desc { font-size: 9.5px; color: #555; line-height: 1.35; margin-top: 2px; }
-.flow-step.active { border-color: #f59e0b; background: linear-gradient(135deg, #fffbeb, #fef3c7); }
-.flow-step.active .flow-num { background: linear-gradient(135deg, #f59e0b, #d97706); }
-.flow-step.critical { border-color: #ef4444; background: linear-gradient(135deg, #fef2f2, #fee2e2); }
-.flow-step.critical .flow-num { background: linear-gradient(135deg, #ef4444, #dc2626); }
-.flow-arrow { display: flex; align-items: center; justify-content: center; flex: 0 0 22px; color: #93b3d6; font-size: 16px; font-weight: 700; }
-.flow-fork { display: flex; flex-direction: column; gap: 6px; flex: 1 1 130px; }
+/* ══════ FLOWCHART — process flow visualization ══════ */
+.flowchart { display: flex; flex-wrap: wrap; gap: 0; align-items: stretch; margin: 20px 0; padding: 16px; background: #f8fafe; border: 1px solid rgba(21,101,192,0.15); border-radius: var(--r); }
+.flow-step { flex: 1 1 140px; min-width: 120px; max-width: 200px; padding: 12px 14px; background: #fff; border: 1px solid #1565c0; border-radius: var(--r); text-align: center; position: relative; }
+.flow-step .flow-num { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 50%; background: #1565c0; color: #fff; font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+.flow-step .flow-title { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.flow-step .flow-desc { font-size: 10px; color: #666; line-height: 1.4; }
+.flow-step.active { border-color: #f59e0b; background: #fffbeb; }
+.flow-step.critical { border-color: #ef4444; background: #fef2f2; }
+.flow-arrow { display: flex; align-items: center; justify-content: center; flex: 0 0 30px; color: #1565c0; font-size: 20px; font-weight: 700; }
+.flow-fork { display: flex; flex-direction: column; gap: 6px; flex: 1 1 140px; }
 .flow-fork .flow-step { flex: none; }
 @media (max-width: 768px) {
   .flowchart { flex-direction: column; align-items: center; }
@@ -178,10 +175,14 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 .metric-card.gold { border-top-color: var(--gold); }
 .metric-card.red { border-top-color: var(--red); }
 
-/* GATE CARDS — Process steps */
-.gate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 16px 0; }
-.gate-card { border: 1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding: 14px; background: var(--bg); }
-.gate-card h3 { margin: 0 0 6px; font-size: 14px; color: var(--navy); }
+/* GATE CARDS — Internal step cards (S1–S5) */
+.gate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 16px 0; }
+.gate-card { border: 1px solid rgba(21,101,192,0.2); border-radius: var(--r); padding: 16px; background: linear-gradient(135deg, #fafcff 0%, #f0f6ff 100%); position: relative; overflow: hidden; }
+.gate-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #1565c0, #42a5f5); }
+.gate-card h3 { margin: 0 0 8px; font-size: 13px; color: var(--navy); display: flex; align-items: center; gap: 8px; }
+.gate-card h3 .step-tag { flex-shrink: 0; display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #1565c0, #1976d2); border: none; letter-spacing: .3px; }
+.gate-card p { font-size: 12px; color: var(--ink2); line-height: 1.55; margin: 0 0 4px; }
+.gate-card b { color: var(--navy); }
 
 /* TABLES — Clean Minimal v10 */
 /* ── TABLE DESIGN (inspired by pricing-table: border #1565c0, header rgba(21,101,192,0.12)) ── */

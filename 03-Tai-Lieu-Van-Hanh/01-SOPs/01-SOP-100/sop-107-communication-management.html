@@ -155,7 +155,32 @@ td,th{}
 <div class="field"><b>Điều kiện không cho phép chuyển bước</b><div class="blank">Không rõ Responsible Person, không đủ dữ liệu tối thiểu, chưa có phê duyệt để gửi ra ngoài, hoặc chưa xác nhận Người nhận Received thông tin khẩn.</div></div>
 </div>
 <h2 class="h2" id="p6">6. cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
-
+<div class="gate-grid">
+<div class="gate-card"><h3><span class="step-tag">S1</span> Phân loại sự kiện &amp; chọn kênh</h3><p>Xác định event family, severity, Người phụ trách, kênh và Người nhận đầu tiên. <b>HOLD</b> nếu sự kiện chưa được phân loại nhưng đã có Người phát ngôn ra ngoài.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S2</span> Kiểm dữ liệu tối thiểu trước phát hành</h3><p>Message phải đủ ID, job/part/rev, impact, action, Người phụ trách, due. <b>HOLD</b> nếu message mơ hồ, thiếu revision hoặc chưa rõ ảnh hưởng.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S3</span> Phê duyệt nội dung phát ra ngoài</h3><p>Thông báo chậm, khiếu nại response, containment plan, RMA, giao hàng một phần, change notice, data incident notice phải có phê duyệt đúng thẩm quyền.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S4</span> Acknowledgement &amp; chuyển cấp ngoài giờ</h3><p>Với severity cao, phải có xác nhận Người nhận và nếu ngoài giờ phải kích hoạt ladder. <b>HOLD</b> nếu chưa xác nhận Người quyết định đã nhận tình huống.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S5</span> Đóng communication &amp; bài học kinh Nhiệm</h3><p>Tình huống chỉ đóng khi nhật ký hành động, quyết định, Người nhận chính và bài học cập nhật đã đầy đủ.</p></div>
+</div>
+<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:32%"/><col style="width:18%"/><col style="width:18%"/><col style="width:32%"/></colgroup><thead><tr><th>KPI</th><th>Mục tiêu</th><th>Tần suất</th><th>Ghi chú</th></tr></thead><tbody>
+<tr><td>Tỷ lệ sự kiện mức nghiêm trọng cao được log trong 15 phút</td><td>≥ 95%</td><td>Tháng</td><td>Áp dụng cho stop-dòng / chuyền, khiếu nại nghi thoát / bỏ qua, rủi ro giao hàng giống / cùng-day, data/IP sự cố.</td></tr>
+<tr><td>Tỷ lệ khách hàng xác nhận / biên nhận đúng SLA</td><td>100%</td><td>Tháng</td><td>Dùng cho khiếu nại, chậm trễ, thay đổi, RMA, cao-rủi ro thông báo.</td></tr>
+<tr><td>Tỷ lệ hành động từ Tier cuộc họp đóng đúng hạn</td><td>≥ 95%</td><td>Tuần</td><td>Đo qua log của <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a>.</td></tr>
+<tr><td>Số tình huống gửi ra ngoài thiếu thẩm quyền hoặc thiếu bằng chứng</td><td>0</td><td>Tháng</td><td>Vi phạm phải mở hành động hệ thống.</td></tr>
+<tr><td>Số vụ trễ escalation ngoài giờ</td><td>0 quan trọng / nghiêm trọng</td><td>Tháng</td><td>Đo theo bậc thang năng lực của <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
+<div class="flowchart">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Xác định nội dung</div><div class="flow-desc">Nhận sự kiện, xác định nội dung cần truyền thông</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">2</div><div class="flow-title">Chọn kênh truyền thông</div><div class="flow-desc">Chọn kênh phù hợp theo mức độ và đối tượng</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-title">Gửi thông báo</div><div class="flow-desc">Phát hành thông báo qua kênh đã chọn</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical"><div class="flow-num">4</div><div class="flow-title">Xác nhận tiếp nhận</div><div class="flow-desc">Xác nhận bên nhận đã tiếp nhận và hiểu</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">Lưu hồ sơ</div><div class="flow-desc">Lưu trữ bằng chứng truyền thông</div></div>
+</div>
 <h3>7.1 Nhận sự kiện và phân loại ngay tại điểm phát sinh</h3>
 <p>Người phát hiện sự kiện không được chờ “có đủ hồ sơ mới báo”. Phải mở truyền đạt / giao tiếp hồ sơ ngay khi có dấu hiệu ảnh hưởng. Hồ sơ đầu tiên phải có: sự kiện gì, ở đâu, job/WO/part nào, phiên bản nào, ảnh hưởng gì, có cần hold ngay không, ai là Responsible Person và mốc phản hồi đầu tiên là khi nào.</p>
 <ul class="tight">

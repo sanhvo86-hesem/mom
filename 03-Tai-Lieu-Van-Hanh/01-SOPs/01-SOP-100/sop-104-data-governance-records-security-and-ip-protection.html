@@ -158,7 +158,35 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <div class="field"><b>Điều kiện không cho phép chuyển bước</b><div class="blank">Thiếu thẩm quyền, thiếu chủ dữ liệu, thiếu hết hạn date cho khách, thiếu lưu giữ label, không test truy cập/ghi nhận được hồ sơ, hoặc chưa chứng minh khôi phục.</div></div>
 </div>
 <h2 class="h2" id="p6">6. Cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
-
+<div class="gate-grid">
+<div class="gate-card"><h3><span class="step-tag">S1</span> Phân loại dữ liệu &amp; chốt SoR/SSOT</h3><p>Chốt loại dữ liệu, mức nhạy cảm, chủ dữ liệu, Responsible Person hệ thống và nơi lưu chuẩn. <b>TẠM GIỮ</b> nếu dữ liệu chưa biết lưu ở đâu hoặc có hơn một nguồn chính thức.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S2</span> Rà quyền, SoD, IP &amp; phê duyệt</h3><p>Kiểm tra ít nhất quyền hạn, SoD, khách/bên ngoài chia sẻ, có đặc quyền truy cập, pháp lý/hợp đồng Requests và thẩm quyền trước hành động. <b>TẠM GIỮ</b> nếu quyền xin vượt vai trò hoặc thiếu phê duyệt.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S3</span> Thực hiện, test &amp; ghi log</h3><p>Chỉ mở dùng thực tế khi quyền đã chạy đúng, siêu dữ liệu/luồng đúng, dấu vết kiểm toán có, và Người dùng test đạt. <b>TẠM GIỮ</b> nếu tạo xong nhưng chưa test hoặc chưa có bằng chứng.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S4</span> Review định kỳ, backup &amp; khôi phục</h3><p>Hàng quý rà soát, khách hết hạn rà soát, không có chủ / mồ côi truy cập rà soát, thử khôi phục và lưu giữ rà soát. <b>TẠM GIỮ</b> kỳ rà soát khi còn mở vấn đề.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S5</span> thôi việc / rời công ty, sự cố &amp; disposition</h3><p>Thu hồi quyền, bàn giao quyền sở hữu, khóa sự cố, xử lý giữ pháp lý/disposition và đóng hồ sơ. <b>TẠM GIỮ</b> nếu còn quyền treo, hộp thư/dùng chung tập tin chưa bàn giao hoặc bằng chứng chưa đủ.</p></div>
+</div>
+<div class="table-card"><table class="table matrix-small"><colgroup><col style="width:32%"/><col style="width:18%"/><col style="width:18%"/><col style="width:32%"/></colgroup><thead><tr><th>KPI</th><th>Mục tiêu</th><th>Tần suất</th><th>Ghi chú vận hành</th></tr></thead><tbody>
+<tr><td>Thời gian cấp quyền chuẩn cho nhân sự mới</td><td>≤ 1 Ngày làm việc sau khi đủ hồ sơ</td><td>Tháng</td><td>Chỉ tính Requests đủ dữ liệu và đúng thẩm quyền.</td></tr>
+<tr><td>Thời gian thu hồi / hủy bỏ khi thôi việc / rời công ty</td><td>Trong Ngày hiệu lực nghỉ việc / chuyển vai trò</td><td>Tình huống-by-tình huống</td><td>tài khoản, khách link, dùng chung thiết bị, hộp thư ủy quyền phải đóng đồng bộ.</td></tr>
+<tr><td>Tỷ lệ hoàn thành rà soát quyền truy cập hàng quý</td><td>100%</td><td>Quý</td><td>rà soát quyền truy cập hàng quý chỉ được đóng khi toàn bộ quyền treo đã được xử lý đúng trạng thái.</td></tr>
+<tr><td>Thử khôi phục pass tỷ lệ</td><td>100%</td><td>Quý</td><td>Phải có time-to-khôi phục và bằng chứng file phục hồi dùng được.</td></tr>
+<tr><td>Tỷ lệ hồ sơ truy xuất nguồn gốc trong 3 phút</td><td>≥ 95%</td><td>Tháng / đánh giá</td><td>Đo trên mẫu hồ sơ thật: khiếu nại, phê duyệt giao hàng, NCR, hồ sơ công việc.</td></tr>
+<tr><td>Số sự cố data/IP do chia sẻ sai, sai quyền, sai file</td><td>0 lớn / nghiêm trọng</td><td>Tháng</td><td>Nếu có sự cố phải mở escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
+<div class="flowchart">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Phân loại dữ liệu</div><div class="flow-desc">Xác định loại, mức nhạy cảm, SoR/SSOT</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">2</div><div class="flow-title">Thiết lập quyền truy cập</div><div class="flow-desc">Gán quyền theo vai trò, phê duyệt access</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-title">Mã hóa và bảo mật</div><div class="flow-desc">Áp dụng mã hóa, backup, bảo vệ IP</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-title">Lưu trữ SSOT</div><div class="flow-desc">Chốt nơi lưu chuẩn duy nhất</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical"><div class="flow-num">5</div><div class="flow-title">Rà soát định kỳ</div><div class="flow-desc">Kiểm tra tuân thủ, phát hiện sai lệch</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">6</div><div class="flow-title">Hủy/giữ pháp lý</div><div class="flow-desc">Quyết định hủy hoặc giữ theo yêu cầu pháp lý</div></div>
+</div>
 <h3>7.1 Phân loại dữ liệu và chốt nơi lưu chuẩn</h3>
 <p>Khi phát sinh loại dữ liệu mới, app mới, báo cáo mới hoặc nhu cầu lưu/chia sẻ mới, QMS Engineer và chủ dữ liệu phải xác định ngay: dữ liệu này là chủ / gốc, giao dịch hay bằng chứng; nhạy cảm ở mức nào; nơi nào là SoR; nơi nào là SSOT; ai chịu trách nhiệm duy trì và ai được phép truy cập. Với dữ liệu kỹ thuật hoặc dữ liệu khách hàng, phải chỉ rõ phiên bản control, source link và lưu giữ.</p>
 <ul class="tight">

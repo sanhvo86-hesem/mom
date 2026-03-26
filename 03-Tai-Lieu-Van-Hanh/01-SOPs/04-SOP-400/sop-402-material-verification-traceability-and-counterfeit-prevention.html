@@ -92,22 +92,36 @@ td,th{}
 <tr><td>nghi ngờ hàng giả / hàng nhái</td><td>Vật liệu hoặc chứng chỉ có red đánh dấu về nguồn gốc, tính xác thực, chỉnh sửa, không khớp hoặc điều kiện bao gói/nhãn không hợp lý; trạng thái mặc định là TẠM GIỮ cho đến khi loại trừ nghi ngờ.</td></tr>
 <tr><td>Đã phê duyệt nguyên vật liệu / Người xử lý</td><td>Nguyên vật liệu nhóm sản phẩm hoặc Người xử lý nằm trong <a href="../../03-Reference/03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a> hoặc <a href="../../03-Reference/04-ANNEX-400/annex-403-approved-processor-list.html">ANNEX-403</a>, phù hợp scope, khách hàng Requests và trạng thái hiện hành.</td></tr>
 </tbody></table></div>
-
+<div class="gate-grid">
+<div class="gate-card"><h3><span class="step-tag">S1</span> Source &amp; PO flowdown</h3><p>PO phải chỉ rõ material/grade/spec/rev, source rules, cert requirements và no-substitution khi áp dụng. Thiếu flowdown → không nhận hàng.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S2</span> Receipt identity</h3><p>Physical marking, label, phiếu kê đóng gói và cert phải khớp. Bất kỳ mismatch nào về grade, size, qty, heat/lot, processor name → HOLD.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S3</span> Cert validity</h3><p>Cert phải đủ trường: supplier/source, material/grade/spec, heat/lot, qty hoặc trace reference, Ngày và Người/đơn vị phát hành. Chứng chỉ sửa tay, scan mờ, copy không kiểm chứng → HOLD.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S4</span> Lot creation &amp; segregation</h3><p>HESEM internal lot và child lot phải tạo trước vấn đề. Mixed source hoặc mixed heat trong cùng location/tray không được phép nếu chưa có rule và marking riêng.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S5</span> Vấn đề to job</h3><p>Lot vấn đề phải khớp job requirement, traveler và current revision; không cấp phát bằng trí nhớ hoặc verbal confirmation.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S6</span> WIP / kiểm tra trace</h3><p>Trong suốt gia công, traveler/WIP tag/kiểm tra hồ sơ phải giữ material lot hoặc pointer truy ngược. Mất mối nối → HOLD job hoặc HOLD lot.</p></div>
+<div class="gate-card"><h3><span class="step-tag">S7</span> Ship trace closure</h3><p>Shipment chỉ được release khi pack còn truy được về material/quy trình cert và mọi split/giao hàng một phần được map đúng shipment pack.</p></div>
+</div>
+<div class="metric-grid">
+<div class="metric-card"><div class="value">100%</div><div class="label">truy vết tính đầy đủ trước vấn đề và ship</div></div>
+<div class="metric-card"><div class="value">0</div><div class="label">hàng giả / hàng nhái / không xác định source phát hành</div></div>
+<div class="metric-card"><div class="value">≤ 30 phút</div><div class="label">Truy ngược từ lô giao hàng → source/cert</div></div>
+<div class="metric-card"><div class="value">≤ 1 ca</div><div class="label">Đóng ngăn chặn khi mất truy vết</div></div>
+</div>
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
 <div class="flowchart">
-  <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><div class="flow-title">Nhận hàng</div><div class="flow-desc">Tiếp nhận và kiểm tra sơ bộ lô hàng</div></div></div>
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Nhận hàng</div><div class="flow-desc">Tiếp nhận và kiểm tra sơ bộ lô hàng</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step critical"><div class="flow-num">2</div><div class="flow-text"><div class="flow-title">Kiểm tra cert</div><div class="flow-desc">Xác minh chứng chỉ, CoC, test report</div></div></div>
+  <div class="flow-step critical"><div class="flow-num">2</div><div class="flow-title">Kiểm tra cert</div><div class="flow-desc">Xác minh chứng chỉ, CoC, test report</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step critical"><div class="flow-num">3</div><div class="flow-text"><div class="flow-title">IQC kiểm tra</div><div class="flow-desc">Kiểm tra chất lượng đầu vào theo plan</div></div></div>
+  <div class="flow-step critical"><div class="flow-num">3</div><div class="flow-title">IQC kiểm tra</div><div class="flow-desc">Kiểm tra chất lượng đầu vào theo plan</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><div class="flow-title">Tạo lot/label</div><div class="flow-desc">Gán mã lot, dán nhãn truy xuất</div></div></div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-title">Tạo lot/label</div><div class="flow-desc">Gán mã lot, dán nhãn truy xuất</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><div class="flow-title">Issue to job</div><div class="flow-desc">Cấp vật tư cho job/WO sản xuất</div></div></div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">Issue to job</div><div class="flow-desc">Cấp vật tư cho job/WO sản xuất</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">6</div><div class="flow-text"><div class="flow-title">WIP trace</div><div class="flow-desc">Theo dõi truy xuất trong quá trình sản xuất</div></div></div>
+  <div class="flow-step"><div class="flow-num">6</div><div class="flow-title">WIP trace</div><div class="flow-desc">Theo dõi truy xuất trong quá trình sản xuất</div></div>
   <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num">7</div><div class="flow-text"><div class="flow-title">Ship trace closure</div><div class="flow-desc">Đóng truy xuất khi giao hàng</div></div></div>
+  <div class="flow-step"><div class="flow-num">7</div><div class="flow-title">Ship trace closure</div><div class="flow-desc">Đóng truy xuất khi giao hàng</div></div>
 </div>
 <h3>7.1 Chuẩn bị nguồn mua và điều kiện trước khi hàng tới</h3>
 <ul class="tight"><li>Mua hàng phải kiểm tra source nằm trong <a href="../../03-Reference/03-ANNEX-300/annex-302-approved-materials-list.html">AML</a> và, khi outsource/công đoạn đặc biệt, Người xử lý nằm trong <a href="../../03-Reference/04-ANNEX-400/annex-403-approved-processor-list.html">ANNEX-403</a>.</li><li>PO phải truyền đạt Requests đúng spec/rev, nguyên vật liệu điều kiện, Requests cert, no-thay thế, truy xuất nguồn gốc, đóng gói và khách hàng-cụ thể điều khoản. Nếu thiếu, PO phải sửa trước khi phiếu nhận / biên nhận.</li><li>Đối với nguyên vật liệu hoặc quy trình nhóm sản phẩm rủi ro cao, QA phải Requests phiếu nhận / biên nhận plan, test bổ sung hoặc trực tiếp / chỉ đạo xác minh với nhà cung cấp trước khi hàng được dùng.</li></ul>
