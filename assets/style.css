@@ -131,8 +131,37 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 .req-tag.should { background: #fff9db; color: #e67700; border: 1px solid #ffe066; }
 .req-tag.may    { background: #ebfbee; color: var(--green); border: 1px solid #b2f2bb; }
 .iso-ref { display: inline-flex; padding: 1px 7px; border-radius: var(--r-sm); font-size: 10px; font-weight: 600; color: var(--blue); background: var(--blue-l); }
-/* Step badges — internal process steps (S1, S2...) */
-.step-tag { display: inline-flex; padding: 3px 10px; border-radius: var(--r-sm); font-size: 10px; font-weight: 800; color: var(--navy); background: #e8edf3; border: 1px solid #c5cdd8; text-transform: uppercase; letter-spacing: .3px; }
+/* ══════ 4 BADGE TYPES — visually distinct ══════ */
+/* TYPE 1: ISO Clause — blue pill (§8.2) */
+.iso-clause { display: inline-flex; padding: 2px 8px; border-radius: 12px; font-size: 9px; font-weight: 700; color: #fff; background: #1565c0; margin-left: 6px; vertical-align: middle; letter-spacing: .3px; }
+/* TYPE 2: Internal Step — navy rounded square (S1, S2...) */
+.step-tag { display: inline-flex; padding: 4px 12px; border-radius: var(--r-sm); font-size: 11px; font-weight: 800; color: #fff; background: #37474f; border: none; text-transform: uppercase; letter-spacing: .5px; }
+/* TYPE 3: System Gate — teal pill (G0, G1...) */
+.gate-tag { display: inline-flex; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #fff; background: #00838f; text-transform: uppercase; letter-spacing: .3px; }
+/* TYPE 4: Procedure Step — amber rounded (Bước 1, Bước 2...) */
+.proc-tag { display: inline-flex; padding: 4px 12px; border-radius: var(--r-sm); font-size: 11px; font-weight: 800; color: #7b4f00; background: #fff3cd; border: 1px solid #ffc107; text-transform: uppercase; letter-spacing: .3px; }
+
+/* ══════ FLOWCHART — process flow visualization ══════ */
+.flowchart { display: flex; flex-wrap: wrap; gap: 0; align-items: stretch; margin: 20px 0; padding: 16px; background: #f8fafe; border: 1px solid rgba(21,101,192,0.15); border-radius: var(--r); }
+.flow-step { flex: 1 1 140px; min-width: 120px; max-width: 200px; padding: 12px 14px; background: #fff; border: 1px solid #1565c0; border-radius: var(--r); text-align: center; position: relative; }
+.flow-step .flow-num { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 50%; background: #1565c0; color: #fff; font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+.flow-step .flow-title { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.flow-step .flow-desc { font-size: 10px; color: #666; line-height: 1.4; }
+.flow-step.active { border-color: #f59e0b; background: #fffbeb; }
+.flow-step.critical { border-color: #ef4444; background: #fef2f2; }
+.flow-arrow { display: flex; align-items: center; justify-content: center; flex: 0 0 30px; color: #1565c0; font-size: 20px; font-weight: 700; }
+.flow-fork { display: flex; flex-direction: column; gap: 6px; flex: 1 1 140px; }
+.flow-fork .flow-step { flex: none; }
+@media (max-width: 768px) {
+  .flowchart { flex-direction: column; align-items: center; }
+  .flow-arrow { transform: rotate(90deg); flex: 0 0 24px; }
+  .flow-step { max-width: 100%; }
+}
+@media print {
+  .flowchart { background: #fff !important; border: 1px solid #1565c0 !important; }
+  .flow-step { border: 1px solid #1565c0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .flow-step .flow-num { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
 .preface-block { background: var(--bg2); border: 1px solid var(--ln); border-radius: var(--r); padding: 20px 24px; margin: 20px 0; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
