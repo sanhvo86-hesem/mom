@@ -1,6 +1,6 @@
 # 04 — Hệ thống thiết kế HTML/CSS (HESEM QMS Design System)
 
-> Phiên bản: v7 | Cập nhật: 2026-03-24
+> Phiên bản: v12 | Cập nhật: 2026-03-26
 > File CSS gốc: `assets/style.css`
 
 ---
@@ -19,8 +19,8 @@ Tất cả biến được khai báo trong `:root` của `style.css`. Mọi comp
   --gold-l:#fff8e1;   /* Nền callout, nền vàng nhạt */
 
   /* ── Bảng màu bổ trợ ── */
-  --th-bg: #eef4fb;   /* Nền header bảng */
-  --th-bdr:#b8d4f0;   /* Border header bảng */
+  --th-bg: rgba(21, 101, 192, 0.12);  /* Nền header bảng — blue tint 12% */
+  --th-bdr: #1565c0;  /* Border bảng — cùng màu --blue */
   --red:   #e03131;   /* Cảnh báo, lỗi, req-tag PHẢI */
   --green: #2f9e44;   /* Thành công, req-tag MAY */
 
@@ -148,9 +148,9 @@ Tất cả biến được khai báo trong `:root` của `style.css`. Mọi comp
 |---|---|---|
 | `.card` | Card chung — bg trắng, border `--ln`, radius `--r`, padding 20px 24px | Không |
 | `.card-title` | Tiêu đề card — 14px bold `--navy` | Không |
-| `.table-card` | Wrapper bảng — border `--ln`, radius `--r`, overflow-x auto | Không |
-| `.gate-card` | Cổng kiểm soát — tương tự card | `border-left: 4px solid var(--blue)` |
-| `.metric-card` | KPI metric — border `--ln`, radius `--r`, padding 14px | Không |
+| `.table-card` | Wrapper bảng — `border: 1px solid var(--th-bdr)` = blue #1565c0, radius `--r`, overflow auto, **no box-shadow** | Không |
+| `.gate-card` | Cổng kiểm soát — border `--ln`, padding 14px | `border-left: 3px solid var(--blue)` |
+| `.metric-card` | KPI metric — border `--ln`, radius `--r`, padding 16px 12px, text-align center | `border-top: 3px solid var(--blue)` |
 | `.callout-card` | Multi-column callout — border `--ln`, padding 14px | Không |
 | `.portal-card` | Portal landing card — border `--ln`, padding 18px | Không |
 | `.link-card` | Card liên kết — border `--ln`, padding 16px | Không |
@@ -179,53 +179,157 @@ Tất cả biến được khai báo trong `:root` của `style.css`. Mọi comp
 | `.loc-box` | Location box — border 2px solid `--ink` |
 | `.ship-box` | Shipping box — border `--ln`, padding 16px |
 
+### 4.4 Metric Card (style.css dòng 137–145)
+
+`.metric-grid` + `.metric-card` dùng hiển thị KPI / chỉ số đo lường.
+
+| Thuộc tính | Giá trị |
+|---|---|
+| `.metric-grid` | `grid-template-columns: repeat(auto-fit, minmax(160px, 1fr))`, gap 14px |
+| `.metric-card` | text-align center, padding 16px 12px, border `--ln`, `border-top: 3px solid var(--blue)` |
+| `.metric-card .value` | 26px, weight 800, `--navy`, line-height 1.2 |
+| `.metric-card .label` | 10px uppercase bold 700, `--ink2`, letter-spacing .5px |
+| `.metric-card .sub` | 11px, `--ink3` |
+| Màu variants | `.metric-card.green` → border-top `--green`, `.metric-card.gold` → `--gold`, `.metric-card.red` → `--red` |
+
+```html
+<!-- ✅ DO -->
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="label">Tỷ lệ lỗi</div>
+    <div class="value">2.3%</div>
+    <div class="sub">Mục tiêu: &lt; 3%</div>
+  </div>
+  <div class="metric-card green">
+    <div class="label">Giao hàng đúng hạn</div>
+    <div class="value">98%</div>
+    <div class="sub">Đạt KPI</div>
+  </div>
+  <div class="metric-card red">
+    <div class="label">NC mở</div>
+    <div class="value">5</div>
+    <div class="sub">Cần đóng trước 30/4</div>
+  </div>
+</div>
+
+<!-- ❌ DON'T — metric-card không nằm trong metric-grid -->
+<div class="metric-card">
+  <div class="value">100%</div>
+</div>
+```
+
+### 4.5 Gate Card (style.css dòng 148–151)
+
+`.gate-grid` + `.gate-card` dùng cho cổng kiểm soát quy trình.
+
+| Thuộc tính | Giá trị |
+|---|---|
+| `.gate-grid` | `grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))`, gap 14px |
+| `.gate-card` | border `--ln`, `border-left: 3px solid var(--blue)`, radius `--r`, padding 14px |
+| `.gate-card h3` | 14px, `--navy`, margin 0 0 6px |
+
+```html
+<!-- ✅ DO -->
+<div class="gate-grid">
+  <div class="gate-card">
+    <h3>Gate 1 — Thiết kế</h3>
+    <p>Review bản vẽ, phê duyệt BOM.</p>
+  </div>
+  <div class="gate-card">
+    <h3>Gate 2 — Sản xuất thử</h3>
+    <p>Kiểm tra mẫu, đo lường CPK.</p>
+  </div>
+  <div class="gate-card">
+    <h3>Gate 3 — Release</h3>
+    <p>Đóng NC, phê duyệt PPAP.</p>
+  </div>
+</div>
+
+<!-- ❌ DON'T — gate-card đơn lẻ không trong gate-grid -->
+<div class="gate-card">Gate lẻ</div>
+```
+
 ---
 
 ## 5. Note/Callout System (Hệ thống ghi chú)
 
-| Class | Nền | Border trái | Dùng khi |
-|---|---|---|---|
-| `.note` | `--blue-l` (#e3f2fd) | 2px `--blue` | Thông tin, hướng dẫn |
-| `.callout` | `--gold-l` (#fff8e1) | 2px `--gold` | Cảnh báo, lệnh điều hành |
-| `.note-soft` | `#fffbeb` | 4px `#eab308` | Cảnh báo vàng nhẹ |
-| `.note-blue` | `--blue-l` | 4px `--blue` | Thông tin xanh biến thể |
-| `.role-note` | `#f8fafc` | 4px `#94a3b8` | Ghi chú vai trò |
-| `.callout-danger` | `#fff5f5` | 4px `#c92a2a` | Nguy hiểm / dừng ngay |
-| `.callout-info` | `#eef7ff` | 4px `#1971c2` | Thông tin bổ sung |
-| `.callout-warn` | `#fff9db` | 4px `#e67700` | Cảnh báo cam |
+> **Nguyên tắc chung:** Tất cả note/callout/box CHỈ có `border-left: 3px solid`, KHÔNG có border khác.
+> Dùng `!important` để override inline styles. Xem `style.css` dòng 111–119.
 
-### Box variants
+### 5.1 Note variants
 
-| Class | Nền | Border trái | Dùng khi |
+| Class | Nền | Border trái 3px | Dùng khi |
 |---|---|---|---|
-| `.box` | `--bg` | `--ln` | Box chung |
-| `.box.core` | `--blue-l` | 2px `--blue` | Yêu cầu cốt lõi |
-| `.box.imp` | `#fff5f5` | 2px `--red` | Quan trọng / bắt buộc |
-| `.box.sup` | `--gold-l` | 2px `--gold` | Hỗ trợ / bổ sung |
-| `.box.mgt` | `#f3f0ff` | 2px `#7950f2` | Quản trị / management |
+| `.note` | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | Thông tin, hướng dẫn |
+| `.note-blue` | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | Alias của `.note` |
+| `.note-soft` | `--bg2` (#f8f9fa) | `--blue` (#1565c0) | Ghi chú nhẹ, nền xám |
+| `.note-green` | `#ebfbee` | `--green` (#2f9e44) | Ghi chú thành công / OK |
+
+### 5.2 Callout variants
+
+| Class | Nền | Border trái 3px | Dùng khi |
+|---|---|---|---|
+| `.callout` | `--gold-l` (#fff8e1) | `--gold` (#f9a825) | Cảnh báo, lệnh điều hành |
+| `.callout-danger` | `#fff5f5` | `--red` (#e03131) | Nguy hiểm / dừng ngay |
+| `.callout-info` | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | Thông tin bổ sung |
+| `.callout-warn` | `--gold-l` (#fff8e1) | `--gold` (#f9a825) | Cảnh báo vàng/cam |
+
+### 5.3 HTML ví dụ
+
+```html
+<!-- ✅ DO — đúng chuẩn -->
+<div class="note">Thông tin hướng dẫn quan trọng.</div>
+<div class="callout">Lệnh điều hành: nội dung lệnh.</div>
+<div class="callout-danger">DỪNG — không được tiếp tục nếu chưa xử lý.</div>
+<div class="note-green">Đạt yêu cầu — có thể tiến hành.</div>
+
+<!-- ❌ DON'T — thêm border inline, override style.css -->
+<div class="note" style="border: 1px solid blue;">Sai</div>
+
+<!-- ❌ DON'T — dùng class không tồn tại trong style.css -->
+<div class="role-note">Không tồn tại trong CSS</div>
+```
+
+### 5.4 Box variants (style.css dòng 265–269)
+
+| Class | Nền | Border trái 3px | Dùng khi |
+|---|---|---|---|
+| `.box` | `--bg` (#ffffff) | `--blue` (#1565c0) | Box chung |
+| `.box.core` | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | Yêu cầu cốt lõi |
+| `.box.sup` | `--gold-l` (#fff8e1) | `--gold` (#f9a825) | Hỗ trợ / bổ sung |
+| `.box.imp` | `#fff5f5` | `--red` (#e03131) | Quan trọng / bắt buộc |
+| `.box.mgt` | `#f3f0ff` | `#7950f2` (tím) | Quản trị / management |
+
+> **Quan trọng:** Tất cả `.box` variants dùng `border: none !important; border-left: 3px solid ... !important;` — KHÔNG có border nào khác.
+
+```html
+<!-- ✅ DO -->
+<div class="box core">Yêu cầu cốt lõi ISO 9001.</div>
+<div class="box imp">Bắt buộc tuân thủ — vi phạm sẽ dừng sản xuất.</div>
+
+<!-- ❌ DON'T — thêm border tay -->
+<div class="box" style="border: 1px solid #ccc;">Sai — box chỉ có border-left</div>
+```
 
 ---
 
 ## 6. Badge/Tag System (Hệ thống nhãn)
 
+> Xem `style.css` dòng 103–132.
+
+### 6.1 Badge & Tag cơ bản
+
 | Class | Kiểu | Ghi chú |
 |---|---|---|
-| `.badge` | Uppercase, navy bg, trắng text, 10px | Nhãn chính |
-| `.tag` | Border `--ln`, bg `--bg3`, 11px | Nhãn inline |
-| `.tag.teal` | Xanh lá — bg `#e6fcf5`, text `#087f5b` | Tag teal |
-| `.tag.orange` | Cam — bg `#fff4e6`, text `#d9480f` | Tag cam |
-| `.chip` | bg `--blue-l`, text `--blue`, 11px | Chip thông tin |
-| `.pill`, `.status-pill` | Rounded 20px, uppercase 10px | Trạng thái |
-| `.kpi-pill` | Xanh lá — bg `#ebfbee`, text `--green` | KPI pill |
-| `.inline-tag` | Rounded 999px, 10px bold, bg `--bg2` | Tag inline nhỏ |
-| `.badge-soft` | Rounded 999px, bg `--blue-l`, text `--navy` | Badge mềm |
-| `.badge-red` | Rounded, bg `#fff5f5`, text `#c92a2a` | Badge đỏ |
-| `.badge-amber` | Rounded, bg `#fff9db`, text `#e67700` | Badge vàng |
-| `.badge-green` | Rounded, bg `#ebfbee`, text `#2b8a3e` | Badge xanh |
-| `.badge-blue` | Rounded, bg `#e7f5ff`, text `#1971c2` | Badge xanh dương |
-| `.badge-navy` | Rounded, bg `#eef2ff`, text `#243b6b` | Badge navy |
+| `.badge` | Uppercase, navy bg, trắng text, 10px, letter-spacing .8px | Nhãn chính |
+| `.tag` | Border `--ln`, bg `--bg3`, 11px, 600 weight | Nhãn inline |
+| `.tag.teal` | bg `#e6fcf5`, text `#087f5b`, border `#96f2d7` | Tag teal |
+| `.tag.orange` | bg `#fff4e6`, text `#d9480f`, border `#ffd8a8` | Tag cam |
+| `.chip` | bg `--blue-l`, text `--blue`, 11px, 600 weight | Chip thông tin |
+| `.pill`, `.status-pill` | Rounded 20px, uppercase 10px, 700 weight, border `--ln` | Trạng thái |
+| `.kpi-pill` | bg `#ebfbee`, text `--green`, border `#b2f2bb`, 11px 700 | KPI pill |
 
-### Severity levels
+### 6.2 Severity levels
 
 | Class | Nền | Text |
 |---|---|---|
@@ -234,59 +338,114 @@ Tất cả biến được khai báo trong `:root` của `style.css`. Mọi comp
 | `.level.l3` | `#fff3bf` | `#e67700` (Vàng — Warning) |
 | `.level.l4` | `#ffe3e3` | `#c92a2a` (Đỏ — Critical) |
 
-### Requirement tags
+### 6.3 Requirement tags (style.css dòng 128–132)
 
-| Class | Nền | Text | Ý nghĩa |
-|---|---|---|---|
-| `.req-tag.shall` | `#fff5f5` | `--red` | BẮT BUỘC (PHẢI) |
-| `.req-tag.should` | `#fff9db` | `#e67700` | KHUYẾN NGHỊ (NÊN) |
-| `.req-tag.may` | `#ebfbee` | `--green` | TÙY CHỌN (CÓ THỂ) |
+| Class | Nền | Text | Border | Hiển thị | Ý nghĩa |
+|---|---|---|---|---|---|
+| `.req-tag.shall` | `#fff5f5` | `--red` (#e03131) | `1px solid #ffc9c9` | **PHẢI** | Yêu cầu bắt buộc |
+| `.req-tag.must` | `#fff5f5` | `--red` (#e03131) | `1px solid #ffc9c9` | **BẮT BUỘC** | Giống shall — alias đỏ |
+| `.req-tag.should` | `#fff9db` | `#e67700` (amber) | `1px solid #ffe066` | **NÊN** | Khuyến nghị |
+| `.req-tag.may` | `#ebfbee` | `--green` (#2f9e44) | `1px solid #b2f2bb` | **CÓ THỂ** | Tùy chọn |
 
-### RACI badges
+> **Lưu ý:** `.req-tag` base: `padding: 3px 10px`, `font-size: 10px`, `font-weight: 800`, `text-transform: uppercase`, `flex-shrink: 0`.
 
-| Class | Nền | Text |
-|---|---|---|
-| `.raci-r`, `.raci-R` | `#e0f2fe` / `#e7f5ff` | `#0369a1` / `#1864ab` |
-| `.raci-a`, `.raci-A` | `#fff3e0` / `#fff5f5` | `#b45309` / `#c92a2a` |
-| `.raci-c`, `.raci-C` | `#f3e8ff` / `#fff9db` | `#7e22ce` / `#e67700` |
-| `.raci-i`, `.raci-I` | `#ecfdf5` / `#ebfbee` | `#047857` / `#2b8a3e` |
+```html
+<!-- ✅ DO — dùng trong .req block -->
+<div class="req">
+  <span class="req-tag shall">PHẢI</span>
+  <div>Kiểm soát tài liệu theo ISO 9001 §7.5.</div>
+</div>
+<div class="req">
+  <span class="req-tag must">BẮT BUỘC</span>
+  <div>Phê duyệt trước khi phát hành.</div>
+</div>
+<div class="req">
+  <span class="req-tag should">NÊN</span>
+  <div>Review định kỳ hàng quý.</div>
+</div>
+<div class="req">
+  <span class="req-tag may">CÓ THỂ</span>
+  <div>Sử dụng template tùy chỉnh.</div>
+</div>
+
+<!-- ❌ DON'T — dùng req-tag ngoài .req block -->
+<span class="req-tag shall">PHẢI</span> Nội dung lẻ không có wrapper.
+```
 
 ---
 
 ## 7. Table System (Hệ thống bảng)
 
+> **Thiết kế bảng v10:** Border xanh `#1565c0`, header blue tint, column dividers, no box-shadow.
+> Xem `style.css` dòng 152–200.
+
 ### 7.1 Quy tắc chung
 
-1. Luôn bọc bảng trong `.table-card` để responsive trên mobile
-2. Dùng class `.table` hoặc `table.table` cho bảng dữ liệu
-3. Dùng `.form-table` cho bảng dạng form (có border tất cả ô)
+1. **BẮT BUỘC** dùng `class="table"` trên mọi `<table>` — nếu thiếu class, bảng sẽ không có đúng style
+2. Luôn bọc bảng trong `.table-card` để responsive trên mobile
+3. Dùng `.form-table` cho bảng dạng form
 4. Dùng `.docx-table` cho bảng từ Word/docx import
 
-### 7.2 Styling mặc định
+### 7.2 Cấu trúc HTML chuẩn
 
-| Thành phần | Style |
+```html
+<!-- ✅ DO — đúng chuẩn -->
+<div class="table-card">
+  <table class="table">
+    <thead>
+      <tr><th>Cột A</th><th>Cột B</th><th>Cột C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Dữ liệu 1</td><td>Dữ liệu 2</td><td>Dữ liệu 3</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ❌ DON'T — thiếu class="table" → sai style -->
+<div class="table-card">
+  <table>
+    <tr><td>Dữ liệu</td></tr>
+  </table>
+</div>
+```
+
+### 7.3 Styling chi tiết (style.css dòng 152–200)
+
+| Thành phần | Style thực tế |
 |---|---|
-| `table` | `width: 100%; table-layout: auto; border-collapse: collapse` |
-| `thead th` | bg `--th-bg`, text `--navy`, 10px uppercase bold, border-bottom 2px `--th-bdr` |
-| `tbody td` | padding 10px 14px, border-bottom 1px `--ln2` |
-| `tr:nth-child(even)` | bg `#fafcfe` (sọc nhẹ xanh) |
-| `tr:hover` | bg `#f0f4ff` |
-| `tbody th` | bg `--th-bg`, bold, border-right `--ln` |
+| `.table-card` | `border: 1px solid var(--th-bdr)` = blue #1565c0, `border-radius: var(--r)`, `box-shadow: none`, `overflow: auto` |
+| `.table` | `width: 100%`, `border-collapse: separate`, `border-spacing: 0`, `border: 1px solid var(--th-bdr)`, `border-radius: var(--r)`, font 12.5px |
+| `thead th` | bg `var(--th-bg)` = `rgba(21,101,192,0.12)`, text `--navy`, 10.5px uppercase bold 700 |
+| `thead th` border | `border-bottom: 1px solid var(--th-bdr)`, `border-right: 1px solid var(--th-bdr)`, last-child: `border-right: none` |
+| `tbody td` | padding 10px 14px, `border-bottom: 1px solid var(--th-bdr)`, `border-right: 1px solid var(--th-bdr)`, last-child: `border-right: none` |
+| `tbody tr:last-child td` | `border-bottom: none` |
+| `tbody tr:hover` | `background: rgba(21,101,192,0.04)` — blue tint rất nhẹ |
+| `tbody th` | bg `rgba(21,101,192,0.06)`, bold 700, `--navy`, font 11.5px, cùng border pattern |
+| `.table.compact` | td/th padding 6px 10px, font 11.5px; thead 8px 10px, font 9.5px |
 
-### 7.3 Bảng chuyên dụng
+> **Lưu ý quan trọng:** Khi bảng nằm trong `.table-card`, bảng bên trong KHÔNG có border riêng (`border: none`) — border ngoài do `.table-card` đảm nhận.
+
+### 7.4 Bảng chuyên dụng
 
 | Class | Mô tả |
 |---|---|
-| `.form-table` | Border tất cả ô, th bg `--th-bg`, 12px |
-| `.docx-table` | Border tất cả ô, 12px, dùng cho import Word |
-| `.iso-matrix` | Font 11px, padding nhỏ 5px 8px |
-| `.tbl` | Bảng đơn giản, border `--ln`, padding 6px 10px |
-| `.assessment-matrix`, `.rubric` | Font 11px, padding nhỏ |
-| `.rule-table` | Cột 1-2 không ngắt dòng |
+| `.form-table` | Cùng thiết kế blue border, th bg `--th-bg`, font 12px, 11px bold |
+| `.docx-table` | Cùng thiết kế blue border, font 12px, dùng cho import Word |
+| `.iso-matrix` | Font 11px, padding nhỏ 5px 8px, thead 9px |
+| `.tbl` | Bảng đơn giản, `border-collapse: collapse`, border `--ln`, padding 6px 10px |
+| `.assessment-matrix`, `.rubric` | Font 11px, padding 5px 8px |
 
-### 7.4 Autofit mode
+### 7.5 Autofit mode
 
 Bảng có attribute `data-qms-autofit="balanced"` hoặc `data-ed-autofit="balanced"` sẽ được ép `table-layout: fixed` và `width: 100%`, giúp cân bằng cột tự động.
+
+```html
+<!-- ✅ DO — autofit balanced -->
+<table class="table" data-qms-autofit="balanced">...</table>
+
+<!-- ❌ DON'T — dùng inline width cứng thay vì autofit -->
+<table class="table" style="width:500px">...</table>
+```
 
 ---
 
@@ -356,17 +515,43 @@ Bảng có attribute `data-qms-autofit="balanced"` hoặc `data-ed-autofit="bala
 
 ## 10. Special Components
 
-### 10.1 ISO Map & Requirements
+### 10.1 ISO Map & Requirements (style.css dòng 120–133)
+
+`.iso-map` là khối hiển thị yêu cầu tuân thủ ISO, có thiết kế nổi bật:
+
+| Thuộc tính | Giá trị |
+|---|---|
+| Background | `linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%)` — gradient xanh nhạt |
+| Border | `1px solid var(--blue)` = #1565c0 |
+| Border-radius | `var(--r)` = 8px |
+| `::before` pseudo | Label **"ISO 9001:2015"** — bg blue, text trắng, font 9px bold, absolute top -9px |
+| `.iso-clause` | Badge xanh `--blue` bg, text trắng, font 9px bold — dùng cho mã điều khoản (vd: §7.5) |
+| `.iso-map .req` | bg `rgba(255,255,255,0.85)`, border `1px solid rgba(21,101,192,0.15)`, border-left `3px solid --blue` |
+| `.iso-title` | 11px bold uppercase, `--ink3`, letter-spacing .8px |
 
 ```html
+<!-- ✅ DO — ISO Map đầy đủ -->
 <div class="iso-map">
   <div class="iso-title">Chuẩn mực áp dụng</div>
+  <h3 class="h3">Kiểm soát tài liệu <span class="iso-clause">§7.5</span></h3>
   <div class="req">
     <span class="req-tag shall">PHẢI</span>
-    <div>Nội dung yêu cầu bắt buộc.</div>
+    <div>Tài liệu phải được phê duyệt trước khi phát hành.</div>
+  </div>
+  <div class="req">
+    <span class="req-tag should">NÊN</span>
+    <div>Review định kỳ để đảm bảo tính phù hợp.</div>
   </div>
 </div>
+
+<!-- ❌ DON'T — dùng .req không nằm trong .iso-map mà không có wrapper -->
+<div class="req">
+  <span class="req-tag shall">PHẢI</span>
+  <div>Req lẻ ngoài iso-map vẫn hoạt động nhưng không có gradient nền.</div>
+</div>
 ```
+
+> **Lưu ý:** `.req` bên ngoài `.iso-map` có `bg: var(--bg)` (trắng), border-left 3px blue. `.req` bên trong `.iso-map` có bg translucent trắng `rgba(255,255,255,0.85)` và thêm border nhẹ xanh.
 
 ### 10.2 Preface block
 
@@ -427,39 +612,53 @@ Bảng có attribute `data-qms-autofit="balanced"` hoặc `data-ed-autofit="bala
 
 ## 11. Print Rules (Quy tắc in)
 
+> **3 khối `@media print`** trong style.css: dòng 360–445, 513–535, 586–632.
+
 ### 11.1 Kích thước trang
 
 ```css
-@page { margin: 18mm 12mm 20mm 12mm; size: A4; }
-html { font-size: 10.5pt; }  /* nhỏ hơn screen 14px */
+/* style.css dòng 369–373 (khối 1) + dòng 623–626 (khối 3) */
+@page { margin: 15mm 12mm 18mm 12mm; }           /* khối 1 */
+@page { margin: 18mm 12mm 20mm 12mm; size: A4; }  /* khối 3 — override cuối */
+@page :first { margin-top: 10mm; }
+html { font-size: 10pt; }
 ```
 
-### 11.2 Page break control
+### 11.2 Page break control (3 khối gộp)
 
 | Quy tắc | Áp dụng cho |
 |---|---|
-| `page-break-inside: avoid` | `.card`, `.table-card`, `.callout`, `.note`, `.box`, `.iso-map`, `.preface-block`, `.jd-mission`, `.form-sheet`, `.lane`, `.legend`, `.req`, `.auth-grid`, `.vstep`, `.sig-row`, `.form-header`, `.badge` |
+| `page-break-inside: avoid` | `.req`, `.vstep`, `.legend`, `.sig-row`, `.sign-row`, `.approval-row`, `.backup-card` (khối 1+2), `.callout`, `.note`, `.card`, `.iso-map`, `.preface-block`, `.jd-mission`, `.form-header`, `.badge`, `.auth-grid` (khối 3) |
+| `page-break-inside: auto` | `.card`, `.table-card`, `.callout`, `.note`, `.box`, `.iso-map`, `.preface-block`, `.form-sheet`, `.form-header` (khối 1+2 — cho phép cắt nếu dài) |
 | `page-break-after: avoid` | `h1-h4`, `.h1-.h4` |
 | `display: table-header-group` | `thead` — lặp header bảng mỗi trang |
 | `display: table-footer-group` | `tfoot` |
 | `orphans: 3; widows: 3` | `p`, headings |
+| `tr` | `page-break-inside: avoid` |
+
+> **Lưu ý:** Khối 3 (dòng 607–612) override khối 1+2, đặt `avoid` cho nhiều element nhỏ. Kết quả cuối: elements nhỏ avoid, elements lớn auto.
 
 ### 11.3 Print visibility
 
 | Class | Screen | Print |
 |---|---|---|
-| `.no-print` | Hiện | Ẩn |
-| `.print-disclaimer` | Ẩn | Hiện |
-| `.no-screen` | Ẩn | Hiện |
-| `.btn` | Hiện | Ẩn |
+| `.no-print` | Hiện | Ẩn (`display: none !important`) |
+| `.print-disclaimer` | Ẩn (`display: none !important`) | Hiện (`display: block !important`) |
+| `.no-screen` | Ẩn (`display: none !important`) | Hiện |
+| `.btn` | Hiện | Ẩn (`display: none !important`) |
 
 ### 11.4 Print overrides
 
-- Link: `color: var(--ink) !important; text-decoration: none`
-- `.page`: bỏ shadow, border, radius
-- `.container`: `max-width: 100%; padding: 0`
-- `.table-card`: `overflow: visible !important; border: 1px solid #999`
-- `.form-header`: `border: 1.5px solid #333; border-radius: 0`
+- Link: `color: var(--ink) !important; text-decoration: none !important`
+- `.page`: `box-shadow: none`, `border: none`, `border-radius: 0`, `overflow: visible`
+- `.page-body`: `padding: 8px 0 0`, `overflow: visible`
+- `.container`: `max-width: 100%; padding: 0; margin: 0; overflow: visible`
+- `.table-card`: `overflow: visible !important; border: 1px solid var(--th-bdr)` (khối 1) + `border: 1px solid #999` (khối 3)
+- `.form-header`: `border: 1px solid #999`, `border-radius: 0`, `page-break-inside: avoid`
+- Table header: `print-color-adjust: exact` — in đúng màu `var(--th-bg)`
+- Note/Callout/Box/Badge: `print-color-adjust: exact` — giữ màu border-left
+- Gate cards: gap 8px, padding 10px, font 11px (compact hơn screen)
+- Footer `@page`: `"Bản in không kiểm soát nếu không có dấu kiểm soát — HESEM QMS"` (khối 1)
 
 ---
 
@@ -540,23 +739,30 @@ Style.css có khối CSS ẩn toàn bộ UI Google Translate (banner, menu, tool
 
 ### Nguyên tắc: WYSIWYG — hiển thị sao, in như vậy
 
-| Thuộc tính | Giá trị |
+| Thuộc tính | Giá trị (kết quả cuối sau 3 khối `@media print`) |
 |-----------|---------|
-| `@page margin` | 15mm top, 12mm sides, 18mm bottom |
-| `form-header` | Giữ nguyên grid layout, border 1px solid #999, `page-break-inside: avoid` |
-| Table header | `print-color-adjust: exact` — in đúng màu |
-| Cards/Notes | `page-break-inside: auto` — cho phép cắt nếu dài |
-| `req`, `vstep` | `page-break-inside: avoid` — không cắt element nhỏ |
-| Badge/Tag | `print-color-adjust: exact` — in đúng màu |
+| `@page margin` | 18mm top, 12mm sides, 20mm bottom; size A4 (khối 3 override) |
+| `@page :first` | margin-top 10mm |
+| `html font-size` | 10pt (nhỏ hơn screen 14px) |
+| `form-header` | Giữ nguyên grid layout, border 1px solid #999, `border-radius: 0`, `page-break-inside: avoid` |
+| Table header | `print-color-adjust: exact` — in đúng màu `var(--th-bg)` |
+| Table border | `border: 1px solid var(--th-bdr)` — giữ blue border khi in |
+| Cards/Notes lớn | `page-break-inside: auto` — cho phép cắt nếu dài hơn 1 trang |
+| `req`, `vstep`, `legend` | `page-break-inside: avoid` — không cắt element nhỏ |
+| Badge/Tag/Chip | `print-color-adjust: exact` — in đúng màu |
+| Gate cards | Compact hơn: gap 8px, padding 10px, font 11px |
+| `.page` | Bỏ shadow, border, radius — in phẳng |
+| `.table-card` | `overflow: visible !important` — không bị cắt khi in |
 
 ### Lưu ý ISO trên bản in:
-- Footer trang: "Bản in không kiểm soát nếu không có dấu kiểm soát — HESEM QMS"
+- Footer trang (khối 1): `"Bản in không kiểm soát nếu không có dấu kiểm soát — HESEM QMS"` (font 7pt, #999)
 - Không thêm header/footer tự động từ browser (tắt trong settings in)
 
 ### Quy tắc bắt buộc:
 1. **KHÔNG** thêm inline `@media print` vào HTML files — tất cả print rules nằm trong `style.css`
-2. **KHÔNG** thêm `page-break-inside: avoid` cho elements lớn (card, table-card, note)
+2. **KHÔNG** thêm `page-break-inside: avoid` cho elements lớn (card, table-card, note, box, iso-map)
 3. **CÓ THỂ** thêm `page-break-before: always` trước heading lớn nếu cần tách trang
+4. **KHÔNG** override `overflow` trong inline styles — style.css đã set `overflow: visible !important` cho print
 
 ---
 
