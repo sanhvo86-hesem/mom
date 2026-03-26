@@ -1,6 +1,6 @@
 # 11 — Hướng dẫn cấu trúc HTML chi tiết (Khi tạo mới hoặc chỉnh sửa tài liệu)
 
-> Phiên bản: v1 | Cập nhật: 2026-03-26
+> Phiên bản: v2 | Cập nhật: 2026-03-27
 > Đây là ghi chú BẮT BUỘC đọc trước khi tạo mới hoặc chỉnh sửa bất kỳ file HTML nào trong hệ thống QMS.
 
 ---
@@ -253,34 +253,130 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 </div>
 ```
 
-### 3.4 Gate Cards — Các bước quy trình nội bộ
+### 3.4 Section 6 — Cổng kiểm soát nội bộ (Internal Gates) — Dạng TABLE
 
-**Quy ước đặt tên bước:** Dùng **S** (Step), KHÔNG dùng **G** (Gate) để tránh nhầm với 8 system gates (G0→G7).
+**Quy tắc cấu trúc Section 6:**
+- Internal Gate dùng ký hiệu **IG** (IG1, IG2, IG3...) — KHÔNG dùng G (G là system gates)
+- Số lượng IG **không giới hạn** — tùy quy trình cụ thể (3, 5, 6, 8...)
+- Format: **TABLE** 5 cột (KHÔNG dùng gate-card/grid)
+- Mỗi IG PHẢI có: Mô tả, Chủ trì, Điểm dừng bắt buộc, KPI đo được
+- Sau table: metric-card grid hiển thị KPI trực quan (tùy chọn)
 
 ```html
-<div class="gate-grid">
-  <div class="gate-card">
-    <h3>{{CODE}}-S1 — Tên bước</h3>
-    <p>Mô tả hoạt động.</p>
-    <p><b>Lead:</b> Vai trò<br>
-    <b>Điểm dừng:</b> Điều kiện hold<br>
-    <b>KPI chính:</b> Metric</p>
+<!-- Section 6: IG Table -->
+<h2 id="p6">6. Cổng kiểm soát nội bộ (Internal Gates), điểm dừng bắt buộc & KPI</h2>
+
+<div class="table-card">
+<table class="table">
+<colgroup>
+  <col class="col-ig"/>     <!-- 50px fixed -->
+  <col class="col-desc"/>   <!-- 34% -->
+  <col class="col-owner"/>  <!-- 14%, min 80px -->
+  <col class="col-hold"/>   <!-- 22% -->
+  <col class="col-kpi"/>    <!-- 18% -->
+</colgroup>
+<thead><tr>
+  <th>IG</th><th>Mô tả hoạt động</th><th>Chủ trì</th><th>Điểm dừng bắt buộc</th><th>KPI chính</th>
+</tr></thead>
+<tbody>
+  <tr>
+    <td class="ig-center"><span class="step-tag">IG1</span></td>
+    <td><b>Tên cổng</b><br>Mô tả chi tiết hoạt động, tham chiếu form/SOP.</td>
+    <td>Vai trò chủ trì</td>
+    <td>KHÔNG cho phép [hành động] nếu chưa [điều kiện].</td>
+    <td>KPI cụ thể đo được (ví dụ: 100%, ≤ 24h, 0 lỗi)</td>
+  </tr>
+  <!-- Thêm IG2, IG3... tương tự -->
+</tbody>
+</table>
+</div>
+```
+
+**⚠ KHÔNG BAO GIỜ:**
+- Dùng gate-card/gate-grid cho IG → dùng TABLE
+- Giới hạn cố định 5 IG → tùy quy trình
+- Để trống cột Chủ trì/Điểm dừng/KPI → mỗi IG PHẢI đầy đủ
+- Đặt IG badge không canh giữa → dùng `class="ig-center"` trên `<td>`
+
+### 3.5 Section 7 — Quy trình chi tiết — FLOWCHART + Balloon headings
+
+**Quy tắc cấu trúc Section 7:**
+- **Phần 1:** Flowchart tổng quan (visual process flow)
+- **Phần 2:** Chi tiết từng bước với **proc-num balloon** trước heading
+- Số bước **không giới hạn** — tùy quy trình (5, 8, 10, 12...)
+- Flowchart PHẢI khớp đúng số bước h3 bên dưới
+- Mỗi bước balloon có **màu xoay** (rotating colors) — KHÔNG cố định 1 màu
+
+**Phần 1: Flowchart**
+```html
+<h2 id="p7">7. Quy trình chi tiết</h2>
+
+<div class="flowchart">
+  <div class="flow-step">
+    <div class="flow-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</div>
+    <div class="flow-text"><div class="flow-title">Tên bước 1</div></div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><!-- .active = quyết định/phê duyệt (vàng) -->
+    <div class="flow-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">2</div>
+    <div class="flow-text"><div class="flow-title">Tên bước 2</div></div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical"><!-- .critical = kiểm tra/đo lường (đỏ) -->
+    <div class="flow-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">3</div>
+    <div class="flow-text"><div class="flow-title">Tên bước 3</div></div>
   </div>
 </div>
 ```
 
-**Phân biệt:**
-| Ký hiệu | Nghĩa | Ví dụ |
-|----------|--------|-------|
-| **G0→G7** | System Gates (8 cổng kiểm soát hệ thống) | G0 Contract, G4 FAI |
-| **S1→S5** | Internal Steps (bước nội bộ trong 1 SOP/WI) | 302-S1, 504-S3 |
+**Bảng màu xoay (10 màu):**
+| Bước | Gradient | Tính chất |
+|------|----------|-----------|
+| 1 | `#1565c0, #1976d2` | Xanh dương |
+| 2 | `#059669, #10b981` | Xanh lá |
+| 3 | `#d97706, #f59e0b` | Vàng cam |
+| 4 | `#7c3aed, #8b5cf6` | Tím |
+| 5 | `#dc2626, #ef4444` | Đỏ |
+| 6 | `#0891b2, #06b6d4` | Teal |
+| 7 | `#c2410c, #ea580c` | Cam đậm |
+| 8 | `#4338ca, #6366f1` | Indigo |
+| 9 | `#15803d, #22c55e` | Xanh lá đậm |
+| 10 | `#be185d, #ec4899` | Hồng |
 
-### 3.5 Step Badge — Nhãn bước nội bộ
+**Phần 2: Chi tiết từng bước**
+```html
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span> Tên bước chi tiết</h3>
+<p>Mô tả chi tiết hoạt động...</p>
+<ul><li>Bullet points cụ thể</li></ul>
+<div class="callout"><b>Điểm dừng bắt buộc (IG1):</b> KHÔNG cho phép... nếu chưa...</div>
+<p><b>Bàn giao:</b> Ai bàn giao gì cho ai.</p>
+```
+
+**⚠ QUY TẮC QUAN TRỌNG:**
+- Flowchart PHẢI có TRƯỚC các h3 chi tiết
+- Số bước trong flowchart = Số h3 headings (KHÔNG được lệch)
+- Màu balloon h3 = Màu tương ứng trong flowchart
+- Khi cập nhật nội dung → kiểm tra lại đánh số + flowchart
+- Bước `.active` (vàng) = quyết định/phê duyệt
+- Bước `.critical` (đỏ) = kiểm tra/đo lường/hold point
+
+### 3.6 Bốn loại Badge/Nút — Phân biệt trực quan
+
+| Badge | CSS Class | Ký hiệu | Màu | Dùng cho |
+|-------|-----------|---------|-----|----------|
+| **ISO Clause** | `.iso-clause` | §7.5, §8.2 | Xanh đậm (#1565c0) nền trắng | Viện dẫn ISO 9001:2026 |
+| **ISO Req** | `.req-tag.shall` / `.req-tag.should` / `.req-tag.may` | PHẢI, NÊN, CÓ THỂ | Đỏ / Vàng / Xanh lá | Mức bắt buộc ISO |
+| **Internal Gate** | `.step-tag` | IG1, IG2... | Navy gradient pill | Cổng kiểm soát nội bộ |
+| **Procedure Step** | `.proc-num` | ①②③... | Rotating 10 colors | Bước quy trình chi tiết |
+| **System Gate** | `.gate-tag` | G0, G1...G7 | Teal (#00838f) | 8 cổng hệ thống |
 
 ```html
-<span class="step-tag">S1</span>
+<!-- ISO Clause -->   <span class="iso-clause">§7.5</span>
+<!-- ISO Req -->       <span class="req-tag shall">PHẢI</span>
+<!-- Internal Gate --> <span class="step-tag">IG1</span>
+<!-- Proc Step -->     <span class="proc-num" style="background:linear-gradient(...)">1</span>
+<!-- System Gate -->   <span class="gate-tag">G0</span>
 ```
-Hiển thị badge xám với mã bước nội bộ — giống style ISO badge nhưng màu trung tính.
 
 ---
 
@@ -297,22 +393,50 @@ Hiển thị badge xám với mã bước nội bộ — giống style ISO badge
 | 7 | Dịch metadata labels (Code, Version, Owner...) | Giữ nguyên tiếng Anh |
 | 8 | Dịch tên SharePoint List, Column names, Site names | Danh từ riêng hệ thống |
 | 9 | Dịch vai trò (Team Leader, Foreman, Inspector...) | Danh từ riêng thống nhất |
-| 10 | Xóa gate mapping note "Vị trí trong hệ thống 8 cổng" | Bắt buộc có trên mọi file |
+| 10 | Dùng gate-card/gate-grid cho Internal Gates | IG PHẢI dùng TABLE 5 cột |
+| 11 | Giới hạn cố định 5 IG | Số IG tùy quy trình, không giới hạn |
+| 12 | Tạo flowchart không khớp số bước h3 | Flowchart steps = h3 headings |
+| 13 | Dùng 1 màu cố định cho proc-num balloons | Dùng 10 màu xoay |
+| 14 | Để trống cột Chủ trì/Điểm dừng/KPI trong IG table | Mỗi IG PHẢI đầy đủ |
 
 ---
 
 ## 5. Checklist trước khi commit file HTML
 
+### 5.1 Cấu trúc chung
 - [ ] File có `<link href="...assets/style.css" rel="stylesheet"/>` ?
 - [ ] `<table>` có `class="table"` ?
+- [ ] IG table có `<colgroup>` với col-ig, col-desc, col-owner, col-hold, col-kpi ?
 - [ ] Không có khai báo lại `.table`, `.note`, `.callout` trong inline `<style>` ?
 - [ ] Form header đúng cấu trúc (logo + title cùng hàng) ?
-- [ ] ISO map có badge (PHẢI/BẮT BUỘC/NÊN) + điều khoản ISO ?
-- [ ] Gate mapping note "Vị trí trong hệ thống 8 cổng" có ?
-- [ ] Tên file, folder, path giữ nguyên tiếng Anh ?
 - [ ] CSS variables dùng `var(--...)` thay vì hard-code màu ?
-- [ ] Border-left trên note/box = 3px (không hard-code khác) ?
-- [ ] Relative path tới assets/ đúng theo bảng ở section 2.1 ?
+- [ ] Relative path tới assets/ đúng ?
+
+### 5.2 ISO map (Section đầu)
+- [ ] ISO map có badge PHẢI/NÊN/CÓ THỂ (`req-tag`) ?
+- [ ] Mỗi yêu cầu có `iso-clause` badge với điều khoản cụ thể (§X.Y) ?
+- [ ] ISO version = 9001:**2026** (KHÔNG phải 2015) ?
+
+### 5.3 Section 6 — Internal Gates
+- [ ] Dùng TABLE 5 cột (KHÔNG dùng gate-card) ?
+- [ ] IG badge dùng `step-tag` + `ig-center` class ?
+- [ ] Mỗi IG có: Mô tả, Chủ trì, Điểm dừng, KPI (KHÔNG để trống) ?
+- [ ] Số IG phù hợp quy trình (KHÔNG giới hạn cố định 5) ?
+
+### 5.4 Section 7 — Quy trình chi tiết
+- [ ] Có flowchart (`<div class="flowchart">`) SAU heading h2 ?
+- [ ] Số bước flowchart = Số h3 headings bên dưới ?
+- [ ] Mỗi h3 có `proc-num` balloon với màu xoay ?
+- [ ] Flowchart steps có `.active` (quyết định) và `.critical` (kiểm tra) ?
+- [ ] Nội dung bước chi tiết: giải thích WHO/WHAT/WHEN/HOW ?
+- [ ] Có callout "Điểm dừng bắt buộc" tại các bước quan trọng ?
+- [ ] Có "Bàn giao" cuối mỗi bước ?
+
+### 5.5 Khi cập nhật nội dung
+- [ ] Kiểm tra lại đánh số IG1→IGn (có bị lệch không) ?
+- [ ] Kiểm tra flowchart khớp h3 headings (thêm/xóa bước → update flowchart) ?
+- [ ] Kiểm tra nội dung procedure không bị đẩy sang section khác ?
+- [ ] Kiểm tra lỗi chính tả (đặc biệt chữ đầu từ tiếng Việt) ?
 
 ---
 
