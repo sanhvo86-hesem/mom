@@ -135,7 +135,7 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 /* TYPE 1: ISO Clause — blue pill (§8.2) */
 .iso-clause { display: inline-flex; padding: 2px 8px; border-radius: 12px; font-size: 9px; font-weight: 700; color: #fff; background: #1565c0; margin-left: 6px; vertical-align: middle; letter-spacing: .3px; }
 /* TYPE 2: Internal Gate — navy rounded pill (IG1, IG2...) */
-.step-tag { display: inline-flex; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #1565c0, #1976d2); border: none; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+.step-tag { display: inline-flex; padding: 2px 8px; border-radius: 12px; font-size: 9px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #1565c0, #1976d2); border: none; text-transform: uppercase; letter-spacing: .3px; white-space: nowrap; }
 /* Center IG badge in table cell */
 .ig-center { text-align: center !important; vertical-align: middle !important; white-space: nowrap !important; padding: 10px 6px !important; }
 .ig-center .step-tag { display: inline-flex; margin: 0 auto; }
@@ -169,7 +169,7 @@ h3:has(.proc-num) { margin-top: 28px; margin-bottom: 10px; display: flex; align-
 .flow-arrow { display: flex; align-items: center; justify-content: center; flex: 0 0 22px; color: #93b3d6; font-size: 16px; font-weight: 700; }
 .flow-fork { display: flex; flex-direction: column; gap: 6px; flex: 1 1 120px; }
 .flow-fork .flow-step { flex: none; }
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .flowchart { flex-direction: column; align-items: center; }
   .flow-arrow { transform: rotate(90deg); flex: 0 0 24px; }
   .flow-step { max-width: 100%; }
