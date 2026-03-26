@@ -136,10 +136,15 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 .iso-clause { display: inline-flex; padding: 2px 8px; border-radius: 12px; font-size: 9px; font-weight: 700; color: #fff; background: #1565c0; margin-left: 6px; vertical-align: middle; letter-spacing: .3px; }
 /* TYPE 2: Internal Gate — navy rounded pill (IG1, IG2...) */
 .step-tag { display: inline-flex; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #1565c0, #1976d2); border: none; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+/* Center IG badge in table cell */
+td .step-tag { margin: 0 auto; }
+td:has(.step-tag) { text-align: center; vertical-align: middle; }
 /* TYPE 3: System Gate — teal pill (G0, G1...) */
 .gate-tag { display: inline-flex; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #fff; background: #00838f; text-transform: uppercase; letter-spacing: .3px; }
 /* TYPE 5: Procedure step balloon — green circle before h3 headings in section 7 */
 .proc-num { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg, #059669, #10b981); color: #fff; font-size: 13px; font-weight: 800; margin-right: 8px; vertical-align: middle; flex-shrink: 0; }
+/* Consistent spacing for procedure step headings */
+h3:has(.proc-num) { margin-top: 28px; margin-bottom: 10px; display: flex; align-items: center; gap: 0; }
 /* TYPE 4: Procedure Step — amber rounded (Bước 1, Bước 2...) */
 .proc-tag { display: inline-flex; padding: 4px 12px; border-radius: var(--r-sm); font-size: 11px; font-weight: 800; color: #7b4f00; background: #fff3cd; border: 1px solid #ffc107; text-transform: uppercase; letter-spacing: .3px; }
 
