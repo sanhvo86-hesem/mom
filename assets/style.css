@@ -136,8 +136,9 @@ ul.list li, .list li { padding: 3px 0 3px 18px; position: relative; }
 .iso-clause { display: inline-flex; padding: 2px 8px; border-radius: 12px; font-size: 9px; font-weight: 700; color: #fff; background: #1565c0; margin-left: 6px; vertical-align: middle; letter-spacing: .3px; }
 /* TYPE 2: Internal Gate — navy rounded pill (IG1, IG2...) */
 .step-tag { display: inline-flex; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #1565c0, #1976d2); border: none; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
-/* Center IG badge in table cell — use display:block + margin:auto as fallback */
-td .step-tag { display: block; margin: 0 auto; width: fit-content; }
+/* Center IG badge in table cell */
+.ig-center { text-align: center !important; vertical-align: middle !important; }
+.ig-center .step-tag { display: inline-flex; }
 /* TYPE 3: System Gate — teal pill (G0, G1...) */
 .gate-tag { display: inline-flex; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #fff; background: #00838f; text-transform: uppercase; letter-spacing: .3px; }
 /* TYPE 5: Procedure step balloon — green circle before h3 headings in section 7 */
