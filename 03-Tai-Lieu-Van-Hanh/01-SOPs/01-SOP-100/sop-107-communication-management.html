@@ -217,7 +217,7 @@ td,th{}
 <li>Data sự cố phải đóng cùng <a href="sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> và <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</li>
 <li>Nếu sự kiện bộc lộ lỗ hổng quyền hạn, escalation bậc thang năng lực hoặc tối thiểu data set, phải cập nhật <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>/<a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a>/<a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a> tương ứng.</li>
 </ul>
-<h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
+<h2 class="h2" id="p8">7. Ngoại lệ, thay đổi &amp; làm lại</h2>
 <div class="flowchart">
   <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</div><div class="flow-text"><div class="flow-title">Xác định nội dung</div></div></div>
   <div class="flow-arrow">→</div>
@@ -235,7 +235,7 @@ td,th{}
 <tr><td>Ngoài giờ / Ngày nghỉ</td><td>Kích hoạt after-hours ladder; backfill vào nhật ký chính thức trong ca làm việc tiếp theo.</td><td>Người trực</td><td>ANNEX-117</td><td>Escalation nhật ký</td></tr>
 <tr><td>Hệ thống nhật ký chính thức bị gián đoạn</td><td>Dùng bộ offline đã phê duyệt, ghi tối thiểu ID + Người phụ trách + due + trạng thái tạm giữ/phê duyệt, sau đó bù lại lên SSOT.</td><td>Planner / QA / IT</td><td>SOP-108</td><td><a href="../../03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118</a></td></tr>
 </tbody></table></div>
-<h2 class="h2" id="p9">9. Hệ thống, hồ sơ &amp; dữ liệu</h2>
+<h2 class="h2" id="p9">8. Hệ thống, hồ sơ &amp; dữ liệu</h2>
 <div class="field-grid">
 <div class="field"><b>Hệ thống / SSOT</b><div class="blank">Communication nhật ký, nhật ký hành động và bằng chứng phải về M365 theo cấu trúc đã phê duyệt. Giao dịch business vẫn về Epicor khi liên quan job/ship/PO.</div></div>
 <div class="field"><b>Trường bắt buộc trong nhật ký</b><div class="blank">Event ID, family, severity, customer/job/part/rev, Người phụ trách, action, due time, trạng thái, tạm giữ/phê duyệt, Người phê duyệt, update time, bằng chứng link.</div></div>
@@ -248,7 +248,7 @@ td,th{}
 <tr><td>Customer truyền đạt / giao tiếp bằng chứng</td><td>Email, portal tin nhắn / thông điệp, đã phê duyệt thông báo, trả lời, đính kèm / tài liệu đính kèm.</td><td>Tình huống thư mục / SSOT</td><td>CS</td><td>Khi khiếu nại/chậm trễ/thay đổi tình huống kết thúc.</td></tr>
 <tr><td>Escalation / war phòng quyết định log</td><td>Ghi ai quyết, quyết gì, khi nào và bước tiếp theo.</td><td>Escalation thư viện</td><td>QA / Sản xuất Giám đốc</td><td>Khi khủng hoảng/sự kiện được ổn định.</td></tr>
 </tbody></table></div>
-<h2 class="h2" id="p10">10. Biểu mẫu, WI, ANNEX, SOP &amp; JD liên kết</h2>
+<h2 class="h2" id="p10">9. Biểu mẫu, WI, ANNEX, SOP &amp; JD liên kết</h2>
 <div class="table-card"><table class="table matrix-small"><colgroup><col style="width:16%"/><col style="width:44%"/><col style="width:40%"/></colgroup><thead><tr><th>Nhóm</th><th>Tài liệu liên quan</th><th>Vai trò trong SOP</th></tr></thead><tbody>
 <tr><td>Biểu mẫu</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-171_Communication_Plan_and_Log.xlsx">FRM-171</a></td><td>Log truyền đạt / giao tiếp, escalation, Người nhận xác nhận / biên nhận và kết thúc / đóng.</td></tr>
 <tr><td>WI</td><td><a href="../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>; <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a>; <a href="../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Point-of-use cho tier cuộc họp, bộ bằng chứng, cao-rủi ro mức sẵn sàng và ngăn chặn escalation.</td></tr>

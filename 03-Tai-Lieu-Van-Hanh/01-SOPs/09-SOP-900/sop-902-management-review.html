@@ -1,200 +1,432 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SOP-902 — Quản lý Review| HESEM QMS</title>
+<title>SOP-902 — Xem xét của lãnh đạo | HESEM QMS</title>
 <link href="../../../assets/style.css" rel="stylesheet"/>
 <style>
-
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
-.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
-.metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;}
-.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
-.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;}
-.link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);}
-.link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
-.link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);}
-.link-list{list-style:none;margin:0;padding:0}
-.link-list li{padding:4px 0 4px 0;font-size:12px}
-.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-.tight{margin:0;padding-left:18px}
-.tight li{margin:4px 0}
-.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
-.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
-.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}
-.hero h1{font-size:24px;margin:0 0 8px;color:var(--navy);}
-.hero p{margin:0;color:var(--ink2);}
-
-.notice-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0;}
-.notice-item{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);}
-
-.small{font-size:12px;color:var(--ink2);}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0;}
-.kpi-card{border:1px solid var(--ln);padding:14px;border-radius:12px;background:var(--bg);}
-.kpi-card h3{font-size:14px;margin:0 0 8px;color:var(--navy);}
-.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:12px 0;}
-.callout-card{border:1px solid var(--ln);padding:14px;border-radius:12px;background:#fff;}
-.callout-card h3{font-size:14px;margin:0 0 8px;color:var(--navy);}
-.req-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0;}
-
-.req-tag{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:24px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.4px}
-.must{background:#ffe8e8;color:#8f1d1d}
-.should{background:#eef6ff;color:#1f4e79}
-.may{background:#eef8ef;color:#2f6b2f}
-.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
-.gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
-.gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.footer-note{margin-top:18px;padding:12px 14px;border-radius:10px;background:#f6f7f9;color:var(--ink2);font-size:12px}
-.svg-wrap{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;overflow:auto;margin:14px 0}
-.field-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:12px 0}
-.field{border:1px solid var(--ln);border-radius:12px;padding:12px;background:#fff}
-.blank{display:block;min-height:46px;border:1px dashed #cbd5e1;border-radius:8px;background:#fcfdff;padding:8px;margin-top:8px}
-.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin:12px 0}
-.check-item{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--ln);border-radius:10px;padding:10px;background:#fff;font-size:12px}
-.chk{display:inline-block;width:14px;height:14px;border:1px solid #64748b;border-radius:3px;margin-top:2px}
-.matrix-small th,.matrix-small td{font-size:12px}
-.doc-link-list{margin:0;padding-left:18px}
-.doc-link-list li{margin:4px 0}
-
+.tight li{margin:4px 0;}
+.callout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:12px 0 16px;}
+.callout-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
+.callout-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;margin:12px 0 16px;}
+.field{padding:12px 14px;border:1px solid var(--ln);border-radius:var(--r);background:var(--bg);}
+.field b{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;}
+.field ul{margin:0;padding-left:18px;}
+.legend-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.role-note{border-left:3px solid var(--blue);background:var(--bg2);padding:12px 14px;border-radius:8px;margin-top:10px;}
+@media(max-width:960px){.field-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-<div class="container">
-<div class="page">
-<div class="page-body">
+<div class="container"><div class="page"><div class="page-body">
+
 <div class="form-header">
 <div class="fh-left">
 <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-<span>Tài liệu vận hành • <a href="sop-901-internal-audit-and-lpa.html">SOP-900</a></span>
+<span>Tài liệu kiểm soát</span>
 </div>
 </div>
 <div class="title">
-<strong>SOP-902 — Quản lý Review</strong>
-<span class="sub-vn">Quy trình quản trị xem xét của lãnh đạo theo logic Responsible Person, đóng băng-date, quyết định bậc thang năng lực và hành động effectiveness</span>
+<strong>SOP-902 — Xem xét của lãnh đạo</strong>
+<span class="sub-vn">Quy trình tổ chức management review dựa trên dữ liệu đã khóa nguồn, quyết định có Responsible Person và theo dõi effectiveness đến khi đóng.</span>
 </div>
 <div class="meta">
 <div class="row"><span><b>Code:</b></span><span>SOP-902</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>QMS Manager / Tổng Giám đốc</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Owner:</b></span><span>QA Manager</span></div>
+<div class="row"><span><b>Approved by:</b></span><span>Chief Executive Officer</span></div>
 </div>
 </div>
-<div class="doc-content" id="docContent">
-<div class="form-sheet">
-<div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>PHẢI tổ chức xem xét lãnh đạo ít nhất 2 lần/năm theo ISO 9001:2026 §9.3. <span class="iso-clause">§9.3</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>PHẢI chuẩn bị pack đầu vào đầy đủ (KPI, NCR, CAPA, audit, customer feedback) trước freeze-date. <span class="iso-clause">§9.3</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>PHẢI ghi nhận quyết định và hành động vào biên bản (FRM-911) với deadline và Responsible Person. <span class="iso-clause">§9.3</span></div></div>
-</div>
-<div class="preface-block"><div class="callout"><div class="card-title">Lệnh điều hành</div><p>Xem xét lãnh đạo không phải cuộc họp điểm danh KPI. Mọi dữ liệu đầu vào phải được khóa nguồn và đóng băng trước Ngày freeze-date. Mỗi quyết định đầu ra phải gắn Responsible Person, deadline và bằng chứng hiệu lực. Không phát hành biên bản khi chưa hoàn tất chữ ký phê duyệt của Tổng Giám đốc.</p><div class="legend-row"><span class="chip">Quy trình review: 902-P1 → 902-P5</span><span class="chip">Biểu mẫu bắt buộc: FRM-911</span><span class="chip">SOP liên đới: SOP-901 / SOP-801 / SOP-701</span></div></div></div>
-<div class="table-card"><table class="table">
-<colgroup><col class="col-ig"/><col class="col-desc"/><col class="col-owner"/><col class="col-hold"/><col class="col-kpi"/></colgroup>
-<thead><tr><th>IG</th><th>Mô tả</th><th>Chủ trì</th><th>Điểm dừng</th><th>KPI chính</th></tr></thead>
-<tbody>
-<tr><td class="ig-center"><span class="step-tag">IG1</span></td><td><b>902-P1 — Lập kế hoạch &amp; lịch Review</b><br></td><td></td><td></td><td></td></tr>
-<tr><td class="ig-center"><span class="step-tag">IG2</span></td><td><b>902-P2 — Thu thập &amp; đóng băng dữ liệu đầu vào</b><br></td><td></td><td></td><td></td></tr>
-<tr><td class="ig-center"><span class="step-tag">IG3</span></td><td><b>902-P3 — Họp xem xét lãnh đạo</b><br></td><td></td><td></td><td></td></tr>
-<tr><td class="ig-center"><span class="step-tag">IG4</span></td><td><b>902-P4 — Phát hành biên bản &amp; theo dõi hành động</b><br></td><td></td><td></td><td></td></tr>
-<tr><td class="ig-center"><span class="step-tag">IG5</span></td><td><b>902-P5 — Đánh giá hiệu lực quyết định</b><br></td><td></td><td></td><td></td></tr>
-</tbody></table></div>
-<div class="hero">
-<h1>SOP-902 — Quản lý Review</h1>
-<p>SOP này chuẩn hóa cách HESEM tổ chức <b>xem xét của lãnh đạo</b> như một cơ chế điều hành cấp hệ thống: nhìn dữ liệu đã khóa nguồn, chốt quyết định có Responsible Person và Ngày đến hạn, rồi kéo quyết định đó đi xuống tài liệu, nguồn lực và cải tiến. Đây không phải cuộc họp "điểm danh KPI".</p>
-</div>
-<div class="metric-grid"><div class="metric-card"><div class="label">Review nhịp độ / chu kỳ họp</div><div class="value">Ít nhất hàng quý</div><div class="small">Có thể mở rà soát bất thường</div></div><div class="metric-card"><div class="label">bắt buộc đầu vào nhóm sản phẩm</div><div class="value">10</div><div class="small">KPI, khách hàng, NCR/CAPA, đánh giá, nhà cung cấp, nguồn lực, rủi ro, thay đổi, an toàn, tính liên tục</div></div><div class="metric-card"><div class="label">Quyết định đầu ra</div><div class="value">5 nhóm</div><div class="small">giữ / ngăn chặn / thay đổi / đầu tư / escalation</div></div><div class="metric-card"><div class="label">Chính / Sơ cấp hồ sơ</div><div class="value"><a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> + pack liên kết</div><div class="small">Biên bản, log hành động, đính kèm / tài liệu đính kèm pack</div></div></div>
-<div class="req-grid">
-<div class="req"><span class="req-tag must">BẮT BUỘC</span><div><b>Dùng dữ liệu đã khóa Responsible Person / đóng băng-date</b><br/>Không dùng số liệu ad hoc chưa rõ nguồn để ra quyết định cấp lãnh đạo.</div></div>
-<div class="req"><span class="req-tag must">BẮT BUỘC</span><div><b>Mỗi quyết định phải có Responsible Person và Ngày đến hạn</b><br/>Quyết định không gắn Responsible Person/due/bằng chứng path được xem như chưa phát hành.</div></div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div><b>Review hiệu lực, không chỉ rà soát tuân thủ</b><br/>Phải hỏi control có đang chống trôi / sai lệch, chống phụ thuộc cá nhân và chống lặp lại lỗi hay không.</div></div>
-</div>
-<div class="note"><b>Liên kết trục các tài liệu điều khiển bắt buộc</b><br/>SOP này nối trực tiếp với <a href="../../03-Reference/01-ANNEX-100/annex-122-kpi-cascade-dictionary.html">ANNEX-122 — KPI Cascade Dictionary</a>, <a href="../../03-Reference/01-ANNEX-100/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115 — Epicor Transaction and Interface Map</a>, <a href="../../03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118 — Offline Fallback Kit</a> và <a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911 — Management Review Minutes</a>. Mục tiêu là chốt được chuỗi: <b>Người phụ trách KPI → nguồn dữ liệu → quyết định lãnh đạo → action hệ thống → bằng chứng hiệu lực</b>.</div>
-<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#m1">1. Mục đích và outcome của xem xét của lãnh đạo</a><a href="#m2">2. Phạm vi, cadence và trigger mở review</a><a href="#m3">3. Vai trò, thẩm quyền và RACI vận hành</a><a href="#m4">4. Pack đầu vào, kiểm soát nguồn và freeze-date</a><a href="#m5">5. Chuẩn bị pre-read và cổng kiểm soát chốt chất lượng dữ liệu</a><a href="#m6">6. Điều hành cuộc họp và decision ladder</a><a href="#m7">7. Action management, carry-over và escalation</a><a href="#m8">8. Review bất thường và tình huống đặc biệt</a><a href="#m9">9. Hồ sơ, form và quy tắc lưu vết</a><a href="#m10">10. KPI hiệu lực của chính quá trình xem xét của lãnh đạo</a><a href="#m11">11. Tài liệu liên kết</a></div></div>
-<h2 class="h2" id="m1">1. Mục đích và outcome của xem xét của lãnh đạo</h2>
-<ul class="tight"><li>Xác nhận QMS còn phù hợp với định hướng kinh doanh, yêu cầu khách hàng, rủi ro, năng lực vận hành và năng lực con Người hay không.</li><li>Đánh giá mức độ hiệu lực của các control trọng yếu: chất lượng, delivery, supplier, product safety, human factors, training, continuity, data integrity, change management.</li><li>Ra quyết định ở cấp hệ thống: giữ nguyên kiểm soát, tăng containment/monitoring, thay đổi SOP/WI/ANNEX/FORM/JD, bổ sung nguồn lực/công nghệ, hoặc escalate tới khách hàng / nhà cung cấp / lãnh đạo site.</li><li>Tạo hành động có Người phụ trách, deadline, resource commitment, yêu cầu bằng chứng và tiêu chí đóng action rõ ràng.</li></ul>
-<h2 class="h2" id="m2">2. Phạm vi, cadence và trigger mở review</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:24%"/><col style="width:16%"/><col style="width:24%"/><col style="width:36%"/></colgroup><thead><tr><th>Loại review</th><th>Chu kỳ mặc định</th><th>Khi nào mở</th><th>Điểm cần đạt</th></tr></thead><tbody><tr><td>Quarterly xem xét của lãnh đạo</td><td>Ít nhất mỗi quý</td><td>Theo lịch hệ thống</td><td>Có pack đầu vào đã khóa nguồn, review đầy đủ 10 family đầu vào, phát hành biên bản và action list.</td></tr><tr><td>Mid-cycle focused review</td><td>Theo nhu cầu</td><td>KPI lệch mạnh, dự án lớn, ramp-up khách hàng, backlog CAPA/đánh giá, shortage nguồn lực</td><td>Giải quyết sâu một chủ đề trọng yếu và ghi rõ liên kết sang kỳ review chính.</td></tr><tr><td>Extraordinary review</td><td>Ngay khi cần</td><td>Khiếu nại lớn, escape nghiêm trọng, incident continuity lớn, thay đổi chiến lược, supplier failure, cyber/IT incident diện rộng</td><td>Không chờ tới quý sau; review ngay tác động hệ thống và ra containment/decision cấp lãnh đạo.</td></tr></tbody></table></div>
-<p>xem xét của lãnh đạo có thể họp nhiều phiên, nhưng phải dùng cùng logic pack control, cùng biên bản, cùng action list và cùng rule carry-over.</p>
-<h2 class="h2" id="m3">3. Vai trò, thẩm quyền và RACI vận hành</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:27%"/><col style="width:25%"/><col style="width:30%"/></colgroup><thead><tr><th>Vai trò</th><th>Trách nhiệm chính</th><th>Quyền quyết định trong MR</th><th>Tài liệu boundary</th></tr></thead><tbody><tr><td>Tổng Giám Đốc / lãnh đạo site</td><td>Chủ trì, xác nhận ưu tiên hệ thống, chốt quyết định ảnh hưởng chiến lược, nguồn lực và risk acceptance.</td><td>Phê duyệt thay đổi lớn, ưu tiên đầu tư, customer escalation, Người phụ trách cuối cùng của carry-over lớn.</td><td><a href="../../03-Reference/01-ANNEX-100/annex-120-authority-matrix.html">ANNEX-120 — Authority Matrix</a> / <a href="../../03-Reference/01-ANNEX-100/annex-123-deputy-backup-matrix.html">ANNEX-123 — Deputy Backup Matrix</a></td></tr><tr><td>QMS Manager / QA Manager</td><td>Điều phối agenda, pack, cổng kiểm soát chất lượng dữ liệu, nhật ký quyết định, theo dõi action, liên kết đánh giá/CAPA/improvement.</td><td>Có quyền reject pack chưa đủ chất lượng dữ liệu; có quyền yêu cầu containment hoặc re-review khi bằng chứng không đủ.</td><td><a href="../../03-Reference/01-ANNEX-100/annex-121-raci-master-matrix.html">ANNEX-121 — RACI Master Matrix</a> / <a href="../../03-Reference/01-ANNEX-100/annex-122-kpi-cascade-dictionary.html">ANNEX-122 — KPI Cascade Dictionary</a></td></tr><tr><td>KPI / chủ quá trình</td><td>Chuẩn bị đầu vào, giải trình trend, đề xuất decision, thực hiện action và chứng minh hiệu lực.</td><td>Chốt data ghi chú điều hành trong phạm vi own quy trình; không tự sửa số liệu sau freeze-date.</td><td><a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901 — Performance Dashboard</a></td></tr><tr><td>IT / Epicor / chủ dữ liệu</td><td>Xác nhận SoR, refresh rule, freeze-date, exception, offline/backfill issues và data quality risk.</td><td>Có quyền yêu cầu note ngoại lệ dữ liệu, đóng băng refresh hoặc tách tình huống mismatch khỏi KPI trend.</td><td><a href="../../03-Reference/01-ANNEX-100/annex-101-role-based-access-map.html">ANNEX-101 — Role-Based Access Map</a> / <a href="../../03-Reference/01-ANNEX-100/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115 — Epicor Transaction and Interface Map</a></td></tr><tr><td>HR / Finance / Supply Chain / Production / Engineering / Sales leaders</td><td>Mang chủ đề bộ phận lên review, nhận action và điều phối xuống handbook/JD/team.</td><td>Quyết định trong phạm vi thẩm quyền; ngoài phạm vi phải escalate ngay trong cuộc họp.</td><td>Handbook bộ phận + JD + ma trận thẩm quyền.</td></tr></tbody></table></div>
-<div class="note"><b>quy tắc Người thay thế (deputy rule)</b><br/>Nếu Người phụ trách chính vắng mặt, Người thay quyền phải là deputy đã được thiết kế trong matrix hoặc được chỉ định rõ trong agenda/biên bản. Không dùng Người "đi họp thay" nhưng không có quyền chốt.</div>
-<h2 class="h2" id="m4">4. Pack đầu vào, kiểm soát nguồn và freeze-date</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:14%"/><col style="width:30%"/><col style="width:14%"/><col style="width:24%"/></colgroup><thead><tr><th>Đầu vào family</th><th>Người phụ trách pack</th><th>Nguồn chuẩn / kiểm soát nguồn</th><th>Freeze-date áp dụng</th><th>Mục tiêu review</th></tr></thead><tbody><tr><td>KPI vận hành &amp; chất lượng</td><td>KPI Người phụ trách + QMS</td><td>Bảng điều khiển đã khóa Người phụ trách/source theo <a href="../../03-Reference/01-ANNEX-100/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115 — Epicor Transaction and Interface Map</a></td><td>T-3 Ngày làm việc trước họp</td><td>Xu hướng, ngưỡng lệch, pattern lặp lại, sự khác biệt giữa chỉ số và cảm nhận thực tế.</td></tr><tr><td>Khách hàng / khiếu nại / satisfaction</td><td>Sales + QA</td><td>Complaint Log, survey, waiver, delivery performance, major phản hồi</td><td>T-3</td><td>Tín hiệu bên ngoài và mức độ tin cậy của công ty với khách hàng.</td></tr><tr><td>NCR / CAPA / đánh giá / LPA</td><td>QA/QMS</td><td><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651 — NCR Report</a>; <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652 — CAPA 8D Report</a>; <a href="sop-901-internal-audit-and-lpa.html">SOP-901 — Đánh giá nội bộ và LPA</a></td><td>T-2</td><td>Repeat vấn đề, hiệu lực hành động, độ sâu RCA, tồn đọng đánh giá.</td></tr><tr><td>Supplier / external providers</td><td>Supply Chain + QA</td><td>Supplier performance, SCAR, incoming quality, công đoạn đặc biệt trạng thái</td><td>T-3</td><td>Rủi ro nguồn ngoài và quyết định source strategy.</td></tr><tr><td>Resources / competence / training</td><td>HR + department heads</td><td>Skill matrix, certification, vacancy, overtime stress, deputy mức sẵn sàng</td><td>T-3</td><td>Độ đủ Người, độ bền đội ngũ, điểm đơn lẻ phụ thuộc cá nhân.</td></tr><tr><td>Risk / opportunity / change</td><td>QMS + Engineering + lãnh đạo liên quan</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx">FRM-131 — Risks and Opportunities Register</a> + DCR/ECR/ECO + project/change các nhật ký</td><td>T-2</td><td>Tín hiệu thay đổi lớn, risk chưa xử lý và cơ hội cần đầu tư.</td></tr><tr><td>Continuity / data / digital governance</td><td>IT + QMS + Epicor</td><td>Access review, incidents, offline events, backfill exceptions, SoR mismatches</td><td>T-2</td><td>Tính kỷ luật dữ liệu và độ bền continuity.</td></tr><tr><td>EHS / product safety / human factors</td><td>EHS + Production + QA</td><td>Incident/sự cố suýt xảy ra (near-miss), ergonomic issues, nhiễm bẩn/FOD signals, fatigue and supervision issues</td><td>T-2</td><td>Tác động an toàn và human factors lên chất lượng/độ tin cậy.</td></tr></tbody></table></div>
-<p><b>Nguyên tắc freeze-date:</b> sau thời điểm freeze, Người phụ trách KPI không được âm thầm sửa số. Nếu có correction hợp lệ, correction phải đi kèm note nguyên nhân, phạm vi ảnh hưởng và Người phê duyệt. Việc này đặc biệt quan trọng với pack dùng để chốt quyết định nguồn lực hoặc customer response.</p>
-<h2 class="h2" id="m5">5. Chuẩn bị pre-read và cổng kiểm soát chốt chất lượng dữ liệu</h2>
-<ul class="tight"><li>QMS phát hành agenda và danh mục pack yêu cầu trước kỳ review; mỗi Người phụ trách nộp pack đã kiểm title, period, Người phụ trách, source, freeze-date, và link lưu trữ.</li><li>Người phụ trách KPI phải thêm ghi chú điều hành: xu hướng, nguyên nhân chính, containment đang mở, decision đề xuất, và nếu cần thì resource ask.</li><li>QMS/IT/chủ dữ liệu rà cổng kiểm soát chất lượng dữ liệu: thiếu source, số không khớp bảng điều khiển vs raw bằng chứng, thiếu freeze-date, sử dụng extract ad hoc, hoặc unresolved mismatch.</li><li>Pack không đạt cổng kiểm soát dữ liệu có thể vẫn được mang vào họp để cảnh báo rủi ro, nhưng phải gắn nhãn vấn đề và không được dùng để chốt quyết định nhạy cảm nếu chưa có clarify đủ.</li><li>Tối thiểu T-1 ngày, Người chủ trì và QMS phải xác nhận agenda cuối cùng: vấn đề nào chỉ để thông tin, vấn đề nào cần quyết định và vấn đề nào cần escalation.</li></ul>
-<div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:82%"/></colgroup><thead><tr><th>Cổng kiểm soát data quality</th><th>Câu hỏi phải trả lời "có" trước khi chốt pack</th></tr></thead><tbody><tr><td>G-D1</td><td>Nguồn dữ liệu đã được chỉ rõ Người phụ trách và vị trí lưu chưa?</td></tr><tr><td>G-D2</td><td>Kỳ dữ liệu và freeze-date có rõ không?</td></tr><tr><td>G-D3</td><td>Số liệu có khớp với raw nhật ký / bộ bằng chứng khi spot-check không?</td></tr><tr><td>G-D4</td><td>Có vấn đề offline/backfill, late posting, manual override nào chưa giải thích không?</td></tr><tr><td>G-D5</td><td>Ghi chú điều hành có nêu decision đề xuất thay vì chỉ nêu hiện tượng không?</td></tr></tbody></table></div>
-<h2 class="h2" id="m6">6. Điều hành cuộc họp và decision ladder</h2>
-<ul class="tight"><li>Cuộc họp đi theo agenda cố định nhưng linh hoạt độ sâu theo risk. Chủ trì phải kéo cuộc họp từ "mô tả" sang "quyết định" và từ "đơn lẻ" sang "hệ thống".</li><li>Mỗi chủ đề phải làm rõ: vấn đề là gì, mức độ ảnh hưởng, nguyên nhân/driver, containment hiện tại, risk nếu không làm gì, decision đề xuất, Người phụ trách và thời hạn.</li><li>QMS ghi trực tiếp decision/action vào FRM-911 trong cuộc họp hoặc ngay sau từng block, không chờ cuối Ngày mới hồi tưởng.</li><li>Khi nhiều dữ liệu không nhất quán, chủ trì có thể chốt decision tạm: giữ control + mở action làm rõ + deadline re-review.</li></ul>
-<div class="callout-grid">
-<div class="callout-card"><h3>Quyết định bậc thang năng lực dùng trong MR</h3><ul class="tight"><li>Giữ nguyên control Current và tiếp tục theo dõi.</li><li>Tăng ngăn chặn / lấy mẫu / escalation tạm thời.</li><li>Sửa SOP/WI/ANNEX/FORM/JD/thẩm quyền/phó.</li><li>Bổ sung Người, đào tạo, thiết bị, phần mềm, dữ liệu hoặc ngân sách.</li><li>Đổi source / dừng source / khách hàng truyền đạt / giao tiếp / bất thường rà soát.</li></ul></div>
-<div class="callout-card"><h3>Các câu hỏi bắt buộc</h3><ul class="tight"><li>Đây là hiện tượng đơn lẻ hay mẫu / quy luật lặp lại?</li><li>Control Current chống lỗi hay chỉ phát hiện lỗi?</li><li>Có phụ thuộc một cá nhân / một file / một hệ thống không?</li><li>Có cần thay sổ tay, JD, KPI, RACI hoặc phó không?</li><li>Khi nào và bằng chứng nào cho phép đóng hành động?</li></ul></div>
-</div>
-<div class="note"><b>Rule khi vấn đề có gốc con Người-system</b><br/>Nếu KPI, khiếu nại, NCR/CAPA hoặc tính liên tục vấn đề bắt nguồn từ yếu tố con Người, xem xét của lãnh đạo không được đóng ở mức "đào tạo lại". Quyết định phải chỉ rõ vai trò bị ảnh hưởng, ranh giới được ủy quyền-to-công việc, điều kiện ngăn chặn tạm thời, hạn chót tái đánh giá năng lực và bố trí Người thay thế cần đạt.</div><h2 class="h2" id="m7">7. Hành động quản lý, mang / chuyển-trên / vượt quá và escalation</h2>
-<div class="flowchart">
-  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</div><div class="flow-title">Lập kế hoạch</div><div class="flow-desc">Xác định cadence, agenda và người tham dự</div></div>
-  <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</div><div class="flow-title">Thu thập input</div><div class="flow-desc">Thu thập KPI, NCR, CAPA, feedback, rủi ro</div></div>
-  <div class="flow-arrow">→</div>
-  <div class="flow-step critical"><div class="flow-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</div><div class="flow-title">Freeze data</div><div class="flow-desc">Đóng băng dữ liệu, kiểm tra chất lượng pack</div></div>
-  <div class="flow-arrow">→</div>
-  <div class="flow-step active"><div class="flow-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</div><div class="flow-title">Họp review</div><div class="flow-desc">Điều hành cuộc họp, ra quyết định</div></div>
-  <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</div><div class="flow-title">Phát hành biên bản</div><div class="flow-desc">Ghi và phát hành biên bản họp chính thức</div></div>
-  <div class="flow-arrow">→</div>
-  <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">6</div><div class="flow-title">Theo dõi actions</div><div class="flow-desc">Giám sát hành động, xác nhận hiệu lực</div></div>
-</div>
-<div class="table-card"><table class="table"><colgroup><col style="width:22%"/><col style="width:48%"/><col style="width:30%"/></colgroup><thead><tr><th>Loại đầu ra</th><th>Phải có gì</th><th>Đóng khi nào</th></tr></thead><tbody><tr><td>khắc phục / cải tiến hành động</td><td>Vấn đề, quyết định, Responsible Person, Ngày đến hạn, bằng chứng dự kiến, liên kết tài liệu/quy trình</td><td>Khi có bằng chứng hành động hoàn tất và hiệu lực bước đầu được xác nhận.</td></tr><tr><td>System tài liệu thay đổi</td><td>Tên tài liệu, section cần đổi, Responsible Person soạn, Approver, target phát hành date</td><td>Khi tài liệu mới ban hành và Người dùng trọng yếu đã được truyền thông/đào tạo.</td></tr><tr><td>nguồn lực / đầu tư Requests</td><td>Nhu cầu, lý do, ảnh hưởng nếu không cấp, Người quyết định, hạn chốt</td><td>Khi quyết định đầu tư/không đầu tư đã được đưa ra và truyền xuống Responsible Person.</td></tr><tr><td>Ngăn chặn / tạm thời control</td><td>Phạm vi, thời hạn, Người giữ, kích hoạt bỏ ngăn chặn</td><td>Khi nguyên nhân gốc hoặc giải pháp bền vững đã triển khai.</td></tr><tr><td>mang / chuyển-trên / vượt quá to next rà soát</td><td>Lý do chưa đóng, rủi ro tồn dư, Current ngăn chặn, Responsible Person, đã lên kế hoạch next điểm kiểm tra</td><td>Khi vấn đề được giải quyết hoặc được chấp nhận rủi ro bởi đúng thẩm quyền.</td></tr></tbody></table></div>
-<p>Hành động MR không được tồn tại độc lập khỏi các hệ thống khác. Nếu hành động tạo ra NCR/CAPA, đánh giá, DCR/ECO, Projects, đào tạo plan hoặc truy cập thay đổi thì <a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> phải dẫn được tới hồ sơ đó và ngược lại.</p>
-<h2 class="h2" id="m8">8. Review bất thường và tình huống đặc biệt</h2>
-<ul class="tight"><li>Mở rà soát bất thường khi có khách hàng khiếu nại lớn, thoát / bỏ qua nghiêm trọng, nhà cung cấp sự cố hỏng máy, mất an toàn nghiêm trọng, sự cố tính liên tục cấp cao, an ninh mạng sự cố, mất truy xuất nguồn gốc hoặc thay đổi chiến lược đáng kể.</li><li>Có thể họp ngắn và chỉ xoay quanh 1 chủ đề, nhưng vẫn phải có biên bản, quyết định, Responsible Person và kỳ theo dõi tiếp.</li><li>Khi Người có thẩm quyền vắng mặt và phó chưa đủ ranh giới, item phải chuyển trạng thái "pending quyết định" thay vì chốt vượt quyền.</li><li>Nếu sau cuộc họp phát hiện source data sai hoặc có bổ sung / thay thế lớn làm đổi kết luận, QMS phải kích hoạt re-rà soát có kiểm soát, không sửa biên bản cũ âm thầm.</li></ul>
-<h2 class="h2" id="m9">9. Hồ sơ, biểu mẫu và quy tắc lưu vết</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:20%"/><col style="width:34%"/><col style="width:46%"/></colgroup><thead><tr><th>Hồ sơ</th><th>Nơi giữ / mẫu dùng</th><th>Yêu cầu</th></tr></thead><tbody><tr><td>Biên bản xem xét của lãnh đạo</td><td><a href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx" download="">FRM-911 — Quản lý Review Biên bản họp</a></td><td>Ghi đủ Người tham dự, đầu vào đã rà soát, quyết định, hành động, mang / chuyển-trên / vượt quá, nguồn lực ask, ký-off.</td></tr><tr><td>Pack đầu vào</td><td>Thư mục hệ thống theo kỳ rà soát</td><td>Mỗi pack phải có Responsible Person, version/đóng băng-date, source và ghi chú điều hành.</td></tr><tr><td>KPI / bảng điều khiển link</td><td><a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901 — Hiệu suất Dashboard</a> + bảng điều khiển được kiểm soát source</td><td>Truy được về raw bằng chứng khi cần mẫu/xác minh.</td></tr><tr><td>NCR/CAPA / đánh giá / rủi ro liên kết</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx" download="">FRM-651 — NCR Báo cáo</a> • <a href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx" download="">FRM-652 — CAPA 8D Báo cáo</a> • <a href="../../../04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx" download="">FRM-131 — rủi ro and Cơ hội Sổ đăng ký</a></td><td>Liên kết hai chiều khi hành động MR mở ra hồ sơ khác.</td></tr></tbody></table></div>
-<div class="note"><b>lệnh cấm</b><br/>Không dùng email/chat đơn lẻ làm bằng chứng duy nhất cho quyết định xem xét của lãnh đạo. Email có thể là bằng chứng phụ, nhưng quyết định chính thức phải được neo vào biên bản và hành động hồ sơ của hệ thống.</div>
-<h2 class="h2" id="m10">10. KPI hiệu lực của chính quá trình xem xét của lãnh đạo</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:40%"/><col style="width:20%"/><col style="width:40%"/></colgroup><thead><tr><th>Tín hiệu kiểm soát</th><th>Responsible Person theo dõi</th><th>Ý nghĩa</th></tr></thead><tbody><tr><td>Tỷ lệ pack nộp đúng hạn và qua cổng kiểm soát dữ liệu ở lần đầu</td><td>QMS Manager</td><td>Đo kỷ luật chuẩn bị rà soát.</td></tr><tr><td>Tỷ lệ hành động MR đóng đúng hạn</td><td>QMS + Quy trình Owner</td><td>Đo chất lượng theo dõi tiếp, không chỉ chất lượng cuộc họp.</td></tr><tr><td>Tỷ lệ hành động MR phải mở lại vì thiếu hiệu lực</td><td>QMS + lãnh đạo liên quan</td><td>Đo chất lượng quyết định và chất lượng xác nhận đóng.</td></tr><tr><td>Tỷ lệ KPI/bảng điều khiển trong MR có Responsible Person + đóng băng-date + kiểm soát nguồn rõ</td><td>QMS + IT/chủ dữ liệu</td><td>Đo độ trưởng thành dữ liệu quản trị.</td></tr><tr><td>Số vấn đề mang / chuyển-trên / vượt quá &gt; 2 kỳ rà soát</td><td>Lãnh đạo site</td><td>Đo công việc tồn đọng chiến lược và điểm nghẽn giải quyết.</td></tr></tbody></table></div>
-<ul class="tight"><li>Ít nhất mỗi năm phải có 1 lần tự-rà soát của chính quá trình xem xét của lãnh đạo: chương trình họp có đủ, Người đúng có mặt, quyết định bậc thang năng lực có được dùng, hành động có đi xuống tài liệu/hệ thống hay không.</li><li>Khi KPI hoặc cấu trúc thẩm quyền/phó thay đổi, SOP này và <a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> phải được rà đồng thời để tránh pack mới nhưng biểu mẫu cũ.</li></ul>
-<h2 class="h2" id="m11">11. Tài liệu liên kết</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:16%"/><col style="width:52%"/><col style="width:32%"/></colgroup><thead><tr><th>Nhóm</th><th>Tài liệu</th><th>Vai trò trong SOP-902</th></tr></thead><tbody><tr><td>Biểu mẫu chính</td><td><a href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx" download="">FRM-911 — Quản lý Review Biên bản họp</a></td><td>Biên bản và hành động sổ đăng ký chính thức.</td></tr><tr><td>KPI / quản trị</td><td><a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html">ANNEX-122 — KPI Phân tầng Từ điển</a> • <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120 — Thẩm quyền Matrix</a> • <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123 — Phó Backup Matrix</a></td><td>Khóa Responsible Person, quyền và phó khi rà soát/chốt hành động.</td></tr><tr><td>Digital / source-control</td><td><a href="../../03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101 — Role-dựa trên Truy cập Map</a> • <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115 — Epicor Giao dịch and giao diện Map</a> • <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118 — Offline phương án dự phòng Kit</a></td><td>Khóa SoR, đóng băng-date, tính liên tục và truy cập rủi ro.</td></tr><tr><td>SOP liên đới</td><td><a href="sop-901-internal-audit-and-lpa.html">SOP-901 — Đánh giá nội bộ và LPA</a> • <a href="sop-903-continual-improvement-and-kaizen.html">SOP-903 — Improvement liên tục và Kaizen</a> • <a href="../01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108 — Ứng phó gián đoạn vận hành và liên tục kinh doanh</a></td><td>Nguồn đầu vào và đường đi của hành động sau MR.</td></tr><tr><td>WI / biểu mẫu hỗ trợ</td><td><a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901 — Hiệu suất Dashboard</a> • <a href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx" download="">FRM-651 — NCR Báo cáo</a> • <a href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx" download="">FRM-652 — CAPA 8D Báo cáo</a> • <a href="../../../04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx" download="">FRM-131 — rủi ro and Cơ hội Sổ đăng ký</a></td><td>Dùng để chuẩn bị đầu vào và triển khai đầu ra.</td></tr></tbody></table></div>
-<div class="footer-note">SOP-902 phải được rà khi thay Responsible Person KPI, bảng điều khiển source, thẩm quyền/phó matrix, nhịp độ / chu kỳ họp rà soát, hoặc khi kết quả đánh giá/tự-rà soát cho thấy xem xét của lãnh đạo đang chỉ "báo cáo" mà không thực sự tạo ra quyết định hệ thống.</div>
 
-<div data-phase2i="true">
-<h2 class="h2" id="m13">13. Quy tắc điều hành — mang / chuyển-trên / vượt quá lớp / phân loại, chuyển đổi lộ trình gia công và KPI quản trị</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:22%"/><col style="width:24%"/><col style="width:22%"/><col style="width:32%"/></colgroup><thead><tr><th>mang / chuyển-trên / vượt quá class</th><th>Dùng khi nào</th><th>Evidence phải thấy ở kỳ sau</th><th>Lộ trình bắt buộc nếu còn lặp / không tiến triển</th></tr></thead><tbody>
-<tr><td>Hành động theo dõi / cảnh giác</td><td>Hành động đang chạy đúng hướng, chưa đến hạn và chưa cần đổi lộ trình gia công.</td><td>mốc quan trọng đã đạt, không có vấn đề chặn mới, KPI/vấn đề chưa xấu thêm.</td><td>Nếu trượt mốc hoặc đổi cơ chế vấn đề, phải phân loại lại ngay.</td></tr>
-<tr><td>Effectiveness theo dõi / cảnh giác</td><td>Hành động đã làm xong nhưng cần cửa sổ xác nhận hiệu lực.</td><td>Xu hướng kỳ mới, xác minh lot / đánh giá / bằng chứng cửa sổ / khung thời gian đúng như đã chốt.</td><td>Nếu không đạt, mở lại vấn đề-giải quyết hồ sơ hoặc hạ source/quy trình trạng thái tương ứng.</td></tr>
-<tr><td>nguồn lực-cổng kiểm soát theo dõi / cảnh giác</td><td>Vấn đề không giải quyết tiếp được nếu chưa cấp Người, tiền, hệ thống hoặc thẩm quyền.</td><td>Quyết định rõ về cấp / không cấp / hoãn / đổi phạm vi.</td><td>Nếu qua một kỳ MR mà chưa có quyết định, phải báo cáo vượt cấp lãnh đạo Người bảo trợ hoặc lộ trình item.</td></tr>
-<tr><td>Tái phát theo dõi / cảnh giác</td><td>Cùng cơ chế vấn đề tái diễn dù đã có hành động trước đó.</td><td>mẫu / quy luật lặp được mô tả rõ theo kỳ, nhóm sản phẩm, site, nhà cung cấp hoặc vai trò.</td><td>Phải chuyển sang <a href="sop-903-continual-improvement-and-kaizen.html">SOP-903</a>, CAPA hoặc đánh giá/nhà cung cấp lộ trình gia công; không để trạng thái-chỉ / duy nhất.</td></tr>
-<tr><td>Data-chất lượng theo dõi / cảnh giác</td><td>Kết luận kỳ này bị ảnh hưởng bởi data gap, bổ sung / thay thế, source không khớp hoặc đóng băng-date vấn đề.</td><td>Pack làm rõ dữ liệu, Responsible Person xác nhận SoR, version / đóng băng-date mới.</td><td>Nếu lặp lại, mở hành động hệ thống số / bảng điều khiển quản trị thay vì chấp nhận mãi ngoại lệ.</td></tr>
-</tbody></table></div>
-<div class="table-card"><table class="table"><colgroup><col style="width:30%"/><col style="width:28%"/><col style="width:42%"/></colgroup><thead><tr><th>Kích hoạt chuyển lộ trình gia công</th><th>Chuyển sang đâu</th><th>Ý nghĩa</th></tr></thead><tbody>
-<tr><td>Cùng vấn đề mang / chuyển-trên / vượt quá qua &gt;2 kỳ MR</td><td><a href="sop-903-continual-improvement-and-kaizen.html">SOP-903</a> / <a href="../../../04-Bieu-Mau/06-FRM-600/FRM-653_A3_PDCA_Form.xlsx" download="">FRM-653</a></td><td>MR tiếp tục giữ quản trị, nhưng vấn đề-giải quyết phải có điều lệ / quy chế và mốc chuẩn rõ.</td></tr>
-<tr><td>Vấn đề chất lượng / lỗi thoát / hệ thống kiểm soát không ngăn tái diễn</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx" download="">FRM-652</a> hoặc nhà cung cấp CAPA lộ trình gia công</td><td>Không dùng MR thay cho CAPA.</td></tr>
-<tr><td>Supplier/source vấn đề lặp ở nhiều lot / kỳ</td><td><a href="../../../04-Bieu-Mau/04-FRM-400/FRM-405_Supplier_Scorecard.xlsx" download="">FRM-405</a> + <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-406_SCAR.xlsx" download="">FRM-406</a> + <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-409_Supplier_Audit_Checklist.xlsx" download="">FRM-409</a></td><td>MR chỉ chốt hướng nguồn lực / thương mại / rủi ro acceptance, không thay thế nhà cung cấp quản trị hồ sơ.</td></tr>
-<tr><td>People-system / ủy quyền / phó gap kéo dài</td><td><a href="../08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a> + đào tạo/ủy quyền hồ sơ</td><td>Phải chuyển thành hành động về năng lực, ủy quyền hoặc bố trí Người thay thế chứ không dừng ở "đào tạo lại".</td></tr>
-</tbody></table></div>
-<div class="note">xem xét của lãnh đạo quản trị <b>quyết định</b>; còn hồ sơ gốc phải quản trị <b>nguyên nhân, đối sách và hiệu lực</b>. mang / chuyển-trên / vượt quá là trạng thái theo dõi, không phải cơ chế đóng vấn đề.</div>
+<div class="doc-content" id="docContent"><div class="form-sheet">
+
+<div class="iso-map">
+<div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Tổ chức xem xét của lãnh đạo theo cadence đã phê duyệt, tối thiểu 2 lần mỗi năm, và mở extraordinary review khi có rủi ro trọng yếu hoặc thay đổi lớn. <span class="iso-clause">§9.3</span></div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Dùng Review Pack đã khóa source, Responsible Person và freeze-date trước khi họp; không ra quyết định từ số liệu ad hoc không truy vết được. <span class="iso-clause">§9.1</span></div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Ghi mọi quyết định, hành động, carry-over và yêu cầu nguồn lực vào FRM-911 với owner, due date và evidence path rõ ràng. <span class="iso-clause">§9.3</span></div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Mở CAPA, risk action hoặc document change tương ứng khi quyết định management review làm thay đổi control hệ thống; không để action đứng tách rời khỏi hồ sơ gốc. <span class="iso-clause">§10.2</span></div></div>
 </div>
-</div>
-<h2>12. Hành động effectiveness, nguồn lực cổng và tái phát theo dõi / cảnh giác</h2>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại hành động</th><th>MR phải chốt điều gì</th><th>Hồ sơ / pack liên kết</th></tr></thead><tbody>
-<tr><td>khắc phục / phòng ngừa hành động</td><td>Không chỉ chốt Ngày đến hạn; phải chốt tiêu chí effectiveness và thời điểm rà soát lại.</td><td><a href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx" download="">FRM-652</a>, <a href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx" download="">FRM-911</a></td></tr>
-<tr><td>Hold / ngăn chặn tuổi tồn (lão hóa / cũ)</td><td>Quyết định xem tình huống chỉ xử lý nội bộ / tại chỗ hay đưa vào định kỳ / lặp lại quản lý theo dõi / cảnh giác.</td><td><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a>, <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>, KPI pack</td></tr>
-<tr><td>nguồn lực-phụ thuộc hành động</td><td>Chỉ rõ nguồn vốn / tooling / số nhân sự / system kiểm soát thay đổi gate, Responsible Person và phương án dự phòng nếu không được cấp ngay.</td><td><a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a>, <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-124-dashboard-evidence-pack-worked-examples.html">ANNEX-124</a></td></tr>
-</tbody></table></div>
-<div class="note">xem xét của lãnh đạo chỉ được coi là hiệu lực khi mang / chuyển-trên / vượt quá, quá hạn hành động và nguồn lực-bị chặn hành động được đánh giá lại theo tiêu chí hiệu lực, không chỉ "nhắc lại" trạng thái.</div>
+
+<div class="preface-block">
+<div class="callout">
+<div class="card-title">Lệnh điều hành</div>
+<p>Xem xét của lãnh đạo là cơ chế điều hành cấp hệ thống, không phải buổi điểm danh KPI. Mọi đầu vào phải có source rõ, được đóng băng đúng hạn và đủ ngữ cảnh để chốt quyết định. Mọi đầu ra phải đi tới action cụ thể, có Responsible Person, due date, evidence path và rule carry-over khi chưa đủ điều kiện đóng.</p>
+<div class="legend-row">
+<span class="chip">Internal Gates: IG1 → IG5</span>
+<span class="chip">Biểu mẫu bắt buộc: FRM-911, FRM-131, FRM-651, FRM-652</span>
+<span class="chip">Tham chiếu: ANNEX-115, ANNEX-120, ANNEX-122, ANNEX-123, ANNEX-124</span>
+<span class="chip">SOP liên đới: SOP-901, SOP-903, SOP-801, SOP-108</span>
 </div>
 </div>
 </div>
+
+<div class="note-blue">
+<b>Vị trí trong hệ thống 8 cổng (G0→G7):</b>
+SOP này vận hành ở lớp quản trị sau toàn bộ G0→G7. SOP không mở release cho một Job đơn lẻ; SOP dùng dữ liệu tổng hợp từ toàn hệ thống để chốt thay đổi control, nguồn lực, escalation và ưu tiên cải tiến.
+<br/>→ Xem <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a> để đối chiếu với logic điều hành theo gate.
 </div>
+
+<div class="toc">
+<div class="toc-title">Mục lục</div>
+<div class="toc-grid">
+<a href="#p1">1. Mục đích</a>
+<a href="#p2">2. Phạm vi</a>
+<a href="#p3">3. Thuật ngữ &amp; nguyên tắc</a>
+<a href="#p4">4. Vai trò, quyền hạn &amp; RACI</a>
+<a href="#p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</a>
+<a href="#p6">6. Cổng kiểm soát nội bộ, điểm dừng bắt buộc &amp; KPI</a>
+<a href="#p7">7. Quy trình chi tiết</a>
+<a href="#p8">8. Ngoại lệ, thay đổi &amp; làm lại</a>
+<a href="#p9">9. Hệ thống, hồ sơ &amp; dữ liệu</a>
+<a href="#p10">10. Biểu mẫu, WI, SOP, ANNEX &amp; JD liên kết</a>
+</div>
+</div>
+
+<h2 class="h2" id="p1">1. Mục đích</h2>
+<ul class="tight">
+<li>Thiết lập cơ chế xem xét của lãnh đạo để đánh giá mức phù hợp, đầy đủ và effectiveness của QMS.</li>
+<li>Bảo đảm mọi quyết định lãnh đạo dựa trên dữ liệu đã khóa nguồn, có Responsible Person và freeze-date rõ ràng.</li>
+<li>Quy định cách phát hành biên bản, giao action, theo dõi carry-over và xác minh effectiveness sau họp.</li>
+<li>Liên kết kết quả management review với đánh giá nội bộ, NCR/CAPA, quản trị rủi ro, đào tạo và thay đổi tài liệu.</li>
+</ul>
+
+<h2 class="h2" id="p2">2. Phạm vi</h2>
+<p>Áp dụng cho Chief Executive Officer, QA Manager, QMS Engineer, Process Owner, Department Head, Data Owner, IT Administrator và mọi chức năng cung cấp đầu vào hoặc nhận action từ management review.</p>
+<div class="callout-grid">
+<div class="callout-card">
+<h3>Có bao phủ</h3>
+<ul class="tight">
+<li>Management review theo kế hoạch hàng quý hoặc tối thiểu 2 lần mỗi năm.</li>
+<li>Extraordinary review khi có complaint lớn, repeat failure, supplier disruption, continuity incident hoặc thay đổi chiến lược.</li>
+<li>Chuẩn bị Review Pack, khóa dữ liệu theo freeze-date, pre-read, họp quyết định, phát hành minutes và theo dõi action.</li>
+<li>Đầu vào từ KPI, audit/LPA, NCR/CAPA, customer feedback, supplier performance, risk, competence, continuity và digital governance.</li>
+</ul>
+</div>
+<div class="callout-card">
+<h3>Không thay thế / không được vượt quyền</h3>
+<ul class="tight">
+<li>Không thay cho daily hoặc weekly operational review, tier meeting hay dashboard review tại WI-901.</li>
+<li>Không thay cho RCA, CAPA, NCR disposition hoặc supplier corrective action tại hồ sơ gốc.</li>
+<li>Không thay cho thẩm quyền phê duyệt thương mại, chất lượng, đầu tư hoặc document release tại ANNEX-120.</li>
+<li>Không cho phép sửa số liệu sau freeze-date nếu chưa mở controlled note và chưa chốt rule re-review.</li>
+</ul>
+</div>
+</div>
+
+<h2 class="h2" id="p3">3. Thuật ngữ &amp; nguyên tắc</h2>
+<div class="table-card">
+<table class="table">
+<colgroup>
+<col style="width:30%"/>
+<col style="width:70%"/>
+</colgroup>
+<thead><tr><th>Thuật ngữ / nguyên tắc</th><th>Quy định sử dụng</th></tr></thead>
+<tbody>
+<tr><td><b>Management Review</b></td><td>Cuộc xem xét của lãnh đạo dùng để đánh giá QMS ở cấp hệ thống và chốt quyết định quản trị; không dùng cho xử lý giao dịch tác nghiệp đơn lẻ.</td></tr>
+<tr><td><b>Review Pack</b></td><td>Bộ đầu vào chính thức của một kỳ review, gồm dữ liệu, phân tích xu hướng, open actions, risk note và exception note đã được QA Manager hoặc QMS Engineer kiểm chất lượng.</td></tr>
+<tr><td><b>Freeze-date</b></td><td>Mốc đóng băng dữ liệu cho kỳ review. Sau mốc này chỉ được cập nhật khi có controlled note, người phê duyệt và rule re-review rõ ràng.</td></tr>
+<tr><td><b>Responsible Person</b></td><td>Người sở hữu một input hoặc action cụ thể. Mọi quyết định trong FRM-911 phải gắn một Responsible Person duy nhất.</td></tr>
+<tr><td><b>Carry-over</b></td><td>Action hoặc quyết định chưa đủ điều kiện đóng và được chuyển sang kỳ review sau kèm lý do, residual risk và temporary control hiện hành.</td></tr>
+<tr><td><b>Effectiveness</b></td><td>Evidence cho thấy action đã làm giảm hoặc loại bỏ rủi ro, không chỉ xác nhận rằng việc đã được thực hiện.</td></tr>
+<tr><td><b>SoR / SSOT</b></td><td>Dữ liệu dùng trong management review phải chỉ ra rõ System of Record và Single Source of Truth tương ứng; không chấp nhận snapshot rời không truy vết được.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-soft"><b>Nguyên tắc nền:</b> mỗi kết luận phải truy được từ tín hiệu → source data → quyết định → action → evidence. Nếu một mắt xích không rõ, item đó chưa đủ điều kiện chốt.</div>
+
+<h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2>
+<div class="table-card">
+<table class="table">
+<colgroup>
+<col style="width:22%"/>
+<col style="width:48%"/>
+<col style="width:30%"/>
+</colgroup>
+<thead><tr><th>Vai trò</th><th>Trách nhiệm chính</th><th>Quyền / điểm chặn</th></tr></thead>
+<tbody>
+<tr><td>Chief Executive Officer</td><td>Chủ trì management review, xác nhận ưu tiên hệ thống, chốt quyết định về nguồn lực, escalation, risk acceptance và thay đổi lớn.</td><td>Không chốt biên bản khi chưa rõ decision owner, due date hoặc phạm vi ảnh hưởng; có quyền yêu cầu extraordinary review.</td></tr>
+<tr><td>QA Manager</td><td>Sở hữu SOP-902, duyệt agenda, kiểm chất lượng Review Pack, xác nhận carry-over rule và theo dõi effectiveness ở cấp hệ thống.</td><td>Có quyền reject pack thiếu source, thiếu owner hoặc sai freeze-date; có quyền mở lại action đã đóng nhưng thiếu evidence hiệu lực.</td></tr>
+<tr><td>QMS Engineer</td><td>Điều phối lịch, thu thập pre-read, lập FRM-911, phát hành minutes, nhắc due date và tổng hợp tình trạng action cho kỳ kế tiếp.</td><td>Không phát hành biên bản khi thiếu sign-off, thiếu link hồ sơ hoặc thiếu action metadata bắt buộc.</td></tr>
+<tr><td>Process Owner / Department Head</td><td>Cung cấp đầu vào của quy trình mình phụ trách, giải thích xu hướng, thực hiện action và chứng minh effectiveness.</td><td>Không được tự sửa dữ liệu sau freeze-date; phải mở controlled note nếu cần chỉnh và phải chấp nhận carry-over khi chưa đủ bằng chứng đóng.</td></tr>
+<tr><td>Data Owner / IT Administrator</td><td>Xác nhận source data, refresh rule, exception, continuity issue, dashboard logic và integrity của dữ liệu số dùng trong review.</td><td>Có quyền gắn nhãn data exception, yêu cầu re-review hoặc dừng sử dụng một metric khi chưa xác minh được SoR.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="role-note"><b>RACI nền:</b> Chief Executive Officer giữ A cho quyết định hệ thống; QA Manager giữ A cho chất lượng review process; QMS Engineer giữ R cho điều phối và minutes; Process Owner và Data Owner giữ R cho input và evidence trong phạm vi mình sở hữu.</div>
+
+<h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2>
+<div class="field-grid">
+<div class="field">
+<b>Đầu vào bắt buộc</b>
+<ul class="tight">
+<li>KPI trend và dashboard export theo WI-901.</li>
+<li>Kết quả audit/LPA, NCR/CAPA, complaint, supplier performance và risk register.</li>
+<li>Tình trạng action mở từ kỳ review trước, gồm carry-over và overdue items.</li>
+<li>Thông tin về competence, manpower, continuity, digital incidents và thay đổi lớn.</li>
+</ul>
+</div>
+<div class="field">
+<b>Đầu ra bắt buộc</b>
+<ul class="tight">
+<li>FRM-911 đã ký và phát hành đúng hạn.</li>
+<li>Action list có owner, due date, evidence path và rule đóng.</li>
+<li>Quyết định về risk, nguồn lực, escalation, change request và priority follow-up.</li>
+<li>Danh sách carry-over cho kỳ kế tiếp khi chưa đủ điều kiện đóng.</li>
+</ul>
+</div>
+<div class="field">
+<b>Điều kiện tiên quyết</b>
+<ul class="tight">
+<li>Lịch họp, chairperson, người tham dự và deputy đã được xác định.</li>
+<li>Freeze-date và checklist đầu vào đã được phát hành trước họp.</li>
+<li>Source link, period, owner và exception note của dữ liệu đã được xác minh.</li>
+<li>Open actions từ kỳ trước đã được cập nhật trạng thái mới nhất.</li>
+</ul>
+</div>
+<div class="field">
+<b>Trigger</b>
+<ul class="tight">
+<li>Chu kỳ quarterly review hoặc tối thiểu semiannual review.</li>
+<li>Complaint lớn, escape nghiêm trọng, repeat failure hoặc major audit finding.</li>
+<li>Supplier disruption, continuity incident, data integrity incident hoặc major change.</li>
+<li>Yêu cầu trực tiếp từ Chief Executive Officer hoặc leadership team.</li>
+</ul>
+</div>
+</div>
+
+<h2 class="h2" id="p6">6. Cổng kiểm soát nội bộ, điểm dừng bắt buộc &amp; KPI</h2>
+<div class="table-card">
+<table class="table">
+<colgroup>
+<col style="width:8%"/>
+<col style="width:33%"/>
+<col style="width:16%"/>
+<col style="width:25%"/>
+<col style="width:18%"/>
+</colgroup>
+<thead><tr><th>IG</th><th>Mô tả hoạt động</th><th>Chủ trì</th><th>Điểm dừng bắt buộc</th><th>KPI chính</th></tr></thead>
+<tbody>
+<tr>
+<td class="ig-center"><span class="step-tag">IG1</span></td>
+<td><b>Lập lịch và agenda review</b><br/>Xác định kỳ review, scope, chairperson, người tham dự, deputy, freeze-date và danh sách input owners.</td>
+<td>QMS Engineer</td>
+<td>Không mở chu kỳ review khi chưa có lịch họp, freeze-date và owner list được QA Manager xác nhận.</td>
+<td>100% kỳ review có agenda phát hành trước ít nhất 5 ngày làm việc.</td>
+</tr>
+<tr>
+<td class="ig-center"><span class="step-tag">IG2</span></td>
+<td><b>Thu thập và khóa Review Pack</b><br/>Nhận input, xác minh source, period, exception và đóng băng dữ liệu phục vụ cuộc họp.</td>
+<td>Process Owner + Data Owner</td>
+<td>Không đưa item vào họp khi thiếu source, chưa rõ owner hoặc có thay đổi sau freeze-date mà chưa có controlled note.</td>
+<td>Ít nhất 95% input owners nộp pack đúng hạn; 100% pack có source và freeze-date.</td>
+</tr>
+<tr>
+<td class="ig-center"><span class="step-tag">IG3</span></td>
+<td><b>Họp và chốt quyết định</b><br/>Review xu hướng, risk, open actions, requests nguồn lực, thay đổi tài liệu và escalation cần thiết.</td>
+<td>Chief Executive Officer</td>
+<td>Không đóng topic khi chưa chốt decision, Responsible Person, due date, evidence path và rule follow-up.</td>
+<td>100% item trọng yếu có decision ngay trong buổi họp.</td>
+</tr>
+<tr>
+<td class="ig-center"><span class="step-tag">IG4</span></td>
+<td><b>Phát hành minutes và cascade action</b><br/>Hoàn tất FRM-911, phát hành biên bản, thông báo action owners và mở link tới hồ sơ gốc liên quan.</td>
+<td>QMS Engineer</td>
+<td>Không phát hành biên bản khi thiếu sign-off, thiếu action owner, thiếu due date hoặc thiếu link hồ sơ liên quan.</td>
+<td>100% biên bản phát hành trong tối đa 2 ngày làm việc sau họp.</td>
+</tr>
+<tr>
+<td class="ig-center"><span class="step-tag">IG5</span></td>
+<td><b>Theo dõi carry-over và xác minh effectiveness</b><br/>Kiểm tra tiến độ, bằng chứng triển khai, evidence hiệu lực và mở lại item khi chưa đủ điều kiện đóng.</td>
+<td>QA Manager + Process Owner</td>
+<td>Không đóng action khi chỉ có xác nhận hoàn thành mà chưa có evidence hiệu lực hoặc chưa ổn định qua một chu kỳ vận hành phù hợp.</td>
+<td>Tỷ lệ action đúng hạn ≥ 90%; action đóng thiếu hiệu lực = 0.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="metric-grid">
+<div class="metric-card">
+<div class="label">Cadence thực hiện</div>
+<div class="value">Hàng quý</div>
+<div class="sub">Tối thiểu 2 lần mỗi năm</div>
+</div>
+<div class="metric-card green">
+<div class="label">Pack đúng hạn</div>
+<div class="value">&ge; 95%</div>
+<div class="sub">Input owners nộp trước freeze-date</div>
+</div>
+<div class="metric-card gold">
+<div class="label">Phát hành biên bản</div>
+<div class="value">&le; 2 ngày</div>
+<div class="sub">Tính từ khi kết thúc họp</div>
+</div>
+<div class="metric-card green">
+<div class="label">Action đúng hạn</div>
+<div class="value">&ge; 90%</div>
+<div class="sub">Không tính item carry-over đã phê duyệt</div>
+</div>
+<div class="metric-card red">
+<div class="label">Đóng thiếu hiệu lực</div>
+<div class="value">0</div>
+<div class="sub">Không chấp nhận close chỉ bằng cam kết</div>
+</div>
+</div>
+<div class="note-soft"><b>Lưu ý:</b> IG trong section này là Internal Gate của SOP-902, không dùng thay cho system gates G0→G7.</div>
+
+<h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
+<div class="flowchart">
+<div class="flow-step">
+<div class="flow-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</div>
+<div class="flow-text"><div class="flow-title">Lập lịch review</div><div class="flow-desc">Xác định kỳ họp, scope và agenda</div></div>
+</div>
+<div class="flow-arrow">→</div>
+<div class="flow-step">
+<div class="flow-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</div>
+<div class="flow-text"><div class="flow-title">Khóa review pack</div><div class="flow-desc">Thu input, xác minh source và freeze-date</div></div>
+</div>
+<div class="flow-arrow">→</div>
+<div class="flow-step active">
+<div class="flow-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</div>
+<div class="flow-text"><div class="flow-title">Họp quyết định</div><div class="flow-desc">Review, chốt decision và action</div></div>
+</div>
+<div class="flow-arrow">→</div>
+<div class="flow-step">
+<div class="flow-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</div>
+<div class="flow-text"><div class="flow-title">Phát hành minutes</div><div class="flow-desc">Hoàn tất FRM-911 và cascade action</div></div>
+</div>
+<div class="flow-arrow">→</div>
+<div class="flow-step critical">
+<div class="flow-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</div>
+<div class="flow-text"><div class="flow-title">Theo dõi hiệu lực</div><div class="flow-desc">Kiểm tra due date, carry-over và effectiveness</div></div>
+</div>
+</div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span>Lập lịch và phát hành agenda review</h3>
+<p>QMS Engineer mở chu kỳ review theo cadence đã duyệt hoặc theo yêu cầu extraordinary review, sau đó chuẩn hóa scope và lịch làm việc trước khi thu thập dữ liệu.</p>
+<ul class="tight">
+<li>Lập agenda, ngày họp, freeze-date, thời hạn nộp input và danh sách người tham dự.</li>
+<li>Xác định deputy cho các vị trí chủ chốt theo <a href="../../03-Reference/01-ANNEX-100/annex-123-deputy-backup-matrix.html">ANNEX-123</a> khi người chính không thể tham dự.</li>
+<li>Gửi checklist đầu vào cho Process Owner, Department Head và Data Owner ngay khi phát hành agenda.</li>
+<li>Đính kèm FRM-911 phiên bản hiện hành và danh sách carry-over từ kỳ review trước để các owner chuẩn bị trước.</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng bắt buộc:</b> không chuyển sang bước 2 nếu agenda, freeze-date và owner list chưa được QA Manager xác nhận.</div>
+<div class="role-note"><b>Bàn giao bắt buộc:</b> QMS Engineer bàn giao agenda, checklist đầu vào và due dates cho Process Owner, Department Head và Data Owner.</div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</span>Thu thập, xác minh và khóa Review Pack</h3>
+<p>Process Owner và Data Owner chuẩn bị input theo phạm vi đã phân công; QMS Engineer và QA Manager chỉ cho phép đưa vào họp những dữ liệu đã có source, period và exception note rõ ràng.</p>
+<ul class="tight">
+<li>Thu KPI trend theo <a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> và kiểm tra link tới SoR theo <a href="../../03-Reference/01-ANNEX-100/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a>.</li>
+<li>Thu NCR, CAPA, risk, audit/LPA, complaint và supplier inputs từ các hồ sơ gốc như FRM-131, FRM-651 và FRM-652.</li>
+<li>Gắn owner, period, source path, freeze-date và exception note cho từng nhóm đầu vào trong Review Pack.</li>
+<li>Đánh dấu rõ item cần extraordinary discussion nếu dữ liệu cho thấy repeat failure, major complaint hoặc continuity risk.</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng bắt buộc:</b> không chuyển sang bước 3 nếu có input trọng yếu thiếu source, có sửa sau freeze-date mà chưa mở controlled note, hoặc owner chưa xác nhận dữ liệu.</div>
+<div class="role-note"><b>Bàn giao bắt buộc:</b> Process Owner và Data Owner bàn giao Review Pack đã khóa cho QA Manager, QMS Engineer và Chief Executive Officer để pre-read.</div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</span>Họp xem xét và chốt quyết định</h3>
+<p>Chief Executive Officer chủ trì cuộc họp; QA Manager giữ kỷ luật review; QMS Engineer ghi trực tiếp decision và action vào FRM-911 trong lúc họp.</p>
+<ul class="tight">
+<li>Rà từng chủ đề theo logic: tín hiệu, mức ảnh hưởng, current control, residual risk, quyết định cần chốt và bằng chứng cần theo dõi.</li>
+<li>Chốt decision theo đúng thẩm quyền: giữ control, tăng containment, mở CAPA, mở risk action, đổi tài liệu, bổ sung nguồn lực hoặc escalate.</li>
+<li>Gắn Responsible Person, due date, evidence path và rule carry-over cho từng action ngay tại thời điểm chốt.</li>
+<li>Đánh dấu item cần re-review nếu có data exception, continuity issue hoặc quyết định còn phụ thuộc phê duyệt nguồn lực bên ngoài phạm vi cuộc họp.</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng bắt buộc:</b> không kết thúc một topic nếu chưa có decision rõ, owner rõ, due date rõ và rule xác minh hiệu lực.</div>
+<div class="role-note"><b>Bàn giao bắt buộc:</b> Chief Executive Officer bàn giao decision đã chốt cho QA Manager và QMS Engineer để phát hành; đồng thời giao action cho từng Process Owner tương ứng.</div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</span>Phát hành minutes và cascade action</h3>
+<p>Ngay sau họp, QMS Engineer hoàn tất FRM-911, xác nhận sign-off và mở liên kết tới hồ sơ gốc để bảo đảm mỗi quyết định đều truy vết được.</p>
+<ul class="tight">
+<li>Chuẩn hóa wording của decision, action, carry-over và escalation trong FRM-911 mà không thay đổi nội dung đã chốt tại cuộc họp.</li>
+<li>Phát hành biên bản, gửi action owners, nhắc due date và lưu bộ hồ sơ vào đúng vị trí quản trị.</li>
+<li>Mở link tới CAPA, risk register, DCR hoặc training plan nếu management review yêu cầu thay đổi hệ thống.</li>
+<li>Thông báo rõ item nào đang carry-over và điều kiện nào cho phép đóng ở kỳ kế tiếp.</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng bắt buộc:</b> không phát hành biên bản khi thiếu sign-off, thiếu owner, thiếu due date hoặc chưa neo được action vào hồ sơ liên quan.</div>
+<div class="role-note"><b>Bàn giao bắt buộc:</b> QMS Engineer bàn giao biên bản chính thức và action register cho Process Owner, Department Head, Data Owner và QA Manager.</div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</span>Theo dõi carry-over và xác minh effectiveness</h3>
+<p>Sau khi phát hành, QA Manager và Process Owner không chỉ theo dõi trạng thái hoàn thành mà còn phải xác minh rằng control mới thực sự vận hành hiệu quả trong thực tế.</p>
+<ul class="tight">
+<li>QMS Engineer theo dõi due date, gửi nhắc việc và tổng hợp overdue items cho QA Manager.</li>
+<li>Process Owner nộp evidence triển khai và evidence hiệu lực theo rule đã chốt trong FRM-911.</li>
+<li>QA Manager mở lại item nếu evidence không đủ, nếu control chưa chạy qua chu kỳ phù hợp hoặc nếu repeat failure xuất hiện lại.</li>
+<li>Chuyển item sang SOP-903, FRM-652 hoặc hồ sơ thay đổi tương ứng khi vấn đề đã vượt khỏi lớp theo dõi của management review.</li>
+</ul>
+<div class="note-soft"><b>Điểm dừng bắt buộc:</b> không đóng action nếu chỉ có xác nhận hoàn thành hoặc meeting note mà chưa có evidence effectiveness.</div>
+<div class="role-note"><b>Bàn giao bắt buộc:</b> Process Owner bàn giao evidence hiệu lực cho QA Manager; QA Manager bàn giao carry-over list và overdue list cho kỳ review tiếp theo.</div>
+
+<h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
+<ul class="tight">
+<li>Khi có complaint lớn, major escape, supplier disruption hoặc continuity incident giữa hai kỳ review, Chief Executive Officer có thể yêu cầu extraordinary review trong vòng 48 giờ và dùng chính FRM-911 để ghi nhận quyết định.</li>
+<li>Khi phát hiện dữ liệu sai sau freeze-date, Data Owner phải mở controlled note; QA Manager quyết định re-review, bổ sung appendix hay hủy kết luận cũ để họp lại.</li>
+<li>Khi người có thẩm quyền vắng mặt và deputy không đủ boundary theo ANNEX-123, item phải để trạng thái pending decision hoặc carry-over; không chốt vượt quyền.</li>
+<li>Khi action lặp lại qua hơn 2 kỳ review hoặc thất bại về effectiveness, QA Manager phải chuyển item sang CAPA, A3 hoặc improvement track phù hợp thay vì tiếp tục theo dõi thụ động.</li>
+<li>Khi quyết định cần ngân sách hoặc thay đổi lớn vượt ngoài thẩm quyền hiện hữu, Process Owner phải escalate theo ANNEX-120 và giữ temporary control cho tới khi có quyết định cuối cùng.</li>
+</ul>
+
+<h2 class="h2" id="p9">9. Hệ thống, hồ sơ &amp; dữ liệu</h2>
+<div class="table-card">
+<table class="table">
+<colgroup>
+<col style="width:22%"/>
+<col style="width:33%"/>
+<col style="width:17%"/>
+<col style="width:28%"/>
+</colgroup>
+<thead><tr><th>Hệ thống / hồ sơ</th><th>Dữ liệu / mục đích</th><th>Trách nhiệm</th><th>Nơi lưu / retention</th></tr></thead>
+<tbody>
+<tr><td>FRM-911</td><td>Biên bản management review, action list, carry-over log và quyết định nguồn lực chính thức.</td><td>QMS Engineer</td><td>QMS Review Folder → QMS Record Library / SSOT; lưu tối thiểu 7 năm.</td></tr>
+<tr><td>Dashboard export theo WI-901</td><td>KPI trend, owner note, exception note và evidence snapshot phục vụ pre-read và cuộc họp.</td><td>Data Owner</td><td>Department Folder / SSOT + snapshot tại QMS Review Folder theo từng kỳ review.</td></tr>
+<tr><td>FRM-131 / FRM-651 / FRM-652</td><td>Risk register, NCR, CAPA và hồ sơ nền khi management review mở action hệ thống.</td><td>Process Owner</td><td>Record Library theo SOP chủ quản; retention theo yêu cầu của hồ sơ gốc.</td></tr>
+<tr><td>Agenda, attendance và pre-read</td><td>Evidence cho việc chuẩn bị họp, danh sách người tham dự, deputy và freeze-date đã phát hành.</td><td>QA Manager</td><td>QMS Review Folder; lưu tối thiểu 7 năm.</td></tr>
+<tr><td>DCR / document update records</td><td>Hồ sơ thay đổi tài liệu phát sinh từ management review khi quyết định yêu cầu cập nhật SOP/WI/ANNEX/FRM/JD.</td><td>Document Responsible Person</td><td>QMS Change Folder; retention theo quy định document control hiện hành.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 class="h2" id="p10">10. Biểu mẫu, WI, SOP, ANNEX &amp; JD liên kết</h2>
+<div class="table-card">
+<table class="table">
+<colgroup>
+<col style="width:12%"/>
+<col style="width:16%"/>
+<col style="width:40%"/>
+<col style="width:32%"/>
+</colgroup>
+<thead><tr><th>Loại</th><th>Mã</th><th>Tên tài liệu</th><th>Vai trò trong SOP-902</th></tr></thead>
+<tbody>
+<tr><td>Biểu mẫu</td><td><a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td><td>Management Review Minutes</td><td>Biên bản và action register chính thức của cuộc họp.</td></tr>
+<tr><td>Biểu mẫu</td><td><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx">FRM-131</a></td><td>Risks and Opportunities Register</td><td>Nguồn đầu vào cho risk, opportunity và follow-up action.</td></tr>
+<tr><td>Biểu mẫu</td><td><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a></td><td>NCR Report</td><td>Đầu vào cho repeat issue và linked corrective action.</td></tr>
+<tr><td>Biểu mẫu</td><td><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a></td><td>CAPA 8D Report</td><td>Hồ sơ gốc khi management review mở hoặc theo dõi CAPA.</td></tr>
+<tr><td>WI</td><td><a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></td><td>Performance Dashboard</td><td>Chuẩn chuẩn bị, giải thích và xác minh KPI đầu vào.</td></tr>
+<tr><td>SOP</td><td><a href="sop-901-internal-audit-and-lpa.html">SOP-901</a></td><td>Internal Audit and LPA</td><td>Cung cấp audit findings, repeat issues và effectiveness evidence.</td></tr>
+<tr><td>SOP</td><td><a href="sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Continual Improvement and Kaizen</td><td>Nhận các issue hệ thống vượt khỏi lớp theo dõi của management review.</td></tr>
+<tr><td>SOP</td><td><a href="../08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a></td><td>Competence, Training and Certification</td><td>Nhận action liên quan competence, backup hoặc authority gap.</td></tr>
+<tr><td>SOP</td><td><a href="../01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td><td>Operational Contingency Plan</td><td>Tham chiếu khi review chạm continuity hoặc major disruption.</td></tr>
+<tr><td>ANNEX</td><td><a href="../../03-Reference/01-ANNEX-100/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a></td><td>Epicor Transaction and Interface Map</td><td>Xác minh SoR và source link của dữ liệu điều hành.</td></tr>
+<tr><td>ANNEX</td><td><a href="../../03-Reference/01-ANNEX-100/annex-120-authority-matrix.html">ANNEX-120</a></td><td>Authority Matrix</td><td>Xác định boundary phê duyệt và escalation.</td></tr>
+<tr><td>ANNEX</td><td><a href="../../03-Reference/01-ANNEX-100/annex-122-kpi-cascade-dictionary.html">ANNEX-122</a></td><td>KPI Cascade Dictionary</td><td>Chuẩn hóa owner, nghĩa KPI và cách giải thích chỉ số.</td></tr>
+<tr><td>ANNEX</td><td><a href="../../03-Reference/01-ANNEX-100/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td><td>Deputy Backup Matrix</td><td>Dùng khi người có thẩm quyền vắng mặt hoặc phải kích hoạt deputy.</td></tr>
+<tr><td>ANNEX</td><td><a href="../../03-Reference/01-ANNEX-100/annex-124-dashboard-evidence-pack-worked-examples.html">ANNEX-124</a></td><td>Dashboard Evidence Pack Worked Examples</td><td>Mẫu chuẩn cho review pack, pre-read và evidence path.</td></tr>
+<tr><td>ANNEX</td><td><a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a></td><td>Gate, MRR and Execution Synchronization Pack</td><td>Đối chiếu management layer với logic G0→G7.</td></tr>
+<tr><td>JD</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">JD</a></td><td>QA Manager</td><td>Vai trò sở hữu quy trình và gate chất lượng dữ liệu.</td></tr>
+<tr><td>JD</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html">JD</a></td><td>QMS Engineer</td><td>Vai trò điều phối, minutes và theo dõi action.</td></tr>
+<tr><td>JD</td><td><a href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">JD</a></td><td>Chief Executive Officer</td><td>Vai trò chủ trì quyết định và phê duyệt cuối cùng.</td></tr>
+</tbody>
+</table>
+</div>
+
+</div></div>
+</div></div></div>
+<div class="no-screen print-disclaimer">Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<script src="../../../assets/app.js"></script>
 </body>
 </html>
-
-
-
-
