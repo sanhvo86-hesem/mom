@@ -111,6 +111,19 @@ td,th{}
 </div>
 <div class="metric-grid"><div class="metric-card"><div class="value">100%</div><div class="label">Lô giao hàng có gói phát hành hoàn chỉnh</div></div><div class="metric-card"><div class="value">0</div><div class="label">Ship không có đã phê duyệt phát hành</div></div><div class="metric-card"><div class="value">≤ 15 phút</div><div class="label">truy xuất lô giao hàng truy vết pack</div></div><div class="metric-card"><div class="value">0</div><div class="label">dán nhãn lại/đóng gói lại sau bến xuất nhập hàng bởi vì of phát hành lỗi</div></div></div>
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
+<div class="flowchart">
+  <div class="flow-step critical"><div class="flow-num">1</div><div class="flow-title">Kiểm tra cuối</div><div class="flow-desc">Kiểm tra sản phẩm theo yêu cầu kỹ thuật</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical"><div class="flow-num">2</div><div class="flow-title">Balloon/đặc tính</div><div class="flow-desc">Xác minh đặc tính quan trọng theo bản vẽ</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-title">CoC draft</div><div class="flow-desc">Soạn Certificate of Conformance</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-title">Packaging</div><div class="flow-desc">Đóng gói theo yêu cầu khách hàng</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">5</div><div class="flow-title">Ship release</div><div class="flow-desc">Phê duyệt phát hành lô giao hàng</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">6</div><div class="flow-title">Invoice trigger</div><div class="flow-desc">Kích hoạt xuất hóa đơn và lưu hồ sơ</div></div>
+</div>
 <h3>7.1 Kích hoạt final release</h3>
 <ul class="tight"><li>Production/Shipping chỉ được gửi lô sang final release khi traveler đã đóng, cleaning/finishing hoàn tất và khu vực HOLD/READY tách rõ ràng.</li><li>QA Final nhận tín hiệu ship request cùng shipment scope: part/rev, qty, lot/serial, ship-to, Ngày đến hạn, package level và customer-specific requirements.</li><li>Khi job thuộc QPL cao, clean/vacuum requirement hoặc customer escape-sensitive, QA Engineer phải tham gia review trước khi CoC phát hành.</li></ul>
 <h3>7.2 Đóng hồ sơ shipment scope</h3>

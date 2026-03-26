@@ -162,6 +162,19 @@ td,th{}
 <div class="metric-card"><div class="value">lịch sử Cập nhật</div><div class="label">% lots cập nhật chuyển đổi đúng hạn</div><div class="mini-note">Nếu lịch sử không sạch, chuyển đổi rule trên các lot sau sẽ sai và toàn bộ kỷ luật / chuyên ngành thống kê bị hỏng.</div></div>
 </div>
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
+<div class="flowchart">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Xác định AQL plan</div><div class="flow-desc">Chọn mức AQL, bảng lấy mẫu phù hợp</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-title">Lấy mẫu</div><div class="flow-desc">Lấy mẫu ngẫu nhiên từ lot theo cỡ mẫu</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical"><div class="flow-num">3</div><div class="flow-title">Kiểm tra</div><div class="flow-desc">Đo lường và kiểm tra mẫu theo tiêu chí</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">4</div><div class="flow-title">Accept/Reject</div><div class="flow-desc">Quyết định chấp nhận hoặc từ chối lot</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">Chuyển đổi mức kiểm tra</div><div class="flow-desc">Tightened/Normal/Reduced theo lịch sử</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">6</div><div class="flow-title">Ghi hồ sơ</div><div class="flow-desc">Lưu kết quả kiểm tra và quyết định</div></div>
+</div>
 <h3 class="h3">7.1 Xác định lot và điều kiện có được lấy mẫu hay không</h3>
 <ol class="tight">
 <li>Trước khi lấy mẫu, QA phải xác nhận lot đồng nhất theo ít nhất các trường: part nhóm sản phẩm, phiên bản, source/site, lộ trình gia công / quy trình nhóm sản phẩm, điều kiện of sản xuất và truy xuất nguồn gốc logic.</li>

@@ -174,6 +174,19 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <tr><td>Số sự cố data/IP do chia sẻ sai, sai quyền, sai file</td><td>0 lớn / nghiêm trọng</td><td>Tháng</td><td>Nếu có sự cố phải mở escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
+<div class="flowchart">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Phân loại dữ liệu</div><div class="flow-desc">Xác định loại, mức nhạy cảm, SoR/SSOT</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">2</div><div class="flow-title">Thiết lập quyền truy cập</div><div class="flow-desc">Gán quyền theo vai trò, phê duyệt access</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-title">Mã hóa và bảo mật</div><div class="flow-desc">Áp dụng mã hóa, backup, bảo vệ IP</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-title">Lưu trữ SSOT</div><div class="flow-desc">Chốt nơi lưu chuẩn duy nhất</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical"><div class="flow-num">5</div><div class="flow-title">Rà soát định kỳ</div><div class="flow-desc">Kiểm tra tuân thủ, phát hiện sai lệch</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">6</div><div class="flow-title">Hủy/giữ pháp lý</div><div class="flow-desc">Quyết định hủy hoặc giữ theo yêu cầu pháp lý</div></div>
+</div>
 <h3>7.1 Phân loại dữ liệu và chốt nơi lưu chuẩn</h3>
 <p>Khi phát sinh loại dữ liệu mới, app mới, báo cáo mới hoặc nhu cầu lưu/chia sẻ mới, QMS Engineer và chủ dữ liệu phải xác định ngay: dữ liệu này là chủ / gốc, giao dịch hay bằng chứng; nhạy cảm ở mức nào; nơi nào là SoR; nơi nào là SSOT; ai chịu trách nhiệm duy trì và ai được phép truy cập. Với dữ liệu kỹ thuật hoặc dữ liệu khách hàng, phải chỉ rõ phiên bản control, source link và lưu giữ.</p>
 <ul class="tight">

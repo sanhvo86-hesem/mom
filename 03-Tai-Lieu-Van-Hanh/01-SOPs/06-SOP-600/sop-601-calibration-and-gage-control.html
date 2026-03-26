@@ -112,6 +112,19 @@ td,th{}
 </div>
 <div class="metric-grid"><div class="metric-card"><div class="value">100%</div><div class="label">Phát hành quyết định dùng gage hợp lệ</div></div><div class="metric-card"><div class="value">≥ 98%</div><div class="label">Hiệu chuẩn on-time</div></div><div class="metric-card"><div class="value">0</div><div class="label">Lô giao hàng đã phê duyệt bằng gage quá hạn/OOT</div></div><div class="metric-card"><div class="value">≤ 1 Ngày làm việc</div><div class="label">Khóa thu hồi scope khi OOT quan trọng / nghiêm trọng</div></div></div>
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
+<div class="flowchart">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Đăng ký gage</div><div class="flow-desc">Đăng ký thiết bị đo mới vào hệ thống</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-title">Lập lịch hiệu chuẩn</div><div class="flow-desc">Xác định chu kỳ và phương thức hiệu chuẩn</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical"><div class="flow-num">3</div><div class="flow-title">Thực hiện CAL</div><div class="flow-desc">Hiệu chuẩn theo chuẩn tham chiếu</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">4</div><div class="flow-title">Pass/Fail</div><div class="flow-desc">Quyết định đạt/không đạt hiệu chuẩn</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">Dán nhãn</div><div class="flow-desc">Gắn nhãn trạng thái hiệu chuẩn lên gage</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical"><div class="flow-num">6</div><div class="flow-title">Rà soát recall</div><div class="flow-desc">Đánh giá ảnh hưởng khi OOT/fail</div></div>
+</div>
 <h3>7.1 hội nhập nhân sự mới thiết bị đo và phân loại rủi ro</h3>
 <ul class="tight"><li>Mỗi thiết bị mới hoặc mượn từ ngoài phải được đăng ký trong <a href="../../../04-Bieu-Mau/05-FRM-500/FRM-525_Gage_and_Measuring_Equipment_Register.xlsx" download="">FRM-525</a> trước khi dùng. Trường tối thiểu: ID, loại, phạm vi / dải, giải quyết / độ phân giải, vị trí, Responsible Person, dự kiến / có chủ đích use, rủi ro class, chủ / gốc/tham chiếu cần dùng, chu kỳ hiệu chuẩn/xác minh.</li><li>Rủi ro class được xác định theo mức ảnh hưởng tới phát hành quyết định: class cao cho gage dùng FAI/kiểm tra cuối/SPC quan trọng / nghiêm trọng, class thấp hơn cho dụng cụ hỗ trợ không trực tiếp chấp nhận/từ chối.</li><li>Thiết bị không đủ thông tin về dự kiến / có chủ đích use hoặc độ không đảm bảo đo Requests không được đưa vào hiệu chuẩn plan và không được dùng cho phát hành.</li></ul>
 <h3>7.2 Lập chu kỳ kiểm soát và chọn phương thức hiệu chuẩn</h3>

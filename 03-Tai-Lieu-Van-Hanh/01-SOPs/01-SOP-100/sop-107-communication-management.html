@@ -170,6 +170,17 @@ td,th{}
 <tr><td>Số vụ trễ escalation ngoài giờ</td><td>0 quan trọng / nghiêm trọng</td><td>Tháng</td><td>Đo theo bậc thang năng lực của <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
+<div class="flowchart">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Xác định nội dung</div><div class="flow-desc">Nhận sự kiện, xác định nội dung cần truyền thông</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">2</div><div class="flow-title">Chọn kênh truyền thông</div><div class="flow-desc">Chọn kênh phù hợp theo mức độ và đối tượng</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-title">Gửi thông báo</div><div class="flow-desc">Phát hành thông báo qua kênh đã chọn</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical"><div class="flow-num">4</div><div class="flow-title">Xác nhận tiếp nhận</div><div class="flow-desc">Xác nhận bên nhận đã tiếp nhận và hiểu</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-title">Lưu hồ sơ</div><div class="flow-desc">Lưu trữ bằng chứng truyền thông</div></div>
+</div>
 <h3>7.1 Nhận sự kiện và phân loại ngay tại điểm phát sinh</h3>
 <p>Người phát hiện sự kiện không được chờ “có đủ hồ sơ mới báo”. Phải mở truyền đạt / giao tiếp hồ sơ ngay khi có dấu hiệu ảnh hưởng. Hồ sơ đầu tiên phải có: sự kiện gì, ở đâu, job/WO/part nào, phiên bản nào, ảnh hưởng gì, có cần hold ngay không, ai là Responsible Person và mốc phản hồi đầu tiên là khi nào.</p>
 <ul class="tight">

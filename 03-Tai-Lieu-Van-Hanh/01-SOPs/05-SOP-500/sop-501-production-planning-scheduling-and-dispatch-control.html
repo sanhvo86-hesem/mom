@@ -163,6 +163,19 @@ td,th{}
 <div class="metric-card"><div class="value">Hot Job hư hỏng</div><div class="label">Tác hại của ghi đè / bỏ qua</div><div class="mini-note">Mọi hot-job phải để lại vết về số job bị dời, số giờ mất ổn định và khôi phục / thu hồi giờ dùng để kéo lại kế hoạch.</div></div>
 </div><div class="callout"><div class="card-title">Chỉ số điều hành bổ sung bắt buộc</div><ul class="tight"><li>Plan đạt được theo trung tâm gia công và theo nút thắt / điểm nghẽn nhóm sản phẩm</li><li>hàng đợi tuổi tồn đỏ vượt ngưỡng / ca</li><li>Số lần sắp xếp lại gây ảnh hưởng chuỗi sau</li><li>% hot-job có phê duyệt đúng bậc thang năng lực và có nguồn bù năng lực</li></ul></div>
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
+<div class="flowchart">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-title">Nhận Job</div><div class="flow-desc">Tiếp nhận job/WO từ sales hoặc khách hàng</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-title">Phân bổ nguồn lực</div><div class="flow-desc">Xác định máy, người, vật tư cần thiết</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">3</div><div class="flow-title">Lập lịch sản xuất</div><div class="flow-desc">Sắp xếp thứ tự và thời gian theo nút thắt</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-title">Dispatch</div><div class="flow-desc">Phát lệnh sản xuất tới từng trạm</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical"><div class="flow-num">5</div><div class="flow-title">Theo dõi WIP</div><div class="flow-desc">Giám sát tiến độ, phát hiện trễ/nghẽn</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active"><div class="flow-num">6</div><div class="flow-title">Đóng Job</div><div class="flow-desc">Xác nhận hoàn tất, đóng job trong hệ thống</div></div>
+</div>
 <h3 class="h3">7.1 Hoạch định năng lực tuần/tháng và bản đồ ràng buộc</h3>
 <ol class="tight">
 <li>Planner phải nhìn tải theo <b>nút thắt / điểm nghẽn thực tế</b>: machine nhóm sản phẩm, setup/chuyển đổi (changeover) time, QA/đo lường khe / vị trí, phòng sạch khe / vị trí, outsource cycle, giao vận cửa sổ / khung thời gian, nhân công/năng lực.</li>
