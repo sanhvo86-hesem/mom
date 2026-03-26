@@ -6,64 +6,64 @@
 <title>ANNEX-113 — Governance dashboard triển khai vận hành, truy cập, refresh và publish control | HESEM QMS</title>
 <link href="../../../../assets/style.css" rel="stylesheet"/>
 <style>
-/* ── Compact dashboard design — synced with portal (index.html) ── */
+/* ── Dashboard design — dark navy palette synced with portal deploy dashboard ── */
 
-/* Hero — compact gradient banner like portal */
-.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:16px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 20px}
-.hero h1{font-size:17px;font-weight:800;color:var(--navy);margin:0 0 4px;line-height:1.35}
-.hero p{font-size:12.5px;color:var(--ink2);margin:0;line-height:1.6}
+/* Hero — dark navy gradient like portal deploy hero */
+.hero{border:none;border-radius:16px;padding:18px 22px;background:linear-gradient(135deg,#0c2d48 0%,#133e68 48%,#1f6aa5 100%);color:#fff;margin:0 0 20px;box-shadow:0 8px 24px rgba(12,45,72,.15)}
+.hero h1{font-size:17px;font-weight:800;color:#fff;margin:0 0 4px;line-height:1.35}
+.hero p{font-size:12.5px;color:rgba(255,255,255,.78);margin:0;line-height:1.6}
 
-/* Section title — matching portal pattern */
-.sec-title{font-size:14px;font-weight:700;color:var(--navy);margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--ln)}
+/* Section title — navy underline */
+.sec-title{font-size:14px;font-weight:700;color:#0c2d48;margin:24px 0 10px;padding-bottom:6px;border-bottom:2px solid #0c2d48}
 .sec-title:first-of-type{margin-top:0}
 
-/* Principle cards — compact 3-col */
+/* Principle cards — navy top border, subtle shadow */
 .principle-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 6px}
-.p-card{border:1px solid var(--ln);border-radius:var(--r);padding:12px 14px;background:var(--bg);border-top:2px solid var(--blue)}
-.p-card h4{font-size:12px;font-weight:700;color:var(--navy);margin:0 0 6px}
+.p-card{border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;background:#fff;border-top:3px solid #0c2d48;box-shadow:0 4px 12px rgba(15,23,42,.04)}
+.p-card h4{font-size:12px;font-weight:700;color:#0c2d48;margin:0 0 6px}
 .p-card ul{list-style:none;margin:0;padding:0}
-.p-card li{font-size:11.5px;line-height:1.55;padding:2px 0 2px 14px;position:relative;color:var(--ink2)}
-.p-card li::before{content:"\203A";position:absolute;left:0;color:var(--blue);font-weight:700}
+.p-card li{font-size:11.5px;line-height:1.55;padding:2px 0 2px 14px;position:relative;color:#334155}
+.p-card li::before{content:"\203A";position:absolute;left:0;color:#1f6aa5;font-weight:700}
 
-/* KPI strip — single row of compact metric pills */
+/* KPI strip — navy value, card shadow */
 .kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:8px 0 4px}
-.kpi-item{border:1px solid var(--ln);border-radius:var(--r);padding:10px 12px;background:var(--bg);text-align:center}
-.kpi-item .val{font-size:16px;font-weight:800;color:var(--navy);line-height:1.2}
-.kpi-item .lbl{font-size:9.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-top:3px;line-height:1.3}
-.kpi-item .hint{font-size:10px;color:var(--ink4);margin-top:2px;line-height:1.35}
+.kpi-item{border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;background:#fff;text-align:center;box-shadow:0 4px 12px rgba(15,23,42,.04)}
+.kpi-item .val{font-size:16px;font-weight:800;color:#0c2d48;line-height:1.2}
+.kpi-item .lbl{font-size:9.5px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.3px;margin-top:3px;line-height:1.3}
+.kpi-item .hint{font-size:10px;color:#94a3b8;margin-top:2px;line-height:1.35}
 
-/* Change class cards — 3-col compact */
+/* Change class cards */
 .change-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 6px}
-.chg-card{border:1px solid var(--ln);border-radius:var(--r);padding:12px 14px;background:var(--bg)}
-.chg-card h4{font-size:12px;font-weight:700;color:var(--navy);margin:0 0 4px;display:flex;align-items:center;gap:6px}
-.chg-card .risk{font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-sm);text-transform:uppercase;letter-spacing:.4px}
-.chg-card .risk.low{background:#ebfbee;color:var(--green)}
-.chg-card .risk.mid{background:var(--gold-l);color:#e67700}
-.chg-card .risk.high{background:#fff5f5;color:var(--red)}
+.chg-card{border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;background:#fff;box-shadow:0 4px 12px rgba(15,23,42,.04)}
+.chg-card h4{font-size:12px;font-weight:700;color:#0c2d48;margin:0 0 4px;display:flex;align-items:center;gap:6px}
+.chg-card .risk{font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.4px}
+.chg-card .risk.low{background:#dcfce7;color:#166534}
+.chg-card .risk.mid{background:#fef3c7;color:#92400e}
+.chg-card .risk.high{background:#fee2e2;color:#b91c1c}
 .chg-card ul{list-style:none;margin:4px 0 0;padding:0}
-.chg-card li{font-size:11.5px;line-height:1.55;padding:1px 0 1px 14px;position:relative;color:var(--ink2)}
-.chg-card li::before{content:"\203A";position:absolute;left:0;color:var(--ink3);font-weight:700}
+.chg-card li{font-size:11.5px;line-height:1.55;padding:1px 0 1px 14px;position:relative;color:#334155}
+.chg-card li::before{content:"\203A";position:absolute;left:0;color:#64748b;font-weight:700}
 
 /* Metadata 2-col cards */
 .meta-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 6px}
-.meta-card{border:1px solid var(--ln);border-radius:var(--r);padding:12px 14px;background:var(--bg)}
-.meta-card h4{font-size:12px;font-weight:700;color:var(--navy);margin:0 0 6px}
+.meta-card{border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;background:#fff;box-shadow:0 4px 12px rgba(15,23,42,.04)}
+.meta-card h4{font-size:12px;font-weight:700;color:#0c2d48;margin:0 0 6px}
 .meta-card ul{list-style:none;margin:0;padding:0}
-.meta-card li{font-size:11.5px;line-height:1.55;padding:2px 0 2px 14px;position:relative;color:var(--ink2)}
-.meta-card li::before{content:"\203A";position:absolute;left:0;color:var(--blue);font-weight:700}
+.meta-card li{font-size:11.5px;line-height:1.55;padding:2px 0 2px 14px;position:relative;color:#334155}
+.meta-card li::before{content:"\203A";position:absolute;left:0;color:#1f6aa5;font-weight:700}
 
-/* Inline rule banners — compact */
-.rule{font-size:12px;line-height:1.6;padding:10px 14px;border-radius:var(--r);margin:8px 0}
-.rule.r-warn{background:var(--gold-l);border-left:3px solid var(--gold)}
-.rule.r-danger{background:#fff5f5;border-left:3px solid var(--red)}
-.rule.r-ok{background:#ebfbee;border-left:3px solid var(--green)}
-.rule b{color:var(--navy)}
+/* Inline rule banners */
+.rule{font-size:12px;line-height:1.6;padding:10px 14px;border-radius:8px;margin:8px 0}
+.rule.r-warn{background:#fffbeb;border-left:3px solid #d97706}
+.rule.r-danger{background:#fef2f2;border-left:3px solid #dc2626}
+.rule.r-ok{background:#f0fdf4;border-left:3px solid #16a34a}
+.rule b{color:#0c2d48}
 
 /* Ref links — compact grid */
 .ref-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:0 0 6px}
-.ref-cell{border:1px solid var(--ln);border-radius:var(--r);padding:10px 14px;background:var(--bg)}
-.ref-cell h4{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin:0 0 4px}
-.ref-cell a{display:block;font-size:12px;padding:2px 0}
+.ref-cell{border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;background:#f8fafc}
+.ref-cell h4{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.3px;margin:0 0 4px}
+.ref-cell a{display:block;font-size:12px;padding:2px 0;color:#1d4ed8}
 
 /* Responsive */
 @media(max-width:960px){

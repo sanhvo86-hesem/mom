@@ -16,7 +16,7 @@
  .block {border-left: 3px solid #111827; padding:10px 12px; background:#f9fafb; border-radius:12px;}
  .mini {font-size: 12px;}
  .grid-3 {display:grid; grid-template-columns: repeat(3, minmax(0, 1fr); gap:12px;}
- @media (max-width: 960px; width:100%; box-sizing:border-box){ .grid-3{
+ @media (max-width: 960px){ .grid-3{
  thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
@@ -25,7 +25,8 @@
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
 table { max-width: 100%; table-layout: auto; }
 td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-
+}
+}
 </style>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
 </head>

@@ -1,0 +1,336 @@
+================================================================================
+COMPREHENSIVE QMS DOCUMENT SYSTEM AUDIT
+================================================================================
+Date:        2026-03-26
+Scope:       All HTML files excluding _build, .claude, .git, _Deleted, 04-Bieu-Mau
+Total files: 436
+  SOPs: 38 | WIs: 48 | Annexes: 71 | Other: 279
+================================================================================
+
+
+============================================================
+=== 1. CSS SYNTAX HEALTH ===
+============================================================
+
+  FAIL: Files with mismatched CSS braces (107 files)
+    Root Cause A: "td,th{ thead{display:..." -- unclosed td,th rule (47 files)
+    Root Cause B: "@media (max-width: 960px; width: 100%; ...)" -- invalid @media
+                  syntax with semicolons instead of "and" (92 files)
+    Both patterns result in exactly 1 extra { per file (diff = +1).
+
+    Affected file categories:
+    - ALL 38 SOPs
+    - 5 WIs (wi-103 through wi-107)
+    - 7 Annexes (annex-105, annex-114, and others)
+    - Quality Manual (all 4 versions including 3 archive)
+    - Policies (pol-qms-001, pol-qms-002)
+    - Department handbooks index
+    - Portal index
+    - Multiple Training Academy SYS-OPS and TRN-OPS files
+
+    Specific broken CSS lines:
+    Line A: td,th{ thead{display:table-header-group}tfoot{display:table-footer-group}
+            Should be: td,th{...} thead{display:table-header-group} tfoot{...}
+    Line B: @media (max-width: 960px; width: 100%; box-sizing: border-box){...}
+            Should be: @media (max-width: 960px){...} with properties inside rules
+
+  PASS: No broken CSS selectors (dangling commas) found
+  PASS: No true orphaned CSS properties outside rules (initial 4737 hits
+        were false positives from minified single-line rules)
+
+
+============================================================
+=== 2. HTML STRUCTURE INTEGRITY ===
+============================================================
+
+  PASS: All 436 files have balanced <table> tags
+
+  WARNING: Files with unbalanced <div> tags (25 files)
+    - sop-303-engineering-release-baseline-package-and-job-snapshot-control.html: 95 vs 96
+    - wi-715-helium-leak-test-standard-work.html: 58 vs 59
+    - wi-716-vacuum-compatible-clean-build-and-bagging.html: 39 vs 40
+    - wi-801-cnc-poka-yoke-examples.html: 48 vs 49
+    - annex-507-poka-yoke-cnc-examples.html: 33 vs 34
+    - annex-801-competency-levels-and-certification-rules.html: 36 vs 37
+    - 19 Training Academy files (SYS-OPS-02 through SYS-OPS-28, TRN-OPS-01/03/06/07)
+
+  WARNING: Files without inline <style> block (24 files)
+    - portal.html, index.html (root)
+    - 15 Annex files (annex-103, annex-111, annex-112, annex-119 through annex-123, etc.)
+    - 4 Training Academy files
+    - annex-201-job-dossier-template, annex-503, annex-607
+
+  FAIL: Files missing style.css link (219 files)
+    Breakdown:
+    - 49 Job Description files (all JDs under 03-Job-Descriptions/)
+    - 10 Department Handbooks
+    - 21 Legacy Reference files (ref-001 through ref-021)
+    - 38 Training Academy files (all SYS-OPS, TRN-OPS, competency levels)
+    - 15 Annex files without style blocks
+    - 86 other files (M365 templates, portal, book, etc.)
+    NOTE: Many of these (JDs, handbooks) use self-contained inline styles.
+          The 38 SOPs and most WIs DO correctly link to style.css.
+
+
+============================================================
+=== 3. 8-GATE SYSTEM CONSISTENCY ===
+============================================================
+
+  PASS: No old reference "G0-G5" found (0 files)
+  PASS: No old reference "G0-G6" found (0 files)
+  PASS: No old reference "6 gate" found (0 files)
+  PASS: No old reference "7 gate" found (0 files)
+  PASS: No old reference "6 cong" found (0 files)
+  PASS: No old reference "7 cong" found (0 files)
+  PASS: No old gate numbering "G1 -- IQC" (0 files)
+  PASS: No old gate numbering "G2 -- Setup" (0 files)
+
+  WARNING: Files without 8-gate mapping reference (31 SOPs/WIs/Annexes)
+    WIs missing gate reference (29):
+    - wi-206, wi-302, wi-502 through wi-518 (stub WIs)
+    - wi-601 through wi-606, wi-711 through wi-716, wi-721
+    - 2 custom templates in portal
+    Annexes missing gate reference (2):
+    - annex-201-job-dossier-template, core-standards/templates/wi-template.html
+
+
+============================================================
+=== 4. TRANSLATION ARTIFACTS ===
+============================================================
+
+  PASS: No excessive "((" double parentheses found (0 files with > 2)
+
+  FAIL: Files with nested duplicate text pattern "word (word (" (14 files)
+    - qms-man-001 (all 4 versions): 1 each
+    - dept-ehs-handbook.html: 3 instances
+    - dept-production-handbook.html: 2 instances
+    - jd-cnc-operator.html: 1 instance
+    - jd-setup-technician.html: 1 instance
+    - jd-engineering-lead-manager.html: 1 instance
+    - jd-process-engineer.html: 1 instance
+    - jd-supply-chain-manager.html: 1 instance
+    - jd-tool-crib-tool-storekeeper.html: 5 instances (worst)
+    - jd-ehs-specialist.html: 1 instance
+    - 03-Job-Descriptions/index.html: 1 instance
+
+  WARNING: Files with potential untranslated English words (9 files)
+    - wi-102: 27 English words (Records, etc.)
+    - wi-103: 12 English words
+    - wi-104: 14 English words
+    - wi-106: 5 English words
+    - annex-134: 12 English words
+    - annex-136: 4 English words
+    - annex-403: 5 English words (Scope, Procedure)
+    - TRN-OPS-02: 16 English words
+    - TRN-OPS-05: 8 English words
+
+
+============================================================
+=== 5. DESIGN SYSTEM COMPLIANCE ===
+============================================================
+
+  PASS: All 38 SOPs have required components (form-header, iso-map,
+        preface-block, gate-grid/gate-card, table-card)
+  PASS: All SOPs with gate-cards have >= 3 gate-cards
+  PASS: All 48 WIs have form-header
+
+  WARNING: WI stub files under 2KB (5 files)
+    - wi-519-custom-hidden-pilot-note.html: 1,666 bytes
+    - wi-502-tier-1-2-3-daily-management.html: 1,665 bytes
+    - wi-503-kpi-scoreboard-and-dashboard.html: 1,899 bytes
+    - wi-504-job-dossier-and-evidence-pack.html: 1,668 bytes
+    - wi-505-gs1-sscc-shipping-data.html: 1,790 bytes
+
+  FAIL: Annexes missing form-header (1 file)
+    - annex-201-job-dossier-template-and-metadata-dictionary.html
+
+
+============================================================
+=== 6. PRINT READINESS ===
+============================================================
+
+  FAIL: Inline @media print rules found in HTML files (2 files)
+    - core-standards/templates/sop-template.html
+    - core-standards/templates/wi-template.html
+
+  WARNING: page-break rules outside @media print (12 files)
+    - qms-man-001 (all 4 versions)
+    - wi-207-high-risk-job-readiness-control-tower.html
+    - wi-701-receiving-iqc-traceability-and-put-away.html
+    - annex-117-escalation-matrix-and-sla.html (2 copies)
+    - annex-401-supplier-risk-model-and-scorecard-method.html
+    - annex-403-approved-processor-list.html
+    - Templates: sop-template.html, wi-template.html
+
+  FAIL: Broken style.css relative paths (5 files)
+    - qms-man-001 _Archive (3 files): href="../../assets/style.css" -> not found
+    - sop-template.html: uses {{RELATIVE_PATH}} placeholder (expected)
+    - wi-template.html: uses {{RELATIVE_PATH}} placeholder (expected)
+    Real issue: 3 archive files with wrong relative depth.
+
+
+============================================================
+=== 7. LINK INTEGRITY (Full Check) ===
+============================================================
+
+  Total internal links checked: 8,284
+  Total broken link instances: 1,016
+  Unique broken targets: 371
+  Broken links in non-archive files: 680 instances (306 unique)
+  Broken links in _Archive files only: 336 instances
+
+  FAIL: Links with double-slash paths (44 instances)
+    All point to: ../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-104-...html
+    Sources: book.html, 10-Training-Academy competency levels
+
+  TOP BROKEN LINK TARGETS (non-archive, by reference count):
+  1. annex-503-cnc-operating-model-and-role-boundary.html (32 refs from JDs)
+     -> File exists at different path than referenced
+  2. annex-502-gate-mrr-and-execution-synchronization-pack.html (28 refs from SOPs)
+     -> File does NOT exist anywhere
+  3. annex-502-gate-mrr-and-execution-synchronization-pack.html (28 refs from Annexes)
+     -> Same missing file, different relative paths
+  4. form-control-register.html (24 refs)
+     -> Points into excluded 04-Bieu-Mau directory
+  5. Various SOP links from Quality Manual archives (13 refs)
+  6. sop-501 from Training Academy (12 refs)
+  7. deputy-backup-matrix references (11 refs)
+  8. sop-104 with double-slash paths (10 refs)
+  9. sop-502-cnc-machining-operations from Training (10 refs)
+  10. Competency level files (C10-L1, C13-L2, C16-L3) (10+ refs)
+
+  PASS: 87.7% of all internal links resolve correctly (7,268 / 8,284)
+
+
+============================================================
+=== 8. METADATA CONSISTENCY ===
+============================================================
+
+  Total files with form-header: 410
+
+  WARNING: Files missing "Code" metadata (26 files)
+    - Handbook index, 4 WI stubs (wi-502 through wi-505)
+    - 16 Legacy REF files (ref-001 through ref-021)
+    - 5 Annex files (annex-104, annex-105, annex-117, annex-124)
+
+  WARNING: Files missing "Version" metadata (22 files)
+    - wi-519 custom template, 4 WI stubs
+    - 16 Legacy REF files
+    - 1 custom template
+
+  WARNING: Files missing "Effective Date" metadata (30 files)
+    - 2 custom templates, handbook index, glossary index
+    - wi-205, wi-502 through wi-505, wi-715, wi-716, wi-801
+    - 16 Legacy REF files
+    - annex-507
+
+  WARNING: Files missing "Owner" metadata (16 files)
+    - wi-605, wi-715
+    - 12 Annex files (annex-101, annex-104 through annex-124)
+    - annex-801, handbook index, 1 custom template
+
+  WARNING: Files missing "Approved" metadata (26 files)
+    - 2 custom templates, handbook index
+    - 4 WI stubs, wi-715, wi-801
+    - 16 Legacy REF files
+
+
+================================================================================
+=== SUMMARY ===
+================================================================================
+
+  TOTAL CHECKS:     33
+  PASS:             16  (48.5%)
+  FAIL:              7  (21.2%)
+  WARNING:          10  (30.3%)
+
+  OVERALL COMPLIANCE: 48.5% pass rate on audit checks
+
+
+  --- TOP 10 PRIORITY FIXES ---
+
+  1. [CRITICAL] CSS Brace Mismatch (107 files)
+     Two broken CSS patterns affect rendering in ALL SOPs and many other files:
+     A. "td,th{" unclosed rule (47 files)
+     B. Invalid @media query with semicolons (92 files)
+     FIX: Search-replace these two patterns across all files.
+
+  2. [CRITICAL] Broken Internal Links - annex-502 MISSING (56+ refs)
+     "annex-502-gate-mrr-and-execution-synchronization-pack.html" does not exist
+     but is referenced by 28 SOPs and 28 Annexes.
+     FIX: Create this file or update all references.
+
+  3. [HIGH] Broken Internal Links - annex-503 wrong path (63 refs from JDs)
+     annex-503-cnc-operating-model-and-role-boundary.html exists but JDs use
+     wrong relative path.
+     FIX: Correct href paths in all 32+ JD files.
+
+  4. [HIGH] Missing style.css link (219 files)
+     Half of all files lack the central stylesheet reference. Many are JDs and
+     handbooks with self-contained styles, but this prevents design system updates.
+     FIX: Add style.css link to all document files; remove duplicate inline styles.
+
+  5. [MEDIUM] Unbalanced <div> tags (25 files)
+     19 Training Academy files and 6 operational docs have mismatched divs.
+     FIX: Run HTML validator on each; typically 1 extra </div> or missing <div>.
+
+  6. [MEDIUM] Nested Duplicate Text / Translation Artifacts (14 files)
+     "word (word (" pattern found in Quality Manual and Job Descriptions.
+     FIX: Manual review of each instance; fix duplicate transliteration.
+
+  7. [MEDIUM] Double-Slash Link Paths (44 instances)
+     Paths like "//01-SOPs//01-SOP-100//" break on some servers.
+     FIX: Replace // with / in all href paths.
+
+  8. [LOW] Metadata gaps in Legacy REF files (16 files missing Code/Version/Date)
+     All under 03-Reference/00-LEGACY-REF/ -- these appear to be deprecated.
+     FIX: Add metadata or mark as archived.
+
+  9. [LOW] WI Stub Files (5 files under 2KB)
+     wi-502 through wi-505 and wi-519 template are minimal placeholders.
+     FIX: Develop full content or mark as planned/draft.
+
+  10. [LOW] Inline @media print rules in templates (2 files)
+      Templates still contain print rules that should be in style.css.
+      FIX: Move to style.css; these are templates so impact is limited.
+
+
+  --- CATEGORY HEALTH SCORES ---
+
+  SOPs (38 files):
+    Design system: 100% compliant
+    CSS syntax: 0% (ALL have brace mismatch)
+    Gate system: 100% (8-gate references present)
+    Metadata: ~100%
+    Links: ~80% (annex-502 missing)
+    OVERALL: GOOD structure, needs CSS fix
+
+  WIs (48 files):
+    Design system: 100% form-header
+    CSS syntax: ~90% (5 files affected)
+    Gate system: 40% missing reference (29 of 48)
+    Metadata: ~85%
+    Stubs: 5 files need content
+    OVERALL: FAIR, gate refs and stubs need work
+
+  Annexes (71 files):
+    Design system: 98.6% (1 missing form-header)
+    CSS syntax: ~90% (7 files affected)
+    Metadata: ~80%
+    Links: annex-502 is the most referenced missing file
+    OVERALL: GOOD, annex-502 is critical gap
+
+  Job Descriptions (49 files):
+    No style.css link (self-contained)
+    Translation artifacts in 6 files
+    Broken links to annex-503 (32+ files)
+    OVERALL: NEEDS ATTENTION for link fixes
+
+  Training Academy (58 files):
+    25 div imbalance issues
+    No style.css link
+    Multiple broken links to SOPs
+    OVERALL: NEEDS SIGNIFICANT WORK
+
+
+--- END OF AUDIT REPORT ---
