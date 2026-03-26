@@ -84,7 +84,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <thead><tr><th>IG</th><th>Tên cổng</th><th>Mô tả hoạt động</th><th>Chủ trì</th><th>Điểm dừng bắt buộc</th><th>KPI chính</th></tr></thead>
 <tbody>
 <tr>
-<td><span class="step-tag">IG1</span></td>
+<td style="text-align:center;vertical-align:middle"><span class="step-tag">IG1</span></td>
 <td><b>Tiếp nhận &amp; phân loại DCR</b></td>
 <td>Nhận yêu cầu thay đổi tài liệu (Document Change Request) từ mọi nguồn: NCR/CAPA, thay đổi kỹ thuật, thay đổi khách hàng, cải tiến nội bộ, thay đổi luật định. Phân loại mức ảnh hưởng (chỉ đọc / vận hành / dữ liệu giao dịch / bằng chứng pháp lý / khách hàng). Xác định Responsible Person, danh sách tài liệu bị kéo theo (SOP/WI/FRM/ANNEX/traveler/NC program) và Point-of-use chịu tác động. Mở <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-102_Document_Change_Request.xlsx">FRM-102</a> và ghi nhận vào <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-101_Master_Document_Register.xlsx">FRM-101</a>.</td>
 <td>QMS Engineer</td>
@@ -92,7 +92,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <td>100% DCR có Responsible Person được chỉ định trong vòng 24 giờ kể từ khi tiếp nhận. Tỷ lệ DCR bị trả lại do thiếu scope ≤ 5%.</td>
 </tr>
 <tr>
-<td><span class="step-tag">IG2</span></td>
+<td style="text-align:center;vertical-align:middle"><span class="step-tag">IG2</span></td>
 <td><b>Soạn thảo &amp; rà soát kỹ thuật</b></td>
 <td>Document Responsible Person soạn/sửa nội dung theo template chuẩn (<a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-111-document-writing-and-cross-reference-rules.html">ANNEX-111</a>). Kiểm tra: mã tài liệu, tiêu đề, phiên bản, ngày hiệu lực, liên kết biểu mẫu, câu lệnh thi hành (không dùng câu mơ hồ). Đối với dữ liệu số (Epicor field mapping, Power Automate flow, M365 list config), phải đính kèm screenshot hoặc export cấu hình. Ghi nhận trên <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-105_Peer_Review_Log.xlsx">FRM-105</a>.</td>
 <td>Document Responsible Person</td>
@@ -100,7 +100,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <td>100% bản dự thảo có cross-review log (<a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-105_Peer_Review_Log.xlsx">FRM-105</a>) hoàn chỉnh trước khi chuyển phê duyệt. Thời gian soạn thảo trung bình ≤ 3 ngày làm việc.</td>
 </tr>
 <tr>
-<td><span class="step-tag">IG3</span></td>
+<td style="text-align:center;vertical-align:middle"><span class="step-tag">IG3</span></td>
 <td><b>Cross-review &amp; phê duyệt</b></td>
 <td>Reviewer chéo (bộ phận liên quan) kiểm tra tính áp dụng thực tế tại hiện trường: Operator có đủ thông tin để làm, đo, ghi nhận không? Biểu mẫu có khớp field với Epicor/M365 không? QA Lead hoặc thẩm quyền được chỉ định ra quyết định: Phê duyệt / Trả lại sửa / Từ chối. Ghi kết quả trên <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html#FRM-103">FRM-103</a>.</td>
 <td>QA Lead / Approver</td>
@@ -108,7 +108,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <td>0 tài liệu phát hành thiếu chữ ký phê duyệt hợp lệ. Thời gian cross-review + phê duyệt ≤ 2 ngày làm việc kể từ khi nhận bản dự thảo hoàn chỉnh.</td>
 </tr>
 <tr>
-<td><span class="step-tag">IG4</span></td>
+<td style="text-align:center;vertical-align:middle"><span class="step-tag">IG4</span></td>
 <td><b>Phát hành &amp; cập nhật register</b></td>
 <td>QMS Engineer gắn ngày hiệu lực, phiên bản chính thức, cập nhật <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-101_Master_Document_Register.xlsx">FRM-101</a> (Master Document Register), <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html#FRM-103">FRM-103</a> (Distribution Log) và <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html#FRM-108">FRM-108</a> (Controlled Copy Register). Đánh dấu bản cũ là "Superseded" với watermark. Đẩy lên QMS Library (M365/SharePoint) và thực hiện sync theo <a href="../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> (SharePoint → Git → server). Gửi thông báo phát hành tới Lead Department và IT Administrator.</td>
 <td>QMS Engineer</td>
@@ -116,7 +116,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <td>≤ 2 ngày làm việc từ DCR mở đến phát hành chính thức. 100% register cập nhật đồng bộ trong vòng 4 giờ sau phê duyệt.</td>
 </tr>
 <tr>
-<td><span class="step-tag">IG5</span></td>
+<td style="text-align:center;vertical-align:middle"><span class="step-tag">IG5</span></td>
 <td><b>Triển khai tại Point-of-use</b></td>
 <td>Lead Department thu hồi bản kiểm soát cũ tại máy CNC, khu đo CMM, kho, khu đóng gói và bảng treo. Thay thế bằng bản mới. Thực hiện hướng dẫn ngắn tại hiện trường khi thay đổi ảnh hưởng vận hành (setup sheet, traveler, inspection plan, NC program). Kiểm tra traveler mẫu, phiếu cài đặt và biểu mẫu in đã phản ánh đúng phiên bản mới. Ghi bằng chứng trên <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-104_Document_Deployment_Checklist.xlsx">FRM-104</a>.</td>
 <td>Lead Department</td>
@@ -124,7 +124,7 @@ td,th{} thead{display:table-header-group}tfoot{display:table-footer-group}
 <td>100% triển khai có bảng kiểm <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-104_Document_Deployment_Checklist.xlsx">FRM-104</a> ký xác nhận. 0 bản kiểm soát cũ còn tồn tại tại Point-of-use sau 24 giờ kể từ phát hành.</td>
 </tr>
 <tr>
-<td><span class="step-tag">IG6</span></td>
+<td style="text-align:center;vertical-align:middle"><span class="step-tag">IG6</span></td>
 <td><b>Archive, retention &amp; disposal</b></td>
 <td>QMS Engineer đóng DCR khi toàn bộ bằng chứng triển khai đã đủ. Khóa hồ sơ (finalize) trên M365/SharePoint — không cho chỉnh sửa tiếp. Áp dụng retention label theo chính sách lưu giữ (<a href="sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>). Kiểm tra legal hold: nếu đang có NCR/CAPA/khiếu nại/tranh chấp/yêu cầu pháp lý mở thì giữ nguyên hồ sơ. IT Administrator thực hiện disposition (hủy có bằng chứng) khi hết thời hạn lưu giữ và không còn legal hold. Ghi nhận trên <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html#FRM-109">FRM-109</a>.</td>
 <td>QMS Engineer / IT Admin</td>
