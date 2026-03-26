@@ -71,7 +71,28 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 @media (max-width: 960px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
 
 </style>
-<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }
+/* Critical inline CSS for file:// compatibility */
+
+/* Flowchart */
+.flowchart{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:stretch;margin:20px 0;padding:16px;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:1px solid rgba(21,101,192,.18);border-radius:10px}
+.flow-step{flex:1 1 120px;min-width:100px;max-width:170px;padding:10px 12px;background:#fff;border:1.5px solid rgba(21,101,192,.3);border-radius:10px;text-align:center;box-shadow:0 1px 3px rgba(21,101,192,.06)}
+.flow-step .flow-num{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#1565c0,#1976d2);color:#fff;font-size:12px;font-weight:800;margin-bottom:5px}
+.flow-step .flow-title{font-size:11px;font-weight:700;color:#0C2D48;line-height:1.35}
+.flow-step .flow-text{text-align:left}
+.flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 22px;color:#93b3d6;font-size:16px;font-weight:700}
+/* Proc-num */
+.proc-num{display:inline-flex;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;flex-shrink:0;margin-right:8px}
+/* Step-tag */
+.step-tag{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0C2D48,#1565c0);text-transform:uppercase;letter-spacing:.3px}
+/* Metric cards */
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:16px 0}
+.metric-card{padding:16px;border:1px solid rgba(21,101,192,.15);border-radius:10px;text-align:center;background:#fff}
+.metric-card .value{font-size:28px;font-weight:800;color:#1565c0;line-height:1.2}
+.metric-card .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-top:4px}
+.metric-card .sub{font-size:11px;color:#666;margin-top:4px;line-height:1.4}
+
+</style>
 <link rel="stylesheet" href="../../../assets/style.css"/>
 </head>
 <body>
