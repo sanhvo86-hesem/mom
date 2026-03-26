@@ -1,6 +1,6 @@
 # 04 — Hệ thống thiết kế HTML/CSS (HESEM QMS Design System)
 
-> Phiên bản: v12 | Cập nhật: 2026-03-26
+> Phiên bản: v13 | Cập nhật: 2026-03-26
 > File CSS gốc: `assets/style.css`
 
 ---
@@ -371,6 +371,79 @@ Tất cả biến được khai báo trong `:root` của `style.css`. Mọi comp
 <!-- ❌ DON'T — dùng req-tag ngoài .req block -->
 <span class="req-tag shall">PHẢI</span> Nội dung lẻ không có wrapper.
 ```
+
+### 6.4 Hệ thống 4 loại nhãn phân biệt (Badge Types)
+
+> **Quy tắc:** Nhìn màu badge = biết loại. KHÔNG dùng lẫn.
+
+| # | Class | Màu | Hình dạng | Ví dụ | Dùng cho |
+|---|-------|-----|-----------|-------|----------|
+| 1 | `.iso-clause` | 🔵 White on blue `#1565c0` | Pill (rounded 12px) | `§8.2` | Viện dẫn ISO 9001:2026 |
+| 2 | `.step-tag` | ⬛ White on dark `#37474f` | Rounded square | `S1`, `S3` | Bước nội bộ SOP/WI |
+| 3 | `.gate-tag` | 🔷 White on teal `#00838f` | Pill (rounded 12px) | `G0`, `G4` | 8 System Gates |
+| 4 | `.proc-tag` | 🟡 Dark on amber `#fff3cd` | Rounded square, border `#ffc107` | `Bước 1` | Quy trình chi tiết (flowchart) |
+
+```html
+<!-- ISO Clause badge — viện dẫn tiêu chuẩn -->
+<span class="iso-clause">§8.2</span>
+
+<!-- Internal Step badge — bước nội bộ SOP -->
+<span class="step-tag">S1</span>
+
+<!-- System Gate badge — 8 cổng kiểm soát -->
+<span class="gate-tag">G4</span>
+
+<!-- Procedure Step badge — quy trình chi tiết -->
+<span class="proc-tag">Bước 1</span>
+```
+
+> **KHÔNG BAO GIỜ** dùng `G1`, `G2`... cho bước nội bộ SOP → dùng `S1`, `S2`...
+> **KHÔNG BAO GIỜ** dùng `.iso-clause` cho non-ISO references.
+> Mỗi yêu cầu PHẢI/NÊN/CÓ THỂ trong iso-map PHẢI có `<span class="iso-clause">§X.Y</span>` kèm theo.
+
+### 6.5 Flowchart — Lưu đồ quy trình chi tiết
+
+> Mỗi SOP section "Quy trình chi tiết" PHẢI bắt đầu bằng flowchart tổng quan.
+
+```html
+<div class="flowchart">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-title">Tên bước</div>
+    <div class="flow-desc">Mô tả ngắn 1 dòng</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step active">
+    <div class="flow-num">2</div>
+    <div class="flow-title">Decision</div>
+    <div class="flow-desc">Bước quyết định/phê duyệt</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step critical">
+    <div class="flow-num">3</div>
+    <div class="flow-title">Inspection</div>
+    <div class="flow-desc">Bước kiểm tra/đo lường</div>
+  </div>
+</div>
+```
+
+**CSS classes:**
+
+| Class | Màu | Dùng cho |
+|-------|-----|----------|
+| `.flow-step` | White, border blue | Bước thường |
+| `.flow-step.active` | Amber background `#fffbeb` | Bước quyết định / phê duyệt / release |
+| `.flow-step.critical` | Red background `#fef2f2` | Bước kiểm tra / đo lường / hold point |
+| `.flow-arrow` | Blue `#1565c0` | Mũi tên nối bước |
+| `.flow-num` | White circle on blue | Số thứ tự bước |
+
+**Quy tắc flowchart:**
+1. Số bước tối đa: **12** (nếu nhiều hơn → chia sub-process)
+2. Tên bước: **2-3 từ** (ngắn gọn)
+3. Mô tả: **1 dòng** (tùy chọn, bỏ trống nếu tên đủ rõ)
+4. Responsive: ngang → dọc trên mobile
+5. Print: in được với đủ màu sắc
+6. **Bắt buộc** đặt trước section "Quy trình chi tiết"
 
 ---
 
