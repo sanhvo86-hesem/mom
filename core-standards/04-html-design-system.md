@@ -116,7 +116,7 @@ Tất cả biến được khai báo trong `:root` của `style.css`. Mọi comp
 | `.field-grid` | `repeat(2, minmax(0,1fr))` | 10px 16px | Form input 2 cột |
 | `.toc-grid` | `auto-fit minmax(220px,1fr)` | 6-10px | Mục lục nhanh |
 | `.metric-grid` | `auto-fit minmax(180-210px,1fr)` | 12-14px | KPI metrics |
-| `.gate-grid` | `auto-fit minmax(220px,1fr)` | 12px | Cổng kiểm soát |
+| `.gate-grid` | `auto-fit minmax(220px,1fr)` | 12px | Grid thẻ thông tin / legacy visual cards; **không dùng cho Section 6 SOP** |
 | `.callout-grid` | `auto-fit minmax(260px,1fr)` | 14px | Multi-column callout |
 | `.auth-grid` | `repeat(2, minmax(0,1fr))` | 12px | Quyền hạn JD |
 | `.comp-grid` | `repeat(2, minmax(0,1fr))` | 12px | Năng lực JD |
@@ -149,7 +149,7 @@ Tất cả biến được khai báo trong `:root` của `style.css`. Mọi comp
 | `.card` | Card chung — bg trắng, border `--ln`, radius `--r`, padding 20px 24px | Không |
 | `.card-title` | Tiêu đề card — 14px bold `--navy` | Không |
 | `.table-card` | Wrapper bảng — `border: 1px solid var(--th-bdr)` = blue #1565c0, radius `--r`, overflow auto, **no box-shadow** | Không |
-| `.gate-card` | Cổng kiểm soát — border `--ln`, padding 14px | `border-left: 3px solid var(--blue)` |
+| `.gate-card` | Thẻ thông tin / legacy gate card — border `--ln`, padding 14px | `border-left: 3px solid var(--blue)` |
 | `.metric-card` | KPI metric — border `--ln`, radius `--r`, padding 16px 12px, text-align center | `border-top: 3px solid var(--blue)` |
 | `.callout-card` | Multi-column callout — border `--ln`, padding 14px | Không |
 | `.portal-card` | Portal landing card — border `--ln`, padding 18px | Không |
@@ -220,7 +220,7 @@ Tất cả biến được khai báo trong `:root` của `style.css`. Mọi comp
 
 ### 4.5 Gate Card (style.css dòng 148–151)
 
-`.gate-grid` + `.gate-card` dùng cho cổng kiểm soát quy trình.
+`.gate-grid` + `.gate-card` là pattern thẻ trực quan dạng legacy. Có thể dùng cho dashboard hoặc note cards, nhưng **không dùng cho Section 6 của SOP**, nơi IG phải trình bày bằng TABLE.
 
 | Thuộc tính | Giá trị |
 |---|---|

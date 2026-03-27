@@ -73,13 +73,12 @@ Mọi SOP của HESEM PHẢI có đủ 10 section theo thứ tự sau. KHÔNG đ
 
 <section id="s6-gates" class="sop-section">
   <h2>6. Cổng kiểm soát, điểm dừng bắt buộc & KPI</h2>
-  <div class="gate-card">
-    <h3>G2 — Tên gate</h3>
-    <p><strong>PASS:</strong> điều kiện</p>
-    <p><strong>HOLD/FAIL:</strong> điều kiện</p>
-    <p><strong>Vai trò:</strong> ai quyết định</p>
-    <p><strong>Hồ sơ:</strong> FRM-XXX</p>
-  </div>
+  <table class="table">
+    <thead><tr><th>IG</th><th>Cổng kiểm soát & mục tiêu</th><th>Vai trò</th><th>Điểm dừng</th><th>KPI / hồ sơ</th></tr></thead>
+    <tbody>
+      <tr><td>IG2</td><td>Tên cổng</td><td>Ai quyết định</td><td>Điều kiện HOLD/FAIL</td><td>FRM-XXX / KPI</td></tr>
+    </tbody>
+  </table>
   <table class="kpi-table">
     <thead><tr><th>KPI</th><th>Mục tiêu</th><th>Đo lường</th><th>Tần suất</th></tr></thead>
     <tbody>...</tbody>

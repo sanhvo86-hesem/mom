@@ -58,7 +58,7 @@
 <div class="card-title">Lệnh điều hành</div>
 <p>Xem xét của lãnh đạo là cơ chế điều hành cấp hệ thống, không phải buổi điểm danh KPI. Mọi đầu vào phải có nguồn dữ liệu rõ, được khóa đúng hạn và đủ ngữ cảnh để chốt quyết định. Mọi đầu ra phải đi tới hành động cụ thể, có người phụ trách chính, hạn hoàn thành, đường dẫn bằng chứng và quy tắc chuyển kỳ khi chưa đủ điều kiện đóng.</p>
 <div class="legend-row">
-<span class="chip">Cổng nội bộ: IG1 → IG5</span>
+<span class="chip">Cổng nội bộ: IG1 → IG6</span>
 <span class="chip">Biểu mẫu bắt buộc: FRM-911, FRM-131, FRM-651, FRM-652</span>
 <span class="chip">Tham chiếu: ANNEX-115, ANNEX-120, ANNEX-122, ANNEX-123, ANNEX-124</span>
 <span class="chip">SOP liên đới: SOP-901, SOP-903, SOP-801, SOP-108</span>
@@ -201,55 +201,7 @@ SOP này vận hành ở lớp quản trị sau toàn bộ G0→G7. SOP không m
 </div>
 
 <h2 class="h2" id="p6">6. Cổng kiểm soát nội bộ, điểm dừng bắt buộc &amp; KPI</h2>
-<div class="table-card">
-<table class="table">
-<colgroup>
-<col style="width:8%"/>
-<col style="width:33%"/>
-<col style="width:16%"/>
-<col style="width:25%"/>
-<col style="width:18%"/>
-</colgroup>
-<thead><tr><th>IG</th><th>Mô tả hoạt động</th><th>Chủ trì</th><th>Điểm dừng bắt buộc</th><th>KPI chính</th></tr></thead>
-<tbody>
-<tr>
-<td class="ig-center"><span class="step-tag">IG1</span></td>
-<td><b>Lập lịch và agenda review</b><br/>Xác định kỳ review, scope, chairperson, người tham dự, deputy, mốc khóa dữ liệu và danh sách input owners.</td>
-<td>QMS Engineer</td>
-<td>Không mở chu kỳ review khi chưa có lịch họp, mốc khóa dữ liệu và owner list được QA Manager xác nhận.</td>
-<td>100% kỳ review có agenda phát hành trước ít nhất 5 ngày làm việc.</td>
-</tr>
-<tr>
-<td class="ig-center"><span class="step-tag">IG2</span></td>
-<td><b>Thu thập và khóa Bộ hồ sơ xem xét</b><br/>Nhận input, xác minh source, period, exception và đóng băng dữ liệu phục vụ cuộc họp.</td>
-<td>Process Owner + Data Owner</td>
-<td>Không đưa item vào họp khi thiếu source, chưa rõ owner hoặc có thay đổi sau mốc khóa dữ liệu mà chưa có controlled note.</td>
-<td>Ít nhất 95% input owners nộp pack đúng hạn; 100% pack có source và mốc khóa dữ liệu.</td>
-</tr>
-<tr>
-<td class="ig-center"><span class="step-tag">IG3</span></td>
-<td><b>Họp và chốt quyết định</b><br/>Review xu hướng, risk, open actions, requests nguồn lực, thay đổi tài liệu và escalation cần thiết.</td>
-<td>Chief Executive Officer</td>
-<td>Không đóng topic khi chưa chốt decision, người phụ trách chính, hạn hoàn thành, đường dẫn bằng chứng và rule follow-up.</td>
-<td>100% item trọng yếu có decision ngay trong buổi họp.</td>
-</tr>
-<tr>
-<td class="ig-center"><span class="step-tag">IG4</span></td>
-<td><b>Phát hành minutes và cascade action</b><br/>Hoàn tất FRM-911, phát hành biên bản, thông báo action owners và mở link tới hồ sơ gốc liên quan.</td>
-<td>QMS Engineer</td>
-<td>Không phát hành biên bản khi thiếu sign-off, thiếu action owner, thiếu hạn hoàn thành hoặc thiếu link hồ sơ liên quan.</td>
-<td>100% biên bản phát hành trong tối đa 2 ngày làm việc sau họp.</td>
-</tr>
-<tr>
-<td class="ig-center"><span class="step-tag">IG5</span></td>
-<td><b>Theo dõi chuyển kỳ và xác minh hiệu lực</b><br/>Kiểm tra tiến độ, bằng chứng triển khai, evidence hiệu lực và mở lại item khi chưa đủ điều kiện đóng.</td>
-<td>QA Manager + Process Owner</td>
-<td>Không đóng action khi chỉ có xác nhận hoàn thành mà chưa có evidence hiệu lực hoặc chưa ổn định qua một chu kỳ vận hành phù hợp.</td>
-<td>Tỷ lệ action đúng hạn ≥ 90%; action đóng thiếu hiệu lực = 0.</td>
-</tr>
-</tbody>
-</table>
-</div>
+<div class="table-card"><table class="table"><colgroup><col style="width:8%"/><col style="width:33%"/><col style="width:16%"/><col style="width:25%"/><col style="width:18%"/></colgroup><thead><tr><th>IG</th><th>Mô tả hoạt động</th><th>Chủ trì</th><th>Điểm dừng bắt buộc</th><th>KPI chính</th></tr></thead><tbody><tr><td class="ig-center"><span class="step-tag">IG1</span></td><td><b>Khóa lịch, agenda và owner đầu vào</b><br/>Khóa điều kiện của cổng này để giữ management review dùng dữ liệu đủ sạch để ra quyết định về nguồn lực, rủi ro, carry-over và hiệu lực hệ thống thay vì chỉ họp để báo cáo.</td><td>QMR</td><td>Không mở IG1 khi đầu ra của cổng này chưa rõ trạng thái, chưa đủ bằng chứng hoặc chưa được QMR xác nhận.</td><td>100% quyết định mở cổng có owner, trạng thái và bằng chứng rõ.</td></tr><tr><td class="ig-center"><span class="step-tag">IG2</span></td><td><b>Thu thập và xác minh review pack</b><br/>Khóa điều kiện của cổng này để giữ management review dùng dữ liệu đủ sạch để ra quyết định về nguồn lực, rủi ro, carry-over và hiệu lực hệ thống thay vì chỉ họp để báo cáo.</td><td>Process Owners</td><td>Không mở IG2 khi đầu ra của cổng này chưa rõ trạng thái, chưa đủ bằng chứng hoặc chưa được Process Owners xác nhận.</td><td>100% quyết định mở cổng có owner, trạng thái và bằng chứng rõ.</td></tr><tr><td class="ig-center"><span class="step-tag">IG3</span></td><td><b>Phân tích, hợp nhất và freeze review pack</b><br/>Khóa điều kiện của cổng này để giữ management review dùng dữ liệu đủ sạch để ra quyết định về nguồn lực, rủi ro, carry-over và hiệu lực hệ thống thay vì chỉ họp để báo cáo.</td><td>QMR</td><td>Không mở IG3 khi đầu ra của cổng này chưa rõ trạng thái, chưa đủ bằng chứng hoặc chưa được QMR xác nhận.</td><td>100% quyết định mở cổng có owner, trạng thái và bằng chứng rõ.</td></tr><tr><td class="ig-center"><span class="step-tag">IG4</span></td><td><b>Thực hiện management review và chốt quyết định</b><br/>Khóa điều kiện của cổng này để giữ management review dùng dữ liệu đủ sạch để ra quyết định về nguồn lực, rủi ro, carry-over và hiệu lực hệ thống thay vì chỉ họp để báo cáo.</td><td>Top Management</td><td>Không mở IG4 khi đầu ra của cổng này chưa rõ trạng thái, chưa đủ bằng chứng hoặc chưa được Top Management xác nhận.</td><td>100% quyết định mở cổng có owner, trạng thái và bằng chứng rõ.</td></tr><tr><td class="ig-center"><span class="step-tag">IG5</span></td><td><b>Cascade action, resource và due date</b><br/>Khóa điều kiện của cổng này để giữ management review dùng dữ liệu đủ sạch để ra quyết định về nguồn lực, rủi ro, carry-over và hiệu lực hệ thống thay vì chỉ họp để báo cáo.</td><td>Functional Heads</td><td>Không mở IG5 khi đầu ra của cổng này chưa rõ trạng thái, chưa đủ bằng chứng hoặc chưa được Functional Heads xác nhận.</td><td>100% quyết định mở cổng có owner, trạng thái và bằng chứng rõ.</td></tr><tr><td class="ig-center"><span class="step-tag">IG6</span></td><td><b>Theo dõi carry-over và xác minh hiệu lực</b><br/>Khóa điều kiện của cổng này để giữ management review dùng dữ liệu đủ sạch để ra quyết định về nguồn lực, rủi ro, carry-over và hiệu lực hệ thống thay vì chỉ họp để báo cáo.</td><td>QMR</td><td>Không mở IG6 khi đầu ra của cổng này chưa rõ trạng thái, chưa đủ bằng chứng hoặc chưa được QMR xác nhận.</td><td>100% quyết định mở cổng có owner, trạng thái và bằng chứng rõ.</td></tr></tbody></table></div>
 <div class="metric-grid">
 <div class="metric-card">
 <div class="label">Nhịp họp thực hiện</div>
@@ -279,90 +231,7 @@ SOP này vận hành ở lớp quản trị sau toàn bộ G0→G7. SOP không m
 </div>
 <div class="note-soft"><b>Lưu ý:</b> IG trong section này là Internal Gate của SOP-902, không dùng thay cho system gates G0→G7.</div>
 
-<h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
-<div class="flowchart">
-<div class="flow-step">
-<div class="flow-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</div>
-<div class="flow-text"><div class="flow-title">Lập lịch review</div><div class="flow-desc">Xác định kỳ họp, scope và agenda</div></div>
-</div>
-<div class="flow-arrow">→</div>
-<div class="flow-step">
-<div class="flow-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</div>
-<div class="flow-text"><div class="flow-title">Khóa review pack</div><div class="flow-desc">Thu input, xác minh source và mốc khóa dữ liệu</div></div>
-</div>
-<div class="flow-arrow">→</div>
-<div class="flow-step active">
-<div class="flow-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</div>
-<div class="flow-text"><div class="flow-title">Họp quyết định</div><div class="flow-desc">Review, chốt decision và action</div></div>
-</div>
-<div class="flow-arrow">→</div>
-<div class="flow-step">
-<div class="flow-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</div>
-<div class="flow-text"><div class="flow-title">Phát hành minutes</div><div class="flow-desc">Hoàn tất FRM-911 và cascade action</div></div>
-</div>
-<div class="flow-arrow">→</div>
-<div class="flow-step critical">
-<div class="flow-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</div>
-<div class="flow-text"><div class="flow-title">Theo dõi hiệu lực</div><div class="flow-desc">Kiểm tra hạn hoàn thành, chuyển kỳ và hiệu lực</div></div>
-</div>
-</div>
-
-<h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span>Lập lịch và phát hành chương trình họp</h3>
-<p>QMS Engineer mở chu kỳ xem xét theo nhịp họp đã duyệt hoặc theo yêu cầu xem xét đột xuất, sau đó chuẩn hóa phạm vi và lịch làm việc trước khi thu thập dữ liệu.</p>
-<ul class="tight">
-<li>Lập agenda, ngày họp, mốc khóa dữ liệu, thời hạn nộp input và danh sách người tham dự.</li>
-<li>Xác định deputy cho các vị trí chủ chốt theo <a href="../../03-Reference/01-ANNEX-100/annex-123-deputy-backup-matrix.html">ANNEX-123</a> khi người chính không thể tham dự.</li>
-<li>Gửi checklist đầu vào cho Process Owner, Department Head và Data Owner ngay khi phát hành agenda.</li>
-<li>Đính kèm FRM-911 phiên bản hiện hành và danh sách chuyển kỳ từ kỳ review trước để các owner chuẩn bị trước.</li>
-</ul>
-<div class="note-soft"><b>Điểm dừng bắt buộc:</b> không chuyển sang bước 2 nếu agenda, mốc khóa dữ liệu và owner list chưa được QA Manager xác nhận.</div>
-<div class="role-note"><b>Bàn giao bắt buộc:</b> QMS Engineer bàn giao chương trình họp, checklist đầu vào và hạn hoàn thành cho Process Owner, Department Head và Data Owner.</div>
-
-<h3><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</span>Thu thập, xác minh và khóa Bộ hồ sơ xem xét</h3>
-<p>Process Owner và Data Owner chuẩn bị input theo phạm vi đã phân công; QMS Engineer và QA Manager chỉ cho phép đưa vào họp những dữ liệu đã có source, period và exception note rõ ràng.</p>
-<ul class="tight">
-<li>Thu KPI trend theo <a href="../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a> và kiểm tra link tới SoR theo <a href="../../03-Reference/01-ANNEX-100/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a>.</li>
-<li>Thu NCR, CAPA, risk, audit/LPA, complaint và supplier inputs từ các hồ sơ gốc như FRM-131, FRM-651 và FRM-652.</li>
-<li>Gắn owner, period, source path, mốc khóa dữ liệu và exception note cho từng nhóm đầu vào trong Bộ hồ sơ xem xét.</li>
-<li>Đánh dấu rõ item cần extraordinary discussion nếu dữ liệu cho thấy repeat failure, major complaint hoặc continuity risk.</li>
-</ul>
-<div class="note-soft"><b>Điểm dừng bắt buộc:</b> không chuyển sang bước 3 nếu có input trọng yếu thiếu source, có sửa sau mốc khóa dữ liệu mà chưa mở controlled note, hoặc owner chưa xác nhận dữ liệu.</div>
-<div class="role-note"><b>Bàn giao bắt buộc:</b> Process Owner và Data Owner bàn giao Bộ hồ sơ xem xét đã khóa cho QA Manager, QMS Engineer và Chief Executive Officer để tài liệu đọc trước.</div>
-
-<h3><span class="proc-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</span>Họp xem xét và chốt quyết định</h3>
-<p>Chief Executive Officer chủ trì cuộc họp; QA Manager giữ kỷ luật review; QMS Engineer ghi trực tiếp decision và action vào FRM-911 trong lúc họp.</p>
-<ul class="tight">
-<li>Rà từng chủ đề theo logic: tín hiệu, mức ảnh hưởng, current control, residual risk, quyết định cần chốt và bằng chứng cần theo dõi.</li>
-<li>Chốt decision theo đúng thẩm quyền: giữ control, tăng containment, mở CAPA, mở risk action, đổi tài liệu, bổ sung nguồn lực hoặc escalate.</li>
-<li>Gắn người phụ trách chính, hạn hoàn thành, đường dẫn bằng chứng và quy tắc chuyển kỳ cho từng action ngay tại thời điểm chốt.</li>
-<li>Đánh dấu item cần re-review nếu có data exception, continuity issue hoặc quyết định còn phụ thuộc phê duyệt nguồn lực bên ngoài phạm vi cuộc họp.</li>
-</ul>
-<div class="note-soft"><b>Điểm dừng bắt buộc:</b> không kết thúc một topic nếu chưa có decision rõ, owner rõ, hạn hoàn thành rõ và rule xác minh hiệu lực.</div>
-<div class="role-note"><b>Bàn giao bắt buộc:</b> Chief Executive Officer bàn giao decision đã chốt cho QA Manager và QMS Engineer để phát hành; đồng thời giao action cho từng Process Owner tương ứng.</div>
-
-<h3><span class="proc-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</span>Phát hành minutes và cascade action</h3>
-<p>Ngay sau họp, QMS Engineer hoàn tất FRM-911, xác nhận sign-off và mở liên kết tới hồ sơ gốc để bảo đảm mỗi quyết định đều truy vết được.</p>
-<ul class="tight">
-<li>Chuẩn hóa wording của decision, action, chuyển kỳ và escalation trong FRM-911 mà không thay đổi nội dung đã chốt tại cuộc họp.</li>
-<li>Phát hành biên bản, gửi action owners, nhắc hạn hoàn thành và lưu bộ hồ sơ vào đúng vị trí quản trị.</li>
-<li>Mở link tới CAPA, risk register, DCR hoặc training plan nếu xem xét của lãnh đạo yêu cầu thay đổi hệ thống.</li>
-<li>Thông báo rõ item nào đang chuyển kỳ và điều kiện nào cho phép đóng ở kỳ kế tiếp.</li>
-</ul>
-<div class="note-soft"><b>Điểm dừng bắt buộc:</b> không phát hành biên bản khi thiếu sign-off, thiếu owner, thiếu hạn hoàn thành hoặc chưa neo được action vào hồ sơ liên quan.</div>
-<div class="role-note"><b>Bàn giao bắt buộc:</b> QMS Engineer bàn giao biên bản chính thức và sổ hành động cho Process Owner, Department Head, Data Owner và QA Manager.</div>
-
-<h3><span class="proc-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</span>Theo dõi chuyển kỳ và xác minh hiệu lực</h3>
-<p>Sau khi phát hành, QA Manager và Process Owner không chỉ theo dõi trạng thái hoàn thành mà còn phải xác minh rằng control mới thực sự vận hành hiệu quả trong thực tế.</p>
-<ul class="tight">
-<li>QMS Engineer theo dõi hạn hoàn thành, gửi nhắc việc và tổng hợp overdue items cho QA Manager.</li>
-<li>Process Owner nộp evidence triển khai và evidence hiệu lực theo rule đã chốt trong FRM-911.</li>
-<li>QA Manager mở lại item nếu evidence không đủ, nếu control chưa chạy qua chu kỳ phù hợp hoặc nếu repeat failure xuất hiện lại.</li>
-<li>Chuyển item sang SOP-903, FRM-652 hoặc hồ sơ thay đổi tương ứng khi vấn đề đã vượt khỏi lớp theo dõi của xem xét của lãnh đạo.</li>
-</ul>
-<div class="note-soft"><b>Điểm dừng bắt buộc:</b> không đóng action nếu chỉ có xác nhận hoàn thành hoặc meeting note mà chưa có evidence hiệu lực.</div>
-<div class="role-note"><b>Bàn giao bắt buộc:</b> Process Owner bàn giao evidence hiệu lực cho QA Manager; QA Manager bàn giao chuyển kỳ list và overdue list cho kỳ review tiếp theo.</div>
-
-<h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
+<h2 class="h2" id="p7">7. Quy trình chi tiết</h2><div class="flowchart"><div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><div class="flow-title">Lập lịch và phát hành chương trình họp</div></div></div><div class="flow-arrow">→</div><div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><div class="flow-title">Xác định đầu vào bắt buộc và owner chịu trách nhiệm</div></div></div><div class="flow-arrow">→</div><div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><div class="flow-title">Thu thập, xác minh và làm sạch review pack</div></div></div><div class="flow-arrow">→</div><div class="flow-step active"><div class="flow-num">4</div><div class="flow-text"><div class="flow-title">Freeze review pack và chuẩn bị điểm cần quyết định</div></div></div><div class="flow-arrow">→</div><div class="flow-step active"><div class="flow-num">5</div><div class="flow-text"><div class="flow-title">Họp management review và chốt quyết định</div></div></div><div class="flow-arrow">→</div><div class="flow-step"><div class="flow-num">6</div><div class="flow-text"><div class="flow-title">Phát hành minutes, action list và resource commitment</div></div></div><div class="flow-arrow">→</div><div class="flow-step"><div class="flow-num">7</div><div class="flow-text"><div class="flow-title">Theo dõi carry-over, overdue và escalation</div></div></div><div class="flow-arrow">→</div><div class="flow-step"><div class="flow-num">8</div><div class="flow-text"><div class="flow-title">Xác minh hiệu lực và đóng chu kỳ review</div></div></div></div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span>Lập lịch và phát hành chương trình họp</h3><p>Chu kỳ review phải được lên lịch đủ sớm để các owner chuẩn bị dữ liệu và không biến cuộc họp thành việc chữa cháy phút cuối.</p><ul class="tight"><li>Xác nhận đầu vào, tiêu chí hoàn tất và dữ liệu nguồn trước khi thực hiện.</li><li>Giữ nhận diện trạng thái, điểm hold hoặc release và bằng chứng ngay tại nơi phát sinh.</li><li>Chuyển giao đầu ra, rủi ro còn mở và dữ liệu liên quan cho bước kế tiếp.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không chuyển bước khi đầu ra, trạng thái hoặc bằng chứng của bước này chưa đủ để bàn giao.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> Bàn giao trạng thái, bằng chứng và điểm còn mở của bước này cho vai trò xử lý bước kế tiếp.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</span>Xác định đầu vào bắt buộc và owner chịu trách nhiệm</h3><p>Ngay từ đầu phải chốt rõ ai nộp gì, dùng kỳ dữ liệu nào và tiêu chí thế nào thì mới được coi là complete.</p><ul class="tight"><li>Xác nhận đầu vào, tiêu chí hoàn tất và dữ liệu nguồn trước khi thực hiện.</li><li>Giữ nhận diện trạng thái, điểm hold hoặc release và bằng chứng ngay tại nơi phát sinh.</li><li>Chuyển giao đầu ra, rủi ro còn mở và dữ liệu liên quan cho bước kế tiếp.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không chuyển bước khi đầu ra, trạng thái hoặc bằng chứng của bước này chưa đủ để bàn giao.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> Bàn giao trạng thái, bằng chứng và điểm còn mở của bước này cho vai trò xử lý bước kế tiếp.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#d97706,#f59e0b)">3</span>Thu thập, xác minh và làm sạch review pack</h3><p>Review pack chỉ có giá trị khi dữ liệu có nguồn, có logic và không còn mâu thuẫn giữa các owner.</p><ul class="tight"><li>Xác nhận đầu vào, tiêu chí hoàn tất và dữ liệu nguồn trước khi thực hiện.</li><li>Giữ nhận diện trạng thái, điểm hold hoặc release và bằng chứng ngay tại nơi phát sinh.</li><li>Chuyển giao đầu ra, rủi ro còn mở và dữ liệu liên quan cho bước kế tiếp.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không chuyển bước khi đầu ra, trạng thái hoặc bằng chứng của bước này chưa đủ để bàn giao.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> Bàn giao trạng thái, bằng chứng và điểm còn mở của bước này cho vai trò xử lý bước kế tiếp.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">4</span>Freeze review pack và chuẩn bị điểm cần quyết định</h3><p>Trước giờ họp phải khóa pack và kéo ra các câu hỏi thật sự cần lãnh đạo quyết định.</p><ul class="tight"><li>Xác nhận đầu vào, tiêu chí hoàn tất và dữ liệu nguồn trước khi thực hiện.</li><li>Giữ nhận diện trạng thái, điểm hold hoặc release và bằng chứng ngay tại nơi phát sinh.</li><li>Chuyển giao đầu ra, rủi ro còn mở và dữ liệu liên quan cho bước kế tiếp.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không chuyển bước khi đầu ra, trạng thái hoặc bằng chứng của bước này chưa đủ để bàn giao.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> Bàn giao trạng thái, bằng chứng và điểm còn mở của bước này cho vai trò xử lý bước kế tiếp.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#dc2626,#ef4444)">5</span>Họp management review và chốt quyết định</h3><p>Cuộc họp phải đi tới quyết định về nguồn lực, rủi ro, target, carry-over và ưu tiên hành động chứ không chỉ đọc slide.</p><ul class="tight"><li>Xác nhận đầu vào, tiêu chí hoàn tất và dữ liệu nguồn trước khi thực hiện.</li><li>Giữ nhận diện trạng thái, điểm hold hoặc release và bằng chứng ngay tại nơi phát sinh.</li><li>Chuyển giao đầu ra, rủi ro còn mở và dữ liệu liên quan cho bước kế tiếp.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không chuyển bước khi đầu ra, trạng thái hoặc bằng chứng của bước này chưa đủ để bàn giao.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> Bàn giao trạng thái, bằng chứng và điểm còn mở của bước này cho vai trò xử lý bước kế tiếp.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">6</span>Phát hành minutes, action list và resource commitment</h3><p>Mỗi quyết định phải có owner, due date, điều kiện đóng và dữ liệu theo dõi đi kèm.</p><ul class="tight"><li>Xác nhận đầu vào, tiêu chí hoàn tất và dữ liệu nguồn trước khi thực hiện.</li><li>Giữ nhận diện trạng thái, điểm hold hoặc release và bằng chứng ngay tại nơi phát sinh.</li><li>Chuyển giao đầu ra, rủi ro còn mở và dữ liệu liên quan cho bước kế tiếp.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không chuyển bước khi đầu ra, trạng thái hoặc bằng chứng của bước này chưa đủ để bàn giao.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> Bàn giao trạng thái, bằng chứng và điểm còn mở của bước này cho vai trò xử lý bước kế tiếp.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#c2410c,#ea580c)">7</span>Theo dõi carry-over, overdue và escalation</h3><p>Các action từ management review phải được kéo tới nơi thực thi và leo thang khi có nguy cơ trượt.</p><ul class="tight"><li>Xác nhận đầu vào, tiêu chí hoàn tất và dữ liệu nguồn trước khi thực hiện.</li><li>Giữ nhận diện trạng thái, điểm hold hoặc release và bằng chứng ngay tại nơi phát sinh.</li><li>Chuyển giao đầu ra, rủi ro còn mở và dữ liệu liên quan cho bước kế tiếp.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không chuyển bước khi đầu ra, trạng thái hoặc bằng chứng của bước này chưa đủ để bàn giao.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> Bàn giao trạng thái, bằng chứng và điểm còn mở của bước này cho vai trò xử lý bước kế tiếp.</div><h3 class="h3"><span class="proc-num" style="background:linear-gradient(135deg,#4338ca,#6366f1)">8</span>Xác minh hiệu lực và đóng chu kỳ review</h3><p>Chu kỳ chỉ kết thúc khi hành động chứng minh được hiệu lực hoặc được mở carry-over có lý do rõ ràng.</p><ul class="tight"><li>Xác nhận đầu vào, tiêu chí hoàn tất và dữ liệu nguồn trước khi thực hiện.</li><li>Giữ nhận diện trạng thái, điểm hold hoặc release và bằng chứng ngay tại nơi phát sinh.</li><li>Chuyển giao đầu ra, rủi ro còn mở và dữ liệu liên quan cho bước kế tiếp.</li></ul><div class="note-soft"><b>Điểm dừng bắt buộc:</b> Không chuyển bước khi đầu ra, trạng thái hoặc bằng chứng của bước này chưa đủ để bàn giao.</div><div class="role-note"><b>Bàn giao bắt buộc:</b> Bàn giao trạng thái, bằng chứng và điểm còn mở của bước này cho vai trò xử lý bước kế tiếp.</div><h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
 <ul class="tight">
 <li>Khi có complaint lớn, major escape, supplier disruption hoặc continuity incident giữa hai kỳ review, Chief Executive Officer có thể yêu cầu phiên xem xét đột xuất trong vòng 48 giờ và dùng chính FRM-911 để ghi nhận quyết định.</li>
 <li>Khi phát hiện dữ liệu sai sau mốc khóa dữ liệu, Data Owner phải mở controlled note; QA Manager quyết định re-review, bổ sung appendix hay hủy kết luận cũ để họp lại.</li>

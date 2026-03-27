@@ -164,14 +164,19 @@ Bảng 3 cột:
 
 ### Section 6: Cổng kiểm soát, điểm dừng bắt buộc & KPI
 
-**Gate cards:**
+**Internal Gates (IG):**
 
-Mọi gate là 1 card chứa:
-- Tên gate (ví dụ: G2 — Kiểm tra cấu trúc)
-- Điều kiện PASS
-- Điều kiện HOLD/FAIL
-- Vai trò quyết định
-- Hồ sơ ghi nhận
+Section 6 không phải nơi kể lại toàn bộ quy trình. Section này chỉ mô tả:
+- cổng nào phải giữ / mở,
+- ai có quyền mở cổng,
+- điều kiện HOLD đo được,
+- KPI hoặc hồ sơ tối thiểu.
+
+**Quy tắc viết:**
+- Dùng **IG table**, không dùng gate cards.
+- Không cố định 5 IG.
+- Không bắt số IG phải bằng số bước chi tiết ở Section 7.
+- Chỉ tạo IG khi có điểm `HOLD / RELEASE` thật sự.
 
 **KPI metrics:**
 
@@ -182,16 +187,22 @@ Mọi gate là 1 card chứa:
 
 ### Section 7: Quy trình chi tiết
 
-Mọi gate có:
-- `<h3>` — Tên gate
-- Mô tả ngắn (1-2 câu)
-- `<ul>` — Các bước thực hiện
-- `<div class="note-soft">` — Ghi chú bổ sung (nếu có)
-- `<div class="role-note">` — Vai trò chịu trách nhiệm
+Section 7 là **dòng công việc thực thi**. Mỗi bước chi tiết nên tách theo:
+- đổi vai trò,
+- đổi khu vực / công đoạn / hệ thống,
+- đổi resource chính (material / machine / tool / fixture / gage / program),
+- điểm kiểm soát chất lượng,
+- điểm bàn giao hoặc revalidation.
+
+**Quy tắc viết:**
+- Có flowchart ở đầu Section 7.
+- Số bubble flowchart phải khớp số heading bước chi tiết.
+- Không ép số bước theo số IG.
+- Với SOP vận hành thật, 8–14 bước là bình thường nếu quy trình có nhiều bàn giao.
 
 **Ví dụ:**
 ```html
-<h3>G3 — Rà soát chéo</h3>
+<h3><span class="proc-num">3</span> Rà soát chéo</h3>
 <p>Người được chỉ định rà soát chéo kiểm tra nội dung và cross-reference.</p>
 <ul>
   <li>Đọc toàn bộ tài liệu, đối chiếu với SOP/WI liên quan.</li>

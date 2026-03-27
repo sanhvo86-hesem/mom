@@ -3406,8 +3406,6 @@ def validate_doc(doc: dict, source: Path, html_text: str) -> None:
 
 def render_doc(doc: dict) -> str:
     source = ROOT / doc["path"]
-    if len(doc["igs"]) != len(doc["steps"]):
-        raise ValueError(f"{doc['code']} IG/step mismatch")
     chips = [
         f"Cổng nội bộ: IG1 → IG{len(doc['igs'])}",
         f"Biểu mẫu bắt buộc: {', '.join(doc['forms'])}",

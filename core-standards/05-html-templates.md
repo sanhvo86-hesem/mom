@@ -118,7 +118,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="card-title">Lệnh điều hành</div>
 <p>Tóm tắt mục đích và phạm vi điều hành của SOP này.</p>
 <div class="legend-row">
-<span class="chip">Cổng kiểm soát: {{CODE}}-G1 → {{CODE}}-G5</span>
+<span class="chip">Cổng kiểm soát: IG1 → IGn (không giới hạn)</span>
 <span class="chip">Biểu mẫu bắt buộc: FRM-xxx</span>
 <span class="chip">Tham chiếu: ANNEX-xxx</span>
 <span class="chip">SOP liên đới: SOP-xxx</span>
@@ -201,11 +201,16 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <!-- MỤC 6 — CỔNG KIỂM SOÁT & KPI                -->
 <!-- ══════════════════════════════════════════════ -->
 <h2 class="h2" id="p6">6. Cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
-<!-- Dùng gate-grid cho cổng -->
-<div class="gate-grid">
-<div class="gate-card"><h3>{{CODE}}-G1 — Tên cổng</h3><p>Điều kiện mở: ...</p></div>
-<div class="gate-card"><h3>{{CODE}}-G2 — Tên cổng</h3><p>Điều kiện mở: ...</p></div>
-</div>
+<div class="table-card"><table class="table">
+<colgroup>
+<col class="col-ig"/><col class="col-desc"/><col class="col-owner"/><col class="col-hold"/><col class="col-kpi"/>
+</colgroup>
+<thead><tr><th>IG</th><th>Cổng kiểm soát &amp; mục tiêu</th><th>Chủ trì</th><th>Điểm dừng bắt buộc</th><th>KPI / hồ sơ tối thiểu</th></tr></thead>
+<tbody>
+<tr><td class="ig-center"><span class="step-tag">IG1</span></td><td><b>Tên cổng 1</b><br/>Mô tả mục tiêu cổng.</td><td>Vai trò</td><td>Điều kiện HOLD đo được.</td><td>100% / ≤ 24h / FRM-xxx</td></tr>
+<tr><td class="ig-center"><span class="step-tag">IG2</span></td><td><b>Tên cổng 2</b><br/>Mô tả mục tiêu cổng.</td><td>Vai trò</td><td>Điều kiện HOLD đo được.</td><td>= 0 lỗi / FRM-yyy</td></tr>
+</tbody>
+</table></div>
 <!-- Dùng metric-grid cho KPI -->
 <h3 class="h3">KPI vận hành</h3>
 <div class="metric-grid">
@@ -217,11 +222,25 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <!-- MỤC 7 — QUY TRÌNH CHI TIẾT                   -->
 <!-- ══════════════════════════════════════════════ -->
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
-<!-- Dùng vflow cho luồng quy trình -->
-<div class="vflow">
-<div class="vstep"><div class="vnum">1</div><div class="vtext"><b>Tên bước 1</b><p>Mô tả chi tiết bước.</p></div></div>
-<div class="vstep"><div class="vnum">2</div><div class="vtext"><b>Tên bước 2</b><p>Mô tả chi tiết bước.</p></div></div>
+<div class="flowchart">
+<div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><div class="flow-title">Tên bước 1</div></div></div>
+<div class="flow-arrow">→</div>
+<div class="flow-step active"><div class="flow-num">2</div><div class="flow-text"><div class="flow-title">Tên bước 2</div></div></div>
 </div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span> Tên bước 1</h3>
+<p>Mô tả chi tiết bước 1.</p>
+<ul class="tight">
+<li>Hành động cụ thể.</li>
+</ul>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</span> Tên bước 2</h3>
+<p>Mô tả chi tiết bước 2.</p>
+<ul class="tight">
+<li>Hành động cụ thể.</li>
+</ul>
+
+<div class="note-soft"><b>Quy tắc:</b> số bước flowchart phải khớp số heading bước chi tiết, nhưng không bị buộc bằng số IG của Section 6.</div>
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 8 — NGOẠI LỆ, THAY ĐỔI & LÀM LẠI       -->

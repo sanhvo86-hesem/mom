@@ -88,7 +88,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="card-title">Lệnh điều hành</div>
 <p>{{MÔ TẢ NGẮN VỀ MỤC TIÊU ĐIỀU HÀNH CỦA SOP NÀY}}</p>
 <div class="legend-row">
-<span class="chip">Cổng kiểm soát: {{CODE}}-G1 → {{CODE}}-GN</span>
+<span class="chip">Cổng kiểm soát: IG1 → IGn (không giới hạn)</span>
 <span class="chip">Biểu mẫu bắt buộc: {{DANH SÁCH FRM}}</span>
 <span class="chip">Tham chiếu: {{DANH SÁCH ANNEX}}</span>
 <span class="chip">SOP liên đới: {{DANH SÁCH SOP}}</span>
@@ -182,14 +182,25 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <!-- SECTION 6 — Cổng kiểm soát, điểm dừng bắt buộc & KPI        -->
 <!-- ════════════════════════════════════════════════════════════════ -->
 <h2 class="h2" id="p6">6. Cổng kiểm soát, điểm dừng bắt buộc &amp; KPI</h2>
-<div class="step-band"><span>{{CODE}}-G1 → {{CODE}}-G2 → ... → {{CODE}}-GN</span></div>
-<div class="gate-grid">
-<div class="gate-card">
-<h3>{{CODE}}-G1 — {{TÊN GATE 1}}</h3>
-<p>{{MÔ TẢ GATE}}</p>
-<div class="mini-note"><b>Lead:</b> {{VAI TRÒ}}<br/><b>Điểm dừng:</b> {{ĐIỀU KIỆN CHẶN}}<br/><b>KPI chính:</b> {{KPI}}</div>
-</div>
-<!-- Thêm gate cards tương tự -->
+<div class="table-card">
+<table class="table">
+<colgroup>
+<col class="col-ig"/><col class="col-desc"/><col class="col-owner"/><col class="col-hold"/><col class="col-kpi"/>
+</colgroup>
+<thead><tr>
+<th>IG</th><th>Cổng kiểm soát &amp; mục tiêu</th><th>Chủ trì</th><th>Điểm dừng bắt buộc</th><th>KPI / hồ sơ tối thiểu</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class="ig-center"><span class="step-tag">IG1</span></td>
+<td><b>{{TÊN CỔNG 1}}</b><br/>{{MỤC TIÊU KIỂM SOÁT 1}}</td>
+<td>{{VAI TRÒ CHỦ TRÌ}}</td>
+<td>{{ĐIỀU KIỆN CHẶN}}</td>
+<td>{{KPI / HỒ SƠ}}</td>
+</tr>
+<!-- Thêm IG2, IG3... tùy quy trình -->
+</tbody>
+</table>
 </div>
 <div class="metric-grid">
 <div class="metric-card"><div class="value">{{GIÁ TRỊ}}</div><div class="label">{{TÊN KPI}}</div><div class="mini-note">{{MÔ TẢ}}</div></div>
@@ -200,7 +211,13 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <!-- ════════════════════════════════════════════════════════════════ -->
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
 
-<h3>{{CODE}}-G1 — {{TÊN GATE 1}}</h3>
+<div class="flowchart">
+<div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><div class="flow-title">{{TÊN BƯỚC 1}}</div></div></div>
+<div class="flow-arrow">→</div>
+<div class="flow-step active"><div class="flow-num">2</div><div class="flow-text"><div class="flow-title">{{TÊN BƯỚC 2}}</div></div></div>
+</div>
+
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span> {{TÊN BƯỚC 1}}</h3>
 <p>{{MÔ TẢ TỔNG QUAN}}</p>
 <ul class="tight">
 <li>{{BƯỚC 1}}</li>
@@ -209,7 +226,14 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="note-soft"><b>Điểm dừng bắt buộc:</b> {{ĐIỀU KIỆN KHÔNG ĐƯỢC CHUYỂN BƯỚC}}</div>
 <div class="role-note"><b>Bàn giao bắt buộc:</b> {{AI BÀN GIAO CHO AI, CÁI GÌ}}</div>
 
-<!-- Lặp lại cho mỗi Gate -->
+<h3><span class="proc-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</span> {{TÊN BƯỚC 2}}</h3>
+<p>{{MÔ TẢ TỔNG QUAN BƯỚC 2}}</p>
+<ul class="tight">
+<li>{{BƯỚC 2.1}}</li>
+<li>{{BƯỚC 2.2}}</li>
+</ul>
+
+<!-- Lặp lại cho mỗi bước chi tiết, KHÔNG buộc theo số IG -->
 
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 8 — Ngoại lệ, thay đổi & làm lại                    -->

@@ -24,7 +24,7 @@
       ⑦ PREFACE BLOCK                ← Lệnh điều hành + chip links
       ⑧ TABLE OF CONTENTS            ← Mục lục dạng grid
       ⑨ NỘI DUNG CHÍNH               ← Sections 1-10
-      ⑩ GATE SECTION                 ← Các bước quy trình (gate-grid)
+      ⑩ SECTION 6 + 7               ← IG table + flowchart + detailed procedure
       ⑪ METRIC SECTION               ← KPI cards
       ⑫ LINKED DOCS                  ← Tài liệu liên kết
     </div></div>
@@ -160,7 +160,7 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
     <div class="card-title">Lệnh điều hành</div>
     <p>Mô tả ngắn gọn mục đích và phạm vi.</p>
     <div class="legend-row">
-      <span class="chip">Cổng kiểm soát: {{CODE}}-G1 → {{CODE}}-G5</span>
+      <span class="chip">Cổng kiểm soát: IG1 → IGn (không giới hạn)</span>
       <span class="chip">Biểu mẫu: FRM-xxx / FRM-xxx</span>
       <span class="chip">Tham chiếu: ANNEX-xxx</span>
       <span class="chip">SOP liên đới: SOP-xxx</span>
@@ -171,7 +171,7 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 
 ### 2.5 Gate Mapping Note — Vị trí trong hệ thống 8 cổng
 
-**BẮT BUỘC** có trên MỌI tài liệu — đặt trước gate-grid hoặc trước section quy trình:
+**BẮT BUỘC** có trên MỌI tài liệu — đặt trước section 1 hoặc ngay sau preface block:
 
 ```html
 <div class="note-blue" style="margin:12px 0">
@@ -260,6 +260,7 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - Số lượng IG **không giới hạn** — tùy quy trình cụ thể (3, 5, 6, 8...)
 - Format: **TABLE** 5 cột (KHÔNG dùng gate-card/grid)
 - Mỗi IG PHẢI có: Mô tả, Chủ trì, Điểm dừng bắt buộc, KPI đo được
+- Số IG **KHÔNG cần** khớp với số bước Section 7
 - Sau table: metric-card grid hiển thị KPI trực quan (tùy chọn)
 
 ```html
@@ -305,6 +306,7 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - **Phần 2:** Chi tiết từng bước với **proc-num balloon** trước heading
 - Số bước **không giới hạn** — tùy quy trình (5, 8, 10, 12...)
 - Flowchart PHẢI khớp đúng số bước h3 bên dưới
+- Số bước Section 7 **KHÔNG bị giới hạn** bởi số IG của Section 6
 - Mỗi bước balloon có **màu xoay** (rotating colors) — KHÔNG cố định 1 màu
 
 **Phần 1: Flowchart**
@@ -395,9 +397,10 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 | 9 | Dịch vai trò (Team Leader, Foreman, Inspector...) | Danh từ riêng thống nhất |
 | 10 | Dùng gate-card/gate-grid cho Internal Gates | IG PHẢI dùng TABLE 5 cột |
 | 11 | Giới hạn cố định 5 IG | Số IG tùy quy trình, không giới hạn |
-| 12 | Tạo flowchart không khớp số bước h3 | Flowchart steps = h3 headings |
-| 13 | Dùng 1 màu cố định cho proc-num balloons | Dùng 10 màu xoay |
-| 14 | Để trống cột Chủ trì/Điểm dừng/KPI trong IG table | Mỗi IG PHẢI đầy đủ |
+| 12 | Buộc số IG = số bước chi tiết | IG và bước chi tiết là hai lớp khác nhau |
+| 13 | Tạo flowchart không khớp số bước h3 | Flowchart steps = h3 headings |
+| 14 | Dùng 1 màu cố định cho proc-num balloons | Dùng 10 màu xoay |
+| 15 | Để trống cột Chủ trì/Điểm dừng/KPI trong IG table | Mỗi IG PHẢI đầy đủ |
 
 ---
 
@@ -422,12 +425,14 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - [ ] IG badge dùng `step-tag` + `ig-center` class ?
 - [ ] Mỗi IG có: Mô tả, Chủ trì, Điểm dừng, KPI (KHÔNG để trống) ?
 - [ ] Số IG phù hợp quy trình (KHÔNG giới hạn cố định 5) ?
+- [ ] Số IG không bị ép khớp với số bước Section 7 ?
 
 ### 5.4 Section 7 — Quy trình chi tiết
 - [ ] Có flowchart (`<div class="flowchart">`) SAU heading h2 ?
 - [ ] Số bước flowchart = Số h3 headings bên dưới ?
 - [ ] Mỗi h3 có `proc-num` balloon với màu xoay ?
 - [ ] Flowchart steps có `.active` (quyết định) và `.critical` (kiểm tra) ?
+- [ ] Số bước chi tiết được tách theo logic vận hành, không theo số IG ?
 - [ ] Nội dung bước chi tiết: giải thích WHO/WHAT/WHEN/HOW ?
 - [ ] Có callout "Điểm dừng bắt buộc" tại các bước quan trọng ?
 - [ ] Có "Bàn giao" cuối mỗi bước ?
