@@ -635,11 +635,16 @@ window._requestRecordId = function(){
         html += '</div>';
       }
       if(formCode){
-        html += '<div class="record-id-download">';
-        html += '<a download href="../04-Bieu-Mau/' + _getFormFolder(formCode) + '/' + formCode + '_*.xlsx" class="record-id-download-btn">';
-        html += '↓ ' + (lang==='en'?'Download blank ':'Tải form blank ') + formCode;
-        html += '</a>';
-        html += '</div>';
+        // Use blank_form_path from API (resolved from form_control_registry)
+        var blankPath = d.blank_form_path || null;
+        var blankName = d.blank_form_filename || (formCode + '.xlsx');
+        if(blankPath){
+          html += '<div class="record-id-download">';
+          html += '<a download="' + blankName + '" href="../' + blankPath + '" class="record-id-download-btn">';
+          html += '↓ ' + (lang==='en'?'Download blank ':'Tải form blank ') + formCode;
+          html += '</a>';
+          html += '</div>';
+        }
       }
       html += '</div>';
       html += '</div>';

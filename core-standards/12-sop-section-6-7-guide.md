@@ -155,6 +155,20 @@ KPI của từng IG nên rơi vào một hoặc nhiều nhóm sau:
 - `Hiệu lực containment` như `% suspect range được khoanh trong 1 giờ`.
 - `Tính ổn định` như `Cpk tối thiểu`, `% on-time calibration`, `% action đóng đúng hạn`.
 
+### 2.6B Benchmark và ngưỡng số
+
+KPI của Section 6 không được viết kiểu mô tả chung chung. Mỗi KPI phải chỉ ra:
+
+1. **Ngưỡng số hoặc SLA**: ví dụ `>= 98%`, `<= 24 giờ`, `= 0 escape`.
+2. **Nguồn dữ liệu chuẩn**: ERP, MES, QMS register, calibration log, audit log, backup log...
+3. **Trigger phản ứng**: lệch bao nhiêu thì giữ cổng, mở escalation hoặc mở action.
+4. **Căn cứ chốt số**:
+   - benchmark chính thức bên ngoài,
+   - yêu cầu khách hàng / luật / chuẩn kỹ thuật,
+   - hoặc mục tiêu nội bộ được thiết kế chặt hơn benchmark vì mức rủi ro của HESEM.
+
+Không copy số benchmark bên ngoài vào SOP nếu chưa chuyển hóa thành ngưỡng vận hành thực tế của HESEM.
+
 ### 2.7 KHÔNG được làm
 
 - ❌ Cố định 5 IG cho mọi SOP.
@@ -211,13 +225,13 @@ Section 7 gồm 2 phần:
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
 
 <div class="flowchart">
-  <div class="flow-step">
-    <div class="flow-num">1</div>
+  <div class="flow-step" style="border-color:rgba(21,101,192,0.28);background:linear-gradient(135deg,rgba(21,101,192,0.10) 0%, rgba(255,255,255,0.98) 64%);">
+    <div class="flow-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</div>
     <div class="flow-text"><div class="flow-title">Tên bước 1</div></div>
   </div>
-  <div class="flow-arrow">→</div>
-  <div class="flow-step active">
-    <div class="flow-num">2</div>
+  <div class="flow-arrow" style="color:rgba(25,118,210,0.45)">→</div>
+  <div class="flow-step" style="border-color:rgba(5,150,105,0.28);background:linear-gradient(135deg,rgba(5,150,105,0.10) 0%, rgba(255,255,255,0.98) 64%);">
+    <div class="flow-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</div>
     <div class="flow-text"><div class="flow-title">Tên bước 2</div></div>
   </div>
 </div>
@@ -249,6 +263,14 @@ Section 7 gồm 2 phần:
 | Chi tiết từng bước | Mỗi bước phải có heading tương ứng |
 
 **Lưu ý:** quy tắc này **không liên quan** đến số lượng IG ở Section 6.
+
+### 3.5A Quy tắc đồ họa flowchart
+
+- Bubble số ở flowchart phải dùng đúng palette màu xoay của `proc-num`.
+- Không để tình trạng cùng một SOP có `proc-num` nhiều màu nhưng balloon flowchart chỉ một màu mặc định.
+- Nên có cả hai lớp bảo vệ:
+  - HTML sinh ra sẵn inline style cho bubble.
+  - CSS toàn cục có fallback palette theo vị trí để file cũ hoặc file viết tay không mất màu.
 
 ### 3.6 Khi nào phải tách thành bước mới
 

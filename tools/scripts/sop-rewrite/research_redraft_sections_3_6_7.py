@@ -673,6 +673,7 @@ DOMAIN_PROFILES.update(
 
 
 def fold(value: str) -> str:
+    value = value.replace("đ", "d").replace("Đ", "D")
     norm = unicodedata.normalize("NFD", value)
     stripped = "".join(ch for ch in norm if unicodedata.category(ch) != "Mn")
     return stripped.lower()
@@ -962,72 +963,196 @@ def unique_sentences(parts: list[str | None], limit: int | None = None) -> list[
     return cleaned
 
 
+def contains_token(text: str, token: str) -> bool:
+    normalized = fold(token)
+    pattern = rf"(?<![a-z0-9]){re.escape(normalized)}(?![a-z0-9])"
+    return re.search(pattern, text) is not None
+
+
+def contains_any(text: str, tokens: list[str]) -> bool:
+    return any(contains_token(text, token) for token in tokens)
+
+
+def contains_all(text: str, tokens: list[str]) -> bool:
+    return all(contains_token(text, token) for token in tokens)
+
+
+def hex_to_rgba(value: str, alpha: float) -> str:
+    raw = value.lstrip("#")
+    red = int(raw[0:2], 16)
+    green = int(raw[2:4], 16)
+    blue = int(raw[4:6], 16)
+    return f"rgba({red},{green},{blue},{alpha:.3f})"
+
+
 def title_family(title: str) -> str | None:
     token_line = fold(repair_text(title) or title)
-    if any(token in token_line for token in ["bat buoc ap dung", "khi nao", "trigger", "pham vi"]):
+    if contains_any(token_line, ["bat buoc ap dung", "khi nao", "trigger", "pham vi"]):
         return "trigger_scope"
-    if any(token in token_line for token in ["route completion", "hoan tat lo trinh cong doan", "route", "lo trinh cong doan"]) and any(
-        token in token_line for token in ["traveler", "phieu cong doan", "truy xuat"]
+    if contains_any(token_line, ["route completion", "hoan tat lo trinh cong doan", "route", "lo trinh cong doan"]) and contains_any(
+        token_line, ["traveler", "phieu cong doan", "truy xuat"]
     ):
         return "route_review"
-    if any(token in token_line for token in ["agenda", "lich hop", "chuong trinh hop", "freeze", "khoa du lieu"]):
+    if contains_any(token_line, ["agenda", "lich hop", "chuong trinh hop", "freeze", "khoa du lieu"]):
         return "review_pack"
     if "review pack" in token_line or "goi du lieu xem xet" in token_line:
-        if any(token in token_line for token in ["traveler", "phieu cong doan", "traceability", "truy xuat", "route", "shipment", "shipping", "ship"]):
+        if contains_any(token_line, ["traveler", "phieu cong doan", "traceability", "truy xuat", "route", "shipment", "shipping", "ship"]):
             return "ship"
         return "review_pack"
-    if any(token in token_line for token in ["minutes", "bien ban", "action list", "danh sach hanh dong", "carry-over", "hanh dong chuyen ky", "resource commitment", "cam ket nguon luc", "effectiveness", "hieu luc"]):
+    if contains_any(token_line, ["minutes", "bien ban", "action list", "danh sach hanh dong", "carry-over", "hanh dong chuyen ky", "resource commitment", "cam ket nguon luc", "effectiveness", "hieu luc"]):
         return "review_actions"
+    if contains_any(token_line, ["cutover", "backout", "rollback"]):
+        return "deploy"
+    if contains_any(token_line, ["bao ve tuc thoi"]) or contains_all(token_line, ["containment", "bao ve"]):
+        return "contingency"
+    if contains_any(token_line, ["rma", "sort", "replace", "chap thuan co dieu kien", "concession"]):
+        return "ncr"
+    if contains_any(
+        token_line,
+        [
+            "quyen truy cap",
+            "xac thuc",
+            "ma hoa",
+            "sao luu",
+            "bao ve vat ly",
+            "backup",
+            "restore",
+            "media sanitization",
+            "sanitization",
+            "phan loai du lieu",
+            "gan muc bao mat",
+        ],
+    ):
+        return "access_security"
+    if contains_any(
+        token_line,
+        [
+            "register",
+            "ssot",
+            "sor",
+            "archive",
+            "retention",
+            "disposal",
+            "tai su dung",
+            "bao ton",
+            "luu ho so",
+            "ra soat chu ky",
+            "tai chuan hoa",
+            "dong ho so",
+        ],
+    ):
+        return "records"
+    if contains_any(
+        token_line,
+        [
+            "failure mode",
+            "severity",
+            "occurrence",
+            "detection",
+            "control plan",
+            "reaction",
+            "fmea",
+            "escape",
+            "tai tham dinh",
+            "re-study",
+            "restudy",
+            "residual rui ro",
+            "risk register",
+            "dang ky rui ro",
+            "risk review",
+        ],
+    ) or contains_all(token_line, ["rui ro", "co hoi"]):
+        return "risk_control"
+    if contains_all(token_line, ["material", "supplier"]):
+        return "receipt"
     if "nhan hang" in token_line or "receipt" in token_line or "receiving" in token_line:
         return "receipt"
-    if any(token in token_line for token in ["cert", "coc", "chung chi", "nhan dang", "identity"]):
+    if contains_any(token_line, ["cert", "coc", "chung chi", "nhan dang", "identity"]):
         return "cert"
-    if any(token in token_line for token in ["storage", "put-away", "location", "vi tri", "luu kho", "remnant", "segregation", "tach lo"]):
+    if contains_any(token_line, ["storage", "put-away", "location", "vi tri", "luu kho", "remnant", "segregation", "tach lo"]):
         return "storage"
-    if any(token in token_line for token in ["issue", "traveler", "wip", "cap phat", "phieu cong doan"]):
+    if contains_any(token_line, ["issue", "traveler", "wip", "cap phat", "phieu cong doan"]):
         return "issue"
-    if any(token in token_line for token in ["packet", "bo ho so cong viec", "revision", "phien ban hieu luc", "baseline", "drawing", "balloon"]):
+    if contains_any(token_line, ["packet", "bo ho so cong viec", "revision", "phien ban hieu luc", "baseline", "drawing", "balloon"]):
         return "packet"
-    if any(token in token_line for token in ["preset", "tooling", "fixture", "do ga", "tool list", "masters", "chuan do", "ngoai may"]):
+    if contains_any(token_line, ["preset", "tooling", "fixture", "do ga", "tool list", "masters", "chuan do", "ngoai may"]):
         return "resource_ready"
-    if any(token in token_line for token in ["datum", "offset", "orientation", "zero", "on-machine", "safety check", "mat chuan", "an toan"]):
+    if contains_any(token_line, ["datum", "offset", "orientation", "zero", "on-machine", "safety check", "mat chuan", "interlock"]):
         return "setup_verify"
-    if "prove-out" in token_line or "dry run" in token_line or "chay xac nhan" in token_line or "chay thu khong cat" in token_line or "first cycle" in token_line:
+    if contains_any(token_line, ["prove-out", "dry run", "chay xac nhan", "chay thu khong cat", "first cycle"]):
         return "proveout"
-    if "first piece" in token_line or "first-off" in token_line or "chi tiet dau tien" in token_line or "fai" in token_line:
+    if contains_any(token_line, ["first piece", "first-off", "chi tiet dau tien", "fai", "mau dai dien"]):
         return "first_piece"
-    if "changeover" in token_line or "doi job" in token_line or "transfer" in token_line or "chuyen giao" in token_line or "restart" in token_line or "khoi dong lai" in token_line or "handoff" in token_line or "ban giao" in token_line:
+    if contains_any(token_line, ["changeover", "doi job", "transfer", "chuyen giao", "restart", "khoi dong lai", "handoff", "ban giao"]):
         return "transfer"
-    if any(token in token_line for token in ["release", "phe duyet", "san luong", "shipment release", "mo cong"]):
+    if contains_any(token_line, ["shipment", "shipping", "final inspection", "kiem tra cuoi", "dong goi", "packaging", "staging", "ship", "chung nhan phu hop", "giao van", "picking"]):
+        return "ship"
+    if contains_any(token_line, ["release", "phe duyet", "san luong", "shipment release", "mo cong", "phat hanh", "authorization", "authorize"]):
         return "release"
-    if any(token in token_line for token in ["planning", "dispatch", "schedule", "routing"]):
+    if contains_any(token_line, ["planning", "dispatch", "schedule", "routing", "demand", "capacity picture", "capacity"]):
         return "planning"
-    if "audit" in token_line or "lpa" in token_line:
+    if "audit" in token_line or "lpa" in token_line or contains_any(token_line, ["finding", "audit trail"]):
         return "audit"
-    if any(token in token_line for token in ["root cause", "corrective", "contain", "ncr", "capa", "disposition"]):
+    if contains_any(token_line, ["root cause", "corrective", "contain", "ncr", "capa", "disposition", "tam giu", "co lap", "sai lech"]):
         return "ncr"
-    if any(token in token_line for token in ["calibration", "gage", "msa", "grr"]):
+    if contains_any(token_line, ["calibration", "gage", "msa", "grr"]):
         return "measurement"
     if "sample" in token_line or "aql" in token_line or "sampling" in token_line:
         return "sampling"
     if "spc" in token_line or "cpk" in token_line or "capability" in token_line or "control chart" in token_line:
         return "spc"
-    if any(token in token_line for token in ["shipment", "shipping", "final inspection", "kiem tra cuoi", "dong goi", "ship"]):
-        return "ship"
-    if any(token in token_line for token in ["cleanliness", "contamination", "clean"]):
+    if contains_any(token_line, ["cleanliness", "contamination", "clean", "cleaning", "rinse", "dry", "muc sach", "khu sach", "chuyen luong"]):
         return "cleanliness"
-    if "fod" in token_line or "product safety" in token_line or "safety" in token_line:
+    if contains_any(token_line, ["fod", "product safety", "safety", "line clearance", "tool accountability"]):
         return "safety"
-    if any(token in token_line for token in ["training", "competence", "qualification", "certification"]):
+    if contains_any(token_line, ["training", "competence", "qualification", "certification"]):
         return "training"
     if "incident" in token_line or "near miss" in token_line or "ehs" in token_line:
         return "ehs"
-    if any(token in token_line for token in ["invoice", "cost", "billing", "arap", "cong no", "hoa don"]):
+    if contains_any(token_line, ["invoice", "cost", "billing", "arap", "cong no", "hoa don"]):
         return "finance"
-    if any(token in token_line for token in ["human factors", "error-proof", "poka", "standard work"]):
+    if contains_any(token_line, ["human factors", "error-proof", "poka", "standard work"]):
         return "human"
-    if "kaizen" in token_line or "trial" in token_line or "a3" in token_line or "improvement" in token_line:
+    if contains_any(token_line, ["kaizen", "trial", "a3", "improvement"]):
         return "improvement"
+    if contains_any(token_line, ["tiep nhan", "thu nhan", "ack", "nhan dien", "phat hien", "mo ta co hoi"]):
+        return "intake"
+    if contains_any(token_line, ["boi canh", "ben lien quan", "chinh sach", "muc tieu", "phan tang kpi"]):
+        return "policy_kpi"
+    if contains_any(token_line, ["danh gia", "cross-ra soat", "cross ra soat", "ra soat ky thuat", "dfm", "feasibility", "make or buy", "criticality", "study dai dien", "dien giai ket qua", "uu tien", "chon tuyen", "phan tich co che", "contract", "cam ket", "strategy", "scar", "re-approval", "reapproval"]):
+        return "assess"
+    if contains_any(token_line, ["trien khai", "point-of-use", "point of use", "truyen thong", "gui thong bao", "xac nhan tiep nhan", "cascade", "phan quyen phan cong", "noi dung", "doi tuong", "kenh", "phan hoi"]):
+        return "deploy"
+    if contains_any(token_line, ["tri thuc", "lessons", "bai hoc", "sang loc", "chia se", "ap dung tai hien truong"]):
+        return "knowledge"
+    if contains_any(token_line, ["su kien du phong", "workaround", "phuong an thay the", "phuc hoi", "backlog re-entry", "dong su kien", "khoi phuc"]):
+        return "contingency"
+    if contains_any(token_line, ["customer property", "bao quan", "mat mat", "hu hong", "tra lai", "luu dai han", "huy"]):
+        return "custody"
+    if contains_any(token_line, ["launch job", "start status", "rebalance", "hot job", "dau ca", "muc san sang", "safe start", "production run", "ctq", "abnormal", "suspect range", "production control", "ipqc"]):
+        return "production_run"
+    if contains_any(token_line, ["pm plan", "condition monitoring", "tool life", "spares", "dang ky tai san", "history", "breakdown", "repair validation", "return to service"]):
+        return "maintenance"
+    if contains_any(token_line, ["finishing", "deburring", "edge break", "self-check", "self check", "chon phuong phap", "leo thang defect", "status truoc thao tac"]):
+        return "secondary_ops"
+    if contains_any(token_line, ["bo nang luc", "skill matrix", "gap", "ojt", "nang luc", "phan cong", "cap chung nhan", "tai chung nhan", "dinh chi"]):
+        return "competence"
+    if contains_any(token_line, ["0 den 10 phut dau", "scene control", "dieu tra nguyen nhan", "khoi phuc co kiem soat", "trend ra soat"]):
+        return "incident_response"
+    if contains_any(token_line, ["du lieu thuong mai", "job cost", "cong no", "ar follow-up", "ar follow up"]):
+        return "finance_control"
+    if contains_any(token_line, ["learn-back", "rut bai hoc", "dong vong", "xem xet cua lanh dao", "ci", "xac minh loi ich", "tac dung phu", "replicate", "sau su co", "ngan tai dien"]):
+        return "review_improve"
+    if contains_any(token_line, ["nguon do", "phuong tien xac minh", "do kiem", "ghi danh thiet bi", "oot", "suspect measurement", "dieu chinh chu ky", "bao ve du lieu"]):
+        return "measurement"
+    if contains_any(token_line, ["dinh nghia lot", "ngau nhien"]):
+        return "sampling"
+    if contains_any(token_line, ["khoa chart", "out-of-control", "out of control"]):
+        return "spc"
+    if contains_any(token_line, ["hang gia", "untraceable condition"]):
+        return "ncr"
+    if contains_any(token_line, ["checklist", "lo trinh cong doan"]):
+        return "audit"
     return None
 
 
@@ -1185,7 +1310,24 @@ def title_hint_handoff(title: str) -> str | None:
 
 
 def title_hint_gate_hold(title: str) -> str | None:
+    title_fold = fold(repair_text(title) or title)
     family = title_family(title)
+    if contains_any(title_fold, ["cutover", "backout", "rollback"]):
+        return "Dừng tại cổng này khi cutover window, owner quyết định, tiêu chí backout hoặc checklist triển khai còn chưa chốt."
+    if contains_any(title_fold, ["bao ve tuc thoi"]) or contains_all(title_fold, ["containment", "bao ve"]):
+        return "Dừng tại cổng này khi phạm vi ảnh hưởng, containment ban đầu, bảo vệ hiện trường hoặc phương án thay thế còn chưa rõ."
+    if contains_any(title_fold, ["ra soat chu ky", "tai chuan hoa"]):
+        return "Dừng tại cổng này khi kỳ review, quyết định giữ hay đổi mục tiêu và hành động tái chuẩn hóa còn chưa chốt."
+    if contains_any(title_fold, ["failure mode", "severity", "occurrence", "detection", "muc do uu tien"]):
+        return "Dừng tại cổng này khi failure mode mức cao chưa có mức ưu tiên, owner hành động hoặc tiêu chí chấp nhận residual risk."
+    if contains_any(title_fold, ["khu sach", "loi vao", "chuyen luong"]):
+        return "Dừng tại cổng này khi quy tắc vào khu sạch, phân luồng người hoặc vật liệu và biện pháp ngăn nhiễm chéo còn chưa khóa."
+    if contains_any(title_fold, ["phan loai du lieu", "gan muc bao mat"]):
+        return "Dừng tại cổng này khi dữ liệu hoặc hồ sơ chưa có classification, owner, SoR/SSOT hoặc retention rule rõ."
+    if contains_any(title_fold, ["quyen truy cap", "xac thuc"]):
+        return "Dừng tại cổng này khi quyền truy cập, vai trò phê duyệt hoặc bằng chứng xác thực còn thiếu."
+    if contains_any(title_fold, ["retention", "huy bo an toan", "secure disposal", "disposal"]):
+        return "Dừng tại cổng này khi retention rule, quyết định hủy, log tiêu hủy hoặc phương pháp sanitize chưa được phê duyệt."
     if family == "trigger_scope":
         return "Dừng tại cổng này khi trigger, phạm vi, mức rủi ro hoặc boundary áp dụng còn chưa rõ."
     if family == "route_review":
@@ -1214,17 +1356,108 @@ def title_hint_gate_hold(title: str) -> str | None:
         return "Dừng tại cổng này khi lịch, chương trình họp, người phụ trách đầu vào hoặc mốc khóa dữ liệu chưa chốt."
     if family == "review_actions":
         return "Dừng tại cổng này khi quyết định hoặc hành động chưa có người phụ trách, hạn hoàn thành, điều kiện đóng hoặc đường dẫn bằng chứng."
-    if family in {"audit", "ncr", "measurement", "sampling", "spc"}:
-        return "Dừng tại cổng này khi trail bằng chứng, quyết định giữ hoặc nhả và phạm vi ảnh hưởng còn chưa rõ."
-    if family in {"ship", "cleanliness", "safety"}:
+    if family == "audit":
+        return "Dừng tại cổng này khi audit trail, loại finding, owner containment hoặc hạn đóng còn chưa rõ."
+    if family == "ncr":
+        return "Dừng tại cổng này khi suspect range, trạng thái cách ly, disposition hoặc owner containment còn chưa rõ."
+    if family == "measurement":
+        return "Dừng tại cổng này khi trạng thái hiệu chuẩn, OOT review, chuẩn tham chiếu hoặc quyết định dùng tiếp chưa rõ."
+    if family == "sampling":
+        return "Dừng tại cổng này khi inspection level, cỡ mẫu, accept/reject count hoặc switching rule chưa chốt."
+    if family == "spc":
+        return "Dừng tại cổng này khi subgroup, tín hiệu out-of-control, suspect range hoặc reaction plan còn chưa rõ."
+    if family == "ship":
         return "Dừng tại cổng này khi sản phẩm thực, nhãn, chứng từ hoặc điều kiện bảo quản chưa khớp."
+    if family == "cleanliness":
+        return "Dừng tại cổng này khi mức sạch, điểm kiểm, bảo quản sau cleaning hoặc nguồn nhiễm bẩn còn chưa kiểm soát."
+    if family == "safety":
+        return "Dừng tại cổng này khi suspect product, line-clearance, FOD status hoặc đặc tính an toàn sản phẩm còn chưa rõ."
     if family in {"training", "ehs", "finance", "human", "improvement"}:
         return "Dừng tại cổng này khi hồ sơ nền, hành động mở hoặc bằng chứng xác minh còn thiếu."
+    if family == "intake":
+        return "Dừng tại cổng này khi yêu cầu, sự kiện hoặc cơ hội chưa có mã nhận diện, owner, mức ưu tiên hoặc phạm vi ảnh hưởng ban đầu."
+    if family == "policy_kpi":
+        return "Dừng tại cổng này khi mục tiêu chưa có công thức tính, owner, nguồn dữ liệu, chu kỳ đo hoặc ngưỡng escalations."
+    if family == "assess":
+        return "Dừng tại cổng này khi đầu vào đánh giá, tiêu chí chốt hoặc kết luận khả thi/tác động còn thiếu."
+    if family == "deploy":
+        return "Dừng tại cổng này khi điểm dùng, người nhận hoặc khu vực bị ảnh hưởng chưa nhận đúng bản đang sống và chưa có bằng chứng triển khai."
+    if family == "records":
+        return "Dừng tại cổng này khi SoR/SSOT, retention, trạng thái hoặc quyết định lưu hủy chưa được khóa rõ."
+    if family == "risk_control":
+        return "Dừng tại cổng này khi risk mức cao chưa có đối sách, reaction plan, owner hoặc điều kiện mở lại sau thay đổi chưa rõ."
+    if family == "access_security":
+        return "Dừng tại cổng này khi phân quyền, xác thực, backup/restore hoặc biện pháp bảo vệ dữ liệu chưa có bằng chứng hiệu lực."
+    if family == "knowledge":
+        return "Dừng tại cổng này khi tri thức trọng yếu chưa được chuẩn hóa, chưa gán owner hoặc chưa xác minh người dùng áp dụng được."
+    if family == "contingency":
+        return "Dừng tại cổng này khi chưa chốt người chỉ huy, phương án thay thế, tiêu chí phục hồi hoặc thứ tự đưa backlog quay lại."
+    if family == "custody":
+        return "Dừng tại cổng này khi ID, vị trí, tình trạng, hướng dẫn khách hàng hoặc quyết định xử lý tài sản chưa rõ."
+    if family == "production_run":
+        return "Dừng tại cổng này khi job chưa đủ readiness, restart chưa được cho phép hoặc suspect range chưa được khoanh rõ."
+    if family == "maintenance":
+        return "Dừng tại cổng này khi criticality, chu kỳ PM, tiêu chí return-to-service hoặc lịch sử thiết bị còn thiếu."
+    if family == "secondary_ops":
+        return "Dừng tại cổng này khi part status, giới hạn thao tác, mẫu đại diện hoặc quyết định defect còn chưa chốt."
+    if family == "competence":
+        return "Dừng tại cổng này khi người được phân công chưa có năng lực còn hiệu lực hoặc skill matrix chưa cập nhật."
+    if family == "incident_response":
+        return "Dừng tại cổng này khi hiện trường chưa an toàn, chưa cô lập khu vực ảnh hưởng hoặc chưa mở điều tra/hành động bắt buộc."
+    if family == "finance_control":
+        return "Dừng tại cổng này khi ship evidence, giá tính, bucket chi phí, điều khoản thanh toán hoặc credit decision chưa rõ."
+    if family == "review_improve":
+        return "Dừng tại cổng này khi action chưa có owner, hạn hoàn thành, điều kiện đóng hoặc dữ liệu xác minh hiệu lực."
     return None
 
 
 def title_hint_kpi(title: str) -> str | None:
+    title_fold = fold(repair_text(title) or title)
     family = title_family(title)
+    if contains_any(title_fold, ["cutover", "backout", "rollback"]):
+        return "100% thay đổi high-risk có cutover checklist, owner quyết định và backout plan trước giờ hiệu lực; failed cutover không có backout đã thử = 0."
+    if contains_any(title_fold, ["bao ve tuc thoi"]) or contains_all(title_fold, ["containment", "bao ve"]):
+        return "Kích hoạt containment hoặc workaround <= 15 phút với gián đoạn critical; 100% phạm vi ảnh hưởng được cô lập trước khi restart."
+    if contains_any(title_fold, ["boi canh", "ben lien quan"]):
+        return "100% đầu vào bối cảnh và yêu cầu bên liên quan loại A/B được rà trước kỳ mục tiêu; 100% thay đổi ảnh hưởng chiến lược mở action <= 5 ngày làm việc."
+    if contains_any(title_fold, ["chinh sach", "muc tieu cap cong ty"]):
+        return "100% mục tiêu cấp công ty có baseline, owner, công thức, nguồn dữ liệu và ngưỡng escalation trước ngày đầu kỳ; KPI chiến lược không có chỉ tiêu 'không đo được' = 0."
+    if contains_any(title_fold, ["phan tang kpi", "phan tang"]):
+        return ">= 95% KPI bộ phận/cell được cascade trước ngày hiệu lực; 100% KPI cấp dưới map được lên KPI cấp trên; 0 KPI vận hành thiếu owner hoặc rule phản ứng."
+    if contains_any(title_fold, ["truyen thong", "dao tao nhan thuc"]):
+        return "Tỷ lệ xác nhận hiểu mục tiêu ở vai trò bị ảnh hưởng >= 95%; 100% nhân sự mới ở vị trí trọng yếu được truyền thông trước khi làm việc độc lập."
+    if contains_any(title_fold, ["ra soat chu ky", "tai chuan hoa"]):
+        return "100% kỳ rà soát mục tiêu hoàn thành đúng lịch; 100% KPI lệch kéo dài có quyết định giữ, đổi ngưỡng hoặc tái chuẩn hóa trong cùng kỳ review."
+    if contains_any(title_fold, ["nhan dien rui ro", "rui ro va co hoi", "risk register"]):
+        return "100% rủi ro mức cao có owner và mức ưu tiên trước release; risk register được cập nhật trong ngày với trigger ảnh hưởng safety, quality hoặc delivery."
+    if contains_any(title_fold, ["failure mode", "severity", "occurrence", "detection", "muc do uu tien"]):
+        return "100% failure mode mức cao có action, owner và due date trước release; PFMEA cập nhật <= 5 ngày làm việc sau change hoặc escape; repeat escape từ cùng failure mode = 0."
+    if contains_any(title_fold, ["control plan", "reaction logic", "reaction plan"]):
+        return "100% Control Plan và reaction plan đồng bộ với PFMEA/WI trước ngày hiệu lực; 0 CTQ không có phương pháp đo, tần suất kiểm hoặc reaction plan."
+    if contains_any(title_fold, ["release control vao van hanh"]):
+        return "100% điểm dùng nhận đúng bản đang sống trước ngày hiệu lực; 0 release khi PFMEA, Control Plan và WI còn lệch phiên bản."
+    if contains_any(title_fold, ["residual rui ro", "sau thay doi", "escape", "ra soat dinh ky"]):
+        return "100% residual risk mức cao được review theo chu kỳ; overdue action mức cao = 0; repeat escape khi action chưa xác minh = 0."
+    if contains_any(title_fold, ["phan loai du lieu", "gan muc bao mat"]):
+        return "100% dữ liệu hoặc hồ sơ mới có classification, owner, SoR/SSOT và retention trước khi go-live; 0 kho dữ liệu critical chưa gán mức bảo mật."
+    if contains_any(title_fold, ["quyen truy cap", "xac thuc"]):
+        return "100% yêu cầu cấp, đổi hoặc thu hồi quyền hoàn tất <= 1 ngày làm việc; privileged-access review = 100% theo quý; orphan account = 0."
+    if contains_any(title_fold, ["ma hoa", "sao luu", "backup", "restore", "bao ve vat ly"]):
+        return "Backup job thành công >= 99%; test restore dữ liệu critical = 100% theo chu kỳ quý; 0 media chứa dữ liệu mật lưu ngoài vùng kiểm soát hoặc không mã hóa."
+    if contains_any(title_fold, ["ssot", "sor", "ban dang song"]):
+        return "100% hồ sơ có SoR/SSOT rõ và truy được bản đang sống <= 15 phút với hồ sơ critical; duplicate live record = 0."
+    if contains_any(title_fold, ["retention", "huy bo an toan", "secure disposal", "disposal"]):
+        return "100% hồ sơ tới hạn có quyết định lưu giữ hoặc hủy trong kỳ; media sanitization compliance = 100%; 0 hủy dữ liệu khi chưa có phê duyệt và log."
+    if contains_any(title_fold, ["khu sach", "loi vao", "chuyen luong"]):
+        return "Entry compliance ở khu sạch = 100%; cross-flow violation = 0; contamination event do kiểm soát lối vào hoặc chuyển luồng = 0."
+    if contains_any(title_fold, ["contract", "cam ket"]):
+        return "100% contract review hoàn tất trước khi commit; quote hoặc PO mismatch phát hiện sau commit = 0; thay đổi khách hàng ảnh hưởng cam kết được ACK <= 1 ngày làm việc."
+    if contains_all(title_fold, ["material", "supplier"]):
+        return "100% vật tư của job có incoming status và chứng chỉ hợp lệ trước khi mở setup; dock-to-ready nội bộ với lô critical <= 24 giờ; supplier document escape = 0."
+    if contains_any(title_fold, ["kiem tra cuoi", "ship release"]):
+        return "0 lô giao thiếu bộ chứng từ bắt buộc; pack/document accuracy >= 99.5%; 100% release cuối map đúng tới sản phẩm thực và phạm vi shipment."
+    if contains_any(title_fold, ["invoice", "closeout", "cash collection"]) or contains_all(title_fold, ["job", "close"]):
+        return "First-time-right invoicing >= 98%; phát hành hóa đơn <= 1 ngày làm việc sau ship release; 100% job-cost variance material được review trước khi đóng job."
     if family == "trigger_scope":
         return "100% trigger được phân loại trước khi đi tiếp; 0 trường hợp dùng nhầm đường rút gọn hoặc đường đầy đủ."
     if family == "route_review":
@@ -1240,49 +1473,83 @@ def title_hint_kpi(title: str) -> str | None:
     if family == "packet":
         return "100% điểm dùng chỉ còn một bộ hồ sơ công việc đang hiệu lực; 0 chạy nhầm revision."
     if family == "resource_ready":
-        return "100% tool, fixture và chuẩn đo sẵn trước khi chiếm máy; changeover externalized theo mục tiêu."
+        return ">= 90% hạng mục chuẩn bị được externalize trước khi chiếm máy; 100% tool, fixture và chuẩn đo sẵn trước start."
     if family == "setup_verify":
         return "0 setup mở khi zero hoặc offset chưa xác minh; 100% setup có bằng chứng datum và safety check."
     if family == "proveout":
         return "0 crash do bỏ qua chạy xác nhận; 100% prove-out có ghi nhận rủi ro và quyết định đi tiếp."
     if family == "first_piece":
-        return "Tỷ lệ pass ngay từ chi tiết đầu tiên theo mục tiêu; 100% mở sản lượng có sign-off bắt buộc."
+        return "First-piece pass ngay lần đầu >= 95%; 100% mở sản lượng có sign-off và dữ liệu đo bắt buộc."
     if family == "transfer":
-        return "100% chuyển giao hoặc khởi động lại có tái xác nhận; thời gian đổi job đạt mục tiêu đã chốt."
+        return "100% chuyển giao hoặc khởi động lại có tái xác nhận; >= 90% changeover hoàn thành trong standard time của cell."
     if family == "release":
         return "100% quyết định phát hành có người phê duyệt, phạm vi rõ và bằng chứng nền liên kết đầy đủ."
     if family == "planning":
-        return "100% lệnh phát hành xuống xưởng có readiness sạch; 0 job phải dừng vì planning release thiếu điều kiện."
+        return "Production schedule attainment >= 90%; 100% lệnh phát hành xuống xưởng có readiness sạch; 0 job dừng do thiếu điều kiện planning."
     if family == "review_pack":
-        return "100% gói dữ liệu xem xét freeze trước họp; 100% đầu vào có người phụ trách và mốc dữ liệu rõ."
+        return "100% gói dữ liệu freeze trước cut-off đã chốt; 100% đầu vào có owner và mốc dữ liệu; 0 metric không truy được nguồn."
     if family == "review_actions":
-        return "100% biên bản phát hành đúng hạn; 100% hành động có người phụ trách, điều kiện đóng và escalation khi quá hạn."
+        return "100% biên bản phát hành <= 2 ngày làm việc sau họp; 100% action có owner, due date, closure rule; overdue critical = 0."
     if family == "audit":
-        return "Hoàn thành audit theo kế hoạch; tỷ lệ đóng findings đúng hạn và tỷ lệ lặp lại theo mục tiêu."
+        return "Audit coverage theo kế hoạch năm = 100%; completion LPA >= 90%; major finding overdue = 0; repeat finding giảm theo mục tiêu năm."
     if family == "ncr":
-        return "Containment mở trong SLA; RCA và CAPA đóng đúng hạn với bằng chứng hiệu lực."
+        return "Containment mở <= 24 giờ; RCA/CAPA đóng <= 30 ngày hoặc có gia hạn duyệt; repeat major escape từ cùng nguyên nhân = 0."
     if family == "measurement":
-        return "Tỷ lệ hiệu chuẩn đúng hạn theo mục tiêu; 0 kết quả đo dùng khi hệ đo chưa đủ điều kiện."
+        return "Calibration on-time >= 98% tổng thể và 100% với gage critical; 0 kết quả đo dùng khi due status/OOT chưa được xử lý."
     if family == "sampling":
         return "100% quyết định lô theo đúng plan lấy mẫu; 0 sai lệch accept hoặc reject do áp sai bảng."
     if family == "spc":
-        return "Tín hiệu out-of-control phản ứng trong SLA; chỉ số capability đạt mục tiêu hoặc có plan xử lý."
+        return "100% tín hiệu out-of-control phản ứng trước lot kế tiếp hoặc <= 1 giờ; đặc tính trọng yếu giữ Cpk/Ppk >= 1.33 hoặc có reaction plan được duyệt."
     if family == "ship":
-        return "0 lô giao không đủ bộ chứng từ; 100% release cuối map đúng tới sản phẩm thực và shipment scope."
+        return "0 lô giao thiếu bộ chứng từ bắt buộc; 100% release cuối map đúng tới sản phẩm thực và phạm vi shipment; pack/document accuracy >= 99.5%."
     if family == "cleanliness":
         return "0 escape do nhiễm bẩn; 100% điểm kiểm sạch có hồ sơ đúng quy định."
     if family == "safety":
-        return "0 escape vật lạ hoặc rủi ro an toàn sản phẩm; 100% nghi ngờ được contain trong SLA."
+        return "0 escape FOD hoặc rủi ro an toàn sản phẩm; 100% suspect product được contain trong ca phát hiện; line-clearance compliance = 100%."
     if family == "training":
-        return "100% nhân sự ở công việc bắt buộc có năng lực còn hiệu lực; 0 phân công vượt phạm vi đủ năng lực."
+        return "100% nhân sự ở công việc bắt buộc có năng lực còn hiệu lực trước phân công; recertification on-time >= 95%; 0 phân công vượt skill matrix."
     if family == "ehs":
-        return "100% sự cố hoặc near miss được ghi nhận và xử lý trong SLA; không để tái diễn không kiểm soát."
+        return "Containment ban đầu <= 10 phút hoặc escalation ngay; 100% sự cố/near miss ghi nhận trong 24 giờ; repeat serious incident = 0 khi chưa verified action."
     if family == "finance":
-        return "Tỷ lệ hóa đơn đúng ngay lần đầu theo mục tiêu; chênh lệch chi phí và công nợ quá hạn trong giới hạn kiểm soát."
+        return "First-time-right invoicing >= 98%; phát hành hóa đơn <= 1 ngày làm việc sau ship release; chênh lệch chi phí và AR overdue được review 100% hàng tháng."
     if family == "human":
-        return "Tỷ lệ lỗi lặp do yếu tố con người giảm theo mục tiêu; 100% điểm chống sai trọng yếu có chủ quản và ngày hoàn thành."
+        return "Repeat error từ cùng cơ chế con người giảm theo mục tiêu năm; 100% điểm chống sai trọng yếu có owner, due date và xác minh hiệu lực."
     if family == "improvement":
-        return "100% thử nghiệm có baseline và kết quả sau thử; tỷ lệ sáng kiến được chuẩn hóa khi đã chứng minh hiệu quả."
+        return "100% thử nghiệm có baseline và kết quả sau thử; >= 70% sáng kiến đạt mục tiêu được chuẩn hóa <= 30 ngày; tác dụng phụ chưa xử lý = 0."
+    if family == "intake":
+        return "100% yêu cầu hoặc sự kiện được cấp mã và owner trong ngày; sự cố ảnh hưởng an toàn/giao hàng ACK trong <= 15 phút, các yêu cầu còn lại <= 1 ngày làm việc."
+    if family == "policy_kpi":
+        return "100% KPI có owner, công thức, nguồn dữ liệu và chu kỳ trước ngày đầu kỳ; 100% lệch mục tiêu mở action <= 5 ngày làm việc."
+    if family == "assess":
+        return "100% hồ sơ đánh giá đủ đầu vào bắt buộc trước khi chốt; SLA đánh giá thường <= 3 ngày làm việc, đánh giá ảnh hưởng chạy máy/cắt chuyển <= 1 ca."
+    if family == "deploy":
+        return "100% đối tượng bị ảnh hưởng nhận đúng bản đang sống trước ngày hiệu lực; tỷ lệ xác nhận triển khai/tiếp nhận >= 98%; 0 dùng trước khi đóng checklist."
+    if family == "records":
+        return "Độ chính xác register/record >= 99%; 100% hồ sơ có SoR/SSOT, owner và retention rõ; 0 hồ sơ mồ côi hoặc quá hạn không có quyết định xử lý."
+    if family == "risk_control":
+        return "100% risk mức cao có control + reaction plan trước release; PFMEA/Control Plan cập nhật <= 5 ngày làm việc sau escape hoặc thay đổi; 0 repeat escape chưa mở action."
+    if family == "access_security":
+        return "100% quyền đặc quyền được rà soát hàng quý; backup thành công >= 99% và test restore 100% theo chu kỳ quý; 0 truy cập trái phép hoặc hủy dữ liệu không sanitize."
+    if family == "knowledge":
+        return ">= 90% bài học trọng yếu được chuẩn hóa trong <= 10 ngày làm việc; >= 95% nội dung yêu cầu OJT được xác minh tại point-of-use; 0 tri thức then chốt không có owner."
+    if family == "contingency":
+        return "Kích hoạt phương án thay thế <= 15 phút với gián đoạn critical; 100% bài test phục hồi hoàn thành theo kế hoạch; 100% backlog re-entry có owner và ưu tiên trước restart."
+    if family == "custody":
+        return "100% tài sản khách hàng có ID, vị trí và tình trạng ở mỗi lần nhận/di chuyển/trả; 0 mất truy xuất; 100% sự cố báo khách hàng <= 24 giờ nếu hợp đồng chưa quy định chặt hơn."
+    if family == "production_run":
+        return "Production schedule attainment >= 90%; first-pass start/first-piece release >= 95%; 0 restart sau bất thường khi chưa có re-authorization và suspect range."
+    if family == "maintenance":
+        return "PM on-time >= 95%; unplanned downtime < 5% thời gian chạy kế hoạch ở máy ràng buộc; 100% tài sản critical có history, owner và action review xu hướng."
+    if family == "secondary_ops":
+        return "First-pass acceptance tại công đoạn phụ >= 95%; 0 major defect escape từ deburr/finish; 100% defect vượt giới hạn được escalation trước lô kế tiếp."
+    if family == "competence":
+        return "100% người được phân công có chứng nhận còn hiệu lực trước khi làm việc; gap training plan mở <= 5 ngày làm việc; 0 phân công vượt skill matrix."
+    if family == "incident_response":
+        return "Containment ban đầu <= 10 phút hoặc escalation ngay; 100% incident/near miss được ghi nhận trong 24 giờ; 0 lặp lại sự cố nghiêm trọng khi chưa xác minh action."
+    if family == "finance_control":
+        return "First-time-right invoicing >= 98%; phát hành hóa đơn <= 1 ngày làm việc sau ship release trừ ngoại lệ hợp đồng; AR overdue và job-cost variance được review hàng tháng 100%."
+    if family == "review_improve":
+        return "100% action có owner, due date và closure evidence; overdue critical = 0; repeat finding/issue trend được review tại kỳ kế tiếp 100%."
     return None
 
 
@@ -1390,17 +1657,25 @@ def flowchart_html(steps: list[dict[str, str | list[str]]]) -> str:
     for idx, step in enumerate(steps, start=1):
         title = repair_text(str(step["title"])) or str(step["title"])
         title_fold = fold(title)
+        c1, c2 = COLOR_PALETTE[(idx - 1) % len(COLOR_PALETTE)]
+        step_style = (
+            ' style="'
+            f'border-color:{hex_to_rgba(c1, 0.28)};'
+            f'background:linear-gradient(135deg,{hex_to_rgba(c1, 0.10)} 0%, rgba(255,255,255,0.98) 64%);'
+            '"'
+        )
+        num_style = f' style="background:linear-gradient(135deg,{c1},{c2})"'
         classes = ["flow-step"]
-        if any(token in title_fold for token in ["quyet dinh", "phe duyet", "release", "pass", "hold"]):
+        if contains_any(title_fold, ["quyet dinh", "phe duyet", "release", "pass", "hold"]):
             classes.append("active")
-        if any(token in title_fold for token in ["kiem", "fai", "iqc", "audit", "ncr", "contain", "inspection"]):
+        if contains_any(title_fold, ["kiem", "fai", "iqc", "audit", "ncr", "contain", "inspection"]):
             classes.append("critical")
         parts.append(
-            f'<div class="{" ".join(classes)}"><div class="flow-num">{idx}</div>'
+            f'<div class="{" ".join(classes)}"{step_style}><div class="flow-num"{num_style}>{idx}</div>'
             f'<div class="flow-text"><div class="flow-title">{esc(title)}</div></div></div>'
         )
         if idx != len(steps):
-            parts.append('<div class="flow-arrow">→</div>')
+            parts.append(f'<div class="flow-arrow" style="color:{hex_to_rgba(c2, 0.45)}">→</div>')
     parts.append("</div>")
     fragment = "".join(parts)
     return repair_text(fragment) or fragment
@@ -1415,8 +1690,6 @@ def render_section3(code: str) -> str:
         '<colgroup><col style="width:32%"/><col style="width:68%"/></colgroup>'
         '<thead><tr><th>Thuật ngữ / nguyên tắc</th><th>Quy định sử dụng</th></tr></thead>'
         f"<tbody>{''.join(rows)}</tbody></table></div>"
-        '<div class="note-soft"><b>Quy tắc dùng thuật ngữ:</b> cột tên dùng mẫu '
-        '<code>English term (thuật ngữ tiếng Việt chuẩn)</code>; trong thân tài liệu ưu tiên dùng bản tiếng Việt đã chốt tại bảng trên.</div>'
     )
 
 
@@ -1456,6 +1729,24 @@ def render_section7(steps: list[dict[str, str | list[str]]]) -> str:
     return "".join(blocks)
 
 
+LEGACY_HTML_PATTERNS = [
+    re.compile(r'<div class="note-soft"><b>Quy tắc dùng thuật ngữ:</b>.*?</div>', re.IGNORECASE | re.DOTALL),
+    re.compile(r'<div class="note-blue"><b>Bổ sung theo note.*?</div>', re.IGNORECASE | re.DOTALL),
+    re.compile(r'<div class="note-blue"><b>Liên kết note.*?</div>', re.IGNORECASE | re.DOTALL),
+    re.compile(
+        r'<h2 class="h2 [^"]*phase3a[^"]*" id="phase[^"]+">.*?(?=<script src="../../../assets/app\.js"></script>)',
+        re.IGNORECASE | re.DOTALL,
+    ),
+]
+
+
+def strip_legacy_artifacts(text: str) -> str:
+    cleaned = text
+    for pattern in LEGACY_HTML_PATTERNS:
+        cleaned = pattern.sub("", cleaned)
+    return re.sub(r"\n{3,}", "\n\n", cleaned)
+
+
 def replace_section(text: str, section_id: str, next_section_id: str, replacement: str) -> str:
     start_tag = f'<h2 class="h2" id="{section_id}">'
     end_tag = f'<h2 class="h2" id="{next_section_id}">'
@@ -1482,11 +1773,16 @@ def replace_preface_gate_chip(text: str, count: int) -> str:
 def validate_html(code: str, text: str, gate_count: int, step_count: int) -> None:
     flow = len(re.findall(r'class="flow-step', text))
     proc = len(re.findall(r'class="proc-num"', text))
-    sections = len(re.findall(r'<h2 class="h2" id="p\d+">', text))
+    flow_num = len(re.findall(r'class="flow-num"', text))
+    flow_num_styled = len(re.findall(r'class="flow-num" style=', text))
+    section_ids = re.findall(r'<h2 class="h2(?: [^"]+)?" id="([^"]+)">', text)
     if flow != proc or flow != step_count:
         raise ValueError(f"{code} step mismatch flow={flow} proc={proc} expected={step_count}")
-    if sections != 10:
-        raise ValueError(f"{code} section count mismatch {sections}")
+    if flow_num != step_count or flow_num_styled != step_count:
+        raise ValueError(f"{code} flow bubble style mismatch flow_num={flow_num} styled={flow_num_styled} expected={step_count}")
+    expected_sections = [f"p{i}" for i in range(1, 11)]
+    if section_ids != expected_sections:
+        raise ValueError(f"{code} section ids mismatch {section_ids}")
     if "{{ENGLISH TERM" in text or "{{THUẬT NGỮ" in text:
         raise ValueError(f"{code} template placeholder leaked into output")
     text = text.replace("English term (thuật ngữ tiếng Việt chuẩn)", "")
@@ -1494,6 +1790,9 @@ def validate_html(code: str, text: str, gate_count: int, step_count: int) -> Non
         raise ValueError(f"{code} template placeholder leaked into output")
     if text.count('<span class="step-tag">IG') < gate_count:
         raise ValueError(f"{code} gate count mismatch")
+    for banned in ["Bổ sung theo note", "Liên kết note", "Quy tắc dùng thuật ngữ", "phase3a-workbook"]:
+        if banned in text:
+            raise ValueError(f"{code} banned legacy text remained: {banned}")
 
 
 def build_document(code: str, raw: dict) -> dict[str, list]:
@@ -1516,6 +1815,7 @@ def main() -> None:
         text = replace_section(text, "p3", "p4", render_section3(code))
         text = replace_section(text, "p6", "p7", render_section6(doc["gates"]))
         text = replace_section(text, "p7", "p8", render_section7(doc["steps"]))
+        text = strip_legacy_artifacts(text)
         text = repair_text(text) or text
         validate_html(code, text, len(doc["gates"]), len(doc["steps"]))
         path.write_text(text, encoding="utf-8")

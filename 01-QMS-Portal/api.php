@@ -6693,6 +6693,20 @@ if ($username === '') {
       $suggestedFilename = $formCode . '_' . $formVer . '_' . $recordId . '_' . $today . '_HHMM-' . $initials . '.xlsx';
     }
 
+    // Resolve blank form download path from form_control_registry
+    $blankFormPath = null;
+    $blankFormFilename = null;
+    if ($formCode) {
+      $formRegFile = $DATA_DIR . '/config/form_control_registry.json';
+      if (file_exists($formRegFile)) {
+        $formReg = json_decode(file_get_contents($formRegFile), true);
+        if (isset($formReg[$formCode])) {
+          $blankFormPath = $formReg[$formCode]['path'] ?? null;
+          $blankFormFilename = $formReg[$formCode]['filename'] ?? null;
+        }
+      }
+    }
+
     api_json([
       'ok' => true,
       'record_id' => $recordId,
@@ -6701,6 +6715,8 @@ if ($username === '') {
       'seq' => $next,
       'form_code' => $formCode,
       'suggested_filename' => $suggestedFilename,
+      'blank_form_path' => $blankFormPath,
+      'blank_form_filename' => $blankFormFilename,
     ]);
   }
 

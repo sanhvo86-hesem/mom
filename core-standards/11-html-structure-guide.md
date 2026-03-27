@@ -310,6 +310,8 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - Flowchart PHẢI khớp đúng số bước h3 bên dưới
 - Số bước Section 7 **KHÔNG bị giới hạn** bởi số IG của Section 6
 - Mỗi bước balloon có **màu xoay** (rotating colors) — KHÔNG cố định 1 màu
+- Màu bubble ở flowchart phải khớp màu `proc-num` của bước tương ứng; không phụ thuộc việc step có class `active/critical` hay không
+- CSS toàn cục PHẢI có fallback palette để file cũ hoặc file viết tay không bị rơi về một màu duy nhất
 - Khi thay nội dung, chỉ thay phần nằm giữa `p7` và `p8`
 - Số bước phải được chốt theo logic bàn giao và risk window của SOP đó, không theo template đẹp
 

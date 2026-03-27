@@ -63,6 +63,19 @@ Không dựa vào:
 - bài tổng hợp không có nguồn gốc,
 - nội dung suy diễn không có tài liệu đỡ lưng.
 
+### Bước 2A. Chốt benchmark KPI trước khi viết Section 6
+
+Trước khi chốt KPI của từng IG, phải trả lời:
+- benchmark chính thức bên ngoài nào dùng làm mốc tham chiếu,
+- ngưỡng nào là yêu cầu cứng của chuẩn / khách hàng / pháp lý,
+- ngưỡng nào là mục tiêu nội bộ thiết kế chặt hơn vì mức rủi ro HESEM,
+- dữ liệu nào trong hệ thống có thể đo được KPI đó thật sự.
+
+Nếu không có benchmark trực tiếp cho đúng tình huống, phải:
+1. dùng benchmark gần nhất có giá trị quản trị,
+2. ghi rõ đây là **mục tiêu nội bộ suy luận từ benchmark + risk level**,
+3. tránh ghi KPI kiểu chung chung không có số.
+
 ### Bước 3. Chốt kiến trúc kiểm soát
 
 Trước khi viết Section 6, phải trả lời:
@@ -72,6 +85,7 @@ Trước khi viết Section 6, phải trả lời:
 - cổng nào là điều kiện trước khi bàn giao,
 - cổng nào là điều kiện trước khi release,
 - KPI nào đo được hiệu lực của từng cổng.
+- KPI nào có benchmark hoặc ngưỡng thiết kế đủ sức điều hành, không chỉ đủ form.
 
 ### Bước 4. Chốt trình tự công việc thực tế
 
@@ -103,6 +117,7 @@ Chỉ sau khi hoàn tất bốn bước trên mới được viết lại.
   - chủ trì,
   - điểm dừng bắt buộc,
   - KPI hoặc bằng chứng tối thiểu.
+- KPI của từng IG phải có ngưỡng số hoặc SLA, nguồn dữ liệu chuẩn và trigger phản ứng.
 
 ### 4.2 Section 7
 
