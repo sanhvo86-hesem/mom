@@ -7,7 +7,8 @@
 <!-- ⚠ Trước phát hành lần đầu: Version luôn là V0. Không tự tăng V1/V2 trong giai đoạn draft. -->
 <title>{{CODE}} — {{TITLE}} | HESEM QMS</title>
 <!-- ⚠ THAY {{RELATIVE_PATH}} bằng đường dẫn tương đối đến root (ví dụ: ../../..) -->
-<!-- ⚠ Khi tạo mới Section 6 / 7, đọc thêm core-standards/12, /13, /16 trước khi viết -->
+<!-- ⚠ Khi tạo mới hoặc viết lại Section 1 / 2 / 3 / 4 / 5 / 8: đọc core-standards/13, /16, /17 trước khi viết -->
+<!-- ⚠ Khi tạo mới hoặc viết lại Section 6 / 7: đọc core-standards/12, /13, /16 trước khi viết -->
 <link href="{{RELATIVE_PATH}}/assets/style.css" rel="stylesheet"/>
 <style>
 /* CSS riêng cho tài liệu này — thêm nếu cần */
@@ -115,28 +116,30 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 1 — Mục đích                                          -->
 <!-- ════════════════════════════════════════════════════════════════ -->
+<!-- ⚠ Section 1 phải suy ra từ rủi ro bị chặn, quyết định bị giữ và đầu ra cuối cùng của SOP này; không dùng lại bộ bullet chung cho nhiều SOP -->
 <h2 class="h2" id="p1">1. Mục đích</h2>
 <p>{{MÔ TẢ MỤC ĐÍCH CỦA SOP — 1-2 câu}}</p>
 <ul class="tight">
-<li>{{Mục tiêu 1 — bắt đầu bằng động từ}}</li>
-<li>{{Mục tiêu 2}}</li>
-<li>{{Mục tiêu 3}}</li>
+<li>{{Chặn rủi ro / lỗi vận hành chính nào}}</li>
+<li>{{Khóa quyết định / trạng thái release nào}}</li>
+<li>{{Bảo đảm đầu ra nào để downstream được tiếp tục}}</li>
 </ul>
 
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 2 — Phạm vi                                           -->
 <!-- ════════════════════════════════════════════════════════════════ -->
+<!-- ⚠ Section 2 phải bám bước đầu, bước cuối, handoff thật và phạm vi restart/re-entry nếu có -->
 <h2 class="h2" id="p2">2. Phạm vi</h2>
 <p>{{MÔ TẢ PHẠM VI ÁP DỤNG}}</p>
 <div class="callout-grid">
 <div class="callout-card"><h3>Có bao phủ</h3>
 <ul class="tight">
-<li>{{Đối tượng/hoạt động thuộc phạm vi}}</li>
+<li>{{Loại job / hoạt động / dữ liệu / sự kiện nằm trong phạm vi từ bước đầu đến bước cuối}}</li>
 </ul>
 </div>
 <div class="callout-card"><h3>Không thay thế / không được vượt quyền</h3>
 <ul class="tight">
-<li>{{Giới hạn phạm vi — SOP/WI khác quản lý}}</li>
+<li>{{Boundary phải đẩy sang SOP/WI khác hoặc quyết định SOP này không được tự hợp thức hóa}}</li>
 </ul>
 </div>
 </div>
@@ -144,6 +147,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 3 — Thuật ngữ & nguyên tắc                            -->
 <!-- ════════════════════════════════════════════════════════════════ -->
+<!-- ⚠ Chỉ giữ thuật ngữ thực sự cần để hiểu Section 6 / 7; tên thuật ngữ phải theo mẫu English term (thuật ngữ tiếng Việt chuẩn) -->
 <h2 class="h2" id="p3">3. Thuật ngữ &amp; nguyên tắc</h2>
 <div class="table-card">
 <table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small">
@@ -158,13 +162,14 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 4 — Vai trò, quyền hạn & RACI                        -->
 <!-- ════════════════════════════════════════════════════════════════ -->
+<!-- ⚠ Section 4 phải bao phủ toàn bộ owner giữ gate, vai trò bàn giao và quyền HOLD / RELEASE / RESTART / REVALIDATE / APPROVE EXCEPTION -->
 <h2 class="h2" id="p4">4. Vai trò, quyền hạn &amp; RACI</h2>
 <div class="table-card">
 <table style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word" class="table matrix-small">
 <colgroup><col style="width:22%"/><col style="width:48%"/><col style="width:30%"/></colgroup>
 <thead><tr><th>Vai trò</th><th>Trách nhiệm chính</th><th>Quyền / điểm chặn</th></tr></thead>
 <tbody>
-<tr><td>{{VAI TRÒ}}</td><td>{{TRÁCH NHIỆM}}</td><td>{{QUYỀN HẠN}}</td></tr>
+<tr><td>{{VAI TRÒ}}</td><td>{{TRÁCH NHIỆM gắn với gate / step}}</td><td>{{Quyền chặn / nhả hold / phê duyệt tiếp / escalation}}</td></tr>
 </tbody>
 </table>
 </div>
@@ -172,12 +177,13 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 5 — Đầu vào, đầu ra & điều kiện tiên quyết           -->
 <!-- ════════════════════════════════════════════════════════════════ -->
+<!-- ⚠ Section 5 phải suy ra từ trước IG1/B1, sau gate cuối/bước cuối và các trigger restart/change/escalation thật -->
 <h2 class="h2" id="p5">5. Đầu vào, đầu ra &amp; điều kiện tiên quyết</h2>
 <div class="field-grid">
-<div class="field"><b>Đầu vào bắt buộc</b><div class="blank">{{DANH SÁCH ĐẦU VÀO}}</div></div>
-<div class="field"><b>Đầu ra bắt buộc</b><div class="blank">{{DANH SÁCH ĐẦU RA}}</div></div>
-<div class="field"><b>Điều kiện kích hoạt</b><div class="blank">{{KHI NÀO SOP NÀY ĐƯỢC KÍCH HOẠT}}</div></div>
-<div class="field"><b>Điều kiện không được chuyển bước</b><div class="blank">{{ĐIỀU KIỆN CHẶN}}</div></div>
+<div class="field"><b>Đầu vào bắt buộc</b><div class="blank">{{Dữ liệu / hồ sơ / nguồn lực phải có trước khi bước đầu được phép chạy}}</div></div>
+<div class="field"><b>Đầu ra bắt buộc</b><div class="blank">{{Đầu ra phải tồn tại khi SOP hoàn tất hoặc gate cuối được đóng}}</div></div>
+<div class="field"><b>Điều kiện tiên quyết / readiness</b><div class="blank">{{Điều kiện sẵn sàng trước khi SOP này được kích hoạt}}</div></div>
+<div class="field"><b>Trigger kích hoạt / chặn / mở lại</b><div class="blank">{{Điều kiện restart, change, hold, escalation hoặc re-entry của SOP}}</div></div>
 </div>
 
 <!-- ════════════════════════════════════════════════════════════════ -->
@@ -207,7 +213,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="metric-grid">
 <div class="metric-card"><div class="value">{{GIÁ TRỊ}}</div><div class="label">{{TÊN KPI}}</div><div class="mini-note">{{MÔ TẢ}}</div></div>
 </div>
-<div class="note-soft"><b>Quy tắc:</b> KPI phải có ngưỡng số hoặc SLA, nguồn dữ liệu và trigger phản ứng; tránh viết KPI chung chung không đo được. Nếu benchmark lấy từ nguồn ngoài, chỉ chuyển hóa thành target vận hành, không chép note benchmark vào body SOP.</div>
+<!-- ⚠ KPI phải có ngưỡng số hoặc SLA, nguồn dữ liệu và trigger phản ứng; không để note benchmark hay note biên tập hiển thị trong body SOP -->
 
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 7 — Quy trình chi tiết                                -->
@@ -221,6 +227,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </div>
 <!-- ⚠ Khi thêm/xóa bước: luôn cập nhật đồng thời flowchart, proc-num headings và màu tương ứng -->
 <!-- ⚠ Với file sinh tự động: giữ inline style cho flow-step/flow-num/flow-arrow để không rơi về một màu -->
+<!-- ⚠ Số bước được chốt theo logic bàn giao, risk window, restart/revalidation thực tế của SOP; không chốt theo số đẹp hay theo số IG -->
 
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span> {{TÊN BƯỚC 1}}</h3>
 <p>{{MÔ TẢ TỔNG QUAN}}</p>
@@ -239,15 +246,21 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ul>
 
 <!-- Lặp lại cho mỗi bước chi tiết, KHÔNG buộc theo số IG -->
-<div class="note-blue"><b>Phương pháp bắt buộc:</b> chốt số bước sau khi đã đọc tài liệu cũ, nghiên cứu nguồn chính thức bên ngoài và xác định các điểm bàn giao, revalidation, restart và containment thực tế của SOP đó. Không để note biên tập, note khác biệt bản cũ hay note quy tắc thuật ngữ trong body SOP.</div>
+<!-- ⚠ Không để note biên tập, note khác biệt bản cũ, note benchmark, note quy tắc thuật ngữ hay note phương pháp lọt vào body SOP -->
 
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 8 — Ngoại lệ, thay đổi & làm lại                    -->
 <!-- ════════════════════════════════════════════════════════════════ -->
+<!-- ⚠ Scenario của Section 8 phải lấy từ hold / restart / revalidation / waiver / change / escalation thật; nếu SOP có nhiều nhánh ngoại lệ thì dùng bảng 5 cột -->
 <h2 class="h2" id="p8">8. Ngoại lệ, thay đổi &amp; làm lại</h2>
-<ul class="tight">
-<li>{{TRƯỜNG HỢP NGOẠI LỆ VÀ CÁCH XỬ LÝ}}</li>
-</ul>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Tình huống</th><th>Quy tắc xử lý bắt buộc</th><th>Chủ trì</th><th>Người gỡ hold / phê duyệt tiếp</th><th>Hồ sơ</th></tr></thead>
+<tbody>
+<tr><td>{{TÌNH HUỐNG NGOẠI LỆ / THAY ĐỔI / LÀM LẠI}}</td><td>{{QUY TẮC XỬ LÝ BẮT BUỘC}}</td><td>{{CHỦ TRÌ}}</td><td>{{NGƯỜI GỠ HOLD / PHÊ DUYỆT TIẾP}}</td><td>{{HỒ SƠ / BẰNG CHỨNG}}</td></tr>
+</tbody>
+</table>
+</div>
 
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 9 — Hệ thống, hồ sơ & dữ liệu                       -->

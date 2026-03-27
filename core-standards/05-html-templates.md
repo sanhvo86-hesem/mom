@@ -20,6 +20,8 @@ Lưu ý khóa:
 - Trước phát hành lần đầu, toàn bộ SOP giữ `Version = V0`.
 - Không đưa note biên tập, note so sánh bản cũ, note quy tắc thuật ngữ hoặc benchmark rationale vào thân SOP.
 - Khi tạo Section 6 / 7 mới, đọc thêm `12-sop-section-6-7-guide.md`, `13-sop-research-redraft-method.md`, `16-sop-graphics-kpi-and-redraft-quality.md`.
+- Template chỉ khóa khung HTML và format. Không dùng template này để đẩy cùng một bộ nội dung vào hàng loạt SOP.
+- Nội dung Section 1 / 2 / 3 / 4 / 5 / 8 phải nghiên cứu và nâng cấp theo từng SOP riêng.
 
 ```html
 <!DOCTYPE html>
@@ -157,6 +159,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Điểm 1.</li>
 <li>Điểm 2.</li>
 </ul>
+<!-- Viết từ rủi ro bị chặn, quyết định bị giữ và đầu ra cuối cùng của SOP này.
+     Không copy lại cùng một bộ bullet cho nhiều SOP. -->
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 2 — PHẠM VI                              -->
@@ -168,6 +172,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="callout-card"><h3>Có bao phủ</h3><ul class="tight"><li>...</li></ul></div>
 <div class="callout-card"><h3>Không thay thế / không được vượt quyền</h3><ul class="tight"><li>...</li></ul></div>
 </div>
+<!-- Boundary phải bám đúng step đầu / step cuối / handoff thật, không dùng danh sách link trang trí. -->
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 3 — THUẬT NGỮ & NGUYÊN TẮC              -->
@@ -179,6 +184,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td><b>Traceability (truy xuất nguồn gốc)</b></td><td>Định nghĩa bằng tiếng Việt chuẩn, sau đó thân tài liệu ưu tiên dùng “truy xuất nguồn gốc”.</td></tr>
 </tbody>
 </table></div>
+<!-- Chỉ giữ 3-6 thuật ngữ thực sự cần để hiểu gate/step; không copy glossary hệ thống. -->
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 4 — VAI TRÒ, QUYỀN HẠN & RACI          -->
@@ -190,6 +196,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td>Vai trò A</td><td>Trách nhiệm.</td><td>Quyền hạn.</td></tr>
 </tbody>
 </table></div>
+<!-- Mọi owner giữ gate ở Section 6 và vai trò bàn giao/gỡ hold ở Section 7 đều phải xuất hiện ở đây. -->
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 5 — ĐẦU VÀO, ĐẦU RA & ĐIỀU KIỆN        -->
@@ -201,6 +208,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="field"><b>Điều kiện kích hoạt</b><div class="blank">...</div></div>
 <div class="field"><b>Điều kiện không được chuyển bước</b><div class="blank">...</div></div>
 </div>
+<!-- Đầu vào map về trạng thái trước IG1/B1; đầu ra map về gate cuối/bước cuối;
+     trigger và điều kiện khóa bước phải phản ánh restart/change/re-entry thật của SOP. -->
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 6 — CỔNG KIỂM SOÁT & KPI                -->
@@ -259,6 +268,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <tr><td>...</td><td>...</td><td>...</td></tr>
 </tbody>
 </table></div>
+<!-- Tình huống ngoại lệ phải xuất phát từ hold/restart/revalidation/change path thật của SOP.
+     Không thêm scenario trang trí không tồn tại trong vận hành. -->
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 9 — HỆ THỐNG, HỒ SƠ & DỮ LIỆU          -->

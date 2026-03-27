@@ -21,6 +21,7 @@
 | 9 | Không đưa ghi chú biên tập vào thân SOP | Không chèn note kiểu "bổ sung theo note", "liên kết note", "quy tắc dùng thuật ngữ", "khác bản trước" vào tài liệu vận hành. |
 | 10 | Không ghi “mới so với bản trước” trong SOP chưa phát hành | Khi tài liệu còn là bản nháp trước phát hành đầu tiên, giữ `V0` và không mô tả khác biệt so với draft cũ trong body. |
 | 11 | Không nhét rationale benchmark vào thân SOP | Lý do chọn KPI, benchmark nguồn và ghi chú suy luận để ở working note / core-standard / hồ sơ soạn thảo, không đưa vào body SOP. |
+| 12 | Chuẩn hóa format được phép làm ở lõi, nội dung phải nâng cấp theo từng SOP | Palette, layout, table structure, checklist kỹ thuật có thể khóa trong core-standard; nhưng nội dung Section 1-8 phải nghiên cứu và viết theo từng tài liệu, không copy hàng loạt. |
 
 ### 1.2 Giọng văn
 
@@ -101,6 +102,8 @@ Mỗi câu lệnh trong SOP/WI tuân theo pattern:
 - 3-5 bullet points.
 - Mọi bullet bắt đầu bằng **động từ** (Thiết lập, Kiểm soát, Đảm bảo, Quy định, Ngăn ngừa).
 - KHÔNG bắt đầu bằng danh từ ("Quy trình này...", "Tài liệu này...").
+- Phải được suy từ rủi ro bị chặn, quyết định được giữ và đầu ra phải khóa trong Section 6 / 7 của chính SOP đó.
+- Không dùng lại nguyên một bộ bullet cho nhiều SOP chỉ bằng cách thay danh từ.
 
 **Ví dụ:**
 ```
@@ -118,6 +121,7 @@ Chia thành 2 phần rõ ràng:
 
 **Không thay thế:**
 - Liệt kê các tài liệu/quy trình KHÔNG nằm trong phạm vi SOP này.
+- Boundary phải bám đúng handoff upstream / downstream thật trong Section 7, không dùng danh sách tài liệu trang trí.
 
 **Ví dụ:**
 ```
@@ -144,6 +148,7 @@ Bảng 2 cột:
 - KHÔNG copy toàn bộ glossary hệ thống vào mỗi SOP.
 - Cột tên thuật ngữ PHẢI theo mẫu `English term (thuật ngữ tiếng Việt chuẩn)`.
 - Trong thân tài liệu, ưu tiên dùng bản tiếng Việt đã chốt ở Section 3.
+- Thuật ngữ chỉ được giữ lại khi thật sự cần để hiểu gate, step, hold, release hoặc exception của SOP đó.
 - KHÔNG viết kiểu nửa Anh nửa Việt như `mixed source kiểm soát`, `job close tài chính`, `trace gap`, `first-piece release` nếu SOP đã có bản Việt chuẩn.
 - Chỉ giữ nguyên chữ viết tắt hoặc mã chuẩn khi đây là ngôn ngữ vận hành phổ biến và không làm mờ nghĩa, ví dụ `FAI`, `SPC`, `Cpk`, `NCR`.
 - Không thêm note giải thích quy tắc viết thuật ngữ ngay trong thân SOP; quy tắc thuộc `core-standard`, không thuộc tài liệu vận hành.
@@ -159,6 +164,8 @@ Bảng 3 cột:
 | Document Owner | Soạn thảo, cập nhật, theo dõi hiệu lực | Chịu trách nhiệm nội dung chính xác |
 
 - Cột "Quyền / Điểm chặn" rất quan trọng — cho biết ai có quyền dừng quy trình.
+- Mọi owner giữ gate trong Section 6 và mọi vai trò có quyền bàn giao / gỡ hold trong Section 7 đều phải xuất hiện ở Section 4.
+- Nếu SOP dùng RACI matrix thay cho bảng 3 cột, vẫn PHẢI thể hiện rõ ai có quyền chặn và ai có quyền gỡ hold.
 
 ### Section 5: Đầu vào, đầu ra & điều kiện tiên quyết
 
@@ -170,6 +177,11 @@ Bảng 3 cột:
 | **Đầu ra** | Sản phẩm/hồ sơ nào được tạo ra khi hoàn thành |
 | **Điều kiện tiên quyết** | Điều kiện nào PHẢI thỏa mãn trước khi bắt đầu |
 | **Trigger** | Sự kiện nào kích hoạt quy trình này |
+
+- Đầu vào phải map được về trạng thái trước `IG1 / B1`.
+- Đầu ra phải map được về trạng thái sau gate cuối hoặc bước cuối.
+- Trigger phải phản ánh đúng sự kiện kích hoạt, restart, transfer, change hoặc escalation thật trong SOP.
+- Không viết box chung chung kiểu `khi cần`, `theo yêu cầu`, `tài liệu liên quan`.
 
 ### Section 6: Cổng kiểm soát, điểm dừng bắt buộc & KPI
 
@@ -253,8 +265,10 @@ Section 7 là **dòng công việc thực thi**. Mỗi bước chi tiết nên t
 
 ### Section 8: Ngoại lệ, thay đổi & làm lại
 
-- Bulleted list các tình huống ngoại lệ.
-- Mọi bullet ghi: tình huống + hành động + người quyết định.
+- Dùng bảng ngoại lệ thay vì bullet list khi SOP có nhiều hold/restart/change path.
+- Mỗi dòng phải ghi: `tình huống + quy tắc xử lý bắt buộc + chủ trì + người gỡ hold hoặc phê duyệt tiếp + hồ sơ`.
+- Tình huống ngoại lệ phải được suy từ điểm hold, restart, revalidation, partial release, waiver, system-down hoặc change path thật trong Section 6 / 7.
+- Không thêm ngoại lệ trang trí không xuất phát từ vận hành thực của SOP.
 
 **Ví dụ:**
 ```

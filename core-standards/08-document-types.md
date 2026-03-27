@@ -8,18 +8,25 @@
 
 Mọi SOP của HESEM PHẢI có đủ 10 section theo thứ tự sau. KHÔNG được bỏ section, KHÔNG được đổi thứ tự.
 
+Lưu ý khóa:
+
+- Tài liệu này chỉ khóa `cấu trúc` và `format`.
+- Không được dùng file này để hợp thức hóa việc nâng cấp nội dung hàng loạt theo cùng một bộ câu mẫu.
+- Đồ họa, palette, table format và HTML skeleton có thể chuẩn hóa ở mức core-standard.
+- Nội dung Section 1 / 2 / 3 / 4 / 5 / 6 / 7 / 8 phải nghiên cứu theo từng SOP một.
+
 ### Cấu trúc bắt buộc
 
 | Section | Tiêu đề | Nội dung chính |
 |---------|---------|---------------|
-| 1 | Mục đích | 3-5 bullet, mỗi bullet bắt đầu bằng động từ |
-| 2 | Phạm vi | "Có bao phủ" + "Không thay thế" |
-| 3 | Thuật ngữ & nguyên tắc | Bảng 2 cột: Thuật ngữ \| Quy định sử dụng |
-| 4 | Vai trò, quyền hạn & RACI | Bảng 3 cột: Vai trò \| Trách nhiệm \| Quyền/Điểm chặn |
-| 5 | Đầu vào, đầu ra & điều kiện tiên quyết | 4 field boxes: Input, Output, Prerequisites, Trigger |
-| 6 | Cổng kiểm soát, điểm dừng bắt buộc & KPI | Gate cards + KPI metrics table |
-| 7 | Quy trình chi tiết | Mọi gate: h3 + mô tả + ul + note-soft + role-note |
-| 8 | Ngoại lệ, thay đổi & làm lại | Bulleted list: tình huống + hành động + người quyết định |
+| 1 | Mục đích | 1 câu mở đầu + 3-5 bullet, bám rủi ro bị chặn và đầu ra phải khóa của SOP đó |
+| 2 | Phạm vi | `Có bao phủ` + `Không thay thế`, bám điểm bắt đầu/kết thúc và handoff thật |
+| 3 | Thuật ngữ & nguyên tắc | Bảng 2 cột: thuật ngữ dùng thật trong gate/step |
+| 4 | Vai trò, quyền hạn & RACI | Bảng vai trò hoặc RACI matrix, nhưng phải thể hiện rõ quyền chặn/gỡ hold |
+| 5 | Đầu vào, đầu ra & điều kiện tiên quyết | 4 field boxes bám trạng thái trước bước đầu và sau bước cuối |
+| 6 | Cổng kiểm soát, điểm dừng bắt buộc & KPI | IG table, KPI thực chiến có số/SLA, không dùng gate cards |
+| 7 | Quy trình chi tiết | Flowchart + heading bước chi tiết + hold/handoff bám đúng flow thật |
+| 8 | Ngoại lệ, thay đổi & làm lại | Bảng tình huống ngoại lệ bám hold/restart/revalidation/change path |
 | 9 | Hệ thống, hồ sơ & dữ liệu | Table mapping: Hệ thống -> Dữ liệu -> Trách nhiệm -> Lưu trữ |
 | 10 | Biểu mẫu, WI, SOP & JD liên kết | Bảng mã tài liệu + tên + link |
 
@@ -74,34 +81,29 @@ Mọi SOP của HESEM PHẢI có đủ 10 section theo thứ tự sau. KHÔNG đ
 <section id="s6-gates" class="sop-section">
   <h2>6. Cổng kiểm soát, điểm dừng bắt buộc & KPI</h2>
   <table class="table">
-    <thead><tr><th>IG</th><th>Cổng kiểm soát & mục tiêu</th><th>Vai trò</th><th>Điểm dừng</th><th>KPI / hồ sơ</th></tr></thead>
+    <thead><tr><th>IG</th><th>Cổng kiểm soát & mục tiêu</th><th>Chủ trì</th><th>Điểm dừng bắt buộc</th><th>KPI / hồ sơ tối thiểu</th></tr></thead>
     <tbody>
-      <tr><td>IG2</td><td>Tên cổng</td><td>Ai quyết định</td><td>Điều kiện HOLD/FAIL</td><td>FRM-XXX / KPI</td></tr>
+      <tr><td>IG2</td><td>Tên cổng</td><td>Ai giữ cổng</td><td>Điều kiện HOLD/RELEASE</td><td>Ngưỡng số / SLA / FRM-XXX</td></tr>
     </tbody>
-  </table>
-  <table class="kpi-table">
-    <thead><tr><th>KPI</th><th>Mục tiêu</th><th>Đo lường</th><th>Tần suất</th></tr></thead>
-    <tbody>...</tbody>
   </table>
 </section>
 
 <section id="s7-procedure" class="sop-section">
   <h2>7. Quy trình chi tiết</h2>
-  <h3>G2 — Tên gate</h3>
+  <div class="flowchart">...</div>
+  <h3><span class="proc-num">1</span> Tên bước</h3>
   <p>Mô tả ngắn.</p>
-  <ul>
-    <li>Bước 1...</li>
-    <li>Bước 2...</li>
-  </ul>
-  <div class="note-soft">Ghi chú bổ sung.</div>
-  <div class="role-note">Vai trò: tên vai trò</div>
+  <ul><li>Hành động thật.</li></ul>
+  <div class="note-soft">Điểm dừng bắt buộc.</div>
+  <div class="role-note">Bàn giao bắt buộc.</div>
 </section>
 
 <section id="s8-exceptions" class="sop-section">
   <h2>8. Ngoại lệ, thay đổi & làm lại</h2>
-  <ul>
-    <li>Khi [tình huống]: [vai trò] [hành động]. Ghi lý do vào [hồ sơ].</li>
-  </ul>
+  <table class="table">
+    <thead><tr><th>Tình huống</th><th>Quy tắc xử lý bắt buộc</th><th>Chủ trì</th><th>Người gỡ hold</th><th>Hồ sơ</th></tr></thead>
+    <tbody><tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr></tbody>
+  </table>
 </section>
 
 <section id="s9-systems" class="sop-section">

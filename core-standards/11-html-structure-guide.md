@@ -182,6 +182,21 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 </div>
 ```
 
+### 2.6 Ranh giới giữa chuẩn hóa format và nâng cấp nội dung
+
+Core-standard **được phép** chuẩn hóa tập trung:
+
+- header, preface, toc, table-card, field-grid, callout-grid,
+- palette màu flowchart, `proc-num`, `flow-num`, arrow, CSS fallback,
+- khung table của Section 6 và Section 8,
+- checklist QA kỹ thuật và comment hướng dẫn trong template.
+
+Core-standard **không được dùng** để biện minh cho cập nhật nội dung hàng loạt:
+
+- nội dung `Section 1, 2, 3, 4, 5, 8` phải suy ra từ `Section 6` và `Section 7` của **từng SOP**,
+- số bước, tên bước, tên IG, KPI, role authority, exception scenario phải nghiên cứu theo **từng SOP**,
+- không để note biên tập, note benchmark, note khác bản cũ hay note quy tắc viết tài liệu hiển thị trong body SOP.
+
 ---
 
 ## 3. Quy tắc đồ họa components
@@ -411,6 +426,10 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 | 13 | Tạo flowchart không khớp số bước h3 | Flowchart steps = h3 headings |
 | 14 | Dùng 1 màu cố định cho proc-num balloons | Dùng 10 màu xoay |
 | 15 | Để trống cột Chủ trì/Điểm dừng/KPI trong IG table | Mỗi IG PHẢI đầy đủ |
+| 16 | Batch-upgrade nội dung `Section 1/2/3/4/5/8` bằng một bộ câu chung cho nhiều SOP | Dẫn tới sai boundary, sai role, sai exception và mất tính thực chiến |
+| 17 | Giữ lại note hướng dẫn biên tập, note benchmark hoặc note khác bản cũ trong body SOP | Tài liệu draft sẽ bẩn, sai ngữ cảnh vận hành và khó phát hành V0 |
+| 18 | Dùng list bullet cho Section 8 khi SOP có nhiều nhánh hold/restart/revalidation/change | Mất owner, mất người gỡ hold và khó audit |
+| 19 | Viết Section 3 bằng thuật ngữ nửa Anh nửa Việt hoặc lặp ngoặc | Làm mờ nghĩa vận hành và tạo lỗi dùng thuật ngữ trong thân SOP |
 
 ---
 
@@ -430,14 +449,26 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - [ ] Mỗi yêu cầu có `iso-clause` badge với điều khoản cụ thể (§X.Y) ?
 - [ ] ISO version = 9001:**2026** (KHÔNG phải 2015) ?
 
-### 5.3 Section 6 — Internal Gates
+### 5.3 Section 1, 2, 3, 4, 5, 8
+- [ ] Section 1 nêu rõ rủi ro / lỗi / quyết định / đầu ra mà SOP này đang khóa, không phải câu mở đầu chung chung ?
+- [ ] Section 2 bám đúng bước đầu, bước cuối và handoff thật sang SOP/WI khác ?
+- [ ] Section 2 có nêu boundary restart / re-entry / transfer nếu Section 7 có nhánh đó ?
+- [ ] Section 3 chỉ giữ các thuật ngữ thật sự cần để hiểu gate/step ?
+- [ ] Tên thuật ngữ theo mẫu `English term (thuật ngữ tiếng Việt chuẩn)` và thân SOP ưu tiên dùng bản tiếng Việt ?
+- [ ] Section 4 bao phủ toàn bộ owner giữ IG và vai trò có quyền HOLD / RELEASE / RESTART / REVALIDATE / APPROVE EXCEPTION ?
+- [ ] Section 5 map được về trước IG1/B1, sau gate cuối/bước cuối và trigger restart/change/escalation thật ?
+- [ ] Section 5 không dùng ô mơ hồ kiểu `khi cần`, `theo yêu cầu`, `tài liệu liên quan` ?
+- [ ] Section 8 dùng table 5 cột khi có nhiều scenario, và mỗi scenario đều có chủ trì + người gỡ hold / phê duyệt tiếp + hồ sơ ?
+- [ ] Body SOP không còn note biên tập, note benchmark, note khác bản cũ hay note phương pháp viết ?
+
+### 5.4 Section 6 — Internal Gates
 - [ ] Dùng TABLE 5 cột (KHÔNG dùng gate-card) ?
 - [ ] IG badge dùng `step-tag` + `ig-center` class ?
 - [ ] Mỗi IG có: Mô tả, Chủ trì, Điểm dừng, KPI (KHÔNG để trống) ?
 - [ ] Số IG phù hợp quy trình (KHÔNG giới hạn cố định 5) ?
 - [ ] Số IG không bị ép khớp với số bước Section 7 ?
 
-### 5.4 Section 7 — Quy trình chi tiết
+### 5.5 Section 7 — Quy trình chi tiết
 - [ ] Có flowchart (`<div class="flowchart">`) SAU heading h2 ?
 - [ ] Số bước flowchart = Số h3 headings bên dưới ?
 - [ ] Mỗi h3 có `proc-num` balloon với màu xoay ?
@@ -449,7 +480,7 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - [ ] Có "Bàn giao" cuối mỗi bước ?
 - [ ] Đã kiểm tra không xóa nhầm `p6`, `p7`, `p8` khi thay section ?
 
-### 5.5 Khi cập nhật nội dung
+### 5.6 Khi cập nhật nội dung
 - [ ] Kiểm tra lại đánh số IG1→IGn (có bị lệch không) ?
 - [ ] Kiểm tra flowchart khớp h3 headings (thêm/xóa bước → update flowchart) ?
 - [ ] Kiểm tra nội dung procedure không bị đẩy sang section khác ?

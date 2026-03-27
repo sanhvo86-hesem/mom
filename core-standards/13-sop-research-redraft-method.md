@@ -12,6 +12,7 @@ Mục tiêu là ngăn kiểu cập nhật cơ học:
 - ép mọi SOP về cùng số cổng kiểm soát,
 - ép mọi SOP về cùng số bước chi tiết,
 - viết lại Section 6 và Section 7 theo một khuôn lặp mà không dựa trên phạm vi vận hành thực của SOP đó,
+- viết phần đầu, vai trò, đầu vào/đầu ra và ngoại lệ theo cùng một template nội dung cho tất cả SOP,
 - trộn nửa Anh nửa Việt làm thuật ngữ vận hành mất chuẩn.
 
 ---
@@ -28,6 +29,8 @@ Mục tiêu là ngăn kiểu cập nhật cơ học:
 6. Chỉ được viết lại Section 6 sau khi đã xác định rõ architecture kiểm soát của SOP đó.
 7. Chỉ được viết lại Section 7 sau khi đã chốt xong dòng công việc thực tế của SOP đó.
 8. Không dùng lại số bước hoặc số IG chỉ vì “trông đẹp”, “đều”, hoặc “dễ sinh hàng loạt”.
+9. Chuẩn hóa đồ họa, palette, HTML structure, bảng và checklist ở mức core-standard là được phép; nhưng nâng cấp nội dung SOP phải làm theo từng tài liệu một.
+10. Không nâng cấp hàng loạt nhiều SOP cùng lúc nếu nội dung thay đổi chạm logic vận hành; chỉ được batch với lỗi kỹ thuật, đồ họa, CSS, link, markup hoặc hygiene mang tính cấu trúc.
 
 ---
 
@@ -110,6 +113,19 @@ Trước khi viết Section 7, phải trả lời:
 ### Bước 5. Viết lại Section 6 và Section 7
 
 Chỉ sau khi hoàn tất bốn bước trên mới được viết lại.
+
+### Bước 5A. Suy lại Section 1, 2, 3, 4, 5, 8 từ Section 6 và Section 7
+
+Sau khi đã chốt gate và flow thật:
+
+- viết lại `Section 1` từ rủi ro bị chặn, quyết định được giữ và đầu ra bị khóa,
+- viết lại `Section 2` từ boundary bắt đầu/kết thúc và handoff thật,
+- viết lại `Section 3` từ các thuật ngữ xuất hiện thật trong gate/step,
+- viết lại `Section 4` từ owner giữ gate và vai trò có quyền chặn/gỡ hold,
+- viết lại `Section 5` từ trạng thái trước bước đầu và sau bước cuối,
+- viết lại `Section 8` từ các điểm hold, restart, revalidation, waiver, partial release hoặc change path thật.
+
+Không được suy các section này từ template cũ nếu template cũ không còn khớp logic vận hành đã chốt.
 
 ---
 
@@ -225,7 +241,7 @@ Chỉ coi một SOP đã cập nhật xong khi trả lời được toàn bộ:
 
 Tài liệu này áp dụng cho:
 - mọi lần viết mới SOP,
-- mọi lần viết lại Section 3, 6 hoặc 7,
+- mọi lần viết lại Section 1, 2, 3, 4, 5, 6, 7 hoặc 8,
 - mọi script tự động thay section của SOP,
 - mọi dự án chuẩn hóa hàng loạt trong `core-standard`.
 

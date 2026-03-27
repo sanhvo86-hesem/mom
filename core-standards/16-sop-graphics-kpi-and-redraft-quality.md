@@ -58,6 +58,23 @@ Lỗi đã gặp:
 - header còn sót `V1` trong khi tài liệu chưa phát hành,
 - rationale benchmark hoặc note biên tập bị lẫn vào body tài liệu vận hành.
 
+### 2.4 Ranh giới chuẩn hóa phải khóa
+
+Được phép chuẩn hóa tập trung ở `core-standard`:
+
+- palette màu,
+- CSS fallback,
+- HTML structure,
+- checklist QA kỹ thuật,
+- format bảng KPI / flowchart / section.
+
+Không được lấy đó làm lý do để nâng cấp `nội dung SOP` theo kiểu hàng loạt.
+
+Quy tắc bắt buộc:
+
+- đồ họa và format có thể sửa ở lõi rồi áp vào nhiều tài liệu,
+- nội dung KPI, gate wording, step wording, purpose, scope, role, input/output và exception phải nghiên cứu theo từng SOP.
+
 ---
 
 ## 3. Chuẩn đồ họa flowchart phải giữ
