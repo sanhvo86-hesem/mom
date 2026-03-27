@@ -108,6 +108,7 @@
 - Logo và Title nằm **CÙNG HÀNG NGANG** (không phải stacked)
 - `{{DOC_TYPE_LABEL}}` theo loại: SOP → "Tài liệu kiểm soát", WI → "Tài liệu vận hành • Hướng dẫn công việc", ANNEX → "Tài liệu vận hành • Phụ lục", JD → "Tài liệu hệ thống"
 - Meta labels giữ nguyên tiếng Anh: Code, Version, Effective Date, Owner, Approved by
+- Với tài liệu chưa phát hành lần đầu, `Version` trong header luôn là `V0`
 - **Viền cam** header: mảnh 1px (border-bottom của .meta)
 - **KHÔNG** thay đổi cấu trúc header — mọi file PHẢI giống nhau
 
@@ -312,6 +313,9 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - Mỗi bước balloon có **màu xoay** (rotating colors) — KHÔNG cố định 1 màu
 - Màu bubble ở flowchart phải khớp màu `proc-num` của bước tương ứng; không phụ thuộc việc step có class `active/critical` hay không
 - CSS toàn cục PHẢI có fallback palette để file cũ hoặc file viết tay không bị rơi về một màu duy nhất
+- Flowchart sinh mới bằng script PHẢI ưu tiên inline style ở `flow-step`, `flow-num`, `flow-arrow`; CSS fallback chỉ để bảo vệ file cũ hoặc file viết tay
+- `.active` và `.critical` chỉ bổ trợ nhấn thị giác; không được ghi đè logic màu theo số bước của bubble
+- Fallback palette phải tính đúng việc `.flow-arrow` chen giữa các `.flow-step`; selector phải dựa trên direct child positions của `.flow-step` thực tế, không giả định tất cả child đều là step
 - Khi thay nội dung, chỉ thay phần nằm giữa `p7` và `p8`
 - Số bước phải được chốt theo logic bàn giao và risk window của SOP đó, không theo template đẹp
 
@@ -437,6 +441,7 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - [ ] Có flowchart (`<div class="flowchart">`) SAU heading h2 ?
 - [ ] Số bước flowchart = Số h3 headings bên dưới ?
 - [ ] Mỗi h3 có `proc-num` balloon với màu xoay ?
+- [ ] Với SOP sinh tự động: mỗi `flow-num` trong flowchart có inline style ?
 - [ ] Flowchart steps có `.active` (quyết định) và `.critical` (kiểm tra) ?
 - [ ] Số bước chi tiết được tách theo logic vận hành, không theo số IG ?
 - [ ] Nội dung bước chi tiết: giải thích WHO/WHAT/WHEN/HOW ?
@@ -449,6 +454,7 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - [ ] Kiểm tra flowchart khớp h3 headings (thêm/xóa bước → update flowchart) ?
 - [ ] Kiểm tra nội dung procedure không bị đẩy sang section khác ?
 - [ ] Kiểm tra lỗi chính tả (đặc biệt chữ đầu từ tiếng Việt) ?
+- [ ] Kiểm tra body không còn note biên tập như `Bổ sung theo note`, `Liên kết note`, `Quy tắc dùng thuật ngữ`, `so với bản trước` ?
 
 ---
 

@@ -169,7 +169,7 @@ Write-Host '[SITE 1] HESEM-Records -Operational records' -ForegroundColor Cyan
 
 # --- Quality-Records ---
 $qualityRoot = Join-Path $recordsSite 'Quality-Records'
-$qualityTypes = @('NCR', 'CAPA', 'FAI', 'Calibration', 'SPC', 'IQC', 'Customer-Complaints', 'Ship-Release', 'Supplier-Quality')
+$qualityTypes = @('NCR', 'CAPA', 'FAI', 'Calibration', 'SPC', 'IQC', 'Customer-Complaints', 'Ship-Release', 'Supplier-Quality', 'SCAR', 'Product-Safety-FOD')
 $qualityYearRoot = Join-Path $qualityRoot $yearFolder
 Ensure-Dir -Path $qualityYearRoot
 Ensure-ChildDirs -BasePath $qualityYearRoot -ChildNames $qualityTypes
@@ -183,12 +183,13 @@ Ensure-ChildDirs -BasePath $qmsYearRoot -ChildNames $qmsTypes
 
 # --- Training-Records ---
 $trainingRoot = Join-Path $recordsSite 'Training-Records'
-$trainingTypes = @('Attendance', 'OJT', 'Assessment', 'Certification', 'Safety-Induction')
+$trainingTypes = @('Attendance', 'OJT', 'Assessment', 'Certification', 'Safety-Induction', 'Effectiveness-Reviews')
 $trainingYearRoot = Join-Path $trainingRoot $yearFolder
 Ensure-Dir -Path $trainingYearRoot
 Ensure-ChildDirs -BasePath $trainingYearRoot -ChildNames $trainingTypes
-# Skill-Matrix is current-state (no year split)
+# Current-state folders (no year split)
 Ensure-Dir -Path (Join-Path $trainingRoot 'Skill-Matrix')
+Ensure-Dir -Path (Join-Path $trainingRoot 'Training-Plans')
 
 # --- Department-Ops ---
 $deptOpsRoot = Join-Path $recordsSite 'Department-Ops'

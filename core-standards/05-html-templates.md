@@ -16,6 +16,11 @@
 
 SOP có 10 mục chuẩn. Luôn có iso-map, preface-block, toc ở đầu.
 
+Lưu ý khóa:
+- Trước phát hành lần đầu, toàn bộ SOP giữ `Version = V0`.
+- Không đưa note biên tập, note so sánh bản cũ, note quy tắc thuật ngữ hoặc benchmark rationale vào thân SOP.
+- Khi tạo Section 6 / 7 mới, đọc thêm `12-sop-section-6-7-guide.md`, `13-sop-research-redraft-method.md`, `16-sop-graphics-kpi-and-redraft-quality.md`.
+
 ```html
 <!DOCTYPE html>
 <html lang="vi">
@@ -212,7 +217,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </tbody>
 </table></div>
 <!-- Dùng metric-grid cho KPI -->
-<div class="note-soft"><b>Quy tắc:</b> chỉ tạo IG khi có điểm HOLD/RELEASE thật; KPI phải có ngưỡng số hoặc SLA, nguồn dữ liệu và trigger phản ứng khi lệch.</div>
+<div class="note-soft"><b>Quy tắc:</b> chỉ tạo IG khi có điểm HOLD/RELEASE thật; KPI phải có ngưỡng số hoặc SLA, nguồn dữ liệu và trigger phản ứng khi lệch; không dùng câu chung chung kiểu “được kiểm soát tốt”.</div>
 <h3 class="h3">KPI vận hành</h3>
 <div class="metric-grid">
 <div class="metric-card"><div class="value">95%</div><div class="label">Tên KPI</div></div>
@@ -241,8 +246,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <li>Hành động cụ thể.</li>
 </ul>
 
-<div class="note-soft"><b>Quy tắc:</b> số bước flowchart phải khớp số heading bước chi tiết; bubble flowchart phải cùng palette với <code>proc-num</code> của bước tương ứng.</div>
-<div class="note-blue"><b>Phương pháp:</b> trước khi chốt số bước, phải đọc tài liệu cũ, nghiên cứu nguồn chính thức bên ngoài và xác định rõ các điểm bàn giao, revalidation, containment, restart.</div>
+<div class="note-soft"><b>Quy tắc:</b> số bước flowchart phải khớp số heading bước chi tiết; bubble flowchart phải cùng palette với <code>proc-num</code> của bước tương ứng; SOP sinh tự động nên gắn inline style cho từng bubble.</div>
+<div class="note-blue"><b>Phương pháp:</b> trước khi chốt số bước, phải đọc tài liệu cũ, nghiên cứu nguồn chính thức bên ngoài và xác định rõ các điểm bàn giao, revalidation, containment, restart. Không ép số bước cho đẹp bố cục.</div>
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 8 — NGOẠI LỆ, THAY ĐỔI & LÀM LẠI       -->

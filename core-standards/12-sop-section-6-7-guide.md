@@ -169,6 +169,45 @@ KPI của Section 6 không được viết kiểu mô tả chung chung. Mỗi KP
 
 Không copy số benchmark bên ngoài vào SOP nếu chưa chuyển hóa thành ngưỡng vận hành thực tế của HESEM.
 
+### 2.6C Công thức viết KPI
+
+Mỗi ô KPI nên đọc được theo một trong các mẫu sau:
+
+- `Metric + threshold + trigger`
+- `Metric + threshold + source + trigger`
+- `Threshold 1 + threshold 2 + zero-defect / zero-escape rule`
+
+Ví dụ đạt chuẩn:
+
+- `100% contract review hoàn tất trước commit; mismatch sau commit = 0; ACK thay đổi khách hàng <= 1 ngày làm việc.`
+- `Backup success >= 99%; restore test dữ liệu critical = 100% theo quý; failed restore không có action = 0.`
+- `100% tín hiệu out-of-control phản ứng trước lot kế tiếp hoặc <= 1 giờ; đặc tính trọng yếu giữ Cpk/Ppk >= 1.33 hoặc có reaction plan được duyệt.`
+
+Ví dụ không đạt chuẩn:
+
+- `Được kiểm soát tốt.`
+- `Đúng hạn và đủ hồ sơ.`
+- `Cải thiện liên tục.`
+
+### 2.6D Thư viện KPI khởi điểm theo family
+
+Các ngưỡng dưới đây là starting points thực chiến để viết SOP mới. Không copy mù quáng; phải điều chỉnh theo risk, customer requirement và năng lực HESEM.
+
+| Family | KPI khởi điểm thường dùng |
+|---|---|
+| Contract review / quotation | `ACK <= 1 ngày làm việc`, `mismatch sau commit = 0`, `100% review trước commit` |
+| Engineering release | `100% quyết định phát hành có approver + evidence`, `release sai revision = 0` |
+| Receiving / material readiness | `dock-to-ready critical <= 24 giờ`, `supplier document escape = 0`, `100% cert trước setup` |
+| Planning / dispatch | `schedule attainment >= 90%`, `0 job dừng vì thiếu readiness planning` |
+| Setup / first-piece / FAI | `first-piece pass >= 95%`, `100% mở sản lượng có sign-off + data đo bắt buộc` |
+| Production control / restart | `restart không re-authorization = 0`, `suspect range phải khoanh trước restart` |
+| Final release / shipping | `document accuracy >= 99.5%`, `thiếu chứng từ bắt buộc = 0`, `100% release map đúng lot/sản phẩm` |
+| Invoice / closeout | `first-time-right invoicing >= 98%`, `invoice <= 1 ngày làm việc sau ship release` |
+| Access control | `cấp/đổi/thu hồi quyền <= 1 ngày làm việc`, `orphan account = 0`, `privileged review = 100% theo quý` |
+| Backup / resilience | `backup success >= 99%`, `restore test = 100% theo chu kỳ`, `failed restore không có action = 0` |
+| Records / retention / disposal | `SoR/SSOT xác định = 100%`, `duplicate live record = 0`, `sanitization compliance = 100%` |
+| MSA / capability | `GRR < 10%` là tốt, `10–30%` chỉ dùng có điều kiện, `>30%` không chấp nhận nếu không có rationale; `Cpk/Ppk >= 1.33` là ngưỡng tham chiếu phổ biến |
+
 ### 2.7 KHÔNG được làm
 
 - ❌ Cố định 5 IG cho mọi SOP.
@@ -271,6 +310,19 @@ Section 7 gồm 2 phần:
 - Nên có cả hai lớp bảo vệ:
   - HTML sinh ra sẵn inline style cho bubble.
   - CSS toàn cục có fallback palette theo vị trí để file cũ hoặc file viết tay không mất màu.
+- Với SOP sinh tự động, nên sinh inline style đồng thời cho `flow-step`, `flow-num` và `flow-arrow`.
+- `.active` và `.critical` là lớp ngữ nghĩa bổ trợ; không được thay đổi số thứ tự hay phá vỡ mapping màu theo step index.
+- Khi dùng fallback palette trong CSS, phải nhớ `.flow-arrow` nằm xen giữa các `.flow-step`; selector phải map đúng vị trí child thực tế của `.flow-step`.
+
+### 3.5B Kiểm tra kỹ thuật tối thiểu cho flowchart
+
+Trước khi coi là đạt chuẩn, phải xác nhận đồng thời:
+
+1. `flow-num count = proc-num count`
+2. Các số bước tăng liên tục từ `1...n`
+3. Mỗi bước chi tiết có `h3` tương ứng
+4. Với SOP sinh tự động: mỗi `flow-num` có inline style
+5. Không có SOP nào rơi về một màu bubble duy nhất chỉ vì thiếu inline style hoặc thiếu fallback CSS
 
 ### 3.6 Khi nào phải tách thành bước mới
 
@@ -376,6 +428,7 @@ Mô hình này cho phép tách riêng:
 - [ ] Số IG do quy trình quyết định, không áp số cứng
 - [ ] Mỗi IG có owner, hold point, KPI/hồ sơ tối thiểu
 - [ ] Không dùng từ mơ hồ cho điều kiện mở cổng
+- [ ] KPI trong từng IG có số/SLA thật, không chỉ là câu mô tả
 
 ### 6.2 Section 7
 
@@ -384,6 +437,7 @@ Mô hình này cho phép tách riêng:
 - [ ] Detailed steps không bị ép bằng số IG
 - [ ] Có đủ bước cho setup, prove-out, first-piece, release, reaction, closeout khi SOP cần
 - [ ] Có handover rõ ở các điểm đổi vai trò
+- [ ] Bubble flowchart có màu đúng từng bước, không rơi về một màu mặc định
 
 ### 6.3 Logic tổng thể
 

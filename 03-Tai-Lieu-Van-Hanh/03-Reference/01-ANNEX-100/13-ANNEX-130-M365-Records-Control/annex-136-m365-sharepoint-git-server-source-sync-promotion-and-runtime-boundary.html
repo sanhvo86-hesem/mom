@@ -202,6 +202,41 @@
  </tbody>
  </table>
  </div>
+
+ <h3>8.1. Luồng sync chi tiết: Online form → SharePoint</h3>
+ <div class="step-box">
+ <p style="margin:0 0 8px;"><strong>Khi Người dùng submit form trực tuyến trên web portal, các bước sau phải được thực hiện tuần tự bởi server:</strong></p>
+ <table class="table">
+ <thead>
+ <tr><th>Bước</th><th>Hành động</th><th>Chi tiết kỹ thuật</th></tr>
+ </thead>
+ <tbody>
+ <tr><td><strong>1</strong></td><td>User submit form trên web portal</td><td>Request POST đến <span class="code">api.php</span> với payload form data đã validate phía client.</td></tr>
+ <tr><td><strong>2</strong></td><td>Server lưu JSON entry (primary storage)</td><td>Ghi vào <span class="code">qms-data/online-forms/entries/{form_code}.json</span>. Đây là bản gốc duy nhất trên server.</td></tr>
+ <tr><td><strong>3</strong></td><td>Server tạo PDF snapshot</td><td>Tên file bắt buộc: <span class="code">FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.pdf</span></td></tr>
+ <tr><td><strong>4</strong></td><td>Gán Record-ID (nếu cần)</td><td>Áp dụng cho NCR, CAPA, FAI và các loại hồ sơ yêu cầu mã định danh. Server gán từ atomic counter sử dụng <span class="code">LOCK_EX</span> để tránh trùng mã.</td></tr>
+ <tr><td><strong>5</strong></td><td>Sync structured data lên SharePoint List</td><td>Server gọi Microsoft Graph API để tạo/cập nhật item trong SharePoint List tương ứng. Dữ liệu structured phục vụ dashboard và báo cáo.</td></tr>
+ <tr><td><strong>6</strong></td><td>Upload PDF lên SharePoint Document Library</td><td>Server upload file PDF snapshot vào Document Library phù hợp theo file plan. PDF là evidence cho audit và retention.</td></tr>
+ <tr><td><strong>7</strong></td><td>Ghi allocation log</td><td>Mọi Record-ID đã cấp được log vào <span class="code">qms-data/counters/_allocation_log.jsonl</span> (append-only, không sửa/xóa).</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>8.2. Luồng dành cho Excel form (offline fill)</h3>
+ <div class="step-box">
+ <p style="margin:0 0 8px;"><strong>Khi hồ sơ yêu cầu điền Excel form ngoại tuyến, luồng bắt buộc như sau:</strong></p>
+ <table class="table">
+ <thead>
+ <tr><th>Bước</th><th>Hành động</th><th>Ghi chú</th></tr>
+ </thead>
+ <tbody>
+ <tr><td><strong>1</strong></td><td>User yêu cầu Record-ID qua portal</td><td>Chọn chức năng <em>"Xin mã hồ sơ mới"</em> trên portal. Server cấp mã từ atomic counter (<span class="code">LOCK_EX</span>) và ghi allocation log.</td></tr>
+ <tr><td><strong>2</strong></td><td>User tải blank form từ portal</td><td>Form được version-stamped (mã form, phiên bản, ngày phát hành) để đảm bảo đúng revision đang hiệu lực.</td></tr>
+ <tr><td><strong>3</strong></td><td>User điền Excel form tại máy cá nhân</td><td>Lưu file với đúng naming convention bắt buộc theo file plan.</td></tr>
+ <tr><td><strong>4</strong></td><td>User upload lên SharePoint</td><td>Validation script tại SharePoint kiểm tra naming convention, version stamp và metadata bắt buộc trước khi chấp nhận.</td></tr>
+ </tbody>
+ </table>
+ </div>
  </div>
 
  <div class="section">
@@ -226,7 +261,7 @@
  <tbody>
  <tr><td>SOP</td><td><a href="../../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td><td>Khóa document control, data governance và change/configuration control.</td></tr>
  <tr><td>WI</td><td><a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a> ; <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> ; <a href="../../../02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a></td><td>Tạo site/library/quyền, thao tác sync/deploy, và điều khiển online forms.</td></tr>
- <tr><td>ANNEX</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> ; <a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a> ; <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> ; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> ; <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> ; <a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-116-sharefile-sync.html">ANNEX-116</a></td><td>Khóa metadata, flow, topology, permissions, file plan và local sync constraints.</td></tr>
+ <tr><td>ANNEX</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> ; <a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a> ; <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> ; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> ; <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> ; <a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-116-sharefile-sync.html">ANNEX-116</a> ; <a href="annex-137-m365-records-online-form-sharepoint-sync-and-evidence-control.html">ANNEX-137</a></td><td>Khóa metadata, flow, topology, permissions, file plan, local sync constraints và online form sync/evidence control.</td></tr>
  </tbody>
  </table>
  </div>

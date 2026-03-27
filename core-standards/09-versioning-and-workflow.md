@@ -23,6 +23,13 @@
 - Mọi lần tăng số chính, số phụ về 0. Ví dụ: V1.3 -> V2.0.
 - KHÔNG dùng số âm, số thập phân nhiều cấp (V1.2.3), hoặc chữ cái (V1a).
 
+### 1.2A Quy tắc bắt buộc cho tài liệu chưa phát hành lần đầu
+
+- Khi tài liệu vẫn đang trong pha soạn thảo / chuẩn hóa nội bộ và chưa có quyết định phát hành lần đầu, header phiên bản luôn giữ `V0`.
+- Không được tự tăng lên `V1`, `V1.x`, `V2` chỉ vì đã sửa nhiều vòng draft.
+- Không đưa note kiểu `mới so với bản trước`, `bổ sung theo vòng review`, `khác bản cũ` vào thân SOP/WI/ANNEX khi tài liệu vẫn là bản nháp.
+- Nếu cần theo dõi tiến trình soạn thảo, ghi trong DCR, working note, review log hoặc commit log; không ghi trong body tài liệu vận hành.
+
 ### 1.3 Phân biệt cập nhật nhỏ và lớn
 
 | Cập nhật nhỏ (Minor — V1.x) | Cập nhật lớn (Major — V2.0+) |
@@ -189,6 +196,7 @@ Mọi tài liệu HTML có bảng revision history ở cuối trang, trong `<foo
 - Mô tả thay đổi cụ thể: ghi section nào, thay đổi gì. KHÔNG ghi "cập nhật nội dung".
 - Mọi dòng có số DCR tương ứng (trừ sửa lỗi chính tả nhỏ).
 - Giữ toàn bộ lịch sử, KHÔNG xóa dòng cũ.
+- Không hiển thị revision history để so sánh các bản nháp nội bộ trước phát hành đầu tiên. Với tài liệu còn `V0` và chưa issue, lịch sử draft nằm trong DCR / review log, không nằm trong thân SOP.
 
 ---
 

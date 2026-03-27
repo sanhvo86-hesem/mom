@@ -145,8 +145,22 @@
  <tr><td>DeployState</td><td>Trạng thái deploy</td><td>Lựa chọn</td><td>Theo deploy</td><td>Release manifest, server deploy register, point-of-use verification.</td></tr>
  <tr><td>ReverseSyncState</td><td>Trạng thái reverse sync</td><td>Lựa chọn</td><td>Theo reverse sync</td><td>Server hotfix intake, reverse-sync register, close-out log.</td></tr>
  <tr><td>SyncBoundaryClass</td><td>Lớp ranh giới sync</td><td>Lựa chọn</td><td>Theo source/runtime</td><td>Phân biệt controlled source, release evidence, runtime record, runtime noise và server-only secret.</td></tr>
+ <tr><td>UserID</td><td>Mã người tạo file</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Mã người tạo file (NVA, TBH, QC1...). Xem <span class="code">ANNEX-137</span> Section 6 cho danh sách UserID chuẩn.</td></tr>
+ <tr><td>HHMM</td><td>Giờ phút tạo file</td><td>Đơn lẻ dòng / chuyền</td><td>Theo hồ sơ</td><td>Giờ phút tạo file theo format 24h (VD: 0830, 1400). Dùng kết hợp với UserID trong quy ước đặt tên file.</td></tr>
+ <tr><td>NCR-Number / Record-Number</td><td>Mã hồ sơ hệ thống cấp</td><td>Đơn lẻ dòng / chuyền (indexed)</td><td>Theo hồ sơ</td><td>Record-ID do server cấp tự động (VD: NCR-2026-043). Dùng cho NCR, CAPA và các sổ đăng ký có số tự tăng.</td></tr>
  </tbody>
  </table>
+ </div>
+ <div class="keyline"><strong>Chuyển đổi quy ước đặt tên file (HHMM-UserID):</strong><br/>
+ Hệ thống đang chuyển từ quy ước cũ sang quy ước mới cho hậu tố tên file:<br/>
+ <ul style="margin:6px 0; padding-left:20px;">
+ <li><span class="code">_{seq}_{RoleCode}</span> (VD: <span class="code">_01_QC</span>) — <strong>DEPRECATED</strong> — không dùng cho file tạo mới.</li>
+ <li><span class="code">_{HHMM}-{UserID}</span> (VD: <span class="code">_0830-NVA</span>) — <strong>ACTIVE</strong> — quy ước chính thức, xem chi tiết tại <span class="code">ANNEX-137</span>.</li>
+ </ul>
+ File cũ theo pattern <span class="code">_{seq}_{RoleCode}</span> vẫn hợp lệ, không cần đổi tên. File mới tạo bắt buộc dùng <span class="code">_{HHMM}-{UserID}</span>.
+ </div>
+ <div class="keyline"><strong>Giới hạn độ sâu thư mục (max 3 cấp):</strong><br/>
+ Metadata là cơ chế khám phá / tìm kiếm chính, KHÔNG phải cấu trúc thư mục lồng sâu. Thư mục tối đa 3 cấp (VD: <span class="code">Zone / Year / SubFolder</span>). Mọi phân loại chi tiết hơn phải dùng metadata column thay vì tạo thêm cấp thư mục. Xem thêm <span class="code">core-standards/14</span> Rule 4.
  </div>
  </div>
 
@@ -269,6 +283,15 @@
  </tbody>
  </table>
  </div>
+ <h3>Tài liệu liên quan</h3>
+ <ul>
+ <li><span class="code">ANNEX-133</span> — Phân loại hệ thống M365</li>
+ <li><span class="code">ANNEX-134</span> — Cung cấp / cấp phát và điều phối</li>
+ <li><span class="code">ANNEX-135</span> — Record Series Catalog</li>
+ <li><span class="code">ANNEX-136</span> — Ranh giới sync</li>
+ <li><span class="code">ANNEX-137</span> — Quy ước đặt tên file, UserID registry và HHMM-UserID naming convention</li>
+ <li><span class="code">core-standards/14</span> — Rule 4: Giới hạn độ sâu thư mục</li>
+ </ul>
  </div>
 
  </div>

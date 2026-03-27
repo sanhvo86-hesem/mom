@@ -76,6 +76,16 @@ Nếu không có benchmark trực tiếp cho đúng tình huống, phải:
 2. ghi rõ đây là **mục tiêu nội bộ suy luận từ benchmark + risk level**,
 3. tránh ghi KPI kiểu chung chung không có số.
 
+### Bước 2B. Giữ benchmark rationale ở ngoài thân SOP
+
+Sau khi chốt benchmark, phải ghi rõ trong working note, script profile hoặc hồ sơ soạn thảo:
+- nguồn benchmark nào được dùng,
+- số nào là benchmark tham chiếu,
+- số nào là target nội bộ suy luận theo risk,
+- lý do siết chặt hoặc nới so với benchmark.
+
+Không đưa các ghi chú này vào thân SOP dưới dạng note biên tập.
+
 ### Bước 3. Chốt kiến trúc kiểm soát
 
 Trước khi viết Section 6, phải trả lời:
@@ -118,6 +128,7 @@ Chỉ sau khi hoàn tất bốn bước trên mới được viết lại.
   - điểm dừng bắt buộc,
   - KPI hoặc bằng chứng tối thiểu.
 - KPI của từng IG phải có ngưỡng số hoặc SLA, nguồn dữ liệu chuẩn và trigger phản ứng.
+- KPI phải đọc được theo logic điều hành thật, ví dụ: `100% ... trước ...`, `<= 24 giờ`, `= 0 escape`, `>= 99%`.
 
 ### 4.2 Section 7
 
@@ -130,6 +141,16 @@ Chỉ sau khi hoàn tất bốn bước trên mới được viết lại.
   - flowchart 7 bước nhưng chi tiết 10 bước,
   - flowchart 5 bước nhưng mô tả chi tiết 8 bước,
   - flowchart chỉ là phiên bản rút gọn không khớp nội dung thực thi.
+- Với SOP sinh tự động, cần kiểm thêm việc bubble flowchart mang đúng palette màu theo step index, không chỉ đúng số lượng.
+
+---
+
+## 5A. Quy tắc hygiene cho bản nháp trước phát hành
+
+- Tài liệu chưa phát hành chính thức lần đầu luôn giữ `V0`.
+- Không ghi trong body SOP các câu kiểu `bổ sung theo note`, `liên kết note`, `khác bản trước`, `điểm mới`, `quy tắc dùng thuật ngữ`.
+- Nếu cần lưu dấu vết soạn thảo, dùng DCR, review log, script output hoặc commit log.
+- Không giữ lại note benchmark, reasoning của AI hoặc comment biên tập trong body tài liệu vận hành.
 
 ---
 
@@ -195,6 +216,8 @@ Chỉ coi một SOP đã cập nhật xong khi trả lời được toàn bộ:
 8. Section 3 đã dùng mẫu `English (Việt)` chưa?
 9. Nội dung thân tài liệu đã ưu tiên dùng tiếng Việt chuẩn chưa?
 10. Đã thay đúng phần `p6→p7` và `p7→p8` mà không xóa nhầm section bên cạnh chưa?
+11. Đã quét sạch note biên tập và dấu vết “so với bản trước” khỏi body chưa?
+12. Với SOP sinh tự động, đã kiểm bubble màu flowchart và KPI numeric bằng script chưa?
 
 ---
 

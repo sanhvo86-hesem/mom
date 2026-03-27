@@ -40,7 +40,7 @@
  <div class="title"><strong>ANNEX-133 - M365 hồ sơ site cấu trúc liên kết, thư viện and thư mục bản thiết kế</strong></div>
  <div class="meta">
  <div class="row"><span><b>Code:</b></span><span>ANNEX-133</span></div>
- <div class="row"><span><b>Version:</b></span><span>V1</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V2</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
  <div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Quản trị viên</span></div>
  <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
@@ -54,7 +54,7 @@
  <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
  <p style="margin:8px 0;">ANNEX này khóa cấu trúc lưu trữ M365 cho toàn bộ HESEM ở ba lớp đồng thời: lớp công ty và QMS, lớp phòng ban và quá trình vận hành, và lớp hồ sơ cá nhân hoặc hồ sơ hệ thống có kiểm soát cao. Mọi hồ sơ phát sinh từ sổ tay phòng ban, SOP, WI, biểu mẫu sổ tay thực hành, dashboard control và quy trình làm việc phải có đúng một vị trí SSOT trong bản thiết kế này.</p>
  <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: không tồn tại hồ sơ chính thức nằm ngoài bản thiết kế; không có hai SSOT cho cùng một loại hồ sơ; mọi thư mục có owner rõ, quyền / sự cho phép ranh giới rõ, lưu giữ cơ sở rõ và rule đặt tên rõ.</div>
- <div class="keyline"><strong>Ranh giới tài liệu:</strong> ANNEX-133 là nguồn chuẩn cho <b>path, thư mục cây / sơ đồ cây, lưu giữ cơ sở và khu vực quyền</b>. Từ điển field/list nằm tại <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>. quyền / sự cho phép ranh giới theo vai trò nằm tại <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a>. Kiến trúc cung cấp / cấp phát/tự động hóa thực thi nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>. File plan chi tiết theo phòng ban, JD và job gate nằm tại <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>.</div>
+ <div class="keyline"><strong>Ranh giới tài liệu:</strong> ANNEX-133 là nguồn chuẩn cho <b>path, thư mục cây / sơ đồ cây, lưu giữ cơ sở và khu vực quyền</b>. Từ điển field/list nằm tại <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>. quyền / sự cho phép ranh giới theo vai trò nằm tại <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a>. Kiến trúc cung cấp / cấp phát/tự động hóa thực thi nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>. File plan chi tiết theo phòng ban, JD và job gate nằm tại <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>. Quy ước đặt tên evidence và records nằm tại <a href="annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a>.</div>
  </div>
 
  <div class="section">
@@ -151,7 +151,12 @@
  </tbody>
  </table>
  </div>
- <div class="keyline"><strong>Site cấu trúc liên kết bắt buộc:</strong> <span class="code">01-QMS-Hồ sơ</span>, <span class="code">02-Chất lượng-Hồ sơ</span>, <span class="code">03-Job-Hồ sơ</span>, <span class="code">04-Đào tạo-Hồ sơ</span>, <span class="code">05-Phòng ban-Hồ sơ</span>, <span class="code">06-Lưu trữ</span>, <span class="code">07-Mẫu-Làm việc</span> và <span class="code">Part-REV-Bản gốc</span> đặt trong site <span class="code">HESEM-QMS-Cốt lõi</span>. <span class="code">08-Con Người-Hồ sơ</span> đặt trong site <span class="code">HESEM-Con Người-Hạn chế</span>. <span class="code">09-Số hóa-System-Hồ sơ</span> và <span class="code">10-QMS-Source-Control</span> đặt trong site <span class="code">HESEM-Số hóa-Control</span>. Cơ chế cung cấp / cấp phát theo site và trình tự triển khai nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>; ranh giới source, Git và server runtime nằm tại <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>.</div>
+ <div class="keyline"><strong>Site cấu trúc liên kết bắt buộc (4-site topology):</strong><br/>
+ <b>SITE 1 — <span class="code">HESEM-Records</span></b>: <span class="code">Quality-Records</span>, <span class="code">QMS-Governance</span>, <span class="code">Training-Records</span>, <span class="code">Department-Ops</span> — hồ sơ vận hành chung (form đã điền, evidence không gắn job).<br/>
+ <b>SITE 2 — <span class="code">HESEM-Job-Evidence</span></b>: <span class="code">Part-REV-Master</span>, <span class="code">Job-Dossiers</span>, <span class="code">Customer-Received</span>, <span class="code">Tooling-Fixture-Gage</span> — job dossier, engineering baseline và IP khách hàng (NO external sharing).<br/>
+ <b>SITE 3 — <span class="code">HESEM-People</span></b>: <span class="code">Employee-Records</span>, <span class="code">HR-Operations</span> — HR restricted.<br/>
+ <b>SITE 4 — <span class="code">HESEM-Digital</span></b>: <span class="code">System-Records</span>, <span class="code">QMS-Source-Control</span> — source control (backup web portal) và IT governance.<br/>
+ Cơ chế cung cấp / cấp phát theo site và trình tự triển khai nằm tại <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>; ranh giới source, Git và server runtime nằm tại <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>.</div>
  </div>
 
  <div class="section">
@@ -534,6 +539,10 @@
  </table>
  </div>
  <div class="keyline"><strong>mẫu / quy luật file phát hành:</strong> <span class="code">REC-{DeptCode}-{YYYY}-{NNNN}-{Mô tả}.pdf</span>, <span class="code">{RecordType}-{JobNum}-{PartNo}-{Mô tả}.pdf</span>, <span class="code">Photos-{YYYYMMDD}-{JobNum}-{Mô tả}.jpg</span>.</div>
+ <div class="callout"><strong>PHÂN BIỆT RoleCode và UserID — hai hệ thống khác nhau, không được nhầm lẫn:</strong><br/>
+ <b>RoleCode</b> (ví dụ: <span class="code">ROLE-QAM</span>, <span class="code">ROLE-SET</span>, <span class="code">ROLE-CNC</span>) dùng cho <b>cấu trúc THƯ MỤC</b> — phân quyền theo vai trò, xác định ai truy cập thư mục nào (xem path <span class="code">06-Working-Transitory-and-Draft/ROLE-{RoleCode}/</span> tại mục 7).<br/>
+ <b>UserID</b> (ví dụ: <span class="code">NVA</span>, <span class="code">QC1</span>, <span class="code">TDH</span>) dùng cho <b>nhãn thời gian trong TÊN FILE</b> — xác định ai tạo hoặc ký hồ sơ (ví dụ: <span class="code">NCR-2026-043-NVA.pdf</span>).<br/>
+ RoleCode quản lý quyền truy cập thư mục; UserID ghi dấu cá nhân trên file. Không dùng UserID làm tên thư mục và không dùng RoleCode trong tên file.</div>
  </div>
 
  <div class="section">

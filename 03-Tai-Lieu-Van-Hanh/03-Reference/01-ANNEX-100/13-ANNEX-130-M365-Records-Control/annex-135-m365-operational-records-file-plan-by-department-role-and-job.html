@@ -590,7 +590,36 @@
  <div class="keyline"><strong>Rule source boundary:</strong> ranh giá»›i SharePoint source library, Git, server deployment, runtime exclusions vÃ  reverse-sync control thá»±c hiá»‡n theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> vÃ  <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a>.</div>
  </div>
 
+ 
  <div class="section">
+ <h2>9.2 Dual-location storage cho NCR / CAPA records</h2>
+ <div class="callout"><strong>NGUYÃN Táº®C DUAL-LOCATION</strong>: Khi má»t NCR ÄÆ°á»£c má» cho job, há» sÆ¡ ÄÆ°á»£c lÆ°u á» <b>HAI vá» trÃ­</b> (khÃ´ng duplicate file) â má»i vá» trÃ­ phá»¥c vá»¥ má»t gÃ³c truy váº¥n khÃ¡c nhau.</div>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr><th>Loáº¡i record</th><th>NÆ¡i lÆ°u (SharePoint path)</th><th>Má»¥c ÄÃ­ch truy váº¥n</th></tr>
+ </thead>
+ <tbody>
+ <tr><td>Master NCR record (FRM-631, root cause analysis, CAPA plan, closure evidence)</td><td><span class="path">HESEM-Records / Quality-Records / {YYYY} / NCR /</span></td><td>Auditor há»i âTáº¥t cáº£ NCR nÄm nayâ â tÃ¬m á» ÄÃ¢y</td></tr>
+ <tr><td>Job-specific evidence (rework, reinspection, customer deviation approval)</td><td><span class="path">HESEM-Job-Evidence / Job-Dossiers / {YYYY} / {JobNum}_{PartRev} / 09_NCR-CAPA-Deviation /</span></td><td>Auditor há»i âTáº¥t cáº£ deviation cho job nÃ yâ â tÃ¬m á» ÄÃ¢y</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <div class="keyline"><strong>Rule báº¯t buá»c:</strong> TUYá»T Äá»I KHÃNG copy file giá»¯a hai site. LiÃªn káº¿t qua metadata column <span class="code">NCR-Number</span>. Má»i file chá» tá»n táº¡i á» ÄÃºng má»t vá» trÃ­; vá» trÃ­ kia truy váº¥n thÃ´ng qua metadata filter hoáº·c cross-site search.</div>
+ </div>
+
+ <div class="section">
+ <h2>9.3 Giá»i háº¡n tá»i Äa 3 cáº¥p folder (max 3-level depth)</h2>
+ <div class="callout"><strong>QUY Táº®C 3-LEVEL</strong>: SharePoint folder nesting khÃ´ng ÄÆ°á»£c vÆ°á»£t quÃ¡ <b>3 cáº¥p</b> tÃ­nh tá»« library root. NgoÃ i 3 cáº¥p, dÃ¹ng metadata columns Äá» filter/group thay vÃ¬ táº¡o thÃªm subfolder.</div>
+ <p style="margin:8px 0;">VÃ­ dá»¥ ÄÃºng:</p>
+ <div class="figure-box">
+ <p style="margin:0;" class="path">Quality-Records / 2026 / NCR / â cáº¥p 3, flat files táº¡i ÄÃ¢y</p>
+ <p style="margin:4px 0 0;" class="muted">KhÃ´ng táº¡o subfolder per-NCR (NCR-001/, NCR-002/â¦). PhÃ¢n biá»t file báº±ng naming convention theo <a href="annex-137-m365-file-naming-convention.html">ANNEX-137</a>, khÃ´ng báº±ng subfolder.</p>
+ </div>
+ <div class="keyline"><strong>LÃ½ do:</strong> URL dÃ i gÃ¢y lá»i sync OneDrive, khÃ³ tÃ¬m file trong search, vÃ  vi pháº¡m SharePoint information architecture best practice. Metadata columns (RecordClass, NCR-Number, JobNumber) thay tháº¿ hoÃ n toÃ n vai trÃ² phÃ¢n loáº¡i cá»§a subfolder sÃ¢u.</div>
+ </div>
+
+<div class="section">
  <h2>10. TÃ i liá»‡u liÃªn quan</h2>
  <div class="table-card">
  <table class="table">
@@ -599,6 +628,7 @@
  </thead>
  <tbody>
  <tr><td>M365 records control</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a><br/><a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a><br/><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a><br/><a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a><br/><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td></tr>
+ <tr><td>Naming convention</td><td><a href="annex-137-m365-file-naming-convention.html">ANNEX-137</a></td></tr>
  <tr><td>SharePoint / thao tÃ¡c</td><td><a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a><br/><a href="../../../02-Work-Instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a><br/><a href="../../../02-Work-Instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a><br/><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a><br/><a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td></tr>
  <tr><td>Job records</td><td><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a><br/><a href="../../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td></tr>
  <tr><td>Data governance</td><td><a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td></tr>

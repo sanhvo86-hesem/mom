@@ -4,8 +4,10 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <!-- ⚠ THAY {{CODE}}, {{TITLE}}, {{SUBTITLE}}, {{OWNER}} bằng giá trị thật -->
+<!-- ⚠ Trước phát hành lần đầu: Version luôn là V0. Không tự tăng V1/V2 trong giai đoạn draft. -->
 <title>{{CODE}} — {{TITLE}} | HESEM QMS</title>
 <!-- ⚠ THAY {{RELATIVE_PATH}} bằng đường dẫn tương đối đến root (ví dụ: ../../..) -->
+<!-- ⚠ Khi tạo mới Section 6 / 7, đọc thêm core-standards/12, /13, /16 trước khi viết -->
 <link href="{{RELATIVE_PATH}}/assets/style.css" rel="stylesheet"/>
 <style>
 /* CSS riêng cho tài liệu này — thêm nếu cần */
@@ -205,7 +207,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="metric-grid">
 <div class="metric-card"><div class="value">{{GIÁ TRỊ}}</div><div class="label">{{TÊN KPI}}</div><div class="mini-note">{{MÔ TẢ}}</div></div>
 </div>
-<div class="note-soft"><b>Quy tắc:</b> KPI phải có ngưỡng số hoặc SLA, nguồn dữ liệu và trigger phản ứng; tránh viết KPI chung chung không đo được.</div>
+<div class="note-soft"><b>Quy tắc:</b> KPI phải có ngưỡng số hoặc SLA, nguồn dữ liệu và trigger phản ứng; tránh viết KPI chung chung không đo được. Nếu benchmark lấy từ nguồn ngoài, chỉ chuyển hóa thành target vận hành, không chép note benchmark vào body SOP.</div>
 
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 7 — Quy trình chi tiết                                -->
@@ -217,6 +219,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="flow-arrow" style="color:rgba(25,118,210,0.45)">→</div>
 <div class="flow-step active" style="border-color:rgba(5,150,105,0.28);background:linear-gradient(135deg,rgba(5,150,105,0.10) 0%, rgba(255,255,255,0.98) 64%);"><div class="flow-num" style="background:linear-gradient(135deg,#059669,#10b981)">2</div><div class="flow-text"><div class="flow-title">{{TÊN BƯỚC 2}}</div></div></div>
 </div>
+<!-- ⚠ Khi thêm/xóa bước: luôn cập nhật đồng thời flowchart, proc-num headings và màu tương ứng -->
+<!-- ⚠ Với file sinh tự động: giữ inline style cho flow-step/flow-num/flow-arrow để không rơi về một màu -->
 
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span> {{TÊN BƯỚC 1}}</h3>
 <p>{{MÔ TẢ TỔNG QUAN}}</p>
@@ -235,7 +239,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ul>
 
 <!-- Lặp lại cho mỗi bước chi tiết, KHÔNG buộc theo số IG -->
-<div class="note-blue"><b>Phương pháp bắt buộc:</b> chốt số bước sau khi đã đọc tài liệu cũ, nghiên cứu nguồn chính thức bên ngoài và xác định các điểm bàn giao, revalidation, restart và containment thực tế của SOP đó.</div>
+<div class="note-blue"><b>Phương pháp bắt buộc:</b> chốt số bước sau khi đã đọc tài liệu cũ, nghiên cứu nguồn chính thức bên ngoài và xác định các điểm bàn giao, revalidation, restart và containment thực tế của SOP đó. Không để note biên tập, note khác biệt bản cũ hay note quy tắc thuật ngữ trong body SOP.</div>
 
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 8 — Ngoại lệ, thay đổi & làm lại                    -->

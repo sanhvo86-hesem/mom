@@ -1,5 +1,5 @@
 ﻿HESEM QMS - SharePoint 4-Site Folder Template
-Generated: 2026-03-27 15:39:51
+Generated: 2026-03-27 16:01:45
 Year: 2026
 
 Architecture: core-standards/14-m365-sharepoint-architecture.md
