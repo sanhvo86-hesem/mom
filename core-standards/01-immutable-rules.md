@@ -97,13 +97,14 @@ Các tên sau là **danh từ riêng của hệ thống** (SharePoint, Epicor, M
 
 #### B3.1 Tên SharePoint Site — giữ nguyên 100%
 
-| Tên site | Chủ sở hữu | Ghi chú |
+| Tên site | Chủ sở hữu | Mục đích |
 |----------|------------|---------|
-| `HESEM-QMS-Cốt lõi` | `QMS-Chủ sở hữu` | Site lõi QMS |
-| `HESEM-Con người-Hạn chế` | `QMS-Chủ sở hữu` | Site quản lý nhân sự |
-| `HESEM-Số hóa-Control` | `QMS-Chủ sở hữu` | Site số hóa |
+| `HESEM-Records` | `QMS-Owner` | Hồ sơ vận hành: Quality, QMS Governance, Training, Department |
+| `HESEM-Job-Evidence` | `QMS-Owner` | Job dossier + Part baseline + IP khách hàng (isolated) |
+| `HESEM-People` | `QMS-Owner` | HR restricted |
+| `HESEM-Digital` | `QMS-Owner` | Source control (backup web) + IT governance |
 
-**Quy tắc:** Tên site, tên thư viện, tên danh sách SharePoint là danh từ riêng — **KHÔNG** dịch, **KHÔNG** chỉnh sửa bất kỳ ký tự nào.
+**Quy tắc:** Tên site, tên thư viện, tên danh sách SharePoint là danh từ riêng — **KHÔNG** dịch, **KHÔNG** chỉnh sửa bất kỳ ký tự nào. Chi tiết kiến trúc: xem `core-standards/14-m365-sharepoint-architecture.md`.
 
 #### B3.2 Tên cột nội bộ (Internal Column Names) — giữ nguyên 100%
 
@@ -131,15 +132,18 @@ Các tên cột sau là định danh kỹ thuật trong M365 Lists / Epicor. **K
 
 | Tên tiếng Anh | Mô tả |
 |---------------|--------|
-| `QMS Library / SSOT` | Thư viện QMS chính |
-| `QMS Change Folder` | Thư mục thay đổi |
-| `QMS Release Folder` | Thư mục phát hành |
-| `Department Folder / SSOT` | Thư mục bộ phận |
-| `QMS Review Folder` | Thư mục rà soát |
+| `Quality-Records` | Library hồ sơ chất lượng (site HESEM-Records) |
+| `QMS-Governance` | Library hồ sơ quản trị QMS (site HESEM-Records) |
+| `Training-Records` | Library hồ sơ đào tạo (site HESEM-Records) |
+| `Department-Ops` | Library hồ sơ phòng ban (site HESEM-Records) |
+| `Part-REV-Master` | Library engineering baseline (site HESEM-Job-Evidence) |
+| `Job-Dossiers` | Library hồ sơ job (site HESEM-Job-Evidence) |
+| `Customer-Received` | Library tài liệu khách hàng (site HESEM-Job-Evidence) |
+| `Tooling-Fixture-Gage` | Library tài sản (site HESEM-Job-Evidence) |
+| `QMS-Source-Control` | Library backup web portal (site HESEM-Digital) |
 | `Point-of-use` / `Point-of-use Control` | Điểm sử dụng |
 | `Document Library` | Thư viện tài liệu |
 | `Record Library` | Thư viện hồ sơ |
-| `Job Folder` | Thư mục Job |
 
 **Quy tắc:** Tên nơi lưu trữ là danh từ riêng M365/SharePoint — dịch sẽ gây nhầm lẫn khi tham chiếu.
 
@@ -359,5 +363,26 @@ Trước khi hoàn thành bất kỳ tài liệu nào, kiểm tra:
 
 ---
 
-> **Cập nhật lần cuối:** 2026-03-24
+## G. Quy tắc đặt tên hồ sơ vận hành — IMMUTABLE
+
+### G1. Hồ sơ vận hành (form đã điền, evidence) PHẢI tuân theo 6 naming patterns
+
+Chi tiết đầy đủ: xem `15-evidence-and-records-naming.md`. Tóm tắt:
+
+| # | Quy tắc | Vi phạm = |
+|---|---------|----------|
+| 1 | Filled form PHẢI có `V{ver}` trong tên (version form blank đã dùng) | REJECT upload |
+| 2 | Mọi file PHẢI có `{YYYYMMDD}` trong tên | REJECT upload |
+| 3 | Mọi file PHẢI có `{HHMM}-{UserID}` để tránh trùng tên khi nhiều người upload cùng lúc | REJECT upload |
+| 4 | Engineering baseline PHẢI có `V{ver}` và chỉ 1 người release (approval gate FRM-306) | REJECT release |
+| 5 | Formal records (NCR, CAPA, FAI, Audit...) PHẢI có Record-ID từ server atomic counter | REJECT submit |
+| 6 | KHÔNG file nào được lưu lên SharePoint với tên có dấu cách hoặc ký tự đặc biệt | REJECT upload |
+
+### G2. UserID PHẢI đăng ký duy nhất
+
+Mỗi nhân viên được gán 1 UserID 3-4 ký tự (VD: NVA, TBH, LMC), đăng ký trong SharePoint List `Employee-Registry`. UserID KHÔNG thay đổi khi đổi phòng/chức vụ, KHÔNG tái sử dụng sau khi nghỉ việc.
+
+---
+
+> **Cập nhật lần cuối:** 2026-03-27
 > **Áp dụng:** Toàn bộ tài liệu QMS — HESEM ENGINEERING

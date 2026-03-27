@@ -171,9 +171,10 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="table-card"><table class="table">
 <thead><tr><th>Thuật ngữ / nguyên tắc</th><th>Quy định sử dụng</th></tr></thead>
 <tbody>
-<tr><td><b>Thuật ngữ A</b></td><td>Giải thích.</td></tr>
+<tr><td><b>Traceability (truy xuất nguồn gốc)</b></td><td>Định nghĩa bằng tiếng Việt chuẩn, sau đó thân tài liệu ưu tiên dùng “truy xuất nguồn gốc”.</td></tr>
 </tbody>
 </table></div>
+<div class="note-soft"><b>Quy tắc:</b> cột tên thuật ngữ phải viết theo mẫu <code>English term (thuật ngữ tiếng Việt chuẩn)</code>; thân tài liệu ưu tiên dùng bản tiếng Việt đã chốt.</div>
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 4 — VAI TRÒ, QUYỀN HẠN & RACI          -->
@@ -212,6 +213,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </tbody>
 </table></div>
 <!-- Dùng metric-grid cho KPI -->
+<div class="note-soft"><b>Quy tắc:</b> chỉ tạo IG khi có điểm HOLD/RELEASE thật; KPI phải đo được hiệu lực của từng cổng, không phải chỉ để đủ form.</div>
 <h3 class="h3">KPI vận hành</h3>
 <div class="metric-grid">
 <div class="metric-card"><div class="value">95%</div><div class="label">Tên KPI</div></div>
@@ -241,6 +243,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ul>
 
 <div class="note-soft"><b>Quy tắc:</b> số bước flowchart phải khớp số heading bước chi tiết, nhưng không bị buộc bằng số IG của Section 6.</div>
+<div class="note-blue"><b>Phương pháp:</b> trước khi chốt số bước, phải đọc tài liệu cũ, nghiên cứu nguồn chính thức bên ngoài và xác định rõ các điểm bàn giao, revalidation, containment, restart.</div>
 
 <!-- ══════════════════════════════════════════════ -->
 <!-- MỤC 8 — NGOẠI LỆ, THAY ĐỔI & LÀM LẠI       -->

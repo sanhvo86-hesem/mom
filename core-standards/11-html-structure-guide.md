@@ -262,6 +262,8 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - Mỗi IG PHẢI có: Mô tả, Chủ trì, Điểm dừng bắt buộc, KPI đo được
 - Số IG **KHÔNG cần** khớp với số bước Section 7
 - Sau table: metric-card grid hiển thị KPI trực quan (tùy chọn)
+- Khi thay nội dung, chỉ thay phần nằm giữa `p6` và `p7`
+- Nội dung phải bám tài liệu cũ + research theo `13-sop-research-redraft-method.md`
 
 ```html
 <!-- Section 6: IG Table -->
@@ -308,6 +310,8 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - Flowchart PHẢI khớp đúng số bước h3 bên dưới
 - Số bước Section 7 **KHÔNG bị giới hạn** bởi số IG của Section 6
 - Mỗi bước balloon có **màu xoay** (rotating colors) — KHÔNG cố định 1 màu
+- Khi thay nội dung, chỉ thay phần nằm giữa `p7` và `p8`
+- Số bước phải được chốt theo logic bàn giao và risk window của SOP đó, không theo template đẹp
 
 **Phần 1: Flowchart**
 ```html
@@ -436,6 +440,7 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 - [ ] Nội dung bước chi tiết: giải thích WHO/WHAT/WHEN/HOW ?
 - [ ] Có callout "Điểm dừng bắt buộc" tại các bước quan trọng ?
 - [ ] Có "Bàn giao" cuối mỗi bước ?
+- [ ] Đã kiểm tra không xóa nhầm `p6`, `p7`, `p8` khi thay section ?
 
 ### 5.5 Khi cập nhật nội dung
 - [ ] Kiểm tra lại đánh số IG1→IGn (có bị lệch không) ?

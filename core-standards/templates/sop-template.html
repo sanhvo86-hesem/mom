@@ -88,7 +88,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="card-title">Lệnh điều hành</div>
 <p>{{MÔ TẢ NGẮN VỀ MỤC TIÊU ĐIỀU HÀNH CỦA SOP NÀY}}</p>
 <div class="legend-row">
-<span class="chip">Cổng kiểm soát: IG1 → IGn (không giới hạn)</span>
+<span class="chip">Cổng kiểm soát: IG1 → IGn (không cố định, chốt theo SOP)</span>
 <span class="chip">Biểu mẫu bắt buộc: {{DANH SÁCH FRM}}</span>
 <span class="chip">Tham chiếu: {{DANH SÁCH ANNEX}}</span>
 <span class="chip">SOP liên đới: {{DANH SÁCH SOP}}</span>
@@ -148,10 +148,11 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <colgroup><col style="width:30%"/><col style="width:70%"/></colgroup>
 <thead><tr><th>Thuật ngữ / nguyên tắc</th><th>Quy định sử dụng</th></tr></thead>
 <tbody>
-<tr><td><b>{{THUẬT NGỮ 1}}</b></td><td>{{ĐỊNH NGHĨA / QUY ĐỊNH}}</td></tr>
+<tr><td><b>{{ENGLISH TERM (VIỆT CHUẨN)}}</b></td><td>{{ĐỊNH NGHĨA / QUY ĐỊNH. THÂN TÀI LIỆU ƯU TIÊN DÙNG BẢN TIẾNG VIỆT}}</td></tr>
 </tbody>
 </table>
 </div>
+<div class="note-soft"><b>Quy tắc:</b> cột tên thuật ngữ phải viết theo mẫu <code>English term (thuật ngữ tiếng Việt chuẩn)</code>. Trong thân tài liệu, ưu tiên dùng bản tiếng Việt.</div>
 
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 4 — Vai trò, quyền hạn & RACI                        -->
@@ -205,6 +206,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="metric-grid">
 <div class="metric-card"><div class="value">{{GIÁ TRỊ}}</div><div class="label">{{TÊN KPI}}</div><div class="mini-note">{{MÔ TẢ}}</div></div>
 </div>
+<div class="note-soft"><b>Quy tắc:</b> KPI phải gắn với hiệu lực mở cổng, ví dụ đúng ngay lần đầu, thời gian phản ứng, tính đầy đủ hồ sơ, tỷ lệ containment hoặc năng lực quá trình.</div>
 
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 7 — Quy trình chi tiết                                -->
@@ -234,6 +236,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </ul>
 
 <!-- Lặp lại cho mỗi bước chi tiết, KHÔNG buộc theo số IG -->
+<div class="note-blue"><b>Phương pháp bắt buộc:</b> chốt số bước sau khi đã đọc tài liệu cũ, nghiên cứu nguồn chính thức bên ngoài và xác định các điểm bàn giao, revalidation, restart và containment thực tế của SOP đó.</div>
 
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 8 — Ngoại lệ, thay đổi & làm lại                    -->

@@ -95,16 +95,18 @@ Mô hình `5 gates = 5 steps` chỉ phù hợp cho:
 
 Nó **không đủ sâu** để điều hành job-order CNC thực chiến.
 
-### 4.2 Mô hình mặc định khuyến nghị
+### 4.2 Mô hình tham chiếu khuyến nghị
 
 Đối với SOP job-order CNC có liên quan Engineering, Planning, Setup, QC, Machining, Shipping:
 
-- **Internal Gates khuyến nghị:** `7`
-- **Detailed Procedure Steps khuyến nghị:** `12`
+- **Internal Gates thường rơi vào:** `6–8`
+- **Detailed Procedure Steps thường rơi vào:** `9–13`
+
+`7 IG / 12 bước` chỉ là **một mẫu tham chiếu mạnh**, không phải luật cố định cho mọi SOP.
 
 ---
 
-## 5. Mô hình 7 Internal Gates khuyến nghị
+## 5. Một mẫu 7 Internal Gates khuyến nghị
 
 | IG | Tên cổng | Mục tiêu |
 |---|---|---|
@@ -118,7 +120,7 @@ Nó **không đủ sâu** để điều hành job-order CNC thực chiến.
 
 ---
 
-## 6. Mô hình 12 bước chi tiết khuyến nghị
+## 6. Một mẫu 12 bước chi tiết khuyến nghị
 
 | Bước | Tên bước | Vì sao phải tách riêng |
 |---|---|---|
@@ -137,7 +139,7 @@ Nó **không đủ sâu** để điều hành job-order CNC thực chiến.
 
 ---
 
-## 7. Mapping 7 IG ↔ 12 bước
+## 7. Mapping của mẫu 7 IG ↔ 12 bước
 
 | IG | Các bước chi tiết thường nằm dưới cổng |
 |---|---|
@@ -166,6 +168,12 @@ Nó **không đủ sâu** để điều hành job-order CNC thực chiến.
 | Quality gating / FAI / NCR reaction | 5–7 | 9–13 |
 | Final inspection / shipment / closeout | 4–6 | 8–10 |
 
+### 8.1 Quy tắc quyết định cuối cùng
+
+- Chọn số IG theo số điểm `HOLD / RELEASE` thật sự.
+- Chọn số bước theo số lần đổi vai trò, đổi resource, đổi trạng thái hệ thống, revalidation và bàn giao.
+- Nếu tài liệu cũ có logic vận hành tốt hơn mẫu tham chiếu, giữ logic cũ rồi chuẩn hóa lại cấu trúc.
+
 ---
 
 ## 9. Anti-patterns phải chặn
@@ -189,4 +197,3 @@ Nó **không đủ sâu** để điều hành job-order CNC thực chiến.
 - [ERPNext - Work Order](https://docs.frappe.io/erpnext/user/manual/en/work-order)
 - [ERPNext - Job Card](https://docs.frappe.io/erpnext/user/manual/en/job-card)
 - [ERPNext - Quality Inspection](https://docs.frappe.io/erpnext/user/manual/en/quality-inspection)
-

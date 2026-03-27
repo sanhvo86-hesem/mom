@@ -26,6 +26,8 @@ Section 6 và Section 7 phục vụ **hai câu hỏi khác nhau**:
    - 6 IG và 12 bước
    - 7 IG và 10 bước
    - 8 IG và 14 bước
+6. Không được chốt số IG hoặc số bước trước khi đọc tài liệu cũ và đối chiếu nguồn chính thức bên ngoài.
+7. Việc viết lại Section 6 và Section 7 PHẢI tuân theo `13-sop-research-redraft-method.md`.
 
 ### 1.2 Khi nào 5 bước là sai
 
@@ -125,6 +127,13 @@ Section 6 **PHẢI** dùng **TABLE**, không dùng `gate-card`, không dùng `ga
 </table></div>
 ```
 
+### 2.5A Quy tắc thay section an toàn
+
+- Khi cập nhật Section 6, chỉ thay phần nội dung nằm giữa `p6` và `p7`.
+- Không được xóa nhầm heading `p6`.
+- Không được xóa nhầm heading `p7`.
+- Nếu SOP cũ có logic gate hữu ích, phải giữ lại tư duy vận hành đúng rồi mới chuẩn hóa cấu trúc bảng.
+
 ### 2.6 Quy tắc viết nội dung IG
 
 | Thành phần | Yêu cầu |
@@ -135,6 +144,16 @@ Section 6 **PHẢI** dùng **TABLE**, không dùng `gate-card`, không dùng `ga
 | Điểm dừng | Cụ thể, đo được, có thể audit |
 | KPI | Có target số hoặc trạng thái đóng/mở |
 | Hồ sơ | Chỉ nêu hồ sơ tối thiểu cần có để mở cổng |
+
+### 2.6A KPI thực chiến
+
+KPI của từng IG nên rơi vào một hoặc nhiều nhóm sau:
+
+- `Đúng ngay lần đầu` như `% receipt accepted without re-open`, `% setup release first-pass`.
+- `Tốc độ phản ứng` như `≤ 30 phút`, `≤ 1 ca`, `≤ 24 giờ`.
+- `Tính đầy đủ bằng chứng` như `100% hồ sơ đủ trường bắt buộc`, `0 lot không truy được`.
+- `Hiệu lực containment` như `% suspect range được khoanh trong 1 giờ`.
+- `Tính ổn định` như `Cpk tối thiểu`, `% on-time calibration`, `% action đóng đúng hạn`.
 
 ### 2.7 KHÔNG được làm
 
@@ -215,6 +234,13 @@ Section 7 gồm 2 phần:
 <div class="role-note"><b>Bàn giao bắt buộc:</b> ai giao gì cho ai.</div>
 ```
 
+### 3.4A Quy tắc thay section an toàn
+
+- Khi cập nhật Section 7, chỉ thay phần nội dung nằm giữa `p7` và `p8`.
+- Không được xóa nhầm heading `p7`.
+- Không được xóa nhầm heading `p8`.
+- Nếu flow cũ và detailed steps cũ không còn phản ánh vận hành thật, phải xóa toàn bộ phần giữa `p7 → p8` và viết lại hoàn toàn.
+
 ### 3.5 Cặp duy nhất phải khớp
 
 | Phần | Quy tắc |
@@ -234,6 +260,7 @@ Phải tách thành bước riêng nếu có một trong các dấu hiệu sau:
 4. Bắt đầu hoặc kết thúc một kiểm soát chất lượng riêng.
 5. Có handover thực sự giữa các bên.
 6. Có điểm `HOLD / review / approval / revalidation`.
+7. Có risk window cần xác định `last-known-good` hoặc `suspect range`.
 
 ### 3.7 KHÔNG được làm
 
@@ -258,6 +285,7 @@ Vì vậy:
 
 - một IG có thể bao trùm nhiều bước,
 - nhiều bước có thể cùng đi tới một IG,
+- một SOP vẫn có thể dùng ít IG nhưng nhiều bước chi tiết nếu quy trình có nhiều bàn giao nội bộ,
 - chỉ khi quy trình thật sự rất ngắn thì số IG và số bước mới vô tình bằng nhau.
 
 ### 4.2 Ví dụ mapping tốt
@@ -361,4 +389,3 @@ Từ ngày **2026-03-27**, core standard của HESEM áp dụng rõ ràng như s
 - **Không giới hạn số bước quy trình chi tiết.**
 - **Nghiêm cấm ép cơ học số IG bằng số bước chi tiết.**
 - **SOP CNC job-order phải được mô hình hóa theo thực tế vận hành, không theo bố cục hình thức.**
-
