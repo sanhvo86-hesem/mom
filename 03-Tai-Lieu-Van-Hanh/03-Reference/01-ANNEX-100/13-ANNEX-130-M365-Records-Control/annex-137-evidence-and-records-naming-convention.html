@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ANNEX-137 - Quy tắc đặt tên hồ sơ, evidence và form đã điền | HESEM QMS</title>
+<link rel="stylesheet" href="../../../../assets/style.css"/>
+<style>
+.page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
+.page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color:var(--navy);}
+.page-body h3 {font-size:14px; line-height:1.5; margin:12px 0 6px; color:var(--ink);}
+code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.pattern-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#f8fafc; margin:12px 0; font-family:var(--mono); font-size:13px;}
+.muted {color:var(--ink2); font-size:12px;}
+.section ul {margin:8px 0; padding-left:20px;}
+.section ol {margin:8px 0; padding-left:20px;}
+@media (max-width: 960px) {
+ .page-body {padding:24px 18px 36px;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+ <div class="page">
+ <div class="page-body">
+
+<div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+ <div class="fh-company">
+ <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Annex số hóa</span>
+ </div>
+ </div>
+ <div class="title"><strong>ANNEX-137 - Quy tắc đặt tên hồ sơ, evidence và form đã điền</strong><br/><span class="muted">Evidence and Records Naming Convention</span></div>
+ <div class="meta">
+ <div class="row"><span><b>Code:</b></span><span>ANNEX-137</span></div>
+ <div class="row"><span><b>Version:</b></span><span>V1</span></div>
+ <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Administrator</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám Đốc</span></div>
+ </div>
+</div>
+
+ <div class="note"><strong>ÁP DỤNG CHO</strong><br/>Mọi file lưu lên SharePoint: form đã điền, evidence sản xuất, engineering baseline, hồ sơ đào tạo, audit, calibration và tài sản. Naming convention thống nhất đảm bảo traceability theo AS9100 &sect;8.5.2 và record control theo ISO 9001 &sect;7.5.3. Tài liệu này là SSOT cho quy tắc đặt tên file trong toàn bộ hệ thống HESEM QMS.</div>
+ <h1>ANNEX-137 - Quy tắc đặt tên hồ sơ, evidence và form đã điền</h1>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 1 — PHẠM VI VÀ MỤC ĐÍCH
+     ═══════════════════════════════════════════════════════════════ -->
+ <div class="section">
+ <h2>1. Phạm vi và mục đích</h2>
+ <p>ANNEX-137 quy định naming convention thống nhất cho <strong>MỌI file</strong> lưu lên SharePoint trong hệ thống HESEM QMS. Quy tắc đặt tên đảm bảo:</p>
+ <ul>
+ <li><strong>Traceability</strong> theo AS9100 &sect;8.5.2 &mdash; mỗi file có thể truy vết ngược về job, scope, người tạo, thời điểm tạo.</li>
+ <li><strong>Record control</strong> theo ISO 9001 &sect;7.5.3 &mdash; nhận dạng, lưu trữ, bảo vệ, truy xuất, thời hạn giữ và hủy.</li>
+ <li><strong>Sort &amp; search</strong> &mdash; tên file sort theo thời gian tự nhiên, search bằng keyword trong SharePoint trả kết quả chính xác.</li>
+ <li><strong>Audit readiness</strong> &mdash; đạt 60-second traceability test (xem Section 10).</li>
+ </ul>
+ <p><strong>Phạm vi áp dụng:</strong> Toàn bộ nhân viên HESEM, nhà thầu phụ, và bất kỳ ai upload file lên hệ thống SharePoint của HESEM. Áp dụng cho tất cả các loại file: form đã điền, evidence sản xuất, engineering baseline, hồ sơ đào tạo, audit evidence, calibration certificate, supplier records, và asset records.</p>
+ </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 2 — QUY TẮC CHUNG
+     ═══════════════════════════════════════════════════════════════ -->
+ <div class="section">
+ <h2>2. Quy tắc chung (áp dụng MỌI file)</h2>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>#</th>
+ <th>Quy tắc</th>
+ <th>Chi tiết</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td>1</td><td>English only</td><td>Không dấu tiếng Việt, không Unicode ngoài ASCII</td></tr>
+ <tr><td>2</td><td>Ký tự cho phép</td><td><code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, hyphen (<code>-</code>), underscore (<code>_</code>), dot (<code>.</code>)</td></tr>
+ <tr><td>3</td><td>Phân cách segment</td><td>Underscore (<code>_</code>)</td></tr>
+ <tr><td>4</td><td>Phân cách từ trong segment</td><td>Hyphen (<code>-</code>)</td></tr>
+ <tr><td>5</td><td>Date format</td><td><code>YYYYMMDD</code> (compact, sort tốt)</td></tr>
+ <tr><td>6</td><td>Time format</td><td><code>HHMM</code> (24h format)</td></tr>
+ <tr><td>7</td><td>Tên file tối đa</td><td>120 ký tự (bao gồm extension)</td></tr>
+ <tr><td>8</td><td>KHÔNG được dùng</td><td>Dấu cách, dấu ngoặc <code>( ) [ ] { }</code>, ký tự đặc biệt <code>! @ # $ % ^ &amp; * + =</code></td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 3 — SÁU NAMING PATTERNS
+     ═══════════════════════════════════════════════════════════════ -->
+ <div class="section">
+ <h2>3. Sáu naming patterns</h2>
+
+ <!-- PATTERN 1 -->
+ <h3>3.1 Pattern 1 &mdash; Form đã điền (Filled Form Record)</h3>
+ <div class="pattern-box">FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Segment</th>
+ <th>Bắt buộc</th>
+ <th>Mô tả</th>
+ <th>Ví dụ</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>FRM-{code}</code></td><td>Luôn</td><td>Mã form theo registry</td><td>FRM-631</td></tr>
+ <tr><td><code>V{ver}</code></td><td>Luôn</td><td>Version form blank đã dùng</td><td>V2.1</td></tr>
+ <tr><td><code>{scope}</code></td><td>Luôn</td><td>Phạm vi (xem bảng Scope Code &mdash; Section 5)</td><td>JOB-2026-0042</td></tr>
+ <tr><td><code>{YYYYMMDD}</code></td><td>Luôn</td><td>Ngày điền/hoàn thành</td><td>20260327</td></tr>
+ <tr><td><code>{HHMM}-{UserID}</code></td><td>Luôn</td><td>Giờ phút + mã người điền</td><td>0830-NVA</td></tr>
+ <tr><td><code>.{ext}</code></td><td>Luôn</td><td>.xlsx hoặc .pdf (online auto)</td><td>.xlsx</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <p><strong>Ví dụ thực tế:</strong></p>
+ <div class="pattern-box">FRM-631_V2.1_NCR-2026-043_20260327_0830-NVA.xlsx<br/>FRM-631_V2.1_NCR-2026-043_20260327_0830-NVA.pdf<br/>FRM-302_V3.2_JOB-2026-0042-OP10_20260327_0900-SET1.xlsx<br/>FRM-641_V1.0_CAPA-2026-008_20260327_1400-QA1.xlsx<br/>FRM-601_V2.0_CAL-MICR-005_20260327_0800-QC1.xlsx<br/>FRM-802_V1.1_TRN-2026-015_20260327_1330-HR1.xlsx<br/>FRM-911_V1.0_MR-2026-Q1_20260327_0900-QMS1.xlsx<br/>FRM-504_V1.0_PRO-SHIFT-A_20260327_0600-SL1.pdf</div>
+
+ <!-- PATTERN 2 -->
+ <h3>3.2 Pattern 2 &mdash; Evidence gắn Job (Job Evidence)</h3>
+ <div class="pattern-box">{RecordType}_{JobNum}_{PartRev}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Segment</th>
+ <th>Bắt buộc</th>
+ <th>Mô tả</th>
+ <th>Ví dụ</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>{RecordType}</code></td><td>Luôn</td><td>Mã loại hồ sơ (xem Section 4)</td><td>CMM</td></tr>
+ <tr><td><code>{JobNum}</code></td><td>Luôn</td><td>Mã job order</td><td>JOB-2026-0042</td></tr>
+ <tr><td><code>{PartRev}</code></td><td>Luôn</td><td>Part number + revision + operation (nếu cần)</td><td>714XXXX-REVA-OP10</td></tr>
+ <tr><td><code>{YYYYMMDD}</code></td><td>Luôn</td><td>Ngày tạo evidence</td><td>20260327</td></tr>
+ <tr><td><code>{HHMM}-{UserID}</code></td><td>Luôn</td><td>Giờ phút + mã người tạo</td><td>0900-QC1</td></tr>
+ <tr><td><code>.{ext}</code></td><td>Luôn</td><td>Extension gốc</td><td>.csv</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <p><strong>Ví dụ thực tế:</strong></p>
+ <div class="pattern-box">PHOTO-SETUP_JOB-2026-0042_714XXXX-REVA-OP10_20260327_0830-SET1.jpg<br/>CMM_JOB-2026-0042_714XXXX-REVA-OP10_20260327_0900-QC1.csv<br/>MTR_JOB-2026-0042_714XXXX-REVA_20260327_0800-SCM1.pdf<br/>COC_JOB-2026-0042_714XXXX-REVA_20260328_1500-QA1.pdf<br/>TRV_JOB-2026-0042_714XXXX-REVA_20260327_1000-PRO1.pdf<br/>PACK_JOB-2026-0042_714XXXX-REVA_20260328_1600-WH1.pdf<br/>POD_JOB-2026-0042_714XXXX-REVA_20260330_0900-WH1.pdf<br/>OFFSET-LOG_JOB-2026-0042_714XXXX-REVA-OP10_20260327_1100-OPR1.xlsx<br/>TOOL-WEAR_JOB-2026-0042_714XXXX-REVA-OP10_20260327_1500-OPR1.xlsx<br/>PROVEOUT_JOB-2026-0042_714XXXX-REVA-OP10_20260327_0845-SET1.pdf</div>
+
+ <!-- PATTERN 3 -->
+ <h3>3.3 Pattern 3 &mdash; Engineering Baseline (Part-REV-Master)</h3>
+ <div class="pattern-box">{FileType}_{PartRev}_{Operation}_{MachineFamily}_V{ver}.{ext}</div>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Segment</th>
+ <th>Bắt buộc</th>
+ <th>Mô tả</th>
+ <th>Ví dụ</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>{FileType}</code></td><td>Luôn</td><td>Loại file engineering (xem Section 4.3)</td><td>NC</td></tr>
+ <tr><td><code>{PartRev}</code></td><td>Luôn</td><td>Part number + revision</td><td>714XXXX-REVA</td></tr>
+ <tr><td><code>{Operation}</code></td><td>Luôn</td><td>Operation number hoặc ALL</td><td>OP10, ALL</td></tr>
+ <tr><td><code>{MachineFamily}</code></td><td>Tùy FileType</td><td>Nhóm máy (bỏ nếu ALL)</td><td>5AX, TURN, CMM</td></tr>
+ <tr><td><code>V{ver}</code></td><td>Luôn</td><td>Version baseline</td><td>V3</td></tr>
+ <tr><td><code>.{ext}</code></td><td>Luôn</td><td>Extension gốc</td><td>.nc</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <p><strong>Lưu ý:</strong> Engineering baseline KHÔNG dùng <code>{HHMM}-{UserID}</code> vì chỉ 1 người release tại 1 thời điểm (có approval gate FRM-306). Dùng <code>V{ver}</code> là đủ unique.</p>
+ <p><strong>Ví dụ thực tế:</strong></p>
+ <div class="pattern-box">NC_714XXXX-REVA_OP10_5AX_V3.nc<br/>NC_714XXXX-REVA_OP20_TURN_V3.nc<br/>CAM_714XXXX-REVA_OP10_5AX_V3.mcam<br/>CAM_714XXXX-REVA_OP20_TURN_V3.f3d<br/>SETUP_714XXXX-REVA_OP10_5AX_V3.xlsx<br/>INSP_714XXXX-REVA_ALL_CMM_V2.dcc<br/>MODEL_714XXXX-REVA_ALL_V1.step<br/>DWG_714XXXX-REVA_ALL_V1.pdf<br/>FIXTURE_714XXXX-REVA_OP10_5AX_V1.pdf<br/>SIM_714XXXX-REVA_OP10_5AX_V3.mp4<br/>CTRL-PLAN_714XXXX-REVA_ALL_V2.xlsx</div>
+
+ <!-- PATTERN 4 -->
+ <h3>3.4 Pattern 4 &mdash; Evidence không gắn Job (Non-job Evidence)</h3>
+ <div class="pattern-box">{RecordType}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Segment</th>
+ <th>Bắt buộc</th>
+ <th>Mô tả</th>
+ <th>Ví dụ</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>{RecordType}</code></td><td>Luôn</td><td>Mã loại hồ sơ (xem Section 4)</td><td>REPORT</td></tr>
+ <tr><td><code>{scope}</code></td><td>Luôn</td><td>Phạm vi (xem Section 5)</td><td>AUD-2026-IA03</td></tr>
+ <tr><td><code>{YYYYMMDD}</code></td><td>Luôn</td><td>Ngày tạo evidence</td><td>20260327</td></tr>
+ <tr><td><code>{HHMM}-{UserID}</code></td><td>Luôn</td><td>Giờ phút + mã người tạo</td><td>0900-QMS1</td></tr>
+ <tr><td><code>.{ext}</code></td><td>Luôn</td><td>Extension gốc</td><td>.pdf</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <p><strong>Ví dụ thực tế:</strong></p>
+ <div class="pattern-box">REPORT_AUD-2026-IA03_20260327_0900-QMS1.pdf<br/>CHECKLIST_AUD-2026-IA03_20260327_0900-QMS1.xlsx<br/>MINUTES_MR-2026-Q1_20260327_0900-QMS1.pdf<br/>INPUT-PACK_MR-2026-Q1_20260327_0830-QMS1.pdf<br/>CAL-CERT_CAL-MICR-005_20260327_0800-QC1.pdf<br/>MEETING-MIN_ENG_20260327_1000-ENG1.pdf<br/>KPI-REPORT_PRO_20260327_0900-PRO1.xlsx<br/>OJT_EMP-0123_C10L2_20260327_1400-SET1.pdf<br/>GATE-TEST_EMP-0123_C10L2_20260327_1500-QA1.pdf<br/>CERT-SCAN_EMP-0123_CNC-TURN_20260327_0800-HR1.pdf<br/>SIGNOFF_TRN-2026-015_20260327_1400-HR1.pdf</div>
+
+ <!-- PATTERN 5 -->
+ <h3>3.5 Pattern 5 &mdash; Form Blank Download (version stamped)</h3>
+ <div class="pattern-box">FRM-{code}_{Title}_V{ver}.xlsx</div>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Segment</th>
+ <th>Bắt buộc</th>
+ <th>Mô tả</th>
+ <th>Ví dụ</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>FRM-{code}</code></td><td>Luôn</td><td>Mã form theo registry</td><td>FRM-302</td></tr>
+ <tr><td><code>{Title}</code></td><td>Luôn</td><td>Tên form (hyphen thay dấu cách)</td><td>Setup-Sheet-and-Tool-List</td></tr>
+ <tr><td><code>V{ver}</code></td><td>Luôn</td><td>Version form blank</td><td>V3.2</td></tr>
+ <tr><td><code>.xlsx</code></td><td>Luôn</td><td>Extension</td><td>.xlsx</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <p><strong>Ví dụ thực tế:</strong></p>
+ <div class="pattern-box">FRM-302_Setup-Sheet-and-Tool-List_V3.2.xlsx<br/>FRM-631_NCR-Report_V2.1.xlsx<br/>FRM-311_FAI-Report_V1.0.xlsx</div>
+ <p><strong>Phân biệt blank vs filled:</strong></p>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Loại</th>
+ <th>Pattern</th>
+ <th>Đặc điểm nhận dạng</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><strong>BLANK</strong></td><td><code>FRM-{code}_{Title}_V{ver}.xlsx</code></td><td>Có Title, KHÔNG có scope/HHMM</td></tr>
+ <tr><td><strong>FILLED</strong></td><td><code>FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx</code></td><td>Có scope + time, KHÔNG có Title</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- PATTERN 6 -->
+ <h3>3.6 Pattern 6 &mdash; Asset Records (Tooling / Fixture / Gage)</h3>
+ <div class="pattern-box">{AssetType}-{AssetID}_{DocType}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Segment</th>
+ <th>Bắt buộc</th>
+ <th>Mô tả</th>
+ <th>Ví dụ</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>{AssetType}-{AssetID}</code></td><td>Luôn</td><td>Loại tài sản + mã tài sản</td><td>FIX-001, GAGE-CMM-005</td></tr>
+ <tr><td><code>{DocType}</code></td><td>Luôn</td><td>Loại tài liệu đính kèm</td><td>DWG, CAL-CERT, PHOTO</td></tr>
+ <tr><td><code>{YYYYMMDD}</code></td><td>Luôn</td><td>Ngày tạo</td><td>20260327</td></tr>
+ <tr><td><code>{HHMM}-{UserID}</code></td><td>Luôn</td><td>Giờ phút + mã người tạo</td><td>0800-ENG1</td></tr>
+ <tr><td><code>.{ext}</code></td><td>Luôn</td><td>Extension gốc</td><td>.pdf</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <p><strong>Ví dụ thực tế:</strong></p>
+ <div class="pattern-box">FIX-001_DWG_20260327_0800-ENG1.pdf<br/>FIX-001_PHOTO_20260327_0830-SET1.jpg<br/>GAGE-CMM-005_CAL-CERT_20260327_0800-QC1.pdf<br/>GAGE-MIC-012_CAL-CERT_20260415_0900-QC1.pdf<br/>FIX-003_MAINT-LOG_20260327_1400-MNT1.xlsx</div>
+ </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 4 — RecordType Code Dictionary
+     ═══════════════════════════════════════════════════════════════ -->
+ <div class="section">
+ <h2>4. RecordType Code Dictionary</h2>
+
+ <h3>4.1 Job Dossier Evidence</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Code</th>
+ <th>Tên</th>
+ <th>Mô tả</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>PO</code></td><td>Purchase Order</td><td>Scan PO khách hàng</td></tr>
+ <tr><td><code>CR</code></td><td>Contract Review</td><td>Kết quả xem xét hợp đồng</td></tr>
+ <tr><td><code>MTR</code></td><td>Material Test Report</td><td>Mill cert, heat cert, CoA</td></tr>
+ <tr><td><code>IQC</code></td><td>Incoming QC Result</td><td>Kết quả kiểm tra đầu vào</td></tr>
+ <tr><td><code>TRV</code></td><td>Traveler / Router</td><td>Scan phiếu theo dõi sản xuất</td></tr>
+ <tr><td><code>CMM</code></td><td>CMM / Measurement Data</td><td>Dữ liệu đo CMM, caliper, mic</td></tr>
+ <tr><td><code>FAI-BALLOON</code></td><td>Ballooned Drawing</td><td>Bản vẽ đánh số balloon</td></tr>
+ <tr><td><code>COC</code></td><td>Certificate of Conformance</td><td>Chứng nhận phù hợp</td></tr>
+ <tr><td><code>PACK</code></td><td>Packing List</td><td>Phiếu đóng gói</td></tr>
+ <tr><td><code>SHIP-LABEL</code></td><td>Shipping Label / SSCC</td><td>Nhãn vận chuyển</td></tr>
+ <tr><td><code>POD</code></td><td>Proof of Delivery</td><td>Bằng chứng giao hàng</td></tr>
+ <tr><td><code>CONCESSION</code></td><td>Deviation / Waiver</td><td>Phê duyệt nhượng bộ</td></tr>
+ <tr><td><code>REWORK</code></td><td>Rework Evidence</td><td>Bằng chứng làm lại + tái kiểm</td></tr>
+ <tr><td><code>CUST-APPR</code></td><td>Customer Approval</td><td>Email/doc khách hàng phê duyệt</td></tr>
+ <tr><td><code>PROVEOUT</code></td><td>Prove-out Evidence</td><td>Ghi chú chạy thử đầu tiên</td></tr>
+ <tr><td><code>OFFSET-LOG</code></td><td>Offset Change Log</td><td>Log thay đổi offset máy</td></tr>
+ <tr><td><code>TOOL-WEAR</code></td><td>Tool Wear Record</td><td>Ghi nhận mòn dao</td></tr>
+ <tr><td><code>DOWNTIME</code></td><td>Downtime Record</td><td>Ghi nhận dừng máy</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>4.2 Photos</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Code</th>
+ <th>Mô tả</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>PHOTO-SETUP</code></td><td>Ảnh trạng thái setup máy</td></tr>
+ <tr><td><code>PHOTO-FAI</code></td><td>Ảnh chi tiết FAI</td></tr>
+ <tr><td><code>PHOTO-FINAL</code></td><td>Ảnh kiểm tra cuối</td></tr>
+ <tr><td><code>PHOTO-PACK</code></td><td>Ảnh đóng gói</td></tr>
+ <tr><td><code>PHOTO-NCR</code></td><td>Ảnh lỗi</td></tr>
+ <tr><td><code>PHOTO-GEN</code></td><td>Ảnh chung</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>4.3 Engineering Baseline</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Code</th>
+ <th>Mô tả</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>NC</code></td><td>NC Program (G-code)</td></tr>
+ <tr><td><code>CAM</code></td><td>CAM Source File</td></tr>
+ <tr><td><code>MODEL</code></td><td>CAD Model (STEP, IGES)</td></tr>
+ <tr><td><code>DWG</code></td><td>Drawing (PDF)</td></tr>
+ <tr><td><code>SETUP</code></td><td>Setup Sheet + Tool List (FRM-302)</td></tr>
+ <tr><td><code>INSP</code></td><td>Inspection Program</td></tr>
+ <tr><td><code>FIXTURE</code></td><td>Fixture / Jig Drawing</td></tr>
+ <tr><td><code>SIM</code></td><td>Simulation Evidence</td></tr>
+ <tr><td><code>CTRL-PLAN</code></td><td>Control Plan</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>4.4 QMS Governance</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Code</th>
+ <th>Mô tả</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>REPORT</code></td><td>Audit report, analysis report</td></tr>
+ <tr><td><code>CHECKLIST</code></td><td>Audit checklist, verify list</td></tr>
+ <tr><td><code>MINUTES</code></td><td>Meeting minutes (MR, dept)</td></tr>
+ <tr><td><code>INPUT-PACK</code></td><td>MR input, audit input package</td></tr>
+ <tr><td><code>ACTION-LOG</code></td><td>Follow-up actions</td></tr>
+ <tr><td><code>KPI-REPORT</code></td><td>Dashboard export, analysis</td></tr>
+ <tr><td><code>RISK-REG</code></td><td>Risk register snapshot</td></tr>
+ <tr><td><code>MEETING-MIN</code></td><td>Department meeting minutes</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>4.5 Training &amp; Competence</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Code</th>
+ <th>Mô tả</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>OJT</code></td><td>On-the-Job Training evidence</td></tr>
+ <tr><td><code>GATE-TEST</code></td><td>Competency gate test result</td></tr>
+ <tr><td><code>CERT-SCAN</code></td><td>Certificate scan (external)</td></tr>
+ <tr><td><code>SIGNOFF</code></td><td>Wet signature sign-off sheet</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>4.6 Calibration &amp; Assets</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Code</th>
+ <th>Mô tả</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>CAL-CERT</code></td><td>Calibration certificate</td></tr>
+ <tr><td><code>MAINT-LOG</code></td><td>Maintenance log</td></tr>
+ <tr><td><code>SPEC</code></td><td>Specification sheet</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>4.7 Supplier</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Code</th>
+ <th>Mô tả</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>SUP-CERT</code></td><td>Supplier process certificate</td></tr>
+ <tr><td><code>SUP-AUDIT</code></td><td>Supplier audit report</td></tr>
+ <tr><td><code>SCAR</code></td><td>Supplier corrective action report</td></tr>
+ <tr><td><code>SUP-EVAL</code></td><td>Supplier evaluation</td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 5 — Scope Code Dictionary
+     ═══════════════════════════════════════════════════════════════ -->
+ <div class="section">
+ <h2>5. Scope Code Dictionary</h2>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Scope type</th>
+ <th>Format</th>
+ <th>Ví dụ</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td>Job order</td><td><code>JOB-{YYYY}-{4digit}</code></td><td>JOB-2026-0042</td></tr>
+ <tr><td>Job + Operation</td><td><code>JOB-{YYYY}-{4d}-OP{nn}</code></td><td>JOB-2026-0042-OP10</td></tr>
+ <tr><td>NCR</td><td><code>NCR-{YYYY}-{3digit}</code></td><td>NCR-2026-043</td></tr>
+ <tr><td>CAPA</td><td><code>CAPA-{YYYY}-{3digit}</code></td><td>CAPA-2026-008</td></tr>
+ <tr><td>FAI</td><td><code>FAI-{YYYY}-{3digit}</code></td><td>FAI-2026-016</td></tr>
+ <tr><td>Training event</td><td><code>TRN-{YYYY}-{3digit}</code></td><td>TRN-2026-015</td></tr>
+ <tr><td>Internal Audit</td><td><code>AUD-{YYYY}-IA{2digit}</code></td><td>AUD-2026-IA03</td></tr>
+ <tr><td>External Audit</td><td><code>AUD-{YYYY}-EA{2digit}</code></td><td>AUD-2026-EA01</td></tr>
+ <tr><td>Management Review</td><td><code>MR-{YYYY}-Q{n}</code></td><td>MR-2026-Q1</td></tr>
+ <tr><td>Calibration</td><td><code>CAL-{EquipCode}-{3digit}</code></td><td>CAL-MICR-005</td></tr>
+ <tr><td>Risk review</td><td><code>RISK-{YYYY}-R{2digit}</code></td><td>RISK-2026-R02</td></tr>
+ <tr><td>Change request (ECR)</td><td><code>ECR-{YYYY}-{3digit}</code></td><td>ECR-2026-012</td></tr>
+ <tr><td>Improvement</td><td><code>IMP-{YYYY}-{code}</code></td><td>IMP-2026-K05</td></tr>
+ <tr><td>Employee</td><td><code>EMP-{4digit}</code></td><td>EMP-0123</td></tr>
+ <tr><td>Department</td><td><code>{DeptCode}</code></td><td>ENG, PRO, QA, SCM, HR, FIN, WH, MNT</td></tr>
+ <tr><td>System-wide</td><td><code>SYS</code></td><td>SYS</td></tr>
+ <tr><td>Shift</td><td><code>PRO-SHIFT-{A/B/C}</code></td><td>PRO-SHIFT-A</td></tr>
+ <tr><td>Part baseline</td><td><code>{PartNum}-REV{X}</code></td><td>714XXXX-REVA</td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 6 — UserID Registry
+     ═══════════════════════════════════════════════════════════════ -->
+ <div class="section">
+ <h2>6. UserID Registry</h2>
+
+ <h3>6.1 Quy tắc tạo UserID</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>#</th>
+ <th>Quy tắc</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td>1</td><td>3&ndash;4 ký tự viết tắt từ họ &ndash; tên đệm &ndash; tên</td></tr>
+ <tr><td>2</td><td>Ưu tiên: chữ đầu họ + chữ đầu tên đệm + chữ đầu tên (NVA, TBH, LMC)</td></tr>
+ <tr><td>3</td><td>Nếu trùng: thêm số (NVA &rarr; NVA2)</td></tr>
+ <tr><td>4</td><td>Đăng ký 1 lần trong SharePoint List <code>Employee-Registry</code> hoặc Epicor Employee Master</td></tr>
+ <tr><td>5</td><td>KHÔNG thay đổi khi nhân viên đổi phòng/chức vụ</td></tr>
+ <tr><td>6</td><td>KHÔNG tái sử dụng UserID sau khi nhân viên nghỉ việc</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>6.2 Ví dụ UserID Registry</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Employee Code</th>
+ <th>Họ và tên</th>
+ <th>UserID</th>
+ <th>Phòng ban</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td>EMP-0001</td><td>Nguyễn Văn An</td><td><code>NVA</code></td><td>Production</td></tr>
+ <tr><td>EMP-0002</td><td>Trần Bảo Huy</td><td><code>TBH</code></td><td>Quality</td></tr>
+ <tr><td>EMP-0003</td><td>Lê Minh Châu</td><td><code>LMC</code></td><td>Engineering</td></tr>
+ <tr><td>EMP-0004</td><td>Phạm Thị Dung</td><td><code>PTD</code></td><td>HR</td></tr>
+ <tr><td>EMP-0005</td><td>Nguyễn Văn Anh</td><td><code>NVA2</code></td><td>Warehouse</td></tr>
+ <tr><td>(Role-based)</td><td>Setup Technician #1</td><td><code>SET1</code></td><td>Production</td></tr>
+ <tr><td>(Role-based)</td><td>QC Inspector #1</td><td><code>QC1</code></td><td>Quality</td></tr>
+ <tr><td>(Role-based)</td><td>QA Engineer #1</td><td><code>QA1</code></td><td>Quality</td></tr>
+ <tr><td>(Role-based)</td><td>QMS Representative #1</td><td><code>QMS1</code></td><td>QMS</td></tr>
+ <tr><td>(Role-based)</td><td>SCM Officer #1</td><td><code>SCM1</code></td><td>Supply Chain</td></tr>
+ <tr><td>(Role-based)</td><td>HR Officer #1</td><td><code>HR1</code></td><td>HR</td></tr>
+ <tr><td>(Role-based)</td><td>Engineering #1</td><td><code>ENG1</code></td><td>Engineering</td></tr>
+ <tr><td>(Role-based)</td><td>Production Supervisor #1</td><td><code>PRO1</code></td><td>Production</td></tr>
+ <tr><td>(Role-based)</td><td>Operator #1</td><td><code>OPR1</code></td><td>Production</td></tr>
+ <tr><td>(Role-based)</td><td>Warehouse #1</td><td><code>WH1</code></td><td>Warehouse</td></tr>
+ <tr><td>(Role-based)</td><td>Maintenance #1</td><td><code>MNT1</code></td><td>Maintenance</td></tr>
+ <tr><td>(Role-based)</td><td>Shift Leader #1</td><td><code>SL1</code></td><td>Production</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>6.3 Tại sao dùng <code>{HHMM}-{UserID}</code> thay vì <code>{seq}_{RoleCode}</code></h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Vấn đề với <code>{seq}</code></th>
+ <th>Giải pháp <code>{HHMM}-{UserID}</code></th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td>Nhiều người upload cùng lúc &rarr; ai quản seq?</td><td>HHMM + UserID tự unique, không cần phối hợp</td></tr>
+ <tr><td>2 QC inspector cùng role code "QC" &rarr; trùng</td><td>UserID unique per person &rarr; NVA &ne; TBH</td></tr>
+ <tr><td>Phải đếm file hiện có trước khi đặt tên</td><td>Chỉ cần nhìn đồng hồ + biết UserID mình</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>6.4 Uniqueness guarantee</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Tình huống</th>
+ <th>HHMM</th>
+ <th>UserID</th>
+ <th>Kết quả</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td>Cùng người, cùng phút, cùng RecordType, cùng scope</td><td>Giống</td><td>Giống</td><td><strong>Không xảy ra</strong> &mdash; 1 người không tạo 2 file cùng loại cùng phút</td></tr>
+ <tr><td>Khác người, cùng phút</td><td>Giống</td><td><strong>Khác</strong></td><td>Unique</td></tr>
+ <tr><td>Cùng người, khác phút</td><td><strong>Khác</strong></td><td>Giống</td><td>Unique</td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 7 — Record-ID — Server atomic counter
+     ═══════════════════════════════════════════════════════════════ -->
+ <div class="section">
+ <h2>7. Record-ID &mdash; Server atomic counter</h2>
+
+ <h3>7.1 Khi nào cần Record-ID</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Loại</th>
+ <th>Cần Record-ID?</th>
+ <th>Ví dụ ID</th>
+ <th>Ai cấp?</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td>NCR</td><td>C&Oacute;</td><td>NCR-2026-043</td><td>Server atomic counter</td></tr>
+ <tr><td>CAPA</td><td>C&Oacute;</td><td>CAPA-2026-008</td><td>Server atomic counter</td></tr>
+ <tr><td>FAI</td><td>C&Oacute;</td><td>FAI-2026-016</td><td>Server atomic counter</td></tr>
+ <tr><td>Training event</td><td>C&Oacute;</td><td>TRN-2026-028</td><td>Server atomic counter</td></tr>
+ <tr><td>Audit</td><td>C&Oacute;</td><td>AUD-2026-IA03</td><td>Server atomic counter</td></tr>
+ <tr><td>ECR/ECO</td><td>C&Oacute;</td><td>ECR-2026-012</td><td>Server atomic counter</td></tr>
+ <tr><td>Job order</td><td>C&Oacute; (từ Epicor)</td><td>JOB-2026-0042</td><td>Epicor SoR</td></tr>
+ <tr><td>Photos, scans</td><td>KH&Ocirc;NG</td><td>(dùng HHMM-UserID)</td><td>Người upload</td></tr>
+ <tr><td>CMM data</td><td>KH&Ocirc;NG</td><td>(dùng HHMM-UserID)</td><td>Người upload</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>7.2 Prefix và số chữ số</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Prefix</th>
+ <th>Số chữ số</th>
+ <th>Ví dụ ID</th>
+ <th>Counter file</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>NCR</code></td><td>3</td><td>NCR-2026-043</td><td><code>qms-data/counters/NCR-2026.txt</code></td></tr>
+ <tr><td><code>CAPA</code></td><td>3</td><td>CAPA-2026-008</td><td><code>qms-data/counters/CAPA-2026.txt</code></td></tr>
+ <tr><td><code>FAI</code></td><td>3</td><td>FAI-2026-016</td><td><code>qms-data/counters/FAI-2026.txt</code></td></tr>
+ <tr><td><code>TRN</code></td><td>3</td><td>TRN-2026-028</td><td><code>qms-data/counters/TRN-2026.txt</code></td></tr>
+ <tr><td><code>AUD</code></td><td>3</td><td>AUD-2026-IA03</td><td><code>qms-data/counters/AUD-2026.txt</code></td></tr>
+ <tr><td><code>ECR</code></td><td>3</td><td>ECR-2026-012</td><td><code>qms-data/counters/ECR-2026.txt</code></td></tr>
+ <tr><td><code>IMP</code></td><td>3</td><td>IMP-2026-K05</td><td><code>qms-data/counters/IMP-2026.txt</code></td></tr>
+ <tr><td><code>JOB</code></td><td>4</td><td>JOB-2026-0042</td><td>Epicor SoR (không dùng counter file)</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>7.3 Cơ chế Server atomic counter</h3>
+ <p>File lock (<code>LOCK_EX</code>) đảm bảo chỉ 1 process đọc/ghi tại 1 thời điểm &rarr; không race condition. Cấu trúc lưu trữ counter:</p>
+ <div class="pattern-box">qms-data/counters/<br/>&emsp;&boxvr;&horbar; NCR-2026.txt&emsp;&emsp;&rarr; "043"<br/>&emsp;&boxvr;&horbar; CAPA-2026.txt&emsp;&rarr; "008"<br/>&emsp;&boxvr;&horbar; FAI-2026.txt&emsp;&emsp;&rarr; "016"<br/>&emsp;&boxvr;&horbar; TRN-2026.txt&emsp;&emsp;&rarr; "028"<br/>&emsp;&boxvr;&horbar; AUD-2026.txt&emsp;&emsp;&rarr; "003"<br/>&emsp;&boxvr;&horbar; ECR-2026.txt&emsp;&emsp;&rarr; "012"<br/>&emsp;&boxur;&horbar; IMP-2026.txt&emsp;&emsp;&rarr; "005"</div>
+
+ <h3>7.4 Luồng lấy Record-ID</h3>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Kênh</th>
+ <th>Luồng</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><strong>Online form</strong></td><td>Server tự cấp khi submit &rarr; nhúng vào filename PDF tự động.</td></tr>
+ <tr><td><strong>Excel form</strong></td><td>User vào portal &rarr; nhấn "Xin mã hồ sơ mới" &rarr; server trả mã &rarr; user dùng trong tên file khi save.</td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 8 — Form version control
+     ═══════════════════════════════════════════════════════════════ -->
+ <div class="section">
+ <h2>8. Form version control</h2>
+
+ <h3>8.1 Form blank download &mdash; version stamp</h3>
+ <p>Khi user tải form blank từ web portal:</p>
+ <ul>
+ <li>Filename <strong>BẮT BUỘC</strong> có <code>V{ver}</code>: <code>FRM-302_Setup-Sheet-and-Tool-List_V3.2.xlsx</code></li>
+ <li>Server inject metadata vào sheet ẩn <code>_QMS_CONTROL</code>:</li>
+ </ul>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Metadata field</th>
+ <th>Mô tả</th>
+ <th>Ví dụ</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><code>form_code</code></td><td>Mã form</td><td>FRM-302</td></tr>
+ <tr><td><code>version</code></td><td>Version form blank</td><td>3.2</td></tr>
+ <tr><td><code>checksum</code></td><td>SHA-256 checksum</td><td>a1b2c3...</td></tr>
+ <tr><td><code>downloaded_by</code></td><td>UserID người tải</td><td>SET1</td></tr>
+ <tr><td><code>downloaded_at</code></td><td>Thời điểm tải</td><td>2026-03-27T09:00:00+07:00</td></tr>
+ <tr><td><code>source</code></td><td>Nguồn tải</td><td>portal.hesem.com.vn</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <h3>8.2 Form filled upload &mdash; version validation</h3>
+ <ul>
+ <li>SharePoint metadata column <code>Form-Version</code> phải khớp active version trong <code>form_control_registry</code>.</li>
+ <li>Nếu version cũ &rarr; FLAG <code>Version-Valid = OBSOLETE</code> + notify uploader.</li>
+ <li>Monthly audit: query files where <code>Version-Valid = OBSOLETE</code> &rarr; action required.</li>
+ </ul>
+
+ <h3>8.3 Phân biệt blank vs filled nhìn từ tên file</h3>
+ <div class="pattern-box">BLANK:&emsp;FRM-{code}_{Title}_V{ver}.xlsx&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&larr; Có Title, KHÔNG có scope/HHMM<br/>FILLED: FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx&emsp;&larr; Có scope + time, KHÔNG có Title</div>
+ </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 9 — Validation rules (fail-fast)
+     ═══════════════════════════════════════════════════════════════ -->
+ <div class="section">
+ <h2>9. Validation rules (fail-fast)</h2>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Kiểm tra</th>
+ <th>Kết quả</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td>Tên file chứa dấu cách hoặc ký tự đặc biệt</td><td><strong>REJECT</strong></td></tr>
+ <tr><td>Tên file không có date segment (<code>YYYYMMDD</code>)</td><td><strong>REJECT</strong></td></tr>
+ <tr><td>Filled form không có <code>V{ver}</code></td><td><strong>REJECT</strong></td></tr>
+ <tr><td>Filled form version &ne; current active version</td><td><strong>FLAG OBSOLETE</strong></td></tr>
+ <tr><td>Job evidence không có <code>JOB-{YYYY}-{nnnn}</code></td><td><strong>REJECT</strong></td></tr>
+ <tr><td>Engineering baseline không có <code>V{ver}</code></td><td><strong>REJECT</strong></td></tr>
+ <tr><td>File trùng tên đã tồn tại (cùng tên, cùng folder)</td><td><strong>REJECT</strong></td></tr>
+ <tr><td>Tên file &gt; 120 ký tự</td><td><strong>WARN</strong></td></tr>
+ <tr><td>RecordType code không trong dictionary (Section 4)</td><td><strong>FLAG</strong></td></tr>
+ <tr><td>Date format sai (không phải <code>YYYYMMDD</code>)</td><td><strong>REJECT</strong></td></tr>
+ <tr><td>Part number trong file &ne; Part number trong folder</td><td><strong>REJECT</strong></td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 10 — 60-second traceability test
+     ═══════════════════════════════════════════════════════════════ -->
+ <div class="section">
+ <h2>10. 60-second traceability test (AS9100 compliance)</h2>
+
+ <h3>10.1 Kịch bản 1 &mdash; FAI report cho job cụ thể</h3>
+ <p><strong>Auditor hỏi:</strong> "Show me the FAI report for job 0042, part 714XXXX rev A"</p>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Bước</th>
+ <th>Hành động</th>
+ <th>Thời gian</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td>1</td><td>Mở HESEM-Job-Evidence &rarr; Job-Dossiers &rarr; 2026</td><td>5s</td></tr>
+ <tr><td>2</td><td>Tìm folder <code>JOB-2026-0042_714XXXX-REVA</code></td><td>5s</td></tr>
+ <tr><td>3</td><td>Filter metadata: Gate = G4-FAI hoặc search "FRM-311"</td><td>5s</td></tr>
+ <tr><td>4</td><td>Thấy: <code>FRM-311_V1.0_JOB-2026-0042_20260327_0900-QC1.xlsx</code><br/>&rarr; Biết: FAI form V1.0, ngày 27/3/2026 lúc 9:00, QC1 điền</td><td>ngay</td></tr>
+ <tr><td>5</td><td>Kèm: <code>CMM_JOB-2026-0042_714XXXX-REVA-OP10_20260327_0905-QC1.csv</code><br/>&rarr; CMM data OP10, cùng ngày, cùng inspector</td><td>ngay</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <p><strong>TỔNG: &lt; 20 giây</strong> (yêu cầu &lt; 60 giây)</p>
+
+ <h3>10.2 Kịch bản 2 &mdash; Tất cả NCR cho khách hàng trong Q1</h3>
+ <p><strong>Auditor hỏi:</strong> "Show me all NCRs for Lam Research in Q1 2026"</p>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Bước</th>
+ <th>Hành động</th>
+ <th>Thời gian</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td>1</td><td>Mở HESEM-Records &rarr; Quality-Records</td><td>3s</td></tr>
+ <tr><td>2</td><td>Filter: Record-Type = NCR, Customer = Lam-Research, Year = 2026</td><td>5s</td></tr>
+ <tr><td>3</td><td>Sort by date &rarr; thấy danh sách tất cả NCR</td><td>ngay</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <p><strong>TỔNG: &lt; 10 giây</strong> (yêu cầu &lt; 60 giây)</p>
+ </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 11 — Tài liệu liên quan
+     ═══════════════════════════════════════════════════════════════ -->
+ <div class="section">
+ <h2>11. Tài liệu liên quan</h2>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Mã tài liệu</th>
+ <th>Tên</th>
+ <th>Mối liên quan</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td><a href="../../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a></td><td>Document and Data Control</td><td>Quy trình kiểm soát tài liệu, version control tổng thể</td></tr>
+ <tr><td><a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td><td>Data Governance, Records Security and IP Protection</td><td>Quản trị dữ liệu, bảo mật hồ sơ, bảo vệ IP</td></tr>
+ <tr><td><a href="../../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td><td>Engineering Release, Baseline Package and Job Snapshot Control</td><td>Kiểm soát engineering baseline, version release</td></tr>
+ <tr><td><a href="../../../02-Work-Instructions/01-WI-100/wi-102-form-lifecycle-download-fill-upload-and-version-control.html">WI-102</a></td><td>Form Lifecycle: Download, Fill, Upload and Version Control</td><td>Vòng đời form: tải, điền, upload, version control</td></tr>
+ <tr><td><a href="../../../02-Work-Instructions/01-WI-100/wi-107-photography-and-visual-evidence-standard.html">WI-107</a></td><td>Photography and Visual Evidence Standard</td><td>Tiêu chuẩn chụp ảnh evidence</td></tr>
+ <tr><td><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Job Dossier Evidence Pack and Record Completeness</td><td>Gói evidence theo job, kiểm tra đầy đủ hồ sơ</td></tr>
+ <tr><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></td><td>M365 Records Metadata, List Schema and Register Catalog</td><td>Schema metadata, danh mục list trên SharePoint</td></tr>
+ <tr><td><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></td><td>M365 Records Site Topology, Library and Folder Blueprint</td><td>Cấu trúc site, thư viện, thư mục trên SharePoint</td></tr>
+ <tr><td><a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td><td>M365 Operational Records File Plan by Department, Role and Job</td><td>File plan chi tiết theo phòng ban, JD và job gate</td></tr>
+ <tr><td><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td><td>M365 SharePoint-Git-Server Source Sync, Promotion and Runtime Boundary</td><td>Ranh giới đồng bộ source giữa SharePoint, Git, Server</td></tr>
+ <tr><td>core-standards/14</td><td>M365 SharePoint Architecture</td><td>Kiến trúc SharePoint tổng thể</td></tr>
+ <tr><td>core-standards/15</td><td>Evidence and Records Naming</td><td>Tài liệu nguồn cho ANNEX-137 này</td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+ </div>
+ </div>
+</div>
+<div class="no-screen print-disclaimer">&#9888; Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

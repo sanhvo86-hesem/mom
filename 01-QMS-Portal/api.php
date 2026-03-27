@@ -6571,6 +6571,166 @@ if ($username === '') {
   }
 
   // ═══════════════════════════════════════════════════
+  // RECORD-ID COUNTER SYSTEM
+  // Atomic sequential ID generator for formal records
+  // (NCR, CAPA, FAI, TRN, AUD, ECR, etc.)
+  // ═══════════════════════════════════════════════════
+
+  case 'record_id_registry': {
+    // GET — return all allowed prefixes and their config
+    $regFile = $DATA_DIR . '/counters/_registry.json';
+    if (!file_exists($regFile)) {
+      api_json(['ok' => false, 'error' => 'registry_not_found'], 500);
+    }
+    $registry = json_decode(file_get_contents($regFile), true);
+    if (!is_array($registry)) {
+      api_json(['ok' => false, 'error' => 'registry_corrupt'], 500);
+    }
+    // Attach current counter values
+    $countersDir = $DATA_DIR . '/counters';
+    $result = [];
+    foreach ($registry as $prefix => $cfg) {
+      if (str_starts_with($prefix, '_')) continue;
+      $year = date('Y');
+      $cFile = $countersDir . '/' . $prefix . '-' . $year . '.txt';
+      $current = file_exists($cFile) ? (int)trim(file_get_contents($cFile)) : 0;
+      $result[$prefix] = array_merge($cfg, [
+        'current_seq' => $current,
+        'last_id' => $current > 0
+          ? $prefix . '-' . $year . '-' . str_pad((string)$current, $cfg['digits'] ?? 3, '0', STR_PAD_LEFT)
+          : null,
+      ]);
+    }
+    api_json(['ok' => true, 'registry' => $result, 'year' => date('Y')]);
+  }
+
+  case 'record_id_next': {
+    // POST — generate next sequential Record-ID (atomic, LOCK_EX)
+    require_csrf();
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!$input || empty($input['prefix'])) {
+      api_json(['ok' => false, 'error' => 'missing_prefix'], 400);
+    }
+    $prefix = strtoupper(trim((string)$input['prefix']));
+    $year = trim((string)($input['year'] ?? date('Y')));
+    if (!preg_match('/^[A-Z]{2,6}$/', $prefix)) {
+      api_json(['ok' => false, 'error' => 'invalid_prefix_format'], 400);
+    }
+    if (!preg_match('/^20[2-3][0-9]$/', $year)) {
+      api_json(['ok' => false, 'error' => 'invalid_year'], 400);
+    }
+    // Validate prefix against registry
+    $regFile = $DATA_DIR . '/counters/_registry.json';
+    if (!file_exists($regFile)) {
+      api_json(['ok' => false, 'error' => 'registry_not_found'], 500);
+    }
+    $registry = json_decode(file_get_contents($regFile), true);
+    if (!isset($registry[$prefix])) {
+      api_json(['ok' => false, 'error' => 'prefix_not_allowed', 'allowed' => array_keys($registry)], 400);
+    }
+    $digits = (int)($registry[$prefix]['digits'] ?? 3);
+    $formCode = $registry[$prefix]['form'] ?? null;
+
+    // Atomic counter with file lock
+    $countersDir = $DATA_DIR . '/counters';
+    if (!is_dir($countersDir)) @mkdir($countersDir, 0755, true);
+    $counterFile = $countersDir . '/' . $prefix . '-' . $year . '.txt';
+
+    $fp = @fopen($counterFile, 'c+');
+    if (!$fp) {
+      api_json(['ok' => false, 'error' => 'counter_file_error'], 500);
+    }
+    if (!flock($fp, LOCK_EX)) {
+      fclose($fp);
+      api_json(['ok' => false, 'error' => 'counter_lock_failed'], 500);
+    }
+    $raw = fread($fp, 20);
+    $current = $raw !== false ? (int)trim($raw) : 0;
+    $next = $current + 1;
+    $padded = str_pad((string)$next, $digits, '0', STR_PAD_LEFT);
+    ftruncate($fp, 0);
+    rewind($fp);
+    fwrite($fp, $padded);
+    fflush($fp);
+    flock($fp, LOCK_UN);
+    fclose($fp);
+
+    $recordId = $prefix . '-' . $year . '-' . $padded;
+
+    // Log the allocation
+    $logFile = $countersDir . '/_allocation_log.jsonl';
+    $logEntry = json_encode([
+      'record_id' => $recordId,
+      'prefix' => $prefix,
+      'year' => $year,
+      'seq' => $next,
+      'user' => $_SESSION['user'] ?? 'anonymous',
+      'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+      'time' => date('c'),
+    ], JSON_UNESCAPED_UNICODE) . "\n";
+    @file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
+
+    // Build suggested filename
+    $today = date('Ymd');
+    $userName = $_SESSION['user'] ?? 'USER';
+    // Extract initials from username (e.g. "sanh.vo" → "SV")
+    $parts = preg_split('/[\.\-_]/', $userName);
+    $initials = '';
+    foreach ($parts as $p) { if ($p !== '') $initials .= strtoupper($p[0]); }
+    if (strlen($initials) < 2) $initials = strtoupper(substr($userName, 0, 3));
+
+    $suggestedFilename = null;
+    if ($formCode) {
+      // Look up form version from registry
+      $formRegFile = $DATA_DIR . '/config/form_control_registry.json';
+      $formVer = 'V0';
+      if (file_exists($formRegFile)) {
+        $formReg = json_decode(file_get_contents($formRegFile), true);
+        if (isset($formReg[$formCode]['rev'])) {
+          $formVer = $formReg[$formCode]['rev'];
+        }
+      }
+      $suggestedFilename = $formCode . '_' . $formVer . '_' . $recordId . '_' . $today . '_HHMM-' . $initials . '.xlsx';
+    }
+
+    api_json([
+      'ok' => true,
+      'record_id' => $recordId,
+      'prefix' => $prefix,
+      'year' => $year,
+      'seq' => $next,
+      'form_code' => $formCode,
+      'suggested_filename' => $suggestedFilename,
+    ]);
+  }
+
+  case 'record_id_peek': {
+    // GET — peek at next ID without incrementing
+    $prefix = strtoupper(trim((string)($_GET['prefix'] ?? '')));
+    $year = trim((string)($_GET['year'] ?? date('Y')));
+    if (!$prefix) { api_json(['ok' => false, 'error' => 'missing_prefix'], 400); }
+    $regFile = $DATA_DIR . '/counters/_registry.json';
+    $registry = file_exists($regFile) ? json_decode(file_get_contents($regFile), true) : [];
+    if (!isset($registry[$prefix])) {
+      api_json(['ok' => false, 'error' => 'prefix_not_allowed'], 400);
+    }
+    $digits = (int)($registry[$prefix]['digits'] ?? 3);
+    $counterFile = $DATA_DIR . '/counters/' . $prefix . '-' . $year . '.txt';
+    $current = file_exists($counterFile) ? (int)trim(file_get_contents($counterFile)) : 0;
+    $nextSeq = $current + 1;
+    $nextId = $prefix . '-' . $year . '-' . str_pad((string)$nextSeq, $digits, '0', STR_PAD_LEFT);
+    api_json([
+      'ok' => true,
+      'next_seq' => $nextSeq,
+      'next_id' => $nextId,
+      'last_seq' => $current,
+      'last_id' => $current > 0
+        ? $prefix . '-' . $year . '-' . str_pad((string)$current, $digits, '0', STR_PAD_LEFT)
+        : null,
+    ]);
+  }
+
+  // ═══════════════════════════════════════════════════
   // ONLINE FORMS ENGINE
   // ═══════════════════════════════════════════════════
   case 'online_form_list': {
@@ -6639,7 +6799,7 @@ if ($username === '') {
     array_unshift($existing, $data);
     // Keep max 1000 entries per form
     if (count($existing) > 1000) $existing = array_slice($existing, 0, 1000);
-    file_put_contents($entryFile, json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    file_put_contents($entryFile, json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
     api_json(['ok' => true, 'entry_id' => $data['entry_id'] ?? '', 'count' => count($existing)]);
   }
 

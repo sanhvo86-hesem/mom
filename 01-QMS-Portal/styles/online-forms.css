@@ -108,6 +108,35 @@
 .form-recent-info{display:flex;gap:16px;flex:1;font-size:12px;color:#374151}
 .form-draft-badge{font-size:9px;font-weight:700;color:#e67700;background:#fff9db;padding:2px 8px;border-radius:999px;text-transform:uppercase}
 
+/* ── Record-ID Panel ── */
+.record-id-panel{background:#fff;border:1px solid #dee2e6;border-radius:10px;padding:20px 24px;margin-bottom:28px;border-left:4px solid #f9a825}
+.record-id-header{margin-bottom:14px}
+.record-id-title{font-size:15px;font-weight:700;color:#0c2d48;margin:0 0 4px}
+.record-id-desc{font-size:12px;color:#6b7280;margin:0}
+.record-id-body{}
+.record-id-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.record-id-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px}
+.record-id-field label{font-size:11px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.3px}
+.record-id-select{padding:9px 12px;border:1px solid #d1d5db;border-radius:7px;font-size:13px;font-family:inherit;background:#fff;min-width:120px}
+.record-id-select:focus{outline:none;border-color:#1565c0;box-shadow:0 0 0 3px rgba(21,101,192,.1)}
+.record-id-btn{font-size:13px;font-weight:600;color:#fff;background:#f9a825;border:none;border-radius:8px;padding:10px 20px;cursor:pointer;transition:all .15s;white-space:nowrap;height:40px}
+.record-id-btn:hover{background:#f57f17}
+
+.record-id-result{margin-top:14px}
+.record-id-loading{font-size:13px;color:#6b7280;padding:8px 0}
+.record-id-error{font-size:13px;color:#e03131;background:#fff5f5;border:1px solid #fecaca;border-radius:7px;padding:10px 14px}
+.record-id-success{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px 20px}
+.record-id-badge{font-family:'SF Mono',Consolas,monospace;font-size:20px;font-weight:800;color:#0c2d48;background:#e3f2fd;display:inline-block;padding:6px 16px;border-radius:8px;margin-bottom:10px;letter-spacing:1px}
+.record-id-detail{display:flex;flex-direction:column;gap:8px}
+.record-id-filename{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.record-id-filename label{font-size:11px;font-weight:600;color:#6b7280;white-space:nowrap}
+.record-id-filename code{font-size:12px;background:#f1f5f9;padding:6px 10px;border-radius:6px;font-family:'SF Mono',Consolas,monospace;color:#1f2937;word-break:break-all;flex:1}
+.record-id-copy{font-size:11px;font-weight:600;color:#1565c0;background:#e3f2fd;border:1px solid #93c5fd;border-radius:6px;padding:5px 10px;cursor:pointer;white-space:nowrap}
+.record-id-copy:hover{background:#1565c0;color:#fff}
+.record-id-download{margin-top:4px}
+.record-id-download-btn{font-size:12px;font-weight:600;color:#2f9e44;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.record-id-download-btn:hover{text-decoration:underline}
+
 /* ── Toast ── */
 .form-toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;z-index:99999;transform:translateY(20px);opacity:0;transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.15)}
 .form-toast.show{transform:translateY(0);opacity:1}

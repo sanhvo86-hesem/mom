@@ -14,6 +14,21 @@ var _currentEntry = null;    // Current entry data being filled
 var _formDirty = false;
 var _tableRowCounters = {};  // Track dynamic table rows
 
+// ── Record-ID Config ──
+var RECORD_FORM_MAP = {
+  'NCR':  { form: 'FRM-631', label: 'NCR — Báo cáo không phù hợp' },
+  'CAPA': { form: 'FRM-641', label: 'CAPA — Hành động khắc phục' },
+  'FAI':  { form: 'FRM-311', label: 'FAI — Kiểm tra sản phẩm đầu tiên' },
+  'TRN':  { form: 'FRM-802', label: 'Training — Sự kiện đào tạo' },
+  'AUD':  { form: 'FRM-913', label: 'Audit — Phát hiện đánh giá' },
+  'ECR':  { form: 'FRM-161', label: 'ECR — Yêu cầu thay đổi kỹ thuật' },
+  'CAL':  { form: 'FRM-601', label: 'Calibration — Hồ sơ hiệu chuẩn' },
+  'SCAR': { form: 'FRM-403', label: 'SCAR — Hành động khắc phục NCC' },
+  'IMP':  { form: null,      label: 'Improvement — Dự án cải tiến' },
+  'MR':   { form: 'FRM-911', label: 'MR — Xem xét lãnh đạo' },
+  'RISK': { form: 'FRM-131', label: 'Risk — Rà soát rủi ro' }
+};
+
 // ── Constants ──
 var FORM_COLORS = {
   production: {bg:'#e7f5ff', border:'#1971c2', icon:'🏭'},
@@ -48,6 +63,35 @@ window.renderOnlineForms = function(formCode){
     html += '<div class="forms-stats">';
     html += '<div class="forms-stat-card"><div class="stat-value">' + schemas.length + '</div><div class="stat-label">' + (lang==='en'?'Forms available':'Form khả dụng') + '</div></div>';
     html += '<div class="forms-stat-card"><div class="stat-value">' + totalEntries + '</div><div class="stat-label">' + (lang==='en'?'Entries today':'Bản ghi hôm nay') + '</div></div>';
+    html += '</div>';
+
+    // ── Record-ID Request Panel ──
+    html += '<div class="record-id-panel">';
+    html += '<div class="record-id-header">';
+    html += '<h2 class="record-id-title">🔢 ' + (lang==='en'?'Request Record ID':'Xin mã hồ sơ mới') + '</h2>';
+    html += '<p class="record-id-desc">' + (lang==='en'?'Get a unique Record-ID before filling an Excel form':'Lấy mã hồ sơ duy nhất trước khi điền form Excel') + '</p>';
+    html += '</div>';
+    html += '<div class="record-id-body">';
+    html += '<div class="record-id-row">';
+    html += '<div class="record-id-field">';
+    html += '<label>' + (lang==='en'?'Record type':'Loại hồ sơ') + '</label>';
+    html += '<select id="rid-prefix" class="record-id-select">';
+    Object.keys(RECORD_FORM_MAP).forEach(function(k){
+      html += '<option value="' + k + '">' + k + ' — ' + RECORD_FORM_MAP[k].label + '</option>';
+    });
+    html += '</select>';
+    html += '</div>';
+    html += '<div class="record-id-field">';
+    html += '<label>' + (lang==='en'?'Year':'Năm') + '</label>';
+    html += '<select id="rid-year" class="record-id-select">';
+    var cy = new Date().getFullYear();
+    for(var y = cy; y >= cy-1; y--) html += '<option value="' + y + '">' + y + '</option>';
+    html += '</select>';
+    html += '</div>';
+    html += '<button class="record-id-btn" onclick="_requestRecordId()">' + (lang==='en'?'Generate ID':'Tạo mã mới') + '</button>';
+    html += '</div>';
+    html += '<div id="rid-result" class="record-id-result" style="display:none"></div>';
+    html += '</div>';
     html += '</div>';
 
     // Group by category
@@ -547,6 +591,94 @@ function _showFormToast(msg, type){
     toast.classList.remove('show');
     setTimeout(function(){ toast.remove(); }, 300);
   }, 3000);
+}
+
+// ═══════════════════════════════════════════════════
+// RECORD-ID REQUEST
+// ═══════════════════════════════════════════════════
+window._requestRecordId = function(){
+  var prefix = document.getElementById('rid-prefix').value;
+  var year = document.getElementById('rid-year').value;
+  var resultDiv = document.getElementById('rid-result');
+  if(!resultDiv) return;
+
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = '<div class="record-id-loading">' + (lang==='en'?'Generating...':'Đang tạo mã...') + '</div>';
+
+  var csrfToken = '';
+  try { csrfToken = typeof window._csrfToken === 'string' ? window._csrfToken : ''; } catch(e){}
+
+  fetch('api.php?action=record_id_next', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': csrfToken
+    },
+    body: JSON.stringify({ prefix: prefix, year: year })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if(d.ok){
+      var map = RECORD_FORM_MAP[prefix] || {};
+      var formCode = d.form_code || map.form || '';
+      var rid = d.record_id;
+      var suggested = d.suggested_filename || '';
+
+      var html = '<div class="record-id-success">';
+      html += '<div class="record-id-badge">' + rid + '</div>';
+      html += '<div class="record-id-detail">';
+      if(suggested){
+        html += '<div class="record-id-filename">';
+        html += '<label>' + (lang==='en'?'Suggested filename':'Tên file đề xuất') + ':</label>';
+        html += '<code id="rid-filename">' + suggested + '</code>';
+        html += '<button class="record-id-copy" onclick="_copyRecordFilename()" title="Copy">' + (lang==='en'?'Copy':'Sao chép') + '</button>';
+        html += '</div>';
+      }
+      if(formCode){
+        html += '<div class="record-id-download">';
+        html += '<a download href="../04-Bieu-Mau/' + _getFormFolder(formCode) + '/' + formCode + '_*.xlsx" class="record-id-download-btn">';
+        html += '↓ ' + (lang==='en'?'Download blank ':'Tải form blank ') + formCode;
+        html += '</a>';
+        html += '</div>';
+      }
+      html += '</div>';
+      html += '</div>';
+      resultDiv.innerHTML = html;
+    } else {
+      resultDiv.innerHTML = '<div class="record-id-error">' + (lang==='en'?'Error: ':'Lỗi: ') + (d.error||'Unknown') + '</div>';
+    }
+  })
+  .catch(function(err){
+    resultDiv.innerHTML = '<div class="record-id-error">' + (lang==='en'?'Network error':'Lỗi kết nối') + '</div>';
+  });
+};
+
+window._copyRecordFilename = function(){
+  var el = document.getElementById('rid-filename');
+  if(!el) return;
+  var text = el.textContent || el.innerText;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){
+      _showFormToast(lang==='en'?'Copied!':'Đã sao chép!', 'success');
+    });
+  } else {
+    // Fallback
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    _showFormToast(lang==='en'?'Copied!':'Đã sao chép!', 'success');
+  }
+};
+
+function _getFormFolder(code){
+  // FRM-631 → 06-FRM-600
+  var num = parseInt(code.replace('FRM-',''), 10);
+  var series = Math.floor(num / 100) * 100;
+  var prefix = String(Math.floor(num / 100)).padStart(2, '0');
+  return prefix + '-FRM-' + series;
 }
 
 // Init
