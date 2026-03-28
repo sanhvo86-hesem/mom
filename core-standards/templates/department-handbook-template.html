@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{{DEPARTMENT_CODE}} — {{TITLE}} | HESEM QMS</title>
+<link href="{{RELATIVE_PATH}}/assets/style.css" rel="stylesheet"/>
+<style>
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
+.metric-card .value{font-size:20px;font-weight:700;color:var(--navy);}
+.metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
+.auth-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:10px 0 16px;}
+.auth-item{padding:12px 14px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2);}
+.process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px;}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700;margin:0 6px 6px 0;}
+.tight{margin:0;padding-left:18px;}
+.tight li{margin:4px 0;}
+.mini-note{font-size:12px;color:var(--ink2);}
+@media(max-width:960px){.auth-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="{{RELATIVE_PATH}}/assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu hệ thống</span>
+</div>
+</div>
+<div class="title">
+<strong>{{TITLE}}</strong>
+<span class="sub-vn">{{SUBTITLE}}</span>
+</div>
+<div class="meta">
+<div class="row"><span><b>Code:</b></span><span>{{DEPARTMENT_CODE}}</span></div>
+<div class="row"><span><b>Version:</b></span><span>V0</span></div>
+<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Owner:</b></span><span>{{OWNER_ENTITY_HTML}}</span></div>
+<div class="row"><span><b>Approved by:</b></span><span>{{APPROVER_ROLE_HTML}}</span></div>
+</div>
+</div>
+
+<div class="doc-content" id="docContent"><div class="form-sheet">
+
+<div class="iso-map">
+<div class="iso-title">Operating intent / nguyên tắc điều hành</div>
+{{ISO_MAP_HTML}}
+</div>
+
+<div class="preface-block">
+{{PREFACE_HTML}}
+</div>
+
+<div class="toc">
+<div class="toc-title">Mục lục</div>
+<div class="toc-grid">
+<a href="#d1">1. Mục tiêu phòng ban</a>
+<a href="#d2">2. Phạm vi</a>
+<a href="#d3">3. Trách nhiệm bắt buộc</a>
+<a href="#d4">4. Quyền hạn</a>
+<a href="#d5">5. Đầu ra / hồ sơ</a>
+<a href="#d6">6. KPI</a>
+<a href="#d7">7. Interface liên phòng ban</a>
+<a href="#d8">8. Tài liệu liên quan</a>
+<a href="#d9">9. Mô hình vận hành &amp; ranh giới vai trò</a>
+<a href="#d10">10. Nhịp điều hành, dữ liệu &amp; bằng chứng</a>
+<a href="#d11">11. Năng lực &amp; deputy</a>
+<a href="#d12">12. Rủi ro &amp; escalations</a>
+</div>
+</div>
+
+<!-- Nội dung từng handbook phải được nghiên cứu riêng, không copy ngang phòng ban -->
+<!-- Trước khi điền template này phải đọc handbook hiện hành, handbook upstream/downstream, JD liên quan, SOP/ANNEX sử dụng boundary đó và core-standard 20 -->
+<!-- Khi boundary thay đổi phải sync workbook qms-terminology-dictionary.xlsx tối thiểu ở sheet Phong ban và Department code & handbook link -->
+
+</div></div>
+</div></div></div>
+</body>
+</html>

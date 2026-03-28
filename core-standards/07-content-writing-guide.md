@@ -22,6 +22,9 @@
 | 10 | Không ghi “mới so với bản trước” trong SOP chưa phát hành | Khi tài liệu còn là bản nháp trước phát hành đầu tiên, giữ `V0` và không mô tả khác biệt so với draft cũ trong body. |
 | 11 | Không nhét rationale benchmark vào thân SOP | Lý do chọn KPI, benchmark nguồn và ghi chú suy luận để ở working note / core-standard / hồ sơ soạn thảo, không đưa vào body SOP. |
 | 12 | Chuẩn hóa format được phép làm ở lõi, nội dung phải nâng cấp theo từng SOP | Palette, layout, table structure, checklist kỹ thuật có thể khóa trong core-standard; nhưng nội dung Section 1-8 phải nghiên cứu và viết theo từng tài liệu, không copy hàng loạt. |
+| 13 | Không dùng ngôn ngữ lai cho role/department boundary | Không viết `Customer Dịch vụ`, `Process Owner`, `all functions`, `Quy trình Owner`, `Department Head`. |
+| 14 | Không che coverage gap bằng cụm chung chung | Nếu thiếu phạm vi phòng ban hoặc thiếu JD cho một quyết định lặp lại, phải ghi nhận gap và cập nhật handbook/core-standard/JD theo rule. |
+| 15 | Handbook/matrix tổ chức không được giữ placeholder mơ hồ | Trong handbook hoặc bảng interface cấp chức năng, không để `các phòng liên quan`, `các phòng chức năng`, `line manager`, `line owner`, `bộ phận chuyên môn`; phải resolve thành `D-code` hoặc `role code`. |
 
 ### 1.2 Giọng văn
 
