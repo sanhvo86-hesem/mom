@@ -1,5 +1,4 @@
-
- thead { display: table-header-group; }
+<div><p>thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
  
@@ -8,33 +7,33 @@
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
 table { max-width: 100%; table-layout: auto; }
 td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-</style>
+
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../assets/style.css"/>
-</head>
-<body>
+<link rel="stylesheet" href="../../assets/style.css">
+
+</p>
 
 <div class="container">
 <div class="page">
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
  </div>
 </div>
 <div class="title">
- <strong>BẰNG CHỨNG-đặt tên-RULE — Evidence Đặt tên Quy ước & Lưu kho Quy tắc (SSOT)</strong>
+ <strong>BẰNG CHỨNG-đặt tên-RULE — Evidence Đặt tên Quy ước &amp; Lưu kho Quy tắc (SSOT)</strong>
  <span class="sub-vn"></span>
 </div>
 <div class="meta">
  <div class="row"><span><b>Code:</b></span><span>BẰNG CHỨNG-đặt tên-RULE</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -84,13 +83,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </p>
 <div class="mono-block" style="margin-top:10px;">
  JOB-2602-001_BRACKET-123_REV-C/
- <br/>├── 00_Input/ (PO, RFQ, Drawing, Spec)
- <br/>├── 10_Engineering/ (Bộ hồ sơ chuẩn (mốc chuẩn gói hàng), CAM, Setup sheet)
- <br/>├── 20_Production/ (Traveler, Setup Photos, Trong quá trình log)
- <br/>├── 30_QC/ (IR, FAI, Final, NCR)
- <br/>├── 40_Supplier/ (MTR, CoC, Outsource cert)
- <br/>├── 50_Shipping/ (bộ hồ sơ giao hàng (ship gói hồ sơ), CoC, Đóng gói, Label)
- <br/>└── 90_Archive/ (hết hiệu lực phiên bản, được thay thế)
+ <br>├── 00_Input/ (PO, RFQ, Drawing, Spec)
+ <br>├── 10_Engineering/ (Bộ hồ sơ chuẩn (mốc chuẩn gói hàng), CAM, Setup sheet)
+ <br>├── 20_Production/ (Traveler, Setup Photos, Trong quá trình log)
+ <br>├── 30_QC/ (IR, FAI, Final, NCR)
+ <br>├── 40_Supplier/ (MTR, CoC, Outsource cert)
+ <br>├── 50_Shipping/ (bộ hồ sơ giao hàng (ship gói hồ sơ), CoC, Đóng gói, Label)
+ <br>└── 90_Archive/ (hết hiệu lực phiên bản, được thay thế)
  </div>
 <p class="small muted" style="margin-top:10px;">
  Quy tắc: 01 job = 01 hồ sơ. Khi thay đổi phiên bản → tạo <b>hồ sơ phiên bản</b> mới và khóa hồ sơ cũ tại 90_Archive.
@@ -102,7 +101,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mẫu chuẩn:
  </p>
 <div class="mono-block">
- {JobNum}_{PartNum}_REV-{Rev}_{RecordType}_{YYYY-MM-DD}_{Seq}_{Responsible Person}.{ext}
+ {JobNum}_{PartNum}_REV-{Rev}_{RecordType}_{YYYY-MM-DD}_{Seq}_{người chịu trách nhiệm}.{ext}
  </div>
 <div class="table-card" style="margin-top:12px;">
 <table class="table">
@@ -114,7 +113,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>RecordType</b></td><td>RecordType</td><td>IR / FAI / NCR / CoC</td></tr>
 <tr><td><b>Date</b></td><td>Ngày tạo</td><td>2026-02-09</td></tr>
 <tr><td><b>Seq</b></td><td>Thứ tự</td><td>01 / 02</td></tr>
-<tr><td><b>Responsible Person</b></td><td>Người tạo</td><td>QC / SET / CAM</td></tr>
+<tr><td><b>người chịu trách nhiệm</b></td><td>Người tạo</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td></tr>
 </tbody>
 </table>
 </div>
@@ -194,5 +193,5 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <script src="../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
-</body>
-</html>
+
+</div>

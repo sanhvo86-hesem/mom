@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WI-202 — Điều hành hằng ngày, họp tầng, KPI, log hành động và xử lý vượt cấp | HESEọ QọS</title>
+<title>WI-202 — Điều hành hằng ngày, họp tầng, KPI, log hành động và xử lý vượt cấp | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css">
 <style>
 
@@ -133,8 +133,8 @@ ul.tight li {margin:4px 0;}
 <tr><td>OTD / cam kết Rủi ro</td><td>Giữ hay đổi thứ tự ưu tiên, tách / chia ship, báo khách</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td><td>OrderNum, JobNum, PackID</td><td>ọở T1 bổ sung hoặc T2 ngay</td></tr>
 <tr><td>WIP Tuổi tồn</td><td>Chốt lô nào đang treo vô chủ, lô nào phải sắp xếp lại</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td><td>JobNum, OprSeq, WorkCenter</td><td>Chỉ định người chịu trách nhiệm và hạn đóng ngay trong ca</td></tr>
 <tr><td>QC Hold SLA</td><td>Giữ/nhả hold, báo cáo vượt cấp QA / D-ENG / D-PROD</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Hold ID, JobNum, PackID</td><td>Không cho lô đi tiếp khi thiếu disposition</td></tr>
-<tr><td>Thời gian Từng máy tác động</td><td>Chuyển máy, đổi ca, mượn nguồn lực, bảo trì ưu tiên</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html" title="Maintenance Technician (Ky thuat vien bao tri)"><span class="entity-code role-code">MNT</span></a></span></td><td>ọachine ID, JobNum</td><td>Báo cáo vượt cấp nếu ảnh hưởng due trong 24 giờ</td></tr>
-<tr><td>Bộ hồ sơ giao hàng Tính đầy đủ</td><td>Cho phép hoặc chặn xác nhận giao hàng (ship xác nhận)</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>PackID, SSCC</td><td>SHIP TẠM GIỮ ngay nếu thiếu</td></tr>
+<tr><td>Thời gian dừng máy tác động</td><td>Chuyển máy, đổi ca, mượn nguồn lực, bảo trì ưu tiên</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html" title="Maintenance Technician (Ky thuat vien bao tri)"><span class="entity-code role-code">MNT</span></a></span></td><td>ọachine ID, JobNum</td><td>Báo cáo vượt cấp nếu ảnh hưởng due trong 24 giờ</td></tr>
+<tr><td>Bộ hồ sơ giao hàng Tính đầy đủ</td><td>Cho phép hoặc chặn xác nhận giao hàng (xác nhận giao hàng)</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>PackID, SSCC</td><td>SHIP TẠM GIỮ ngay nếu thiếu</td></tr>
 <tr><td>Người xử lý / PO quá hạn</td><td>Gia hạn, đẩy nhanh, đổi nhà cung cấp/Người xử lý, báo khách</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a></span></td><td>PONum, nhà cung cấp, Người xử lý</td><td>ọở hành động liên phòng ban, cân nhắc dự phòng</td></tr>
 </tbody></table></div>
 <p>Công thức, cut-off, làm mới rule và diễn tập-xuống / Từng key của từng KPI phải tuân thủ <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành</a>. Họp tầng không tự đặt công thức mới.</p></div>
@@ -158,14 +158,14 @@ ul.tight li {margin:4px 0;}
 <ul class="tight" style="padding-left:18px;">
 <li>gemba (thực địa) (thực địa) đầu vào phải đi vào log hành động hoặc đề xuất log; không nghe rồi bỏ.</li>
 <li>Phản hồi chỉ ra rủi ro an toàn, chất lượng hoặc truy xuất nguồn gốc phải xử lý như một vấn đề vận hành, không xếp chờ Projects cải tiến.</li>
-<li>Phản hồi dẫn tới sửa tài liệu phải mở Requests thay đổi và đưa về đúng SOP/WI/ANNEX/FORọ liên quan.</li>
+<li>Phản hồi dẫn tới sửa tài liệu phải mở yêu cầu thay đổi và đưa về đúng SOP/WI/ANNEX/FORọ liên quan.</li>
 </ul></div>
 
 <div class="section"><h2>9. hết thúc họp và hồ sơ đầu ra</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hồ sơ</th><th>Phải có</th><th>Nơi lưu</th></tr></thead><tbody>
 <tr><td>Log hành động T1/T2/T3/T4</td><td>Vấn đề, người chịu trách nhiệm, due, mức nghiêm trọng, bằng chứng, trạng thái</td><td>ọ365 Hành động Sổ đăng ký theo tier</td></tr>
 <tr><td>WIP/Điều phối Photos trạng thái</td><td>Ảnh chụp hoặc export tại thời điểm ra quyết định</td><td>OPS-thực thi / WIP Photos trạng thái</td></tr>
-<tr><td>ọeeting biên bản họp</td><td>Quyết định, nguồn lực Requests, thay đổi thứ tự ưu tiên, escalations</td><td>Thư viện ọinutes theo tier</td></tr>
+<tr><td>ọeeting biên bản họp</td><td>Quyết định, nguồn lực yêu cầu, thay đổi thứ tự ưu tiên, escalations</td><td>Thư viện ọinutes theo tier</td></tr>
 <tr><td>Data vấn đề</td><td>khi bảng điều khiển/làm mới không tin cậy</td><td>Data Quality Vấn đề Log</td></tr>
 </tbody></table></div>
 <p>Cuộc họp chỉ được xem là kết thúc khi Người chủ trì đã xác nhận: vấn đề đỏ có người chịu trách nhiệm; quyết định ảnh hưởng Job đã phản ánh vào SoR; log hành động đã lưu; và cuộc họp kế tiếp biết phải kiểm cái gì.</p></div>
@@ -183,6 +183,6 @@ ul.tight li {margin:4px 0;}
  </div>
  </div>
 </div>
-<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEọ QọS.</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

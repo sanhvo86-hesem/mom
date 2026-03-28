@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
- <meta charset="utf-8"/>
- <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
- <title>TRN-OPS-08 — Cấu hình & Phiên bản Control for CNC (Sai-Rev Phòng ngừa) | HESEM OS</title>
- <link href="../../../assets/style.css" rel="stylesheet"/>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>TRN-OPS-08 — Cấu hình &amp; Phiên bản Control for CNC (Sai-Rev Phòng ngừa) | HESEM OS</title>
+ <link href="../../../assets/style.css" rel="stylesheet">
  <style>
  .mini{font-size:12px;color:#374151;}
  .path{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; font-size:12px;}
@@ -25,22 +25,22 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
  </div>
 </div>
 <div class="title">
- <strong>TRN-OPS-08 — Cấu hình & Phiên bản Control for CNC (Sai-Rev Phòng ngừa)</strong>
+ <strong>TRN-OPS-08 — Cấu hình &amp; Phiên bản Control for CNC (Sai-Rev Phòng ngừa)</strong>
  <span class="sub-vn"></span>
 </div>
 <div class="meta">
  <div class="row"><span><b>Code:</b></span><span>TRN-OPS-08</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -57,7 +57,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  Mục tiêu: giảm "sai phiên bản / sai program" về <b>0</b> bằng 3 lớp kiểm soát:
  <b>(1) Bộ hồ sơ chuẩn (mốc chuẩn gói hàng)</b> (đúng file, đúng Rev),
  <b>(2) Cổng kiểm soát (gate) kiểm tra</b> (Kế hoạch phát hành → Job khởi động → Mẫu đầu (tiên chi tiết / sản phẩm),
- <b>(3) Cấu hình đánh giá</b> (đối chiếu as‑đã xây dựng ↔ Requests).
+ <b>(3) Cấu hình đánh giá</b> (đối chiếu as‑đã xây dựng ↔ yêu cầu).
  </p>
  </div>
  <div class="note">
@@ -88,7 +88,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <h2>2) Rev có thể sai ở đâu? (điểm đứt gãy)</h2>
  <div class="table-card">
  <table class="table tight">
- <colgroup><col style="width:26%"/><col style="width:44%"/><col style="width:30%"/></colgroup>
+ <colgroup><col style="width:26%"><col style="width:44%"><col style="width:30%"></colgroup>
  <thead><tr><th>Điểm lỗi</th><th>Ví dụ</th><th>Control bắt buộc</th></tr></thead>
  <tbody>
  <tr><td><b>PO / Drawing</b></td><td>Khách gửi bản vẽ mới nhưng PO ghi cũ</td><td>Review hợp đồng <a download="" href="../../../04-Bieu-Mau/02-FRM-200/FRM-202_Contract_Review_Checklist.xlsx">FRM‑QA‑001</a> + đóng băng</td></tr>
@@ -117,9 +117,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="note">
  <h3>(2) Cấu hình Đánh giá</h3>
  <ul class="list">
- <li>Đối chiếu Requests ↔ program/setup/kiểm tra ↔ chứng chỉ ↔ as‑đã xây dựng.</li>
+ <li>Đối chiếu yêu cầu ↔ program/setup/kiểm tra ↔ chứng chỉ ↔ as‑đã xây dựng.</li>
  <li>Thực hiện nhanh bằng <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a>.</li>
- <li>Áp dụng tối thiểu cho job có: Rev mới, CTQ, outsource công đoạn đặc biệt, hoặc khách Requests.</li>
+ <li>Áp dụng tối thiểu cho job có: Rev mới, CTQ, outsource công đoạn đặc biệt, hoặc khách yêu cầu.</li>
  </ul>
  </div>
  </div>
@@ -156,7 +156,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <h2>5) Phân xưởng: làm cấu hình đánh giá trong 15 phút</h2>
  <p class="mini">Chọn 1 job thật (hoặc job mẫu), thực hiện FRM‑QA‑017 theo nhóm. Mục tiêu: tìm ít nhất 2 điểm không khớp tiềm ẩn và đề xuất control.</p>
  <ul class="list">
- <li>Nhóm 1: Requests (drawing/spec/CTQ)</li>
+ <li>Nhóm 1: yêu cầu (drawing/spec/CTQ)</li>
  <li>Nhóm 2: program/setup (CAM/NC/phiếu cài đặt)</li>
  <li>Nhóm 3: kiểm tra/hồ sơ (IR/FAI/CMM program)</li>
  <li>Nhóm 4: bộ hồ sơ giao hàng (nhãn/CoC/chứng chỉ)</li>
@@ -169,7 +169,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="callout">
  <h3>Bài kiểm tra nhanh (10 câu — bắt buộc)</h3>
  <ol class="list">
- <li>"One source of sự thật" nghĩa là gì trong cấu hình?</li>
+ <li>"One nguồn sự thật" nghĩa là gì trong cấu hình?</li>
  <li>Nêu 3 điểm dễ sai Rev nhất trong CNC.</li>
  <li>FRM‑QA‑017 dùng khi nào?</li>
  <li>Tại sao cần hiển thị Program ID/Rev trên báo cáo đo?</li>
@@ -206,8 +206,3 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <script src="../../../assets/app.js"></script>
 </body>
 </html>
-
-
-
-
-

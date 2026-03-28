@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
 <title>TRN-Bài diễn tập ACA-DRL-04 — Setup + Kiểm tra sản phẩm đầu tiên (sản phẩm / bài viết) + IR/FAI | HESEM Academy</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 
 <style>
  .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
@@ -29,7 +28,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
@@ -43,8 +42,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="row"><span><b>Code:</b></span><span>DIỄN TẬP-SETUP-kiểm tra sản phẩm đầu tiên (FIRSTARTICLE)-IR</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -85,10 +84,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">người chịu trách nhiệm</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Pre-start an toàn: PPE, bảo vệ / tấm chắn, LO/TO (KHI setup), 5S khu vực máy.</td><td>Setup/Operator</td><td>Pre-start bảng kiểm + ảnh 5S</td><td>STOP</td></tr><tr><td>2</td><td>Xác nhận program/phiếu cài đặt đúng REV và đúng job.</td><td>Setup</td><td>Link mốc chuẩn + phát hành chương trình (program phát hành) note</td><td>STOP</td></tr><tr><td>3</td><td>Kiểm tra dụng cụ đo: mã gage + hạn hiệu chuẩn + tình trạng.</td><td>QC</td><td>Gage kiểm tra log + ảnh tem cal</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Setup máy theo phiếu cài đặt: tool, bù trừ (offset), fixture, không / bằng không.</td><td>Setup</td><td>Setup bảng kiểm + ảnh fixture</td><td>TẠM GIỮ</td></tr><tr><td>5</td><td>Chạy mẫu đầu: đo CTQ theo kế hoạch kiểm tra (plan) và ghi IR/FAI.</td><td>QC + Setup</td><td>IR/FAI ký + ảnh mẫu đầu</td><td>TẠM GIỮ</td></tr><tr><td>6</td><td>Quyết định phát hành: PASS hoặc TẠM GIỮ + escal theo bậc thang năng lực.</td><td>Supervisor + QA</td><td>Phát hành note hoặc TẠM GIỮ tag + log escal</td><td>FAIL</td></tr><tr><td>7</td><td>Lưu toàn bộ bằng chứng vào 20_Production/ và 30_QC/ theo đặt tên rule.</td><td>Setup/QC</td><td>liên kết SSOT đúng tên</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Pre-start an toàn: PPE, bảo vệ / tấm chắn, LO/TO (KHI setup), 5S khu vực máy.</td><td>Setup/Operator</td><td>Pre-start bảng kiểm + ảnh 5S</td><td>STOP</td></tr><tr><td>2</td><td>Xác nhận program/phiếu cài đặt đúng REV và đúng job.</td><td>Setup</td><td>Link mốc chuẩn + phát hành chương trình (program phát hành) note</td><td>STOP</td></tr><tr><td>3</td><td>Kiểm tra dụng cụ đo: mã gage + hạn hiệu chuẩn + tình trạng.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>Gage kiểm tra log + ảnh tem cal</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Setup máy theo phiếu cài đặt: tool, bù trừ (offset), fixture, không / bằng không.</td><td>Setup</td><td>Setup bảng kiểm + ảnh fixture</td><td>TẠM GIỮ</td></tr><tr><td>5</td><td>Chạy mẫu đầu: đo CTQ theo kế hoạch kiểm tra (plan) và ghi IR/FAI.</td><td>QC + Setup</td><td>IR/FAI ký + ảnh mẫu đầu</td><td>TẠM GIỮ</td></tr><tr><td>6</td><td>Quyết định phát hành: PASS hoặc TẠM GIỮ + escal theo bậc thang năng lực.</td><td>Supervisor + QA</td><td>Phát hành note hoặc TẠM GIỮ tag + log escal</td><td>FAIL</td></tr><tr><td>7</td><td>Lưu toàn bộ bằng chứng vào 20_Production/ và 30_QC/ theo đặt tên rule.</td><td>Setup/QC</td><td>liên kết SSOT đúng tên</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>

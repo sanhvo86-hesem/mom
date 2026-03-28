@@ -106,8 +106,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="notice-item"><b>Dùng theo mức rủi ro</b>Không phải mọi bảng điều khiển đều cần full pack. Pack phải tỷ lệ với mức độ quyết định và độ nhạy dữ liệu.</div>
 </div>
 <div class="table-card"><table class="table"><thead><tr><th>Loại pack</th><th>Khi nào phải có</th><th>Người phụ trách tối thiểu</th><th>Consumer chính</th></tr></thead><tbody>
-<tr><td>Freeze-date pack</td><td>KPI pack dùng cho tier review, MR hoặc quyết định chính thức</td><td>Người phụ trách KPI + QMS</td><td>Lãnh đạo / chủ quá trình</td></tr>
-<tr><td>Exception-note pack</td><td>Có late posting, manual correction, offline event, missing source, restatement</td><td>Người phụ trách Bảng điều khiển + chủ dữ liệu</td><td>Người dùng pack / QMS / đánh giá</td></tr>
+<tr><td>Freeze-date pack</td><td>KPI pack dùng cho tier review, MR hoặc quyết định chính thức</td><td>Người phụ trách KPI + QMS</td><td>Lãnh đạo / OPS_SCOPE_OWNERS</td></tr>
+<tr><td>Exception-note pack</td><td>Có late posting, manual correction, offline event, missing source, restatement</td><td>Người phụ trách Bảng điều khiển + FUNC_OWNERS / ITA / ESA</td><td>Người dùng pack / QMS / đánh giá</td></tr>
 <tr><td>Quarterly access-bộ hồ sơ rà soát</td><td>Rà định kỳ quyền user, privileged account, deputy, service account</td><td>IT admin + Người phụ trách hệ thống + Người rà soát độc lập</td><td>IT / QMS / management</td></tr>
 <tr><td>Management-bộ hồ sơ rà soát</td><td>Họp xem xét của lãnh đạo theo SOP-902</td><td>QMS + KPI Người phụ trách</td><td>Ban lãnh đạo</td></tr>
 </tbody></table></div>
@@ -131,7 +131,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <tr><td>Affected KPI / bảng điều khiển</td><td>OTD dispatch, shipped revenue, overdue jobs</td><td>Chỉ rõ chỉ số nào bị ảnh hưởng.</td></tr>
 <tr><td>Data impact</td><td>3 shipments posted late after freeze; revenue restated +1.8%</td><td>Cho Người đọc biết mức độ ảnh hưởng.</td></tr>
 <tr><td>Temporary treatment</td><td>Freeze giữ nguyên; ghi chú điều hành nêu riêng; restatement ở pack kỳ sau</td><td>Không được sửa âm thầm.</td></tr>
-<tr><td>Người phụ trách / Người phê duyệt</td><td>Epicor admin / Finance manager / QA manager</td><td>Chỉ rõ ai chịu trách nhiệm giải trình.</td></tr>
+<tr><td>Người phụ trách / Người phê duyệt</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="entity-code role-code">ESA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Chỉ rõ ai chịu trách nhiệm giải trình.</td></tr>
 </tbody></table></div>
 <div class="field-grid">
 <div class="field"><b>Backfill / reconciliation path</b><div class="blank">Link tới raw extract, manual ledger, nhật ký sự cố (incident nhật ký), closure bằng chứng.</div></div>

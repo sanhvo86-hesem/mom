@@ -1,5 +1,4 @@
-
- thead { display: table-header-group; }
+<div><p>thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
  
@@ -8,31 +7,31 @@
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
 table { max-width: 100%; table-layout: auto; }
 td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-</style>
+
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../../assets/style.css"/>
-</head>
-<body>
+<link rel="stylesheet" href="../../../../assets/style.css">
+
+</p>
 
 <div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
  </div>
 </div>
 <div class="title">
- <strong>C18-L1 — Chuỗi cung ứng, Mua hàng & Hậu cần — Nền tảng</strong>
+ <strong>C18-L1 — Chuỗi cung ứng, Mua hàng &amp; Hậu cần — Nền tảng</strong>
  <span class="sub-vn"></span>
 </div>
 <div class="meta">
  <div class="row"><span><b>Code:</b></span><span>C18-L1</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent"><h1>C18-L1 — Chuỗi cung ứng – mua hàng – hậu cần (nhận/xuất/truy xuất nguồn gốc) — Nhận/Xuất đúng chứng từ &amp; nhãn truy xuất nguồn gốc</h1><div class="note-blue" style="margin:12px 0">
@@ -118,7 +117,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="step">
 <div class="cap">B1 — Nhận chứng từ</div>
 <ul>
-<li>Lấy PO, phiếu kê đóng gói, MTR/CoC (khi áp dụng), Requests đặc biệt (spec, phiên bản).</li>
+<li>Lấy PO, phiếu kê đóng gói, MTR/CoC (khi áp dụng), yêu cầu đặc biệt (spec, phiên bản).</li>
 <li>Kiểm tra mã nhà cung cấp, số PO, số lô/mẻ nấu (heat).</li>
 </ul>
 </div>
@@ -147,7 +146,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="step">
 <div class="cap">B5 — Xuất kho / giao nhận</div>
 <ul>
-<li>Chọn / Lấy hàng đúng Part/Rev/Lot, đối chiếu với Requests job.</li>
+<li>Chọn / Lấy hàng đúng Part/Rev/Lot, đối chiếu với yêu cầu job.</li>
 <li>Đóng gói theo spec, dán nhãn giao vận, chuẩn bị hồ sơ.</li>
 </ul>
 </div>
@@ -169,7 +168,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Đối chiếu Job/Part/Rev/Qty với phiếu công đoạn (traveller)/phiếu kê đóng gói.</li>
 <li>Trạng thái đã Phát hành (QA/OPS), không có TẠM GIỮ.</li>
 <li>Đóng gói theo quy định bảo quản; nhãn giao vận đầy đủ.</li>
-<li>Hồ sơ: CoC/IR/FAI (khi Requests) + phiếu kê đóng gói.</li>
+<li>Hồ sơ: CoC/IR/FAI (khi yêu cầu) + phiếu kê đóng gói.</li>
 <li>Ghi log phát hành CoC: <a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-QA-011</a>.</li>
 </ul>
 </div>
@@ -186,7 +185,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul>
 <li>Gắn TẠM GIỮ, đưa vào khu TẠM GIỮ, chụp ảnh nhãn/mẻ nấu (heat).</li>
 <li>Cập nhật PO bảng theo dõi trạng thái <b>TẠM GIỮ – thiếu chứng từ</b>.</li>
-<li>Báo PUR/QA: Requests bổ sung MTR/CoC; không được cấp phát vào sản xuất.</li>
+<li>Báo PUR/QA: yêu cầu bổ sung MTR/CoC; không được cấp phát vào sản xuất.</li>
 </ul>
 </div><div class="case">
 <div class="cap">Tình huống 2 — Nhãn mẻ nấu (heat) không khớp chứng từ</div>
@@ -214,7 +213,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>OK: đủ dữ liệu và khớp; TẠM GIỮ: thiếu dữ liệu hoặc có sai lệch cần xác minh.</li>
 <li>Gắn TẠM GIỮ và cô lập lô.</li>
 <li>Khi có quy tắc truy xuất nguồn gốc + hồ sơ gộp lô được phê duyệt.</li>
-<li>CoC/IR/FAI (khi Requests) + phiếu kê đóng gói + nhãn giao vận.</li>
+<li>CoC/IR/FAI (khi yêu cầu) + phiếu kê đóng gói + nhãn giao vận.</li>
 <li>FRM-PUR-001.</li>
 <li>FRM-PUR-007.</li>
 <li>Xuất sai vật liệu/nhầm phiên bản/thiếu chứng từ truy xuất nguồn gốc.</li>
@@ -235,14 +234,5 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <script src="../../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
-</body>
-</html>
 
-
-
-
-
-
-
-
-
+</div>

@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
 <title>TRN-Bài diễn tập ACA-DRL-05 — CAM Gói phát hành + Kiểm soát thay đổi | HESEM Academy</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 
 <style>
  .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
@@ -29,7 +28,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
@@ -43,8 +42,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="row"><span><b>Code:</b></span><span>DIỄN TẬP-CAM-PHÁT HÀNH-kiểm soát thay đổi (CHANGECONTRO)</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -85,10 +84,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">người chịu trách nhiệm</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Xác nhận đầu vào: drawing/spec đúng REV và CTQ list đã chốt.</td><td>CAM/ENG</td><td>Link đầu vào tập tin + REV xác nhận note</td><td>STOP</td></tr><tr><td>2</td><td>Tạo program + danh sách dao cụ + phiếu cài đặt theo template mốc chuẩn.</td><td>CAM</td><td>Program file + danh sách dao cụ + phiếu cài đặt</td><td>TẠM GIỮ</td></tr><tr><td>3</td><td>Chạy mô phỏng/xác minh và lưu bằng chứng (ảnh hoặc báo cáo).</td><td>CAM</td><td>Mô phỏng báo cáo/ảnh</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Gói phát hành: đặt tên file đúng chuẩn, tạo DCR hồ sơ (REV, date, lý do).</td><td>CAM/ENG</td><td>Phát hành log + link pack</td><td>CHẶN</td></tr><tr><td>5</td><td>Phát hành: cập nhật Hồ sơ công việc (hồ sơ công việc)/10_Engineering/ và gửi link cho Setup/Sản xuất.</td><td>CAM</td><td>SharePoint link + bàn giao log</td><td>FAIL</td></tr><tr><td>6</td><td>Thay đổi tình huống: nhận drawing REV mới → thu hồi pack cũ, lưu trữ, tạo pack mới và chạy xác minh lại.</td><td>CAM/ENG + QA</td><td>Thay đổi thông báo + new pack + lưu trữ bằng chứng</td><td>CHẶN</td></tr>
+<tr><td>1</td><td>Xác nhận đầu vào: drawing/spec đúng REV và CTQ list đã chốt.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Link đầu vào tập tin + REV xác nhận note</td><td>STOP</td></tr><tr><td>2</td><td>Tạo program + danh sách dao cụ + phiếu cài đặt theo template mốc chuẩn.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>Program file + danh sách dao cụ + phiếu cài đặt</td><td>TẠM GIỮ</td></tr><tr><td>3</td><td>Chạy mô phỏng/xác minh và lưu bằng chứng (ảnh hoặc báo cáo).</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>Mô phỏng báo cáo/ảnh</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Gói phát hành: đặt tên file đúng chuẩn, tạo DCR hồ sơ (REV, date, lý do).</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Phát hành log + link pack</td><td>CHẶN</td></tr><tr><td>5</td><td>Phát hành: cập nhật Hồ sơ công việc (hồ sơ công việc)/10_Engineering/ và gửi link cho Setup/Sản xuất.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>SharePoint link + bàn giao log</td><td>FAIL</td></tr><tr><td>6</td><td>Thay đổi tình huống: nhận drawing REV mới → thu hồi pack cũ, lưu trữ, tạo pack mới và chạy xác minh lại.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Thay đổi thông báo + new pack + lưu trữ bằng chứng</td><td>CHẶN</td></tr>
 </tbody>
 </table>
 </div>

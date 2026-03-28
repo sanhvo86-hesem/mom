@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
 <title>TRN-Bài diễn tập ACA-DRL-02 — Phiên bản &amp; SSOT (Đánh giá 60-Thứ hai / Giây) | HESEM Academy</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 
 <style>
  .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
@@ -29,7 +28,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
@@ -43,8 +42,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="row"><span><b>Code:</b></span><span>DIỄN TẬP-phiên bản-SSOT-60S</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -86,7 +85,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">người chịu trách nhiệm</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
 <tr><td>1</td><td>Người đánh giá cung cấp JobNum. Học viên mở đúng Hồ sơ công việc (hồ sơ công việc) và đọc REV tại thư mục name.</td><td>Học viên</td><td>Photos màn hình đường dẫn + REV</td><td>STOP</td></tr><tr><td>2</td><td>Mở đúng drawing/spec thuộc phiên bản set hiện hành (file được kiểm soát).</td><td>Học viên</td><td>Link file drawing/spec</td><td>FAIL</td></tr><tr><td>3</td><td>Mở đúng bộ hồ sơ chuẩn (mốc chuẩn gói hàng): phiếu cài đặt hoặc kế hoạch kiểm tra (plan).</td><td>Học viên</td><td>Link mốc chuẩn file</td><td>FAIL</td></tr><tr><td>4</td><td>Mở đúng IR/FAI mới nhất và chỉ ra CTQ #1.</td><td>Học viên</td><td>Link IR/FAI + CTQ nổi bật / đánh dấu</td><td>FAIL</td></tr><tr><td>5</td><td>Khi có thay đổi: mở DCR hồ sơ/thông báo và chỉ ra tác động tới công đoạn đang làm.</td><td>Học viên</td><td>Link thay đổi hồ sơ</td><td>CHẶN</td></tr><tr><td>6</td><td>Người đánh giá bấm giờ: toàn bộ bước 1–4 hoàn tất ≤ 60 giây.</td><td>Người đánh giá</td><td>Time kết quả + ghi chú</td><td>FAIL</td></tr>

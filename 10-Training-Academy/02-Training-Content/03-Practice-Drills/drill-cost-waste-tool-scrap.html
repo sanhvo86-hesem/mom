@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
 <title>TRN-Bài diễn tập ACA-DRL-10 — Chi phí &amp; Lãng phí (Tool tuổi thọ / vòng đời • Phế phẩm • Làm lại) | HESEM Academy</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 
 <style>
  .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
@@ -29,7 +28,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
@@ -43,8 +42,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="row"><span><b>Code:</b></span><span>DIỄN TẬP-chi phí-lãng phí-TOOL-phế liệu</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -52,7 +51,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="kicker">Bộ diễn tập</div>
 <h1 class="h1">DRL-Bài diễn tập 10 — Chi phí &amp; Lãng phí (Tool tuổi thọ / vòng đời • Phế phẩm • Làm lại)</h1>
 <p class="lead">
- Diễn tập này rèn năng lực <b>tính chi phí thực tế</b> và <b>khóa lãng phí</b>: phế phẩm, làm lại, tool mài mòn, thời gian Từng máy.
+ Diễn tập này rèn năng lực <b>tính chi phí thực tế</b> và <b>khóa lãng phí</b>: phế phẩm, làm lại, tool mài mòn, thời gian dừng máy.
  Đầu ra của diễn tập là 01 hành động cập nhật standard và có kiểm chứng.
  </p>
 </div>
@@ -76,7 +75,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">Chuẩn bị</span>
 <ul class="tight">
-<li>ERP/MES log hoặc bảng theo dõi tool, phế phẩm, thời gian Từng máy.</li>
+<li>ERP/MES log hoặc bảng theo dõi tool, phế phẩm, thời gian dừng máy.</li>
 <li>Template chi phí tính toán sheet.</li>
 <li>Bảng KPI cell.</li>
 </ul>
@@ -86,10 +85,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">người chịu trách nhiệm</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Chọn 01 job/cell và lấy dữ liệu: phế phẩm qty, làm lại time, tool tiêu thụ, thời gian Từng máy.</td><td>Team lead + Planner</td><td>Data trích xuất (sheet)</td><td>FAIL</td></tr><tr><td>2</td><td>Tính chi phí: nguyên vật liệu phế phẩm + machine time + tool chi phí + outsource chi phí (KHI có).</td><td>Team lead</td><td>Chi phí tính toán sheet (ký)</td><td>FAIL</td></tr><tr><td>3</td><td>Xếp hạng 3 nguyên nhân chi phí cao nhất và chỉ ra điểm gãy trong quy trình.</td><td>Team</td><td>Pareto + vấn đề báo cáo / tuyên bố</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Chốt 1 biện pháp đối phó có tác động lớn: thông số, tool thay đổi rule, kiểm tra step, poka (chống sai) (chống sai)-giá đỡ (yoke).</td><td>OPS/ENG</td><td>Kế hoạch hành động + đã cập nhật standard</td><td>CHẶN</td></tr><tr><td>5</td><td>Chạy xác minh sau 1 ca: đo lại phế phẩm/làm lại/tool và cập nhật bảng.</td><td>Team lead</td><td>trước/sau KPI Photos trạng thái</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Chọn 01 job/cell và lấy dữ liệu: phế phẩm qty, làm lại time, tool tiêu thụ, thời gian dừng máy.</td><td>Team lead + Planner</td><td>Data trích xuất (sheet)</td><td>FAIL</td></tr><tr><td>2</td><td>Tính chi phí: nguyên vật liệu phế phẩm + machine time + tool chi phí + outsource chi phí (KHI có).</td><td>Team lead</td><td>Chi phí tính toán sheet (ký)</td><td>FAIL</td></tr><tr><td>3</td><td>Xếp hạng 3 nguyên nhân chi phí cao nhất và chỉ ra điểm gãy trong quy trình.</td><td>Team</td><td>Pareto + vấn đề báo cáo / tuyên bố</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Chốt 1 biện pháp đối phó có tác động lớn: thông số, tool thay đổi rule, kiểm tra step, poka (chống sai) (chống sai)-giá đỡ (yoke).</td><td>OPS/ENG</td><td>Kế hoạch hành động + đã cập nhật standard</td><td>CHẶN</td></tr><tr><td>5</td><td>Chạy xác minh sau 1 ca: đo lại phế phẩm/làm lại/tool và cập nhật bảng.</td><td>Team lead</td><td>trước/sau KPI Photos trạng thái</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
@@ -110,7 +109,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Data độ chính xác</b></td><td>Dữ liệu có nguồn rõ (ERP/MES/log); không nhập tay theo cảm tính.</td><td>0/1/2</td></tr><tr><td><b>Chi phí tính toán</b></td><td>Công thức đúng; đơn vị đúng; có kiểm tra chéo.</td><td>0/1/2</td></tr><tr><td><b>Vấn đề trọng tâm</b></td><td>Chọn đúng 3 nguyên nhân chính; không dàn trải.</td><td>0/1/2</td></tr><tr><td><b>biện pháp đối phó chất lượng</b></td><td>Hành động gắn vào standard; có Responsible Person + due + điều kiện kiểm soát.</td><td>0/1/2</td></tr><tr><td><b>Xác minh</b></td><td>Có trước/sau KPI; kết luận dựa trên số liệu.</td><td>0/1/2</td></tr>
+<tr><td><b>Data độ chính xác</b></td><td>Dữ liệu có nguồn rõ (ERP/MES/log); không nhập tay theo cảm tính.</td><td>0/1/2</td></tr><tr><td><b>Chi phí tính toán</b></td><td>Công thức đúng; đơn vị đúng; có kiểm tra chéo.</td><td>0/1/2</td></tr><tr><td><b>Vấn đề trọng tâm</b></td><td>Chọn đúng 3 nguyên nhân chính; không dàn trải.</td><td>0/1/2</td></tr><tr><td><b>biện pháp đối phó chất lượng</b></td><td>Hành động gắn vào standard; có người chịu trách nhiệm + due + điều kiện kiểm soát.</td><td>0/1/2</td></tr><tr><td><b>Xác minh</b></td><td>Có trước/sau KPI; kết luận dựa trên số liệu.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>

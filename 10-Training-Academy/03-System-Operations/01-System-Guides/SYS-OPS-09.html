@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>SYS-OPS-09 — Epicor Kinetic (Epicor) (Epicor) tích hợp Pack (BAQ → REST → M365 Bản sao) | HESEM OS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 <style>
  .kpi{display:inline-block;padding:2px 8px;border-radius:999px;background:#f3f4f6;border:1px solid #e5e7eb;font-size:12px;margin-right:6px;}
  .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; font-size:12px;}
@@ -30,7 +29,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
@@ -44,8 +43,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-09</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 
@@ -67,7 +66,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Epicor Kinetic (Epicor) (Epicor) = nguồn đúng (Nguồn chuẩn)</b> cho Job/Rev/Lộ trình gia công/Lô giao hàng/MES time mục nhập.</li>
 <li><b>M365 = thực thi + bằng chứng</b> cho approvals, bảng kiểm, hồ sơ (Bộ bằng chứng) và log vận hành.</li>
 <li><b>phản chiếu / sao chép trong M365 = chỉ đọc</b> (JobIndex/JobOperIndex/LaborMirror/ShipmentMirror). Không chỉnh tay dữ liệu phản chiếu / sao chép.</li>
-<li><b>Không có bằng chứng = không có cổng kiểm soát.</b> Thiếu MRR bắt buộc → CHẶN (đặc biệt cổng kiểm soát phê duyệt giao hàng (ship phát hành).</li>
+<li><b>Không có bằng chứng = không có cổng kiểm soát.</b> Thiếu MRR bắt buộc → CHẶN (đặc biệt cổng kiểm soát phê duyệt giao hàng (phê duyệt giao hàng).</li>
 </ul>
 </div>
 <div class="table-wrap" style="margin-top:12px">
@@ -101,12 +100,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>Operator / Setup</td><td>Chạy đúng Job/Rev/Op, dừng khi sai bằng chứng</td><td>JobIndex, JobOperIndex, Hồ sơ công việc (mở nhanh)</td></tr>
 <tr><td>Lập trình viên (CNC)</td><td>Phát hành chương trình đúng Rev, chống nhầm Rev</td><td>JobIndex.RevisionNum, Part/REV Bản gốc, Phát hành hồ sơ</td></tr>
-<tr><td>QC / QA</td><td>Hold/NCR/CAPA, xác nhận ĐẠT/KHÔNG ĐẠT, đóng hồ sơ</td><td>QCHoldLog, NCRLog, InspectionReports, ApprovalHistory</td></tr>
-<tr><td>Kho</td><td>Đóng gói, in SSCC, cổng kiểm soát phê duyệt giao hàng</td><td>PackSSCCRegister, PackagingChecks, ShipRelease, ShipmentMirror</td></tr>
-<tr><td>Planner</td><td>Ưu tiên WIP, OTD, giải phóng nghẽn</td><td>JobIndex.DueDate/Trạng thái, KPI bảng điều khiển</td></tr>
-<tr><td>Mua hàng</td><td>Outsource/chứng chỉ, tránh thiếu chứng từ</td><td>OutsourceMirror, Hồ sơ công việc (chứng chỉ)</td></tr>
-<tr><td>Bảo trì</td><td>Thời gian Từng máy Log chuẩn để phản ánh OEE</td><td>Thời gian Từng máy Log (list liên quan) IncidentLog (SharePoint List) + Teams: QMS-ALERT.</td></tr>
-<tr><td>EHS</td><td>Hành động an toàn vào Tier bảng</td><td>StandupActions (Mức nghiêm trọng/SLA)</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Hold/NCR/CAPA, xác nhận ĐẠT/KHÔNG ĐẠT, đóng hồ sơ</td><td>QCHoldLog, NCRLog, InspectionReports, ApprovalHistory</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>Đóng gói, in SSCC, cổng kiểm soát phê duyệt giao hàng</td><td>PackSSCCRegister, PackagingChecks, ShipRelease, ShipmentMirror</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td><td>Ưu tiên WIP, OTD, giải phóng nghẽn</td><td>JobIndex.DueDate/Trạng thái, KPI bảng điều khiển</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a></span></td><td>Outsource/chứng chỉ, tránh thiếu chứng từ</td><td>OutsourceMirror, Hồ sơ công việc (chứng chỉ)</td></tr>
+<tr><td>Bảo trì</td><td>Thời gian dừng máy Log chuẩn để phản ánh OEE</td><td>Thời gian dừng máy Log (list liên quan) IncidentLog (SharePoint List) + Teams: QMS-ALERT.</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a></span></td><td>Hành động an toàn vào Tier bảng</td><td>StandupActions (Mức nghiêm trọng/SLA)</td></tr>
 <tr><td>Người định giá (SAL-03)</td><td>Cam kết giao hàng dựa trên cổng kiểm soát</td><td>ShipRelease.Trạng thái, Gate_ShipReady, OTD</td></tr>
 <tr><td>Supervisor</td><td>Trung tâm điều hành (control tháp / cột): lỗi sync, vấn đề chặn, escalations</td><td>IntegrationLogs, StandupActions, Data Sức khỏe</td></tr>
 </tbody>
@@ -246,13 +245,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>ShipRelease ĐÃ CHẶN</td>
 <td>Mở lý do thiếu; tải lên Final IR/CoC/ảnh đóng gói; re-xác nhận hiệu lực</td>
-<td>WHS + QA</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
 <td>ShipRelease + thư mục bộ hồ sơ giao hàng + ApprovalHistory</td>
 </tr>
 <tr>
 <td>Điều tiết 429</td>
 <td>Dừng chạy lại liên tục; chuyển sang thử lại/chờ lùi (backoff); giảm batch; ghi log</td>
-<td>IT</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td>
 <td>IntegrationLogs cảnh báo/Thất bại + cấu hình thử lại/batch</td>
 </tr>
 </tbody>
@@ -264,20 +263,20 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <p class="mini">Bảng kiểm áp dụng cho ca trưởng/supervisor và Người trực IT/QMS.</p>
 <div class="table-wrap">
 <table class="table tight">
-<thead><tr><th>#</th><th>Bước</th><th>Responsible Person</th><th>Evidence (MRR)</th><th>Lỗi hay gặp</th></tr></thead>
+<thead><tr><th>#</th><th>Bước</th><th>người chịu trách nhiệm</th><th>Evidence (MRR)</th><th>Lỗi hay gặp</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Kiểm tra IntegrationLogs 3 luồng phản chiếu / sao chép (công việc / đơn hàng/ops/ship) trạng thái thành công/cảnh báo</td><td>Supervisor</td><td>Ảnh màn hình IntegrationLogs</td><td>Chỉ nhìn "luồng run thành công" mà bỏ ErrorSummary</td></tr>
-<tr><td>2</td><td>Kiểm tra IntegrationSettings dấu chìm / hình chìm cập nhật đúng sau thành công</td><td>IT</td><td>Hồ sơ IntegrationSettings + dấu thời gian</td><td>con trỏ nhảy khi run FAIL</td></tr>
+<tr><td>2</td><td>Kiểm tra IntegrationSettings dấu chìm / hình chìm cập nhật đúng sau thành công</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td><td>Hồ sơ IntegrationSettings + dấu thời gian</td><td>con trỏ nhảy khi run FAIL</td></tr>
 <tr><td>3</td><td>Kiểm tra Data Sức khỏe: null khóa / phím/trùng lặp/độ trễ</td><td>Supervisor</td><td>Báo cáo Data Sức khỏe CNC-IMS-HUB → QMS-Hồ sơ → bảng điều khiển (Dash)-Photos trạng thái.</td><td>Không phân loại ưu tiên lỗi lặp</td></tr>
-<tr><td>4</td><td>điểm / tại chỗ kiểm tra 5 Job: JobIndex ↔ Epicor (JobNum, Rev, DueDate, Trạng thái)</td><td>Planner</td><td>Danh sách điểm / tại chỗ kiểm tra + ảnh</td><td>So sai công ty/nhà máy</td></tr>
-<tr><td>5</td><td>Kiểm tra Hồ sơ công việc tạo đủ thư mục template theo ANNEX-QMS-003</td><td>QA/QMS</td><td>Link thư mục + danh sách thư mục</td><td>Template lệch do luồng cấu hình khác</td></tr>
-<tr><td>6</td><td>Kiểm tra ShipRelease pending/ĐÃ CHẶN; chốt vấn đề chặn trong ngày</td><td>WHS + QA</td><td>Danh sách ĐÃ CHẶN + lý do</td><td>Đổi Trạng thái bằng tay</td></tr>
-<tr><td>7</td><td>Kiểm tra PackSSCCRegister: trạng thái Đã xác minh/Released đúng logic</td><td>WHS</td><td>Hồ sơ PackSSCCRegister + scan bằng chứng</td><td>in lại không có lý do</td></tr>
-<tr><td>8</td><td>Kiểm tra ApprovalHistory đủ cho phê duyệt giao hàng, NCR/CAPA kết thúc / đóng</td><td>QA</td><td>ApprovalHistory lọc theo SourceList</td><td>Phê duyệt qua chat/miệng</td></tr>
+<tr><td>4</td><td>điểm / tại chỗ kiểm tra 5 Job: JobIndex ↔ Epicor (JobNum, Rev, DueDate, Trạng thái)</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td><td>Danh sách điểm / tại chỗ kiểm tra + ảnh</td><td>So sai công ty/nhà máy</td></tr>
+<tr><td>5</td><td>Kiểm tra Hồ sơ công việc tạo đủ thư mục template theo ANNEX-QMS-003</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Link thư mục + danh sách thư mục</td><td>Template lệch do luồng cấu hình khác</td></tr>
+<tr><td>6</td><td>Kiểm tra ShipRelease pending/ĐÃ CHẶN; chốt vấn đề chặn trong ngày</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Danh sách ĐÃ CHẶN + lý do</td><td>Đổi Trạng thái bằng tay</td></tr>
+<tr><td>7</td><td>Kiểm tra PackSSCCRegister: trạng thái Đã xác minh/Released đúng logic</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>Hồ sơ PackSSCCRegister + scan bằng chứng</td><td>in lại không có lý do</td></tr>
+<tr><td>8</td><td>Kiểm tra ApprovalHistory đủ cho phê duyệt giao hàng, NCR/CAPA kết thúc / đóng</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>ApprovalHistory lọc theo SourceList</td><td>Phê duyệt qua chat/miệng</td></tr>
 <tr><td>9</td><td>Kiểm tra đặt tên bằng chứng Tier 1 theo ANNEX-QMS-003</td><td>Doc Control</td><td>Danh sách file Tier 1 + tên file</td><td>tên tập tin có dấu/ký tự không hợp lệ</td></tr>
-<tr><td>10</td><td>Kiểm tra bảng điều khiển làm mới trạng thái (JobIndex/ShipRelease nhịp độ / chu kỳ họp)</td><td>IT</td><td>Làm mới log + thời điểm Cần nhất</td><td>Bảng điều khiển hiển thị "cũ" mà không báo</td></tr>
-<tr><td>11</td><td>Đóng phân loại ưu tiên: StandupActions Mức nghiêm trọng S1/S2 có Responsible Person + Ngày đến hạn</td><td>Supervisor</td><td>StandupActions list</td><td>Không gán Responsible Person rõ</td></tr>
-<tr><td>12</td><td>Ghi nhận học viên OJT hoàn thành hiệu suất test</td><td>Người đào tạo</td><td>Phiếu chấm + link bằng chứng</td><td>Chấm "đạt" không có dấu vết</td></tr>
+<tr><td>10</td><td>Kiểm tra bảng điều khiển làm mới trạng thái (JobIndex/ShipRelease nhịp độ / chu kỳ họp)</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td><td>Làm mới log + thời điểm Cần nhất</td><td>Bảng điều khiển hiển thị "cũ" mà không báo</td></tr>
+<tr><td>11</td><td>Đóng phân loại ưu tiên: StandupActions Mức nghiêm trọng S1/S2 có người chịu trách nhiệm + Ngày đến hạn</td><td>Supervisor</td><td>StandupActions list</td><td>Không gán người chịu trách nhiệm rõ</td></tr>
+<tr><td>12</td><td>Ghi nhận học viên OJT hoàn thành hiệu suất test</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Ky su quy trinh)"><span class="entity-code role-code">PE</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="entity-code role-code">QE</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html" title="Metrology and Calibration Specialist (Chuyen vien do luong va hieu chuan)"><span class="entity-code role-code">MCS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html" title="Maintenance Technician (Ky thuat vien bao tri)"><span class="entity-code role-code">MNT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html" title="Tool Crib / Tool Storekeeper (Thu kho dao cu)"><span class="entity-code role-code">TOOL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="entity-code role-code">ESA</span></a></span></td><td>Phiếu chấm + link bằng chứng</td><td>Chấm "đạt" không có dấu vết</td></tr>
 </tbody>
 </table>
 </div>
@@ -511,14 +510,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Ảnh mở thư mục + bảng kiểm</td>
 </tr>
 <tr>
-<td>QC/QA</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
 <td>Tạo 01 QCHoldLog + đính bằng chứng đúng; tạo/kiểm tra ApprovalHistory</td>
 <td>Hồ sơ đầy đủ trường bắt buộc; link đúng thư mục; luồng công việc rõ</td>
 <td>Hold không ngăn chặn; bằng chứng đặt sai nơi; đóng không phê duyệt</td>
 <td>QCHoldLog + ApprovalHistory + thư mục link</td>
 </tr>
 <tr>
-<td>WHS</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
 <td>Đăng ký SSCC + PackagingChecks + ShipRelease; xử lý từ ĐÃ CHẶN → ĐÃ PHÁT HÀNH</td>
 <td>PASS đủ điều kiện; Người xác nhận chuyển ĐÃ PHÁT HÀNH; phê duyệt có log</td>
 <td>Xuất kho khi ĐÃ CHẶN; sửa Trạng thái bằng tay</td>
@@ -532,7 +531,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Ảnh bảng điều khiển + hồ sơ ShipRelease</td>
 </tr>
 <tr>
-<td>IT</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td>
 <td>phân loại ưu tiên 01 lỗi sync: cũ / lỗi thời/phân trang/giới hạn tốc độ (throttling)</td>
 <td>Khoanh vùng nguyên nhân; hành động khôi phục; các log đầy đủ</td>
 <td>Đẩy dấu chìm / hình chìm khi lỗi; xoá dữ liệu không đánh giá</td>
@@ -618,9 +617,3 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
-
-
-
-
-
-

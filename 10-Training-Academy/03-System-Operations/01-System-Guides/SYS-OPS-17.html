@@ -1,5 +1,4 @@
-
- thead { display: table-header-group; }
+<div><p>thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
  
@@ -8,17 +7,17 @@
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
 table { max-width: 100%; table-layout: auto; }
 td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-</style>
+
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../assets/style.css"/>
-</head>
-<body>
+<link rel="stylesheet" href="../../../assets/style.css">
+
+</p>
 <div class="container">
 <div class="page">
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
@@ -32,8 +31,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="row"><span><b>Code:</b></span><span>SYS-OPS-17</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -118,9 +117,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:260px">Rủi ro</th><th>Hậu quả</th><th style="width:280px">Điểm chặn của mô-đun</th></tr></thead>
 <tbody>
-<tr><td><b>Sai phiên bản</b></td><td>Gia công sai Requests, ship sai, khiếu nại / Requests bồi thường</td><td>TẠM GIỮ tức thì + khóa Job/ship + kiểm chứng Job/Part/Rev trước phát hành</td></tr>
+<tr><td><b>Sai phiên bản</b></td><td>Gia công sai yêu cầu, ship sai, khiếu nại / yêu cầu bồi thường</td><td>TẠM GIỮ tức thì + khóa Job/ship + kiểm chứng Job/Part/Rev trước phát hành</td></tr>
 <tr><td><b>Lẫn lộn/lẫn lô</b></td><td>Mất truy xuất nguồn gốc, lẫn trạng thái OK/NG</td><td>cách ly khu TẠM GIỮ + nhãn trạng thái + truy xuất nguồn gốc theo JobNum</td></tr>
-<tr><td><b>thiếu / đã giả mạo outsource tài liệu</b></td><td>Không đạt Requests đặc biệt, rủi ro pháp lý</td><td>CHẶN phê duyệt giao hàng (ship phát hành) khi thiếu cert; NCR+SCAR</td></tr>
+<tr><td><b>thiếu / đã giả mạo outsource tài liệu</b></td><td>Không đạt yêu cầu đặc biệt, rủi ro pháp lý</td><td>CHẶN phê duyệt giao hàng (phê duyệt giao hàng) khi thiếu cert; NCR+SCAR</td></tr>
 <tr><td><b>OOT gage/hiệu chuẩn quá hạn</b></td><td>Đo sai, lọt lỗi CTQ</td><td>TẠM GIỮ + đánh giá ảnh hưởng + NCR/CAPA theo SOP-QMS-007</td></tr>
 <tr><td><b>Vượt qua cổng kiểm soát</b></td><td>Giao nhầm, mất bằng chứng đánh giá</td><td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate); mọi phát hành có hồ sơ</td></tr>
 </tbody>
@@ -152,7 +151,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><b>Operator</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a></span></td>
 <td>Phát hiện NC; dừng công đoạn; tách hàng; gắn nhãn; báo Supervisor/QC; không tự ý "sửa hồ sơ".</td>
 <td>Thực hiện đúng "60 giây" + tạo TẠM GIỮ vật lý đúng nhãn + không để hàng rời trạng thái.</td>
 </tr>
@@ -167,27 +166,27 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Tạo bằng chứng nguyên nhân gốc + bản sửa program + khóa phiên bản; cập nhật bộ tài liệu Point-of-use.</td>
 </tr>
 <tr>
-<td><b>QC</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td>
 <td>Đo/xác nhận NC; lập Kiểm tra bằng chứng; kích hoạt TẠM GIỮ; cung cấp dữ kiện đo phục vụ NCR/MRB.</td>
 <td>Đo đúng dụng cụ &amp; trạng thái hiệu chuẩn; ghi rõ Job/Part/Rev; bằng chứng đủ để QA mở NCR trong ngày.</td>
 </tr>
 <tr>
-<td><b>QA</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
 <td>Mở NCR; phân loại mức; điều phối MRB; quyết định mở CAPA; theo dõi hiệu lực; đóng hồ sơ.</td>
 <td>Không đóng NCR/CAPA khi thiếu bằng chứng; chặn concession không có chấp thuận; đóng CAPA khi có effectiveness kiểm tra.</td>
 </tr>
 <tr>
-<td><b>Kho</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
 <td>Quản lý khu TẠM GIỮ; chống lẫn lộn; kiểm soát bộ hồ sơ giao hàng (ship gói hồ sơ); CHẶN giao hàng khi thiếu điều kiện.</td>
 <td>Không xuất hàng khi ShipRelease trạng thái Đã chặn/RequestRelease; lưu bằng chứng đúng thư mục.</td>
 </tr>
 <tr>
-<td><b>Mua hàng</b></td>
-<td>NC do NCC/thuê ngoài: khóa nhận hàng; phát hành SCAR; xử lý RTS/khiếu nại / Requests bồi thường; kiểm chứng chứng chỉ.</td>
-<td>SCAR có Requests rõ + hạn chót; bằng chứng trả hàng/khiếu nại / Requests bồi thường; liên kết NCR/CAPA vào hồ sơ nhà cung cấp.</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a></span></td>
+<td>NC do NCC/thuê ngoài: khóa nhận hàng; phát hành SCAR; xử lý RTS/khiếu nại / yêu cầu bồi thường; kiểm chứng chứng chỉ.</td>
+<td>SCAR có yêu cầu rõ + hạn chót; bằng chứng trả hàng/khiếu nại / yêu cầu bồi thường; liên kết NCR/CAPA vào hồ sơ nhà cung cấp.</td>
 </tr>
 <tr>
-<td><b>Planner</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td>
 <td>Stop-ship và kế hoạch lại; khóa ưu tiên khi có TẠM GIỮ; cập nhật Job trạng thái trên hệ thống (SoR).</td>
 <td>Không "đẩy" Job qua cổng kiểm soát khi còn TẠM GIỮ; cập nhật đúng trạng thái để không phát sinh ship nhầm.</td>
 </tr>
@@ -197,19 +196,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Hành động có bằng chứng (log/ảnh/đo); bàn giao lại theo tiêu chí kiểm chứng (mẫu đầu (tiên chi tiết / sản phẩm) / năng lực / khả năng) <b>M365/SharePoint → HESEM-QMS-SSOT</b>.</td>
 </tr>
 <tr>
-<td><b>EHS</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a></span></td>
 <td>Xử lý phế phẩm/hoá chất/dầu; quy trình cách ly an toàn; kiểm soát chất thải khi phế phẩm/trả lại.</td>
 <td>Phế phẩm/trả lại không tạo rủi ro an toàn; hồ sơ chất thải đầy đủ theo quy định EHS nội bộ <b>M365/SharePoint → HESEM-QMS-SSOT</b>.</td>
 </tr>
 <tr>
 <td><b>Người định giá (SAL-03)</b></td>
 <td>Concession/khách hàng: chặn giao; thu bằng chứng chấp thuận; cập nhật bộ hồ sơ giao hàng; chuyển SOP-QMS-012 khi có thoát lỗi.</td>
-<td>Mọi chấp thuận phải nằm trong SSOT; không dùng "đồng ý miệng"; bằng chứng chấp thuận nằm trong SSOT; mọi thay đổi Requests có thay đổi hồ sơ.</td>
+<td>Mọi chấp thuận phải nằm trong SSOT; không dùng "đồng ý miệng"; bằng chứng chấp thuận nằm trong SSOT; mọi thay đổi yêu cầu có thay đổi hồ sơ.</td>
 </tr>
 <tr>
 <td><b>Supervisor</b></td>
-<td>Kích hoạt ngăn chặn; phân công Responsible Person; duy trì kỷ luật cổng kiểm soát; điều phối nguồn lực MRB/CAPA.</td>
-<td>Không có vượt qua cổng kiểm soát; phân công rõ Responsible Person &amp; hạn chót; báo cáo vượt cấp theo fail-nhanh khi quá hạn.</td>
+<td>Kích hoạt ngăn chặn; phân công người chịu trách nhiệm; duy trì kỷ luật cổng kiểm soát; điều phối nguồn lực MRB/CAPA.</td>
+<td>Không có vượt qua cổng kiểm soát; phân công rõ người chịu trách nhiệm &amp; hạn chót; báo cáo vượt cấp theo fail-nhanh khi quá hạn.</td>
 </tr>
 </tbody>
 </table>
@@ -268,14 +267,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" id="s5" style="margin-top:0">5. Biện pháp kiểm soát rủi ro (liệt kê điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6)</h2>
 <div class="note">
-<b>Quy tắc:</b> Mỗi điểm kiểm soát có <b>Responsible Person</b> rõ + <b>Evidence</b> rõ + <b>Tiêu chí đạt</b> rõ. Thiếu bằng chứng là <b>CHẶN</b>.
+<b>Quy tắc:</b> Mỗi điểm kiểm soát có <b>người chịu trách nhiệm</b> rõ + <b>Evidence</b> rõ + <b>Tiêu chí đạt</b> rõ. Thiếu bằng chứng là <b>CHẶN</b>.
  </div>
 <div class="table-card">
 <table class="table">
 <thead>
 <tr>
 <th style="width:190px">Điểm kiểm soát</th>
-<th style="width:170px">Responsible Person</th>
+<th style="width:170px">người chịu trách nhiệm</th>
 <th>Evidence (MRR)</th>
 <th style="width:260px">Tiêu chí đạt</th>
 </tr>
@@ -289,19 +288,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>CP-02 QCHoldLog</b></td>
-<td>QC/QA</td>
-<td>Hồ sơ QCHoldLog: JobNum, ReasonCode, Mức nghiêm trọng, Ngăn chặn, Trạng thái, Responsible Person</td>
-<td>Hồ sơ tạo trong ca; Trạng thái=Mở; Responsible Person được giao trong ca</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
+<td>Hồ sơ QCHoldLog: JobNum, ReasonCode, Mức nghiêm trọng, Ngăn chặn, Trạng thái, người chịu trách nhiệm</td>
+<td>Hồ sơ tạo trong ca; Trạng thái=Mở; người chịu trách nhiệm được giao trong ca</td>
 </tr>
 <tr>
 <td><b>CP-03 NCRLog + thư mục</b></td>
-<td>QA</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
 <td>Hồ sơ NCRLog + thư mục NCR_&lt;NCR-ID&gt; có ảnh/đo/CMM</td>
 <td>NCR có DetectedAt + DefectType + QtyAffected; có link EvidenceFolderUrl</td>
 </tr>
 <tr>
 <td><b>CP-04 MRB quyết định</b></td>
-<td>QA + Quy trình Owner + Kỹ thuật (khi cần)</td>
+<td>QA + OPS_SCOPE_OWNERS + Kỹ thuật (khi cần)</td>
 <td>Biên bản MRB (biên bản họp) + disposition code + điều kiện phát hành</td>
 <td>Disposition rõ; làm lại có WI; concession có chấp thuận trước giao</td>
 </tr>
@@ -313,8 +312,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>CP-06 CAPA8D</b></td>
-<td>QA (Responsible Person) + các bộ phận liên quan</td>
-<td>Hồ sơ CAPA8D: SourceType/SourceID, Mức nghiêm trọng, Responsible Person, Trạng thái; 8D có RootCause+EscapePoint</td>
+<td>QA (người chịu trách nhiệm) + các bộ phận liên quan</td>
+<td>Hồ sơ CAPA8D: SourceType/SourceID, Mức nghiêm trọng, người chịu trách nhiệm, Trạng thái; 8D có RootCause+EscapePoint</td>
 <td>CAPA có hành động hệ thống + bằng chứng triển khai + hạn chót</td>
 </tr>
 <tr>
@@ -331,7 +330,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>CP-09 Phê duyệt giao hàng cổng kiểm soát</b></td>
-<td>Kho + QA</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
 <td>ShipRelease: PacketComplete=Yes, FinalIRPass=Yes, PackagingPass=Yes</td>
 <td>Trạng thái=Released mới xuất hàng; thiếu 1 điều kiện là Đã chặn</td>
 </tr>
@@ -345,7 +344,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <b>Câu hỏi bắt buộc trước khi chọn disposition:</b>
  (1) Lỗi có chạm CTQ/đặc tính chức năng không? (2) Có ảnh hưởng truy xuất nguồn gốc lô/Job/Rev không? (3) Có rủi ro khách hàng/điều khoản hợp đồng không?
- (4) Làm lại có đưa về đúng Requests bản vẽ không? (5) sửa chữa có tạo lệch Requests và cần concession không?
+ (4) Làm lại có đưa về đúng yêu cầu bản vẽ không? (5) sửa chữa có tạo lệch yêu cầu và cần concession không?
  </div>
 <div class="table-card">
 <table class="table">
@@ -359,17 +358,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><b>RWK</b> (Làm lại)</td>
-<td>Đưa về đúng Requests bản vẽ/tiêu chuẩn; không thay đổi Requests</td>
+<td>Đưa về đúng yêu cầu bản vẽ/tiêu chuẩn; không thay đổi yêu cầu</td>
 <td>WI làm lại + điểm kiểm tra đo + IR/CMM PASS + cập nhật lộ trình gia công trên SoR khi có thay đổi công đoạn</td>
 </tr>
 <tr>
 <td><b>REP</b> (sửa chữa)</td>
-<td>Không thể đưa về đúng Requests nhưng vẫn đáp ứng chức năng; có lệch Requests</td>
+<td>Không thể đưa về đúng yêu cầu nhưng vẫn đáp ứng chức năng; có lệch yêu cầu</td>
 <td>Đánh giá rủi ro + tiêu chí chấp nhận + chấp thuận khách hàng trước giao + nhận diện sản phẩm sửa chữa</td>
 </tr>
 <tr>
 <td><b>UAI</b> (Use-as-is)</td>
-<td>Không cần làm lại; đáp ứng Requests; hoặc có concession chấp thuận</td>
+<td>Không cần làm lại; đáp ứng yêu cầu; hoặc có concession chấp thuận</td>
 <td>Biên bản MRB + bằng chứng trong dung sai hoặc concession bằng văn bản; bộ hồ sơ giao hàng cập nhật</td>
 </tr>
 <tr>
@@ -379,13 +378,13 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><b>RTS</b> (Trả lại nhà cung cấp)</td>
-<td>Lỗi do NCC/thuê ngoài; trả hàng/khiếu nại / Requests bồi thường</td>
+<td>Lỗi do NCC/thuê ngoài; trả hàng/khiếu nại / yêu cầu bồi thường</td>
 <td>SCAR/RMA + bằng chứng lỗi + bằng chứng trả hàng; liên kết NCR vào hồ sơ NCC</td>
 </tr>
 <tr>
 <td><b>MRB</b> (Pending)</td>
 <td>Thiếu dữ kiện hoặc cần thử Nhiệm</td>
-<td>Danh sách dữ kiện cần bổ sung + Responsible Person + hạn chót; TẠM GIỮ duy trì đến khi có quyết định</td>
+<td>Danh sách dữ kiện cần bổ sung + người chịu trách nhiệm + hạn chót; TẠM GIỮ duy trì đến khi có quyết định</td>
 </tr>
 </tbody>
 </table>
@@ -397,7 +396,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td><b>Lớn / Nghiêm trọng/Quan trọng</b></td><td>Bất kỳ</td><td>Bắt buộc mở CAPA/8D và có kiểm tra hiệu lực.</td></tr>
 <tr><td><b>Lặp lại vấn đề</b></td><td>≥ 2 lần / 90 Ngày hoặc theo cảnh báo KPI</td><td>Bắt buộc mở CAPA; xác định điểm lọt; bổ sung điểm kiểm tra.</td></tr>
-<tr><td><b>Customer / giao hàng tác động</b></td><td>Stop-ship, khiếu nại / Requests bồi thường, trả lại</td><td>Phối hợp SOP-QMS-012 và mở CAPA.</td></tr>
+<tr><td><b>Customer / giao hàng tác động</b></td><td>Stop-ship, khiếu nại / yêu cầu bồi thường, trả lại</td><td>Phối hợp SOP-QMS-012 và mở CAPA.</td></tr>
 <tr><td><b>NC hệ thống</b></td><td>kiểm soát tài liệu / hiệu chuẩn / đào tạo / truy xuất nguồn gốc</td><td>Bắt buộc CAPA và kiểm soát thay đổi (SOP-QMS-001, SOP-QMS-008).</td></tr>
 </tbody>
 </table>
@@ -412,7 +411,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:70px">D</th>
 <th style="width:240px">Nội dung</th>
-<th>Đầu ra Requests tối thiểu</th>
+<th>Đầu ra yêu cầu tối thiểu</th>
 </tr>
 </thead>
 <tbody>
@@ -424,7 +423,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td><b>D5</b></td><td>Chọn hành động khắc phục</td><td>Hành động hệ thống (poka (chống sai) (chống sai)-giá đỡ (yoke), program khóa, fixture control, điểm kiểm tra); đánh giá rủi ro</td></tr>
 <tr><td><b>D6</b></td><td>Triển khai &amp; xác nhận</td><td>WI/Setup/kế hoạch kiểm tra (plan) cập nhật có kiểm soát; bằng chứng triển khai; đào tạo hồ sơ</td></tr>
 <tr><td><b>D7</b></td><td>Ngăn tái diễn</td><td>Chuẩn hóa quy trình; cập nhật tài liệu; đánh giá tại hiện trường; KPI theo dõi</td></tr>
-<tr><td><b>D8</b></td><td>Kết thúc &amp; ghi nhận</td><td>Hiệu lực đạt; bài học kinh Nhiệm; đóng CAPA; phản hồi liên quan (khách hàng/NCC)</td></tr>
+<tr><td><b>D8</b></td><td>Kết thúc &amp; ghi nhận</td><td>Hiệu lực đạt; bài học kinh nghiệm; đóng CAPA; phản hồi liên quan (khách hàng/NCC)</td></tr>
 </tbody>
 </table>
 </div>
@@ -501,7 +500,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>Thiếu chứng từ outsource</b></td>
 <td>TẠM GIỮ nhận hàng; đánh dấu DocsMissing; báo Mua hàng+QA; chặn đưa vào sản xuất</td>
-<td>QCHoldLog ReasonCode=OUT; ảnh PO/lot; link Requests cert</td>
+<td>QCHoldLog ReasonCode=OUT; ảnh PO/lot; link yêu cầu cert</td>
 </tr>
 <tr>
 <td><b>OOT gage</b></td>
@@ -523,7 +522,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 8 -->
 <div class="card">
-<h2 class="h2" id="s8" style="margin-top:0">8. Bảng kiểm vận hành (≤15 bước) — mỗi bước có Responsible Person, Evidence/MRR, "điểm sai hay gặp"</h2>
+<h2 class="h2" id="s8" style="margin-top:0">8. Bảng kiểm vận hành (≤15 bước) — mỗi bước có người chịu trách nhiệm, Evidence/MRR, "điểm sai hay gặp"</h2>
 <p class="muted">Bảng kiểm áp dụng cho mọi ca khi phát sinh NC. Mỗi bước là 01 "điểm chặn", thiếu 1 bước là tạo lỗ hổng đánh giá và rủi ro giao hàng.</p>
 <div class="table-card">
 <table class="table">
@@ -531,31 +530,31 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <th style="width:44px">#</th>
 <th>Bước vận hành</th>
-<th style="width:150px">Responsible Person</th>
+<th style="width:150px">người chịu trách nhiệm</th>
 <th style="width:260px">Evidence/MRR</th>
 <th style="width:260px">Điểm sai hay gặp</th>
 </tr>
 </thead>
 <tbody>
 <tr><td>1</td><td><b>STOP/TẠM GIỮ vật lý</b>: tách hàng, gắn nhãn, đưa vào khu TẠM GIỮ</td><td>Operator/Setup/WHS</td><td>Ảnh nhãn TẠM GIỮ + vị trí</td><td>Để hàng "tạm" tại dòng / chuyền; nhãn thiếu JobNum/ca</td></tr>
-<tr><td>2</td><td><b>Tạo QCHoldLog</b> với ReasonCode/Mức nghiêm trọng/Ngăn chặn/Responsible Person</td><td>QC/QA</td><td>QCHoldLog hồ sơ</td><td>Ghi UNK nhưng không gán Responsible Person; thiếu Ngăn chặn</td></tr>
+<tr><td>2</td><td><b>Tạo QCHoldLog</b> với ReasonCode/Mức nghiêm trọng/Ngăn chặn/người chịu trách nhiệm</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>QCHoldLog hồ sơ</td><td>Ghi UNK nhưng không gán người chịu trách nhiệm; thiếu Ngăn chặn</td></tr>
 <tr><td>3</td><td><b>Khóa truy xuất nguồn gốc</b>: xác nhận Job/Part/Rev; khóa program/print tại Point-of-use</td><td>Supervisor/Lập trình viên (CNC)</td><td>Ảnh màn hình/print + ghi Rev nghi ngờ</td><td>Đổi file ngoài kiểm soát; dùng file cũ tại máy</td></tr>
-<tr><td>4</td><td><b>Thu bằng chứng</b>: đo/ảnh/CMM; ghi rõ gage ID &amp; trạng thái hiệu chuẩn</td><td>QC</td><td>IR/CMM báo cáo + ảnh + gage ID</td><td>Ảnh không có thước; không ghi gage ID</td></tr>
-<tr><td>5</td><td><b>Mở NCR</b> khi đủ dữ kiện tối thiểu</td><td>QA</td><td>NCRLog + thư mục NCR</td><td>Thiếu DetectedAt/QtyAffected; không link thư mục</td></tr>
+<tr><td>4</td><td><b>Thu bằng chứng</b>: đo/ảnh/CMM; ghi rõ gage ID &amp; trạng thái hiệu chuẩn</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>IR/CMM báo cáo + ảnh + gage ID</td><td>Ảnh không có thước; không ghi gage ID</td></tr>
+<tr><td>5</td><td><b>Mở NCR</b> khi đủ dữ kiện tối thiểu</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>NCRLog + thư mục NCR</td><td>Thiếu DetectedAt/QtyAffected; không link thư mục</td></tr>
 <tr><td>6</td><td><b>Đánh giá ảnh hưởng</b>: khoanh vùng WIP/FG/thuê ngoài/ship lịch sử</td><td>QA+Supervisor+Planner</td><td>Danh sách phạm vi ảnh hưởng + link Job/lot</td><td>Chỉ khoanh vùng dòng / chuyền Current; bỏ sót hàng chờ ship</td></tr>
-<tr><td>7</td><td><b>Triệu tập MRB</b>: chuẩn bị dữ kiện + phương án disposition</td><td>QA</td><td>MRB biên bản họp + phương án</td><td>MRB họp không có dữ liệu đo; quyết theo cảm tính</td></tr>
+<tr><td>7</td><td><b>Triệu tập MRB</b>: chuẩn bị dữ kiện + phương án disposition</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>MRB biên bản họp + phương án</td><td>MRB họp không có dữ liệu đo; quyết theo cảm tính</td></tr>
 <tr><td>8</td><td><b>Ra disposition</b> + tiêu chí phát hành rõ</td><td>MRB</td><td>Disposition code + điều kiện phát hành</td><td>Không ghi tiêu chí đo lại; concession thiếu chấp thuận</td></tr>
 <tr><td>9</td><td><b>Thực hiện làm lại/sort/phế phẩm/trả lại</b> theo quyết định</td><td>Setup/WHS/PUR</td><td>WI làm lại + Epicor giao dịch <b>M365/SharePoint → HESEM-QMS-SSOT</b> mã giao dịch nội bộ</td><td>Làm lại không có WI; phế phẩm không ghi nhận trên SoR</td></tr>
-<tr><td>10</td><td><b>Xác minh</b>: IR/CMM PASS trước phát hành</td><td>QC/QA</td><td>IR PASS + ảnh kết quả</td><td>Đo lại không theo plan; thiếu 100% khi CTQ</td></tr>
-<tr><td>11</td><td><b>Quyết định mở CAPA/8D</b> theo ngưỡng</td><td>QA</td><td>CAPA8D hồ sơ + 8D file</td><td>Lớn / Nghiêm trọng/Quan trọng nhưng không mở CAPA</td></tr>
-<tr><td>12</td><td><b>Nguyên nhân gốc + điểm lọt</b> + hành động hệ thống</td><td>Responsible Person CAPA</td><td>5-Why/Ishikawa + hành động + bằng chứng triển khai</td><td>Nguyên nhân gốc = "do Người"; không có cơ chế ngăn</td></tr>
+<tr><td>10</td><td><b>Xác minh</b>: IR/CMM PASS trước phát hành</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>IR PASS + ảnh kết quả</td><td>Đo lại không theo plan; thiếu 100% khi CTQ</td></tr>
+<tr><td>11</td><td><b>Quyết định mở CAPA/8D</b> theo ngưỡng</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>CAPA8D hồ sơ + 8D file</td><td>Lớn / Nghiêm trọng/Quan trọng nhưng không mở CAPA</td></tr>
+<tr><td>12</td><td><b>Nguyên nhân gốc + điểm lọt</b> + hành động hệ thống</td><td>người chịu trách nhiệm CAPA</td><td>5-Why/Ishikawa + hành động + bằng chứng triển khai</td><td>Nguyên nhân gốc = "do Người"; không có cơ chế ngăn</td></tr>
 <tr><td>13</td><td><b>Effectiveness kiểm tra</b> và đóng hồ sơ</td><td>QA+Supervisor</td><td>Evidence trước/sau + CAPA trạng thái Closed</td><td>Đóng vì "đã làm xong" nhưng không có dữ liệu hiệu lực</td></tr>
-<tr><td>14</td><td><b>Phát hành/Ship</b> chỉ khi cổng kiểm soát PASS</td><td>QA+WHS</td><td>ShipRelease Released + gói hồ sơ đầy đủ</td><td>Xuất hàng khi thiếu gói hồ sơ; thiếu link NCR</td></tr>
+<tr><td>14</td><td><b>Phát hành/Ship</b> chỉ khi cổng kiểm soát PASS</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>ShipRelease Released + gói hồ sơ đầy đủ</td><td>Xuất hàng khi thiếu gói hồ sơ; thiếu link NCR</td></tr>
 </tbody>
 </table>
 </div>
 <div class="note" style="margin-top:12px">
-<b>Phản ứng khi quá hạn:</b> Khi QCHoldLog hoặc NCR không có Responsible Person hoặc quá hạn xử lý, Supervisor kích hoạt escalation theo Tier nhịp độ / chu kỳ họp <b>M365/SharePoint → HESEM-QMS-SSOT</b> chuẩn escalation nội bộ.
+<b>Phản ứng khi quá hạn:</b> Khi QCHoldLog hoặc NCR không có người chịu trách nhiệm hoặc quá hạn xử lý, Supervisor kích hoạt escalation theo Tier nhịp độ / chu kỳ họp <b>M365/SharePoint → HESEM-QMS-SSOT</b> chuẩn escalation nội bộ.
  </div>
 </div>
 <!-- 9 -->
@@ -578,7 +577,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr><td>1</td><td>STOP/TẠM GIỮ vật lý</td><td>Tách OK/NG; nhãn có JobNum/ca/ngày; đưa vào khu TẠM GIỮ</td><td>Chặn lan rộng và chặn giao nhầm</td></tr>
-<tr><td>2</td><td>Tạo QCHoldLog</td><td>Chọn đúng ReasonCode/Mức nghiêm trọng; ghi Ngăn chặn hành động ngay; gán Responsible Person</td><td>Quy tắc điều hướng hoạt động; không "TẠM GIỮ vô chủ"</td></tr>
+<tr><td>2</td><td>Tạo QCHoldLog</td><td>Chọn đúng ReasonCode/Mức nghiêm trọng; ghi Ngăn chặn hành động ngay; gán người chịu trách nhiệm</td><td>Quy tắc điều hướng hoạt động; không "TẠM GIỮ vô chủ"</td></tr>
 <tr><td>3</td><td>Khóa Job/Rev tại Point-of-use</td><td>So sánh Job pack ↔ program ↔ setup ↔ print; dán tag "Rev nghi ngờ"</td><td>Chặn sai Rev là rủi ro chết Người</td></tr>
 <tr><td>4</td><td>Thu bằng chứng đo</td><td>Ghi rõ gage ID; ảnh có thước/quy mô / thang đo; CMM báo cáo gắn đúng JobNum</td><td>MRB quyết dựa trên dữ liệu, không dựa cảm giác</td></tr>
 <tr><td>5</td><td>QA mở NCR</td><td>DetectedAt/DefectType/QtyAffected; link EvidenceFolderUrl; Trạng thái=Mở</td><td>dấu vết kiểm toán đầy đủ; khoanh vùng ảnh hưởng</td></tr>
@@ -627,14 +626,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Dẫn dắt ngăn chặn tại dòng / chuyền; huấn luyện ca; chặn vượt qua</td>
 </tr>
 <tr>
-<td><b>QC</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td>
 <td>Phân biệt khuyết tật type; đọc Rev</td>
 <td>Đo đúng gage; ghi bằng chứng rõ</td>
 <td>Tạo hold log đúng mã; cung cấp dữ kiện MRB</td>
 <td>Thiết kế điểm kiểm tra bịt điểm lọt; dẫn dắt sort/xác minh</td>
 </tr>
 <tr>
-<td><b>QA</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
 <td>Nhận biết ngưỡng mở CAPA</td>
 <td>Mở NCR đủ dữ kiện; điều phối MRB có dữ liệu</td>
 <td>Đóng NCR/CAPA đúng tiêu chí; không phát hành khi thiếu bằng chứng</td>
@@ -648,10 +647,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Thiết kế poka (chống sai) (chống sai)-giá đỡ (yoke) số hoá (program khóa/tổng kiểm tra) <b>SSOT/Data-Mô hình-giá trị kiểm tra (tổng kiểm tra) (tổng kiểm tra.txt)</b></td>
 </tr>
 <tr>
-<td><b>WHS/PUR/Planner/Kinh doanh</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a></span></td>
 <td>Nhận biết rủi ro giao hàng và chứng từ</td>
 <td>CHẶN giao hàng khi thiếu gói hồ sơ; khóa nhận hàng khi thiếu cert</td>
-<td>Vận hành cổng kiểm soát đúng hồ sơ; bàn giao rõ Responsible Person/hạn chót</td>
+<td>Vận hành cổng kiểm soát đúng hồ sơ; bàn giao rõ người chịu trách nhiệm/hạn chót</td>
 <td>Chủ trì escalation liên phòng; chặn áp lực Ngày đến hạn làm vượt qua cổng kiểm soát</td>
 </tr>
 </tbody>
@@ -660,8 +659,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3 class="h3">10.1 Quyền hạn sau khi đạt (ví dụ)</h3>
 <ul style="line-height:1.9">
 <li><b>Operator/Setup L3:</b> được quyền STOP tại máy và đưa WIP vào TẠM GIỮ không cần xin phép trước.</li>
-<li><b>QC L3:</b> được quyền tạo QCHoldLog và Requests kho CHẶN phê duyệt giao hàng khi thiếu bằng chứng.</li>
-<li><b>QA L3:</b> được quyền phát hành khi IR PASS và hồ sơ đầy đủ; được quyền mở CAPA và đặt Responsible Person/hạn chót.</li>
+<li><b>QC L3:</b> được quyền tạo QCHoldLog và yêu cầu kho CHẶN phê duyệt giao hàng khi thiếu bằng chứng.</li>
+<li><b>QA L3:</b> được quyền phát hành khi IR PASS và hồ sơ đầy đủ; được quyền mở CAPA và đặt người chịu trách nhiệm/hạn chót.</li>
 <li><b>Supervisor L4:</b> được quyền điều phối MRB và báo cáo vượt cấp lên GM khi có concession/stop-ship.</li>
 </ul>
 </div>
@@ -677,7 +676,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>DefectType "DIM" đại diện nhóm lỗi nào trong NCRLog?</li>
 <li>Phân biệt "sửa chữa / hiệu chính" và "khắc phục hành động" bằng 01 ví dụ thực tế.</li>
 <li>Disposition "UAI" chỉ được dùng khi nào?</li>
-<li>Ai là Responsible Person bắt buộc để mở NCR theo SOP-QMS-006?</li>
+<li>Ai là người chịu trách nhiệm bắt buộc để mở NCR theo SOP-QMS-006?</li>
 <li>Khi dụng cụ đo hết hạn hiệu chuẩn, hành động ngay là STOP/TẠM GIỮ/CHẶN mức nào?</li>
 <li>MRB tối thiểu gồm những vai trò nào để quyết disposition không mù rủi ro?</li>
 <li>Nguyên nhân gốc khác điểm lọt ở điểm nào? Nêu 01 ví dụ "điểm lọt" trong CNC.</li>
@@ -689,24 +688,24 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Planner phải làm gì để chống vượt qua cổng kiểm soát khi có TẠM GIỮ?</li>
 <li>Kho phải kiểm tra những điều kiện nào trước khi chuyển ShipRelease sang Released?</li>
 <li>Ghi sai mã Mức nghiêm trọng trong list gây hậu quả vận hành gì?</li>
-<li>Khi nguyên nhân gốc ghi "do Người", Requests bắt buộc phải bổ sung là gì?</li>
+<li>Khi nguyên nhân gốc ghi "do Người", yêu cầu bắt buộc phải bổ sung là gì?</li>
 <li>Điều kiện PASS của xác minh khi tình huống là CTQ là gì?</li>
 <li>CAPA8D.SourceType dùng để làm gì? Nêu 3 nguồn.</li>
 <li>Thiếu EvidenceFolderUrl trong NCRLog gây lỗi gì trong đánh giá và truy xuất nguồn gốc?</li>
 <li>Ai chịu trách nhiệm cuối cùng để chặn concession không có chấp thuận?</li>
 </ol>
-<h3 class="h3">11.2 Tình huống (3 tình huống thật; có dữ kiện; Requests quyết định TẠM GIỮ/GO và ghi MRR)</h3>
+<h3 class="h3">11.2 Tình huống (3 tình huống thật; có dữ kiện; yêu cầu quyết định TẠM GIỮ/GO và ghi MRR)</h3>
 <div class="card" style="margin-top:12px">
 <h3 class="h3" style="margin-top:0">Tình huống 1 — Sai Rev do program</h3>
 <p><b>Dữ kiện:</b> Job J-240215, Part P-881, Rev trên traveler = B. Tại máy, file program tên "P-881_REV-A.nc". QC đo 3 pcs đầu: 2/3 vượt giới hạn CTQ vát mép.</p>
-<p><b>Quyết định bắt buộc:</b> kích hoạt STOP/TẠM GIỮ/CHẶN mức nào; chọn HoldReasonCode; liệt kê 05 bằng chứng tối thiểu phải có trong 30 phút đầu; xác định ai là Responsible Person nguyên nhân gốc và ai là Responsible Person điểm lọt.</p>
+<p><b>Quyết định bắt buộc:</b> kích hoạt STOP/TẠM GIỮ/CHẶN mức nào; chọn HoldReasonCode; liệt kê 05 bằng chứng tối thiểu phải có trong 30 phút đầu; xác định ai là người chịu trách nhiệm nguyên nhân gốc và ai là người chịu trách nhiệm điểm lọt.</p>
 <p><b>MRR bắt buộc:</b> ảnh nhãn TẠM GIỮ + QCHoldLog + IR/CMM bằng chứng + ghi chú Rev nghi ngờ + link thư mục NCR.</p>
 </div>
 <div class="card" style="margin-top:12px">
 <h3 class="h3" style="margin-top:0">Tình huống 2 — Thiếu chứng từ outsource + rủi ro giao hàng</h3>
-<p><b>Dữ kiện:</b> Lô xi mạ anốt (anodize) về kho, label có JobNum nhưng không có cert độ dày/lot. Planner đang chuẩn bị ship trong 24 giờ. Kinh doanh báo khách Requests "ship đúng hẹn".</p>
+<p><b>Dữ kiện:</b> Lô xi mạ anốt (anodize) về kho, label có JobNum nhưng không có cert độ dày/lot. Planner đang chuẩn bị ship trong 24 giờ. Kinh doanh báo khách yêu cầu "ship đúng hẹn".</p>
 <p><b>Quyết định bắt buộc:</b> quyết định TẠM GIỮ/GO; xác định điểm CHẶN; list ai phải nhận thông báo trong 60 giây; chọn hồ sơ phải tạo trong ShipRelease; xác định đường lưu chứng từ trong SSOT.</p>
-<p><b>MRR bắt buộc:</b> QCHoldLog ReasonCode=OUT + DocsMissing bằng chứng + ShipRelease=Đã chặn + Requests cert gửi Mua hàng.</p>
+<p><b>MRR bắt buộc:</b> QCHoldLog ReasonCode=OUT + DocsMissing bằng chứng + ShipRelease=Đã chặn + yêu cầu cert gửi Mua hàng.</p>
 </div>
 <div class="card" style="margin-top:12px">
 <h3 class="h3" style="margin-top:0">Tình huống 3 — Lặp lại vấn đề và CAPA không hiệu lực</h3>
@@ -725,7 +724,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <thead><tr><th style="width:220px">Hạng mục</th><th>đạt khi</th><th>Không đạt khi</th></tr></thead>
 <tbody>
 <tr><td>TẠM GIỮ 60 giây</td><td>Cô lập vật lý + báo đúng tuyến + hồ sơ TẠM GIỮ</td><td>Chỉ báo miệng; không có hồ sơ; hàng rời khỏi dòng / chuyền</td></tr>
-<tr><td>QCHoldLog</td><td>ReasonCode/Mức nghiêm trọng/Ngăn chặn/Responsible Person/Trạng thái đầy đủ</td><td>Thiếu Responsible Person hoặc ngăn chặn; dùng sai code</td></tr>
+<tr><td>QCHoldLog</td><td>ReasonCode/Mức nghiêm trọng/Ngăn chặn/người chịu trách nhiệm/Trạng thái đầy đủ</td><td>Thiếu người chịu trách nhiệm hoặc ngăn chặn; dùng sai code</td></tr>
 <tr><td>NCR gói hàng</td><td>NCRLog đủ trường + thư mục có ≥3 bằng chứng</td><td>Thiếu Job/Rev hoặc thiếu bằng chứng đo</td></tr>
 <tr><td>MRB quyết định</td><td>Disposition rõ + tiêu chí xác minh + concession có phê duyệt (khi có)</td><td>Quyết mơ hồ; không có tiêu chí đo lại</td></tr>
 <tr><td>CAPA &amp; hiệu lực</td><td>Nguyên nhân gốc + điểm lọt + hành động hệ thống + kế hoạch effectiveness</td><td>Nguyên nhân gốc = "do Người"; đóng CAPA không có dữ liệu</td></tr>
@@ -751,11 +750,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" id="s13" style="margin-top:0">13. MRR tối thiểu (hồ sơ) + quy tắc đặt tên + nơi lưu + Chung đánh giá phát hiện</h2>
 <h3 class="h3">13.1 Danh sách MRR bắt buộc cho mô-đun này</h3>
 <div class="note">
-<b>SSOT vận hành theo SOP-QMS-006:</b><br/>
- • Hồ sơ công việc: CNC-IMS-HUB/Job-Hồ sơ/&lt;JobNum&gt;/05_NCR-Hold-CAPA/NCR_&lt;NCR-ID&gt;/<br/>
- • CAPA: CNC-IMS-HUB/QMS-Hồ sơ/05_NCR-Hold-CAPA/CAPA_&lt;CAPA-ID&gt;/<br/>
- • Hold: CNC-IMS-HUB/QMS-Hồ sơ/05_NCR-Hold-CAPA/Hold-Log/<br/>
-<b>MRR đào tạo:</b> M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → đào tạo → academy → system-ops → SYS-OPS-17<br/>
+<b>SSOT vận hành theo SOP-QMS-006:</b><br>
+ • Hồ sơ công việc: CNC-IMS-HUB/Job-Hồ sơ/&lt;JobNum&gt;/05_NCR-Hold-CAPA/NCR_&lt;NCR-ID&gt;/<br>
+ • CAPA: CNC-IMS-HUB/QMS-Hồ sơ/05_NCR-Hold-CAPA/CAPA_&lt;CAPA-ID&gt;/<br>
+ • Hold: CNC-IMS-HUB/QMS-Hồ sơ/05_NCR-Hold-CAPA/Hold-Log/<br>
+<b>MRR đào tạo:</b> M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → đào tạo → academy → system-ops → SYS-OPS-17<br>
 <b>M365/SharePoint → HESEM-QMS-SSOT</b> Tên thư viện/quyền truy cập và cấu trúc thư mục đào tạo theo IT.
  </div>
 <div class="table-card">
@@ -768,9 +767,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>QCHoldLog</td><td>HoldID = TẠM GIỮ-YYYY-####</td><td>JobNum + ReasonCode + Mức nghiêm trọng + Ngăn chặn + Trạng thái + Responsible Person</td></tr>
+<tr><td>QCHoldLog</td><td>HoldID = TẠM GIỮ-YYYY-####</td><td>JobNum + ReasonCode + Mức nghiêm trọng + Ngăn chặn + Trạng thái + người chịu trách nhiệm</td></tr>
 <tr><td>NCRLog</td><td>NCRID = NCR-YYYY-####</td><td>DetectedAt + DefectType + QtyAffected + Trạng thái; link EvidenceFolderUrl</td></tr>
-<tr><td>CAPA8D</td><td>CAPAID = CAPA-YYYY-####</td><td>SourceType/SourceID + Mức nghiêm trọng + Responsible Person + Trạng thái + EffectivenessCheckDate</td></tr>
+<tr><td>CAPA8D</td><td>CAPAID = CAPA-YYYY-####</td><td>SourceType/SourceID + Mức nghiêm trọng + người chịu trách nhiệm + Trạng thái + EffectivenessCheckDate</td></tr>
 <tr><td>NCR bộ bằng chứng</td><td>NCR_&lt;NCR-ID&gt;_EvidencePack.pdf</td><td>Ảnh + đo + CMM/IR + Rev bằng chứng; không để file rời khỏi thư mục NCR</td></tr>
 <tr><td>MRB biên bản họp</td><td>MRB_Minutes_&lt;NCR-ID&gt;_YYYY-MM-DD.docx</td><td>Disposition + điều kiện phát hành + quyết định mở CAPA</td></tr>
 <tr><td>Làm lại hướng dẫn</td><td>WI_Rework_&lt;NCR-ID&gt;_Vx.pdf</td><td>Step rõ + điểm kiểm tra đo + ai ký xác nhận</td></tr>
@@ -820,13 +819,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div> <!-- /doc-content -->
 </div>
 </div>
-</div>
+
 <script src="../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
-</body>
-</html>
 
-
-
-
-
+</div>

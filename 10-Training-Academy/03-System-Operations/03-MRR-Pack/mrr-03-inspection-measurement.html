@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
 <title>TRN-ACA-MRR-03 — Kiểm tra &amp; Đo lường Pack | HESEM Academy</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 
 <style>
  .chk{font-family:var(--mono); font-weight:800;}
@@ -34,7 +33,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
@@ -48,8 +47,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="row"><span><b>Code:</b></span><span>MRR-03-KIỂM TRA-đo lường</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -61,7 +60,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Áp dụng</strong>
 <ul class="tight">
-<li><b>Vai trò:</b> QC • QA/QMS • OPS</li>
+<li><b>Vai trò:</b> QC • QA / QMS • OPS</li>
 <li><b>Chuẩn lưu:</b> SSOT theo <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a></li>
 <li><b>Cổng kiểm soát (gate):</b> Thiếu MRR → STOP/TẠM GIỮ/CHẶN theo mục "Fail-nhanh".</li>
 </ul>
@@ -69,10 +68,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <strong>Thông tin Job / Hồ sơ</strong>
 <div class="mini">
- JobCode: <span class="formline"> </span><br/>
- Customer: <span class="formline"> </span><br/>
- Part No: <span class="formline"> </span>   Rev: <span class="formline"> </span><br/>
- Số lượng: <span class="formline"> </span>   Due: <span class="formline"> </span><br/>
+ JobCode: <span class="formline"> </span><br>
+ Customer: <span class="formline"> </span><br>
+ Part No: <span class="formline"> </span>   Rev: <span class="formline"> </span><br>
+ Số lượng: <span class="formline"> </span>   Due: <span class="formline"> </span><br>
 </div>
 </div>
 </div>
@@ -89,19 +88,19 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th style="min-width:320px;">MRR / Evidence</th>
 <th style="min-width:140px;">RecordType</th>
 <th style="min-width:110px;">Cổng kiểm soát</th>
-<th style="min-width:120px;">Responsible Person</th>
+<th style="min-width:120px;">người chịu trách nhiệm</th>
 <th style="min-width:220px;">SSOT path</th>
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
-<tr><td><span class="chk">☐</span> Danh mục gage dùng cho job (gage list) + trạng thái OK</td><td>GAGE</td><td>Q0</td><td>QC</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/GAGE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_GAGELIST_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> Hiệu chuẩn chứng chỉ / giấy chứng nhận cho gage CTQ</td><td>CAL</td><td>Q0</td><td>QA/QC</td><td class="mini">SSOT/Quality/CAL/</td><td class="mini">CAL_<gageid>_<span class="pill">&lt;YYYYMMDD&gt;</span>.pdf</gageid></td></tr>
-<tr><td><span class="chk">☐</span> kế hoạch kiểm tra (plan) / CTQ map (tần suất + phương pháp đo)</td><td>kế hoạch kiểm tra (IPLAN)</td><td>Q0</td><td>QA</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/PLAN/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPLAN_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> FAI/IR (mẫu đầu (tiên chi tiết / sản phẩm) ký xác nhận</td><td>FAI/IR</td><td>Q1</td><td>QC</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FAI/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FAI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> IPQC hồ sơ (đo trong quá trình)</td><td>IPQC</td><td>Q2</td><td>QC</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/IPQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> SPC chart (khi CTQ Requests kiểm soát thống kê)</td><td>SPC</td><td>Q2</td><td>QC</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/SPC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SPC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> MSA/GRR (khi thay gage, thay phương pháp đo, thay Người đo)</td><td>MSA</td><td>Q2</td><td>QA</td><td class="mini">SSOT/Quality/MSA/</td><td class="mini">MSA_<gageid>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</gageid></td></tr>
-<tr><td><span class="chk">☐</span> NCR (khi phát hiện NG) + disposition</td><td>NCR</td><td>Q2</td><td>QA</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> Final Kiểm tra Báo cáo + acceptance</td><td>FQC</td><td>Q3</td><td>QC</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Danh mục gage dùng cho job (gage list) + trạng thái OK</td><td>GAGE</td><td>Q0</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/GAGE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_GAGELIST_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> Hiệu chuẩn chứng chỉ / giấy chứng nhận cho gage CTQ</td><td>CAL</td><td>Q0</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td class="mini">SSOT/Quality/CAL/</td><td class="mini">CAL_<gageid>_<span class="pill">&lt;YYYYMMDD&gt;</span>.pdf</gageid></td></tr>
+<tr><td><span class="chk">☐</span> kế hoạch kiểm tra (plan) / CTQ map (tần suất + phương pháp đo)</td><td>kế hoạch kiểm tra (IPLAN)</td><td>Q0</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/PLAN/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPLAN_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> FAI/IR (mẫu đầu (tiên chi tiết / sản phẩm) ký xác nhận</td><td>FAI/IR</td><td>Q1</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FAI/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FAI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> IPQC hồ sơ (đo trong quá trình)</td><td>IPQC</td><td>Q2</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/IPQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> SPC chart (khi CTQ yêu cầu kiểm soát thống kê)</td><td>SPC</td><td>Q2</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/SPC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SPC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> MSA/GRR (khi thay gage, thay phương pháp đo, thay Người đo)</td><td>MSA</td><td>Q2</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td class="mini">SSOT/Quality/MSA/</td><td class="mini">MSA_<gageid>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</gageid></td></tr>
+<tr><td><span class="chk">☐</span> NCR (khi phát hiện NG) + disposition</td><td>NCR</td><td>Q2</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> Final Kiểm tra Báo cáo + acceptance</td><td>FQC</td><td>Q3</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 </table>
 </div>
 <div class="note mini"><strong>Gắn với mô-đun</strong>: C16 (Đo lường), C03 (Quality at source), C13 (Kiểm soát thay đổi), C10 (Cổng kiểm soát).</div>
@@ -121,9 +120,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Ký xác nhận</h2>
 <div class="sig">
-<div class="box"><b>Người lập</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
-<div class="box"><b>Người kiểm</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
-<div class="box"><b>QA/QMS xác nhận</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+<div class="box"><b>Người lập</b><br><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+<div class="box"><b>Người kiểm</b><br><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+<div class="box"><b>QA / QMS xác nhận</b><br><span class="mini">Họ tên / Chức danh / Ngày</span></div>
 </div>
 </div>
 </div>
@@ -133,4 +132,3 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
-

@@ -70,7 +70,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Sản phẩm</td><td>kiểm tra cuối đạt, trực quan và kích thước đạt, qty thật khớp lệnh xuất</td><td>eó mở vấn đề, nghi ngờ đo lường, hỗn hợp / lẫn lộn lot, hỗn hợp / lẫn lộn phiên bản hoặc thiếu kiểm</td></tr>
 <tr><td>eert / thuê ngoài quy trình</td><td>Nguyên vật liệu cert, công đoạn đặc biệt cert, Người xử lý scope/khách hàng scope đúng</td><td>eert thiếu, cert không khớp lô hoặc Người xử lý ngoài đã phê duyệt scope</td></tr>
 <tr><td>Bao gói / nhãn</td><td>bên trong-pack, bên ngoài-pack, khách hàng label, SSee/PackID, ship đánh dấu, qty per pack đúng</td><td>không khớp kiện, label không đúng phiên bản, in lại không có void/phát hành lại vết / nhật ký thay đổi</td></tr>
-<tr><td>Hệ thống</td><td>Epicor/SoR cho thấy job/lot đủ điều kiện phát hành; SSOT có link pack chứng cứ</td><td>Ship Requests có nhưng phát hành trạng thái chưa mở, hoặc bằng chứng tồn tại ngoài SSOT</td></tr>
+<tr><td>Hệ thống</td><td>Epicor/SoR cho thấy job/lot đủ điều kiện phát hành; SSOT có link pack chứng cứ</td><td>Ship yêu cầu có nhưng phát hành trạng thái chưa mở, hoặc bằng chứng tồn tại ngoài SSOT</td></tr>
 </tbody></table></div></div><div class="section"><h2>3. Trình tự phát hành từ QA sang Giao vận</h2>
 <div class="step-list">
 <div class="step-item"><strong>Bước 1 — Khóa tập ứng viên release.</strong><br>QA chọn đúng job/lot/box set chuẩn bị xuất, khóa nhầm lẫn với phần còn lại của balance. Với giao hàng một phầnment hoặc split lot, phải xác định rõ phần nào release hôm nay, phần nào ở lại, và phần nào vẫn đang HOLD.</div>
@@ -95,7 +95,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>tách / chia lot / đa-box / đa-pallet</td><td>Mỗi box hoặc pallet phải có nhận dạng riêng; pack list phải truy ngược qty theo từng kiện; hỗn hợp / lẫn lộn lot chỉ được chấp nhận nếu khách hàng cho phép và bằng chứng thể hiện rõ.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Logistics and Shipping Function (Bo phan Logistics va Giao van)"><span class="entity-code dept-code">D-LOG</span></a></span></td></tr>
 <tr><td>Hỗn hợp pack theo khách hàng kit</td><td>Phải có kit bảng kê; mỗi dòng / chuyền item trong kit phải kiểm đủ part/rev/qty; kiện ngoài và kiện trong phải cùng logic nhận diện.</td><td><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a></span></td></tr>
 <tr><td>dán nhãn lại / in lại / đóng gói lại</td><td>ehỉ được thực hiện khi có lý do rõ, void label cũ, ảnh bằng chứng trước/sau, và cập nhật vào gói phát hành.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td></tr>
-<tr><td>Re-mở sau khi đã ký eoe</td><td>Phải đóng trạng thái bản cũ, ghi lý do mở lại, kiểm lại toàn bộ trường ảnh hưởng, phát hành bản mới và cập nhật bàn giao.</td><td>QA Manager theo thẩm quyền</td></tr>
+<tr><td>Re-mở sau khi đã ký eoe</td><td>Phải đóng trạng thái bản cũ, ghi lý do mở lại, kiểm lại toàn bộ trường ảnh hưởng, phát hành bản mới và cập nhật bàn giao.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span> theo ANNEX-120</td></tr>
 </tbody></table></div></div><div class="section"><h2>6. Điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm chặn))) và phản ứng trong 60 phút đầu</h2>
 <div class="two-col">
 <div class="card"><h3>TẠM GIỮ bắt buộc</h3><ul class="tight" style="padding-left:18px;">
@@ -107,7 +107,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="card"><h3>Phản ứng 60 phút đầu</h3><ul class="tight" style="padding-left:18px;">
 <li>Đặt TẠM GIỮ trên lô/kiện và khóa không cho bàn giao xe.</li>
 <li>Khoanh vùng toàn bộ bộ chứng từ và nhãn đã in liên quan.</li>
-<li>Thông báo QA Manager, Kho Manager, Kế hoạch và Kinh doanh/eS nếu ảnh hưởng cam kết giao hàng.</li>
+<li>Thông báo QA, D-WHS, PPL và D-SCS nếu ảnh hưởng cam kết giao hàng.</li>
 <li>Nếu đã in SSee/label sai, thực hiện void theo <a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a> trước khi in lại.</li>
 </ul></div>
 </div></div><div class="section"><h2>7. Hồ sơ bàn giao bắt buộc cho Kho/Giao vận</h2>
@@ -134,7 +134,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </ul></div>
 </div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>hhung quản trị kiểm tra cuối, eoe và phê duyệt giao hàng (ship phát hành).</td></tr>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>hhung quản trị kiểm tra cuối, eoe và phê duyệt giao hàng (phê duyệt giao hàng).</td></tr>
 <tr><td><a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>hiểm tính đầy đủ của hồ sơ trước khi ký phát hành.</td></tr>
 <tr><td><a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td><td>Đối soát pack, nhãn và SSee trước xác nhận giao hàng.</td></tr>
 <tr><td><a href="wi-601-visual-inspection-and-defect-classification.html">WI-601</a></td><td>Tiêu chí trực quan và khuyết tật class dùng ở cổng kiểm soát cuối.</td></tr>

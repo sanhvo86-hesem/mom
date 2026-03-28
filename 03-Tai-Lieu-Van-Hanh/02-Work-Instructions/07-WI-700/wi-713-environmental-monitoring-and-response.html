@@ -64,7 +64,7 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>2. Thông số theo dõi và tần suất</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thông số</th><th>Khu áp dụng</th><th>Tần suất tối thiểu</th><th>Phản ứng mức Alert / Hành động</th></tr></thead><tbody>
 <tr><td>Nhiệt độ / độ ẩm</td><td>Kho, clean-pack, khu vực chuẩn bị / sắp xếp sạch, khu kiểm sạch</td><td>Ít nhất 1 lần/ca; tăng khi thời tiết biến động hoặc Job nhạy</td><td>Alert: theo dõi tăng cường; Hành động: TẠM GIỮ hàng nhạy ảnh hưởng.</td></tr>
-<tr><td>hạt / phần tử / vệ sinh / sạch sẽ chỉ số</td><td>Khu clean-pack hoặc khi khách hàng/QPL Requests</td><td>Theo kế hoạch khu vực; trước batch đặc biệt hoặc sau vệ sinh lớn</td><td>Alert: vệ sinh tăng cường; Hành động: dừng mở túi/đóng gói, đánh giá lại khu.</td></tr>
+<tr><td>hạt / phần tử / vệ sinh / sạch sẽ chỉ số</td><td>Khu clean-pack hoặc khi khách hàng/QPL yêu cầu</td><td>Theo kế hoạch khu vực; trước batch đặc biệt hoặc sau vệ sinh lớn</td><td>Alert: vệ sinh tăng cường; Hành động: dừng mở túi/đóng gói, đánh giá lại khu.</td></tr>
 <tr><td>Tình trạng PPE/dính mat/vệ sinh công nghiệp (5S)</td><td>Mọi điểm vào khu sạch</td><td>Đầu ca và khi có lưu lượng cao</td><td>Hành động ngay nếu vật tư hết, mat bẩn nặng, khu bẩn nhìn thấy.</td></tr>
 <tr><td>Chênh áp / thiết bị báo động</td><td>Khi khu có trang bị</td><td>Theo lịch khu vực hoặc khi cảnh báo</td><td>Hành động khi chênh áp mất ổn định hoặc cảnh báo lặp.</td></tr>
 </tbody></table></div></div>
@@ -80,8 +80,8 @@ ul.tight li {margin:4px 0;}
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phản ứng bắt buộc</th><th>Quyền quyết định mở lại</th></tr></thead><tbody>
 <tr><td>Nhiệt ẩm vượt ngưỡng khu vực hàng nhạy</td><td>Hold nhạy, chặn mở túi/đóng gói, ghi log, Mọi người chịu trách nhiệm khu vực.</td><td>QA hoặc người chịu trách nhiệm khu vực theo quyền hạn đã giao.</td></tr>
 <tr><td>hạt / phần tử / tỷ lệ lỗi / hạt rơi cao bất thường hoặc khu nhiều bụi nhìn thấy</td><td>Dừng vận hành sạch, thực hiện vệ sinh, thay vật tư phát bụi, re-kiểm tra trước khi làm tiếp.</td><td>QA/clean khu vực người chịu trách nhiệm.</td></tr>
-<tr><td>dính mat/PPE trạm / vị trí làm việc mất hiệu lực</td><td>Khôi phục ngay; nếu có Người/part đã đi qua trong lúc mất kiểm soát, đánh giá phạm vi ảnh hưởng.</td><td>Supervisor khu vực.</td></tr>
-<tr><td>Phát hiện thùng thùng carton hở, vật lạ, hành vi vi phạm mặc đồ bảo hộ (gowning)</td><td>Dòng / Chuyền thông quan / giải phóng, loại bỏ vật không được phép, đánh giá hàng mở.</td><td>Supervisor + QA khi ảnh hưởng sản phẩm.</td></tr>
+<tr><td>dính mat/PPE trạm / vị trí làm việc mất hiệu lực</td><td>Khôi phục ngay; nếu có Người/part đã đi qua trong lúc mất kiểm soát, đánh giá phạm vi ảnh hưởng.</td><td>AREA_LEADS.</td></tr>
+<tr><td>Phát hiện thùng thùng carton hở, vật lạ, hành vi vi phạm mặc đồ bảo hộ (gowning)</td><td>Dòng / Chuyền thông quan / giải phóng, loại bỏ vật không được phép, đánh giá hàng mở.</td><td>AREA_LEADS + QA khi ảnh hưởng sản phẩm.</td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>5. Hồ sơ, KPI và liên kết</h2>
 <div class="two-col">

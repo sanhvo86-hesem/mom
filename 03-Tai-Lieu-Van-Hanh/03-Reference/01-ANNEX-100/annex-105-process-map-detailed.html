@@ -256,8 +256,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card"><table class="table">
 <colgroup><col style="width:2.36%;"><col style="width:11.02%;"><col style="width:43.31%;"><col style="width:18.90%;"><col style="width:24.41%;"></colgroup><thead><tr><th>Pha</th><th>Bàn giao</th><th>Hồ sơ bắt buộc</th><th>SoR</th><th>SSOT</th></tr></thead>
 <tbody>
-<tr><td>P01</td><td>Sales → ENG</td><td>rà soát hợp đồng đóng + QPL xác định</td><td>Epicor (RFQ/Báo giá/SO)</td><td>M365 (hồ sơ yêu cầu, phê duyệt)</td></tr>
-<tr><td>P02</td><td>ENG → Planning</td><td>Bộ hồ sơ chuẩn (baseline package) phát hành + Control Plan (khi áp dụng)</td><td>Epicor (Part/Rev/Job)</td><td>M365 (baseline, control plan)</td></tr>
+<tr><td>P01</td><td>D-SCS → D-ENG</td><td>rà soát hợp đồng đóng + QPL xác định</td><td>Epicor (RFQ/Báo giá/SO)</td><td>M365 (hồ sơ yêu cầu, phê duyệt)</td></tr>
+<tr><td>P02</td><td>D-ENG → D-PPC</td><td>Bộ hồ sơ chuẩn (baseline package) phát hành + Control Plan (khi áp dụng)</td><td>Epicor (Part/Rev/Job)</td><td>M365 (baseline, control plan)</td></tr>
 <tr><td>P03</td><td>Planning → OPS</td><td>Job khởi động bảng kiểm + traveler phát hành</td><td>Epicor (dispatch)</td><td>M365 (traveler, bảng kiểm)</td></tr>
 <tr><td>P04</td><td>OPS → QA</td><td>FAI/Mẫu đầu (first piece) (khi áp dụng) + IPQC nhật ký</td><td>Epicor (job trạng thái/time)</td><td>M365 (kiểm tra hồ sơ)</td></tr>
 <tr><td>P05</td><td>QA → Shipping</td><td>Kiểm tra cuối + CoC release + Bộ hồ sơ giao hàng (ship packet)</td><td>Epicor (xác nhận giao hàng (ship confirm)</td><td>M365 (ship bằng chứng)</td></tr>
@@ -286,9 +286,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2">4. Nhóm quá trình theo 37 SOP hiện hành</h2>
 <div class="table-card"><table class="table small-table"><thead><tr><th>Nhóm</th><th>Vai trò của nhóm</th><th>SOP hiện hành</th><th>Điểm giao diện chính</th></tr></thead><tbody>
 <tr><td>M1 — Quản trị hệ thống</td><td>Khóa bối cảnh, tài liệu, dữ liệu, thay đổi, truyền thông, contingency.</td><td>SOP-101 đến SOP-108</td><td>Áp cho mọi quá trình trước khi release và khi có thay đổi.</td></tr>
-<tr><td>P1 — Khách hàng / hợp đồng</td><td>Nhận yêu cầu, review hợp đồng, quản lý tài sản khách hàng, khiếu nại.</td><td>SOP-201, SOP-202, SOP-203</td><td>Sales → ENG → Planning; Customer phản hồi → QA / QMS.</td></tr>
-<tr><td>P2 — Engineering</td><td>DFM, quoting, bộ hồ sơ chuẩn, mẫu đầu / FAI.</td><td>SOP-301, SOP-302, SOP-303</td><td>ENG → Planning / Production / QA.</td></tr>
-<tr><td>S1 — NCC / vật tư</td><td>Nhà cung cấp, công đoạn đặc biệt, traceability, counterfeit phòng ngừa.</td><td>SOP-401, SOP-402</td><td>PUR / WHS / QA / ENG.</td></tr>
+<tr><td>P1 — Khách hàng / hợp đồng</td><td>Nhận yêu cầu, review hợp đồng, quản lý tài sản khách hàng, khiếu nại.</td><td>SOP-201, SOP-202, SOP-203</td><td>D-SCS → D-D-ENG → D-PPC; Customer phản hồi → QA / QMS.</td></tr>
+<tr><td>P2 — Engineering</td><td>DFM, quoting, bộ hồ sơ chuẩn, mẫu đầu / FAI.</td><td>SOP-301, SOP-302, SOP-303</td><td>D-ENG → D-PPC / Production / QA.</td></tr>
+<tr><td>S1 — NCC / vật tư</td><td>Nhà cung cấp, công đoạn đặc biệt, traceability, counterfeit phòng ngừa.</td><td>SOP-401, SOP-402</td><td>D-PUR / D-WHS / QA / D-ENG.</td></tr>
 <tr><td>P3 — Điều độ / gia công / hoàn thiện</td><td>Lập kế hoạch, setup, machining, bảo trì, secondary operations.</td><td>SOP-501 đến SOP-505</td><td>Planning → OPS → QA.</td></tr>
 <tr><td>P4 — Đo lường / release</td><td>Hiệu chuẩn, MSA, AQL, SPC, kiểm tra cuối, NCR/CAPA.</td><td>SOP-601 đến SOP-606</td><td>QA ↔ OPS ↔ WHS ↔ Sales.</td></tr>
 <tr><td>S2 — Kho / sạch / an toàn sản phẩm</td><td>Receiving, preservation, cleanliness, FOD, conformity.</td><td>SOP-701 đến SOP-703</td><td>WHS / QA / OPS / Shipping.</td></tr>

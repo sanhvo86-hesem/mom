@@ -1,8 +1,0 @@
-03-Tai-Lieu-Van-Hanh\02-Work-Instructions\01-WI-100\wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html :: SAL
-03-Tai-Lieu-Van-Hanh\03-Reference\01-ANNEX-100\10-ANNEX-100-Foundation-Maps-and-Control\annex-105-process-map-detailed.html :: ENG
-03-Tai-Lieu-Van-Hanh\03-Reference\01-ANNEX-100\13-ANNEX-130-M365-Records-Control\annex-133-m365-records-site-topology-library-and-folder-blueprint.html :: SAL, ENG
-03-Tai-Lieu-Van-Hanh\03-Reference\01-ANNEX-100\13-ANNEX-130-M365-Records-Control\annex-135-m365-operational-records-file-plan-by-department-role-and-job.html :: ENG
-03-Tai-Lieu-Van-Hanh\03-Reference\01-ANNEX-100\annex-105-process-map-detailed.html :: ENG
-03-Tai-Lieu-Van-Hanh\03-Reference\01-ANNEX-100\annex-106-iso9001-matrix-full.html :: ENG
-03-Tai-Lieu-Van-Hanh\03-Reference\01-ANNEX-100\annex-116-m365-folder-structure-blueprint.html :: SAL, ENG
-03-Tai-Lieu-Van-Hanh\03-Reference\03-ANNEX-300\annex-302-approved-materials-list.html :: ENG

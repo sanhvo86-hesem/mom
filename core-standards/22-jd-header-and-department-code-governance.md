@@ -1,6 +1,6 @@
 # 22. JD Header and Department-Code Governance
 
-> Version: v1 | Date: 2026-03-28 | Owner: QMS Engineer
+> Version: v4 | Date: 2026-03-28 | Owner: QMS Engineer
 
 ---
 
@@ -24,6 +24,7 @@ Tai lieu nay duoc dung cung:
 - Header `Chu so huu` cua JD KHONG duoc de `D-HR` chi vi JD di qua quy trinh HR.
 - Header `Phe duyet` cua JD PHAI dung role chip cua role co tham quyen phe duyet nguon; mac dinh hien hanh la `CEO` neu chua co ngoai le da duoc cong bo ro.
 - Header JD KHONG duoc de text tran, ten phong ban viet dai dong, hoac alias mo ho chua resolve.
+- Rule nay ap dung ca cho header phu / sub-header dung `fh-kv`, `meta row`, `hero meta`, `academy header`, `training module header`; khong duoc sua `meta` ma bo sot header phu trong cung tai lieu.
 
 Vi du dung:
 - `Chu so huu: D-ENG`
@@ -78,11 +79,31 @@ Pseudo-role nhu `QMS Manager`, `IT Manager`, `Sales Manager`, `Engineering Manag
 - `D-code` neu do la mandate cap chuc nang;
 - `bundle` neu do la lop actor explicit da duoc core-standard cong bo.
 
+Neu mot cum nhu `Supervisor`, `Lead`, `Manager`, `Owner`, `Sender`, `Nguoi dinh gia`, `Nguoi dieu phoi`, `Nguoi chiu trach nhiem KPI` xuat hien ma chua ro la ai, nguoi sua PHAI quay lai 3 lop nguon de chot:
+1. co JD ca nhan da ton tai hay chua;
+2. neu chua co, day la mandate cap phong ban hay nhom actor lap lai;
+3. neu van la authority ca nhan lap lai va co tac dong phe duyet/hold/release/escalation that, phai cap nhat nguoc vao JD/registry truoc khi sua downstream.
+
+Khong duoc chua chay task bang cach doi text mo ho sang text mo ho khac, vi du:
+- `Production Supervisor` -> `Team Leader`
+- `Department Head` -> `Department Truong bo phan`
+- `KPI owner` -> `Nguoi phu trach KPI`
+
+Ket qua hop le chi duoc la:
+- `role code`;
+- `D-code`;
+- `bundle` da cong bo.
+
 Bundle cross-functional duoc phep dung khi va chi khi bundle do da duoc cong bo trong registry nguon. Hien tai:
 - `DEPLOYMENT_STEERING` = hoi dong dieu hanh trien khai / steering board cho digital-QMS rollout;
 - `ALL_DEPTS` = toan bo department code cap doanh nghiep khi tai lieu dang noi ve pham vi "all functions" o lop chuc nang, khong phai mot ca nhan cu the.
+- `FUNC_HEADS` = tap hop role head cap chuc nang da duoc cong bo trong registry;
+- `DIRECT_LINE_MGRS` = lop quan ly truc tiep tai hien truong / direct line management da duoc cong bo;
+- `TOP_MGMT` = lop lanh dao cap cao duoc cong bo cho tai lieu dieu hanh / MR / dashboard;
+- `MR_REPORT_OWNERS` = nhom role chiu trach nhiem dong va nop pack bao cao MR da duoc cong bo.
 
 WI/ANNEX reference cap doanh nghiep duoc phep de header owner o dang `D-code` neu tai lieu dang khoa governance cap he thong hoac cap phong ban. WI thao tac / gate / phan ung hien truong uu tien `role code` neu owner la vai tro tac nghiep cu the.
+Ma tran tham quyen, ma tran deputy, dashboard audience table, authority summary page, org summary page, freeze-pack table va cac ANNEX tong hop cung PHAI tuan thu y het rule phan lop nay; khong co ngoai le chi vi tai lieu do la reference page thay vi SOP/WI.
 
 ---
 
@@ -105,11 +126,62 @@ WI/ANNEX reference cap doanh nghiep duoc phep de header owner o dang `D-code` ne
 - Header, preface va row cau truc cua JD PHAI khop nhau ve layer: title = English title, owner = D-code, approver = role code.
 - Cau mo dau trong `jd-purpose` PHAI goi ten vi tri bang `English title (ROLECODE)` de khoa ten chuc danh, tranh tro lai cac bien the nua mua nhu `Truong bo phan ...`, `Specialist Bao gia`, `Governance He thong ...`.
 - Cot `owner`, `owner chinh`, `chu tri`, `phe duyet`, `dau moi phu trach` trong SOP/WI/ANNEX PHAI dung chip link theo `role code`, `D-code` hoac bundle da cong bo; khong de text tran kieu `Steering Committee`, `All chuc nang`, `Department Truong bo phan`.
+- Header va owner cell cua tai lieu `Training Academy`, `competency`, `OJT`, `gate test`, `authorization`, `role roadmap` cung PHAI theo y het rule nay; khong duoc de `QA/QMS`, `HR Manager / QA Manager`, `HR + OPS + QA/QMS`, `Department Quan ly` hay `Tong / Chung Manager`.
+- Cot `nguoi dung chinh`, `audience`, `functional users`, `reviewers`, `escalation audience`, `MR users`, `dashboard users`, `backup activation` cung PHAI dung `role code`, `D-code` hoac bundle da cong bo; khong de text tran kieu `supervisors`, `site leadership`, `process owners`, `all managers`.
 - Cot mo ta `owner group`, `editor group`, `security group`, `M365 group` trong tai lieu kien truc quyen he thong duoc phep giu ten group ky thuat; khong ep doi cac ten group nay thanh JD/D-code neu doi tuong du lieu dang la nhom quyen he thong, khong phai vai tro nhan su.
 - Trong noi dung cong bo, ma phong ban PHAI dung bo canonical: `D-SCS`, `D-ENG`, `D-PROD`, `D-PPC`, `D-QUAL`, `D-SCM`, `D-PUR`, `D-WHS`, `D-TCR`, `D-LOG`, `D-FIN`, `D-HR`, `D-EHS`, `D-IT`, `D-ERP`.
 - Alias cu kieu `SAL`, `ENG`, `PRO`, `PLA`, `PUR`, `WHS`, `HSE`, `IT`, `CNC`, `OPS`, `Dept Head`, `Line Manager`, `Supervisor`, `Ops Manager`, `Purchasing Manager`, `Engineering Manager` KHONG duoc de lai trong header, owner cell, RACI, interface table, audience table hoac ma tran phan quyen sau khi da co role-boundary/job-order registry.
 - Neu mot o dang noi ve tham quyen cua phong ban thi doi sang `D-code`; neu dang noi ve tham quyen cua nguoi giu vai tro thi doi sang `role code`; neu dang noi ve lop actor on dinh lap lai thi chi duoc dung `bundle` da cong bo.
 - Bundle duoc phep dung de rut gon ma khong mat nghia, nhung bundle cung phai la actor explicit da cong bo trong registry nguon. Khong tu phat minh bundle trong tai lieu phat hanh roi moi quay lai hop thuc hoa sau.
+- Header, preface, RACI, actor cell, owner cell, approval cell va KPI-owner cell KHONG duoc giu lai text nua mua kieu `Warehouse + IQC`, `Buyer + IQC`, `Supervisor / QA`, `QA / Quy trinh Owner`, `Sales Lead`, `MRB`, `Sender`, `Maintenance + Workshop`; tat ca PHAI resolve ve `role code`, `D-code` hoac `bundle` hop le.
+- Neu mot o cau truc can them mo ta bo sung nhu `theo ANNEX-120`, `tuy luong`, `khi co`, `theo rota`, `neu anh huong ...`, phan chip PHAI dung truoc, phan mo ta bo sung dat sau; khong duoc quay lai viet ten chuc danh dai dong de "giai thich cho de doc".
+- `backup-card` trong JD PHAI chi ro role nao chi dinh backup va D-code nao bo tri nguon luc backup, dong thoi dan chieu `ANNEX-123`; khong duoc de lai text mo ho kieu `Lead/Manager truc tiep`, `Nguoi quan ly truc tiep`, `dong nghiep phu hop`.
+- Header meta bi loi nhan / loi unicode nhung van nhin ro y nghia nhu `...so huu`, `...phe duyet` PHAI duoc normalize theo y dinh nhan truong, khong duoc bo qua chi vi label HTML bi meo.
+- Row `Cap vai tro` trong JD PHAI dung controlled label ngan va on dinh nhu `Executive`, `Manager`, `Lead`, `Supervisor`, `Engineer / Specialist`, `Technician / Operator`; khong duoc de hybrid mo ho kieu `Supervisor / Lead`.
+
+### 6.1 Rule body text cho JD va tai lieu lien doi
+
+- Tieu de JD va row `Chuc danh theo tai lieu` giu `English title` chuan.
+- Header `Chu so huu`, `Phe duyet`, row `Bo phan`, owner cell, RACI cell va actor cell dung `role code`, `D-code` hoac `bundle` theo dung lop.
+- Trong body text, neu mot tu dang chi actor/authority that thi doi sang `role code` hoac `D-code`; khong de lai cum nua mua kieu `Customer Dich vu`, `Engineering Lead`, `Supervisor`, `Planning`, `Purchasing`.
+- Neu mot tu dang chi business concept, khong chi actor to chuc, phai viet lai bang tieng Viet van hanh ro nghia; khong de hybrid English-Viet kieu `and giao dien Map`, `kinh Nghiem`, `Working van phong`, `source of su that`.
+- Ten group ky thuat cua he thong duoc giu nguyen chi khi doi tuong dang la security group, M365 group, ERP role group hoac queue ky thuat that.
+
+### 6.3 Rule bat buoc cho digital / KPI / dashboard docs
+
+Khi sua WI/ANNEX/SOP ve bang dieu khien, KPI, ERP, M365, access review, deputy, data governance:
+- `MR_REPORT_OWNERS` = nhom role chu tri pack KPI/MR.
+- `ITA / ESA` = nhom role xac nhan lop nguon he thong, workflow, refresh logic, truy vet ky thuat.
+- `FUNC_OWNERS` hoac `OPS_SCOPE_OWNERS` = nhom role/chuc nang so huu noi dung nghiep vu cua du lieu.
+
+Trong actor cell, owner cell, approver cell, reviewer cell, audience cell:
+- KHONG duoc de `data owner`, `system owner`, `business owner`, `KPI owner`, `nguoi chiu trach nhiem KPI`, `nguoi chiu trach nhiem du lieu`, `nguoi chiu trach nhiem nghiep vu`.
+- PHAI resolve thanh `role code`, `D-code` hoac `bundle` cong bo.
+
+Trong prose neu can noi toi mot khai niem phi-actor:
+- dung `don vi so huu du lieu nghiep vu` cho business-content ownership;
+- dung `role xac nhan nguon du lieu` cho lop kiem xac nhan source/refresh;
+- dung `role chu tri pack` cho nguoi chot va nop pack KPI/MR.
+
+Khong duoc viet nua mua:
+- `IT chu du lieu`
+- `Finance team`
+- `All site nhan su`
+- `Lanh dao / Quy trinh Owner`
+- `Department Truong bo phan`
+- `Reviewer doc lap` neu chua resolve duoc vao role/bundle that.
+
+### 6.2 Rule audit residue sau khi normalize
+
+Audit residue PHAI tach ro:
+- residue that can sua: `SAL`, `ENG`, `Supervisor`, `Engineering Lead`, `Department Head`, `Process Owner`, `Data Owner`, `Customer Dich vu`, `Working van phong`, `kinh Nghiem`;
+- token hop le khong duoc bao sai: `D-ENG`, `ENGM`, `FRM-ENG-xxx`, `PROC-SAL-xxx`, `RET-SCS-xxx`, `HESEM ENGINEERING`.
+
+Neu scan van bao `SAL`/`ENG`, nguoi sua phai xac nhan no la:
+1. alias cu dang lot trong noi dung;
+2. hay chi la mot phan cua ma form, ma retention, role code, department code hoac ten cong ty.
+
+Chi duoc dong task khi residue that da ve 0. Khong duoc ket luan sai chi vi scanner dang bao nham token hop le.
 
 ---
 

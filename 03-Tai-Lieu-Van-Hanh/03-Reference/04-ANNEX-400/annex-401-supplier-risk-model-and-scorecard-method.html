@@ -59,9 +59,9 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div>
 <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi chọn nguồn cung mới, tái đánh giá nhà cung cấp hiện hữu, rà soát định kỳ, ra quyết định thử việc/chặn / khóa, xác định mức đầu vào / nhận hàng control và quyết định kép-source hoặc dự phòng source.</div>
 <h1>ANNEX-401 — Mô hình rủi ro nhà cung cấp và phương pháp thẻ điểm</h1>
-<div class="callout-info"><b>Nguyên tắc nền:</b> Supplier không được đánh giá chỉ bằng giá và thời gian dẫn (lead time). Mọi nhà cung cấp ảnh hưởng CTQ, truy xuất nguồn gốc, cert tính toàn vẹn, công đoạn đặc biệt, giao hàng độ ổn định hoặc khách hàng Requests PHẢI đi qua mô hình rủi ro và thẻ điểm này trước khi cấp PO hoặc cho phép phát hành vào sản xuất.</div>
+<div class="callout-info"><b>Nguyên tắc nền:</b> Supplier không được đánh giá chỉ bằng giá và thời gian dẫn (lead time). Mọi nhà cung cấp ảnh hưởng CTQ, truy xuất nguồn gốc, cert tính toàn vẹn, công đoạn đặc biệt, giao hàng độ ổn định hoặc khách hàng yêu cầu PHẢI đi qua mô hình rủi ro và thẻ điểm này trước khi cấp PO hoặc cho phép phát hành vào sản xuất.</div>
 <h2>1. Mục đích và phạm vi áp dụng</h2>
-<p>ANNEX này quy định hai lớp kiểm soát song song: <b>(1) rủi ro nền của nhà cung cấp</b> và <b>(2) hiệu năng thực tế theo thẻ điểm</b>. Hai lớp này cùng quyết định nhà cung cấp trạng thái, tần suất rà soát, mức độ xác minh đầu vào, Requests kép-source, kích hoạt thử việc/chặn / khóa và điều kiện mở khóa lại.</p>
+<p>ANNEX này quy định hai lớp kiểm soát song song: <b>(1) rủi ro nền của nhà cung cấp</b> và <b>(2) hiệu năng thực tế theo thẻ điểm</b>. Hai lớp này cùng quyết định nhà cung cấp trạng thái, tần suất rà soát, mức độ xác minh đầu vào, yêu cầu kép-source, kích hoạt thử việc/chặn / khóa và điều kiện mở khóa lại.</p>
 <p>Tài liệu áp dụng cho raw nguyên vật liệu suppliers, khách hàng-được chỉ định suppliers, đặc biệt nhà gia công, gia công ngoài gia công cơ khí nhà / chứa, dịch vụ kiểm định/hiệu chuẩn ảnh hưởng sản phẩm, và các nguồn cung ảnh hưởng trực tiếp tới tiến độ/tuân thủ chất lượng của Lệnh sản xuất CNC.</p>
 <h2>2. Phân loại nhóm sản phẩm và rủi ro nền R1–R4</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
@@ -69,7 +69,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tbody>
 <tr><td>Quan trọng raw nguyên vật liệu</td><td>Bar/tấm / bản/ống/rèn/đúc, vật liệu đặc chủng, khách hàng-đã quy định cấp / hạng</td><td><span class="badge-red">R1</span></td><td>Đã phê duyệt source, cert/MTR 100%, mẻ nấu (heat)/lot truy vết, xác minh đầu vào, thay thế control, định kỳ thẻ điểm.</td></tr>
 <tr><td>đặc biệt Người xử lý</td><td>xi mạ anốt (anodize), mạ, thụ động hóa (passivation), mẻ nấu (heat) xử lý, NDT, làm sạch đặc biệt, lớp phủ / mạ</td><td><span class="badge-red">R1</span></td><td>Đã phê duyệt Người xử lý list, quy trình scope/site scope rà soát, bộ chứng từ chứng nhận, khách hàng luồng-xuống / Từng, trả lại xác minh, hết hạn control.</td></tr>
-<tr><td>Gia công ngoài gia công cơ khí / thứ cấp ops</td><td>mài, EDM, laser đánh dấu, thuê ngoài gia công cơ khí, cân bằng, mài rà (lapping)</td><td><span class="badge-amber">R2</span></td><td>Khả năng rà soát, lộ trình gia công/vận hành luồng-xuống / Từng, đầu tiên lot/FAI theo Requests, giao hàng giám sát, ngăn chặn rule.</td></tr>
+<tr><td>Gia công ngoài gia công cơ khí / thứ cấp ops</td><td>mài, EDM, laser đánh dấu, thuê ngoài gia công cơ khí, cân bằng, mài rà (lapping)</td><td><span class="badge-amber">R2</span></td><td>Khả năng rà soát, lộ trình gia công/vận hành luồng-xuống / Từng, đầu tiên lot/FAI theo yêu cầu, giao hàng giám sát, ngăn chặn rule.</td></tr>
 <tr><td>Kiểm tra / hiệu chuẩn / bên ngoài test dịch vụ</td><td>Lab, hiệu chuẩn nhà cung cấp dịch vụ, bên ngoài đo lường/xác nhận dịch vụ</td><td><span class="badge-amber">R2</span></td><td>Phê duyệt scope, cert hiệu lực, truy xuất nguồn gốc chuỗi, bằng chứng lưu giữ, re-rà soát khi scope thay đổi.</td></tr>
 <tr><td>Đóng gói / hậu cần / chung / tổng quát cung ứng</td><td>Bao bì, vật tư tiêu hao, vận chuyển, vật tư phụ không trực tiếp tạo đặc tính sản phẩm</td><td><span class="badge-blue">R3</span></td><td>PO sự rõ ràng, nhận hàng cơ bản kiểm tra, OTD giám sát, vấn đề log.</td></tr>
 <tr><td>Tổng / Chung dịch vụ / low-tác động nhà cung cấp</td><td>Dịch vụ văn phòng, vật tư gián tiếp, dịch vụ không chạm sản phẩm</td><td><span class="badge-green">R4</span></td><td>Thương mại control, dịch vụ rà soát theo nhu cầu, vấn đề log khi có phát sinh.</td></tr>
@@ -77,10 +77,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="callout-warn"><b>Quy tắc:</b> Customer-chỉ đạo nhà cung cấp vẫn PHẢI được chấm rủi ro và theo dõi hiệu năng. Customer-chỉ đạo không có nghĩa là tự động "pass" cho các Job khác hoặc được miễn chứng cứ cert/truy vết/scope.</div>
 <h2>3. Cổng kiểm soát (gate) hội nhập nhân sự mới trước PO đầu tiên</h2>
 <div class="step-list">
-<div class="step-item"><b>Xác định nhóm sản phẩm và R-class.</b> Mua hàng xác định nhóm sản phẩm; QA/Kỹ thuật xác nhận mức ảnh hưởng tới CTQ, cert, vệ sinh / sạch sẽ, công đoạn đặc biệt, khách hàng Requests và kinh doanh tính liên tục.</div>
+<div class="step-item"><b>Xác định nhóm sản phẩm và R-class.</b> Mua hàng xác định nhóm sản phẩm; QA/Kỹ thuật xác nhận mức ảnh hưởng tới CTQ, cert, vệ sinh / sạch sẽ, công đoạn đặc biệt, khách hàng yêu cầu và kinh doanh tính liên tục.</div>
 <div class="step-item"><b>Thu bộ bằng chứng.</b> Supplier hồ sơ / biên dạng, site địa chỉ, quy trình scope, khách hàng scope, cert/công nhận, bảo hiểm/liên hệ escalation, mẫu cert/MTR/CoC, công suất Photos trạng thái, NDA/data bảo vệ nếu cần.</div>
 <div class="step-item"><b>Đánh giá fit.</b> Với raw nguyên vật liệu: cấp / hạng/điều kiện/size/truy vết fit. Với Người xử lý: quy trình scope/site khớp / phù hợp. Với gia công ngoài gia công cơ khí: machine bao bì / phong bì/năng lực / khả năng/gage/quy trình control fit.</div>
-<div class="step-item"><b>Chấm rủi ro nền và thiết lập mức kiểm soát đầu vào.</b> Xác định đầu vào / nhận hàng plan, đầu tiên-lot rule, cert rà soát chiều sâu, kép-source cần và dự phòng Requests.</div>
+<div class="step-item"><b>Chấm rủi ro nền và thiết lập mức kiểm soát đầu vào.</b> Xác định đầu vào / nhận hàng plan, đầu tiên-lot rule, cert rà soát chiều sâu, kép-source cần và dự phòng yêu cầu.</div>
 <div class="step-item"><b>Chỉ sau khi chủ / gốc được phê duyệt mới được cấp PO.</b> PO không được phát hành trước rồi mới hợp thức hóa hồ sơ nhà cung cấp.</div>
 </div>
 <h2>4. Phương pháp thẻ điểm và trọng số</h2>
@@ -117,7 +117,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tbody>
 <tr><td><span class="badge-green">90–100 ưu tiên</span></td><td>Hiệu năng ổn định, dữ liệu sạch, không có kiểm soát cổng sự kiện mở</td><td>Dùng theo lộ trình gia công chuẩn; vẫn giữ kiểm soát nền theo R-class</td><td>R1 hàng tháng; R2 hàng quý; R3/R4 nửa năm</td></tr>
 <tr><td><span class="badge-blue">80–89 Đã phê duyệt</span></td><td>Dùng được, còn điểm cần theo dõi</td><td>Review cải tiến theo vấn đề log; không bỏ cert/truy vết rà soát nền</td><td>R1 hàng tháng; R2 hàng quý; R3 nửa năm; R4 hàng năm</td></tr>
-<tr><td><span class="badge-amber">65–79 Có điều kiện</span></td><td>Cho phép dùng có điều kiện</td><td>Tăng đầu vào / nhận hàng kiểm tra, giới hạn scope/part nhóm sản phẩm, Requests kế hoạch hành động, xem xét kép-source</td><td>Hàng tháng đến khi phục hồi</td></tr>
+<tr><td><span class="badge-amber">65–79 Có điều kiện</span></td><td>Cho phép dùng có điều kiện</td><td>Tăng đầu vào / nhận hàng kiểm tra, giới hạn scope/part nhóm sản phẩm, yêu cầu kế hoạch hành động, xem xét kép-source</td><td>Hàng tháng đến khi phục hồi</td></tr>
 <tr><td><span class="badge-red">50–64 Thử việc</span></td><td>Rủi ro cao, chỉ dùng khi có chấp thuận</td><td>PO mới cần phê duyệt tình huống-by-tình huống; phải có ngăn chặn và kế hoạch hành động; có thể chặn / khóa theo item/quy trình</td><td>Review mỗi lô hoặc mỗi tháng</td></tr>
 <tr><td><span class="badge-red">&lt; 50 Chặn</span></td><td>PHẢI chặn</td><td>Dừng PO mới; chỉ mở lại sau tái đánh giá năng lực và thẩm quyền phê duyệt</td><td>Chỉ rà soát lại khi đã có hồ sơ tái đánh giá năng lực</td></tr>
 </tbody></table></div>

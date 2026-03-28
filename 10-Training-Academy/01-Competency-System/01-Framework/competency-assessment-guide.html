@@ -1,5 +1,4 @@
-
- thead { display: table-header-group; }
+<div><p>thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
  
@@ -9,17 +8,17 @@
 table { max-width: 100%; table-layout: auto; }
 td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 
-</style>
+
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../assets/style.css"/>
-</head>
-<body>
+<link rel="stylesheet" href="../../../assets/style.css">
+
+</p>
 <div class="container">
 <div class="page">
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu kiểm soát</span>
@@ -33,8 +32,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="row"><span><b>Code:</b></span><span>năng lực-ĐÁNH GIÁ-hướng dẫn</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+<div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent"><div class="note-blue" style="margin:12px 0">
@@ -48,7 +47,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  áp dụng minh chứng, phương pháp đánh giá và câu hỏi kiểm tra.
  </p>
 <div class="note">
-<strong>Cách dùng nhanh:</strong> (1) Chọn năng lực áp dụng theo vị trí; (2) so sánh Level Requests vs Level Current;
+<strong>Cách dùng nhanh:</strong> (1) Chọn năng lực áp dụng theo vị trí; (2) so sánh Level yêu cầu vs Level Current;
  (3) thu thập minh chứng; (4) chấm theo tiêu chí; (5) lập kế hoạch bù (IDP) khi chưa đạt.
  </div>
 </div><div style="height:16px"></div><div class="card">
@@ -56,8 +55,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2" style="margin-top:12px;">0) Triết lý đánh giá năng lực tại HESEM</h2>
 <p class="lead">
  Đánh giá năng lực không chỉ để "chấm điểm" mà để <b>chuẩn hóa cách làm – phát triển con Người – bảo vệ chất lượng</b>.
- Vì HESEM vận hành theo mô hình gia công CNC <b>Lệnh sản xuất</b> (đa dạng mã hàng, thay đổi liên tục, Requests truy xuất nguồn gốc),
- hệ thống năng lực phải đảm bảo 3 Requests đồng thời: <b>(1) An toàn</b>, <b>(2) Quality</b>, <b>(3) Đúng hạn &amp; chi phí</b>.
+ Vì HESEM vận hành theo mô hình gia công CNC <b>Lệnh sản xuất</b> (đa dạng mã hàng, thay đổi liên tục, yêu cầu truy xuất nguồn gốc),
+ hệ thống năng lực phải đảm bảo 3 yêu cầu đồng thời: <b>(1) An toàn</b>, <b>(2) Quality</b>, <b>(3) Đúng hạn &amp; chi phí</b>.
  </p>
 <div class="grid-2">
 <div class="note">
@@ -72,7 +71,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div class="note">
-<strong>"Cổng kiểm soát (gate)" (điều kiện chặn) lập Requests</strong>
+<strong>"Cổng kiểm soát (gate)" (điều kiện chặn) lập yêu cầu</strong>
 <ul style="margin:8px 0 0 0; padding-left:18px; line-height:1.75;">
 <li><b>C01 An toàn:</b> có vi phạm nghiêm trọng → <b>không cấp Level</b> và phải đào tạo lại bắt buộc.</li>
 <li><b>C02 Tuân thủ:</b> dùng sai phiên bản / làm sai SOP gây lỗi lớn → <b>không đạt</b> kỳ đánh giá.</li>
@@ -85,7 +84,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div><div style="height:16px"></div><div class="card">
 <h2 class="h2" style="margin-top:0;">1) Mô hình năng lực: KSA + Hành vi + Kết quả (KSA-BR)</h2>
 <p class="lead">
- Để đánh giá <b>định lượng – rõ ràng</b>, HESEM lập Requests coi năng lực là tổng của 4 lớp minh chứng:
+ Để đánh giá <b>định lượng – rõ ràng</b>, HESEM lập yêu cầu coi năng lực là tổng của 4 lớp minh chứng:
  <b>Kiến thức (K)</b>, <b>Kỹ năng (S)</b>, <b>Hành vi/Thái độ (B)</b>, <b>Kết quả/Đầu ra (R)</b>.
  </p>
 <table class="table">
@@ -119,7 +118,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>R</b> (Kết quả)</td>
 <td>Đầu ra đo được: chất lượng/đúng hạn/chi phí.</td>
-<td>FPY, phế phẩm, OTD, thời gian Từng máy, tuổi dao (tool tuổi thọ / vòng đời), tồn kho, thời gian dẫn (lead time) báo giá…</td>
+<td>FPY, phế phẩm, OTD, thời gian dừng máy, tuổi dao (tool tuổi thọ / vòng đời), tồn kho, thời gian dẫn (lead time) báo giá…</td>
 <td>KPI/ số liệu</td>
 </tr>
 </tbody>
@@ -129,9 +128,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <b>K</b> để đảm bảo hiểu đúng; <b>R</b> dùng để kiểm chứng "làm có ra kết quả".
  </div>
 </div><div style="height:16px"></div><div class="card">
-<h2 class="h2" style="margin-top:0;">2) Quy trình đánh giá chi tiết (lập Requests 8 bước)</h2>
+<h2 class="h2" style="margin-top:0;">2) Quy trình đánh giá chi tiết (lập yêu cầu 8 bước)</h2>
 <div class="vtext">
-<strong>B1 - Xác định Level Requests theo vị trí</strong>
+<strong>B1 - Xác định Level yêu cầu theo vị trí</strong>
 </div>
 </div><div class="vstep">
 <div class="vnum">2</div>
@@ -190,14 +189,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 </div><div data-phase2f="true">
 <h2 class="h2" id="phase2f-competence-vs-authorization">Kiểm soát bổ sung — Năng lực so với ủy quyền</h2>
-<div class="note"><b>Nguyên tắc điều hành</b><br/>Năng lực không tự động đồng nghĩa với ủy quyền. Một Người chỉ được xem là "được phép thực hiện / phát hành / phê duyệt" khi có đủ tổ hợp: <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-801_Training_Plan.xlsx">FRM-801</a> (plan), <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM-803</a> (OJT), <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-804_Competence_Assessment.xlsx">FRM-804</a> (đánh giá), <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-809</a> (trạng thái / phó mức sẵn sàng) và thẩm quyền ranh giới theo JD / ANNEX-QMS-025.</div>
+<div class="note"><b>Nguyên tắc điều hành</b><br>Năng lực không tự động đồng nghĩa với ủy quyền. Một Người chỉ được xem là "được phép thực hiện / phát hành / phê duyệt" khi có đủ tổ hợp: <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-801_Training_Plan.xlsx">FRM-801</a> (plan), <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-803_OJT_Checklist.xlsx">FRM-803</a> (OJT), <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-804_Competence_Assessment.xlsx">FRM-804</a> (đánh giá), <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-809</a> (trạng thái / phó mức sẵn sàng) và thẩm quyền ranh giới theo JD / ANNEX-QMS-025.</div>
 </div></div>
 </div>
 </div>
 <table class="table">
 <thead><tr><th style="width:240px;">Vai trò</th><th>Trách nhiệm chính</th></tr></thead>
 <tbody>
-<tr><td>Department Manager / Foreman</td><td>Responsible Person tiêu chuẩn năng lực vị trí, phê duyệt kết quả chấm, phân công Người hướng dẫn.</td></tr>
+<tr><td>Department Manager / Foreman</td><td>người chịu trách nhiệm tiêu chuẩn năng lực vị trí, phê duyệt kết quả chấm, phân công Người hướng dẫn.</td></tr>
 <tr><td>Người hướng dẫn L3–L4</td><td>Huấn luyện OJT, quan sát thực hành, xác nhận bảng kiểm tay nghề.</td></tr>
 <tr><td>HR/Training</td><td>Quản hồ sơ, lịch đánh giá, biểu mẫu, tổng hợp ma trận kỹ năng (matrix), theo dõi IDP.</td></tr>
 <tr><td>QA (khi liên quan chất lượng)</td><td>Xác nhận tiêu chuẩn đo/kiểm, CTQ, FAI/final; tham gia đánh giá C03/C16.</td></tr>
@@ -206,6 +205,5 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <script src="../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
-</body>
-</html>
 
+</div>

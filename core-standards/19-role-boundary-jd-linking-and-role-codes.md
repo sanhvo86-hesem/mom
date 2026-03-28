@@ -1,6 +1,6 @@
 # 19. Role Boundary, JD Linking and Role Codes
 
-> Version: v2 | Date: 2026-03-28 | Owner: QMS Engineer
+> Version: v4 | Date: 2026-03-28 | Owner: QMS Engineer
 
 ---
 
@@ -43,6 +43,30 @@ Neu 3 lop mau thuan nhau:
 - workbook chi la tu dien tham chieu, khong duoc phep di nguoc JD va registry.
 
 Khong duoc phat hanh SOP/WI/ANNEX/JD moi neu vai tro trong tai lieu chua resolve vao 1 trong 3 lop tren.
+
+### 2.1 Benchmark ben ngoai bat buoc khi sua JD
+
+Khi sua JD cho mo hinh `job-order CNC`, nguoi sua PHAI doi chieu them benchmark ben ngoai truoc khi chot boundary:
+- role dieu hanh san xuat va nang luc nha may;
+- role ky thuat / process / routing / prove-out;
+- role buyer / supply / warehouse / shipping;
+- role customer service / estimator trong chuoi `RFQ -> work order -> ship`;
+- role QMS / QA / inspection governance.
+
+Nguon benchmark ben ngoai chi duoc dung de:
+- kiem tra xem boundary noi bo co bo sot mot lop cong viec quan trong khong;
+- xac nhan mot role dang la authority ca nhan hay chi la mandate cap chuc nang;
+- bo sung nhiem vu thuc chien cho JD khi tai lieu cu noi qua so luoc.
+
+Role-family benchmark toi thieu nguoi sua PHAI doi chieu gom:
+- industrial production manager / workshop manager layer;
+- first-line supervisor / frontline lead layer;
+- industrial / manufacturing / process engineer layer;
+- quality manager / quality engineer / inspector lead layer;
+- customer service / estimator / order admin layer;
+- IT infrastructure admin vs ERP / application admin layer.
+
+Khong duoc copy nguyen van benchmark ben ngoai vao JD. Boundary cuoi cung van phai khoa theo to chuc HESEM, handbook phong ban va registry role da cong bo.
 
 ---
 
@@ -150,6 +174,21 @@ Quy tac bundle:
 - khong tao bundle de che mo trach nhiem;
 - bundle chi dung khi trach nhiem thuc su la lop actor chung, khong phai mot JD don le;
 - neu SOP chi ap cho mot pham vi hep, phai dung subset explicit hoac base role cu the, khong lay bundle rong cho tien.
+
+### 4.4 Boundary bat buoc cho he role digital va frontline
+
+Khi sua JD theo benchmark `job-order CNC`, phai giu ro 4 ranh gioi sau:
+- `ITA` = ha tang CNTT nen, endpoint, account lifecycle, backup, network, user support; KHONG giu quyen noi dung du lieu nghiep vu.
+- `ESA` = cau hinh ERP, workflow, transaction integrity, BAQ/reporting governance, SoD va rollback/UAT; KHONG thay `FUNC_OWNERS` phe duyet noi dung nghiep vu.
+- `SL` va `QCL` = frontline lead tai diem dung; duoc dieu hanh, xac nhan trong pham vi duoc uy quyen, nhung khong tro thanh `department head` thu nho.
+- `PPL`, `WKM`, `ENGM`, `QA`, `SCM`, `FIN`, `HR`, `EHS` = cac role giu ranh gioi quyen han chuc nang / gate / sign-off o cap dieu hanh, khong duoc bi hoa tan thanh cum chung chung kieu `manager`, `owner`, `lead`.
+
+Trong tai lieu digital / KPI / authority:
+- `MR_REPORT_OWNERS` = nhom role chot va nop pack KPI/MR.
+- `FUNC_OWNERS` hoac `OPS_SCOPE_OWNERS` = nhom role/chuc nang so huu noi dung nghiep vu cua du lieu.
+- `ITA / ESA` = nhom role so huu lop nen he thong, access, refresh logic, backup, workflow va truy vet ky thuat.
+
+Khong duoc gop 3 lop nay thanh mot cum mo ho nhu `data owner`, `business owner`, `system owner`, `process owner`.
 
 ---
 

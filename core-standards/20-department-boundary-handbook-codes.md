@@ -1,6 +1,6 @@
 # 20. Department Boundary, Handbook Codes and Coverage Gaps
 
-> Version: v2 | Date: 2026-03-28 | Owner: QMS Engineer
+> Version: v3 | Date: 2026-03-28 | Owner: QMS Engineer
 
 ---
 
@@ -137,6 +137,18 @@ Rule resolve:
 - `D-LOG` — Logistics and Shipping Function
 - `D-ERP` — ERP Administration Function
 
+### 4.3 Data-content vs platform ownership trong job-order CNC
+
+Trong cac tai lieu so hoa / KPI / ERP / M365, phai tach ro:
+- `D-IT` = ha tang CNTT nen, endpoint, network, backup, access lifecycle.
+- `D-ERP` = quan tri ERP, workflow, transaction integrity, BAQ/reporting governance.
+- cac `D-code` chuc nang nhu `D-SCS`, `D-ENG`, `D-PROD`, `D-QUAL`, `D-SCM`, `D-FIN`, `D-HR`, `D-EHS` = noi so huu noi dung nghiep vu, quy tac giao dich va quy tac dung du lieu trong pham vi minh.
+
+Vi vay:
+- neu cau dang noi ve `noi dung du lieu nghiep vu`, dung `D-code` chuc nang hoac role trong `FUNC_OWNERS` / `OPS_SCOPE_OWNERS`;
+- neu cau dang noi ve `nen tang he thong`, dung `D-IT` / `D-ERP` hoac role `ITA` / `ESA`;
+- khong duoc viet mo ho kieu `IT chu du lieu`, `bo phan lien quan`, `system owner`, `data owner`.
+
 Chỉ tạo thêm `D-` code mới khi thỏa cả 4 điều kiện:
 - công việc lặp lại ổn định;
 - có đầu vào/đầu ra và điểm bàn giao rõ;
@@ -186,6 +198,27 @@ Khi đã xác định có `Department gap`, `Subfunction gap` hoặc `JD gap`, n
    - `Department code & handbook link`
 4. cập nhật các tài liệu hệ thống liên đới như matrix tổ chức, ANNEX, SOP có ô interface/owner dùng lại boundary đó;
 5. chỉ sau đó mới coi việc sửa tài liệu downstream là hoàn tất.
+
+### 5.4 Rule ve phan cong theo phong ban vs theo JD
+
+Neu mot o dang noi ve:
+- function mandate, interface, queue, handoff, ownership cap phong ban: dung `D-code`;
+- phe duyet, hold/release, sign-off, deputy, escalation decision: dung `role code`;
+- lop actor lap lai da cong bo ro: dung `bundle`.
+
+Khong duoc giu text nua mua kieu:
+- `Engineering`, `Sales`, `Planning`, `Warehouse`, `Purchasing`, `Operations`;
+- `truong bo phan`, `line manager`, `supervisor`, `team lead`;
+- `phong lien quan`, `cac phong chuc nang`, `bo phan chuyen mon`.
+
+Khi mot tu khoa phong ban cu xuat hien trong body SOP/WI/ANNEX/JD, nguoi sua phai tra loi ro no dang noi ve:
+1. mot department/subfunction;
+2. mot role co JD that;
+3. hay mot business concept phi-to-chuc.
+
+Neu la (1), doi sang `D-code`.
+Neu la (2), doi sang `role code`.
+Neu la (3), viet lai bang tieng Viet van hanh ro nghia, khong de lai cau hybrid nua mua.
 
 ---
 

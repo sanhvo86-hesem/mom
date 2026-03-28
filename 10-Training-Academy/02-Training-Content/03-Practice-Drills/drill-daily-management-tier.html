@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
 <title>TRN-Bài diễn tập ACA-DRL-08 — Hàng Ngày Quản lý (Tier Cuộc họp) | HESEM Academy</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 
 <style>
  .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
@@ -29,7 +28,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
@@ -43,8 +42,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="row"><span><b>Code:</b></span><span>DIỄN TẬP-hàng ngày-quản lý-TIER</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -62,7 +61,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">Mục tiêu</span>
 <ul class="tight">
-<li>10 phút họp ra được ưu tiên và hành động có Responsible Person/due.</li>
+<li>10 phút họp ra được ưu tiên và hành động có người chịu trách nhiệm/due.</li>
 <li>Escal đúng tuyến và đúng SLA.</li>
 <li>Bàn giao ca sau bằng hồ sơ, không bàn giao bằng lời.</li>
 </ul>
@@ -77,7 +76,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li>KPI bảng hoặc bảng điều khiển (An toàn/Quality/Giao hàng/Chi phí/People).</li>
 <li>Log hành động template (1 trang).</li>
-<li>01 vấn đề thật trong phân xưởng: lỗi chất lượng, trễ tiến độ, thời gian Từng máy, thiếu vật tư.</li>
+<li>01 vấn đề thật trong phân xưởng: lỗi chất lượng, trễ tiến độ, thời gian dừng máy, thiếu vật tư.</li>
 </ul>
 </div>
 <div class="card">
@@ -85,10 +84,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="table-card">
 <table class="table">
 <thead>
-<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">Responsible Person</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">người chịu trách nhiệm</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Chuẩn bị bảng: An toàn/Quality/Giao hàng/Chi phí/People + dữ liệu Ngày hôm trước.</td><td>Team lead</td><td>Bảng Photos trạng thái + data source link</td><td>FAIL</td></tr><tr><td>2</td><td>Họp Tier 1 (≤ 10 phút): rà soát KPI, top 3 vấn đề, xác nhận ưu tiên trong ngày.</td><td>Team lead</td><td>Cuộc họp biên bản họp (1 trang)</td><td>FAIL</td></tr><tr><td>3</td><td>Escalation: vấn đề vượt cell → escal Tier 2 theo SLA (≤ 15 phút).</td><td>Team lead</td><td>Escalation log</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>log hành động: mỗi vấn đề có Responsible Person + due + bằng chứng link; không để 'đang xử lý' mơ hồ.</td><td>Team lead + Responsible Person</td><td>log hành động cập nhật</td><td>FAIL</td></tr><tr><td>5</td><td>Kèm cặp phát triển tại hiện trường: 1 phản hồi cụ thể cho 1 cá nhân (kỹ năng/hành vi).</td><td>Trưởng nhóm</td><td>Kèm cặp phát triển note</td><td>FAIL</td></tr><tr><td>6</td><td>End-of-shift: chốt kết quả, đối soát hành động, cập nhật plan cho ca sau.</td><td>Team lead</td><td>Shift bàn giao note + liên kết</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Chuẩn bị bảng: An toàn/Quality/Giao hàng/Chi phí/People + dữ liệu Ngày hôm trước.</td><td>Team lead</td><td>Bảng Photos trạng thái + data source link</td><td>FAIL</td></tr><tr><td>2</td><td>Họp Tier 1 (≤ 10 phút): rà soát KPI, top 3 vấn đề, xác nhận ưu tiên trong ngày.</td><td>Team lead</td><td>Cuộc họp biên bản họp (1 trang)</td><td>FAIL</td></tr><tr><td>3</td><td>Escalation: vấn đề vượt cell → escal Tier 2 theo SLA (≤ 15 phút).</td><td>Team lead</td><td>Escalation log</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>log hành động: mỗi vấn đề có người chịu trách nhiệm + due + bằng chứng link; không để 'đang xử lý' mơ hồ.</td><td>Team lead + người chịu trách nhiệm</td><td>log hành động cập nhật</td><td>FAIL</td></tr><tr><td>5</td><td>Kèm cặp phát triển tại hiện trường: 1 phản hồi cụ thể cho 1 cá nhân (kỹ năng/hành vi).</td><td>Trưởng nhóm</td><td>Kèm cặp phát triển note</td><td>FAIL</td></tr><tr><td>6</td><td>End-of-shift: chốt kết quả, đối soát hành động, cập nhật plan cho ca sau.</td><td>Team lead</td><td>Shift bàn giao note + liên kết</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
@@ -97,7 +96,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">Fail-nhanh</span>
 <ul class="tight">
 <li>Bảng không có nguồn dữ liệu hoặc số liệu không khớp.</li>
-<li>log hành động thiếu Responsible Person/due hoặc không có link bằng chứng.</li>
+<li>log hành động thiếu người chịu trách nhiệm/due hoặc không có link bằng chứng.</li>
 <li>Không escal khi vấn đề chặn vượt cell.</li>
 </ul>
 </div>
@@ -108,7 +107,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>Data kỷ luật / chuyên ngành</b></td><td>Mọi kết luận gắn với số liệu/hồ sơ; không tranh luận bằng cảm tính.</td><td>0/1/2</td></tr><tr><td><b>Time kỷ luật / chuyên ngành</b></td><td>Họp Tier 1 ≤ 10 phút, đúng chương trình họp.</td><td>0/1/2</td></tr><tr><td><b>Hành động kết thúc / đóng</b></td><td>log hành động có Responsible Person + due + link; theo dõi tiếp tại ca sau.</td><td>0/1/2</td></tr><tr><td><b>Escalation chất lượng</b></td><td>Escal đúng bậc thang năng lực và đúng SLA; không giấu vấn đề chặn.</td><td>0/1/2</td></tr><tr><td><b>Kèm cặp phát triển</b></td><td>Phản hồi cụ thể (quan sát–tác động–kỳ vọng–cam kết).</td><td>0/1/2</td></tr>
+<tr><td><b>Data kỷ luật / chuyên ngành</b></td><td>Mọi kết luận gắn với số liệu/hồ sơ; không tranh luận bằng cảm tính.</td><td>0/1/2</td></tr><tr><td><b>Time kỷ luật / chuyên ngành</b></td><td>Họp Tier 1 ≤ 10 phút, đúng chương trình họp.</td><td>0/1/2</td></tr><tr><td><b>Hành động kết thúc / đóng</b></td><td>log hành động có người chịu trách nhiệm + due + link; theo dõi tiếp tại ca sau.</td><td>0/1/2</td></tr><tr><td><b>Escalation chất lượng</b></td><td>Escal đúng bậc thang năng lực và đúng SLA; không giấu vấn đề chặn.</td><td>0/1/2</td></tr><tr><td><b>Kèm cặp phát triển</b></td><td>Phản hồi cụ thể (quan sát–tác động–kỳ vọng–cam kết).</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>

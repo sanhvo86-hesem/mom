@@ -1,5 +1,4 @@
-
- thead { display: table-header-group; }
+<div><p>thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
  
@@ -8,31 +7,31 @@
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
 table { max-width: 100%; table-layout: auto; }
 td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-</style>
+
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../../assets/style.css"/>
-</head>
-<body>
+<link rel="stylesheet" href="../../../../assets/style.css">
+
+</p>
 
 <div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
 <div class="fh-left">
- <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu kiểm soát</span>
  </div>
 </div>
 <div class="title">
- <strong>C18-L2 — Chuỗi cung ứng, Mua hàng & Hậu cần — Người thực hành</strong>
+ <strong>C18-L2 — Chuỗi cung ứng, Mua hàng &amp; Hậu cần — Người thực hành</strong>
  <span class="sub-vn"></span>
 </div>
 <div class="meta">
  <div class="row"><span><b>Code:</b></span><span>C18-L2</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA/QMS</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent"><h1>C18-L2 — Chuỗi cung ứng – mua hàng – hậu cần (nhận/xuất/truy xuất nguồn gốc) — Kiểm soát nhà cung cấp &amp; outsource (điều phối xuất hàng/trả lại) bằng hồ sơ</h1><div class="note-blue" style="margin:12px 0">
@@ -57,11 +56,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h2 class="h2">Mục tiêu huấn luyện</h2>
 <ul>
 <li>Governance <b>PO bảng theo dõi</b> và kiểm soát nhà cung cấp theo quy trình.</li>
-<li>Vận hành <b>thuê ngoài hoàn thiện bề mặt</b>: Requests – điều phối xuất hàng – nhận về – kiểm tra đầu vào – hồ sơ.</li>
+<li>Vận hành <b>thuê ngoài hoàn thiện bề mặt</b>: yêu cầu – điều phối xuất hàng – nhận về – kiểm tra đầu vào – hồ sơ.</li>
 <li>Thực hiện <b>cycle count</b> và khoá sai lệch tồn kho bằng hành động khắc phục.</li>
 </ul>
 <div class="callout ok">
-<b>Chuẩn thực chiến:</b> 01 PO dòng / chuyền phải có đủ: Requests kỹ thuật + điều kiện giao hàng + điều kiện chứng từ + trạng thái kiểm tra đầu vào.
+<b>Chuẩn thực chiến:</b> 01 PO dòng / chuyền phải có đủ: yêu cầu kỹ thuật + điều kiện giao hàng + điều kiện chứng từ + trạng thái kiểm tra đầu vào.
  </div>
 </div>
 <div class="note">
@@ -95,10 +94,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tbody>
 </table><h2 class="h2">2) Luồng vận hành mua hàng &amp; outsource (end-to-end)</h2><div class="vflow">
 <div class="step">
-<div class="cap">B1 — Xác định Requests mua/thuê ngoài</div>
+<div class="cap">B1 — Xác định yêu cầu mua/thuê ngoài</div>
 <ul>
-<li>Đầu vào bắt buộc: bản vẽ/phiên bản, spec xử lý, tiêu chí chất lượng, Requests chứng từ.</li>
-<li>Ghi rõ điều kiện giao hàng, hạn chót, Requests nhãn truy xuất nguồn gốc.</li>
+<li>Đầu vào bắt buộc: bản vẽ/phiên bản, spec xử lý, tiêu chí chất lượng, yêu cầu chứng từ.</li>
+<li>Ghi rõ điều kiện giao hàng, hạn chót, yêu cầu nhãn truy xuất nguồn gốc.</li>
 </ul>
 </div>
 <div class="step">
@@ -119,7 +118,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="cap">B4 — Điều phối outsource</div>
 <ul>
 <li>Dùng <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx">FRM-PUR-003</a> và <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-PUR-004</a>.</li>
-<li>Đảm bảo part/qty/rev/điều kiện/đóng gói đúng, kèm phiếu công đoạn (traveller)/Requests sheet.</li>
+<li>Đảm bảo part/qty/rev/điều kiện/đóng gói đúng, kèm phiếu công đoạn (traveller)/yêu cầu sheet.</li>
 </ul>
 </div>
 <div class="step">
@@ -163,7 +162,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thống nhất phương án: trả lại hoặc re-đơn hàng, cập nhật Kế hoạch.</li>
 </ol>
 </div><h2 class="h2">5) Bài kiểm tra nhanh (10 câu)</h2><ol>
-<li>Kiểm soát nhà cung cấp thuộc nhóm Requests ISO nào?</li>
+<li>Kiểm soát nhà cung cấp thuộc nhóm yêu cầu ISO nào?</li>
 <li>3 dữ liệu bắt buộc phải có trên PO dòng / chuyền cho dịch vụ outsource?</li>
 <li>FRM nào dùng để đánh giá nhà cung cấp?</li>
 <li>FRM nào dùng để thẻ điểm NCC theo tháng?</li>
@@ -176,7 +175,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol><details class="card"><summary><b>Đáp án chuẩn</b></summary>
 <ol>
 <li>Kiểm soát quá trình/đầu vào từ bên ngoài (được cung cấp).</li>
-<li>Part/Rev/Quy trình + Qty + Requests chứng từ/tiêu chí chất lượng.</li>
+<li>Part/Rev/Quy trình + Qty + yêu cầu chứng từ/tiêu chí chất lượng.</li>
 <li>FRM-PUR-002.</li>
 <li>FRM-PUR-005.</li>
 <li>FRM-PUR-006.</li>
@@ -188,16 +187,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ol>
 </details><h2 class="h2">6) Bài test thực hành</h2><div class="card">
 <ol>
-<li>Xử lý 01 PO outsource: tạo hồ sơ Requests, cập nhật bảng theo dõi, điều phối xuất hàng, nhận về, hoàn tất đầu vào / nhận hàng.</li>
+<li>Xử lý 01 PO outsource: tạo hồ sơ yêu cầu, cập nhật bảng theo dõi, điều phối xuất hàng, nhận về, hoàn tất đầu vào / nhận hàng.</li>
 <li>Thực hiện 01 cycle count và xử lý sai lệch: tìm nguyên nhân + hành động + xác nhận.</li>
 </ol>
 </div></div></div></div>
 </div>
 <script src="../../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
-</body>
-</html>
 
-
-
-
+</div>
