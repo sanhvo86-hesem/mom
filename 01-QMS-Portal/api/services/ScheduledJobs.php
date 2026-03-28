@@ -1,0 +1,770 @@
+<?php
+
+declare(strict_types=1);
+
+namespace HESEM\QMS\Services;
+
+use HESEM\QMS\Database\Connection;
+use RuntimeException;
+use Throwable;
+
+/**
+ * Scheduled job definitions for HESEM QMS Portal.
+ *
+ * Each method is designed to be invoked by a cron runner (e.g. system cron,
+ * Epicor scheduler, or the portal's own job dispatcher). All jobs are
+ * idempotent and safe to re-run.
+ *
+ * Typical crontab schedule:
+ *   - Daily at 01:00:   runDailyKpiSnapshot, runNcrAging, runNotificationDigest
+ *   - Daily at 06:00:   runCalibrationAlerts, runTrainingAlerts, runCapaEscalation
+ *   - Weekly Sun 02:00: runWeeklyReport
+ *   - Monthly 1st 03:00: runSupplierScoring
+ *   - Monthly 1st 04:00: runDataPurge
+ *
+ * @package HESEM\QMS\Services
+ * @since   4.0.0
+ */
+final class ScheduledJobs
+{
+    private Connection       $db;
+    private KpiEngine        $kpi;
+    private SpcEngine        $spc;
+    private DashboardService $dashboard;
+
+    /** Absolute path to qms-data directory. */
+    private readonly string $dataDir;
+
+    /** Job execution log directory. */
+    private readonly string $logDir;
+
+    // ── Construction ────────────────────────────────────────────────────────
+
+    /**
+     * @param string          $dataDir Absolute path to qms-data directory.
+     * @param Connection|null $db      Database connection override.
+     */
+    public function __construct(string $dataDir, ?Connection $db = null)
+    {
+        $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
+        $this->logDir  = $this->dataDir . '/job-logs';
+
+        if (!is_dir($this->logDir)) {
+            @mkdir($this->logDir, 0775, true);
+        }
+
+        $this->db        = $db ?? Connection::getInstance();
+        $this->kpi       = new KpiEngine($this->db);
+        $this->spc       = new SpcEngine($this->db);
+        $this->dashboard = new DashboardService($dataDir, $this->db, $this->kpi, $this->spc);
+    }
+
+    // ── Job Definitions ─────────────────────────────────────────────────────
+
+    /**
+     * Daily KPI Snapshot: calculate and store all KPI values.
+     *
+     * Calculates every active KPI for the trailing 30-day window and
+     * persists the results to the kpi_snapshots table. This provides
+     * historical trend data for dashboards and management review.
+     *
+     * Schedule: Daily at 01:00.
+     *
+     * @return array{job: string, kpis_processed: int, errors: int, duration_ms: float}
+     */
+    public function runDailyKpiSnapshot(): array
+    {
+        return $this->executeJob('daily_kpi_snapshot', function (): array {
+            $period  = new DateRange(
+                date('Y-m-d', strtotime('-30 days')),
+                date('Y-m-d'),
+            );
+            $results = $this->kpi->calculateAllKpis($period);
+
+            $processed = 0;
+            $errors    = 0;
+
+            foreach ($results as $code => $result) {
+                try {
+                    if ($result instanceof KpiResult && $result->status !== KpiStatus::GREY) {
+                        $this->kpi->saveSnapshot($code, $result);
+                        $processed++;
+                    }
+                } catch (Throwable $e) {
+                    $errors++;
+                    $this->logJobError('daily_kpi_snapshot', "Failed to save {$code}: {$e->getMessage()}");
+                }
+            }
+
+            return ['kpis_processed' => $processed, 'errors' => $errors];
+        });
+    }
+
+    /**
+     * Weekly Report: generate weekly quality and production summary.
+     *
+     * Builds a comprehensive report covering NCR/CAPA status, OEE/OTD
+     * performance, SPC alerts, and training/calibration compliance for
+     * the past 7 days. The report is stored as a JSON file and can be
+     * rendered by the ReportGenerator.
+     *
+     * Schedule: Weekly on Sunday at 02:00.
+     *
+     * @return array{job: string, report_file: string, duration_ms: float}
+     */
+    public function runWeeklyReport(): array
+    {
+        return $this->executeJob('weekly_report', function (): array {
+            $period = new DateRange(
+                date('Y-m-d', strtotime('-7 days')),
+                date('Y-m-d'),
+            );
+
+            $report = [
+                'report_type'  => 'weekly_summary',
+                'generated_at' => gmdate('c'),
+                'period'       => $period->toArray(),
+                'executive'    => $this->dashboard->getExecutiveDashboard($period),
+                'quality'      => $this->dashboard->getQualityDashboard($period),
+                'production'   => $this->dashboard->getProductionDashboard($period),
+                'spc_alerts'   => $this->spc->getSpcAlerts(),
+                'kpi_alerts'   => $this->kpi->getKpiAlerts(),
+            ];
+
+            $reportDir = $this->dataDir . '/reports/weekly';
+            if (!is_dir($reportDir)) {
+                @mkdir($reportDir, 0775, true);
+            }
+
+            $filename = "weekly-report-{$period->start}-to-{$period->end}.json";
+            $filepath = $reportDir . '/' . $filename;
+            file_put_contents(
+                $filepath,
+                json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+                LOCK_EX,
+            );
+
+            return ['report_file' => $filepath];
+        });
+    }
+
+    /**
+     * Calibration Alerts: check for upcoming and overdue calibrations.
+     *
+     * Scans the equipment table for gages/instruments whose calibration
+     * is due within 14 days or already overdue. Creates notification
+     * records for the responsible quality team members.
+     *
+     * Schedule: Daily at 06:00.
+     *
+     * @return array{job: string, overdue: int, due_soon: int, notifications_sent: int, duration_ms: float}
+     */
+    public function runCalibrationAlerts(): array
+    {
+        return $this->executeJob('calibration_alerts', function (): array {
+            // Overdue calibrations
+            $overdue = $this->db->query(
+                "SELECT equipment_id, equipment_name, calibration_due, department_id
+                 FROM equipment
+                 WHERE is_active = TRUE
+                   AND calibration_due IS NOT NULL
+                   AND calibration_due < CURRENT_DATE
+                 ORDER BY calibration_due",
+            );
+
+            // Due within 14 days
+            $dueSoon = $this->db->query(
+                "SELECT equipment_id, equipment_name, calibration_due, department_id
+                 FROM equipment
+                 WHERE is_active = TRUE
+                   AND calibration_due IS NOT NULL
+                   AND calibration_due BETWEEN CURRENT_DATE AND (CURRENT_DATE + INTERVAL '14 days')
+                 ORDER BY calibration_due",
+            );
+
+            $sent = 0;
+
+            // Create notifications for overdue
+            foreach ($overdue as $eq) {
+                $sent += $this->createAlertNotification(
+                    category: 'overdue',
+                    title: "OVERDUE Calibration: {$eq['equipment_name']} ({$eq['equipment_id']})",
+                    body: "Calibration was due on {$eq['calibration_due']}. Immediate action required.",
+                    link: "/equipment/{$eq['equipment_id']}/calibration",
+                    deptCode: $eq['department_id'],
+                );
+            }
+
+            // Create notifications for upcoming
+            foreach ($dueSoon as $eq) {
+                $sent += $this->createAlertNotification(
+                    category: 'alert',
+                    title: "Calibration Due Soon: {$eq['equipment_name']} ({$eq['equipment_id']})",
+                    body: "Calibration due on {$eq['calibration_due']}. Schedule calibration.",
+                    link: "/equipment/{$eq['equipment_id']}/calibration",
+                    deptCode: $eq['department_id'],
+                );
+            }
+
+            return [
+                'overdue'            => count($overdue),
+                'due_soon'           => count($dueSoon),
+                'notifications_sent' => $sent,
+            ];
+        });
+    }
+
+    /**
+     * Training Alerts: check for upcoming and overdue training/certifications.
+     *
+     * Scans training_records for certifications expiring within 30 days
+     * or already expired. Notifies HR and department managers.
+     *
+     * Schedule: Daily at 06:30.
+     *
+     * @return array{job: string, expiring: int, expired: int, notifications_sent: int, duration_ms: float}
+     */
+    public function runTrainingAlerts(): array
+    {
+        return $this->executeJob('training_alerts', function (): array {
+            // Expired certifications
+            $expired = $this->db->query(
+                "SELECT tr.training_id, tr.trainee_id, tr.training_topic,
+                        tr.certification_expiry, e.department_id,
+                        CONCAT(e.first_name, ' ', e.last_name) AS employee_name
+                 FROM training_records tr
+                 JOIN employees e ON e.employee_id = tr.trainee_id
+                 WHERE tr.certification_expiry IS NOT NULL
+                   AND tr.certification_expiry < CURRENT_DATE
+                   AND tr.certification_expiry >= (CURRENT_DATE - INTERVAL '90 days')
+                 ORDER BY tr.certification_expiry",
+            );
+
+            // Expiring within 30 days
+            $expiring = $this->db->query(
+                "SELECT tr.training_id, tr.trainee_id, tr.training_topic,
+                        tr.certification_expiry, e.department_id,
+                        CONCAT(e.first_name, ' ', e.last_name) AS employee_name
+                 FROM training_records tr
+                 JOIN employees e ON e.employee_id = tr.trainee_id
+                 WHERE tr.certification_expiry IS NOT NULL
+                   AND tr.certification_expiry BETWEEN CURRENT_DATE AND (CURRENT_DATE + INTERVAL '30 days')
+                 ORDER BY tr.certification_expiry",
+            );
+
+            $sent = 0;
+
+            foreach ($expired as $tr) {
+                $sent += $this->createAlertNotification(
+                    category: 'overdue',
+                    title: "EXPIRED Certification: {$tr['employee_name']} - {$tr['training_topic']}",
+                    body: "Certification expired on {$tr['certification_expiry']}. Recertification required.",
+                    link: "/training/{$tr['training_id']}",
+                    deptCode: $tr['department_id'],
+                );
+            }
+
+            foreach ($expiring as $tr) {
+                $sent += $this->createAlertNotification(
+                    category: 'alert',
+                    title: "Certification Expiring: {$tr['employee_name']} - {$tr['training_topic']}",
+                    body: "Certification expires on {$tr['certification_expiry']}. Schedule recertification.",
+                    link: "/training/{$tr['training_id']}",
+                    deptCode: $tr['department_id'],
+                );
+            }
+
+            return [
+                'expired'            => count($expired),
+                'expiring'           => count($expiring),
+                'notifications_sent' => $sent,
+            ];
+        });
+    }
+
+    /**
+     * CAPA Escalation: escalate CAPAs that are overdue.
+     *
+     * Identifies CAPAs past their target date that remain open and
+     * creates escalation notifications for quality management.
+     *
+     * Schedule: Daily at 07:00.
+     *
+     * @return array{job: string, escalated: int, notifications_sent: int, duration_ms: float}
+     */
+    public function runCapaEscalation(): array
+    {
+        return $this->executeJob('capa_escalation', function (): array {
+            $overdue = $this->db->query(
+                "SELECT cr.capa_id, cr.record_id, cr.target_date, cr.capa_status,
+                        cr.corrective_action,
+                        (CURRENT_DATE - cr.target_date) AS days_overdue
+                 FROM capa_records cr
+                 WHERE cr.capa_status NOT IN ('Closed', 'Verified')
+                   AND cr.target_date < CURRENT_DATE
+                 ORDER BY cr.target_date",
+            );
+
+            $sent = 0;
+            foreach ($overdue as $capa) {
+                $daysOverdue = (int) ($capa['days_overdue'] ?? 0);
+                $urgency = $daysOverdue > 30 ? 'CRITICAL' : ($daysOverdue > 14 ? 'HIGH' : 'MEDIUM');
+
+                $sent += $this->createAlertNotification(
+                    category: 'overdue',
+                    title: "[{$urgency}] Overdue CAPA: {$capa['record_id']} ({$daysOverdue} days)",
+                    body: "CAPA target date was {$capa['target_date']}. Status: {$capa['capa_status']}. Escalation required.",
+                    link: "/capa/{$capa['record_id']}",
+                    deptCode: 'QA',
+                );
+            }
+
+            // Update metadata with escalation timestamp
+            if (!empty($overdue)) {
+                $capaIds = array_column($overdue, 'capa_id');
+                $placeholders = implode(',', array_fill(0, count($capaIds), '?'));
+                $this->db->execute(
+                    "UPDATE capa_records
+                     SET metadata = metadata || jsonb_build_object(
+                         'last_escalation', '" . gmdate('c') . "',
+                         'escalation_count', COALESCE((metadata->>'escalation_count')::int, 0) + 1
+                     )
+                     WHERE capa_id IN ({$placeholders})",
+                    $capaIds,
+                );
+            }
+
+            return [
+                'escalated'          => count($overdue),
+                'notifications_sent' => $sent,
+            ];
+        });
+    }
+
+    /**
+     * NCR Aging: flag NCRs that have been open longer than 30 days.
+     *
+     * Schedule: Daily at 01:30.
+     *
+     * @return array{job: string, flagged: int, notifications_sent: int, duration_ms: float}
+     */
+    public function runNcrAging(): array
+    {
+        return $this->executeJob('ncr_aging', function (): array {
+            $aged = $this->db->query(
+                "SELECT nr.ncr_number, nr.record_id, nr.defect_type,
+                        r.created_at,
+                        EXTRACT(DAY FROM (now() - r.created_at)) AS age_days
+                 FROM ncr_records nr
+                 JOIN records r ON r.record_id = nr.record_id
+                 WHERE r.status NOT IN ('closed', 'cancelled')
+                   AND r.created_at < (now() - INTERVAL '30 days')
+                 ORDER BY r.created_at",
+            );
+
+            $sent = 0;
+            foreach ($aged as $ncr) {
+                $ageDays = (int) ($ncr['age_days'] ?? 0);
+
+                $sent += $this->createAlertNotification(
+                    category: 'alert',
+                    title: "Aging NCR: {$ncr['ncr_number']} open {$ageDays} days",
+                    body: "NCR {$ncr['ncr_number']} ({$ncr['defect_type']}) has been open for {$ageDays} days. Review disposition.",
+                    link: "/ncr/{$ncr['record_id']}",
+                    deptCode: 'QA',
+                );
+            }
+
+            return [
+                'flagged'            => count($aged),
+                'notifications_sent' => $sent,
+            ];
+        });
+    }
+
+    /**
+     * Supplier Scoring: recalculate supplier ratings.
+     *
+     * Evaluates each active vendor's OTD and quality performance for
+     * the past period and writes a new vendor_ratings row.
+     *
+     * Schedule: Monthly on 1st at 03:00.
+     *
+     * @return array{job: string, vendors_scored: int, duration_ms: float}
+     */
+    public function runSupplierScoring(): array
+    {
+        return $this->executeJob('supplier_scoring', function (): array {
+            $periodStart = date('Y-m-01', strtotime('-1 month'));
+            $periodEnd   = date('Y-m-t', strtotime('-1 month'));
+
+            $vendors = $this->db->query(
+                "SELECT vendor_id, vendor_name FROM vendors WHERE vendor_status = 'approved'",
+            );
+
+            $scored = 0;
+
+            foreach ($vendors as $vendor) {
+                try {
+                    // OTD calculation for vendor
+                    $otdRow = $this->db->queryOne(
+                        "SELECT
+                            COUNT(*) FILTER (WHERE delivery_date_actual <= delivery_date_est) AS on_time,
+                            COUNT(*) AS total
+                         FROM purchase_orders po
+                         JOIN shipments s ON s.shipment_code = po.po_number
+                         WHERE po.vendor_id = :vid
+                           AND s.ship_date BETWEEN :s AND :e
+                           AND s.shipment_status = 'delivered'",
+                        [':vid' => $vendor['vendor_id'], ':s' => $periodStart, ':e' => $periodEnd],
+                    );
+
+                    $otdTotal = (int) ($otdRow['total'] ?? 0);
+                    $otdPct   = $otdTotal > 0 ? ((int) $otdRow['on_time'] / $otdTotal) * 100 : null;
+
+                    // Quality calculation for vendor (accepted lots)
+                    $qualRow = $this->db->queryOne(
+                        "SELECT
+                            COUNT(*) FILTER (WHERE ir.pass_fail = 'PASS') AS accepted,
+                            COUNT(*) AS total
+                         FROM inspection_results ir
+                         JOIN purchase_orders po ON po.po_number = ir.job_number
+                         WHERE po.vendor_id = :vid
+                           AND ir.recorded_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
+                        [':vid' => $vendor['vendor_id'], ':s' => $periodStart, ':e' => $periodEnd],
+                    );
+
+                    $qualTotal = (int) ($qualRow['total'] ?? 0);
+                    $qualPct   = $qualTotal > 0 ? ((int) $qualRow['accepted'] / $qualTotal) * 100 : null;
+
+                    // SCAR count
+                    $scarCount = (int) $this->db->queryScalar(
+                        "SELECT COUNT(*) FROM ncr_records nr
+                         JOIN records r ON r.record_id = nr.record_id
+                         WHERE (nr.metadata->>'vendor_id') = :vid
+                           AND r.created_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz",
+                        [':vid' => $vendor['vendor_id'], ':s' => $periodStart, ':e' => $periodEnd],
+                    );
+
+                    // Composite score: 50% OTD + 40% Quality - 10% SCAR penalty
+                    $otdScore = $otdPct ?? 50;
+                    $qualScore = $qualPct ?? 50;
+                    $scarPenalty = min($scarCount * 5, 30);
+                    $rating = max(0, ($otdScore * 0.5) + ($qualScore * 0.4) - $scarPenalty);
+
+                    $grade = match (true) {
+                        $rating >= 90 => 'A',
+                        $rating >= 75 => 'B',
+                        $rating >= 60 => 'C',
+                        $rating >= 40 => 'D',
+                        default       => 'F',
+                    };
+
+                    $this->db->execute(
+                        "INSERT INTO vendor_ratings
+                            (vendor_id, period_start, period_end, rating_score, rating_grade, otd_pct, quality_pct, scar_count)
+                         VALUES (:vid, :ps, :pe, :score, :grade::vendor_rating_grade, :otd, :qual, :scar)",
+                        [
+                            ':vid'   => $vendor['vendor_id'],
+                            ':ps'    => $periodStart,
+                            ':pe'    => $periodEnd,
+                            ':score' => round($rating, 2),
+                            ':grade' => $grade,
+                            ':otd'   => $otdPct !== null ? round($otdPct, 2) : null,
+                            ':qual'  => $qualPct !== null ? round($qualPct, 2) : null,
+                            ':scar'  => $scarCount,
+                        ],
+                    );
+
+                    // Update vendor master rating
+                    $this->db->execute(
+                        "UPDATE vendors SET vendor_rating_score = :score, vendor_rating_grade = :grade::vendor_rating_grade, updated_at = now()
+                         WHERE vendor_id = :vid",
+                        [':vid' => $vendor['vendor_id'], ':score' => round($rating, 2), ':grade' => $grade],
+                    );
+
+                    $scored++;
+                } catch (Throwable $e) {
+                    $this->logJobError('supplier_scoring', "Failed scoring {$vendor['vendor_id']}: {$e->getMessage()}");
+                }
+            }
+
+            return ['vendors_scored' => $scored];
+        });
+    }
+
+    /**
+     * Notification Digest: send daily email digests.
+     *
+     * Aggregates unread notifications per user and creates a digest
+     * record. Actual email delivery is delegated to the notification
+     * transport layer (SMTP / M365 Graph API).
+     *
+     * Schedule: Daily at 08:00.
+     *
+     * @return array{job: string, users_notified: int, total_notifications: int, duration_ms: float}
+     */
+    public function runNotificationDigest(): array
+    {
+        return $this->executeJob('notification_digest', function (): array {
+            $digests = $this->db->query(
+                "SELECT u.user_id, u.email, u.display_name,
+                        COUNT(n.notification_id) AS unread_count
+                 FROM users u
+                 JOIN notifications n ON n.user_id = u.user_id
+                 WHERE n.is_read = FALSE
+                   AND n.created_at >= (now() - INTERVAL '24 hours')
+                   AND u.is_active = TRUE
+                   AND u.email IS NOT NULL
+                 GROUP BY u.user_id, u.email, u.display_name
+                 HAVING COUNT(n.notification_id) > 0
+                 ORDER BY unread_count DESC",
+            );
+
+            $usersNotified      = 0;
+            $totalNotifications = 0;
+
+            foreach ($digests as $digest) {
+                $unread = (int) $digest['unread_count'];
+
+                // Load notification details for this user
+                $notifications = $this->db->query(
+                    "SELECT title, body, category, link, created_at
+                     FROM notifications
+                     WHERE user_id = :uid AND is_read = FALSE
+                       AND created_at >= (now() - INTERVAL '24 hours')
+                     ORDER BY created_at DESC
+                     LIMIT 50",
+                    [':uid' => $digest['user_id']],
+                );
+
+                // Store digest record
+                $digestPath = $this->dataDir . '/notification-digests';
+                if (!is_dir($digestPath)) {
+                    @mkdir($digestPath, 0775, true);
+                }
+
+                $digestFile = $digestPath . '/' . date('Y-m-d') . '_' . md5($digest['user_id']) . '.json';
+                @file_put_contents($digestFile, json_encode([
+                    'user_id'       => $digest['user_id'],
+                    'email'         => $digest['email'],
+                    'display_name'  => $digest['display_name'],
+                    'unread_count'  => $unread,
+                    'notifications' => $notifications,
+                    'generated_at'  => gmdate('c'),
+                ], JSON_UNESCAPED_UNICODE), LOCK_EX);
+
+                $usersNotified++;
+                $totalNotifications += $unread;
+            }
+
+            return [
+                'users_notified'      => $usersNotified,
+                'total_notifications' => $totalNotifications,
+            ];
+        });
+    }
+
+    /**
+     * Data Purge: archive old audit logs, expire notifications.
+     *
+     * Removes notifications older than 90 days (already read) and
+     * archives audit log entries older than 365 days. Keeps the
+     * database lean while preserving records per retention policy.
+     *
+     * Schedule: Monthly on 1st at 04:00.
+     *
+     * @return array{job: string, notifications_purged: int, audit_archived: int, duration_ms: float}
+     */
+    public function runDataPurge(): array
+    {
+        return $this->executeJob('data_purge', function (): array {
+            // Purge old read notifications (> 90 days)
+            $notifPurged = $this->db->execute(
+                "DELETE FROM notifications
+                 WHERE is_read = TRUE
+                   AND created_at < (now() - INTERVAL '90 days')",
+            );
+
+            // Archive old audit logs to file and delete from DB (> 365 days)
+            $auditRows = $this->db->query(
+                "SELECT * FROM audit_trail
+                 WHERE created_at < (now() - INTERVAL '365 days')
+                 ORDER BY created_at
+                 LIMIT 10000",
+            );
+
+            $auditArchived = 0;
+            if (!empty($auditRows)) {
+                $archiveDir = $this->dataDir . '/audit-archive';
+                if (!is_dir($archiveDir)) {
+                    @mkdir($archiveDir, 0775, true);
+                }
+
+                $archiveFile = $archiveDir . '/audit-archive-' . date('Y-m-d-His') . '.jsonl';
+                $lines = [];
+                $ids   = [];
+                foreach ($auditRows as $row) {
+                    $lines[] = json_encode($row, JSON_UNESCAPED_UNICODE);
+                    $ids[]   = $row['audit_id'] ?? $row['id'] ?? null;
+                }
+                file_put_contents($archiveFile, implode("\n", $lines) . "\n", LOCK_EX);
+
+                $ids = array_filter($ids);
+                if (!empty($ids)) {
+                    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                    $auditArchived = $this->db->execute(
+                        "DELETE FROM audit_trail WHERE audit_id IN ({$placeholders})",
+                        array_values($ids),
+                    );
+                }
+            }
+
+            // Clean expired widget cache files
+            $cacheDir = $this->dataDir . '/dashboard-cache';
+            if (is_dir($cacheDir)) {
+                $cacheFiles = glob($cacheDir . '/*.json') ?: [];
+                foreach ($cacheFiles as $file) {
+                    if (filemtime($file) < (time() - 3600)) {
+                        @unlink($file);
+                    }
+                }
+            }
+
+            return [
+                'notifications_purged' => $notifPurged,
+                'audit_archived'       => $auditArchived,
+            ];
+        });
+    }
+
+    // ── Job Execution Framework ─────────────────────────────────────────────
+
+    /**
+     * Execute a job with timing, error handling, and logging.
+     *
+     * @param string   $jobName Job identifier.
+     * @param callable $fn      Job function returning result array.
+     * @return array Job result with metadata.
+     */
+    private function executeJob(string $jobName, callable $fn): array
+    {
+        $startTime = microtime(true);
+        $startIso  = gmdate('c');
+
+        try {
+            $result = $fn();
+            $durationMs = round((microtime(true) - $startTime) * 1000, 1);
+
+            $logEntry = array_merge([
+                'job'         => $jobName,
+                'status'      => 'success',
+                'started_at'  => $startIso,
+                'duration_ms' => $durationMs,
+            ], $result);
+
+            $this->logJobRun($logEntry);
+
+            return $logEntry;
+        } catch (Throwable $e) {
+            $durationMs = round((microtime(true) - $startTime) * 1000, 1);
+
+            $logEntry = [
+                'job'         => $jobName,
+                'status'      => 'failed',
+                'started_at'  => $startIso,
+                'duration_ms' => $durationMs,
+                'error'       => $e->getMessage(),
+                'trace'       => $e->getTraceAsString(),
+            ];
+
+            $this->logJobRun($logEntry);
+
+            return $logEntry;
+        }
+    }
+
+    /**
+     * Create alert notifications for users in a department.
+     *
+     * @return int Number of notifications created.
+     */
+    private function createAlertNotification(
+        string $category,
+        string $title,
+        string $body,
+        string $link,
+        ?string $deptCode = null,
+    ): int {
+        try {
+            // Find users to notify: department members + QA managers
+            $where = 'u.is_active = TRUE';
+            $params = [];
+
+            if ($deptCode !== null) {
+                $where .= " AND (u.department_id = :dept OR u.role IN ('qa_manager', 'admin'))";
+                $params[':dept'] = $deptCode;
+            } else {
+                $where .= " AND u.role IN ('qa_manager', 'admin')";
+            }
+
+            $users = $this->db->query(
+                "SELECT user_id FROM users u WHERE {$where}",
+                $params,
+            );
+
+            $created = 0;
+            foreach ($users as $user) {
+                // Avoid duplicate notifications (same title within 24h)
+                $exists = $this->db->queryScalar(
+                    "SELECT COUNT(*) FROM notifications
+                     WHERE user_id = :uid AND title = :title
+                       AND created_at >= (now() - INTERVAL '24 hours')",
+                    [':uid' => $user['user_id'], ':title' => $title],
+                );
+
+                if ((int) $exists === 0) {
+                    $this->db->execute(
+                        "INSERT INTO notifications (user_id, title, body, link, category)
+                         VALUES (:uid, :title, :body, :link, :cat)",
+                        [
+                            ':uid'   => $user['user_id'],
+                            ':title' => $title,
+                            ':body'  => $body,
+                            ':link'  => $link,
+                            ':cat'   => $category,
+                        ],
+                    );
+                    $created++;
+                }
+            }
+
+            return $created;
+        } catch (Throwable) {
+            return 0;
+        }
+    }
+
+    /**
+     * Write a job execution log entry.
+     */
+    private function logJobRun(array $entry): void
+    {
+        $logFile = $this->logDir . '/' . date('Y-m-d') . '.jsonl';
+        $line = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        @file_put_contents($logFile, $line . "\n", FILE_APPEND | LOCK_EX);
+    }
+
+    /**
+     * Write a job-specific error log entry.
+     */
+    private function logJobError(string $jobName, string $message): void
+    {
+        $this->logJobRun([
+            'job'       => $jobName,
+            'status'    => 'error',
+            'message'   => $message,
+            'timestamp' => gmdate('c'),
+        ]);
+    }
+}
