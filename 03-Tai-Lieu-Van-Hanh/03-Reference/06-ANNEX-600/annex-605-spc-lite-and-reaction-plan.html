@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANNEX-605 — Thông số SPC, chọn biểu đồ, năng lực / khả năng và phản ứng plan | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../assets/style.css">
 <style>
 
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
@@ -45,7 +45,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="page-body">
  <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Annex</span>
@@ -56,11 +56,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="row"><span><b>Code:</b></span><span>ANNEX-605</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>QA Manager / Quy trình Engineer</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Owner:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a><span class="role-sep">/</span><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Ky su quy trinh)"><span class="role-code">PE</span></a></span></span></div>
+<div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
  </div>
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Áp dụng khi kế hoạch kiểm soát Requests SPC/năng lực / khả năng hoặc khi cần theo dõi trôi / sai lệch của đặc tính quan trọng trong quá trình gia công CNC.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Áp dụng khi kế hoạch kiểm soát Requests SPC/năng lực / khả năng hoặc khi cần theo dõi trôi / sai lệch của đặc tính quan trọng trong quá trình gia công CNC.</div>
  <h1>ANNEX-605 — Thông số SPC, chọn biểu đồ, năng lực / khả năng và phản ứng plan</h1>
  <div class="section"><h2>1. Mục đích và phạm vi áp dụng SPC</h2><p>ANNEX này quy định logic dùng SPC, chọn loại chart, đặt phản ứng plan và đọc năng lực / khả năng cho môi trường gia công CNC lệnh sản xuất. SPC dùng để phát hiện trôi / sai lệch và mất ổn định đủ sớm để ngăn thoát / bỏ qua. SPC không thay cho việc hiểu quá trình, không thay cho mẫu đầu (tiên chi tiết / sản phẩm) và không thay cho kiểm tra cuối.</p><ul><li>Áp dụng cho đặc tính có thể đo lặp lại, có nhịp dữ liệu đủ và có giá trị kiểm soát trôi / sai lệch trước khi vượt dung sai.</li><li>Không ép áp dụng SPC cho mọi đặc tính chỉ để "đủ bài"; chỉ áp dụng nơi dữ liệu và phản ứng có ý nghĩa vận hành.</li></ul></div><div class="section"><h2>2. Chọn biểu đồ và logic nhóm con</h2><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống dữ liệu</th><th>Chart ưu tiên</th><th>Ghi chú</th></tr></thead><tbody><tr><td>Đo liên tiếp từng chiếc, sản lượng thấp, lệnh sản xuất ngắn</td><td>I-MR</td><td>Phù hợp cho nhiều job CNC vì nhóm con nhỏ và dữ liệu nối thời gian</td></tr>
 <tr><td>Có thể lấy nhóm con hợp lý trong một điều kiện ổn định ngắn</td><td>Xbar-R hoặc Xbar-S</td><td>Chỉ dùng khi nhóm con thực sự đồng nhất</td></tr>

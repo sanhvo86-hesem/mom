@@ -95,11 +95,11 @@
     <span class="sub-vn">{{SUBTITLE}}</span>
   </div>
   <div class="meta">
-    <div class="row"><span><b>Code:</b></span><span>{{CODE}}</span></div>
-    <div class="row"><span><b>Version:</b></span><span>V0</span></div>
-    <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-    <div class="row"><span><b>Owner:</b></span><span>{{OWNER}}</span></div>
-    <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+    <div class="row"><span><b>Mã:</b></span><span>{{CODE}}</span></div>
+    <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+    <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+    <div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
+    <div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_HTML}}</span></div>
   </div>
 </div>
 ```
@@ -107,10 +107,25 @@
 **Lưu ý:**
 - Logo và Title nằm **CÙNG HÀNG NGANG** (không phải stacked)
 - `{{DOC_TYPE_LABEL}}` theo loại: SOP → "Tài liệu kiểm soát", WI → "Tài liệu vận hành • Hướng dẫn công việc", ANNEX → "Tài liệu vận hành • Phụ lục", JD → "Tài liệu hệ thống"
-- Meta labels giữ nguyên tiếng Anh: Code, Version, Effective Date, Owner, Approved by
+- Meta labels hiển thị tiếng Việt: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`
 - Với tài liệu chưa phát hành lần đầu, `Version` trong header luôn là `V0`
 - **Viền cam** header: mảnh 1px (border-bottom của .meta)
 - **KHÔNG** thay đổi cấu trúc header — mọi file PHẢI giống nhau
+- `{{OWNER_ROLE_HTML}}` và `{{APPROVER_ROLE_HTML}}` phải là role chips link trực tiếp tới JD
+- Header không dùng text dài kiểu `QA Manager / Supply Chain Manager`; phải dùng role code gọn như `QA / SCM`
+
+### 2.2a JD Header và Identity Rows
+
+Với JD:
+- `strong` trong title block phải theo chuẩn `JD-<ROLECODE> — <Job title English>`.
+- `sub-vn` dùng tiếng Việt chuẩn của vị trí.
+- Row `Mã` trong header phải khớp đúng `JD-<ROLECODE>`.
+- Trong bảng thông tin vị trí:
+  - `Mã vị trí` = `JD-<ROLECODE>`
+  - `Mã vai trò dùng trong SOP/RACI` = role chip JD-linked
+  - `Mũ quản trị có thể gắn` chỉ xuất hiện khi role thật sự có hat cho phép
+  - `Chức danh theo tài liệu` giữ plain English title, không render chip
+- Không cho phép JD có cấu trúc fragment kiểu thiếu `<html>`, `<head>` hoặc `<body>`.
 
 ### 2.3 ISO MAP — Chuẩn mực áp dụng
 

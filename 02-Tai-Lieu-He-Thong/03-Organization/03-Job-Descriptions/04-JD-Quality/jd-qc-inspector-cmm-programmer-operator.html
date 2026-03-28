@@ -1,55 +1,11 @@
-
- thead { display: table-header-group; }
- tfoot { display: table-footer-group; }
- p { orphans: 3; widows: 3; }
- 
-}
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
-.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
-.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
-.raci-A {background:#fff5f5; color:#c92a2a;}
-.raci-R {background:#e7f5ff; color:#1864ab;}
-.raci-C {background:#fff9db; color:#e67700;}
-.raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
-.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
-.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
-.doc-link-list {list-style:none; margin:0; padding:0;}
-.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
-.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
-.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
-.svg-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
-.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
-kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
-
-/* JD-LAYOUT-PLUS */
-.jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
-.jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
-.jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
-.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
-.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
-.muted-note{font-size:12px; color:var(--ink2,#475569);}
-.raci-badge{display:inline-block; min-width:26px; text-align:center; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;}
-.raci-a{background:#fff3e0; color:#b45309;}
-.raci-r{background:#e0f2fe; color:#0369a1;}
-.raci-c{background:#f3e8ff; color:#7e22ce;}
-.raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
-.comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
-.comp-card ul{margin-bottom:0;}
-.require-table th{width:24%;}
-.inline-note{margin-top:8px; font-size:12px; color:var(--ink2,#475569);}
-@media (max-width: 960px){ .auth-grid,.comp-grid{grid-template-columns:1fr;} }
-
-}
-
-</style>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>JD-QC — QC Inspector / CMM Programmer-Operator | HESEM QMS</title>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../../assets/style.css">
 </head>
 <body>
 <div class="container">
@@ -57,22 +13,22 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu kiểm soát</span>
 </div>
 </div>
 <div class="title">
-<strong>JD-QC-NGƯỜI KIỂM TRA-CMM-LẬP TRÌNH VIÊN-NGƯỜI VẬN HÀNH — QC Inspector / CMM Lập trình viên (CNC)-Operator</strong>
-<span class="sub-vn">Nhân viên QC / Lập trình &amp; Vận hành CMM</span>
+<strong>JD-QC — QC Inspector / CMM Programmer-Operator</strong>
+<span class="sub-vn">Nhan vien QC / lap trinh vien - van hanh CMM</span>
 </div>
 <div class="meta">
-<div class="row"><span><b>Code:</b></span><span>JD-QC-NGƯỜI KIỂM TRA-CMM-LẬP TRÌNH VIÊN-NGƯỜI VẬN HÀNH</span></div>
-<div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>HR Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Mã:</b></span><span>JD-QC</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="role-cluster"><a class="role-link" href="../08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="role-cluster"><a class="role-link" href="../01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -88,15 +44,15 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2">1. Thông tin vị trí (Vị trí / Chức vụ ID &amp; tiêu đề)</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
-<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-QC-NGƯỜI KIỂM TRA-CMM-LẬP TRÌNH VIÊN-NGƯỜI VẬN HÀNH</td></tr>
-<tr><th>Chức danh theo tài liệu</th><td>QC Inspector / CMM Lập trình viên (CNC)-Operator</td></tr>
+<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-QC</td></tr>
+<tr><th>Mã vai trò dùng trong SOP/RACI</th><td><span class="role-cluster"><a class="role-link" href="jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="role-code">QC</span></a></span></td></tr><tr><th>Chức danh theo tài liệu</th><td>QC Inspector / CMM Programmer-Operator</td></tr>
 <tr><th>Bộ phận</th><td>Quality</td></tr>
 <tr><th>Cấp vai trò</th><td>Chuyên nghiệp / Nhân viên</td></tr>
 <tr><th>Nhóm vai trò</th><td>QA / QC / kiểm tra chất lượng / đo lường</td></tr>
 <tr><th>Báo cáo trực tiếp cho</th><td>QC Inspector Lead.</td></tr>
 <tr><th>Quản lý trực tiếp</th><td>Không có nhân sự báo cáo trực tiếp.</td></tr>
 <tr><th>Phối hợp chức năng chính</th><td>Phối hợp với QC Inspector Lead về ưu tiên và mức sẵn sàng; với QA Manager cho phát hành/escalation vượt thẩm quyền; với Quality Engineer cho ngăn chặn; với Đo lường &amp; Hiệu chuẩn Specialist cho đo lường vấn đề / đánh giá năng lực / MSA; với Sản xuất về thời điểm kiểm và trạng thái lot.</td></tr>
-<tr><th>Hệ thống / công cụ vận hành chính</th><td>Traveler; drawing / phiên bản gói hàng; gage/CMM; <a download="" href="../../../../04-Bieu-Mau/06-FRM-600/<a download="" href="../../../../04-Bieu-Mau/06-FRM-600/FRM-621_AQL_Inspection_Record.xlsx">FRM-621</a>_AQL_Inspection_Record.xlsx"><a download="" href="../../../../04-Bieu-Mau/06-FRM-600/FRM-621_AQL_Inspection_Record.xlsx">FRM-621</a></a>/<a download="" href="../../../../04-Bieu-Mau/06-FRM-600/<a download="" href="../../../../04-Bieu-Mau/06-FRM-600/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a>_Final_Inspection_Report.xlsx"><a download="" href="../../../../04-Bieu-Mau/06-FRM-600/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a></a>/<a download="" href="../../../../04-Bieu-Mau/06-FRM-600/<a download="" href="../../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>_NCR_Report.xlsx"><a download="" href="../../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a></a>; Epicor kiểm tra trạng thái và được kiểm soát hồ sơ.</td></tr>
+<tr><th>Hệ thống / công cụ vận hành chính</th><td>Traveler; drawing / phiên bản gói hàng; gage/CMM; <a download="" href="../../../../04-Bieu-Mau/06-FRM-600/&lt;a%20download=">FRM-621</a>_AQL_Inspection_Record.xlsx"&gt;<a download="" href="../../../../04-Bieu-Mau/06-FRM-600/FRM-621_AQL_Inspection_Record.xlsx">FRM-621</a>/<a download="" href="../../../../04-Bieu-Mau/06-FRM-600/&lt;a%20download=">FRM-641</a>_Final_Inspection_Report.xlsx"&gt;<a download="" href="../../../../04-Bieu-Mau/06-FRM-600/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a>/<a download="" href="../../../../04-Bieu-Mau/06-FRM-600/&lt;a%20download=">FRM-651</a>_NCR_Report.xlsx"&gt;<a download="" href="../../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a>; Epicor kiểm tra trạng thái và được kiểm soát hồ sơ.</td></tr>
 <tr><th>Vai trò trong chuỗi giá trị</th><td>FAI/IPQC/OQC theo kế hoạch đã phê duyệt → lập trình/vận hành CMM khi được giao → ghi dữ liệu → trạng thái sản phẩm và bằng chứng kiểm tra.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Mission)</h2>
@@ -118,7 +74,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th style="width:26%">Mức sẵn sàng trước khi kiểm</th><td><ul><li>Xác nhận traveler, drawing phiên bản, lấy mẫu plan, CTQ, dụng cụ đo, tình trạng hiệu chuẩn và điều kiện đo trước khi bắt đầu kiểm tra.</li><li>Không thực hiện cổng kiểm soát kiểm khi thiếu tài liệu đúng phiên bản, gage/CMM không hợp lệ hoặc điều kiện đo không đủ tin cậy.</li><li>Thông báo ngay cho QC Inspector Lead khi job khẩn cấp, công việc tồn đọng, lot nghi ngờ hoặc Requests kỹ thuật chưa rõ.</li></ul></td></tr>
 <tr><th style="width:26%">Mẫu đầu / trong quá trình / final / CMM kiểm tra</th><td><ul><li>Thực hiện kiểm tra theo đúng plan, phương pháp đo và tiêu chuẩn đã ban hành; lập trình/vận hành CMM khi áp dụng.</li><li>Xác nhận đạt/không đạt dựa trên dữ liệu đo thực tế; không bỏ qua đặc tính trọng yếu, note bản vẽ hoặc bằng chứng bắt buộc của cổng kiểm soát.</li><li>Bàn giao kết quả rõ ràng cho Sản xuất / Hậu cần / QA Manager theo tuyến được quy định.</li></ul></td></tr>
 <tr><th style="width:26%">Hồ sơ, truy vết và tính toàn vẹn</th><td><ul><li>Ghi nhận đầy đủ kiểm tra kết quả, gage ID, mẫu size, kết luận và liên kết chứng từ đo/CMM đúng quy định.</li><li>Đảm bảo báo cáo, file CMM, ảnh hoặc bộ bằng chứng được lưu đúng nơi, đúng tên, truy xuất nguồn gốc được khi đánh giá hoặc điều tra.</li><li>Không ký thay, không sửa hậu kiểm thiếu kiểm soát, không làm đẹp số liệu để "qua cổng kiểm soát".</li></ul></td></tr>
-<tr><th style="width:26%">Hold, ngăn chặn và escalation</th><td><ul><li>Hold / cách ly ngay vật tư hoặc thành phẩm nghi ngờ không phù hợp; gắn nhãn, thông báo Responsible Person và cập nhật log liên quan.</li><li>Phối hợp thu thập dữ liệu đo, ảnh, CMM báo cáo cho NCR / ngăn chặn / re-kiểm tra khi có bất thường.</li><li>đã báo cáo vượt cấp QC Inspector Lead / QA Manager khi gặp disposition vượt thẩm quyền, xung đột về tiêu chí, nghi ngờ thoát / bỏ qua hoặc rủi ro to ship.</li></ul></td></tr>
+<tr><th style="width:26%">Hold, ngăn chặn và escalation</th><td><ul><li>Hold / cách ly ngay vật tư hoặc thành phẩm nghi ngờ không phù hợp; gắn nhãn, thông báo người chịu trách nhiệm và cập nhật log liên quan.</li><li>Phối hợp thu thập dữ liệu đo, ảnh, CMM báo cáo cho NCR / ngăn chặn / re-kiểm tra khi có bất thường.</li><li>đã báo cáo vượt cấp QC Inspector Lead / QA Manager khi gặp disposition vượt thẩm quyền, xung đột về tiêu chí, nghi ngờ thoát / bỏ qua hoặc rủi ro to ship.</li></ul></td></tr>
 <tr><th style="width:26%">Đo lường bằng chứng &amp; nghi ngờ ngăn chặn</th><td><ul><li>Thực hiện trực quan/CMM/đo lường theo tiêu chí đã phê duyệt; xác nhận program/phiên bản, gage trạng thái, part nhận dạng và môi trường/gá kẹp phù hợp.</li><li>Khi phát hiện nghi ngờ kết quả, out-of-xu hướng, không rõ ràng mốc chuẩn (mốc chuẩn (datum)/set-up, không khớp phiên bản hoặc bằng chứng thiếu, phải giữ kết quả ở trạng thái chưa phát hành và báo QC Team Leader/QE.</li><li>Ghi kết quả kiểm, truy xuất nguồn gốc, ghi chú và bàn giao đủ rõ để công đoạn sau dùng cho quyết định phát hành hoặc CAPA.</li></ul></td></tr></tbody></table>
 </div>
 <div class="table-card ranh giới trách nhiệm-box">
@@ -135,7 +91,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </tbody>
 </table>
 </div>
-<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng Responsible Person thay vì xử lý ngoài tuyến kiểm soát.</p>
+<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng người chịu trách nhiệm thay vì xử lý ngoài tuyến kiểm soát.</p>
 <p class="inline-note">Mọi thay đổi ảnh hưởng chất lượng, giao hàng, chi phí, phiên bản, phát hành hoặc truy vết phải tuân theo quy trình/hồ sơ liên kết tại Mục 12.</p>
 <h2 class="h2">5. Quyền hạn (Thẩm quyền &amp; quyền ra quyết định (quyền)</h2>
 <div class="auth-grid">
@@ -154,7 +110,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </thead>
 <tbody>
 <tr>
-<th style="width:20%">QC Inspector Lead</th>
+<th style="width:20%"><span class="role-cluster"><a class="role-link" href="jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="role-code">QCL</span></a></span></th>
 <td><p>Nhận ưu tiên kiểm tra, phạm vi lô/job, phương pháp đo và hạn chót cho từng nhiệm vụ.</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-r">R</span></td>
 <td>Năng lực kiểm tra được phân bổ đúng nơi cần trước.</td>
@@ -166,10 +122,10 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td>mặt bằng xưởng chỉ tiếp tục khi bằng chứng kiểm tra đã rõ.</td>
 </tr>
 <tr>
-<th style="width:20%">Quality Engineer / QA Manager</th>
+<th style="width:20%"><span class="role-cluster"><a class="role-link" href="jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="role-code">QE</span></a><span class="role-sep">/</span><a class="role-link" href="jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a></span></th>
 <td><p>Báo cáo vượt cấp kết quả NG, mẫu bất thường, tranh chấp về spec, năng lực / khả năng lo nTại / vấn đề hoặc nghi vấn đo lường system.</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-c">C</span></td>
-<td>Quyết định chất lượng đi đúng tuyến Responsible Person.</td>
+<td>Quyết định chất lượng đi đúng tuyến người chịu trách nhiệm.</td>
 </tr>
 <tr>
 <th style="width:20%">Đo lường &amp; Hiệu chuẩn Specialist</th>
@@ -234,9 +190,3 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </div>
 </body>
 </html>
-
-
-
-
-
-

@@ -1,55 +1,11 @@
-
- thead { display: table-header-group; }
- tfoot { display: table-footer-group; }
- p { orphans: 3; widows: 3; }
- 
-}
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
-.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
-.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
-.raci-A {background:#fff5f5; color:#c92a2a;}
-.raci-R {background:#e7f5ff; color:#1864ab;}
-.raci-C {background:#fff9db; color:#e67700;}
-.raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
-.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
-.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
-.doc-link-list {list-style:none; margin:0; padding:0;}
-.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
-.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
-.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
-.svg-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
-.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
-kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
-
-/* JD-LAYOUT-PLUS */
-.jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
-.jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
-.jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
-.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
-.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
-.muted-note{font-size:12px; color:var(--ink2,#475569);}
-.raci-badge{display:inline-block; min-width:26px; text-align:center; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;}
-.raci-a{background:#fff3e0; color:#b45309;}
-.raci-r{background:#e0f2fe; color:#0369a1;}
-.raci-c{background:#f3e8ff; color:#7e22ce;}
-.raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
-.comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
-.comp-card ul{margin-bottom:0;}
-.require-table th{width:24%;}
-.inline-note{margin-top:8px; font-size:12px; color:var(--ink2,#475569);}
-@media (max-width: 960px){ .auth-grid,.comp-grid{grid-template-columns:1fr;} }
-
-}
-
-</style>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>JD-WKM — CNC Workshop Manager | HESEM QMS</title>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../../assets/style.css">
 </head>
 <body>
 <div class="container">
@@ -57,22 +13,22 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu kiểm soát</span>
 </div>
 </div>
 <div class="title">
-<strong>JD-CNC-xưởng-MANAGER — CNC Workshop Manager</strong>
-<span class="sub-vn">Quản lý Phân xưởng CNC</span>
+<strong>JD-WKM — CNC Workshop Manager</strong>
+<span class="sub-vn">Quan ly phan xuong CNC</span>
 </div>
 <div class="meta">
-<div class="row"><span><b>Code:</b></span><span>JD-CNC-xưởng-MANAGER</span></div>
-<div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>HR Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Mã:</b></span><span>JD-WKM</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="role-cluster"><a class="role-link" href="../08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="role-cluster"><a class="role-link" href="../01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -88,9 +44,9 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2">1. Thông tin vị trí (Vị trí / Chức vụ ID &amp; tiêu đề)</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
-<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-CNC-xưởng-MANAGER</td></tr>
-<tr><th>Chức danh theo tài liệu</th><td>CNC Workshop Manager</td></tr>
-<tr><th>Bộ phận</th><td>Sản xuất</td></tr>
+<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-WKM</td></tr>
+<tr><th>Mã vai trò dùng trong SOP/RACI</th><td><span class="role-cluster"><a class="role-link" href="jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="role-code">WKM</span></a></span></td></tr><tr><th>Chức danh theo tài liệu</th><td>CNC Workshop Manager</td></tr>
+<tr><th>Bộ phận</th><td>Production</td></tr>
 <tr><th>Cấp vai trò</th><td>Manager</td></tr>
 <tr><th>Nhóm vai trò</th><td>Sản xuất / điều hành shopfloor / kiểm soát thực thi</td></tr>
 <tr><th>Báo cáo trực tiếp cho</th><td>Production Director.</td></tr>
@@ -123,7 +79,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tbody>
 <tr>
 <th style="width:26%">Điểm kết thúc trách nhiệm</th>
-<td>CNC Workshop Manager là Responsible Person thực thi của khu vực CNC; không tự phát hành thay đổi kỹ thuật, không bỏ cổng kiểm soát chất lượng và không cam kết thương mại ra khách hàng.</td>
+<td>CNC Workshop Manager là người chịu trách nhiệm thực thi của khu vực CNC; không tự phát hành thay đổi kỹ thuật, không bỏ cổng kiểm soát chất lượng và không cam kết thương mại ra khách hàng.</td>
 </tr>
 <tr>
 <th style="width:26%">Không thuộc trách nhiệm chính / phải đã báo cáo vượt cấp</th>
@@ -132,7 +88,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </tbody>
 </table>
 </div>
-<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng Responsible Person thay vì xử lý ngoài tuyến kiểm soát.</p>
+<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng người chịu trách nhiệm thay vì xử lý ngoài tuyến kiểm soát.</p>
 <p class="inline-note">Mọi thay đổi ảnh hưởng chất lượng, giao hàng, chi phí, phiên bản, phát hành hoặc truy vết phải tuân theo quy trình/hồ sơ liên kết tại Mục 12.</p>
 <h2 class="h2">5. Quyền hạn (Thẩm quyền &amp; quyền ra quyết định (quyền)</h2>
 <div class="auth-grid">
@@ -151,13 +107,13 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </thead>
 <tbody>
 <tr>
-<th style="width:20%">Sản xuất Giám đốc</th>
+<th style="width:20%"><span class="role-cluster"><a class="role-link" href="../01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="role-code">PD</span></a></span></th>
 <td><p>Nhận mục tiêu đầu ra, ưu tiên khách hàng, nguồn lực tăng ca và các escalations vượt thẩm quyền phân xưởng.</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-r">R</span></td>
 <td>Phân xưởng chạy đúng mục tiêu nhà máy và thứ tự ưu tiên đã phê duyệt.</td>
 </tr>
 <tr>
-<th style="width:20%">Production Planner</th>
+<th style="width:20%"><span class="role-cluster"><a class="role-link" href="jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="role-code">PPL</span></a></span></th>
 <td><p>Nhận điều phối xuất hàng ưu tiên, due-date rủi ro, trình tự ràng buộc, thiếu hụt tác động và phản hồi khả năng thực thi thực tế.</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-a">A</span></td>
 <td>Kế hoạch được biến thành lịch chạy khả thi trên phân xưởng.</td>
@@ -166,7 +122,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <th style="width:20%">Kỹ thuật / Quy trình / CAM</th>
 <td><p>Báo cáo vượt cấp vấn đề phương pháp, chứng minh, tool/fixture, kiểm soát thay đổi và bài học kinh Nhiệm từ hiện trường.</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-c">C</span></td>
-<td>Các vấn đề kỹ thuật được xử lý đúng Responsible Person và không phát sinh giải pháp tạm vô kiểm soát.</td>
+<td>Các vấn đề kỹ thuật được xử lý đúng người chịu trách nhiệm và không phát sinh giải pháp tạm vô kiểm soát.</td>
 </tr>
 <tr>
 <th style="width:20%">QC / QA</th>
@@ -184,9 +140,9 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </table>
 </div><p class="inline-note">Quy ước: R = đầu mối trực tiếp thực hiện/phản hồi; A = đầu mối chịu trách nhiệm cuối cùng trong tuyến phối hợp; C = cần tham vấn/bắt buộc đồng bộ trước khi tiếp tục; I = cần được thông tin để đồng bộ trạng thái.</p>
 <h2 class="h2">7. Đầu ra bắt buộc / hồ sơ quản trị</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nơi lưu / nguồn</th></tr></thead><tbody><tr><td>Machine lịch trình / xưởng bảng</td><td>Lịch chạy máy theo ca / cell / ưu tiên job và trạng thái mức sẵn sàng.</td><td>Ngày / ca</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a>, bảng điều độ phân phân xưởng, bảng điều khiển phân xưởng.</td></tr><tr><td>Shift mức sẵn sàng &amp; bất thường log</td><td>Danh sách máy / job chưa đủ điều kiện, sự cố trong ca, Responsible Person và ETA kết thúc / đóng.</td><td>Ngày / ca</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>, log phân xưởng, SSOT sản xuất.</td></tr><tr><td>Báo cáo thời gian Từng máy / tổn thất cây / sơ đồ cây</td><td>Tổng hợp thời gian Từng máy theo mã nguyên nhân và máy, có đánh dấu tổn thất lặp.</td><td>Ngày / tuần</td><td>Bảng điều khiển OEE, log thời gian Từng máy, SSOT sản xuất.</td></tr><tr><td>Theo dõi mẫu đầu &amp; bàn giao</td><td>Tình trạng mẫu đầu, job đang hold, việc dang dở và nội dung bàn giao ca.</td><td>Ca</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>, traveler / hồ sơ hiện trường.</td></tr><tr><td>Cell mức sẵn sàng &amp; bất thường log</td><td>Evidence mức sẵn sàng đầu ca/cell, danh sách fail-start, bất thường Responsible Person, dòng / chuyền-thông quan / giải phóng/FOD xác nhận và bàn giao liên ca để Planner/Giám đốc/QA phản ứng trong ngày.</td><td>Mỗi ca / ngày</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>; <a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a>; <a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-512_Downtime_Log.xlsx">FRM-512</a>; <a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a>; shift bảng; bất thường log.</td></tr></tbody></table></div>
+<div class="table-card"><table class="table"><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nơi lưu / nguồn</th></tr></thead><tbody><tr><td>Machine lịch trình / xưởng bảng</td><td>Lịch chạy máy theo ca / cell / ưu tiên job và trạng thái mức sẵn sàng.</td><td>Ngày / ca</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a>, bảng điều độ phân phân xưởng, bảng điều khiển phân xưởng.</td></tr><tr><td>Shift mức sẵn sàng &amp; bất thường log</td><td>Danh sách máy / job chưa đủ điều kiện, sự cố trong ca, người chịu trách nhiệm và ETA kết thúc / đóng.</td><td>Ngày / ca</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>, log phân xưởng, SSOT sản xuất.</td></tr><tr><td>Báo cáo thời gian Từng máy / tổn thất cây / sơ đồ cây</td><td>Tổng hợp thời gian Từng máy theo mã nguyên nhân và máy, có đánh dấu tổn thất lặp.</td><td>Ngày / tuần</td><td>Bảng điều khiển OEE, log thời gian Từng máy, SSOT sản xuất.</td></tr><tr><td>Theo dõi mẫu đầu &amp; bàn giao</td><td>Tình trạng mẫu đầu, job đang hold, việc dang dở và nội dung bàn giao ca.</td><td>Ca</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>, traveler / hồ sơ hiện trường.</td></tr><tr><td>Cell mức sẵn sàng &amp; bất thường log</td><td>Evidence mức sẵn sàng đầu ca/cell, danh sách fail-start, bất thường người chịu trách nhiệm, dòng / chuyền-thông quan / giải phóng/FOD xác nhận và bàn giao liên ca để Planner/Giám đốc/QA phản ứng trong ngày.</td><td>Mỗi ca / ngày</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>; <a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a>; <a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-512_Downtime_Log.xlsx">FRM-512</a>; <a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a>; shift bảng; bất thường log.</td></tr></tbody></table></div>
 <h2 class="h2">8. KPI cá nhân</h2>
-<div class="table-card"><table class="table"><thead><tr><th>KPI trọng yếu</th><th>Cách đo / nguồn dữ liệu</th><th>Chu kỳ theo dõi</th></tr></thead><tbody><tr><td>OEE / machine tỷ lệ sử dụng theo phân xưởng</td><td>Theo machine log, nhân công hồ sơ và bảng điều khiển phân xưởng.</td><td>Ngày / tuần / tháng</td></tr><tr><td>lịch trình tuân thủ theo máy / ca</td><td>So sánh machine lịch trình với thực tế run / ready-to-run / đã hoàn thành.</td><td>Ngày / tuần</td></tr><tr><td>Mẫu đầu on-time &amp; mẫu đầu pass</td><td>Tỷ lệ setup hoàn tất và mẫu đầu pass trong SLA.</td><td>Ngày / tuần</td></tr><tr><td>Thời gian Từng máy do thiếu mức sẵn sàng / điều phối</td><td>Thời gian dừng do thiếu tool, thiếu gói hồ sơ, thiếu QC, thiếu nguyên vật liệu, chờ quyết định.</td><td>Ngày / tuần</td></tr><tr><td>sai phiên bản / sai gói hồ sơ / hồ sơ vi phạm</td><td>Số vụ vi phạm kỷ luật tài liệu và data tại máy.</td><td>Ngày / tháng</td></tr><tr><td>Shift bàn giao tuân thủ</td><td>Tỷ lệ ca có bàn giao đầy đủ, rõ Responsible Person và không phát sinh "mù thông tin".</td><td>Ca / tuần</td></tr><tr><td>Tỷ lệ fail-start do thiếu mức sẵn sàng trong phạm vi phân xưởng</td><td>Số lần job không thể start đúng điều phối xuất hàng do thiếu setup, thiếu dòng / chuyền thông quan / giải phóng, thiếu Operator phạm vi bao phủ, thiếu tool/gage hoặc kỷ luật / chuyên ngành thực thi trong phạm vi phân xưởng.</td><td>Tuần / tháng</td></tr></tbody></table></div>
+<div class="table-card"><table class="table"><thead><tr><th>KPI trọng yếu</th><th>Cách đo / nguồn dữ liệu</th><th>Chu kỳ theo dõi</th></tr></thead><tbody><tr><td>OEE / machine tỷ lệ sử dụng theo phân xưởng</td><td>Theo machine log, nhân công hồ sơ và bảng điều khiển phân xưởng.</td><td>Ngày / tuần / tháng</td></tr><tr><td>lịch trình tuân thủ theo máy / ca</td><td>So sánh machine lịch trình với thực tế run / ready-to-run / đã hoàn thành.</td><td>Ngày / tuần</td></tr><tr><td>Mẫu đầu on-time &amp; mẫu đầu pass</td><td>Tỷ lệ setup hoàn tất và mẫu đầu pass trong SLA.</td><td>Ngày / tuần</td></tr><tr><td>Thời gian Từng máy do thiếu mức sẵn sàng / điều phối</td><td>Thời gian dừng do thiếu tool, thiếu gói hồ sơ, thiếu QC, thiếu nguyên vật liệu, chờ quyết định.</td><td>Ngày / tuần</td></tr><tr><td>sai phiên bản / sai gói hồ sơ / hồ sơ vi phạm</td><td>Số vụ vi phạm kỷ luật tài liệu và data tại máy.</td><td>Ngày / tháng</td></tr><tr><td>Shift bàn giao tuân thủ</td><td>Tỷ lệ ca có bàn giao đầy đủ, rõ người chịu trách nhiệm và không phát sinh "mù thông tin".</td><td>Ca / tuần</td></tr><tr><td>Tỷ lệ fail-start do thiếu mức sẵn sàng trong phạm vi phân xưởng</td><td>Số lần job không thể start đúng điều phối xuất hàng do thiếu setup, thiếu dòng / chuyền thông quan / giải phóng, thiếu Operator phạm vi bao phủ, thiếu tool/gage hoặc kỷ luật / chuyên ngành thực thi trong phạm vi phân xưởng.</td><td>Tuần / tháng</td></tr></tbody></table></div>
 <h2 class="h2">9. Yêu cầu năng lực (Năng lực Yêu cầu)</h2>
 <div class="comp-grid">
 <div class="comp-card"><p><b>Kiến thức chuyên môn &amp; hệ thống</b></p><ul><li>Hiểu sâu logic <a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a>, <a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a>, mẫu đầu cổng kiểm soát, phiên bản control, machine trạng thái, thời gian Từng máy mã hóa / lập trình và hàng Ngày quản lý.</li><li>Đọc được traveler, phiếu cài đặt, NC phát hành, bảng điều khiển OEE / WIP / điều phối xuất hàng và biết điều chỉnh ưu tiên theo rủi ro thực tế.</li></ul></div>
@@ -216,9 +172,3 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </div>
 </body>
 </html>
-
-
-
-
-
-

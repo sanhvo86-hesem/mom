@@ -505,6 +505,44 @@ pre, code { overflow-wrap: anywhere; word-break: break-word; }
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
 }
+
+/* Role chips bound to JD registry */
+.role-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.2;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ln2, #cbd5e1);
+  background: var(--bg3, #eef2f7);
+  white-space: nowrap;
+}
+
+.role-link {
+  text-decoration: none;
+}
+
+.role-link:hover .role-code,
+.role-link:focus-visible .role-code {
+  border-color: #1d4ed8;
+  background: #eef6ff;
+}
+
+.role-cluster {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.role-sep {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink3, #64748b);
+}
 @media screen and (max-width: 768px) {
   /* Mobile overflow fixes */
   .table-card, .table-block, .table-wrap { overflow-x: auto; }

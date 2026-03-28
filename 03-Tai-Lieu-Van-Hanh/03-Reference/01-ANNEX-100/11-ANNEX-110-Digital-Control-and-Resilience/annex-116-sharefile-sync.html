@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANNEX-116 - M365 SharePoint local synced working copy, endpoint boundary và local Git workspace model | HESEM QMS</title>
-<link rel="stylesheet" href="../../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../../assets/style.css">
 <style>
 
 .page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
@@ -29,7 +29,7 @@
 
 <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Annex số hóa</span>
@@ -41,11 +41,11 @@
  <div class="row"><span><b>Version:</b></span><span>V1</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
  <div class="row"><span><b>Owner:</b></span><span>IT System Administrator / QMS Manager</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám Đốc</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
 </div>
 
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi thiết kế endpoint local cho bộ source tài liệu, xác định ai được sync library source, path nào được phép, path nào bị cấm, và cách recover/onboard endpoint mới. ANNEX này là chuẩn endpoint và workspace model, không phải WI thao tác từng bước.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi thiết kế endpoint local cho bộ source tài liệu, xác định ai được sync library source, path nào được phép, path nào bị cấm, và cách recover/onboard endpoint mới. ANNEX này là chuẩn endpoint và workspace model, không phải WI thao tác từng bước.</div>
  <h1>ANNEX-116 - M365 SharePoint local synced working copy, endpoint boundary và local Git workspace model</h1>
 
  <div class="section">
@@ -77,19 +77,19 @@
  <div class="figure-box">
  <h3>Allowed layout</h3>
  <div class="path">SharePoint source library
- -> OneDrive sync folder
- -> qms.hesem.com.vn (worktree only)
+ -&gt; OneDrive sync folder
+ -&gt; qms.hesem.com.vn (worktree only)
 Git metadata
- -> C:\HESEM-Git\qms.hesem.com.vn.git</div>
+ -&gt; C:\HESEM-Git\qms.hesem.com.vn.git</div>
  </div>
  <div class="figure-box">
  <h3>Forbidden layout</h3>
  <div class="path">SharePoint source library
- -> qms.hesem.com.vn
- -> .git
- -> node_modules runtime cache
- -> secrets
- -> session data</div>
+ -&gt; qms.hesem.com.vn
+ -&gt; .git
+ -&gt; node_modules runtime cache
+ -&gt; secrets
+ -&gt; session data</div>
  </div>
  </div>
  </div>

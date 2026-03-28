@@ -31,6 +31,8 @@ Mục tiêu là ngăn kiểu cập nhật cơ học:
 8. Không dùng lại số bước hoặc số IG chỉ vì “trông đẹp”, “đều”, hoặc “dễ sinh hàng loạt”.
 9. Chuẩn hóa đồ họa, palette, HTML structure, bảng và checklist ở mức core-standard là được phép; nhưng nâng cấp nội dung SOP phải làm theo từng tài liệu một.
 10. Không nâng cấp hàng loạt nhiều SOP cùng lúc nếu nội dung thay đổi chạm logic vận hành; chỉ được batch với lỗi kỹ thuật, đồ họa, CSS, link, markup hoặc hygiene mang tính cấu trúc.
+11. Trước khi sửa vai trò, chủ trì, quyền hạn, RACI hoặc owner cell của SOP, phải đối chiếu `JD thật -> role registry -> benchmark chính thức bên ngoài` rồi mới chốt mapping.
+12. Các label như `Process Owner`, `Department Head`, `Responsible Person`, `Data Owner`, `Lead Auditor`, `Incident Commander` không được giữ nguyên nếu chúng đang đóng vai trò authority thật; phải resolve về base role, governance hat hoặc explicit role bundle.
 
 ---
 
@@ -65,6 +67,21 @@ Không dựa vào:
 - blog marketing không có giá trị quy trình,
 - bài tổng hợp không có nguồn gốc,
 - nội dung suy diễn không có tài liệu đỡ lưng.
+
+### Bước 2C. Chốt ranh giới vai trò trước khi viết Section 4 / 6 / 8
+
+Trước khi sửa bất kỳ owner/authority cell nào, phải trả lời:
+- ai giữ dữ liệu;
+- ai quyết định;
+- ai release;
+- ai chỉ execute;
+- ai có quyền stop;
+- vai trò đó có phải vị trí JD thật hay chỉ là governance hat.
+
+Nếu vai trò không có JD thật mà vẫn lặp lại trong nhiều SOP:
+1. quyết định đó là hat hay base role mới;
+2. cập nhật JD/registry trước;
+3. rồi mới cập nhật SOP.
 
 ### Bước 2A. Chốt benchmark KPI trước khi viết Section 6
 

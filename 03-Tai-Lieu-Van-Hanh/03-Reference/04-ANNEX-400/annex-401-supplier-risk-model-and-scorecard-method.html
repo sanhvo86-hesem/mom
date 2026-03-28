@@ -1,9 +1,10 @@
-<!DOCTYPE html> <html lang="vi">
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>ANNEX-401 — Mô hình rủi ro nhà cung cấp và phương pháp thẻ điểm (bảng điểm) | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 <style>
  h1, h2, h3 { break-after: avoid; page-break-after: avoid; } tr, td, th { break-inside: avoid; page-break-inside: avoid; }
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
@@ -41,7 +42,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="page">
 <div class="page-body"><div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu vận hành • Annex</span>
@@ -53,10 +54,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Owner:</b></span><span>Mua hàng Manager / QA Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi chọn nguồn cung mới, tái đánh giá nhà cung cấp hiện hữu, rà soát định kỳ, ra quyết định thử việc/chặn / khóa, xác định mức đầu vào / nhận hàng control và quyết định kép-source hoặc dự phòng source.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi chọn nguồn cung mới, tái đánh giá nhà cung cấp hiện hữu, rà soát định kỳ, ra quyết định thử việc/chặn / khóa, xác định mức đầu vào / nhận hàng control và quyết định kép-source hoặc dự phòng source.</div>
 <h1>ANNEX-401 — Mô hình rủi ro nhà cung cấp và phương pháp thẻ điểm</h1>
 <div class="callout-info"><b>Nguyên tắc nền:</b> Supplier không được đánh giá chỉ bằng giá và thời gian dẫn (lead time). Mọi nhà cung cấp ảnh hưởng CTQ, truy xuất nguồn gốc, cert tính toàn vẹn, công đoạn đặc biệt, giao hàng độ ổn định hoặc khách hàng Requests PHẢI đi qua mô hình rủi ro và thẻ điểm này trước khi cấp PO hoặc cho phép phát hành vào sản xuất.</div>
 <h2>1. Mục đích và phạm vi áp dụng</h2>
@@ -143,22 +144,22 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr><th>Trạng thái trước đó</th><th>Evidence mở lại tối thiểu</th><th>Ai xác minh</th><th>Ai phê duyệt mở lại</th></tr></thead>
 <tbody>
-<tr><td>Có điều kiện → Đã phê duyệt</td><td>Score hồi phục, không còn mở vấn đề quá hạn, đầu vào / nhận hàng kiểm tra tăng cường đã ổn</td><td>Mua hàng + QA</td><td>Pur Mgr</td></tr>
+<tr><td>Có điều kiện → Đã phê duyệt</td><td>Score hồi phục, không còn mở vấn đề quá hạn, đầu vào / nhận hàng kiểm tra tăng cường đã ổn</td><td><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="role-code">BUY</span></a><span class="role-sep">+</span><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a></span></td><td>Pur Mgr</td></tr>
 <tr><td>Thử việc → Có điều kiện/Đã phê duyệt</td><td>Kế hoạch hành động đóng, ít nhất 1 lô hoặc 1 tháng vận hành sạch theo loại nhà cung cấp, không còn kiểm soát cổng sự kiện mở</td><td>Mua hàng + QA + bộ phận dùng nguồn</td><td>Pur Mgr + QA Mgr</td></tr>
 <tr><td>Chặn → Thử việc/Có điều kiện</td><td>Tái đánh giá năng lực đầy đủ, rà soát lãnh đạo, test lot/đầu tiên phiếu nhận / biên nhận pass, khách hàng scope/cert/công đoạn đặc biệt bằng chứng hợp lệ</td><td>QA Mgr + Pur Mgr + Eng/Kế hoạch khi liên quan</td><td>Tổng Giám đốc hoặc Người được ủy quyền theo thẩm quyền</td></tr>
 </tbody></table></div>
 <h2>9. Hồ sơ, KPI và tài liệu liên kết</h2>
 <div class="kpi-grid">
-<div class="kpi-box"><b>KPI-01</b><br/>% nhà cung cấp/Người xử lý đúng rà soát tần suất theo R-class.</div>
-<div class="kpi-box"><b>KPI-02</b><br/>Số kiểm soát cổng sự kiện không được phản ứng trong SLA.</div>
-<div class="kpi-box"><b>KPI-03</b><br/>% nhà cung cấp thẻ điểm có đủ bằng chứng vết / nhật ký thay đổi và nguồn dữ liệu.</div>
-<div class="kpi-box"><b>KPI-04</b><br/>% PO quan trọng / nghiêm trọng phát hành cho source đã đã phê duyệt đúng scope.</div>
+<div class="kpi-box"><b>KPI-01</b><br>% nhà cung cấp/Người xử lý đúng rà soát tần suất theo R-class.</div>
+<div class="kpi-box"><b>KPI-02</b><br>Số kiểm soát cổng sự kiện không được phản ứng trong SLA.</div>
+<div class="kpi-box"><b>KPI-03</b><br>% nhà cung cấp thẻ điểm có đủ bằng chứng vết / nhật ký thay đổi và nguồn dữ liệu.</div>
+<div class="kpi-box"><b>KPI-04</b><br>% PO quan trọng / nghiêm trọng phát hành cho source đã đã phê duyệt đúng scope.</div>
 </div>
 <p><b>Hồ sơ bắt buộc:</b> nhà cung cấp hội nhập nhân sự mới pack, thẻ điểm, SCAR, công suất rà soát, cert scope bằng chứng, khách hàng phê duyệt bằng chứng và quyết định trạng thái. Tài liệu liên kết chặt: <a href="annex-402-outsource-special-process-pack.html">ANNEX-402</a>, <a href="annex-403-approved-processor-list.html">ANNEX-403</a>, <a href="../03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a>, <a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>, <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-402_Supplier_Evaluation_Form.xlsx" download="">FRM-402</a>, <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-405_Supplier_Scorecard.xlsx" download="">FRM-405</a>.</p>
 <div data-phase2f="true">
 <h2 class="h2" id="phase2f-form-linkage">Kiểm soát bổ sung — liên kết to vận hành biểu mẫu</h2>
-<div class="note"><b>Triển khai</b><br/>ANNEX này là mô hình rủi ro / chấm điểm / xước. Khi đưa vào điều hành, cần nối sang <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-402_Supplier_Evaluation_Form.xlsx" download="">FRM-402</a> để chốt phê duyệt scope, <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-406_SCAR.xlsx" download="">FRM-406</a> để phục hồi nguồn và <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download="">FRM-701</a> / <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx" download="">FRM-413</a> để kéo rủi ro xuống cổng kiểm soát phiếu nhận / biên nhận thực tế.</div>
-</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-annex-pur001">Biểu mẫu Excel đang hiệu lực — Nối rủi ro mô hình sang sổ tay thực hành phiếu nhận / biên nhận hiện hành</h2><div class="note phase3a-workbook-alignment"><b>Rule nối dữ liệu</b><br/>Rủi ro / thẻ điểm / khôi phục / thu hồi mô hình tại ANNEX-401 phải nối xuống <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download="">FRM-701</a> sổ tay thực hành để rủi ro class thật sự đi vào phiếu nhận / biên nhận cổng kiểm soát, và dùng <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx" download="">FRM-413</a> khi cần TẠM GIỮ/disposition/phát hành. là mã không phát hành trong danh mục hiện hành và được chuẩn hóa tại ; không phải sổ tay thực hành hiện hành.</div></div>
+<div class="note"><b>Triển khai</b><br>ANNEX này là mô hình rủi ro / chấm điểm / xước. Khi đưa vào điều hành, cần nối sang <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-402_Supplier_Evaluation_Form.xlsx" download="">FRM-402</a> để chốt phê duyệt scope, <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-406_SCAR.xlsx" download="">FRM-406</a> để phục hồi nguồn và <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download="">FRM-701</a> / <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx" download="">FRM-413</a> để kéo rủi ro xuống cổng kiểm soát phiếu nhận / biên nhận thực tế.</div>
+</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-annex-pur001">Biểu mẫu Excel đang hiệu lực — Nối rủi ro mô hình sang sổ tay thực hành phiếu nhận / biên nhận hiện hành</h2><div class="note phase3a-workbook-alignment"><b>Rule nối dữ liệu</b><br>Rủi ro / thẻ điểm / khôi phục / thu hồi mô hình tại ANNEX-401 phải nối xuống <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download="">FRM-701</a> sổ tay thực hành để rủi ro class thật sự đi vào phiếu nhận / biên nhận cổng kiểm soát, và dùng <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx" download="">FRM-413</a> khi cần TẠM GIỮ/disposition/phát hành. là mã không phát hành trong danh mục hiện hành và được chuẩn hóa tại ; không phải sổ tay thực hành hiện hành.</div></div>
 </div>
 </div>
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>

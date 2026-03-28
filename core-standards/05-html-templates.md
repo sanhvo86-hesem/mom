@@ -7,7 +7,8 @@
 - `{{CODE}}` — Mã tài liệu (VD: SOP-101, WI-511, ANNEX-301)
 - `{{TITLE}}` — Tiêu đề tài liệu
 - `{{SUBTITLE}}` — Phụ đề tiếng Việt
-- `{{OWNER}}` — Vai trò chủ sở hữu tài liệu
+- `{{OWNER_ROLE_HTML}}` — Role code JD-linked của chủ sở hữu tài liệu
+- `{{APPROVER_ROLE_HTML}}` — Role code JD-linked của người phê duyệt
 - `{{RELATIVE_PATH}}` — Đường dẫn tương đối tới thư mục gốc (VD: `../../..`)
 
 ---
@@ -100,8 +101,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="row"><span><b>Code:</b></span><span>{{CODE}}</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>{{OWNER}}</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_HTML}}</span></div>
 </div>
 </div>
 
@@ -309,6 +310,22 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 
 ---
 
+## Template 3: JD (Job Description)
+
+JD dùng template riêng tại `core-standards/templates/jd-template.html`.
+
+Lưu ý khóa:
+- JD cũng phải là HTML đầy đủ: có `<!DOCTYPE html>`, `<html>`, `<head>`, `<body>`.
+- Meta header của JD dùng nhãn tiếng Việt giống SOP/WI: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`.
+- Title block của JD dùng chuẩn `JD-<ROLECODE> — <Job title English>`.
+- `Chủ sở hữu` và `Phê duyệt` ở header phải là `role chip` link JD, không dùng text trần.
+- Bảng thông tin vị trí phải có đúng 1 hàng `Mã vai trò dùng trong SOP/RACI`.
+- Nếu role có governance hat được phép gắn, thêm đúng 1 hàng `Mũ quản trị có thể gắn`.
+- Hàng `Chức danh theo tài liệu` giữ plain English title, không gắn chip.
+- Không được tạo JD bằng fragment HTML hở đầu/hở cuối rồi ghép tay vào portal.
+
+---
+
 ## Template 2: WI (Hướng dẫn công việc)
 
 WI có 7 mục. Không có iso-map và preface-block. Thường có `.note` ở đầu thay vì iso-map.
@@ -356,8 +373,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="row"><span><b>Code:</b></span><span>{{CODE}}</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>{{OWNER}}</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_HTML}}</span></div>
 </div>
 </div>
 
@@ -500,8 +517,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="row"><span><b>Code:</b></span><span>{{CODE}}</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>{{OWNER}}</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_HTML}}</span></div>
 </div>
 </div>
 
@@ -628,8 +645,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="row"><span><b>Code:</b></span><span>{{CODE}}</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>HR Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_HTML}}</span></div>
 </div>
 </div>
 
@@ -809,8 +826,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="row"><span><b>Code:</b></span><span>{{CODE}}</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>{{OWNER}}</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_HTML}}</span></div>
 </div>
 </div>
 
@@ -973,8 +990,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="row"><span><b>Code:</b></span><span>DEPT-{{DEPT_CODE}}-HANDBOOK</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>{{DEPT_HEAD}}</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_HTML}}</span></div>
 </div>
 </div>
 

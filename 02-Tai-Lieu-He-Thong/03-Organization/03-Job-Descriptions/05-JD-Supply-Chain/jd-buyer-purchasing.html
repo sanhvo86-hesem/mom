@@ -1,47 +1,11 @@
- thead { display: table-header-group; } tfoot { display: table-footer-group; } p { orphans: 3; widows: 3; } 
-}
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
-.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
-.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
-.raci-A {background:#fff5f5; color:#c92a2a;}
-.raci-R {background:#e7f5ff; color:#1864ab;}
-.raci-C {background:#fff9db; color:#e67700;}
-.raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
-.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
-.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
-.doc-link-list {list-style:none; margin:0; padding:0;}
-.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
-.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
-.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
-.svg-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
-.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
-kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;} /* JD-LAYOUT-PLUS */
-.jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
-.jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
-.jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
-.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
-.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
-.muted-note{font-size:12px; color:var(--ink2,#475569);}
-.raci-badge{display:inline-block; min-width:26px; text-align:center; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;}
-.raci-a{background:#fff3e0; color:#b45309;}
-.raci-r{background:#e0f2fe; color:#0369a1;}
-.raci-c{background:#f3e8ff; color:#7e22ce;}
-.raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
-.comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
-.comp-card ul{margin-bottom:0;}
-.require-table th{width:24%;}
-.inline-note{margin-top:8px; font-size:12px; color:var(--ink2,#475569);}
-@media (max-width: 960px){ .auth-grid,.comp-grid{grid-template-columns:1fr;} }
-
-} </style>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>JD-BUY — Buyer / Purchasing | HESEM QMS</title>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../../assets/style.css">
 </head>
 <body>
 <div class="container">
@@ -49,22 +13,22 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu kiểm soát</span>
 </div>
 </div>
 <div class="title">
-<strong>JD-nhân viên mua hàng-mua hàng — Nhân viên mua hàng / Mua hàng</strong>
-<span class="sub-vn">Nhân viên Mua hàng</span>
+<strong>JD-BUY — Buyer / Purchasing</strong>
+<span class="sub-vn">Nhan vien mua hang</span>
 </div>
 <div class="meta">
-<div class="row"><span><b>Code:</b></span><span>JD-nhân viên mua hàng-mua hàng</span></div>
-<div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>HR Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Mã:</b></span><span>JD-BUY</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="role-cluster"><a class="role-link" href="../08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="role-cluster"><a class="role-link" href="../01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -80,9 +44,9 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2">1. Thông tin vị trí (Vị trí / Chức vụ ID &amp; tiêu đề)</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
-<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-nhân viên mua hàng-mua hàng</td></tr>
-<tr><th>Chức danh theo tài liệu</th><td>Nhân viên mua hàng / Mua hàng</td></tr>
-<tr><th>Bộ phận</th><td>Chuỗi cung ứng</td></tr>
+<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-BUY</td></tr>
+<tr><th>Mã vai trò dùng trong SOP/RACI</th><td><span class="role-cluster"><a class="role-link" href="jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="role-code">BUY</span></a></span></td></tr><tr><th>Chức danh theo tài liệu</th><td>Buyer / Purchasing</td></tr>
+<tr><th>Bộ phận</th><td>Supply Chain</td></tr>
 <tr><th>Cấp vai trò</th><td>Chuyên nghiệp / Nhân viên</td></tr>
 <tr><th>Nhóm vai trò</th><td>Mua hàng / kho / hậu cần / giao vận</td></tr>
 <tr><th>Báo cáo trực tiếp cho</th><td>Chuỗi cung ứng Manager.</td></tr>
@@ -92,7 +56,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Từ nhu cầu/PR/PO-ready → RFQ nhà cung cấp → đặt PO/theo dõi tiếp → cert/trạng thái → bàn giao vật tư/dịch vụ đúng hạn.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>Nhân viên mua hàng / Mua hàng bảo đảm nhà máy nhận đúng vật tư, tool, dịch vụ và chứng từ vào đúng thời điểm cần, với rủi ro thấp nhất và chi phí phù hợp. Đây là vị trí biến nhu cầu kỹ thuật – sản xuất thành cam kết nguồn cung có kiểm soát.</p><p>Ngoài việc phát hành PO, vị trí này còn phải kiểm soát truyền đạt Requests kỹ thuật, bộ chứng từ chứng nhận, thời gian dẫn, trạng thái NCC và khả năng ứng phó khi cung ứng có biến động.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>PO phát hành đúng dữ liệu, đúng spec, đúng cần date và có theo dõi cam kết date đáng tin cậy.</li><li>Không có sai mua, thiếu cert, dùng thay thế không phê duyệt hoặc đẩy rủi ro cung ứng sang nhận hàng / sản xuất.</li><li>Các vấn đề NCC được phát hiện sớm và đã báo cáo vượt cấp đủ nhanh để bảo vệ OTD của công ty.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Nhân viên mua hàng / Mua hàng chịu trách nhiệm thực thi mua hàng và theo đuổi nhà cung cấp theo ngày; không tự phê duyệt nhà cung cấp về mặt chất lượng, không tự chấp nhận sai lệch kỹ thuật và không quản kho/ship thay các vai trò liên quan.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Bảo đảm mỗi PO phát ra là một gói truyền đạt Requests dùng được: đúng spec, đúng phiên bản, đúng chứng từ, đúng Người xử lý path và đúng kỳ vọng chất lượng/giao hàng.</li><li>Theo nhà cung cấp/Người xử lý như Responsible Person của một cam kết vận hành, không chỉ như Người gửi email hỏi hàng.</li><li>Nhận diện sớm nguy cơ thiếu / bỏ sót ETA, cert vấn đề, hàng giả / hàng nhái/nguyên vật liệu không khớp và kéo đúng Người vào xử lý trước khi ảnh hưởng lập kế hoạch phát hành.</li></ul></div>
+<div class="jd-mission"><p>Nhân viên mua hàng / Mua hàng bảo đảm nhà máy nhận đúng vật tư, tool, dịch vụ và chứng từ vào đúng thời điểm cần, với rủi ro thấp nhất và chi phí phù hợp. Đây là vị trí biến nhu cầu kỹ thuật – sản xuất thành cam kết nguồn cung có kiểm soát.</p><p>Ngoài việc phát hành PO, vị trí này còn phải kiểm soát truyền đạt Requests kỹ thuật, bộ chứng từ chứng nhận, thời gian dẫn, trạng thái NCC và khả năng ứng phó khi cung ứng có biến động.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>PO phát hành đúng dữ liệu, đúng spec, đúng cần date và có theo dõi cam kết date đáng tin cậy.</li><li>Không có sai mua, thiếu cert, dùng thay thế không phê duyệt hoặc đẩy rủi ro cung ứng sang nhận hàng / sản xuất.</li><li>Các vấn đề NCC được phát hiện sớm và đã báo cáo vượt cấp đủ nhanh để bảo vệ OTD của công ty.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Nhân viên mua hàng / Mua hàng chịu trách nhiệm thực thi mua hàng và theo đuổi nhà cung cấp theo ngày; không tự phê duyệt nhà cung cấp về mặt chất lượng, không tự chấp nhận sai lệch kỹ thuật và không quản kho/ship thay các vai trò liên quan.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Bảo đảm mỗi PO phát ra là một gói truyền đạt Requests dùng được: đúng spec, đúng phiên bản, đúng chứng từ, đúng Người xử lý path và đúng kỳ vọng chất lượng/giao hàng.</li><li>Theo nhà cung cấp/Người xử lý như người chịu trách nhiệm của một cam kết vận hành, không chỉ như Người gửi email hỏi hàng.</li><li>Nhận diện sớm nguy cơ thiếu / bỏ sót ETA, cert vấn đề, hàng giả / hàng nhái/nguyên vật liệu không khớp và kéo đúng Người vào xử lý trước khi ảnh hưởng lập kế hoạch phát hành.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
@@ -119,12 +83,12 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </tr>
 <tr>
 <th style="width:26%">Không thuộc trách nhiệm chính / phải đã báo cáo vượt cấp</th>
-<td><ul><li>Không tự phê duyệt nhà cung cấp sai lệch, nguyên vật liệu thay thế, công đoạn đặc biệt thay Quality/Kỹ thuật/SCM; mọi thay đổi kỹ thuật phải được Responsible Person chức năng chấp thuận.</li><li>Không nhận vật tư vào kho hoặc quyết định đạt/không đạt IQC thay Kho/Quality.</li><li>Không giữ thông tin thiếu hụt/muộn / trễ giao hàng ở phạm vi cá nhân; mọi rủi ro phải đẩy ngược về SCM/Planner/Sản xuất theo SLA để bảo vệ lịch sản xuất.</li><li>Chịu trách nhiệm RFQ nhà cung cấp, so sánh giá/thời gian dẫn, phát hành PO, theo dõi OTD nhà cung cấp, kéo chứng chỉ/cert và đã báo cáo vượt cấp chậm trễ/thiếu hụt của nguồn cung.</li><li>Kết thúc trách nhiệm mỗi đơn hàng khi PO phát hành đúng điều kiện, trạng thái giao hàng/cert minh bạch và vật tư/dịch vụ được bàn giao đúng Responsible Person tiếp nhận.</li></ul></td>
+<td><ul><li>Không tự phê duyệt nhà cung cấp sai lệch, nguyên vật liệu thay thế, công đoạn đặc biệt thay Quality/Kỹ thuật/SCM; mọi thay đổi kỹ thuật phải được người chịu trách nhiệm chức năng chấp thuận.</li><li>Không nhận vật tư vào kho hoặc quyết định đạt/không đạt IQC thay Kho/Quality.</li><li>Không giữ thông tin thiếu hụt/muộn / trễ giao hàng ở phạm vi cá nhân; mọi rủi ro phải đẩy ngược về SCM/Planner/Sản xuất theo SLA để bảo vệ lịch sản xuất.</li><li>Chịu trách nhiệm RFQ nhà cung cấp, so sánh giá/thời gian dẫn, phát hành PO, theo dõi OTD nhà cung cấp, kéo chứng chỉ/cert và đã báo cáo vượt cấp chậm trễ/thiếu hụt của nguồn cung.</li><li>Kết thúc trách nhiệm mỗi đơn hàng khi PO phát hành đúng điều kiện, trạng thái giao hàng/cert minh bạch và vật tư/dịch vụ được bàn giao đúng người chịu trách nhiệm tiếp nhận.</li></ul></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng Responsible Person thay vì xử lý ngoài tuyến kiểm soát.</p>
+<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng người chịu trách nhiệm thay vì xử lý ngoài tuyến kiểm soát.</p>
 <p class="inline-note">Mọi thay đổi ảnh hưởng chất lượng, giao hàng, chi phí, phiên bản, phát hành hoặc truy vết phải tuân theo quy trình/hồ sơ liên kết tại Mục 12.</p>
 <h2 class="h2">5. Quyền hạn (Thẩm quyền &amp; quyền ra quyết định (quyền)</h2>
 <div class="auth-grid">
@@ -155,7 +119,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <td>Kế hoạch sản xuất phản ánh đúng tình trạng cung ứng.</td>
 </tr>
 <tr>
-<th style="width:20%">Quality Engineer / QA</th>
+<th style="width:20%"><span class="role-cluster"><a class="role-link" href="../04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="role-code">QE</span></a><span class="role-sep">/</span><a class="role-link" href="../04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a></span></th>
 <td><p>Phối hợp về nhà cung cấp chất lượng vấn đề, cert/nguyên vật liệu sai khác, bên ngoài công đoạn đặc biệt và danh mục nhà cung cấp cần duyệt.</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-c">C</span></td>
 <td>Mua hàng không mở nguồn hoặc chấp nhận sai lệch ngoài kiểm soát.</td>
@@ -202,12 +166,9 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2">12. SOP / WI / Biểu mẫu / Academy liên quan</h2>
 <div class="table-card"><table class="table"><tbody><tr><th style="width:28%">SOP cốt lõi</th><td><ul class="doc-link-list"><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401 — Kiểm soát nhà cung cấp, mua hàng và công đoạn đặc biệt thuê ngoài</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402 — Xác minh vật liệu, truy xuất nguồn gốc và phòng chống vật tư giả/không rõ nguồn gốc</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701 — Tiếp nhận, kho, đóng gói, vận hành và bảo quản</a></li></ul></td></tr><tr><th style="width:28%">WI / Reference / System</th><td><ul class="doc-link-list"><li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207 — Mức sẵn sàng rà soát / trung tâm điều hành (control tháp / cột) cho Job rủi ro cao, Job Cấp và Job đặc biệt</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701 — Nhận hàng, IQC đầu vào, truy vết, dán nhãn và nhập vị trí</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-401-supplier-risk-model-and-scorecard-method.html">ANNEX-401 — Mô hình rủi ro nhà cung cấp và phương pháp thẻ điểm (bảng điểm)</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-402-outsource-special-process-pack.html">ANNEX-402 — Gói kiểm soát outsource / công đoạn đặc biệt / cert luồng-xuống / Từng</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-403-approved-processor-list.html">ANNEX-403 — Đã phê duyệt Người xử lý list, scope phê duyệt và rule tạm ngưng</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117 — Ma trận escalation, SLA phản ứng, liên lạc theo cấp và quyền quyết định</a></li></ul></td></tr><tr><th style="width:28%">Biểu mẫu / hồ sơ</th><td><ul class="doc-link-list"><li><a download="" href="../../../../04-Bieu-Mau/04-FRM-400/FRM-401_Purchase_Order_Tracking_Log.xlsx"><b>FRM-401</b> — Mua hàng Đơn hàng Theo dõi Log</a></li><li><a download="" href="../../../../04-Bieu-Mau/04-FRM-400/FRM-402_Supplier_Evaluation_Form.xlsx">FRM-402 — Supplier đánh giá Biểu mẫu</a></li><li><a download="" href="../../../../04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx"><b>FRM-403</b> — thuê ngoài Quy trình Yêu cầu</a></li><li><a download="" href="../../../../04-Bieu-Mau/04-FRM-400/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-404 — Outsource Điều phối Bảng kiểm</a></li><li><a download="" href="../../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701 — Nhận hàng and IQC Log</a></li></ul></td></tr><tr><th style="width:28%">Academy / năng lực</th><td><ul class="doc-link-list"><li><a href="../../../../10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-purchasing.html"><b>TRN-ACA-OJT-PUR-01</b> — OJT 1 trang — Mua hàng / Gia công ngoài | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C13.html"><b>Mô-đun C13</b> — Rủi ro Quản lý &amp; Phiên bản Control | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C15.html"><b>Mô-đun C15</b> — Nguyên vật liệu Khoa học &amp; Bề mặt Xử lý | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C18.html"><b>Mô-đun C18</b> — Chuỗi cung ứng, Mua hàng &amp; Hậu cần | HESEM OS</a></li></ul></td></tr><tr><th style="width:28%">Reference điều hành</th><td><ul class="doc-link-list"><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503 — CNC Vận hành Mô hình and Role Ranh giới</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html"><b>ANNEX-120</b> — Thẩm quyền Matrix</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html"><b>ANNEX-121</b> — RACI Bản gốc Matrix</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html"><b>ANNEX-122</b> — KPI Phân tầng Từ điển</a></li><li><a href="../../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html"><b>ANNEX-123</b> — Phó Backup Matrix</a></li></ul></td></tr></tbody></table></div>
 </div>
-<h2 class="h2 phase3a-workbook-alignment" id="phase3a-jd-workbooks">13. Biểu mẫu Excel đang hiệu lực — Ranh giới áp dụng sổ tay thực hành cho Nhân viên mua hàng / Mua hàng</h2><div class="note phase3a-workbook-alignment"><b>Quy tắc trách nhiệm</b><br/>Nhân viên mua hàng / Mua hàng phải hiểu rõ ranh giới áp dụng: quyết định rủi ro/chọn nguồn đi xuống cổng tiếp nhận qua sổ tay thực hành <a download="" href="../../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a>, còn <a href="../../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html#FRM-412">FRM-412</a> chỉ còn là mã tham chiếu phạm vi. Khi tham chiếu biểu mẫu trong JD, áp dụng thứ tự ưu tiên: sổ tay thực hành hiện hành → Biểu mẫu Control Sổ đăng ký → Biểu mẫu Quản lý phiên bản Mô hình → Biểu mẫu Phát hành Bảng kiểm. Xem thêm <a download="" href="../../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> và <a download="" href="../../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a>.</div></div>
+<h2 class="h2 phase3a-workbook-alignment" id="phase3a-jd-workbooks">13. Biểu mẫu Excel đang hiệu lực — Ranh giới áp dụng sổ tay thực hành cho Nhân viên mua hàng / Mua hàng</h2><div class="note phase3a-workbook-alignment"><b>Quy tắc trách nhiệm</b><br>Nhân viên mua hàng / Mua hàng phải hiểu rõ ranh giới áp dụng: quyết định rủi ro/chọn nguồn đi xuống cổng tiếp nhận qua sổ tay thực hành <a download="" href="../../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a>, còn <a href="../../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html#FRM-412">FRM-412</a> chỉ còn là mã tham chiếu phạm vi. Khi tham chiếu biểu mẫu trong JD, áp dụng thứ tự ưu tiên: sổ tay thực hành hiện hành → Biểu mẫu Control Sổ đăng ký → Biểu mẫu Quản lý phiên bản Mô hình → Biểu mẫu Phát hành Bảng kiểm. Xem thêm <a download="" href="../../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> và <a download="" href="../../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a>.</div></div>
 </div>
 </div>
 </div>
 </body>
-</html> 
-
-
-
+</html>

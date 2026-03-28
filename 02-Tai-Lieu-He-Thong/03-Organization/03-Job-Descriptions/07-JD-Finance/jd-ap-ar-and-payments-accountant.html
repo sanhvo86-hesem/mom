@@ -1,55 +1,11 @@
-
- thead { display: table-header-group; }
- tfoot { display: table-footer-group; }
- p { orphans: 3; widows: 3; }
- 
-}
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
-.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
-.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
-.raci-A {background:#fff5f5; color:#c92a2a;}
-.raci-R {background:#e7f5ff; color:#1864ab;}
-.raci-C {background:#fff9db; color:#e67700;}
-.raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
-.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
-.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
-.doc-link-list {list-style:none; margin:0; padding:0;}
-.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
-.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
-.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
-.svg-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
-.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
-kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
-
-/* JD-LAYOUT-PLUS */
-.jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
-.jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
-.jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
-.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
-.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
-.muted-note{font-size:12px; color:var(--ink2,#475569);}
-.raci-badge{display:inline-block; min-width:26px; text-align:center; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;}
-.raci-a{background:#fff3e0; color:#b45309;}
-.raci-r{background:#e0f2fe; color:#0369a1;}
-.raci-c{background:#f3e8ff; color:#7e22ce;}
-.raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
-.comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
-.comp-card ul{margin-bottom:0;}
-.require-table th{width:24%;}
-.inline-note{margin-top:8px; font-size:12px; color:var(--ink2,#475569);}
-@media (max-width: 960px){ .auth-grid,.comp-grid{grid-template-columns:1fr;} }
-
-}
-
-</style>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>JD-APAR — AP/AR and Payments Accountant | HESEM QMS</title>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../../assets/style.css">
 </head>
 <body>
 <div class="container">
@@ -57,22 +13,22 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu kiểm soát</span>
 </div>
 </div>
 <div class="title">
-<strong>JD-AP-AR-AND-thanh toán-KẾ TOÁN — AP/AR &amp; Thanh toán Kế toán</strong>
-<span class="sub-vn">Kế toán Công nợ &amp; Thanh toán</span>
+<strong>JD-APAR — AP/AR and Payments Accountant</strong>
+<span class="sub-vn">Ke toan cong no va thanh toan</span>
 </div>
 <div class="meta">
-<div class="row"><span><b>Code:</b></span><span>JD-AP-AR-AND-thanh toán-KẾ TOÁN</span></div>
-<div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>HR Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Mã:</b></span><span>JD-APAR</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="role-cluster"><a class="role-link" href="../08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="role-cluster"><a class="role-link" href="../01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -88,8 +44,8 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2">1. Thông tin vị trí (Vị trí / Chức vụ ID &amp; tiêu đề)</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
-<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-AP-AR-AND-thanh toán-KẾ TOÁN</td></tr>
-<tr><th>Chức danh theo tài liệu</th><td>AP/AR &amp; Thanh toán Kế toán</td></tr>
+<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-APAR</td></tr>
+<tr><th>Mã vai trò dùng trong SOP/RACI</th><td><span class="role-cluster"><a class="role-link" href="jd-ap-ar-and-payments-accountant.html" title="AP/AR and Payments Accountant (Ke toan cong no va thanh toan)"><span class="role-code">APAR</span></a></span></td></tr><tr><th>Chức danh theo tài liệu</th><td>AP/AR and Payments Accountant</td></tr>
 <tr><th>Bộ phận</th><td>Finance</td></tr>
 <tr><th>Cấp vai trò</th><td>Chuyên nghiệp / Nhân viên</td></tr>
 <tr><th>Nhóm vai trò</th><td>Finance / kế toán / kiểm soát nội bộ</td></tr>
@@ -100,7 +56,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Hóa đơn/thu thập/thanh toán cycle → theo dõi công nợ → thanh toán → đối soát ngân hàng và hồ sơ liên quan AP/AR.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>AP/AR &amp; Thanh toán Kế toán là Người giữ nhịp tiền vào – tiền ra hằng Ngày của doanh nghiệp, bảo đảm mọi khoản thu, khoản chi và công nợ đều đi qua hồ sơ đầy đủ, đúng đối tượng, đúng thời điểm và đúng kiểm soát nội bộ.</p><p>Vị trí này không chỉ "hạch toán thanh toán" mà còn phải bảo vệ dòng tiền, minh bạch công nợ, ngăn thanh toán sai / trùng / thiếu phê duyệt và hỗ trợ khả năng ra quyết định tín dụng – mua hàng – giao hàng của công ty.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>AP và AR được cập nhật kịp thời, phản ánh đúng nghĩa vụ thanh toán / thu tiền thực tế của doanh nghiệp.</li><li>Mọi đợt thanh toán và thu tiền có đối chiếu chứng từ, có bằng chứng phê duyệt và có khả năng truy vết kiểm toán.</li><li>Danh mục công nợ quá hạn, sai lệch chứng từ hoặc rủi ro dòng tiền được phát hiện sớm và đã báo cáo vượt cấp đúng lúc.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> AP/AR &amp; Thanh toán Kế toán chịu trách nhiệm dòng công nợ và thanh toán; không quyết định giá bán/mua, không phát hành lô giao hàng và không tự xử lý các ngoại lệ thương mại khi chưa có Responsible Person kinh doanh/phê duyệt.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Thực hiện AR/AP và thanh toán trên nền hồ sơ đã đối soát, không đẩy sai sót thương mại hay vận hành thành lỗi tài chính.</li><li>Bảo đảm hóa đơn/thanh toán ngoại lệ được nhìn thấy sớm và kéo đúng Responsible Person vào xử lý.</li><li>Giữ kỷ luật / chuyên ngành chứng từ và dòng tiền ở cấp giao dịch hàng ngày.</li></ul></div>
+<div class="jd-mission"><p>AP/AR &amp; Thanh toán Kế toán là Người giữ nhịp tiền vào – tiền ra hằng Ngày của doanh nghiệp, bảo đảm mọi khoản thu, khoản chi và công nợ đều đi qua hồ sơ đầy đủ, đúng đối tượng, đúng thời điểm và đúng kiểm soát nội bộ.</p><p>Vị trí này không chỉ "hạch toán thanh toán" mà còn phải bảo vệ dòng tiền, minh bạch công nợ, ngăn thanh toán sai / trùng / thiếu phê duyệt và hỗ trợ khả năng ra quyết định tín dụng – mua hàng – giao hàng của công ty.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>AP và AR được cập nhật kịp thời, phản ánh đúng nghĩa vụ thanh toán / thu tiền thực tế của doanh nghiệp.</li><li>Mọi đợt thanh toán và thu tiền có đối chiếu chứng từ, có bằng chứng phê duyệt và có khả năng truy vết kiểm toán.</li><li>Danh mục công nợ quá hạn, sai lệch chứng từ hoặc rủi ro dòng tiền được phát hiện sớm và đã báo cáo vượt cấp đúng lúc.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> AP/AR &amp; Thanh toán Kế toán chịu trách nhiệm dòng công nợ và thanh toán; không quyết định giá bán/mua, không phát hành lô giao hàng và không tự xử lý các ngoại lệ thương mại khi chưa có người chịu trách nhiệm kinh doanh/phê duyệt.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Thực hiện AR/AP và thanh toán trên nền hồ sơ đã đối soát, không đẩy sai sót thương mại hay vận hành thành lỗi tài chính.</li><li>Bảo đảm hóa đơn/thanh toán ngoại lệ được nhìn thấy sớm và kéo đúng người chịu trách nhiệm vào xử lý.</li><li>Giữ kỷ luật / chuyên ngành chứng từ và dòng tiền ở cấp giao dịch hàng ngày.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
@@ -123,7 +79,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tbody>
 <tr>
 <th style="width:26%">Điểm kết thúc trách nhiệm</th>
-<td>AP/AR &amp; Thanh toán Kế toán chịu trách nhiệm dòng công nợ và thanh toán; không quyết định giá bán/mua, không phát hành lô giao hàng và không tự xử lý các ngoại lệ thương mại khi chưa có Responsible Person kinh doanh/phê duyệt.</td>
+<td>AP/AR &amp; Thanh toán Kế toán chịu trách nhiệm dòng công nợ và thanh toán; không quyết định giá bán/mua, không phát hành lô giao hàng và không tự xử lý các ngoại lệ thương mại khi chưa có người chịu trách nhiệm kinh doanh/phê duyệt.</td>
 </tr>
 <tr>
 <th style="width:26%">Không thuộc trách nhiệm chính / phải đã báo cáo vượt cấp</th>
@@ -132,7 +88,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </tbody>
 </table>
 </div>
-<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng Responsible Person thay vì xử lý ngoài tuyến kiểm soát.</p>
+<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng người chịu trách nhiệm thay vì xử lý ngoài tuyến kiểm soát.</p>
 <p class="inline-note">Mọi thay đổi ảnh hưởng chất lượng, giao hàng, chi phí, phiên bản, phát hành hoặc truy vết phải tuân theo quy trình/hồ sơ liên kết tại Mục 12.</p>
 <h2 class="h2">5. Quyền hạn (Thẩm quyền &amp; quyền ra quyết định (quyền)</h2>
 <div class="auth-grid">
@@ -151,7 +107,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </thead>
 <tbody>
 <tr>
-<th style="width:20%">Finance Manager</th>
+<th style="width:20%"><span class="role-cluster"><a class="role-link" href="jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="role-code">FIN</span></a></span></th>
 <td><p>Nhận chính sách tín dụng, kiểm soát thanh toán, escalations về nợ quá hạn hoặc lệch dòng tiền.</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-r">R</span></td>
 <td>Công nợ và thanh toán bám đúng kiểm soát tài chính.</td>
@@ -184,7 +140,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </table>
 </div><p class="inline-note">Quy ước: R = đầu mối trực tiếp thực hiện/phản hồi; A = đầu mối chịu trách nhiệm cuối cùng trong tuyến phối hợp; C = cần tham vấn/bắt buộc đồng bộ trước khi tiếp tục; I = cần được thông tin để đồng bộ trạng thái.</p>
 <h2 class="h2">7. Đầu ra bắt buộc / hồ sơ quản trị</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nơi lưu / nguồn</th></tr></thead><tbody><tr><td>AP / AR tuổi tồn báo cáo</td><td>Báo cáo chi tiết công nợ phải trả, phải thu, quá hạn mục / hạng mục và ghi chú hành động theo từng khoản.</td><td>Tuần / tháng</td><td>Tuổi tồn báo cáo, Epicor / sổ công nợ.</td></tr><tr><td>thanh toán đề xuất &amp; thanh toán batch hồ sơ</td><td>Danh sách đề nghị thanh toán, hồ sơ phê duyệt, chứng từ ngân hàng và bằng chứng chuyển tiền.</td><td>Theo đợt thanh toán</td><td>thanh toán file, ngân hàng hồ sơ, hồ sơ AP.</td></tr><tr><td>Hóa đơn vấn đề &amp; thu thập hồ sơ</td><td>Hồ sơ xuất hóa đơn, hóa đơn Requests, bằng chứng giao hàng và log thu hồi công nợ / tranh chấp hóa đơn.</td><td>Ngày / tuần</td><td><a download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-821_Invoice_Request.xlsx">FRM-821</a>, <a download="" href="../../../../04-Bieu-Mau/06-FRM-600/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a>, hóa đơn sổ đăng ký / AR log.</td></tr><tr><td>ngân hàng đối soát &amp; chưa khớp item log</td><td>Đối chiếu ngân hàng, danh sách khoản treo / chưa khớp và hành động xử lý.</td><td>Ngày / tuần / tháng</td><td>ngân hàng đối soát file, GL hỗ trợ lịch trình.</td></tr><tr><td>sẵn sàng cho đánh giá thanh toán hồ sơ</td><td>Bộ hồ sơ thanh toán / công nợ đủ chứng từ, dễ truy xuất nguồn gốc và sẵn sàng cho kiểm toán / thuế.</td><td>Liên tục / tháng</td><td>dùng chung finance hồ sơ, hồ sơ số / bản cứng theo file plan.</td></tr><tr><td>AR/AP ngoại lệ log</td><td>Danh sách lệch chứng từ, hóa đơn/thanh toán holds, Responsible Person xử lý và trạng thái kết thúc / đóng để không làm trôi lỗi tài chính-vận hành.</td><td>Ngày / tuần</td><td>AR/AP các log; <a download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-821_Invoice_Request.xlsx">FRM-821</a>; phiếu nhận / biên nhận/lô giao hàng hồ sơ.</td></tr></tbody></table></div>
+<div class="table-card"><table class="table"><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nơi lưu / nguồn</th></tr></thead><tbody><tr><td>AP / AR tuổi tồn báo cáo</td><td>Báo cáo chi tiết công nợ phải trả, phải thu, quá hạn mục / hạng mục và ghi chú hành động theo từng khoản.</td><td>Tuần / tháng</td><td>Tuổi tồn báo cáo, Epicor / sổ công nợ.</td></tr><tr><td>thanh toán đề xuất &amp; thanh toán batch hồ sơ</td><td>Danh sách đề nghị thanh toán, hồ sơ phê duyệt, chứng từ ngân hàng và bằng chứng chuyển tiền.</td><td>Theo đợt thanh toán</td><td>thanh toán file, ngân hàng hồ sơ, hồ sơ AP.</td></tr><tr><td>Hóa đơn vấn đề &amp; thu thập hồ sơ</td><td>Hồ sơ xuất hóa đơn, hóa đơn Requests, bằng chứng giao hàng và log thu hồi công nợ / tranh chấp hóa đơn.</td><td>Ngày / tuần</td><td><a download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-821_Invoice_Request.xlsx">FRM-821</a>, <a download="" href="../../../../04-Bieu-Mau/06-FRM-600/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a>, hóa đơn sổ đăng ký / AR log.</td></tr><tr><td>ngân hàng đối soát &amp; chưa khớp item log</td><td>Đối chiếu ngân hàng, danh sách khoản treo / chưa khớp và hành động xử lý.</td><td>Ngày / tuần / tháng</td><td>ngân hàng đối soát file, GL hỗ trợ lịch trình.</td></tr><tr><td>sẵn sàng cho đánh giá thanh toán hồ sơ</td><td>Bộ hồ sơ thanh toán / công nợ đủ chứng từ, dễ truy xuất nguồn gốc và sẵn sàng cho kiểm toán / thuế.</td><td>Liên tục / tháng</td><td>dùng chung finance hồ sơ, hồ sơ số / bản cứng theo file plan.</td></tr><tr><td>AR/AP ngoại lệ log</td><td>Danh sách lệch chứng từ, hóa đơn/thanh toán holds, người chịu trách nhiệm xử lý và trạng thái kết thúc / đóng để không làm trôi lỗi tài chính-vận hành.</td><td>Ngày / tuần</td><td>AR/AP các log; <a download="" href="../../../../04-Bieu-Mau/08-FRM-800/FRM-821_Invoice_Request.xlsx">FRM-821</a>; phiếu nhận / biên nhận/lô giao hàng hồ sơ.</td></tr></tbody></table></div>
 <h2 class="h2">8. KPI cá nhân</h2>
 <div class="table-card"><table class="table"><thead><tr><th>KPI trọng yếu</th><th>Cách đo / nguồn dữ liệu</th><th>Chu kỳ theo dõi</th></tr></thead><tbody><tr><td>quá hạn AR control</td><td>Giá trị và tỷ lệ công nợ khách hàng quá hạn so với tổng phải thu; hiệu quả thu hồi theo kế hoạch.</td><td>Tuần / tháng</td></tr><tr><td>On-time thanh toán thực thi</td><td>Tỷ lệ thanh toán nhà cung cấp / chi phí được thực hiện đúng hạn, đúng hồ sơ và không phát sinh lỗi chuyển tiền.</td><td>Tuần / tháng</td></tr><tr><td>Hóa đơn / thanh toán tài liệu độ chính xác</td><td>Tỷ lệ hồ sơ hóa đơn và thanh toán đạt 3-way khớp / phù hợp / đủ phê duyệt ngay lần đầu.</td><td>Tháng</td></tr><tr><td>ngân hàng đối soát đúng hạn</td><td>Mức độ hoàn thành đối chiếu ngân hàng và xử lý khoản treo đúng hạn.</td><td>Tháng</td></tr><tr><td>chưa áp dụng / tranh chấp item tuổi tồn</td><td>Số lượng và tuổi của các khoản chưa khớp / tranh chấp chưa được xử lý.</td><td>Tháng</td></tr><tr><td>Control tuân thủ</td><td>Số lỗi kiểm soát nội bộ, trùng lặp rủi ro hoặc vi phạm bảo mật dữ liệu tài chính phát hiện trong kỳ.</td><td>Tháng / quý</td></tr><tr><td>Hóa đơn / thanh toán ngoại lệ tỷ lệ</td><td>Tỷ lệ giao dịch AR/AP phải giữ hoặc sửa do không khớp chứng từ, trạng thái lô giao hàng/phiếu nhận / biên nhận hoặc phê duyệt chuỗi.</td><td>Tháng</td></tr></tbody></table></div>
 <h2 class="h2">9. Yêu cầu năng lực (Năng lực Yêu cầu)</h2>
@@ -216,8 +172,3 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </div>
 </body>
 </html>
-
-
-
-
-

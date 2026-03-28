@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANNEX-114 — Go-Live runbook, cutover control và hypercare command center | HESEM QMS</title>
-<link href="../../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../../assets/style.css" rel="stylesheet">
 <style>
 .hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f7fbff 0%,#fff9ef 100%);margin:0 0 18px;}
 .hero h1{margin:0 0 8px;font-size:24px;color:var(--navy);}
@@ -34,7 +34,7 @@
 
 <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Annex số hóa</span>
@@ -48,18 +48,18 @@
  <div class="row"><span><b>Version:</b></span><span>V1</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
  <div class="row"><span><b>Owner:</b></span><span>Cutover Lead / QMS Manager / IT Manager</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
 </div>
 
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Áp dụng cho mọi go-live hoặc cutover liên quan đến tài liệu vận hành, M365 hồ sơ, dashboard điều hành, routing metadata, access production, release package, workflow, pilot chuyển sang production và handoff sang hypercare.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Áp dụng cho mọi go-live hoặc cutover liên quan đến tài liệu vận hành, M365 hồ sơ, dashboard điều hành, routing metadata, access production, release package, workflow, pilot chuyển sang production và handoff sang hypercare.</div>
 
 <div class="hero">
  <h1>ANNEX-114 — Runbook điều hành Ngày go-live và 14 Ngày đầu sau triển khai</h1>
  <p>Mọi go-live phải có runbook theo mốc thời gian, Người chỉ huy, severity rõ, rollback trigger rõ, kênh liên lạc rõ và bằng chứng rõ. Không cho phép triển khai kiểu "ai rảnh thì xử lý" hoặc chỉ dựa vào chat nhóm.</p>
 </div>
 
-<div class="callout"><strong>PHẢI</strong><br/>Go-live chỉ được phép diễn ra khi đã chốt đủ 6 lớp: Người quyết định, Người vận hành, dữ liệu nguồn, dashboard trạng thái, fallback và kênh hỗ trợ Người dùng. Thiếu một lớp thì dừng go-live.</div>
+<div class="callout"><strong>PHẢI</strong><br>Go-live chỉ được phép diễn ra khi đã chốt đủ 6 lớp: Người quyết định, Người vận hành, dữ liệu nguồn, dashboard trạng thái, fallback và kênh hỗ trợ Người dùng. Thiếu một lớp thì dừng go-live.</div>
 
 <div class="section">
  <h2>1. Vai trò trong cutover và hypercare</h2>
@@ -159,7 +159,7 @@
  <tr>
  <td>Data &amp; dashboard</td>
  <td>Dashboard có owner, source, last refresh, exception rule, baseline KPI</td>
- <td>Data Owner</td>
+ <td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="role-code">PD</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="role-code">ENGM</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Truong bo phan dam bao chat luong)"><span class="role-code">QA[QMR]</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="role-code">SCM</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="role-code">FIN</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="role-code">EHS</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="role-code">ITA</span></a></span></td>
  <td>Số không đáng tin hoặc không có nguồn thay thế được công bố</td>
  </tr>
  <tr>
@@ -386,19 +386,19 @@
  <tbody>
  <tr>
  <td>Kế hoạch triển khai</td>
- <td><a href="../../../02-Work-Instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html">WI-106</a><br/><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td>
+ <td><a href="../../../02-Work-Instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html">WI-106</a><br><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td>
  </tr>
  <tr>
  <td>Dashboard và dữ liệu</td>
- <td><a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a><br/><a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></td>
+ <td><a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a><br><a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></td>
  </tr>
  <tr>
  <td>Escalation và fallback</td>
- <td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a><br/><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a><br/><a href="../../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td>
+ <td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a><br><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a><br><a href="../../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td>
  </tr>
  <tr>
  <td>Điều hướng và evidence</td>
- <td><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a><br/><a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a><br/><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td>
+ <td><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a><br><a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a><br><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td>
  </tr>
  </tbody>
  </table>

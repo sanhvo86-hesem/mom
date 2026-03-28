@@ -1,0 +1,403 @@
+{
+  "model": "job-order-cnc",
+  "version": "2026-03-28",
+  "roles": {
+    "CEO": {
+      "jd_code": "JD-CEO",
+      "title_en": "Chief Executive Officer",
+      "title_vi": "Tong Giam doc",
+      "body_vi": "Tong Giam doc",
+      "department": "Executive",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html",
+      "hats_allowed": ["IC-BIZ"]
+    },
+    "PD": {
+      "jd_code": "JD-PD",
+      "title_en": "Production Director",
+      "title_vi": "Giam doc san xuat",
+      "body_vi": "Giam doc san xuat",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html",
+      "hats_allowed": ["IC-PROD"]
+    },
+    "CPS": {
+      "jd_code": "JD-CPS",
+      "title_en": "Cleaning and Packaging Supervisor",
+      "title_vi": "Giam sat ve sinh va dong goi",
+      "body_vi": "Giam sat ve sinh va dong goi",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html",
+      "hats_allowed": []
+    },
+    "CPT": {
+      "jd_code": "JD-CPT",
+      "title_en": "Cleaning and Packaging Technician",
+      "title_vi": "Ky thuat vien ve sinh va dong goi",
+      "body_vi": "Ky thuat vien ve sinh va dong goi",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-packaging-technician.html",
+      "hats_allowed": []
+    },
+    "OPR": {
+      "jd_code": "JD-OPR",
+      "title_en": "CNC Operator",
+      "title_vi": "Nhan vien van hanh CNC",
+      "body_vi": "Nhan vien van hanh CNC",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html",
+      "hats_allowed": []
+    },
+    "WKM": {
+      "jd_code": "JD-WKM",
+      "title_en": "CNC Workshop Manager",
+      "title_vi": "Quan ly phan xuong CNC",
+      "body_vi": "Quan ly phan xuong CNC",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html",
+      "hats_allowed": []
+    },
+    "DBL": {
+      "jd_code": "JD-DBL",
+      "title_en": "Deburr Team Lead",
+      "title_vi": "To truong pha ba via",
+      "body_vi": "To truong pha ba via",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html",
+      "hats_allowed": []
+    },
+    "DBT": {
+      "jd_code": "JD-DBT",
+      "title_en": "Deburr Technician",
+      "title_vi": "Ky thuat vien pha ba via",
+      "body_vi": "Ky thuat vien pha ba via",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-technician.html",
+      "hats_allowed": []
+    },
+    "MNT": {
+      "jd_code": "JD-MNT",
+      "title_en": "Maintenance Technician",
+      "title_vi": "Ky thuat vien bao tri",
+      "body_vi": "Ky thuat vien bao tri",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html",
+      "hats_allowed": []
+    },
+    "PIE": {
+      "jd_code": "JD-PIE",
+      "title_en": "Production Engineer / Industrial Engineer",
+      "title_vi": "Ky su san xuat / ky su cong nghiep",
+      "body_vi": "Ky su san xuat / ky su cong nghiep",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-engineer-industrial-engineer.html",
+      "hats_allowed": ["CI"]
+    },
+    "PPL": {
+      "jd_code": "JD-PPL",
+      "title_en": "Production Planner",
+      "title_vi": "Dieu do san xuat",
+      "body_vi": "Dieu do san xuat",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html",
+      "hats_allowed": []
+    },
+    "SET": {
+      "jd_code": "JD-SET",
+      "title_en": "Setup Technician",
+      "title_vi": "Ky thuat vien setup",
+      "body_vi": "Ky thuat vien setup",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html",
+      "hats_allowed": []
+    },
+    "SL": {
+      "jd_code": "JD-SL",
+      "title_en": "Shift Leader",
+      "title_vi": "Truong ca",
+      "body_vi": "Truong ca",
+      "department": "Production",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html",
+      "hats_allowed": []
+    },
+    "CAM": {
+      "jd_code": "JD-CAM",
+      "title_en": "CAM / NC Programmer",
+      "title_vi": "Lap trinh vien CAM / NC",
+      "body_vi": "Lap trinh vien CAM / NC",
+      "department": "Engineering",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html",
+      "hats_allowed": []
+    },
+    "DFM": {
+      "jd_code": "JD-DFM",
+      "title_en": "DFM Engineer",
+      "title_vi": "Ky su DFM",
+      "body_vi": "Ky su DFM",
+      "department": "Engineering",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html",
+      "hats_allowed": []
+    },
+    "ENGM": {
+      "jd_code": "JD-ENGM",
+      "title_en": "Engineering Lead / Manager",
+      "title_vi": "Truong nhom / quan ly ky thuat",
+      "body_vi": "Truong nhom / quan ly ky thuat",
+      "department": "Engineering",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html",
+      "hats_allowed": []
+    },
+    "PE": {
+      "jd_code": "JD-PE",
+      "title_en": "Process Engineer",
+      "title_vi": "Ky su quy trinh",
+      "body_vi": "Ky su quy trinh",
+      "department": "Engineering",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html",
+      "hats_allowed": []
+    },
+    "IAO": {
+      "jd_code": "JD-IAO",
+      "title_en": "Internal Auditor (Outsource)",
+      "title_vi": "Danh gia vien noi bo thue ngoai",
+      "body_vi": "Danh gia vien noi bo thue ngoai",
+      "department": "Quality",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-internal-auditor-outsource.html",
+      "hats_allowed": []
+    },
+    "MCS": {
+      "jd_code": "JD-MCS",
+      "title_en": "Metrology and Calibration Specialist",
+      "title_vi": "Chuyen vien do luong va hieu chuan",
+      "body_vi": "Chuyen vien do luong va hieu chuan",
+      "department": "Quality",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html",
+      "hats_allowed": []
+    },
+    "QA": {
+      "jd_code": "JD-QA",
+      "title_en": "QA Manager",
+      "title_vi": "Truong bo phan dam bao chat luong",
+      "body_vi": "Truong bo phan dam bao chat luong",
+      "department": "Quality",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html",
+      "hats_allowed": ["QMR", "PSO"]
+    },
+    "QC": {
+      "jd_code": "JD-QC",
+      "title_en": "QC Inspector / CMM Programmer-Operator",
+      "title_vi": "Nhan vien QC / lap trinh vien - van hanh CMM",
+      "body_vi": "Nhan vien QC / lap trinh vien - van hanh CMM",
+      "department": "Quality",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html",
+      "hats_allowed": []
+    },
+    "QCL": {
+      "jd_code": "JD-QCL",
+      "title_en": "QC Inspector Lead",
+      "title_vi": "To truong QC",
+      "body_vi": "To truong QC",
+      "department": "Quality",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html",
+      "hats_allowed": []
+    },
+    "QMS": {
+      "jd_code": "JD-QMS",
+      "title_en": "QMS Engineer",
+      "title_vi": "Ky su he thong QMS",
+      "body_vi": "Ky su he thong QMS",
+      "department": "Quality",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html",
+      "hats_allowed": ["DC", "LA"]
+    },
+    "QE": {
+      "jd_code": "JD-QE",
+      "title_en": "Quality Engineer",
+      "title_vi": "Ky su chat luong",
+      "body_vi": "Ky su chat luong",
+      "department": "Quality",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html",
+      "hats_allowed": []
+    },
+    "BUY": {
+      "jd_code": "JD-BUY",
+      "title_en": "Buyer / Purchasing",
+      "title_vi": "Nhan vien mua hang",
+      "body_vi": "Nhan vien mua hang",
+      "department": "Supply Chain",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html",
+      "hats_allowed": []
+    },
+    "LOG": {
+      "jd_code": "JD-LOG",
+      "title_en": "Logistics / Shipping Coordinator",
+      "title_vi": "Dieu phoi logistics / giao nhan",
+      "body_vi": "Dieu phoi logistics / giao nhan",
+      "department": "Supply Chain",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html",
+      "hats_allowed": []
+    },
+    "SCM": {
+      "jd_code": "JD-SCM",
+      "title_en": "Supply Chain Manager",
+      "title_vi": "Quan ly chuoi cung ung",
+      "body_vi": "Quan ly chuoi cung ung",
+      "department": "Supply Chain",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html",
+      "hats_allowed": []
+    },
+    "TOOL": {
+      "jd_code": "JD-TOOL",
+      "title_en": "Tool Crib / Tool Storekeeper",
+      "title_vi": "Thu kho dao cu",
+      "body_vi": "Thu kho dao cu",
+      "department": "Supply Chain",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html",
+      "hats_allowed": []
+    },
+    "WAR": {
+      "jd_code": "JD-WAR",
+      "title_en": "Warehouse Clerk",
+      "title_vi": "Nhan vien kho",
+      "body_vi": "Nhan vien kho",
+      "department": "Supply Chain",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html",
+      "hats_allowed": []
+    },
+    "CS": {
+      "jd_code": "JD-CS",
+      "title_en": "Customer Service",
+      "title_vi": "Nhan vien dich vu khach hang",
+      "body_vi": "Nhan vien dich vu khach hang",
+      "department": "Sales",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html",
+      "hats_allowed": []
+    },
+    "EST": {
+      "jd_code": "JD-EST",
+      "title_en": "Estimator",
+      "title_vi": "Nhan vien bao gia",
+      "body_vi": "Nhan vien bao gia",
+      "department": "Sales",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html",
+      "hats_allowed": []
+    },
+    "APAR": {
+      "jd_code": "JD-APAR",
+      "title_en": "AP/AR and Payments Accountant",
+      "title_vi": "Ke toan cong no va thanh toan",
+      "body_vi": "Ke toan cong no va thanh toan",
+      "department": "Finance",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-ap-ar-and-payments-accountant.html",
+      "hats_allowed": []
+    },
+    "FIN": {
+      "jd_code": "JD-FIN",
+      "title_en": "Finance Manager",
+      "title_vi": "Quan ly tai chinh",
+      "body_vi": "Quan ly tai chinh",
+      "department": "Finance",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html",
+      "hats_allowed": []
+    },
+    "GLP": {
+      "jd_code": "JD-GLP",
+      "title_en": "General Ledger and Payroll Accountant",
+      "title_vi": "Ke toan tong hop va tien luong",
+      "body_vi": "Ke toan tong hop va tien luong",
+      "department": "Finance",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-general-ledger-and-payroll-accountant.html",
+      "hats_allowed": []
+    },
+    "HR": {
+      "jd_code": "JD-HR",
+      "title_en": "HR Manager",
+      "title_vi": "Quan ly nhan su",
+      "body_vi": "Quan ly nhan su",
+      "department": "HR",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html",
+      "hats_allowed": []
+    },
+    "EHS": {
+      "jd_code": "JD-EHS",
+      "title_en": "EHS Specialist",
+      "title_vi": "Chuyen vien EHS",
+      "body_vi": "Chuyen vien EHS",
+      "department": "EHS",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html",
+      "hats_allowed": ["IC-EHS"]
+    },
+    "ESA": {
+      "jd_code": "JD-ESA",
+      "title_en": "Epicor System Administrator",
+      "title_vi": "Quan tri vien he thong Epicor",
+      "body_vi": "Quan tri vien he thong Epicor",
+      "department": "IT",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html",
+      "hats_allowed": ["IC-IT"]
+    },
+    "ITA": {
+      "jd_code": "JD-ITA",
+      "title_en": "IT Admin",
+      "title_vi": "Quan tri vien CNTT",
+      "body_vi": "Quan tri vien CNTT",
+      "department": "IT",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html",
+      "hats_allowed": ["IC-IT"]
+    }
+  },
+  "hats": {
+    "QMR": {
+      "label_en": "Quality Management Representative",
+      "label_vi": "Dai dien lanh dao ve chat luong",
+      "host_roles": ["QA"]
+    },
+    "DC": {
+      "label_en": "Document Controller",
+      "label_vi": "Dieu phoi kiem soat tai lieu",
+      "host_roles": ["QMS"]
+    },
+    "LA": {
+      "label_en": "Lead Auditor",
+      "label_vi": "Truong nhom danh gia",
+      "host_roles": ["QMS"]
+    },
+    "CI": {
+      "label_en": "Continuous Improvement Lead",
+      "label_vi": "Dau moi cai tien lien tuc",
+      "host_roles": ["PIE"]
+    },
+    "PSO": {
+      "label_en": "Product Safety Officer",
+      "label_vi": "Dau moi an toan san pham",
+      "host_roles": ["QA"]
+    },
+    "IC-BIZ": {
+      "label_en": "Incident Commander - Business",
+      "label_vi": "Chi huy xu ly su co cap doanh nghiep",
+      "host_roles": ["CEO"]
+    },
+    "IC-PROD": {
+      "label_en": "Incident Commander - Production",
+      "label_vi": "Chi huy xu ly su co san xuat",
+      "host_roles": ["PD"]
+    },
+    "IC-EHS": {
+      "label_en": "Incident Commander - EHS",
+      "label_vi": "Chi huy xu ly su co EHS",
+      "host_roles": ["EHS"]
+    },
+    "IC-IT": {
+      "label_en": "Incident Commander - Digital / IT",
+      "label_vi": "Chi huy xu ly su co he thong so / CNTT",
+      "host_roles": ["ITA", "ESA"]
+    }
+  },
+  "bundles": {
+    "FUNC_HEADS": ["PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA"],
+    "TOP_MGMT": ["CEO", "PD", "QA[QMR]", "ENGM", "SCM", "FIN"],
+    "AREA_LEADS": ["SL", "WKM", "CPS", "QCL"],
+    "COMMERCIAL_FRONT": ["CS", "EST"],
+    "QUALITY_CORE": ["QA", "QE", "QCL", "QC", "QMS", "MCS"],
+    "ENG_RELEASE_CORE": ["ENGM", "DFM", "PE", "CAM"]
+  }
+}

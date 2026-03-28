@@ -161,11 +161,13 @@ Bảng 3 cột:
 |---------|------------|------------------|
 | QMS Engineer | Rà soát cấu trúc, kiểm tra cross-ref | Quyền từ chối phát hành nếu thiếu cross-review |
 | QA Manager | Phê duyệt tài liệu cấp SOP | Điểm chặn: Không phê duyệt = không phát hành |
-| Document Owner | Soạn thảo, cập nhật, theo dõi hiệu lực | Chịu trách nhiệm nội dung chính xác |
+| QMS[DC] hoặc role bundle JD-linked phù hợp | Soạn thảo, cập nhật, theo dõi hiệu lực theo phạm vi SOP | Chịu trách nhiệm nội dung theo đúng role boundary đã chốt |
 
 - Cột "Quyền / Điểm chặn" rất quan trọng — cho biết ai có quyền dừng quy trình.
 - Mọi owner giữ gate trong Section 6 và mọi vai trò có quyền bàn giao / gỡ hold trong Section 7 đều phải xuất hiện ở Section 4.
 - Nếu SOP dùng RACI matrix thay cho bảng 3 cột, vẫn PHẢI thể hiện rõ ai có quyền chặn và ai có quyền gỡ hold.
+- Không dùng placeholder mơ hồ như `Process Owner`, `Department Head`, `Responsible Person`, `Data Owner`, `Top Management` trong dòng vai trò của Section 4; phải resolve thành role code JD-linked hoặc explicit role bundle.
+- Header, Section 4, Section 6 và Section 8 ưu tiên role code chip/link JD; thân đoạn văn mới dùng tên English đầy đủ khi cần.
 
 ### Section 5: Đầu vào, đầu ra & điều kiện tiên quyết
 

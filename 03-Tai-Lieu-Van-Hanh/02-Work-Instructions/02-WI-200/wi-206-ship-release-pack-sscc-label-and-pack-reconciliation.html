@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WI-206 — Ship Phát hành Pack, SSCC Label and Pack Đối soát | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../assets/style.css">
 <style>
 
 
@@ -49,7 +49,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="page-body">
  <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
@@ -61,15 +61,15 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
  <div class="row"><span><b>Owner:</b></span><span>QA Manager / Kho Manager / Giao vận Lead / Kinh doanh-Customer Dịch vụ Manager</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
  </div>
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi lô giao hàng có cổng kiểm soát release; bắt buộc áp dụng khi có PackID/Shipment, khi có yêu cầu SSCC hoặc customer label, khi có giao hàng một phầnment, relabel, repack, split shipment hoặc khi phải bàn giao bộ chứng từ giao hàng cho khách/vận chuyển.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi lô giao hàng có cổng kiểm soát release; bắt buộc áp dụng khi có PackID/Shipment, khi có yêu cầu SSCC hoặc customer label, khi có giao hàng một phầnment, relabel, repack, split shipment hoặc khi phải bàn giao bộ chứng từ giao hàng cho khách/vận chuyển.</div>
  <h1>WI-206 — bộ hồ sơ phê duyệt giao hàng, nhãn SSCC, đối soát kiện và bàn giao xác nhận giao hàng</h1>
  
 <div class="section"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
 <p>WI này quy định cách lập <b>Bộ hồ sơ phê duyệt giao hàng</b>, gán <b>SSCC</b>, đối soát inner-pack/outer-pack/logistic unit và bàn giao sang bước <b>Xác nhận giao hàng</b>. WI này áp dụng cho mọi lô xuất có kiểm soát chất lượng và áp dụng thêm khi khách hàng yêu cầu GS1/SSCC, customer label overlay, chứng từ vật liệu, chứng từ công đoạn đặc biệt, hoặc giao hàng một phầnment.</p>
-<div class="callout-danger"><strong>QUYỀN DỪNG</strong><br/>QA, Warehouse, Shipping, Sales/Customer Service và Người có thẩm quyền release có quyền dừng xuất khi phát hiện sai part, sai rev, sai qty, sai lot/serial, sai SSCC, sai nhãn khách hàng, thiếu chứng từ, bao gói hỏng, hoặc bộ bằng chứng chưa đủ. <b>PHẢI</b> hoàn tất hồ sơ trước khi xác nhận giao hàng.</div></div>
+<div class="callout-danger"><strong>QUYỀN DỪNG</strong><br>QA, Warehouse, Shipping, Sales/Customer Service và Người có thẩm quyền release có quyền dừng xuất khi phát hiện sai part, sai rev, sai qty, sai lot/serial, sai SSCC, sai nhãn khách hàng, thiếu chứng từ, bao gói hỏng, hoặc bộ bằng chứng chưa đủ. <b>PHẢI</b> hoàn tất hồ sơ trước khi xác nhận giao hàng.</div></div>
 
 <div class="section"><h2>2. Thuật ngữ vận hành bắt buộc</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thuật ngữ</th><th>Ý nghĩa dùng trong HESEM</th></tr></thead><tbody>
@@ -89,15 +89,15 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Source data</td><td>Part, Rev, Qty, Lot/Serial, SO/PO, Ship-to, carrier/service, customer PN nếu áp dụng, dữ liệu label đều lấy từ SoR/SSOT hiệu lực</td><td>Dữ liệu lấy từ email/chat/Excel rời hoặc có nhiều nguồn mâu thuẫn</td></tr>
 <tr><td>Packaging condition</td><td>Bao gói đáp ứng <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a> và yêu cầu khách hàng; kiện sạch, không FOD, không hỏng</td><td>Bao gói chưa đạt, thiếu vật tư, thiếu ảnh/bằng chứng hoặc còn nguy cơ nhiễm bẩn</td></tr>
 </tbody></table></div>
-<div class="callout-info"><strong>SoR / SSOT</strong><br/>Trạng thái lô giao hàng, PackID, số lượng, phân bổ và xác nhận giao hàng phải lấy từ SoR giao dịch. Evidence, ảnh, bảng kiểm, lịch sử phê duyệt và liên kết chứng từ phải nằm trong SSOT hồ sơ. Không được duy trì "bộ hồ sơ giao hàng riêng" ngoài hệ thống.</div></div>
+<div class="callout-info"><strong>SoR / SSOT</strong><br>Trạng thái lô giao hàng, PackID, số lượng, phân bổ và xác nhận giao hàng phải lấy từ SoR giao dịch. Evidence, ảnh, bảng kiểm, lịch sử phê duyệt và liên kết chứng từ phải nằm trong SSOT hồ sơ. Không được duy trì "bộ hồ sơ giao hàng riêng" ngoài hệ thống.</div></div>
 
 <div class="section"><h2>4. Lập cấu trúc kiện và gán SSCC</h2>
 <div class="step-list">
-<div class="step-item"><strong>Khóa quantity đủ điều kiện giao.</strong><br/>Chốt quantity theo line / lot / serial / WO. Nếu là giao hàng một phầnment phải ghi rõ quantity còn lại và quantity kỳ này; không gộp lẫn giữa quantity đã release và quantity chưa release.</div>
-<div class="step-item"><strong>Xác định cấu trúc pack.</strong><br/>Xác định mỗi logistic unit chứa gì, bao nhiêu, thuộc lot nào, serial range nào, có inner pack nào bên trong, có item lẻ hoặc accessory kèm theo hay không.</div>
-<div class="step-item"><strong>Cấp PackID và SSCC.</strong><br/>Mỗi logistic unit phải có PackID và khi job áp dụng GS1 phải có 01 SSCC duy nhất. SSCC không được tái sử dụng; nhãn lỗi phải VOID chứ không xóa dấu vết.</div>
-<div class="step-item"><strong>In nhãn từ template kiểm soát.</strong><br/>Nhãn phải lấy từ mẫu được kiểm soát, đọc được bằng mắt và bằng scan, không che barcode bằng băng keo mờ, không in tạm bằng file cá nhân.</div>
-<div class="step-item"><strong>Quét và xác minh 100%.</strong><br/>Quét từng nhãn sau in và sau dán. Chuỗi SSCC, human-readable text, Part/Rev/Qty/Ship-to và reference dữ liệu phải khớp với pack structure đã khóa.</div>
+<div class="step-item"><strong>Khóa quantity đủ điều kiện giao.</strong><br>Chốt quantity theo line / lot / serial / WO. Nếu là giao hàng một phầnment phải ghi rõ quantity còn lại và quantity kỳ này; không gộp lẫn giữa quantity đã release và quantity chưa release.</div>
+<div class="step-item"><strong>Xác định cấu trúc pack.</strong><br>Xác định mỗi logistic unit chứa gì, bao nhiêu, thuộc lot nào, serial range nào, có inner pack nào bên trong, có item lẻ hoặc accessory kèm theo hay không.</div>
+<div class="step-item"><strong>Cấp PackID và SSCC.</strong><br>Mỗi logistic unit phải có PackID và khi job áp dụng GS1 phải có 01 SSCC duy nhất. SSCC không được tái sử dụng; nhãn lỗi phải VOID chứ không xóa dấu vết.</div>
+<div class="step-item"><strong>In nhãn từ template kiểm soát.</strong><br>Nhãn phải lấy từ mẫu được kiểm soát, đọc được bằng mắt và bằng scan, không che barcode bằng băng keo mờ, không in tạm bằng file cá nhân.</div>
+<div class="step-item"><strong>Quét và xác minh 100%.</strong><br>Quét từng nhãn sau in và sau dán. Chuỗi SSCC, human-readable text, Part/Rev/Qty/Ship-to và reference dữ liệu phải khớp với pack structure đã khóa.</div>
 </div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống đóng gói</th><th>Quy tắc bắt buộc</th><th>Thẩm quyền tối thiểu</th></tr></thead><tbody>
 <tr><td>Một dòng giao hàng — một đơn vị hậu cần</td><td>01 PackID / 01 SSCC / 01 bộ bằng chứng</td><td>Kho/Giao vận</td></tr>
@@ -116,7 +116,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Vật liệu / thuê ngoài</td><td>Khi khách hàng hoặc Requests kỹ thuật Requests</td><td>MTR/CoC vật liệu, chứng từ chứng nhận công đoạn đặc biệt, bộ hồ sơ thuê ngoài, chuỗi mẻ nhiệt/lô</td></tr>
 <tr><td>Vận chuyển / xuất khẩu / chứng từ khách hàng</td><td>Khi áp dụng</td><td>AWB/BOL/theo dõi, nhãn theo Requests khách hàng, chứng từ thương mại, xuất xứ hàng hóa</td></tr>
 </tbody></table></div>
-<div class="callout-warn"><strong>Quy tắc chứng từ</strong><br/>Nếu lô giao hàng chia nhiều đợt, mỗi đợt phải có bộ hồ sơ phê duyệt giao hàng riêng. Chứng từ chung chỉ được dùng lại khi quy định khách hàng cho phép và phải trỏ đúng lô giao hàng Current.</div></div>
+<div class="callout-warn"><strong>Quy tắc chứng từ</strong><br>Nếu lô giao hàng chia nhiều đợt, mỗi đợt phải có bộ hồ sơ phê duyệt giao hàng riêng. Chứng từ chung chỉ được dùng lại khi quy định khách hàng cho phép và phải trỏ đúng lô giao hàng Current.</div></div>
 
 <div class="section"><h2>6. Đối soát kiện trong ↔ kiện ngoài ↔ lô giao hàng</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bước đối soát</th><th>Yêu cầu ĐẠT</th><th>Performer</th></tr></thead><tbody>
@@ -127,7 +127,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Tình trạng bao gói</td><td>niêm phong, đệm / chống sốc, chất hút ẩm/VCI/ESD/bao gói sạch theo Requests kỹ thuật; kiện không bẹp, không rách, không bẩn</td><td>Kho</td></tr>
 <tr><td>Độ đầy đủ của bằng chứng</td><td>Ảnh nhãn, ảnh kiện, bảng kiểm, phê duyệt hồ sơ và liên kết chứng từ chứng nhận truy cập được</td><td>QA / Kho</td></tr>
 </tbody></table></div>
-<div class="keyline"><strong>Quy tắc trộn lô / trộn mã</strong><br/>Không trộn mã chi tiết khác nhau vào cùng đơn vị hậu cần trừ khi có quy cách đóng gói hoặc hướng dẫn của khách hàng cho phép bằng văn bản. Không trộn lô/số sê-ri nếu truy xuất nguồn gốc nguồn gốc hoặc chứng từ Requests tách riêng. Khi buộc phải giao kèm phụ kiện, phải thể hiện rõ trên cấu trúc kiện và phiếu đóng gói.</div></div>
+<div class="keyline"><strong>Quy tắc trộn lô / trộn mã</strong><br>Không trộn mã chi tiết khác nhau vào cùng đơn vị hậu cần trừ khi có quy cách đóng gói hoặc hướng dẫn của khách hàng cho phép bằng văn bản. Không trộn lô/số sê-ri nếu truy xuất nguồn gốc nguồn gốc hoặc chứng từ Requests tách riêng. Khi buộc phải giao kèm phụ kiện, phải thể hiện rõ trên cấu trúc kiện và phiếu đóng gói.</div></div>
 
 <div class="section"><h2>7. Phê duyệt, dán nhãn lại/đóng gói lại và bàn giao xác nhận giao hàng</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thay đổi phát sinh</th><th>Được phép làm gì</th><th>Ai phê duyệt</th><th>Hồ sơ phải cập nhật</th></tr></thead><tbody>

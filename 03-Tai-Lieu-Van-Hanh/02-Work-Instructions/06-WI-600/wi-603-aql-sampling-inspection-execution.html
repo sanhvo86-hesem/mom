@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WI-603 — Thực hiện lấy mẫu AQL, chọn mẫu và quyết định chấp nhận/từ chối lô | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../assets/style.css">
 
 <style>
 
@@ -47,7 +47,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="page-body">
  <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
@@ -58,11 +58,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="row"><span><b>Code:</b></span><span>WI-603</span></div>
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QA Manager / QC Team Leader</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Owner:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a><span class="role-sep">/</span><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="role-code">QCL</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
  </div>
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi quyết định chấp nhận/từ chối theo lô ở đầu vào / nhận hàng, IPQC hoặc Final theo kế hoạch AQL hiệu lực.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi quyết định chấp nhận/từ chối theo lô ở đầu vào / nhận hàng, IPQC hoặc Final theo kế hoạch AQL hiệu lực.</div>
  <h1>WI-603 — Thực hiện lấy mẫu AQL, chọn mẫu và quyết định chấp nhận/từ chối lô</h1>
  
 <div class="section"><h2>1. Mục đích, phạm vi và logic lô kiểm</h2>
@@ -79,12 +79,12 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>3. Trình tự thực hiện AQL</h2>
 <div class="step-list">
-<div class="step-item"><strong>Chốt lot và đơn vị kiểm.</strong><br/>Ghi rõ lot size, kiểm tra unit, QPL/customer level, trạng thái normal/tightened/reduced và nguồn plan sử dụng.</div>
-<div class="step-item"><strong>Tra cỡ mẫu và Ac/Re.</strong><br/>Tra theo lot size và kiểm tra level trong bảng đã phê duyệt. Nếu lot nhỏ hoặc customer chỉ định 100% thì không dùng AQL để giảm mẫu.</div>
-<div class="step-item"><strong>Lấy mẫu nMẫu nhiên.</strong><br/>Mẫu phải rải đều qua toàn lô hoặc toàn kiện; không lấy liên tiếp trong một khay duy nhất nếu lot phân bố nhiều vị trí/thời điểm. Với lot có nhiều pallet/box/khay, phải có quy tắc random hóa từng tầng chứa.</div>
-<div class="step-item"><strong>Kiểm và ghi defect.</strong><br/>Kiểm theo plan, phân loại defect từng chiếc, từng loại. Không được cộng dồn mơ hồ. Defect critical tách riêng khỏi major/minor.</div>
-<div class="step-item"><strong>Quyết định accept/reject.</strong><br/>So defect count với Ac/Re; reject lô khi vượt Re hoặc khi xuất hiện bất kỳ critical defect thuộc rule zero acceptance. Nếu plan nhiều bước yêu cầu sample tiếp theo, phải tuân đúng logic.</div>
-<div class="step-item"><strong>Xử lý sau quyết định.</strong><br/>Accept thì release lô theo cổng kiểm soát tương ứng. Reject thì giữ lô, mở containment/NCR nếu cần và xác định hướng 100% sort/rework/reinspect dưới quyền QA.</div>
+<div class="step-item"><strong>Chốt lot và đơn vị kiểm.</strong><br>Ghi rõ lot size, kiểm tra unit, QPL/customer level, trạng thái normal/tightened/reduced và nguồn plan sử dụng.</div>
+<div class="step-item"><strong>Tra cỡ mẫu và Ac/Re.</strong><br>Tra theo lot size và kiểm tra level trong bảng đã phê duyệt. Nếu lot nhỏ hoặc customer chỉ định 100% thì không dùng AQL để giảm mẫu.</div>
+<div class="step-item"><strong>Lấy mẫu nMẫu nhiên.</strong><br>Mẫu phải rải đều qua toàn lô hoặc toàn kiện; không lấy liên tiếp trong một khay duy nhất nếu lot phân bố nhiều vị trí/thời điểm. Với lot có nhiều pallet/box/khay, phải có quy tắc random hóa từng tầng chứa.</div>
+<div class="step-item"><strong>Kiểm và ghi defect.</strong><br>Kiểm theo plan, phân loại defect từng chiếc, từng loại. Không được cộng dồn mơ hồ. Defect critical tách riêng khỏi major/minor.</div>
+<div class="step-item"><strong>Quyết định accept/reject.</strong><br>So defect count với Ac/Re; reject lô khi vượt Re hoặc khi xuất hiện bất kỳ critical defect thuộc rule zero acceptance. Nếu plan nhiều bước yêu cầu sample tiếp theo, phải tuân đúng logic.</div>
+<div class="step-item"><strong>Xử lý sau quyết định.</strong><br>Accept thì release lô theo cổng kiểm soát tương ứng. Reject thì giữ lô, mở containment/NCR nếu cần và xác định hướng 100% sort/rework/reinspect dưới quyền QA.</div>
 </div></div>
 
 <div class="section"><h2>4. chuyển đổi quy tắc, kiểm tra lại và lỗi thường gặp</h2>
@@ -103,10 +103,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="card"><h3>HOLD bắt buộc</h3><ul class="tight" style="padding-left:18px;"><li>Không xác định được lot boundary hoặc mixed lot.</li><li>Không xác định được plan hiệu lực.</li><li>Measurement system nghi ngờ hoặc defect class còn tranh cãi.</li><li>Phát hiện critical defect hoặc dấu hiệu sample bias.</li></ul></div>
 </div>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>KPI-WI603-01</strong><br/>Tỷ lệ từ chối theo lot và theo khuyết tật class.</div>
-<div class="kpi-box"><strong>KPI-WI603-02</strong><br/>Số lần chuyển siết chặt / thắt chặt/giảm sai quy tắc.</div>
-<div class="kpi-box"><strong>KPI-WI603-03</strong><br/>Tỷ lệ tái kiểm do lot định nghĩa/mẫu sai lệch hệ thống sai.</div>
-<div class="kpi-box"><strong>KPI-WI603-04</strong><br/>Tỷ lệ từ chối lot sau đó phát hiện nguyên nhân thuộc đo lường system.</div>
+<div class="kpi-box"><strong>KPI-WI603-01</strong><br>Tỷ lệ từ chối theo lot và theo khuyết tật class.</div>
+<div class="kpi-box"><strong>KPI-WI603-02</strong><br>Số lần chuyển siết chặt / thắt chặt/giảm sai quy tắc.</div>
+<div class="kpi-box"><strong>KPI-WI603-03</strong><br>Tỷ lệ tái kiểm do lot định nghĩa/mẫu sai lệch hệ thống sai.</div>
+<div class="kpi-box"><strong>KPI-WI603-04</strong><br>Tỷ lệ từ chối lot sau đó phát hiện nguyên nhân thuộc đo lường system.</div>
 </div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../01-SOPs/06-SOP-600/sop-603-aql-sampling-inspection.html">SOP-603</a></td><td>Khung AQL và scope áp dụng.</td></tr>

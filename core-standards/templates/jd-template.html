@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{{JD_CODE}} — {{TITLE_EN}} | HESEM QMS</title>
+<link href="{{RELATIVE_PATH}}/assets/style.css" rel="stylesheet"/>
+<style>
+.jd-purpose{margin:12px 0 18px;background:var(--bg2);border:1px solid var(--ln);border-left:3px solid var(--blue);border-radius:8px;padding:12px 14px}
+.jd-mission{background:#eef6ff;border:1px solid #cfe0ff;border-left:3px solid #2563eb;border-radius:8px;padding:14px 16px;margin:8px 0 18px}
+.auth-grid,.comp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.auth-item,.comp-card,.backup-card{padding:12px 14px;border:1px solid var(--ln);border-radius:8px;background:var(--bg)}
+.backup-card{border-left:3px solid #0f766e;margin-top:10px}
+.inline-note{margin-top:8px;font-size:12px;color:var(--ink2)}
+.require-table th{width:24%}
+@media(max-width:960px){.auth-grid,.comp-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="{{RELATIVE_PATH}}/assets/hesem-logo.svg"/></a>
+<div class="fh-company">
+<a href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu hệ thống</span>
+</div>
+</div>
+<div class="title">
+<strong>{{JD_CODE}} — {{TITLE_EN}}</strong>
+<span class="sub-vn">{{TITLE_VI}}</span>
+</div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span>{{JD_CODE}}</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_HTML}}</span></div>
+</div>
+</div>
+
+<div class="doc-content" id="docContent">
+<div class="form-sheet">
+
+<div class="preface-block">
+<p><b>Bộ phận</b> {{DEPARTMENT_VI}} &nbsp;&nbsp; <b>Vai trò trong chuỗi giá trị</b> {{VALUE_STREAM_ROLE}} &nbsp;&nbsp; <b>Tài liệu liên đới</b> {{LINKED_DOCS_INLINE}}</p>
+</div>
+
+<div class="jd-purpose">
+<p>{{JD_PURPOSE_BLOCK}}</p>
+</div>
+
+<div class="note-blue" style="margin:12px 0">
+<b>Vị trí trong hệ thống 8 cổng (G0→G7):</b> {{ROLE_GATE_NOTE}}<br/>
+→ Xem {{ROLE_BOUNDARY_REFERENCE}}
+</div>
+
+<h2 class="h2">1. Thông tin vị trí (Vị trí / Chức vụ ID &amp; tiêu đề)</h2>
+<div class="table-card">
+<table class="table require-table"><tbody>
+<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>{{JD_CODE}}</td></tr>
+<tr><th>Mã vai trò dùng trong SOP/RACI</th><td>{{ROLE_CODE_HTML}}</td></tr>
+<!-- Chỉ giữ hàng dưới nếu role thật sự có governance hat -->
+<tr><th>Mũ quản trị có thể gắn</th><td>{{HATS_HTML_OPTIONAL}}</td></tr>
+<tr><th>Chức danh theo tài liệu</th><td>{{TITLE_EN}}</td></tr>
+<tr><th>Bộ phận</th><td>{{DEPARTMENT_EN}}</td></tr>
+<tr><th>Cấp vai trò</th><td>{{ROLE_LEVEL}}</td></tr>
+<tr><th>Nhóm vai trò</th><td>{{ROLE_FAMILY}}</td></tr>
+<tr><th>Báo cáo trực tiếp cho</th><td>{{REPORTS_TO}}</td></tr>
+<tr><th>Quản lý trực tiếp</th><td>{{DIRECT_REPORTS_SCOPE}}</td></tr>
+<tr><th>Phối hợp chức năng chính</th><td>{{PRIMARY_INTERFACES}}</td></tr>
+<tr><th>Hệ thống / công cụ vận hành chính</th><td>{{SYSTEMS_AND_TOOLS}}</td></tr>
+<tr><th>Vai trò trong chuỗi giá trị</th><td>{{VALUE_STREAM_ROLE}}</td></tr>
+</tbody></table>
+</div>
+
+<h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
+<div class="jd-mission">
+<p>{{MISSION_P1}}</p>
+<p>{{MISSION_P2}}</p>
+<div class="callout">
+<p><b>Kết quả vị trí phải tạo ra</b></p>
+<ul>
+<li>{{OUTCOME_1}}</li>
+<li>{{OUTCOME_2}}</li>
+<li>{{OUTCOME_3}}</li>
+</ul>
+</div>
+<p class="inline-note"><b>Ranh giới vị trí:</b> {{ROLE_BOUNDARY_NOTE}}</p>
+</div>
+
+<h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
+<div class="table-card">
+<table class="table require-table"><tbody>
+<tr><th>Báo cáo trực tiếp</th><td>{{REPORTS_TO}}</td></tr>
+<tr><th>Nhân sự báo cáo trực tiếp</th><td>{{DIRECT_REPORTS_SCOPE}}</td></tr>
+<tr><th>Tuyến phối hợp chức năng</th><td>{{PRIMARY_INTERFACES}}</td></tr>
+<tr><th>Interfaces nội bộ chính</th><td>{{INTERNAL_INTERFACES}}</td></tr>
+<tr><th>Interfaces bên ngoài</th><td>{{EXTERNAL_INTERFACES}}</td></tr>
+<tr><th>Phạm vi vị trí</th><td>{{ROLE_SCOPE}}</td></tr>
+</tbody></table>
+</div>
+
+<h2 class="h2">4. Trách nhiệm chính (Key Trách nhiệm)</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th style="width:26%">Nhóm trách nhiệm</th><th>Nội dung trách nhiệm</th></tr></thead>
+<tbody>
+<tr><th style="width:26%">{{RESP_BLOCK_1_TITLE}}</th><td>{{RESP_BLOCK_1_BODY}}</td></tr>
+<tr><th style="width:26%">{{RESP_BLOCK_2_TITLE}}</th><td>{{RESP_BLOCK_2_BODY}}</td></tr>
+<tr><th style="width:26%">{{RESP_BLOCK_3_TITLE}}</th><td>{{RESP_BLOCK_3_BODY}}</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 class="h2">5. Quyền hạn &amp; điểm chặn</h2>
+<div class="auth-grid">
+<div class="auth-item"><p><b>Quyền quyết định</b></p><p>{{AUTH_DECISION}}</p></div>
+<div class="auth-item"><p><b>Điểm chặn bắt buộc</b></p><p>{{AUTH_HOLD}}</p></div>
+<div class="auth-item"><p><b>Không được vượt quyền</b></p><p>{{AUTH_LIMIT}}</p></div>
+<div class="auth-item"><p><b>Escalation bắt buộc</b></p><p>{{AUTH_ESCALATION}}</p></div>
+</div>
+
+<h2 class="h2">6. Deliverables &amp; hồ sơ phải giữ</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Deliverable / hồ sơ</th><th>Nội dung phải có</th><th>Chu kỳ</th><th>Hồ sơ / hệ thống</th></tr></thead>
+<tbody>
+<tr><td>{{DELIVERABLE_1}}</td><td>{{DELIVERABLE_1_RULE}}</td><td>{{DELIVERABLE_1_FREQ}}</td><td>{{DELIVERABLE_1_RECORD}}</td></tr>
+<tr><td>{{DELIVERABLE_2}}</td><td>{{DELIVERABLE_2_RULE}}</td><td>{{DELIVERABLE_2_FREQ}}</td><td>{{DELIVERABLE_2_RECORD}}</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 class="h2">7. KPI cá nhân</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>KPI trọng yếu</th><th>Cách đo / nguồn dữ liệu</th><th>Chu kỳ theo dõi</th></tr></thead>
+<tbody>
+<tr><td>{{KPI_1}}</td><td>{{KPI_1_RULE}}</td><td>{{KPI_1_FREQ}}</td></tr>
+<tr><td>{{KPI_2}}</td><td>{{KPI_2_RULE}}</td><td>{{KPI_2_FREQ}}</td></tr>
+<tr><td>{{KPI_3}}</td><td>{{KPI_3_RULE}}</td><td>{{KPI_3_FREQ}}</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 class="h2">8. Yêu cầu năng lực (Năng lực Yêu cầu)</h2>
+<div class="comp-grid">
+<div class="comp-card"><p><b>Kiến thức chuyên môn &amp; hệ thống</b></p><ul><li>{{COMPETENCY_TECH_1}}</li><li>{{COMPETENCY_TECH_2}}</li></ul></div>
+<div class="comp-card"><p><b>Năng lực hành vi / phối hợp</b></p><ul><li>{{COMPETENCY_BEHAVIOR_1}}</li><li>{{COMPETENCY_BEHAVIOR_2}}</li></ul></div>
+</div>
+<p class="inline-note">{{COMPETENCY_NOTE}}</p>
+
+<h2 class="h2">9. Học vấn, kinh nghiệm &amp; yêu cầu tuyển dụng</h2>
+<div class="table-card">
+<table class="table require-table"><tbody>
+<tr><th>Trình độ / chứng chỉ</th><td>{{EDUCATION}}</td></tr>
+<tr><th>Kinh nghiệm</th><td>{{EXPERIENCE}}</td></tr>
+<tr><th>Hệ thống / công cụ cần dùng</th><td>{{TOOLS_REQUIRED}}</td></tr>
+<tr><th>Điều kiện / đặc thù công việc</th><td>{{JOB_CONDITIONS}}</td></tr>
+<tr><th>Lưu ý tuyển dụng ưu tiên</th><td>{{HIRING_PRIORITY}}</td></tr>
+</tbody></table>
+</div>
+
+<h2 class="h2">10. Người thay thế / kế nhiệm tạm thời</h2>
+<div class="backup-card">
+<p><b>Chính / Sơ cấp Backup:</b> {{BACKUP_PRIMARY}}</p>
+<p><b>Thứ cấp / Phụ Backup:</b> {{BACKUP_SECONDARY}}</p>
+<p><b>Giới hạn quyền khi thay thế:</b> {{BACKUP_LIMIT}}</p>
+<p><b>Nguyên tắc kích hoạt:</b> {{BACKUP_TRIGGER}}</p>
+</div>
+
+<h2 class="h2">11. Tài liệu liên kết</h2>
+<div class="table-card">
+<table class="table">
+<tbody>
+<tr><th style="width:28%">SOP cốt lõi</th><td>{{LINKED_SOPS}}</td></tr>
+<tr><th style="width:28%">WI / Reference / System</th><td>{{LINKED_WI_ANNEX}}</td></tr>
+<tr><th style="width:28%">Biểu mẫu / hồ sơ</th><td>{{LINKED_FRMS}}</td></tr>
+<tr><th style="width:28%">Academy / năng lực</th><td>{{LINKED_TRAINING}}</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 class="h2">12. Ghi chú chuẩn hóa role-code</h2>
+<div class="note-soft">
+<b>Bắt buộc:</b> Header owner/approver dùng role chip; `Chức danh theo tài liệu` giữ plain English title; không dùng placeholder như `Responsible Person`, `Department Head`, `Top Management`, `Supervisor` để thay cho JD thật.
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

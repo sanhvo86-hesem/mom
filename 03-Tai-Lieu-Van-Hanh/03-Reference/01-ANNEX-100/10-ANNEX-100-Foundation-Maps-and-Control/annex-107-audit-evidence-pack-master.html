@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANNEX-107 — Bản gốc pack bằng chứng đánh giá, chéo-tham chiếu và hồ sơ map | HESEM QMS</title>
-<link rel="stylesheet" href="../../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../../assets/style.css">
 
 <style>
 
@@ -43,7 +43,7 @@ ul.tight li {margin:4px 0;}
  <div class="page-body">
  <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Annex</span>
@@ -55,10 +55,10 @@ ul.tight li {margin:4px 0;}
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
  <div class="row"><span><b>Owner:</b></span><span>QMS Manager / Tài liệu Control / Quy trình Owner</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
  </div>
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi chuẩn bị đánh giá nội bộ, đánh giá khách hàng, đánh giá chứng nhận và khi cần truy xuất nguồn gốc nhanh bằng chứng hệ thống hoặc bằng chứng theo Job.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi chuẩn bị đánh giá nội bộ, đánh giá khách hàng, đánh giá chứng nhận và khi cần truy xuất nguồn gốc nhanh bằng chứng hệ thống hoặc bằng chứng theo Job.</div>
  <h1>ANNEX-107 — Bản gốc pack bằng chứng đánh giá, chéo-tham chiếu và hồ sơ map</h1>
  
 <div class="section"><h2>1. Mục đích và mô hình 2 tầng của bộ bằng chứng</h2>
@@ -70,7 +70,7 @@ ul.tight li {margin:4px 0;}
 <p>Không được trộn lẫn hai tầng này thành một đống thư mục không chuẩn. Đánh giá viên hỏi hệ thống thì mở system pack. Đánh giá viên hỏi Job thì mở job pack. Cả hai phải liên kết được với nhau qua code, path và hồ sơ ID.</p></div>
 
 <div class="section"><h2>2. Cấu trúc bằng chứng bắt buộc theo chủ đề</h2>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Chủ đề</th><th>Evidence tối thiểu</th><th>Nơi lưu chuẩn</th><th>Responsible Person</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Chủ đề</th><th>Evidence tối thiểu</th><th>Nơi lưu chuẩn</th><th>người chịu trách nhiệm</th></tr></thead><tbody>
 <tr><td>Scope, quy trình map, thẩm quyền</td><td>Scope, quy trình map, ma trận thẩm quyền, RACI, KPI lan truyền / phân tầng.</td><td>System pack / QMS quản trị.</td><td>QMS + EXE.</td></tr>
 <tr><td>Tài liệu control</td><td>Lịch sử sửa đổi, phê duyệt, log thay đổi, được thay thế control, portal công bố / phát hành bằng chứng.</td><td>System pack / tài liệu control.</td><td>Tài liệu Control.</td></tr>
 <tr><td>Operations by Job</td><td>PO, mốc chuẩn, lộ trình gia công, mẫu đầu/FAI, trong quá trình/kiểm tra cuối, cert, bộ hồ sơ phê duyệt giao hàng (ship gói phát hành).</td><td>Hồ sơ công việc (hồ sơ công việc) theo <a href="../../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>.</td><td>Kế hoạch + QA + Kho.</td></tr>
@@ -80,9 +80,9 @@ ul.tight li {margin:4px 0;}
 
 <div class="section"><h2>3. Rule đặt tên, index và truy xuất nguồn gốc 60 giây</h2>
 <div class="step-list">
-<div class="step-item"><strong>Quy tắc tên file.</strong><br/>Tên file phải đọc được bằng mắt: <span class="code">YYYYMMDD_Job-Part-Rev_RecordType_Version</span> hoặc sơ đồ cấu trúc đã chốt trong <a href="../../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>. Không dùng tên kiểu <span class="code">scan001</span>, <span class="code">new file</span>, <span class="code">IMG_...</span> làm hồ sơ chính thức.</div>
-<div class="step-item"><strong>Quy tắc index.</strong><br/>Mỗi bộ bằng chứng phải có index hoặc siêu dữ liệu đủ để trả lời 4 câu: hồ sơ gì, của Job nào/hệ thống nào, đang ở đâu, ai chịu trách nhiệm.</div>
-<div class="step-item"><strong>60-thứ hai / giây truy xuất diễn tập.</strong><br/>QMS phải có khả năng truy bất kỳ bằng chứng đã khai báo trong tối đa 60 giây bằng đường dẫn, siêu dữ liệu, filter hoặc search hợp lệ. Tìm không ra trong 60 giây thì coi như hệ thống chưa sẵn sàng đánh giá.</div>
+<div class="step-item"><strong>Quy tắc tên file.</strong><br>Tên file phải đọc được bằng mắt: <span class="code">YYYYMMDD_Job-Part-Rev_RecordType_Version</span> hoặc sơ đồ cấu trúc đã chốt trong <a href="../../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>. Không dùng tên kiểu <span class="code">scan001</span>, <span class="code">new file</span>, <span class="code">IMG_...</span> làm hồ sơ chính thức.</div>
+<div class="step-item"><strong>Quy tắc index.</strong><br>Mỗi bộ bằng chứng phải có index hoặc siêu dữ liệu đủ để trả lời 4 câu: hồ sơ gì, của Job nào/hệ thống nào, đang ở đâu, ai chịu trách nhiệm.</div>
+<div class="step-item"><strong>60-thứ hai / giây truy xuất diễn tập.</strong><br>QMS phải có khả năng truy bất kỳ bằng chứng đã khai báo trong tối đa 60 giây bằng đường dẫn, siêu dữ liệu, filter hoặc search hợp lệ. Tìm không ra trong 60 giây thì coi như hệ thống chưa sẵn sàng đánh giá.</div>
 </div>
 <div class="callout-warning"><strong>PHẢI</strong> đưa bằng chứng vào SSOT có link/hồ sơ kiểm soát; không để bằng chứng chỉ tồn tại trong email cá nhân, chat, điện thoại cá nhân hoặc máy tính bàn nội bộ / tại chỗ.</div></div>
 
@@ -110,7 +110,3 @@ ul.tight li {margin:4px 0;}
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
-
-
-
-

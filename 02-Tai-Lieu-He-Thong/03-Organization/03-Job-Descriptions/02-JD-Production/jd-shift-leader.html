@@ -1,55 +1,11 @@
-
- thead { display: table-header-group; }
- tfoot { display: table-footer-group; }
- p { orphans: 3; widows: 3; }
- 
-}
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
-.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
-.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
-.raci-A {background:#fff5f5; color:#c92a2a;}
-.raci-R {background:#e7f5ff; color:#1864ab;}
-.raci-C {background:#fff9db; color:#e67700;}
-.raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
-.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
-.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
-.doc-link-list {list-style:none; margin:0; padding:0;}
-.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
-.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
-.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
-.svg-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
-.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
-kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
-
-/* JD-LAYOUT-PLUS */
-.jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
-.jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
-.jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
-.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
-.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
-.muted-note{font-size:12px; color:var(--ink2,#475569);}
-.raci-badge{display:inline-block; min-width:26px; text-align:center; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;}
-.raci-a{background:#fff3e0; color:#b45309;}
-.raci-r{background:#e0f2fe; color:#0369a1;}
-.raci-c{background:#f3e8ff; color:#7e22ce;}
-.raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
-.comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
-.comp-card ul{margin-bottom:0;}
-.require-table th{width:24%;}
-.inline-note{margin-top:8px; font-size:12px; color:var(--ink2,#475569);}
-@media (max-width: 960px){ .auth-grid,.comp-grid{grid-template-columns:1fr;} }
-
-}
-
-</style>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>JD-SL — Shift Leader | HESEM QMS</title>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../../assets/style.css">
 </head>
 <body>
 <div class="container">
@@ -57,22 +13,22 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu kiểm soát</span>
 </div>
 </div>
 <div class="title">
-<strong>JD-SHIFT-trưởng nhóm — Shift Leader – Ca 1 / Ca 2</strong>
-<span class="sub-vn">Team Leader Ca – Ca 1 / Ca 2</span>
+<strong>JD-SL — Shift Leader</strong>
+<span class="sub-vn">Truong ca</span>
 </div>
 <div class="meta">
-<div class="row"><span><b>Code:</b></span><span>JD-SHIFT-trưởng nhóm</span></div>
-<div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>HR Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Mã:</b></span><span>JD-SL</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="role-cluster"><a class="role-link" href="../08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="role-cluster"><a class="role-link" href="../01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -84,9 +40,9 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2">1. Thông tin vị trí (Vị trí / Chức vụ ID &amp; tiêu đề)</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
-<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-SHIFT-trưởng nhóm</td></tr>
-<tr><th>Chức danh theo tài liệu</th><td>Shift Leader – Ca 1 / Ca 2</td></tr>
-<tr><th>Bộ phận</th><td>Sản xuất</td></tr>
+<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-SL</td></tr>
+<tr><th>Mã vai trò dùng trong SOP/RACI</th><td><span class="role-cluster"><a class="role-link" href="jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="role-code">SL</span></a></span></td></tr><tr><th>Chức danh theo tài liệu</th><td>Shift Leader</td></tr>
+<tr><th>Bộ phận</th><td>Production</td></tr>
 <tr><th>Cấp vai trò</th><td>Supervisor / Lead</td></tr>
 <tr><th>Nhóm vai trò</th><td>Sản xuất / điều hành mặt bằng xưởng / kiểm soát thực thi</td></tr>
 <tr><th>Báo cáo trực tiếp cho</th><td>CNC Workshop Manager.</td></tr>
@@ -96,7 +52,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>Điều hành ca sản xuất tại hiện trường: khởi động, nhân lực, đầu ra, phản ứng to bất thường, shift báo cáo và bàn giao ca.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>Shift Leader là Người giữ nhịp vận hành trong suốt ca sản xuất. Vị trí này bảo đảm ca được khởi động đúng điều kiện, bất thường được phát hiện sớm, đã báo cáo vượt cấp đúng tuyến và bàn giao ca kế tiếp bằng thông tin đầy đủ, có thể hành động được.</p><p>Đây là vị trí "mắt xích hiện trường" giữa kế hoạch sản xuất và thực thi tại máy; chất lượng của ca phụ thuộc lớn vào năng lực kiểm soát mức sẵn sàng, phản ứng bất thường và kỷ luật ghi nhận của vị trí này.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mỗi ca có trạng thái máy / job / nhân sự / mức sẵn sàng rõ ràng ngay từ đầu và được cập nhật liên tục trong ca.</li><li>Bất thường không bị "ôm lại" hoặc che giấu trong ca; mọi vấn đề có Responsible Person, ETA và tuyến escalation phù hợp.</li><li>Thông tin bàn giao ca đủ để ca sau tiếp quản ngay, không mất thời gian dò lại phiên bản, trạng thái hold, tuổi dao (tool tuổi thọ / vòng đời) hay công việc dang dở.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Shift Leader quản thực thi của một ca nhưng không thay quyền của Planner, Kỹ thuật, QA hay Customer Dịch vụ; nhiệm vụ chính là bảo đảm ca chạy đúng tài liệu và đã báo cáo vượt cấp đúng khi có bất thường.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Điều hành ca dựa trên mức sẵn sàng thật, không giao Người/giao máy theo thói quen khi job chưa đủ điều kiện chạy.</li><li>Bảo đảm mọi bất thường được dừng đúng, Mọi đúng Người, ghi đúng log và bàn giao ca sau bằng thông tin dùng được ngay.</li><li>Giữ nhịp kỷ luật mặt bằng xưởng về dòng / chuyền thông quan / giải phóng, FOD, mẫu kiểm tra, escalation và phản hồi hiện trường về điều phối xuất hàng/trung tâm điều hành (control tháp / cột).</li></ul></div>
+<div class="jd-mission"><p>Shift Leader là Người giữ nhịp vận hành trong suốt ca sản xuất. Vị trí này bảo đảm ca được khởi động đúng điều kiện, bất thường được phát hiện sớm, đã báo cáo vượt cấp đúng tuyến và bàn giao ca kế tiếp bằng thông tin đầy đủ, có thể hành động được.</p><p>Đây là vị trí "mắt xích hiện trường" giữa kế hoạch sản xuất và thực thi tại máy; chất lượng của ca phụ thuộc lớn vào năng lực kiểm soát mức sẵn sàng, phản ứng bất thường và kỷ luật ghi nhận của vị trí này.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mỗi ca có trạng thái máy / job / nhân sự / mức sẵn sàng rõ ràng ngay từ đầu và được cập nhật liên tục trong ca.</li><li>Bất thường không bị "ôm lại" hoặc che giấu trong ca; mọi vấn đề có người chịu trách nhiệm, ETA và tuyến escalation phù hợp.</li><li>Thông tin bàn giao ca đủ để ca sau tiếp quản ngay, không mất thời gian dò lại phiên bản, trạng thái hold, tuổi dao (tool tuổi thọ / vòng đời) hay công việc dang dở.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Shift Leader quản thực thi của một ca nhưng không thay quyền của Planner, Kỹ thuật, QA hay Customer Dịch vụ; nhiệm vụ chính là bảo đảm ca chạy đúng tài liệu và đã báo cáo vượt cấp đúng khi có bất thường.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Điều hành ca dựa trên mức sẵn sàng thật, không giao Người/giao máy theo thói quen khi job chưa đủ điều kiện chạy.</li><li>Bảo đảm mọi bất thường được dừng đúng, Mọi đúng Người, ghi đúng log và bàn giao ca sau bằng thông tin dùng được ngay.</li><li>Giữ nhịp kỷ luật mặt bằng xưởng về dòng / chuyền thông quan / giải phóng, FOD, mẫu kiểm tra, escalation và phản hồi hiện trường về điều phối xuất hàng/trung tâm điều hành (control tháp / cột).</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
@@ -132,14 +88,14 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <p style="font-size:12px;margin:4px 0;">G0 Contract → G1 Engineering ‖ G2 IQC → G3 Setup → G4 FAI → G5 IPQC → G6 Final QC → G7 Ship</p>
 <ul class="tight">
 <li><b>G3 Setup</b> — Tham vấn (C): xác nhận mức sẵn sàng nhân sự ca, phân ca cho setup.</li>
-<li><b>G5 IPQC</b> — Chủ trì (&#9733;): điều hành ca sản xuất, giám sát vận hành, phản ứng bất thường, kỷ luật tự kiểm và bàn giao ca.</li>
+<li><b>G5 IPQC</b> — Chủ trì (★): điều hành ca sản xuất, giám sát vận hành, phản ứng bất thường, kỷ luật tự kiểm và bàn giao ca.</li>
 </ul></div>
-<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng Responsible Person thay vì xử lý ngoài tuyến kiểm soát.</p>
+<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng người chịu trách nhiệm thay vì xử lý ngoài tuyến kiểm soát.</p>
 <p class="inline-note">Mọi thay đổi ảnh hưởng chất lượng, giao hàng, chi phí, phiên bản, phát hành hoặc truy vết phải tuân theo quy trình/hồ sơ liên kết tại Mục 12.</p>
 <h2 class="h2">5. Quyền hạn (Thẩm quyền &amp; quyền ra quyết định (quyền)</h2>
 <div class="auth-grid">
 <div class="auth-item">Dừng job hoặc dừng máy trong ca khi có dấu hiệu mất an toàn, sai phiên bản, rủi ro CTQ hoặc thiếu điều kiện chạy.</div><div class="auth-item">Điều chỉnh phân Worker sự trong ca để ổn định dòng chảy công việc và xử lý điểm nghẽn hiện trường.</div><div class="auth-item">Yêu cầu hỗ trợ từ QC / Kỹ thuật / Bảo trì theo SLA khi bất thường phát sinh.</div><div class="auth-item">Từ chối bàn giao / nhận bàn giao ca nếu thông tin không đầy đủ hoặc chưa được làm rõ bằng log kiểm soát.</div>
-<div class="auth-item">Có quyền dừng vận hành tại ca và giữ chuyển giao ca khi chưa dòng / chuyền-clear xong, chưa chốt Responsible Person cho bất thường hoặc chưa đủ thông tin để ca sau tiếp quản an toàn.</div></div>
+<div class="auth-item">Có quyền dừng vận hành tại ca và giữ chuyển giao ca khi chưa dòng / chuyền-clear xong, chưa chốt người chịu trách nhiệm cho bất thường hoặc chưa đủ thông tin để ca sau tiếp quản an toàn.</div></div>
 <h2 class="h2">6. Interfaces liên phòng ban — RACI / Bàn giao</h2>
 <div class="table-card">
 <table class="table">
@@ -153,13 +109,13 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </thead>
 <tbody>
 <tr>
-<th style="width:20%">CNC Workshop Manager</th>
+<th style="width:20%"><span class="role-cluster"><a class="role-link" href="jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="role-code">WKM</span></a></span></th>
 <td><p>Nhận mục tiêu ca, ưu tiên job, kế hoạch nhân lực (plan) và các vấn đề cần theo dõi đặc biệt (theo dõi tiếp).</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-r">R</span></td>
 <td>Ca sản xuất bám đúng định hướng điều hành của phân xưởng.</td>
 </tr>
 <tr>
-<th style="width:20%">Production Planner</th>
+<th style="width:20%"><span class="role-cluster"><a class="role-link" href="jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="role-code">PPL</span></a></span></th>
 <td><p>Nhận điều phối xuất hàng list; phản hồi hoàn thành, trượt tiến độ, setup chậm trễ, machine xuống / Từng và đề xuất điều chỉnh thực tế.</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-c">C</span></td>
 <td>Kế hoạch có dữ liệu thực để cập nhật lịch.</td>
@@ -186,9 +142,9 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </table>
 </div><p class="inline-note">Quy ước: R = đầu mối trực tiếp thực hiện/phản hồi; A = đầu mối chịu trách nhiệm cuối cùng trong tuyến phối hợp; C = cần tham vấn/bắt buộc đồng bộ trước khi tiếp tục; I = cần được thông tin để đồng bộ trạng thái.</p>
 <h2 class="h2">7. Đầu ra bắt buộc / hồ sơ quản trị</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nơi lưu / nguồn</th></tr></thead><tbody><tr><td>Shift mức sẵn sàng hồ sơ</td><td>Tình trạng Người – máy – job – gói hồ sơ – rủi ro của đầu ca.</td><td>Ca</td><td>Bảng ca / log hiện trường / SSOT sản xuất.</td></tr><tr><td>Shift Bàn giao Log</td><td>Nội dung bàn giao, job tồn, job hold, bất thường chưa đóng, Responsible Person và ETA.</td><td>Ca</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>, SSOT sản xuất.</td></tr><tr><td>bất thường / escalation log</td><td>Danh sách vấn đề phát sinh trong ca và tuyến đã Mọi hỗ trợ.</td><td>Ca</td><td>Log ca, log tier cuộc họp.</td></tr><tr><td>Xác nhận chuyên cần / điểm danh / OT / nhiệm vụ phân công</td><td>Thông tin phân ca, OT và bố trí nhân sự phục vụ bảng lương / điều độ.</td><td>Ca / ngày</td><td>Log ca, hồ sơ HR / sản xuất.</td></tr><tr><td>Shift mức sẵn sàng &amp; bàn giao gói hàng</td><td>Báo cáo khởi động-off, bất thường/phản ứng log, nút thắt / điểm nghẽn trạng thái, Responsible Person pending, FOD/dòng / chuyền-clear xác nhận và bàn giao chi tiết cho ca kế tiếp.</td><td>Mỗi ca</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>; <a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-512_Downtime_Log.xlsx">FRM-512</a>; <a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a>; shift bảng; dòng / chuyền-clear hồ sơ.</td></tr></tbody></table></div>
+<div class="table-card"><table class="table"><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nơi lưu / nguồn</th></tr></thead><tbody><tr><td>Shift mức sẵn sàng hồ sơ</td><td>Tình trạng Người – máy – job – gói hồ sơ – rủi ro của đầu ca.</td><td>Ca</td><td>Bảng ca / log hiện trường / SSOT sản xuất.</td></tr><tr><td>Shift Bàn giao Log</td><td>Nội dung bàn giao, job tồn, job hold, bất thường chưa đóng, người chịu trách nhiệm và ETA.</td><td>Ca</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>, SSOT sản xuất.</td></tr><tr><td>bất thường / escalation log</td><td>Danh sách vấn đề phát sinh trong ca và tuyến đã Mọi hỗ trợ.</td><td>Ca</td><td>Log ca, log tier cuộc họp.</td></tr><tr><td>Xác nhận chuyên cần / điểm danh / OT / nhiệm vụ phân công</td><td>Thông tin phân ca, OT và bố trí nhân sự phục vụ bảng lương / điều độ.</td><td>Ca / ngày</td><td>Log ca, hồ sơ HR / sản xuất.</td></tr><tr><td>Shift mức sẵn sàng &amp; bàn giao gói hàng</td><td>Báo cáo khởi động-off, bất thường/phản ứng log, nút thắt / điểm nghẽn trạng thái, người chịu trách nhiệm pending, FOD/dòng / chuyền-clear xác nhận và bàn giao chi tiết cho ca kế tiếp.</td><td>Mỗi ca</td><td><a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a>; <a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-512_Downtime_Log.xlsx">FRM-512</a>; <a download="" href="../../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a>; shift bảng; dòng / chuyền-clear hồ sơ.</td></tr></tbody></table></div>
 <h2 class="h2">8. KPI cá nhân</h2>
-<div class="table-card"><table class="table"><thead><tr><th>KPI trọng yếu</th><th>Cách đo / nguồn dữ liệu</th><th>Chu kỳ theo dõi</th></tr></thead><tbody><tr><td>Đầu ra đạt được theo ca</td><td>Sản lượng / mốc việc hoàn thành so với kế hoạch ca.</td><td>Ca / tuần</td></tr><tr><td>Phế phẩm và thời gian Từng máy theo ca</td><td>Phế phẩm, dừng máy và nguyên nhân trực tiếp phát sinh trong ca.</td><td>Ca / tuần</td></tr><tr><td>Mẫu đầu &amp; phản hồi tuân thủ</td><td>Tỷ lệ mẫu đầu đúng quy trình và thời gian phản ứng bất thường trong ca.</td><td>Ca / tuần</td></tr><tr><td>Bàn giao tính đầy đủ</td><td>Tỷ lệ bàn giao ca đầy đủ, không tạo lỗ hổng thông tin cho ca sau.</td><td>Ca / tháng</td></tr><tr><td>Tính toàn vẹn hồ sơ trong ca</td><td>Mức độ đầy đủ của log, traveler, hold hồ sơ và escalation bằng chứng.</td><td>Ca / tuần</td></tr><tr><td>bất thường escalation on-time</td><td>Tỷ lệ sự kiện bất thường của ca được đã báo cáo vượt cấp đúng thời gian và có Responsible Person/ETA rõ ngay trong ca theo log bàn giao.</td><td>Tuần / tháng</td></tr></tbody></table></div>
+<div class="table-card"><table class="table"><thead><tr><th>KPI trọng yếu</th><th>Cách đo / nguồn dữ liệu</th><th>Chu kỳ theo dõi</th></tr></thead><tbody><tr><td>Đầu ra đạt được theo ca</td><td>Sản lượng / mốc việc hoàn thành so với kế hoạch ca.</td><td>Ca / tuần</td></tr><tr><td>Phế phẩm và thời gian Từng máy theo ca</td><td>Phế phẩm, dừng máy và nguyên nhân trực tiếp phát sinh trong ca.</td><td>Ca / tuần</td></tr><tr><td>Mẫu đầu &amp; phản hồi tuân thủ</td><td>Tỷ lệ mẫu đầu đúng quy trình và thời gian phản ứng bất thường trong ca.</td><td>Ca / tuần</td></tr><tr><td>Bàn giao tính đầy đủ</td><td>Tỷ lệ bàn giao ca đầy đủ, không tạo lỗ hổng thông tin cho ca sau.</td><td>Ca / tháng</td></tr><tr><td>Tính toàn vẹn hồ sơ trong ca</td><td>Mức độ đầy đủ của log, traveler, hold hồ sơ và escalation bằng chứng.</td><td>Ca / tuần</td></tr><tr><td>bất thường escalation on-time</td><td>Tỷ lệ sự kiện bất thường của ca được đã báo cáo vượt cấp đúng thời gian và có người chịu trách nhiệm/ETA rõ ngay trong ca theo log bàn giao.</td><td>Tuần / tháng</td></tr></tbody></table></div>
 <h2 class="h2">9. Yêu cầu năng lực (Năng lực Yêu cầu)</h2>
 <div class="comp-grid">
 <div class="comp-card"><p><b>Kiến thức chuyên môn &amp; hệ thống</b></p><ul><li>Hiểu traveler, phiếu cài đặt, mẫu đầu cổng kiểm soát, hold/tag, thời gian Từng máy mã, shift bàn giao và escalation matrix.</li><li>Có khả năng đọc tình trạng hiện trường nhanh và nhận diện sớm rủi ro về an toàn, phiên bản, truy xuất nguồn gốc, CTQ.</li></ul></div>
@@ -218,9 +174,3 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </div>
 </body>
 </html>
-
-
-
-
-
-

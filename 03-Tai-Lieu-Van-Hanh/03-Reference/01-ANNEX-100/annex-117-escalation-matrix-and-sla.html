@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANNEX-117 — Ma trận escalation, SLA phản ứng, liên lạc theo cấp và quyền quyết định | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../assets/style.css">
 <style>
  h1,h2,h3 { break-after: avoid; page-break-after: avoid; } }
 .page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
@@ -34,7 +34,7 @@
  <div class="page-body">
  <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Annex hệ thống</span>
@@ -46,11 +46,11 @@
  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / Ops Manager</span></div>
- <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
+ <div class="row"><span><b>Phê duyệt:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
  </div>
 
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi phát sinh sự kiện chất lượng, giao hàng, an toàn, máy móc, dữ liệu, khiếu nại, escalation sau giờ hoặc sự cố cần nâng cấp quyết định theo cấp.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi phát sinh sự kiện chất lượng, giao hàng, an toàn, máy móc, dữ liệu, khiếu nại, escalation sau giờ hoặc sự cố cần nâng cấp quyết định theo cấp.</div>
  <h1>ANNEX-117 — Ma trận escalation, SLA phản ứng, liên lạc theo cấp và quyền quyết định</h1>
 
  <div class="section">
@@ -63,10 +63,10 @@
  <div class="section">
  <h2>2. Nguyên tắc vận hành bắt buộc</h2>
  <div class="two-col">
- <div class="keyline"><b>2.1 Một sự kiện – một Người phụ trách điều phối</b><br/>Mỗi sự kiện chỉ có một Người điều phối chính để giữ nhật ký hành động, nhịp thông báo, quyết định họp war room và đóng sự kiện. Người điều phối không được đẩy trách nhiệm sang nhiều đầu mối song song.</div>
- <div class="keyline"><b>2.2 Containment đi trước phân tích</b><br/>Khi sự kiện có nguy cơ lan rộng, ưu tiên đầu tiên là chặn lan rộng: HOLD lot, cách ly part, dừng công đoạn, khóa shipment, đóng quyền truy cập, khóa revision hoặc chặn use-to-stock.</div>
- <div class="keyline"><b>2.3 Escalation theo ngưỡng, không theo cảm tính</b><br/>Nếu chạm ngưỡng của bảng trigger thì escalation tự động có hiệu lực, kể cả khi Người phụ trách cho rằng "có thể tự xử lý".</div>
- <div class="keyline"><b>2.4 Sau giờ vẫn phải xử lý</b><br/>Sự kiện phát sinh ngoài giờ, Ngày nghỉ, Ngày lễ vẫn áp dụng SLA. Không được đợi đến sáng hôm sau nếu sự kiện chạm ngưỡng Critical, ảnh hưởng shipment, safety, data integrity hoặc customer-facing commitment.</div>
+ <div class="keyline"><b>2.1 Một sự kiện – một Người phụ trách điều phối</b><br>Mỗi sự kiện chỉ có một Người điều phối chính để giữ nhật ký hành động, nhịp thông báo, quyết định họp war room và đóng sự kiện. Người điều phối không được đẩy trách nhiệm sang nhiều đầu mối song song.</div>
+ <div class="keyline"><b>2.2 Containment đi trước phân tích</b><br>Khi sự kiện có nguy cơ lan rộng, ưu tiên đầu tiên là chặn lan rộng: HOLD lot, cách ly part, dừng công đoạn, khóa shipment, đóng quyền truy cập, khóa revision hoặc chặn use-to-stock.</div>
+ <div class="keyline"><b>2.3 Escalation theo ngưỡng, không theo cảm tính</b><br>Nếu chạm ngưỡng của bảng trigger thì escalation tự động có hiệu lực, kể cả khi Người phụ trách cho rằng "có thể tự xử lý".</div>
+ <div class="keyline"><b>2.4 Sau giờ vẫn phải xử lý</b><br>Sự kiện phát sinh ngoài giờ, Ngày nghỉ, Ngày lễ vẫn áp dụng SLA. Không được đợi đến sáng hôm sau nếu sự kiện chạm ngưỡng Critical, ảnh hưởng shipment, safety, data integrity hoặc customer-facing commitment.</div>
  </div>
  </div>
 
@@ -88,11 +88,11 @@
  <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
  <thead><tr><th>Family</th><th>Trigger L2</th><th>Trigger L3</th><th>Trigger L4</th><th>Người phụ trách điều phối mặc định</th></tr></thead>
  <tbody>
- <tr><td>Quality / Conformity</td><td>NCR lặp lại; fail mẫu đầu; sai khác ảnh hưởng lot hiện hành.</td><td>CTQ/OOS; mixed trạng thái; nghi ngờ escape; missing mandatory bằng chứng trước release.</td><td>Escape đã ship, suspect counterfeit, mất truy xuất vật liệu cho hàng đã giao.</td><td>QA</td></tr>
+ <tr><td>Quality / Conformity</td><td>NCR lặp lại; fail mẫu đầu; sai khác ảnh hưởng lot hiện hành.</td><td>CTQ/OOS; mixed trạng thái; nghi ngờ escape; missing mandatory bằng chứng trước release.</td><td>Escape đã ship, suspect counterfeit, mất truy xuất vật liệu cho hàng đã giao.</td><td><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a></span></td></tr>
  <tr><td>Delivery / Planning</td><td>tuổi tồn WIP (tuổi tồn / tuổi tồn) vượt ngưỡng đỏ; hot job không có Người phụ trách; cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch) bị phá.</td><td>Nguy cơ miss ship date đã cam kết; machine bottleneck không có route thay thế; giao hàng một phần chưa được phê duyệt.</td><td>Customer stop line / penalty exposure / shipment blocked ở cửa giao.</td><td>Planning / Ops</td></tr>
- <tr><td>Machine / Tooling / Utility</td><td>Breakdown > 30 phút ở công đoạn nút cổ chai; tuổi dao (tool life) vượt ngưỡng.</td><td>Crash làm ảnh hưởng đường chạy dao/setup/part genealogy; utility event làm dừng nhiều cell.</td><td>Sự kiện gây mất an toàn, fire risk, electrical hazard hoặc ảnh hưởng nhiều job trọng yếu.</td><td>Ops / Maintenance</td></tr>
+ <tr><td>Machine / Tooling / Utility</td><td>Breakdown &gt; 30 phút ở công đoạn nút cổ chai; tuổi dao (tool life) vượt ngưỡng.</td><td>Crash làm ảnh hưởng đường chạy dao/setup/part genealogy; utility event làm dừng nhiều cell.</td><td>Sự kiện gây mất an toàn, fire risk, electrical hazard hoặc ảnh hưởng nhiều job trọng yếu.</td><td>Ops / Maintenance</td></tr>
  <tr><td>Cleanliness / FOD / Packaging</td><td>Monitoring vượt alert; phát hiện open-pack không đúng quy tắc; line clearance fail.</td><td>Particle trend vượt action limit; FOD found trong khu/pack; preservation window quá hạn.</td><td>Nhiễm bẩn có khả năng ảnh hưởng customer application; clean-state bị phá sau release.</td><td>QA / Ops</td></tr>
- <tr><td>Supplier / External provider</td><td>Chậm cert, chậm processor slot, missing bằng chứng khi receipt.</td><td>Processor scope không phù hợp; công đoạn đặc biệt fail; approved trạng thái xuống probation.</td><td>NCC gây escape lớn, vi phạm pháp lý, mất cert/approval bắt buộc cho job đang chạy.</td><td>Purchasing / QA</td></tr>
+ <tr><td>Supplier / External provider</td><td>Chậm cert, chậm processor slot, missing bằng chứng khi receipt.</td><td>Processor scope không phù hợp; công đoạn đặc biệt fail; approved trạng thái xuống probation.</td><td>NCC gây escape lớn, vi phạm pháp lý, mất cert/approval bắt buộc cho job đang chạy.</td><td><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="role-code">BUY</span></a><span class="role-sep">/</span><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a></span></td></tr>
  <tr><td>Data / System / Access</td><td>Luồng công việc lỗi làm chậm phê duyệt; folder sai path; user access mismatch cục bộ.</td><td>Data integrity risk giữa Epicor và M365; hồ sơ không khôi phục được; quyền cao cấp cấp sai cho user đang active.</td><td>Mất dữ liệu release/shipment; suspected cyber event; thay đổi trái phép ảnh hưởng quyết định quality/delivery.</td><td>IT / QMS</td></tr>
  <tr><td>Customer / Khiếu nại / Commercial</td><td>Khiếu nại cần phản hồi trong ngày; sai điều kiện giao hàng cần xác nhận lại.</td><td>RMA/warranty event; khiếu nại có nguy cơ lan sang nhiều shipment.</td><td>Recall, stop-ship, customer executive escalation, legal exposure.</td><td>Sales-CS / QA</td></tr>
  <tr><td>Safety / EHS</td><td>Sự cố suýt xảy ra (near-miss) nghiêm trọng; PPE fail ở công việc nguy cơ cao.</td><td>Recordable injury, chemical spill, compressed-air misuse, lifting event có nguy cơ tái diễn.</td><td>Severe injury, fire, evacuation, regulator-facing event.</td><td>HSE / Ops</td></tr>
@@ -109,7 +109,7 @@
  <tr><td>Containment ban đầu</td><td>≤ 2 giờ</td><td>≤ 1 giờ</td><td>Ngay lập tức / dừng ngay</td></tr>
  <tr><td>Escalation tới quản lý chức năng</td><td>≤ 2 giờ</td><td>≤ 30 phút</td><td>≤ 15 phút</td></tr>
  <tr><td>Escalation tới cấp điều hành</td><td>Khi miss SLA hoặc risk tăng cấp</td><td>≤ 2 giờ</td><td>≤ 30 phút</td></tr>
- <tr><td>Quyết định war room</td><td>Khi blocker kéo dài > 1 ca</td><td>≤ 4 giờ</td><td>Ngay khi xác nhận L4</td></tr>
+ <tr><td>Quyết định war room</td><td>Khi blocker kéo dài &gt; 1 ca</td><td>≤ 4 giờ</td><td>Ngay khi xác nhận L4</td></tr>
  <tr><td>Customer notification</td><td>Khi contract/CSR yêu cầu</td><td>≤ 24 giờ hoặc sớm hơn theo hợp đồng</td><td>Verbal ngay khi đủ dữ kiện tối thiểu, email formal ≤ 24 giờ</td></tr>
  <tr><td>Mở NCR / event hồ sơ</td><td>≤ 8 giờ làm việc</td><td>≤ 4 giờ</td><td>≤ 2 giờ</td></tr>
  <tr><td>Nguyên nhân gốc sơ bộ</td><td>≤ 2 Ngày làm việc</td><td>≤ 1 Ngày làm việc</td><td>≤ 24 giờ</td></tr>
@@ -123,7 +123,7 @@
  <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
  <thead><tr><th>Quyết định</th><th>Người đề xuất</th><th>Người được quyền duyệt</th><th>Bằng chứng tối thiểu trước khi duyệt</th></tr></thead>
  <tbody>
- <tr><td>Hold lot / hold job / stop machine</td><td>Lead / QA / Ops / Maintenance</td><td>Lead hoặc chức năng sở hữu công đoạn; escalation lên Ops Manager nếu > 1 cell/job</td><td>Mã job/lot affected, phạm vi ảnh hưởng, lý do hold, thời điểm hold, Người thực hiện</td></tr>
+ <tr><td>Hold lot / hold job / stop machine</td><td>Lead / QA / Ops / Maintenance</td><td>Lead hoặc chức năng sở hữu công đoạn; escalation lên Ops Manager nếu &gt; 1 cell/job</td><td>Mã job/lot affected, phạm vi ảnh hưởng, lý do hold, thời điểm hold, Người thực hiện</td></tr>
  <tr><td>Mở lại sản xuất sau sự kiện quality/machine</td><td>Người phụ trách điều phối</td><td>QA + Ops; thêm Engineering khi thay đổi program/setup/tool</td><td>Containment hoàn tất, nguyên nhân sơ bộ, mẫu đầu/revalidation nếu áp dụng, cập nhật Hồ sơ công việc (job dossier)</td></tr>
  <tr><td>Mở shipment / release giao hàng</td><td>QA / WHS / Sales-CS</td><td>QA Manager hoặc Người được ủy quyền theo ANNEX-120</td><td>Gói phát hành đủ, CoC đúng, label/SSCC đúng, quantity reconcile, deviation/customer approval nếu có</td></tr>
  <tr><td>Customer notice chính thức</td><td>Sales-CS / QA / QMS</td><td>Commercial Người phụ trách + QA/QMS + GM khi L4 hoặc hợp đồng yêu cầu</td><td>Fact pack tối thiểu: part/job/lot, vấn đề statement, containment, impact known/unknown, next update time</td></tr>
@@ -131,8 +131,8 @@
  </tbody>
  </table></div>
  <div class="two-col">
- <div class="keyline"><b>Liên kết thẩm quyền</b><br/>Mọi quyền duyệt cuối cùng phải phù hợp với <b>ANNEX-120</b> và quy tắc deputy/backup của <b>ANNEX-123</b>. Không viện cớ "vắng Người ký" để mở line hoặc giao hàng sai thẩm quyền.</div>
- <div class="keyline"><b>Liên kết daily management</b><br/>Sự kiện L2/L3 kéo dài qua ca phải được đưa vào <b>WI-202</b> và board hành động của ca/ngày. Event không được biến mất khỏi radar chỉ vì đã chat xong trên Teams.</div>
+ <div class="keyline"><b>Liên kết thẩm quyền</b><br>Mọi quyền duyệt cuối cùng phải phù hợp với <b>ANNEX-120</b> và quy tắc deputy/backup của <b>ANNEX-123</b>. Không viện cớ "vắng Người ký" để mở line hoặc giao hàng sai thẩm quyền.</div>
+ <div class="keyline"><b>Liên kết daily management</b><br>Sự kiện L2/L3 kéo dài qua ca phải được đưa vào <b>WI-202</b> và board hành động của ca/ngày. Event không được biến mất khỏi radar chỉ vì đã chat xong trên Teams.</div>
  </div>
  </div>
 
@@ -165,10 +165,10 @@
  <div class="section">
  <h2>9. KPI hiệu lực của chương trình escalation</h2>
  <div class="kpi-grid">
- <div class="kpi-box"><b>KPI-1 — % sự kiện chạm ngưỡng được escalates đúng SLA</b><br/>Mục tiêu: ≥ 95% / tháng</div>
- <div class="kpi-box"><b>KPI-2 — % event nhật ký có đủ Người phụ trách + Ngày đến hạn + next action</b><br/>Mục tiêu: 100%</div>
- <div class="kpi-box"><b>KPI-3 — % L3/L4 có containment xác nhận trong SLA</b><br/>Mục tiêu: ≥ 95%</div>
- <div class="kpi-box"><b>KPI-4 — % customer notice phát hành đúng Người có thẩm quyền</b><br/>Mục tiêu: 100%</div>
+ <div class="kpi-box"><b>KPI-1 — % sự kiện chạm ngưỡng được escalates đúng SLA</b><br>Mục tiêu: ≥ 95% / tháng</div>
+ <div class="kpi-box"><b>KPI-2 — % event nhật ký có đủ Người phụ trách + Ngày đến hạn + next action</b><br>Mục tiêu: 100%</div>
+ <div class="kpi-box"><b>KPI-3 — % L3/L4 có containment xác nhận trong SLA</b><br>Mục tiêu: ≥ 95%</div>
+ <div class="kpi-box"><b>KPI-4 — % customer notice phát hành đúng Người có thẩm quyền</b><br>Mục tiêu: 100%</div>
  </div>
  </div>
 

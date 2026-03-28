@@ -147,7 +147,7 @@ Các tên cột sau là định danh kỹ thuật trong M365 Lists / Epicor. **K
 
 **Quy tắc:** Tên nơi lưu trữ là danh từ riêng M365/SharePoint — dịch sẽ gây nhầm lẫn khi tham chiếu.
 
-#### B3.2c Chức danh / Vai trò — giữ nguyên tiếng Anh 100%
+#### B3.2c Chức danh / Vai trò — chuẩn hóa theo JD và role code
 
 | Tiếng Anh | Tiếng Việt (mô tả) |
 |-----------|---------------------|
@@ -161,7 +161,12 @@ Các tên cột sau là định danh kỹ thuật trong M365 Lists / Epicor. **K
 | `Performer` / `Inspector` / `Operator` | Người thực hiện / kiểm tra / vận hành |
 | `Specialist` / `Worker` / `End User` | Chuyên viên / Công nhân / Người dùng cuối |
 
-**Quy tắc:** Chức danh dùng tiếng Anh xuyên suốt — RACI, bảng chủ trì, gate, nội dung văn bản.
+**Quy tắc thay thế:**
+- Chức danh JD chuẩn dùng tiếng Anh.
+- Header, RACI, bảng chủ trì, gate owner, hold/release authority và approver dùng `role code` rút gọn có link JD.
+- Governance hats phải gắn lên host role thật, ví dụ `QA[QMR]`, `QMS[DC]`, `QMS[LA]`.
+- Cấm dùng độc lập các placeholder như `Process Owner`, `Department Head`, `Responsible Person`, `Data Owner`, `Top Management` trong owner/RACI/authority cells.
+- Khi cần một nhóm vai trò, phải render thành explicit role bundle gồm nhiều role chips link JD, không viết nhóm mơ hồ.
 
 #### B3.3 Tên SharePoint List — giữ nguyên 100%
 
@@ -201,8 +206,8 @@ Các nhãn metadata trong header tài liệu sử dụng tiếng Việt theo quy
 | **Mã:** | Mã tài liệu (SOP-101, WI-201...) |
 | **Phiên bản:** | V0, V1, V2... |
 | **Ngày hiệu lực:** | Ngày hoặc "Theo quyết định ban hành" |
-| **Chủ sở hữu:** | Phòng ban chịu trách nhiệm |
-| **Phê duyệt:** | Người/chức vụ phê duyệt |
+| **Chủ sở hữu:** | Role code JD-linked chịu trách nhiệm |
+| **Phê duyệt:** | Role code JD-linked có quyền phê duyệt |
 
 Mã tài liệu (SOP-101, WI-201, FRM-301, ANNEX-111) **LUÔN** giữ nguyên tiếng Anh.
 

@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>WI-517 — Setup, chuyển đổi (changeover), SMED Chuyển đổi (chuyển đổi (changeover) Hồ sơ theo họ máy và xác nhận ready-to-run | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 <style>
 
 
@@ -50,7 +49,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
@@ -62,15 +61,15 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Owner:</b></span><span>Sản xuất Manager / Kỹ thuật Manager / Bảo trì Manager / QA Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi đổi job, đổi Part/Rev, đổi machine, đổi fixture, đổi program, đổi setup logic, chuyển giao công việc, khởi động lại sau sự cố nghiêm trọng/cảnh báo/PM lớn, hoặc bất kỳ setup nào có rủi ro gây phế phẩm, trôi / sai lệch hoặc sự cố nghiêm trọng.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi đổi job, đổi Part/Rev, đổi machine, đổi fixture, đổi program, đổi setup logic, chuyển giao công việc, khởi động lại sau sự cố nghiêm trọng/cảnh báo/PM lớn, hoặc bất kỳ setup nào có rủi ro gây phế phẩm, trôi / sai lệch hoặc sự cố nghiêm trọng.</div>
 <h1>WI-517 — Setup, chuyển đổi (changeover), SMED Chuyển đổi (chuyển đổi (changeover) Hồ sơ theo họ máy và xác nhận ready-to-run</h1>
 <div class="section"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
 <p>WI này chuẩn hóa toàn bộ hoạt động setup và chuyển đổi (changeover) để máy vào trạng thái <b>ready-to-run</b> đúng phiên bản, đúng chương trình, đúng đồ gá, đúng danh sách dao cụ, đúng phương pháp đo và đúng điều kiện an toàn trước khi cắt phoi. WI này áp dụng cho 3-trục đứng phay, 5-trục phay, CNC tiện và phay-lượt / quay.</p>
-<div class="callout-danger"><strong>QUYỀN DỪNG</strong><br/>Setup Lead, Supervisor, QA, Kỹ thuật và Bảo trì có quyền dừng chuyển đổi (changeover) ngay lập tức khi có một trong các tình huống sau: sai phiên bản set; nghi ngờ sai chương trình; fixture/jaw không đủ điều kiện; bù trừ (offset)/đầu dò (probe) không / bằng không không tin cậy; gage CTQ chưa sẵn sàng; phát hiện nguy cơ sự cố nghiêm trọng, FOD hoặc rủi ro năng lượng chưa được kiểm soát. <b>PHẢI</b> xác minh điều kiện an toàn và mức sẵn sàng trước khi chạy thử.</div>
-<div class="keyline"><strong>Kết quả đầu ra bắt buộc</strong><br/>Kết thúc WI-517 phải tạo được 03 đầu ra: <b>(1)</b> máy ở trạng thái ready-to-run có ký-off, <b>(2)</b> hồ sơ setup/chuyển đổi (changeover) được ghi vết đầy đủ, <b>(3)</b> lệnh chuyển qua <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> và <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a> để xác nhận mẫu đầu (tiên chi tiết / sản phẩm) và pre-run trước Cycle Start.</div></div>
+<div class="callout-danger"><strong>QUYỀN DỪNG</strong><br>Setup Lead, Supervisor, QA, Kỹ thuật và Bảo trì có quyền dừng chuyển đổi (changeover) ngay lập tức khi có một trong các tình huống sau: sai phiên bản set; nghi ngờ sai chương trình; fixture/jaw không đủ điều kiện; bù trừ (offset)/đầu dò (probe) không / bằng không không tin cậy; gage CTQ chưa sẵn sàng; phát hiện nguy cơ sự cố nghiêm trọng, FOD hoặc rủi ro năng lượng chưa được kiểm soát. <b>PHẢI</b> xác minh điều kiện an toàn và mức sẵn sàng trước khi chạy thử.</div>
+<div class="keyline"><strong>Kết quả đầu ra bắt buộc</strong><br>Kết thúc WI-517 phải tạo được 03 đầu ra: <b>(1)</b> máy ở trạng thái ready-to-run có ký-off, <b>(2)</b> hồ sơ setup/chuyển đổi (changeover) được ghi vết đầy đủ, <b>(3)</b> lệnh chuyển qua <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> và <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a> để xác nhận mẫu đầu (tiên chi tiết / sản phẩm) và pre-run trước Cycle Start.</div></div>
 <div class="section"><h2>2. Tình huống bắt buộc mở WI-517</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Mức chuyển đổi (changeover) bắt buộc</th><th>Cổng kiểm soát (gate) / hồ sơ tối thiểu</th><th>Không được chạy khi</th></tr></thead><tbody>
 <tr><td>Job mới hoặc Part/Rev mới</td><td>Đầy đủ bên ngoài + nội bộ SMED Chuyển đổi (chuyển đổi (changeover) Hồ sơ</td><td><a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a> + <a href="../../../04-Bieu-Mau/05-FRM-500/FRM-514_SMED_Changeover_Record.xlsx" download="">FRM-514</a> + <a href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx" download="">FRM-511</a></td><td>Thiếu phát hành set, thiếu phiếu cài đặt, thiếu danh sách dao cụ, thiếu mẫu đầu plan</td></tr>
@@ -100,11 +99,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>phay-lượt / quay</td><td>Chuẩn bị cả 2 trục chính (spindle) nếu dùng; Live tool định hướng / đào tạo hội nhập; chuyển giao vị trí / chức vụ; kênh/sync plan; hỗ trợ chi tiết / linh kiện</td><td>Sai logic chuyển giao, sai không / bằng không giữa main/sub, Live tool va chạm và lỗi đồng bộ kênh</td></tr>
 </tbody></table></div>
 <div class="step-list">
-<div class="step-item"><strong>Khóa phát hành set.</strong><br/>Chuẩn bị gói kỹ thuật hiệu lực gồm drawing/spec, traveler, phiếu cài đặt, danh sách dao cụ, CTQ/kiểm tra phương pháp, khách hàng lớp phủ và lộ trình gia công. Nếu thiếu 1 thành phần, chuyển đổi (changeover) không được khởi động.</div>
-<div class="step-item"><strong>Lập kéo list và cài đặt trước tool.</strong><br/>chuẩn bị bộ linh kiện theo ToolID, cán dao / đầu gá, mảnh dao (insert) cấp / hạng, dính / que-out, dung dịch làm mát option, tuổi dao (tool tuổi thọ / vòng đời) mốc chuẩn và tool ưu tiên cho CTQ. Tool có dấu hiệu sứt, độ đảo (runout) bất thường hoặc hết tuổi thọ / vòng đời phải loại trước khi ra máy.</div>
-<div class="step-item"><strong>đánh giá năng lực fixture/jaw ngoài máy.</strong><br/>Làm sạch toàn bộ bề mặt tỳ, chốt định vị, jaw step, bu-lông, mềm jaw lỗ khoan; kiểm kích thước tham chiếu khi có chuẩn; xác nhận định hướng / đào tạo hội nhập bằng ảnh chuẩn hoặc phác thảo. Không mang fixture chưa pass ra máy.</div>
-<div class="step-item"><strong>Chuẩn bị đo lường và mẫu đầu plan.</strong><br/>Gọi sẵn gage CTQ, phương pháp đo, Người nhận đo, vị trí lưu bằng chứng. Job có CMM, chân không Requests, rò rỉ Requests hoặc khách hàng gói hàng đặc biệt phải chuẩn bị từ trước khi máy dừng.</div>
-<div class="step-item"><strong>Chuẩn bị vật liệu và xử lý đóng-out job cũ.</strong><br/>Nguyên vật liệu lot phải chờ sẵn theo FIFO/FEFO và không lẫn với job khác. Job cũ phải làm xong đóng-out, dọn hết part/WIP/tool thừa, clear fixture trạng thái và clear FOD trước khi đưa job mới vào máy.</div>
+<div class="step-item"><strong>Khóa phát hành set.</strong><br>Chuẩn bị gói kỹ thuật hiệu lực gồm drawing/spec, traveler, phiếu cài đặt, danh sách dao cụ, CTQ/kiểm tra phương pháp, khách hàng lớp phủ và lộ trình gia công. Nếu thiếu 1 thành phần, chuyển đổi (changeover) không được khởi động.</div>
+<div class="step-item"><strong>Lập kéo list và cài đặt trước tool.</strong><br>chuẩn bị bộ linh kiện theo ToolID, cán dao / đầu gá, mảnh dao (insert) cấp / hạng, dính / que-out, dung dịch làm mát option, tuổi dao (tool tuổi thọ / vòng đời) mốc chuẩn và tool ưu tiên cho CTQ. Tool có dấu hiệu sứt, độ đảo (runout) bất thường hoặc hết tuổi thọ / vòng đời phải loại trước khi ra máy.</div>
+<div class="step-item"><strong>đánh giá năng lực fixture/jaw ngoài máy.</strong><br>Làm sạch toàn bộ bề mặt tỳ, chốt định vị, jaw step, bu-lông, mềm jaw lỗ khoan; kiểm kích thước tham chiếu khi có chuẩn; xác nhận định hướng / đào tạo hội nhập bằng ảnh chuẩn hoặc phác thảo. Không mang fixture chưa pass ra máy.</div>
+<div class="step-item"><strong>Chuẩn bị đo lường và mẫu đầu plan.</strong><br>Gọi sẵn gage CTQ, phương pháp đo, Người nhận đo, vị trí lưu bằng chứng. Job có CMM, chân không Requests, rò rỉ Requests hoặc khách hàng gói hàng đặc biệt phải chuẩn bị từ trước khi máy dừng.</div>
+<div class="step-item"><strong>Chuẩn bị vật liệu và xử lý đóng-out job cũ.</strong><br>Nguyên vật liệu lot phải chờ sẵn theo FIFO/FEFO và không lẫn với job khác. Job cũ phải làm xong đóng-out, dọn hết part/WIP/tool thừa, clear fixture trạng thái và clear FOD trước khi đưa job mới vào máy.</div>
 </div></div>
 <div class="section"><h2>5. Nội bộ chuyển đổi (changeover) — trình tự tại máy</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bước</th><th>Yêu cầu bắt buộc</th><th>PASS</th><th>TẠM GIỮ</th></tr></thead><tbody>
@@ -117,7 +116,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>7. Dry-run / đơn lẻ chặn / khóa / chứng minh-out</td><td>Chạy chứng minh-out theo mức rủi ro: air cut, đơn lẻ chặn / khóa, giảm bước tiến (feed), chặn / khóa-by-chặn / khóa ở vùng kẹp / gá kẹp/quay/chuyển giao</td><td>Không va chạm, không cảnh báo bất thường, đường dao đúng</td><td>Có điểm mù, không rõ thông quan / giải phóng hoặc cảnh báo không giải thích được</td></tr>
 <tr><td>8. Đầu tiên cut có kiểm soát</td><td>Cắt phoi chậm và có quan sát; ưu tiên part đầu để xác nhận kích thước, bề mặt, phoi (chip), bavia, tool load</td><td>Part đầu đủ điều kiện chuyển <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> / <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Xuất hiện rung, xước, bavia tăng, trôi / sai lệch hoặc chạm Cần</td></tr>
 </tbody></table></div>
-<div class="callout-info"><strong>Quy tắc chứng minh-out</strong><br/>nhóm máy (machine nhóm sản phẩm) càng phức tạp thì chứng minh-out càng phải chậm và chia nhỏ. 5-trục và phay-lượt / quay phải chứng minh-out cả vùng xoay, vùng chuyển giao và vùng đổi kênh. tiện phải chứng minh-out vùng mâm cặp (chuck) jaw, ụ sau (tailstock) và thông quan / giải phóng của tool ngoài/mặt đầu.</div></div>
+<div class="callout-info"><strong>Quy tắc chứng minh-out</strong><br>nhóm máy (machine nhóm sản phẩm) càng phức tạp thì chứng minh-out càng phải chậm và chia nhỏ. 5-trục và phay-lượt / quay phải chứng minh-out cả vùng xoay, vùng chuyển giao và vùng đổi kênh. tiện phải chứng minh-out vùng mâm cặp (chuck) jaw, ụ sau (tailstock) và thông quan / giải phóng của tool ngoài/mặt đầu.</div></div>
 <div class="section"><h2>6. Ready-to-run ký-off và bàn giao ca</h2>
 <p><b>Ready-to-run</b> chỉ đạt khi Người nhận máy có thể chạy part đầu một cách kiểm soát mà không cần hỏi lại dữ liệu nền. Không dùng câu "máy chạy được rồi" thay cho ký-off có trường dữ liệu.</p>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường phải bàn giao</th><th>Nội dung tối thiểu</th><th>Người xác nhận</th></tr></thead><tbody>
@@ -165,7 +164,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div></div>
 <div data-phase2f="true">
 <h2 class="h2" id="phase2f-setup-boundary">Kiểm soát bổ sung — Quan trọng bù trừ (offset) / khởi động lại ranh giới</h2>
-<div class="note"><b>Bổ sung thực chiến</b><br/>Sau phase này, mọi quan trọng / nghiêm trọng bù trừ (offset) / thông số, fixture thay đổi, đầu dò (probe) mốc chuẩn hoặc bất thường setup điều kiện cần được phản ánh lại trên <a href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx" download="">FRM-511</a>. WI này hướng dẫn cách làm; <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> là hồ sơ ra quyết định cho phép chạy hàng loạt.</div>
+<div class="note"><b>Bổ sung thực chiến</b><br>Sau phase này, mọi quan trọng / nghiêm trọng bù trừ (offset) / thông số, fixture thay đổi, đầu dò (probe) mốc chuẩn hoặc bất thường setup điều kiện cần được phản ánh lại trên <a href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx" download="">FRM-511</a>. WI này hướng dẫn cách làm; <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> là hồ sơ ra quyết định cho phép chạy hàng loạt.</div>
 </div></div>
 </div>
 </div>

@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>ANNEX-124 — Bảng điều khiển Bộ bằng chứng Worked Examples | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 <style>
 
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
@@ -78,7 +77,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="container"><div class="page landscape"><div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Phụ lục tham chiếu • ANNEX-Digital</span>
@@ -93,12 +92,12 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
 <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / Bảng điều khiển Người phụ trách / IT Người phụ trách hệ thống</span></div>
-<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc / QA Manager theo thẩm quyền</span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent"><div class="form-sheet">
 <div class="hero"><h1>ANNEX-124 — worked examples cho bảng điều khiển bằng chứng packs</h1><p>Phụ lục này không tạo thêm một lớp giấy tờ mới. Nó cung cấp <b>ví dụ mẫu dùng ngay</b> cho freeze-date pack, exception-note pack, quarterly access-bộ hồ sơ rà soát và management-bộ hồ sơ rà soát, để đội vận hành hiểu cụ thể một pack "đủ dùng" phải trông như thế nào, chứa gì và khóa metadata ra sao.</p></div>
-<div class="note"><b>Đọc cùng</b><br/><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>, <a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a>, <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a>, <a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> và <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118</a>.</div>
+<div class="note"><b>Đọc cùng</b><br><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>, <a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a>, <a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a>, <a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> và <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118</a>.</div>
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#a1">1. Mục đích và boundary</a><a href="#a2">2. Worked example A — freeze-date pack</a><a href="#a3">3. Worked example B — exception-note pack</a><a href="#a4">4. Worked example C — quarterly access-bộ hồ sơ rà soát</a><a href="#a5">5. Worked example D — management-bộ hồ sơ rà soát</a><a href="#a5e">5E. Worked example E — competence / deputy note</a><a href="#a6">6. Naming, metadata và bằng chứng rules</a><a href="#a7">7. Liên kết tài liệu và cách dùng</a></div></div>
 <h2 class="h2" id="a1">1. Mục đích và boundary</h2>
 <div class="notice-strip">
@@ -124,7 +123,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <tr><td>Bằng chứng index</td><td>Link đến extract, query, list, report, cert nhật ký, NCR nhật ký</td><td>Link phải trỏ tới SoR/SSOT, không trỏ bản copy không kiểm soát.</td></tr>
 <tr><td>Exception note (nếu có)</td><td>Gắn sang worked example B</td><td>Nếu có bất thường, freeze-date pack không được giả vờ "số sạch".</td></tr>
 </tbody></table></div>
-<div class="note-warning"><b>Naming example</b><br/>`MR-KPI-PACK_Q1-2026_FREEZE_2026-03-17_1700_v01.pdf` hoặc cùng logic trong SharePoint / folder name. Quy tắc tên phải cho phép Người đến sau đọc ra được kỳ nào, đã khóa lúc nào và bản nào đang được dùng.</div>
+<div class="note-warning"><b>Naming example</b><br>`MR-KPI-PACK_Q1-2026_FREEZE_2026-03-17_1700_v01.pdf` hoặc cùng logic trong SharePoint / folder name. Quy tắc tên phải cho phép Người đến sau đọc ra được kỳ nào, đã khóa lúc nào và bản nào đang được dùng.</div>
 <h2 class="h2" id="a3">3. Worked example B — exception-note pack</h2>
 <div class="table-card"><table class="table"><thead><tr><th>Trường</th><th>Ví dụ</th><th>Mục đích</th></tr></thead><tbody>
 <tr><td>Event ID</td><td>OFL-2026-004</td><td>Khóa truy vết sang incident / offline nhật ký.</td></tr>
@@ -156,8 +155,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </tbody></table></div>
 <div class="note">Worked example này nên chảy trực tiếp sang <a download="" href="../../../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a>. Biên bản chỉ có giá trị khi Người đến sau lần ngược được pack nào đã được dùng để ra từng quyết định.</div>
 <h2 class="h2" id="a5e">5E. Worked example E — competence / deputy note cho KPI pack</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:24%"/><col style="width:26%"/><col style="width:24%"/><col style="width:26%"/></colgroup><thead><tr><th>Scenario</th><th>Ghi chú điều hành chuẩn</th><th>Bằng chứng đính kèm</th><th>Decision ask lên xem xét của lãnh đạo</th></tr></thead><tbody><tr><td>OTD giảm vì chỉ một Người đủ điều kiện chạy setup / mẫu đầu (first piece)</td><td>Nêu rõ đây là gap về bố trí Người thay thế, không phải chỉ là lịch làm việc. Ghi tên vai trò, công việc bị nghẽn và Ngày risk sẽ thành critical.</td><td>FRM-807 skill matrix, FRM-805 level certification, FRM-806 tracking nhật ký, ANNEX-123 deputy matrix.</td><td>Phê duyệt kế hoạch requalification / temporary restriction / overtime containment / hiring or đào tạo chéo.</td></tr><tr><td>Defect lặp lại sau đào tạo lại</td><td>Ghi rõ Người liên quan đã attend training nhưng bằng chứng competency và authorization còn thiếu hoặc chưa chứng minh hiệu lực trên sản phẩm thật.</td><td>FRM-803 OJT Checklist, FRM-804 competency đánh giá, NCR/CAPA link.</td><td>Yêu cầu đổi phương pháp đào tạo, supervisor sign-off, revalidation on-job hoặc stop-release cho tới khi đủ điều kiện.</td></tr><tr><td>CMM / final release phụ thuộc một cá nhân duy nhất</td><td>Ghi rõ đây là continuity risk và đánh giá-mức sẵn sàng risk; nêu điều kiện tạm chấp nhận và Ngày hết hiệu lực.</td><td>Certification nhật ký, access / authorization hồ sơ, deputy plan.</td><td>Mở action về bố trí Người thay thế, succession, recertification cadence và escalation class.</td></tr></tbody></table></div>
-<div class="note"><b>Cách dùng</b><br/>Worked example này dùng khi KPI ghi chú điều hành chạm tới yếu tố con Người. Mục đích là để pack trình bày đúng bản chất vấn đề: không nhầm <b>đã học</b> với <b>đã đủ năng lực và được phép làm</b>.</div>
+<div class="table-card"><table class="table"><colgroup><col style="width:24%"><col style="width:26%"><col style="width:24%"><col style="width:26%"></colgroup><thead><tr><th>Scenario</th><th>Ghi chú điều hành chuẩn</th><th>Bằng chứng đính kèm</th><th>Decision ask lên xem xét của lãnh đạo</th></tr></thead><tbody><tr><td>OTD giảm vì chỉ một Người đủ điều kiện chạy setup / mẫu đầu (first piece)</td><td>Nêu rõ đây là gap về bố trí Người thay thế, không phải chỉ là lịch làm việc. Ghi tên vai trò, công việc bị nghẽn và Ngày risk sẽ thành critical.</td><td>FRM-807 skill matrix, FRM-805 level certification, FRM-806 tracking nhật ký, ANNEX-123 deputy matrix.</td><td>Phê duyệt kế hoạch requalification / temporary restriction / overtime containment / hiring or đào tạo chéo.</td></tr><tr><td>Defect lặp lại sau đào tạo lại</td><td>Ghi rõ Người liên quan đã attend training nhưng bằng chứng competency và authorization còn thiếu hoặc chưa chứng minh hiệu lực trên sản phẩm thật.</td><td>FRM-803 OJT Checklist, FRM-804 competency đánh giá, NCR/CAPA link.</td><td>Yêu cầu đổi phương pháp đào tạo, supervisor sign-off, revalidation on-job hoặc stop-release cho tới khi đủ điều kiện.</td></tr><tr><td>CMM / final release phụ thuộc một cá nhân duy nhất</td><td>Ghi rõ đây là continuity risk và đánh giá-mức sẵn sàng risk; nêu điều kiện tạm chấp nhận và Ngày hết hiệu lực.</td><td>Certification nhật ký, access / authorization hồ sơ, deputy plan.</td><td>Mở action về bố trí Người thay thế, succession, recertification cadence và escalation class.</td></tr></tbody></table></div>
+<div class="note"><b>Cách dùng</b><br>Worked example này dùng khi KPI ghi chú điều hành chạm tới yếu tố con Người. Mục đích là để pack trình bày đúng bản chất vấn đề: không nhầm <b>đã học</b> với <b>đã đủ năng lực và được phép làm</b>.</div>
 <h2 class="h2" id="a6">6. Naming, metadata và bằng chứng rules</h2>
 <div class="check-grid">
 <div class="check-item"><span class="chk"></span>Tên pack phải đọc ra được kỳ, freeze-date, version và audience</div>
@@ -186,7 +185,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </div>
 </div>
 <h2>6F. Worked example F — action effectiveness &amp; resource-cổng kiểm soát bộ hồ sơ rà soát</h2>
-<div class="note"><b>Mục đích</b><br/>Dùng khi xem xét của lãnh đạo hoặc tier review không chỉ cần danh sách action đang mở mà cần biết action nào đang bị chặn bởi nguồn lực, action nào đã đủ bằng chứng effectiveness, và action nào cần nâng lên recurrence watch.</div>
+<div class="note"><b>Mục đích</b><br>Dùng khi xem xét của lãnh đạo hoặc tier review không chỉ cần danh sách action đang mở mà cần biết action nào đang bị chặn bởi nguồn lực, action nào đã đủ bằng chứng effectiveness, và action nào cần nâng lên recurrence watch.</div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Sheet / tab</th><th>Nội dung tối thiểu</th><th>Ghi chú đặt tên</th></tr></thead><tbody>
 <tr><td>01_action-register</td><td>Action ID, origin, Người phụ trách, due, current trạng thái, linked KPI / NCR / hold / khiếu nại.</td><td>Khóa freeze-date cho snapshot review.</td></tr>
 <tr><td>02_effectiveness-check</td><td>Criterion, measured result, đạt/không đạt, bằng chứng path, Người rà soát.</td><td>PHẢI có basis đo cho ô "effective"; không để trống căn cứ.</td></tr>
@@ -196,4 +195,3 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </div></div></div></div>
 </body>
 </html>
-

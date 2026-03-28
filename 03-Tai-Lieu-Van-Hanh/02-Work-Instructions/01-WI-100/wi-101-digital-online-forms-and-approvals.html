@@ -1,5 +1,4 @@
-
- thead { display: table-header-group; }
+<div><p>thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
  
@@ -8,7 +7,7 @@
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
 table { max-width: 100%; table-layout: auto; }
 td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-</style>
+
 <style>
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
@@ -28,15 +27,15 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 .section-rule{height:1px;background:var(--ln);margin:18px 0}
 .note-list li{margin:6px 0}
 </style>
-<link rel="stylesheet" href="../../../assets/style.css"/>
-</head>
-<body>
+<link rel="stylesheet" href="../../../assets/style.css">
+
+</p>
 <div class="container">
 <div class="page">
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu vận hành • Phân xưởng CNC</span>
@@ -44,7 +43,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="title">
 <strong>WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</strong>
-</div><div class="meta"><div class="row"><span><b>Mã:</b></span><span>WI-101</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / IT System Administrator</span></div><div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div></div>
+</div><div class="meta"><div class="row"><span><b>Mã:</b></span><span>WI-101</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / IT System Administrator</span></div><div class="row"><span><b>Phê duyệt:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div></div>
 </div><div class="doc-content" id="docContent"><div class="form-sheet"><div class="preface-block"><h2 class="h2">Điều kiện áp dụng và kiểm soát</h2><div class="grid-2"><div><p><b>ÁP DỤNG KHI</b></p><ul class="list"><li>Khi tài liệu được viện dẫn trong Job/Quy trình/Forms liên quan.</li><li>Khi phát sinh thay đổi ảnh hưởng chất lượng hoặc yêu cầu khách hàng.</li><li>Khi cần xác định tạm giữ/phê duyệt hoặc yêu cầu bằng chứng bắt buộc.</li></ul></div><div><p><b>Đầu vào / Đầu ra</b></p><ul class="list"><li><b>Đầu vào:</b> Epicor Kinetic (giao dịch)</li><li><b>Đầu vào:</b> M365/SharePoint (SSOT hồ sơ)</li><li><b>Đầu vào:</b> 10-QMS-Source-Control + Git (source definitions / released schemas / source templates)</li><li><b>Đầu ra:</b> Hồ sơ/Nhật ký đầy đủ tại SSOT</li><li><b>Đầu ra:</b> Trạng thái cổng kiểm soát được mở hoặc giữ theo tiêu chí</li></ul></div></div><p class="callout"><b>Hold/Release:</b> Thiếu bằng chứng bắt buộc: áp dụng HOLD theo tiêu chí của tài liệu; không chuyển bước cho đến khi đủ bằng chứng.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết hồ sơ SSOT.</p></div><div class="card"><span class="badge"><span class="dot"></span>WI-101</span><h1 class="h1" style="margin-top:12px;">WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</h1><p class="lead">Tài liệu này quy định cách triển khai và sử dụng biểu mẫu số hoá trên M365 (SharePoint Lists/Power Apps/Power Automate) và cách lưu bằng chứng theo SSOT. Mọi giao dịch vận hành (time entry, trạng thái job, PO, xuất/nhập kho, xác nhận giao hàng (ship confirm) <b>chỉ</b> được ghi nhận trong <b>Epicor Kinetic</b>.</p><p class="callout"><b>Ranh giới source bắt buộc:</b> form definition, released schema, source template và source code hỗ trợ phải nằm trong <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> tại <span class="code">10-QMS-Source-Control</span> và đi theo Git. Submission, approval payload, runtime archive và dữ liệu vận hành phát sinh không được đưa vào Git/source library.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">1. Khi áp dụng</h2><ul>
 <li><b>Phải</b> áp dụng khi thay thế biểu mẫu giấy bằng biểu mẫu số hoá để ghi nhận vận hành tại xưởng CNC: kiểm tra công đoạn, nhật ký hold, bảng kiểm đóng gói, nhật ký giao ca, yêu cầu hỗ trợ máy/tooling.</li>
 <li><b>Phải</b> áp dụng khi cần <b>phê duyệt điện tử</b> (Power Automate Approvals) cho các điểm dừng chất lượng/ship-release.</li>
@@ -55,8 +54,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Thiết bị: PC/ki-ốt tại phân xưởng; máy quét mã vạch 1D/2D (USB bàn phím-nêm); mạng nội bộ ổn định; máy in nhãn (nếu biểu mẫu có nhãn).</li>
 <li>Hệ thống SoR: <b>Epicor Kinetic (Epicor) (Epicor)</b> (Job, Vận hành, Hàng tồn kho, PO, Lô giao hàng, Pack, Xác nhận giao hàng).</li>
 </ul></div><div class="card"><h2 class="h2" style="margin-top:0;">3. Các bước thực hiện</h2><h3 class="h3">3.1 Khởi tạo biểu mẫu số hoá (bắt buộc theo kiểm soát tài liệu)</h3>
-<div class="callout-strong"><b>Online hay Offline? — Khung quyết định bắt buộc</b><br/>Trước khi khởi tạo, <b>phải</b> xác định kênh điền (Online trên portal hay Offline bằng Excel) theo bảng chấm điểm 7 tiêu chí (tần suất, số fields, nơi điền, dashboard, workflow, attachments, formula). <b>Tổng &gt; 60 → Online; Tổng ≤ 60 → Offline (Excel).</b>
-<br/><br/><b>Quy tắc nhanh:</b>
+<div class="callout-strong"><b>Online hay Offline? — Khung quyết định bắt buộc</b><br>Trước khi khởi tạo, <b>phải</b> xác định kênh điền (Online trên portal hay Offline bằng Excel) theo bảng chấm điểm 7 tiêu chí (tần suất, số fields, nơi điền, dashboard, workflow, attachments, formula). <b>Tổng &gt; 60 → Online; Tổng ≤ 60 → Offline (Excel).</b>
+<br><br><b>Quy tắc nhanh:</b>
 <ul class="tight" style="margin:6px 0 4px">
 <li>Form điền <b>≥ 2 lần/ngày</b> hoặc điền <b>tại máy sản xuất</b> → <b>Online</b>.</li>
 <li>Form <b>multi-tab Excel có công thức VLOOKUP/matrix</b> → <b>Offline</b>.</li>
@@ -114,7 +113,7 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <li><b>Phải</b> lưu DCR hồ sơ cấu hình (Power App/Luồng) tại: <b>M365: CNC-IMS-HUB/QMS-Hồ sơ/IT-OPS/cấu hình-Thay đổi-Log/</b>.</li>
 </ul></div><div class="card"><h2 class="h2" style="margin-top:0;">4. điểm kiểm tra &amp; Điểm giữ</h2><div class="table-card">
 <table class="table">
-<colgroup><col style="width:13.68%;"/><col style="width:23.16%;"/><col style="width:20.53%;"/><col style="width:23.68%;"/><col style="width:18.95%;"/></colgroup><thead>
+<colgroup><col style="width:13.68%;"><col style="width:23.16%;"><col style="width:20.53%;"><col style="width:23.68%;"><col style="width:18.95%;"></colgroup><thead>
 <tr>
 <th>Mốc kiểm soát</th>
 <th>Tiêu chí chấp nhận</th>
@@ -156,13 +155,13 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 </table>
 </div></div><div class="card"><h2 class="h2" style="margin-top:0;">5. Đầu ra &amp; hồ sơ (Hồ sơ)</h2><div class="table-card">
 <table class="table">
-<colgroup><col style="width:13.88%;"/><col style="width:12.24%;"/><col style="width:22.86%;"/><col style="width:32.65%;"/><col style="width:18.37%;"/></colgroup><thead>
+<colgroup><col style="width:13.88%;"><col style="width:12.24%;"><col style="width:22.86%;"><col style="width:32.65%;"><col style="width:18.37%;"></colgroup><thead>
 <tr>
 <th>Hồ sơ</th>
 <th>Sổ đăng ký/List</th>
 <th>Nơi lưu SSOT</th>
 <th>Lưu giữ (sự kiện-dựa trên)</th>
-<th>Responsible Person</th>
+<th>người chịu trách nhiệm</th>
 </tr>
 </thead>
 <tbody>
@@ -202,7 +201,7 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <li><b>Phải</b> tuân thủ quy định ESD khi ghi nhận tại khu vực có linh kiện nhạy ESD; <b>không được</b> đặt thiết bị cá nhân lên bàn vận hành.</li>
 </ul></div><div class="card"><h2 class="h2" style="margin-top:0;">7. Hệ thống áp dụng (SoR / SSOT)</h2><div class="table-card">
 <table class="table">
-<colgroup><col style="width:27.38%;"/><col style="width:25.00%;"/><col style="width:47.62%;"/></colgroup><thead>
+<colgroup><col style="width:27.38%;"><col style="width:25.00%;"><col style="width:47.62%;"></colgroup><thead>
 <tr><th>Hệ thống</th><th>Vai trò</th><th>Quy định bắt buộc</th></tr>
 </thead>
 <tbody>
@@ -246,18 +245,15 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <div class="kpi-card"><h3>KPI-DIG-03 — Tỷ lệ bổ sung / thay thế đóng trong hạn</h3><div class="mini-note">Số hồ sơ offline được bổ sung / thay thế đúng thời hạn ÷ tổng hồ sơ offline. Mục tiêu: ≥ 95% trong cùng ca hoặc ca kế tiếp theo rule đã duyệt.</div></div>
 <div class="kpi-card"><h3>KPI-DIG-04 — Tỷ lệ phê duyệt có log đầy đủ</h3><div class="mini-note">Số quyết định Phát hành/Từ chối có đủ Người duyệt, mốc thời gian, nhận xét và trạng thái cuối ÷ tổng quyết định cần duyệt. Mục tiêu: 100%.</div></div>
 </div>
-</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-workbook-usage">11. Biểu mẫu Excel đang hiệu lực — Cách dùng biểu mẫu khi biểu mẫu active đã chuyển hoàn toàn sang sổ tay thực hành Excel</h2><div class="note phase3a-workbook-alignment"><b>Vận hành chuẩn</b><br/>Người dùng mở FRM qua portal hoặc link tài liệu hệ thống phải được tải trực tiếp sổ tay thực hành hiện hành. Không dùng HTML biểu mẫu cũ để nhập liệu hoặc xác nhận phê duyệt; nếu cần xem trạng thái ĐÃ PHÁT HÀNH / mã không phát hành trong danh mục hiện hành, phiên bản, Responsible Person hoặc phạm vi mã / phạm vi quy trình thì dùng và <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Biểu mẫu Control Sổ đăng ký</a>.</div><h3 class="h3 phase3a-workbook-alignment">11.1 Xin mã hồ sơ (Record-ID) cho biểu mẫu Excel</h3>
+</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-workbook-usage">11. Biểu mẫu Excel đang hiệu lực — Cách dùng biểu mẫu khi biểu mẫu active đã chuyển hoàn toàn sang sổ tay thực hành Excel</h2><div class="note phase3a-workbook-alignment"><b>Vận hành chuẩn</b><br>Người dùng mở FRM qua portal hoặc link tài liệu hệ thống phải được tải trực tiếp sổ tay thực hành hiện hành. Không dùng HTML biểu mẫu cũ để nhập liệu hoặc xác nhận phê duyệt; nếu cần xem trạng thái ĐÃ PHÁT HÀNH / mã không phát hành trong danh mục hiện hành, phiên bản, người chịu trách nhiệm hoặc phạm vi mã / phạm vi quy trình thì dùng và <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Biểu mẫu Control Sổ đăng ký</a>.</div><h3 class="h3 phase3a-workbook-alignment">11.1 Xin mã hồ sơ (Record-ID) cho biểu mẫu Excel</h3>
 <ol class="tight phase3a-workbook-alignment">
 <li>Người dùng vào <b>QMS Portal</b> → chọn <b>"Xin mã hồ sơ mới"</b> → chọn loại hồ sơ (NCR / CAPA / FAI / …) → server trả về mã duy nhất (unique Record-ID) từ atomic counter.</li>
 <li>Người dùng <b>phải</b> dùng mã này trong tên file khi lưu biểu mẫu Excel đã điền: <span class="code">FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx</span></li>
 <li>Chi tiết cơ chế cấp mã, phạm vi counter và quy tắc đặt tên: xem <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a> Mục 7.</li>
 </ol>
 <h3 class="h3 phase3a-workbook-alignment">11.2 Mở và sử dụng sổ tay thực hành Excel</h3>
-<ol class="tight phase3a-workbook-alignment"><li>Mở trực tiếp sổ tay thực hành của mã FRM đang ĐÃ PHÁT HÀNH từ portal hoặc từ link trong SOP/WI/sổ tay/JD.</li><li>Nếu cần kiểm phiên bản, Responsible Person, đường dẫn phát hành, tổng kiểm tra hoặc bảng kê, tra <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Biểu mẫu Control Sổ đăng ký</a>.</li><li>Nếu mã FRM không phát hành trong danh mục hiện hành, không tạo hồ sơ mới dưới mã đó; tra phạm vi mã / phạm vi quy trình trong .</li><li>Ví dụ: <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html#FRM-412">FRM-412</a> không phát hành trong danh mục hiện hành; Người dùng phải tải và dùng <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> sổ tay thực hành cho phiếu nhận / biên nhận/IQC cổng kiểm soát và <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> cho TẠM GIỮ/disposition.</li></ol></div></div></div></div>
+<ol class="tight phase3a-workbook-alignment"><li>Mở trực tiếp sổ tay thực hành của mã FRM đang ĐÃ PHÁT HÀNH từ portal hoặc từ link trong SOP/WI/sổ tay/JD.</li><li>Nếu cần kiểm phiên bản, người chịu trách nhiệm, đường dẫn phát hành, tổng kiểm tra hoặc bảng kê, tra <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Biểu mẫu Control Sổ đăng ký</a>.</li><li>Nếu mã FRM không phát hành trong danh mục hiện hành, không tạo hồ sơ mới dưới mã đó; tra phạm vi mã / phạm vi quy trình trong .</li><li>Ví dụ: <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html#FRM-412">FRM-412</a> không phát hành trong danh mục hiện hành; Người dùng phải tải và dùng <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> sổ tay thực hành cho phiếu nhận / biên nhận/IQC cổng kiểm soát và <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> cho TẠM GIỮ/disposition.</li></ol></div></div></div></div>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 <script src="../../../assets/app.js"></script>
-</body>
-</html>
 
-
-
+</div>

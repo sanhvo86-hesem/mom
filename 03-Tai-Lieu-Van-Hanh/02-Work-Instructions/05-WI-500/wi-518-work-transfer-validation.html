@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WI-518 — Xác nhận chuyển công đoạn, chuyển máy, chuyển ca và chuyển Operator | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../assets/style.css">
 <style>
 
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
@@ -45,7 +45,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="page-body">
  <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
@@ -57,10 +57,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
  <div class="row"><span><b>Owner:</b></span><span>Sản xuất Manager / Kế hoạch Manager / QA Manager</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
  </div>
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi bàn giao Job giữa ca, giữa Operator, giữa máy, giữa công đoạn, hoặc khi chuyển WIP sang outsource/nhận lại từ outsource.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi bàn giao Job giữa ca, giữa Operator, giữa máy, giữa công đoạn, hoặc khi chuyển WIP sang outsource/nhận lại từ outsource.</div>
  <h1>WI-518 — Xác nhận chuyển công đoạn, chuyển máy, chuyển ca và chuyển Operator</h1>
  
 <div class="section"><h2>1. Mục đích và phạm vi</h2>
@@ -71,7 +71,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại chuyển giao</th><th>Khi xảy ra</th><th>Điều kiện vào</th><th>Người nhận xác nhận</th></tr></thead><tbody>
 <tr><td>Shift bàn giao</td><td>Hết ca hoặc đổi Người chạy cùng máy/cùng job</td><td>Máy an toàn, trạng thái job rõ, Qty cập nhật</td><td>Operator/Trưởng nhóm ca nhận</td></tr>
 <tr><td>Machine chuyển giao</td><td>Chuyển cùng Op sang máy khác</td><td>Đã phê duyệt đổi machine, phát hành set cập nhật</td><td>Setup/Sản xuất tại máy nhận</td></tr>
-<tr><td>Vận hành chuyển giao</td><td>Chuyển sang OpSeq kế tiếp</td><td>Op Current đầy đủ, hồ sơ đủ, label đúng</td><td>Responsible Person công đoạn kế tiếp</td></tr>
+<tr><td>Vận hành chuyển giao</td><td>Chuyển sang OpSeq kế tiếp</td><td>Op Current đầy đủ, hồ sơ đủ, label đúng</td><td>người chịu trách nhiệm công đoạn kế tiếp</td></tr>
 <tr><td>Outsource chuyển giao</td><td>Gửi ra nhà cung cấp/nhận từ nhà cung cấp</td><td>PO truyền đạt Requests, cert Requests, đóng gói đúng</td><td>WHS / PUR / QA</td></tr>
 <tr><td>Làm lại vòng lặp</td><td>Quay lại bước trước hoặc chuyển tuyến sửa</td><td>Có disposition rõ và lộ trình gia công đặc biệt</td><td>QA + Sản xuất</td></tr>
 </tbody></table></div>
@@ -90,26 +90,26 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>4. Trình tự xác nhận chuyển giao</h2>
 <div class="step-list">
-<div class="step-item"><strong>Người bàn giao chốt hiện trạng.</strong><br/>Dừng công đoạn ở điểm an toàn; cập nhật giao dịch và nhãn; chốt tốt / đạt/nghi ngờ/phế phẩm; ghi mở vấn đề và cuối cùng đã biết tốt / đạt. Không bàn giao lúc tình trạng còn mơ hồ.</div>
-<div class="step-item"><strong>Người nhận đối chiếu vật lý và hồ sơ.</strong><br/>Đối chiếu JobNum, PartNo, Rev, Qty, thùng chứa, nhãn, traveler, và hồ sơ/bằng chứng liên quan. Nếu là machine chuyển giao, phải đối chiếu thêm phát hành set của máy nhận.</div>
-<div class="step-item"><strong>Kiểm điều kiện tiếp tục chạy.</strong><br/>Xem mẫu đầu/FAI trạng thái, IPQC trạng thái, tuổi dao (tool tuổi thọ / vòng đời), bù trừ (offset) trạng thái, mở hold/mở NCR. Nếu có thay đổi machine/fixture/tool ảnh hưởng part thì phải quay về setup/mẫu đầu tương ứng.</div>
-<div class="step-item"><strong>Ký nhận hoặc từ chối nhận.</strong><br/>Chỉ ký nhận khi đủ thông tin, đủ hồ sơ và điều kiện vật lý phù hợp. Nếu từ chối, ghi rõ lý do và báo cáo vượt cấp ngay trong ca.</div>
+<div class="step-item"><strong>Người bàn giao chốt hiện trạng.</strong><br>Dừng công đoạn ở điểm an toàn; cập nhật giao dịch và nhãn; chốt tốt / đạt/nghi ngờ/phế phẩm; ghi mở vấn đề và cuối cùng đã biết tốt / đạt. Không bàn giao lúc tình trạng còn mơ hồ.</div>
+<div class="step-item"><strong>Người nhận đối chiếu vật lý và hồ sơ.</strong><br>Đối chiếu JobNum, PartNo, Rev, Qty, thùng chứa, nhãn, traveler, và hồ sơ/bằng chứng liên quan. Nếu là machine chuyển giao, phải đối chiếu thêm phát hành set của máy nhận.</div>
+<div class="step-item"><strong>Kiểm điều kiện tiếp tục chạy.</strong><br>Xem mẫu đầu/FAI trạng thái, IPQC trạng thái, tuổi dao (tool tuổi thọ / vòng đời), bù trừ (offset) trạng thái, mở hold/mở NCR. Nếu có thay đổi machine/fixture/tool ảnh hưởng part thì phải quay về setup/mẫu đầu tương ứng.</div>
+<div class="step-item"><strong>Ký nhận hoặc từ chối nhận.</strong><br>Chỉ ký nhận khi đủ thông tin, đủ hồ sơ và điều kiện vật lý phù hợp. Nếu từ chối, ghi rõ lý do và báo cáo vượt cấp ngay trong ca.</div>
 </div></div>
 
 <div class="section"><h2>5. Quy tắc riêng cho từng loại chuyển giao</h2>
 <div class="matrix">
 <div class="card"><h3>5.1 Shift bàn giao</h3><ul class="tight" style="padding-left:20px;"><li>Chốt part cuối cùng đang nằm ở trạng thái nào: tốt / đạt / nghi ngờ / đang đo / đang chờ quyết định.</li><li>Giao rõ tool sắp hết tuổi thọ / vòng đời, bù trừ (offset) vừa chỉnh, đặc tính đang trôi / sai lệch, lỗi vừa xảy ra.</li><li>Người nhận phải thực hiện nhanh-kiểm tra theo <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a> trước khi bấm chạy lại.</li></ul></div>
 <div class="card"><h3>5.2 Machine chuyển giao</h3><ul class="tight" style="padding-left:20px;"><li>Không dùng trạng thái của máy cũ để suy diễn máy mới.</li><li>Phải re-thiết lập WCS/fixture/tooling trên máy mới và đánh giá lại mẫu đầu/FAI theo tác động.</li><li>Lộ trình gia công/điều phối xuất hàng phải cập nhật trước khi chuyển WIP vật lý.</li></ul></div>
-<div class="card"><h3>5.3 Vận hành chuyển giao</h3><ul class="tight" style="padding-left:20px;"><li>thùng chứa phải được di chuyển scan đúng công đoạn.</li><li>Điểm kiểm của công đoạn trước phải đóng đủ trước khi chuyển.</li><li>Responsible Person công đoạn nhận kiểm tình trạng bề mặt, truy xuất nguồn gốc và hồ sơ kèm theo.</li></ul></div>
+<div class="card"><h3>5.3 Vận hành chuyển giao</h3><ul class="tight" style="padding-left:20px;"><li>thùng chứa phải được di chuyển scan đúng công đoạn.</li><li>Điểm kiểm của công đoạn trước phải đóng đủ trước khi chuyển.</li><li>người chịu trách nhiệm công đoạn nhận kiểm tình trạng bề mặt, truy xuất nguồn gốc và hồ sơ kèm theo.</li></ul></div>
 <div class="card"><h3>5.4 Outsource chuyển giao</h3><ul class="tight" style="padding-left:20px;"><li>Phải có truyền đạt Requests, đóng gói, label và cert Requests rõ.</li><li>Khi nhận về phải kiểm qty, tình trạng kiện, bộ chứng từ chứng nhận và trạng thái hold trước khi nhập.</li><li>Không nhập kho "treo chứng từ" cho job Requests cert bắt buộc.</li></ul></div>
 </div></div>
 
 <div class="section"><h2>6. Hồ sơ, KPI và tài liệu liên kết</h2>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>KPI-WI518-01</strong><br/>Tỷ lệ chuyển giao có bàn giao log / scan / qty đối soát đầy đủ.</div>
-<div class="kpi-box"><strong>KPI-WI518-02</strong><br/>Số lỗi phát sinh do bàn giao thiếu thông tin hoặc chuyển sai lộ trình gia công.</div>
-<div class="kpi-box"><strong>KPI-WI518-03</strong><br/>Tỷ lệ machine chuyển giao phải làm lại mẫu đầu do phát hành set sai hoặc thiếu.</div>
-<div class="kpi-box"><strong>KPI-WI518-04</strong><br/>Thời gian phản ứng khi chuyển giao bị từ chối vì thiếu điều kiện.</div>
+<div class="kpi-box"><strong>KPI-WI518-01</strong><br>Tỷ lệ chuyển giao có bàn giao log / scan / qty đối soát đầy đủ.</div>
+<div class="kpi-box"><strong>KPI-WI518-02</strong><br>Số lỗi phát sinh do bàn giao thiếu thông tin hoặc chuyển sai lộ trình gia công.</div>
+<div class="kpi-box"><strong>KPI-WI518-03</strong><br>Tỷ lệ machine chuyển giao phải làm lại mẫu đầu do phát hành set sai hoặc thiếu.</div>
+<div class="kpi-box"><strong>KPI-WI518-04</strong><br>Thời gian phản ứng khi chuyển giao bị từ chối vì thiếu điều kiện.</div>
 </div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="wi-517-setup-changeover-smed-standard-work.html">WI-517</a></td><td>Setup/chuyển đổi (changeover) trước khi bàn giao máy/job.</td></tr>

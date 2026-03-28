@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WI-514 — Hướng dẫn vận hành tiện CNC | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../assets/style.css">
 <style>
 
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
@@ -45,7 +45,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="page-body">
  <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
@@ -57,10 +57,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Owner:</b></span><span>Sản xuất Manager / Kỹ thuật Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
  </div>
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho máy tiện CNC, tiện trung tâm và nguyên công tiện trên máy có Live tooling khi logic kẹp quay/phôi quay vẫn là rủi ro chính.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho máy tiện CNC, tiện trung tâm và nguyên công tiện trên máy có Live tooling khi logic kẹp quay/phôi quay vẫn là rủi ro chính.</div>
  <h1>WI-514 — Hướng dẫn vận hành tiện CNC</h1>
  <div class="section"><h2>1. Mục đích và rủi ro đặc thù</h2><p>WI này chuẩn hóa vận hành tiện CNC và các nguyên công tiện/Live-tooling mức tiện. Trọng tâm là kiểm soát kẹp / nắm chiều dài, độ đảo (runout), dính / que-out, ụ sau (tailstock)/ổn định còn lại / nghỉ, tool mũi dao bán kính bù trừ và các điểm dễ gây cắt đứt (parting)/ren hỏng / lỗi.</p><div class="callout-danger"><strong>NGUY HIỂM CAO</strong> phôi quay tốc độ cao có thể gây văng phôi, cuốn vật lạ và gây chấn thương nghiêm trọng. Không đo, không Đạt phoi (chip), không chỉnh tay Cần mâm cặp (chuck) khi trục chính (spindle) đang quay.</div></div><div class="section"><h2>2. Setup mâm cặp (chuck)/ống kẹp (collet) và chứng minh-out</h2><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục</th><th>Yêu cầu</th><th>Điểm dừng</th></tr></thead><tbody><tr><td>Jaw/ống kẹp (collet)</td><td>Chọn đúng dải kẹp, đúng hình dáng và chiều kẹp; mặt kẹp sạch và không nứt</td><td>Jaw/ống kẹp (collet) không phù hợp hoặc bẩn = không chạy</td></tr>
 <tr><td>kẹp / nắm chiều dài / dính / que-out</td><td>Phải chứng minh đủ kẹp / nắm, đủ hỗ trợ; L/D cao phải có ụ sau (tailstock)/ổn định còn lại / nghỉ nếu cần</td><td>dính / que-out vượt kiểm soát mà chưa có hỗ trợ = TẠM GIỮ</td></tr>

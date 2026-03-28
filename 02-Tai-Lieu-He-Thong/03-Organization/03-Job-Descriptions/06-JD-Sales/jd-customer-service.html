@@ -1,55 +1,11 @@
-
- thead { display: table-header-group; }
- tfoot { display: table-footer-group; }
- p { orphans: 3; widows: 3; }
- 
-}
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
-.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
-.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
-.raci-A {background:#fff5f5; color:#c92a2a;}
-.raci-R {background:#e7f5ff; color:#1864ab;}
-.raci-C {background:#fff9db; color:#e67700;}
-.raci-I {background:#ebfbee; color:#2b8a3e;}
-.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
-.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
-.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
-.doc-link-list {list-style:none; margin:0; padding:0;}
-.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
-.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
-.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
-.svg-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
-.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
-kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
-
-/* JD-LAYOUT-PLUS */
-.jd-purpose{margin:12px 0 18px; background:var(--bg2,#f8fafc); border:1px solid var(--ln,#d7deea); border-left: 3px solid #1d4ed8; border-radius:8px; padding:12px 14px;}
-.jd-mission{background:#eef6ff; border:1px solid #cfe0ff; border-left: 3px solid #2563eb; border-radius:8px; padding:14px 16px; margin:8px 0 18px;}
-.jd-mission p:last-child,.auth-item p:last-child,.backup-card p:last-child,.comp-card p:last-child{margin-bottom:0;}
-.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
-.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
-.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
-.muted-note{font-size:12px; color:var(--ink2,#475569);}
-.raci-badge{display:inline-block; min-width:26px; text-align:center; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;}
-.raci-a{background:#fff3e0; color:#b45309;}
-.raci-r{background:#e0f2fe; color:#0369a1;}
-.raci-c{background:#f3e8ff; color:#7e22ce;}
-.raci-i{background:#ecfdf5; color:#047857;}
-.comp-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:10px;}
-.comp-card{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:#ffffff;}
-.comp-card ul{margin-bottom:0;}
-.require-table th{width:24%;}
-.inline-note{margin-top:8px; font-size:12px; color:var(--ink2,#475569);}
-@media (max-width: 960px){ .auth-grid,.comp-grid{grid-template-columns:1fr;} }
-
-}
-
-</style>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>JD-CS — Customer Service | HESEM QMS</title>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../../assets/style.css">
 </head>
 <body>
 <div class="container">
@@ -57,22 +13,22 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu kiểm soát</span>
 </div>
 </div>
 <div class="title">
-<strong>JD-khách hàng-dịch vụ — Customer Dịch vụ</strong>
-<span class="sub-vn">Nhân viên Chăm sóc Customer / Điều phối Đơn hàng</span>
+<strong>JD-CS — Customer Service</strong>
+<span class="sub-vn">Nhan vien dich vu khach hang</span>
 </div>
 <div class="meta">
-<div class="row"><span><b>Code:</b></span><span>JD-khách hàng-dịch vụ</span></div>
-<div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span>HR Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Mã:</b></span><span>JD-CS</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="role-cluster"><a class="role-link" href="../08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="role-cluster"><a class="role-link" href="../01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <div class="doc-content" id="docContent">
@@ -88,9 +44,9 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2">1. Thông tin vị trí (Vị trí / Chức vụ ID &amp; tiêu đề)</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
-<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-khách hàng-dịch vụ</td></tr>
-<tr><th>Chức danh theo tài liệu</th><td>Customer Dịch vụ</td></tr>
-<tr><th>Bộ phận</th><td>Kinh doanh &amp; Customer Dịch vụ</td></tr>
+<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-CS</td></tr>
+<tr><th>Mã vai trò dùng trong SOP/RACI</th><td><span class="role-cluster"><a class="role-link" href="jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="role-code">CS</span></a></span></td></tr><tr><th>Chức danh theo tài liệu</th><td>Customer Service</td></tr>
+<tr><th>Bộ phận</th><td>Sales</td></tr>
 <tr><th>Cấp vai trò</th><td>Chuyên nghiệp / Nhân viên</td></tr>
 <tr><th>Nhóm vai trò</th><td>Kinh doanh hỗ trợ / ước tính / định giá / khách hàng giao diện</td></tr>
 <tr><th>Báo cáo trực tiếp cho</th><td>Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên.</td></tr>
@@ -100,7 +56,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tr><th>Vai trò trong chuỗi giá trị</th><td>PO/dự báo/khách hàng Requests → rà soát hợp đồng phối hợp → đơn hàng xác nhận / biên nhận/kiểm soát thay đổi → giao hàng truyền đạt / giao tiếp → khiếu nại/RMA thương mại giao diện.</td></tr></tbody></table>
 </div>
 <h2 class="h2">2. Sứ mệnh vị trí (Vai trò Sứ mệnh)</h2>
-<div class="jd-mission"><p>Customer Dịch vụ là "mặt tiền dữ liệu đơn hàng" của doanh nghiệp: tiếp nhận PO, khóa đúng phiên bản / CSR / giao vận hướng dẫn, điều phối thông tin xuyên suốt từ khách hàng vào hệ thống và ngược lại. Vị trí này bảo đảm nhà máy chỉ cam kết những gì đã được rà soát hợp đồng đầy đủ và có thể thực hiện.</p><p>Trong môi trường gia công bán dẫn / cơ khí chính xác, sai một phiên bản, sai một PO dòng / chuyền hoặc sai một Requests chứng từ có thể dẫn đến từ chối, hoàn phí / bồi hoàn hoặc mất uy tín. Vì vậy Customer Dịch vụ phải làm chủ tính chính xác thương mại – dữ liệu – chứng từ, chứ không chỉ trả lời email khách hàng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mọi đơn hàng được tiếp nhận, xác nhận và thay đổi theo đúng phiên bản, đúng điều kiện thương mại và đúng Requests hồ sơ / nhãn / đóng gói.</li><li>Cam kết giao hàng ra khách hàng được hình thành trên dữ liệu plan thực và được cập nhật chủ động khi có rủi ro thay đổi.</li><li>Khiếu nại, RMA, khách hàng thuộc tính / tài sản và chứng từ lô giao hàng có đầu mối rõ, có log đầy đủ và không bị đứt mạch giữa khách hàng với nội bộ.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Customer Dịch vụ là Responsible Person của giao tiếp đơn hàng và dữ liệu thương mại với khách hàng; không tự quyết định tính khả thi kỹ thuật, không báo giá thay Người định giá và không hứa lịch giao khi Planner/Sản xuất chưa xác nhận.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Khóa đúng dữ liệu thương mại và cam kết-date giả định ngay từ đầu: phiên bản, CSR, ship điều kiện, chứng từ, tách / chia lô giao hàng, khiếu nại path.</li><li>Customer Dịch vụ phải là đơn lẻ source of sự thật cho giao tiếp đối ngoại, nhưng không tự sở hữu dữ liệu kỹ thuật/chất lượng/nguồn cung ngoài phạm vi của mình.</li><li>Mọi cam kết lại với khách phải bám năng lực thực tế đã được xác nhận nội bộ; không cam kết bằng kỳ vọng.</li></ul></div>
+<div class="jd-mission"><p>Customer Dịch vụ là "mặt tiền dữ liệu đơn hàng" của doanh nghiệp: tiếp nhận PO, khóa đúng phiên bản / CSR / giao vận hướng dẫn, điều phối thông tin xuyên suốt từ khách hàng vào hệ thống và ngược lại. Vị trí này bảo đảm nhà máy chỉ cam kết những gì đã được rà soát hợp đồng đầy đủ và có thể thực hiện.</p><p>Trong môi trường gia công bán dẫn / cơ khí chính xác, sai một phiên bản, sai một PO dòng / chuyền hoặc sai một Requests chứng từ có thể dẫn đến từ chối, hoàn phí / bồi hoàn hoặc mất uy tín. Vì vậy Customer Dịch vụ phải làm chủ tính chính xác thương mại – dữ liệu – chứng từ, chứ không chỉ trả lời email khách hàng.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Mọi đơn hàng được tiếp nhận, xác nhận và thay đổi theo đúng phiên bản, đúng điều kiện thương mại và đúng Requests hồ sơ / nhãn / đóng gói.</li><li>Cam kết giao hàng ra khách hàng được hình thành trên dữ liệu plan thực và được cập nhật chủ động khi có rủi ro thay đổi.</li><li>Khiếu nại, RMA, khách hàng thuộc tính / tài sản và chứng từ lô giao hàng có đầu mối rõ, có log đầy đủ và không bị đứt mạch giữa khách hàng với nội bộ.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> Customer Dịch vụ là người chịu trách nhiệm của giao tiếp đơn hàng và dữ liệu thương mại với khách hàng; không tự quyết định tính khả thi kỹ thuật, không báo giá thay Người định giá và không hứa lịch giao khi Planner/Sản xuất chưa xác nhận.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Khóa đúng dữ liệu thương mại và cam kết-date giả định ngay từ đầu: phiên bản, CSR, ship điều kiện, chứng từ, tách / chia lô giao hàng, khiếu nại path.</li><li>Customer Dịch vụ phải là đơn lẻ source of sự thật cho giao tiếp đối ngoại, nhưng không tự sở hữu dữ liệu kỹ thuật/chất lượng/nguồn cung ngoài phạm vi của mình.</li><li>Mọi cam kết lại với khách phải bám năng lực thực tế đã được xác nhận nội bộ; không cam kết bằng kỳ vọng.</li></ul></div>
 <h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
@@ -123,7 +79,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <tbody>
 <tr>
 <th style="width:26%">Điểm kết thúc trách nhiệm</th>
-<td>Customer Dịch vụ là Responsible Person của giao tiếp đơn hàng và dữ liệu thương mại với khách hàng; không tự quyết định tính khả thi kỹ thuật, không báo giá thay Người định giá và không hứa lịch giao khi Planner/Sản xuất chưa xác nhận.</td>
+<td>Customer Dịch vụ là người chịu trách nhiệm của giao tiếp đơn hàng và dữ liệu thương mại với khách hàng; không tự quyết định tính khả thi kỹ thuật, không báo giá thay Người định giá và không hứa lịch giao khi Planner/Sản xuất chưa xác nhận.</td>
 </tr>
 <tr>
 <th style="width:26%">Không thuộc trách nhiệm chính / phải đã báo cáo vượt cấp</th>
@@ -132,11 +88,11 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </tbody>
 </table>
 </div>
-<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng Responsible Person thay vì xử lý ngoài tuyến kiểm soát.</p>
+<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng người chịu trách nhiệm thay vì xử lý ngoài tuyến kiểm soát.</p>
 <p class="inline-note">Mọi thay đổi ảnh hưởng chất lượng, giao hàng, chi phí, phiên bản, phát hành hoặc truy vết phải tuân theo quy trình/hồ sơ liên kết tại Mục 12.</p>
 <h2 class="h2">5. Quyền hạn (Thẩm quyền &amp; quyền ra quyết định (quyền)</h2>
 <div class="auth-grid">
-<div class="auth-item">Từ chối xác nhận đơn hàng hoặc thay đổi đơn hàng khi thiếu phiên bản, thiếu CSR, thiếu điều kiện thương mại hoặc còn điểm mơ hồ chưa được làm rõ bằng văn bản.</div><div class="auth-item">Yêu cầu hold đơn hàng / hold lô giao hàng ở mức dữ liệu khi phát hiện PO, label, chứng từ hoặc khách hàng hướng dẫn không đồng nhất với hồ sơ đã phê duyệt.</div><div class="auth-item">Yêu cầu các bộ phận liên quan phản hồi tiến độ / chứng từ trong SLA để không làm trễ phản hồi khách hàng.</div><div class="auth-item">Báo cáo vượt cấp rủi ro giao hàng, khiếu nại hoặc thay đổi hợp đồng trọng yếu lên Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên và các Responsible Person liên quan trước khi cam kết lại với khách hàng.</div>
+<div class="auth-item">Từ chối xác nhận đơn hàng hoặc thay đổi đơn hàng khi thiếu phiên bản, thiếu CSR, thiếu điều kiện thương mại hoặc còn điểm mơ hồ chưa được làm rõ bằng văn bản.</div><div class="auth-item">Yêu cầu hold đơn hàng / hold lô giao hàng ở mức dữ liệu khi phát hiện PO, label, chứng từ hoặc khách hàng hướng dẫn không đồng nhất với hồ sơ đã phê duyệt.</div><div class="auth-item">Yêu cầu các bộ phận liên quan phản hồi tiến độ / chứng từ trong SLA để không làm trễ phản hồi khách hàng.</div><div class="auth-item">Báo cáo vượt cấp rủi ro giao hàng, khiếu nại hoặc thay đổi hợp đồng trọng yếu lên Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên và các người chịu trách nhiệm liên quan trước khi cam kết lại với khách hàng.</div>
 <div class="auth-item">Có quyền từ chối xác nhận đơn hàng hoặc từ chối hứa lại Ngày giao với khách khi giả định kỹ thuật/nguồn cung/chất lượng chưa được chốt bằng dữ liệu chính thức.</div></div>
 <h2 class="h2">6. Interfaces liên phòng ban — RACI / Bàn giao</h2>
 <div class="table-card">
@@ -151,13 +107,13 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </thead>
 <tbody>
 <tr>
-<th style="width:20%">Người định giá</th>
+<th style="width:20%"><span class="role-cluster"><a class="role-link" href="jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="role-code">EST</span></a></span></th>
 <td><p>Nhận báo giá cơ sở, giả định, giá hiệu lực và các điều kiện kỹ thuật/thương mại cần truyền đạt Requests vào đơn hàng.</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-c">C</span></td>
 <td>PO acceptance không đi lệch cơ sở của báo giá.</td>
 </tr>
 <tr>
-<th style="width:20%">Production Planner</th>
+<th style="width:20%"><span class="role-cluster"><a class="role-link" href="../02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="role-code">PPL</span></a></span></th>
 <td><p>Yêu cầu xác nhận Ngày giao, thay đổi số lượng, đẩy nhanh tiến độ Requests và nhận cảnh báo rủi ro lịch giao.</p></td>
 <td style="width:10%; text-align:center"><span class="raci-badge raci-c">C</span></td>
 <td>Customer chỉ nhận các cam kết có thể thực hiện.</td>
@@ -190,7 +146,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 <h2 class="h2">9. Yêu cầu năng lực (Năng lực Yêu cầu)</h2>
 <div class="comp-grid">
 <div class="comp-card"><p><b>Kiến thức chuyên môn &amp; hệ thống</b></p><ul><li>Hiểu luồng RFQ → báo giá → rà soát hợp đồng → lập kế hoạch → lô giao hàng → lập hóa đơn; nắm nguyên tắc phiên bản control và Requests truy vết theo lệnh sản xuất.</li><li>Thành thạo ERP / Epicor hoặc hệ thống tương đương, email / Excel / portal; biết kiểm chứng dữ liệu trước khi phát hành cam kết cho khách hàng.</li><li>Có kiến thức nền về chứng từ giao hàng, COC / COA, label / đóng gói Requests và khách hàng thuộc tính / tài sản control.</li></ul></div>
-<div class="comp-card"><p><b>Năng lực hành vi / phối hợp</b></p><ul><li>Cẩn trọng dữ liệu, giao tiếp rõ ràng, phản hồi nhanh nhưng không hứa vượt thẩm quyền.</li><li>Biết giữ nhịp với khách hàng đồng thời bám sát Responsible Person nội bộ để không bỏ sót thay đổi hoặc rủi ro lô giao hàng.</li><li>Có tác phong dịch vụ chuyên nghiệp, chịu được áp lực hạn chót và nhiều Requests song song.</li></ul></div>
+<div class="comp-card"><p><b>Năng lực hành vi / phối hợp</b></p><ul><li>Cẩn trọng dữ liệu, giao tiếp rõ ràng, phản hồi nhanh nhưng không hứa vượt thẩm quyền.</li><li>Biết giữ nhịp với khách hàng đồng thời bám sát người chịu trách nhiệm nội bộ để không bỏ sót thay đổi hoặc rủi ro lô giao hàng.</li><li>Có tác phong dịch vụ chuyên nghiệp, chịu được áp lực hạn chót và nhiều Requests song song.</li></ul></div>
 </div>
 <div class="callout"><p><b>Mô-đun năng lực / đào tạo cốt lõi</b></p><ul><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C04.html">C04 — Mô-đun C04 — chéo-Department Truyền đạt &amp; Phối hợp | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C05.html">C05 — Mô-đun C05 — Customer Dịch vụ Tư duy (B2B) | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C08.html">C08 — Mô-đun C08 — Data-Định hướng bởi Tư duy &amp; System Sử dụng (ERP/Excel) | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C10.html">C10 — Mô-đun C10 — Quy trình Lệnh sản xuất CNC (RFQ → Tiền mặt) | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C11.html">C11 — Mô-đun C11 — Kinh doanh / RFQ &amp; Review hợp đồng | HESEM OS</a></li><li><a href="../../../../10-Training-Academy/02-Training-Content/01-Modules/C13.html">C13 — Mô-đun C13 — Rủi ro Quản lý &amp; Phiên bản Control | HESEM OS</a></li></ul></div>
 <p class="inline-note">Mức đánh giá chi tiết, kiểm soát cổng OJT và lộ trình phát triển áp dụng theo ma trận đào tạo (matrix) / năng lực đánh giá hướng dẫn hiện hành của bộ phận.</p>
@@ -216,9 +172,3 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </div>
 </body>
 </html>
-
-
-
-
-
-

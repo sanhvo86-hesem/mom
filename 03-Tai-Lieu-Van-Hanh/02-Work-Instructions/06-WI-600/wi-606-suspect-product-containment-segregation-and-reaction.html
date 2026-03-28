@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>WI-606 — Cô lập hàng nghi ngờ, khoanh vùng ảnh hưởng và phản ứng hiện trường | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 <style>
 
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
@@ -46,7 +45,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
@@ -58,10 +57,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Owner:</b></span><span>QA Manager / Sản xuất Manager / Kho Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng ngay khi phát sinh hàng nghi ngờ, hỗn hợp / lẫn lộn lot, khuyết tật lớn / nghiêm trọng/quan trọng / nghiêm trọng, gage vấn đề, tool sự cố nghiêm trọng, cert vấn đề hoặc mọi tình huống cần ngăn chặn.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng ngay khi phát sinh hàng nghi ngờ, hỗn hợp / lẫn lộn lot, khuyết tật lớn / nghiêm trọng/quan trọng / nghiêm trọng, gage vấn đề, tool sự cố nghiêm trọng, cert vấn đề hoặc mọi tình huống cần ngăn chặn.</div>
 <h1>WI-606 — Cô lập hàng nghi ngờ, khoanh vùng ảnh hưởng và phản ứng hiện trường</h1><div class="section">
 <h2>1. Mục đích, định nghĩa nghi ngờ sản phẩm và kích hoạt bắt buộc</h2>
 <p>WI này điều khiển phản ứng hiện trường khi phát sinh <strong>nghi ngờ sản phẩm</strong> — tức bất kỳ vật tư, WIP, thành phẩm, hồ sơ cert hoặc bản ghi nào có lý do hợp lý để nghi ngờ về tình trạng phù hợp, truy vết, độ sạch, tình trạng phát hành hoặc tính toàn vẹn của bằng chứng. Khi đã gắn trạng thái nghi ngờ, sản phẩm đó <strong>không được</strong> chuyển công đoạn, ship, nhập kho có thể sử dụng hoặc trộn lại với hàng tốt cho tới khi có disposition và phát hành đúng thẩm quyền.</p>
@@ -69,11 +68,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </div><div class="section">
 <h2>2. Phản ứng trong 15 phút đầu</h2>
 <div class="step-list">
-<div class="step-item"><strong>Bước 1 — STOP / TẠM GIỮ ngay tại điểm phát hiện.</strong><br/>Dừng công đoạn liên quan; dừng vấn đề; dừng ship nếu có khả năng lô ảnh hưởng đã tới khu xuất; chặn di chuyển giao dịch tiếp theo trên hệ thống.</div>
-<div class="step-item"><strong>Bước 2 — Cô lập vật lý.</strong><br/>Đưa vật tư/WIP/FG vào khu <span class="code">TẠM GIỮ</span> hoặc <span class="code">cách ly / biệt trữ</span> đã định danh; dán tag nhận diện rõ part, lot, qty, lý do, time, Người gắn.</div>
-<div class="step-item"><strong>Bước 3 — Giữ nguyên chứng cứ.</strong><br/>Không được tự ý đánh bóng, đổi nhãn, tháo bag, dỡ pallet, sửa bù trừ (offset), reset bộ đếm / quầy, xóa dữ liệu, hoặc tách kiện trước khi chụp ảnh và ghi nhận tình trạng ban đầu.</div>
-<div class="step-item"><strong>Bước 4 — Gọi đúng Người.</strong><br/>Báo Supervisor, QA, WHS và Responsible Person công đoạn. Nếu nghi đã chạm giao vận/khách hàng rủi ro, escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> trong cùng ca, không chờ họp sáng hôm sau.</div>
-<div class="step-item"><strong>Bước 5 — Mở hồ sơ.</strong><br/>Mở <a href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx" download="">FRM-651</a> hoặc log hold tương đương; ghi thời điểm phát hiện, part/rev, lot/số sê-ri, qty ảnh hưởng, vị trí phát hiện, trạng thái Current và nguyên nhân sơ bộ.</div>
+<div class="step-item"><strong>Bước 1 — STOP / TẠM GIỮ ngay tại điểm phát hiện.</strong><br>Dừng công đoạn liên quan; dừng vấn đề; dừng ship nếu có khả năng lô ảnh hưởng đã tới khu xuất; chặn di chuyển giao dịch tiếp theo trên hệ thống.</div>
+<div class="step-item"><strong>Bước 2 — Cô lập vật lý.</strong><br>Đưa vật tư/WIP/FG vào khu <span class="code">TẠM GIỮ</span> hoặc <span class="code">cách ly / biệt trữ</span> đã định danh; dán tag nhận diện rõ part, lot, qty, lý do, time, Người gắn.</div>
+<div class="step-item"><strong>Bước 3 — Giữ nguyên chứng cứ.</strong><br>Không được tự ý đánh bóng, đổi nhãn, tháo bag, dỡ pallet, sửa bù trừ (offset), reset bộ đếm / quầy, xóa dữ liệu, hoặc tách kiện trước khi chụp ảnh và ghi nhận tình trạng ban đầu.</div>
+<div class="step-item"><strong>Bước 4 — Gọi đúng Người.</strong><br>Báo Supervisor, QA, WHS và người chịu trách nhiệm công đoạn. Nếu nghi đã chạm giao vận/khách hàng rủi ro, escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> trong cùng ca, không chờ họp sáng hôm sau.</div>
+<div class="step-item"><strong>Bước 5 — Mở hồ sơ.</strong><br>Mở <a href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx" download="">FRM-651</a> hoặc log hold tương đương; ghi thời điểm phát hiện, part/rev, lot/số sê-ri, qty ảnh hưởng, vị trí phát hiện, trạng thái Current và nguyên nhân sơ bộ.</div>
 </div>
 </div><div class="section">
 <h2>3. Ranh giới lot logic và hỗn hợp / lẫn lộn-vị trí quét / dọn dẹp</h2>
@@ -109,7 +108,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </ul></div>
 <div class="card"><h3>Điều kiện phát hành lại</h3><ul class="tight" style="padding-left:18px;">
 <li>Đã xác định rõ phạm vi ảnh hưởng và số lượng còn lại.</li>
-<li><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a> và hồ sơ TẠM GIỮ/ngăn chặn đã đủ ảnh, lot, qty, lý do, Responsible Person.</li>
+<li><a download="" href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx">FRM-651</a> và hồ sơ TẠM GIỮ/ngăn chặn đã đủ ảnh, lot, qty, lý do, người chịu trách nhiệm.</li>
 <li>Kết quả sort / đo lại / cert bổ sung / rà soát nhà cung cấp đã đóng đủ.</li>
 <li>Tag vật lý, trạng thái hệ thống, nhãn mới và vị trí đã đồng bộ.</li>
 <li>QA phê duyệt phát hành; các concession bắt buộc đã có văn bản hợp lệ.</li>
@@ -143,5 +142,3 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
-
-

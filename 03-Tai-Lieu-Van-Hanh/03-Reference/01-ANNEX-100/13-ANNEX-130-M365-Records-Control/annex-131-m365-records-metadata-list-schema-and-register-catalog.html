@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANNEX-131 - M365 hồ sơ siêu dữ liệu, list sơ đồ cấu trúc, value bộ / tập hợp and sổ đăng ký danh mục | HESEM QMS</title>
-<link rel="stylesheet" href="../../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../../assets/style.css">
 <style>
 
 .page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
@@ -30,7 +30,7 @@
 
 <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Annex số hóa</span>
@@ -42,11 +42,11 @@
  <div class="row"><span><b>Version:</b></span><span>V2</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
  <div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Quản trị viên</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
 </div>
 
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi tạo mới hoặc sửa M365 List/Sổ đăng ký, nội dung type, biểu mẫu, Power Automate flow, dashboard, tích hợp và siêu dữ liệu sơ đồ cấu trúc cho toàn bộ QMS số hóa. ANNEX này là nguồn chuẩn cho nội bộ name, lựa chọn code, list danh mục, tra cứu source, validation rule và source-of-hồ sơ ranh giới.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi tạo mới hoặc sửa M365 List/Sổ đăng ký, nội dung type, biểu mẫu, Power Automate flow, dashboard, tích hợp và siêu dữ liệu sơ đồ cấu trúc cho toàn bộ QMS số hóa. ANNEX này là nguồn chuẩn cho nội bộ name, lựa chọn code, list danh mục, tra cứu source, validation rule và source-of-hồ sơ ranh giới.</div>
  <h1>ANNEX-131 - M365 hồ sơ siêu dữ liệu, list sơ đồ cấu trúc, value bộ / tập hợp and sổ đăng ký danh mục</h1>
 
  <div class="section">
@@ -151,15 +151,15 @@
  </tbody>
  </table>
  </div>
- <div class="keyline"><strong>Chuyển đổi quy ước đặt tên file (HHMM-UserID):</strong><br/>
- Hệ thống đang chuyển từ quy ước cũ sang quy ước mới cho hậu tố tên file:<br/>
+ <div class="keyline"><strong>Chuyển đổi quy ước đặt tên file (HHMM-UserID):</strong><br>
+ Hệ thống đang chuyển từ quy ước cũ sang quy ước mới cho hậu tố tên file:<br>
  <ul style="margin:6px 0; padding-left:20px;">
  <li><span class="code">_{seq}_{RoleCode}</span> (VD: <span class="code">_01_QC</span>) — <strong>DEPRECATED</strong> — không dùng cho file tạo mới.</li>
  <li><span class="code">_{HHMM}-{UserID}</span> (VD: <span class="code">_0830-NVA</span>) — <strong>ACTIVE</strong> — quy ước chính thức, xem chi tiết tại <span class="code">ANNEX-137</span>.</li>
  </ul>
  File cũ theo pattern <span class="code">_{seq}_{RoleCode}</span> vẫn hợp lệ, không cần đổi tên. File mới tạo bắt buộc dùng <span class="code">_{HHMM}-{UserID}</span>.
  </div>
- <div class="keyline"><strong>Giới hạn độ sâu thư mục (max 3 cấp):</strong><br/>
+ <div class="keyline"><strong>Giới hạn độ sâu thư mục (max 3 cấp):</strong><br>
  Metadata là cơ chế khám phá / tìm kiếm chính, KHÔNG phải cấu trúc thư mục lồng sâu. Thư mục tối đa 3 cấp (VD: <span class="code">Zone / Year / SubFolder</span>). Mọi phân loại chi tiết hơn phải dùng metadata column thay vì tạo thêm cấp thư mục. Xem thêm <span class="code">core-standards/14</span> Rule 4.
  </div>
  </div>
@@ -205,7 +205,7 @@
  <tbody>
  <tr><td>QMS-Tài liệu-Sổ đăng ký</td><td>Được kiểm soát tài liệu sổ đăng ký</td><td>DocCode + Phiên bản</td><td>QMS</td><td>SupersededDate</td></tr>
  <tr><td>QMS-Thay đổi-Sổ đăng ký</td><td>System and quy trình thay đổi</td><td>ChangeId</td><td>QMS</td><td>ClosedDate</td></tr>
- <tr><td>QMS-NCR-Sổ đăng ký</td><td>NCR trường hợp</td><td>mã NCR (NCRId)</td><td>QA</td><td>DispositionApprovedDate</td></tr>
+ <tr><td>QMS-NCR-Sổ đăng ký</td><td>NCR trường hợp</td><td>mã NCR (NCRId)</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a></span></td><td>DispositionApprovedDate</td></tr>
  <tr><td>QMS-CAPA-Sổ đăng ký</td><td>CAPA trường hợp</td><td>mã CAPA (CAPAId)</td><td>QMS</td><td>EffectivenessVerifiedDate</td></tr>
  <tr><td>OPS-Job-Hồ sơ-Index</td><td>Hồ sơ index for all công việc / đơn hàng</td><td>Công ty + Nhà máy + JobNum</td><td>Kế hoạch</td><td>JobClosedDate</td></tr>
  <tr><td>QMS-Đào tạo-Sổ đăng ký</td><td>Đào tạo sự kiện and bằng chứng sổ đăng ký</td><td>TrainingCode + SessionDate</td><td>HR / QA</td><td>TrainingEventDate or nhân viên phân tách per rule</td></tr>
@@ -299,4 +299,3 @@
 </div>
 </body>
 </html>
-

@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>WI-519 — Kiểm nhanh bộ hồ sơ công việc (job gói hồ sơ), xác minh trước khi chạy, đầu tiên cut và khởi động lại sau bất thường | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 <style>
 
 
@@ -50,7 +49,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
@@ -62,14 +61,14 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Owner:</b></span><span>Sản xuất Manager / Setup Lead / QA Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng ngay trước Cycle Start, sau setup/chuyển đổi (changeover), sau tool thay đổi ảnh hưởng CTQ, sau bù trừ (offset) edit/WCS reset, sau power tổn thất/cảnh báo, sau chuyển giao công việc hoặc bất kỳ lần nào phải chạy lại máy sau trạng thái không ổn định.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng ngay trước Cycle Start, sau setup/chuyển đổi (changeover), sau tool thay đổi ảnh hưởng CTQ, sau bù trừ (offset) edit/WCS reset, sau power tổn thất/cảnh báo, sau chuyển giao công việc hoặc bất kỳ lần nào phải chạy lại máy sau trạng thái không ổn định.</div>
 <h1>WI-519 — Kiểm nhanh bộ hồ sơ công việc, xác minh trước khi chạy, đầu tiên cut và khởi động lại sau bất thường</h1>
 <div class="section"><h2>1. Quy tắc 60 giây trước Cycle Start</h2>
 <p>WI này là cổng chặn cuối cùng trước khi nhấn <b>Cycle Start</b>. Trong vòng 60 giây, Operator hoặc Setup Lead phải xác nhận đủ 07 điểm bắt buộc tại máy. Nếu có 01 điểm không PASS hoặc không chứng minh được, máy phải vào <b>TẠM GIỮ</b>.</p>
-<div class="callout-danger"><strong>STOP-THE-dòng / chuyền</strong><br/>Không được chạy máy để "test tạm" khi chưa qua WI-519. Không được bỏ qua bước kiểm vì job lặp, vì đã từng chạy, vì Cần đến giờ giao, hoặc vì Người setup nói "ổn rồi".</div></div>
+<div class="callout-danger"><strong>STOP-THE-dòng / chuyền</strong><br>Không được chạy máy để "test tạm" khi chưa qua WI-519. Không được bỏ qua bước kiểm vì job lặp, vì đã từng chạy, vì Cần đến giờ giao, hoặc vì Người setup nói "ổn rồi".</div></div>
 <div class="section"><h2>2. Khi nào bắt buộc dùng WI-519</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thời điểm</th><th>Phải thực hiện</th><th>Người xác nhận</th></tr></thead><tbody>
 <tr><td>Part đầu sau setup / chuyển đổi (changeover)</td><td>Đủ 07 điểm kiểm + chứng minh-out + xác nhận đầu tiên cut</td><td>Operator + Setup Lead</td></tr>
@@ -89,7 +88,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>6. Dung dịch làm mát (dung dịch làm nguội) / phoi (chip) sơ tán / FOD</td><td>Dung dịch làm mát đúng loại và đúng vị trí phun; phoi (chip) băng tải hoặc thu phoi hoạt động; vùng cắt sạch</td><td>Kiểm trực quan + máy ở trạng thái sạch</td><td>phoi (chip) kẹt, dung dịch làm mát yếu/sai hướng, còn vật lạ trong machine khu vực</td></tr>
 <tr><td>7. Dry-run / đơn lẻ chặn / khóa / đầu tiên cut</td><td>Đã chứng minh-out đoạn rủi ro; đã kiểm vùng Cần kẹp / gá kẹp/quay/chuyển giao; có kế hoạch dừng kiểm part đầu</td><td><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> hoặc hồ sơ đầu tiên cut</td><td>Chưa chứng minh-out, chưa kiểm vùng rủi ro, hoặc đầu tiên cut không có Người theo dõi</td></tr>
 </tbody></table></div>
-<div class="callout-info"><strong>Kiểm bổ sung bắt buộc</strong><br/>Job QPL-3/QPL-4, part có CTQ cao, part lần đầu, part có Requests chân không/clean/rò rỉ hoặc khách hàng lớp phủ đặc biệt phải kiểm thêm: gage mức sẵn sàng, kiểm tra phương pháp, bằng chứng path và Người nhận đo part đầu.</div></div>
+<div class="callout-info"><strong>Kiểm bổ sung bắt buộc</strong><br>Job QPL-3/QPL-4, part có CTQ cao, part lần đầu, part có Requests chân không/clean/rò rỉ hoặc khách hàng lớp phủ đặc biệt phải kiểm thêm: gage mức sẵn sàng, kiểm tra phương pháp, bằng chứng path và Người nhận đo part đầu.</div></div>
 <div class="section"><h2>4. Ba mức kiểm trước khi chạy</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mức kiểm</th><th>Mục tiêu</th><th>Nội dung</th><th>Không đạt thì làm gì</th></tr></thead><tbody>
 <tr><td>Mức A — Gói hồ sơ</td><td>Chặn sai phiên bản, sai job, sai vật liệu, sai lộ trình gia công</td><td>Kiểm tài liệu, traveler, nguyên vật liệu lot, QPL, khách hàng lớp phủ, trước đó hold/NCR</td><td>TẠM GIỮ bộ hồ sơ công việc; báo Supervisor / QA / Kỹ thuật</td></tr>
@@ -121,16 +120,16 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tbody></table></div></div>
 <div class="section"><h2>8. Phản ứng khi không đạt</h2>
 <div class="step-list">
-<div class="step-item"><strong>Dừng Cycle Start.</strong><br/>Không cho phép chạy "một cái xem sao".</div>
-<div class="step-item"><strong>Giữ trạng thái TẠM GIỮ.</strong><br/>Tag máy, tag WIP hoặc tag lot liên quan nếu đã có cắt phoi sau lần kiểm cuối đạt.</div>
-<div class="step-item"><strong>Báo đúng Người.</strong><br/>Sai gói hồ sơ/phiên bản báo Kỹ thuật + QA; sai setup báo Setup Lead/Supervisor; nghi ngờ machine điều kiện báo Bảo trì; sai lot/nguyên vật liệu báo Kho + QA.</div>
-<div class="step-item"><strong>Khoanh vùng cuối cùng-đã biết-tốt / đạt.</strong><br/>Nếu đã có sản phẩm sau lần kiểm cuối đạt, phải xác định part phạm vi / dải nghi ngờ trước khi mở lại máy.</div>
-<div class="step-item"><strong>Chỉ mở lại khi đã PASS lại WI-519.</strong><br/>Sửa xong nhưng không lặp lại WI-519 thì vẫn xem là chưa đủ điều kiện chạy.</div>
+<div class="step-item"><strong>Dừng Cycle Start.</strong><br>Không cho phép chạy "một cái xem sao".</div>
+<div class="step-item"><strong>Giữ trạng thái TẠM GIỮ.</strong><br>Tag máy, tag WIP hoặc tag lot liên quan nếu đã có cắt phoi sau lần kiểm cuối đạt.</div>
+<div class="step-item"><strong>Báo đúng Người.</strong><br>Sai gói hồ sơ/phiên bản báo Kỹ thuật + QA; sai setup báo Setup Lead/Supervisor; nghi ngờ machine điều kiện báo Bảo trì; sai lot/nguyên vật liệu báo Kho + QA.</div>
+<div class="step-item"><strong>Khoanh vùng cuối cùng-đã biết-tốt / đạt.</strong><br>Nếu đã có sản phẩm sau lần kiểm cuối đạt, phải xác định part phạm vi / dải nghi ngờ trước khi mở lại máy.</div>
+<div class="step-item"><strong>Chỉ mở lại khi đã PASS lại WI-519.</strong><br>Sửa xong nhưng không lặp lại WI-519 thì vẫn xem là chưa đủ điều kiện chạy.</div>
 </div>
 <div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">% pre-run PASS lần đầu; số khởi động lại sau bất thường; số sự cố sai-rev/sai-tool/sai-bù trừ (offset) bị chặn trước Cycle Start; số cảnh báo trong 10 part đầu.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="wi-517-setup-changeover-smed-standard-work.html">WI-517</a>; <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>; <a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a>; <a href="../../03-Reference/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>.</div></div></div></div>
 <div data-phase2f="true">
 <h2 class="h2" id="phase2f-job-packet-gate">Kiểm soát bổ sung — Bộ hồ sơ công việc quick-check to decision hồ sơ</h2>
-<div class="note"><b>Làm rõ vai trò</b><br/>WI-519 là quick-check tiêu chuẩn hoá bước chuẩn bị; kết quả chuẩn bị này phải được chốt thành decision hồ sơ trên <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> khi setup / restart / chuyển giao công việc thực sự mở cổng kiểm soát chạy.</div>
+<div class="note"><b>Làm rõ vai trò</b><br>WI-519 là quick-check tiêu chuẩn hoá bước chuẩn bị; kết quả chuẩn bị này phải được chốt thành decision hồ sơ trên <a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> khi setup / restart / chuyển giao công việc thực sự mở cổng kiểm soát chạy.</div>
 </div></div>
 </div>
 </div>

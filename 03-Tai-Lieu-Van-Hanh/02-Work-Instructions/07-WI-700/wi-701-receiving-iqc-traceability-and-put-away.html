@@ -1,9 +1,10 @@
-<!DOCTYPE html> <html lang="vi">
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>WI-701 — Nhận hàng, IQC đầu vào, truy vết, dán nhãn và nhập vị trí | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<link href="../../../assets/style.css" rel="stylesheet">
 <style>
  h1, h2, h3 { break-after: avoid; page-break-after: avoid; } tr, td, th { break-inside: avoid; page-break-inside: avoid; }
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
@@ -38,7 +39,7 @@ ul.tight li {margin:4px 0;}
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
 <div class="fh-company">
 <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
 <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
@@ -50,17 +51,17 @@ ul.tight li {margin:4px 0;}
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Owner:</b></span><span>Kho Supervisor / IQC Team Leader</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
 </div>
 </div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi phiếu nhận / biên nhận vật tư, vật tư gia công ngoài, khách hàng thuộc tính / tài sản, tooling nhận về và mọi trường hợp cần nhập vị trí có kiểm soát trước khi cấp phát cho Job.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi phiếu nhận / biên nhận vật tư, vật tư gia công ngoài, khách hàng thuộc tính / tài sản, tooling nhận về và mọi trường hợp cần nhập vị trí có kiểm soát trước khi cấp phát cho Job.</div>
 <h1>WI-701 — Nhận hàng, IQC đầu vào, truy vết, dán nhãn và nhập vị trí</h1><div class="section">
 <h2>1. Mục đích, quyền dừng và ba lỗi gốc phải chặn</h2>
 <p>WI này điều khiển toàn bộ hoạt động nhận hàng từ lúc xe tới bến xuất nhập hàng cho đến khi hàng được gắn trạng thái, tạo phiếu nhận / biên nhận, kiểm chứng IQC, dán nhãn truy vết và nhập vị trí chính thức. Mục tiêu là chặn ba lỗi gốc gây hold cuối tuyến và khách hàng thoát / bỏ qua: <strong>nhận sai hàng hoặc sai phiên bản</strong>, <strong>đứt chuỗi truy vết lot/mẻ nấu (heat)/batch</strong>, và <strong>đưa hàng chưa phát hành vào kho có thể sử dụng hoặc cấp phát cho Job</strong>.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ mở có thể sử dụng, cấp phát, tách lô hoặc nhập vị trí sau khi đã xác minh đúng chứng từ, đúng lot hoặc mẻ nấu (heat), đúng trạng thái IQC và đúng nhãn truy vết. Mọi giao dịch phiếu nhận / biên nhận, hold, phát hành và di chuyển vị trí phải nằm trên Epicor; hồ sơ ảnh, cert, MTC, biên bản IQC và bằng chứng ngoại lệ phải lưu SSOT trên M365 bằng link-not-copy.</div>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>KPI-WI701-01</strong><br/>Phiếu nhận Quyền / Đúng-Đầu tiên-Time = số phiếu nhận / biên nhận PASS ngay lần đầu / tổng phiếu nhận / biên nhận có kiểm.</div>
-<div class="kpi-box"><strong>KPI-WI701-02</strong><br/>Tỷ lệ phiếu nhận / biên nhận bị TẠM GIỮ do thiếu cert / sai lot / sai source / sai phiên bản.</div>
+<div class="kpi-box"><strong>KPI-WI701-01</strong><br>Phiếu nhận Quyền / Đúng-Đầu tiên-Time = số phiếu nhận / biên nhận PASS ngay lần đầu / tổng phiếu nhận / biên nhận có kiểm.</div>
+<div class="kpi-box"><strong>KPI-WI701-02</strong><br>Tỷ lệ phiếu nhận / biên nhận bị TẠM GIỮ do thiếu cert / sai lot / sai source / sai phiên bản.</div>
 </div>
 </div><div class="section">
 <h2>2. Chuẩn bị bắt buộc trước khi mở kiện hoặc tháo phôi / dỡ hàng</h2>
@@ -77,7 +78,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>Raw nguyên vật liệu bar / tấm / bản / ống / phôi thỏi</td><td>PO, nhà cung cấp, nguyên vật liệu cấp / hạng/spec, mẻ nấu (heat)/lot, size, điều kiện, MTC/phay Cert, đã phê duyệt source.</td><td>bến xuất nhập hàng → tài liệu kiểm tra → IQC / cert xác minh → label truy vết → put-cách xa / rời theo <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a>.</td><td>Thiếu mẻ nấu (heat) truy vết, sai cấp / hạng/spec, source không có trong <a href="../../03-Reference/03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a>, hoặc có dấu hiệu hàng giả / hàng nhái.</td></tr>
 <tr><td>Công đoạn đặc biệt / outsource trả lại</td><td>Part no, rev, qty, lot, Người xử lý, cert quy trình, scope, date, job tham chiếu, pack tính toàn vẹn.</td><td>bến xuất nhập hàng → cách ly / biệt trữ → cert/scope kiểm tra → IQC theo <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> → PASS/TẠM GIỮ → nhập kho hoặc trả QA.</td><td>Người xử lý không nằm trong <a href="../../03-Reference/04-ANNEX-400/annex-403-approved-processor-list.html">ANNEX-403</a>, cert sai lot/part/rev, thiếu báo cáo bắt buộc.</td></tr>
 <tr><td>Customer thuộc tính / tài sản / ký gửi nguyên vật liệu</td><td>Customer tag, phiếu kê đóng gói, số sê-ri/lot, điều kiện dựa trên phiếu nhận / biên nhận, số kiện, niêm phong tình trạng.</td><td>bến xuất nhập hàng → xác minh với chứng từ khách → nhãn khách hàng thuộc tính / tài sản riêng → khu lưu riêng → vấn đề theo job.</td><td>Không rõ quyền sở hữu, thiếu nhận diện khách, số kiện lệch hoặc điều kiện bất thường.</td></tr>
-<tr><td>Tooling / gage / fixture / mảnh dao (insert) đặc thù</td><td>ID tooling/gage, số sê-ri, hiệu chuẩn trạng thái khi áp dụng, Responsible Person, dự kiến / có chủ đích machine/job.</td><td>bến xuất nhập hàng → xác minh ID → trạng thái có thể sử dụng / hiệu chuẩn / hold → nhập vị trí tooling.</td><td>Thiếu ID, hiệu chuẩn hết hạn, tooling không rõ Responsible Person hoặc nghi va chạm.</td></tr>
+<tr><td>Tooling / gage / fixture / mảnh dao (insert) đặc thù</td><td>ID tooling/gage, số sê-ri, hiệu chuẩn trạng thái khi áp dụng, người chịu trách nhiệm, dự kiến / có chủ đích machine/job.</td><td>bến xuất nhập hàng → xác minh ID → trạng thái có thể sử dụng / hiệu chuẩn / hold → nhập vị trí tooling.</td><td>Thiếu ID, hiệu chuẩn hết hạn, tooling không rõ người chịu trách nhiệm hoặc nghi va chạm.</td></tr>
 <tr><td>vật tư tiêu hao / MRO / hàng không đi vào sản phẩm</td><td>PO, qty, tình trạng bao gói, date code / kệ-tuổi thọ / vòng đời nếu có, SDS hoặc Requests lưu trữ nếu là hoá chất.</td><td>bến xuất nhập hàng → tài liệu/cơ bản kiểm tra → nhãn / vị trí → put-cách xa / rời theo môi trường Requests.</td><td>kệ-tuổi thọ / vòng đời hết hạn, nhãn không đọc được, vật chứa rò rỉ hoặc quy cách lưu trữ chưa sẵn sàng.</td></tr>
 </tbody></table></div>
 </div><div class="section">
@@ -124,11 +125,11 @@ ul.tight li {margin:4px 0;}
 </div><div class="section">
 <h2>7. Quy trình xử lý sai lệch, nhà cung cấp nghi ngờ và escalation</h2>
 <div class="step-list">
-<div class="step-item"><strong>Bước 1 — Chặn ngay tại điểm nhận.</strong><br/>Dán TẠM GIỮ, chụp ảnh, dừng put-cách xa / rời và dừng cấp phát. Không được tiếp tục mở các kiện còn lại nếu nghi ngờ hệ thống như sai cert hàng loạt, nhầm part hoặc hỗn hợp / lẫn lộn lot.</div>
-<div class="step-item"><strong>Bước 2 — Xác định loại sai lệch.</strong><br/>Phân loại: trên / vượt quá/ngắn / thiếu; cert thiếu; cert sai spec/rev; source không đã phê duyệt; Người xử lý ngoài scope; đóng gói vi phạm; nghi hàng giả / hàng nhái; nhầm khách hàng thuộc tính / tài sản; label không đọc được; hỗn hợp / lẫn lộn mẻ nấu (heat) / hỗn hợp / lẫn lộn batch.</div>
-<div class="step-item"><strong>Bước 3 — Khoanh phạm vi ảnh hưởng.</strong><br/>Rà toàn bộ kiện cùng phiếu nhận / biên nhận, cùng PO, cùng nhà cung cấp lô giao hàng, cùng Người xử lý batch hoặc cùng mẻ nấu (heat). Nếu không xác định được biên, mặc định <strong>TẠM GIỮ toàn bộ lô giao hàng</strong>.</div>
-<div class="step-item"><strong>Bước 4 — Gọi đúng Responsible Person trong cùng ca.</strong><br/>Báo Mua hàng khi liên quan nhà cung cấp/Người xử lý; báo QA khi liên quan cert, chất lượng, truy vết, nghi ngờ hàng giả / hàng nhái; báo Kế hoạch khi ảnh hưởng Ngày đến hạn hoặc job đang chờ vật tư. Trường hợp nghi hàng đã vấn đề hoặc đã vào WIP, xử lý tiếp theo <a href="../06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
-<div class="step-item"><strong>Bước 5 — Mở hồ sơ bắt buộc.</strong><br/>Phiếu nhận chênh lệch / phương sai, <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a>, <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> (nếu có), NCR/SCAR khi phát hiện NG từ nhà cung cấp/Người xử lý, và giữ link ảnh + cert + trao đổi với nhà cung cấp trong cùng hồ sơ.</div>
+<div class="step-item"><strong>Bước 1 — Chặn ngay tại điểm nhận.</strong><br>Dán TẠM GIỮ, chụp ảnh, dừng put-cách xa / rời và dừng cấp phát. Không được tiếp tục mở các kiện còn lại nếu nghi ngờ hệ thống như sai cert hàng loạt, nhầm part hoặc hỗn hợp / lẫn lộn lot.</div>
+<div class="step-item"><strong>Bước 2 — Xác định loại sai lệch.</strong><br>Phân loại: trên / vượt quá/ngắn / thiếu; cert thiếu; cert sai spec/rev; source không đã phê duyệt; Người xử lý ngoài scope; đóng gói vi phạm; nghi hàng giả / hàng nhái; nhầm khách hàng thuộc tính / tài sản; label không đọc được; hỗn hợp / lẫn lộn mẻ nấu (heat) / hỗn hợp / lẫn lộn batch.</div>
+<div class="step-item"><strong>Bước 3 — Khoanh phạm vi ảnh hưởng.</strong><br>Rà toàn bộ kiện cùng phiếu nhận / biên nhận, cùng PO, cùng nhà cung cấp lô giao hàng, cùng Người xử lý batch hoặc cùng mẻ nấu (heat). Nếu không xác định được biên, mặc định <strong>TẠM GIỮ toàn bộ lô giao hàng</strong>.</div>
+<div class="step-item"><strong>Bước 4 — Gọi đúng người chịu trách nhiệm trong cùng ca.</strong><br>Báo Mua hàng khi liên quan nhà cung cấp/Người xử lý; báo QA khi liên quan cert, chất lượng, truy vết, nghi ngờ hàng giả / hàng nhái; báo Kế hoạch khi ảnh hưởng Ngày đến hạn hoặc job đang chờ vật tư. Trường hợp nghi hàng đã vấn đề hoặc đã vào WIP, xử lý tiếp theo <a href="../06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
+<div class="step-item"><strong>Bước 5 — Mở hồ sơ bắt buộc.</strong><br>Phiếu nhận chênh lệch / phương sai, <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a>, <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> (nếu có), NCR/SCAR khi phát hiện NG từ nhà cung cấp/Người xử lý, và giữ link ảnh + cert + trao đổi với nhà cung cấp trong cùng hồ sơ.</div>
 </div>
 <div class="callout-danger"><strong>Kích hoạt nhà cung cấp/Người xử lý nghi ngờ:</strong> lặp lỗi cert/truy vết trong 3 lô Cần nhất; không khớp part/rev/lot; Người xử lý thay đổi vị trí/scope mà không luồng-xuống / Từng; dấu hiệu sửa cert bằng tay; bao gói tái sử dụng có nguy cơ trộn lẫn. Khi có kích hoạt này, phiếu nhận / biên nhận kế tiếp từ cùng nguồn <strong>PHẢI</strong> tăng mức kiểm cho đến khi được Mua hàng + QA giải tỏa.</div>
 </div><div class="section">
@@ -151,7 +152,7 @@ ul.tight li {margin:4px 0;}
 </tbody></table></div>
 <h2>10. Chuỗi bằng chứng tối thiểu cho inbound / outsource / warehouse</h2>
 <div class="check-grid"><div class="check-item"><span class="chk"></span>Receipt cổng kiểm soát decision tồn tại trước giao dịch kho</div><div class="check-item"><span class="chk"></span>Lot/heat/serial header được carry-forward qua label và location</div><div class="check-item"><span class="chk"></span>Movement nhật ký không xóa dấu vết hold / restriction / conditional use</div><div class="check-item"><span class="chk"></span>Warehouse bàn giao truy về được bộ chứng từ chứng nhận hoặc quy trình return pack</div></div>
-<h2 class="h2 phase3a-workbook-alignment" id="phase3a-wi701-unified-model">11. Biểu mẫu Excel đang hiệu lực — Mô hình thống nhất FRM-701 workbook</h2><div class="note phase3a-workbook-alignment"><b>Override điều hành</b><br/>Kể từ bộ form Excel mới, <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> là workbook hiện hành thống nhất cho receipt/IQC cổng kiểm soát, route PASS/HOLD/REJECT, put-away và storage bàn giao. không còn nằm trong luồng công việc hiện hành; phạm vi mã / phạm vi quy trình của mã cũ chỉ được quản tại . <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> tiếp tục giữ hold/disposition/release thẩm quyền sau cổng kiểm soát.</div><div class="table-card phase3a-workbook-alignment"><table class="table matrix-small"><colgroup><col style="width:28%"/><col style="width:28%"/><col style="width:44%"/></colgroup><thead><tr><th>Tình huống</th><th>Workbook / form dùng</th><th>Quy tắc ra quyết định</th></tr></thead><tbody>
+<h2 class="h2 phase3a-workbook-alignment" id="phase3a-wi701-unified-model">11. Biểu mẫu Excel đang hiệu lực — Mô hình thống nhất FRM-701 workbook</h2><div class="note phase3a-workbook-alignment"><b>Override điều hành</b><br>Kể từ bộ form Excel mới, <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> là workbook hiện hành thống nhất cho receipt/IQC cổng kiểm soát, route PASS/HOLD/REJECT, put-away và storage bàn giao. không còn nằm trong luồng công việc hiện hành; phạm vi mã / phạm vi quy trình của mã cũ chỉ được quản tại . <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> tiếp tục giữ hold/disposition/release thẩm quyền sau cổng kiểm soát.</div><div class="table-card phase3a-workbook-alignment"><table class="table matrix-small"><colgroup><col style="width:28%"><col style="width:28%"><col style="width:44%"></colgroup><thead><tr><th>Tình huống</th><th>Workbook / form dùng</th><th>Quy tắc ra quyết định</th></tr></thead><tbody>
 <tr><td>Nhận hàng bình thường, cert/source sạch, route kiểm rõ</td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a></td><td>Ghi traceability header, route PASS/HOLD/REJECT, put-away instruction và bàn giao trên cùng workbook.</td></tr>
 <tr><td>Nghi mixed lot, cert muộn, package damage, source doubt</td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> + <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a></td><td>Cổng kiểm soát decision và traceability header ở FRM-701; hold/disposition/release thẩm quyền và suspect-stock control ở FRM-413.</td></tr>
 <tr><td>Outsource return xác minh</td><td>FRM-701 + FRM-411</td><td>FRM-411 vẫn dùng cho return-from-outsource xác minh; receipt route và stock bàn giao vẫn đi qua FRM-701 workbook.</td></tr>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WI-512 — Hướng dẫn vận hành máy phay đứng 3 trục | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../assets/style.css">
 <style>
 
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
@@ -45,7 +45,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="page-body">
  <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Công việc Hướng dẫn</span>
@@ -57,10 +57,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Owner:</b></span><span>Sản xuất Manager / Kỹ thuật Manager</span></div>
-<div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+<div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
  </div>
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi Job chạy trên VMC 3 trục hoặc máy phay/khoan có logic setup tương đương.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi Job chạy trên VMC 3 trục hoặc máy phay/khoan có logic setup tương đương.</div>
  <h1>WI-512 — Hướng dẫn vận hành máy phay đứng 3 trục</h1>
  <div class="section"><h2>1. Mục đích, phạm vi và ranh giới</h2><p>WI này chuẩn hóa thao tác tại máy phay đứng 3 trục từ lúc nhận máy đến lúc bàn giao Job. Mục tiêu là giữ đúng WCS, đúng tool, đúng vùng kẹp, đúng mẫu đầu (first piece) và giữ quá trình ổn định trong suốt ca chạy. WI này áp dụng cho VMC 3 trục, máy khoan/phay cùng logic trục X/Y/Z và các setup không có rotary 5-axis.</p><div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Thực hiện warm-up đầu ca, xác minh WCS sau mỗi changeover, xóa logic offset của Job trước khi nhận Job mới và chứng minh đủ clearance trước khi chạy qua clamp hoặc soft jaw.</div></div><div class="section"><h2>2. Chuẩn bị trước khi chạy</h2><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục</th><th>Yêu cầu bắt buộc</th><th>Đạt/không đạt</th></tr></thead><tbody><tr><td>Tình trạng máy</td><td>Điện/khí/dung dịch làm mát (coolant)/bôi trơn/chip conveyor/guard/liên động an toàn (interlock) bình thường; vùng làm việc sạch</td><td>Thiếu 1 mục = không nhận máy</td></tr>
 <tr><td>Tài liệu</td><td>Bộ hồ sơ công việc (job packet), setup sheet, tool list, phát hành chương trình (program release), cổng kiểm soát trạng thái mở</td><td>Thiếu hoặc mâu thuẫn = HOLD</td></tr>

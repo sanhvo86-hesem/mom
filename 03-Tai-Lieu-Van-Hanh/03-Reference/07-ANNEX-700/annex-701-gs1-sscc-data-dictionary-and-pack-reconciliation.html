@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<link rel="stylesheet" href="../../../assets/style.css">
 <style>
 
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
@@ -45,7 +45,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="page-body">
  <div class="form-header">
  <div class="fh-left">
- <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
  <div class="fh-company">
  <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
  <span>Tài liệu vận hành • Annex</span>
@@ -57,10 +57,10 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
  <div class="row"><span><b>Owner:</b></span><span>WHS Manager / IT Manager / QMS Manager</span></div>
- <div class="row"><span><b>Approved by:</b></span><span>Tổng Giám đốc</span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
  </div>
  </div>
- <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng khi cấp PackID/SSCC, in nhãn hậu cần, tách / chia/gộp / hợp nhất kiện, in lại/void nhãn, và đối soát trước xác nhận giao hàng (ship xác nhận).</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi cấp PackID/SSCC, in nhãn hậu cần, tách / chia/gộp / hợp nhất kiện, in lại/void nhãn, và đối soát trước xác nhận giao hàng (ship xác nhận).</div>
  <h1>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</h1>
  
 <div class="section"><h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
@@ -83,11 +83,11 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>3. Quy tắc vòng đời PackID / SSCC</h2>
 <div class="step-list">
-<div class="step-item"><strong>Cấp mã.</strong><br/>PackID được tạo trong giao dịch đã phê duyệt. SSCC chỉ được cấp cho hậu cần đơn vị thực sự tồn tại. Không cấp mã "dự trữ" để dán sau.</div>
-<div class="step-item"><strong>In và quét xác nhận.</strong><br/>Sau in, phải quét xác nhận đúng bộ phân tích cú pháp, đúng PackID và đúng lô giao hàng bối cảnh. Nhãn không đọc được hoặc đọc sai AI phải hủy ngay.</div>
-<div class="step-item"><strong>tách / chia / gộp / hợp nhất.</strong><br/>tách / chia tạo PackID/SSCC con mới, giữ liên hệ cha-con và điều chỉnh Qty. gộp / hợp nhất phải giữ một cha / gốc đơn vị rõ ràng; không mất dấu thùng chứa thành phần.</div>
-<div class="step-item"><strong>in lại / void.</strong><br/>in lại chỉ cho phép khi nhãn hỏng, mất hoặc đổi vật lý thùng chứa hợp lệ. Void dùng khi thùng chứa bị hủy, gộp lại, dán sai, hoặc lô giao hàng đổi cấu trúc. Mọi hành động phải lưu log.</div>
-<div class="step-item"><strong>Xác nhận giao hàng.</strong><br/>Chỉ cho phép khi PacketComplete = PASS, ReconciliationStatus = PASS, không có hold mở và bộ hồ sơ giao hàng đủ.</div>
+<div class="step-item"><strong>Cấp mã.</strong><br>PackID được tạo trong giao dịch đã phê duyệt. SSCC chỉ được cấp cho hậu cần đơn vị thực sự tồn tại. Không cấp mã "dự trữ" để dán sau.</div>
+<div class="step-item"><strong>In và quét xác nhận.</strong><br>Sau in, phải quét xác nhận đúng bộ phân tích cú pháp, đúng PackID và đúng lô giao hàng bối cảnh. Nhãn không đọc được hoặc đọc sai AI phải hủy ngay.</div>
+<div class="step-item"><strong>tách / chia / gộp / hợp nhất.</strong><br>tách / chia tạo PackID/SSCC con mới, giữ liên hệ cha-con và điều chỉnh Qty. gộp / hợp nhất phải giữ một cha / gốc đơn vị rõ ràng; không mất dấu thùng chứa thành phần.</div>
+<div class="step-item"><strong>in lại / void.</strong><br>in lại chỉ cho phép khi nhãn hỏng, mất hoặc đổi vật lý thùng chứa hợp lệ. Void dùng khi thùng chứa bị hủy, gộp lại, dán sai, hoặc lô giao hàng đổi cấu trúc. Mọi hành động phải lưu log.</div>
+<div class="step-item"><strong>Xác nhận giao hàng.</strong><br>Chỉ cho phép khi PacketComplete = PASS, ReconciliationStatus = PASS, không có hold mở và bộ hồ sơ giao hàng đủ.</div>
 </div></div>
 
 <div class="section"><h2>4. Quy tắc đối soát kiện hàng</h2>
@@ -123,6 +123,3 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
-
-
-
