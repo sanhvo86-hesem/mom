@@ -1,4 +1,4 @@
-﻿# Checklist Test Word-like Editor (HESEM QMS)
+# Checklist Test Word-like Editor (HESEM QMS)
 
 ## 1) Mục tiêu
 - Xác nhận các lệnh soạn thảo hoạt động gần hành vi Microsoft Word nhất có thể trong kiến trúc web hiện tại.

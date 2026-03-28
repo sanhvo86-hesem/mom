@@ -1,4 +1,4 @@
-﻿# HESEM QMS - Server Delivery Rollout Baseline V1
+# HESEM QMS - Server Delivery Rollout Baseline V1
 
 Date: 2026-03-25
 

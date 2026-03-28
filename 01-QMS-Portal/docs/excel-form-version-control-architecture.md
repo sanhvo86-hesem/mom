@@ -1,4 +1,4 @@
-﻿# Excel Form Version Control Architecture
+# Excel Form Version Control Architecture
 
 Date: 2026-03-25
 

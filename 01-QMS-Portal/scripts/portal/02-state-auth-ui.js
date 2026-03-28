@@ -1165,7 +1165,7 @@ async function doLogin(){
       const res = await apiCall('auth_enroll_verify', {code: otp});
       if(!res.ok){
         if(res.error === 'unauthorized' || res.error === 'enroll_expired'){
-          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator setup timed out. Please sign in again.' : 'Phiên thiết lập Authenticator đã hết hạn. Vui lòng Ä‘Äƒng nhập lại.'});
+          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator setup timed out. Please sign in again.' : 'Phiên thiết lập Authenticator đã hết hạn. Vui lòng đăng nhập lại.'});
         } else {
           showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã'));
         }
@@ -1183,7 +1183,7 @@ async function doLogin(){
       const res = await apiCall('auth_mfa_verify', {username:u, password:p, code: otp, recovery: recovery});
       if(!res.ok){
         if(res.error === 'mfa_expired' || res.error === 'unauthorized'){
-          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator verification timed out. Please sign in again.' : 'Phiên xác thực OTP đã hết hạn. Vui lòng Ä‘Äƒng nhập lại.'});
+          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator verification timed out. Please sign in again.' : 'Phiên xác thực OTP đã hết hạn. Vui lòng đăng nhập lại.'});
         } else {
           showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã'));
         }
@@ -1217,7 +1217,7 @@ async function doLogout(){
 }
 
 async function checkSession(){
-  setLoginChecking(true, lang==='en' ? 'Checking session…' : 'Đang kiểm tra phiên Ä‘Äƒng nhập…');
+  setLoginChecking(true, lang==='en' ? 'Checking session…' : 'Đang kiểm tra phiên đăng nhập…');
 
   let lastStatus = null;
   const delays = [0, 350, 900, 1600];
@@ -1272,7 +1272,7 @@ async function checkSession(){
 
 async function showApp(){
   if(!currentUser){
-    resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Login session is no longer valid.' : 'Phiên Ä‘Äƒng nhập không còn hợp lệ.'});
+    resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Login session is no longer valid.' : 'Phiên đăng nhập không còn hợp lệ.'});
     return;
   }
 
@@ -1311,11 +1311,11 @@ async function showApp(){
         stage:'password',
         errorMsg: status && status.auth_expired
           ? getPendingAuthExpiredMessage(status.auth_expired)
-          : (lang==='en' ? 'Login session is no longer valid. Please sign in again.' : 'Phiên Ä‘Äƒng nhập không còn hợp lệ. Vui lòng Ä‘Äƒng nhập lại.')
+          : (lang==='en' ? 'Login session is no longer valid. Please sign in again.' : 'Phiên đăng nhập không còn hợp lệ. Vui lòng đăng nhập lại.')
       });
       return;
     }
-    showToast(lang==='en' ? 'Document index is temporarily unavailable.' : 'Danh mục tài liệu tạm thời chÆ°a tải được.');
+    showToast(lang==='en' ? 'Document index is temporarily unavailable.' : 'Danh mục tài liệu tạm thời chưa tải được.');
   }
 
   await loadFolderDescriptions();

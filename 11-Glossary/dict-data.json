@@ -7958,9 +7958,9 @@
   {
     "term": "EAN",
     "meaning": "European Article Number",
-    "vi": "EAN (Mã số hàng hóa châu �u)",
+    "vi": "EAN (Mã số hàng hóa châu Âu)",
     "def": "Mã số/mã vạch chuẩn để định danh sản phẩm/đơn vị thương mại; hỗ trợ quét mã, truy xuất và quản lý kho.",
-    "ctx": "Sử dụng EAN (Mã số hàng hóa châu �u) trong quy trình kho–vận để đảm bảo giao nhận đúng và có truy xuất.",
+    "ctx": "Sử dụng EAN (Mã số hàng hóa châu Âu) trong quy trình kho–vận để đảm bảo giao nhận đúng và có truy xuất.",
     "rec": "Quy cách nhãn/mã vạch đã phê duyệt; Biên bản kiểm tra nhãn/mã vạch (verification); Master data ERP/WMS & log quét mã",
     "cat": "Logistics"
   },

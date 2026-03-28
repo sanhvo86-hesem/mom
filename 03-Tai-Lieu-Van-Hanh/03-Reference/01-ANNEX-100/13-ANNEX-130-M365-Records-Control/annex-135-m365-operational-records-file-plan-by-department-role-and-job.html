@@ -6,11 +6,17 @@
 <title>ANNEX-135 - M365 operational records file plan by department, role and job | HESEM QMS</title>
 <link rel="stylesheet" href="../../../../assets/style.css">
 <style>
-
+@media print {
+  .card, .table-card, .callout, .note, .box, .keyline, .figure-box { break-inside: avoid; page-break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+}
 .page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
 .page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color:var(--navy);}
 .page-body h3 {font-size:14px; line-height:1.5; margin:12px 0 6px; color:var(--ink);}
-
+.table-card table {width:100%; border-collapse:collapse; font-size:12px;}
+.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align:top;}
+.table-card th {background:var(--th-bg); border-color:var(--th-bdr); text-align:left;}
 .two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
 .keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius:var(--r); background:#fcfcfd;}
 .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
@@ -19,627 +25,583 @@
 .figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
 .section ul {margin:8px 0; padding-left:20px;}
 @media (max-width:960px) {
- .two-col {grid-template-columns:1fr;}
- .page-body {padding:24px 18px 36px;}
+  .two-col {grid-template-columns:1fr;}
+  .page-body {padding:24px 18px 36px;}
 }
 </style>
 </head>
 <body>
 <div class="container">
- <div class="page">
- <div class="page-body">
+  <div class="page">
+    <div class="page-body">
 
 <div class="form-header">
- <div class="fh-left">
- <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
- <div class="fh-company">
- <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
- <span>TÃ i liá»‡u váº­n hÃ nh —¢ Annex sá»' hÃ³a</span>
- </div>
- </div>
- <div class="title"><strong>ANNEX-135 - M365 operational records file plan by department, role and job</strong></div>
- <div class="meta">
- <div class="row"><span><b>Code:</b></span><span>ANNEX-135</span></div>
- <div class="row"><span><b>Version:</b></span><span>V1</span></div>
- <div class="row"><span><b>Effective Date:</b></span><span>Theo quyáº¿t Ä'á»‹nh ban hÃ nh</span></div>
- <div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Quáº£n trá»‹ viÃªn</span></div>
- <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
- </div>
+  <div class="fh-left">
+    <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
+    <div class="fh-company">
+      <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+      <span>Tài liệu vận hành • Annex số hóa</span>
+    </div>
+  </div>
+  <div class="title"><strong>ANNEX-135 - M365 operational records file plan by department, role and job</strong></div>
+  <div class="meta">
+    <div class="row"><span><b>Code:</b></span><span>ANNEX-135</span></div>
+    <div class="row"><span><b>Version:</b></span><span>V1</span></div>
+    <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+    <div class="row"><span><b>Owner:</b></span><span>QMS Manager / IT System Quản trị viên</span></div>
+    <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
+  </div>
 </div>
 
- <div class="note"><strong>ÃP Dá»¤NG KHI</strong><br>DÃ¹ng khi quyáº¿t Ä'á»‹nh má»i file phÃ¡t sinh trong váº­n hÃ nh pháº£i lÆ°u á»Ÿ Ä'Ã¢u trÃªn M365: file chÃ­nh thá»©c, file current, file log, file project, file draft, file nháº­n tá»« ngoÃ i, convenience copy, snapshot tá»« há»‡ nguá»"n, record háº¡n cháº¿ cá»§a con ngÆ°á»i, record quáº£n trá»‹ há»‡ thá»'ng vÃ  toÃ n bá»™ evidence theo job gate.</div>
- <h1>ANNEX-135 - M365 operational records file plan by department, role and job</h1>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi quyết định mọi file phát sinh trong vận hành phải lưu ở đâu trên M365: file chính thức, file current, file log, file project, file draft, file nhận từ ngoài, convenience copy, snapshot từ hệ nguồn, record hạn chế của con người, record quản trị hệ thống và toàn bộ evidence theo job gate.</div>
+      <h1>ANNEX-135 - M365 operational records file plan by department, role and job</h1>
 
- <div class="section">
- <h2>1. Má»¥c Ä'Ã­ch, pháº¡m vi vÃ  káº¿t quáº£ báº¯t buá»™c</h2>
- <p style="margin:8px 0;">ANNEX nÃ y lÃ  file plan chi tiáº¿t cáº¥p phÃ²ng ban vÃ  cáº¥p job cho toÃ n bá»™ HESEM. Má»i file phÃ¡t sinh trong Ä'iá»u hÃ nh, há»— trá»£, sáº£n xuáº¥t, ká»¹ thuáº­t, cháº¥t lÆ°á»£ng, giao váº­n, tÃ i chÃ­nh, nhÃ¢n sá»±, EHS, IT vÃ  ERP Ä'á»u pháº£i Ä'Æ°á»£c route vÃ o má»™t record series rÃµ rÃ ng hoáº·c vÃ o má»™t working/reference zone cÃ³ thá»i háº¡n vÃ  quy táº¯c promote/cull rÃµ rÃ ng. Má»™t file khÃ´ng cÃ³ chá»— lÆ°u trong file plan nÃ y lÃ  lá»—i thiáº¿t káº¿ há»‡ thá»'ng, khÃ´ng pháº£i ngoáº¡i lá»‡ váº­n hÃ nh.</p>
- <div class="callout"><strong>Káº¾T QUáº¢ Báº®T BUá»˜C</strong>: khÃ´ng cÃ²n tÃ¬nh tráº¡ng file náº±m ráº£i rÃ¡c á»Ÿ desktop, email, Zalo, á»• máº¡ng cÅ©, OneDrive cÃ¡ nhÃ¢n hoáº·c thÆ° má»¥c tá»± Ä'áº·t tÃªn. Má»i file Ä'á»u Ä'i vÃ o má»™t trong cÃ¡c lá»›p: official record, current operational record, register/log, released interface pack, project record, working transitory, received reference, convenience copy, restricted people record hoáº·c system-admin record.</div>
- <div class="keyline"><strong>Ranh giá»›i tÃ i liá»‡u:</strong> <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> khÃ³a blueprint site/library/path; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> khÃ³a provisioning/permission/automation; <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> khÃ³a metadata/list catalog; <a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> khÃ³a logic há»" sÆ¡ job. ANNEX-135 khÃ³a file plan chi tiáº¿t theo phÃ²ng ban, JD vÃ  job gate.</div>
- </div>
+      <div class="section">
+        <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
+        <p style="margin:8px 0;">ANNEX này là file plan chi tiết cấp phòng ban và cấp job cho toàn bộ HESEM. Mọi file phát sinh trong điều hành, hỗ trợ, sản xuất, kỹ thuật, chất lượng, giao vận, tài chính, nhân sự, EHS, IT và ERP đều phải được route vào một record series rõ ràng hoặc vào một working/reference zone có thời hạn và quy tắc promote/cull rõ ràng. Một file không có chỗ lưu trong file plan này là lỗi thiết kế hệ thống, không phải ngoại lệ vận hành.</p>
+        <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: không còn tình trạng file nằm rải rác ở desktop, email, Zalo, ổ mạng cũ, OneDrive cá nhân hoặc thư mục tự đặt tên. Mọi file đều đi vào một trong các lớp: official record, current operational record, register/log, released interface pack, project record, working transitory, received reference, convenience copy, restricted people record hoặc system-admin record.</div>
+        <div class="keyline"><strong>Ranh giới tài liệu:</strong> <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> khóa blueprint site/library/path; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> khóa provisioning/permission/automation; <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> khóa metadata/list catalog; <a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> khóa logic hồ sơ job. ANNEX-135 khóa file plan chi tiết theo phòng ban, JD và job gate.</div>
+      </div>
 
- <div class="section">
- <h2>2. CÆ¡ sá»Ÿ thiáº¿t káº¿ theo chuáº©n quá»'c táº¿</h2>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Nguá»"n chuáº©n</th><th>NguyÃªn táº¯c Ã¡p dá»¥ng vÃ o file plan</th><th>CÃ¡ch Ã¡p vÃ o HESEM</th></tr>
- </thead>
- <tbody>
- <tr><td><a href="https://www.iso.org/files/live/sites/isoorg/files/news/magazine/ISO%20Focus%20%282004-2009%29/2006/ISO%20Focus%2C%20March%202006.pdf" target="_blank" rel="noopener">ISO 15489 / ISO 23081</a></td><td>Records Ä'Æ°á»£c thiáº¿t káº¿ theo hoáº¡t Ä'á»™ng kinh doanh, pháº£i cÃ³ metadata, pháº£i há»— trá»£ evidence, access vÃ  discovery, vÃ  khÃ´ng Ä'Æ°á»£c Ä'á»ƒ náº±m trong silo khÃ´ng capture.</td><td>HESEM dÃ¹ng phÃ¢n loáº¡i theo business function vÃ  record series; metadata <span class="code">RecordClass</span>, <span class="code">RecordSeriesCode</span>, <span class="code">OriginatingRoleCode</span>, <span class="code">SourceSystemCode</span> lÃ  báº¯t buá»™c á»Ÿ cÃ¡c flow/list tÆ°Æ¡ng á»©ng.</td></tr>
- <tr><td><a href="https://committee.iso.org/home/tc176/iso-9001-auditing-practices-group.html" target="_blank" rel="noopener">ISO 9001 documented information</a></td><td>ThÃ´ng tin Ä'Æ°á»£c duy trÃ¬ vÃ  lÆ°u giá»¯ pháº£i rÃµ rÃ ng, nháº­n diá»‡n Ä'Æ°á»£c, truy há»"i Ä'Æ°á»£c vÃ  Ä'á»§ lÃ m báº±ng chá»©ng cho viá»‡c váº­n hÃ nh vÃ  kiá»ƒm soÃ¡t.</td><td>Official records, review packs, release packs, logs, approvals vÃ  controlled snapshots pháº£i cÃ³ nÆ¡i lÆ°u riÃªng, owner rÃµ vÃ  retrieval logic rÃµ.</td></tr>
- <tr><td><a href="https://www.iso.org/standard/27001" target="_blank" rel="noopener">ISO/IEC 27001</a></td><td>ThÃ´ng tin pháº£i Ä'Æ°á»£c báº£o vá»‡ theo risk-based access, confidentiality, integrity, availability vÃ  need-to-know.</td><td>People records, payroll, medical, disciplinary vÃ  system-admin evidence bá»‹ tÃ¡ch sang site/library háº¡n cháº¿; khÃ´ng dÃ¹ng shared public area Ä'á»ƒ lÆ°u dá»¯ liá»‡u nháº¡y cáº£m.</td></tr>
- <tr><td><a href="https://www.archives.gov/records-mgmt/scheduling/implementation" target="_blank" rel="noopener">NARA file plan practice</a></td><td>Má»—i office/program cáº§n file plan riÃªng, cÃ³ identifier, series title, description, location, disposition instructions vÃ  cáº£ hÆ°á»›ng dáº«n cho non-record materials.</td><td>ANNEX nÃ y Ä'Ã³ng vai trÃ² file plan cáº¥p phÃ²ng ban/chÆ°Æ¡ng trÃ¬nh; cÃ¡c nhÃ¡nh <span class="code">06-Working-Transitory-and-Draft</span> vÃ  <span class="code">07-Reference-and-Received-External</span> chÃ­nh lÃ  pháº§n non-record/transitory handling.</td></tr>
- <tr><td><a href="https://support.microsoft.com/en-gb/office/plan-the-content-for-your-sharepoint-site-6cfc059e-2c45-46d5-8d7d-507d3dace301" target="_blank" rel="noopener">SharePoint information architecture</a> vÃ  <a href="https://learn.microsoft.com/en-us/purview/retention" target="_blank" rel="noopener">Microsoft Purview retention</a></td><td>Ná»™i dung pháº£i Ä'Æ°á»£c tá»• chá»©c báº±ng libraries/lists/content types/metadata; sensitive content nÃªn dÃ¹ng site hoáº·c library riÃªng; retention labels nÃªn dÃ¹ng á»Ÿ má»©c library/folder/item theo nhu cáº§u.</td><td>HESEM dÃ¹ng 3 sites, library chuáº©n, role-based groups, retention labels theo record series, vÃ  default/current/reference/transitory zones Ä'á»ƒ trÃ¡nh item-level chaos.</td></tr>
- </tbody>
- </table>
- </div>
- <div class="keyline"><strong>NguyÃªn táº¯c thiáº¿t káº¿ rÃºt ra:</strong> file plan pháº£i Ä'i theo chá»©c nÄƒng vÃ  record series, khÃ´ng Ä'i theo tÃªn cÃ¡ nhÃ¢n; má»i file pháº£i cÃ³ metadata vÃ  retention logic; record, draft vÃ  convenience copy pháº£i bá»‹ tÃ¡ch lá»›p; site/library quyá»n pháº£i pháº£n Ã¡nh Ä'á»™ nháº¡y cáº£m chá»© khÃ´ng chá»‰ pháº£n Ã¡nh sÆ¡ Ä'á»" tá»• chá»©c.</div>
- </div>
+      <div class="section">
+        <h2>2. Cơ sở thiết kế theo chuẩn quốc tế</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Nguồn chuẩn</th><th>Nguyên tắc áp dụng vào file plan</th><th>Cách áp vào HESEM</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><a href="https://www.iso.org/files/live/sites/isoorg/files/news/magazine/ISO%20Focus%20%282004-2009%29/2006/ISO%20Focus%2C%20March%202006.pdf" target="_blank" rel="noopener">ISO 15489 / ISO 23081</a></td><td>Records được thiết kế theo hoạt động kinh doanh, phải có metadata, phải hỗ trợ evidence, access và discovery, và không được để nằm trong silo không capture.</td><td>HESEM dùng phân loại theo business function và record series; metadata <span class="code">RecordClass</span>, <span class="code">RecordSeriesCode</span>, <span class="code">OriginatingRoleCode</span>, <span class="code">SourceSystemCode</span> là bắt buộc ở các flow/list tương ứng.</td></tr>
+              <tr><td><a href="https://committee.iso.org/home/tc176/iso-9001-auditing-practices-group.html" target="_blank" rel="noopener">ISO 9001 documented information</a></td><td>Thông tin được duy trì và lưu giữ phải rõ ràng, nhận diện được, truy hồi được và đủ làm bằng chứng cho việc vận hành và kiểm soát.</td><td>Official records, review packs, release packs, logs, approvals và controlled snapshots phải có nơi lưu riêng, owner rõ và retrieval logic rõ.</td></tr>
+              <tr><td><a href="https://www.iso.org/standard/27001" target="_blank" rel="noopener">ISO/IEC 27001</a></td><td>Thông tin phải được bảo vệ theo risk-based access, confidentiality, integrity, availability và need-to-know.</td><td>People records, payroll, medical, disciplinary và system-admin evidence bị tách sang site/library hạn chế; không dùng shared public area để lưu dữ liệu nhạy cảm.</td></tr>
+              <tr><td><a href="https://www.archives.gov/records-mgmt/scheduling/implementation" target="_blank" rel="noopener">NARA file plan practice</a></td><td>Mỗi office/program cần file plan riêng, có identifier, series title, description, location, disposition instructions và cả hướng dẫn cho non-record materials.</td><td>ANNEX này đóng vai trò file plan cấp phòng ban/chương trình; các nhánh <span class="code">06-Working-Transitory-and-Draft</span> và <span class="code">07-Reference-and-Received-External</span> chính là phần non-record/transitory handling.</td></tr>
+              <tr><td><a href="https://support.microsoft.com/en-gb/office/plan-the-content-for-your-sharepoint-site-6cfc059e-2c45-46d5-8d7d-507d3dace301" target="_blank" rel="noopener">SharePoint information architecture</a> và <a href="https://learn.microsoft.com/en-us/purview/retention" target="_blank" rel="noopener">Microsoft Purview retention</a></td><td>Nội dung phải được tổ chức bằng libraries/lists/content types/metadata; sensitive content nên dùng site hoặc library riêng; retention labels nên dùng ở mức library/folder/item theo nhu cầu.</td><td>HESEM dùng 3 sites, library chuẩn, role-based groups, retention labels theo record series, và default/current/reference/transitory zones để tránh item-level chaos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Nguyên tắc thiết kế rút ra:</strong> file plan phải đi theo chức năng và record series, không đi theo tên cá nhân; mọi file phải có metadata và retention logic; record, draft và convenience copy phải bị tách lớp; site/library quyền phải phản ánh độ nhạy cảm chứ không chỉ phản ánh sơ đồ tổ chức.</div>
+      </div>
 
- <div class="section">
- <h2>3. Quy táº¯c route má»i loáº¡i file</h2>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Lá»›p file</th><th>Äá»‹nh nghÄ©a</th><th>NÆ¡i lÆ°u báº¯t buá»™c</th><th>Rule</th></tr>
- </thead>
- <tbody>
- <tr><td><span class="code">OfficialRecord</span></td><td>File Ä'Ã£ Ä'Æ°á»£c dÃ¹ng Ä'á»ƒ quyáº¿t Ä'á»‹nh, phÃ¡t hÃ nh, phÃª duyá»‡t, chá»©ng minh thá»±c hiá»‡n hoáº·c chá»©ng minh tuÃ¢n thá»§.</td><td>Library SSOT tÆ°Æ¡ng á»©ng trong <span class="code">01</span>, <span class="code">02</span>, <span class="code">03</span>, <span class="code">04</span>, <span class="code">05</span>, <span class="code">08</span>, <span class="code">09</span>, <span class="code">Part-REV-Báº£n gá»'c</span></td><td>KhÃ´ng lÆ°u báº£n chÃ­nh trong <span class="code">06-Working</span> hoáº·c <span class="code">07-Reference</span>.</td></tr>
- <tr><td><span class="code">OperationalCurrent</span></td><td>Báº£ng current, queue hiá»‡n hÃ nh, active control list, current pack chÆ°a chá»'t ká»³ nhÆ°ng Ä'ang lÃ  tÃ i liá»‡u váº­n hÃ nh chÃ­nh thá»©c.</td><td><span class="code">00-Live-Control-and-Master-Data</span> hoáº·c nhÃ¡nh <span class="code">00-Current</span>/<span class="code">00-Active</span></td><td>Khi closed ká»³, snapshot hoáº·c close pack má»›i Ä'i vÃ o <span class="code">{YYYY}</span>.</td></tr>
- <tr><td><span class="code">RegisterLog</span></td><td>Register, log, tracker, queue, aging report, issue tracker, release tracker, audit trail file do bá»™ pháº­n duy trÃ¬.</td><td><span class="code">03-Registers-and-Logs/00-Current</span> hoáº·c <span class="code">03-Registers-and-Logs/{YYYY}</span></td><td>Log current Ä'Æ°á»£c giá»¯ sá»'ng; log theo ká»³ hoáº·c log Ä'Ã£ Ä'Ã³ng Ä'i vÃ o nÄƒm.</td></tr>
- <tr><td><span class="code">ReleasedPack</span></td><td>Pack Ä'Ã£ phÃ¡t hÃ nh Ä'á»ƒ bÃ n giao cho bá»™ pháº­n khÃ¡c, cho khÃ¡ch hÃ ng, cho nhÃ  cung cáº¥p hoáº·c cho gate tiáº¿p theo.</td><td><span class="code">05-Interfaces-and-Released-Packs</span> hoáº·c gate tÆ°Æ¡ng á»©ng trong <span class="code">03-Job-Há»" sÆ¡</span></td><td>Pack Ä'Ã£ phÃ¡t hÃ nh khÃ´ng Ä'Æ°á»£c thay ná»™i dung mÃ  khÃ´ng cÃ³ change control.</td></tr>
- <tr><td><span class="code">ProjectImprovement</span></td><td>Dá»± Ã¡n cáº£i tiáº¿n, kaizen, CAPEX implementation, system upgrade, benefit verification.</td><td><span class="code">04-Projects-and-Improvement/00-Active</span> hoáº·c <span class="code">{YYYY}</span></td><td>Project Ä'ang má»Ÿ á»Ÿ <span class="code">00-Active</span>; khi Ä'Ã³ng má»›i chá»'t vÃ o nÄƒm.</td></tr>
- <tr><td><span class="code">WorkingTransitory</span></td><td>File draft, working copy, review copy, note, export táº¡m, Photos táº¡m, file chá» promote, scratch analysis.</td><td><span class="code">06-Working-Transitory-and-Draft/ROLE-{RoleCode}</span></td><td>Pháº£i promote hoáº·c cull; khÃ´ng Ä'Æ°á»£c dÃ¹ng lÃ m SSOT.</td></tr>
- <tr><td><span class="code">ReferenceReceived</span></td><td>TÃ i liá»‡u nháº­n tá»« khÃ¡ch hÃ ng/nhÃ  cung cáº¥p, tiÃªu chuáº©n, manual, convenience copy, read-only reference.</td><td><span class="code">07-Reference-and-Received-External</span></td><td>Náº¿u tÃ i liá»‡u nÃ y trá»Ÿ thÃ nh Ä'áº§u vÃ o quyáº¿t Ä'á»‹nh/phÃ¡t hÃ nh thÃ¬ pháº£i promote hoáº·c link vÃ o series chÃ­nh thá»©c phÃ¹ há»£p.</td></tr>
- <tr><td><span class="code">SoRSnapshot</span></td><td>Export hoáº·c snapshot láº¥y tá»« Epicor, Power BI, mÃ¡y CNC, há»‡ thá»'ng khÃ¡c Ä'á»ƒ lÃ m evidence, review hoáº·c reconciliation.</td><td>Series chÃ­nh thá»©c Ä'ang dÃ¹ng snapshot Ä'Ã³, hoáº·c <span class="code">09-Sá»' hÃ³a-System-Há»" sÆ¡</span> náº¿u lÃ  admin snapshot</td><td>Báº¯t buá»™c cÃ³ <span class="code">SourceSystemCode</span>, thá»i Ä'iá»ƒm chá»¥p vÃ  link back vá» há»‡ nguá»"n náº¿u cÃ³.</td></tr>
- <tr><td><span class="code">RestrictedPeopleRecord</span></td><td>Há»" sÆ¡ phÃ¡p lÃ½, payroll, medical, disciplinary, onboarding/offboarding cÃ¡ nhÃ¢n.</td><td><span class="code">08-Con ngÆ°á»i-Há»" sÆ¡</span></td><td>KhÃ´ng lÆ°u á»Ÿ department shared area.</td></tr>
- <tr><td><span class="code">SystemAdminRecord</span></td><td>Access review, config, deployment, backup, recovery, incident, admin evidence.</td><td><span class="code">09-Sá»' hÃ³a-System-Há»" sÆ¡</span></td><td>Department folders chá»‰ giá»¯ interface pack hoáº·c current queue, khÃ´ng giá»¯ admin SSOT.</td></tr>
- <tr><td><span class="code">ControlledSourceArtifact</span></td><td>Source docs, portal source, released form definitions, release manifest, deploy receipt vÃ  reverse-sync close-out Ä'Æ°á»£c phÃ©p Ä'i qua Git.</td><td><span class="code">10-QMS-Source-Control</span></td><td>KhÃ´ng chá»©a runtime payload, sessions, rate-limit data, secrets hoáº·c form submissions.</td></tr>
- </tbody>
- </table>
- </div>
- <div class="keyline"><strong>Rule cá»'t lÃµi:</strong> file Ä'Æ°á»£c route theo <b>Ã½ nghÄ©a nghiá»‡p vá»¥</b>, khÃ´ng route theo Ä'uÃ´i file. Má»™t file <span class="code">xlsx</span> cÃ³ thá»ƒ lÃ  official record, transitory draft, reference copy hoáº·c system snapshot tÃ¹y vai trÃ² cá»§a nÃ³ trong quy trÃ¬nh.</div>
- </div>
+      <div class="section">
+        <h2>3. Quy tắc route mọi loại file</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Lớp file</th><th>Định nghĩa</th><th>Nơi lưu bắt buộc</th><th>Rule</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="code">OfficialRecord</span></td><td>File đã được dùng để quyết định, phát hành, phê duyệt, chứng minh thực hiện hoặc chứng minh tuân thủ.</td><td>Library SSOT tương ứng trong <span class="code">01</span>, <span class="code">02</span>, <span class="code">03</span>, <span class="code">04</span>, <span class="code">05</span>, <span class="code">08</span>, <span class="code">09</span>, <span class="code">Part-REV-Bản gốc</span></td><td>Không lưu bản chính trong <span class="code">06-Working</span> hoặc <span class="code">07-Reference</span>.</td></tr>
+              <tr><td><span class="code">OperationalCurrent</span></td><td>Bảng current, queue hiện hành, active control list, current pack chưa chốt kỳ nhưng đang là tài liệu vận hành chính thức.</td><td><span class="code">00-Live-Control-and-Master-Data</span> hoặc nhánh <span class="code">00-Current</span>/<span class="code">00-Active</span></td><td>Khi closed kỳ, snapshot hoặc close pack mới đi vào <span class="code">{YYYY}</span>.</td></tr>
+              <tr><td><span class="code">RegisterLog</span></td><td>Register, log, tracker, queue, aging report, issue tracker, release tracker, audit trail file do bộ phận duy trì.</td><td><span class="code">03-Registers-and-Logs/00-Current</span> hoặc <span class="code">03-Registers-and-Logs/{YYYY}</span></td><td>Log current được giữ sống; log theo kỳ hoặc log đã đóng đi vào năm.</td></tr>
+              <tr><td><span class="code">ReleasedPack</span></td><td>Pack đã phát hành để bàn giao cho bộ phận khác, cho khách hàng, cho nhà cung cấp hoặc cho gate tiếp theo.</td><td><span class="code">05-Interfaces-and-Released-Packs</span> hoặc gate tương ứng trong <span class="code">03-Job-Hồ sơ</span></td><td>Pack đã phát hành không được thay nội dung mà không có change control.</td></tr>
+              <tr><td><span class="code">ProjectImprovement</span></td><td>Dự án cải tiến, kaizen, CAPEX implementation, system upgrade, benefit verification.</td><td><span class="code">04-Projects-and-Improvement/00-Active</span> hoặc <span class="code">{YYYY}</span></td><td>Project đang mở ở <span class="code">00-Active</span>; khi đóng mới chốt vào năm.</td></tr>
+              <tr><td><span class="code">WorkingTransitory</span></td><td>File draft, working copy, review copy, note, export tạm, Photos tạm, file chờ promote, scratch analysis.</td><td><span class="code">06-Working-Transitory-and-Draft/ROLE-{RoleCode}</span></td><td>Phải promote hoặc cull; không được dùng làm SSOT.</td></tr>
+              <tr><td><span class="code">ReferenceReceived</span></td><td>Tài liệu nhận từ khách hàng/nhà cung cấp, tiêu chuẩn, manual, convenience copy, read-only reference.</td><td><span class="code">07-Reference-and-Received-External</span></td><td>Nếu tài liệu này trở thành đầu vào quyết định/phát hành thì phải promote hoặc link vào series chính thức phù hợp.</td></tr>
+              <tr><td><span class="code">SoRSnapshot</span></td><td>Export hoặc snapshot lấy từ Epicor, Power BI, máy CNC, hệ thống khác để làm evidence, review hoặc reconciliation.</td><td>Series chính thức đang dùng snapshot đó, hoặc <span class="code">09-Số hóa-System-Hồ sơ</span> nếu là admin snapshot</td><td>Bắt buộc có <span class="code">SourceSystemCode</span>, thời điểm chụp và link back về hệ nguồn nếu có.</td></tr>
+              <tr><td><span class="code">RestrictedPeopleRecord</span></td><td>Hồ sơ pháp lý, payroll, medical, disciplinary, onboarding/offboarding cá nhân.</td><td><span class="code">08-Con người-Hồ sơ</span></td><td>Không lưu ở department shared area.</td></tr>
+              <tr><td><span class="code">SystemAdminRecord</span></td><td>Access review, config, deployment, backup, recovery, incident, admin evidence.</td><td><span class="code">09-Số hóa-System-Hồ sơ</span></td><td>Department folders chỉ giữ interface pack hoặc current queue, không giữ admin SSOT.</td></tr>
+              <tr><td><span class="code">ControlledSourceArtifact</span></td><td>Source docs, portal source, released form definitions, release manifest, deploy receipt và reverse-sync close-out được phép đi qua Git.</td><td><span class="code">10-QMS-Source-Control</span></td><td>Không chứa runtime payload, sessions, rate-limit data, secrets hoặc form submissions.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Rule cốt lõi:</strong> file được route theo <b>ý nghĩa nghiệp vụ</b>, không route theo đuôi file. Một file <span class="code">xlsx</span> có thể là official record, transitory draft, reference copy hoặc system snapshot tùy vai trò của nó trong quy trình.</div>
+      </div>
 
- <div class="section">
- <h2>4. Khung sÆ°á»n phÃ²ng ban báº¯t buá»™c Ä'á»ƒ chá»©a toÃ n bá»™ dá»¯ liá»‡u váº­n hÃ nh</h2>
- <div class="figure-box">
- <p style="margin:0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/00-Live-Control-and-Master-Data/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/01-Governance/00-Current/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/01-Governance/{YYYY}/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/02-Operations/00-Current/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/02-Operations/{YYYY}/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/03-Registers-and-Logs/00-Current/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/03-Registers-and-Logs/{YYYY}/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/04-Projects-and-Improvement/00-Active/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/04-Projects-and-Improvement/{YYYY}/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/05-Interfaces-and-Released-Packs/00-Current/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/05-Interfaces-and-Released-Packs/{YYYY}/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/06-Working-Transitory-and-Draft/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/07-Reference-and-Received-External/</p>
- <p style="margin:4px 0 0;" class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-{CODE}/99-Archive/</p>
- </div>
- <div class="two-col">
- <div class="figure-box">
- <h3>06-Working-Transitory-and-Draft</h3>
- <p style="margin:8px 0;">Má»—i role pháº£i cÃ³ team workbench vÃ  named employee workbench riÃªng:</p>
- <p style="margin:0;" class="path">ROLE-{RoleCode}/00-Team-Inbox/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/01-Team-Draft/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/02-Team-Review/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/03-Team-Promote/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/04-Team-Offline/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/05-Team-Ref/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}/00-My-Inbox/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}/01-My-WIP/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}/02-My-Review/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}/03-My-Handoff/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}/04-My-Offline-Pack/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}/05-My-Ref/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}/99-Clear-30d/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/91-Deputy-Handover/</p>
- <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/99-Clear-90d/</p>
- </div>
- <div class="figure-box">
- <h3>07-Reference-and-Received-External</h3>
- <p style="margin:8px 0;">DÃ¹ng chung cho reference vÃ  received materials:</p>
- <p style="margin:0;" class="path">01-Customer-Received/</p>
- <p style="margin:4px 0 0;" class="path">02-Supplier-Received/</p>
- <p style="margin:4px 0 0;" class="path">03-Standards-and-Manuals/</p>
- <p style="margin:4px 0 0;" class="path">04-Department-Work-Aids-and-Visuals/</p>
- <p style="margin:4px 0 0;" class="path">05-Portal-Exports-and-System-Downloads/</p>
- <p style="margin:4px 0 0;" class="path">06-Convenience-Copies/</p>
- <p style="margin:4px 0 0;" class="path">07-To-Be-Culled/</p>
- </div>
- </div>
- <div class="keyline"><strong>Quy táº¯c sá»­ dá»¥ng:</strong> chá»‰ file Ä'ang sá»'ng trong váº­n hÃ nh má»›i Ä'Æ°á»£c á»Ÿ <span class="code">00-Live</span>, <span class="code">00-Current</span>, <span class="code">00-Active</span>. Team work in progress á»Ÿ role root trong <span class="code">06</span>; file gáº¯n vá»›i tá»«ng cÃ¡ nhÃ¢n Ä'i vÃ o named employee workbench dÆ°á»›i <span class="code">90-Employee-WB</span>. File nháº­n tá»« ngoÃ i hoáº·c convenience copy á»Ÿ <span class="code">07</span>. File Ä'Ã£ trá»Ÿ thÃ nh output theo ká»³, snapshot, historical pack hoáº·c close pack má»›i vÃ o <span class="code">{YYYY}</span>. Má»—i nhÃ¢n viÃªn cÃ³ tá»'i Ä'a 03 nÆ¡i lÆ°u: team/employee workbench, official destination theo record series, vÃ  restricted people dossier náº¿u thuá»™c diá»‡n nhÃ¢n sá»± nháº¡y cáº£m.</div>
- <div class="keyline"><strong>Path-budget rule:</strong> các segment rút gọn như <span class="code">90-Employee-WB</span>, <span class="code">01-My-WIP</span>, <span class="code">04-My-Offline-Pack</span>, <span class="code">02-Pending-Starters</span> và <span class="code">08-Medical-and-Fit-to-Work-Restricted</span> là tên chuẩn bắt buộc, không phải viết tắt tạm thời. Mọi file name đặt trong các nhánh sâu phải ngắn, có cấu trúc, không lặp lại tên department/role/site vì ngữ cảnh đã có sẵn trong path.</div>
- </div>
+      <div class="section">
+        <h2>4. Khung sườn phòng ban bắt buộc để chứa toàn bộ dữ liệu vận hành</h2>
+        <div class="figure-box">
+          <p style="margin:0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/00-Live-Control-and-Master-Data/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/01-Governance/00-Current/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/01-Governance/{YYYY}/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/02-Operations/00-Current/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/02-Operations/{YYYY}/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/03-Registers-and-Logs/00-Current/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/03-Registers-and-Logs/{YYYY}/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/04-Projects-and-Improvement/00-Active/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/04-Projects-and-Improvement/{YYYY}/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/05-Interfaces-and-Released-Packs/00-Current/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/05-Interfaces-and-Released-Packs/{YYYY}/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/06-Working-Transitory-and-Draft/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/07-Reference-and-Received-External/</p>
+          <p style="margin:4px 0 0;" class="path">05-Phòng ban-Hồ sơ/DEP-{CODE}/99-Archive/</p>
+        </div>
+        <div class="two-col">
+          <div class="figure-box">
+            <h3>06-Working-Transitory-and-Draft</h3>
+            <p style="margin:8px 0;">Mỗi role phải có workbench riêng:</p>
+            <p style="margin:0;" class="path">ROLE-{RoleCode}/00-Inbox/</p>
+            <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/01-Draft/</p>
+            <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/02-Review/</p>
+            <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/03-Promote-to-Official-Record/</p>
+            <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/99-Clear-Within-90d/</p>
+          </div>
+          <div class="figure-box">
+            <h3>07-Reference-and-Received-External</h3>
+            <p style="margin:8px 0;">Dùng chung cho reference và received materials:</p>
+            <p style="margin:0;" class="path">01-Customer-Received/</p>
+            <p style="margin:4px 0 0;" class="path">02-Supplier-Received/</p>
+            <p style="margin:4px 0 0;" class="path">03-Standards-and-Manuals/</p>
+            <p style="margin:4px 0 0;" class="path">04-Convenience-Copies/</p>
+            <p style="margin:4px 0 0;" class="path">05-To-Be-Culled/</p>
+          </div>
+        </div>
+        <div class="keyline"><strong>Quy tắc sử dụng:</strong> chỉ file đang sống trong vận hành mới được ở <span class="code">00-Live</span>, <span class="code">00-Current</span>, <span class="code">00-Active</span>. File tạm ở <span class="code">06</span>. File nhận từ ngoài hoặc convenience copy ở <span class="code">07</span>. File đã trở thành output theo kỳ, snapshot, historical pack hoặc close pack mới vào <span class="code">{YYYY}</span>.</div>
+      </div>
 
- <div class="section">
- <h2>5. Rule route theo loáº¡i file</h2>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Loáº¡i file / nguá»"n file</th><th>Náº¿u file lÃ  gÃ¬ vá» máº·t nghiá»‡p vá»¥</th><th>NÆ¡i lÆ°u</th><th>Must not do</th></tr>
- </thead>
- <tbody>
- <tr><td><span class="code">xlsx</span>, <span class="code">xlsm</span>, <span class="code">csv</span></td><td>register, log, checklist, costing, KPI snapshot, inspection result, payroll input, export</td><td>Route theo record series cá»§a ná»™i dung; náº¿u lÃ  draft thÃ¬ vÃ o <span class="code">06</span>; náº¿u lÃ  reference/export táº¡m thÃ¬ vÃ o <span class="code">07</span></td><td>KhÃ´ng route theo "vÃ¬ lÃ  Excel nÃªn Ä'á»ƒ chung má»™t chá»—".</td></tr>
- <tr><td><span class="code">docx</span>, <span class="code">pptx</span>, <span class="code">pdf</span></td><td>proposal, memo, minutes, procedure pack, release pack, decision pack, customer response, board pack</td><td>Series chÃ­nh thá»©c tÆ°Æ¡ng á»©ng hoáº·c <span class="code">06</span> khi cÃ²n draft</td><td>KhÃ´ng giá»¯ báº£n final duy nháº¥t trong thÆ° má»¥c draft.</td></tr>
- <tr><td><span class="code">jpg</span>, <span class="code">png</span>, <span class="code">mp4</span></td><td>photo evidence, issue evidence, setup proof, packaging proof, incident proof, receiving damage proof</td><td>Gate/job series, QA series, EHS series, SCM receiving/shipping series hoáº·c <span class="code">06</span> náº¿u má»›i chá»¥p chá» chá»n lá»c</td><td>KhÃ´ng Ä'á»ƒ photo chá»©ng cá»© chá»‰ tá»"n táº¡i trÃªn Ä'iá»‡n thoáº¡i hoáº·c chat app.</td></tr>
- <tr><td><span class="code">dwg</span>, <span class="code">step</span>, <span class="code">dxf</span>, <span class="code">nc</span>, post file</td><td>engineering baseline, CAM release, fixture release, job-specific posted program reference</td><td><span class="code">Part-REV-Báº£n gá»'c</span> náº¿u lÃ  baseline; <span class="code">03-Job-Há»" sÆ¡</span> náº¿u lÃ  job-specific release reference</td><td>KhÃ´ng trá»™n baseline part master vá»›i job working pack.</td></tr>
- <tr><td><span class="code">msg</span>, <span class="code">eml</span></td><td>phÃª duyá»‡t, customer commitment, supplier confirmation, complaint response, access evidence</td><td>Official series náº¿u email lÃ  báº±ng chá»©ng; <span class="code">06</span> náº¿u chá»‰ Ä'ang tham kháº£o; <span class="code">07</span> náº¿u lÃ  received reference</td><td>KhÃ´ng Ä'á»ƒ quyáº¿t Ä'á»‹nh chá»‰ tá»"n táº¡i trong mailbox cÃ¡ nhÃ¢n.</td></tr>
- <tr><td><span class="code">zip</span>, <span class="code">bak</span>, system export</td><td>backup, deployment package, audit export, machine backup, restore test evidence</td><td><span class="code">09-Sá»' hÃ³a-System-Há»" sÆ¡</span> hoáº·c role series náº¿u lÃ  released pack cÃ³ kiá»ƒm soÃ¡t</td><td>KhÃ´ng dÃ¹ng department shared folder Ä'á»ƒ giá»¯ admin backup gá»'c.</td></tr>
- <tr><td>Power BI, dashboard, machine export, Epicor export</td><td>snapshot, review input, reconciliation evidence, performance pack</td><td>Series Ä'ang dÃ¹ng snapshot Ä'Ã³; pháº£i tag <span class="code">SourceSystemCode</span> vÃ  thá»i Ä'iá»ƒm chá»¥p</td><td>KhÃ´ng dÃ¹ng export rá»i ráº¡c Ä'á»ƒ thay tháº¿ SoR.</td></tr>
- </tbody>
- </table>
- </div>
- <div class="two-col">
- <div class="figure-box">
- <h3>Grammar chuáº©n trong má»i folder Operations</h3>
- <p style="margin:0;" class="path">01-Inputs-and-Requests/</p>
- <p style="margin:4px 0 0;" class="path">02-Working-Control/</p>
- <p style="margin:4px 0 0;" class="path">03-Issued-Outputs/</p>
- <p style="margin:4px 0 0;" class="path">04-Photos-External-Evidence-and-Exports/</p>
- <p style="margin:4px 0 0;" class="path">05-Follow-Up-and-Closure/</p>
- </div>
- <div class="figure-box">
- <h3>Grammar chuáº©n trong má»i folder Logs vÃ  Interfaces</h3>
- <p style="margin:0;" class="path">Logs/01-Live-Register/</p>
- <p style="margin:4px 0 0;" class="path">Logs/02-Supporting-Evidence/</p>
- <p style="margin:4px 0 0;" class="path">Logs/03-Review-and-Close/</p>
- <p style="margin:10px 0 0;" class="path">Interfaces/01-Outgoing-Released/</p>
- <p style="margin:4px 0 0;" class="path">Interfaces/02-Returned-Acknowledgements/</p>
- <p style="margin:4px 0 0;" class="path">Interfaces/03-Reissue-and-Change-History/</p>
- </div>
- </div>
- <div class="keyline"><strong>Quy Ä'á»‹nh cáº¥u trÃºc con:</strong> má»i folder nghiá»‡p vá»¥ dÆ°á»›i <span class="code">02-Operations</span>, <span class="code">03-Registers-and-Logs</span> vÃ  <span class="code">05-Interfaces-and-Released-Packs</span> pháº£i dÃ¹ng grammar chuáº©n nÃ y. Nhá» Ä'Ã³ má»i input, output, áº£nh, export, acknowledgement vÃ  follow-up Ä'á»u cÃ³ vá»‹ trÃ­ cá»' Ä'á»‹nh. KhÃ´ng táº¡o thÆ° má»¥c tá»± phÃ¡t nhÆ° <span class="code">Misc</span>, <span class="code">Temp</span>, <span class="code">New Folder</span>, <span class="code">áº¢nh má»›i</span> trong cÃ¡c nhÃ¡nh váº­n hÃ nh chÃ­nh.</div>
- </div>
+      <div class="section">
+        <h2>5. Rule route theo loại file</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Loại file / nguồn file</th><th>Nếu file là gì về mặt nghiệp vụ</th><th>Nơi lưu</th><th>Must not do</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="code">xlsx</span>, <span class="code">xlsm</span>, <span class="code">csv</span></td><td>register, log, checklist, costing, KPI snapshot, inspection result, payroll input, export</td><td>Route theo record series của nội dung; nếu là draft thì vào <span class="code">06</span>; nếu là reference/export tạm thì vào <span class="code">07</span></td><td>Không route theo “vì là Excel nên để chung một chỗ”.</td></tr>
+              <tr><td><span class="code">docx</span>, <span class="code">pptx</span>, <span class="code">pdf</span></td><td>proposal, memo, minutes, procedure pack, release pack, decision pack, customer response, board pack</td><td>Series chính thức tương ứng hoặc <span class="code">06</span> khi còn draft</td><td>Không giữ bản final duy nhất trong thư mục draft.</td></tr>
+              <tr><td><span class="code">jpg</span>, <span class="code">png</span>, <span class="code">mp4</span></td><td>photo evidence, issue evidence, setup proof, packaging proof, incident proof, receiving damage proof</td><td>Gate/job series, QA series, EHS series, SCM receiving/shipping series hoặc <span class="code">06</span> nếu mới chụp chờ chọn lọc</td><td>Không để photo chứng cứ chỉ tồn tại trên điện thoại hoặc chat app.</td></tr>
+              <tr><td><span class="code">dwg</span>, <span class="code">step</span>, <span class="code">dxf</span>, <span class="code">nc</span>, post file</td><td>engineering baseline, CAM release, fixture release, job-specific posted program reference</td><td><span class="code">Part-REV-Bản gốc</span> nếu là baseline; <span class="code">03-Job-Hồ sơ</span> nếu là job-specific release reference</td><td>Không trộn baseline part master với job working pack.</td></tr>
+              <tr><td><span class="code">msg</span>, <span class="code">eml</span></td><td>phê duyệt, customer commitment, supplier confirmation, complaint response, access evidence</td><td>Official series nếu email là bằng chứng; <span class="code">06</span> nếu chỉ đang tham khảo; <span class="code">07</span> nếu là received reference</td><td>Không để quyết định chỉ tồn tại trong mailbox cá nhân.</td></tr>
+              <tr><td><span class="code">zip</span>, <span class="code">bak</span>, system export</td><td>backup, deployment package, audit export, machine backup, restore test evidence</td><td><span class="code">09-Số hóa-System-Hồ sơ</span> hoặc role series nếu là released pack có kiểm soát</td><td>Không dùng department shared folder để giữ admin backup gốc.</td></tr>
+              <tr><td>Power BI, dashboard, machine export, Epicor export</td><td>snapshot, review input, reconciliation evidence, performance pack</td><td>Series đang dùng snapshot đó; phải tag <span class="code">SourceSystemCode</span> và thời điểm chụp</td><td>Không dùng export rời rạc để thay thế SoR.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="two-col">
+          <div class="figure-box">
+            <h3>Grammar chuẩn trong mọi folder Operations</h3>
+            <p style="margin:0;" class="path">01-Inputs-and-Requests/</p>
+            <p style="margin:4px 0 0;" class="path">02-Working-Control/</p>
+            <p style="margin:4px 0 0;" class="path">03-Issued-Outputs/</p>
+            <p style="margin:4px 0 0;" class="path">04-Photos-External-Evidence-and-Exports/</p>
+            <p style="margin:4px 0 0;" class="path">05-Follow-Up-and-Closure/</p>
+          </div>
+          <div class="figure-box">
+            <h3>Grammar chuẩn trong mọi folder Logs và Interfaces</h3>
+            <p style="margin:0;" class="path">Logs/01-Live-Register/</p>
+            <p style="margin:4px 0 0;" class="path">Logs/02-Supporting-Evidence/</p>
+            <p style="margin:4px 0 0;" class="path">Logs/03-Review-and-Close/</p>
+            <p style="margin:10px 0 0;" class="path">Interfaces/01-Outgoing-Released/</p>
+            <p style="margin:4px 0 0;" class="path">Interfaces/02-Returned-Acknowledgements/</p>
+            <p style="margin:4px 0 0;" class="path">Interfaces/03-Reissue-and-Change-History/</p>
+          </div>
+        </div>
+        <div class="keyline"><strong>Quy định cấu trúc con:</strong> mọi folder nghiệp vụ dưới <span class="code">02-Operations</span>, <span class="code">03-Registers-and-Logs</span> và <span class="code">05-Interfaces-and-Released-Packs</span> phải dùng grammar chuẩn này. Nhờ đó mọi input, output, ảnh, export, acknowledgement và follow-up đều có vị trí cố định. Không tạo thư mục tự phát như <span class="code">Misc</span>, <span class="code">Temp</span>, <span class="code">New Folder</span>, <span class="code">Ảnh mới</span> trong các nhánh vận hành chính.</div>
+      </div>
 
- <div class="section">
- <h2>6. File plan chi tiáº¿t theo tá»«ng phÃ²ng ban</h2>
+      <div class="section">
+        <h2>6. File plan chi tiết theo từng phòng ban</h2>
 
- <h3>6.1 EXEC</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-EXEC/02-Operations/00-Current/01-Strategy-Deployment</td><td>annual operating plan, strategy deck, objective cascade, capex priority map, key initiative tracker, CEO directive pack</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="role-code">PD</span></a></span></td><td>MR minutes chÃ­nh thá»©c vÃ  audit records</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-Management-Review-Inputs</td><td>pre-read pack, management review input summaries, executive escalation summaries, cross-functional performance inputs</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="role-code">PD</span></a></span></td><td>FRM-911 final minutes SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-Board-and-Customer-Commitments</td><td>major commitment matrix, concession decision memos, high-value customer commitment packs, board-ready executive summaries</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></td><td>customer order/job execution evidence</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>decision log, objective tracking, strategic action tracker, stakeholder commitment tracker</td><td>CEO Office</td><td>department daily logs cá»§a bá»™ pháº­n khÃ¡c</td></tr>
- <tr><td class="path">.../05-Interfaces-and-Released-Packs/00-Current</td><td>leadership communication packs, issued executive notices, board and management packs</td><td>CEO Office</td><td>draft presentations chÆ°a duyá»‡t</td></tr>
- <tr><td class="path">.../06-Working-Transitory-and-Draft/ROLE-CEO, ROLE-PDIR</td><td>draft memos, annotated board decks, negotiation notes, what-if analyses</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="role-code">PD</span></a></span></td><td>báº£n final Ä'Ã£ dÃ¹ng Ä'á»ƒ quyáº¿t Ä'á»‹nh</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>6.1 EXEC</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-EXEC/02-Operations/00-Current/01-Strategy-Deployment</td><td>annual operating plan, strategy deck, objective cascade, capex priority map, key initiative tracker, CEO directive pack</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a></span></td><td>MR minutes chính thức và audit records</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-Management-Review-Inputs</td><td>pre-read pack, management review input summaries, executive escalation summaries, cross-functional performance inputs</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a></span></td><td>FRM-911 final minutes SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-Board-and-Customer-Commitments</td><td>major commitment matrix, concession decision memos, high-value customer commitment packs, board-ready executive summaries</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></td><td>customer order/job execution evidence</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>decision log, objective tracking, strategic action tracker, stakeholder commitment tracker</td><td>CEO Office</td><td>department daily logs của bộ phận khác</td></tr>
+              <tr><td class="path">.../05-Interfaces-and-Released-Packs/00-Current</td><td>leadership communication packs, issued executive notices, board and management packs</td><td>CEO Office</td><td>draft presentations chưa duyệt</td></tr>
+              <tr><td class="path">.../06-Working-Transitory-and-Draft/ROLE-CEO, ROLE-PDIR</td><td>draft memos, annotated board decks, negotiation notes, what-if analyses</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a></span></td><td>bản final đã dùng để quyết định</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>6.2 QMS</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-QMS/02-Operations/00-Current/01-Document-Control-Operations</td><td>document issue queues, deployment trackers, document readiness packs, controlled copy distribution trackers, master register working updates</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="role-code">QMS</span></a></span></td><td>báº£n ban hÃ nh chÃ­nh thá»©c cá»§a SOP/WI/ANNEX</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-Change-Control-Coordination</td><td>change request working packs, impact coordination sheets, config audit prep packs, change implementation trackers</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="role-code">QMS</span></a></span></td><td>technical ECR/ECO engineering SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-Management-System-Maintenance</td><td>context refresh notes, interested-party update working packs, CSR review working files, knowledge maintenance packs</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="role-code">QMS</span></a></span></td><td>official QMS-level retained records in 01-QMS-Há»" sÆ¡</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>document issue log, training effectiveness log, retention review log, system review tracker</td><td>QMS Engineer, Internal Auditor Outsource</td><td>NCR/CAPA case SSOT</td></tr>
- <tr><td class="path">.../05-Interfaces-and-Released-Packs/00-Current</td><td>audit input packs, management review input packs, issued communication packs to departments</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="role-code">QMS</span></a></span></td><td>working drafts chÆ°a phÃ¡t hÃ nh</td></tr>
- <tr><td class="path">.../06-Working-Transitory-and-Draft/ROLE-QMSE, ROLE-IAO</td><td>draft procedures, audit prep notes, clause mapping worksheets, review comments, training material drafts</td><td>QMS Engineer, Internal Auditor Outsource</td><td>approved final documents</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>6.2 QMS</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-QMS/02-Operations/00-Current/01-Document-Control-Operations</td><td>document issue queues, deployment trackers, document readiness packs, controlled copy distribution trackers, master register working updates</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>bản ban hành chính thức của SOP/WI/ANNEX</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-Change-Control-Coordination</td><td>change request working packs, impact coordination sheets, config audit prep packs, change implementation trackers</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>technical ECR/ECO engineering SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-Management-System-Maintenance</td><td>context refresh notes, interested-party update working packs, CSR review working files, knowledge maintenance packs</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>official QMS-level retained records in 01-QMS-Hồ sơ</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>document issue log, training effectiveness log, retention review log, system review tracker</td><td>QMS Engineer, Internal Auditor Outsource</td><td>NCR/CAPA case SSOT</td></tr>
+              <tr><td class="path">.../05-Interfaces-and-Released-Packs/00-Current</td><td>audit input packs, management review input packs, issued communication packs to departments</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>working drafts chưa phát hành</td></tr>
+              <tr><td class="path">.../06-Working-Transitory-and-Draft/ROLE-QMSE, ROLE-IAO</td><td>draft procedures, audit prep notes, clause mapping worksheets, review comments, training material drafts</td><td>QMS Engineer, Internal Auditor Outsource</td><td>approved final documents</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>6.3 QA</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-QA/02-Operations/00-Current/01-Incoming-and-In-Process-Control</td><td>inspection planning packs, receiving review notes, containment photos, characteristic review packs, in-process control working files</td><td>QA Manager, Quality Engineer, QC roles</td><td>lot/job official inspection evidence SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-Final-Inspection-and-Release</td><td>release readiness packs, final inspection coordination files, ship-release interface files, release board extracts</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="role-code">QCL</span></a></span></td><td>final released CoC/inspection SSOT if already filed in 02/03 libraries</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-Calibration-Coordination</td><td>calibration scheduling packs, overdue escalation notes, MSA planning files, gage readiness coordination</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html" title="Metrology and Calibration Specialist (Chuyen vien do luong va hieu chuan)"><span class="role-code">MCS</span></a></span></td><td>official calibration certificates and MSA studies SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/04-Customer-Complaint-Response</td><td>complaint response working packs, interim response drafts, escape investigation coordination, customer reply drafts</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="role-code">QE</span></a></span></td><td>formal complaint case file SSOT</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>hold/release log, gage status log, deviation reaction log, inspection coverage log</td><td>QA team</td><td>department KPI deck final output</td></tr>
- <tr><td class="path">.../05-Interfaces-and-Released-Packs/00-Current</td><td>customer complaint response packs, supplier quality packs, released inspection summaries to other departments</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="role-code">QE</span></a></span></td><td>internal draft investigation notes</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>6.3 QA</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-QA/02-Operations/00-Current/01-Incoming-and-In-Process-Control</td><td>inspection planning packs, receiving review notes, containment photos, characteristic review packs, in-process control working files</td><td>QA Manager, Quality Engineer, QC roles</td><td>lot/job official inspection evidence SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-Final-Inspection-and-Release</td><td>release readiness packs, final inspection coordination files, ship-release interface files, release board extracts</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a></span></td><td>final released CoC/inspection SSOT if already filed in 02/03 libraries</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-Calibration-Coordination</td><td>calibration scheduling packs, overdue escalation notes, MSA planning files, gage readiness coordination</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html" title="Metrology and Calibration Specialist (Chuyen vien do luong va hieu chuan)"><span class="entity-code role-code">MCS</span></a></span></td><td>official calibration certificates and MSA studies SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/04-Customer-Complaint-Response</td><td>complaint response working packs, interim response drafts, escape investigation coordination, customer reply drafts</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="entity-code role-code">QE</span></a></span></td><td>formal complaint case file SSOT</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>hold/release log, gage status log, deviation reaction log, inspection coverage log</td><td>QA team</td><td>department KPI deck final output</td></tr>
+              <tr><td class="path">.../05-Interfaces-and-Released-Packs/00-Current</td><td>customer complaint response packs, supplier quality packs, released inspection summaries to other departments</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="entity-code role-code">QE</span></a></span></td><td>internal draft investigation notes</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>6.4 ENG</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-ENG/02-Operations/00-Current/01-Feasibility-and-DFM</td><td>RFQ technical question lists, DFM checklists, manufacturability comments, tolerance review notes, assumption logs</td><td>Engineering Lead, DFM Engineer, Estimator interface</td><td>customer-released baseline master records</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-CAM-and-Method-Release</td><td>setup sheets, tool lists, CAM release packs, method sheets, posted-program references, prove-out notes</td><td>CAM/NC Programmer, Process Engineer</td><td>part master baseline SSOT or machine raw backup SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-Tooling-and-Fixture-Control</td><td>fixture design packs, fixture status, tool holder readiness, fixture validation notes, gauge-fixture interface packs</td><td>Process Engineer, CAM/NC Programmer</td><td>maintenance asset history</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/04-Technical-Change-Execution</td><td>ECR/ECO working packs, implementation notes, supersedure notices, change impact coordination, technical concession response</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="role-code">ENGM</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Ky su quy trinh)"><span class="role-code">PE</span></a></span></td><td>QMS-level change control SSOT</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>release queue, revision change log, fixture status log, programming error lessons</td><td>ENG team</td><td>job traveler evidence</td></tr>
- <tr><td class="path">.../05-Interfaces-and-Released-Packs/00-Current</td><td>RFQ response packs, process readiness packs, engineering CAPA responses</td><td>Engineering Lead, DFM Engineer, CAM/NC Programmer</td><td>role-private draft notes</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>6.4 ENG</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-ENG/02-Operations/00-Current/01-Feasibility-and-DFM</td><td>RFQ technical question lists, DFM checklists, manufacturability comments, tolerance review notes, assumption logs</td><td>Engineering Lead, DFM Engineer, Estimator interface</td><td>customer-released baseline master records</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-CAM-and-Method-Release</td><td>setup sheets, tool lists, CAM release packs, method sheets, posted-program references, prove-out notes</td><td>CAM/NC Programmer, Process Engineer</td><td>part master baseline SSOT or machine raw backup SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-Tooling-and-Fixture-Control</td><td>fixture design packs, fixture status, tool holder readiness, fixture validation notes, gauge-fixture interface packs</td><td>Process Engineer, CAM/NC Programmer</td><td>maintenance asset history</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/04-Technical-Change-Execution</td><td>ECR/ECO working packs, implementation notes, supersedure notices, change impact coordination, technical concession response</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Ky su quy trinh)"><span class="entity-code role-code">PE</span></a></span></td><td>QMS-level change control SSOT</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>release queue, revision change log, fixture status log, programming error lessons</td><td>ENG team</td><td>job traveler evidence</td></tr>
+              <tr><td class="path">.../05-Interfaces-and-Released-Packs/00-Current</td><td>RFQ response packs, process readiness packs, engineering CAPA responses</td><td>Engineering Lead, DFM Engineer, CAM/NC Programmer</td><td>role-private draft notes</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>6.5 PRO</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-PRO/02-Operations/00-Current/01-Dispatch-and-Readiness</td><td>daily dispatch files, readiness boards, finite-capacity working sheets, bottleneck reviews, hot-job recovery packs</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="role-code">PPL</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="role-code">SL</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="role-code">PD</span></a></span></td><td>official closed job evidence</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-Setup-and-First-Piece</td><td>setup packs, pre-run verification files, first-piece coordination, machine setup photos, work transfer prep</td><td>Setup Technician, CNC Workshop Manager, Production Engineer/IE</td><td>G1/G3 job dossier final evidence SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-Shift-Handover-and-WIP</td><td>shift handover packs, WIP aging reviews, blocker lists, line readiness notes, operator escalation packs</td><td>Shift Leader, CNC Operator, Deburr/Clean-Pack supervisors</td><td>formal payroll/attendance records</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/04-Secondary-Operations-and-Clean-Pack</td><td>deburr planning, cleaning/packaging readiness, line clearance packs, contamination-prevention check prep, packaging coordination</td><td>Deburr Team Lead, Cleaning and Packaging Supervisor, technicians</td><td>final packaging and ship SSOT when already filed in job dossier</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/05-Tooling-Maintenance-and-Breakdown</td><td>PM coordination, crash response packs, breakdown recovery, tooling availability notes, maintenance readiness boards</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html" title="Maintenance Technician (Ky thuat vien bao tri)"><span class="role-code">MNT</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="role-code">WKM</span></a></span></td><td>system backup or admin records</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>machine history log, downtime log, shift handover log, tool life log, line clearance log</td><td>Production team</td><td>formal NCR/CAPA case file</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>6.5 PRO</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-PRO/02-Operations/00-Current/01-Dispatch-and-Readiness</td><td>daily dispatch files, readiness boards, finite-capacity working sheets, bottleneck reviews, hot-job recovery packs</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a></span></td><td>official closed job evidence</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-Setup-and-First-Piece</td><td>setup packs, pre-run verification files, first-piece coordination, machine setup photos, work transfer prep</td><td>Setup Technician, CNC Workshop Manager, Production Engineer/IE</td><td>G1/G3 job dossier final evidence SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-Shift-Handover-and-WIP</td><td>shift handover packs, WIP aging reviews, blocker lists, line readiness notes, operator escalation packs</td><td>Shift Leader, CNC Operator, Deburr/Clean-Pack supervisors</td><td>formal payroll/attendance records</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/04-Secondary-Operations-and-Clean-Pack</td><td>deburr planning, cleaning/packaging readiness, line clearance packs, contamination-prevention check prep, packaging coordination</td><td>Deburr Team Lead, Cleaning and Packaging Supervisor, technicians</td><td>final packaging and ship SSOT when already filed in job dossier</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/05-Tooling-Maintenance-and-Breakdown</td><td>PM coordination, crash response packs, breakdown recovery, tooling availability notes, maintenance readiness boards</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html" title="Maintenance Technician (Ky thuat vien bao tri)"><span class="entity-code role-code">MNT</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a></span></td><td>system backup or admin records</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>machine history log, downtime log, shift handover log, tool life log, line clearance log</td><td>Production team</td><td>formal NCR/CAPA case file</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>6.6 SCM</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-SCM/02-Operations/00-Current/01-Supplier-Qualification-and-Performance</td><td>supplier onboarding packs, scorecards, SCAR coordination, processor qualification packs, flowdown readiness files</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="role-code">SCM</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="role-code">BUY</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="role-code">BUY</span></a></span></td><td>supplier quality event SSOT náº¿u Ä'Ã£ cÃ³ á»Ÿ 02-Cháº¥t lÆ°á»£ng-Há»" sÆ¡</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-PO-and-Subcontract-Follow-Up</td><td>PO follow-up sheets, expedite notes, outsource dispatch packs, due-date recovery files</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="role-code">BUY</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="role-code">BUY</span></a></span></td><td>Epicor PO transaction SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-Receiving-and-IQC-Handoff</td><td>receiving packs, damaged receipt photos, supplier cert packs, IQC handoff files, receiving exception notes</td><td>Warehouse Clerk, Buyer, QA interface</td><td>job-specific official receiving SSOT if filed elsewhere</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/04-Warehouse-and-Traceability</td><td>FIFO reviews, location correction packs, traceability maps, stock discrepancy working files, tool crib readiness</td><td>Warehouse Clerk, Tool Crib/Storekeeper</td><td>Epicor stock ledger SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/05-Shipping-and-Packing-Coordination</td><td>shipping coordination files, carrier booking, pack reconciliation prep, ship hold recovery notes</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Logistics and Shipping Function (Bo phan Logistics va Giao van)"><span class="entity-code dept-code">D-LOG</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html" title="Logistics / Shipping Coordinator (Dieu phoi logistics / giao nhan)"><span class="entity-code role-code">LOG</span></a></span></td><td>G5 official shipping evidence SSOT</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>expedite log, shortage risk log, receiving exception log, lot traceability log, carrier performance log</td><td>SCM team</td><td>customer complaint file</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>6.6 SCM</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-SCM/02-Operations/00-Current/01-Supplier-Qualification-and-Performance</td><td>supplier onboarding packs, scorecards, SCAR coordination, processor qualification packs, flowdown readiness files</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="entity-code role-code">BUY</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a></span></td><td>supplier quality event SSOT nếu đã có ở 02-Chất lượng-Hồ sơ</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-PO-and-Subcontract-Follow-Up</td><td>PO follow-up sheets, expedite notes, outsource dispatch packs, due-date recovery files</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="entity-code role-code">BUY</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a></span></td><td>Epicor PO transaction SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-Receiving-and-IQC-Handoff</td><td>receiving packs, damaged receipt photos, supplier cert packs, IQC handoff files, receiving exception notes</td><td>Warehouse Clerk, Buyer, QA interface</td><td>job-specific official receiving SSOT if filed elsewhere</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/04-Warehouse-and-Traceability</td><td>FIFO reviews, location correction packs, traceability maps, stock discrepancy working files, tool crib readiness</td><td>Warehouse Clerk, Tool Crib/Storekeeper</td><td>Epicor stock ledger SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/05-Shipping-and-Packing-Coordination</td><td>shipping coordination files, carrier booking, pack reconciliation prep, ship hold recovery notes</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Logistics and Shipping Function (Bo phan Logistics va Giao van)"><span class="entity-code dept-code">D-LOG</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html" title="Logistics / Shipping Coordinator (Dieu phoi logistics / giao nhan)"><span class="entity-code role-code">LOG</span></a></span></td><td>G5 official shipping evidence SSOT</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>expedite log, shortage risk log, receiving exception log, lot traceability log, carrier performance log</td><td>SCM team</td><td>customer complaint file</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>6.7 SAL</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-SAL/02-Operations/00-Current/01-RFQ-and-Quote-Pack</td><td>RFQ register outputs, quote drafts, customer question lists, technical/commercial assumption packs</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="role-code">CS</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="role-code">EST</span></a></span></td><td>engineering baseline master records</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-Contract-Review-and-Order-Ack</td><td>order ack packs, contract review working files, commitment alignment notes, Incoterm and shipment requirement packs</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="role-code">CS</span></a></span></td><td>Epicor order transaction SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-Customer-Change-and-Escalation</td><td>customer change requests, escalation packs, revised requirement communication, deadline change packs</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="role-code">CS</span></a></span></td><td>formal ECR/ECO SSOT if engineering-owned</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/04-Complaint-and-RMA-Coordination</td><td>RMA coordination files, response drafts, customer update cadence packs, return logistics coordination</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="role-code">CS</span></a></span></td><td>formal complaint case SSOT</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>quote lead-time log, commitment change log, customer communication log, RMA tracking</td><td>Sales/CS team</td><td>internal payroll or HR records</td></tr>
- <tr><td class="path">.../05-Interfaces-and-Released-Packs/00-Current</td><td>order release packs, customer communication packs, issued quote packs</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="role-code">CS</span></a><span class="role-sep">·</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="role-code">EST</span></a></span></td><td>private negotiation notes chÆ°a phÃ¡t hÃ nh</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>6.7 SAL</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-SAL/02-Operations/00-Current/01-RFQ-and-Quote-Pack</td><td>RFQ register outputs, quote drafts, customer question lists, technical/commercial assumption packs</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></td><td>engineering baseline master records</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-Contract-Review-and-Order-Ack</td><td>order ack packs, contract review working files, commitment alignment notes, Incoterm and shipment requirement packs</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a></span></td><td>Epicor order transaction SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-Customer-Change-and-Escalation</td><td>customer change requests, escalation packs, revised requirement communication, deadline change packs</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a></span></td><td>formal ECR/ECO SSOT if engineering-owned</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/04-Complaint-and-RMA-Coordination</td><td>RMA coordination files, response drafts, customer update cadence packs, return logistics coordination</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a></span></td><td>formal complaint case SSOT</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>quote lead-time log, commitment change log, customer communication log, RMA tracking</td><td>Sales/CS team</td><td>internal payroll or HR records</td></tr>
+              <tr><td class="path">.../05-Interfaces-and-Released-Packs/00-Current</td><td>order release packs, customer communication packs, issued quote packs</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></td><td>private negotiation notes chưa phát hành</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>6.8 FIN</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-FIN/02-Operations/00-Current/01-Invoice-Pack-and-AR</td><td>invoice request packs, AR collection working files, customer billing support packs, disputed invoice notes</td><td>Finance Manager, AP/AR Accountant</td><td>employee payroll detail records</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-AP-and-Payment-Proposal</td><td>payment proposal files, vendor payment support packs, due list reviews, cash-out planning</td><td>AP/AR Accountant</td><td>bank token/admin security records</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-Job-Costing-and-Margin</td><td>job costing analysis, margin reviews, variance files, overhead allocation working files</td><td>Finance Manager, GL/Payroll Accountant</td><td>Epicor costing transaction SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/04-Period-Close-and-Reconciliation</td><td>close checklist, reconciliation packs, accrual reviews, exception analysis and close issue packs</td><td>Finance team</td><td>board-ready final financial statements náº¿u controlled elsewhere</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/05-Tax-and-Statutory-Submission</td><td>tax working files, statutory filing support packs, compliance checklists, audit query responses</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="role-code">FIN</span></a></span></td><td>medical or disciplinary HR records</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>collection log, payment release log, close issue log, cash forecast log, financial control review</td><td>Finance team</td><td>báº£ng lÆ°Æ¡ng SSOT</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>6.8 FIN</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-FIN/02-Operations/00-Current/01-Invoice-Pack-and-AR</td><td>invoice request packs, AR collection working files, customer billing support packs, disputed invoice notes</td><td>Finance Manager, AP/AR Accountant</td><td>employee payroll detail records</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-AP-and-Payment-Proposal</td><td>payment proposal files, vendor payment support packs, due list reviews, cash-out planning</td><td>AP/AR Accountant</td><td>bank token/admin security records</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-Job-Costing-and-Margin</td><td>job costing analysis, margin reviews, variance files, overhead allocation working files</td><td>Finance Manager, GL/Payroll Accountant</td><td>Epicor costing transaction SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/04-Period-Close-and-Reconciliation</td><td>close checklist, reconciliation packs, accrual reviews, exception analysis and close issue packs</td><td>Finance team</td><td>board-ready final financial statements nếu controlled elsewhere</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/05-Tax-and-Statutory-Submission</td><td>tax working files, statutory filing support packs, compliance checklists, audit query responses</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a></span></td><td>medical or disciplinary HR records</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>collection log, payment release log, close issue log, cash forecast log, financial control review</td><td>Finance team</td><td>bảng lương SSOT</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>6.9 HR</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-HR/02-Operations/00-Current/01-Manpower-and-Recruitment</td><td>headcount plans, recruitment tracker packs, vacancy approvals, candidate pipeline working files</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></td><td>full candidate/employee legal dossier SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-Onboarding-and-Induction</td><td>onboarding packs, induction coordination, equipment/access coordination, new-hire readiness boards</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></td><td>restricted personal records already in 08-Con ngÆ°á»i-Há»" sÆ¡</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-Performance-and-Probation</td><td>probation cycle packs, appraisal coordination, role-roadmap packs, capability coverage reviews</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></td><td>signed personal performance records SSOT if restricted</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/04-Employee-Relations-and-Discipline</td><td>case coordination packs, grievance workflow files, investigation tracking, manager communication packs</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></td><td>formal disciplinary evidence SSOT if restricted personal record</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/05-Offboarding-and-Revocation</td><td>offboarding packs, revocation coordination, return-of-asset tracking packs, exit readiness files</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></td><td>system admin revocation logs SSOT</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>headcount log, recruitment funnel log, leave/attendance interface log, asset return tracking, access revocation tracking</td><td>HR team</td><td>payroll and medical SSOT</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>6.9 HR</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-HR/02-Operations/00-Current/01-Manpower-and-Recruitment</td><td>headcount plans, recruitment tracker packs, vacancy approvals, candidate pipeline working files</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a></span></td><td>full candidate/employee legal dossier SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-Onboarding-and-Induction</td><td>onboarding packs, induction coordination, equipment/access coordination, new-hire readiness boards</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a></span></td><td>restricted personal records already in 08-Con người-Hồ sơ</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-Performance-and-Probation</td><td>probation cycle packs, appraisal coordination, role-roadmap packs, capability coverage reviews</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a></span></td><td>signed personal performance records SSOT if restricted</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/04-Employee-Relations-and-Discipline</td><td>case coordination packs, grievance workflow files, investigation tracking, manager communication packs</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a></span></td><td>formal disciplinary evidence SSOT if restricted personal record</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/05-Offboarding-and-Revocation</td><td>offboarding packs, revocation coordination, return-of-asset tracking packs, exit readiness files</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a></span></td><td>system admin revocation logs SSOT</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>headcount log, recruitment funnel log, leave/attendance interface log, asset return tracking, access revocation tracking</td><td>HR team</td><td>payroll and medical SSOT</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>6.10 EHS</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-EHS/02-Operations/00-Current/01-Risk-and-Hazard-Control</td><td>hazard maps, risk review packs, PPE matrix working files, permit readiness packs, unsafe-work stop records</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="role-code">EHS</span></a></span></td><td>personal medical detail records</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-Permit-and-PPE-Control</td><td>permit packs, PPE issue coordination, contractor safety access packs, area restriction files</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="role-code">EHS</span></a></span></td><td>HR personal PPE/medical SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-Incident-and-Near-Miss-Response</td><td>incident response packs, investigation working files, lessons-learned packs, restart safety packs</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="role-code">EHS</span></a></span></td><td>formal CAPA case SSOT if owned elsewhere</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/04-Emergency-Preparedness</td><td>drill packs, emergency roster, contingency readiness packs, facility restart readiness</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="role-code">EHS</span></a></span></td><td>IT disaster recovery admin evidence</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/05-Environmental-Monitoring</td><td>lighting and environment logs, waste handling packs, cleanroom support observations, contamination-prevention monitoring</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="role-code">EHS</span></a></span></td><td>QA product release SSOT</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>incident log, unsafe condition log, PPE issue log, inspection log, waste and environment log</td><td>EHS team</td><td>employee disciplinary case SSOT</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>6.10 EHS</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-EHS/02-Operations/00-Current/01-Risk-and-Hazard-Control</td><td>hazard maps, risk review packs, PPE matrix working files, permit readiness packs, unsafe-work stop records</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a></span></td><td>personal medical detail records</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-Permit-and-PPE-Control</td><td>permit packs, PPE issue coordination, contractor safety access packs, area restriction files</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a></span></td><td>HR personal PPE/medical SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-Incident-and-Near-Miss-Response</td><td>incident response packs, investigation working files, lessons-learned packs, restart safety packs</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a></span></td><td>formal CAPA case SSOT if owned elsewhere</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/04-Emergency-Preparedness</td><td>drill packs, emergency roster, contingency readiness packs, facility restart readiness</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a></span></td><td>IT disaster recovery admin evidence</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/05-Environmental-Monitoring</td><td>lighting and environment logs, waste handling packs, cleanroom support observations, contamination-prevention monitoring</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a></span></td><td>QA product release SSOT</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>incident log, unsafe condition log, PPE issue log, inspection log, waste and environment log</td><td>EHS team</td><td>employee disciplinary case SSOT</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>6.11 IT</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-IT/02-Operations/00-Current/01-Service-Request-and-Endpoint</td><td>service request working packs, endpoint rollout plans, hardware handover coordination, user support work queues</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="role-code">ITA</span></a></span></td><td>official access review or config SSOT</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-Identity-and-Access-Coordination</td><td>coordination packs for access request/change/removal, onboarding-offboarding access queues, review prep packs</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="role-code">ITA</span></a></span></td><td>approved access evidence SSOT in 09</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-M365-Configuration-Change</td><td>working config plans, testing notes, rollout coordination, communication packs for SharePoint/M365 changes</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="role-code">ITA</span></a></span></td><td>formal change record SSOT in 09</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/04-Backup-Restore-and-Recovery</td><td>restore drill coordination, recovery readiness boards, continuity work packs</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="role-code">ITA</span></a></span></td><td>backup job outputs and restore evidence SSOT in 09</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/05-Security-and-Incident-Response</td><td>security issue triage packs, endpoint quarantine coordination, corrective action work files</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="role-code">ITA</span></a></span></td><td>security incident official record SSOT in 09</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>ticket log, asset compliance log, backup exception log, access review tracker, security issue log</td><td>IT team</td><td>admin evidence SSOT in 09</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>6.11 IT</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-IT/02-Operations/00-Current/01-Service-Request-and-Endpoint</td><td>service request working packs, endpoint rollout plans, hardware handover coordination, user support work queues</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td>official access review or config SSOT</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-Identity-and-Access-Coordination</td><td>coordination packs for access request/change/removal, onboarding-offboarding access queues, review prep packs</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td>approved access evidence SSOT in 09</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-M365-Configuration-Change</td><td>working config plans, testing notes, rollout coordination, communication packs for SharePoint/M365 changes</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td>formal change record SSOT in 09</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/04-Backup-Restore-and-Recovery</td><td>restore drill coordination, recovery readiness boards, continuity work packs</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td>backup job outputs and restore evidence SSOT in 09</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/05-Security-and-Incident-Response</td><td>security issue triage packs, endpoint quarantine coordination, corrective action work files</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td>security incident official record SSOT in 09</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>ticket log, asset compliance log, backup exception log, access review tracker, security issue log</td><td>IT team</td><td>admin evidence SSOT in 09</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>6.12 ERP</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Path</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th><th>Vai trÃ² phÃ¡t sinh chÃ­nh</th><th>Do not store here</th></tr>
- </thead>
- <tbody>
- <tr><td class="path">05-PhÃ²ng ban-Há»" sÆ¡/DEP-ERP/02-Operations/00-Current/01-Role-and-Access-Governance</td><td>role review working packs, role cleanup planning, SoD remediation coordination</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="role-code">ESA</span></a></span></td><td>official role review SSOT in 09</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/02-Master-Data-Control</td><td>master data request queues, approval prep packs, validation notes, cleanup work files</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="role-code">ESA</span></a></span></td><td>approved master-data admin evidence SSOT in 09</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/03-UAT-Deployment-and-Cutover</td><td>UAT prep packs, cutover runbooks, deployment coordination files, hypercare tracking</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="role-code">ESA</span></a></span></td><td>deployment approval SSOT in 09</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/04-Transaction-Error-and-Recovery</td><td>transaction error triage, re-entry work files, reconciliation prep packs, restart and clean-up actions</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="role-code">ESA</span></a></span></td><td>formal incident/problem SSOT in 09</td></tr>
- <tr><td class="path">.../02-Operations/00-Current/05-Report-and-Interface-Control</td><td>report validation packs, interface monitoring reviews, scheduled job checks, file-exchange coordination</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="role-code">ESA</span></a></span></td><td>integration admin logs SSOT in 09</td></tr>
- <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>SoD review log, master data change tracker, deployment calendar, error re-entry log, integration monitoring log</td><td>ERP team</td><td>department-level convenience copies</td></tr>
- </tbody>
- </table>
- </div>
- </div>
+        <h3>6.12 ERP</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>File phải để ở đây</th><th>Vai trò phát sinh chính</th><th>Do not store here</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="path">05-Phòng ban-Hồ sơ/DEP-ERP/02-Operations/00-Current/01-Role-and-Access-Governance</td><td>role review working packs, role cleanup planning, SoD remediation coordination</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="entity-code role-code">ESA</span></a></span></td><td>official role review SSOT in 09</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/02-Master-Data-Control</td><td>master data request queues, approval prep packs, validation notes, cleanup work files</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="entity-code role-code">ESA</span></a></span></td><td>approved master-data admin evidence SSOT in 09</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/03-UAT-Deployment-and-Cutover</td><td>UAT prep packs, cutover runbooks, deployment coordination files, hypercare tracking</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="entity-code role-code">ESA</span></a></span></td><td>deployment approval SSOT in 09</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/04-Transaction-Error-and-Recovery</td><td>transaction error triage, re-entry work files, reconciliation prep packs, restart and clean-up actions</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="entity-code role-code">ESA</span></a></span></td><td>formal incident/problem SSOT in 09</td></tr>
+              <tr><td class="path">.../02-Operations/00-Current/05-Report-and-Interface-Control</td><td>report validation packs, interface monitoring reviews, scheduled job checks, file-exchange coordination</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="entity-code role-code">ESA</span></a></span></td><td>integration admin logs SSOT in 09</td></tr>
+              <tr><td class="path">.../03-Registers-and-Logs/00-Current</td><td>SoD review log, master data change tracker, deployment calendar, error re-entry log, integration monitoring log</td><td>ERP team</td><td>department-level convenience copies</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
- <div class="section">
- <h2>7. JD routing matrix</h2>
- <div class="keyline"><strong>Rule:</strong> JD khÃ´ng táº¡o má»™t SSOT riÃªng. Má»—i JD cÃ³ team workbench táº¡i role root vÃ  named employee workbench táº¡i <span class="code">ROLE-{RoleCode}/90-Employee-WB/{EmployeeID}-{DisplayName}</span> trong <span class="code">06-Working-Transitory-and-Draft</span>, nhÆ°ng output chÃ­nh thá»©c cá»§a JD pháº£i Ä'i vÃ o record series cá»§a department, library hoáº·c job gate tÆ°Æ¡ng á»©ng.</div>
+      <div class="section">
+        <h2>7. JD routing matrix</h2>
+        <div class="keyline"><strong>Rule:</strong> JD không tạo một SSOT riêng. Mỗi JD có <b>workbench</b> riêng trong <span class="code">06-Working-Transitory-and-Draft</span>, nhưng output chính thức của JD phải đi vào record series của department, library hoặc job gate tương ứng.</div>
 
- <h3>7.1 Executive vÃ  production leadership</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>JD</th><th>Official destination chÃ­nh</th><th>Working destination</th><th>Must not do</th></tr>
- </thead>
- <tbody>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></td><td>DEP-EXEC strategy, management review inputs, decision logs; 01-QMS-Há»" sÆ¡ cho official MR/governance records</td><td>DEP-EXEC/06-Working-Transitory-and-Draft/ROLE-CEO</td><td>Giá»¯ quyáº¿t Ä'á»‹nh Ä'iá»u hÃ nh chá»‰ trong email cÃ¡ nhÃ¢n</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="role-code">PD</span></a></span></td><td>DEP-PRO readiness/recovery packs; DEP-EXEC board and customer commitments; 03-Job-Há»" sÆ¡ cho job-critical escalations</td><td>DEP-EXEC/06-Working-Transitory-and-Draft/ROLE-PDIR</td><td>Äá»ƒ recovery plan á»Ÿ file táº¡m khÃ´ng promote</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>7.1 Executive và production leadership</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>JD</th><th>Official destination chính</th><th>Working destination</th><th>Must not do</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></td><td>DEP-EXEC strategy, management review inputs, decision logs; 01-QMS-Hồ sơ cho official MR/governance records</td><td>DEP-EXEC/06-Working-Transitory-and-Draft/ROLE-CEO</td><td>Giữ quyết định điều hành chỉ trong email cá nhân</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a></span></td><td>DEP-PRO readiness/recovery packs; DEP-EXEC board and customer commitments; 03-Job-Hồ sơ cho job-critical escalations</td><td>DEP-EXEC/06-Working-Transitory-and-Draft/ROLE-PDIR</td><td>Để recovery plan ở file tạm không promote</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>7.2 Production roles</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>JD</th><th>Official destination chÃ­nh</th><th>Working destination</th><th>Must not do</th></tr>
- </thead>
- <tbody>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="role-code">WKM</span></a></span></td><td>DEP-PRO machine readiness, tooling maintenance, downtime review; job G1/G4 interfaces</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-CWM</td><td>Giá»¯ machine crash record chá»‰ á»Ÿ mÃ¡y cá»¥c bá»™</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="role-code">PPL</span></a></span></td><td>DEP-PRO dispatch/readiness, WIP/current queue, control tower packs; 03-Job-Há»" sÆ¡ admin/control</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-PPLN</td><td>Quáº£n lÃ½ plan báº±ng sheet rá»i ngoÃ i current board</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-engineer-industrial-engineer.html" title="Production Engineer / Industrial Engineer (Ky su san xuat / ky su cong nghiep)"><span class="role-code">PIE</span></a></span></td><td>DEP-PRO setup readiness, improvement projects; 03-Job-Há»" sÆ¡ G1/G4 support packs</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-PIE</td><td>Äá»ƒ work transfer validation chá»‰ á»Ÿ draft folder</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="role-code">SL</span></a></span></td><td>DEP-PRO shift handover and WIP current logs; 03-Job-Há»" sÆ¡ G3 evidence links</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-SHFL</td><td>Chá»¥p áº£nh handover xong khÃ´ng ná»™p vá» SSOT</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="role-code">SET</span></a></span></td><td>03-Job-Há»" sÆ¡ G1/G3 evidence; DEP-PRO setup current packs</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-SET</td><td>Giá»¯ setup sheet final á»Ÿ USB/desktop</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="role-code">OPR</span></a></span></td><td>03-Job-Há»" sÆ¡ G3 production evidence; DEP-PRO shift/WIP logs</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-CNC</td><td>Giá»¯ current production notes trÃªn giáº¥y khÃ´ng sá»' hÃ³a</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html" title="Deburr Team Lead (To truong pha ba via)"><span class="role-code">DBL</span></a></span></td><td>DEP-PRO secondary operation and clean-pack current packs; 03-Job-Há»" sÆ¡ G4 support</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-DBTL</td><td>Äá»ƒ line-clearance notes ngoÃ i system</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-technician.html" title="Deburr Technician (Ky thuat vien pha ba via)"><span class="role-code">DBT</span></a></span></td><td>03-Job-Há»" sÆ¡ G3/G5 work evidence theo job; DEP-PRO current support files</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-DBT</td><td>Giá»¯ áº£nh lá»—i/chá»©ng cá»© trÃªn Ä'iá»‡n thoáº¡i cÃ¡ nhÃ¢n</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html" title="Cleaning and Packaging Supervisor (Giam sat ve sinh va dong goi)"><span class="role-code">CPS</span></a></span></td><td>DEP-PRO clean-pack coordination; 03-Job-Há»" sÆ¡ G4/G6 release readiness</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-CPS</td><td>Giá»¯ ship-ready pack á»Ÿ folder draft</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-packaging-technician.html" title="Cleaning and Packaging Technician (Ky thuat vien ve sinh va dong goi)"><span class="role-code">CPT</span></a></span></td><td>03-Job-Há»" sÆ¡ G4/G6 packaging evidence; DEP-PRO clean-pack support files</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-CPT</td><td>KhÃ´ng route label/photo/checklist vá» job</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html" title="Maintenance Technician (Ky thuat vien bao tri)"><span class="role-code">MNT</span></a></span></td><td>DEP-PRO tooling maintenance and breakdown packs; DEP-IT/DEP-EHS interfaces khi cáº§n</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-MNT</td><td>Giá»¯ breakdown root-cause chá»‰ á»Ÿ notebook cÃ¡ nhÃ¢n</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>7.2 Production roles</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>JD</th><th>Official destination chính</th><th>Working destination</th><th>Must not do</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a></span></td><td>DEP-PRO machine readiness, tooling maintenance, downtime review; job G1/G4 interfaces</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-CWM</td><td>Giữ machine crash record chỉ ở máy cục bộ</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td><td>DEP-PRO dispatch/readiness, WIP/current queue, control tower packs; 03-Job-Hồ sơ admin/control</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-PPLN</td><td>Quản lý plan bằng sheet rời ngoài current board</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-engineer-industrial-engineer.html" title="Production Engineer / Industrial Engineer (Ky su san xuat / ky su cong nghiep)"><span class="entity-code role-code">PIE</span></a></span></td><td>DEP-PRO setup readiness, improvement projects; 03-Job-Hồ sơ G1/G4 support packs</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-PIE</td><td>Để work transfer validation chỉ ở draft folder</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a></span></td><td>DEP-PRO shift handover and WIP current logs; 03-Job-Hồ sơ G3 evidence links</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-SHFL</td><td>Chụp ảnh handover xong không nộp về SSOT</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a></span></td><td>03-Job-Hồ sơ G1/G3 evidence; DEP-PRO setup current packs</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-SET</td><td>Giữ setup sheet final ở USB/desktop</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a></span></td><td>03-Job-Hồ sơ G3 production evidence; DEP-PRO shift/WIP logs</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-CNC</td><td>Giữ current production notes trên giấy không số hóa</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html" title="Deburr Team Lead (To truong pha ba via)"><span class="entity-code role-code">DBL</span></a></span></td><td>DEP-PRO secondary operation and clean-pack current packs; 03-Job-Hồ sơ G4 support</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-DBTL</td><td>Để line-clearance notes ngoài system</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-technician.html" title="Deburr Technician (Ky thuat vien pha ba via)"><span class="entity-code role-code">DBT</span></a></span></td><td>03-Job-Hồ sơ G3/G5 work evidence theo job; DEP-PRO current support files</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-DBT</td><td>Giữ ảnh lỗi/chứng cứ trên điện thoại cá nhân</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html" title="Cleaning and Packaging Supervisor (Giam sat ve sinh va dong goi)"><span class="entity-code role-code">CPS</span></a></span></td><td>DEP-PRO clean-pack coordination; 03-Job-Hồ sơ G4/G6 release readiness</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-CPS</td><td>Giữ ship-ready pack ở folder draft</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-packaging-technician.html" title="Cleaning and Packaging Technician (Ky thuat vien ve sinh va dong goi)"><span class="entity-code role-code">CPT</span></a></span></td><td>03-Job-Hồ sơ G4/G6 packaging evidence; DEP-PRO clean-pack support files</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-CPT</td><td>Không route label/photo/checklist về job</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html" title="Maintenance Technician (Ky thuat vien bao tri)"><span class="entity-code role-code">MNT</span></a></span></td><td>DEP-PRO tooling maintenance and breakdown packs; DEP-IT/DEP-EHS interfaces khi cần</td><td>DEP-PRO/06-Working-Transitory-and-Draft/ROLE-MNT</td><td>Giữ breakdown root-cause chỉ ở notebook cá nhân</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>7.3 Engineering roles</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>JD</th><th>Official destination chÃ­nh</th><th>Working destination</th><th>Must not do</th></tr>
- </thead>
- <tbody>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="role-code">ENGM</span></a></span></td><td>DEP-ENG released packs, change execution, RFQ response packs; Part-REV baseline approvals</td><td>DEP-ENG/06-Working-Transitory-and-Draft/ROLE-ELM</td><td>DÃ¹ng email inbox lÃ m release queue</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html" title="DFM Engineer (Ky su DFM)"><span class="role-code">DFM</span></a></span></td><td>DEP-ENG feasibility/DFM; SAL RFQ interfaces; 03-Job-Há»" sÆ¡ G0/G2 when job-specific</td><td>DEP-ENG/06-Working-Transitory-and-Draft/ROLE-DFM</td><td>Äá»ƒ marked-up drawing chá»‰ á»Ÿ local download</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Ky su quy trinh)"><span class="role-code">PE</span></a></span></td><td>DEP-ENG tooling/fixture and technical change; 03-Job-Há»" sÆ¡ G1/G3/G4 support</td><td>DEP-ENG/06-Working-Transitory-and-Draft/ROLE-PE</td><td>Giá»¯ fixture validation notes ngoÃ i ENG zone</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="role-code">CAM</span></a></span></td><td>DEP-ENG CAM and method release; Part-REV-Báº£n gá»'c for baseline release; job G1 references</td><td>DEP-ENG/06-Working-Transitory-and-Draft/ROLE-CAM</td><td>Trá»™n posted program draft vá»›i baseline master</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>7.3 Engineering roles</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>JD</th><th>Official destination chính</th><th>Working destination</th><th>Must not do</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a></span></td><td>DEP-ENG released packs, change execution, RFQ response packs; Part-REV baseline approvals</td><td>DEP-ENG/06-Working-Transitory-and-Draft/ROLE-ELM</td><td>Dùng email inbox làm release queue</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html" title="DFM Engineer (Ky su DFM)"><span class="entity-code role-code">DFM</span></a></span></td><td>DEP-ENG feasibility/DFM; SAL RFQ interfaces; 03-Job-Hồ sơ G0/G2 when job-specific</td><td>DEP-ENG/06-Working-Transitory-and-Draft/ROLE-DFM</td><td>Để marked-up drawing chỉ ở local download</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Ky su quy trinh)"><span class="entity-code role-code">PE</span></a></span></td><td>DEP-ENG tooling/fixture and technical change; 03-Job-Hồ sơ G1/G3/G4 support</td><td>DEP-ENG/06-Working-Transitory-and-Draft/ROLE-PE</td><td>Giữ fixture validation notes ngoài ENG zone</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>DEP-ENG CAM and method release; Part-REV-Bản gốc for baseline release; job G1 references</td><td>DEP-ENG/06-Working-Transitory-and-Draft/ROLE-CAM</td><td>Trộn posted program draft với baseline master</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>7.4 Quality roles</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>JD</th><th>Official destination chÃ­nh</th><th>Working destination</th><th>Must not do</th></tr>
- </thead>
- <tbody>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a></span></td><td>02-Cháº¥t lÆ°á»£ng-Há»" sÆ¡; DEP-QA complaint/release/calibration coordination packs</td><td>DEP-QA/06-Working-Transitory-and-Draft/ROLE-QAM</td><td>Giá»¯ release decision ngoÃ i quality SSOT</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="role-code">QE</span></a></span></td><td>02-Cháº¥t lÆ°á»£ng-Há»" sÆ¡ NCR/CAPA/complaint; DEP-QA response and reaction packs</td><td>DEP-QA/06-Working-Transitory-and-Draft/ROLE-QE</td><td>Äá»ƒ 8D/NCR draft final á»Ÿ mail cÃ¡ nhÃ¢n</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="role-code">QCL</span></a></span></td><td>02-Cháº¥t lÆ°á»£ng-Há»" sÆ¡ inspection/release; DEP-QA final inspection coordination</td><td>DEP-QA/06-Working-Transitory-and-Draft/ROLE-QCL</td><td>Giá»¯ release board only offline</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="role-code">QC</span></a></span></td><td>03-Job-Há»" sÆ¡ G2/G5 evidence; 02-Cháº¥t lÆ°á»£ng-Há»" sÆ¡ inspection result SSOT</td><td>DEP-QA/06-Working-Transitory-and-Draft/ROLE-QCCMM</td><td>Äá»ƒ raw data vÃ  report final á»Ÿ mÃ¡y CMM duy nháº¥t</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html" title="Metrology and Calibration Specialist (Chuyen vien do luong va hieu chuan)"><span class="role-code">MCS</span></a></span></td><td>02-Cháº¥t lÆ°á»£ng-Há»" sÆ¡ calibration/MSA; DEP-QA calibration coordination</td><td>DEP-QA/06-Working-Transitory-and-Draft/ROLE-MCS</td><td>Giá»¯ overdue list ngoÃ i current log</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="role-code">QMS</span></a></span></td><td>01-QMS-Há»" sÆ¡ and DEP-QMS work series</td><td>DEP-QMS/06-Working-Transitory-and-Draft/ROLE-QMSE</td><td>Trá»™n QMS admin work vá»›i QA case files</td></tr>
- <tr><td>Internal Auditor Outsource</td><td>01-QMS-Há»" sÆ¡ audit records; DEP-QMS audit workbench and packs</td><td>DEP-QMS/06-Working-Transitory-and-Draft/ROLE-IAO</td><td>Giá»¯ audit evidence á»Ÿ personal device sau khi audit Ä'Ã³ng</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>7.4 Quality roles</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>JD</th><th>Official destination chính</th><th>Working destination</th><th>Must not do</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>02-Chất lượng-Hồ sơ; DEP-QA complaint/release/calibration coordination packs</td><td>DEP-QA/06-Working-Transitory-and-Draft/ROLE-QAM</td><td>Giữ release decision ngoài quality SSOT</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="entity-code role-code">QE</span></a></span></td><td>02-Chất lượng-Hồ sơ NCR/CAPA/complaint; DEP-QA response and reaction packs</td><td>DEP-QA/06-Working-Transitory-and-Draft/ROLE-QE</td><td>Để 8D/NCR draft final ở mail cá nhân</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a></span></td><td>02-Chất lượng-Hồ sơ inspection/release; DEP-QA final inspection coordination</td><td>DEP-QA/06-Working-Transitory-and-Draft/ROLE-QCL</td><td>Giữ release board only offline</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>03-Job-Hồ sơ G2/G5 evidence; 02-Chất lượng-Hồ sơ inspection result SSOT</td><td>DEP-QA/06-Working-Transitory-and-Draft/ROLE-QCCMM</td><td>Để raw data và report final ở máy CMM duy nhất</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html" title="Metrology and Calibration Specialist (Chuyen vien do luong va hieu chuan)"><span class="entity-code role-code">MCS</span></a></span></td><td>02-Chất lượng-Hồ sơ calibration/MSA; DEP-QA calibration coordination</td><td>DEP-QA/06-Working-Transitory-and-Draft/ROLE-MCS</td><td>Giữ overdue list ngoài current log</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>01-QMS-Hồ sơ and DEP-QMS work series</td><td>DEP-QMS/06-Working-Transitory-and-Draft/ROLE-QMSE</td><td>Trộn QMS admin work với QA case files</td></tr>
+              <tr><td>Internal Auditor Outsource</td><td>01-QMS-Hồ sơ audit records; DEP-QMS audit workbench and packs</td><td>DEP-QMS/06-Working-Transitory-and-Draft/ROLE-IAO</td><td>Giữ audit evidence ở personal device sau khi audit đóng</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>7.5 Supply chain, sales and finance roles</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>JD</th><th>Official destination chÃ­nh</th><th>Working destination</th><th>Must not do</th></tr>
- </thead>
- <tbody>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="role-code">SCM</span></a></span></td><td>DEP-SCM supplier, receiving, warehouse and shipping current packs; 02/03 libraries when formal case/job record</td><td>DEP-SCM/06-Working-Transitory-and-Draft/ROLE-SCMM</td><td>Giá»¯ processor approval pack á»Ÿ personal folder</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="role-code">BUY</span></a></span></td><td>DEP-SCM supplier and PO follow-up series</td><td>DEP-SCM/06-Working-Transitory-and-Draft/ROLE-BUY</td><td>DÃ¹ng email inbox lÃ m PO tracker duy nháº¥t</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html" title="Warehouse Clerk (Nhan vien kho)"><span class="role-code">WAR</span></a></span></td><td>DEP-SCM receiving, warehouse and traceability series; job G4/G6 handoff packs</td><td>DEP-SCM/06-Working-Transitory-and-Draft/ROLE-WHC</td><td>Giá»¯ receiving photo proof only on phone</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html" title="Tool Crib / Tool Storekeeper (Thu kho dao cu)"><span class="role-code">TOOL</span></a></span></td><td>DEP-SCM warehouse/traceability and DEP-PRO tooling interfaces</td><td>DEP-SCM/06-Working-Transitory-and-Draft/ROLE-TCR</td><td>Quáº£n lÃ½ tool issue báº±ng note giáº¥y khÃ´ng sá»' hÃ³a</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html" title="Logistics / Shipping Coordinator (Dieu phoi logistics / giao nhan)"><span class="role-code">LOG</span></a></span></td><td>DEP-SCM shipping coordination and carrier logs; 03-Job-Há»" sÆ¡ G5 ship packs</td><td>DEP-SCM/06-Working-Transitory-and-Draft/ROLE-LSC</td><td>Giá»¯ pack reconciliation final ngoÃ i job dossier</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="role-code">CS</span></a></span></td><td>DEP-SAL quote/order/change/complaint coordination series; 03-Job-Há»" sÆ¡ and 02-Cháº¥t lÆ°á»£ng-Há»" sÆ¡ when formal</td><td>DEP-SAL/06-Working-Transitory-and-Draft/ROLE-CS</td><td>Giá»¯ customer commitment only in mailbox</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="role-code">EST</span></a></span></td><td>DEP-SAL RFQ/quote packs and DEP-ENG DFM interfaces</td><td>DEP-SAL/06-Working-Transitory-and-Draft/ROLE-EST</td><td>Giá»¯ costing assumptions ngoÃ i quote pack</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="role-code">FIN</span></a></span></td><td>DEP-FIN close, tax, job costing and control review packs</td><td>DEP-FIN/06-Working-Transitory-and-Draft/ROLE-FM</td><td>Giá»¯ month-close decision pack ngoÃ i FIN zone</td></tr>
- <tr><td>AP/AR and Payments Accountant</td><td>DEP-FIN invoice, AR/AP and payment proposal series</td><td>DEP-FIN/06-Working-Transitory-and-Draft/ROLE-APAR</td><td>LÆ°u bank/payment supporting files á»Ÿ shared open area</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-general-ledger-and-payroll-accountant.html" title="General Ledger and Payroll Accountant (Ke toan tong hop va tien luong)"><span class="role-code">GLP</span></a></span></td><td>DEP-FIN close and costing series; payroll input packs in DEP-HR/DEP-FIN interfaces; restricted payroll SSOT in 08</td><td>DEP-FIN/06-Working-Transitory-and-Draft/ROLE-GLPAY</td><td>Äá»ƒ payroll-support detail á»Ÿ shared FIN folder</td></tr>
- </tbody>
- </table>
- </div>
+        <h3>7.5 Supply chain, sales and finance roles</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>JD</th><th>Official destination chính</th><th>Working destination</th><th>Must not do</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a></span></td><td>DEP-SCM supplier, receiving, warehouse and shipping current packs; 02/03 libraries when formal case/job record</td><td>DEP-SCM/06-Working-Transitory-and-Draft/ROLE-SCMM</td><td>Giữ processor approval pack ở personal folder</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="entity-code role-code">BUY</span></a></span></td><td>DEP-SCM supplier and PO follow-up series</td><td>DEP-SCM/06-Working-Transitory-and-Draft/ROLE-BUY</td><td>Dùng email inbox làm PO tracker duy nhất</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html" title="Warehouse Clerk (Nhan vien kho)"><span class="entity-code role-code">WAR</span></a></span></td><td>DEP-SCM receiving, warehouse and traceability series; job G4/G6 handoff packs</td><td>DEP-SCM/06-Working-Transitory-and-Draft/ROLE-WHC</td><td>Giữ receiving photo proof only on phone</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html" title="Tool Crib / Tool Storekeeper (Thu kho dao cu)"><span class="entity-code role-code">TOOL</span></a></span></td><td>DEP-SCM warehouse/traceability and DEP-PRO tooling interfaces</td><td>DEP-SCM/06-Working-Transitory-and-Draft/ROLE-TCR</td><td>Quản lý tool issue bằng note giấy không số hóa</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html" title="Logistics / Shipping Coordinator (Dieu phoi logistics / giao nhan)"><span class="entity-code role-code">LOG</span></a></span></td><td>DEP-SCM shipping coordination and carrier logs; 03-Job-Hồ sơ G5 ship packs</td><td>DEP-SCM/06-Working-Transitory-and-Draft/ROLE-LSC</td><td>Giữ pack reconciliation final ngoài job dossier</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a></span></td><td>DEP-SAL quote/order/change/complaint coordination series; 03-Job-Hồ sơ and 02-Chất lượng-Hồ sơ when formal</td><td>DEP-SAL/06-Working-Transitory-and-Draft/ROLE-CS</td><td>Giữ customer commitment only in mailbox</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></td><td>DEP-SAL RFQ/quote packs and DEP-ENG DFM interfaces</td><td>DEP-SAL/06-Working-Transitory-and-Draft/ROLE-EST</td><td>Giữ costing assumptions ngoài quote pack</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a></span></td><td>DEP-FIN close, tax, job costing and control review packs</td><td>DEP-FIN/06-Working-Transitory-and-Draft/ROLE-FM</td><td>Giữ month-close decision pack ngoài FIN zone</td></tr>
+              <tr><td>AP/AR and Payments Accountant</td><td>DEP-FIN invoice, AR/AP and payment proposal series</td><td>DEP-FIN/06-Working-Transitory-and-Draft/ROLE-APAR</td><td>Lưu bank/payment supporting files ở shared open area</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-general-ledger-and-payroll-accountant.html" title="General Ledger and Payroll Accountant (Ke toan tong hop va tien luong)"><span class="entity-code role-code">GLP</span></a></span></td><td>DEP-FIN close and costing series; payroll input packs in DEP-HR/DEP-FIN interfaces; restricted payroll SSOT in 08</td><td>DEP-FIN/06-Working-Transitory-and-Draft/ROLE-GLPAY</td><td>Để payroll-support detail ở shared FIN folder</td></tr>
+            </tbody>
+          </table>
+        </div>
 
- <h3>7.6 HR, EHS, IT vÃ  ERP roles</h3>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>JD</th><th>Official destination chÃ­nh</th><th>Working destination</th><th>Must not do</th></tr>
- </thead>
- <tbody>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a></span></td><td>DEP-HR operations/logs; 04-ÄÃ o táº¡o-Há»" sÆ¡; 08-Con ngÆ°á»i-Há»" sÆ¡ cho restricted personal files</td><td>DEP-HR/06-Working-Transitory-and-Draft/ROLE-HRM</td><td>Giá»¯ personnel case file á»Ÿ shared HR area</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="role-code">EHS</span></a></span></td><td>DEP-EHS hazard, incident, emergency and environment series; 08-Con ngÆ°á»i-Há»" sÆ¡ if personal medical/legal</td><td>DEP-EHS/06-Working-Transitory-and-Draft/ROLE-EHS</td><td>Äá»ƒ incident evidence chá»‰ á»Ÿ chat/email</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="role-code">ITA</span></a></span></td><td>DEP-IT current queues and coordination packs; 09-Sá»' hÃ³a-System-Há»" sÆ¡ for admin evidence</td><td>DEP-IT/06-Working-Transitory-and-Draft/ROLE-ITA</td><td>Giá»¯ access/config/admin SSOT á»Ÿ department shared area</td></tr>
- <tr><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="role-code">ESA</span></a></span></td><td>DEP-ERP current queues and work packs; 09-Sá»' hÃ³a-System-Há»" sÆ¡ for role/master data/UAT/admin evidence</td><td>DEP-ERP/06-Working-Transitory-and-Draft/ROLE-ERPA</td><td>Giá»¯ master-data change history duy nháº¥t á»Ÿ local export</td></tr>
- </tbody>
- </table>
- </div>
- </div>
+        <h3>7.6 HR, EHS, IT và ERP roles</h3>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>JD</th><th>Official destination chính</th><th>Working destination</th><th>Must not do</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a></span></td><td>DEP-HR operations/logs; 04-Đào tạo-Hồ sơ; 08-Con người-Hồ sơ cho restricted personal files</td><td>DEP-HR/06-Working-Transitory-and-Draft/ROLE-HRM</td><td>Giữ personnel case file ở shared HR area</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a></span></td><td>DEP-EHS hazard, incident, emergency and environment series; 08-Con người-Hồ sơ if personal medical/legal</td><td>DEP-EHS/06-Working-Transitory-and-Draft/ROLE-EHS</td><td>Để incident evidence chỉ ở chat/email</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td>DEP-IT current queues and coordination packs; 09-Số hóa-System-Hồ sơ for admin evidence</td><td>DEP-IT/06-Working-Transitory-and-Draft/ROLE-ITA</td><td>Giữ access/config/admin SSOT ở department shared area</td></tr>
+              <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="entity-code role-code">ESA</span></a></span></td><td>DEP-ERP current queues and work packs; 09-Số hóa-System-Hồ sơ for role/master data/UAT/admin evidence</td><td>DEP-ERP/06-Working-Transitory-and-Draft/ROLE-ERPA</td><td>Giữ master-data change history duy nhất ở local export</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
- <div class="section">
- <h2>8. File plan chi tiáº¿t cho tá»«ng job</h2>
- <div class="figure-box">
- <p style="margin:0;" class="path">03-Job-Há»" sÆ¡/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/00_Admin-Control/</p>
- <p style="margin:4px 0 0;" class="path">03-Job-Há»" sÆ¡/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/01_G0-Contract-Kickoff/</p>
- <p style="margin:4px 0 0;" class="path">03-Job-Há»" sÆ¡/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/02_G1-Engineering-Release/</p>
- <p style="margin:4px 0 0;" class="path">03-Job-Há»" sÆ¡/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/03_G2-IQC-Receiving/</p>
- <p style="margin:4px 0 0;" class="path">03-Job-Há»" sÆ¡/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/04_G3-Setup-Release/</p>
- <p style="margin:4px 0 0;" class="path">03-Job-Há»" sÆ¡/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/05_G4-FAI-First-Piece/</p>
- <p style="margin:4px 0 0;" class="path">03-Job-Há»" sÆ¡/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/06_G5-IPQC-Production/</p>
- <p style="margin:4px 0 0;" class="path">03-Job-Há»" sÆ¡/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/07_G6-Final-QC-Packaging/</p>
- <p style="margin:4px 0 0;" class="path">03-Job-Há»" sÆ¡/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/08_G7-Ship-Release/</p>
- <p style="margin:4px 0 0;" class="path">03-Job-Há»" sÆ¡/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/07_NCR-CAPA-Deviation/</p>
- <p style="margin:4px 0 0;" class="path">03-Job-Há»" sÆ¡/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/99_Archive-Locked/</p>
- </div>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Gate</th><th>Subfolder báº¯t buá»™c</th><th>File pháº£i Ä'á»ƒ á»Ÿ Ä'Ã¢y</th></tr>
- </thead>
- <tbody>
- <tr><td><span class="code">00_Admin-Control</span></td><td><span class="code">01-Job-Index</span>, <span class="code">02-Approvals-and-Status</span>, <span class="code">03-Change-History</span>, <span class="code">04-Customer-Requirement-Summary</span>, <span class="code">05-Link-to-Part-Master</span></td><td>job index, FRM-205, approval history, status snapshots, customer requirement summary, links tá»›i part baseline, gate status board exports</td></tr>
- <tr><td><span class="code">01_G0-Contract-Kickoff</span></td><td><span class="code">01-RFQ-and-Quote-Inputs</span>, <span class="code">02-Contract-Review-and-PO</span>, <span class="code">03-Kickoff-and-Planning</span>, <span class="code">04-Customer-Change-Inputs</span>, <span class="code">05-Customer-Property-and-Consigned</span></td><td>PO/ack, contract review checklist, kickoff checklist, customer change inputs, consigned material/property records, launch readiness pack</td></tr>
- <tr><td><span class="code">02_G1-Engineering-Release</span></td><td><span class="code">01-DFM-Review</span>, <span class="code">02-Baseline-Package</span>, <span class="code">03-CAM-NC-Release</span>, <span class="code">04-Routing-and-Method</span>, <span class="code">05-Engineering-Change-Inputs</span></td><td>DFM review checklist, baseline package approval, CAM/NC program release, routing, setup sheet master, tool list, inspection requirement, engineering change inputs</td></tr>
- <tr><td><span class="code">03_G2-IQC-Receiving</span></td><td><span class="code">01-Receiving-Log</span>, <span class="code">02-Material-Certs</span>, <span class="code">03-IQC-Results</span>, <span class="code">04-Lot-Heat-Traceability</span>, <span class="code">05-Handoff-to-Production</span></td><td>receiving and IQC log, material certs, IQC inspection results, lot/heat traceability records, handoff to production evidence</td></tr>
- <tr><td><span class="code">04_G3-Setup-Release</span></td><td><span class="code">01-Router-and-Traveler</span>, <span class="code">02-Setup-Sheets-and-Tool-Lists</span>, <span class="code">03-Program-and-Method-Links</span>, <span class="code">04-Gage-and-Fixture-Readiness</span>, <span class="code">05-Pre-Run-and-Work-Transfer</span></td><td>setup sheet, tooling list, released program links, fixture readiness, gage readiness, FRM-519, work transfer validation, setup photos when required</td></tr>
- <tr><td><span class="code">05_G4-FAI-First-Piece</span></td><td><span class="code">01-FAI-Request-and-Plan</span>, <span class="code">02-Ballooned-Drawing</span>, <span class="code">03-Raw-Measurement-Data</span>, <span class="code">04-Photos-and-Deviations</span>, <span class="code">05-Release-Decision</span></td><td>FAI report, ballooned drawing, CMM/raw data, photos, deviation notes, release/hold decision, first-piece correction loop</td></tr>
- <tr><td><span class="code">06_G5-IPQC-Production</span></td><td><span class="code">01-Traveler-and-Operation-Evidence</span>, <span class="code">02-IPQC-AQL-SPC</span>, <span class="code">03-WIP-Hold-Restart</span>, <span class="code">04-Tool-Life-and-Downtime</span>, <span class="code">05-Outsource-and-Receiving-Handoff</span></td><td>traveler scans, in-process inspection, AQL/SPC files, WIP tags, hold/restart notes, tool-life logs, downtime evidence, outsource return verification, receiving handoffs</td></tr>
- <tr><td><span class="code">07_G6-Final-QC-Packaging</span></td><td><span class="code">01-Final-Inspection-and-CoC-Draft</span>, <span class="code">02-Packaging-and-Clean-Pack</span>, <span class="code">03-Labels-and-SSCC-Staging</span>, <span class="code">04-Photos-and-Preservation</span>, <span class="code">05-Release-Handoff</span></td><td>final inspection report, CoC draft, packaging checklist, clean-pack checklist, label proofs, photos, preservation records, pack-ready handoff</td></tr>
- <tr><td><span class="code">08_G7-Ship-Release</span></td><td><span class="code">01-Ship-Release-Approval</span>, <span class="code">02-Packing-List-and-Labels</span>, <span class="code">03-Carrier-and-POD</span>, <span class="code">04-Customer-Shipment-Pack</span>, <span class="code">05-Invoice-Interface-Snapshot</span></td><td>shipping checklist, final labels, SSCC, carrier docs, POD, customer shipment pack, invoice request interface snapshot, shipped confirmation handoff</td></tr>
- <tr><td><span class="code">07_NCR-CAPA-Deviation</span></td><td><span class="code">01-NCR</span>, <span class="code">02-Concession-Waiver</span>, <span class="code">03-Rework-and-Reinspection</span>, <span class="code">04-CAPA-8D</span>, <span class="code">05-Customer-Deviation-Approval</span></td><td>NCRs, concession/waiver, rework travelers, reinspection, CAPA, 8D, customer deviation approvals linked to the job</td></tr>
- <tr><td><span class="code">99_Archive-Locked</span></td><td><span class="code">01-Final-Evidence-Index</span>, <span class="code">02-Sealed-Export-Pack</span>, <span class="code">03-Archive-Note</span></td><td>final evidence index, sealed archive export, archive note, legal/retention markers</td></tr>
- </tbody>
- </table>
- </div>
- <div class="keyline"><strong>Rule job:</strong> file job-specific Ä'Æ°á»£c route vÃ o gate trÆ°á»›c, rá»"i má»›i tá»›i loáº¡i file. VÃ­ dá»¥ áº£nh setup Ä'i vÃ o <span class="code">04_G3/.../05-Pre-Run-and-Work-Transfer</span>, khÃ´ng Ä'i vÃ o má»™t thÆ° má»¥c chung tÃªn "Photos".</div>
- </div>
+      <div class="section">
+        <h2>8. File plan chi tiết cho từng job</h2>
+        <div class="figure-box">
+          <p style="margin:0;" class="path">03-Job-Hồ sơ/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/00_Admin-Control/</p>
+          <p style="margin:4px 0 0;" class="path">03-Job-Hồ sơ/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/01_G0-Contract-Kickoff/</p>
+          <p style="margin:4px 0 0;" class="path">03-Job-Hồ sơ/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/02_G1-Engineering-Release/</p>
+          <p style="margin:4px 0 0;" class="path">03-Job-Hồ sơ/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/03_G2-IQC-Receiving/</p>
+          <p style="margin:4px 0 0;" class="path">03-Job-Hồ sơ/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/04_G3-Setup-Release/</p>
+          <p style="margin:4px 0 0;" class="path">03-Job-Hồ sơ/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/05_G4-FAI-First-Piece/</p>
+          <p style="margin:4px 0 0;" class="path">03-Job-Hồ sơ/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/06_G5-IPQC-Production/</p>
+          <p style="margin:4px 0 0;" class="path">03-Job-Hồ sơ/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/07_G6-Final-QC-Packaging/</p>
+          <p style="margin:4px 0 0;" class="path">03-Job-Hồ sơ/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/08_G7-Ship-Release/</p>
+          <p style="margin:4px 0 0;" class="path">03-Job-Hồ sơ/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/07_NCR-CAPA-Deviation/</p>
+          <p style="margin:4px 0 0;" class="path">03-Job-Hồ sơ/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/99_Archive-Locked/</p>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Gate</th><th>Subfolder bắt buộc</th><th>File phải để ở đây</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="code">00_Admin-Control</span></td><td><span class="code">01-Job-Index</span>, <span class="code">02-Approvals-and-Status</span>, <span class="code">03-Change-History</span>, <span class="code">04-Customer-Requirement-Summary</span>, <span class="code">05-Link-to-Part-Master</span></td><td>job index, FRM-205, approval history, status snapshots, customer requirement summary, links tới part baseline, gate status board exports</td></tr>
+              <tr><td><span class="code">01_G0-Contract-Kickoff</span></td><td><span class="code">01-RFQ-and-Quote-Inputs</span>, <span class="code">02-Contract-Review-and-PO</span>, <span class="code">03-Kickoff-and-Planning</span>, <span class="code">04-Customer-Change-Inputs</span>, <span class="code">05-Customer-Property-and-Consigned</span></td><td>PO/ack, contract review checklist, kickoff checklist, customer change inputs, consigned material/property records, launch readiness pack</td></tr>
+              <tr><td><span class="code">02_G1-Engineering-Release</span></td><td><span class="code">01-DFM-Review</span>, <span class="code">02-Baseline-Package</span>, <span class="code">03-CAM-NC-Release</span>, <span class="code">04-Routing-and-Method</span>, <span class="code">05-Engineering-Change-Inputs</span></td><td>DFM review checklist, baseline package approval, CAM/NC program release, routing, setup sheet master, tool list, inspection requirement, engineering change inputs</td></tr>
+              <tr><td><span class="code">03_G2-IQC-Receiving</span></td><td><span class="code">01-Receiving-Log</span>, <span class="code">02-Material-Certs</span>, <span class="code">03-IQC-Results</span>, <span class="code">04-Lot-Heat-Traceability</span>, <span class="code">05-Handoff-to-Production</span></td><td>receiving and IQC log, material certs, IQC inspection results, lot/heat traceability records, handoff to production evidence</td></tr>
+              <tr><td><span class="code">04_G3-Setup-Release</span></td><td><span class="code">01-Router-and-Traveler</span>, <span class="code">02-Setup-Sheets-and-Tool-Lists</span>, <span class="code">03-Program-and-Method-Links</span>, <span class="code">04-Gage-and-Fixture-Readiness</span>, <span class="code">05-Pre-Run-and-Work-Transfer</span></td><td>setup sheet, tooling list, released program links, fixture readiness, gage readiness, FRM-519, work transfer validation, setup photos when required</td></tr>
+              <tr><td><span class="code">05_G4-FAI-First-Piece</span></td><td><span class="code">01-FAI-Request-and-Plan</span>, <span class="code">02-Ballooned-Drawing</span>, <span class="code">03-Raw-Measurement-Data</span>, <span class="code">04-Photos-and-Deviations</span>, <span class="code">05-Release-Decision</span></td><td>FAI report, ballooned drawing, CMM/raw data, photos, deviation notes, release/hold decision, first-piece correction loop</td></tr>
+              <tr><td><span class="code">06_G5-IPQC-Production</span></td><td><span class="code">01-Traveler-and-Operation-Evidence</span>, <span class="code">02-IPQC-AQL-SPC</span>, <span class="code">03-WIP-Hold-Restart</span>, <span class="code">04-Tool-Life-and-Downtime</span>, <span class="code">05-Outsource-and-Receiving-Handoff</span></td><td>traveler scans, in-process inspection, AQL/SPC files, WIP tags, hold/restart notes, tool-life logs, downtime evidence, outsource return verification, receiving handoffs</td></tr>
+              <tr><td><span class="code">07_G6-Final-QC-Packaging</span></td><td><span class="code">01-Final-Inspection-and-CoC-Draft</span>, <span class="code">02-Packaging-and-Clean-Pack</span>, <span class="code">03-Labels-and-SSCC-Staging</span>, <span class="code">04-Photos-and-Preservation</span>, <span class="code">05-Release-Handoff</span></td><td>final inspection report, CoC draft, packaging checklist, clean-pack checklist, label proofs, photos, preservation records, pack-ready handoff</td></tr>
+              <tr><td><span class="code">08_G7-Ship-Release</span></td><td><span class="code">01-Ship-Release-Approval</span>, <span class="code">02-Packing-List-and-Labels</span>, <span class="code">03-Carrier-and-POD</span>, <span class="code">04-Customer-Shipment-Pack</span>, <span class="code">05-Invoice-Interface-Snapshot</span></td><td>shipping checklist, final labels, SSCC, carrier docs, POD, customer shipment pack, invoice request interface snapshot, shipped confirmation handoff</td></tr>
+              <tr><td><span class="code">07_NCR-CAPA-Deviation</span></td><td><span class="code">01-NCR</span>, <span class="code">02-Concession-Waiver</span>, <span class="code">03-Rework-and-Reinspection</span>, <span class="code">04-CAPA-8D</span>, <span class="code">05-Customer-Deviation-Approval</span></td><td>NCRs, concession/waiver, rework travelers, reinspection, CAPA, 8D, customer deviation approvals linked to the job</td></tr>
+              <tr><td><span class="code">99_Archive-Locked</span></td><td><span class="code">01-Final-Evidence-Index</span>, <span class="code">02-Sealed-Export-Pack</span>, <span class="code">03-Archive-Note</span></td><td>final evidence index, sealed archive export, archive note, legal/retention markers</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Rule job:</strong> file job-specific được route vào gate trước, rồi mới tới loại file. Ví dụ ảnh setup đi vào <span class="code">04_G3/.../05-Pre-Run-and-Work-Transfer</span>, không đi vào một thư mục chung tên “Photos”.</div>
+      </div>
 
- <div class="section">
- <h2>9. Promote, cull, reference vÃ  permission rules</h2>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Loáº¡i khu vá»±c</th><th>Quyá»n tá»'i thiá»ƒu</th><th>Rule báº¯t buá»™c</th></tr>
- </thead>
- <tbody>
- <tr><td><span class="code">00-Live</span>, <span class="code">00-Current</span>, <span class="code">00-Active</span></td><td>Group cá»§a department tÆ°Æ¡ng á»©ng; QMS owners full control</td><td>ÄÃ¢y lÃ  operational SSOT/current zone. KhÃ´ng Ä'áº·t permission láº» theo cÃ¡ nhÃ¢n.</td></tr>
- <tr><td><span class="code">06-Working-Transitory-and-Draft</span></td><td>Department editor group; chá»‰ exception má»›i tÃ¡ch thÃªm</td><td>File draft pháº£i Ä'Æ°á»£c promote hoáº·c cull trong vÃ²ng 90 ngÃ y trá»« khi project/job cÃ²n má»Ÿ vÃ  cÃ³ lÃ½ do rÃµ.</td></tr>
- <tr><td><span class="code">07-Reference-and-Received-External</span></td><td>Department editor/read group</td><td>Reference copy khÃ´ng pháº£i báº£n chÃ­nh. Má»—i quÃ½ pháº£i review vÃ  chuyá»ƒn cÃ¡c convenience copies háº¿t giÃ¡ trá»‹ sang <span class="code">05-To-Be-Culled</span>.</td></tr>
- <tr><td><span class="code">03-Job-Há»" sÆ¡</span></td><td>Káº¿ hoáº¡ch, QA, ENG, PRO, SCM theo gate; external share chá»‰ qua approved package</td><td>Gate evidence pháº£i Ä'Æ°á»£c ná»™p Ä'Ãºng ngÃ y/ca theo WI-203. KhÃ´ng dÃ¹ng <span class="code">06-Working</span> lÃ m nÆ¡i giá»¯ evidence cuá»'i.</td></tr>
- <tr><td><span class="code">08-Con ngÆ°á»i-Há»" sÆ¡</span></td><td>HR core restricted; payroll/medical sub-groups</td><td>KhÃ´ng nhÃ¢n Ä'Ã´i há»" sÆ¡ cÃ¡ nhÃ¢n nháº¡y cáº£m qua shared department folders.</td></tr>
- <tr><td><span class="code">09-Sá»' hÃ³a-System-Há»" sÆ¡</span></td><td>IT/ERP admin groups</td><td>Access/config/backup/deployment/admin evidence khÃ´ng Ä'Æ°á»£c Ä'áº·t á»Ÿ department shared area.</td></tr>
- <tr><td><span class="code">10-QMS-Source-Control</span></td><td>QMS/IT/Portal editor groups; sync chá»‰ trÃªn endpoint Ä'Æ°á»£c phÃª duyá»‡t</td><td>Source docs, release manifest, deploy receipt vÃ  reverse-sync log á»Ÿ Ä'Ã¢y; khÃ´ng external share, khÃ´ng runtime payload, khÃ´ng secrets.</td></tr>
- </tbody>
- </table>
- </div>
- <div class="keyline"><strong>Rule promote:</strong> file tá»« <span class="code">06-Working</span> trá»Ÿ thÃ nh official record ngay khi nÃ³ Ä'Æ°á»£c phÃª duyá»‡t, phÃ¡t hÃ nh, dÃ¹ng Ä'á»ƒ ra quyáº¿t Ä'á»‹nh, dÃ¹ng Ä'á»ƒ bÃ n giao hoáº·c dÃ¹ng lÃ m evidence cho gate/inspection/review/audit. Khi promote, file pháº£i Ä'Æ°á»£c chuyá»ƒn hoáº·c copy cÃ³ kiá»ƒm soÃ¡t vÃ o record series chÃ­nh thá»©c, gáº¯n metadata chÃ­nh thá»©c vÃ  cáº­p nháº­t <span class="code">PromotionState = Promoted</span>.</div>
- </div>
+      <div class="section">
+        <h2>9. Promote, cull, reference và permission rules</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Loại khu vực</th><th>Quyền tối thiểu</th><th>Rule bắt buộc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="code">00-Live</span>, <span class="code">00-Current</span>, <span class="code">00-Active</span></td><td>Group của department tương ứng; QMS owners full control</td><td>Đây là operational SSOT/current zone. Không đặt permission lẻ theo cá nhân.</td></tr>
+              <tr><td><span class="code">06-Working-Transitory-and-Draft</span></td><td>Department editor group; chỉ exception mới tách thêm</td><td>File draft phải được promote hoặc cull trong vòng 90 ngày trừ khi project/job còn mở và có lý do rõ.</td></tr>
+              <tr><td><span class="code">07-Reference-and-Received-External</span></td><td>Department editor/read group</td><td>Reference copy không phải bản chính. Mỗi quý phải review và chuyển các convenience copies hết giá trị sang <span class="code">05-To-Be-Culled</span>.</td></tr>
+              <tr><td><span class="code">03-Job-Hồ sơ</span></td><td>Kế hoạch, QA, ENG, PRO, SCM theo gate; external share chỉ qua approved package</td><td>Gate evidence phải được nộp đúng ngày/ca theo WI-203. Không dùng <span class="code">06-Working</span> làm nơi giữ evidence cuối.</td></tr>
+              <tr><td><span class="code">08-Con người-Hồ sơ</span></td><td>HR core restricted; payroll/medical sub-groups</td><td>Không nhân đôi hồ sơ cá nhân nhạy cảm qua shared department folders.</td></tr>
+              <tr><td><span class="code">09-Số hóa-System-Hồ sơ</span></td><td>IT/ERP admin groups</td><td>Access/config/backup/deployment/admin evidence không được đặt ở department shared area.</td></tr>
+              <tr><td><span class="code">10-QMS-Source-Control</span></td><td>QMS/IT/Portal editor groups; sync chỉ trên endpoint được phê duyệt</td><td>Source docs, release manifest, deploy receipt và reverse-sync log ở đây; không external share, không runtime payload, không secrets.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Rule promote:</strong> file từ <span class="code">06-Working</span> trở thành official record ngay khi nó được phê duyệt, phát hành, dùng để ra quyết định, dùng để bàn giao hoặc dùng làm evidence cho gate/inspection/review/audit. Khi promote, file phải được chuyển hoặc copy có kiểm soát vào record series chính thức, gắn metadata chính thức và cập nhật <span class="code">PromotionState = Promoted</span>.</div>
+      </div>
 
- <div class="section">
- <h2>9.1 Ranh giá»›i source, forms vÃ  runtime</h2>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>NhÃ³m ná»™i dung</th><th>NÆ¡i lÆ°u báº¯t buá»™c</th><th>Rule báº¯t buá»™c</th></tr>
- </thead>
- <tbody>
- <tr><td>Source docs, portal source, released form definitions, approved source templates</td><td><span class="code">10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>ÄÃ¢y lÃ  controlled source Ä'i theo SharePoint local sync vÃ  Git. KhÃ´ng thay cho record library nghiá»‡p vá»¥.</td></tr>
- <tr><td>Release manifest, server deploy receipt, reverse-sync intake</td><td><span class="code">10-QMS-Source-Control/02-Release-Manifests</span>, <span class="code">03-Server-Deploy-Receipts</span>, <span class="code">04-Reverse-Sync-Intake</span></td><td>LÆ°u nhÆ° source-control records, khÃ´ng nÃ©m láº«n vÃ o <span class="code">09-Sá»' hÃ³a-System-Há»" sÆ¡</span> hay folder phÃ²ng ban.</td></tr>
- <tr><td>Form submissions, approvals, operational responses, runtime record payload</td><td>Route vá» library há»" sÆ¡ tÆ°Æ¡ng á»©ng trong <span class="code">01</span> Ä'áº¿n <span class="code">09</span> theo file plan nÃ y hoáº·c runtime record area Ä'Æ°á»£c phÃª duyá»‡t</td><td>KhÃ´ng commit vÃ o Git, khÃ´ng Ä'á»ƒ trong source library, khÃ´ng dÃ¹ng thÆ° má»¥c phÃ²ng ban lÃ m nÆ¡i thay tháº¿ record library chÃ­nh thá»©c.</td></tr>
- <tr><td>Session files, rate-limit state, workflow draft binaries, server-only secrets, runtime noise</td><td>Server runtime area hoáº·c server-only protected path</td><td>Tuyá»‡t Ä'á»'i khÃ´ng Ä'Æ°a vÃ o <span class="code">10-QMS-Source-Control</span>, khÃ´ng external share, khÃ´ng xem lÃ  release evidence.</td></tr>
- </tbody>
- </table>
- </div>
- <div class="keyline"><strong>Rule source boundary:</strong> ranh giá»›i SharePoint source library, Git, server deployment, runtime exclusions vÃ  reverse-sync control thá»±c hiá»‡n theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> vÃ  <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a>.</div>
- </div>
+      <div class="section">
+        <h2>9.1 Ranh giới source, forms và runtime</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Nhóm nội dung</th><th>Nơi lưu bắt buộc</th><th>Rule bắt buộc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Source docs, portal source, released form definitions, approved source templates</td><td><span class="code">10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Đây là controlled source đi theo SharePoint local sync và Git. Không thay cho record library nghiệp vụ.</td></tr>
+              <tr><td>Release manifest, server deploy receipt, reverse-sync intake</td><td><span class="code">10-QMS-Source-Control/02-Release-Manifests</span>, <span class="code">03-Server-Deploy-Receipts</span>, <span class="code">04-Reverse-Sync-Intake</span></td><td>Lưu như source-control records, không ném lẫn vào <span class="code">09-Số hóa-System-Hồ sơ</span> hay folder phòng ban.</td></tr>
+              <tr><td>Form submissions, approvals, operational responses, runtime record payload</td><td>Route về library hồ sơ tương ứng trong <span class="code">01</span> đến <span class="code">09</span> theo file plan này hoặc runtime record area được phê duyệt</td><td>Không commit vào Git, không để trong source library, không dùng thư mục phòng ban làm nơi thay thế record library chính thức.</td></tr>
+              <tr><td>Session files, rate-limit state, workflow draft binaries, server-only secrets, runtime noise</td><td>Server runtime area hoặc server-only protected path</td><td>Tuyệt đối không đưa vào <span class="code">10-QMS-Source-Control</span>, không external share, không xem là release evidence.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="keyline"><strong>Rule source boundary:</strong> ranh giới SharePoint source library, Git, server deployment, runtime exclusions và reverse-sync control thực hiện theo <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> và <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a>.</div>
+      </div>
 
- 
- <div class="section">
- <h2>9.2 Dual-location storage cho NCR / CAPA records</h2>
- <div class="callout"><strong>NGUYÃN Táº®C DUAL-LOCATION</strong>: Khi má»t NCR ÄÆ°á»£c má» cho job, há» sÆ¡ ÄÆ°á»£c lÆ°u á» <b>HAI vá» trÃ­</b> (khÃ´ng duplicate file) â má»i vá» trÃ­ phá»¥c vá»¥ má»t gÃ³c truy váº¥n khÃ¡c nhau.</div>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>Loáº¡i record</th><th>NÆ¡i lÆ°u (SharePoint path)</th><th>Má»¥c ÄÃ­ch truy váº¥n</th></tr>
- </thead>
- <tbody>
- <tr><td>Master NCR record (FRM-631, root cause analysis, CAPA plan, closure evidence)</td><td><span class="path">HESEM-Records / Quality-Records / {YYYY} / NCR /</span></td><td>Auditor há»i âTáº¥t cáº£ NCR nÄm nayâ â tÃ¬m á» ÄÃ¢y</td></tr>
- <tr><td>Job-specific evidence (rework, reinspection, customer deviation approval)</td><td><span class="path">HESEM-Job-Evidence / Job-Dossiers / {YYYY} / {JobNum}_{PartRev} / 09_NCR-CAPA-Deviation /</span></td><td>Auditor há»i âTáº¥t cáº£ deviation cho job nÃ yâ â tÃ¬m á» ÄÃ¢y</td></tr>
- </tbody>
- </table>
- </div>
- <div class="keyline"><strong>Rule báº¯t buá»c:</strong> TUYá»T Äá»I KHÃNG copy file giá»¯a hai site. LiÃªn káº¿t qua metadata column <span class="code">NCR-Number</span>. Má»i file chá» tá»n táº¡i á» ÄÃºng má»t vá» trÃ­; vá» trÃ­ kia truy váº¥n thÃ´ng qua metadata filter hoáº·c cross-site search.</div>
- </div>
+      <div class="section">
+        <h2>10. Tài liệu liên quan</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Nhóm</th><th>Tài liệu</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>M365 records control</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a><br><a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a><br><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a><br><a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a><br><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td></tr>
+              <tr><td>SharePoint / thao tác</td><td><a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a><br><a href="../../../02-Work-Instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a><br><a href="../../../02-Work-Instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a><br><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a><br><a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td></tr>
+              <tr><td>Job records</td><td><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a><br><a href="../../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td></tr>
+              <tr><td>Data governance</td><td><a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td></tr>
+              <tr><td>Organization and roles</td><td><a href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/index.html">Department handbooks</a><br><a href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">JD library</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
- <div class="section">
- <h2>9.3 Giá»i háº¡n tá»i Äa 3 cáº¥p folder (max 3-level depth)</h2>
- <div class="callout"><strong>QUY Táº®C 3-LEVEL</strong>: SharePoint folder nesting khÃ´ng ÄÆ°á»£c vÆ°á»£t quÃ¡ <b>3 cáº¥p</b> tÃ­nh tá»« library root. NgoÃ i 3 cáº¥p, dÃ¹ng metadata columns Äá» filter/group thay vÃ¬ táº¡o thÃªm subfolder.</div>
- <p style="margin:8px 0;">VÃ­ dá»¥ ÄÃºng:</p>
- <div class="figure-box">
- <p style="margin:0;" class="path">Quality-Records / 2026 / NCR / â cáº¥p 3, flat files táº¡i ÄÃ¢y</p>
- <p style="margin:4px 0 0;" class="muted">KhÃ´ng táº¡o subfolder per-NCR (NCR-001/, NCR-002/â¦). PhÃ¢n biá»t file báº±ng naming convention theo <a href="annex-137-m365-file-naming-convention.html">ANNEX-137</a>, khÃ´ng báº±ng subfolder.</p>
- </div>
- <div class="keyline"><strong>LÃ½ do:</strong> URL dÃ i gÃ¢y lá»i sync OneDrive, khÃ³ tÃ¬m file trong search, vÃ  vi pháº¡m SharePoint information architecture best practice. Metadata columns (RecordClass, NCR-Number, JobNumber) thay tháº¿ hoÃ n toÃ n vai trÃ² phÃ¢n loáº¡i cá»§a subfolder sÃ¢u.</div>
- </div>
-
-<div class="section">
- <h2>10. TÃ i liá»‡u liÃªn quan</h2>
- <div class="table-card">
- <table class="table">
- <thead>
- <tr><th>NhÃ³m</th><th>TÃ i liá»‡u</th></tr>
- </thead>
- <tbody>
- <tr><td>M365 records control</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a><br><a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a><br><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a><br><a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a><br><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td></tr>
- <tr><td>Naming convention</td><td><a href="annex-137-m365-file-naming-convention.html">ANNEX-137</a></td></tr>
- <tr><td>SharePoint / thao tÃ¡c</td><td><a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a><br><a href="../../../02-Work-Instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a><br><a href="../../../02-Work-Instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a><br><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a><br><a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td></tr>
- <tr><td>Job records</td><td><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a><br><a href="../../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td></tr>
- <tr><td>Data governance</td><td><a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td></tr>
- <tr><td>Organization and roles</td><td><a href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/index.html">Department handbooks</a><br><a href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">JD library</a></td></tr>
- </tbody>
- </table>
- </div>
- </div>
-
- </div>
- </div>
+    </div>
+  </div>
 </div>
 </body>
 </html>

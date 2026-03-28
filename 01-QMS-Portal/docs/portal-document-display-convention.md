@@ -1,4 +1,4 @@
-﻿# Portal Document Display Convention
+# Portal Document Display Convention
 
 Updated: 2026-03-25
 

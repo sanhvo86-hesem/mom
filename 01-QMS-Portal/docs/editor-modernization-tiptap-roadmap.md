@@ -1,4 +1,4 @@
-﻿# Lộ trình nâng cấp Editor sang ProseMirror/Tiptap (theo pha)
+# Lộ trình nâng cấp Editor sang ProseMirror/Tiptap (theo pha)
 
 ## Mục tiêu
 - Tăng ổn định lệnh (không phụ thuộc `document.execCommand` vốn deprecated).
