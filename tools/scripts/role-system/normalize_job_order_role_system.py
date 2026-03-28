@@ -41,6 +41,13 @@ def load_registry() -> dict:
     return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
 
 
+def split_role_hat(code: str) -> tuple[str, str | None]:
+    if "[" in code and code.endswith("]"):
+        base, hat = code[:-1].split("[", 1)
+        return base, hat
+    return code, None
+
+
 def expand_spec(spec: dict, registry: dict) -> tuple[list[str], str]:
     joiner = spec.get("joiner", " / ")
     if "bundle" in spec:
@@ -48,26 +55,37 @@ def expand_spec(spec: dict, registry: dict) -> tuple[list[str], str]:
     return list(spec["codes"]), joiner
 
 
-def role_link(code: str, current_file: Path, registry: dict) -> str:
-    base, hat = (code[:-1].split("[", 1) if "[" in code and code.endswith("]") else (code, None))
-    role = registry["roles"][base]
-    title = role["title_en"]
+def resolve_entity(code: str, registry: dict) -> tuple[str, dict, str | None]:
+    base, hat = split_role_hat(code)
+    if base in registry["roles"]:
+        return "role", registry["roles"][base], hat
+    if base in registry.get("departments", {}):
+        return "department", registry["departments"][base], None
+    raise KeyError(f"Unknown role/department code: {code}")
+
+
+def entity_link(code: str, current_file: Path, registry: dict) -> str:
+    entity_type, meta, hat = resolve_entity(code, registry)
+    title = meta["title_en"]
     if hat:
         title = f'{title} [{registry["hats"][hat]["label_en"]}]'
-    jd_abs = ROOT / role["jd_path"]
-    href = os.path.relpath(jd_abs, current_file.parent).replace("\\", "/")
+    target_key = "jd_path" if entity_type == "role" else "handbook_path"
+    target_abs = ROOT / meta[target_key]
+    href = os.path.relpath(target_abs, current_file.parent).replace("\\", "/")
+    link_class = "role-link" if entity_type == "role" else "dept-link"
+    code_class = "role-code" if entity_type == "role" else "dept-code"
     return (
-        f'<a class="role-link" href="{href}" title="{title} ({role["title_vi"]})">'
-        f'<span class="role-code">{code}</span></a>'
+        f'<a class="entity-link {link_class}" href="{href}" title="{title} ({meta["title_vi"]})">'
+        f'<span class="entity-code {code_class}">{code}</span></a>'
     )
 
 
 def render_spec(spec: dict, current_file: Path, registry: dict) -> str:
     codes, joiner = expand_spec(spec, registry)
-    sep = f'<span class="role-sep">{joiner.strip()}</span>'
-    chips = [role_link(code, current_file, registry) for code in codes]
+    sep = f'<span class="entity-sep role-sep">{joiner.strip()}</span>'
+    chips = [entity_link(code, current_file, registry) for code in codes]
     body = "".join(chips[i] + (sep if i < len(chips) - 1 else "") for i in range(len(chips)))
-    return f'<span class="role-cluster">{body}</span>'
+    return f'<span class="entity-cluster role-cluster">{body}</span>'
 
 
 def set_element_html(element: etree._Element, html_fragment: str) -> None:
@@ -220,6 +238,67 @@ def title_aliases() -> dict[str, str]:
     }
 
 
+def department_alias_map() -> dict[str, dict]:
+    return {
+        "Sales": expr("D-SCS"),
+        "Commercial": expr("D-SCS"),
+        "Kinh doanh": expr("D-SCS"),
+        "Sales & Customer Service": expr("D-SCS"),
+        "Sales and Customer Service": expr("D-SCS"),
+        "Sales and Customer Service Department": expr("D-SCS"),
+        "Kinh doanh-CS": expr("D-SCS"),
+        "Kinh doanh / CS": expr("D-SCS"),
+        "Kinh doanh & Customer Dịch vụ": expr("D-SCS"),
+        "Engineering": expr("D-ENG"),
+        "Engineering Department": expr("D-ENG"),
+        "Kỹ thuật": expr("D-ENG"),
+        "Production": expr("D-PROD"),
+        "Production Department": expr("D-PROD"),
+        "Sản xuất": expr("D-PROD"),
+        "Planning": expr("D-PPC"),
+        "Production Planning": expr("D-PPC"),
+        "Production Control": expr("D-PPC"),
+        "Kế hoạch": expr("D-PPC"),
+        "Điều độ": expr("D-PPC"),
+        "Quality": expr("D-QUAL"),
+        "Quality Department": expr("D-QUAL"),
+        "Chất lượng": expr("D-QUAL"),
+        "Supply Chain": expr("D-SCM"),
+        "Supply Chain Department": expr("D-SCM"),
+        "Chuỗi cung ứng": expr("D-SCM"),
+        "Purchasing": expr("D-PUR"),
+        "Mua hàng": expr("D-PUR"),
+        "Warehouse": expr("D-WHS"),
+        "Warehouse Department": expr("D-WHS"),
+        "Kho": expr("D-WHS"),
+        "WHS": expr("D-WHS"),
+        "Tool Crib": expr("D-TCR"),
+        "Tool Store": expr("D-TCR"),
+        "Kho dao cụ": expr("D-TCR"),
+        "Kho dụng cụ": expr("D-TCR"),
+        "Logistics": expr("D-LOG"),
+        "Shipping": expr("D-LOG"),
+        "Giao vận": expr("D-LOG"),
+        "Hậu cần": expr("D-LOG"),
+        "Finance": expr("D-FIN"),
+        "Finance Department": expr("D-FIN"),
+        "Tài chính": expr("D-FIN"),
+        "HR": expr("D-HR"),
+        "Human Resources": expr("D-HR"),
+        "Human Resources Department": expr("D-HR"),
+        "Nhân sự": expr("D-HR"),
+        "EHS": expr("D-EHS"),
+        "EHS Department": expr("D-EHS"),
+        "IT": expr("D-IT"),
+        "IT Department": expr("D-IT"),
+        "CNTT": expr("D-IT"),
+        "ERP": expr("D-ERP"),
+        "Epicor": expr("D-ERP"),
+        "Epicor / ERP": expr("D-ERP"),
+        "ERP Administration": expr("D-ERP"),
+    }
+
+
 def role_alias_map() -> dict[str, dict]:
     return {
         "CEO": expr("CEO"),
@@ -282,8 +361,7 @@ def role_alias_map() -> dict[str, dict]:
         "Trưởng Supply Chain": expr("SCM"),
         "Buyer / Purchasing": expr("BUY"),
         "Buyer": expr("BUY"),
-        "Purchasing": expr("BUY"),
-        "Mua hàng": expr("BUY"),
+        "Nhân viên mua hàng": expr("BUY"),
         "Warehouse Clerk": expr("WAR"),
         "Warehouse Supervisor": expr("SCM"),
         "Kho Nhân viên văn phòng": expr("WAR"),
@@ -295,7 +373,7 @@ def role_alias_map() -> dict[str, dict]:
         "Thủ kho Dao cụ": expr("TOOL"),
         "Logistics / Shipping Coordinator": expr("LOG"),
         "Shipping Coordinator": expr("LOG"),
-        "Hậu cần / Giao vận": expr("LOG"),
+        "Hậu cần / Giao vận Điều phối viên": expr("LOG"),
         "IT Administrator": expr("ITA"),
         "IT Admin": expr("ITA"),
         "Quản trị IT": expr("ITA"),
@@ -328,6 +406,11 @@ def role_alias_map() -> dict[str, dict]:
         "Cleaning Supervisor": expr("CPS"),
         "Cleaning / Packaging Technician": expr("CPT"),
         "Cleaning Technician": expr("CPT"),
+        "Làm sạch & Đóng gói Supervisor": expr("CPS"),
+        "Làm sạch / Đóng gói Technician": expr("CPT"),
+        "Metrology & Hiệu chuẩn Specialist": expr("MCS"),
+        "Internal Auditor (outsource)": expr("IAO"),
+        "Chuỗi cung ứng Manager": expr("SCM"),
         "Deburr Team Lead": expr("DBL"),
         "Deburr Technician": expr("DBT"),
         "Finance Manager": expr("FIN"),
@@ -393,6 +476,63 @@ def try_resolve_roleish_text(text: str, aliases: dict[str, dict], overrides: dic
     return expr(*codes, joiner=joiner) if codes else None
 
 
+def find_department_for_handbook(current_file: Path, registry: dict) -> tuple[str, dict] | None:
+    matches = [
+        (code, meta)
+        for code, meta in registry.get("departments", {}).items()
+        if Path(meta["handbook_path"]).name == current_file.name
+    ]
+    if not matches:
+        return None
+    for code, meta in matches:
+        if meta.get("type") == "department":
+            return code, meta
+    return matches[0]
+
+
+def set_meta_row_text(doc: etree._Element, label_tokens: tuple[str, ...], value: str) -> None:
+    for row in doc.xpath('//div[contains(@class,"meta")]/div[contains(@class,"row")]'):
+        spans = row.xpath("./span")
+        if len(spans) < 2:
+            continue
+        label = element_text(spans[0]).lower()
+        if not any(token in label for token in label_tokens):
+            continue
+        value_el = spans[-1]
+        for child in list(value_el):
+            value_el.remove(child)
+        value_el.text = value
+        break
+
+
+def set_meta_row_spec(doc: etree._Element, label_tokens: tuple[str, ...], spec: dict, current_file: Path, registry: dict) -> None:
+    rendered = render_spec(spec, current_file, registry)
+    for row in doc.xpath('//div[contains(@class,"meta")]/div[contains(@class,"row")]'):
+        spans = row.xpath("./span")
+        if len(spans) < 2:
+            continue
+        label = element_text(spans[0]).lower()
+        if not any(token in label for token in label_tokens):
+            continue
+        set_element_html(spans[-1], rendered)
+        break
+
+
+def normalize_department_handbook_header(doc: etree._Element, current_file: Path, registry: dict) -> None:
+    matched = find_department_for_handbook(current_file, registry)
+    if not matched:
+        return
+    dept_code, dept = matched
+    title_nodes = doc.xpath('//div[contains(@class,"title")]/strong')
+    if title_nodes:
+        title_nodes[0].text = f'{dept["title_en"]} Handbook'
+    page_titles = doc.xpath("//title")
+    if page_titles:
+        page_titles[0].text = f'{dept["title_en"]} Handbook | HESEM QMS'
+    set_meta_row_text(doc, ("code", "mã"), dept_code)
+    set_meta_row_spec(doc, ("owner", "chủ sở hữu"), expr(dept_code), current_file, registry)
+
+
 def update_meta_rows(doc: etree._Element, current_file: Path, registry: dict, aliases: dict[str, dict], overrides: dict[str, dict]) -> None:
     for row in doc.xpath('//div[contains(@class,"meta")]/div[contains(@class,"row")]'):
         spans = row.xpath("./span")
@@ -413,7 +553,7 @@ def update_meta_rows(doc: etree._Element, current_file: Path, registry: dict, al
 def update_role_cells(doc: etree._Element, current_file: Path, registry: dict, aliases: dict[str, dict], overrides: dict[str, dict]) -> None:
     targets = doc.xpath('//th|//td|//span[contains(@class,"inline-tag")]')
     for element in targets:
-        if element.xpath('.//*[contains(@class,"role-link")]'):
+        if element.xpath('.//*[contains(@class,"role-link") or contains(@class,"dept-link") or contains(@class,"entity-link")]'):
             continue
         text = element_text(element)
         if not text or len(text) > 120:
@@ -429,7 +569,7 @@ def update_plain_titles(doc: etree._Element, mapping: dict[str, str]) -> None:
         if parent is None:
             continue
         class_name = parent.get("class") or ""
-        if "role-code" in class_name or "role-link" in class_name:
+        if any(token in class_name for token in ["role-code", "role-link", "dept-code", "dept-link", "entity-code", "entity-link"]):
             continue
         value = str(node)
         stripped = normalize_ws(value)
@@ -446,7 +586,7 @@ def replace_text_fragments(doc: etree._Element, replacements: dict[str, str]) ->
         if parent is None:
             continue
         class_name = parent.get("class") or ""
-        if "role-code" in class_name or "role-link" in class_name:
+        if any(token in class_name for token in ["role-code", "role-link", "dept-code", "dept-link", "entity-code", "entity-link"]):
             continue
         value = str(node)
         new_value = value
@@ -517,7 +657,7 @@ def replace_exact_cell_text(
 ) -> None:
     rendered = render_spec(spec, current_file, registry)
     for element in doc.xpath('//th|//td'):
-        if element.xpath('.//*[contains(@class,"role-link")]'):
+        if element.xpath('.//*[contains(@class,"role-link") or contains(@class,"dept-link") or contains(@class,"entity-link")]'):
             continue
         if element_text(element) == exact_text:
             set_element_html(element, rendered)
@@ -880,6 +1020,7 @@ def normalize_controlled_file(
     local_overrides.update(file_overrides.get(doc_path.name, {}))
     update_meta_rows(doc, doc_path, registry, aliases, local_overrides)
     update_role_cells(doc, doc_path, registry, aliases, local_overrides)
+    normalize_department_handbook_header(doc, doc_path, registry)
     replace_text_fragments(doc, phrase_replacements)
     apply_file_specific_tweaks(doc, doc_path, registry)
     doc_path.write_text(serialize_html_document(doc), encoding="utf-8")
@@ -933,6 +1074,33 @@ def refresh_workbook(registry: dict) -> None:
         hats.cell(row=index + 1, column=4).value = hat["label_vi"]
         hats.cell(row=index + 1, column=5).value = ", ".join(hat["host_roles"])
 
+    dept_name = "Department code & handbook link"
+    if dept_name in wb.sheetnames:
+        del wb[dept_name]
+    depts = wb.create_sheet(dept_name)
+    dept_headers = [
+        "STT",
+        "Department code",
+        "Department title English",
+        "Ten tieng Viet chuan",
+        "Loai",
+        "Parent department",
+        "Handbook path",
+        "Lead roles",
+    ]
+    for col, header in enumerate(dept_headers, 1):
+        depts.cell(row=1, column=col).value = header
+    for index, code in enumerate(sorted(registry.get("departments", {})), start=1):
+        dept = registry["departments"][code]
+        depts.cell(row=index + 1, column=1).value = index
+        depts.cell(row=index + 1, column=2).value = code
+        depts.cell(row=index + 1, column=3).value = dept["title_en"]
+        depts.cell(row=index + 1, column=4).value = dept["title_vi"]
+        depts.cell(row=index + 1, column=5).value = dept.get("type", "department")
+        depts.cell(row=index + 1, column=6).value = dept.get("parent_department")
+        depts.cell(row=index + 1, column=7).value = dept["handbook_path"]
+        depts.cell(row=index + 1, column=8).value = ", ".join(dept.get("lead_roles", []))
+
     wb.save(WORKBOOK_PATH)
 
 
@@ -980,11 +1148,13 @@ def scan_unresolved(paths: list[Path]) -> str:
 
 def main() -> None:
     registry = load_registry()
-    aliases = role_alias_map()
+    aliases = department_alias_map()
+    aliases.update(role_alias_map())
     titles = title_aliases()
     phrase_replacements = {
         "Responsible Person": "người chịu trách nhiệm",
         "Top Management": "Ban lãnh đạo",
+        "Top Quản lý": "Ban lãnh đạo",
     }
     overrides = {
         "QMS Engineer / QA Lead": expr("QMS[DC]", "QA[QMR]", joiner=" + "),

@@ -345,6 +345,143 @@
       "hats_allowed": ["IC-IT"]
     }
   },
+  "departments": {
+    "D-SCS": {
+      "title_en": "Sales and Customer Service Department",
+      "title_vi": "Phong Kinh doanh va Dich vu khach hang",
+      "body_vi": "phong Kinh doanh va Dich vu khach hang",
+      "type": "department",
+      "parent_department": null,
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html",
+      "lead_roles": ["CS", "EST"]
+    },
+    "D-ENG": {
+      "title_en": "Engineering Department",
+      "title_vi": "Phong Ky thuat",
+      "body_vi": "phong Ky thuat",
+      "type": "department",
+      "parent_department": null,
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html",
+      "lead_roles": ["ENGM", "DFM", "PE", "CAM"]
+    },
+    "D-PROD": {
+      "title_en": "Production Department",
+      "title_vi": "Phong San xuat",
+      "body_vi": "phong San xuat",
+      "type": "department",
+      "parent_department": null,
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html",
+      "lead_roles": ["PD", "WKM", "SL"]
+    },
+    "D-PPC": {
+      "title_en": "Production Planning and Control Function",
+      "title_vi": "Dieu do va kiem soat san xuat",
+      "body_vi": "bo phan dieu do va kiem soat san xuat",
+      "type": "subfunction",
+      "parent_department": "D-PROD",
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html",
+      "lead_roles": ["PPL", "PD", "WKM"]
+    },
+    "D-QUAL": {
+      "title_en": "Quality Department",
+      "title_vi": "Phong Chat luong",
+      "body_vi": "phong Chat luong",
+      "type": "department",
+      "parent_department": null,
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html",
+      "lead_roles": ["QA", "QMS", "QE", "QCL", "MCS"]
+    },
+    "D-SCM": {
+      "title_en": "Supply Chain Department",
+      "title_vi": "Phong Chuoi cung ung",
+      "body_vi": "phong Chuoi cung ung",
+      "type": "department",
+      "parent_department": null,
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
+      "lead_roles": ["SCM", "BUY", "WAR", "TOOL", "LOG"]
+    },
+    "D-PUR": {
+      "title_en": "Purchasing Function",
+      "title_vi": "Bo phan Mua hang",
+      "body_vi": "bo phan Mua hang",
+      "type": "subfunction",
+      "parent_department": "D-SCM",
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
+      "lead_roles": ["BUY", "SCM"]
+    },
+    "D-WHS": {
+      "title_en": "Warehouse Function",
+      "title_vi": "Bo phan Kho",
+      "body_vi": "bo phan Kho",
+      "type": "subfunction",
+      "parent_department": "D-SCM",
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
+      "lead_roles": ["WAR", "SCM"]
+    },
+    "D-TCR": {
+      "title_en": "Tool Crib Function",
+      "title_vi": "Bo phan Kho dao cu",
+      "body_vi": "bo phan Kho dao cu",
+      "type": "subfunction",
+      "parent_department": "D-SCM",
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
+      "lead_roles": ["TOOL", "SCM"]
+    },
+    "D-LOG": {
+      "title_en": "Logistics and Shipping Function",
+      "title_vi": "Bo phan Logistics va Giao van",
+      "body_vi": "bo phan Logistics va Giao van",
+      "type": "subfunction",
+      "parent_department": "D-SCM",
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
+      "lead_roles": ["LOG", "SCM"]
+    },
+    "D-FIN": {
+      "title_en": "Finance Department",
+      "title_vi": "Phong Tai chinh",
+      "body_vi": "phong Tai chinh",
+      "type": "department",
+      "parent_department": null,
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html",
+      "lead_roles": ["FIN", "APAR", "GLP"]
+    },
+    "D-HR": {
+      "title_en": "Human Resources Department",
+      "title_vi": "Phong Nhan su",
+      "body_vi": "phong Nhan su",
+      "type": "department",
+      "parent_department": null,
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html",
+      "lead_roles": ["HR"]
+    },
+    "D-EHS": {
+      "title_en": "EHS Department",
+      "title_vi": "Phong EHS",
+      "body_vi": "phong EHS",
+      "type": "department",
+      "parent_department": null,
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html",
+      "lead_roles": ["EHS"]
+    },
+    "D-IT": {
+      "title_en": "IT Department",
+      "title_vi": "Phong CNTT",
+      "body_vi": "phong CNTT",
+      "type": "department",
+      "parent_department": null,
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html",
+      "lead_roles": ["ITA"]
+    },
+    "D-ERP": {
+      "title_en": "ERP Administration Function",
+      "title_vi": "Bo phan quan tri ERP",
+      "body_vi": "bo phan quan tri ERP",
+      "type": "subfunction",
+      "parent_department": "D-IT",
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html",
+      "lead_roles": ["ESA"]
+    }
+  },
   "hats": {
     "QMR": {
       "label_en": "Quality Management Representative",

@@ -57,7 +57,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <div class="row"><span><b>Version:</b></span><span>V0</span></div>
  <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
  <div class="row"><span><b>Owner:</b></span><span>WHS Manager / IT Manager / QMS Manager</span></div>
- <div class="row"><span><b>Approved by:</b></span><span><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></span></div>
+ <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
  </div>
  </div>
  <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi cấp PackID/SSCC, in nhãn hậu cần, tách / chia/gộp / hợp nhất kiện, in lại/void nhãn, và đối soát trước xác nhận giao hàng (ship xác nhận).</div>
@@ -71,7 +71,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Field</th><th>Bắt buộc</th><th>Nguồn dữ liệu chuẩn</th><th>Quy tắc</th></tr></thead><tbody>
 <tr><td>PackID</td><td>Có</td><td>Epicor/WHS giao dịch</td><td>Duy nhất trong lô giao hàng scope; không đổi sau xác nhận giao hàng.</td></tr>
 <tr><td>SSCC (AI 00)</td><td>Có khi dùng hậu cần label</td><td>Dịch vụ cấp mã được kiểm soát</td><td>18 số, kiểm tra chữ số hợp lệ, duy nhất toàn cục trong vòng đời quản lý của công ty.</td></tr>
-<tr><td>Lô giao hàng / Đơn hàng / Phát hành</td><td>Có</td><td>Epicor</td><td>Phải khớp ship-to, hóa đơn / bảng kê-to, điều kiện giao hàng.</td></tr>
+<tr><td>Lô giao hàng / Đơn hàng / Phát hành</td><td>Có</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bo phan quan tri ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td><td>Phải khớp ship-to, hóa đơn / bảng kê-to, điều kiện giao hàng.</td></tr>
 <tr><td>JobNum / PartNo / Rev</td><td>Có</td><td>Epicor + được kiểm soát phát hành set</td><td>Không được ship sai phiên bản; phiên bản phải khớp hồ sơ chất lượng phát hành.</td></tr>
 <tr><td>Qty / UOM</td><td>Có</td><td>Epicor + đóng gói count thực tế</td><td>Tổng qty trên mọi PackID phải khớp lô giao hàng dòng / đường.</td></tr>
 <tr><td>con / phụ thuộc-cha / gốc sơ đồ ánh xạ</td><td>Có khi pallet/thùng thùng carton nhiều tầng</td><td>WHS scan logic</td><td>Phải nhìn được quan hệ pallet ↔ thùng thùng carton ↔ bên trong pack.</td></tr>

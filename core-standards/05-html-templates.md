@@ -9,6 +9,7 @@
 - `{{SUBTITLE}}` — Phụ đề tiếng Việt
 - `{{OWNER_ROLE_HTML}}` — Role code JD-linked của chủ sở hữu tài liệu
 - `{{APPROVER_ROLE_HTML}}` — Role code JD-linked của người phê duyệt
+- `{{OWNER_ENTITY_HTML}}` — Department code hoặc role code của chủ sở hữu, tùy loại tài liệu
 - `{{RELATIVE_PATH}}` — Đường dẫn tương đối tới thư mục gốc (VD: `../../..`)
 
 ---
@@ -23,6 +24,7 @@ Lưu ý khóa:
 - Khi tạo Section 6 / 7 mới, đọc thêm `12-sop-section-6-7-guide.md`, `13-sop-research-redraft-method.md`, `16-sop-graphics-kpi-and-redraft-quality.md`.
 - Template chỉ khóa khung HTML và format. Không dùng template này để đẩy cùng một bộ nội dung vào hàng loạt SOP.
 - Nội dung Section 1 / 2 / 3 / 4 / 5 / 8 phải nghiên cứu và nâng cấp theo từng SOP riêng.
+- Nếu tài liệu là handbook phòng ban hoặc tài liệu mô tả mandate cấp chức năng, đọc thêm `20-department-boundary-handbook-codes.md` và `reference/job-order-cnc-department-boundary-model.md`.
 
 ```html
 <!DOCTYPE html>
@@ -318,6 +320,38 @@ Lưu ý khóa:
 - JD cũng phải là HTML đầy đủ: có `<!DOCTYPE html>`, `<html>`, `<head>`, `<body>`.
 - Meta header của JD dùng nhãn tiếng Việt giống SOP/WI: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`.
 - Title block của JD dùng chuẩn `JD-<ROLECODE> — <Job title English>`.
+
+---
+
+## Template 5: Department Handbook
+
+Department handbook phải dùng `department code` ở header owner và giữ ranh giới rõ giữa:
+- mandate cấp phòng ban;
+- `subfunction` ổn định;
+- `role code` có link JD;
+- `coverage gap` đang được khóa tạm.
+
+Tài liệu này không được tạo bằng cách copy nội dung giữa các phòng ban. Người viết phải:
+- đọc handbook hiện hành, JD liên quan và benchmark job-order CNC;
+- quyết định riêng cho từng handbook đâu là department mandate, đâu là role decision, đâu là gap;
+- chỉ sau đó mới dựng HTML.
+
+Khung section tối thiểu:
+- Mục tiêu phòng ban
+- Phạm vi
+- Trách nhiệm bắt buộc
+- Quyền hạn cấp chức năng
+- Đầu ra / hồ sơ
+- KPI
+- Interface liên phòng ban
+- Tài liệu liên quan
+- Mô hình vận hành & ranh giới vai trò
+- Nhịp điều hành, dữ liệu & bằng chứng
+- Năng lực / deputy
+- Rủi ro & escalation
+- Coverage gap callout nếu có
+
+Template HTML dùng tại `core-standards/templates/department-handbook-template.html`.
 - `Chủ sở hữu` và `Phê duyệt` ở header phải là `role chip` link JD, không dùng text trần.
 - Bảng thông tin vị trí phải có đúng 1 hàng `Mã vai trò dùng trong SOP/RACI`.
 - Nếu role có governance hat được phép gắn, thêm đúng 1 hàng `Mũ quản trị có thể gắn`.

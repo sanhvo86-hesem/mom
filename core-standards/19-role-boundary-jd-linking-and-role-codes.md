@@ -24,6 +24,9 @@ Muc tieu la chan 6 loi he thong:
 - viet role dai dong trong header/RACI khien nguoi doc khong nhan ra ai co quyen that;
 - de sot role chung chung trong tai lieu cap doanh nghiep cua mo hinh `job-order CNC`.
 
+Tai lieu nay khoa chuan cho `role code`, `governance hat` va `bundle`.
+Quy tac cho `department code`, `subfunction code` va `coverage gap` duoc khoa rieng tai `20-department-boundary-handbook-codes.md`.
+
 ---
 
 ## 2. Nguon chan ly
@@ -249,6 +252,8 @@ Trong cac bang vai tro, authority, gate, hold/release, exception:
 - uu tien dung role code chip;
 - neu can nhieu vai tro, render nhieu chip;
 - khong dung text dai khi co the render chip.
+
+Neu o dang noi toi mandate cap phong ban hoac phan he on dinh, KHONG duoc ep thanh role code. Khi do phai ap dung `department code` theo `20-department-boundary-handbook-codes.md`.
 
 ### 6.3 Narrative prose
 

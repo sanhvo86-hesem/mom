@@ -1,0 +1,10 @@
+File,Cluster,Classification,Markers,BadSeq,C1,Replacement,BOMStart,LineHits
+"03-Tai-Lieu-Van-Hanh\03-Reference\01-ANNEX-100\13-ANNEX-130-M365-Records-Control\annex-135-m365-operational-records-file-plan-by-department-role-and-job.html","03-Tai-Lieu-Van-Hanh","replacement-or-control",1585,1475,110,0,0,187
+"03-Tai-Lieu-Van-Hanh\02-Work-Instructions\01-WI-100\wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html","03-Tai-Lieu-Van-Hanh","replacement-or-control",809,762,47,0,0,78
+"11-Glossary\dict-data.json","11-Glossary","replacement-or-control",4,2,0,2,0,2
+"general_note.md","general_note.md","replacement-or-control",4,2,0,2,0,2
+"01-QMS-Portal\docs\editor-modernization-tiptap-roadmap.md","01-QMS-Portal","single-encoded",1,0,0,0,1,0
+"01-QMS-Portal\docs\editor-wordlike-test-checklist.md","01-QMS-Portal","single-encoded",1,0,0,0,1,0
+"01-QMS-Portal\docs\excel-form-version-control-architecture.md","01-QMS-Portal","single-encoded",1,0,0,0,1,0
+"01-QMS-Portal\docs\form-server-delivery-rollout-baseline.md","01-QMS-Portal","single-encoded",1,0,0,0,1,0
+"01-QMS-Portal\docs\portal-document-display-convention.md","01-QMS-Portal","single-encoded",1,0,0,0,1,0

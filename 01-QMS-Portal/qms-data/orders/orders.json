@@ -1,0 +1,15 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-03-28",
+    "description": "Sales Order → Job Order → Work Order hierarchy. Tạm placeholder — sau này kết nối Epicor ERP.",
+    "counters": {
+      "last_so": "SO-2026-00000",
+      "last_jo": "JO-2026-00000",
+      "last_wo": "WO-2026-00000"
+    }
+  },
+  "sales_orders": [],
+  "job_orders": [],
+  "work_orders": []
+}
