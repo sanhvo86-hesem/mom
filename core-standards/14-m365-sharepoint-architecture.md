@@ -237,18 +237,38 @@ SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
 
 ## 8. Online forms vs Excel forms
 
-### 8.1 Tiêu chí phân loại
+> **Chi tiết đầy đủ:** core-standards/18-online-vs-offline-form-decision-framework.md
 
-| Tiêu chí | → Online | → Excel |
-|----------|---------|---------|
-| Tần suất | Hàng ngày, mỗi ca, mỗi sự kiện | Hàng tháng, hàng quý, 1 lần/job |
-| Độ phức tạp | < 20 fields, dữ liệu đơn giản | Matrix, multi-tab, công thức phức tạp |
-| Nơi điền | Tại sàn SX (điện thoại/tablet) | Tại bàn làm việc (desktop) |
-| Real-time tracking | Cần dashboard live | Không cần |
+### 8.1 Tiêu chí phân loại (7 tiêu chí, tổng 100 điểm)
 
-### 8.2 Danh sách online forms (~25 forms)
+| # | Tiêu chí | Trọng số | → Online (+) | → Excel (−) |
+|---|----------|---------|-------------|------------|
+| 1 | **Tần suất** | 25 | Daily/per-shift: +25 · Per-event: +20 | Monthly: −5 · Quarterly+: −15 |
+| 2 | **Số fields** | 20 | ≤15: +20 · 16-25: +10 | 26-50: −5 · >50/multi-tab: −20 |
+| 3 | **Nơi điền** | 15 | Sàn SX/tại máy: +15 | Phòng kỹ thuật: 0 · Phòng họp: −5 |
+| 4 | **Dashboard** | 15 | KPI live/escalation: +15 | Batch report: −5 · None: −10 |
+| 5 | **Approval workflow** | 10 | Multi-step e-sig: +10 | No workflow: 0 |
+| 6 | **Attachments** | 10 | Photo tại chỗ: +10 | CMM/CAM files: −5 · Multi-file: −10 |
+| 7 | **Formula** | 5 | Không cần: +5 | Matrix/VLOOKUP: −5 |
 
-FRM-208, FRM-413, FRM-501, FRM-502, FRM-504, FRM-505, FRM-507, FRM-511, FRM-512, FRM-521, FRM-525, FRM-631, FRM-641, FRM-651, FRM-701, FRM-711, FRM-715, FRM-721, FRM-802, FRM-913.
+**Quy tắc:** Tổng > 60 → **ONLINE**. Tổng ≤ 60 → **OFFLINE (Excel)**.
+
+### 8.2 Quick Rules (không cần chấm điểm)
+
+| LUÔN ONLINE | LUÔN OFFLINE |
+|-------------|-------------|
+| Điền ≥2 lần/ngày hoặc mỗi ca | Multi-tab Excel với formula phức tạp |
+| Escalation/notification bắt buộc | Reference document, không điền mới |
+| Dữ liệu chảy vào OEE/OTD dashboard | Engineering baseline (CAM/NC linkage) |
+| Điền tại máy bằng phone/tablet | Tần suất ≤ quarterly |
+
+### 8.3 Danh sách online forms (3 phases, ~25 forms)
+
+**Phase 1 (đã triển khai):** FRM-208, FRM-504, FRM-512
+
+**Phase 2 (ưu tiên cao):** FRM-631, FRM-641, FRM-651, FRM-701, FRM-711, FRM-715, FRM-511, FRM-521, FRM-802, FRM-913, FRM-403, FRM-601
+
+**Phase 3 (mở rộng):** FRM-501, FRM-502, FRM-505, FRM-507, FRM-513, FRM-514, FRM-518, FRM-519, FRM-721, FRM-525
 
 ### 8.3 Sync mechanism
 

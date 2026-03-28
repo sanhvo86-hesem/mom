@@ -22,17 +22,17 @@ var _lastRecordId = null;
 
 // ── Record-ID Config ──
 var RECORD_FORM_MAP = {
-  'NCR':  { form: 'FRM-631', label: 'NCR — Non-Conformity Report', labelVi: 'NCR — Báo cáo không phù hợp', digits: 3 },
-  'CAPA': { form: 'FRM-641', label: 'CAPA — Corrective/Preventive Action', labelVi: 'CAPA — Hành động khắc phục', digits: 3 },
-  'FAI':  { form: 'FRM-311', label: 'FAI — First Article Inspection', labelVi: 'FAI — Kiểm tra sản phẩm đầu tiên', digits: 3 },
-  'TRN':  { form: 'FRM-802', label: 'Training — Training Event', labelVi: 'Training — Sự kiện đào tạo', digits: 3 },
-  'AUD':  { form: 'FRM-913', label: 'Audit — Audit Finding', labelVi: 'Audit — Phát hiện đánh giá', digits: 3 },
-  'ECR':  { form: 'FRM-161', label: 'ECR — Engineering Change Request', labelVi: 'ECR — Yêu cầu thay đổi kỹ thuật', digits: 3 },
-  'CAL':  { form: 'FRM-601', label: 'Calibration — Calibration Record', labelVi: 'Calibration — Hồ sơ hiệu chuẩn', digits: 3 },
-  'SCAR': { form: 'FRM-403', label: 'SCAR — Supplier Corrective Action', labelVi: 'SCAR — Hành động khắc phục NCC', digits: 3 },
-  'IMP':  { form: null,      label: 'Improvement — Improvement Project', labelVi: 'Improvement — Dự án cải tiến', digits: 3 },
-  'MR':   { form: 'FRM-911', label: 'MR — Management Review', labelVi: 'MR — Xem xét lãnh đạo', digits: 0 },
-  'RISK': { form: 'FRM-131', label: 'Risk — Risk Assessment', labelVi: 'Risk — Rà soát rủi ro', digits: 3 }
+  'NCR':  { form: 'FRM-631', label: 'NCR — Non-Conformity Report', labelVi: 'NCR — Báo cáo không phù hợp', digits: 3, online: true, score: 82 },
+  'CAPA': { form: 'FRM-641', label: 'CAPA — Corrective/Preventive Action', labelVi: 'CAPA — Hành động khắc phục', digits: 3, online: true, score: 78 },
+  'FAI':  { form: 'FRM-311', label: 'FAI — First Article Inspection', labelVi: 'FAI — Kiểm tra sản phẩm đầu tiên', digits: 3, online: false, score: 35 },
+  'TRN':  { form: 'FRM-802', label: 'Training — Training Event', labelVi: 'Training — Sự kiện đào tạo', digits: 3, online: true, score: 72 },
+  'AUD':  { form: 'FRM-913', label: 'Audit — Audit Finding', labelVi: 'Audit — Phát hiện đánh giá', digits: 3, online: true, score: 70 },
+  'ECR':  { form: 'FRM-161', label: 'ECR — Engineering Change Request', labelVi: 'ECR — Yêu cầu thay đổi kỹ thuật', digits: 3, online: false, score: 42 },
+  'CAL':  { form: 'FRM-601', label: 'Calibration — Calibration Record', labelVi: 'Calibration — Hồ sơ hiệu chuẩn', digits: 3, online: true, score: 65 },
+  'SCAR': { form: 'FRM-403', label: 'SCAR — Supplier Corrective Action', labelVi: 'SCAR — Hành động khắc phục NCC', digits: 3, online: true, score: 68 },
+  'IMP':  { form: null,      label: 'Improvement — Improvement Project', labelVi: 'Improvement — Dự án cải tiến', digits: 3, online: false, score: 45 },
+  'MR':   { form: 'FRM-911', label: 'MR — Management Review', labelVi: 'MR — Xem xét lãnh đạo', digits: 0, online: false, score: 30 },
+  'RISK': { form: 'FRM-131', label: 'Risk — Risk Assessment', labelVi: 'Risk — Rà soát rủi ro', digits: 3, online: false, score: 25 }
 };
 
 // ── Constants ──
