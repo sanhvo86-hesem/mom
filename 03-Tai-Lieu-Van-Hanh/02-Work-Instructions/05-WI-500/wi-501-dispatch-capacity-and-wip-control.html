@@ -63,7 +63,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
  <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
  </div>
  </div>
- <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho Planner, Nhân viên điều phối, Supervisor và Cell Lead ở mọi ca có job mở/Released/WIP, đặc biệt khi có nút thắt / điểm nghẽn, hot-job, machine xuống / Từng hoặc outsource khớp nối.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho PPL / DIRECT_LINE_MGRS ở mọi ca có job mở/Released/WIP, đặc biệt khi có nút thắt / điểm nghẽn, hot-job, machine xuống / Từng hoặc outsource khớp nối.</div>
  <h1><a href="">WI-501</a> — Điều độ hằng ca, rà soát năng lực và kiểm soát WIP</h1>
 
 <div class="section"><h2>1. Mục tiêu và quy tắc không thương lượng</h2>
@@ -87,7 +87,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>3. Bảng kiểm phát hành điều phối xuất hàng cho từng trung tâm gia công</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điểm kiểm</th><th>đạt khi</th><th>FAIL thì làm gì</th></tr></thead><tbody>
-<tr><td>Job/Rev/Op đúng SoR</td><td>Không có mismatch giữa traveler, dispatch, snapshot và phát hành kỹ thuật</td><td>HOLD job; trả về ENG/Planning để sửa packet</td></tr>
+<tr><td>Job/Rev/Op đúng SoR</td><td>Không có mismatch giữa traveler, dispatch, snapshot và phát hành kỹ thuật</td><td>HOLD job; trả về D-ENG / PPL để sửa packet</td></tr>
 <tr><td>Material ready</td><td>Đủ qty, đúng lot/heat/condition, reservation hoặc staging đã xác nhận</td><td>Gắn HR01-MAT; không xếp vào vị trí chạy</td></tr>
 <tr><td>Setup / tool / fixture ready</td><td>Có setup sheet, tool list, prove-out plan, fixture/jaw đúng</td><td>Gắn HR03-TOL; dời lịch hoặc chuyển sang cell khác nếu hợp lệ</td></tr>
 <tr><td>QA / cổng kiểm soát ready</td><td>QPL, CTQ plan, mẫu đầu / FAI / leak / clean cổng kiểm soát đã rõ Người nhận</td><td>Gắn HR04-QA; không phát hành chạy mù</td></tr>
@@ -98,10 +98,10 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>4. Cách phát hành điều phối xuất hàng đầu ca</h2>
 <div class="step-list">
-<div class="step-item"><strong>Phát hành bảng theo nhóm máy (machine nhóm sản phẩm).</strong><br>Tách riêng 3-trục, 5-trục, tiện, phay-lượt / quay, hoàn thiện bề mặt, clean/rò rỉ/final phát hành và outsource hàng đợi. Không trộn tất cả lên một danh sách rồi Requests Supervisor tự hiểu.</div>
+<div class="step-item"><strong>Phát hành bảng theo nhóm máy (machine nhóm sản phẩm).</strong><br>Tách riêng 3-trục, 5-trục, tiện, phay-lượt / quay, hoàn thiện bề mặt, clean/rò rỉ/final phát hành và outsource hàng đợi. Không trộn tất cả lên một danh sách rồi rồi để DIRECT_LINE_MGRS tự hiểu.</div>
 <div class="step-item"><strong>Khóa Top list.</strong><br>Đầu mỗi ca phải xác định rõ Top P0/P1, job đầu tiên lên máy, job thứ hai đã đã sắp xếp, và các job P3/TẠM GIỮ bị chặn.</div>
 <div class="step-item"><strong>Xác định cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch).</strong><br>Sau khi công bố điều phối xuất hàng đầu ca, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) của ca có hiệu lực. Từ thời điểm này, mọi đổi lịch phải theo rule ở <a href="../../03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a>.</div>
-<div class="step-item"><strong>Giao việc và xác nhận hiểu việc.</strong><br>Supervisor/Cell Lead phải xác nhận Người chạy máy hiểu job nào chạy trước, job nào chờ, job nào cần setup song song, và job nào có cổng kiểm soát QA/ENG/WHS đi kèm.</div>
+<div class="step-item"><strong>Giao việc và xác nhận hiểu việc.</strong><br>DIRECT_LINE_MGRS phải xác nhận Người chạy máy hiểu job nào chạy trước, job nào chờ, job nào cần setup song song, và job nào có cổng kiểm soát QA/ENG/WHS đi kèm.</div>
 </div>
 </div>
 
@@ -141,7 +141,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="step-item"><strong>Xác nhận class P0/P1.</strong><br>Ghi rõ vì sao job này đủ điều kiện chen ngang và ai duyệt.</div>
 <div class="step-item"><strong>Chỉ rõ công việc / đơn hàng bị ảnh hưởng.</strong><br>Tên job bị lùi, công đoạn bị lùi, thời lượng lùi và rủi ro giao hàng phải được nói rõ.</div>
 <div class="step-item"><strong>Kiểm tra mức sẵn sàng của hot-job.</strong><br>Không được chen ngang một job còn thiếu gói hồ sơ/setup/gage rồi bắt phân xưởng chờ tại máy.</div>
-<div class="step-item"><strong>Đồng bộ công đoạn sau.</strong><br>Nếu job chen ngang có FAI, clean-pack, rò rỉ test, kiểm tra cuối hoặc lô giao hàng ngay sau đó, phải báo QA/WHS/ENG trước khi start.</div>
+<div class="step-item"><strong>Đồng bộ công đoạn sau.</strong><br>Nếu job chen ngang có FAI, clean-pack, rò rỉ test, kiểm tra cuối hoặc lô giao hàng ngay sau đó, phải báo QA / D-WHS / D-ENG trước khi start.</div>
 </div>
 <div class="callout-warn"><strong>Không dùng hot-job để che lập kế hoạch yếu</strong><br>Một job chỉ được Mọi là hot khi có kích hoạt thực sự. Không được gắn hot chỉ vì Kinh doanh hỏi tiến độ hoặc vì Planner phát hành chậm.</div>
 </div>

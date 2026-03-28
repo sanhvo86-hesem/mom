@@ -6,7 +6,7 @@
 - Excluded: `.git`, `.claude`, `node_modules`, `_build`, `_reports`, `_Deleted`, `tools/php82`.
 
 ## Snapshot
-- Files scanned: **570**
+- Files scanned: **594**
 - Files with encoding residue: **0**
 - Total marker hits: **0**
 - Total line-level patch points: **0**

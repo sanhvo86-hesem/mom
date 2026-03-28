@@ -106,6 +106,10 @@ WI/ANNEX reference cap doanh nghiep duoc phep de header owner o dang `D-code` ne
 - Cau mo dau trong `jd-purpose` PHAI goi ten vi tri bang `English title (ROLECODE)` de khoa ten chuc danh, tranh tro lai cac bien the nua mua nhu `Truong bo phan ...`, `Specialist Bao gia`, `Governance He thong ...`.
 - Cot `owner`, `owner chinh`, `chu tri`, `phe duyet`, `dau moi phu trach` trong SOP/WI/ANNEX PHAI dung chip link theo `role code`, `D-code` hoac bundle da cong bo; khong de text tran kieu `Steering Committee`, `All chuc nang`, `Department Truong bo phan`.
 - Cot mo ta `owner group`, `editor group`, `security group`, `M365 group` trong tai lieu kien truc quyen he thong duoc phep giu ten group ky thuat; khong ep doi cac ten group nay thanh JD/D-code neu doi tuong du lieu dang la nhom quyen he thong, khong phai vai tro nhan su.
+- Trong noi dung cong bo, ma phong ban PHAI dung bo canonical: `D-SCS`, `D-ENG`, `D-PROD`, `D-PPC`, `D-QUAL`, `D-SCM`, `D-PUR`, `D-WHS`, `D-TCR`, `D-LOG`, `D-FIN`, `D-HR`, `D-EHS`, `D-IT`, `D-ERP`.
+- Alias cu kieu `SAL`, `ENG`, `PRO`, `PLA`, `PUR`, `WHS`, `HSE`, `IT`, `CNC`, `OPS`, `Dept Head`, `Line Manager`, `Supervisor`, `Ops Manager`, `Purchasing Manager`, `Engineering Manager` KHONG duoc de lai trong header, owner cell, RACI, interface table, audience table hoac ma tran phan quyen sau khi da co role-boundary/job-order registry.
+- Neu mot o dang noi ve tham quyen cua phong ban thi doi sang `D-code`; neu dang noi ve tham quyen cua nguoi giu vai tro thi doi sang `role code`; neu dang noi ve lop actor on dinh lap lai thi chi duoc dung `bundle` da cong bo.
+- Bundle duoc phep dung de rut gon ma khong mat nghia, nhung bundle cung phai la actor explicit da cong bo trong registry nguon. Khong tu phat minh bundle trong tai lieu phat hanh roi moi quay lai hop thuc hoa sau.
 
 ---
 

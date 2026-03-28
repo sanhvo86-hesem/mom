@@ -71,7 +71,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="step-item"><strong>Bước 1 — STOP / TẠM GIỮ ngay tại điểm phát hiện.</strong><br>Dừng công đoạn liên quan; dừng vấn đề; dừng ship nếu có khả năng lô ảnh hưởng đã tới khu xuất; chặn di chuyển giao dịch tiếp theo trên hệ thống.</div>
 <div class="step-item"><strong>Bước 2 — Cô lập vật lý.</strong><br>Đưa vật tư/WIP/FG vào khu <span class="code">TẠM GIỮ</span> hoặc <span class="code">cách ly / biệt trữ</span> đã định danh; dán tag nhận diện rõ part, lot, qty, lý do, time, Người gắn.</div>
 <div class="step-item"><strong>Bước 3 — Giữ nguyên chứng cứ.</strong><br>Không được tự ý đánh bóng, đổi nhãn, tháo bag, dỡ pallet, sửa bù trừ (offset), reset bộ đếm / quầy, xóa dữ liệu, hoặc tách kiện trước khi chụp ảnh và ghi nhận tình trạng ban đầu.</div>
-<div class="step-item"><strong>Bước 4 — Gọi đúng Người.</strong><br>Báo Supervisor, QA, WHS và người chịu trách nhiệm công đoạn. Nếu nghi đã chạm giao vận/khách hàng rủi ro, escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> trong cùng ca, không chờ họp sáng hôm sau.</div>
+<div class="step-item"><strong>Bước 4 — Gọi đúng Người.</strong><br>Báo WKM / SL, QA, D-WHS và người chịu trách nhiệm công đoạn. Nếu nghi đã chạm giao vận/khách hàng rủi ro, escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> trong cùng ca, không chờ họp sáng hôm sau.</div>
 <div class="step-item"><strong>Bước 5 — Mở hồ sơ.</strong><br>Mở <a href="../../../04-Bieu-Mau/06-FRM-600/FRM-651_NCR_Report.xlsx" download="">FRM-651</a> hoặc log hold tương đương; ghi thời điểm phát hiện, part/rev, lot/số sê-ri, qty ảnh hưởng, vị trí phát hiện, trạng thái Current và nguyên nhân sơ bộ.</div>
 </div>
 </div><div class="section">
@@ -91,7 +91,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Dùng khi</th><th>Quy tắc bắt buộc</th></tr></thead><tbody>
 <tr><td>HOLD</td><td>Chưa đủ bằng chứng hoặc đang chờ đánh giá</td><td>Không vấn đề, không move sang công đoạn kế, không ship; phải có Người phụ trách và due cho bước tiếp.</td></tr>
 <tr><td>QUARANTINE</td><td>Cần tách vật lý khỏi hàng tốt</td><td>Đặt tại khu riêng; nhãn phải có reason code, qty, lot, Người gắn, thời điểm.</td></tr>
-<tr><td>REVIEW</td><td>Đang chờ xác nhận QA/ENG hoặc waiting on supplier/customer</td><td>Không được coi là usable; trạng thái review không thay cho PASS.</td></tr>
+<tr><td>REVIEW</td><td>Đang chờ xác nhận QA / D-ENG hoặc waiting on supplier/customer</td><td>Không được coi là usable; trạng thái review không thay cho PASS.</td></tr>
 <tr><td>REWORK / SORT</td><td>Đã chốt disposition có đường thực hiện rõ</td><td>Phải có WI/route/tiêu chí chấp nhận và Người phê duyệt. Rework xong phải quay lại cổng kiểm soát kiểm phù hợp.</td></tr>
 <tr><td>SCRAP / RETURN</td><td>Lô không thể hoặc không được phép release</td><td>Phải khóa qty, lot, chi phí, bằng chứng và giao dịch hệ thống tương ứng.</td></tr>
 </tbody></table></div>

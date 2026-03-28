@@ -101,6 +101,14 @@ def token_is_entity(token: str, registry: dict) -> bool:
     return base in registry["roles"] or base in registry.get("departments", {})
 
 
+def token_is_bundle(token: str, registry: dict) -> bool:
+    return token in registry.get("bundles", {})
+
+
+def render_bundle_chip(token: str) -> str:
+    return f'<span class="chip bundle-chip" data-bundle="{xml_escape(token)}">{xml_escape(token)}</span>'
+
+
 def render_token_cluster(tokens: list[str], current_file: Path, registry: dict, joiner: str = " / ") -> str:
     if not tokens:
         return ""
@@ -109,6 +117,8 @@ def render_token_cluster(tokens: list[str], current_file: Path, registry: dict, 
     for index, token in enumerate(tokens):
         if token_is_entity(token, registry):
             chunks.append(entity_link(token, current_file, registry))
+        elif token_is_bundle(token, registry):
+            chunks.append(render_bundle_chip(token))
         else:
             chunks.append(f'<span class="chip">{xml_escape(token)}</span>')
         if index < len(tokens) - 1:
@@ -840,7 +850,9 @@ def update_meta_rows(doc: etree._Element, current_file: Path, registry: dict, al
 def update_role_cells(doc: etree._Element, current_file: Path, registry: dict, aliases: dict[str, dict], overrides: dict[str, dict]) -> None:
     targets = doc.xpath('//th|//td|//span[contains(@class,"inline-tag")]')
     for element in targets:
-        if element.xpath('.//*[contains(@class,"role-link") or contains(@class,"dept-link") or contains(@class,"entity-link")]'):
+        if element.xpath(
+            './/*[contains(@class,"role-link") or contains(@class,"dept-link") or contains(@class,"entity-link") or contains(@class,"bundle-chip")]'
+        ):
             continue
         text = element_text(element)
         if not text or len(text) > 120:
@@ -856,7 +868,7 @@ def update_plain_titles(doc: etree._Element, mapping: dict[str, str]) -> None:
         if parent is None:
             continue
         class_name = parent.get("class") or ""
-        if any(token in class_name for token in ["role-code", "role-link", "dept-code", "dept-link", "entity-code", "entity-link"]):
+        if any(token in class_name for token in ["role-code", "role-link", "dept-code", "dept-link", "entity-code", "entity-link", "bundle-chip"]):
             continue
         value = str(node)
         stripped = normalize_ws(value)
@@ -873,7 +885,7 @@ def replace_text_fragments(doc: etree._Element, replacements: dict[str, str]) ->
         if parent is None:
             continue
         class_name = parent.get("class") or ""
-        if any(token in class_name for token in ["role-code", "role-link", "dept-code", "dept-link", "entity-code", "entity-link"]):
+        if any(token in class_name for token in ["role-code", "role-link", "dept-code", "dept-link", "entity-code", "entity-link", "bundle-chip"]):
             continue
         value = str(node)
         new_value = value
@@ -1362,6 +1374,39 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
 
     if current_file.name == "wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html":
         set_meta_row_spec(doc, ("owner", "chủ sở hữu"), expr("QMS", "HR", "ITA"), current_file, registry)
+        replace_text_fragments(
+            doc,
+            {
+                "supervisor kiểm được trong ca;": "FRONTLINE_LEADS kiểm được trong ca;",
+                "community/champion hỗ trợ.": "mạng DEPLOYMENT_LEADS hỗ trợ.",
+                "Champion từng phòng ban": "DEPLOYMENT_LEADS",
+                "Department Manager / Supervisor": "FUNC_HEADS / DIRECT_LINE_MGRS",
+                "danh sách champion theo phòng ban và ca.": "danh sách DEPLOYMENT_LEADS theo phòng ban và ca.",
+                "Cam kết supervisor rà soát": "Cam kết DIRECT_LINE_MGRS rà soát",
+                "Champion biết dạy lại": "DEPLOYMENT_LEADS biết dạy lại",
+                "Danh sách champion đủ phạm vi bao phủ theo phòng ban và shift.": "Danh sách DEPLOYMENT_LEADS đủ phạm vi bao phủ theo phòng ban và shift.",
+                "Người đào tạo/champion quan sát.": "OJT_COACHES / DEPLOYMENT_LEADS quan sát.",
+                "Supervisor phải kiểm truy xuất ngay sau khi nộp.": "DIRECT_LINE_MGRS phải kiểm truy xuất ngay sau khi nộp.",
+                "Setup / Planner": "SET / PPL",
+                "Planner, ENG, Setup, Production Engineer": "PPL / D-ENG / SET / PIE",
+                "Setup, QA, QC, ENG": "SET / QA / QC / D-ENG",
+                "Supervisor mở lại trong 60 giây.": "DIRECT_LINE_MGRS mở lại trong 60 giây.",
+                "DEP-SAL": "D-SCS",
+                "SAL RFQ": "D-SCS RFQ",
+                "LÆ°u bá»™ RFQ vÃ o Ä‘Ãºng nhÃ¡nh SAL;": "LÆ°u bá»™ RFQ vÃ o Ä‘Ãºng nhÃ¡nh D-SCS;",
+                "Supervisor Requests má»Ÿ láº¡i 1-2 há»“ sÆ¡ vá»«a ná»™p": "DIRECT_LINE_MGRS má»Ÿ láº¡i 1-2 há»“ sÆ¡ vá»«a ná»™p",
+                "Má»—i supervisor kiá»ƒm Ã­t nháº¥t 3 há»“ sÆ¡ má»›i má»—i ca.": "Má»—i DIRECT_LINE_MGRS kiá»ƒm Ã­t nháº¥t 3 há»“ sÆ¡ má»›i má»—i ca.",
+                "Ä‘á»•i supervisor": "Ä‘á»•i DIRECT_LINE_MGRS",
+                "Supervisor hiá»ƒu KPI vÃ  nhá»‹p kiá»ƒm.": "DIRECT_LINE_MGRS hiá»ƒu KPI vÃ  nhá»‹p kiá»ƒm.",
+                "Champion tá»± thao tÃ¡c Ä‘Æ°á»£c vÃ  dáº¡y láº¡i Ä‘Æ°á»£c.": "DEPLOYMENT_LEADS tá»± thao tÃ¡c Ä‘Æ°á»£c vÃ  dáº¡y láº¡i Ä‘Æ°á»£c.",
+                "QMS + phÃ²ng ban champion máº«u Ã­t nháº¥t 10 file/tuáº§n/phÃ²ng ban.": "QMS + DEPLOYMENT_LEADS máº«u Ã­t nháº¥t 10 file/tuáº§n/phÃ²ng ban.",
+            },
+        )
+        set_row_cell_html(doc, "2. Chá»n champion theo phÃ²ng ban vÃ  shift", 1, render_token_cluster(["FUNC_HEADS"], current_file, registry))
+        set_row_cell_html(doc, "3. Chuáº©n bá»‹ playlist vÃ  tÃ¬nh huá»‘ng theo role", 1, render_token_cluster(["QMS", "HR", "DEPLOYMENT_LEADS"], current_file, registry))
+        set_row_cell_html(doc, "6. Dáº¡y theo role/shift", 1, render_token_cluster(["DEPLOYMENT_LEADS", "DIRECT_LINE_MGRS"], current_file, registry))
+        set_row_cell_html(doc, "7. OJT trÃªn 3-5 job Ä‘áº§u", 1, render_token_cluster(["DIRECT_LINE_MGRS", "DEPLOYMENT_LEADS"], current_file, registry))
+        set_row_cell_html(doc, "8. HÃ ng NgÃ y rÃ  soÃ¡t + vÄƒn phÃ²ng giá»", 1, render_token_cluster(["DIRECT_LINE_MGRS", "QMS", "ITA"], current_file, registry))
 
     if current_file.name == "wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html":
         set_meta_row_spec(doc, ("owner", "chủ sở hữu"), expr("QMS", "HR"), current_file, registry)
@@ -1406,6 +1451,26 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
             },
         )
 
+    if current_file.name == "annex-116-m365-folder-structure-blueprint.html":
+        replace_text_fragments(
+            doc,
+            {
+                "MÃ£ phÃ²ng ban: QMS, QA, ENG, PRO, PUR, HR, WHS, MNT, PLA, SAL, FIN, HSE, IT, CNC, OPS": "MÃ£ phÃ²ng ban: D-EXEC, D-SCS, D-ENG, D-PROD, D-PPC, D-QUAL, D-SCM, D-PUR, D-WHS, D-TCR, D-LOG, D-FIN, D-HR, D-EHS, D-IT, D-ERP",
+                "RET-JOB-ENG-10Y": "RET-JOB-G1-10Y",
+                "RET-SAL-WARRANTY-7Y": "RET-SCS-WARRANTY-7Y",
+                "Chá»‰ ENG Ä‘Æ°á»£c phÃ¡t hÃ nh revision chuáº©n": "Chá»‰ D-ENG Ä‘Æ°á»£c phÃ¡t hÃ nh revision chuáº©n",
+                "QMS + owner quy trÃ¬nh": "QMS + OPS_SCOPE_OWNERS",
+                "IT + QMS data owner": "ITA + QMS + MR_REPORT_OWNERS",
+                "QA/QMS + owner Ä‘Æ°á»£c chá»‰ Ä‘á»‹nh": "QA / QMS + owner Ä‘Æ°á»£c chá»‰ Ä‘á»‹nh",
+                "QA + ENG": "QA + D-ENG",
+                "SAL + QA": "D-SCS + QA",
+                "QA + SAL": "QA + D-SCS",
+                "PRO + ENG": "D-PROD + D-ENG",
+                "PUR + QA": "D-PUR + QA",
+                "Change Records (Job)</td><td>ENG</td>": "Change Records (Job)</td><td>D-ENG</td>",
+            },
+        )
+
     if current_file.name == "annex-133-m365-records-site-topology-library-and-folder-blueprint.html":
         replace_text_fragments(
             doc,
@@ -1426,8 +1491,11 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
             doc,
             {
                 "Kế hoạch Team Leader": "PPL",
+                "QA/ENG/OPS": "QA / D-ENG / D-PROD",
             },
         )
+        set_row_cell_html(doc, "QC Hold SLA", 2, chips(expr("QA")))
+        set_row_cell_html(doc, "Thời gian Từng máy tác động", 2, chips(expr("WKM", "MNT")))
 
     if current_file.name == "wi-203-job-dossier-evidence-pack-and-record-completeness.html":
         set_meta_row_spec(doc, ("owner", "chủ sở hữu"), expr("QA", "QMS", "PPL", "ENGM"), current_file, registry)
@@ -1440,11 +1508,61 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
                 "IQC Team Leader / WHS": "QCL / D-WHS",
                 "IQC Team Leader.": "QCL.",
                 "IQC Team Leader báo QA Manager trong 1 giờ.": "QCL báo QA trong 1 giờ.",
+                "Kế hoạch, ENG, Sản xuất, QA và WHS": "PPL, D-ENG, D-PROD, QA và D-WHS",
+                "Kế hoạch/OPS": "PPL / PD",
+                "Supervisor, ENG và Người setup phải kiểm chéo": "WKM / SL, D-ENG và SET phải kiểm chéo",
+                "ENG phát hành lại; gắn link SSOT và ProgramRev": "D-ENG phát hành lại; gắn link SSOT và ProgramRev",
+                "ENG phát hành phiên bản mới và thông báo lập kế hoạch": "D-ENG phát hành phiên bản mới và thông báo PPL",
+                "TẠM GIỮ ngay; Mọi ENG/Kế hoạch": "TẠM GIỮ ngay; D-ENG / PPL xử lý",
+                "TẠM GIỮ; đổi gage hoặc Mọi QA": "TẠM GIỮ; đổi gage hoặc QA xử lý",
             },
         )
 
     if current_file.name == "wi-501-dispatch-capacity-and-wip-control.html":
         set_meta_row_spec(doc, ("owner", "chủ sở hữu"), expr("PPL", "WKM"), current_file, registry)
+        replace_text_fragments(
+            doc,
+            {
+                "Planner, Nhân viên điều phối, Supervisor và Cell Lead": "PPL / DIRECT_LINE_MGRS",
+                "HOLD job; trả về ENG/Planning để sửa packet": "HOLD job; trả về D-ENG / PPL để sửa packet",
+                "Requests Supervisor tự hiểu.": "rồi để DIRECT_LINE_MGRS tự hiểu.",
+                "Supervisor/Cell Lead": "DIRECT_LINE_MGRS",
+                "QA/WHS/ENG": "QA / D-WHS / D-ENG",
+            },
+        )
+
+    if current_file.name == "wi-501-dispatch-capacity-and-wip-control.html":
+        replace_text_fragments(
+            doc,
+            {
+                "QA/ENG/WHS": "QA / D-ENG / D-WHS",
+                "Ops Manager hoáº·c cao hÆ¡n": "PD hoáº·c cao hÆ¡n",
+            },
+        )
+
+    if current_file.name == "wi-201-quality-gates-hold-points-and-release-execution.html":
+        replace_text_fragments(
+            doc,
+            {
+                "QuÃ¡ SLA â†’ Engineering Lead bÃ¡o Ops Manager trong 2 giá». QuÃ¡ 2Ã— SLA â†’ Ops Manager escalate CEO.": "QuÃ¡ SLA â†’ ENGM bÃ¡o PD trong 2 giá». QuÃ¡ 2Ã— SLA â†’ PD escalate CEO.",
+            },
+        )
+
+    if current_file.name == "wi-501-dispatch-capacity-and-wip-control.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Ops Manager ho\u1eb7c cao h\u01a1n": "PD ho\u1eb7c cao h\u01a1n",
+            },
+        )
+
+    if current_file.name == "wi-201-quality-gates-hold-points-and-release-execution.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Qu\u00e1 SLA \u2192 Engineering Lead b\u00e1o Ops Manager trong 2 gi\u1edd. Qu\u00e1 2\u00d7 SLA \u2192 Ops Manager escalate CEO.": "Qu\u00e1 SLA \u2192 ENGM b\u00e1o PD trong 2 gi\u1edd. Qu\u00e1 2\u00d7 SLA \u2192 PD escalate CEO.",
+            },
+        )
 
     if current_file.name == "wi-701-receiving-iqc-traceability-and-put-away.html":
         set_meta_row_spec(doc, ("owner", "chủ sở hữu"), expr("WAR", "QCL"), current_file, registry)
@@ -1452,8 +1570,25 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
     if current_file.name == "wi-711-cleanroom-entry-and-gowning.html":
         set_meta_row_spec(doc, ("owner", "chủ sở hữu"), expr("CPS", "QE", "EHS"), current_file, registry)
 
+    if current_file.name == "wi-711-cleanroom-entry-and-gowning.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Supervisor/QA": "CPS / QE",
+                "Supervisor hoáº·c QA.": "CPS hoáº·c QE.",
+                "Supervisor/HSE": "CPS / EHS",
+                "Supervisor cho phÃ©p.": "CPS cho phÃ©p.",
+            },
+        )
+
     if current_file.name == "wi-712-ultrasonic-cleaning-standard-work.html":
         set_meta_row_spec(doc, ("owner", "chủ sở hữu"), expr("CPS", "QE"), current_file, registry)
+        replace_text_fragments(
+            doc,
+            {
+                "Theo phê duyệt ENG/QA": "Theo phê duyệt D-ENG / QA",
+            },
+        )
 
     if current_file.name == "wi-713-environmental-monitoring-and-response.html":
         set_meta_row_spec(doc, ("owner", "chủ sở hữu"), expr("QE", "EHS", "CPS"), current_file, registry)
@@ -1488,6 +1623,25 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
                 "Department head / chủ quá trình": "FUNC_HEADS / OPS_SCOPE_OWNERS",
                 "Department head + chủ quá trình": "FUNC_HEADS + OPS_SCOPE_OWNERS",
                 "Line Manager / deputy trigger Người phụ trách": "DIRECT_LINE_MGRS / deputy trigger theo ANNEX-123",
+                "Dòng / Chuyền Manager / người chịu trách nhiệm quy trình": "DIRECT_LINE_MGRS / OPS_SCOPE_OWNERS",
+                "Department trưởng / đầu hoặc ủy quyền hợp lệ": "FUNC_HEADS hoặc ủy quyền hợp lệ theo ANNEX-123",
+                "Department trưởng / đầu / Quy trình Owner": "FUNC_HEADS / OPS_SCOPE_OWNERS",
+                "người chịu trách nhiệm System + chủ nghiệp vụ đồng ký": "ITA / ESA + OPS_SCOPE_OWNERS đồng ký",
+                "Top quản lý / được ủy quyền điều hành theo mức độ": "CEO / FUNC_HEADS theo ANNEX-120",
+                "IT/Epicor admin": "ITA / ESA",
+                "Dòng / Chuyền Manager / phó kích hoạt người chịu trách nhiệm": "DIRECT_LINE_MGRS / deputy kích hoạt theo ANNEX-123",
+                "Department trưởng / đầu + Quy trình Owner": "FUNC_HEADS + OPS_SCOPE_OWNERS",
+            },
+        )
+
+    if current_file.name == "annex-102-access-request-field-dictionary.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Người dùng/Dòng / Chuyền Manager": "Người dùng / DIRECT_LINE_MGRS",
+                "Dòng / Chuyền Manager + người chịu trách nhiệm hệ / Approver luồng công việc chuẩn": "DIRECT_LINE_MGRS + ITA / ESA / approver luồng chuẩn",
+                "Department trưởng / đầu / Quy trình Owner + Approver theo quyết định nhóm sản phẩm": "FUNC_HEADS / OPS_SCOPE_OWNERS + approver theo ANNEX-120",
+                "Dòng / Chuyền Manager + phòng ban trưởng / đầu + Quy trình Owner": "DIRECT_LINE_MGRS + FUNC_HEADS + OPS_SCOPE_OWNERS",
             },
         )
 
@@ -1597,6 +1751,10 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
                 "QA Engineer #1": "QE #1",
                 "Production Supervisor #1": "WKM #1",
                 "PRO1": "WKM1",
+                "MEETING-MIN_ENG_": "MEETING-MIN_D-ENG_",
+                "0800-ENG1": "0800-ENGM1",
+                "ENG, PRO, QA, SCM, HR, FIN, WH, MNT": "D-ENG, D-PROD, QA, D-SCM, HR, FIN, D-WHS, MNT",
+                "Engineering #1": "ENGM #1",
             },
         )
 
@@ -1741,6 +1899,214 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
 
     if current_file.name == "pol-qms-002-quality-objectives.html":
         set_row_cell_html(doc, "Hệ thống & cải tiến", 2, chips(bundle("ALL_DEPTS")))
+
+    if current_file.name == "wi-302-first-piece-fai-execution-and-evidence-pack.html":
+        replace_text_fragments(
+            doc,
+            {
+                "QA và ENG quyết định phạm vi; không dùng dữ liệu cũ để suy diễn.": "QA và D-ENG quyết định phạm vi; không dùng dữ liệu cũ để suy diễn.",
+                "trả về ENG/Setup.": "trả về D-ENG / SET.",
+                "Supervisor + QA": "WKM / SL + QA",
+            },
+        )
+
+    if current_file.name == "wi-606-suspect-product-containment-segregation-and-reaction.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Báo Supervisor, QA, WHS và người chịu trách nhiệm công đoạn.": "Báo WKM / SL, QA, D-WHS và người chịu trách nhiệm công đoạn.",
+                "QA/ENG": "QA / D-ENG",
+            },
+        )
+
+    if current_file.name == "annex-106-iso9001-matrix-full.html":
+        replace_text_fragments(
+            doc,
+            {
+                "QMS + Ban lãnh đạo": "QMS + CEO",
+                "Kinh doanh/Program + QMS": "D-SCS + QMS",
+                "QMS + Chủ quá trình": "QMS + OPS_SCOPE_OWNERS",
+                "Tổng / Chung Manager": "CEO",
+                "Tổng / Chung Manager + QMS": "CEO + QMS",
+                "Tổng / Chung Manager + QMS + HR": "CEO + QMS + HR",
+                "Chủ quá trình + QMS": "OPS_SCOPE_OWNERS + QMS",
+                "Top quản lý + Chủ quá trình": "CEO + OPS_SCOPE_OWNERS",
+                "Quy trình Owner + QA/ENG": "OPS_SCOPE_OWNERS + QA + D-ENG",
+                "HR / Sản xuất / QA / HSE": "HR / D-PROD / QA / EHS",
+                "QMS + HR + Chủ quá trình": "QMS + HR + OPS_SCOPE_OWNERS",
+                "HR + Dòng / Chuyền quản lý": "HR + DIRECT_LINE_MGRS",
+                "Chủ quá trình": "OPS_SCOPE_OWNERS",
+                "QMS + chủ dữ liệu": "QMS + MR_REPORT_OWNERS",
+                "Kinh doanh/Program": "D-SCS",
+                "QA + Quy trình Owner": "QA + OPS_SCOPE_OWNERS",
+                "Line managers": "DIRECT_LINE_MGRS",
+                "QMS Engineer / doc điều phối viên": "QMS[DC]",
+                "Dept Trưởng bộ phận + Finance": "FUNC_HEADS + FIN",
+                "Dept Trưởng bộ phận": "FUNC_HEADS",
+                "HR / dòng / chuyền người chịu trách nhiệm": "HR / DIRECT_LINE_MGRS",
+                "EHS / khu vực người chịu trách nhiệm": "EHS / AREA_LEADS",
+                "Finance team": "D-FIN",
+                "QMS / IT / chủ dữ liệu": "QMS / ITA / MR_REPORT_OWNERS",
+                "người chịu trách nhiệm chức năng + QMS": "FUNC_OWNERS + QMS",
+                "người chịu trách nhiệm chức năng + QMS + CEO": "FUNC_OWNERS + QMS + CEO",
+                "chủ tài liệu": "QMS[DC]",
+            },
+        )
+
+    if current_file.name == "annex-106-iso9001-matrix-full.html":
+        replace_text_fragments(
+            doc,
+            {
+                "QA/ENG": "QA / D-ENG",
+            },
+        )
+
+    if current_file.name == "annex-105-process-map-detailed.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Kinh doanh â†’ ENG": "D-SCS â†’ D-ENG",
+                "Sales â†’ ENG": "D-SCS â†’ D-ENG",
+                "ENG â†’ Káº¿ hoáº¡ch": "D-ENG â†’ D-PPC",
+                "Kinh doanh â†’ ENG â†’ Káº¿ hoáº¡ch; Customer pháº£n há»“i â†’ QA / QMS.": "D-SCS â†’ D-ENG â†’ D-PPC; Customer pháº£n há»“i â†’ QA / QMS.",
+                "Sales â†’ ENG â†’ Planning; Customer pháº£n há»“i â†’ QA / QMS.": "D-SCS â†’ D-ENG â†’ D-PPC; Customer pháº£n há»“i â†’ QA / QMS.",
+                "ENG â†’ Káº¿ hoáº¡ch / Sáº£n xuáº¥t / QA.": "D-ENG â†’ D-PPC / D-PROD / QA.",
+                "PUR / WHS / QA / ENG.": "D-PUR / D-WHS / QA / D-ENG.",
+            },
+        )
+
+    if current_file.name == "annex-116-m365-folder-structure-blueprint.html":
+        replace_text_fragments(
+            doc,
+            {
+                "{Dept} = QMS, QA, ENG, PRO, PUR, HR, WHS, MNT, PLA, SAL, FIN, HSE, IT, CNC, OPS": "{Dept} = D-SCS, D-ENG, D-PROD, D-PPC, D-QUAL, D-SCM, D-PUR, D-WHS, D-TCR, D-LOG, D-FIN, D-HR, D-EHS, D-IT, D-ERP",
+                "Planning, QA, ENG, Production, WHS theo nhu cầu": "D-PPC / QA / D-ENG / D-PROD / D-WHS theo nhu cầu",
+                "ENG cập nhật, QA/OPS đọc": "D-ENG cập nhật, QA / D-PROD đọc",
+                "QMS + Người phụ trách quy trình": "QMS + OPS_SCOPE_OWNERS",
+                "IT + QMS chủ dữ liệu": "ITA + QMS + MR_REPORT_OWNERS",
+                "Dept Head": "FUNC_HEADS",
+            },
+        )
+
+    if current_file.name == "annex-133-m365-records-site-topology-library-and-folder-blueprint.html":
+        replace_text_fragments(
+            doc,
+            {
+                "DEP-SAL": "D-SCS",
+                "SAL RFQ": "D-SCS RFQ",
+                "DEP-ENG": "D-ENG",
+                "ENG team": "D-ENG",
+            },
+        )
+
+    if current_file.name == "annex-133-m365-records-site-topology-library-and-folder-blueprint.html":
+        replace_text_fragments(
+            doc,
+            {
+                "MÃ£ phÃ²ng ban chuáº©n: EXEC, QMS, QA, ENG, PRO, SCM, SAL, FIN, HR, EHS, IT, ERP.": "MÃ£ phÃ²ng ban chuáº©n: D-EXEC, D-SCS, D-ENG, D-PROD, D-PPC, D-QUAL, D-SCM, D-PUR, D-WHS, D-TCR, D-LOG, D-FIN, D-HR, D-EHS, D-IT, D-ERP.",
+                "ENG edit, QA/OPS Ä‘á»c.": "D-ENG edit, QA / D-PROD Ä‘á»c.",
+            },
+        )
+
+    if current_file.name == "annex-134-m365-records-provisioning-permissions-and-automation-architecture.html":
+        replace_text_fragments(
+            doc,
+            {
+                "SAL khu vực": "D-SCS khu vực",
+                "QMS-SAL-Biên tập viên": "QMS-D-SCS-Biên tập viên",
+                "05-SAL": "05-D-SCS",
+            },
+        )
+
+    if current_file.name == "annex-135-m365-operational-records-file-plan-by-department-role-and-job.html":
+        replace_text_fragments(
+            doc,
+            {
+                "6.4 ENG": "6.4 D-ENG",
+                "ENG team": "D-ENG",
+                "6.7 SAL": "6.7 D-SCS",
+                "SAL RFQ interfaces": "D-SCS RFQ interfaces",
+                "DEP-SAL": "D-SCS",
+                "DEP-ENG": "D-ENG",
+            },
+        )
+
+    if current_file.name == "annex-135-m365-operational-records-file-plan-by-department-role-and-job.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Giá»¯ fixture validation notes ngoÃ i ENG zone": "Giá»¯ fixture validation notes ngoÃ i vÃ¹ng D-ENG",
+                "Káº¿ hoáº¡ch, QA, ENG, PRO, SCM theo gate; external share chá»‰ qua approved package": "D-PPC, QA, D-ENG, D-PROD, D-SCM theo gate; external share chá»‰ qua approved package",
+            },
+        )
+
+    if current_file.name == "annex-302-approved-materials-list.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Engineering + QA + khi áp dụng: Customer": "D-ENG + QA + Customer khi áp dụng",
+                "Customer + Engineering + QA": "Customer + D-ENG + QA",
+                "ENG Manager + QA Manager phê duyệt §9 quy trình.": "ENGM + QA phê duyệt §9 quy trình.",
+                "Engineering phải": "D-ENG phải",
+                "Engineering mở review": "D-ENG mở review",
+                "Engineering, DFM, báo giá và hoạch định gia công.": "D-ENG, DFM, EST và hoạch định gia công.",
+                "ENG Manager": "ENGM",
+                "Purchasing Manager": "SCM",
+                "General Manager (EXE-01)": "CEO",
+            },
+        )
+
+    if current_file.name == "annex-302-approved-materials-list.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Auto upgrade / ENG+QA / ENG+QA+Customer / Block": "Auto upgrade / D-ENG+QA / D-ENG+QA+Customer / Block",
+                "confirm vá»›i Purchasing. ENG approval": "confirm vá»›i D-PUR. D-ENG approval",
+                "CL-B structural non-wetted: ENG approval.": "CL-B structural non-wetted: D-ENG approval.",
+                "ENG approval required.": "D-ENG approval required.",
+                "Engineering PHáº¢I cáº­p nháº­t": "D-ENG PHáº¢I cáº­p nháº­t",
+                "Chá»‰ CL-C non-wetted vá»›i ENG approval riÃªng.": "Chá»‰ CL-C non-wetted vá»›i D-ENG approval riÃªng.",
+                "ENG + QA required": "D-ENG + QA required",
+                "ENG review; thÆ°á»ng OK": "D-ENG review; thÆ°á»ng OK",
+                "ENG + Customer approval": "D-ENG + Customer approval",
+                "Downgrade â€” ENG+QA+Customer": "Downgrade â€” D-ENG+QA+Customer",
+            },
+        )
+
+    if current_file.name == "annex-501-dispatch-capacity-wip-rules.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Planner, Nhân viên điều phối, Supervisor và Ops Manager": "PPL / DIRECT_LINE_MGRS / PD",
+                "Ops Manager hoặc cao hơn theo ma trận thẩm quyền": "PD hoặc cao hơn theo ANNEX-120",
+                "Planner Lead / Ops Manager": "PPL / PD",
+                "chờ ENG": "chờ D-ENG",
+                "Requests Supervisor tự hiểu": "để DIRECT_LINE_MGRS tự hiểu",
+                "Planner + Supervisor": "PPL + DIRECT_LINE_MGRS",
+                "ENG phát hành controlled copy": "D-ENG phát hành controlled copy",
+                "ENG release set mới": "D-ENG release set mới",
+                "QA/WHS/ENG": "QA / D-WHS / D-ENG",
+                "được ENG/QA chấp thuận": "được D-ENG / QA chấp thuận",
+            },
+        )
+
+    if current_file.name == "annex-801-competency-levels-and-certification-rules.html":
+        set_meta_row_spec(doc, ("owner", "chủ sở hữu"), expr("HR", "QA", "PD"), current_file, registry)
+        set_row_cell_html(doc, "C04", 3, render_token_cluster(["FRONTLINE_LEADS", "PPL", "QA", "D-WHS", "D-ENG"], current_file, registry))
+        set_row_cell_html(doc, "C06", 3, render_token_cluster(["FRONTLINE_LEADS", "QA", "D-ENG", "FUNC_HEADS"], current_file, registry))
+        set_row_cell_html(doc, "C10", 3, render_token_cluster(["D-PROD", "QA", "D-PPC", "D-WHS", "D-ENG"], current_file, registry))
+        set_row_cell_html(doc, "C13", 3, render_token_cluster(["D-ENG", "QA", "FRONTLINE_LEADS", "D-PUR"], current_file, registry))
+        set_row_cell_html(doc, "C14", 3, render_token_cluster(["OPR", "SET", "QA", "D-ENG", "CAM"], current_file, registry))
+        set_row_cell_html(doc, "C15", 3, render_token_cluster(["D-ENG", "QA", "SET", "D-PUR"], current_file, registry))
+        set_row_cell_html(doc, "C16", 3, render_token_cluster(["QA", "QC", "SET", "QCL"], current_file, registry))
+        set_row_cell_html(doc, "C17", 3, render_token_cluster(["OPR", "SET", "CAM", "MNT"], current_file, registry))
+        set_row_cell_html(doc, "C19", 3, render_token_cluster(["DIRECT_LINE_MGRS", "OJT_COACHES", "FUNC_HEADS"], current_file, registry))
+        replace_text_fragments(
+            doc,
+            {
+                "supervisor xác nhận.": "DIRECT_LINE_MGRS xác nhận.",
+            },
+        )
 
     if current_file.name == "sop-802-incident-near-miss-and-ehs.html":
         role_rows = doc.xpath('//h2[@id="p4"]/following-sibling::div[contains(@class,"table-card")][1]//table/tbody/tr')
@@ -1972,9 +2338,93 @@ def apply_jd_specific_tweaks(doc: etree._Element, role_code: str, current_file: 
     if role_code == "HR":
         set_row_first_cell_html(doc, "Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên", chips(bundle("DEPLOYMENT_STEERING")))
         set_row_first_cell_html(doc, "Department Trưởng bộ phận", chips(bundle("FUNC_HEADS")))
+        replace_text_fragments(
+            doc,
+            {
+                "lên Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên.": "lên CEO.",
+            },
+        )
 
     if role_code == "GLP":
         set_row_first_cell_html(doc, "Sản xuất Giám đốc / phòng ban trưởng bộ phận", chips(bundle("FUNC_HEADS")))
+
+    if role_code == "PD":
+        set_row_first_cell_html(
+            doc,
+            "Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên",
+            render_token_cluster(["CEO", "ENGM", "PPL", "WKM", "CPS", "MNT", "PIE"], current_file, registry),
+        )
+
+    if role_code == "QA":
+        set_row_first_cell_html(doc, "Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên", chips(expr("CEO")))
+        set_row_first_cell_html(doc, "Sản xuất Giám đốc / Kỹ thuật Lead", render_token_cluster(["PD", "ENGM"], current_file, registry))
+        set_row_first_cell_html(doc, "Customer Dịch vụ / khách hàng", render_token_cluster(["CS", "EST", "Khách hàng"], current_file, registry))
+
+    if role_code == "QE":
+        set_row_first_cell_html(doc, "Customer Dịch vụ / khách hàng", render_token_cluster(["CS", "EST", "Khách hàng"], current_file, registry))
+
+    if role_code == "SCM":
+        set_row_first_cell_html(doc, "Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên", chips(expr("CEO")))
+        set_row_first_cell_html(
+            doc,
+            "Nhân viên mua hàng / Kho / Tool kho dụng cụ (tool kho dụng cụ (tool kho dụng cụ (tool crib)) / Hậu cần",
+            render_token_cluster(["BUY", "WAR", "TOOL", "LOG"], current_file, registry),
+        )
+
+    if role_code == "CS":
+        set_row_first_cell_html(
+            doc,
+            "Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên / key tài khoản",
+            render_token_cluster(["CEO", "ENGM", "PPL", "QA", "SCM", "FIN", "WKM", "LOG"], current_file, registry),
+        )
+        replace_text_fragments(
+            doc,
+            {
+                "lên Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên và các người chịu trách nhiệm liên quan": "lên CEO và các role chịu trách nhiệm liên quan",
+            },
+        )
+
+    if role_code == "FIN":
+        set_row_first_cell_html(doc, "Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên", chips(expr("CEO")))
+        replace_text_fragments(
+            doc,
+            {
+                "lên Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên.": "lên CEO.",
+            },
+        )
+
+    if role_code == "EHS":
+        set_row_first_cell_html(doc, "Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên", render_token_cluster(["CEO", "PD", "WKM", "HR", "QA"], current_file, registry))
+        replace_text_fragments(
+            doc,
+            {
+                "lên Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên": "lên CEO / PD",
+            },
+        )
+
+    if role_code == "ITA":
+        set_row_first_cell_html(doc, "Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên", render_token_cluster(["CEO", "ESA"], current_file, registry))
+        set_row_first_cell_html(
+            doc,
+            "All phòng ban / Người dùng",
+            render_token_cluster(["D-SCS", "D-ENG", "D-PROD", "D-QUAL", "D-SCM", "D-FIN", "D-HR", "D-EHS", "D-IT", "Người dùng"], current_file, registry),
+        )
+        set_row_first_cell_html(doc, "QMS / Finance / HR khi liên quan", render_token_cluster(["QMS", "D-FIN", "D-HR"], current_file, registry))
+        replace_text_fragments(
+            doc,
+            {
+                "lên Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên và Governance viên hệ thống Epicor.": "lên CEO / ESA.",
+            },
+        )
+
+    if role_code == "IAO":
+        set_row_first_cell_html(
+            doc,
+            "Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên / Xem xét của lãnh đạo",
+            render_token_cluster(["QA", "QMS", "CEO"], current_file, registry),
+        )
+        set_row_first_cell_html(doc, "HR / Training / QMS", render_token_cluster(["HR", "OJT_COACHES", "QMS"], current_file, registry))
+        set_row_first_cell_html(doc, "đã đánh giá Department", chips(bundle("ALL_DEPTS")))
 
     if role_code == "ESA":
         set_row_first_cell_html(
@@ -1985,6 +2435,12 @@ def apply_jd_specific_tweaks(doc: etree._Element, role_code: str, current_file: 
                 current_file,
                 registry,
             ),
+        )
+        replace_text_fragments(
+            doc,
+            {
+                "lên Trưởng / Giám đốc Điều hành Cán bộ / Nhân viên theo mức độ.": "lên ITA / CEO theo mức độ.",
+            },
         )
 
 
