@@ -19,7 +19,7 @@
 | Phần tử | Dịch? | Lý do |
 |---------|-------|-------|
 | Nội dung text (giữa `>` và `<`) | **CÓ** — dịch sang tiếng Việt | Đây là nội dung người dùng đọc |
-| Thẻ `<title>` | **CÓ** — dịch sang tiếng Việt | Hiển thị trên tab trình duyệt |
+| Thẻ `<title>` (tài liệu kiểm soát) | **KHÔNG** — giữ chuẩn English SSOT theo filename | Đồng bộ với `Tên file / tiêu đề chuẩn` trong Portal và tránh mất link khi rename |
 | Thuộc tính `href` | **KHÔNG** — giữ nguyên | Đường dẫn file, không phải nội dung |
 | Thuộc tính `class` | **KHÔNG** — giữ nguyên | Tên CSS class |
 | Thuộc tính `id` | **KHÔNG** — giữ nguyên | Định danh phần tử |

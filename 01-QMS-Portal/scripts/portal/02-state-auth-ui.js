@@ -2299,7 +2299,7 @@ function renderDocFileList(docs){
     const displayTitle = getDocDisplayTitle(doc);
     const displayDesc = getDocDisplayDescription(doc);
     html += `
-      <div class="fm-file-row ${locked?'locked':''}" ${locked?'':`onclick="openDoc('${doc.code}')"`} ${dragAttr} oncontextmenu="event.preventDefault();event.stopPropagation();openDocEditMenu(event,'${escapeHtml(doc.code)}','${escapeHtml(doc.title)}')" data-doc-code="${doc.code}">
+      <div class="fm-file-row ${locked?'locked':''}" ${locked?'':`onclick="openDoc('${doc.code}')"`} ${dragAttr} oncontextmenu="event.preventDefault();event.stopPropagation();openDocEditMenu(event,'${escapeHtml(doc.code)}')" data-doc-code="${doc.code}">
         <div class="fm-file-icon" style="border-color:${cat?cat.color:'#a5b4fc'}">${getDocIcon(doc.code)}</div>
         <div class="fm-file-name">
           <span style="color:${cat?cat.color:'#64748b'}">${doc.code}</span>
@@ -2309,7 +2309,7 @@ function renderDocFileList(docs){
         <div class="fm-file-rev">v${getDocRevision(doc)}</div>
         <div class="fm-file-status"><span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;background:${statusColor(getDocStatus(doc))}15;color:${statusColor(getDocStatus(doc))}">${statusLabel(getDocStatus(doc))}</span></div>
         <div class="fm-file-access">${locked?'<span style="color:var(--red)">🔒</span>':'<span style="color:var(--green)">✓</span>'}</div>
-        ${folderEditMode&&canCreateNewDoc()?`<div class="fm-file-del"><button class="fm-del-btn-row" onclick="event.stopPropagation();confirmDeleteDoc('${escapeHtml(doc.code)}','${escapeHtml(doc.title)}')" title="${lang==='en'?'Delete':'Xóa'}">🗑️</button></div>`:''}
+        ${folderEditMode&&canCreateNewDoc()?`<div class="fm-file-del"><button class="fm-del-btn-row" onclick="event.stopPropagation();confirmDeleteDoc('${escapeHtml(doc.code)}','${escapeHtml(displayTitle)}')" title="${lang==='en'?'Delete':'Xóa'}">🗑️</button></div>`:''}
       </div>`;
   });
   html += `</div>`;
@@ -2437,6 +2437,7 @@ async function doQuickCreateDoc(folder, cat){
   const owner = (document.getElementById('qc-owner')?.value||'').trim();
   if(!code){ showToast(lang==='en'?'Enter doc code':'Nhập mã tài liệu'); return; }
   if(!title){ showToast(lang==='en'?'Enter title':'Nhập tiêu đề'); return; }
+  if(!ensureEnglishStandardTitle(title)) return;
   try {
     const res = await apiCall('doc_create', {code, title, cat, owner, folder, revision:'0.0'});
     if(res && res.ok){
@@ -2504,17 +2505,19 @@ function openFolderEditMenu(event, folderPath, folderKey){
   setTimeout(()=>document.addEventListener('click', close), 10);
 }
 
-function openDocEditMenu(event, code, title){
+function openDocEditMenu(event, code){
   event.stopPropagation();
   document.querySelectorAll('.fm-context-menu').forEach(m=>m.remove());
+  const doc = DOCS.find(d=>d.code===code) || {};
+  const standardTitle = getDocDisplayTitle(doc) || String(doc.title || '').trim() || code;
   const menu = document.createElement('div');
   menu.className = 'fm-context-menu';
   menu.style.cssText = `position:fixed;top:${event.clientY}px;left:${event.clientX}px;z-index:9999;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.15);padding:6px 0;min-width:180px`;
   const vi=lang!=='en';
   menu.innerHTML = `
     <div class="ctx-item" onclick="openDoc('${escapeHtml(code)}')">📄 ${vi?'Mở tài liệu':'Open document'}</div>
-    <div class="ctx-item" onclick="openDocEditDialog('${escapeHtml(code)}','${escapeHtml(title)}')">✏️ ${vi?'Chỉnh sửa thông tin':'Edit info'}</div>
-    ${canCreateNewDoc()?`<div style="border-top:1px solid #f1f3f5;margin:4px 0"></div><div class="ctx-item ctx-danger" onclick="confirmDeleteDoc('${escapeHtml(code)}','${escapeHtml(title)}')">🗑️ ${vi?'Xóa tài liệu':'Delete document'}</div>`:''}
+    <div class="ctx-item" onclick="openDocEditDialog('${escapeHtml(code)}')">✏️ ${vi?'Chỉnh sửa thông tin':'Edit info'}</div>
+    ${canCreateNewDoc()?`<div style="border-top:1px solid #f1f3f5;margin:4px 0"></div><div class="ctx-item ctx-danger" onclick="confirmDeleteDoc('${escapeHtml(code)}','${escapeHtml(standardTitle)}')">🗑️ ${vi?'Xóa tài liệu':'Delete document'}</div>`:''}
   `;
   document.body.appendChild(menu);
   menu.querySelectorAll('.ctx-item').forEach(item=>{
@@ -2612,8 +2615,31 @@ async function doSaveFolderEdit(folderPath, folderKey){
 }
 
 // ═══ UNIFIED DOC EDIT DIALOG (code + title + desc) ═══
-function openDocEditDialog(code, title){
+function titleHasNonAsciiChars(text){
+  return /[^\x20-\x7E]/.test(String(text||''));
+}
+
+function ensureEnglishStandardTitle(title){
+  const value = String(title || '').trim();
+  if(!value){
+    showToast(lang==='en'?'⚠ Missing standard title':'⚠ Thiếu tên file chuẩn');
+    return false;
+  }
+  if(titleHasNonAsciiChars(value)){
+    showToast(lang==='en'?'⚠ Standard title must be English (ASCII only)':'⚠ Tên file chuẩn phải là tiếng Anh (ASCII)');
+    return false;
+  }
+  if(!/[A-Za-z]/.test(value)){
+    showToast(lang==='en'?'⚠ Invalid standard title':'⚠ Tên file chuẩn không hợp lệ');
+    return false;
+  }
+  return true;
+}
+
+function openDocEditDialog(code){
   document.querySelectorAll('.fm-context-menu').forEach(m=>m.remove());
+  const doc = DOCS.find(d=>d.code===code) || {};
+  const standardTitle = getDocDisplayTitle(doc) || String(doc.title || '').trim() || code;
   const desc = getDocDesc(code);
   const curIcon = getDocIcon(code);
   const modal = document.createElement('div');
@@ -2640,8 +2666,8 @@ function openDocEditDialog(code, title){
         </div>
 
         <div class="modal-field" style="margin-top:10px">
-          <label>${lang==='en'?'Standard title / file name':'Tên file / tiêu đề chuẩn'}</label>
-          <input id="de-title" type="text" value="${escapeHtml(title)}" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
+          <label>${lang==='en'?'English standard title / file name':'Tên file chuẩn tiếng Anh'}</label>
+          <input id="de-title" data-original="${escapeHtml(standardTitle)}" type="text" value="${escapeHtml(standardTitle)}" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
         </div>
 
         <div class="modal-field" style="margin-top:10px">
@@ -2649,7 +2675,7 @@ function openDocEditDialog(code, title){
           <textarea id="de-desc" rows="2" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;font-size:13px" placeholder="${lang==='en'?'Brief Vietnamese description':'Mô tả ngắn bằng tiếng Việt'}">${escapeHtml(desc)}</textarea>
         </div>
 
-        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Portal layout follows Code → English standard title → Vietnamese description. Renaming updates all cross-references automatically.':'Portal hiển thị theo thứ tự Mã tài liệu → tên file chuẩn tiếng Anh → mô tả tiếng Việt. Đổi mã/tiêu đề sẽ cập nhật tất cả tham chiếu chéo tự động.'}</div>
+        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Code + English standard title are SSOT. Changing this field renames the physical file and updates cross-references automatically.':'Mã + tên file chuẩn tiếng Anh là SSOT. Đổi trường này sẽ đổi tên file thật và cập nhật liên kết chéo tự động.'}</div>
       </div>
       <div class="modal-actions">
         <button class="btn-admin" onclick="document.getElementById('doc-edit-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
@@ -2662,8 +2688,15 @@ function openDocEditDialog(code, title){
 
 async function doSaveDocEdit(oldCode){
   const newCode = (document.getElementById('de-code')?.value||'').trim();
-  const newTitle = (document.getElementById('de-title')?.value||'').trim();
+  const titleEl = document.getElementById('de-title');
+  const newTitle = (titleEl?.value||'').trim();
+  const originalTitle = (titleEl?.dataset?.original||'').trim();
   const desc = (document.getElementById('de-desc')?.value||'').trim();
+  if(!newCode){
+    showToast(lang==='en'?'⚠ Missing document code':'⚠ Thiếu mã tài liệu');
+    return;
+  }
+  if(!ensureEnglishStandardTitle(newTitle)) return;
 
   // Save doc description
   if(desc !== getDocDesc(oldCode)){
@@ -2671,8 +2704,11 @@ async function doSaveDocEdit(oldCode){
     try{ await apiCall('save_doc_description', {code: oldCode, description: desc}); }catch(e){}
   }
 
-  // Rename if changed
-  if(newCode && (newCode !== oldCode || newTitle)){
+  const codeChanged = newCode !== oldCode;
+  const titleChanged = newTitle !== originalTitle;
+
+  // Rename file + sync header title when code or standard title changes
+  if(codeChanged || titleChanged){
     try {
       const res = await apiCall('rename_doc', {old_code: oldCode, new_code: newCode, new_title: newTitle});
       if(res && res.ok){
@@ -2932,7 +2968,7 @@ async function executeDeleteFolder(folderPath){
     showToast('\u26A0 Error: '+e.message);
   }
 }
-function openDocContextMenu(event, code, title){ openDocEditMenu(event, code, title); }
+function openDocContextMenu(event, code, title){ openDocEditMenu(event, code); }
 
 // Legacy rename - kept for API compatibility
 async function doRenameFolder(oldPath){
@@ -2962,7 +2998,7 @@ async function doSaveDesc(folderPath){
 }
 
 // Legacy: openRenameDocDialog replaced by openDocEditDialog
-function openRenameDocDialog(code, title){ openDocEditDialog(code, title); }
+function openRenameDocDialog(code, title){ openDocEditDialog(code); }
 
 async function doRenameDoc(oldCode){
   const newCode = (document.getElementById('rd-code')?.value||'').trim();
@@ -3291,6 +3327,7 @@ async function submitCreateDoc(cat){
 
   if(!code){ showToast(lang==='en'?'⚠ Missing document code':'⚠ Thiếu mã tài liệu'); return; }
   if(!title){ showToast(lang==='en'?'⚠ Missing title':'⚠ Thiếu tiêu đề'); return; }
+  if(!ensureEnglishStandardTitle(title)) return;
 
   if(revision && !/^\d+(?:\.\d+)?$/.test(revision)){
     showToast(lang==='en'?'⚠ Invalid version (e.g., 0.0, 1.0, 1.1)':'⚠ Phiên bản không hợp lệ (ví dụ: 0.0, 1.0, 1.1)');

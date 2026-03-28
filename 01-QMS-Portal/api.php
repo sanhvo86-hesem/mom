@@ -1206,6 +1206,131 @@ function slugify(string $text): string {
   return $text === '' ? 'doc' : $text;
 }
 
+function portal_standard_title_token(string $token, int $index): string {
+  $lower = strtolower(trim($token));
+  if ($lower === '') return '';
+  $tokenMap = [
+    'api' => 'API',
+    'ar' => 'AR',
+    'bom' => 'BOM',
+    'cam' => 'CAM',
+    'capa' => 'CAPA',
+    'cnc' => 'CNC',
+    'cmm' => 'CMM',
+    'coc' => 'CoC',
+    'coa' => 'CoA',
+    'csr' => 'CSR',
+    'ctq' => 'CTQ',
+    'dcr' => 'DCR',
+    'dfm' => 'DFM',
+    'eco' => 'ECO',
+    'ecr' => 'ECR',
+    'ehs' => 'EHS',
+    'erp' => 'ERP',
+    'fai' => 'FAI',
+    'fmea' => 'FMEA',
+    'fod' => 'FOD',
+    'frm' => 'FRM',
+    'hr' => 'HR',
+    'it' => 'IT',
+    'jd' => 'JD',
+    'kpi' => 'KPI',
+    'm365' => 'M365',
+    'msa' => 'MSA',
+    'nc' => 'NC',
+    'ncr' => 'NCR',
+    'oee' => 'OEE',
+    'ojt' => 'OJT',
+    'pfmea' => 'PFMEA',
+    'po' => 'PO',
+    'ppc' => 'PPC',
+    'qa' => 'QA',
+    'qc' => 'QC',
+    'qms' => 'QMS',
+    'raci' => 'RACI',
+    'rfq' => 'RFQ',
+    'sla' => 'SLA',
+    'sop' => 'SOP',
+    'spc' => 'SPC',
+    'sscc' => 'SSCC',
+    'swot' => 'SWOT',
+    'wi' => 'WI',
+    'wip' => 'WIP',
+  ];
+  if (isset($tokenMap[$lower])) return $tokenMap[$lower];
+  if (preg_match('/^\d+$/', $lower)) return $lower;
+  $lowerWords = ['a','an','and','as','at','by','for','from','in','of','on','or','the','to','via','with'];
+  if ($index > 0 && in_array($lower, $lowerWords, true)) return $lower;
+  return strtoupper(substr($lower, 0, 1)) . substr($lower, 1);
+}
+
+function portal_standard_title_from_filename(string $fileName, string $code = ''): string {
+  $stem = pathinfo($fileName, PATHINFO_FILENAME);
+  if ($stem === '') return portal_fallback_doc_title($fileName);
+
+  $codeNorm = strtoupper(trim($code));
+  if ($codeNorm === '') $codeNorm = scan_extract_code($fileName);
+  $codeTokens = preg_split('/[^a-z0-9]+/i', strtolower($codeNorm), -1, PREG_SPLIT_NO_EMPTY);
+  if (is_array($codeTokens) && !empty($codeTokens)) {
+    $parts = array_map(static fn(string $t): string => preg_quote($t, '/'), $codeTokens);
+    $prefixPattern = '/^' . implode('[-_]+', $parts) . '(?:[-_]+)?/i';
+    $removed = preg_replace($prefixPattern, '', $stem, 1);
+    if (is_string($removed)) $stem = $removed;
+  }
+  $stem = trim((string)$stem, "-_ \t\n\r\0\x0B");
+  if ($stem === '') return portal_fallback_doc_title($fileName);
+
+  $tokens = preg_split('/[-_]+/', $stem, -1, PREG_SPLIT_NO_EMPTY);
+  if (!is_array($tokens) || empty($tokens)) return portal_fallback_doc_title($fileName);
+
+  $out = [];
+  foreach ($tokens as $idx => $token) {
+    $converted = portal_standard_title_token((string)$token, (int)$idx);
+    if ($converted !== '') $out[] = $converted;
+  }
+  if (empty($out)) return portal_fallback_doc_title($fileName);
+  $title = trim((string)preg_replace('/\s+/', ' ', implode(' ', $out)));
+  return $title !== '' ? $title : portal_fallback_doc_title($fileName);
+}
+
+function portal_standard_title_from_rel_path(string $relPath, string $code = ''): string {
+  return portal_standard_title_from_filename((string)basename($relPath), $code);
+}
+
+function portal_title_has_non_ascii(string $title): bool {
+  return preg_match('/[^\x20-\x7E]/', $title) === 1;
+}
+
+function portal_sync_doc_title_blocks(string $html, string $docCode, string $title): string {
+  $docCode = strtoupper(trim($docCode));
+  $title = trim($title);
+  if ($docCode === '' || $title === '') return $html;
+
+  $safeTitleTag = htmlspecialchars($docCode . ' - ' . $title . ' | HESEM QMS', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+  $safeDocLabel = htmlspecialchars($docCode . ' - ' . $title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+  $next = preg_replace('/<title[^>]*>.*?<\/title>/isu', '<title>' . $safeTitleTag . '</title>', $html, 1);
+  if (is_string($next)) $html = $next;
+
+  $next = preg_replace_callback(
+    '/(<div[^>]*class=["\'][^"\']*\btitle\b[^"\']*["\'][^>]*>\s*<strong>).*?(<\/strong>)/isu',
+    static fn(array $m): string => (string)($m[1] ?? '') . $safeDocLabel . (string)($m[2] ?? ''),
+    $html,
+    1
+  );
+  if (is_string($next)) $html = $next;
+
+  $next = preg_replace_callback(
+    '/(<h1[^>]*class=["\'][^"\']*\bh1\b[^"\']*["\'][^>]*>).*?(<\/h1>)/isu',
+    static fn(array $m): string => (string)($m[1] ?? '') . $safeDocLabel . (string)($m[2] ?? ''),
+    $html,
+    1
+  );
+  if (is_string($next)) $html = $next;
+
+  return $html;
+}
+
 
 // =============================
 // Per-folder "_Archive" store
@@ -3071,6 +3196,7 @@ switch ($action) {
 
     if ($code === '') api_json(['ok' => false, 'error' => 'missing_code'], 400);
     if ($title === '') api_json(['ok' => false, 'error' => 'missing_title'], 400);
+    if (portal_title_has_non_ascii($title)) api_json(['ok' => false, 'error' => 'title_must_be_english_ascii'], 400);
     if ($cat === '') api_json(['ok' => false, 'error' => 'missing_category'], 400);
 
     if ($folder === '') {
@@ -5770,17 +5896,8 @@ if ($username === '') {
 
     // Helper: extract title from HTML <title> tag
     function extract_title(string $absFile, string $fallback): string {
-      $fallbackTitle = portal_fallback_doc_title($fallback);
-      if (portal_get_doc_extension($absFile) !== 'html') return $fallbackTitle;
-      $head = @file_get_contents($absFile, false, null, 0, 2048);
-      if (!$head) return $fallbackTitle;
-      if (preg_match('/<title[^>]*>([^<]+)<\/title>/i', $head, $tm)) {
-        $raw = html_entity_decode(trim($tm[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $raw = preg_replace('/\s*\|\s*HESEM\s*(OS|QMS)\s*$/i', '', $raw);
-        if (preg_match('/^[A-Z0-9-]+\s*[—–-]\s*(.+)$/u', $raw, $tm2)) return $tm2[1];
-        return $raw;
-      }
-      return $fallbackTitle;
+      $code = scan_extract_code($fallback);
+      return portal_standard_title_from_filename($fallback, $code);
     }
 
     $append_scanned_doc = function(string $absFile, string $relPath, string $topCat, ?string $subName, string $folderPath) use (&$docs, &$seen, $docOwnerOverrides, $allowedExtensions): bool {
@@ -6449,6 +6566,7 @@ if ($username === '') {
       $newTitle = trim((string)($data['new_title'] ?? ''));
       if ($oldCode === '') api_json(['ok' => false, 'error' => 'missing_old_code'], 400);
       if ($newCode !== '' && !preg_match('/^[A-Z0-9_-]{3,40}$/', $newCode)) api_json(['ok' => false, 'error' => 'bad_new_code'], 400);
+      if ($newTitle !== '' && portal_title_has_non_ascii($newTitle)) api_json(['ok' => false, 'error' => 'title_must_be_english_ascii'], 400);
 
       // ── Find doc from scan cache or custom_docs ──
       $foundFile = null;
@@ -6530,29 +6648,34 @@ if ($username === '') {
       $oldRel = (string)$foundRel;
       $oldFilename = basename($foundFile);
       $updated = 0;
+      $currentTitle = portal_standard_title_from_rel_path($oldRel, $oldCode);
+      $effectiveCode = $newCode !== '' ? $newCode : $oldCode;
+      if ($newTitle === '') $newTitle = $currentTitle;
+      if ($newTitle === '') $newTitle = $effectiveCode;
 
       // ── Update title in HTML content ──
-      if ($newTitle !== '') {
+      if (portal_get_doc_extension($foundFile) === 'html') {
         $content = @file_get_contents($foundFile);
         if ($content !== false) {
-          $content = preg_replace('/<title>[^<]*<\/title>/', '<title>' . htmlspecialchars($newTitle, ENT_QUOTES, 'UTF-8') . '</title>', $content);
-          $safeH1 = htmlspecialchars(($newCode ?: $oldCode) . ' — ' . $newTitle, ENT_QUOTES, 'UTF-8');
-          $content = preg_replace('/(<h1[^>]*>).*?(<\/h1>)/s', '$1' . $safeH1 . '$2', $content, 1);
+          $content = portal_sync_doc_title_blocks((string)$content, $effectiveCode, $newTitle);
           @file_put_contents($foundFile, $content);
         }
       }
 
       // ── Rename file if code changed ──
       $renamedRel = $foundRel;
-      if ($newCode !== '' && $newCode !== $oldCode) {
+      $titleSlugChanged = slugify($newTitle) !== slugify($currentTitle);
+      if (($newCode !== '' && $newCode !== $oldCode) || $titleSlugChanged) {
         $dir = dirname($foundFile);
-        $newSlug = strtolower(str_replace(['_', ' '], '-', $newCode));
+        $newSlug = strtolower(str_replace(['_', ' '], '-', $effectiveCode));
         if ($newTitle !== '') {
           $titleSlug = substr(preg_replace('/[^a-z0-9]+/', '-', strtolower($newTitle)), 0, 60);
           $newSlug .= '-' . trim($titleSlug, '-');
         }
         $newSlug = preg_replace('/-+/', '-', trim($newSlug, '-'));
-        $newFileName = $newSlug . '.html';
+        $ext = pathinfo($oldFilename, PATHINFO_EXTENSION);
+        if ($ext === '') $ext = 'html';
+        $newFileName = $newSlug . '.' . strtolower((string)$ext);
         $newFilePath = $dir . '/' . $newFileName;
         if ($oldFilename !== $newFileName) {
           if (is_file($newFilePath)) api_json(['ok' => false, 'error' => 'file_exists'], 400);
@@ -6560,7 +6683,7 @@ if ($username === '') {
           $relDir = dirname($oldRel);
           $renamedRel = ($relDir === '.' || $relDir === '/') ? $newFileName : ($relDir . '/' . $newFileName);
           $renamedRel = ltrim(str_replace('\\', '/', $renamedRel), './');
-          rename_doc_store_assets($ROOT_DIR, $oldRel, $renamedRel, $newCode);
+          rename_doc_store_assets($ROOT_DIR, $oldRel, $renamedRel, $effectiveCode);
 
           // Update cross-references in ALL HTML files
           $scanIter = new RecursiveIteratorIterator(
@@ -6593,13 +6716,26 @@ if ($username === '') {
         if (!is_array($cd)) continue;
         if (strtoupper((string)($cd['code'] ?? '')) === $oldCode) {
           if ($newCode !== '') { $cd['code'] = $newCode; $changed = true; }
-          if ($newTitle !== '') { $cd['title'] = $newTitle; $changed = true; }
+          if (($cd['title'] ?? null) !== $newTitle) { $cd['title'] = $newTitle; $changed = true; }
           $cd['path'] = $renamedRel; $changed = true;
           break;
         }
       }
       unset($cd);
       if ($changed) save_custom_docs($CUSTOM_DOCS_FILE, $custom);
+
+      // Move description key when document code changes.
+      if ($newCode !== '' && $newCode !== $oldCode) {
+        $descFile = $DATA_DIR . '/config/doc_descriptions.json';
+        if (is_file($descFile)) {
+          $descs = @json_decode(@file_get_contents($descFile), true) ?: [];
+          if (is_array($descs) && array_key_exists($oldCode, $descs) && !array_key_exists($newCode, $descs)) {
+            $descs[$newCode] = $descs[$oldCode];
+            unset($descs[$oldCode]);
+            @file_put_contents($descFile, json_encode($descs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX);
+          }
+        }
+      }
       invalidate_scan_cache($DATA_DIR);
 
       api_json(['ok' => true, 'new_path' => $renamedRel, 'updated_files' => $updated]);

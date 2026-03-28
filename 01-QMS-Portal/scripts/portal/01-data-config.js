@@ -1567,10 +1567,10 @@ function getDocDisplayTitle(doc){
   const rawTitle = String(doc.title || '').trim();
   const code = String(doc.code || '').trim();
   const derivedTitle = deriveDocTitleFromPath(doc);
-  // Keep header text in sync with Admin "Edit Document" title input.
-  // Only derive from path when title is missing or equals code.
-  if(!rawTitle || rawTitle.toUpperCase() === code.toUpperCase()) return derivedTitle || rawTitle || code;
-  return rawTitle;
+  // SSOT rule: standard title shown in portal follows physical filename (English).
+  if(derivedTitle) return derivedTitle;
+  if(rawTitle && rawTitle.toUpperCase() !== code.toUpperCase()) return rawTitle;
+  return rawTitle || code;
 }
 
 function getDocDisplayDescription(doc){
