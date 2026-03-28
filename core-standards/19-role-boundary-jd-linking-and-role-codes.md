@@ -1,96 +1,98 @@
 # 19. Role Boundary, JD Linking and Role Codes
 
-> Version: v1 | Date: 2026-03-28 | Owner: QMS Engineer
+> Version: v2 | Date: 2026-03-28 | Owner: QMS Engineer
 
 ---
 
-## 1. Mục tiêu
+## 1. Muc tieu
 
-Tài liệu này khóa chuẩn bắt buộc cho toàn bộ hệ thống QMS khi dùng chức danh, vai trò chủ trì, quyền hạn, RACI, cổng kiểm soát và KPI owner trong mô hình `job-order CNC`.
+Tai lieu nay khoa chuan bat buoc cho toan bo he thong QMS khi dung:
+- chuc danh;
+- vai tro chu tri;
+- quyen han;
+- RACI;
+- owner KPI;
+- owner du lieu;
+- hold/release authority;
+- actor trong exception va escalation.
 
-Mục tiêu là chặn 5 lỗi hệ thống:
-- dùng chức danh trôi dạt, không khớp JD thật;
-- dùng placeholder mơ hồ như `Process Owner`, `Department Head`, `Responsible Person`, `Data Owner` như thể đó là chức danh;
-- dùng một vai trò không có trong JD nhưng vẫn giao quyền vận hành thật;
-- ghi dài dòng ở header/RACI khiến người đọc không nhận ra ai có quyền thật;
-- thay thế chức danh cơ học mà không nghiên cứu ranh giới vai trò của chính SOP đó.
+Muc tieu la chan 6 loi he thong:
+- dung chuc danh troi dat, khong khop JD that;
+- dung placeholder mo ho nhu `Process Owner`, `Department Head`, `Data Owner`, `QA/QMS`;
+- giao authority cho mot vai tro khong ton tai trong JD;
+- thay the co hoc bang mot cum vai tro qua rong khong dung ngu canh SOP;
+- viet role dai dong trong header/RACI khien nguoi doc khong nhan ra ai co quyen that;
+- de sot role chung chung trong tai lieu cap doanh nghiep cua mo hinh `job-order CNC`.
 
 ---
 
-## 2. Chuẩn nguồn chân lý
+## 2. Nguon chan ly
 
-Nguồn chân lý vai trò gồm 3 lớp, theo thứ tự ưu tiên:
+Nguon chan ly vai tro gom 3 lop, theo thu tu uu tien:
 
 1. `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/`
 2. `tools/data/role-registry-job-order-cnc.json`
 3. `tools/data/qms-terminology-dictionary.xlsx`
 
-Nếu 3 lớp này mâu thuẫn nhau:
-- JD thật là nguồn gốc đầu tiên để xác nhận có hay không có vị trí;
-- role registry là nguồn gốc hiển thị dùng cho header/RACI/link JD;
-- workbook là từ điển tham chiếu cho người soạn thảo, không được phép đi ngược JD/registry.
+Neu 3 lop mau thuan nhau:
+- JD that la nguon goc dau tien de xac nhan co hay khong co vai tro;
+- role registry la nguon hien thi chuan de dung trong HTML, header, RACI va link JD;
+- workbook chi la tu dien tham chieu, khong duoc phep di nguoc JD va registry.
 
-Không được phát hành SOP/WI/ANNEX/JD mới nếu vai trò trong tài liệu chưa được resolve vào một trong 3 lớp trên.
+Khong duoc phat hanh SOP/WI/ANNEX/JD moi neu vai tro trong tai lieu chua resolve vao 1 trong 3 lop tren.
 
 ---
 
-## 3. Mô hình chuẩn cho job-order CNC
+## 3. Mo hinh role cho job-order CNC
 
-HESEM vận hành theo mô hình `job-order CNC`, tức:
+HESEM van hanh theo mo hinh `job-order CNC`, tuc la:
 - high-mix, low-to-medium volume;
-- luồng RFQ -> contract review -> engineering release -> material readiness -> setup -> first-piece/FAI -> production -> final release -> shipment;
-- nhiều handoff giữa thương mại, kỹ thuật, kế hoạch, xưởng, QC và logistics;
-- quyền HOLD rộng hơn quyền RELEASE;
-- mỗi gate chỉ đi tiếp khi đủ bằng chứng.
+- nhieu handoff giua thuong mai, ky thuat, ke hoach, xuong, QC, logistics va tai chinh;
+- quyen HOLD rong hon quyen RELEASE;
+- moi gate chi di tiep khi du bang chung.
 
-Vì vậy ranh giới vai trò phải tách rõ:
-- vai trò giao tiếp khách hàng;
-- vai trò định giá thương mại;
-- vai trò feasibility/DFM;
-- vai trò process/routing/setup standard;
-- vai trò CAM/NC;
-- vai trò planning/dispatch;
-- vai trò workshop execution;
-- vai trò setup/prove-out;
-- vai trò operator execution;
-- vai trò QC execution;
-- vai trò quality governance/release;
-- vai trò metrology/MSA confidence;
-- vai trò supply chain sourcing;
-- vai trò warehouse/logistics execution;
-- vai trò finance closing;
-- vai trò HR/EHS/IT system support.
+Vi vay role boundary phai tach ro:
+- thuong mai va customer communication;
+- quoting va commit gia;
+- engineering feasibility va release;
+- process/routing/setup standard;
+- shop scheduling va dispatch;
+- workshop execution;
+- frontline leadership tai diem dung;
+- QC/QA/QMS governance;
+- supply chain, warehouse, shipping;
+- finance closeout;
+- HR/EHS/IT support.
 
-Không được gộp các ranh giới này chỉ vì tài liệu cũ từng viết gộp.
+Khong duoc gop cac ranh gioi nay chi vi tai lieu cu tung viet gop.
 
 ---
 
-## 4. Base Roles và Governance Hats
+## 4. Cac lop role duoc phep
 
 ### 4.1 Base roles
 
-Base role là vị trí có JD thật. Ví dụ:
+Base role la vi tri co JD that. Vi du:
 - `CEO`, `PD`
-- `ENGM`, `DFM`, `PE`, `CAM`
-- `PPL`, `WKM`, `SL`, `SET`, `OPR`, `MNT`
-- `QA`, `QE`, `QMS`, `QCL`, `QC`, `MCS`, `IAO`
-- `SCM`, `BUY`, `WAR`, `TOOL`, `LOG`
 - `CS`, `EST`
+- `ENGM`, `DFM`, `PE`, `CAM`
+- `PPL`, `WKM`, `SL`, `SET`, `OPR`, `MNT`, `CPS`, `DBL`
+- `QA`, `QMS`, `QE`, `QCL`, `QC`, `MCS`
+- `SCM`, `BUY`, `WAR`, `TOOL`, `LOG`
 - `FIN`, `APAR`, `GLP`
 - `HR`, `EHS`, `ITA`, `ESA`
-- `CPS`, `CPT`, `DBL`, `DBT`
 
-Base role chỉ được tạo khi:
-- có JD riêng;
-- có đường báo cáo rõ;
-- có ranh giới trách nhiệm ổn định;
-- có nhu cầu dùng lặp lại trong nhiều tài liệu.
+Chi tao base role moi khi:
+- co JD rieng;
+- co duong bao cao ro;
+- co ranh gioi trach nhiem on dinh;
+- co nhu cau dung lap lai trong nhieu tai lieu.
 
 ### 4.2 Governance hats
 
-Governance hat không phải vị trí độc lập. Đó là “mũ” quản trị gắn lên một base role.
+Governance hat khong phai vi tri doc lap. Do la "mu" quan tri gan len mot base role that.
 
-Các hat chuẩn hiện hành:
+Hat chuan hien hanh:
 - `QA[QMR]`
 - `QMS[DC]`
 - `QMS[LA]`
@@ -99,198 +101,272 @@ Các hat chuẩn hiện hành:
 - `CEO[IC-BIZ]`
 - `PD[IC-PROD]`
 - `EHS[IC-EHS]`
-- `ITA[IC-IT]` hoặc `ESA[IC-IT]`
+- `ITA[IC-IT]`
+- `ESA[IC-IT]`
 
-Quy tắc:
-- không viết trần `QMR`, `Document Controller`, `Lead Auditor`, `CI Lead`, `Product Safety Officer`, `Incident Commander`;
-- phải gắn hat lên host role thật;
-- nếu một hat đổi host role thì phải cập nhật cả JD, role registry và tài liệu liên quan.
+Quy tac:
+- khong viet tran `QMR`, `Lead Auditor`, `Document Controller`, `CI Lead`, `Incident Commander`;
+- phai gan hat len host role that;
+- neu host role thay doi, phai cap nhat ca JD, registry va tai lieu lien quan.
 
 ### 4.3 Role bundles
 
-Role bundle không phải JD mới. Đây là nhóm explicit của nhiều base role thật, dùng khi một trách nhiệm xuyên nhiều vai trò nhưng vẫn phải truy về JD gốc của từng người.
+Role bundle khong phai JD moi. Day la nhom explicit cua nhieu base role that, dung khi mot trach nhiem thuc su la lop actor chung nhung van phai truy ve JD goc cua tung nguoi.
 
-Bundle chuẩn hiện hành:
+Bundle chuan hien hanh:
 - `TOP_MGMT`
 - `FUNC_HEADS`
+- `FUNC_OWNERS`
 - `COMMERCIAL_FRONT`
 - `QUALITY_CORE`
 - `ENG_RELEASE_CORE`
 - `AREA_LEADS`
+- `POU_LEADS`
+- `OPS_SCOPE_OWNERS`
+- `FRONTLINE_LEADS`
+- `DEPLOYMENT_LEADS`
+- `DIRECT_LINE_MGRS`
+- `OJT_COACHES`
+- `KNOWLEDGE_SMES`
+- `MR_REPORT_OWNERS`
 
-`AREA_LEADS` trong bối cảnh `job-order CNC` là bundle cho vai trò dẫn dắt hiện trường và kiểm soát khu vực vận hành, hiện chốt gồm:
-- `SL`
-- `WKM`
-- `CPS`
-- `QCL`
+Y nghia bat buoc:
+- `FUNC_HEADS` = `PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA`
+- `FUNC_OWNERS` = `CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA`
+- `AREA_LEADS` = `SL / WKM / CPS / QCL`
+- `POU_LEADS` = `WKM / SL / QCL / SCM`
+- `OPS_SCOPE_OWNERS` = `CS / EST / PPL / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA / WKM / SL / QCL / LOG`
+- `FRONTLINE_LEADS` = `WKM / SL / DBL / CPS / QCL`
+- `DEPLOYMENT_LEADS` = `WKM / SL / DBL / CPS / QCL / HR`
+- `DIRECT_LINE_MGRS` = `CEO / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA / WKM / SL / DBL / CPS / QCL`
+- `OJT_COACHES` = `ENGM / PE / QE / MCS / WKM / SL / SET / QCL / MNT / TOOL / ESA`
+- `KNOWLEDGE_SMES` = `DFM / CAM / PE / QE / MCS / WKM / SET / QCL / MNT / TOOL / ESA`
+- `MR_REPORT_OWNERS` = `CS / EST / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA`
 
-Quy tắc:
-- không tạo bundle để che mờ trách nhiệm;
-- bundle chỉ dùng khi trách nhiệm thực sự là lớp actor chung, không phải một JD đơn lẻ;
-- nếu quy trình chỉ áp cho một khu vực hẹp thì phải dùng subset explicit hoặc base role cụ thể, không lấy bundle rộng cho tiện.
+Quy tac bundle:
+- khong tao bundle de che mo trach nhiem;
+- bundle chi dung khi trach nhiem thuc su la lop actor chung, khong phai mot JD don le;
+- neu SOP chi ap cho mot pham vi hep, phai dung subset explicit hoac base role cu the, khong lay bundle rong cho tien.
 
 ---
 
-## 5. Placeholder bị cấm trong owner/RACI
+## 5. Placeholder bi cam
 
-Các cụm sau bị cấm xuất hiện độc lập trong header, owner cell, RACI cell, hold/release authority cell hoặc approver cell:
+Cam xuat hien doc lap trong header, owner cell, RACI cell, hold/release cell, approver cell, KPI owner cell:
 - `Process Owner`
 - `Department Head`
+- `Department head`
 - `Functional Head`
 - `Lead Department`
 - `Responsible Person`
 - `Document Owner`
 - `Data Owner`
+- `QA/QMS`
+- `QMS/QA`
+- `HR Lead`
+- `Team Leader`
+- `Supervisor`
 - `Top Management`
 - `Approval Board`
 - `Change Owner`
 - `Commercial Responsible Person`
 
-Nếu cần dùng các khái niệm này, phải resolve thành một trong 3 dạng:
+Neu can dung cac khai niem nay, phai resolve thanh mot trong 3 dang:
 
-1. Một base role cụ thể.
-2. Một governance hat gắn trên base role.
-3. Một explicit role bundle gồm nhiều base role được render bằng nhiều role chips có link JD.
+1. mot base role cu the;
+2. mot governance hat gan tren base role;
+3. mot explicit role bundle duoc render bang role chips co link JD.
 
-Ví dụ đúng:
+Vi du dung:
 - `QA[QMR]`
 - `QMS[DC]`
 - `CS / EST / PPL`
-- `PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA`
+- `CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA`
+- `WKM / SL / DBL / CPS / QCL`
 
-Ví dụ sai:
+Vi du sai:
 - `Process Owner`
 - `Department Head + QA`
-- `Responsible Person Thương mại`
+- `Responsible Person Thuong mai`
 - `Top Management`
+- `QA/QMS`
+- `Team Leader / Supervisor`
+
+### 5.1 Rule resolve `truong bo phan` va role chung chung
+
+Khi tai lieu cu viet `truong bo phan`, `department head`, `supervisor`, `team leader`, `process owner` hoac `data owner`, nguoi sua KHONG duoc doi co hoc bang mot bundle duy nhat cho toan he thong. Phai tra loi ro 3 cau hoi truoc khi chot role:
+
+1. Day la owner chuc nang kinh doanh hay owner hien truong?
+2. Day la owner authority, owner tri du lieu, hay nguoi thuc thi tac nghiep?
+3. Day la pham vi enterprise, pham vi function, hay pham vi cell/shift/point-of-use?
+
+Mapping bat buoc theo ngu canh:
+- commercial function owner: `CS / EST`
+- enterprise functional owner: `FUNC_OWNERS`
+- point-of-use / document deployment / visual control: `POU_LEADS`
+- cross-functional operational scope owner: `OPS_SCOPE_OWNERS`
+- line-manager accountability cho nang luc va phan cong: `DIRECT_LINE_MGRS`
+- OJT / coaching / xac nhan thao tac: `OJT_COACHES`
+- technical SME / knowledge gate: `KNOWLEDGE_SMES`
+
+Neu sau khi doc SOP cu va JD van khong xac dinh duoc vai tro, phai:
+- xem ngu canh gate, KPI, exception, record owner va escalation;
+- doi chieu route job-order CNC thuc te;
+- neu van phat sinh mot role assignment moi co tinh on dinh, cap nhat registry, core standard va JD truoc khi dua vao SOP.
+
+Khong duoc de lai cac cum mo nhu:
+- `truong bo phan`
+- `department head lien quan`
+- `nguoi phu trach qua trinh`
+- `nguoi chiu trach nhiem KPI`
+- `trainer / mentor`
+- `supervisor`
+
+Neu muon nhac toi mot vai tro giao viec tam thoi nhu nguoi kem cap, chi duoc mo ta trong prose la `nguoi kem cap duoc chi dinh`; khong duoc dat no vao owner cell, approver cell hay header neu vai tro do khong co JD.
 
 ---
 
-## 6. Quy tắc hiển thị
+## 6. Quy tac hien thi
 
 ### 6.1 Header
 
-Header dùng role code rút gọn, không dùng chức danh dài.
+Header dung role code rut gon, khong dung chuc danh dai.
 
-Ví dụ đúng:
-- `Chủ sở hữu: QMS[DC] + QA[QMR]`
-- `Chủ sở hữu: CS / EST / PPL`
-- `Phê duyệt: CEO`
+Vi du dung:
+- `Chu so huu: QMS[DC] + QA[QMR]`
+- `Chu so huu: CS / EST / PPL`
+- `Phe duyet: CEO`
 
-Role code trong header phải:
-- hiển thị bằng chip ngắn;
-- link trực tiếp tới JD tương ứng;
-- dùng đúng relative path;
-- không để text trần khi đã có JD.
+Role code trong header phai:
+- hien thi bang chip ngan;
+- link truc tiep toi JD tuong ung;
+- dung dung relative path;
+- khong de text tran khi da co JD.
 
 ### 6.2 Section 4 / 6 / 8 / RACI / owner columns
 
-Trong các bảng vai trò, authority, gate, hold/release, exception:
-- ưu tiên dùng role code chip;
-- nếu cần nhiều vai trò, render nhiều chip;
-- không dùng text dài khi có thể render chip.
+Trong cac bang vai tro, authority, gate, hold/release, exception:
+- uu tien dung role code chip;
+- neu can nhieu vai tro, render nhieu chip;
+- khong dung text dai khi co the render chip.
 
 ### 6.3 Narrative prose
 
-Trong thân tài liệu:
-- thuật ngữ vận hành theo rule `English term (tiếng Việt chuẩn)` của Section 3;
-- còn chức danh JD dùng tên English chuẩn nếu cần viết đầy đủ trong câu;
-- không dùng nửa Anh nửa Việt kiểu `QA Lead`, `Customer Dịch vụ`, `Governance viên hệ thống Epicor`, `Production Engineer-IE`.
+Trong than tai lieu:
+- thuat ngu van hanh theo rule `English term (tieng Viet chuan)` cua Section 3;
+- chuc danh JD dung ten English chuan neu can viet day du trong cau;
+- khong dung nua Anh nua Viet kieu `QA Lead`, `Customer Dich vu`, `Production Engineer-IE`.
 
-### 6.4 Placeholder trong prose và label cột
+### 6.4 Role placeholder trong prose va label cot
 
-Trong prose, note, label cột hoặc giải thích:
-- không để nguyên English placeholder kiểu `Responsible Person`, `Top Management`, `Supervisor` nếu tài liệu đang viết tiếng Việt;
-- phải đổi thành tiếng Việt vận hành chuẩn, hoặc resolve thành role code / role bundle nếu đó là owner thực;
-- ví dụ:
-  - `Responsible Person` -> `người chịu trách nhiệm` hoặc `vai trò chủ trì`
-  - `Top Management` -> `Ban lãnh đạo` hoặc bundle explicit như `TOP_MGMT`
-  - `Supervisor` -> mô tả đúng bối cảnh như `cấp quản lý hiện trường` hoặc resolve thành bundle `AREA_LEADS`
+Trong prose, note, label cot hoac giai thich:
+- khong de nguyen placeholder kieu `Responsible Person`, `Top Management`, `Supervisor`;
+- phai doi thanh tieng Viet van hanh chuan, hoac resolve thanh role code / role bundle neu do la owner that;
+- khong duoc viet `QA/QMS`, `Department Head`, `Lead Department`, `Data Owner`, `Process Owner` nhu mot vai tro that neu chua neu ro do la ai.
 
-Không được dùng English placeholder như một lối tắt vì sẽ làm mờ ranh giới trách nhiệm.
+Vi du:
+- `Responsible Person` -> `nguoi chiu trach nhiem` hoac `vai tro chu tri`
+- `Top Management` -> `Ban lanh dao` hoac `TOP_MGMT`
+- `Supervisor` -> `cap quan ly hien truong` hoac explicit frontline roles nhu `WKM / SL / DBL / CPS / QCL`
 
 ---
 
-## 7. JD Rules
+## 7. Rule rieng cho HESEM commercial va frontline
 
-Mỗi JD phải có:
-- mã JD rút gọn theo role code, ví dụ `JD-QA`, `JD-CS`, `JD-PPL`;
-- title English chuẩn;
-- subtitle tiếng Việt chuẩn;
-- row `Mã vai trò dùng trong SOP/RACI`;
-- nếu có, row `Mũ quản trị có thể gắn`.
+### 7.1 Khong duoc viet chung `Department Head` cho nhanh thuong mai
 
-Meta header của JD phải dùng nhãn tiếng Việt:
-- `Mã`
-- `Phiên bản`
-- `Ngày hiệu lực`
-- `Chủ sở hữu`
-- `Phê duyệt`
+HESEM hien khong co JD `Sales Manager` rieng. Vi vay:
+- neu tai lieu cap doanh nghiep can neu owner thuong mai, phai ghi ro `CS / EST`;
+- neu can tuyen phe duyet thuong mai cuoi cung, phai ghi `CEO`;
+- khong duoc viet chung `Sales Head`, `Department Head`, `Lead Department`.
 
-Các vùng được phép dùng role chip trong JD:
+### 7.2 Khong duoc viet chung `Supervisor` cho hien truong
+
+Neu y la cap quan ly truc tiep tai diem dung trong nha may `job-order CNC`, phai resolve ve vai tro that:
+- `WKM`
+- `SL`
+- `DBL`
+- `CPS`
+- `QCL`
+
+Khong duoc de tran `Supervisor` hoac `Team Leader` trong SOP/WI/ANNEX neu tai lieu dang giao authority that.
+
+---
+
+## 8. Rule cho `Process Owner` va `Data Owner`
+
+`Process Owner` va `Data Owner` la hai cum de sai nhat. Tu nay:
+- khong duoc tu dong mass-replace chung bang mot bundle mac dinh;
+- phai resolve theo dung logic cua chinh SOP do.
+
+Bat buoc tra loi ro 4 cau hoi:
+- ai that su so huu process hay bao cao do;
+- ai giu source data;
+- ai co quyen action;
+- ai co quyen stop/review/release.
+
+Neu chua tra loi duoc 4 cau hoi tren, khong duoc resolve co hoc.
+
+---
+
+## 9. JD rules
+
+Moi JD phai co:
+- ma JD rut gon theo role code, vi du `JD-QA`, `JD-CS`, `JD-PPL`;
+- title English chuan;
+- subtitle tieng Viet chuan;
+- row `Ma vai tro dung trong SOP/RACI`;
+- neu co, row `Mu quan tri co the gan`.
+
+Meta header cua JD phai dung nhan tieng Viet:
+- `Ma`
+- `Phien ban`
+- `Ngay hieu luc`
+- `Chu so huu`
+- `Phe duyet`
+
+Vung duoc phep dung role chip trong JD:
 - header owner/approver;
-- row `Mã vai trò dùng trong SOP/RACI`;
-- row `Mũ quản trị có thể gắn`;
-- các bảng authority/RACI/quyền hạn nếu có.
+- row `Ma vai tro dung trong SOP/RACI`;
+- row `Mu quan tri co the gan`;
+- cac bang authority/RACI/quyen han neu co.
 
-Các vùng không được tự động render chip:
-- `Chức danh theo tài liệu`
-- title English của JD
-- subtitle tiếng Việt của JD
-- mô tả narrative đang dùng chức danh như một danh từ ngữ nghĩa, không phải cell quyền hạn.
+Vung khong duoc tu dong render chip:
+- `Chuc danh theo tai lieu`
+- title English cua JD
+- subtitle tieng Viet cua JD
+- mo ta narrative dang dung chuc danh nhu mot danh tu ngu nghia, khong phai cell quyen han.
 
-Nếu SOP phát sinh một vai trò lặp lại mà chưa có JD:
-- không được vá tạm bằng text tự nghĩ;
-- phải quyết định đó là base role mới hay governance hat;
-- nếu là base role mới, phải tạo/cập nhật JD trước khi phát hành SOP;
-- nếu là hat, phải cập nhật JD của host role để mô tả quyền, phạm vi và giới hạn của hat đó.
+Neu SOP phat sinh mot vai tro lap lai ma chua co JD:
+- khong duoc va tam bang text tu nghia;
+- phai quyet dinh do la base role moi hay governance hat;
+- neu la base role moi, phai tao/cap nhat JD truoc khi phat hanh SOP;
+- neu la hat, phai cap nhat JD cua host role de mo ta quyen, pham vi va gioi han cua hat do.
 
 ---
 
-## 8. Phương pháp nghiên cứu vai trò trước khi sửa tài liệu
+## 10. Phuong phap nghien cuu role truoc khi sua tai lieu
 
-Khi gặp một vai trò/alias chưa rõ:
+Khi gap mot vai tro / alias chua ro:
 
-1. Đọc JD hiện có và tài liệu cũ để xem đang được hiểu như thế nào.
-2. Đối chiếu benchmark chính thức bên ngoài theo đúng bối cảnh `job-order CNC`.
-3. Chốt ranh giới:
-   - ai giữ dữ liệu,
-   - ai quyết định,
+1. Doc JD hien co va tai lieu cu de xem dang duoc hieu nhu the nao.
+2. Doi chieu benchmark chinh thuc ben ngoai theo dung boi canh `job-order CNC`.
+3. Chot ranh gioi:
+   - ai giu du lieu,
+   - ai quyet dinh,
    - ai release,
-   - ai chỉ execute,
-   - ai có quyền stop.
-4. Xác định vai trò đó là:
+   - ai chi execute,
+   - ai co quyen stop.
+4. Xac dinh vai tro do la:
    - base role,
    - governance hat,
    - role bundle,
-   - hay chỉ là placeholder phải cấm.
-5. Cập nhật registry/JD/core-standard trước khi cập nhật SOP.
+   - hay chi la placeholder phai cam.
+5. Neu tai lieu dang dung placeholder kieu `Process Owner`, `Data Owner`, `Department Head`, `Lead Department`, `QA/QMS`, bat buoc viet lai theo dung vai tro cu the cua chinh SOP do; khong duoc mass-replace bang mot bundle rong cho xong.
+6. Neu phat hien mot nhanh trach nhiem lap lai thuc su nhung chua co JD, phai quyet dinh ro:
+   - do la base role moi;
+   - hay la hat / nhiem vu gan len base role hien co.
+   Khong duoc giu nguyen placeholder vi se lam sai authority cua nha may.
+7. Cap nhat registry/JD/core-standard truoc khi cap nhat SOP.
 
-Không được làm ngược trình tự này.
-
----
-
-## 9. Benchmark tối thiểu phải dùng
-
-Khi chốt ranh giới vai trò cho job-order CNC, tối thiểu phải đối chiếu các nguồn chính thức phù hợp:
-- ERP/MRP workflow docs chính thức như ERPNext, MRPeasy hoặc tương đương;
-- nguồn nghề nghiệp chính thức như O*NET cho planner, industrial engineer, production manager, QC inspector, purchasing, customer service;
-- nguồn chính thức về digital access/governance như Microsoft Learn, NIST khi vai trò chạm quyền hệ thống, emergency access, access review, least privilege;
-- tiêu chuẩn/nguồn kỹ thuật chính thức khi vai trò chạm metrology, calibration, MSA, capability.
-
-Không dùng blog marketing hoặc bài viết AI tổng hợp làm chuẩn ranh giới vai trò.
-
----
-
-## 10. Checklist bắt buộc trước khi coi là xong
-
-1. Mọi owner/approver cell đã link tới JD chưa?
-2. Header đã dùng role code rút gọn chưa?
-3. Có placeholder mơ hồ nào còn đứng độc lập không?
-4. Governance hat có gắn đúng host role không?
-5. Có vai trò nào đang dùng trong SOP nhưng không tồn tại trong JD/registry không?
-6. Nếu có vai trò phát sinh, JD đã được cập nhật trước chưa?
-7. Role boundaries có còn đè nhau giữa CS/EST, PE/CAM/DFM, PPL/WKM/SL, QA/QE/QCL/QC/MCS, SCM/BUY/WAR/LOG không?
-8. Tài liệu có còn alias nửa Anh nửa Việt không?
-
-Nếu có bất kỳ câu trả lời `chưa`, tài liệu chưa được xem là hoàn tất.
+Khong duoc lam nguoc trinh tu nay.

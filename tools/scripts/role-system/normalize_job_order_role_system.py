@@ -29,6 +29,10 @@ def normalize_ws(value: str) -> str:
     return re.sub(r"\s+", " ", value.replace("\xa0", " ")).strip()
 
 
+def has_class(element: etree._Element, token: str) -> bool:
+    return token in ((element.get("class") or "").split())
+
+
 def element_text(element: etree._Element) -> str:
     return normalize_ws(" ".join(element.itertext()))
 
@@ -341,28 +345,6 @@ def role_alias_map() -> dict[str, dict]:
         "Lead Auditor": expr("QMS[LA]"),
         "Continuous Improvement Lead": expr("PIE[CI]"),
         "Product Safety Officer": expr("QA[PSO]"),
-        "Top Management": bundle("TOP_MGMT"),
-        "Functional Heads": bundle("FUNC_HEADS"),
-        "Functional Head": bundle("FUNC_HEADS"),
-        "Functional Leader": bundle("FUNC_HEADS"),
-        "Department Head": bundle("FUNC_HEADS"),
-        "Department Heads": bundle("FUNC_HEADS"),
-        "Department Head / Functional Leader": bundle("FUNC_HEADS"),
-        "Lead Department": bundle("FUNC_HEADS"),
-        "Department Manager": bundle("FUNC_HEADS"),
-        "Process Owner": bundle("FUNC_HEADS"),
-        "Process Owners": bundle("FUNC_HEADS"),
-        "Document Owner": bundle("FUNC_HEADS"),
-        "Document Responsible Person": bundle("FUNC_HEADS"),
-        "Data Owner": bundle("FUNC_HEADS"),
-        "QMS Data Owner": expr("QMS", "ITA"),
-        "Chủ dữ liệu / Process Owner": bundle("FUNC_HEADS"),
-        "QA/QMS hoặc Responsible Person quá trình": expr("QA[QMR]", "QMS", "PD", "ENGM", "SCM", "FIN", "HR", "EHS", "ITA"),
-        "Responsible Person nghiệp vụ + QA/QMS": expr("PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA", "QMS"),
-        "Department Head + HR": expr("PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA"),
-        "IT Administrator / Data Responsible Person": expr("ITA", "PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS"),
-        "Responsible Person Thương mại": expr("CS"),
-        "Responsible Person Thương mại hoặc GM theo giá trị / rủi ro": expr("CS", "CEO"),
         "Incident Commander": expr("PD[IC-PROD]"),
         "Leadership Sponsor": expr("CEO"),
         "QA/QC Lead + Sales Lead": expr("QCL", "CS", "EST"),
@@ -478,7 +460,267 @@ def replace_text_fragments(doc: etree._Element, replacements: dict[str, str]) ->
             parent.tail = new_value
 
 
+def section_table_rows(doc: etree._Element, section_id: str, table_index: int = 1) -> list[etree._Element]:
+    headers = doc.xpath(f'//h2[@id="{section_id}"]')
+    if not headers:
+        return []
+    tables: list[etree._Element] = []
+    node = headers[0].getnext()
+    while node is not None:
+        if isinstance(node.tag, str) and node.tag.lower() == "h2":
+            break
+        if has_class(node, "table-card"):
+            tables.append(node)
+        node = node.getnext()
+    if 0 < table_index <= len(tables):
+        return tables[table_index - 1].xpath(".//tbody/tr")
+    return []
+
+
+def set_section_role_cell(
+    doc: etree._Element,
+    section_id: str,
+    row_index: int,
+    spec: dict,
+    current_file: Path,
+    registry: dict,
+    table_index: int = 1,
+) -> None:
+    rows = section_table_rows(doc, section_id, table_index)
+    if 0 <= row_index < len(rows):
+        cells = rows[row_index].xpath("./td")
+        if cells:
+            set_element_html(cells[0], render_spec(spec, current_file, registry))
+
+
+def set_section_cell_html(
+    doc: etree._Element,
+    section_id: str,
+    row_index: int,
+    cell_index: int,
+    html_fragment: str,
+    table_index: int = 1,
+) -> None:
+    rows = section_table_rows(doc, section_id, table_index)
+    if 0 <= row_index < len(rows):
+        cells = rows[row_index].xpath("./td")
+        if 0 <= cell_index < len(cells):
+            set_element_html(cells[cell_index], html_fragment)
+
+
+def replace_exact_cell_text(
+    doc: etree._Element,
+    current_file: Path,
+    registry: dict,
+    exact_text: str,
+    spec: dict,
+) -> None:
+    rendered = render_spec(spec, current_file, registry)
+    for element in doc.xpath('//th|//td'):
+        if element.xpath('.//*[contains(@class,"role-link")]'):
+            continue
+        if element_text(element) == exact_text:
+            set_element_html(element, rendered)
+
+
+def replace_exact_block_text(
+    doc: etree._Element,
+    xpath: str,
+    exact_text: str,
+    new_html: str,
+) -> None:
+    for element in doc.xpath(xpath):
+        if element_text(element) == exact_text:
+            set_element_html(element, new_html)
+
+
 def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry: dict) -> None:
+    def chips(spec: dict) -> str:
+        return render_spec(spec, current_file, registry)
+
+    if current_file.name == "sop-101-document-and-data-control.html":
+        set_section_role_cell(doc, "p4", 0, bundle("FUNC_OWNERS"), current_file, registry)
+        set_section_role_cell(doc, "p4", 3, bundle("FUNC_OWNERS"), current_file, registry)
+        set_section_role_cell(doc, "p4", 5, bundle("POU_LEADS"), current_file, registry)
+        set_section_cell_html(doc, "p8", 2, 2, chips(expr("WKM", "SL", "QCL")))
+        set_section_cell_html(
+            doc,
+            "p9",
+            3,
+            3,
+            chips(expr("CS", "EST", "PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA", "WKM", "SL", "QCL")),
+        )
+        set_section_cell_html(doc, "p9", 5, 3, chips(expr("QMS", "WKM", "SL", "QCL", "SCM")))
+
+    if current_file.name == "sop-102-quality-policy-objectives-and-organizational-context.html":
+        set_section_role_cell(doc, "p4", 3, bundle("FUNC_OWNERS"), current_file, registry)
+        set_section_role_cell(doc, "p4", 4, bundle("DEPLOYMENT_LEADS"), current_file, registry)
+        set_section_cell_html(doc, "p8", 3, 2, chips(bundle("OPS_SCOPE_OWNERS")))
+        set_section_cell_html(doc, "p9", 0, 1, chips(expr("QA", "QMS")), table_index=2)
+        set_section_cell_html(doc, "p9", 1, 1, chips(expr("QA", "QMS", "CS", "EST", "PPL", "PD", "ENGM", "SCM", "FIN", "HR", "EHS", "ITA", "WKM", "SL", "QCL", "LOG")), table_index=2)
+        set_section_cell_html(doc, "p9", 2, 1, chips(bundle("OPS_SCOPE_OWNERS")), table_index=2)
+        set_section_cell_html(doc, "p9", 3, 1, chips(bundle("OPS_SCOPE_OWNERS")), table_index=2)
+        replace_text_fragments(
+            doc,
+            {
+                "JD của các trưởng / đầu Department": "JD của các vai trò trong OPS_SCOPE_OWNERS",
+            },
+        )
+        replace_exact_block_text(
+            doc,
+            '//div[contains(@class,"role-note")]',
+            "RACI nền: CEO giữ A cho policy và mục tiêu cấp công ty; QA Lead giữ A cho chất lượng logic điều hành; QMS Engineer giữ R cho register và evidence; các Trưởng bộ phận giữ R cho phân tầng, đo lường và phản ứng trong phạm vi mình sở hữu.",
+            "<b>RACI nền:</b> CEO giữ A cho policy và mục tiêu cấp công ty; QA giữ A cho chất lượng logic điều hành; QMS giữ R cho register và evidence; OPS_SCOPE_OWNERS giữ R cho phân tầng, đo lường và phản ứng trong phạm vi được giao.",
+        )
+
+    if current_file.name == "sop-104-data-governance-records-security-and-ip-protection.html":
+        set_section_role_cell(doc, "p4", 4, bundle("DIRECT_LINE_MGRS"), current_file, registry)
+        set_section_cell_html(doc, "p8", 1, 3, chips(bundle("OPS_SCOPE_OWNERS")))
+        set_section_cell_html(doc, "p8", 2, 2, chips(bundle("OPS_SCOPE_OWNERS")))
+        set_section_cell_html(doc, "p8", 2, 3, chips(expr("QA", "CS", "EST", "PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA", "CEO")))
+
+    if current_file.name == "sop-106-change-and-configuration-management.html":
+        set_section_role_cell(doc, "p4", 2, expr("PD", "WKM", "SL"), current_file, registry)
+
+    if current_file.name == "sop-105-organizational-knowledge-management.html":
+        set_section_role_cell(doc, "p4", 2, bundle("FUNC_OWNERS"), current_file, registry)
+        set_section_role_cell(doc, "p4", 3, bundle("KNOWLEDGE_SMES"), current_file, registry)
+        set_section_role_cell(doc, "p4", 4, bundle("FRONTLINE_LEADS"), current_file, registry)
+        set_section_cell_html(doc, "p4", 0, 1, chips(expr("QA", "QMS", "CS", "EST", "PD", "ENGM", "SCM", "FIN", "HR", "EHS", "ITA")), table_index=2)
+        set_section_cell_html(doc, "p9", 4, 3, chips(bundle("DIRECT_LINE_MGRS")))
+        replace_text_fragments(
+            doc,
+            {
+                "JD của QMS Engineer, HR Lead, Lead Department và SME trọng yếu phải mô tả trách nhiệm nhận diện tri thức, bài học kinh Nhiệm, bàn giao pack, cập nhật đào tạo và quyền chặn thôi việc / rời công ty khi chưa bàn giao tri thức.":
+                "JD của QMS, HR, các vai trò trong FUNC_OWNERS và các vai trò trong KNOWLEDGE_SMES phải mô tả rõ trách nhiệm nhận diện tri thức, bàn giao tri thức, cập nhật đào tạo và quyền giữ mở khi chưa chuyển giao đủ tri thức.",
+                "Tri thức có tranh cãi dữ liệu hoặc chưa được QA/QMS xác thực.": "Tri thức có tranh cãi dữ liệu hoặc chưa được QA / QMS xác thực.",
+            },
+        )
+
+    if current_file.name == "sop-107-communication-management.html":
+        set_section_cell_html(doc, "p4", 0, 1, chips(expr("CS", "SL", "PPL", "QA")))
+        set_section_cell_html(doc, "p4", 0, 2, chips(bundle("OPS_SCOPE_OWNERS")))
+        set_section_cell_html(doc, "p4", 0, 3, chips(expr("QMS")))
+        set_section_cell_html(doc, "p4", 1, 1, chips(expr("PPL", "QA", "WKM")))
+        set_section_cell_html(doc, "p4", 1, 2, chips(expr("PD", "QA")))
+        set_section_cell_html(doc, "p4", 1, 3, chips(expr("ENGM", "WAR", "BUY")))
+        set_section_cell_html(doc, "p4", 2, 1, chips(expr("CS", "EST")))
+        set_section_cell_html(doc, "p4", 2, 2, chips(expr("QA", "PD")))
+        set_section_cell_html(doc, "p4", 2, 3, chips(expr("ENGM", "PPL", "FIN")))
+        set_section_cell_html(doc, "p4", 3, 1, chips(expr("SL", "WKM", "QCL", "ITA")))
+        set_section_cell_html(doc, "p4", 3, 2, chips(expr("PD", "QA", "CEO")))
+        set_section_cell_html(doc, "p4", 3, 3, chips(expr("PPL", "ENGM", "ITA", "WAR")))
+        set_section_cell_html(doc, "p4", 4, 1, chips(bundle("OPS_SCOPE_OWNERS")))
+        set_section_cell_html(doc, "p4", 4, 2, chips(expr("CS", "EST", "PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA", "WKM", "SL", "QCL")))
+        set_section_cell_html(doc, "p4", 4, 3, chips(expr("QMS")))
+
+    if current_file.name == "sop-401-supplier-control-and-special-process.html":
+        set_section_role_cell(doc, "p4", 4, expr("ENGM", "PE", "QE", "CAM"), current_file, registry)
+        replace_exact_block_text(
+            doc,
+            '//div[contains(@class,"role-note")]',
+            "RACI nền: Supply Chain Manager giữ A cho source approval và re-approval; QA Manager giữ A cho acceptance of quality risk và SCAR closure; Buyer giữ R cho PO và dispatch accuracy; Process Owner giữ R cho technical flow-down.",
+            "<b>RACI nền:</b> SCM giữ A cho source approval và re-approval; QA giữ A cho quality risk và SCAR closure; BUY giữ R cho PO và dispatch accuracy; ENGM / PE / QE / CAM giữ R cho technical flow-down và acceptance logic.",
+        )
+
+    if current_file.name == "sop-402-material-verification-traceability-and-counterfeit-prevention.html":
+        set_section_cell_html(doc, "p6", 2, 2, chips(expr("QCL")))
+
+    if current_file.name == "sop-604-spc-and-capability-control.html":
+        set_section_role_cell(doc, "p4", 4, expr("ENGM", "PE", "PIE", "WKM", "SET", "MNT", "TOOL"), current_file, registry)
+        replace_exact_block_text(
+            doc,
+            '//div[contains(@class,"role-note")]',
+            "RACI nền: Quality Engineer giữ A cho rule SPC và capability; Operator giữ R cho tín hiệu tại nguồn; QC giữ R cho dữ liệu xác nhận; QA Manager giữ A cho escalation; Process Owner giữ R cho cải tiến quá trình.",
+            "<b>RACI nền:</b> QE giữ A cho rule SPC và capability; OPR giữ R cho tín hiệu tại nguồn; QC giữ R cho dữ liệu xác nhận; QA giữ A cho escalation; ENGM / PE / PIE / WKM / SET / MNT / TOOL giữ R cho cải tiến quá trình.",
+        )
+
+    if current_file.name == "sop-606-ncr-capa-and-ipqc-reaction.html":
+        set_section_role_cell(doc, "p4", 3, expr("WKM", "ENGM", "QE", "SCM", "HR", "MNT"), current_file, registry)
+        replace_exact_block_text(
+            doc,
+            '//div[contains(@class,"role-note")]',
+            "RACI nền: QC giữ R cho stop và containment đầu tiên; QA Manager giữ A cho disposition và CAPA trigger; QMS Engineer giữ R cho logic hồ sơ và hiệu lực; Process Owner giữ R cho action gốc tại quá trình; Planner hoặc Shipping giữ R cho integrity của lot trong containment.",
+            "<b>RACI nền:</b> QC giữ R cho stop và containment đầu tiên; QA giữ A cho disposition và CAPA trigger; QMS giữ R cho logic hồ sơ và hiệu lực; WKM / ENGM / QE / SCM / HR / MNT giữ R cho action gốc tại quá trình; PPL / LOG giữ R cho integrity của lot trong containment.",
+        )
+
+    if current_file.name == "sop-702-contamination-control-and-cleanliness.html":
+        set_section_cell_html(doc, "p6", 1, 2, chips(expr("CPS", "WKM")))
+        replace_exact_block_text(
+            doc,
+            '//div[contains(@class,"role-note")]',
+            "RACI nền: Cleaning Supervisor giữ A cho route sạch; Technician giữ R cho thao tác; QC giữ A cho verification; QA Manager giữ A cho breach disposition; EHS giữ R cho safety của điều kiện môi trường và hóa chất.",
+            "<b>RACI nền:</b> CPS giữ A cho route sạch; CPT giữ R cho thao tác; QC giữ A cho verification; QA giữ A cho breach disposition; EHS giữ R cho safety của điều kiện môi trường và hóa chất.",
+        )
+
+    if current_file.name == "sop-801-competence-training-and-certification.html":
+        set_section_role_cell(doc, "p4", 2, bundle("DIRECT_LINE_MGRS"), current_file, registry)
+        set_section_role_cell(doc, "p4", 3, bundle("OJT_COACHES"), current_file, registry)
+        set_section_cell_html(doc, "p6", 2, 2, chips(bundle("DIRECT_LINE_MGRS")))
+        set_section_cell_html(doc, "p8", 2, 2, chips(bundle("OJT_COACHES")))
+        set_section_cell_html(doc, "p8", 2, 3, chips(bundle("DIRECT_LINE_MGRS")))
+        set_section_cell_html(doc, "p9", 1, 3, chips(bundle("OJT_COACHES")))
+        replace_exact_block_text(
+            doc,
+            '//div[contains(@class,"role-note")]',
+            "RACI nền: HR giữ R cho hạ tầng hồ sơ; QA Manager giữ A cho competence quality-critical; Department Head giữ A cho năng lực theo vai trò; Trainer giữ R cho OJT evidence; người học giữ trách nhiệm tuân thủ giới hạn chứng nhận của mình.",
+            "<b>RACI nền:</b> HR giữ R cho hạ tầng hồ sơ; QA giữ A cho competence quality-critical; DIRECT_LINE_MGRS giữ A cho năng lực theo vai trò và phân công công việc; OJT_COACHES giữ R cho evidence OJT; người học giữ trách nhiệm tuân thủ giới hạn chứng nhận của mình.",
+        )
+
+    if current_file.name == "sop-901-internal-audit-and-lpa.html":
+        set_section_role_cell(doc, "p4", 3, bundle("OPS_SCOPE_OWNERS"), current_file, registry)
+        set_section_role_cell(doc, "p4", 4, bundle("OPS_SCOPE_OWNERS"), current_file, registry)
+        set_section_cell_html(doc, "p9", 2, 3, chips(expr("QMS[LA]")))
+        replace_exact_block_text(
+            doc,
+            '//div[contains(@class,"role-note")]',
+            "RACI nền: QMS Engineer giữ R cho execution và trend reporting; QA Manager giữ A cho severity, escalation và closure; Auditor giữ R cho bằng chứng; Process Owner giữ R cho hành động; Functional Head giữ A cho nguồn lực và cross-functional unblock.",
+            "<b>RACI nền:</b> QMS giữ R cho execution và trend reporting; QA giữ A cho severity, escalation và closure; QMS[LA] giữ R cho bằng chứng; OPS_SCOPE_OWNERS giữ R cho hành động; OPS_SCOPE_OWNERS giữ A cho nguồn lực và cross-functional unblock trong phạm vi được audit.",
+        )
+
+    if current_file.name == "sop-902-management-review.html":
+        set_section_role_cell(doc, "p4", 3, bundle("OPS_SCOPE_OWNERS"), current_file, registry)
+        set_section_role_cell(doc, "p4", 4, bundle("OPS_SCOPE_OWNERS"), current_file, registry)
+        set_section_cell_html(doc, "p9", 1, 3, chips(bundle("OPS_SCOPE_OWNERS")))
+        replace_text_fragments(
+            doc,
+            {
+                "Áp dụng cho Chief Executive Officer, QA Manager, QMS Engineer, Process Owner, Department Head, Data Owner, IT Administrator và mọi chức năng cung cấp đầu vào hoặc nhận action từ xem xét của lãnh đạo.":
+                "Áp dụng cho CEO, QA, QMS và các vai trò cung cấp đầu vào hoặc nhận action từ xem xét của lãnh đạo, gồm CS, EST, PPL, PD, ENGM, SCM, FIN, HR, EHS, ITA, WKM, SL, QCL và LOG.",
+                "Khi phát hiện dữ liệu sai sau mốc khóa dữ liệu, Data Owner phải mở controlled note; QA Manager quyết định re-review, bổ sung appendix hay hủy kết luận cũ để họp lại.":
+                "Khi phát hiện dữ liệu sai sau mốc khóa dữ liệu, vai trò sở hữu metric hoặc nguồn dữ liệu trong OPS_SCOPE_OWNERS phải mở controlled note; QA quyết định re-review, bổ sung appendix hay hủy kết luận cũ để họp lại.",
+                "Khi quyết định cần ngân sách hoặc thay đổi lớn vượt ngoài thẩm quyền hiện hữu, Process Owner phải escalate theo ANNEX-120 và giữ temporary control cho tới khi có quyết định cuối cùng.":
+                "Khi quyết định cần ngân sách hoặc thay đổi lớn vượt ngoài thẩm quyền hiện hữu, vai trò chủ trì trong OPS_SCOPE_OWNERS phải escalate theo ANNEX-120 và giữ temporary control tới khi có quyết định cuối cùng.",
+            },
+        )
+        replace_exact_block_text(
+            doc,
+            '//div[contains(@class,"role-note")]',
+            "RACI nền: Chief Executive Officer giữ A cho quyết định hệ thống; QA Manager giữ A cho chất lượng review process; QMS Engineer giữ R cho điều phối và minutes; Process Owner và Data Owner giữ R cho input và evidence trong phạm vi mình sở hữu.",
+            "<b>RACI nền:</b> CEO giữ A cho quyết định hệ thống; QA giữ A cho chất lượng review process; QMS giữ R cho điều phối và minutes; OPS_SCOPE_OWNERS giữ R cho input và evidence trong phạm vi được giao.",
+        )
+
+    if current_file.name == "sop-903-continual-improvement-and-kaizen.html":
+        set_section_role_cell(doc, "p4", 0, bundle("OPS_SCOPE_OWNERS"), current_file, registry)
+        set_section_cell_html(doc, "p6", 4, 2, chips(expr("QA[QMR]", "FIN", joiner=" + ")))
+        set_section_cell_html(doc, "p8", 0, 2, chips(bundle("OPS_SCOPE_OWNERS")))
+        replace_exact_block_text(
+            doc,
+            '//div[contains(@class,"role-note")]',
+            "RACI nền: Process Owner giữ A cho pain point thật và duy trì kết quả; Production Engineer or IE giữ R cho thiết kế và trial; QA or QMS giữ A cho risk and standardization discipline; Finance giữ A cho hard-benefit sign-off; HR or sponsor giữ A cho adoption and unblock cross-functional resources.",
+            "<b>RACI nền:</b> OPS_SCOPE_OWNERS giữ A cho pain point thật và duy trì kết quả; PIE giữ R cho thiết kế và trial; QA / QMS giữ A cho risk và standardization discipline; FIN giữ A cho hard-benefit sign-off; HR / CEO giữ A cho adoption và unblock cross-functional resources.",
+        )
+
+    if current_file.name == "annex-503-cnc-operating-model-and-role-boundary.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Đo lường, QC Team Leader, QA": "MCS, QCL, QA",
+                "QC Team Leader, QA, Hậu cần, Customer Dịch vụ": "QCL, QA, LOG, CS",
+                "Không thay QC Team Leader trong bố trí nguồn lực kiểm hằng ngày; không tự disposition sản phẩm": "Không thay QC Inspector Lead trong bố trí nguồn lực kiểm hằng ngày; không tự disposition sản phẩm",
+            },
+        )
+
     if current_file.name == "sop-802-incident-near-miss-and-ehs.html":
         role_rows = doc.xpath('//h2[@id="p4"]/following-sibling::div[contains(@class,"table-card")][1]//table/tbody/tr')
         if len(role_rows) >= 2:
@@ -698,11 +940,16 @@ def scan_unresolved(paths: list[Path]) -> str:
     hints = [
         "Process Owner",
         "Department Head",
+        "Department head",
         "Functional Head",
         "Responsible Person",
+        "Department Trưởng / Đầu",
+        "Trưởng bộ phận",
         "Document Controller",
         "Data Owner",
         "Top Management",
+        "QA/QMS",
+        "QMS/QA",
         "QA Lead",
         "QC Lead",
         "QA Engineer",
@@ -711,7 +958,11 @@ def scan_unresolved(paths: list[Path]) -> str:
         "Metrology Lead",
         "Incident Commander",
         "Continuous Improvement Lead",
-        "Commercial Responsible Person"
+        "Commercial Responsible Person",
+        "Team Leader",
+        "Area Supervisor",
+        "Team Leader / Supervisor",
+        "Trainer / Mentor",
     ]
     lines: list[str] = []
     parser = html.HTMLParser(encoding="utf-8")
@@ -770,7 +1021,6 @@ def main() -> None:
         "QMS Engineer / QA Manager": expr("QMS[LA]", "QA[QMR]", joiner=" + "),
         "QA Manager": expr("QA[QMR]"),
         "Production Engineer-IE / QA Manager": expr("PIE[CI]", "QA[QMR]", joiner=" + "),
-        "Document Responsible Person": expr("QMS[DC]"),
         "Document Controller": expr("QMS[DC]"),
         "Lead Auditor": expr("QMS[LA]"),
         "Continuous Improvement Lead": expr("PIE[CI]"),
@@ -805,9 +1055,9 @@ def main() -> None:
             normalize_controlled_file(path, registry, aliases, titles, overrides, file_overrides, phrase_replacements)
 
     refresh_workbook(registry)
-    report = scan_unresolved(jd_files + controlled_files)
+    report = scan_unresolved(controlled_files)
     print("UPDATED ROLE SYSTEM")
-    print("UNRESOLVED: 0" if not report else report)
+    print("UNRESOLVED: 0" if not report else f"UNRESOLVED: see {UNRESOLVED_REPORT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

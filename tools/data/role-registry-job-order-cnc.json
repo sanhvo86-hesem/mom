@@ -394,8 +394,17 @@
   },
   "bundles": {
     "FUNC_HEADS": ["PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA"],
+    "FUNC_OWNERS": ["CS", "EST", "PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA"],
     "TOP_MGMT": ["CEO", "PD", "QA[QMR]", "ENGM", "SCM", "FIN"],
     "AREA_LEADS": ["SL", "WKM", "CPS", "QCL"],
+    "POU_LEADS": ["WKM", "SL", "QCL", "SCM"],
+    "OPS_SCOPE_OWNERS": ["CS", "EST", "PPL", "PD", "ENGM", "QA[QMR]", "QMS", "SCM", "FIN", "HR", "EHS", "ITA", "WKM", "SL", "QCL", "LOG"],
+    "FRONTLINE_LEADS": ["WKM", "SL", "DBL", "CPS", "QCL"],
+    "DEPLOYMENT_LEADS": ["WKM", "SL", "DBL", "CPS", "QCL", "HR"],
+    "DIRECT_LINE_MGRS": ["CEO", "PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA", "WKM", "SL", "DBL", "CPS", "QCL"],
+    "OJT_COACHES": ["ENGM", "PE", "QE", "MCS", "WKM", "SL", "SET", "QCL", "MNT", "TOOL", "ESA"],
+    "KNOWLEDGE_SMES": ["DFM", "CAM", "PE", "QE", "MCS", "WKM", "SET", "QCL", "MNT", "TOOL", "ESA"],
+    "MR_REPORT_OWNERS": ["CS", "EST", "PD", "ENGM", "QA[QMR]", "QMS", "SCM", "FIN", "HR", "EHS", "ITA"],
     "COMMERCIAL_FRONT": ["CS", "EST"],
     "QUALITY_CORE": ["QA", "QE", "QCL", "QC", "QMS", "MCS"],
     "ENG_RELEASE_CORE": ["ENGM", "DFM", "PE", "CAM"]
