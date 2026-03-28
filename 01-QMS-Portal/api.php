@@ -3196,6 +3196,46 @@ switch ($action) {
       '</body>' . "\n" .
       '</html>';
 
+    // Canonical UTF-8 template (source-of-truth) to prevent mojibake on newly created documents.
+    $docHtml = '<!DOCTYPE html>' . "\n" .
+      '<html lang="vi">' . "\n" .
+      '<head>' . "\n" .
+      '  <meta charset="utf-8"/>' . "\n" .
+      '  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>' . "\n" .
+      '  <title>' . $safeCode . ' - ' . $safeTitle . ' | HESEM QMS</title>' . "\n" .
+      '  <link rel="stylesheet" href="' . $assetsCss . '"/>' . "\n" .
+      '</head>' . "\n" .
+      '<body>' . "\n" .
+      '<div class="container"><div class="page"><div class="page-body"><div class="form-header">' . "\n" .
+      '<div class="fh-left"> <a class="brand-logo" href="' . $rootHref . '"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>' . "\n" .
+      '<div class="fh-company"> <a href="' . $rootHref . '">HESEM ENGINEERING</a> <span>Tài liệu kiểm soát</span> </div>' . "\n" .
+      '</div>' . "\n" .
+      '<div class="title"> <strong>' . $safeCode . ' - ' . $safeTitle . '</strong><br/>' . "\n" .
+      '<span class="sub-vn">Tài liệu mới (Draft)</span> <span class="muted">Soạn thảo nội dung theo yêu cầu ISO/QMS.</span> </div>' . "\n" .
+      '<div class="meta">' . "\n" .
+      '<div class="row"><span><b>Mã:</b></span><span>' . $safeCode . '</span></div>' . "\n" .
+      '<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>' . "\n" .
+      '<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>' . "\n" .
+      '<div class="row"><span><b>Chủ sở hữu:</b></span><span>' . $safeOwner . '</span></div>' . "\n" .
+      '<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>' . "\n" .
+      '</div>' . "\n" .
+      '</div><div class="doc-content" id="docContent"><div class="form-sheet">' . "\n" .
+      '<div class="card">' . "\n" .
+      '  <div class="badge"><span class="dot"></span>' . $safeCode . '</div>' . "\n" .
+      '  <h1 class="h1" style="margin-top:10px">' . $safeCode . ' - ' . $safeTitle . '</h1>' . "\n" .
+      '  <p class="lead">(Soạn thảo nội dung tại đây...)</p>' . "\n" .
+      '</div>' . "\n" .
+      '<h2 class="h2">1. Mục đích</h2>' . "\n" .
+      '<p>...</p>' . "\n" .
+      '<h2 class="h2">2. Phạm vi</h2>' . "\n" .
+      '<p>...</p>' . "\n" .
+      '<h2 class="h2">3. Nội dung</h2>' . "\n" .
+      '<p>...</p>' . "\n" .
+      '</div></div></div></div></div>' . "\n" .
+      '<script src="' . $assetsJs . '"></script>' . "\n" .
+      '</body>' . "\n" .
+      '</html>';
+
     // Write base file
     if (@file_put_contents($absFile, $docHtml, LOCK_EX) === false) {
       api_json(['ok' => false, 'error' => 'write_failed'], 500);

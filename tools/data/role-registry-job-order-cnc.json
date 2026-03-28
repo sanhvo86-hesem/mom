@@ -7,7 +7,7 @@
       "title_en": "Chief Executive Officer",
       "title_vi": "Tong Giam doc",
       "body_vi": "Tong Giam doc",
-      "department": "Executive",
+      "department": "Executive Department",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html",
       "hats_allowed": ["IC-BIZ"]
     },
@@ -346,6 +346,15 @@
     }
   },
   "departments": {
+    "D-EXEC": {
+      "title_en": "Executive Department",
+      "title_vi": "Phong Dieu hanh",
+      "body_vi": "phong Dieu hanh",
+      "type": "department",
+      "parent_department": null,
+      "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-executive-handbook.html",
+      "lead_roles": ["CEO"]
+    },
     "D-SCS": {
       "title_en": "Sales and Customer Service Department",
       "title_vi": "Phong Kinh doanh va Dich vu khach hang",
@@ -533,6 +542,8 @@
     "FUNC_HEADS": ["PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA"],
     "FUNC_OWNERS": ["CS", "EST", "PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA"],
     "TOP_MGMT": ["CEO", "PD", "QA[QMR]", "ENGM", "SCM", "FIN"],
+    "DEPLOYMENT_STEERING": ["CEO", "PD", "ENGM", "QA[QMR]", "SCM", "FIN", "HR", "EHS", "ITA"],
+    "ALL_DEPTS": ["D-SCS", "D-ENG", "D-PROD", "D-QUAL", "D-SCM", "D-FIN", "D-HR", "D-EHS", "D-IT", "D-ERP"],
     "AREA_LEADS": ["SL", "WKM", "CPS", "QCL"],
     "POU_LEADS": ["WKM", "SL", "QCL", "SCM"],
     "OPS_SCOPE_OWNERS": ["CS", "EST", "PPL", "PD", "ENGM", "QA[QMR]", "QMS", "SCM", "FIN", "HR", "EHS", "ITA", "WKM", "SL", "QCL", "LOG"],

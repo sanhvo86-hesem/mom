@@ -43,7 +43,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <div class="title">
 <strong>WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</strong>
-</div><div class="meta"><div class="row"><span><b>Mã:</b></span><span>WI-101</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / IT System Administrator</span></div><div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div><div class="meta"><div class="row"><span><b>Mã:</b></span><span>WI-101</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></span></div><div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 </div><div class="doc-content" id="docContent"><div class="form-sheet"><div class="preface-block"><h2 class="h2">Điều kiện áp dụng và kiểm soát</h2><div class="grid-2"><div><p><b>ÁP DỤNG KHI</b></p><ul class="list"><li>Khi tài liệu được viện dẫn trong Job/Quy trình/Forms liên quan.</li><li>Khi phát sinh thay đổi ảnh hưởng chất lượng hoặc yêu cầu khách hàng.</li><li>Khi cần xác định tạm giữ/phê duyệt hoặc yêu cầu bằng chứng bắt buộc.</li></ul></div><div><p><b>Đầu vào / Đầu ra</b></p><ul class="list"><li><b>Đầu vào:</b> Epicor Kinetic (giao dịch)</li><li><b>Đầu vào:</b> M365/SharePoint (SSOT hồ sơ)</li><li><b>Đầu vào:</b> 10-QMS-Source-Control + Git (source definitions / released schemas / source templates)</li><li><b>Đầu ra:</b> Hồ sơ/Nhật ký đầy đủ tại SSOT</li><li><b>Đầu ra:</b> Trạng thái cổng kiểm soát được mở hoặc giữ theo tiêu chí</li></ul></div></div><p class="callout"><b>Hold/Release:</b> Thiếu bằng chứng bắt buộc: áp dụng HOLD theo tiêu chí của tài liệu; không chuyển bước cho đến khi đủ bằng chứng.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết hồ sơ SSOT.</p></div><div class="card"><span class="badge"><span class="dot"></span>WI-101</span><h1 class="h1" style="margin-top:12px;">WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</h1><p class="lead">Tài liệu này quy định cách triển khai và sử dụng biểu mẫu số hoá trên M365 (SharePoint Lists/Power Apps/Power Automate) và cách lưu bằng chứng theo SSOT. Mọi giao dịch vận hành (time entry, trạng thái job, PO, xuất/nhập kho, xác nhận giao hàng (ship confirm) <b>chỉ</b> được ghi nhận trong <b>Epicor Kinetic</b>.</p><p class="callout"><b>Ranh giới source bắt buộc:</b> form definition, released schema, source template và source code hỗ trợ phải nằm trong <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> tại <span class="code">10-QMS-Source-Control</span> và đi theo Git. Submission, approval payload, runtime archive và dữ liệu vận hành phát sinh không được đưa vào Git/source library.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">1. Khi áp dụng</h2><ul>
 <li><b>Phải</b> áp dụng khi thay thế biểu mẫu giấy bằng biểu mẫu số hoá để ghi nhận vận hành tại xưởng CNC: kiểm tra công đoạn, nhật ký hold, bảng kiểm đóng gói, nhật ký giao ca, yêu cầu hỗ trợ máy/tooling.</li>
 <li><b>Phải</b> áp dụng khi cần <b>phê duyệt điện tử</b> (Power Automate Approvals) cho các điểm dừng chất lượng/ship-release.</li>
@@ -74,7 +74,7 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <li><b>Phải</b> tạo Power App giao diện ki-ốt theo vai trò (OPS/QA/WHS/QMS):
  <ul>
 <li>Scan mã → tự điền JobNum/PackNum (nếu có) → chọn biểu mẫu → nhập dữ liệu → gửi.</li>
-<li><b>Không được</b> cho phép Người dùng sửa bản ghi sau khi đã "Đã phê duyệt/Released", trừ vai trò QA/QMS được phân quyền.</li>
+<li><b>Không được</b> cho phép Người dùng sửa bản ghi sau khi đã "Đã phê duyệt/Released", trừ vai trò QA / QMS được phân quyền.</li>
 </ul>
 </li>
 <li><b>Phải</b> cấu hình Power Automate:
@@ -134,7 +134,7 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <td>CP-101.2 — Evidence</td>
 <td>EvidenceUrl trỏ đúng SSOT, truy cập được</td>
 <td>Thiếu link/đường dẫn sai → TẠM GIỮ</td>
-<td>QA Lead hoặc Quy trình Owner theo RACI</td>
+<td>QA hoặc OPS_SCOPE_OWNERS theo ANNEX-121</td>
 <td>Link thư mục/tệp trong Hồ sơ công việc (hồ sơ công việc)</td>
 </tr>
 <tr>
@@ -148,7 +148,7 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <td>CP-101.4 — Lưu giữ/Hồ sơ</td>
 <td>Nhãn lưu giữ áp đúng theo <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td>
 <td>Chưa áp nhãn → TẠM GIỮ cho các cổng kiểm soát Tier‑1</td>
-<td>QA/QMS (Tài liệu Control)</td>
+<td>QA / QMS (Tài liệu Control)</td>
 <td>Lưu giữ label log (Phạm vi quản lý)</td>
 </tr>
 </tbody>
@@ -177,7 +177,7 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <td>ApprovalHistory</td>
 <td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/QMS/Approvals/</b></td>
 <td>Khi hồ sơ được đóng (Closed) + 10 năm</td>
-<td>QA/QMS</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
 </tr>
 <tr>
 <td>Thư mục bằng chứng theo Job</td>

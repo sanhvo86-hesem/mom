@@ -164,11 +164,23 @@ Cam xuat hien doc lap trong header, owner cell, RACI cell, hold/release cell, ap
 - `Responsible Person`
 - `Document Owner`
 - `Data Owner`
+- `Data Owners`
+- `IT Data Owner`
+- `KPI owner`
 - `QA/QMS`
 - `QMS/QA`
+- `QMS Manager`
+- `IT Manager`
+- `Sales Manager`
+- `Engineering Manager`
+- `Production Supervisor`
+- `IQC Team Leader`
+- `QC Operator`
 - `HR Lead`
 - `Team Leader`
 - `Supervisor`
+- `Business Owner`
+- `System Owner`
 - `Top Management`
 - `Approval Board`
 - `Change Owner`
@@ -194,6 +206,10 @@ Vi du sai:
 - `Top Management`
 - `QA/QMS`
 - `Team Leader / Supervisor`
+- `QMS Manager / IT Data Owner`
+- `Business Owner + System Owner`
+
+Pseudo-role kieu `QMS Manager`, `IT Manager`, `Sales Manager`, `Engineering Manager`, `Production Supervisor`, `IQC Team Leader`, `QC Operator`, `Business Owner`, `System Owner`, `KPI owner` chi duoc giu lai neu da duoc nang cap thanh JD that va cap nhat registry. Neu chua co JD that, phai resolve ve role code, hat quan tri, bundle hoac D-code da duoc cong bo.
 
 ### 5.1 Rule resolve `truong bo phan` va role chung chung
 
@@ -245,6 +261,13 @@ Role code trong header phai:
 - link truc tiep toi JD tuong ung;
 - dung dung relative path;
 - khong de text tran khi da co JD.
+
+JD alignment rule bo sung:
+- Khi role-boundary cua phong ban thay doi theo mo hinh `job-order CNC`, JD phai duoc cap nhat truoc SOP/WI/ANNEX.
+- `Chuc danh theo tai lieu` trong JD giu English title; `Ma vai tro dung trong SOP/RACI` moi dung role chip.
+- Preface JD khong duoc lap handbook/link tham chieu; chi giu mot lan cho moi tai lieu lien doi.
+
+Neu header cua WI/ANNEX/handbook dang noi toi mandate cap chuc nang hoac governance lien phong ban, duoc phep dung `D-code` theo `20-department-boundary-handbook-codes.md`. Khong duoc ep moi header thanh role code neu tai lieu do khong co mot owner ca nhan duy nhat.
 
 ### 6.2 Section 4 / 6 / 8 / RACI / owner columns
 
@@ -347,6 +370,20 @@ Neu SOP phat sinh mot vai tro lap lai ma chua co JD:
 - phai quyet dinh do la base role moi hay governance hat;
 - neu la base role moi, phai tao/cap nhat JD truoc khi phat hanh SOP;
 - neu la hat, phai cap nhat JD cua host role de mo ta quyen, pham vi va gioi han cua hat do.
+
+### 9.1 Header JD va department ownership
+
+- `Chu so huu` cua JD phai dung `D-code` cua phong ban hoac phan he so huu vai tro theo role-boundary profile.
+- `Chu so huu` cua JD khong duoc de residue hanh chinh kieu `D-HR` neu vai tro do thuoc `D-EXEC`, `D-ENG`, `D-PROD`, `D-QUAL`, `D-SCM`, `D-FIN`, `D-EHS`, `D-IT` hoac phan he khac.
+- `Phe duyet` cua JD phai dung role chip cua role co tham quyen phe duyet nguon; mac dinh hien hanh la `CEO` neu khong co ngoai le da duoc cong bo ro trong core standard.
+- Header JD la metadata quy tri de xac dinh ai so huu mandate cap phong ban va ai phe duyet role; khong duoc de text tran, alias mo ho hoac ten phong ban viet dai dong.
+
+### 9.2 Phan biet role chip va department chip trong JD
+
+- Role chip duoc dung cho `Phe duyet`, row `Ma vai tro dung trong SOP/RACI`, row `Mu quan tri co the gan` va cac bang authority/RACI/quyen han.
+- Department chip duoc dung cho header `Chu so huu`, row `Bo phan` va preface block khi dang noi toi lop so huu chuc nang cua vai tro.
+- Khong duoc dung role chip de che mat department owner cua JD.
+- Khong duoc dung department chip de thay cho role co tham quyen phe duyet, sign-off hoac quyet dinh ca nhan.
 
 ---
 

@@ -7,6 +7,11 @@ def doc(label: str, path: str) -> dict:
 
 DEPARTMENT_TERMS = [
     {
+        "en": "Executive Department",
+        "vi": "Phòng Điều hành",
+        "note": "Dùng cho lớp điều hành cấp doanh nghiệp; chỉ dùng khi đang nói tới mandate cấp điều hành hoặc enterprise-level resource steering, không dùng thay vai trò quyết định cá nhân của CEO.",
+    },
+    {
         "en": "Sales and Customer Service Department",
         "vi": "Phòng Kinh doanh và Dịch vụ khách hàng",
         "note": "Dùng cho mandate cấp phòng ban; không dùng thay vai trò phê duyệt hoặc người giữ cam kết thương mại cá nhân.",
@@ -100,6 +105,151 @@ DEPARTMENT_TERMS = [
 
 
 HANDBOOKS = []
+
+
+HANDBOOKS.append(
+    {
+        "code": "D-EXEC",
+        "path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-executive-handbook.html",
+        "title": "Executive Department Handbook",
+        "subtitle": "Sổ tay ranh giới lớp điều hành doanh nghiệp cho chiến lược, escalations cấp công ty và quyết định liên phòng ban",
+        "short_vi": "phòng Điều hành",
+        "approver": "CEO",
+        "roles": ["CEO"],
+        "subfunctions": [],
+        "primary_docs": [
+            doc("SOP-102", "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html"),
+            doc("SOP-107", "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-107-communication-management.html"),
+            doc("SOP-108", "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html"),
+            doc("SOP-902", "03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html"),
+            doc("SOP-903", "03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html"),
+            doc("ANNEX-503", "03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html"),
+        ],
+        "index_tags": ["Strategy", "Escalation", "Resource commitment", "Enterprise risk"],
+        "index_intro": "Đọc khi cần phân biệt rõ đâu là mandate cấp điều hành doanh nghiệp, đâu là quyết định vẫn phải ở cấp chức năng hoặc role cá nhân trong mô hình job-order CNC.",
+        "index_next_docs": [
+            doc("SOP-102", "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html"),
+            doc("SOP-107", "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-107-communication-management.html"),
+            doc("SOP-902", "03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html"),
+            doc("ANNEX-120", "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html"),
+        ],
+        "iso_map": [
+            {
+                "text": "D-EXEC giữ lớp quyết định cấp doanh nghiệp về định hướng, nguồn lực, chấp nhận rủi ro hệ thống và escalations vượt khỏi thẩm quyền chức năng.",
+                "clause": "5.1",
+            },
+            {
+                "text": "D-EXEC không được che mờ ranh giới của các chức năng chuyên môn; khi SOP đã giao quyền cho D-SCS, D-ENG, D-PPC, D-PROD, D-QUAL, D-SCM, D-FIN, D-HR, D-EHS hoặc D-IT thì lớp điều hành chỉ vào cuộc ở mức override, resource commitment hoặc conflict resolution.",
+                "clause": "5.3",
+            },
+            {
+                "text": "Mọi quyết định cấp doanh nghiệp phải truy được về data, risk, người chịu trách nhiệm thực thi và điều kiện kiểm tra hiệu lực sau quyết định.",
+                "clause": "9.1",
+            },
+        ],
+        "purpose": "Khóa ranh giới của lớp điều hành doanh nghiệp trong mô hình job-order CNC: quyết định chiến lược, resource steering, escalations liên phòng ban, chấp nhận rủi ro vượt thẩm quyền chức năng và nhịp xem xét toàn hệ thống.",
+        "metric_cards": [
+            {"value": "Enterprise direction", "label": "Định hướng và ưu tiên cấp công ty"},
+            {"value": "Escalation closure", "label": "Quyết định vượt cấp có điểm chốt"},
+            {"value": "Resource steering", "label": "Nguồn lực mở đúng chỗ"},
+            {"value": "Risk discipline", "label": "Không override mù quy trình"},
+        ],
+        "scope": "Bao phủ chiến lược công ty, mục tiêu và policy cấp doanh nghiệp, cross-functional escalation, phê duyệt nguồn lực hoặc đầu tư lớn, quyết định concession/override cấp công ty, management review, business continuity cấp doanh nghiệp và lớp chấp thuận cuối cho các thay đổi vượt khung chức năng.",
+        "scope_rows": [
+            {
+                "group": "Chiến lược và mục tiêu",
+                "include": "Định hướng khách hàng mục tiêu, năng lực ưu tiên, policy rủi ro, chất lượng, đầu tư năng lực và các mục tiêu QCDS cấp công ty.",
+                "exclude": "Không viết thay SOP/WI của từng chức năng và không tự thay cơ chế vận hành chi tiết khi chưa đi qua owner chức năng.",
+            },
+            {
+                "group": "Escalation liên phòng ban",
+                "include": "Giải quyết xung đột khi nhiều chức năng cùng đúng trong phạm vi của mình nhưng doanh nghiệp cần một quyết định cuối cùng để tiếp tục hoặc dừng.",
+                "exclude": "Không thay thế contract review, engineering release, quality disposition, dispatching hay shipment release ở những case vẫn còn nằm trong authority matrix cấp chức năng.",
+            },
+            {
+                "group": "Nguồn lực và continuity",
+                "include": "Cam kết nguồn lực, ngân sách, ưu tiên khôi phục khi có gián đoạn lớn, quyết định dừng hoặc mở lại ở cấp doanh nghiệp và tài trợ cho các project trọng yếu.",
+                "exclude": "Không dùng danh nghĩa D-EXEC để bỏ qua hold, release hay reaction plan đang được SOP quy định rõ ở tuyến hiện trường.",
+            },
+        ],
+        "responsibilities": [
+            "Khóa rõ định hướng công ty, mức chấp nhận rủi ro và thứ tự ưu tiên chiến lược để các phòng ban không tự kéo hệ thống theo những logic cục bộ xung đột nhau.",
+            "Giữ vai trò quyết định cuối khi escalation vượt khỏi thẩm quyền của D-SCS, D-ENG, D-PPC, D-PROD, D-QUAL, D-SCM, D-FIN, D-HR, D-EHS hoặc D-IT.",
+            "Phê duyệt hoặc từ chối các override cấp doanh nghiệp liên quan lead time, concession thương mại lớn, đầu tư, continuity mode kéo dài hoặc chấp nhận rủi ro hệ thống.",
+            "Bảo đảm management review, risk review, KPI review và action review dẫn tới quyết định thật về nguồn lực, ownership và thời hạn chứ không chỉ dừng ở thảo luận.",
+            "Giữ một nhịp enterprise escalation log để mọi quyết định lớn đều truy được về dữ liệu, người chủ trì thực thi, hạn hoàn thành và bài học hệ thống.",
+            "Dẫn dắt văn hóa không bỏ cổng kiểm soát chỉ vì áp lực thương mại hoặc áp lực giao hàng.",
+        ],
+        "authorities": [
+            {"title": "Chốt trade-off cấp công ty", "body": "D-EXEC có quyền ra quyết định cuối về trade-off giữa giao hàng, rủi ro, năng lực và đầu tư khi các chức năng không tự giải quyết được trong authority matrix hiện hành."},
+            {"title": "Mở hoặc giữ resource priority", "body": "D-EXEC có quyền điều phối nguồn lực, ngân sách, overtime, recovery priority hoặc project sponsorship ở cấp doanh nghiệp."},
+            {"title": "Giữ override ở mức doanh nghiệp", "body": "Mọi override liên quan concession lớn, ship risk trọng yếu, customer strategic exception hoặc continuity mode kéo dài phải được giữ trong log và chỉ đóng khi D-EXEC xác nhận."},
+            {"title": "Buộc quay về đúng chức năng", "body": "D-EXEC có quyền trả việc về đúng phòng ban hoặc role code khi escalation thực chất vẫn nằm trong thẩm quyền chức năng mà chưa được xử lý đủ."},
+        ],
+        "outputs": [
+            {"name": "Company objective and priority pack", "description": "Mục tiêu, policy, risk appetite và ưu tiên nguồn lực cấp công ty đã được phát hành cho kỳ điều hành.", "owner": "D-EXEC", "decision": "CEO", "system": "Management review record / strategic pack"},
+            {"name": "Enterprise escalation decision log", "description": "Sổ quyết định vượt cấp với owner thực thi, deadline, basis và điều kiện kiểm tra hiệu lực.", "owner": "D-EXEC", "decision": "CEO", "system": "Escalation log / management action register"},
+            {"name": "Continuity decision pack", "description": "Quyết định dừng, khôi phục ưu tiên, chế độ doanh nghiệp tạm thời và nguồn lực phục hồi khi sự kiện vượt mức chức năng.", "owner": "D-EXEC", "decision": "CEO", "system": "Business continuity record / FRM-181 linkage"},
+            {"name": "Strategic resource approval", "description": "Quyết định cấp nguồn lực, CAPEX, headcount hoặc support liên phòng ban để gỡ nút thắt hệ thống.", "owner": "D-EXEC", "decision": "CEO", "system": "Investment / resource approval pack"},
+        ],
+        "kpis": [
+            {"name": "Escalation closure discipline", "owner": "D-EXEC", "target": ">= 95% escalation cấp CEO có owner, hạn và quyết định rõ trong <= 3 ngày làm việc; case đỏ trong <= 1 ngày.", "source": "Enterprise escalation log / management review action log", "reaction": "Nếu lệch 2 kỳ liên tiếp phải rà lại authority matrix, route escalation và resource ownership."},
+            {"name": "Management review action on-time", "owner": "D-EXEC", "target": ">= 90% action từ management review đóng đúng hạn hoặc có controlled carry-over được phê duyệt.", "source": "FRM-911 / MR action tracker", "reaction": "Nếu lệch phải mở top-action review riêng, không để trôi sang kỳ sau mà không có chủ trì."},
+            {"name": "Strategic decision implementation", "owner": "CEO", "target": "100% quyết định chiến lược cấp công ty có sponsor, owner thực thi và mốc kiểm tra hiệu lực.", "source": "Strategic action register / budget pack / project review", "reaction": "Nếu thiếu sponsor hoặc owner, quyết định chưa được coi là có hiệu lực."},
+            {"name": "Continuity response governance", "owner": "CEO", "target": "100% sự kiện gián đoạn cấp doanh nghiệp có tuyên bố sự kiện, priority order và closure review sau sự kiện.", "source": "FRM-181 / continuity decision log", "reaction": "Nếu thiếu closure review phải giữ sự kiện ở trạng thái mở và chặn tuyên bố 'đã ổn'."},
+        ],
+        "interfaces": [
+            {"with": "D-SCS", "receive": "Nhận escalations thương mại, khách chiến lược, concession lớn và xung đột cam kết vượt policy.", "handoff": "Bàn giao quyết định cuối, mức chấp nhận rủi ro và điều kiện truyền thông ra khách.", "func_owner": ["D-EXEC", "D-SCS"], "decision": ["CEO", "CS"]},
+            {"with": "D-PROD", "receive": "Nhận escalations về năng lực nhà máy, continuity, shutdown/restart và resource bottleneck cấp doanh nghiệp.", "handoff": "Bàn giao priority order, resource commitment và điều kiện phục hồi.", "func_owner": ["D-EXEC", "D-PROD"], "decision": ["CEO", "PD"]},
+            {"with": "D-QUAL", "receive": "Nhận risk hệ thống, customer escape trọng yếu, management review input và recommendation về chất lượng cấp công ty.", "handoff": "Bàn giao quyết định về risk acceptance, resource opening và closure expectation.", "func_owner": ["D-EXEC", "D-QUAL"], "decision": ["CEO", "QA"]},
+            {"with": "D-FIN", "receive": "Nhận phân tích hiệu quả tài chính, cash impact, đầu tư, credit risk và budget constraint.", "handoff": "Bàn giao quyết định đầu tư, ngân sách hoặc giới hạn tài chính cho các chương trình ưu tiên.", "func_owner": ["D-EXEC", "D-FIN"], "decision": ["CEO", "FIN"]},
+            {"with": "D-HR", "receive": "Nhận đề xuất headcount, succession, leadership gap và workforce risk.", "handoff": "Bàn giao quyết định tuyển, thay thế, đào tạo hoặc cơ chế kế nhiệm cho vị trí trọng yếu.", "func_owner": ["D-EXEC", "D-HR"], "decision": ["CEO", "HR"]},
+            {"with": "D-IT", "receive": "Nhận escalations về hệ thống số, cyber / continuity risk và hạ tầng ảnh hưởng toàn doanh nghiệp.", "handoff": "Bàn giao priority khôi phục, resource commitment và decision về downtime / restart cấp doanh nghiệp.", "func_owner": ["D-EXEC", "D-IT"], "decision": ["CEO", "ITA"]},
+        ],
+        "related_docs": [
+            {"group": "QMS / tổ chức", "docs": [doc("QMS-MAN-001", "02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html"), doc("ANNEX-120", "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html"), doc("ANNEX-121", "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html"), doc("ANNEX-122", "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html"), doc("ANNEX-123", "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html"), doc("ANNEX-503", "03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html")]},
+            {"group": "SOP / WI trọng yếu", "docs": [doc("SOP-102", "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html"), doc("SOP-107", "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-107-communication-management.html"), doc("SOP-108", "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html"), doc("SOP-902", "03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html"), doc("SOP-903", "03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html"), doc("WI-202", "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html")]},
+            {"group": "Biểu mẫu / hồ sơ chính", "docs": [doc("FRM-181", "04-Bieu-Mau/01-FRM-100/FRM-181_Business_Disruption_Event_Log.xlsx"), doc("FRM-911", "04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx"), doc("FRM-131", "04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx"), doc("FRM-809", "04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx")]},
+        ],
+        "operating_model": ["Định hướng", "Nhận escalation", "Review data", "Chốt trade-off", "Mở nguồn lực", "Theo dõi closure"],
+        "boundary_intro": "D-EXEC không phải một phòng ban làm thay mọi việc. Đây là lớp điều hành cấp doanh nghiệp dùng để giữ định hướng, chốt trade-off và gỡ nút thắt vượt thẩm quyền chức năng; còn mọi quyết định chuyên môn vẫn phải quay về role code và department code đã được phát hành trong handbook và SOP của từng chức năng.",
+        "boundaries": [
+            {"point": "Decision layer vs execution layer", "owner": ["D-EXEC", "D-PROD"], "boundary": "D-EXEC chốt priority và resource trade-off; D-PROD vẫn giữ execution, dispatch, restart và recovery ở lớp vận hành khi chưa vượt thẩm quyền."},
+            {"point": "Enterprise risk vs quality decision", "owner": ["D-EXEC", "D-QUAL"], "boundary": "D-EXEC chốt mức chấp nhận rủi ro hệ thống; D-QUAL vẫn giữ hold, release, disposition và reaction plan theo authority matrix."},
+            {"point": "Strategic concession vs contract execution", "owner": ["D-EXEC", "D-SCS"], "boundary": "D-EXEC chốt concession hoặc cam kết cấp chiến lược; D-SCS vẫn giữ một tiếng nói với khách hàng và contract record."},
+            {"point": "Resource approval vs budget control", "owner": ["D-EXEC", "D-FIN"], "boundary": "D-EXEC quyết định hướng đầu tư; D-FIN giữ tính đúng của số liệu tài chính, dòng tiền và điều kiện kiểm soát giải ngân."},
+        ],
+        "coverage_gap": [
+            "Hiện chưa tách COO, Commercial Director hoặc các executive role chuyên biệt khác. Các escalations cấp doanh nghiệp hiện tập trung tại CEO và chỉ được tách thêm JD khi tần suất hoặc độ phức tạp của quyết định lặp lại đủ lớn.",
+        ],
+        "rhythm_notes": [
+            "D-EXEC phải có một enterprise escalation log sống, không được ra quyết định miệng mà không có owner, hạn và điều kiện kiểm tra hiệu lực.",
+            "Mỗi kỳ management review phải tách rõ: issue nào đóng ở cấp chức năng, issue nào phải giữ ở cấp điều hành doanh nghiệp.",
+            "Khi kích hoạt continuity cấp doanh nghiệp, D-EXEC phải chỉ định rõ người chỉ huy từng mặt trận: vận hành, chất lượng, EHS, IT và truyền thông khách hàng.",
+            "Quyết định cấp công ty chỉ được coi là hoàn tất khi đã được chuyển hóa thành action, budget, policy hoặc tài liệu downstream có hiệu lực.",
+        ],
+        "data_table": [
+            {"data": "Enterprise escalation log", "source": "Escalation tracker / WI-202 / control tower", "frequency": "Theo sự kiện / hàng ngày", "decision": "Quyết định cuối, route resource, giữ hoặc nhả escalations"},
+            {"data": "Management review input and action status", "source": "FRM-911 / KPI dashboard / action pack", "frequency": "Tháng / quý", "decision": "Chốt ưu tiên cấp công ty, action carry-over và resource opening"},
+            {"data": "Strategic risk and opportunity register", "source": "FRM-131 / executive review pack", "frequency": "Tháng / quý", "decision": "Risk acceptance, mitigation funding hoặc chương trình ưu tiên mới"},
+            {"data": "Continuity status and recovery priority", "source": "FRM-181 / incident log / IT and production recovery updates", "frequency": "Theo sự kiện", "decision": "Shutdown, restart order, offline mode và closure review"},
+        ],
+        "competence_intro": "Lớp D-EXEC trong doanh nghiệp job-order CNC phải nhìn thấy được cả bức tranh customer-strategy-capability-risk-data, nhưng vẫn tôn trọng ranh giới của từng chức năng chuyên môn và chỉ can thiệp ở đúng lớp quyết định cấp công ty.",
+        "competence_rows": [
+            {"role": "CEO", "skill": "Strategic steering, cross-functional trade-off, risk governance, management review closure, continuity leadership và enterprise resource allocation", "evidence": "Escalation closure quality, MR action completion, continuity decisions, capital allocation results", "requalify": "Khi doanh nghiệp đổi chiến lược, đổi phân khúc khách hàng, mở nhà xưởng mới hoặc xuất hiện pattern escalations lặp ngoài authority hiện tại"},
+        ],
+        "deputies": [
+            {"title": "Deputy coverage", "body": "Khi CEO vắng mặt, chỉ được kích hoạt deputy bằng ủy quyền rõ ràng trong ANNEX-123 hoặc quyết định chính thức; không dùng 'người thay lời' mơ hồ cho các quyết định cấp doanh nghiệp."},
+            {"title": "Escalation discipline", "body": "Deputy chỉ được nhận escalations có đủ pack tối thiểu gồm dữ liệu, rủi ro, lựa chọn, khuyến nghị chức năng và tác động nếu không quyết định trong kỳ."},
+        ],
+        "risks": [
+            {"risk": "Escalation trôi không owner", "signal": "Vấn đề đỏ đã lên cấp công ty nhưng không có người chốt, không có hạn hoặc không rõ basis quyết định", "first_hour": "Gán owner, định nghĩa câu hỏi cần quyết và mở enterprise action log ngay", "escalation": "CEO"},
+            {"risk": "Override sai authority", "signal": "Một quyết định cấp công ty đang can thiệp vào hold/release hoặc technical disposition vốn chưa đi qua owner chức năng", "first_hour": "Dừng override, yêu cầu functional owner trình basis và chỉ chốt lại sau khi authority matrix được tôn trọng", "escalation": ["CEO", "QA"]},
+            {"risk": "Continuity thiếu priority order", "signal": "Sự kiện lớn nhưng các chức năng đang tự khôi phục theo logic riêng, không có trật tự phục hồi cấp doanh nghiệp", "first_hour": "Tuyên bố priority order, chỉ định người chỉ huy từng mặt trận và khóa một nguồn cập nhật trạng thái", "escalation": "CEO"},
+            {"risk": "Resource opening không gắn closure", "signal": "Đã mở ngân sách hoặc nguồn lực nhưng không có owner, không có expected outcome hoặc không đo hậu quả", "first_hour": "Giữ trạng thái pending, yêu cầu objective-owner-metric trước khi coi là phê duyệt có hiệu lực", "escalation": ["CEO", "FIN"]},
+        ],
+    }
+)
 
 
 HANDBOOKS.append(
