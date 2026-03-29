@@ -235,11 +235,47 @@ SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
 
 ---
 
-## 8. Online forms vs Excel forms
+## 8. Master Data Module và Order Management
+
+### 8.1 Master Data Control
+
+QMS Portal bao gồm module **Master Data Control** quản lý dữ liệu nền tảng mà tất cả form và order phụ thuộc vào:
+
+| Đối tượng | Mô tả | Cascading relationships |
+|-----------|-------|----------------------|
+| **Customer** | Khách hàng đã phê duyệt | Customer -> SO, Customer -> Part |
+| **Supplier** | Nhà cung cấp / gia công ngoài | Customer -> Approved Supplier |
+| **Part** | Mã chi tiết | Customer -> Part -> Revision |
+| **Part Revision** | Phiên bản chi tiết (REV-A, REV-B...) | Part -> Revision -> Engineering baseline |
+| **Sales Order (SO)** | Đơn hàng bán | Customer -> SO -> JO |
+| **Job Order (JO)** | Lệnh sản xuất | SO -> JO -> WO |
+| **Work Order (WO)** | Phiếu công việc per operation | JO -> WO (per routing operation) |
+
+**Quy tắc:** Khi field trên form đã có master data được quản lý, form **KHÔNG** cho phép nhập tay tự do. Phải dùng searchable lookup từ master data source.
+
+### 8.2 Order Management (SO -> JO -> WO)
+
+Module `Quản lý đơn hàng` trên sidebar portal quản lý quan hệ phân cấp:
+
+```
+Sales Order (SO)
+  └── Job Order (JO)
+        └── Work Order (WO) per operation
+```
+
+Mỗi record chứa: customer, part number, revision, quantity, due date, status, route/operation context.
+
+Evidence forms (FRM-631 NCR, FRM-651 Final Inspection, FRM-511 Setup...) **bind** vào order record thay vì nhập text thủ công. Thay đổi trạng thái hoặc revision trên order được phản ánh trong form context.
+
+**SharePoint sync:** Order data được sync vào `LST-Job-Board` và `LST-Gate-Tracker` trên SITE 2 (HESEM-Job-Evidence) qua Graph API.
+
+---
+
+## 9. Online forms vs Excel forms
 
 > **Chi tiết đầy đủ:** core-standards/18-online-vs-offline-form-decision-framework.md
 
-### 8.1 Tiêu chí phân loại (7 tiêu chí, tổng 100 điểm)
+### 9.1 Tiêu chí phân loại (7 tiêu chí, tổng 100 điểm)
 
 | # | Tiêu chí | Trọng số | → Online (+) | → Excel (−) |
 |---|----------|---------|-------------|------------|
@@ -253,7 +289,7 @@ SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
 
 **Quy tắc:** Tổng > 60 → **ONLINE**. Tổng ≤ 60 → **OFFLINE (Excel)**.
 
-### 8.2 Quick Rules (không cần chấm điểm)
+### 9.2 Quick Rules (không cần chấm điểm)
 
 | LUÔN ONLINE | LUÔN OFFLINE |
 |-------------|-------------|
@@ -262,7 +298,7 @@ SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
 | Dữ liệu chảy vào OEE/OTD dashboard | Engineering baseline (CAM/NC linkage) |
 | Điền tại máy bằng phone/tablet | Tần suất ≤ quarterly |
 
-### 8.3 Danh sách online forms (3 phases, ~25 forms)
+### 9.3 Danh sách online forms (3 phases, ~25 forms)
 
 **Phase 1 (đã triển khai):** FRM-208, FRM-504, FRM-512
 
@@ -270,7 +306,7 @@ SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
 
 **Phase 3 (mở rộng):** FRM-501, FRM-502, FRM-505, FRM-507, FRM-513, FRM-514, FRM-518, FRM-519, FRM-721, FRM-525
 
-### 8.3 Sync mechanism
+### 9.3b Sync mechanism
 
 ```
 Online form submit → api.php:
@@ -280,7 +316,7 @@ Online form submit → api.php:
 └── Upload PDF to SharePoint Library → evidence
 ```
 
-### 8.4 Excel form version control
+### 9.4 Excel form version control
 
 ```
 Download: api.php inject version stamp → filename FRM-302_Setup-Sheet_V3.2.xlsx
@@ -289,7 +325,7 @@ Upload:   SharePoint validate version vs registry → reject if obsolete
 
 ---
 
-## 9. Storage estimate
+## 10. Storage estimate
 
 | File type | Size trung bình | Volume/năm | Total/năm |
 |-----------|----------------|-----------|-----------|
@@ -305,6 +341,6 @@ M365 Business Basic: 1TB + 10GB/user. Với 100 user = ~2TB. 18GB/năm = **100+ 
 
 ---
 
-> **Cập nhật lần cuối:** 2026-03-27
+> **Cập nhật lần cuối:** 2026-03-29
 > **Áp dụng:** M365 SharePoint deployment — HESEM ENGINEERING
-> **Tài liệu liên quan:** 15-evidence-and-records-naming.md, WI-102, WI-107, ANNEX-131 đến ANNEX-136
+> **Tài liệu liên quan:** 15-evidence-and-records-naming.md, WI-102, WI-107, ANNEX-131 đến ANNEX-136, 23-form-lifecycle-and-allocation.md, record_type_expanded.json

@@ -217,9 +217,42 @@ Mỗi dải có slot dự phòng từ số cuối cùng + 1 đến x99. Ví dụ
 
 ---
 
-## 8. Lộ trình tich hop hệ thống
+## 8. QMS Portal — Nền tảng số hóa (qms.hesem.com.vn)
 
-### 8.1 Epicor ERP
+### 8.1 Trạng thái hiện tại (2026-03-29)
+
+| Hạng mục | Mô tả | Trạng thái |
+|----------|-------|-----------|
+| **PostgreSQL schema** | 103 bảng, 80+ enum types, pgvector, partitioned audit/inventory/labor | HOÀN THÀNH |
+| **API MVC** | Router, 9 domain controllers, middleware stack, service layer, validators | HOÀN THÀNH |
+| **Form Engine** | 6 services: FormEngine, WorkflowEngine, RecordIdGenerator, AuditTrail, AttachmentService, ESignatureService | HOÀN THÀNH |
+| **KPI / SPC** | KpiEngine (OEE, OTD, DPMO, COPQ, FPY, Scrap, OQL), SpcEngine (control charts, Cpk/Ppk, run rules) | HOÀN THÀNH |
+| **PWA / Offline** | Service Worker, IndexedDB sync queue, conflict resolution, barcode scanner, mobile layouts | HOÀN THÀNH |
+| **Form Hub** | 4-tab redesign: Form Control, Evidence Fill/Download, Record ID Assistant, Allocation Tracker | HOÀN THÀNH |
+| **Master Data** | Reference module cho customer, supplier, part, revision, SO, JO, WO | HOÀN THÀNH |
+| **E-Signature** | Reusable component: identity-bound, re-auth, audit trail, meaning capture | HOÀN THÀNH |
+| **Record Types** | Mở rộng từ 11 lên 42 loại hồ sơ (record_type_expanded.json) | HOÀN THÀNH |
+| **Intelligence Layer** | Semantic search, auto-fill, anomaly detection, RCA assistant | CHƯA BẮT ĐẦU |
+| **Production Integration** | Phases A-H: master data, schema-driven forms, form builder, record ID, offline packages, e-signature flow, order management, documentation update | TIẾP THEO |
+
+### 8.2 Lộ trình tích hợp sản xuất (Phases A-H)
+
+| Phase | Nội dung | Phụ thuộc |
+|-------|---------|-----------|
+| A | Master Data Control: customer, supplier, part, revision, SO/JO/WO | Nền tảng |
+| B | FRM-631 NCR chuyển từ demo sang production schema-driven | Phase A |
+| C | Form Builder / Form Version Control module | Phase B |
+| D | Record ID Assistant tách riêng với issuance log đầy đủ | Phase A |
+| E | Offline form package: hidden metadata, upload verification, receipt lifecycle | Phase D |
+| F | Production e-signature approval flow với audit trail | Phase B |
+| G | Order Management (SO -> JO -> WO) tích hợp form context | Phase A |
+| H | Cập nhật tài liệu kiểm soát: core standards, WI, ANNEX | Phases A-G |
+
+---
+
+## 9. Lộ trình tich hop hệ thống (Epicor / M365 / Power BI)
+
+### 9.1 Epicor ERP
 
 | Giai đoạn | Nội dung | Thời điểm dự kiến |
 |-----------|---------|-------------------|
@@ -229,7 +262,7 @@ Mỗi dải có slot dự phòng từ số cuối cùng + 1 đến x99. Ví dụ
 | Phase 3 | Dashboard KPI doc trực tiếp tu Epicor | Q1 2026 |
 | Phase 4 | Workflow phê duyệt tich hop Epicor-M365 | Q2 2026 |
 
-### 8.2 Microsoft 365
+### 9.2 Microsoft 365
 
 | Giai đoạn | Nội dung | Thời điểm dự kiến |
 |-----------|---------|-------------------|
@@ -239,7 +272,7 @@ Mỗi dải có slot dự phòng từ số cuối cùng + 1 đến x99. Ví dụ
 | Phase 3 | Teams integration: thong bao tu dong khi tài liệu thay đổi | Q1 2026 |
 | Phase 4 | Retention labels tu dong trên SharePoint | Q2 2026 |
 
-### 8.3 Power BI
+### 9.3 Power BI
 
 | Giai đoạn | Nội dung | Thời điểm dự kiến |
 |-----------|---------|-------------------|
@@ -251,15 +284,15 @@ Mỗi dải có slot dự phòng từ số cuối cùng + 1 đến x99. Ví dụ
 
 ---
 
-## 9. Lộ trình chuyen doi V0 sang V1
+## 10. Lộ trình chuyen doi V0 sang V1
 
-### 9.1 Trạng thái hiện tại
+### 10.1 Trạng thái hiện tại
 
 - Toan bo tài liệu QMS dang ở V0 (phát hành lan dau).
 - Cấu trúc, nội dung, format đã chuẩn hoa.
 - Chua co chữ ký chinh thuc tren ban in.
 
-### 9.2 Dieu kien de chuyen V0 -> V1.0
+### 10.2 Dieu kien de chuyen V0 -> V1.0
 
 | # | Dieu kien | Trạng thái |
 |---|----------|-----------|
@@ -271,7 +304,7 @@ Mỗi dải có slot dự phòng từ số cuối cùng + 1 đến x99. Ví dụ
 | 6 | Internal audit lan dau hoan thanh | Chua |
 | 7 | Management review lan dau hoan thanh | Chua |
 
-### 9.3 Ke hoặch chuyen doi
+### 10.3 Ke hoặch chuyen doi
 
 | Giai doan | Nội dung | Thời gian |
 |-----------|---------|-----------|
@@ -283,7 +316,7 @@ Mỗi dải có slot dự phòng từ số cuối cùng + 1 đến x99. Ví dụ
 | 6. Management Review | Hop xem xét lanh dao lan dau | 1 tuan |
 | 7. Certification audit | Dang ky audit chung nhan ISO 9001 | Theo ke hoặch |
 
-### 9.4 Quy tắc chuyen doi
+### 10.4 Quy tắc chuyen doi
 
 - KHÔNG chuyen V0 -> V1.0 tu tung tài liệu. Chuyen DONG LOAT toàn bộ hệ thống.
 - Mọi tài liệu PHẢI có DCR và chữ ký phê duyệt trước khi chuyển V1.0.
@@ -292,7 +325,7 @@ Mỗi dải có slot dự phòng từ số cuối cùng + 1 đến x99. Ví dụ
 
 ---
 
-## 10. Nguyen tac mở rộng chung
+## 11. Nguyen tac mở rộng chung
 
 | # | Nguyen tac | Mô tả |
 |---|-----------|-------|

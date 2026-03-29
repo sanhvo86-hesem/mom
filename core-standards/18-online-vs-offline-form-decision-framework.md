@@ -101,6 +101,33 @@ Các trường hợp rõ ràng, không cần qua scoring matrix:
 
 ---
 
+## 3.4 Registry loại hồ sơ mở rộng (42 record types)
+
+Hệ thống HESEM hiện quản lý **42 loại hồ sơ** (mở rộng từ 11 loại ban đầu), được định nghĩa tại:
+
+- **SSOT:** `01-QMS-Portal/qms-data/config/record_type_expanded.json`
+- **Nguồn gốc:** `qms-data/counters/_registry.json` + `qms-data/config/document_type_registry.json`
+
+| Nhóm | Ví dụ record types | Số lượng |
+|------|-------------------|---------|
+| Quality | NCR, CAPA, FAI, SCAR, DEV, CON, ESC, MRB | 8 |
+| Production | JO, WO, DTL, SHR, SPR, TWL, SCH | 7 |
+| Engineering | ECR, ECO, BLN, DFM, PRV | 5 |
+| HR / Training | TRN, OJT, CRT, SKL | 4 |
+| Admin / Governance | DCR, MRV, AUD, RMA, IMP | 5 |
+| Logistics | SHP, RCV, PKG, EXP | 4 |
+| Finance | INV, CST, PO | 3 |
+| Maintenance | CAL, PMO, MWO | 3 |
+| Other | EHS, CCC, NPI | 3 |
+
+Khi tạo form mới, **PHẢI** kiểm tra record type tương ứng trong registry mở rộng để xác định:
+- `format_pattern` (mẫu mã hồ sơ)
+- `department_owner` (phòng ban chủ sở hữu)
+- `linked_form` (form liên kết)
+- `category` (nhóm phân loại cho scoring matrix)
+
+---
+
 ## 4. Phân loại toàn bộ form HESEM
 
 ### 4.1 ONLINE — Phase 1 (đã triển khai)
@@ -252,6 +279,6 @@ Khi tạo form schema mới (`qms-data/online-forms/schemas/FRM-XXX.json`):
 
 ---
 
-> **Cập nhật lần cuối:** 2026-03-28
+> **Cập nhật lần cuối:** 2026-03-29
 > **Áp dụng:** Mọi quyết định tạo form mới hoặc migrate form từ offline → online
-> **Tài liệu liên quan:** 14-m365-sharepoint-architecture.md (§8), 15-evidence-and-records-naming.md, WI-101, ANNEX-137
+> **Tài liệu liên quan:** 14-m365-sharepoint-architecture.md (§8), 15-evidence-and-records-naming.md, WI-101, ANNEX-137, record_type_expanded.json (42 loại hồ sơ)

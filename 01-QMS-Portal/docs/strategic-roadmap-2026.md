@@ -3,8 +3,8 @@
 **Document ID:** ROADMAP-2026-001
 **Date:** 2026-03-28
 **Owner:** IT / QMS Engineering
-**Status:** Draft
-**Scope:** Migrate the QMS Portal from JSON file storage to PostgreSQL, modernize the API, and add analytics, offline, and intelligence capabilities.
+**Status:** Active (Phases 1-5 Complete, Phase 7 in progress)
+**Scope:** Migrate the QMS Portal from JSON file storage to PostgreSQL, modernize the API, and add analytics, offline, and intelligence capabilities. Production integration (Phase 7) converts demo components into governed production modules.
 
 ---
 
@@ -19,8 +19,9 @@
 7. [Phase 4: Dashboard and Analytics (Weeks 13-16)](#phase-4-dashboard-and-analytics-weeks-13-16)
 8. [Phase 5: Offline and Mobile (Weeks 17-20)](#phase-5-offline-and-mobile-weeks-17-20)
 9. [Phase 6: Intelligence Layer (Weeks 21-24)](#phase-6-intelligence-layer-weeks-21-24)
-10. [Risk Register](#7-risk-register)
-11. [Resource Summary](#8-resource-summary)
+10. [Phase 7: Production Integration (Phases A-H)](#phase-7-production-integration-phases-a-h)
+11. [Risk Register](#7-risk-register)
+12. [Resource Summary](#8-resource-summary)
 
 ---
 
@@ -228,7 +229,9 @@ Intelligence Layer
 
 ---
 
-## Phase 1: Database Migration Layer (Weeks 1-4)
+## Phase 1: Database Migration Layer (Weeks 1-4) -- COMPLETE
+
+**Status:** COMPLETE (2026-03-29) -- PostgreSQL schema (103 tables, 80+ enums) deployed; DataLayer abstraction operational; JSON-to-PG import scripts verified; feature flags controlling read/write source.
 
 **Goal:** Shadow-write all data operations to PostgreSQL while keeping JSON files as the primary read/write source. Zero disruption to the running portal.
 
@@ -520,7 +523,9 @@ Testing approach: PHPUnit 10+ with a dedicated test PostgreSQL database (can use
 
 ---
 
-## Phase 2: API Modernization (Weeks 5-8)
+## Phase 2: API Modernization (Weeks 5-8) -- COMPLETE
+
+**Status:** COMPLETE (2026-03-29) -- MVC router, 9 domain controllers, middleware stack (Auth, CORS, CSRF, RateLimit, Logging), service layer, and server-side validators all operational. Legacy `?action=` routing preserved.
 
 **Goal:** Refactor the monolithic `api.php` (6,876 lines) into a proper MVC structure with domain controllers, middleware, and server-side validation. Maintain backward compatibility for the existing `?action=` query parameter routing.
 
@@ -739,7 +744,9 @@ The OpenAPI spec documents all 55+ endpoints with:
 
 ---
 
-## Phase 3: Form Engine Enhancement (Weeks 9-12)
+## Phase 3: Form Engine Enhancement (Weeks 9-12) -- COMPLETE
+
+**Status:** COMPLETE (2026-03-29) -- FormEngine, WorkflowEngine, RecordIdGenerator, AuditTrail, AttachmentService, and ESignatureService all built. 4-tab Form Hub UI (Form Control, Evidence Fill/Download, Record ID Assistant, Allocation Tracker) deployed. 42 record types defined in record_type_expanded.json.
 
 **Goal:** Build a robust form system with JSON Schema validation, state-machine workflow, atomic record ID generation, comprehensive audit trail, and file attachment integrity.
 
@@ -989,7 +996,9 @@ This is preparation only (full e-signature requires legal review):
 
 ---
 
-## Phase 4: Dashboard and Analytics (Weeks 13-16)
+## Phase 4: Dashboard and Analytics (Weeks 13-16) -- COMPLETE
+
+**Status:** COMPLETE (2026-03-29) -- KpiEngine (7 calculators: OEE, OTD, DPMO, COPQ, FPY, Scrap, OQL), SpcEngine (control charts, Cpk/Ppk, run rules), DashboardController, NotificationService, ReportGenerator, and cron jobs all built.
 
 **Goal:** Real-time KPI dashboards, SPC analytics, and reporting for management review. Replace static Excel reports with live portal dashboards.
 
@@ -1160,7 +1169,9 @@ These scripts are standalone CLI scripts that use `DataLayer` to access PostgreS
 
 ---
 
-## Phase 5: Offline and Mobile (Weeks 17-20)
+## Phase 5: Offline and Mobile (Weeks 17-20) -- COMPLETE
+
+**Status:** COMPLETE (2026-03-29) -- PWA manifest, Service Worker with cache strategies, IndexedDB offline store, sync queue, conflict resolution, barcode/QR scanner, and mobile-optimized form layouts all built.
 
 **Goal:** Enable QC inspectors and operators on the shop floor to fill forms on tablets without network connectivity. Data syncs when connectivity is restored.
 
@@ -1341,7 +1352,9 @@ Design principles:
 
 ---
 
-## Phase 6: Intelligence Layer (Weeks 21-24)
+## Phase 6: Intelligence Layer (Weeks 21-24) -- NOT STARTED
+
+**Status:** NOT STARTED -- Deferred pending completion of Phase 7 production integration. Prerequisite KPI/SPC data pipelines exist from Phase 4.
 
 **Goal:** Add AI-powered search, auto-fill suggestions, and anomaly detection to the QMS portal. Leverage pgvector embeddings for semantic document search.
 
@@ -1488,6 +1501,57 @@ Features:
 
 ---
 
+## Phase 7: Production Integration (Phases A-H) -- IN PROGRESS
+
+**Status:** IN PROGRESS (started 2026-03-29) -- Converting demo components and reference-grade assets into governed production modules. See `01-QMS-Portal/docs/pro-handoff-next-implementation-spec-2026-03-29.md` for full build specification.
+
+**Goal:** Bridge the gap between the completed infrastructure (Phases 1-5) and real production use. Convert the NCR demo, reusable UI components, and master data stubs into fully integrated, schema-driven, audit-backed production modules.
+
+**Estimated effort:** 50-60 person-days
+
+### Phase A: Master Data Control
+
+Build the production master data module that all forms and orders depend on. Covers: customers, suppliers, parts, part revisions, sales orders, job orders, work orders, CAPA references. Provides cascading lookups (Customer -> SO -> JO -> WO; Customer -> Part -> Revision).
+
+### Phase B: FRM-631 NCR Production Schema-Driven Form
+
+Convert the NCR demo (`form-ncr-demo.html`) into a governed, schema-driven production form. Runtime rendering from `FRM-631.json` schema with searchable lookups, multi-select 6M root cause, CAPA linkage, and master-data-backed fields.
+
+### Phase C: Form Builder / Form Version Control
+
+Build Tab 1 of Evidence Control as a real form builder: create, revise, clone, submit for review, approve/reject, and obsolete form definitions. Output matches CS-024 design system. Immutable released revisions with audit trail.
+
+### Phase D: Record ID Assistant
+
+Separate code issuance from form fill/download. Filter chain (department -> family -> type -> subtype), preview, confirm, log issuance, copy to clipboard, track status (issued / used / received / superseded / cancelled). Atomic, non-duplicating counters across 42 record types.
+
+### Phase E: Offline Form Package and Return Flow
+
+System-issued offline packages with hidden Excel metadata (form code, revision, allocation ID, timestamp, issuer, checksum). Upload verification checks system origin, metadata integrity, revision match, and duplicate receipt. Controlled submission versioning.
+
+### Phase F: Production E-Signature Approval Flow
+
+Identity-bound signatures with re-authentication, meaning capture, timestamp, hash evidence. Supports Reported By, Checked By, Approved By roles. Signature event and approval state change are atomic.
+
+### Phase G: Order Management Integration
+
+Production `Quan ly don hang` module for SO -> JO -> WO hierarchy with customer, part, revision, quantity, due date, status. Forms bind to real order records instead of manual text entry.
+
+### Phase H: Controlled Documentation Update
+
+Synchronize core standards, WI, and ANNEX documents with actual portal behavior. Minimum targets: CS-024, CS-018, WI-101, ANNEX-137, and any SOP/WI governing NCR/CAPA and online forms.
+
+### Phase 7 Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|------------|
+| Master data schema changes during integration | Medium | High | Lock master data API contract before Phase B starts |
+| Form builder scope creep | High | Medium | Strict scope per phase; defer advanced builder features |
+| Offline metadata injection compatibility across Excel versions | Medium | Medium | Test on Excel 2019+, LibreOffice, Google Sheets |
+| Parallel GPT/Claude work creating merge conflicts | Medium | Medium | Clear file ownership boundaries in handoff spec |
+
+---
+
 ## 7. Risk Register (Cross-Phase)
 
 | ID | Risk | Phase | Likelihood | Impact | Mitigation | Owner |
@@ -1506,15 +1570,16 @@ Features:
 
 ## 8. Resource Summary
 
-| Phase | Weeks | Person-Days | Key Skills Required |
-|-------|-------|-------------|-------------------|
-| Phase 1: Database Migration Layer | 1-4 | 28 | PHP, PostgreSQL, SQL, data migration |
-| Phase 2: API Modernization | 5-8 | 35 | PHP OOP, API design, testing |
-| Phase 3: Form Engine Enhancement | 9-12 | 40 | PHP, JSON Schema, state machines, security |
-| Phase 4: Dashboard and Analytics | 13-16 | 30 | PHP, SQL analytics, SPC statistics, PDF generation |
-| Phase 5: Offline and Mobile | 17-20 | 32 | JavaScript, Service Workers, IndexedDB, responsive CSS |
-| Phase 6: Intelligence Layer | 21-24 | 28 | ML/embeddings, pgvector, PHP, JavaScript |
-| **Total** | **24 weeks** | **193 person-days** | |
+| Phase | Weeks | Person-Days | Key Skills Required | Status |
+|-------|-------|-------------|-------------------|--------|
+| Phase 1: Database Migration Layer | 1-4 | 28 | PHP, PostgreSQL, SQL, data migration | COMPLETE |
+| Phase 2: API Modernization | 5-8 | 35 | PHP OOP, API design, testing | COMPLETE |
+| Phase 3: Form Engine Enhancement | 9-12 | 40 | PHP, JSON Schema, state machines, security | COMPLETE |
+| Phase 4: Dashboard and Analytics | 13-16 | 30 | PHP, SQL analytics, SPC statistics, PDF generation | COMPLETE |
+| Phase 5: Offline and Mobile | 17-20 | 32 | JavaScript, Service Workers, IndexedDB, responsive CSS | COMPLETE |
+| Phase 6: Intelligence Layer | 21-24 | 28 | ML/embeddings, pgvector, PHP, JavaScript | NOT STARTED |
+| Phase 7: Production Integration (A-H) | 25-32 | 55 | Full-stack PHP/JS, form engine, master data, Excel processing | IN PROGRESS |
+| **Total** | **32 weeks** | **248 person-days** | | |
 
 **Recommended team:** 2 full-time developers (1 backend PHP/PostgreSQL, 1 frontend JS/PWA) plus 1 part-time QMS domain expert for validation and acceptance testing.
 
