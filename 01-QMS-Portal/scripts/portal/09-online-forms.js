@@ -40,21 +40,20 @@ window._fhState = {
 
 // ── Constants ──
 var FORM_COLORS = {
-  production:  {bg:'#e7f5ff', border:'#1971c2', icon:'&#x1F3ED;', label:'San xuat',         labelEn:'Production'},
-  quality:     {bg:'#ebfbee', border:'#2f9e44', icon:'&#x1F50D;', label:'Chat luong',        labelEn:'Quality'},
-  maintenance: {bg:'#fff9db', border:'#e67700', icon:'&#x1F527;', label:'Bao tri',           labelEn:'Maintenance'},
-  hr:          {bg:'#f3f0ff', border:'#7950f2', icon:'&#x1F465;', label:'Nhan su & Dao tao', labelEn:'HR & Training'},
-  logistics:   {bg:'#fff4e6', border:'#d9480f', icon:'&#x1F4E6;', label:'Kho van',           labelEn:'Logistics'},
-  safety:      {bg:'#fff5f5', border:'#e03131', icon:'&#x26A0;',  label:'An toan',           labelEn:'Safety'}
+  production:  {bg:'#e7f5ff', border:'#1971c2', icon:'&#x1F3ED;', label:'Sản xuất',           labelEn:'Production'},
+  quality:     {bg:'#ebfbee', border:'#2f9e44', icon:'&#x1F50D;', label:'Chất lượng',         labelEn:'Quality'},
+  maintenance: {bg:'#fff9db', border:'#e67700', icon:'&#x1F527;', label:'Bảo trì',            labelEn:'Maintenance'},
+  hr:          {bg:'#f3f0ff', border:'#7950f2', icon:'&#x1F465;', label:'Nhân sự & Đào tạo', labelEn:'HR & Training'},
+  logistics:   {bg:'#fff4e6', border:'#d9480f', icon:'&#x1F4E6;', label:'Kho vận',            labelEn:'Logistics'},
+  safety:      {bg:'#fff5f5', border:'#e03131', icon:'&#x26A0;',  label:'An toàn',            labelEn:'Safety'}
 };
 window._fhFormColors = FORM_COLORS;
 
 var TAB_CONFIG = [
-  {id:'catalog',       icon:'&#x1F4CB;', labelVi:'Danh muc Form',      labelEn:'Form Catalog'},
-  {id:'fill-download', icon:'&#x270F;',  labelVi:'Dien / Tai Form',    labelEn:'Fill / Download'},
-  {id:'record-id',     icon:'&#x1F522;', labelVi:'Xin ma ho so',       labelEn:'Record ID'},
-  {id:'upload',        icon:'&#x1F4E4;', labelVi:'Upload & Kiem tra',  labelEn:'Upload & Validate'},
-  {id:'so-jo-wo',      icon:'&#x1F4CA;', labelVi:'SO / JO / WO',      labelEn:'SO / JO / WO'}
+  {id:'catalog',       icon:'&#x1F4CB;', labelVi:'Danh mục Form',          labelEn:'Form Catalog'},
+  {id:'fill-download', icon:'&#x270F;',  labelVi:'Điền & Tải Form',       labelEn:'Fill & Download'},
+  {id:'record-id',     icon:'&#x1F522;', labelVi:'Trợ lý tạo mã',        labelEn:'ID Generator'},
+  {id:'upload',        icon:'&#x1F4E4;', labelVi:'Tải lên & Kiểm tra',   labelEn:'Upload & Verify'}
 ];
 
 // ===================================================================
@@ -87,7 +86,7 @@ function _renderFormHub(schemas, page){
   h += '<div class="fh-hero">';
   h += '<div>';
   h += '<div class="fh-hero-kicker">HESEM QMS &mdash; ANNEX-137 Compliant</div>';
-  h += '<h1>' + _t('Form Hub &mdash; Trung tam quan ly bieu mau','Form Hub &mdash; Central Form Management') + '</h1>';
+  h += '<h1>' + _t('Kiểm soát chứng cứ &mdash; Trung tâm quản lý biểu mẫu','Evidence Control &mdash; Central Form Management') + '</h1>';
   h += '<p>' + _t(
     'Tao ho so, xin ma, dien form online, tai Excel, upload evidence &mdash; tat ca tai day. Ten file tu dong theo ANNEX-137.',
     'Create records, request IDs, fill forms online, download Excel, upload evidence &mdash; all in one place. Filenames auto-generated per ANNEX-137.'
@@ -101,8 +100,8 @@ function _renderFormHub(schemas, page){
   Object.keys(_formEntries).forEach(function(k){ totalEntries += (_formEntries[k]||[]).length; });
 
   h += '<div class="fh-hero-side">';
-  h += '<div class="fh-side-card"><span class="fh-side-label">' + _t('Form kha dung','Available') + '</span><strong>' + totalForms + '</strong><div>' + onlineForms + ' online</div></div>';
-  h += '<div class="fh-side-card"><span class="fh-side-label">' + _t('Ban ghi','Entries') + '</span><strong>' + totalEntries + '</strong><div>' + _t('Hom nay','Today') + '</div></div>';
+  h += '<div class="fh-side-card"><span class="fh-side-label">' + _t('Form khả dụng','Available') + '</span><strong>' + totalForms + '</strong><div>' + onlineForms + ' online</div></div>';
+  h += '<div class="fh-side-card"><span class="fh-side-label">' + _t('Bản ghi','Entries') + '</span><strong>' + totalEntries + '</strong><div>' + _t('Hôm nay','Today') + '</div></div>';
   h += '</div>';
   h += '</div>';
 
@@ -116,11 +115,11 @@ function _renderFormHub(schemas, page){
   });
 
   h += '<div class="fh-summary">';
-  h += _kpiCard('blue',   totalForms,   _t('Tong form','Total Forms'),         _t('Dang hieu luc','Active'));
-  h += _kpiCard('green',  onlineForms,  _t('Form online','Online Forms'),      _t('Dien truc tuyen','Fill online'));
-  h += _kpiCard('amber',  offlineForms, _t('Form Excel','Offline Forms'),      _t('Tai ve dien','Download'));
-  h += _kpiCard('purple', 0,            _t('Ma da cap','Allocated IDs'),       _t('AllocationTracker','Tracker'));
-  h += _kpiCard('red',    drafts,       _t('Cho nop','Pending Submissions'),   _t('Nhap + cho xu ly','Draft + pending'));
+  h += _kpiCard('blue',   totalForms,   _t('Tổng form','Total Forms'),         _t('Đang hiệu lực','Active'));
+  h += _kpiCard('green',  onlineForms,  _t('Form online','Online Forms'),      _t('Điền trực tuyến','Fill online'));
+  h += _kpiCard('amber',  offlineForms, _t('Form Excel','Offline Forms'),      _t('Tải về điền','Download'));
+  h += _kpiCard('purple', 0,            _t('Mã đã cấp','Allocated IDs'),       _t('AllocationTracker','Tracker'));
+  h += _kpiCard('red',    drafts,       _t('Chờ nộp','Pending Submissions'),   _t('Nháp + chờ xử lý','Draft + pending'));
   h += '</div>';
 
   // ── Tab Bar ──
@@ -196,28 +195,28 @@ function _activateTab(tabId, schemas){
       if(typeof window._renderFillDownload === 'function'){
         window._renderFillDownload(schemas, entries, container);
       } else {
-        container.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b"><p>' + _t('Module dien/tai form chua tai.','Fill/Download module not loaded.') + '</p></div>';
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b"><p>' + _t('Module điền/tải form chưa tải.','Fill/Download module not loaded.') + '</p></div>';
       }
       break;
     case 'record-id':
       if(typeof window._renderRecordIdGenerator === 'function'){
         window._renderRecordIdGenerator(schemas, entries, container);
       } else {
-        container.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b"><p>' + _t('Module cap ma chua tai.','Record ID module not loaded.') + '</p></div>';
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b"><p>' + _t('Module cấp mã chưa tải.','Record ID module not loaded.') + '</p></div>';
       }
       break;
     case 'upload':
       if(typeof window._renderUploadVerify === 'function'){
         window._renderUploadVerify(schemas, entries, container);
       } else {
-        container.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b"><p>' + _t('Module upload chua tai.','Upload module not loaded.') + '</p></div>';
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b"><p>' + _t('Module upload chưa tải.','Upload module not loaded.') + '</p></div>';
       }
       break;
     case 'so-jo-wo':
       if(typeof window._renderSoJoWoDashboard === 'function'){
         window._renderSoJoWoDashboard(schemas, entries, container);
       } else {
-        container.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b"><p>' + _t('Module SO/JO/WO chua tai.','SO/JO/WO module not loaded.') + '</p></div>';
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b"><p>' + _t('Module SO/JO/WO chưa tải.','SO/JO/WO module not loaded.') + '</p></div>';
       }
       break;
   }
@@ -231,9 +230,9 @@ function _renderCatalogFallback(schemas, container){
 
   // Filter bar
   h += '<div class="fh-filter-bar">';
-  h += '<input type="text" class="fh-search" id="fh-search" placeholder="' + _t('Tim form theo ma, ten, SOP...','Search by code, name, SOP...') + '" oninput="_fhFilterForms()" value="' + _escHtml(_searchQuery) + '">';
+  h += '<input type="text" class="fh-search" id="fh-search" placeholder="' + _t('Tìm form theo mã, tên, SOP...','Search by code, name, SOP...') + '" oninput="_fhFilterForms()" value="' + _escHtml(_searchQuery) + '">';
   h += '<div class="fh-filter-chips">';
-  h += '<button class="fh-chip' + (_activeFilter==='all'?' active':'') + '" onclick="_fhSetFilter(\'all\')">' + _t('Tat ca','All') + '</button>';
+  h += '<button class="fh-chip' + (_activeFilter==='all'?' active':'') + '" onclick="_fhSetFilter(\'all\')">' + _t('Tất cả','All') + '</button>';
   Object.keys(FORM_COLORS).forEach(function(cat){
     var cfg = FORM_COLORS[cat];
     h += '<button class="fh-chip' + (_activeFilter===cat?' active':'') + '" onclick="_fhSetFilter(\'' + cat + '\')">' + cfg.icon + ' ' + _t(cfg.label, cfg.labelEn) + '</button>';
@@ -292,12 +291,12 @@ function _renderFormCards(schemas){
       h += '<div class="form-card-desc">' + _escHtml(s.description||'') + '</div>';
       h += '<div class="form-card-footer">';
       h += '<span class="form-card-ref">' + _escHtml(s.sop_ref||'') + '</span>';
-      if(entries > 0) h += '<span class="form-card-entries">' + entries + ' ' + _t('ban ghi','entries') + '</span>';
+      if(entries > 0) h += '<span class="form-card-entries">' + entries + ' ' + _t('bản ghi','entries') + '</span>';
 
       if(isOnline){
-        h += '<button class="form-card-btn" onclick="renderOnlineForms(\'' + _escHtml(s.form_code) + '\')">' + _t('Dien online','Fill online') + ' &rarr;</button>';
+        h += '<button class="form-card-btn" onclick="renderOnlineForms(\'' + _escHtml(s.form_code) + '\')">' + _t('Điền online','Fill online') + ' &rarr;</button>';
       } else {
-        h += '<button class="form-card-btn" onclick="_fhDownloadBlank(\'' + _escHtml(s.form_code) + '\')">' + _t('Tai ve','Download') + ' &darr;</button>';
+        h += '<button class="form-card-btn" onclick="_fhDownloadBlank(\'' + _escHtml(s.form_code) + '\')">' + _t('Tải về','Download') + ' &darr;</button>';
       }
       h += '</div>';
       h += '</div>';
@@ -306,7 +305,7 @@ function _renderFormCards(schemas){
     h += '</div></div>';
   });
 
-  if(!h) h = '<div style="text-align:center;padding:40px;color:#64748b"><p style="font-size:32px;margin-bottom:8px">&#x1F50D;</p><p>' + _t('Khong tim thay form nao','No forms found') + '</p></div>';
+  if(!h) h = '<div style="text-align:center;padding:40px;color:#64748b"><p style="font-size:32px;margin-bottom:8px">&#x1F50D;</p><p>' + _t('Không tìm thấy form nào','No forms found') + '</p></div>';
   return h;
 }
 
@@ -341,9 +340,9 @@ window._fhDownloadBlank = function(formCode){
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    _showFormToast(_t('Dang tai ','Downloading ') + formCode, 'info');
+    _showFormToast(_t('Đang tải ','Downloading ') + formCode, 'info');
   } else {
-    _showFormToast(_t('Form blank chua co san. Lien he QMS Admin.','Blank form not available. Contact QMS Admin.'), 'warn');
+    _showFormToast(_t('Form blank chưa có sẵn. Liên hệ QMS Admin.','Blank form not available. Contact QMS Admin.'), 'warn');
   }
 };
 
@@ -424,7 +423,7 @@ window._renderFormEntry = function(schema, page){
 
   // Back button + header
   html += '<div class="form-entry-topbar">';
-  html += '<button class="form-back-btn" onclick="renderOnlineForms()">&larr; ' + _t('Quay lai','Back') + '</button>';
+  html += '<button class="form-back-btn" onclick="renderOnlineForms()">&larr; ' + _t('Quay lại','Back') + '</button>';
   html += '<div class="form-entry-meta">';
   html += '<span class="form-code-badge" style="background:' + cfg.bg + ';border:1px solid ' + cfg.border + ';color:' + cfg.border + '">' + _escHtml(schema.form_code) + '</span>';
   html += '<span class="form-version-badge">v' + _escHtml(String(schema.version||'1')) + '</span>';
@@ -444,9 +443,9 @@ window._renderFormEntry = function(schema, page){
   });
 
   html += '<div class="form-actions">';
-  html += '<button type="submit" class="form-submit-btn">&#x1F4BE; ' + _t('Luu & Gui','Save & Submit') + '</button>';
-  html += '<button type="button" class="form-draft-btn" onclick="_onlineFormSaveDraft()">&#x1F4DD; ' + _t('Luu nhap','Save Draft') + '</button>';
-  html += '<button type="button" class="form-clear-btn" onclick="_onlineFormClear()">&#x1F5D1; ' + _t('Xoa','Clear') + '</button>';
+  html += '<button type="submit" class="form-submit-btn">&#x1F4BE; ' + _t('Lưu & Gửi','Save & Submit') + '</button>';
+  html += '<button type="button" class="form-draft-btn" onclick="_onlineFormSaveDraft()">&#x1F4DD; ' + _t('Lưu nháp','Save Draft') + '</button>';
+  html += '<button type="button" class="form-clear-btn" onclick="_onlineFormClear()">&#x1F5D1; ' + _t('Xóa','Clear') + '</button>';
   html += '</div>';
   html += '</form>';
 
@@ -485,7 +484,7 @@ function _renderField(field, schema){
     case 'select':
       html += '<div class="form-field"' + showIf + '><label for="' + fid + '">' + field.label + req + '</label>';
       html += '<select id="' + fid + '" name="' + field.id + '"' + (field.required?' required':'') + ' onchange="_onlineFieldChange(this)">';
-      html += '<option value="">&mdash; ' + _t('Chon','Select') + ' &mdash;</option>';
+      html += '<option value="">&mdash; ' + _t('Chọn','Select') + ' &mdash;</option>';
       (field.options||[]).forEach(function(opt){ html += '<option value="' + _escHtml(opt.value) + '">' + _escHtml(opt.label) + '</option>'; });
       html += '</select></div>';
       break;
@@ -514,7 +513,7 @@ function _renderTableField(field){
   _tableRowCounters[field.id] = 0;
   var html = '<div class="form-field form-field-table">';
   html += '<div class="form-table-header"><label>' + field.label + '</label>';
-  html += '<button type="button" class="form-table-add" onclick="_addTableRow(\'' + field.id + '\')">+ ' + _t('Them dong','Add row') + '</button></div>';
+  html += '<button type="button" class="form-table-add" onclick="_addTableRow(\'' + field.id + '\')">+ ' + _t('Thêm dòng','Add row') + '</button></div>';
   html += '<div class="form-table-wrap"><table class="form-data-table" id="' + tid + '"><thead><tr>';
   (field.columns||[]).forEach(function(col){ html += '<th style="width:' + (col.width||'auto') + '">' + col.label + '</th>'; });
   html += '<th style="width:40px"></th></tr></thead><tbody id="' + tid + '-body"></tbody></table></div></div>';
@@ -637,7 +636,7 @@ window._onlineFormSubmit = function(e){
     }
   });
   if(missing.length > 0){
-    alert(_t('Thieu truong bat buoc: ','Missing required fields: ') + missing.join(', '));
+    alert(_t('Thiếu trường bắt buộc: ','Missing required fields: ') + missing.join(', '));
     return false;
   }
 
@@ -649,11 +648,11 @@ window._onlineFormSubmit = function(e){
       if(!_formEntries[_currentForm]) _formEntries[_currentForm] = [];
       _formEntries[_currentForm].unshift(data);
       _formDirty = false;
-      _showFormToast(_t('Form da gui thanh cong!','Form submitted successfully!'), 'success');
+      _showFormToast(_t('Form đã gửi thành công!','Form submitted successfully!'), 'success');
       var page = document.getElementById('page-forms');
       _renderFormEntry(schema, page);
     } else {
-      _showFormToast(_t('Loi: ','Error: ') + ((d && d.error)||'Unknown'), 'error');
+      _showFormToast(_t('Lỗi: ','Error: ') + ((d && d.error)||'Unknown'), 'error');
     }
   };
 
@@ -662,7 +661,7 @@ window._onlineFormSubmit = function(e){
     _formEntries[_currentForm].unshift(data);
     _saveLocalEntries();
     _formDirty = false;
-    _showFormToast(_t('Da luu cuc bo (offline)','Saved locally (offline)'), 'warn');
+    _showFormToast(_t('Đã lưu cục bộ (offline)','Saved locally (offline)'), 'warn');
     var page = document.getElementById('page-forms');
     _renderFormEntry(schema, page);
   };

@@ -1237,14 +1237,14 @@ body {
     <div class="qf-grid" style="margin-top: var(--form-field-gap);">
       <div class="qf-field" data-required>
         <label class="qf-label">Customer <span class="qf-required">*</span></label>
-        <span class="qf-label-vi">Khach hang</span>
+        <span class="qf-label-vi">Khách hàng</span>
         <select class="qf-select" name="customer" required>
           <option value="">-- Select --</option>
           <option value="acme">ACME Industries</option>
           <option value="globex">Globex Corporation</option>
           <option value="initech">Initech Manufacturing</option>
           <option value="umbrella">Umbrella Tech</option>
-          <option value="other">Other / Khac</option>
+          <option value="other">Other / Khác</option>
         </select>
         <span class="qf-error-msg">Required field</span>
       </div>
@@ -1254,12 +1254,12 @@ body {
     <div class="qf-grid qf-grid--2" style="margin-top: var(--form-field-gap);">
       <div class="qf-field">
         <label class="qf-label">Operation</label>
-        <span class="qf-label-vi">Cong doan phat hien</span>
+        <span class="qf-label-vi">Công đoạn phát hiện</span>
         <input type="text" class="qf-input" name="operation" placeholder="VD: OP20 -- Milling">
       </div>
       <div class="qf-field">
         <label class="qf-label">Machine ID</label>
-        <span class="qf-label-vi">Ma may</span>
+        <span class="qf-label-vi">Mã máy</span>
         <input type="text" class="qf-input" name="machine_id" placeholder="VD: CNC-05">
       </div>
     </div>
@@ -1276,7 +1276,7 @@ body {
       <span class="qf-section-num">2</span>
       <div class="qf-section-title-text">
         <h3>Defect Description</h3>
-        <p class="qf-section-subtitle">Mo ta khuyet tat</p>
+        <p class="qf-section-subtitle">Mô tả khuyết tật</p>
       </div>
     </div>
     <div class="qf-section-toggle" aria-hidden="true">
@@ -1288,27 +1288,27 @@ body {
     <div class="qf-grid qf-grid--2">
       <div class="qf-field" data-required>
         <label class="qf-label">Defect Type <span class="qf-required">*</span></label>
-        <span class="qf-label-vi">Loai loi</span>
+        <span class="qf-label-vi">Loại lỗi</span>
         <select class="qf-select" name="defect_type" required onchange="styleDefectType(this)">
           <option value="">-- Select --</option>
-          <option value="dimensional" data-color="blue">Kich thuoc (Dimensional)</option>
-          <option value="surface" data-color="amber">Be mat (Surface)</option>
-          <option value="material" data-color="purple">Vat lieu (Material)</option>
-          <option value="documentation" data-color="gray">Tai lieu (Documentation)</option>
-          <option value="process" data-color="orange">Quy trinh (Process)</option>
-          <option value="other" data-color="slate">Khac (Other)</option>
+          <option value="dimensional" data-color="blue">Kích thước (Dimensional)</option>
+          <option value="surface" data-color="amber">Bề mặt (Surface)</option>
+          <option value="material" data-color="purple">Vật liệu (Material)</option>
+          <option value="documentation" data-color="gray">Tài liệu (Documentation)</option>
+          <option value="process" data-color="orange">Quy trình (Process)</option>
+          <option value="other" data-color="slate">Khác (Other)</option>
         </select>
         <span class="qf-error-msg">Required field</span>
       </div>
       <div class="qf-field" data-required>
         <label class="qf-label">Severity <span class="qf-required">*</span></label>
-        <span class="qf-label-vi">Muc do nghiem trong</span>
+        <span class="qf-label-vi">Mức độ nghiêm trọng</span>
         <div class="qf-severity-wrap">
           <select class="qf-select" name="severity" required onchange="updateSeverityDot(this)">
             <option value="">-- Select --</option>
-            <option value="minor" data-color="green">Nhe (Minor)</option>
-            <option value="major" data-color="amber">Nang (Major)</option>
-            <option value="critical" data-color="red">Nghiem trong (Critical)</option>
+            <option value="minor" data-color="green">Nhẹ (Minor)</option>
+            <option value="major" data-color="amber">Nặng (Major)</option>
+            <option value="critical" data-color="red">Nghiêm trọng (Critical)</option>
           </select>
           <span class="qf-severity-dot" id="severityDot"></span>
         </div>
@@ -1320,8 +1320,8 @@ body {
     <div class="qf-grid" style="margin-top: var(--form-field-gap);">
       <div class="qf-field" data-required>
         <label class="qf-label">Defect Description <span class="qf-required">*</span></label>
-        <span class="qf-label-vi">Mo ta loi</span>
-        <textarea class="qf-textarea" name="defect_description" rows="4" required placeholder="Mo ta chi tiet loi khong phu hop..."></textarea>
+        <span class="qf-label-vi">Mô tả lỗi</span>
+        <textarea class="qf-textarea" name="defect_description" rows="4" required placeholder="Mô tả chi tiết lỗi không phù hợp..."></textarea>
         <span class="qf-error-msg">Required field</span>
       </div>
     </div>
@@ -1330,19 +1330,19 @@ body {
     <div class="qf-grid qf-grid--3" style="margin-top: var(--form-field-gap);">
       <div class="qf-field" data-required>
         <label class="qf-label">Qty Inspected <span class="qf-required">*</span></label>
-        <span class="qf-label-vi">SL kiem tra</span>
+        <span class="qf-label-vi">SL kiểm tra</span>
         <input type="number" class="qf-input" name="qty_inspected" min="1" required>
         <span class="qf-error-msg">Required field</span>
       </div>
       <div class="qf-field" data-required>
         <label class="qf-label">Qty Affected <span class="qf-required">*</span></label>
-        <span class="qf-label-vi">SL bi anh huong</span>
+        <span class="qf-label-vi">SL bị ảnh hưởng</span>
         <input type="number" class="qf-input" name="qty_affected" min="1" required>
         <span class="qf-error-msg">Required field</span>
       </div>
       <div class="qf-field" data-required>
         <label class="qf-label">Qty Rejected <span class="qf-required">*</span></label>
-        <span class="qf-label-vi">SL loai bo</span>
+        <span class="qf-label-vi">SL loại bỏ</span>
         <input type="number" class="qf-input" name="qty_rejected" min="0" required>
         <span class="qf-error-msg">Required field</span>
       </div>
@@ -1351,7 +1351,7 @@ body {
     <!-- File Upload -->
     <div style="margin-top: var(--form-field-gap);">
       <label class="qf-label">Attach Photos</label>
-      <span class="qf-label-vi">Dinh kem anh</span>
+      <span class="qf-label-vi">Đính kèm ảnh</span>
       <div class="qf-file-drop" id="fileDrop" ondragover="event.preventDefault(); this.classList.add('is-dragover')" ondragleave="this.classList.remove('is-dragover')" ondrop="event.preventDefault(); this.classList.remove('is-dragover')">
         <div class="qf-file-drop-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -1374,7 +1374,7 @@ body {
       <span class="qf-section-num">3</span>
       <div class="qf-section-title-text">
         <h3>Containment Actions</h3>
-        <p class="qf-section-subtitle">Hanh dong ngan chan</p>
+        <p class="qf-section-subtitle">Hành động ngăn chặn</p>
       </div>
     </div>
     <div class="qf-section-toggle" aria-hidden="true">
@@ -1391,28 +1391,28 @@ body {
 
     <div class="qf-field" data-required>
       <label class="qf-label">Containment Action <span class="qf-required">*</span></label>
-      <span class="qf-label-vi">Hanh dong ngan chan tuc thoi</span>
-      <textarea class="qf-textarea" name="containment_action" rows="3" required placeholder="Hanh dong ngan chan tuc thoi de co lap san pham loi..."></textarea>
+      <span class="qf-label-vi">Hành động ngăn chặn tức thời</span>
+      <textarea class="qf-textarea" name="containment_action" rows="3" required placeholder="Hành động ngăn chặn tức thời để cô lập sản phẩm lỗi..."></textarea>
       <span class="qf-error-msg">Required field</span>
     </div>
 
     <div class="qf-grid qf-grid--2" style="margin-top: var(--form-field-gap);">
       <div class="qf-field" data-required>
         <label class="qf-label">Disposition <span class="qf-required">*</span></label>
-        <span class="qf-label-vi">Quyet dinh xu ly</span>
+        <span class="qf-label-vi">Quyết định xử lý</span>
         <select class="qf-select" name="disposition" required>
           <option value="">-- Select --</option>
-          <option value="rework">&#9881; Sua chua (Rework)</option>
-          <option value="scrap">&#128465; Phe pham (Scrap)</option>
-          <option value="use_as_is">&#9989; Su dung nguyen trang (Use As-Is)</option>
-          <option value="return_to_vendor">&#8617; Tra nha cung cap (Return to Vendor)</option>
+          <option value="rework">&#9881; Sửa chữa (Rework)</option>
+          <option value="scrap">&#128465; Phế phẩm (Scrap)</option>
+          <option value="use_as_is">&#9989; Sử dụng nguyên trạng (Use As-Is)</option>
+          <option value="return_to_vendor">&#8617; Trả nhà cung cấp (Return to Vendor)</option>
           <option value="mrb">&#128196; MRB (Material Review Board)</option>
         </select>
         <span class="qf-error-msg">Required field</span>
       </div>
       <div class="qf-field">
         <label class="qf-label">Disposition Authority</label>
-        <span class="qf-label-vi">Nguoi co tham quyen xu ly</span>
+        <span class="qf-label-vi">Người có thẩm quyền xử lý</span>
         <input type="text" class="qf-input" name="disposition_authority" placeholder="Name / Role">
       </div>
     </div>
@@ -1429,7 +1429,7 @@ body {
       <span class="qf-section-num">4</span>
       <div class="qf-section-title-text">
         <h3>Root Cause Analysis</h3>
-        <p class="qf-section-subtitle">Phan tich nguyen nhan goc</p>
+        <p class="qf-section-subtitle">Phân tích nguyên nhân gốc</p>
       </div>
     </div>
     <div class="qf-section-toggle" aria-hidden="true">
@@ -1440,7 +1440,7 @@ body {
     <!-- 6M Radio Cards -->
     <div class="qf-field">
       <label class="qf-label">Root Cause Category (6M)</label>
-      <span class="qf-label-vi">Nhom nguyen nhan goc</span>
+      <span class="qf-label-vi">Nhóm nguyên nhân gốc</span>
     </div>
     <div class="qf-radio-cards" style="margin-top: var(--form-space-2);">
       <label class="qf-radio-card">
@@ -1448,7 +1448,7 @@ body {
         <div class="qf-radio-card-inner">
           <span class="qf-radio-card-icon">&#128100;</span>
           <span class="qf-radio-card-label">Man</span>
-          <span class="qf-radio-card-label-vi">Con nguoi</span>
+          <span class="qf-radio-card-label-vi">Con người</span>
         </div>
       </label>
       <label class="qf-radio-card">
@@ -1456,7 +1456,7 @@ body {
         <div class="qf-radio-card-inner">
           <span class="qf-radio-card-icon">&#128295;</span>
           <span class="qf-radio-card-label">Machine</span>
-          <span class="qf-radio-card-label-vi">May moc</span>
+          <span class="qf-radio-card-label-vi">Máy móc</span>
         </div>
       </label>
       <label class="qf-radio-card">
@@ -1464,7 +1464,7 @@ body {
         <div class="qf-radio-card-inner">
           <span class="qf-radio-card-icon">&#128203;</span>
           <span class="qf-radio-card-label">Method</span>
-          <span class="qf-radio-card-label-vi">Phuong phap</span>
+          <span class="qf-radio-card-label-vi">Phương pháp</span>
         </div>
       </label>
       <label class="qf-radio-card">
@@ -1472,7 +1472,7 @@ body {
         <div class="qf-radio-card-inner">
           <span class="qf-radio-card-icon">&#129521;</span>
           <span class="qf-radio-card-label">Material</span>
-          <span class="qf-radio-card-label-vi">Vat lieu</span>
+          <span class="qf-radio-card-label-vi">Vật liệu</span>
         </div>
       </label>
       <label class="qf-radio-card">
@@ -1480,7 +1480,7 @@ body {
         <div class="qf-radio-card-inner">
           <span class="qf-radio-card-icon">&#128207;</span>
           <span class="qf-radio-card-label">Measurement</span>
-          <span class="qf-radio-card-label-vi">Do luong</span>
+          <span class="qf-radio-card-label-vi">Đo lường</span>
         </div>
       </label>
       <label class="qf-radio-card">
@@ -1488,7 +1488,7 @@ body {
         <div class="qf-radio-card-inner">
           <span class="qf-radio-card-icon">&#127777;</span>
           <span class="qf-radio-card-label">Environment</span>
-          <span class="qf-radio-card-label-vi">Moi truong</span>
+          <span class="qf-radio-card-label-vi">Môi trường</span>
         </div>
       </label>
     </div>
@@ -1496,14 +1496,14 @@ body {
     <!-- Root Cause Description -->
     <div class="qf-field" style="margin-top: var(--form-field-gap);">
       <label class="qf-label">Root Cause Description</label>
-      <span class="qf-label-vi">Mo ta nguyen nhan goc</span>
-      <textarea class="qf-textarea" name="root_cause_description" rows="3" placeholder="Phan tich nguyen nhan goc..."></textarea>
+      <span class="qf-label-vi">Mô tả nguyên nhân gốc</span>
+      <textarea class="qf-textarea" name="root_cause_description" rows="3" placeholder="Phân tích nguyên nhân gốc..."></textarea>
     </div>
 
     <!-- Linked CAPA -->
     <div class="qf-field" style="margin-top: var(--form-field-gap);">
       <label class="qf-label">Linked CAPA Number</label>
-      <span class="qf-label-vi">CAPA lien ket</span>
+      <span class="qf-label-vi">CAPA liên kết</span>
       <div class="qf-lookup-wrap">
         <input type="text" class="qf-input" name="linked_capa" placeholder="VD: CAPA-2026-001">
         <span class="qf-lookup-icon">
@@ -1525,7 +1525,7 @@ body {
       <span class="qf-section-num">5</span>
       <div class="qf-section-title-text">
         <h3>Signatures</h3>
-        <p class="qf-section-subtitle">Chu ky</p>
+        <p class="qf-section-subtitle">Chữ ký</p>
       </div>
     </div>
     <div class="qf-section-toggle" aria-hidden="true">
@@ -1536,7 +1536,7 @@ body {
     <div class="qf-signature-grid">
       <!-- Reported By -->
       <div class="qf-signature-block">
-        <div class="qf-signature-title">Reported By / Nguoi bao cao</div>
+        <div class="qf-signature-title">Reported By / Người báo cáo</div>
         <div class="qf-signature-pad">Signature area</div>
         <div class="qf-signature-fields">
           <input type="text" name="sig_reported_name" placeholder="Full Name">
@@ -1558,7 +1558,7 @@ body {
 
       <!-- Approved By -->
       <div class="qf-signature-block">
-        <div class="qf-signature-title">Approved By / Nguoi phe duyet</div>
+        <div class="qf-signature-title">Approved By / Người phê duyệt</div>
         <div class="qf-signature-pad">Signature area</div>
         <div class="qf-signature-fields">
           <input type="text" name="sig_approved_name" placeholder="Full Name">
@@ -1581,18 +1581,18 @@ body {
       <span class="qf-btn-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       </span>
-      Save Draft / Luu nhap
+      Save Draft / Lưu nháp
     </button>
     <button type="button" class="qf-btn qf-btn--ghost" onclick="clearForm()">
       <span class="qf-btn-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
       </span>
-      Clear / Xoa
+      Clear / Xóa
     </button>
     <div class="qf-actions-spacer"></div>
     <button type="button" class="qf-btn qf-btn--primary" onclick="submitForm()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-      Submit / Gui
+      Submit / Gửi
     </button>
   </div>
 </div>
@@ -1685,7 +1685,7 @@ function saveDraft() {
 
 /* Clear Form */
 function clearForm() {
-  if (confirm('Clear all fields? This cannot be undone.\nXoa tat ca cac truong? Hanh dong nay khong the hoan tac.')) {
+  if (confirm('Clear all fields? This cannot be undone.\nXóa tất cả các trường? Hành động này không thể hoàn tác.')) {
     document.getElementById('ncrForm').reset();
     document.querySelectorAll('.qf-field.is-error').forEach(function(f) {
       f.classList.remove('is-error');

@@ -561,8 +561,86 @@ Reusable form section templates are defined in:
 
 ---
 
+## 21. Language and Diacritics Rules / Quy tắc ngôn ngữ và dấu
+
+### 21.1 Mandatory Rule: Vietnamese Diacritics on Frontend
+
+**ALL Vietnamese text displayed to users on the frontend MUST use proper Unicode diacritics (UTF-8).**
+
+This is a non-negotiable requirement for professionalism and readability.
+
+| Layer | Language | Diacritics | Example |
+|-------|----------|-----------|---------|
+| **Frontend HTML** | Vietnamese | ✅ REQUIRED | `Báo cáo không phù hợp` |
+| **Frontend JS strings** | Vietnamese | ✅ REQUIRED | `_t('Kiểm soát chứng cứ', 'Evidence Control')` |
+| **JSON label_vi fields** | Vietnamese | ✅ REQUIRED | `"label_vi": "Mã tài liệu"` |
+| **JSON title_vi fields** | Vietnamese | ✅ REQUIRED | `"title_vi": "Nhật ký bàn giao ca"` |
+| **CSS content/comments** | English | ❌ No diacritics | `/* Form builder canvas */` |
+| **PHP backend code** | English | ❌ No diacritics | `$formCode = 'FRM-631';` |
+| **SQL schema** | English | ❌ No diacritics | `CREATE TABLE ncr_records` |
+| **Variable names** | English | ❌ No diacritics | `defect_description` |
+| **API responses (keys)** | English | ❌ No diacritics | `{"status": "ok"}` |
+| **Git commit messages** | English | ❌ No diacritics | `Fix NCR form validation` |
+
+### 21.2 Correct vs Incorrect Examples
+
+| ❌ WRONG (no diacritics) | ✅ CORRECT (with diacritics) |
+|--------------------------|------------------------------|
+| `Bao cao khong phu hop` | `Báo cáo không phù hợp` |
+| `Thong tin nhan dang` | `Thông tin nhận dạng` |
+| `Hanh dong ngan chan` | `Hành động ngăn chặn` |
+| `Nguyen nhan goc` | `Nguyên nhân gốc` |
+| `Chu ky` | `Chữ ký` |
+| `Phong ban` | `Phòng ban` |
+| `Kiem soat chung cu` | `Kiểm soát chứng cứ` |
+| `Dien online` | `Điền online` |
+| `Tai ve` | `Tải về` |
+| `Luu nhap` | `Lưu nháp` |
+
+### 21.3 Font Requirements
+
+All frontend fonts MUST support Vietnamese Unicode characters. Approved font stacks:
+
+```css
+font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Roboto', sans-serif;
+```
+
+Avoid: Monospace fonts without Vietnamese support, custom fonts not tested with dấu.
+
+### 21.4 Encoding
+
+- All HTML files: `<meta charset="UTF-8">`
+- All JSON files: UTF-8 encoding (no BOM)
+- All JS files: UTF-8 encoding
+- PHP: `header('Content-Type: application/json; charset=utf-8')`
+- Database: `charset = 'utf8'` in PostgreSQL connection
+
+### 21.5 Bilingual Label Convention
+
+Vietnamese is the PRIMARY language (displayed larger/bolder). English is SECONDARY (smaller, gray).
+
+```html
+<label class="qf-label">
+  <span class="qf-label-vi">Mô tả khuyết tật</span>
+  <span class="qf-label-en">Defect Description</span>
+</label>
+```
+
+### 21.6 Module Naming Convention
+
+| Module | Sidebar Label (VI) | Sidebar Label (EN) |
+|--------|-------------------|-------------------|
+| Dashboard | Tổng quan | Dashboard |
+| Documents | Danh sách tài liệu | Documents |
+| Order Management | Quản lý đơn hàng | Order Management |
+| Evidence Control | Kiểm soát chứng cứ | Evidence Control |
+| Admin | Quản trị hệ thống | Admin Panel |
+
+---
+
 ## Revision History
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | 2026-03-29 | QMS Portal Team | Initial release |
+| 1.1 | 2026-03-29 | QMS Portal Team | Add Section 21: Language and Diacritics Rules |
