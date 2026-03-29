@@ -101,7 +101,7 @@ foreach ($file in $jsonFiles) {
 
 Write-Step "MES wiring"
 $wiringCommand = @"
-rg -n 'page-mes|page-exceptions|14-mes-control-center|14-exception-dashboard|_renderMesControlCenter|_renderExceptionDashboard|navigateTo\(''exceptions''\)|data-page=\"mes\"|mes_snapshot|mes_connector_snapshot|mes_machine_signal_upsert|exception_dashboard|exception_detail|program_mismatches|program_handshake_queue|program_release_queue|tool_readiness_queue|program_release_risk|tool_readiness_risk|wo_launch_blocked|mes_wo_transition_guard|oee_timeline|downtime_pareto|mes_wo_report_progress|mes_downtime_create|mes_maintenance_create|mes_tooling_upsert|data-open-signal-bridge|nc_program_releases|downtime_reason_codes|downtime_resolution_codes|reason_code|resolution_code' "$($wiringFiles -join '" "')"
+rg -n 'page-mes|page-exceptions|14-mes-control-center|14-exception-dashboard|_renderMesControlCenter|_renderExceptionDashboard|navigateTo\(''exceptions''\)|data-page=\"mes\"|mes_snapshot|mes_connector_snapshot|mes_machine_signal_upsert|exception_dashboard|exception_detail|program_mismatches|program_handshake_queue|program_release_queue|tool_readiness_queue|program_release_risk|tool_readiness_risk|downtime_governance_gaps|wo_launch_blocked|mes_wo_transition_guard|oee_timeline|downtime_pareto|mes_wo_report_progress|mes_downtime_create|mes_maintenance_create|mes_tooling_upsert|data-open-signal-bridge|nc_program_releases|downtime_reason_codes|downtime_resolution_codes|reason_code|resolution_code' "$($wiringFiles -join '" "')"
 "@
 Invoke-Checked "MES wiring lookup" $wiringCommand
 

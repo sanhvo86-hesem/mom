@@ -2974,6 +2974,54 @@ function mes_build_downtime_pareto(array $downtimeEvents, DateTimeImmutable $now
   return $rows;
 }
 
+function mes_downtime_governance_gap_rows(array $mes, array $master): array {
+  $rows = [];
+  $reasonCodes = master_index_by((array)($master['downtime_reason_codes'] ?? []), 'reason_code');
+  $resolutionCodes = master_index_by((array)($master['downtime_resolution_codes'] ?? []), 'resolution_code');
+  foreach ((array)($mes['downtime_events'] ?? []) as $event) {
+    if (!is_array($event)) continue;
+    $issues = [];
+    $reasonCode = trim((string)($event['reason_code'] ?? ''));
+    $reasonMeta = $reasonCode !== '' ? ($reasonCodes[$reasonCode] ?? null) : null;
+    if ($reasonCode === '') {
+      $issues[] = 'missing_reason_code';
+    } elseif (!is_array($reasonMeta)) {
+      $issues[] = 'invalid_reason_code';
+    } elseif (strtolower(trim((string)($reasonMeta['status'] ?? 'active'))) !== 'active') {
+      $issues[] = 'inactive_reason_code';
+    }
+
+    $status = strtolower(trim((string)($event['status'] ?? 'open')));
+    $resolutionCode = trim((string)($event['resolution_code'] ?? ''));
+    $resolutionMeta = $resolutionCode !== '' ? ($resolutionCodes[$resolutionCode] ?? null) : null;
+    if ($status === 'resolved') {
+      if ($resolutionCode === '') {
+        $issues[] = 'missing_resolution_code';
+      } elseif (!is_array($resolutionMeta)) {
+        $issues[] = 'invalid_resolution_code';
+      } elseif (strtolower(trim((string)($resolutionMeta['status'] ?? 'active'))) !== 'active') {
+        $issues[] = 'inactive_resolution_code';
+      }
+    }
+
+    if (!$issues) continue;
+    $rows[] = [
+      'downtime_id' => (string)($event['downtime_id'] ?? ''),
+      'machine_id' => (string)($event['machine_id'] ?? ''),
+      'wo_number' => (string)($event['wo_number'] ?? ''),
+      'status' => $status,
+      'started_at' => (string)($event['started_at'] ?? ''),
+      'reported_by' => (string)($event['reported_by'] ?? ''),
+      'reason_code' => $reasonCode,
+      'reason_name_vi' => (string)($event['reason_name_vi'] ?? ''),
+      'reason_name' => (string)($event['reason_name'] ?? ''),
+      'resolution_code' => $resolutionCode,
+      'issues' => $issues,
+    ];
+  }
+  return $rows;
+}
+
 function mes_build_program_handshake_queue(array $dispatch): array {
   $rows = [];
   foreach ($dispatch as $row) {
@@ -11372,6 +11420,7 @@ if ($username === '') {
     $programMismatches = count((array)($mesSnapshot['program_handshake_queue'] ?? []));
     $programReleaseRisk = count((array)($mesSnapshot['program_release_queue'] ?? []));
     $toolReadinessRisk = count((array)($mesSnapshot['tool_readiness_queue'] ?? []));
+    $downtimeGovernanceGaps = count(mes_downtime_governance_gap_rows($mes, $master));
 
     // 6. Orphan record links (links pointing to non-existent orders)
     $orphanLinks = 0;
@@ -11394,6 +11443,7 @@ if ($username === '') {
       'program_mismatches'  => $programMismatches,
       'program_release_risk'=> $programReleaseRisk,
       'tool_readiness_risk' => $toolReadinessRisk,
+      'downtime_governance_gaps' => $downtimeGovernanceGaps,
       'orphan_links'        => $orphanLinks,
     ]);
   }
@@ -11576,6 +11626,27 @@ if ($username === '') {
               (string)($row['top_tool_id'] ?? ''),
               $row['highest_life_pct'] === null ? '' : ('Life ' . round((float)$row['highest_life_pct'], 1) . '%'),
               (string)($row['top_issue'] ?? ''),
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'downtime_governance_gaps': {
+        $master = load_master_data_store();
+        $mes = load_mes_runtime_store();
+        foreach (mes_downtime_governance_gap_rows($mes, $master) as $row) {
+          $items[] = [
+            'id' => (string)($row['downtime_id'] ?? ''),
+            'type' => 'downtime_governance',
+            'department' => (string)($row['machine_id'] ?? ''),
+            'date' => substr((string)($row['started_at'] ?? ''), 0, 10),
+            'responsible' => (string)($row['reported_by'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['wo_number'] ?? ''),
+              (string)($row['reason_code'] ?? ''),
+              (string)($row['reason_name_vi'] ?? $row['reason_name'] ?? ''),
+              !empty($row['resolution_code']) ? ('RES ' . (string)$row['resolution_code']) : '',
+              !empty($row['issues']) ? ('Issues: ' . implode(', ', (array)$row['issues'])) : '',
             ])),
           ];
         }

@@ -121,6 +121,18 @@ var EXCEPTION_TYPES = [
     page: 'mes'
   },
   {
+    key: 'downtime_governance_gaps',
+    icon: '\ud83e\udde0',
+    accent: '#be185d',
+    surface: '#fdf2f8',
+    border: '#f9a8d4',
+    labelVi: 'Downtime thiếu mã quản trị',
+    labelEn: 'Ungoverned downtime',
+    descVi: 'Sự kiện downtime chưa có mã lý do hoặc mã khôi phục hợp lệ nên sẽ làm bẩn analytics.',
+    descEn: 'Downtime records are missing governed reason or resolution codes and will contaminate analytics.',
+    page: 'mes'
+  },
+  {
     key: 'orphan_links',
     icon: '\ud83e\uddf7',
     accent: '#2563eb',
@@ -307,7 +319,7 @@ function renderSummary(){
     total += count;
     if (count > 0) activeGroups += 1;
   });
-  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.overdue_orders || 0);
+  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
   var nextPage = highPriority > 0 ? t('MES / Chứng cứ', 'MES / Evidence') : (activeGroups > 0 ? t('Đơn hàng', 'Orders') : t('Ổn định', 'Stable'));
   var totalEl = state.container.querySelector('#excx-total');
   var groupsEl = state.container.querySelector('#excx-groups');
