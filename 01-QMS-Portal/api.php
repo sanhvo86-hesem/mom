@@ -2750,6 +2750,107 @@ function mes_build_tool_readiness_queue(array $dispatch): array {
   return $rows;
 }
 
+function mes_wo_status_requires_governance(string $status): bool {
+  return in_array(strtolower(trim($status)), ['setup', 'running', 'inspection'], true);
+}
+
+function mes_dispatch_row_for_wo(array $snapshot, string $woNumber): ?array {
+  foreach ((array)($snapshot['dispatch'] ?? []) as $row) {
+    if (!is_array($row)) continue;
+    if ((string)($row['wo_number'] ?? '') === $woNumber) return $row;
+  }
+  return null;
+}
+
+function mes_governance_blockers_for_dispatch(array $dispatchRow): array {
+  $blockers = [];
+
+  $gate = (array)($dispatchRow['evidence_gate'] ?? []);
+  $gateStatus = strtolower(trim((string)($gate['status'] ?? 'not_required')));
+  if (!in_array($gateStatus, ['ready', 'not_required'], true)) {
+    $blockers[] = [
+      'code' => 'evidence_gate_incomplete',
+      'severity' => 'critical',
+      'message_vi' => 'WO còn thiếu gate chứng cứ bắt buộc trước khi chạy.',
+      'message_en' => 'The WO is still missing required evidence gates before it can run.',
+      'detail' => [
+        'status' => $gateStatus,
+        'summary_vi' => (string)($gate['summary_vi'] ?? ''),
+        'summary_en' => (string)($gate['summary_en'] ?? ''),
+        'missing_form_codes' => array_values((array)($gate['missing_form_codes'] ?? [])),
+      ],
+    ];
+  }
+
+  $release = (array)($dispatchRow['program_release'] ?? []);
+  $releaseBand = strtolower(trim((string)($release['band'] ?? 'ready')));
+  if (!in_array($releaseBand, ['ready', 'not_required'], true)) {
+    $blockers[] = [
+      'code' => 'nc_release_not_ready',
+      'severity' => (string)($release['severity'] ?? 'warning'),
+      'message_vi' => (string)($release['message_vi'] ?? 'NC release chưa sẵn sàng cho WO này.'),
+      'message_en' => (string)($release['message_en'] ?? 'The NC release is not ready for this WO.'),
+      'detail' => [
+        'band' => $releaseBand,
+        'status' => (string)($release['status'] ?? ''),
+        'expected_program_id' => (string)($dispatchRow['nc_program_id'] ?? ''),
+        'program_id' => (string)($release['program_id'] ?? ''),
+        'release_status' => (string)($release['release_status'] ?? ''),
+        'context_issues' => array_values((array)($release['context_issues'] ?? [])),
+      ],
+    ];
+  }
+
+  $tool = (array)($dispatchRow['tool_readiness'] ?? []);
+  $toolBand = strtolower(trim((string)($tool['band'] ?? 'ready')));
+  if (!in_array($toolBand, ['ready', 'not_required'], true)) {
+    $blockers[] = [
+      'code' => 'tool_readiness_not_ready',
+      'severity' => (string)($tool['severity'] ?? 'warning'),
+      'message_vi' => (string)($tool['message_vi'] ?? 'Tooling chưa sẵn sàng để chạy WO này.'),
+      'message_en' => (string)($tool['message_en'] ?? 'Tooling is not ready for this WO.'),
+      'detail' => [
+        'band' => $toolBand,
+        'status' => (string)($tool['status'] ?? ''),
+        'top_tool_id' => (string)($tool['top_tool_id'] ?? ''),
+        'top_issue' => (string)($tool['top_issue'] ?? ''),
+        'alert_count' => (int)($tool['alert_count'] ?? 0),
+        'highest_life_pct' => $tool['highest_life_pct'] ?? null,
+      ],
+    ];
+  }
+
+  return $blockers;
+}
+
+function mes_wo_transition_guard(array $orders, array $master, array $mes, string $woNumber, string $targetStatus): ?array {
+  if (!mes_wo_status_requires_governance($targetStatus)) return null;
+  $snapshot = build_mes_snapshot($orders, $master, $mes);
+  $dispatchRow = mes_dispatch_row_for_wo($snapshot, $woNumber);
+  if (!$dispatchRow) {
+    return [
+      'ok' => false,
+      'error' => 'work_order_not_in_mes_snapshot',
+      'target_status' => $targetStatus,
+    ];
+  }
+  $blockers = mes_governance_blockers_for_dispatch($dispatchRow);
+  if (!$blockers) return null;
+
+  return [
+    'ok' => false,
+    'error' => 'wo_launch_blocked',
+    'target_status' => $targetStatus,
+    'wo_number' => $woNumber,
+    'blockers' => $blockers,
+    'snapshot' => [
+      'evidence_gate' => (array)($dispatchRow['evidence_gate'] ?? []),
+      'program_release' => (array)($dispatchRow['program_release'] ?? []),
+      'tool_readiness' => (array)($dispatchRow['tool_readiness'] ?? []),
+    ],
+  ];
+}
+
 function mes_metric_band(?float $value, float $good = 85.0, float $watch = 65.0): string {
   if ($value === null) return 'unknown';
   if ($value >= $good) return 'strong';
@@ -9981,6 +10082,7 @@ if ($username === '') {
     if ($woNumber === '') api_json(['ok' => false, 'error' => 'missing_wo_number'], 400);
 
     $orders = load_orders_store();
+    $master = load_master_data_store();
     $mes = load_mes_runtime_store();
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
     $reportStatus = strtolower(trim((string)($body['status'] ?? '')));
@@ -9992,6 +10094,18 @@ if ($username === '') {
       if ($reportStatus !== '' && !order_transition_allowed('wo', $currentStatus, $reportStatus)) {
         api_json(['ok' => false, 'error' => 'invalid_status_transition', 'from' => $currentStatus, 'to' => $reportStatus], 409);
       }
+      $targetStatus = $reportStatus !== '' ? $reportStatus : $currentStatus;
+      $ordersPreview = $orders;
+      if ($targetStatus !== '') {
+        $ordersPreview['work_orders'][$idx]['status'] = $targetStatus;
+      }
+      foreach (['machine_id', 'work_center_id', 'operator_id', 'nc_program_id', 'fixture_id'] as $key) {
+        if (array_key_exists($key, $body) && trim((string)$body[$key]) !== '') {
+          $ordersPreview['work_orders'][$idx][$key] = trim((string)$body[$key]);
+        }
+      }
+      $launchGuard = mes_wo_transition_guard($ordersPreview, $master, $mes, $woNumber, $targetStatus);
+      if ($launchGuard) api_json($launchGuard, 409);
       if ($reportStatus !== '' && $reportStatus !== $currentStatus) {
         $orders['work_orders'][$idx]['status'] = $reportStatus;
         $orders['work_orders'][$idx]['status_history'] = array_values((array)($orders['work_orders'][$idx]['status_history'] ?? []));
@@ -10066,7 +10180,7 @@ if ($username === '') {
       'ok' => true,
       'work_order' => $updatedWo,
       'progress' => $progress,
-      'data' => build_mes_snapshot($orders, load_master_data_store(), $mes),
+      'data' => build_mes_snapshot($orders, $master, $mes),
     ]);
   }
 
@@ -10181,6 +10295,10 @@ if ($username === '') {
         if (!is_array($row) || (string)($row['wo_number'] ?? '') !== $woNumber) continue;
         $currentStatus = strtolower(trim((string)($row['status'] ?? 'on_hold')));
         if (order_transition_allowed('wo', $currentStatus, $resumeStatus)) {
+          $ordersPreview = $orders;
+          $ordersPreview['work_orders'][$idx]['status'] = $resumeStatus;
+          $launchGuard = mes_wo_transition_guard($ordersPreview, $master, $mes, $woNumber, $resumeStatus);
+          if ($launchGuard) api_json($launchGuard, 409);
           $orders['work_orders'][$idx]['status'] = $resumeStatus;
           $orders['work_orders'][$idx]['status_history'] = array_values((array)($orders['work_orders'][$idx]['status_history'] ?? []));
           $orders['work_orders'][$idx]['status_history'][] = [
@@ -10559,6 +10677,8 @@ if ($username === '') {
       $parentJo = find_order_record($orders, 'jo', $joNumber);
       if (!$parentJo) api_json(['ok' => false, 'error' => 'parent_jo_not_found'], 404);
       $orders['work_orders'][] = $record;
+      $launchGuard = mes_wo_transition_guard($orders, $master, load_mes_runtime_store(), (string)($record['wo_number'] ?? ''), (string)($record['status'] ?? 'scheduled'));
+      if ($launchGuard) api_json($launchGuard, 409);
     }
 
     save_orders_store($orders);
@@ -10580,6 +10700,8 @@ if ($username === '') {
     if ($orderId === '' || $newStatus === '') api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
 
     $orders = load_orders_store();
+    $master = $entity === 'wo' ? load_master_data_store() : [];
+    $mes = $entity === 'wo' ? load_mes_runtime_store() : [];
     $meta = order_entity_config($entity);
     $storeKey = $meta['store_key'];
     $idKey = $meta['number_key'];
@@ -10594,6 +10716,12 @@ if ($username === '') {
           'from' => $currentStatus,
           'to' => $newStatus,
         ], 409);
+      }
+      if ($entity === 'wo') {
+        $ordersPreview = $orders;
+        $ordersPreview[$storeKey][$idx]['status'] = $newStatus;
+        $launchGuard = mes_wo_transition_guard($ordersPreview, $master, $mes, $orderId, $newStatus);
+        if ($launchGuard) api_json($launchGuard, 409);
       }
       $orders[$storeKey][$idx]['status'] = $newStatus;
       $orders[$storeKey][$idx]['updated_at'] = now_iso();
@@ -10712,6 +10840,10 @@ if ($username === '') {
         }
         if ($workCenterId !== '' && !isset($workCenters[$workCenterId])) api_json(['ok' => false, 'error' => 'work_center_not_found'], 404);
         if ($operatorId !== '' && !isset($operators[$operatorId])) api_json(['ok' => false, 'error' => 'operator_not_found'], 404);
+        $mes = load_mes_runtime_store();
+        $currentStatus = strtolower(trim((string)($orders[$storeKey][$idx]['status'] ?? 'scheduled')));
+        $launchGuard = mes_wo_transition_guard($orders, $master, $mes, $orderId, $currentStatus);
+        if ($launchGuard) api_json($launchGuard, 409);
       }
 
       $orders[$storeKey][$idx]['updated_at'] = now_iso();

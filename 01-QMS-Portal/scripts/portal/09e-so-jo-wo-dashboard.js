@@ -104,6 +104,7 @@ function _status(type, key){ var s=((STATUS[type]||{})[key]||{ vi:key||'-', en:k
 function _rgba(hex,a){ var r=parseInt(hex.slice(1,3),16)||148, g=parseInt(hex.slice(3,5),16)||163, b=parseInt(hex.slice(5,7),16)||184; return 'rgba('+r+','+g+','+b+','+a+')'; }
 function _api(action, payload, method){ if(typeof apiCall==='function') return apiCall(action, payload||{}, method||'POST', 30000); return fetch('api.php?action='+encodeURIComponent(action), { method:method||'POST', credentials:'include', headers:{'Content-Type':'application/json', ...(typeof csrfToken!=='undefined'&&csrfToken?{'X-CSRF-Token':csrfToken}:{})}, body:(method||'POST')==='GET'?undefined:JSON.stringify(payload||{}) }).then(function(r){ return r.json(); }); }
 function _toast(msg, type){ var box=document.createElement('div'); box.className='sj-toast '+(type||'info'); box.textContent=msg; document.body.appendChild(box); requestAnimationFrame(function(){ box.classList.add('show'); }); setTimeout(function(){ box.classList.remove('show'); setTimeout(function(){ if(box.parentNode) box.remove(); }, 180); }, 3200); }
+function _governanceError(resp, fallbackVi, fallbackEn){ if(resp && resp.error==='wo_launch_blocked'){ var blockers=Array.isArray(resp.blockers)?resp.blockers:[]; var first=blockers[0]||{}; return _t(first.message_vi||'WO đang bị chặn vì chưa đạt điều kiện MES bắt buộc.','The WO is blocked because MES launch conditions are not yet satisfied.'); } return _t(fallbackVi, fallbackEn); }
 function _permission(type, action){ var cfg={ so:{create:['sales_manager','estimator'],edit:['sales_manager','estimator','customer_service']}, jo:{create:['production_manager','planning_manager'],edit:['production_manager','planning_manager','quality_manager']}, wo:{create:['production_manager','planning_manager'],edit:['production_manager','planning_manager','supervisor','operator']} }; var role=(typeof currentUser!=='undefined'&&currentUser)?(currentUser.role||''):''; if(!role) return true; return ((cfg[type]||{})[action]||[]).indexOf(role)>=0; }
 function _master(){ return (typeof window._mdGetSnapshot==='function' ? (window._mdGetSnapshot()||{}) : {}); }
 function _flatten(h){ var rows=[]; (h||[]).forEach(function(so){ rows.push(Object.assign({_type:'so'},so)); (so.job_orders||[]).forEach(function(jo){ rows.push(Object.assign({_type:'jo'},jo)); (jo.work_orders||[]).forEach(function(wo){ rows.push(Object.assign({_type:'wo'},wo)); }); }); }); return rows; }
@@ -314,7 +315,7 @@ function _showStatusTransition(type, orderId, currentStatus){
     _api(type==='so'?'order_so_update_status':type==='jo'?'order_jo_update_status':'order_wo_update_status', payload).then(function(r){
       _setSubmitLoading(submitBtn, false);
       if(r&&r.ok){ close(); _toast(_t('Đã cập nhật trạng thái.','Status updated.'),'success'); _refresh(); }
-      else { _toast(_t('Không thể cập nhật trạng thái.','Unable to update status.'),'error'); }
+      else { _toast(_governanceError(r,'Không thể cập nhật trạng thái.','Unable to update status.'),'error'); }
     }).catch(function(){ _setSubmitLoading(submitBtn, false); _toast(_t('Lỗi kết nối.','Connection error.'),'error'); });
   };
 }
@@ -492,7 +493,7 @@ function _bind(){
     Array.prototype.forEach.call(_container.querySelectorAll('[data-col]'), function(col){
       col.addEventListener('dragover', function(ev){ ev.preventDefault(); col.classList.add('drop'); });
       col.addEventListener('dragleave', function(){ col.classList.remove('drop'); });
-      col.addEventListener('drop', function(ev){ ev.preventDefault(); col.classList.remove('drop'); if(!_dragItem) return; var next=_pipelineStatus(_dragItem.type,col.getAttribute('data-col')); if(!next) return; _api(_dragItem.type==='so'?'order_so_update_status':_dragItem.type==='jo'?'order_jo_update_status':'order_wo_update_status',{ order_id:_dragItem.id, status:next }).then(function(r){ if(r&&r.ok){ _toast(_t('Đã cập nhật trạng thái.','Status updated.'),'success'); _refresh(); } else { _toast(_t('Không thể cập nhật trạng thái.','Unable to update status.'),'error'); } }); });
+      col.addEventListener('drop', function(ev){ ev.preventDefault(); col.classList.remove('drop'); if(!_dragItem) return; var next=_pipelineStatus(_dragItem.type,col.getAttribute('data-col')); if(!next) return; _api(_dragItem.type==='so'?'order_so_update_status':_dragItem.type==='jo'?'order_jo_update_status':'order_wo_update_status',{ order_id:_dragItem.id, status:next }).then(function(r){ if(r&&r.ok){ _toast(_t('Đã cập nhật trạng thái.','Status updated.'),'success'); _refresh(); } else { _toast(_governanceError(r,'Không thể cập nhật trạng thái.','Unable to update status.'),'error'); } }); });
     });
   }
 }

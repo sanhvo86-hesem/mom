@@ -197,6 +197,14 @@ function api(action, payload, method){
   }
   return fetch(url, options).then(function(response){ return response.json(); });
 }
+function governanceFailureMessage(resp, fallbackVi, fallbackEn){
+  if(resp && resp.error === 'wo_launch_blocked'){
+    var blockers = Array.isArray(resp.blockers) ? resp.blockers : [];
+    var first = blockers[0] || {};
+    return t(first.message_vi || 'WO đang bị MES chặn chạy vì chưa đạt điều kiện bắt buộc.', first.message_en || 'The WO is blocked by MES because mandatory launch conditions are not yet satisfied.');
+  }
+  return t(fallbackVi, fallbackEn);
+}
 function defaultSnapshot(){
   return {
     kpis: {},
@@ -1008,7 +1016,11 @@ function openProgressModal(woNumber){
         run_time_actual: Number((modal.querySelector('#mes-progress-run-min') || {}).value || 0),
         note: (modal.querySelector('#mes-progress-note') || {}).value || ''
       }, 'POST').then(function(resp){
-        if(!resp || !resp.ok) throw new Error((resp && resp.error) || 'progress_failed');
+        if(!resp || !resp.ok){
+          toast(governanceFailureMessage(resp, 'Không thể cập nhật tiến độ WO.', 'Could not update work-order progress.'), 'error');
+          if(window.console) console.error(resp);
+          return;
+        }
         state.snapshot = resp.data || state.snapshot;
         toast(t('Đã cập nhật tiến độ WO.', 'Work-order progress updated.'), 'success');
         closeModal();
@@ -1093,7 +1105,11 @@ function openResolveDowntimeModal(downtimeId){
         resolved_at: (modal.querySelector('#mes-dt-resolved-at') || {}).value || '',
         corrective_action: (modal.querySelector('#mes-dt-action') || {}).value || ''
       }, 'POST').then(function(resp){
-        if(!resp || !resp.ok) throw new Error((resp && resp.error) || 'resolve_failed');
+        if(!resp || !resp.ok){
+          toast(governanceFailureMessage(resp, 'Không thể khôi phục downtime.', 'Could not resolve the downtime event.'), 'error');
+          if(window.console) console.error(resp);
+          return;
+        }
         state.snapshot = resp.data || state.snapshot;
         toast(t('Đã khôi phục downtime.', 'Downtime resolved.'), 'success');
         closeModal();
