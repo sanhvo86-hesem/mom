@@ -99,7 +99,27 @@ function flattenOrders(list){
     (so.job_orders || []).forEach(function(jo){
       out.job_orders.push({ value:jo.jo_number, label:jo.jo_number, sub:[jo.part_number || '', jo.part_revision || '', jo.part_description || ''].filter(Boolean).join(' · '), so_number:so.so_number || '', jo_number:jo.jo_number || '', customer_id:so.customer_id || '', customer_name:so.customer_name || '', part_number:jo.part_number || '', part_revision:jo.part_revision || '', part_description:jo.part_description || '' });
       (jo.work_orders || []).forEach(function(wo){
-        out.work_orders.push({ value:wo.wo_number, label:wo.wo_number, sub:[wo.operation_desc || '', wo.machine_id || '', wo.work_center_id || ''].filter(Boolean).join(' · '), so_number:so.so_number || '', jo_number:jo.jo_number || '', wo_number:wo.wo_number || '', customer_id:so.customer_id || '', customer_name:so.customer_name || '', part_number:jo.part_number || '', part_revision:jo.part_revision || '', operation_desc:wo.operation_desc || '', machine_id:wo.machine_id || '' });
+        out.work_orders.push({
+          value:wo.wo_number,
+          label:wo.wo_number,
+          sub:[wo.operation_desc || '', wo.machine_id || '', wo.work_center_id || ''].filter(Boolean).join(' · '),
+          so_number:so.so_number || '',
+          jo_number:jo.jo_number || '',
+          wo_number:wo.wo_number || '',
+          customer_id:so.customer_id || '',
+          customer_name:so.customer_name || '',
+          part_number:jo.part_number || '',
+          part_revision:jo.part_revision || '',
+          part_description:jo.part_description || '',
+          operation_number:wo.operation_number || '',
+          operation_desc:wo.operation_desc || '',
+          machine_id:wo.machine_id || '',
+          work_center_id:wo.work_center_id || '',
+          operator_id:wo.operator_id || '',
+          scheduled_start:wo.scheduled_start || '',
+          scheduled_end:wo.scheduled_end || '',
+          status:wo.status || ''
+        });
       });
     });
   });
@@ -354,10 +374,12 @@ function renderField(field){
     html += '<select class="ecf-select" id="ecf-field-' + esc(field.id) + '"><option value="">' + esc(t('Chọn giá trị', 'Select value')) + '</option>' + (field.options || []).map(function(option){ var value = typeof option === 'string' ? option : option.value; var text = typeof option === 'string' ? option : (option.label_vi || option.label || option.value); return '<option value="' + esc(value) + '">' + esc(t(text, option.label_en || option.label || option.value || value)) + '</option>'; }).join('') + '</select>';
   } else if(field.type === 'multi_select'){
     html += '<div class="ecf-multi">' + (field.options || []).map(function(option){ var value = typeof option === 'string' ? option : option.value; var text = typeof option === 'string' ? option : (option.label_vi || option.label || option.value); return '<label class="ecf-check"><input type="checkbox" data-multi-field="' + esc(field.id) + '" value="' + esc(value) + '"><span>' + esc(t(text, option.label_en || option.label || option.value || value)) + '</span></label>'; }).join('') + '</div>';
+  } else if(field.type === 'checkbox'){
+    html += '<label class="ecf-check ecf-check-single"><input id="ecf-field-' + esc(field.id) + '" type="checkbox"><span>' + esc(t(field.checkbox_label_vi || field.checkbox_label || field.label_vi || field.label || field.id, field.checkbox_label_en || field.checkbox_label || field.label_en || field.label || field.id)) + '</span></label>';
   } else if(field.type === 'textarea'){
     html += '<textarea class="ecf-textarea" id="ecf-field-' + esc(field.id) + '" placeholder="' + esc(t(field.placeholder_vi || field.placeholder || '', field.placeholder_en || field.placeholder || '')) + '"></textarea>';
   } else {
-    var type = field.type === 'date' ? 'date' : (field.type === 'number' ? 'number' : 'text');
+    var type = field.type === 'date' ? 'date' : (field.type === 'time' ? 'time' : (field.type === 'number' ? 'number' : 'text'));
     html += '<input class="ecf-input" id="ecf-field-' + esc(field.id) + '" type="' + type + '" placeholder="' + esc(t(field.placeholder_vi || field.placeholder || '', field.placeholder_en || field.placeholder || '')) + '">';
   }
   if(note) html += '<div class="ecf-note">' + esc(t(note, field.helper_en || field.note_en || note)) + '</div>';
@@ -388,15 +410,20 @@ function buildLookupItems(field){
   var currentPart = state.fieldValues.part_number || '';
   var currentSo = state.fieldValues.so_number || '';
   var currentJo = state.fieldValues.jo_number || '';
+  var currentMachine = state.fieldValues.machine_id || '';
+  var currentWorkCenter = state.fieldValues.work_center_id || '';
   var master = state.master || {};
   if(source === 'customers') return (master.customers || []).map(function(item){ return { value:item.customer_id, label:item.customer_id, sub:item.customer_name || '', customer_id:item.customer_id, customer_name:item.customer_name || '' }; });
   if(source === 'suppliers') return (master.suppliers || []).map(function(item){ return { value:item.supplier_id, label:item.supplier_id, sub:item.supplier_name || '', supplier_id:item.supplier_id, supplier_name:item.supplier_name || '' }; });
   if(source === 'parts') return (master.parts || []).filter(function(item){ return !currentCustomer || String(item.customer_id || '') === String(currentCustomer); }).map(function(item){ return { value:item.part_number, label:item.part_number, sub:item.part_description || '', part_number:item.part_number, part_description:item.part_description || '', customer_id:item.customer_id || '' }; });
   if(source === 'revisions') return (master.revisions || []).filter(function(item){ return !currentPart || String(item.part_number || '') === String(currentPart); }).map(function(item){ return { value:item.revision, label:item.revision, sub:(item.part_number || '') + (item.status ? (' · ' + item.status) : ''), part_number:item.part_number || '', revision:item.revision || '', revision_id:item.revision_id || '' }; });
   if(source === 'capas') return (master.capas || []).filter(function(item){ if(currentCustomer && String(item.customer_id || '') !== String(currentCustomer)) return false; if(currentPart && String(item.part_number || '') !== String(currentPart)) return false; return true; }).map(function(item){ return { value:item.capa_number, label:item.capa_number, sub:[item.title || '', item.status || ''].filter(Boolean).join(' · '), capa_number:item.capa_number, customer_id:item.customer_id || '', part_number:item.part_number || '', title:item.title || '' }; });
+  if(source === 'work_centers') return (master.work_centers || []).map(function(item){ return { value:item.work_center_id, label:item.work_center_id, sub:[item.work_center_name || '', item.department || '', item.process_family || ''].filter(Boolean).join(' · '), work_center_id:item.work_center_id || '', work_center_name:item.work_center_name || '', department:item.department || '' }; });
+  if(source === 'machines') return (master.machines || []).filter(function(item){ return !currentWorkCenter || String(item.work_center_id || '') === String(currentWorkCenter); }).map(function(item){ return { value:item.machine_id, label:item.machine_id, sub:[item.machine_name || '', item.work_center_id || '', item.machine_type || ''].filter(Boolean).join(' · '), machine_id:item.machine_id || '', machine_name:item.machine_name || '', work_center_id:item.work_center_id || '', machine_type:item.machine_type || '', location:item.location || '', preferred_operator_id:item.preferred_operator_id || '' }; });
+  if(source === 'operators') return (master.operators || []).filter(function(item){ return !currentWorkCenter || String(item.work_center_id || '') === String(currentWorkCenter); }).map(function(item){ return { value:item.operator_id, label:item.operator_id, sub:[item.operator_name || '', item.role || '', item.work_center_id || ''].filter(Boolean).join(' · '), operator_id:item.operator_id || '', operator_name:item.operator_name || '', work_center_id:item.work_center_id || '', role:item.role || '' }; });
   if(source === 'sales_orders') return (state.orders.sales_orders || []).filter(function(item){ return !currentCustomer || String(item.customer_id || '') === String(currentCustomer); });
   if(source === 'job_orders') return (state.orders.job_orders || []).filter(function(item){ return !currentSo || String(item.so_number || '') === String(currentSo); });
-  if(source === 'work_orders') return (state.orders.work_orders || []).filter(function(item){ return !currentJo || String(item.jo_number || '') === String(currentJo); });
+  if(source === 'work_orders') return (state.orders.work_orders || []).filter(function(item){ if(currentJo && String(item.jo_number || '') !== String(currentJo)) return false; if(currentMachine && String(item.machine_id || '') !== String(currentMachine)) return false; return true; });
   return [];
 }
 
@@ -457,7 +484,13 @@ function bindSimpleFields(form){
     }
     var el = document.getElementById('ecf-field-' + field.id); if(!el) return;
     var value = state.fieldValues[field.id]; if(value === undefined || value === null) value = '';
-    el.value = value; el.oninput = el.onchange = function(){ state.fieldValues[field.id] = field.type === 'number' ? (el.value === '' ? '' : Number(el.value)) : el.value; };
+    if(field.type === 'checkbox'){
+      el.checked = value === true || value === 1 || value === '1' || value === 'true';
+      el.onchange = function(){ state.fieldValues[field.id] = !!el.checked; };
+      return;
+    }
+    el.value = value;
+    el.oninput = el.onchange = function(){ state.fieldValues[field.id] = field.type === 'number' ? (el.value === '' ? '' : Number(el.value)) : el.value; };
   });
 }
 
@@ -521,7 +554,19 @@ function renderHistoryPanel(formCode, page){
 
 function validateOnline(form){
   var missing = [];
-  (form.schema && form.schema.fields ? form.schema.fields : []).forEach(function(field){ var value = state.fieldValues[field.id]; if(!field.required) return; if(field.type === 'multi_select'){ if(!Array.isArray(value) || !value.length) missing.push(t(field.label_vi || field.label || field.id, field.label_en || field.label || field.id)); return; } if(value === undefined || value === null || value === '') missing.push(t(field.label_vi || field.label || field.id, field.label_en || field.label || field.id)); });
+  (form.schema && form.schema.fields ? form.schema.fields : []).forEach(function(field){
+    var value = state.fieldValues[field.id];
+    if(!field.required) return;
+    if(field.type === 'multi_select'){
+      if(!Array.isArray(value) || !value.length) missing.push(t(field.label_vi || field.label || field.id, field.label_en || field.label || field.id));
+      return;
+    }
+    if(field.type === 'checkbox'){
+      if(value !== true) missing.push(t(field.label_vi || field.label || field.id, field.label_en || field.label || field.id));
+      return;
+    }
+    if(value === undefined || value === null || value === '') missing.push(t(field.label_vi || field.label || field.id, field.label_en || field.label || field.id));
+  });
   approvalSteps(form).forEach(function(step){
     if(step.requiredOnSubmit && !state.signatures[step.id]) missing.push(t(step.labelVi || step.id, step.labelEn || step.id));
   });

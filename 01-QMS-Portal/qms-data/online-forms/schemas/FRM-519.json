@@ -2,84 +2,314 @@
   "form_code": "FRM-519",
   "title": "Pre-Run Quick Check",
   "title_vi": "Phiếu kiểm tra nhanh trước khi chạy",
-  "version": "V1",
+  "version": "V2",
   "category": "production",
   "frequency": "per_event",
+  "delivery_mode": "online",
+  "online": true,
+  "decision_score": 84,
   "sop_ref": "SOP-504",
-  "description": "Phiếu kiểm tra nhanh 7 điểm trước khi bắt đầu chạy sản xuất, đảm bảo đủ điều kiện an toàn và chất lượng.",
-  "roles_allowed": ["admin", "production_manager", "shift_leader", "cnc_operator", "qc_inspector"],
+  "description": "Governed pre-run release for CNC work orders with machine, WO, operator, and setup-readiness confirmation before machining starts.",
+  "description_vi": "Biểu mẫu pre-run có kiểm soát cho WO CNC với máy, WO, người vận hành và xác nhận mức sẵn sàng setup trước khi chạy máy.",
+  "roles_allowed": [
+    "admin",
+    "production_manager",
+    "shift_leader",
+    "cnc_operator",
+    "qc_inspector"
+  ],
+  "record_context": {
+    "required": ["wo_number", "machine_id", "work_center_id"],
+    "autofill_priority": ["wo_number", "machine_id", "operator_id"]
+  },
+  "offline_package": {
+    "enabled": false,
+    "fallback_form": "FRM-519"
+  },
+  "sections": [
+    {
+      "id": "context",
+      "title": "Execution Context",
+      "title_vi": "Ngữ cảnh thực thi",
+      "description": "Select the governed WO, machine, and operator to make sure pre-run evidence links to the exact job context.",
+      "description_vi": "Chọn WO, máy và người vận hành đã được quản lý để pre-run luôn bám đúng ngữ cảnh job.",
+      "field_ids": ["check_date", "shift", "work_center_id", "machine_id", "wo_number", "operator_id", "part_number", "part_revision"]
+    },
+    {
+      "id": "readiness",
+      "title": "Readiness Checks",
+      "title_vi": "Kiểm tra mức sẵn sàng",
+      "description": "Verify the minimum release conditions before machining starts.",
+      "description_vi": "Xác nhận các điều kiện tối thiểu trước khi cho máy chạy sản xuất.",
+      "field_ids": ["document_set_ok", "material_lot_ok", "tool_list_ok", "offset_probe_ok", "fixture_setup_ok", "coolant_chip_ok", "dry_run_ok", "risk_flags", "notes"]
+    }
+  ],
   "fields": [
-    {"id": "date", "type": "date", "label": "Ngày", "label_en": "Date", "required": true, "default": "today"},
-    {"id": "job_number", "type": "text", "label": "Số Job", "label_en": "Job Number", "required": true},
-    {"id": "part_number", "type": "text", "label": "Mã chi tiết", "label_en": "Part Number", "required": true},
-    {"id": "part_rev", "type": "text", "label": "Revision", "label_en": "Part Revision", "required": true},
-    {"id": "machine_id", "type": "text", "label": "Mã máy", "label_en": "Machine ID", "required": true, "placeholder": "VD: CNC-01"},
-    {"id": "operator_id", "type": "text", "label": "Người vận hành", "label_en": "Operator", "required": true},
+    {
+      "id": "check_date",
+      "type": "date",
+      "label": "Check Date",
+      "label_vi": "Ngày kiểm tra",
+      "required": true,
+      "default": "today",
+      "width": "third"
+    },
+    {
+      "id": "shift",
+      "type": "select",
+      "label": "Shift",
+      "label_vi": "Ca làm việc",
+      "required": true,
+      "width": "third",
+      "options": [
+        { "value": "1", "label": "Shift 1", "label_vi": "Ca 1" },
+        { "value": "2", "label": "Shift 2", "label_vi": "Ca 2" },
+        { "value": "3", "label": "Shift 3", "label_vi": "Ca 3" },
+        { "value": "day", "label": "Day", "label_vi": "Hành chính" }
+      ]
+    },
+    {
+      "id": "work_center_id",
+      "type": "lookup",
+      "label": "Work Center",
+      "label_vi": "Work center",
+      "required": true,
+      "width": "third",
+      "lookup_source": "work_centers",
+      "strict_select": true,
+      "display_fields": ["work_center_id", "work_center_name"],
+      "placeholder": "Search work center",
+      "placeholder_vi": "Tìm work center"
+    },
+    {
+      "id": "machine_id",
+      "type": "lookup",
+      "label": "Machine",
+      "label_vi": "Máy",
+      "required": true,
+      "width": "third",
+      "lookup_source": "machines",
+      "strict_select": true,
+      "depends_on": ["work_center_id"],
+      "display_fields": ["machine_id", "machine_name", "machine_type"],
+      "autofill_map": {
+        "work_center_id": "work_center_id"
+      },
+      "placeholder": "Search machine",
+      "placeholder_vi": "Tìm máy"
+    },
+    {
+      "id": "wo_number",
+      "type": "lookup",
+      "label": "Work Order",
+      "label_vi": "Work Order",
+      "required": true,
+      "width": "third",
+      "lookup_source": "work_orders",
+      "strict_select": true,
+      "depends_on": ["machine_id"],
+      "display_fields": ["wo_number", "operation_desc", "part_number", "part_revision"],
+      "autofill_map": {
+        "customer_id": "customer_id",
+        "so_number": "so_number",
+        "jo_number": "jo_number",
+        "wo_number": "wo_number",
+        "part_number": "part_number",
+        "part_revision": "part_revision",
+        "machine_id": "machine_id",
+        "work_center_id": "work_center_id",
+        "operator_id": "operator_id"
+      },
+      "placeholder": "Search work order",
+      "placeholder_vi": "Tìm Work Order"
+    },
+    {
+      "id": "operator_id",
+      "type": "lookup",
+      "label": "Operator",
+      "label_vi": "Người vận hành",
+      "required": true,
+      "width": "third",
+      "lookup_source": "operators",
+      "strict_select": true,
+      "depends_on": ["work_center_id"],
+      "display_fields": ["operator_id", "operator_name", "role"],
+      "placeholder": "Search operator",
+      "placeholder_vi": "Tìm người vận hành"
+    },
+    {
+      "id": "part_number",
+      "type": "lookup",
+      "label": "Part Number",
+      "label_vi": "Part Number",
+      "required": true,
+      "width": "third",
+      "lookup_source": "parts",
+      "strict_select": true,
+      "depends_on": ["customer_id"],
+      "display_fields": ["part_number", "part_description"],
+      "autofill_map": {
+        "customer_id": "customer_id",
+        "part_number": "part_number"
+      },
+      "placeholder": "Search part number",
+      "placeholder_vi": "Tìm Part Number"
+    },
+    {
+      "id": "part_revision",
+      "type": "lookup",
+      "label": "Part Revision",
+      "label_vi": "Revision",
+      "required": true,
+      "width": "third",
+      "lookup_source": "revisions",
+      "strict_select": true,
+      "depends_on": ["part_number"],
+      "display_fields": ["revision", "status"],
+      "autofill_map": {
+        "part_number": "part_number",
+        "part_revision": "part_revision"
+      },
+      "placeholder": "Search revision",
+      "placeholder_vi": "Tìm revision"
+    },
     {
       "id": "document_set_ok",
       "type": "checkbox",
-      "label": "Bộ tài liệu đầy đủ (bản vẽ, WI, Control Plan)",
-      "label_en": "Document Set OK",
+      "label": "Document Set",
+      "label_vi": "Bộ tài liệu",
+      "checkbox_label": "Document set is complete (drawing, setup instruction, control plan)",
+      "checkbox_label_vi": "Bộ tài liệu đầy đủ (bản vẽ, hướng dẫn setup, control plan)",
       "required": true,
       "default": false
     },
     {
       "id": "material_lot_ok",
       "type": "checkbox",
-      "label": "Vật liệu / lô hàng đúng và có truy xuất",
-      "label_en": "Material & Lot OK",
+      "label": "Material & Lot",
+      "label_vi": "Vật liệu & lô",
+      "checkbox_label": "Material, lot, and traceability are correct",
+      "checkbox_label_vi": "Vật liệu, lô và truy xuất là chính xác",
       "required": true,
       "default": false
     },
     {
       "id": "tool_list_ok",
       "type": "checkbox",
-      "label": "Danh sách dao đầy đủ và đúng quy cách",
-      "label_en": "Tool List OK",
+      "label": "Tool List",
+      "label_vi": "Danh sách dao",
+      "checkbox_label": "Tool list and cutter configuration are correct",
+      "checkbox_label_vi": "Danh sách dao và cấu hình dao là đúng",
       "required": true,
       "default": false
     },
     {
       "id": "offset_probe_ok",
       "type": "checkbox",
-      "label": "Offset và probe đã được xác nhận",
-      "label_en": "Offset & Probe OK",
+      "label": "Offset & Probe",
+      "label_vi": "Offset & probe",
+      "checkbox_label": "Offsets and probes have been verified",
+      "checkbox_label_vi": "Offsets và probe đã được xác nhận",
       "required": true,
       "default": false
     },
     {
       "id": "fixture_setup_ok",
       "type": "checkbox",
-      "label": "Đồ gá lắp đặt đúng và chắc chắn",
-      "label_en": "Fixture Setup OK",
+      "label": "Fixture Setup",
+      "label_vi": "Đồ gá",
+      "checkbox_label": "Fixture setup is correct and secure",
+      "checkbox_label_vi": "Đồ gá lắp đúng và chắc chắn",
       "required": true,
       "default": false
     },
     {
       "id": "coolant_chip_ok",
       "type": "checkbox",
-      "label": "Dung dịch cắt và phoi đã kiểm tra",
-      "label_en": "Coolant & Chip OK",
+      "label": "Coolant & Chips",
+      "label_vi": "Dung dịch cắt & phoi",
+      "checkbox_label": "Coolant flow and chip evacuation are ready",
+      "checkbox_label_vi": "Dung dịch cắt và thoát phoi đã sẵn sàng",
       "required": true,
       "default": false
     },
     {
       "id": "dry_run_ok",
       "type": "checkbox",
-      "label": "Chạy thử không phôi (Dry Run) hoàn tất",
-      "label_en": "Dry Run OK",
+      "label": "Dry Run",
+      "label_vi": "Dry run",
+      "checkbox_label": "Dry run or prove-out has been completed",
+      "checkbox_label_vi": "Dry run hoặc prove-out đã hoàn tất",
       "required": true,
       "default": false
     },
-    {"id": "supervisor_signoff", "type": "text", "label": "Xác nhận của quản lý ca", "label_en": "Supervisor Sign-off", "required": true},
-    {"id": "notes", "type": "textarea", "label": "Ghi chú", "label_en": "Notes", "rows": 3, "placeholder": "Các lưu ý hoặc ngoại lệ..."}
+    {
+      "id": "risk_flags",
+      "type": "multi_select",
+      "label": "Risk Flags",
+      "label_vi": "Cờ rủi ro cần chú ý",
+      "required": false,
+      "options": [
+        { "value": "new_revision", "label": "New revision", "label_vi": "Revision mới" },
+        { "value": "customer_hold_point", "label": "Customer hold point", "label_vi": "Điểm hold khách hàng" },
+        { "value": "special_process", "label": "Special process downstream", "label_vi": "Có special process phía sau" },
+        { "value": "tight_tolerance", "label": "Tight tolerance", "label_vi": "Dung sai chặt" },
+        { "value": "first_run_on_machine", "label": "First run on this machine", "label_vi": "Lần đầu chạy trên máy này" }
+      ]
+    },
+    {
+      "id": "notes",
+      "type": "textarea",
+      "label": "Notes",
+      "label_vi": "Ghi chú",
+      "required": false,
+      "rows": 4,
+      "width": "full",
+      "placeholder": "Notes, concern points, or escalation items",
+      "placeholder_vi": "Ghi chú, điểm cần lưu ý hoặc mục cần escalation"
+    }
   ],
-  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
-  "computed_fields": [
-    {"id": "all_pass", "formula": "all(document_set_ok, material_lot_ok, tool_list_ok, offset_probe_ok, fixture_setup_ok, coolant_chip_ok, dry_run_ok)", "label": "Tất cả đạt"}
+  "signature_blocks": [
+    {
+      "id": "performed_by",
+      "label": "Operator Confirmation",
+      "label_vi": "Chữ ký người vận hành",
+      "label_en": "Operator Confirmation",
+      "help": "Confirm that all required pre-run checks have been completed truthfully.",
+      "help_vi": "Xác nhận tất cả kiểm tra pre-run đã được thực hiện trung thực.",
+      "require_reason": false,
+      "require_pin": false,
+      "signature_meaning": "Pre-run confirmation",
+      "signature_meaning_vi": "Xác nhận pre-run"
+    },
+    {
+      "id": "verified_by",
+      "label": "Shift Leader / QC Verification",
+      "label_vi": "Chữ ký xác nhận của trưởng ca / QC",
+      "label_en": "Shift Leader / QC Verification",
+      "help": "Verify that the WO is safe and ready to release for machining.",
+      "help_vi": "Xác nhận WO đủ điều kiện an toàn và chất lượng để cho máy chạy.",
+      "require_reason": true,
+      "require_pin": true,
+      "signature_meaning": "Pre-run release verification",
+      "signature_meaning_vi": "Xác nhận release pre-run"
+    }
   ],
-  "notifications": {
-    "on_fail": ["shift_leader", "qc_inspector"],
-    "on_submit": ["shift_leader"]
-  }
+  "approval_flow": [
+    {
+      "id": "performed_by",
+      "signature_block_id": "performed_by",
+      "requiredOnSubmit": true,
+      "labelVi": "Người vận hành",
+      "labelEn": "Operator"
+    },
+    {
+      "id": "verified_by",
+      "signature_block_id": "verified_by",
+      "requiredOnSubmit": false,
+      "labelVi": "Trưởng ca / QC",
+      "labelEn": "Shift leader / QC"
+    }
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"]
 }

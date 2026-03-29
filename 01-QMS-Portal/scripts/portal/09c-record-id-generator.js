@@ -50,7 +50,10 @@ var RECORD_TYPE_LABELS_VI = {
   CAL: 'Hồ sơ hiệu chuẩn',
   SCAR: 'Hành động khắc phục nhà cung cấp',
   DOWNTIME: 'Sự cố dừng máy',
-  'PO-EXCEPTION': 'Ngoại lệ đơn mua hàng'
+  'PO-EXCEPTION': 'Ngoại lệ đơn mua hàng',
+  'PM-ORDER': 'Lệnh bảo trì phòng ngừa',
+  'CM-ORDER': 'Lệnh bảo trì khắc phục',
+  'SPARE-PART': 'Yêu cầu phụ tùng'
 };
 
 window._renderRecordIdGenerator = function(schemas, entries, container){

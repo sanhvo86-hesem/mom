@@ -1,0 +1,58 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-03-29T17:00:00+07:00",
+    "updated": "2026-03-29T17:00:00+07:00",
+    "description": "MES runtime seed for dispatch, machine state, downtime, maintenance, and progress reporting."
+  },
+  "downtime_events": [
+    {
+      "downtime_id": "DT-202603291030-A1B2C3",
+      "machine_id": "MC-3AX-04",
+      "machine_name": "Brother S700X2",
+      "work_center_id": "WC-3AX",
+      "wo_number": "WO-2026-00003",
+      "category": "tool_change",
+      "severity": "major",
+      "reason": "Dao roughing đạt ngưỡng mòn, cần thay dao và xác nhận offset.",
+      "note": "Ưu tiên khôi phục trước 10:45 để không trễ lịch WO-2026-00003.",
+      "started_at": "2026-03-29T10:30:00+07:00",
+      "status": "open",
+      "reported_by": "shift.leader"
+    }
+  ],
+  "maintenance_requests": [
+    {
+      "request_id": "MNT-202603291100-D4E5F6",
+      "machine_id": "CMM-01",
+      "machine_name": "Mitutoyo Crysta-Apex",
+      "work_center_id": "WC-QA",
+      "maintenance_type": "preventive",
+      "priority": "medium",
+      "title": "PM định kỳ tháng cho CMM-01",
+      "description": "Kiểm tra khí nén, làm sạch rail và xác nhận probe calibration health.",
+      "wo_number": "",
+      "requested_at": "2026-03-29T11:00:00+07:00",
+      "requested_by": "qa.manager",
+      "assigned_to": "MNT-001",
+      "due_date": "2026-03-31",
+      "status": "open"
+    }
+  ],
+  "progress_reports": [
+    {
+      "progress_id": "PRG-202603291145-F7G8H9",
+      "wo_number": "WO-2026-00001",
+      "status": "setup",
+      "machine_id": "MC-5AX-01",
+      "operator_id": "OPR-001",
+      "qty_completed": 0,
+      "qty_scrap": 0,
+      "setup_time_actual": 35,
+      "run_time_actual": 0,
+      "reported_at": "2026-03-29T11:45:00+07:00",
+      "reported_by": "planner",
+      "note": "Đã hoàn tất kẹp gá, chờ xác nhận dry-run."
+    }
+  ]
+}

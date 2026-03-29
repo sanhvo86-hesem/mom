@@ -46,6 +46,7 @@ $PORTAL_DISPLAY_CONFIG_FILE = $CONF_DIR . '/portal_display_config.json';
 $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
 $ORDERS_FILE = $DATA_DIR . '/orders/orders.json';
 $MASTER_DATA_FILE = $DATA_DIR . '/master-data/master-data.json';
+$MES_RUNTIME_FILE = $DATA_DIR . '/mes/mes-runtime.json';
 $PORTAL_CONFIG_JS_FILE = $BASE_DIR . '/scripts/portal/01-data-config.js';
 $LOG_FILE   = $DATA_DIR . '/php_error.log';
 $RL_DIR     = $DATA_DIR . '/ratelimit';
@@ -1832,6 +1833,9 @@ function master_data_store_default(): array {
     'parts' => [],
     'revisions' => [],
     'capas' => [],
+    'work_centers' => [],
+    'machines' => [],
+    'operators' => [],
   ];
 }
 
@@ -1860,6 +1864,49 @@ function save_master_data_store(array $data): void {
   write_json_file($MASTER_DATA_FILE, $data);
 }
 
+function mes_runtime_default(): array {
+  return [
+    '_meta' => [
+      'version' => '1.0',
+      'updated' => now_iso(),
+      'description' => 'MES runtime store for dispatch, machine state, downtime, maintenance, and progress reporting.',
+    ],
+    'downtime_events' => [],
+    'maintenance_requests' => [],
+    'progress_reports' => [],
+  ];
+}
+
+function load_mes_runtime_store(): array {
+  global $MES_RUNTIME_FILE;
+  ensure_dir(dirname($MES_RUNTIME_FILE));
+  $data = read_json_file($MES_RUNTIME_FILE);
+  if (!is_array($data)) {
+    $data = mes_runtime_default();
+    write_json_file($MES_RUNTIME_FILE, $data);
+  }
+  $defaults = mes_runtime_default();
+  foreach ($defaults as $key => $value) {
+    if ($key === '_meta') continue;
+    $data[$key] = array_values(is_array($data[$key] ?? null) ? $data[$key] : []);
+  }
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $defaults['_meta'];
+  return $data;
+}
+
+function save_mes_runtime_store(array $data): void {
+  global $MES_RUNTIME_FILE;
+  ensure_dir(dirname($MES_RUNTIME_FILE));
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
+  $data['_meta']['updated'] = now_iso();
+  write_json_file($MES_RUNTIME_FILE, $data);
+}
+
+function mes_runtime_id(string $prefix): string {
+  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  return strtoupper($prefix) . '-' . $dt->format('YmdHis') . '-' . substr(bin2hex(random_bytes(3)), 0, 6);
+}
+
 function order_entity_config(string $entity): array {
   $map = [
     'so' => ['config_key' => 'sales_order', 'store_key' => 'sales_orders', 'number_key' => 'so_number', 'counter_key' => 'last_so', 'digits' => 4, 'default_status' => 'draft'],
@@ -1875,6 +1922,15 @@ function load_order_runtime_config(): array {
   $file = $CONF_DIR . '/so_jo_wo_config.json';
   $cfg = read_json_file($file);
   return is_array($cfg) ? $cfg : [];
+}
+
+function order_transition_allowed(string $entity, string $fromStatus, string $toStatus): bool {
+  if ($fromStatus === '' || $toStatus === '') return false;
+  if ($fromStatus === $toStatus) return true;
+  $cfg = load_order_runtime_config();
+  $flow = is_array($cfg['status_flow'][$entity]['transitions'] ?? null) ? $cfg['status_flow'][$entity]['transitions'] : [];
+  $allowed = array_map('strtolower', array_values((array)($flow[$fromStatus] ?? [])));
+  return in_array(strtolower($toStatus), $allowed, true);
 }
 
 function order_role_allowed(array $me, string $entity, string $permission): bool {
@@ -2014,6 +2070,209 @@ function find_order_record(array $store, string $entity, string $id): ?array {
   return null;
 }
 
+function master_index_by(array $rows, string $key): array {
+  $index = [];
+  foreach ($rows as $row) {
+    if (!is_array($row)) continue;
+    $id = trim((string)($row[$key] ?? ''));
+    if ($id === '') continue;
+    $index[$id] = $row;
+  }
+  return $index;
+}
+
+function build_mes_snapshot(array $orders, array $master, array $mes): array {
+  $customers = master_index_by((array)($master['customers'] ?? []), 'customer_id');
+  $parts = master_index_by((array)($master['parts'] ?? []), 'part_number');
+  $workCenters = master_index_by((array)($master['work_centers'] ?? []), 'work_center_id');
+  $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+  $operators = master_index_by((array)($master['operators'] ?? []), 'operator_id');
+
+  $jos = master_index_by((array)($orders['job_orders'] ?? []), 'jo_number');
+  $wos = master_index_by((array)($orders['work_orders'] ?? []), 'wo_number');
+  $sales = master_index_by((array)($orders['sales_orders'] ?? []), 'so_number');
+
+  $activeDowntimeByMachine = [];
+  foreach ((array)($mes['downtime_events'] ?? []) as $event) {
+    if (!is_array($event) || strtolower((string)($event['status'] ?? 'open')) !== 'open') continue;
+    $machineId = trim((string)($event['machine_id'] ?? ''));
+    if ($machineId === '') continue;
+    $activeDowntimeByMachine[$machineId] = $event;
+  }
+
+  $activeMaintenanceByMachine = [];
+  foreach ((array)($mes['maintenance_requests'] ?? []) as $request) {
+    if (!is_array($request)) continue;
+    $status = strtolower((string)($request['status'] ?? 'open'));
+    if (!in_array($status, ['open', 'approved', 'in_progress'], true)) continue;
+    $machineId = trim((string)($request['machine_id'] ?? ''));
+    if ($machineId === '') continue;
+    $activeMaintenanceByMachine[$machineId] = $request;
+  }
+
+  $dispatch = [];
+  $workOrdersByMachine = [];
+  foreach ((array)($orders['work_orders'] ?? []) as $wo) {
+    if (!is_array($wo)) continue;
+    $woNumber = trim((string)($wo['wo_number'] ?? ''));
+    $joNumber = trim((string)($wo['jo_number'] ?? ''));
+    $machineId = trim((string)($wo['machine_id'] ?? ''));
+    $status = strtolower((string)($wo['status'] ?? 'scheduled'));
+    $jo = $jos[$joNumber] ?? [];
+    $so = $sales[(string)($jo['so_number'] ?? '')] ?? [];
+    $customerId = (string)($jo['customer_id'] ?? $so['customer_id'] ?? '');
+    $partNumber = (string)($jo['part_number'] ?? '');
+    $dispatchRow = [
+      'wo_number' => $woNumber,
+      'jo_number' => $joNumber,
+      'so_number' => (string)($jo['so_number'] ?? ''),
+      'status' => $status,
+      'operation_number' => (int)($wo['operation_number'] ?? 0),
+      'operation_desc' => (string)($wo['operation_desc'] ?? ''),
+      'machine_id' => $machineId,
+      'machine_name' => (string)($machines[$machineId]['machine_name'] ?? ''),
+      'work_center_id' => (string)($wo['work_center_id'] ?? ''),
+      'work_center_name' => (string)($workCenters[(string)($wo['work_center_id'] ?? '')]['work_center_name'] ?? ''),
+      'operator_id' => (string)($wo['operator_id'] ?? ''),
+      'operator_name' => (string)($operators[(string)($wo['operator_id'] ?? '')]['operator_name'] ?? ''),
+      'customer_id' => $customerId,
+      'customer_name' => (string)($customers[$customerId]['customer_name'] ?? $so['customer_name'] ?? ''),
+      'part_number' => $partNumber,
+      'part_revision' => (string)($jo['part_revision'] ?? ''),
+      'part_description' => (string)($jo['part_description'] ?? $parts[$partNumber]['part_description'] ?? ''),
+      'qty_ordered' => (int)($jo['qty_ordered'] ?? 0),
+      'qty_completed' => (int)($wo['qty_completed'] ?? 0),
+      'qty_scrap' => (int)($wo['qty_scrap'] ?? 0),
+      'scheduled_start' => (string)($wo['scheduled_start'] ?? ''),
+      'scheduled_end' => (string)($wo['scheduled_end'] ?? ''),
+      'actual_start' => (string)($wo['actual_start'] ?? ''),
+      'actual_end' => (string)($wo['actual_end'] ?? ''),
+      'setup_time_est' => (float)($wo['setup_time_est'] ?? 0),
+      'run_time_est' => (float)($wo['run_time_est'] ?? 0),
+      'setup_time_actual' => (float)($wo['setup_time_actual'] ?? 0),
+      'run_time_actual' => (float)($wo['run_time_actual'] ?? 0),
+      'fixture_id' => (string)($wo['fixture_id'] ?? ''),
+      'priority' => (string)($so['priority'] ?? 'normal'),
+    ];
+    $dispatch[] = $dispatchRow;
+    if ($machineId !== '') $workOrdersByMachine[$machineId][] = $dispatchRow;
+  }
+
+  usort($dispatch, function ($a, $b) {
+    return strcmp((string)($a['scheduled_start'] ?? ''), (string)($b['scheduled_start'] ?? ''));
+  });
+
+  $machineWall = [];
+  foreach ((array)($master['machines'] ?? []) as $machine) {
+    if (!is_array($machine)) continue;
+    $machineId = trim((string)($machine['machine_id'] ?? ''));
+    if ($machineId === '') continue;
+    $queue = array_values((array)($workOrdersByMachine[$machineId] ?? []));
+    $activeWo = null;
+    foreach ($queue as $candidate) {
+      if (in_array((string)($candidate['status'] ?? ''), ['running', 'setup', 'inspection', 'on_hold'], true)) {
+        $activeWo = $candidate;
+        break;
+      }
+    }
+    if ($activeWo === null && !empty($queue)) $activeWo = $queue[0];
+
+    $status = 'idle';
+    if (isset($activeDowntimeByMachine[$machineId])) {
+      $status = 'down';
+    } elseif (isset($activeMaintenanceByMachine[$machineId])) {
+      $status = 'maintenance';
+    } elseif ($activeWo) {
+      $status = (string)($activeWo['status'] ?? 'scheduled');
+    } elseif (!empty($queue)) {
+      $status = 'scheduled';
+    }
+
+    $machineWall[] = [
+      'machine_id' => $machineId,
+      'machine_name' => (string)($machine['machine_name'] ?? ''),
+      'machine_type' => (string)($machine['machine_type'] ?? ''),
+      'status' => $status,
+      'work_center_id' => (string)($machine['work_center_id'] ?? ''),
+      'work_center_name' => (string)($workCenters[(string)($machine['work_center_id'] ?? '')]['work_center_name'] ?? ''),
+      'location' => (string)($machine['location'] ?? ''),
+      'preferred_operator_id' => (string)($machine['preferred_operator_id'] ?? ''),
+      'preferred_operator_name' => (string)($operators[(string)($machine['preferred_operator_id'] ?? '')]['operator_name'] ?? ''),
+      'queue_count' => count($queue),
+      'active_work_order' => $activeWo,
+      'open_downtime' => $activeDowntimeByMachine[$machineId] ?? null,
+      'open_maintenance' => $activeMaintenanceByMachine[$machineId] ?? null,
+      'last_pm_date' => (string)($machine['last_pm_date'] ?? ''),
+      'next_pm_date' => (string)($machine['next_pm_date'] ?? ''),
+    ];
+  }
+
+  usort($machineWall, function ($a, $b) {
+    return strcmp((string)($a['machine_id'] ?? ''), (string)($b['machine_id'] ?? ''));
+  });
+
+  $openDowntimes = array_values(array_filter((array)($mes['downtime_events'] ?? []), fn($row) => is_array($row) && strtolower((string)($row['status'] ?? 'open')) === 'open'));
+  usort($openDowntimes, function ($a, $b) {
+    return strcmp((string)($b['started_at'] ?? ''), (string)($a['started_at'] ?? ''));
+  });
+
+  $maintenanceQueue = array_values(array_filter((array)($mes['maintenance_requests'] ?? []), fn($row) => is_array($row) && !in_array(strtolower((string)($row['status'] ?? 'open')), ['completed', 'cancelled'], true)));
+  usort($maintenanceQueue, function ($a, $b) {
+    return strcmp((string)($a['requested_at'] ?? ''), (string)($b['requested_at'] ?? ''));
+  });
+
+  $now = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $overdueWo = count(array_filter($dispatch, function ($row) use ($now) {
+    $status = strtolower((string)($row['status'] ?? ''));
+    if (in_array($status, ['completed', 'closed'], true)) return false;
+    $scheduledEnd = trim((string)($row['scheduled_end'] ?? ''));
+    if ($scheduledEnd === '') return false;
+    try {
+      return new DateTimeImmutable($scheduledEnd) < $now;
+    } catch (Throwable) {
+      return false;
+    }
+  }));
+
+  $kpis = [
+    'machines_total' => count($machineWall),
+    'machines_running' => count(array_filter($machineWall, fn($row) => in_array((string)($row['status'] ?? ''), ['running', 'setup', 'inspection'], true))),
+    'machines_down' => count(array_filter($machineWall, fn($row) => (string)($row['status'] ?? '') === 'down')),
+    'maintenance_open' => count($maintenanceQueue),
+    'downtime_open' => count($openDowntimes),
+    'wo_active' => count(array_filter($dispatch, fn($row) => in_array((string)($row['status'] ?? ''), ['scheduled', 'setup', 'running', 'inspection', 'on_hold'], true))),
+    'wo_overdue' => $overdueWo,
+  ];
+
+  $workCenterSummary = [];
+  foreach ((array)($master['work_centers'] ?? []) as $center) {
+    if (!is_array($center)) continue;
+    $centerId = trim((string)($center['work_center_id'] ?? ''));
+    if ($centerId === '') continue;
+    $centerOrders = array_values(array_filter($dispatch, fn($row) => (string)($row['work_center_id'] ?? '') === $centerId));
+    $centerMachines = array_values(array_filter($machineWall, fn($row) => (string)($row['work_center_id'] ?? '') === $centerId));
+    $workCenterSummary[] = [
+      'work_center_id' => $centerId,
+      'work_center_name' => (string)($center['work_center_name'] ?? ''),
+      'department' => (string)($center['department'] ?? ''),
+      'machine_count' => count($centerMachines),
+      'wo_count' => count($centerOrders),
+      'running_count' => count(array_filter($centerMachines, fn($row) => in_array((string)($row['status'] ?? ''), ['running', 'setup', 'inspection'], true))),
+      'down_count' => count(array_filter($centerMachines, fn($row) => (string)($row['status'] ?? '') === 'down')),
+    ];
+  }
+
+  return [
+    'kpis' => $kpis,
+    'machine_wall' => $machineWall,
+    'dispatch' => $dispatch,
+    'open_downtimes' => $openDowntimes,
+    'maintenance_queue' => $maintenanceQueue,
+    'progress_reports' => array_slice(array_values(array_reverse((array)($mes['progress_reports'] ?? []))), 0, 20),
+    'work_center_summary' => $workCenterSummary,
+  ];
+}
+
 function upsert_master_data_item(array &$store, string $entity, array $item, string $username): array {
   $map = [
     'customers' => 'customer_id',
@@ -2021,6 +2280,9 @@ function upsert_master_data_item(array &$store, string $entity, array $item, str
     'parts' => 'part_number',
     'revisions' => 'revision_id',
     'capas' => 'capa_number',
+    'work_centers' => 'work_center_id',
+    'machines' => 'machine_id',
+    'operators' => 'operator_id',
   ];
   if (!isset($map[$entity])) throw new RuntimeException('invalid_master_entity');
   $idKey = $map[$entity];
@@ -8432,6 +8694,9 @@ if ($username === '') {
         'parts' => count($data['parts'] ?? []),
         'revisions' => count($data['revisions'] ?? []),
         'capas' => count($data['capas'] ?? []),
+        'work_centers' => count($data['work_centers'] ?? []),
+        'machines' => count($data['machines'] ?? []),
+        'operators' => count($data['operators'] ?? []),
       ],
     ]);
   }
@@ -8442,7 +8707,7 @@ if ($username === '') {
     require_csrf();
 
     $role = migrate_role((string)($me['role'] ?? ''));
-    $allowedRoles = ['ceo', 'qa_manager', 'qms_engineer', 'sales_manager', 'estimator', 'customer_service', 'buyer', 'supply_chain_manager', 'production_manager', 'planning_manager'];
+    $allowedRoles = ['ceo', 'qa_manager', 'qms_engineer', 'sales_manager', 'estimator', 'customer_service', 'buyer', 'supply_chain_manager', 'production_manager', 'planning_manager', 'maintenance_manager', 'supervisor', 'shift_leader'];
     if (!in_array($role, $allowedRoles, true) && !in_array($role, admin_roles(), true)) {
       api_json(['ok' => false, 'error' => 'forbidden'], 403);
     }
@@ -8463,6 +8728,335 @@ if ($username === '') {
   }
 
   // ── Order Management Runtime ───────────────────────────────────────────
+  case 'mes_snapshot': {
+    require_logged_in($store);
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    api_json([
+      'ok' => true,
+      'data' => build_mes_snapshot($orders, $master, $mes),
+      'orders_updated' => (string)($orders['_meta']['updated'] ?? ''),
+      'master_updated' => (string)($master['_meta']['updated'] ?? ''),
+      'mes_updated' => (string)($mes['_meta']['updated'] ?? ''),
+    ]);
+  }
+
+  case 'mes_wo_report_progress': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $woNumber = trim((string)($body['wo_number'] ?? ''));
+    if ($woNumber === '') api_json(['ok' => false, 'error' => 'missing_wo_number'], 400);
+
+    $orders = load_orders_store();
+    $mes = load_mes_runtime_store();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $reportStatus = strtolower(trim((string)($body['status'] ?? '')));
+    $updatedWo = null;
+    $context = [];
+    foreach ($orders['work_orders'] as $idx => $row) {
+      if (!is_array($row) || (string)($row['wo_number'] ?? '') !== $woNumber) continue;
+      $currentStatus = strtolower(trim((string)($row['status'] ?? 'scheduled')));
+      if ($reportStatus !== '' && !order_transition_allowed('wo', $currentStatus, $reportStatus)) {
+        api_json(['ok' => false, 'error' => 'invalid_status_transition', 'from' => $currentStatus, 'to' => $reportStatus], 409);
+      }
+      if ($reportStatus !== '' && $reportStatus !== $currentStatus) {
+        $orders['work_orders'][$idx]['status'] = $reportStatus;
+        $orders['work_orders'][$idx]['status_history'] = array_values((array)($orders['work_orders'][$idx]['status_history'] ?? []));
+        $orders['work_orders'][$idx]['status_history'][] = [
+          'status' => $reportStatus,
+          'timestamp' => now_iso(),
+          'user' => $username,
+          'note' => trim((string)($body['note'] ?? '')),
+        ];
+      }
+      foreach (['machine_id', 'work_center_id', 'operator_id', 'nc_program_id', 'fixture_id'] as $key) {
+        if (array_key_exists($key, $body) && trim((string)$body[$key]) !== '') {
+          $orders['work_orders'][$idx][$key] = trim((string)$body[$key]);
+        }
+      }
+      foreach (['qty_completed', 'qty_scrap'] as $key) {
+        if (array_key_exists($key, $body) && $body[$key] !== '' && $body[$key] !== null) {
+          $orders['work_orders'][$idx][$key] = max(0, (int)$body[$key]);
+        }
+      }
+      foreach (['setup_time_actual', 'run_time_actual'] as $key) {
+        if (array_key_exists($key, $body) && $body[$key] !== '' && $body[$key] !== null) {
+          $orders['work_orders'][$idx][$key] = max(0, (float)$body[$key]);
+        }
+      }
+      if (!empty($body['actual_start'])) {
+        $orders['work_orders'][$idx]['actual_start'] = trim((string)$body['actual_start']);
+      } elseif (!empty($reportStatus) && in_array($reportStatus, ['setup', 'running', 'inspection'], true) && empty($orders['work_orders'][$idx]['actual_start'])) {
+        $orders['work_orders'][$idx]['actual_start'] = now_iso();
+      }
+      if (!empty($body['actual_end'])) {
+        $orders['work_orders'][$idx]['actual_end'] = trim((string)$body['actual_end']);
+      } elseif ($reportStatus === 'completed' && empty($orders['work_orders'][$idx]['actual_end'])) {
+        $orders['work_orders'][$idx]['actual_end'] = now_iso();
+      }
+      $orders['work_orders'][$idx]['updated_at'] = now_iso();
+      $orders['work_orders'][$idx]['updated_by'] = $username;
+      $updatedWo = $orders['work_orders'][$idx];
+      $jo = find_order_record($orders, 'jo', (string)($updatedWo['jo_number'] ?? '')) ?? [];
+      $context = normalize_master_context([
+        'so_number' => (string)($jo['so_number'] ?? ''),
+        'jo_number' => (string)($updatedWo['jo_number'] ?? ''),
+        'wo_number' => (string)($updatedWo['wo_number'] ?? ''),
+        'customer_id' => (string)($jo['customer_id'] ?? ''),
+        'part_number' => (string)($jo['part_number'] ?? ''),
+        'part_revision' => (string)($jo['part_revision'] ?? ''),
+      ]);
+      break;
+    }
+    if (!$updatedWo) api_json(['ok' => false, 'error' => 'work_order_not_found'], 404);
+
+    $progress = [
+      'progress_id' => mes_runtime_id('PRG'),
+      'wo_number' => $woNumber,
+      'status' => (string)($updatedWo['status'] ?? 'scheduled'),
+      'machine_id' => (string)($updatedWo['machine_id'] ?? ''),
+      'operator_id' => (string)($updatedWo['operator_id'] ?? ''),
+      'qty_completed' => (int)($updatedWo['qty_completed'] ?? 0),
+      'qty_scrap' => (int)($updatedWo['qty_scrap'] ?? 0),
+      'setup_time_actual' => (float)($updatedWo['setup_time_actual'] ?? 0),
+      'run_time_actual' => (float)($updatedWo['run_time_actual'] ?? 0),
+      'reported_at' => now_iso(),
+      'reported_by' => $username,
+      'note' => trim((string)($body['note'] ?? '')),
+      'record_context' => $context,
+    ];
+    $mes['progress_reports'][] = $progress;
+    save_orders_store($orders);
+    save_mes_runtime_store($mes);
+
+    api_json([
+      'ok' => true,
+      'work_order' => $updatedWo,
+      'progress' => $progress,
+      'data' => build_mes_snapshot($orders, load_master_data_store(), $mes),
+    ]);
+  }
+
+  case 'mes_downtime_create': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $machineId = trim((string)($body['machine_id'] ?? ''));
+    $category = strtolower(trim((string)($body['category'] ?? 'breakdown')));
+    if ($machineId === '') api_json(['ok' => false, 'error' => 'missing_machine_id'], 400);
+
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+    if (!isset($machines[$machineId])) api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
+
+    $woNumber = trim((string)($body['wo_number'] ?? ''));
+    $jo = [];
+    $wo = [];
+    if ($woNumber !== '') {
+      $wo = find_order_record($orders, 'wo', $woNumber) ?? [];
+      if (!$wo) api_json(['ok' => false, 'error' => 'work_order_not_found'], 404);
+      $jo = find_order_record($orders, 'jo', (string)($wo['jo_number'] ?? '')) ?? [];
+    }
+
+    $event = [
+      'downtime_id' => mes_runtime_id('DT'),
+      'machine_id' => $machineId,
+      'machine_name' => (string)($machines[$machineId]['machine_name'] ?? ''),
+      'work_center_id' => trim((string)($body['work_center_id'] ?? $machines[$machineId]['work_center_id'] ?? '')),
+      'wo_number' => $woNumber,
+      'category' => $category,
+      'severity' => strtolower(trim((string)($body['severity'] ?? 'major'))),
+      'reason' => trim((string)($body['reason'] ?? '')),
+      'note' => trim((string)($body['note'] ?? '')),
+      'started_at' => trim((string)($body['started_at'] ?? now_iso())),
+      'status' => 'open',
+      'reported_by' => $username,
+      'record_context' => normalize_master_context([
+        'so_number' => (string)($jo['so_number'] ?? ''),
+        'jo_number' => (string)($wo['jo_number'] ?? ''),
+        'wo_number' => $woNumber,
+        'customer_id' => (string)($jo['customer_id'] ?? ''),
+        'part_number' => (string)($jo['part_number'] ?? ''),
+        'part_revision' => (string)($jo['part_revision'] ?? ''),
+      ]),
+    ];
+    $mes['downtime_events'][] = $event;
+
+    if ($wo) {
+      foreach ($orders['work_orders'] as $idx => $row) {
+        if (!is_array($row) || (string)($row['wo_number'] ?? '') !== $woNumber) continue;
+        $currentStatus = strtolower(trim((string)($row['status'] ?? 'scheduled')));
+        if ($currentStatus !== 'completed' && $currentStatus !== 'on_hold' && order_transition_allowed('wo', $currentStatus, 'on_hold')) {
+          $orders['work_orders'][$idx]['status'] = 'on_hold';
+          $orders['work_orders'][$idx]['status_history'] = array_values((array)($orders['work_orders'][$idx]['status_history'] ?? []));
+          $orders['work_orders'][$idx]['status_history'][] = [
+            'status' => 'on_hold',
+            'timestamp' => now_iso(),
+            'user' => $username,
+            'note' => 'downtime:' . $event['downtime_id'],
+          ];
+          $orders['work_orders'][$idx]['updated_at'] = now_iso();
+          $orders['work_orders'][$idx]['updated_by'] = $username;
+        }
+        break;
+      }
+    }
+
+    save_orders_store($orders);
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'downtime' => $event, 'data' => build_mes_snapshot($orders, $master, $mes)]);
+  }
+
+  case 'mes_downtime_resolve': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $downtimeId = trim((string)($body['downtime_id'] ?? ''));
+    if ($downtimeId === '') api_json(['ok' => false, 'error' => 'missing_downtime_id'], 400);
+
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $resolved = null;
+    foreach ($mes['downtime_events'] as $idx => $row) {
+      if (!is_array($row) || (string)($row['downtime_id'] ?? '') !== $downtimeId) continue;
+      $mes['downtime_events'][$idx]['status'] = 'resolved';
+      $mes['downtime_events'][$idx]['resolved_at'] = trim((string)($body['resolved_at'] ?? now_iso()));
+      $mes['downtime_events'][$idx]['resolved_by'] = $username;
+      $mes['downtime_events'][$idx]['corrective_action'] = trim((string)($body['corrective_action'] ?? ''));
+      $mes['downtime_events'][$idx]['resolution_code'] = trim((string)($body['resolution_code'] ?? 'resolved'));
+      $resolved = $mes['downtime_events'][$idx];
+      break;
+    }
+    if (!$resolved) api_json(['ok' => false, 'error' => 'downtime_not_found'], 404);
+
+    $resumeStatus = strtolower(trim((string)($body['resume_status'] ?? 'running')));
+    $woNumber = trim((string)($resolved['wo_number'] ?? ''));
+    if ($woNumber !== '') {
+      foreach ($orders['work_orders'] as $idx => $row) {
+        if (!is_array($row) || (string)($row['wo_number'] ?? '') !== $woNumber) continue;
+        $currentStatus = strtolower(trim((string)($row['status'] ?? 'on_hold')));
+        if (order_transition_allowed('wo', $currentStatus, $resumeStatus)) {
+          $orders['work_orders'][$idx]['status'] = $resumeStatus;
+          $orders['work_orders'][$idx]['status_history'] = array_values((array)($orders['work_orders'][$idx]['status_history'] ?? []));
+          $orders['work_orders'][$idx]['status_history'][] = [
+            'status' => $resumeStatus,
+            'timestamp' => now_iso(),
+            'user' => $username,
+            'note' => 'downtime_resolved:' . $downtimeId,
+          ];
+          $orders['work_orders'][$idx]['updated_at'] = now_iso();
+          $orders['work_orders'][$idx]['updated_by'] = $username;
+          if (in_array($resumeStatus, ['setup', 'running', 'inspection'], true) && empty($orders['work_orders'][$idx]['actual_start'])) {
+            $orders['work_orders'][$idx]['actual_start'] = now_iso();
+          }
+        }
+        break;
+      }
+    }
+
+    save_orders_store($orders);
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'downtime' => $resolved, 'data' => build_mes_snapshot($orders, $master, $mes)]);
+  }
+
+  case 'mes_maintenance_create': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $machineId = trim((string)($body['machine_id'] ?? ''));
+    $title = trim((string)($body['title'] ?? ''));
+    if ($machineId === '' || $title === '') api_json(['ok' => false, 'error' => 'missing_required_fields'], 400);
+
+    $master = load_master_data_store();
+    $orders = load_orders_store();
+    $mes = load_mes_runtime_store();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+    if (!isset($machines[$machineId])) api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
+
+    $request = [
+      'request_id' => mes_runtime_id('MNT'),
+      'machine_id' => $machineId,
+      'machine_name' => (string)($machines[$machineId]['machine_name'] ?? ''),
+      'work_center_id' => (string)($machines[$machineId]['work_center_id'] ?? ''),
+      'maintenance_type' => strtolower(trim((string)($body['maintenance_type'] ?? 'corrective'))),
+      'priority' => strtolower(trim((string)($body['priority'] ?? 'medium'))),
+      'title' => $title,
+      'description' => trim((string)($body['description'] ?? '')),
+      'wo_number' => trim((string)($body['wo_number'] ?? '')),
+      'requested_at' => now_iso(),
+      'requested_by' => $username,
+      'assigned_to' => trim((string)($body['assigned_to'] ?? '')),
+      'due_date' => trim((string)($body['due_date'] ?? '')),
+      'status' => 'open',
+    ];
+    $mes['maintenance_requests'][] = $request;
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'maintenance' => $request, 'data' => build_mes_snapshot($orders, $master, $mes)]);
+  }
+
+  case 'mes_maintenance_update_status': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $requestId = trim((string)($body['request_id'] ?? ''));
+    $newStatus = strtolower(trim((string)($body['status'] ?? '')));
+    if ($requestId === '' || $newStatus === '') api_json(['ok' => false, 'error' => 'missing_required_fields'], 400);
+
+    $master = load_master_data_store();
+    $orders = load_orders_store();
+    $mes = load_mes_runtime_store();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $updated = null;
+    foreach ($mes['maintenance_requests'] as $idx => $row) {
+      if (!is_array($row) || (string)($row['request_id'] ?? '') !== $requestId) continue;
+      $mes['maintenance_requests'][$idx]['status'] = $newStatus;
+      if (!empty($body['assigned_to'])) $mes['maintenance_requests'][$idx]['assigned_to'] = trim((string)$body['assigned_to']);
+      if (!empty($body['note'])) $mes['maintenance_requests'][$idx]['note'] = trim((string)$body['note']);
+      if (!empty($body['actual_start']) || $newStatus === 'in_progress') {
+        $mes['maintenance_requests'][$idx]['actual_start'] = trim((string)($body['actual_start'] ?? now_iso()));
+      }
+      if (!empty($body['actual_end']) || $newStatus === 'completed') {
+        $mes['maintenance_requests'][$idx]['actual_end'] = trim((string)($body['actual_end'] ?? now_iso()));
+      }
+      $mes['maintenance_requests'][$idx]['updated_at'] = now_iso();
+      $mes['maintenance_requests'][$idx]['updated_by'] = $username;
+      $updated = $mes['maintenance_requests'][$idx];
+      break;
+    }
+    if (!$updated) api_json(['ok' => false, 'error' => 'maintenance_request_not_found'], 404);
+
+    if ($newStatus === 'completed') {
+      foreach ($master['machines'] as $idx => $row) {
+        if (!is_array($row) || (string)($row['machine_id'] ?? '') !== (string)($updated['machine_id'] ?? '')) continue;
+        $master['machines'][$idx]['last_maintenance_at'] = now_iso();
+        if ((string)($updated['maintenance_type'] ?? '') === 'preventive') {
+          $master['machines'][$idx]['last_pm_date'] = date('Y-m-d');
+          if (!empty($body['next_pm_date'])) $master['machines'][$idx]['next_pm_date'] = trim((string)$body['next_pm_date']);
+        }
+        $master['machines'][$idx]['updated_at'] = now_iso();
+        $master['machines'][$idx]['updated_by'] = $username;
+        break;
+      }
+      save_master_data_store($master);
+    }
+
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'maintenance' => $updated, 'data' => build_mes_snapshot($orders, $master, $mes)]);
+  }
+
   case 'order_dashboard_stats': {
     $me = require_logged_in($store);
     require_order_permission($me, 'so', 'view');
@@ -8611,6 +9205,15 @@ if ($username === '') {
     $updated = null;
     foreach ($orders[$storeKey] as $idx => $row) {
       if (!is_array($row) || (string)($row[$idKey] ?? '') !== $orderId) continue;
+      $currentStatus = strtolower(trim((string)($row['status'] ?? '')));
+      if (!order_transition_allowed($entity, $currentStatus, $newStatus)) {
+        api_json([
+          'ok' => false,
+          'error' => 'invalid_status_transition',
+          'from' => $currentStatus,
+          'to' => $newStatus,
+        ], 409);
+      }
       $orders[$storeKey][$idx]['status'] = $newStatus;
       $orders[$storeKey][$idx]['updated_at'] = now_iso();
       $orders[$storeKey][$idx]['updated_by'] = (string)($_SESSION['user'] ?? 'system');
@@ -8625,6 +9228,14 @@ if ($username === '') {
       $orders[$storeKey][$idx]['status_history'][] = $historyEntry;
       if ($entity === 'so' && $newStatus === 'shipped' && empty($orders[$storeKey][$idx]['shipped_date'])) {
         $orders[$storeKey][$idx]['shipped_date'] = date('Y-m-d');
+      }
+      if ($entity === 'wo') {
+        if (in_array($newStatus, ['setup', 'running', 'inspection'], true) && empty($orders[$storeKey][$idx]['actual_start'])) {
+          $orders[$storeKey][$idx]['actual_start'] = now_iso();
+        }
+        if ($newStatus === 'completed' && empty($orders[$storeKey][$idx]['actual_end'])) {
+          $orders[$storeKey][$idx]['actual_end'] = now_iso();
+        }
       }
       if (in_array($newStatus, ['closed', 'completed'], true)) {
         $orders[$storeKey][$idx]['closed_date'] = date('Y-m-d');

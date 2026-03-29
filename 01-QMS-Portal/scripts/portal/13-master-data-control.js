@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
    13-master-data-control.js -- Governed Master Data Control
-   HESEM QMS Portal -- Customer / Supplier / Part / Revision / CAPA
-   Shared source for Order Management and Evidence Control lookups
+   HESEM QMS Portal -- Customer / Supplier / Part / Revision / CAPA / Work Center / Machine / Operator
+   Shared source for Order Management, Evidence Control, and MES runtime lookups
    =================================================================== */
 
 (function(){
@@ -112,6 +112,67 @@ var ENTITY_CONFIG = {
       { key:'customer_id', type:'lookup', entity:'customers', label:'Khách hàng' },
       { key:'part_number', type:'lookup', entity:'parts', label:'Part Number' }
     ]
+  },
+  work_centers: {
+    key: 'work_center_id',
+    labelVi: 'Work center',
+    labelEn: 'Work centers',
+    emptyVi: 'Chưa có work center nào.',
+    listColumns: [
+      { key:'work_center_id', label:'Mã' },
+      { key:'work_center_name', label:'Tên work center' },
+      { key:'status', label:'Trạng thái' }
+    ],
+    fields: [
+      { key:'work_center_id', type:'text', required:true, label:'Mã work center' },
+      { key:'work_center_name', type:'text', required:true, label:'Tên work center' },
+      { key:'department', type:'select', required:true, label:'Phòng ban', options:['PRO','QA','ENG','SCM','MNT'] },
+      { key:'process_family', type:'select', label:'Nhóm công nghệ', options:['3-axis','5-axis','turning','inspection','maintenance','grinding'] },
+      { key:'area', type:'text', label:'Khu vực / line' },
+      { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','inactive','blocked'] }
+    ]
+  },
+  machines: {
+    key: 'machine_id',
+    labelVi: 'Máy / thiết bị',
+    labelEn: 'Machines',
+    emptyVi: 'Chưa có máy hoặc thiết bị nào.',
+    listColumns: [
+      { key:'machine_id', label:'Mã máy' },
+      { key:'machine_name', label:'Tên máy' },
+      { key:'status', label:'Trạng thái' }
+    ],
+    fields: [
+      { key:'machine_id', type:'text', required:true, label:'Mã máy' },
+      { key:'machine_name', type:'text', required:true, label:'Tên máy' },
+      { key:'work_center_id', type:'lookup', entity:'work_centers', required:true, label:'Work center' },
+      { key:'machine_type', type:'select', required:true, label:'Loại máy', options:['5-axis','3-axis','turning','mill-turn','cmm','washing','support'] },
+      { key:'location', type:'text', label:'Vị trí máy' },
+      { key:'preferred_operator_id', type:'lookup', entity:'operators', label:'Người vận hành ưu tiên' },
+      { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','idle','maintenance','down','blocked','retired'] },
+      { key:'last_pm_date', type:'date', label:'Ngày PM gần nhất' },
+      { key:'next_pm_date', type:'date', label:'Ngày PM tiếp theo' }
+    ]
+  },
+  operators: {
+    key: 'operator_id',
+    labelVi: 'Nhân lực vận hành',
+    labelEn: 'Operators',
+    emptyVi: 'Chưa có nhân lực vận hành nào.',
+    listColumns: [
+      { key:'operator_id', label:'Mã' },
+      { key:'operator_name', label:'Họ tên' },
+      { key:'status', label:'Trạng thái' }
+    ],
+    fields: [
+      { key:'operator_id', type:'text', required:true, label:'Mã nhân lực' },
+      { key:'operator_name', type:'text', required:true, label:'Họ tên' },
+      { key:'role', type:'select', required:true, label:'Vai trò', options:['operator','qc_inspector','shift_leader','maintenance_tech','planner','engineer'] },
+      { key:'work_center_id', type:'lookup', entity:'work_centers', label:'Work center chính' },
+      { key:'shift', type:'select', label:'Ca làm việc', options:['1','2','3','day','night','office'] },
+      { key:'skills', type:'text', label:'Kỹ năng / chứng nhận', helper:'Nhập các kỹ năng chính, phân tách bằng dấu phẩy.' },
+      { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','inactive','training','blocked'] }
+    ]
   }
 };
 
@@ -163,6 +224,9 @@ function _optionLabel(entity, row){
   if(entity === 'parts') return row.part_number || '';
   if(entity === 'revisions') return row.revision_id || row.revision || '';
   if(entity === 'capas') return row.capa_number || '';
+  if(entity === 'work_centers') return row.work_center_name || row.work_center_id || '';
+  if(entity === 'machines') return row.machine_name || row.machine_id || '';
+  if(entity === 'operators') return row.operator_name || row.operator_id || '';
   return '';
 }
 
@@ -181,6 +245,9 @@ function _defaultDraft(entity){
   if(entity === 'parts') draft.status = 'active';
   if(entity === 'revisions') draft.status = 'released';
   if(entity === 'capas') draft.status = 'open';
+  if(entity === 'work_centers') draft.status = 'active';
+  if(entity === 'machines') draft.status = 'active';
+  if(entity === 'operators') draft.status = 'active';
   return draft;
 }
 
@@ -348,7 +415,7 @@ window._mdEnsureSnapshot = function(force){
   if(!force && _mdCache) return Promise.resolve(_mdCache);
   if(!force && _mdPromise) return _mdPromise;
   _mdPromise = _api('master_data_snapshot', {}, 'GET').then(function(res){
-    _mdCache = (res && res.ok && res.data) ? res.data : { customers:[], suppliers:[], parts:[], revisions:[], capas:[] };
+    _mdCache = (res && res.ok && res.data) ? res.data : Object.keys(ENTITY_CONFIG).reduce(function(out, key){ out[key] = []; return out; }, {});
     return _mdCache;
   }).finally(function(){ _mdPromise = null; });
   return _mdPromise;

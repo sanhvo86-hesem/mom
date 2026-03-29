@@ -3,7 +3,7 @@
     "version": "1.0",
     "created": "2026-03-29T12:00:00+07:00",
     "updated": "2026-03-29T12:00:00+07:00",
-    "description": "Master data seed for customer, supplier, part, revision, and CAPA linkage used by Evidence Control and Order Management."
+    "description": "Master data seed for customer, supplier, part, revision, CAPA, work center, machine, and operator linkage used by Evidence Control, Order Management, and MES runtime."
   },
   "customers": [
     {
@@ -136,6 +136,113 @@
       "status": "closed",
       "customer_id": "CUS-GLOBEX",
       "part_number": "P-2003"
+    }
+  ],
+  "work_centers": [
+    {
+      "work_center_id": "WC-5AX",
+      "work_center_name": "5-Axis Machining Cell",
+      "department": "PRO",
+      "process_family": "5-axis",
+      "area": "Xưởng CNC A",
+      "status": "active"
+    },
+    {
+      "work_center_id": "WC-3AX",
+      "work_center_name": "VMC Production Cell",
+      "department": "PRO",
+      "process_family": "3-axis",
+      "area": "Xưởng CNC B",
+      "status": "active"
+    },
+    {
+      "work_center_id": "WC-QA",
+      "work_center_name": "Final Inspection Cell",
+      "department": "QA",
+      "process_family": "inspection",
+      "area": "Phòng QA",
+      "status": "active"
+    },
+    {
+      "work_center_id": "WC-MNT",
+      "work_center_name": "Maintenance Support Cell",
+      "department": "MNT",
+      "process_family": "maintenance",
+      "area": "Utility Bay",
+      "status": "active"
+    }
+  ],
+  "machines": [
+    {
+      "machine_id": "MC-5AX-01",
+      "machine_name": "Makino DA300",
+      "work_center_id": "WC-5AX",
+      "machine_type": "5-axis",
+      "location": "Xưởng CNC A - Line 01",
+      "preferred_operator_id": "OPR-001",
+      "status": "active",
+      "last_pm_date": "2026-03-21",
+      "next_pm_date": "2026-04-21"
+    },
+    {
+      "machine_id": "MC-3AX-04",
+      "machine_name": "Brother S700X2",
+      "work_center_id": "WC-3AX",
+      "machine_type": "3-axis",
+      "location": "Xưởng CNC B - Line 02",
+      "preferred_operator_id": "OPR-014",
+      "status": "active",
+      "last_pm_date": "2026-03-14",
+      "next_pm_date": "2026-04-14"
+    },
+    {
+      "machine_id": "CMM-01",
+      "machine_name": "Mitutoyo Crysta-Apex",
+      "work_center_id": "WC-QA",
+      "machine_type": "cmm",
+      "location": "Phòng QA - CMM Zone",
+      "preferred_operator_id": "QC-002",
+      "status": "active",
+      "last_pm_date": "2026-03-05",
+      "next_pm_date": "2026-04-05"
+    }
+  ],
+  "operators": [
+    {
+      "operator_id": "OPR-001",
+      "operator_name": "Nguyễn Văn An",
+      "role": "operator",
+      "work_center_id": "WC-5AX",
+      "shift": "1",
+      "skills": "5-axis, setup, prove-out",
+      "status": "active"
+    },
+    {
+      "operator_id": "OPR-014",
+      "operator_name": "Trần Minh Khang",
+      "role": "operator",
+      "work_center_id": "WC-3AX",
+      "shift": "2",
+      "skills": "3-axis, VMC, tool offsets",
+      "status": "active"
+    },
+    {
+      "operator_id": "QC-002",
+      "operator_name": "Lê Thu Hà",
+      "role": "qc_inspector",
+      "work_center_id": "WC-QA",
+      "shift": "day",
+      "skills": "CMM, FAI, final inspection",
+      "status": "active"
+    },
+    {
+      "operator_id": "MNT-001",
+      "operator_name": "Phạm Quốc Dũng",
+      "role": "maintenance_tech",
+      "work_center_id": "WC-MNT",
+      "shift": "day",
+      "skills": "PM, spindle, coolant, pneumatics",
+      "status": "active"
     }
   ]
 }

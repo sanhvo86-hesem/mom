@@ -1356,6 +1356,7 @@ function renderSidebar(){
   if(isPortalSidebarCoreVisible('deploy')){
     html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'DEPLOYMENT':'TRIỂN KHAI VẬN HÀNH'}</div>
       <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">🚀</span><span>${lang==='en'?'Operations Deploy':'Triển khai vận hành'}</span></button>
+      <button class="nav-item ${currentPage==='mes'?'active':''}" onclick="navigateTo('mes')"><span class="icon">🏭</span><span>${lang==='en'?'MES Control Center':'Trung tâm điều hành MES'}</span></button>
       <button class="nav-item ${currentPage==='orders'?'active':''}" onclick="navigateTo('orders')"><span class="icon">📦</span><span>${lang==='en'?'Order Management':'Quản lý đơn hàng'}</span></button>
       <button class="nav-item ${currentPage==='forms'?'active':''}" onclick="navigateTo('forms')"><span class="icon">📋</span><span>${lang==='en'?'Evidence Control':'Kiểm soát chứng cứ'}</span></button>
     </div>`;
@@ -1400,10 +1401,10 @@ function navigateTo(page, filter){
   document.getElementById('user-dropdown').classList.remove('show');
   
   // Track page view for activity log
-  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',orders:'Quản lý đơn hàng',forms:'Kiểm soát chứng cứ'};
+  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',mes:'Trung tâm điều hành MES',orders:'Quản lý đơn hàng',forms:'Kiểm soát chứng cứ'};
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
-  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ'};
+  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ'};
   // Reset header breadcrumb for non-documents pages
   if(page !== 'documents'){
     const bcEl = document.getElementById('header-breadcrumb');
@@ -1417,6 +1418,7 @@ function navigateTo(page, filter){
   if(page==='dictionary') renderDictionary();
   if(page==='access') renderAccessMatrix();
   if(page==='deploy') renderDeployDashboard();
+  if(page==='mes' && typeof window._renderMesControlCenter==='function'){ var mp=document.getElementById('page-mes'); if(mp) window._renderMesControlCenter(mp); }
   if(page==='orders' && typeof window._renderSoJoWoDashboard==='function'){ var op=document.getElementById('page-orders'); if(op) window._renderSoJoWoDashboard(null,null,op); }
   if(page==='forms' && typeof renderOnlineForms==='function') renderOnlineForms();
   if(page==='admin'){ if(!isAdmin()){navigateTo('dashboard');return;} renderAdmin(); }
