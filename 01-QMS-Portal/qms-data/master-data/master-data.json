@@ -1,0 +1,141 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-03-29T12:00:00+07:00",
+    "updated": "2026-03-29T12:00:00+07:00",
+    "description": "Master data seed for customer, supplier, part, revision, and CAPA linkage used by Evidence Control and Order Management."
+  },
+  "customers": [
+    {
+      "customer_id": "CUS-LAM",
+      "customer_name": "Lam Research",
+      "customer_name_vi": "Lam Research",
+      "customer_type": "OEM",
+      "status": "active",
+      "contact_name": "SQE Desk",
+      "contact_email": "sqe@lam.example",
+      "site_code": "LAM-US"
+    },
+    {
+      "customer_id": "CUS-ACME",
+      "customer_name": "ACME Industries",
+      "customer_name_vi": "ACME Industries",
+      "customer_type": "Tier 1",
+      "status": "active",
+      "contact_name": "John Smith",
+      "contact_email": "john.smith@acme.example",
+      "site_code": "ACME-SG"
+    },
+    {
+      "customer_id": "CUS-GLOBEX",
+      "customer_name": "Globex Corporation",
+      "customer_name_vi": "Globex Corporation",
+      "customer_type": "Tier 1",
+      "status": "active",
+      "contact_name": "Jane Doe",
+      "contact_email": "jane.doe@globex.example",
+      "site_code": "GLOBEX-VN"
+    }
+  ],
+  "suppliers": [
+    {
+      "supplier_id": "SUP-ACOAT",
+      "supplier_name": "A-Coat Surface Treatment",
+      "supplier_name_vi": "A-Coat Surface Treatment",
+      "supplier_type": "special_process",
+      "status": "approved",
+      "approved_customers": ["CUS-LAM"],
+      "contact_name": "Planner",
+      "contact_email": "planner@acoat.example"
+    },
+    {
+      "supplier_id": "SUP-MITUTOYO",
+      "supplier_name": "Mitutoyo Vietnam",
+      "supplier_name_vi": "Mitutoyo Vietnam",
+      "supplier_type": "calibration",
+      "status": "approved",
+      "approved_customers": ["CUS-LAM", "CUS-ACME"],
+      "contact_name": "Service Desk",
+      "contact_email": "service@mitutoyo.example"
+    },
+    {
+      "supplier_id": "SUP-KIMLONG",
+      "supplier_name": "Kim Long Precision Supply",
+      "supplier_name_vi": "Kim Long Precision Supply",
+      "supplier_type": "raw_material",
+      "status": "approved",
+      "approved_customers": ["CUS-GLOBEX", "CUS-ACME"],
+      "contact_name": "Buyer 02",
+      "contact_email": "buyer@kimlong.example"
+    }
+  ],
+  "parts": [
+    {
+      "part_number": "714-1101",
+      "part_description": "Valve Housing, 17-4PH",
+      "customer_id": "CUS-LAM",
+      "status": "active",
+      "preferred_supplier_id": "SUP-ACOAT"
+    },
+    {
+      "part_number": "P-1001",
+      "part_description": "Mounting Bracket, AL6061",
+      "customer_id": "CUS-ACME",
+      "status": "active",
+      "preferred_supplier_id": "SUP-KIMLONG"
+    },
+    {
+      "part_number": "P-2003",
+      "part_description": "Drive Shaft, 316SS",
+      "customer_id": "CUS-GLOBEX",
+      "status": "active",
+      "preferred_supplier_id": "SUP-KIMLONG"
+    }
+  ],
+  "revisions": [
+    {
+      "revision_id": "714-1101-REV-C",
+      "part_number": "714-1101",
+      "revision": "REV-C",
+      "status": "released",
+      "release_date": "2026-03-10"
+    },
+    {
+      "revision_id": "P-1001-REV-C",
+      "part_number": "P-1001",
+      "revision": "REV-C",
+      "status": "released",
+      "release_date": "2026-02-18"
+    },
+    {
+      "revision_id": "P-2003-REV-B",
+      "part_number": "P-2003",
+      "revision": "REV-B",
+      "status": "released",
+      "release_date": "2026-01-21"
+    }
+  ],
+  "capas": [
+    {
+      "capa_number": "CAPA-2026-001",
+      "title": "Tooling wear on CNC-05",
+      "status": "open",
+      "customer_id": "CUS-LAM",
+      "part_number": "714-1101"
+    },
+    {
+      "capa_number": "CAPA-2026-002",
+      "title": "Operator training gap - night shift",
+      "status": "in_progress",
+      "customer_id": "CUS-ACME",
+      "part_number": "P-1001"
+    },
+    {
+      "capa_number": "CAPA-2026-003",
+      "title": "Raw material specification deviation",
+      "status": "closed",
+      "customer_id": "CUS-GLOBEX",
+      "part_number": "P-2003"
+    }
+  ]
+}

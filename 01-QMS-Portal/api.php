@@ -44,6 +44,8 @@ $CUSTOM_DOCS_FILE  = $CONF_DIR . '/docs_custom.json';
 $DOC_VIS_FILE     = $CONF_DIR . '/docs_visibility.json';
 $PORTAL_DISPLAY_CONFIG_FILE = $CONF_DIR . '/portal_display_config.json';
 $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
+$ORDERS_FILE = $DATA_DIR . '/orders/orders.json';
+$MASTER_DATA_FILE = $DATA_DIR . '/master-data/master-data.json';
 $PORTAL_CONFIG_JS_FILE = $BASE_DIR . '/scripts/portal/01-data-config.js';
 $LOG_FILE   = $DATA_DIR . '/php_error.log';
 $RL_DIR     = $DATA_DIR . '/ratelimit';
@@ -1772,6 +1774,280 @@ function read_json_body(): array {
   if ($raw === false || trim($raw) === '') return [];
   $data = json_decode($raw, true);
   return is_array($data) ? $data : [];
+}
+
+function orders_store_default(): array {
+  return [
+    '_meta' => [
+      'version' => '1.1',
+      'updated' => now_iso(),
+      'description' => 'Sales Order -> Job Order -> Work Order hierarchy managed inside the QMS Portal.',
+      'counters' => [
+        'last_so' => 'SO-' . date('Y') . '-0000',
+        'last_jo' => 'JO-' . date('Y') . '-0000',
+        'last_wo' => 'WO-' . date('Y') . '-000000',
+      ],
+    ],
+    'sales_orders' => [],
+    'job_orders' => [],
+    'work_orders' => [],
+    'form_links' => [],
+  ];
+}
+
+function load_orders_store(): array {
+  global $ORDERS_FILE;
+  ensure_dir(dirname($ORDERS_FILE));
+  $data = read_json_file($ORDERS_FILE);
+  if (!is_array($data)) {
+    $data = orders_store_default();
+    write_json_file($ORDERS_FILE, $data);
+  }
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : orders_store_default()['_meta'];
+  $data['sales_orders'] = array_values(is_array($data['sales_orders'] ?? null) ? $data['sales_orders'] : []);
+  $data['job_orders'] = array_values(is_array($data['job_orders'] ?? null) ? $data['job_orders'] : []);
+  $data['work_orders'] = array_values(is_array($data['work_orders'] ?? null) ? $data['work_orders'] : []);
+  $data['form_links'] = array_values(is_array($data['form_links'] ?? null) ? $data['form_links'] : []);
+  $data['_meta']['counters'] = is_array($data['_meta']['counters'] ?? null) ? $data['_meta']['counters'] : orders_store_default()['_meta']['counters'];
+  return $data;
+}
+
+function save_orders_store(array $data): void {
+  global $ORDERS_FILE;
+  ensure_dir(dirname($ORDERS_FILE));
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
+  $data['_meta']['updated'] = now_iso();
+  write_json_file($ORDERS_FILE, $data);
+}
+
+function master_data_store_default(): array {
+  return [
+    '_meta' => [
+      'version' => '1.0',
+      'updated' => now_iso(),
+      'description' => 'Governed master data for lookups in orders and evidence forms.',
+    ],
+    'customers' => [],
+    'suppliers' => [],
+    'parts' => [],
+    'revisions' => [],
+    'capas' => [],
+  ];
+}
+
+function load_master_data_store(): array {
+  global $MASTER_DATA_FILE;
+  ensure_dir(dirname($MASTER_DATA_FILE));
+  $data = read_json_file($MASTER_DATA_FILE);
+  if (!is_array($data)) {
+    $data = master_data_store_default();
+    write_json_file($MASTER_DATA_FILE, $data);
+  }
+  $defaults = master_data_store_default();
+  foreach ($defaults as $key => $value) {
+    if ($key === '_meta') continue;
+    $data[$key] = array_values(is_array($data[$key] ?? null) ? $data[$key] : []);
+  }
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $defaults['_meta'];
+  return $data;
+}
+
+function save_master_data_store(array $data): void {
+  global $MASTER_DATA_FILE;
+  ensure_dir(dirname($MASTER_DATA_FILE));
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
+  $data['_meta']['updated'] = now_iso();
+  write_json_file($MASTER_DATA_FILE, $data);
+}
+
+function order_entity_config(string $entity): array {
+  $map = [
+    'so' => ['config_key' => 'sales_order', 'store_key' => 'sales_orders', 'number_key' => 'so_number', 'counter_key' => 'last_so', 'digits' => 4, 'default_status' => 'draft'],
+    'jo' => ['config_key' => 'job_order', 'store_key' => 'job_orders', 'number_key' => 'jo_number', 'counter_key' => 'last_jo', 'digits' => 4, 'default_status' => 'planned'],
+    'wo' => ['config_key' => 'work_order', 'store_key' => 'work_orders', 'number_key' => 'wo_number', 'counter_key' => 'last_wo', 'digits' => 6, 'default_status' => 'scheduled'],
+  ];
+  if (!isset($map[$entity])) throw new RuntimeException('unknown_order_entity');
+  return $map[$entity];
+}
+
+function load_order_runtime_config(): array {
+  global $CONF_DIR;
+  $file = $CONF_DIR . '/so_jo_wo_config.json';
+  $cfg = read_json_file($file);
+  return is_array($cfg) ? $cfg : [];
+}
+
+function order_role_allowed(array $me, string $entity, string $permission): bool {
+  $cfg = load_order_runtime_config();
+  $meta = order_entity_config($entity);
+  $node = $cfg[$meta['config_key']] ?? [];
+  $roles = array_map('migrate_role', (array)($node['roles_' . $permission] ?? []));
+  $role = migrate_role((string)($me['role'] ?? ''));
+  if ($role === '') return false;
+  if (in_array($role, admin_roles(), true)) return true;
+  return in_array($role, $roles, true);
+}
+
+function require_order_permission(array $me, string $entity, string $permission): void {
+  if (!order_role_allowed($me, $entity, $permission)) {
+    api_json(['ok' => false, 'error' => 'forbidden'], 403);
+  }
+}
+
+function next_order_number(array &$store, string $entity): string {
+  $meta = order_entity_config($entity);
+  $counterKey = $meta['counter_key'];
+  $current = (string)($store['_meta']['counters'][$counterKey] ?? '');
+  if (!preg_match('/^[A-Z]{2}-([0-9]{4})-([0-9]+)$/', $current, $m)) {
+    $currentYear = (int)date('Y');
+    $seq = 0;
+  } else {
+    $currentYear = (int)$m[1];
+    $seq = (int)$m[2];
+  }
+  $year = (int)date('Y');
+  if ($currentYear !== $year) $seq = 0;
+  $seq++;
+  $next = strtoupper($entity) . '-' . $year . '-' . str_pad((string)$seq, $meta['digits'], '0', STR_PAD_LEFT);
+  $store['_meta']['counters'][$counterKey] = $next;
+  return $next;
+}
+
+function build_order_hierarchy(array $store, array $master): array {
+  $customers = [];
+  foreach (($master['customers'] ?? []) as $row) {
+    if (!is_array($row)) continue;
+    $customers[(string)($row['customer_id'] ?? '')] = $row;
+  }
+  $parts = [];
+  foreach (($master['parts'] ?? []) as $row) {
+    if (!is_array($row)) continue;
+    $parts[(string)($row['part_number'] ?? '')] = $row;
+  }
+  $revisions = [];
+  foreach (($master['revisions'] ?? []) as $row) {
+    if (!is_array($row)) continue;
+    $revisions[(string)($row['revision_id'] ?? '')] = $row;
+  }
+
+  $wosByJo = [];
+  foreach (($store['work_orders'] ?? []) as $wo) {
+    if (!is_array($wo)) continue;
+    $wosByJo[(string)($wo['jo_number'] ?? '')][] = $wo;
+  }
+  $linksByOrder = [];
+  foreach (($store['form_links'] ?? []) as $link) {
+    if (!is_array($link)) continue;
+    $key = (string)($link['order_type'] ?? '') . '|' . (string)($link['order_id'] ?? '');
+    $linksByOrder[$key][] = $link;
+  }
+  $josBySo = [];
+  foreach (($store['job_orders'] ?? []) as $jo) {
+    if (!is_array($jo)) continue;
+    $joNumber = (string)($jo['jo_number'] ?? '');
+    $partNumber = (string)($jo['part_number'] ?? '');
+    $customerId = (string)($jo['customer_id'] ?? '');
+    if ($customerId === '' && isset($parts[$partNumber])) {
+      $customerId = (string)($parts[$partNumber]['customer_id'] ?? '');
+      $jo['customer_id'] = $customerId;
+    }
+    if (($jo['part_description'] ?? '') === '' && isset($parts[$partNumber])) {
+      $jo['part_description'] = (string)($parts[$partNumber]['part_description'] ?? '');
+    }
+    $jo['customer_name'] = (string)($customers[$customerId]['customer_name'] ?? '');
+    $jo['operations'] = array_values($wosByJo[$joNumber] ?? []);
+    $jo['linked_forms'] = array_values($linksByOrder['jo|' . $joNumber] ?? []);
+    $josBySo[(string)($jo['so_number'] ?? '')][] = $jo;
+  }
+
+  $tree = [];
+  foreach (($store['sales_orders'] ?? []) as $so) {
+    if (!is_array($so)) continue;
+    $customerId = (string)($so['customer_id'] ?? '');
+    if (($so['customer_name'] ?? '') === '' && isset($customers[$customerId])) {
+      $so['customer_name'] = (string)($customers[$customerId]['customer_name'] ?? '');
+    }
+    $soNumber = (string)($so['so_number'] ?? '');
+    $so['job_orders'] = array_values($josBySo[$soNumber] ?? []);
+    $so['linked_forms'] = array_values($linksByOrder['so|' . $soNumber] ?? []);
+    $tree[] = $so;
+  }
+  return $tree;
+}
+
+function compute_order_dashboard_stats(array $store): array {
+  $salesOrders = array_values((array)($store['sales_orders'] ?? []));
+  $jobOrders = array_values((array)($store['job_orders'] ?? []));
+  $workOrders = array_values((array)($store['work_orders'] ?? []));
+
+  $activeSo = count(array_filter($salesOrders, fn($x) => in_array((string)($x['status'] ?? ''), ['quoted', 'confirmed', 'in_production'], true)));
+  $activeJo = count(array_filter($jobOrders, fn($x) => in_array((string)($x['status'] ?? ''), ['released', 'active', 'on_hold'], true)));
+  $activeWo = count(array_filter($workOrders, fn($x) => in_array((string)($x['status'] ?? ''), ['scheduled', 'setup', 'running', 'inspection', 'on_hold'], true)));
+  $overdueCount = count(array_filter($salesOrders, function ($x) {
+    $due = (string)($x['due_date'] ?? '');
+    $status = (string)($x['status'] ?? '');
+    return $due !== '' && $due < date('Y-m-d') && !in_array($status, ['closed', 'shipped', 'cancelled'], true);
+  }));
+  $closedSo = array_filter($salesOrders, fn($x) => in_array((string)($x['status'] ?? ''), ['shipped', 'closed'], true));
+  $onTime = 0;
+  foreach ($closedSo as $so) {
+    $shipDate = (string)($so['shipped_date'] ?? $so['closed_date'] ?? '');
+    $dueDate = (string)($so['due_date'] ?? '');
+    if ($shipDate !== '' && $dueDate !== '' && $shipDate <= $dueDate) $onTime++;
+  }
+  $otd = count($closedSo) > 0 ? round(($onTime / count($closedSo)) * 100, 1) : null;
+
+  return [
+    'active_so' => $activeSo,
+    'active_jo' => $activeJo,
+    'active_wo' => $activeWo,
+    'overdue_count' => $overdueCount,
+    'otd_percent' => $otd,
+  ];
+}
+
+function find_order_record(array $store, string $entity, string $id): ?array {
+  $meta = order_entity_config($entity);
+  foreach (($store[$meta['store_key']] ?? []) as $row) {
+    if (is_array($row) && (string)($row[$meta['number_key']] ?? '') === $id) return $row;
+  }
+  return null;
+}
+
+function upsert_master_data_item(array &$store, string $entity, array $item, string $username): array {
+  $map = [
+    'customers' => 'customer_id',
+    'suppliers' => 'supplier_id',
+    'parts' => 'part_number',
+    'revisions' => 'revision_id',
+    'capas' => 'capa_number',
+  ];
+  if (!isset($map[$entity])) throw new RuntimeException('invalid_master_entity');
+  $idKey = $map[$entity];
+  $id = trim((string)($item[$idKey] ?? ''));
+  if ($id === '') throw new RuntimeException('missing_master_key');
+
+  $normalized = $item;
+  $normalized[$idKey] = $id;
+  $normalized['updated_at'] = now_iso();
+  $normalized['updated_by'] = $username;
+  if (empty($normalized['created_at'])) $normalized['created_at'] = now_iso();
+
+  $found = false;
+  foreach ($store[$entity] as $idx => $row) {
+    if (!is_array($row)) continue;
+    if ((string)($row[$idKey] ?? '') !== $id) continue;
+    $normalized['created_at'] = (string)($row['created_at'] ?? $normalized['created_at']);
+    $normalized['created_by'] = (string)($row['created_by'] ?? $username);
+    $store[$entity][$idx] = array_merge($row, $normalized);
+    $found = true;
+    break;
+  }
+  if (!$found) {
+    $normalized['created_by'] = $username;
+    $store[$entity][] = $normalized;
+  }
+  return $normalized;
 }
 
 function file_head_bytes(string $path, int $length = 4096): string {
@@ -7043,6 +7319,257 @@ if ($username === '') {
     $ctrl->setStore($store);
     $ctrl->handleAction($action);
     break; // handleAction() calls exit, but break for safety
+  }
+
+  // ── Master Data Runtime ────────────────────────────────────────────────
+  case 'master_data_snapshot': {
+    require_logged_in($store);
+    $data = load_master_data_store();
+    api_json([
+      'ok' => true,
+      'data' => $data,
+      'summary' => [
+        'customers' => count($data['customers'] ?? []),
+        'suppliers' => count($data['suppliers'] ?? []),
+        'parts' => count($data['parts'] ?? []),
+        'revisions' => count($data['revisions'] ?? []),
+        'capas' => count($data['capas'] ?? []),
+      ],
+    ]);
+  }
+
+  case 'master_data_upsert': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+
+    $role = migrate_role((string)($me['role'] ?? ''));
+    $allowedRoles = ['ceo', 'qa_manager', 'qms_engineer', 'sales_manager', 'estimator', 'customer_service', 'buyer', 'supply_chain_manager', 'production_manager', 'planning_manager'];
+    if (!in_array($role, $allowedRoles, true) && !in_array($role, admin_roles(), true)) {
+      api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    }
+
+    $body = read_json_body();
+    $entity = trim((string)($body['entity'] ?? ''));
+    $item = is_array($body['item'] ?? null) ? $body['item'] : null;
+    if ($entity === '' || $item === null) api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+
+    try {
+      $data = load_master_data_store();
+      $saved = upsert_master_data_item($data, $entity, $item, (string)($_SESSION['user'] ?? 'system'));
+      save_master_data_store($data);
+      api_json(['ok' => true, 'entity' => $entity, 'item' => $saved]);
+    } catch (Throwable $e) {
+      api_json(['ok' => false, 'error' => $e->getMessage()], 400);
+    }
+  }
+
+  // ── Order Management Runtime ───────────────────────────────────────────
+  case 'order_dashboard_stats': {
+    $me = require_logged_in($store);
+    require_order_permission($me, 'so', 'view');
+    $stats = compute_order_dashboard_stats(load_orders_store());
+    api_json(['ok' => true, 'data' => $stats]);
+  }
+
+  case 'order_hierarchy': {
+    $me = require_logged_in($store);
+    require_order_permission($me, 'so', 'view');
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $hierarchy = build_order_hierarchy($orders, $master);
+    api_json(['ok' => true, 'data' => $hierarchy, 'hierarchy' => $hierarchy]);
+  }
+
+  case 'order_detail': {
+    $me = require_logged_in($store);
+    $body = read_json_body();
+    $orderId = trim((string)($body['order_id'] ?? $_GET['order_id'] ?? ''));
+    $orderType = strtolower(trim((string)($body['order_type'] ?? $_GET['order_type'] ?? '')));
+    if ($orderId === '' || !in_array($orderType, ['so', 'jo', 'wo'], true)) {
+      api_json(['ok' => false, 'error' => 'invalid_order_detail_request'], 400);
+    }
+    require_order_permission($me, $orderType, 'view');
+
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $record = find_order_record($orders, $orderType, $orderId);
+    if (!$record) api_json(['ok' => false, 'error' => 'not_found'], 404);
+
+    $links = array_values(array_filter((array)($orders['form_links'] ?? []), fn($row) => is_array($row) && (string)($row['order_type'] ?? '') === $orderType && (string)($row['order_id'] ?? '') === $orderId));
+
+    if ($orderType === 'jo') {
+      $record['operations'] = array_values(array_filter((array)($orders['work_orders'] ?? []), fn($row) => is_array($row) && (string)($row['jo_number'] ?? '') === $orderId));
+    }
+    if ($orderType === 'so') {
+      $record['job_orders'] = array_values(array_filter((array)($orders['job_orders'] ?? []), fn($row) => is_array($row) && (string)($row['so_number'] ?? '') === $orderId));
+    }
+    if ($orderType === 'wo') {
+      $parentJo = (string)($record['jo_number'] ?? '');
+      if ($parentJo !== '') {
+        $record['job_order'] = find_order_record($orders, 'jo', $parentJo);
+      }
+    }
+
+    $record['linked_forms'] = $links;
+    $record['master_data_ref'] = [
+      'customer_id' => (string)($record['customer_id'] ?? ''),
+      'part_number' => (string)($record['part_number'] ?? ''),
+      'part_revision' => (string)($record['part_revision'] ?? ''),
+    ];
+    api_json(['ok' => true, 'data' => $record]);
+  }
+
+  case 'order_so_create':
+  case 'order_jo_create':
+  case 'order_wo_create': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $entity = str_contains($action, '_so_') ? 'so' : (str_contains($action, '_jo_') ? 'jo' : 'wo');
+    require_order_permission($me, $entity, 'create');
+
+    $body = read_json_body();
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $meta = order_entity_config($entity);
+    $idKey = $meta['number_key'];
+    $now = now_iso();
+    $username = (string)($_SESSION['user'] ?? 'system');
+
+    $record = $body;
+    $record[$idKey] = next_order_number($orders, $entity);
+    $record['status'] = strtolower(trim((string)($record['status'] ?? $meta['default_status'])));
+    $record['created_at'] = $now;
+    $record['created_by'] = $username;
+    $record['updated_at'] = $now;
+    $record['updated_by'] = $username;
+    $record['status_history'] = [[
+      'status' => $record['status'],
+      'timestamp' => $now,
+      'user' => $username,
+      'note' => 'created'
+    ]];
+
+    if ($entity === 'so') {
+      $customerId = trim((string)($record['customer_id'] ?? ''));
+      if ($customerId === '' || trim((string)($record['customer_po'] ?? '')) === '' || trim((string)($record['order_date'] ?? '')) === '' || trim((string)($record['due_date'] ?? '')) === '') {
+        api_json(['ok' => false, 'error' => 'missing_required_fields'], 400);
+      }
+      foreach (($master['customers'] ?? []) as $customer) {
+        if (is_array($customer) && (string)($customer['customer_id'] ?? '') === $customerId) {
+          $record['customer_name'] = (string)($customer['customer_name'] ?? '');
+          break;
+        }
+      }
+      $orders['sales_orders'][] = $record;
+    } elseif ($entity === 'jo') {
+      $soNumber = trim((string)($record['so_number'] ?? ''));
+      $partNumber = trim((string)($record['part_number'] ?? ''));
+      if ($soNumber === '' || $partNumber === '' || trim((string)($record['part_revision'] ?? '')) === '' || trim((string)($record['start_date'] ?? '')) === '' || trim((string)($record['due_date'] ?? '')) === '') {
+        api_json(['ok' => false, 'error' => 'missing_required_fields'], 400);
+      }
+      $parentSo = find_order_record($orders, 'so', $soNumber);
+      if (!$parentSo) api_json(['ok' => false, 'error' => 'parent_so_not_found'], 404);
+      $record['customer_id'] = (string)($parentSo['customer_id'] ?? '');
+      foreach (($master['parts'] ?? []) as $part) {
+        if (!is_array($part) || (string)($part['part_number'] ?? '') !== $partNumber) continue;
+        if (($record['part_description'] ?? '') === '') $record['part_description'] = (string)($part['part_description'] ?? '');
+        break;
+      }
+      $orders['job_orders'][] = $record;
+    } else {
+      $joNumber = trim((string)($record['jo_number'] ?? ''));
+      if ($joNumber === '' || trim((string)($record['operation_number'] ?? '')) === '' || trim((string)($record['operation_desc'] ?? '')) === '' || trim((string)($record['machine_id'] ?? '')) === '' || trim((string)($record['work_center_id'] ?? '')) === '') {
+        api_json(['ok' => false, 'error' => 'missing_required_fields'], 400);
+      }
+      $parentJo = find_order_record($orders, 'jo', $joNumber);
+      if (!$parentJo) api_json(['ok' => false, 'error' => 'parent_jo_not_found'], 404);
+      $orders['work_orders'][] = $record;
+    }
+
+    save_orders_store($orders);
+    api_json(['ok' => true, 'data' => $record]);
+  }
+
+  case 'order_so_update_status':
+  case 'order_jo_update_status':
+  case 'order_wo_update_status': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $entity = str_contains($action, '_so_') ? 'so' : (str_contains($action, '_jo_') ? 'jo' : 'wo');
+    require_order_permission($me, $entity, 'edit');
+
+    $body = read_json_body();
+    $orderId = trim((string)($body['order_id'] ?? ''));
+    $newStatus = strtolower(trim((string)($body['status'] ?? '')));
+    if ($orderId === '' || $newStatus === '') api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+
+    $orders = load_orders_store();
+    $meta = order_entity_config($entity);
+    $storeKey = $meta['store_key'];
+    $idKey = $meta['number_key'];
+    $updated = null;
+    foreach ($orders[$storeKey] as $idx => $row) {
+      if (!is_array($row) || (string)($row[$idKey] ?? '') !== $orderId) continue;
+      $orders[$storeKey][$idx]['status'] = $newStatus;
+      $orders[$storeKey][$idx]['updated_at'] = now_iso();
+      $orders[$storeKey][$idx]['updated_by'] = (string)($_SESSION['user'] ?? 'system');
+      $orders[$storeKey][$idx]['status_history'] = array_values((array)($orders[$storeKey][$idx]['status_history'] ?? []));
+      $orders[$storeKey][$idx]['status_history'][] = [
+        'status' => $newStatus,
+        'timestamp' => now_iso(),
+        'user' => (string)($_SESSION['user'] ?? 'system'),
+      ];
+      if ($entity === 'so' && $newStatus === 'shipped' && empty($orders[$storeKey][$idx]['shipped_date'])) {
+        $orders[$storeKey][$idx]['shipped_date'] = date('Y-m-d');
+      }
+      if (in_array($newStatus, ['closed', 'completed'], true)) {
+        $orders[$storeKey][$idx]['closed_date'] = date('Y-m-d');
+      }
+      $updated = $orders[$storeKey][$idx];
+      break;
+    }
+    if (!$updated) api_json(['ok' => false, 'error' => 'not_found'], 404);
+    save_orders_store($orders);
+    api_json(['ok' => true, 'data' => $updated]);
+  }
+
+  case 'order_link_form': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+
+    $body = read_json_body();
+    $orderId = trim((string)($body['order_id'] ?? ''));
+    $orderType = strtolower(trim((string)($body['order_type'] ?? '')));
+    $recordId = strtoupper(trim((string)($body['record_id'] ?? '')));
+    if ($orderId === '' || $recordId === '' || !in_array($orderType, ['so', 'jo', 'wo'], true)) {
+      api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    }
+    require_order_permission($me, $orderType, 'edit');
+
+    $orders = load_orders_store();
+    if (!find_order_record($orders, $orderType, $orderId)) api_json(['ok' => false, 'error' => 'order_not_found'], 404);
+    foreach (($orders['form_links'] ?? []) as $link) {
+      if (!is_array($link)) continue;
+      if ((string)($link['order_type'] ?? '') === $orderType && (string)($link['order_id'] ?? '') === $orderId && (string)($link['record_id'] ?? '') === $recordId) {
+        api_json(['ok' => false, 'error' => 'link_exists'], 400);
+      }
+    }
+    $link = [
+      'link_id' => 'LINK-' . date('YmdHis') . '-' . substr(md5($orderType . '|' . $orderId . '|' . $recordId), 0, 8),
+      'order_id' => $orderId,
+      'order_type' => $orderType,
+      'record_id' => $recordId,
+      'status' => 'linked',
+      'linked_at' => now_iso(),
+      'linked_by' => (string)($_SESSION['user'] ?? 'system'),
+    ];
+    $orders['form_links'][] = $link;
+    save_orders_store($orders);
+    api_json(['ok' => true, 'data' => $link]);
   }
 
   default:
