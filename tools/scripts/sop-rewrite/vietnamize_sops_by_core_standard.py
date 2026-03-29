@@ -2537,6 +2537,7 @@ FINAL_VIETNAMESE_REFINEMENTS: dict[str, list[tuple[str, str]]] = {
         (r"\bIG6 Archive, lưu giữ và tiêu hủy\b", "IG6 Lưu trữ, lưu giữ và tiêu hủy"),
         (r"\bKhóa Archive, lưu giữ và tiêu hủy\b", "Khóa Lưu trữ, lưu giữ và tiêu hủy"),
         (r"\bANNEX-136 Section 8\b", "ANNEX-136 Mục 8"),
+        (r"IG6 Archive, lưu giữ và tiêu hủy", "IG6 Lưu trữ, lưu giữ và tiêu hủy"),
     ],
     "01-SOP-100/sop-103-risk-opportunity-fmea-and-control-plan.html": [
         (r"\bOpportunity liên quan\b", "Cơ hội liên quan"),
@@ -2547,6 +2548,12 @@ FINAL_VIETNAMESE_REFINEMENTS: dict[str, list[tuple[str, str]]] = {
         (r"\brủi ro/opportunity\b", "rủi ro/cơ hội"),
         (r"\bOpportunity dùng AI/tự động hóa\b", "Cơ hội dùng AI/tự động hóa"),
         (r"\bOpportunity hồ sơ\b", "hồ sơ cơ hội"),
+        (r"\bnote22 axes impacted\b", "ghi chú 22 trục bị ảnh hưởng"),
+        (r"\bcấu hình element bị ảnh hưởng\b", "phần tử cấu hình bị ảnh hưởng"),
+        (r"\bbộ bằng chứng required\b", "bộ bằng chứng bắt buộc"),
+        (r"\bJD của Trưởng QA, Kỹ sư Chất lượng, Kỹ sư Quy trình và sản xuất kỹ sư/IE\b", "JD-QA, JD-QE, JD-PE và JD-IE"),
+        (r"\bđầu mối phụ tráchhip\b", "đầu mối phụ trách"),
+        (r"; sản xuất kỹ sư / IE", "; JD-PE / JD-IE"),
     ],
     "01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html": [
         (r"\bchưa có classification\b", "chưa có phân loại"),
@@ -2562,6 +2569,12 @@ FINAL_VIETNAMESE_REFINEMENTS: dict[str, list[tuple[str, str]]] = {
         (r"\bFinance / AR\b", "FIN / AR"),
         (r"\bFinance sổ đăng ký\b", "sổ đăng ký tài chính"),
         (r"\bKích hoạt bàn giao sang Finance\b", "Kích hoạt bàn giao sang tài chính"),
+        (r"\bmáy tính cục bộ folder\b", "thư mục cục bộ trên máy tính"),
+    ],
+    "02-SOP-200/sop-203-customer-property-control.html": [
+        (r"\barchive rõ\b", "lưu trữ rõ"),
+        (r"\bDeletion confirmation\b", "Xác nhận xóa hoặc hủy"),
+        (r"\bEscalate ngay\b", "Báo vượt cấp ngay"),
     ],
     "03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html": [
         (r"\bKỹ thuật Lead giữ A\b", "ENGM giữ A"),
@@ -2596,15 +2609,18 @@ FINAL_VIETNAMESE_REFINEMENTS: dict[str, list[tuple[str, str]]] = {
     "05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html": [
         (r"\btẩy ba via Technician giữ R cho thao tác tại bàn và tự kiểm; Team Lead giữ A cho phương pháp và báo vượt cấp tại khu; QC giữ A cho chấp nhận sau gia công hoàn thiện; QA quản lý giữ A cho giới hạn làm lại và NCR quyết định\.", "DBT giữ R cho thao tác tại bàn và tự kiểm; DBL giữ A cho phương pháp và báo vượt cấp tại khu; QC giữ A cho chấp nhận sau gia công hoàn thiện; QA giữ A cho giới hạn làm lại và quyết định NCR."),
         (r"\bJD tẩy ba via Technician, tẩy ba via Team Lead, làm sạch và đóng gói Supervisor, QC Inspector và QA quản lý phải mô tả rõ giới hạn xử lý cho phép và quyền dừng khi chi tiết vượt ngoài giới hạn đó theo SOP-505\.", "JD-DBT, JD-DBL, JD-CPS, JD-QC và JD-QA phải mô tả rõ giới hạn xử lý cho phép và quyền dừng khi chi tiết vượt ngoài giới hạn đó theo SOP-505."),
+        (r"\bM365 giữ bàn notes\b", "M365 giữ ghi chú tại bàn"),
     ],
     "06-SOP-600/sop-601-calibration-and-gage-control.html": [
         (r"\bđo lường Specialist giữ R cho trạng thái thiết bị; QA quản lý giữ A cho sản phẩm-tác động quyết định; QC Inspector giữ R cho kỷ luật kiểm tra trước khi dùng; phân xưởng quản lý giữ R cho thu hồi thiết bị tại hiện trường khi có thu hồi\.", "MCS giữ R cho trạng thái thiết bị; QA giữ A cho quyết định ảnh hưởng sản phẩm; QC giữ R cho kỷ luật kiểm tra trước khi dùng; WKM giữ R cho thu hồi thiết bị tại hiện trường khi có thu hồi."),
         (r"\bdùng classification\b", "mục đích sử dụng"),
         (r"\bJD đo lường và hiệu chuẩn Specialist, QA quản lý, QC Inspector và CNC phân xưởng quản lý phải mô tả nhất quán rằng thiết bị đo chỉ được dùng khi trạng thái và mục đích sử dụng của nó còn hợp lệ theo SOP-601\.", "JD-MCS, JD-QA, JD-QC và JD-WKM phải mô tả nhất quán rằng thiết bị đo chỉ được dùng khi trạng thái và mục đích sử dụng của nó còn hợp lệ theo SOP-601."),
+        (r"\bFRM-612 Bias / Linearity / Stability nghiên cứu biểu mẫu\b", "FRM-612 biểu mẫu nghiên cứu độ chệch / độ tuyến tính / độ ổn định"),
     ],
     "06-SOP-600/sop-602-measurement-system-analysis-msagr-r.html": [
         (r"\bchất lượng kỹ sư giữ R cho nghiên cứu design và diễn giải; đo lường giữ R cho device mức sẵn sàng; QA quản lý giữ A cho trường hợp sử dụng quyết định; người đo giữ R cho dữ liệu tính toàn vẹn trong nghiên cứu\.", "QE giữ R cho thiết kế nghiên cứu và diễn giải; MCS giữ R cho mức sẵn sàng của thiết bị; QA giữ A cho quyết định trường hợp sử dụng; người đo giữ R cho tính toàn vẹn dữ liệu trong nghiên cứu."),
         (r"\bJD chất lượng kỹ sư, đo lường Specialist, QA quản lý và QC Inspector phải mô tả rõ giới hạn sử dụng dữ liệu đo và trách nhiệm giữ tính toàn vẹn của nghiên cứu theo SOP-602\.", "JD-QE, JD-MCS, JD-QA và JD-QC phải mô tả rõ giới hạn sử dụng dữ liệu đo và trách nhiệm giữ tính toàn vẹn của nghiên cứu theo SOP-602."),
+        (r"Áp dụng cho variable MSA, GRR, độ chệch, linearity, stability, attribute agreement và thẩm định của hệ đo khi dữ liệu đầu ra sẽ được dùng cho chấp nhận, quy trình kiểm soát, năng lực quá trình hoặc hướng khách hàng hồ sơ\.", "Áp dụng cho MSA biến liên tục, GRR, độ chệch, độ tuyến tính, độ ổn định, mức nhất trí thuộc tính và thẩm định hệ đo khi dữ liệu đầu ra được dùng cho chấp nhận, kiểm soát quy trình, năng lực quá trình hoặc hồ sơ hướng khách hàng."),
     ],
     "06-SOP-600/sop-604-spc-and-capability-control.html": [
         (r"\bFRM-511 Setup và First Piece hồ sơ\b", "FRM-511 hồ sơ Setup và chi tiết đầu tiên"),
@@ -2615,6 +2631,10 @@ FINAL_VIETNAMESE_REFINEMENTS: dict[str, list[tuple[str, str]]] = {
         (r"\bconcession\b", "chấp thuận ngoại lệ"),
         (r"\bxác minh of hiệu lực\b", "xác minh hiệu lực"),
         (r"\bkhông chờ supervisor mới hành động\.", "không chờ người giám sát mới hành động."),
+        (r"\bEffectiveness xác minh\b", "xác minh hiệu lực"),
+        (r"\bdừng-first, escalate-second\b", "dừng trước, báo vượt cấp sau"),
+        (r"\bphát hành blocker\b", "điểm chặn phát hành"),
+        (r"\bMeasurement-system vấn đề\b", "vấn đề hệ thống đo"),
     ],
     "07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html": [
         (r"\bPlanner giữ R cho luồng yêu cầu gắn với vị trí\.", "PPL giữ R cho luồng yêu cầu gắn với vị trí."),
@@ -2652,6 +2672,15 @@ FINAL_VIETNAMESE_REFINEMENTS: dict[str, list[tuple[str, str]]] = {
         (r"\bQMS hồ sơ Library / SSOT\b", "thư mục hồ sơ QMS / SSOT"),
         (r"\bQMS thay đổi Thư mục\b", "thư mục thay đổi QMS"),
         (r"phát hành biên bản họp(?: họp)+, danh sách hành động và cam kết nguồn lực", "Phát hành biên bản họp, danh sách hành động và cam kết nguồn lực"),
+        (r"\bhồ sơ Library theo SOP chủ quản\b", "thư mục hồ sơ theo SOP chủ quản"),
+    ],
+    "01-SOP-100/sop-106-change-and-configuration-management.html": [
+        (r"\bkỹ thuật gói danh sách, chương trình repository\b", "gói danh sách kỹ thuật, kho lưu trữ chương trình"),
+        (r"\bkỹ thuật / QMS thay đổi library lưu\b", "thư viện thay đổi kỹ thuật / QMS lưu"),
+        (r"\bYêu cầu thay đổi no\.;\b", "Số yêu cầu thay đổi;"),
+        (r"\bimpacted jobs/WIP\b", "đơn hàng/WIP bị ảnh hưởng"),
+        (r"\bpost-thay đổi xác minh\b", "xác minh sau thay đổi"),
+        (r"\bJD-ENGM, JD-QA, JD-PD, JD-ITA và JD-ESA phải ghi rõ quyền phê duyệt thay đổi, trách nhiệm tác động rà soát, cắt chuyển, cấu hình đánh giá, WIP cách ly và KPI thay đổi chưa được phê duyệt / post-thay đổi xác minh\.", "JD-ENGM, JD-QA, JD-PD, JD-ITA và JD-ESA phải ghi rõ quyền phê duyệt thay đổi, trách nhiệm rà soát tác động, cắt chuyển, đánh giá cấu hình, cách ly WIP và xác minh sau thay đổi đối với KPI thay đổi chưa được phê duyệt."),
     ],
     "09-SOP-900/sop-903-continual-improvement-and-kaizen.html": [
         (r"\bJD sản xuất Director, sản xuất kỹ sư hoặc IE, QA quản lý, chất lượng kỹ sư, Finance quản lý và HR quản lý\b", "JD-PD, JD-PE hoặc JD-IE, JD-QA, JD-QE, JD-FIN và JD-HR"),
