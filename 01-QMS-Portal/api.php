@@ -2050,6 +2050,476 @@ function upsert_master_data_item(array &$store, string $entity, array $item, str
   return $normalized;
 }
 
+function load_record_type_registry(): array {
+  global $DATA_DIR;
+  $file = $DATA_DIR . '/config/record_type_expanded.json';
+  if (!is_file($file)) return [];
+  $data = json_decode((string)file_get_contents($file), true);
+  return is_array($data['record_types'] ?? null) ? $data['record_types'] : [];
+}
+
+function load_form_schema_by_code(string $formCode): ?array {
+  global $DATA_DIR;
+  $file = $DATA_DIR . '/online-forms/schemas/' . basename($formCode) . '.json';
+  if (!is_file($file)) return null;
+  $data = json_decode((string)file_get_contents($file), true);
+  return is_array($data) ? $data : null;
+}
+
+function load_form_registry_entry(string $formCode): ?array {
+  global $FORM_CONTROL_REGISTRY_FILE;
+  if (!is_file($FORM_CONTROL_REGISTRY_FILE)) return null;
+  $data = json_decode((string)file_get_contents($FORM_CONTROL_REGISTRY_FILE), true);
+  if (!is_array($data) || !isset($data[$formCode]) || !is_array($data[$formCode])) return null;
+  return $data[$formCode];
+}
+
+function online_form_entries_file(string $formCode): string {
+  global $DATA_DIR;
+  return $DATA_DIR . '/online-forms/entries/' . basename($formCode) . '.json';
+}
+
+function load_online_form_entries_store(string $formCode): array {
+  $entryFile = online_form_entries_file($formCode);
+  if (!is_file($entryFile)) return [];
+  $data = json_decode((string)file_get_contents($entryFile), true);
+  return is_array($data) ? $data : [];
+}
+
+function save_online_form_entries_store(string $formCode, array $entries): void {
+  $entryFile = online_form_entries_file($formCode);
+  ensure_dir(dirname($entryFile));
+  file_put_contents($entryFile, json_encode($entries, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
+}
+
+function find_online_form_entry_index(array $entries, string $entryId = '', string $allocationId = ''): int {
+  foreach ($entries as $idx => $entry) {
+    if (!is_array($entry)) continue;
+    if ($entryId !== '' && (string)($entry['entry_id'] ?? '') === $entryId) return $idx;
+    if ($allocationId !== '' && (string)($entry['allocation_id'] ?? '') === $allocationId) return $idx;
+  }
+  return -1;
+}
+
+function form_is_online_runtime(string $formCode): bool {
+  $schema = load_form_schema_by_code($formCode);
+  if (!$schema) return false;
+  return ($schema['online'] ?? true) !== false;
+}
+
+function build_user_initials(string $username): string {
+  $parts = preg_split('/[\.\-_@\s]+/', strtoupper(trim($username)));
+  $initials = '';
+  foreach ($parts as $part) {
+    if ($part !== '') $initials .= substr($part, 0, 1);
+  }
+  if (strlen($initials) < 2) {
+    $letters = preg_replace('/[^A-Z0-9]/', '', strtoupper($username));
+    $initials = substr($letters, 0, 3);
+  }
+  return $initials !== '' ? $initials : 'USR';
+}
+
+function qms_runtime_secret(): string {
+  global $ROOT_DIR;
+  $secret = trim((string)(getenv('QMS_RUNTIME_SECRET') ?: ''));
+  if ($secret !== '') return $secret;
+  return hash('sha256', 'hesem-qms|' . $ROOT_DIR);
+}
+
+function allocation_base_dir(): string {
+  global $DATA_DIR;
+  $dir = $DATA_DIR . '/allocations';
+  ensure_dir($dir);
+  ensure_dir($dir . '/downloads');
+  ensure_dir($dir . '/uploads');
+  ensure_dir($dir . '/tmp');
+  return $dir;
+}
+
+function allocation_store_file(): string {
+  return allocation_base_dir() . '/allocations.json';
+}
+
+function load_allocation_store(): array {
+  $file = allocation_store_file();
+  if (!is_file($file)) {
+    return [
+      '_meta' => ['version' => '1.0', 'created_at' => now_iso(), 'updated_at' => now_iso()],
+      'allocations' => [],
+    ];
+  }
+  $data = json_decode((string)file_get_contents($file), true);
+  if (!is_array($data)) {
+    return [
+      '_meta' => ['version' => '1.0', 'created_at' => now_iso(), 'updated_at' => now_iso()],
+      'allocations' => [],
+    ];
+  }
+  if (!isset($data['allocations']) || !is_array($data['allocations'])) $data['allocations'] = [];
+  return $data;
+}
+
+function save_allocation_store(array $store): void {
+  $store['_meta']['updated_at'] = now_iso();
+  file_put_contents(allocation_store_file(), json_encode($store, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
+}
+
+function allocation_uuid(): string {
+  $bytes = random_bytes(16);
+  $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
+  $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+  $hex = bin2hex($bytes);
+  return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split($hex, 4));
+}
+
+function allocation_status_normalize(string $status): string {
+  $status = strtolower(trim($status));
+  return match ($status) {
+    'form_downloaded' => 'downloaded',
+    'allocated', 'downloaded', 'submitted', 'received', 'void' => $status,
+    default => 'allocated',
+  };
+}
+
+function allocation_append_event(array &$allocation, string $status, string $user, string $note = '', array $meta = []): void {
+  $status = allocation_status_normalize($status);
+  $allocation['history'] = is_array($allocation['history'] ?? null) ? $allocation['history'] : [];
+  $allocation['history'][] = [
+    'status' => $status,
+    'at' => now_iso(),
+    'by' => $user,
+    'note' => $note,
+    'meta' => $meta,
+  ];
+  $allocation['status'] = $status;
+  $allocation['updated_at'] = now_iso();
+  $allocation['updated_by'] = $user;
+}
+
+function &allocation_find_ref(array &$store, string $allocationId) {
+  foreach ($store['allocations'] as $idx => &$row) {
+    if (is_array($row) && (string)($row['allocation_id'] ?? '') === $allocationId) {
+      return $row;
+    }
+  }
+  $null = null;
+  return $null;
+}
+
+function allocation_find(array $store, string $allocationId): ?array {
+  foreach ($store['allocations'] as $row) {
+    if (is_array($row) && (string)($row['allocation_id'] ?? '') === $allocationId) {
+      return $row;
+    }
+  }
+  return null;
+}
+
+function allocation_find_by_record_id(array $store, string $recordId): ?array {
+  foreach ($store['allocations'] as $row) {
+    if (is_array($row) && (string)($row['record_id'] ?? '') === $recordId) {
+      return $row;
+    }
+  }
+  return null;
+}
+
+function next_record_id_value(string $recordType, string $year): array {
+  global $DATA_DIR;
+
+  $prefix = strtoupper(trim($recordType));
+  if ($prefix === '') {
+    throw new RuntimeException('missing_prefix');
+  }
+  if (!preg_match('/^20[2-3][0-9]$/', $year)) {
+    throw new RuntimeException('invalid_year');
+  }
+
+  $counterRegistryFile = $DATA_DIR . '/counters/_registry.json';
+  $counterRegistry = is_file($counterRegistryFile) ? (json_decode((string)file_get_contents($counterRegistryFile), true) ?: []) : [];
+  $recordRegistry = load_record_type_registry();
+
+  $digits = (int)($counterRegistry[$prefix]['digits'] ?? $recordRegistry[$prefix]['digits'] ?? 3);
+  if ($digits < 2) $digits = 3;
+
+  $countersDir = $DATA_DIR . '/counters';
+  ensure_dir($countersDir);
+  $counterFile = $countersDir . '/' . $prefix . '-' . $year . '.txt';
+
+  $fp = @fopen($counterFile, 'c+');
+  if (!$fp) throw new RuntimeException('counter_file_error');
+  if (!flock($fp, LOCK_EX)) {
+    fclose($fp);
+    throw new RuntimeException('counter_lock_failed');
+  }
+  $raw = fread($fp, 20);
+  $current = $raw !== false ? (int)trim($raw) : 0;
+  $next = $current + 1;
+  $padded = str_pad((string)$next, $digits, '0', STR_PAD_LEFT);
+  ftruncate($fp, 0);
+  rewind($fp);
+  fwrite($fp, $padded);
+  fflush($fp);
+  flock($fp, LOCK_UN);
+  fclose($fp);
+
+  $recordId = $prefix . '-' . $year . '-' . $padded;
+  @file_put_contents(
+    $countersDir . '/_allocation_log.jsonl',
+    json_encode([
+      'record_id' => $recordId,
+      'prefix' => $prefix,
+      'year' => $year,
+      'seq' => $next,
+      'time' => now_iso(),
+      'user' => $_SESSION['user'] ?? 'anonymous',
+      'ip' => client_ip(),
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n",
+    FILE_APPEND | LOCK_EX
+  );
+
+  return ['record_id' => $recordId, 'seq' => $next, 'digits' => $digits];
+}
+
+function normalize_master_context(array $context): array {
+  $keys = ['customer_id', 'supplier_id', 'so_number', 'jo_number', 'wo_number', 'part_number', 'part_revision', 'capa_number'];
+  $normalized = [];
+  foreach ($keys as $key) {
+    $value = trim((string)($context[$key] ?? ''));
+    if ($value !== '') $normalized[$key] = $value;
+  }
+  return $normalized;
+}
+
+function build_issued_filename(string $formCode, string $formRevision, string $recordId, string $username, string $ext = 'xlsx'): string {
+  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $stampDate = $dt->format('Ymd');
+  $stampTime = $dt->format('Hi');
+  $initials = build_user_initials($username);
+  return sprintf('%s_%s_%s_%s_%s-%s.%s', $formCode, $formRevision, $recordId, $stampDate, $stampTime, $initials, $ext);
+}
+
+function build_received_filename(array $allocation, int $receiptVersion, string $ext = 'xlsx'): string {
+  $formCode = (string)($allocation['form_code'] ?? 'FORM');
+  $formRevision = (string)($allocation['form_revision'] ?? 'V0');
+  $recordId = (string)($allocation['record_id'] ?? 'RECORD');
+  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  return sprintf('%s_%s_%s_%s_R%02d.%s', $formCode, $formRevision, $recordId, $dt->format('Ymd'), $receiptVersion, $ext);
+}
+
+function build_expected_filename_pattern(string $formCode, string $formRevision, string $recordId, string $ext = 'xlsx'): string {
+  return '^' . preg_quote($formCode, '/') . '_' . preg_quote($formRevision, '/') . '_' . preg_quote($recordId, '/') . '_\\d{8}_\\d{4}-[A-Z0-9]{2,6}\\.' . preg_quote($ext, '/') . '$';
+}
+
+function build_hidden_sheet_payload(array $allocation, array $formEntry): array {
+  $issuedAt = (string)($allocation['downloaded_at'] ?? now_iso());
+  $downloadUser = (string)($allocation['downloaded_by'] ?? $allocation['created_by'] ?? 'system');
+  $payload = [
+    'form_code' => (string)($allocation['form_code'] ?? ''),
+    'form_revision' => (string)($allocation['form_revision'] ?? 'V0'),
+    'download_timestamp' => $issuedAt,
+    'download_user' => $downloadUser,
+    'system_origin' => 'HESEM-QMS-v3',
+    'allocation_id' => (string)($allocation['allocation_id'] ?? ''),
+    'expected_filename_pattern' => (string)($allocation['expected_filename_pattern'] ?? ''),
+    'max_file_size_mb' => 25,
+    'allowed_macros' => false,
+    'template_checksum' => (string)($allocation['template_checksum'] ?? ''),
+    'issued_record_id' => (string)($allocation['record_id'] ?? ''),
+    'issued_to_user' => $downloadUser,
+    'issued_at' => $issuedAt,
+    'receipt_status' => allocation_status_normalize((string)($allocation['status'] ?? 'allocated')),
+    'receipt_version' => (int)($allocation['receipt_version'] ?? 0),
+    'master_context_json' => normalize_master_context((array)($allocation['master_context'] ?? [])),
+    'receipt_history_json' => (array)($allocation['receipts'] ?? []),
+    'latest_stored_filename' => (string)($allocation['latest_stored_filename'] ?? ''),
+    'latest_upload_timestamp' => (string)($allocation['latest_upload_timestamp'] ?? ''),
+  ];
+  $payload['download_hash'] = hash('sha256', implode('|', [
+    $payload['form_code'],
+    $payload['form_revision'],
+    $payload['download_timestamp'],
+    $payload['download_user'],
+    qms_runtime_secret(),
+  ]));
+  return $payload;
+}
+
+function python_runtime_command(array $args): string {
+  $script = __DIR__ . '/tools/excel_hidden_sheet_runtime.py';
+  $parts = ['python', escapeshellarg($script)];
+  foreach ($args as $arg) {
+    $parts[] = escapeshellarg((string)$arg);
+  }
+  return implode(' ', $parts);
+}
+
+function run_python_runtime(array $args): array {
+  $exitCode = 0;
+  $output = shell_run(python_runtime_command($args), $exitCode);
+  if ($exitCode !== 0) {
+    throw new RuntimeException('excel_runtime_failed: ' . $output);
+  }
+  $data = json_decode($output, true);
+  if (!is_array($data)) {
+    throw new RuntimeException('excel_runtime_invalid_json');
+  }
+  return $data;
+}
+
+function write_temp_json_file(array $payload, string $prefix = 'qms-'): string {
+  $file = allocation_base_dir() . '/tmp/' . $prefix . bin2hex(random_bytes(6)) . '.json';
+  file_put_contents($file, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
+  return $file;
+}
+
+function inspect_uploaded_workbook(string $sourcePath): array {
+  global $DATA_DIR;
+  $spec = $DATA_DIR . '/config/excel_hidden_sheet_spec.json';
+  if (!is_file($spec)) throw new RuntimeException('excel_hidden_sheet_spec_missing');
+  return run_python_runtime(['inspect', '--src', $sourcePath, '--spec', $spec]);
+}
+
+function issue_offline_workbook_package(string $sourcePath, string $targetPath, array $payload): array {
+  global $DATA_DIR;
+  $spec = $DATA_DIR . '/config/excel_hidden_sheet_spec.json';
+  if (!is_file($spec)) throw new RuntimeException('excel_hidden_sheet_spec_missing');
+  $metaFile = write_temp_json_file($payload, 'issue-');
+  try {
+    return run_python_runtime(['issue', '--src', $sourcePath, '--dst', $targetPath, '--spec', $spec, '--meta', $metaFile]);
+  } finally {
+    @unlink($metaFile);
+  }
+}
+
+function append_receipt_to_workbook(string $sourcePath, string $targetPath, array $receiptPayload): array {
+  global $DATA_DIR;
+  $spec = $DATA_DIR . '/config/excel_hidden_sheet_spec.json';
+  if (!is_file($spec)) throw new RuntimeException('excel_hidden_sheet_spec_missing');
+  $receiptFile = write_temp_json_file($receiptPayload, 'receipt-');
+  try {
+    return run_python_runtime(['append-receipt', '--src', $sourcePath, '--dst', $targetPath, '--spec', $spec, '--receipt', $receiptFile]);
+  } finally {
+    @unlink($receiptFile);
+  }
+}
+
+function stream_download_file(string $path, string $filename): void {
+  if (!is_file($path)) api_json(['ok' => false, 'error' => 'file_not_found'], 404);
+  if (session_status() === PHP_SESSION_ACTIVE) @session_write_close();
+  http_response_code(200);
+  header('Content-Type: application/octet-stream');
+  header('Content-Length: ' . filesize($path));
+  header('Content-Disposition: attachment; filename="' . rawurlencode($filename) . '"; filename*=UTF-8\'\'' . rawurlencode($filename));
+  header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+  readfile($path);
+  exit;
+}
+
+function allocation_history_query(array $filters = []): array {
+  $store = load_allocation_store();
+  $rows = array_values(array_filter((array)($store['allocations'] ?? []), function ($row) use ($filters) {
+    if (!is_array($row)) return false;
+    if (!empty($filters['record_type']) && (string)($row['record_type'] ?? '') !== (string)$filters['record_type']) return false;
+    if (!empty($filters['department']) && (string)($row['department'] ?? '') !== (string)$filters['department']) return false;
+    if (!empty($filters['form_code']) && (string)($row['form_code'] ?? '') !== (string)$filters['form_code']) return false;
+    if (!empty($filters['delivery_mode']) && (string)($row['delivery_mode'] ?? '') !== (string)$filters['delivery_mode']) return false;
+    if (!empty($filters['status']) && allocation_status_normalize((string)($row['status'] ?? 'allocated')) !== allocation_status_normalize((string)$filters['status'])) return false;
+    $updatedAt = (string)($row['updated_at'] ?? $row['created_at'] ?? '');
+    if (!empty($filters['date_from']) && substr($updatedAt, 0, 10) < (string)$filters['date_from']) return false;
+    if (!empty($filters['date_to']) && substr($updatedAt, 0, 10) > (string)$filters['date_to']) return false;
+    if (!empty($filters['search'])) {
+      $haystack = strtolower(json_encode([
+        $row['record_id'] ?? '',
+        $row['record_type'] ?? '',
+        $row['department'] ?? '',
+        $row['form_code'] ?? '',
+        $row['master_context'] ?? [],
+        $row['notes'] ?? '',
+      ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+      if (!str_contains($haystack, strtolower((string)$filters['search']))) return false;
+    }
+    return true;
+  }));
+
+  usort($rows, function ($a, $b) {
+    return strcmp((string)($b['updated_at'] ?? ''), (string)($a['updated_at'] ?? ''));
+  });
+
+  $page = max(1, (int)($filters['page'] ?? 1));
+  $pageSize = max(1, min(100, (int)($filters['page_size'] ?? 20)));
+  $total = count($rows);
+  $items = array_slice($rows, ($page - 1) * $pageSize, $pageSize);
+
+  return [
+    'entries' => $items,
+    'page' => $page,
+    'page_size' => $pageSize,
+    'total' => $total,
+    'total_pages' => max(1, (int)ceil($total / $pageSize)),
+  ];
+}
+
+function verify_hidden_sheet_metadata(array $metadata, ?array $allocation, string $originalFilename): array {
+  $issues = [];
+  $warnings = [];
+  $status = 'verified';
+
+  if (($metadata['system_origin'] ?? '') !== 'HESEM-QMS-v3') {
+    $issues[] = 'origin_invalid';
+  }
+
+  $expectedHash = hash('sha256', implode('|', [
+    (string)($metadata['form_code'] ?? ''),
+    (string)($metadata['form_revision'] ?? ''),
+    (string)($metadata['download_timestamp'] ?? ''),
+    (string)($metadata['download_user'] ?? ''),
+    qms_runtime_secret(),
+  ]));
+  if (($metadata['download_hash'] ?? '') !== $expectedHash) {
+    $issues[] = 'hash_mismatch';
+  }
+
+  if (!$allocation) {
+    $issues[] = 'allocation_not_found';
+  } else {
+    $state = allocation_status_normalize((string)($allocation['status'] ?? 'allocated'));
+    if (!in_array($state, ['downloaded', 'submitted', 'received'], true)) {
+      $issues[] = 'allocation_wrong_state';
+    }
+    if (($metadata['issued_record_id'] ?? '') !== '' && (string)($metadata['issued_record_id'] ?? '') !== (string)($allocation['record_id'] ?? '')) {
+      $issues[] = 'record_id_mismatch';
+    }
+    if (($metadata['form_code'] ?? '') !== '' && (string)($metadata['form_code'] ?? '') !== (string)($allocation['form_code'] ?? '')) {
+      $issues[] = 'form_code_mismatch';
+    }
+    if (($metadata['template_checksum'] ?? '') !== '' && (string)($metadata['template_checksum'] ?? '') !== (string)($allocation['template_checksum'] ?? '')) {
+      $issues[] = 'template_checksum_mismatch';
+    }
+  }
+
+  $pattern = (string)($metadata['expected_filename_pattern'] ?? '');
+  if ($pattern !== '' && @preg_match('/' . $pattern . '/i', '') !== false && !preg_match('/' . $pattern . '/i', $originalFilename)) {
+    $warnings[] = 'filename_warning';
+  }
+
+  if ($issues) {
+    $status = 'rejected';
+  } elseif ($warnings) {
+    $status = 'warning';
+  }
+
+  return [
+    'status' => $status,
+    'issues' => $issues,
+    'warnings' => $warnings,
+    'hash_valid' => !in_array('hash_mismatch', $issues, true),
+    'origin_valid' => !in_array('origin_invalid', $issues, true),
+    'allocation_valid' => !in_array('allocation_not_found', $issues, true) && !in_array('allocation_wrong_state', $issues, true),
+  ];
+}
+
 function file_head_bytes(string $path, int $length = 4096): string {
   if (!is_file($path) || $length < 1) return '';
   $fh = @fopen($path, 'rb');
@@ -2096,6 +2566,55 @@ function uploaded_workbook_signature_valid(string $path, string $ext): bool {
     'csv' => csv_payload_looks_textual($head),
     default => false,
   };
+}
+
+function validate_signature_payloads(array $schema, array $signatures): array {
+  $blocks = is_array($schema['signature_blocks'] ?? null) ? $schema['signature_blocks'] : [];
+  $errors = [];
+  $summary = [];
+
+  foreach ($blocks as $block) {
+    if (!is_array($block)) continue;
+    $blockId = trim((string)($block['id'] ?? ''));
+    if ($blockId === '') continue;
+
+    $signature = $signatures[$blockId] ?? null;
+    if (!is_array($signature)) {
+      if (!empty($block['required_on_submit'])) {
+        $errors[] = ['signature_block' => $blockId, 'error' => 'missing_required_signature'];
+      }
+      continue;
+    }
+
+    $summary[$blockId] = [
+      'signer_id' => trim((string)($signature['signer_id'] ?? '')),
+      'signer_name' => trim((string)($signature['signer_name'] ?? '')),
+      'signed_at' => trim((string)($signature['signed_at'] ?? '')),
+      'pin_confirmed' => !empty($signature['pin_confirmed']),
+      'hash_prefix' => substr(trim((string)($signature['hash'] ?? '')), 0, 16),
+    ];
+
+    foreach (['signer_id', 'signer_name', 'signed_at', 'hash'] as $requiredKey) {
+      if (trim((string)($signature[$requiredKey] ?? '')) === '') {
+        $errors[] = ['signature_block' => $blockId, 'error' => 'signature_field_missing', 'field' => $requiredKey];
+      }
+    }
+
+    if (!empty($block['require_pin']) && empty($signature['pin_confirmed'])) {
+      $errors[] = ['signature_block' => $blockId, 'error' => 'pin_confirmation_required'];
+    }
+
+    $appliedTo = trim((string)($signature['applied_to'] ?? ''));
+    if ($appliedTo !== '' && substr($appliedTo, -strlen(':' . $blockId)) !== ':' . $blockId) {
+      $errors[] = ['signature_block' => $blockId, 'error' => 'signature_target_mismatch'];
+    }
+  }
+
+  return [
+    'ok' => !$errors,
+    'errors' => $errors,
+    'summary' => $summary,
+  ];
 }
 
 function client_ip(): string {
@@ -7035,6 +7554,416 @@ if ($username === '') {
   // (NCR, CAPA, FAI, TRN, AUD, ECR, etc.)
   // ═══════════════════════════════════════════════════
 
+  case 'config_record_types': {
+    require_logged_in($store);
+    api_json(['ok' => true, 'record_types' => load_record_type_registry()]);
+  }
+
+  case 'record_id_generate': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $recordType = strtoupper(trim((string)($body['record_type'] ?? '')));
+    $department = strtoupper(trim((string)($body['department'] ?? '')));
+    $year = trim((string)($body['year'] ?? date('Y')));
+    if ($recordType === '' || $department === '') {
+      api_json(['ok' => false, 'error' => 'missing_record_type_or_department'], 400);
+    }
+
+    $recordTypes = load_record_type_registry();
+    $recordCfg = is_array($recordTypes[$recordType] ?? null) ? $recordTypes[$recordType] : [];
+    $generated = next_record_id_value($recordType, $year);
+    $recordId = (string)$generated['record_id'];
+
+    $formCode = trim((string)($body['form_code'] ?? $recordCfg['linked_form'] ?? ''));
+    $schema = $formCode !== '' ? load_form_schema_by_code($formCode) : null;
+    $formRegistryEntry = $formCode !== '' ? load_form_registry_entry($formCode) : null;
+    $formRevision = trim((string)($schema['version'] ?? $formRegistryEntry['rev'] ?? 'V0'));
+    $deliveryMode = $schema ? ((($schema['online'] ?? true) !== false) ? 'online' : 'offline') : 'offline';
+    $masterContext = normalize_master_context((array)($body['master_context'] ?? []));
+    $createdBy = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    $suggestedFilename = build_issued_filename($formCode !== '' ? $formCode : $recordType, $formRevision, $recordId, $createdBy, $deliveryMode === 'offline' ? 'xlsx' : 'pdf');
+
+    $allocation = [
+      'allocation_id' => allocation_uuid(),
+      'record_id' => $recordId,
+      'record_type' => $recordType,
+      'department' => $department,
+      'year' => $year,
+      'seq' => (int)($generated['seq'] ?? 0),
+      'form_code' => $formCode,
+      'form_revision' => $formRevision,
+      'delivery_mode' => $deliveryMode,
+      'status' => 'allocated',
+      'priority' => trim((string)($body['priority'] ?? 'normal')),
+      'notes' => trim((string)($body['notes'] ?? '')),
+      'master_context' => $masterContext,
+      'linked_order_id' => trim((string)($body['linked_order_id'] ?? '')),
+      'blank_form_path' => $deliveryMode === 'offline' ? (string)($formRegistryEntry['path'] ?? '') : '',
+      'blank_form_filename' => $deliveryMode === 'offline' ? (string)($formRegistryEntry['filename'] ?? '') : '',
+      'template_checksum' => $deliveryMode === 'offline' ? (string)($formRegistryEntry['sha256'] ?? '') : '',
+      'expected_filename_pattern' => build_expected_filename_pattern($formCode !== '' ? $formCode : $recordType, $formRevision, $recordId, $deliveryMode === 'offline' ? 'xlsx' : 'pdf'),
+      'receipt_version' => 0,
+      'receipts' => [],
+      'history' => [],
+      'created_at' => now_iso(),
+      'created_by' => $createdBy,
+      'updated_at' => now_iso(),
+      'updated_by' => $createdBy,
+      'suggested_filename' => $suggestedFilename,
+    ];
+    allocation_append_event($allocation, 'allocated', $createdBy, 'record_id_allocated');
+
+    $allocationStore = load_allocation_store();
+    $allocationStore['allocations'][] = $allocation;
+    save_allocation_store($allocationStore);
+
+    api_json([
+      'ok' => true,
+      'allocation_id' => $allocation['allocation_id'],
+      'record_id' => $recordId,
+      'record_type' => $recordType,
+      'department' => $department,
+      'form_code' => $formCode,
+      'form_revision' => $formRevision,
+      'delivery_mode' => $deliveryMode,
+      'blank_form_path' => $allocation['blank_form_path'],
+      'blank_form_filename' => $allocation['blank_form_filename'],
+      'suggested_filename' => $suggestedFilename,
+      'allocation' => $allocation,
+    ]);
+  }
+
+  case 'record_id_history': {
+    require_logged_in($store);
+    $body = read_json_body();
+    $filters = array_merge($_GET, $body);
+    api_json(array_merge(['ok' => true], allocation_history_query($filters)));
+  }
+
+  case 'upload_allocation_status': {
+    require_logged_in($store);
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? $_GET['allocation_id'] ?? ''));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+    $allocation = allocation_find(load_allocation_store(), $allocationId);
+    if (!$allocation) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+    api_json(['ok' => true, 'allocation' => $allocation]);
+  }
+
+  case 'record_id_check_duplicate': {
+    require_logged_in($store);
+    $body = read_json_body();
+    $recordId = strtoupper(trim((string)($body['record_id'] ?? $_GET['record_id'] ?? '')));
+    if ($recordId === '') api_json(['ok' => false, 'error' => 'missing_record_id'], 400);
+    $allocation = allocation_find_by_record_id(load_allocation_store(), $recordId);
+    api_json(['ok' => true, 'exists' => (bool)$allocation, 'allocation' => $allocation]);
+  }
+
+  case 'record_id_void': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? ''));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+    $allocationStore = load_allocation_store();
+    $allocation =& allocation_find_ref($allocationStore, $allocationId);
+    if (!is_array($allocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+    if (allocation_status_normalize((string)($allocation['status'] ?? 'allocated')) === 'received') {
+      api_json(['ok' => false, 'error' => 'received_allocation_cannot_be_voided'], 409);
+    }
+    allocation_append_event($allocation, 'void', strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous'))), trim((string)($body['reason'] ?? '')));
+    save_allocation_store($allocationStore);
+    api_json(['ok' => true, 'allocation' => $allocation]);
+  }
+
+  case 'form_fill_download_offline': {
+    $downloadMode = isset($_GET['download']) && $_GET['download'] === '1';
+    if ($downloadMode) {
+      require_logged_in($store);
+      $allocationId = trim((string)($_GET['allocation_id'] ?? ''));
+      if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+      $allocation = allocation_find(load_allocation_store(), $allocationId);
+      if (!$allocation) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+      $packagePath = trim((string)($allocation['offline_package']['issued_path'] ?? ''));
+      if ($packagePath === '') api_json(['ok' => false, 'error' => 'package_not_generated'], 404);
+      stream_download_file($packagePath, (string)($allocation['offline_package']['filename'] ?? basename($packagePath)));
+    }
+
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? ''));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+
+    $allocationStore = load_allocation_store();
+    $allocation =& allocation_find_ref($allocationStore, $allocationId);
+    if (!is_array($allocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+    if ((string)($allocation['delivery_mode'] ?? '') !== 'offline') api_json(['ok' => false, 'error' => 'form_not_offline'], 409);
+
+    $formCode = trim((string)($body['form_code'] ?? $allocation['form_code'] ?? ''));
+    $formEntry = load_form_registry_entry($formCode);
+    if (!$formEntry || empty($formEntry['path'])) api_json(['ok' => false, 'error' => 'blank_form_not_found'], 404);
+
+    $sourcePath = join_in_root($ROOT_DIR, (string)$formEntry['path']);
+    if (!is_file($sourcePath)) api_json(['ok' => false, 'error' => 'blank_form_missing_on_disk'], 404);
+
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    $filename = build_issued_filename($formCode, (string)($allocation['form_revision'] ?? 'V0'), (string)($allocation['record_id'] ?? ''), $username, pathinfo($sourcePath, PATHINFO_EXTENSION) ?: 'xlsx');
+    $issueDir = allocation_base_dir() . '/downloads/' . $allocationId;
+    ensure_dir($issueDir);
+    $issuedPath = $issueDir . '/' . $filename;
+
+    $allocation['master_context'] = normalize_master_context(array_merge((array)($allocation['master_context'] ?? []), (array)($body['master_context'] ?? [])));
+    $allocation['downloaded_at'] = now_iso();
+    $allocation['downloaded_by'] = $username;
+    $allocation['template_checksum'] = (string)($formEntry['sha256'] ?? hash_file('sha256', $sourcePath));
+    $allocation['expected_filename_pattern'] = build_expected_filename_pattern($formCode, (string)($allocation['form_revision'] ?? 'V0'), (string)($allocation['record_id'] ?? ''), pathinfo($sourcePath, PATHINFO_EXTENSION) ?: 'xlsx');
+
+    $hiddenPayload = build_hidden_sheet_payload($allocation, $formEntry);
+    issue_offline_workbook_package($sourcePath, $issuedPath, $hiddenPayload);
+
+    $allocation['offline_package'] = [
+      'issued_path' => $issuedPath,
+      'filename' => $filename,
+      'issued_at' => $allocation['downloaded_at'],
+    ];
+    allocation_append_event($allocation, 'downloaded', $username, 'offline_package_issued', ['filename' => $filename]);
+    save_allocation_store($allocationStore);
+
+    api_json([
+      'ok' => true,
+      'allocation_id' => $allocationId,
+      'filename' => $filename,
+      'download_url' => 'api.php?action=form_fill_download_offline&allocation_id=' . rawurlencode($allocationId) . '&download=1',
+      'allocation' => $allocation,
+    ]);
+  }
+
+  case 'form_fill_submit_online': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? ''));
+    $formCode = trim((string)($body['form_code'] ?? ''));
+    $formData = is_array($body['form_data'] ?? null) ? $body['form_data'] : [];
+    if ($allocationId === '' || $formCode === '' || !$formData) {
+      api_json(['ok' => false, 'error' => 'invalid_submit_payload'], 400);
+    }
+
+    $allocationStore = load_allocation_store();
+    $allocation =& allocation_find_ref($allocationStore, $allocationId);
+    if (!is_array($allocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+    if ((string)($allocation['delivery_mode'] ?? '') !== 'online') api_json(['ok' => false, 'error' => 'form_not_online'], 409);
+
+    $schema = load_form_schema_by_code($formCode) ?: [];
+    $signatures = is_array($formData['signatures'] ?? null) ? $formData['signatures'] : [];
+    $requiredContext = is_array($schema['record_context']['required'] ?? null) ? $schema['record_context']['required'] : [];
+    $formData['master_context'] = normalize_master_context(array_merge((array)($allocation['master_context'] ?? []), (array)($formData['master_context'] ?? [])));
+    foreach ($requiredContext as $contextKey) {
+      if (!array_key_exists($contextKey, $formData['master_context'])) {
+        api_json(['ok' => false, 'error' => 'missing_required_context', 'field' => $contextKey], 422);
+      }
+    }
+    if (is_array($schema['signature_blocks'] ?? null)) {
+      foreach ($schema['signature_blocks'] as $signatureBlock) {
+        if (!is_array($signatureBlock) || empty($signatureBlock['required_on_submit'])) continue;
+        $signatureId = trim((string)($signatureBlock['id'] ?? ''));
+        if ($signatureId !== '' && !is_array($signatures[$signatureId] ?? null)) {
+          api_json(['ok' => false, 'error' => 'missing_required_signature', 'signature_block' => $signatureId], 422);
+        }
+      }
+    }
+    $signatureValidation = validate_signature_payloads($schema, $signatures);
+    if (!($signatureValidation['ok'] ?? false)) {
+      api_json([
+        'ok' => false,
+        'error' => 'invalid_signature_payload',
+        'details' => $signatureValidation['errors'] ?? [],
+      ], 422);
+    }
+
+    $entryId = trim((string)($formData['entry_id'] ?? $allocation['online_submission']['entry_id'] ?? ''));
+    if ($entryId === '') {
+      $entryId = $formCode . '-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
+    }
+
+    $formData['entry_id'] = $entryId;
+    $formData['record_id'] = (string)($allocation['record_id'] ?? '');
+    $formData['allocation_id'] = $allocationId;
+    $formData['submitted_at'] = now_iso();
+    $formData['submitted_by'] = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    $formData['signatures'] = $signatures;
+    $formData['updated_at'] = now_iso();
+    $formData['updated_by'] = $formData['submitted_by'];
+
+    $existing = load_online_form_entries_store($formCode);
+    $existingIdx = find_online_form_entry_index($existing, $entryId, $allocationId);
+    $previous = $existingIdx >= 0 && is_array($existing[$existingIdx] ?? null) ? $existing[$existingIdx] : null;
+    $formData['submission_revision'] = ((int)($previous['submission_revision'] ?? 0)) + 1;
+    if ($previous && !empty($previous['created_at'])) {
+      $formData['created_at'] = (string)$previous['created_at'];
+      $formData['created_by'] = (string)($previous['created_by'] ?? $formData['submitted_by']);
+    } else {
+      $formData['created_at'] = $formData['submitted_at'];
+      $formData['created_by'] = $formData['submitted_by'];
+    }
+    if ($previous && empty($formData['master_context']) && !empty($previous['master_context']) && is_array($previous['master_context'])) {
+      $formData['master_context'] = $previous['master_context'];
+    }
+    if ($existingIdx >= 0) {
+      array_splice($existing, $existingIdx, 1);
+    }
+    array_unshift($existing, $formData);
+    if (count($existing) > 1000) $existing = array_slice($existing, 0, 1000);
+    save_online_form_entries_store($formCode, $existing);
+
+    $allocation['online_submission'] = [
+      'entry_id' => $entryId,
+      'submitted_at' => $formData['submitted_at'],
+      'submitted_by' => $formData['submitted_by'],
+      'updated_at' => $formData['updated_at'],
+      'updated_by' => $formData['updated_by'],
+      'submission_revision' => (int)$formData['submission_revision'],
+      'approval_state' => (string)($formData['approval_state'] ?? 'draft'),
+      'signature_count' => count((array)($signatureValidation['summary'] ?? [])),
+      'signature_summary' => $signatureValidation['summary'] ?? [],
+    ];
+    $allocation['signatures'] = is_array($formData['signatures'] ?? null) ? $formData['signatures'] : [];
+    allocation_append_event($allocation, 'submitted', $formData['submitted_by'], 'online_form_submitted', [
+      'entry_id' => $entryId,
+      'submission_revision' => (int)$formData['submission_revision'],
+      'approval_state' => (string)($formData['approval_state'] ?? 'draft'),
+      'signature_blocks' => array_keys((array)($signatureValidation['summary'] ?? [])),
+    ]);
+    save_allocation_store($allocationStore);
+
+    api_json(['ok' => true, 'entry_id' => $entryId, 'allocation' => $allocation]);
+  }
+
+  case 'upload_read_hidden_sheet': {
+    require_logged_in($store);
+    require_csrf();
+    if (empty($_FILES['file']) || !is_array($_FILES['file'])) api_json(['ok' => false, 'error' => 'missing_file'], 400);
+    $file = $_FILES['file'];
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) api_json(['ok' => false, 'error' => 'upload_failed'], 400);
+    $ext = strtolower((string)pathinfo((string)$file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, ['xlsx', 'xlsm'], true)) api_json(['ok' => false, 'error' => 'unsupported_file_type'], 400);
+
+    $tmpInspect = allocation_base_dir() . '/tmp/' . basename((string)tempnam(allocation_base_dir() . '/tmp', 'inspect-')) . '.' . $ext;
+    if (!@move_uploaded_file((string)$file['tmp_name'], $tmpInspect)) {
+      if (!@copy((string)$file['tmp_name'], $tmpInspect)) api_json(['ok' => false, 'error' => 'temp_move_failed'], 500);
+    }
+
+    try {
+      $inspect = inspect_uploaded_workbook($tmpInspect);
+      if (!($inspect['ok'] ?? false)) api_json(['ok' => false, 'error' => $inspect['error'] ?? 'inspect_failed'], 422);
+      $metadata = is_array($inspect['metadata'] ?? null) ? $inspect['metadata'] : [];
+      $allocationId = trim((string)($metadata['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
+      $allocation = $allocationId !== '' ? allocation_find(load_allocation_store(), $allocationId) : null;
+      $verification = verify_hidden_sheet_metadata($metadata, $allocation, (string)$file['name']);
+      api_json([
+        'ok' => true,
+        'metadata' => $metadata,
+        'upload_log' => $inspect['upload_log'] ?? [],
+        'allocation' => $allocation,
+        'verification' => $verification,
+      ]);
+    } finally {
+      @unlink($tmpInspect);
+    }
+  }
+
+  case 'upload_submit': {
+    $me = require_logged_in($store);
+    require_csrf();
+    if (empty($_FILES['file']) || !is_array($_FILES['file'])) api_json(['ok' => false, 'error' => 'missing_file'], 400);
+    $file = $_FILES['file'];
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) api_json(['ok' => false, 'error' => 'upload_failed'], 400);
+    if ((int)($file['size'] ?? 0) > $MAX_FORM_UPLOAD_BYTES) api_json(['ok' => false, 'error' => 'file_too_large'], 413);
+    $ext = strtolower((string)pathinfo((string)$file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, ['xlsx', 'xlsm'], true)) api_json(['ok' => false, 'error' => 'unsupported_file_type'], 400);
+
+    $tmpUpload = allocation_base_dir() . '/tmp/' . basename((string)tempnam(allocation_base_dir() . '/tmp', 'upload-')) . '.' . $ext;
+    if (!@move_uploaded_file((string)$file['tmp_name'], $tmpUpload)) {
+      if (!@copy((string)$file['tmp_name'], $tmpUpload)) api_json(['ok' => false, 'error' => 'temp_move_failed'], 500);
+    }
+
+    try {
+      if (!uploaded_workbook_signature_valid($tmpUpload, $ext)) {
+        api_json(['ok' => false, 'error' => 'workbook_signature_invalid'], 422);
+      }
+
+      $inspect = inspect_uploaded_workbook($tmpUpload);
+      if (!($inspect['ok'] ?? false)) api_json(['ok' => false, 'error' => $inspect['error'] ?? 'inspect_failed'], 422);
+      $metadata = is_array($inspect['metadata'] ?? null) ? $inspect['metadata'] : [];
+      $allocationId = trim((string)($_POST['allocation_id'] ?? $metadata['allocation_id'] ?? ''));
+      if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+
+      $allocationStore = load_allocation_store();
+      $allocation =& allocation_find_ref($allocationStore, $allocationId);
+      if (!is_array($allocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+
+      $verification = verify_hidden_sheet_metadata($metadata, $allocation, (string)$file['name']);
+      if (($verification['status'] ?? 'rejected') === 'rejected') {
+        api_json(['ok' => false, 'error' => 'verification_failed', 'verification' => $verification, 'metadata' => $metadata], 422);
+      }
+
+      $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+      $receiptVersion = ((int)($allocation['receipt_version'] ?? 0)) + 1;
+      $storedFilename = build_received_filename($allocation, $receiptVersion, $ext);
+      $targetDir = allocation_base_dir() . '/uploads/' . $allocationId;
+      ensure_dir($targetDir);
+      $storedPath = $targetDir . '/' . $storedFilename;
+
+      $receiptHistory = is_array($allocation['receipts'] ?? null) ? $allocation['receipts'] : [];
+      $receiptPayload = [
+        'upload_timestamp' => now_iso(),
+        'uploaded_by' => $username,
+        'version' => $receiptVersion,
+        'server_path' => $storedPath,
+        'sha256_hash' => hash_file('sha256', $tmpUpload),
+        'verification_status' => ($verification['warnings'] ?? []) ? 'filename_warning' : 'verified',
+        'receipt_status' => 'received',
+        'receipt_version' => $receiptVersion,
+        'latest_stored_filename' => $storedFilename,
+        'latest_upload_timestamp' => now_iso(),
+      ];
+      $receiptHistory[] = [
+        'version' => $receiptVersion,
+        'uploaded_at' => $receiptPayload['upload_timestamp'],
+        'uploaded_by' => $username,
+        'original_filename' => (string)$file['name'],
+        'stored_filename' => $storedFilename,
+        'verification_status' => $receiptPayload['verification_status'],
+      ];
+      $receiptPayload['receipt_history_json'] = $receiptHistory;
+
+      append_receipt_to_workbook($tmpUpload, $storedPath, $receiptPayload);
+
+      if (allocation_status_normalize((string)($allocation['status'] ?? 'allocated')) !== 'submitted') {
+        allocation_append_event($allocation, 'submitted', $username, 'offline_form_submitted', ['original_filename' => (string)$file['name']]);
+      }
+      $allocation['receipt_version'] = $receiptVersion;
+      $allocation['receipts'] = $receiptHistory;
+      $allocation['latest_stored_filename'] = $storedFilename;
+      $allocation['latest_upload_timestamp'] = $receiptPayload['latest_upload_timestamp'];
+      allocation_append_event($allocation, 'received', $username, 'offline_form_received', ['stored_filename' => $storedFilename, 'version' => $receiptVersion]);
+      save_allocation_store($allocationStore);
+
+      api_json([
+        'ok' => true,
+        'allocation' => $allocation,
+        'verification' => $verification,
+        'receipt_version' => $receiptVersion,
+        'stored_filename' => $storedFilename,
+        'warning' => ($verification['warnings'] ?? []) ? 'filename_warning' : null,
+      ]);
+    } finally {
+      @unlink($tmpUpload);
+    }
+  }
+
   case 'record_id_registry': {
     // GET — return all allowed prefixes and their config
     $regFile = $DATA_DIR . '/counters/_registry.json';
@@ -7238,6 +8167,79 @@ if ($username === '') {
     api_json(['ok' => true, 'forms' => $forms, 'entries' => $entries]);
   }
 
+  case 'form_catalog_snapshot': {
+    require_logged_in($store);
+    $schemasDir = $DATA_DIR . '/online-forms/schemas';
+    $onlineMap = [];
+    $catalogMap = [];
+    if (is_dir($schemasDir)) {
+      foreach (glob($schemasDir . '/*.json') as $f) {
+        $schema = json_decode((string)@file_get_contents($f), true);
+        if (!is_array($schema) || empty($schema['form_code'])) continue;
+        $code = (string)$schema['form_code'];
+        $onlineMap[$code] = [
+          'form_code' => $code,
+          'title' => (string)($schema['title'] ?? $code),
+          'title_vi' => (string)($schema['title_vi'] ?? $schema['title'] ?? $code),
+          'description' => (string)($schema['description'] ?? ''),
+          'description_vi' => (string)($schema['description_vi'] ?? $schema['description'] ?? ''),
+          'category' => (string)($schema['category'] ?? 'other'),
+          'sop_ref' => (string)($schema['sop_ref'] ?? ''),
+          'online' => ($schema['online'] ?? true) !== false,
+          'version' => (string)($schema['version'] ?? 'V1'),
+          'schema' => $schema,
+        ];
+        $catalogMap[$code] = $onlineMap[$code];
+      }
+    }
+
+    if (is_file($FORM_CONTROL_REGISTRY_FILE)) {
+      $registry = json_decode((string)file_get_contents($FORM_CONTROL_REGISTRY_FILE), true);
+      if (is_array($registry)) {
+        foreach ($registry as $code => $entry) {
+          if (!is_array($entry)) continue;
+          if (isset($onlineMap[$code])) {
+            $catalogMap[$code]['blank_path'] = (string)($entry['path'] ?? '');
+            $catalogMap[$code]['blank_filename'] = (string)($entry['filename'] ?? '');
+            $catalogMap[$code]['template_checksum'] = (string)($entry['sha256'] ?? '');
+            $catalogMap[$code]['offline_fallback_available'] = (string)($entry['path'] ?? '') !== '';
+            $catalogMap[$code]['delivery_mode'] = !empty($catalogMap[$code]['online'])
+              ? 'online'
+              : (string)($entry['delivery_mode'] ?? 'download');
+            continue;
+          }
+          $num = (int)preg_replace('/\D+/', '', (string)$code);
+          $series = (int)floor($num / 100) * 100;
+          $category = match (true) {
+            $series >= 500 && $series < 600 => 'production',
+            $series >= 600 && $series < 700 => 'quality',
+            $series >= 800 && $series < 900 => 'hr',
+            $series >= 700 && $series < 800 => 'logistics',
+            default => 'other',
+          };
+          $catalogMap[$code] = [
+            'form_code' => (string)$code,
+            'title' => (string)($entry['title'] ?? $code),
+            'title_vi' => (string)($entry['title'] ?? $code),
+            'description' => '',
+            'category' => $category,
+            'sop_ref' => '',
+            'online' => false,
+            'version' => (string)($entry['rev'] ?? 'V0'),
+            'blank_path' => (string)($entry['path'] ?? ''),
+            'blank_filename' => (string)($entry['filename'] ?? ''),
+            'template_checksum' => (string)($entry['sha256'] ?? ''),
+            'delivery_mode' => (string)($entry['delivery_mode'] ?? 'download'),
+          ];
+        }
+      }
+    }
+
+    $forms = array_values($catalogMap);
+    usort($forms, fn($a, $b) => strcmp((string)($a['form_code'] ?? ''), (string)($b['form_code'] ?? '')));
+    api_json(['ok' => true, 'forms' => $forms]);
+  }
+
   case 'online_form_schema': {
     $code = trim((string)($_GET['code'] ?? ''));
     if (!$code) { api_json(['ok' => false, 'error' => 'missing_code'], 400); }
@@ -7288,6 +8290,21 @@ if ($username === '') {
       $entries = $raw ? json_decode($raw, true) : [];
     }
     api_json(['ok' => true, 'entries' => is_array($entries) ? $entries : []]);
+  }
+
+  case 'online_form_entry_get': {
+    require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $code = trim((string)($body['form_code'] ?? $_GET['form_code'] ?? ''));
+    if ($code === '') { api_json(['ok' => false, 'error' => 'missing_form_code'], 400); }
+    $entryId = trim((string)($body['entry_id'] ?? $_GET['entry_id'] ?? ''));
+    $allocationId = trim((string)($body['allocation_id'] ?? $_GET['allocation_id'] ?? ''));
+    if ($entryId === '' && $allocationId === '') { api_json(['ok' => false, 'error' => 'missing_entry_selector'], 400); }
+    $entries = load_online_form_entries_store($code);
+    $entryIndex = find_online_form_entry_index($entries, $entryId, $allocationId);
+    if ($entryIndex < 0 || !is_array($entries[$entryIndex] ?? null)) { api_json(['ok' => false, 'error' => 'entry_not_found'], 404); }
+    api_json(['ok' => true, 'entry' => $entries[$entryIndex]]);
   }
 
   // ── Dashboard, KPI & SPC Analytics ─────────────────────────────────────

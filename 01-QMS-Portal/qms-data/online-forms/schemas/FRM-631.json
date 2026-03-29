@@ -2,117 +2,515 @@
   "form_code": "FRM-631",
   "title": "Non-Conformity Report (NCR)",
   "title_vi": "Phiếu báo lỗi không phù hợp (NCR)",
-  "version": "V1",
+  "version": "V2.1",
   "category": "quality",
   "frequency": "per_event",
+  "delivery_mode": "online",
+  "online": true,
+  "decision_score": 82,
   "sop_ref": "SOP-606",
-  "description": "Ghi nhận sự không phù hợp về sản phẩm, quá trình hoặc hệ thống; xác định nguyên nhân gốc, xử lý và hành động khắc phục.",
-  "roles_allowed": ["admin", "qa_manager", "qc_inspector", "quality_engineer", "production_manager", "shift_leader", "engineering_manager"],
+  "description": "Governed NCR runtime with master-data-bound lookup, multi-select 6M root cause, and electronic approval workflow.",
+  "description_vi": "Biểu mẫu NCR online có lookup dữ liệu nền, 6M multi-select và workflow chữ ký điện tử để kiểm soát truy xuất, phê duyệt và đồng bộ allocation.",
+  "roles_allowed": [
+    "admin",
+    "qa_manager",
+    "qc_inspector",
+    "quality_engineer",
+    "production_manager",
+    "shift_leader",
+    "engineering_manager"
+  ],
+  "record_context": {
+    "required": [
+      "customer_id",
+      "so_number",
+      "jo_number",
+      "wo_number",
+      "part_number",
+      "part_revision"
+    ],
+    "autofill_priority": [
+      "wo_number",
+      "jo_number",
+      "so_number",
+      "part_number",
+      "part_revision"
+    ]
+  },
+  "offline_package": {
+    "enabled": false,
+    "fallback_form": "FRM-631"
+  },
+  "sections": [
+    {
+      "id": "identity",
+      "title": "Identification & Traceability",
+      "title_vi": "Nhận diện và truy xuất",
+      "description": "Capture the governed production context so NCR evidence can trace back to customer, order, job, work order, and part revision without manual typing.",
+      "description_vi": "Ghi nhận ngữ cảnh sản xuất đã được quản lý để NCR truy xuất ngược về khách hàng, đơn hàng, job, work order và revision mà không nhập tay.",
+      "field_ids": [
+        "ncr_date",
+        "department",
+        "customer_id",
+        "so_number",
+        "jo_number",
+        "wo_number",
+        "part_number",
+        "part_revision",
+        "operation",
+        "supplier_id",
+        "capa_number"
+      ]
+    },
+    {
+      "id": "finding",
+      "title": "Finding & Containment",
+      "title_vi": "Phát hiện và ngăn chặn",
+      "description": "Describe the nonconformity, how much product is affected, and the immediate containment / disposition applied on the floor.",
+      "description_vi": "Mô tả lỗi không phù hợp, số lượng bị ảnh hưởng và hành động ngăn chặn / xử lý tức thời đã áp dụng tại hiện trường.",
+      "field_ids": [
+        "defect_type",
+        "severity",
+        "quantity_affected",
+        "quantity_rejected",
+        "ncr_status",
+        "defect_description",
+        "containment_action",
+        "disposition"
+      ]
+    },
+    {
+      "id": "root-cause",
+      "title": "Root Cause & Actions",
+      "title_vi": "Nguyên nhân gốc và hành động",
+      "description": "Use the 6M framework and record the corrective / preventive actions linked to this NCR.",
+      "description_vi": "Dùng khung 6M để xác định nguyên nhân gốc và ghi nhận hành động khắc phục / phòng ngừa gắn với NCR này.",
+      "field_ids": [
+        "root_cause_categories",
+        "root_cause_description",
+        "corrective_action",
+        "preventive_action"
+      ]
+    },
+    {
+      "id": "verification",
+      "title": "Verification",
+      "title_vi": "Xác nhận và bàn giao",
+      "description": "Record who inspected the issue and any production / quality notes required before routing to review and approval.",
+      "description_vi": "Ghi nhận người kiểm tra và các ghi chú cần thiết trước khi chuyển sang bước xem xét và phê duyệt.",
+      "field_ids": [
+        "inspector_id",
+        "production_notes"
+      ]
+    }
+  ],
   "fields": [
-    {"id": "ncr_date", "type": "date", "label": "Ngày phát hiện", "label_en": "NCR Date", "required": true, "default": "today"},
+    {
+      "id": "ncr_date",
+      "type": "date",
+      "label": "NCR Date",
+      "label_vi": "Ngày phát hiện",
+      "required": true,
+      "default": "today",
+      "width": "third"
+    },
     {
       "id": "department",
       "type": "select",
-      "label": "Phòng ban phát hiện",
-      "label_en": "Department",
+      "label": "Department",
+      "label_vi": "Phòng ban phát hiện",
       "required": true,
+      "width": "third",
       "options": [
-        {"value": "PROD", "label": "Sản xuất"},
-        {"value": "ENG", "label": "Kỹ thuật"},
-        {"value": "QA", "label": "Chất lượng"},
-        {"value": "SCM", "label": "Chuỗi cung ứng"},
-        {"value": "WH", "label": "Kho vận"}
+        { "value": "PRO", "label": "Production", "label_vi": "Sản xuất" },
+        { "value": "ENG", "label": "Engineering", "label_vi": "Kỹ thuật" },
+        { "value": "QA", "label": "Quality", "label_vi": "Chất lượng" },
+        { "value": "SCM", "label": "Supply Chain", "label_vi": "Chuỗi cung ứng" },
+        { "value": "WH", "label": "Warehouse", "label_vi": "Kho vận" }
       ]
     },
-    {"id": "job_number", "type": "text", "label": "Số Job", "label_en": "Job Number", "required": true, "placeholder": "VD: J-2026-0150"},
-    {"id": "part_number", "type": "text", "label": "Mã chi tiết", "label_en": "Part Number", "required": true},
-    {"id": "part_rev", "type": "text", "label": "Revision", "label_en": "Part Revision", "required": true, "placeholder": "VD: Rev C"},
-    {"id": "customer", "type": "text", "label": "Khách hàng", "label_en": "Customer", "required": true},
-    {"id": "operation", "type": "text", "label": "Công đoạn phát hiện", "label_en": "Operation", "required": false, "placeholder": "VD: OP20 — Milling"},
+    {
+      "id": "customer_id",
+      "type": "lookup",
+      "label": "Customer",
+      "label_vi": "Khách hàng",
+      "required": true,
+      "width": "third",
+      "lookup_source": "customers",
+      "strict_select": true,
+      "display_fields": ["customer_id", "customer_name"],
+      "placeholder": "Search governed customer",
+      "placeholder_vi": "Tìm khách hàng đã được quản lý"
+    },
+    {
+      "id": "so_number",
+      "type": "lookup",
+      "label": "Sales Order",
+      "label_vi": "Sales Order",
+      "required": true,
+      "width": "third",
+      "lookup_source": "sales_orders",
+      "strict_select": true,
+      "depends_on": ["customer_id"],
+      "display_fields": ["so_number", "customer_id"],
+      "autofill_map": {
+        "customer_id": "customer_id",
+        "so_number": "so_number"
+      },
+      "placeholder": "Search sales order",
+      "placeholder_vi": "Tìm Sales Order"
+    },
+    {
+      "id": "jo_number",
+      "type": "lookup",
+      "label": "Job Order",
+      "label_vi": "Job Order",
+      "required": true,
+      "width": "third",
+      "lookup_source": "job_orders",
+      "strict_select": true,
+      "depends_on": ["so_number"],
+      "display_fields": ["jo_number", "part_number", "part_revision"],
+      "autofill_map": {
+        "customer_id": "customer_id",
+        "so_number": "so_number",
+        "jo_number": "jo_number",
+        "part_number": "part_number",
+        "part_revision": "part_revision"
+      },
+      "placeholder": "Search job order",
+      "placeholder_vi": "Tìm Job Order"
+    },
+    {
+      "id": "wo_number",
+      "type": "lookup",
+      "label": "Work Order",
+      "label_vi": "Work Order",
+      "required": true,
+      "width": "third",
+      "lookup_source": "work_orders",
+      "strict_select": true,
+      "depends_on": ["jo_number"],
+      "display_fields": ["wo_number", "operation_desc"],
+      "autofill_map": {
+        "customer_id": "customer_id",
+        "so_number": "so_number",
+        "jo_number": "jo_number",
+        "wo_number": "wo_number",
+        "part_number": "part_number",
+        "part_revision": "part_revision"
+      },
+      "placeholder": "Search work order",
+      "placeholder_vi": "Tìm Work Order"
+    },
+    {
+      "id": "part_number",
+      "type": "lookup",
+      "label": "Part Number",
+      "label_vi": "Part Number",
+      "required": true,
+      "width": "third",
+      "lookup_source": "parts",
+      "strict_select": true,
+      "depends_on": ["customer_id"],
+      "display_fields": ["part_number", "part_description"],
+      "autofill_map": {
+        "customer_id": "customer_id",
+        "part_number": "part_number"
+      },
+      "placeholder": "Search part number",
+      "placeholder_vi": "Tìm Part Number"
+    },
+    {
+      "id": "part_revision",
+      "type": "lookup",
+      "label": "Part Revision",
+      "label_vi": "Revision",
+      "required": true,
+      "width": "third",
+      "lookup_source": "revisions",
+      "strict_select": true,
+      "depends_on": ["part_number"],
+      "display_fields": ["revision", "status"],
+      "autofill_map": {
+        "part_number": "part_number",
+        "part_revision": "part_revision"
+      },
+      "placeholder": "Search revision",
+      "placeholder_vi": "Tìm Revision"
+    },
+    {
+      "id": "operation",
+      "type": "text",
+      "label": "Operation / Detection Point",
+      "label_vi": "Công đoạn / điểm phát hiện",
+      "required": false,
+      "width": "third",
+      "placeholder": "Example: OP20 - Finish milling",
+      "placeholder_vi": "Ví dụ: OP20 - Phay tinh"
+    },
+    {
+      "id": "supplier_id",
+      "type": "lookup",
+      "label": "Supplier (if applicable)",
+      "label_vi": "Nhà cung cấp (nếu có)",
+      "required": false,
+      "width": "third",
+      "lookup_source": "suppliers",
+      "strict_select": true,
+      "display_fields": ["supplier_id", "supplier_name"],
+      "placeholder": "Search supplier",
+      "placeholder_vi": "Tìm nhà cung cấp"
+    },
+    {
+      "id": "capa_number",
+      "type": "lookup",
+      "label": "Linked CAPA",
+      "label_vi": "CAPA liên kết",
+      "required": false,
+      "width": "third",
+      "lookup_source": "capas",
+      "strict_select": true,
+      "depends_on": ["customer_id", "part_number"],
+      "display_fields": ["capa_number", "title", "status"],
+      "autofill_map": {
+        "customer_id": "customer_id",
+        "part_number": "part_number",
+        "capa_number": "capa_number"
+      },
+      "placeholder": "Search governed CAPA",
+      "placeholder_vi": "Tìm CAPA đã được quản lý"
+    },
     {
       "id": "defect_type",
       "type": "select",
-      "label": "Loại lỗi",
-      "label_en": "Defect Type",
+      "label": "Defect Type",
+      "label_vi": "Loại lỗi",
       "required": true,
+      "width": "third",
       "options": [
-        {"value": "dimensional", "label": "Kích thước (Dimensional)"},
-        {"value": "surface", "label": "Bề mặt (Surface)"},
-        {"value": "material", "label": "Vật liệu (Material)"},
-        {"value": "documentation", "label": "Tài liệu (Documentation)"},
-        {"value": "process", "label": "Quy trình (Process)"},
-        {"value": "other", "label": "Khác (Other)"}
+        { "value": "dimensional", "label": "Dimensional", "label_vi": "Kích thước" },
+        { "value": "surface", "label": "Surface", "label_vi": "Bề mặt" },
+        { "value": "material", "label": "Material", "label_vi": "Vật liệu" },
+        { "value": "documentation", "label": "Documentation", "label_vi": "Tài liệu" },
+        { "value": "process", "label": "Process", "label_vi": "Quy trình" },
+        { "value": "other", "label": "Other", "label_vi": "Khác" }
       ]
     },
-    {"id": "defect_description", "type": "textarea", "label": "Mô tả lỗi", "label_en": "Defect Description", "rows": 4, "required": true, "placeholder": "Mô tả chi tiết lỗi không phù hợp..."},
-    {"id": "quantity_affected", "type": "number", "label": "Số lượng bị ảnh hưởng", "label_en": "Quantity Affected", "min": 1, "required": true},
-    {"id": "quantity_rejected", "type": "number", "label": "Số lượng loại bỏ", "label_en": "Quantity Rejected", "min": 0, "required": true},
     {
       "id": "severity",
       "type": "select",
-      "label": "Mức độ nghiêm trọng",
-      "label_en": "Severity",
+      "label": "Severity",
+      "label_vi": "Mức độ nghiêm trọng",
       "required": true,
+      "width": "third",
       "options": [
-        {"value": "minor", "label": "Nhẹ (Minor)", "color": "#2f9e44"},
-        {"value": "major", "label": "Nặng (Major)", "color": "#e67700"},
-        {"value": "critical", "label": "Nghiêm trọng (Critical)", "color": "#e03131"}
+        { "value": "minor", "label": "Minor", "label_vi": "Nhẹ" },
+        { "value": "major", "label": "Major", "label_vi": "Nặng" },
+        { "value": "critical", "label": "Critical", "label_vi": "Nghiêm trọng" }
       ]
     },
-    {"id": "containment_action", "type": "textarea", "label": "Hành động ngăn chặn", "label_en": "Containment Action", "rows": 3, "required": true, "placeholder": "Hành động ngăn chặn tức thời để cô lập sản phẩm lỗi..."},
+    {
+      "id": "quantity_affected",
+      "type": "number",
+      "label": "Quantity Affected",
+      "label_vi": "Số lượng bị ảnh hưởng",
+      "required": true,
+      "width": "third",
+      "placeholder": "0",
+      "placeholder_vi": "0"
+    },
+    {
+      "id": "quantity_rejected",
+      "type": "number",
+      "label": "Quantity Rejected",
+      "label_vi": "Số lượng loại bỏ",
+      "required": true,
+      "width": "third",
+      "placeholder": "0",
+      "placeholder_vi": "0"
+    },
+    {
+      "id": "ncr_status",
+      "type": "select",
+      "label": "NCR Status",
+      "label_vi": "Trạng thái NCR",
+      "required": true,
+      "width": "third",
+      "default": "open",
+      "options": [
+        { "value": "open", "label": "Open", "label_vi": "Mở" },
+        { "value": "containment", "label": "Containment", "label_vi": "Đang ngăn chặn" },
+        { "value": "investigation", "label": "Investigation", "label_vi": "Đang điều tra" },
+        { "value": "corrective_action", "label": "Corrective Action", "label_vi": "Đang khắc phục" },
+        { "value": "verification", "label": "Verification", "label_vi": "Đang xác nhận" },
+        { "value": "closed", "label": "Closed", "label_vi": "Đã đóng" }
+      ]
+    },
+    {
+      "id": "defect_description",
+      "type": "textarea",
+      "label": "Defect Description",
+      "label_vi": "Mô tả lỗi",
+      "required": true,
+      "width": "full",
+      "placeholder": "Describe what is nonconforming and where it was detected.",
+      "placeholder_vi": "Mô tả chi tiết lỗi không phù hợp và nơi phát hiện."
+    },
+    {
+      "id": "containment_action",
+      "type": "textarea",
+      "label": "Containment Action",
+      "label_vi": "Hành động ngăn chặn",
+      "required": true,
+      "width": "full",
+      "placeholder": "Describe immediate segregation or containment steps.",
+      "placeholder_vi": "Mô tả cách cô lập / ngăn chặn tức thời đã thực hiện."
+    },
     {
       "id": "disposition",
       "type": "select",
-      "label": "Quyết định xử lý",
-      "label_en": "Disposition",
+      "label": "Disposition",
+      "label_vi": "Quyết định xử lý",
       "required": true,
+      "width": "third",
       "options": [
-        {"value": "rework", "label": "Sửa chữa (Rework)"},
-        {"value": "scrap", "label": "Phế phẩm (Scrap)"},
-        {"value": "use_as_is", "label": "Sử dụng nguyên trạng (Use As-Is)"},
-        {"value": "return_to_vendor", "label": "Trả nhà cung cấp (Return to Vendor)"},
-        {"value": "mrb", "label": "MRB (Material Review Board)"}
+        { "value": "rework", "label": "Rework", "label_vi": "Sửa chữa" },
+        { "value": "scrap", "label": "Scrap", "label_vi": "Phế phẩm" },
+        { "value": "use_as_is", "label": "Use As-Is", "label_vi": "Sử dụng nguyên trạng" },
+        { "value": "return_to_vendor", "label": "Return to Vendor", "label_vi": "Trả nhà cung cấp" },
+        { "value": "mrb", "label": "MRB", "label_vi": "MRB" }
       ]
     },
     {
-      "id": "root_cause_category",
-      "type": "select",
-      "label": "Nhóm nguyên nhân gốc",
-      "label_en": "Root Cause Category",
+      "id": "root_cause_categories",
+      "type": "multi_select",
+      "label": "Root Cause (6M)",
+      "label_vi": "Nguyên nhân gốc (6M)",
+      "required": true,
+      "width": "full",
+      "helper": "Select all contributing categories, not just one.",
+      "helper_vi": "Cho phép chọn nhiều nhóm nguyên nhân đồng thời nếu có liên quan.",
+      "options": [
+        { "value": "man", "label": "Man", "label_vi": "Con người" },
+        { "value": "machine", "label": "Machine", "label_vi": "Máy móc" },
+        { "value": "method", "label": "Method", "label_vi": "Phương pháp" },
+        { "value": "material", "label": "Material", "label_vi": "Vật liệu" },
+        { "value": "measurement", "label": "Measurement", "label_vi": "Đo lường" },
+        { "value": "environment", "label": "Environment", "label_vi": "Môi trường" }
+      ]
+    },
+    {
+      "id": "root_cause_description",
+      "type": "textarea",
+      "label": "Root Cause Description",
+      "label_vi": "Mô tả nguyên nhân gốc",
+      "required": true,
+      "width": "full",
+      "placeholder": "Summarize the validated root cause and why it happened.",
+      "placeholder_vi": "Tóm tắt nguyên nhân gốc đã xác nhận và lý do phát sinh."
+    },
+    {
+      "id": "corrective_action",
+      "type": "textarea",
+      "label": "Corrective Action",
+      "label_vi": "Hành động khắc phục",
+      "required": true,
+      "width": "full",
+      "placeholder": "Describe actions that remove the root cause.",
+      "placeholder_vi": "Mô tả hành động khắc phục để loại bỏ nguyên nhân gốc."
+    },
+    {
+      "id": "preventive_action",
+      "type": "textarea",
+      "label": "Preventive Action",
+      "label_vi": "Hành động phòng ngừa",
       "required": false,
-      "options": [
-        {"value": "man", "label": "Con người (Man)"},
-        {"value": "machine", "label": "Máy móc (Machine)"},
-        {"value": "method", "label": "Phương pháp (Method)"},
-        {"value": "material", "label": "Vật liệu (Material)"},
-        {"value": "measurement", "label": "Đo lường (Measurement)"},
-        {"value": "environment", "label": "Môi trường (Environment)"}
-      ]
+      "width": "full",
+      "placeholder": "Describe actions preventing recurrence in similar flow.",
+      "placeholder_vi": "Mô tả hành động phòng ngừa tái diễn ở các luồng tương tự."
     },
-    {"id": "root_cause_description", "type": "textarea", "label": "Mô tả nguyên nhân gốc", "label_en": "Root Cause Description", "rows": 3, "placeholder": "Phân tích nguyên nhân gốc..."},
-    {"id": "corrective_action", "type": "textarea", "label": "Hành động khắc phục", "label_en": "Corrective Action", "rows": 3, "placeholder": "Hành động khắc phục để loại bỏ nguyên nhân..."},
-    {"id": "preventive_action", "type": "textarea", "label": "Hành động phòng ngừa", "label_en": "Preventive Action", "rows": 3, "placeholder": "Hành động phòng ngừa tái phát..."},
-    {"id": "inspector_id", "type": "text", "label": "Mã QC Inspector", "label_en": "Inspector ID", "required": false},
-    {"id": "reported_by", "type": "text", "label": "Người báo cáo", "label_en": "Reported By", "required": true},
-    {"id": "approved_by", "type": "text", "label": "Người phê duyệt", "label_en": "Approved By", "required": false},
     {
-      "id": "status",
-      "type": "select",
-      "label": "Trạng thái",
-      "label_en": "Status",
-      "required": true,
-      "default": "open",
-      "options": [
-        {"value": "open", "label": "Mở (Open)", "color": "#e03131"},
-        {"value": "containment", "label": "Đang ngăn chặn (Containment)", "color": "#e67700"},
-        {"value": "investigation", "label": "Đang điều tra (Investigation)", "color": "#1971c2"},
-        {"value": "corrective_action", "label": "Đang khắc phục (Corrective Action)", "color": "#862e9c"},
-        {"value": "verification", "label": "Đang xác nhận (Verification)", "color": "#0369a1"},
-        {"value": "closed", "label": "Đã đóng (Closed)", "color": "#2f9e44"}
-      ]
+      "id": "inspector_id",
+      "type": "text",
+      "label": "Inspector ID",
+      "label_vi": "Mã QC Inspector",
+      "required": false,
+      "width": "third",
+      "placeholder": "Example: QC-01",
+      "placeholder_vi": "Ví dụ: QC-01"
     },
-    {"id": "photos", "type": "file", "label": "Hình ảnh đính kèm", "label_en": "Photos", "accept": "image/*", "multiple": true, "max_files": 10, "required": false},
-    {"id": "linked_capa", "type": "text", "label": "CAPA liên kết", "label_en": "Linked CAPA", "required": false, "placeholder": "VD: CAPA-2026-001"}
+    {
+      "id": "production_notes",
+      "type": "textarea",
+      "label": "Production / Quality Notes",
+      "label_vi": "Ghi chú sản xuất / chất lượng",
+      "required": false,
+      "width": "full",
+      "placeholder": "Additional notes for handoff to review and approval.",
+      "placeholder_vi": "Ghi chú bổ sung để bàn giao sang bước xem xét và phê duyệt."
+    }
+  ],
+  "signature_blocks": [
+    {
+      "id": "reported_by",
+      "label": "Reported by",
+      "label_vi": "Người báo cáo",
+      "help": "The person who detected or logged the NCR confirms the initial facts.",
+      "help_vi": "Người phát hiện hoặc lập NCR xác nhận thông tin ban đầu là đúng.",
+      "signature_meaning": "Initial NCR reporting confirmation",
+      "signature_meaning_vi": "Xác nhận báo cáo NCR ban đầu",
+      "require_reason": true,
+      "require_pin": false,
+      "required_on_submit": true
+    },
+    {
+      "id": "reviewed_by",
+      "label": "Reviewed by",
+      "label_vi": "Người xem xét",
+      "help": "Quality or responsible owner reviews the containment and root cause proposal.",
+      "help_vi": "Bộ phận chất lượng hoặc người phụ trách xem xét nội dung ngăn chặn và nguyên nhân gốc.",
+      "signature_meaning": "Review of NCR containment and root cause",
+      "signature_meaning_vi": "Xem xét hành động ngăn chặn và nguyên nhân gốc",
+      "require_reason": true,
+      "require_pin": true,
+      "required_on_submit": false
+    },
+    {
+      "id": "approved_by",
+      "label": "Approved by",
+      "label_vi": "Người phê duyệt",
+      "help": "Approver accepts the NCR routing, actions, and governed evidence package.",
+      "help_vi": "Người phê duyệt chấp nhận luồng xử lý NCR, các hành động và bộ chứng cứ đi kèm.",
+      "signature_meaning": "Final approval of NCR actions",
+      "signature_meaning_vi": "Phê duyệt cuối cùng cho hành động NCR",
+      "require_reason": true,
+      "require_pin": true,
+      "required_on_submit": false
+    }
+  ],
+  "approval_flow": [
+    {
+      "id": "reported",
+      "signature_block_id": "reported_by",
+      "label": "Reported by",
+      "label_vi": "Người báo cáo",
+      "required_on_submit": true
+    },
+    {
+      "id": "reviewed",
+      "signature_block_id": "reviewed_by",
+      "label": "Reviewed by",
+      "label_vi": "Người xem xét",
+      "required_on_submit": false
+    },
+    {
+      "id": "approved",
+      "signature_block_id": "approved_by",
+      "label": "Approved by",
+      "label_vi": "Người phê duyệt",
+      "required_on_submit": false
+    }
   ],
   "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
   "notifications": {

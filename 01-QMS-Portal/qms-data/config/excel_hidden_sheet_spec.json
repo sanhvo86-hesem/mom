@@ -88,6 +88,70 @@
       "type": "boolean",
       "value": false,
       "description": "Whether macro-enabled (.xlsm) uploads are accepted"
+    },
+    {
+      "cell": "A11",
+      "key": "template_checksum",
+      "type": "string",
+      "algorithm": "SHA-256",
+      "description": "Checksum of the original controlled blank template"
+    },
+    {
+      "cell": "A12",
+      "key": "issued_record_id",
+      "type": "string",
+      "description": "Formal record number allocated by the system before download"
+    },
+    {
+      "cell": "A13",
+      "key": "issued_to_user",
+      "type": "string",
+      "description": "User account that requested the download package"
+    },
+    {
+      "cell": "A14",
+      "key": "issued_at",
+      "type": "datetime",
+      "format": "ISO 8601",
+      "description": "Server timestamp when the issuance package was generated"
+    },
+    {
+      "cell": "A15",
+      "key": "receipt_status",
+      "type": "string",
+      "enum": ["allocated", "downloaded", "submitted", "received", "void"],
+      "description": "Current lifecycle status mirrored from the allocation ledger"
+    },
+    {
+      "cell": "A16",
+      "key": "receipt_version",
+      "type": "integer",
+      "description": "Latest received version stored by the system"
+    },
+    {
+      "cell": "A17",
+      "key": "master_context_json",
+      "type": "json",
+      "description": "Serialized governed master data context bound at issuance time"
+    },
+    {
+      "cell": "A18",
+      "key": "receipt_history_json",
+      "type": "json",
+      "description": "Serialized receipt history summary for quick verification"
+    },
+    {
+      "cell": "A19",
+      "key": "latest_stored_filename",
+      "type": "string",
+      "description": "Latest server-side normalized filename"
+    },
+    {
+      "cell": "A20",
+      "key": "latest_upload_timestamp",
+      "type": "datetime",
+      "format": "ISO 8601",
+      "description": "Timestamp of the latest accepted upload"
     }
   ],
 
@@ -96,7 +160,7 @@
     "2. Verify system_origin == 'HESEM-QMS-v3'",
     "3. Recompute SHA-256 hash from stored components + SERVER_SALT",
     "4. Compare recomputed hash with download_hash in A5",
-    "5. Verify allocation_id exists and status is 'form_downloaded' or 'submitted'",
+    "5. Verify allocation_id exists and status is 'downloaded', 'submitted', or 'received'",
     "6. Verify filename matches expected_filename_pattern",
     "7. Check file size <= max_file_size_mb",
     "8. If all pass: accept upload, update allocation status",
@@ -140,7 +204,7 @@
       "column": "F",
       "key": "verification_status",
       "type": "string",
-      "enum": ["verified", "hash_mismatch", "allocation_invalid", "filename_invalid", "file_too_large", "rejected"],
+      "enum": ["verified", "hash_mismatch", "allocation_invalid", "filename_warning", "file_too_large", "rejected"],
       "description": "Result of upload verification check"
     }
   ],
