@@ -26,6 +26,8 @@ function Assert-PathExists {
 
 $portalRoot = Join-Path $RepoRoot "01-QMS-Portal"
 $apiFile = Join-Path $portalRoot "api.php"
+$dataLayerFile = Join-Path $portalRoot "database\DataLayer.php"
+$runtimeShadowFile = Join-Path $portalRoot "database\RuntimeShadowSync.php"
 $schemaFile = Join-Path $portalRoot "qms-data\online-forms\schemas\FRM-631.json"
 $jsFiles = @(
   (Join-Path $portalRoot "scripts\portal\09-online-forms.js"),
@@ -53,6 +55,8 @@ $requiredApiActions = @(
 
 Invoke-Step "Required files exist" {
   Assert-PathExists $apiFile
+  Assert-PathExists $dataLayerFile
+  Assert-PathExists $runtimeShadowFile
   Assert-PathExists $schemaFile
   foreach ($file in $jsFiles) { Assert-PathExists $file }
   Assert-PathExists (Join-Path $portalRoot "tools\excel_hidden_sheet_runtime.py")
@@ -61,6 +65,10 @@ Invoke-Step "Required files exist" {
 Invoke-Step "PHP syntax check" {
   & php -l $apiFile | Out-Host
   if ($LASTEXITCODE -ne 0) { throw "php -l failed" }
+  & php -l $dataLayerFile | Out-Host
+  if ($LASTEXITCODE -ne 0) { throw "php -l failed for DataLayer" }
+  & php -l $runtimeShadowFile | Out-Host
+  if ($LASTEXITCODE -ne 0) { throw "php -l failed for RuntimeShadowSync" }
 }
 
 Invoke-Step "JavaScript parse check" {
@@ -152,10 +160,28 @@ Invoke-Step "Governance services wired into api.php" {
   $apiText = Get-Content -LiteralPath $apiFile -Raw
   foreach ($token in @(
     'master_data_service()',
-    'order_workflow_service()'
+    'order_workflow_service()',
+    'runtime_data_layer()',
+    'shadow_sync_master_data_store(',
+    'shadow_sync_orders_store(',
+    'shadow_sync_mes_runtime_store('
   )) {
     if ($apiText -notmatch [regex]::Escape($token)) {
       throw "Missing governance service usage: $token"
+    }
+  }
+}
+
+Invoke-Step "Runtime shadow sync surface exists" {
+  $dataLayerText = Get-Content -LiteralPath $dataLayerFile -Raw
+  foreach ($token in @(
+    'syncMasterDataStore',
+    'syncOrdersStore',
+    'syncMesRuntimeStore',
+    'RuntimeShadowSync'
+  )) {
+    if ($dataLayerText -notmatch [regex]::Escape($token)) {
+      throw "Missing DataLayer runtime shadow token: $token"
     }
   }
 }

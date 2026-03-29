@@ -6,6 +6,10 @@ namespace HESEM\QMS\Database;
 
 use RuntimeException;
 
+require_once __DIR__ . '/Connection.php';
+require_once __DIR__ . '/QueryBuilder.php';
+require_once __DIR__ . '/RuntimeShadowSync.php';
+
 /**
  * Unified Data Abstraction Layer for HESEM QMS Portal.
  *
@@ -34,6 +38,7 @@ class DataLayer
     private Connection $db;
     private array $config;
     private string $mode;
+    private ?RuntimeShadowSync $runtimeShadow = null;
 
     /** Base path for QMS data files (e.g. .../01-QMS-Portal/qms-data). */
     private string $dataDir;
@@ -79,6 +84,70 @@ class DataLayer
     public function getMode(): string
     {
         return $this->mode;
+    }
+
+    /**
+     * Mirror governed runtime master data into PostgreSQL without changing the
+     * operational JSON-first flow.
+     */
+    public function syncMasterDataStore(array $store): bool
+    {
+        if (!$this->usesPostgres()) {
+            return true;
+        }
+
+        try {
+            $this->runtimeShadow()->syncMasterDataStore($store);
+            return true;
+        } catch (\Throwable $e) {
+            @error_log('[DataLayer] runtime master shadow sync failed: ' . $e->getMessage());
+            if ($this->mode === self::MODE_SHADOW_WRITE) {
+                return false;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Mirror governed runtime orders into PostgreSQL.
+     */
+    public function syncOrdersStore(array $store): bool
+    {
+        if (!$this->usesPostgres()) {
+            return true;
+        }
+
+        try {
+            $this->runtimeShadow()->syncOrdersStore($store);
+            return true;
+        } catch (\Throwable $e) {
+            @error_log('[DataLayer] runtime orders shadow sync failed: ' . $e->getMessage());
+            if ($this->mode === self::MODE_SHADOW_WRITE) {
+                return false;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Mirror MES runtime overlays into PostgreSQL.
+     */
+    public function syncMesRuntimeStore(array $store, array $orders = [], array $master = []): bool
+    {
+        if (!$this->usesPostgres()) {
+            return true;
+        }
+
+        try {
+            $this->runtimeShadow()->syncMesRuntimeStore($store, $orders, $master);
+            return true;
+        } catch (\Throwable $e) {
+            @error_log('[DataLayer] runtime MES shadow sync failed: ' . $e->getMessage());
+            if ($this->mode === self::MODE_SHADOW_WRITE) {
+                return false;
+            }
+            throw $e;
+        }
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -1574,6 +1643,20 @@ class DataLayer
     private function usesPostgres(): bool
     {
         return $this->mode !== self::MODE_JSON_ONLY;
+    }
+
+    /**
+     * Lazy constructor for runtime JSON -> PG shadow sync adapter.
+     */
+    private function runtimeShadow(): RuntimeShadowSync
+    {
+        if ($this->runtimeShadow === null) {
+            if (!$this->usesPostgres()) {
+                throw new RuntimeException('Runtime shadow sync requested in JSON-only mode.');
+            }
+            $this->runtimeShadow = new RuntimeShadowSync($this->db);
+        }
+        return $this->runtimeShadow;
     }
 
     /**

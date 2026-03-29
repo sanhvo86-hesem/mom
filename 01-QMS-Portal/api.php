@@ -1819,6 +1819,7 @@ function save_orders_store(array $data): void {
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
   write_json_file($ORDERS_FILE, $data);
+  shadow_sync_orders_store($data);
 }
 
 function master_data_store_default(): array {
@@ -1866,6 +1867,7 @@ function save_master_data_store(array $data): void {
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
   write_json_file($MASTER_DATA_FILE, $data);
+  shadow_sync_master_data_store($data);
 }
 
 function master_data_entity_key(string $entity): ?string {
@@ -1904,6 +1906,50 @@ function order_workflow_service(): \HESEM\QMS\Services\OrderWorkflowService {
     $service = new \HESEM\QMS\Services\OrderWorkflowService($DATA_DIR);
   }
   return $service;
+}
+
+function runtime_data_layer(): \HESEM\QMS\Database\DataLayer {
+  global $DATA_DIR;
+  static $layer = null;
+  if ($layer === null) {
+    require_once __DIR__ . '/database/Connection.php';
+    require_once __DIR__ . '/database/RuntimeShadowSync.php';
+    require_once __DIR__ . '/database/DataLayer.php';
+    $layer = new \HESEM\QMS\Database\DataLayer($DATA_DIR, dirname(__DIR__));
+  }
+  return $layer;
+}
+
+function shadow_sync_master_data_store(array $data): void {
+  try {
+    runtime_data_layer()->syncMasterDataStore($data);
+  } catch (Throwable $e) {
+    @error_log('[runtime-shadow] master_data sync failed: ' . $e->getMessage());
+  }
+}
+
+function shadow_sync_orders_store(array $data): void {
+  try {
+    $master = load_master_data_store();
+    $layer = runtime_data_layer();
+    $layer->syncMasterDataStore($master);
+    $layer->syncOrdersStore($data);
+  } catch (Throwable $e) {
+    @error_log('[runtime-shadow] orders sync failed: ' . $e->getMessage());
+  }
+}
+
+function shadow_sync_mes_runtime_store(array $data, ?array $orders = null, ?array $master = null): void {
+  try {
+    $orders = is_array($orders) ? $orders : load_orders_store();
+    $master = is_array($master) ? $master : load_master_data_store();
+    $layer = runtime_data_layer();
+    $layer->syncMasterDataStore($master);
+    $layer->syncOrdersStore($orders);
+    $layer->syncMesRuntimeStore($data, $orders, $master);
+  } catch (Throwable $e) {
+    @error_log('[runtime-shadow] mes sync failed: ' . $e->getMessage());
+  }
 }
 
 function mes_runtime_default(): array {
@@ -1945,6 +1991,7 @@ function save_mes_runtime_store(array $data): void {
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
   write_json_file($MES_RUNTIME_FILE, $data);
+  shadow_sync_mes_runtime_store($data);
 }
 
 function mes_runtime_id(string $prefix): string {
@@ -10053,6 +10100,7 @@ if ($username === '') {
             break;
           }
         }
+        shadow_sync_master_data_store($currentStore);
         api_json([
           'ok' => true,
           'entity' => $entity,
@@ -10104,6 +10152,9 @@ if ($username === '') {
       $message = $pending
         ? 'Yêu cầu thay đổi đã được đưa vào hàng chờ phê duyệt.'
         : 'Đã lưu dữ liệu nền có kiểm soát.';
+      if (!$pending) {
+        shadow_sync_master_data_store($currentStore);
+      }
       api_json([
         'ok' => true,
         'entity' => $entity,
@@ -10959,6 +11010,7 @@ if ($username === '') {
         'data' => $result->data,
       ], $statusCode);
     }
+    shadow_sync_orders_store(load_orders_store());
     api_json(['ok' => true, 'data' => $result->data]);
   }
 
@@ -11080,6 +11132,7 @@ if ($username === '') {
       ], $statusCode);
     }
 
+    shadow_sync_orders_store(load_orders_store());
     api_json(['ok' => true, 'data' => $result->data]);
   }
 
