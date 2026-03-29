@@ -2,7 +2,8 @@
    14-exception-dashboard.js
    HESEM QMS Portal - Exception Dashboard
    Standalone workspace for overdue allocations, upload failures,
-   overdue orders, overdue CAPA, missing evidence, and orphan links.
+   overdue orders, overdue CAPA, missing evidence, NC program mismatches,
+   and orphan links.
    =================================================================== */
 
 (function(){
@@ -81,6 +82,18 @@ var EXCEPTION_TYPES = [
     labelEn: 'WO missing evidence',
     descVi: 'L\u1ec7nh \u0111ang ch\u1ea1y nh\u01b0ng ch\u01b0a \u0111\u1ee7 form / b\u1eb1ng ch\u1ee9ng gate.',
     descEn: 'Work orders are active without the required gate evidence.',
+    page: 'mes'
+  },
+  {
+    key: 'program_mismatches',
+    icon: '\ud83d\udcbe',
+    accent: '#7c3aed',
+    surface: '#f5f3ff',
+    border: '#c4b5fd',
+    labelVi: 'Lệch chương trình NC',
+    labelEn: 'Program mismatch',
+    descVi: 'Chương trình máy đang báo về không khớp với WO đã phát hành.',
+    descEn: 'The machine-reported NC program does not match the released WO.',
     page: 'mes'
   },
   {
@@ -219,7 +232,7 @@ function buildShell(){
     '        <button type="button" class="excx-btn secondary" onclick="window._excRefreshNow()">\ud83d\udd04 ' + esc(t('Làm mới', 'Refresh')) + '</button>',
     '      </div>',
     '      <div class="excx-facts">',
-    '        <span class="excx-fact">\u26a0\ufe0f ' + esc(t('6 nhóm ngoại lệ chuẩn', '6 governed exception groups')) + '</span>',
+    '        <span class="excx-fact">\u26a0\ufe0f ' + esc(t('7 nhóm ngoại lệ chuẩn', '7 governed exception groups')) + '</span>',
     '        <span class="excx-fact">\ud83d\udce5 ' + esc(t('Xuất CSV tức thời', 'Instant CSV export')) + '</span>',
     '        <span class="excx-fact">\ud83d\udd01 ' + esc(t('Tự làm mới mỗi 5 phút', 'Auto refresh every 5 minutes')) + '</span>',
     '      </div>',
@@ -236,7 +249,7 @@ function buildShell(){
     '        <div class="excx-kpi-grid">',
     '          <div class="excx-kpi"><small>' + esc(t('Tổng ngoại lệ', 'Total exceptions')) + '</small><strong id="excx-total">-</strong><span>' + esc(t('Tổng tất cả queue đang mở.', 'All open exception queues combined.')) + '</span></div>',
     '          <div class="excx-kpi"><small>' + esc(t('Nhóm có cảnh báo', 'Active groups')) + '</small><strong id="excx-groups">-</strong><span>' + esc(t('Số nhóm đang có ít nhất 1 mục cần xử lý.', 'Groups with at least one actionable item.')) + '</span></div>',
-    '          <div class="excx-kpi"><small>' + esc(t('Ưu tiên cao', 'High priority')) + '</small><strong id="excx-hot">-</strong><span>' + esc(t('Allocation quá hạn, WO thiếu chứng cứ, đơn hàng quá hạn.', 'Overdue allocations, missing evidence, and overdue orders.')) + '</span></div>',
+    '          <div class="excx-kpi"><small>' + esc(t('Ưu tiên cao', 'High priority')) + '</small><strong id="excx-hot">-</strong><span>' + esc(t('Allocation quá hạn, WO thiếu chứng cứ, lệch chương trình NC, đơn hàng quá hạn.', 'Overdue allocations, missing evidence, NC mismatches, and overdue orders.')) + '</span></div>',
     '          <div class="excx-kpi"><small>' + esc(t('Hướng xử lý', 'Primary next step')) + '</small><strong id="excx-next">-</strong><span>' + esc(t('Gợi ý workspace nên mở tiếp theo.', 'Suggested workspace to open next.')) + '</span></div>',
     '        </div>',
     '      </article>',
@@ -270,7 +283,7 @@ function renderSummary(){
     total += count;
     if (count > 0) activeGroups += 1;
   });
-  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.overdue_orders || 0);
+  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.overdue_orders || 0);
   var nextPage = highPriority > 0 ? t('MES / Chứng cứ', 'MES / Evidence') : (activeGroups > 0 ? t('Đơn hàng', 'Orders') : t('Ổn định', 'Stable'));
   var totalEl = state.container.querySelector('#excx-total');
   var groupsEl = state.container.querySelector('#excx-groups');

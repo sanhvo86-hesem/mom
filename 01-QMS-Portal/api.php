@@ -2393,6 +2393,186 @@ function mes_tool_alert_payload(array $row): array {
   return $row;
 }
 
+function mes_metric_band(?float $value, float $good = 85.0, float $watch = 65.0): string {
+  if ($value === null) return 'unknown';
+  if ($value >= $good) return 'strong';
+  if ($value >= $watch) return 'watch';
+  return 'risk';
+}
+
+function mes_build_oee_timeline(array $machineWall): array {
+  $rows = [];
+  foreach ($machineWall as $machine) {
+    if (!is_array($machine)) continue;
+    $oee = isset($machine['oee_pct']) ? (float)$machine['oee_pct'] : null;
+    $availability = isset($machine['availability_pct']) ? (float)$machine['availability_pct'] : null;
+    $performance = isset($machine['performance_pct']) ? (float)$machine['performance_pct'] : null;
+    $quality = isset($machine['quality_pct']) ? (float)$machine['quality_pct'] : null;
+
+    $lossMap = array_filter([
+      'availability' => $availability,
+      'performance' => $performance,
+      'quality' => $quality,
+    ], static fn($value) => $value !== null);
+
+    $dominantLoss = '';
+    $dominantValue = null;
+    if ($lossMap) {
+      asort($lossMap, SORT_NUMERIC);
+      $dominantLoss = (string)array_key_first($lossMap);
+      $dominantValue = (float)reset($lossMap);
+    }
+
+    $rows[] = [
+      'machine_id' => (string)($machine['machine_id'] ?? ''),
+      'machine_name' => (string)($machine['machine_name'] ?? ''),
+      'work_center_id' => (string)($machine['work_center_id'] ?? ''),
+      'status' => (string)($machine['status'] ?? 'idle'),
+      'active_wo_number' => (string)($machine['active_work_order']['wo_number'] ?? ''),
+      'part_number' => (string)($machine['active_work_order']['part_number'] ?? ''),
+      'part_revision' => (string)($machine['active_work_order']['part_revision'] ?? ''),
+      'customer_name' => (string)($machine['active_work_order']['customer_name'] ?? ''),
+      'availability_pct' => $availability,
+      'performance_pct' => $performance,
+      'quality_pct' => $quality,
+      'oee_pct' => $oee,
+      'band' => mes_metric_band($oee),
+      'dominant_loss' => $dominantLoss,
+      'dominant_loss_pct' => $dominantValue,
+      'open_downtime' => $machine['open_downtime'] ?? null,
+      'connector_health' => (string)($machine['connector_health'] ?? 'offline'),
+    ];
+  }
+
+  usort($rows, static function ($a, $b) {
+    $priority = ['risk' => 0, 'watch' => 1, 'strong' => 2, 'unknown' => 3];
+    $ap = $priority[(string)($a['band'] ?? 'unknown')] ?? 9;
+    $bp = $priority[(string)($b['band'] ?? 'unknown')] ?? 9;
+    if ($ap !== $bp) return $ap <=> $bp;
+    return (float)($a['oee_pct'] ?? 0) <=> (float)($b['oee_pct'] ?? 0);
+  });
+
+  return $rows;
+}
+
+function mes_build_downtime_pareto(array $downtimeEvents, DateTimeImmutable $now): array {
+  $grouped = [];
+  $totalMinutes = 0.0;
+  foreach ($downtimeEvents as $event) {
+    if (!is_array($event)) continue;
+    $category = trim((string)($event['category'] ?? 'uncategorized'));
+    if ($category === '') $category = 'uncategorized';
+    $minutes = mes_minutes_between(
+      (string)($event['started_at'] ?? ''),
+      strtolower((string)($event['status'] ?? 'open')) === 'resolved' ? (string)($event['resolved_at'] ?? '') : '',
+      $now
+    );
+    if ($minutes <= 0) continue;
+    if (!isset($grouped[$category])) {
+      $grouped[$category] = [
+        'category' => $category,
+        'minutes' => 0.0,
+        'event_count' => 0,
+        'open_count' => 0,
+        'major_count' => 0,
+        'latest_started_at' => '',
+      ];
+    }
+    $grouped[$category]['minutes'] += $minutes;
+    $grouped[$category]['event_count']++;
+    if (strtolower((string)($event['status'] ?? 'open')) === 'open') $grouped[$category]['open_count']++;
+    if (in_array(strtolower((string)($event['severity'] ?? 'minor')), ['major', 'critical'], true)) $grouped[$category]['major_count']++;
+    $startedAt = (string)($event['started_at'] ?? '');
+    if ($startedAt !== '' && $startedAt > (string)$grouped[$category]['latest_started_at']) {
+      $grouped[$category]['latest_started_at'] = $startedAt;
+    }
+    $totalMinutes += $minutes;
+  }
+
+  $rows = array_values($grouped);
+  usort($rows, static function ($a, $b) {
+    return (float)($b['minutes'] ?? 0) <=> (float)($a['minutes'] ?? 0);
+  });
+
+  $runningShare = 0.0;
+  foreach ($rows as &$row) {
+    $share = $totalMinutes > 0 ? round(((float)$row['minutes'] / $totalMinutes) * 100, 1) : 0.0;
+    $runningShare += $share;
+    $row['share_pct'] = $share;
+    $row['cumulative_pct'] = min(100.0, round($runningShare, 1));
+  }
+  unset($row);
+
+  return $rows;
+}
+
+function mes_build_program_handshake_queue(array $dispatch): array {
+  $rows = [];
+  foreach ($dispatch as $row) {
+    if (!is_array($row)) continue;
+    $status = strtolower((string)($row['status'] ?? 'scheduled'));
+    if (!in_array($status, ['setup', 'running', 'inspection', 'on_hold'], true)) continue;
+
+    $expectedProgram = trim((string)($row['nc_program_id'] ?? ''));
+    if ($expectedProgram === '') continue;
+
+    $telemetry = (array)($row['telemetry'] ?? []);
+    $actualProgram = trim((string)($telemetry['current_program_id'] ?? ''));
+    $connectorHealth = strtolower((string)($telemetry['connector_health'] ?? 'offline'));
+    $freshSignal = in_array($connectorHealth, ['healthy', 'delayed', 'manual_only'], true);
+
+    $issueType = '';
+    $severity = 'info';
+    if ($actualProgram === '' && $freshSignal) {
+      $issueType = 'missing_program';
+      $severity = 'warning';
+    } elseif ($actualProgram !== '' && strcasecmp($actualProgram, $expectedProgram) !== 0) {
+      $issueType = 'program_mismatch';
+      $severity = $freshSignal ? 'critical' : 'warning';
+    }
+    if ($issueType === '') continue;
+
+    $rows[] = [
+      'wo_number' => (string)($row['wo_number'] ?? ''),
+      'jo_number' => (string)($row['jo_number'] ?? ''),
+      'so_number' => (string)($row['so_number'] ?? ''),
+      'machine_id' => (string)($row['machine_id'] ?? ''),
+      'machine_name' => (string)($row['machine_name'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'operator_id' => (string)($row['operator_id'] ?? ''),
+      'operator_name' => (string)($row['operator_name'] ?? ''),
+      'customer_name' => (string)($row['customer_name'] ?? ''),
+      'part_number' => (string)($row['part_number'] ?? ''),
+      'part_revision' => (string)($row['part_revision'] ?? ''),
+      'status' => $status,
+      'issue_type' => $issueType,
+      'severity' => $severity,
+      'expected_program_id' => $expectedProgram,
+      'actual_program_id' => $actualProgram,
+      'connector_health' => $connectorHealth,
+      'signal_state' => (string)($telemetry['signal_state'] ?? ''),
+      'last_heartbeat_at' => (string)($telemetry['last_heartbeat_at'] ?? ''),
+      'signal_freshness_seconds' => $telemetry['signal_freshness_seconds'] ?? null,
+      'message_vi' => $issueType === 'missing_program'
+        ? 'Máy chưa trả về mã chương trình NC đang chạy.'
+        : 'Chương trình NC trên máy không khớp với WO phát hành.',
+      'message_en' => $issueType === 'missing_program'
+        ? 'Machine did not report the active NC program.'
+        : 'Machine NC program does not match the released WO.',
+    ];
+  }
+
+  usort($rows, static function ($a, $b) {
+    $priority = ['critical' => 0, 'warning' => 1, 'info' => 2];
+    $ap = $priority[(string)($a['severity'] ?? 'info')] ?? 9;
+    $bp = $priority[(string)($b['severity'] ?? 'info')] ?? 9;
+    if ($ap !== $bp) return $ap <=> $bp;
+    return strcmp((string)($a['wo_number'] ?? ''), (string)($b['wo_number'] ?? ''));
+  });
+
+  return $rows;
+}
+
 function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $customers = master_index_by((array)($master['customers'] ?? []), 'customer_id');
   $parts = master_index_by((array)($master['parts'] ?? []), 'part_number');
@@ -2790,6 +2970,12 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     ];
   }, array_values(array_filter($dispatch, fn($row) => in_array((string)($row['evidence_gate']['status'] ?? 'not_required'), ['missing', 'partial'], true)))));
 
+  $oeeTimeline = mes_build_oee_timeline($machineWall);
+  $downtimePareto = mes_build_downtime_pareto((array)($mes['downtime_events'] ?? []), $now);
+  $programHandshakeQueue = mes_build_program_handshake_queue($dispatch);
+
+  $kpis['program_mismatches'] = count($programHandshakeQueue);
+
   return [
     'kpis' => $kpis,
     'machine_wall' => $machineWall,
@@ -2799,6 +2985,9 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'progress_reports' => array_slice(array_values(array_reverse((array)($mes['progress_reports'] ?? []))), 0, 20),
     'work_center_summary' => $workCenterSummary,
     'connector_summary' => $connectorSummary,
+    'oee_timeline' => array_slice($oeeTimeline, 0, 12),
+    'downtime_pareto' => array_slice($downtimePareto, 0, 8),
+    'program_handshake_queue' => array_slice($programHandshakeQueue, 0, 20),
     'tooling_alerts' => array_slice($toolingAlerts, 0, 20),
     'evidence_gate_queue' => array_slice($evidenceGateQueue, 0, 20),
   ];
@@ -10644,10 +10833,11 @@ if ($username === '') {
     $mes = load_mes_runtime_store();
     $mesSnapshot = build_mes_snapshot($orders, $master, $mes);
     $woMissingEvidence = count((array)($mesSnapshot['evidence_gate_queue'] ?? []));
+    $programMismatches = count((array)($mesSnapshot['program_handshake_queue'] ?? []));
 
     // 6. Orphan record links (links pointing to non-existent orders)
     $orphanLinks = 0;
-    foreach ($formLinks as $link) {
+    foreach ((array)($orders['form_links'] ?? []) as $link) {
       if (!is_array($link)) continue;
       $ot = (string)($link['order_type'] ?? '');
       $oid = (string)($link['order_id'] ?? '');
@@ -10663,6 +10853,7 @@ if ($username === '') {
       'overdue_orders'      => $overdueOrders,
       'overdue_capas'       => $overdueCapas,
       'wo_missing_evidence' => $woMissingEvidence,
+      'program_mismatches'  => $programMismatches,
       'orphan_links'        => $orphanLinks,
     ]);
   }
@@ -10774,6 +10965,29 @@ if ($username === '') {
               (string)($row['customer_name'] ?? ''),
               trim((string)($row['part_number'] ?? '') . ' ' . (string)($row['part_revision'] ?? '')),
               !empty($row['missing_form_codes']) ? ('Thiếu: ' . implode(', ', (array)$row['missing_form_codes'])) : '',
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'program_mismatches': {
+        $orders = load_orders_store();
+        $master = load_master_data_store();
+        $mes = load_mes_runtime_store();
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['program_handshake_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $items[] = [
+            'id' => (string)($row['wo_number'] ?? ''),
+            'type' => (string)($row['issue_type'] ?? 'program_mismatch'),
+            'department' => (string)($row['work_center_id'] ?? ''),
+            'date' => substr((string)($row['last_heartbeat_at'] ?? ''), 0, 10),
+            'responsible' => (string)($row['machine_id'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['customer_name'] ?? ''),
+              trim((string)($row['part_number'] ?? '') . ' ' . (string)($row['part_revision'] ?? '')),
+              'EXP ' . (string)($row['expected_program_id'] ?? ''),
+              ($row['actual_program_id'] ?? '') !== '' ? ('ACT ' . (string)$row['actual_program_id']) : 'ACT missing',
             ])),
           ];
         }

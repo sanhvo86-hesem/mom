@@ -53,6 +53,7 @@ var GATE_META = {
 };
 
 var EXCEPTION_META = {
+  program_mismatches:  { vi:'Lệch chương trình NC', en:'Program mismatch', icon:'💾' },
   overdue_allocations: { vi:'Allocation quá hạn', en:'Overdue allocations', icon:'⏳' },
   failed_uploads:      { vi:'Upload lỗi', en:'Failed uploads', icon:'📤' },
   overdue_orders:      { vi:'Đơn hàng quá hạn', en:'Overdue orders', icon:'📦' },
@@ -194,6 +195,9 @@ function defaultSnapshot(){
     progress_reports: [],
     work_center_summary: [],
     connector_summary: [],
+    oee_timeline: [],
+    downtime_pareto: [],
+    program_handshake_queue: [],
     tooling_alerts: [],
     evidence_gate_queue: []
   };
@@ -258,6 +262,29 @@ function ensureStyles(){
     '.mesx-connector p{margin:4px 0 0;font-size:12px;color:#64748b;line-height:1.55}',
     '.mesx-connector-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
     '.mesx-connector-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}',
+    '.mesx-analytics{display:grid;gap:12px}',
+    '.mesx-analytics-stack{display:grid;gap:12px}',
+    '.mesx-metric-row{display:grid;grid-template-columns:160px minmax(0,1fr) 68px;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #eef2f6}',
+    '.mesx-metric-row:last-child{border-bottom:none;padding-bottom:0}',
+    '.mesx-metric-row:first-child{padding-top:0}',
+    '.mesx-metric-label strong{display:block;font-size:13px;color:#0f172a}',
+    '.mesx-metric-label span{display:block;margin-top:4px;font-size:11px;color:#64748b;line-height:1.55}',
+    '.mesx-bar{position:relative;height:12px;border-radius:999px;background:#e2e8f0;overflow:hidden}',
+    '.mesx-bar > span{position:absolute;inset:0 auto 0 0;border-radius:999px;background:linear-gradient(90deg,#1f6aa5 0%,#f9a825 100%)}',
+    '.mesx-bar[data-band=\"strong\"] > span{background:linear-gradient(90deg,#0f9d58 0%,#34d399 100%)}',
+    '.mesx-bar[data-band=\"watch\"] > span{background:linear-gradient(90deg,#f59e0b 0%,#fbbf24 100%)}',
+    '.mesx-bar[data-band=\"risk\"] > span{background:linear-gradient(90deg,#dc2626 0%,#f97316 100%)}',
+    '.mesx-metric-value{font-size:12px;font-weight:800;color:#0c2d48;text-align:right}',
+    '.mesx-pareto-row{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #eef2f6}',
+    '.mesx-pareto-row:last-child{border-bottom:none;padding-bottom:0}',
+    '.mesx-pareto-row:first-child{padding-top:0}',
+    '.mesx-pareto-main strong{display:block;font-size:13px;color:#0f172a}',
+    '.mesx-pareto-main span{display:block;margin-top:4px;font-size:11px;color:#64748b;line-height:1.55}',
+    '.mesx-handshake-list{display:grid;gap:12px}',
+    '.mesx-handshake{border:1px solid #e2e8f0;border-radius:18px;padding:14px;background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%)}',
+    '.mesx-handshake-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}',
+    '.mesx-handshake h4{margin:0;font-size:14px;color:#0f172a}',
+    '.mesx-handshake p{margin:6px 0 0;font-size:12px;color:#64748b;line-height:1.6}',
     '.mesx-mini{padding:10px 12px;border-radius:14px;background:#f8fafc;border:1px solid #edf2f7}',
     '.mesx-mini small{display:block;font-size:10px;font-weight:800;color:#64748b;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}',
     '.mesx-mini strong{display:block;font-size:13px;color:#0f172a}',
@@ -626,6 +653,64 @@ function renderProgressList(rows){
   }).join('');
 }
 
+function renderOeeTimeline(rows){
+  if(!rows.length){
+    return '<div class="mesx-empty"><strong>' + esc(t('Chưa có OEE timeline', 'No OEE timeline yet')) + '</strong>' + esc(t('Cần ít nhất một máy có runtime hoặc tiến độ để tính OEE.', 'At least one machine needs runtime or progress to compute OEE.')) + '</div>';
+  }
+  return '<div class="mesx-analytics-stack">' + rows.slice(0, 6).map(function(row){
+    var band = String(row.band || 'unknown');
+    var dominantMap = {
+      availability: t('Availability là nút thắt', 'Availability is the bottleneck'),
+      performance: t('Performance đang kéo xuống', 'Performance is dragging down'),
+      quality: t('Quality cần phản ứng', 'Quality needs reaction')
+    };
+    var note = dominantMap[row.dominant_loss] || t('Đủ dữ liệu để so sánh theo máy', 'Enough data to compare by machine');
+    return '<div class="mesx-metric-row">' +
+      '<div class="mesx-metric-label"><strong>' + esc((row.machine_id || '—') + ' · ' + (row.active_wo_number || t('Chưa gắn WO', 'No WO'))) + '</strong><span>' + esc([row.customer_name || '', row.part_number || '', row.part_revision || '', note].filter(Boolean).join(' · ')) + '</span></div>' +
+      '<div class="mesx-bar" data-band="' + esc(band) + '"><span style="width:' + esc(String(Math.max(0, Math.min(100, Number(row.oee_pct || 0))))) + '%"></span></div>' +
+      '<div class="mesx-metric-value">' + esc(fmtPercent(row.oee_pct)) + '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+function renderDowntimePareto(rows){
+  if(!rows.length){
+    return '<div class="mesx-empty"><strong>' + esc(t('Chưa có downtime đủ để phân tích', 'No downtime available for pareto')) + '</strong>' + esc(t('Khi runtime có downtime, bảng pareto sẽ xếp hạng theo tổng phút mất.', 'Once downtime exists in runtime, the pareto view will rank losses by total minutes.')) + '</div>';
+  }
+  return '<div class="mesx-analytics-stack">' + rows.slice(0, 5).map(function(row){
+    var band = Number(row.share_pct || 0) >= 50 ? 'risk' : (Number(row.share_pct || 0) >= 25 ? 'watch' : 'strong');
+    return '<div class="mesx-pareto-row">' +
+      '<div class="mesx-pareto-main"><strong>' + esc(String(row.category || 'uncategorized')) + '</strong><span>' + esc([(row.event_count || 0) + ' ' + t('sự kiện', 'events'), (row.open_count || 0) + ' ' + t('đang mở', 'open'), (row.major_count || 0) + ' ' + t('mức major+', 'major+')].join(' · ')) + '</span><div class="mesx-bar" data-band="' + esc(band) + '" style="margin-top:8px"><span style="width:' + esc(String(Math.max(0, Math.min(100, Number(row.share_pct || 0))))) + '%"></span></div></div>' +
+      '<div class="mesx-metric-value">' + esc(fmtMinutes(row.minutes || 0) + ' · ' + fmtPercent(row.share_pct || 0)) + '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+function renderProgramHandshakeQueue(rows){
+  if(!rows.length){
+    return '<div class="mesx-empty"><strong>' + esc(t('NC handshake đang sạch', 'NC handshake is clean')) + '</strong>' + esc(t('Chưa có WO nào báo sai hoặc thiếu chương trình NC so với lệnh phát hành.', 'No active WO is reporting a missing or mismatched NC program against the released route.')) + '</div>';
+  }
+  return '<div class="mesx-handshake-list">' + rows.slice(0, 8).map(function(row){
+    var severity = String(row.severity || 'info') === 'critical' ? statusMeta('down') : statusMeta('on_hold');
+    var context = {
+      so_number: row.so_number || '',
+      jo_number: row.jo_number || '',
+      wo_number: row.wo_number || '',
+      part_number: row.part_number || '',
+      part_revision: row.part_revision || '',
+      machine_id: row.machine_id || '',
+      work_center_id: row.work_center_id || '',
+      operator_id: row.operator_id || ''
+    };
+    return '<div class="mesx-handshake">' +
+      '<div class="mesx-handshake-head"><div><h4>' + esc((row.machine_id || '—') + ' · ' + (row.wo_number || '—')) + '</h4><p>' + esc([row.customer_name || '', row.part_number || '', row.part_revision || '', row.machine_name || ''].filter(Boolean).join(' · ')) + '</p></div>' + badge(severity) + '</div>' +
+      '<div class="mesx-meta">' + esc([t('Kỳ vọng', 'Expected') + ': ' + (row.expected_program_id || '—'), t('Thực tế', 'Actual') + ': ' + (row.actual_program_id || t('Thiếu', 'Missing')), t('Kết nối', 'Connector') + ': ' + (row.connector_health || 'offline')].join(' · ')) + '</div>' +
+      '<p>' + esc(t(row.message_vi || 'Cần xác nhận lại chương trình NC trước khi tiếp tục chạy.', row.message_en || 'Validate the NC program before continuing the run.')) + '</p>' +
+      '<div class="mesx-mini-actions" style="margin-top:10px"><button type="button" class="mesx-link warning" data-open-signal-bridge="' + esc(row.machine_id || '') + '">' + esc(t('Xác nhận tín hiệu', 'Verify signal')) + '</button><button type="button" class="mesx-link" data-report-progress="' + esc(row.wo_number || '') + '">' + esc(t('Báo tiến độ', 'Report progress')) + '</button><button type="button" class="mesx-link" data-open-form="FRM-519" data-context="' + esc(jsonAttr(context)) + '">' + esc(t('Mở pre-run', 'Open pre-run')) + '</button></div>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
 function render(){
   if(!state.container) return;
   if(state.loading && !state.snapshot){
@@ -638,7 +723,15 @@ function render(){
   var centers = workCenters();
   var machineWall = Array.isArray(snapshot.machine_wall) ? snapshot.machine_wall : [];
   var connectors = Array.isArray(snapshot.connector_summary) ? snapshot.connector_summary : [];
+  var oeeTimeline = Array.isArray(snapshot.oee_timeline) ? snapshot.oee_timeline : [];
+  var downtimePareto = Array.isArray(snapshot.downtime_pareto) ? snapshot.downtime_pareto : [];
+  var programHandshake = Array.isArray(snapshot.program_handshake_queue) ? snapshot.program_handshake_queue : [];
   var kpi = snapshot.kpis || {};
+  var analyticsBand =
+    '<section class="mesx-band" style="margin-top:18px">' +
+      '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Xung OEE và pareto downtime', 'OEE pulse and downtime pareto')) + '</h2><p>' + esc(t('Đọc nhanh máy nào đang kéo OEE xuống và loại downtime nào đang nuốt nhiều phút mất nhất để ra phản ứng đúng thứ tự.', 'See which machines are pulling OEE down and which downtime category is consuming the most lost minutes so action follows the right order.')) + '</p></div></div><div class="mesx-analytics"><div class="mesx-section" style="margin-top:0;padding-top:0;border-top:none"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('OEE theo máy', 'Machine OEE pulse')) + '</small><strong>' + esc(t('Ưu tiên dải đỏ trước, sau đó xử lý nút thắt availability / performance / quality.', 'Work the red band first, then the dominant availability / performance / quality loss.')) + '</strong></div>' + renderOeeTimeline(oeeTimeline) + '</div><div class="mesx-section"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Pareto downtime', 'Downtime pareto')) + '</small><strong>' + esc(t('Nhìn loại tổn thất lớn nhất trước khi đổ nguồn lực xử lý rải rác.', 'Look at the dominant loss mode before spreading recovery effort across too many categories.')) + '</strong></div>' + renderDowntimePareto(downtimePareto) + '</div></div></article>' +
+      '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('NC handshake queue', 'NC handshake queue')) + '</h2><p>' + esc(t('So khớp chương trình máy đang báo về với WO phát hành để chặn chạy nhầm revision hoặc thiếu handshake trước khi tiếp tục cắt.', 'Match the machine-reported program against the released WO to stop wrong revisions or missing handshakes before the cut continues.')) + '</p></div></div>' + renderProgramHandshakeQueue(programHandshake) + '</article>' +
+    '</section>';
 
   state.container.innerHTML = '<div class="mesx">' +
     '<section class="mesx-hero">' +
@@ -655,6 +748,7 @@ function render(){
           renderKpiTile(t('Kết nối rủi ro', 'Connector risk'), kpi.connectors_stale || 0, t('Stale hoặc offline cần xử lý ngay', 'Stale or offline, needs action')) +
           renderKpiTile(t('Tooling cảnh báo', 'Tooling alerts'), kpi.tooling_alerts || 0, t('Tool gần tới hạn hoặc lệch offset', 'Tool near limit or offset risk')) +
           renderKpiTile(t('WO thiếu gate', 'WO missing gates'), kpi.wo_gate_missing || 0, t('Cần bổ sung chứng cứ bắt buộc', 'Evidence gate completion required')) +
+          renderKpiTile(t('Lệch chương trình NC', 'Program mismatches'), kpi.program_mismatches || 0, t('Máy đang báo sai hoặc thiếu chương trình so với WO', 'Machine-reported program is missing or mismatched against the WO')) +
           renderKpiTile(t('Cầu nối tay', 'Manual bridges'), kpi.manual_bridges || 0, t('Máy đang cập nhật bằng manual bridge', 'Machines currently updated through the manual bridge')) +
           renderKpiTile('Availability', fmtPercent(kpi.availability_pct), t('Thời gian sẵn sàng của máy', 'Machine readiness time')) +
           renderKpiTile('Performance', fmtPercent(kpi.performance_pct), t('So với takt / runtime kế hoạch', 'Against planned runtime')) +
@@ -668,6 +762,7 @@ function render(){
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Ngoại lệ cần xử lý', 'Exceptions to handle')) + '</h2><p>' + esc(t('Nhóm các ngoại lệ ảnh hưởng trực tiếp đến truy xuất, giao hàng, upload và evidence readiness.', 'Grouped exceptions that directly affect traceability, delivery, uploads, and evidence readiness.')) + '</p></div></div>' + renderExceptionRail() + '</article>' +
     '</section>' +
     '<section class="mesx-band" style="margin-top:18px"><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Giám sát kết nối máy', 'Machine connectivity overview')) + '</h2><p>' + esc(t('Theo dõi từng máy đang lấy trạng thái từ MTConnect, OPC UA hay cầu nối nhập tay; nhịp heartbeat nào stale sẽ nổi lên trước để không bị mù dữ liệu shop-floor.', 'Track whether each machine is reading state from MTConnect, OPC UA, or a manual bridge; stale heartbeats rise to the top so the shop floor never goes blind.')) + '</p></div></div><div class="mesx-connector-grid">' + (connectors.length ? connectors.map(renderConnectorCard).join('') : '<div class="mesx-empty"><strong>' + esc(t('Chưa có connector runtime', 'No connector runtime yet')) + '</strong>' + esc(t('Hãy bơm tín hiệu pilot hoặc khai báo metadata kết nối cho máy.', 'Seed a pilot signal or declare connector metadata for the machine first.')) + '</div>') + '</div></article><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Điểm rơi vận hành', 'Runtime guidance')) + '</h2><p>' + esc(t('Luôn ưu tiên xử lý theo thứ tự: stale connector -> downtime -> gate chứng cứ -> tooling alert. Điều này giúp OEE và traceability không lệch nhau.', 'Always triage in this order: stale connector -> downtime -> evidence gate -> tooling alert. This keeps OEE and traceability aligned.')) + '</p></div></div><div class="mesx-list"><div class="mesx-list-item"><h4>' + esc(t('Heartbeat stale là blocker ẩn', 'Stale heartbeat is a hidden blocker')) + '</h4><p>' + esc(t('Nếu máy vẫn chạy nhưng connector stale, OEE và dispatch có thể đẹp giả. Hãy cập nhật tín hiệu hoặc khôi phục adapter trước khi tin vào số liệu.', 'If the machine keeps running while the connector is stale, OEE and dispatch can look falsely healthy. Update the signal or restore the adapter before trusting the numbers.')) + '</p></div><div class="mesx-list-item"><h4>' + esc(t('Cầu nối tay là chế độ chuyển tiếp', 'Manual bridge is a transition mode')) + '</h4><p>' + esc(t('Dùng manual bridge cho CMM hoặc pilot machine là hợp lý, nhưng phải nhìn rõ máy nào còn đang phụ thuộc nhập tay để ưu tiên tự động hóa tiếp.', 'Using the manual bridge for a CMM or a pilot machine is acceptable, but operators must clearly see which assets still depend on manual input so automation can be prioritized next.')) + '</p></div></div></article></section>' +
+    analyticsBand +
     '<section class="mesx-main">' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Dispatch board theo Work Order', 'Work Order dispatch board')) + '</h2><p>' + esc(t('Lọc theo work center và trạng thái, sau đó báo tiến độ hoặc mở đúng form chứng cứ mà không phải nhập tay context.', 'Filter by work center and status, then report progress or launch the correct evidence form without typing context by hand.')) + '</p></div></div><div class="mesx-toolbar"><input class="mesx-input search" id="mes-search" type="search" value="' + esc(state.search) + '" placeholder="' + esc(t('Tìm WO / Part / máy / khách hàng...', 'Search WO / part / machine / customer...')) + '"><select class="mesx-select" id="mes-filter-center"><option value="">' + esc(t('Tất cả work center', 'All work centers')) + '</option>' + centers.map(function(center){ return '<option value="' + esc(center.work_center_id || '') + '"' + (state.workCenter === center.work_center_id ? ' selected' : '') + '>' + esc((center.work_center_id || '') + ' · ' + (center.work_center_name || '')) + '</option>'; }).join('') + '</select><select class="mesx-select" id="mes-filter-status"><option value="">' + esc(t('Tất cả trạng thái', 'All statuses')) + '</option>' + ['scheduled','setup','running','inspection','on_hold','completed'].map(function(key){ return '<option value="' + esc(key) + '"' + (state.dispatchStatus === key ? ' selected' : '') + '>' + esc(t(statusMeta(key).vi, statusMeta(key).en)) + '</option>'; }).join('') + '</select></div>' + renderDispatchTable(rows) + '</article>' +
       '<div class="mesx-stack"><article class="mesx-panel"><div class="mesx-panel-head"><div><h3>' + esc(t('Machine wall', 'Machine wall')) + '</h3><p>' + esc(t('Từng máy hiển thị tình trạng, OEE, gate chứng cứ và tool-life để trưởng ca xử lý ngay tại chỗ.', 'Each machine shows state, OEE, evidence gate, and tool-life so supervisors can act directly on the floor.')) + '</p></div></div><div class="mesx-machine-wall">' + (machineWall.length ? machineWall.map(renderMachineCard).join('') : '<div class="mesx-empty"><strong>' + esc(t('Chưa có machine wall', 'No machine wall data')) + '</strong>' + esc(t('Hãy khai báo máy trong master data trước.', 'Define machines in master data first.')) + '</div>') + '</div></article></div>' +

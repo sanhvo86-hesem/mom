@@ -212,11 +212,11 @@
       "last_heartbeat_at": "2026-03-29T13:47:00+07:00",
       "wo_number": "WO-2026-00001",
       "operator_id": "OPR-001",
-      "current_program_id": "NC_714-1101_REVC_OP10_5AX_V3",
+      "current_program_id": "NC_714-1101_REVC_OP10_5AX_V2",
       "spindle_load_pct": 68,
       "feed_override_pct": 100,
       "part_count": 24,
-      "note": "Heartbeat tốt, spindle load ổn định sau prove-out.",
+      "note": "Heartbeat tốt nhưng máy vẫn đang giữ V2, cần xác nhận handshake lên V3 trước khi chạy tiếp.",
       "updated_at": "2026-03-29T13:47:00+07:00",
       "updated_by": "system"
     },
