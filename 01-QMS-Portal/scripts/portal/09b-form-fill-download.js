@@ -332,7 +332,7 @@ function renderOnlineRuntime(form, allocation){
       done: !!state.signatures[step.id]
     };
   });
-  return '<div style="display:grid;gap:16px"><div class="ecf-stepper">' + steps.map(function(step){ return '<span class="ecf-step' + (step.done ? ' done' : '') + '">' + esc(step.label) + '</span>'; }).join('') + '</div><div class="ecf-context">' + renderContext(t('Mã hồ sơ', 'Record ID'), allocation.record_id) + renderContext(t('Khách hàng', 'Customer'), ctx.customer_id) + renderContext(t('SO / JO / WO', 'SO / JO / WO'), [ctx.so_number || '', ctx.jo_number || '', ctx.wo_number || ''].filter(Boolean).join(' · ')) + renderContext(t('Part / Rev', 'Part / Rev'), [ctx.part_number || '', ctx.part_revision || ''].filter(Boolean).join(' · ')) + renderContext(t('Allocation status', 'Allocation status'), allocation.status || 'allocated') + renderContext(t('Approval state', 'Approval state'), currentApprovalState(form)) + '</div>' + sections.map(function(section){ return renderSection(schema, section); }).join('') + renderSignatureSection(form) + '<div class="ecf-actions"><button type="button" class="ecf-btn secondary" id="ecf-save-draft">💾 ' + esc(t('Lưu nháp', 'Save draft')) + '</button><button type="button" class="ecf-btn ghost" id="ecf-reset-form">↺ ' + esc(t('Làm sạch dữ liệu', 'Reset form')) + '</button><button type="button" class="ecf-btn primary" id="ecf-submit-online">✅ ' + esc(t('Gửi biểu mẫu online', 'Submit online form')) + '</button></div>' +
+  return '<div style="display:grid;gap:16px"><div class="ecf-stepper">' + steps.map(function(step){ return '<span class="ecf-step' + (step.done ? ' done' : '') + '">' + esc(step.label) + '</span>'; }).join('') + '</div><div class="ecf-context">' + renderContext(t('Mã hồ sơ', 'Record ID'), allocation.record_id) + renderContext(t('Khách hàng', 'Customer'), ctx.customer_id) + renderContext(t('SO / JO / WO', 'SO / JO / WO'), [ctx.so_number || '', ctx.jo_number || '', ctx.wo_number || ''].filter(Boolean).join(' · ')) + renderContext(t('Part / Rev', 'Part / Rev'), [ctx.part_number || '', ctx.part_revision || ''].filter(Boolean).join(' · ')) + renderContext(t('Allocation status', 'Allocation status'), allocation.status || 'allocated') + renderContext(t('Approval state', 'Approval state'), currentApprovalState(form)) + '</div>' + sections.map(function(section){ return renderSection(schema, section); }).join('') + renderSignatureSection(form) + '<div class="ecf-actions"><button type="button" class="ecf-btn secondary" id="ecf-save-draft">💾 ' + esc(t('Lưu nháp', 'Save draft')) + '</button><button type="button" class="ecf-btn ghost" id="ecf-reset-form">↺ ' + esc(t('Làm sạch dữ liệu', 'Reset form')) + '</button><button type="button" class="ecf-btn primary" id="ecf-submit-online">✅ ' + esc(t('Gửi biểu mẫu online', 'Submit online form')) + '</button></div>' + renderApprovalActionBar(allocation) +
     '<section class="ecf-section" id="ecf-history-section"><div class="ecf-section-head"><h4>' + esc(t('Lịch sử nộp form', 'Form submission history')) + '</h4><p>' + esc(t('Các bản nộp gần đây cho form này.', 'Recent submissions for this form.')) + '</p></div><div class="ecf-section-body"><div id="ecf-history-list"><div class="ecf-empty">' + esc(t('Đang tải lịch sử...', 'Loading history...')) + '</div></div><div id="ecf-history-pager" style="display:flex;gap:8px;justify-content:center;margin-top:8px"></div></div></section></div>';
 }
 
@@ -434,6 +434,7 @@ function bindOnlineForm(form){
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-sign]'), function(button){ button.onclick = function(){ openSignature(form, button.getAttribute('data-sign')); }; });
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-sign-clear]'), function(button){ button.onclick = function(){ delete state.signatures[button.getAttribute('data-sign-clear') || '']; render(state.container); }; });
   var submitBtn = document.getElementById('ecf-submit-online'); if(submitBtn) submitBtn.onclick = function(){ submitOnline(form, allocation, submitBtn); };
+  bindApprovalActions(form);
   renderHistoryPanel(form.form_code, 1);
 }
 
@@ -535,6 +536,153 @@ function collectPayload(form, allocation){
 
 function linkOrderIfPossible(allocation){
   var ctx = allocation && allocation.master_context ? allocation.master_context : {}; var orderType = ctx.wo_number ? 'wo' : (ctx.jo_number ? 'jo' : (ctx.so_number ? 'so' : '')); var orderId = ctx.wo_number || ctx.jo_number || ctx.so_number || ''; if(!orderType || !orderId || !allocation.record_id) return; api('order_link_form', { order_type: orderType, order_id: orderId, record_id: allocation.record_id }, 'POST').catch(function(){});
+}
+
+// ── Evidence Approval Engine (G3 P1-02) ─────────────────────────────────
+
+function userHasApproveRole(){
+  var user = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : {};
+  var roles = Array.isArray(user.roles) ? user.roles : [String(user.role || '')];
+  var approveRoles = ['admin', 'qa_manager', 'quality_manager', 'production_manager', 'engineering_manager', 'quality_engineer'];
+  for(var i = 0; i < roles.length; i++){
+    if(approveRoles.indexOf(String(roles[i]).toLowerCase()) >= 0) return true;
+  }
+  return false;
+}
+
+function renderApprovalActionBar(allocation){
+  if(!allocation) return '';
+  var status = String(allocation.status || '').toLowerCase();
+  var html = '';
+
+  if(status === 'submitted'){
+    html += '<div class="ecf-actions" style="border-top:2px solid #f59e0b;margin-top:8px">' +
+      '<span style="font-size:12px;font-weight:700;color:#92400e;margin-right:auto">' + esc(t('Chứng cứ đã nộp — sẵn sàng gửi duyệt', 'Evidence submitted — ready for review')) + '</span>' +
+      '<button type="button" class="ecf-btn primary" id="ecf-submit-for-review" style="background:#f59e0b">📋 ' + esc(t('Gửi duyệt', 'Submit for review')) + '</button></div>';
+  }
+
+  if(status === 'in_review'){
+    html += '<div class="ecf-actions" style="border-top:2px solid #f97316;margin-top:8px">' +
+      '<span style="font-size:12px;font-weight:700;color:#c2410c;margin-right:auto">' + esc(t('Đang chờ xem xét và phê duyệt', 'Pending review and approval')) + '</span>';
+    if(userHasApproveRole()){
+      html += '<button type="button" class="ecf-btn ghost" id="ecf-reject-evidence" style="border-color:#dc2626;color:#dc2626">✕ ' + esc(t('Từ chối', 'Reject')) + '</button>' +
+        '<button type="button" class="ecf-btn primary" id="ecf-approve-evidence" style="background:#16a34a">✓ ' + esc(t('Duyệt', 'Approve')) + '</button>';
+    } else {
+      html += '<span style="font-size:11px;color:#64748b">' + esc(t('Bạn không có quyền duyệt. Vui lòng chờ người có thẩm quyền xem xét.', 'You do not have approval authority. Please wait for a reviewer.')) + '</span>';
+    }
+    html += '</div>';
+  }
+
+  if(status === 'approved'){
+    html += '<div class="ecf-actions" style="border-top:2px solid #16a34a;margin-top:8px">' +
+      '<span style="font-size:12px;font-weight:700;color:#166534;margin-right:auto">✓ ' + esc(t('Chứng cứ đã được phê duyệt', 'Evidence has been approved')) +
+      (allocation.approved_by ? (' — ' + esc(allocation.approved_by)) : '') +
+      (allocation.approved_at ? (' · ' + esc(new Date(allocation.approved_at).toLocaleString())) : '') +
+      '</span>';
+    if(userHasApproveRole()){
+      html += '<button type="button" class="ecf-btn ghost" id="ecf-reopen-evidence">↺ ' + esc(t('Mở lại', 'Reopen')) + '</button>';
+    }
+    html += '</div>';
+  }
+
+  if(status === 'rejected'){
+    html += '<div class="ecf-actions" style="border-top:2px solid #dc2626;margin-top:8px">' +
+      '<span style="font-size:12px;font-weight:700;color:#991b1b;margin-right:auto">✕ ' + esc(t('Chứng cứ bị từ chối', 'Evidence was rejected')) +
+      (allocation.rejected_by ? (' — ' + esc(allocation.rejected_by)) : '') +
+      (allocation.rejection_reason ? (': ' + esc(allocation.rejection_reason)) : '') +
+      '</span>';
+    if(userHasApproveRole()){
+      html += '<button type="button" class="ecf-btn ghost" id="ecf-reopen-evidence">↺ ' + esc(t('Mở lại', 'Reopen')) + '</button>';
+    }
+    html += '</div>';
+  }
+
+  return html;
+}
+
+function bindApprovalActions(form){
+  var allocation = selectedAllocation(); if(!allocation) return;
+
+  var submitReviewBtn = document.getElementById('ecf-submit-for-review');
+  if(submitReviewBtn) submitReviewBtn.onclick = function(){
+    if(!confirm(t('Gửi chứng cứ này cho người có thẩm quyền xem xét và phê duyệt?', 'Submit this evidence for review and approval?'))) return;
+    submitReviewBtn.disabled = true;
+    api('evidence_submit_for_review', { allocation_id: allocation.allocation_id }, 'POST').then(function(resp){
+      if(resp && resp.ok){ toast(t('Đã gửi duyệt thành công.', 'Submitted for review successfully.'), 'success'); refreshAllocations().then(function(){ render(state.container); }); }
+      else toast(t('Không thể gửi duyệt: ', 'Could not submit for review: ') + (resp && resp.error ? resp.error : ''), 'error');
+    }).catch(function(){ toast(t('Lỗi kết nối khi gửi duyệt.', 'Connection error during review submission.'), 'error'); }).finally(function(){ submitReviewBtn.disabled = false; });
+  };
+
+  var approveBtn = document.getElementById('ecf-approve-evidence');
+  if(approveBtn) approveBtn.onclick = function(){
+    // Open e-signature modal, then prompt for password
+    if(typeof window.ESignature !== 'function'){ toast(t('Component chữ ký điện tử chưa sẵn sàng.', 'Electronic signature component is not available.'), 'error'); return; }
+    var user = currentUserProfile();
+    var schema = form && form.schema ? form.schema : {};
+    var approveBlock = (schema.signature_blocks || []).find(function(b){ return b.id === 'approved_by'; }) || {};
+    new window.ESignature({
+      lang: (typeof lang !== 'undefined' && lang === 'en') ? 'en' : 'vi',
+      requireReason: true,
+      requirePin: false
+    }).show({
+      signerId: user.signerId,
+      signerName: user.name,
+      signerRole: user.title || user.dept,
+      signatureMeaning: t(approveBlock.signature_meaning_vi || 'Phê duyệt chứng cứ kiểm soát', approveBlock.signature_meaning || 'Evidence control approval'),
+      appliedTo: (allocation.record_id || '') + ':approval',
+      onSign: function(signatureData){
+        // Prompt for password (step-up re-auth)
+        var password = prompt(t('Nhập mật khẩu để xác nhận phê duyệt (step-up re-auth):', 'Enter your password to confirm approval (step-up re-auth):'));
+        if(!password){ toast(t('Phê duyệt bị hủy — chưa nhập mật khẩu.', 'Approval cancelled — no password entered.'), 'warn'); return; }
+        approveBtn.disabled = true;
+        api('evidence_review', {
+          allocation_id: allocation.allocation_id,
+          action: 'approve',
+          reason: signatureData.reason || '',
+          signature_data: signatureData,
+          password: password
+        }, 'POST').then(function(resp){
+          if(resp && resp.ok){ toast(t('Đã phê duyệt chứng cứ thành công.', 'Evidence approved successfully.'), 'success'); refreshAllocations().then(function(){ render(state.container); }); }
+          else {
+            var errMsg = resp && resp.error ? resp.error : '';
+            if(errMsg === 'invalid_password') toast(t('Mật khẩu không đúng. Vui lòng thử lại.', 'Invalid password. Please try again.'), 'error');
+            else if(errMsg === 'insufficient_role') toast(t('Bạn không có quyền phê duyệt form này.', 'You do not have permission to approve this form.'), 'error');
+            else toast(t('Không thể phê duyệt: ', 'Could not approve: ') + errMsg, 'error');
+          }
+        }).catch(function(){ toast(t('Lỗi kết nối khi phê duyệt.', 'Connection error during approval.'), 'error'); }).finally(function(){ approveBtn.disabled = false; });
+      }
+    });
+  };
+
+  var rejectBtn = document.getElementById('ecf-reject-evidence');
+  if(rejectBtn) rejectBtn.onclick = function(){
+    var reason = prompt(t('Lý do từ chối (bắt buộc):', 'Rejection reason (required):'));
+    if(!reason || !reason.trim()){ toast(t('Phải nhập lý do từ chối.', 'A rejection reason is required.'), 'warn'); return; }
+    if(!confirm(t('Xác nhận từ chối chứng cứ này?', 'Confirm rejection of this evidence?'))) return;
+    rejectBtn.disabled = true;
+    api('evidence_review', {
+      allocation_id: allocation.allocation_id,
+      action: 'reject',
+      reason: reason.trim()
+    }, 'POST').then(function(resp){
+      if(resp && resp.ok){ toast(t('Đã từ chối chứng cứ.', 'Evidence rejected.'), 'success'); refreshAllocations().then(function(){ render(state.container); }); }
+      else toast(t('Không thể từ chối: ', 'Could not reject: ') + (resp && resp.error ? resp.error : ''), 'error');
+    }).catch(function(){ toast(t('Lỗi kết nối khi từ chối.', 'Connection error during rejection.'), 'error'); }).finally(function(){ rejectBtn.disabled = false; });
+  };
+
+  var reopenBtn = document.getElementById('ecf-reopen-evidence');
+  if(reopenBtn) reopenBtn.onclick = function(){
+    var reason = prompt(t('Lý do mở lại (bắt buộc):', 'Reopen reason (required):'));
+    if(!reason || !reason.trim()){ toast(t('Phải nhập lý do mở lại.', 'A reopen reason is required.'), 'warn'); return; }
+    reopenBtn.disabled = true;
+    api('evidence_reopen', {
+      allocation_id: allocation.allocation_id,
+      reason: reason.trim()
+    }, 'POST').then(function(resp){
+      if(resp && resp.ok){ toast(t('Đã mở lại chứng cứ.', 'Evidence reopened.'), 'success'); refreshAllocations().then(function(){ render(state.container); }); }
+      else toast(t('Không thể mở lại: ', 'Could not reopen: ') + (resp && resp.error ? resp.error : ''), 'error');
+    }).catch(function(){ toast(t('Lỗi kết nối khi mở lại.', 'Connection error during reopen.'), 'error'); }).finally(function(){ reopenBtn.disabled = false; });
+  };
 }
 
 function submitOnline(form, allocation, button){

@@ -8,7 +8,10 @@
   "status_transitions": {
     "allocated": ["form_downloaded", "void"],
     "form_downloaded": ["submitted", "void"],
-    "submitted": ["received", "resubmitted"],
+    "submitted": ["received", "resubmitted", "in_review"],
+    "in_review": ["approved", "rejected"],
+    "approved": ["closed", "submitted"],
+    "rejected": ["submitted", "void"],
     "received": ["closed", "resubmitted"],
     "resubmitted": ["received"],
     "void": [],
@@ -19,6 +22,9 @@
     "allocated":       { "label": "Allocated",        "label_vi": "Đã cấp phát",         "color": "#3b82f6", "icon": "tag" },
     "form_downloaded": { "label": "Form Downloaded",   "label_vi": "Đã tải form",         "color": "#8b5cf6", "icon": "download" },
     "submitted":       { "label": "Submitted",         "label_vi": "Đã nộp",              "color": "#f59e0b", "icon": "upload" },
+    "in_review":       { "label": "In Review",         "label_vi": "Đang xem xét",        "color": "#f97316", "icon": "eye" },
+    "approved":        { "label": "Approved",          "label_vi": "Đã duyệt",            "color": "#16a34a", "icon": "check-circle-2" },
+    "rejected":        { "label": "Rejected",          "label_vi": "Từ chối",             "color": "#dc2626", "icon": "x-octagon" },
     "received":        { "label": "Received",          "label_vi": "Đã nhận",             "color": "#10b981", "icon": "check-circle" },
     "resubmitted":     { "label": "Resubmitted",       "label_vi": "Nộp lại",             "color": "#6366f1", "icon": "refresh-cw" },
     "void":            { "label": "Void",              "label_vi": "Hủy",                 "color": "#ef4444", "icon": "x-circle" },
@@ -53,13 +59,17 @@
   ],
 
   "permissions": {
-    "allocate":   ["qms_admin", "department_head", "quality_manager"],
-    "void":       ["qms_admin", "quality_manager"],
-    "receive":    ["qms_admin", "quality_manager", "department_head"],
-    "resubmit":   ["qms_admin", "quality_manager", "allocated_by"],
-    "close":      ["qms_admin", "quality_manager"],
-    "view_all":   ["qms_admin", "quality_manager", "ceo"],
-    "view_dept":  ["department_head", "supervisor"]
+    "allocate":          ["qms_admin", "department_head", "quality_manager"],
+    "void":              ["qms_admin", "quality_manager"],
+    "receive":           ["qms_admin", "quality_manager", "department_head"],
+    "resubmit":          ["qms_admin", "quality_manager", "allocated_by"],
+    "close":             ["qms_admin", "quality_manager"],
+    "submit_for_review": ["qms_admin", "quality_manager", "allocated_by"],
+    "approve":           ["qms_admin", "qa_manager", "quality_manager", "production_manager", "engineering_manager"],
+    "reject":            ["qms_admin", "qa_manager", "quality_manager", "production_manager", "engineering_manager"],
+    "reopen":            ["qms_admin", "qa_manager", "quality_manager", "production_manager", "engineering_manager"],
+    "view_all":          ["qms_admin", "quality_manager", "ceo"],
+    "view_dept":         ["department_head", "supervisor"]
   },
 
   "notifications": {
