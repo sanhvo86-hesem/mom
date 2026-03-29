@@ -8589,6 +8589,68 @@ if ($username === '') {
     api_json(['ok' => true, 'data' => $link]);
   }
 
+  // ── Form Fill: Load Schema, Save Draft, History ─────────────────────────
+  case 'form_fill_load_schema': {
+    $code = trim((string)($_GET['form_code'] ?? ''));
+    if ($code === '') api_json(['ok' => false, 'error' => 'missing_form_code'], 400);
+    // Sanitise: allow only alphanumeric, dash, underscore, dot
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $code)) api_json(['ok' => false, 'error' => 'invalid_form_code'], 400);
+    $schemasDir = $DATA_DIR . '/online-forms/schemas';
+    $file = $schemasDir . '/' . $code . '.json';
+    if (!file_exists($file)) api_json(['ok' => false, 'error' => 'schema_not_found'], 404);
+    $schema = json_decode(file_get_contents($file), true);
+    if (!$schema) api_json(['ok' => false, 'error' => 'invalid_schema'], 500);
+    api_json(['ok' => true, 'schema' => $schema]);
+  }
+
+  case 'form_fill_save_draft': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? ''));
+    $formCode = trim((string)($body['form_code'] ?? ''));
+    $data = is_array($body['data'] ?? null) ? $body['data'] : [];
+    if ($allocationId === '' || $formCode === '') {
+      api_json(['ok' => false, 'error' => 'missing_allocation_id_or_form_code'], 400);
+    }
+    // Sanitise allocation_id
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $allocationId)) api_json(['ok' => false, 'error' => 'invalid_allocation_id'], 400);
+    $draftsDir = $DATA_DIR . '/online-forms/drafts';
+    if (!is_dir($draftsDir)) @mkdir($draftsDir, 0755, true);
+    $draftFile = $draftsDir . '/' . $allocationId . '.json';
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    $draftPayload = [
+      'allocation_id' => $allocationId,
+      'form_code' => $formCode,
+      'data' => $data,
+      'saved_at' => date('c'),
+      'saved_by' => $username,
+    ];
+    file_put_contents($draftFile, json_encode($draftPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+    api_json(['ok' => true]);
+  }
+
+  case 'form_fill_history': {
+    require_logged_in($store);
+    $formCode = trim((string)($_GET['form_code'] ?? ''));
+    $userFilter = trim((string)($_GET['user'] ?? ''));
+    $page = max(1, (int)($_GET['page'] ?? 1));
+    $pageSize = max(1, min(100, (int)($_GET['page_size'] ?? 20)));
+    if ($formCode === '') api_json(['ok' => false, 'error' => 'missing_form_code'], 400);
+    $entries = load_online_form_entries_store($formCode);
+    if ($userFilter !== '') {
+      $userFilterLc = strtolower($userFilter);
+      $entries = array_values(array_filter($entries, function ($e) use ($userFilterLc) {
+        return strtolower(trim((string)($e['submitted_by'] ?? $e['created_by'] ?? $e['_session_user'] ?? ''))) === $userFilterLc;
+      }));
+    }
+    $total = count($entries);
+    $pages = max(1, (int)ceil($total / $pageSize));
+    $offset = ($page - 1) * $pageSize;
+    $slice = array_slice($entries, $offset, $pageSize);
+    api_json(['ok' => true, 'entries' => $slice, 'total' => $total, 'page' => $page, 'pages' => $pages]);
+  }
+
   default:
     api_json(['ok' => false, 'error' => 'unknown_action'], 400);
 }
