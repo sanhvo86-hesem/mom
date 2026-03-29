@@ -44,7 +44,9 @@
       "supplier_name_vi": "A-Coat Surface Treatment",
       "supplier_type": "special_process",
       "status": "approved",
-      "approved_customers": ["CUS-LAM"],
+      "approved_customers": [
+        "CUS-LAM"
+      ],
       "contact_name": "Planner",
       "contact_email": "planner@acoat.example"
     },
@@ -54,7 +56,10 @@
       "supplier_name_vi": "Mitutoyo Vietnam",
       "supplier_type": "calibration",
       "status": "approved",
-      "approved_customers": ["CUS-LAM", "CUS-ACME"],
+      "approved_customers": [
+        "CUS-LAM",
+        "CUS-ACME"
+      ],
       "contact_name": "Service Desk",
       "contact_email": "service@mitutoyo.example"
     },
@@ -64,7 +69,10 @@
       "supplier_name_vi": "Kim Long Precision Supply",
       "supplier_type": "raw_material",
       "status": "approved",
-      "approved_customers": ["CUS-GLOBEX", "CUS-ACME"],
+      "approved_customers": [
+        "CUS-GLOBEX",
+        "CUS-ACME"
+      ],
       "contact_name": "Buyer 02",
       "contact_email": "buyer@kimlong.example"
     }

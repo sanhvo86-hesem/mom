@@ -53,22 +53,36 @@ final class MasterDataService
      * Map of entity type => primary-key field name.
      */
     private const ENTITY_KEYS = [
-        'customers'  => 'customer_id',
-        'suppliers'  => 'supplier_id',
-        'parts'      => 'part_number',
-        'revisions'  => 'revision_id',
-        'capas'      => 'capa_number',
+        'customers'                 => 'customer_id',
+        'suppliers'                 => 'supplier_id',
+        'parts'                     => 'part_number',
+        'revisions'                 => 'revision_id',
+        'nc_program_releases'       => 'program_id',
+        'capas'                     => 'capa_number',
+        'work_centers'              => 'work_center_id',
+        'machines'                  => 'machine_id',
+        'operators'                 => 'operator_id',
+        'tooling_assets'            => 'tool_id',
+        'downtime_reason_codes'     => 'reason_code',
+        'downtime_resolution_codes' => 'resolution_code',
     ];
 
     /**
      * Map of entity type => field used for duplicate detection (natural key).
      */
     private const DUPLICATE_FIELDS = [
-        'customers' => 'customer_name',
-        'suppliers' => 'supplier_name',
-        'parts'     => 'part_number',
-        'revisions' => 'revision_id',
-        'capas'     => 'capa_number',
+        'customers'                 => 'customer_name',
+        'suppliers'                 => 'supplier_name',
+        'parts'                     => 'part_number',
+        'revisions'                 => 'revision_id',
+        'nc_program_releases'       => 'program_id',
+        'capas'                     => 'capa_number',
+        'work_centers'              => 'work_center_name',
+        'machines'                  => 'machine_name',
+        'operators'                 => 'operator_id',
+        'tooling_assets'            => 'tool_id',
+        'downtime_reason_codes'     => 'reason_code',
+        'downtime_resolution_codes' => 'resolution_code',
     ];
 
     /**
@@ -76,11 +90,18 @@ final class MasterDataService
      * Statuses not listed here are rejected by changeStatus().
      */
     private const STATUS_MAP = [
-        'customers'  => ['draft', 'active', 'inactive', 'obsolete'],
-        'suppliers'  => ['draft', 'approved', 'conditional', 'blocked', 'inactive', 'obsolete'],
-        'parts'      => ['draft', 'active', 'inactive', 'obsolete'],
-        'revisions'  => ['draft', 'released', 'superseded', 'obsolete'],
-        'capas'      => ['draft', 'open', 'in_progress', 'closed', 'obsolete'],
+        'customers'                 => ['draft', 'active', 'inactive', 'blocked', 'obsolete'],
+        'suppliers'                 => ['draft', 'approved', 'conditional', 'blocked', 'inactive', 'obsolete'],
+        'parts'                     => ['draft', 'active', 'inactive', 'obsolete'],
+        'revisions'                 => ['draft', 'released', 'superseded', 'obsolete'],
+        'nc_program_releases'       => ['draft', 'released', 'blocked', 'superseded', 'obsolete'],
+        'capas'                     => ['draft', 'open', 'in_progress', 'closed', 'cancelled', 'obsolete'],
+        'work_centers'              => ['draft', 'active', 'inactive', 'blocked', 'obsolete'],
+        'machines'                  => ['draft', 'active', 'idle', 'maintenance', 'down', 'blocked', 'retired', 'obsolete'],
+        'operators'                 => ['draft', 'active', 'inactive', 'training', 'blocked', 'obsolete'],
+        'tooling_assets'            => ['draft', 'active', 'quarantine', 'retired', 'obsolete'],
+        'downtime_reason_codes'     => ['draft', 'active', 'inactive', 'obsolete'],
+        'downtime_resolution_codes' => ['draft', 'active', 'inactive', 'obsolete'],
     ];
 
     /**
@@ -89,16 +110,23 @@ final class MasterDataService
      * by STATUS_MAP first.
      */
     private const TRANSITIONS = [
-        'draft'       => ['active', 'approved', 'open', 'released'],
+        'draft'       => ['active', 'approved', 'open', 'released', 'training', 'idle', 'maintenance', 'down', 'quarantine'],
         'active'      => ['inactive', 'obsolete'],
         'approved'    => ['conditional', 'blocked', 'inactive', 'obsolete'],
         'conditional' => ['approved', 'blocked', 'inactive', 'obsolete'],
         'blocked'     => ['approved', 'conditional', 'inactive', 'obsolete'],
         'inactive'    => ['active', 'approved', 'obsolete'],
-        'open'        => ['in_progress', 'closed', 'obsolete'],
+        'open'        => ['in_progress', 'closed', 'cancelled', 'obsolete'],
         'in_progress' => ['closed', 'open', 'obsolete'],
-        'released'    => ['superseded', 'obsolete'],
+        'released'    => ['blocked', 'superseded', 'obsolete'],
         'superseded'  => ['obsolete'],
+        'idle'        => ['active', 'maintenance', 'down', 'blocked', 'retired', 'obsolete'],
+        'maintenance' => ['active', 'idle', 'blocked', 'retired', 'obsolete'],
+        'down'        => ['active', 'idle', 'maintenance', 'blocked', 'retired', 'obsolete'],
+        'training'    => ['active', 'inactive', 'blocked', 'obsolete'],
+        'quarantine'  => ['active', 'retired', 'obsolete'],
+        'cancelled'   => ['obsolete'],
+        'retired'     => ['obsolete'],
         'closed'      => ['obsolete'],
         'obsolete'    => [],
     ];
@@ -182,9 +210,14 @@ final class MasterDataService
         }
 
         $now = $this->nowIso();
+        $validStatuses = self::STATUS_MAP[$entityType] ?? [];
+        $requestedStatus = trim((string)($data['status'] ?? 'draft'));
+        if ($requestedStatus === '' || !in_array($requestedStatus, $validStatuses, true)) {
+            $requestedStatus = 'draft';
+        }
         $record = array_merge($data, [
             $idKey       => $id,
-            'status'     => 'draft',
+            'status'     => $requestedStatus,
             'created_at' => $now,
             'created_by' => $userId,
             'updated_at' => $now,
@@ -831,9 +864,16 @@ final class MasterDataService
             '_meta'     => ['version' => '1.0', 'updated' => $this->nowIso()],
             'customers' => [],
             'suppliers' => [],
-            'parts'     => [],
+            'parts' => [],
             'revisions' => [],
-            'capas'     => [],
+            'nc_program_releases' => [],
+            'capas' => [],
+            'work_centers' => [],
+            'machines' => [],
+            'operators' => [],
+            'tooling_assets' => [],
+            'downtime_reason_codes' => [],
+            'downtime_resolution_codes' => [],
         ];
     }
 

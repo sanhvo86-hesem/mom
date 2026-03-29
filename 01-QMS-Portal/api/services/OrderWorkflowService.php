@@ -330,17 +330,27 @@ final class OrderWorkflowService
         // Append to status_history
         $statusHistory   = array_values((array)($orders[$storeKey][$recordIdx]['status_history'] ?? []));
         $statusHistory[] = [
+            'status'    => $targetStatus,
             'from'      => $currentStatus,
             'to'        => $targetStatus,
             'timestamp' => $now,
             'user'      => $userId,
             'reason'    => $reason,
+            'note'      => $reason,
         ];
         $orders[$storeKey][$recordIdx]['status_history'] = $statusHistory;
 
         // Auto-set date fields
         if ($orderType === 'so' && $targetStatus === 'shipped' && empty($orders[$storeKey][$recordIdx]['shipped_date'])) {
             $orders[$storeKey][$recordIdx]['shipped_date'] = date('Y-m-d');
+        }
+        if ($orderType === 'wo') {
+            if (in_array($targetStatus, ['setup', 'running', 'inspection'], true) && empty($orders[$storeKey][$recordIdx]['actual_start'])) {
+                $orders[$storeKey][$recordIdx]['actual_start'] = $now;
+            }
+            if ($targetStatus === 'completed' && empty($orders[$storeKey][$recordIdx]['actual_end'])) {
+                $orders[$storeKey][$recordIdx]['actual_end'] = $now;
+            }
         }
         if (in_array($targetStatus, ['closed', 'completed'], true)) {
             $orders[$storeKey][$recordIdx]['closed_date'] = date('Y-m-d');
@@ -779,11 +789,17 @@ final class OrderWorkflowService
         $history = array_values((array)($orders[$storeKey][$recordIdx]['change_history'] ?? []));
 
         $fieldEntries = [];
+        $legacyChanges = [];
         foreach ($changeDiff as $field => $diff) {
             $fieldEntries[] = [
                 'field_name' => $field,
                 'old_value'  => $diff['old'] ?? null,
                 'new_value'  => $diff['new'] ?? null,
+            ];
+            $legacyChanges[] = [
+                'field' => $field,
+                'old'   => $diff['old'] ?? null,
+                'new'   => $diff['new'] ?? null,
             ];
         }
 
@@ -791,6 +807,8 @@ final class OrderWorkflowService
             'timestamp'     => $this->nowIso(),
             'user'          => $userId,
             'reason'        => $reason,
+            'note'          => $reason,
+            'changes'       => $legacyChanges,
             'field_changes' => $fieldEntries,
         ];
 

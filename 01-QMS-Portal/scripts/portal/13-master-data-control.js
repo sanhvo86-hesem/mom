@@ -511,10 +511,10 @@ function _renderEditor(){
       return window._mdEnsureSnapshot(true).then(function(snapshot){
         var key = cfg.key;
         _mdState.selectedId = String((res.item || payload)[key] || payload[key] || '');
-        _mdState.draft = _clone(res.item || payload);
+        _mdState.draft = _clone(res.pending ? payload : (res.item || payload));
         _renderRail(); _renderList(); _renderEditor();
         window.dispatchEvent(new CustomEvent('master-data:updated', { detail:{ snapshot:snapshot, entity:_mdState.entity, item:res.item || payload } }));
-        _toast(_t('Đã lưu dữ liệu nền.', 'Master data saved.'), 'success');
+        _toast(res.message || _t('Đã lưu dữ liệu nền.', 'Master data saved.'), res.pending ? 'warn' : 'success');
       });
     }).catch(function(){ _toast(_t('Lỗi mạng khi lưu dữ liệu nền.', 'Network error while saving master data.'), 'error'); });
   };

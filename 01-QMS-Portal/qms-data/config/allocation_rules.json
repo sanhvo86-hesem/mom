@@ -4,82 +4,310 @@
     "created": "2026-03-29",
     "description": "Rules governing form allocation lifecycle in Tab 3 (Record ID & Allocation). Defines status transitions, auto-void policy, retention, and allocation record schema."
   },
-
   "status_transitions": {
-    "allocated": ["form_downloaded", "void"],
-    "form_downloaded": ["submitted", "void"],
-    "submitted": ["received", "resubmitted", "in_review"],
-    "in_review": ["approved", "rejected"],
-    "approved": ["closed", "submitted"],
-    "rejected": ["submitted", "void"],
-    "received": ["closed", "resubmitted"],
-    "resubmitted": ["received"],
+    "allocated": [
+      "form_downloaded",
+      "void"
+    ],
+    "form_downloaded": [
+      "submitted",
+      "void"
+    ],
+    "submitted": [
+      "received",
+      "resubmitted",
+      "in_review"
+    ],
+    "in_review": [
+      "approved",
+      "rejected"
+    ],
+    "approved": [
+      "closed",
+      "submitted"
+    ],
+    "rejected": [
+      "submitted",
+      "void"
+    ],
+    "received": [
+      "closed",
+      "resubmitted"
+    ],
+    "resubmitted": [
+      "received"
+    ],
     "void": [],
     "closed": []
   },
-
   "status_labels": {
-    "allocated":       { "label": "Allocated",        "label_vi": "Đã cấp phát",         "color": "#3b82f6", "icon": "tag" },
-    "form_downloaded": { "label": "Form Downloaded",   "label_vi": "Đã tải form",         "color": "#8b5cf6", "icon": "download" },
-    "submitted":       { "label": "Submitted",         "label_vi": "Đã nộp",              "color": "#f59e0b", "icon": "upload" },
-    "in_review":       { "label": "In Review",         "label_vi": "Đang xem xét",        "color": "#f97316", "icon": "eye" },
-    "approved":        { "label": "Approved",          "label_vi": "Đã duyệt",            "color": "#16a34a", "icon": "check-circle-2" },
-    "rejected":        { "label": "Rejected",          "label_vi": "Từ chối",             "color": "#dc2626", "icon": "x-octagon" },
-    "received":        { "label": "Received",          "label_vi": "Đã nhận",             "color": "#10b981", "icon": "check-circle" },
-    "resubmitted":     { "label": "Resubmitted",       "label_vi": "Nộp lại",             "color": "#6366f1", "icon": "refresh-cw" },
-    "void":            { "label": "Void",              "label_vi": "Hủy",                 "color": "#ef4444", "icon": "x-circle" },
-    "closed":          { "label": "Closed",            "label_vi": "Đóng",                "color": "#6b7280", "icon": "archive" }
+    "allocated": {
+      "label": "Allocated",
+      "label_vi": "Đã cấp phát",
+      "color": "#3b82f6",
+      "icon": "tag"
+    },
+    "form_downloaded": {
+      "label": "Form Downloaded",
+      "label_vi": "Đã tải form",
+      "color": "#8b5cf6",
+      "icon": "download"
+    },
+    "submitted": {
+      "label": "Submitted",
+      "label_vi": "Đã nộp",
+      "color": "#f59e0b",
+      "icon": "upload"
+    },
+    "in_review": {
+      "label": "In Review",
+      "label_vi": "Đang xem xét",
+      "color": "#f97316",
+      "icon": "eye"
+    },
+    "approved": {
+      "label": "Approved",
+      "label_vi": "Đã duyệt",
+      "color": "#16a34a",
+      "icon": "check-circle-2"
+    },
+    "rejected": {
+      "label": "Rejected",
+      "label_vi": "Từ chối",
+      "color": "#dc2626",
+      "icon": "x-octagon"
+    },
+    "received": {
+      "label": "Received",
+      "label_vi": "Đã nhận",
+      "color": "#10b981",
+      "icon": "check-circle"
+    },
+    "resubmitted": {
+      "label": "Resubmitted",
+      "label_vi": "Nộp lại",
+      "color": "#6366f1",
+      "icon": "refresh-cw"
+    },
+    "void": {
+      "label": "Void",
+      "label_vi": "Hủy",
+      "color": "#ef4444",
+      "icon": "x-circle"
+    },
+    "closed": {
+      "label": "Closed",
+      "label_vi": "Đóng",
+      "color": "#6b7280",
+      "icon": "archive"
+    }
   },
-
   "auto_void_days": 90,
   "auto_void_description": "Allocations not submitted within 90 days of creation are automatically voided by the system scheduler",
-
   "version_increment_on_resubmit": true,
   "max_resubmit_count": 5,
-
   "retention_days": 365,
   "retention_description": "Void and closed allocations are retained for 365 days before archival. Active allocations are never auto-archived.",
-
   "fields": [
-    { "key": "allocation_id",    "type": "uuid",     "required": true,  "description": "System-generated UUID for each allocation" },
-    { "key": "record_id",        "type": "string",   "required": true,  "description": "Generated Record ID (e.g. NCR-2026-001)" },
-    { "key": "record_type",      "type": "string",   "required": true,  "description": "Record type code from _registry.json (e.g. NCR, CAPA)" },
-    { "key": "department",       "type": "string",   "required": true,  "description": "Department code (e.g. QA, PRO, ENG)" },
-    { "key": "allocated_by",     "type": "string",   "required": true,  "description": "User ID of person who allocated the record" },
-    { "key": "allocated_at",     "type": "datetime", "required": true,  "description": "ISO 8601 timestamp of allocation" },
-    { "key": "status",           "type": "string",   "required": true,  "description": "Current status per status_transitions" },
-    { "key": "form_code",        "type": "string",   "required": false, "description": "Linked form code (e.g. FRM-631), null if no form" },
-    { "key": "linked_job",       "type": "string",   "required": false, "description": "Job number if allocation is job-specific" },
-    { "key": "linked_wo",        "type": "string",   "required": false, "description": "Work order ID if allocation is WO-specific" },
-    { "key": "return_status",    "type": "string",   "required": false, "description": "Status of returned/uploaded form (pass, fail, pending_review)" },
-    { "key": "returned_at",      "type": "datetime", "required": false, "description": "ISO 8601 timestamp of form return/upload" },
-    { "key": "returned_version", "type": "integer",  "required": false, "description": "Version number of returned form, increments on resubmit" },
-    { "key": "file_hash",        "type": "string",   "required": false, "description": "SHA-256 hash of uploaded file for integrity verification" },
-    { "key": "notes",            "type": "string",   "required": false, "description": "Free-text notes from allocator or reviewer" }
+    {
+      "key": "allocation_id",
+      "type": "uuid",
+      "required": true,
+      "description": "System-generated UUID for each allocation"
+    },
+    {
+      "key": "record_id",
+      "type": "string",
+      "required": true,
+      "description": "Generated Record ID (e.g. NCR-2026-001)"
+    },
+    {
+      "key": "record_type",
+      "type": "string",
+      "required": true,
+      "description": "Record type code from _registry.json (e.g. NCR, CAPA)"
+    },
+    {
+      "key": "department",
+      "type": "string",
+      "required": true,
+      "description": "Department code (e.g. QA, PRO, ENG)"
+    },
+    {
+      "key": "allocated_by",
+      "type": "string",
+      "required": true,
+      "description": "User ID of person who allocated the record"
+    },
+    {
+      "key": "allocated_at",
+      "type": "datetime",
+      "required": true,
+      "description": "ISO 8601 timestamp of allocation"
+    },
+    {
+      "key": "status",
+      "type": "string",
+      "required": true,
+      "description": "Current status per status_transitions"
+    },
+    {
+      "key": "form_code",
+      "type": "string",
+      "required": false,
+      "description": "Linked form code (e.g. FRM-631), null if no form"
+    },
+    {
+      "key": "linked_job",
+      "type": "string",
+      "required": false,
+      "description": "Job number if allocation is job-specific"
+    },
+    {
+      "key": "linked_wo",
+      "type": "string",
+      "required": false,
+      "description": "Work order ID if allocation is WO-specific"
+    },
+    {
+      "key": "return_status",
+      "type": "string",
+      "required": false,
+      "description": "Status of returned/uploaded form (pass, fail, pending_review)"
+    },
+    {
+      "key": "returned_at",
+      "type": "datetime",
+      "required": false,
+      "description": "ISO 8601 timestamp of form return/upload"
+    },
+    {
+      "key": "returned_version",
+      "type": "integer",
+      "required": false,
+      "description": "Version number of returned form, increments on resubmit"
+    },
+    {
+      "key": "file_hash",
+      "type": "string",
+      "required": false,
+      "description": "SHA-256 hash of uploaded file for integrity verification"
+    },
+    {
+      "key": "notes",
+      "type": "string",
+      "required": false,
+      "description": "Free-text notes from allocator or reviewer"
+    }
   ],
-
   "permissions": {
-    "allocate":          ["qms_admin", "department_head", "quality_manager"],
-    "void":              ["qms_admin", "quality_manager"],
-    "receive":           ["qms_admin", "quality_manager", "department_head"],
-    "resubmit":          ["qms_admin", "quality_manager", "allocated_by"],
-    "close":             ["qms_admin", "quality_manager"],
-    "submit_for_review": ["qms_admin", "quality_manager", "allocated_by"],
-    "approve":           ["qms_admin", "qa_manager", "quality_manager", "production_manager", "engineering_manager"],
-    "reject":            ["qms_admin", "qa_manager", "quality_manager", "production_manager", "engineering_manager"],
-    "reopen":            ["qms_admin", "qa_manager", "quality_manager", "production_manager", "engineering_manager"],
-    "view_all":          ["qms_admin", "quality_manager", "ceo"],
-    "view_dept":         ["department_head", "supervisor"]
+    "allocate": [
+      "qms_admin",
+      "department_head",
+      "quality_manager"
+    ],
+    "void": [
+      "qms_admin",
+      "quality_manager"
+    ],
+    "receive": [
+      "qms_admin",
+      "quality_manager",
+      "department_head"
+    ],
+    "resubmit": [
+      "qms_admin",
+      "quality_manager",
+      "allocated_by"
+    ],
+    "close": [
+      "qms_admin",
+      "quality_manager"
+    ],
+    "submit_for_review": [
+      "qms_admin",
+      "quality_manager",
+      "allocated_by"
+    ],
+    "approve": [
+      "qms_admin",
+      "qa_manager",
+      "quality_manager",
+      "production_manager",
+      "engineering_manager"
+    ],
+    "reject": [
+      "qms_admin",
+      "qa_manager",
+      "quality_manager",
+      "production_manager",
+      "engineering_manager"
+    ],
+    "reopen": [
+      "qms_admin",
+      "qa_manager",
+      "quality_manager",
+      "production_manager",
+      "engineering_manager"
+    ],
+    "view_all": [
+      "qms_admin",
+      "quality_manager",
+      "ceo"
+    ],
+    "view_dept": [
+      "department_head",
+      "supervisor"
+    ]
   },
-
   "notifications": {
-    "on_allocate":     { "notify": ["allocated_by"], "channel": ["email", "teams"] },
-    "on_void":         { "notify": ["allocated_by"], "channel": ["email", "teams"] },
-    "on_submit":       { "notify": ["quality_manager", "department_head"], "channel": ["email", "teams"] },
-    "on_auto_void":    { "notify": ["allocated_by", "quality_manager"], "channel": ["email"] },
-    "on_resubmit":     { "notify": ["quality_manager"], "channel": ["email", "teams"] }
+    "on_allocate": {
+      "notify": [
+        "allocated_by"
+      ],
+      "channel": [
+        "email",
+        "teams"
+      ]
+    },
+    "on_void": {
+      "notify": [
+        "allocated_by"
+      ],
+      "channel": [
+        "email",
+        "teams"
+      ]
+    },
+    "on_submit": {
+      "notify": [
+        "quality_manager",
+        "department_head"
+      ],
+      "channel": [
+        "email",
+        "teams"
+      ]
+    },
+    "on_auto_void": {
+      "notify": [
+        "allocated_by",
+        "quality_manager"
+      ],
+      "channel": [
+        "email"
+      ]
+    },
+    "on_resubmit": {
+      "notify": [
+        "quality_manager"
+      ],
+      "channel": [
+        "email",
+        "teams"
+      ]
+    }
   },
-
   "validation_rules": {
     "record_id_unique": true,
     "form_code_must_exist_in_registry": true,

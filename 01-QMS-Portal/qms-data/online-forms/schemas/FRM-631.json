@@ -122,11 +122,31 @@
       "required": true,
       "width": "third",
       "options": [
-        { "value": "PRO", "label": "Production", "label_vi": "Sản xuất" },
-        { "value": "ENG", "label": "Engineering", "label_vi": "Kỹ thuật" },
-        { "value": "QA", "label": "Quality", "label_vi": "Chất lượng" },
-        { "value": "SCM", "label": "Supply Chain", "label_vi": "Chuỗi cung ứng" },
-        { "value": "WH", "label": "Warehouse", "label_vi": "Kho vận" }
+        {
+          "value": "PRO",
+          "label": "Production",
+          "label_vi": "Sản xuất"
+        },
+        {
+          "value": "ENG",
+          "label": "Engineering",
+          "label_vi": "Kỹ thuật"
+        },
+        {
+          "value": "QA",
+          "label": "Quality",
+          "label_vi": "Chất lượng"
+        },
+        {
+          "value": "SCM",
+          "label": "Supply Chain",
+          "label_vi": "Chuỗi cung ứng"
+        },
+        {
+          "value": "WH",
+          "label": "Warehouse",
+          "label_vi": "Kho vận"
+        }
       ]
     },
     {
@@ -138,7 +158,10 @@
       "width": "third",
       "lookup_source": "customers",
       "strict_select": true,
-      "display_fields": ["customer_id", "customer_name"],
+      "display_fields": [
+        "customer_id",
+        "customer_name"
+      ],
       "placeholder": "Search governed customer",
       "placeholder_vi": "Tìm khách hàng đã được quản lý"
     },
@@ -151,8 +174,13 @@
       "width": "third",
       "lookup_source": "sales_orders",
       "strict_select": true,
-      "depends_on": ["customer_id"],
-      "display_fields": ["so_number", "customer_id"],
+      "depends_on": [
+        "customer_id"
+      ],
+      "display_fields": [
+        "so_number",
+        "customer_id"
+      ],
       "autofill_map": {
         "customer_id": "customer_id",
         "so_number": "so_number"
@@ -169,8 +197,14 @@
       "width": "third",
       "lookup_source": "job_orders",
       "strict_select": true,
-      "depends_on": ["so_number"],
-      "display_fields": ["jo_number", "part_number", "part_revision"],
+      "depends_on": [
+        "so_number"
+      ],
+      "display_fields": [
+        "jo_number",
+        "part_number",
+        "part_revision"
+      ],
       "autofill_map": {
         "customer_id": "customer_id",
         "so_number": "so_number",
@@ -190,8 +224,13 @@
       "width": "third",
       "lookup_source": "work_orders",
       "strict_select": true,
-      "depends_on": ["jo_number"],
-      "display_fields": ["wo_number", "operation_desc"],
+      "depends_on": [
+        "jo_number"
+      ],
+      "display_fields": [
+        "wo_number",
+        "operation_desc"
+      ],
       "autofill_map": {
         "customer_id": "customer_id",
         "so_number": "so_number",
@@ -212,8 +251,13 @@
       "width": "third",
       "lookup_source": "parts",
       "strict_select": true,
-      "depends_on": ["customer_id"],
-      "display_fields": ["part_number", "part_description"],
+      "depends_on": [
+        "customer_id"
+      ],
+      "display_fields": [
+        "part_number",
+        "part_description"
+      ],
       "autofill_map": {
         "customer_id": "customer_id",
         "part_number": "part_number"
@@ -230,8 +274,13 @@
       "width": "third",
       "lookup_source": "revisions",
       "strict_select": true,
-      "depends_on": ["part_number"],
-      "display_fields": ["revision", "status"],
+      "depends_on": [
+        "part_number"
+      ],
+      "display_fields": [
+        "revision",
+        "status"
+      ],
       "autofill_map": {
         "part_number": "part_number",
         "part_revision": "part_revision"
@@ -258,7 +307,10 @@
       "width": "third",
       "lookup_source": "suppliers",
       "strict_select": true,
-      "display_fields": ["supplier_id", "supplier_name"],
+      "display_fields": [
+        "supplier_id",
+        "supplier_name"
+      ],
       "placeholder": "Search supplier",
       "placeholder_vi": "Tìm nhà cung cấp"
     },
@@ -271,8 +323,15 @@
       "width": "third",
       "lookup_source": "capas",
       "strict_select": true,
-      "depends_on": ["customer_id", "part_number"],
-      "display_fields": ["capa_number", "title", "status"],
+      "depends_on": [
+        "customer_id",
+        "part_number"
+      ],
+      "display_fields": [
+        "capa_number",
+        "title",
+        "status"
+      ],
       "autofill_map": {
         "customer_id": "customer_id",
         "part_number": "part_number",
@@ -289,12 +348,36 @@
       "required": true,
       "width": "third",
       "options": [
-        { "value": "dimensional", "label": "Dimensional", "label_vi": "Kích thước" },
-        { "value": "surface", "label": "Surface", "label_vi": "Bề mặt" },
-        { "value": "material", "label": "Material", "label_vi": "Vật liệu" },
-        { "value": "documentation", "label": "Documentation", "label_vi": "Tài liệu" },
-        { "value": "process", "label": "Process", "label_vi": "Quy trình" },
-        { "value": "other", "label": "Other", "label_vi": "Khác" }
+        {
+          "value": "dimensional",
+          "label": "Dimensional",
+          "label_vi": "Kích thước"
+        },
+        {
+          "value": "surface",
+          "label": "Surface",
+          "label_vi": "Bề mặt"
+        },
+        {
+          "value": "material",
+          "label": "Material",
+          "label_vi": "Vật liệu"
+        },
+        {
+          "value": "documentation",
+          "label": "Documentation",
+          "label_vi": "Tài liệu"
+        },
+        {
+          "value": "process",
+          "label": "Process",
+          "label_vi": "Quy trình"
+        },
+        {
+          "value": "other",
+          "label": "Other",
+          "label_vi": "Khác"
+        }
       ]
     },
     {
@@ -305,9 +388,21 @@
       "required": true,
       "width": "third",
       "options": [
-        { "value": "minor", "label": "Minor", "label_vi": "Nhẹ" },
-        { "value": "major", "label": "Major", "label_vi": "Nặng" },
-        { "value": "critical", "label": "Critical", "label_vi": "Nghiêm trọng" }
+        {
+          "value": "minor",
+          "label": "Minor",
+          "label_vi": "Nhẹ"
+        },
+        {
+          "value": "major",
+          "label": "Major",
+          "label_vi": "Nặng"
+        },
+        {
+          "value": "critical",
+          "label": "Critical",
+          "label_vi": "Nghiêm trọng"
+        }
       ]
     },
     {
@@ -339,12 +434,36 @@
       "width": "third",
       "default": "open",
       "options": [
-        { "value": "open", "label": "Open", "label_vi": "Mở" },
-        { "value": "containment", "label": "Containment", "label_vi": "Đang ngăn chặn" },
-        { "value": "investigation", "label": "Investigation", "label_vi": "Đang điều tra" },
-        { "value": "corrective_action", "label": "Corrective Action", "label_vi": "Đang khắc phục" },
-        { "value": "verification", "label": "Verification", "label_vi": "Đang xác nhận" },
-        { "value": "closed", "label": "Closed", "label_vi": "Đã đóng" }
+        {
+          "value": "open",
+          "label": "Open",
+          "label_vi": "Mở"
+        },
+        {
+          "value": "containment",
+          "label": "Containment",
+          "label_vi": "Đang ngăn chặn"
+        },
+        {
+          "value": "investigation",
+          "label": "Investigation",
+          "label_vi": "Đang điều tra"
+        },
+        {
+          "value": "corrective_action",
+          "label": "Corrective Action",
+          "label_vi": "Đang khắc phục"
+        },
+        {
+          "value": "verification",
+          "label": "Verification",
+          "label_vi": "Đang xác nhận"
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "label_vi": "Đã đóng"
+        }
       ]
     },
     {
@@ -375,11 +494,31 @@
       "required": true,
       "width": "third",
       "options": [
-        { "value": "rework", "label": "Rework", "label_vi": "Sửa chữa" },
-        { "value": "scrap", "label": "Scrap", "label_vi": "Phế phẩm" },
-        { "value": "use_as_is", "label": "Use As-Is", "label_vi": "Sử dụng nguyên trạng" },
-        { "value": "return_to_vendor", "label": "Return to Vendor", "label_vi": "Trả nhà cung cấp" },
-        { "value": "mrb", "label": "MRB", "label_vi": "MRB" }
+        {
+          "value": "rework",
+          "label": "Rework",
+          "label_vi": "Sửa chữa"
+        },
+        {
+          "value": "scrap",
+          "label": "Scrap",
+          "label_vi": "Phế phẩm"
+        },
+        {
+          "value": "use_as_is",
+          "label": "Use As-Is",
+          "label_vi": "Sử dụng nguyên trạng"
+        },
+        {
+          "value": "return_to_vendor",
+          "label": "Return to Vendor",
+          "label_vi": "Trả nhà cung cấp"
+        },
+        {
+          "value": "mrb",
+          "label": "MRB",
+          "label_vi": "MRB"
+        }
       ]
     },
     {
@@ -392,12 +531,36 @@
       "helper": "Select all contributing categories, not just one.",
       "helper_vi": "Cho phép chọn nhiều nhóm nguyên nhân đồng thời nếu có liên quan.",
       "options": [
-        { "value": "man", "label": "Man", "label_vi": "Con người" },
-        { "value": "machine", "label": "Machine", "label_vi": "Máy móc" },
-        { "value": "method", "label": "Method", "label_vi": "Phương pháp" },
-        { "value": "material", "label": "Material", "label_vi": "Vật liệu" },
-        { "value": "measurement", "label": "Measurement", "label_vi": "Đo lường" },
-        { "value": "environment", "label": "Environment", "label_vi": "Môi trường" }
+        {
+          "value": "man",
+          "label": "Man",
+          "label_vi": "Con người"
+        },
+        {
+          "value": "machine",
+          "label": "Machine",
+          "label_vi": "Máy móc"
+        },
+        {
+          "value": "method",
+          "label": "Method",
+          "label_vi": "Phương pháp"
+        },
+        {
+          "value": "material",
+          "label": "Material",
+          "label_vi": "Vật liệu"
+        },
+        {
+          "value": "measurement",
+          "label": "Measurement",
+          "label_vi": "Đo lường"
+        },
+        {
+          "value": "environment",
+          "label": "Environment",
+          "label_vi": "Môi trường"
+        }
       ]
     },
     {
@@ -512,9 +675,19 @@
       "required_on_submit": false
     }
   ],
-  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "auto_fields": [
+    "submitted_by",
+    "submitted_at",
+    "entry_id"
+  ],
   "notifications": {
-    "on_critical": ["qa_manager", "production_manager", "production_director"],
-    "on_submit": ["qa_manager"]
+    "on_critical": [
+      "qa_manager",
+      "production_manager",
+      "production_director"
+    ],
+    "on_submit": [
+      "qa_manager"
+    ]
   }
 }

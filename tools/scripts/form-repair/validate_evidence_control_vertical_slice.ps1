@@ -148,6 +148,18 @@ Invoke-Step "API actions present" {
   }
 }
 
+Invoke-Step "Governance services wired into api.php" {
+  $apiText = Get-Content -LiteralPath $apiFile -Raw
+  foreach ($token in @(
+    'master_data_service()',
+    'order_workflow_service()'
+  )) {
+    if ($apiText -notmatch [regex]::Escape($token)) {
+      throw "Missing governance service usage: $token"
+    }
+  }
+}
+
 Invoke-Step "Portal wiring present" {
   $portalHtml = Get-Content -LiteralPath (Join-Path $portalRoot "portal.html") -Raw
   foreach ($token in @(

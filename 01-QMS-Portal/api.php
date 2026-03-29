@@ -1868,6 +1868,44 @@ function save_master_data_store(array $data): void {
   write_json_file($MASTER_DATA_FILE, $data);
 }
 
+function master_data_entity_key(string $entity): ?string {
+  static $map = [
+    'customers' => 'customer_id',
+    'suppliers' => 'supplier_id',
+    'parts' => 'part_number',
+    'revisions' => 'revision_id',
+    'nc_program_releases' => 'program_id',
+    'capas' => 'capa_number',
+    'work_centers' => 'work_center_id',
+    'machines' => 'machine_id',
+    'operators' => 'operator_id',
+    'tooling_assets' => 'tool_id',
+    'downtime_reason_codes' => 'reason_code',
+    'downtime_resolution_codes' => 'resolution_code',
+  ];
+  return $map[$entity] ?? null;
+}
+
+function master_data_service(): \HESEM\QMS\Services\MasterDataService {
+  global $DATA_DIR;
+  require_once __DIR__ . '/api/services/MasterDataService.php';
+  static $service = null;
+  if ($service === null) {
+    $service = new \HESEM\QMS\Services\MasterDataService($DATA_DIR);
+  }
+  return $service;
+}
+
+function order_workflow_service(): \HESEM\QMS\Services\OrderWorkflowService {
+  global $DATA_DIR;
+  require_once __DIR__ . '/api/services/OrderWorkflowService.php';
+  static $service = null;
+  if ($service === null) {
+    $service = new \HESEM\QMS\Services\OrderWorkflowService($DATA_DIR);
+  }
+  return $service;
+}
+
 function mes_runtime_default(): array {
   return [
     '_meta' => [
@@ -9972,12 +10010,108 @@ if ($username === '') {
     $entity = trim((string)($body['entity'] ?? ''));
     $item = is_array($body['item'] ?? null) ? $body['item'] : null;
     if ($entity === '' || $item === null) api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    $idKey = master_data_entity_key($entity);
+    if ($idKey === null) api_json(['ok' => false, 'error' => 'invalid_master_entity'], 400);
 
     try {
-      $data = load_master_data_store();
-      $saved = upsert_master_data_item($data, $entity, $item, (string)($_SESSION['user'] ?? 'system'));
-      save_master_data_store($data);
-      api_json(['ok' => true, 'entity' => $entity, 'item' => $saved]);
+      $username = (string)($_SESSION['user'] ?? 'system');
+      $service = master_data_service();
+      $currentStore = load_master_data_store();
+      $recordId = trim((string)($item[$idKey] ?? ''));
+      if ($recordId === '') api_json(['ok' => false, 'error' => 'missing_master_key'], 400);
+
+      $existing = null;
+      foreach (($currentStore[$entity] ?? []) as $row) {
+        if (is_array($row) && (string)($row[$idKey] ?? '') === $recordId) {
+          $existing = $row;
+          break;
+        }
+      }
+
+      $requestedStatus = trim((string)($item['status'] ?? ''));
+      $reason = trim((string)($body['reason'] ?? ''));
+      if ($reason === '') {
+        $reason = $existing ? 'Cập nhật dữ liệu nền qua Master Data Control' : 'Tạo dữ liệu nền qua Master Data Control';
+      }
+
+      if ($existing === null) {
+        $createResult = $service->create($entity, $item, $username);
+        if (!$createResult->ok) {
+          $statusCode = in_array($createResult->errorCode, ['duplicate', 'duplicate_key'], true) ? 409 : 400;
+          api_json([
+            'ok' => false,
+            'error' => $createResult->errorCode ?? 'master_data_create_failed',
+            'message' => $createResult->message,
+            'data' => $createResult->data,
+          ], $statusCode);
+        }
+        $currentStore = load_master_data_store();
+        $saved = null;
+        foreach (($currentStore[$entity] ?? []) as $row) {
+          if (is_array($row) && (string)($row[$idKey] ?? '') === $recordId) {
+            $saved = $row;
+            break;
+          }
+        }
+        api_json([
+          'ok' => true,
+          'entity' => $entity,
+          'item' => $saved ?? ($createResult->data ?? $item),
+          'message' => $createResult->message,
+          'pending' => false,
+        ]);
+      }
+
+      $changes = $item;
+      unset($changes[$idKey], $changes['created_at'], $changes['created_by'], $changes['updated_at'], $changes['updated_by']);
+      unset($changes['status']);
+
+      $pending = false;
+      $pendingMeta = [];
+      if (!empty($changes)) {
+        $updateResult = $service->update($entity, $recordId, $changes, $username, $reason);
+        if (!$updateResult->ok) {
+          $statusCode = $updateResult->errorCode === 'not_found' ? 404 : 400;
+          api_json([
+            'ok' => false,
+            'error' => $updateResult->errorCode ?? 'master_data_update_failed',
+            'message' => $updateResult->message,
+            'data' => $updateResult->data,
+          ], $statusCode);
+        }
+        $pending = (($updateResult->data['status'] ?? '') === 'pending');
+        $pendingMeta = is_array($updateResult->data ?? null) ? $updateResult->data : [];
+      }
+
+      if (!$pending && $requestedStatus !== '' && strtolower((string)($existing['status'] ?? '')) !== strtolower($requestedStatus)) {
+        if (!$service->changeStatus($entity, $recordId, strtolower($requestedStatus), $username)) {
+          api_json([
+            'ok' => false,
+            'error' => 'invalid_status_transition',
+            'message' => 'Không thể chuyển trạng thái dữ liệu nền theo lifecycle rule hiện tại.',
+          ], 409);
+        }
+      }
+
+      $currentStore = load_master_data_store();
+      $saved = $existing;
+      foreach (($currentStore[$entity] ?? []) as $row) {
+        if (is_array($row) && (string)($row[$idKey] ?? '') === $recordId) {
+          $saved = $row;
+          break;
+        }
+      }
+      $message = $pending
+        ? 'Yêu cầu thay đổi đã được đưa vào hàng chờ phê duyệt.'
+        : 'Đã lưu dữ liệu nền có kiểm soát.';
+      api_json([
+        'ok' => true,
+        'entity' => $entity,
+        'item' => $saved,
+        'pending' => $pending,
+        'message' => $message,
+        'change_id' => $pendingMeta['change_id'] ?? null,
+      ]);
     } catch (Throwable $e) {
       api_json(['ok' => false, 'error' => $e->getMessage()], 400);
     }
@@ -10147,14 +10281,25 @@ if ($username === '') {
     $master = load_master_data_store();
     $mes = load_mes_runtime_store();
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $workflow = order_workflow_service();
     $reportStatus = strtolower(trim((string)($body['status'] ?? '')));
     $updatedWo = null;
     $context = [];
     foreach ($orders['work_orders'] as $idx => $row) {
       if (!is_array($row) || (string)($row['wo_number'] ?? '') !== $woNumber) continue;
       $currentStatus = strtolower(trim((string)($row['status'] ?? 'scheduled')));
-      if ($reportStatus !== '' && !order_transition_allowed('wo', $currentStatus, $reportStatus)) {
-        api_json(['ok' => false, 'error' => 'invalid_status_transition', 'from' => $currentStatus, 'to' => $reportStatus], 409);
+      if ($reportStatus !== '') {
+        $transitionCheck = $workflow->validateTransition('wo', $currentStatus, $reportStatus, (string)($me['role'] ?? ''));
+        if (!$transitionCheck->ok) {
+          api_json([
+            'ok' => false,
+            'error' => $transitionCheck->errorCode ?? 'invalid_status_transition',
+            'message' => $transitionCheck->message,
+            'from' => $currentStatus,
+            'to' => $reportStatus,
+            'allowed' => $transitionCheck->data['allowed'] ?? [],
+          ], 409);
+        }
       }
       $targetStatus = $reportStatus !== '' ? $reportStatus : $currentStatus;
       $ordersPreview = $orders;
@@ -10312,22 +10457,17 @@ if ($username === '') {
     $mes['downtime_events'][] = $event;
 
     if ($wo) {
-      foreach ($orders['work_orders'] as $idx => $row) {
-        if (!is_array($row) || (string)($row['wo_number'] ?? '') !== $woNumber) continue;
-        $currentStatus = strtolower(trim((string)($row['status'] ?? 'scheduled')));
-        if ($currentStatus !== 'completed' && $currentStatus !== 'on_hold' && order_transition_allowed('wo', $currentStatus, 'on_hold')) {
-          $orders['work_orders'][$idx]['status'] = 'on_hold';
-          $orders['work_orders'][$idx]['status_history'] = array_values((array)($orders['work_orders'][$idx]['status_history'] ?? []));
-          $orders['work_orders'][$idx]['status_history'][] = [
-            'status' => 'on_hold',
-            'timestamp' => now_iso(),
-            'user' => $username,
-            'note' => 'downtime:' . $event['downtime_id'],
-          ];
-          $orders['work_orders'][$idx]['updated_at'] = now_iso();
-          $orders['work_orders'][$idx]['updated_by'] = $username;
+      $workflow = order_workflow_service();
+      $currentWo = find_order_record($orders, 'wo', $woNumber);
+      $currentStatus = strtolower(trim((string)($currentWo['status'] ?? 'scheduled')));
+      if ($currentStatus !== 'completed' && $currentStatus !== 'on_hold') {
+        $transitionCheck = $workflow->validateTransition('wo', $currentStatus, 'on_hold', (string)($me['role'] ?? ''));
+        if ($transitionCheck->ok) {
+          $transitionResult = $workflow->executeTransition('wo', $woNumber, 'on_hold', $username, 'downtime:' . $event['downtime_id']);
+          if ($transitionResult->ok) {
+            $orders = load_orders_store();
+          }
         }
-        break;
       }
     }
 
@@ -10372,29 +10512,23 @@ if ($username === '') {
     $resumeStatus = strtolower(trim((string)($body['resume_status'] ?? 'running')));
     $woNumber = trim((string)($resolved['wo_number'] ?? ''));
     if ($woNumber !== '') {
-      foreach ($orders['work_orders'] as $idx => $row) {
-        if (!is_array($row) || (string)($row['wo_number'] ?? '') !== $woNumber) continue;
-        $currentStatus = strtolower(trim((string)($row['status'] ?? 'on_hold')));
-        if (order_transition_allowed('wo', $currentStatus, $resumeStatus)) {
-          $ordersPreview = $orders;
+      $workflow = order_workflow_service();
+      $currentWo = find_order_record($orders, 'wo', $woNumber);
+      $currentStatus = strtolower(trim((string)($currentWo['status'] ?? 'on_hold')));
+      $transitionCheck = $workflow->validateTransition('wo', $currentStatus, $resumeStatus, (string)($me['role'] ?? ''));
+      if ($transitionCheck->ok) {
+        $ordersPreview = $orders;
+        foreach ($ordersPreview['work_orders'] as $idx => $row) {
+          if (!is_array($row) || (string)($row['wo_number'] ?? '') !== $woNumber) continue;
           $ordersPreview['work_orders'][$idx]['status'] = $resumeStatus;
-          $launchGuard = mes_wo_transition_guard($ordersPreview, $master, $mes, $woNumber, $resumeStatus);
-          if ($launchGuard) api_json($launchGuard, 409);
-          $orders['work_orders'][$idx]['status'] = $resumeStatus;
-          $orders['work_orders'][$idx]['status_history'] = array_values((array)($orders['work_orders'][$idx]['status_history'] ?? []));
-          $orders['work_orders'][$idx]['status_history'][] = [
-            'status' => $resumeStatus,
-            'timestamp' => now_iso(),
-            'user' => $username,
-            'note' => 'downtime_resolved:' . $downtimeId,
-          ];
-          $orders['work_orders'][$idx]['updated_at'] = now_iso();
-          $orders['work_orders'][$idx]['updated_by'] = $username;
-          if (in_array($resumeStatus, ['setup', 'running', 'inspection'], true) && empty($orders['work_orders'][$idx]['actual_start'])) {
-            $orders['work_orders'][$idx]['actual_start'] = now_iso();
-          }
+          break;
         }
-        break;
+        $launchGuard = mes_wo_transition_guard($ordersPreview, $master, $mes, $woNumber, $resumeStatus);
+        if ($launchGuard) api_json($launchGuard, 409);
+        $transitionResult = $workflow->executeTransition('wo', $woNumber, $resumeStatus, $username, 'downtime_resolved:' . $downtimeId);
+        if ($transitionResult->ok) {
+          $orders = load_orders_store();
+        }
       }
     }
 
@@ -10781,21 +10915,27 @@ if ($username === '') {
     if ($orderId === '' || $newStatus === '') api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
 
     $orders = load_orders_store();
+    $workflow = order_workflow_service();
     $master = $entity === 'wo' ? load_master_data_store() : [];
     $mes = $entity === 'wo' ? load_mes_runtime_store() : [];
     $meta = order_entity_config($entity);
     $storeKey = $meta['store_key'];
     $idKey = $meta['number_key'];
-    $updated = null;
+    $existing = null;
+    $currentStatus = '';
     foreach ($orders[$storeKey] as $idx => $row) {
       if (!is_array($row) || (string)($row[$idKey] ?? '') !== $orderId) continue;
+      $existing = $row;
       $currentStatus = strtolower(trim((string)($row['status'] ?? '')));
-      if (!order_transition_allowed($entity, $currentStatus, $newStatus)) {
+      $transitionCheck = $workflow->validateTransition($entity, $currentStatus, $newStatus, (string)($me['role'] ?? ''));
+      if (!$transitionCheck->ok) {
         api_json([
           'ok' => false,
-          'error' => 'invalid_status_transition',
+          'error' => $transitionCheck->errorCode ?? 'invalid_status_transition',
+          'message' => $transitionCheck->message,
           'from' => $currentStatus,
           'to' => $newStatus,
+          'allowed' => $transitionCheck->data['allowed'] ?? [],
         ], 409);
       }
       if ($entity === 'wo') {
@@ -10804,38 +10944,22 @@ if ($username === '') {
         $launchGuard = mes_wo_transition_guard($ordersPreview, $master, $mes, $orderId, $newStatus);
         if ($launchGuard) api_json($launchGuard, 409);
       }
-      $orders[$storeKey][$idx]['status'] = $newStatus;
-      $orders[$storeKey][$idx]['updated_at'] = now_iso();
-      $orders[$storeKey][$idx]['updated_by'] = (string)($_SESSION['user'] ?? 'system');
-      $orders[$storeKey][$idx]['status_history'] = array_values((array)($orders[$storeKey][$idx]['status_history'] ?? []));
-      $statusNote = trim((string)($body['note'] ?? ''));
-      $historyEntry = [
-        'status' => $newStatus,
-        'timestamp' => now_iso(),
-        'user' => (string)($_SESSION['user'] ?? 'system'),
-      ];
-      if ($statusNote !== '') $historyEntry['note'] = $statusNote;
-      $orders[$storeKey][$idx]['status_history'][] = $historyEntry;
-      if ($entity === 'so' && $newStatus === 'shipped' && empty($orders[$storeKey][$idx]['shipped_date'])) {
-        $orders[$storeKey][$idx]['shipped_date'] = date('Y-m-d');
-      }
-      if ($entity === 'wo') {
-        if (in_array($newStatus, ['setup', 'running', 'inspection'], true) && empty($orders[$storeKey][$idx]['actual_start'])) {
-          $orders[$storeKey][$idx]['actual_start'] = now_iso();
-        }
-        if ($newStatus === 'completed' && empty($orders[$storeKey][$idx]['actual_end'])) {
-          $orders[$storeKey][$idx]['actual_end'] = now_iso();
-        }
-      }
-      if (in_array($newStatus, ['closed', 'completed'], true)) {
-        $orders[$storeKey][$idx]['closed_date'] = date('Y-m-d');
-      }
-      $updated = $orders[$storeKey][$idx];
       break;
     }
-    if (!$updated) api_json(['ok' => false, 'error' => 'not_found'], 404);
-    save_orders_store($orders);
-    api_json(['ok' => true, 'data' => $updated]);
+    if (!$existing) api_json(['ok' => false, 'error' => 'not_found'], 404);
+
+    $statusNote = trim((string)($body['note'] ?? ''));
+    $result = $workflow->executeTransition($entity, $orderId, $newStatus, (string)($_SESSION['user'] ?? 'system'), $statusNote !== '' ? $statusNote : null);
+    if (!$result->ok) {
+      $statusCode = $result->errorCode === 'not_found' ? 404 : 409;
+      api_json([
+        'ok' => false,
+        'error' => $result->errorCode ?? 'transition_failed',
+        'message' => $result->message,
+        'data' => $result->data,
+      ], $statusCode);
+    }
+    api_json(['ok' => true, 'data' => $result->data]);
   }
 
   // ── G2 P1-01: Retrieve linked forms for an order ────────────────
@@ -10854,94 +10978,109 @@ if ($username === '') {
     require_order_permission($me, $entity, 'edit');
 
     $orders = load_orders_store();
+    $workflow = order_workflow_service();
     $master = load_master_data_store();
     $meta = order_entity_config($entity);
     $storeKey = $meta['store_key'];
     $idKey = $meta['number_key'];
     $allowed = array_flip(order_editable_fields($entity));
     $username = (string)($_SESSION['user'] ?? 'system');
-    $updated = null;
 
     $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
     $operators = master_index_by((array)($master['operators'] ?? []), 'operator_id');
     $workCenters = master_index_by((array)($master['work_centers'] ?? []), 'work_center_id');
     $revisions = (array)($master['revisions'] ?? []);
 
-    foreach ($orders[$storeKey] as $idx => $row) {
-      if (!is_array($row) || (string)($row[$idKey] ?? '') !== $orderId) continue;
-
-      $audit = [];
-      foreach ($changes as $field => $rawValue) {
-        if (!is_string($field) || !isset($allowed[$field])) continue;
-        $newValue = order_normalize_edit_value($field, $rawValue);
-        $oldValue = $orders[$storeKey][$idx][$field] ?? null;
-        if (json_encode($oldValue, JSON_UNESCAPED_UNICODE) === json_encode($newValue, JSON_UNESCAPED_UNICODE)) {
-          continue;
-        }
-        $orders[$storeKey][$idx][$field] = $newValue;
-        $audit[] = [
-          'field' => $field,
-          'old' => $oldValue,
-          'new' => $newValue,
-        ];
-      }
-
-      if (!$audit) {
-        $updated = $orders[$storeKey][$idx];
+    $existing = null;
+    foreach ($orders[$storeKey] as $row) {
+      if (is_array($row) && (string)($row[$idKey] ?? '') === $orderId) {
+        $existing = $row;
         break;
       }
+    }
+    if (!$existing) api_json(['ok' => false, 'error' => 'not_found'], 404);
 
-      if ($entity === 'jo') {
-        $partNumber = trim((string)($orders[$storeKey][$idx]['part_number'] ?? ''));
-        $partRevision = trim((string)($orders[$storeKey][$idx]['part_revision'] ?? ''));
-        $hasRevision = false;
-        foreach ($revisions as $revision) {
-          if (!is_array($revision)) continue;
-          if ((string)($revision['part_number'] ?? '') === $partNumber && (string)($revision['revision'] ?? '') === $partRevision) {
-            $hasRevision = true;
-            break;
-          }
-        }
-        if (!$hasRevision) {
-          api_json(['ok' => false, 'error' => 'revision_not_found_for_part'], 422);
-        }
+    $sanitizedChanges = [];
+    foreach ($changes as $field => $rawValue) {
+      if (!is_string($field) || !isset($allowed[$field])) continue;
+      $newValue = order_normalize_edit_value($field, $rawValue);
+      $oldValue = $existing[$field] ?? null;
+      if (json_encode($oldValue, JSON_UNESCAPED_UNICODE) === json_encode($newValue, JSON_UNESCAPED_UNICODE)) {
+        continue;
       }
-
-      if ($entity === 'wo') {
-        $machineId = trim((string)($orders[$storeKey][$idx]['machine_id'] ?? ''));
-        $workCenterId = trim((string)($orders[$storeKey][$idx]['work_center_id'] ?? ''));
-        $operatorId = trim((string)($orders[$storeKey][$idx]['operator_id'] ?? ''));
-        if ($machineId !== '') {
-          if (!isset($machines[$machineId])) api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
-          $machineWorkCenter = trim((string)($machines[$machineId]['work_center_id'] ?? ''));
-          if ($machineWorkCenter !== '') {
-            $orders[$storeKey][$idx]['work_center_id'] = $machineWorkCenter;
-            $workCenterId = $machineWorkCenter;
-          }
-        }
-        if ($workCenterId !== '' && !isset($workCenters[$workCenterId])) api_json(['ok' => false, 'error' => 'work_center_not_found'], 404);
-        if ($operatorId !== '' && !isset($operators[$operatorId])) api_json(['ok' => false, 'error' => 'operator_not_found'], 404);
-        $mes = load_mes_runtime_store();
-        $currentStatus = strtolower(trim((string)($orders[$storeKey][$idx]['status'] ?? 'scheduled')));
-        $launchGuard = mes_wo_transition_guard($orders, $master, $mes, $orderId, $currentStatus);
-        if ($launchGuard) api_json($launchGuard, 409);
-      }
-
-      $orders[$storeKey][$idx]['updated_at'] = now_iso();
-      $orders[$storeKey][$idx]['updated_by'] = $username;
-      $orders[$storeKey][$idx]['change_history'] = array_values((array)($orders[$storeKey][$idx]['change_history'] ?? []));
-      $orders[$storeKey][$idx]['change_history'][] = [
-        'timestamp' => now_iso(),
-        'user' => $username,
-        'changes' => $audit,
-      ];
-      $updated = $orders[$storeKey][$idx];
-      break;
+      $sanitizedChanges[$field] = $newValue;
     }
 
-    if (!$updated) api_json(['ok' => false, 'error' => 'not_found'], 404);
-    save_orders_store($orders);
-    api_json(['ok' => true, 'data' => $updated]);
+    if (!$sanitizedChanges) {
+      api_json(['ok' => true, 'data' => $existing]);
+    }
+
+    $preview = array_merge($existing, $sanitizedChanges);
+
+    if ($entity === 'jo') {
+      $partNumber = trim((string)($preview['part_number'] ?? ''));
+      $partRevision = trim((string)($preview['part_revision'] ?? ''));
+      $hasRevision = false;
+      foreach ($revisions as $revision) {
+        if (!is_array($revision)) continue;
+        if ((string)($revision['part_number'] ?? '') === $partNumber && (string)($revision['revision'] ?? '') === $partRevision) {
+          $hasRevision = true;
+          break;
+        }
+      }
+      if (!$hasRevision) {
+        api_json(['ok' => false, 'error' => 'revision_not_found_for_part'], 422);
+      }
+    }
+
+    if ($entity === 'wo') {
+      $machineId = trim((string)($preview['machine_id'] ?? ''));
+      if ($machineId !== '') {
+        if (!isset($machines[$machineId])) api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
+        $machineWorkCenter = trim((string)($machines[$machineId]['work_center_id'] ?? ''));
+        if ($machineWorkCenter !== '') {
+          $preview['work_center_id'] = $machineWorkCenter;
+          $sanitizedChanges['work_center_id'] = $machineWorkCenter;
+        }
+      }
+      $workCenterId = trim((string)($preview['work_center_id'] ?? ''));
+      $operatorId = trim((string)($preview['operator_id'] ?? ''));
+      if ($workCenterId !== '' && !isset($workCenters[$workCenterId])) api_json(['ok' => false, 'error' => 'work_center_not_found'], 404);
+      if ($operatorId !== '' && !isset($operators[$operatorId])) api_json(['ok' => false, 'error' => 'operator_not_found'], 404);
+
+      $ordersPreview = $orders;
+      foreach ($ordersPreview[$storeKey] as $idx => $row) {
+        if (!is_array($row) || (string)($row[$idKey] ?? '') !== $orderId) continue;
+        $ordersPreview[$storeKey][$idx] = array_merge($row, $preview);
+        break;
+      }
+      $mes = load_mes_runtime_store();
+      $currentStatus = strtolower(trim((string)($existing['status'] ?? 'scheduled')));
+      $launchGuard = mes_wo_transition_guard($ordersPreview, $master, $mes, $orderId, $currentStatus);
+      if ($launchGuard) api_json($launchGuard, 409);
+    }
+
+    $reason = trim((string)($body['note'] ?? ''));
+    if ($reason === '') {
+      $reason = 'Controlled field update via Order Management';
+    }
+    $result = $workflow->executeFieldEdit($entity, $orderId, $sanitizedChanges, $username, $reason);
+    if (!$result->ok) {
+      $statusCode = match ($result->errorCode) {
+        'not_found' => 404,
+        'forbidden' => 403,
+        'validation_failed', 'field_locked', 'ecr_required', 'status_locked' => 409,
+        default => 400,
+      };
+      api_json([
+        'ok' => false,
+        'error' => $result->errorCode ?? 'order_edit_failed',
+        'message' => $result->message,
+        'data' => $result->data,
+      ], $statusCode);
+    }
+
+    api_json(['ok' => true, 'data' => $result->data]);
   }
 
   case 'order_get_linked_forms': {
