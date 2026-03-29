@@ -2177,7 +2177,8 @@ function allocation_status_normalize(string $status): string {
   $status = strtolower(trim($status));
   return match ($status) {
     'form_downloaded' => 'downloaded',
-    'allocated', 'downloaded', 'submitted', 'received', 'void' => $status,
+    'allocated', 'downloaded', 'submitted', 'received', 'void',
+    'in_review', 'approved', 'rejected' => $status,
     default => 'allocated',
   };
 }
@@ -7618,6 +7619,45 @@ if ($username === '') {
     $allocationStore['allocations'][] = $allocation;
     save_allocation_store($allocationStore);
 
+    // ── G2 P1-01: Auto-link evidence to order context ───────────────
+    $autoLinkResult = null;
+    $alJobNumber = trim((string)($body['job_number'] ?? ''));
+    $alWorkOrder = trim((string)($body['work_order'] ?? ''));
+    if ($alJobNumber !== '' || $alWorkOrder !== '') {
+      $alOrderType = $alWorkOrder !== '' ? 'wo' : 'jo';
+      $alOrderId   = $alWorkOrder !== '' ? $alWorkOrder : $alJobNumber;
+      $orders = load_orders_store();
+      if (find_order_record($orders, $alOrderType, $alOrderId)) {
+        // Check for duplicate link
+        $alDuplicate = false;
+        foreach (($orders['form_links'] ?? []) as $existingLink) {
+          if (is_array($existingLink)
+              && (string)($existingLink['order_type'] ?? '') === $alOrderType
+              && (string)($existingLink['order_id'] ?? '') === $alOrderId
+              && (string)($existingLink['record_id'] ?? '') === $recordId) {
+            $alDuplicate = true;
+            break;
+          }
+        }
+        if (!$alDuplicate) {
+          $autoLink = [
+            'link_id'    => 'LINK-' . date('YmdHis') . '-' . substr(md5($alOrderType . '|' . $alOrderId . '|' . $recordId), 0, 8),
+            'order_id'   => $alOrderId,
+            'order_type' => $alOrderType,
+            'record_id'  => $recordId,
+            'form_code'  => $formCode,
+            'status'     => 'linked',
+            'auto_linked'=> true,
+            'linked_at'  => now_iso(),
+            'linked_by'  => $createdBy,
+          ];
+          $orders['form_links'][] = $autoLink;
+          save_orders_store($orders);
+          $autoLinkResult = $autoLink;
+        }
+      }
+    }
+
     api_json([
       'ok' => true,
       'allocation_id' => $allocation['allocation_id'],
@@ -7631,6 +7671,7 @@ if ($username === '') {
       'blank_form_filename' => $allocation['blank_form_filename'],
       'suggested_filename' => $suggestedFilename,
       'allocation' => $allocation,
+      'auto_link' => $autoLinkResult,
     ]);
   }
 
@@ -8277,7 +8318,47 @@ if ($username === '') {
     // Keep max 1000 entries per form
     if (count($existing) > 1000) $existing = array_slice($existing, 0, 1000);
     file_put_contents($entryFile, json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
-    api_json(['ok' => true, 'entry_id' => $data['entry_id'] ?? '', 'count' => count($existing)]);
+
+    // ── G2 P1-01: Auto-link evidence to order context on form submit ──
+    $ofsAutoLink = null;
+    $ofsRecordId = strtoupper(trim((string)($data['record_id'] ?? $data['entry_id'] ?? '')));
+    $ofsJobNumber = trim((string)($data['job_number'] ?? $input['job_number'] ?? ''));
+    $ofsWorkOrder = trim((string)($data['work_order'] ?? $input['work_order'] ?? ''));
+    if ($ofsRecordId !== '' && ($ofsJobNumber !== '' || $ofsWorkOrder !== '')) {
+      $ofsOrderType = $ofsWorkOrder !== '' ? 'wo' : 'jo';
+      $ofsOrderId   = $ofsWorkOrder !== '' ? $ofsWorkOrder : $ofsJobNumber;
+      $ofsOrders = load_orders_store();
+      if (find_order_record($ofsOrders, $ofsOrderType, $ofsOrderId)) {
+        $ofsDup = false;
+        foreach (($ofsOrders['form_links'] ?? []) as $el) {
+          if (is_array($el)
+              && (string)($el['order_type'] ?? '') === $ofsOrderType
+              && (string)($el['order_id'] ?? '') === $ofsOrderId
+              && (string)($el['record_id'] ?? '') === $ofsRecordId) {
+            $ofsDup = true;
+            break;
+          }
+        }
+        if (!$ofsDup) {
+          $ofsLink = [
+            'link_id'    => 'LINK-' . date('YmdHis') . '-' . substr(md5($ofsOrderType . '|' . $ofsOrderId . '|' . $ofsRecordId), 0, 8),
+            'order_id'   => $ofsOrderId,
+            'order_type' => $ofsOrderType,
+            'record_id'  => $ofsRecordId,
+            'form_code'  => $code,
+            'status'     => 'linked',
+            'auto_linked'=> true,
+            'linked_at'  => now_iso(),
+            'linked_by'  => (string)($_SESSION['user'] ?? 'system'),
+          ];
+          $ofsOrders['form_links'][] = $ofsLink;
+          save_orders_store($ofsOrders);
+          $ofsAutoLink = $ofsLink;
+        }
+      }
+    }
+
+    api_json(['ok' => true, 'entry_id' => $data['entry_id'] ?? '', 'count' => count($existing), 'auto_link' => $ofsAutoLink]);
   }
 
   case 'online_form_entries': {
@@ -8551,6 +8632,59 @@ if ($username === '') {
     if (!$updated) api_json(['ok' => false, 'error' => 'not_found'], 404);
     save_orders_store($orders);
     api_json(['ok' => true, 'data' => $updated]);
+  }
+
+  // ── G2 P1-01: Retrieve linked forms for an order ────────────────
+  case 'order_get_linked_forms': {
+    $me = require_logged_in($store);
+    $orderType = strtolower(trim((string)($_GET['order_type'] ?? '')));
+    $orderId   = trim((string)($_GET['order_id'] ?? ''));
+    if ($orderId === '' || !in_array($orderType, ['so', 'jo', 'wo'], true)) {
+      api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    }
+    require_order_permission($me, $orderType, 'view');
+
+    $orders = load_orders_store();
+    if (!find_order_record($orders, $orderType, $orderId)) {
+      api_json(['ok' => false, 'error' => 'order_not_found'], 404);
+    }
+    $links = array_values(array_filter((array)($orders['form_links'] ?? []), function ($row) use ($orderType, $orderId) {
+      return is_array($row)
+        && (string)($row['order_type'] ?? '') === $orderType
+        && (string)($row['order_id'] ?? '') === $orderId;
+    }));
+
+    // Enrich each link with basic allocation/entry info when available
+    $allocationStore = null;
+    $enriched = array_map(function ($link) use (&$allocationStore) {
+      $rid = (string)($link['record_id'] ?? '');
+      $fc  = (string)($link['form_code'] ?? '');
+      $info = [
+        'link_id'     => (string)($link['link_id'] ?? ''),
+        'record_id'   => $rid,
+        'form_code'   => $fc,
+        'status'      => (string)($link['status'] ?? 'linked'),
+        'auto_linked' => (bool)($link['auto_linked'] ?? false),
+        'linked_at'   => (string)($link['linked_at'] ?? ''),
+        'linked_by'   => (string)($link['linked_by'] ?? ''),
+      ];
+      // Try to pull allocation status
+      if ($rid !== '') {
+        if ($allocationStore === null) $allocationStore = load_allocation_store();
+        foreach (($allocationStore['allocations'] ?? []) as $alloc) {
+          if (is_array($alloc) && (string)($alloc['record_id'] ?? '') === $rid) {
+            $info['alloc_status'] = (string)($alloc['status'] ?? '');
+            $info['delivery_mode'] = (string)($alloc['delivery_mode'] ?? '');
+            $info['created_at'] = (string)($alloc['created_at'] ?? '');
+            $info['created_by'] = (string)($alloc['created_by'] ?? '');
+            break;
+          }
+        }
+      }
+      return $info;
+    }, $links);
+
+    api_json(['ok' => true, 'forms' => $enriched]);
   }
 
   case 'order_link_form': {
