@@ -946,8 +946,15 @@ function openExceptionDetail(type){
     var rows = resp && Array.isArray(resp.items) ? resp.items : [];
     var meta = EXCEPTION_META[type] || { vi:type, en:type, icon:'•' };
     var body = rows.length ? '<table class="mesx-detail-table"><thead><tr><th>' + esc(t('Mã', 'ID')) + '</th><th>' + esc(t('Ngày', 'Date')) + '</th><th>' + esc(t('Phụ trách', 'Responsible')) + '</th><th>' + esc(t('Chi tiết', 'Detail')) + '</th></tr></thead><tbody>' + rows.map(function(item){ return '<tr><td class="mesx-code">' + esc(item.id || '') + '</td><td>' + esc(item.date || '—') + '</td><td>' + esc(item.responsible || '—') + '</td><td>' + esc(item.detail || '—') + '</td></tr>'; }).join('') + '</tbody></table>' : '<div class="mesx-empty"><strong>' + esc(t('Không có bản ghi exception', 'No exception records')) + '</strong>' + esc(t('Snapshot hiện tại không ghi nhận mục chi tiết nào trong nhóm này.', 'The current snapshot has no detail rows in this exception group.')) + '</div>';
-    showModal(t(meta.vi, meta.en), t('Hàng đợi chi tiết để trưởng ca / quản lý xử lý dứt điểm.', 'Detailed queue for supervisors and managers to close out.'), body + '<div class="mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Đóng', 'Close')) + '</button></div>');
+    showModal(t(meta.vi, meta.en), t('Hàng đợi chi tiết để trưởng ca / quản lý xử lý dứt điểm.', 'Detailed queue for supervisors and managers to close out.'), body + '<div class="mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-open-exception-dashboard>⚠️ ' + esc(t('Mở bảng ngoại lệ', 'Open exception dashboard')) + '</button><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Đóng', 'Close')) + '</button></div>');
     bindModalButtons();
+    var jump = document.querySelector('.mesx-modal [data-open-exception-dashboard]');
+    if(jump){
+      jump.onclick = function(){
+        closeModal();
+        if(typeof navigateTo === 'function') navigateTo('exceptions');
+      };
+    }
   }).catch(function(error){
     toast(t('Không thể tải chi tiết exception.', 'Could not load the exception detail.'), 'error');
     if(window.console) console.error(error);

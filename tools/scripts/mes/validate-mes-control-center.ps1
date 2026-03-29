@@ -43,7 +43,8 @@ $jsFiles = @(
   (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\09d-upload-verify.js"),
   (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\09e-so-jo-wo-dashboard.js"),
   (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\13-master-data-control.js"),
-  (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\14-mes-control-center.js")
+  (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\14-mes-control-center.js"),
+  (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\14-exception-dashboard.js")
 )
 
 $jsonFiles = @(
@@ -60,6 +61,7 @@ $wiringFiles = @(
   (Join-Path $RepoRoot "01-QMS-Portal\portal.html"),
   (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\02-state-auth-ui.js"),
   (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\14-mes-control-center.js"),
+  (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\14-exception-dashboard.js"),
   (Join-Path $RepoRoot "01-QMS-Portal\api.php")
 )
 
@@ -70,7 +72,8 @@ $mojibakeTargets = @(
   (Join-Path $RepoRoot "01-QMS-Portal\qms-data\online-forms\schemas\FRM-512.json"),
   (Join-Path $RepoRoot "01-QMS-Portal\qms-data\online-forms\schemas\FRM-519.json"),
   (Join-Path $RepoRoot "01-QMS-Portal\qms-data\online-forms\schemas\FRM-521.json"),
-  (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\14-mes-control-center.js")
+  (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\14-mes-control-center.js"),
+  (Join-Path $RepoRoot "01-QMS-Portal\scripts\portal\14-exception-dashboard.js")
 )
 
 Write-Step "PHP syntax"
@@ -97,7 +100,7 @@ foreach ($file in $jsonFiles) {
 
 Write-Step "MES wiring"
 $wiringCommand = @"
-rg -n 'page-mes|14-mes-control-center|_renderMesControlCenter|data-page=\"mes\"|mes_snapshot|mes_wo_report_progress|mes_downtime_create|mes_maintenance_create|mes_tooling_upsert' "$($wiringFiles -join '" "')"
+rg -n 'page-mes|page-exceptions|14-mes-control-center|14-exception-dashboard|_renderMesControlCenter|_renderExceptionDashboard|navigateTo\(''exceptions''\)|data-page=\"mes\"|mes_snapshot|exception_dashboard|exception_detail|mes_wo_report_progress|mes_downtime_create|mes_maintenance_create|mes_tooling_upsert' "$($wiringFiles -join '" "')"
 "@
 Invoke-Checked "MES wiring lookup" $wiringCommand
 
@@ -113,4 +116,4 @@ if ($rgExit -gt 1) {
 }
 
 Write-Step "MES validation completed"
-Write-Host "MES Control Center validation passed." -ForegroundColor Green
+Write-Host "MES Control Center + Exception Dashboard validation passed." -ForegroundColor Green
