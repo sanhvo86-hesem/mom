@@ -46,11 +46,11 @@ Nếu cần một sơ đồ điều hành ngắn gọn ở portal, có thể dù
 
 ---
 
-## 2. Section 6 — Cổng kiểm soát nội bộ (Internal Gates)
+## 2. Section 6 — Cổng kiểm soát nội bộ (IG)
 
 ### 2.1 Định nghĩa
 
-**Internal Gate (IG)** là điểm mà quy trình **không được phép đi tiếp** nếu chưa có:
+**IG** là điểm mà quy trình **không được phép đi tiếp** nếu chưa có:
 
 - điều kiện đầu vào đúng,
 - bằng chứng tối thiểu đúng,
@@ -62,7 +62,7 @@ Nếu cần một sơ đồ điều hành ngắn gọn ở portal, có thể dù
 | Ký hiệu | Nghĩa | Phạm vi |
 |---|---|---|
 | **G0→G7** | System gates | Toàn bộ vòng đời đơn hàng |
-| **IG1, IG2...** | Internal gates | Bên trong một SOP cụ thể |
+| **IG1, IG2...** | Cổng kiểm soát nội bộ | Bên trong một SOP cụ thể |
 
 ### 2.2 Khi nào phải tạo một IG
 

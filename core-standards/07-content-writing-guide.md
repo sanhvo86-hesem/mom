@@ -11,7 +11,7 @@
 | # | Nguyên tắc | Giải thích |
 |---|-----------|-----------|
 | 1 | Câu ngắn, rõ ràng, dùng để thi hành | Mỗi câu tối đa 25 từ. Người đọc phải hiểu ngay phải làm gì. |
-| 2 | Chủ ngữ + hành động + đối tượng | Luôn nêu rõ AI làm, làm GÌ, với CÁI GÌ. |
+| 2 | Chủ ngữ + hành động + đối tượng | Luôn nêu rõ ai làm, làm GÌ, với CÁI GÌ. |
 | 3 | Không dùng câu diễn giải mơ hồ | Không viết "nhằm đảm bảo", "góp phần nâng cao", "hướng tới mục tiêu". |
 | 4 | Không meta-text | Không viết "tài liệu này nhằm mục đích...", "phần này mô tả...". |
 | 5 | Không "AI generated" | Không ghi "được tạo bởi AI", "AI generated", "auto-generated". |
@@ -102,9 +102,11 @@ Mỗi câu lệnh trong SOP/WI tuân theo pattern:
 
 ### Section 1: Mục đích
 
-- 3-5 bullet points.
+- Cho phép `1 câu điều hành rất ngắn` mở đầu nếu câu đó khóa đúng cơ chế vận hành thật của SOP.
+- Sau câu mở đầu, dùng `3-5 bullet points`.
 - Mọi bullet bắt đầu bằng **động từ** (Thiết lập, Kiểm soát, Đảm bảo, Quy định, Ngăn ngừa).
 - KHÔNG bắt đầu bằng danh từ ("Quy trình này...", "Tài liệu này...").
+- Câu mở đầu không được dài quá 1 câu, không được là meta-text và không được thay thế cho các bullet điều hành.
 - Phải được suy từ rủi ro bị chặn, quyết định được giữ và đầu ra phải khóa trong Section 6 / 7 của chính SOP đó.
 - Không dùng lại nguyên một bộ bullet cho nhiều SOP chỉ bằng cách thay danh từ.
 
@@ -270,7 +272,8 @@ Section 7 là **dòng công việc thực thi**. Mỗi bước chi tiết nên t
 
 ### Section 8: Ngoại lệ, thay đổi & làm lại
 
-- Dùng bảng ngoại lệ thay vì bullet list khi SOP có nhiều hold/restart/change path.
+- Mặc định dùng bảng ngoại lệ 5 cột.
+- Chỉ cho phép bullet list khi SOP thật sự là tài liệu governance hẹp, số tình huống ít, không có nhiều owner/gỡ hold khác nhau và không làm mất khả năng audit quyết định.
 - Mỗi dòng phải ghi: `tình huống + quy tắc xử lý bắt buộc + chủ trì + người gỡ hold hoặc phê duyệt tiếp + hồ sơ`.
 - Tình huống ngoại lệ phải được suy từ điểm hold, restart, revalidation, partial release, waiver, system-down hoặc change path thật trong Section 6 / 7.
 - Không thêm ngoại lệ trang trí không xuất phát từ vận hành thực của SOP.

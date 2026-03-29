@@ -196,7 +196,14 @@ Format chuẩn:
   - `Quy tắc xử lý bắt buộc`
   - `Chủ trì`
   - `Người gỡ hold / phê duyệt tiếp`
-  - `Hồ sơ`
+- `Hồ sơ`
+
+Chỉ cho phép thay bảng bằng bullet list khi đồng thời thỏa cả 4 điều kiện:
+
+- SOP là governance hẹp, ít nhánh ngoại lệ và không phải flow transaction/shop-floor.
+- Số tình huống thực tế ít, ổn định và không vượt quá mức cần theo dõi bằng bảng.
+- Không có nhiều owner hoặc nhiều người gỡ hold khác nhau giữa các tình huống.
+- Cách trình bày bullet không làm mất khả năng audit về quyết định, escalation và hồ sơ.
 
 Nguồn scenario phải lấy từ:
 
@@ -265,6 +272,7 @@ Section 8 sai hướng khi:
 - [ ] Section 5 không có box chung chung kiểu “khi cần”, “theo yêu cầu”.
 - [ ] Section 8 bao phủ đủ các scenario hold/restart/change/waiver thật.
 - [ ] Section 8 có rõ chủ trì, người gỡ hold và hồ sơ.
+- [ ] Nếu Section 8 không dùng bảng 5 cột, đã có lý do rõ ràng theo rule governance hẹp và không làm mất trace quyết định.
 - [ ] Không còn thuật ngữ nửa Anh nửa Việt, nhãn dịch hỏng hay dấu vết biên tập.
 
 ---

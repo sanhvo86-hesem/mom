@@ -25,7 +25,7 @@
       ⑧ TABLE OF CONTENTS            ← Mục lục dạng grid
       ⑨ NỘI DUNG CHÍNH               ← Sections 1-10
       ⑩ SECTION 6 + 7               ← IG table + flowchart + detailed procedure
-      ⑪ METRIC SECTION               ← KPI cards
+      ⑪ KPI SUMMARY (nếu có)         ← Chỉ dùng khi tài liệu thật sự cần thẻ KPI tóm tắt
       ⑫ LINKED DOCS                  ← Tài liệu liên kết
     </div></div>
   </div></div></div>
@@ -444,7 +444,8 @@ Core-standard **không được dùng** để biện minh cho cập nhật nội
 | 16 | Batch-upgrade nội dung `Section 1/2/3/4/5/8` bằng một bộ câu chung cho nhiều SOP | Dẫn tới sai boundary, sai role, sai exception và mất tính thực chiến |
 | 17 | Giữ lại note hướng dẫn biên tập, note benchmark hoặc note khác bản cũ trong body SOP | Tài liệu draft sẽ bẩn, sai ngữ cảnh vận hành và khó phát hành V0 |
 | 18 | Dùng list bullet cho Section 8 khi SOP có nhiều nhánh hold/restart/revalidation/change | Mất owner, mất người gỡ hold và khó audit |
-| 19 | Viết Section 3 bằng thuật ngữ nửa Anh nửa Việt hoặc lặp ngoặc | Làm mờ nghĩa vận hành và tạo lỗi dùng thuật ngữ trong thân SOP |
+| 19 | Bắt buộc `metric-grid` cho mọi SOP dù không có nhu cầu tóm tắt KPI riêng | Tạo section trang trí, trùng lặp KPI đã nằm trong Section 6 |
+| 20 | Viết Section 3 bằng thuật ngữ nửa Anh nửa Việt hoặc lặp ngoặc | Làm mờ nghĩa vận hành và tạo lỗi dùng thuật ngữ trong thân SOP |
 
 ---
 
@@ -473,7 +474,8 @@ Core-standard **không được dùng** để biện minh cho cập nhật nội
 - [ ] Section 4 bao phủ toàn bộ owner giữ IG và vai trò có quyền HOLD / RELEASE / RESTART / REVALIDATE / APPROVE EXCEPTION ?
 - [ ] Section 5 map được về trước IG1/B1, sau gate cuối/bước cuối và trigger restart/change/escalation thật ?
 - [ ] Section 5 không dùng ô mơ hồ kiểu `khi cần`, `theo yêu cầu`, `tài liệu liên quan` ?
-- [ ] Section 8 dùng table 5 cột khi có nhiều scenario, và mỗi scenario đều có chủ trì + người gỡ hold / phê duyệt tiếp + hồ sơ ?
+- [ ] Section 8 mặc định dùng table 5 cột; nếu dùng bullet list thì đã chứng minh SOP này là governance hẹp và không mất owner / người gỡ hold / hồ sơ ?
+- [ ] Mỗi scenario ở Section 8 đều có chủ trì + người gỡ hold / phê duyệt tiếp + hồ sơ ?
 - [ ] Body SOP không còn note biên tập, note benchmark, note khác bản cũ hay note phương pháp viết ?
 
 ### 5.4 Section 6 — Internal Gates
